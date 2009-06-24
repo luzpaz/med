@@ -58,36 +58,36 @@ int medsplitter(const char* inputfilename,
 
   //Pointer to the initial collection
   MEDSPLITTER::MESHCollection* collection; 
- 
+
   // Loading the mesh collection
   string input(inputfilename);
-  
+
   if (is_distributed ==0)
-    {
-      string meshname (mesh);
-      collection=new MEDSPLITTER::MESHCollection(input,meshname);
-    }
+  {
+    string meshname (mesh);
+    collection=new MEDSPLITTER::MESHCollection(input,meshname);
+  }
   else
     collection = new MEDSPLITTER::MESHCollection(input);
-  	  
+
   // Creating the graph and partitioning it	  
   MEDSPLITTER::Topology* new_topo;
   if (method==0)
     new_topo = collection->createPartition(nprocs,MEDSPLITTER::Graph::METIS);
   else
     new_topo = collection->createPartition(nprocs,MEDSPLITTER::Graph::SCOTCH);
-  
+
   // Creating a new mesh collection from the partitioning 
   MEDSPLITTER::MESHCollection new_collection(*collection, new_topo);
- 
+
   //Writing the output files (master + MED files)
   string output(outputfilename);
   new_collection.write(output);
-  
+
   // Casting the fields on the new collection
   if (meshonly!=0)
     new_collection.castAllFields(*collection);
   delete collection;
- 
+
   return 0;
 }

@@ -80,21 +80,21 @@ MESHCollectionMedXMLDriver::MESHCollectionMedXMLDriver(MESHCollection* collectio
  * 
  *\param filename XML file containing the list of MED v2.3 files
  * */
- 
+
 int MESHCollectionMedXMLDriver::read(char* filename)
 {
-  
+
   const char* LOC = "MEDSPLITTER::MESHCollectionDriver::read()";
   BEGIN_OF_MED(LOC);
-  
-		//ditributed meshes
-	vector<int*> cellglobal;
+
+  //ditributed meshes
+  vector<int*> cellglobal;
   vector<int*> nodeglobal;
   vector<int*> faceglobal;
-  
+
   int nbdomain;
 
-	m_master_filename=filename;
+  m_master_filename=filename;
 
   // reading ascii master file
   try{
@@ -143,111 +143,111 @@ int MESHCollectionMedXMLDriver::read(char* filename)
     int nbfiles = xpathObj->nodesetval ->nodeNr;
 
     for (int i=0; i<nbfiles;i++)
-      {
-        //reading information about the domain
+    {
+      //reading information about the domain
 
-        string host;
-        string meshname;
-        //char meshname[MED_TAILLE_NOM];
+      string host;
+      string meshname;
+      //char meshname[MED_TAILLE_NOM];
 
-        cellglobal[i]=0;
-        faceglobal[i]=0;
-        nodeglobal[i]=0;
-        
-        ////////////////////////////
-        //reading file names 
-        ////////////////////////////
-        ostringstream name_search_string;
-        name_search_string<<"//files/subfile[@id=\""<<i+1<<"\"]/name";
-        cout <<name_search_string.str()<<endl;
-        xmlXPathObjectPtr xpathObjfilename =
-          xmlXPathEvalExpression(BAD_CAST name_search_string.str().c_str(),xpathCtx);
-        if (xpathObjfilename->nodesetval ==0)
-          throw MEDEXCEPTION("MED XML reader : Error retrieving file name ");
-        //ostringstream filename(m_filename[i]);
-        m_filename[i]=(const char*)xpathObjfilename->nodesetval->nodeTab[0]->children->content;
-        //filename.flush();
-        //cout<<m_filename[i]<<endl;
-//				xmlNodePtr current =  xpathObj->nodesetval->nodeTab[i];
-//				xmlAttrPtr properties = current->properties;
-//        
-//        
-//				//browsing XML attributes of subfile node until "id" attribute is found
-//				while(strcmp((const char*)(properties->name),"id")!=0)
-//					properties=properties->next;
-//				sscanf((const char*)properties->children->content,"%d",&idomain);
-//				properties = current->properties;
-//    
-//				//browsing XML attributes of subfile node until "name" attribute is found
-//				while(strcmp((const char*)(properties->name),"name")!=0)
-//					properties=properties->next;
-//				m_filename[i]=(const char*)properties->children->content;
+      cellglobal[i]=0;
+      faceglobal[i]=0;
+      nodeglobal[i]=0;
 
-				////////////////////////////////
-				//reading the local mesh names
-				////////////////////////////////
-        ostringstream mesh_search_string;
-        mesh_search_string<<"//mapping/mesh/chunk[@subdomain=\""<<i+1<<"\"]/name";
-        
-        xmlXPathObjectPtr xpathMeshObj = xmlXPathEvalExpression(BAD_CAST mesh_search_string.str().c_str(),xpathCtx);
-        if (xpathMeshObj->nodesetval ==0)
-          throw MEDEXCEPTION("MED XML reader : Error retrieving mesh name ");
-        meshname=(const char*)xpathMeshObj->nodesetval->nodeTab[0]->children->content;
+      ////////////////////////////
+      //reading file names 
+      ////////////////////////////
+      ostringstream name_search_string;
+      name_search_string<<"//files/subfile[@id=\""<<i+1<<"\"]/name";
+      cout <<name_search_string.str()<<endl;
+      xmlXPathObjectPtr xpathObjfilename =
+        xmlXPathEvalExpression(BAD_CAST name_search_string.str().c_str(),xpathCtx);
+      if (xpathObjfilename->nodesetval ==0)
+        throw MEDEXCEPTION("MED XML reader : Error retrieving file name ");
+      //ostringstream filename(m_filename[i]);
+      m_filename[i]=(const char*)xpathObjfilename->nodesetval->nodeTab[0]->children->content;
+      //filename.flush();
+      //cout<<m_filename[i]<<endl;
+      //				xmlNodePtr current =  xpathObj->nodesetval->nodeTab[i];
+      //				xmlAttrPtr properties = current->properties;
+      //        
+      //        
+      //				//browsing XML attributes of subfile node until "id" attribute is found
+      //				while(strcmp((const char*)(properties->name),"id")!=0)
+      //					properties=properties->next;
+      //				sscanf((const char*)properties->children->content,"%d",&idomain);
+      //				properties = current->properties;
+      //    
+      //				//browsing XML attributes of subfile node until "name" attribute is found
+      //				while(strcmp((const char*)(properties->name),"name")!=0)
+      //					properties=properties->next;
+      //				m_filename[i]=(const char*)properties->children->content;
 
-         
-//         
-//				xmlXPathObjectPtr xpathMeshObj = xmlXPathEvalExpression(BAD_CAST "//mesh/chunk" , xpathCtx);
-//				int nbchunks = xpathMeshObj->nodesetval ->nodeNr;
-//				for (int ichunk=0; ichunk<nbchunks; ichunk++)
-//					{
-//						xmlNodePtr currentchunk =  xpathMeshObj->nodesetval->nodeTab[ichunk];
-//						xmlAttrPtr propertieschunk = currentchunk->properties;
-//						int id;
-//						sscanf((const char*)propertieschunk->children->content, "%d",&id);
-//						if (strcmp((const char*)propertieschunk->name, "subdomain")==0 && id==idomain)
-//							{
-//								propertieschunk=propertieschunk->next;
-//								meshstring=(const char*)propertieschunk->children->content;
-//							}
-//					}
-				
-//				if (idomain!=i+1)
-//					{
-//						cerr<<"Error : domain must be written from 1 to N in master file descriptor"<<endl;
-//						return 1;
-//					}
-        readSubdomain(meshname, cellglobal, faceglobal, nodeglobal, i);
-        xmlXPathFreeObject(xpathObjfilename);
-        
-        xmlXPathFreeObject(xpathMeshObj);
-	    }//loop on domains
-        
-        // LIBXML cleanup
+      ////////////////////////////////
+      //reading the local mesh names
+      ////////////////////////////////
+      ostringstream mesh_search_string;
+      mesh_search_string<<"//mapping/mesh/chunk[@subdomain=\""<<i+1<<"\"]/name";
+
+      xmlXPathObjectPtr xpathMeshObj = xmlXPathEvalExpression(BAD_CAST mesh_search_string.str().c_str(),xpathCtx);
+      if (xpathMeshObj->nodesetval ==0)
+        throw MEDEXCEPTION("MED XML reader : Error retrieving mesh name ");
+      meshname=(const char*)xpathMeshObj->nodesetval->nodeTab[0]->children->content;
+
+
+      //         
+      //				xmlXPathObjectPtr xpathMeshObj = xmlXPathEvalExpression(BAD_CAST "//mesh/chunk" , xpathCtx);
+      //				int nbchunks = xpathMeshObj->nodesetval ->nodeNr;
+      //				for (int ichunk=0; ichunk<nbchunks; ichunk++)
+      //					{
+      //						xmlNodePtr currentchunk =  xpathMeshObj->nodesetval->nodeTab[ichunk];
+      //						xmlAttrPtr propertieschunk = currentchunk->properties;
+      //						int id;
+      //						sscanf((const char*)propertieschunk->children->content, "%d",&id);
+      //						if (strcmp((const char*)propertieschunk->name, "subdomain")==0 && id==idomain)
+      //							{
+      //								propertieschunk=propertieschunk->next;
+      //								meshstring=(const char*)propertieschunk->children->content;
+      //							}
+      //					}
+
+      //				if (idomain!=i+1)
+      //					{
+      //						cerr<<"Error : domain must be written from 1 to N in master file descriptor"<<endl;
+      //						return 1;
+      //					}
+      readSubdomain(meshname, cellglobal, faceglobal, nodeglobal, i);
+      xmlXPathFreeObject(xpathObjfilename);
+
+      xmlXPathFreeObject(xpathMeshObj);
+    }//loop on domains
+
+    // LIBXML cleanup
     xmlXPathFreeObject(xpathObj); 
     xmlXPathFreeContext(xpathCtx); 
     xmlFreeDoc(master_doc); 
-  
-		MESSAGE_MED("end of read");
+
+    MESSAGE_MED("end of read");
   }//of try
   catch(...)
-    {
-      throw MEDEXCEPTION("I/O error reading parallel MED file");
-    }
-    
+  {
+    throw MEDEXCEPTION("I/O error reading parallel MED file");
+  }
+
   //creation of topology from mesh and connect zones
   ParallelTopology* aPT = new ParallelTopology
     ((m_collection->getMesh()), (m_collection->getCZ()), cellglobal, nodeglobal, faceglobal);
   m_collection->setTopology(aPT);
-    
+
   for (int i=0; i<nbdomain; i++)
-    {
-			if (cellglobal[i]!=0) delete[] cellglobal[i];
-			if (nodeglobal[i]!=0) delete[] nodeglobal[i];
-			if (faceglobal[i]!=0) delete[] faceglobal[i];
-    }
+  {
+    if (cellglobal[i]!=0) delete[] cellglobal[i];
+    if (nodeglobal[i]!=0) delete[] nodeglobal[i];
+    if (faceglobal[i]!=0) delete[] faceglobal[i];
+  }
 
   END_OF_MED(LOC);
-		return 0;
+  return 0;
 }
 
 
@@ -258,107 +258,107 @@ int MESHCollectionMedXMLDriver::read(char* filename)
  */
 void MESHCollectionMedXMLDriver::write(char* filename)
 {
-	
+
   const char* LOC = "MEDSPLITTER::MESHCollectionDriver::writeXML()";
   BEGIN_OF_MED(LOC);
- 
-	xmlDocPtr master_doc = 0;
-	xmlNodePtr root_node = 0, node, node2;
-	//	xmlDTDPtr dtd = 0;
 
-	char buff[256];
+  xmlDocPtr master_doc = 0;
+  xmlNodePtr root_node = 0, node, node2;
+  //	xmlDTDPtr dtd = 0;
 
-	//Creating the XML document
+  char buff[256];
 
-	master_doc = xmlNewDoc(BAD_CAST "1.0");
-	root_node = xmlNewNode(0, BAD_CAST "root");
-	xmlDocSetRootElement(master_doc,root_node);
-	
-	//Creating child nodes
+  //Creating the XML document
 
-	// Version tag
-	node = xmlNewChild(root_node, 0, BAD_CAST "version",0);
-	xmlNewProp(node, BAD_CAST "maj", BAD_CAST "2");
-	xmlNewProp(node, BAD_CAST "min", BAD_CAST "3");
-	xmlNewProp(node, BAD_CAST "ver", BAD_CAST "1");
+  master_doc = xmlNewDoc(BAD_CAST "1.0");
+  root_node = xmlNewNode(0, BAD_CAST "root");
+  xmlDocSetRootElement(master_doc,root_node);
 
-	//Description tag
+  //Creating child nodes
 
-	time_t present;
-	time( &present);
-	struct tm *time_asc = localtime(&present);
-	char date[6];
-	sprintf(date,"%02d%02d%02d",time_asc->tm_year
-					                ,time_asc->tm_mon+1
-					                ,time_asc->tm_mday);
+  // Version tag
+  node = xmlNewChild(root_node, 0, BAD_CAST "version",0);
+  xmlNewProp(node, BAD_CAST "maj", BAD_CAST "2");
+  xmlNewProp(node, BAD_CAST "min", BAD_CAST "3");
+  xmlNewProp(node, BAD_CAST "ver", BAD_CAST "1");
 
-	node = xmlNewChild(root_node,0, BAD_CAST "description",0);
+  //Description tag
 
-	xmlNewProp(node, BAD_CAST "what", BAD_CAST m_collection->getDescription().c_str());
-	xmlNewProp(node, BAD_CAST "when", BAD_CAST date);
-	
-	//Content tag
-	node =xmlNewChild(root_node,0, BAD_CAST "content",0);
-	node2 = xmlNewChild(node, 0, BAD_CAST "mesh",0);
-	xmlNewProp(node2, BAD_CAST "name", BAD_CAST m_collection->getName().c_str());
-	
-	//Splitting tag
-	node=xmlNewChild(root_node,0,BAD_CAST "splitting",0);
-	node2=xmlNewChild(node,0,BAD_CAST "subdomain",0);
-	sprintf(buff, "%d", m_collection->getMesh().size());
-	xmlNewProp(node2, BAD_CAST "number", BAD_CAST buff);
-	node2=xmlNewChild(node,0,BAD_CAST "global_numbering",0);
-	xmlNewProp(node2, BAD_CAST "present", BAD_CAST "yes");
+  time_t present;
+  time( &present);
+  struct tm *time_asc = localtime(&present);
+  char date[6];
+  sprintf(date,"%02d%02d%02d",time_asc->tm_year
+          ,time_asc->tm_mon+1
+          ,time_asc->tm_mday);
 
-	//Files tag
-	xmlNodePtr file_node=xmlNewChild(root_node,0,BAD_CAST "files",0);
+  node = xmlNewChild(root_node,0, BAD_CAST "description",0);
 
-	//Mapping tag
-	node = xmlNewChild(root_node,0,BAD_CAST "mapping",0);
-	xmlNodePtr mesh_node = xmlNewChild(node, 0, BAD_CAST "mesh",0);
-	xmlNewProp(mesh_node, BAD_CAST "name", BAD_CAST m_collection->getName().c_str());
+  xmlNewProp(node, BAD_CAST "what", BAD_CAST m_collection->getDescription().c_str());
+  xmlNewProp(node, BAD_CAST "when", BAD_CAST date);
 
-	int nbdomains= m_collection->getMesh().size();
-	m_filename.resize(nbdomains);
+  //Content tag
+  node =xmlNewChild(root_node,0, BAD_CAST "content",0);
+  node2 = xmlNewChild(node, 0, BAD_CAST "mesh",0);
+  xmlNewProp(node2, BAD_CAST "name", BAD_CAST m_collection->getName().c_str());
 
-	//loop on the domains
-	for (int idomain=nbdomains-1; idomain>=0;idomain--)
-		{
-			char distfilename[256];
-	
-			ostringstream suffix;
-			suffix << filename<< idomain+1 <<".med";
-		
-			strcpy(distfilename,suffix.str().c_str());
+  //Splitting tag
+  node=xmlNewChild(root_node,0,BAD_CAST "splitting",0);
+  node2=xmlNewChild(node,0,BAD_CAST "subdomain",0);
+  sprintf(buff, "%d", m_collection->getMesh().size());
+  xmlNewProp(node2, BAD_CAST "number", BAD_CAST buff);
+  node2=xmlNewChild(node,0,BAD_CAST "global_numbering",0);
+  xmlNewProp(node2, BAD_CAST "present", BAD_CAST "yes");
 
-			m_filename[idomain]=string(distfilename);
-		
-			MESSAGE_MED("File name "<<string(distfilename));
-		
-			int id=(m_collection->getMesh())[idomain]->addDriver(MEDMEM::MED_DRIVER,distfilename,(m_collection->getMesh())[idomain]->getName(),MED_EN::WRONLY);
-		
-			MESSAGE_MED("Start writing");
-			(m_collection->getMesh())[idomain]->write(id);
-			(m_collection->getMesh())[idomain]->rmDriver(id);
-		
-			//updating the ascii description file
-			node = xmlNewChild(file_node, 0, BAD_CAST "subfile",0);
-			sprintf (buff,"%d",idomain+1);
-			xmlNewProp(node, BAD_CAST "id", BAD_CAST buff);
-      xmlNewChild(node,0,BAD_CAST "name",BAD_CAST distfilename);
-      xmlNewChild(node,0,BAD_CAST "machine",BAD_CAST "localhost");
+  //Files tag
+  xmlNodePtr file_node=xmlNewChild(root_node,0,BAD_CAST "files",0);
 
-			node = xmlNewChild(mesh_node,0, BAD_CAST "chunk",0);
-			xmlNewProp(node, BAD_CAST "subdomain", BAD_CAST buff);
-      xmlNewChild(node,0,BAD_CAST "name", BAD_CAST (m_collection->getMesh())[idomain]->getName().c_str());
-		
-			writeSubdomain(idomain, nbdomains, distfilename);
-		}
-	strcat(filename,".xml");
-	m_master_filename=filename;
-	xmlSaveFormatFileEnc(filename, master_doc, "UTF-8", 1);
- 	xmlFreeDoc(master_doc);
-	xmlCleanupParser();
+  //Mapping tag
+  node = xmlNewChild(root_node,0,BAD_CAST "mapping",0);
+  xmlNodePtr mesh_node = xmlNewChild(node, 0, BAD_CAST "mesh",0);
+  xmlNewProp(mesh_node, BAD_CAST "name", BAD_CAST m_collection->getName().c_str());
+
+  int nbdomains= m_collection->getMesh().size();
+  m_filename.resize(nbdomains);
+
+  //loop on the domains
+  for (int idomain=nbdomains-1; idomain>=0;idomain--)
+  {
+    char distfilename[256];
+
+    ostringstream suffix;
+    suffix << filename<< idomain+1 <<".med";
+
+    strcpy(distfilename,suffix.str().c_str());
+
+    m_filename[idomain]=string(distfilename);
+
+    MESSAGE_MED("File name "<<string(distfilename));
+
+    int id=(m_collection->getMesh())[idomain]->addDriver(MEDMEM::MED_DRIVER,distfilename,(m_collection->getMesh())[idomain]->getName(),MED_EN::WRONLY);
+
+    MESSAGE_MED("Start writing");
+    (m_collection->getMesh())[idomain]->write(id);
+    (m_collection->getMesh())[idomain]->rmDriver(id);
+
+    //updating the ascii description file
+    node = xmlNewChild(file_node, 0, BAD_CAST "subfile",0);
+    sprintf (buff,"%d",idomain+1);
+    xmlNewProp(node, BAD_CAST "id", BAD_CAST buff);
+    xmlNewChild(node,0,BAD_CAST "name",BAD_CAST distfilename);
+    xmlNewChild(node,0,BAD_CAST "machine",BAD_CAST "localhost");
+
+    node = xmlNewChild(mesh_node,0, BAD_CAST "chunk",0);
+    xmlNewProp(node, BAD_CAST "subdomain", BAD_CAST buff);
+    xmlNewChild(node,0,BAD_CAST "name", BAD_CAST (m_collection->getMesh())[idomain]->getName().c_str());
+
+    writeSubdomain(idomain, nbdomains, distfilename);
+  }
+  strcat(filename,".xml");
+  m_master_filename=filename;
+  xmlSaveFormatFileEnc(filename, master_doc, "UTF-8", 1);
+  xmlFreeDoc(master_doc);
+  xmlCleanupParser();
 
   END_OF_MED(LOC);
 

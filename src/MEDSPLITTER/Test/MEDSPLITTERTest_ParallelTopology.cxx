@@ -114,61 +114,61 @@ void MEDSPLITTERTest::testParallelTopology_graph_constructor()
   string filename_para_wr            = tmp_dir + "/myWrField_seq_pointe22_";
   string filename_para_med0           = tmp_dir + "/myWrField_seq_pointe22_1.med";
   string filename_para_med1           = tmp_dir + "/myWrField_seq_pointe22_2.med";
-  
+
   string meshname="carre_en_quad4";
   MESHCollection collection(filename_rd,meshname);
-  
+
   MEDMEM::MEDSKYLINEARRAY* array=0;
   int* edgeweights=0;
-    
+
   collection.buildCellGraph(array,edgeweights);
-    
+
   boost::shared_ptr<Graph> cell_graph=boost::shared_ptr<Graph>(new METISGraph(array,edgeweights));
-         
+
   cell_graph->partGraph(2,"");
-  
+
   //cell_graph is a shared pointer 
   Topology* topology = new ParallelTopology (cell_graph, 2, collection.getMeshDimension());
-  
-  
-	/*
-	 * test_SPLITTER_square
-	 * 
-	 * computes a partitioning for the following geometry
-	 * 
-	 * 
-	 * 
-	 * 7------------8------------9
-	 * |            |            |
-	 * |            |            |
-	 * |     3      |     4      |
-	 * |            |            |
-	 * |            |            |
-	 * 4------------5------------6
-	 * |            |            |
-	 * |            |            |
-	 * |     1      |     2      |
-	 * |            |            |
-	 * |            |            |
-	 * 1------------2------------3 
-	 *
-	 * Result of the 2 domain split :
-	 *  
-	 * 5------------6 5------------6
-	 * |            | |            |
-	 * |            | |            |
-	 * |     2      | |     2      |
-	 * |            | |            |
-	 * |            | |            |
-	 * 1------------2 1------------2
-	 * |            | |            |
-	 * |            | |            |
-	 * |     1      | |     1      |
-	 * |            | |            |
-	 * |            | |            |
-	 * 4------------3 4------------3 
-	 */
- 
+
+
+  /*
+   * test_SPLITTER_square
+   * 
+   * computes a partitioning for the following geometry
+   * 
+   * 
+   * 
+   * 7------------8------------9
+   * |            |            |
+   * |            |            |
+   * |     3      |     4      |
+   * |            |            |
+   * |            |            |
+   * 4------------5------------6
+   * |            |            |
+   * |            |            |
+   * |     1      |     2      |
+   * |            |            |
+   * |            |            |
+   * 1------------2------------3 
+   *
+   * Result of the 2 domain split :
+   *  
+   * 5------------6 5------------6
+   * |            | |            |
+   * |            | |            |
+   * |     2      | |     2      |
+   * |            | |            |
+   * |            | |            |
+   * 1------------2 1------------2
+   * |            | |            |
+   * |            | |            |
+   * |     1      | |     1      |
+   * |            | |            |
+   * |            | |            |
+   * 4------------3 4------------3 
+   */
+
   int iglobal[3]={1,2,3};
   int* iloc=new int[3];
   int* iproc=new int[3];
@@ -176,44 +176,44 @@ void MEDSPLITTERTest::testParallelTopology_graph_constructor()
   int iproc_answer[3]={0,1,0};
   topology->convertGlobalCellList(iglobal,3,iloc,iproc);
   for(int i=0; i<3; i++)
-		{ 
-			CPPUNIT_ASSERT_EQUAL(iloc_answer[i], iloc[i]);
-			CPPUNIT_ASSERT_EQUAL(iproc_answer[i],iproc[i]);
-		}
+  { 
+    CPPUNIT_ASSERT_EQUAL(iloc_answer[i], iloc[i]);
+    CPPUNIT_ASSERT_EQUAL(iproc_answer[i],iproc[i]);
+  }
   int* global_2 = new int[3];
   topology->convertCellToGlobal(0,iloc,3,global_2);
   int global_answer[3]={1,1,3};
   for (int i=0; i<3; i++)
-		{
-			CPPUNIT_ASSERT_EQUAL(global_answer[i],global_2[i]);
-		}
-  
+  {
+    CPPUNIT_ASSERT_EQUAL(global_answer[i],global_2[i]);
+  }
+
   CPPUNIT_ASSERT_EQUAL(topology->getCellNumber(0),2);  
   CPPUNIT_ASSERT_EQUAL(topology->getCellNumber(1),2);
-  
-    
+
+
   CPPUNIT_ASSERT_EQUAL(topology->nbCells(0),2);
   CPPUNIT_ASSERT_EQUAL(topology->nbCells(1),2);
-  
+
   CPPUNIT_ASSERT_EQUAL(topology->nbDomain(),2);
   //node and face lists have not yet been computed
   CPPUNIT_ASSERT_THROW(topology->convertGlobalNodeList(iglobal,3,iloc,iproc),MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(topology->convertGlobalFaceList(iglobal,3,iloc,iproc),MEDEXCEPTION);
-  
+
   MESHCollection new_collection(collection, topology);
-  
+
   CPPUNIT_ASSERT_EQUAL(topology->getNodeNumber(0),6);  
   CPPUNIT_ASSERT_EQUAL(topology->getNodeNumber(1),6);
-  
+
   topology->convertGlobalNodeList(iglobal,3,iloc,iproc);
-   
+
   int iloc_node_answer[3]={4,3,3};
   int iproc_node_answer[3]={0,0,1};
   for(int i=0; i<3; i++)
-		{ 
-			CPPUNIT_ASSERT_EQUAL(iloc_node_answer[i], iloc[i]);
-			CPPUNIT_ASSERT_EQUAL(iproc_node_answer[i],iproc[i]);
-		}
+  { 
+    CPPUNIT_ASSERT_EQUAL(iloc_node_answer[i], iloc[i]);
+    CPPUNIT_ASSERT_EQUAL(iproc_node_answer[i],iproc[i]);
+  }
   int* local_nodes;
   int* ip_nodes;
   int* full_array;
@@ -223,10 +223,10 @@ void MEDSPLITTERTest::testParallelTopology_graph_constructor()
   int iloc_node_wt_answer[4]={4,3,4,3};
   int iproc_node_wt_answer[4]={0,0,1,1};
   for(int i=0; i<4; i++)
-		{ 
-			CPPUNIT_ASSERT_EQUAL(iloc_node_wt_answer[i], local_nodes[i]);
-			CPPUNIT_ASSERT_EQUAL(iproc_node_wt_answer[i],ip_nodes[i]);
-		}
+  { 
+    CPPUNIT_ASSERT_EQUAL(iloc_node_wt_answer[i], local_nodes[i]);
+    CPPUNIT_ASSERT_EQUAL(iproc_node_wt_answer[i],ip_nodes[i]);
+  }
   delete topology;
   delete[] iloc;
   delete[]iproc;

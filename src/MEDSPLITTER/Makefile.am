@@ -79,6 +79,12 @@ libmedsplitter_la_LDFLAGS=
 #libmedsplitter_la_LDFLAGS= $(MED2_LIBS) $(HDF5_LIBS) $(STDLIB) $(LIBXML_LIBS) \
 #	../MEDMEM/libmedmem.la ../MEDWrapper/V2_1/Core/libmed_V2_1.la
 
+if MED_ENABLE_PARMETIS
+  libmedsplitter_la_CPPFLAGS+= $(PARMETIS_CPPFLAGS)
+  libmedsplitter_la_LDFLAGS+= $(PARMETIS_LIBS)
+  METIS_CPPFLAGS=
+  METIS_LIBS=
+endif
 if MED_ENABLE_METIS
   libmedsplitter_la_CPPFLAGS+= $(METIS_CPPFLAGS)
   libmedsplitter_la_LDFLAGS+= $(METIS_LIBS)
