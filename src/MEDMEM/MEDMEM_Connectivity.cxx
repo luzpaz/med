@@ -1381,8 +1381,14 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 		}
 	    }
 	}
-      if(eltsCounter.size()>2)
+      if(eltsCounter.size()>2) {
+        // free memory (issue 0020411: [CEA 342] Sigsegv on gibi writing of MESH coming from MED file without face computation)
+        delete [] descend_connectivity;
+        delete [] descend_connectivity_index;
+        delete [] ConstituentsTypes;
+        delete [] NumberOfConstituentsForeachType;
 	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Descending connectivity does not support more than 2 types."));
+      }
       status=eltsCounter.begin();
       if(!eltsCounter.empty())
       {
@@ -1513,9 +1519,18 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 		      if (NumberOfCellsInList > 0) { // We have found some elements !
 			int CellNumber = CellsList[0];
 			//delete [] CellsList;
-			if (NumberOfCellsInList>1)
+			if (NumberOfCellsInList>1) {
+                          // free memory (issue 0020411: [CEA 342] Sigsegv on gibi writing of MESH coming from MED file without face computation)
+                          delete [] CellsList;
+                          delete [] NodesLists;
+                          delete [] ReverseDescendingConnectivityValue;
+                          delete [] tmp_NumberOfConstituentsForeachType;
+                          delete [] descend_connectivity;
+                          delete [] descend_connectivity_index;
+                          delete [] ConstituentNodalConnectivity;
+                          delete [] ConstituentNodalConnectivityIndex;
 			  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"More than one other Cell ("<<NumberOfCellsInList<<") !"));
-
+                        }
 			if (NumberOfCellsInList==1)
 			  {
 			    ReverseDescendingConnectivityValue[(TotalNumberOfSubCell-1)*2+1]=CellNumber;
