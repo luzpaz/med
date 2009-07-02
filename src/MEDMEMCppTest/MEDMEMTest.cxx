@@ -701,3 +701,25 @@ bool MEDMEMTest_TmpFilesRemover::Register(const string theTmpFile)
 {
   return (myTmpFiles.insert(theTmpFile)).second;
 }
+
+//================================================================================
+/*!
+ * \brief Returns writable temporary directory
+ */
+//================================================================================
+
+string getTmpDirectory()
+{
+  string path;
+
+  list<string> dirs;
+  if ( getenv("TMP") ) dirs.push_back( getenv("TMP" ));
+  if ( getenv("TMPDIR") ) dirs.push_back( getenv("TMPDIR" ));
+  dirs.push_back( "/tmp" );
+
+  for ( list<string>::iterator dir = dirs.begin(); dir != dirs.end(); ++dir )
+    if ( access( dir->data(), W_OK ) == 0 )
+      return *dir;
+
+  throw std::runtime_error("Can't find writable temporary directory. Set TMP environment variable");
+}
