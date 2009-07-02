@@ -783,6 +783,7 @@ int MED_MESH_RDONLY_DRIVER22::getCONNECTIVITY()
       if (_ptrMesh->_meshDimension == 3) {
         MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DES FACES..." );
         CONNECTIVITY * ConnectivityFace = new CONNECTIVITY(MED_EN::MED_FACE) ;
+        ConnectivityFace->_numberOfNodes    = _ptrMesh->_numberOfNodes ;
 	ConnectivityFace->_typeConnectivity = Connectivity->_typeConnectivity ; // NODAL or DESCENDING
 	SCRUTE(ConnectivityFace->_typeConnectivity);
 	if (Connectivity->_typeConnectivity == MED_DESCENDING) {
@@ -813,6 +814,7 @@ int MED_MESH_RDONLY_DRIVER22::getCONNECTIVITY()
       if (_ptrMesh->_meshDimension > 1) { // we are in 3 or 2D 
         MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DES ARRETES...." );
 	CONNECTIVITY * ConnectivityEdge = new CONNECTIVITY(MED_EDGE) ;
+        ConnectivityEdge->_numberOfNodes    = _ptrMesh->_numberOfNodes ;
 	ConnectivityEdge->_typeConnectivity = Connectivity->_typeConnectivity ;
 	if (Connectivity->_typeConnectivity == MED_DESCENDING) {
           MESSAGE(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DESCENDANTE DES ARRETES" );
@@ -1155,6 +1157,7 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 
 	      // Create a CONNECTIVITY constituent to put in the top level CONNECTIVITY recursive class
 	      CONNECTIVITY * constituent = new CONNECTIVITY(numberOfFacesTypes,MED_EN::MED_FACE) ;
+              constituent->_numberOfNodes   = _ptrMesh->_numberOfNodes ; 
 	      constituent->_entityDimension = 2 ;
 	      constituent->_count[0]=1 ;
 
@@ -1295,6 +1298,7 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
 	  if (numberOfEdgesTypes!=0) 
 	    {
 	      CONNECTIVITY * constituent = new CONNECTIVITY(numberOfEdgesTypes,MED_EDGE) ;
+              constituent->_numberOfNodes   = _ptrMesh->_numberOfNodes ;
 	      constituent->_entityDimension = 1 ;
 	      constituent->_count[0]=1 ;
 
@@ -1516,6 +1520,7 @@ int MED_MESH_RDONLY_DRIVER22::getNodalConnectivity(CONNECTIVITY * Connectivity)
           {
             if (Connectivity->_constituent == NULL) // 3D mesh : polygons in Connectivity->_constituent
               Connectivity->_constituent = new CONNECTIVITY(MED_FACE);
+              Connectivity->_constituent->_numberOfNodes = _ptrMesh->_numberOfNodes ;
 //CCRT
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
             int* tmp_PolygonsConnectivity = new int[ConnectivitySize];
