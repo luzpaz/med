@@ -35,6 +35,7 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_AsciiFieldDriver.cxx \
 	MEDMEMTest_Connectivity.cxx \
 	MEDMEMTest_Coordinate.cxx \
+	MEDMEMTest_DesactivateFacesComputation.cxx \
 	MEDMEMTest_DriverFactory.cxx \
 	MEDMEMTest_Exception.cxx \
 	MEDMEMTest_Family.cxx \
@@ -54,7 +55,6 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_MedVersion.cxx \
 	MEDMEMTest_MeshAndMeshing.cxx \
 	MEDMEMTest_ModulusArray.cxx \
-	MEDMEMTest_nArray.cxx \
 	MEDMEMTest_PointerOf.cxx \
 	MEDMEMTest_PolyhedronArray.cxx \
 	MEDMEMTest_PorflowMeshDriver.cxx \
@@ -64,7 +64,8 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_Unit.cxx \
 	MEDMEMTest_VtkFieldDriver.cxx \
 	MEDMEMTest_VtkMedDriver.cxx \
-	MEDMEMTest_VtkMeshDriver.cxx
+	MEDMEMTest_VtkMeshDriver.cxx \
+	MEDMEMTest_nArray.cxx
 
 libMEDMEMCppTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED2_INCLUDES) $(HDF5_INCLUDES) \
 	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core
