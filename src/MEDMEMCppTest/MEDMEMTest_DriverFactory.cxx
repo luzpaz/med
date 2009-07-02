@@ -298,13 +298,32 @@ void MEDMEMTest::testDriverFactory()
   delete aDriver;
 
   // wronly
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMesh(GIBI_DRIVER, "anyfile", &mesh,
-                                                         "my driver name", MED_EN::WRONLY),
-                       MED_EXCEPTION);
+  // 0020412: [CEA 343] GIBI Driver is not usable using MESH::addDriver
+//   CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMesh(GIBI_DRIVER, "anyfile", &mesh,
+//                                                          "my driver name", MED_EN::WRONLY),
+//                        MED_EXCEPTION);
+  aDriver = DRIVERFACTORY::buildDriverForMesh
+    (GIBI_DRIVER, "anyfile", &mesh, "my driver name", MED_EN::WRONLY);
+  CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
+  CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
+
+  GIBI_MESH_WRONLY_DRIVER * aGibiWRDriverForMesh = dynamic_cast<GIBI_MESH_WRONLY_DRIVER*>(aDriver);
+  CPPUNIT_ASSERT(aGibiWRDriverForMesh);
+  delete aDriver;
+
   // rdwr
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMesh(GIBI_DRIVER, "anyfile", &mesh,
-                                                         "my driver name", MED_EN::RDWR),
-                       MED_EXCEPTION);
+  // 0020412: [CEA 343] GIBI Driver is not usable using MESH::addDriver
+//   CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMesh(GIBI_DRIVER, "anyfile", &mesh,
+//                                                          "my driver name", MED_EN::RDWR),
+//                        MED_EXCEPTION);
+  aDriver = DRIVERFACTORY::buildDriverForMesh
+    (GIBI_DRIVER, "anyfile", &mesh, "my driver name", MED_EN::RDWR);
+  CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
+  CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
+
+  GIBI_MESH_RDWR_DRIVER * aGibiRWDriverForMesh = dynamic_cast<GIBI_MESH_RDWR_DRIVER*>(aDriver);
+  CPPUNIT_ASSERT(aGibiRWDriverForMesh);
+  delete aDriver;
 
   // 4.3: PORFLOW_DRIVER
 
