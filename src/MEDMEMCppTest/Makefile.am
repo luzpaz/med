@@ -35,6 +35,7 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_AsciiFieldDriver.cxx \
 	MEDMEMTest_Connectivity.cxx \
 	MEDMEMTest_Coordinate.cxx \
+	MEDMEMTest_DesactivateFacesComputation.cxx \
 	MEDMEMTest_DriverFactory.cxx \
 	MEDMEMTest_Exception.cxx \
 	MEDMEMTest_Extractor.cxx \
@@ -55,7 +56,6 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_MedVersion.cxx \
 	MEDMEMTest_MeshAndMeshing.cxx \
 	MEDMEMTest_ModulusArray.cxx \
-	MEDMEMTest_nArray.cxx \
 	MEDMEMTest_PointerOf.cxx \
 	MEDMEMTest_PolyhedronArray.cxx \
 	MEDMEMTest_PorflowMeshDriver.cxx \
@@ -66,6 +66,7 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_VtkFieldDriver.cxx \
 	MEDMEMTest_VtkMedDriver.cxx \
 	MEDMEMTest_VtkMeshDriver.cxx \
+	MEDMEMTest_nArray.cxx \
 	MEDMEMTest_Utils.hxx \
 	MEDMEMTest_Utils.cxx
 
