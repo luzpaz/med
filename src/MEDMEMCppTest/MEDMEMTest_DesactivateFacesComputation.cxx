@@ -181,9 +181,10 @@ void MEDMEMTest::testDesactivateFacesComputation()
   CPPUNIT_ASSERT_NO_THROW(nbOfTypes=mesh->getNumberOfTypes(MED_EN::MED_EDGE));
   CPPUNIT_ASSERT_EQUAL(0,nbOfTypes);
   MEDMEM::GIBI_MESH_WRONLY_DRIVER *gibidriver=new MEDMEM::GIBI_MESH_WRONLY_DRIVER(tmpGibiFile,mesh );
-  gibidriver->open();
-  gibidriver->write();
-  gibidriver->close();
+  id=mesh->addDriver(*gibidriver);
+  mesh->write(id);
+  CPPUNIT_ASSERT( access(tmpGibiFile.c_str(), F_OK) == 0 );
+
   delete gibidriver;
   delete driver;
   //
