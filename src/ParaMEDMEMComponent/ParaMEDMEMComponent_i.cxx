@@ -23,6 +23,37 @@
 #include "utilities.h"
 using namespace std;
 
+MPIMEDCouplingFieldDoubleServant::MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,ParaMEDMEM::ParaFIELD* field):ParaMEDMEM::MEDCouplingFieldDoubleServant(field->getField()),MPIObject_i()
+{
+  _pcompo = pcompo;
+  _field = field;
+  Engines::MPIObject_var pobj = POA_SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface::_this();
+  BCastIOR(orb,pobj,false);
+}
+
+void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling)
+{
+  pthread_t *th;
+  if(_numproc == 0){
+    th = new pthread_t[_nbproc];
+    for(int ip=1;ip<_nbproc;ip++){
+      thread_st *st = new thread_st;
+      st->ip = ip;
+      st->tior = _tior;
+      st->coupling = coupling;
+      pthread_create(&(th[ip]),NULL,th_getdatabympi,(void*)st);
+    }
+  }
+
+  _pcompo->getOutputFieldCoupling(coupling,_field);
+    
+  if(_numproc == 0){
+    for(int ip=1;ip<_nbproc;ip++)
+      pthread_join(th[ip],NULL);
+    delete[] th;
+  }
+}
+
 ParaMEDMEMComponent_i::ParaMEDMEMComponent_i() : Engines_Component_i(), MPIObject_i(), _commgroup(NULL)
 {
   _interface = new ParaMEDMEM::CommInterface();
@@ -196,3 +227,11 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling)
   delete _dec[coupling];
   _dec.erase(coupling);
 }
+
+void *th_getdatabympi(void *s)
+{
+  thread_st *st = (thread_st*)s;
+  (SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface::_narrow((*(st->tior))[st->ip]))->getDataByMPI(st->coupling.c_str());
+  delete st;
+}
+

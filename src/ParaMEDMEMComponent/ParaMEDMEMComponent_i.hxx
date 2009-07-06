@@ -31,7 +31,16 @@
 #include "IntersectionDEC.hxx"
 #include "MPIProcessorGroup.hxx"
 #include "CommInterface.hxx"
+#include "MEDCouplingFieldDoubleServant.hxx"
 #include <map>
+
+void * th_getdatabympi(void *st);
+
+typedef struct {
+  int ip;
+  std::string coupling;
+  Engines::IORTab* tior;
+} thread_st;
 
 class ParaMEDMEMComponent_i : public POA_SALOME_MED::ParaMEDMEMComponent, public Engines_Component_i, public MPIObject_i
 {
@@ -49,17 +58,29 @@ class ParaMEDMEMComponent_i : public POA_SALOME_MED::ParaMEDMEMComponent, public
 
   // Destructor
   ~ParaMEDMEMComponent_i();
+  void getOutputFieldCoupling(const char * coupling, ParaMEDMEM::ParaFIELD* field);
 
 protected:
   ParaMEDMEM::ProcessorGroup* _commgroup;
   void initializeCoupling(const char * coupling, const bool source);
   void setInputFieldCoupling(const char * coupling, ParaMEDMEM::ParaFIELD* field);
-  void getOutputFieldCoupling(const char * coupling, ParaMEDMEM::ParaFIELD* field);
   void terminateCoupling(const char * coupling);
 
 private:
   ParaMEDMEM::CommInterface* _interface;
   std::map<std::string,ParaMEDMEM::MPIProcessorGroup*> _source, _target;
   std::map<std::string,ParaMEDMEM::IntersectionDEC*> _dec;
+};
+
+class MPIMEDCouplingFieldDoubleServant : public POA_SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface,
+					 public ParaMEDMEM::MEDCouplingFieldDoubleServant,
+					 public MPIObject_i
+{
+public:
+  MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,ParaMEDMEM::ParaFIELD* field);
+  void getDataByMPI(const char* coupling);
+private:
+  ParaMEDMEMComponent_i *_pcompo;
+  ParaMEDMEM::ParaFIELD* _field;
 };
 #endif
