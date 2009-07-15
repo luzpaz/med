@@ -78,28 +78,21 @@ void MEDMEMTest::testPorflowMeshDriver()
   MESH *aMesh                      = new MESH();
   MESH *aMesh_1                    = new MESH();
 
-  string tmp_dir                   = getTmpDirectory();
   string filename_rd               = getResourceFile("Case1.inp");
-  string filename_wr               = tmp_dir  + "/myWr_Case1.inp";
+  string filename_wr               = makeTmpFile("myWr_Case1.inp");
   string meshname                  = "Case1";
   string newmeshname               = "new" + meshname;
   string fileNotExistsName_rd      = "notExists.inp";
   string fileNotExistsName_wr      = "/path_not_exists/file_not_exists.inp";
-  string filename_rdwr             =  tmp_dir  + "/myRdWr_Case1.inp";
-  string fcopy                     = "cp " + filename_rd  + " " + filename_rdwr;
-  string fcopy1                    = "cp " + getResourceFile("Case1.xyz") + " " + tmp_dir + "/Case1.xyz";
-  string fcopy2                    = "cp " + getResourceFile("Case1.cnc") + " " + tmp_dir + "/Case1.cnc";
-
-  //Copy files in the TMP dir for testing READ/WRITE case
-  system(fcopy.data());
-  system(fcopy1.data());
-  system(fcopy2.data());
+  string filename_rdwr             = makeTmpFile("myRdWr_Case1.inp", filename_rd);
+  string res_file1                 = makeTmpFile("Case1.xyz", getResourceFile("Case1.xyz"));
+  string res_file2                 = makeTmpFile("Case1.cnc", getResourceFile("Case1.cnc"));
 
   MEDMEMTest_TmpFilesRemover aRemover;
   aRemover.Register(filename_wr);
   aRemover.Register(filename_rdwr);
-  aRemover.Register(tmp_dir + "/Case1.xyz");
-  aRemover.Register(tmp_dir + "/Case1.cnc");
+  aRemover.Register(res_file1);
+  aRemover.Register(res_file2);
 
   //-----------------------------Test READ ONLY part---------------------------------------//
   {

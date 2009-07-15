@@ -127,8 +127,12 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType,
 	  return ret;
 	}
 	case RDWR :
+	  ret=new GIBI_MESH_RDWR_DRIVER(fileName,mesh);
+	  return ret;
+          
 	case WRONLY :{
-	  throw MED_EXCEPTION ("access mode other than MED_LECT has been specified with the GIBI_DRIVER type which is not allowed because GIBI_DRIVER is only a read access driver");
+	  ret=new GIBI_MESH_WRONLY_DRIVER(fileName,mesh);
+	  return ret;
 	}
  	default:
 	  throw MED_EXCEPTION ("access type has not been properly specified to the method");

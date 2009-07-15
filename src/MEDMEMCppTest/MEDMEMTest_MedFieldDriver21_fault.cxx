@@ -78,7 +78,6 @@ void MEDMEMTest_testMedFieldDriver21()
   FIELD<int> *aField                = new FIELD<int> ();
   FIELD<int> *aField_1              = new FIELD<int> ();
   FIELD<double> *aField_2           = new FIELD<double> ();
-  string tmp_dir                    = getTmpDirectory();
   string filename_rd                = getResourceFile("pointe.med");
   string filenameWithOutFileds      = getResourceFile("Mistrat.med");
   string fileldnotexist             = "anyfield";
@@ -87,17 +86,14 @@ void MEDMEMTest_testMedFieldDriver21()
   string fileNotExist_rd            = "notExist.med";
   string emptyfilename              = "";
 
-  string filename_wr                = tmp_dir + "/myWrField_pointe21.med";
-  string cp_file_wr                 = "cp " + filename_rd + " " + filename_wr;
+  string filename_wr                = makeTmpFile("myWrField_pointe21.med", filename_rd);
   string fileNotExist_wr            = "/path_not_exist/file_not_exist.med";
-  string emptyfile_wr               = tmp_dir + "/myWrField_pointe_empty21.med";
+  string emptyfile_wr               = makeTmpFile("myWrField_pointe_empty21.med");
   string other_file                 = getResourceFile("fra.med");
-  string other_file_wr              = tmp_dir + "/myWRfra.med";
-  string cp_other_file              = "cp " + other_file + " " + other_file_wr;
+  string other_file_wr              = makeTmpFile("myWRfra.med", other_file);
 
-  string filename_rdwr              = tmp_dir + "/myRdWrField_pointe21.med";
-  string cp_file_rdwr               = "cp " + filename_rd + " " + filename_rdwr;
-  string emptyfile_rdwr             = tmp_dir + "/myRdWrField_pointe_empty21.med";
+  string filename_rdwr              = makeTmpFile("myRdWrField_pointe21.med", filename_rd);
+  string emptyfile_rdwr             = makeTmpFile("myRdWrField_pointe_empty21.med");
   string fieldnameDouble            = "fieldnodedouble";
   string fieldnameDouble_cpy        = fieldnameDouble + "_cpy";
 
@@ -250,10 +246,6 @@ void MEDMEMTest_testMedFieldDriver21()
 
 
   //--------------------------Test WRITE ONLY part------------------------------//
-
-  //Copy file
-  system(cp_other_file.c_str());
-  system(cp_file_wr.c_str());
 
   /////////////////////////////////////
   //  TEST1: Open not existing file  //
@@ -410,8 +402,6 @@ void MEDMEMTest_testMedFieldDriver21()
 
   //--------------------------Test READ/WRITE part------------------------------//
 
-  //Copy files
-  system(cp_file_rdwr.c_str());
   /////////////////////////////////////
   //  TEST1: Open not existing file  //
   /////////////////////////////////////

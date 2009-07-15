@@ -76,12 +76,11 @@ void MEDMEMTest::testExtractor()
   // =======================
 
   // read a mesh from a MED file
-  string tmp_dir   = getTmpDirectory();
   string filename  = getResourceFile("pointe.med");
   string meshname  = "maa1";
   string fieldname = "fieldcelldoublescalar";
 
-  string result_file  = tmp_dir + "/extracted_2D.med";
+  string result_file = makeTmpFile("extracted_2D.med", filename);
 
   // To remove tmp files from disk
   MEDMEMTest_TmpFilesRemover aRemover;
@@ -113,10 +112,6 @@ void MEDMEMTest::testExtractor()
     CPPUNIT_ASSERT( !bool( resField ));
   }
   CPPUNIT_ASSERT_NO_THROW( resField = extractor->extractPlane(coords,normal ));
-
-  //Copy file with mesh to result_file
-  string cp_file = "cp " + filename + " " + result_file;
-  system(cp_file.c_str());
 
   // store extracted mesh
   MESH* mesh = resField->getSupport()->getMesh();
@@ -194,7 +189,7 @@ void MEDMEMTest::testExtractor()
   // store input mesh
 
   fieldname   = "doubleOnTria";
-  result_file = tmp_dir + "/extracted_1D.med";
+  result_file = makeTmpFile("extracted_1D.med");
 
   // To remove tmp files from disk
   aRemover.Register(result_file);
@@ -324,7 +319,7 @@ void MEDMEMTest::testExtractor()
   // store input mesh
 
   fieldname   = "doubleOnHex";
-  result_file = tmp_dir + "/extracted3D_1D.med";
+  result_file = makeTmpFile("extracted3D_1D.med");
 
   // To remove tmp files from disk
   aRemover.Register(result_file);

@@ -559,14 +559,11 @@ void proj2d (const double * temp, double* output)
 
 void testDrivers()
 {
-  string tmp_dir                      = getTmpDirectory();
-
   string filename_rd                  = getResourceFile("pointe.med");
-  string filename_wr                  = tmp_dir  + "/myMedFieldfile.med";
-  string filename_support_wr          = tmp_dir  + "/myMedSupportFiledfile.med";
+  string filename_wr                  = makeTmpFile("myMedFieldfile.med", filename_rd);
+  string filename_support_wr          = makeTmpFile("myMedSupportFiledfile.med");
   string filename22_rd                = getResourceFile("pointe_import22.med");
-  string filenamevtk_wr                = tmp_dir  + "/myMedFieldfile22.vtk";
-  string cp_file                      = "cp " + filename_rd + " " + filename_wr;
+  string filenamevtk_wr               = makeTmpFile("myMedFieldfile22.vtk");
 
   string fieldname_celldouble_rd      = "fieldcelldoublescalar";
   string fieldname_celldouble_wr      = fieldname_celldouble_rd + "_cpy";
@@ -580,9 +577,6 @@ void testDrivers()
   aRemover.Register(filename_wr);
   aRemover.Register(filenamevtk_wr);
   aRemover.Register(filename_support_wr);
-
-  //Copy file
-  system(cp_file.c_str());
 
   FIELD<int> aInvalidField;
   //must throw becase only VTK_DRIVER or MED_DRIVER may be specified as driverType for FIELD

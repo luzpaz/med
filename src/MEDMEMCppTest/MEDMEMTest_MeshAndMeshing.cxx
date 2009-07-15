@@ -241,9 +241,8 @@ void MEDMEMTest::testMeshAndMeshing()
 {
   string filename = getResourceFile("pointe.med");
   string meshname = "maa1";
-  string tmp_dir  = getTmpDirectory();
-  string filenameout21        = tmp_dir + "/myMeshWrite4_pointe21.med";
-  string filename_profiles_wr = tmp_dir + "/myMedProfilesFieldfile.med";
+  string filenameout21        = makeTmpFile("myMeshWrite4_pointe21.med");
+  string filename_profiles_wr = makeTmpFile("myMedProfilesFieldfile.med");
 
   // To remove tmp files from disk
   MEDMEMTest_TmpFilesRemover aRemover;

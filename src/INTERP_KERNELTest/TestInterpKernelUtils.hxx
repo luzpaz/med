@@ -20,13 +20,16 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef _MEDMEMTEST_UTILS_HXX_
-#define _MEDMEMTEST_UTILS_HXX_
+#ifndef _TESTINTERPKERNELUTILS_HXX_
+#define _TESTINTERPKERNELUTILS_HXX_
 
 #include <string>
 
-std::string getResourceFile( const std::string& );
-std::string getTmpDirectory();
-std::string makeTmpFile( const std::string&, const std::string& = "" );
+namespace INTERP_TEST
+{
 
-#endif
+  std::string getResourceFile( const std::string& );
+
+} // namespace INTERP_TEST
+
+#endif // _TESTINTERPKERNELUTILS_HXX_

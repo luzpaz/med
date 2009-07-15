@@ -20,13 +20,28 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef _MEDMEMTEST_UTILS_HXX_
-#define _MEDMEMTEST_UTILS_HXX_
+#include "TestInterpKernelUtils.hxx"
 
-#include <string>
+#include <cstdlib>
 
-std::string getResourceFile( const std::string& );
-std::string getTmpDirectory();
-std::string makeTmpFile( const std::string&, const std::string& = "" );
+namespace INTERP_TEST
+{
+  std::string getResourceFile( const std::string& filename )
+  {
+    std::string resourceFile = "";
+    
+    if ( getenv("top_srcdir") ) {
+      // we are in 'make check' step
+      resourceFile = getenv("top_srcdir");
+      resourceFile += "/resources/";
+    }
+    else if ( getenv("MED_ROOT_DIR") ) {
+      // use MED_ROOT_DIR env.var
+      resourceFile = getenv("MED_ROOT_DIR");
+      resourceFile += "/share/salome/resources/med/";
+    }
+    resourceFile += filename;
+    return resourceFile;
+  }
 
-#endif
+} // namespace INTERP_TEST

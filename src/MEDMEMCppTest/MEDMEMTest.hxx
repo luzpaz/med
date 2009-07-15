@@ -102,6 +102,8 @@ class MEDMEMTest : public CppUnit::TestFixture
   //CPPUNIT_TEST( testmedimport_src /* not in spec */ );
   //60
   CPPUNIT_TEST( testExtractor );
+  CPPUNIT_TEST( testDesactivateFacesComputation ); // issue 0020411
+
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -171,6 +173,7 @@ public:
   //void testmedimport_src() /* not in spec */;
   //60
   void testExtractor();
+  void testDesactivateFacesComputation(); // issue 0020411
 };
 
 // to create a mesh with certain filling
@@ -203,7 +206,5 @@ void MEDMEMTest_DumpArray (std::ostream & stream, const T* array, const int leng
   }
   stream << "}" << std::endl;
 };
-
-std::string getTmpDirectory();
 
 #endif

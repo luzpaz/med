@@ -75,23 +75,18 @@ void MEDMEMTest::testMedMeshDriver22()
   MESH *aMesh                      = new MESH();
   MESH *aMesh_1                    = new MESH();
 
-  string tmp_dir                   = getTmpDirectory();
   string filename_rd               = getResourceFile("pointe_import22.med");
-  string filename_wr               = tmp_dir  + "/myWr_pointe22.med";
-  string tmpfile                   = tmp_dir  + "/tmp.med";
+  string filename_wr               = makeTmpFile("myWr_pointe22.med");
+  string tmpfile                   = makeTmpFile("tmp.med");
   string meshname                  = "maa1";
   string newmeshname               = "new" + meshname;
   string fileNotExistsName_rd      = "notExists.med";
   string fileNotExistsName_wr      = "/path_not_exists/file_not_exists.med";
-  string filename_rdwr             =  tmp_dir  + "/myRdWr_pointe22.med";
+  string filename_rdwr             = makeTmpFile("myRdWr_pointe22.med", filename_rd);
   char* longmeshname               = new char[MED_TAILLE_NOM+2];
-  string fcopy                     = "cp " + filename_rd + " " + filename_rdwr;
   for (int i = 0; i<MED_TAILLE_NOM+2; ++i)
     longmeshname[i] = 'a';
   longmeshname[MED_TAILLE_NOM+1] = '\0';
-
-  //Copy file in the TMP dir for testing READ/WRITE case
-  system(fcopy.data());
 
   // To remove tmp files from disk
   MEDMEMTest_TmpFilesRemover aRemover;

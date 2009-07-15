@@ -51,11 +51,10 @@ using namespace MED_EN;
 void MEDMEMTest::testVtkMedDriver()
 {
   MED *aMed                = new MED();
-  string tmp_dir           = getTmpDirectory();
   string filename_rd       = getResourceFile("pointe.med");
   string emptyfilename     = "";
   string fileNotExistsName = "/path_not_exists/file_not_exists.vtk";
-  string filename_wr       =  tmp_dir  + "/myMED_pointe.vtk";
+  string filename_wr       = makeTmpFile( "myMED_pointe.vtk" );
 
   MEDMEMTest_TmpFilesRemover aRemover;
   aRemover.Register(filename_wr);

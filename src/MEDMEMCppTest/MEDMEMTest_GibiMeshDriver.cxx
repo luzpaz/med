@@ -104,20 +104,18 @@ void MEDMEMTest::testGibiMeshDriver()
   MED  *aMed                       = new MED();
   MED  *aMed_1                     = NULL;
 
-  string tmp_dir                   = getTmpDirectory();
   string filename_rd               = getResourceFile("Darcy3_3D_H_10x10x10.sauve");
   string filenamemed_rd            = getResourceFile("elle_3D_HPr_10x10x10.sauve");
-  string filename_wr               = tmp_dir  + "/myWr_Darcy3_3D_H_10x10x10.sauve";
-  string tmpfile                   = tmp_dir  + "/tmp.sauve";
-  string tmpfile_rdwr              = tmp_dir  + "/rdwr_tmp.sauve";
-  string filenamemed_wr            = tmp_dir  + "/myWrMed_elle_3D_HPr_10x10x10.sauve";
-  string tmpfilemed                = tmp_dir  + "/tmpmed.sauve";
+  string filename_wr               = makeTmpFile("myWr_Darcy3_3D_H_10x10x10.sauve");
+  string tmpfile                   = makeTmpFile("tmp.sauve");
+  string tmpfile_rdwr              = makeTmpFile("rdwr_tmp.sauve");
+  string filenamemed_wr            = makeTmpFile("myWrMed_elle_3D_HPr_10x10x10.sauve");
+  string tmpfilemed                = makeTmpFile("tmpmed.sauve");
   string meshname                  = "Darcy3_3D_H_10x10x10";
   string newmeshname               = "new" + meshname;
   string fileNotExistsName_rd      = "notExists.sauve";
   string fileNotExistsName_wr      = "/path_not_exists/file_not_exists.sauve";
-  string filename_rdwr             =  tmp_dir  + "/myRdWr_Darcy3_3D_H_10x10x10.sauve";
-  string fcopy                     = "cp " + filename_rd + " " + filename_rdwr;
+  string filename_rdwr             = makeTmpFile("myRdWr_Darcy3_3D_H_10x10x10.sauve", filename_rd);
 
   // To remove tmp files from disk
   MEDMEMTest_TmpFilesRemover aRemover;
@@ -293,9 +291,6 @@ void MEDMEMTest::testGibiMeshDriver()
 
   //-------------------------------Test GIBI READ/WRITE part---------------------------------//
   {
-    //Copy file
-    system(fcopy.c_str());
-
     {
       //Creation a incorrect gibi read/write driver
       GIBI_MESH_RDWR_DRIVER *aInvalidGibiRdWrDriver =

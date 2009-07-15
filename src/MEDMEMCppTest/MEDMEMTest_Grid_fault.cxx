@@ -119,8 +119,7 @@ using namespace MED_EN;
 void MEDMEMTest_testGrid()
 {
   string filename = getResourceFile("test19.med") ;
-  string tmp_dir  = getTmpDirectory();
-  string filenameout21 = tmp_dir + "/myGridWrite_grid21.med";
+  string filenameout21 = makeTmpFile("myGridWrite_grid21.med");
 
   // To remove tmp files from disk
   MEDMEMTest_TmpFilesRemover aRemover;

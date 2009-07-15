@@ -51,12 +51,11 @@ void MEDMEMTest::testTopLevel()
 {
   MED * aMed = NULL;
 
-  string tmp_dir                    = getTmpDirectory();
   string filename_rd                = getResourceFile("pointe.med");
   string filename22_rd              = getResourceFile("pointe_import22.med");
-  string filenameMesh_wr            = tmp_dir + "/myMesh.med";
-  string filenameMed_wr             = tmp_dir + "/myMed.med";
-  string filenameField_wr           = tmp_dir + "/myField.med";
+  string filenameMesh_wr            = makeTmpFile("myMesh.med");
+  string filenameMed_wr             = makeTmpFile("myMed.med");
+  string filenameField_wr           = makeTmpFile("myField.med");
   string fileNotExist_rd            = "/notExist.med";
   string fileNotExist_wr            = "/path_not_exist/file_not_exist.med";
   string meshname                   = "maa1";

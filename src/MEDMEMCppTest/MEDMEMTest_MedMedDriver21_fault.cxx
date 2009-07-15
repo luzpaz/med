@@ -89,22 +89,17 @@ using namespace MED_EN;
  */
 void MEDMEMTest_testMedMedDriver21() {
   MED *aMed                        = new MED();
-  string tmp_dir                   = getTmpDirectory();
   string filename_rd               = getResourceFile("pointe.med");
   string emptyfilename             = "";
-  string filename_wr               = tmp_dir  + "/myMedWr_pointe21.med";
+  string filename_wr               = makeTmpFile("myMedWr_pointe21.med");
   string fileNotExistsName_rd      = "notExists.med";
   string fileNotExistsName_wr      = "/path_not_exists/file_not_exists.med";
-  string filename_rdwr             = tmp_dir + "/myMedRdWr_pointe21.med";
-  string fcopy                     = "cp " + filename_rd + " " + filename_rdwr;
+  string filename_rdwr             = makeTmpFile("myMedRdWr_pointe21.med", filename_rd);
 
   // To remove tmp files from disk
   MEDMEMTest_TmpFilesRemover aRemover;
   aRemover.Register(filename_wr);
   aRemover.Register(filename_rdwr);
-
-  //Copy file in the TMP dir for testing READ/WRITE case
-  system(fcopy.data());
 
   //-------------------------------Test READ_ONLY part-------------------------------------------------------
   //Creation incorrect Med_Med read only driver (file is not exist)
