@@ -233,5 +233,6 @@ void *th_getdatabympi(void *s)
   thread_st *st = (thread_st*)s;
   (SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface::_narrow((*(st->tior))[st->ip]))->getDataByMPI(st->coupling.c_str());
   delete st;
+  return NULL;
 }
 
