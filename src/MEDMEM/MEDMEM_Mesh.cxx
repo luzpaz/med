@@ -92,7 +92,7 @@ via a constructor and should be written with the addDriver()/write() methods.
 // ------- Drivers Management Part
 
 /*! Add a %MESH driver of type %driverTypes (MED_DRIVER, ....) associated with file fileName. The meshname used in the file
-    is  driverName. addDriver returns an integer handler. */
+  is  driverName. addDriver returns an integer handler. */
 int MESH::addDriver(driverTypes driverType,
                     const string & fileName/*="Default File Name.med"*/,
 		    const string & driverName/*="Default Mesh Name"*/,
@@ -106,7 +106,7 @@ int MESH::addDriver(driverTypes driverType,
   SCRUTE_MED(driverType);
 
   driver = DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,
-					     driverName,access) ;
+                                             driverName,access) ;
 
   _drivers.push_back(driver);
 
@@ -156,7 +156,7 @@ void MESH::rmDriver (int index/*=0*/) {
   if (index >= 0 && index < _drivers.size() && _drivers[index]) {
     delete _drivers[index];
     _drivers[index] = 0;
-     MESSAGE_MED ("detruire");
+    MESSAGE_MED ("detruire");
   }
   else
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
@@ -201,11 +201,11 @@ MESH::MESH():_coordinate(NULL),_connectivity(NULL), _isAGrid(false) {
 
 /*! \if MEDMEM_ug
   \addtogroup MESH_constructors
-@{
+  @{
 \endif
 */
 /*!
-Copy constructor
+  Copy constructor
 */
 MESH::MESH(MESH &m)
 {
@@ -228,59 +228,59 @@ MESH::MESH(MESH &m)
 
   _familyNode = m._familyNode;
   for (int i=0; i<(int)m._familyNode.size(); i++)
-    {
-      _familyNode[i] = new FAMILY(* m._familyNode[i]);
-      _familyNode[i]->setMeshDirectly(this);
-    }
+  {
+    _familyNode[i] = new FAMILY(* m._familyNode[i]);
+    _familyNode[i]->setMeshDirectly(this);
+  }
 
   _familyCell = m._familyCell;
   for (int i=0; i<(int)m._familyCell.size(); i++)
-    {
-      _familyCell[i] = new FAMILY(* m._familyCell[i]);
-      _familyCell[i]->setMeshDirectly(this);
-    }
+  {
+    _familyCell[i] = new FAMILY(* m._familyCell[i]);
+    _familyCell[i]->setMeshDirectly(this);
+  }
 
   _familyFace = m._familyFace;
   for (int i=0; i<(int)m._familyFace.size(); i++)
-    {
-      _familyFace[i] = new FAMILY(* m._familyFace[i]);
-      _familyFace[i]->setMeshDirectly(this);
-    }
+  {
+    _familyFace[i] = new FAMILY(* m._familyFace[i]);
+    _familyFace[i]->setMeshDirectly(this);
+  }
 
   _familyEdge = m._familyEdge;
   for (int i=0; i<(int)m._familyEdge.size(); i++)
-    {
-      _familyEdge[i] = new FAMILY(* m._familyEdge[i]);
-      _familyEdge[i]->setMeshDirectly(this);
-    }
+  {
+    _familyEdge[i] = new FAMILY(* m._familyEdge[i]);
+    _familyEdge[i]->setMeshDirectly(this);
+  }
 
   _groupNode = m._groupNode;
   for (int i=0; i<(int)m._groupNode.size(); i++)
-    {
-      _groupNode[i] = new GROUP(* m._groupNode[i]);
-      _groupNode[i]->setMeshDirectly(this);
-    }
+  {
+    _groupNode[i] = new GROUP(* m._groupNode[i]);
+    _groupNode[i]->setMeshDirectly(this);
+  }
 
   _groupCell = m._groupCell;
   for (int i=0; i<(int)m._groupCell.size(); i++)
-    {
-      _groupCell[i] = new GROUP(* m._groupCell[i]);
-      _groupCell[i]->setMeshDirectly(this);
-    }
+  {
+    _groupCell[i] = new GROUP(* m._groupCell[i]);
+    _groupCell[i]->setMeshDirectly(this);
+  }
 
   _groupFace = m._groupFace;
   for (int i=0; i<(int)m._groupFace.size(); i++)
-    {
-      _groupFace[i] = new GROUP(* m._groupFace[i]);
-      _groupFace[i]->setMeshDirectly(this);
-    }
+  {
+    _groupFace[i] = new GROUP(* m._groupFace[i]);
+    _groupFace[i]->setMeshDirectly(this);
+  }
 
   _groupEdge = m._groupEdge;
   for (int i=0; i<(int)m._groupEdge.size(); i++)
-    {
-      _groupEdge[i] = new GROUP(* m._groupEdge[i]);
-      _groupEdge[i]->setMeshDirectly(this);
-    }
+  {
+    _groupEdge[i] = new GROUP(* m._groupEdge[i]);
+    _groupEdge[i]->setMeshDirectly(this);
+  }
 
   //_drivers = m._drivers;  //Recopie des drivers?
 }
@@ -330,10 +330,10 @@ MESH::~MESH() {
   MESSAGE_MED("In this object MESH there is(are) " << _drivers.size() << " driver(s)");
 
   for (unsigned int index=0; index < _drivers.size(); index++ )
-    {
-      SCRUTE_MED(_drivers[index]);
-      if ( _drivers[index] != NULL) delete _drivers[index];
-    }
+  {
+    SCRUTE_MED(_drivers[index]);
+    if ( _drivers[index] != NULL) delete _drivers[index];
+  }
 
 }
 
@@ -345,7 +345,7 @@ MESH::~MESH() {
 */
 /*!
   Method equivalent to getNumberOfTypes except that it includes not only classical Types but polygons/polyhedra also.
- */
+*/
 int MESH::getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const
 {
   if(_connectivity!= NULL)
@@ -356,7 +356,7 @@ int MESH::getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const
 /*
   Method equivalent to getTypesWithPoly except that it includes not only classical Types but polygons/polyhedra also.
   WARNING the returned array MUST be deallocated.
- */
+*/
 MED_EN::medGeometryElement * MESH::getTypesWithPoly(MED_EN::medEntityMesh Entity) const
 {
   if (Entity == MED_EN::MED_NODE)
@@ -368,26 +368,26 @@ MED_EN::medGeometryElement * MESH::getTypesWithPoly(MED_EN::medEntityMesh Entity
 
 /*
   Method equivalent to getNumberOfElementsWithPoly except that it includes not only classical Types but polygons/polyhedra also.
- */
+*/
 int MESH::getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity, MED_EN::medGeometryElement Type) const
 {
   if(Type==MED_POLYGON || Type==MED_POLYHEDRA)
-    {
-      int nbOfPolygs=_connectivity->getNumberOfElementOfPolyType(Entity);
-      return nbOfPolygs;
-    }
+  {
+    int nbOfPolygs=_connectivity->getNumberOfElementOfPolyType(Entity);
+    return nbOfPolygs;
+  }
   else if(Type==MED_ALL_ELEMENTS)
-    {
-      int nbOfClassicalTypes=getNumberOfElements(Entity,MED_ALL_ELEMENTS);
-      int nbOfClassicalTypes2=_connectivity->getNumberOfElementOfPolyType(Entity);
-      return nbOfClassicalTypes+nbOfClassicalTypes2;
-    }
+  {
+    int nbOfClassicalTypes=getNumberOfElements(Entity,MED_ALL_ELEMENTS);
+    int nbOfClassicalTypes2=_connectivity->getNumberOfElementOfPolyType(Entity);
+    return nbOfClassicalTypes+nbOfClassicalTypes2;
+  }
   else
     return getNumberOfElements(Entity,Type);
 }
 
 /*! \if MEDMEM_ug
-@}
+  @}
 \endif*/
 bool MESH::existConnectivityWithPoly(MED_EN::medConnectivity ConnectivityType,
                                      MED_EN::medEntityMesh Entity) const
@@ -407,34 +407,34 @@ MESH & MESH::operator=(const MESH &m)
 
   // ATTENTION CET OPERATEUR DE RECOPIE EST DANGEREUX POUR LES
   // POINTEURS : ex : nodal_connectivity ???? EXPRES ????
-//    _drivers = m._drivers;
+  //    _drivers = m._drivers;
 
-//    space_dimension=m.space_dimension;
-//    mesh_dimension=m.mesh_dimension;
+  //    space_dimension=m.space_dimension;
+  //    mesh_dimension=m.mesh_dimension;
 
-//    nodes_count=m.nodes_count;
-//    coordinates=m.coordinates;
-//    coordinates_name=m.coordinates_name ;
-//    coordinates_unit=m.coordinates_unit ;
-//    nodes_numbers=m.nodes_numbers ;
+  //    nodes_count=m.nodes_count;
+  //    coordinates=m.coordinates;
+  //    coordinates_name=m.coordinates_name ;
+  //    coordinates_unit=m.coordinates_unit ;
+  //    nodes_numbers=m.nodes_numbers ;
 
-//    cells_types_count=m.cells_types_count;
-//    cells_type=m.cells_type;
-//    cells_count=m.cells_count;
-//    nodal_connectivity=m.nodal_connectivity;
+  //    cells_types_count=m.cells_types_count;
+  //    cells_type=m.cells_type;
+  //    cells_count=m.cells_count;
+  //    nodal_connectivity=m.nodal_connectivity;
 
-//    nodes_families_count=m.nodes_families_count;
-//    nodes_Families=m.nodes_Families;
+  //    nodes_families_count=m.nodes_families_count;
+  //    nodes_Families=m.nodes_Families;
 
-//    cells_families_count=m.cells_families_count;
-//    cells_Families=m.cells_Families;
+  //    cells_families_count=m.cells_families_count;
+  //    cells_Families=m.cells_Families;
 
-//    maximum_cell_number_by_node = m.maximum_cell_number_by_node;
-//    if (maximum_cell_number_by_node > 0)
-//      {
-//        reverse_nodal_connectivity = m.reverse_nodal_connectivity;
-//        reverse_nodal_connectivity_index = m.reverse_nodal_connectivity_index ;
-//      }
+  //    maximum_cell_number_by_node = m.maximum_cell_number_by_node;
+  //    if (maximum_cell_number_by_node > 0)
+  //      {
+  //        reverse_nodal_connectivity = m.reverse_nodal_connectivity;
+  //        reverse_nodal_connectivity_index = m.reverse_nodal_connectivity_index ;
+  //      }
   END_OF_MED(LOC);
 
   return *this;
@@ -453,8 +453,8 @@ bool MESH::operator==(const MESH& other) const
 \endif
 */
 /*!
- Creates a %MESH object using a %MESH driver of type %driverTypes (MED_DRIVER, GIBI_DRIVER, ...) associated with file \a fileName. As several meshes can coexist in the same file (notably in MED files) , the constructor takes a third argument that specifies the name of the mesh.
-The constructor will throw an exception if the file does not exist, has no reading permissions or if the mesh does not exist in the file.
+  Creates a %MESH object using a %MESH driver of type %driverTypes (MED_DRIVER, GIBI_DRIVER, ...) associated with file \a fileName. As several meshes can coexist in the same file (notably in MED files) , the constructor takes a third argument that specifies the name of the mesh.
+  The constructor will throw an exception if the file does not exist, has no reading permissions or if the mesh does not exist in the file.
 */
 MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string &  driverName/*=""*/) throw (MEDEXCEPTION)
 {
@@ -483,10 +483,10 @@ MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string
 @{
 */
 /*!
-Returns true if mesh \a other has same
-coordinates (to 1E-15 precision ) and same connectivity as the calling object.
-Information like name or description is not taken into account 
-for the comparison.
+  Returns true if mesh \a other has same
+  coordinates (to 1E-15 precision ) and same connectivity as the calling object.
+  Information like name or description is not taken into account 
+  for the comparison.
 */
 
 bool MESH::deepCompare(const MESH& other) const
@@ -521,7 +521,7 @@ bool MESH::deepCompare(const MESH& other) const
   return ret;
 }
 /*!
-@}
+  @}
 */
 
 /*!
@@ -547,10 +547,10 @@ void MESH::printMySelf(ostream &os) const
   os << "Space Dimension : " << spacedimension << endl << endl;
 
   os << "Mesh Dimension : " << meshdimension << endl << endl;
-  
+
   if(myMesh.getCoordinateptr()) {
     const double * coordinates = myMesh.getCoordinates(MED_FULL_INTERLACE);
-    
+
     os << "SHOW NODES COORDINATES : " << endl;
     os << "Name :" << endl;
     const string * coordinatesnames = myMesh.getCoordinatesNames();
@@ -572,48 +572,48 @@ void MESH::printMySelf(ostream &os) const
     {
       os << "Nodes " << i+1 << " : ";
       for (int j=0; j<spacedimension ; j++)
-	os << coordinates[i*spacedimension+j] << " ";
+        os << coordinates[i*spacedimension+j] << " ";
       os << endl;
     }
   }
-  
+
   if(myMesh.getConnectivityptr()) {
     os << endl << "SHOW CONNECTIVITY  :" << endl;
     os << *myMesh._connectivity << endl;
   }
-  
+
   medEntityMesh entity;
   os << endl << "SHOW FAMILIES :" << endl << endl;
   for (int k=1; k<=4; k++)
+  {
+    if (k==1) entity = MED_NODE;
+    if (k==2) entity = MED_CELL;
+    if (k==3) entity = MED_FACE;
+    if (k==4) entity = MED_EDGE;
+    int numberoffamilies = myMesh.getNumberOfFamilies(entity);
+    os << "NumberOfFamilies on "<< entNames[entity] <<" : "<<numberoffamilies<<endl;
+    using namespace MED_EN;
+    for (int i=1; i<numberoffamilies+1;i++)
     {
-      if (k==1) entity = MED_NODE;
-      if (k==2) entity = MED_CELL;
-      if (k==3) entity = MED_FACE;
-      if (k==4) entity = MED_EDGE;
-      int numberoffamilies = myMesh.getNumberOfFamilies(entity);
-      os << "NumberOfFamilies on "<< entNames[entity] <<" : "<<numberoffamilies<<endl;
-      using namespace MED_EN;
-      for (int i=1; i<numberoffamilies+1;i++)
-	{
-	  os << * myMesh.getFamily(entity,i) << endl;
-	}
+      os << * myMesh.getFamily(entity,i) << endl;
     }
+  }
 
   os << endl << "SHOW GROUPS :" << endl << endl;
   for (int k=1; k<=4; k++)
+  {
+    if (k==1) entity = MED_NODE;
+    if (k==2) entity = MED_CELL;
+    if (k==3) entity = MED_FACE;
+    if (k==4) entity = MED_EDGE;
+    int numberofgroups = myMesh.getNumberOfGroups(entity);
+    os << "NumberOfGroups on "<< entNames[entity] <<" : "<<numberofgroups<<endl;
+    using namespace MED_EN;
+    for (int i=1; i<numberofgroups+1;i++)
     {
-      if (k==1) entity = MED_NODE;
-      if (k==2) entity = MED_CELL;
-      if (k==3) entity = MED_FACE;
-      if (k==4) entity = MED_EDGE;
-      int numberofgroups = myMesh.getNumberOfGroups(entity);
-      os << "NumberOfGroups on "<< entNames[entity] <<" : "<<numberofgroups<<endl;
-      using namespace MED_EN;
-      for (int i=1; i<numberofgroups+1;i++)
-	{
-	  os << * myMesh.getGroup(entity,i) << endl;
-	}
+      os << * myMesh.getGroup(entity,i) << endl;
     }
+  }
 }
 
 /*!
@@ -659,14 +659,14 @@ int MESH::getElementNumber(MED_EN::medConnectivity ConnectivityType,
     for (itList=cellsList.begin();itList!=cellsList.end();itList++) {
       bool find = false ;
       for (int j=myReverseConnectivityIndex[connectivity_i-1]; j<myReverseConnectivityIndex[connectivity_i]; j++) {
-	if ((*itList)==myReverseConnectivityValue[j-1]) {
-	  find=true ;
-	  break ;
-	}
+        if ((*itList)==myReverseConnectivityValue[j-1]) {
+          find=true ;
+          break ;
+        }
       }
       if (!find) {
-	itList=cellsList.erase(itList);
-	itList--; // well : rigth if itList = cellsList.begin() ??
+        itList=cellsList.erase(itList);
+        itList--; // well : rigth if itList = cellsList.begin() ??
       }
     }
   }
@@ -695,7 +695,7 @@ computation time can be large.
   Returns a support which reference all elements on the boundary of mesh.
   For a d-dimensional mesh, a boundary element is defined as a d-1 dimension
   element that is referenced by only one element in the full descending connectivity.
-  
+
   This method can also return the list of nodes that belong to the boundary elements.
 
   WARNING: This method can recalculate descending connectivity from partial to full form,
@@ -715,15 +715,15 @@ SUPPORT * MESH::getBoundaryElements(MED_EN::medEntityMesh Entity)
   if(_spaceDimension == 3)
     if (Entity != MED_FACE)
       if(Entity==MED_NODE)
-	entityToParse=MED_FACE;
+        entityToParse=MED_FACE;
       else
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 3D mesh for entity "<<Entity<<" !"));
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 3D mesh for entity "<<Entity<<" !"));
   if(_spaceDimension == 2)
     if(Entity != MED_EDGE)
       if(Entity==MED_NODE)
-	entityToParse=MED_EDGE;
+        entityToParse=MED_EDGE;
       else
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 2D mesh for entity "<<Entity<<" !"));
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 2D mesh for entity "<<Entity<<" !"));
 
   // assure that descending connectivity is full
   if ( !_connectivity )
@@ -748,7 +748,7 @@ SUPPORT * MESH::getBoundaryElements(MED_EN::medEntityMesh Entity)
     return buildSupportOnElementsFromElementList(myElementsList,entityToParse);
 }
 /*! 
-@}
+  @}
 */
 
 /*!
@@ -769,11 +769,11 @@ SUPPORT * MESH::getSupportOnAll(medEntityMesh entity)
   if(it != _entitySupport.end())
     return (*it).second;
   else{
-    
+
     //build, store and return support
     string aSuppName = "SupportOnAll_"+entNames[entity];
     SUPPORT * aSupport = new SUPPORT((MESH *)this,aSuppName,entity);
-    
+
     _entitySupport.insert(make_pair(entity,aSupport));
     return aSupport;
   }
@@ -782,7 +782,7 @@ SUPPORT * MESH::getSupportOnAll(medEntityMesh entity)
 
 /*!
   Method that do the same thing as buildSupportOnNodeFromElementList except that a SUPPORT is not created.
- */
+*/
 void MESH::fillSupportOnNodeFromElementList(const list<int>& listOfElt, SUPPORT *supportToFill) const throw (MEDEXCEPTION)
 {
   MED_EN::medEntityMesh entity=supportToFill->getEntity();
@@ -800,7 +800,7 @@ void MESH::fillSupportOnNodeFromElementList(const list<int>& listOfElt, SUPPORT 
       int lgth;
       const int *conn=_connectivity->getConnectivityOfAnElementWithPoly(MED_NODAL,entity,*iter,lgth);
       for(i=0;i<lgth;i++)
-	nodes.insert(conn[i]);
+        nodes.insert(conn[i]);
     }
     list<int> nodesList;
     for(set<int>::iterator iter2=nodes.begin();iter2!=nodes.end();iter2++)
@@ -812,7 +812,7 @@ void MESH::fillSupportOnNodeFromElementList(const list<int>& listOfElt, SUPPORT 
 /*!
   Method created to factorize code. This method creates a new support on NODE (to deallocate) containing all the nodes id contained in elements 'listOfElt' of
   entity 'entity'.
- */
+*/
 SUPPORT *MESH::buildSupportOnNodeFromElementList(const list<int>& listOfElt,MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION)
 {
   SUPPORT * mySupport = new SUPPORT((MESH *)this,"Boundary",entity);
@@ -823,7 +823,7 @@ SUPPORT *MESH::buildSupportOnNodeFromElementList(const list<int>& listOfElt,MED_
 /*!
   Method created to factorize code. This method creates a new support on entity 'entity' (to deallocate) containing all the entities contained in
   elements 'listOfElt' of entity 'entity'.
- */
+*/
 SUPPORT *MESH::buildSupportOnElementsFromElementList(const list<int>& listOfElt, MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION)
 {
   const char* LOC = "MESH::buildSupportOnElementsFromElementList : ";
@@ -839,7 +839,7 @@ SUPPORT *MESH::buildSupportOnElementsFromElementList(const list<int>& listOfElt,
 @{
 */
 /*! Retrieves the volume of all the elements contained in \a Support. This method returns 
-a FIELD structure based on this support. It only works on MED_CELL for 3D meshes.
+  a FIELD structure based on this support. It only works on MED_CELL for 3D meshes.
 */
 FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const throw (MEDEXCEPTION)
 {
@@ -893,17 +893,17 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
   const double * coord = getCoordinates(MED_FULL_INTERLACE);
 
   for (int i=0;i<nb_type;i++)
+  {
+    medGeometryElement type = types[i] ;
+    double xvolume;
+    nb_entity_type = Support->getNumberOfElements(type);
+    if(type != MED_EN::MED_POLYHEDRA)
     {
-      medGeometryElement type = types[i] ;
-      double xvolume;
-      nb_entity_type = Support->getNumberOfElements(type);
-      if(type != MED_EN::MED_POLYHEDRA)
-	{
-	  if (onAll)
+      if (onAll)
 	    {
 	      global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
 	    }
-	  else
+      else
 	    {
 	      const int * supp_number = Support->getNumber(type);
 	      const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
@@ -911,167 +911,167 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
 	      int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
 
 	      for (int k_type = 0; k_type<nb_entity_type; k_type++) {
-		for (int j_ent = 0; j_ent<(type%100); j_ent++) {
-		  global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[connectivityIndex[supp_number[k_type]-1]+j_ent-1];
-		}
+          for (int j_ent = 0; j_ent<(type%100); j_ent++) {
+            global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[connectivityIndex[supp_number[k_type]-1]+j_ent-1];
+          }
 	      }
 	      global_connectivity = global_connectivity_tmp ;
 	    }
-	}
-
-      switch (type)
-	{
-	case MED_TETRA4 : case MED_TETRA10 :
-	  {
-	    for (int tetra=0;tetra<nb_entity_type;tetra++)
-	      {
-		int tetra_index = (type%100)*tetra;
-		int N1 = global_connectivity[tetra_index]-1;
-		int N2 = global_connectivity[tetra_index+1]-1;
-		int N3 = global_connectivity[tetra_index+2]-1;
-		int N4 = global_connectivity[tetra_index+3]-1;
-		xvolume=INTERP_KERNEL::calculateVolumeForTetra(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4);
-		volume->setIJ(index,1,xvolume) ;
-		index++;
-	      }
-	    break;
-	  }
-	case MED_PYRA5 : case MED_PYRA13 :
-	  {
-	    for (int pyra=0;pyra<nb_entity_type;pyra++)
-	      {
-		int pyra_index = (type%100)*pyra;
-		int N1 = global_connectivity[pyra_index]-1;
-		int N2 = global_connectivity[pyra_index+1]-1;
-		int N3 = global_connectivity[pyra_index+2]-1;
-		int N4 = global_connectivity[pyra_index+3]-1;
-		int N5 = global_connectivity[pyra_index+4]-1;
-		xvolume=INTERP_KERNEL::calculateVolumeForPyra(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5);
-		volume->setIJ(index,1,xvolume) ;
-		index++;
-	      }
-	    break;
-	  }
-	case MED_PENTA6 : case MED_PENTA15 :
-	  {
-	    for (int penta=0;penta<nb_entity_type;penta++)
-	      {
-		int penta_index = (type%100)*penta;
-		int N1 = global_connectivity[penta_index]-1;
-		int N2 = global_connectivity[penta_index+1]-1;
-		int N3 = global_connectivity[penta_index+2]-1;
-		int N4 = global_connectivity[penta_index+3]-1;
-		int N5 = global_connectivity[penta_index+4]-1;
-		int N6 = global_connectivity[penta_index+5]-1;
-		xvolume=INTERP_KERNEL::calculateVolumeForPenta(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5,coord+dim_space*N6);
-		volume->setIJ(index,1,xvolume) ;
-		index++;
-	      }
-	    break;
-	  }
-	case MED_HEXA8 : case MED_HEXA20 :
-	  {
-	    for (int hexa=0;hexa<nb_entity_type;hexa++)
-	      {
-		int hexa_index = (type%100)*hexa;
-
-		int N1 = global_connectivity[hexa_index]-1;
-		int N2 = global_connectivity[hexa_index+1]-1;
-		int N3 = global_connectivity[hexa_index+2]-1;
-		int N4 = global_connectivity[hexa_index+3]-1;
-		int N5 = global_connectivity[hexa_index+4]-1;
-		int N6 = global_connectivity[hexa_index+5]-1;
-		int N7 = global_connectivity[hexa_index+6]-1;
-		int N8 = global_connectivity[hexa_index+7]-1;
-		xvolume=INTERP_KERNEL::calculateVolumeForHexa(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5,coord+dim_space*N6,coord+dim_space*N7,coord+dim_space*N8);
-		volume->setIJ(index,1,xvolume) ;
-		index++;
-	      }
-	    break;
-	  }
-	case MED_POLYHEDRA:
-	  {
-	    double bary[3];
-	    if(onAll)
-	      {
-		for (int polyhs=0;polyhs<nb_entity_type;polyhs++)
-		  {
-		    int lgthNodes,iPts,iFaces,iPtsInFace;
-		    int offsetWithClassicType=getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
-		    int *nodes=_connectivity->getNodesOfPolyhedron(offsetWithClassicType+polyhs+1,lgthNodes);
-		    int nbOfFaces,*nbOfNodesPerFaces;
-		    int **nodes1=_connectivity->getNodesPerFaceOfPolyhedron(offsetWithClassicType+polyhs+1,nbOfFaces,nbOfNodesPerFaces);
-		    double **pts=new double * [lgthNodes];
-		    double ***pts1=new double ** [nbOfFaces];
-		    for(iPts=0;iPts<lgthNodes;iPts++)
-		      pts[iPts]=(double *)(coord+3*(nodes[iPts]-1));
-		    for(iFaces=0;iFaces<nbOfFaces;iFaces++)
-		      {
-			pts1[iFaces]=new double* [nbOfNodesPerFaces[iFaces]];
-			for(iPtsInFace=0;iPtsInFace<nbOfNodesPerFaces[iFaces];iPtsInFace++)
-			  pts1[iFaces][iPtsInFace]=(double *)(coord+3*(nodes1[iFaces][iPtsInFace]-1));
-		      }
-		    delete [] nodes1;
-		    INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,lgthNodes,3,bary);
-		    delete [] nodes;
-		    delete [] pts;
-		    xvolume=INTERP_KERNEL::calculateVolumeForPolyh((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
-		    delete [] nbOfNodesPerFaces;
-		    for(iFaces=0;iFaces<nbOfFaces;iFaces++)
-			delete [] pts1[iFaces];
-		    delete [] pts1;
-		    volume->setIJ(index,1,xvolume) ;
-		    index++;
-		  }
-	      }
-	    else
-	      {
-		const int * supp_number = Support->getNumber(MED_EN::MED_POLYHEDRA);
-		for (int polyhs=0;polyhs<nb_entity_type;polyhs++)
-		  {
-		    int lgthNodes,iPts,iFaces,iPtsInFace;
-		    int *nodes=_connectivity->getNodesOfPolyhedron(supp_number[polyhs],lgthNodes);
-		    int nbOfFaces,*nbOfNodesPerFaces;
-		    int **nodes1=_connectivity->getNodesPerFaceOfPolyhedron(supp_number[polyhs],nbOfFaces,nbOfNodesPerFaces);
-		    double **pts=new double * [lgthNodes];
-		    double ***pts1=new double ** [nbOfFaces];
-		    for(iPts=0;iPts<lgthNodes;iPts++)
-		      pts[iPts]=(double *)(coord+3*(nodes[iPts]-1));
-		    for(iFaces=0;iFaces<nbOfFaces;iFaces++)
-		      {
-			pts1[iFaces]=new double* [nbOfNodesPerFaces[iFaces]];
-			for(iPtsInFace=0;iPtsInFace<nbOfNodesPerFaces[iFaces];iPtsInFace++)
-			  pts1[iFaces][iPtsInFace]=(double *)(coord+3*(nodes1[iFaces][iPtsInFace]-1));
-		      }
-		    delete [] nodes1;
-		    INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,lgthNodes,3,bary);
-		    delete [] nodes;
-		    delete [] pts;
-		    xvolume=INTERP_KERNEL::calculateVolumeForPolyh((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
-		    delete [] nbOfNodesPerFaces;
-		    for(iFaces=0;iFaces<nbOfFaces;iFaces++)
-			delete [] pts1[iFaces];
-		    delete [] pts1;
-		    volume->setIJ(index,1,xvolume) ;
-		    index++;
-		  }
-	      }
-	    break;
-	  }
-	default :
-	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad Support to get Volumes on it !"));
-	  break;
-	}
-
-      if (!onAll && type!=MED_EN::MED_POLYHEDRA)
-	delete [] global_connectivity ;
     }
+
+    switch (type)
+    {
+    case MED_TETRA4 : case MED_TETRA10 :
+      {
+        for (int tetra=0;tetra<nb_entity_type;tetra++)
+	      {
+          int tetra_index = (type%100)*tetra;
+          int N1 = global_connectivity[tetra_index]-1;
+          int N2 = global_connectivity[tetra_index+1]-1;
+          int N3 = global_connectivity[tetra_index+2]-1;
+          int N4 = global_connectivity[tetra_index+3]-1;
+          xvolume=INTERP_KERNEL::calculateVolumeForTetra(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4);
+          volume->setIJ(index,1,xvolume) ;
+          index++;
+	      }
+        break;
+      }
+    case MED_PYRA5 : case MED_PYRA13 :
+      {
+        for (int pyra=0;pyra<nb_entity_type;pyra++)
+	      {
+          int pyra_index = (type%100)*pyra;
+          int N1 = global_connectivity[pyra_index]-1;
+          int N2 = global_connectivity[pyra_index+1]-1;
+          int N3 = global_connectivity[pyra_index+2]-1;
+          int N4 = global_connectivity[pyra_index+3]-1;
+          int N5 = global_connectivity[pyra_index+4]-1;
+          xvolume=INTERP_KERNEL::calculateVolumeForPyra(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5);
+          volume->setIJ(index,1,xvolume) ;
+          index++;
+	      }
+        break;
+      }
+    case MED_PENTA6 : case MED_PENTA15 :
+      {
+        for (int penta=0;penta<nb_entity_type;penta++)
+	      {
+          int penta_index = (type%100)*penta;
+          int N1 = global_connectivity[penta_index]-1;
+          int N2 = global_connectivity[penta_index+1]-1;
+          int N3 = global_connectivity[penta_index+2]-1;
+          int N4 = global_connectivity[penta_index+3]-1;
+          int N5 = global_connectivity[penta_index+4]-1;
+          int N6 = global_connectivity[penta_index+5]-1;
+          xvolume=INTERP_KERNEL::calculateVolumeForPenta(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5,coord+dim_space*N6);
+          volume->setIJ(index,1,xvolume) ;
+          index++;
+	      }
+        break;
+      }
+    case MED_HEXA8 : case MED_HEXA20 :
+      {
+        for (int hexa=0;hexa<nb_entity_type;hexa++)
+	      {
+          int hexa_index = (type%100)*hexa;
+
+          int N1 = global_connectivity[hexa_index]-1;
+          int N2 = global_connectivity[hexa_index+1]-1;
+          int N3 = global_connectivity[hexa_index+2]-1;
+          int N4 = global_connectivity[hexa_index+3]-1;
+          int N5 = global_connectivity[hexa_index+4]-1;
+          int N6 = global_connectivity[hexa_index+5]-1;
+          int N7 = global_connectivity[hexa_index+6]-1;
+          int N8 = global_connectivity[hexa_index+7]-1;
+          xvolume=INTERP_KERNEL::calculateVolumeForHexa(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5,coord+dim_space*N6,coord+dim_space*N7,coord+dim_space*N8);
+          volume->setIJ(index,1,xvolume) ;
+          index++;
+	      }
+        break;
+      }
+    case MED_POLYHEDRA:
+      {
+        double bary[3];
+        if(onAll)
+	      {
+          for (int polyhs=0;polyhs<nb_entity_type;polyhs++)
+          {
+            int lgthNodes,iPts,iFaces,iPtsInFace;
+            int offsetWithClassicType=getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
+            int *nodes=_connectivity->getNodesOfPolyhedron(offsetWithClassicType+polyhs+1,lgthNodes);
+            int nbOfFaces,*nbOfNodesPerFaces;
+            int **nodes1=_connectivity->getNodesPerFaceOfPolyhedron(offsetWithClassicType+polyhs+1,nbOfFaces,nbOfNodesPerFaces);
+            double **pts=new double * [lgthNodes];
+            double ***pts1=new double ** [nbOfFaces];
+            for(iPts=0;iPts<lgthNodes;iPts++)
+              pts[iPts]=(double *)(coord+3*(nodes[iPts]-1));
+            for(iFaces=0;iFaces<nbOfFaces;iFaces++)
+            {
+              pts1[iFaces]=new double* [nbOfNodesPerFaces[iFaces]];
+              for(iPtsInFace=0;iPtsInFace<nbOfNodesPerFaces[iFaces];iPtsInFace++)
+                pts1[iFaces][iPtsInFace]=(double *)(coord+3*(nodes1[iFaces][iPtsInFace]-1));
+            }
+            delete [] nodes1;
+            INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,lgthNodes,3,bary);
+            delete [] nodes;
+            delete [] pts;
+            xvolume=INTERP_KERNEL::calculateVolumeForPolyh((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
+            delete [] nbOfNodesPerFaces;
+            for(iFaces=0;iFaces<nbOfFaces;iFaces++)
+              delete [] pts1[iFaces];
+            delete [] pts1;
+            volume->setIJ(index,1,xvolume) ;
+            index++;
+          }
+	      }
+        else
+	      {
+          const int * supp_number = Support->getNumber(MED_EN::MED_POLYHEDRA);
+          for (int polyhs=0;polyhs<nb_entity_type;polyhs++)
+          {
+            int lgthNodes,iPts,iFaces,iPtsInFace;
+            int *nodes=_connectivity->getNodesOfPolyhedron(supp_number[polyhs],lgthNodes);
+            int nbOfFaces,*nbOfNodesPerFaces;
+            int **nodes1=_connectivity->getNodesPerFaceOfPolyhedron(supp_number[polyhs],nbOfFaces,nbOfNodesPerFaces);
+            double **pts=new double * [lgthNodes];
+            double ***pts1=new double ** [nbOfFaces];
+            for(iPts=0;iPts<lgthNodes;iPts++)
+              pts[iPts]=(double *)(coord+3*(nodes[iPts]-1));
+            for(iFaces=0;iFaces<nbOfFaces;iFaces++)
+            {
+              pts1[iFaces]=new double* [nbOfNodesPerFaces[iFaces]];
+              for(iPtsInFace=0;iPtsInFace<nbOfNodesPerFaces[iFaces];iPtsInFace++)
+                pts1[iFaces][iPtsInFace]=(double *)(coord+3*(nodes1[iFaces][iPtsInFace]-1));
+            }
+            delete [] nodes1;
+            INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,lgthNodes,3,bary);
+            delete [] nodes;
+            delete [] pts;
+            xvolume=INTERP_KERNEL::calculateVolumeForPolyh((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
+            delete [] nbOfNodesPerFaces;
+            for(iFaces=0;iFaces<nbOfFaces;iFaces++)
+              delete [] pts1[iFaces];
+            delete [] pts1;
+            volume->setIJ(index,1,xvolume) ;
+            index++;
+          }
+	      }
+        break;
+      }
+    default :
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad Support to get Volumes on it !"));
+      break;
+    }
+
+    if (!onAll && type!=MED_EN::MED_POLYHEDRA)
+      delete [] global_connectivity ;
+  }
 
   return Volume;
 }
 /*! Retrieves the area of all the elements contained in \a Support. This method returns 
-a FIELD structure based on this support. It only works on MED_CELL for 2D meshes or MED_FACE
-for 3D meshes.
+  a FIELD structure based on this support. It only works on MED_CELL for 2D meshes or MED_FACE
+  for 3D meshes.
 */
 
 FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw (MEDEXCEPTION)
@@ -1127,118 +1127,118 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
   index = 0;
 
   for (int i=0;i<nb_type;i++)
+  {
+    medGeometryElement type = types[i] ;
+    nb_entity_type = Support->getNumberOfElements(type);
+    const int *global_connectivityIndex = 0;
+    if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
     {
-      medGeometryElement type = types[i] ;
-      nb_entity_type = Support->getNumberOfElements(type);
-      const int *global_connectivityIndex = 0;
-      if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
-	{
-	  global_connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
-	  if (onAll)
+      global_connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
+      if (onAll)
 	    {
 	      global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
 	    }
-	  else
+      else
 	    {
 	      const int * supp_number = Support->getNumber(type);
 	      const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
 	      int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
 
 	      for (int k_type = 0; k_type<nb_entity_type; k_type++) {
-		for (int j_ent = 0; j_ent<(type%100); j_ent++) {
-		  global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[global_connectivityIndex[supp_number[k_type]-1]+j_ent-1];
-		}
+          for (int j_ent = 0; j_ent<(type%100); j_ent++) {
+            global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[global_connectivityIndex[supp_number[k_type]-1]+j_ent-1];
+          }
 	      }
 	      global_connectivity = global_connectivity_tmp ;
 	    }
-	}
-      switch (type)
-	{
-	case MED_TRIA3 : case MED_TRIA6 :
-	  {
-	    for (int tria=0;tria<nb_entity_type;tria++)
-	      {
-		int tria_index = (type%100)*tria;
-
-		int N1 = global_connectivity[tria_index]-1;
-		int N2 = global_connectivity[tria_index+1]-1;
-		int N3 = global_connectivity[tria_index+2]-1;
-
-		area[index]=INTERP_KERNEL::calculateAreaForTria(coord+(dim_space*N1),
-						   coord+(dim_space*N2),
-						   coord+(dim_space*N3),dim_space);
-		index++;
-	      }
-	    break;
-	  }
-	case MED_QUAD4 : case MED_QUAD8 :
-	  {
-	    for (int quad=0;quad<nb_entity_type;quad++)
-	      {
-		int quad_index = (type%100)*quad;
-
-		int N1 = global_connectivity[quad_index]-1;
-		int N2 = global_connectivity[quad_index+1]-1;
-		int N3 = global_connectivity[quad_index+2]-1;
-		int N4 = global_connectivity[quad_index+3]-1;
-
-		area[index]=INTERP_KERNEL::calculateAreaForQuad(coord+dim_space*N1,
-						   coord+dim_space*N2,
-						   coord+dim_space*N3,
-						   coord+dim_space*N4,dim_space);
-		index++;
-	      }
-	    break;
-	  }
-	case MED_POLYGON :
-	  {
-	    if(onAll)
-	      {
-		const int * connectivity = getPolygonsConnectivity(MED_EN::MED_NODAL,support_entity);
-		const int * connectivity_index = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,support_entity);
-		for (int polygs=0;polygs<nb_entity_type;polygs++)
-		  {
-		    int size=connectivity_index[polygs+1]-connectivity_index[polygs];
-		    double **pts=new double * [size];
-		    for(int iPts=0;iPts<size;iPts++)
-		      pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[polygs]+iPts-1]-1));
-		    area[index] = INTERP_KERNEL::calculateAreaForPolyg((const double **)pts,size,dim_space);
-		    delete [] pts;
-		    index++;
-		  }
-	      }
-	    else
-	      {
-		const int * supp_number = Support->getNumber(MED_EN::MED_POLYGON);
-		const int * connectivity = getPolygonsConnectivity(MED_EN::MED_NODAL,support_entity);
-		const int * connectivity_index = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,support_entity);
-		int offsetWithClassicType=getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
-		for (int polygs=0;polygs<nb_entity_type;polygs++)
-		  {
-		    int size=connectivity_index[supp_number[polygs]-offsetWithClassicType]-connectivity_index[supp_number[polygs]-offsetWithClassicType-1];
-		    double **pts=new double * [size];
-		    for(int iPts=0;iPts<size;iPts++)
-		      pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[supp_number[polygs]-offsetWithClassicType-1]+iPts-1]-1));
-		    area[index]=INTERP_KERNEL::calculateAreaForPolyg((const double **)pts,size,dim_space);
-		    delete [] pts;
-		    index++;
-		  }
-	      }
-	    break;
-	  }
-	default :
-	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad Support to get Areas on it !"));
-	  break;
-	}
-
-      if (!onAll)
-	if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
-	  delete [] global_connectivity ;
     }
+    switch (type)
+    {
+    case MED_TRIA3 : case MED_TRIA6 :
+      {
+        for (int tria=0;tria<nb_entity_type;tria++)
+	      {
+          int tria_index = (type%100)*tria;
+
+          int N1 = global_connectivity[tria_index]-1;
+          int N2 = global_connectivity[tria_index+1]-1;
+          int N3 = global_connectivity[tria_index+2]-1;
+
+          area[index]=INTERP_KERNEL::calculateAreaForTria(coord+(dim_space*N1),
+                                                          coord+(dim_space*N2),
+                                                          coord+(dim_space*N3),dim_space);
+          index++;
+	      }
+        break;
+      }
+    case MED_QUAD4 : case MED_QUAD8 :
+      {
+        for (int quad=0;quad<nb_entity_type;quad++)
+	      {
+          int quad_index = (type%100)*quad;
+
+          int N1 = global_connectivity[quad_index]-1;
+          int N2 = global_connectivity[quad_index+1]-1;
+          int N3 = global_connectivity[quad_index+2]-1;
+          int N4 = global_connectivity[quad_index+3]-1;
+
+          area[index]=INTERP_KERNEL::calculateAreaForQuad(coord+dim_space*N1,
+                                                          coord+dim_space*N2,
+                                                          coord+dim_space*N3,
+                                                          coord+dim_space*N4,dim_space);
+          index++;
+	      }
+        break;
+      }
+    case MED_POLYGON :
+      {
+        if(onAll)
+	      {
+          const int * connectivity = getPolygonsConnectivity(MED_EN::MED_NODAL,support_entity);
+          const int * connectivity_index = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,support_entity);
+          for (int polygs=0;polygs<nb_entity_type;polygs++)
+          {
+            int size=connectivity_index[polygs+1]-connectivity_index[polygs];
+            double **pts=new double * [size];
+            for(int iPts=0;iPts<size;iPts++)
+              pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[polygs]+iPts-1]-1));
+            area[index] = INTERP_KERNEL::calculateAreaForPolyg((const double **)pts,size,dim_space);
+            delete [] pts;
+            index++;
+          }
+	      }
+        else
+	      {
+          const int * supp_number = Support->getNumber(MED_EN::MED_POLYGON);
+          const int * connectivity = getPolygonsConnectivity(MED_EN::MED_NODAL,support_entity);
+          const int * connectivity_index = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,support_entity);
+          int offsetWithClassicType=getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
+          for (int polygs=0;polygs<nb_entity_type;polygs++)
+          {
+            int size=connectivity_index[supp_number[polygs]-offsetWithClassicType]-connectivity_index[supp_number[polygs]-offsetWithClassicType-1];
+            double **pts=new double * [size];
+            for(int iPts=0;iPts<size;iPts++)
+              pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[supp_number[polygs]-offsetWithClassicType-1]+iPts-1]-1));
+            area[index]=INTERP_KERNEL::calculateAreaForPolyg((const double **)pts,size,dim_space);
+            delete [] pts;
+            index++;
+          }
+	      }
+        break;
+      }
+    default :
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad Support to get Areas on it !"));
+      break;
+    }
+
+    if (!onAll)
+      if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
+        delete [] global_connectivity ;
+  }
   return Area;
 }
 /*! Retrieves the length of all the elements contained in \a Support. This method returns 
-a FIELD structure based on this support. It only works on MED_EDGE supports.
+  a FIELD structure based on this support. It only works on MED_EDGE supports.
 */
 FIELD<double, FullInterlace>* MESH::getLength(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
@@ -1281,76 +1281,76 @@ FIELD<double, FullInterlace>* MESH::getLength(const SUPPORT * Support) const thr
   index = 1;
 
   for (int i=0;i<nb_type;i++)
+  {
+    medGeometryElement type = types[i] ;
+    double xlength;
+
+    if (onAll)
     {
-      medGeometryElement type = types[i] ;
-      double xlength;
-
-      if (onAll)
-	{
-	  nb_entity_type = getNumberOfElements(support_entity,type);
-	  global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
-	}
-      else
-	{
- 	  nb_entity_type = Support->getNumberOfElements(type);
- 	  const int * supp_number = Support->getNumber(type);
- 	  const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
- 	  const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
-	  int* global_connectivity_tmp = new int[(type%100)*nb_entity_type];
-
- 	  for (int k_type = 0; k_type<nb_entity_type; k_type++) {
- 	    for (int j_ent = 0; j_ent<(type%100); j_ent++) {
- 	      global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[connectivityIndex[supp_number[k_type]-1]+j_ent-1];
- 	    }
- 	  }
-	  global_connectivity = global_connectivity_tmp ;
-	}
-
-      switch (type)
-	{
-	case MED_SEG2 : case MED_SEG3 :
-	  {
-	    for (int edge=0;edge<nb_entity_type;edge++)
-	      {
-		int edge_index = (type%100)*edge;
-
-		int N1 = global_connectivity[edge_index]-1;
-		int N2 = global_connectivity[edge_index+1]-1;
-
-		double x1 = coord[dim_space*N1];
-		double x2 = coord[dim_space*N2];
-
-		double y1 = coord[dim_space*N1+1];
-		double y2 = coord[dim_space*N2+1];
-
-		double z1, z2 ; z1 = 0.0 ; z2 = 0.0 ; if (dim_space==3) {
-		  z1 = coord[dim_space*N1+2]; z2 = coord[dim_space*N2+2];}
-
-		xlength =  sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2) +
-				(z1 - z2)*(z1 - z2));
-
-		length->setIJ(index,1,xlength) ;
-		index++;
-	      }
-	    break;
-	  }
-	default :
-	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad Support to get Lengths on it !"));
-	  break;
-	}
-
-      if (!onAll) delete [] global_connectivity ;
+      nb_entity_type = getNumberOfElements(support_entity,type);
+      global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
     }
+    else
+    {
+      nb_entity_type = Support->getNumberOfElements(type);
+      const int * supp_number = Support->getNumber(type);
+      const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+      const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
+      int* global_connectivity_tmp = new int[(type%100)*nb_entity_type];
+
+      for (int k_type = 0; k_type<nb_entity_type; k_type++) {
+        for (int j_ent = 0; j_ent<(type%100); j_ent++) {
+          global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[connectivityIndex[supp_number[k_type]-1]+j_ent-1];
+        }
+      }
+      global_connectivity = global_connectivity_tmp ;
+    }
+
+    switch (type)
+    {
+    case MED_SEG2 : case MED_SEG3 :
+      {
+        for (int edge=0;edge<nb_entity_type;edge++)
+	      {
+          int edge_index = (type%100)*edge;
+
+          int N1 = global_connectivity[edge_index]-1;
+          int N2 = global_connectivity[edge_index+1]-1;
+
+          double x1 = coord[dim_space*N1];
+          double x2 = coord[dim_space*N2];
+
+          double y1 = coord[dim_space*N1+1];
+          double y2 = coord[dim_space*N2+1];
+
+          double z1, z2 ; z1 = 0.0 ; z2 = 0.0 ; if (dim_space==3) {
+            z1 = coord[dim_space*N1+2]; z2 = coord[dim_space*N2+2];}
+
+          xlength =  sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2) +
+                          (z1 - z2)*(z1 - z2));
+
+          length->setIJ(index,1,xlength) ;
+          index++;
+	      }
+        break;
+      }
+    default :
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad Support to get Lengths on it !"));
+      break;
+    }
+
+    if (!onAll) delete [] global_connectivity ;
+  }
 
   return Length;
 }
 
 /*! Retrieves the normal for all elements contained in SUPPORT \a Support.
-The method is only functional for 2D supports for 3D meshes and 1D supports
-for 2D meshes. It returns 
-a FIELD for which the number of components is equal to the dimension of the 
-mesh and which represents coordinates of the vector normal to the element.
-The direction of the vector is undetermined.
+  The method is only functional for 2D supports for 3D meshes and 1D supports
+  for 2D meshes. It returns 
+  a FIELD for which the number of components is equal to the dimension of the 
+  mesh and which represents coordinates of the vector normal to the element.
+  The direction of the vector is undetermined.
 */
 FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
@@ -1403,26 +1403,26 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
   index = 0;
 
   for (int i=0;i<nb_type;i++)
+  {
+    medGeometryElement type = types[i] ;
+    nb_entity_type = Support->getNumberOfElements(type);
+
+    // Make sure we trying to get Normals on
+    // TRIA3 or TRIA6 or QUAD4 QUAD8 (2D) cells on a 3D mesh
+    // or on SEG2 or SEG3 (1D) cells on a 2D mesh
+
+    if ( (((type==MED_TRIA3) || (type==MED_TRIA6) ||
+           (type==MED_QUAD4) || (type==MED_QUAD8) || (type==MED_POLYGON)) &&
+          (dim_space != 3)) || (((type==MED_SEG2) || (type==MED_SEG3)) &&
+                                (dim_space != 2)) )
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"no compatibility between *this and SUPPORT::_mesh : dimension problem !"));
+    if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
     {
-      medGeometryElement type = types[i] ;
-      nb_entity_type = Support->getNumberOfElements(type);
-
-      // Make sure we trying to get Normals on
-      // TRIA3 or TRIA6 or QUAD4 QUAD8 (2D) cells on a 3D mesh
-      // or on SEG2 or SEG3 (1D) cells on a 2D mesh
-
-      if ( (((type==MED_TRIA3) || (type==MED_TRIA6) ||
-	     (type==MED_QUAD4) || (type==MED_QUAD8) || (type==MED_POLYGON)) &&
-      	    (dim_space != 3)) || (((type==MED_SEG2) || (type==MED_SEG3)) &&
-				  (dim_space != 2)) )
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"no compatibility between *this and SUPPORT::_mesh : dimension problem !"));
-      if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
-	{
-	  if (onAll)
+      if (onAll)
 	    {
 	      global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
 	    }
-	  else
+      else
 	    {
 	      const int * supp_number = Support->getNumber(type);
 	      const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
@@ -1430,121 +1430,121 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
 	      int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
 
 	      for (int k_type = 0; k_type<nb_entity_type; k_type++) {
-		for (int j_ent = 0; j_ent<(type%100); j_ent++) {
-		  global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[connectivityIndex[supp_number[k_type]-1]+j_ent-1];
-		}
+          for (int j_ent = 0; j_ent<(type%100); j_ent++) {
+            global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[connectivityIndex[supp_number[k_type]-1]+j_ent-1];
+          }
 	      }
 
 	      global_connectivity = global_connectivity_tmp ;
 	    }
-	}
-
-      switch (type)
-	{
-	case MED_TRIA3 : case MED_TRIA6 :
-	  {
-	    for (int tria=0;tria<nb_entity_type;tria++)
-	      {
-		int tria_index = (type%100)*tria;
-		int N1 = global_connectivity[tria_index]-1;
-		int N2 = global_connectivity[tria_index+1]-1;
-		int N3 = global_connectivity[tria_index+2]-1;
-		INTERP_KERNEL::calculateNormalForTria(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,normal+3*index);
-		index++;
-	      }
-	    break;
-	  }
-	case MED_QUAD4 : case MED_QUAD8 :
-	  {
-	    for (int quad=0;quad<nb_entity_type;quad++)
-	      {
-		int quad_index = (type%100)*quad;
-		int N1 = global_connectivity[quad_index]-1;
-		int N2 = global_connectivity[quad_index+1]-1;
-		int N3 = global_connectivity[quad_index+2]-1;
-		int N4 = global_connectivity[quad_index+3]-1;
-		INTERP_KERNEL::calculateNormalForQuad(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,normal+3*index);
-		index++;
-	      }
-	    break;
-	  }
-	case MED_SEG2 : case MED_SEG3 :
-	  {
-	    double xnormal1, xnormal2;
-	    for (int edge=0;edge<nb_entity_type;edge++)
-	      {
-		int edge_index = (type%100)*edge;
-
-		int N1 = global_connectivity[edge_index]-1;
-		int N2 = global_connectivity[edge_index+1]-1;
-
-		double x1 = coord[dim_space*N1];
-		double x2 = coord[dim_space*N2];
-
-		double y1 = coord[dim_space*N1+1];
-		double y2 = coord[dim_space*N2+1];
-
-		xnormal1 = -(y2-y1);
-		xnormal2 = x2-x1;
-
-		normal[2*index] = xnormal1 ;
-		normal[2*index+1] = xnormal2 ;
-
-		index++;
-	      }
-	    break;
-	  }
-	case MED_POLYGON :
-	  {
-	    if(onAll)
-	      {
-		const int * connectivity = getPolygonsConnectivity(MED_EN::MED_NODAL,support_entity);
-		const int * connectivity_index = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,support_entity);
-		for (int polygs=0;polygs<nb_entity_type;polygs++)
-		  {
-		    int size=connectivity_index[polygs+1]-connectivity_index[polygs];
-		    double **pts=new double * [size];
-		    for(int iPts=0;iPts<size;iPts++)
-		      pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[polygs]+iPts-1])-1);
-		    INTERP_KERNEL::calculateNormalForPolyg((const double **)pts,size,normal+3*index);
-		    delete [] pts;
-		    index++;
-		  }
-	      }
-	    else
-	      {
-		const int * supp_number = Support->getNumber(MED_EN::MED_POLYGON);
-		const int * connectivity = getPolygonsConnectivity(MED_EN::MED_NODAL,support_entity);
-		const int * connectivity_index = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,support_entity);
-		int offsetWithClassicType=getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
-		for (int polygs=0;polygs<nb_entity_type;polygs++)
-		  {
-		    int localPolygsNbP1=supp_number[polygs]-offsetWithClassicType;
-		    int size=connectivity_index[localPolygsNbP1]-connectivity_index[localPolygsNbP1-1];
-		    double **pts=new double * [size];
-		    for(int iPts=0;iPts<size;iPts++)
-		      pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[localPolygsNbP1-1]+iPts-1])-1);
-		    INTERP_KERNEL::calculateNormalForPolyg((const double **)pts,size,normal+3*index);
-		    delete [] pts;
-		    index++;
-		  }
-	      }
-	    break;
-	  }
-	default :
-	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad Support to get Normals on it !"));
-	  break;
-	}
-      if (!onAll && type!=MED_EN::MED_POLYGON)
-	delete [] global_connectivity ;
     }
+
+    switch (type)
+    {
+    case MED_TRIA3 : case MED_TRIA6 :
+      {
+        for (int tria=0;tria<nb_entity_type;tria++)
+	      {
+          int tria_index = (type%100)*tria;
+          int N1 = global_connectivity[tria_index]-1;
+          int N2 = global_connectivity[tria_index+1]-1;
+          int N3 = global_connectivity[tria_index+2]-1;
+          INTERP_KERNEL::calculateNormalForTria(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,normal+3*index);
+          index++;
+	      }
+        break;
+      }
+    case MED_QUAD4 : case MED_QUAD8 :
+      {
+        for (int quad=0;quad<nb_entity_type;quad++)
+	      {
+          int quad_index = (type%100)*quad;
+          int N1 = global_connectivity[quad_index]-1;
+          int N2 = global_connectivity[quad_index+1]-1;
+          int N3 = global_connectivity[quad_index+2]-1;
+          int N4 = global_connectivity[quad_index+3]-1;
+          INTERP_KERNEL::calculateNormalForQuad(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,normal+3*index);
+          index++;
+	      }
+        break;
+      }
+    case MED_SEG2 : case MED_SEG3 :
+      {
+        double xnormal1, xnormal2;
+        for (int edge=0;edge<nb_entity_type;edge++)
+	      {
+          int edge_index = (type%100)*edge;
+
+          int N1 = global_connectivity[edge_index]-1;
+          int N2 = global_connectivity[edge_index+1]-1;
+
+          double x1 = coord[dim_space*N1];
+          double x2 = coord[dim_space*N2];
+
+          double y1 = coord[dim_space*N1+1];
+          double y2 = coord[dim_space*N2+1];
+
+          xnormal1 = -(y2-y1);
+          xnormal2 = x2-x1;
+
+          normal[2*index] = xnormal1 ;
+          normal[2*index+1] = xnormal2 ;
+
+          index++;
+	      }
+        break;
+      }
+    case MED_POLYGON :
+      {
+        if(onAll)
+	      {
+          const int * connectivity = getPolygonsConnectivity(MED_EN::MED_NODAL,support_entity);
+          const int * connectivity_index = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,support_entity);
+          for (int polygs=0;polygs<nb_entity_type;polygs++)
+          {
+            int size=connectivity_index[polygs+1]-connectivity_index[polygs];
+            double **pts=new double * [size];
+            for(int iPts=0;iPts<size;iPts++)
+              pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[polygs]+iPts-1])-1);
+            INTERP_KERNEL::calculateNormalForPolyg((const double **)pts,size,normal+3*index);
+            delete [] pts;
+            index++;
+          }
+	      }
+        else
+	      {
+          const int * supp_number = Support->getNumber(MED_EN::MED_POLYGON);
+          const int * connectivity = getPolygonsConnectivity(MED_EN::MED_NODAL,support_entity);
+          const int * connectivity_index = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,support_entity);
+          int offsetWithClassicType=getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
+          for (int polygs=0;polygs<nb_entity_type;polygs++)
+          {
+            int localPolygsNbP1=supp_number[polygs]-offsetWithClassicType;
+            int size=connectivity_index[localPolygsNbP1]-connectivity_index[localPolygsNbP1-1];
+            double **pts=new double * [size];
+            for(int iPts=0;iPts<size;iPts++)
+              pts[iPts]=(double *)(coord+dim_space*(connectivity[connectivity_index[localPolygsNbP1-1]+iPts-1])-1);
+            INTERP_KERNEL::calculateNormalForPolyg((const double **)pts,size,normal+3*index);
+            delete [] pts;
+            index++;
+          }
+	      }
+        break;
+      }
+    default :
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad Support to get Normals on it !"));
+      break;
+    }
+    if (!onAll && type!=MED_EN::MED_POLYGON)
+      delete [] global_connectivity ;
+  }
   END_OF_MED(LOC);
 
   return Normal;
 }
 /*!Returns the barycenter for each element in the support. The barycenter positions are returned
-as a field with a number of components equal to the mesh dimension.
-The barycenter computed by this method is actually the barycenter of the set of nodes of the elements, each having the same weight. 
+  as a field with a number of components equal to the mesh dimension.
+  The barycenter computed by this method is actually the barycenter of the set of nodes of the elements, each having the same weight. 
 */
 FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
@@ -1584,285 +1584,285 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
   const double * coord = getCoordinates(MED_FULL_INTERLACE);
   int index=0;
   for (int i=0;i<nb_type;i++)
+  {
+    medGeometryElement type = types[i] ;
+    nb_entity_type = Support->getNumberOfElements(type);
+    if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA )
     {
-      medGeometryElement type = types[i] ;
-      nb_entity_type = Support->getNumberOfElements(type);
-      if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA )
-	{
-	  if (onAll)
+      if (onAll)
 	    {
 	      global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
 	    }
-	  else
+      else
 	    {
 	      const int * supp_number = Support->getNumber(type);
 	      const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
 	      int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
 
 	      for (int k_type = 0; k_type<nb_entity_type; k_type++) {
-		for (int j_ent = 0; j_ent<(type%100); j_ent++) {
-		  const int *global_connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
-		  global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[global_connectivityIndex[supp_number[k_type]-1]+j_ent-1];
-		}
+          for (int j_ent = 0; j_ent<(type%100); j_ent++) {
+            const int *global_connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
+            global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[global_connectivityIndex[supp_number[k_type]-1]+j_ent-1];
+          }
 	      }
 	      global_connectivity = global_connectivity_tmp;
 	    }
-	}
-
-      switch (type)
-	{
-	case MED_TETRA4 : case MED_TETRA10 :
-	  {
-	    for (int tetra =0;tetra<nb_entity_type;tetra++)
-	      {
-		int tetra_index = (type%100)*tetra;
-
-		int N1 = global_connectivity[tetra_index]-1;
-		int N2 = global_connectivity[tetra_index+1]-1;
-		int N3 = global_connectivity[tetra_index+2]-1;
-		int N4 = global_connectivity[tetra_index+3]-1;
-		double *pts[4];
-		pts[0]=(double *)coord+dim_space*N1;
-		pts[1]=(double *)coord+dim_space*N2;
-		pts[2]=(double *)coord+dim_space*N3;
-		pts[3]=(double *)coord+dim_space*N4;
-		INTERP_KERNEL::calculateBarycenter<4,3>((const double **)pts,barycenter+3*index);
-		index++;
-	      }
-	    break;
-	  }
-	case MED_PYRA5 : case MED_PYRA13 :
-	  {
-	    for (int pyra=0;pyra<nb_entity_type;pyra++)
-	      {
-		int pyra_index = (type%100)*pyra;
-
-		int N1 = global_connectivity[pyra_index]-1;
-		int N2 = global_connectivity[pyra_index+1]-1;
-		int N3 = global_connectivity[pyra_index+2]-1;
-		int N4 = global_connectivity[pyra_index+3]-1;
-		int N5 = global_connectivity[pyra_index+4]-1;
-		double *pts[5];
-		pts[0]=(double *)coord+dim_space*N1;
-		pts[1]=(double *)coord+dim_space*N2;
-		pts[2]=(double *)coord+dim_space*N3;
-		pts[3]=(double *)coord+dim_space*N4;
-		pts[4]=(double *)coord+dim_space*N5;
-		INTERP_KERNEL::calculateBarycenter<5,3>((const double **)pts,barycenter+3*index);
-		index++;
-	      }
-	    break;
-	  }
-	case MED_PENTA6 : case MED_PENTA15 :
-	  {
-	    for (int penta=0;penta<nb_entity_type;penta++)
-	      {
-		int penta_index = (type%100)*penta;
-
-		int N1 = global_connectivity[penta_index]-1;
-		int N2 = global_connectivity[penta_index+1]-1;
-		int N3 = global_connectivity[penta_index+2]-1;
-		int N4 = global_connectivity[penta_index+3]-1;
-		int N5 = global_connectivity[penta_index+4]-1;
-		int N6 = global_connectivity[penta_index+5]-1;
-		double *pts[6];
-		pts[0]=(double *)coord+dim_space*N1;
-		pts[1]=(double *)coord+dim_space*N2;
-		pts[2]=(double *)coord+dim_space*N3;
-		pts[3]=(double *)coord+dim_space*N4;
-		pts[4]=(double *)coord+dim_space*N5;
-		pts[5]=(double *)coord+dim_space*N6;
-		INTERP_KERNEL::calculateBarycenter<6,3>((const double **)pts,barycenter+3*index);
-		index++;
-	      }
-	    break;
-	  }
-	case MED_HEXA8 : case MED_HEXA20 :
-	  {
-	    for (int hexa=0;hexa<nb_entity_type;hexa++)
-	      {
-		int hexa_index = (type%100)*hexa;
-
-		int N1 = global_connectivity[hexa_index]-1;
-		int N2 = global_connectivity[hexa_index+1]-1;
-		int N3 = global_connectivity[hexa_index+2]-1;
-		int N4 = global_connectivity[hexa_index+3]-1;
-		int N5 = global_connectivity[hexa_index+4]-1;
-		int N6 = global_connectivity[hexa_index+5]-1;
-		int N7 = global_connectivity[hexa_index+6]-1;
-		int N8 = global_connectivity[hexa_index+7]-1;
-		double *pts[8];
-		pts[0]=(double *)coord+dim_space*N1;
-		pts[1]=(double *)coord+dim_space*N2;
-		pts[2]=(double *)coord+dim_space*N3;
-		pts[3]=(double *)coord+dim_space*N4;
-		pts[4]=(double *)coord+dim_space*N5;
-		pts[5]=(double *)coord+dim_space*N6;
-		pts[6]=(double *)coord+dim_space*N7;
-		pts[7]=(double *)coord+dim_space*N8;
-		INTERP_KERNEL::calculateBarycenter<8,3>((const double **)pts,barycenter+3*index);
-		index++;
-	      }
-	    break;
-	  }
-	case MED_TRIA3 : case MED_TRIA6 :
-	  {
-	    for (int tria=0;tria<nb_entity_type;tria++)
-	      {
-		int tria_index = (type%100)*tria;
-		int N1 = global_connectivity[tria_index]-1;
-		int N2 = global_connectivity[tria_index+1]-1;
-		int N3 = global_connectivity[tria_index+2]-1;
-		double *pts[3];
-		pts[0]=(double *)coord+dim_space*N1;
-		pts[1]=(double *)coord+dim_space*N2;
-		pts[2]=(double *)coord+dim_space*N3;
-		if (dim_space==2)
-		  INTERP_KERNEL::calculateBarycenter<3,2>((const double **)pts,barycenter+2*index);
-		else
-		  INTERP_KERNEL::calculateBarycenter<3,3>((const double **)pts,barycenter+3*index);
-		index++;
-	      }
-	    break;
-	  }
-	case MED_QUAD4 : case MED_QUAD8 :
-	  {
-	    for (int quad=0;quad<nb_entity_type;quad++)
-	      {
-		int quad_index = (type%100)*quad;
-		int N1 = global_connectivity[quad_index]-1;
-		int N2 = global_connectivity[quad_index+1]-1;
-		int N3 = global_connectivity[quad_index+2]-1;
-		int N4 = global_connectivity[quad_index+3]-1;
-		double *pts[4];
-		pts[0]=(double *)coord+dim_space*N1;
-		pts[1]=(double *)coord+dim_space*N2;
-		pts[2]=(double *)coord+dim_space*N3;
-		pts[3]=(double *)coord+dim_space*N4;
-		if (dim_space==2)
-		  INTERP_KERNEL::calculateBarycenter<4,2>((const double **)pts,barycenter+2*index);
-		else
-		  INTERP_KERNEL::calculateBarycenter<4,3>((const double **)pts,barycenter+3*index);
-		index++;
-	      }
-	    break;
-	  }
-	case MED_SEG2 : case MED_SEG3 :
-	  {
-	    for (int edge=0;edge<nb_entity_type;edge++)
-	      {
-		int edge_index = (type%100)*edge;
-		int N1 = global_connectivity[edge_index]-1;
-		int N2 = global_connectivity[edge_index+1]-1;
-		double *pts[2];
-		pts[0]=(double *)coord+dim_space*N1;
-		pts[1]=(double *)coord+dim_space*N2;
-		if (dim_space==2)
-		  INTERP_KERNEL::calculateBarycenter<2,2>((const double **)pts,barycenter+2*index);
-		else
-		  INTERP_KERNEL::calculateBarycenter<2,3>((const double **)pts,barycenter+3*index);
-		index++;
-	      }
-	    break;
-	  }
-	case MED_POLYGON :
-	  {
-	    if(onAll)
-	      {
-		const int * connectivity = getPolygonsConnectivity(MED_EN::MED_NODAL,support_entity);
-		const int * connectivity_index = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,support_entity);
-		for (int polygs=0;polygs<nb_entity_type;polygs++)
-		  {
-		    int size=connectivity_index[polygs+1]-connectivity_index[polygs];
-		    double **pts=new double * [size];
-		    for(int iPts=0;iPts<size;iPts++)
-		      pts[iPts]=(double *)coord+dim_space*(connectivity[connectivity_index[polygs]+iPts-1]-1);
-		    INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,size,dim_space,barycenter+dim_space*index);
-		    delete [] pts;
-		  }
-	      }
-	    else
-	      {
-		const int * supp_number = Support->getNumber(MED_EN::MED_POLYGON);
-		const int * connectivity = getPolygonsConnectivity(MED_EN::MED_NODAL,support_entity);
-		const int * connectivity_index = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,support_entity);
-		int offsetWithClassicType=getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
-		for (int polygs=0;polygs<nb_entity_type;polygs++)
-		  {
-		    int localPolygsNbP1=supp_number[polygs]-offsetWithClassicType;
-		    int size=connectivity_index[localPolygsNbP1]-connectivity_index[localPolygsNbP1-1];
-		    double **pts=new double * [size];
-		    for(int iPts=0;iPts<size;iPts++)
-		      pts[iPts]=(double *)coord+dim_space*(connectivity[connectivity_index[localPolygsNbP1-1]+iPts-1]-1);
-		    INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,size,dim_space,barycenter+dim_space*index);
-		    delete [] pts;
-		  }
-	      }
-	    index++;
-	    break;
-	  }
-	case MED_EN::MED_POLYHEDRA:
-	  {
-	    if(onAll)
-	      {
-		for (int polyhs=0;polyhs<nb_entity_type;polyhs++)
-		  {
-		    int lgthNodes;
-		    int offsetWithClassicType=getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
-		    int *nodes=_connectivity->getNodesOfPolyhedron(offsetWithClassicType+polyhs+1,lgthNodes);
-		    double **pts=new double * [lgthNodes];
-		    for(int iPts=0;iPts<lgthNodes;iPts++)
-		      pts[iPts]=(double *)coord+3*(nodes[iPts]-1);
-		    INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,lgthNodes,3,barycenter+3*index);
-		    delete [] pts;
-		    delete [] nodes;
-		    index++;
-		  }
-	      }
-	    else
-	      {
-		const int * supp_number = Support->getNumber(MED_EN::MED_POLYHEDRA);
-		for (int polyhs=0;polyhs<nb_entity_type;polyhs++)
-		  {
-		    int lgthNodes;
-		    int *nodes=_connectivity->getNodesOfPolyhedron(supp_number[polyhs],lgthNodes);
-		    double **pts=new double * [lgthNodes];
-		    for(int iPts=0;iPts<lgthNodes;iPts++)
-		      pts[iPts]=(double *)coord+3*(nodes[iPts]-1);
-		    INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,lgthNodes,3,barycenter+3*index);
-		    delete [] pts;
-		    delete [] nodes;
-		    index++;
-		  }
-	      }
-	    break;
-	  }
-	default :
-	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad Support to get a barycenter on it (in fact unknown type) !"));
-	  break;
-	}
-
-      if (!onAll)
-	if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
-	  delete [] global_connectivity;
     }
+
+    switch (type)
+    {
+    case MED_TETRA4 : case MED_TETRA10 :
+      {
+        for (int tetra =0;tetra<nb_entity_type;tetra++)
+	      {
+          int tetra_index = (type%100)*tetra;
+
+          int N1 = global_connectivity[tetra_index]-1;
+          int N2 = global_connectivity[tetra_index+1]-1;
+          int N3 = global_connectivity[tetra_index+2]-1;
+          int N4 = global_connectivity[tetra_index+3]-1;
+          double *pts[4];
+          pts[0]=(double *)coord+dim_space*N1;
+          pts[1]=(double *)coord+dim_space*N2;
+          pts[2]=(double *)coord+dim_space*N3;
+          pts[3]=(double *)coord+dim_space*N4;
+          INTERP_KERNEL::calculateBarycenter<4,3>((const double **)pts,barycenter+3*index);
+          index++;
+	      }
+        break;
+      }
+    case MED_PYRA5 : case MED_PYRA13 :
+      {
+        for (int pyra=0;pyra<nb_entity_type;pyra++)
+	      {
+          int pyra_index = (type%100)*pyra;
+
+          int N1 = global_connectivity[pyra_index]-1;
+          int N2 = global_connectivity[pyra_index+1]-1;
+          int N3 = global_connectivity[pyra_index+2]-1;
+          int N4 = global_connectivity[pyra_index+3]-1;
+          int N5 = global_connectivity[pyra_index+4]-1;
+          double *pts[5];
+          pts[0]=(double *)coord+dim_space*N1;
+          pts[1]=(double *)coord+dim_space*N2;
+          pts[2]=(double *)coord+dim_space*N3;
+          pts[3]=(double *)coord+dim_space*N4;
+          pts[4]=(double *)coord+dim_space*N5;
+          INTERP_KERNEL::calculateBarycenter<5,3>((const double **)pts,barycenter+3*index);
+          index++;
+	      }
+        break;
+      }
+    case MED_PENTA6 : case MED_PENTA15 :
+      {
+        for (int penta=0;penta<nb_entity_type;penta++)
+	      {
+          int penta_index = (type%100)*penta;
+
+          int N1 = global_connectivity[penta_index]-1;
+          int N2 = global_connectivity[penta_index+1]-1;
+          int N3 = global_connectivity[penta_index+2]-1;
+          int N4 = global_connectivity[penta_index+3]-1;
+          int N5 = global_connectivity[penta_index+4]-1;
+          int N6 = global_connectivity[penta_index+5]-1;
+          double *pts[6];
+          pts[0]=(double *)coord+dim_space*N1;
+          pts[1]=(double *)coord+dim_space*N2;
+          pts[2]=(double *)coord+dim_space*N3;
+          pts[3]=(double *)coord+dim_space*N4;
+          pts[4]=(double *)coord+dim_space*N5;
+          pts[5]=(double *)coord+dim_space*N6;
+          INTERP_KERNEL::calculateBarycenter<6,3>((const double **)pts,barycenter+3*index);
+          index++;
+	      }
+        break;
+      }
+    case MED_HEXA8 : case MED_HEXA20 :
+      {
+        for (int hexa=0;hexa<nb_entity_type;hexa++)
+	      {
+          int hexa_index = (type%100)*hexa;
+
+          int N1 = global_connectivity[hexa_index]-1;
+          int N2 = global_connectivity[hexa_index+1]-1;
+          int N3 = global_connectivity[hexa_index+2]-1;
+          int N4 = global_connectivity[hexa_index+3]-1;
+          int N5 = global_connectivity[hexa_index+4]-1;
+          int N6 = global_connectivity[hexa_index+5]-1;
+          int N7 = global_connectivity[hexa_index+6]-1;
+          int N8 = global_connectivity[hexa_index+7]-1;
+          double *pts[8];
+          pts[0]=(double *)coord+dim_space*N1;
+          pts[1]=(double *)coord+dim_space*N2;
+          pts[2]=(double *)coord+dim_space*N3;
+          pts[3]=(double *)coord+dim_space*N4;
+          pts[4]=(double *)coord+dim_space*N5;
+          pts[5]=(double *)coord+dim_space*N6;
+          pts[6]=(double *)coord+dim_space*N7;
+          pts[7]=(double *)coord+dim_space*N8;
+          INTERP_KERNEL::calculateBarycenter<8,3>((const double **)pts,barycenter+3*index);
+          index++;
+	      }
+        break;
+      }
+    case MED_TRIA3 : case MED_TRIA6 :
+      {
+        for (int tria=0;tria<nb_entity_type;tria++)
+	      {
+          int tria_index = (type%100)*tria;
+          int N1 = global_connectivity[tria_index]-1;
+          int N2 = global_connectivity[tria_index+1]-1;
+          int N3 = global_connectivity[tria_index+2]-1;
+          double *pts[3];
+          pts[0]=(double *)coord+dim_space*N1;
+          pts[1]=(double *)coord+dim_space*N2;
+          pts[2]=(double *)coord+dim_space*N3;
+          if (dim_space==2)
+            INTERP_KERNEL::calculateBarycenter<3,2>((const double **)pts,barycenter+2*index);
+          else
+            INTERP_KERNEL::calculateBarycenter<3,3>((const double **)pts,barycenter+3*index);
+          index++;
+	      }
+        break;
+      }
+    case MED_QUAD4 : case MED_QUAD8 :
+      {
+        for (int quad=0;quad<nb_entity_type;quad++)
+	      {
+          int quad_index = (type%100)*quad;
+          int N1 = global_connectivity[quad_index]-1;
+          int N2 = global_connectivity[quad_index+1]-1;
+          int N3 = global_connectivity[quad_index+2]-1;
+          int N4 = global_connectivity[quad_index+3]-1;
+          double *pts[4];
+          pts[0]=(double *)coord+dim_space*N1;
+          pts[1]=(double *)coord+dim_space*N2;
+          pts[2]=(double *)coord+dim_space*N3;
+          pts[3]=(double *)coord+dim_space*N4;
+          if (dim_space==2)
+            INTERP_KERNEL::calculateBarycenter<4,2>((const double **)pts,barycenter+2*index);
+          else
+            INTERP_KERNEL::calculateBarycenter<4,3>((const double **)pts,barycenter+3*index);
+          index++;
+	      }
+        break;
+      }
+    case MED_SEG2 : case MED_SEG3 :
+      {
+        for (int edge=0;edge<nb_entity_type;edge++)
+	      {
+          int edge_index = (type%100)*edge;
+          int N1 = global_connectivity[edge_index]-1;
+          int N2 = global_connectivity[edge_index+1]-1;
+          double *pts[2];
+          pts[0]=(double *)coord+dim_space*N1;
+          pts[1]=(double *)coord+dim_space*N2;
+          if (dim_space==2)
+            INTERP_KERNEL::calculateBarycenter<2,2>((const double **)pts,barycenter+2*index);
+          else
+            INTERP_KERNEL::calculateBarycenter<2,3>((const double **)pts,barycenter+3*index);
+          index++;
+	      }
+        break;
+      }
+    case MED_POLYGON :
+      {
+        if(onAll)
+	      {
+          const int * connectivity = getPolygonsConnectivity(MED_EN::MED_NODAL,support_entity);
+          const int * connectivity_index = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,support_entity);
+          for (int polygs=0;polygs<nb_entity_type;polygs++)
+          {
+            int size=connectivity_index[polygs+1]-connectivity_index[polygs];
+            double **pts=new double * [size];
+            for(int iPts=0;iPts<size;iPts++)
+              pts[iPts]=(double *)coord+dim_space*(connectivity[connectivity_index[polygs]+iPts-1]-1);
+            INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,size,dim_space,barycenter+dim_space*index);
+            delete [] pts;
+          }
+	      }
+        else
+	      {
+          const int * supp_number = Support->getNumber(MED_EN::MED_POLYGON);
+          const int * connectivity = getPolygonsConnectivity(MED_EN::MED_NODAL,support_entity);
+          const int * connectivity_index = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,support_entity);
+          int offsetWithClassicType=getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
+          for (int polygs=0;polygs<nb_entity_type;polygs++)
+          {
+            int localPolygsNbP1=supp_number[polygs]-offsetWithClassicType;
+            int size=connectivity_index[localPolygsNbP1]-connectivity_index[localPolygsNbP1-1];
+            double **pts=new double * [size];
+            for(int iPts=0;iPts<size;iPts++)
+              pts[iPts]=(double *)coord+dim_space*(connectivity[connectivity_index[localPolygsNbP1-1]+iPts-1]-1);
+            INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,size,dim_space,barycenter+dim_space*index);
+            delete [] pts;
+          }
+	      }
+        index++;
+        break;
+      }
+    case MED_EN::MED_POLYHEDRA:
+      {
+        if(onAll)
+	      {
+          for (int polyhs=0;polyhs<nb_entity_type;polyhs++)
+          {
+            int lgthNodes;
+            int offsetWithClassicType=getNumberOfElements(support_entity,MED_ALL_ELEMENTS);
+            int *nodes=_connectivity->getNodesOfPolyhedron(offsetWithClassicType+polyhs+1,lgthNodes);
+            double **pts=new double * [lgthNodes];
+            for(int iPts=0;iPts<lgthNodes;iPts++)
+              pts[iPts]=(double *)coord+3*(nodes[iPts]-1);
+            INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,lgthNodes,3,barycenter+3*index);
+            delete [] pts;
+            delete [] nodes;
+            index++;
+          }
+	      }
+        else
+	      {
+          const int * supp_number = Support->getNumber(MED_EN::MED_POLYHEDRA);
+          for (int polyhs=0;polyhs<nb_entity_type;polyhs++)
+          {
+            int lgthNodes;
+            int *nodes=_connectivity->getNodesOfPolyhedron(supp_number[polyhs],lgthNodes);
+            double **pts=new double * [lgthNodes];
+            for(int iPts=0;iPts<lgthNodes;iPts++)
+              pts[iPts]=(double *)coord+3*(nodes[iPts]-1);
+            INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,lgthNodes,3,barycenter+3*index);
+            delete [] pts;
+            delete [] nodes;
+            index++;
+          }
+	      }
+        break;
+      }
+    default :
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad Support to get a barycenter on it (in fact unknown type) !"));
+      break;
+    }
+
+    if (!onAll)
+      if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
+        delete [] global_connectivity;
+  }
   //END_OF_MED();
   return Barycenter;
 }
 /*!  
-@}
+  @}
 */
 
 bool MESH::isEmpty() const
 {
-    bool notempty = _name != "NOT DEFINED"                || _coordinate != NULL           || _connectivity != NULL ||
-	         _spaceDimension !=MED_INVALID || _meshDimension !=MED_INVALID  ||
-		 _numberOfNodes !=MED_INVALID  || _groupNode.size() != 0   ||
-		 _familyNode.size() != 0       || _groupCell.size() != 0   ||
-		 _familyCell.size() != 0       || _groupFace.size() != 0   ||
-		 _familyFace.size() != 0       || _groupEdge.size() != 0   ||
-		 _familyEdge.size() != 0       || _isAGrid != 0 ;
-    return !notempty;
+  bool notempty = _name != "NOT DEFINED"                || _coordinate != NULL           || _connectivity != NULL ||
+    _spaceDimension !=MED_INVALID || _meshDimension !=MED_INVALID  ||
+    _numberOfNodes !=MED_INVALID  || _groupNode.size() != 0   ||
+    _familyNode.size() != 0       || _groupCell.size() != 0   ||
+    _familyCell.size() != 0       || _groupFace.size() != 0   ||
+    _familyFace.size() != 0       || _groupEdge.size() != 0   ||
+    _familyEdge.size() != 0       || _isAGrid != 0 ;
+  return !notempty;
 }
 
 void MESH::read(int index)
@@ -1887,7 +1887,7 @@ void MESH::read(int index)
 /*!
 \addtogroup MESH_io
 @{
- */
+*/
 /*! Writes all the content of the MESH using driver referenced by the integer handle returned by a \a addDriver call.
 
 Example :
@@ -1919,23 +1919,23 @@ void MESH::write(int index/*=0*/, const string & driverName/* = ""*/)
   END_OF_MED(LOC);
 }
 /*!
-@}
+  @}
 */
 
 /*!
 \addtogroup MESH_advanced
 @{
- */
+*/
 
 /*!
-Retrieves the skin of support \a Support3D. This method is only available in 3D.
-On output, it returns a MED_FACE support with the skin of all elements contained in support.
-The skin is defined as the list of faces that are compnents of only one volume in the input
-support.
+  Retrieves the skin of support \a Support3D. This method is only available in 3D.
+  On output, it returns a MED_FACE support with the skin of all elements contained in support.
+  The skin is defined as the list of faces that are compnents of only one volume in the input
+  support.
 
-WARNING: This method can recalculate descending connectivity from partial to full form,
-so that partial SUPPORT on MED_FACE on this mesh becomes invalid.
- */
+  WARNING: This method can recalculate descending connectivity from partial to full form,
+  so that partial SUPPORT on MED_FACE on this mesh becomes invalid.
+*/
 SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getSkin : " ;
@@ -1980,7 +1980,7 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
 
     int * myConnectivityValue = const_cast <int *>
       (getConnectivity(MED_FULL_INTERLACE, MED_DESCENDING,
-		       MED_CELL, MED_ALL_ELEMENTS));
+                       MED_CELL, MED_ALL_ELEMENTS));
     int * myConnectivityIndex = const_cast <int *> (getConnectivityIndex(MED_DESCENDING, MED_CELL));
     int * myCellNbs = const_cast <int *> (Support3D->getnumber()->getValue());
     int nbCells = Support3D->getnumber()->getLength();
@@ -2044,9 +2044,9 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
     for (myElementsListIt=myElementsList.begin();myElementsListIt!=myElementsList.end();myElementsListIt++) {
       medGeometryElement myType = getElementType(MED_FACE,*myElementsListIt) ;
       if (theType.find(myType) != theType.end() )
-	theType[myType]+=1 ;
+        theType[myType]+=1 ;
       else
-	theType[myType]=1 ;
+        theType[myType]=1 ;
     }
     numberOfGeometricType = theType.size() ;
     geometricType = new medGeometryElement[numberOfGeometricType] ;
@@ -2080,7 +2080,7 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
   delete[] geometricType;
   delete[] mySkyLineArrayIndex;
   delete[] myListArray;
-//   delete mySkyLineArray;
+  //   delete mySkyLineArray;
 
   END_OF_MED(LOC);
   return mySupport ;
@@ -2106,105 +2106,105 @@ SUPPORT * MESH::mergeSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPT
   if (size == 0)
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) <<
                                      " mergeSupports() does't accept zero size vector"));
-    
+
   if (size == 1)
-    {
-      MESSAGE_MED(LOC <<" there is only one SUPPORT in the argument list, the method return a copy of this object !");
-      SUPPORT * obj = const_cast <SUPPORT *> (Supports[0]);
+  {
+    MESSAGE_MED(LOC <<" there is only one SUPPORT in the argument list, the method return a copy of this object !");
+    SUPPORT * obj = const_cast <SUPPORT *> (Supports[0]);
 
-      returnedSupport = new SUPPORT(*obj);
+    returnedSupport = new SUPPORT(*obj);
 
-      int lenName = strlen((Supports[0]->getName()).c_str()) + 8 + 1;
-      int lenDescription = strlen((Supports[0]->getDescription()).c_str()) + 8 + 1;
+    int lenName = strlen((Supports[0]->getName()).c_str()) + 8 + 1;
+    int lenDescription = strlen((Supports[0]->getDescription()).c_str()) + 8 + 1;
 
-      returnedSupportNameChar = new char[lenName];
-      returnedSupportDescriptionChar = new char[lenDescription];
+    returnedSupportNameChar = new char[lenName];
+    returnedSupportDescriptionChar = new char[lenDescription];
 
-      returnedSupportNameChar = strcpy(returnedSupportNameChar,"Copy of ");
-      returnedSupportNameChar = strcat(returnedSupportNameChar,(Supports[0]->getName()).c_str());
-      returnedSupportDescriptionChar = strcpy(returnedSupportDescriptionChar,"Copy of ");
-      returnedSupportDescriptionChar = strcat(returnedSupportDescriptionChar,
-					      (Supports[0]->getDescription()).c_str());
+    returnedSupportNameChar = strcpy(returnedSupportNameChar,"Copy of ");
+    returnedSupportNameChar = strcat(returnedSupportNameChar,(Supports[0]->getName()).c_str());
+    returnedSupportDescriptionChar = strcpy(returnedSupportDescriptionChar,"Copy of ");
+    returnedSupportDescriptionChar = strcat(returnedSupportDescriptionChar,
+                                            (Supports[0]->getDescription()).c_str());
 
-      returnedSupportName = string(returnedSupportNameChar);
-      returnedSupportDescription = string(returnedSupportDescriptionChar);
+    returnedSupportName = string(returnedSupportNameChar);
+    returnedSupportDescription = string(returnedSupportDescriptionChar);
 
-      returnedSupport->setName(returnedSupportName);
-      returnedSupport->setDescription(returnedSupportDescription);
+    returnedSupport->setName(returnedSupportName);
+    returnedSupport->setDescription(returnedSupportDescription);
 
-      delete [] returnedSupportNameChar;
-      delete [] returnedSupportDescriptionChar;
-    }
+    delete [] returnedSupportNameChar;
+    delete [] returnedSupportDescriptionChar;
+  }
   else
+  {
+    SUPPORT * obj = const_cast <SUPPORT *> (Supports[0]);
+    returnedSupport = new SUPPORT(*obj);
+
+    int lenName = strlen((Supports[0]->getName()).c_str()) + 9 + 1;
+    int lenDescription = strlen((Supports[0]->getDescription()).c_str()) + 9 + 1;
+
+    for(int i = 1;i<size;i++)
     {
-      SUPPORT * obj = const_cast <SUPPORT *> (Supports[0]);
-      returnedSupport = new SUPPORT(*obj);
+      obj = const_cast <SUPPORT *> (Supports[i]);
+      returnedSupport->blending(obj);
 
-      int lenName = strlen((Supports[0]->getName()).c_str()) + 9 + 1;
-      int lenDescription = strlen((Supports[0]->getDescription()).c_str()) + 9 + 1;
-
-      for(int i = 1;i<size;i++)
-	{
-	  obj = const_cast <SUPPORT *> (Supports[i]);
-	  returnedSupport->blending(obj);
-
-	  if (i == (size-1))
+      if (i == (size-1))
 	    {
 	      lenName = lenName + 5 + strlen((Supports[i]->getName()).c_str());
 	      lenDescription = lenDescription + 5 +
-		strlen((Supports[i]->getDescription()).c_str());
+          strlen((Supports[i]->getDescription()).c_str());
 	    }
-	  else
+      else
 	    {
 	      lenName = lenName + 2 + strlen((Supports[i]->getName()).c_str());
 	      lenDescription = lenDescription + 2 +
-		strlen((Supports[i]->getDescription()).c_str());
+          strlen((Supports[i]->getDescription()).c_str());
 	    }
-	}
+    }
 
-      returnedSupportNameChar = new char[lenName];
-      returnedSupportDescriptionChar = new char[lenDescription];
+    returnedSupportNameChar = new char[lenName];
+    returnedSupportDescriptionChar = new char[lenDescription];
 
-      returnedSupportNameChar = strcpy(returnedSupportNameChar,"Merge of ");
-      returnedSupportDescriptionChar = strcpy(returnedSupportDescriptionChar,"Merge of ");
+    returnedSupportNameChar = strcpy(returnedSupportNameChar,"Merge of ");
+    returnedSupportDescriptionChar = strcpy(returnedSupportDescriptionChar,"Merge of ");
 
-      returnedSupportNameChar = strcat(returnedSupportNameChar,(Supports[0]->getName()).c_str());
-      returnedSupportDescriptionChar = strcat(returnedSupportDescriptionChar,
-					      (Supports[0]->getDescription()).c_str());
+    returnedSupportNameChar = strcat(returnedSupportNameChar,(Supports[0]->getName()).c_str());
+    returnedSupportDescriptionChar = strcat(returnedSupportDescriptionChar,
+                                            (Supports[0]->getDescription()).c_str());
 
-      for(int i = 1;i<size;i++)
-	{
-	  if (i == (size-1))
+    for(int i = 1;i<size;i++)
+    {
+      if (i == (size-1))
 	    {
 	      returnedSupportNameChar = strcat(returnedSupportNameChar," and ");
 	      returnedSupportDescriptionChar = strcat(returnedSupportDescriptionChar," and ");
 
 	      returnedSupportNameChar = strcat(returnedSupportNameChar,
-					       (Supports[i]->getName()).c_str());
+                                         (Supports[i]->getName()).c_str());
 	      returnedSupportDescriptionChar = strcat(returnedSupportDescriptionChar,
-						      (Supports[i]->getDescription()).c_str());
+                                                (Supports[i]->getDescription()).c_str());
 	    }
-	  else
+      else
 	    {
 	      returnedSupportNameChar = strcat(returnedSupportNameChar,", ");
 	      returnedSupportNameChar = strcat(returnedSupportNameChar,
-					       (Supports[i]->getName()).c_str());
+                                         (Supports[i]->getName()).c_str());
 
 	      returnedSupportDescriptionChar = strcat(returnedSupportDescriptionChar,", ");
 	      returnedSupportDescriptionChar = strcat(returnedSupportDescriptionChar,
-						      (Supports[i]->getDescription()).c_str());
+                                                (Supports[i]->getDescription()).c_str());
 	    }
-	}
-
-      returnedSupportName = string(returnedSupportNameChar);
-      returnedSupport->setName(returnedSupportName);
-
-      returnedSupportDescription = string(returnedSupportDescriptionChar);
-      returnedSupport->setDescription(returnedSupportDescription);
-
-      delete [] returnedSupportNameChar;
-      delete [] returnedSupportDescriptionChar;
     }
+
+    returnedSupportName = string(returnedSupportNameChar);
+    returnedSupport->setName(returnedSupportName);
+
+    returnedSupportDescription = string(returnedSupportDescriptionChar);
+    returnedSupport->setDescription(returnedSupportDescription);
+
+    delete [] returnedSupportNameChar;
+    delete [] returnedSupportDescriptionChar;
+  }
 
   END_OF_MED(LOC);
   return returnedSupport;
@@ -2228,151 +2228,151 @@ SUPPORT * MESH::intersectSupports(const vector<SUPPORT *> Supports) throw (MEDEX
   int size = Supports.size();
 
   if (size == 1)
+  {
+    MESSAGE_MED(PREFIX_MED <<" there is only one SUPPORT in the argument list, the method return a copy of this object !");
+    SUPPORT * obj = const_cast <SUPPORT *> (Supports[0]);
+
+    returnedSupport = new SUPPORT(*obj);
+
+    int lenName = strlen((Supports[0]->getName()).c_str()) + 8 + 1;
+    int lenDescription = strlen((Supports[0]->getDescription()).c_str()) + 8 + 1;
+
+    returnedSupportNameChar = new char[lenName];
+    returnedSupportDescriptionChar = new char[lenDescription];
+
+    returnedSupportNameChar = strcpy(returnedSupportNameChar,"Copy of ");
+    returnedSupportNameChar = strcat(returnedSupportNameChar,(Supports[0]->getName()).c_str());
+    returnedSupportDescriptionChar = strcpy(returnedSupportDescriptionChar,"Copy of ");
+    returnedSupportDescriptionChar = strcat(returnedSupportDescriptionChar,
+                                            (Supports[0]->getDescription()).c_str());
+
+    returnedSupportName = string(returnedSupportNameChar);
+    returnedSupportDescription = string(returnedSupportDescriptionChar);
+
+    returnedSupport->setName(returnedSupportName);
+    returnedSupport->setDescription(returnedSupportDescription);
+
+    delete [] returnedSupportNameChar;
+    delete [] returnedSupportDescriptionChar;
+  }
+  else
+  {
+    SUPPORT * obj = const_cast <SUPPORT *> (Supports[0]);
+    returnedSupport = new SUPPORT(*obj);
+
+    int lenName = strlen((Supports[0]->getName()).c_str()) + 16 + 1;
+    int lenDescription = strlen((Supports[0]->getDescription()).c_str()) + 16 + 1;
+
+    for(int i = 1;i<size;i++)
     {
-      MESSAGE_MED(PREFIX_MED <<" there is only one SUPPORT in the argument list, the method return a copy of this object !");
-      SUPPORT * obj = const_cast <SUPPORT *> (Supports[0]);
+      obj = const_cast <SUPPORT *> (Supports[i]);
+      returnedSupport->intersecting(obj);
 
-      returnedSupport = new SUPPORT(*obj);
-
-      int lenName = strlen((Supports[0]->getName()).c_str()) + 8 + 1;
-      int lenDescription = strlen((Supports[0]->getDescription()).c_str()) + 8 + 1;
-
+      if (i == (size-1))
+	    {
+	      lenName = lenName + 5 + strlen((Supports[i]->getName()).c_str());
+	      lenDescription = lenDescription + 5 +
+          strlen((Supports[i]->getDescription()).c_str());
+	    }
+      else
+	    {
+	      lenName = lenName + 2 + strlen((Supports[i]->getName()).c_str());
+	      lenDescription = lenDescription + 2 +
+          strlen((Supports[i]->getDescription()).c_str());
+	    }
+    }
+    if(returnedSupport != (SUPPORT *) NULL)
+    {
       returnedSupportNameChar = new char[lenName];
       returnedSupportDescriptionChar = new char[lenDescription];
 
-      returnedSupportNameChar = strcpy(returnedSupportNameChar,"Copy of ");
-      returnedSupportNameChar = strcat(returnedSupportNameChar,(Supports[0]->getName()).c_str());
-      returnedSupportDescriptionChar = strcpy(returnedSupportDescriptionChar,"Copy of ");
-      returnedSupportDescriptionChar = strcat(returnedSupportDescriptionChar,
-					      (Supports[0]->getDescription()).c_str());
+      returnedSupportNameChar = strcpy(returnedSupportNameChar,
+                                       "Intersection of ");
+      returnedSupportDescriptionChar =
+        strcpy(returnedSupportDescriptionChar,"Intersection of ");
+
+      returnedSupportNameChar = strcat(returnedSupportNameChar,
+                                       (Supports[0]->getName()).c_str());
+      returnedSupportDescriptionChar =
+        strcat(returnedSupportDescriptionChar,
+               (Supports[0]->getDescription()).c_str());
+
+      for(int i = 1;i<size;i++)
+	    {
+	      if (i == (size-1))
+        {
+          returnedSupportNameChar = strcat(returnedSupportNameChar,
+                                           " and ");
+          returnedSupportDescriptionChar =
+            strcat(returnedSupportDescriptionChar," and ");
+
+          returnedSupportNameChar =
+            strcat(returnedSupportNameChar,
+                   (Supports[i]->getName()).c_str());
+          returnedSupportDescriptionChar =
+            strcat(returnedSupportDescriptionChar,
+                   (Supports[i]->getDescription()).c_str());
+        }
+	      else
+        {
+          returnedSupportNameChar = strcat(returnedSupportNameChar,
+                                           ", ");
+          returnedSupportNameChar =
+            strcat(returnedSupportNameChar,
+                   (Supports[i]->getName()).c_str());
+
+          returnedSupportDescriptionChar =
+            strcat(returnedSupportDescriptionChar,", ");
+          returnedSupportDescriptionChar =
+            strcat(returnedSupportDescriptionChar,
+                   (Supports[i]->getDescription()).c_str());
+        }
+	    }
 
       returnedSupportName = string(returnedSupportNameChar);
-      returnedSupportDescription = string(returnedSupportDescriptionChar);
-
       returnedSupport->setName(returnedSupportName);
+
+      returnedSupportDescription = string(returnedSupportDescriptionChar);
       returnedSupport->setDescription(returnedSupportDescription);
 
       delete [] returnedSupportNameChar;
       delete [] returnedSupportDescriptionChar;
     }
-  else
-    {
-      SUPPORT * obj = const_cast <SUPPORT *> (Supports[0]);
-      returnedSupport = new SUPPORT(*obj);
-
-      int lenName = strlen((Supports[0]->getName()).c_str()) + 16 + 1;
-      int lenDescription = strlen((Supports[0]->getDescription()).c_str()) + 16 + 1;
-
-      for(int i = 1;i<size;i++)
-	{
-	  obj = const_cast <SUPPORT *> (Supports[i]);
-	  returnedSupport->intersecting(obj);
-
-	  if (i == (size-1))
-	    {
-	      lenName = lenName + 5 + strlen((Supports[i]->getName()).c_str());
-	      lenDescription = lenDescription + 5 +
-		strlen((Supports[i]->getDescription()).c_str());
-	    }
-	  else
-	    {
-	      lenName = lenName + 2 + strlen((Supports[i]->getName()).c_str());
-	      lenDescription = lenDescription + 2 +
-		strlen((Supports[i]->getDescription()).c_str());
-	    }
-	}
-      if(returnedSupport != (SUPPORT *) NULL)
-	{
-	  returnedSupportNameChar = new char[lenName];
-	  returnedSupportDescriptionChar = new char[lenDescription];
-
-	  returnedSupportNameChar = strcpy(returnedSupportNameChar,
-					   "Intersection of ");
-	  returnedSupportDescriptionChar =
-	    strcpy(returnedSupportDescriptionChar,"Intersection of ");
-
-	  returnedSupportNameChar = strcat(returnedSupportNameChar,
-					   (Supports[0]->getName()).c_str());
-	  returnedSupportDescriptionChar =
-	    strcat(returnedSupportDescriptionChar,
-		   (Supports[0]->getDescription()).c_str());
-
-	  for(int i = 1;i<size;i++)
-	    {
-	      if (i == (size-1))
-		{
-		  returnedSupportNameChar = strcat(returnedSupportNameChar,
-						   " and ");
-		  returnedSupportDescriptionChar =
-		    strcat(returnedSupportDescriptionChar," and ");
-
-		  returnedSupportNameChar =
-		    strcat(returnedSupportNameChar,
-			   (Supports[i]->getName()).c_str());
-		  returnedSupportDescriptionChar =
-		    strcat(returnedSupportDescriptionChar,
-			   (Supports[i]->getDescription()).c_str());
-		}
-	      else
-		{
-		  returnedSupportNameChar = strcat(returnedSupportNameChar,
-						   ", ");
-		  returnedSupportNameChar =
-		    strcat(returnedSupportNameChar,
-			   (Supports[i]->getName()).c_str());
-
-		  returnedSupportDescriptionChar =
-		    strcat(returnedSupportDescriptionChar,", ");
-		  returnedSupportDescriptionChar =
-		    strcat(returnedSupportDescriptionChar,
-			   (Supports[i]->getDescription()).c_str());
-		}
-	    }
-
-	  returnedSupportName = string(returnedSupportNameChar);
-	  returnedSupport->setName(returnedSupportName);
-
-	  returnedSupportDescription = string(returnedSupportDescriptionChar);
-	  returnedSupport->setDescription(returnedSupportDescription);
-
-	  delete [] returnedSupportNameChar;
-	  delete [] returnedSupportDescriptionChar;
-	}
-    }
+  }
 
   END_OF_MED(LOC);
   return returnedSupport;
 }
 /*!
-@}
+  @}
 */
 
 /*!\addtogroup MESH_families
-@{
+  @{
 */
 
 /*! Retrieves the group named \a name.
-The method browses all the entities in order to find the group.
-If two groups with the same name coexist, the first one found will be
-returned. If no group with the correct name is found, the method throws
-an exception.
- */
+  The method browses all the entities in order to find the group.
+  If two groups with the same name coexist, the first one found will be
+  returned. If no group with the correct name is found, the method throws
+  an exception.
+*/
 const GROUP* MESH::getGroup(const string& name) const  throw (MEDEXCEPTION)
 {
 	const vector<GROUP*>* group_vectors [4]={&_groupNode, &_groupEdge,&_groupFace,&_groupCell};
 	for (int ientity=0;ientity<4;ientity++)
 		for (int igroup=0; igroup< group_vectors[ientity]->size();igroup++)
-			{
-				const vector<GROUP*>& group_vect = *group_vectors[ientity];
-				GROUP* group=group_vect[igroup];
-				if (group->getName()==name)
-					return group;
-			}
+    {
+      const vector<GROUP*>& group_vect = *group_vectors[ientity];
+      GROUP* group=group_vect[igroup];
+      if (group->getName()==name)
+        return group;
+    }
 	cerr << "MESH::getGroup("<<name<<") : group "<<name <<" was not found"<<endl;
 	throw MEDEXCEPTION("MESH::getGroup(name) : name not found");
 }
 /*! 
-@}
+  @}
 */
 
 const GROUP* MESH::getGroup(MED_EN::medEntityMesh entity, int i) const
@@ -2412,7 +2412,7 @@ const GROUP* MESH::getGroup(MED_EN::medEntityMesh entity, int i) const
 @{
 */
 /*! Returns the groups of type \a entity present in the mesh as a vector of pointers. The GROUP class inheriting from the SUPPORT class, the 
-methods that can be used on these groups are explained in the related section.*/
+  methods that can be used on these groups are explained in the related section.*/
 const vector<GROUP*> MESH::getGroups(MED_EN::medEntityMesh entity) const
 {
   switch (entity) {
@@ -2429,7 +2429,7 @@ const vector<GROUP*> MESH::getGroups(MED_EN::medEntityMesh entity) const
   }
 }
 /*!
-@}
+  @}
 */
 
 /*!
@@ -2442,47 +2442,47 @@ const vector<GROUP*> MESH::getGroups(MED_EN::medEntityMesh entity) const
 void MESH::createGroups()
 {
   for (medEntityMesh entity=MED_CELL; entity!=MED_ALL_ENTITIES; ++entity)
+  {
+    // make myFamilies points to the member corresponding to entity
+    vector<FAMILY*>* myFamilies;
+    vector<GROUP*>* myGroups;
+    switch ( entity )
     {
-      // make myFamilies points to the member corresponding to entity
-      vector<FAMILY*>* myFamilies;
-      vector<GROUP*>* myGroups;
-      switch ( entity )
-        {
-        case MED_CELL :
-          myFamilies = & _familyCell;
-          myGroups = & _groupCell;
-          break;
-        case MED_FACE :
-          myFamilies = & _familyFace;
-          myGroups = & _groupFace;
-          break;
-        case MED_EDGE :
-          myFamilies = & _familyEdge;
-          myGroups = & _groupEdge;
-          break;
-        case MED_NODE :
-          myFamilies = & _familyNode;
-          myGroups = & _groupNode;
-          break;
-        }
-      
-      
-      for (int i=0; i< myFamilies->size(); i++)
-        {
-          list <FAMILY*> fam_list;
-          fam_list.push_back((*myFamilies)[i]);
-          //creates a group with the family name and only one family
-          GROUP* group=new GROUP((*myFamilies)[i]->getName(),fam_list);
-          (*myGroups).push_back(group);
-        }
+    case MED_CELL :
+      myFamilies = & _familyCell;
+      myGroups = & _groupCell;
+      break;
+    case MED_FACE :
+      myFamilies = & _familyFace;
+      myGroups = & _groupFace;
+      break;
+    case MED_EDGE :
+      myFamilies = & _familyEdge;
+      myGroups = & _groupEdge;
+      break;
+    case MED_NODE :
+      myFamilies = & _familyNode;
+      myGroups = & _groupNode;
+      break;
     }
+
+
+    for (int i=0; i< myFamilies->size(); i++)
+    {
+      list <FAMILY*> fam_list;
+      fam_list.push_back((*myFamilies)[i]);
+      //creates a group with the family name and only one family
+      GROUP* group=new GROUP((*myFamilies)[i]->getName(),fam_list);
+      (*myGroups).push_back(group);
+    }
+  }
 }
 
 // internal helper type
 struct _cell
 {
-    std::vector<int> groups;
-    MED_EN::medGeometryElement geometricType;
+  std::vector<int> groups;
+  MED_EN::medGeometryElement geometricType;
   // to have geometricType good for nodal groups when MESH::getNumberOfTypesWithPoly(MED_NODE)==0
   _cell():geometricType(MED_POINT1) {}
 };
@@ -2490,241 +2490,241 @@ struct _cell
 // Create families from groups
 void MESH::createFamilies()
 {
-    int idFamNode = 0; // identifier for node families
-    int idFamElement = 0; // identifier for cell, face or edge families
+  int idFamNode = 0; // identifier for node families
+  int idFamElement = 0; // identifier for cell, face or edge families
 
-    // Main loop on mesh's entities
-    for (medEntityMesh entity=MED_CELL; entity!=MED_ALL_ENTITIES; ++entity)
+  // Main loop on mesh's entities
+  for (medEntityMesh entity=MED_CELL; entity!=MED_ALL_ENTITIES; ++entity)
+  {
+    int numberofgroups = getNumberOfGroups(entity);
+    if(!numberofgroups)
+      continue; // no groups for this entity
+
+    vector< vector<FAMILY*> > whichFamilyInGroup(numberofgroups); // this container is used to update groups at the end
+
+    // make myFamilies points to the member corresponding to entity
+    vector<FAMILY*>* myFamilies;
+    switch ( entity )
     {
-	int numberofgroups = getNumberOfGroups(entity);
-	if(!numberofgroups)
-	    continue; // no groups for this entity
+    case MED_CELL :
+      myFamilies = & _familyCell;
+      break;
+    case MED_FACE :
+      myFamilies = & _familyFace;
+      break;
+    case MED_EDGE :
+      myFamilies = & _familyEdge;
+      break;
+    case MED_NODE :
+      myFamilies = & _familyNode;
+      break;
+    }
 
-	vector< vector<FAMILY*> > whichFamilyInGroup(numberofgroups); // this container is used to update groups at the end
-
-	// make myFamilies points to the member corresponding to entity
-	vector<FAMILY*>* myFamilies;
-	switch ( entity )
-	{
-	    case MED_CELL :
-		myFamilies = & _familyCell;
-		break;
-	    case MED_FACE :
-		myFamilies = & _familyFace;
-		break;
-	    case MED_EDGE :
-		myFamilies = & _familyEdge;
-		break;
-	    case MED_NODE :
-		myFamilies = & _familyNode;
-		break;
-	}
-
-	vector<GROUP*> myGroups=getGroups(entity); // get a copy of the groups ptr for the entity
-	// get a copy of the (old) family ptrs before clearing
-	vector<FAMILY*> myOldFamilies=getFamilies(entity);
-	myFamilies->clear();
+    vector<GROUP*> myGroups=getGroups(entity); // get a copy of the groups ptr for the entity
+    // get a copy of the (old) family ptrs before clearing
+    vector<FAMILY*> myOldFamilies=getFamilies(entity);
+    myFamilies->clear();
 
 
-	// 1 - Create a vector containing for each cell (of the entity) an information structure
-	//     giving geometric type and the groups it belong to
+    // 1 - Create a vector containing for each cell (of the entity) an information structure
+    //     giving geometric type and the groups it belong to
 
-	med_int numberOfTypes=getNumberOfTypesWithPoly(entity);
-	medGeometryElement* geometricTypes=_connectivity->getGeometricTypesWithPoly(entity); // pb avec entity=MED_NODE???
-	med_int numberOfCells=getNumberOfElementsWithPoly(entity, MED_ALL_ELEMENTS);  // total number of cells for that entity
-	SCRUTE_MED(numberOfTypes);
-	SCRUTE_MED(numberOfCells);
-	vector< _cell > tab_cell(numberOfCells);
-        vector< _cell >::iterator cell = tab_cell.begin();
-	for(med_int t=0; t!=numberOfTypes; ++t) {
-          int nbCellsOfType = getNumberOfElementsWithPoly(entity,geometricTypes[t]);
-          for(int n=0; n!=nbCellsOfType; ++n, ++cell)
-            cell->geometricType=geometricTypes[t];
+    med_int numberOfTypes=getNumberOfTypesWithPoly(entity);
+    medGeometryElement* geometricTypes=_connectivity->getGeometricTypesWithPoly(entity); // pb avec entity=MED_NODE???
+    med_int numberOfCells=getNumberOfElementsWithPoly(entity, MED_ALL_ELEMENTS);  // total number of cells for that entity
+    SCRUTE_MED(numberOfTypes);
+    SCRUTE_MED(numberOfCells);
+    vector< _cell > tab_cell(numberOfCells);
+    vector< _cell >::iterator cell = tab_cell.begin();
+    for(med_int t=0; t!=numberOfTypes; ++t) {
+      int nbCellsOfType = getNumberOfElementsWithPoly(entity,geometricTypes[t]);
+      for(int n=0; n!=nbCellsOfType; ++n, ++cell)
+        cell->geometricType=geometricTypes[t];
+    }
+    delete [] geometricTypes;
+
+    // 2 - Scan cells in groups and update in tab_cell the container of groups a cell belong to
+
+    for (unsigned g=0; g!=myGroups.size(); ++g)
+    {
+      // scan cells that belongs to the group
+      const int* groupCells=myGroups[g]->getnumber()->getValue();
+      int nbCells=myGroups[g]->getnumber()->getLength();
+      for(int c=0; c!=nbCells; ++c)
+        tab_cell[groupCells[c]-1].groups.push_back(g);
+    }
+
+
+    // 3 - Scan the cells vector, genarate family name, and create a map associating the family names
+    //     whith the vector of contained cells
+
+    map< string,vector<int> > tab_families;
+    map< string,vector<int> >::iterator fam;
+    for(int n=0; n!=numberOfCells; ++n)
+    {
+      ostringstream key; // to generate the name of the family
+      key << "FAM";
+      if(tab_cell[n].groups.empty()) // this cell don't belong to any group
+        key << "_NONE" << entity;
+
+      for(vector<int>::const_iterator it=tab_cell[n].groups.begin(); it!=tab_cell[n].groups.end(); ++it)
+      {
+        string groupName=myGroups[*it]->getName();
+        if(groupName.empty())
+          key << "_G" << *it;
+        else
+          key << "_" << groupName;
+      }
+
+      tab_families[key.str()].push_back(n+1); // fill the vector of contained cells associated whith the family
+    }
+
+
+    // 4 - Scan the family map, create MED Families, check if it already exist.
+
+    for( fam=tab_families.begin(); fam!=tab_families.end(); ++fam)
+    {
+      vector<medGeometryElement> tab_types_geometriques;
+      medGeometryElement geometrictype=MED_NONE;
+      vector<int> tab_index_types_geometriques;
+      vector<int> tab_nombres_elements;
+      if ( fam->second.empty() )
+        continue; // it is just a truncated long family name
+
+      // scan family cells and fill the tab that are needed by the create a MED FAMILY
+      for( int i=0; i!=fam->second.size(); ++i)
+      {
+        int ncell=fam->second[i]-1;
+        if(tab_cell[ncell].geometricType != geometrictype)
+        {
+          // new geometric type -> we store it and complete index tabs
+          if(!tab_index_types_geometriques.empty())
+            tab_nombres_elements.push_back(i+1-tab_index_types_geometriques.back());
+          tab_types_geometriques.push_back( (geometrictype=tab_cell[ncell].geometricType));
+          tab_index_types_geometriques.push_back(i+1);
         }
-        delete [] geometricTypes;
+      }
+      // store and complete index tabs for the last geometric type
+      tab_nombres_elements.push_back(fam->second.size()+1-tab_index_types_geometriques.back());
+      tab_index_types_geometriques.push_back(fam->second.size()+1);
 
-	// 2 - Scan cells in groups and update in tab_cell the container of groups a cell belong to
+      // family name sould not be longer than MED_TAILLE_NOM
+      string famName = fam->first;
+      if ( famName.size() > MED_TAILLE_NOM ) {
+        // try to cut off "FAM_" from the head
+        if ( famName.size() - 4 <= MED_TAILLE_NOM ) {
+          famName = famName.substr(4);
+        }
+        else { // try to make a unique name by cutting off char by char from the tail
+          famName = famName.substr(0, MED_TAILLE_NOM);
+          map< string,vector<int> >::iterator foundName = tab_families.find( famName );
+          while ( !famName.empty() &&
+                  ( foundName != tab_families.end() || famName[ famName.size()-1 ] == ' ' ))
+          {
+            famName = famName.substr( 0, famName.size() - 1 );
+            foundName = tab_families.find( famName );
+          }
+        }
+        tab_families[ famName ]; // add a new name in the table to assure uniqueness
+      }
 
-	for (unsigned g=0; g!=myGroups.size(); ++g)
-	{
-	    // scan cells that belongs to the group
-	    const int* groupCells=myGroups[g]->getnumber()->getValue();
-	    int nbCells=myGroups[g]->getnumber()->getLength();
-	    for(int c=0; c!=nbCells; ++c)
-		tab_cell[groupCells[c]-1].groups.push_back(g);
-	}
+      // create an empty MED FAMILY and fill it with the tabs we constructed
+      FAMILY* newFam = new FAMILY();
+      //newFam->setTotalNumberOfElements(fam->second.size());
+      newFam->setName(famName);
+      newFam->setMeshDirectly(this);
+      newFam->setNumberOfGeometricType(tab_types_geometriques.size());
+      newFam->setGeometricType(&tab_types_geometriques[0]); // we know the tab is not empy
+      newFam->setNumberOfElements(&tab_nombres_elements[0]);
+      newFam->setNumber(&tab_index_types_geometriques[0],&fam->second[0]);
+      newFam->setEntity(entity);
+      newFam->setAll(false);
 
+      int idFam = 0;
 
-	// 3 - Scan the cells vector, genarate family name, and create a map associating the family names
-	//     whith the vector of contained cells
+      switch ( entity )
+      {
+      case MED_NODE :
+        ++idFamNode;
+        idFam = idFamNode;
+        break;
+      case MED_CELL:
+        ++idFamElement;
+        idFam = -idFamElement;
+        break;
+      case MED_FACE :
+        ++idFamElement;
+        idFam = -idFamElement;
+        break;
+      case MED_EDGE :
+        ++idFamElement;
+        idFam = -idFamElement;
+        break;
+      }
 
-	map< string,vector<int> > tab_families;
-	map< string,vector<int> >::iterator fam;
-	for(int n=0; n!=numberOfCells; ++n)
-	{
-	    ostringstream key; // to generate the name of the family
-	    key << "FAM";
-	    if(tab_cell[n].groups.empty()) // this cell don't belong to any group
-		key << "_NONE" << entity;
+      newFam->setIdentifier(idFam);
 
-	    for(vector<int>::const_iterator it=tab_cell[n].groups.begin(); it!=tab_cell[n].groups.end(); ++it)
-	    {
-		string groupName=myGroups[*it]->getName();
-		if(groupName.empty())
-		    key << "_G" << *it;
-		else
-		    key << "_" << groupName;
-	    }
+      // Update links between families and groups
 
-	    tab_families[key.str()].push_back(n+1); // fill the vector of contained cells associated whith the family
-	}
+      int ncell1=fam->second[0]-1;  // number of first cell in family
+      int numberOfGroups=tab_cell[ncell1].groups.size(); // number of groups in the family
+      if(numberOfGroups)
+      {
+        newFam->setNumberOfGroups(numberOfGroups);
+        string * groupNames=new string[numberOfGroups];
 
+        // iterate on the groups the family belongs to
+        vector<int>::const_iterator it=tab_cell[ncell1].groups.begin();
+        for(int ng=0 ; it!=tab_cell[ncell1].groups.end(); ++it, ++ng)
+        {
+          whichFamilyInGroup[*it].push_back(newFam);
+          groupNames[ng]=myGroups[*it]->getName();
+        }
+        newFam->setGroupsNames(groupNames);
+      }
 
-	// 4 - Scan the family map, create MED Families, check if it already exist.
+      MESSAGE_MED("  MESH::createFamilies() entity " << entity <<
+                  " size " << myFamilies->size());
 
-	for( fam=tab_families.begin(); fam!=tab_families.end(); ++fam)
-	{
-	    vector<medGeometryElement> tab_types_geometriques;
-	    medGeometryElement geometrictype=MED_NONE;
-	    vector<int> tab_index_types_geometriques;
-	    vector<int> tab_nombres_elements;
-            if ( fam->second.empty() )
-              continue; // it is just a truncated long family name
+      myFamilies->push_back(newFam);
+    }
 
-	    // scan family cells and fill the tab that are needed by the create a MED FAMILY
-	    for( int i=0; i!=fam->second.size(); ++i)
-	    {
-		int ncell=fam->second[i]-1;
-		if(tab_cell[ncell].geometricType != geometrictype)
-		{
-		    // new geometric type -> we store it and complete index tabs
-		    if(!tab_index_types_geometriques.empty())
-			tab_nombres_elements.push_back(i+1-tab_index_types_geometriques.back());
-		    tab_types_geometriques.push_back( (geometrictype=tab_cell[ncell].geometricType));
-		    tab_index_types_geometriques.push_back(i+1);
-		}
-	    }
-	    // store and complete index tabs for the last geometric type
-	    tab_nombres_elements.push_back(fam->second.size()+1-tab_index_types_geometriques.back());
-	    tab_index_types_geometriques.push_back(fam->second.size()+1);
+    // delete old families
+    for (unsigned int i=0;i<myOldFamilies.size();i++)
+      delete myOldFamilies[i] ;
 
-            // family name sould not be longer than MED_TAILLE_NOM
-            string famName = fam->first;
-            if ( famName.size() > MED_TAILLE_NOM ) {
-              // try to cut off "FAM_" from the head
-              if ( famName.size() - 4 <= MED_TAILLE_NOM ) {
-                famName = famName.substr(4);
-              }
-              else { // try to make a unique name by cutting off char by char from the tail
-                famName = famName.substr(0, MED_TAILLE_NOM);
-                map< string,vector<int> >::iterator foundName = tab_families.find( famName );
-                while ( !famName.empty() &&
-                        ( foundName != tab_families.end() || famName[ famName.size()-1 ] == ' ' ))
-                {
-                  famName = famName.substr( 0, famName.size() - 1 );
-                  foundName = tab_families.find( famName );
-                }
-              }
-              tab_families[ famName ]; // add a new name in the table to assure uniqueness
-            }
-
-	    // create an empty MED FAMILY and fill it with the tabs we constructed
-	    FAMILY* newFam = new FAMILY();
-	    //newFam->setTotalNumberOfElements(fam->second.size());
-	    newFam->setName(famName);
-	    newFam->setMeshDirectly(this);
-	    newFam->setNumberOfGeometricType(tab_types_geometriques.size());
-	    newFam->setGeometricType(&tab_types_geometriques[0]); // we know the tab is not empy
-	    newFam->setNumberOfElements(&tab_nombres_elements[0]);
-	    newFam->setNumber(&tab_index_types_geometriques[0],&fam->second[0]);
-	    newFam->setEntity(entity);
-	    newFam->setAll(false);
-
-	    int idFam = 0;
-
-	    switch ( entity )
-	      {
-	      case MED_NODE :
-		++idFamNode;
-		idFam = idFamNode;
-		break;
-	      case MED_CELL:
-		++idFamElement;
-		idFam = -idFamElement;
-		break;
-	      case MED_FACE :
-		++idFamElement;
-		idFam = -idFamElement;
-		break;
-	      case MED_EDGE :
-		++idFamElement;
-		idFam = -idFamElement;
-		break;
-	      }
-
-	    newFam->setIdentifier(idFam);
-
-	    // Update links between families and groups
-
-	    int ncell1=fam->second[0]-1;  // number of first cell in family
-	    int numberOfGroups=tab_cell[ncell1].groups.size(); // number of groups in the family
-	    if(numberOfGroups)
-	    {
-		newFam->setNumberOfGroups(numberOfGroups);
-		string * groupNames=new string[numberOfGroups];
-
-		// iterate on the groups the family belongs to
-		vector<int>::const_iterator it=tab_cell[ncell1].groups.begin();
-		for(int ng=0 ; it!=tab_cell[ncell1].groups.end(); ++it, ++ng)
-		{
-		    whichFamilyInGroup[*it].push_back(newFam);
-		    groupNames[ng]=myGroups[*it]->getName();
-		}
-		newFam->setGroupsNames(groupNames);
-	    }
-
-	    MESSAGE_MED("  MESH::createFamilies() entity " << entity <<
-                        " size " << myFamilies->size());
-
-	    myFamilies->push_back(newFam);
-	}
-
-	// delete old families
-	for (unsigned int i=0;i<myOldFamilies.size();i++)
-	    delete myOldFamilies[i] ;
-
-	// update references in groups
-	for (unsigned int i=0;i<myGroups.size();i++)
-	{
-	    myGroups[i]->setNumberOfFamilies(whichFamilyInGroup[i].size());
-	    myGroups[i]->setFamilies(whichFamilyInGroup[i]);
-	}
+    // update references in groups
+    for (unsigned int i=0;i<myGroups.size();i++)
+    {
+      myGroups[i]->setNumberOfFamilies(whichFamilyInGroup[i].size());
+      myGroups[i]->setFamilies(whichFamilyInGroup[i]);
+    }
 
     // re-scan the cells vector, and fill the family vector with cells.
     // creation of support, check if it already exist.
-    }
+  }
 }
 
 int MESH::getElementContainingPoint(const double *coord)
 {
   if(_spaceDimension==3)
-    {
-      Meta_Wrapper<3> fromWrapper(getNumberOfNodes(),const_cast<double *>(getCoordinates(MED_FULL_INTERLACE)),
-							const_cast<CONNECTIVITY *>(getConnectivityptr()));
-      Meta_Wrapper<3> toWrapper(1,const_cast<double *>(coord));
-      Meta_Mapping<3> mapping(&fromWrapper,&toWrapper);
-      mapping.Cree_Mapping(1);
-      return mapping.Get_Mapping()[0]+1;
-    }
+  {
+    Meta_Wrapper<3> fromWrapper(getNumberOfNodes(),const_cast<double *>(getCoordinates(MED_FULL_INTERLACE)),
+                                const_cast<CONNECTIVITY *>(getConnectivityptr()));
+    Meta_Wrapper<3> toWrapper(1,const_cast<double *>(coord));
+    Meta_Mapping<3> mapping(&fromWrapper,&toWrapper);
+    mapping.Cree_Mapping(1);
+    return mapping.Get_Mapping()[0]+1;
+  }
   else if(_spaceDimension==2)
-    {
-      Meta_Wrapper<2> fromWrapper(getNumberOfNodes(),const_cast<double *>(getCoordinates(MED_FULL_INTERLACE)),
-							const_cast<CONNECTIVITY *>(getConnectivityptr()));
-      Meta_Wrapper<2> toWrapper(1,const_cast<double *>(coord));
-      Meta_Mapping<2> mapping(&fromWrapper,&toWrapper);
-      mapping.Cree_Mapping(1);
-      return mapping.Get_Mapping()[0]+1;
-      }
+  {
+    Meta_Wrapper<2> fromWrapper(getNumberOfNodes(),const_cast<double *>(getCoordinates(MED_FULL_INTERLACE)),
+                                const_cast<CONNECTIVITY *>(getConnectivityptr()));
+    Meta_Wrapper<2> toWrapper(1,const_cast<double *>(coord));
+    Meta_Mapping<2> mapping(&fromWrapper,&toWrapper);
+    mapping.Cree_Mapping(1);
+    return mapping.Get_Mapping()[0]+1;
+  }
   else
     throw MEDEXCEPTION("MESH::getElementContainingPoint : invalid _spaceDimension must be equal to 2 or 3 !!!");
 }
@@ -2746,59 +2746,59 @@ void MESH::convertToPoly()
     ///////////////////////////////////////////
 
     const int* oldconn = getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL, MED_EN::MED_FACE, MED_EN::MED_ALL_ELEMENTS);
-    
+
     const int* oldconnindex= getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_FACE);
     int oldnbface = getNumberOfElements(MED_EN::MED_FACE,MED_EN::MED_ALL_ELEMENTS);
     const int* oldconnpoly =0;
     const int* oldconnpolyindex =0;
     if(existPolygonsConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE))
     {
-     oldconnpoly = getPolygonsConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE);
-     oldconnpolyindex = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_FACE);
-     }
+      oldconnpoly = getPolygonsConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE);
+      oldconnpolyindex = getPolygonsConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_FACE);
+    }
     int oldnbtotalface = getNumberOfElementsWithPoly(MED_EN::MED_FACE,MED_EN::MED_ALL_ELEMENTS);
-    
+
     int nbnodes=0;
-    
+
     if (oldconnindex !=0)
       nbnodes += oldconnindex[oldnbface] -1 ;
-    
+
     if (oldconnpolyindex !=0)
       nbnodes+= oldconnpolyindex[oldnbtotalface-oldnbface]-1;
-    
+
     int* newconn = new int[nbnodes];
     int* newconnindex= new int [oldnbtotalface+1];
-    
+
     //copying classical types connectivity  
     memcpy(newconn, oldconn, sizeof(int)*(oldconnindex[oldnbface]-1) );
-    
+
     //copying poly types connectivity
     if(oldconnpoly)
       memcpy (newconn+oldconnindex[oldnbface]-1, oldconnpoly, sizeof(int)*(oldconnpolyindex[oldnbtotalface-oldnbface]-1) );
-    
+
     newconnindex[0]=1;
     for (int i=0; i<oldnbface;i++)
       newconnindex[i+1]=newconnindex[i]+oldconnindex[i+1]-oldconnindex[i];
     for (int i=oldnbface; i<oldnbtotalface;i++)
       newconnindex[i+1]=newconnindex[i]+
-	oldconnpolyindex[i-oldnbface+1]-oldconnpolyindex[i-oldnbface];
-    
-    
+        oldconnpolyindex[i-oldnbface+1]-oldconnpolyindex[i-oldnbface];
+
+
     newpolygonconnectivity->setPolygonsConnectivity(MED_EN::MED_NODAL,
-					     MED_EN::MED_FACE,
-					     newconn,
-					     newconnindex,
-					     nbnodes,
-					     oldnbtotalface);
+                                                    MED_EN::MED_FACE,
+                                                    newconn,
+                                                    newconnindex,
+                                                    nbnodes,
+                                                    oldnbtotalface);
     //    _connectivity->setConstituent(newconnectivity);
   }
   ///////////////////////////////////////////
   // 2nd step : Treating polyhedra connectivity
   //////////////////////////////////////////
   {
-  
+
     const int* oldconn = getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
-    
+
     const int* oldconnindex= getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_CELL);
     int oldnbelem = getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
     const int* oldconnpoly = 0;
@@ -2806,96 +2806,96 @@ void MESH::convertToPoly()
     const int* oldfaceindex = 0;
     if(existPolyhedronConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL))
     {
-       oldconnpoly = getPolyhedronConnectivity(MED_EN::MED_NODAL);
-       oldconnpolyindex = getPolyhedronIndex(MED_EN::MED_NODAL);
-       oldfaceindex =  getPolyhedronFacesIndex();
+      oldconnpoly = getPolyhedronConnectivity(MED_EN::MED_NODAL);
+      oldconnpolyindex = getPolyhedronIndex(MED_EN::MED_NODAL);
+      oldfaceindex =  getPolyhedronFacesIndex();
     }
     const MED_EN::medGeometryElement* oldtypes = getTypes(MED_EN::MED_CELL);
     int nboldtypes=getNumberOfTypes(MED_EN::MED_CELL);
     int nboldpolyhedra=getNumberOfPolyhedron();
     int oldnbtotalelem = getNumberOfElementsWithPoly(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
-    
+
     int nbnodes=0;
-    
+
     if (oldconnindex !=0)
       nbnodes += oldconnindex[oldnbelem] -1 ;
-    
+
     if (oldconnpolyindex !=0)
       nbnodes+= oldconnpolyindex[oldnbtotalelem-oldnbelem]-1;
-  
+
     //computing number of faces
     int nbfaces=0;
     //    first part : number of faces for the classical types
     for (int itype=0; itype<nboldtypes; itype++)
-      {
-	MED_EN::medGeometryElement type = oldtypes[itype];
-	MEDMEM::CELLMODEL cellmodel(type);
-	int nb_elems=getNumberOfElements(MED_EN::MED_CELL,type);
-	int nbfacespertype = cellmodel.getNumberOfConstituents(1);
-	nbfaces+=nb_elems*nbfacespertype;
-      }
-    //   second part : number of faces for the polyhedra
-    nbfaces += getNumberOfPolyhedronFaces();
-
-    //allocating tables for new connectivity
-  vector<int> newconn;
-  vector<int> newconnindex(1,1);
-  vector<int> newfaceindex(1,1);
-  
-  for (int itype=0; itype<nboldtypes; itype++)
     {
       MED_EN::medGeometryElement type = oldtypes[itype];
       MEDMEM::CELLMODEL cellmodel(type);
       int nb_elems=getNumberOfElements(MED_EN::MED_CELL,type);
       int nbfacespertype = cellmodel.getNumberOfConstituents(1);
-	for (int ielem = 0; ielem<nb_elems; ielem++)
-	  {
-	    for (int iface =0; iface< nbfacespertype; iface ++)
-	      {
-		//local conn contains the local nodal connectivity for the iface-th face of type type
-		const int* local_conn = cellmodel.getNodesConstituent(1,iface+1); // iface+1 for MED numbering
-		MED_EN::medGeometryElement facetype = cellmodel.getConstituentType(1,iface+1);
-		int nbface_nodes=facetype%100;
-		for ( int inode=0; inode<nbface_nodes;inode++)
-		  {
-		    newconn.push_back(oldconn[oldconnindex[newconnindex.size()-1]-1+local_conn[inode]-1]);
-		  }
-		newfaceindex.push_back(newfaceindex[newfaceindex.size()-1]+nbface_nodes);
-	      }
-	    newconnindex.push_back(newconnindex[newconnindex.size()-1]+nbfacespertype);
-	  }
-      }
+      nbfaces+=nb_elems*nbfacespertype;
+    }
+    //   second part : number of faces for the polyhedra
+    nbfaces += getNumberOfPolyhedronFaces();
 
-  for (int i=0; i<nboldpolyhedra; i++)
+    //allocating tables for new connectivity
+    vector<int> newconn;
+    vector<int> newconnindex(1,1);
+    vector<int> newfaceindex(1,1);
+
+    for (int itype=0; itype<nboldtypes; itype++)
+    {
+      MED_EN::medGeometryElement type = oldtypes[itype];
+      MEDMEM::CELLMODEL cellmodel(type);
+      int nb_elems=getNumberOfElements(MED_EN::MED_CELL,type);
+      int nbfacespertype = cellmodel.getNumberOfConstituents(1);
+      for (int ielem = 0; ielem<nb_elems; ielem++)
+      {
+        for (int iface =0; iface< nbfacespertype; iface ++)
+	      {
+          //local conn contains the local nodal connectivity for the iface-th face of type type
+          const int* local_conn = cellmodel.getNodesConstituent(1,iface+1); // iface+1 for MED numbering
+          MED_EN::medGeometryElement facetype = cellmodel.getConstituentType(1,iface+1);
+          int nbface_nodes=facetype%100;
+          for ( int inode=0; inode<nbface_nodes;inode++)
+          {
+            newconn.push_back(oldconn[oldconnindex[newconnindex.size()-1]-1+local_conn[inode]-1]);
+          }
+          newfaceindex.push_back(newfaceindex[newfaceindex.size()-1]+nbface_nodes);
+	      }
+        newconnindex.push_back(newconnindex[newconnindex.size()-1]+nbfacespertype);
+      }
+    }
+
+    for (int i=0; i<nboldpolyhedra; i++)
     {
       newconnindex.push_back(newconnindex[newconnindex.size()-1]+oldconnpolyindex[i+1]-oldconnpolyindex[i]);
     }
-  if(oldconnpolyindex)
-  {
-    for (int i=0; i<oldconnpolyindex[nboldpolyhedra]-1;i++)
+    if(oldconnpolyindex)
+    {
+      for (int i=0; i<oldconnpolyindex[nboldpolyhedra]-1;i++)
       {
         newfaceindex.push_back(newfaceindex[newfaceindex.size()-1]+oldfaceindex[i+1]-oldfaceindex[i]);
       }
-    for (int i=0; i< oldfaceindex[oldconnpolyindex[nboldpolyhedra]-1]-1; i++)
-      newconn.push_back(oldconnpoly[i]);
-  }
-  //  memcpy(newconn_ptr,oldconnpoly,sizeof(int)*(oldfaceindex[oldconnpoly[nboldpolyhedra]-1]-1));
+      for (int i=0; i< oldfaceindex[oldconnpolyindex[nboldpolyhedra]-1]-1; i++)
+        newconn.push_back(oldconnpoly[i]);
+    }
+    //  memcpy(newconn_ptr,oldconnpoly,sizeof(int)*(oldfaceindex[oldconnpoly[nboldpolyhedra]-1]-1));
 
-    
-  newpolyhedraconnectivity->setPolyhedronConnectivity(MED_EN::MED_NODAL,
-					     &newconn[0],
-					     &newconnindex[0],
-					     newfaceindex[newfaceindex.size()-1]-1,
-					     newconnindex.size()-1,
-					     &newfaceindex[0],
-					     newfaceindex.size()-1);
 
-  newpolyhedraconnectivity->setEntityDimension(3);
+    newpolyhedraconnectivity->setPolyhedronConnectivity(MED_EN::MED_NODAL,
+                                                        &newconn[0],
+                                                        &newconnindex[0],
+                                                        newfaceindex[newfaceindex.size()-1]-1,
+                                                        newconnindex.size()-1,
+                                                        &newfaceindex[0],
+                                                        newfaceindex.size()-1);
 
-  delete _connectivity;
+    newpolyhedraconnectivity->setEntityDimension(3);
 
- _connectivity=newpolyhedraconnectivity;
- _connectivity->setConstituent(newpolygonconnectivity);
+    delete _connectivity;
+
+    _connectivity=newpolyhedraconnectivity;
+    _connectivity->setConstituent(newpolygonconnectivity);
 
   }
 }
@@ -2908,21 +2908,21 @@ vector< vector<double> > MESH::getBoundingBox() const
   ret[0].resize(_spaceDimension);
   ret[1].resize(_spaceDimension);
   for(i=0;i<_spaceDimension;i++)
-    {
-      ret[0][i]=1.e300;
-      ret[1][i]=-1.e300;
-    }
+  {
+    ret[0][i]=1.e300;
+    ret[1][i]=-1.e300;
+  }
   for(i=0;i<_coordinate->getNumberOfNodes();i++)
+  {
+    for(j=0;j<_spaceDimension;j++)
     {
-      for(j=0;j<_spaceDimension;j++)
-	{
-	  double tmp=myCoords[i*_spaceDimension+j];
-	  if(tmp<ret[0][j])
-	    ret[0][j]=tmp;
-	  if(tmp>ret[1][j])
-	    ret[1][j]=tmp;
-	}
+      double tmp=myCoords[i*_spaceDimension+j];
+      if(tmp<ret[0][j])
+        ret[0][j]=tmp;
+      if(tmp>ret[1][j])
+        ret[1][j]=tmp;
     }
+  }
   return ret;
 }
 
