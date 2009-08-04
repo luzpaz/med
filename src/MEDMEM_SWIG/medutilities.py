@@ -5,6 +5,14 @@
 
 from libMEDMEM_Swig import *
 
+def my_remove(f):
+    from os import remove
+    try:
+        remove(f)
+    except OSError:
+        pass
+    return
+
 def sauv2med(*argv):
     argv = list(argv)
     # argv = argv[1:]
@@ -104,8 +112,7 @@ def convert(file_in, driver_in, driver_out, format=1, file_out=None):
         msg = "Driver in %s is unknown"%(driver_in)
         raise NotImplementedError(msg)
     #
-    from os import system
-    system("rm -f "+file_out)
+    my_remove(file_out)
     #
     if driver_out == "GIBI":
         mesh_name = med.getMeshName(0)
@@ -116,8 +123,7 @@ def convert(file_in, driver_in, driver_out, format=1, file_out=None):
         mesh_dim = mesh.getSpaceDimension()
         if format == 0:
             file_out = file_out+'__format__'
-            from os import system
-            system("rm -f "+file_out)
+            my_remove(file_out)
             pass
         driver = GIBI_MED_WRONLY_DRIVER(file_out, med, mesh)
         driver.open()
@@ -125,15 +131,27 @@ def convert(file_in, driver_in, driver_out, format=1, file_out=None):
         driver.close()
         #
         if mesh_dim >= 3:
-            cmd  = "sed"
-            cmd += ' -e "s/IFOUR  -1/IFOUR   2/g"'
-            cmd += ' -e "s/IFOMOD  -1/IFOMOD   2/g"'
-            # cmd += ' -e "s/IECHO   1/IECHO   0/g"'
-            cmd += ' %s > .dummy'%(file_out)
-            cmd += ' && '
-            cmd += ' mv -f .dummy %s'%(file_out)
-            from os import system
-            system(cmd)
+            from sys import platform
+            if platform in ["win32"]:
+                f = open(file_out)
+                content = f.read()
+                f.close()
+                content = content.replace("IFOUR  -1", "IFOUR   2")
+                content = content.replace("IFOMOD  -1", "IFOMOD   2")
+                f = open(file_out, "w")
+                f.write(content)
+                f.close()
+            else:
+                cmd  = "sed"
+                cmd += ' -e "s/IFOUR  -1/IFOUR   2/g"'
+                cmd += ' -e "s/IFOMOD  -1/IFOMOD   2/g"'
+                # cmd += ' -e "s/IECHO   1/IECHO   0/g"'
+                cmd += ' %s > .dummy'%(file_out)
+                cmd += ' && '
+                cmd += ' mv -f .dummy %s'%(file_out)
+                from os import system
+                system(cmd)
+                pass
             pass
         #
         if format == 0:
@@ -165,8 +183,7 @@ def avs2med_one_file(file_in, file_out, mesh_name, field_name):
     http://help.avs.com/Express/doc/help/reference/dvmac/UCD_Form.htm
     
     """
-    from os import system
-    system('rm -f %s'%(file_out))
+    my_remove(file_out)
     #
     meshing = MESHING()
     meshing.setName(mesh_name)
