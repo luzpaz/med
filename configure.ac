@@ -553,7 +553,7 @@ fi
 
 if test "$MED_WITH_KERNEL" = "yes" ; then 
     # --with-kernel=yes
-    obligatory_vars="$obligatory_vars python_ok swig_ok hdf5_ok med2_ok omniORB_ok $splitter_vars"
+    obligatory_vars="$obligatory_vars python_ok boost_ok swig_ok hdf5_ok med2_ok omniORB_ok $splitter_vars"
     optional_vars="$optional_vars openpbs_ok lsf_ok graphviz_ok Kernel_ok"
     if test "${gui_ok}" = "yes"; then
         # GUI is enabled
@@ -568,7 +568,7 @@ else
         optional_vars="$optional_vars hdf5_ok med2_ok"
     else
         # --with-interp-kernel-only=no mode
-        obligatory_vars="$obligatory_vars python_ok swig_ok hdf5_ok med2_ok omniORB_ok $splitter_vars"
+        obligatory_vars="$obligatory_vars python_ok boost_ok swig_ok hdf5_ok med2_ok omniORB_ok $splitter_vars"
     fi
 fi
 
