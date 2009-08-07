@@ -1267,106 +1267,179 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
 The output mesh has no group, nor elements of connectivity lesser than that of the present support. The method does not handle polygon or polyhedral elements. Nodes are renumbered so that they are numberd from 1 to N in the new mesh. The order of the elements in the new mesh corresponds to that of the elements in the original support.
 */
 MESH* SUPPORT::makeMesh()
-{ 
+{
+  const char* LOC = "SUPPORT::makeMesh(): ";
+  if ( !_mesh )
+    throw MED_EXCEPTION(STRING(LOC)<<" NULL mesh in support");
+  if ( _entity == MED_NODE )
+    throw MED_EXCEPTION(STRING(LOC)<<" unavailable for support on nodes");
 
-  // the first part of the method consists in browsing through elements to create a mapping between 
-  //the new nodes and the old nodes
-  // nodes are numbered
-  map<int,int> oldnodes;  
-  //loop on all elements to map nodes
-  int nbtypes = getNumberOfTypes();
-  const medGeometryElement* types=getTypes();
-  int newid=1;
-  for (int itype=0; itype<nbtypes;itype++)
-  {
-    medGeometryElement type= types[itype];
-    int nbelems = getNumberOfElements(type);
-    const int* conn = _mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,_entity,type);
-
-    for (int ielem=0; ielem<nbelems;ielem++)
-    {
-      for (int i=0; i<type%100;i++)
-      {
-        map<int,int>::iterator iter=oldnodes.find(conn[ielem*(type%100)+i]);
-        if (iter == oldnodes.end())
-        {
-          oldnodes.insert(make_pair(conn[ielem*(type%100)+i],newid));
-          newid++;
-        }
-      }
-    }
-  }
+  // define mesh dimension
+  int mesh_dim = (_entity == MED_CELL) ? _mesh->getMeshDimension() : (_entity == MED_FACE) ? 2 : 1;
 
   //Creating the new mesh
 
-  MESHING* newmesh= new MESHING();
-  newmesh->setName("MeshFromSupport");
+  MESHING* newmesh = new MESHING();
+  newmesh->setName( STRING("MeshFromSupport_") << getName() );
 
+  // set types info
+  const medGeometryElement* types = getTypes();
+  int nb_types = _numberOfGeometricType;
+  if ( types[nb_types-1] == MED_POLYGON || types[nb_types-1] == MED_POLYHEDRA )
+    --nb_types;
+  newmesh->setNumberOfTypes   ( nb_types, MED_CELL );
+  newmesh->setTypes           ( types, MED_CELL );
+  newmesh->setNumberOfElements( _numberOfElements, MED_CELL);
+  newmesh->setSpaceDimension  ( _mesh->getSpaceDimension() );
+  newmesh->setMeshDimension   ( mesh_dim );
 
-  //definition of coordinates
-  int spacedim=_mesh->getSpaceDimension();  
-  double* newcoords=new double[oldnodes.size()*spacedim];
-  const double*oldcoords = _mesh->getCoordinates(MED_FULL_INTERLACE);
-  double* newcoordsp=newcoords;
-  for (std::map<int,int>::const_iterator iter=oldnodes.begin(); iter!=oldnodes.end();iter++)
+  // browsing through elements to create a mapping between
+  // the new nodes and the old nodes and to create nodal connectivity
+
+  const medGeometryElement* all_mesh_types = _mesh->getTypes( _entity );
+  const int *                    num_index = _mesh->getGlobalNumberingIndex( _entity );
+
+  map<int,int> oldnodes; // map old to new nodes
+  int newid=1;
+  for (int itype=0; itype < _numberOfGeometricType;itype++)
   {
-    std::copy( oldcoords+iter->first*spacedim, oldcoords+iter->first*spacedim+spacedim,newcoordsp);
-    newcoordsp+=spacedim;
-  }
-  newmesh->setCoordinates(spacedim,oldnodes.size(),newcoords,"CARTESIAN",MED_FULL_INTERLACE);
+    medGeometryElement type = types[itype];
+    int nbelems = getNumberOfElements(type);
 
-  //defining mesh dimension form the support entity type
-  int newmeshdim = 0;
-  if (_entity==MED_CELL)
-    newmeshdim=_mesh->getMeshDimension() ;
-  else
-    switch (_entity) 
+    // get connectivity info
+    const int *conn, *index, *findex;
+    int shift = 1; // to pass from elem number to array index
+    switch ( type )
     {
-    case MED_FACE:
-      newmeshdim=2;
+    case MED_POLYGON:
+      conn  = _mesh->getPolygonsConnectivity     (MED_NODAL,_entity);
+      index = _mesh->getPolygonsConnectivityIndex(MED_NODAL,_entity);
+      shift+= _mesh->getNumberOfElements         (_entity, MED_ALL_ELEMENTS);
       break;
-    case MED_EDGE:
-      newmeshdim=1;
+    case MED_POLYHEDRA:
+      conn   = _mesh->getPolyhedronConnectivity(MED_NODAL);
+      index  = _mesh->getPolyhedronIndex       (MED_NODAL);
+      findex = _mesh->getPolyhedronFacesIndex  ();
+      shift += _mesh->getNumberOfElements      (_entity, MED_ALL_ELEMENTS);
       break;
     default:
-      throw MEDEXCEPTION("makeMesh is not available for node supports");
+      conn  = _mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,_entity,MED_ALL_ELEMENTS);
+      index = _mesh->getConnectivityIndex(MED_NODAL,_entity);
+      int t = 0;
+      while ( type != all_mesh_types[t] ) ++t;
+      shift+= num_index[ t ] - num_index[0];
+      index+= num_index[ t ] - num_index[0];
     }
-  newmesh->setMeshDimension(newmeshdim);
 
-  //setting up connectivity information
-  newmesh->setNumberOfTypes(nbtypes,MED_CELL);
-  medGeometryElement* elemtypes = new medGeometryElement[nbtypes];
-  int* elemtypenumbers = new int [nbtypes];
-  for (int itype=0; itype<nbtypes;itype++)
-  {
-    elemtypes[itype]=types[itype];
-    elemtypenumbers[itype]=getNumberOfElements(elemtypes[itype]);
-
-  }
-  newmesh->setTypes(elemtypes,MED_CELL);
-  newmesh->setNumberOfElements(elemtypenumbers,MED_CELL);
-  delete[] elemtypes;
-  delete[] elemtypenumbers;
-  for (int itype=0; itype<nbtypes;itype++)
-  {
-    medGeometryElement type=types[itype];
-    int nbelems = getNumberOfElements(type);
-    const int* conn = _mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL, _entity,type);
-    int* newconn=new int[(type%100) * nbelems];
-    int* newconnp=newconn;
-    for (int ielem=0; ielem<nbelems;ielem++)
+    // make and set new connectivity
+    if ( _isOnAllElts  && _entity == MED_CELL )
     {
-      for (int i=0; i<type%100;i++)
+      switch ( type )
       {
-        //adding the connectivity taking into account the correspondency
-        //between old and new nodes
-        *(newconnp++)=oldnodes[conn[ielem*(type%100)+i]];
-
+      case MED_POLYGON:
+        newmesh->setPolygonsConnectivity( index, conn, nbelems, MED_CELL );
+        break;
+      case MED_POLYHEDRA:
+        newmesh->setPolyhedraConnectivity( index, findex, conn, nbelems );
+        break;
+      default:
+        newmesh->setConnectivity( conn, MED_CELL, type );
       }
     }
-    newmesh->setConnectivity(newconn,MED_CELL,type);
+    else // partial support or support of sub-entities
+    {
+      vector<int> new_conn, new_index;
+      new_conn.reserve ( nbelems * (type % 100) );
+      new_index.reserve( nbelems + 1 );
+      new_index.push_back(1);
 
+      const int * nums = _isOnAllElts ? 0 : getNumber( type );
+
+      if ( type == MED_POLYHEDRA )
+      {
+        vector<int> new_findex;
+        new_findex.push_back(1);
+
+        for (int i=0; i<nbelems;i++) // loop on polyhedrons
+        {
+          int ielem = nums ? nums[i]-shift : i;
+          int elem_face = index[ ielem   ] - 1;
+          int faces_end = index[ ielem+1 ] - 1;
+          new_index.push_back( new_index.back() + faces_end - elem_face );
+          for ( ; elem_face < faces_end; ++elem_face )
+          {
+            const int* face_node = conn + findex[ elem_face   ] - 1;
+            const int* nodes_end = conn + findex[ elem_face+1 ] - 1;
+            new_findex.push_back( new_findex.back() + nodes_end - face_node );
+            for ( ; face_node < nodes_end; ++face_node )
+            {
+              // make new connectivity
+              map<int,int>::iterator old_new=oldnodes.insert(make_pair( *face_node, newid )).first;
+              new_conn.push_back( old_new->second );
+              if ( old_new->second == newid )
+                newid++;
+            }
+          }
+        }
+        // set new connectivity
+        newmesh->setPolyhedraConnectivity( &new_index[0], &new_findex[0], &new_conn[0], nbelems);
+      }
+      else // MED_POLYGON and classical types
+      {
+        for (int i=0; i<nbelems;i++)
+        {
+          int ielem = nums ? nums[i]-shift : i;
+          const int* elem_node = conn + index[ ielem   ] - 1;
+          const int* nodes_end = conn + index[ ielem+1 ] - 1;
+          for ( ; elem_node < nodes_end; ++elem_node )
+          {
+            // make new connectivity
+            map<int,int>::iterator old_new = oldnodes.insert(make_pair( *elem_node, newid )).first;
+            new_conn.push_back( old_new->second );
+            if ( old_new->second == newid )
+              newid++;
+          }
+          if ( type == MED_POLYGON )
+            new_index.push_back( new_index.back() + index[ ielem+1 ] - index[ ielem ] );
+        }
+        // set new connectivity
+        if ( type == MED_POLYGON )
+          newmesh->setPolygonsConnectivity( & new_index[0], & new_conn[0], nbelems, MED_CELL );
+        else
+          newmesh->setConnectivity( & new_conn[0], MED_CELL, type );
+      }
+    }
   }
+
+  //definition of coordinates
+
+  int nb_nodes, spacedim = _mesh->getSpaceDimension();  
+  const double*oldcoords = _mesh->getCoordinates(MED_FULL_INTERLACE);
+  PointerOf<double> newcoords;
+
+  if ( _isOnAllElts && _entity == MED_CELL )
+  {
+    nb_nodes = _mesh->getNumberOfNodes();
+    newcoords.set( oldcoords );
+  }
+  else
+  {
+    nb_nodes = oldnodes.size();
+    newcoords.set( nb_nodes * spacedim);
+    double* newcoordsp = newcoords;
+    for (std::map<int,int>::const_iterator iter=oldnodes.begin(); iter!=oldnodes.end();iter++)
+    {
+      std::copy( oldcoords+iter->first*spacedim, oldcoords+iter->first*spacedim+spacedim,newcoordsp);
+      newcoordsp+=spacedim;
+    }
+  }
+  newmesh->setCoordinates(spacedim, nb_nodes, newcoords,
+                          _mesh->getCoordinatesSystem(), MED_FULL_INTERLACE);
+  newmesh->setCoordinatesNames ( _mesh->getCoordinatesNames() );
+  newmesh->setCoordinatesUnits ( _mesh->getCoordinatesUnits() );
+
+  ((CONNECTIVITY*) newmesh->getConnectivityptr() )->setNumberOfNodes( nb_nodes );
+
   return newmesh;
 }
 /*! 
