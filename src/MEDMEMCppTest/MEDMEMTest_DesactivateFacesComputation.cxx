@@ -130,7 +130,7 @@ void MEDMEMTest::testDesactivateFacesComputation()
   //
   string tmp_dir=getTmpDirectory();
   string tmpfile=tmp_dir+"/toto3434535.med";
-  string tmpGibiFile=tmp_dir+"TET4.sauv";
+  string tmpGibiFile=tmp_dir+"/TET4.sauv";
   MEDMEMTest_TmpFilesRemover aRemover;
   aRemover.Register(tmpfile);
   aRemover.Register(tmpGibiFile);
