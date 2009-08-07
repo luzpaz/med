@@ -25,6 +25,7 @@
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Support.hxx"
+#include "MEDMEM_MedMeshDriver.hxx"
 
 #include <sstream>
 #include <cmath>
@@ -387,15 +388,112 @@ void MEDMEMTest::testSupport()
   CPPUNIT_ASSERT_THROW(aSupportOnFaces1.getNumberOfElements(MED_EN::MED_QUAD8), MEDEXCEPTION);
 
 	//checking makeMesh()
-	MESH* meshFromSupport=aSupportOnFaces1.makeMesh();
+	auto_ptr<MESH> meshFromSupport( aSupportOnFaces1.makeMesh() );
 	CPPUNIT_ASSERT_EQUAL(4,meshFromSupport->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_TRIA3));
 	CPPUNIT_ASSERT_EQUAL(4,meshFromSupport->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_QUAD4));
 	int nbnodes=  meshFromSupport->getNumberOfNodes();
 	const int* conn=meshFromSupport->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_EN::MED_NODAL, MED_EN::MED_CELL, MED_EN::MED_TRIA3);
 	for (int i=0; i<12;i++)
-		{
-			CPPUNIT_ASSERT(conn[i]>0 && conn[i]<=nbnodes);
-		}
+    CPPUNIT_ASSERT(conn[i]>0 && conn[i]<=nbnodes);
+
+  SUPPORT nodal_support (aSupportOnFaces1.getMesh(), "nodal_support", MED_EN::MED_NODE);
+  CPPUNIT_ASSERT_THROW(nodal_support.makeMesh(), MEDEXCEPTION);
+
+	//checking makeMesh() on polygonal support
+  {
+    // "poly3D" mesh contains:
+    // 19 MED_NODE
+    // 6 MED_TRIA3
+    // 8 MED_QUAD4
+    // 3 MED_POLYGON
+    // 1 MED_TETRA4
+    // 2 MED_POLYHEDRA
+    string med_file = getResourceFile("poly3D.med");
+    MESH poly_mesh;
+    MED_MESH_RDONLY_DRIVER meshDrv(med_file,&poly_mesh);
+    meshDrv.setMeshName( "poly3D" );
+    meshDrv.desactivateFacesComputation(); // to have nb of faces like in the file
+    meshDrv.open();
+    meshDrv.read();
+    meshDrv.close();
+    if ( poly_mesh.getNumberOfElementsWithPoly(MED_EN::MED_FACE, MED_EN::MED_ALL_ELEMENTS) != 17 )
+      CPPUNIT_FAIL("Nb of faces in mesh from 'poly3D.med' resource file != 17");
+
+    // support on 3 cells and the mesh made from it
+    SUPPORT poly_supp( &poly_mesh, "poly_supp");
+    auto_ptr<MESH> poly_supp_mesh( poly_supp.makeMesh() );
+    CPPUNIT_ASSERT_EQUAL(3,poly_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,
+                                                                       MED_EN::MED_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_EQUAL(1,poly_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,
+                                                                       MED_EN::MED_TETRA4));
+    CPPUNIT_ASSERT_EQUAL(2,poly_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,
+                                                                       MED_EN::MED_POLYHEDRA));
+    int nbnodes=poly_supp_mesh->getNumberOfNodes();
+    const int* conn=poly_supp_mesh->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_EN::MED_NODAL,
+                                                    MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
+    int con_len = 1 * MED_EN::MED_TETRA4 % 100;
+    for (int i=0; i<con_len;i++)
+      CPPUNIT_ASSERT(conn[i]>0 && conn[i]<=nbnodes);
+
+    conn = poly_supp_mesh->getPolyhedronConnectivity(MED_EN::MED_NODAL);
+    con_len = poly_supp_mesh->getPolyhedronConnectivityLength(MED_EN::MED_NODAL);
+    for (int i=0; i<con_len;i++)
+      CPPUNIT_ASSERT(conn[i]>0 && conn[i]<=nbnodes);
+
+    // support on 17 faces and the mesh made from it
+    SUPPORT polygon_supp( &poly_mesh, "polygon_supp", MED_EN::MED_FACE);
+    auto_ptr<MESH> polygon_supp_mesh( polygon_supp.makeMesh() );
+    CPPUNIT_ASSERT_EQUAL(17,polygon_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,
+                                                                           MED_EN::MED_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_EQUAL(6,polygon_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,
+                                                                          MED_EN::MED_TRIA3));
+    CPPUNIT_ASSERT_EQUAL(8,polygon_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,
+                                                                          MED_EN::MED_QUAD4));
+    CPPUNIT_ASSERT_EQUAL(3,polygon_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,
+                                                                          MED_EN::MED_POLYGON));
+    nbnodes = polygon_supp_mesh->getNumberOfNodes();
+    conn=polygon_supp_mesh->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_EN::MED_NODAL,
+                                            MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
+    con_len = 6 * MED_EN::MED_TRIA3 % 100 + 8 * MED_EN::MED_QUAD4 % 100;
+    for (int i=0; i<con_len;i++)
+      CPPUNIT_ASSERT(conn[i]>0 && conn[i]<=nbnodes);
+
+    conn = polygon_supp_mesh->getPolygonsConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL);
+    con_len = polygon_supp_mesh->getPolygonsConnectivityLength(MED_EN::MED_NODAL,MED_EN::MED_CELL);
+    for (int i=0; i<con_len;i++)
+      CPPUNIT_ASSERT(conn[i]>0 && conn[i]<=nbnodes);
+
+    // make polygon_supp patrial: make it contain 4 QUAD4 and 2 POLYGON
+    const int nb_types = 2;
+    const int nb_elems = 4 + 2;
+    int index[nb_types+1] = { 1, 1+4, 1+4+2 };
+    int elems[nb_elems] = { 8, 10, 11, 13,  16, 17 };
+    MED_EN::medGeometryElement types[nb_types] = { MED_EN::MED_QUAD4, MED_EN::MED_POLYGON };
+    MEDSKYLINEARRAY* array = new MEDSKYLINEARRAY(nb_types, nb_elems, index, elems);
+    polygon_supp.setNumberOfGeometricType( nb_types );
+    polygon_supp.setGeometricType( types );
+    polygon_supp.setpartial( array, /*shallowCopy=*/true);
+
+    // make mesh from partial support containing polygons
+    auto_ptr<MESH> partial_supp_mesh( polygon_supp.makeMesh() );
+    CPPUNIT_ASSERT_EQUAL(6,partial_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,
+                                                                          MED_EN::MED_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_EQUAL(4,partial_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,types[0]));
+    CPPUNIT_ASSERT_EQUAL(2,partial_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,types[1]));
+
+    nbnodes = partial_supp_mesh->getNumberOfNodes();
+    conn=partial_supp_mesh->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_EN::MED_NODAL,
+                                            MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
+    con_len = 4 * MED_EN::MED_QUAD4 % 100;
+    for (int i=0; i<con_len;i++)
+      CPPUNIT_ASSERT(conn[i]>0 && conn[i]<=nbnodes);
+
+    conn = partial_supp_mesh->getPolygonsConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL);
+    con_len = partial_supp_mesh->getPolygonsConnectivityLength(MED_EN::MED_NODAL,MED_EN::MED_CELL);
+    for (int i=0; i<con_len;i++)
+      CPPUNIT_ASSERT(conn[i]>0 && conn[i]<=nbnodes);
+  }
+    
 	
   // check number
   CPPUNIT_ASSERT_THROW(aSupportOnFaces1.getNumberIndex(), MEDEXCEPTION);
