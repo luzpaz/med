@@ -553,6 +553,8 @@ class SUPPORT
 
   void setDescription(std::string Description);
 
+  MESH* makeMesh();
+
   %extend {
     %newobject __str__();
     const char* __str__()
