@@ -216,9 +216,11 @@ public:
 
   void setConstituent (CONNECTIVITY * Constituent)
                        			throw (MEDEXCEPTION);
+  const CONNECTIVITY* getConstituent (const MED_EN::medEntityMesh Entity) const
+                       			throw (MEDEXCEPTION);
 
   void setGeometricTypes (const MED_EN::medGeometryElement * Types,
-			   const MED_EN::medEntityMesh Entity)
+                          const MED_EN::medEntityMesh        Entity)
                                         throw (MEDEXCEPTION);
 
   void setCount (const int * Count, const MED_EN::medEntityMesh Entity)
@@ -230,8 +232,8 @@ public:
                                         throw (MEDEXCEPTION);
 
   inline void setNumberOfNodes(int NumberOfNodes);
-	inline int getNumberOfNodes();
-  inline int getEntityDimension() const;
+  inline int  getNumberOfNodes();
+  inline int  getEntityDimension() const;
 
   inline void setEntityDimension(int EntityDimension);
 
