@@ -249,7 +249,7 @@ void MESHING::setCoordinateUnit(const string unit, const int i)
   MED_FACE connectivity before MED_CELL).
 */
 void MESHING::setNumberOfTypes(const int NumberOfTypes,
-															 const MED_EN::medEntityMesh Entity) 
+                               const MED_EN::medEntityMesh Entity) 
   throw (MEDEXCEPTION)
 {
   const char * LOC = "MESHING::setNumberOfTypes( medEntityMesh ) : ";
@@ -260,8 +260,8 @@ void MESHING::setNumberOfTypes(const int NumberOfTypes,
 
   if (MED_CELL == Entity) {
     SCRUTE_MED(_connectivity);
-//     if (_connectivity != (CONNECTIVITY *) NULL)
-//       delete _connectivity ;
+    //     if (_connectivity != (CONNECTIVITY *) NULL)
+    //       delete _connectivity ;
     _connectivity = new CONNECTIVITY(NumberOfTypes,Entity) ;
 
     _connectivity->setNumberOfNodes( _numberOfNodes );
@@ -273,15 +273,15 @@ void MESHING::setNumberOfTypes(const int NumberOfTypes,
 
     if (MED_FACE == Entity)
       if (3 != getSpaceDimension())
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity on MED_FACE could be defined in non 3D space !"));
-    
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity on MED_FACE could be defined in non 3D space !"));
+
     if (MED_EDGE == Entity)
-      if (3 == getSpaceDimension()) {
-	if (!_connectivity->existConnectivity(MED_NODAL,MED_FACE))
-	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity on MED_FACE defined !"));
+      if (3 == getMeshDimension()) {
+        if (!_connectivity->existConnectivity(MED_NODAL,MED_FACE))
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity on MED_FACE defined !"));
       } else {
-	if (2 != getSpaceDimension())
-	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Could not set connectivity on MED_EDGE !"));
+        if (2 != getMeshDimension())
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Could not set connectivity on MED_EDGE !"));
       }
     // all right, we could create connectivity !
     CONNECTIVITY * myConnectivity = new CONNECTIVITY(NumberOfTypes,Entity) ;
@@ -304,7 +304,7 @@ If \a entity is not defined, the method will throw an exception.
 */
 
 void MESHING::setTypes(const MED_EN::medGeometryElement * Types,
-											const MED_EN::medEntityMesh entity)
+                       const MED_EN::medEntityMesh        entity)
   throw (MEDEXCEPTION)
 {
   if (entity == MED_NODE)
@@ -312,6 +312,9 @@ void MESHING::setTypes(const MED_EN::medGeometryElement * Types,
 
   if (_connectivity == NULL)
     throw MEDEXCEPTION(LOCALIZED("MESHING::setTypes : No connectivity defined !"));
+
+  if ( entity == MED_EN::MED_CELL && getNumberOfTypes( entity ) > 0 )
+    setMeshDimension( Types[0] / 100 );
 
   _connectivity->setGeometricTypes(Types,entity) ;
 }
@@ -420,7 +423,9 @@ void MESHING::setPolygonsConnectivity     (const int * ConnectivityIndex,
 {
   if (_connectivity == (CONNECTIVITY*)NULL)
     throw MEDEXCEPTION("No connectivity defined !");
-  
+
+  setMeshDimension( Entity == MED_EN::MED_CELL ? 2 : 3 );
+
   _connectivity->setPolygonsConnectivity(MED_NODAL, Entity, Connectivity, ConnectivityIndex,ConnectivityIndex[nbOfPolygons]-1,nbOfPolygons) ;
 }
 
