@@ -40,7 +40,7 @@ void MESHCollectionDriver::readFields(vector<MEDMEM::FIELD<T>* >& fields,char* f
     char filename[256];
     strcpy(filename,m_filename[i].c_str());
     cout << "maillage : " << filename << " champ : " << fieldname << endl;
-    //		MEDMEM::FIELD<T>* field = new MEDMEM::FIELD<T>(MEDMEM::MED_DRIVER,filename,fieldname,itnumber,ordernumber);
+    //    MEDMEM::FIELD<T>* field = new MEDMEM::FIELD<T>(MEDMEM::MED_DRIVER,filename,fieldname,itnumber,ordernumber);
     fields.push_back (new MEDMEM::FIELD<T>(MEDMEM::MED_DRIVER,filename,fieldname,itnumber,ordernumber));
   }
 }
