@@ -26,7 +26,7 @@
 #include "MEDSPLITTER_SequentialTopology.hxx"
 
 using namespace MEDSPLITTER;
-	
+  
 SequentialTopology::SequentialTopology(){throw MEDEXCEPTION("SequentialTopology - not implemented yet");}
 
 SequentialTopology::SequentialTopology(std::vector<MEDMEM::MESH*>, std::vector<MEDMEM::CONNECTZONE*>){throw MEDEXCEPTION("SequentialTopology - not implemented yet");}

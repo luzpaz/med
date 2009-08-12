@@ -267,7 +267,7 @@ int main(int argc, char** argv)
 
   cout << "MEDSPLITTER - computing partition "<<endl;
 
-  // Creating the graph and partitioning it	  
+  // Creating the graph and partitioning it   
 #ifdef ENABLE_METIS
 #ifndef ENABLE_SCOTCH
   library = "metis";

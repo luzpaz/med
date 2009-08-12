@@ -26,11 +26,11 @@ namespace MEDSPLITTER {
   {
   public:
     SCOTCHGraph();
-    SCOTCHGraph(const MEDMEM::MEDSKYLINEARRAY*, int* edgeweight=0);
+    SCOTCHGraph(MEDMEM::MEDSKYLINEARRAY*, int* edgeweight=0);
     virtual ~SCOTCHGraph();
-    void partGraph(int ndomain, const string& options_string="");
+    void partGraph(int ndomain, const string& options_string="", ParaDomainSelector* sel=0);
     //private:
-    //	const MEDMEM::MEDSKYLINEARRAY* m_graph;
+    //  const MEDMEM::MEDSKYLINEARRAY* m_graph;
   };
 }
 #endif /*SCOTCHGRAPH_HXX_*/

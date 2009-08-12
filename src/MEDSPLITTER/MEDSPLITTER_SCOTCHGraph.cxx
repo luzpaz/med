@@ -25,22 +25,20 @@ extern "C" {
 #include "MEDSPLITTER_SCOTCHGraph.hxx"
 
 using namespace MEDSPLITTER;
-	
+  
 SCOTCHGraph::SCOTCHGraph():Graph()
 {
 }
 
-SCOTCHGraph::SCOTCHGraph(const MEDMEM::MEDSKYLINEARRAY* graph, int* edgeweight):Graph(graph,edgeweight)
+SCOTCHGraph::SCOTCHGraph(MEDMEM::MEDSKYLINEARRAY* graph, int* edgeweight):Graph(graph,edgeweight)
 {
 }
 
 SCOTCHGraph::~SCOTCHGraph()
 {
-  if (m_partition!=0) {delete m_partition; m_partition=0;}
-  if (m_graph!=0) {delete m_graph; m_graph=0;}
 }
 
-void SCOTCHGraph::partGraph(int ndomain, const string& options_string)
+void SCOTCHGraph::partGraph(int ndomain, const string& options_string, ParaDomainSelector* sel)
 {
   // number of graph vertices
   int n = m_graph->getNumberOf();
@@ -71,7 +69,7 @@ void SCOTCHGraph::partGraph(int ndomain, const string& options_string)
                     adjncy,
                     m_edgeweight);
 
-  SCOTCH_Strat scotch_strategy;					  
+  SCOTCH_Strat scotch_strategy;           
   SCOTCH_stratInit(&scotch_strategy);
 
   //!user-defined options for the strategy
@@ -79,7 +77,7 @@ void SCOTCHGraph::partGraph(int ndomain, const string& options_string)
     SCOTCH_stratGraphMap(&scotch_strategy,options_string.c_str());
 
 
-  if (nparts>1)					  
+  if (nparts>1)           
     SCOTCH_graphPart(&scotch_graph,nparts,&scotch_strategy,partition);
   else
     // partition for 1 subdomain
