@@ -31,7 +31,6 @@ dist_libMEDSPLITTERTest_la_SOURCES= \
 if MED_ENABLE_PARMETIS
   dist_libMEDSPLITTERTest_la_SOURCES+= \
 	ParaMEDSPLITTERTest_MeshSendReceive.cxx \
-	ParaMEDSPLITTERTest_METISGraph.cxx \
 	ParaMEDSPLITTERTest_ParaDomainSelector.cxx \
 	ParaMEDSPLITTERTest_medsplitter_para.cxx	
 endif
