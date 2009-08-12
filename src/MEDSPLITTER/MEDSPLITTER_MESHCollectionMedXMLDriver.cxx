@@ -50,6 +50,7 @@
 #include "MEDSPLITTER_MESHCollectionDriver.hxx"
 #include "MEDSPLITTER_MESHCollection.hxx"
 #include "MEDSPLITTER_MESHCollectionMedXMLDriver.hxx"
+#include "MEDSPLITTER_ParaDomainSelector.hxx"
 
 using namespace MEDSPLITTER;
 
@@ -81,7 +82,7 @@ MESHCollectionMedXMLDriver::MESHCollectionMedXMLDriver(MESHCollection* collectio
  *\param filename XML file containing the list of MED v2.3 files
  * */
 
-int MESHCollectionMedXMLDriver::read(char* filename)
+int MESHCollectionMedXMLDriver::read(char* filename, ParaDomainSelector* domainSelector)
 {
 
   const char* LOC = "MEDSPLITTER::MESHCollectionDriver::read()";
@@ -94,7 +95,7 @@ int MESHCollectionMedXMLDriver::read(char* filename)
 
   int nbdomain;
 
-  m_master_filename=filename;
+  _master_filename=filename;
 
   // reading ascii master file
   try{
@@ -125,11 +126,12 @@ int MESHCollectionMedXMLDriver::read(char* filename)
     xpathObj = xmlXPathEvalExpression(BAD_CAST "//content/mesh", xpathCtx);
     if (xpathObj==0 || xpathObj->nodesetval->nodeNr ==0)
       throw MEDEXCEPTION("MEDSPLITTER read - XML Master File does not contain /MED/content/mesh node");
-    m_collection->setName( (const char*)xpathObj->nodesetval->nodeTab[0]->properties->children->content);
+    _collection->setName( (const char*)xpathObj->nodesetval->nodeTab[0]->properties->children->content);
 
-    cout << "nb domain" << nbdomain << endl;
-    m_filename.resize(nbdomain);
-    (m_collection->getMesh()).resize(nbdomain);
+    cout << "nb domain " << nbdomain << endl;
+    _filename.resize(nbdomain);
+    _meshname.resize(nbdomain);
+    (_collection->getMesh()).resize(nbdomain);
     cellglobal.resize(nbdomain);
     nodeglobal.resize(nbdomain);
     faceglobal.resize(nbdomain);
@@ -147,8 +149,6 @@ int MESHCollectionMedXMLDriver::read(char* filename)
       //reading information about the domain
 
       string host;
-      string meshname;
-      //char meshname[MED_TAILLE_NOM];
 
       cellglobal[i]=0;
       faceglobal[i]=0;
@@ -159,29 +159,12 @@ int MESHCollectionMedXMLDriver::read(char* filename)
       ////////////////////////////
       ostringstream name_search_string;
       name_search_string<<"//files/subfile[@id=\""<<i+1<<"\"]/name";
-      cout <<name_search_string.str()<<endl;
+      //cout <<name_search_string.str()<<endl;
       xmlXPathObjectPtr xpathObjfilename =
         xmlXPathEvalExpression(BAD_CAST name_search_string.str().c_str(),xpathCtx);
       if (xpathObjfilename->nodesetval ==0)
         throw MEDEXCEPTION("MED XML reader : Error retrieving file name ");
-      //ostringstream filename(m_filename[i]);
-      m_filename[i]=(const char*)xpathObjfilename->nodesetval->nodeTab[0]->children->content;
-      //filename.flush();
-      //cout<<m_filename[i]<<endl;
-      //				xmlNodePtr current =  xpathObj->nodesetval->nodeTab[i];
-      //				xmlAttrPtr properties = current->properties;
-      //        
-      //        
-      //				//browsing XML attributes of subfile node until "id" attribute is found
-      //				while(strcmp((const char*)(properties->name),"id")!=0)
-      //					properties=properties->next;
-      //				sscanf((const char*)properties->children->content,"%d",&idomain);
-      //				properties = current->properties;
-      //    
-      //				//browsing XML attributes of subfile node until "name" attribute is found
-      //				while(strcmp((const char*)(properties->name),"name")!=0)
-      //					properties=properties->next;
-      //				m_filename[i]=(const char*)properties->children->content;
+      _filename[i]=(const char*)xpathObjfilename->nodesetval->nodeTab[0]->children->content;
 
       ////////////////////////////////
       //reading the local mesh names
@@ -192,31 +175,10 @@ int MESHCollectionMedXMLDriver::read(char* filename)
       xmlXPathObjectPtr xpathMeshObj = xmlXPathEvalExpression(BAD_CAST mesh_search_string.str().c_str(),xpathCtx);
       if (xpathMeshObj->nodesetval ==0)
         throw MEDEXCEPTION("MED XML reader : Error retrieving mesh name ");
-      meshname=(const char*)xpathMeshObj->nodesetval->nodeTab[0]->children->content;
+      _meshname[i]=(const char*)xpathMeshObj->nodesetval->nodeTab[0]->children->content;
 
-
-      //         
-      //				xmlXPathObjectPtr xpathMeshObj = xmlXPathEvalExpression(BAD_CAST "//mesh/chunk" , xpathCtx);
-      //				int nbchunks = xpathMeshObj->nodesetval ->nodeNr;
-      //				for (int ichunk=0; ichunk<nbchunks; ichunk++)
-      //					{
-      //						xmlNodePtr currentchunk =  xpathMeshObj->nodesetval->nodeTab[ichunk];
-      //						xmlAttrPtr propertieschunk = currentchunk->properties;
-      //						int id;
-      //						sscanf((const char*)propertieschunk->children->content, "%d",&id);
-      //						if (strcmp((const char*)propertieschunk->name, "subdomain")==0 && id==idomain)
-      //							{
-      //								propertieschunk=propertieschunk->next;
-      //								meshstring=(const char*)propertieschunk->children->content;
-      //							}
-      //					}
-
-      //				if (idomain!=i+1)
-      //					{
-      //						cerr<<"Error : domain must be written from 1 to N in master file descriptor"<<endl;
-      //						return 1;
-      //					}
-      readSubdomain(meshname, cellglobal, faceglobal, nodeglobal, i);
+      if ( !domainSelector || domainSelector->isMyDomain(i))
+        readSubdomain(cellglobal, faceglobal, nodeglobal, i);
       xmlXPathFreeObject(xpathObjfilename);
 
       xmlXPathFreeObject(xpathMeshObj);
@@ -236,8 +198,8 @@ int MESHCollectionMedXMLDriver::read(char* filename)
 
   //creation of topology from mesh and connect zones
   ParallelTopology* aPT = new ParallelTopology
-    ((m_collection->getMesh()), (m_collection->getCZ()), cellglobal, nodeglobal, faceglobal);
-  m_collection->setTopology(aPT);
+    ((_collection->getMesh()), (_collection->getCZ()), cellglobal, nodeglobal, faceglobal);
+  _collection->setTopology(aPT);
 
   for (int i=0; i<nbdomain; i++)
   {
@@ -256,7 +218,7 @@ int MESHCollectionMedXMLDriver::read(char* filename)
  * with the connect zones being written as joints
  * \param filename name of the XML file containing the meshes description
  */
-void MESHCollectionMedXMLDriver::write(char* filename)
+void MESHCollectionMedXMLDriver::write(char* filename, ParaDomainSelector* domainSelector)
 {
 
   const char* LOC = "MEDSPLITTER::MESHCollectionDriver::writeXML()";
@@ -264,7 +226,7 @@ void MESHCollectionMedXMLDriver::write(char* filename)
 
   xmlDocPtr master_doc = 0;
   xmlNodePtr root_node = 0, node, node2;
-  //	xmlDTDPtr dtd = 0;
+  //  xmlDTDPtr dtd = 0;
 
   char buff[256];
 
@@ -294,18 +256,18 @@ void MESHCollectionMedXMLDriver::write(char* filename)
 
   node = xmlNewChild(root_node,0, BAD_CAST "description",0);
 
-  xmlNewProp(node, BAD_CAST "what", BAD_CAST m_collection->getDescription().c_str());
+  xmlNewProp(node, BAD_CAST "what", BAD_CAST _collection->getDescription().c_str());
   xmlNewProp(node, BAD_CAST "when", BAD_CAST date);
 
   //Content tag
   node =xmlNewChild(root_node,0, BAD_CAST "content",0);
   node2 = xmlNewChild(node, 0, BAD_CAST "mesh",0);
-  xmlNewProp(node2, BAD_CAST "name", BAD_CAST m_collection->getName().c_str());
+  xmlNewProp(node2, BAD_CAST "name", BAD_CAST _collection->getName().c_str());
 
   //Splitting tag
   node=xmlNewChild(root_node,0,BAD_CAST "splitting",0);
   node2=xmlNewChild(node,0,BAD_CAST "subdomain",0);
-  sprintf(buff, "%d", m_collection->getMesh().size());
+  sprintf(buff, "%d", _collection->getMesh().size());
   xmlNewProp(node2, BAD_CAST "number", BAD_CAST buff);
   node2=xmlNewChild(node,0,BAD_CAST "global_numbering",0);
   xmlNewProp(node2, BAD_CAST "present", BAD_CAST "yes");
@@ -316,10 +278,10 @@ void MESHCollectionMedXMLDriver::write(char* filename)
   //Mapping tag
   node = xmlNewChild(root_node,0,BAD_CAST "mapping",0);
   xmlNodePtr mesh_node = xmlNewChild(node, 0, BAD_CAST "mesh",0);
-  xmlNewProp(mesh_node, BAD_CAST "name", BAD_CAST m_collection->getName().c_str());
+  xmlNewProp(mesh_node, BAD_CAST "name", BAD_CAST _collection->getName().c_str());
 
-  int nbdomains= m_collection->getMesh().size();
-  m_filename.resize(nbdomains);
+  int nbdomains= _collection->getMesh().size();
+  _filename.resize(nbdomains);
 
   //loop on the domains
   for (int idomain=nbdomains-1; idomain>=0;idomain--)
@@ -331,16 +293,22 @@ void MESHCollectionMedXMLDriver::write(char* filename)
 
     strcpy(distfilename,suffix.str().c_str());
 
-    m_filename[idomain]=string(distfilename);
+    _filename[idomain]=string(distfilename);
 
     MESSAGE_MED("File name "<<string(distfilename));
 
-    int id=(m_collection->getMesh())[idomain]->addDriver(MEDMEM::MED_DRIVER,distfilename,(m_collection->getMesh())[idomain]->getName(),MED_EN::WRONLY);
+    if ( !domainSelector || domainSelector->isMyDomain( idomain ) )
+    {
+      if ( !_collection->getMesh()[idomain]->getConnectivityptr() ) continue;//empty domain
 
-    MESSAGE_MED("Start writing");
-    (m_collection->getMesh())[idomain]->write(id);
-    (m_collection->getMesh())[idomain]->rmDriver(id);
+      int id=(_collection->getMesh())[idomain]->addDriver(MEDMEM::MED_DRIVER,distfilename,(_collection->getMesh())[idomain]->getName(),MED_EN::WRONLY);
+      
+      MESSAGE_MED("Start writing");
+      (_collection->getMesh())[idomain]->write(id);
+      (_collection->getMesh())[idomain]->rmDriver(id);
 
+      writeSubdomain(idomain, nbdomains, distfilename, domainSelector);
+    }
     //updating the ascii description file
     node = xmlNewChild(file_node, 0, BAD_CAST "subfile",0);
     sprintf (buff,"%d",idomain+1);
@@ -350,13 +318,13 @@ void MESHCollectionMedXMLDriver::write(char* filename)
 
     node = xmlNewChild(mesh_node,0, BAD_CAST "chunk",0);
     xmlNewProp(node, BAD_CAST "subdomain", BAD_CAST buff);
-    xmlNewChild(node,0,BAD_CAST "name", BAD_CAST (m_collection->getMesh())[idomain]->getName().c_str());
+    xmlNewChild(node,0,BAD_CAST "name", BAD_CAST (_collection->getMesh())[idomain]->getName().c_str());
 
-    writeSubdomain(idomain, nbdomains, distfilename);
   }
   strcat(filename,".xml");
-  m_master_filename=filename;
-  xmlSaveFormatFileEnc(filename, master_doc, "UTF-8", 1);
+  _master_filename=filename;
+  if ( !domainSelector || domainSelector->rank() == 0 )
+    xmlSaveFormatFileEnc(filename, master_doc, "UTF-8", 1);
   xmlFreeDoc(master_doc);
   xmlCleanupParser();
 

@@ -50,6 +50,7 @@
 #include "MEDSPLITTER_MESHCollectionDriver.hxx"
 #include "MEDSPLITTER_MESHCollection.hxx"
 #include "MEDSPLITTER_MESHCollectionMedAsciiDriver.hxx"
+#include "MEDSPLITTER_ParaDomainSelector.hxx"
 
 using namespace MEDSPLITTER;
 
@@ -68,7 +69,7 @@ MESHCollectionMedAsciiDriver::MESHCollectionMedAsciiDriver(MESHCollection* colle
  *\param filename ascii file containing the list of MED v2.3 files
  * */
 
-int MESHCollectionMedAsciiDriver::read(char* filename)
+int MESHCollectionMedAsciiDriver::read(char* filename, ParaDomainSelector* domainSelector)
 {
 
   const char* LOC = "MEDSPLITTER::MESHCollectionDriver::read()";
@@ -99,10 +100,11 @@ int MESHCollectionMedAsciiDriver::read(char* filename)
 
     //reading number of domains
     nbdomain=atoi(charbuffer);
-    cout << "nb domain"<<nbdomain<<endl;
+    cout << "nb domain "<<nbdomain<<endl;
     //    asciiinput>>nbdomain;
-    m_filename.resize(nbdomain);
-    (m_collection->getMesh()).resize(nbdomain);
+    _filename.resize(nbdomain);
+    _meshname.resize(nbdomain);
+    (_collection->getMesh()).resize(nbdomain);
     cellglobal.resize(nbdomain);
     nodeglobal.resize(nbdomain);
     faceglobal.resize(nbdomain);
@@ -116,25 +118,24 @@ int MESHCollectionMedAsciiDriver::read(char* filename)
       string mesh;
       int idomain;
       string host;
-      string meshstring;
       cellglobal[i]=0;
       faceglobal[i]=0;
       nodeglobal[i]=0;
 
-      asciiinput >> mesh >> idomain >> meshstring >> host >> m_filename[i];
+      asciiinput >> mesh >> idomain >> _meshname[i] >> host >> _filename[i];
 
       //Setting the name of the global mesh (which is the same
       //for all the subdomains)
       if (i==0)
-        m_collection->setName(mesh);
+        _collection->setName(mesh);
 
       if (idomain!=i+1)
       {
         cerr<<"Error : domain must be written from 1 to N in asciifile descriptor"<<endl;
         return 1;
       }
-      readSubdomain(meshstring, cellglobal,faceglobal,nodeglobal, i);
-
+      if ( !domainSelector || domainSelector->isMyDomain(i))
+        readSubdomain(cellglobal,faceglobal,nodeglobal, i);
 
     }//loop on domains
     MESSAGE_MED("end of read");
@@ -147,8 +148,8 @@ int MESHCollectionMedAsciiDriver::read(char* filename)
 
   //creation of topology from mesh and connect zones
   ParallelTopology* aPT = new ParallelTopology
-    ((m_collection->getMesh()), (m_collection->getCZ()), cellglobal, nodeglobal, faceglobal);
-  m_collection->setTopology(aPT);
+    ((_collection->getMesh()), (_collection->getCZ()), cellglobal, nodeglobal, faceglobal);
+  _collection->setTopology(aPT);
 
   for (int i=0; i<nbdomain; i++)
   {
@@ -167,20 +168,14 @@ int MESHCollectionMedAsciiDriver::read(char* filename)
  * with the connect zones being written as joints
  * \param filename name of the ascii file containing the meshes description
  */
-void MESHCollectionMedAsciiDriver::write(char* filename)
+void MESHCollectionMedAsciiDriver::write(char* filename, ParaDomainSelector* domainSelector)
 {
 
   const char* LOC = "MEDSPLITTER::MESHCollectionDriver::write()";
   BEGIN_OF_MED(LOC);
 
-  ofstream file(filename);
-
-  file <<"#MED Fichier V 2.3"<<" "<<endl;
-  file <<"#"<<" "<<endl;
-  file<<m_collection->getMesh().size()<<" "<<endl;
-
-  int nbdomains= m_collection->getMesh().size();
-  m_filename.resize(nbdomains);
+  int nbdomains= _collection->getMesh().size();
+  _filename.resize(nbdomains);
 
   //loop on the domains
   for (int idomain=0; idomain<nbdomains;idomain++)
@@ -192,19 +187,36 @@ void MESHCollectionMedAsciiDriver::write(char* filename)
 
     strcpy(distfilename,suffix.str().c_str());
 
-    m_filename[idomain]=string(distfilename);
+    _filename[idomain]=string(distfilename);
 
     MESSAGE_MED("File name "<<string(distfilename));
 
-    int id=(m_collection->getMesh())[idomain]->addDriver(MEDMEM::MED_DRIVER,distfilename,(m_collection->getMesh())[idomain]->getName(),MED_EN::WRONLY);
+    if ( !domainSelector || domainSelector->isMyDomain( idomain ) )
+    {
+      if ( !_collection->getMesh()[idomain]->getConnectivityptr() ) continue;//empty domain
 
-    MESSAGE_MED("Start writing");
-    (m_collection->getMesh())[idomain]->write(id);
+      int id=(_collection->getMesh())[idomain]->addDriver(MEDMEM::MED_DRIVER,distfilename,(_collection->getMesh())[idomain]->getName(),MED_EN::WRONLY);
 
-    //updating the ascii description file
-    file << m_collection->getName() <<" "<< idomain+1 << " "<< (m_collection->getMesh())[idomain]->getName() << " localhost " << distfilename << " "<<endl;
+      MESSAGE_MED("Start writing");
+      (_collection->getMesh())[idomain]->write(id);
 
-    writeSubdomain(idomain, nbdomains, distfilename);
+      writeSubdomain(idomain, nbdomains, distfilename, domainSelector);
+    }
+  }
+
+  // write master file
+  if ( !domainSelector || domainSelector->rank() == 0 )
+  {
+    ofstream file(filename);
+
+    file <<"#MED Fichier V 2.3"<<" "<<endl;
+    file <<"#"<<" "<<endl;
+    file<<_collection->getMesh().size()<<" "<<endl;
+
+    for (int idomain=0; idomain<nbdomains;idomain++)
+      file << _collection->getName() <<" "<< idomain+1 << " "
+           << (_collection->getMesh())[idomain]->getName() << " localhost "
+           << _filename[idomain] << " "<<endl;
   }
 
   END_OF_MED(LOC);

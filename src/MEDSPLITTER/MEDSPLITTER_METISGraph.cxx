@@ -16,14 +16,15 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifdef ENABLE_PARMETIS
 #include <parmetis.h>
 #endif
 extern "C" {
-#include "metis.h"
+#include <metis.h>
 }
-#include"MEDSPLITTER_Graph.hxx"
 #include "MEDSPLITTER_METISGraph.hxx"
+#include "MEDSPLITTER_ParaDomainSelector.hxx"
 
 using namespace MEDSPLITTER;
 
@@ -31,18 +32,18 @@ METISGraph::METISGraph():Graph()
 {
 }
 
-METISGraph::METISGraph(const MEDMEM::MEDSKYLINEARRAY* graph, int* edgeweight)
+METISGraph::METISGraph(MEDMEM::MEDSKYLINEARRAY* graph, int* edgeweight)
   :Graph(graph,edgeweight)
 {
 }
 
 METISGraph::~METISGraph()
 {
-  if (m_partition!=0) {delete m_partition; m_partition=0;}
-  if (m_graph!=0)  {delete m_graph; m_graph=0;}
 }
 
-void METISGraph::partGraph(int ndomain, const string& options_string)
+void METISGraph::partGraph(int                 ndomain,
+                           const string&       options_string,
+                           ParaDomainSelector* parallelizer)
 {
   // number of graph vertices
   int n = m_graph->getNumberOf();
@@ -66,20 +67,36 @@ void METISGraph::partGraph(int ndomain, const string& options_string)
 
   // output parameters
   int edgecut;
-  int* partition = new int[n+1];
+  int* partition = new int[n];
 
   if (nparts >1)
   {
-    if (options_string != "k")
-      METIS_PartGraphRecursive(&n, xadj, adjncy, vwgt, adjwgt, &wgtflag,
-                               &base, &nparts, options, &edgecut, partition);
+    if ( parallelizer )
+    {
+#ifdef ENABLE_PARMETIS
+      // distribution of vertices of the graph among the processors
+      int * vtxdist = parallelizer ? parallelizer->getNbVertOfProcs() : 0;
+      MPI_Comm comm = MPI_COMM_WORLD;
+
+      ParMETIS_PartKway( vtxdist, xadj, adjncy, vwgt, adjwgt, &wgtflag,
+                         &base, &nparts, options, &edgecut, partition, &comm );
+#else
+      throw MEDEXCEPTION("ParMETIS is not available. Check your products, please.");
+#endif
+    }
     else
-      METIS_PartGraphKway(&n, xadj, adjncy, vwgt, adjwgt, &wgtflag,
-                          &base, &nparts, options, &edgecut, partition);
+    {
+      if (options_string != "k")
+        METIS_PartGraphRecursive(&n, xadj, adjncy, vwgt, adjwgt, &wgtflag,
+                                 &base, &nparts, options, &edgecut, partition);
+      else
+        METIS_PartGraphKway(&n, xadj, adjncy, vwgt, adjwgt, &wgtflag,
+                            &base, &nparts, options, &edgecut, partition);
+    }
   }
   else
   {
-    for (int i=0; i<n+1; i++)
+    for (int i=0; i<n; i++)
       partition[i]=1;
   }
 

@@ -24,6 +24,7 @@
 namespace MEDSPLITTER
 {
   class MESHCollection;
+  class ParaDomainSelector;
 
   class MEDSPLITTER_EXPORT MESHCollectionDriver
   {
@@ -32,10 +33,10 @@ namespace MEDSPLITTER
     MESHCollectionDriver(MESHCollection*);
     virtual ~MESHCollectionDriver(){}
 
-    virtual int read(char*)=0;
+    virtual int read(char*, ParaDomainSelector* sel=0)=0;
     int readSeq(char*,char*);
 
-    virtual void write(char*)=0;
+    virtual void write(char*, ParaDomainSelector* sel=0)=0;
     virtual void readFields (vector <MEDMEM::FIELD<int> *>& filenames, char* fieldname,
                              int itnumber, int ordernumber) =0;
     virtual void readFields (vector <MEDMEM::FIELD<double> *>& filenames, char* fieldname,
@@ -46,14 +47,20 @@ namespace MEDSPLITTER
     void readFileStruct(vector <string>&  field_names,vector<int>& iternumber,vector <int>&  ordernumber,vector <int> & types);
 
     int getFieldType(const std::string& fieldname);
-    //	void exportFamily(vector<int*>,MED_EN::medEntityMesh, const string& name);
+    //  void exportFamily(vector<int*>,MED_EN::medEntityMesh, const string& name);
+
+    void readLoc2GlobCellConnect(int idomain, const set<int>& loc_domains, ParaDomainSelector* ds,
+                                 vector<int> & loc2glob_corr);
+
+    int readMeshDimension() const;
 
   protected:
 
-    void readSubdomain(const string& meshname, vector<int*>& cellglobal,
+    void readSubdomain(vector<int*>& cellglobal,
                        vector<int*>& faceglobal,
                        vector<int*>& nodeglobal, int idomain);
-    void writeSubdomain(int idomain,int nbdomain, char*filename);
+    void writeSubdomain(int idomain,int nbdomain, char*filename,
+                        ParaDomainSelector* domain_selector);
 
     void writeElementJoint(medEntityMesh entity ,
                            int icz, 
@@ -66,9 +73,10 @@ namespace MEDSPLITTER
 
 
 
-    MESHCollection* m_collection;
+    MESHCollection* _collection;
 
-    std::vector <std::string> m_filename;
+    std::vector <std::string> _filename;
+    std::vector <std::string> _meshname;
 
   };
 

@@ -32,9 +32,9 @@ namespace MEDSPLITTER
     MESHCollectionMedAsciiDriver(MESHCollection*);
     virtual ~MESHCollectionMedAsciiDriver(){}
 
-    int read(char*);
+    int read(char*, ParaDomainSelector* sel=0);
 
-    void write(char*);
+    void write(char*, ParaDomainSelector* sel=0);
 
     void readFields(vector <MEDMEM::FIELD<int> *>& filenames, char* fieldname,
                     int itnumber, int ordernumber)
@@ -67,7 +67,7 @@ namespace MEDSPLITTER
 
 
 
-    std::string m_master_filename;
+    std::string _master_filename;
   };
 
 }

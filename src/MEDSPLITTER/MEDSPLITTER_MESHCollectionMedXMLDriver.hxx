@@ -33,9 +33,9 @@ namespace MEDSPLITTER
     virtual ~MESHCollectionMedXMLDriver(){}
 
 
-    int read(char*);
+    int read(char*, ParaDomainSelector* sel=0);
 
-    void write(char*);
+    void write(char*, ParaDomainSelector* sel=0);
 
     void readFields(vector <MEDMEM::FIELD<int> *>& filenames, char* fieldname,
                     int itnumber, int ordernumber)
@@ -67,7 +67,7 @@ namespace MEDSPLITTER
     template <class T>
     void _writeFields(vector <MEDMEM::FIELD<T> *>& filenames, char* fieldname);
 
-    std::string m_master_filename;
+    std::string _master_filename;
   };
 
 }
