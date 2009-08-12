@@ -101,7 +101,8 @@ Remapper.hxx \
 PointLocator.hxx \
 PointLocatorAlgos.txx \
 MEDNormalizedUnstructuredMesh.hxx \
-MEDNormalizedUnstructuredMesh.txx
+MEDNormalizedUnstructuredMesh.txx \
+MEDMEM_MeshFuse.hxx
 
 dist_libmedmem_la_SOURCES= \
 MEDMEM_Init.cxx \
@@ -146,7 +147,8 @@ MEDMEM_DriverTools.cxx \
 MEDMEM_GaussLocalization.cxx \
 MEDMEM_Extractor.cxx \
 PointLocator.cxx \
-Remapper.cxx
+Remapper.cxx \
+MEDMEM_MeshFuse.cxx
 
 #libmedmem_la_LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 # libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@
