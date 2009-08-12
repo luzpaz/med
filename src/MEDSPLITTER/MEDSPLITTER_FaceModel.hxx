@@ -19,6 +19,11 @@
 #ifndef MEDSPLITTER_FACEMODEL_HXX_
 #define MEDSPLITTER_FACEMODEL_HXX_
 
+namespace MEDMEM
+{
+  class CELLMODEL;
+}
+
 namespace MEDSPLITTER
 {
 
@@ -33,6 +38,14 @@ namespace MEDSPLITTER
     int& operator[](int i){return *(_conn+i);}
     int getGlobal(){return _global;}
     void setGlobal(int i){_global=i;}
+
+    // Makes face common for two given cells (implemented in MEDSPLITTER_MESHCollection.cxx)
+    static MEDSPLITTER_FaceModel* getCommonFace(const int*               nodes1,
+                                                const int*               nodes1_local,
+                                                const MEDMEM::CELLMODEL& celltype1,
+                                                const int*               nodes2,
+                                                int                      nb_nodes2,
+                                                int                      global_id);
 
   private:
     int _nbnodes;
