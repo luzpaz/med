@@ -1806,7 +1806,8 @@ void MESHCollection::buildConnectZonesBetweenProcs(TGeom2FacesByDomian & face_ma
     const int* partition = global_graph->getPart();
     const int dj = gra_index[0];
 
-    const vector< int > & glob_cells_here = _topology->getFusedCellNumbers( idomain );
+    vector< int > glob_cells_here( _topology->getCellNumber( idomain ));
+    _topology->getCellList( idomain, & glob_cells_here[0]);
     for ( int loc_here = 0; loc_here < glob_cells_here.size(); ++loc_here )
     {
       int glob_here = glob_cells_here[ loc_here ];
