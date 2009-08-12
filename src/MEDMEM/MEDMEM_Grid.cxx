@@ -323,10 +323,14 @@ void GRID::fillCoordinates() const
   const char* LOC = "GRID::fillCoordinates()";
   BEGIN_OF_MED(LOC);
   
-  // if coordonate has not been allocated, perform shalow copy, transfer ownership of matrix
+  // if coordinate has not been allocated, perform shalow copy, transfer ownership of matrix
   if(_coordinate->getSpaceDimension()*_coordinate->getNumberOfNodes() == 0)
-      _coordinate->setCoordinates(new MEDARRAY<double>(_spaceDimension,_numberOfNodes,MED_FULL_INTERLACE),true); 
-
+  {
+    MEDARRAY<double> coord(new double[_spaceDimension*_numberOfNodes],
+                           _spaceDimension,_numberOfNodes,MED_FULL_INTERLACE,
+                           /*shallowCopy=*/true, /*ownershipOfValues=*/false);
+    _coordinate->setCoordinates( &coord, /*shallowCopy=*/true );
+  }
   double* myCoord = const_cast <double *> ( _coordinate->getCoordinates(MED_FULL_INTERLACE) );
 
   bool hasJ = _jArrayLength, hasK = _kArrayLength;
@@ -380,6 +384,7 @@ CONNECTIVITY * GRID::makeConnectivity (MED_EN::medEntityMesh           Entity,
   int numberOfGeometricType    = 1;
   Connectivity->_numberOfTypes = numberOfGeometricType;
 
+  if ( Connectivity->_count ) delete [] Connectivity->_count;
   Connectivity->_count    = new int [numberOfGeometricType + 1] ;
   Connectivity->_count[0] = 1;
   Connectivity->_count[1] = 1 + NbEntities;
@@ -637,7 +642,7 @@ void GRID::fillConnectivity() const
             n4 = n3 - 1;
             break;
           default: // nodes for faces normal to k direction
-            n2 = n1 + I;
+            n2 = n1 + I + 1; // take into account --I
             n3 = n2 + 1;
             n4 = n1 + 1;
           }
@@ -849,6 +854,7 @@ Axis [1,2,3] means one of directions: along \a i, \a j or \a k.
 For cell constituents (FACE or EDGE), Axis selects one of those having same  \f$ (i, j, k )\f$ :
 - a FACE which is normal to direction along given \a Axis;
 - an EDGE going along given \a Axis.
+ \a i, \a j and \a k counts from zero.
 
 Exception for \a Axis out of range.
 For 2D grids, \a k is a dummy argument. */
@@ -912,18 +918,14 @@ int GRID::getFaceNumber(const int Axis, const int i, const int j, const int k)
   int Len[4] = {0,_iArrayLength-1, _jArrayLength-1, _kArrayLength-1 }, I=1, J=2, K=3;
 
   Len[Axis]++;
-  int Nb = 1 + i + j*Len[ I ] + k*Len[ J ]*Len[ K ];
+  int Nb = 1 + i + j*Len[ I ] + k*Len[ I ]*Len[ J ];
   Len[Axis]--;
   
-  if (Axis > 1) { // add all faces in i direction
-    Len[I]++ ;
-    Nb += Len[ I ]*Len[ J ]*Len[ K ];
-    Len[I]-- ;
-  }
-  if (Axis > 2) { // add all faces in j direction
-    Len[J]++ ;
-    Nb += Len[ I ]*Len[ J ]*Len[ K ];
-  }
+  if (Axis > 1) // add all faces in i direction
+    Nb += ( Len[ I ]+1 )*Len[ J ]*Len[ K ];
+
+  if (Axis > 2) // add all faces in j direction
+    Nb += Len[ I ]*( Len[ J ]+1 )*Len[ K ];
 
   END_OF_MED(LOC);
 
