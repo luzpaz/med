@@ -102,6 +102,7 @@ class MEDMEMTest : public CppUnit::TestFixture
   //CPPUNIT_TEST( testmedimport_src /* not in spec */ );
   //60
   CPPUNIT_TEST( testExtractor );
+  CPPUNIT_TEST( testMeshFuse );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -171,6 +172,7 @@ public:
   //void testmedimport_src() /* not in spec */;
   //60
   void testExtractor();
+  void testMeshFuse();
 };
 
 // to create a mesh with certain filling

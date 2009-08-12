@@ -67,7 +67,8 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_VtkMedDriver.cxx \
 	MEDMEMTest_VtkMeshDriver.cxx \
 	MEDMEMTest_Utils.hxx \
-	MEDMEMTest_Utils.cxx
+	MEDMEMTest_Utils.cxx \
+	MEDMEMTest_MeshFuse.cxx
 
 libMEDMEMCppTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED2_INCLUDES) $(HDF5_INCLUDES) \
 	-I$(srcdir)/../MEDMEM -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../MEDWrapper/V2_1/Core
@@ -79,36 +80,36 @@ if MED_ENABLE_KERNEL
 endif
 
 # Executables targets
-bin_PROGRAMS = \
-	TestMEDMEM \
-	MEDMEMTest_Array_fault \
-	MEDMEMTest_Connectivity_fault \
-	MEDMEMTest_Coordinate_fault \
-	MEDMEMTest_Family_fault \
-	MEDMEMTest_Field_fault \
-	MEDMEMTest_Grid_fault \
-	MEDMEMTest_MedFieldDriver21_fault \
-	MEDMEMTest_MedMedDriver21_fault \
-	MEDMEMTest_MedMedDriver22_fault \
-	MEDMEMTest_MeshAndMeshing_fault \
-	MEDMEMTest_Support_fault \
-	MEDMEMTest_VtkFieldDriver_fault \
-	MEDMEMTest_VtkMeshDriver_fault
+bin_PROGRAMS = TestMEDMEM
+#	TestMEDMEM \
+# 	MEDMEMTest_Array_fault \
+# 	MEDMEMTest_Connectivity_fault \
+# 	MEDMEMTest_Coordinate_fault \
+# 	MEDMEMTest_Family_fault \
+# 	MEDMEMTest_Field_fault \
+# 	MEDMEMTest_Grid_fault \
+# 	MEDMEMTest_MedFieldDriver21_fault \
+# 	MEDMEMTest_MedMedDriver21_fault \
+# 	MEDMEMTest_MedMedDriver22_fault \
+# 	MEDMEMTest_MeshAndMeshing_fault \
+# 	MEDMEMTest_Support_fault \
+# 	MEDMEMTest_VtkFieldDriver_fault \
+# 	MEDMEMTest_VtkMeshDriver_fault
 
 dist_TestMEDMEM_SOURCES= TestMEDMEM.cxx
-dist_MEDMEMTest_Array_fault_SOURCES= MEDMEMTest_Array_fault.cxx
-dist_MEDMEMTest_Connectivity_fault_SOURCES= MEDMEMTest_Connectivity_fault.cxx
-dist_MEDMEMTest_Coordinate_fault_SOURCES= MEDMEMTest_Coordinate_fault.cxx
-dist_MEDMEMTest_Family_fault_SOURCES= MEDMEMTest_Family_fault.cxx
-dist_MEDMEMTest_Field_fault_SOURCES= MEDMEMTest_Field_fault.cxx
-dist_MEDMEMTest_Grid_fault_SOURCES= MEDMEMTest_Grid_fault.cxx
-dist_MEDMEMTest_MedFieldDriver21_fault_SOURCES= MEDMEMTest_MedFieldDriver21_fault.cxx
-dist_MEDMEMTest_MedMedDriver21_fault_SOURCES= MEDMEMTest_MedMedDriver21_fault.cxx
-dist_MEDMEMTest_MedMedDriver22_fault_SOURCES= MEDMEMTest_MedMedDriver22_fault.cxx
-dist_MEDMEMTest_MeshAndMeshing_fault_SOURCES= MEDMEMTest_MeshAndMeshing_fault.cxx
-dist_MEDMEMTest_Support_fault_SOURCES= MEDMEMTest_Support_fault.cxx
-dist_MEDMEMTest_VtkFieldDriver_fault_SOURCES= MEDMEMTest_VtkFieldDriver_fault.cxx
-dist_MEDMEMTest_VtkMeshDriver_fault_SOURCES= MEDMEMTest_VtkMeshDriver_fault.cxx
+# dist_MEDMEMTest_Array_fault_SOURCES= MEDMEMTest_Array_fault.cxx
+# dist_MEDMEMTest_Connectivity_fault_SOURCES= MEDMEMTest_Connectivity_fault.cxx
+# dist_MEDMEMTest_Coordinate_fault_SOURCES= MEDMEMTest_Coordinate_fault.cxx
+# dist_MEDMEMTest_Family_fault_SOURCES= MEDMEMTest_Family_fault.cxx
+# dist_MEDMEMTest_Field_fault_SOURCES= MEDMEMTest_Field_fault.cxx
+# dist_MEDMEMTest_Grid_fault_SOURCES= MEDMEMTest_Grid_fault.cxx
+# dist_MEDMEMTest_MedFieldDriver21_fault_SOURCES= MEDMEMTest_MedFieldDriver21_fault.cxx
+# dist_MEDMEMTest_MedMedDriver21_fault_SOURCES= MEDMEMTest_MedMedDriver21_fault.cxx
+# dist_MEDMEMTest_MedMedDriver22_fault_SOURCES= MEDMEMTest_MedMedDriver22_fault.cxx
+# dist_MEDMEMTest_MeshAndMeshing_fault_SOURCES= MEDMEMTest_MeshAndMeshing_fault.cxx
+# dist_MEDMEMTest_Support_fault_SOURCES= MEDMEMTest_Support_fault.cxx
+# dist_MEDMEMTest_VtkFieldDriver_fault_SOURCES= MEDMEMTest_VtkFieldDriver_fault.cxx
+# dist_MEDMEMTest_VtkMeshDriver_fault_SOURCES= MEDMEMTest_VtkMeshDriver_fault.cxx
 
 LDADD= $(MED2_LIBS) $(libMEDMEMCppTest_la_LDFLAGS) -lm \
 	../MEDWrapper/V2_1/Core/libmed_V2_1.la ../MEDMEM/libmedmem.la libMEDMEMCppTest.la
