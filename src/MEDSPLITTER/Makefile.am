@@ -45,7 +45,10 @@ MEDSPLITTER_UserGraph.hxx\
 MEDSPLITTER_API.hxx \
 MEDSPLITTER_SequentialTopology.hxx \
 MEDSPLITTER_utils.hxx \
-MEDSPLITTER.hxx
+MEDSPLITTER.hxx \
+MEDSPLITTER_ParaDomainSelector.hxx \
+MEDSPLITTER_MeshSendReceive.hxx \
+MEDSPLITTER_JointExchangeData.hxx
 
 if MED_ENABLE_METIS
     salomeinclude_HEADERS+= MEDSPLITTER_METISGraph.hxx
@@ -62,7 +65,10 @@ MEDSPLITTER_MESHCollectionMedAsciiDriver.cxx \
 MEDSPLITTER_ParallelTopology.cxx \
 MEDSPLITTER_Graph.cxx\
 MEDSPLITTER_UserGraph.cxx\
-MEDSPLITTER_API.cxx
+MEDSPLITTER_API.cxx \
+MEDSPLITTER_ParaDomainSelector.cxx \
+MEDSPLITTER_MeshSendReceive.cxx \
+MEDSPLITTER_JointExchangeData.cxx
 
 if MED_ENABLE_METIS
     dist_libmedsplitter_la_SOURCES+= MEDSPLITTER_METISGraph.cxx
@@ -82,8 +88,6 @@ libmedsplitter_la_LDFLAGS=
 if MED_ENABLE_PARMETIS
   libmedsplitter_la_CPPFLAGS+= $(PARMETIS_CPPFLAGS)
   libmedsplitter_la_LDFLAGS+= $(PARMETIS_LIBS)
-  METIS_CPPFLAGS=
-  METIS_LIBS=
 endif
 if MED_ENABLE_METIS
   libmedsplitter_la_CPPFLAGS+= $(METIS_CPPFLAGS)
@@ -110,6 +114,13 @@ medsplitter_CPPFLAGS= $(libmedsplitter_la_CPPFLAGS)
 medsplitter_LDADD= $(libmedsplitter_la_LDFLAGS) -lm $(BOOST_LIBS) libmedsplitter.la
 if MED_ENABLE_KERNEL
   medsplitter_LDADD+= -lSALOMEBasics
+endif
+
+if MPI_IS_OK
+  bin_PROGRAMS+=medsplitter_para
+  dist_medsplitter_para_SOURCES= medsplitter_para.cxx
+  medsplitter_para_CPPFLAGS= $(medsplitter_CPPFLAGS)
+  medsplitter_para_LDADD= $(medsplitter_LDADD)
 endif
 
 OBSOLETE_FILES = \

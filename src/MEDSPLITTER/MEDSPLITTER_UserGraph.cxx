@@ -43,15 +43,13 @@ UserGraph::UserGraph(MEDMEM::MEDSKYLINEARRAY* array, const int* partition, int n
   //m_partition = new MEDMEM::MEDSKYLINEARRAY(n,n, index, partition, true);
   m_partition = new MEDMEM::MEDSKYLINEARRAY(n,n, index, partition, false);
   delete[] index;
-} 
+}
 
 UserGraph::~UserGraph()
 {
-  if (m_partition!=0) {delete m_partition; m_partition=0;}
-  if (m_graph!=0)  {delete m_graph; m_graph=0;}
 }
 
-void UserGraph::partGraph(int ndomain, const string& options)
+void UserGraph::partGraph(int ndomain, const string& options, ParaDomainSelector* sel)
 {
   cerr<<"MEDSPLITTER::UserGraph::partGraph() should not have to be used"<<endl;
 }

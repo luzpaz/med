@@ -54,24 +54,3 @@ void MEDSPLITTERTest::tearDown()
 // #8: MEDSPLITTER_METISGraph.hxx                    }  MEDSPLITTERTest_METISGraph.cxx
 // #9: MEDSPLITTER_SCOTCHGraph.hxx                   }  MEDSPLITTERTest_SCOTCHGraph.cxx
 // #10: MEDSPLITTER_UserGraph.hxx                    }  MEDSPLITTERTest_UserGraph.cxx (-)
-
-
-/*!
- *  Tool to remove temporary files.
- *  Allows automatique removal of temporary files in case of test failure.
- */
-MEDSPLITTERTest_TmpFilesRemover::~MEDSPLITTERTest_TmpFilesRemover()
-{
-  set<string>::iterator it = myTmpFiles.begin();
-  for (; it != myTmpFiles.end(); it++) {
-    if (access((*it).data(), F_OK) == 0)
-      remove((*it).data());
-  }
-  myTmpFiles.clear();
-  //cout << "~MEDSPLITTERTest_TmpFilesRemover()" << endl;
-}
-
-bool MEDSPLITTERTest_TmpFilesRemover::Register(const string theTmpFile)
-{
-  return (myTmpFiles.insert(theTmpFile)).second;
-}

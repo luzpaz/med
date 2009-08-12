@@ -19,11 +19,18 @@
 #ifndef TOPOLOGY_HXX_
 #define TOPOLOGY_HXX_
 
+#include "MEDMEM_define.hxx"
+
 #include "boost/shared_ptr.hpp"
+
+#include <map>
+#include <vector>
 
 namespace MEDMEM
 {
-  class	CONNECTZONE;
+  class CONNECTZONE;
+  class MESH;
+  class MEDSKYLINEARRAY;
 }
 
 namespace MEDSPLITTER {
@@ -31,6 +38,9 @@ namespace MEDSPLITTER {
   class Graph;
   class MESHCollection;
   class MEDSPLITTER_FaceModel;
+
+  typedef std::map<MED_EN::medGeometryElement, std::vector<MEDSPLITTER_FaceModel*> > TGeom2Faces;
+  typedef std::vector< TGeom2Faces > TGeom2FacesByDomian;
 
   class Topology
   {
@@ -60,11 +70,11 @@ namespace MEDSPLITTER {
     virtual int nbDomain() const =0;
 
     //number of cells
-    virtual	int nbCells() const=0;
+    virtual int nbCells() const=0;
 
 
     //number of cells on a specific domain
-    virtual	int nbCells(int idomain) const=0;
+    virtual int nbCells(int idomain) const=0;
 
     ////creating node mapping 
     virtual void createNodeMapping(std::map<MED_EN::medGeometryElement,int*>& type_connectivity,
@@ -77,9 +87,9 @@ namespace MEDSPLITTER {
                                    int domain)=0;
 
     ////creating face mapping 
-    //	virtual void createFaceMapping(std::map<MED_EN::medGeometryElement,int*>& type_connectivity,
-    //										std::map<MED_EN::medGeometryElement,int>& present_type_numbers,int domain)=0;
-    //			
+    //  virtual void createFaceMapping(std::map<MED_EN::medGeometryElement,int*>& type_connectivity,
+    //                    std::map<MED_EN::medGeometryElement,int>& present_type_numbers,int domain)=0;
+    //      
     virtual void createFaceMapping(const MESHCollection&)=0;
 
     //converting node global numberings to local numberings
@@ -104,6 +114,12 @@ namespace MEDSPLITTER {
     //retrieving list of nodes
     virtual void getNodeList(int idomain, int* list) const =0;
 
+    virtual std::vector<int> & getFusedCellNumbers(int idomain) = 0;
+    virtual const std::vector<int> & getFusedCellNumbers(int idomain) const = 0;
+
+    virtual std::vector<int> & getFusedFaceNumbers(int idomain) = 0;
+    virtual const std::vector<int> & getFusedFaceNumbers(int idomain) const = 0;
+
     //retrieving number of nodes
     virtual int getCellNumber(int idomain) const =0;
 
@@ -120,6 +136,15 @@ namespace MEDSPLITTER {
     //adding a face to the mapping
     virtual void appendFace(int idomain, int ilocal, int iglobal)=0;
 
+    //return max global face number
+    virtual int getMaxGlobalFace()const=0;
+
+    //return next free global face number
+    //virtual int nextGlobalFace(int start_num) const=0;
+
+    //!converting a global cell number to a local representation
+    virtual std::pair<int,int> convertGlobalCell(int iglobal) const =0;
+
     //converting a global face number to a local representation
     virtual int convertGlobalFace(int iglobal, int idomain)=0;
 
@@ -127,16 +152,19 @@ namespace MEDSPLITTER {
     virtual int convertGlobalNode(int iglobal, int idomain)=0;
 
     //! computing arrays with node/node correspondencies
-    virtual void computeNodeNodeCorrespondencies(int nbdomain, vector<MEDMEM::MEDSKYLINEARRAY*>&) const =0;
+    virtual void computeNodeNodeCorrespondencies(int nbdomain, std::vector<MEDMEM::MEDSKYLINEARRAY*>&) const =0;
 
     //! computing arrays with cell/cell correspondencies
-    virtual void computeCellCellCorrespondencies(int nbdomain, vector<MEDMEM::MEDSKYLINEARRAY*>&, const Graph*) const =0;
+    virtual void computeCellCellCorrespondencies(int nbdomain, std::vector<MEDMEM::MEDSKYLINEARRAY*>&, const Graph*) const =0;
 
     //! retrieving graph
     virtual boost::shared_ptr<Graph> getGraph() const=0;
 
     //!recreating a face mapping from scratch
-    virtual void recreateFaceMapping(std::vector<std::map<MED_EN::medGeometryElement, std::vector<MEDSPLITTER_FaceModel*> > >) =0;
+    virtual void recreateFaceMapping(const TGeom2FacesByDomian& )=0;
+
+    //!recreating cell and node mapping after send-reveive and fusion of domain meshes
+    virtual void recreateMappingAfterFusion(const std::vector<MEDMEM::MESH*>& ) = 0;
   };
 }
 #endif /*TOPOLOGY_HXX_*/

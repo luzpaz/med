@@ -44,6 +44,7 @@ class MEDSPLITTERTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testMESHCollection_complete_sequence_with_polygon);
   CPPUNIT_TEST( testMESHCollection_families);
   //  CPPUNIT_TEST( testMESHCollection_complete_sequence_with_polyhedra);
+
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -63,19 +64,6 @@ public:
   void testMESHCollection_complete_sequence_with_polyhedra();
   void testMESHCollection_families();
   void testParallelTopology_graph_constructor();
-
-};
-
-// to automatically remove temporary files from disk
-class MEDSPLITTERTest_TmpFilesRemover
-{
-public:
-  MEDSPLITTERTest_TmpFilesRemover() {}
-  ~MEDSPLITTERTest_TmpFilesRemover();
-  bool Register(const std::string theTmpFile);
-
-private:
-  std::set<std::string> myTmpFiles;
 };
 
 /*!

@@ -36,6 +36,7 @@
 //#include "MEDSPLITTER_SCOTCHGraph.hxx"
 #include "MEDSPLITTER_MESHCollection.hxx"
 #include "MEDSPLITTER_MESHCollectionDriver.hxx"
+#include "MEDSPLITTERTest_Utils.hxx"
 
 #include "MEDMEM_Exception.hxx"
 
@@ -309,9 +310,9 @@ void MEDSPLITTERTest::testMESHCollection_square()
 
   //testing distant domains
 
-  char desc1[MED_TAILLE_DESC];
-  char maa_dist1[MED_TAILLE_NOM], jn1[MED_TAILLE_NOM];
-  char desc2[MED_TAILLE_DESC], maa_dist2[MED_TAILLE_NOM], jn2[MED_TAILLE_NOM];
+  char desc1[MED_TAILLE_DESC+1];
+  char maa_dist1[MED_TAILLE_NOM+1], jn1[MED_TAILLE_NOM+1];
+  char desc2[MED_TAILLE_DESC+1], maa_dist2[MED_TAILLE_NOM+1], jn2[MED_TAILLE_NOM+1];
   int dom1, dom2;
   med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
   med_2_3::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
@@ -349,7 +350,7 @@ void MEDSPLITTERTest::testMESHCollection_square()
 
   //testing nodes global numbering
   med_2_3::med_int* num = new med_2_3::med_int[6];
-  cout << "Reading global " << MEDglobalNumLire(fid1, meshname1, num, 6, typ_ent_loc, typ_geo_loc) << endl;
+  //cout << "Reading global " << MEDglobalNumLire(fid1, meshname1, num, 6, typ_ent_loc, typ_geo_loc) << endl;
 
   med_2_3::med_int globnoderef1[] = {4,5,2,1,7,8};
 
@@ -480,9 +481,9 @@ void MEDSPLITTERTest::testMESHCollection_square_with_faces()
 
   //testing distant domains
 
-  char desc1[MED_TAILLE_DESC];
-  char maa_dist1[MED_TAILLE_NOM], jn1[MED_TAILLE_NOM];
-  char desc2[MED_TAILLE_DESC], maa_dist2[MED_TAILLE_NOM], jn2[MED_TAILLE_NOM];
+  char desc1[MED_TAILLE_DESC+1];
+  char maa_dist1[MED_TAILLE_NOM+1], jn1[MED_TAILLE_NOM+1];
+  char desc2[MED_TAILLE_DESC+1], maa_dist2[MED_TAILLE_NOM+1], jn2[MED_TAILLE_NOM+1];
   int dom1, dom2;
   med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
   med_2_3::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
@@ -518,7 +519,7 @@ void MEDSPLITTERTest::testMESHCollection_square_with_faces()
 
   //testing nodes global numbering
   med_2_3::med_int* num = new med_2_3::med_int[6];
-  cout << "Reading global " << MEDglobalNumLire(fid1, meshname1, num, 6, typ_ent_loc, typ_geo_loc) << endl;
+  //cout << "Reading global " << MEDglobalNumLire(fid1, meshname1, num, 6, typ_ent_loc, typ_geo_loc) << endl;
 
   med_2_3::med_int globnoderef1[]={4,5,2,1,7,8};
 
@@ -653,7 +654,7 @@ void MEDSPLITTERTest::testMESHCollection_indivisible()
 
 
   char meshname[20]  = "MAILTRQU";
-  char family[MED_TAILLE_NOM]="QUAD";
+  char family[MED_TAILLE_NOM+1]="QUAD";
   MESHCollection collection(filename_rd,meshname);
   collection.setIndivisibleGroup(family);
   Topology* topo;
@@ -794,10 +795,10 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
 
   //testing distant domains
 
-  char desc1[MED_TAILLE_DESC];
-  char maa_dist1[MED_TAILLE_NOM], jn1[MED_TAILLE_NOM];
-  char desc2[MED_TAILLE_DESC];
-  char maa_dist2[MED_TAILLE_NOM], jn2[MED_TAILLE_NOM];
+  char desc1[MED_TAILLE_DESC+1];
+  char maa_dist1[MED_TAILLE_NOM+1], jn1[MED_TAILLE_NOM+1];
+  char desc2[MED_TAILLE_DESC+1];
+  char maa_dist2[MED_TAILLE_NOM+1], jn2[MED_TAILLE_NOM+1];
   //int dom1, dom2;
   med_2_3::med_int dom1, dom2;
   med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
@@ -833,7 +834,7 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
 
   //testing nodes global numbering
   med_2_3::med_int* num = new med_2_3::med_int[7];
-  cout << "Reading global " << MEDglobalNumLire(fid1, meshname1, num, 7, typ_ent_loc, typ_geo_loc) << endl;
+  //cout << "Reading global " << MEDglobalNumLire(fid1, meshname1, num, 7, typ_ent_loc, typ_geo_loc) << endl;
   med_2_3::med_int globnoderef1[7] = {4,5,2,1,8,9,6};
 
   for (int i=0; i<7; i++)

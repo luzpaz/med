@@ -25,9 +25,20 @@ lib_LTLIBRARIES = libMEDSPLITTERTest.la
 dist_libMEDSPLITTERTest_la_SOURCES= \
 	MEDSPLITTERTest.cxx \
 	MEDSPLITTERTest_MESHCollection.cxx \
-	MEDSPLITTERTest_ParallelTopology.cxx
+	MEDSPLITTERTest_ParallelTopology.cxx \
+	MEDSPLITTERTest_Utils.cxx
 
-salomeinclude_HEADERS = MEDSPLITTERTest.hxx
+if MED_ENABLE_PARMETIS
+  dist_libMEDSPLITTERTest_la_SOURCES+= \
+	ParaMEDSPLITTERTest_MeshSendReceive.cxx \
+	ParaMEDSPLITTERTest_METISGraph.cxx \
+	ParaMEDSPLITTERTest_ParaDomainSelector.cxx \
+	ParaMEDSPLITTERTest_medsplitter_para.cxx	
+endif
+
+salomeinclude_HEADERS = \
+	MEDSPLITTERTest.hxx \
+	MEDSPLITTERTest_Utils.cxx
 
 libMEDSPLITTERTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED2_INCLUDES) \
 	$(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ $(BOOST_CPPFLAGS) $(LIBXML_CXXFLAGS) \
@@ -40,6 +51,10 @@ if MED_ENABLE_KERNEL
     libMEDSPLITTERTest_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
 endif
 
+if MED_ENABLE_PARMETIS
+  libMEDSPLITTERTest_la_CPPFLAGS+= $(PARMETIS_CPPFLAGS)
+  libMEDSPLITTERTest_la_LDFLAGS+= $(PARMETIS_LIBS)
+endif
 if MED_ENABLE_METIS
   libMEDSPLITTERTest_la_CPPFLAGS+= $(METIS_CPPFLAGS)
   libMEDSPLITTERTest_la_LDFLAGS+= $(METIS_LIBS)
@@ -65,6 +80,17 @@ endif
 dist_salomescript_DATA = testMEDSPLITTER.py
 
 UNIT_TEST_PROG = TestMEDSPLITTER
+
+# parallel exe
+
+if MED_ENABLE_PARMETIS
+  bin_PROGRAMS+= TestParaMEDSPLITTER
+  TestParaMEDSPLITTER_SOURCES= TestParaMEDSPLITTER.cxx
+  TestParaMEDSPLITTER_CPPFLAGS = $(TestMEDSPLITTER_CPPFLAGS)
+  TestParaMEDSPLITTER_LDADD = $(TestMEDSPLITTER_LDADD) $(HDF5_LIBS)
+  dist_salomescript_DATA += testParaMEDSPLITTER.py
+  TESTS = TestParaMEDSPLITTER
+endif
 
 check: tests
 

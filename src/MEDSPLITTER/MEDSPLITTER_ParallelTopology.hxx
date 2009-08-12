@@ -49,7 +49,11 @@ namespace MEDSPLITTER {
 
     ParallelTopology();
 
-    ParallelTopology(vector<MEDMEM::MESH*>, vector<MEDMEM::CONNECTZONE*>,vector<int*>&, vector<int*>&, vector<int*>&);
+    ParallelTopology(const std::vector<MEDMEM::MESH*>&,
+                     const std::vector<MEDMEM::CONNECTZONE*>&,
+                     std::vector<int*>&,
+                     std::vector<int*>&,
+                     std::vector<int*>&);
 
     ParallelTopology(boost::shared_ptr<Graph> graph, int nbdomain, int mesh_dimension);
 
@@ -66,8 +70,8 @@ namespace MEDSPLITTER {
 
     //!converts a list of global face numbers
     //!to a distributed array with local face numbers
-    void convertGlobalFaceList(const int*, int , int*, int *);	
-    void convertGlobalFaceList(const int*, int , int*, int);	
+    void convertGlobalFaceList(const int*, int , int*, int *);  
+    void convertGlobalFaceList(const int*, int , int*, int);  
     void convertGlobalFaceListWithTwins(const int* face_list, int nbface, int*& local, int*& ip, int*& full_array,int& size);
 
     //!creating node mapping 
@@ -81,9 +85,9 @@ namespace MEDSPLITTER {
                            std::vector<int>& polyhedron_face_index,
                            int idomain);
 
-    //	void createFaceMapping(std::map<MED_EN::medGeometryElement,int*>& type_connectivity,
-    //						   std::map<MED_EN::medGeometryElement,int>& present_type_numbers,
-    //						   int idomain);					
+    //  void createFaceMapping(std::map<MED_EN::medGeometryElement,int*>& type_connectivity,
+    //               std::map<MED_EN::medGeometryElement,int>& present_type_numbers,
+    //               int idomain);          
 
     void createFaceMapping(const MESHCollection &);
     void createFaceMapping2ndversion(const MESHCollection &);
@@ -101,10 +105,10 @@ namespace MEDSPLITTER {
     void computeNodeNodeCorrespondencies(int nbdomain,vector<MEDMEM::MEDSKYLINEARRAY*>& ) const;
 
     //! computing arrays with node/node correspondencies
-    void computeCellCellCorrespondencies(int nbdomain,vector<MEDMEM::MEDSKYLINEARRAY*>&, const Graph* ) const;
+    void computeCellCellCorrespondencies(int nbdomain,vector<MEDMEM::MEDSKYLINEARRAY*>&, const Graph*) const;
 
     //! retrieving Graph
-    //	boost::shared_ptr<Graph> getGraph() const;
+    //  boost::shared_ptr<Graph> getGraph() const;
 
 
     //!converting node local numbering to global
@@ -153,13 +157,13 @@ namespace MEDSPLITTER {
       for (int i=0; i<n; i++)
       {
         global[i]=m_face_loc_to_glob[ip][local[i]-1];
-        //					if (m_face_loc_to_glob.find(make_pair(ip,local[i]))==m_face_loc_to_glob.end())
-        //						{
-        //							cout << "problem : face # "<< local[i] << " of processor "<< ip<< " was not found in mapping loc2glob"<<endl;	
-        //							global[i]=-1;
-        //						}
-        //					else
-        //						global[i]=m_face_loc_to_glob.find(make_pair(ip,local[i]))->second;
+        //          if (m_face_loc_to_glob.find(make_pair(ip,local[i]))==m_face_loc_to_glob.end())
+        //            {
+        //              cout << "problem : face # "<< local[i] << " of processor "<< ip<< " was not found in mapping loc2glob"<<endl; 
+        //              global[i]=-1;
+        //            }
+        //          else
+        //            global[i]=m_face_loc_to_glob.find(make_pair(ip,local[i]))->second;
       }
     }
 
@@ -210,6 +214,25 @@ namespace MEDSPLITTER {
       }
     }
 
+    //!< retrieving cell numbers after fusing in parallel mode
+    std::vector<int> & getFusedCellNumbers(int idomain)
+    {
+      return m_cell_loc_to_glob_fuse[idomain];
+    }
+    const std::vector<int> & getFusedCellNumbers(int idomain) const
+    {
+      return m_cell_loc_to_glob_fuse[idomain];
+    }
+
+    //!< retrieving face numbers after fusing in parallel mode
+    std::vector<int> & getFusedFaceNumbers(int idomain)
+    {
+      return m_face_loc_to_glob_fuse[idomain];
+    }
+    const std::vector<int> & getFusedFaceNumbers(int idomain) const
+    {
+      return m_face_loc_to_glob_fuse[idomain];
+    }
 
 
     //!retrieving number of nodes
@@ -263,6 +286,12 @@ namespace MEDSPLITTER {
 
     }
 
+    //! converting a global cell number to a local representation (domain + local number)
+    inline std::pair<int,int> convertGlobalCell(int iglobal) const
+    {
+      return m_glob_to_loc.find(iglobal)->second;
+    }
+
     inline int convertGlobalFace(int iglobal, int idomain)
     {
       typedef __gnu_cxx::hash_multimap<int, pair<int,int> >::const_iterator MMiter;
@@ -294,20 +323,26 @@ namespace MEDSPLITTER {
       m_face_glob_to_loc.insert(make_pair(iglobal,make_pair(idomain,ilocal)));
     }
 
+    //return max global face number
+    int getMaxGlobalFace() const;
+
     boost::shared_ptr<Graph> getGraph() const
     {
       return m_graph;
     }
 
     //!recreating a face mapping from scratch
-    void recreateFaceMapping(vector<map<MED_EN::medGeometryElement, vector<MEDSPLITTER_FaceModel*> > >);
+    void recreateFaceMapping(const TGeom2FacesByDomian& face_map);
 
+    // recreating cell and node mapping after send-reveive and fusion of domain meshes
+    virtual void recreateMappingAfterFusion(const std::vector<MEDMEM::MESH*>& );
 
 
 
   private:
     //!mapping global -> local
-    __gnu_cxx::hash_map<int,pair<int,int> > m_glob_to_loc;
+    typedef __gnu_cxx::hash_map<int,pair<int,int> > TGlob2DomainLoc;
+    TGlob2DomainLoc m_glob_to_loc;
 
     //  bool is_equal_pair (pair<int,int> a, pair<int,int> b){
     //      return  (a.first==b.first && a.second==b.second);
@@ -322,13 +357,18 @@ namespace MEDSPLITTER {
     __gnu_cxx::hash_multimap<int,pair<int,int> > m_node_glob_to_loc;
 
     //!mapping local -> global
-    //	map<pair<int,int>,int> m_node_loc_to_glob;
+    //  map<pair<int,int>,int> m_node_loc_to_glob;
     //__gnu_cxx::hash_map<pair<int,int>,int, __gnu_cxx::hash<pair<int,int> > > m_node_loc_to_glob;
     vector<vector <int> > m_node_loc_to_glob;
 
+    // global numbers in parallel mode
+    vector<vector <int> > m_cell_loc_to_glob_fuse; // glob nums after fusing
+    vector<vector <int> > m_face_loc_to_glob_fuse; // glob nums after fusing
+
 
     //!mapping global -> local
-    __gnu_cxx::hash_multimap<int,pair<int,int> > m_face_glob_to_loc;
+    typedef __gnu_cxx::hash_multimap<int,pair<int,int> > TGlob2LocsMap;
+    TGlob2LocsMap m_face_glob_to_loc;
 
     //!mapping local -> global
     //__gnu_cxx::hash_map<pair<int,int>,int, __gnu_cxx::hash<pair<int,int> > > m_face_loc_to_glob;
