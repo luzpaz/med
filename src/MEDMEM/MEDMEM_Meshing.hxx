@@ -83,7 +83,7 @@ public :
 				     const int * FacesIndex,
 				     const int * Nodes,
 				     int nbOfPolyhedra,
-				     const MED_EN::medEntityMesh Entity)
+				     const MED_EN::medEntityMesh Entity=MED_EN::MED_CELL)
     throw (MEDEXCEPTION) ;
 
   void setConnectivities   (const int * ConnectivityIndex,
