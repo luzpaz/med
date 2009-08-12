@@ -48,13 +48,13 @@ using namespace std;
  */
  
 int medsplitter(const char* inputfilename, 
-		const char* mesh,
-		const char* outputfilename,  
-		int is_distributed,
-		int nprocs,
-		int method,
-		int meshonly)
-{			 
+                const char* mesh,
+                const char* outputfilename,  
+                int is_distributed,
+                int nprocs,
+                int method,
+                int meshonly)
+{      
 
   //Pointer to the initial collection
   MEDSPLITTER::MESHCollection* collection; 
@@ -70,7 +70,7 @@ int medsplitter(const char* inputfilename,
   else
     collection = new MEDSPLITTER::MESHCollection(input);
 
-  // Creating the graph and partitioning it	  
+  // Creating the graph and partitioning it   
   MEDSPLITTER::Topology* new_topo;
   if (method==0)
     new_topo = collection->createPartition(nprocs,MEDSPLITTER::Graph::METIS);
