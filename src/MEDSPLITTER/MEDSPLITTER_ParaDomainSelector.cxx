@@ -639,7 +639,7 @@ double ParaDomainSelector::getPassedTime() const
 
 //================================================================================
 /*!
- * \brief Evaluate current memory usage and return the maximal one in MB
+ * \brief Evaluate current memory usage and return the maximal one in KB
  */
 //================================================================================
 
@@ -653,7 +653,7 @@ int ParaDomainSelector::evaluateMemory() const
     int err = sysinfo( &si );
     if ( !err )
       used_memory =
-        (( si.totalram - si.freeram + si.totalswap - si.freeswap ) * si.mem_unit ) / 1024 / 1024;
+        (( si.totalram - si.freeram + si.totalswap - si.freeswap ) * si.mem_unit ) / 1024;
 #endif
     if ( used_memory > _max_memory )
       ((ParaDomainSelector*) this)->_max_memory = used_memory;

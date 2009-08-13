@@ -120,7 +120,7 @@ public:
   // Return time passed from construction in seconds
   double getPassedTime() const;
 
-  // Evaluate current memory usage and return the maximal one in MB
+  // Evaluate current memory usage and return the maximal one in KB
   int evaluateMemory() const;
 
 private:
