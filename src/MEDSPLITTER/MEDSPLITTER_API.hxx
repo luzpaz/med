@@ -29,4 +29,12 @@ extern "C" int medsplitter(const char* inputfilename,
                            int method,
                            int meshonly);
 
+MEDSPLITTER_EXPORT
+extern "C" int medsplitter_para(const char* inputfilename, 
+                                const char* outputfilename,  
+                                const int   nprocs,
+                                const int   method,
+                                const       bool create_boundary_faces,
+                                const       bool family_splitting);
+
 #endif

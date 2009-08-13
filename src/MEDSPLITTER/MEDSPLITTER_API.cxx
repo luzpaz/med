@@ -33,6 +33,7 @@
 #include "MEDSPLITTER_Graph.hxx"
 #include "MEDSPLITTER_MESHCollection.hxx"
 #include "MEDSPLITTER_Topology.hxx"
+#include "MEDSPLITTER_ParaDomainSelector.hxx"
 
 using namespace std;
 /*!
@@ -88,6 +89,49 @@ int medsplitter(const char* inputfilename,
   if (meshonly!=0)
     new_collection.castAllFields(*collection);
   delete collection;
+
+  return 0;
+}
+
+
+/*!
+ * Parallel MEDSPLITTER high-level API
+ * 
+ * \param inputfilename name of the input distributed MED file
+ * \param outputfilename name out the master output file
+ * \param nprocs number of subdomains
+ * \param method METIS(0) or SCOTCH(1)
+ * \param create_boundary_faces creates the necessary faces so that faces joints are created in the output files
+ * \param family_splitting preserves the family names instead of focusing on the groups
+ */
+
+int medsplitter_para(const char* inputfilename, 
+                     const char* outputfilename,  
+                     const int   nprocs,
+                     const int   method,
+                     const       bool create_boundary_faces,
+                     const       bool family_splitting)
+{
+  // Parallelizer
+  MEDSPLITTER::ParaDomainSelector parallelizer;
+
+  // Loading the mesh collection
+  MEDSPLITTER::MESHCollection collection (inputfilename, parallelizer);
+
+  // Creating the graph and partitioning it   
+  auto_ptr<MEDSPLITTER::Topology> new_topo;
+  if (method==0)
+    new_topo.reset( collection.createPartition(nprocs,MEDSPLITTER::Graph::METIS));
+  else
+    new_topo.reset( collection.createPartition(nprocs,MEDSPLITTER::Graph::SCOTCH));
+
+  // Creating a new mesh collection from the partitioning 
+  MEDSPLITTER::MESHCollection new_collection(collection, new_topo.get(),family_splitting);
+  new_collection.setSubdomainBoundaryCreates(create_boundary_faces);
+
+  //Writing the output files (master + MED files)
+  string output(outputfilename);
+  new_collection.write(output);
 
   return 0;
 }
