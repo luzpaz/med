@@ -260,7 +260,7 @@ ParallelTopology::ParallelTopology(const vector<MEDMEM::MESH*>& meshes,
       for (int iface=0; iface<m_nb_faces[idomain]; iface++)
       {
         int global_number=faceglobal[idomain][iface];
-        //cout << "dom: "<< idomain << " gl face " << global_number << endl;
+        //cout << "dom: "<< idomain << " read glob face " << global_number << endl;
         //SCRUTE_MED(global_number);
         m_face_glob_to_loc.insert(make_pair(global_number,make_pair(idomain,iface+1)));
         //m_face_loc_to_glob[make_pair(idomain,iface+1)]=global_number;
@@ -1177,7 +1177,7 @@ void ParallelTopology::recreateMappingAfterFusion(const vector<MEDMEM::MESH*>& m
     for (int iface=0; iface<m_nb_faces[idomain]; iface++)
     {
       int global_number=m_face_loc_to_glob_fuse[idomain][iface];
-      m_face_loc_to_glob[idomain][iface]=global_number;
+      m_face_glob_to_loc.insert(make_pair(global_number,make_pair(idomain,iface+1)));
     }
   }
 
