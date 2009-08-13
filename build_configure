@@ -76,35 +76,16 @@ if test ${MED_WITH_KERNEL} = no; then
   CONFIGURE_SOURCE_DIR=${ABS_CONF_DIR}/adm_local_without_kernel
 fi
 
-rm -rf salome_adm
-mkdir -p salome_adm/unix/config_files
-#cp -f ${CONFIGURE_SOURCE_DIR}/unix/config_files/* salome_adm/unix/config_files
-cp -f ${CONFIGURE_SOURCE_DIR}/unix/SALOMEconfig.h.in salome_adm/unix
-#if test ${MED_WITH_KERNEL} = yes; then
-#  cp -f ${CONFIGURE_SOURCE_DIR}/unix/pythonbe.py salome_adm/unix
-#fi
-
-# if with GUI, cofy configure files from it
-#if test ${MED_WITH_GUI} = yes; then
-#  cp -f ${GUI_ROOT_DIR}/adm_local/unix/config_files/* salome_adm/unix/config_files
-#fi
-
-# remove KERNEL deprecated configure files
-#for deprecated in ac_cc_warnings.m4 ac_cxx_partial_specialization.m4 \
-#  check_mico.m4 config.guess ltmain.sh ac_cxx_bool.m4 ltconfig ac_cxx_typename.m4 \
-#  check_pthreads.m4 config.sub libtool.m4 ac_cxx_mutable.m4 missing
-#do
-#  rm -f salome_adm/unix/config_files/${deprecated}
-#done
+#######################################################################
 
 # ____________________________________________________________________
 # aclocal creates the aclocal.m4 file from the standard macro and the
-# custom macro embedded in the directory salome_adm/unix/config_files
-# and KERNEL config_files directory.
+# custom macro embedded in the directory adm_local/unix/config_files
+# and KERNEL salome_adm/unix/config_files directory.
 # output:
 #   aclocal.m4
 #   autom4te.cache (directory)
-echo "====================================================== aclocal"
+echo "======================================================= aclocal"
 
 aclocal -I adm_local/unix/config_files \
         -I ${CONFIGURE_SOURCE_DIR}/unix/config_files || exit 1
@@ -115,16 +96,12 @@ aclocal -I adm_local/unix/config_files \
 # version. The files are created in the directory specified with the
 # AC_CONFIG_AUX_DIR(<mydir>) tag (see configure.ac).
 # output:
-#   salome_adm/unix/config_files/config.guess
-#   salome_adm/unix/config_files/config.sub
-#   salome_adm/unix/config_files/ltmain.sh
-#echo "====================================================== libtoolize"
+#   adm_local/unix/config_files/config.guess
+#   adm_local/unix/config_files/config.sub
+#   adm_local/unix/config_files/ltmain.sh
+echo "==================================================== libtoolize"
 
 libtoolize --force --copy --automake || exit 1
-
-# ____________________________________________________________________
-# make link to KERNEL configuration files to
-#ln -sf ${KERNEL_ROOT_DIR}/salome_adm .
 
 # ____________________________________________________________________
 # autoconf creates the configure script from the file configure.ac (or
@@ -142,11 +119,11 @@ autoconf
 # AC_CONFIG_AUX_DIR(<mydir>) tag (see configure.ac). This step also
 # creates the Makefile.in files from the Makefile.am files.
 # output:
-#   salome_adm/unix/config_files/compile
-#   salome_adm/unix/config_files/depcomp
-#   salome_adm/unix/config_files/install-sh
-#   salome_adm/unix/config_files/missing
-#   salome_adm/unix/config_files/py-compile
+#   adm_local/unix/config_files/compile
+#   adm_local/unix/config_files/depcomp
+#   adm_local/unix/config_files/install-sh
+#   adm_local/unix/config_files/missing
+#   adm_local/unix/config_files/py-compile
 #   Makefile.in (from Makefile.am)
 echo "====================================================== automake"
 

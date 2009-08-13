@@ -163,8 +163,8 @@ libmedmem_la_LDFLAGS=$(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2
 	../MEDWrapper/Base/libMEDWrapperBase.la $(STDLIB) ../INTERP_KERNEL/libinterpkernel.la
 
 
-AM_CPPFLAGS= $(libmedmem_la_CPPFLAGS)
-AM_CXXFLAGS= $(libmedmem_la_CXXFLAGS)
+AM_CPPFLAGS+= $(libmedmem_la_CPPFLAGS)
+AM_CXXFLAGS+= $(libmedmem_la_CXXFLAGS)
 LDADD= $(libmedmem_la_LDFLAGS) -lm libmedmem.la
 
 OBSOLETE_FILES = \

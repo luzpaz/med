@@ -46,7 +46,7 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 #    libMEDMEMBinTest_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
 #endif
 
-AM_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
+AM_CPPFLAGS += $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
 	-I$(srcdir)/../MEDWrapper/Base \
 	-I$(srcdir)/../MEDWrapper/V2_1/Core -I$(srcdir)/../INTERPOLATION \
 	-I$(srcdir)/../MEDMEM

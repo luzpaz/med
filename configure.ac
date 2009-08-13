@@ -26,7 +26,7 @@
 # Modified by : Mikhail PONIKAROV (OCN)
 #
 AC_INIT([Salome2 Project MED module], [5.1.2], [webmaster.salome@opencascade.com], [SalomeMED])
-AC_CONFIG_AUX_DIR(salome_adm/unix/config_files)
+AC_CONFIG_AUX_DIR(adm_local/unix/config_files)
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([tar-pax -Wno-portability])
@@ -164,7 +164,7 @@ dnl Fix up the INSTALL macro if it s a relative path. We want the
 dnl full-path to the binary instead.
 case "$INSTALL" in
    *install-sh*)
-      INSTALL='\${ROOT_BUILDDIR}'/salome_adm/unix/config_files/install-sh
+      INSTALL='\${ROOT_BUILDDIR}'/adm_local/unix/config_files/install-sh
       ;;
 esac
 
@@ -651,7 +651,6 @@ AC_OUTPUT_COMMANDS([ \
 ])
 
 AC_OUTPUT([ \
-	salome_adm/unix/SALOMEconfig.h \
 	adm_local_without_kernel/unix/SALOMEconfig.h \
 	Makefile \
 	MED_version.h \
@@ -735,6 +734,3 @@ AC_OUTPUT([ \
 	doc/doxygen/Makefile \
 	doc/doxygen/Doxyfile_med_user \
 ])
-
-dnl To avoid recompiling half of the sources because of SALOMEconfig.h recreating
-touch -d 01Jan2007 salome_adm/unix/SALOMEconfig.h

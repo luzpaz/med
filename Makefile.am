@@ -69,17 +69,5 @@ EXTRA_DIST += build_configure clean_configure LICENCE INSTALL README
 dist-hook:
 	rm -rf `find $(distdir) -name CVS`
 
-if MED_ENABLE_SSTREAM
-  install-data-local: $(pkgincludedir)/SALOMEconfig.h
-else !MED_ENABLE_SSTREAM
-  install-data-local: $(pkgincludedir)/SALOMEconfig.h $(pkgincludedir)/sstream
-endif
-
-$(pkgincludedir)/SALOMEconfig.h: ./salome_adm/unix/SALOMEconfig.h
-	cp -f $^ $(pkgincludedir)
-
-$(pkgincludedir)/sstream: ./include/salome/sstream
-	cp -f $^ $(pkgincludedir)
-
 dev_docs:
 	(cd doc && $(MAKE) $(AM_MAKEFLAGS) dev_docs)

@@ -43,7 +43,7 @@ dist_libmedcouplingcorba_la_SOURCES=       \
 	MEDCouplingFieldServant.cxx        \
 	MEDCouplingFieldDoubleServant.cxx  
 
-libmedcouplingcorba_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) -I$(top_builddir)/salome_adm/unix -I$(top_builddir)/idl ${KERNEL_CXXFLAGS} \
+libmedcouplingcorba_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) -I$(top_builddir)/idl ${KERNEL_CXXFLAGS} \
 	-I$(srcdir)/../MEDCoupling -I$(srcdir)/../INTERP_KERNEL/Bases
 libmedcouplingcorba_la_LDFLAGS= \
 	../../idl/libSalomeIDLMED.la \

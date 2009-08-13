@@ -116,7 +116,7 @@ LDADD= $(MED2_LIBS) $(libMEDMEMCppTest_la_LDFLAGS) -lm \
 if MED_ENABLE_KERNEL
      LDADD+= -lSALOMEBasics
 endif
-AM_CPPFLAGS= $(libMEDMEMCppTest_la_CPPFLAGS)
+AM_CPPFLAGS += $(libMEDMEMCppTest_la_CPPFLAGS)
 
 dist_salomescript_DATA = testMEDMEM.py
 
