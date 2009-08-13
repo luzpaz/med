@@ -38,7 +38,6 @@ class ParaMEDSPLITTERTest : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE( ParaMEDSPLITTERTest );
 
-  CPPUNIT_TEST( testMETISGraph_partGraph_parallel );
   CPPUNIT_TEST( testMeshSendReceive );
   CPPUNIT_TEST( testMeshFuse );
 
@@ -55,7 +54,6 @@ class ParaMEDSPLITTERTest : public CppUnit::TestFixture
 
 public:
 
-  void testMETISGraph_partGraph_parallel();
   void testMeshSendReceive();
   void testMeshFuse();
 
