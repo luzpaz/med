@@ -27,6 +27,7 @@
 #include "MEDSPLITTER_ParaDomainSelector.hxx"
 #include "MEDSPLITTER_MESHCollection.hxx"
 #include "MEDSPLITTER_ParaDomainSelector.hxx"
+#include "MEDSPLITTER_Topology.hxx"
 
 #include <MEDMEM_Mesh.hxx>
 #include <MEDMEM_PointerOf.hxx>
@@ -44,7 +45,7 @@ using namespace MED_EN;
 void ParaMEDSPLITTERTest::functional_validation()
 {
   //test_medsplitter_para( "/dn25/salome/eap/salome/misc/tmp/meshing_REsplit1.med", "meshing_1");
-  //test_medsplitter_para( getResourceFile("TimeStamps_import22.med"), "dom");
+  test_medsplitter_para( getResourceFile("TimeStamps_import22.med"), "dom");
   test_medsplitter_para( getResourceFile("square1.med"), "Mesh_2");
   test_medsplitter_para( getResourceFile("pointe_import22.med"), "maa1");
 }
@@ -97,6 +98,23 @@ void ParaMEDSPLITTERTest::test_medsplitter_para( const string& med_file, const s
   MESHCollection collection_3w( collection_2r, new_topo_3.get());
   collection_3w.setDriverType(MEDSPLITTER::MedAscii);
   collection_3w.write( file_3 );
+
+  // check global face numbers of collection_3w
+  {
+    int total_nb_faces = 0;
+    for ( int idomain=0; idomain < collection_3w.getMesh().size(); ++idomain )
+      total_nb_faces += collection_3w.getMesh()[idomain]->getNumberOfElementsWithPoly(collection_3w.getSubEntity(), MED_ALL_ELEMENTS );
+
+    for ( int idomain=0; idomain < collection_3w.getMesh().size(); ++idomain )
+    {
+      int nb_dom_faces = new_topo_3->getFaceNumber(idomain);
+      MEDMEM::PointerOf<int> glob_ids( nb_dom_faces );
+      new_topo_3->getFaceList(idomain, glob_ids);
+      for ( int i = 0; i < nb_dom_faces; ++i )
+        if ( glob_ids[i] < 1 || glob_ids[i] > total_nb_faces )
+          CPPUNIT_FAIL(MEDMEM::STRING("Invalid global face id: ")<< glob_ids[i]);
+    }
+  }
   
   MPI_Barrier( MPI_COMM_WORLD ); // wait for master file_3
 
