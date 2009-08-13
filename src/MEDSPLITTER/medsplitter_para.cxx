@@ -313,7 +313,7 @@ int main(int argc, char** argv)
     {
       MEDMEM::STRING text("proc ");
       text << parallelizer.rank() << ": elapsed time = " << parallelizer.getPassedTime()
-           << ", max memory usage = " << parallelizer.evaluateMemory() << " MB";
+           << ", max memory usage = " << parallelizer.evaluateMemory() << " KB";
       cout << text << endl;
     }
   // Casting the fields on the new collection
