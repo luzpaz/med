@@ -118,6 +118,9 @@ namespace MEDSPLITTER
     //getting name of the mesh
     std::string getMeshName() const;
 
+    //return constituent entity
+    MED_EN::medEntityMesh getSubEntity() const;
+
     //getting a reference to mesh vector
     std::vector<MEDMEM::MESH*>& getMesh() ;
 

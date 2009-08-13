@@ -143,7 +143,7 @@ MESHCollection::MESHCollection(const MESHCollection& initial_collection, Topolog
   _topology->createFaceMapping(initial_collection); 
   for (int idomain=0; idomain<_topology->nbDomain(); idomain++)
   {
-    switch (getMeshDimension())
+    switch (mesh_dim)
     {
     case 3:
       createNodalConnectivity(initial_collection,idomain, MED_EN::MED_FACE);
@@ -231,7 +231,7 @@ MESHCollection::MESHCollection(const MESHCollection& initial_collection, Topolog
             fuse->append( MED_EN::MED_CELL,
                           _topology->getFusedCellNumbers( idomain ), cells_other_proc );
 
-            fuse->append( getMeshDimension()==3 ? MED_EN::MED_FACE : MED_EN::MED_EDGE,
+            fuse->append( mesh_dim==3 ? MED_EN::MED_FACE : MED_EN::MED_EDGE,
                           _topology->getFusedFaceNumbers( idomain ), faces_other_proc );
 
             if ( _mesh[idomain]->getNumberOfNodes() > 0 )
@@ -242,8 +242,9 @@ MESHCollection::MESHCollection(const MESHCollection& initial_collection, Topolog
     }
     _topology->recreateMappingAfterFusion( getMesh() );
   }
-  if ( _i_non_empty_mesh < 0 ) // non of domains resides on this proc
-    _i_non_empty_mesh = 0; // we need only dimension that is set to all meshes
+  if ( _i_non_empty_mesh < 0 ) // non of domains resides on this proc,
+    _i_non_empty_mesh = 0; // in this case we need only dimension that is set to all meshes
+
 }
 
 /*! constructing the MESH collection from a distributed file
@@ -807,6 +808,11 @@ void MESHCollection::getCoordinates(int* node_list,int nb_nodes, double* coordin
   }
   delete[]local;
   delete[] ip;
+}
+/*! returns constituent entity*/
+MED_EN::medEntityMesh MESHCollection::getSubEntity() const
+{
+  return getMeshDimension()==3 ? MED_EN::MED_FACE : MED_EN::MED_EDGE;
 }
 
 /*! retrieves the space dimension*/
@@ -1397,7 +1403,7 @@ Topology* MESHCollection::createPartition(const int* partition)
 void MESHCollection::addJointGroup(const std::vector<int>& loc_face_ids, int idomain, int idistant)
 {
   MEDMEM::MESHING* meshing = dynamic_cast<MEDMEM::MESHING*> (_mesh[idomain]);
-  MED_EN::medEntityMesh constituent_entity = (getMeshDimension()==3)?MED_EN::MED_FACE:MED_EN::MED_EDGE;
+  MED_EN::medEntityMesh constituent_entity = getSubEntity();
 
   MEDMEM::STRING jointname("joint_");
   jointname<<idistant+1;
@@ -1473,7 +1479,7 @@ void MESHCollection::buildConnectZones()
   vector <map <MED_EN::medGeometryElement, vector<MEDSPLITTER_FaceModel*> > > face_map(_topology->nbDomain());
   map< pair<int,int>, MEDMEM::MEDSKYLINEARRAY*> cell_corresp_here;
 
-  MED_EN::medEntityMesh constituent_entity = (getMeshDimension()==3)?MED_EN::MED_FACE:MED_EN::MED_EDGE;
+  MED_EN::medEntityMesh constituent_entity = getSubEntity();
 
   if ( isParallelMode() )
   {
@@ -1871,8 +1877,7 @@ void MESHCollection::buildConnectZonesBetweenProcs(TGeom2FacesByDomian & face_ma
   _domain_selector->gatherEntityTypesInfo( _mesh, MED_EN::MED_CELL );
 
   // gather info on nb of sub-entities to compute their global numbers for joints
-  MED_EN::medEntityMesh sub_entity = getMeshDimension()==3 ? MED_EN::MED_FACE : MED_EN::MED_EDGE;
-  _domain_selector->gatherNbOf( sub_entity, _mesh );
+  _domain_selector->gatherNbOf( getSubEntity(), _mesh );
   _domain_selector->gatherNbCellPairs();
   if ( _subdomain_boundary_creates )
   {
@@ -1918,16 +1923,8 @@ void MESHCollection::castFamilies(const MESHCollection& old_collection)
   //defines the entities over which the information is cast
   MED_EN::medEntityMesh entities[3];
   entities[0]=MED_EN::MED_NODE;
+  entities[1]=getSubEntity();
   entities[2]=MED_EN::MED_CELL;
-  switch (getMeshDimension())
-  {
-  case 3:
-    entities[1]= MED_EN::MED_FACE;  
-    break;
-  case 2:
-    entities[1]= MED_EN::MED_EDGE;  
-    break;
-  }
 
   for (int ientity=0; ientity<=2;ientity++)
   {
@@ -2429,7 +2426,7 @@ void MESHCollection::createNodalConnectivity(const MESHCollection& initial_colle
 void MESHCollection::getFaces(int idomain, 
                               map<MED_EN::medGeometryElement, vector<MEDSPLITTER_FaceModel*> >& face_map)                     
 {
-  MED_EN::medEntityMesh constituent_entity = (getMeshDimension()==3)?MED_EN::MED_FACE:MED_EN::MED_EDGE;
+  MED_EN::medEntityMesh constituent_entity = getSubEntity();
   const medGeometryElement* types;
   try
   {
