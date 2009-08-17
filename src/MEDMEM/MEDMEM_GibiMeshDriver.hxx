@@ -61,6 +61,17 @@ class GROUP;
 class SUPPORT;
 class CONNECTIVITY;
 struct _intermediateMED;
+
+// IMP 0020434: mapping GIBI names to MED names
+struct nameGIBItoMED {
+  // GIBI value (in PILE_SOUS_MAILLAGE or in PILE_FIELD)
+  int key_pile;
+  int key_id;
+  // MED value (in PILE_STRINGS)
+  int val_id; // used only on reading
+  string value; // used only on writing
+};
+
 class MEDMEM_EXPORT GIBI_MESH_DRIVER : public GENDRIVER
 {
 protected:
@@ -265,13 +276,23 @@ public :
   /*!
     Write MESH and _supports.
   */
-  void writeSupportsAndMesh();
+  void writeSupportsAndMesh(list<nameGIBItoMED>& listGIBItoMED);
+  /*!
+   * Store MED names of supports and fields.
+   * All MED names are written in STRINGS PILE, and the correspondence
+   * between GIBI and MED names is written as TABLE "noms_med"
+  */
+  void writeMEDNames(const list<nameGIBItoMED>& listGIBItoMED);
   /*!
     Write the record closing file
   */
   void writeLastRecord();
 
-  static void addName( map<string,int>& nameMap, string& name, int index, string prefix );
+  //static void addName( map<string,int>& nameMap, string& name, int index, string prefix );
+  static void addName( map<string,int>& nameMap,
+                       map<string,int>& namePrefixesMap,
+                       string&          name,
+                       int              index);
 
   void writeNames( map<string,int>& nameMap );
 
