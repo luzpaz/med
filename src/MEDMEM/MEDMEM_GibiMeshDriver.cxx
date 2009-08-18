@@ -2232,12 +2232,10 @@ void GIBI_MESH_WRONLY_DRIVER::addName (map<string,int>& nameMap,
 
     // first 5 or less characters of the name
     if (len > 5) len = 5;
-    char *str = new char[9];
+    //char *str = new char[9];
+    char str [9];
     str[8] = '\0';
     int addr = 0;
-    //for (; addr < len; addr++) {
-    //  str[addr] = name[addr];
-    //}
     strncpy(str, name.c_str(), len);
     addr = len;
     str[addr] = '\0';
@@ -2580,6 +2578,11 @@ void GIBI_MESH_WRONLY_DRIVER::writeMEDNames (const list<nameGIBItoMED>& listGIBI
   list<int> theOffsets;
   int currOffset = 0;
 
+  // Provide unique MED names, to exclude conflicts on reading saved files
+  // (use case: read fra.med, save it to GIBI, read it from GIBI,
+  // save to MED again -> this new MED file is not readable)
+  set<string> medUniqueNames;
+
   // The TABLE PILE
   // * 800   FORMAT (' ENREGISTREMENT DE TYPE', I4)
   _gibi << " ENREGISTREMENT DE TYPE   2" << endl;
@@ -2606,11 +2609,24 @@ void GIBI_MESH_WRONLY_DRIVER::writeMEDNames (const list<nameGIBItoMED>& listGIBI
     // ID of value i
     _gibi << setw(8) << ii; fcount1++;
 
+    // check MED name to be unique
+    string aMedName = itGIBItoMED->value;
+    if (!medUniqueNames.insert(aMedName).second) {
+      string aMedNameNew;
+      int ind = 1;
+      char strInd [32];
+      do {
+        sprintf(strInd, "_%d", ind++);
+        aMedNameNew = aMedName + strInd;
+      } while (!medUniqueNames.insert(aMedNameNew).second);
+      aMedName = aMedNameNew;
+    }
+
     // add to the string
-    theWholeString += itGIBItoMED->value; // MED name
+    theWholeString += aMedName; // MED name
 
     // add an offset
-    currOffset += itGIBItoMED->value.length();
+    currOffset += aMedName.length();
     theOffsets.push_back(currOffset);
   }
   fcount1.stop();
