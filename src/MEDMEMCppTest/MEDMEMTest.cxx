@@ -29,6 +29,7 @@
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_STRING.hxx"
+#include "MEDMEM_Remapper.hxx"
 
 #include <sstream>
 #include <cmath>
