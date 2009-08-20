@@ -25,6 +25,7 @@
 #include "MEDMEMTest_Utils.hxx"
 
 #include <cppunit/extensions/HelperMacros.h>
+#include "MEDMEM_Field.hxx"
 
 #include <set>
 #include <string>
@@ -41,7 +42,7 @@ class MEDMEMTest : public CppUnit::TestFixture
   //0
   CPPUNIT_TEST( testArray );
   CPPUNIT_TEST( testArrayConvert );
-    //CPPUNIT_TEST( testArrayInterface /* not in spec */ );
+  //CPPUNIT_TEST( testArrayInterface /* not in spec */ );
   CPPUNIT_TEST( testAsciiFieldDriver );
   //CPPUNIT_TEST( testCellModel /* not in spec */ );
   CPPUNIT_TEST( testConnectivity );
@@ -67,7 +68,7 @@ class MEDMEMTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testMedFieldDriver21 );
   CPPUNIT_TEST( testMedFieldDriver22 );
   //CPPUNIT_TEST( testMedFieldDriver /* not in spec */ );
-    CPPUNIT_TEST( testMed );
+  CPPUNIT_TEST( testMed );
   //30
   CPPUNIT_TEST( testMedMedDriver21 );
   CPPUNIT_TEST( testMedMedDriver22 );
@@ -75,7 +76,7 @@ class MEDMEMTest : public CppUnit::TestFixture
   //CPPUNIT_TEST( testMEDMEMchampLire /* not in spec */ );
   //CPPUNIT_TEST( testMEDMEMgaussEcr /* not in spec */ );
   //CPPUNIT_TEST( testMEDMEMprofilEcr /* not in spec */ );
-   CPPUNIT_TEST( testMedMeshDriver21 );
+  CPPUNIT_TEST( testMedMeshDriver21 );
   CPPUNIT_TEST( testMedMeshDriver22 );
   //CPPUNIT_TEST( testMedMeshDriver /* not in spec */ );
   CPPUNIT_TEST( testMedVersion );
@@ -94,7 +95,7 @@ class MEDMEMTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testSupport );
   //CPPUNIT_TEST( testTags /* not in spec */ );
   //CPPUNIT_TEST( testTopLevel );
-	//  CPPUNIT_TEST( testTypeMeshDriver );
+  //  CPPUNIT_TEST( testTypeMeshDriver );
   CPPUNIT_TEST( testUnit );
   CPPUNIT_TEST( testVtkFieldDriver );
   CPPUNIT_TEST( testVtkMedDriver );
@@ -104,6 +105,10 @@ class MEDMEMTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testExtractor );
   CPPUNIT_TEST( testDesactivateFacesComputation ); // issue 0020411
 
+  CPPUNIT_TEST( test_RemapperP0P0 );
+  CPPUNIT_TEST( test_RemapperP1P1 );
+  CPPUNIT_TEST( test_RemapperP1P0 );
+  CPPUNIT_TEST( test_RemapperP0P1 );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -174,6 +179,13 @@ public:
   //60
   void testExtractor();
   void testDesactivateFacesComputation(); // issue 0020411
+  void test_RemapperP0P0();
+  void test_RemapperP1P1();
+  void test_RemapperP1P0();
+  void test_RemapperP0P1();
+
+  //private:
+  void absField(MEDMEM::FIELD<double>&);
 };
 
 // to create a mesh with certain filling
