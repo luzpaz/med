@@ -45,6 +45,7 @@ dist_admlocalwithoutkernelm4_DATA = \
     check_swig.m4 \
     enable_pthreads.m4 \
     production.m4 \
-    python.m4
+    python.m4 \
+    local_install.m4
 
 EXTRA_DIST += DEPRECATED
