@@ -59,6 +59,7 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_PointerOf.cxx \
 	MEDMEMTest_PolyhedronArray.cxx \
 	MEDMEMTest_PorflowMeshDriver.cxx \
+	MEDMEMTest_Remapper.cxx \
 	MEDMEMTest_SkyLineArray.cxx \
 	MEDMEMTest_Support.cxx \
 	MEDMEMTest_TopLevel.cxx \
