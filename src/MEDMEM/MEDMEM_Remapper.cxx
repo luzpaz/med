@@ -173,7 +173,7 @@ namespace MEDMEM
     \param field_source : source field to be remapped
     \return : field resulting from the remapping on the target mesh
   */
-  MEDMEM::FIELD<double> *  Remapper::transferHXX2SALOME(const MEDMEM::FIELD<double>& field_source, MEDMEM::MESH& target_mesh)
+  MEDMEM::FIELD<double> *  Remapper::transferField(const MEDMEM::FIELD<double>& field_source, MEDMEM::MESH& target_mesh)
   {
     int source_nbcomp=field_source.getNumberOfComponents();
     const double* value_source = field_source.getValue();
@@ -206,7 +206,7 @@ namespace MEDMEM
     \param field_target : target field to be remapped
     \return : field resulting from the remapping on the source mesh
   */
-  MEDMEM::FIELD<double> *  Remapper::reverseTransferHXX2SALOME(const MEDMEM::FIELD<double>& field_target, MEDMEM::MESH& source_mesh)
+  MEDMEM::FIELD<double> *  Remapper::reverseTransferField(const MEDMEM::FIELD<double>& field_target, MEDMEM::MESH& source_mesh)
   {
     int target_nbcomp=field_target.getNumberOfComponents();
     const double* value_target = field_target.getValue();

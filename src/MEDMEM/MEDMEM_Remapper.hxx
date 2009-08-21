@@ -38,8 +38,8 @@ namespace MEDMEM
     bool prepare(const MEDMEM::MESH& mesh_source, const MEDMEM::MESH& mesh_target, const char *method);
     void transfer(const MEDMEM::FIELD<double>& field_source, MEDMEM::FIELD<double>& field_target);
     void reverseTransfer(MEDMEM::FIELD<double>& field_source, const MEDMEM::FIELD<double>& field_target);
-    MEDMEM::FIELD<double> * transferHXX2SALOME(const MEDMEM::FIELD<double>& field_source, MEDMEM::MESH& mesh_target);
-    MEDMEM::FIELD<double> * reverseTransferHXX2SALOME(const MEDMEM::FIELD<double>& field_target, MEDMEM::MESH& mesh_source);
+    MEDMEM::FIELD<double> * transferField(const MEDMEM::FIELD<double>& field_source, MEDMEM::MESH& mesh_target);
+    MEDMEM::FIELD<double> * reverseTransferField(const MEDMEM::FIELD<double>& field_target, MEDMEM::MESH& mesh_source);
     bool setOptionDouble(const std::string& key, double value);
     bool setOptionInt(const std::string& key, int value);
     bool setOptionString(const std::string& key, std::string& value);
