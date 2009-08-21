@@ -97,7 +97,7 @@ MEDMEM.hxx \
 MEDMEM_OptionManager.hxx \
 MEDMEM_EnsightUtils.hxx \
 MEDMEM_Extractor.hxx \
-Remapper.hxx \
+MEDMEM_Remapper.hxx \
 PointLocator.hxx \
 PointLocatorAlgos.txx \
 MEDNormalizedUnstructuredMesh.hxx \
@@ -146,7 +146,7 @@ MEDMEM_DriverTools.cxx \
 MEDMEM_GaussLocalization.cxx \
 MEDMEM_Extractor.cxx \
 PointLocator.cxx \
-Remapper.cxx
+MEDMEM_Remapper.cxx
 
 #libmedmem_la_LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 # libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@

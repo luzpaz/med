@@ -16,39 +16,44 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef REMAPPER_HXX_
-#define REMAPPER_HXX_
+#ifndef MEDMEM_REMAPPER_HXX_
+#define MEDMEM_REMAPPER_HXX_
 
-#include "InterpKernelMatrix.hxx"
 #include "MEDMEM_Mesh.hxx"
-#include "MEDMEM_Support.hxx"
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM.hxx"
+#include "MEDNormalizedUnstructuredMesh.hxx"
+#include "MEDNormalizedUnstructuredMesh.txx"
+#include "InterpKernelMatrix.hxx"
+#include "InterpolationOptions.hxx"
 
-namespace INTERP_KERNEL
+namespace MEDMEM
 {
-
-  class MEDMEM_EXPORT Remapper
+	
+  class MEDMEM_EXPORT Remapper : public INTERP_KERNEL::InterpolationOptions
   {
   public:
     Remapper();
     virtual ~Remapper();
-    void prepare(const MEDMEM::MESH& mesh_source, const MEDMEM::MESH& mesh_target, const char *method);
+    bool prepare(const MEDMEM::MESH& mesh_source, const MEDMEM::MESH& mesh_target, const char *method);
     void transfer(const MEDMEM::FIELD<double>& field_source, MEDMEM::FIELD<double>& field_target);
-		void transferVector(const MEDMEM::FIELD<double>& field_source,MEDMEM::FIELD<double>& field_target);
-		void reverseTransfer(const MEDMEM::FIELD<double>& field_source,MEDMEM::FIELD<double>& field_target);
-		void reverseTransferVector(const MEDMEM::FIELD<double>& field_source,MEDMEM::FIELD<double>& field_target);
-    void setOptionDouble(const std::string& key, double value);
-    void setOptionInt(const std::string& key, int value);
+    void reverseTransfer(MEDMEM::FIELD<double>& field_source, const MEDMEM::FIELD<double>& field_target);
+    MEDMEM::FIELD<double> * transferHXX2SALOME(const MEDMEM::FIELD<double>& field_source, MEDMEM::MESH& mesh_target);
+    MEDMEM::FIELD<double> * reverseTransferHXX2SALOME(const MEDMEM::FIELD<double>& field_target, MEDMEM::MESH& mesh_source);
+    bool setOptionDouble(const std::string& key, double value);
+    bool setOptionInt(const std::string& key, int value);
+    bool setOptionString(const std::string& key, std::string& value);
   private :
-    Matrix<double,ALL_FORTRAN_MODE>* _matrix;
+    INTERP_KERNEL::Matrix<double, INTERP_KERNEL::ALL_FORTRAN_MODE>* _matrix;
     MEDMEM::FIELD<double>* getSupportVolumes(const MEDMEM::SUPPORT& support);
     std::vector<double> _deno_multiply;
     std::vector<double> _deno_reverse_multiply;
-		int _nb_rows;
-		int _nb_cols;
+    int _nb_rows;
+    int _nb_cols;
+    string _sourceFieldType;
+    string _targetFieldType;
   };
-
+	
 }
 
 #endif /*REMAPPER_HXX_*/
