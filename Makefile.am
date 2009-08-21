@@ -61,7 +61,7 @@ endif
 SUBDIRS+= resources bin
 DIST_SUBDIRS= adm_local adm_local_without_kernel idl src doc resources bin
 
-DISTCLEANFILES= a.out aclocal.m4 configure 
+DISTCLEANFILES= a.out aclocal.m4 configure local-install.sh
 
 salomeinclude_DATA = MED_version.h
 
