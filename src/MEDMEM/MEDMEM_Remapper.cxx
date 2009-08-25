@@ -235,101 +235,17 @@ namespace MEDMEM
 
   bool Remapper::setOptionDouble(const std::string& key, double value)
   {
-    if(key == "Precision") 
-      {
-        setPrecision(value);
-        return true;
-      }
-    else if(key == "MedianPlane") 
-      {
-        setMedianPlane(value);
-        return true;
-      }
-    else if(key == "BoundingBoxAdjustment") 
-      {
-        setBoundingBoxAdjustment(value);
-        return true;
-      }
-    else if(key == "BoundingBoxAdjustmentAbs") 
-      {
-        setBoundingBoxAdjustmentAbs(value);
-        return true;
-      }
-    else if(key == "MaxDistance3DSurfIntersect") 
-      {
-        setMaxDistance3DSurfIntersect(value);
-        return true;
-      }
-    else 
-      return true;
+    return INTERP_KERNEL::InterpolationOptions::setOptionDouble(key,value);
   }
 	
   bool Remapper::setOptionInt(const std::string& key, int value)
   {
-    if(key == "PrintLevel") 
-      {
-        setPrintLevel(value);
-        return true;
-      }
-    else if(key == "DoRotate") 
-      {
-        setDoRotate(value);
-        return true;
-      }
-    else if(key == "Orientation") 
-      {
-        setOrientation(value);
-        return true;
-      }
-    else
-      return false;
+    return INTERP_KERNEL::InterpolationOptions::setOptionInt(key,value);
   }
 
   bool Remapper::setOptionString(const std::string& key, std::string& value)
   {
-    if(key == "IntersectionType") 
-      {
-        if(value == "Triangulation")
-          {
-            setIntersectionType(INTERP_KERNEL::Triangulation);
-            return true;
-          }
-        else if(value == "Convex")
-          {
-            setIntersectionType(INTERP_KERNEL::Convex);
-            return true;
-          }
-        else if(value == "Geometric2D")
-          {
-            setIntersectionType(INTERP_KERNEL::Geometric2D);
-            return true;
-          }
-      }
-    else if(key == "SplittingPolicy") 
-      {
-        if(value == "PLANAR_FACE_5")
-          {
-            setSplittingPolicy(INTERP_KERNEL::PLANAR_FACE_5);
-            return true;
-          }
-        else if(value == "PLANAR_FACE_6")
-          {
-            setSplittingPolicy(INTERP_KERNEL::PLANAR_FACE_6);
-            return true;
-          }
-        else if(value == "GENERAL_24")
-          {
-            setSplittingPolicy(INTERP_KERNEL::GENERAL_24);
-            return true;
-          }
-        else if(value == "GENERAL_48")
-          {
-            setSplittingPolicy(INTERP_KERNEL::GENERAL_48);
-            return true;
-          }
-        else
-          return false;
-      }
+    return INTERP_KERNEL::InterpolationOptions::setOptionString(key,value);
   }
 
   /*!
