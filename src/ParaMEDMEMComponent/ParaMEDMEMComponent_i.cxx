@@ -143,7 +143,7 @@ void ParaMEDMEMComponent_i::setInputFieldCoupling(const char * coupling, ParaMED
     {
 
       //Creating the intersection Data Exchange Channel
-      _dec[coupling] = new ParaMEDMEM::IntersectionDEC(*_source[coupling], *_target[coupling]);
+      _dec[coupling] = new ParaMEDMEM::InterpKernelDEC(*_source[coupling], *_target[coupling]);
       
       //Attaching the field to the DEC
       _dec[coupling]->attachLocalField(field);
@@ -179,7 +179,7 @@ void ParaMEDMEMComponent_i::getOutputFieldCoupling(const char * coupling, ParaME
     {
 
       //Creating the intersection Data Exchange Channel
-      _dec[coupling] = new ParaMEDMEM::IntersectionDEC(*_source[coupling], *_target[coupling]);
+      _dec[coupling] = new ParaMEDMEM::InterpKernelDEC(*_source[coupling], *_target[coupling]);
   
       //Attaching the field to the DEC
       _dec[coupling]->attachLocalField(field);

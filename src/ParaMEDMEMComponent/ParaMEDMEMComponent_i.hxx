@@ -28,7 +28,7 @@
 #include "SALOME_Component_i.hxx"
 #include "Topology.hxx"
 #include "ParaFIELD.hxx"
-#include "IntersectionDEC.hxx"
+#include "InterpKernelDEC.hxx"
 #include "MPIProcessorGroup.hxx"
 #include "CommInterface.hxx"
 #include "MEDCouplingFieldDoubleServant.hxx"
@@ -69,7 +69,7 @@ protected:
 private:
   ParaMEDMEM::CommInterface* _interface;
   std::map<std::string,ParaMEDMEM::MPIProcessorGroup*> _source, _target;
-  std::map<std::string,ParaMEDMEM::IntersectionDEC*> _dec;
+  std::map<std::string,ParaMEDMEM::InterpKernelDEC*> _dec;
 };
 
 class MPIMEDCouplingFieldDoubleServant : public POA_SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface,
