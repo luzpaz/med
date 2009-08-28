@@ -54,76 +54,76 @@ void mergeOrderedTabs(const int *tab1, int lgth1, const int *tab2, int lgth2, in
   unsigned char switcher=0;
   const int *tabS[2]={tab1,tab2};
   while(cpt[0]<lgth1 && cpt[1]<lgth2)
+  {
+    if(tabS[1-switcher][cpt[1-switcher]]<tabS[switcher][cpt[switcher]])
+      cpt[1-switcher]++;
+    else if(tabS[1-switcher][cpt[1-switcher]]>tabS[switcher][cpt[switcher]])
+      switcher=1-switcher;
+    else
     {
-      if(tabS[1-switcher][cpt[1-switcher]]<tabS[switcher][cpt[switcher]])
-        cpt[1-switcher]++;
-      else if(tabS[1-switcher][cpt[1-switcher]]>tabS[switcher][cpt[switcher]])
-        switcher=1-switcher;
-      else
-        {
-          int tmp=tabS[switcher][cpt[switcher]];
-          cpt[switcher]++; cpt[1-switcher]++;
-          result[lgth++]=tmp;
-        }
+      int tmp=tabS[switcher][cpt[switcher]];
+      cpt[switcher]++; cpt[1-switcher]++;
+      result[lgth++]=tmp;
     }
+  }
 }
 
 /*!
-   Default Constructor. /n
-   Default for Entity is MED_CELL and type of Connectivity is MED_NODAL */
+  Default Constructor. /n
+  Default for Entity is MED_CELL and type of Connectivity is MED_NODAL */
 //--------------------------------------------------------------//
 CONNECTIVITY::CONNECTIVITY(medEntityMesh Entity /* =MED_CELL */) :
-//--------------------------------------------------------------//
-  				_entity(Entity),
-  				_typeConnectivity(MED_NODAL),
-  				_numberOfTypes(0),
-  				_geometricTypes((medGeometryElement*)NULL),
-  				_type((CELLMODEL*)NULL),
-  				_entityDimension(0),
-				_numberOfNodes(0),
-  				_count((int*)NULL),
-  				_nodal((MEDSKYLINEARRAY*)NULL),
-				_polygonsNodal((MEDSKYLINEARRAY*)NULL),
-				_polyhedronNodal((POLYHEDRONARRAY*)NULL),
-  				_descending((MEDSKYLINEARRAY*)NULL),
-				_polygonsDescending((MEDSKYLINEARRAY*)NULL),
-				_polyhedronDescending((MEDSKYLINEARRAY*)NULL),
-  				_reverseNodalConnectivity((MEDSKYLINEARRAY*)NULL),
-  				_reverseDescendingConnectivity((MEDSKYLINEARRAY*)NULL),
-  				_neighbourhood((MEDSKYLINEARRAY*)NULL),
-  				_constituent((CONNECTIVITY*)NULL),
-                                _isDescendingConnectivityPartial(false)
+  //--------------------------------------------------------------//
+  _entity(Entity),
+  _typeConnectivity(MED_NODAL),
+  _numberOfTypes(0),
+  _geometricTypes((medGeometryElement*)NULL),
+  _type((CELLMODEL*)NULL),
+  _entityDimension(0),
+  _numberOfNodes(0),
+  _count((int*)NULL),
+  _nodal((MEDSKYLINEARRAY*)NULL),
+  _polygonsNodal((MEDSKYLINEARRAY*)NULL),
+  _polyhedronNodal((POLYHEDRONARRAY*)NULL),
+  _descending((MEDSKYLINEARRAY*)NULL),
+  _polygonsDescending((MEDSKYLINEARRAY*)NULL),
+  _polyhedronDescending((MEDSKYLINEARRAY*)NULL),
+  _reverseNodalConnectivity((MEDSKYLINEARRAY*)NULL),
+  _reverseDescendingConnectivity((MEDSKYLINEARRAY*)NULL),
+  _neighbourhood((MEDSKYLINEARRAY*)NULL),
+  _constituent((CONNECTIVITY*)NULL),
+  _isDescendingConnectivityPartial(false)
 {
   const char* LOC = "CONNECTIVITY(medEntityMesh Entity=MED_CELL)";
   BEGIN_OF_MED(LOC);
-   MESSAGE_MED("CONNECTIVITY(medEntityMesh Entity=MED_CELL)");
+  MESSAGE_MED("CONNECTIVITY(medEntityMesh Entity=MED_CELL)");
   _count = new int[1];
   _count[0]=1;
   END_OF_MED(LOC);
 }
 
 /*!
-   Constructor. /n
-   Default for Entity is MED_CELL */
+  Constructor. /n
+  Default for Entity is MED_CELL */
 //------------------------------------------------------------------------------//
 CONNECTIVITY::CONNECTIVITY(int numberOfTypes,medEntityMesh Entity /* =MED_CELL */):
-//------------------------------------------------------------------------------//
-  				_entity(Entity),
-  				_typeConnectivity(MED_NODAL),
-  				_numberOfTypes(numberOfTypes),
-  				_entityDimension(0),
-				_numberOfNodes(0),
-  				_nodal((MEDSKYLINEARRAY*)NULL),
-				_polygonsNodal((MEDSKYLINEARRAY*)NULL),
-				_polyhedronNodal((POLYHEDRONARRAY*)NULL),
-  				_descending((MEDSKYLINEARRAY*)NULL),
-				_polygonsDescending((MEDSKYLINEARRAY*)NULL),
-				_polyhedronDescending((MEDSKYLINEARRAY*)NULL),
-  				_reverseNodalConnectivity((MEDSKYLINEARRAY*)NULL),
-  				_reverseDescendingConnectivity((MEDSKYLINEARRAY*)NULL),
-  				_neighbourhood((MEDSKYLINEARRAY*)NULL),
-  				_constituent((CONNECTIVITY*)NULL),
-                                _isDescendingConnectivityPartial(false)
+  //------------------------------------------------------------------------------//
+  _entity(Entity),
+  _typeConnectivity(MED_NODAL),
+  _numberOfTypes(numberOfTypes),
+  _entityDimension(0),
+  _numberOfNodes(0),
+  _nodal((MEDSKYLINEARRAY*)NULL),
+  _polygonsNodal((MEDSKYLINEARRAY*)NULL),
+  _polyhedronNodal((POLYHEDRONARRAY*)NULL),
+  _descending((MEDSKYLINEARRAY*)NULL),
+  _polygonsDescending((MEDSKYLINEARRAY*)NULL),
+  _polyhedronDescending((MEDSKYLINEARRAY*)NULL),
+  _reverseNodalConnectivity((MEDSKYLINEARRAY*)NULL),
+  _reverseDescendingConnectivity((MEDSKYLINEARRAY*)NULL),
+  _neighbourhood((MEDSKYLINEARRAY*)NULL),
+  _constituent((CONNECTIVITY*)NULL),
+  _isDescendingConnectivityPartial(false)
 {
   MESSAGE_MED("CONNECTIVITY(int numberOfTypes,medEntityMesh Entity=MED_CELL)");
   _geometricTypes = new medGeometryElement[numberOfTypes];
@@ -137,135 +137,135 @@ CONNECTIVITY::CONNECTIVITY(int numberOfTypes,medEntityMesh Entity /* =MED_CELL *
 */
 //------------------------------------------------------//
 CONNECTIVITY::CONNECTIVITY (const CONNECTIVITY & m):
-//----------------------------------------------------//
-  				_entity           (m._entity),
-  				_typeConnectivity (m._typeConnectivity),
-  				_numberOfTypes    (m._numberOfTypes),
-  				_entityDimension  (m._entityDimension),
-  				_numberOfNodes    (m._numberOfNodes),
-                                _isDescendingConnectivityPartial(m._isDescendingConnectivityPartial)
+  //----------------------------------------------------//
+  _entity           (m._entity),
+  _typeConnectivity (m._typeConnectivity),
+  _numberOfTypes    (m._numberOfTypes),
+  _entityDimension  (m._entityDimension),
+  _numberOfNodes    (m._numberOfNodes),
+  _isDescendingConnectivityPartial(m._isDescendingConnectivityPartial)
 {
- if (m._geometricTypes != NULL)
- {
+  if (m._geometricTypes != NULL)
+  {
     _geometricTypes = new medGeometryElement[_numberOfTypes];
     memcpy(_geometricTypes,m._geometricTypes,_numberOfTypes*sizeof(medGeometryElement));
- }
- else
+  }
+  else
     _geometricTypes = (medGeometryElement *) NULL;
 
- if (m._type != NULL)
- {
+  if (m._type != NULL)
+  {
     _type = new CELLMODEL[_numberOfTypes];
     for (int i=0;i<_numberOfTypes;i++)
-        _type[i] = CELLMODEL(m._type[i]);
- }
- else
+      _type[i] = CELLMODEL(m._type[i]);
+  }
+  else
     _type = (CELLMODEL *) NULL;
 
- if (m._count != NULL)
- {
-      _count = new int[_numberOfTypes+1];
-      memcpy(_count,m._count,(_numberOfTypes+1)*sizeof(int));
- }
- else
+  if (m._count != NULL)
+  {
+    _count = new int[_numberOfTypes+1];
+    memcpy(_count,m._count,(_numberOfTypes+1)*sizeof(int));
+  }
+  else
     _count = (int *) NULL;
 
- if (m._nodal != NULL)
+  if (m._nodal != NULL)
     _nodal = new MEDSKYLINEARRAY(* m._nodal);
- else
+  else
     _nodal = (MEDSKYLINEARRAY *) NULL;
 
- if (m._polygonsNodal != NULL)
-   _polygonsNodal = new MEDSKYLINEARRAY(* m._polygonsNodal);
- else
-   _polygonsNodal = (MEDSKYLINEARRAY *) NULL;
+  if (m._polygonsNodal != NULL)
+    _polygonsNodal = new MEDSKYLINEARRAY(* m._polygonsNodal);
+  else
+    _polygonsNodal = (MEDSKYLINEARRAY *) NULL;
 
- if (m._polyhedronNodal != NULL)
-   _polyhedronNodal = new POLYHEDRONARRAY(* m._polyhedronNodal);
- else
-   _polyhedronNodal = (POLYHEDRONARRAY *) NULL;
+  if (m._polyhedronNodal != NULL)
+    _polyhedronNodal = new POLYHEDRONARRAY(* m._polyhedronNodal);
+  else
+    _polyhedronNodal = (POLYHEDRONARRAY *) NULL;
 
- if (m._descending != NULL)
+  if (m._descending != NULL)
     _descending = new MEDSKYLINEARRAY(* m._descending);
- else
+  else
     _descending = (MEDSKYLINEARRAY *) NULL;
 
- if (m._polygonsDescending != NULL)
-   _polygonsDescending = new MEDSKYLINEARRAY(* m._polygonsDescending);
- else
-   _polygonsDescending = (MEDSKYLINEARRAY *) NULL;
+  if (m._polygonsDescending != NULL)
+    _polygonsDescending = new MEDSKYLINEARRAY(* m._polygonsDescending);
+  else
+    _polygonsDescending = (MEDSKYLINEARRAY *) NULL;
 
- if (m._polyhedronDescending != NULL)
-   _polyhedronDescending = new MEDSKYLINEARRAY(* m._polyhedronDescending);
- else
-   _polyhedronDescending = (MEDSKYLINEARRAY *) NULL;
+  if (m._polyhedronDescending != NULL)
+    _polyhedronDescending = new MEDSKYLINEARRAY(* m._polyhedronDescending);
+  else
+    _polyhedronDescending = (MEDSKYLINEARRAY *) NULL;
 
- if (m._reverseNodalConnectivity != NULL)
+  if (m._reverseNodalConnectivity != NULL)
     _reverseNodalConnectivity = new MEDSKYLINEARRAY(* m._reverseNodalConnectivity);
- else
+  else
     _reverseNodalConnectivity = (MEDSKYLINEARRAY *) NULL;
 
- if (m._reverseDescendingConnectivity != NULL)
+  if (m._reverseDescendingConnectivity != NULL)
     _reverseDescendingConnectivity = new MEDSKYLINEARRAY(* m._reverseDescendingConnectivity);
- else
+  else
     _reverseDescendingConnectivity = (MEDSKYLINEARRAY *) NULL;
 
- if (m._neighbourhood != NULL)
+  if (m._neighbourhood != NULL)
     _neighbourhood = new MEDSKYLINEARRAY(* m._neighbourhood);
- else
+  else
     _neighbourhood = (MEDSKYLINEARRAY *) NULL;
 
- if (m._constituent != NULL)
+  if (m._constituent != NULL)
     _constituent = new CONNECTIVITY(* m._constituent);
- else
+  else
     _constituent = (CONNECTIVITY *) NULL;
 }
 
 /*!
-   Destructor./n
-   desallocates existing pointers */
+  Destructor./n
+  desallocates existing pointers */
 //----------------------------//
 CONNECTIVITY::~CONNECTIVITY()
-//----------------------------//
+  //----------------------------//
 {
   MESSAGE_MED("Destructeur de CONNECTIVITY()");
 
   if (_geometricTypes != NULL)
-     delete [] _geometricTypes;
+    delete [] _geometricTypes;
   if (_type != NULL)
-     delete [] _type;
+    delete [] _type;
   if (_count != NULL)
-     delete [] _count;
+    delete [] _count;
   if (_nodal != NULL)
-     delete _nodal;
+    delete _nodal;
   if (_polygonsNodal != NULL)
-     delete _polygonsNodal;
+    delete _polygonsNodal;
   if (_polyhedronNodal != NULL)
-     delete _polyhedronNodal;
+    delete _polyhedronNodal;
   if (_descending != NULL)
-     delete _descending;
+    delete _descending;
   if (_polygonsDescending != NULL)
-     delete _polygonsDescending;
+    delete _polygonsDescending;
   if (_polyhedronDescending != NULL)
     delete _polyhedronDescending;
   if (_reverseNodalConnectivity != NULL)
-     delete _reverseNodalConnectivity;
+    delete _reverseNodalConnectivity;
   if (_reverseDescendingConnectivity != NULL)
-     delete _reverseDescendingConnectivity;
+    delete _reverseDescendingConnectivity;
   if (_constituent != NULL)
-     delete _constituent;
+    delete _constituent;
 }
 
 /*!
-   set _constituent to Constituent
-   be aware desallocation of _constituent is done by CONNECTIVITY:~CONNECTIVITY
-   throws an exception if Constituent = MED_CELL
-   A DOCUMENTER
-    */
+  set _constituent to Constituent
+  be aware desallocation of _constituent is done by CONNECTIVITY:~CONNECTIVITY
+  throws an exception if Constituent = MED_CELL
+  A DOCUMENTER
+*/
 //----------------------------------------------------------//
 void CONNECTIVITY::setConstituent(CONNECTIVITY * Constituent)
-  		    throw (MEDEXCEPTION)
-//----------------------------------------------------------//
+  throw (MEDEXCEPTION)
+  //----------------------------------------------------------//
 {
   medEntityMesh Entity = Constituent->getEntity();
   if (Entity == MED_CELL)
@@ -278,18 +278,18 @@ void CONNECTIVITY::setConstituent(CONNECTIVITY * Constituent)
     _constituent->setConstituent(Constituent);
   }
   else
-    {
-      delete _constituent;
-      _constituent = Constituent;
-    }
+  {
+    delete _constituent;
+    _constituent = Constituent;
+  }
 }
 
 /*! Duplicated Types array in CONNECTIVITY object. */
 //--------------------------------------------------------------------//
 void CONNECTIVITY::setGeometricTypes(const medGeometryElement * Types,
-				     const medEntityMesh Entity)
-  				     throw (MEDEXCEPTION)
-//--------------------------------------------------------------------//
+                                     const medEntityMesh Entity)
+  throw (MEDEXCEPTION)
+  //--------------------------------------------------------------------//
 {
   if (Entity == _entity)
     for (int i=0; i<_numberOfTypes; i++)
@@ -298,9 +298,9 @@ void CONNECTIVITY::setGeometricTypes(const medGeometryElement * Types,
       _type[i] = CELLMODEL(_geometricTypes[i]);
     }
   else
-    {
+  {
     if (_constituent == NULL)
-        throw MEDEXCEPTION(LOCALIZED("CONNECTIVITY::setGeometricTypes : Entity not found !"));
+      throw MEDEXCEPTION(LOCALIZED("CONNECTIVITY::setGeometricTypes : Entity not found !"));
     _constituent->setGeometricTypes(Types,Entity);
   }
 }
@@ -308,8 +308,8 @@ void CONNECTIVITY::setGeometricTypes(const medGeometryElement * Types,
 /*! A DOCUMENTER */
 //--------------------------------------------------------------------//
 void CONNECTIVITY::setCount(const int * Count, const medEntityMesh Entity)
-  			    throw (MEDEXCEPTION)
-//--------------------------------------------------------------------//
+  throw (MEDEXCEPTION)
+  //--------------------------------------------------------------------//
 {
   if (Entity == _entity)
   {
@@ -327,7 +327,7 @@ void CONNECTIVITY::setCount(const int * Count, const medEntityMesh Entity)
       _count[i+1] = Count[i+1];
       int NumberOfNodesPerElement = _type[i].getNumberOfNodes() ;
       for (int j=_count[i]; j<_count[i+1]; j++)
-	index[j] = index[j-1]+NumberOfNodesPerElement;
+        index[j] = index[j-1]+NumberOfNodesPerElement;
     }
     // allocate _nodal
     if (_nodal != NULL) delete _nodal;
@@ -350,10 +350,10 @@ void CONNECTIVITY::setCount(const int * Count, const medEntityMesh Entity)
 
 //--------------------------------------------------------------------//
 void CONNECTIVITY::setNodal(const int * Connectivity,
-			    const medEntityMesh Entity,
-			    const medGeometryElement Type)
-  			    throw (MEDEXCEPTION)
-//--------------------------------------------------------------------//
+                            const medEntityMesh Entity,
+                            const medGeometryElement Type)
+  throw (MEDEXCEPTION)
+  //--------------------------------------------------------------------//
 {
   if (_entity == Entity)
   {
@@ -361,11 +361,11 @@ void CONNECTIVITY::setNodal(const int * Connectivity,
     bool find = false;
     for (int i=0; i<_numberOfTypes; i++)
       if (_geometricTypes[i] == Type) {
-	find = true;
-	int NumberOfNodePerElements = _type[i].getNumberOfNodes() ;
-	//_nodal->setI(i+1,Connectivity);
-	for( int j=_count[i];j<_count[i+1]; j++)
-	  _nodal->setI(j,Connectivity+(j-_count[i])*NumberOfNodePerElements);
+        find = true;
+        int NumberOfNodePerElements = _type[i].getNumberOfNodes() ;
+        //_nodal->setI(i+1,Connectivity);
+        for( int j=_count[i];j<_count[i+1]; j++)
+          _nodal->setI(j,Connectivity+(j-_count[i])*NumberOfNodePerElements);
       }
     if (!find)
       throw MEDEXCEPTION(LOCALIZED("CONNECTIVITY::setNodal : geometric type not found"));
@@ -373,101 +373,101 @@ void CONNECTIVITY::setNodal(const int * Connectivity,
   {
     if (_constituent == NULL)
       throw MEDEXCEPTION(LOCALIZED("CONNECTIVITY::setNodal : Entity not found !"));
-      _constituent->setNodal(Connectivity,Entity,Type);
+    _constituent->setNodal(Connectivity,Entity,Type);
   }
 }
 
 
 //--------------------------------------------------------------------//
 void CONNECTIVITY::setPolygonsConnectivity(medConnectivity ConnectivityType, medEntityMesh Entity, const int* PolygonsConnectivity, const int* PolygonsConnectivityIndex, int ConnectivitySize, int NumberOfPolygons)
-//--------------------------------------------------------------------//
+  //--------------------------------------------------------------------//
 {
   const char* LOC = "CONNECTIVITY::setPolygonsConnectivity";
   BEGIN_OF_MED(LOC);
 
   if (_entity == Entity)
-    {
-      MEDSKYLINEARRAY* Connectivity = new MEDSKYLINEARRAY(NumberOfPolygons,ConnectivitySize,PolygonsConnectivityIndex,PolygonsConnectivity);
+  {
+    MEDSKYLINEARRAY* Connectivity = new MEDSKYLINEARRAY(NumberOfPolygons,ConnectivitySize,PolygonsConnectivityIndex,PolygonsConnectivity);
 
-      if (ConnectivityType == MED_NODAL)
-	{
-	  if (_polygonsNodal != (MEDSKYLINEARRAY*) NULL)
-	    delete _polygonsNodal;
-	  _polygonsNodal = Connectivity;
-	}
-      else
-	{
-	  if (_typeConnectivity != MED_DESCENDING)
-	    _typeConnectivity = MED_DESCENDING; //by default it is set to MED_NODAL
-	  if (_polygonsDescending != (MEDSKYLINEARRAY*) NULL)
-	    delete _polygonsDescending;
-	  _polygonsDescending = Connectivity;
-	}
-    }
-  else
+    if (ConnectivityType == MED_NODAL)
     {
-      if (_entityDimension==3)
-      {
-        if (_constituent == (CONNECTIVITY*) NULL)
-          _constituent=new CONNECTIVITY(MED_EN::MED_FACE);
-      }
-      else if (_constituent == (CONNECTIVITY*) NULL)
-      {
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Entity not found !"));
-      }
-      _constituent->setPolygonsConnectivity(ConnectivityType, Entity,
-                                            PolygonsConnectivity, PolygonsConnectivityIndex,
-                                            ConnectivitySize, NumberOfPolygons);
+      if (_polygonsNodal != (MEDSKYLINEARRAY*) NULL)
+        delete _polygonsNodal;
+      _polygonsNodal = Connectivity;
     }
+    else
+    {
+      if (_typeConnectivity != MED_DESCENDING)
+        _typeConnectivity = MED_DESCENDING; //by default it is set to MED_NODAL
+      if (_polygonsDescending != (MEDSKYLINEARRAY*) NULL)
+        delete _polygonsDescending;
+      _polygonsDescending = Connectivity;
+    }
+  }
+  else
+  {
+    if (_entityDimension==3)
+    {
+      if (_constituent == (CONNECTIVITY*) NULL)
+        _constituent=new CONNECTIVITY(MED_EN::MED_FACE);
+    }
+    else if (_constituent == (CONNECTIVITY*) NULL)
+    {
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Entity not found !"));
+    }
+    _constituent->setPolygonsConnectivity(ConnectivityType, Entity,
+                                          PolygonsConnectivity, PolygonsConnectivityIndex,
+                                          ConnectivitySize, NumberOfPolygons);
+  }
 }
 
 
 //--------------------------------------------------------------------//
 void CONNECTIVITY::setPolyhedronConnectivity(medConnectivity ConnectivityType, const int* PolyhedronConnectivity, const int* PolyhedronIndex, int ConnectivitySize, int NumberOfPolyhedron, const int* PolyhedronFacesIndex /* =(int*)NULL */, int NumberOfFaces /* =0 */)
-//--------------------------------------------------------------------//
+  //--------------------------------------------------------------------//
 {
   const char* LOC = "CONNECTIVITY::setPolyhedronConnectivity";
   BEGIN_OF_MED(LOC);
 
   if (_entity == MED_CELL)
+  {
+    if (ConnectivityType == MED_NODAL)
     {
-      if (ConnectivityType == MED_NODAL)
-	{
-	  if (_polyhedronNodal != (POLYHEDRONARRAY*) NULL)
-	    delete _polyhedronNodal;
-	  _polyhedronNodal = new POLYHEDRONARRAY(NumberOfPolyhedron,NumberOfFaces,ConnectivitySize);
+      if (_polyhedronNodal != (POLYHEDRONARRAY*) NULL)
+        delete _polyhedronNodal;
+      _polyhedronNodal = new POLYHEDRONARRAY(NumberOfPolyhedron,NumberOfFaces,ConnectivitySize);
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-          int i ;
-          MED_EN::med_int * tmp_PolyhedronIndex = new med_int[NumberOfPolyhedron+1] ;
-          for ( i = 0 ; i < NumberOfPolyhedron+1 ; i++ )
-             tmp_PolyhedronIndex[i] = PolyhedronIndex[i] ;
-	  _polyhedronNodal->setPolyhedronIndex(tmp_PolyhedronIndex);
-          delete [] tmp_PolyhedronIndex ;
-          MED_EN::med_int * tmp_PolyhedronFacesIndex = new med_int[NumberOfFaces+1] ;
-          for ( i = 0 ; i < NumberOfFaces+1 ; i++ )
-             tmp_PolyhedronFacesIndex[i] = PolyhedronFacesIndex[i] ;
-	  _polyhedronNodal->setFacesIndex(tmp_PolyhedronFacesIndex);
-          delete [] tmp_PolyhedronFacesIndex ;
-          MED_EN::med_int * tmp_PolyhedronConnectivity = new med_int[ConnectivitySize] ;
-          for ( i = 0 ; i < ConnectivitySize ; i++ )
-             tmp_PolyhedronConnectivity[i] = PolyhedronConnectivity[i] ;
-	  _polyhedronNodal->setNodes(tmp_PolyhedronConnectivity);
-          delete [] tmp_PolyhedronConnectivity ;
+      int i ;
+      MED_EN::med_int * tmp_PolyhedronIndex = new med_int[NumberOfPolyhedron+1] ;
+      for ( i = 0 ; i < NumberOfPolyhedron+1 ; i++ )
+        tmp_PolyhedronIndex[i] = PolyhedronIndex[i] ;
+      _polyhedronNodal->setPolyhedronIndex(tmp_PolyhedronIndex);
+      delete [] tmp_PolyhedronIndex ;
+      MED_EN::med_int * tmp_PolyhedronFacesIndex = new med_int[NumberOfFaces+1] ;
+      for ( i = 0 ; i < NumberOfFaces+1 ; i++ )
+        tmp_PolyhedronFacesIndex[i] = PolyhedronFacesIndex[i] ;
+      _polyhedronNodal->setFacesIndex(tmp_PolyhedronFacesIndex);
+      delete [] tmp_PolyhedronFacesIndex ;
+      MED_EN::med_int * tmp_PolyhedronConnectivity = new med_int[ConnectivitySize] ;
+      for ( i = 0 ; i < ConnectivitySize ; i++ )
+        tmp_PolyhedronConnectivity[i] = PolyhedronConnectivity[i] ;
+      _polyhedronNodal->setNodes(tmp_PolyhedronConnectivity);
+      delete [] tmp_PolyhedronConnectivity ;
 #else
-	  _polyhedronNodal->setPolyhedronIndex(PolyhedronIndex);
-	  _polyhedronNodal->setFacesIndex(PolyhedronFacesIndex);
-	  _polyhedronNodal->setNodes(PolyhedronConnectivity);
+      _polyhedronNodal->setPolyhedronIndex(PolyhedronIndex);
+      _polyhedronNodal->setFacesIndex(PolyhedronFacesIndex);
+      _polyhedronNodal->setNodes(PolyhedronConnectivity);
 #endif
-	}
-      else
-	{
-	  if (_typeConnectivity != MED_DESCENDING)
-	    _typeConnectivity = MED_DESCENDING; //by default it is set to MED_NODAL
-	  if (_polyhedronDescending != (MEDSKYLINEARRAY*) NULL)
-	    delete _polyhedronDescending;
-	  _polyhedronDescending = new MEDSKYLINEARRAY(NumberOfPolyhedron,ConnectivitySize,PolyhedronIndex,PolyhedronConnectivity);
-	}
     }
+    else
+    {
+      if (_typeConnectivity != MED_DESCENDING)
+        _typeConnectivity = MED_DESCENDING; //by default it is set to MED_NODAL
+      if (_polyhedronDescending != (MEDSKYLINEARRAY*) NULL)
+        delete _polyhedronDescending;
+      _polyhedronDescending = new MEDSKYLINEARRAY(NumberOfPolyhedron,ConnectivitySize,PolyhedronIndex,PolyhedronConnectivity);
+    }
+  }
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : _entity must be MED_CELL to set polyhedron !"));
 }
@@ -475,21 +475,21 @@ void CONNECTIVITY::setPolyhedronConnectivity(medConnectivity ConnectivityType, c
 bool CONNECTIVITY::existConnectivityWithPoly (MED_EN::medConnectivity connectivityType,
                                               MED_EN::medEntityMesh Entity) const
 {
-   if (_entity == Entity) {
+  if (_entity == Entity) {
     if ((connectivityType == MED_EN::MED_NODAL) &&
         (_nodal != (MEDSKYLINEARRAY*)NULL || _polygonsNodal || _polyhedronNodal))
       return true;
     if ((connectivityType == MED_EN::MED_DESCENDING) && (_descending != (MEDSKYLINEARRAY*)NULL))
       return true;
-   } else if (_constituent != NULL)
-     return _constituent->existConnectivityWithPoly(connectivityType, Entity);
-   return false;
+  } else if (_constituent != NULL)
+    return _constituent->existConnectivityWithPoly(connectivityType, Entity);
+  return false;
 }
 
 /*! A DOCUMENTER */
 //------------------------------------------------------------------------------------------//
 void CONNECTIVITY::calculateConnectivity(medConnectivity ConnectivityType, medEntityMesh Entity)
-//------------------------------------------------------------------------------------------//
+  //------------------------------------------------------------------------------------------//
 {
   MESSAGE_MED("CONNECTIVITY::calculateConnectivity");
 
@@ -502,9 +502,9 @@ void CONNECTIVITY::calculateConnectivity(medConnectivity ConnectivityType, medEn
       calculateNodalConnectivity();
     else
       if (Entity==MED_CELL)
-	calculateDescendingConnectivity();
+        calculateDescendingConnectivity();
       else
-	throw MEDEXCEPTION("CONNECTIVITY::calculateConnectivity : Could not build DESCENDING !");
+        throw MEDEXCEPTION("CONNECTIVITY::calculateConnectivity : Could not build DESCENDING !");
   if (Entity!=_entity) {
     calculateDescendingConnectivity();
     if (_entityDimension == 2 || _entityDimension == 3)
@@ -513,14 +513,14 @@ void CONNECTIVITY::calculateConnectivity(medConnectivity ConnectivityType, medEn
 }
 
 /*!  Give, in full or no interlace mode (for nodal connectivity),
-     descending or nodal connectivity.
+  descending or nodal connectivity.
 
-      You must give a %medEntityMesh (ie:MED_EDGE)
-      and a %medGeometryElement (ie:MED_SEG3).  */
+  You must give a %medEntityMesh (ie:MED_EDGE)
+  and a %medGeometryElement (ie:MED_SEG3).  */
 
 //------------------------------------------------------------//
 void CONNECTIVITY::updateFamily(const vector<FAMILY*>& myFamilies)
-//------------------------------------------------------------//
+  //------------------------------------------------------------//
 {
   const char * LOC = "CONNECTIVITY::updateFamily(vector<FAMILY*>) ";
   int numberOfFamilies = myFamilies.size();
@@ -568,16 +568,16 @@ void CONNECTIVITY::updateFamily(const vector<FAMILY*>& myFamilies)
 
   int nbOfTurnInGlobalLoop=1;//Defined to know if a second search on polygons is needed.
   if(oldNumberOfFacePoly>0)
-    {
-      oldNumberOfFaceTab[1] = oldNumberOfFacePoly;
-      oldConstituentValuePoly = oldConstituent->_polygonsNodal->getValue();
-      oldConstituentValueTab[1] = oldConstituentValuePoly;
-      oldConstituentIndexPoly = oldConstituent->_polygonsNodal->getIndex();
-      oldConstituentIndexTab[1] = oldConstituentIndexPoly;
-      renumberingFromOldToNewPoly = new int[oldNumberOfFacePoly+1];
-      renumberingFromOldToNewTab[1] = renumberingFromOldToNewPoly;
-      nbOfTurnInGlobalLoop++;
-    }
+  {
+    oldNumberOfFaceTab[1] = oldNumberOfFacePoly;
+    oldConstituentValuePoly = oldConstituent->_polygonsNodal->getValue();
+    oldConstituentValueTab[1] = oldConstituentValuePoly;
+    oldConstituentIndexPoly = oldConstituent->_polygonsNodal->getIndex();
+    oldConstituentIndexTab[1] = oldConstituentIndexPoly;
+    renumberingFromOldToNewPoly = new int[oldNumberOfFacePoly+1];
+    renumberingFromOldToNewTab[1] = renumberingFromOldToNewPoly;
+    nbOfTurnInGlobalLoop++;
+  }
 
   calculateDescendingConnectivity();//perform calculation of descending connectivity to update all connectivities after having taken into account of direction of faces...
   _constituent->calculateReverseNodalConnectivity();//getting d-1 nodal connectivity to find get new face numbers from nodes numbers...
@@ -586,76 +586,76 @@ void CONNECTIVITY::updateFamily(const vector<FAMILY*>& myFamilies)
   const int * reverseFaceNodalIndex = _constituent->getReverseNodalConnectivityIndex(); //Common to polygons and classic geometric types
 
   for (int loop=startNbOfTurnInGlobalLoop; loop<nbOfTurnInGlobalLoop; loop++)
+  {
+    int oldNumberOfFaceLoop=oldNumberOfFaceTab[loop];
+    const int * oldConstituentValueLoop=oldConstituentValueTab[loop];
+    const int * oldConstituentIndexLoop= oldConstituentIndexTab[loop];
+    int * renumberingFromOldToNewLoop=renumberingFromOldToNewTab[loop];
+    CELLMODEL * aCELLMODEL = 0;
+    if ( loop == 0 ) aCELLMODEL = & oldConstituent->_type[0];
+    int nbOfClassicalFaces=_constituent->getNumberOf(_constituent->getEntity(),MED_ALL_ELEMENTS);
+    for(int iOldFace=0;iOldFace<oldNumberOfFaceLoop;iOldFace++)
     {
-      int oldNumberOfFaceLoop=oldNumberOfFaceTab[loop];
-      const int * oldConstituentValueLoop=oldConstituentValueTab[loop];
-      const int * oldConstituentIndexLoop= oldConstituentIndexTab[loop];
-      int * renumberingFromOldToNewLoop=renumberingFromOldToNewTab[loop];
-      CELLMODEL * aCELLMODEL = 0;
-      if ( loop == 0 ) aCELLMODEL = & oldConstituent->_type[0];
-      int nbOfClassicalFaces=_constituent->getNumberOf(_constituent->getEntity(),MED_ALL_ELEMENTS);
-      for(int iOldFace=0;iOldFace<oldNumberOfFaceLoop;iOldFace++)
-	{
-	  const int *nodesOfCurrentFaceOld=oldConstituentValueLoop+oldConstituentIndexLoop[iOldFace]-1;
-	  int nbOfNodesOfCurrentFaceOld=oldConstituentIndexLoop[iOldFace+1]-oldConstituentIndexLoop[iOldFace];
+      const int *nodesOfCurrentFaceOld=oldConstituentValueLoop+oldConstituentIndexLoop[iOldFace]-1;
+      int nbOfNodesOfCurrentFaceOld=oldConstituentIndexLoop[iOldFace+1]-oldConstituentIndexLoop[iOldFace];
 
-	  //retrieving new number of polygon face...
-	  int sizeOfNewFaceNb=reverseFaceNodalIndex[nodesOfCurrentFaceOld[0]]-reverseFaceNodalIndex[nodesOfCurrentFaceOld[0]-1];
-	  int *newFaceNb=new int[sizeOfNewFaceNb];
-	  memcpy(newFaceNb,reverseFaceNodal+reverseFaceNodalIndex[nodesOfCurrentFaceOld[0]-1]-1,sizeOfNewFaceNb*sizeof(int));//all faces candidates are in newFaceNb !!!
-	  for(int curNode=1;curNode<nbOfNodesOfCurrentFaceOld && sizeOfNewFaceNb>1;curNode++)
-	    {
-	      const int *newFacesNbForCurNode=reverseFaceNodal+reverseFaceNodalIndex[nodesOfCurrentFaceOld[curNode]-1]-1;
-	      int sizeOfNewFacesNbForCurNode=reverseFaceNodalIndex[nodesOfCurrentFaceOld[curNode]]-reverseFaceNodalIndex[nodesOfCurrentFaceOld[curNode]-1];
-	      for(int i=0;i<sizeOfNewFaceNb;)
-		{
-		  bool found=false;
-		  for(int j=0;j<sizeOfNewFacesNbForCurNode && !found;j++)
-		    {
-		      if(newFacesNbForCurNode[j]==newFaceNb[i])
-			found=true;
-		    }
-		  if(found)
-		    i++;
-		  else
-		    newFaceNb[i]=newFaceNb[--sizeOfNewFaceNb];
-		}
-	    }
-	  if(sizeOfNewFaceNb!=1)
-	    throw MED_EXCEPTION(LOCALIZED(STRING(LOC)<<"unexisting face specified!!!"));
-	  renumberingFromOldToNewLoop[iOldFace]=newFaceNb[0];
-	  delete [] newFaceNb;
-	  //end of retrieving new number of polygon face...
-	  int nbOfNodesOfCurrentFaceNew;
-	  const int *nodesOfCurrentFaceNew=_constituent->getConnectivityOfAnElementWithPoly(MED_NODAL,_constituent->getEntity(),
-											    renumberingFromOldToNewLoop[iOldFace],nbOfNodesOfCurrentFaceNew);
-          // compare nodes of a new face and those of an old one;
-          // for the second order elements, only vertex nodes are compared
-          int nbOfVertices = nbOfNodesOfCurrentFaceOld;
-          if ( aCELLMODEL ) {
-            if ( aCELLMODEL->getNumberOfNodes() != nbOfNodesOfCurrentFaceOld ) {
-              // type changed, find a corresponding CELLMODEL
-              int iType = 2; // 1-st type is already used at loop beginning
-              //while ( iOldFace + 1 >= oldConstituent->_count[ 1 + iType ]) // check next type
-              while ( iOldFace + 1 >= oldConstituent->_count[ iType ]) // check next type
-                ++iType;
-              aCELLMODEL = & oldConstituent->_type[ iType - 1 ];
-            }
-            nbOfVertices = aCELLMODEL->getNumberOfVertexes();
+      //retrieving new number of polygon face...
+      int sizeOfNewFaceNb=reverseFaceNodalIndex[nodesOfCurrentFaceOld[0]]-reverseFaceNodalIndex[nodesOfCurrentFaceOld[0]-1];
+      int *newFaceNb=new int[sizeOfNewFaceNb];
+      memcpy(newFaceNb,reverseFaceNodal+reverseFaceNodalIndex[nodesOfCurrentFaceOld[0]-1]-1,sizeOfNewFaceNb*sizeof(int));//all faces candidates are in newFaceNb !!!
+      for(int curNode=1;curNode<nbOfNodesOfCurrentFaceOld && sizeOfNewFaceNb>1;curNode++)
+      {
+        const int *newFacesNbForCurNode=reverseFaceNodal+reverseFaceNodalIndex[nodesOfCurrentFaceOld[curNode]-1]-1;
+        int sizeOfNewFacesNbForCurNode=reverseFaceNodalIndex[nodesOfCurrentFaceOld[curNode]]-reverseFaceNodalIndex[nodesOfCurrentFaceOld[curNode]-1];
+        for(int i=0;i<sizeOfNewFaceNb;)
+        {
+          bool found=false;
+          for(int j=0;j<sizeOfNewFacesNbForCurNode && !found;j++)
+          {
+            if(newFacesNbForCurNode[j]==newFaceNb[i])
+              found=true;
           }
-	  MEDMODULUSARRAY modulusArrayOld(nbOfVertices,nbOfNodesOfCurrentFaceOld,nodesOfCurrentFaceOld);
-          int nbOfVerticesNew = nbOfVertices;
-          if (nbOfVerticesNew > nbOfNodesOfCurrentFaceNew) nbOfVerticesNew = nbOfNodesOfCurrentFaceNew;
-	  MEDMODULUSARRAY modulusArrayNew(nbOfVerticesNew,nbOfNodesOfCurrentFaceNew,nodesOfCurrentFaceNew);
-	  int retCompareNewOld=modulusArrayNew.compare(modulusArrayOld);
-	  if(retCompareNewOld==0)
-	    throw MED_EXCEPTION(LOCALIZED(STRING(LOC)<<"Uncompatible given user face with calculated existing faces"));
-	  if(retCompareNewOld==-1)
-            // Issue 0020316 [CEA 338]. Classical face can become polygon after calculateFullDescendingConnectivity()
-	    //invertConnectivityForAFace(renumberingFromOldToNewLoop[iOldFace],nodesOfCurrentFaceOld,loop==1);
-            invertConnectivityForAFace(renumberingFromOldToNewLoop[iOldFace],nodesOfCurrentFaceOld,renumberingFromOldToNewLoop[iOldFace]>nbOfClassicalFaces);
-	}
+          if(found)
+            i++;
+          else
+            newFaceNb[i]=newFaceNb[--sizeOfNewFaceNb];
+        }
+      }
+      if(sizeOfNewFaceNb!=1)
+        throw MED_EXCEPTION(LOCALIZED(STRING(LOC)<<"unexisting face specified!!!"));
+      renumberingFromOldToNewLoop[iOldFace]=newFaceNb[0];
+      delete [] newFaceNb;
+      //end of retrieving new number of polygon face...
+      int nbOfNodesOfCurrentFaceNew;
+      const int *nodesOfCurrentFaceNew=_constituent->getConnectivityOfAnElementWithPoly(MED_NODAL,_constituent->getEntity(),
+                                                                                        renumberingFromOldToNewLoop[iOldFace],nbOfNodesOfCurrentFaceNew);
+      // compare nodes of a new face and those of an old one;
+      // for the second order elements, only vertex nodes are compared
+      int nbOfVertices = nbOfNodesOfCurrentFaceOld;
+      if ( aCELLMODEL ) {
+        if ( aCELLMODEL->getNumberOfNodes() != nbOfNodesOfCurrentFaceOld ) {
+          // type changed, find a corresponding CELLMODEL
+          int iType = 2; // 1-st type is already used at loop beginning
+          //while ( iOldFace + 1 >= oldConstituent->_count[ 1 + iType ]) // check next type
+          while ( iOldFace + 1 >= oldConstituent->_count[ iType ]) // check next type
+            ++iType;
+          aCELLMODEL = & oldConstituent->_type[ iType - 1 ];
+        }
+        nbOfVertices = aCELLMODEL->getNumberOfVertexes();
+      }
+      MEDMODULUSARRAY modulusArrayOld(nbOfVertices,nbOfNodesOfCurrentFaceOld,nodesOfCurrentFaceOld);
+      int nbOfVerticesNew = nbOfVertices;
+      if (nbOfVerticesNew > nbOfNodesOfCurrentFaceNew) nbOfVerticesNew = nbOfNodesOfCurrentFaceNew;
+      MEDMODULUSARRAY modulusArrayNew(nbOfVerticesNew,nbOfNodesOfCurrentFaceNew,nodesOfCurrentFaceNew);
+      int retCompareNewOld=modulusArrayNew.compare(modulusArrayOld);
+      if(retCompareNewOld==0)
+        throw MED_EXCEPTION(LOCALIZED(STRING(LOC)<<"Uncompatible given user face with calculated existing faces"));
+      if(retCompareNewOld==-1)
+        // Issue 0020316 [CEA 338]. Classical face can become polygon after calculateFullDescendingConnectivity()
+        //invertConnectivityForAFace(renumberingFromOldToNewLoop[iOldFace],nodesOfCurrentFaceOld,loop==1);
+        invertConnectivityForAFace(renumberingFromOldToNewLoop[iOldFace],nodesOfCurrentFaceOld,renumberingFromOldToNewLoop[iOldFace]>nbOfClassicalFaces);
     }
+  }
   // Updating the Family
   for(vector<FAMILY*>::const_iterator iter=myFamilies.begin();iter!=myFamilies.end();iter++)
     (*iter)->changeElementsNbs(_constituent->getEntity(), renumberingFromOldToNewTab[0],
@@ -677,7 +677,7 @@ void CONNECTIVITY::updateFamily(const vector<FAMILY*>& myFamilies)
 
 //------------------------------------------------------------------------------------------------------------------//
 const int * MEDMEM::CONNECTIVITY::getConnectivity(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type)
-//------------------------------------------------------------------------------------------------------------------//
+  //------------------------------------------------------------------------------------------------------------------//
 {
   const char * LOC = "CONNECTIVITY::getConnectivity";
   //  BEGIN_OF_MED(LOC);
@@ -686,25 +686,25 @@ const int * MEDMEM::CONNECTIVITY::getConnectivity(medConnectivity ConnectivityTy
   if (Entity==_entity) {
 
     if (ConnectivityType==MED_NODAL)
-      {
-	calculateNodalConnectivity();
-	Connectivity=_nodal;
-      }
+    {
+      calculateNodalConnectivity();
+      Connectivity=_nodal;
+    }
     else
-      {
-	calculateDescendingConnectivity();
-	Connectivity=_descending;
-      }
+    {
+      calculateDescendingConnectivity();
+      Connectivity=_descending;
+    }
 
     if (Connectivity!=NULL)
       if (Type==MED_ALL_ELEMENTS)
-	return Connectivity->getValue();
+        return Connectivity->getValue();
       else {
-	for (int i=0; i<_numberOfTypes; i++)
-	  if (_geometricTypes[i]==Type)
-	    //return Connectivity->getI(i+1);
-	    return Connectivity->getI(_count[i]);
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Type not found !"));
+        for (int i=0; i<_numberOfTypes; i++)
+          if (_geometricTypes[i]==Type)
+            //return Connectivity->getI(i+1);
+            return Connectivity->getI(_count[i]);
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Type not found !"));
       }
     else
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Connectivity not defined !"));
@@ -717,7 +717,7 @@ const int * MEDMEM::CONNECTIVITY::getConnectivity(medConnectivity ConnectivityTy
 
 //------------------------------------------------------------------------------------------------------------------//
 int CONNECTIVITY::getConnectivityLength(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type)
-//------------------------------------------------------------------------------------------------------------------//
+  //------------------------------------------------------------------------------------------------------------------//
 {
   const char * LOC = "CONNECTIVITY::getConnectivity";
   BEGIN_OF_MED(LOC);
@@ -726,29 +726,29 @@ int CONNECTIVITY::getConnectivityLength(medConnectivity ConnectivityType, medEnt
   if (Entity==_entity) {
 
     if (ConnectivityType==MED_NODAL)
-      {
-	calculateNodalConnectivity();
-	Connectivity=_nodal;
-      }
+    {
+      calculateNodalConnectivity();
+      Connectivity=_nodal;
+    }
     else
-      {
-	calculateDescendingConnectivity();
-	Connectivity=_descending;
-      }
+    {
+      calculateDescendingConnectivity();
+      Connectivity=_descending;
+    }
 
     if (Connectivity!=NULL)
       if (Type==MED_ALL_ELEMENTS)
-	return Connectivity->getLength();
+        return Connectivity->getLength();
       else {
-	for (int i=0; i<_numberOfTypes; i++)
-	  if (_geometricTypes[i]==Type)
+        for (int i=0; i<_numberOfTypes; i++)
+          if (_geometricTypes[i]==Type)
             // issue 19983
             //return (_count[i+1]-_count[i])*getType(Type).getNumberOfNodes();
           {
             const int *ind=Connectivity->getIndex();
             return ind[_count[i+1]-1]-ind[_count[i]-1];
           }
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Type not found !"));
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Type not found !"));
       }
     else
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Connectivity not defined !"));
@@ -761,16 +761,16 @@ int CONNECTIVITY::getConnectivityLength(medConnectivity ConnectivityType, medEnt
 }
 
 /*!  Give morse index array to use with
-     getConnectivity(MED_FULL_INTERLACE,mode,entity,MED_ALL_ELEMENTS).
+  getConnectivity(MED_FULL_INTERLACE,mode,entity,MED_ALL_ELEMENTS).
 
-      Each value give start index for corresponding entity in connectivity array.
+  Each value give start index for corresponding entity in connectivity array.
 
-      Example : i-th element, j-th node of it :
-      - In C mode : Connectivity[ConnectivityIndex[i]-1+j-1]
-      - In fortran mode : Connectivity[ConnectivityIndex[i]+j] */
+  Example : i-th element, j-th node of it :
+  - In C mode : Connectivity[ConnectivityIndex[i]-1+j-1]
+  - In fortran mode : Connectivity[ConnectivityIndex[i]+j] */
 //-----------------------------------------------------------------------------------------------//
 const int * CONNECTIVITY::getConnectivityIndex(medConnectivity ConnectivityType, medEntityMesh Entity)
-//-----------------------------------------------------------------------------------------------//
+  //-----------------------------------------------------------------------------------------------//
 {
   const char * LOC = "CONNECTIVITY::getConnectivityIndex";
 
@@ -797,29 +797,29 @@ const int * CONNECTIVITY::getConnectivityIndex(medConnectivity ConnectivityType,
 
 //-------------------------------------------------------------//
 const int* CONNECTIVITY::getPolygonsConnectivity(medConnectivity ConnectivityType, medEntityMesh Entity)
-//-------------------------------------------------------------//
+  //-------------------------------------------------------------//
 {
   const char* LOC = "CONNECTIVITY::getPolygonsConnectivity";
   BEGIN_OF_MED(LOC);
 
   MEDSKYLINEARRAY* Connectivity;
   if (Entity == _entity)
+  {
+    if (ConnectivityType == MED_NODAL)
     {
-      if (ConnectivityType == MED_NODAL)
-	{
-	  calculateNodalConnectivity();
-	  Connectivity = _polygonsNodal;
-	}
-      else
-	{
-	  calculateDescendingConnectivity();
-	  Connectivity = _polygonsDescending;
-	}
-      if (Connectivity != NULL)
-	return Connectivity->getValue();
-      else
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Polygons Connectivity not defined !"));
+      calculateNodalConnectivity();
+      Connectivity = _polygonsNodal;
     }
+    else
+    {
+      calculateDescendingConnectivity();
+      Connectivity = _polygonsDescending;
+    }
+    if (Connectivity != NULL)
+      return Connectivity->getValue();
+    else
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Polygons Connectivity not defined !"));
+  }
   else
     if (_constituent != NULL)
       return _constituent->getPolygonsConnectivity(ConnectivityType, Entity);
@@ -829,29 +829,29 @@ const int* CONNECTIVITY::getPolygonsConnectivity(medConnectivity ConnectivityTyp
 
 //-------------------------------------------------------------//
 const int* CONNECTIVITY::getPolygonsConnectivityIndex(medConnectivity ConnectivityType, medEntityMesh Entity)
-//-------------------------------------------------------------//
+  //-------------------------------------------------------------//
 {
   const char* LOC = "CONNECTIVITY::getPolygonsConnectivityIndex";
   BEGIN_OF_MED(LOC);
 
   MEDSKYLINEARRAY* Connectivity;
   if (Entity == _entity)
+  {
+    if (ConnectivityType == MED_NODAL)
     {
-      if (ConnectivityType == MED_NODAL)
-	{
-	  //	  calculateNodalConnectivity();
-	  Connectivity = _polygonsNodal;
-	}
-      else
-	{
-	  //	  calculateDescendingConnectivity();
-	  Connectivity = _polygonsDescending;
-	}
-      if (Connectivity != NULL)
-	return Connectivity->getIndex();
-      else
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Polygons Connectivity not defined !"));
+      //   calculateNodalConnectivity();
+      Connectivity = _polygonsNodal;
     }
+    else
+    {
+      //   calculateDescendingConnectivity();
+      Connectivity = _polygonsDescending;
+    }
+    if (Connectivity != NULL)
+      return Connectivity->getIndex();
+    else
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Polygons Connectivity not defined !"));
+  }
   else
     if (_constituent != NULL)
       return _constituent->getPolygonsConnectivityIndex(ConnectivityType, Entity);
@@ -863,138 +863,138 @@ const int* CONNECTIVITY::getPolygonsConnectivityIndex(medConnectivity Connectivi
   are coherent.*/
 //-------------------------------------------------------------//
 int CONNECTIVITY::getNumberOfPolygons(MED_EN::medEntityMesh Entity) const
-//-------------------------------------------------------------//
+  //-------------------------------------------------------------//
 {
   if(Entity==MED_ALL_ENTITIES || Entity==_entity )
-    {
-      if (_polygonsNodal != (MEDSKYLINEARRAY*) NULL)
-	return _polygonsNodal->getNumberOf();
-      else if (_polygonsDescending != (MEDSKYLINEARRAY*) NULL)
-	return _polygonsDescending->getNumberOf();
-      else
-	return 0;
-    }
+  {
+    if (_polygonsNodal != (MEDSKYLINEARRAY*) NULL)
+      return _polygonsNodal->getNumberOf();
+    else if (_polygonsDescending != (MEDSKYLINEARRAY*) NULL)
+      return _polygonsDescending->getNumberOf();
+    else
+      return 0;
+  }
   else
-    {
-      if (_constituent == (CONNECTIVITY*) NULL)
-	throw MEDEXCEPTION("getNumberOfPolygons : Entity not found !");
-      return _constituent->getNumberOfPolygons(Entity);
-    }
+  {
+    if (_constituent == (CONNECTIVITY*) NULL)
+      throw MEDEXCEPTION("getNumberOfPolygons : Entity not found !");
+    return _constituent->getNumberOfPolygons(Entity);
+  }
 }
 
 
 //--------------------------------------------------------------//
 const int* CONNECTIVITY::getPolyhedronConnectivity(medConnectivity ConnectivityType) const
-//--------------------------------------------------------------//
+  //--------------------------------------------------------------//
 {
   const char* LOC = "CONNECTIVITY::getPolyhedronConnectivity";
   BEGIN_OF_MED(LOC);
 
   if (_entity == MED_CELL) //polyhedron can only be MED_CELL
+  {
+    if (ConnectivityType == MED_NODAL)
     {
-      if (ConnectivityType == MED_NODAL)
-	{
-	  ((CONNECTIVITY *)(this))->calculateNodalConnectivity();
-	  if (_polyhedronNodal != (POLYHEDRONARRAY*) NULL) {
-//CCRT
+      ((CONNECTIVITY *)(this))->calculateNodalConnectivity();
+      if (_polyhedronNodal != (POLYHEDRONARRAY*) NULL) {
+        //CCRT
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-            int i ;
-            const MED_EN::med_int * tmp_PolyhedronConnectivity = _polyhedronNodal->getNodes();
-            int * PolyhedronConnectivity = new int[_polyhedronNodal->getNumberOfNodes()] ;
-            for ( i = 0 ; i < _polyhedronNodal->getNumberOfNodes() ; i++ )
-               PolyhedronConnectivity[i] = tmp_PolyhedronConnectivity[i] ;
-//CCRT : return of a copy of PolyhedronConnectivity
-            return PolyhedronConnectivity ;
+        int i ;
+        const MED_EN::med_int * tmp_PolyhedronConnectivity = _polyhedronNodal->getNodes();
+        int * PolyhedronConnectivity = new int[_polyhedronNodal->getNumberOfNodes()] ;
+        for ( i = 0 ; i < _polyhedronNodal->getNumberOfNodes() ; i++ )
+          PolyhedronConnectivity[i] = tmp_PolyhedronConnectivity[i] ;
+        //CCRT : return of a copy of PolyhedronConnectivity
+        return PolyhedronConnectivity ;
 #else
-	    return _polyhedronNodal->getNodes();
+        return _polyhedronNodal->getNodes();
 #endif
-          }
-	  else
-	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Polyhedron Nodal Connectivity not defined !"));
-	}
+      }
       else
-	{
-	  ((CONNECTIVITY *)(this))->calculateDescendingConnectivity();
-	  if (_polyhedronDescending != (MEDSKYLINEARRAY*) NULL) {
-	    return _polyhedronDescending->getValue();
-          }
-	  else
-	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Polyhedron Descending Connectivity not defined !"));
-	}
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Polyhedron Nodal Connectivity not defined !"));
     }
+    else
+    {
+      ((CONNECTIVITY *)(this))->calculateDescendingConnectivity();
+      if (_polyhedronDescending != (MEDSKYLINEARRAY*) NULL) {
+        return _polyhedronDescending->getValue();
+      }
+      else
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Polyhedron Descending Connectivity not defined !"));
+    }
+  }
   throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : No polyhedron for _entity different from MED_CELL !"));
 }
 
 
 //---------------------------------------------------------------//
 const int* CONNECTIVITY::getPolyhedronFacesIndex() const
-//---------------------------------------------------------------//
+  //---------------------------------------------------------------//
 {
   const char* LOC = "CONNECTIVITY::getPolyhedronFacesIndex";
   BEGIN_OF_MED(LOC);
 
   if (_entity == MED_CELL) //polyhedron can only be MED_CELL
-    {
-      //      calculateNodalConnectivity();
-      if (_polyhedronNodal != (POLYHEDRONARRAY*) NULL) {
-//CCRT
+  {
+    //      calculateNodalConnectivity();
+    if (_polyhedronNodal != (POLYHEDRONARRAY*) NULL) {
+      //CCRT
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-            int i ;
-            const MED_EN::med_int * tmp_PolyhedronFacesIndex = _polyhedronNodal->getFacesIndex();
-            int * PolyhedronFacesIndex = new int[_polyhedronNodal->getNumberOfFaces()+1] ;
-            for ( i = 0 ; i < _polyhedronNodal->getNumberOfFaces()+1 ; i++ )
-               PolyhedronFacesIndex[i] = tmp_PolyhedronFacesIndex[i] ;
-//CCRT : return of a copy of PolyhedronFacesIndex
-            return PolyhedronFacesIndex ;
+      int i ;
+      const MED_EN::med_int * tmp_PolyhedronFacesIndex = _polyhedronNodal->getFacesIndex();
+      int * PolyhedronFacesIndex = new int[_polyhedronNodal->getNumberOfFaces()+1] ;
+      for ( i = 0 ; i < _polyhedronNodal->getNumberOfFaces()+1 ; i++ )
+        PolyhedronFacesIndex[i] = tmp_PolyhedronFacesIndex[i] ;
+      //CCRT : return of a copy of PolyhedronFacesIndex
+      return PolyhedronFacesIndex ;
 #else
-	return _polyhedronNodal->getFacesIndex();
+      return _polyhedronNodal->getFacesIndex();
 #endif
-      }
-      else
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : No Polyhedron in that Connectivity !"));
     }
+    else
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : No Polyhedron in that Connectivity !"));
+  }
   throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : No polyhedron for _entity different from MED_CELL !"));
 }
 
 
 //--------------------------------------------------------------//
 const int* CONNECTIVITY::getPolyhedronIndex(medConnectivity ConnectivityType) const
-//--------------------------------------------------------------//
+  //--------------------------------------------------------------//
 {
   const char* LOC = "CONNECTIVITY::getPolyhedronIndex";
   BEGIN_OF_MED(LOC);
 
   if (_entity == MED_CELL) //polyhedron can only be MED_CELL
+  {
+    if (ConnectivityType == MED_NODAL)
     {
-      if (ConnectivityType == MED_NODAL)
-	{
-	  //	  calculateNodalConnectivity();
-	  if (_polyhedronNodal != (POLYHEDRONARRAY*) NULL) {
-//CCRT
+      //   calculateNodalConnectivity();
+      if (_polyhedronNodal != (POLYHEDRONARRAY*) NULL) {
+        //CCRT
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-            int i ;
-            const MED_EN::med_int * tmp_PolyhedronIndex = _polyhedronNodal->getPolyhedronIndex();
-            int * PolyhedronIndex = new int[_polyhedronNodal->getNumberOfPolyhedron()+1] ;
-            for ( i = 0 ; i < _polyhedronNodal->getNumberOfPolyhedron()+1 ; i++ )
-               PolyhedronIndex[i] = tmp_PolyhedronIndex[i] ;
-//CCRT : return of a copy of PolyhedronIndex
-            return PolyhedronIndex ;
+        int i ;
+        const MED_EN::med_int * tmp_PolyhedronIndex = _polyhedronNodal->getPolyhedronIndex();
+        int * PolyhedronIndex = new int[_polyhedronNodal->getNumberOfPolyhedron()+1] ;
+        for ( i = 0 ; i < _polyhedronNodal->getNumberOfPolyhedron()+1 ; i++ )
+          PolyhedronIndex[i] = tmp_PolyhedronIndex[i] ;
+        //CCRT : return of a copy of PolyhedronIndex
+        return PolyhedronIndex ;
 #else
-	    return _polyhedronNodal->getPolyhedronIndex();
+        return _polyhedronNodal->getPolyhedronIndex();
 #endif
-          }
-	  else
-	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Polyhedron Nodal Connectivity not defined !"));
-	}
+      }
       else
-	{
-	  //	  calculateDescendingConnectivity();
-	  if (_polyhedronDescending != (MEDSKYLINEARRAY*) NULL)
-	    return _polyhedronDescending->getIndex();
-	  else
-	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Polyhedron Descending Connectivity not defined !"));
-	}
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Polyhedron Nodal Connectivity not defined !"));
     }
+    else
+    {
+      //   calculateDescendingConnectivity();
+      if (_polyhedronDescending != (MEDSKYLINEARRAY*) NULL)
+        return _polyhedronDescending->getIndex();
+      else
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Polyhedron Descending Connectivity not defined !"));
+    }
+  }
   throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : No polyhedron for _entity different from MED_CELL !"));
 }
 
@@ -1003,7 +1003,7 @@ const int* CONNECTIVITY::getPolyhedronIndex(medConnectivity ConnectivityType) co
   are coherent.*/
 //-------------------------------------------------------------//
 int CONNECTIVITY::getNumberOfPolyhedronFaces() const
-//-------------------------------------------------------------//
+  //-------------------------------------------------------------//
 {
   //  if (_polyhedronNodal == (POLYHEDRONARRAY*) NULL)
   //    calculateNodalConnectivity();
@@ -1018,7 +1018,7 @@ int CONNECTIVITY::getNumberOfPolyhedronFaces() const
   are coherent.*/
 //--------------------------------------------------------------//
 int CONNECTIVITY::getNumberOfPolyhedron() const
-//--------------------------------------------------------------//
+  //--------------------------------------------------------------//
 {
   if (_polyhedronNodal != (POLYHEDRONARRAY*) NULL)
     return _polyhedronNodal->getNumberOfPolyhedron();
@@ -1032,9 +1032,9 @@ int CONNECTIVITY::getNumberOfPolyhedron() const
 /*! A DOCUMENTER */
 //--------------------------------------------------------------//
 const CELLMODEL & CONNECTIVITY::getType(medGeometryElement Type) const
-//--------------------------------------------------------------//
+  //--------------------------------------------------------------//
 {
- 
+
   if ((Type==MED_ALL_ELEMENTS) || (Type==MED_NONE))
     throw MEDEXCEPTION("CONNECTIVITY::getType : medGeometryElement must be different of MED_ALL_ELEMENTS and MED_NONE !");
   for (int i=0; i<_numberOfTypes; i++)
@@ -1044,10 +1044,10 @@ const CELLMODEL & CONNECTIVITY::getType(medGeometryElement Type) const
 }
 
 /*!  Returns the number of elements of type %medGeometryElement.
-     Note : not implemented for MED_ALL_ELEMENTS nor for MED_NONE */
+  Note : not implemented for MED_ALL_ELEMENTS nor for MED_NONE */
 //------------------------------------------------------------------------//
 int CONNECTIVITY::getNumberOfNodesInType(medGeometryElement Type) const
-//------------------------------------------------------------------------//
+  //------------------------------------------------------------------------//
 {
   const char * LOC = "CONNECTIVITY::getNumberOfNodesInType";
   BEGIN_OF_MED(LOC);
@@ -1061,10 +1061,10 @@ int CONNECTIVITY::getNumberOfNodesInType(medGeometryElement Type) const
 }
 
 /*!  Returns the number of geometric sub cells of %medGeometryElement type.
-not implemented for MED_ALL_ELEMENTS nor for MED_NONE */
+  not implemented for MED_ALL_ELEMENTS nor for MED_NONE */
 //------------------------------------------------------------------------//
 int CONNECTIVITY::getNumberOfSubCellInType(medGeometryElement Type) const
-//------------------------------------------------------------------------//
+  //------------------------------------------------------------------------//
 {
   if ((Type==MED_ALL_ELEMENTS) || (Type==MED_NONE))
     throw MEDEXCEPTION("CONNECTIVITY::getNumberOfSubCell : medGeometryElement must be different of MED_ALL_ELEMENTS and MED_NONE!");
@@ -1076,13 +1076,13 @@ int CONNECTIVITY::getNumberOfSubCellInType(medGeometryElement Type) const
 
 /*!  Returns the number of elements of type %medGeometryElement.
 
-     Note :
-      - Implemented for MED_ALL_ELEMENTS
-      - Not implemented for MED_ALL_ENTITIES (A VERIFIER)
-      - Not implemented for MED_NONE */
+Note :
+- Implemented for MED_ALL_ELEMENTS
+- Not implemented for MED_ALL_ENTITIES (A VERIFIER)
+- Not implemented for MED_NONE */
 //-----------------------------------------------------------------------------------//
 int CONNECTIVITY::getNumberOf(medEntityMesh Entity, medGeometryElement Type) const
-//-----------------------------------------------------------------------------------//
+  //-----------------------------------------------------------------------------------//
 {
   if (Entity==_entity) {
     if (Type==MED_EN::MED_NONE)
@@ -1093,7 +1093,7 @@ int CONNECTIVITY::getNumberOf(medEntityMesh Entity, medGeometryElement Type) con
       return _count[_numberOfTypes]-1;
     for (int i=0; i<_numberOfTypes; i++)
       if (_geometricTypes[i]==Type)
-	return (_count[i+1] - _count[i]);
+        return (_count[i+1] - _count[i]);
     //throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : medGeometryElement not found !"));
   } else
     if (_constituent != NULL)
@@ -1106,81 +1106,81 @@ int CONNECTIVITY::getNumberOf(medEntityMesh Entity, medGeometryElement Type) con
 /*! A DOCUMENTER */
 //--------------------------------------------------------------//
 const int* CONNECTIVITY::getValue(medConnectivity TypeConnectivity,
-				medGeometryElement Type)
-//--------------------------------------------------------------//
+                                  medGeometryElement Type)
+  //--------------------------------------------------------------//
 {
   if (TypeConnectivity == MED_NODAL)
-    {
-	  calculateNodalConnectivity();
-	  if (Type==MED_ALL_ELEMENTS)
-	    return _nodal->getValue();
-	  for (int i=0; i<_numberOfTypes; i++)
-	    if (_geometricTypes[i]==Type)
-	      return _nodal->getI(_count[i]);
-    }
+  {
+    calculateNodalConnectivity();
+    if (Type==MED_ALL_ELEMENTS)
+      return _nodal->getValue();
+    for (int i=0; i<_numberOfTypes; i++)
+      if (_geometricTypes[i]==Type)
+        return _nodal->getI(_count[i]);
+  }
   else
-    {
-      calculateDescendingConnectivity();
-      if (Type==MED_ALL_ELEMENTS)
-	return _descending->getValue();
-      for (int i=0; i<_numberOfTypes; i++)
-	if (_geometricTypes[i]==Type)
-	  return _descending->getI(_count[i]);
-    }
+  {
+    calculateDescendingConnectivity();
+    if (Type==MED_ALL_ELEMENTS)
+      return _descending->getValue();
+    for (int i=0; i<_numberOfTypes; i++)
+      if (_geometricTypes[i]==Type)
+        return _descending->getI(_count[i]);
+  }
   throw MEDEXCEPTION("Not found");
 }
 
 /*! A DOCUMENTER */
 //---------------------------------------------------------------------//
 const int* CONNECTIVITY:: getValueIndex(medConnectivity TypeConnectivity)
-//---------------------------------------------------------------------//
+  //---------------------------------------------------------------------//
 {
   if (TypeConnectivity == MED_NODAL)
-    {
-      calculateNodalConnectivity();
-      return _nodal->getIndex();
-    }
+  {
+    calculateNodalConnectivity();
+    return _nodal->getIndex();
+  }
   else
-    {
-      calculateDescendingConnectivity();
-      return _descending->getIndex();
-    }
+  {
+    calculateDescendingConnectivity();
+    return _descending->getIndex();
+  }
 }
 
 /*! Not yet implemented */
 //----------------------------------------------//
 const int* CONNECTIVITY:: getNeighbourhood() const
-//----------------------------------------------//
+  //----------------------------------------------//
 {
   throw MEDEXCEPTION("CONNECTIVITY::getNeighbourhood : Not implemented");
 }
 
 /*! Returns an array which contains, for each node, all cells
-    arround it. */
+  arround it. */
 //-------------------------------------------------//
 const int* CONNECTIVITY::getReverseNodalConnectivity()
-//-------------------------------------------------//
+  //-------------------------------------------------//
 {
   calculateReverseNodalConnectivity();
   return _reverseNodalConnectivity->getValue();
 }
 
 /*!  Give index array to use with getReverseConnectivity(MED_NODAL).
-     It is unusefull with MED_DESCENDING mode, because we have allways two cells.  */
+  It is unusefull with MED_DESCENDING mode, because we have allways two cells.  */
 //-------------------------------------------------------//
 const int* CONNECTIVITY::getReverseNodalConnectivityIndex()
-//-------------------------------------------------------//
+  //-------------------------------------------------------//
 {
   calculateReverseNodalConnectivity();
   return _reverseNodalConnectivity->getIndex();
 }
 
 /*! Returns an array which contains, for each face (or edge),
-    the 2 cells of each side. First is cell which face normal is outgoing.
-    arround it. */
+  the 2 cells of each side. First is cell which face normal is outgoing.
+  arround it. */
 //------------------------------------------------------//
 const int* CONNECTIVITY::getReverseDescendingConnectivity()
-//------------------------------------------------------//
+  //------------------------------------------------------//
 {
   // it is in _constituent connectivity only if we are in MED_CELL
   // (we could not for instance calculate face-edge connectivity !)
@@ -1189,17 +1189,17 @@ const int* CONNECTIVITY::getReverseDescendingConnectivity()
 
   // we need descending connectivity
   calculateDescendingConnectivity();
-	if (_reverseDescendingConnectivity==NULL)
-		_reverseDescendingConnectivity=_descending->makeReverseArray();
+  if (_reverseDescendingConnectivity==NULL)
+    _reverseDescendingConnectivity=_descending->makeReverseArray();
 
   return _reverseDescendingConnectivity->getValue();
 }
 
 /*! calculate the reverse descending Connectivity
-    and returns the index  ( A DOCUMENTER MIEUX)*/
+  and returns the index  ( A DOCUMENTER MIEUX)*/
 //-----------------------------------------------------------//
 const int* CONNECTIVITY::getReverseDescendingConnectivityIndex()
-//-----------------------------------------------------------//
+  //-----------------------------------------------------------//
 {
   // it is in _constituent connectivity only if we are in MED_CELL
   if (_entity!=MED_CELL)
@@ -1213,23 +1213,23 @@ const int* CONNECTIVITY::getReverseDescendingConnectivityIndex()
 /*! A DOCUMENTER (et a finir ???) */
 //--------------------------------------------//
 void CONNECTIVITY::calculateNodalConnectivity()
-//--------------------------------------------//
+  //--------------------------------------------//
 {
   if (_nodal==NULL && _polygonsNodal==NULL && _polyhedronNodal==NULL)
-    {
-      if (_descending==NULL && _polygonsDescending==NULL && _polyhedronDescending==NULL)
-	throw MEDEXCEPTION("CONNECTIVITY::calculateNodalConnectivity : No connectivity found !");
-      // calculate _nodal, _polygonsNodal and _polyhedronNodal from _descending, _polygonsDescending and _polyhedronDescending
-    }
+  {
+    if (_descending==NULL && _polygonsDescending==NULL && _polyhedronDescending==NULL)
+      throw MEDEXCEPTION("CONNECTIVITY::calculateNodalConnectivity : No connectivity found !");
+    // calculate _nodal, _polygonsNodal and _polyhedronNodal from _descending, _polygonsDescending and _polyhedronDescending
+  }
 }
 
 
 
 /*! If not yet done, calculate the nodal Connectivity
-    and the reverse nodal Connectivity*/
+  and the reverse nodal Connectivity*/
 //---------------------------------------------------//
 void CONNECTIVITY::calculateReverseNodalConnectivity()
-//---------------------------------------------------//
+  //---------------------------------------------------//
 {
   const char* LOC = "CONNECTIVITY::calculateReverseNodalConnectivity : ";
   BEGIN_OF_MED(LOC);
@@ -1246,53 +1246,53 @@ void CONNECTIVITY::calculateReverseNodalConnectivity()
     vector <vector <int> > reverse_connectivity;
     reverse_connectivity.resize(_numberOfNodes+1);
 
-  // Treat all cells types
+    // Treat all cells types
 
     for (int j = 0; j < _numberOfTypes; j++)
-      {
-	// node number of the cell type
-	node_number = _type[j].getNumberOfNodes();
-	// treat all cells of a particular type
-	for (int k = _count[j]; k < _count[j+1]; k++)
-	  // treat all nodes of the cell type
-	  for (int local_node_number = 1; local_node_number < node_number+1; local_node_number++)
-	    {
-	      int global_node = _nodal->getIJ(k,local_node_number);
-	      reverse_connectivity[global_node].push_back(k);
-	    }
-      }
+    {
+      // node number of the cell type
+      node_number = _type[j].getNumberOfNodes();
+      // treat all cells of a particular type
+      for (int k = _count[j]; k < _count[j+1]; k++)
+        // treat all nodes of the cell type
+        for (int local_node_number = 1; local_node_number < node_number+1; local_node_number++)
+        {
+          int global_node = _nodal->getIJ(k,local_node_number);
+          reverse_connectivity[global_node].push_back(k);
+        }
+    }
 
     if(_polygonsNodal != NULL && _entityDimension==2)
+    {
+      int nbOfPolygons=_polygonsNodal->getNumberOf();
+      int offset=getNumberOf(_entity,MED_ALL_ELEMENTS);
+      const int *index=_polygonsNodal->getIndex();
+      const int *value=_polygonsNodal->getValue();
+      for (int local_polyg_number = 0; local_polyg_number < nbOfPolygons; local_polyg_number++)
       {
-	int nbOfPolygons=_polygonsNodal->getNumberOf();
-	int offset=getNumberOf(_entity,MED_ALL_ELEMENTS);
-	const int *index=_polygonsNodal->getIndex();
-	const int *value=_polygonsNodal->getValue();
-	for (int local_polyg_number = 0; local_polyg_number < nbOfPolygons; local_polyg_number++)
-	  {
-	    for(int i=index[local_polyg_number];i<index[local_polyg_number+1];i++)
-	      reverse_connectivity[value[i-1]].push_back(offset+local_polyg_number+1);
-	  }
+        for(int i=index[local_polyg_number];i<index[local_polyg_number+1];i++)
+          reverse_connectivity[value[i-1]].push_back(offset+local_polyg_number+1);
       }
+    }
 
     if(_polyhedronNodal != NULL && _entityDimension==3)
+    {
+      int nbOfPolyhedra=_polyhedronNodal->getNumberOfPolyhedron();
+      int offset=getNumberOf(_entity,MED_ALL_ELEMENTS);
+      for (int local_polyh_number = 0; local_polyh_number < nbOfPolyhedra; local_polyh_number++)
       {
-	int nbOfPolyhedra=_polyhedronNodal->getNumberOfPolyhedron();
-	int offset=getNumberOf(_entity,MED_ALL_ELEMENTS);
-	for (int local_polyh_number = 0; local_polyh_number < nbOfPolyhedra; local_polyh_number++)
-	    {
-	      int nbOfNodes;
-	      int global_polyh_number=offset+local_polyh_number+1;
-	      int *nodes=getNodesOfPolyhedron(global_polyh_number,nbOfNodes);
-	      for(int i=0;i<nbOfNodes;i++)
-                reverse_connectivity[nodes[i]].push_back(global_polyh_number);
-	      delete [] nodes;
-	    }
+        int nbOfNodes;
+        int global_polyh_number=offset+local_polyh_number+1;
+        int *nodes=getNodesOfPolyhedron(global_polyh_number,nbOfNodes);
+        for(int i=0;i<nbOfNodes;i++)
+          reverse_connectivity[nodes[i]].push_back(global_polyh_number);
+        delete [] nodes;
       }
+    }
 
     // Full reverse_nodal_connectivity and reverse_nodal_connectivity_index
 
-  //calculate size of reverse_nodal_connectivity array
+    //calculate size of reverse_nodal_connectivity array
     int size_reverse_nodal_connectivity  = 0;
     for (int i = 1; i < _numberOfNodes+1; i++)
       size_reverse_nodal_connectivity += reverse_connectivity[i].size();
@@ -1302,16 +1302,16 @@ void CONNECTIVITY::calculateReverseNodalConnectivity()
 
     reverse_nodal_connectivity_index[0] = 1;
     for (int i = 1; i < _numberOfNodes+1; i++)
-      {
-	int size = reverse_connectivity[i].size();
-	reverse_nodal_connectivity_index[i] = reverse_nodal_connectivity_index[i-1] + size;
-	for (int j = 0; j < size; j++)
-	  reverse_nodal_connectivity[reverse_nodal_connectivity_index[i-1]-1+j]= reverse_connectivity[i][j];
-      }
+    {
+      int size = reverse_connectivity[i].size();
+      reverse_nodal_connectivity_index[i] = reverse_nodal_connectivity_index[i-1] + size;
+      for (int j = 0; j < size; j++)
+        reverse_nodal_connectivity[reverse_nodal_connectivity_index[i-1]-1+j]= reverse_connectivity[i][j];
+    }
 
     _reverseNodalConnectivity = new MEDSKYLINEARRAY(_numberOfNodes,size_reverse_nodal_connectivity,
-						    reverse_nodal_connectivity_index,
-						    reverse_nodal_connectivity,true);
+                                                    reverse_nodal_connectivity_index,
+                                                    reverse_nodal_connectivity,true);
   }
   END_OF_MED(LOC);
 }
@@ -1348,7 +1348,7 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 /*! If not yet done, calculate the full Descending Connectivity */
 //-------------------------------------------------//
 void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Entity)
-//-------------------------------------------------//
+  //-------------------------------------------------//
 {
   const char * LOC = "CONNECTIVITY::calculateFullDescendingConnectivity() : ";
   BEGIN_OF_MED(LOC);
@@ -1371,26 +1371,26 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
       delete _constituent;
       _constituent=0;
       if (_entityDimension == 3)
-	_constituent = new CONNECTIVITY(MED_FACE);
+        _constituent = new CONNECTIVITY(MED_FACE);
       else if (_entityDimension == 2)
-	_constituent = new CONNECTIVITY(MED_EDGE);
+        _constituent = new CONNECTIVITY(MED_EDGE);
       else
-	{
-	  MESSAGE_MED(LOC<<"We are in 1D");
-	  return;
-	}
+      {
+        MESSAGE_MED(LOC<<"We are in 1D");
+        return;
+      }
 
       _constituent->_typeConnectivity = MED_NODAL;
       _constituent->_numberOfNodes = _numberOfNodes;
       // foreach cells, we built array of constituent
       int DescendingSize = 0;
       for(int i=0; i<_numberOfTypes; i++)
-	DescendingSize+=(_count[i+1]-_count[i])*_type[i].getNumberOfConstituents(1);
+        DescendingSize+=(_count[i+1]-_count[i])*_type[i].getNumberOfConstituents(1);
       //_descending = new MEDSKYLINEARRAY(_count[_numberOfTypes]-1,DescendingSize);
       //const int * descend_connectivity = _descending->getValue();
       int * descend_connectivity = new int[DescendingSize];
       for (int i=0; i<DescendingSize; i++)
-	descend_connectivity[i]=0;
+        descend_connectivity[i]=0;
       //const int * descend_connectivity_index = _descending->getIndex();
       int * descend_connectivity_index = new int[_count[_numberOfTypes]];
       if(_numberOfTypes>0)
@@ -1406,39 +1406,39 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
       NumberOfConstituentsForeachType[1]=0;
       map<medGeometryElement,int>::iterator status;
       for(int i=0; i<_numberOfTypes; i++)
-	{
-	  // initialize descend_connectivity_index array :
-	  int NumberOfConstituents = _type[i].getNumberOfConstituents(1);
-	  for (int j=_count[i];j<_count[i+1];j++)
-	    {
-	      descend_connectivity_index[j]=descend_connectivity_index[j-1]+NumberOfConstituents;
-	      // compute number of constituent of all cell for each type
-	      for(int k=1;k<NumberOfConstituents+1;k++)
-		{
-		  medGeometryElement MEDType = _type[i].getConstituentType(1,k);
-		  status=eltsCounter.find(MEDType);
-		  if(status!=eltsCounter.end())
-		    (*status).second++;
-		  else
-		    eltsCounter[MEDType]=1;
-		}
-	    }
-	}
+      {
+        // initialize descend_connectivity_index array :
+        int NumberOfConstituents = _type[i].getNumberOfConstituents(1);
+        for (int j=_count[i];j<_count[i+1];j++)
+        {
+          descend_connectivity_index[j]=descend_connectivity_index[j-1]+NumberOfConstituents;
+          // compute number of constituent of all cell for each type
+          for(int k=1;k<NumberOfConstituents+1;k++)
+          {
+            medGeometryElement MEDType = _type[i].getConstituentType(1,k);
+            status=eltsCounter.find(MEDType);
+            if(status!=eltsCounter.end())
+              (*status).second++;
+            else
+              eltsCounter[MEDType]=1;
+          }
+        }
+      }
       if(eltsCounter.size()>2) {
         // free memory (issue 0020411: [CEA 342] Sigsegv on gibi writing of MESH coming from MED file without face computation)
         delete [] descend_connectivity;
         delete [] descend_connectivity_index;
         delete [] ConstituentsTypes;
         delete [] NumberOfConstituentsForeachType;
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Descending connectivity does not support more than 2 types."));
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Descending connectivity does not support more than 2 types."));
       }
       status=eltsCounter.begin();
       if(!eltsCounter.empty())
       {
-	ConstituentsTypes[0]=(*status).first; NumberOfConstituentsForeachType[0]=(*status).second;
-	status++;
-	if(status!=eltsCounter.end())
-	  { ConstituentsTypes[1]=(*status).first; NumberOfConstituentsForeachType[1]=(*status).second; }
+        ConstituentsTypes[0]=(*status).first; NumberOfConstituentsForeachType[0]=(*status).second;
+        status++;
+        if(status!=eltsCounter.end())
+        { ConstituentsTypes[1]=(*status).first; NumberOfConstituentsForeachType[1]=(*status).second; }
       }
       // we could built _constituent !
       int TotalNumberOfConstituents = NumberOfConstituentsForeachType[0]+NumberOfConstituentsForeachType[1];
@@ -1457,12 +1457,12 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
       if(ConstituentsTypes[0]==MED_NONE && ConstituentsTypes[1]==MED_NONE && _numberOfTypes==0)
         _constituent->_numberOfTypes = 0;
       else if (ConstituentsTypes[1]==MED_NONE)
-	_constituent->_numberOfTypes = 1;
+        _constituent->_numberOfTypes = 1;
       else
-	_constituent->_numberOfTypes = 2;
+        _constituent->_numberOfTypes = 2;
       _constituent->_geometricTypes = new medGeometryElement[_constituent->_numberOfTypes];
       _constituent->_type = new CELLMODEL[_constituent->_numberOfTypes];
-//CCRT      _constituent->_count = new med_int[_constituent->_numberOfTypes+1];
+      //CCRT      _constituent->_count = new med_int[_constituent->_numberOfTypes+1];
       if(_constituent->_count)
         delete [] _constituent->_count;
       _constituent->_count = new int[_constituent->_numberOfTypes+1];
@@ -1470,20 +1470,20 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
       med_int* tmp_NumberOfConstituentsForeachType = new med_int[_constituent->_numberOfTypes+1];
       tmp_NumberOfConstituentsForeachType[0]=0; // to count constituent of each type
       for (int i=0; i<_constituent->_numberOfTypes;i++) {
-	_constituent->_geometricTypes[i]=ConstituentsTypes[i];
-	_constituent->_count[i+1]=_constituent->_count[i]+NumberOfConstituentsForeachType[i];
-	CELLMODEL Type(ConstituentsTypes[i]);
-	_constituent->_type[i]=Type;
-	tmp_NumberOfConstituentsForeachType[i+1]=NumberOfConstituentsForeachType[i];
-	for (int j=tmp_NumberOfConstituentsForeachType[i]; j<tmp_NumberOfConstituentsForeachType[i+1]+tmp_NumberOfConstituentsForeachType[i]; j++)
-	  ConstituentNodalConnectivityIndex[j+1]=ConstituentNodalConnectivityIndex[j]+(ConstituentsTypes[i]%100);
+        _constituent->_geometricTypes[i]=ConstituentsTypes[i];
+        _constituent->_count[i+1]=_constituent->_count[i]+NumberOfConstituentsForeachType[i];
+        CELLMODEL Type(ConstituentsTypes[i]);
+        _constituent->_type[i]=Type;
+        tmp_NumberOfConstituentsForeachType[i+1]=NumberOfConstituentsForeachType[i];
+        for (int j=tmp_NumberOfConstituentsForeachType[i]; j<tmp_NumberOfConstituentsForeachType[i+1]+tmp_NumberOfConstituentsForeachType[i]; j++)
+          ConstituentNodalConnectivityIndex[j+1]=ConstituentNodalConnectivityIndex[j]+(ConstituentsTypes[i]%100);
       }
       delete [] ConstituentsTypes;
       delete [] NumberOfConstituentsForeachType;
 
       // we need reverse nodal connectivity
       if (! _reverseNodalConnectivity)
-	calculateReverseNodalConnectivity();
+        calculateReverseNodalConnectivity();
       const int * ReverseNodalConnectivityIndex = _reverseNodalConnectivity->getIndex();
       const int * ReverseNodalConnectivityValue = _reverseNodalConnectivity->getValue();
 
@@ -1492,141 +1492,141 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
 
       int TotalNumberOfSubCell = 0;
       for (int i=0; i<_numberOfTypes; i++)
-	{ // loop on all cell type
-	  CELLMODEL Type = _type[i];
-	  //      int NumberOfNodesPerCell = Type.getNumberOfNodes();
-	  int NumberOfConstituentPerCell = Type.getNumberOfConstituents(1);
-	  for (int j=_count[i]; j<_count[i+1]; j++) // we loop on all cell of this type
-	    for (int k=1; k<=NumberOfConstituentPerCell; k++)
-	      { // we loop on all sub cell of it
-		if (descend_connectivity[descend_connectivity_index[j-1]+k-2]==0) {
-		  // it is a new sub cell !
-		  //	    TotalNumberOfSubCell++;
-		  // Which type ?
-		  if (Type.getConstituentType(1,k)==_constituent->_geometricTypes[0]){
-		    tmp_NumberOfConstituentsForeachType[0]++;
-		    TotalNumberOfSubCell=tmp_NumberOfConstituentsForeachType[0];
-		  } else {
-		    tmp_NumberOfConstituentsForeachType[1]++;
-		    TotalNumberOfSubCell=tmp_NumberOfConstituentsForeachType[1];
-		  }
-		  //we have maximum two types
+      { // loop on all cell type
+        CELLMODEL Type = _type[i];
+        //      int NumberOfNodesPerCell = Type.getNumberOfNodes();
+        int NumberOfConstituentPerCell = Type.getNumberOfConstituents(1);
+        for (int j=_count[i]; j<_count[i+1]; j++) // we loop on all cell of this type
+          for (int k=1; k<=NumberOfConstituentPerCell; k++)
+          { // we loop on all sub cell of it
+            if (descend_connectivity[descend_connectivity_index[j-1]+k-2]==0) {
+              // it is a new sub cell !
+              //      TotalNumberOfSubCell++;
+              // Which type ?
+              if (Type.getConstituentType(1,k)==_constituent->_geometricTypes[0]){
+                tmp_NumberOfConstituentsForeachType[0]++;
+                TotalNumberOfSubCell=tmp_NumberOfConstituentsForeachType[0];
+              } else {
+                tmp_NumberOfConstituentsForeachType[1]++;
+                TotalNumberOfSubCell=tmp_NumberOfConstituentsForeachType[1];
+              }
+              //we have maximum two types
 
-		  descend_connectivity[descend_connectivity_index[j-1]+k-2]=TotalNumberOfSubCell;
-		  ReverseDescendingConnectivityValue[(TotalNumberOfSubCell-1)*2]=j;
-		  int NumberOfNodesPerConstituent = Type.getConstituentType(1,k)%100;
+              descend_connectivity[descend_connectivity_index[j-1]+k-2]=TotalNumberOfSubCell;
+              ReverseDescendingConnectivityValue[(TotalNumberOfSubCell-1)*2]=j;
+              int NumberOfNodesPerConstituent = Type.getConstituentType(1,k)%100;
 
-		  int * NodesLists = new int[NumberOfNodesPerConstituent];
-		  for (int l=0; l<NumberOfNodesPerConstituent; l++) {
-		    NodesLists[l]=_nodal->getIJ(j,Type.getNodeConstituent(1,k,l+1));
-		    ConstituentNodalConnectivity[ConstituentNodalConnectivityIndex[TotalNumberOfSubCell-1]-1+l]=NodesLists[l];
-		  }
-		  // we use reverse_nodal_connectivity to find the other element which contain this sub cell
+              int * NodesLists = new int[NumberOfNodesPerConstituent];
+              for (int l=0; l<NumberOfNodesPerConstituent; l++) {
+                NodesLists[l]=_nodal->getIJ(j,Type.getNodeConstituent(1,k,l+1));
+                ConstituentNodalConnectivity[ConstituentNodalConnectivityIndex[TotalNumberOfSubCell-1]-1+l]=NodesLists[l];
+              }
+              // we use reverse_nodal_connectivity to find the other element which contain this sub cell
 
-		  // all elements which contains first node of sub cell :
-		  int ReverseNodalConnectivityIndex_0 = ReverseNodalConnectivityIndex[NodesLists[0]-1];
-		  int ReverseNodalConnectivityIndex_1 = getIndexOfEndClassicElementInReverseNodal(ReverseNodalConnectivityValue,ReverseNodalConnectivityIndex,NodesLists[0]-1);
-		  //ReverseNodalConnectivityIndex[NodesLists[0]];
-		  int NumberOfCellsInList = ReverseNodalConnectivityIndex_1-ReverseNodalConnectivityIndex_0;
+              // all elements which contains first node of sub cell :
+              int ReverseNodalConnectivityIndex_0 = ReverseNodalConnectivityIndex[NodesLists[0]-1];
+              int ReverseNodalConnectivityIndex_1 = getIndexOfEndClassicElementInReverseNodal(ReverseNodalConnectivityValue,ReverseNodalConnectivityIndex,NodesLists[0]-1);
+              //ReverseNodalConnectivityIndex[NodesLists[0]];
+              int NumberOfCellsInList = ReverseNodalConnectivityIndex_1-ReverseNodalConnectivityIndex_0;
 
-		  if (NumberOfCellsInList > 0)
-		    { // we could have no element !
-		      int * CellsList = new int[NumberOfCellsInList];
-		      for (int l=ReverseNodalConnectivityIndex_0; l<ReverseNodalConnectivityIndex_1; l++)
-			CellsList[l-ReverseNodalConnectivityIndex_0]=ReverseNodalConnectivityValue[l-1];
+              if (NumberOfCellsInList > 0)
+              { // we could have no element !
+                int * CellsList = new int[NumberOfCellsInList];
+                for (int l=ReverseNodalConnectivityIndex_0; l<ReverseNodalConnectivityIndex_1; l++)
+                  CellsList[l-ReverseNodalConnectivityIndex_0]=ReverseNodalConnectivityValue[l-1];
 
-		      // foreach node in sub cell, we search elements which are in common
-		      // at the end, we must have only one !
+                // foreach node in sub cell, we search elements which are in common
+                // at the end, we must have only one !
 
-		      for (int l=1; l<NumberOfNodesPerConstituent; l++) {
-			int NewNumberOfCellsInList = 0;
-			int * NewCellsList = new int[NumberOfCellsInList];
-			for (int l1=0; l1<NumberOfCellsInList; l1++)
-			  for (int l2=ReverseNodalConnectivityIndex[NodesLists[l]-1]; l2<getIndexOfEndClassicElementInReverseNodal(ReverseNodalConnectivityValue,ReverseNodalConnectivityIndex,NodesLists[l]-1); l2++)
-			  //for (int l2=ReverseNodalConnectivityIndex[NodesLists[l]-1]; l2<ReverseNodalConnectivityIndex[NodesLists[l]]; l2++)
-			    {
-			      if (CellsList[l1]<ReverseNodalConnectivityValue[l2-1])
-				// increasing order : CellsList[l1] are not in elements list of node l
-				break;
-			      if ((CellsList[l1]==ReverseNodalConnectivityValue[l2-1])&(CellsList[l1]!=j)) {
-				// we have found one
-				NewCellsList[NewNumberOfCellsInList]=CellsList[l1];
-				NewNumberOfCellsInList++;
-				break;
-			      }
-			    }
-			NumberOfCellsInList = NewNumberOfCellsInList;
+                for (int l=1; l<NumberOfNodesPerConstituent; l++) {
+                  int NewNumberOfCellsInList = 0;
+                  int * NewCellsList = new int[NumberOfCellsInList];
+                  for (int l1=0; l1<NumberOfCellsInList; l1++)
+                    for (int l2=ReverseNodalConnectivityIndex[NodesLists[l]-1]; l2<getIndexOfEndClassicElementInReverseNodal(ReverseNodalConnectivityValue,ReverseNodalConnectivityIndex,NodesLists[l]-1); l2++)
+                      //for (int l2=ReverseNodalConnectivityIndex[NodesLists[l]-1]; l2<ReverseNodalConnectivityIndex[NodesLists[l]]; l2++)
+                    {
+                      if (CellsList[l1]<ReverseNodalConnectivityValue[l2-1])
+                        // increasing order : CellsList[l1] are not in elements list of node l
+                        break;
+                      if ((CellsList[l1]==ReverseNodalConnectivityValue[l2-1])&(CellsList[l1]!=j)) {
+                        // we have found one
+                        NewCellsList[NewNumberOfCellsInList]=CellsList[l1];
+                        NewNumberOfCellsInList++;
+                        break;
+                      }
+                    }
+                  NumberOfCellsInList = NewNumberOfCellsInList;
 
-			delete [] CellsList;
-			CellsList = NewCellsList;
-		      }
+                  delete [] CellsList;
+                  CellsList = NewCellsList;
+                }
 
-		      if (NumberOfCellsInList > 0) { // We have found some elements !
-			int CellNumber = CellsList[0];
-			//delete [] CellsList;
-			if (NumberOfCellsInList>1) {
-                          // free memory (issue 0020411: [CEA 342] Sigsegv on gibi writing of MESH coming from MED file without face computation)
-                          delete [] CellsList;
-                          delete [] NodesLists;
-                          delete [] ReverseDescendingConnectivityValue;
-                          delete [] tmp_NumberOfConstituentsForeachType;
-                          delete [] descend_connectivity;
-                          delete [] descend_connectivity_index;
-                          delete [] ConstituentNodalConnectivity;
-                          delete [] ConstituentNodalConnectivityIndex;
-			  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"More than one other Cell ("<<NumberOfCellsInList<<") !"));
+                if (NumberOfCellsInList > 0) { // We have found some elements !
+                  int CellNumber = CellsList[0];
+                  //delete [] CellsList;
+                  if (NumberOfCellsInList>1) {
+                    // free memory (issue 0020411: [CEA 342] Sigsegv on gibi writing of MESH coming from MED file without face computation)
+                    delete [] CellsList;
+                    delete [] NodesLists;
+                    delete [] ReverseDescendingConnectivityValue;
+                    delete [] tmp_NumberOfConstituentsForeachType;
+                    delete [] descend_connectivity;
+                    delete [] descend_connectivity_index;
+                    delete [] ConstituentNodalConnectivity;
+                    delete [] ConstituentNodalConnectivityIndex;
+                    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"More than one other Cell ("<<NumberOfCellsInList<<") !"));
+                  }
+
+                  if (NumberOfCellsInList==1)
+                  {
+                    ReverseDescendingConnectivityValue[(TotalNumberOfSubCell-1)*2+1]=CellNumber;
+
+                    // we search sub cell number in this cell to not calculate it another time
+                    // which type ?
+                    CELLMODEL Type2;
+                    for (int l=0; l<_numberOfTypes; l++)
+                      if (CellNumber < _count[l+1]) {
+                        Type2=_type[l];
+                        break;
+                      }
+                    //int sub_cell_count2 = Type2.get_entities_count(1);
+                    //int nodes_cell_count2 = Type2.get_nodes_count();
+                    bool find2 = false;
+                    for (int l=1; l<=Type2.getNumberOfConstituents(1);l++) { // on all sub cell
+                      int counter = 0;
+                      for (int m=1; m<=Type2.getConstituentType(1,l)%100; m++)
+                        for (int n=1; n<=Type.getConstituentType(1,k)%100; n++)
+                        {
+                          if (_nodal->getIJ(CellNumber,Type2.getNodeConstituent(1,l,m)) == NodesLists[n-1])
+                            counter++;
                         }
+                      if (counter==Type.getConstituentType(1,k)%100)
+                      {
+                        descend_connectivity[descend_connectivity_index[CellNumber-1]+l-2]=-1*TotalNumberOfSubCell; // because, see it in other side !
+                        find2 = true;
+                      }
+                      if (find2)
+                        break;
+                    }
+                    if (!find2)
+                      MESSAGE_MED(LOC<<"ERROR ERROR ERROR ERROR ERROR : we find any subcell !!!"); // exception ?
+                  }
+                } else {
+                  ReverseDescendingConnectivityValue[(TotalNumberOfSubCell-1)*2+1]=0;
+                }
+                delete [] CellsList;
+              }
 
-			if (NumberOfCellsInList==1)
-			  {
-			    ReverseDescendingConnectivityValue[(TotalNumberOfSubCell-1)*2+1]=CellNumber;
-
-			    // we search sub cell number in this cell to not calculate it another time
-			    // which type ?
-			    CELLMODEL Type2;
-			    for (int l=0; l<_numberOfTypes; l++)
-			      if (CellNumber < _count[l+1]) {
-				Type2=_type[l];
-				break;
-			      }
-			    //int sub_cell_count2 = Type2.get_entities_count(1);
-			    //int nodes_cell_count2 = Type2.get_nodes_count();
-			    bool find2 = false;
-			    for (int l=1; l<=Type2.getNumberOfConstituents(1);l++) { // on all sub cell
-			      int counter = 0;
-			      for (int m=1; m<=Type2.getConstituentType(1,l)%100; m++)
-				for (int n=1; n<=Type.getConstituentType(1,k)%100; n++)
-				  {
-				    if (_nodal->getIJ(CellNumber,Type2.getNodeConstituent(1,l,m)) == NodesLists[n-1])
-				      counter++;
-				  }
-			      if (counter==Type.getConstituentType(1,k)%100)
-				{
-				  descend_connectivity[descend_connectivity_index[CellNumber-1]+l-2]=-1*TotalNumberOfSubCell; // because, see it in other side !
-				  find2 = true;
-				}
-			      if (find2)
-				break;
-			    }
-			    if (!find2)
-			      MESSAGE_MED(LOC<<"ERROR ERROR ERROR ERROR ERROR : we find any subcell !!!"); // exception ?
-			  }
-		      } else {
-			ReverseDescendingConnectivityValue[(TotalNumberOfSubCell-1)*2+1]=0;
-		      }
-		      delete [] CellsList;
-		    }
-
-		  delete [] NodesLists;
-		}
-	      }
-	}
+              delete [] NodesLists;
+            }
+          }
+      }
       // we adjust _constituent
       int NumberOfConstituent=0;
       int SizeOfConstituentNodal=0;
       for (int i=0;i<_constituent->_numberOfTypes; i++) {
-	NumberOfConstituent += tmp_NumberOfConstituentsForeachType[i]-_constituent->_count[i]+1;
-	SizeOfConstituentNodal += (tmp_NumberOfConstituentsForeachType[i]-_constituent->_count[i]+1)*_constituent->_type[i].getNumberOfNodes();
+        NumberOfConstituent += tmp_NumberOfConstituentsForeachType[i]-_constituent->_count[i]+1;
+        SizeOfConstituentNodal += (tmp_NumberOfConstituentsForeachType[i]-_constituent->_count[i]+1)*_constituent->_type[i].getNumberOfNodes();
       }
       // we built new _nodal attribute in _constituent
       //MEDSKYLINEARRAY *ConstituentNodal = new MEDSKYLINEARRAY(NumberOfConstituent,SizeOfConstituentNodal);
@@ -1645,35 +1645,35 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
 
       // first constituent type
       for(int j=0; j<tmp_NumberOfConstituentsForeachType[0]; j++) {
-	ConstituentNodalIndex[j+1]=ConstituentNodalConnectivityIndex[j+1];
-	for(int k=ConstituentNodalIndex[j]; k<ConstituentNodalIndex[j+1]; k++){
-	  ConstituentNodalValue[k-1]=ConstituentNodalConnectivity[k-1];
-	}
-	reverseDescendingConnectivityIndex[j+1]=reverseDescendingConnectivityIndex[j]+2;
-	for(int k=reverseDescendingConnectivityIndex[j]; k<reverseDescendingConnectivityIndex[j+1]; k++){
-	  reverseDescendingConnectivityValue[k-1]=ReverseDescendingConnectivityValue[k-1];
-	}
+        ConstituentNodalIndex[j+1]=ConstituentNodalConnectivityIndex[j+1];
+        for(int k=ConstituentNodalIndex[j]; k<ConstituentNodalIndex[j+1]; k++){
+          ConstituentNodalValue[k-1]=ConstituentNodalConnectivity[k-1];
+        }
+        reverseDescendingConnectivityIndex[j+1]=reverseDescendingConnectivityIndex[j]+2;
+        for(int k=reverseDescendingConnectivityIndex[j]; k<reverseDescendingConnectivityIndex[j+1]; k++){
+          reverseDescendingConnectivityValue[k-1]=ReverseDescendingConnectivityValue[k-1];
+        }
       }
       // second type if any
       if (_constituent->_numberOfTypes==2) {
-	int offset = _constituent->_count[1]-tmp_NumberOfConstituentsForeachType[0]-1;
-	int offset1=offset*_constituent->_type[0].getNumberOfNodes();
-	int offset2=offset*2;
-	int NumberOfNodesPerConstituent = _constituent->_type[1].getNumberOfNodes();
-	for(int j=tmp_NumberOfConstituentsForeachType[0]; j<NumberOfConstituent; j++) {
-	  ConstituentNodalIndex[j+1]=ConstituentNodalIndex[j]+NumberOfNodesPerConstituent;
-	  for(int k=ConstituentNodalIndex[j]; k<ConstituentNodalIndex[j+1]; k++){
-	    ConstituentNodalValue[k-1]=ConstituentNodalConnectivity[offset1+k-1];
-	  }
-	  reverseDescendingConnectivityIndex[j+1]=reverseDescendingConnectivityIndex[j]+2;
-	  for(int k=reverseDescendingConnectivityIndex[j]; k<reverseDescendingConnectivityIndex[j+1]; k++){
-	    reverseDescendingConnectivityValue[k-1]=ReverseDescendingConnectivityValue[offset2+k-1];
-	  }
-	}
-	_constituent->_count[2]=NumberOfConstituent+1;
-	// we correct _descending to adjust face number
-	for(int j=0;j<DescendingSize;j++)
-	  if (abs(descend_connectivity[j])>tmp_NumberOfConstituentsForeachType[0]) {
+        int offset = _constituent->_count[1]-tmp_NumberOfConstituentsForeachType[0]-1;
+        int offset1=offset*_constituent->_type[0].getNumberOfNodes();
+        int offset2=offset*2;
+        int NumberOfNodesPerConstituent = _constituent->_type[1].getNumberOfNodes();
+        for(int j=tmp_NumberOfConstituentsForeachType[0]; j<NumberOfConstituent; j++) {
+          ConstituentNodalIndex[j+1]=ConstituentNodalIndex[j]+NumberOfNodesPerConstituent;
+          for(int k=ConstituentNodalIndex[j]; k<ConstituentNodalIndex[j+1]; k++){
+            ConstituentNodalValue[k-1]=ConstituentNodalConnectivity[offset1+k-1];
+          }
+          reverseDescendingConnectivityIndex[j+1]=reverseDescendingConnectivityIndex[j]+2;
+          for(int k=reverseDescendingConnectivityIndex[j]; k<reverseDescendingConnectivityIndex[j+1]; k++){
+            reverseDescendingConnectivityValue[k-1]=ReverseDescendingConnectivityValue[offset2+k-1];
+          }
+        }
+        _constituent->_count[2]=NumberOfConstituent+1;
+        // we correct _descending to adjust face number
+        for(int j=0;j<DescendingSize;j++)
+          if (abs(descend_connectivity[j])>tmp_NumberOfConstituentsForeachType[0]) {
             if ( descend_connectivity[j] > 0 )
               descend_connectivity[j]-=offset;
             else 
@@ -1689,9 +1689,9 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
       delete [] tmp_NumberOfConstituentsForeachType;
 
       _descending = new MEDSKYLINEARRAY(_count[_numberOfTypes]-1,
-					DescendingSize,
-					descend_connectivity_index,
-					descend_connectivity);
+                                        DescendingSize,
+                                        descend_connectivity_index,
+                                        descend_connectivity);
       delete [] descend_connectivity_index;
       delete [] descend_connectivity;
 
@@ -1712,54 +1712,54 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
       int NumberOfNewSeg = 0;
 
       for (int i=0; i <getNumberOfPolygons(); i++) // for each polygon
-	{
-	  const int * vector_begin = &_polygonsNodal->getValue()[_polygonsNodal->getIndex()[i]-1];
-	  int vector_size = _polygonsNodal->getIndex()[i+1]-_polygonsNodal->getIndex()[i]+1;
-	  vector<int> myPolygon(vector_begin, vector_begin+vector_size);
-	  myPolygon[myPolygon.size()-1] = myPolygon[0]; // because first and last point make a segment
+      {
+        const int * vector_begin = &_polygonsNodal->getValue()[_polygonsNodal->getIndex()[i]-1];
+        int vector_size = _polygonsNodal->getIndex()[i+1]-_polygonsNodal->getIndex()[i]+1;
+        vector<int> myPolygon(vector_begin, vector_begin+vector_size);
+        myPolygon[myPolygon.size()-1] = myPolygon[0]; // because first and last point make a segment
 
-	  for (int j=0; j<(int)myPolygon.size()-1; j++) // for each segment of polygon
-	    {
-	      MEDMODULUSARRAY segment_poly(2,&myPolygon[j]);
-	      int ret_compare = 0;
+        for (int j=0; j<(int)myPolygon.size()-1; j++) // for each segment of polygon
+        {
+          MEDMODULUSARRAY segment_poly(2,&myPolygon[j]);
+          int ret_compare = 0;
 
-	      // we search it in existing segments
+          // we search it in existing segments
 
-	      for (int k=0; k<(int)Constituentnodalindex.size()-1; k++)
-		{
-		  MEDMODULUSARRAY segment(2,&Constituentnodalvalue[0] + Constituentnodalindex[k]-1);
-		  ret_compare = segment_poly.compare(segment);
-		  if (ret_compare) // segment_poly already exists
-		    {
-		      PolyDescending.push_back(ret_compare*(k+1)); // we had it to the connectivity
-		      insert_vector(Reversedescendingconnectivityvalue, 2*k+1, i+1 + getNumberOf(MED_CELL,MED_ALL_ELEMENTS)); // add polygon i to reverse descending connectivity for segment_poly (in 2sd place)
-		      break;
-		    }
-		}
+          for (int k=0; k<(int)Constituentnodalindex.size()-1; k++)
+          {
+            MEDMODULUSARRAY segment(2,&Constituentnodalvalue[0] + Constituentnodalindex[k]-1);
+            ret_compare = segment_poly.compare(segment);
+            if (ret_compare) // segment_poly already exists
+            {
+              PolyDescending.push_back(ret_compare*(k+1)); // we had it to the connectivity
+              insert_vector(Reversedescendingconnectivityvalue, 2*k+1, i+1 + getNumberOf(MED_CELL,MED_ALL_ELEMENTS)); // add polygon i to reverse descending connectivity for segment_poly (in 2sd place)
+              break;
+            }
+          }
 
-	      // segment_poly must be created
+          // segment_poly must be created
 
-	      if (!ret_compare)
-		{
-		  NumberOfNewSeg++;
-		  PolyDescending.push_back(NumberOfConstituent+NumberOfNewSeg); // we had it to the connectivity
-		  Constituentnodalvalue.push_back(segment_poly[0]);
-		  Constituentnodalvalue.push_back(segment_poly[1]);
-		  Constituentnodalindex.push_back(Constituentnodalindex[Constituentnodalindex.size()-1] + 2); // we have only segments
-		  insert_vector(Reversedescendingconnectivityvalue, 2*(NumberOfConstituent+NumberOfNewSeg-1), i+1 + getNumberOf(MED_CELL,MED_ALL_ELEMENTS)); // add polygon i to reverse descending connectivity for segment_poly (in 1st place)
-		  insert_vector(Reversedescendingconnectivityindex, NumberOfConstituent+NumberOfNewSeg-1, 2*(NumberOfConstituent+NumberOfNewSeg-1)+1); // idem with index
-		}
-	    }
-	}
+          if (!ret_compare)
+          {
+            NumberOfNewSeg++;
+            PolyDescending.push_back(NumberOfConstituent+NumberOfNewSeg); // we had it to the connectivity
+            Constituentnodalvalue.push_back(segment_poly[0]);
+            Constituentnodalvalue.push_back(segment_poly[1]);
+            Constituentnodalindex.push_back(Constituentnodalindex[Constituentnodalindex.size()-1] + 2); // we have only segments
+            insert_vector(Reversedescendingconnectivityvalue, 2*(NumberOfConstituent+NumberOfNewSeg-1), i+1 + getNumberOf(MED_CELL,MED_ALL_ELEMENTS)); // add polygon i to reverse descending connectivity for segment_poly (in 1st place)
+            insert_vector(Reversedescendingconnectivityindex, NumberOfConstituent+NumberOfNewSeg-1, 2*(NumberOfConstituent+NumberOfNewSeg-1)+1); // idem with index
+          }
+        }
+      }
 
       if (getNumberOfPolygons() > 0)
-	{
-	  _polygonsDescending = new MEDSKYLINEARRAY(getNumberOfPolygons(),_polygonsNodal->getLength(),_polygonsNodal->getIndex(),&PolyDescending[0]); // index are the same for polygons nodal and descending connectivities
+      {
+        _polygonsDescending = new MEDSKYLINEARRAY(getNumberOfPolygons(),_polygonsNodal->getLength(),_polygonsNodal->getIndex(),&PolyDescending[0]); // index are the same for polygons nodal and descending connectivities
 
-	  NumberOfConstituent += NumberOfNewSeg;
-	  SizeOfConstituentNodal += 2*NumberOfNewSeg;
-	  _constituent->_count[1] = NumberOfConstituent+1;
-	}
+        NumberOfConstituent += NumberOfNewSeg;
+        SizeOfConstituentNodal += 2*NumberOfNewSeg;
+        _constituent->_count[1] = NumberOfConstituent+1;
+      }
 
 
       // polyhedron (3D mesh)
@@ -1772,420 +1772,420 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
       int *tabRes = new int[1000]; //temporay array for intersection calculation
 
       for (int i=0; i<getNumberOfPolyhedron(); i++) // for each polyhedron
-	{
-	  // we create a POLYHEDRONARRAY containing only this polyhedra
-	  int myNumberOfFaces = _polyhedronNodal->getPolyhedronIndex()[i+1]-_polyhedronNodal->getPolyhedronIndex()[i];
-	  int myNumberOfNodes = _polyhedronNodal->getFacesIndex()[_polyhedronNodal->getPolyhedronIndex()[i+1]-1]-_polyhedronNodal->getFacesIndex()[_polyhedronNodal->getPolyhedronIndex()[i]-1];
-	  POLYHEDRONARRAY myPolyhedra(1,myNumberOfFaces,myNumberOfNodes);
-//CCRT	  vector<int> myFacesIndex(_polyhedronNodal->getFacesIndex() + _polyhedronNodal->getPolyhedronIndex()[i]-1, _polyhedronNodal->getFacesIndex() + _polyhedronNodal->getPolyhedronIndex()[i]-1 + myNumberOfFaces+1);
-	  vector<med_int> myFacesIndex(_polyhedronNodal->getFacesIndex() + _polyhedronNodal->getPolyhedronIndex()[i]-1, _polyhedronNodal->getFacesIndex() + _polyhedronNodal->getPolyhedronIndex()[i]-1 + myNumberOfFaces+1);
-	  for (int j=myNumberOfFaces; j>=0; j--)
-	    myFacesIndex[j] -= myFacesIndex[0]-1;
-	  myPolyhedra.setFacesIndex(&myFacesIndex[0]);
-	  myPolyhedra.setNodes(_polyhedronNodal->getNodes() + _polyhedronNodal->getFacesIndex()[_polyhedronNodal->getPolyhedronIndex()[i]-1]-1);
+      {
+        // we create a POLYHEDRONARRAY containing only this polyhedra
+        int myNumberOfFaces = _polyhedronNodal->getPolyhedronIndex()[i+1]-_polyhedronNodal->getPolyhedronIndex()[i];
+        int myNumberOfNodes = _polyhedronNodal->getFacesIndex()[_polyhedronNodal->getPolyhedronIndex()[i+1]-1]-_polyhedronNodal->getFacesIndex()[_polyhedronNodal->getPolyhedronIndex()[i]-1];
+        POLYHEDRONARRAY myPolyhedra(1,myNumberOfFaces,myNumberOfNodes);
+        //CCRT   vector<int> myFacesIndex(_polyhedronNodal->getFacesIndex() + _polyhedronNodal->getPolyhedronIndex()[i]-1, _polyhedronNodal->getFacesIndex() + _polyhedronNodal->getPolyhedronIndex()[i]-1 + myNumberOfFaces+1);
+        vector<med_int> myFacesIndex(_polyhedronNodal->getFacesIndex() + _polyhedronNodal->getPolyhedronIndex()[i]-1, _polyhedronNodal->getFacesIndex() + _polyhedronNodal->getPolyhedronIndex()[i]-1 + myNumberOfFaces+1);
+        for (int j=myNumberOfFaces; j>=0; j--)
+          myFacesIndex[j] -= myFacesIndex[0]-1;
+        myPolyhedra.setFacesIndex(&myFacesIndex[0]);
+        myPolyhedra.setNodes(_polyhedronNodal->getNodes() + _polyhedronNodal->getFacesIndex()[_polyhedronNodal->getPolyhedronIndex()[i]-1]-1);
 
-	  for (int j=0; j<myPolyhedra.getNumberOfFaces(); j++) // for each face of polyhedra
-	    {
-	      int myFaceNumberOfNodes = myPolyhedra.getFacesIndex()[j+1]-myPolyhedra.getFacesIndex()[j];
-//CCRT
+        for (int j=0; j<myPolyhedra.getNumberOfFaces(); j++) // for each face of polyhedra
+        {
+          int myFaceNumberOfNodes = myPolyhedra.getFacesIndex()[j+1]-myPolyhedra.getFacesIndex()[j];
+          //CCRT
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-              int ii ;
-              const med_int * Nodes = myPolyhedra.getNodes() ;
-              int * tmp_Nodes = new int[myPolyhedra.getNumberOfNodes()] ;
-              for ( ii = 0 ; ii < myPolyhedra.getNumberOfNodes() ; ii++ )
-                 tmp_Nodes[ii] = Nodes[ii] ;
-              const med_int * FacesIndex = myPolyhedra.getFacesIndex() ;
-              int * tmp_FacesIndex = new int[myPolyhedra.getNumberOfFaces()+1] ;
-              for ( ii = 0 ; ii < myPolyhedra.getNumberOfFaces() ; ii++ )
-                 tmp_FacesIndex[ii] = FacesIndex[ii] ;
-//CCRT : copy of Nodes
-	      MEDMODULUSARRAY face_poly(myFaceNumberOfNodes,tmp_Nodes + tmp_FacesIndex[j]-1);
-//CCRT              delete [] tmp_Nodes ;
-              delete [] tmp_FacesIndex ;
+          int ii ;
+          const med_int * Nodes = myPolyhedra.getNodes() ;
+          int * tmp_Nodes = new int[myPolyhedra.getNumberOfNodes()] ;
+          for ( ii = 0 ; ii < myPolyhedra.getNumberOfNodes() ; ii++ )
+            tmp_Nodes[ii] = Nodes[ii] ;
+          const med_int * FacesIndex = myPolyhedra.getFacesIndex() ;
+          int * tmp_FacesIndex = new int[myPolyhedra.getNumberOfFaces()+1] ;
+          for ( ii = 0 ; ii < myPolyhedra.getNumberOfFaces() ; ii++ )
+            tmp_FacesIndex[ii] = FacesIndex[ii] ;
+          //CCRT : copy of Nodes
+          MEDMODULUSARRAY face_poly(myFaceNumberOfNodes,tmp_Nodes + tmp_FacesIndex[j]-1);
+          //CCRT              delete [] tmp_Nodes ;
+          delete [] tmp_FacesIndex ;
 #else
-	      MEDMODULUSARRAY face_poly(myFaceNumberOfNodes,myPolyhedra.getNodes() + myPolyhedra.getFacesIndex()[j]-1);
+          MEDMODULUSARRAY face_poly(myFaceNumberOfNodes,myPolyhedra.getNodes() + myPolyhedra.getFacesIndex()[j]-1);
 #endif
-	      int ret_compare = 0;
+          int ret_compare = 0;
 
-	      // we search it in existing faces
+          // we search it in existing faces
 
-	      // we search first in TRIA3 and QUAD4
-	      if (myFaceNumberOfNodes == 3 || myFaceNumberOfNodes == 4)
-		{
-		  int Begin = -1; // first TRIA3 or QUAD4
-		  int Number = 0; // number of TRIA3 or QUAD4
-		  for (int k=0; k<(int)Constituentnodalindex.size()-1; k++)
-		    if (Constituentnodalindex[k+1]-Constituentnodalindex[k] == myFaceNumberOfNodes)
-		      {
-			if (Begin == -1)
-			  Begin = k;
-			Number++;
-		      }
-
-		  for (int k=0; k<Number; k++)
-		    {
-		      MEDMODULUSARRAY face(myFaceNumberOfNodes,&Constituentnodalvalue[0] + Constituentnodalindex[Begin+k]-1);
-		      ret_compare = face_poly.compare(face);
-		      if (ret_compare)
-			{
-			  PolyDescending.push_back(ret_compare*(Begin+k+1)); // we had it to the connectivity
-			  insert_vector(Reversedescendingconnectivityvalue, 2*(Begin+k)+1, i+1 + getNumberOf(MED_CELL,MED_ALL_ELEMENTS)); // add polyhedra i to reverse descending connectivity for face_poly (in 2sd place)
-			  break;
-			}
-		    }
-		}
-
-	      // we search last in POLYGONS
-	      if (!ret_compare)
+          // we search first in TRIA3 and QUAD4
+          if (myFaceNumberOfNodes == 3 || myFaceNumberOfNodes == 4)
+          {
+            int Begin = -1; // first TRIA3 or QUAD4
+            int Number = 0; // number of TRIA3 or QUAD4
+            for (int k=0; k<(int)Constituentnodalindex.size()-1; k++)
+              if (Constituentnodalindex[k+1]-Constituentnodalindex[k] == myFaceNumberOfNodes)
               {
-                int lgth;
-                const int *facePolyTab=face_poly.getArray(lgth);
-                int nbOfCandidatesCell = ReverseNodalConnectivityIndex[facePolyTab[0]] -
-                                         ReverseNodalConnectivityIndex[facePolyTab[0]-1];
-                const int *candidatesCell = ReverseNodalConnectivityValue +
-                                            ReverseNodalConnectivityIndex[facePolyTab[0]-1] - 1;
-                memcpy(tabRes,candidatesCell,nbOfCandidatesCell*sizeof(int));
-                int lgth2=nbOfCandidatesCell;
-                for (int k=1;k<lgth && lgth2!=0;k++)
+                if (Begin == -1)
+                  Begin = k;
+                Number++;
+              }
+
+            for (int k=0; k<Number; k++)
+            {
+              MEDMODULUSARRAY face(myFaceNumberOfNodes,&Constituentnodalvalue[0] + Constituentnodalindex[Begin+k]-1);
+              ret_compare = face_poly.compare(face);
+              if (ret_compare)
+              {
+                PolyDescending.push_back(ret_compare*(Begin+k+1)); // we had it to the connectivity
+                insert_vector(Reversedescendingconnectivityvalue, 2*(Begin+k)+1, i+1 + getNumberOf(MED_CELL,MED_ALL_ELEMENTS)); // add polyhedra i to reverse descending connectivity for face_poly (in 2sd place)
+                break;
+              }
+            }
+          }
+
+          // we search last in POLYGONS
+          if (!ret_compare)
+          {
+            int lgth;
+            const int *facePolyTab=face_poly.getArray(lgth);
+            int nbOfCandidatesCell = ReverseNodalConnectivityIndex[facePolyTab[0]] -
+              ReverseNodalConnectivityIndex[facePolyTab[0]-1];
+            const int *candidatesCell = ReverseNodalConnectivityValue +
+              ReverseNodalConnectivityIndex[facePolyTab[0]-1] - 1;
+            memcpy(tabRes,candidatesCell,nbOfCandidatesCell*sizeof(int));
+            int lgth2=nbOfCandidatesCell;
+            for (int k=1;k<lgth && lgth2!=0;k++)
+            {
+              nbOfCandidatesCell = ReverseNodalConnectivityIndex[facePolyTab[k]] -
+                ReverseNodalConnectivityIndex[facePolyTab[k]-1];
+              candidatesCell = ReverseNodalConnectivityValue +
+                ReverseNodalConnectivityIndex[facePolyTab[k]-1] - 1;
+              mergeOrderedTabs(tabRes,lgth2,candidatesCell,nbOfCandidatesCell,tabRes,lgth2);
+            }
+            if (lgth2<=1)
+              ret_compare=0;//here normally tabRes[0]==offsetCell+i+1
+            else //> 2 should never happend : A face is shared by more than 2 polyhedrons...
+            {
+              if (tabRes[0] == offsetCell+i+1) //as tabRes is ordered by construction tabRes[1] > tabRes[0] so the current 
+                // face is shared with an another cell whose id > current id. So let's create
+                ret_compare=0;
+              else
+              {//tabRes[0]<Constituentpolygonsnodalindex.size()-1 that is to say the current face has been built previously.
+                const int *facesConstitutingAlreadyBuiltPolyh = &PolyDescending[0] + _polyhedronNodal->getPolyhedronIndex()[tabRes[0]-offsetCell-1] - 1;
+                int nbOfFacesConstitutingAlreadyBuiltPolyh = _polyhedronNodal->getPolyhedronIndex()[tabRes[0]-offsetCell] - _polyhedronNodal->getPolyhedronIndex()[tabRes[0]-offsetCell-1];
+                for (int k1=0; k1<nbOfFacesConstitutingAlreadyBuiltPolyh && (ret_compare==0); k1++)
                 {
-                  nbOfCandidatesCell = ReverseNodalConnectivityIndex[facePolyTab[k]] -
-                                       ReverseNodalConnectivityIndex[facePolyTab[k]-1];
-                  candidatesCell = ReverseNodalConnectivityValue +
-                                   ReverseNodalConnectivityIndex[facePolyTab[k]-1] - 1;
-                  mergeOrderedTabs(tabRes,lgth2,candidatesCell,nbOfCandidatesCell,tabRes,lgth2);
-                }
-                if (lgth2<=1)
-                  ret_compare=0;//here normally tabRes[0]==offsetCell+i+1
-                else //> 2 should never happend : A face is shared by more than 2 polyhedrons...
-                {
-                  if (tabRes[0] == offsetCell+i+1) //as tabRes is ordered by construction tabRes[1] > tabRes[0] so the current 
-                    // face is shared with an another cell whose id > current id. So let's create
-                    ret_compare=0;
-                  else
-                  {//tabRes[0]<Constituentpolygonsnodalindex.size()-1 that is to say the current face has been built previously.
-                    const int *facesConstitutingAlreadyBuiltPolyh = &PolyDescending[0] + _polyhedronNodal->getPolyhedronIndex()[tabRes[0]-offsetCell-1] - 1;
-                    int nbOfFacesConstitutingAlreadyBuiltPolyh = _polyhedronNodal->getPolyhedronIndex()[tabRes[0]-offsetCell] - _polyhedronNodal->getPolyhedronIndex()[tabRes[0]-offsetCell-1];
-                    for (int k1=0; k1<nbOfFacesConstitutingAlreadyBuiltPolyh && (ret_compare==0); k1++)
+                  int curFaceId=facesConstitutingAlreadyBuiltPolyh[k1];
+                  if(curFaceId>NumberOfConstituent)//In other case it is not a polyhedron : no chance to fit if you see comment 30 lines behind.
+                  {
+                    int nbOfNodesForCurrentFace =
+                      Constituentpolygonsnodalindex[curFaceId-NumberOfConstituent]
+                      - Constituentpolygonsnodalindex[curFaceId-NumberOfConstituent-1];
+                    MEDMODULUSARRAY face (nbOfNodesForCurrentFace,&Constituentpolygonsnodalvalue[0]+
+                                          Constituentpolygonsnodalindex[curFaceId-NumberOfConstituent-1]-1);
+                    ret_compare = face_poly.compare(face);
+                    if (ret_compare)
                     {
-                      int curFaceId=facesConstitutingAlreadyBuiltPolyh[k1];
-                      if(curFaceId>NumberOfConstituent)//In other case it is not a polyhedron : no chance to fit if you see comment 30 lines behind.
-                      {
-                        int nbOfNodesForCurrentFace =
-                          Constituentpolygonsnodalindex[curFaceId-NumberOfConstituent]
-                          - Constituentpolygonsnodalindex[curFaceId-NumberOfConstituent-1];
-                        MEDMODULUSARRAY face (nbOfNodesForCurrentFace,&Constituentpolygonsnodalvalue[0]+
-                                              Constituentpolygonsnodalindex[curFaceId-NumberOfConstituent-1]-1);
-                        ret_compare = face_poly.compare(face);
-                        if (ret_compare)
-                        {
-                          PolyDescending.push_back(ret_compare*curFaceId); // we had it to the connectivity
-                          insert_vector(Reversedescendingconnectivityvalue, 2*(curFaceId-1)+1,
-                                        i + 1 + getNumberOf(MED_CELL,MED_ALL_ELEMENTS));
-                        }
-                      }
+                      PolyDescending.push_back(ret_compare*curFaceId); // we had it to the connectivity
+                      insert_vector(Reversedescendingconnectivityvalue, 2*(curFaceId-1)+1,
+                                    i + 1 + getNumberOf(MED_CELL,MED_ALL_ELEMENTS));
                     }
                   }
                 }
               }
+            }
+          }
 
-	      // if not found, face_poly must be created
+          // if not found, face_poly must be created
 
-	      if (!ret_compare)
-		{
-		  NumberOfNewFaces++;
-		  PolyDescending.push_back(NumberOfConstituent+NumberOfNewFaces); // we had it to the connectivity
-		  for (int k=0; k<myFaceNumberOfNodes; k++)
-		    Constituentpolygonsnodalvalue.push_back(face_poly[k]);
-		  Constituentpolygonsnodalindex.push_back(Constituentpolygonsnodalindex[Constituentpolygonsnodalindex.size()-1]+myFaceNumberOfNodes);
-		  insert_vector(Reversedescendingconnectivityvalue, 2*(NumberOfConstituent+NumberOfNewFaces-1), i+1 + getNumberOf(MED_CELL,MED_ALL_ELEMENTS)); // add polyhedra i to reverse descending connectivity for face_poly (in 1st place)
-		  insert_vector(Reversedescendingconnectivityindex, NumberOfConstituent+NumberOfNewFaces-1, 2*(NumberOfConstituent+NumberOfNewFaces-1)+1); // idem with index
-		}
-	    }
-	}
+          if (!ret_compare)
+          {
+            NumberOfNewFaces++;
+            PolyDescending.push_back(NumberOfConstituent+NumberOfNewFaces); // we had it to the connectivity
+            for (int k=0; k<myFaceNumberOfNodes; k++)
+              Constituentpolygonsnodalvalue.push_back(face_poly[k]);
+            Constituentpolygonsnodalindex.push_back(Constituentpolygonsnodalindex[Constituentpolygonsnodalindex.size()-1]+myFaceNumberOfNodes);
+            insert_vector(Reversedescendingconnectivityvalue, 2*(NumberOfConstituent+NumberOfNewFaces-1), i+1 + getNumberOf(MED_CELL,MED_ALL_ELEMENTS)); // add polyhedra i to reverse descending connectivity for face_poly (in 1st place)
+            insert_vector(Reversedescendingconnectivityindex, NumberOfConstituent+NumberOfNewFaces-1, 2*(NumberOfConstituent+NumberOfNewFaces-1)+1); // idem with index
+          }
+        }
+      }
       delete [] tabRes;
 
       if (getNumberOfPolyhedron() > 0)
-	{
+      {
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-          int * tmp_PolyhedronIndex = new int[getNumberOfPolyhedron()+1] ;
-          const MED_EN::med_int * PolyhedronIndex = _polyhedronNodal->getPolyhedronIndex() ;
-          int ii ;
-          for ( ii = 0 ; ii < getNumberOfPolyhedron()+1 ; ii++ )
-             tmp_PolyhedronIndex[ii] = PolyhedronIndex[ii] ;
-//CCRT : copy of PolyhedronIndex
-	  _polyhedronDescending = new MEDSKYLINEARRAY(getNumberOfPolyhedron(),_polyhedronNodal->getNumberOfFaces(),tmp_PolyhedronIndex,&PolyDescending[0]); // polyhedron index are the same for nodal and descending connectivities
+        int * tmp_PolyhedronIndex = new int[getNumberOfPolyhedron()+1] ;
+        const MED_EN::med_int * PolyhedronIndex = _polyhedronNodal->getPolyhedronIndex() ;
+        int ii ;
+        for ( ii = 0 ; ii < getNumberOfPolyhedron()+1 ; ii++ )
+          tmp_PolyhedronIndex[ii] = PolyhedronIndex[ii] ;
+        //CCRT : copy of PolyhedronIndex
+        _polyhedronDescending = new MEDSKYLINEARRAY(getNumberOfPolyhedron(),_polyhedronNodal->getNumberOfFaces(),tmp_PolyhedronIndex,&PolyDescending[0]); // polyhedron index are the same for nodal and descending connectivities
 #else
-	  _polyhedronDescending = new MEDSKYLINEARRAY(getNumberOfPolyhedron(),_polyhedronNodal->getNumberOfFaces(),_polyhedronNodal->getPolyhedronIndex(),&PolyDescending[0]); // polyhedron index are the same for nodal and descending connectivities
+        _polyhedronDescending = new MEDSKYLINEARRAY(getNumberOfPolyhedron(),_polyhedronNodal->getNumberOfFaces(),_polyhedronNodal->getPolyhedronIndex(),&PolyDescending[0]); // polyhedron index are the same for nodal and descending connectivities
 #endif
 
-	  if (_constituent->_polygonsNodal != NULL)
-	    delete [] _constituent->_polygonsNodal;
-	  _constituent->_polygonsNodal = new MEDSKYLINEARRAY(Constituentpolygonsnodalindex.size()-1,Constituentpolygonsnodalvalue.size(),&Constituentpolygonsnodalindex[0],&Constituentpolygonsnodalvalue[0]);
-	}
+        if (_constituent->_polygonsNodal != NULL)
+          delete [] _constituent->_polygonsNodal;
+        _constituent->_polygonsNodal = new MEDSKYLINEARRAY(Constituentpolygonsnodalindex.size()-1,Constituentpolygonsnodalvalue.size(),&Constituentpolygonsnodalindex[0],&Constituentpolygonsnodalvalue[0]);
+      }
 
       // delete _constituent->_nodal
       _constituent->_nodal = new MEDSKYLINEARRAY(NumberOfConstituent,
-						 SizeOfConstituentNodal,
-						 &Constituentnodalindex[0],
-						 &Constituentnodalvalue[0]);
+                                                 SizeOfConstituentNodal,
+                                                 &Constituentnodalindex[0],
+                                                 &Constituentnodalvalue[0]);
 
       int NumberOfConstituentWithPolygons = NumberOfConstituent + NumberOfNewFaces;
       Reversedescendingconnectivityindex.push_back(Reversedescendingconnectivityindex[Reversedescendingconnectivityindex.size()-1]+2); // we complete the index
       _reverseDescendingConnectivity = new MEDSKYLINEARRAY(NumberOfConstituentWithPolygons+1,
-							   2*NumberOfConstituentWithPolygons,
-							   &Reversedescendingconnectivityindex[0],
-							   &Reversedescendingconnectivityvalue[0]);
+                                                           2*NumberOfConstituentWithPolygons,
+                                                           &Reversedescendingconnectivityindex[0],
+                                                           &Reversedescendingconnectivityvalue[0]);
       ////
       _isDescendingConnectivityPartial = false;
     }
-  END_OF_MED(LOC);
+    END_OF_MED(LOC);
   }
 }
-	
+
 void CONNECTIVITY::addToDescendingConnectivity(const set<int>& nodes,
                                                multimap<int,int>& descending,
                                                int iglobal_cell,
                                                const CONNECTIVITY_HashMap & face_map )
 {
-	int dimension = getEntityDimension();
-	vector<int> signature (dimension);
-	set<int>::const_iterator iter=nodes.begin();
-	for (int i=0; i< dimension;i++)
-		{
-			signature[i]=*iter;
-			iter++;
-		}
-	
-	
-	CONNECTIVITY_HashMap::const_iterator itermap=face_map.find(signature);
-	CONNECTIVITY_HashMap::const_iterator iterend=face_map.end();
-	
-	
-	if (itermap!=iterend)
-		descending.insert(make_pair(iglobal_cell,itermap->second));
-	
+  int dimension = getEntityDimension();
+  vector<int> signature (dimension);
+  set<int>::const_iterator iter=nodes.begin();
+  for (int i=0; i< dimension;i++)
+  {
+    signature[i]=*iter;
+    iter++;
+  }
+
+
+  CONNECTIVITY_HashMap::const_iterator itermap=face_map.find(signature);
+  CONNECTIVITY_HashMap::const_iterator iterend=face_map.end();
+
+
+  if (itermap!=iterend)
+    descending.insert(make_pair(iglobal_cell,itermap->second));
+
 }
 
 /*! This method calculates the descending connectivity without creating missing elements. It only maps the constituent elements that are described in the nodal representation. 
-For instance, let us consider the following mesh with no MED_EDGE elements on the inner edges.
+  For instance, let us consider the following mesh with no MED_EDGE elements on the inner edges.
 
-+----1----+----2----+
-|         |         |
-8    1    |    2    3
-|         |         |
-+---------+---------+
-|         |         |
-7    3    |    4    4
-|         |         |
-+----6----+----5----+
+  +----1----+----2----+
+  |         |         |
+  8    1    |    2    3
+  |         |         |
+  +---------+---------+
+  |         |         |
+  7    3    |    4    4
+  |         |         |
+  +----6----+----5----+
 
 
-calculatePartialDescendingConnectivity()
-will return
-1:1,8
-2:2,3
-3:6,7
-4:4,5
+  calculatePartialDescendingConnectivity()
+  will return
+  1:1,8
+  2:2,3
+  3:6,7
+  4:4,5
 
-whereas calculateDescendingConnectivity()
-will create new edges, renumbering existing ones and return
-1:1,2,3,4
-2:5,6,7,2
-3:3,8,9,10
-4:7,11,12,8
+  whereas calculateDescendingConnectivity()
+  will create new edges, renumbering existing ones and return
+  1:1,2,3,4
+  2:5,6,7,2
+  3:3,8,9,10
+  4:7,11,12,8
 
-+----1----+----5----+
-|         |         |
-4    1    2    2    6
-|         |         |
-+----3----+----7----+
-|         |         |
-10    3   8    4    11
-|         |         |
-+----9----+----12---+
+  +----1----+----5----+
+  |         |         |
+  4    1    2    2    6
+  |         |         |
+  +----3----+----7----+
+  |         |         |
+  10    3   8    4    11
+  |         |         |
+  +----9----+----12---+
 */
 
 void CONNECTIVITY::calculatePartialDescendingConnectivity()
 {
-	////////////////////////////////////////////////////////////////////////////
-	// First stage : creating hash_map referencing faces with the triplet
-	// of the lowest order nodes as a key and the global face number as a value
-	
-	CONNECTIVITY_HashMap face_map;
-	const medGeometryElement* face_types = _constituent->getGeometricTypes(_constituent->getEntity());
-	int nbface_types=_constituent->getNumberOfTypes(_constituent->getEntity());
-	int iglobal_face=1;
-	
-	int dimension = getEntityDimension();
+  ////////////////////////////////////////////////////////////////////////////
+  // First stage : creating hash_map referencing faces with the triplet
+  // of the lowest order nodes as a key and the global face number as a value
 
-	//classical types
-	for (int itype=0; itype<nbface_types; itype++)
-		{
-			medGeometryElement face_type=face_types[itype];
-			int nbnodes=face_type%100;
-			int nbfaces=_constituent->getNumberOf(_constituent->getEntity(),face_type);
-			for (int iface=0;iface<nbfaces;iface++)
-				{
-					set<int> nodes;
-					const int* index=_constituent->_nodal->getIndex();
-					const int* conn=_constituent->_nodal->getValue();
-					for (int inode=0;inode<nbnodes;inode++)
-						nodes.insert(conn[index[iglobal_face-1]-1+inode]);
-					vector<int> signature (dimension);
-					set<int>::iterator iter=nodes.begin();
-					for (int i=0; i< dimension;i++)
-						{
-							signature[i]=*iter;
-							iter++;
-						}
-					face_map.insert(make_pair(signature,iglobal_face));
-					iglobal_face++;
-				}			
-		}
+  CONNECTIVITY_HashMap face_map;
+  const medGeometryElement* face_types = _constituent->getGeometricTypes(_constituent->getEntity());
+  int nbface_types=_constituent->getNumberOfTypes(_constituent->getEntity());
+  int iglobal_face=1;
 
-	//polygons
-	if (dimension==3 && _polygonsNodal!=0)
-		{
-			int nbfaces=_constituent->getNumberOfPolygons();
-			for (int iface=0;iface<nbfaces;iface++)
-				{
-					set<int> nodes;
-					const int* index=_constituent->_polygonsNodal->getIndex();
-					int nbnodes=index[iface+1]-index[iface];
-					const int* conn=_constituent->_polygonsNodal->getValue();
-					for (int inode=0;inode<nbnodes;inode++)
-						nodes.insert(conn[index[iface]-1+inode]);
-					vector<int> signature (dimension);
-					set<int>::iterator iter=nodes.begin();
-					for (int i=0; i< dimension;i++)
-						{
-							signature[i]=*iter;
-							iter++;
-						}
-					face_map.insert(make_pair(signature,iglobal_face));
-					iglobal_face++;
-				}	
-		}
+  int dimension = getEntityDimension();
 
-	////////////////////////////////////////////////////////////////////////////
-	//Second stage : going through all the faces of the cells and
-	// connecting them to the hash_map created in the first stage
+  //classical types
+  for (int itype=0; itype<nbface_types; itype++)
+  {
+    medGeometryElement face_type=face_types[itype];
+    int nbnodes=face_type%100;
+    int nbfaces=_constituent->getNumberOf(_constituent->getEntity(),face_type);
+    for (int iface=0;iface<nbfaces;iface++)
+    {
+      set<int> nodes;
+      const int* index=_constituent->_nodal->getIndex();
+      const int* conn=_constituent->_nodal->getValue();
+      for (int inode=0;inode<nbnodes;inode++)
+        nodes.insert(conn[index[iglobal_face-1]-1+inode]);
+      vector<int> signature (dimension);
+      set<int>::iterator iter=nodes.begin();
+      for (int i=0; i< dimension;i++)
+      {
+        signature[i]=*iter;
+        iter++;
+      }
+      face_map.insert(make_pair(signature,iglobal_face));
+      iglobal_face++;
+    }       
+  }
 
-	multimap<int,int> descending; //map storing the descending connectivity
+  //polygons
+  if (dimension==3 && _polygonsNodal!=0)
+  {
+    int nbfaces=_constituent->getNumberOfPolygons();
+    for (int iface=0;iface<nbfaces;iface++)
+    {
+      set<int> nodes;
+      const int* index=_constituent->_polygonsNodal->getIndex();
+      int nbnodes=index[iface+1]-index[iface];
+      const int* conn=_constituent->_polygonsNodal->getValue();
+      for (int inode=0;inode<nbnodes;inode++)
+        nodes.insert(conn[index[iface]-1+inode]);
+      vector<int> signature (dimension);
+      set<int>::iterator iter=nodes.begin();
+      for (int i=0; i< dimension;i++)
+      {
+        signature[i]=*iter;
+        iter++;
+      }
+      face_map.insert(make_pair(signature,iglobal_face));
+      iglobal_face++;
+    } 
+  }
 
-	//classical types
-	int nbcell_types=getNumberOfTypes(_entity);
-	const medGeometryElement* cell_types=getGeometricTypes(_entity);
-	int iglobal_cell=1;
-	for (int itype=0; itype<nbcell_types; itype++)
-		{
-			medGeometryElement cell_type=cell_types[itype];
-			int nbcells=getNumberOf(_entity,cell_type);
-		
-			CELLMODEL cellmodel=CELLMODEL_Map::retrieveCellModel(cell_type);
-			for (int icell=0;icell<nbcells;icell++)
-				{
-					int nbfaces=cellmodel.getNumberOfConstituents(1);
-					for (int iface=0; iface<nbfaces;iface++)
-						{
-							set<int> nodes;
-							const int* local_index=cellmodel.getNodesConstituent(1,iface+1);
-							medGeometryElement face_type = cellmodel.getConstituentType(1,iface+1);
-							const int* index=_nodal->getIndex();
-							const int* conn=_nodal->getValue();
-							int nbnodes=face_type%100;
-							for (int inode=0;inode<nbnodes;inode++)
-								nodes.insert(conn[index[iglobal_cell-1]-1+local_index[inode]-1]);
-							addToDescendingConnectivity(nodes,descending,iglobal_cell,face_map);
-						}
-					iglobal_cell++;
-				}
-		}
+  ////////////////////////////////////////////////////////////////////////////
+  //Second stage : going through all the faces of the cells and
+  // connecting them to the hash_map created in the first stage
 
-	// polygon case
-	if (dimension==2 && _polygonsNodal!=0)
+  multimap<int,int> descending; //map storing the descending connectivity
+
+  //classical types
+  int nbcell_types=getNumberOfTypes(_entity);
+  const medGeometryElement* cell_types=getGeometricTypes(_entity);
+  int iglobal_cell=1;
+  for (int itype=0; itype<nbcell_types; itype++)
+  {
+    medGeometryElement cell_type=cell_types[itype];
+    int nbcells=getNumberOf(_entity,cell_type);
+
+    CELLMODEL cellmodel=CELLMODEL_Map::retrieveCellModel(cell_type);
+    for (int icell=0;icell<nbcells;icell++)
+    {
+      int nbfaces=cellmodel.getNumberOfConstituents(1);
+      for (int iface=0; iface<nbfaces;iface++)
+      {
+        set<int> nodes;
+        const int* local_index=cellmodel.getNodesConstituent(1,iface+1);
+        medGeometryElement face_type = cellmodel.getConstituentType(1,iface+1);
+        const int* index=_nodal->getIndex();
+        const int* conn=_nodal->getValue();
+        int nbnodes=face_type%100;
+        for (int inode=0;inode<nbnodes;inode++)
+          nodes.insert(conn[index[iglobal_cell-1]-1+local_index[inode]-1]);
+        addToDescendingConnectivity(nodes,descending,iglobal_cell,face_map);
+      }
+      iglobal_cell++;
+    }
+  }
+
+  // polygon case
+  if (dimension==2 && _polygonsNodal!=0)
+  {
+    int nbcells=getNumberOfElementsWithPoly(_entity,MED_POLYGON);
+    const int* index = _polygonsNodal->getIndex();
+    const int* conn = _polygonsNodal->getValue();
+
+    for (int icell=0;icell<nbcells;icell++)
+    {
+      int nbnodes=index[icell+1]-index[icell];
+      int nbfaces=nbnodes;
+      for (int iface=0; iface<nbfaces;iface++)
+      {
+        set<int> nodes;
+        if (iface+1!=nbfaces)
         {
-          int nbcells=getNumberOfElementsWithPoly(_entity,MED_POLYGON);
-          const int* index = _polygonsNodal->getIndex();
-          const int* conn = _polygonsNodal->getValue();
-
-          for (int icell=0;icell<nbcells;icell++)
-          {
-            int nbnodes=index[icell+1]-index[icell];
-            int nbfaces=nbnodes;
-            for (int iface=0; iface<nbfaces;iface++)
-            {
-              set<int> nodes;
-              if (iface+1!=nbfaces)
-              {
-                nodes.insert(conn[index[icell]-1+iface]);
-                nodes.insert(conn[index[icell]-1+iface+1]);
-              }
-              else
-              {
-                nodes.insert(conn[index[icell]-1+iface]);
-                nodes.insert(conn[index[icell]-1]);
-              }
-              addToDescendingConnectivity(nodes,descending,iglobal_cell,face_map);
-            }
-            iglobal_cell++;
-          }
+          nodes.insert(conn[index[icell]-1+iface]);
+          nodes.insert(conn[index[icell]-1+iface+1]);
         }
-
-	//polyhedra case
-	if (dimension==3 && _polyhedronNodal!=0)
+        else
         {
-          int nbcells = getNumberOfElementsWithPoly(_entity,MED_POLYHEDRA);
-          const MED_EN::med_int* index = _polyhedronNodal->getPolyhedronIndex();
-          const MED_EN::med_int* conn = _polyhedronNodal->getNodes();
-          const MED_EN::med_int* face_index = _polyhedronNodal->getFacesIndex();
-
-          for (int icell = 0; icell < nbcells; icell++)
-          {
-            for (int iface = face_index[icell]; iface < face_index[icell+1]; iface++)
-            {
-              set<int> nodes;
-              for (int inode = index[iface-1]; iface < index[iface]; iface++)
-                nodes.insert(conn[inode-1]);
-              addToDescendingConnectivity(nodes,descending,iglobal_cell,face_map);
-            }
-            iglobal_cell++;
-          }
+          nodes.insert(conn[index[icell]-1+iface]);
+          nodes.insert(conn[index[icell]-1]);
         }
+        addToDescendingConnectivity(nodes,descending,iglobal_cell,face_map);
+      }
+      iglobal_cell++;
+    }
+  }
+
+  //polyhedra case
+  if (dimension==3 && _polyhedronNodal!=0)
+  {
+    int nbcells = getNumberOfElementsWithPoly(_entity,MED_POLYHEDRA);
+    const MED_EN::med_int* index = _polyhedronNodal->getPolyhedronIndex();
+    const MED_EN::med_int* conn = _polyhedronNodal->getNodes();
+    const MED_EN::med_int* face_index = _polyhedronNodal->getFacesIndex();
+
+    for (int icell = 0; icell < nbcells; icell++)
+    {
+      for (int iface = face_index[icell]; iface < face_index[icell+1]; iface++)
+      {
+        set<int> nodes;
+        for (int inode = index[iface-1]; iface < index[iface]; iface++)
+          nodes.insert(conn[inode-1]);
+        addToDescendingConnectivity(nodes,descending,iglobal_cell,face_map);
+      }
+      iglobal_cell++;
+    }
+  }
 
 
-	////////////////////////////////////////////////////////////////////////////
-	// Third stage : reorganizing the descending data to store it in a medskylinearray
+  ////////////////////////////////////////////////////////////////////////////
+  // Third stage : reorganizing the descending data to store it in a medskylinearray
 
-	vector<int> index;
-	vector<int> value;
-	index.push_back(1);
+  vector<int> index;
+  vector<int> value;
+  index.push_back(1);
 
-	//the number of cells is given by the number
-	//obtained by browsing all the cell types
-	int nb_cells = iglobal_cell-1;
+  //the number of cells is given by the number
+  //obtained by browsing all the cell types
+  int nb_cells = iglobal_cell-1;
 
-	for (int icell=0; icell< nb_cells;icell++)
-		{
-			multimap<int,int>::iterator beginning_of_range = descending.lower_bound(icell);
-			multimap<int,int>::iterator end_of_range = descending.upper_bound(icell);
-			int nb=0;
-			for (multimap<int,int>::iterator iter2 = beginning_of_range; iter2!=end_of_range;iter2++)
-				{
-					value.push_back(iter2->second);
-					nb++;
-				}
-			index.push_back(index[index.size()-1]+nb);
-		}
-	_descending=new MEDSKYLINEARRAY(index.size()-1,value.size(),&index[0],&value[0]);
-	_isDescendingConnectivityPartial = true;
+  for (int icell=0; icell< nb_cells;icell++)
+  {
+    multimap<int,int>::iterator beginning_of_range = descending.lower_bound(icell);
+    multimap<int,int>::iterator end_of_range = descending.upper_bound(icell);
+    int nb=0;
+    for (multimap<int,int>::iterator iter2 = beginning_of_range; iter2!=end_of_range;iter2++)
+    {
+      value.push_back(iter2->second);
+      nb++;
+    }
+    index.push_back(index[index.size()-1]+nb);
+  }
+  _descending=new MEDSKYLINEARRAY(index.size()-1,value.size(),&index[0],&value[0]);
+  _isDescendingConnectivityPartial = true;
 }
 
 
 /*! Not implemented yet */
 //--------------------------------------------------------------------//
 void CONNECTIVITY::calculateNeighbourhood(CONNECTIVITY &myConnectivity)
-//--------------------------------------------------------------------//
+  //--------------------------------------------------------------------//
 {
   const char* LOC = "CONNECTIVITY::calculateNeighbourhood(CONNECTIVITY &myConnectivity) : ";
   BEGIN_OF_MED(LOC);
@@ -2205,7 +2205,7 @@ void CONNECTIVITY::calculateNeighbourhood(CONNECTIVITY &myConnectivity)
 */
 //--------------------------------------------------------------------//
 medGeometryElement CONNECTIVITY::getElementType(medEntityMesh Entity,int globalNumber) const
-//--------------------------------------------------------------------//
+  //--------------------------------------------------------------------//
 {
   const char * LOC = "medGeometryElement CONNECTIVITY::getElementType(medEntityMesh Entity, int globalNumber) const : ";
   BEGIN_OF_MED(LOC);
@@ -2226,7 +2226,7 @@ medGeometryElement CONNECTIVITY::getElementType(medEntityMesh Entity,int globalN
   if (_entity==Entity) {
     for(int i=1; i<=_numberOfTypes;i++)
       if (globalNumber<_count[i])
-	return _geometricTypes[i-1];
+        return _geometricTypes[i-1];
   }
   else if (_constituent!=NULL)
     return _constituent->getElementType(Entity,globalNumber);
@@ -2242,202 +2242,202 @@ medGeometryElement CONNECTIVITY::getElementType(medEntityMesh Entity,int globalN
 */
 //--------------------------------------------------------------------//
 medGeometryElement CONNECTIVITY::getElementTypeWithPoly(medEntityMesh Entity,int globalNumber) const
-//--------------------------------------------------------------------//
+  //--------------------------------------------------------------------//
 {
   int globalNumberMaxOfClassicType;
   if(_entity==Entity)
+  {
+    if (_count==0)
+      globalNumberMaxOfClassicType = 1;
+    else
+      globalNumberMaxOfClassicType=_count[_numberOfTypes];
+    if(globalNumber>=1)
     {
-      if (_count==0)
-        globalNumberMaxOfClassicType = 1;
+      if(globalNumber<globalNumberMaxOfClassicType)
+      {
+        for(int i=1; i<=_numberOfTypes;i++)
+          if (globalNumber<_count[i])
+            return _geometricTypes[i-1];
+        throw MEDEXCEPTION("never happens just for compilo");
+      }
       else
-        globalNumberMaxOfClassicType=_count[_numberOfTypes];
-      if(globalNumber>=1)
-	{
-	  if(globalNumber<globalNumberMaxOfClassicType)
-	    {
-	      for(int i=1; i<=_numberOfTypes;i++)
-		if (globalNumber<_count[i])
-		  return _geometricTypes[i-1];
-	      throw MEDEXCEPTION("never happens just for compilo");
-	    }
-	  else
-	    {
-	      int localNumberInPolyArray=globalNumber-globalNumberMaxOfClassicType;
-	      int nbOfPol=getNumberOfElementOfPolyType(_entity);
-	      if(localNumberInPolyArray<nbOfPol)
-		return getPolyTypeRelativeTo();
-	      else
-		throw MEDEXCEPTION("getElementTypeWithPoly : unexisting element type");
-	    }
-	}
-      else
-	throw MEDEXCEPTION("getElementTypeWithPoly : globalNumber < 1");
+      {
+        int localNumberInPolyArray=globalNumber-globalNumberMaxOfClassicType;
+        int nbOfPol=getNumberOfElementOfPolyType(_entity);
+        if(localNumberInPolyArray<nbOfPol)
+          return getPolyTypeRelativeTo();
+        else
+          throw MEDEXCEPTION("getElementTypeWithPoly : unexisting element type");
+      }
     }
+    else
+      throw MEDEXCEPTION("getElementTypeWithPoly : globalNumber < 1");
+  }
   else
-    {
-      if(_constituent!=NULL)
-	return _constituent->getElementTypeWithPoly(Entity,globalNumber);
-      else
-	throw MEDEXCEPTION("getElementTypeWithPoly : Entity not defined !");
-    }
+  {
+    if(_constituent!=NULL)
+      return _constituent->getElementTypeWithPoly(Entity,globalNumber);
+    else
+      throw MEDEXCEPTION("getElementTypeWithPoly : Entity not defined !");
+  }
 }
 
 ostream & MEDMEM::operator<<(ostream &os, CONNECTIVITY &co)
 {
-    os << endl << "------------- Entity = ";
-    switch (co._entity)
+  os << endl << "------------- Entity = ";
+  switch (co._entity)
+  {
+  case MED_CELL:
+    os << "MED_CELL";
+    break;
+  case MED_FACE:
+    os << "MED_FACE";
+    break;
+  case MED_EDGE:
+    os << "MED_EDGE";
+    break;
+  case MED_NODE:
+    os << "MED_NODE";
+    break;
+  case MED_ALL_ENTITIES:
+    os << "MED_ALL_ENTITIES";
+    break;
+  default:
+    os << "Unknown";
+    break;
+  }
+  os  << " -------------\n\nMedConnectivity : ";
+  switch (co._typeConnectivity)
+  {
+  case MED_NODAL:
+    os << "MED_NODAL\n";
+    break;
+  case MED_DESCENDING:
+    os << "MED_DESCENDING\n";
+    break;
+  default:
+    break;
+  }
+  os << "Entity dimension : " << co._entityDimension << endl;
+  os << "Number of nodes : " << co._numberOfNodes << endl;
+  os << "Number of types : " << co._numberOfTypes << endl;
+  for (int i=0; i!=co._numberOfTypes ; ++i)
+    os << "  -> Type " << co._geometricTypes[i] << " (" << co._type[i].getName() << ") : "
+       << co._count[i+1]-co._count[i] << " elements" << endl;
+
+  if (co._typeConnectivity == MED_NODAL )
+  {
+    for (int i=0; i<co._numberOfTypes; i++)
     {
-	case MED_CELL:
-	    os << "MED_CELL";
-	    break;
-	case MED_FACE:
-	    os << "MED_FACE";
-	    break;
-	case MED_EDGE:
-	    os << "MED_EDGE";
-	    break;
-	case MED_NODE:
-	    os << "MED_NODE";
-	    break;
-	case MED_ALL_ENTITIES:
-	    os << "MED_ALL_ENTITIES";
-	    break;
-	default:
-	    os << "Unknown";
-	    break;
-    }
-    os  << " -------------\n\nMedConnectivity : ";
-    switch (co._typeConnectivity)
-    {
-	case MED_NODAL:
-	    os << "MED_NODAL\n";
-	    break;
-	case MED_DESCENDING:
-	    os << "MED_DESCENDING\n";
-	    break;
-	default:
-	    break;
-    }
-    os << "Entity dimension : " << co._entityDimension << endl;
-    os << "Number of nodes : " << co._numberOfNodes << endl;
-    os << "Number of types : " << co._numberOfTypes << endl;
-    for (int i=0; i!=co._numberOfTypes ; ++i)
-	os << "  -> Type " << co._geometricTypes[i] << " (" << co._type[i].getName() << ") : "
-	   << co._count[i+1]-co._count[i] << " elements" << endl;
-
-    if (co._typeConnectivity == MED_NODAL )
-    {
-	for (int i=0; i<co._numberOfTypes; i++)
-	{
-	    os << endl << co._type[i].getName() << " : " << endl;
-	    int numberofelements = co._count[i+1]-co._count[i];
-	    const int * connectivity = co.getConnectivity(co._typeConnectivity, co._entity, co._geometricTypes[i]);
-	    int numberofnodespercell = co._geometricTypes[i]%100;
-	    for (int j=0;j<numberofelements;j++)
-	    {
-		os << setw(6) << j+1 << " : ";
-		for (int k=0;k<numberofnodespercell;k++)
-		    os << connectivity[j*numberofnodespercell+k]<<" ";
-		os << endl;
-	    }
-	}
-
-	os << endl << "MED_POLYGON : " << co.getNumberOfPolygons() << " polygons" << endl;
-	if (co.getNumberOfPolygons() > 0)
-	  {
-	    const int* polygonsconnectivity = co.getPolygonsConnectivity(MED_NODAL,co.getEntity());
-	    const int* polygonsconnectivityindex = co.getPolygonsConnectivityIndex(MED_NODAL,co.getEntity());
-
-	    for (int i=0; i<co.getNumberOfPolygons(); i++)
-	      {
-		int numberofnodesperpolygon = polygonsconnectivityindex[i+1]-polygonsconnectivityindex[i];
-		for (int j=0; j<numberofnodesperpolygon; j++)
-		  os << polygonsconnectivity[polygonsconnectivityindex[i]-1+j] << " ";
-		os << endl;
-	      }
-	  }
-
-	os << endl << "MED_POLYHEDRA : " << co.getNumberOfPolyhedron() << " polyhedron" << endl;
-	if (co.getNumberOfPolyhedron() > 0)
-	  {
-	    const int* polyhedronconnectivity = co.getPolyhedronConnectivity(MED_NODAL);
-	    const int* polyhedronfacesindex = co.getPolyhedronFacesIndex();
-	    const int* polyhedronindex = co.getPolyhedronIndex(MED_NODAL);
-
-	    for (int i=0; i<co.getNumberOfPolyhedron(); i++)
-	      {
-		int numberoffacesperpolyhedra = polyhedronindex[i+1]-polyhedronindex[i];
-		for (int j=0; j<numberoffacesperpolyhedra; j++)
-		  {
-		    int numberofnodesperface = polyhedronfacesindex[polyhedronindex[i]-1+j+1]-polyhedronfacesindex[polyhedronindex[i]-1+j];
-		    for (int k=0; k<numberofnodesperface; k++)
-		      os << polyhedronconnectivity[polyhedronfacesindex[polyhedronindex[i]-1+j]-1+k] << " ";
-		    if (j != numberoffacesperpolyhedra-1) os << "| ";
-		  }
-		os << endl;
-	      }
-	  }
-
-    }
-    else if (co._typeConnectivity == MED_DESCENDING)
-    {
-	int numberofelements = co.getNumberOf( co._entity , MED_ALL_ELEMENTS);
-	if (numberofelements > 0)
-	  {
-	    const int *connectivity =  co.getConnectivity( co._typeConnectivity, co._entity, MED_ALL_ELEMENTS);
-	    const int *connectivity_index =  co.getConnectivityIndex( co._typeConnectivity, co._entity );
-
-	    for ( int j=0; j!=numberofelements; j++ )
-	      {
-		os << "Element " << j+1 << " : ";
-		for ( int k=connectivity_index[j]; k!=connectivity_index[j+1]; k++ )
-		  os << connectivity[k-1] << " ";
-		os << endl;
-	      }
-	  }
-
-	os << endl << "MED_POLYGON : " << co.getNumberOfPolygons() << " polygons" << endl;
-	if (co.getNumberOfPolygons() > 0)
-	  {
-	    const int* polygonsconnectivity = co.getPolygonsConnectivity(MED_DESCENDING,co.getEntity());
-	    const int* polygonsconnectivityindex = co.getPolygonsConnectivityIndex(MED_DESCENDING,co.getEntity());
-
-	    for (int i=0; i<co.getNumberOfPolygons(); i++)
-	      {
-		int numberofedgesperpolygon = polygonsconnectivityindex[i+1]-polygonsconnectivityindex[i];
-		for (int j=0; j<numberofedgesperpolygon; j++)
-		  os << polygonsconnectivity[polygonsconnectivityindex[i]-1+j] << " ";
-		os << endl;
-	      }
-	  }
-
-	os << endl << "MED_POLYHEDRA : " << co.getNumberOfPolyhedron() << " polyhedron" << endl;
-	if (co.getNumberOfPolyhedron() > 0)
-	  {
-	    const int* polyhedronconnectivity = co.getPolyhedronConnectivity(MED_DESCENDING);
-	    const int* polyhedronindex = co.getPolyhedronIndex(MED_DESCENDING);
-
-	    for (int i=0; i<co.getNumberOfPolyhedron(); i++)
-	      {
-		int numberoffacesperpolyhedra = polyhedronindex[i+1]-polyhedronindex[i];
-		for (int j=0; j<numberoffacesperpolyhedra; j++)
-		  os << polyhedronconnectivity[polyhedronindex[i]-1+j] << " ";
-		os << endl;
-	      }
-	  }
-
+      os << endl << co._type[i].getName() << " : " << endl;
+      int numberofelements = co._count[i+1]-co._count[i];
+      const int * connectivity = co.getConnectivity(co._typeConnectivity, co._entity, co._geometricTypes[i]);
+      int numberofnodespercell = co._geometricTypes[i]%100;
+      for (int j=0;j<numberofelements;j++)
+      {
+        os << setw(6) << j+1 << " : ";
+        for (int k=0;k<numberofnodespercell;k++)
+          os << connectivity[j*numberofnodespercell+k]<<" ";
+        os << endl;
+      }
     }
 
-    if (co._constituent)
-	os << endl << *co._constituent << endl;
+    os << endl << "MED_POLYGON : " << co.getNumberOfPolygons() << " polygons" << endl;
+    if (co.getNumberOfPolygons() > 0)
+    {
+      const int* polygonsconnectivity = co.getPolygonsConnectivity(MED_NODAL,co.getEntity());
+      const int* polygonsconnectivityindex = co.getPolygonsConnectivityIndex(MED_NODAL,co.getEntity());
 
-    return os;
+      for (int i=0; i<co.getNumberOfPolygons(); i++)
+      {
+        int numberofnodesperpolygon = polygonsconnectivityindex[i+1]-polygonsconnectivityindex[i];
+        for (int j=0; j<numberofnodesperpolygon; j++)
+          os << polygonsconnectivity[polygonsconnectivityindex[i]-1+j] << " ";
+        os << endl;
+      }
+    }
+
+    os << endl << "MED_POLYHEDRA : " << co.getNumberOfPolyhedron() << " polyhedron" << endl;
+    if (co.getNumberOfPolyhedron() > 0)
+    {
+      const int* polyhedronconnectivity = co.getPolyhedronConnectivity(MED_NODAL);
+      const int* polyhedronfacesindex = co.getPolyhedronFacesIndex();
+      const int* polyhedronindex = co.getPolyhedronIndex(MED_NODAL);
+
+      for (int i=0; i<co.getNumberOfPolyhedron(); i++)
+      {
+        int numberoffacesperpolyhedra = polyhedronindex[i+1]-polyhedronindex[i];
+        for (int j=0; j<numberoffacesperpolyhedra; j++)
+        {
+          int numberofnodesperface = polyhedronfacesindex[polyhedronindex[i]-1+j+1]-polyhedronfacesindex[polyhedronindex[i]-1+j];
+          for (int k=0; k<numberofnodesperface; k++)
+            os << polyhedronconnectivity[polyhedronfacesindex[polyhedronindex[i]-1+j]-1+k] << " ";
+          if (j != numberoffacesperpolyhedra-1) os << "| ";
+        }
+        os << endl;
+      }
+    }
+
+  }
+  else if (co._typeConnectivity == MED_DESCENDING)
+  {
+    int numberofelements = co.getNumberOf( co._entity , MED_ALL_ELEMENTS);
+    if (numberofelements > 0)
+    {
+      const int *connectivity =  co.getConnectivity( co._typeConnectivity, co._entity, MED_ALL_ELEMENTS);
+      const int *connectivity_index =  co.getConnectivityIndex( co._typeConnectivity, co._entity );
+
+      for ( int j=0; j!=numberofelements; j++ )
+      {
+        os << "Element " << j+1 << " : ";
+        for ( int k=connectivity_index[j]; k!=connectivity_index[j+1]; k++ )
+          os << connectivity[k-1] << " ";
+        os << endl;
+      }
+    }
+
+    os << endl << "MED_POLYGON : " << co.getNumberOfPolygons() << " polygons" << endl;
+    if (co.getNumberOfPolygons() > 0)
+    {
+      const int* polygonsconnectivity = co.getPolygonsConnectivity(MED_DESCENDING,co.getEntity());
+      const int* polygonsconnectivityindex = co.getPolygonsConnectivityIndex(MED_DESCENDING,co.getEntity());
+
+      for (int i=0; i<co.getNumberOfPolygons(); i++)
+      {
+        int numberofedgesperpolygon = polygonsconnectivityindex[i+1]-polygonsconnectivityindex[i];
+        for (int j=0; j<numberofedgesperpolygon; j++)
+          os << polygonsconnectivity[polygonsconnectivityindex[i]-1+j] << " ";
+        os << endl;
+      }
+    }
+
+    os << endl << "MED_POLYHEDRA : " << co.getNumberOfPolyhedron() << " polyhedron" << endl;
+    if (co.getNumberOfPolyhedron() > 0)
+    {
+      const int* polyhedronconnectivity = co.getPolyhedronConnectivity(MED_DESCENDING);
+      const int* polyhedronindex = co.getPolyhedronIndex(MED_DESCENDING);
+
+      for (int i=0; i<co.getNumberOfPolyhedron(); i++)
+      {
+        int numberoffacesperpolyhedra = polyhedronindex[i+1]-polyhedronindex[i];
+        for (int j=0; j<numberoffacesperpolyhedra; j++)
+          os << polyhedronconnectivity[polyhedronindex[i]-1+j] << " ";
+        os << endl;
+      }
+    }
+
+  }
+
+  if (co._constituent)
+    os << endl << *co._constituent << endl;
+
+  return os;
 }
 
 /*!
   method that adds to vector 'nodes' all the nodes of polyhedron with id 'polyhedronId'.
   WARNING the returned pointer should be deallocated. Returned nodes and polyhedronId are in form [1,...]
- */
+*/
 int *CONNECTIVITY::getNodesOfPolyhedron(int polyhedronId, int& lgthOfTab) const
 {
   const int *nodes=getPolyhedronConnectivity(MED_EN::MED_NODAL);
@@ -2451,10 +2451,10 @@ int *CONNECTIVITY::getNodesOfPolyhedron(int polyhedronId, int& lgthOfTab) const
   int endFace=glob[polyhedronId-offsetWithClassicType]-1;
   int i;
   for(i=startFace;i!=endFace;i++)
-    {
-      for(int j=faces[i];j<faces[i+1];j++)
-	retInSet.insert(nodes[j-1]);
-    }
+  {
+    for(int j=faces[i];j<faces[i+1];j++)
+      retInSet.insert(nodes[j-1]);
+  }
   lgthOfTab=retInSet.size();
   int *ret=new int[lgthOfTab];
   set<int>::iterator iter=retInSet.begin();
@@ -2468,7 +2468,7 @@ int *CONNECTIVITY::getNodesOfPolyhedron(int polyhedronId, int& lgthOfTab) const
   Idem as MESH::getNodesOfPolyhedron except that returned nodes are sorted by face. 'nbOfNodesPerFaces' is an array of size 'nbOfFaces'.
   Returned int** has a size of 'nbOfNodesPerFaces' too, and for each element j in int** the size is  nbOfNodesPerFaces[j].
   Warning both returned 'nbOfNodesPerFaces' and returned value should be deallocated. Returned nodes and 'polyhedronId' are in form [1,...]
- */
+*/
 int **CONNECTIVITY::getNodesPerFaceOfPolyhedron(int polyhedronId, int& nbOfFaces, int* & nbOfNodesPerFaces) const
 {
   int i;
@@ -2478,17 +2478,17 @@ int **CONNECTIVITY::getNodesPerFaceOfPolyhedron(int polyhedronId, int& nbOfFaces
   int offsetWithClassicType=getNumberOf(_entity,MED_ALL_ELEMENTS);
   if (polyhedronId<offsetWithClassicType || polyhedronId> getNumberOfElementsWithPoly (MED_CELL, MED_ALL_ELEMENTS))
     throw MEDEXCEPTION("Polyhedron ID does not match a polyhedron in the element range");
- 
+
   int startFace=glob[polyhedronId-offsetWithClassicType-1]-1;
   nbOfFaces=glob[polyhedronId-offsetWithClassicType]-startFace-1;
   nbOfNodesPerFaces=new int[nbOfFaces];
   int **ret=new int* [nbOfFaces];
   for(i=0;i<nbOfFaces;i++)
-    {
-      int startNode=faces[startFace+i]-1;
-      nbOfNodesPerFaces[i]=faces[startFace+i+1]-startNode-1;
-      ret[i]=(int *)(nodes)+startNode;
-    }
+  {
+    int startNode=faces[startFace+i]-1;
+    nbOfNodesPerFaces[i]=faces[startFace+i+1]-startNode-1;
+    ret[i]=(int *)(nodes)+startNode;
+  }
   return ret;
 }
 
@@ -2497,11 +2497,11 @@ int CONNECTIVITY::getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const
   SCRUTE_MED(_entity);
   SCRUTE_MED(Entity);
   if (_entity==Entity)
-    {
-      SCRUTE_MED(_numberOfTypes);
-      SCRUTE_MED(getNumberOfPolyType());
-      return _numberOfTypes+getNumberOfPolyType();
-    }
+  {
+    SCRUTE_MED(_numberOfTypes);
+    SCRUTE_MED(getNumberOfPolyType());
+    return _numberOfTypes+getNumberOfPolyType();
+  }
   else if (_constituent!=NULL)
     return _constituent->getNumberOfTypesWithPoly(Entity);
   else
@@ -2511,10 +2511,10 @@ int CONNECTIVITY::getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const
 int CONNECTIVITY::getNumberOfPolyType()  const
 {
   if (_entity==MED_CELL && _entityDimension==3)
-    {
-      if(getNumberOfPolyhedron()>0)
-	return 1;
-    }
+  {
+    if(getNumberOfPolyhedron()>0)
+      return 1;
+  }
   else if ((_entity==MED_CELL && _entityDimension==2) || (_entity==MED_FACE))
     if(getNumberOfPolygons()>0)
       return 1;
@@ -2524,67 +2524,67 @@ int CONNECTIVITY::getNumberOfPolyType()  const
 int CONNECTIVITY::getNumberOfElementOfPolyType(MED_EN::medEntityMesh Entity)  const
 {
   if(_entity==Entity)
-    {
-      if (_entity==MED_CELL && _entityDimension==3)
-	return getNumberOfPolyhedron();
-      else if ((_entity==MED_CELL && _entityDimension==2) || (_entity==MED_FACE))
-	return getNumberOfPolygons();
-      return 0;
-    }
+  {
+    if (_entity==MED_CELL && _entityDimension==3)
+      return getNumberOfPolyhedron();
+    else if ((_entity==MED_CELL && _entityDimension==2) || (_entity==MED_FACE))
+      return getNumberOfPolygons();
+    return 0;
+  }
   else
-    {
-      if(_constituent!=NULL)
-	return _constituent->getNumberOfElementOfPolyType(Entity);
-      else
-        //throw MEDEXCEPTION("_constituent required to evaluate getNumberOfElementOfPolyType");
-        return 0;
-    }
+  {
+    if(_constituent!=NULL)
+      return _constituent->getNumberOfElementOfPolyType(Entity);
+    else
+      //throw MEDEXCEPTION("_constituent required to evaluate getNumberOfElementOfPolyType");
+      return 0;
+  }
 }
 
 /*
   Method equivalent to getGeometricTypes except that it includes not only classical Types but polygons/polyhedra also.
   WARNING the returned array MUST be deallocated.
- */
+*/
 MED_EN::medGeometryElement * CONNECTIVITY::getGeometricTypesWithPoly(MED_EN::medEntityMesh Entity) const throw (MEDEXCEPTION)
 {
   if(_entity==Entity)
+  {
+    int nbOfTypesTotal=getNumberOfTypesWithPoly(Entity);
+    int nbOfTypesWithoutPoly=getNumberOfTypes(Entity);
+    medGeometryElement *ret=new medGeometryElement[nbOfTypesTotal];
+    memcpy(ret,getGeometricTypes(Entity),nbOfTypesWithoutPoly*sizeof(medGeometryElement));
+    if(nbOfTypesTotal>nbOfTypesWithoutPoly)
     {
-      int nbOfTypesTotal=getNumberOfTypesWithPoly(Entity);
-      int nbOfTypesWithoutPoly=getNumberOfTypes(Entity);
-      medGeometryElement *ret=new medGeometryElement[nbOfTypesTotal];
-      memcpy(ret,getGeometricTypes(Entity),nbOfTypesWithoutPoly*sizeof(medGeometryElement));
-      if(nbOfTypesTotal>nbOfTypesWithoutPoly)
-	{
-	  if (Entity==MED_CELL && _entityDimension==3)
-	    ret[nbOfTypesWithoutPoly]=MED_EN::MED_POLYHEDRA;
-	  else if((Entity==MED_CELL && _entityDimension==2) || (Entity==MED_FACE))
-	    ret[nbOfTypesWithoutPoly]=MED_EN::MED_POLYGON;
-	}
-      return ret;
+      if (Entity==MED_CELL && _entityDimension==3)
+        ret[nbOfTypesWithoutPoly]=MED_EN::MED_POLYHEDRA;
+      else if((Entity==MED_CELL && _entityDimension==2) || (Entity==MED_FACE))
+        ret[nbOfTypesWithoutPoly]=MED_EN::MED_POLYGON;
     }
+    return ret;
+  }
   else
-    {
-      if(_constituent)
-	return _constituent->getGeometricTypesWithPoly(Entity);
-			else 
-				return 0;
-    }
+  {
+    if(_constituent)
+      return _constituent->getGeometricTypesWithPoly(Entity);
+    else 
+      return 0;
+  }
 }
 
 /*
   Method used in CalculateDescendingConnectivity. So it's typically a private method.
   The aim of this method is to hide to CalculateDescendingConnectivity algorithm the fact that in reverse connectivity polygons and polyhedrons
   are not in separate data structure, contrary to not reverse connectivities.
- */
+*/
 int CONNECTIVITY::getIndexOfEndClassicElementInReverseNodal(const int *reverseNodalValue, const int *reverseNodalIndex, int rk)  const
 {
   int nbOfLastElt=getNumberOf(_entity,MED_ALL_ELEMENTS);
   int ret=reverseNodalIndex[rk];
   for(int i=reverseNodalIndex[rk];i<reverseNodalIndex[rk+1];i++)
-    {
-      if(reverseNodalValue[i-1]<=nbOfLastElt)
-	ret++;
-    }
+  {
+    if(reverseNodalValue[i-1]<=nbOfLastElt)
+      ret++;
+  }
   return ret;
 }
 
@@ -2592,7 +2592,7 @@ int CONNECTIVITY::getIndexOfEndClassicElementInReverseNodal(const int *reverseNo
   Method that inverts the face with faceId 'faceId' in the data structure. If it's a polygon face 'faceId' is a value between 1 and nbOfPolygons.
   This method has to be applied on a instance of MEDMEM::CONNECTIVITY with _entityDimension==3.
   WARNING calculateDescendingConnectivity must have been called before.
- */
+*/
 void CONNECTIVITY::invertConnectivityForAFace(int faceId, const int *nodalConnForFace, bool polygonFace)
 {
   // we have always 2 neighbourings
@@ -2614,105 +2614,105 @@ void CONNECTIVITY::invertConnectivityForAFace(int faceId, const int *nodalConnFo
     const int NB_OF_CELLS_SHARING_A_FACE=2;
     int cellsToUpdate[NB_OF_CELLS_SHARING_A_FACE]; cellsToUpdate[0]=cell1; cellsToUpdate[1]=cell2;
     for(int curCell=0;curCell<NB_OF_CELLS_SHARING_A_FACE;curCell++)
+    {
+      int cell=cellsToUpdate[curCell];
+      bool polyhCell=(getElementTypeWithPoly(MED_CELL,cell)==MED_POLYHEDRA);
+      if(polyhCell)
+        cell-=getNumberOf(MED_CELL,MED_ALL_ELEMENTS);
+      const int *newDescendingIndex=(!polyhCell)?_descending->getIndex():_polyhedronDescending->getIndex();
+      MEDSKYLINEARRAY *currentDescending=(!polyhCell)?_descending:_polyhedronDescending;
+      for(int iface=newDescendingIndex[cell-1];iface<newDescendingIndex[cell];iface++)
       {
-	int cell=cellsToUpdate[curCell];
-	bool polyhCell=(getElementTypeWithPoly(MED_CELL,cell)==MED_POLYHEDRA);
-	if(polyhCell)
-	  cell-=getNumberOf(MED_CELL,MED_ALL_ELEMENTS);
-	const int *newDescendingIndex=(!polyhCell)?_descending->getIndex():_polyhedronDescending->getIndex();
-	MEDSKYLINEARRAY *currentDescending=(!polyhCell)?_descending:_polyhedronDescending;
-	for(int iface=newDescendingIndex[cell-1];iface<newDescendingIndex[cell];iface++)
-	  {
-	    int curValue=currentDescending->getIndexValue(iface);
-	    if (abs(curValue)==faceId)
-	      currentDescending->setIndexValue(iface,-curValue);
-	  }
+        int curValue=currentDescending->getIndexValue(iface);
+        if (abs(curValue)==faceId)
+          currentDescending->setIndexValue(iface,-curValue);
       }
+    }
   }
 }
 
 /*
   Method with 2 output : the connectivity required and its length 'lgth'. This method gives the connectivity independently it is a polygons/polyhedrons or normal element. 
- */
+*/
 const int * CONNECTIVITY::getConnectivityOfAnElementWithPoly(MED_EN::medConnectivity ConnectivityType, MED_EN::medEntityMesh Entity, int Number, int &lgth)
 {
   if(Entity==MED_EN::MED_NODE)
     throw  MEDEXCEPTION("No connectivity attached to a node entity");
   if(Entity==_entity)
+  {
+    if((_entity==MED_EDGE) || (_entity==MED_CELL && _entityDimension==1))
     {
-      if((_entity==MED_EDGE) || (_entity==MED_CELL && _entityDimension==1))
-	{
-	  const int * newConstituentValue = 0;
-	  const int * newConstituentIndex = 0;
-	  newConstituentValue = getConnectivity(ConnectivityType,Entity,MED_ALL_ELEMENTS);
-	  newConstituentIndex = getConnectivityIndex(ConnectivityType,Entity);
-	  lgth=newConstituentIndex[Number]-newConstituentIndex[Number-1];
-	  return newConstituentValue+newConstituentIndex[Number-1]-1;
-	}
-      int nbOfClassicalElements=getNumberOf(_entity,MED_ALL_ELEMENTS);
-      if((_entity==MED_FACE) || (_entity==MED_CELL && _entityDimension==2))
-	{
-	  const int * newConstituentValue = 0;
-	  const int * newConstituentIndex = 0;
-	  if(Number<=nbOfClassicalElements && nbOfClassicalElements!=0)
-	    {
-	      newConstituentValue = getConnectivity(ConnectivityType,Entity,MED_ALL_ELEMENTS);
-	      newConstituentIndex = getConnectivityIndex(ConnectivityType,Entity);
-	      lgth=newConstituentIndex[Number]-newConstituentIndex[Number-1];
-	      return newConstituentValue+newConstituentIndex[Number-1]-1;
-	    }
-	  else
-	    {
-	      int localNumber=Number-nbOfClassicalElements-1;
-	      if(localNumber<getNumberOfPolygons())
-		{
-		  newConstituentValue = getPolygonsConnectivity(ConnectivityType,Entity);
-		  newConstituentIndex = getPolygonsConnectivityIndex(ConnectivityType,Entity);
-		  lgth=newConstituentIndex[localNumber+1]-newConstituentIndex[localNumber];
-		  return newConstituentValue+newConstituentIndex[localNumber]-1;
-		}
-	      else
-		throw  MEDEXCEPTION("Unknown number");
-	    }
-	}
-      else if(_entity==MED_CELL && _entityDimension==3)
-	{
-	  const int * newConstituentValue = 0;
-	  const int * newConstituentIndex = 0;
-	  if(Number<=nbOfClassicalElements)
-	    {
-	      newConstituentValue = getConnectivity(ConnectivityType,Entity,MED_ALL_ELEMENTS);
-	      newConstituentIndex = getConnectivityIndex(ConnectivityType,Entity);
-	      lgth=newConstituentIndex[Number]-newConstituentIndex[Number-1];
-	      return newConstituentValue+newConstituentIndex[Number-1]-1;
-	    }
-	  else
-	    {
-	      int localNumber=Number-nbOfClassicalElements-1;
-	      if(localNumber<getNumberOfPolyhedron())
-		{
-		  if(ConnectivityType==MED_NODAL)
-		    throw  MEDEXCEPTION("NODAL Connectivity for a polyhedron not directly accessible.\n Use getPolyhedronNodal and getPolyhedronFaces instead");
-// 		  newConstituentValue = _polyhedronDescending->getValue();
-// 		  newConstituentIndex = _polyhedronDescending->getIndex();
-		  newConstituentValue = getPolyhedronConnectivity( ConnectivityType );
-		  newConstituentIndex = getPolyhedronIndex( ConnectivityType );
-		  lgth=newConstituentIndex[localNumber+1]-newConstituentIndex[localNumber];
-		  return newConstituentValue+newConstituentIndex[localNumber]-1;
-		}
-	      else
-		throw  MEDEXCEPTION("Unknown number");
-	    }
-	}
+      const int * newConstituentValue = 0;
+      const int * newConstituentIndex = 0;
+      newConstituentValue = getConnectivity(ConnectivityType,Entity,MED_ALL_ELEMENTS);
+      newConstituentIndex = getConnectivityIndex(ConnectivityType,Entity);
+      lgth=newConstituentIndex[Number]-newConstituentIndex[Number-1];
+      return newConstituentValue+newConstituentIndex[Number-1]-1;
+    }
+    int nbOfClassicalElements=getNumberOf(_entity,MED_ALL_ELEMENTS);
+    if((_entity==MED_FACE) || (_entity==MED_CELL && _entityDimension==2))
+    {
+      const int * newConstituentValue = 0;
+      const int * newConstituentIndex = 0;
+      if(Number<=nbOfClassicalElements && nbOfClassicalElements!=0)
+      {
+        newConstituentValue = getConnectivity(ConnectivityType,Entity,MED_ALL_ELEMENTS);
+        newConstituentIndex = getConnectivityIndex(ConnectivityType,Entity);
+        lgth=newConstituentIndex[Number]-newConstituentIndex[Number-1];
+        return newConstituentValue+newConstituentIndex[Number-1]-1;
+      }
       else
-	throw MEDEXCEPTION("No connectivity available");
+      {
+        int localNumber=Number-nbOfClassicalElements-1;
+        if(localNumber<getNumberOfPolygons())
+        {
+          newConstituentValue = getPolygonsConnectivity(ConnectivityType,Entity);
+          newConstituentIndex = getPolygonsConnectivityIndex(ConnectivityType,Entity);
+          lgth=newConstituentIndex[localNumber+1]-newConstituentIndex[localNumber];
+          return newConstituentValue+newConstituentIndex[localNumber]-1;
+        }
+        else
+          throw  MEDEXCEPTION("Unknown number");
+      }
     }
-  else
+    else if(_entity==MED_CELL && _entityDimension==3)
     {
-      if(_constituent==NULL)
-	calculateDescendingConnectivity();
-      return _constituent->getConnectivityOfAnElementWithPoly(ConnectivityType,Entity,Number,lgth);
+      const int * newConstituentValue = 0;
+      const int * newConstituentIndex = 0;
+      if(Number<=nbOfClassicalElements)
+      {
+        newConstituentValue = getConnectivity(ConnectivityType,Entity,MED_ALL_ELEMENTS);
+        newConstituentIndex = getConnectivityIndex(ConnectivityType,Entity);
+        lgth=newConstituentIndex[Number]-newConstituentIndex[Number-1];
+        return newConstituentValue+newConstituentIndex[Number-1]-1;
+      }
+      else
+      {
+        int localNumber=Number-nbOfClassicalElements-1;
+        if(localNumber<getNumberOfPolyhedron())
+        {
+          if(ConnectivityType==MED_NODAL)
+            throw  MEDEXCEPTION("NODAL Connectivity for a polyhedron not directly accessible.\n Use getPolyhedronNodal and getPolyhedronFaces instead");
+          //        newConstituentValue = _polyhedronDescending->getValue();
+          //        newConstituentIndex = _polyhedronDescending->getIndex();
+          newConstituentValue = getPolyhedronConnectivity( ConnectivityType );
+          newConstituentIndex = getPolyhedronIndex( ConnectivityType );
+          lgth=newConstituentIndex[localNumber+1]-newConstituentIndex[localNumber];
+          return newConstituentValue+newConstituentIndex[localNumber]-1;
+        }
+        else
+          throw  MEDEXCEPTION("Unknown number");
+      }
     }
+    else
+      throw MEDEXCEPTION("No connectivity available");
+  }
+  else
+  {
+    if(_constituent==NULL)
+      calculateDescendingConnectivity();
+    return _constituent->getConnectivityOfAnElementWithPoly(ConnectivityType,Entity,Number,lgth);
+  }
 }
 
 int CONNECTIVITY::getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity, MED_EN::medGeometryElement Type) const
@@ -2720,27 +2720,27 @@ int CONNECTIVITY::getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity, MED_
   if(Entity==MED_EN::MED_NODE)
     return _numberOfNodes;
   if(Entity==_entity)
-    {
-      if (Type == MED_ALL_ELEMENTS)
-	return  getNumberOfElementOfPolyType(_entity)+ getNumberOf(_entity,Type) ;
+  {
+    if (Type == MED_ALL_ELEMENTS)
+      return  getNumberOfElementOfPolyType(_entity)+ getNumberOf(_entity,Type) ;
 
-      if(Type==MED_POLYGON || Type==MED_POLYHEDRA)
-	{
-	  if(Type==MED_POLYGON && Entity==MED_CELL && _entityDimension==3 || Type==MED_POLYHEDRA && Entity==MED_FACE)
-	    return 0;
-	  return getNumberOfElementOfPolyType(_entity);
-	}
-      else
-	return getNumberOf(_entity,Type);
-    }
-  else
+    if(Type==MED_POLYGON || Type==MED_POLYHEDRA)
     {
-      if(_constituent)
-	return _constituent->getNumberOfElementsWithPoly(Entity,Type);
-      else
-	//throw MEDEXCEPTION("CONNECTIVITY::getNumberOfElementsWithPoly : _constituent needed");
+      if(Type==MED_POLYGON && Entity==MED_CELL && _entityDimension==3 || Type==MED_POLYHEDRA && Entity==MED_FACE)
         return 0;
+      return getNumberOfElementOfPolyType(_entity);
     }
+    else
+      return getNumberOf(_entity,Type);
+  }
+  else
+  {
+    if(_constituent)
+      return _constituent->getNumberOfElementsWithPoly(Entity,Type);
+    else
+      //throw MEDEXCEPTION("CONNECTIVITY::getNumberOfElementsWithPoly : _constituent needed");
+      return 0;
+  }
 }
 
 /*!
@@ -2758,8 +2758,8 @@ bool CONNECTIVITY::deepCompare(const CONNECTIVITY& other) const
     return false;
   bool ret=true;
   for(int i=0;i<size1 && ret;i++)
-    {
-      ret=(conn1[i]==conn2[i]);
-    }
+  {
+    ret=(conn1[i]==conn2[i]);
+  }
   return ret;
 }
