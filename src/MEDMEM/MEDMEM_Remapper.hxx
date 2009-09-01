@@ -27,33 +27,31 @@
 #include "InterpKernelMatrix.hxx"
 #include "InterpolationOptions.hxx"
 
-namespace MEDMEM
+
+
+class MEDMEM_REMAPPER : public INTERP_KERNEL::InterpolationOptions
 {
-	
-  class MEDMEM_EXPORT Remapper : public INTERP_KERNEL::InterpolationOptions
-  {
-  public:
-    Remapper();
-    virtual ~Remapper();
-    bool prepare(const MEDMEM::MESH& mesh_source, const MEDMEM::MESH& mesh_target, const char *method);
-    void transfer(const MEDMEM::FIELD<double>& field_source, MEDMEM::FIELD<double>& field_target);
-    void reverseTransfer(MEDMEM::FIELD<double>& field_source, const MEDMEM::FIELD<double>& field_target);
-    MEDMEM::FIELD<double> * transferField(const MEDMEM::FIELD<double>& field_source, MEDMEM::MESH& mesh_target);
-    MEDMEM::FIELD<double> * reverseTransferField(const MEDMEM::FIELD<double>& field_target, MEDMEM::MESH& mesh_source);
-    bool setOptionDouble(const std::string& key, double value);
-    bool setOptionInt(const std::string& key, int value);
-    bool setOptionString(const std::string& key, std::string& value);
-  private :
-    INTERP_KERNEL::Matrix<double, INTERP_KERNEL::ALL_FORTRAN_MODE>* _matrix;
-    MEDMEM::FIELD<double>* getSupportVolumes(const MEDMEM::SUPPORT& support);
-    std::vector<double> _deno_multiply;
-    std::vector<double> _deno_reverse_multiply;
-    int _nb_rows;
-    int _nb_cols;
-    string _sourceFieldType;
-    string _targetFieldType;
-  };
-	
-}
+public:
+  MEDMEM_REMAPPER();
+  virtual ~MEDMEM_REMAPPER();
+  int prepare(const MEDMEM::MESH& mesh_source, const MEDMEM::MESH& mesh_target, const char *method);
+  void transfer(const MEDMEM::FIELD<double>& field_source, MEDMEM::FIELD<double>& field_target);
+  void reverseTransfer(MEDMEM::FIELD<double>& field_source, const MEDMEM::FIELD<double>& field_target);
+  MEDMEM::FIELD<double> * transferField(const MEDMEM::FIELD<double>& field_source, const MEDMEM::MESH& mesh_target);
+  MEDMEM::FIELD<double> * reverseTransferField(const MEDMEM::FIELD<double>& field_target, const MEDMEM::MESH& mesh_source);
+  int setOptionDouble(const std::string& key, double value);
+  int setOptionInt(const std::string& key, int value);
+  int setOptionString(const std::string& key, std::string& value);
+private :
+  INTERP_KERNEL::Matrix<double, INTERP_KERNEL::ALL_FORTRAN_MODE>* _matrix;
+  MEDMEM::FIELD<double>* getSupportVolumes(const MEDMEM::SUPPORT& support);
+  std::vector<double> _deno_multiply;
+  std::vector<double> _deno_reverse_multiply;
+  int _nb_rows;
+  int _nb_cols;
+  string _sourceFieldType;
+  string _targetFieldType;
+};
+
 
 #endif /*REMAPPER_HXX_*/
