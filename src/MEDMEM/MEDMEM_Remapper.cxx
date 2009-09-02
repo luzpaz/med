@@ -242,12 +242,12 @@ int MEDMEM_REMAPPER::setOptionDouble(const std::string& key, double value)
     return 0;
 }
 
-bool MEDMEM_REMAPPER::setOptionInt(const std::string& key, int value)
+int MEDMEM_REMAPPER::setOptionInt(const std::string& key, int value)
 {
   return INTERP_KERNEL::InterpolationOptions::setOptionInt(key,value);
 }
 
-bool MEDMEM_REMAPPER::setOptionString(const std::string& key, std::string& value)
+int MEDMEM_REMAPPER::setOptionString(const std::string& key, std::string& value)
 {
   return INTERP_KERNEL::InterpolationOptions::setOptionString(key,value);
 }
