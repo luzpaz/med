@@ -242,19 +242,15 @@ int MEDMEM_REMAPPER::setOptionDouble(const std::string& key, double value)
     return 0;
 }
 
-int MEDMEM_REMAPPER::setOptionInt(const std::string& key, int value)
+bool MEDMEM_REMAPPER::setOptionInt(const std::string& key, int value)
 {
-  bool result = INTERP_KERNEL::InterpolationOptions::setOptionInt(key,value);
-	
-  bool Remapper::setOptionInt(const std::string& key, int value)
-  {
-    return INTERP_KERNEL::InterpolationOptions::setOptionInt(key,value);
-  }
+  return INTERP_KERNEL::InterpolationOptions::setOptionInt(key,value);
+}
 
-  bool Remapper::setOptionString(const std::string& key, std::string& value)
-  {
-    return INTERP_KERNEL::InterpolationOptions::setOptionString(key,value);
-  }
+bool MEDMEM_REMAPPER::setOptionString(const std::string& key, std::string& value)
+{
+  return INTERP_KERNEL::InterpolationOptions::setOptionString(key,value);
+}
 
 /*!
   \brief returns the volumes of the cells underlying the support \a support
