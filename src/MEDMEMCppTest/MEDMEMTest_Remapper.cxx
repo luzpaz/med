@@ -98,8 +98,8 @@ void MEDMEMTest::test_RemapperP0P0() {
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,min,1e-10);    
   
   //MN: Hxx2salome transfer test
-  MEDMEM::FIELD<double> *newSourceField =remapper.transferField(source_field,target_mesh);
-  MEDMEM::FIELD<double> *newTargetField =remapper.reverseTransferField(target_field,source_mesh);
+  MEDMEM::FIELD<double> *newTargetField =remapper.transferField(source_field,target_mesh);
+  MEDMEM::FIELD<double> *newSourceField =remapper.reverseTransferField(target_field,source_mesh);
   sourcevalue=const_cast<double*>((*newSourceField).getValue());
   targetvalue=const_cast<double*>((*newTargetField).getValue());
   max = -2;
