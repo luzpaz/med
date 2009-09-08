@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_MedMeshDriver22.hxx"
@@ -201,9 +201,12 @@ void MED_MESH_RDONLY_DRIVER22::read(void)
   int aVersionHex     = (aMajor << 16 | aMinor << 8 | aRelease);
   int aVersionHexCurr = (aMajorCurr << 16 | aMinorCurr << 8 | aReleaseCurr);
 
-  if (aRet != 0 || aVersionHex > aVersionHexCurr)
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
-	  <<" cannot read a file of version higher than the currently used version of med."));
+  if (aRet != 0 || aVersionHex > aVersionHexCurr) {
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << " cannot read file " << _fileName
+                                 << " of version (" << aMajor << "." << aMinor << "." << aRelease
+                                 << ") higher than the currently used version of med ("
+                                 << aMajorCurr << "." << aMinorCurr << "." << aReleaseCurr << ")."));
+  }
   // 0020058: end of version check
 
   SCRUTE_MED(_ptrMesh->getIsAGrid());
