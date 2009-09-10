@@ -192,44 +192,44 @@ FIELD<double>* FIELD_::_getFieldSize() const
     FIELD<double>* p_field_size;
     switch (getSupport()->getEntity())
     {
-	case MED_CELL :
-	    switch (getSupport()->getMesh()->getMeshDimension() ) 
-	    {
-		case 1:
-		    p_field_size=getSupport()->getMesh()->getLength(getSupport() );
-		    break;
-		case 2:
-		    p_field_size=getSupport()->getMesh()->getArea(getSupport() );
-		    break;
-		case 3:
-		    p_field_size=getSupport()->getMesh()->getVolume(getSupport() );
-		    break;
-	    }
-	    break;
-	    
-	case MED_FACE :
-	    p_field_size=getSupport()->getMesh()->getArea(getSupport() );
-	    break;
+        case MED_CELL :
+            switch (getSupport()->getMesh()->getMeshDimension() ) 
+            {
+                case 1:
+                    p_field_size=getSupport()->getMesh()->getLength(getSupport() );
+                    break;
+                case 2:
+                    p_field_size=getSupport()->getMesh()->getArea(getSupport() );
+                    break;
+                case 3:
+                    p_field_size=getSupport()->getMesh()->getVolume(getSupport() );
+                    break;
+            }
+            break;
+            
+        case MED_FACE :
+            p_field_size=getSupport()->getMesh()->getArea(getSupport() );
+            break;
 
-	case MED_EDGE :
-	    p_field_size=getSupport()->getMesh()->getLength(getSupport() );
-	    break;
+        case MED_EDGE :
+            p_field_size=getSupport()->getMesh()->getLength(getSupport() );
+            break;
         case MED_NODE : // issue 0020120: [CEA 206] normL2 on NODE field
           {
             SUPPORT volSupport(getSupport()->getMesh());
-	    switch (getSupport()->getMesh()->getMeshDimension() ) 
-	    {
-		case 1:
-		    p_field_size=getSupport()->getMesh()->getLength( &volSupport );
-		    break;
-		case 2:
-		    p_field_size=getSupport()->getMesh()->getArea( &volSupport );
-		    break;
-		case 3:
-		    p_field_size=getSupport()->getMesh()->getVolume( &volSupport );
-		    break;
-	    }
-	    break;
+            switch (getSupport()->getMesh()->getMeshDimension() ) 
+            {
+                case 1:
+                    p_field_size=getSupport()->getMesh()->getLength( &volSupport );
+                    break;
+                case 2:
+                    p_field_size=getSupport()->getMesh()->getArea( &volSupport );
+                    break;
+                case 3:
+                    p_field_size=getSupport()->getMesh()->getVolume( &volSupport );
+                    break;
+            }
+            break;
           }
     }
     return p_field_size;
@@ -250,9 +250,9 @@ void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume,
     {
       if ( !nodalAllowed )
       {
-	diagnosis="Cannot compute sobolev norm on a field "+getName()+
-	    " : it has support on nodes!";
-	throw MEDEXCEPTION(diagnosis.c_str());
+        diagnosis="Cannot compute sobolev norm on a field "+getName()+
+            " : it has support on nodes!";
+        throw MEDEXCEPTION(diagnosis.c_str());
       }
       if ( !getSupport()->getMesh() )
       {
@@ -267,12 +267,12 @@ void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume,
           throw MEDEXCEPTION(diagnosis.c_str());
       }
     }
-	
+        
     if (getNumberOfValues()*getNumberOfComponents()<= 0) // Size of array has to be strictly positive
     {
-	diagnosis="Cannot compute the norm of "+getName()+
-	    " : it size is non positive!";
-	throw MEDEXCEPTION(diagnosis.c_str());
+        diagnosis="Cannot compute the norm of "+getName()+
+            " : it size is non positive!";
+        throw MEDEXCEPTION(diagnosis.c_str());
     }
 
     if( getSupport()->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS) != getNumberOfValues() ) {
@@ -283,7 +283,7 @@ void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume,
 
     if (getGaussPresence() ) {
       diagnosis="Cannot compute Lnorm of "+getName()+
-	" : Gauss numbers greater than one are not yet implemented!";
+        " : Gauss numbers greater than one are not yet implemented!";
       throw MEDEXCEPTION(diagnosis.c_str());
     }
 
@@ -295,23 +295,23 @@ void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume,
             getSupport()->getMesh()->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS))
         {
           diagnosis="Cannot compute Lnorm of nodal field "+getName()+
-	    " : the volume furnished has wrong number of values";
+            " : the volume furnished has wrong number of values";
           throw MEDEXCEPTION(diagnosis.c_str());
         }
         return;
       }
-	if(support_volume->getSupport()!=getSupport())
-	{
-	    diagnosis="Cannot compute Lnorm of "+getName()+
-	    " : the volume furnished has not the same support!";
-	    throw MEDEXCEPTION(diagnosis.c_str());
-	}
-	if(support_volume->getNumberOfValues()!=getNumberOfValues())
-	{
-	    diagnosis="Cannot compute Lnorm of "+getName()+
-	    " : the volume furnished has not the same number of values!";
-	    throw MEDEXCEPTION(diagnosis.c_str());
-	}
+        if(support_volume->getSupport()!=getSupport())
+        {
+            diagnosis="Cannot compute Lnorm of "+getName()+
+            " : the volume furnished has not the same support!";
+            throw MEDEXCEPTION(diagnosis.c_str());
+        }
+        if(support_volume->getNumberOfValues()!=getNumberOfValues())
+        {
+            diagnosis="Cannot compute Lnorm of "+getName()+
+            " : the volume furnished has not the same number of values!";
+            throw MEDEXCEPTION(diagnosis.c_str());
+        }
         if( getSupport()->getNumberOfElements() != 
             support_volume->getSupport()->getNumberOfElements() ) {
           diagnosis="Cannot compute Lnorm of "+getName()+
@@ -338,8 +338,8 @@ void FIELD_::_checkFieldCompatibility(const FIELD_& m, const FIELD_& n, bool che
 
     if(m._support != n._support)
       {
-	if(!(*m._support==*n._support))
-	  diagnosis+="They don't have the same support!";
+        if(!(*m._support==*n._support))
+          diagnosis+="They don't have the same support!";
       }
     else if(m._numberOfComponents != n._numberOfComponents)
       diagnosis+="They don't have the same number of components!";
@@ -349,37 +349,37 @@ void FIELD_::_checkFieldCompatibility(const FIELD_& m, const FIELD_& n, bool che
       diagnosis+="They don't have the same number of values!";
     else
       {
-	if(checkUnit)
-	  {
-	    for(int i=0; i<m._numberOfComponents; i++)
-	      {
-		// Not yet implemented   
-		//	    if(m._componentsTypes[i] != n._componentsTypes[i])
-		//	    {
-		//		diagnosis+="Components don't have the same types!";
-		//		break;
-		//	    }
-		if(m._MEDComponentsUnits[i] != n._MEDComponentsUnits[i])
-		  {
-		    diagnosis+="Components don't have the same units!";
-		    break;
-		  }
-	      }
-	  }
+        if(checkUnit)
+          {
+            for(int i=0; i<m._numberOfComponents; i++)
+              {
+                // Not yet implemented   
+                //          if(m._componentsTypes[i] != n._componentsTypes[i])
+                //          {
+                //              diagnosis+="Components don't have the same types!";
+                //              break;
+                //          }
+                if(m._MEDComponentsUnits[i] != n._MEDComponentsUnits[i])
+                  {
+                    diagnosis+="Components don't have the same units!";
+                    break;
+                  }
+              }
+          }
       }
 
     if(diagnosis.size()) // if fields are not compatible : complete diagnosis and throw exception
     {
-	diagnosis="Field's operation not allowed!\nThe fields " + m._name + " and " 
-	         + n._name + " are not compatible.\n" + diagnosis;
-	throw MEDEXCEPTION(diagnosis.c_str());
+        diagnosis="Field's operation not allowed!\nThe fields " + m._name + " and " 
+                 + n._name + " are not compatible.\n" + diagnosis;
+        throw MEDEXCEPTION(diagnosis.c_str());
     }
 
     if( m.getNumberOfValues()<=0 || m.getNumberOfComponents()<=0) // check up the size is strictly positive
     {
-	diagnosis="Field's operation not allowed!\nThe fields " + m._name + " and " 
-	         + n._name + " are empty! (size<=0).\n";
-	throw MEDEXCEPTION(diagnosis.c_str());
+        diagnosis="Field's operation not allowed!\nThe fields " + m._name + " and " 
+                 + n._name + " are empty! (size<=0).\n";
+        throw MEDEXCEPTION(diagnosis.c_str());
     }
 
 }
@@ -395,8 +395,8 @@ void FIELD_::_deepCheckFieldCompatibility(const FIELD_& m, const FIELD_& n , boo
 
     if(m._support != n._support)
       {
-	if(!(m._support->deepCompare(*n._support)))
-	  diagnosis+="They don't have the same support!";
+        if(!(m._support->deepCompare(*n._support)))
+          diagnosis+="They don't have the same support!";
       }
     else if (m._valueType != n._valueType)
       diagnosis+="They don't have the same type!";
@@ -406,31 +406,31 @@ void FIELD_::_deepCheckFieldCompatibility(const FIELD_& m, const FIELD_& n , boo
       diagnosis+="They don't have the same number of values!";
     else
       {
-	if(checkUnit)
-	  {
-	    for(int i=0; i<m._numberOfComponents; i++)
-	      {
-		if(m._MEDComponentsUnits[i] != n._MEDComponentsUnits[i])
-		  {
-		    diagnosis+="Components don't have the same units!";
-		    break;
-		  }
-	      }
-	  }
+        if(checkUnit)
+          {
+            for(int i=0; i<m._numberOfComponents; i++)
+              {
+                if(m._MEDComponentsUnits[i] != n._MEDComponentsUnits[i])
+                  {
+                    diagnosis+="Components don't have the same units!";
+                    break;
+                  }
+              }
+          }
       }
 
     if(diagnosis.size()) // if fields are not compatible : complete diagnosis and throw exception
     {
-	diagnosis="Field's operation not allowed!\nThe fields " + m._name + " and " 
-	         + n._name + " are not compatible.\n" + diagnosis;
-	throw MEDEXCEPTION(diagnosis.c_str());
+        diagnosis="Field's operation not allowed!\nThe fields " + m._name + " and " 
+                 + n._name + " are not compatible.\n" + diagnosis;
+        throw MEDEXCEPTION(diagnosis.c_str());
     }
 
     if( m.getNumberOfValues()<=0 || m.getNumberOfComponents()<=0) // check up the size is strictly positive
     {
-	diagnosis="Field's operation not allowed!\nThe fields " + m._name + " and " 
-	         + n._name + " are empty! (size<=0).\n";
-	throw MEDEXCEPTION(diagnosis.c_str());
+        diagnosis="Field's operation not allowed!\nThe fields " + m._name + " and " 
+                 + n._name + " are empty! (size<=0).\n";
+        throw MEDEXCEPTION(diagnosis.c_str());
     }
 } 
 
@@ -442,8 +442,8 @@ void     FIELD_::rmDriver      (int index)
 
 int      FIELD_::addDriver     (driverTypes driverType, 
                                 const string & fileName,
-				const string & driverFieldName,
-				MED_EN::med_mode_acces access)
+                                const string & driverFieldName,
+                                MED_EN::med_mode_acces access)
 {
   MESSAGE_MED("int FIELD_::addDriver(driverTypes driverType, const string & fileName, const string & driverFieldName) : adding the driver " << driverType << " fileName = " << fileName.c_str() << " driverFieldName = " << driverFieldName.c_str());
   return 0;
