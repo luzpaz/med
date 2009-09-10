@@ -77,7 +77,7 @@ ParaMEDMEMComponent_i::~ParaMEDMEMComponent_i()
   delete _interface;
 }
 
-void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling, const bool source)
+void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling)
 {
   int gsize, grank;
   set<int> procs;
@@ -97,7 +97,7 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling, const bool
 
   // Connection to distributed parallel component
 #ifdef HAVE_MPI2
-  remoteMPI2Connect(!source,coupling);
+  remoteMPI2Connect(coupling);
 #else
   MESSAGE("[" << _numproc << "] You have to use a MPI2 compliant mpi implementation !");
   throw POException(_numproc,"You have to use a MPI2 compliant mpi implementation !");
@@ -108,7 +108,7 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling, const bool
   MESSAGE("[" << grank << "] new communicator of " << gsize << " processes");
 
   // Creation of processors group for ParaMEDMEM
-  if(source)
+  if(_numproc==grank)
     {
       _source[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,0,_nbproc-1,_gcom[coupling]);
       _target[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,_nbproc,gsize-1,_gcom[coupling]);

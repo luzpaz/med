@@ -62,7 +62,7 @@ class ParaMEDMEMComponent_i : public POA_SALOME_MED::ParaMEDMEMComponent, public
 
 protected:
   ParaMEDMEM::ProcessorGroup* _commgroup;
-  void initializeCoupling(const char * coupling, const bool source);
+  void initializeCoupling(const char * coupling);
   void setInputFieldCoupling(const char * coupling, ParaMEDMEM::ParaFIELD* field);
   void terminateCoupling(const char * coupling);
 
