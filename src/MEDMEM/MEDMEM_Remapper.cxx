@@ -181,13 +181,13 @@ MEDMEM::FIELD<double> *  MEDMEM_REMAPPER::transferField(const MEDMEM::FIELD<doub
   if (_nb_cols != nb_source_values)
     throw MEDMEM::MEDEXCEPTION("MEDMEM_REMAPPER::transfer: incoherent number of field values, cannot cannot multiply by interpolation matrix");
 
-  MEDMEM::SUPPORT target_support;
+  MEDMEM::SUPPORT* target_support;
   if(	_targetFieldType == "P0")
-    target_support = MEDMEM::SUPPORT((MEDMEM::MESH *)&target_mesh,"on All support",MED_EN::MED_CELL);
+    target_support = new MEDMEM::SUPPORT((MEDMEM::MESH *)&target_mesh,"on All support",MED_EN::MED_CELL);
   else
-    target_support = MEDMEM::SUPPORT((MEDMEM::MESH *)&target_mesh,"on All support",MED_EN::MED_NODE);
+    target_support = new MEDMEM::SUPPORT((MEDMEM::MESH *)&target_mesh,"on All support",MED_EN::MED_NODE);
 		
-  MEDMEM::FIELD<double> * target_field = new MEDMEM::FIELD<double>(&target_support,source_nbcomp);
+  MEDMEM::FIELD<double> * target_field = new MEDMEM::FIELD<double>(target_support,source_nbcomp);
   double* value_target = const_cast<double*> ((*target_field).getValue());
 		
   _matrix->multiply(value_source, value_target,source_nbcomp);
@@ -214,13 +214,13 @@ MEDMEM::FIELD<double> *  MEDMEM_REMAPPER::reverseTransferField(const MEDMEM::FIE
   if (_nb_rows != nb_target_values)
     throw MEDMEM::MEDEXCEPTION(" MEDMEM_REMAPPER::reverseTransfer: incoherent number of field values, cannot cannot transpose-multiply by interpolation matrix");
 	
-  MEDMEM::SUPPORT source_support;
+  MEDMEM::SUPPORT* source_support;
   if(	_sourceFieldType == "P0")
-    source_support = MEDMEM::SUPPORT((MEDMEM::MESH *)&source_mesh,"on All support",MED_EN::MED_CELL);
+    source_support = new MEDMEM::SUPPORT((MEDMEM::MESH *)&source_mesh,"on All support",MED_EN::MED_CELL);
   else
-    source_support = MEDMEM::SUPPORT((MEDMEM::MESH *)&source_mesh,"on All support",MED_EN::MED_NODE);
+    source_support = new MEDMEM::SUPPORT((MEDMEM::MESH *)&source_mesh,"on All support",MED_EN::MED_NODE);
 	
-  MEDMEM::FIELD<double> * source_field = new MEDMEM::FIELD<double>(&source_support,target_nbcomp);
+  MEDMEM::FIELD<double> * source_field = new MEDMEM::FIELD<double>(source_support,target_nbcomp);
   double* value_source = const_cast<double*> ((*source_field).getValue());
 	
   _matrix->transposeMultiply(value_target, value_source, _nb_cols,target_nbcomp);//transposeMultiply(input,output, nbcols,nbcomp)
