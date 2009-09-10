@@ -102,8 +102,8 @@ public :
     Constructor.
   */
   GIBI_MESH_DRIVER(const string & fileName,  
-		  MESH * ptrMesh, 
-		  MED_EN::med_mode_acces accessMode) ;
+                  MESH * ptrMesh, 
+                  MED_EN::med_mode_acces accessMode) ;
   /*!
     Copy constructor.
   */
