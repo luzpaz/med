@@ -2533,6 +2533,9 @@ double FIELD<T, INTERLACING_TAG>::normL2(const FIELD<double, FullInterlace> * p_
         }
         totVol+=std::abs(*vol);
       }
+      if ( nbCells > 0 && totVol == 0.)
+        throw MEDEXCEPTION("can't compute sobolev norm : "
+                           "none of elements has values on all it's nodes");
     }
     else
     {
@@ -2571,7 +2574,7 @@ double FIELD<T, INTERLACING_TAG>::normL2(const FIELD<double, FullInterlace> * p_
         delete p_field_size; // delete temporary volume field
 
     if( totVol <= 0)
-        throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
+      throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
 
     return integrale/totVol;
 }
