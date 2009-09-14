@@ -34,11 +34,11 @@ class MEDMEM_REMAPPER : public INTERP_KERNEL::InterpolationOptions
 public:
   MEDMEM_REMAPPER();
   virtual ~MEDMEM_REMAPPER();
-  int prepare(const MEDMEM::MESH& mesh_source, const MEDMEM::MESH& mesh_target, const char *method);
-  void transfer(const MEDMEM::FIELD<double>& field_source, MEDMEM::FIELD<double>& field_target);
-  void reverseTransfer(MEDMEM::FIELD<double>& field_source, const MEDMEM::FIELD<double>& field_target);
-  MEDMEM::FIELD<double> * transferField(const MEDMEM::FIELD<double>& field_source, const MEDMEM::MESH& mesh_target);
-  MEDMEM::FIELD<double> * reverseTransferField(const MEDMEM::FIELD<double>& field_target, const MEDMEM::MESH& mesh_source);
+  int prepare(const MEDMEM::MESH& source_mesh, const MEDMEM::MESH& target_mesh, const char *method);
+  void transfer(const MEDMEM::FIELD<double>& source_field, MEDMEM::FIELD<double>& target_field);
+  void reverseTransfer(MEDMEM::FIELD<double>& source_field, const MEDMEM::FIELD<double>& target_field);
+  MEDMEM::FIELD<double> * transferField(const MEDMEM::FIELD<double>& source_field);
+  MEDMEM::FIELD<double> * reverseTransferField(const MEDMEM::FIELD<double>& target_field);
   int setOptionDouble(const std::string& key, double value);
   int setOptionInt(const std::string& key, int value);
   int setOptionString(const std::string& key, std::string& value);
@@ -51,6 +51,10 @@ private :
   int _nb_cols;
   string _sourceFieldType;
   string _targetFieldType;
+  const MEDMEM::MESH * _sourceMesh;
+  const MEDMEM::MESH * _targetMesh;
+  MEDMEM::SUPPORT * _sourceSupport;
+  MEDMEM::SUPPORT * _targetSupport;
 };
 
 

@@ -34,13 +34,17 @@
 //   int  InterpolationOptions::_orientation =0;
 //   SplittingPolicy  InterpolationOptions::_splittingPolicy =GENERAL_48;
 
-MEDMEM_REMAPPER::MEDMEM_REMAPPER():_matrix(0)
+MEDMEM_REMAPPER::MEDMEM_REMAPPER():_matrix(0),_sourceMesh(0), _targetMesh(0), _sourceSupport(0), _targetSupport(0)
 {
 }
 
 MEDMEM_REMAPPER::~MEDMEM_REMAPPER()
 {
   delete _matrix;
+	delete _sourceMesh;
+	delete _targetMesh;
+	delete _sourceSupport;
+	delete _targetSupport;
 }
 /*! This method computes the intersection matrix between 
  * source \a mesh_source and \a mesh_target. It is a preliminary step 
@@ -57,40 +61,13 @@ int MEDMEM_REMAPPER::prepare(const MEDMEM::MESH& mesh_source, const MEDMEM::MESH
 
   delete _matrix;
   _matrix= new INTERP_KERNEL::Matrix<double,INTERP_KERNEL::ALL_FORTRAN_MODE>;
-		
-  if (tm_spacedim!=sm_spacedim || tm_meshdim!=sm_meshdim)
-    throw MEDEXCEPTION("incompatible mesh and/or space dimensions in meshes");
-  if ((sm_spacedim==2)&&(sm_meshdim==2))
-    {
-      MEDNormalizedUnstructuredMesh<2,2> source_mesh_wrapper(&mesh_source);
-      MEDNormalizedUnstructuredMesh<2,2> target_mesh_wrapper(&mesh_target);
-      INTERP_KERNEL::Interpolation2D interpolation(*this);
-      _nb_cols = interpolation.interpolateMeshes(source_mesh_wrapper,target_mesh_wrapper,*_matrix,method);
-    }
-  else if ((sm_spacedim==3)&&(sm_meshdim==3))
-    {
-      MEDNormalizedUnstructuredMesh<3,3> source_mesh_wrapper(&mesh_source);
-      MEDNormalizedUnstructuredMesh<3,3> target_mesh_wrapper(&mesh_target);
-      INTERP_KERNEL::Interpolation3D interpolation(*this);
-      _nb_cols = interpolation.interpolateMeshes(source_mesh_wrapper,target_mesh_wrapper,*_matrix,method);
-    }
-  else if ((sm_spacedim==3)&&(sm_meshdim==2))
-    {
-      MEDNormalizedUnstructuredMesh<3,2> source_mesh_wrapper(&mesh_source);
-      MEDNormalizedUnstructuredMesh<3,2> target_mesh_wrapper(&mesh_target);
-      INTERP_KERNEL::Interpolation3DSurf interpolation(*this);
-      _nb_cols =  interpolation.interpolateMeshes(source_mesh_wrapper,target_mesh_wrapper,*_matrix,method);
-    }
-  else
-    throw MEDEXCEPTION("no Interpolation exists for the given mesh and space dimensions");
 
-  _nb_rows=(*_matrix).getNbRows();
+	delete _sourceMesh;
+	_sourceMesh= new MEDMEM::MESH((MEDMEM::MESH&)mesh_source);
+	delete _targetMesh;
+	_targetMesh= new MEDMEM::MESH((MEDMEM::MESH&)mesh_target);
 
-  _deno_multiply.resize(_nb_rows);
-  _matrix->rowSum(_deno_multiply);
-  _deno_reverse_multiply.resize(_nb_cols);
-  _matrix->colSum(_deno_reverse_multiply, _nb_cols);
-  std::string methodC=method;
+	std::string methodC=method;
   if(methodC == "P0P0"){
     _sourceFieldType = "P0";
     _targetFieldType = "P0";
@@ -110,6 +87,51 @@ int MEDMEM_REMAPPER::prepare(const MEDMEM::MESH& mesh_source, const MEDMEM::MESH
   else
     throw INTERP_KERNEL::Exception("MEDMEM_REMAPPER::prepare: Invalid method specified ! Must be in : \"P0P0\" \"P0P1\" \"P1P0\" or \"P1P1\"");
 		
+
+	delete _sourceSupport;
+	delete _targetSupport;
+	if(	_sourceFieldType == "P0")
+    _sourceSupport = new MEDMEM::SUPPORT((MEDMEM::MESH *)_sourceMesh,"on All support",MED_EN::MED_CELL);
+  else
+    _sourceSupport = new MEDMEM::SUPPORT((MEDMEM::MESH *)_sourceMesh,"on All support",MED_EN::MED_NODE);
+  if(	_targetFieldType == "P0")
+    _targetSupport = new MEDMEM::SUPPORT((MEDMEM::MESH *)_targetMesh,"on All support",MED_EN::MED_CELL);
+  else
+    _targetSupport = new MEDMEM::SUPPORT((MEDMEM::MESH *)_targetMesh,"on All support",MED_EN::MED_NODE);
+	
+  if (tm_spacedim!=sm_spacedim || tm_meshdim!=sm_meshdim)
+    throw MEDEXCEPTION("incompatible mesh and/or space dimensions in meshes");
+  if ((sm_spacedim==2)&&(sm_meshdim==2))
+    {
+      MEDNormalizedUnstructuredMesh<2,2> source_mesh_wrapper(_sourceMesh);
+      MEDNormalizedUnstructuredMesh<2,2> target_mesh_wrapper(_targetMesh);
+      INTERP_KERNEL::Interpolation2D interpolation(*this);
+      _nb_cols = interpolation.interpolateMeshes(source_mesh_wrapper,target_mesh_wrapper,*_matrix,method);
+    }
+  else if ((sm_spacedim==3)&&(sm_meshdim==3))
+    {
+      MEDNormalizedUnstructuredMesh<3,3> source_mesh_wrapper(_sourceMesh);
+      MEDNormalizedUnstructuredMesh<3,3> target_mesh_wrapper(_targetMesh);
+      INTERP_KERNEL::Interpolation3D interpolation(*this);
+      _nb_cols = interpolation.interpolateMeshes(source_mesh_wrapper,target_mesh_wrapper,*_matrix,method);
+    }
+  else if ((sm_spacedim==3)&&(sm_meshdim==2))
+    {
+      MEDNormalizedUnstructuredMesh<3,2> source_mesh_wrapper(_sourceMesh);
+      MEDNormalizedUnstructuredMesh<3,2> target_mesh_wrapper(_targetMesh);
+      INTERP_KERNEL::Interpolation3DSurf interpolation(*this);
+      _nb_cols =  interpolation.interpolateMeshes(source_mesh_wrapper,target_mesh_wrapper,*_matrix,method);
+    }
+  else
+    throw MEDEXCEPTION("no Interpolation exists for the given mesh and space dimensions");
+
+  _nb_rows=(*_matrix).getNbRows();
+
+  _deno_multiply.resize(_nb_rows);
+  _matrix->rowSum(_deno_multiply);
+  _deno_reverse_multiply.resize(_nb_cols);
+  _matrix->colSum(_deno_reverse_multiply, _nb_cols);
+
   return 1;
 }
 
@@ -172,7 +194,7 @@ void MEDMEM_REMAPPER::reverseTransfer( MEDMEM::FIELD<double>& field_source, cons
   \param field_source : source field to be remapped
   \return : field resulting from the remapping on the target mesh
 */
-MEDMEM::FIELD<double> *  MEDMEM_REMAPPER::transferField(const MEDMEM::FIELD<double>& field_source, const MEDMEM::MESH& target_mesh)
+MEDMEM::FIELD<double> *  MEDMEM_REMAPPER::transferField(const MEDMEM::FIELD<double>& field_source)
 {
   int source_nbcomp=field_source.getNumberOfComponents();
   const double* value_source = field_source.getValue();
@@ -180,14 +202,8 @@ MEDMEM::FIELD<double> *  MEDMEM_REMAPPER::transferField(const MEDMEM::FIELD<doub
 
   if (_nb_cols != nb_source_values)
     throw MEDMEM::MEDEXCEPTION("MEDMEM_REMAPPER::transfer: incoherent number of field values, cannot cannot multiply by interpolation matrix");
-
-  MEDMEM::SUPPORT* target_support;
-  if(	_targetFieldType == "P0")
-    target_support = new MEDMEM::SUPPORT((MEDMEM::MESH *)&target_mesh,"on All support",MED_EN::MED_CELL);
-  else
-    target_support = new MEDMEM::SUPPORT((MEDMEM::MESH *)&target_mesh,"on All support",MED_EN::MED_NODE);
-		
-  MEDMEM::FIELD<double> * target_field = new MEDMEM::FIELD<double>(target_support,source_nbcomp);
+	
+  MEDMEM::FIELD<double> * target_field = new MEDMEM::FIELD<double>(_targetSupport,source_nbcomp);
   double* value_target = const_cast<double*> ((*target_field).getValue());
 		
   _matrix->multiply(value_source, value_target,source_nbcomp);
@@ -205,7 +221,7 @@ MEDMEM::FIELD<double> *  MEDMEM_REMAPPER::transferField(const MEDMEM::FIELD<doub
   \param field_target : target field to be remapped
   \return : field resulting from the remapping on the source mesh
 */
-MEDMEM::FIELD<double> *  MEDMEM_REMAPPER::reverseTransferField(const MEDMEM::FIELD<double>& field_target, const MEDMEM::MESH& source_mesh)
+MEDMEM::FIELD<double> *  MEDMEM_REMAPPER::reverseTransferField(const MEDMEM::FIELD<double>& field_target)
 {
   int target_nbcomp=field_target.getNumberOfComponents();
   const double* value_target = field_target.getValue();
@@ -214,13 +230,7 @@ MEDMEM::FIELD<double> *  MEDMEM_REMAPPER::reverseTransferField(const MEDMEM::FIE
   if (_nb_rows != nb_target_values)
     throw MEDMEM::MEDEXCEPTION(" MEDMEM_REMAPPER::reverseTransfer: incoherent number of field values, cannot cannot transpose-multiply by interpolation matrix");
 	
-  MEDMEM::SUPPORT* source_support;
-  if(	_sourceFieldType == "P0")
-    source_support = new MEDMEM::SUPPORT((MEDMEM::MESH *)&source_mesh,"on All support",MED_EN::MED_CELL);
-  else
-    source_support = new MEDMEM::SUPPORT((MEDMEM::MESH *)&source_mesh,"on All support",MED_EN::MED_NODE);
-	
-  MEDMEM::FIELD<double> * source_field = new MEDMEM::FIELD<double>(source_support,target_nbcomp);
+  MEDMEM::FIELD<double> * source_field = new MEDMEM::FIELD<double>(_sourceSupport,target_nbcomp);
   double* value_source = const_cast<double*> ((*source_field).getValue());
 	
   _matrix->transposeMultiply(value_target, value_source, _nb_cols,target_nbcomp);//transposeMultiply(input,output, nbcols,nbcomp)
