@@ -460,7 +460,13 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
       vector<string> str( sub_data->nbComponents() );
       f->setComponentsDescriptions( &str[0] );
       f->setMEDComponentsUnits( &str[0] );
-
+      if ( !hasCommonSupport() && nb_fields > 1 )
+      {
+        f->setName( MEDMEM::STRING(_name) << "_Sub_" << nb_fields );
+        INFOS_MED("Warning: field |" <<_name<<"| is incompatible with MED format (has "
+                  "sub-fields of different nature), so we map its sub-field #"<< nb_fields <<
+                  " into a separate field |"<<f->getName() << "|");
+      }
       res.push_back( make_pair( f , hasCommonSupport() ? _group_id : sub_data->_supp_id ));
       MESSAGE_MED(" MAKE " << nb_fields << "-th field <" << _name << "> on group_id " << _group_id );
 
