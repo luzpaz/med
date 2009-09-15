@@ -214,8 +214,8 @@ public:
   // Les numéros d'entités dans les profils doivent être croissant
   // pour respecter la norme MED
   void setpartial(string Description, int NumberOfGeometricType,
-		  int TotalNumberOfEntity, MED_EN::medGeometryElement *GeometricType,
-		  const int *NumberOfEntity, const int *NumberValue);
+                  int TotalNumberOfEntity, MED_EN::medGeometryElement *GeometricType,
+                  const int *NumberOfEntity, const int *NumberValue);
 
   void setpartial(MEDSKYLINEARRAY * number, bool shallowCopy=false) throw (MEDEXCEPTION);
 
@@ -238,7 +238,7 @@ public:
   void fillFromNodeList(const list<int>& listOfNode) throw (MEDEXCEPTION);
   void fillFromElementList(const list<int>& listOfElt) throw (MEDEXCEPTION);
   void clearDataOnNumbers();
-	MESH* makeMesh();
+        MESH* makeMesh();
 
   //A.G. Addings for RC
   virtual void addReference() const;
@@ -269,7 +269,7 @@ protected:
 
   Note : If SUPPORT is defined on MED_NODE, use MED_ALL_ELEMENTS as
          medGeometryElement GeometricType and it will return the number
-	 of nodes in the support (or in the mesh).
+         of nodes in the support (or in the mesh).
 */
 //-----------------------------------------------------------------------------
 inline int SUPPORT::getNumberOfElements(MED_EN::medGeometryElement GeometricType) const
@@ -454,11 +454,11 @@ inline void SUPPORT::setGeometricType(const MED_EN::medGeometryElement *Geometri
       // giving a default value to profile names
       vector<string> prof_names( _numberOfGeometricType);
       for (int itype=0; itype < _numberOfGeometricType; itype++)
-	{
-	  ostringstream typestr;
-	  typestr<<_name<<"_type"<<_geometricType[itype];
-	  prof_names[itype]=typestr.str();
-	}
+        {
+          ostringstream typestr;
+          typestr<<_name<<"_type"<<_geometricType[itype];
+          prof_names[itype]=typestr.str();
+        }
       _profilNames=prof_names;
     }
 }
