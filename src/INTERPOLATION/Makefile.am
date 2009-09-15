@@ -64,7 +64,7 @@ dist_UseCaseMapping_SOURCES= UseCaseMapping.cxx
 dist_UseCaseWrapper_Maillage_SOURCES= UseCaseWrapper_Maillage.cxx
 
 AM_CPPFLAGS +=-U_DEBUG_ $(MED2_INCLUDES) $(HDF5_INCLUDES) -I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core
-LDADD=-lm $(MED2_LIBS) $(HDF5_LIBS) ../MEDMEM/libmedmem.la ../MEDWrapper/V2_1/Core/libmed_V2_1.la
+LDADD=-lm $(MED2_LIBS) $(HDF5_LIBS) ../MEDMEM/libmedmem.la ../MEDWrapper/V2_1/Core/libmed_V2_1.la ../INTERP_KERNEL/libinterpkernel.la
 
 AM_CXXFLAGS += @CXXTMPDPTHFLAGS@
 

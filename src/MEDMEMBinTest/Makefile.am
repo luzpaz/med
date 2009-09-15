@@ -52,7 +52,8 @@ AM_CPPFLAGS += $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
 	-I$(srcdir)/../MEDMEM
 
 LDADD= $(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
-	../MEDWrapper/Base/libMEDWrapperBase.la $(STDLIB) ../MEDMEM/libmedmem.la
+	../MEDWrapper/Base/libMEDWrapperBase.la $(STDLIB) ../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la
+
 
 if MED_ENABLE_KERNEL
     AM_CPPFLAGS+= ${KERNEL_CXXFLAGS}

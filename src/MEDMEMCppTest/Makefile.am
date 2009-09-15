@@ -113,7 +113,8 @@ dist_MEDMEMTest_VtkFieldDriver_fault_SOURCES= MEDMEMTest_VtkFieldDriver_fault.cx
 dist_MEDMEMTest_VtkMeshDriver_fault_SOURCES= MEDMEMTest_VtkMeshDriver_fault.cxx
 
 LDADD= $(MED2_LIBS) $(libMEDMEMCppTest_la_LDFLAGS) -lm \
-	../MEDWrapper/V2_1/Core/libmed_V2_1.la ../MEDMEM/libmedmem.la libMEDMEMCppTest.la
+	../MEDWrapper/V2_1/Core/libmed_V2_1.la ../MEDMEM/libmedmem.la \
+	../INTERP_KERNEL/libinterpkernel.la libMEDMEMCppTest.la
 if MED_ENABLE_KERNEL
      LDADD+= -lSALOMEBasics
 endif

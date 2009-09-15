@@ -57,7 +57,8 @@ TestMEDSPLITTER_SOURCES= TestMEDSPLITTER.cxx
 TestMEDSPLITTER_CPPFLAGS= $(libMEDSPLITTERTest_la_CPPFLAGS) 
 TestMEDSPLITTER_LDADD= $(MED2_LIBS) $(libMEDSPLITTERTest_la_LDFLAGS) -lm \
 	libMEDSPLITTERTest.la ../../MEDWrapper/V2_1/Core/libmed_V2_1.la \
-	../../MEDMEM/libmedmem.la ../libmedsplitter.la
+	../../MEDMEM/libmedmem.la ../../INTERP_KERNEL/libinterpkernel.la \
+	../libmedsplitter.la 
 if MED_ENABLE_KERNEL
      TestMEDSPLITTER_LDADD+= -lSALOMEBasics
 endif

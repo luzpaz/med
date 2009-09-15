@@ -83,4 +83,5 @@ multipr_LDADD= $(libMULTIPR_API_la_LDFLAGS) \
 	../MEDWrapper/V2_1/Wrapper/libMEDWrapper_V2_1.la \
 	../MEDWrapper/V2_2/libMEDWrapper_V2_2.la \
 	../MEDWrapper/Base/libMEDWrapperBase.la \
+	../INTERP_KERNEL/libinterpkernel.la \
 	libMULTIPR_API.la
