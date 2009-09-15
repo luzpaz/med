@@ -75,11 +75,11 @@ struct MEDMEM_EXPORT _maille
     };
     _maille(MED_EN::medGeometryElement _geometricType, size_t nelem) : geometricType(_geometricType),ordre(0),reverse(false)
     {
-	sommets.reserve(nelem);
+        sommets.reserve(nelem);
     };
     int dimension() const // retourne la dimension de la maille
     {
-	return geometricType/100;
+        return geometricType/100;
     };
     bool operator < (const _maille& ma) const;
     MED_EN::medEntityMesh getEntity(const int meshDimension) const throw (MEDEXCEPTION);
@@ -90,7 +90,7 @@ struct MEDMEM_EXPORT _mailleIteratorCompare // pour ordonner le set d'iterateurs
 {
     bool operator () (std::set<_maille>::iterator i1, std::set<_maille>::iterator i2)
     {
-	return *i1<*i2;
+        return *i1<*i2;
     }
 };
 

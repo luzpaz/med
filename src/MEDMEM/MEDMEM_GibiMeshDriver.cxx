@@ -1735,8 +1735,8 @@ void GIBI_MESH_WRONLY_DRIVER::close()
   BEGIN_OF(LOC);
     if ( _status == MED_OPENED)
     {
-	_gibi.close();
-	_status = MED_CLOSED;
+        _gibi.close();
+        _status = MED_CLOSED;
     }
   END_OF(LOC);
 }
@@ -2485,14 +2485,14 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
     for ( ; it != fields.end(); it++ ) {
       int nbComponents = (*it)->getNumberOfComponents();
       if(nbComponents>0) { 
-	UNIT* compoUnits = new UNIT[nbComponents];
-	string* MEDcompoUnits = new string[nbComponents];
-	for(int l = 0; l<nbComponents; l++) {
-	  compoUnits[l] = UNIT("", "");
-	  MEDcompoUnits[l] = "";
-	}
-	(*it)->setComponentsUnits(compoUnits);
-	(*it)->setMEDComponentsUnits(MEDcompoUnits);
+        UNIT* compoUnits = new UNIT[nbComponents];
+        string* MEDcompoUnits = new string[nbComponents];
+        for(int l = 0; l<nbComponents; l++) {
+          compoUnits[l] = UNIT("", "");
+          MEDcompoUnits[l] = "";
+        }
+        (*it)->setComponentsUnits(compoUnits);
+        (*it)->setMEDComponentsUnits(MEDcompoUnits);
       }
       _med->addField( *it );
     }
@@ -2545,9 +2545,9 @@ GENDRIVER * GIBI_MED_WRONLY_DRIVER::copy ( void ) const
 
 template< class T, class INTERLACING_TAG>
 static void writeDataSection (fstream&                    file,
-			      FIELD<T, INTERLACING_TAG> * field,
-			      const int                   id1,
-			      const int                   id2) throw (MEDEXCEPTION)
+                              FIELD<T, INTERLACING_TAG> * field,
+                              const int                   id1,
+                              const int                   id2) throw (MEDEXCEPTION)
 {
   const char * LOC="writeDataSection (.....) :";
   BEGIN_OF(LOC);
@@ -2770,15 +2770,15 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
         int id2 = id1 + idsize->second;
 
         // PAL11040
-	//if  (f->getGaussPresence() )
+        //if  (f->getGaussPresence() )
         //throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "GibiDriver don't support Field with Gauss point"));
-	
-	if ( f->getInterlacingType() == MED_NO_INTERLACE )
-	  writeDataSection( gibi, static_cast<FIELD<double,NoInterlace  > * >(f), id1, id2 );
-	else if ( f->getInterlacingType() == MED_FULL_INTERLACE )
-	  writeDataSection( gibi, static_cast<FIELD<double,FullInterlace> * >(f), id1, id2 );
-	else
-	  writeDataSection( gibi, static_cast<FIELD<double,NoInterlaceByType> * >(f), id1, id2 );
+        
+        if ( f->getInterlacingType() == MED_NO_INTERLACE )
+          writeDataSection( gibi, static_cast<FIELD<double,NoInterlace  > * >(f), id1, id2 );
+        else if ( f->getInterlacingType() == MED_FULL_INTERLACE )
+          writeDataSection( gibi, static_cast<FIELD<double,FullInterlace> * >(f), id1, id2 );
+        else
+          writeDataSection( gibi, static_cast<FIELD<double,NoInterlaceByType> * >(f), id1, id2 );
 
         id1 = id2;
       }
