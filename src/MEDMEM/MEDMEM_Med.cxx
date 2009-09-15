@@ -137,11 +137,11 @@ MED::~MED()
 //   for ( currentMesh=_meshes.begin();currentMesh != _meshes.end(); currentMesh++ ) {
 //     if ( (*currentMesh).second != NULL)
 //       {
-// 	SCRUTE_MED((*currentMesh).second);
+//      SCRUTE_MED((*currentMesh).second);
 
-// 	string meshName = ((*currentMesh).second)->getName();
+//      string meshName = ((*currentMesh).second)->getName();
 
-// 	MESSAGE_MED("             " << meshName);
+//      MESSAGE_MED("             " << meshName);
 //       }
 //   }
 
@@ -152,14 +152,14 @@ MED::~MED()
       // cast in right type to delete it !
       switch ((*currentField).first->getValueType()) {
       case MED_INT32 : 
-	delete (FIELD<int>*) (*currentField).first ;
-	break ;
+        delete (FIELD<int>*) (*currentField).first ;
+        break ;
       case MED_REEL64 :
-	delete (FIELD<double>*) (*currentField).first ;
-	break ;
+        delete (FIELD<double>*) (*currentField).first ;
+        break ;
       default : 
-	MESSAGE_MED(PREFIX_MED << "Field has type different of int or double, could not destroy its values array !") ;
-	delete (*currentField).first;
+        MESSAGE_MED(PREFIX_MED << "Field has type different of int or double, could not destroy its values array !") ;
+        delete (*currentField).first;
       }
     }
   }
@@ -169,17 +169,17 @@ MED::~MED()
     for ( itSupport=(*itSupportOnMesh).second.begin();itSupport!=(*itSupportOnMesh).second.end();itSupport++)
       if (! dynamic_cast<GROUP*>( (*itSupport).second ) &&
           ! dynamic_cast<FAMILY*>( (*itSupport).second ) )
-	delete (*itSupport).second ;
+        delete (*itSupport).second ;
   }
 
   //  map<MESH_NAME_,MESH*>::const_iterator  currentMesh;
   for ( currentMesh=_meshes.begin();currentMesh != _meshes.end(); currentMesh++ ) {
     if ( (*currentMesh).second != NULL)
       {
-	if (!((*currentMesh).second)->getIsAGrid())
-	  delete (*currentMesh).second;
-	else
-	  delete (GRID *) (*currentMesh).second;
+        if (!((*currentMesh).second)->getIsAGrid())
+          delete (*currentMesh).second;
+        else
+          delete (GRID *) (*currentMesh).second;
       }
   }
 
@@ -209,8 +209,8 @@ MED::~MED()
   read or write methods.
 */
 int MED::addDriver(driverTypes driverType,
-		   const string & fileName="Default File Name.med",
-		   MED_EN::med_mode_acces access)
+                   const string & fileName="Default File Name.med",
+                   MED_EN::med_mode_acces access)
 {
 
   const char* LOC = "MED::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\") : ";
@@ -222,7 +222,7 @@ int MED::addDriver(driverTypes driverType,
   SCRUTE_MED(access);
 
   GENDRIVER *driver = DRIVERFACTORY::buildDriverForMed(driverType,fileName,
-						       this,access);
+                                                       this,access);
 
   _drivers.push_back(driver);
 
@@ -389,10 +389,10 @@ void MED::read  (int index/*=0*/)
   }
   else
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-				     << "The index given is invalid, index must be between  >0 and < |" 
-				     << _drivers.size()-1 
-				     )
-			  );  
+                                     << "The index given is invalid, index must be between  >0 and < |" 
+                                     << _drivers.size()-1 
+                                     )
+                          );  
   END_OF_MED(LOC);
   
 }
@@ -729,10 +729,10 @@ FIELD_  *MED::getField2(const string & fieldName, double time, int it) const thr
   for(;iters!=(*itFields).second.end() && !found;iters++)
     if(fabs((*iters).second->getTime()-time)<eps)
       //if(it==(*iters).first.it)
-	{
-	  ret=(*iters).second;
-	  found=true;
-	}
+        {
+          ret=(*iters).second;
+          found=true;
+        }
   if(!found)
     throw MED_EXCEPTION(LOCALIZED( STRING(LOC) << "There is no known field existing at specified time and iteration !!! "));
   return ret;
@@ -791,7 +791,7 @@ SUPPORT *  MED::getSupport (const string & meshName,MED_EN::medEntityMesh entity
     {
       map<MED_EN::medEntityMesh,SUPPORT *>::const_iterator const_itSupport ;
       for (const_itSupport=(*const_itSupportOnMesh).second.begin();
-	   const_itSupport!=(*const_itSupportOnMesh).second.end();const_itSupport++) index++;
+           const_itSupport!=(*const_itSupportOnMesh).second.end();const_itSupport++) index++;
     }
 
   MESSAGE_MED(LOC << "In this MED object there is(are) " << index << " support(s):");
@@ -800,10 +800,10 @@ SUPPORT *  MED::getSupport (const string & meshName,MED_EN::medEntityMesh entity
     {
       map<MED_EN::medEntityMesh,SUPPORT *>::const_iterator const_itSupport ;
       for (const_itSupport=(*const_itSupportOnMesh).second.begin();
-	   const_itSupport!=(*const_itSupportOnMesh).second.end();const_itSupport++)
-	{
-	  MESSAGE_MED(LOC << "Support on mesh " << (*const_itSupportOnMesh).first << " on entity " << (*const_itSupport).first << " : " << *((*const_itSupport).second));
-	}
+           const_itSupport!=(*const_itSupportOnMesh).second.end();const_itSupport++)
+        {
+          MESSAGE_MED(LOC << "Support on mesh " << (*const_itSupportOnMesh).first << " on entity " << (*const_itSupport).first << " : " << *((*const_itSupport).second));
+        }
   }
 
   const_itSupportOnMesh = _support.find(meshName) ;
@@ -821,7 +821,7 @@ SUPPORT *  MED::getSupport (const string & meshName,MED_EN::medEntityMesh entity
 //   if (itSupport == SupportOnMesh.end() )
 //     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
 //                                      << "There is no support on entity "
-// 				     << entity << " in mesh named |" 
+//                                   << entity << " in mesh named |" 
 //                                      << meshName << "|"
 //                                      )
 //                           );
@@ -834,7 +834,7 @@ SUPPORT *  MED::getSupport (const string & meshName,MED_EN::medEntityMesh entity
   if (itSupport == SupportOnMesh.end() )
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
                                      << "There is no support on entity "
-				     << entity << " in mesh named |" 
+                                     << entity << " in mesh named |" 
                                      << meshName << "|"
                                      )
                           );
@@ -877,14 +877,14 @@ void MED::updateSupport ()
         anEntity2SupportTmp[aKey] = aData;
       }
       catch (MEDEXCEPTION & ex) {
-	// entity not defined in mesh -> we remove support on it !
-	MESSAGE_MED(PREFIX_MED<<ex.what());
-	delete (*itSupport).second ;
-	//(*itSupportOnMesh).second.erase(itSupport) ; // that's right ????
-	//itSupport-- ;
+        // entity not defined in mesh -> we remove support on it !
+        MESSAGE_MED(PREFIX_MED<<ex.what());
+        delete (*itSupport).second ;
+        //(*itSupportOnMesh).second.erase(itSupport) ; // that's right ????
+        //itSupport-- ;
         map<MED_EN::medEntityMesh,SUPPORT *>::iterator itSupportCurr = itSupport;
         itSupport--; // decrement before erase()
-	(*itSupportOnMesh).second.erase(itSupportCurr);
+        (*itSupportOnMesh).second.erase(itSupportCurr);
       }
     }
 
@@ -998,7 +998,7 @@ void MED::addField( FIELD_ * const ptrField)
   DT_IT_ dtIt;
   dtIt.dt  = ptrField->getIterationNumber();
   dtIt.it  = ptrField->getOrderNumber();
-		
+                
   _fields   [fieldName][dtIt] = ptrField; // if it already exists it is replaced
   _meshName [ptrField]        = meshName; // if it already exists it is replaced
   _meshes   [meshName]        = ptrMesh;  // if it already exists it is replaced
