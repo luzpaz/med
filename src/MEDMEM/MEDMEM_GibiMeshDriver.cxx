@@ -2482,17 +2482,29 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
     _med->addMesh( _ptrMesh );
 
     list< FIELD_* >::iterator it = fields.begin();
-    for ( ; it != fields.end(); it++ ) {
-      int nbComponents = (*it)->getNumberOfComponents();
-      if(nbComponents>0) { 
+    for ( ; it != fields.end(); it++ )
+    {
+      FIELD_* fld = *it;
+      int nbComponents = fld->getNumberOfComponents();
+      if(nbComponents>0) {
         UNIT* compoUnits = new UNIT[nbComponents];
         string* MEDcompoUnits = new string[nbComponents];
         for(int l = 0; l<nbComponents; l++) {
           compoUnits[l] = UNIT("", "");
           MEDcompoUnits[l] = "";
         }
-        (*it)->setComponentsUnits(compoUnits);
-        (*it)->setMEDComponentsUnits(MEDcompoUnits);
+        fld->setComponentsUnits(compoUnits);
+        fld->setMEDComponentsUnits(MEDcompoUnits);
+      }
+      // 0020466: [CEA] sauv2med : bad conversion
+      // Provide profile names for a partial field
+      const SUPPORT* sup = fld->getSupport();
+      if ( sup && !sup->isOnAllElements() )
+      {
+        vector<string> prof_names( sup->getNumberOfTypes() );
+        for (int itype=0; itype < prof_names.size(); itype++)
+          prof_names[itype]=STRING( sup->getName())<<"_type_"<<sup->getTypes()[itype];
+        ((SUPPORT*) sup)->setProfilNames( prof_names );
       }
       _med->addField( *it );
     }
