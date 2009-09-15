@@ -130,16 +130,16 @@ MED_EN::medEntityMesh _maille::getEntity(const int meshDimension) const throw (M
     switch (mailleDimension)
       {
       case 0 :
-	entity = MED_NODE;
-	break;
+        entity = MED_NODE;
+        break;
       case 1 :
-	entity = MED_EDGE;
-	break;
+        entity = MED_EDGE;
+        break;
       case 2 :
-	entity = MED_FACE;
-	break;
+        entity = MED_FACE;
+        break;
       default :
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Impossible de determiner l'entite de la maille."));
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Impossible de determiner l'entite de la maille."));
       }
 return entity;
 
@@ -160,12 +160,12 @@ std::ostream& operator << (std::ostream& os, const _maille& ma)
     os << "maille " << ma.ordre() << " (" << ma.geometricType << ") : < ";
     os << ma.nodeNum(0);
     for( int i=1; i!=ma.sommets.size(); ++i)
-	os << ", " << ma.nodeNum( i );
+        os << ", " << ma.nodeNum( i );
     os << " > sortedNodeIDs: ";
     if ( ma.sortedNodeIDs ) {
       os << "< ";
       for( int i=0; i!=ma.sommets.size(); ++i)
-	os << ( i ? ", " : "" ) << ma.sortedNodeIDs[ i ];
+        os << ( i ? ", " : "" ) << ma.sortedNodeIDs[ i ];
       os << " >";
     }
     else {
@@ -181,14 +181,14 @@ std::ostream& operator << (std::ostream& os, const _groupe& gr)
     os << "--- Groupe " << gr.nom << " --- " << std::endl ;
     os << " -> liste des sous-groupes : ";
     for( std::vector<int>::const_iterator i=gr.groupes.begin(); i!=gr.groupes.end(); ++i)
-	    os << *i << " ";
+            os << *i << " ";
     
     os << std::endl << " -> liste des "<< gr.mailles.size() << " mailles : " << std::endl;
     
     _groupe::TMailleIter i1=gr.mailles.begin();
     int l;
     for(l = 0; l < DUMP_LINES_LIMIT && i1!=gr.mailles.end(); i1++, l++)
-	    os << setw(3) << l+1 << " " << *(*i1) << std::endl;
+            os << setw(3) << l+1 << " " << *(*i1) << std::endl;
     
     if ( l == DUMP_LINES_LIMIT )
       os << "   ... skip " << gr.mailles.size() - l << " mailles" << endl;
@@ -208,7 +208,7 @@ std::ostream& operator << (std::ostream& os, const _noeud& no)
     std::vector<double>::const_iterator i=no.coord.begin();
     os << *i++ ;
     for( ; i!=no.coord.end(); ++i)
-	os << ", " << *i;
+        os << ", " << *i;
     os << " >";
     return os;
 }
@@ -521,7 +521,7 @@ COORDINATE * _intermediateMED::getCoordinate(const string & coordinateSystem)
     double * xyz = coord;
     for( std::map<int,_noeud>::const_iterator i=points.begin(); i!=points.end(); ++i )
       if ( i->second.number > 0 ) {
-	std::copy(i->second.coord.begin(), i->second.coord.end(), xyz );
+        std::copy(i->second.coord.begin(), i->second.coord.end(), xyz );
         xyz += spaceDimension;
       }
 
