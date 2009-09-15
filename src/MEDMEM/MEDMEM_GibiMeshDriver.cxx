@@ -1222,6 +1222,7 @@ void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
       MESSAGE_MED(LOC <<  medi );
 
       fillMesh( &medi );
+      updateSupports(); // create families from groups etc.
     }
   }
   catch (MEDEXCEPTION &ex)
@@ -1735,62 +1736,57 @@ void GIBI_MESH_RDONLY_DRIVER::fillMesh(_intermediateMED* _ptrMedi)
                         _ptrMesh->_groupNode, _ptrMesh);
 
     _ptrMesh->_connectivity = _ptrMedi->getConnectivity();
-
-    // calcul de la connectivite d-1 complete, avec renumerotation des groupes
-    //if (_ptrMesh->_spaceDimension==3)
-    //    _ptrMesh->_connectivity->updateGroup(_ptrMesh->_groupFace);
-    //else if (_ptrMesh->_spaceDimension==2)
-    //    _ptrMesh->_connectivity->updateGroup(_ptrMesh->_groupEdge);
-
-    // Creation des familles à partir des groupes
-    // NC : Cet appel pourra être différé quand la gestion de la cohérence famille/groupes sera assurée
-    _ptrMesh->createFamilies();
-    // TAKE CARE OF ELEMENTS ORDER IN GROUPS AFTER THEIR SPLITING INTO FAMILIES !!!!
-    // _ptrMesh->createFamilies() breaks the order
-//     _ptrMedi->getFamilies(_ptrMesh->_familyCell,
-//                           _ptrMesh->_familyFace,
-//                           _ptrMesh->_familyEdge,
-//                           _ptrMesh->_familyNode, _ptrMesh);
-
-    // add attributes to families
-    set<string> famNames;
-    for (medEntityMesh entity=MED_CELL; entity<MED_ALL_ENTITIES; ++entity)
-    {
-      int i, nb = _ptrMesh->getNumberOfFamilies(entity);
-      for ( i = 1; i <= nb; ++i ) {
-        FAMILY* f = const_cast<FAMILY*>( _ptrMesh->getFamily( entity, i ));
-        f->setNumberOfAttributes( 1 );
-        int* attIDs = new int[1];
-        attIDs[0] = 1;
-        f->setAttributesIdentifiers( attIDs );
-        int* attVals = new int[1];
-        attVals[0] = 1;
-        f->setAttributesValues( attVals );
-        string* attDescr = new string[1];
-        attDescr[0] = "med_family";
-        f->setAttributesDescriptions( attDescr );
-        // limit a name length
-        if ( f->getName().length() > 31 ) {
-          ostringstream name;
-          name << "FAM" << f->getIdentifier();
-          f->setName( name.str());
-        }
-        // check if family is on the whole mesh entity
-        if (_ptrMesh->getNumberOfElements( entity, MED_ALL_ELEMENTS ) ==
-            f->getNumberOfElements( MED_ALL_ELEMENTS ))
-          f->setAll( true );
-      }
-      // setAll() for groups
-      nb = _ptrMesh->getNumberOfGroups(entity);
-      for ( i = 1; i <= nb; ++i ) {
-        GROUP * g = const_cast<GROUP*>( _ptrMesh->getGroup( entity, i ));
-        if (_ptrMesh->getNumberOfElements( entity, MED_ALL_ELEMENTS ) ==
-            g->getNumberOfElements( MED_ALL_ELEMENTS ))
-          g->setAll( true );
-      }
-    }
   }
   END_OF_MED(LOC);
+}
+
+//================================================================================
+/*!
+ * \brief Create families from groups etc.
+ */
+//================================================================================
+
+void GIBI_MESH_RDONLY_DRIVER::updateSupports()
+{
+  _ptrMesh->createFamilies();
+
+  // add attributes to families
+  set<string> famNames;
+  for (medEntityMesh entity=MED_CELL; entity<MED_ALL_ENTITIES; ++entity)
+  {
+    int i, nb = _ptrMesh->getNumberOfFamilies(entity);
+    for ( i = 1; i <= nb; ++i ) {
+      FAMILY* f = const_cast<FAMILY*>( _ptrMesh->getFamily( entity, i ));
+      f->setNumberOfAttributes( 1 );
+      int* attIDs = new int[1];
+      attIDs[0] = 1;
+      f->setAttributesIdentifiers( attIDs );
+      int* attVals = new int[1];
+      attVals[0] = 1;
+      f->setAttributesValues( attVals );
+      string* attDescr = new string[1];
+      attDescr[0] = "med_family";
+      f->setAttributesDescriptions( attDescr );
+      // limit a name length
+      if ( f->getName().length() > 31 ) {
+        ostringstream name;
+        name << "FAM" << f->getIdentifier();
+        f->setName( name.str());
+      }
+      // check if family is on the whole mesh entity
+      if (_ptrMesh->getNumberOfElements( entity, MED_ALL_ELEMENTS ) ==
+          f->getNumberOfElements( MED_ALL_ELEMENTS ))
+        f->setAll( true );
+    }
+    // setAll() for groups
+    nb = _ptrMesh->getNumberOfGroups(entity);
+    for ( i = 1; i <= nb; ++i ) {
+      GROUP * g = const_cast<GROUP*>( _ptrMesh->getGroup( entity, i ));
+      if (_ptrMesh->getNumberOfElements( entity, MED_ALL_ELEMENTS ) ==
+          g->getNumberOfElements( MED_ALL_ELEMENTS ))
+        g->setAll( true );
+    }
+  }
 }
 
 void GIBI_MESH_RDONLY_DRIVER::write( void ) const
@@ -2783,6 +2779,7 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
 
     list< FIELD_* > fields;
     medi.getFields( fields );
+    updateSupports(); // create families from groups etc.
     MESSAGE_MED( "nb fields: " << fields.size() );
 
     if ( _ptrMesh->getName().empty() )
@@ -2791,8 +2788,10 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
     _med->addMesh( _ptrMesh );
 
     list< FIELD_* >::iterator it = fields.begin();
-    for ( ; it != fields.end(); it++ ) {
-      int nbComponents = (*it)->getNumberOfComponents();
+    for ( ; it != fields.end(); it++ )
+    {
+      FIELD_* fld = *it;
+      int nbComponents = fld->getNumberOfComponents();
       if(nbComponents>0) {
         UNIT* compoUnits = new UNIT[nbComponents];
         string* MEDcompoUnits = new string[nbComponents];
@@ -2800,8 +2799,18 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
           compoUnits[l] = UNIT("", "");
           MEDcompoUnits[l] = "";
         }
-        (*it)->setComponentsUnits(compoUnits);
-        (*it)->setMEDComponentsUnits(MEDcompoUnits);
+        fld->setComponentsUnits(compoUnits);
+        fld->setMEDComponentsUnits(MEDcompoUnits);
+      }
+      // 0020466: [CEA] sauv2med : bad conversion
+      // Provide profile names for a partial field
+      const SUPPORT* sup = fld->getSupport();
+      if ( sup && !sup->isOnAllElements() )
+      {
+        vector<string> prof_names( sup->getNumberOfTypes() );
+        for (int itype=0; itype < prof_names.size(); itype++)
+          prof_names[itype]=STRING( sup->getName())<<"_type_"<<sup->getTypes()[itype];
+        ((SUPPORT*) sup)->setProfilNames( prof_names );
       }
       _med->addField( *it );
     }

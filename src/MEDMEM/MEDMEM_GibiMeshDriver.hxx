@@ -177,6 +177,8 @@ protected:
 
   void fillMesh(_intermediateMED* medi);
 
+  void updateSupports();
+
 private:
  
   GENDRIVER * copy ( void ) const ;
