@@ -81,7 +81,9 @@ dist_salomescript_DATA= \
 		   testMedObj.py \
 		   test_profil_MedFieldDriver.py \
 		   testWriteAndFam.py \
-		   testMedMemGeneral.py \
+		   testMedMemGeneral.py
+
+dist_salomescript_SCRIPTS = \
 		   med2sauv \
 		   sauv2med \
 		   avs2med
@@ -98,3 +100,8 @@ $(DESTDIR)$(libdir)/_libMEDMEM_Swig.so:
 
 uninstall-hook:
 	( cd $(DESTDIR)$(libdir); rm -f _libMEDMEM_Swig.so; )
+
+install-data-hook:
+	@for f in $(dist_salomescript_SCRIPTS) ; do \
+          chmod -f a+x $(DESTDIR)$(salomescriptdir)/$$f ; \
+	done
