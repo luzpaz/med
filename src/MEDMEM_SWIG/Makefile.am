@@ -82,10 +82,17 @@ dist_salomescript_DATA   = \
 		   testMedMemCxxTests.py \
 		   dumpMEDMEM.py \
 		   ensightMedEnsight_test.py \
-		   medEnsightMed_test.py \
+		   medEnsightMed_test.py
+
+dist_salomescript_SCRIPTS = \
 		   med2sauv \
 		   sauv2med \
 		   avs2med
 
 dist_salomepython_DATA = \
 		   medutilities.py
+
+install-data-hook:
+	@for f in $(dist_salomescript_SCRIPTS) ; do \
+          chmod -f a+x $(DESTDIR)$(salomescriptdir)/$$f ; \
+	done
