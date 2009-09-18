@@ -209,7 +209,8 @@ MESH::MESH():_coordinate(NULL),_connectivity(NULL), _isAGrid(false) {
 */
 MESH::MESH(MESH &m)
 {
-  _name=m._name;
+  _name = m._name;
+  _description = m._description;
   _isAGrid = m._isAGrid;
 
   if (m._coordinate != NULL)
@@ -225,6 +226,9 @@ MESH::MESH(MESH &m)
   _spaceDimension = m._spaceDimension;
   _meshDimension = m._meshDimension;
   _numberOfNodes = m._numberOfNodes;
+
+  _arePresentOptionnalNodesNumbers = m._arePresentOptionnalNodesNumbers;
+  _optionnalToCanonicNodesNumbers = m._optionnalToCanonicNodesNumbers;
 
   _familyNode = m._familyNode;
   for (int i=0; i<(int)m._familyNode.size(); i++)

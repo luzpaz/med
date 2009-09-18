@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #ifndef MESH_HXX
 #define MESH_HXX
 
@@ -79,7 +79,6 @@ protected :
   int   _spaceDimension;
   int   _meshDimension;
   int   _numberOfNodes;
-
 
   //////////////////////////////////////////////////////////////////////////////////////
   ///  Modification pour prise en compte de la numérotation optionnelle des noeuds   ///
@@ -156,15 +155,15 @@ public :
   virtual bool operator==(const MESH& other) const;
   virtual bool deepCompare(const MESH& other) const;
   MESH( driverTypes driverType, const string & fileName="",
-	const string & meshName="") throw (MEDEXCEPTION);
+        const string & meshName="") throw (MEDEXCEPTION);
   virtual ~MESH();
   friend ostream & operator<<(ostream &os, const MESH &my);
   virtual void printMySelf(ostream &os) const;
 
   int  addDriver(driverTypes driverType,
-		 const string & fileName  ="Default File Name.med",
-		 const string & driverName="Default Mesh Name",
-		 MED_EN::med_mode_acces access=MED_EN::RDWR);
+                 const string & fileName  ="Default File Name.med",
+                 const string & driverName="Default Mesh Name",
+                 MED_EN::med_mode_acces access=MED_EN::RDWR);
   int  addDriver(GENDRIVER & driver);
   void rmDriver(int index=0);
 
@@ -174,16 +173,16 @@ public :
   virtual void write(int index=0, const string & driverName = "");
   inline void write(const GENDRIVER & genDriver);
 
-  inline void 	      setName(string name);
-  inline void 	      setDescription(string description);
-  inline void 	      setMeshDimension(int dim);
+  inline void         setName(string name);
+  inline void         setDescription(string description);
+  inline void         setMeshDimension(int dim);
   inline string       getName() const;
   inline string       getDescription() const;
-  inline int 	      getSpaceDimension() const;
-  inline int 	      getMeshDimension() const;
-  inline bool	      getIsAGrid();
+  inline int          getSpaceDimension() const;
+  inline int          getMeshDimension() const;
+  inline bool         getIsAGrid();
 
-  inline int 	                    getNumberOfNodes() const;
+  inline int                        getNumberOfNodes() const;
   virtual inline const COORDINATE * getCoordinateptr() const;
   inline string                     getCoordinatesSystem() const;
   virtual inline const double *     getCoordinates(MED_EN::medModeSwitch Mode) const;
@@ -200,40 +199,40 @@ public :
   virtual inline string * getCellTypeNames(MED_EN::medEntityMesh Entity) const;
   virtual const int * getGlobalNumberingIndex(MED_EN::medEntityMesh Entity) const;
   virtual inline int getNumberOfElements(MED_EN::medEntityMesh Entity,
-					 MED_EN::medGeometryElement Type) const;
+                                         MED_EN::medGeometryElement Type) const;
   virtual int getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity,
-					 MED_EN::medGeometryElement Type) const;
+                                         MED_EN::medGeometryElement Type) const;
   virtual inline bool existConnectivity(MED_EN::medConnectivity ConnectivityType,
-					MED_EN::medEntityMesh Entity) const;
+                                        MED_EN::medEntityMesh Entity) const;
   virtual bool existConnectivityWithPoly(MED_EN::medConnectivity ConnectivityType,
                                          MED_EN::medEntityMesh Entity) const;
   inline bool existPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
-					MED_EN::medEntityMesh Entity) const;
+                                        MED_EN::medEntityMesh Entity) const;
   inline bool existPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType,
-					  MED_EN::medEntityMesh Entity) const;
+                                          MED_EN::medEntityMesh Entity) const;
 
   virtual inline MED_EN::medGeometryElement getElementType(MED_EN::medEntityMesh Entity,
-						   int Number) const;
+                                                   int Number) const;
   virtual inline MED_EN::medGeometryElement getElementTypeWithPoly(MED_EN::medEntityMesh Entity,
-						   int Number) const;
+                                                   int Number) const;
   virtual inline void calculateConnectivity(MED_EN::medModeSwitch Mode,
-					    MED_EN::medConnectivity ConnectivityType,
-					    MED_EN::medEntityMesh Entity) const ;
+                                            MED_EN::medConnectivity ConnectivityType,
+                                            MED_EN::medEntityMesh Entity) const ;
   virtual inline int getConnectivityLength(MED_EN::medModeSwitch Mode,
-					     MED_EN::medConnectivity ConnectivityType,
-					     MED_EN::medEntityMesh Entity,
-					     MED_EN::medGeometryElement Type) const;
+                                             MED_EN::medConnectivity ConnectivityType,
+                                             MED_EN::medEntityMesh Entity,
+                                             MED_EN::medGeometryElement Type) const;
   virtual inline const int * getConnectivity(MED_EN::medModeSwitch Mode,
-					     MED_EN::medConnectivity ConnectivityType,
-					     MED_EN::medEntityMesh Entity,
-					     MED_EN::medGeometryElement Type) const;
+                                             MED_EN::medConnectivity ConnectivityType,
+                                             MED_EN::medEntityMesh Entity,
+                                             MED_EN::medGeometryElement Type) const;
   virtual inline const int * getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
-						  MED_EN::medEntityMesh Entity) const;
+                                                  MED_EN::medEntityMesh Entity) const;
 
   inline int getPolygonsConnectivityLength(MED_EN::medConnectivity ConnectivityType,
                                            MED_EN::medEntityMesh Entity) const;
   inline const int * getPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
-					     MED_EN::medEntityMesh Entity) const;
+                                             MED_EN::medEntityMesh Entity) const;
   inline const int * getPolygonsConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
                                                   MED_EN::medEntityMesh Entity) const;
   inline int getNumberOfPolygons(MED_EN::medEntityMesh Entity=MED_EN::MED_ALL_ENTITIES) const;
@@ -249,50 +248,50 @@ public :
                                                MED_EN::medGeometryElement Type,
                                                int * connectivity) const;
   virtual inline int getReverseConnectivityLength(MED_EN::medConnectivity ConnectivityType,
-						  MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
+                                                  MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
   virtual inline const int * getReverseConnectivity(MED_EN::medConnectivity ConnectivityType,
-						    MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
+                                                    MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
   virtual inline int getReverseConnectivityIndexLength(MED_EN::medConnectivity ConnectivityType,
-							 MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
+                                                         MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
   virtual inline const int * getReverseConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
-							 MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
+                                                         MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
 
   virtual int                          getNumberOfFamilies(MED_EN::medEntityMesh Entity) const;
   virtual inline const vector<FAMILY*> getFamilies(MED_EN::medEntityMesh Entity) const;
   virtual inline const FAMILY*         getFamily(MED_EN::medEntityMesh Entity,int i) const;
-  virtual int          		       getNumberOfGroups(MED_EN::medEntityMesh Entity) const;
+  virtual int                          getNumberOfGroups(MED_EN::medEntityMesh Entity) const;
   virtual const vector<GROUP*>  getGroups(MED_EN::medEntityMesh Entity) const;
   virtual const GROUP*          getGroup(MED_EN::medEntityMesh Entity,int i) const;
-	virtual const GROUP*          getGroup(const string& name) const throw (MEDEXCEPTION);
+        virtual const GROUP*          getGroup(const string& name) const throw (MEDEXCEPTION);
   virtual inline const CONNECTIVITY*   getConnectivityptr() const;
-	inline void setConnectivityptr(CONNECTIVITY*);
+        inline void setConnectivityptr(CONNECTIVITY*);
   virtual SUPPORT *                    getBoundaryElements(MED_EN::medEntityMesh Entity)
-						throw (MEDEXCEPTION);
+                                                throw (MEDEXCEPTION);
   virtual SUPPORT *                    getSupportOnAll(MED_EN::medEntityMesh Entity)
                                                 throw (MEDEXCEPTION);
   // problème avec le maillage dans le support :
   //            le pointeur n'est pas const, mais sa valeur oui. A voir !!! PG
 
   SUPPORT *                            getSkin(const SUPPORT * Support3D)
-						throw (MEDEXCEPTION);
+                                                throw (MEDEXCEPTION);
 
   //  Node DonneBarycentre(const Cell &m) const;
   virtual FIELD<double>* getVolume (const SUPPORT * Support) const
-				throw (MEDEXCEPTION);
-				// Support must be on 3D elements
+                                throw (MEDEXCEPTION);
+                                // Support must be on 3D elements
   virtual FIELD<double>* getArea (const SUPPORT * Support) const
-				throw (MEDEXCEPTION);
-				// Support must be on 2D elements
+                                throw (MEDEXCEPTION);
+                                // Support must be on 2D elements
   virtual FIELD<double>* getLength (const SUPPORT * Support) const
-				throw (MEDEXCEPTION);
-				// Support must be on 1D elements
+                                throw (MEDEXCEPTION);
+                                // Support must be on 1D elements
   virtual FIELD<double>* getNormal (const SUPPORT * Support) const
-				throw (MEDEXCEPTION);
-				// Support must be on 2D elements
+                                throw (MEDEXCEPTION);
+                                // Support must be on 2D elements
   virtual FIELD<double>* getBarycenter (const SUPPORT * Support) const
-				throw (MEDEXCEPTION);
+                                throw (MEDEXCEPTION);
   //  FIELD<int>* getNeighbourhood(SUPPORT * Support) const
-  //				throw (MEDEXCEPTION); // Il faut preciser !
+  //                            throw (MEDEXCEPTION); // Il faut preciser !
 
   /*!
     returns a SUPPORT pointer on the union of all SUPPORTs in Supports.
@@ -315,7 +314,7 @@ public :
    * (There is no way to know which family has change.)
    */
   void createFamilies();
-	void createGroups();
+        void createGroups();
   SUPPORT *buildSupportOnNodeFromElementList(const list<int>& listOfElt, MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION);
   void fillSupportOnNodeFromElementList(const list<int>& listOfElt, SUPPORT *supportToFill) const throw (MEDEXCEPTION);
   SUPPORT *buildSupportOnElementsFromElementList(const list<int>& listOfElt, MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION);
@@ -334,7 +333,7 @@ public :
 };
 
 // ---------------------------------------
-// 		Methodes Inline
+//              Methodes Inline
 // ---------------------------------------
 
 inline const CONNECTIVITY* MESH::getConnectivityptr() const
@@ -345,7 +344,7 @@ inline const CONNECTIVITY* MESH::getConnectivityptr() const
 
 inline void MESH::setConnectivityptr(CONNECTIVITY* conn)
 {
-	_connectivity=conn;
+        _connectivity=conn;
 }
 // This method is MED specific : don't use it
 // must be private.
@@ -419,7 +418,7 @@ inline string MESH::getName() const
 
 inline void MESH::setMeshDimension(int dim)
 {
-  _meshDimension=dim;
+  _meshDimension = dim;
 }
 
 /*! Set the MESH description */
@@ -428,11 +427,11 @@ Sets the MESH description. Description should not exceed MED_TAILLE_DESC length 
 \endif */
 inline void MESH::setDescription(string description)
 {
-  _description=description; //NOM interne à la classe
+  _description = description; //NOM interne à la classe
 }
 
-/*! Gets the MESH description. The string returned contains 
-a short description of the mesh, which is stored for 
+/*! Gets the MESH description. The string returned contains
+a short description of the mesh, which is stored for
 information purposes only.*/
 inline string MESH::getDescription() const
 {
@@ -472,7 +471,7 @@ inline int MESH::getNumberOfNodes() const
   return _numberOfNodes;
 }
 
-/*! \ifnot MEDMEM_ug 
+/*! \ifnot MEDMEM_ug
  Gets the COORDINATES object. Use it only if you need COORDINATES informations not provided by the MESH class.
 \endif
 */
@@ -524,7 +523,7 @@ Here is a small C++ example program for which the
 Python version may be found in
 \a MESHcoordinates.py.
 
-\example MESHcoordinates.cxx 
+\example MESHcoordinates.cxx
 
 @}
 \endif
@@ -549,8 +548,6 @@ Python version may be found in
     If there is no connectivity, returns an exception.
 
     \param entity  entity type (MED_CELL, MED_FACE, MED_EDGE, MED_NODE, MED_ALL_ENTITIES)
-
-    
 */
 inline int MESH::getNumberOfTypes(MED_EN::medEntityMesh entity) const
 {
@@ -653,9 +650,9 @@ inline int MESH::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGe
     {
 //       checkGridFillConnectivity();
       if (_connectivity != (CONNECTIVITY*)NULL)
-	return _connectivity->getNumberOf(entity,Type);
+        return _connectivity->getNumberOf(entity,Type);
       else
-	return 0;
+        return 0;
       //throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"connectivity not defined !"));
     }
 }
@@ -663,14 +660,14 @@ inline int MESH::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGe
 
 This example shows the use of connectivity retrieval methods on a mesh which
 corresponds to the four-element mesh given in figure ??. Note
-the use of connectivity and connnectivity index tables, and the 
+the use of connectivity and connnectivity index tables, and the
 offsets used to convert Fortran-style numbering to C arrays.
 
 The output of this program reads :
 \code
 Number of types : 3
 Type #0
-Element 1 : 1 2 3 
+Element 1 : 1 2 3
 Type #1
 Element 1 : 2 4 5 3
 Element 2 : 5 6 7 8
@@ -680,7 +677,7 @@ Element 1 : 4 6 5 10 11 9
 
 \example read_example.cxx
 
-A more complete example involving descending connectivities 
+A more complete example involving descending connectivities
 can be found in \c MESHconnectivities.cxx and \c MESHconnectivities.py.
 
 @}
@@ -862,7 +859,7 @@ inline int MESH::getPolygonsConnectivityLength(MED_EN::medConnectivity Connectiv
   You must also get the corresponding index array.
  */
 inline const int * MESH::getPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
-						 MED_EN::medEntityMesh Entity) const
+                                                 MED_EN::medEntityMesh Entity) const
 {
   return _connectivity->getPolygonsConnectivity(ConnectivityType,Entity);
 }
@@ -870,7 +867,7 @@ inline const int * MESH::getPolygonsConnectivity(MED_EN::medConnectivity Connect
   Return the required index array for polygons connectivity.
  */
 inline const int * MESH::getPolygonsConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
-						      MED_EN::medEntityMesh Entity) const
+                                                      MED_EN::medEntityMesh Entity) const
 {
   return _connectivity->getPolygonsConnectivityIndex(ConnectivityType,Entity);
 }
@@ -895,7 +892,7 @@ inline int MESH::getPolyhedronConnectivityLength(MED_EN::medConnectivity Connect
   return getPolyhedronFacesIndex()[ getNumberOfPolyhedronFaces() ] - 1;
 }
 
-/*! \if MEDMEM_ug 
+/*! \if MEDMEM_ug
 \addtogroup MESH_poly
 @{ \endif */
 
@@ -952,7 +949,7 @@ inline int MESH::getNumberOfPolyhedron() const
  */
 
 inline int MESH::getReverseConnectivityLength(MED_EN::medConnectivity ConnectivityType,
-						    MED_EN::medEntityMesh Entity) const
+                                                    MED_EN::medEntityMesh Entity) const
 {
   int spaceDim = getSpaceDimension();
   int nb;
@@ -964,11 +961,11 @@ inline int MESH::getReverseConnectivityLength(MED_EN::medConnectivity Connectivi
   else
     {
       if (spaceDim == 2)
-	nb = getNumberOfElements(MED_EN::MED_EDGE,
-					MED_EN::MED_ALL_ELEMENTS);
+        nb = getNumberOfElements(MED_EN::MED_EDGE,
+                                        MED_EN::MED_ALL_ELEMENTS);
       else if (spaceDim == 3)
-	nb = getNumberOfElements(MED_EN::MED_FACE,
-					MED_EN::MED_ALL_ELEMENTS);
+        nb = getNumberOfElements(MED_EN::MED_FACE,
+                                        MED_EN::MED_ALL_ELEMENTS);
     }
   return getReverseConnectivityIndex(ConnectivityType,Entity)[nb]-1;
 }
@@ -993,7 +990,7 @@ inline const int * MESH::getReverseConnectivity(MED_EN::medConnectivity Connecti
   Used particulary for wrapping CORBA and python.
  */
 inline int MESH::getReverseConnectivityIndexLength(MED_EN::medConnectivity ConnectivityType,
-							 MED_EN::medEntityMesh Entity) const
+                                                         MED_EN::medEntityMesh Entity) const
 {
   int spaceDim = getSpaceDimension();
 
@@ -1004,11 +1001,11 @@ inline int MESH::getReverseConnectivityIndexLength(MED_EN::medConnectivity Conne
   else
     {
       if (spaceDim == 2)
-	return getNumberOfElements(MED_EN::MED_EDGE,MED_EN::MED_ALL_ELEMENTS)+1;
+        return getNumberOfElements(MED_EN::MED_EDGE,MED_EN::MED_ALL_ELEMENTS)+1;
       else if (spaceDim == 3)
-	return getNumberOfElements(MED_EN::MED_FACE,MED_EN::MED_ALL_ELEMENTS)+1;
+        return getNumberOfElements(MED_EN::MED_FACE,MED_EN::MED_ALL_ELEMENTS)+1;
       else
-	throw MEDEXCEPTION("Invalid dimension");
+        throw MEDEXCEPTION("Invalid dimension");
     }
 }
 /*!
@@ -1144,7 +1141,7 @@ namespace MEDMEM {
 //Create a new FIELD that should be deallocated based on a SUPPORT that should be deallocated too.
 template<class T>
 FIELD<T, FullInterlace> * MESH::mergeFields(const vector< FIELD<T, FullInterlace> * > & others,
-					    bool meshCompare)
+                                            bool meshCompare)
 {
   const char * LOC = "MESH::mergeFields(const vector< FIELD<T>* >& others,bool meshCompare): ";
   BEGIN_OF_MED(LOC);
@@ -1159,7 +1156,7 @@ FIELD<T, FullInterlace> * MESH::mergeFields(const vector< FIELD<T, FullInterlace
     {
       MED_EN::med_type_champ valueTypeIter = (*iter)->getValueType();
       if (valueTypeIter != valueType)
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Fields vector have not the same value type"));
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Fields vector have not the same value type"));
 
       sup.push_back((SUPPORT *)(*iter)->getSupport());
     }
@@ -1173,33 +1170,33 @@ FIELD<T, FullInterlace> * MESH::mergeFields(const vector< FIELD<T, FullInterlace
   if(retSup->isOnAllElements())
     {
       for(i=0;i<nbOfEltsRetSup;i++)
-	{
-	  bool found=false;
-	  for(iter=others.begin();iter!=others.end() && !found;iter++)
-	    {
-	      found=(*iter)->getValueOnElement(i+1,tempValues);
-	      if(found)
-		for(j=0;j<retNumberOfComponents;j++)
-		  valuesToSet[i*retNumberOfComponents+j]=tempValues[j];
-	    }
-	}
+        {
+          bool found=false;
+          for(iter=others.begin();iter!=others.end() && !found;iter++)
+            {
+              found=(*iter)->getValueOnElement(i+1,tempValues);
+              if(found)
+                for(j=0;j<retNumberOfComponents;j++)
+                  valuesToSet[i*retNumberOfComponents+j]=tempValues[j];
+            }
+        }
     }
   else
     {
       const int *eltsRetSup=retSup->getNumber(MED_EN::MED_ALL_ELEMENTS);
       for(i=0;i<nbOfEltsRetSup;i++)
-	{
-	  bool found=false;
-	  for(iter=others.begin();iter!=others.end() && !found;iter++)
-	    {
-	      found=(*iter)->getValueOnElement(eltsRetSup[i],tempValues);
-	      if(found)
-		for(j=0;j<retNumberOfComponents;j++)
-		  valuesToSet[i*retNumberOfComponents+j]=tempValues[j];
-	    }
-	  if(!found)
-	    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Merging error due to an error in merging support"));
-	}
+        {
+          bool found=false;
+          for(iter=others.begin();iter!=others.end() && !found;iter++)
+            {
+              found=(*iter)->getValueOnElement(eltsRetSup[i],tempValues);
+              if(found)
+                for(j=0;j<retNumberOfComponents;j++)
+                  valuesToSet[i*retNumberOfComponents+j]=tempValues[j];
+            }
+          if(!found)
+            throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Merging error due to an error in merging support"));
+        }
     }
   delete [] tempValues;
   END_OF_MED(LOC);
