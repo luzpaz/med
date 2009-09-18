@@ -41,10 +41,10 @@ MEDMEM_REMAPPER::MEDMEM_REMAPPER():_matrix(0),_sourceMesh(0), _targetMesh(0), _s
 MEDMEM_REMAPPER::~MEDMEM_REMAPPER()
 {
   delete _matrix;
-	delete _sourceMesh;
-	delete _targetMesh;
-	delete _sourceSupport;
-	delete _targetSupport;
+        delete _sourceMesh;
+        delete _targetMesh;
+        delete _sourceSupport;
+        delete _targetSupport;
 }
 /*! This method computes the intersection matrix between 
  * source \a mesh_source and \a mesh_target. It is a preliminary step 
@@ -62,12 +62,12 @@ int MEDMEM_REMAPPER::prepare(const MEDMEM::MESH& mesh_source, const MEDMEM::MESH
   delete _matrix;
   _matrix= new INTERP_KERNEL::Matrix<double,INTERP_KERNEL::ALL_FORTRAN_MODE>;
 
-	delete _sourceMesh;
-	_sourceMesh= new MEDMEM::MESH((MEDMEM::MESH&)mesh_source);
-	delete _targetMesh;
-	_targetMesh= new MEDMEM::MESH((MEDMEM::MESH&)mesh_target);
+        delete _sourceMesh;
+        _sourceMesh= new MEDMEM::MESH((MEDMEM::MESH&)mesh_source);
+        delete _targetMesh;
+        _targetMesh= new MEDMEM::MESH((MEDMEM::MESH&)mesh_target);
 
-	std::string methodC=method;
+        std::string methodC=method;
   if(methodC == "P0P0"){
     _sourceFieldType = "P0";
     _targetFieldType = "P0";
@@ -86,19 +86,19 @@ int MEDMEM_REMAPPER::prepare(const MEDMEM::MESH& mesh_source, const MEDMEM::MESH
   }
   else
     throw INTERP_KERNEL::Exception("MEDMEM_REMAPPER::prepare: Invalid method specified ! Must be in : \"P0P0\" \"P0P1\" \"P1P0\" or \"P1P1\"");
-		
+                
 
-	delete _sourceSupport;
-	delete _targetSupport;
-	if(	_sourceFieldType == "P0")
+        delete _sourceSupport;
+        delete _targetSupport;
+        if(     _sourceFieldType == "P0")
     _sourceSupport = new MEDMEM::SUPPORT((MEDMEM::MESH *)_sourceMesh,"on All support",MED_EN::MED_CELL);
   else
     _sourceSupport = new MEDMEM::SUPPORT((MEDMEM::MESH *)_sourceMesh,"on All support",MED_EN::MED_NODE);
-  if(	_targetFieldType == "P0")
+  if(   _targetFieldType == "P0")
     _targetSupport = new MEDMEM::SUPPORT((MEDMEM::MESH *)_targetMesh,"on All support",MED_EN::MED_CELL);
   else
     _targetSupport = new MEDMEM::SUPPORT((MEDMEM::MESH *)_targetMesh,"on All support",MED_EN::MED_NODE);
-	
+        
   if (tm_spacedim!=sm_spacedim || tm_meshdim!=sm_meshdim)
     throw MEDEXCEPTION("incompatible mesh and/or space dimensions in meshes");
   if ((sm_spacedim==2)&&(sm_meshdim==2))
@@ -159,7 +159,7 @@ void MEDMEM_REMAPPER::transfer(const MEDMEM::FIELD<double>& field_source, MEDMEM
 
   for (int i=0; i< _nb_rows; i++)
     for(int comp = 0; comp < source_nbcomp; comp++)
-      value_target[i*source_nbcomp+comp]/=_deno_multiply[i]; 		
+      value_target[i*source_nbcomp+comp]/=_deno_multiply[i];            
 }
 
 /*
@@ -202,16 +202,16 @@ MEDMEM::FIELD<double> *  MEDMEM_REMAPPER::transferField(const MEDMEM::FIELD<doub
 
   if (_nb_cols != nb_source_values)
     throw MEDMEM::MEDEXCEPTION("MEDMEM_REMAPPER::transfer: incoherent number of field values, cannot cannot multiply by interpolation matrix");
-	
+        
   MEDMEM::FIELD<double> * target_field = new MEDMEM::FIELD<double>(_targetSupport,source_nbcomp);
   double* value_target = const_cast<double*> ((*target_field).getValue());
-		
+                
   _matrix->multiply(value_source, value_target,source_nbcomp);
-		
+                
   for (int i=0; i< _nb_rows; i++)
     for(int comp = 0; comp < source_nbcomp; comp++)
-      value_target[i*source_nbcomp+comp]/=_deno_multiply[i]; 	
-		
+      value_target[i*source_nbcomp+comp]/=_deno_multiply[i];    
+                
   return target_field;
 }
 
@@ -226,26 +226,26 @@ MEDMEM::FIELD<double> *  MEDMEM_REMAPPER::reverseTransferField(const MEDMEM::FIE
   int target_nbcomp=field_target.getNumberOfComponents();
   const double* value_target = field_target.getValue();
   int nb_target_values= field_target.getNumberOfValues();
-	
+        
   if (_nb_rows != nb_target_values)
     throw MEDMEM::MEDEXCEPTION(" MEDMEM_REMAPPER::reverseTransfer: incoherent number of field values, cannot cannot transpose-multiply by interpolation matrix");
-	
+        
   MEDMEM::FIELD<double> * source_field = new MEDMEM::FIELD<double>(_sourceSupport,target_nbcomp);
   double* value_source = const_cast<double*> ((*source_field).getValue());
-	
+        
   _matrix->transposeMultiply(value_target, value_source, _nb_cols,target_nbcomp);//transposeMultiply(input,output, nbcols,nbcomp)
-	
+        
   for (int i=0; i< _nb_cols; i++)
     for(int comp = 0; comp < target_nbcomp; comp++)
       value_source[i*target_nbcomp+comp]/=_deno_reverse_multiply[i];
-	
+        
   return source_field;
 }
 
 int MEDMEM_REMAPPER::setOptionDouble(const std::string& key, double value)
 {
   bool result = INTERP_KERNEL::InterpolationOptions::setOptionDouble(key,value);
-	
+        
   if(result)
     return 1;
   else
@@ -255,7 +255,7 @@ int MEDMEM_REMAPPER::setOptionDouble(const std::string& key, double value)
 int MEDMEM_REMAPPER::setOptionInt(const std::string& key, int value)
 {
   bool result = INTERP_KERNEL::InterpolationOptions::setOptionInt(key,value);
-	
+        
   if(result)
     return 1;
   else
@@ -265,7 +265,7 @@ int MEDMEM_REMAPPER::setOptionInt(const std::string& key, int value)
 int MEDMEM_REMAPPER::setOptionString(const std::string& key, std::string& value)
 {
   bool result = INTERP_KERNEL::InterpolationOptions::setOptionString(key,value);
-	
+        
   if(result)
     return 1;
   else
