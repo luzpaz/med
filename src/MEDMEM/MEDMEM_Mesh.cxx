@@ -226,6 +226,7 @@ MESH::MESH(MESH &m)
   _spaceDimension = m._spaceDimension;
   _meshDimension = m._meshDimension;
   _numberOfNodes = m._numberOfNodes;
+  _arePresentOptionnalNodesNumbers = m._arePresentOptionnalNodesNumbers;
 
   _arePresentOptionnalNodesNumbers = m._arePresentOptionnalNodesNumbers;
   _optionnalToCanonicNodesNumbers = m._optionnalToCanonicNodesNumbers;

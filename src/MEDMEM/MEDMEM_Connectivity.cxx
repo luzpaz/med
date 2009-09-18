@@ -1454,7 +1454,7 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
       ConstituentNodalConnectivityIndex[0]=1;
 
       _constituent->_entityDimension = _entityDimension-1;
-      if(ConstituentsTypes[0]==MED_NONE && ConstituentsTypes[1]==MED_NONE && _numberOfTypes==0)
+      if(ConstituentsTypes[0]==MED_NONE && ConstituentsTypes[1]==MED_NONE && getNumberOfTypesWithPoly(_entity)==0)
         _constituent->_numberOfTypes = 0;
       else if (ConstituentsTypes[1]==MED_NONE)
         _constituent->_numberOfTypes = 1;
@@ -1714,10 +1714,10 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
       for (int i=0; i <getNumberOfPolygons(); i++) // for each polygon
       {
         const int * vector_begin = &_polygonsNodal->getValue()[_polygonsNodal->getIndex()[i]-1];
-        int vector_size = _polygonsNodal->getIndex()[i+1]-_polygonsNodal->getIndex()[i]+1;
+        int vector_size = _polygonsNodal->getIndex()[i+1]-_polygonsNodal->getIndex()[i];
         vector<int> myPolygon(vector_begin, vector_begin+vector_size);
-        myPolygon[myPolygon.size()-1] = myPolygon[0]; // because first and last point make a segment
-
+        //myPolygon[myPolygon.size()-1] = myPolygon[0]; // because first and last point make a segment
+        myPolygon.push_back(myPolygon[0]);
         for (int j=0; j<(int)myPolygon.size()-1; j++) // for each segment of polygon
         {
           MEDMODULUSARRAY segment_poly(2,&myPolygon[j]);
@@ -1752,6 +1752,7 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
         }
       }
 
+      //Reversedescendingconnectivityvalue.push_back(0);
       if (getNumberOfPolygons() > 0)
       {
         _polygonsDescending = new MEDSKYLINEARRAY(getNumberOfPolygons(),_polygonsNodal->getLength(),_polygonsNodal->getIndex(),&PolyDescending[0]); // index are the same for polygons nodal and descending connectivities
@@ -1931,11 +1932,11 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
 
       int NumberOfConstituentWithPolygons = NumberOfConstituent + NumberOfNewFaces;
       Reversedescendingconnectivityindex.push_back(Reversedescendingconnectivityindex[Reversedescendingconnectivityindex.size()-1]+2); // we complete the index
+      Reversedescendingconnectivityvalue.push_back(0);
       _reverseDescendingConnectivity = new MEDSKYLINEARRAY(NumberOfConstituentWithPolygons+1,
                                                            2*NumberOfConstituentWithPolygons,
                                                            &Reversedescendingconnectivityindex[0],
                                                            &Reversedescendingconnectivityvalue[0]);
-      ////
       _isDescendingConnectivityPartial = false;
     }
     END_OF_MED(LOC);

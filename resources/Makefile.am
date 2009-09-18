@@ -162,6 +162,10 @@ dist_salomeres_DATA = \
     CornerTetra.med \
     SimpleIncludedTetra.med \
     SimpleIncludingTetra.med \
+    Test2D.med \
+    Test2Dpoly.med \
+    Test3D.med \
+    Test3Dpoly.med \
     UnitTetraDegenT.med \
     DegenEdgeXY.med \
     DegenFaceXYZ.med \

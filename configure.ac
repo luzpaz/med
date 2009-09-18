@@ -81,13 +81,13 @@ if test "x${old_with_kernel}" != "x${MED_WITH_KERNEL}"; then
              echo "Configuration changed: without KERNEL -> with KERNEL"
              echo -n "Updating 'configure' script ...  "
              cd $ROOT_SRCDIR
-	     if build_configure --with-kernel={MED_WITH_KERNEL}; then
-	       echo "... done"
-	     else
-	       echo "... failed"
-	       cd $ROOT_BUILDDIR
-	       exit 1
-	     fi
+           if build_configure --with-kernel={MED_WITH_KERNEL}; then
+             echo "... done"
+           else
+             echo "... failed"
+             cd $ROOT_BUILDDIR
+             exit 1
+           fi
              cd $ROOT_BUILDDIR
              $0 $*
              exit
@@ -106,8 +106,8 @@ echo
 ###
 
 AC_ARG_WITH([interp-kernel-only],
-	    [AC_HELP_STRING([--with-interp-kernel-only],[Build MicroMED packages only, default=no])],
-	    [],[with_interp_kernel_only=no])
+          [AC_HELP_STRING([--with-interp-kernel-only],[Build MicroMED packages only, default=no])],
+          [],[with_interp_kernel_only=no])
 
 if test "$MED_WITH_KERNEL" == "yes" ; then
   if test "$with_interp_kernel_only" != "no" ; then
@@ -319,7 +319,8 @@ if test "$with_interp_kernel_only" != "yes" ; then
     echo ---------------------------------------------
     echo
     
-    CHECK_BOOST
+    CHECK_BOOST 
+
     
     echo
     echo ---------------------------------------------
@@ -345,7 +346,7 @@ if test "$with_interp_kernel_only" != "yes" ; then
         echo ---------------------------------------------
         echo scotch_ok=no 
         CHECK_SCOTCH 
-        dnl scotch_ok is set to yes by CHECK_SCOTCH	 
+        dnl scotch_ok is set to yes by CHECK_SCOTCH    
         
         echo        
         echo --------------------------------------------- 
@@ -357,6 +358,20 @@ if test "$with_interp_kernel_only" != "yes" ; then
         
     fi
     
+    AC_ENABLE_RENUMBER(yes)
+
+    if test "x$ENABLE_RENUMBER" = "xyes"; then
+        if test "x$metis_ok" = "x"; then
+            echo  
+            echo --------------------------------------------- 
+            echo testing METIS 
+            echo ---------------------------------------------
+            echo 
+            metis_ok=no 
+            CHECK_METIS dnl metis_ok is set to yes by CHECK_METIS
+        fi
+    fi
+
     if test "${MED_WITH_KERNEL}" = "yes"; then
         
         echo
@@ -375,54 +390,54 @@ if test "$with_interp_kernel_only" != "yes" ; then
         
         CHECK_LSF
         
-	dnl
-	dnl ---------------------------------------------
-	dnl testing sockets
-	dnl ---------------------------------------------
-	dnl
+      dnl
+      dnl ---------------------------------------------
+      dnl testing sockets
+      dnl ---------------------------------------------
+      dnl
         
-	CHECK_SOCKETS
+      CHECK_SOCKETS
         
-	dnl
-	dnl ---------------------------------------------
-	dnl testing Batch
-	dnl ---------------------------------------------
-	dnl
+      dnl
+      dnl ---------------------------------------------
+      dnl testing Batch
+      dnl ---------------------------------------------
+      dnl
         
-	WITH_BATCH=no
-	test x$openpbs_ok = xyes || test x$lsf_ok = xyes && WITH_BATCH=yes
-	AC_SUBST(WITH_BATCH)
+      WITH_BATCH=no
+      test x$openpbs_ok = xyes || test x$lsf_ok = xyes && WITH_BATCH=yes
+      AC_SUBST(WITH_BATCH)
         
-	echo
-	echo ---------------------------------------------
-	echo testing omniORB
-	echo ---------------------------------------------
-	echo
+      echo
+      echo ---------------------------------------------
+      echo testing omniORB
+      echo ---------------------------------------------
+      echo
         
-	CHECK_OMNIORB
+      CHECK_OMNIORB
         
-	DEFAULT_ORB=omniORB
-	CHECK_CORBA
+      DEFAULT_ORB=omniORB
+      CHECK_CORBA
         
-	AC_SUBST_FILE(CORBA)
-	corba=make_$ORB
-	CORBA=adm_local/unix/$corba
+      AC_SUBST_FILE(CORBA)
+      corba=make_$ORB
+      CORBA=adm_local/unix/$corba
         
-	dnl echo
-	dnl echo ---------------------------------------------
-	dnl echo testing mico
-	dnl echo ---------------------------------------------
-	dnl echo
+      dnl echo
+      dnl echo ---------------------------------------------
+      dnl echo testing mico
+      dnl echo ---------------------------------------------
+      dnl echo
         
-	dnl CHECK_MICO
+      dnl CHECK_MICO
         
-	echo
-	echo ---------------------------------------------
-	echo testing SALOME Kernel
-	echo ---------------------------------------------
-	echo
+      echo
+      echo ---------------------------------------------
+      echo testing SALOME Kernel
+      echo ---------------------------------------------
+      echo
         
-	CHECK_KERNEL
+      CHECK_KERNEL
         
         echo
         echo ---------------------------------------------
@@ -448,7 +463,7 @@ if test "$with_interp_kernel_only" != "yes" ; then
             echo Build without GUI option has been chosen
         fi
         
-	if test "${gui_ok}" = "yes" ; then
+      if test "${gui_ok}" = "yes" ; then
             
             echo
             echo ---------------------------------------------
@@ -525,7 +540,8 @@ AM_CONDITIONAL(MED_ENABLE_FVM,      [test "$ENABLE_FVM" = yes])
 AM_CONDITIONAL(WITH_OPENPBS,        [test "$WITHOPENPBS" = yes])
 AM_CONDITIONAL(WITH_LSF,            [test "$WITH_LSF" = yes])
 AM_CONDITIONAL(MED_ENABLE_MED2,     [test "$med2_ok" = yes])
-
+AM_CONDITIONAL(MED_ENABLE_RENUMBER, [test "$ENABLE_RENUMBER" = yes])
+AM_CONDITIONAL(BOOST_IS_OK,         [test "$boost_ok" = yes])
 ###
 # Print summary
 ###
@@ -552,9 +568,14 @@ if test "x$ENABLE_SPLITTER" = "xyes" ; then
   splitter_vars="metis_ok scotch_ok libxml_ok"
 fi
 
+if test "x$ENABLE_RENUMBER" = "xyes" ; then
+  if test "x$splitter_vars" = "x" ; then
+    renumber_vars="metis_ok"
+  fi
+fi
 if test "$MED_WITH_KERNEL" = "yes" ; then 
     # --with-kernel=yes
-    obligatory_vars="$obligatory_vars python_ok boost_ok swig_ok hdf5_ok med2_ok omniORB_ok $splitter_vars"
+    obligatory_vars="$obligatory_vars python_ok boost_ok swig_ok hdf5_ok med2_ok omniORB_ok $splitter_vars $renumber_vars"
     optional_vars="$optional_vars openpbs_ok lsf_ok graphviz_ok Kernel_ok"
     if test "${gui_ok}" = "yes"; then
         # GUI is enabled
@@ -569,7 +590,7 @@ else
         optional_vars="$optional_vars hdf5_ok med2_ok"
     else
         # --with-interp-kernel-only=no mode
-        obligatory_vars="$obligatory_vars python_ok boost_ok swig_ok hdf5_ok med2_ok omniORB_ok $splitter_vars"
+        obligatory_vars="$obligatory_vars python_ok boost_ok swig_ok hdf5_ok med2_ok omniORB_ok $splitter_vars $renumber_vars"
     fi
 fi
 
@@ -648,90 +669,91 @@ echo ---------------------------------------------
 echo
 
 AC_OUTPUT_COMMANDS([ \
-	chmod +x ./bin/* \
+      chmod +x ./bin/* \
 ])
 
 AC_OUTPUT([ \
-	adm_local_without_kernel/unix/SALOMEconfig.h \
-	Makefile \
-	MED_version.h \
-	adm_local/unix/config_files/Makefile \
+        adm_local_without_kernel/unix/SALOMEconfig.h \
+        Makefile \
+        MED_version.h \
+        adm_local/unix/config_files/Makefile \
         adm_local/unix/Makefile \
         adm_local/cmake_files/Makefile \
-	adm_local/Makefile \
-	adm_local_without_kernel/unix/config_files/Makefile \
+        adm_local/Makefile \
+        adm_local_without_kernel/unix/config_files/Makefile \
         adm_local_without_kernel/unix/Makefile \
-	adm_local_without_kernel/Makefile \
-	resources/Makefile
-	resources/MEDCatalog.xml \
-	bin/Makefile \
-	bin/VERSION \
-	idl/Makefile \
-	src/Makefile \
-	src/MEDWrapper/Makefile \
-	src/MEDWrapper/Base/Makefile \
-	src/MEDWrapper/Factory/Makefile \
-	src/MEDWrapper/V2_1/Makefile \
-	src/MEDWrapper/V2_1/Core/Makefile \
-	src/MEDWrapper/V2_1/Wrapper/Makefile \
-	src/MEDWrapper/V2_2/Makefile \
-	src/MEDMEM/Doxyfile_med_devel \
-	src/MEDMEM/Doxyfile_med_user \
-	src/MEDMEM/Makefile \
-	src/INTERPOLATION/Makefile \
-	src/MEDMEM_SWIG/Makefile \
-	src/MEDMEMBinTest/Makefile \
-	src/MEDMEMCppTest/Makefile \
-	src/INTERP_KERNEL/Makefile \
+        adm_local_without_kernel/Makefile \
+        resources/Makefile
+        resources/MEDCatalog.xml \
+        bin/Makefile \
+        bin/VERSION \
+        idl/Makefile \
+        src/Makefile \
+        src/MEDWrapper/Makefile \
+        src/MEDWrapper/Base/Makefile \
+        src/MEDWrapper/Factory/Makefile \
+        src/MEDWrapper/V2_1/Makefile \
+        src/MEDWrapper/V2_1/Core/Makefile \
+        src/MEDWrapper/V2_1/Wrapper/Makefile \
+        src/MEDWrapper/V2_2/Makefile \
+        src/MEDMEM/Doxyfile_med_devel \
+        src/MEDMEM/Doxyfile_med_user \
+        src/MEDMEM/Makefile \
+        src/INTERPOLATION/Makefile \
+        src/MEDMEM_SWIG/Makefile \
+        src/MEDMEMBinTest/Makefile \
+        src/MEDMEMCppTest/Makefile \
+        src/INTERP_KERNEL/Makefile \
         src/INTERP_KERNEL/Bases/Makefile \
-	src/INTERP_KERNEL/Geometric2D/Makefile \
-	src/INTERP_KERNELTest/Makefile \
+        src/INTERP_KERNEL/Geometric2D/Makefile \
+        src/INTERP_KERNELTest/Makefile \
         src/MEDCoupling/Makefile \
         src/MEDCoupling/Test/Makefile \
         src/MEDCoupling_Swig/Makefile \
         src/MEDCouplingCorba/Makefile \
         src/MEDCouplingCorba/Client/Makefile \
         src/MEDCouplingCorba/Test/Makefile \
-	src/MEDSPLITTER/Makefile \
-	src/MEDSPLITTER/Test/Makefile \
+        src/MEDSPLITTER/Makefile \
+        src/MEDSPLITTER/Test/Makefile \
         src/MEDSPLITTER_Swig/Makefile \
-	src/MULTIPR/Makefile \
-	src/ParaMEDMEM/Makefile \
- 	src/ParaMEDMEMComponent/Makefile \
+        src/RENUMBER/Makefile \
+        src/MULTIPR/Makefile \
+        src/ParaMEDMEM/Makefile \
+        src/ParaMEDMEMComponent/Makefile \
         src/ParaMEDMEM/MEDLoader/Makefile \
-	src/ParaMEDMEM/Test/Makefile \
+        src/ParaMEDMEM/Test/Makefile \
         src/ParaMEDMEM_Swig/Makefile \
-	src/MEDMEM_I/Makefile \
-	src/MED/Makefile \
-	src/MedCorba_Swig/Makefile \
-	src/MED_SWIG/Makefile \
-	src/MedClient/Makefile \
-	src/MedClient/src/Makefile \
-	src/MedClient/test/Makefile \
-	src/MedClient/test/environ/Makefile \
-	src/MedClient/test/environ/runContainer \
-	src/MedClient/test/environ/runEnvironTests \
-	src/MedClient/test/environ/runTestMedCorba \
-	src/MedClient/test/environ/stopContainer \
-	src/MedClient/test/environ/csh/init1 \
-	src/MedClient/test/environ/csh/init2 \
-	src/MedClient/test/environ/csh/init3 \
-	src/MedClient/test/environ/csh/Makefile \
-	src/MedClient/test/environ/csh/runContainer \
-	src/MedClient/test/environ/csh/runEnvironTests \
-	src/MedClient/test/environ/csh/stopContainer \
-	src/MedClient/test/test1/Makefile \
-	src/MedClient/test/test2/Makefile \
-	src/MEDGUI/Makefile \
-	doc/Makefile \
-	doc/MEDMEM/Makefile \
-	doc/MEDMEM/MEDMEM_Content.tex \
-	doc/MEDMEM/MEDMEM_UML_light.png \
-	doc/MEDMEM/MEDMEM_UML.png \
-	doc/MEDMEM/MEDMEM_UsersGuide.tex \
-	doc/salome/Makefile \
-	doc/salome/tui/Makefile \
-	doc/salome/tui/doxyfile \
-	doc/doxygen/Makefile \
-	doc/doxygen/Doxyfile_med_user \
+        src/MEDMEM_I/Makefile \
+        src/MED/Makefile \
+        src/MedCorba_Swig/Makefile \
+        src/MED_SWIG/Makefile \
+        src/MedClient/Makefile \
+        src/MedClient/src/Makefile \
+        src/MedClient/test/Makefile \
+        src/MedClient/test/environ/Makefile \
+        src/MedClient/test/environ/runContainer \
+        src/MedClient/test/environ/runEnvironTests \
+        src/MedClient/test/environ/runTestMedCorba \
+        src/MedClient/test/environ/stopContainer \
+        src/MedClient/test/environ/csh/init1 \
+        src/MedClient/test/environ/csh/init2 \
+        src/MedClient/test/environ/csh/init3 \
+        src/MedClient/test/environ/csh/Makefile \
+        src/MedClient/test/environ/csh/runContainer \
+        src/MedClient/test/environ/csh/runEnvironTests \
+        src/MedClient/test/environ/csh/stopContainer \
+        src/MedClient/test/test1/Makefile \
+        src/MedClient/test/test2/Makefile \
+        src/MEDGUI/Makefile \
+        doc/Makefile \
+        doc/MEDMEM/Makefile \
+        doc/MEDMEM/MEDMEM_Content.tex \
+        doc/MEDMEM/MEDMEM_UML_light.png \
+        doc/MEDMEM/MEDMEM_UML.png \
+        doc/MEDMEM/MEDMEM_UsersGuide.tex \
+        doc/salome/Makefile \
+        doc/salome/tui/Makefile \
+        doc/salome/tui/doxyfile \
+        doc/doxygen/Makefile \
+        doc/doxygen/Doxyfile_med_user \
 ])
