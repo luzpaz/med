@@ -29,7 +29,7 @@ salomeinclude_HEADERS= ParaMEDMEMComponent_i.hxx
 dist_libparamedmemcompo_la_SOURCES= ParaMEDMEMComponent_i.cxx
 
 #libmedmem_la_LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
-libparamedmemcompo_la_CPPFLAGS= $(KERNEL_CXXFLAGS) $(MPI_INCLUDES) @CXXTMPDPTHFLAGS@ \
+libparamedmemcompo_la_CPPFLAGS= $(KERNEL_CXXFLAGS) $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) $(MPI_INCLUDES) @CXXTMPDPTHFLAGS@ \
 	-I$(srcdir)/../ParaMEDMEM -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases -I$(srcdir)/../INTERP_KERNEL/Geometric2D -I$(srcdir)/../MEDCoupling -I$(srcdir)/../MEDCouplingCorba -I$(top_builddir)/idl
 
 # change motivated by the bug KERNEL4778.
