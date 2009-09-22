@@ -46,14 +46,14 @@ FAMILY::FAMILY():_identifier(0), _numberOfAttribute(0), _numberOfGroup(0)
 FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
                int *AttributeIdentifier, int *AttributeValue, string AttributeDescription,
                int NumberOfGroup, string GroupName,
-	       int * MEDArrayNodeFamily,
-	       int ** MEDArrayCellFamily,
-	       int ** MEDArrayFaceFamily,
-	       int ** MEDArrayEdgeFamily
-	       ): SUPPORT(Mesh,Name),
-		  _identifier(Identifier), 
-		  _numberOfAttribute(NumberOfAttribute), 
-		  _numberOfGroup(NumberOfGroup)
+               int * MEDArrayNodeFamily,
+               int ** MEDArrayCellFamily,
+               int ** MEDArrayFaceFamily,
+               int ** MEDArrayEdgeFamily
+               ): SUPPORT(Mesh,Name),
+                  _identifier(Identifier), 
+                  _numberOfAttribute(NumberOfAttribute), 
+                  _numberOfGroup(NumberOfGroup)
 {
   MESSAGE_MED("FAMILY(int Identifier, string Name, int NumberOfAttribute,int *AttributeIdentifier,int *AttributeValue,string AttributeDescription,int NumberOfGroup,string GroupName, int ** Number) : "<<Identifier);
 
@@ -67,9 +67,9 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
       //_attributeDescription.set(_numberOfAttribute);
       _attributeDescription.resize(_numberOfAttribute);
       for (int i=0;i<NumberOfAttribute;i++) {
-	_attributeDescription[i].assign(AttributeDescription,i*MED_TAILLE_DESC,MED_TAILLE_DESC);
-	_attributeDescription[i].erase(strlen(_attributeDescription[i].c_str()));
-	//SCRUTE_MED(_attributeDescription[i]);
+        _attributeDescription[i].assign(AttributeDescription,i*MED_TAILLE_DESC,MED_TAILLE_DESC);
+        _attributeDescription[i].erase(strlen(_attributeDescription[i].c_str()));
+        //SCRUTE_MED(_attributeDescription[i]);
       }
     }
   else
@@ -145,7 +145,7 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
       NumberIndex[0]=1;                          //set the MEDSKYLINEARRAY Index table
       NumberIndex[1]=1+NumberOfNodesInFamily;    //set the MEDSKYLINEARRAY Index table
       for(int i=0; i<NumberOfNodesInFamily; i++) // OH LA LA... 
-	NumberValue[i]=tmp_NodesList[i] ;        // RESIZE de tmp_NodesList serait plus efficace !!!!!!!!
+        NumberValue[i]=tmp_NodesList[i] ;        // RESIZE de tmp_NodesList serait plus efficace !!!!!!!!
       // PG : pas de problème, si ca marche. Il faudra déplacer le delete !
       if(_number!=NULL) delete _number ;
       _number=new MEDSKYLINEARRAY(1,NumberOfNodesInFamily,NumberIndex,NumberValue) ;
@@ -202,7 +202,7 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
                   getNumberOfElements(getTypes()[j])<<" element(s) : ");
       SCRUTE_MED(getNumber(getTypes()[j]));
       //      for (int k=0; k<numberOfElements;k++)
-        //	MESSAGE_MED("________________ " << number[k]);
+        //      MESSAGE_MED("________________ " << number[k]);
     }
   }
   else
@@ -342,11 +342,11 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
       
     for (int i=0; i<NumberOfElements; i++)
       {
-        //	SCRUTE_MED(ElementsOfThisFamilyNumber[i]);
-	if (_identifier == ElementsOfThisFamilyNumber[i]) {
-	  tmp_ElementsList[NumberOfElementsInThisFamily]=i+GlobalNumberingIndex[TypeNumber] ;
-	  NumberOfElementsInThisFamily++;
-	}
+        //      SCRUTE_MED(ElementsOfThisFamilyNumber[i]);
+        if (_identifier == ElementsOfThisFamilyNumber[i]) {
+          tmp_ElementsList[NumberOfElementsInThisFamily]=i+GlobalNumberingIndex[TypeNumber] ;
+          NumberOfElementsInThisFamily++;
+        }
       }
     
     if (NumberOfElementsInThisFamily>0) {// we have found some elements
@@ -355,7 +355,7 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
       //int * ElementsList = tmp_ElementsList.resize(NumberOfElementsInThisFamily);
       int * ElementsList = new int[NumberOfElementsInThisFamily] ;
       memcpy(ElementsList,tmp_ElementsList,sizeof(int)*NumberOfElementsInThisFamily); // RESIZE de tmp_NodesList serait plus efficace !!!!!!!!
-	
+        
       tmp_ElementsLists[numberOfElementTypesInFamily]=ElementsList ;
       tmp_Types[numberOfElementTypesInFamily]=types[TypeNumber];
       //      GeometricTypeNumber[numberOfElementTypesInFamily]=TypeNumber+1;
@@ -398,16 +398,16 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
       _isOnAllElts = true ;
       // all others attributs are rights !
       for (int i=0; i<_numberOfGeometricType; i++)
-	delete[] tmp_ElementsLists[i];
+        delete[] tmp_ElementsLists[i];
     } else {
       int *NumberValue = new int[_totalNumberOfElements];
       int *NumberIndex = new int[_numberOfGeometricType+1];
       NumberIndex[0]=1;
       for (int i=0; i<_numberOfGeometricType; i++) {
-	NumberIndex[i+1]=NumberIndex[i]+_numberOfElements[i];
-	for (int j=NumberIndex[i]; j<NumberIndex[i+1]; j++)
-	  NumberValue[j-1]=tmp_ElementsLists[i][j-NumberIndex[i]];
-	delete[] tmp_ElementsLists[i];
+        NumberIndex[i+1]=NumberIndex[i]+_numberOfElements[i];
+        for (int j=NumberIndex[i]; j<NumberIndex[i+1]; j++)
+          NumberValue[j-1]=tmp_ElementsLists[i][j-NumberIndex[i]];
+        delete[] tmp_ElementsLists[i];
       }
       if(_number!=NULL) delete _number ;
       _number = new MEDSKYLINEARRAY(_numberOfGeometricType,_totalNumberOfElements,NumberIndex,NumberValue);
