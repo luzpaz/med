@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #ifndef GIBI_MESH_DRIVER_HXX
 #define GIBI_MESH_DRIVER_HXX
 
@@ -49,7 +49,7 @@
   Driver GIBI for MESH.
 
   Generic part : implement the readopen and close methods.
-  
+
 */
 
 namespace MEDMEM {
@@ -75,7 +75,7 @@ struct nameGIBItoMED {
 class MEDMEM_EXPORT GIBI_MESH_DRIVER : public GENDRIVER
 {
 protected:
-  
+
   MESH *          _ptrMesh;
   // A VOIR FILE DESCRIPTEUR ? MED_FR::med_idt _medIdt;
   string          _meshName;
@@ -101,8 +101,8 @@ public :
   /*!
     Constructor.
   */
-  GIBI_MESH_DRIVER(const string & fileName,  
-                  MESH * ptrMesh, 
+  GIBI_MESH_DRIVER(const string & fileName,
+                  MESH * ptrMesh,
                   MED_EN::med_mode_acces accessMode) ;
   /*!
     Copy constructor.
@@ -140,7 +140,7 @@ public :
 class MEDMEM_EXPORT GIBI_MESH_RDONLY_DRIVER : public virtual GIBI_MESH_DRIVER
 {
 public :
-  
+
   /*!
     Constructor.
   */
@@ -158,7 +158,7 @@ public :
     Destructor.
   */
   virtual ~GIBI_MESH_RDONLY_DRIVER() ;
-  
+
   /*!
     Return a MEDEXCEPTION : it is the read-only driver.
   */
@@ -180,7 +180,7 @@ protected:
   void updateSupports();
 
 private:
- 
+
   GENDRIVER * copy ( void ) const ;
 
   // fields and methods for file reading
@@ -204,7 +204,7 @@ private:
   char* str() const { return _curPos; }
   int index() const { return _iRead; }
   int getInt() const { return atoi( str() ); }
-  double getDouble() const { return atof( str() ); }
+  double getDouble() const;
   string getName() const;
 
   // line getting
@@ -229,9 +229,9 @@ private:
 */
 
 class MEDMEM_EXPORT GIBI_MESH_WRONLY_DRIVER : public virtual GIBI_MESH_DRIVER {
-  
+
 public :
-  
+
   /*!
     Constructor.
   */
@@ -303,7 +303,7 @@ public :
   struct typeData
   {
     int         _nbElems;
-    const int * _ptrElemIDs; // elem ids or 
+    const int * _ptrElemIDs; // elem ids or
     int         _elemID1;    // first elem id if isOnAllElements()
     typeData( int nbElems=0, const int * ptrElemIDs=NULL, int elemID1=0 )
       : _nbElems(nbElems),  _ptrElemIDs(ptrElemIDs), _elemID1(elemID1) {}
@@ -386,7 +386,7 @@ class MEDMEM_EXPORT GIBI_MED_RDONLY_DRIVER : public GIBI_MESH_RDONLY_DRIVER {
   MED * _med;
 
 public:
-  
+
   /*!
     Constructor.
   */
@@ -404,14 +404,14 @@ public:
     Destructor.
   */
   virtual ~GIBI_MED_RDONLY_DRIVER() ;
-  
+
   /*!
     Read MESH in the specified file.
   */
   void read ( void ) throw (MEDEXCEPTION);
 
 private:
- 
+
   GENDRIVER * copy ( void ) const ;
 
 };
@@ -429,7 +429,7 @@ class MEDMEM_EXPORT GIBI_MED_WRONLY_DRIVER : public GIBI_MESH_WRONLY_DRIVER {
   MED * _med;
 
 public :
-  
+
   /*!
     Constructor.
   */

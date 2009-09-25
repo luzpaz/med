@@ -1199,6 +1199,34 @@ string GIBI_MESH_RDONLY_DRIVER::getName() const
 }
 
 //=======================================================================
+//function : getDouble
+//purpose  : double reading
+//=======================================================================
+
+double GIBI_MESH_RDONLY_DRIVER::getDouble() const
+{
+  //return atof(str());
+
+  std::string aStr (str());
+
+  // Correction 1: add missing 'E' specifier
+  int aPosSign = aStr.find_first_of("+-");
+  if (aPosSign < aStr.length()) {
+    if (aStr[aPosSign - 1] != 'e' && aStr[aPosSign - 1] != 'E')
+      aStr.insert(aPosSign, "E", 1);
+  }
+
+  // Correction 2: set "C" numeric locale to read numbers
+  // with dot decimal point separator, as it is in SAUVE files
+  char* aCurLocale = setlocale(LC_NUMERIC, 0);
+  setlocale(LC_NUMERIC, "C");
+  double ret = atof(aStr.data());
+  setlocale(LC_NUMERIC, aCurLocale);
+
+  return ret;
+}
+
+//=======================================================================
 //function : read
 //purpose  :
 //=======================================================================
