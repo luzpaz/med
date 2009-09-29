@@ -1454,7 +1454,10 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
       ConstituentNodalConnectivityIndex[0]=1;
 
       _constituent->_entityDimension = _entityDimension-1;
-      if(ConstituentsTypes[0]==MED_NONE && ConstituentsTypes[1]==MED_NONE && getNumberOfTypesWithPoly(_entity)==0)
+      // Rall back modif made in BR_renumbering branch because of regression: 
+      // 0020478: [CEA] Groups in a mesh obj not written in MED file when mesh contains only polyg/polyh elts
+      //if(ConstituentsTypes[0]==MED_NONE && ConstituentsTypes[1]==MED_NONE && getNumberOfTypesWithPoly(_entity)==0)
+      if(ConstituentsTypes[0]==MED_NONE && ConstituentsTypes[1]==MED_NONE && _numberOfTypes==0)
         _constituent->_numberOfTypes = 0;
       else if (ConstituentsTypes[1]==MED_NONE)
         _constituent->_numberOfTypes = 1;
