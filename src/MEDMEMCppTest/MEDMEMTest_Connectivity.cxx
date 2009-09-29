@@ -1211,8 +1211,8 @@ void MEDMEMTest::testConnectivity()
   CPPUNIT_ASSERT_THROW(myNodalConnectivity.getNumberOfNodesInType(MED_EN::MED_POLYGON), MEDEXCEPTION);
 
 
-	// does not throw any more exception because 
-	// it is now possible to work on meshes with only polyhedric elements
+        // does not throw any more exception because 
+        // it is now possible to work on meshes with only polyhedric elements
   CPPUNIT_ASSERT_NO_THROW(myNodalConnectivity.calculateConnectivity
                        (MED_EN::MED_DESCENDING, MED_EN::MED_CELL));
 
