@@ -1210,10 +1210,13 @@ double GIBI_MESH_RDONLY_DRIVER::getDouble() const
   std::string aStr (str());
 
   // Correction 1: add missing 'E' specifier
-  int aPosSign = aStr.find_first_of("+-");
-  if (aPosSign < aStr.length()) {
-    if (aStr[aPosSign - 1] != 'e' && aStr[aPosSign - 1] != 'E')
-      aStr.insert(aPosSign, "E", 1);
+  int aPosStart = aStr.find_first_not_of(" \t");
+  if (aPosStart < aStr.length()) {
+    int aPosSign = aStr.find_first_of("+-", aPosStart + 1); // pass the leading symbol, as it can be a sign
+    if (aPosSign < aStr.length()) {
+      if (aStr[aPosSign - 1] != 'e' && aStr[aPosSign - 1] != 'E')
+        aStr.insert(aPosSign, "E", 1);
+    }
   }
 
   // Correction 2: set "C" numeric locale to read numbers
