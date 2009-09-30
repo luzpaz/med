@@ -40,10 +40,12 @@
 #endif
 
 #else /* H5_VERS_MINOR >= 7 */
+#define HDF_NEW_API2
 #define HDF_NEW_API
 #endif /* H5_VERS_MINOR */
 
 #else /* H5_VERS_MAJOR >= 2 */
+#define HDF_NEW_API2
 #define HDF_NEW_API
 #endif /* H5_VERS_MAJOR */
 
