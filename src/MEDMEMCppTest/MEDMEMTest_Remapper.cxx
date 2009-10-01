@@ -18,7 +18,9 @@
 //
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
+
 #include "MEDMEM_Remapper.hxx"
+#include "MEDMEM_Meshing.hxx"
 
 #include <iostream>
 //#include <vector>
@@ -284,6 +286,106 @@ void  MEDMEMTest::test_RemapperP0P1() {
   
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,max,1e-10);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,min,1e-10);    
+}
+
+namespace {
+
+  MESH * build3DSourceMesh1()
+  {
+    const double coords[84]={100.0, 100.0, 0.0, 100.0, 100.0, 100.0, 100.0, 0.0, 100.0, 100.0, 0.0, 0.0, 0.0, 100.0, 0.0,
+                             0.0, 100.0, 100.0, 0.0, 0.0, 100.0, 0.0, 0.0, 0.0, 100.0, 100.0, 200.0, 100.0, 0.0, 200.0,
+                             0.0, 100.0, 200.0, 0.0, 0.0, 200.0, 100.0, 200.0, 0.0, 100.0, 200.0, 100.0, 0.0, 200.0, 0.0,
+                             0.0, 200.0, 100.0, 100.0, 200.0, 200.0, 0.0, 200.0, 200.0, 200.0, 100.0, 0.0, 200.0, 100.00000000833332,
+                             100.00000000833332, 200.0, 0.0, 100.0, 200.0, 0.0, 0.0, 200.0, 100.0, 200.0, 200.0, 0.0, 200.0, 200.0,
+                             200.0, 0.0, 200.0, 200.0, 100.0, 200.0, 200.0, 200.0, 149.999999970343, 149.9999999874621, 49.999999881628682};
+
+    const int conn[212]={26, 28, 14, 20, 19, 4, 21, 22, 6, 11, 18, 2, 2, 4, 1, 8, 19, 2, 1, 28, 13, 28, 14, 25,
+                         26, 20, 17, 27, 2, 3, 7, 9, 16, 14, 13, 6, 25, 14, 26, 28, 11, 12, 10, 7, 20, 9, 24, 2,
+                         23, 9, 24, 20, 17, 14, 18, 2, 7, 10, 11, 9, 14, 18, 6, 16, 6, 5, 2, 13, 19, 1, 25, 28,
+                         20, 21, 19, 2, 8, 7, 6, 2, 5, 13, 16, 15, 26, 28, 20, 19, 2, 20, 17, 14, 21, 20, 24, 2,
+                         28, 13, 2, 1, 7, 6, 2, 11, 5, 6, 2, 8, 13, 28, 2, 14, 6, 16, 5, 13, 20, 17, 27, 23, 14,
+                         6, 18, 2, 2, 4, 8, 3, 14, 6, 2, 13, 19, 2, 4, 1, 9, 24, 3, 10, 4, 2, 19, 21, 2, 28, 20,
+                         14, 25, 26, 19, 28, 26, 17, 20, 14, 8, 2, 3, 7, 4, 2, 21, 3, 9, 17, 18, 2, 8, 5, 1, 2, 19,
+                         20, 2, 28, 28, 13, 1, 25, 10, 7, 3, 9, 2, 5, 1, 13, 20, 17, 23, 9, 9, 3, 24, 2, 2, 17, 20,
+                         9, 21, 3, 2, 24, 11, 2, 7, 9, 11, 9, 18, 2};
+    MESHING* meshing = new MESHING;
+    meshing->setName( "TESTMESH" );
+    meshing->setSpaceDimension(3);
+    const int nNodes=28;
+    meshing->setNumberOfNodes(nNodes);
+    meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
+                            MED_EN::MED_FULL_INTERLACE);
+    string coordname[3] = { "x", "y", "z" };
+    meshing->setCoordinatesNames(coordname);
+    string coordunit[3] = { "m", "m", "m" };
+    meshing->setCoordinatesUnits(coordunit);
+    //Cell connectivity info for classical elts
+    const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MED_TETRA4};
+    const int nbOfCellElts[1]={53};
+    meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
+    meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
+    meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
+    meshing->setMeshDimension(3);
+    //All cell conn
+    meshing->setConnectivity(conn,MED_EN::MED_CELL,MED_EN::MED_TETRA4);
+    return meshing;
+  }
+
+  MESH * build3DTargetMesh1()
+  {
+    const double coords[24]={200.0, 200.0, 0.0, 200.0, 200.0, 200.0, 200.0, 0.0, 0.0, 200.0, 0.0, 200.0,
+                             0.0, 200.0, 0.0, 0.0, 200.0, 200.0, 0.0, 0.0, 0.0, 0.0, 0.0, 200.0};
+
+    const int conn[20]={6, 7, 4, 1, 2, 4, 1, 6, 4, 7, 6, 8, 7, 5, 1, 6, 7, 4, 1, 3};
+
+    MESHING* meshing = new MESHING;
+    meshing->setName( "TESTMESH" );
+    meshing->setSpaceDimension(3);
+    const int nNodes=8;
+    meshing->setNumberOfNodes(nNodes);
+    meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
+                            MED_EN::MED_FULL_INTERLACE);
+    string coordname[3] = { "x", "y", "z" };
+    meshing->setCoordinatesNames(coordname);
+    string coordunit[3] = { "m", "m", "m" };
+    meshing->setCoordinatesUnits(coordunit);
+    //Cell connectivity info for classical elts
+    const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MED_TETRA4};
+    const int nbOfCellElts[1]={5};
+    meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
+    meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
+    meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
+    meshing->setMeshDimension(3);
+    //All cell conn
+    meshing->setConnectivity(conn,MED_EN::MED_CELL,MED_EN::MED_TETRA4);
+    return meshing;
+  }
+
+} // noname namespace
+
+void MEDMEMTest::test_remapper4()
+{
+  const double valsSrc[28]={1.,2.,3.,4.,5.,6.,7.,8.,9.,10.,11.,12.,13.,14.,15.,16.,17.,18.,19.,20.,21.,22.,23.,24.,25.,26.,27.,28.};
+  const double targetExpected[8]= {16.2061111122415724, 21.8916666665293072, 15.5833333333333321, 13.1613888888184309, 11.8583333333333361, 10.6969444444233712, 4.48388888888888815, 9.42500000000000071};
+
+  MESH *source=build3DSourceMesh1();
+  MESH *target=build3DTargetMesh1();
+  SUPPORT supSrc(source,"Src",MED_EN::MED_NODE);
+  FIELD<double> f1(&supSrc,1);
+  double *val=(double *)f1.getValue();
+  std::copy(valsSrc,valsSrc+28,val);
+  SUPPORT supTrg(target,"Trg",MED_EN::MED_NODE);
+  FIELD<double> f2(&supTrg,1);
+  //
+  MEDMEM_REMAPPER remap;
+  remap.prepare(*source,*target,"P1P1");
+  remap.transfer(f1,f2);
+  const double *tmp=f2.getValue();
+  for(int i=0;i<8;i++)
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(targetExpected[i],tmp[i],1e-12);
+  //
+  delete source;
+  delete target;
 }
 
 void absField(MEDMEM::FIELD<double>& field)
