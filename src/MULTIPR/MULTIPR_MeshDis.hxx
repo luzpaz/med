@@ -36,6 +36,10 @@
 // Includes section
 //*****************************************************************************
 
+#include <boost/thread/recursive_mutex.hpp>
+//#include <boost/thread/mutex.hpp>
+//#include <boost/shared_ptr.hpp>
+
 extern "C"
 {
     #include "med.h"
@@ -52,10 +56,6 @@ extern "C"
 #include "MEDSPLITTER_MESHCollection.hxx"
 #include "MEDSPLITTER_Topology.hxx"
 #include "MULTIPR_Globals.hxx"
-
-#include <boost/thread/recursive_mutex.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/shared_ptr.hpp>
 
 namespace multipr
 {
