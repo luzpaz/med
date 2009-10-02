@@ -584,7 +584,7 @@ class SUPPORT
     PyObject * getNumberIndex()
       {
 	const int * numberindex = self->getNumberIndex();
-	int size = (self->getNumberOfElements(MED_ALL_ELEMENTS))+1;
+	int size = (self->getNumberOfTypes())+1;
         TYPEMAP_OUTPUT_ARRAY(numberindex, size, PyInt_FromLong,
 			     SUPPORT::getNumberIndex);
       }
