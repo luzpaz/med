@@ -60,4 +60,4 @@ else
   libMEDWrapperBase_la_CPPFLAGS+= -I$(top_builddir)/adm_local_without_kernel/unix
 endif
 libMEDWrapperBase_la_CPPFLAGS+= $(MED_CPPFLAGS)
-libMEDWrapperBase_la_LDFLAGS= $(BOOST_LIBS) -lboost_thread${BOOST_LIBSUFFIX}
+libMEDWrapperBase_la_LDFLAGS= $(BOOST_LIB_THREAD)

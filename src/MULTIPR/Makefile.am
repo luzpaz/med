@@ -79,7 +79,7 @@ dist_multipr_SOURCES= multipr.cxx
 multipr_CPPFLAGS= $(libMULTIPR_API_la_CPPFLAGS)
 multipr_LDADD= $(libMULTIPR_API_la_LDFLAGS) \
 	../MEDWrapper/V2_1/Core/libmed_V2_1.la \
-	$(BOOST_LIBS) -lboost_thread${BOOST_LIBSUFFIX} \
+	$(BOOST_LIB_THREAD) \
 	../MEDWrapper/V2_1/Wrapper/libMEDWrapper_V2_1.la \
 	../MEDWrapper/V2_2/libMEDWrapper_V2_2.la \
 	../MEDWrapper/Base/libMEDWrapperBase.la \
