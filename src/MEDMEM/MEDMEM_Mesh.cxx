@@ -846,7 +846,7 @@ SUPPORT *MESH::buildSupportOnElementsFromElementList(const list<int>& listOfElt,
 /*! Retrieves the volume of all the elements contained in \a Support. This method returns 
   a FIELD structure based on this support. It only works on MED_CELL for 3D meshes.
 */
-FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const throw (MEDEXCEPTION)
+FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support, bool isAbs) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getVolume(SUPPORT*) : ";
   BEGIN_OF_MED(LOC);
@@ -936,6 +936,8 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
           int N3 = global_connectivity[tetra_index+2]-1;
           int N4 = global_connectivity[tetra_index+3]-1;
           xvolume=INTERP_KERNEL::calculateVolumeForTetra(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4);
+          if(isAbs)
+            xvolume=fabs(xvolume);
           volume->setIJ(index,1,xvolume) ;
           index++;
         }
@@ -952,6 +954,8 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
           int N4 = global_connectivity[pyra_index+3]-1;
           int N5 = global_connectivity[pyra_index+4]-1;
           xvolume=INTERP_KERNEL::calculateVolumeForPyra(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5);
+          if(isAbs)
+            xvolume=fabs(xvolume);
           volume->setIJ(index,1,xvolume) ;
           index++;
         }
@@ -969,6 +973,8 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
           int N5 = global_connectivity[penta_index+4]-1;
           int N6 = global_connectivity[penta_index+5]-1;
           xvolume=INTERP_KERNEL::calculateVolumeForPenta(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5,coord+dim_space*N6);
+          if(isAbs)
+            xvolume=fabs(xvolume);
           volume->setIJ(index,1,xvolume) ;
           index++;
         }
@@ -989,6 +995,8 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
           int N7 = global_connectivity[hexa_index+6]-1;
           int N8 = global_connectivity[hexa_index+7]-1;
           xvolume=INTERP_KERNEL::calculateVolumeForHexa(coord+dim_space*N1,coord+dim_space*N2,coord+dim_space*N3,coord+dim_space*N4,coord+dim_space*N5,coord+dim_space*N6,coord+dim_space*N7,coord+dim_space*N8);
+          if(isAbs)
+            xvolume=fabs(xvolume);
           volume->setIJ(index,1,xvolume) ;
           index++;
         }
@@ -1020,7 +1028,10 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
             INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,lgthNodes,3,bary);
             delete [] nodes;
             delete [] pts;
-            xvolume=INTERP_KERNEL::calculateVolumeForPolyh((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
+            if(isAbs)
+              xvolume=INTERP_KERNEL::calculateVolumeForPolyhAbs((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
+            else
+              xvolume=INTERP_KERNEL::calculateVolumeForPolyh((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
             delete [] nbOfNodesPerFaces;
             for(iFaces=0;iFaces<nbOfFaces;iFaces++)
               delete [] pts1[iFaces];
@@ -1052,7 +1063,10 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support) const thro
             INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,lgthNodes,3,bary);
             delete [] nodes;
             delete [] pts;
-            xvolume=INTERP_KERNEL::calculateVolumeForPolyh((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
+            if(isAbs)
+              xvolume=INTERP_KERNEL::calculateVolumeForPolyhAbs((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
+            else
+              xvolume=INTERP_KERNEL::calculateVolumeForPolyh((const double ***)pts1,nbOfNodesPerFaces,nbOfFaces,bary);
             delete [] nbOfNodesPerFaces;
             for(iFaces=0;iFaces<nbOfFaces;iFaces++)
               delete [] pts1[iFaces];

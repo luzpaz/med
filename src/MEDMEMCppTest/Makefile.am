@@ -36,6 +36,7 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_Connectivity.cxx \
 	MEDMEMTest_Coordinate.cxx \
 	MEDMEMTest_DesactivateFacesComputation.cxx \
+	MEDMEMTest_GetVolumeAbs.cxx \
 	MEDMEMTest_DriverFactory.cxx \
 	MEDMEMTest_Exception.cxx \
 	MEDMEMTest_Extractor.cxx \

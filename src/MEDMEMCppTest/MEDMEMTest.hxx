@@ -104,6 +104,7 @@ class MEDMEMTest : public CppUnit::TestFixture
   //60
   CPPUNIT_TEST( testExtractor );
   CPPUNIT_TEST( testDesactivateFacesComputation ); // issue 0020411
+  CPPUNIT_TEST( testGetVolumeAbs );
 
   CPPUNIT_TEST( test_remapper4 );
   CPPUNIT_TEST( test_RemapperP0P0 );
@@ -181,6 +182,7 @@ public:
   //60
   void testExtractor();
   void testDesactivateFacesComputation(); // issue 0020411
+  void testGetVolumeAbs();
   void test_RemapperP0P0();
   void test_RemapperP1P1();
   void test_RemapperP1P0();

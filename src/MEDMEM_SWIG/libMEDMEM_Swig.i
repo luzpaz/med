@@ -1383,10 +1383,10 @@ public :
       }
       
 
-    %newobject getVolume(const SUPPORT * );
-    FIELD<double, FullInterlace> * getVolume(const SUPPORT * Support)
+    %newobject getVolume(const SUPPORT * , bool );
+    FIELD<double, FullInterlace> * getVolume(const SUPPORT * Support, bool isAbs = true)
       {
-	return (FIELD<double, FullInterlace> *) self->getVolume(Support);
+	return (FIELD<double, FullInterlace> *) self->getVolume(Support,isAbs);
       }
 
     %newobject getArea(const SUPPORT * );

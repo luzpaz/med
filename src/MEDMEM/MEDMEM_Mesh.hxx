@@ -276,7 +276,7 @@ public :
                                                 throw (MEDEXCEPTION);
 
   //  Node DonneBarycentre(const Cell &m) const;
-  virtual FIELD<double>* getVolume (const SUPPORT * Support) const
+  virtual FIELD<double>* getVolume (const SUPPORT * Support, bool isAbs = true) const
                                 throw (MEDEXCEPTION);
                                 // Support must be on 3D elements
   virtual FIELD<double>* getArea (const SUPPORT * Support) const
