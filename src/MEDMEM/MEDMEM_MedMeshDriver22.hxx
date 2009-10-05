@@ -40,7 +40,7 @@ class FAMILY;
 class GROUP;
 class CONNECTIVITY;
 
-class MED_MESH_DRIVER22 : public virtual MED_MESH_DRIVER
+class MEDMEM_EXPORT MED_MESH_DRIVER22 : public virtual MED_MESH_DRIVER
 {
 protected:
   
@@ -85,7 +85,7 @@ public :
 
 */
 
-class MED_MESH_RDONLY_DRIVER22 : public virtual IMED_MESH_RDONLY_DRIVER, public virtual MED_MESH_DRIVER22
+class MEDMEM_EXPORT MED_MESH_RDONLY_DRIVER22 : public virtual IMED_MESH_RDONLY_DRIVER, public virtual MED_MESH_DRIVER22
 {
 
 public :
@@ -148,7 +148,7 @@ private:
 
 */
 
-class MED_MESH_WRONLY_DRIVER22 : public virtual IMED_MESH_WRONLY_DRIVER, public virtual MED_MESH_DRIVER22 {
+class MEDMEM_EXPORT MED_MESH_WRONLY_DRIVER22 : public virtual IMED_MESH_WRONLY_DRIVER, public virtual MED_MESH_DRIVER22 {
   
 public :
   
@@ -195,7 +195,7 @@ private:
 
 */
 
-class MED_MESH_RDWR_DRIVER22 : public IMED_MESH_RDWR_DRIVER, public MED_MESH_RDONLY_DRIVER22, public MED_MESH_WRONLY_DRIVER22 {
+class MEDMEM_EXPORT MED_MESH_RDWR_DRIVER22 : public IMED_MESH_RDWR_DRIVER, public MED_MESH_RDONLY_DRIVER22, public MED_MESH_WRONLY_DRIVER22 {
 
 public :
 

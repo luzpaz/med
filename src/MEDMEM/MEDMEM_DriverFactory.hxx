@@ -55,35 +55,35 @@ namespace MEDMEM {
 
     driverTypes deduceDriverTypeFromFileName(const std::string & fileName);
 
-    GENDRIVER * buildDriverForMesh(driverTypes driverType,
-				   const std::string & fileName,
-				   MESH *mesh,const string &  driverName,
-				   MED_EN::med_mode_acces access);
+    MEDMEM_EXPORT GENDRIVER * buildDriverForMesh(driverTypes driverType,
+						 const std::string & fileName,
+						 MESH *mesh,const string &  driverName,
+						 MED_EN::med_mode_acces access);
 
     template<class T, class INTERLACING_TAG>
     GENDRIVER * buildDriverForField(driverTypes driverType,
 				    const std::string & fileName,
 				    FIELD<T,INTERLACING_TAG> *fielde,
 				    MED_EN::med_mode_acces access);
-    GENDRIVER * buildDriverForMed(driverTypes driverType,
-				  const std::string & fileName,
-				  MED *mede,
-				  MED_EN::med_mode_acces access);
-    GENDRIVER * buildMedDriverFromFile(const string & fileName,
-				       MED * const ptrMed,
-				       MED_EN::med_mode_acces access);
-    GENDRIVER * buildMeshDriverFromFile(const string & fileName,
-					MESH * ptrMesh,
-					MED_EN::med_mode_acces access);
+    MEDMEM_EXPORT GENDRIVER * buildDriverForMed(driverTypes driverType,
+						const std::string & fileName,
+						MED *mede,
+						MED_EN::med_mode_acces access);
+    MEDMEM_EXPORT GENDRIVER * buildMedDriverFromFile(const string & fileName,
+						     MED * const ptrMed,
+						     MED_EN::med_mode_acces access);
+    MEDMEM_EXPORT GENDRIVER * buildMeshDriverFromFile(const string & fileName,
+						      MESH * ptrMesh,
+						      MED_EN::med_mode_acces access);
     template<class T, class INTERLACING_TAG>
     GENDRIVER * buildFieldDriverFromFile(const string & fileName,
 					 FIELD<T,INTERLACING_TAG> * ptrField,
 					 MED_EN::med_mode_acces access);
-    GENDRIVER * buildConcreteMedDriverForMesh(const std::string & fileName,
-					      MESH *mesh,
-					      const string & driverName,
-					      MED_EN::med_mode_acces access,
-					      MED_EN::medFileVersion version);
+    MEDMEM_EXPORT GENDRIVER * buildConcreteMedDriverForMesh(const std::string & fileName,
+							    MESH *mesh,
+							    const string & driverName,
+							    MED_EN::med_mode_acces access,
+							    MED_EN::medFileVersion version);
     template<class T, class INTERLACING_TAG>
     GENDRIVER * buildConcreteMedDriverForField(const std::string & fileName,
 					       FIELD<T,INTERLACING_TAG> *fielde,

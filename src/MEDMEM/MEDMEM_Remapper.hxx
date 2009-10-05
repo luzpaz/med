@@ -29,7 +29,7 @@
 
 
 
-class MEDMEM_REMAPPER : public INTERP_KERNEL::InterpolationOptions
+class MEDMEM_EXPORT MEDMEM_REMAPPER : public INTERP_KERNEL::InterpolationOptions
 {
 public:
   MEDMEM_REMAPPER();

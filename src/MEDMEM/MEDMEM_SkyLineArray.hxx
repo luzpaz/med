@@ -33,7 +33,7 @@
 
 namespace MEDMEM {
   class MEDSKYLINEARRAY;
-  ostream& operator<<(ostream &os, const MEDSKYLINEARRAY &sky);
+  MEDMEM_EXPORT ostream& operator<<(ostream &os, const MEDSKYLINEARRAY &sky);
 
 class MEDMEM_EXPORT MEDSKYLINEARRAY
 {

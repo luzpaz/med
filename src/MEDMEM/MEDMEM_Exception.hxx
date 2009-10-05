@@ -68,7 +68,7 @@ public :
 
 
 //---------------------------------------------------------//
-class MED_DRIVER_NOT_FOUND_EXCEPTION : public MEDEXCEPTION
+class MEDMEM_EXPORT MED_DRIVER_NOT_FOUND_EXCEPTION : public MEDEXCEPTION
 //---------------------------------------------------------//
 {
 private :

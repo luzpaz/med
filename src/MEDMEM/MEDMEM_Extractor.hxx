@@ -42,7 +42,7 @@ namespace MEDMEM
    *<li>  3D -> 1D (3D mesh cut by line)</li>
    *<li>  2D -> 1D (2D mesh cut by line in 2D space or by plane in 3D space)</li></ul>
    */
-  class Extractor
+  class MEDMEM_EXPORT Extractor
   {
   /*!
    * \brief Creates a tool

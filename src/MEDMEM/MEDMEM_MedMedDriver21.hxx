@@ -43,7 +43,7 @@ class MESH;
 class FIELD_;
 class MED;
 
-class MED_MED_DRIVER21 : public virtual MED_MED_DRIVER
+class MEDMEM_EXPORT MED_MED_DRIVER21 : public virtual MED_MED_DRIVER
 {
 protected:
 
@@ -74,7 +74,7 @@ private:
 
 */
 
-  class MED_MED_RDONLY_DRIVER21 : public virtual IMED_MED_RDONLY_DRIVER, public virtual MED_MED_DRIVER21
+  class MEDMEM_EXPORT MED_MED_RDONLY_DRIVER21 : public virtual IMED_MED_RDONLY_DRIVER, public virtual MED_MED_DRIVER21
 {
 public :
   MED_MED_RDONLY_DRIVER21();
@@ -89,7 +89,7 @@ private:
   virtual GENDRIVER * copy ( void ) const ;
 };
 
-class MED_MED_WRONLY_DRIVER21 : public virtual IMED_MED_WRONLY_DRIVER, public virtual MED_MED_DRIVER21
+class MEDMEM_EXPORT MED_MED_WRONLY_DRIVER21 : public virtual IMED_MED_WRONLY_DRIVER, public virtual MED_MED_DRIVER21
 {
 
 public :
@@ -105,7 +105,7 @@ private:
   virtual GENDRIVER * copy ( void ) const ;
 };
 
-class MED_MED_RDWR_DRIVER21 : public MED_MED_RDONLY_DRIVER21,
+class MEDMEM_EXPORT MED_MED_RDWR_DRIVER21 : public MED_MED_RDONLY_DRIVER21,
 			      public MED_MED_WRONLY_DRIVER21,
 			      public IMED_MED_RDWR_DRIVER
 {
