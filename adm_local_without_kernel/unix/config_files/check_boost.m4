@@ -34,10 +34,14 @@ BOOST_LIBS=""
 
 AC_CHECKING(for BOOST location)
 AC_ARG_WITH(boost,
-            [  --with-boost=DIR      root directory path to BOOST library installation ],
-            [BOOSTDIR="$withval"
-             AC_MSG_RESULT("select $withval as path to BOOST library")
-            ])
+   [AC_HELP_STRING([--with-boost=DIR],[root directory path to BOOST library installation])],
+   [BOOSTDIR="$withval"
+    AC_MSG_RESULT("select $withval as path to BOOST library")
+   ])
+   
+if test "x${BOOSTDIR}" = "x" ; then
+  BOOSTDIR="/usr"
+fi
 
 AC_MSG_RESULT(\$BOOSTDIR = ${BOOSTDIR})
 
@@ -46,7 +50,12 @@ LIBS_old=$LIBS
 
 if test "x${BOOSTDIR}" != "x" ; then
   BOOST_CPPFLAGS="-I${BOOSTDIR}/include"
-  BOOST_LIBS="-L${BOOSTDIR}/lib"
+  BOOST_LIBS="-L${BOOSTDIR}/lib${LIB_LOCATION_SUFFIX}"
+fi
+
+if test "x${BOOSTDIR}" = "x/usr" ; then
+  BOOST_CPPFLAGS=""
+  BOOST_LIBS=""
 fi
 
 boost_ok=no
@@ -63,6 +72,14 @@ if test "x${BOOSTDIR}" != "x" ; then
                 boost_include_dir_ok=yes,
                 boost_include_dir_ok=no)
 fi
+
+BOOST_PROGRAM_OPTIONS_LIB=no
+if test "x${boost_include_dir_ok}" = "xyes" ; then
+  AC_CHECK_FILE(${BOOSTDIR}/include/boost/program_options.hpp,
+                BOOST_PROGRAM_OPTIONS_LIB=yes,
+                BOOST_PROGRAM_OPTIONS_LIB=no)
+fi
+AC_MSG_RESULT(for boost program_options tool: $BOOST_PROGRAM_OPTIONS_LIB)
 
 if test "x${boost_include_dir_ok}" = "xyes" ; then
   AC_TRY_COMPILE([#include <boost/shared_ptr.hpp>],
@@ -83,12 +100,12 @@ if test "x${boost_headers_ok}" = "xyes" ; then
   AC_CHECKING(for BOOST binaries)
   boost_lib_dir_ok=yes
   if test "x${BOOSTDIR}" != "x" ; then
-    AC_CHECK_FILE(${BOOSTDIR}/lib/libboost_thread${BOOST_LIBSUFFIX}.so,
+    AC_CHECK_FILE(${BOOSTDIR}/lib${LIB_LOCATION_SUFFIX}/libboost_thread${BOOST_LIBSUFFIX}.so,
                   boost_lib_dir_ok=yes,
                   boost_lib_dir_ok=no)
     if test "x${boost_lib_dir_ok}" = "xno" ; then
       BOOST_LIBSUFFIX=""
-      AC_CHECK_FILE(${BOOSTDIR}/lib/libboost_thread${BOOST_LIBSUFFIX}.so,
+      AC_CHECK_FILE(${BOOSTDIR}/lib${LIB_LOCATION_SUFFIX}/libboost_thread${BOOST_LIBSUFFIX}.so,
                     boost_lib_dir_ok=yes,
                     boost_lib_dir_ok=no)
     fi
@@ -116,6 +133,15 @@ if test "x${boost_binaries_ok}" = "xno" ; then
 else
   AC_MSG_RESULT(\$BOOST_LIBSUFFIX = ${BOOST_LIBSUFFIX})
   AC_MSG_RESULT(\$BOOST_LIBS = ${BOOST_LIBS})
+  AC_CHECK_FILE(${BOOSTDIR}/lib${LIB_LOCATION_SUFFIX}/libboost_thread${BOOST_LIBSUFFIX}.so,
+                BOOST_LIB_THREAD="${BOOST_LIBS} -lboost_thread${BOOST_LIBSUFFIX}",
+                BOOST_LIB_THREAD="")
+  AC_CHECK_FILE(${BOOSTDIR}/lib${LIB_LOCATION_SUFFIX}/libboost_signals${BOOST_LIBSUFFIX}.so,
+                BOOST_LIB_SIGNALS="${BOOST_LIBS} -lboost_signals${BOOST_LIBSUFFIX}",
+                BOOST_LIB_SIGNALS="")
+  AC_CHECK_FILE(${BOOSTDIR}/lib${LIB_LOCATION_SUFFIX}/libboost_system${BOOST_LIBSUFFIX}.so,
+                BOOST_LIB_SYSTEM="${BOOST_LIBS} -lboost_system${BOOST_LIBSUFFIX}",
+                BOOST_LIB_SYSTEM="")
 fi
 AC_MSG_RESULT(for boost binaries: $boost_binaries_ok)
 
@@ -133,6 +159,10 @@ AC_MSG_RESULT(for boost: $boost_ok)
 AC_SUBST(BOOST_CPPFLAGS)
 AC_SUBST(BOOST_LIBSUFFIX)
 AC_SUBST(BOOST_LIBS)
+AC_SUBST(BOOST_LIB_THREAD)
+AC_SUBST(BOOST_LIB_SIGNALS)
+AC_SUBST(BOOST_LIB_SYSTEM)
+AC_SUBST(BOOST_PROGRAM_OPTIONS_LIB)
 
 AC_LANG_RESTORE
 
