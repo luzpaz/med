@@ -25,7 +25,7 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 lib_LTLIBRARIES = libMEDMEMCppTest.la
 
-salomeinclude_HEADERS = MEDMEMTest.hxx
+salomeinclude_HEADERS = MEDMEMTest.hxx MEDMEMCppTestExport.hxx
 
 EXTRA_DIST += BasicMainTest.hxx
 
@@ -74,7 +74,8 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 
 libMEDMEMCppTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED2_INCLUDES) $(HDF5_INCLUDES) \
 	-I$(srcdir)/../MEDMEM -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases -I$(srcdir)/../MEDWrapper/V2_1/Core
-libMEDMEMCppTest_la_LDFLAGS= $(MED2_LIBS) @CPPUNIT_LIBS@
+libMEDMEMCppTest_la_LDFLAGS= $(MED2_LIBS) @CPPUNIT_LIBS@ \
+	../MEDMEM/libmedmem.la
 
 if MED_ENABLE_KERNEL
     libMEDMEMCppTest_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
