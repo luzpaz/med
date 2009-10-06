@@ -173,7 +173,7 @@ int main (int argc, char ** argv) {
   delete sup2;
 
   SUPPORT *sup = new SUPPORT(&myMeshing);
-  FIELD<double> *vols = myMeshing.getVolume(sup);
+  FIELD<double> *vols = myMeshing.getVolume(sup,false);
   const double *vals = vols->getValue();
   const double REFVolOfPolyHedron[3] = {2.333333333333333, -11.66666666666666, -13.83224131414673};
   for(i=0;i<3;i++)
@@ -197,4 +197,5 @@ int main (int argc, char ** argv) {
 
   if ( getenv("srcdir") )
     remove("totoPoly_V22.med");
+  return 0;
 }
