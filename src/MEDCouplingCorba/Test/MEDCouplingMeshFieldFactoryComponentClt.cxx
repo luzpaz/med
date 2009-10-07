@@ -23,6 +23,7 @@
 #include "MEDCouplingFieldDouble.hxx"
 #include "MEDCouplingFieldDoubleClient.hxx"
 #include <fstream>
+#include <pthread.h>
 
 SALOME_TEST::MEDCouplingMeshFieldFactory_ptr SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::_objC;
 

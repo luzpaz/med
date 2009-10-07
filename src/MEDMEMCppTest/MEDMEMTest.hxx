@@ -22,6 +22,7 @@
 #ifndef _MEDMEMTEST_HXX_
 #define _MEDMEMTEST_HXX_
 
+#include "MEDMEMCppTestExport.hxx"
 #include "MEDMEMTest_Utils.hxx"
 
 #include <cppunit/extensions/HelperMacros.h>
@@ -36,7 +37,7 @@ namespace MEDMEM {
   class MESH;
 };
 
-class MEDMEMTest : public CppUnit::TestFixture
+class MEDMEMCPPTEST_EXPORT MEDMEMTest : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE( MEDMEMTest );
   //0
@@ -194,10 +195,10 @@ public:
 };
 
 // to create a mesh with certain filling
-MEDMEM::MESH * MEDMEMTest_createTestMesh();
+MEDMEMCPPTEST_EXPORT MEDMEM::MESH * MEDMEMTest_createTestMesh();
 
 // to automatically remove temporary files from disk
-class MEDMEMTest_TmpFilesRemover
+class MEDMEMCPPTEST_EXPORT MEDMEMTest_TmpFilesRemover
 {
 public:
   MEDMEMTest_TmpFilesRemover() {}
