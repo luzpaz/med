@@ -30,7 +30,7 @@ namespace ParaMEDMEM
   class MEDCouplingFieldDoubleClient : public MEDCouplingFieldDouble
   {
   public:
-    static MEDCouplingFieldDouble *New(SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr field);
+    MEDCOUPLINGCLIENT_EXPORT static MEDCouplingFieldDouble *New(SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr field);
   private:
     MEDCouplingFieldDoubleClient();
   };
