@@ -23,10 +23,12 @@
 #ifndef _MEDMEMTEST_UTILS_HXX_
 #define _MEDMEMTEST_UTILS_HXX_
 
+#include "MEDMEMCppTestExport.hxx"
+
 #include <string>
 
-std::string getResourceFile( const std::string& );
-std::string getTmpDirectory();
-std::string makeTmpFile( const std::string&, const std::string& = "" );
+MEDMEMCPPTEST_EXPORT std::string getResourceFile( const std::string& );
+MEDMEMCPPTEST_EXPORT std::string getTmpDirectory();
+MEDMEMCPPTEST_EXPORT std::string makeTmpFile( const std::string&, const std::string& = "" );
 
 #endif
