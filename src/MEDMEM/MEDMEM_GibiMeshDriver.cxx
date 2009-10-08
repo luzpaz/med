@@ -2250,18 +2250,86 @@ void GIBI_MESH_WRONLY_DRIVER::addName(map<string,int>& nameMap,
   }
 }
 */
+
+// Converts names like:
+// MED:
+//   TEMPERATURE_FLUIDE
+//   TEMPERATURE_SOLIDE
+//   PRESSION
+//   NU
+//   VOLUM001
+//   VOLUMOFOBJECT
+//   VOLUM002
+//
+// GIBI:
+//   TEMPE001
+//   TEMPE002
+//   PRESSION
+//   NU
+//   VOLUM001
+//   VOLUM003
+//   VOLUM002
 void GIBI_MESH_WRONLY_DRIVER::addName (map<string,int>& nameMap,
                                        map<string,int>& namePrefixesMap,
                                        string&          theName,
                                        int              index)
 {
   string name = cleanName(theName);
+  int ind = index;
+
   if (!name.empty()) {
     int len = name.length();
+    for (int i = 0; i < len; ++i)
+      name[i] = toupper(name[i]);
+
+    bool doResave = false; // only for tracing
+
+    // I. Save a short name as it is
+    if (len <= 8) {
+      INFOS_MED("Save <" << theName << "> as <" << name << ">");
+
+      map<string,int>::iterator it = nameMap.find(name);
+      if (it != nameMap.end()) {
+        // There is already such name in the map.
+
+        // a. Replace in the map the old pair by the current one
+        int old_ind = nameMap.at(name);
+        nameMap.at(name) = ind;
+        // b. Rebuild the old pair (which was in the map,
+        //    it seems to be built automatically by step II)
+        ind = old_ind;
+        // continue with step II
+        doResave = true; // only for tracing
+      }
+      else {
+        // Save in the map
+        nameMap.insert(make_pair(name, ind));
+
+        // Update loc_index for this name (if last free characters represents a number)
+        // to avoid conflicts with long names, same in first 5 characters
+        if (len == 8) {
+          int new_loc_index = atoi(name.c_str() + 5);
+          if (new_loc_index > 0) {
+            // prefix
+            char str [6];
+            strncpy(str, name.c_str(), 5);
+            str[5] = '\0';
+
+            if (namePrefixesMap.find(str) != namePrefixesMap.end()) {
+              int old_loc_index = namePrefixesMap[str];
+              if (new_loc_index < old_loc_index) new_loc_index = old_loc_index;
+            }
+            namePrefixesMap[str] = new_loc_index;
+          }
+        }
+        return;
+      }
+    } // if (len <= 8)
+
+    // II. Cut long name and add a numeric suffix
 
     // first 5 or less characters of the name
     if (len > 5) len = 5;
-    //char *str = new char[9];
     char str [9];
     str[8] = '\0';
     int addr = 0;
@@ -2288,8 +2356,13 @@ void GIBI_MESH_WRONLY_DRIVER::addName (map<string,int>& nameMap,
     }
     sprintf(str + addr, "%d", loc_index);
 
-    /*bool ok = */nameMap.insert(make_pair(str, index))/*.second*/;
-    INFOS_MED("Save <" << name << "> as <" << str << ">");
+    nameMap.insert(make_pair(str, ind));
+    if (doResave) {
+      INFOS_MED("Resave previous <" << name << "> as <" << str << ">");
+    }
+    else {
+      INFOS_MED("Save <" << theName << "> as <" << str << ">");
+    }
   }
 }
 
