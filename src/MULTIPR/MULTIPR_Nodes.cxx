@@ -37,6 +37,7 @@
 
 #include <iostream>
 #include <limits>
+#include <cstring>
 
 using namespace std;
 

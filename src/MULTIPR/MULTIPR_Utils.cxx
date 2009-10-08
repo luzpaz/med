@@ -37,6 +37,7 @@
 #include "MULTIPR_Mesh.hxx"
 
 #include <iostream>
+#include <cstring>
 
 using namespace std;
 
