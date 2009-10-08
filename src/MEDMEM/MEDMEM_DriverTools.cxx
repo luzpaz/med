@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #include "MEDMEM_DriverTools.hxx"
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Exception.hxx"
@@ -62,7 +62,7 @@ bool _maille::operator < (const _maille& ma) const
     if(*v1 != *v2)
       return *v1 < *v2;
   return false; // cas d'égalité
-  
+
 //   if(geometricType==ma.geometricType)
 //   {
 //     // construction de deux vecteur temporaire contenant les numeros de sommets
@@ -91,7 +91,7 @@ bool _maille::operator < (const _maille& ma) const
 //     return geometricType<ma.geometricType;
 }
 
-// creates if needed and return sortedNodeIDs  
+// creates if needed and return sortedNodeIDs
 const int* _maille::getSortedNodes() const
 {
   if ( !sortedNodeIDs )
@@ -182,17 +182,17 @@ std::ostream& operator << (std::ostream& os, const _groupe& gr)
     os << " -> liste des sous-groupes : ";
     for( std::vector<int>::const_iterator i=gr.groupes.begin(); i!=gr.groupes.end(); ++i)
             os << *i << " ";
-    
+
     os << std::endl << " -> liste des "<< gr.mailles.size() << " mailles : " << std::endl;
-    
+
     _groupe::TMailleIter i1=gr.mailles.begin();
     int l;
     for(l = 0; l < DUMP_LINES_LIMIT && i1!=gr.mailles.end(); i1++, l++)
             os << setw(3) << l+1 << " " << *(*i1) << std::endl;
-    
+
     if ( l == DUMP_LINES_LIMIT )
       os << "   ... skip " << gr.mailles.size() - l << " mailles" << endl;
-    
+
     os << " relocMap, size=" << gr.relocMap.size() << endl;
     map<unsigned,int>::const_iterator it = gr.relocMap.begin();
     for ( l = 0; l < DUMP_LINES_LIMIT && it != gr.relocMap.end(); ++it, ++l )
@@ -284,7 +284,7 @@ void _intermediateMED::treatGroupes()
   if ( myGroupsTreated )
     return;
   myGroupsTreated = true;
-  
+
   // --------------------
   // erase useless group
   // --------------------
@@ -358,7 +358,7 @@ void _intermediateMED::treatGroupes()
   // define if there are groups with mixed entity types
   // ---------------------------------------------------
 
-  hasMixedCells = false;  
+  hasMixedCells = false;
   for (unsigned int i=0; i!=this->groupes.size(); ++i)
   {
     _groupe& grp = groupes[i];
@@ -497,7 +497,7 @@ bool _intermediateMED::numerotationPoints()
   }
   return false;
 }
-    
+
 int _intermediateMED::nbMerged(int type) const //!< nb nodes removed by merge
 {
   TNbByType::const_iterator typeNb = nbRemovedByType.find( type );
@@ -680,7 +680,7 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
         Connectivity->setConstituent (Constituent);
       Constituent = Connectivity;
     }
-    
+
     // put polygones in order of increasing number
     int numShift = 1 + Connectivity->getNumberOf( entity, MED_ALL_ELEMENTS );
     int nbPoly = polygones.size() - nbMerged( MED_POLYGON );
@@ -870,7 +870,7 @@ void _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
           }
           if ( (int)i > *sub_grps.begin() ) { // roll back
             support_groups.erase( i );
-            support_groups.insert( sub_grps.begin(), sub_grps.end() ); 
+            support_groups.insert( sub_grps.begin(), sub_grps.end() );
             i = *sub_grps.begin() - 1;
             continue;
           }
@@ -916,14 +916,14 @@ void _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
 
     // if !isOnAll, build a map _maille::ordre() -> index in GROUP.getNumber(MED_ALL_ELEMENTS).
     // It is used while fields building.
-    if ( !isOnAll || isSelfIntersect ) {
+    if ( !isOnAll || isSelfIntersect || isFieldSupport ) {
       TMailleSet::iterator maIt = mailleSet.begin();
       for ( int iMa = 0; maIt != mailleSet.end(); maIt++ )
         grp.relocMap.insert( make_pair( (*maIt)->ordre(), ++iMa ));
     }
     //Parcours des mailles (a partir de la deuxieme) pour compter les types geometriques
     int nb_geometric_types=1;
-    TMailleSet::iterator j=mailleSet.begin(); 
+    TMailleSet::iterator j=mailleSet.begin();
     medGeometryElement geometrictype=(**j).geometricType;
     for ( ++j ; j!=mailleSet.end(); ++j )
     {
@@ -1020,13 +1020,13 @@ void _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
 //=======================================================================
 
 // void _intermediateMED::getFamilies(std::vector<FAMILY *> & _famCell,
-//                                    std::vector<FAMILY *> & _famFace, 
+//                                    std::vector<FAMILY *> & _famFace,
 //                                    std::vector<FAMILY *> & _famEdge,
 //                                    std::vector<FAMILY *> & _famNode, MESH * _ptrMesh)
 // {
 //   const char * LOC = "_intermediateMED::getFamilies() : ";
 //   BEGIN_OF_MED(LOC);
-  
+
 //   int nbElemFam = 0, nbNodeFam = 0;
 //   std::map< GROUP*, vector< FAMILY * > > grpFamsMap;
 //   int dimension_maillage=maillage.rbegin()->dimension();
@@ -1135,7 +1135,7 @@ void _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
 
 //=======================================================================
 //function : getGroup
-//purpose  : 
+//purpose  :
 //=======================================================================
 
 // GROUP * _intermediateMED::getGroup( int i )
@@ -1149,7 +1149,7 @@ void _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
 
 //=======================================================================
 //function : getFields
-//purpose  : 
+//purpose  :
 //=======================================================================
 
 void _intermediateMED::getFields(std::list< FIELD_* >& theFields)
@@ -1221,7 +1221,7 @@ void _fieldBase::getGroupIds( std::set<int> & ids, bool all ) const
 
 //=======================================================================
 //function : hasSameComponentsBySupport
-//purpose  : 
+//purpose  :
 //=======================================================================
 
 bool _fieldBase::hasSameComponentsBySupport() const

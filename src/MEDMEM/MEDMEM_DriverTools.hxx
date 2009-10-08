@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #ifndef DRIVERTOOLS_HXX
 #define DRIVERTOOLS_HXX
 
@@ -258,7 +258,7 @@ private:
 /*!
  * \if developper
  * Intermediate structure used by drivers to store data read from the other format file.
- * The structure provides functions that transform the stored data to the MED format : 
+ * The structure provides functions that transform the stored data to the MED format :
  * getCoordinate(), getConnectivity(), getGroups().
  * The elements inserted in maillage and points are automaticaly ordered.
  * Renumbering are performed by getConnectivity & getGroups before writing the MED structures.
@@ -285,10 +285,10 @@ struct MEDMEM_EXPORT _intermediateMED
   void mergeNodesAndElements(double tolerance); // optionally merge nodes and elements
   CONNECTIVITY * getConnectivity(); // creates MED connectivity from the intermediate structure
   COORDINATE * getCoordinate(const string & coordinateSystem="CARTESIAN"); // makes MED coordinate
-//   void getFamilies(std::vector<FAMILY *> & _famCell, std::vector<FAMILY *> & _famFace, 
+//   void getFamilies(std::vector<FAMILY *> & _famCell, std::vector<FAMILY *> & _famFace,
 //                    std::vector<FAMILY *> & _famEdge, std::vector<FAMILY *> & _famNode,
 //                    MESH * _ptrMesh);
-  void getGroups(std::vector<GROUP *> & _groupCell, std::vector<GROUP *> & _groupFace, 
+  void getGroups(std::vector<GROUP *> & _groupCell, std::vector<GROUP *> & _groupFace,
                  std::vector<GROUP *> & _groupEdge, std::vector<GROUP *> & _groupNode,
                  MESH * _ptrMesh);
   //GROUP * getGroup( int i );
@@ -370,7 +370,7 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
 
   int i_comp_tot = 0, nb_fields = 0;
   std::set<int> supp_id_set; // to create a new field when support repeats if hasCommonSupport()
-  std::vector< _sub_data >::const_iterator sub_data, sub_end = _sub.end(); 
+  std::vector< _sub_data >::const_iterator sub_data, sub_end = _sub.end();
 
   _groupe*  grp = 0;
   GROUP* medGrp = 0;
@@ -498,7 +498,7 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
     }
 
     // Set values
-    
+
     // get nb elements in a group
     _groupe & sub_grp = groupes[ sub_data->_supp_id ];
     int nb_supp_elems = sub_grp.mailles.size();
