@@ -2293,8 +2293,8 @@ void GIBI_MESH_WRONLY_DRIVER::addName (map<string,int>& nameMap,
         // There is already such name in the map.
 
         // a. Replace in the map the old pair by the current one
-        int old_ind = nameMap.at(name);
-        nameMap.at(name) = ind;
+        int old_ind = nameMap[name];
+        nameMap[name] = ind;
         // b. Rebuild the old pair (which was in the map,
         //    it seems to be built automatically by step II)
         ind = old_ind;
