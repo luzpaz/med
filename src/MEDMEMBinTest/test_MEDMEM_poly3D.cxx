@@ -229,10 +229,10 @@ int main (int argc, char ** argv)
       cout << "TEST2 K0 ! : Invalid data in memory for families !!!" << endl;
       return 1;
     }
-  // TEST 3 : volumes, aeras, barycenter
+  // TEST 3 : volumes, areas, barycenter
   nbOfPtsForTest=0;
   SUPPORT *supOnCell=new SUPPORT(myMesh);
-  FIELD<double>* vol1=myMesh->getVolume(supOnCell);
+  FIELD<double>* vol1=myMesh->getVolume(supOnCell, false);
   int lgth=vol1->getValueLength();
   const double *vals=vol1->getValue();
   if(lgth==3)
@@ -240,6 +240,15 @@ int main (int argc, char ** argv)
   const double REFVolOfPolyHedron[3]={2.333333333333333,-11.66666666666666,-13.83224131414673};
   for(i=0;i<3;i++)
     if(fabs(REFVolOfPolyHedron[i]-vals[i])<1e-12)
+      nbOfPtsForTest++;
+  delete vol1;
+  vol1=myMesh->getVolume(supOnCell, true);
+  lgth=vol1->getValueLength();
+  vals=vol1->getValue();
+  if(lgth==3)
+    nbOfPtsForTest++;
+  for(i=0;i<3;i++)
+    if(fabs(fabs(REFVolOfPolyHedron[i])-vals[i])<1e-12)
       nbOfPtsForTest++;
   delete vol1;
   FIELD<double>* bary=myMesh->getBarycenter(supOnCell);
@@ -287,9 +296,9 @@ int main (int argc, char ** argv)
     if(fabs(REFAreaForTri[i]-vals[i])<1e-12)
       nbOfPtsForTest++;
   delete vol1;
-  if(nbOfPtsForTest!=34)
+  if(nbOfPtsForTest!=38)
     {
-      cout << "TEST3 K0 ! : Error in caluclation of basic properties !!!" << endl;
+      cout << "TEST3 K0 ! : Error in calculation of basic properties !!!" << endl;
       return 1;
     }
   // TEST 4 -- CHECK FOR Reverse descending using getBoundaryElements.
