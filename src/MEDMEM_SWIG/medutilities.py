@@ -1,5 +1,4 @@
-#! /usr/bin/python
-#  -*- coding: iso-8859-1 -*-
+# -*- coding: iso-8859-1 -*-
 # --
 # Copyright (C) CEA DEN
 # Author : Erwan ADAM (CEA)
