@@ -482,16 +482,28 @@ void MEDMEMTest::testSupport()
     CPPUNIT_ASSERT_EQUAL(2,partial_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,types[1]));
 
     nbnodes = partial_supp_mesh->getNumberOfNodes();
+    int spaceDimension = partial_supp_mesh->getSpaceDimension();
+    int meshDimension = partial_supp_mesh->getMeshDimension();
+    const double *coords = partial_supp_mesh->getCoordinates(MED_FULL_INTERLACE);
+    const double coordsExpected[45]={3., 2., 2., 3., 2., 0., 4., 1., 0., 4., 1., 2., 0., 1., 2., 2., 0., 2., 2., 0., 0., 0.,
+                                     1., 0., 1., 2., 2., 1., 2., 0., 7., 2., 2., 5., 3., 2., 6., 3., 0., 7., 2., 0., 6., 0., 2.};
+    CPPUNIT_ASSERT_EQUAL(3,spaceDimension);
+    CPPUNIT_ASSERT_EQUAL(2,meshDimension);
+    CPPUNIT_ASSERT_EQUAL(15,nbnodes);
+    for(int i=0 ; i<spaceDimension*nbnodes; i++)
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(coordsExpected[i],coords[i],1e-15);
     conn=partial_supp_mesh->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_EN::MED_NODAL,
                                             MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
     con_len = 4 * MED_EN::MED_QUAD4 % 100;
+    int connExpected[16]={1, 2, 3, 4, 5, 6, 7, 8, 9, 5, 8, 10, 11, 12, 13, 14};
     for (int i=0; i<con_len;i++)
-      CPPUNIT_ASSERT(conn[i]>0 && conn[i]<=nbnodes);
+      CPPUNIT_ASSERT_EQUAL(connExpected[i],conn[i]);
 
     conn = partial_supp_mesh->getPolygonsConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL);
     con_len = partial_supp_mesh->getPolygonsConnectivityLength(MED_EN::MED_NODAL,MED_EN::MED_CELL);
+    int connExpectedP[10]={7, 3, 2, 10, 8, 12, 11, 15, 4, 1};
     for (int i=0; i<con_len;i++)
-      CPPUNIT_ASSERT(conn[i]>0 && conn[i]<=nbnodes);
+      CPPUNIT_ASSERT_EQUAL(connExpectedP[i],conn[i]);
   }
     
 	

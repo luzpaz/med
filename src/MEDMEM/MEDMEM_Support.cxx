@@ -1426,11 +1426,9 @@ MESH* SUPPORT::makeMesh()
   {
     nb_nodes = oldnodes.size();
     newcoords.set( nb_nodes * spacedim);
-    double* newcoordsp = newcoords;
     for (std::map<int,int>::const_iterator iter=oldnodes.begin(); iter!=oldnodes.end();iter++)
     {
-      std::copy( oldcoords+iter->first*spacedim, oldcoords+iter->first*spacedim+spacedim,newcoordsp);
-      newcoordsp+=spacedim;
+      std::copy( oldcoords+(iter->first-1)*spacedim, oldcoords+iter->first*spacedim,newcoords+((*iter).second-1)*spacedim);
     }
   }
   newmesh->setCoordinates(spacedim, nb_nodes, newcoords,
