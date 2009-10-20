@@ -813,7 +813,8 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         //nb_objets_nommes, nb_objets
         //objets_nommes, indices_objets_nommes
 
-        const char *noms_med_name = "noms_med";
+        //const char *noms_med_name = "noms_med";
+        const char *noms_med_name = "NOMS_MED";
         int noms_med_id = -1;
         for (int iname = 0; iname < nb_objets_nommes && noms_med_id < 0; iname++) {
           //if (GIBI_EQUAL(objets_nommes[iname], noms_med_name)) {
@@ -878,10 +879,16 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         if (nbSubStrings != nb_objets) {
           // error
         }
-        getNextLine( ligne );
-        string aWholeString = ligne;
-        if (aWholeString.length() != stringLen) {
-          // error
+        string aWholeString;
+        string aCurrLine;
+        while (aWholeString.length() < stringLen) {
+          getNextLine( ligne );
+          aCurrLine = ligne;
+          // cut leading blanks
+          int firstChar = aCurrLine.find_first_not_of(" \t");
+          if (firstChar < aCurrLine.length()) {
+            aWholeString += aCurrLine.substr(firstChar);
+          }
         }
         int prevOffset = 0;
         int currOffset = 0;
