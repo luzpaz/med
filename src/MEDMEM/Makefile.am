@@ -99,7 +99,6 @@ MEDMEM_EnsightUtils.hxx \
 MEDMEM_Extractor.hxx \
 MEDMEM_Remapper.hxx \
 PointLocator.hxx \
-PointLocatorAlgos.txx \
 MEDNormalizedUnstructuredMesh.hxx \
 MEDNormalizedUnstructuredMesh.txx
 
