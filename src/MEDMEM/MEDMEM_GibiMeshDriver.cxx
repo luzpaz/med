@@ -249,7 +249,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
   unsigned space_dimension = 0;
 
   // IMP 0020434: mapping GIBI names to MED names
-  list<nameGIBItoMED> listGIBItoMED; // to be read from PILE_TABLES, from table "noms_med"
+  list<nameGIBItoMED> listGIBItoMED; // to be read from PILE_TABLES, from table "NOMS_MED"
   map<int,string> mapStrings; // to be read from PILE_STRINGS
   vector<_fieldBase*> node_fields;
   vector<_fieldBase*> cell_fields;
@@ -825,7 +825,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         if (noms_med_id < 0) continue;
 
         for (int itable = 1; itable <= nb_objets; itable++) {
-          // read table "noms_med", that keeps correspondence
+          // read table "NOMS_MED", that keeps correspondence
           // between GIBI names (8 symbols) and MED names (possibly longer)
           getNextLine( ligne );
           unsigned nb_table_vals = atoi( ligne );
@@ -849,7 +849,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
             name_i_val_pile = getInt(); next();
             name_i.val_id   = getInt(); next();
 
-            // check, if this table is "noms_med"
+            // check, if this table is "NOMS_MED"
             if (itable == noms_med_id) {
               //if (name_i.key_pile != ) {
               //}
@@ -2701,7 +2701,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeMEDNames (const list<nameGIBItoMED>& listGIBI
   // * 801     FORMAT(' PILE NUMERO',I4,'NBRE OBJETS NOMMES',I8,'NBRE OBJETS',I8)
   _gibi << " PILE NUMERO  10NBRE OBJETS NOMMES" << setw(8) << 1 <<
     "NBRE OBJETS" << setw(8) << 1 << endl; // One named table, no others
-  _gibi << " noms_med" << endl; // Name of single table is "noms_med"
+  _gibi << " NOMS_MED" << endl; // Name of single table is "NOMS_MED"
   _gibi << setw(8) << 1 << endl; // ID of single table is 1
 
   _gibi << setw(8) << nbNames << endl; // Nb of pairs key-value
@@ -2763,7 +2763,12 @@ void GIBI_MESH_WRONLY_DRIVER::writeMEDNames (const list<nameGIBItoMED>& listGIBI
         << setw(8) << nbNames << endl;
 
   // Write the whole string
-  _gibi << theWholeString.data() << endl;
+  const int fixedLength = 71;
+  int aPos = 0;
+  int aLen = theWholeString.length();
+  for (; aPos < aLen; aPos += fixedLength) {
+    _gibi << setw(72) << theWholeString.substr(aPos, fixedLength) << endl;
+  } while (aPos < aLen);
 
   // Write the offsets
   TFieldCounter fcount3 (_gibi, 10);
