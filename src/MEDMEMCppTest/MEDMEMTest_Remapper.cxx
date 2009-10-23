@@ -29,12 +29,10 @@
 // {
 
 void MEDMEMTest::test_RemapperP0P0() {
-  string sourcename=getenv("MED_ROOT_DIR");
-  sourcename +="/share/salome/resources/med/square1.med";
+  std::string sourcename=getResourceFile("square1.med");
   MEDMEM::MESH source_mesh (MED_DRIVER,sourcename,"Mesh_2");
   
-  string targetname=getenv("MED_ROOT_DIR");
-  targetname +="/share/salome/resources/med/square2.med";
+  std::string targetname=getResourceFile("square2.med");
   MEDMEM::MESH target_mesh (MED_DRIVER,targetname,"Mesh_3");
   
   int nbcomp=3;
@@ -53,8 +51,8 @@ void MEDMEMTest::test_RemapperP0P0() {
   
   
   MEDMEM_REMAPPER remapper;
-  const string intersectiontype = "IntersectionType";
-  string convex = "Convex";
+  const std::string intersectiontype = "IntersectionType";
+  std::string convex = "Convex";
   remapper.setOptionDouble("Precision",1.e-8);
   remapper.setOptionString(intersectiontype,convex);
   remapper.setOptionInt("PrintLevel",1);
@@ -131,12 +129,10 @@ void MEDMEMTest::test_RemapperP0P0() {
 }
 
 void  MEDMEMTest::test_RemapperP1P1() {
-  string sourcename=getenv("MED_ROOT_DIR");
-  sourcename +="/share/salome/resources/med/square1.med";
+  std::string sourcename=getResourceFile("square1.med");
   MEDMEM::MESH source_mesh (MED_DRIVER,sourcename,"Mesh_2");
   
-  string targetname=getenv("MED_ROOT_DIR");
-  targetname +="/share/salome/resources/med/square2.med";
+  std::string targetname=getResourceFile("square2.med");
   MEDMEM::MESH target_mesh (MED_DRIVER,targetname,"Mesh_3");
   
   int nbcomp=2;
@@ -185,12 +181,10 @@ void  MEDMEMTest::test_RemapperP1P1() {
 
 
 void  MEDMEMTest::test_RemapperP1P0() {
-  string sourcename=getenv("MED_ROOT_DIR");
-  sourcename +="/share/salome/resources/med/square1.med";
+  std::string sourcename=getResourceFile("square1.med");
   MEDMEM::MESH source_mesh (MED_DRIVER,sourcename,"Mesh_2");
   
-  string targetname=getenv("MED_ROOT_DIR");
-  targetname +="/share/salome/resources/med/square2.med";
+  std::string targetname=getResourceFile("square2.med");
   MEDMEM::MESH target_mesh (MED_DRIVER,targetname,"Mesh_3");
   
   int nbcomp=3;
@@ -237,12 +231,10 @@ void  MEDMEMTest::test_RemapperP1P0() {
 }
 
 void  MEDMEMTest::test_RemapperP0P1() {
-  string sourcename=getenv("MED_ROOT_DIR");
-  sourcename +="/share/salome/resources/med/square1.med";
+  std::string sourcename=getResourceFile("square1.med");
   MEDMEM::MESH source_mesh (MED_DRIVER,sourcename,"Mesh_2");
 
-  string targetname=getenv("MED_ROOT_DIR");
-  targetname +="/share/salome/resources/med/square2.med";
+  std::string targetname=getResourceFile("square2.med");
   MEDMEM::MESH target_mesh (MED_DRIVER,targetname,"Mesh_3");
 
   int nbcomp=4;
@@ -315,9 +307,9 @@ namespace {
     meshing->setNumberOfNodes(nNodes);
     meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
                             MED_EN::MED_FULL_INTERLACE);
-    string coordname[3] = { "x", "y", "z" };
+    std::string coordname[3] = { "x", "y", "z" };
     meshing->setCoordinatesNames(coordname);
-    string coordunit[3] = { "m", "m", "m" };
+    std::string coordunit[3] = { "m", "m", "m" };
     meshing->setCoordinatesUnits(coordunit);
     //Cell connectivity info for classical elts
     const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MED_TETRA4};
@@ -345,9 +337,9 @@ namespace {
     meshing->setNumberOfNodes(nNodes);
     meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
                             MED_EN::MED_FULL_INTERLACE);
-    string coordname[3] = { "x", "y", "z" };
+    std::string coordname[3] = { "x", "y", "z" };
     meshing->setCoordinatesNames(coordname);
-    string coordunit[3] = { "m", "m", "m" };
+    std::string coordunit[3] = { "m", "m", "m" };
     meshing->setCoordinatesUnits(coordunit);
     //Cell connectivity info for classical elts
     const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MED_TETRA4};
