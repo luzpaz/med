@@ -1398,12 +1398,8 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
 
 
       map<medGeometryElement,int> eltsCounter;
-      medGeometryElement* ConstituentsTypes = new medGeometryElement[2];
-      ConstituentsTypes[0]=MED_NONE;
-      ConstituentsTypes[1]=MED_NONE;
-      int * NumberOfConstituentsForeachType = new int[2];
-      NumberOfConstituentsForeachType[0]=0;
-      NumberOfConstituentsForeachType[1]=0;
+      medGeometryElement ConstituentsTypes[2] = { MED_NONE, MED_NONE };
+      int NumberOfConstituentsForeachType [2] = { 0, 0 };
       map<medGeometryElement,int>::iterator status;
       for(int i=0; i<_numberOfTypes; i++)
       {
@@ -1424,12 +1420,15 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
           }
         }
       }
+      if (getNumberOfPolygons() > 0) // there are constituent segments
+      {
+        status=eltsCounter.insert(make_pair( MED_SEG2,0 )).first;
+        status->second++; // increment zero or that there was
+      }
       if(eltsCounter.size()>2) {
         // free memory (issue 0020411: [CEA 342] Sigsegv on gibi writing of MESH coming from MED file without face computation)
         delete [] descend_connectivity;
         delete [] descend_connectivity_index;
-        delete [] ConstituentsTypes;
-        delete [] NumberOfConstituentsForeachType;
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Descending connectivity does not support more than 2 types."));
       }
       status=eltsCounter.begin();
@@ -1454,7 +1453,7 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
       ConstituentNodalConnectivityIndex[0]=1;
 
       _constituent->_entityDimension = _entityDimension-1;
-      // Rall back modif made in BR_renumbering branch because of regression: 
+      // Roll back modif made in BR_renumbering branch because of regression: 
       // 0020478: [CEA] Groups in a mesh obj not written in MED file when mesh contains only polyg/polyh elts
       //if(ConstituentsTypes[0]==MED_NONE && ConstituentsTypes[1]==MED_NONE && getNumberOfTypesWithPoly(_entity)==0)
       if(ConstituentsTypes[0]==MED_NONE && ConstituentsTypes[1]==MED_NONE && _numberOfTypes==0)
@@ -1481,8 +1480,6 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
         for (int j=tmp_NumberOfConstituentsForeachType[i]; j<tmp_NumberOfConstituentsForeachType[i+1]+tmp_NumberOfConstituentsForeachType[i]; j++)
           ConstituentNodalConnectivityIndex[j+1]=ConstituentNodalConnectivityIndex[j]+(ConstituentsTypes[i]%100);
       }
-      delete [] ConstituentsTypes;
-      delete [] NumberOfConstituentsForeachType;
 
       // we need reverse nodal connectivity
       if (! _reverseNodalConnectivity)
