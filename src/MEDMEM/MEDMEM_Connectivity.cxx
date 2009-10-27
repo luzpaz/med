@@ -1355,12 +1355,8 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 
 
       map<medGeometryElement,int> eltsCounter;
-      medGeometryElement* ConstituentsTypes = new medGeometryElement[2];
-      ConstituentsTypes[0]=MED_NONE;
-      ConstituentsTypes[1]=MED_NONE;
-      int * NumberOfConstituentsForeachType = new int[2];
-      NumberOfConstituentsForeachType[0]=0;
-      NumberOfConstituentsForeachType[1]=0;
+      medGeometryElement ConstituentsTypes[2] = { MED_NONE, MED_NONE };
+      int NumberOfConstituentsForeachType [2] = { 0, 0 };
       map<medGeometryElement,int>::iterator status;
       for(int i=0; i<_numberOfTypes; i++)
         {
@@ -1381,12 +1377,15 @@ void CONNECTIVITY::calculateDescendingConnectivity()
                 }
             }
         }
+      if (getNumberOfPolygons() > 0) // there are constituent segments
+      {
+        status=eltsCounter.insert(make_pair( MED_SEG2,0 )).first;
+        status->second++; // increment zero or that there was
+      }
       if(eltsCounter.size()>2) {
         // free memory (issue 0020411: [CEA 342] Sigsegv on gibi writing of MESH coming from MED file without face computation)
         delete [] descend_connectivity;
         delete [] descend_connectivity_index;
-        delete [] ConstituentsTypes;
-        delete [] NumberOfConstituentsForeachType;
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Descending connectivity does not support more than 2 types."));
       }
       status=eltsCounter.begin();
@@ -1433,8 +1432,6 @@ void CONNECTIVITY::calculateDescendingConnectivity()
         for (int j=tmp_NumberOfConstituentsForeachType[i]; j<tmp_NumberOfConstituentsForeachType[i+1]+tmp_NumberOfConstituentsForeachType[i]; j++)
           ConstituentNodalConnectivityIndex[j+1]=ConstituentNodalConnectivityIndex[j]+(ConstituentsTypes[i]%100);
       }
-      delete [] ConstituentsTypes;
-      delete [] NumberOfConstituentsForeachType;
 
       // we need reverse nodal connectivity
       if (! _reverseNodalConnectivity)
