@@ -107,7 +107,9 @@ def convert(file_in, driver_in, driver_out, format=1, file_out=None):
     elif driver_in == "MED":
         driver = MED_MED_RDONLY_DRIVER(file_in, med)
         driver.open()
-        driver.readFileStruct()
+        # 020499: [CEA 356] Pb to retrieve MED field from sauv file
+        #driver.readFileStruct()
+        driver.read()
         driver.close()
     else:
         msg = "Driver in %s is unknown"%(driver_in)
@@ -119,7 +121,8 @@ def convert(file_in, driver_in, driver_out, format=1, file_out=None):
         mesh_name = med.getMeshName(0)
         mesh = med.getMesh(mesh_name)
         if driver_in == "MED":
-            mesh.read()
+            # 020499: [CEA 356] Pb to retrieve MED field from sauv file
+            #mesh.read()
             pass
         mesh_dim = mesh.getSpaceDimension()
         if format == 0:
