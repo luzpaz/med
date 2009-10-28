@@ -249,7 +249,9 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
   unsigned space_dimension = 0;
 
   // IMP 0020434: mapping GIBI names to MED names
-  list<nameGIBItoMED> listGIBItoMED; // to be read from PILE_TABLES, from table "NOMS_MED"
+  list<nameGIBItoMED> listGIBItoMED_mail; // to be read from PILE_TABLES, from table "MED_MAIL"
+  list<nameGIBItoMED> listGIBItoMED_cham; // to be read from PILE_TABLES, from table "MED_CHAM"
+  list<nameGIBItoMED> listGIBItoMED_comp; // to be read from PILE_TABLES, from table "MED_COMP"
   map<int,string> mapStrings; // to be read from PILE_STRINGS
   vector<_fieldBase*> node_fields;
   vector<_fieldBase*> cell_fields;
@@ -810,22 +812,33 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
       // IMP 0020434: mapping GIBI names to MED names
       else if (numero_pile == PILE_TABLES)
       {
-        //nb_objets_nommes, nb_objets
-        //objets_nommes, indices_objets_nommes
+        const char * table_med_mail = "MED_MAIL";
+        const char * table_med_cham = "MED_CHAM";
+        const char * table_med_comp = "MED_COMP";
 
-        //const char *noms_med_name = "noms_med";
-        const char *noms_med_name = "NOMS_MED";
-        int noms_med_id = -1;
-        for (int iname = 0; iname < nb_objets_nommes && noms_med_id < 0; iname++) {
-          //if (GIBI_EQUAL(objets_nommes[iname], noms_med_name)) {
-          if (strcmp(objets_nommes[iname].c_str(), noms_med_name) == 0) {
-            noms_med_id = indices_objets_nommes[iname];
+        int table_med_mail_id = -1;
+        int table_med_cham_id = -1;
+        int table_med_comp_id = -1;
+
+        for (int iname = 0; iname < nb_objets_nommes; iname++) {
+          if (strcmp(objets_nommes[iname].c_str(), table_med_mail) == 0) {
+            table_med_mail_id = indices_objets_nommes[iname];
+          }
+          else if (strcmp(objets_nommes[iname].c_str(), table_med_cham) == 0) {
+            table_med_cham_id = indices_objets_nommes[iname];
+          }
+          else if (strcmp(objets_nommes[iname].c_str(), table_med_comp) == 0) {
+            table_med_comp_id = indices_objets_nommes[iname];
+          }
+          else {
           }
         }
-        if (noms_med_id < 0) continue;
+        //if (noms_med_id < 0) continue;
+        if (table_med_mail_id < 0 && table_med_cham_id < 0 && table_med_comp_id < 0)
+          continue;
 
         for (int itable = 1; itable <= nb_objets; itable++) {
-          // read table "NOMS_MED", that keeps correspondence
+          // read tables "MED_MAIL", "MED_CHAM" and "MED_COMP", that keeps correspondence
           // between GIBI names (8 symbols) and MED names (possibly longer)
           getNextLine( ligne );
           unsigned nb_table_vals = atoi( ligne );
@@ -835,29 +848,55 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
             return false;
           }
 
-          int name_i_val_pile;
+          //int name_i_val_pile;
+          int name_i_med_pile;
           initIntReading(nb_table_vals * 4);
           for (unsigned i = 0; i < nb_table_vals; i++)
           {
-            //int key_pile = getInt(); next();
-            //int key_id   = getInt(); next();
-            //int val_pile = getInt(); next();
-            //int val_id   = getInt(); next();
-            nameGIBItoMED name_i;
-            name_i.key_pile = getInt(); next();
-            name_i.key_id   = getInt(); next();
-            name_i_val_pile = getInt(); next();
-            name_i.val_id   = getInt(); next();
+            if (itable == table_med_mail_id ||
+                itable == table_med_cham_id ||
+                itable == table_med_comp_id)
+            {
+              nameGIBItoMED name_i;
+              //name_i.key_pile = getInt(); next();
+              //name_i.key_id   = getInt(); next();
+              //name_i_val_pile = getInt(); next();
+              //name_i.val_id   = getInt(); next();
+              name_i_med_pile  = getInt(); next();
+              name_i.med_id    = getInt(); next();
+              name_i.gibi_pile = getInt(); next();
+              name_i.gibi_id   = getInt(); next();
 
-            // check, if this table is "NOMS_MED"
-            if (itable == noms_med_id) {
-              //if (name_i.key_pile != ) {
-              //}
-              if (name_i_val_pile != PILE_STRINGS) {
-                // error
+              if (name_i_med_pile != PILE_STRINGS) {
+                // error: med(long) names are always kept in PILE_STRINGS
               }
 
-              listGIBItoMED.push_back(name_i);
+              if (itable == table_med_mail_id) {
+                if (name_i.gibi_pile != PILE_SOUS_MAILLAGE) {
+                  // error: must be PILE_SOUS_MAILLAGE
+                }
+                listGIBItoMED_mail.push_back(name_i);
+              }
+              else if (itable == table_med_cham_id) {
+                if (name_i.gibi_pile != PILE_FIELD &&
+                    name_i.gibi_pile != PILE_NODES_FIELD) {
+                  // error: must be PILE_FIELD or PILE_NODES_FIELD
+                }
+                listGIBItoMED_cham.push_back(name_i);
+              }
+              else if (itable == table_med_comp_id) {
+                if (name_i.gibi_pile != PILE_STRINGS) {
+                  // error: gibi(short) names of components are kept in PILE_STRINGS
+                }
+                listGIBItoMED_comp.push_back(name_i);
+              }
+              else {
+              }
+            }
+            else
+            {
+              // pass table
+              next(); next(); next(); next();
             }
           }
         } // for (int itable = 0; itable < nb_objets; itable++)
@@ -870,9 +909,6 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
       // IMP 0020434: mapping GIBI names to MED names
       else if (numero_pile == PILE_STRINGS)
       {
-        //nb_objets_nommes, nb_objets
-        //objets_nommes, indices_objets_nommes
-
         initIntReading(2);
         int stringLen = getInt(); next();
         int nbSubStrings = getInt(); next();
@@ -884,7 +920,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         while (aWholeString.length() < stringLen) {
           getNextLine( ligne );
           aCurrLine = ligne;
-          // cut leading blanks
+          // cut off leading white spaces
           int firstChar = aCurrLine.find_first_not_of(" \t");
           if (firstChar < aCurrLine.length()) {
             aWholeString += aCurrLine.substr(firstChar);
@@ -909,24 +945,52 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
 
   // IMP 0020434: mapping GIBI names to MED names
   // set med names to objects (mesh, fields, support, group or other)
-  if (listGIBItoMED.size() > 0) {
-    // listGIBItoMED, mapStrings
-    list<nameGIBItoMED>::iterator itGIBItoMED = listGIBItoMED.begin();
-    for (; itGIBItoMED != listGIBItoMED.end(); itGIBItoMED++) {
-      if (itGIBItoMED->key_pile == PILE_SOUS_MAILLAGE) {
-        _groupe & grp = medi->groupes[itGIBItoMED->key_id - 1];
-        grp.nom = mapStrings[itGIBItoMED->val_id];
+  if (listGIBItoMED_mail.size() > 0) {
+    list<nameGIBItoMED>::iterator itGIBItoMED = listGIBItoMED_mail.begin();
+    for (; itGIBItoMED != listGIBItoMED_mail.end(); itGIBItoMED++) {
+      _groupe & grp = medi->groupes[itGIBItoMED->gibi_id - 1];
+      grp.nom = mapStrings[itGIBItoMED->med_id];
+    } // iterate on listGIBItoMED_mail
+  }
+  if (listGIBItoMED_cham.size() > 0) {
+    list<nameGIBItoMED>::iterator itGIBItoMED = listGIBItoMED_cham.begin();
+    for (; itGIBItoMED != listGIBItoMED_cham.end(); itGIBItoMED++) {
+      if (itGIBItoMED->gibi_pile == PILE_FIELD) {
+        cell_fields[itGIBItoMED->gibi_id - 1]->_name = mapStrings[itGIBItoMED->med_id];
       }
-      else if (itGIBItoMED->key_pile == PILE_FIELD) {
-        cell_fields[itGIBItoMED->key_id - 1]->_name = mapStrings[itGIBItoMED->val_id];
-      }
-      else if (itGIBItoMED->key_pile == PILE_NODES_FIELD) {
-        node_fields[itGIBItoMED->key_id - 1]->_name = mapStrings[itGIBItoMED->val_id];
+      else if (itGIBItoMED->gibi_pile == PILE_NODES_FIELD) {
+        node_fields[itGIBItoMED->gibi_id - 1]->_name = mapStrings[itGIBItoMED->med_id];
       }
       else {
-        // ???
       }
-    }
+    } // iterate on listGIBItoMED_cham
+  }
+  if (listGIBItoMED_comp.size() > 0) {
+    list<nameGIBItoMED>::iterator itGIBItoMED = listGIBItoMED_comp.begin();
+    for (; itGIBItoMED != listGIBItoMED_comp.end(); itGIBItoMED++)
+    {
+      string medName  = mapStrings[itGIBItoMED->med_id];
+      string gibiName = mapStrings[itGIBItoMED->gibi_id];
+
+      int posDot = medName.find(".");
+      string medNameField = medName.substr(0, posDot);
+      string medNameCompo = medName.substr(posDot + 1);
+
+      int nbFields = cell_fields.size();
+      for (int ifi = 0; ifi < nbFields; ifi++) {
+        if (cell_fields[ifi]->_name == medNameField) {
+          std::vector<_fieldBase::_sub_data>& aSubDs = cell_fields[ifi]->_sub;
+          int nbSub = aSubDs.size();
+          for (int isu = 0; isu < nbSub; isu++) {
+            for (int ico = 0; ico < aSubDs[isu].nbComponents(); ico++) {
+              if (aSubDs[isu].compName(ico) == gibiName) {
+                cell_fields[ifi]->_sub[isu].compName(ico) = medNameCompo;
+              }
+            }
+          }
+        }
+      }
+    } // iterate on listGIBItoMED_comp
   }
 
   // check if all needed piles present
@@ -1940,9 +2004,11 @@ void GIBI_MESH_WRONLY_DRIVER::write(void) const
   GIBI_MESH_WRONLY_DRIVER * me = const_cast<GIBI_MESH_WRONLY_DRIVER *>(this);
 //  try {
     // IMP 0020434: mapping GIBI names to MED names
-    list<nameGIBItoMED> listGIBItoMED;
-    me->writeSupportsAndMesh(listGIBItoMED);
-    me->writeMEDNames(listGIBItoMED);
+    list<nameGIBItoMED> listGIBItoMED_mail;
+    list<nameGIBItoMED> listGIBItoMED_cham;
+    list<nameGIBItoMED> listGIBItoMED_comp;
+    me->writeSupportsAndMesh(listGIBItoMED_mail);
+    me->writeMEDNames(listGIBItoMED_mail, listGIBItoMED_cham, listGIBItoMED_comp);
     me->writeLastRecord();
 //   }
 //   catch (MEDEXCEPTION &ex)
@@ -1962,6 +2028,7 @@ static string cleanName( const string& theName )
 {
   string name = theName;
   if ( !name.empty() ) {
+    /*
     // find a name string end
     int i, len = name.length();
     for ( i = 0; i < len; ++i ) {
@@ -1974,6 +2041,17 @@ static string cleanName( const string& theName )
     if ( i != len ) {
       name = name.substr( 0, i );
       len = i;
+    }
+    */
+    // cut off leading white spaces
+    int firstChar = name.find_first_not_of(" \t");
+    if (firstChar < name.length()) {
+      name = name.substr(firstChar);
+    }
+    // cut off trailing white spaces
+    int lastChar = name.find_last_not_of(" \t");
+    if (lastChar < name.length()) {
+      name = name.substr(0, lastChar + 1);
     }
   }
   return name;
@@ -2408,7 +2486,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeNames( map<string,int>& nameNbMap )
 //purpose  :
 //=======================================================================
 
-void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh(list<nameGIBItoMED>& listGIBItoMED)
+void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh(list<nameGIBItoMED>& listGIBItoMED_mail)
 {
   const char * LOC = "void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh() ";
   BEGIN_OF_MED(LOC);
@@ -2457,10 +2535,10 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh(list<nameGIBItoMED>& listGIBI
 
     // IMP 0020434: mapping GIBI names to MED names
     nameGIBItoMED aMEDName;
-    aMEDName.key_pile = 1;
-    aMEDName.key_id = data._id;
-    aMEDName.value = data._cleanName;
-    listGIBItoMED.push_back(aMEDName);
+    aMEDName.gibi_pile = 1; // PILE_SOUS_MAILLAGE
+    aMEDName.gibi_id = data._id;
+    aMEDName.med_name = data._cleanName;
+    listGIBItoMED_mail.push_back(aMEDName);
 
     MESSAGE_MED( "obj " << data._id << " " << data._cleanName);
 
@@ -2674,15 +2752,25 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh(list<nameGIBItoMED>& listGIBI
 //function : writeMEDNames
 //purpose  :
 //=======================================================================
-void GIBI_MESH_WRONLY_DRIVER::writeMEDNames (const list<nameGIBItoMED>& listGIBItoMED)
+void GIBI_MESH_WRONLY_DRIVER::writeMEDNames (const list<nameGIBItoMED>& listGIBItoMED_mail,
+                                             const list<nameGIBItoMED>& listGIBItoMED_cham,
+                                             const list<nameGIBItoMED>& listGIBItoMED_comp)
 {
   // IMP 0020434: mapping GIBI names to MED names
   // Store correspondence between GIBI and MED names
   // as one PILE_STRINGS and one PILE_TABLES
+  // (in three tables: MED_MAIL, MED_CHAM and MED_COMP)
 
-  int nbNames = listGIBItoMED.size();
+  int nbNames_mail = listGIBItoMED_mail.size();
+  int nbNames_cham = listGIBItoMED_cham.size();
+  int nbNames_comp = listGIBItoMED_comp.size();
 
-  if (!nbNames)
+  int nbTables = 0;
+  if (nbNames_mail) nbTables++;
+  if (nbNames_cham) nbTables++;
+  if (nbNames_comp) nbTables++;
+
+  if (!nbTables)
     return;
 
   // The whole string (concatenated names)
@@ -2690,58 +2778,157 @@ void GIBI_MESH_WRONLY_DRIVER::writeMEDNames (const list<nameGIBItoMED>& listGIBI
   list<int> theOffsets;
   int currOffset = 0;
 
-  // Provide unique MED names, to exclude conflicts on reading saved files
-  // (use case: read fra.med, save it to GIBI, read it from GIBI,
-  // save to MED again -> this new MED file is not readable)
-  set<string> medUniqueNames;
-
   // The TABLE PILE
   // * 800   FORMAT (' ENREGISTREMENT DE TYPE', I4)
   _gibi << " ENREGISTREMENT DE TYPE   2" << endl;
   // * 801     FORMAT(' PILE NUMERO',I4,'NBRE OBJETS NOMMES',I8,'NBRE OBJETS',I8)
-  _gibi << " PILE NUMERO  10NBRE OBJETS NOMMES" << setw(8) << 1 <<
-    "NBRE OBJETS" << setw(8) << 1 << endl; // One named table, no others
-  _gibi << " NOMS_MED" << endl; // Name of single table is "NOMS_MED"
-  _gibi << setw(8) << 1 << endl; // ID of single table is 1
+  _gibi << " PILE NUMERO  10NBRE OBJETS NOMMES" << setw(8) << nbTables <<
+    "NBRE OBJETS" << setw(8) << nbTables << endl; // <nbTables> named tables
+  // Table names
+  if (nbNames_mail)
+    _gibi << " MED_MAIL";
+  if (nbNames_cham)
+    _gibi << " MED_CHAM";
+  if (nbNames_comp)
+    _gibi << " MED_COMP";
+  _gibi << endl;
+  // Table indices
+  _gibi << setw(8) << 1;
+  if (nbTables > 1) _gibi << setw(8) << 2;
+  if (nbTables > 2) _gibi << setw(8) << 3;
+  _gibi << endl;
 
-  _gibi << setw(8) << nbNames << endl; // Nb of pairs key-value
+  int istr = 1;
 
-  TFieldCounter fcount1 (_gibi, 10);
-  _gibi << right;
-  int ii = 1;
-  list<nameGIBItoMED>::const_iterator itGIBItoMED = listGIBItoMED.begin();
-  for (; itGIBItoMED != listGIBItoMED.end(); itGIBItoMED++, ii++) {
-    // PILE of key i (PILE_SOUS_MAILLAGE number is 1)
-    _gibi << setw(8) << itGIBItoMED->key_pile; fcount1++;
-    // ID of key i
-    _gibi << setw(8) << itGIBItoMED->key_id; fcount1++;
+  // Table MED_MAIL
+  if (nbNames_mail) {
+    // Provide unique MED names, to exclude conflicts on reading saved files
+    // (use case: read fra.med, save it to GIBI, read it from GIBI,
+    // save to MED again -> this new MED file is not readable)
+    set<string> medUniqueNames;
 
-    // PILE of value i (PILE_STRINGS number is 27)
-    _gibi << setw(8) << 27; fcount1++;
-    // ID of value i
-    _gibi << setw(8) << ii; fcount1++;
+    _gibi << setw(8) << nbNames_mail << endl; // Nb of pairs key-value
 
-    // check MED name to be unique
-    string aMedName = itGIBItoMED->value;
-    if (!medUniqueNames.insert(aMedName).second) {
-      string aMedNameNew;
-      int ind = 1;
-      char strInd [32];
-      do {
-        sprintf(strInd, "_%d", ind++);
-        aMedNameNew = aMedName + strInd;
-      } while (!medUniqueNames.insert(aMedNameNew).second);
-      aMedName = aMedNameNew;
+    TFieldCounter fcount1 (_gibi, 10);
+    _gibi << right;
+    list<nameGIBItoMED>::const_iterator itGIBItoMED = listGIBItoMED_mail.begin();
+    for (; itGIBItoMED != listGIBItoMED_mail.end(); itGIBItoMED++, istr++) {
+      // PILE of i-th key(med name)
+      _gibi << setw(8) << 27; fcount1++; // PILE_STRINGS number is 27
+      // ID of i-th key(med name)
+      _gibi << setw(8) << istr; fcount1++;
+
+      // PILE of i-th value(gibi name)
+      _gibi << setw(8) << itGIBItoMED->gibi_pile; fcount1++; // PILE_SOUS_MAILLAGE number is 1
+      // ID of i-th value(gibi name)
+      _gibi << setw(8) << itGIBItoMED->gibi_id; fcount1++;
+
+      // check MED name to be unique
+      string aMedName = itGIBItoMED->med_name;
+      if (!medUniqueNames.insert(aMedName).second) {
+        string aMedNameNew;
+        int ind = 1;
+        char strInd [32];
+        do {
+          sprintf(strInd, "_%d", ind++);
+          aMedNameNew = aMedName + strInd;
+        } while (!medUniqueNames.insert(aMedNameNew).second);
+        aMedName = aMedNameNew;
+      }
+
+      // add to the string
+      theWholeString += aMedName; // MED name
+
+      // add an offset
+      currOffset += aMedName.length();
+      theOffsets.push_back(currOffset);
     }
-
-    // add to the string
-    theWholeString += aMedName; // MED name
-
-    // add an offset
-    currOffset += aMedName.length();
-    theOffsets.push_back(currOffset);
+    fcount1.stop();
   }
-  fcount1.stop();
+
+  // Table MED_CHAM
+  if (nbNames_cham) {
+    // Provide unique MED names, to exclude conflicts on reading saved files
+    // (use case: read fra.med, save it to GIBI, read it from GIBI,
+    // save to MED again -> this new MED file is not readable)
+    set<string> medUniqueNames;
+
+    _gibi << setw(8) << nbNames_cham << endl; // Nb of pairs key-value
+
+    TFieldCounter fcount1 (_gibi, 10);
+    _gibi << right;
+    list<nameGIBItoMED>::const_iterator itGIBItoMED = listGIBItoMED_cham.begin();
+    for (; itGIBItoMED != listGIBItoMED_cham.end(); itGIBItoMED++, istr++) {
+      // PILE of i-th key(med name)
+      _gibi << setw(8) << 27; fcount1++; // PILE_STRINGS number is 27
+      // ID of i-th key(med name)
+      _gibi << setw(8) << istr; fcount1++;
+
+      // PILE of i-th value(gibi name)
+      // PILE_NODES_FIELD number is 2, PILE_FIELD number is 39
+      _gibi << setw(8) << itGIBItoMED->gibi_pile; fcount1++;
+      // ID of i-th value(gibi name)
+      _gibi << setw(8) << itGIBItoMED->gibi_id; fcount1++;
+
+      // check MED name to be unique
+      string aMedName = itGIBItoMED->med_name;
+      if (!medUniqueNames.insert(aMedName).second) {
+        string aMedNameNew;
+        int ind = 1;
+        char strInd [32];
+        do {
+          sprintf(strInd, "_%d", ind++);
+          aMedNameNew = aMedName + strInd;
+        } while (!medUniqueNames.insert(aMedNameNew).second);
+        aMedName = aMedNameNew;
+      }
+
+      // add to the string
+      theWholeString += aMedName; // MED name
+
+      // add an offset
+      currOffset += aMedName.length();
+      theOffsets.push_back(currOffset);
+    }
+    fcount1.stop();
+  }
+
+  // Table MED_COMP
+  if (nbNames_comp) {
+    // for components, both key and value (long and short name) is in the STRING PILE
+
+    _gibi << setw(8) << nbNames_comp << endl; // Nb of pairs key-value
+
+    TFieldCounter fcount1 (_gibi, 10);
+    _gibi << right;
+    list<nameGIBItoMED>::const_iterator itGIBItoMED = listGIBItoMED_comp.begin();
+    for (; itGIBItoMED != listGIBItoMED_comp.end(); itGIBItoMED++, istr+=2) {
+      // PILE of i-th key(med name)
+      _gibi << setw(8) << 27; fcount1++; // PILE_STRINGS number is 27
+      // ID of i-th key(med name)
+      _gibi << setw(8) << istr; fcount1++;
+
+      // PILE of i-th value(gibi name)
+      _gibi << setw(8) << 27; fcount1++; // PILE_STRINGS number is 27
+      // ID of i-th value(gibi name)
+      _gibi << setw(8) << istr + 1; fcount1++;
+
+      // add to the string
+      string aMedName  = itGIBItoMED->med_name;
+      string aGibiName = itGIBItoMED->gibi_name;
+      theWholeString += aMedName; // MED name
+      theWholeString += aGibiName; // GIBI name
+
+      // add offsets
+      currOffset += aMedName.length();
+      theOffsets.push_back(currOffset);
+      currOffset += aGibiName.length();
+      theOffsets.push_back(currOffset);
+    }
+    fcount1.stop();
+  }
+
+  int nbNames = nbNames_mail + nbNames_cham + 2 * nbNames_comp; // tmp
 
   // The STRING PILE
   // * 800   FORMAT (' ENREGISTREMENT DE TYPE', I4)
@@ -3073,7 +3260,9 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
   list<pair<int,int> >::iterator idsize;
 
   // IMP 0020434: mapping GIBI names to MED names
-  list<nameGIBItoMED> listGIBItoMED;
+  list<nameGIBItoMED> listGIBItoMED_mail;
+  list<nameGIBItoMED> listGIBItoMED_cham;
+  list<nameGIBItoMED> listGIBItoMED_comp;
 
   string *names=new string[ nbFields ];
   _med->getFieldNames( names );
@@ -3102,10 +3291,10 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
 
       // IMP 0020434: mapping GIBI names to MED names
       nameGIBItoMED aMEDName;
-      aMEDName.key_pile = 39;
-      aMEDName.key_id = nb_obj;
-      aMEDName.value = names[ iField ];
-      listGIBItoMED.push_back(aMEDName);
+      aMEDName.gibi_pile = 39; // PILE_FIELD
+      aMEDName.gibi_id = nb_obj;
+      aMEDName.med_name = names[ iField ];
+      listGIBItoMED_cham.push_back(aMEDName);
 
       nb_sub_list.push_back( nb_sub );
     }
@@ -3114,7 +3303,7 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
   // write mesh
 
   //try {
-  me->writeSupportsAndMesh(listGIBItoMED);
+  me->writeSupportsAndMesh(listGIBItoMED_mail);
 //   }
 //   catch (MEDEXCEPTION &ex)
 //   {
@@ -3139,7 +3328,7 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
     list<FIELD_*>::iterator itF = fields.begin();
     list<int>::iterator itNbSub = nb_sub_list.begin();
     int nb_sub = 0, cur_nb_sub = 0;
-    for ( ; itF != fields.end(); itF++ )
+    for ( iField = 0; itF != fields.end(); itF++, iField++ )
     {
       if ( cur_nb_sub == nb_sub && itNbSub != nb_sub_list.end() ) {
         // start the next field writting
@@ -3191,6 +3380,42 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
       FIELD_* f = *itF;
       int id1 = 1;
       int iComp, nbComp = f->getNumberOfComponents();
+
+      // IMP 0020434: mapping GIBI names to MED names
+      int compIndex = 1;
+      map<string, string> mapMedToGibi;
+      for (int ico = 0; ico < nbComp; ico++) {
+        string compMedName = f->getComponentName(ico + 1);
+        mapMedToGibi[compMedName] = compMedName;
+      }
+      map<string, string>::iterator namesIt = mapMedToGibi.begin();
+      for (; namesIt != mapMedToGibi.end(); namesIt++) {
+        string compMedName = (*namesIt).first;
+        compMedName = cleanName(compMedName);
+        string compGibiName = compMedName;
+        if (compGibiName.size() > 4) {
+          // use new name in form "CXXX", where "XXX" is a number
+          do {
+            char strCGN [32];
+            strCGN[0] = 'C';
+            int pos = 1;
+            if (compIndex < 100) strCGN[pos++] = '0';
+            if (compIndex < 10 ) strCGN[pos++] = '0';
+            sprintf(strCGN + pos, "%d", compIndex++);
+            compGibiName = strCGN;
+          } while (mapMedToGibi.count(compGibiName) > 0); // real component name could be CXXX
+
+          mapMedToGibi[compMedName] = compGibiName;
+        }
+
+        compMedName = names[iField] + "." + compMedName;
+        nameGIBItoMED aMEDName;
+        aMEDName.med_name = compMedName;
+        aMEDName.gibi_pile = 27; // PILE_STRINGS
+        aMEDName.gibi_name = compGibiName;
+        listGIBItoMED_comp.push_back(aMEDName);
+      } // IMP 0020434
+
       // loop on sub-components
       getSubMeshIdAndSize( f->getSupport(), subIdSizeList );
       for ( idsize = subIdSizeList.begin(); idsize != subIdSizeList.end(); idsize++ )
@@ -3203,9 +3428,10 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
         // component names
         gibi << left;
         for ( fcount.init(8), iComp = 0; iComp < nbComp; ++iComp, fcount++ ) {
-          string compName = f->getComponentName( iComp + 1 );
-          if ( compName.size() > 8 )
-            compName = compName.substr(0, 8);
+          string compMedName = cleanName(f->getComponentName(iComp + 1));
+          string compName = mapMedToGibi[compMedName];
+          //if ( compName.size() > 8 )
+          //  compName = compName.substr(0, 8);
           gibi << " "  << setw(8) << compName;
         }
         fcount.stop();
@@ -3235,7 +3461,7 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
   }
 
   // IMP 0020434: mapping GIBI names to MED names
-  me->writeMEDNames(listGIBItoMED);
+  me->writeMEDNames(listGIBItoMED_mail, listGIBItoMED_cham, listGIBItoMED_comp);
 
   me->writeLastRecord();
   delete [] names;
