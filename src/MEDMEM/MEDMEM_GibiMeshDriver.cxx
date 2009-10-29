@@ -841,8 +841,8 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
           // read tables "MED_MAIL", "MED_CHAM" and "MED_COMP", that keeps correspondence
           // between GIBI names (8 symbols) and MED names (possibly longer)
           getNextLine( ligne );
-          unsigned nb_table_vals = atoi( ligne );
-          if (nb_table_vals <= 0) {
+          int nb_table_vals = atoi( ligne );
+          if (nb_table_vals < 0) {
             INFOS_MED("Erreur de lecture dans enregistrement de pile " <<
                       PILE_TABLES << DUMP_LINE_NB );
             return false;
@@ -850,8 +850,8 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
 
           //int name_i_val_pile;
           int name_i_med_pile;
-          initIntReading(nb_table_vals * 4);
-          for (unsigned i = 0; i < nb_table_vals; i++)
+          initIntReading(nb_table_vals);
+          for (int i = 0; i < nb_table_vals/4; i++)
           {
             if (itable == table_med_mail_id ||
                 itable == table_med_cham_id ||
@@ -917,13 +917,17 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         }
         string aWholeString;
         string aCurrLine;
+        const int fixedLength = 71;
         while (aWholeString.length() < stringLen) {
           getNextLine( ligne );
-          aCurrLine = ligne;
-          // cut off leading white spaces
-          int firstChar = aCurrLine.find_first_not_of(" \t");
-          if (firstChar < aCurrLine.length()) {
-            aWholeString += aCurrLine.substr(firstChar);
+          int remainLen = stringLen - aWholeString.length();
+          if ( remainLen > fixedLength )
+          {
+            aWholeString += ligne + 1;
+          }
+          else
+          {
+            aWholeString += ligne + ( 72 - remainLen );
           }
         }
         int prevOffset = 0;
@@ -2045,8 +2049,13 @@ static string cleanName( const string& theName )
     */
     // cut off leading white spaces
     int firstChar = name.find_first_not_of(" \t");
-    if (firstChar < name.length()) {
+    if (firstChar < name.length())
+    {
       name = name.substr(firstChar);
+    }
+    else
+    {
+      name = ""; // only whitespaces there - remove them
     }
     // cut off trailing white spaces
     int lastChar = name.find_last_not_of(" \t");
@@ -2807,7 +2816,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeMEDNames (const list<nameGIBItoMED>& listGIBI
     // save to MED again -> this new MED file is not readable)
     set<string> medUniqueNames;
 
-    _gibi << setw(8) << nbNames_mail << endl; // Nb of pairs key-value
+    _gibi << setw(8) << nbNames_mail*4 << endl; // Nb of table values
 
     TFieldCounter fcount1 (_gibi, 10);
     _gibi << right;
@@ -2853,7 +2862,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeMEDNames (const list<nameGIBItoMED>& listGIBI
     // save to MED again -> this new MED file is not readable)
     set<string> medUniqueNames;
 
-    _gibi << setw(8) << nbNames_cham << endl; // Nb of pairs key-value
+    _gibi << setw(8) << nbNames_cham*4 << endl; // Nb of table values
 
     TFieldCounter fcount1 (_gibi, 10);
     _gibi << right;
@@ -2897,7 +2906,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeMEDNames (const list<nameGIBItoMED>& listGIBI
   if (nbNames_comp) {
     // for components, both key and value (long and short name) is in the STRING PILE
 
-    _gibi << setw(8) << nbNames_comp << endl; // Nb of pairs key-value
+    _gibi << setw(8) << nbNames_comp*4 << endl; // Nb of table values
 
     TFieldCounter fcount1 (_gibi, 10);
     _gibi << right;
@@ -3386,12 +3395,12 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
       map<string, string> mapMedToGibi;
       for (int ico = 0; ico < nbComp; ico++) {
         string compMedName = f->getComponentName(ico + 1);
+        compMedName = cleanName(compMedName);
         mapMedToGibi[compMedName] = compMedName;
       }
       map<string, string>::iterator namesIt = mapMedToGibi.begin();
       for (; namesIt != mapMedToGibi.end(); namesIt++) {
         string compMedName = (*namesIt).first;
-        compMedName = cleanName(compMedName);
         string compGibiName = compMedName;
         if (compGibiName.size() > 4) {
           // use new name in form "CXXX", where "XXX" is a number
