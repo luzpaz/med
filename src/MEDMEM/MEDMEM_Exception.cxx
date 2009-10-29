@@ -44,13 +44,13 @@ extern "C"
 char* duplicate( const char *const str ) ;
 char* duplicate( const char *const str )
 {
-	ASSERT_MED(str!=NULL) ;
-	const size_t length = strlen( str ) ;
-	ASSERT_MED(length>0) ;
-	char *new_str = new char[ 1+length ] ;
-	ASSERT_MED(new_str) ;
-	strcpy( new_str , str ) ;
-	return new_str ;
+        ASSERT_MED(str!=NULL) ;
+        const size_t length = strlen( str ) ;
+        ASSERT_MED(length>0) ;
+        char *new_str = new char[ 1+length ] ;
+        ASSERT_MED(new_str) ;
+        strcpy( new_str , str ) ;
+        return new_str ;
 }
 
 /*!
@@ -87,7 +87,7 @@ char *makeText( const char *text, const char *fileName, const unsigned int lineN
 
       ASSERT_MED(lineNumber>=1) ;
       const size_t l3 = 1+int(log10(float(lineNumber))) ;
-	
+        
       const size_t l4 =  l0+l1+l2+l3+10+1 ;
       newText = new char [ l4 ] ;
       sprintf( newText , "%s in %s [%u] : %s" , prefix, fileName, lineNumber, text ) ;
@@ -111,7 +111,7 @@ char *makeText( const char *text, const char *fileName, const unsigned int lineN
 */
 // ------------------------------------------------------------------------------------------------ //
 MEDEXCEPTION::MEDEXCEPTION( const char *text, const char *fileName, const unsigned int lineNumber ) : 
-	      exception(), _text( makeText( text , fileName , lineNumber ) )
+              exception(), _text( makeText( text , fileName , lineNumber ) )
 // ------------------------------------------------------------------------------------------------ //
 {
   MESSAGE_MED(_text);
