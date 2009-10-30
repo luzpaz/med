@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_Family.hxx"
 #include "MEDMEM_Group.hxx"
@@ -723,22 +723,22 @@ int CONNECTIVITY::getConnectivityLength(medConnectivity ConnectivityType, medEnt
   BEGIN_OF_MED(LOC);
 
   MEDSKYLINEARRAY * Connectivity;
-  if (Entity==_entity) {
-
-    if (ConnectivityType==MED_NODAL)
+  if (Entity == _entity) {
+    if (ConnectivityType == MED_NODAL)
     {
       calculateNodalConnectivity();
-      Connectivity=_nodal;
+      Connectivity = _nodal;
     }
     else
     {
       calculateDescendingConnectivity();
-      Connectivity=_descending;
+      Connectivity = _descending;
     }
 
-    if (Connectivity!=NULL)
-      if (Type==MED_ALL_ELEMENTS)
+    if (Connectivity != NULL) {
+      if (Type == MED_ALL_ELEMENTS) {
         return Connectivity->getLength();
+      }
       else {
         for (int i=0; i<_numberOfTypes; i++)
           if (_geometricTypes[i]==Type)
@@ -750,6 +750,7 @@ int CONNECTIVITY::getConnectivityLength(medConnectivity ConnectivityType, medEnt
           }
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Type not found !"));
       }
+    }
     else
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" : Connectivity not defined !"));
   }
@@ -1453,7 +1454,7 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
       ConstituentNodalConnectivityIndex[0]=1;
 
       _constituent->_entityDimension = _entityDimension-1;
-      // Roll back modif made in BR_renumbering branch because of regression: 
+      // Roll back modif made in BR_renumbering branch because of regression:
       // 0020478: [CEA] Groups in a mesh obj not written in MED file when mesh contains only polyg/polyh elts
       //if(ConstituentsTypes[0]==MED_NONE && ConstituentsTypes[1]==MED_NONE && getNumberOfTypesWithPoly(_entity)==0)
       if(ConstituentsTypes[0]==MED_NONE && ConstituentsTypes[1]==MED_NONE && _numberOfTypes==0)
@@ -1676,7 +1677,7 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
           if (abs(descend_connectivity[j])>tmp_NumberOfConstituentsForeachType[0]) {
             if ( descend_connectivity[j] > 0 )
               descend_connectivity[j]-=offset;
-            else 
+            else
               descend_connectivity[j]+=offset;
           }
       }
@@ -1859,7 +1860,7 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
               ret_compare=0;//here normally tabRes[0]==offsetCell+i+1
             else //> 2 should never happend : A face is shared by more than 2 polyhedrons...
             {
-              if (tabRes[0] == offsetCell+i+1) //as tabRes is ordered by construction tabRes[1] > tabRes[0] so the current 
+              if (tabRes[0] == offsetCell+i+1) //as tabRes is ordered by construction tabRes[1] > tabRes[0] so the current
                 // face is shared with an another cell whose id > current id. So let's create
                 ret_compare=0;
               else
@@ -1964,10 +1965,9 @@ void CONNECTIVITY::addToDescendingConnectivity(const set<int>& nodes,
 
   if (itermap!=iterend)
     descending.insert(make_pair(iglobal_cell,itermap->second));
-
 }
 
-/*! This method calculates the descending connectivity without creating missing elements. It only maps the constituent elements that are described in the nodal representation. 
+/*! This method calculates the descending connectivity without creating missing elements. It only maps the constituent elements that are described in the nodal representation.
   For instance, let us consider the following mesh with no MED_EDGE elements on the inner edges.
 
   +----1----+----2----+
@@ -2041,7 +2041,7 @@ void CONNECTIVITY::calculatePartialDescendingConnectivity()
       }
       face_map.insert(make_pair(signature,iglobal_face));
       iglobal_face++;
-    }       
+    }
   }
 
   //polygons
@@ -2065,7 +2065,7 @@ void CONNECTIVITY::calculatePartialDescendingConnectivity()
       }
       face_map.insert(make_pair(signature,iglobal_face));
       iglobal_face++;
-    } 
+    }
   }
 
   ////////////////////////////////////////////////////////////////////////////
@@ -2075,16 +2075,16 @@ void CONNECTIVITY::calculatePartialDescendingConnectivity()
   multimap<int,int> descending; //map storing the descending connectivity
 
   //classical types
-  int nbcell_types=getNumberOfTypes(_entity);
-  const medGeometryElement* cell_types=getGeometricTypes(_entity);
-  int iglobal_cell=1;
+  int nbcell_types = getNumberOfTypes(_entity);
+  const medGeometryElement* cell_types = getGeometricTypes(_entity);
+  int iglobal_cell = 1;
   for (int itype=0; itype<nbcell_types; itype++)
   {
-    medGeometryElement cell_type=cell_types[itype];
-    int nbcells=getNumberOf(_entity,cell_type);
+    medGeometryElement cell_type = cell_types[itype];
+    int nbcells = getNumberOf(_entity,cell_type);
 
     CELLMODEL cellmodel=CELLMODEL_Map::retrieveCellModel(cell_type);
-    for (int icell=0;icell<nbcells;icell++)
+    for (int icell = 0; icell < nbcells; icell++, iglobal_cell++)
     {
       int nbfaces=cellmodel.getNumberOfConstituents(1);
       for (int iface=0; iface<nbfaces;iface++)
@@ -2099,7 +2099,6 @@ void CONNECTIVITY::calculatePartialDescendingConnectivity()
           nodes.insert(conn[index[iglobal_cell-1]-1+local_index[inode]-1]);
         addToDescendingConnectivity(nodes,descending,iglobal_cell,face_map);
       }
-      iglobal_cell++;
     }
   }
 
@@ -2166,19 +2165,21 @@ void CONNECTIVITY::calculatePartialDescendingConnectivity()
   //obtained by browsing all the cell types
   int nb_cells = iglobal_cell-1;
 
-  for (int icell=0; icell< nb_cells;icell++)
+  //for (int icell = 0; icell < nb_cells; icell++)
+  for (int icell = 1; icell <= nb_cells; icell++)
   {
     multimap<int,int>::iterator beginning_of_range = descending.lower_bound(icell);
     multimap<int,int>::iterator end_of_range = descending.upper_bound(icell);
     int nb=0;
-    for (multimap<int,int>::iterator iter2 = beginning_of_range; iter2!=end_of_range;iter2++)
+    for (multimap<int,int>::iterator iter2 = beginning_of_range; iter2 != end_of_range; iter2++)
     {
       value.push_back(iter2->second);
       nb++;
     }
     index.push_back(index[index.size()-1]+nb);
   }
-  _descending=new MEDSKYLINEARRAY(index.size()-1,value.size(),&index[0],&value[0]);
+
+  _descending = new MEDSKYLINEARRAY(index.size()-1, value.size(), &index[0], &value[0]);
   _isDescendingConnectivityPartial = true;
 }
 
@@ -2567,7 +2568,7 @@ MED_EN::medGeometryElement * CONNECTIVITY::getGeometricTypesWithPoly(MED_EN::med
   {
     if(_constituent)
       return _constituent->getGeometricTypesWithPoly(Entity);
-    else 
+    else
       return 0;
   }
 }
@@ -2633,7 +2634,8 @@ void CONNECTIVITY::invertConnectivityForAFace(int faceId, const int *nodalConnFo
 }
 
 /*
-  Method with 2 output : the connectivity required and its length 'lgth'. This method gives the connectivity independently it is a polygons/polyhedrons or normal element. 
+  Method with 2 output : the connectivity required and its length 'lgth'.
+  This method gives the connectivity independently it is a polygons/polyhedrons or normal element.
 */
 const int * CONNECTIVITY::getConnectivityOfAnElementWithPoly(MED_EN::medConnectivity ConnectivityType, MED_EN::medEntityMesh Entity, int Number, int &lgth)
 {
