@@ -150,7 +150,7 @@ MEDMEM_Remapper.cxx
 
 #libmedmem_la_LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 # libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@
-libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) \
+libmedmem_la_CPPFLAGS= ${KERNEL_CXXFLAGS} $(MED2_INCLUDES) $(HDF5_INCLUDES) \
 	-I$(srcdir)/../MEDWrapper/Base \
 	-I$(srcdir)/../INTERP_KERNEL \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \
@@ -159,7 +159,7 @@ libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) \
 libmedmem_la_CXXFLAGS= @CXXTMPDPTHFLAGS@
 
 # change motivated by the bug KERNEL4778.
-libmedmem_la_LDFLAGS=$(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
+libmedmem_la_LDFLAGS=${KERNEL_LDFLAGS} $(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
 	../MEDWrapper/Base/libMEDWrapperBase.la $(STDLIB) ../INTERP_KERNEL/libinterpkernel.la
 
 
