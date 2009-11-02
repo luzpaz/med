@@ -41,10 +41,10 @@ MEDMEM_REMAPPER::MEDMEM_REMAPPER():_matrix(0),_sourceMesh(0), _targetMesh(0), _s
 MEDMEM_REMAPPER::~MEDMEM_REMAPPER()
 {
   delete _matrix;
-        delete _sourceMesh;
-        delete _targetMesh;
-        delete _sourceSupport;
-        delete _targetSupport;
+  delete _sourceMesh;
+  delete _targetMesh;
+  delete _sourceSupport;
+  delete _targetSupport;
 }
 /*! This method computes the intersection matrix between 
  * source \a mesh_source and \a mesh_target. It is a preliminary step 
@@ -62,12 +62,12 @@ int MEDMEM_REMAPPER::prepare(const MEDMEM::MESH& mesh_source, const MEDMEM::MESH
   delete _matrix;
   _matrix= new INTERP_KERNEL::Matrix<double,INTERP_KERNEL::ALL_FORTRAN_MODE>;
 
-        delete _sourceMesh;
-        _sourceMesh= new MEDMEM::MESH((MEDMEM::MESH&)mesh_source);
-        delete _targetMesh;
-        _targetMesh= new MEDMEM::MESH((MEDMEM::MESH&)mesh_target);
+  delete _sourceMesh;
+  _sourceMesh= new MEDMEM::MESH((MEDMEM::MESH&)mesh_source);
+  delete _targetMesh;
+  _targetMesh= new MEDMEM::MESH((MEDMEM::MESH&)mesh_target);
 
-        std::string methodC=method;
+  std::string methodC=method;
   if(methodC == "P0P0"){
     _sourceFieldType = "P0";
     _targetFieldType = "P0";
@@ -88,9 +88,9 @@ int MEDMEM_REMAPPER::prepare(const MEDMEM::MESH& mesh_source, const MEDMEM::MESH
     throw INTERP_KERNEL::Exception("MEDMEM_REMAPPER::prepare: Invalid method specified ! Must be in : \"P0P0\" \"P0P1\" \"P1P0\" or \"P1P1\"");
                 
 
-        delete _sourceSupport;
-        delete _targetSupport;
-        if(     _sourceFieldType == "P0")
+  delete _sourceSupport;
+  delete _targetSupport;
+  if(     _sourceFieldType == "P0")
     _sourceSupport = new MEDMEM::SUPPORT((MEDMEM::MESH *)_sourceMesh,"on All support",MED_EN::MED_CELL);
   else
     _sourceSupport = new MEDMEM::SUPPORT((MEDMEM::MESH *)_sourceMesh,"on All support",MED_EN::MED_NODE);
@@ -150,6 +150,8 @@ void MEDMEM_REMAPPER::transfer(const MEDMEM::FIELD<double>& field_source, MEDMEM
   int target_nbcomp=field_target.getNumberOfComponents();
   double* value_target = const_cast<double*> (field_target.getValue());
 
+  double precision = getPrecision();
+
   if (source_nbcomp != target_nbcomp)
     throw MEDMEM::MEDEXCEPTION("MEDMEM_REMAPPER::transfer: incoherent number of components for source and target fields");
   if (_nb_cols != nb_source_values)
@@ -158,8 +160,12 @@ void MEDMEM_REMAPPER::transfer(const MEDMEM::FIELD<double>& field_source, MEDMEM
   _matrix->multiply(value_source, value_target,source_nbcomp);
 
   for (int i=0; i< _nb_rows; i++)
-    for(int comp = 0; comp < source_nbcomp; comp++)
-      value_target[i*source_nbcomp+comp]/=_deno_multiply[i];            
+    if(fabs(_deno_multiply[i]) > precision)
+      for(int comp = 0; comp < source_nbcomp; comp++)
+        value_target[i*source_nbcomp+comp]/=_deno_multiply[i];
+    else
+      for(int comp = 0; comp < source_nbcomp; comp++)
+        value_target[i*source_nbcomp+comp]=0.;            
 }
 
 /*
@@ -177,6 +183,8 @@ void MEDMEM_REMAPPER::reverseTransfer( MEDMEM::FIELD<double>& field_source, cons
   int nb_target_values= field_target.getNumberOfValues();
   const double* value_target = field_target.getValue();
 
+  double precision = getPrecision();
+
   if (source_nbcomp != target_nbcomp)
     throw MEDMEM::MEDEXCEPTION(" MEDMEM_REMAPPER::reverseTransfer: incoherent number of components for source and target fields");
   if (_nb_rows != nb_target_values)
@@ -185,8 +193,12 @@ void MEDMEM_REMAPPER::reverseTransfer( MEDMEM::FIELD<double>& field_source, cons
   _matrix->transposeMultiply(value_target, value_source, _nb_cols,target_nbcomp);//transposeMultiply(input,output, nbcols,nbcomp)
 
   for (int i=0; i< _nb_cols; i++)
-    for(int comp = 0; comp < source_nbcomp; comp++)
-      value_source[i*target_nbcomp+comp]/=_deno_reverse_multiply[i];
+    if(fabs(_deno_reverse_multiply[i]) > precision)
+      for(int comp = 0; comp < target_nbcomp; comp++)
+        value_source[i*target_nbcomp+comp]/=_deno_reverse_multiply[i];
+    else
+      for(int comp = 0; comp < target_nbcomp; comp++)
+        value_source[i*target_nbcomp+comp]=0.;
 }
 
 /*
@@ -200,6 +212,8 @@ MEDMEM::FIELD<double> *  MEDMEM_REMAPPER::transferField(const MEDMEM::FIELD<doub
   const double* value_source = field_source.getValue();
   int nb_source_values= field_source.getNumberOfValues();
 
+  double precision = getPrecision();
+
   if (_nb_cols != nb_source_values)
     throw MEDMEM::MEDEXCEPTION("MEDMEM_REMAPPER::transfer: incoherent number of field values, cannot cannot multiply by interpolation matrix");
         
@@ -209,9 +223,13 @@ MEDMEM::FIELD<double> *  MEDMEM_REMAPPER::transferField(const MEDMEM::FIELD<doub
   _matrix->multiply(value_source, value_target,source_nbcomp);
                 
   for (int i=0; i< _nb_rows; i++)
-    for(int comp = 0; comp < source_nbcomp; comp++)
-      value_target[i*source_nbcomp+comp]/=_deno_multiply[i];    
-                
+    if(fabs(_deno_multiply[i]) > precision)
+      for(int comp = 0; comp < source_nbcomp; comp++)
+        value_target[i*source_nbcomp+comp]/=_deno_multiply[i];    
+    else
+      for(int comp = 0; comp < source_nbcomp; comp++)
+        value_target[i*source_nbcomp+comp]=0.;
+	
   return target_field;
 }
 
@@ -226,7 +244,9 @@ MEDMEM::FIELD<double> *  MEDMEM_REMAPPER::reverseTransferField(const MEDMEM::FIE
   int target_nbcomp=field_target.getNumberOfComponents();
   const double* value_target = field_target.getValue();
   int nb_target_values= field_target.getNumberOfValues();
-        
+
+  double precision = getPrecision();
+
   if (_nb_rows != nb_target_values)
     throw MEDMEM::MEDEXCEPTION(" MEDMEM_REMAPPER::reverseTransfer: incoherent number of field values, cannot cannot transpose-multiply by interpolation matrix");
         
@@ -236,9 +256,13 @@ MEDMEM::FIELD<double> *  MEDMEM_REMAPPER::reverseTransferField(const MEDMEM::FIE
   _matrix->transposeMultiply(value_target, value_source, _nb_cols,target_nbcomp);//transposeMultiply(input,output, nbcols,nbcomp)
         
   for (int i=0; i< _nb_cols; i++)
-    for(int comp = 0; comp < target_nbcomp; comp++)
-      value_source[i*target_nbcomp+comp]/=_deno_reverse_multiply[i];
-        
+    if(fabs(_deno_reverse_multiply[i]) > precision)
+      for(int comp = 0; comp < target_nbcomp; comp++)
+        value_source[i*target_nbcomp+comp]/=_deno_reverse_multiply[i];
+    else
+      for(int comp = 0; comp < target_nbcomp; comp++)
+        value_source[i*target_nbcomp+comp]=0.;
+	
   return source_field;
 }
 
