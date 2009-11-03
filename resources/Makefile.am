@@ -57,8 +57,6 @@ dist_salomeres_DATA=\
     Darcy3_3D_H_10x10x10_2.med \
     Darcy3_3D_H_10x10x10.sauve \
     Data.png \
-    Deff_fdt_5.8_castem_efmh_diff_conc_dom.med \
-    Deff_fdt_5.8_castem_vf_diff_conc_dom.med \
     dx200_dy1_avec_2couches.sauve \
     elle_2D_QT_10x10.sauve \
     elle_2D_QT_2x2.sauve \
@@ -127,8 +125,6 @@ dist_salomeres_DATA=\
     Old_darcy2_Castem_EFMH.med \
     Old_darcy2_Castem_qua_EFMH.med \
     Old_darcy2_Castem_qua_VF.med \
-    Old_Deff_fdt_5.8_castem_efmh_diff_conc_dom.med \
-    Old_Deff_fdt_5.8_castem_vf_diff_conc_dom.med \
     Old_H_CastCast_EFMH_I129_COUPLEX1.med \
     Old_H_CastCast_VF_I129_COUPLEX1.med \
     Old_H_CastCast_VF_Se79_COUPLEX1.med \
