@@ -40,8 +40,6 @@
 
 class MEDMEM::FIELD_;
 
-#include <Basics_Utils.hxx>
-
 #include <stdio.h>
 #include <fcntl.h>
 #ifdef WNT
@@ -1298,8 +1296,12 @@ double GIBI_MESH_RDONLY_DRIVER::getDouble() const
 
   // Correction 2: set "C" numeric locale to read numbers
   // with dot decimal point separator, as it is in SAUVE files
-  Kernel_Utils::Localizer loc;
+  //char* aCurLocale = setlocale(LC_NUMERIC, 0);
+  std::string aCurLocale = setlocale(LC_NUMERIC, 0);
+  setlocale(LC_NUMERIC, "C");
   double ret = atof(aStr.data());
+  //setlocale(LC_NUMERIC, aCurLocale);
+  setlocale(LC_NUMERIC, aCurLocale.data());
 
   return ret;
 }
