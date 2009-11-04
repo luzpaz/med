@@ -2809,6 +2809,8 @@ void MESH::convertToPoly()
                                                     newconnindex,
                                                     nbnodes,
                                                     oldnbtotalface);
+    delete [] newconn;
+    delete [] newconnindex;
     //    _connectivity->setConstituent(newconnectivity);
   }
   ///////////////////////////////////////////
