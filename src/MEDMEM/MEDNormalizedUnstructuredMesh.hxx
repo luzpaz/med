@@ -37,6 +37,7 @@ public:
   static const INTERP_KERNEL::NumberingPolicy My_numPol=INTERP_KERNEL::ALL_FORTRAN_MODE;
 public:
   MEDNormalizedUnstructuredMesh(const MEDMEM::MESH *mesh);
+  ~MEDNormalizedUnstructuredMesh();
   void getBoundingBox(double *boundingBox) const;
   INTERP_KERNEL::NormalizedCellType getTypeOfElement(int eltId) const;
   unsigned char getNumberOfNodesOfElement(int eltId) const;
@@ -45,9 +46,15 @@ public:
   const int *getConnectivityPtr() const;
   const double *getCoordinatesPtr() const;
   const int *getConnectivityIndexPtr() const;
-  void ReleaseTempArrays();
+  void releaseTempArrays();
+protected:
+  void prepare();
 protected:
   const MEDMEM::MESH *_meshInMedMode;
+  int *_conn_for_interp;
+  bool _own_conn_for_interp;
+  int *_conn_index_for_interp;
+  bool _own_conn_index_for_interp;
 };
 
 #endif
