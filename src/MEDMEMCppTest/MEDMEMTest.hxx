@@ -111,6 +111,7 @@ class MEDMEMCPPTEST_EXPORT MEDMEMTest : public CppUnit::TestFixture
   CPPUNIT_TEST( test_remapper5 );
   CPPUNIT_TEST( test_remapper6 );
   CPPUNIT_TEST( test_remapper7 );
+  CPPUNIT_TEST( test_remapper3DTo1D );
   CPPUNIT_TEST( test_RemapperP0P0 );
   CPPUNIT_TEST( test_RemapperP1P1 );
   CPPUNIT_TEST( test_RemapperP1P0 );
@@ -195,6 +196,7 @@ public:
   void test_remapper5();
   void test_remapper6();
   void test_remapper7();
+  void test_remapper3DTo1D();
 
   //private:
   void absField(MEDMEM::FIELD<double>&);

@@ -364,6 +364,34 @@ namespace {
     return meshing;
   }
 
+  MESH * build1DTargetMesh1()
+  {
+    double coords[36]={ 25.,25.,0., 25.,25.,50., 25.,25.,200., 75.,25.,0., 75.,25.,50., 75.,25.,200.,
+                        25.,125.,0., 25.,125.,50., 25.,125.,200., 125.,125.,0., 125.,125.,50., 125.,125.,200.};
+    const int conn[16]={1, 2, 2, 3, 4, 5, 5, 6, 7, 8, 8, 9, 10, 11, 11, 12};
+    MESHING* meshing = new MESHING;
+    meshing->setName( "TESTMESH" );
+    meshing->setSpaceDimension(3);
+    const int nNodes=12;
+    meshing->setNumberOfNodes(nNodes);
+    meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
+                            MED_EN::MED_FULL_INTERLACE);
+    string coordname[3] = { "x", "y", "z" };
+    meshing->setCoordinatesNames(coordname);
+    string coordunit[3] = { "m", "m", "m" };
+    meshing->setCoordinatesUnits(coordunit);
+    //Cell connectivity info for classical elts
+    const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MED_SEG2};
+    const int nbOfCellElts[1]={8};
+    meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
+    meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
+    meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
+    meshing->setMeshDimension(1);
+    //All cell conn
+    meshing->setConnectivity(conn,MED_EN::MED_CELL,MED_EN::MED_SEG2);
+    return meshing;
+  }
+
   MESH * build3DSourceMesh2()
   {
     double coords[27]={ 0.0, 0.0, 200.0, 0.0, 0.0, 0.0, 0.0, 200.0, 200.0, 0.0, 200.0, 0.0, 200.0, 0.0, 200.0,
@@ -692,6 +720,31 @@ void MEDMEMTest::test_remapper7()
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.,res[7][6],1e-12);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.,res[7][12],1e-12);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(21.,sumAll(res),1e-12);
+  delete targetMesh;
+  delete sourceMesh;
+}
+
+void MEDMEMTest::test_remapper3DTo1D()
+{
+  MESH *sourceMesh=build3DTargetMesh2();
+  MESH *targetMesh=build1DTargetMesh1();
+  MEDNormalizedUnstructuredMesh<3,3> sourceWrapper(sourceMesh);
+  MEDNormalizedUnstructuredMesh<3,3> targetWrapper(targetMesh);
+  INTERP_KERNEL::Interpolation3D myInterpolator;
+  vector<map<int,double> > res;
+  myInterpolator.setPrecision(1e-12);
+  myInterpolator.setIntersectionType(INTERP_KERNEL::PointLocator);
+  myInterpolator.interpolateMeshes(sourceWrapper,targetWrapper,res,"P0P0");
+  CPPUNIT_ASSERT_EQUAL(8,(int)res.size());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(1.,res[0][1],1e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(1.,res[1][5],1e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(1.,res[2][2],1e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(1.,res[3][6],1e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(1.,res[4][3],1e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(1.,res[5][7],1e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(1.,res[6][4],1e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(1.,res[7][8],1e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(8.,sumAll(res),1e-12);
   delete targetMesh;
   delete sourceMesh;
 }
