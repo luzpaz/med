@@ -498,10 +498,9 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_3::med_idt        id,
       {
         //if (entity != (*currentEntity).first )  (NB)
         if ( medmem_entity != entity )
-          continue;
-//           throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Field |"  << fieldName
-//                                        << "| with (ndt,or) = (" << ndt << ","
-//                                        << od << ") must not be defined on different entity types" ));
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Field |"  << fieldName
+                                       << "| with (ndt,or) = (" << ndt << ","
+                                       << od << ") must not be defined on different entity types" ));
 
       }
       else
