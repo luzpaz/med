@@ -115,7 +115,7 @@ void MESHCollectionMedXMLDriver::_writeFields(vector<MEDMEM::FIELD<T>* >& fields
  	//Clean up
 	xmlXPathFreeContext(xpathCtx); 
   xmlFreeDoc(master_doc);
-  xmlCleanupParser();
+//  xmlCleanupParser();
 
 }
 

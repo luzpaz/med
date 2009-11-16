@@ -358,7 +358,7 @@ void MESHCollectionMedXMLDriver::write(char* filename)
 	m_master_filename=filename;
 	xmlSaveFormatFileEnc(filename, master_doc, "UTF-8", 1);
  	xmlFreeDoc(master_doc);
-	xmlCleanupParser();
+//	xmlCleanupParser();
 
   END_OF_MED(LOC);
 

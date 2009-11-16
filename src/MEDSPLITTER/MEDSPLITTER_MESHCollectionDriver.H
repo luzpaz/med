@@ -84,7 +84,7 @@ void MESHCollectionDriver::writeFields(vector<MEDMEM::FIELD<T>* >& fields,char* 
 		}
 	xmlSaveFormatFileEnc(m_master_filename.c_str(), master_doc, "UTF-8", 1);
  	xmlFreeDoc(master_doc);
-	xmlCleanupParser();
+//	xmlCleanupParser();
 
 }
 
