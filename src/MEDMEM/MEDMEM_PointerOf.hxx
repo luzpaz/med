@@ -28,44 +28,44 @@
 #include "MEDMEM_Exception.hxx"
 
 /*!
-	The template class PointerOf embedding a standard pointer (_pointer) is in charge of
-	managing the pointed memory.\n
-	
+        The template class PointerOf embedding a standard pointer (_pointer) is in charge of
+        managing the pointed memory.\n
+        
         the object PointerOf is the memory owner if a size is given at object construction.
         In these cases, memory will be desallocated at object destruction. In all other cases,
-	the desallocator will only nullify pointers.
+        the desallocator will only nullify pointers.
 */
 namespace MEDMEM {
 
 template <typename T> class PointerOf
 {
 protected :
-			/*! pointer to the pointed memory */
-	T* _pointer ;
-			/*! boolean setted to true if memory has to be desallocated */
-	bool _done ;
+                        /*! pointer to the pointed memory */
+        T* _pointer ;
+                        /*! boolean setted to true if memory has to be desallocated */
+        bool _done ;
 
 public :
-	PointerOf() ;
-	~PointerOf() ;
-	PointerOf( const int &size ) ;
-	PointerOf( const T *pointer ) ;
-	PointerOf( const int &size, const T *pointer ) ;
-	PointerOf( const PointerOf<T> & pointerOf ) ;
+        PointerOf() ;
+        ~PointerOf() ;
+        PointerOf( const int &size ) ;
+        PointerOf( const T *pointer ) ;
+        PointerOf( const int &size, const T *pointer ) ;
+        PointerOf( const PointerOf<T> & pointerOf ) ;
   ///PointerOf( const int &size, const PointerOf<T> & pointerOf ) ;
-	operator T*() ;
-	operator const T*() const ;
-	void set( const int &size ) ;
-	void set( const T *pointer ) ;
-	void set( const int &size, const T *pointer ) ;
+        operator T*() ;
+        operator const T*() const ;
+        void set( const int &size ) ;
+        void set( const T *pointer ) ;
+        void set( const int &size, const T *pointer ) ;
         void setShallowAndOwnership( const T *pointer );
-	PointerOf<T>& operator=( const PointerOf<T> &pointer ) ;
+        PointerOf<T>& operator=( const PointerOf<T> &pointer ) ;
 } ;
 
 // ------------------------------------------------------------ //
-//			         				//
-//			Implementation				//
-//			         				//
+//                                                              //
+//                      Implementation                          //
+//                                                              //
 // ------------------------------------------------------------ //
 
 /*! Creates a null T* pointer and sets the boolean (for desallocation) to false. */
@@ -84,7 +84,7 @@ template <typename T> PointerOf<T>::PointerOf(const PointerOf<T> & pointerOf) :
 {
   const char* LOC = "PointerOf<T>::PointerOf(const PointerOf<T> & pointerOf)";
   BEGIN_OF_MED(LOC);
-	MESSAGE_MED("Warning ! No Propriety Transfer");
+        MESSAGE_MED("Warning ! No Propriety Transfer");
   END_OF_MED(LOC);
 }
 
@@ -104,12 +104,12 @@ template <typename T> PointerOf<T>::PointerOf( const int &size )
         if (size < 0)
         {
                 _pointer=(T*)NULL;
-		_done=false;
+                _done=false;
         }
         else
         {
                 _pointer = new T[ size ] ;
-		_done=true;
+                _done=true;
         }
 }
 
@@ -137,20 +137,20 @@ template <typename T> PointerOf<T>::PointerOf( const int &size, const T* pointer
     The attribute _pointer is nullified */
 template <typename T> PointerOf<T>::~PointerOf()
 {
-	if ( _pointer )
-	{
-		if( _done )
-		{
-			MESSAGE_MED("PointerOf<T>::~PointerOf() --> deleting _pointer") ;
-			delete [] _pointer ;
-			_done = false ;
-		}
-		else
-		{
-			MESSAGE_MED("_pointer is only nullified") ;
-		}
-		_pointer = 0 ;
-	}
+        if ( _pointer )
+        {
+                if( _done )
+                {
+                        MESSAGE_MED("PointerOf<T>::~PointerOf() --> deleting _pointer") ;
+                        delete [] _pointer ;
+                        _done = false ;
+                }
+                else
+                {
+                        MESSAGE_MED("_pointer is only nullified") ;
+                }
+                _pointer = 0 ;
+        }
 }
 
 /*! Creates a standard pointer (T*) to the pointed memory. \n
@@ -164,25 +164,25 @@ template <typename T> PointerOf<T>& PointerOf<T>::operator=( const PointerOf<T> 
 {
   const char* LOC = "PointerOf<T>::operator=( const PointerOf<T> &pointer )";
   BEGIN_OF_MED(LOC);
-	if ( &pointer != this )
-	{
-		this->set( pointer._pointer ) ;
-	}
+        if ( &pointer != this )
+        {
+                this->set( pointer._pointer ) ;
+        }
   END_OF_MED(LOC);
-	return *this ;
+        return *this ;
 }
 
 /*! Returns _pointer.*/
 template <typename T> PointerOf<T>::operator T*()
 {
-	return _pointer ;
+        return _pointer ;
 }
 
 
 /*! Returns _pointer.*/
 template <typename T> PointerOf<T>::operator const T*() const
 {
-	return _pointer ;
+        return _pointer ;
 }
 
 /*! If necessary, released memory holded by PointerOf\n.
@@ -191,22 +191,22 @@ template <typename T> PointerOf<T>::operator const T*() const
     Memory will be desallocated  when erasing this PointerOf*/
 template <typename T> void PointerOf<T>::set( const int &size )
 {
-	if ( _pointer && _done )
-	{
-		delete [] _pointer ;
-		_pointer=0 ;
-	}
-	// if (size < 0) TODO: analyse why it does not work
-	if (size <= 0)
-	{
-		_pointer=(T*)NULL;
-	}
-	else
-	{
-		_pointer = new T[ size ] ;
-	}
-	_done = true ;
-	return ;
+        if ( _pointer && _done )
+        {
+                delete [] _pointer ;
+                _pointer=0 ;
+        }
+        // if (size < 0) TODO: analyse why it does not work
+        if (size <= 0)
+        {
+                _pointer=(T*)NULL;
+        }
+        else
+        {
+                _pointer = new T[ size ] ;
+        }
+        _done = true ;
+        return ;
 }
 
 /*! If necessary, released memory holded by PointerOf\n.
@@ -215,20 +215,20 @@ template <typename T> void PointerOf<T>::set( const int &size )
     memory will not be released when erasing this PointerOf*/
 template <typename T> void PointerOf<T>::set( const T *pointer )
 {
-	MESSAGE_MED( "BEGIN PointerOf<T>::set( const T *pointer )" ) ;
-	SCRUTE_MED(pointer) ;
-	SCRUTE_MED(_done) ;
-	if ( _pointer && _done )
-	{
-		MESSAGE_MED("PointerOf<T>::set --> deleting _pointer") ;
-		delete [] _pointer ;
-		_pointer=0 ;
-		_done=false ;
-	}
-	_pointer=(T*)pointer ;
-	_done=false ;
-	MESSAGE_MED( "END PointerOf<T>::set( const T *pointer )" ) ;
-	return ;
+        MESSAGE_MED( "BEGIN PointerOf<T>::set( const T *pointer )" ) ;
+        SCRUTE_MED(pointer) ;
+        SCRUTE_MED(_done) ;
+        if ( _pointer && _done )
+        {
+                MESSAGE_MED("PointerOf<T>::set --> deleting _pointer") ;
+                delete [] _pointer ;
+                _pointer=0 ;
+                _done=false ;
+        }
+        _pointer=(T*)pointer ;
+        _done=false ;
+        MESSAGE_MED( "END PointerOf<T>::set( const T *pointer )" ) ;
+        return ;
 }
 
 /*! If necessary, released memory holded by PointerOf\n.
@@ -263,4 +263,4 @@ template <typename T> void PointerOf<T>::setShallowAndOwnership( const T *pointe
 
 }//End namespace MEDMEM
 
-# endif		/* # if ! defined( __PointerOf_HXX__ ) */
+# endif         /* # if ! defined( __PointerOf_HXX__ ) */
