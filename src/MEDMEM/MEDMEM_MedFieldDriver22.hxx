@@ -67,7 +67,8 @@ protected:
                                vector<int> &    numberOfElementsOfTypeC,
                                vector<int> &    numberOfGaussPoint,
                                int &            totalNumberOfElWg,
-                               MED_EN::medEntityMesh & fieldMedFileEntity
+                               MED_EN::medEntityMesh & fieldMedFileEntity,
+                               MED_EN::medEntityMesh preferEntity=MED_EN::MED_ALL_ENTITIES
                                ) const throw (MEDEXCEPTION);
 
   void getMeshGeometricTypeFromFile(med_2_3::med_idt      id,
@@ -403,7 +404,10 @@ private:
   - numberOfElementsOfTypeC : nombres d'entités cumulés de chaque type géométrique
        avec numberOfElementsOfTypeC[0]=1 et de taille nombre de types+1
   - numberOfGaussPoint : nombre de points de Gauss par type géométrique
-       avec numberOfGaussPoint[0]=1 et de taille  nombre de types+1
+       avec numberOfGaussPoint[0]=1 et de taille  nombre de types+1.
+  <preferEntity> argument (if not default) gives entity of already present support,
+  which is used to select entity if there are several of them. See issue
+  20582: [CEA 368] MEDMEM don't work with a same field on NODES and CELLS
 */
 
 template <class T> bool
@@ -416,7 +420,8 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_3::med_idt        id,
                                                vector<int> &           numberOfElementsOfTypeC,
                                                vector<int> &           numberOfGaussPoint,
                                                int &                   totalNumberOfElWg,
-                                               MED_EN::medEntityMesh & fieldMedFileEntity
+                                               MED_EN::medEntityMesh & fieldMedFileEntity,
+                                               MED_EN::medEntityMesh   preferEntity
                                                ) const throw (MEDEXCEPTION)
 {
 
@@ -493,17 +498,26 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_3::med_idt        id,
       if ( nbPdtIt <=  0 )
         continue;
 
+      
+      if ( preferEntity != MED_EN::MED_ALL_ENTITIES ) //issue 20582: field on NODES and CELLS
+      {
+        bool preferNode = (preferEntity  == MED_EN::MED_NODE);
+        bool  foundNode = (medmem_entity == MED_EN::MED_NODE);
+        if ( preferNode != foundNode )
+          continue;
+      }
+
       /* Verifie que le champ n'est pas défini sur un autre type d'entité */
       if ( alreadyFoundAnEntity )
       {
-        //if (entity != (*currentEntity).first )  (NB)
         if ( medmem_entity != entity )
+        {
           throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Field |"  << fieldName
                                        << "| with (ndt,or) = (" << ndt << ","
                                        << od << ") must not be defined on different entity types" ));
-
+        }
       }
-      else
+      //else
       { 
         //entity=(*currentEntity).first; (NB)
         entity=medmem_entity;
@@ -655,10 +669,8 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_3::med_idt        id,
     support.setAll(true);
     numberOfElementsOfTypeC.resize(numberOfGeometricType+1);
     numberOfGaussPoint.resize(numberOfGeometricType+1);
-                
-    return alreadyFoundAnEntity;
-  } else
-    return false;
+  }
+  return alreadyFoundAnEntity;
 }
 
 template <class T> MED_EN::medEntityMesh
@@ -1088,6 +1100,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   MESH * ptrMesh = 0;
   bool   haveSupport = false;
   bool   haveMesh    = false;
+  MED_EN::medEntityMesh preferEntity = MED_EN::MED_ALL_ENTITIES;
   if ( MED_FIELD_DRIVER<T>::_ptrField->getSupport() ) {
     // Verif à faire sur la taille du meshName
     ptrMesh = MED_FIELD_DRIVER<T>::_ptrField->getSupport()->getMesh();
@@ -1096,6 +1109,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
       haveMesh = true;
     }
     haveSupport = true;
+    preferEntity = MED_FIELD_DRIVER<T>::_ptrField->getSupport()->getEntity();
   }
 
   // Cherche le type d'entité, le nombre d'entité  par type géométrique sur le type d'entité
@@ -1112,7 +1126,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
                                        MED_FIELD_DRIVER<T>::_ptrField->_orderNumber,
                                        *mySupport, meshName,
                                        numberOfElementsOfTypeC, numberOfGaussPoint,
-                                       totalNumberOfElWg, fieldMedFileEntity);
+                                       totalNumberOfElWg, fieldMedFileEntity, preferEntity);
 
 
   if ( !found ) {
