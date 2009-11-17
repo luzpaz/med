@@ -254,7 +254,9 @@ namespace MED
     if(aType == eNON_STRUCTURE){
       switch(theGeom){
       case ePOINT1:
-	return GetPNodeInfo(theMeshInfo,theErr);
+        if(theEntity == eNOEUD)
+          return GetPNodeInfo(theMeshInfo,theErr);
+        return GetPCellInfo(theMeshInfo,theEntity,theGeom,theConnMode,theErr);
 	break;
       case ePOLYGONE:
 	return GetPPolygoneInfo(theMeshInfo,theEntity,theGeom,theConnMode);
