@@ -953,6 +953,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
     list<nameGIBItoMED>::iterator itGIBItoMED = listGIBItoMED_mail.begin();
     for (; itGIBItoMED != listGIBItoMED_mail.end(); itGIBItoMED++) {
       _groupe & grp = medi->groupes[itGIBItoMED->gibi_id - 1];
+      if ( medi->groupes.size() < itGIBItoMED->gibi_id ) continue;
       grp.nom = mapStrings[itGIBItoMED->med_id];
     } // iterate on listGIBItoMED_mail
   }
