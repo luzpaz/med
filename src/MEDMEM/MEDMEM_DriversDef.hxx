@@ -56,7 +56,7 @@ public :
 
 static const GEO_NAME geoNames ;
 
-//				____________________________	
+//                              ____________________________    
   
 /*! This Class inherits from map. \n
     It is a constant map association int (which is a med_entite_maillage) and string. \n
@@ -80,7 +80,7 @@ public :
 
 static const ENT_NAME entNames ;
 
-//				____________________________	
+//                              ____________________________    
 
 /*! This Class inherits from map. \n
     It is a constant map association int (which is a med_entite_maillage) and  a list. \n
@@ -103,8 +103,8 @@ public :
   const list<MED_EN::medGeometryElement> & operator[]( const  MED_EN::medEntityMesh &c ) const;
   
 private:
-  					/*! This operator is used to initialize class objects of 
-					    type  const list<med_geometrie_element> */
+                                        /*! This operator is used to initialize class objects of 
+                                            type  const list<med_geometrie_element> */
   list<MED_EN::medGeometryElement> & operator[]( const  MED_EN::medEntityMesh &c );
   
 } ;

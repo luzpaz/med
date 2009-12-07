@@ -65,7 +65,7 @@ public :
   // Sinon le MEDSKYLINEARRAY prend directement les pointeurs et en devient 
   // propriétaire
   MEDSKYLINEARRAY( const int count, const int length,
-		   const int* index, const int* value, bool shallowCopy=false );
+                   const int* index, const int* value, bool shallowCopy=false );
 
   ~MEDSKYLINEARRAY();
   //void setMEDSKYLINEARRAY( const int count, const int length, int* index , int* value ) ;
@@ -85,7 +85,7 @@ public :
   inline void setIndexValue(int i, int value) throw (MEDEXCEPTION) ;
 
   friend ostream& operator<<(ostream &os, const MEDSKYLINEARRAY &sky);
-	MEDSKYLINEARRAY* makeReverseArray();
+        MEDSKYLINEARRAY* makeReverseArray();
 
 };
 

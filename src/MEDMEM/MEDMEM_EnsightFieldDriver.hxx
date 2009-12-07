@@ -50,7 +50,7 @@ public :
   */
   ENSIGHT_FIELD_DRIVER();
   ENSIGHT_FIELD_DRIVER(const std::string &    fileName,
-		       FIELD_ *               ptrField,
+                       FIELD_ *               ptrField,
                        MED_EN::med_mode_acces accessMode);
   /*!
     Copy constructor.

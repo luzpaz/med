@@ -93,9 +93,9 @@ void TYPE_MESH_DRIVER::close()
 //     H5close(); // If we call H5close() all the files are closed.
 //     if (err != 0)
 //       throw MEDEXCEPTION( LOCALIZED(STRING(LOC)
-// 				    <<" Error when closing file !"
-// 				    )
-// 			  );
+//                                  <<" Error when closing file !"
+//                                  )
+//                        );
 //     _status = MED_CLOSED;
 //     _medIdt = MED_INVALID;
 //   }
@@ -211,7 +211,7 @@ TYPE_MESH_RDWR_DRIVER::TYPE_MESH_RDWR_DRIVER():TYPE_MESH_DRIVER()
 }
 
 TYPE_MESH_RDWR_DRIVER::TYPE_MESH_RDWR_DRIVER(const string & fileName,
-					   MESH * ptrMesh):
+                                           MESH * ptrMesh):
   TYPE_MESH_DRIVER(fileName,ptrMesh,MED_RDWR)
 {
   MESSAGE_MED("TYPE_MESH_RDWR_DRIVER::TYPE_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been created");

@@ -63,21 +63,21 @@ template <class T> class MEDARRAY
 {
 private :
 
-  				/*! leading dimension of value (example : space dimension for coordinates) */
-  int 	_ldValues;
-  				/*! length of values (example : number of nodes for coordinates) */
-  int 	_lengthValues;
-  				/*! data access mode. possible values are :\n
-        		          -  MED_FULL_INTERLACE (default mode) \n
-			          -  MED_NO_INTERLACE */
+                                /*! leading dimension of value (example : space dimension for coordinates) */
+  int   _ldValues;
+                                /*! length of values (example : number of nodes for coordinates) */
+  int   _lengthValues;
+                                /*! data access mode. possible values are :\n
+                                  -  MED_FULL_INTERLACE (default mode) \n
+                                  -  MED_NO_INTERLACE */
   MED_EN::medModeSwitch _mode;
-				/*! Pointer to representation in mode MED_FULL_INTERLACE */
+                                /*! Pointer to representation in mode MED_FULL_INTERLACE */
   PointerOf <T> _valuesFull;
-				/*! Pointer to representation in mode MED_NO_INTERLACE */
+                                /*! Pointer to representation in mode MED_NO_INTERLACE */
   PointerOf <T> _valuesNo;
-				/*! Pointer to representation in mode _mode */
+                                /*! Pointer to representation in mode _mode */
   PointerOf <T> _valuesDefault;
-				/*! Pointer to representation in the other mode (!=_mode) */
+                                /*! Pointer to representation in the other mode (!=_mode) */
   PointerOf <T> _valuesOther;
 
 public :
@@ -86,9 +86,9 @@ public :
   inline ~MEDARRAY();
 
   MEDARRAY  (const int ld_values, const int length_values,
-	     const MED_EN::medModeSwitch mode=MED_EN::MED_FULL_INTERLACE);
+             const MED_EN::medModeSwitch mode=MED_EN::MED_FULL_INTERLACE);
   MEDARRAY  (T* values, const int ld_values,
-	     const int length_values, const MED_EN::medModeSwitch mode=MED_EN::MED_FULL_INTERLACE,bool shallowCopy=false, bool ownershipOfValues=false);
+             const int length_values, const MED_EN::medModeSwitch mode=MED_EN::MED_FULL_INTERLACE,bool shallowCopy=false, bool ownershipOfValues=false);
   MEDARRAY  (MEDARRAY const &m);
   MEDARRAY  (MEDARRAY const &m, bool copyOther);
   MEDARRAY & operator = (const MEDARRAY & m);
@@ -110,8 +110,8 @@ public :
   inline MED_EN::medModeSwitch getMode() const;
 
   void set   (const MED_EN::medModeSwitch mode,const T* value);
-  void setI  (const int i, 	       const T* value);
-  void setJ  (const int j, 	       const T* value);
+  void setI  (const int i,             const T* value);
+  void setJ  (const int j,             const T* value);
   void setIJ (const int i, const int j, const T  value);
 
   void calculateOther();
@@ -121,7 +121,7 @@ public :
 
 //-------------------------------------------------//
 //                                                 //
-// 		IMPLEMENTED CODE                   //
+//              IMPLEMENTED CODE                   //
 //                                                 //
 //-------------------------------------------------//
 
@@ -133,32 +133,32 @@ template <class T> inline MEDARRAY<T>::MEDARRAY():
 {
 }
 
-//				------------------
+//                              ------------------
 
 template <class T> inline MEDARRAY<T>::~MEDARRAY()
 {
 }
 
-//				------------------
+//                              ------------------
 
-  				/*! This constructor does allocation and does not set values : \n.
-				    It allocates a "T" array of length_values*ld_values length.\n
-				    You don't have to know the T values when calling this construtor
-				    but you have to call "set" method to initialize them later.
-				    You also can  get the pointer to the memory zone (with "get" method),
-				    and work with it.\n
-				    The desallocation of T array is not your responsability. \n\n
-				    Throws MEDEXCEPTION if  T array length is < 1*/
+                                /*! This constructor does allocation and does not set values : \n.
+                                    It allocates a "T" array of length_values*ld_values length.\n
+                                    You don't have to know the T values when calling this construtor
+                                    but you have to call "set" method to initialize them later.
+                                    You also can  get the pointer to the memory zone (with "get" method),
+                                    and work with it.\n
+                                    The desallocation of T array is not your responsability. \n\n
+                                    Throws MEDEXCEPTION if  T array length is < 1*/
 
 template <class T> MEDARRAY<T>::MEDARRAY(const int ld_values,
-					 const int length_values,
-					 const MED_EN::medModeSwitch mode):
+                                         const int length_values,
+                                         const MED_EN::medModeSwitch mode):
 
-						_ldValues(ld_values),
-						_lengthValues(length_values),
-						_mode(mode),
-						_valuesFull(), _valuesNo(),
-						_valuesDefault(),_valuesOther()
+                                                _ldValues(ld_values),
+                                                _lengthValues(length_values),
+                                                _mode(mode),
+                                                _valuesFull(), _valuesNo(),
+                                                _valuesDefault(),_valuesOther()
 {
   //  BEGIN_OF_MED("constructor MEDARRAY<T>::MEDARRAY(const int, const int, const medModeSwitch)");
 
@@ -168,19 +168,19 @@ template <class T> MEDARRAY<T>::MEDARRAY(const int ld_values,
 
   if ((ld_values<1)|(length_values<1))
   {
-    	throw MEDEXCEPTION(LOCALIZED("MEDARRAY<T>::MEDARRAY(const int, const int, const medModeSwitch) : dimension < 1 !"));
+        throw MEDEXCEPTION(LOCALIZED("MEDARRAY<T>::MEDARRAY(const int, const int, const medModeSwitch) : dimension < 1 !"));
   }
 
   if ( _mode == MED_EN::MED_FULL_INTERLACE)
   {
-	_valuesFull.set(length_values*ld_values);
-  	_valuesDefault.set((T*) _valuesFull);
+        _valuesFull.set(length_values*ld_values);
+        _valuesDefault.set((T*) _valuesFull);
   }
   else
   {
-	ASSERT_MED (_mode == MED_EN::MED_NO_INTERLACE);
-	_valuesNo.set(length_values*ld_values);
-  	_valuesDefault.set((T*)_valuesNo);
+        ASSERT_MED (_mode == MED_EN::MED_NO_INTERLACE);
+        _valuesNo.set(length_values*ld_values);
+        _valuesDefault.set((T*)_valuesNo);
   }
 
   ASSERT_MED( (T*)_valuesDefault != NULL);
@@ -192,22 +192,22 @@ template <class T> MEDARRAY<T>::MEDARRAY(const int ld_values,
   //  END_OF_MED("constructor MEDARRAY<T>::MEDARRAY(const int, const int, const medModeSwitch ()");
 }
 
-//				------------------
+//                              ------------------
 
-  				/*! This constructor duplicate T*values.\n
+                                /*! This constructor duplicate T*values.\n
 
-				    Throws MEDEXCEPTION if  the lenght of T is < 1*/
+                                    Throws MEDEXCEPTION if  the lenght of T is < 1*/
 template <class T> MEDARRAY<T>::MEDARRAY( T*values,
-					  const int ld_values,
-					  const int length_values,
-					  const MED_EN::medModeSwitch mode,
-					  bool shallowCopy,
-					  bool ownershipOfValues):
-						_ldValues(ld_values),
-						_lengthValues(length_values),
-						_mode(mode),
-						_valuesFull(),_valuesNo(),
-						_valuesDefault(),_valuesOther()
+                                          const int ld_values,
+                                          const int length_values,
+                                          const MED_EN::medModeSwitch mode,
+                                          bool shallowCopy,
+                                          bool ownershipOfValues):
+                                                _ldValues(ld_values),
+                                                _lengthValues(length_values),
+                                                _mode(mode),
+                                                _valuesFull(),_valuesNo(),
+                                                _valuesDefault(),_valuesOther()
 {
   //  BEGIN_OF_MED("constructor MEDARRAY<T>::MEDARRAY(T* values, const int, const int, const medModeSwitch)");
 
@@ -216,44 +216,44 @@ template <class T> MEDARRAY<T>::MEDARRAY( T*values,
 
   if ( (ld_values<1) | (length_values<1) )
   {
- 	   throw MEDEXCEPTION(LOCALIZED("MEDARRAY<T>::MEDARRAY(T* values, const int, const medModeSwitch) : dimension < 1 !"));
+           throw MEDEXCEPTION(LOCALIZED("MEDARRAY<T>::MEDARRAY(T* values, const int, const medModeSwitch) : dimension < 1 !"));
   }
   if ( _mode == MED_EN::MED_FULL_INTERLACE)
   {
-  	if(shallowCopy)
-	  {
-	    if(ownershipOfValues)
-	      {
-		_valuesFull.setShallowAndOwnership((const T*)values);
-	    }
-	    else
-	      {
-		_valuesFull.set((const T*)values);
-	      }
-	  }
-	else
-	  {
-	    _valuesFull.set(_ldValues*length_values,values);
-	  }
-	_valuesDefault.set((T*)_valuesFull);
+        if(shallowCopy)
+          {
+            if(ownershipOfValues)
+              {
+                _valuesFull.setShallowAndOwnership((const T*)values);
+            }
+            else
+              {
+                _valuesFull.set((const T*)values);
+              }
+          }
+        else
+          {
+            _valuesFull.set(_ldValues*length_values,values);
+          }
+        _valuesDefault.set((T*)_valuesFull);
   }
   else
   {
-	ASSERT_MED (_mode == MED_EN::MED_NO_INTERLACE);
-	if(shallowCopy)
-	{
-	  if(ownershipOfValues)
-	    {
-	      _valuesNo.setShallowAndOwnership((const T*)values);
-	    }
-	  else
-	    {
-	      _valuesNo.set((const T*)values);
-	    }
-	}
-	else
-	  _valuesNo.set(_ldValues*length_values,values);
-  	_valuesDefault.set((T*)_valuesNo);
+        ASSERT_MED (_mode == MED_EN::MED_NO_INTERLACE);
+        if(shallowCopy)
+        {
+          if(ownershipOfValues)
+            {
+              _valuesNo.setShallowAndOwnership((const T*)values);
+            }
+          else
+            {
+              _valuesNo.set((const T*)values);
+            }
+        }
+        else
+          _valuesNo.set(_ldValues*length_values,values);
+        _valuesDefault.set((T*)_valuesNo);
   }
   ASSERT_MED( (T*)_valuesDefault != NULL);
 //   SCRUTE_MED((T*)_valuesDefault);
@@ -264,19 +264,19 @@ template <class T> MEDARRAY<T>::MEDARRAY( T*values,
   //  END_OF_MED("constructor MEDARRAY<T>::MEDARRAY(T* values, const int, const int, const medModeSwitch)");
 }
 
-//				------------------
+//                              ------------------
 
-				/*! This constructor allocates a new medarray and does a copy of pointers\n
-				    It DOES NOT copy the memory . The two objects will share the same data.\n
-				    (for copying data, use constructor MEDARRAY(MEDARRAY<T> const & m,bool copyOther). */
+                                /*! This constructor allocates a new medarray and does a copy of pointers\n
+                                    It DOES NOT copy the memory . The two objects will share the same data.\n
+                                    (for copying data, use constructor MEDARRAY(MEDARRAY<T> const & m,bool copyOther). */
 template <class T> MEDARRAY<T>::MEDARRAY(MEDARRAY<T> const & m ):
-  					_ldValues(m._ldValues),
-					_lengthValues(m._lengthValues),
-  					_mode(m._mode),
-					_valuesFull((const T*)m._valuesFull),
-					_valuesNo((const T*)m._valuesNo),
-					_valuesDefault((const T*)m._valuesDefault),
-					_valuesOther((const T*)m._valuesOther)
+                                        _ldValues(m._ldValues),
+                                        _lengthValues(m._lengthValues),
+                                        _mode(m._mode),
+                                        _valuesFull((const T*)m._valuesFull),
+                                        _valuesNo((const T*)m._valuesNo),
+                                        _valuesDefault((const T*)m._valuesDefault),
+                                        _valuesOther((const T*)m._valuesOther)
 {
   //  BEGIN_OF_MED("constructor MEDARRAY<T>::MEDARRAY(MEDARRAY<T> const & m)");
   ASSERT_MED( (T*)_valuesDefault != NULL);
@@ -287,21 +287,21 @@ template <class T> MEDARRAY<T>::MEDARRAY(MEDARRAY<T> const & m ):
   //  END_OF_MED("constructor MEDARRAY<T>::MEDARRAY(MEDARRAY<T> const & m)");
 }
 
-				/*! This constructor allocates a new array and does a copy of values
-				    included in the m arrays.\n
-				    If the boolean is setted to true, both representations (in full mode
-				    and no interlace mode)  will be copied.\n
-				    Otherwise, only _valuesDefault will be copied.\n
-				    Desallocation of the arrays is not your reponsability.\n\n
-				    Throws MEDEXCEPTION if _valuesOther is null and copyOther equals true*/
+                                /*! This constructor allocates a new array and does a copy of values
+                                    included in the m arrays.\n
+                                    If the boolean is setted to true, both representations (in full mode
+                                    and no interlace mode)  will be copied.\n
+                                    Otherwise, only _valuesDefault will be copied.\n
+                                    Desallocation of the arrays is not your reponsability.\n\n
+                                    Throws MEDEXCEPTION if _valuesOther is null and copyOther equals true*/
 template <class T> MEDARRAY<T>::MEDARRAY(MEDARRAY<T> const & p,bool copyOther ):
-  					_ldValues(p._ldValues),
-					_lengthValues(p._lengthValues),
-  					_mode(p._mode),
-					_valuesFull(),
-					_valuesNo(),
-					_valuesDefault(),
-					_valuesOther()
+                                        _ldValues(p._ldValues),
+                                        _lengthValues(p._lengthValues),
+                                        _mode(p._mode),
+                                        _valuesFull(),
+                                        _valuesNo(),
+                                        _valuesDefault(),
+                                        _valuesOther()
 {
   //  BEGIN_OF_MED("Constructeur deepCopy MEDARRAY<T>::MEDARRAY(MEDARRAY<T> const & m,bool copyOther");
 
@@ -317,11 +317,11 @@ template <class T> MEDARRAY<T>::MEDARRAY(MEDARRAY<T> const & p,bool copyOther ):
       _valuesFull.set(p._ldValues*p._lengthValues,(const T*)p._valuesFull);
       _valuesDefault.set((T*)_valuesFull);
       if (copyOther)
-	if ((const T*)p._valuesNo != NULL)
-	  {
-	    _valuesNo.set(p._ldValues*p._lengthValues,(const T*)p._valuesNo);
-	    _valuesOther.set((T*)_valuesNo);
-	  }
+        if ((const T*)p._valuesNo != NULL)
+          {
+            _valuesNo.set(p._ldValues*p._lengthValues,(const T*)p._valuesNo);
+            _valuesOther.set((T*)_valuesNo);
+          }
     }
   else
     {
@@ -329,15 +329,15 @@ template <class T> MEDARRAY<T>::MEDARRAY(MEDARRAY<T> const & p,bool copyOther ):
       _valuesNo.set(p._ldValues*p._lengthValues,(const T*)p._valuesNo);
       _valuesDefault.set((T*)_valuesNo);
       if (copyOther)
-	if ((const T*)p._valuesFull != NULL)
-	  {
-	    _valuesFull.set(p._ldValues*p._lengthValues,(const T*)p._valuesFull);
-	    _valuesOther.set((T*)_valuesFull);
-	  }
+        if ((const T*)p._valuesFull != NULL)
+          {
+            _valuesFull.set(p._ldValues*p._lengthValues,(const T*)p._valuesFull);
+            _valuesOther.set((T*)_valuesFull);
+          }
     }
 }
 
-//				------------------
+//                              ------------------
 
 /*! This operator makes a deep copy of the arrays.\n */
 
@@ -404,78 +404,78 @@ template <class T> MEDARRAY<T> & MEDARRAY<T>::shallowCopy(const MEDARRAY & m)
   return *this;
 }
 
-//				------------------
+//                              ------------------
 
-				/*! returns _ldValues. (for example, space dimension for coordinates array)*/
+                                /*! returns _ldValues. (for example, space dimension for coordinates array)*/
 template <class T> inline int MEDARRAY<T>::getLeadingValue() const
 {
   return _ldValues;
 }
 
-//				------------------
+//                              ------------------
 
-				/*! returns _ldValues. (for example, number of nodes for coordinates array)*/
+                                /*! returns _ldValues. (for example, number of nodes for coordinates array)*/
 template <class T> inline int MEDARRAY<T>::getLengthValue() const
 {
   return _lengthValues;
 }
 
-//				------------------
+//                              ------------------
 
-				/*! returns a pointer to _valuesDefault or _valuesOther, depending on
-				    mode value : if mode is the same as _mode, _valuesDefault is returned.
-				    else, if _valuesOther is calculated (if necessary) and then returned.
-				    The pointer can be used to set values */
+                                /*! returns a pointer to _valuesDefault or _valuesOther, depending on
+                                    mode value : if mode is the same as _mode, _valuesDefault is returned.
+                                    else, if _valuesOther is calculated (if necessary) and then returned.
+                                    The pointer can be used to set values */
 template <class T> const T* MEDARRAY<T>::get(const MED_EN::medModeSwitch mode)
 {
   //  BEGIN_OF_MED("MEDARRAY<T>::get(const medModeSwitch mode)");
   if ((T*)_valuesDefault == NULL)
   {
-  	throw MEDEXCEPTION("MEDARRAY::get(mode) : No values defined !");
+        throw MEDEXCEPTION("MEDARRAY::get(mode) : No values defined !");
   }
   if (mode == _mode)
   {
-	//PN : pour enlever les warning compilateurs
-    	//return (const T*)_valuesDefault;
-    	return  (T*) _valuesDefault;
+        //PN : pour enlever les warning compilateurs
+        //return (const T*)_valuesDefault;
+        return  (T*) _valuesDefault;
   }
   else
   {
-	if ((T*)_valuesOther == NULL)
-	{
-  		calculateOther();
-	}
-	//PN : pour enlever les warning compilateurs
-    	//return (const T*)_valuesDefault;
-      	return  (T*) _valuesOther;
+        if ((T*)_valuesOther == NULL)
+        {
+                calculateOther();
+        }
+        //PN : pour enlever les warning compilateurs
+        //return (const T*)_valuesDefault;
+        return  (T*) _valuesOther;
   }
 }
 
-//				------------------
+//                              ------------------
 
-				/*! returns a pointer to ith element of the array.
-				    (ith line in a MED_FULL_INTERLACE representation )\n
-				    Be aware : if _mode is MED_NO_INTERLACE, the entire
-				    array will be recalculate in MED_FULL_INTERLACE representation.\n*/
+                                /*! returns a pointer to ith element of the array.
+                                    (ith line in a MED_FULL_INTERLACE representation )\n
+                                    Be aware : if _mode is MED_NO_INTERLACE, the entire
+                                    array will be recalculate in MED_FULL_INTERLACE representation.\n*/
 
 template <class T> const T* MEDARRAY<T>::getRow(const int i)
 {
   if ((T*)_valuesDefault == NULL)
   {
-  	throw MEDEXCEPTION("MEDARRAY::getRow(i) : No values defined !");
+        throw MEDEXCEPTION("MEDARRAY::getRow(i) : No values defined !");
   }
   if (i<1)
   {
-	throw MEDEXCEPTION("MEDARRAY::getRow(i) : argument i must be >= 1");
+        throw MEDEXCEPTION("MEDARRAY::getRow(i) : argument i must be >= 1");
   }
   if (i>_lengthValues)
   {
-	throw MEDEXCEPTION("MEDARRAY::getRow(i) : argument i must be <= _lengthValues");
+        throw MEDEXCEPTION("MEDARRAY::getRow(i) : argument i must be <= _lengthValues");
   }
 
   if ((T*)_valuesFull == NULL)
   {
-  	calculateOther();
+        calculateOther();
   }
   ASSERT_MED((T*)_valuesFull != NULL);
 
@@ -485,33 +485,33 @@ template <class T> const T* MEDARRAY<T>::getRow(const int i)
 
   return ptr;
 }
-//				------------------
+//                              ------------------
 
-				/*! this method is similar to getRow method.\n
-				    It returns a pointer to jth line of the array in a MED_NO-INTERLACE representation
-				    (for example, 2nd coordinates).\n
-				    Be aware : if _mode is MED_FULL_INTERLACE, the entire
-				    array will be recalculate in MED_NO_INTERLACE representation.\n*/
+                                /*! this method is similar to getRow method.\n
+                                    It returns a pointer to jth line of the array in a MED_NO-INTERLACE representation
+                                    (for example, 2nd coordinates).\n
+                                    Be aware : if _mode is MED_FULL_INTERLACE, the entire
+                                    array will be recalculate in MED_NO_INTERLACE representation.\n*/
 
 template <class T> const T* MEDARRAY<T>::getColumn(const int j)
 {
   if ((T*)_valuesDefault == NULL)
   {
-  	throw MEDEXCEPTION("MEDARRAY::getColumn(j) : No values defined !");
+        throw MEDEXCEPTION("MEDARRAY::getColumn(j) : No values defined !");
   }
   if (j<1)
   {
-	throw MEDEXCEPTION("MEDARRAY::getColumn(j) : argument j must be >= 1");
+        throw MEDEXCEPTION("MEDARRAY::getColumn(j) : argument j must be >= 1");
   }
   if (j>_ldValues)
   {
-	throw MEDEXCEPTION("MEDARRAY::getColumn(j) : argument j must be <= _ldValues");
+        throw MEDEXCEPTION("MEDARRAY::getColumn(j) : argument j must be <= _ldValues");
   }
 
   if ((T*)_valuesNo == NULL)
   {
-	ASSERT_MED(((T*) _valuesDefault)==((T*) _valuesFull));
-  	calculateOther();
+        ASSERT_MED(((T*) _valuesDefault)==((T*) _valuesFull));
+        calculateOther();
   }
   //PN pour enlever les warning compilateur
   //const T* ptr = (const T*)_valuesNo + (j-1)*_lengthValues;
@@ -520,28 +520,28 @@ template <class T> const T* MEDARRAY<T>::getColumn(const int j)
   return ptr;
 }
 
-//				------------------
+//                              ------------------
 
-				/*! returns Jth value of Ith element .\n
-				    don't forget first element is element 1 (and not element 0). */
+                                /*! returns Jth value of Ith element .\n
+                                    don't forget first element is element 1 (and not element 0). */
 template <class T> const T MEDARRAY<T>::getIJ(const int i,const  int j) const
 {
 
   if (i<1)
   {
-	throw MEDEXCEPTION("MEDARRAY::getIJ(i,j) : argument i must be >= 1");
+        throw MEDEXCEPTION("MEDARRAY::getIJ(i,j) : argument i must be >= 1");
   }
   if (i>_lengthValues)
   {
-	throw MEDEXCEPTION("MEDARRAY::getIJ(i,j) : argument i must be <= _lengthValues");
+        throw MEDEXCEPTION("MEDARRAY::getIJ(i,j) : argument i must be <= _lengthValues");
   }
   if (j<1)
   {
-	throw MEDEXCEPTION("MEDARRAY::getIJ(i,j) : argument j must be >= 1");
+        throw MEDEXCEPTION("MEDARRAY::getIJ(i,j) : argument j must be >= 1");
   }
   if (j>_ldValues)
   {
-	throw MEDEXCEPTION("MEDARRAY::getIJ(i,j) : argument j must be <= _ldValues");
+        throw MEDEXCEPTION("MEDARRAY::getIJ(i,j) : argument j must be <= _ldValues");
   }
 
   if ( (const T*)_valuesDefault ==  NULL)
@@ -551,30 +551,30 @@ template <class T> const T MEDARRAY<T>::getIJ(const int i,const  int j) const
 
   if (_mode == MED_EN::MED_FULL_INTERLACE)
   {
-  	return _valuesDefault[(i-1)*_ldValues+j-1];
+        return _valuesDefault[(i-1)*_ldValues+j-1];
   }
   else
   {
-  	return _valuesDefault[(j-1)*_lengthValues+i-1];
+        return _valuesDefault[(j-1)*_lengthValues+i-1];
   }
 
 }
 
-//				------------------
+//                              ------------------
 
-				/*! returns the default mode (_mode)\n
-  				    (internal use : needed by write method) */
+                                /*! returns the default mode (_mode)\n
+                                    (internal use : needed by write method) */
 template <class T> inline MED_EN::medModeSwitch MEDARRAY<T>::getMode() const
 {
   return _mode;
 }
 
-//				------------------
+//                              ------------------
 
-				/*! sets T pointer of _valuesDefault (cf class PointerOf) on value.\n
-				    no copy of value is done. \n
-				    the other representation mode is not recalculate.
-				    the corresponding pointers are setted to null */
+                                /*! sets T pointer of _valuesDefault (cf class PointerOf) on value.\n
+                                    no copy of value is done. \n
+                                    the other representation mode is not recalculate.
+                                    the corresponding pointers are setted to null */
 //  template <class T> void MEDARRAY<T>::set(const medModeSwitch mode, const T* value)
 //  {
 
@@ -583,16 +583,16 @@ template <class T> inline MED_EN::medModeSwitch MEDARRAY<T>::getMode() const
 //    _mode = mode;
 //    if ( _mode == MED_FULL_INTERLACE)
 //    {
-//    	_valuesFull.set(value);
-//    	_valuesDefault.set((T*)_valuesFull);
-//  	_valuesNo.set(0);
+//      _valuesFull.set(value);
+//      _valuesDefault.set((T*)_valuesFull);
+//      _valuesNo.set(0);
 //    }
 //    else
 //    {
-//  	ASSERT_MED (_mode == MED_NO_INTERLACE);
-//    	_valuesNo.set(value);
-//    	_valuesDefault.set((T*)_valuesNo);
-//  	_valuesFull.set(0);
+//      ASSERT_MED (_mode == MED_NO_INTERLACE);
+//      _valuesNo.set(value);
+//      _valuesDefault.set((T*)_valuesNo);
+//      _valuesFull.set(0);
 //    }
 //    _valuesOther.set(0);
 //    END_OF_MED("MEDARRAY<T>::set(mode,i,value)");
@@ -631,27 +631,27 @@ template <class T> void MEDARRAY<T>::clearOtherMode()
 {
     if(isOtherCalculated())
     {
-	if ( _mode == MED_EN::MED_FULL_INTERLACE)
-	    _valuesNo.set(0);
-	else
-	    _valuesFull.set(0);
-	_valuesOther.set(0);
+        if ( _mode == MED_EN::MED_FULL_INTERLACE)
+            _valuesNo.set(0);
+        else
+            _valuesFull.set(0);
+        _valuesOther.set(0);
     }
 }
 
 
-//				------------------
+//                              ------------------
 
-					/*! Sets ith element to T* values\n
-					    if they both exist, both _valuesFull and _valuesNo arrays will be updated.\n
-					    Throws exception if i < 1 or i > _lengthValues */
+                                        /*! Sets ith element to T* values\n
+                                            if they both exist, both _valuesFull and _valuesNo arrays will be updated.\n
+                                            Throws exception if i < 1 or i > _lengthValues */
 template <class T> void MEDARRAY<T>::setI(const int i, const T* value)
 {
   //  BEGIN_OF_MED("MEDARRAY<T>::setI(i,value)");
 
   if ((T*)_valuesDefault == NULL)
   {
-	throw MEDEXCEPTION("MEDARRAY::setI(i,value) : No values defined !");
+        throw MEDEXCEPTION("MEDARRAY::setI(i,value) : No values defined !");
   }
   if (i<=0)
   {
@@ -666,7 +666,7 @@ template <class T> void MEDARRAY<T>::setI(const int i, const T* value)
   {
    for (int k = 0;k<_ldValues;k++)
    {
-		_valuesFull[k+_ldValues*(i-1)] = value[k];
+                _valuesFull[k+_ldValues*(i-1)] = value[k];
    }
   }
 
@@ -674,37 +674,37 @@ template <class T> void MEDARRAY<T>::setI(const int i, const T* value)
   {
    for (int k = 0;k<_ldValues;k++)
    {
-		_valuesNo[k*_lengthValues +(i-1)] = value[k];
+                _valuesNo[k*_lengthValues +(i-1)] = value[k];
    }
   }
 
   //  END_OF_MED("MEDARRAY::setI(i,value)");
 }
-//				------------------
+//                              ------------------
 
-					/*! Sets ith element to T* values\n
-					    if they both exist, both _valuesFull and _valuesNo arrays will be updated.\n
-					    Throws exception if i < 1 or i > _lengthValues */
+                                        /*! Sets ith element to T* values\n
+                                            if they both exist, both _valuesFull and _valuesNo arrays will be updated.\n
+                                            Throws exception if i < 1 or i > _lengthValues */
 template <class T> void MEDARRAY<T>::setJ(const int j, const T* value)
 {
   //  BEGIN_OF_MED("MEDARRAY::setJ(j,value)");
   if (( T*)_valuesDefault == NULL)
   {
-  	throw MEDEXCEPTION("MEDARRAY::setJ(j) : No values defined !");
+        throw MEDEXCEPTION("MEDARRAY::setJ(j) : No values defined !");
   }
   if (j<1)
   {
-	throw MEDEXCEPTION("MEDARRAY::setJ(j) : argument j must be >= 1");
+        throw MEDEXCEPTION("MEDARRAY::setJ(j) : argument j must be >= 1");
   }
   if (j>_ldValues)
   {
-	throw MEDEXCEPTION("MEDARRAY::setJ(j) : argument j must be <= _ldValues");
+        throw MEDEXCEPTION("MEDARRAY::setJ(j) : argument j must be <= _ldValues");
   }
   if ((T*)_valuesFull != NULL)
   {
    for (int k = 0;k<_lengthValues;k++)
    {
-		_valuesFull[k*_ldValues+(j-1)] = value[k];
+                _valuesFull[k*_ldValues+(j-1)] = value[k];
    }
   }
 
@@ -712,18 +712,18 @@ template <class T> void MEDARRAY<T>::setJ(const int j, const T* value)
   {
    for (int k = 0;k<_lengthValues;k++)
    {
-		_valuesNo[k+_lengthValues*(j-1)] = value[k];
+                _valuesNo[k+_lengthValues*(j-1)] = value[k];
    }
   }
   //  END_OF_MED("MEDARRAY::setJ(j,value)");
 }
 
-//				------------------
+//                              ------------------
 
-					/*! Sets value of Jth coordinate of Ith element to T value.\n
-					    Maintains coherency.\n
-					    Throws exception if we don't have
-					    1<=i<=_lengthValues and 1<=j<=_ldValues */
+                                        /*! Sets value of Jth coordinate of Ith element to T value.\n
+                                            Maintains coherency.\n
+                                            Throws exception if we don't have
+                                            1<=i<=_lengthValues and 1<=j<=_ldValues */
 template <class T> void MEDARRAY<T>::setIJ(const int i, const int j, const T value)
 {
   // 1<=i<=_lengthValues and 1<=j<=_ldValues
@@ -745,56 +745,56 @@ template <class T> void MEDARRAY<T>::setIJ(const int i, const int j, const T val
 
   if ((T*)_valuesFull != NULL)
   {
-	_valuesFull[j-1+_ldValues*(i-1)] = value;
+        _valuesFull[j-1+_ldValues*(i-1)] = value;
   }
   if ((T*)_valuesNo != NULL)
   {
-  	_valuesNo[(j-1)*_lengthValues+i-1] = value;
+        _valuesNo[(j-1)*_lengthValues+i-1] = value;
   }
 }
 
-					/*! Calculates the other mode of representation : MED_FULL_INTERLACE
-					    if __mode = MED_NO_INTERLACE and vice versa.\n
-					    Throws exception if no value are setted */
+                                        /*! Calculates the other mode of representation : MED_FULL_INTERLACE
+                                            if __mode = MED_NO_INTERLACE and vice versa.\n
+                                            Throws exception if no value are setted */
 template <class T> void MEDARRAY<T>::calculateOther()
 {
   //  BEGIN_OF_MED("MEDARRAY<T>::calculateOther()");
   if ((T*)_valuesDefault == NULL)
   {
-    	throw MEDEXCEPTION("MEDARRAY::calculateOther() : No values defined !");
+        throw MEDEXCEPTION("MEDARRAY::calculateOther() : No values defined !");
   }
 
   if ((T*)_valuesOther == NULL)
   {
-	_valuesOther.set(_ldValues*_lengthValues);
+        _valuesOther.set(_ldValues*_lengthValues);
   }
   if (_mode == MED_EN::MED_NO_INTERLACE)
   {
-	_valuesFull.set((T*)_valuesOther);
+        _valuesFull.set((T*)_valuesOther);
   }
   else
   {
-	ASSERT_MED( _mode==MED_EN::MED_FULL_INTERLACE);
-	_valuesNo.set((T*)_valuesOther);
+        ASSERT_MED( _mode==MED_EN::MED_FULL_INTERLACE);
+        _valuesNo.set((T*)_valuesOther);
   }
 
   for (int i=0; i<_lengthValues;i++)
   {
-	for (int j=0; j<_ldValues; j++)
-	{
-		if (_mode == MED_EN::MED_NO_INTERLACE)
-		{
-			_valuesFull[i*_ldValues+j] = _valuesNo[j*_lengthValues+i];
-		}
-		else
-		{
-			_valuesNo[j*_lengthValues+i]=_valuesFull[i*_ldValues+j];
-		}
-	}
+        for (int j=0; j<_ldValues; j++)
+        {
+                if (_mode == MED_EN::MED_NO_INTERLACE)
+                {
+                        _valuesFull[i*_ldValues+j] = _valuesNo[j*_lengthValues+i];
+                }
+                else
+                {
+                        _valuesNo[j*_lengthValues+i]=_valuesFull[i*_ldValues+j];
+                }
+        }
   }
   //  END_OF_MED("MEDARRAY<T>::calculateOther()");
 }
 
 } //End of namespace MEDMEM
 
-# endif 	/* # ifndef __MEDARRAY_H__ */
+# endif         /* # ifndef __MEDARRAY_H__ */
