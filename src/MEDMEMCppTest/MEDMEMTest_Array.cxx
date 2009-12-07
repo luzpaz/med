@@ -417,7 +417,7 @@ void MEDMEMTest::testArray()
   //#ifdef ENABLE_FAULTS
   //???skl CPPUNIT_ASSERT_DOUBLES_EQUAL(c7n3 * 2.0, shc.getIJ(3, 7), delta);
   //#endif
-	
+        
   //CPPUNIT_ASSERT_DOUBLES_EQUAL(c7n3 * 2.0, cpy.getIJ(3, 7), delta);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(c7n3, cpy.getIJ(3, 7), delta);
 

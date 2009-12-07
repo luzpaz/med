@@ -86,7 +86,7 @@ void MEDMEMTest::testGetVolumeAbs()
   const int nNodes=21;
   meshing->setNumberOfNodes(nNodes);
   meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
-			  MED_EN::MED_FULL_INTERLACE);
+                          MED_EN::MED_FULL_INTERLACE);
   string coordname[3] = { "x", "y", "z" };
   meshing->setCoordinatesNames(coordname);
   string coordunit[3] = { "m", "m", "m" };

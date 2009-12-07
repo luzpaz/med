@@ -350,12 +350,12 @@ void MEDMEMTest::testFormulae()
     bool isException=false;
     try
       {
-	INTERP_KERNEL::calculateNormalForPolyg(polygon_si, /*nbOfPtsInPolygs*/4,
-					       poly_normal);
+        INTERP_KERNEL::calculateNormalForPolyg(polygon_si, /*nbOfPtsInPolygs*/4,
+                                               poly_normal);
       }
     catch(std::exception& e)
       {
-	isException=true;
+        isException=true;
       }
     CPPUNIT_ASSERT(isException);
     //MEDMEMTest_DumpArray<double>(cout, poly_normal, 3, "Invalid Polygon normal");

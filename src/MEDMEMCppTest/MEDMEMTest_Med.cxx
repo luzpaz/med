@@ -232,18 +232,18 @@ void MEDMEMTest::testMed()
           // Fixed: * added
           //#endif
           // not compilable
-	  //FIELD<int> *myFieldT;
-	  //CPPUNIT_ASSERT_NO_THROW(myFieldT = myMed->getFieldT<int>(field_names[nb], myFIter[nbIter].dt, myFIter[nbIter].it))
+          //FIELD<int> *myFieldT;
+          //CPPUNIT_ASSERT_NO_THROW(myFieldT = myMed->getFieldT<int>(field_names[nb], myFIter[nbIter].dt, myFIter[nbIter].it))
           // PROBLEM NOT REPRODUCED
-	}
+        }
         break;
       case MED_REEL64:
-	{
+        {
           // not compilable
-	  //FIELD<double> *myFieldT;
-	  //CPPUNIT_ASSERT_NO_THROW(myFieldT = myMed->getFieldT<double>(field_names[nb], myFIter[nbIter].dt, myFIter[nbIter].it))
+          //FIELD<double> *myFieldT;
+          //CPPUNIT_ASSERT_NO_THROW(myFieldT = myMed->getFieldT<double>(field_names[nb], myFIter[nbIter].dt, myFIter[nbIter].it))
           // PROBLEM NOT REPRODUCED
-	}
+        }
         break;
       }
     }
