@@ -40,7 +40,7 @@ namespace med_2_3 {
 
 MEDMEM_EXPORT med_err
 MEDMEMgaussEcr(med_idt fid, med_geometrie_element type_geo, med_float *refcoo, med_mode_switch mode_coo,
-	    med_int ngauss, med_float *gscoo, med_float * wg, char * locname );
+            med_int ngauss, med_float *gscoo, med_float * wg, char * locname );
 
   }
 }

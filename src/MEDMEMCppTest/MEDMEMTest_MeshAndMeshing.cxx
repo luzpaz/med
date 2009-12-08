@@ -50,7 +50,7 @@ double dmax(double x, double y) { return (x>y)?x:y;}
 double dmin(double x, double y) { return (x>y)?y:x;}
 
 void addMedFacesGroup (MESHING& meshing, int nFaces, const int *groupValue,
-		       string groupName, const MED_EN::medGeometryElement *mytypes,
+                       string groupName, const MED_EN::medGeometryElement *mytypes,
                        const int *index, const int *myNumberOfElements, int nbOfGeomTypes)
 {
   GROUP faces;
@@ -1229,17 +1229,17 @@ void MEDMEMTest::testMeshAndMeshing()
       double minnorm=0.;
       double tmp_value;
       for (int i = 1; i<=NumberOfElem; i++) {
-	normal_square = 0.;
-	cout << "Normal " << i << " ";
-	for (int j=1; j<=SpaceDim; j++) {
-	  tmp_value = normal->getValueIJ(i,j);
-	  normal_square += tmp_value*tmp_value;
-	  cout << tmp_value << " ";
-	}
-	norm = sqrt(normal_square);
-	maxnorm = dmax(maxnorm,norm);
-	minnorm = dmin(minnorm,norm);
-	cout << ", Norm = " << norm << endl;
+        normal_square = 0.;
+        cout << "Normal " << i << " ";
+        for (int j=1; j<=SpaceDim; j++) {
+          tmp_value = normal->getValueIJ(i,j);
+          normal_square += tmp_value*tmp_value;
+          cout << tmp_value << " ";
+        }
+        norm = sqrt(normal_square);
+        maxnorm = dmax(maxnorm,norm);
+        minnorm = dmin(minnorm,norm);
+        cout << ", Norm = " << norm << endl;
       }
       cout << "Max Norm " << maxnorm << " Min Norm " << minnorm << endl;
       delete normal;
@@ -1254,10 +1254,10 @@ void MEDMEMTest::testMeshAndMeshing()
       areatot = 0.0;
       for (int i = 1; i<=NumberOfElem;i++)
       {
-	cout << "Area " << i << " " << area->getValueIJ(i,1) << endl;
-	maxarea = dmax(maxarea,area->getValueIJ(i,1));
-	minarea = dmin(minarea,area->getValueIJ(i,1));
-	areatot = areatot + area->getValueIJ(i,1);
+        cout << "Area " << i << " " << area->getValueIJ(i,1) << endl;
+        maxarea = dmax(maxarea,area->getValueIJ(i,1));
+        minarea = dmin(minarea,area->getValueIJ(i,1));
+        areatot = areatot + area->getValueIJ(i,1);
       }
 
       cout << "Max Area " << maxarea << " Min Area " << minarea << endl;
@@ -1294,10 +1294,10 @@ void MEDMEMTest::testMeshAndMeshing()
       voltot = 0.0;
       for (int i = 1; i<=NumberOfElem;i++)
       {
-	cout << "Volume " << i << " " << volume->getValueIJ(i,1) << endl;
-	maxvol = dmax(maxvol,volume->getValueIJ(i,1));
-	minvol = dmin(minvol,volume->getValueIJ(i,1));
-	voltot = voltot + volume->getValueIJ(i,1);
+        cout << "Volume " << i << " " << volume->getValueIJ(i,1) << endl;
+        maxvol = dmax(maxvol,volume->getValueIJ(i,1));
+        minvol = dmin(minvol,volume->getValueIJ(i,1));
+        voltot = voltot + volume->getValueIJ(i,1);
       }
 
       cout << "Max Volume " << maxvol << " Min Volume " << minvol << endl;
@@ -1317,30 +1317,30 @@ void MEDMEMTest::testMeshAndMeshing()
       SUPPORT *copyMergeSkin;
       CPPUNIT_ASSERT_NO_THROW(copyMergeSkin = myMesh3->mergeSupports(myVectSup));
       try{
-	CPPUNIT_ASSERT(copyMergeSkin->deepCompare(*skin));
+        CPPUNIT_ASSERT(copyMergeSkin->deepCompare(*skin));
       }
       catch (const std::exception &e)
       {
-	CPPUNIT_FAIL(e.what());
+        CPPUNIT_FAIL(e.what());
       }
       catch (...)
       {
-	CPPUNIT_FAIL("Unknown exception");
+        CPPUNIT_FAIL("Unknown exception");
       }
 
       //method return a copy of skin object
       SUPPORT *copyIntersectSkin;
       CPPUNIT_ASSERT_NO_THROW(copyIntersectSkin = myMesh3->intersectSupports(myVectSup));
       try{
-	CPPUNIT_ASSERT(copyIntersectSkin->deepCompare(*skin));
+        CPPUNIT_ASSERT(copyIntersectSkin->deepCompare(*skin));
       }
       catch (const std::exception &e)
       {
-	CPPUNIT_FAIL(e.what());
+        CPPUNIT_FAIL(e.what());
       }
       catch (...)
       {
-	CPPUNIT_FAIL("Unknown exception");
+        CPPUNIT_FAIL("Unknown exception");
       }
 
       delete skin;
@@ -1781,7 +1781,7 @@ void MEDMEMTest::testMeshAndMeshing()
   const int nNodes=18;
   meshing->setNumberOfNodes(nNodes);
   meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
-			  MED_EN::MED_FULL_INTERLACE);
+                          MED_EN::MED_FULL_INTERLACE);
   string coordname[3] = { "x", "y", "z" };
   meshing->setCoordinatesNames(coordname);
   string coordunit[3] = { "m", "m", "m" };

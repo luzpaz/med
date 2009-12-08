@@ -172,7 +172,7 @@ void MEDMEMTest::testMedFieldDriver21()
   //#ifdef ENABLE_FORCED_FAILURES
   //Trying open file secondary.
   //CPPUNIT_ASSERT_THROW(aMedRdFieldDriver21->open(), MEDEXCEPTION);
-	//  CPPUNIT_ASSERT_NO_THROW(aMedRdFieldDriver21->open());
+        //  CPPUNIT_ASSERT_NO_THROW(aMedRdFieldDriver21->open());
   // (BUG) No exception in this case
   //#endif
 
@@ -481,10 +481,10 @@ void MEDMEMTest::testMedFieldDriver21()
   //=>Segmentation fault in this case
   //#endif
 
-	//VB : I don't quite understand the test, because, if the 
-	//file is already open, it is the open method that should fail. 
-	// as it is of little importance for the whole test base, 
-	//I remove it altogether
+        //VB : I don't quite understand the test, because, if the 
+        //file is already open, it is the open method that should fail. 
+        // as it is of little importance for the whole test base, 
+        //I remove it altogether
 
 //   //////////////////////////////////////////////
 //   //  TEST6: Writing field in the other file  //
@@ -532,7 +532,7 @@ void MEDMEMTest::testMedFieldDriver21()
 
   //#ifdef ENABLE_FORCED_FAILURES
   //Trying open file secondary.
-	//  CPPUNIT_ASSERT_THROW(aMedRdWrFieldDriver21->open(), MEDEXCEPTION);
+        //  CPPUNIT_ASSERT_THROW(aMedRdWrFieldDriver21->open(), MEDEXCEPTION);
   // (BUG) No exception in this case
   //#endif
 
@@ -555,10 +555,10 @@ void MEDMEMTest::testMedFieldDriver21()
   CPPUNIT_ASSERT_EQUAL(fileldnotexist, aMedRdWrFieldDriver21->getFieldName());
 
   //Trying read not existing field from file
-	// CPPUNIT_ASSERT_THROW(aMedRdWrFieldDriver21->read(), MEDEXCEPTION);
+        // CPPUNIT_ASSERT_THROW(aMedRdWrFieldDriver21->read(), MEDEXCEPTION);
 
   //Test read() method
-	
+        
   aMedRdWrFieldDriver21->setFieldName(fieldnameDouble);
   aMedRdWrFieldDriver21->open(); 
   try
@@ -652,6 +652,6 @@ void MEDMEMTest::testMedFieldDriver21()
   delete aInvalidMedRdWrFieldDriver21_2;
   delete aInvalidMedRdWrFieldDriver21_3;
   delete aInvalidMedRdWrFieldDriver21_4;
-	//  delete aInvalidMedRdWrFieldDriver21_5;
+        //  delete aInvalidMedRdWrFieldDriver21_5;
   delete aMedRdWrFieldDriver21;
 }

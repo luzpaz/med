@@ -53,7 +53,7 @@ public :
   MED_MED_DRIVER21();
   MED_MED_DRIVER21(const string & fileName,  MED * const ptrMed);
   MED_MED_DRIVER21(const string & fileName,  MED * const ptrMed,
-		   MED_EN::med_mode_acces accessMode);
+                   MED_EN::med_mode_acces accessMode);
   MED_MED_DRIVER21(const MED_MED_DRIVER21 & driver);
   virtual ~MED_MED_DRIVER21();
   void open() throw (MEDEXCEPTION) ;
@@ -106,8 +106,8 @@ private:
 };
 
 class MEDMEM_EXPORT MED_MED_RDWR_DRIVER21 : public MED_MED_RDONLY_DRIVER21,
-			      public MED_MED_WRONLY_DRIVER21,
-			      public IMED_MED_RDWR_DRIVER
+                              public MED_MED_WRONLY_DRIVER21,
+                              public IMED_MED_RDWR_DRIVER
 {
 public :
   MED_MED_RDWR_DRIVER21();

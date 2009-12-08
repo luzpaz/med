@@ -64,12 +64,14 @@ struct _intermediateMED;
 
 // IMP 0020434: mapping GIBI names to MED names
 struct nameGIBItoMED {
-  // GIBI value (in PILE_SOUS_MAILLAGE or in PILE_FIELD)
-  int key_pile;
-  int key_id;
-  // MED value (in PILE_STRINGS)
-  int val_id; // used only on reading
-  string value; // used only on writing
+  // GIBI value
+  int gibi_pile;    // PILE_SOUS_MAILLAGE or PILE_FIELD/PILE_NODES_FIELD, or PILE_STRINGS(for components)
+  int gibi_id;
+  string gibi_name; // used only for components
+  // MED value
+  // med_pile = 27; // PILE_STRINGS
+  int med_id;       // used only on reading
+  string med_name;  // used only on writing
 };
 
 class MEDMEM_EXPORT GIBI_MESH_DRIVER : public GENDRIVER
@@ -278,13 +280,15 @@ public :
   /*!
     Write MESH and _supports.
   */
-  void writeSupportsAndMesh(list<nameGIBItoMED>& listGIBItoMED);
+  void writeSupportsAndMesh(list<nameGIBItoMED>& listGIBItoMED_mail);
   /*!
    * Store MED names of supports and fields.
    * All MED names are written in STRINGS PILE, and the correspondence
    * between GIBI and MED names is written as TABLE "noms_med"
   */
-  void writeMEDNames(const list<nameGIBItoMED>& listGIBItoMED);
+  void writeMEDNames(const list<nameGIBItoMED>& listGIBItoMED_mail,
+                     const list<nameGIBItoMED>& listGIBItoMED_cham,
+                     const list<nameGIBItoMED>& listGIBItoMED_comp);
   /*!
     Write the record closing file
   */

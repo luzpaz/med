@@ -422,8 +422,8 @@ void MEDMEMTest::testDriverFactory()
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
 //#ifdef ENABLE_FORCED_FAILURES
   // (BUG) Wrong access mode (WRONLY) passed to parent class!
-	// confusion between MED_DRWR (defined as WRONLY in MEDMEM_define.hxx)
-	// and RDWR causes confusion in MEDMEM_MedFieldDriver22.hxx
+        // confusion between MED_DRWR (defined as WRONLY in MEDMEM_define.hxx)
+        // and RDWR causes confusion in MEDMEM_MedFieldDriver22.hxx
   CPPUNIT_ASSERT_EQUAL(MED_EN::RDWR,aDriver->getAccessMode());
 //#endif
 

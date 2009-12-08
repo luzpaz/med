@@ -48,7 +48,7 @@ GROUP & GROUP::operator=(const GROUP &group)
   if ( &group == this ) return *this;
   SUPPORT::operator=(group);
   _numberOfFamilies = group._numberOfFamilies ;
-  _family      	    = group._family ;
+  _family           = group._family ;
   return *this;
 }
 
@@ -135,7 +135,7 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
 
 //   _number = new MEDSKYLINEARRAY(*famNumber) ;
   _number = new MEDSKYLINEARRAY(famNumberCount,famNumberLength,
-				famNumberIndex,famNumberValue) ;
+                                famNumberIndex,famNumberValue) ;
 
   SCRUTE_MED(_number);
 

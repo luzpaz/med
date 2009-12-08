@@ -230,7 +230,7 @@ public:
                                         throw (MEDEXCEPTION);
 
   inline void setNumberOfNodes(int NumberOfNodes);
-        inline int getNumberOfNodes();
+  inline int getNumberOfNodes();
   inline int getEntityDimension() const;
 
   inline void setEntityDimension(int EntityDimension);

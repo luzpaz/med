@@ -32,7 +32,7 @@ using namespace MEDMEM;
 
 MED_MED_DRIVER::MED_MED_DRIVER(): GENDRIVER(MED_DRIVER), 
                                   _ptrMed(0),
-				  _concreteMedDrv(0)
+                                  _concreteMedDrv(0)
 {}
 
 MED_MED_DRIVER::MED_MED_DRIVER(const string & fileName,  MED * const ptrMed):
@@ -44,8 +44,8 @@ MED_MED_DRIVER::MED_MED_DRIVER(const string & fileName,  MED * const ptrMed):
 }
 
 MED_MED_DRIVER::MED_MED_DRIVER(const string & fileName,
-			       MED * const ptrMed,
-			       MED_EN::med_mode_acces accessMode):
+                               MED * const ptrMed,
+                               MED_EN::med_mode_acces accessMode):
   GENDRIVER(fileName, accessMode, MED_DRIVER),
   _ptrMed(ptrMed),
   _concreteMedDrv(0)

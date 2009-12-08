@@ -87,112 +87,112 @@ driverTypes DRIVERFACTORY::deduceDriverTypeFromFileName(const std::string & file
 }
 
 GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType,
-					     const std::string & fileName,
-					     MESH *mesh,
-					     const string & driverName,
-					     med_mode_acces access)
+                                             const std::string & fileName,
+                                             MESH *mesh,
+                                             const string & driverName,
+                                             med_mode_acces access)
 {
   GENDRIVER *ret;
   switch(driverType)
     {
     case MED_DRIVER : {
       switch(access)
-	{
-	case RDONLY : {
-	  ret = new MED_MESH_RDONLY_DRIVER(fileName, mesh);
-	  ret->setMeshName(driverName);
-	  return ret;
-	}
-	case WRONLY : {
-	  ret = new MED_MESH_WRONLY_DRIVER(fileName, mesh, access);
-	  ret->setMeshName(driverName);
-	  return ret;
-	}
-	case RDWR : {
-	  ret = new MED_MESH_RDWR_DRIVER(fileName, mesh);
-	  ret->setMeshName(driverName);
-	  return ret;
-	}
-	default:
-	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
-	}
+        {
+        case RDONLY : {
+          ret = new MED_MESH_RDONLY_DRIVER(fileName, mesh);
+          ret->setMeshName(driverName);
+          return ret;
+        }
+        case WRONLY : {
+          ret = new MED_MESH_WRONLY_DRIVER(fileName, mesh, access);
+          ret->setMeshName(driverName);
+          return ret;
+        }
+        case RDWR : {
+          ret = new MED_MESH_RDWR_DRIVER(fileName, mesh);
+          ret->setMeshName(driverName);
+          return ret;
+        }
+        default:
+          throw MED_EXCEPTION ("access type has not been properly specified to the method");
+        }
       break;
     }
 
     case GIBI_DRIVER : {
       switch(access)
-	{
-	case RDONLY : {
-	  ret=new GIBI_MESH_RDONLY_DRIVER(fileName,mesh);
-	  return ret;
-	}
-	case RDWR :
-	  ret=new GIBI_MESH_RDWR_DRIVER(fileName,mesh);
-	  return ret;
+        {
+        case RDONLY : {
+          ret=new GIBI_MESH_RDONLY_DRIVER(fileName,mesh);
+          return ret;
+        }
+        case RDWR :
+          ret=new GIBI_MESH_RDWR_DRIVER(fileName,mesh);
+          return ret;
           
-	case WRONLY :{
-	  ret=new GIBI_MESH_WRONLY_DRIVER(fileName,mesh);
-	  return ret;
-	}
- 	default:
-	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
-	}
+        case WRONLY :{
+          ret=new GIBI_MESH_WRONLY_DRIVER(fileName,mesh);
+          return ret;
+        }
+        default:
+          throw MED_EXCEPTION ("access type has not been properly specified to the method");
+        }
       break;
     }
 
     case PORFLOW_DRIVER : {
       switch(access)
-	{
-	case RDONLY : {
-	  ret=new PORFLOW_MESH_RDONLY_DRIVER(fileName,mesh);
-	  return ret;
-	}
-	case RDWR :
-	case WRONLY : {
-	  throw MED_EXCEPTION ("access mode other than MED_LECT has been specified with the PORFLOW_DRIVER type which is not allowed because PORFLOW_DRIVER is only a read access driver");
-	}
-	default:
-	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
-	}
+        {
+        case RDONLY : {
+          ret=new PORFLOW_MESH_RDONLY_DRIVER(fileName,mesh);
+          return ret;
+        }
+        case RDWR :
+        case WRONLY : {
+          throw MED_EXCEPTION ("access mode other than MED_LECT has been specified with the PORFLOW_DRIVER type which is not allowed because PORFLOW_DRIVER is only a read access driver");
+        }
+        default:
+          throw MED_EXCEPTION ("access type has not been properly specified to the method");
+        }
       break;
     }
 
     case ENSIGHT_DRIVER : {
       switch(access)
-	{
-	case RDONLY : {
-	  ret=new ENSIGHT_MESH_RDONLY_DRIVER(fileName,mesh);
-	  return ret;
-	}
-	case WRONLY : {
-	  ret=new ENSIGHT_MESH_WRONLY_DRIVER(fileName,mesh);
-	  return ret;
-	}
-	case RDWR : {
-	  throw MED_EXCEPTION ("not yet implemented");
-	  return ret;
-	}
-	default:
-	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
-	}
+        {
+        case RDONLY : {
+          ret=new ENSIGHT_MESH_RDONLY_DRIVER(fileName,mesh);
+          return ret;
+        }
+        case WRONLY : {
+          ret=new ENSIGHT_MESH_WRONLY_DRIVER(fileName,mesh);
+          return ret;
+        }
+        case RDWR : {
+          throw MED_EXCEPTION ("not yet implemented");
+          return ret;
+        }
+        default:
+          throw MED_EXCEPTION ("access type has not been properly specified to the method");
+        }
       break;
     }
 
     case VTK_DRIVER : {
       switch(access)
-	{
-	case RDONLY : {
-	  throw MED_EXCEPTION ("access mode other than MED_ECRI or MED_REMPT has been specified with the VTK_DRIVER type which is not allowed because VTK_DRIVER is only a write access driver");
-	}
+        {
+        case RDONLY : {
+          throw MED_EXCEPTION ("access mode other than MED_ECRI or MED_REMPT has been specified with the VTK_DRIVER type which is not allowed because VTK_DRIVER is only a write access driver");
+        }
         case RDWR :
-	case WRONLY : {
-	  ret=new VTK_MESH_DRIVER(fileName,mesh);
-	  return ret;
-	}
+        case WRONLY : {
+          ret=new VTK_MESH_DRIVER(fileName,mesh);
+          return ret;
+        }
 
-	default:
-	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
-	}
+        default:
+          throw MED_EXCEPTION ("access type has not been properly specified to the method");
+        }
       break;
     }
 
@@ -205,8 +205,8 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMesh(driverTypes driverType,
 }
 
 GENDRIVER *DRIVERFACTORY::buildDriverForMed(driverTypes driverType,
-					    const std::string & fileName,
-					    MED *med, med_mode_acces access)
+                                            const std::string & fileName,
+                                            MED *med, med_mode_acces access)
 {
   GENDRIVER *ret;
 
@@ -214,63 +214,63 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMed(driverTypes driverType,
     {
     case MED_DRIVER : {
       switch(access)
-	{
-	case RDONLY : {
-	  ret=new MED_MED_RDONLY_DRIVER(fileName,med);
-	  break ;
-	}
-	case WRONLY : {
-	  ret=new MED_MED_WRONLY_DRIVER(fileName,med);
-	  break ;
-	}
-	case RDWR : {
-	  ret=new MED_MED_RDWR_DRIVER(fileName,med);
-	  break ;
-	}
-	default:
-	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
-	}
+        {
+        case RDONLY : {
+          ret=new MED_MED_RDONLY_DRIVER(fileName,med);
+          break ;
+        }
+        case WRONLY : {
+          ret=new MED_MED_WRONLY_DRIVER(fileName,med);
+          break ;
+        }
+        case RDWR : {
+          ret=new MED_MED_RDWR_DRIVER(fileName,med);
+          break ;
+        }
+        default:
+          throw MED_EXCEPTION ("access type has not been properly specified to the method");
+        }
       break;
     }
 
     case VTK_DRIVER : {
       switch(access)
-	{
-	case RDONLY : {
-	  throw MED_EXCEPTION ("access mode other than MED_ECRI or MED_REMPT has been specified with the VTK_DRIVER type which is not allowed because VTK_DRIVER is only a write access driver");
-	}
-	case WRONLY : {
-	  ret=new VTK_MED_DRIVER(fileName,med);
-	  break ;
-	}
-	case RDWR : {
-	  ret=new VTK_MED_DRIVER(fileName,med);
-	  break ;
-	}
-	default:
-	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
-	}
+        {
+        case RDONLY : {
+          throw MED_EXCEPTION ("access mode other than MED_ECRI or MED_REMPT has been specified with the VTK_DRIVER type which is not allowed because VTK_DRIVER is only a write access driver");
+        }
+        case WRONLY : {
+          ret=new VTK_MED_DRIVER(fileName,med);
+          break ;
+        }
+        case RDWR : {
+          ret=new VTK_MED_DRIVER(fileName,med);
+          break ;
+        }
+        default:
+          throw MED_EXCEPTION ("access type has not been properly specified to the method");
+        }
       break;
     }
 
     case ENSIGHT_DRIVER : {
       switch(access)
-	{
-	case RDONLY : {
-	  ret=new ENSIGHT_MED_RDONLY_DRIVER(fileName,med);
-	  break ;
-	}
-	case WRONLY : {
-	  ret=new ENSIGHT_MED_WRONLY_DRIVER(fileName,med);
-	  break ;
-	}
-	case RDWR : {
-	  throw MED_EXCEPTION ("not yet implemented");
-	  break ;
-	}
-	default:
-	  throw MED_EXCEPTION ("access type has not been properly specified to the method");
-	}
+        {
+        case RDONLY : {
+          ret=new ENSIGHT_MED_RDONLY_DRIVER(fileName,med);
+          break ;
+        }
+        case WRONLY : {
+          ret=new ENSIGHT_MED_WRONLY_DRIVER(fileName,med);
+          break ;
+        }
+        case RDWR : {
+          throw MED_EXCEPTION ("not yet implemented");
+          break ;
+        }
+        default:
+          throw MED_EXCEPTION ("access type has not been properly specified to the method");
+        }
       break;
     }
 
@@ -295,8 +295,8 @@ GENDRIVER *DRIVERFACTORY::buildDriverForMed(driverTypes driverType,
 }
 
 GENDRIVER * DRIVERFACTORY::buildMedDriverFromFile(const string & fileName,
-						  MED * const ptrMed,
-						  MED_EN::med_mode_acces access)
+                                                  MED * const ptrMed,
+                                                  MED_EN::med_mode_acces access)
 {
   medFileVersion version;
 
@@ -317,23 +317,23 @@ GENDRIVER * DRIVERFACTORY::buildMedDriverFromFile(const string & fileName,
     {
     case RDONLY : {
       if (version == V21)
-	driver = new MED_MED_RDONLY_DRIVER21(fileName,ptrMed);
+        driver = new MED_MED_RDONLY_DRIVER21(fileName,ptrMed);
       else if (version == V22)
-	driver = new MED_MED_RDONLY_DRIVER22(fileName,ptrMed);
+        driver = new MED_MED_RDONLY_DRIVER22(fileName,ptrMed);
       return driver;
     }
     case WRONLY : {
       if (version == V21)
-	driver = new MED_MED_WRONLY_DRIVER21(fileName,ptrMed);
+        driver = new MED_MED_WRONLY_DRIVER21(fileName,ptrMed);
       else if (version == V22)
-	driver = new MED_MED_WRONLY_DRIVER22(fileName,ptrMed);
+        driver = new MED_MED_WRONLY_DRIVER22(fileName,ptrMed);
       return driver;
     }
     case RDWR : {
       if (version == V21)
-	driver = new MED_MED_RDWR_DRIVER21(fileName,ptrMed);
+        driver = new MED_MED_RDWR_DRIVER21(fileName,ptrMed);
       else if (version == V22)
-	driver = new MED_MED_RDWR_DRIVER22(fileName,ptrMed);
+        driver = new MED_MED_RDWR_DRIVER22(fileName,ptrMed);
       return driver;
     }
     default:
@@ -342,8 +342,8 @@ GENDRIVER * DRIVERFACTORY::buildMedDriverFromFile(const string & fileName,
 }
 
 GENDRIVER * DRIVERFACTORY::buildMeshDriverFromFile(const string & fileName,
-						   MESH * ptrMesh,
-						   MED_EN::med_mode_acces access)
+                                                   MESH * ptrMesh,
+                                                   MED_EN::med_mode_acces access)
 {
   medFileVersion version;
 
@@ -364,23 +364,23 @@ GENDRIVER * DRIVERFACTORY::buildMeshDriverFromFile(const string & fileName,
     {
     case RDONLY : {
       if (version == V21)
-	driver = new MED_MESH_RDONLY_DRIVER21(fileName,ptrMesh);
+        driver = new MED_MESH_RDONLY_DRIVER21(fileName,ptrMesh);
       else if (version == V22)
-	driver = new MED_MESH_RDONLY_DRIVER22(fileName,ptrMesh);
+        driver = new MED_MESH_RDONLY_DRIVER22(fileName,ptrMesh);
       return driver;
     }
     case WRONLY : {
       if (version == V21)
-	driver = new MED_MESH_WRONLY_DRIVER21(fileName,ptrMesh);
+        driver = new MED_MESH_WRONLY_DRIVER21(fileName,ptrMesh);
       else if (version == V22)
-				driver = new MED_MESH_WRONLY_DRIVER22(fileName,ptrMesh,access);
+                                driver = new MED_MESH_WRONLY_DRIVER22(fileName,ptrMesh,access);
       return driver;
     }
     case RDWR : {
       if (version == V21)
-	driver = new MED_MESH_RDWR_DRIVER21(fileName,ptrMesh);
+        driver = new MED_MESH_RDWR_DRIVER21(fileName,ptrMesh);
       else if (version == V22)
-	driver = new MED_MESH_RDWR_DRIVER22(fileName,ptrMesh);
+        driver = new MED_MESH_RDWR_DRIVER22(fileName,ptrMesh);
       return driver;
     }
     default:
@@ -389,9 +389,9 @@ GENDRIVER * DRIVERFACTORY::buildMeshDriverFromFile(const string & fileName,
 }
 
 GENDRIVER * DRIVERFACTORY::buildConcreteMedDriverForMesh(const std::string & fileName,
-							 MESH *ptrMesh,const string &  driverName,
-							 MED_EN::med_mode_acces access,
-							 MED_EN::medFileVersion version)
+                                                         MESH *ptrMesh,const string &  driverName,
+                                                         MED_EN::med_mode_acces access,
+                                                         MED_EN::medFileVersion version)
 {
   GENDRIVER * driver;
 
@@ -401,25 +401,25 @@ GENDRIVER * DRIVERFACTORY::buildConcreteMedDriverForMesh(const std::string & fil
     {
     case RDONLY : {
       if (version == V21)
-	driver = new MED_MESH_RDONLY_DRIVER21(fileName,ptrMesh);
+        driver = new MED_MESH_RDONLY_DRIVER21(fileName,ptrMesh);
       else if (version == V22)
-	driver = new MED_MESH_RDONLY_DRIVER22(fileName,ptrMesh);
+        driver = new MED_MESH_RDONLY_DRIVER22(fileName,ptrMesh);
       driver->setMeshName(driverName);
       return driver;
     }
     case WRONLY : {
       if (version == V21)
-	driver = new MED_MESH_WRONLY_DRIVER21(fileName,ptrMesh);
+        driver = new MED_MESH_WRONLY_DRIVER21(fileName,ptrMesh);
       else if (version == V22)
-	driver = new MED_MESH_WRONLY_DRIVER22(fileName,ptrMesh);
+        driver = new MED_MESH_WRONLY_DRIVER22(fileName,ptrMesh);
       driver->setMeshName(driverName);
       return driver;
     }
     case RDWR : {
       if (version == V21)
-	driver = new MED_MESH_RDWR_DRIVER21(fileName,ptrMesh);
+        driver = new MED_MESH_RDWR_DRIVER21(fileName,ptrMesh);
       else if (version == V22)
-	driver = new MED_MESH_RDWR_DRIVER22(fileName,ptrMesh);
+        driver = new MED_MESH_RDWR_DRIVER22(fileName,ptrMesh);
       driver->setMeshName(driverName);
       return driver;
     }

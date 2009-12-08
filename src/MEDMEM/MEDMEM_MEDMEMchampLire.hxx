@@ -40,9 +40,9 @@ namespace med_2_3 {
 
 MEDMEM_EXPORT med_err
 MEDMEMchampLire(med_idt fid,char *maa, char *cha, unsigned char *val,med_mode_switch interlace,med_int numco,
-	     char * locname, char *profil, med_mode_profil pflmod, 
-	     med_entite_maillage type_ent, med_geometrie_element type_geo,
-	     med_int numdt, med_int numo);
+             char * locname, char *profil, med_mode_profil pflmod, 
+             med_entite_maillage type_ent, med_geometrie_element type_geo,
+             med_int numdt, med_int numo);
 
 
   }

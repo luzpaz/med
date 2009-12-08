@@ -27,14 +27,14 @@ using namespace std;
 using namespace MEDMEM;
 
 MEDSKYLINEARRAY::MEDSKYLINEARRAY(): _count(0), _length(0),
-				_index((int*)NULL),_value((int*)NULL)
+                                _index((int*)NULL),_value((int*)NULL)
 {
   MESSAGE_MED("Constructeur MEDSKYLINEARRAY sans parametre");
 }
 
 MEDSKYLINEARRAY::MEDSKYLINEARRAY(const MEDSKYLINEARRAY &myArray):
-			        _count(myArray._count),_length(myArray._length),
-				_index(_count+1),_value(_length)
+                                _count(myArray._count),_length(myArray._length),
+                                _index(_count+1),_value(_length)
 {
   const char* LOC = "MEDSKYLINEARRAY(const MEDSKYLINEARRAY &)";
   BEGIN_OF_MED(LOC);
@@ -55,24 +55,24 @@ MEDSKYLINEARRAY::MEDSKYLINEARRAY(const int count, const int length):
                                 _count(count), _length(length),
                                 _index(_count+1),_value(_length)
 {
-	MESSAGE_MED("Constructeur MEDSKYLINEARRAY(count="<<count<<", length="<<length<<") avec parametres");
+        MESSAGE_MED("Constructeur MEDSKYLINEARRAY(count="<<count<<", length="<<length<<") avec parametres");
 }
 
 MEDSKYLINEARRAY::MEDSKYLINEARRAY(const int count, const int length,
-				 const int* index, const int* value,bool shallowCopy):
+                                 const int* index, const int* value,bool shallowCopy):
                                 _count(count), _length(length)
 {
-// 	MESSAGE_MED("Constructeur MEDSKYLINEARRAY(count="<<count<<", length="<<length<<") avec parametres");
-		if(shallowCopy)
-	  {
-	    _index.setShallowAndOwnership(index);
-	    _value.setShallowAndOwnership(value);
-	  }
-	else
-	  {
-	    _index.set(_count+1,index);
-	    _value.set(_length,value);
-	  }
+//      MESSAGE_MED("Constructeur MEDSKYLINEARRAY(count="<<count<<", length="<<length<<") avec parametres");
+                if(shallowCopy)
+          {
+            _index.setShallowAndOwnership(index);
+            _value.setShallowAndOwnership(value);
+          }
+        else
+          {
+            _index.set(_count+1,index);
+            _value.set(_length,value);
+          }
 }
 
 //creates the reverse array
@@ -92,32 +92,32 @@ MEDSKYLINEARRAY::MEDSKYLINEARRAY(const int count, const int length,
 
 MEDSKYLINEARRAY* MEDSKYLINEARRAY::makeReverseArray()
 {
-	multimap<int,int > reverse;
-	int size=0;
+        multimap<int,int > reverse;
+        int size=0;
   for (int i=0; i<_count;i++)
-		for (int j=_index[i];j<_index[i+1];j++)
-			{
-				int value=_value[j-1];
-				reverse.insert(make_pair(value,i+1));
-				if (value>size) size=value;
-			}
-	int* r_index=new int [size+1];
-	int* r_value=new int [_length];
-	r_index[0]=1;
-	pair<multimap<int,int>::iterator,multimap<int,int>::iterator>piter;
-	int* ptr_value=r_value;
-	for (int i=0; i<size;i++)
-		{
-			piter=reverse.equal_range(i);
-			int index_incr=0;
-			for (multimap<int,int>::iterator iter=piter.first; iter!=piter.second; iter++)
-				{
-					*ptr_value++=iter->second;
-					index_incr++;
-				}
-			r_index[i+1]=r_index[i]+index_incr;
-		}
-	return new MEDSKYLINEARRAY(size,_length,r_index,r_value,true);
+                for (int j=_index[i];j<_index[i+1];j++)
+                        {
+                                int value=_value[j-1];
+                                reverse.insert(make_pair(value,i+1));
+                                if (value>size) size=value;
+                        }
+        int* r_index=new int [size+1];
+        int* r_value=new int [_length];
+        r_index[0]=1;
+        pair<multimap<int,int>::iterator,multimap<int,int>::iterator>piter;
+        int* ptr_value=r_value;
+        for (int i=0; i<size;i++)
+                {
+                        piter=reverse.equal_range(i);
+                        int index_incr=0;
+                        for (multimap<int,int>::iterator iter=piter.first; iter!=piter.second; iter++)
+                                {
+                                        *ptr_value++=iter->second;
+                                        index_incr++;
+                                }
+                        r_index[i+1]=r_index[i]+index_incr;
+                }
+        return new MEDSKYLINEARRAY(size,_length,r_index,r_value,true);
 }
 ostream& MEDMEM::operator<<(ostream &os, const MEDSKYLINEARRAY &sky) {
   os << "_count : " << sky._count << " ,_length : " << sky._length;
@@ -138,6 +138,6 @@ ostream& MEDMEM::operator<<(ostream &os, const MEDSKYLINEARRAY &sky) {
 //    //if (_index != NULL) delete [] _index;
 //    //if (_value != NULL) delete [] _value;
 
-//  	  _index.set(index);
-//  	  _value.set(value);
+//        _index.set(index);
+//        _value.set(value);
 //  }

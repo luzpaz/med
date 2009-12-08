@@ -28,27 +28,27 @@
 namespace med_2_3 {
   extern "C" {
 
-# define ICI                    {					\
-      fflush(stdout);							\
-      fprintf(stderr, "%s [%d] : " , __FILE__ , __LINE__ ) ;		\
-      fflush(stderr) ;							\
+# define ICI                    {                                       \
+      fflush(stdout);                                                   \
+      fprintf(stderr, "%s [%d] : " , __FILE__ , __LINE__ ) ;            \
+      fflush(stderr) ;                                                  \
     }
 
-# define ISCRUTE_MED(entier)        {					\
-      ICI ;								\
-      fprintf(stderr,"%s = %d\n",#entier,entier) ;			\
-      fflush(stderr) ;							\
+# define ISCRUTE_MED(entier)        {                                   \
+      ICI ;                                                             \
+      fprintf(stderr,"%s = %d\n",#entier,entier) ;                      \
+      fflush(stderr) ;                                                  \
     }
 
-# define SSCRUTE_MED(chaine)        {					\
-      ICI ;								\
-      fprintf(stderr,"%s = \"%s\"\n",#chaine,chaine) ;			\
-      fflush(stderr) ;							\
+# define SSCRUTE_MED(chaine)        {                                   \
+      ICI ;                                                             \
+      fprintf(stderr,"%s = \"%s\"\n",#chaine,chaine) ;                  \
+      fflush(stderr) ;                                                  \
     }
-# define MESSAGE_MED(chaine)        {					\
-      ICI ;								\
-      fprintf(stderr,"%s\n",chaine) ;					\
-      fflush(stderr) ;							\
+# define MESSAGE_MED(chaine)        {                                   \
+      ICI ;                                                             \
+      fprintf(stderr,"%s\n",chaine) ;                                   \
+      fflush(stderr) ;                                                  \
     }
 
     extern void _MEDmodeErreurVerrouiller(void);
@@ -82,9 +82,9 @@ namespace med_2_3 {
 
     med_err
     MEDMEMchampLire(med_idt fid,char *maa, char *cha, unsigned char *val,med_mode_switch interlace,med_int numco,
-		 char * locname, char *profil, med_mode_profil pflmod,
-		 med_entite_maillage type_ent, med_geometrie_element type_geo,
-		 med_int numdt, med_int numo)
+                 char * locname, char *profil, med_mode_profil pflmod,
+                 med_entite_maillage type_ent, med_geometrie_element type_geo,
+                 med_int numdt, med_int numo)
 
     {
       med_err ret=-1;
@@ -108,28 +108,28 @@ namespace med_2_3 {
       strcpy(chemin,MED_CHA);
       strcat(chemin,cha);
       if ((gid = _MEDdatagroupOuvrir(fid,chemin)) < 0)
-	goto ERROR;
+        goto ERROR;
 
       /* Lecture du nbre de composantes du champ */
 
       if (_MEDattrEntierLire(gid,MED_NOM_NCO,&ncomp) < 0)
-	goto ERROR;
+        goto ERROR;
 
       /*
        * Si le Data Group  de niveau 1 <type_ent>[.<type_geo>] n'existe pas => erreur
        */
       if (_MEDnomEntite(nomdatagroup1,type_ent) < 0)
-	goto ERROR;
+        goto ERROR;
       if ((type_ent != MED_NOEUD))
-	{
-	  if (_MEDnomGeometrie(tmp1,type_geo) < 0)
-	    goto ERROR;
-	  strcat(nomdatagroup1,".");
-	  strcat(nomdatagroup1,tmp1);
-	}
+        {
+          if (_MEDnomGeometrie(tmp1,type_geo) < 0)
+            goto ERROR;
+          strcat(nomdatagroup1,".");
+          strcat(nomdatagroup1,tmp1);
+        }
       datagroup1 = 0;
       if ( (datagroup1 = _MEDdatagroupOuvrir(gid,nomdatagroup1)) < 0 )
-	goto ERROR;
+        goto ERROR;
 
       /*
        * Si le Data Group de niveau 2 <numdt>.<numoo> n'existe pas => erreur
@@ -138,19 +138,19 @@ namespace med_2_3 {
 
       datagroup2 = 0;
       if ( (datagroup2 = _MEDdatagroupOuvrir(datagroup1,nomdatagroup2)) < 0)
-	goto ERROR;
+        goto ERROR;
 
       /*
        * Ouvre le datagroup de niveau 3 <maa>
        */
 
       if ( ! strcmp(maa,MED_NOREF) )
-	if (_MEDattrStringLire(datagroup2,MED_NOM_MAI,MED_TAILLE_NOM,maa) < 0)
-	  goto ERROR;
+        if (_MEDattrStringLire(datagroup2,MED_NOM_MAI,MED_TAILLE_NOM,maa) < 0)
+          goto ERROR;
 
       datagroup3 = 0;
       if ( (datagroup3 = _MEDdatagroupOuvrir(datagroup2,maa)) < 0 )
-	goto ERROR;
+        goto ERROR;
 
       /* Gestion des profils*/
 
@@ -159,40 +159,40 @@ namespace med_2_3 {
        */
 
       if (_MEDattrStringLire(datagroup3,MED_NOM_PFL,MED_TAILLE_NOM,pfltmp) < 0)
-	goto ERROR;
+        goto ERROR;
 
       if ( pfluse = (strcmp(pfltmp,MED_NOPFLi) && strcmp(pfltmp,"")) ) /* le test MED_NOPFLi pour des raisons de compatibilité */
-	{
-	  strcpy(profil,pfltmp);
-	  if ( (i = MEDnValProfil(fid,profil)) < 0 )
-	    goto ERROR;
-	  else
-	    psize = i;
+        {
+          strcpy(profil,pfltmp);
+          if ( (i = MEDnValProfil(fid,profil)) < 0 )
+            goto ERROR;
+          else
+            psize = i;
 
-	  pfltabtmp = (med_int *)   malloc (sizeof(med_int)*psize);
-	  pfltab = (med_ssize *) malloc (sizeof(med_ssize)*psize);
-	  if (MEDprofilLire(fid,pfltabtmp,profil) < 0)
-	    goto ERROR;
-	  for (i=0;i<psize;i++)
-	    pfltab[i] = (med_ssize) pfltabtmp[i];
+          pfltabtmp = (med_int *)   malloc (sizeof(med_int)*psize);
+          pfltab = (med_ssize *) malloc (sizeof(med_ssize)*psize);
+          if (MEDprofilLire(fid,pfltabtmp,profil) < 0)
+            goto ERROR;
+          for (i=0;i<psize;i++)
+            pfltab[i] = (med_ssize) pfltabtmp[i];
 
-	}
+        }
       else {
-	psize = MED_NOPF;
-	strcpy(profil,MED_NOPFL);
+        psize = MED_NOPF;
+        strcpy(profil,MED_NOPFL);
       }
 
 
       /* Lire le nbre des points de GAUSS*/
       if (_MEDattrEntierLire(datagroup3,MED_NOM_NGA,&ngauss) < 0) {
-	MESSAGE_MED("Erreur à la lecture de l'attribut MED_NOM_NGA : ");
-	ISCRUTE_MED(ngauss);goto ERROR;
+        MESSAGE_MED("Erreur à la lecture de l'attribut MED_NOM_NGA : ");
+        ISCRUTE_MED(ngauss);goto ERROR;
       };
 
       /* Lire l'identificateur de localisation des points de GAUSS*/
       if ( _MEDattrStringLire(datagroup3,MED_NOM_GAU,MED_TAILLE_NOM,locname) < 0) {
-	MESSAGE_MED("Erreur à la lecture de l'attribut MED_NOM_GAU : ");
-	SSCRUTE_MED(locname); goto ERROR;
+        MESSAGE_MED("Erreur à la lecture de l'attribut MED_NOM_GAU : ");
+        SSCRUTE_MED(locname); goto ERROR;
       }
 
       /*
@@ -200,45 +200,45 @@ namespace med_2_3 {
        */
 
       if (_MEDattrEntierLire(gid,MED_NOM_TYP,&chtype) < 0)
-	goto ERROR;
+        goto ERROR;
 
       switch(chtype)
-	{
-	case MED_FLOAT64 :
-	  if ( _MEDdatasetNumLire(datagroup3,MED_NOM_CO,MED_FLOAT64,
-				  interlace,ncomp,numco,
-				  psize,pflmod,pfltab,ngauss,val)< 0)
-	    goto ERROR;
-	  break;
+        {
+        case MED_FLOAT64 :
+          if ( _MEDdatasetNumLire(datagroup3,MED_NOM_CO,MED_FLOAT64,
+                                  interlace,ncomp,numco,
+                                  psize,pflmod,pfltab,ngauss,val)< 0)
+            goto ERROR;
+          break;
 
-	case MED_INT32 :
+        case MED_INT32 :
 #if defined(F77INT64)
-	  if ( _MEDdatasetNumLire(datagroup3,MED_NOM_CO,MED_INT64,
-				  interlace,ncomp,numco,
-				  psize,pflmod,pfltab,ngauss,val)< 0)
-	    goto ERROR;
+          if ( _MEDdatasetNumLire(datagroup3,MED_NOM_CO,MED_INT64,
+                                  interlace,ncomp,numco,
+                                  psize,pflmod,pfltab,ngauss,val)< 0)
+            goto ERROR;
 #else
-	  if ( _MEDdatasetNumLire(datagroup3,MED_NOM_CO,MED_INT32,
-				  interlace,ncomp,numco,
-				  psize,pflmod,pfltab,ngauss,val)< 0)
-	    goto ERROR;
+          if ( _MEDdatasetNumLire(datagroup3,MED_NOM_CO,MED_INT32,
+                                  interlace,ncomp,numco,
+                                  psize,pflmod,pfltab,ngauss,val)< 0)
+            goto ERROR;
 #endif
-	  break;
+          break;
 
-	case MED_INT64 :
+        case MED_INT64 :
 #if defined(F77INT64)
-	  if ( _MEDdatasetNumLire(datagroup3,MED_NOM_CO,MED_INT64,
-				  interlace,ncomp,numco,
-				  psize,pflmod,pfltab,ngauss,val)< 0)
-	    goto ERROR;
+          if ( _MEDdatasetNumLire(datagroup3,MED_NOM_CO,MED_INT64,
+                                  interlace,ncomp,numco,
+                                  psize,pflmod,pfltab,ngauss,val)< 0)
+            goto ERROR;
 #else
-	  goto ERROR;
+          goto ERROR;
 #endif
-	  break;
+          break;
 
-	default :
-	  goto ERROR;
-	}
+        default :
+          goto ERROR;
+        }
 
       /*
        * On ferme tout
@@ -251,23 +251,23 @@ namespace med_2_3 {
       if ( pfluse ) { free(pfltab); free(pfltabtmp);}
 
       if (datagroup3>0)     if (_MEDdatagroupFermer(datagroup3) < 0) {
-	MESSAGE_MED("Impossible de fermer le datagroup : ");
-	ISCRUTE_MED(datagroup3); ret = -1;
+        MESSAGE_MED("Impossible de fermer le datagroup : ");
+        ISCRUTE_MED(datagroup3); ret = -1;
       }
 
       if (datagroup2>0)     if (_MEDdatagroupFermer(datagroup2) < 0) {
-	MESSAGE_MED("Impossible de fermer le datagroup : ");
-	ISCRUTE_MED(datagroup2); ret = -1;
+        MESSAGE_MED("Impossible de fermer le datagroup : ");
+        ISCRUTE_MED(datagroup2); ret = -1;
       }
 
       if (datagroup1>0)     if (_MEDdatagroupFermer(datagroup1) < 0) {
-	MESSAGE_MED("Impossible de fermer le datagroup : ");
-	ISCRUTE_MED(datagroup1); ret = -1;
+        MESSAGE_MED("Impossible de fermer le datagroup : ");
+        ISCRUTE_MED(datagroup1); ret = -1;
       }
 
       if (gid>0)     if (_MEDdatagroupFermer(gid) < 0) {
-	MESSAGE_MED("Impossible de fermer le datagroup : ");
-	ISCRUTE_MED(gid); ret = -1;
+        MESSAGE_MED("Impossible de fermer le datagroup : ");
+        ISCRUTE_MED(gid); ret = -1;
       }
 
       return ret;

@@ -108,8 +108,8 @@ public:
   void addMesh  ( MESH    * const ptrMesh   ) throw (MED_EXCEPTION) ;
   void updateNamesInMaps();
   int  addDriver     (driverTypes driverType,
-		      const string & fileName,
-		      MED_EN::med_mode_acces access=MED_EN::RDWR);
+                      const string & fileName,
+                      MED_EN::med_mode_acces access=MED_EN::RDWR);
   int  addDriver     (GENDRIVER & driver);
   void rmDriver      (int index=0) throw (MEDEXCEPTION) ;
 
@@ -137,7 +137,7 @@ public:
                                  const int dt,  const int it) const throw (MEDEXCEPTION) ;
 
   FIELD_   * getField2          ( const string & fieldName,
-				 double time, int it=0) const throw (MEDEXCEPTION) ;
+                                 double time, int it=0) const throw (MEDEXCEPTION) ;
 
   const map<MED_EN::medEntityMesh,SUPPORT *> & getSupports(const string & meshName) const throw (MEDEXCEPTION) ;
 

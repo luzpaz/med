@@ -624,11 +624,11 @@ void testDrivers()
   FIELD<int> *aFieldSupport;
   //#ifdef ENABLE_FORCED_FAILURES  
   CPPUNIT_ASSERT_THROW(aFieldSupport = 
-			  new FIELD<int>(aSupport, MED_DRIVER,filename_rd,
+                          new FIELD<int>(aSupport, MED_DRIVER,filename_rd,
                                          fieldname_nodeint_rd), MEDMEM::MEDEXCEPTION);
   aSupport = new SUPPORT(aMesh, "aSupport",MED_NODE);
   CPPUNIT_ASSERT_NO_THROW(aFieldSupport = 
-			  new FIELD<int>(aSupport, MED_DRIVER, filename_rd,
+                          new FIELD<int>(aSupport, MED_DRIVER, filename_rd,
                                          fieldname_nodeint_rd));
   //(BUG) Can not open file
   MED_FIELD_WRONLY_DRIVER21<int> * aFieldWrDriver21 = 
@@ -1776,4 +1776,69 @@ void MEDMEMTest::testFieldConvert()
   // STD::vector
   //CPPUNIT_FAIL("FieldConvert() fails if _componentsUnits is not set, because it calls FIELD_::operator=");
   //#endif
+}
+
+//================================================================================
+/*!
+ * \brief 0020582: [CEA 368] MEDMEM don't work with a same field on NODES and CELLS
+ * Before fixing the issue there was the error:
+ *   RuntimeError: MED Exception in .../MED_SRC/src/MEDMEM/MEDMEM_MedFieldDriver22.hxx [503] : MED_FIELD_DRIVER<T>::createFieldSupportPart1(...) Field |field on NODEs and CELLs| with (ndt,or) = (-1,-1) must not be defined on different entity types
+ */
+//================================================================================
+
+void MEDMEMTest::testReadFieldOnNodesAndCells()
+{
+  const string outfile = makeTmpFile("field_on_nodes_and_cells.med");
+  const string fieldName = "field on NODEs and CELLs";
+
+  MEDMEMTest_TmpFilesRemover aTmpFilesRemover;
+  aTmpFilesRemover.Register( outfile );
+
+  // write file with a field on NODEs and CELLs
+
+  using namespace MED_EN;
+
+  auto_ptr<MEDMEM::MESH> mesh( MEDMEMTest_createTestMesh());
+  int drv = mesh->addDriver( MED_DRIVER, outfile, mesh->getName());
+  mesh->write(drv);
+
+  SUPPORT supportOnCells(mesh.get(),"On_All_Cells",MED_CELL);
+  SUPPORT supportOnNodes(mesh.get(),"On_All_Nodes",MED_NODE);
+  int numberOfCells = supportOnCells.getNumberOfElements(MED_ALL_ELEMENTS);
+  int numberOfNodes = supportOnNodes.getNumberOfElements(MED_ALL_ELEMENTS);
+
+  PointerOf<double> cellValues( numberOfCells ), nodeValues( numberOfNodes );
+  for ( int i = 0; i < numberOfCells; ++i ) cellValues[i] = i;
+  for ( int i = 0; i < numberOfNodes; ++i ) nodeValues[i] = -i;
+
+  FIELD<double> wrFieldOnCells(&supportOnCells,1);
+  wrFieldOnCells.setName(fieldName);
+  wrFieldOnCells.setComponentName(1,"Vx");
+  wrFieldOnCells.setComponentDescription(1,"comp1");
+  wrFieldOnCells.setMEDComponentUnit(1,"unit1");
+  wrFieldOnCells.setValue( cellValues );
+  drv = wrFieldOnCells.addDriver(MED_DRIVER, outfile, fieldName);
+  wrFieldOnCells.write( drv );
+
+  FIELD<double> wrFieldOnNodes(&supportOnNodes,1);
+  wrFieldOnNodes.setName(fieldName);
+  wrFieldOnNodes.setComponentName(1,"Vx");
+  wrFieldOnNodes.setComponentDescription(1,"comp1");
+  wrFieldOnNodes.setMEDComponentUnit(1,"unit1");
+  wrFieldOnNodes.setValue( nodeValues );
+  drv = wrFieldOnNodes.addDriver(MED_DRIVER, outfile, fieldName);
+  wrFieldOnNodes.write( drv );
+
+
+  //  READ FIELDS BACK
+
+  //  field on CELLs
+  FIELD<double> cellField(&supportOnCells, MED_DRIVER, outfile, fieldName, -1, -1 );
+  CPPUNIT_ASSERT_EQUAL( MED_CELL, cellField.getSupport()->getEntity());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL( numberOfCells-1, cellField.getValueIJ( numberOfCells, 1 ),1e-20);
+
+  //  field on NODEs
+  FIELD<double> nodeField(&supportOnNodes, MED_DRIVER, outfile, fieldName, -1, -1 );
+  CPPUNIT_ASSERT_EQUAL( MED_NODE, nodeField.getSupport()->getEntity());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL( -(numberOfNodes-1), nodeField.getValueIJ( numberOfNodes, 1 ),1e-20);
 }

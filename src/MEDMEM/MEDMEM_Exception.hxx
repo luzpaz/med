@@ -59,7 +59,7 @@ protected :
 
 public :
   MEDEXCEPTION(const char *text, const char *fileName=0, 
-	       const unsigned int lineNumber=0 );
+               const unsigned int lineNumber=0 );
   MEDEXCEPTION(const MEDEXCEPTION &ex );
   ~MEDEXCEPTION() throw ();
   friend ostream & operator<< (ostream &os, const MEDEXCEPTION &ex );
@@ -83,4 +83,4 @@ public :
 };
 }
 
-#endif	/* MEDEXCEPTION_HXX */
+#endif  /* MEDEXCEPTION_HXX */

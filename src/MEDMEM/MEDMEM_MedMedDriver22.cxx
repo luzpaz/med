@@ -681,9 +681,31 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
                           DT_IT_ dtIt;
                           dtIt.dt  = timeStepNumber;
                           dtIt.it  = orderNumber;
-                
-                          (_fields  [fieldName])[dtIt] = ptrField;
-                          _meshName[ptrField ]       = meshName;
+
+                          //020582:[CEA 368] MEDMEM don't work with a same field on NODES and CELLS
+                          //(_fields  [fieldName])[dtIt] = ptrField;
+                          MAP_DT_IT_::iterator dtit_field =
+                            _fields  [fieldName].insert(make_pair(dtIt, ptrField)).first;
+                          if ( ptrField != dtit_field->second )
+                          {
+                            if ( ptrField->getSupport()->getEntity() !=
+                                 dtit_field->second->getSupport()->getEntity())
+                            {
+                              INFOS_MED("Can't store field |"<<fieldName<<"| with (timeStepNumber="<<
+                                        timeStepNumber<<",orderNumber="<<orderNumber<<
+                                        ") on "<<entNames[ ptrField->getSupport()->getEntity() ]<<
+                                        " since its part on " <<
+                                        entNames[ dtit_field->second->getSupport()->getEntity() ]<<
+                                        " has been already stored.\n Use constructor "
+                                        "FIELD(SUPPORT,MED_DRIVER,...) to get the part on "<<
+                                        entNames[ ptrField->getSupport()->getEntity() ]);
+                            }
+                            delete ptrField;
+                          }
+                          else
+                          {
+                            _meshName[ptrField ]       = meshName;
+                          }
                         }
                     }
                 }

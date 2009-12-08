@@ -168,7 +168,7 @@ typedef hssize_t       med_ssize;
 typedef herr_t         med_err;
 
 /* types elementaires */
-typedef int	       med_int;
+typedef int            med_int;
 typedef double         med_float;
 #endif
 

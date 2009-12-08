@@ -53,7 +53,7 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
   */
 
   fid21 = med_2_1::MEDouvrir((const_cast <char *> (fileName.c_str())),
-			     access21);
+                             access21);
 
   if (fid21 < 0)
     throw MEDEXCEPTION("Problem in getMedFileVersion(const string &) Med file V2.1 access");
@@ -80,7 +80,7 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
   */
 
   fid22 = med_2_3::MEDouvrir((const_cast <char *> (fileName.c_str())),
-			     access22);
+                             access22);
 
   if (fid22 < 0)
     throw MEDEXCEPTION("Problem in getMedFileVersion(const string &) Med file V2.2 access");
@@ -112,9 +112,9 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
   if (major21 == 2)
     {
       if (minor21 == 1)
-	version = V21;
+        version = V21;
       else if (minor21 > 1)
-	version = V22;
+        version = V22;
     }
   else
     version = V22;
@@ -147,26 +147,26 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
     {
     case MED_LECT :
       if (access(nom,F_OK))
-	return -1;
+        return -1;
       else 
-	if ((fid = _MEDfichierOuvrir(nom,mode_acces)) < 0)
-	  return -1;
+        if ((fid = _MEDfichierOuvrir(nom,mode_acces)) < 0)
+          return -1;
       break;
 
     case MED_ECRI :
       if (access(nom,F_OK))
-	{
-	  if ((fid = _MEDfichierCreer(nom)) < 0)
-	    return -1;
-	}
+        {
+          if ((fid = _MEDfichierCreer(nom)) < 0)
+            return -1;
+        }
       else
-	if ((fid = _MEDfichierOuvrir(nom,mode_acces)) < 0)
-	  return -1;
+        if ((fid = _MEDfichierOuvrir(nom,mode_acces)) < 0)
+          return -1;
       break;
 
     case MED_REMP :
       if ((fid = _MEDfichierCreer(nom)) < 0)
-	return -1;
+        return -1;
       break;
 */
 //    switch ( mode ) {
@@ -188,7 +188,7 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
 //    case MED_EN::MED_LECT: return med_2_3::MED_LECTURE;
 //    case MED_EN::MED_ECRI: return med_2_3::MED_LECTURE_ECRITURE;
 //    case MED_EN::MED_REMP: return med_2_3::MED_LECTURE_ECRITURE;
-//		case MED_EN::MED_CREA: return med_2_3::MED_CREATION;
+//              case MED_EN::MED_CREA: return med_2_3::MED_CREATION;
 //    default:
 //      throw MEDEXCEPTION("getMedAccessMode(): Wrong access mode");
 //    }

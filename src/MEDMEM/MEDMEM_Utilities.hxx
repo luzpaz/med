@@ -86,21 +86,21 @@ using namespace std;
 /* --- To print date and time of compilation of current source on stdout --- */
 
 # if defined ( __GNUC__ )
-# define COMPILER_MED		"g++" ;
+# define COMPILER_MED           "g++" ;
 # elif defined ( __sun )
-# define COMPILER_MED		"CC" ;
+# define COMPILER_MED           "CC" ;
 # elif defined ( __KCC )
-# define COMPILER_MED		"KCC" ;
+# define COMPILER_MED           "KCC" ;
 # elif defined ( __PGI )
-# define COMPILER_MED		"pgCC" ;
+# define COMPILER_MED           "pgCC" ;
 # else
-# define COMPILER_MED		"undefined" ;
+# define COMPILER_MED           "undefined" ;
 # endif
 
 # ifdef INFOS_COMPILATION_MED
 # undef INFOS_COMPILATION_MED
 # endif
-# define INFOS_COMPILATION_MED	{\
+# define INFOS_COMPILATION_MED  {\
   cerr << flush;\
   cout << __FILE__ ;\
   cout << " [" << __LINE__ << "] : " ;\

@@ -57,6 +57,7 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_MedVersion.cxx \
 	MEDMEMTest_MeshAndMeshing.cxx \
 	MEDMEMTest_ModulusArray.cxx \
+	MEDMEMTest_PartialDescendingConnectivity.cxx \
 	MEDMEMTest_PointerOf.cxx \
 	MEDMEMTest_PolyhedronArray.cxx \
 	MEDMEMTest_PorflowMeshDriver.cxx \
@@ -79,7 +80,7 @@ libMEDMEMCppTest_la_LDFLAGS= $(MED2_LIBS) @CPPUNIT_LIBS@ \
 
 if MED_ENABLE_KERNEL
     libMEDMEMCppTest_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
-    libMEDMEMCppTest_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
+    libMEDMEMCppTest_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace
 endif
 
 # Executables targets

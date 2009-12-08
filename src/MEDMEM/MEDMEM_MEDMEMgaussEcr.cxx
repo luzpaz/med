@@ -73,7 +73,7 @@ namespace med_2_3 {
 
     med_err
     MEDMEMgaussEcr(med_idt fid, med_geometrie_element type_geo, med_float *refcoo, med_mode_switch mode_coo,
-		   med_int ngauss, med_float *gscoo, med_float * wg, char * locname )
+                   med_int ngauss, med_float *gscoo, med_float * wg, char * locname )
     {
       med_idt gid=0, chid=0;
       med_size dimd[1];
@@ -92,31 +92,31 @@ namespace med_2_3 {
       strncpy(chemin,MED_GAUSS,MED_TAILLE_GAUSS-1);
       chemin[MED_TAILLE_GAUSS-1] = '\0';
       if ((gid = _MEDdatagroupOuvrir(fid,chemin)) < 0)
-	if ((gid = _MEDdatagroupCreer(fid,chemin)) < 0) {
-	  MESSAGE_MED("Impossible de creer le groupe MED_GAUSS : ");
-	  SSCRUTE_MED(chemin); goto ERROR;
-	}
+        if ((gid = _MEDdatagroupCreer(fid,chemin)) < 0) {
+          MESSAGE_MED("Impossible de creer le groupe MED_GAUSS : ");
+          SSCRUTE_MED(chemin); goto ERROR;
+        }
 
       /*
        * Si le groupe <locname> n'existe pas, on le cree
        * Sinon => erreur
        */
       if ((chid = _MEDdatagroupOuvrir(gid,locname)) >= 0) {
-	if ( false )//MED_MODE_ACCES != MED_LECTURE_ECRITURE )
+        if ( false )//MED_MODE_ACCES != MED_LECTURE_ECRITURE )
   {
-	  MESSAGE_MED("Le nom de localisation existe déjà : ");
-	  SSCRUTE_MED(locname); goto ERROR;
-	}
+          MESSAGE_MED("Le nom de localisation existe déjà : ");
+          SSCRUTE_MED(locname); goto ERROR;
+        }
       } else
-	if ((chid = _MEDdatagroupCreer(gid,locname)) < 0)
-	  goto ERROR;
+        if ((chid = _MEDdatagroupCreer(gid,locname)) < 0)
+          goto ERROR;
 
       /*
        * On stocke <ngauss> sous forme d'attribut
        */
       if (_MEDattrEntierEcrire(chid,MED_NOM_NBR,&ngauss) < 0) {
-	MESSAGE_MED("Erreur à l'écriture de l'attribut MED_NOM_NBR : ");
-	ISCRUTE_MED(ngauss);goto ERROR;
+        MESSAGE_MED("Erreur à l'écriture de l'attribut MED_NOM_NBR : ");
+        ISCRUTE_MED(ngauss);goto ERROR;
       };
 
       /*
@@ -124,14 +124,14 @@ namespace med_2_3 {
        */
       typegeo = (med_int) type_geo;
       /* sizeof(enum) tjrs = sizeof(int) en C, or
-	 sur machines 64 bits par défaut med_int==long,
-	 du coup sur  machines 64 bits _MEDattrEntierEcrire utilise
-	 le type hdf NATIVE_LONG, ce qui pose un problème qd on passe
-	 un enum.
+         sur machines 64 bits par défaut med_int==long,
+         du coup sur  machines 64 bits _MEDattrEntierEcrire utilise
+         le type hdf NATIVE_LONG, ce qui pose un problème qd on passe
+         un enum.
       */
       if (_MEDattrEntierEcrire(chid,MED_NOM_GEO,&typegeo) < 0) {
-	MESSAGE_MED("Erreur à l'écriture de l'attribut MED_NOM_GEO : ");
-	ISCRUTE_MED(type_geo);goto ERROR;
+        MESSAGE_MED("Erreur à l'écriture de l'attribut MED_NOM_GEO : ");
+        ISCRUTE_MED(type_geo);goto ERROR;
       };
 
 
@@ -141,9 +141,9 @@ namespace med_2_3 {
 
       dimd[0] = (type_geo%100)*(type_geo/100);
       if ( _MEDdatasetNumEcrire(chid,MED_NOM_COO,MED_FLOAT64,mode_coo,(type_geo/100),MED_ALL,MED_NOPF,MED_NO_PFLMOD,0,MED_NOPG,dimd,
-				(unsigned char*) refcoo)  < 0 ) {
-	MESSAGE_MED("Impossible d'ecrire le dataset : ");SSCRUTE_MED(MED_NOM_COO);
-	ISCRUTE_MED(dimd); goto ERROR;
+                                (unsigned char*) refcoo)  < 0 ) {
+        MESSAGE_MED("Impossible d'ecrire le dataset : ");SSCRUTE_MED(MED_NOM_COO);
+        ISCRUTE_MED(dimd); goto ERROR;
       }
 
       /*
@@ -152,9 +152,9 @@ namespace med_2_3 {
 
       dimd[0] = ngauss*(type_geo/100);
       if ( _MEDdatasetNumEcrire(chid,MED_NOM_GAU,MED_FLOAT64,mode_coo,(type_geo/100),MED_ALL,MED_NOPF,MED_NO_PFLMOD,0,MED_NOPG,dimd,
-				(unsigned char*) gscoo)  < 0 ) {
-	MESSAGE_MED("Impossible d'ecrire le dataset : ");SSCRUTE_MED(MED_NOM_GAU);
-	ISCRUTE_MED(dimd); goto ERROR;
+                                (unsigned char*) gscoo)  < 0 ) {
+        MESSAGE_MED("Impossible d'ecrire le dataset : ");SSCRUTE_MED(MED_NOM_GAU);
+        ISCRUTE_MED(dimd); goto ERROR;
       }
 
       /*
@@ -163,9 +163,9 @@ namespace med_2_3 {
 
       dimd[0] = ngauss;
       if ( _MEDdatasetNumEcrire(chid,MED_NOM_VAL,MED_FLOAT64,mode_coo,1,MED_ALL,MED_NOPF,MED_NO_PFLMOD,0,MED_NOPG,dimd,
-				(unsigned char*) wg)  < 0 ) {
-	MESSAGE_MED("Impossible d'ecrire le dataset : ");SSCRUTE_MED(MED_NOM_VAL);
-	ISCRUTE_MED(dimd); goto ERROR;
+                                (unsigned char*) wg)  < 0 ) {
+        MESSAGE_MED("Impossible d'ecrire le dataset : ");SSCRUTE_MED(MED_NOM_VAL);
+        ISCRUTE_MED(dimd); goto ERROR;
       }
 
 
@@ -178,13 +178,13 @@ namespace med_2_3 {
        */
 
       if (chid>0)     if (_MEDdatagroupFermer(chid) < 0) {
-	MESSAGE_MED("Impossible de fermer le datagroup : ");
-	ISCRUTE_MED(chid); ret = -1;
+        MESSAGE_MED("Impossible de fermer le datagroup : ");
+        ISCRUTE_MED(chid); ret = -1;
       }
 
       if (gid>0)     if (_MEDdatagroupFermer(gid) < 0) {
-	MESSAGE_MED("Impossible de fermer le datagroup : ");
-	ISCRUTE_MED(gid); ret = -1;
+        MESSAGE_MED("Impossible de fermer le datagroup : ");
+        ISCRUTE_MED(gid); ret = -1;
       }
 
       return ret;

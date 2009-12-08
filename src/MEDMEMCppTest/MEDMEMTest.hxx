@@ -68,6 +68,7 @@ class MEDMEMCPPTEST_EXPORT MEDMEMTest : public CppUnit::TestFixture
   //CPPUNIT_TEST( testInterlacingTraits /* not in spec */ );
   CPPUNIT_TEST( testMedFieldDriver21 );
   CPPUNIT_TEST( testMedFieldDriver22 );
+  CPPUNIT_TEST( testReadFieldOnNodesAndCells );
   //CPPUNIT_TEST( testMedFieldDriver /* not in spec */ );
   CPPUNIT_TEST( testMed );
   //30
@@ -85,6 +86,7 @@ class MEDMEMCPPTEST_EXPORT MEDMEMTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testMeshAndMeshing );
   CPPUNIT_TEST( testModulusArray );
   CPPUNIT_TEST( testnArray );
+  CPPUNIT_TEST( testPartialDescendingConnectivity );
   CPPUNIT_TEST( testPointerOf );
   CPPUNIT_TEST( testPolyhedronArray );
   CPPUNIT_TEST( testPorflowMeshDriver );
@@ -150,6 +152,7 @@ public:
   //void testInterlacingTraits() /* not in spec */;
   void testMedFieldDriver21();
   void testMedFieldDriver22();
+  void testReadFieldOnNodesAndCells();
   //void testMedFieldDriver /* not in spec */();
   void testMed();
   //30
@@ -167,6 +170,7 @@ public:
   void testMeshAndMeshing();
   void testModulusArray();
   void testnArray();
+  void testPartialDescendingConnectivity();
   void testPointerOf();
   void testPolyhedronArray();
   void testPorflowMeshDriver();

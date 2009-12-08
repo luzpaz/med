@@ -93,23 +93,23 @@ namespace MEDMEM {
     SUPPORT                *_support;
     mutable FIELD<T>       *_ptrField;
     std::string             _fileName;
-    mutable ofstream	    _file;
-    unsigned int	    _code;
+    mutable ofstream        _file;
+    unsigned int            _code;
     MED_EN::med_sort_direc  _direc;
-    int			    _nbComponents;
-    int			    _spaceDimension;
+    int                     _nbComponents;
+    int                     _spaceDimension;
     //static int           _nbComponentsForCpyInfo;
 
   public:
     template <class INTERLACING_TAG>
     ASCII_FIELD_DRIVER():GENDRIVER(),
-			 _ptrField((FIELD<T>)MED_NULL),
-			 _fileName("") {}
+                         _ptrField((FIELD<T>)MED_NULL),
+                         _fileName("") {}
 
     template <class INTERLACING_TAG>
     ASCII_FIELD_DRIVER(const string & fileName, FIELD<T,INTERLACING_TAG> * ptrField,
-		       MED_EN::med_sort_direc direction=MED_EN::ASCENDING,
-		       const char *priority="");
+                       MED_EN::med_sort_direc direction=MED_EN::ASCENDING,
+                       const char *priority="");
 
 
     ASCII_FIELD_DRIVER(const ASCII_FIELD_DRIVER<T>& other);
@@ -175,9 +175,9 @@ namespace MEDMEM {
   template <class T>
   template <class INTERLACING_TAG>
   ASCII_FIELD_DRIVER<T>::ASCII_FIELD_DRIVER(const string & fileName,
-					    FIELD<T,INTERLACING_TAG> * ptrField,
-					    MED_EN::med_sort_direc direction,
-					    const char *priority)
+                                            FIELD<T,INTERLACING_TAG> * ptrField,
+                                            MED_EN::med_sort_direc direction,
+                                            const char *priority)
     :GENDRIVER(fileName, MED_EN::WRONLY, ASCII_DRIVER),
      _ptrField((FIELD<T>*)ptrField),
      _fileName(fileName),
@@ -185,31 +185,31 @@ namespace MEDMEM {
     {
       _nbComponents=_ptrField->getNumberOfComponents();
       if(_nbComponents<=0)
-	throw MEDEXCEPTION("ASCII_FIELD_DRIVER : No components in FIELD<T>");
+        throw MEDEXCEPTION("ASCII_FIELD_DRIVER : No components in FIELD<T>");
       _support=(SUPPORT *)_ptrField->getSupport();
       _mesh=(MESH *)_support->getMesh();
       _spaceDimension=_mesh->getSpaceDimension();
       _code=3;
       int i;
       if(priority[0]=='\0')
-	for(i=_spaceDimension-1;i>=0;i--)
-	  {
-	    _code<<=2;
-	    _code+=i;
-	  }
+        for(i=_spaceDimension-1;i>=0;i--)
+          {
+            _code<<=2;
+            _code+=i;
+          }
       else
-	{
-	  if(_spaceDimension!=strlen(priority))
-	    throw MEDEXCEPTION("ASCII_FIELD_DRIVER : Coordinate priority invalid with spaceDim");
-	  for(i=_spaceDimension-1;i>=0;i--)
-	    {
-	      char c=toupper(priority[i]);
-	      if(int(c-'X')>(_spaceDimension-1) || int(c-'X')<0)
-		throw MEDEXCEPTION("ASCII_FIELD_DRIVER : Invalid priority definition");
-	      _code<<=2;
-	      _code+=c-'X';
-	    }
-	}
+        {
+          if(_spaceDimension!=strlen(priority))
+            throw MEDEXCEPTION("ASCII_FIELD_DRIVER : Coordinate priority invalid with spaceDim");
+          for(i=_spaceDimension-1;i>=0;i--)
+            {
+              char c=toupper(priority[i]);
+              if(int(c-'X')>(_spaceDimension-1) || int(c-'X')<0)
+                throw MEDEXCEPTION("ASCII_FIELD_DRIVER : Invalid priority definition");
+              _code<<=2;
+              _code+=c-'X';
+            }
+        }
     }
 
 
@@ -230,8 +230,8 @@ namespace MEDMEM {
   template <class T>
   void ASCII_FIELD_DRIVER<T>::open() throw (MEDEXCEPTION)
   {
-		if (_file.is_open())
-			throw MEDEXCEPTION("ASCII_FIELD_DRIVER::open() : file is already open !");
+                if (_file.is_open())
+                        throw MEDEXCEPTION("ASCII_FIELD_DRIVER::open() : file is already open !");
     _file.open(_fileName.c_str(),ofstream::out | ofstream::app);
     // for MEDMEMTest_AsciiFieldDriver.cxx:208 :
     // must throw because the file is opened
@@ -261,73 +261,73 @@ namespace MEDMEM {
   template <class T>
   void ASCII_FIELD_DRIVER<T>::write( void ) const throw (MEDEXCEPTION)
   {
-		if (!_file.is_open()) 
-			throw MEDEXCEPTION("ASCII_FIELD_DRIVER::write : can't write a file that was not opened !");
-		
+                if (!_file.is_open()) 
+                        throw MEDEXCEPTION("ASCII_FIELD_DRIVER::write : can't write a file that was not opened !");
+                
     buildIntroduction();
     switch(_spaceDimension)
       {
       case 2:
-	{
-	  switch(_code)
-	    {
-	    case 52: //XY
-	      {
-		sortAndWrite<2,52>();
-		break;
-	      }
-	    case 49: //YX
-	      {
-		sortAndWrite<2,49>();
-		break;
-	      }
-	    default:
-	      MEDEXCEPTION("ASCII_FIELD_DRIVER : Invalid priority definition");
-	    }
-	  break;
-	}
-	case 3:
-	{
-	  switch(_code)
-	    {
-	    case 228: //XYZ
-	      {
-		sortAndWrite<3,228>();
-		break;
-	      }
-	    case 216: //XZY
-	      {
-		sortAndWrite<3,216>();
-		break;
-	      }
-	    case 225://YXZ
-	      {
-		sortAndWrite<3,225>();
-		break;
-	      }
-	    case 201://YZX
-	      {
-		sortAndWrite<3,201>();
-		break;
-	      }
-	    case 210://ZXY
-	      {
-		sortAndWrite<3,210>();
-		break;
-	      }
-	    case 198://ZYX
-	      {
-		sortAndWrite<3,198>();
-		break;
-	      }
-	     default:
-	      MEDEXCEPTION("ASCII_FIELD_DRIVER : Invalid priority definition");
-	    }
-	  break;
-	  }
+        {
+          switch(_code)
+            {
+            case 52: //XY
+              {
+                sortAndWrite<2,52>();
+                break;
+              }
+            case 49: //YX
+              {
+                sortAndWrite<2,49>();
+                break;
+              }
+            default:
+              MEDEXCEPTION("ASCII_FIELD_DRIVER : Invalid priority definition");
+            }
+          break;
+        }
+        case 3:
+        {
+          switch(_code)
+            {
+            case 228: //XYZ
+              {
+                sortAndWrite<3,228>();
+                break;
+              }
+            case 216: //XZY
+              {
+                sortAndWrite<3,216>();
+                break;
+              }
+            case 225://YXZ
+              {
+                sortAndWrite<3,225>();
+                break;
+              }
+            case 201://YZX
+              {
+                sortAndWrite<3,201>();
+                break;
+              }
+            case 210://ZXY
+              {
+                sortAndWrite<3,210>();
+                break;
+              }
+            case 198://ZYX
+              {
+                sortAndWrite<3,198>();
+                break;
+              }
+             default:
+              MEDEXCEPTION("ASCII_FIELD_DRIVER : Invalid priority definition");
+            }
+          break;
+          }
       default:
-	MEDEXCEPTION("ASCII_FIELD_DRIVER : Invalid space dimension must be 2 or 3");
-	}
+        MEDEXCEPTION("ASCII_FIELD_DRIVER : Invalid space dimension must be 2 or 3");
+        }
   }
 
   template <class T>
@@ -343,33 +343,33 @@ namespace MEDMEM {
     const std::string *compoNames=_ptrField->getComponentsNames();
     for(i=0;i<_nbComponents;i++)
       {
-	if(!compoNames)
-	  _file << compoNames[i];
-	else
-	  _file << "None";
-	if(i<_nbComponents-1)
-	  _file << " | ";
+        if(!compoNames)
+          _file << compoNames[i];
+        else
+          _file << "None";
+        if(i<_nbComponents-1)
+          _file << " | ";
       }
     _file << endl;
     _file << "#COLUMN_UNITS: ";
     compoNames=_mesh->getCoordinateptr()->getCoordinatesUnits();
     for(i=0;i<_spaceDimension;i++)
       {
-	if(!compoNames)
-	  _file << compoNames[i];
-	else
-	  _file << "None";
-	_file << " | ";
+        if(!compoNames)
+          _file << compoNames[i];
+        else
+          _file << "None";
+        _file << " | ";
       }
     const UNIT *compoUnits=_ptrField->getComponentsUnits();
     for(i=0;i<_nbComponents;i++)
       {
-	if(!compoUnits)
-	  _file << compoUnits[i].getName();
-	else
-	  _file << "None";
-	if(i<_nbComponents-1)
-	  _file << " | ";
+        if(!compoUnits)
+          _file << compoUnits[i].getName();
+        else
+          _file << "None";
+        if(i<_nbComponents-1)
+          _file << " | ";
       }
     _file << endl;
   }
@@ -401,30 +401,30 @@ namespace MEDMEM
     if(_support->getEntity()==MED_EN::MED_NODE) {
       if (_support->isOnAllElements()) {
 
-	coord=_mesh->getCoordinates(MED_EN::MED_NO_INTERLACE);
-	for(i=0; i<SPACEDIMENSION; i++)
-	  xyz[i]=(double *)coord+i*numberOfValues;
+        coord=_mesh->getCoordinates(MED_EN::MED_NO_INTERLACE);
+        for(i=0; i<SPACEDIMENSION; i++)
+          xyz[i]=(double *)coord+i*numberOfValues;
 
       } else {
 
-	coord = _mesh->getCoordinates(MED_EN::MED_FULL_INTERLACE);
-	const int * nodesNumber=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
-	for(i=0; i<SPACEDIMENSION; i++)
-	  xyz[i]=new double[numberOfValues];
-	    deallocateXyz=true;
-	    for(i=0;i<numberOfValues;i++) {
-	      for(j=0;j<SPACEDIMENSION;j++)
-		xyz[j][i]=coord[(nodesNumber[i]-1)*SPACEDIMENSION+j];
-	    }
+        coord = _mesh->getCoordinates(MED_EN::MED_FULL_INTERLACE);
+        const int * nodesNumber=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
+        for(i=0; i<SPACEDIMENSION; i++)
+          xyz[i]=new double[numberOfValues];
+            deallocateXyz=true;
+            for(i=0;i<numberOfValues;i++) {
+              for(j=0;j<SPACEDIMENSION;j++)
+                xyz[j][i]=coord[(nodesNumber[i]-1)*SPACEDIMENSION+j];
+            }
       }
     } else {
 
       barycenterField = _mesh->getBarycenter(_support);
       baryArrayTmp = ArrayConvert
-	( *( static_cast<ArrayDoubleFull*>(barycenterField->getArray()) ) );
+        ( *( static_cast<ArrayDoubleFull*>(barycenterField->getArray()) ) );
       coord = baryArrayTmp->getPtr();
       for(i=0; i<SPACEDIMENSION; i++)
-	xyz[i]=(double *)(coord+i*numberOfValues);
+        xyz[i]=(double *)(coord+i*numberOfValues);
     }
 
     const T * valsToSet;
@@ -433,18 +433,18 @@ namespace MEDMEM
       valsToSet= _ptrField->getValue();
     else if ( _ptrField->getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
       tmpArray = ArrayConvert
-	( *( static_cast<ArrayNoByType*>(_ptrField->getArray()) ) );
+        ( *( static_cast<ArrayNoByType*>(_ptrField->getArray()) ) );
       valsToSet= tmpArray->getPtr();
     }
     else {
       tmpArray = ArrayConvert
-	( *( static_cast<ArrayNo*>(_ptrField->getArray()) ) );
+        ( *( static_cast<ArrayNo*>(_ptrField->getArray()) ) );
       valsToSet= tmpArray->getPtr();
     }
     double temp[SPACEDIMENSION];
     for(i=0;i<numberOfValues;i++) {
       for(j=0;j<SPACEDIMENSION;j++)
-	temp[j]=xyz[j][i];
+        temp[j]=xyz[j][i];
       li.push_back(SDForSorting<T,SPACEDIMENSION,SORTSTRATEGY>(temp,valsToSet+i*_nbComponents,_nbComponents));
     }
 
@@ -454,20 +454,20 @@ namespace MEDMEM
 
     if(deallocateXyz)
       for(j=0;j<SPACEDIMENSION;j++)
-	delete [] xyz[j];
+        delete [] xyz[j];
 
     li.sort();
     _file << setprecision(PRECISION_IN_ASCII_FILE);
     if(_direc==MED_EN::ASCENDING) {
       typename std::list< SDForSorting<T,SPACEDIMENSION,SORTSTRATEGY > >::iterator iter;
       for(iter=li.begin();iter!=li.end();iter++)
-	(*iter).writeLine(_file);
+        (*iter).writeLine(_file);
       _file << endl;
     } else if (_direc==MED_EN::DESCENDING) {
 
       typename std::list< SDForSorting<T,SPACEDIMENSION,SORTSTRATEGY > >::reverse_iterator iter;
       for(iter=li.rbegin();iter!=li.rend();iter++)
-	(*iter).writeLine(_file);
+        (*iter).writeLine(_file);
       _file << endl;
     } else
       MEDEXCEPTION("ASCII_FIELD_DRIVER : Invalid sort direction");
