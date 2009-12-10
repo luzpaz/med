@@ -40,6 +40,7 @@
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_CellModel.hxx"
 
+#include <fcntl.h>
 
 /*!
 
@@ -594,15 +595,16 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
   SCRUTE_MED(name.str());
   SCRUTE_MED(fieldType);
 
+  std::string typeStr;
   switch (fieldType)
     {
     case MED_EN::MED_INT32 :
       {
-        break ;
+        typeStr = " int"; break ;
       }
     case MED_EN::MED_REEL64 :
       {
-        break ;
+        typeStr = " float"; break ;
       }
     default :
       { 
@@ -611,10 +613,10 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
     }
 
   if (NomberOfComponents==3)
-    (*_vtkFile) << "VECTORS " << name.str() << " int" << endl ;
+    (*_vtkFile) << "VECTORS " << name.str() << typeStr << endl ;
   else if (NomberOfComponents<=4)
     {
-      (*_vtkFile) << "SCALARS " << name.str() << " int " << NomberOfComponents << endl ;
+      (*_vtkFile) << "SCALARS " << name.str() << typeStr << " " << NomberOfComponents << endl ;
       (*_vtkFile) << "LOOKUP_TABLE default" << endl ;
     }
   else
@@ -690,12 +692,39 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
   if (!(supportField->isOnAllElements()))
     throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" which is not on all entities of the mesh !" << entitySupport));
 
+  // BEGIN issue 0020610: [CEA 371] VTK field driver : save many fields
+  // POINT_DATA and CELL_DATA must encounters once
+  STRING dataStr;
   if (entitySupport == MED_EN::MED_NODE)
-    (*_vtkFile) << "POINT_DATA " << meshField->getNumberOfNodes() << endl ;
+    //(*_vtkFile) << "POINT_DATA " << meshField->getNumberOfNodes() << endl ;
+    dataStr << "POINT_DATA " << meshField->getNumberOfNodes() ;
   else if (entitySupport == MED_EN::MED_CELL)
-    (*_vtkFile) << "CELL_DATA " << meshField->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS) << endl ;
+    //(*_vtkFile) << "CELL_DATA " << meshField->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS) << endl ;
+    dataStr << "CELL_DATA " << meshField->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
   else
     throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" which is not on all nodes or cells but it's on !" << entitySupport));
+
+  // check if dataStr is already present in the file
+  bool toWriteDataStr = true;
+#ifdef WNT
+  int vtkFile = ::_open (_fileName.c_str(), _O_RDONLY|_O_BINARY);
+#else
+  int vtkFile = ::open (_fileName.c_str(), O_RDONLY);
+#endif
+  if ( vtkFile > 0 )
+    {
+      ssize_t fileSize = ::lseek( vtkFile, 0, SEEK_END); ::lseek( vtkFile, 0, SEEK_SET);
+      char* buf = new char[ fileSize ];
+      ::read (vtkFile, buf, fileSize );
+      char *vtkData = buf, *vtkDataEnd = buf+fileSize-dataStr.size();
+      while ( ++vtkData < vtkDataEnd && toWriteDataStr )
+        toWriteDataStr = ( strncmp( dataStr.data(), vtkData, dataStr.size()) != 0 );
+      delete [] buf;
+      ::close (vtkFile);
+    }
+  if ( toWriteDataStr )
+    (*_vtkFile) << dataStr;
+  // END issue 0020610: [CEA 371] VTK field driver : save many fields
 
   int NomberOfValue = supportField->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS) ;
   int NomberOfComponents =  _ptrField->getNumberOfComponents() ;
@@ -704,15 +733,17 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
 
   SCRUTE_MED(name.str());
   SCRUTE_MED(fieldType);
+
+  std::string typeStr;
   switch (fieldType)
     {
     case MED_EN::MED_INT32 :
       {
-        break ;
+        typeStr = " int"; break ;
       }
     case MED_EN::MED_REEL64 :
       {
-        break ;
+        typeStr = " float"; break ;
       }
     default :
       { 
@@ -721,10 +752,10 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
     }
 
   if (NomberOfComponents==3)
-    (*_vtkFile) << "VECTORS " << name.str() << " int" << endl ;
+    (*_vtkFile) << "VECTORS " << name.str() << typeStr << endl ;
   else if (NomberOfComponents<=4)
     {
-      (*_vtkFile) << "SCALARS " << name.str() << " int " << NomberOfComponents << endl ;
+      (*_vtkFile) << "SCALARS " << name.str() << typeStr << " " << NomberOfComponents << endl ;
       (*_vtkFile) << "LOOKUP_TABLE default" << endl ;
     }
   else
