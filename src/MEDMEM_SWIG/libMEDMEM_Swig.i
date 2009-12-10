@@ -555,6 +555,8 @@ class SUPPORT
 
   MESH* makeMesh();
 
+  SUPPORT* buildSupportOnNode();
+
   %extend {
     %newobject __str__();
     const char* __str__()
