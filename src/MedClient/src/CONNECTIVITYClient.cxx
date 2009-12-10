@@ -33,7 +33,7 @@ using namespace MEDMEM;
 //=============================================================================
 
 CONNECTIVITYClient::CONNECTIVITYClient(const SALOME_MED::MESH_ptr m,
-				       medEntityMesh Entity) :
+                                       medEntityMesh Entity) :
   CONNECTIVITY(m->getNumberOfTypes(Entity), Entity),
   IOR_Mesh(SALOME_MED::MESH::_duplicate(m)),
   _numberOfElements_client(0),
@@ -241,14 +241,14 @@ int CONNECTIVITYClient::getNumberOf(medEntityMesh Entity,
     if (Entity == _entity) {
       
       if (Type==MED_ALL_ELEMENTS)
-	n = _totalNumberOfElements_client;
+        n = _totalNumberOfElements_client;
       
       for (int i=0; i<_numberOfTypes; i++) {
-	SCRUTE(_geometricTypes[i]);
-	if (_geometricTypes[i] == Type) {
-	  n = _numberOfElements_client[i];
-	  break;
-	}
+        SCRUTE(_geometricTypes[i]);
+        if (_geometricTypes[i] == Type) {
+          n = _numberOfElements_client[i];
+          break;
+        }
       }
     } 
     else if (_constituent != NULL)
@@ -268,8 +268,8 @@ int CONNECTIVITYClient::getNumberOf(medEntityMesh Entity,
 //=============================================================================
 const int * CONNECTIVITYClient::getConnectivity
                       (medConnectivity ConnectivityType, 
-		       medEntityMesh Entity,
-		       medGeometryElement Type)
+                       medEntityMesh Entity,
+                       medGeometryElement Type)
 {
   if (!_complete)
     fillCopy();
@@ -286,7 +286,7 @@ const int * CONNECTIVITYClient::getConnectivity
 //=============================================================================
 const int * CONNECTIVITYClient::getConnectivityIndex
                       (medConnectivity ConnectivityType,
-		       medEntityMesh Entity)
+                       medEntityMesh Entity)
 {
   if (!_complete)
     fillCopy();
@@ -303,7 +303,7 @@ const int * CONNECTIVITYClient::getConnectivityIndex
 //=============================================================================
 void CONNECTIVITYClient::calculateConnectivity
                       (medConnectivity connectivityType, 
-		       medEntityMesh Entity)
+                       medEntityMesh Entity)
 {
   if (!_complete)
     fillCopy();
@@ -343,7 +343,7 @@ const int * CONNECTIVITYClient::getGlobalNumberingIndex
  */
 //=============================================================================
 bool CONNECTIVITYClient::existConnectivity(medConnectivity ConnectivityType, 
-					   medEntityMesh Entity) const
+                                           medEntityMesh Entity) const
 { 
   if (!_complete)
     (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
@@ -359,7 +359,7 @@ bool CONNECTIVITYClient::existConnectivity(medConnectivity ConnectivityType,
 //=============================================================================
 const int * CONNECTIVITYClient::getReverseConnectivity
                       (medConnectivity ConnectivityType, 
-		       medEntityMesh Entity) throw (MEDEXCEPTION)
+                       medEntityMesh Entity) throw (MEDEXCEPTION)
 {
   if (!_complete)
     fillCopy();
@@ -376,7 +376,7 @@ const int * CONNECTIVITYClient::getReverseConnectivity
 //=============================================================================
 const int * CONNECTIVITYClient::getReverseConnectivityIndex
                       (medConnectivity ConnectivityType,
-		       medEntityMesh Entity) throw (MEDEXCEPTION)
+                       medEntityMesh Entity) throw (MEDEXCEPTION)
 {
   if (!_complete)
     fillCopy();
@@ -392,7 +392,7 @@ const int * CONNECTIVITYClient::getReverseConnectivityIndex
  */
 //=============================================================================
 const int* CONNECTIVITYClient::getValue(medConnectivity TypeConnectivity, 
-			medGeometryElement Type)
+                        medGeometryElement Type)
 {
   if (!_complete)
     fillCopy();

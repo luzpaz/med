@@ -38,8 +38,8 @@ namespace med_2_1{
 
 med_err 
 _MEDparametresGeometrie(med_entite_maillage type_ent,
-			med_geometrie_element type_geo, int *dim, 
-			int *nnoe,int *ndes)
+                        med_geometrie_element type_geo, int *dim, 
+                        int *nnoe,int *ndes)
 {
   *nnoe = type_geo % 100;
   *dim = type_geo / 100;
@@ -48,110 +48,110 @@ _MEDparametresGeometrie(med_entite_maillage type_ent,
     {
     case MED_MAILLE :
       switch (type_geo)
-	{
-	case MED_POINT1 :
-	  *ndes = 0;
-	  break;
-	  
-	case MED_SEG2 :
-	  *ndes = 2;
-	  break;
-	  
-	case MED_SEG3 :
-	  *ndes = 3;
-	  break;
-	  
-	case MED_TRIA3 :
-	  *ndes = 3;
-	  break;
-	  
-	case MED_TRIA6 :
-	  *ndes = 3;
-	  break;
-	  
-	case MED_QUAD4 :
-	  *ndes = 4;
-	  break;
-	  
-	case MED_QUAD8 :
-	  *ndes = 4;
-	  break;
-	  
-	case MED_TETRA4 :
-	  *ndes = 4;
-	  break;
-	  
-	case MED_TETRA10 :
-	  *ndes = 4;
-	  break;
-	  
-	case MED_HEXA8 :
-	  *ndes = 6;
-	  break;
-	  
-	case MED_HEXA20 :
-	  *ndes = 6;
-	  break;
-	  
-	case MED_PENTA6 :
-	  *ndes = 5;
-	  break;
-	  
-	case MED_PENTA15 :
-	  *ndes = 5;
-	  break;
-	  
-	case MED_PYRA5 :
-	  *ndes = 5;
-	  break;
-	  
-	case MED_PYRA13 :
-	  *ndes = 5;
-	  break;
-	  
-	default :
-	  return -1;
-	}
+        {
+        case MED_POINT1 :
+          *ndes = 0;
+          break;
+          
+        case MED_SEG2 :
+          *ndes = 2;
+          break;
+          
+        case MED_SEG3 :
+          *ndes = 3;
+          break;
+          
+        case MED_TRIA3 :
+          *ndes = 3;
+          break;
+          
+        case MED_TRIA6 :
+          *ndes = 3;
+          break;
+          
+        case MED_QUAD4 :
+          *ndes = 4;
+          break;
+          
+        case MED_QUAD8 :
+          *ndes = 4;
+          break;
+          
+        case MED_TETRA4 :
+          *ndes = 4;
+          break;
+          
+        case MED_TETRA10 :
+          *ndes = 4;
+          break;
+          
+        case MED_HEXA8 :
+          *ndes = 6;
+          break;
+          
+        case MED_HEXA20 :
+          *ndes = 6;
+          break;
+          
+        case MED_PENTA6 :
+          *ndes = 5;
+          break;
+          
+        case MED_PENTA15 :
+          *ndes = 5;
+          break;
+          
+        case MED_PYRA5 :
+          *ndes = 5;
+          break;
+          
+        case MED_PYRA13 :
+          *ndes = 5;
+          break;
+          
+        default :
+          return -1;
+        }
       break;
       
     case MED_FACE :
       switch(type_geo)
-	{
-	case MED_TRIA3 :
-	  *ndes = 3;
-	  break;
-	  
-	case MED_TRIA6 :
-	  *ndes = 3;
-	  break;
-	  
-	case MED_QUAD4 :
-	  *ndes = 4;
-	  break;
-	  
-	case MED_QUAD8 :
-	  *ndes = 4;
-	  break;
-	  
-	default :
-	  return -1;
-	}
+        {
+        case MED_TRIA3 :
+          *ndes = 3;
+          break;
+          
+        case MED_TRIA6 :
+          *ndes = 3;
+          break;
+          
+        case MED_QUAD4 :
+          *ndes = 4;
+          break;
+          
+        case MED_QUAD8 :
+          *ndes = 4;
+          break;
+          
+        default :
+          return -1;
+        }
       break;
       
     case MED_ARETE :
       switch(type_geo)
-	{
-	case MED_SEG2 :
-	  *ndes = 2;
-	  break;
-	  
-	case MED_SEG3 :
-	  *ndes = 3;
-	  break;
-	  
-	default :
-	  return -1;
-	}
+        {
+        case MED_SEG2 :
+          *ndes = 2;
+          break;
+          
+        case MED_SEG3 :
+          *ndes = 3;
+          break;
+          
+        default :
+          return -1;
+        }
       break;
       
     default :

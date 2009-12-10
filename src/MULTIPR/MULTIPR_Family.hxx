@@ -183,7 +183,7 @@ public:
     /**
      * Inserts a new element (by its index) into this Family.
      * \param  pIndexElt index of the element to be added; must be >= 1.
-	 * \param  pMeshIndex Index of the mesh (eMED_TETRA4 etc...). Default value when its a family of nodes.
+         * \param  pMeshIndex Index of the mesh (eMED_TETRA4 etc...). Default value when its a family of nodes.
      * \throw  IllegalArgumentException if pIndexElt <= 0.
      */
     void insertElt(med_int pIndexElt, eMeshType pMeshIndex = eMED_POINT1); 
@@ -218,12 +218,12 @@ public:
      */
     Family* extractGroup(const char* pGroupName);
     
-	/**
+        /**
      * Returns the set of all the elements referenced in this Family.
      * \return the set of all the elements referenced in this Family.
      */
     const std::set<med_int>& getSetOfElt(eMeshType pMeshIndex) const { return mElt[pMeshIndex]; }
-	
+        
     //---------------------------------------------------------------------
     // I/O
     //---------------------------------------------------------------------
@@ -362,7 +362,7 @@ public:
      * \return the number of elements referenced in this Group.
      */
     int getSize(eMeshType pMeshIndex) const { return mElt[pMeshIndex].size(); }
-	
+        
     //---------------------------------------------------------------------
     // I/O
     //---------------------------------------------------------------------
@@ -388,7 +388,7 @@ private:
     bool               mIsGroupOfNodes;  /**< Is it a group of nodes or a group of elements? */
     
     bool               mFlagPrintAll;    /** Flag to control the behaviour of the stream operator <<. */
-	
+        
 private:
 
     // do not allow copy constructor

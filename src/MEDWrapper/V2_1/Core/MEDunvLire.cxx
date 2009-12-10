@@ -51,7 +51,7 @@ MEDunvLire(med_idt fid, char *maa,char *nomu)
    * Creation/Ecriture de l'attribut nom universel 
    */
   if ((ret = _MEDattrStringLire(maaid,MED_NOM_UNV,MED_TAILLE_LNOM,
-			       nomu )) < 0)
+                               nomu )) < 0)
     return -1;
 
   /* 

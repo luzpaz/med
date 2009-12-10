@@ -75,10 +75,10 @@ int main (int argc, char ** argv) {
       int NumberOfIteration = FieldIteration.size() ;
       cout << "    Number of iteration pair : "<< NumberOfIteration << endl;
       for (int j=0; j<NumberOfIteration; j++) {
-	FIELD_ * myField = myMed.getField(FieldName[i],FieldIteration[j].dt,FieldIteration[j].it) ;
-	
-	myField->read() ;
-	cout << "    * Iteration "<<FieldIteration[j].dt<<" and  order number "<<FieldIteration[j].it<<" ) is read !" << endl;
+        FIELD_ * myField = myMed.getField(FieldName[i],FieldIteration[j].dt,FieldIteration[j].it) ;
+        
+        myField->read() ;
+        cout << "    * Iteration "<<FieldIteration[j].dt<<" and  order number "<<FieldIteration[j].it<<" ) is read !" << endl;
       }
     }
     int id = myMed.addDriver(ENSIGHT_DRIVER,filenameOUT,MED_EN::WRONLY) ;

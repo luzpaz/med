@@ -71,10 +71,10 @@ namespace MED{
   typedef enum {eNOD, eDESC} EConnectivite ; 
 
   typedef enum {ePOINT1=1, eSEG2=102, eSEG3=103, eTRIA3=203,
-		eQUAD4=204, eTRIA6=206,eQUAD8=208, eTETRA4=304,
-		ePYRA5=305, ePENTA6=306, eHEXA8=308, eTETRA10=310, 
-		ePYRA13=313, ePENTA15=315, eHEXA20=320, 
-		ePOLYGONE=400, ePOLYEDRE=500, eNONE=0} EGeometrieElement;
+                eQUAD4=204, eTRIA6=206,eQUAD8=208, eTETRA4=304,
+                ePYRA5=305, ePENTA6=306, eHEXA8=308, eTETRA10=310, 
+                ePYRA13=313, ePENTA15=315, eHEXA20=320, 
+                ePOLYGONE=400, ePOLYEDRE=500, eNONE=0} EGeometrieElement;
 
   typedef enum {eMAILLE, eFACE, eARETE, eNOEUD, eNOEUD_ELEMENT} EEntiteMaillage; 
 
@@ -127,8 +127,8 @@ namespace MED{
   MEDWRAPPER_EXPORT
   TInt
   GetNbConn(EGeometrieElement typmai,
-	    EEntiteMaillage typent,
-	    TInt mdim);
+            EEntiteMaillage typent,
+            TInt mdim);
   
   MEDWRAPPER_EXPORT
   TInt 

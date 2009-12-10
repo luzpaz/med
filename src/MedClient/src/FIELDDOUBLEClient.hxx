@@ -31,7 +31,7 @@ class FIELDDOUBLEClient :
 {
 public:
   FIELDDOUBLEClient(SALOME_MED::FIELDDOUBLE_ptr ptrCorba,
-		    MEDMEM::SUPPORT * S = NULL);
+                    MEDMEM::SUPPORT * S = NULL);
   ~FIELDDOUBLEClient();
 };
 

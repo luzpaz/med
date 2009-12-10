@@ -31,7 +31,7 @@ namespace med_2_1{
 
 med_err 
 MEDbodyFittedEcr(med_idt fid, char *maa, med_int mdim, med_float *coo, med_int *nbr, med_mode_switch mode_coo,
-		 med_repere repere, char *nomcoo, char *unicoo, med_int *fam, med_int nnoeuds, med_mode_acces mode )
+                 med_repere repere, char *nomcoo, char *unicoo, med_int *fam, med_int nnoeuds, med_mode_acces mode )
 {
     /* ecriture des coordonnees */
     med_idt   maaid, noeid, dataset;

@@ -78,13 +78,13 @@ bool SupportTester::isIncludedAndNotAlreadyConsumed(const int *tabOfNodesOfTheEl
   for(vector<int>::iterator iter=_eltsActiveYet.begin();iter!=_eltsActiveYet.end();iter++)
     if(areEquivalent(_tabOfNodes+(*iter),tabOfNodesOfTheElementToTest,*iter2))
       {
-	_eltsActiveYet.erase(iter);
-	_lgthOfEltsActiveYet.erase(iter2);
-	return true;
+        _eltsActiveYet.erase(iter);
+        _lgthOfEltsActiveYet.erase(iter2);
+        return true;
       }
     else
       {
-	iter2++;
+        iter2++;
       }
   return false;
 }
@@ -138,25 +138,25 @@ int main (int argc, char ** argv)
   //7
   const int REFfacesIndex[20]={1, 7, 11, 15, 19, 23, 27, 31, 34, 39, 44, 48, 52, 55, 58, 61, 64, 68, 72, 75};
   const int REFnodalConnOfFaces[74]={1, 2, 3, 4, 5, 6, // Polyhedron 1
-				     1, 7, 8, 2, 
-				     2, 8, 9, 3, 
-				     4, 3, 9, 10, 
-				     5, 4, 10, 11, 
-				     6, 5, 11, 12, 
-				     1, 6, 12, 7, 
-				     7, 12, 8, 10, 
-				     9, 8, 12, 11,
+                                     1, 7, 8, 2, 
+                                     2, 8, 9, 3, 
+                                     4, 3, 9, 10, 
+                                     5, 4, 10, 11, 
+                                     6, 5, 11, 12, 
+                                     1, 6, 12, 7, 
+                                     7, 12, 8, 10, 
+                                     9, 8, 12, 11,
 
-				     13, 14, 15, 3, 2, // Polyhedron 2
-				     13, 2, 8, 16, 
-				     14, 13, 16, 17, 
-				     15, 14, 17, 15, 
-				     17, 18, 15, 
-				     18, 9, 3, 
-				     15, 9, 2, 
-				     3, 9, 8, 
-				     8, 9, 17, 16, 
-				     9, 18, 17 };
+                                     13, 14, 15, 3, 2, // Polyhedron 2
+                                     13, 2, 8, 16, 
+                                     14, 13, 16, 17, 
+                                     15, 14, 17, 15, 
+                                     17, 18, 15, 
+                                     18, 9, 3, 
+                                     15, 9, 2, 
+                                     3, 9, 8, 
+                                     8, 9, 17, 16, 
+                                     9, 18, 17 };
   for(i=0;i<20;i++)
     if(REFfacesIndex[i]==facesIndex[i])
       nbOfPtsForTest++;
@@ -190,7 +190,7 @@ int main (int argc, char ** argv)
       int lgth;
       const int *conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElementWithPoly(MED_NODAL,MED_FACE,nbs[i],lgth);
       if(test1.isIncludedAndNotAlreadyConsumed(conn))
-	nbOfPtsForTest++;
+        nbOfPtsForTest++;
     }
   if(test1.areAllEltsConsumed())
     nbOfPtsForTest++;
@@ -205,7 +205,7 @@ int main (int argc, char ** argv)
       int lgth;
       const int *conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElementWithPoly(MED_NODAL,MED_FACE,nbs[i],lgth);
       if(test2.isIncludedAndNotAlreadyConsumed(conn))
-	nbOfPtsForTest++;
+        nbOfPtsForTest++;
     }
   if(test2.areAllEltsConsumed())
     nbOfPtsForTest++;
@@ -220,7 +220,7 @@ int main (int argc, char ** argv)
       int lgth;
       const int *conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElementWithPoly(MED_NODAL,MED_FACE,nbs[i],lgth);
       if(test3.isIncludedAndNotAlreadyConsumed(conn))
-	nbOfPtsForTest++;
+        nbOfPtsForTest++;
     }
   if(test3.areAllEltsConsumed())
     nbOfPtsForTest++;
@@ -279,7 +279,7 @@ int main (int argc, char ** argv)
   if(lgth==8)
     nbOfPtsForTest++;
   const double REFAreaForQuad[8]={2.1213203435596424, 2.8284271247461903, 4.4721359549995796, 4.4721359549995796, 
-				  2.8284271247461903, 2.1213203435596428, 3.6798724963767362, 4};
+                                  2.8284271247461903, 2.1213203435596428, 3.6798724963767362, 4};
   for(i=0;i<8;i++)
     if(fabs(REFAreaForQuad[i]-vals[i])<1e-12)
       nbOfPtsForTest++;
@@ -291,7 +291,7 @@ int main (int argc, char ** argv)
   if(lgth==6)
     nbOfPtsForTest++;
   const double REFAreaForTri[6]={2.9580398915498081, 1.4142135623730951, 2.2360679774997898, 
-				 3.3541019662496847, 3.3541019662496847, 2.2360679774997898};
+                                 3.3541019662496847, 3.3541019662496847, 2.2360679774997898};
   for(i=0;i<6;i++)
     if(fabs(REFAreaForTri[i]-vals[i])<1e-12)
       nbOfPtsForTest++;

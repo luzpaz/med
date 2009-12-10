@@ -40,8 +40,8 @@ namespace MED
 
   std::string 
   GetString(TInt theId, 
-	    TInt theStep, 
-	    const TString& theString)
+            TInt theStep, 
+            const TString& theString)
   {
     const char* aPos = &theString[theId*theStep];
     TInt aSize = std::min(TInt(strlen(aPos)),theStep);
@@ -50,9 +50,9 @@ namespace MED
 
   void 
   SetString(TInt theId, 
-	    TInt theStep, 
-	    TString& theString, 
-	    const std::string& theValue)
+            TInt theStep, 
+            TString& theString, 
+            const std::string& theValue)
   {
     TInt aSize = std::min(TInt(theValue.size()+1),theStep);
     char* aPos = &theString[theId*theStep];
@@ -61,9 +61,9 @@ namespace MED
 
   void 
   SetString(TInt theId, 
-	    TInt theStep, 
-	    TString& theString, 
-	    const TString& theValue)
+            TInt theStep, 
+            TString& theString, 
+            const TString& theValue)
   {
     TInt aSize = std::min(TInt(theValue.size()+1),theStep);
     char* aPos = &theString[theId*theStep];
@@ -291,9 +291,9 @@ TMeshValueBase
 void
 TMeshValueBase
 ::Allocate(TInt theNbElem,
-	   TInt theNbGauss,
-	   TInt theNbComp,
-	   EModeSwitch theMode)
+           TInt theNbGauss,
+           TInt theNbComp,
+           EModeSwitch theMode)
 {
   myModeSwitch = theMode;
   
@@ -513,15 +513,15 @@ TGrilleInfo
   if(myGrilleType == eGRILLE_STANDARD)
     for(int i=0;i<aDim;i++)
       if(nbNodes == 0)
-	nbNodes = this->GetGrilleStructure()[i];
+        nbNodes = this->GetGrilleStructure()[i];
       else
-	nbNodes = nbNodes*this->GetGrilleStructure()[i];
+        nbNodes = nbNodes*this->GetGrilleStructure()[i];
   else
     for(int i=0;i<aDim;i++)
       if(nbNodes == 0)
-	nbNodes = GetNbIndexes(i);
+        nbNodes = GetNbIndexes(i);
       else
-	nbNodes = nbNodes*GetNbIndexes(i);
+        nbNodes = nbNodes*GetNbIndexes(i);
   
   return nbNodes;
 }
@@ -535,15 +535,15 @@ TGrilleInfo
   if(this->GetGrilleType() == eGRILLE_STANDARD)
     for(int i=0;i<aDim;i++)
       if(nbCells == 0)
-	nbCells = this->GetGrilleStructure()[i]-1;
+        nbCells = this->GetGrilleStructure()[i]-1;
       else
-	nbCells = nbCells*(this->GetGrilleStructure()[i]-1);
+        nbCells = nbCells*(this->GetGrilleStructure()[i]-1);
   else
     for(int i=0;i<aDim;i++)
       if(nbCells == 0)
-	nbCells = GetNbIndexes(i)-1;
+        nbCells = GetNbIndexes(i)-1;
       else
-	nbCells = nbCells*(GetNbIndexes(i)-1);
+        nbCells = nbCells*(GetNbIndexes(i)-1);
   return nbCells;
 }
 
@@ -649,11 +649,11 @@ TGrilleInfo
       i = theId % nbIndxX;
       j = theId / nbIndxX;
       if(myGrilleType == eGRILLE_CARTESIENNE){
-	aCoord[0] = aVecX[i];
-	aCoord[1] = aVecY[j];
+        aCoord[0] = aVecX[i];
+        aCoord[1] = aVecY[j];
       } else { // eGRILLE_POLAIRE (cylindrical)
-	aCoord[0] = aVecX[i] * cos(aVecY[j]);
-	aCoord[1] = aVecX[i] * sin(aVecY[j]);
+        aCoord[0] = aVecX[i] * cos(aVecY[j]);
+        aCoord[1] = aVecX[i] * sin(aVecY[j]);
       }
       break;
     }
@@ -669,13 +669,13 @@ TGrilleInfo
       k = theId / (nbIndxX*nbIndxY);
 
       if(myGrilleType == eGRILLE_CARTESIENNE){
-	aCoord[0] = aVecX[i];
-	aCoord[1] = aVecY[j];
-	aCoord[2] = aVecZ[k];
+        aCoord[0] = aVecX[i];
+        aCoord[1] = aVecY[j];
+        aCoord[2] = aVecZ[k];
       } else { // eGRILLE_POLAIRE (cylindrical)
-	aCoord[0] = aVecX[i] * cos(aVecY[j]);
-	aCoord[1] = aVecX[i] * sin(aVecY[j]);
-	aCoord[2] = aVecZ[k];
+        aCoord[0] = aVecX[i] * cos(aVecY[j]);
+        aCoord[1] = aVecX[i] * sin(aVecY[j]);
+        aCoord[2] = aVecZ[k];
       }
       
       break;
@@ -744,13 +744,13 @@ TGrilleInfo
   for (loc[2]=kMin; loc[2]<=kMax; loc[2]++)
     {
       for (loc[1]=jMin; loc[1]<=jMax; loc[1]++)
-	{
-	  for (loc[0]=iMin; loc[0]<=iMax; loc[0]++)
-	    {
-	      idx = loc[0] + loc[1]*nbX + loc[2]*d01;
-	      anIndexes.push_back(idx);
-	    }
-	}
+        {
+          for (loc[0]=iMin; loc[0]<=iMax; loc[0]++)
+            {
+              idx = loc[0] + loc[1]*nbX + loc[2]*d01;
+              anIndexes.push_back(idx);
+            }
+        }
     }
   
   return anIndexes;

@@ -25,7 +25,7 @@
   - 2 polyedres
     ayant pour faces 3 polygones
                      9 quadrangles
-		     6 triangles
+                     6 triangles
   - 1 tetra4
 
 */
@@ -124,9 +124,9 @@ int main (int argc, char **argv)
   med_int npolyhedronfaces = 19;
   med_int npolyhedronnodes = 74;
   med_int polyhedronconnectivity[74] = {1,2,3,4,5,6,1,7,8,2,2,8,9,3,4,3,9,10,5,4,10,11,6,5,11,12,1,6,12,7,7,12,8,10,9,8,12,11,
-					13,14,15,3,2,13,2,8,16,14,13,16,17,15,14,17,15,17,18,15,18,9,3,15,9,2,3,9,8,8,9,17,16,9,18,17};
+                                        13,14,15,3,2,13,2,8,16,14,13,16,17,15,14,17,15,17,18,15,18,9,3,15,9,2,3,9,8,8,9,17,16,9,18,17};
   med_int polyhedronfacesindex[20] = {1,7,11,15,19,23,27,31,34,
-				      39,44,48,52,55,58,61,64,68,72,75};
+                                      39,44,48,52,55,58,61,64,68,72,75};
   med_int polyhedronindex[3] = {1,10,20};
   char nompolyhedron[MED_TAILLE_PNOM*2+1] = "polyhedron1     polyhedron2     ";
   med_int numpolyhedron[2] = {2,3};
@@ -192,8 +192,8 @@ int main (int argc, char **argv)
   /***************************************************************************/
   if (ret == 0)
     ret = MEDnoeudsEcr(fid,maa,mdim,coo,MED_FULL_INTERLACE,MED_CART,
-		       nomcoo,unicoo,nomnoe,MED_FAUX,numnoe,MED_VRAI,
-		       nufano,nnoe);
+                       nomcoo,unicoo,nomnoe,MED_FAUX,numnoe,MED_VRAI,
+                       nufano,nnoe);
   printf("MEDnoeudsEcr : %d\n",ret);
 
   /* ecriture des faces MED_QUAD4 :
@@ -203,8 +203,8 @@ int main (int argc, char **argv)
      - numeros des familles */
   if (ret == 0) 
     ret = MEDelementsEcr(fid,maa,mdim,quad4,MED_FULL_INTERLACE,
-			 nomquad4,MED_FAUX,numquad4,MED_VRAI,nufaquad4,nquad4,
-			 MED_MAILLE,MED_QUAD4,MED_NOD);
+                         nomquad4,MED_FAUX,numquad4,MED_VRAI,nufaquad4,nquad4,
+                         MED_MAILLE,MED_QUAD4,MED_NOD);
   printf("MEDelementsEcr for quad : %d \n",ret);
 
   /* ecriture des faces MED_TRIA3 :
@@ -214,8 +214,8 @@ int main (int argc, char **argv)
      - numeros des familles */
   if (ret == 0) 
     ret = MEDelementsEcr(fid,maa,mdim,tria3,MED_FULL_INTERLACE,
-			 nomtria3,MED_FAUX,numtria3,MED_VRAI,nufatria3,ntria3,
-			 MED_MAILLE,MED_TRIA3,MED_NOD);
+                         nomtria3,MED_FAUX,numtria3,MED_VRAI,nufatria3,ntria3,
+                         MED_MAILLE,MED_TRIA3,MED_NOD);
   printf("MEDelementsEcr for tria : %d \n",ret);
 
   /* ecriture des faces MED_POLYGONE :
@@ -226,7 +226,7 @@ int main (int argc, char **argv)
      Dans ce cas il n existe pas de routine globale (Warning !!) */
   if (ret == 0)
     ret = MEDpolygoneConnEcr(fid,maa,indexpolygon,nindexpolygon,polygon,
-			     MED_MAILLE,MED_NOD);
+                             MED_MAILLE,MED_NOD);
   printf("MEDpolygoneConnEcr: %d \n",ret);
 
   if (ret == 0)
@@ -270,8 +270,8 @@ int main (int argc, char **argv)
      - numeros des familles */
   if (ret == 0)
     ret = MEDelementsEcr(fid,maa,mdim,tetra4,MED_FULL_INTERLACE,
-			 nomtetra4,MED_FAUX,numtetra4,MED_VRAI,nufatetra4,ntetra4,
-			 MED_MAILLE,MED_TETRA4,MED_NOD);
+                         nomtetra4,MED_FAUX,numtetra4,MED_VRAI,nufatetra4,ntetra4,
+                         MED_MAILLE,MED_TETRA4,MED_NOD);
   printf("MEDelementsEcr for tetra : %d \n",ret);
 
   /***************************************************************************/
@@ -291,7 +291,7 @@ int main (int argc, char **argv)
       strcpy(nomfam,"FAMILLE_0");
       numfam = 0;
       ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,0,
-		     gro,0);
+                     gro,0);
     }
   printf("MEDfamCr : %d \n",ret);
 
@@ -313,7 +313,7 @@ int main (int argc, char **argv)
       ngro = 1;
 
       ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,
-		     natt,gro,ngro);
+                     natt,gro,ngro);
       printf("MEDfamCr : %d\n",ret);
 
       numfam = -2;
@@ -327,7 +327,7 @@ int main (int argc, char **argv)
       ngro = 1;
 
       ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,
-		     natt,gro,ngro);
+                     natt,gro,ngro);
       printf("MEDfamCr : %d\n",ret);
 
       numfam = -3;
@@ -341,7 +341,7 @@ int main (int argc, char **argv)
       ngro = 1;
 
       ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,
-		     natt,gro,ngro);
+                     natt,gro,ngro);
       printf("MEDfamCr : %d\n",ret);
 
       numfam = -4;
@@ -355,7 +355,7 @@ int main (int argc, char **argv)
       ngro = 1;
 
       ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,
-		     natt,gro,ngro);
+                     natt,gro,ngro);
       printf("MEDfamCr : %d\n",ret);
 
       numfam = -5;
@@ -369,7 +369,7 @@ int main (int argc, char **argv)
       ngro = 1;
 
       ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,
-		     natt,gro,ngro);
+                     natt,gro,ngro);
       printf("MEDfamCr : %d\n",ret);
     }
   */
@@ -382,12 +382,12 @@ int main (int argc, char **argv)
       ret = MEDchampCr(fid,champ1,MED_INT32,champ1_comp,champ1_unit,1);
       printf("MEDchampCr : %d \n",ret);
       if (ret == 0) {
-	ret = MEDchampEcr(fid, maa, champ1, (unsigned char *)fieldnodeint,
-			  MED_NO_INTERLACE, nnoe, MED_NOGAUSS, MED_ALL,
-			  MED_NOPFL, MED_NO_PFLMOD, MED_NOEUD, 0,
-			  MED_NOPDT,"        ", 0., MED_NONOR);
-	
-	printf("MEDchampEcr : %d \n",ret);
+        ret = MEDchampEcr(fid, maa, champ1, (unsigned char *)fieldnodeint,
+                          MED_NO_INTERLACE, nnoe, MED_NOGAUSS, MED_ALL,
+                          MED_NOPFL, MED_NO_PFLMOD, MED_NOEUD, 0,
+                          MED_NOPDT,"        ", 0., MED_NONOR);
+        
+        printf("MEDchampEcr : %d \n",ret);
       }
     }
   
@@ -396,16 +396,16 @@ int main (int argc, char **argv)
       ret = MEDchampCr(fid,champ2,MED_FLOAT64,champ2_comp,champ2_unit,1);
       printf("MEDchampCr : %d \n",ret);
       if (ret == 0) {
-	ret = MEDchampEcr(fid, maa, champ2, (unsigned char *)fieldnodedouble1,
-			  MED_NO_INTERLACE, nnoe, MED_NOGAUSS, MED_ALL,
-			  MED_NOPFL, MED_NO_PFLMOD, MED_NOEUD, 0,
-			  1,"S       ", 1.1 , MED_NONOR);
-	printf("MEDchampEcr1 : %d \n",ret);
-	ret = MEDchampEcr(fid, maa, champ2, (unsigned char *)fieldnodedouble2,
-			  MED_NO_INTERLACE, nnoe, MED_NOGAUSS, MED_ALL,
-			  MED_NOPFL, MED_NO_PFLMOD, MED_NOEUD, 0,
-			  2,"S       ", 1.2 , MED_NONOR);
-	printf("MEDchampEcr2 : %d \n",ret);
+        ret = MEDchampEcr(fid, maa, champ2, (unsigned char *)fieldnodedouble1,
+                          MED_NO_INTERLACE, nnoe, MED_NOGAUSS, MED_ALL,
+                          MED_NOPFL, MED_NO_PFLMOD, MED_NOEUD, 0,
+                          1,"S       ", 1.1 , MED_NONOR);
+        printf("MEDchampEcr1 : %d \n",ret);
+        ret = MEDchampEcr(fid, maa, champ2, (unsigned char *)fieldnodedouble2,
+                          MED_NO_INTERLACE, nnoe, MED_NOGAUSS, MED_ALL,
+                          MED_NOPFL, MED_NO_PFLMOD, MED_NOEUD, 0,
+                          2,"S       ", 1.2 , MED_NONOR);
+        printf("MEDchampEcr2 : %d \n",ret);
       }
     }
   
@@ -413,9 +413,9 @@ int main (int argc, char **argv)
   if (ret == 0)
     {
       ret = MEDchampEcr(fid, maa, champ2, (unsigned char *)fieldnodedouble1,
-			MED_NO_INTERLACE, nnoe,	MED_NOGAUSS, MED_ALL,
-			MED_NOPFL, MED_NO_PFLMOD, MED_NOEUD, 0,
-			MED_NOPDT,"        ", 0. , MED_NONOR);
+                        MED_NO_INTERLACE, nnoe, MED_NOGAUSS, MED_ALL,
+                        MED_NOPFL, MED_NO_PFLMOD, MED_NOEUD, 0,
+                        MED_NOPDT,"        ", 0. , MED_NONOR);
       printf("MEDchampEcr : %d \n",ret); 
     }
 
@@ -424,11 +424,11 @@ int main (int argc, char **argv)
       ret = MEDchampCr(fid,champ3,MED_FLOAT64,champ3_comp,champ3_unit,2);
       printf("MEDchampCr : %d \n",ret);
       if (ret == 0) {
-	ret = MEDchampEcr(fid, maa, champ3, (unsigned char *)fieldfacedouble,
-			  MED_NO_INTERLACE, ntria3, MED_NOGAUSS, MED_ALL,
-			  MED_NOPFL, MED_NO_PFLMOD, MED_FACE, MED_TRIA3,
-			  MED_NOPDT,"        ", 0., MED_NONOR);
-	printf("MEDchampEcr : %d \n",ret);
+        ret = MEDchampEcr(fid, maa, champ3, (unsigned char *)fieldfacedouble,
+                          MED_NO_INTERLACE, ntria3, MED_NOGAUSS, MED_ALL,
+                          MED_NOPFL, MED_NO_PFLMOD, MED_FACE, MED_TRIA3,
+                          MED_NOPDT,"        ", 0., MED_NONOR);
+        printf("MEDchampEcr : %d \n",ret);
       }
     }
   /***************************************************************************/

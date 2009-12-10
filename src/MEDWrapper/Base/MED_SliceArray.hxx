@@ -61,9 +61,9 @@ namespace MED
     {
       long int anId = -1;
       if(theId < mySlice.size()){
-	anId = mySlice.start() + theId*mySlice.stride();
-	if(anId < mySourceSize)
-	  return;
+        anId = mySlice.start() + theId*mySlice.stride();
+        if(anId < mySourceSize)
+          return;
       }
       throw std::out_of_range("TCSlice::check_id");
     }
@@ -96,8 +96,8 @@ namespace MED
 
     //! Construct the class from bare pointer
     TCSlice(const value_type* theValuePtr,
-	    size_t theSourceSize,
-	    const std::slice& theSlice): 
+            size_t theSourceSize,
+            const std::slice& theSlice): 
       myCValuePtr(theValuePtr),
       mySourceSize(theSourceSize),
       mySlice(theSlice)
@@ -105,7 +105,7 @@ namespace MED
     
     //! Construct the class from corresponding container
     TCSlice(const TVector<value_type>& theContainer,
-	    const std::slice& theSlice): 
+            const std::slice& theSlice): 
       myCValuePtr(&theContainer[0]),
       mySourceSize(theContainer.size()),
       mySlice(theSlice)
@@ -151,15 +151,15 @@ namespace MED
 
     //! Construct the class from bare pointer
     TSlice(value_type* theValuePtr,
-	   size_t theSourceSize,
-	   const std::slice& theSlice): 
+           size_t theSourceSize,
+           const std::slice& theSlice): 
       TSupperClass(theValuePtr, theSourceSize, theSlice),
       myValuePtr(theValuePtr)
     {}
     
     //! Construct the class from corresponding container
     TSlice(TVector<value_type>& theContainer,
-	   const std::slice& theSlice): 
+           const std::slice& theSlice): 
       TSupperClass(theContainer, theSlice),
       myValuePtr(&theContainer[0])
     {}

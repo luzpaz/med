@@ -23,7 +23,7 @@ namespace med_2_1{
 
 med_err
 MEDfamMaaInfo(med_idt fid,char *maa,med_int *nfam,med_int *nattc,
-	      med_int *ngroc)
+              med_int *ngroc)
 {
   med_int ret;
   med_int i;
@@ -39,10 +39,10 @@ MEDfamMaaInfo(med_idt fid,char *maa,med_int *nfam,med_int *nattc,
   for (i=0;i<*nfam;i++)
     {
       if ((ret = MEDnFam(fid,maa,i+1,MED_ATTR)) < 0)
-	return -1;
+        return -1;
       *nattc += ret;
       if ((ret = MEDnFam(fid,maa,i+1,MED_GROUPE)) < 0)
-	return -1;
+        return -1;
       *ngroc += ret;
     }
 

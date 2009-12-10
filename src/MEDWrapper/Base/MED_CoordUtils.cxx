@@ -106,7 +106,7 @@ namespace MED
   TFloat 
   TCoordHelper
   ::GetCoord(TCCoordSlice& theCoordSlice, 
-	     TInt theCoordId)
+             TInt theCoordId)
   {
     return (*myGetCoord[theCoordId])(theCoordSlice);
   }
@@ -126,37 +126,37 @@ namespace MED
         // 1D - always along X
         // 2D - always in XOY plane
         anIsDimPresent[iDim] = iDim < aMeshDimension;
-// 	std::string aName = theNodeInfo->GetCoordName(iDim);
+//      std::string aName = theNodeInfo->GetCoordName(iDim);
 //         if ( aName.size() > 1 ) // PAL12148, aName has size 8 or 16
 //           aName = aName.substr(0,1);
-// 	if(aName == "x" || aName == "X")
-// 	  anIsDimPresent[eX] = true;
-// 	else if(aName == "y" || aName == "Y")
-// 	  anIsDimPresent[eY] = true;
-// 	else if(aName == "z" || aName == "Z")
-// 	  anIsDimPresent[eZ] = true;
+//      if(aName == "x" || aName == "X")
+//        anIsDimPresent[eX] = true;
+//      else if(aName == "y" || aName == "Y")
+//        anIsDimPresent[eY] = true;
+//      else if(aName == "z" || aName == "Z")
+//        anIsDimPresent[eZ] = true;
       }
 
       switch(aMeshDimension){
       case 3:
-	aCoordHelper.reset(new TCoordHelper(aXYZGetCoord));
-	break;
+        aCoordHelper.reset(new TCoordHelper(aXYZGetCoord));
+        break;
       case 2:
-	if(anIsDimPresent[eY] && anIsDimPresent[eZ])
-	  aCoordHelper.reset(new TCoordHelper(aYZGetCoord));
-	else if(anIsDimPresent[eX] && anIsDimPresent[eZ])
-	  aCoordHelper.reset(new TCoordHelper(aXZGetCoord));
-	else
-	  aCoordHelper.reset(new TCoordHelper(aXYGetCoord));
-	break;
+        if(anIsDimPresent[eY] && anIsDimPresent[eZ])
+          aCoordHelper.reset(new TCoordHelper(aYZGetCoord));
+        else if(anIsDimPresent[eX] && anIsDimPresent[eZ])
+          aCoordHelper.reset(new TCoordHelper(aXZGetCoord));
+        else
+          aCoordHelper.reset(new TCoordHelper(aXYGetCoord));
+        break;
       case 1:
-	if(anIsDimPresent[eY])
-	  aCoordHelper.reset(new TCoordHelper(aYGetCoord));
-	else if(anIsDimPresent[eZ])
-	  aCoordHelper.reset(new TCoordHelper(aZGetCoord));
-	else
-	  aCoordHelper.reset(new TCoordHelper(aXGetCoord));
-	break;
+        if(anIsDimPresent[eY])
+          aCoordHelper.reset(new TCoordHelper(aYGetCoord));
+        else if(anIsDimPresent[eZ])
+          aCoordHelper.reset(new TCoordHelper(aZGetCoord));
+        else
+          aCoordHelper.reset(new TCoordHelper(aXGetCoord));
+        break;
       }
     }
     return aCoordHelper;

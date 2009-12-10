@@ -56,8 +56,8 @@ int main (int argc, char ** argv) {
   if (argc==4)
   {
         string comp=argv[3];
-  	if ( comp == "MED_NO_INTERLACE" ) Mode = MED_EN::MED_NO_INTERLACE;
-	else if ( comp != "MED_FULL_INTERLACE") usage(argv[0]);
+        if ( comp == "MED_NO_INTERLACE" ) Mode = MED_EN::MED_NO_INTERLACE;
+        else if ( comp != "MED_FULL_INTERLACE") usage(argv[0]);
   }
 
 
@@ -103,9 +103,9 @@ int main (int argc, char ** argv) {
   const string * CoordinatesNames = myMesh->getCoordinatesNames() ;
   for (int i=0; i < SpaceDimension ; i++) 
   {
-	string bonnelongueur=chainevide;
-	bonnelongueur.replace(1,CoordinatesNames[i].size(),CoordinatesNames[i]);
-  	cout << bonnelongueur;
+        string bonnelongueur=chainevide;
+        bonnelongueur.replace(1,CoordinatesNames[i].size(),CoordinatesNames[i]);
+        cout << bonnelongueur;
   }
   cout <<endl;
 
@@ -113,9 +113,9 @@ int main (int argc, char ** argv) {
   const string * CoordinatesUnits = myMesh->getCoordinatesUnits() ;
   for ( int i=0; i < SpaceDimension ; i++) 
   {
-	string bonnelongueur=chainevide;
-	bonnelongueur.replace(1,CoordinatesUnits[i].size(),CoordinatesUnits[i]);
-  	cout << bonnelongueur;
+        string bonnelongueur=chainevide;
+        bonnelongueur.replace(1,CoordinatesUnits[i].size(),CoordinatesUnits[i]);
+        cout << bonnelongueur;
   }
   cout <<endl;
 
@@ -123,7 +123,7 @@ int main (int argc, char ** argv) {
   cout << "- Coordonnees des noeuds : " << endl;
   for (int i=0; i < SpaceDimension*NumberOfNodes; i++)
   {
-	fprintf(stdout," %f ",Coordinates[i]);
+        fprintf(stdout," %f ",Coordinates[i]);
   }
   cout <<endl;
 

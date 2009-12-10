@@ -220,9 +220,9 @@ bool MESHClient::operator==(const MESH& other) const
   if(otherClt)
     {
       if(this==otherClt)
-	{
-	  return true;
-	}
+        {
+          return true;
+        }
       return IOR_Mesh->areEquals(otherClt->IOR_Mesh);
     }
   return false;

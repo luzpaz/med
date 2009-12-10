@@ -48,7 +48,7 @@ int main (int argc, char ** argv)
        currentGeom != MED_EN::geoNames.end(); 
        currentGeom++) 
   {
-		cout << (*currentGeom).second << endl;
+                cout << (*currentGeom).second << endl;
   };
 
   MED_EN::MESH_ENTITIES::const_iterator currentEntity;
@@ -61,14 +61,14 @@ int main (int argc, char ** argv)
        currentEntity != MED_EN::meshEntities.end(); 
        currentEntity++) 
   {
-	cout << (*((MED_EN::entNames).find((*currentEntity).first))).second <<endl;
-  	for (currentGeometry  = (*currentEntity).second.begin();
-       	     currentGeometry != (*currentEntity).second.end(); 
-      	     currentGeometry++) 
-	{
-	cout << MED_EN::geoNames[(MED_EN::medGeometryElement)(*currentGeometry)] << endl;
-	}
-	cout << endl;
+        cout << (*((MED_EN::entNames).find((*currentEntity).first))).second <<endl;
+        for (currentGeometry  = (*currentEntity).second.begin();
+             currentGeometry != (*currentEntity).second.end(); 
+             currentGeometry++) 
+        {
+        cout << MED_EN::geoNames[(MED_EN::medGeometryElement)(*currentGeometry)] << endl;
+        }
+        cout << endl;
   }
 
 }

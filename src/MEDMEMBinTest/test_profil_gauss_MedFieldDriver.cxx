@@ -85,9 +85,9 @@ void affiche_fieldT(FIELD<double,INTERLACING_TAG> * myField)
   cout << "myField->getNumberOfGeometricType ()              : " << numberOfGeometricType << endl;
   for (int i=0; i < numberOfGeometricType; i++) {
     cout << "Number Of Elements on type "<< MED_EN::geoNames[typeList[i]]
-	 <<" : "<< nbOfElements[i] << endl;
+         <<" : "<< nbOfElements[i] << endl;
     cout << "Number Of Gauss Points on type "<< MED_EN::geoNames[typeList[i]]
-	 <<" : "<< myField->getNumberOfGaussPoints(typeList[i]) << endl;
+         <<" : "<< myField->getNumberOfGaussPoints(typeList[i]) << endl;
     cout << "Localization description : " << endl << myField->getGaussLocalization(typeList[i]) << endl;
   }
 
@@ -135,9 +135,9 @@ void affiche_fieldT(FIELD<double, FullInterlace> * myField)
   // pour tous les types géométriques
   for (int i=0; i < numberOfGeometricType; i++) {
     cout << "Number Of Elements on type "<< MED_EN::geoNames[typeList[i]]
-	 <<" : "<< nbOfElements[i] << endl;
+         <<" : "<< nbOfElements[i] << endl;
     cout << "Number Of Gauss Points on type "<< MED_EN::geoNames[typeList[i]]
-	 <<" : "<< nbGaussPoints[i] << endl;
+         <<" : "<< nbGaussPoints[i] << endl;
     cout << "Localization description : " << endl << myField->getGaussLocalization(typeList[i]) << endl;
   }
 
@@ -198,9 +198,9 @@ void affiche_fieldT(FIELD<double, NoInterlace> * myField)
   // pour tous les types géométriques
   for (int i=0; i < numberOfGeometricType; i++) {
     cout << "Number Of Elements on type "<< MED_EN::geoNames[typeList[i]]
-	 <<" : "<< nbOfElements[i] << endl;
+         <<" : "<< nbOfElements[i] << endl;
     cout << "Number Of Gauss Points on type "<< MED_EN::geoNames[typeList[i]]
-	 <<" : "<< nbGaussPoints[i] << endl;
+         <<" : "<< nbGaussPoints[i] << endl;
     cout << "Localization description : " << endl << myField->getGaussLocalization(typeList[i]) << endl;
   }
 
@@ -265,9 +265,9 @@ void affiche_fieldT2(FIELD<double, FullInterlace> * myField)
   // pour tous les types géométriques
   for (int i=0; i < numberOfGeometricType; i++) {
     cout << "Number Of Elements on type "<< MED_EN::geoNames[typeList[i]]
-	 <<" : "<< nbOfElements[i] << endl;
+         <<" : "<< nbOfElements[i] << endl;
     cout << "Number Of Gauss Points on type "<< MED_EN::geoNames[typeList[i]]
-	 <<" : "<< nbGaussPoints[i] << endl;
+         <<" : "<< nbGaussPoints[i] << endl;
   }
 
 
@@ -285,10 +285,10 @@ void affiche_fieldT2(FIELD<double, FullInterlace> * myField)
   for (int ntyp=1; ntyp <= numberOfGeometricType; ntyp++ ) {
     for (int  i=0; i < nbOfElements[ntyp-1] ; i++ ) {
       for (int k=1; k <= nbGaussPoints[ntyp-1]; k++)
-	for (int j=1; j <= numberOfComponents; j++) {
-	  cout << " value["<< fct(elemno-1,number) << "," <<j<<","<<k<<"] = "
-	  << myField->getValueIJK(fct(elemno-1,number),j,k);
-	}
+        for (int j=1; j <= numberOfComponents; j++) {
+          cout << " value["<< fct(elemno-1,number) << "," <<j<<","<<k<<"] = "
+          << myField->getValueIJK(fct(elemno-1,number),j,k);
+        }
       elemno++;
       cout << endl;
     }
@@ -303,7 +303,7 @@ int main (int argc, char ** argv) {
 
   if ((argc !=3) && (argc != 5)) {
     cerr << "Usage : " << argv[0]
-	 << " filename fieldName [iterationNumber] [orderNumber]" << endl << endl;
+         << " filename fieldName [iterationNumber] [orderNumber]" << endl << endl;
     exit(-1);
   }
 
@@ -327,7 +327,7 @@ int main (int argc, char ** argv) {
     // pour effecuter la renumérotation.
     {
       FIELD<double,INTERLACING_MODE> * myField1  = new FIELD<double,INTERLACING_MODE>(MED_DRIVER,fileName,fieldName,
-										      iterationNumber, orderNumber);
+                                                                                      iterationNumber, orderNumber);
       affiche_fieldT(myField1);
       cout << endl;
       affiche_fieldT2(myField1);
@@ -377,7 +377,7 @@ int main (int argc, char ** argv) {
 //       // un fichier que l'on vient de lire)
 //    {
 //      FIELD<double,INTERLACING_MODE> * myField2  = new FIELD<double,INTERLACING_MODE>(MED_DRIVER,fileName,fieldName,
-// 										     iterationNumber, orderNumber);
+//                                                                                   iterationNumber, orderNumber);
 
 //      meshName = myField2->getSupport()->getMeshName();
 //      MESH * myMesh2 = new MESH(MED_DRIVER,fileName,meshName);
@@ -421,13 +421,13 @@ int main (int argc, char ** argv) {
 //    {
 //      med_2_3::med_err err=-1;
 //      med_2_3::med_idt id = med_2_3::MEDouvrir(const_cast<char *> ( ("Copy_nomesh_"+fileName).c_str()),
-// 					      med_2_3::MED_LECTURE_ECRITURE);
+//                                            med_2_3::MED_LECTURE_ECRITURE);
 //      if (id <=0) cout << "Erreur dans MEDouvrir pour le fichier " << "Copy_nomesh_"+fileName <<endl;
 
 //      err=med_2_3::MEDlienEcr(id, const_cast<char *> ( ("Copy_withmesh_"+fileName).c_str()),
-// 			     const_cast<char *> (meshName.c_str()) );
+//                           const_cast<char *> (meshName.c_str()) );
 //      if (err !=0) cout << "Erreur dans MEDlienEcr pour le maillage distant " << meshName
-// 		       <<" contenu dans le fichier " << "Copy_withmesh_"+fileName <<endl;
+//                     <<" contenu dans le fichier " << "Copy_withmesh_"+fileName <<endl;
 
 
 //      err=med_2_3::MEDfermer(id);

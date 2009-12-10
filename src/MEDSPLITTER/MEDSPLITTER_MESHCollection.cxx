@@ -81,8 +81,8 @@ MESHCollection::MESHCollection()
     m_driver(0),
     m_driver_type(MEDSPLITTER::MedXML),
     m_subdomain_boundary_creates(false),
-		m_family_splitting(false),
-		m_create_empty_groups(false)
+                m_family_splitting(false),
+                m_create_empty_groups(false)
 {
 }
 
@@ -105,42 +105,42 @@ MESHCollection::MESHCollection(const MESHCollection& initial_collection, Topolog
     m_driver(0),
     m_driver_type(MEDSPLITTER::MedXML),
     m_subdomain_boundary_creates(false),
-		m_family_splitting(family_splitting),
-		m_create_empty_groups(create_empty_groups)
+                m_family_splitting(family_splitting),
+                m_create_empty_groups(create_empty_groups)
 {
-	string mesh_name = initial_collection.getName();
-	m_mesh.resize(m_topology->nbDomain());
-	for (int idomain=0; idomain < m_topology->nbDomain(); idomain++)
-		{
-			//creating the new mesh
-			MEDMEM::MESHING* mesh_builder=new MEDMEM::MESHING;
-			m_mesh[idomain]= static_cast<MEDMEM::MESH*> (mesh_builder);
-			ostringstream osname;
-			osname << mesh_name<<"_"<<idomain+1;
+        string mesh_name = initial_collection.getName();
+        m_mesh.resize(m_topology->nbDomain());
+        for (int idomain=0; idomain < m_topology->nbDomain(); idomain++)
+                {
+                        //creating the new mesh
+                        MEDMEM::MESHING* mesh_builder=new MEDMEM::MESHING;
+                        m_mesh[idomain]= static_cast<MEDMEM::MESH*> (mesh_builder);
+                        ostringstream osname;
+                        osname << mesh_name<<"_"<<idomain+1;
       SCRUTE_MED(osname.str());
-			mesh_builder->setName(osname.str());
+                        mesh_builder->setName(osname.str());
 
-			createNodalConnectivity(initial_collection,idomain, MED_EN::MED_CELL);
-			mesh_builder->setMeshDimension(initial_collection.getMeshDimension());
-			mesh_builder->setSpaceDimension(initial_collection.getSpaceDimension());
-		}
-	
-	m_topology->createFaceMapping(initial_collection);	
-	for (int idomain=0; idomain<m_topology->nbDomain(); idomain++)
-		{
-			switch (getMeshDimension())
-				{
-				case 3:
-					createNodalConnectivity(initial_collection,idomain, MED_EN::MED_FACE);
-					break;
-				case 2:
-					createNodalConnectivity(initial_collection,idomain, MED_EN::MED_EDGE);
-					break;
-				default : 
-					cerr<<"MEDSPLITTER : Mesh dimension must be 2 or 3"<<endl;
-				}
-		}
-	
+                        createNodalConnectivity(initial_collection,idomain, MED_EN::MED_CELL);
+                        mesh_builder->setMeshDimension(initial_collection.getMeshDimension());
+                        mesh_builder->setSpaceDimension(initial_collection.getSpaceDimension());
+                }
+        
+        m_topology->createFaceMapping(initial_collection);      
+        for (int idomain=0; idomain<m_topology->nbDomain(); idomain++)
+                {
+                        switch (getMeshDimension())
+                                {
+                                case 3:
+                                        createNodalConnectivity(initial_collection,idomain, MED_EN::MED_FACE);
+                                        break;
+                                case 2:
+                                        createNodalConnectivity(initial_collection,idomain, MED_EN::MED_EDGE);
+                                        break;
+                                default : 
+                                        cerr<<"MEDSPLITTER : Mesh dimension must be 2 or 3"<<endl;
+                                }
+                }
+        
   castFamilies(initial_collection);
 }
 
@@ -154,32 +154,32 @@ MESHCollection::MESHCollection(const string& filename)
     m_driver(0),
     m_driver_type(MEDSPLITTER::Undefined),
     m_subdomain_boundary_creates(false),
-		m_family_splitting(false),
-		m_create_empty_groups(false)
+                m_family_splitting(false),
+                m_create_empty_groups(false)
 {
-	char filenamechar[256];
-	strcpy(filenamechar,filename.c_str());
-	try
-		{
-			m_driver=new MESHCollectionMedXMLDriver(this);
-			m_driver->read (filenamechar);
-			m_driver_type = MedXML;
+        char filenamechar[256];
+        strcpy(filenamechar,filename.c_str());
+        try
+                {
+                        m_driver=new MESHCollectionMedXMLDriver(this);
+                        m_driver->read (filenamechar);
+                        m_driver_type = MedXML;
 
-		}
-	catch(MEDEXCEPTION&){
-		delete m_driver;
-		try
-			{
-				m_driver=new MESHCollectionMedAsciiDriver(this);
-				m_driver->read (filenamechar);
-				m_driver_type=MedAscii;
-			}
-		catch(MEDEXCEPTION&)
-			{
-				delete m_driver;
-				throw MEDEXCEPTION("file does not comply with any recognized format");
-			}
-	}
+                }
+        catch(MEDEXCEPTION&){
+                delete m_driver;
+                try
+                        {
+                                m_driver=new MESHCollectionMedAsciiDriver(this);
+                                m_driver->read (filenamechar);
+                                m_driver_type=MedAscii;
+                        }
+                catch(MEDEXCEPTION&)
+                        {
+                                delete m_driver;
+                                throw MEDEXCEPTION("file does not comply with any recognized format");
+                        }
+        }
 }
 
 /*! constructing the MESH collection from a sequential MED-file
@@ -194,24 +194,24 @@ MESHCollection::MESHCollection(const string& filename, const string& meshname)
     m_driver(0),
     m_driver_type(MEDSPLITTER::MedXML),
     m_subdomain_boundary_creates(false),
-		m_family_splitting(false),
-		m_create_empty_groups(false)
+                m_family_splitting(false),
+                m_create_empty_groups(false)
 {
-	char filenamechar[256];
-	char meshnamechar[256];
-	strcpy(filenamechar,filename.c_str());
-	strcpy(meshnamechar,meshname.c_str());
-	retrieveDriver()->readSeq (filenamechar,meshnamechar);
+        char filenamechar[256];
+        char meshnamechar[256];
+        strcpy(filenamechar,filename.c_str());
+        strcpy(meshnamechar,meshname.c_str());
+        retrieveDriver()->readSeq (filenamechar,meshnamechar);
 }
 
 MESHCollection::~MESHCollection()
 {
-	for (int i=0; i<m_mesh.size();i++)
-	  if (m_mesh[i]!=0) {delete m_mesh[i]; }
-	for (int i=0; i<m_connect_zones.size();i++)
-	  if (m_connect_zones[i]!=0) {delete m_connect_zones[i];}
-	if (m_driver !=0) {delete m_driver; m_driver=0;}
-	if (m_topology!=0 && m_owns_topology) {delete m_topology; m_topology=0;}
+        for (int i=0; i<m_mesh.size();i++)
+          if (m_mesh[i]!=0) {delete m_mesh[i]; }
+        for (int i=0; i<m_connect_zones.size();i++)
+          if (m_connect_zones[i]!=0) {delete m_connect_zones[i];}
+        if (m_driver !=0) {delete m_driver; m_driver=0;}
+        if (m_topology!=0 && m_owns_topology) {delete m_topology; m_topology=0;}
 }
 
 /*!gets the connectivity for a certain type
@@ -464,39 +464,39 @@ void MESHCollection::getPolyhedraNodeConnectivity(const int* cell_list,int nb_ce
 void MESHCollection::write(const string& filename)
 {
   //building the connect zones necessary for writing joints
-	cout<<"Building Connect Zones"<<endl;
+        cout<<"Building Connect Zones"<<endl;
   if (m_topology->nbDomain()>1)
     buildConnectZones();
   cout <<"End of connect zones building"<<endl;
-	//suppresses link with driver so that it can be changed for writing
-	if (m_driver!=0)delete m_driver;
-	m_driver=0;
+        //suppresses link with driver so that it can be changed for writing
+        if (m_driver!=0)delete m_driver;
+        m_driver=0;
 
-	char filenamechar[256];
-	strcpy(filenamechar,filename.c_str());
-	retrieveDriver()->write (filenamechar);
+        char filenamechar[256];
+        strcpy(filenamechar,filename.c_str());
+        retrieveDriver()->write (filenamechar);
 }
 
 /*! creates or gets the link to the collection driver
  */
 MESHCollectionDriver* MESHCollection::retrieveDriver()
 {
-	if (m_driver==0)
-		{
-			switch(m_driver_type)
-				{
-				case MedXML:
-					m_driver=new MESHCollectionMedXMLDriver(this);
-					break;
-				case MedAscii:
-					m_driver=new MESHCollectionMedAsciiDriver(this);
-					break;
-				default:
-					throw MEDEXCEPTION("Unrecognized driver");
-				}
-		}
-	
-	return m_driver;
+        if (m_driver==0)
+                {
+                        switch(m_driver_type)
+                                {
+                                case MedXML:
+                                        m_driver=new MESHCollectionMedXMLDriver(this);
+                                        break;
+                                case MedAscii:
+                                        m_driver=new MESHCollectionMedAsciiDriver(this);
+                                        break;
+                                default:
+                                        throw MEDEXCEPTION("Unrecognized driver");
+                                }
+                }
+        
+        return m_driver;
 }
 
 
@@ -505,7 +505,7 @@ MESHCollectionDriver* MESHCollection::retrieveDriver()
  */
 MESHCollectionDriver* MESHCollection::getDriver() const
 {
-	return m_driver;
+        return m_driver;
 }
 
 
@@ -516,29 +516,29 @@ MESHCollectionDriver* MESHCollection::getDriver() const
  * \param type_list on output, list of types for the cells given in cell_list
  */
 void MESHCollection::getTypeList(int* cell_list,int nb_cells,
-																 MED_EN::medEntityMesh entity,
-																 MED_EN::medGeometryElement* type_list) const 
+                                                                                                                                 MED_EN::medEntityMesh entity,
+                                                                                                                                 MED_EN::medGeometryElement* type_list) const 
 {
   MESSAGE_MED (" Beginning of getTypeList with entity "<<entity);
-	int *local=new int[nb_cells];
-	int *ip=new int[nb_cells];
-	switch (entity)
-		{
-		case MED_EN::MED_CELL:
-			m_topology->convertGlobalCellList(cell_list,nb_cells,local,ip);
-			break;
-		case MED_EN::MED_FACE:
-		case MED_EN::MED_EDGE:
-			m_topology->convertGlobalFaceList(cell_list,nb_cells,local,ip);
-			break;
-		}
-	
-	for (int icell=0; icell<nb_cells; icell++)
-		{
-			type_list[icell]=m_mesh[ip[icell]]->getElementTypeWithPoly(entity,local[icell]);										
-		}
-	delete[]local;
-	delete[]ip;
+        int *local=new int[nb_cells];
+        int *ip=new int[nb_cells];
+        switch (entity)
+                {
+                case MED_EN::MED_CELL:
+                        m_topology->convertGlobalCellList(cell_list,nb_cells,local,ip);
+                        break;
+                case MED_EN::MED_FACE:
+                case MED_EN::MED_EDGE:
+                        m_topology->convertGlobalFaceList(cell_list,nb_cells,local,ip);
+                        break;
+                }
+        
+        for (int icell=0; icell<nb_cells; icell++)
+                {
+                        type_list[icell]=m_mesh[ip[icell]]->getElementTypeWithPoly(entity,local[icell]);                                                                                
+                }
+        delete[]local;
+        delete[]ip;
   MESSAGE_MED("end of getTypeList");
 }
 
@@ -557,51 +557,51 @@ void MESHCollection::getTypeList(int* cell_list,int nb_cells,
  * */ 
  
 void MESHCollection::getFaceConnectivity(const int* cell_list,int nb_cells,MED_EN::medEntityMesh entity,
-																				 MED_EN::medGeometryElement type, int* type_connectivity) const
+                                                                                                                                                                 MED_EN::medGeometryElement type, int* type_connectivity) const
 {
-	int *local=new int[nb_cells];
-	int *ip=new int[nb_cells];
-	switch (entity)
-		{
-		case MED_EN::MED_CELL:
-			m_topology->convertGlobalCellList(cell_list,nb_cells,local,ip);
-			break;
-		case MED_EN::MED_FACE:
-		case MED_EN::MED_EDGE:
-			m_topology->convertGlobalFaceList(cell_list,nb_cells,local,ip);
-			break;
-		}
-	
-	
-	int nbface_per_type;
-	switch (type){
-	case 308:
-	  nbface_per_type=6;
-	  break;
-	case 304:
-	  nbface_per_type=4;
-	  break;
-	case 306:
-	  nbface_per_type=5;
-	  break;
-	}
-	
-	vector<int> number_of_types_array(m_topology->nbDomain(),0);
-	for (int i=0; i<m_topology->nbDomain(); i++)
-		number_of_types_array[i]=m_mesh[i]->getNumberOfTypesWithPoly(entity);
-		
-	//defining a connectivity table for different domains	
-	vector  <const int*> conn_ip(m_topology->nbDomain());
-	for (int i=0; i<m_topology->nbDomain();i++)
-		{
-			int nb_elem = m_mesh[i]->getNumberOfElementsWithPoly(entity,type);
-			if (nb_elem>0)
-				conn_ip[i]=m_mesh[i]->getConnectivity(MED_EN::MED_FULL_INTERLACE,						     MED_EN::MED_DESCENDING,entity,type);				
-			else
-				conn_ip[i]=0;											
-		}
+        int *local=new int[nb_cells];
+        int *ip=new int[nb_cells];
+        switch (entity)
+                {
+                case MED_EN::MED_CELL:
+                        m_topology->convertGlobalCellList(cell_list,nb_cells,local,ip);
+                        break;
+                case MED_EN::MED_FACE:
+                case MED_EN::MED_EDGE:
+                        m_topology->convertGlobalFaceList(cell_list,nb_cells,local,ip);
+                        break;
+                }
+        
+        
+        int nbface_per_type;
+        switch (type){
+        case 308:
+          nbface_per_type=6;
+          break;
+        case 304:
+          nbface_per_type=4;
+          break;
+        case 306:
+          nbface_per_type=5;
+          break;
+        }
+        
+        vector<int> number_of_types_array(m_topology->nbDomain(),0);
+        for (int i=0; i<m_topology->nbDomain(); i++)
+                number_of_types_array[i]=m_mesh[i]->getNumberOfTypesWithPoly(entity);
+                
+        //defining a connectivity table for different domains   
+        vector  <const int*> conn_ip(m_topology->nbDomain());
+        for (int i=0; i<m_topology->nbDomain();i++)
+                {
+                        int nb_elem = m_mesh[i]->getNumberOfElementsWithPoly(entity,type);
+                        if (nb_elem>0)
+                                conn_ip[i]=m_mesh[i]->getConnectivity(MED_EN::MED_FULL_INTERLACE,                                                    MED_EN::MED_DESCENDING,entity,type);                               
+                        else
+                                conn_ip[i]=0;                                                                                   
+                }
 
-	for (int icell=0; icell<nb_cells; icell++)
+        for (int icell=0; icell<nb_cells; icell++)
         {
           int number_of_types = number_of_types_array[ip[icell]];
           const MEDMEM::CELLMODEL* types =  m_mesh[ip[icell]]->getCellsTypes(entity);
@@ -611,16 +611,16 @@ void MESHCollection::getFaceConnectivity(const int* cell_list,int nb_cells,MED_E
             if (types[itype].getType() < type)
               type_offset += m_mesh[ip[icell]]->getNumberOfElementsWithPoly(entity,types[itype].getType());
           }
-          const int* conn=conn_ip[ip[icell]];						
+          const int* conn=conn_ip[ip[icell]];                                           
           for (int iface=0; iface<nbface_per_type; iface++)
           {
             type_connectivity[icell*nbface_per_type+iface] = m_topology->convertFaceToGlobal
-              (ip[icell], abs(conn[(local[icell] - type_offset - 1) * nbface_per_type + iface]));						
+              (ip[icell], abs(conn[(local[icell] - type_offset - 1) * nbface_per_type + iface]));                                               
           }
         }
 
-	delete[]local;
-	delete[]ip;
+        delete[]local;
+        delete[]ip;
 }
 
 /*! gets the list of coordinates for a given list of global node numbers
@@ -636,61 +636,61 @@ void MESHCollection::getFaceConnectivity(const int* cell_list,int nb_cells,MED_E
  
 void MESHCollection::getCoordinates(int* node_list,int nb_nodes, double* coordinates) const
 {
-	int* local=new int[nb_nodes];
-	int* ip=new int[nb_nodes];
-	int space_dimension= getSpaceDimension();
-	m_topology->convertGlobalNodeList(node_list,nb_nodes,local,ip);
-	for (int i=0; i< nb_nodes; i++)
-		{
-			const double* coord=m_mesh[ip[i]]->getCoordinates(MED_EN::MED_FULL_INTERLACE);
-			for (int icoord=0; icoord<space_dimension; icoord++)
-				coordinates[i*space_dimension+icoord]=coord[(local[i]-1)*space_dimension+icoord];
-		}
-	delete[]local;
-	delete[] ip;
+        int* local=new int[nb_nodes];
+        int* ip=new int[nb_nodes];
+        int space_dimension= getSpaceDimension();
+        m_topology->convertGlobalNodeList(node_list,nb_nodes,local,ip);
+        for (int i=0; i< nb_nodes; i++)
+                {
+                        const double* coord=m_mesh[ip[i]]->getCoordinates(MED_EN::MED_FULL_INTERLACE);
+                        for (int icoord=0; icoord<space_dimension; icoord++)
+                                coordinates[i*space_dimension+icoord]=coord[(local[i]-1)*space_dimension+icoord];
+                }
+        delete[]local;
+        delete[] ip;
 }
 
 /*! retrieves the space dimension*/
 int MESHCollection::getSpaceDimension() const
 {
-	return m_mesh[0]->getSpaceDimension();
+        return m_mesh[0]->getSpaceDimension();
 }
 /*! retrieves the mesh dimension*/
 int MESHCollection::getMeshDimension() const
 {
-	return m_mesh[0]->getMeshDimension();
+        return m_mesh[0]->getMeshDimension();
 }
 
 /*! retrieves the type of coordinates system*/
 string MESHCollection::getSystem() const
 {
-	return m_mesh[0]->getCoordinatesSystem();
+        return m_mesh[0]->getCoordinatesSystem();
 }
 
 /*!retrieves the name of the mesh*/
 string MESHCollection::getMeshName() const
 {
-	return m_mesh[0]->getName();
+        return m_mesh[0]->getName();
 }
 
 vector<MEDMEM::MESH*>& MESHCollection::getMesh() 
 {
-	return m_mesh;
+        return m_mesh;
 }
 
 MEDMEM::MESH* MESHCollection::getMesh(int idomain) const
 {
-	return m_mesh[idomain];
+        return m_mesh[idomain];
 }
 
 vector<MEDMEM::CONNECTZONE*>& MESHCollection::getCZ()
 {
-	return m_connect_zones;
+        return m_connect_zones;
 }
 
 Topology* MESHCollection::getTopology() const 
 {
-	return m_topology;
+        return m_topology;
 }
 
 void MESHCollection::setTopology(Topology* topo)
@@ -705,8 +705,8 @@ void MESHCollection::setTopology(Topology* topo)
 
 void MESHCollection::setIndivisibleGroup(const string& name)
 {
-	m_indivisible_regions.push_back(name);
-	
+        m_indivisible_regions.push_back(name);
+        
 }
 
 /*! Browses the domains and the regions that have 
@@ -716,36 +716,36 @@ void MESHCollection::setIndivisibleGroup(const string& name)
  * and that contains an integer corresponding to the group otherwise.
  * 
  * \param   indivisible_tag on input is an int* allocated as int[nbcells]
- *		    on output contains the tags 
+ *                  on output contains the tags 
  */
 
 
 void MESHCollection::treatIndivisibleRegions(int* indivisible_tag)
 {
-	//tag 0 is positioned on all the cells that are not affected by these tags
-	for (int i=0; i<m_topology->nbCells(); i++)
-		indivisible_tag[i]=0;
+        //tag 0 is positioned on all the cells that are not affected by these tags
+        for (int i=0; i<m_topology->nbCells(); i++)
+                indivisible_tag[i]=0;
 
-	//treating cell groups		
-	for (int idomain=0; idomain<m_topology->nbDomain();idomain++)
-		for (int igroup=0; igroup<m_mesh[idomain]->getNumberOfGroups(MED_EN::MED_CELL); igroup++)
-			for (int i=0; i<m_indivisible_regions.size(); i++)
-				{
-					const MEDMEM::GROUP* group = m_mesh[idomain]->getGroup(MED_EN::MED_CELL,igroup+1);
-					string groupname = group->getName();
-					if (trim(groupname)==trim(m_indivisible_regions[i]))
-						{
-							int nbcells=group->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-							const int* numbers=group->getNumber(MED_EN::MED_ALL_ELEMENTS);
-							int* global=new int[nbcells];
-							m_topology->convertCellToGlobal(idomain,numbers,nbcells,global);
-							for (int icell=0; icell<nbcells; icell++)
-								indivisible_tag[global[icell]-1]=i+1;
-							delete[] global;
-						} 
-				}
-				
-}	
+        //treating cell groups          
+        for (int idomain=0; idomain<m_topology->nbDomain();idomain++)
+                for (int igroup=0; igroup<m_mesh[idomain]->getNumberOfGroups(MED_EN::MED_CELL); igroup++)
+                        for (int i=0; i<m_indivisible_regions.size(); i++)
+                                {
+                                        const MEDMEM::GROUP* group = m_mesh[idomain]->getGroup(MED_EN::MED_CELL,igroup+1);
+                                        string groupname = group->getName();
+                                        if (trim(groupname)==trim(m_indivisible_regions[i]))
+                                                {
+                                                        int nbcells=group->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+                                                        const int* numbers=group->getNumber(MED_EN::MED_ALL_ELEMENTS);
+                                                        int* global=new int[nbcells];
+                                                        m_topology->convertCellToGlobal(idomain,numbers,nbcells,global);
+                                                        for (int icell=0; icell<nbcells; icell++)
+                                                                indivisible_tag[global[icell]-1]=i+1;
+                                                        delete[] global;
+                                                } 
+                                }
+                                
+}       
 
 
 /*! Method creating the cell graph
@@ -1017,54 +1017,54 @@ cout<< "end of graph creation"<<endl;
  * returns a topology based on the new graph
  */
 Topology* MESHCollection::createPartition(int nbdomain, 
-					  Graph::splitter_type split, 
-					  const string& options_string,
-					  int* user_edge_weights,
-					  int* user_vertices_weights)
+                                          Graph::splitter_type split, 
+                                          const string& options_string,
+                                          int* user_edge_weights,
+                                          int* user_vertices_weights)
 {
-	if (nbdomain <1) throw MEDEXCEPTION("Number of subdomains must be >0");
-	MEDMEM::MEDSKYLINEARRAY* array=0;
-	int* edgeweights=0;
+        if (nbdomain <1) throw MEDEXCEPTION("Number of subdomains must be >0");
+        MEDMEM::MEDSKYLINEARRAY* array=0;
+        int* edgeweights=0;
 
-	MESSAGE_MED("Building cell graph");
-	buildCellGraph(array,edgeweights);
+        MESSAGE_MED("Building cell graph");
+        buildCellGraph(array,edgeweights);
 
-	switch (split)
-		{
-		case Graph::METIS:
+        switch (split)
+                {
+                case Graph::METIS:
 #ifdef ENABLE_METIS
-			m_cell_graph=boost::shared_ptr<Graph>(new METISGraph(array,edgeweights));
+                        m_cell_graph=boost::shared_ptr<Graph>(new METISGraph(array,edgeweights));
 #else
-			throw MEDEXCEPTION("METIS Graph is not available. Check your products, please.");
+                        throw MEDEXCEPTION("METIS Graph is not available. Check your products, please.");
 #endif
-			break;
-		case Graph::SCOTCH:
+                        break;
+                case Graph::SCOTCH:
 #ifdef ENABLE_SCOTCH
-			m_cell_graph=boost::shared_ptr<Graph>(new SCOTCHGraph(array,edgeweights));
+                        m_cell_graph=boost::shared_ptr<Graph>(new SCOTCHGraph(array,edgeweights));
 #else
-			throw MEDEXCEPTION("SCOTCH Graph is not available. Check your products, please.");
+                        throw MEDEXCEPTION("SCOTCH Graph is not available. Check your products, please.");
 #endif
-			break;
-		}
+                        break;
+                }
 
-	//!user-defined weights
-	if (user_edge_weights!=0) 
-	  m_cell_graph->setEdgesWeights(user_edge_weights);
-	if (user_vertices_weights!=0)
-	  m_cell_graph->setVerticesWeights(user_vertices_weights);
+        //!user-defined weights
+        if (user_edge_weights!=0) 
+          m_cell_graph->setEdgesWeights(user_edge_weights);
+        if (user_vertices_weights!=0)
+          m_cell_graph->setVerticesWeights(user_vertices_weights);
 
-	MESSAGE_MED("Partitioning graph");
-	m_cell_graph->partGraph(nbdomain,options_string);
+        MESSAGE_MED("Partitioning graph");
+        m_cell_graph->partGraph(nbdomain,options_string);
 
-	MESSAGE_MED("Building new topology");
-	//m_cell_graph is a shared pointer 
-	Topology* topology = new ParallelTopology (m_cell_graph, nbdomain, getMeshDimension());
+        MESSAGE_MED("Building new topology");
+        //m_cell_graph is a shared pointer 
+        Topology* topology = new ParallelTopology (m_cell_graph, nbdomain, getMeshDimension());
 
-	//cleaning
-	if (edgeweights!=0) delete[] edgeweights;
-	//if (array!=0) delete array;
-	MESSAGE_MED("End of partition creation");
-	return topology;
+        //cleaning
+        if (edgeweights!=0) delete[] edgeweights;
+        //if (array!=0) delete array;
+        MESSAGE_MED("End of partition creation");
+        return topology;
 }
 
 /*! Creates a topology for a partition specified by the user
@@ -1075,25 +1075,25 @@ Topology* MESHCollection::createPartition(int nbdomain,
  */
 Topology* MESHCollection::createPartition(const int* partition)
 {
-	MEDMEM::MEDSKYLINEARRAY* array=0;
-	int* edgeweights=0;
-	
-	buildCellGraph(array,edgeweights);
-	
-	set<int> domains;
-	for (int i=0; i<m_topology->nbCells(); i++)
-		{
-			domains.insert(partition[i]);
-		}
-	int nbdomain=domains.size();
-	
-	m_cell_graph=boost::shared_ptr<Graph>(new UserGraph(array, partition, m_topology->nbCells()));
-	
-	//m_cell_graph is a shared pointer 
-	Topology* topology = new ParallelTopology (m_cell_graph, nbdomain, getMeshDimension());
-	
-	//if (array!=0) delete array;
-	return topology;
+        MEDMEM::MEDSKYLINEARRAY* array=0;
+        int* edgeweights=0;
+        
+        buildCellGraph(array,edgeweights);
+        
+        set<int> domains;
+        for (int i=0; i<m_topology->nbCells(); i++)
+                {
+                        domains.insert(partition[i]);
+                }
+        int nbdomain=domains.size();
+        
+        m_cell_graph=boost::shared_ptr<Graph>(new UserGraph(array, partition, m_topology->nbCells()));
+        
+        //m_cell_graph is a shared pointer 
+        Topology* topology = new ParallelTopology (m_cell_graph, nbdomain, getMeshDimension());
+        
+        //if (array!=0) delete array;
+        return topology;
 }
 
 
@@ -1108,55 +1108,55 @@ Topology* MESHCollection::createPartition(const int* partition)
  
 void MESHCollection::buildConnectZones(int idomain)
 {
-	// constructing node/node correspondencies
-	vector<MEDMEM::MEDSKYLINEARRAY*> node_node_correspondency;
-	node_node_correspondency.resize(m_topology->nbDomain());
+        // constructing node/node correspondencies
+        vector<MEDMEM::MEDSKYLINEARRAY*> node_node_correspondency;
+        node_node_correspondency.resize(m_topology->nbDomain());
 
-	cout << "Computing node/node corresp"<<endl;
+        cout << "Computing node/node corresp"<<endl;
 
-	m_topology->computeNodeNodeCorrespondencies(idomain, node_node_correspondency );
-	
-	for (int idistant=0; idistant< m_topology->nbDomain(); idistant++)
-		{
-			// on regarde si une correspondance noeud/noeud a été trouvée 
-			// entre idomain et idistant
-			// si oui, on crée une connectzone
-			if (node_node_correspondency[idistant]!=0)
-				{
-					MEDMEM::CONNECTZONE* cz= new MEDMEM::CONNECTZONE();
-					cz->setLocalMesh(m_mesh[idomain]);
-					cz->setDistantMesh(m_mesh[idistant]);
-					cz->setLocalDomainNumber(idomain);
-					cz->setDistantDomainNumber(idistant);
-					cz-> setName ("Connect zone defined by SPLITTER");
-					cz->setNodeCorresp(node_node_correspondency[idistant]);
-					m_connect_zones.push_back(cz);	
-				}
-		}
-	cout << "Computing node/node corresp"<<endl;
-
-	vector<MEDMEM::MEDSKYLINEARRAY*> cell_cell_correspondency;
-	cell_cell_correspondency.resize(m_topology->nbDomain());
-	m_topology->computeCellCellCorrespondencies(idomain, cell_cell_correspondency, m_cell_graph.get());
-	
-	for (int idistant=0; idistant< m_topology->nbDomain(); idistant++)
-		{
-			//the connect zone has been created by the node/node computation
-			if (cell_cell_correspondency[idistant]!=0)
-				{
-					MEDMEM::CONNECTZONE* cz=0;
-					for (int icz=0; icz<m_connect_zones.size();icz++)
-						if (m_connect_zones[icz]->getLocalDomainNumber()==idomain &&
-								m_connect_zones[icz]->getDistantDomainNumber()==idistant)
-							cz = m_connect_zones[icz];
-					if (cz!=0)	
-						cz->setEntityCorresp(MED_EN::MED_CELL,MED_EN::MED_CELL, cell_cell_correspondency[idistant]);
-					else 
-						throw MEDEXCEPTION("MESHCollection::buildConnectZones() -A connect zone should exist");   
-					//delete cell_cell_correspondency[idistant];
-				}
+        m_topology->computeNodeNodeCorrespondencies(idomain, node_node_correspondency );
         
-		}
+        for (int idistant=0; idistant< m_topology->nbDomain(); idistant++)
+                {
+                        // on regarde si une correspondance noeud/noeud a été trouvée 
+                        // entre idomain et idistant
+                        // si oui, on crée une connectzone
+                        if (node_node_correspondency[idistant]!=0)
+                                {
+                                        MEDMEM::CONNECTZONE* cz= new MEDMEM::CONNECTZONE();
+                                        cz->setLocalMesh(m_mesh[idomain]);
+                                        cz->setDistantMesh(m_mesh[idistant]);
+                                        cz->setLocalDomainNumber(idomain);
+                                        cz->setDistantDomainNumber(idistant);
+                                        cz-> setName ("Connect zone defined by SPLITTER");
+                                        cz->setNodeCorresp(node_node_correspondency[idistant]);
+                                        m_connect_zones.push_back(cz);  
+                                }
+                }
+        cout << "Computing node/node corresp"<<endl;
+
+        vector<MEDMEM::MEDSKYLINEARRAY*> cell_cell_correspondency;
+        cell_cell_correspondency.resize(m_topology->nbDomain());
+        m_topology->computeCellCellCorrespondencies(idomain, cell_cell_correspondency, m_cell_graph.get());
+        
+        for (int idistant=0; idistant< m_topology->nbDomain(); idistant++)
+                {
+                        //the connect zone has been created by the node/node computation
+                        if (cell_cell_correspondency[idistant]!=0)
+                                {
+                                        MEDMEM::CONNECTZONE* cz=0;
+                                        for (int icz=0; icz<m_connect_zones.size();icz++)
+                                                if (m_connect_zones[icz]->getLocalDomainNumber()==idomain &&
+                                                                m_connect_zones[icz]->getDistantDomainNumber()==idistant)
+                                                        cz = m_connect_zones[icz];
+                                        if (cz!=0)      
+                                                cz->setEntityCorresp(MED_EN::MED_CELL,MED_EN::MED_CELL, cell_cell_correspondency[idistant]);
+                                        else 
+                                                throw MEDEXCEPTION("MESHCollection::buildConnectZones() -A connect zone should exist");   
+                                        //delete cell_cell_correspondency[idistant];
+                                }
+        
+                }
 }
 /*! building Connect Zones for storing the informations
  * of the connectivity 
@@ -1229,18 +1229,18 @@ void MESHCollection::buildConnectZones()
       if (cell_cell_correspondency[idistant]!=0)
         {
           int nbcells = cell_cell_correspondency[idistant]->getNumberOf();
-					//					MEDMEM::CELLMODEL_Map cellmodel_map;
+                                        //                                      MEDMEM::CELLMODEL_Map cellmodel_map;
           for (int ilocal=0; ilocal<nbcells; ilocal++)
           { 
-						//            medGeometryElement local_type = m_mesh[idomain]->getElementType(MED_EN::MED_CELL,ilocal+1);
-						//            MEDMEM::CELLMODEL  local_model = cellmodel_map.retrieveCellModel (local_type);
+                                                //            medGeometryElement local_type = m_mesh[idomain]->getElementType(MED_EN::MED_CELL,ilocal+1);
+                                                //            MEDMEM::CELLMODEL  local_model = cellmodel_map.retrieveCellModel (local_type);
             const int* index = cell_cell_correspondency[idistant]->getIndex();
             const int* value = cell_cell_correspondency[idistant]->getValue();
             for (int icelldistant = index[ilocal]; icelldistant < index[ilocal+1]; icelldistant++)
             {
               int distant_id = value[icelldistant-1];
-							//               medGeometryElement distant_type = m_mesh[idistant]->getElementType(MED_EN::MED_CELL,distant_id);
-							 //							 MEDMEM::CELLMODEL distant_model = cellmodel_map.retrieveCellModel (distant_type);
+                                                        //               medGeometryElement distant_type = m_mesh[idistant]->getElementType(MED_EN::MED_CELL,distant_id);
+                                                         //                                                      MEDMEM::CELLMODEL distant_model = cellmodel_map.retrieveCellModel (distant_type);
                MEDSPLITTER_FaceModel* face = getCommonFace(idomain,ilocal+1,idistant,distant_id,global_face_id);
                face_map[idomain][face->getType()].push_back(face);
                MEDSPLITTER_FaceModel* face2 = getCommonFace(idistant,distant_id,idomain, ilocal+1,global_face_id);
@@ -1444,205 +1444,205 @@ void MESHCollection::buildConnectZones()
  */
 void MESHCollection::castFamilies(const MESHCollection& old_collection)
 {
-	vector <list<int> > element_array  (m_topology->nbDomain());
-	
-	//loop on old domains to create groups out of the existing families
-	if (m_family_splitting)
-		for (int idomain=0; idomain < old_collection.m_topology->nbDomain(); idomain++)
-				old_collection.getMesh(idomain)->createGroups();
-			
-	//definition of the entities array which 
-	//defines the entities over which the information is cast
-	MED_EN::medEntityMesh entities[3];
-	entities[0]=MED_EN::MED_NODE;
-	entities[2]=MED_EN::MED_CELL;
-	switch (getMeshDimension())
-		{
-		case 3:
-			entities[1]= MED_EN::MED_FACE;	
-			break;
-		case 2:
-			entities[1]= MED_EN::MED_EDGE;	
-			break;
-		}
-
-	for (int ientity=0; ientity<=2;ientity++)
-		{
-        	
-			//int nbgroups = old_collection.getMesh(0)->getNumberOfGroups(entities[ientity]);
+        vector <list<int> > element_array  (m_topology->nbDomain());
         
-			map <string, set<int> > group_map;
-			for (int idomain=0; idomain < old_collection.m_topology->nbDomain(); idomain++)
-				{
-					for (int igroup=0; igroup<old_collection.getMesh(idomain)->getNumberOfGroups(entities[ientity]); igroup++)
+        //loop on old domains to create groups out of the existing families
+        if (m_family_splitting)
+                for (int idomain=0; idomain < old_collection.m_topology->nbDomain(); idomain++)
+                                old_collection.getMesh(idomain)->createGroups();
+                        
+        //definition of the entities array which 
+        //defines the entities over which the information is cast
+        MED_EN::medEntityMesh entities[3];
+        entities[0]=MED_EN::MED_NODE;
+        entities[2]=MED_EN::MED_CELL;
+        switch (getMeshDimension())
+                {
+                case 3:
+                        entities[1]= MED_EN::MED_FACE;  
+                        break;
+                case 2:
+                        entities[1]= MED_EN::MED_EDGE;  
+                        break;
+                }
+
+        for (int ientity=0; ientity<=2;ientity++)
+                {
+                
+                        //int nbgroups = old_collection.getMesh(0)->getNumberOfGroups(entities[ientity]);
+        
+                        map <string, set<int> > group_map;
+                        for (int idomain=0; idomain < old_collection.m_topology->nbDomain(); idomain++)
+                                {
+                                        for (int igroup=0; igroup<old_collection.getMesh(idomain)->getNumberOfGroups(entities[ientity]); igroup++)
             {
-							//retrieves a group
+                                                        //retrieves a group
               MEDMEM::GROUP* group = (old_collection.getMesh(idomain)->getGroups(entities[ientity]))[igroup];
-							//increments the number of groups if it is a new group
+                                                        //increments the number of groups if it is a new group
               //if (group_map.find(group->getName())==group_map.end())
                
-							group_map[group->getName()].insert(idomain);
-							//   group_map.insert(make_pair(group->getName(), idomain);
+                                                        group_map[group->getName()].insert(idomain);
+                                                        //   group_map.insert(make_pair(group->getName(), idomain);
               
             }   
-				}
-			int nbgroups=group_map.size();
-			vector <int> igroupold(old_collection.m_topology->nbDomain(),0);
-			map<string,set<int> >::const_iterator iter=group_map.begin();
+                                }
+                        int nbgroups=group_map.size();
+                        vector <int> igroupold(old_collection.m_topology->nbDomain(),0);
+                        map<string,set<int> >::const_iterator iter=group_map.begin();
          
-			for (int igroup=0; igroup<nbgroups; igroup++)
-		    {
-					vector <const MEDMEM::SUPPORT*> old_supports(old_collection.m_topology->nbDomain());
-		      string group_name = iter->first;
-					iter++; 
-			
-					//parameters stored for passing group description
-					// form the old meshes to the new ones
+                        for (int igroup=0; igroup<nbgroups; igroup++)
+                    {
+                                        vector <const MEDMEM::SUPPORT*> old_supports(old_collection.m_topology->nbDomain());
+                      string group_name = iter->first;
+                                        iter++; 
+                        
+                                        //parameters stored for passing group description
+                                        // form the old meshes to the new ones
            
-					for (int idomain=0; idomain < old_collection.m_topology->nbDomain(); idomain++)
-						{
-							//                for (set<int>::iterator iter=group_map[group_name].begin(); iter!=group_map[group_name].end(); iter++)
-							//                cout << *iter<<" ";
-							//                cout <<endl;
-							if (group_map[group_name].find(idomain)==group_map[group_name].end()) continue;
+                                        for (int idomain=0; idomain < old_collection.m_topology->nbDomain(); idomain++)
+                                                {
+                                                        //                for (set<int>::iterator iter=group_map[group_name].begin(); iter!=group_map[group_name].end(); iter++)
+                                                        //                cout << *iter<<" ";
+                                                        //                cout <<endl;
+                                                        if (group_map[group_name].find(idomain)==group_map[group_name].end()) continue;
                                     
-							//retrieves the group igroup on domain idomain
-							MEDMEM::GROUP* group = (old_collection.getMesh(idomain)->getGroups(entities[ientity]))[igroupold[idomain]];
-							old_supports[idomain] = static_cast<const MEDMEM::SUPPORT*> (group);
-							igroupold[idomain]++;
-						}
-			
-					vector <MEDMEM::GROUP*>new_groups(m_topology->nbDomain());
-					vector <MEDMEM::SUPPORT*> new_supports(m_topology->nbDomain());
-					for (int i=0; i<m_topology->nbDomain(); i++)
-						{
-							new_groups[i]=new MEDMEM::GROUP();
-							new_supports[i]=static_cast<MEDMEM::SUPPORT*>(new_groups[i]);
-						}
-					castSupport(old_collection,old_supports,new_supports);			
-			
-					//creating new groups from the previous list of elements
-					for (int idomain=0; idomain <m_topology->nbDomain(); idomain++)
-						{
-							MEDMEM::MESHING* mesh_builder=static_cast<MEDMEM::MESHING*> (m_mesh[idomain]);
-							mesh_builder->addGroup(*new_groups[idomain]);
-						}
-					//groups are copied by the addGroup method,
-					//so they can be safely deleted here
-					for (int i=0; i<m_topology->nbDomain(); i++)
-						{
-							delete new_groups[i];
-						}
-		
-				}// on groups
-		}//on entities
+                                                        //retrieves the group igroup on domain idomain
+                                                        MEDMEM::GROUP* group = (old_collection.getMesh(idomain)->getGroups(entities[ientity]))[igroupold[idomain]];
+                                                        old_supports[idomain] = static_cast<const MEDMEM::SUPPORT*> (group);
+                                                        igroupold[idomain]++;
+                                                }
+                        
+                                        vector <MEDMEM::GROUP*>new_groups(m_topology->nbDomain());
+                                        vector <MEDMEM::SUPPORT*> new_supports(m_topology->nbDomain());
+                                        for (int i=0; i<m_topology->nbDomain(); i++)
+                                                {
+                                                        new_groups[i]=new MEDMEM::GROUP();
+                                                        new_supports[i]=static_cast<MEDMEM::SUPPORT*>(new_groups[i]);
+                                                }
+                                        castSupport(old_collection,old_supports,new_supports);                  
+                        
+                                        //creating new groups from the previous list of elements
+                                        for (int idomain=0; idomain <m_topology->nbDomain(); idomain++)
+                                                {
+                                                        MEDMEM::MESHING* mesh_builder=static_cast<MEDMEM::MESHING*> (m_mesh[idomain]);
+                                                        mesh_builder->addGroup(*new_groups[idomain]);
+                                                }
+                                        //groups are copied by the addGroup method,
+                                        //so they can be safely deleted here
+                                        for (int i=0; i<m_topology->nbDomain(); i++)
+                                                {
+                                                        delete new_groups[i];
+                                                }
+                
+                                }// on groups
+                }//on entities
 }
 
 
 void MESHCollection::castSupport(const MESHCollection& old_collection, vector<const MEDMEM::SUPPORT*> old_support, vector<MEDMEM::SUPPORT*> new_support)
 {
-	
-	if (old_collection.m_topology->nbDomain() != old_support.size())
-		{
-			throw MED_EXCEPTION(STRING("Error : wrong call to MESHCollection::castSupport"));
-		}
-	vector <list<int> > element_array  (m_topology->nbDomain());
-	
-	//parameters stored for passing description
-	// form the old meshes to the new ones
-	string name;
-	string description;
-	MED_EN::medEntityMesh entity;
-	vector <string> support_name(1);
-	support_name[0]="support";
-	for (int inew=0; inew< m_topology->nbDomain(); inew++)
-		element_array[inew].clear();
-		
-	for (int idomain=0; idomain < old_collection.m_topology->nbDomain(); idomain++)
-		{
-			//retrieves the group igroup on domain idomain
-			const MEDMEM::SUPPORT* support = old_support[idomain];
-			if (old_support[idomain]==0) continue;
-			name = support->getName();
-			description=support->getDescription();
-			int nbelem = support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-			if (nbelem==0 && !m_create_empty_groups) continue;
-		
-			int* list_of_elems;
-			if (support->isOnAllElements())
-				{
-					list_of_elems = new int[nbelem];
-					for (int i=0; i<nbelem;i++)
-						list_of_elems[i]=i+1;
-				}
-			else
-				list_of_elems = const_cast<int*> (support->getNumber(MED_EN::MED_ALL_ELEMENTS));
-
-			int* array=new int[nbelem];
-			int* ip=0;
-			int* local=0;
-			int* full_array=0;
-			entity = support->getEntity();
-			int size;
-
-			switch (entity)
-				{
-				case MED_EN::MED_CELL :
-					ip=new int[nbelem];
-					local= new int[nbelem];
-					size=nbelem;
-					old_collection.getTopology()->convertCellToGlobal(idomain,list_of_elems,nbelem,array);
-					m_topology->convertGlobalCellList(array,nbelem,local,ip);
-					for (int i=0; i<nbelem; i++)
-						//							cell_arrays[ip[i]][local[i]]=id;
-						{
-							//					cout <<"(glob,ip,iloc)/nbelem"<<array[i]<<" "<<ip[i]<<" "<<local[i]<<"/"<<nbelem<<endl;
-							element_array[ip[i]].push_back(local[i]);
-						}
-					break;
-				case MED_EN::MED_FACE :
-				case MED_EN::MED_EDGE :
-					old_collection.getTopology()->convertFaceToGlobal(idomain,list_of_elems,nbelem,array);
-					m_topology->convertGlobalFaceListWithTwins(array,nbelem,local,ip,full_array,size);
-					for (int i=0; i<size; i++)
-						element_array[ip[i]].push_back(local[i]);
-					delete[] full_array;	
-					break;
-				case MED_EN::MED_NODE :
-					old_collection.getTopology()->convertNodeToGlobal(idomain,list_of_elems,nbelem,array);
-					m_topology->convertGlobalNodeListWithTwins(array,nbelem,local,ip,full_array,size);
-					for (int i=0; i<size; i++)
-						element_array[ip[i]].push_back(local[i]);
-					delete[] full_array;
-					break;
-				
-				}
-			delete[] ip;
-			delete[] local;
-			delete[] array;
         
-			if (support->isOnAllElements()) delete[] list_of_elems;
-		}
-	
-	//creating new groups from the previous list of elements
-	for (int idomain=0; idomain <m_topology->nbDomain(); idomain++)
-		{
-			MEDMEM::SUPPORT* support= new_support[idomain];
-			support->setName(name);
-			support->setMesh(m_mesh[idomain]);
-			support->setDescription(description);
-			support->setEntity(entity);
+        if (old_collection.m_topology->nbDomain() != old_support.size())
+                {
+                        throw MED_EXCEPTION(STRING("Error : wrong call to MESHCollection::castSupport"));
+                }
+        vector <list<int> > element_array  (m_topology->nbDomain());
+        
+        //parameters stored for passing description
+        // form the old meshes to the new ones
+        string name;
+        string description;
+        MED_EN::medEntityMesh entity;
+        vector <string> support_name(1);
+        support_name[0]="support";
+        for (int inew=0; inew< m_topology->nbDomain(); inew++)
+                element_array[inew].clear();
+                
+        for (int idomain=0; idomain < old_collection.m_topology->nbDomain(); idomain++)
+                {
+                        //retrieves the group igroup on domain idomain
+                        const MEDMEM::SUPPORT* support = old_support[idomain];
+                        if (old_support[idomain]==0) continue;
+                        name = support->getName();
+                        description=support->getDescription();
+                        int nbelem = support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+                        if (nbelem==0 && !m_create_empty_groups) continue;
+                
+                        int* list_of_elems;
+                        if (support->isOnAllElements())
+                                {
+                                        list_of_elems = new int[nbelem];
+                                        for (int i=0; i<nbelem;i++)
+                                                list_of_elems[i]=i+1;
+                                }
+                        else
+                                list_of_elems = const_cast<int*> (support->getNumber(MED_EN::MED_ALL_ELEMENTS));
 
-			element_array[idomain].sort();
-			element_array[idomain].unique();
-		
-			if (entity != MED_EN::MED_NODE)
-				support->fillFromElementList(element_array[idomain]);
-			else
-				{
-					support->fillFromNodeList(element_array[idomain]);
-				}
-		}
+                        int* array=new int[nbelem];
+                        int* ip=0;
+                        int* local=0;
+                        int* full_array=0;
+                        entity = support->getEntity();
+                        int size;
+
+                        switch (entity)
+                                {
+                                case MED_EN::MED_CELL :
+                                        ip=new int[nbelem];
+                                        local= new int[nbelem];
+                                        size=nbelem;
+                                        old_collection.getTopology()->convertCellToGlobal(idomain,list_of_elems,nbelem,array);
+                                        m_topology->convertGlobalCellList(array,nbelem,local,ip);
+                                        for (int i=0; i<nbelem; i++)
+                                                //                                                      cell_arrays[ip[i]][local[i]]=id;
+                                                {
+                                                        //                                      cout <<"(glob,ip,iloc)/nbelem"<<array[i]<<" "<<ip[i]<<" "<<local[i]<<"/"<<nbelem<<endl;
+                                                        element_array[ip[i]].push_back(local[i]);
+                                                }
+                                        break;
+                                case MED_EN::MED_FACE :
+                                case MED_EN::MED_EDGE :
+                                        old_collection.getTopology()->convertFaceToGlobal(idomain,list_of_elems,nbelem,array);
+                                        m_topology->convertGlobalFaceListWithTwins(array,nbelem,local,ip,full_array,size);
+                                        for (int i=0; i<size; i++)
+                                                element_array[ip[i]].push_back(local[i]);
+                                        delete[] full_array;    
+                                        break;
+                                case MED_EN::MED_NODE :
+                                        old_collection.getTopology()->convertNodeToGlobal(idomain,list_of_elems,nbelem,array);
+                                        m_topology->convertGlobalNodeListWithTwins(array,nbelem,local,ip,full_array,size);
+                                        for (int i=0; i<size; i++)
+                                                element_array[ip[i]].push_back(local[i]);
+                                        delete[] full_array;
+                                        break;
+                                
+                                }
+                        delete[] ip;
+                        delete[] local;
+                        delete[] array;
+        
+                        if (support->isOnAllElements()) delete[] list_of_elems;
+                }
+        
+        //creating new groups from the previous list of elements
+        for (int idomain=0; idomain <m_topology->nbDomain(); idomain++)
+                {
+                        MEDMEM::SUPPORT* support= new_support[idomain];
+                        support->setName(name);
+                        support->setMesh(m_mesh[idomain]);
+                        support->setDescription(description);
+                        support->setEntity(entity);
+
+                        element_array[idomain].sort();
+                        element_array[idomain].unique();
+                
+                        if (entity != MED_EN::MED_NODE)
+                                support->fillFromElementList(element_array[idomain]);
+                        else
+                                {
+                                        support->fillFromNodeList(element_array[idomain]);
+                                }
+                }
 }
 
 void MESHCollection::castField(const MESHCollection& old_collection, const string& fieldname, int itnumber, int ordernumber)
@@ -1659,161 +1659,161 @@ void MESHCollection::castField(const MESHCollection& old_collection, const strin
 
 void MESHCollection::castAllFields(const MESHCollection& initial_collection)
 {
-	vector <string> field_names;
-	vector <int> iternumber;
-	vector <int> ordernumber;
-	vector <int> types;
-	initial_collection.getDriver()->readFileStruct(field_names,iternumber,ordernumber,types);
-	
-	for (int i=0; i<field_names.size(); i++)
-		{
-			char field_char[80];
-			strcpy(field_char,field_names[i].c_str());
-		
-			// choosing whether the field is of int or double type
-			if (types[i] ==0)
+        vector <string> field_names;
+        vector <int> iternumber;
+        vector <int> ordernumber;
+        vector <int> types;
+        initial_collection.getDriver()->readFileStruct(field_names,iternumber,ordernumber,types);
+        
+        for (int i=0; i<field_names.size(); i++)
+                {
+                        char field_char[80];
+                        strcpy(field_char,field_names[i].c_str());
+                
+                        // choosing whether the field is of int or double type
+                        if (types[i] ==0)
         castFields<int>(initial_collection, field_char, iternumber[i], ordernumber[i]);
-			else
-			  castFields<double>(initial_collection, field_char, iternumber[i], ordernumber[i]);
-		}
+                        else
+                          castFields<double>(initial_collection, field_char, iternumber[i], ordernumber[i]);
+                }
 }
 
 void MESHCollection::createNodalConnectivity(const MESHCollection& initial_collection,int idomain, MED_EN::medEntityMesh entity)
 {
   MESSAGE_MED ("beginning of createNodalConnectivity for entity "<<entity);
-	int dimension=0;
-	int nb_elems=0;
-	MEDMEM::MESHING* mesh_builder = static_cast<MEDMEM::MESHING*>(m_mesh[idomain]);
-	
+        int dimension=0;
+        int nb_elems=0;
+        MEDMEM::MESHING* mesh_builder = static_cast<MEDMEM::MESHING*>(m_mesh[idomain]);
+        
   
-	//number of elements per type
-	std::map<MED_EN::medGeometryElement,int> type_numbers;
-	
-	//creating arrays for storing global numbers and cell types
-	switch (entity)
-		{
-		case MED_EN::MED_CELL:
-			dimension=initial_collection.getMeshDimension();
-			nb_elems=m_topology->getCellNumber(idomain);
-			break;
-		case MED_EN::MED_EDGE:
-		case MED_EN::MED_FACE:
-			dimension=initial_collection.getMeshDimension()-1;
-			nb_elems=m_topology->getFaceNumber(idomain);	
-			break;
-		default:
-			nb_elems=0;
-			break;
-		}
+        //number of elements per type
+        std::map<MED_EN::medGeometryElement,int> type_numbers;
+        
+        //creating arrays for storing global numbers and cell types
+        switch (entity)
+                {
+                case MED_EN::MED_CELL:
+                        dimension=initial_collection.getMeshDimension();
+                        nb_elems=m_topology->getCellNumber(idomain);
+                        break;
+                case MED_EN::MED_EDGE:
+                case MED_EN::MED_FACE:
+                        dimension=initial_collection.getMeshDimension()-1;
+                        nb_elems=m_topology->getFaceNumber(idomain);    
+                        break;
+                default:
+                        nb_elems=0;
+                        break;
+                }
  
   if (nb_elems == 0) return;
   SCRUTE_MED(nb_elems);
   
-   	
-	int *list= new int[nb_elems];
-	MED_EN::medGeometryElement *cell_type_list= new MED_EN::medGeometryElement[nb_elems];
-	
+        
+        int *list= new int[nb_elems];
+        MED_EN::medGeometryElement *cell_type_list= new MED_EN::medGeometryElement[nb_elems];
+        
   
-	//	cout << "Beginning of retrieval "<<endl;
-	//retrieving global id list
-	switch (entity)
-		{
-		case MED_EN::MED_CELL:
-			m_topology->getCellList(idomain,list);
-			break;
-		case MED_EN::MED_EDGE:
-		case MED_EN::MED_FACE:
-			m_topology->getFaceList(idomain,list);
-			break;
-		default:
-			
-			break;
-		}
-	
-	//retrieving cell_types
-	initial_collection.getTypeList(list,nb_elems,entity,cell_type_list);
-	//	cout <<"end of type retrieval"<<endl;
-	//vector containing the number of cells per type
-	type_numbers.clear();
-	for (int icell=0; icell<nb_elems; icell++)
-		{
-			map<MED_EN::medGeometryElement,int>::iterator iter= type_numbers.find(cell_type_list[icell]);
-			if (iter!=type_numbers.end())
-				(iter->second)++;
-			else	
-				type_numbers[cell_type_list[icell]]=1;
-		
-		}
-	//cout << "Nombre de tetras"<<type_numbers[304]<<endl;
-	int nb_present_types=type_numbers.size();
-	
-	//setting the list of cells for each type
-	map<MED_EN::medGeometryElement,int> index;
-	
-	map<MED_EN::medGeometryElement,int*> type_cell_list;
-	
-	MED_EN::MESH_ENTITIES::const_iterator currentEntity;
-	std::map<MED_EN::medGeometryElement,int>::const_iterator iter;
-	//currentEntity  = MED_EN::meshEntities.find(entity);
-	for (iter = type_numbers.begin();iter != type_numbers.end(); iter++)	
-		{
+        //      cout << "Beginning of retrieval "<<endl;
+        //retrieving global id list
+        switch (entity)
+                {
+                case MED_EN::MED_CELL:
+                        m_topology->getCellList(idomain,list);
+                        break;
+                case MED_EN::MED_EDGE:
+                case MED_EN::MED_FACE:
+                        m_topology->getFaceList(idomain,list);
+                        break;
+                default:
+                        
+                        break;
+                }
+        
+        //retrieving cell_types
+        initial_collection.getTypeList(list,nb_elems,entity,cell_type_list);
+        //      cout <<"end of type retrieval"<<endl;
+        //vector containing the number of cells per type
+        type_numbers.clear();
+        for (int icell=0; icell<nb_elems; icell++)
+                {
+                        map<MED_EN::medGeometryElement,int>::iterator iter= type_numbers.find(cell_type_list[icell]);
+                        if (iter!=type_numbers.end())
+                                (iter->second)++;
+                        else    
+                                type_numbers[cell_type_list[icell]]=1;
+                
+                }
+        //cout << "Nombre de tetras"<<type_numbers[304]<<endl;
+        int nb_present_types=type_numbers.size();
+        
+        //setting the list of cells for each type
+        map<MED_EN::medGeometryElement,int> index;
+        
+        map<MED_EN::medGeometryElement,int*> type_cell_list;
+        
+        MED_EN::MESH_ENTITIES::const_iterator currentEntity;
+        std::map<MED_EN::medGeometryElement,int>::const_iterator iter;
+        //currentEntity  = MED_EN::meshEntities.find(entity);
+        for (iter = type_numbers.begin();iter != type_numbers.end(); iter++)    
+                {
       MED_EN::medGeometryElement type = iter->first;
-			if (!isDimensionOK(type,dimension)) continue;
-			//if (iter->second==0) continue;
-			index[type]=0;
-			type_cell_list[type]=new int[type_numbers[type]];
+                        if (!isDimensionOK(type,dimension)) continue;
+                        //if (iter->second==0) continue;
+                        index[type]=0;
+                        type_cell_list[type]=new int[type_numbers[type]];
      // cout << "type :"<<type<<" nb:"<<type_numbers[type]<<endl;
-		}
-	
-	for (int icell=0; icell<nb_elems; icell++)
-		{
-			type_cell_list[cell_type_list[icell]][index[cell_type_list[icell]]++]=list[icell];
-		}
-	
-	delete[]list;
-	delete[]cell_type_list;
-	
-	//setting the list of present ypes
-	int* present_type_numbers=new int[nb_present_types];
-	MED_EN::medGeometryElement* type_array = new MED_EN::medGeometryElement[nb_present_types];
-	MESSAGE_MED("Nb de types presents "<<nb_present_types);
-	int itype=0;
+                }
+        
+        for (int icell=0; icell<nb_elems; icell++)
+                {
+                        type_cell_list[cell_type_list[icell]][index[cell_type_list[icell]]++]=list[icell];
+                }
+        
+        delete[]list;
+        delete[]cell_type_list;
+        
+        //setting the list of present ypes
+        int* present_type_numbers=new int[nb_present_types];
+        MED_EN::medGeometryElement* type_array = new MED_EN::medGeometryElement[nb_present_types];
+        MESSAGE_MED("Nb de types presents "<<nb_present_types);
+        int itype=0;
    for (iter = type_numbers.begin();iter != type_numbers.end(); iter++)  
-  	{
+        {
       MED_EN::medGeometryElement type = iter->first;
       if (!isDimensionOK(type,dimension)) continue;
      
-			type_array[itype]=type;
-		
-			present_type_numbers[itype]=type_numbers[type];
-		
-			MESSAGE_MED("Nombre d'elements de type "<<type<<" : "<<type_numbers[type]);
-			itype++;
-		}
-		
-	//retrieving connectivity in global numbering for each typeinitial_collection.getMesh(iold)->get
-	map<MED_EN::medGeometryElement,int*> type_connectivity;
-	vector<int> polygon_conn;
+                        type_array[itype]=type;
+                
+                        present_type_numbers[itype]=type_numbers[type];
+                
+                        MESSAGE_MED("Nombre d'elements de type "<<type<<" : "<<type_numbers[type]);
+                        itype++;
+                }
+                
+        //retrieving connectivity in global numbering for each typeinitial_collection.getMesh(iold)->get
+        map<MED_EN::medGeometryElement,int*> type_connectivity;
+        vector<int> polygon_conn;
   vector<int> polygon_conn_index;
   vector<int> polyhedron_conn;
   vector<int> polyhedron_conn_index;
   vector<int> polyhedron_face_index;
   
-	//Treating nodes
-		
-	
+        //Treating nodes
+                
+        
   for (iter = type_numbers.begin();iter != type_numbers.end(); iter++)  
     {
       MED_EN::medGeometryElement type = iter->first;
    
-		
+                
       if (!isDimensionOK(type,dimension)) continue;
-			//if (type_numbers[type]==0) continue;
+                        //if (type_numbers[type]==0) continue;
       if (type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
       { 
-			  int nbnode_per_type = (int)type%100;
-			  type_connectivity[type]=new int[type_numbers[type]*nbnode_per_type];
-	      initial_collection.getNodeConnectivity(type_cell_list[type],type_numbers[type],entity,type,type_connectivity[type]);
+                          int nbnode_per_type = (int)type%100;
+                          type_connectivity[type]=new int[type_numbers[type]*nbnode_per_type];
+              initial_collection.getNodeConnectivity(type_cell_list[type],type_numbers[type],entity,type,type_connectivity[type]);
       }
       else if (type == MED_EN::MED_POLYGON && dimension==2)
       {
@@ -1827,17 +1827,17 @@ void MESHCollection::createNodalConnectivity(const MESHCollection& initial_colle
         //type_connectivity[type]=&polygon_conn[0];
       }
       delete[] type_cell_list[type];
-		}	
-		
-	//creating node mapping 
-	//!TODO : compute the total number of nodes 
-	if (entity==MED_EN::MED_CELL)
+                }       
+                
+        //creating node mapping 
+        //!TODO : compute the total number of nodes 
+        if (entity==MED_EN::MED_CELL)
     {
-		  m_topology->createNodeMapping(type_connectivity,type_numbers,polygon_conn,polygon_conn_index,
+                  m_topology->createNodeMapping(type_connectivity,type_numbers,polygon_conn,polygon_conn_index,
                                     polyhedron_conn,polyhedron_conn_index,polyhedron_face_index,idomain);
-    }	
+    }   
     
-	//converting node global numberings to local numberings
+        //converting node global numberings to local numberings
   //for (iter = (*currentEntity).second.begin();iter != (*currentEntity).second.end(); iter++)
   for (iter = type_numbers.begin();iter != type_numbers.end(); iter++)  
     {
@@ -1862,62 +1862,62 @@ void MESHCollection::createNodalConnectivity(const MESHCollection& initial_colle
       }
       
     } 
-		
-		
-	//writing coordinates
-	if (entity==MED_EN::MED_CELL)	
-		{
-			//setting coordinates from initial_collection coordinates
-			int nbnode=m_topology->getNodeNumber(idomain);
-			MESSAGE_MED("Number of nodes on domain "<< idomain <<" : "<<nbnode);
-		
-			double* coordinates=new double[initial_collection.getSpaceDimension()*nbnode];
-			int* node_list=new int[nbnode];
-			m_topology->getNodeList(idomain,node_list);
-			initial_collection.getCoordinates(node_list,nbnode,coordinates);	
-			delete[] node_list;
-		
-			// redundant specification of number of nodes is required!! MED imperfection, sorry...	
-		
-			mesh_builder->setNumberOfNodes(nbnode);
-			//TODO : change MEDMEM so that it accepts a direct setting of coordinates
-			// (in the present version, it is deep-copied)
-			mesh_builder->setCoordinates(initial_collection.getSpaceDimension(), 
-																	 m_topology->getNodeNumber(idomain), coordinates, initial_collection.getSystem(),
-																	 MED_EN::MED_FULL_INTERLACE);
-    	delete [] coordinates;
-		}
+                
+                
+        //writing coordinates
+        if (entity==MED_EN::MED_CELL)   
+                {
+                        //setting coordinates from initial_collection coordinates
+                        int nbnode=m_topology->getNodeNumber(idomain);
+                        MESSAGE_MED("Number of nodes on domain "<< idomain <<" : "<<nbnode);
+                
+                        double* coordinates=new double[initial_collection.getSpaceDimension()*nbnode];
+                        int* node_list=new int[nbnode];
+                        m_topology->getNodeList(idomain,node_list);
+                        initial_collection.getCoordinates(node_list,nbnode,coordinates);        
+                        delete[] node_list;
+                
+                        // redundant specification of number of nodes is required!! MED imperfection, sorry...  
+                
+                        mesh_builder->setNumberOfNodes(nbnode);
+                        //TODO : change MEDMEM so that it accepts a direct setting of coordinates
+                        // (in the present version, it is deep-copied)
+                        mesh_builder->setCoordinates(initial_collection.getSpaceDimension(), 
+                                                                                                                                         m_topology->getNodeNumber(idomain), coordinates, initial_collection.getSystem(),
+                                                                                                                                         MED_EN::MED_FULL_INTERLACE);
+        delete [] coordinates;
+                }
 
   int nb_plain_types=0;
   for (iter = type_numbers.begin();iter != type_numbers.end(); iter++) 
   { 
-  	 MED_EN::medGeometryElement type = iter->first;
+         MED_EN::medGeometryElement type = iter->first;
        
      if (!isDimensionOK(type, dimension)) continue;
      if (type_numbers[type]==0) continue;
      if (type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
      nb_plain_types++;
   }
-	mesh_builder->setNumberOfTypes(nb_plain_types,entity);
-	mesh_builder->setTypes(type_array,entity);
-	mesh_builder->setNumberOfElements(present_type_numbers,entity);
+        mesh_builder->setNumberOfTypes(nb_plain_types,entity);
+        mesh_builder->setTypes(type_array,entity);
+        mesh_builder->setNumberOfElements(present_type_numbers,entity);
   if (entity==MED_EN::MED_CELL)
     mesh_builder->setMeshDimension(dimension);
   
-	delete[]present_type_numbers;
-	delete[]type_array;
-	//setting node connectivities
+        delete[]present_type_numbers;
+        delete[]type_array;
+        //setting node connectivities
   for (iter = type_numbers.begin();iter != type_numbers.end(); iter++)  
     {
       MED_EN::medGeometryElement type = iter->first;
    
-			if (!isDimensionOK(type,dimension)) continue;
-	    if (type_numbers[type]==0) continue;
+                        if (!isDimensionOK(type,dimension)) continue;
+            if (type_numbers[type]==0) continue;
        
       if (type != MED_EN::MED_POLYHEDRA && type != MED_EN::MED_POLYGON)
       {
-	     mesh_builder->setConnectivity(type_connectivity[type],entity,type);
-	     delete[] type_connectivity[type];
+             mesh_builder->setConnectivity(type_connectivity[type],entity,type);
+             delete[] type_connectivity[type];
       }
       else if (type == MED_EN::MED_POLYGON && dimension ==2)
       {
@@ -1935,8 +1935,8 @@ void MESHCollection::createNodalConnectivity(const MESHCollection& initial_colle
                                                 entity);
                                                 
       }
-		}
-		MESSAGE_MED("end of createNodalConnectivity");
+                }
+                MESSAGE_MED("end of createNodalConnectivity");
 }
 
 

@@ -28,7 +28,7 @@ namespace MEDMEM{
  */
 //=============================================================================
 FIELDINTClient::FIELDINTClient(SALOME_MED::FIELDINT_ptr ptrCorba,
-				     MEDMEM::SUPPORT * S) :
+                                     MEDMEM::SUPPORT * S) :
   FIELDClient<int>(ptrCorba,S)
 {
   const char* LOC = "Constructor with arguments (for Python API) FIELDINTClient";

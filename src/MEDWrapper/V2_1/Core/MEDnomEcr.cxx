@@ -26,7 +26,7 @@ namespace med_2_1{
 
 med_err 
 MEDnomEcr(med_idt fid,char *maa, char *nom, med_int n, med_mode_acces mode,
-	  med_entite_maillage type_ent,med_geometrie_element type_geo)
+          med_entite_maillage type_ent,med_geometrie_element type_geo)
 {
   med_idt root, maaid, entid, geoid, dataset;
   med_err ret;
@@ -69,11 +69,11 @@ MEDnomEcr(med_idt fid,char *maa, char *nom, med_int n, med_mode_acces mode,
    if ((type_ent==MED_MAILLE)||(type_ent==MED_FACE)||(type_ent==MED_ARETE))
      {
        if ((ret = _MEDnomGeometrie(nom_geo,type_geo)) < 0)
-	 return -1;
+         return -1;
 
        if ((geoid = _MEDdatagroupOuvrir(entid,nom_geo)) < 0)
-	 if ((geoid = _MEDdatagroupCreer(entid,nom_geo)) < 0)
-	   return -1;
+         if ((geoid = _MEDdatagroupCreer(entid,nom_geo)) < 0)
+           return -1;
      }
    else
      geoid = -1;

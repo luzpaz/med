@@ -57,45 +57,45 @@ MEDnFam(med_idt fid,char *maa, int indice, med_dim_famille quoi)
        */
       num = indice - 1;
       if ((ret = _MEDobjetIdentifier(fid,chemin,num,
-			    famille)) < 0)
-	return -1;
+                            famille)) < 0)
+        return -1;
       
   /* 
    * Si le Data Group de la famille n'existe pas => erreur
    */
       strcat(chemin,famille);
       if ((famid = _MEDdatagroupOuvrir(fid,chemin)) < 0)
-	return -1;
+        return -1;
 
       switch (quoi)
-	{
-	case MED_GROUPE :
-	  if ((datagroup = _MEDdatagroupOuvrir(famid,MED_NOM_GRO)) < 0)
-	    n = 0;
-	  else
-	    {
-	      if ((ret = _MEDattrEntierLire(datagroup,MED_NOM_NBR,&n)) < 0)
-		return -1;
-	      if ((ret = _MEDdatagroupFermer(datagroup)) < 0)
-		return -1;
-	    }
-	  break;
+        {
+        case MED_GROUPE :
+          if ((datagroup = _MEDdatagroupOuvrir(famid,MED_NOM_GRO)) < 0)
+            n = 0;
+          else
+            {
+              if ((ret = _MEDattrEntierLire(datagroup,MED_NOM_NBR,&n)) < 0)
+                return -1;
+              if ((ret = _MEDdatagroupFermer(datagroup)) < 0)
+                return -1;
+            }
+          break;
 
-	case MED_ATTR :
-	  if ((datagroup = _MEDdatagroupOuvrir(famid,MED_NOM_ATT)) < 0)
-	    n = 0;
-	  else
-	    {
-	      if ((ret = _MEDattrEntierLire(datagroup,MED_NOM_NBR,&n)) < 0)
-		return -1;
-	      if ((ret = _MEDdatagroupFermer(datagroup)) < 0)
-		return -1;
-	    }
-	  break;
+        case MED_ATTR :
+          if ((datagroup = _MEDdatagroupOuvrir(famid,MED_NOM_ATT)) < 0)
+            n = 0;
+          else
+            {
+              if ((ret = _MEDattrEntierLire(datagroup,MED_NOM_NBR,&n)) < 0)
+                return -1;
+              if ((ret = _MEDdatagroupFermer(datagroup)) < 0)
+                return -1;
+            }
+          break;
 
-	default :
-	  return -1;
-	}
+        default :
+          return -1;
+        }
 
       if ((ret = _MEDdatagroupFermer(famid)) < 0)
         return -1;

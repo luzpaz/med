@@ -44,10 +44,10 @@ int main () {
 
   try {
     
-    MESH	    fromMesh	(MED_DRIVER,fromFileName,fromMeshName); 	 
-    SUPPORT	    fromSupport (&fromMesh,"XsupportX",MED_NODE);		 
-    FIELD<double>   fromField	(&fromSupport,MED_DRIVER,fromFileName,fieldName);
-    MESH	    toMesh	(MED_DRIVER,toFileName,toMeshName);		 
+    MESH            fromMesh    (MED_DRIVER,fromFileName,fromMeshName);          
+    SUPPORT         fromSupport (&fromMesh,"XsupportX",MED_NODE);                
+    FIELD<double>   fromField   (&fromSupport,MED_DRIVER,fromFileName,fieldName);
+    MESH            toMesh      (MED_DRIVER,toFileName,toMeshName);              
     
     INTERPOLATION<3> myInter (fromField,toMesh);
     

@@ -99,51 +99,51 @@ namespace MEDMEM
   {
     if (_fieldTptr==NULL)
       THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
-				   SALOME::INTERNAL_ERROR);
+                                   SALOME::INTERNAL_ERROR);
     typename FIELDI_TRAITS<T,INTERLACING_TAG>::SeqVarType myseq = new typename FIELDI_TRAITS<T,INTERLACING_TAG>::SeqType;
     try
       {
-	medModeSwitch modemed=convertIdlModeToMedMode(mode);
-	// 		::FIELD<T> *ptrD=dynamic_cast< ::FIELD<T>* >(_fieldTptr);
-	// the alternative is not safe but the dynamic_cast fails using the python API
-	MEDMEM::FIELD<T, INTERLACING_TAG> *ptrD = static_cast<MEDMEM::FIELD<T, INTERLACING_TAG>* >(_fieldTptr);
-	int nbval=ptrD->getValueLength();
-	if(ptrD->getInterlacingType()==modemed)
-	  {
-	    const T* values =ptrD->getValue();
-	    myseq->length(nbval);
-	    for (int i=0; i<nbval; i++)
-	      {
-		myseq[i]=values[i];
-	      }
-	  }
-	else
-	  {
-	    T *values;
-	    if  ( ptrD->getGaussPresence() ) 
-	      {
-		typename MEDMEM_ArrayInterface<T,INTERLACING_TAG,Gauss>::Array * myArray = ptrD->getArrayGauss();
-		int size=myArray->getArraySize();
-		values=new T[size];
-		delete ArrayConvert(*myArray,values);
-	      }
-	    else 
-	      {
-		typename MEDMEM_ArrayInterface<T,INTERLACING_TAG,NoGauss>::Array * myArray = ptrD->getArrayNoGauss();
-		int size=myArray->getArraySize();
-		values=new T[size];
-		delete ArrayConvert(*myArray,values);
-	      }
-	    for (int i=0; i<nbval; i++)
-	      {
-		myseq[i]=values[i];
-	      }
-	  }
+        medModeSwitch modemed=convertIdlModeToMedMode(mode);
+        //              ::FIELD<T> *ptrD=dynamic_cast< ::FIELD<T>* >(_fieldTptr);
+        // the alternative is not safe but the dynamic_cast fails using the python API
+        MEDMEM::FIELD<T, INTERLACING_TAG> *ptrD = static_cast<MEDMEM::FIELD<T, INTERLACING_TAG>* >(_fieldTptr);
+        int nbval=ptrD->getValueLength();
+        if(ptrD->getInterlacingType()==modemed)
+          {
+            const T* values =ptrD->getValue();
+            myseq->length(nbval);
+            for (int i=0; i<nbval; i++)
+              {
+                myseq[i]=values[i];
+              }
+          }
+        else
+          {
+            T *values;
+            if  ( ptrD->getGaussPresence() ) 
+              {
+                typename MEDMEM_ArrayInterface<T,INTERLACING_TAG,Gauss>::Array * myArray = ptrD->getArrayGauss();
+                int size=myArray->getArraySize();
+                values=new T[size];
+                delete ArrayConvert(*myArray,values);
+              }
+            else 
+              {
+                typename MEDMEM_ArrayInterface<T,INTERLACING_TAG,NoGauss>::Array * myArray = ptrD->getArrayNoGauss();
+                int size=myArray->getArraySize();
+                values=new T[size];
+                delete ArrayConvert(*myArray,values);
+              }
+            for (int i=0; i<nbval; i++)
+              {
+                myseq[i]=values[i];
+              }
+          }
       }
     catch (MEDEXCEPTION &ex)
       {
-	MESSAGE("Unable to acces Field ");
-	THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        MESSAGE("Unable to acces Field ");
+        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
       }
     return myseq._retn();
   }
@@ -158,45 +158,45 @@ namespace MEDMEM
   {
     if (_fieldTptr==NULL)
       THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
-				   SALOME::INTERNAL_ERROR);
+                                   SALOME::INTERNAL_ERROR);
     typename FIELDI_TRAITS<T,INTERLACING_TAG>::SenderPtrType ret;
     try
       {
-	medModeSwitch modemed=convertIdlModeToMedMode(mode);
-	// ::FIELD<T> *ptrD=dynamic_cast< ::FIELD<T>* >(_fieldTptr);
-	// the alternative is not safe but the dynamic_cast fails using the python API
-	MEDMEM::FIELD<T, INTERLACING_TAG> *ptrD=static_cast< MEDMEM::FIELD<T, INTERLACING_TAG>* >(_fieldTptr);
-	int nbval=ptrD->getValueLength();
-	if(ptrD->getInterlacingType()==modemed)
-	  {
-	    const T* values =ptrD->getValue();
-	    ret=SenderFactory::buildSender(*this,values,nbval);
-	  }
-	else
-	  {
-	    T *values;
-	    if  ( ptrD->getGaussPresence() ) 
-	      {
-		typename MEDMEM_ArrayInterface<T,INTERLACING_TAG,Gauss>::Array * myArray = ptrD->getArrayGauss();
-		int size=myArray->getArraySize();
-		values=new T[size];
-		delete ArrayConvert(*myArray,values);
-		
-	      }
-	    else 
-	      {
-		typename MEDMEM_ArrayInterface<T,INTERLACING_TAG,NoGauss>::Array * myArray = ptrD->getArrayNoGauss();
-		int size=myArray->getArraySize();
-		values=new T[size];
-		delete ArrayConvert(*myArray,values);
-	      }
-	    ret=SenderFactory::buildSender(*this,values,nbval);
-	  }
+        medModeSwitch modemed=convertIdlModeToMedMode(mode);
+        // ::FIELD<T> *ptrD=dynamic_cast< ::FIELD<T>* >(_fieldTptr);
+        // the alternative is not safe but the dynamic_cast fails using the python API
+        MEDMEM::FIELD<T, INTERLACING_TAG> *ptrD=static_cast< MEDMEM::FIELD<T, INTERLACING_TAG>* >(_fieldTptr);
+        int nbval=ptrD->getValueLength();
+        if(ptrD->getInterlacingType()==modemed)
+          {
+            const T* values =ptrD->getValue();
+            ret=SenderFactory::buildSender(*this,values,nbval);
+          }
+        else
+          {
+            T *values;
+            if  ( ptrD->getGaussPresence() ) 
+              {
+                typename MEDMEM_ArrayInterface<T,INTERLACING_TAG,Gauss>::Array * myArray = ptrD->getArrayGauss();
+                int size=myArray->getArraySize();
+                values=new T[size];
+                delete ArrayConvert(*myArray,values);
+                
+              }
+            else 
+              {
+                typename MEDMEM_ArrayInterface<T,INTERLACING_TAG,NoGauss>::Array * myArray = ptrD->getArrayNoGauss();
+                int size=myArray->getArraySize();
+                values=new T[size];
+                delete ArrayConvert(*myArray,values);
+              }
+            ret=SenderFactory::buildSender(*this,values,nbval);
+          }
       }
     catch (MEDEXCEPTION &ex)
       {
-	MESSAGE("Unable to acces Field ");
-	THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        MESSAGE("Unable to acces Field ");
+        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
       }
     return ret;
   }

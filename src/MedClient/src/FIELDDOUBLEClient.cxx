@@ -28,7 +28,7 @@ namespace MEDMEM{
  */
 //=============================================================================
 FIELDDOUBLEClient::FIELDDOUBLEClient(SALOME_MED::FIELDDOUBLE_ptr ptrCorba,
-				     MEDMEM::SUPPORT * S) :
+                                     MEDMEM::SUPPORT * S) :
   FIELDClient<double>(ptrCorba,S)
 {
   const char* LOC = "Constructor with arguments (for Python API) FIELDDOUBLEClient";

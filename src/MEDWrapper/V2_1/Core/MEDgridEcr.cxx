@@ -25,7 +25,7 @@ namespace med_2_1{
 
 med_err 
 MEDgridEcr(med_idt fid, char *maa, med_int mdim, med_float *coo, med_int nb, med_int dim, med_mode_switch mode_coo,
-	   med_repere repere, char *nomcoo, char *unicoo, med_mode_acces mode )
+           med_repere repere, char *nomcoo, char *unicoo, med_mode_acces mode )
 {
     /* ecriture des indices */
 

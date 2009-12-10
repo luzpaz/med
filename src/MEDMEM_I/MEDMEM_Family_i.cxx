@@ -38,7 +38,7 @@ using namespace MEDMEM;
  */
 //=============================================================================
 FAMILY_i::FAMILY_i(): _family((::FAMILY*)NULL),
-				SUPPORT_i()
+                                SUPPORT_i()
 {
 }
 //=============================================================================
@@ -47,7 +47,7 @@ FAMILY_i::FAMILY_i(): _family((::FAMILY*)NULL),
  */
 //=============================================================================
 FAMILY_i::FAMILY_i(const FAMILY_i & f): _family(f._family),
-				        SUPPORT_i(f._family)
+                                        SUPPORT_i(f._family)
 {
 }
 //=============================================================================
@@ -64,7 +64,7 @@ FAMILY_i::~FAMILY_i()
  */
 //=============================================================================
 FAMILY_i::FAMILY_i(const ::FAMILY * const f): _family(f),
-				              SUPPORT_i(f)
+                                              SUPPORT_i(f)
 {
 }
 //=============================================================================
@@ -76,10 +76,10 @@ FAMILY_i::FAMILY_i(const ::FAMILY * const f): _family(f),
 CORBA::Long FAMILY_i::getIdentifier()      
 throw (SALOME::SALOME_Exception)
 {
-	if (_family==NULL)
+        if (_family==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Family",\
-					     SALOME::INTERNAL_ERROR); 
-	try
+                                             SALOME::INTERNAL_ERROR); 
+        try
         {
                 return _family->getIdentifier();
         }
@@ -122,23 +122,23 @@ throw (SALOME::SALOME_Exception)
         if (_family==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Family",\
                                              SALOME::INTERNAL_ERROR);
-	SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
-	try
-	{
-		int nbAttribute=_family->getNumberOfAttributes();
-		myseq->length(nbAttribute);
-		const int * identifiers=_family->getAttributesIdentifiers();
-		for (int i=0;i<nbAttribute;i++)
-		{
-			myseq[i]=identifiers[i];
-		}
-	}
+        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
+        try
+        {
+                int nbAttribute=_family->getNumberOfAttributes();
+                myseq->length(nbAttribute);
+                const int * identifiers=_family->getAttributesIdentifiers();
+                for (int i=0;i<nbAttribute;i++)
+                {
+                        myseq[i]=identifiers[i];
+                }
+        }
         catch(MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to acces Family Identifiers");
                 THROW_SALOME_CORBA_EXCEPTION(ex.what(),SALOME::INTERNAL_ERROR);
         }
-	return myseq._retn();
+        return myseq._retn();
 }
 //=============================================================================
 /*!
@@ -148,7 +148,7 @@ throw (SALOME::SALOME_Exception)
 CORBA::Long FAMILY_i::getAttributeIdentifier(CORBA::Long i) 
 throw (SALOME::SALOME_Exception)
 {    
-	if (_family==NULL)
+        if (_family==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Family",\
                                              SALOME::INTERNAL_ERROR);
         try
@@ -223,24 +223,24 @@ throw (SALOME::SALOME_Exception)
         if (_family==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Family",\
                                              SALOME::INTERNAL_ERROR);
-	
-	SALOME_MED::string_array_var myseq = new SALOME_MED::string_array;
+        
+        SALOME_MED::string_array_var myseq = new SALOME_MED::string_array;
         try
         {
-		int nbAttribute=_family->getNumberOfAttributes();
-		myseq->length(nbAttribute);
-		const string * descattribute=_family->getAttributesDescriptions();
-		for (int i=0;i<nbAttribute;i++)
-		{
-			myseq[i]=CORBA::string_dup(descattribute[i].c_str());
-		}
-	}
+                int nbAttribute=_family->getNumberOfAttributes();
+                myseq->length(nbAttribute);
+                const string * descattribute=_family->getAttributesDescriptions();
+                for (int i=0;i<nbAttribute;i++)
+                {
+                        myseq[i]=CORBA::string_dup(descattribute[i].c_str());
+                }
+        }
         catch(MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to acces attributs descriptions");
                 THROW_SALOME_CORBA_EXCEPTION(ex.what(),SALOME::INTERNAL_ERROR);
         }
-	return myseq._retn();
+        return myseq._retn();
 
 }
 //=============================================================================

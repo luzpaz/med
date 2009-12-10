@@ -45,7 +45,7 @@ _MEDfichierCreer(char *nom)
   _MEDmodeErreurVerrouiller();
 
   if ((fid = H5Fcreate(nom,H5F_ACC_TRUNC,
-			       H5P_DEFAULT,H5P_DEFAULT)) < 0)
+                               H5P_DEFAULT,H5P_DEFAULT)) < 0)
     return -1;
 
   if ((gid = _MEDdatagroupCreer(fid,MED_NOM_INFOS)) < 0)

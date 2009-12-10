@@ -77,18 +77,18 @@ int main (int argc, char ** argv)
   
   double * coor1 = new  double[SpaceDim*NbOfNodes];
   for( int k=0 ; k<SpaceDim*NbOfNodes ; k++ ) 
-	coor1[k] = coor[k] ;
+        coor1[k] = coor[k] ;
 
   MEDARRAY<double>* CoordinateArray = new MEDARRAY<double>(coor1,SpaceDim,NbOfNodes,ModeFull);
   COORDINATE mycoo;
   try
   {
-  	mycoo.setCoordinates(CoordinateArray);
+        mycoo.setCoordinates(CoordinateArray);
   }
   catch ( const std::exception &e )
   {
         cout << "-------------------------------" << endl;
-	cout << "pb avec setCoordinates" << endl;
+        cout << "pb avec setCoordinates" << endl;
         cout << "-------------------------------" << endl;
         MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
@@ -96,28 +96,28 @@ int main (int argc, char ** argv)
   catch (...)
   {
         cout << "-------------------------------" << endl;
-	cout << "pb avec setCoordinates" << endl;
+        cout << "pb avec setCoordinates" << endl;
         cout << "-------------------------------" << endl;
         return EXIT_FAILURE ;
   };
 
   //--------------------------------------------------------------------//
-  //			Tests des methodes				//
-  //									//
-  // - setCoordinatesNames						//
-  // - setCoordinatesUnits						//
-  // - setCoordinatesSystem						//
-  // - setNodesNumbers							//
-  //									//
+  //                    Tests des methodes                              //
+  //                                                                    //
+  // - setCoordinatesNames                                              //
+  // - setCoordinatesUnits                                              //
+  // - setCoordinatesSystem                                             //
+  // - setNodesNumbers                                                  //
+  //                                                                    //
   //--------------------------------------------------------------------//
   try
   {
-  	mycoo.setCoordinatesNames(noms);
+        mycoo.setCoordinatesNames(noms);
   }
   catch ( const std::exception &e )
   {
         cout << "-------------------------------" << endl;
-	cout << "pb avec setCoordinatesNames" << endl;
+        cout << "pb avec setCoordinatesNames" << endl;
         cout << "-------------------------------" << endl;
         MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
@@ -125,19 +125,19 @@ int main (int argc, char ** argv)
   catch (...)
   {
         cout << "-------------------------------" << endl;
-	cout << "pb avec setCoordinatesNames" << endl;
+        cout << "pb avec setCoordinatesNames" << endl;
         cout << "-------------------------------" << endl;
         return EXIT_FAILURE ;
   };
 
   try
   {
-  	mycoo.setCoordinatesUnits(units);
+        mycoo.setCoordinatesUnits(units);
   }
   catch ( const std::exception &e )
   {
         cout << "-------------------------------" << endl;
-	cout << "pb avec setCoordinatesUnits" << endl;
+        cout << "pb avec setCoordinatesUnits" << endl;
         cout << "-------------------------------" << endl;
         MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
@@ -145,19 +145,19 @@ int main (int argc, char ** argv)
   catch (...)
   {
         cout << "-------------------------------" << endl;
-	cout << "pb avec setCoordinatesUnits" << endl;
+        cout << "pb avec setCoordinatesUnits" << endl;
         cout << "-------------------------------" << endl;
         return EXIT_FAILURE ;
   };
 
   try
   {
-  	mycoo.setCoordinatesSystem("cartesien");
+        mycoo.setCoordinatesSystem("cartesien");
   }
   catch ( const std::exception &e )
   {
         cout << "-------------------------------" << endl;
-	cout << "pb avec setCoordinatesSystem" << endl;
+        cout << "pb avec setCoordinatesSystem" << endl;
         cout << "-------------------------------" << endl;
         MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
@@ -165,19 +165,19 @@ int main (int argc, char ** argv)
   catch (...)
   {
         cout << "-------------------------------" << endl;
-	cout << "pb avec setCoordinatesSystem" << endl;
+        cout << "pb avec setCoordinatesSystem" << endl;
         cout << "-------------------------------" << endl;
         return EXIT_FAILURE ;
   };
 
   try
   {
-  	mycoo.setNodesNumbers(numbers);
+        mycoo.setNodesNumbers(numbers);
   }
   catch ( const std::exception &e )
   {
         cout << "-------------------------------" << endl;
-	cout << "pb avec setNodesNumbers" << endl;
+        cout << "pb avec setNodesNumbers" << endl;
         cout << "-------------------------------" << endl;
         MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
@@ -185,32 +185,32 @@ int main (int argc, char ** argv)
   catch (...)
   {
         cout << "-------------------------------" << endl;
-	cout << "pb avec setNodesNumbers" << endl;
+        cout << "pb avec setNodesNumbers" << endl;
         cout << "-------------------------------" << endl;
         return EXIT_FAILURE ;
   };
   
   //--------------------------------------------------------------------//
-  //			Tests des methodes				//
-  //									//
-  // - getCoordinatesNames						//
-  // - getCoordinatesUnits						//
-  // - getCoordinatesUnit						//
-  // - getCoordinatesSystem						//
-  // - getNodesNumbers							//
-  //									//
+  //                    Tests des methodes                              //
+  //                                                                    //
+  // - getCoordinatesNames                                              //
+  // - getCoordinatesUnits                                              //
+  // - getCoordinatesUnit                                               //
+  // - getCoordinatesSystem                                             //
+  // - getNodesNumbers                                                  //
+  //                                                                    //
   //--------------------------------------------------------------------//
 
   cout << endl << " Relecture des Coordonnees" << endl << endl;
 
   try
   {
-  	cout << "  Le systeme est : " << mycoo.getCoordinatesSystem() << endl;
+        cout << "  Le systeme est : " << mycoo.getCoordinatesSystem() << endl;
   }
   catch ( const std::exception &e )
   {
         cout << "-------------------------------" << endl;
-	cout << "pb avec getCoordinatesSystem" << endl;
+        cout << "pb avec getCoordinatesSystem" << endl;
         cout << "-------------------------------" << endl;
         MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
@@ -218,7 +218,7 @@ int main (int argc, char ** argv)
   catch (...)
   {
         cout << "-------------------------------" << endl;
-	cout << "pb avec getCoordinatesSystem" << endl;
+        cout << "pb avec getCoordinatesSystem" << endl;
         cout << "-------------------------------" << endl;
         return EXIT_FAILURE ;
   };
@@ -226,36 +226,36 @@ int main (int argc, char ** argv)
   const string * units2;
   try
   {
-  	units2=mycoo.getCoordinatesUnits();
-  	for (int axe = 0; axe < SpaceDim; axe++)
-  	{
-		try
-		{
-			string  verif = mycoo.getCoordinateUnit(axe+1);
-			if (verif != units2[axe]) 
-				cout << "Pb avec les noms des axes" << endl;
-		}
-  		catch ( const std::exception &e )
-  		{
-        		cout << "-------------------------" << endl;
-			cout << "pb avec getCoordinateUnit" << endl;
-        		cout << "-------------------------" << endl;
-        		MESSAGE_MED( "catched exception : " << e.what() ) ;
-        		return EXIT_FAILURE ;
-  		}
-  		catch (...)
-  		{
-        		cout << "-------------------------" << endl;
-			cout << "pb avec getCoordinateUnit" << endl;
-        		cout << "-------------------------" << endl;
-        		return EXIT_FAILURE ;
-  		};
-	}
+        units2=mycoo.getCoordinatesUnits();
+        for (int axe = 0; axe < SpaceDim; axe++)
+        {
+                try
+                {
+                        string  verif = mycoo.getCoordinateUnit(axe+1);
+                        if (verif != units2[axe]) 
+                                cout << "Pb avec les noms des axes" << endl;
+                }
+                catch ( const std::exception &e )
+                {
+                        cout << "-------------------------" << endl;
+                        cout << "pb avec getCoordinateUnit" << endl;
+                        cout << "-------------------------" << endl;
+                        MESSAGE_MED( "catched exception : " << e.what() ) ;
+                        return EXIT_FAILURE ;
+                }
+                catch (...)
+                {
+                        cout << "-------------------------" << endl;
+                        cout << "pb avec getCoordinateUnit" << endl;
+                        cout << "-------------------------" << endl;
+                        return EXIT_FAILURE ;
+                };
+        }
   }
   catch ( const std::exception &e )
   {
         cout << "---------------------------" << endl;
-	cout << "pb avec getCoordinatesUnits" << endl;
+        cout << "pb avec getCoordinatesUnits" << endl;
         cout << "---------------------------" << endl;
         MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
@@ -263,7 +263,7 @@ int main (int argc, char ** argv)
   catch (...)
   {
         cout << "---------------------------" << endl;
-	cout << "pb avec getCoordinatesUnits" << endl;
+        cout << "pb avec getCoordinatesUnits" << endl;
         cout << "---------------------------" << endl;
         return EXIT_FAILURE ;
   };
@@ -271,36 +271,36 @@ int main (int argc, char ** argv)
   const string * noms2;
   try
   {
-  	noms2=mycoo.getCoordinatesNames();
-  	for (int axe = 0; axe < SpaceDim; axe++)
-  	{
-		try
-		{
-			string  verif = mycoo.getCoordinateName(axe+1);
-			if (verif != noms2[axe]) 
-				cout << "Pb avec les noms des axes" << endl;
-		}
-  		catch ( const std::exception &e )
-  		{
-        		cout << "-------------------------" << endl;
-			cout << "pb avec getCoordinateName" << endl;
-        		cout << "-------------------------" << endl;
-        		MESSAGE_MED( "catched exception : " << e.what() ) ;
-        		return EXIT_FAILURE ;
-  		}
-  		catch (...)
-  		{
-        		cout << "-------------------------" << endl;
-			cout << "pb avec getCoordinateName" << endl;
-        		cout << "-------------------------" << endl;
-        		return EXIT_FAILURE ;
-  		};
-	}
+        noms2=mycoo.getCoordinatesNames();
+        for (int axe = 0; axe < SpaceDim; axe++)
+        {
+                try
+                {
+                        string  verif = mycoo.getCoordinateName(axe+1);
+                        if (verif != noms2[axe]) 
+                                cout << "Pb avec les noms des axes" << endl;
+                }
+                catch ( const std::exception &e )
+                {
+                        cout << "-------------------------" << endl;
+                        cout << "pb avec getCoordinateName" << endl;
+                        cout << "-------------------------" << endl;
+                        MESSAGE_MED( "catched exception : " << e.what() ) ;
+                        return EXIT_FAILURE ;
+                }
+                catch (...)
+                {
+                        cout << "-------------------------" << endl;
+                        cout << "pb avec getCoordinateName" << endl;
+                        cout << "-------------------------" << endl;
+                        return EXIT_FAILURE ;
+                };
+        }
   }
   catch ( const std::exception &e )
   {
         cout << "---------------------------" << endl;
-	cout << "pb avec getCoordinatesNames" << endl;
+        cout << "pb avec getCoordinatesNames" << endl;
         cout << "---------------------------" << endl;
         MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
@@ -308,7 +308,7 @@ int main (int argc, char ** argv)
   catch (...)
   {
         cout << "---------------------------" << endl;
-	cout << "pb avec getCoordinatesNames" << endl;
+        cout << "pb avec getCoordinatesNames" << endl;
         cout << "---------------------------" << endl;
         return EXIT_FAILURE ;
   };
@@ -316,63 +316,63 @@ int main (int argc, char ** argv)
 
   try
   {
-  	for (int axe = 0; axe < SpaceDim; axe++)
-  	{
+        for (int axe = 0; axe < SpaceDim; axe++)
+        {
 
-        	cout << "Coordonnees sur l'Axe : " <<  noms2[axe] ;
-		cout << " dont l unite est " << units2[axe] << endl;
+                cout << "Coordonnees sur l'Axe : " <<  noms2[axe] ;
+                cout << " dont l unite est " << units2[axe] << endl;
 
-		try
-		{
-  			for (int num=0; num < NbOfNodes; num++)
-  			{
-				try
-				{
-					const double d = mycoo.getCoordinate(num + 1,axe+1);
-					cout << d <<" , ";
-					ASSERT_MED(fabs(d - mycoo.getCoordinateAxis(axe+1)[num])  < pouieme);
-       	         			ASSERT_MED(fabs(d - mycoo.getCoordinates(ModeFull)[(num * SpaceDim)+axe]) < pouieme);
-                			ASSERT_MED(fabs(d - coor [(num * SpaceDim)+axe]) < pouieme);
-				}
-  				catch ( const std::exception &e )
-  				{
-        				cout << "----------------------" << endl;
-					cout << "pb avec getCoordinates" << endl;
-        				cout << "----------------------" << endl;
-        				MESSAGE_MED( "catched exception : " << e.what() ) ;
-        				return EXIT_FAILURE ;
-  				}
-  				catch (...)
-  				{
-        				cout << "----------------------" << endl;
-					cout << "pb avec getCoordinates" << endl;
-        				cout << "----------------------" << endl;
-        				return EXIT_FAILURE ;
-  				};
-   			}
-			cout << endl;
-   		}
-  		catch ( const std::exception &e )
-  		{
-        		cout << "-------------------------" << endl;
-			cout << "pb avec getCoordinateAxis" << endl;
-        		cout << "-------------------------" << endl;
-        		MESSAGE_MED( "catched exception : " << e.what() ) ;
-        		return EXIT_FAILURE ;
-  		}
-  		catch (...)
-  		{
-        		cout << "-------------------------" << endl;
-			cout << "pb avec getCoordinateAxis" << endl;
-        		cout << "-------------------------" << endl;
-        		return EXIT_FAILURE ;
-  		}
-	}
+                try
+                {
+                        for (int num=0; num < NbOfNodes; num++)
+                        {
+                                try
+                                {
+                                        const double d = mycoo.getCoordinate(num + 1,axe+1);
+                                        cout << d <<" , ";
+                                        ASSERT_MED(fabs(d - mycoo.getCoordinateAxis(axe+1)[num])  < pouieme);
+                                        ASSERT_MED(fabs(d - mycoo.getCoordinates(ModeFull)[(num * SpaceDim)+axe]) < pouieme);
+                                        ASSERT_MED(fabs(d - coor [(num * SpaceDim)+axe]) < pouieme);
+                                }
+                                catch ( const std::exception &e )
+                                {
+                                        cout << "----------------------" << endl;
+                                        cout << "pb avec getCoordinates" << endl;
+                                        cout << "----------------------" << endl;
+                                        MESSAGE_MED( "catched exception : " << e.what() ) ;
+                                        return EXIT_FAILURE ;
+                                }
+                                catch (...)
+                                {
+                                        cout << "----------------------" << endl;
+                                        cout << "pb avec getCoordinates" << endl;
+                                        cout << "----------------------" << endl;
+                                        return EXIT_FAILURE ;
+                                };
+                        }
+                        cout << endl;
+                }
+                catch ( const std::exception &e )
+                {
+                        cout << "-------------------------" << endl;
+                        cout << "pb avec getCoordinateAxis" << endl;
+                        cout << "-------------------------" << endl;
+                        MESSAGE_MED( "catched exception : " << e.what() ) ;
+                        return EXIT_FAILURE ;
+                }
+                catch (...)
+                {
+                        cout << "-------------------------" << endl;
+                        cout << "pb avec getCoordinateAxis" << endl;
+                        cout << "-------------------------" << endl;
+                        return EXIT_FAILURE ;
+                }
+        }
   }
   catch ( const std::exception &e )
   {
         cout << "----------------------" << endl;
-	cout << "pb avec getCoordinates" << endl;
+        cout << "pb avec getCoordinates" << endl;
         cout << "----------------------" << endl;
         MESSAGE_MED( "catched exception : " << e.what() ) ;
         return EXIT_FAILURE ;
@@ -380,7 +380,7 @@ int main (int argc, char ** argv)
   catch (...)
   {
         cout << "----------------------" << endl;
-	cout << "pb avec getCoordinates" << endl;
+        cout << "pb avec getCoordinates" << endl;
         cout << "----------------------" << endl;
         return EXIT_FAILURE ;
   };

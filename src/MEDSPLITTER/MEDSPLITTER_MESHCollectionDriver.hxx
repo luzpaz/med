@@ -22,7 +22,7 @@
 #include "MEDSPLITTER.hxx"
 
 namespace MEDSPLITTER{
-	
+        
 class MESHCollection;
 
 class MEDSPLITTER_EXPORT MESHCollectionDriver
@@ -36,17 +36,17 @@ public:
   int readSeq(char*,char*);
   
   virtual void write(char*)=0;
-	virtual void readFields (vector <MEDMEM::FIELD<int> *>& filenames, char* fieldname,
-															int itnumber, int ordernumber) =0;
-	virtual void readFields (vector <MEDMEM::FIELD<double> *>& filenames, char* fieldname,
-															int itnumber, int ordernumber) =0;
-	virtual void writeFields(vector <MEDMEM::FIELD<int> *>& filenames, char* fieldname)=0;
-	virtual void writeFields(vector <MEDMEM::FIELD<double> *>& filenames, char* fieldname)=0;
+        virtual void readFields (vector <MEDMEM::FIELD<int> *>& filenames, char* fieldname,
+                                                                                                                        int itnumber, int ordernumber) =0;
+        virtual void readFields (vector <MEDMEM::FIELD<double> *>& filenames, char* fieldname,
+                                                                                                                        int itnumber, int ordernumber) =0;
+        virtual void writeFields(vector <MEDMEM::FIELD<int> *>& filenames, char* fieldname)=0;
+        virtual void writeFields(vector <MEDMEM::FIELD<double> *>& filenames, char* fieldname)=0;
 
   void readFileStruct(vector <string>&  field_names,vector<int>& iternumber,vector <int>&  ordernumber,vector <int> & types);
   
   int getFieldType(const std::string& fieldname);
-  //	void exportFamily(vector<int*>,MED_EN::medEntityMesh, const string& name);
+  //    void exportFamily(vector<int*>,MED_EN::medEntityMesh, const string& name);
 
 protected:
 

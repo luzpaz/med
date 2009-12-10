@@ -44,56 +44,56 @@
 struct Plus 
 {
 public :
-	static double apply(double a,double b) {return a+b;}
+        static double apply(double a,double b) {return a+b;}
 };
 
 struct Multiply
 {
 public :
-	static double apply(double a,double b) {return a*b;}
+        static double apply(double a,double b) {return a*b;}
 };
 
 
 template <typename Left,typename Op, typename Right> struct X
 {
-	Left left;
-	Right right;
-	X(Left l,Right r):left(l),right(r){}
-	double operator[](int i)
-		{
-		return Op::apply(left[i],right[i]);
-		}
+        Left left;
+        Right right;
+        X(Left l,Right r):left(l),right(r){}
+        double operator[](int i)
+                {
+                return Op::apply(left[i],right[i]);
+                }
 };
 
 template <typename Right> struct X<double,Multiply,Right>
 {
-	double left;
-	Right right;
-	X(double l,Right r):left(l),right(r){}
-	double operator[](int i)
-		{
-		return Multiply::apply(left,right[i]);
-		}
+        double left;
+        Right right;
+        X(double l,Right r):left(l),right(r){}
+        double operator[](int i)
+                {
+                return Multiply::apply(left,right[i]);
+                }
 };
 
 template <class TYPE> class Valeur
 {
 protected :
-	TYPE * valeurs;
-	int nbr_valeurs;
-	int a_detruire;
+        TYPE * valeurs;
+        int nbr_valeurs;
+        int a_detruire;
 public :
-	Valeur();
-	Valeur(TYPE * val,int nv);
-	Valeur(int n);
-	template <typename Left,typename Op,typename Right> Valeur(X<Left,Op,Right> expression);
-	template <typename Left,typename Op,typename Right> void operator=(X<Left,Op,Right> expression);
-	void operator=(Valeur v);
-	Valeur(const Valeur &v);
-	~Valeur();
-	TYPE operator[](int i);
-	int SIZE() const;
-	double NormeAbs();
+        Valeur();
+        Valeur(TYPE * val,int nv);
+        Valeur(int n);
+        template <typename Left,typename Op,typename Right> Valeur(X<Left,Op,Right> expression);
+        template <typename Left,typename Op,typename Right> void operator=(X<Left,Op,Right> expression);
+        void operator=(Valeur v);
+        Valeur(const Valeur &v);
+        ~Valeur();
+        TYPE operator[](int i);
+        int SIZE() const;
+        double NormeAbs();
 };
 
 template <typename TYPE> X< Valeur<TYPE>,Plus,Valeur<TYPE> > operator+(Valeur<TYPE> v1,Valeur<TYPE> v2)
@@ -185,12 +185,12 @@ template <class TYPE> double Valeur<TYPE>::NormeAbs()
 }
 
 template <class TYPE> ostream &operator<<(ostream &os,Valeur<TYPE> v)
-	{	
-	os<<"("<<flush;
-	for (int i=0;i<v.SIZE();i++) os<<" "<<v[i]<<flush;
-	os<<" ) "<<flush;
-	return os;
-	}
+        {       
+        os<<"("<<flush;
+        for (int i=0;i<v.SIZE();i++) os<<" "<<v[i]<<flush;
+        os<<" ) "<<flush;
+        return os;
+        }
 
 /*********************************************************/
 /*                                                       */
@@ -203,29 +203,29 @@ template <class TYPE> ostream &operator<<(ostream &os,Valeur<TYPE> v)
 class Wrapper_MED_Field
 {
 protected :
-	int nbr_valeurs;
-	int nbr_composantes;
-	double * valeurs;
+        int nbr_valeurs;
+        int nbr_composantes;
+        double * valeurs;
 public :
-	Wrapper_MED_Field():valeurs(NULL){}
-	Wrapper_MED_Field(int nv, int nc, double * v):nbr_valeurs(nv),nbr_composantes(nc),valeurs(v)
-		{
-		}
-	Wrapper_MED_Field(const MEDMEM::FIELD<double,MEDMEM::FullInterlace> * medfield)
-		{
-		nbr_valeurs=medfield->getNumberOfValues();
-		nbr_composantes=medfield->getNumberOfComponents();
-		valeurs=const_cast<double *>(medfield->getValue());
-		}
-	~Wrapper_MED_Field(){}
-	inline Valeur<double> operator[](int i) 
-		{
-		return Valeur<double>(&valeurs[nbr_composantes*i],nbr_composantes);
-		}
-	double * Get_Valeurs() {return valeurs;}
-	inline int Get_Nbr_Valeurs() const {return nbr_valeurs;}
-	inline int Get_Nbr_Composantes() const {return nbr_composantes;}
-	friend ostream & operator<<(ostream &os, Wrapper_MED_Field);
+        Wrapper_MED_Field():valeurs(NULL){}
+        Wrapper_MED_Field(int nv, int nc, double * v):nbr_valeurs(nv),nbr_composantes(nc),valeurs(v)
+                {
+                }
+        Wrapper_MED_Field(const MEDMEM::FIELD<double,MEDMEM::FullInterlace> * medfield)
+                {
+                nbr_valeurs=medfield->getNumberOfValues();
+                nbr_composantes=medfield->getNumberOfComponents();
+                valeurs=const_cast<double *>(medfield->getValue());
+                }
+        ~Wrapper_MED_Field(){}
+        inline Valeur<double> operator[](int i) 
+                {
+                return Valeur<double>(&valeurs[nbr_composantes*i],nbr_composantes);
+                }
+        double * Get_Valeurs() {return valeurs;}
+        inline int Get_Nbr_Valeurs() const {return nbr_valeurs;}
+        inline int Get_Nbr_Composantes() const {return nbr_composantes;}
+        friend ostream & operator<<(ostream &os, Wrapper_MED_Field);
 }; 
 
 inline ostream & operator<<(ostream &os, Wrapper_MED_Field wmf)

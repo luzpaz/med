@@ -29,7 +29,7 @@ using namespace MEDMEM;
  */
 //=============================================================================
 FAMILYClient::FAMILYClient(const SALOME_MED::FAMILY_ptr S,
-			     MESH * M) 
+                             MESH * M) 
   : SUPPORTClient(S, M), 
     FAMILY(), 
     IOR_Family(SALOME_MED::FAMILY::_duplicate(S))

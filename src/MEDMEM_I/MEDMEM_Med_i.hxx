@@ -46,7 +46,7 @@ namespace MEDMEM {
 typedef map<DT_IT_, SALOME_MED::FIELD_ptr, LT_DT_IT_ > MAP_IOR_DT_IT_; 
 
 class MEDMEM_I_EXPORT MED_i: public POA_SALOME_MED::MED,
-	     public SALOME::GenericObj_i
+             public SALOME::GenericObj_i
 {
 
 private :
@@ -78,7 +78,7 @@ public:
                          const string & fileName, bool persistence=false);
 
   void addInStudy(SALOMEDS::Study_ptr myStudy, SALOME_MED::MED_ptr myIor,
-		  SALOMEDS::SComponent_ptr mySComp, const char * medObjName)
+                  SALOMEDS::SComponent_ptr mySComp, const char * medObjName)
     throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
 
   SALOME_MED::SUPPORT_ptr getSupport(string                meshName,
@@ -87,14 +87,14 @@ public:
 
 
     // IDL Methods 
-    CORBA::Long 	    getNumberOfMeshes() throw (SALOME::SALOME_Exception);
-    CORBA::Long 	    getNumberOfFields() throw (SALOME::SALOME_Exception);
+    CORBA::Long             getNumberOfMeshes() throw (SALOME::SALOME_Exception);
+    CORBA::Long             getNumberOfFields() throw (SALOME::SALOME_Exception);
     SALOME_MED::string_array * getMeshNames()      throw (SALOME::SALOME_Exception);
     SALOME_MED::string_array * getFieldNames()     throw (SALOME::SALOME_Exception);
     SALOME_MED::MESH_ptr    getMeshByName(const char* meshName) 
-						throw (SALOME::SALOME_Exception);
+                                                throw (SALOME::SALOME_Exception);
     SALOME_MED::MESH_ptr    getMesh(SALOME_MED::FIELD_ptr fieldPtr) 
-						throw (SALOME::SALOME_Exception);
+                                                throw (SALOME::SALOME_Exception);
     CORBA::Long getFieldNumberOfIteration(const char* fieldName) 
       throw (SALOME::SALOME_Exception);
     SALOME_MED::long_array * getFieldIteration(const char* fieldName, CORBA::Long i) 
@@ -102,28 +102,28 @@ public:
     SALOME_MED::long_array * getFieldIterations(const char* fieldName) 
       throw (SALOME::SALOME_Exception);
     SALOME_MED::FIELD_ptr   getField(const char* fieldName,
-				     CORBA::Long pasTemps, 
+                                     CORBA::Long pasTemps, 
                                      CORBA::Long numOrdre) 
-						throw (SALOME::SALOME_Exception);
-    CORBA::Long 	    addDriver(SALOME_MED::medDriverTypes driverType, 
-				      const char* fileName) 
-						throw (SALOME::SALOME_Exception);
-    void 		    rmDriver(CORBA::Long i) 
-						throw (SALOME::SALOME_Exception);
-    void 		    readFileStruct(CORBA::Long i) 
-						throw (SALOME::SALOME_Exception);
-    void 		    writeFrom(CORBA::Long i) 
-						throw (SALOME::SALOME_Exception);
-    void 		    write(CORBA::Long i) 
-						throw (SALOME::SALOME_Exception);
-    void 		    addMesh(SALOME_MED::MESH_ptr ptrMesh) 
-						throw (SALOME::SALOME_Exception);
-    void 		    addField(SALOME_MED::FIELD_ptr ptrField) 
-						throw (SALOME::SALOME_Exception);
-    void 		    addInStudy(SALOMEDS::Study_ptr myStudy,
-				       SALOME_MED::MED_ptr myIor) 
-						throw (SALOME::SALOME_Exception,
-						       SALOMEDS::StudyBuilder::LockProtection);
+                                                throw (SALOME::SALOME_Exception);
+    CORBA::Long             addDriver(SALOME_MED::medDriverTypes driverType, 
+                                      const char* fileName) 
+                                                throw (SALOME::SALOME_Exception);
+    void                    rmDriver(CORBA::Long i) 
+                                                throw (SALOME::SALOME_Exception);
+    void                    readFileStruct(CORBA::Long i) 
+                                                throw (SALOME::SALOME_Exception);
+    void                    writeFrom(CORBA::Long i) 
+                                                throw (SALOME::SALOME_Exception);
+    void                    write(CORBA::Long i) 
+                                                throw (SALOME::SALOME_Exception);
+    void                    addMesh(SALOME_MED::MESH_ptr ptrMesh) 
+                                                throw (SALOME::SALOME_Exception);
+    void                    addField(SALOME_MED::FIELD_ptr ptrField) 
+                                                throw (SALOME::SALOME_Exception);
+    void                    addInStudy(SALOMEDS::Study_ptr myStudy,
+                                       SALOME_MED::MED_ptr myIor) 
+                                                throw (SALOME::SALOME_Exception,
+                                                       SALOMEDS::StudyBuilder::LockProtection);
 };
 }
 

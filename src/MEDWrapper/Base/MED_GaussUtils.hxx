@@ -56,9 +56,9 @@ namespace MED
     //! To init the class
     void
     Init(TInt theNbElem,
-	 TInt theNbGauss,
-	 TInt theDim,
-	 EModeSwitch theMode = eFULL_INTERLACE);
+         TInt theNbGauss,
+         TInt theDim,
+         EModeSwitch theMode = eFULL_INTERLACE);
 
     TInt
     GetNbElem() const;
@@ -88,11 +88,11 @@ namespace MED
   MEDWRAPPER_EXPORT 
   bool
   GetGaussCoord3D(const TGaussInfo& theGaussInfo, 
-		  const TCellInfo& theCellInfo,
-		  const TNodeInfo& theNodeInfo,
-		  TGaussCoord& theGaussCoord,
-		  const TElemNum& theElemNum = TElemNum(),
-		  EModeSwitch theMode = eFULL_INTERLACE);
+                  const TCellInfo& theCellInfo,
+                  const TNodeInfo& theNodeInfo,
+                  TGaussCoord& theGaussCoord,
+                  const TElemNum& theElemNum = TElemNum(),
+                  EModeSwitch theMode = eFULL_INTERLACE);
 
 
   //---------------------------------------------------------------
@@ -100,28 +100,28 @@ namespace MED
   MEDWRAPPER_EXPORT 
   bool
   GetBaryCenter(const TCellInfo& theCellInfo,
-		const TNodeInfo& theNodeInfo,
-		TGaussCoord& theGaussCoord,
-		const TElemNum& theElemNum = TElemNum(),
-		EModeSwitch theMode = eFULL_INTERLACE);
+                const TNodeInfo& theNodeInfo,
+                TGaussCoord& theGaussCoord,
+                const TElemNum& theElemNum = TElemNum(),
+                EModeSwitch theMode = eFULL_INTERLACE);
 
   //! To calculate Gauss Points coordinates for defined TPolygoneInfo as its bary center
   MEDWRAPPER_EXPORT 
   bool
   GetBaryCenter(const TPolygoneInfo& thePolygoneInfo,
-		const TNodeInfo& theNodeInfo,
-		TGaussCoord& theGaussCoord,
-		const TElemNum& theElemNum = TElemNum(),
-		EModeSwitch theMode = eFULL_INTERLACE);
+                const TNodeInfo& theNodeInfo,
+                TGaussCoord& theGaussCoord,
+                const TElemNum& theElemNum = TElemNum(),
+                EModeSwitch theMode = eFULL_INTERLACE);
 
   //! To calculate Gauss Points coordinates for defined TPolyedreInfo as its bary center
   MEDWRAPPER_EXPORT 
   bool
   GetBaryCenter(const TPolyedreInfo& thePolyedreInfo,
-		const TNodeInfo& theNodeInfo,
-		TGaussCoord& theGaussCoord,
-		const TElemNum& theElemNum = TElemNum(),
-		EModeSwitch theMode = eFULL_INTERLACE);
+                const TNodeInfo& theNodeInfo,
+                TGaussCoord& theGaussCoord,
+                const TElemNum& theElemNum = TElemNum(),
+                EModeSwitch theMode = eFULL_INTERLACE);
 
   //---------------------------------------------------------------
   //! Shape function definitions

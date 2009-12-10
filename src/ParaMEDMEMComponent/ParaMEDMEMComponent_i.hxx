@@ -73,8 +73,8 @@ private:
 };
 
 class MPIMEDCouplingFieldDoubleServant : public POA_SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface,
-					 public ParaMEDMEM::MEDCouplingFieldDoubleServant,
-					 public MPIObject_i
+                                         public ParaMEDMEM::MEDCouplingFieldDoubleServant,
+                                         public MPIObject_i
 {
 public:
   MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,ParaMEDMEM::ParaFIELD* field);

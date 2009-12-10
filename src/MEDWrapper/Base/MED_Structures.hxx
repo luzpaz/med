@@ -42,21 +42,21 @@ namespace MED
   MEDWRAPPER_EXPORT
   std::string 
   GetString(TInt theId, TInt theStep, 
-	    const TString& theString);
+            const TString& theString);
   
   //! Set a substring in the sequence of the strings
   MEDWRAPPER_EXPORT 
   void
   SetString(TInt theId, TInt theStep, 
-		 TString& theString, 
-		 const std::string& theValue);
+                 TString& theString, 
+                 const std::string& theValue);
 
   //! Set a substring in the sequence of the strings
   MEDWRAPPER_EXPORT
   void
   SetString(TInt theId, TInt theStep, 
-		 TString& theString, 
-		 const TString& theValue);
+                 TString& theString, 
+                 const TString& theValue);
 
   //---------------------------------------------------------------
   //! Define a parent class for all MEDWrapper classes
@@ -556,9 +556,9 @@ namespace MED
     //! Initialize the class
     void
     Allocate(TInt theNbElem,
-	     TInt theNbGauss,
-	     TInt theNbComp,
-	     EModeSwitch theMode = eFULL_INTERLACE);
+             TInt theNbGauss,
+             TInt theNbComp,
+             EModeSwitch theMode = eFULL_INTERLACE);
 
     //! Returns size of the value container
     size_t
@@ -602,9 +602,9 @@ namespace MED
     //! Initialize the class
     void
     Allocate(TInt theNbElem,
-	     TInt theNbGauss,
-	     TInt theNbComp,
-	     EModeSwitch theMode = eFULL_INTERLACE)
+             TInt theNbGauss,
+             TInt theNbComp,
+             EModeSwitch theMode = eFULL_INTERLACE)
     {
       TMeshValueBase::Allocate(theNbElem, theNbGauss, theNbComp, theMode);
       myValue.resize(theNbElem * this->GetStep());
@@ -640,18 +640,18 @@ namespace MED
     {
       TCValueSliceArr aValueSliceArr(myNbGauss);
       if(GetModeSwitch() == eFULL_INTERLACE){
-	TInt anId = theElemId * myStep;
-	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
-	  aValueSliceArr[aGaussId] =
-	    TCValueSlice(myValue, std::slice(anId, myNbComp, 1));
-	  anId += myNbComp;
-	}
+        TInt anId = theElemId * myStep;
+        for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+          aValueSliceArr[aGaussId] =
+            TCValueSlice(myValue, std::slice(anId, myNbComp, 1));
+          anId += myNbComp;
+        }
       }
       else{
-	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
-	  aValueSliceArr[aGaussId] =
-	    TCValueSlice(myValue, std::slice(theElemId, myNbComp, myStep));
-	}
+        for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+          aValueSliceArr[aGaussId] =
+            TCValueSlice(myValue, std::slice(theElemId, myNbComp, myStep));
+        }
       }
       return aValueSliceArr;
     }
@@ -662,18 +662,18 @@ namespace MED
     {
       TValueSliceArr aValueSliceArr(myNbGauss);
       if(GetModeSwitch() == eFULL_INTERLACE){
-	TInt anId = theElemId*myStep;
-	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
-	  aValueSliceArr[aGaussId] =
-	    TValueSlice(myValue, std::slice(anId, myNbComp, 1));
-	  anId += myNbComp;
-	}
+        TInt anId = theElemId*myStep;
+        for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+          aValueSliceArr[aGaussId] =
+            TValueSlice(myValue, std::slice(anId, myNbComp, 1));
+          anId += myNbComp;
+        }
       }
       else{
-	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
-	  aValueSliceArr[aGaussId] =
-	    TValueSlice(myValue, std::slice(theElemId, myNbComp, myStep));
-	}
+        for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+          aValueSliceArr[aGaussId] =
+            TValueSlice(myValue, std::slice(theElemId, myNbComp, myStep));
+        }
       }
       return aValueSliceArr;
     }
@@ -684,18 +684,18 @@ namespace MED
     {
       TCValueSliceArr aValueSliceArr(myNbComp);
       if(GetModeSwitch() == eFULL_INTERLACE){
-	TInt anId = theElemId*myStep;
-	for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
-	  aValueSliceArr[aCompId] =
-	    TCValueSlice(myValue, std::slice(anId, myNbGauss, myNbComp));
-	  anId += 1;
-	}
+        TInt anId = theElemId*myStep;
+        for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
+          aValueSliceArr[aCompId] =
+            TCValueSlice(myValue, std::slice(anId, myNbGauss, myNbComp));
+          anId += 1;
+        }
       }
       else{
-	for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
-	  aValueSliceArr[aCompId] =
-	    TCValueSlice(myValue, std::slice(theElemId, myNbGauss, myStep));
-	}
+        for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
+          aValueSliceArr[aCompId] =
+            TCValueSlice(myValue, std::slice(theElemId, myNbGauss, myStep));
+        }
       }
       return aValueSliceArr;
     }
@@ -705,22 +705,22 @@ namespace MED
     GetCompValueSliceArr(TInt theElemId)
     {
       if(GetModeSwitch() == eFULL_INTERLACE){
-	TValueSliceArr aValueSliceArr(myNbComp);
-	TInt anId = theElemId*myStep;
-	for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
-	  aValueSliceArr[aCompId] =
-	    TValueSlice(myValue, std::slice(anId, myNbGauss, myNbComp));
-	  anId += 1;
-	}
-	return aValueSliceArr;
+        TValueSliceArr aValueSliceArr(myNbComp);
+        TInt anId = theElemId*myStep;
+        for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
+          aValueSliceArr[aCompId] =
+            TValueSlice(myValue, std::slice(anId, myNbGauss, myNbComp));
+          anId += 1;
+        }
+        return aValueSliceArr;
       }
       else{
-	TValueSliceArr aValueSliceArr(myNbGauss);
-	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
-	  aValueSliceArr[aGaussId] =
-	    TValueSlice(myValue,std::slice(theElemId, myNbComp, myStep));
-	}
-	return aValueSliceArr;
+        TValueSliceArr aValueSliceArr(myNbGauss);
+        for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+          aValueSliceArr[aGaussId] =
+            TValueSlice(myValue,std::slice(theElemId, myNbComp, myStep));
+        }
+        return aValueSliceArr;
       }
     }
   };
@@ -771,10 +771,10 @@ namespace MED
     virtual 
     void
     AllocateValue(EGeometrieElement theGeom,
-		  TInt theNbElem,
-		  TInt theNbGauss,
-		  TInt theNbComp,
-		  EModeSwitch theMode = eFULL_INTERLACE) = 0;
+                  TInt theNbElem,
+                  TInt theNbGauss,
+                  TInt theNbComp,
+                  EModeSwitch theMode = eFULL_INTERLACE) = 0;
     
     virtual 
     size_t
@@ -830,7 +830,7 @@ namespace MED
     {
       typename TTGeom2Value::const_iterator anIter = myGeom2Value.find(theGeom);
       if(anIter == myGeom2Value.end())
-	EXCEPTION(std::runtime_error,"TTimeStampValue::GetMeshValuePtr - myGeom2Value.find(theGeom) fails");
+        EXCEPTION(std::runtime_error,"TTimeStampValue::GetMeshValuePtr - myGeom2Value.find(theGeom) fails");
       return anIter->second;
     }
 
@@ -840,8 +840,8 @@ namespace MED
     {
       myGeomSet.insert(theGeom);
       if(myGeom2Value.find(theGeom) == myGeom2Value.end()){
-	myGeom2Value[theGeom] = PTMeshValue(new TTMeshValue());
-	return myGeom2Value[theGeom];
+        myGeom2Value[theGeom] = PTMeshValue(new TTMeshValue());
+        return myGeom2Value[theGeom];
       }
       return myGeom2Value[theGeom];
     }
@@ -880,7 +880,7 @@ namespace MED
   template<class TMeshValueTypeFrom, class TMeshValueTypeTo>
   void
   CopyTimeStampValue(SharedPtr<TTimeStampValue<TMeshValueTypeFrom> > theTimeStampValueFrom,
-		     SharedPtr<TTimeStampValue<TMeshValueTypeTo> > theTimeStampValueTo)
+                     SharedPtr<TTimeStampValue<TMeshValueTypeTo> > theTimeStampValueTo)
   {
     typedef TTimeStampValue<TMeshValueTypeFrom> TimeStampValueTypeFrom;
     typedef TTimeStampValue<TMeshValueTypeTo> TimeStampValueTypeTo;
@@ -893,21 +893,21 @@ namespace MED
       const typename TimeStampValueTypeFrom::TTMeshValue& aMeshValue = *anIter->second;
       typename TimeStampValueTypeTo::TTMeshValue& aMeshValue2 = theTimeStampValueTo->GetMeshValue(aGeom);
       aMeshValue2.Allocate(aMeshValue.myNbElem, 
-			   aMeshValue.myNbGauss, 
-			   aMeshValue.myNbComp,
-			   aMeshValue.myModeSwitch);
+                           aMeshValue.myNbGauss, 
+                           aMeshValue.myNbComp,
+                           aMeshValue.myModeSwitch);
       const typename TimeStampValueTypeFrom::TTMeshValue::TValue& aValue = aMeshValue.myValue;
       typename TimeStampValueTypeTo::TTMeshValue::TValue& aValue2 = aMeshValue2.myValue;
       TInt aSize = aValue.size();
       for(TInt anId = 0; anId < aSize; anId++)
-	aValue2[anId] = TElementTo(aValue[anId]);
+        aValue2[anId] = TElementTo(aValue[anId]);
     }
   }
 
   template<class TMeshValueType>
   void
   CopyTimeStampValue(SharedPtr<TTimeStampValue<TMeshValueType> > theTimeStampValueFrom,
-		     SharedPtr<TTimeStampValue<TMeshValueType> > theTimeStampValueTo)
+                     SharedPtr<TTimeStampValue<TMeshValueType> > theTimeStampValueTo)
   {
     typedef TTimeStampValue<TMeshValueType> TimeStampValueType;
     typename TimeStampValueType::TTGeom2Value& aGeom2Value = theTimeStampValueFrom->myGeom2Value;
@@ -924,18 +924,18 @@ namespace MED
   inline
   void
   CopyTimeStampValueBase(const PTimeStampValueBase& theValueFrom, 
-			 const PTimeStampValueBase& theValueTo)
+                         const PTimeStampValueBase& theValueTo)
   {
     if(theValueFrom->GetTypeChamp() == theValueTo->GetTypeChamp()){
       if(theValueFrom->GetTypeChamp() == eFLOAT64)
-	CopyTimeStampValue<TFloatMeshValue>(theValueFrom, theValueTo);
+        CopyTimeStampValue<TFloatMeshValue>(theValueFrom, theValueTo);
       else if(theValueFrom->GetTypeChamp() == eINT)
-	CopyTimeStampValue<TIntMeshValue>(theValueFrom, theValueTo);
+        CopyTimeStampValue<TIntMeshValue>(theValueFrom, theValueTo);
     }else{
       if(theValueFrom->GetTypeChamp() == eFLOAT64 && theValueTo->GetTypeChamp() == eINT)
-	CopyTimeStampValue<TFloatMeshValue, TIntMeshValue>(theValueFrom, theValueTo);
+        CopyTimeStampValue<TFloatMeshValue, TIntMeshValue>(theValueFrom, theValueTo);
       else if(theValueFrom->GetTypeChamp() == eINT && theValueTo->GetTypeChamp() == eFLOAT64)
-	CopyTimeStampValue<TIntMeshValue, TFloatMeshValue>(theValueFrom, theValueTo);
+        CopyTimeStampValue<TIntMeshValue, TFloatMeshValue>(theValueFrom, theValueTo);
     }
   }
 

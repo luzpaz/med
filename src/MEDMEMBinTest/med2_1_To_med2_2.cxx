@@ -31,7 +31,7 @@ int main (int argc, char ** argv)
   if (argc != 2)
     {
       cerr << "Usage : " << argv[0] 
-	   << " fileNameIn" << endl ;
+           << " fileNameIn" << endl ;
       cerr << "Where - fileNameIn is .med V2.1 file supplied by the user including all the directory path" << endl;
       cerr << "fileNameOut is .med V2.3.2 file produced by this command in the directory $HOME/TMP_Med2_3Files/" << endl;
       cerr << "This command is supposed to be the same as the med File V2.2 medimport utility" << endl << endl;
@@ -43,7 +43,7 @@ int main (int argc, char ** argv)
 
   string fileNameIn = argv[1] ;
   char * fileNameOut = med2_1_To_med2_3((const_cast <char *>
-					 (fileNameIn.c_str())));
+                                         (fileNameIn.c_str())));
 
   if (fileNameOut == ((char *) NULL))
     {

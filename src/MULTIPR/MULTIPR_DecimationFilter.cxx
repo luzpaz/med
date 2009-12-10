@@ -65,10 +65,10 @@ DecimationFilter* DecimationFilter::create(const char* pFilterName)
     {
         return new DecimationFilterGradAvg();
     }
-	else if (strcmp(pFilterName, "Filtre_Direct") == 0)
-	{
-		return new DecimationFilterTreshold();
-	}
+        else if (strcmp(pFilterName, "Filtre_Direct") == 0)
+        {
+                return new DecimationFilterTreshold();
+        }
     else
     {
         throw IllegalArgumentException("unknown filter", __FILE__, __LINE__);
@@ -103,13 +103,13 @@ Mesh* DecimationFilterGradAvg::apply(Mesh* pMesh, const char* pArgv, const char*
     
     char   fieldName[MED_TAILLE_NOM + 1];
     int    fieldIt;
-	int	   meshIt;
+        int        meshIt;
     double threshold;
     double radius;
     int    boxing; // number of cells along axis (if 100 then grid will have 100*100*100 = 10**6 cells)
     set<med_int> elementsToKeep[eMaxMedMesh];
     Field* field = NULL;
-	
+        
     int ret = sscanf(pArgv, "%s %d %lf %lf %d",
         fieldName,
         &fieldIt,
@@ -118,33 +118,33 @@ Mesh* DecimationFilterGradAvg::apply(Mesh* pMesh, const char* pArgv, const char*
         &boxing);
     if (ret != 5) throw IllegalArgumentException("wrong number of arguments for filter GradAvg; expected 5 parameters", __FILE__, __LINE__);
     
-	for (meshIt = 0; meshIt < eMaxMedMesh; ++meshIt)
-	{
-		
-		//---------------------------------------------------------------------
-		// Retrieve field = for each point: get its coordinate and the value of the field
-		//---------------------------------------------------------------------
-		field = pMesh->getFieldByName(fieldName, (eMeshType)meshIt);
-		
-		if (field == NULL) continue;
-		if ((fieldIt < 1) || (fieldIt > field->getNumberOfTimeSteps())) throw IllegalArgumentException("invalid field iteration", __FILE__, __LINE__);
-		
-		vector<PointOfField> points;
-		pMesh->getAllPointsOfField(field, fieldIt, points, (eMeshType)meshIt);
-	
-		//---------------------------------------------------------------------
-		// Creates acceleration structure used to compute gradient
-		//---------------------------------------------------------------------
-		DecimationAccel* accel = new DecimationAccelGrid();
-		char strCfg[256]; // a string is used for genericity
-		sprintf(strCfg, "%d %d %d", boxing, boxing, boxing);
-		accel->configure(strCfg);
-		accel->create(points);
-		
-		//---------------------------------------------------------------------
-		// Collects elements of the mesh to be kept
-		//---------------------------------------------------------------------
-		int numElements = 0;
+        for (meshIt = 0; meshIt < eMaxMedMesh; ++meshIt)
+        {
+                
+                //---------------------------------------------------------------------
+                // Retrieve field = for each point: get its coordinate and the value of the field
+                //---------------------------------------------------------------------
+                field = pMesh->getFieldByName(fieldName, (eMeshType)meshIt);
+                
+                if (field == NULL) continue;
+                if ((fieldIt < 1) || (fieldIt > field->getNumberOfTimeSteps())) throw IllegalArgumentException("invalid field iteration", __FILE__, __LINE__);
+                
+                vector<PointOfField> points;
+                pMesh->getAllPointsOfField(field, fieldIt, points, (eMeshType)meshIt);
+        
+                //---------------------------------------------------------------------
+                // Creates acceleration structure used to compute gradient
+                //---------------------------------------------------------------------
+                DecimationAccel* accel = new DecimationAccelGrid();
+                char strCfg[256]; // a string is used for genericity
+                sprintf(strCfg, "%d %d %d", boxing, boxing, boxing);
+                accel->configure(strCfg);
+                accel->create(points);
+                
+                //---------------------------------------------------------------------
+                // Collects elements of the mesh to be kept
+                //---------------------------------------------------------------------
+                int numElements = 0;
         if (field->isFieldOnNodes())
         {
             numElements = pMesh->getNodes()->getNumberOfNodes();
@@ -160,7 +160,7 @@ Mesh* DecimationFilterGradAvg::apply(Mesh* pMesh, const char* pArgv, const char*
             numElements = profil->getSet().size();
         }
       
-		int numGaussPointsByElt = 0;
+                int numGaussPointsByElt = 0;
         if (field->isFieldOnNodes())
         {
             numGaussPointsByElt = 1;
@@ -169,60 +169,60 @@ Mesh* DecimationFilterGradAvg::apply(Mesh* pMesh, const char* pArgv, const char*
         {
             numGaussPointsByElt = points.size() / numElements;
         }
-        		
-		// for each element
-		for (int itElt = 0 ; itElt < numElements ; itElt++)
-		{
-			bool keepElement = false;
-			
-			// for each Gauss point of the current element
-			for (int itPtGauss = 0 ; itPtGauss < numGaussPointsByElt ; itPtGauss++)
-			{
-				const PointOfField& currentPt = points[itElt * numGaussPointsByElt + itPtGauss];
-				
-				vector<PointOfField> neighbours = accel->findNeighbours(
-					currentPt.mXYZ[0], 
-					currentPt.mXYZ[1], 
-					currentPt.mXYZ[2], 
-					radius);
-				
-				// if no neighbours => keep element
-				if (neighbours.size() == 0)
-				{
-					keepElement = true;
-					break;
-				}
-				
-				// otherwise compute gradient...
-				med_float normGrad = computeNormGrad(currentPt, neighbours);
-				
-				// debug
-				//cout << (itElt * numGaussPointsByElt + j) << ": " << normGrad << endl;
-				
-				if ((normGrad >= threshold) || isnan(normGrad))
-				{
-					keepElement = true;
-					break;
-				}
-			}
-			
-			if (keepElement)
-			{
-				// add index of the element to keep (index must start at 1)
-				elementsToKeep[meshIt].insert(med_int(itElt + 1));
-			}
-		}
-	
-		//---------------------------------------------------------------------
-		// Cleans
-		//---------------------------------------------------------------------
-		delete accel;
+                        
+                // for each element
+                for (int itElt = 0 ; itElt < numElements ; itElt++)
+                {
+                        bool keepElement = false;
+                        
+                        // for each Gauss point of the current element
+                        for (int itPtGauss = 0 ; itPtGauss < numGaussPointsByElt ; itPtGauss++)
+                        {
+                                const PointOfField& currentPt = points[itElt * numGaussPointsByElt + itPtGauss];
+                                
+                                vector<PointOfField> neighbours = accel->findNeighbours(
+                                        currentPt.mXYZ[0], 
+                                        currentPt.mXYZ[1], 
+                                        currentPt.mXYZ[2], 
+                                        radius);
+                                
+                                // if no neighbours => keep element
+                                if (neighbours.size() == 0)
+                                {
+                                        keepElement = true;
+                                        break;
+                                }
+                                
+                                // otherwise compute gradient...
+                                med_float normGrad = computeNormGrad(currentPt, neighbours);
+                                
+                                // debug
+                                //cout << (itElt * numGaussPointsByElt + j) << ": " << normGrad << endl;
+                                
+                                if ((normGrad >= threshold) || isnan(normGrad))
+                                {
+                                        keepElement = true;
+                                        break;
+                                }
+                        }
+                        
+                        if (keepElement)
+                        {
+                                // add index of the element to keep (index must start at 1)
+                                elementsToKeep[meshIt].insert(med_int(itElt + 1));
+                        }
+                }
+        
+                //---------------------------------------------------------------------
+                // Cleans
+                //---------------------------------------------------------------------
+                delete accel;
         
         if (field->isFieldOnNodes())
         {
             break;
         }
-	}
+        }
     
     //---------------------------------------------------------------------
     // Create the final mesh by extracting elements to keep from the current mesh
@@ -264,7 +264,7 @@ void DecimationFilterGradAvg::getGradientInfo(
     if (pFieldName == NULL) throw NullArgumentException("pFieldName should not be NULL", __FILE__, __LINE__);
     
     for (int meshIt = 0; meshIt < eMaxMedMesh; ++meshIt)
-	{
+        {
 
         //---------------------------------------------------------------------
         // Retrieve field = for each point: get its coordinate and the value of the field
@@ -289,7 +289,7 @@ void DecimationFilterGradAvg::getGradientInfo(
         //---------------------------------------------------------------------
         // Collects elements of the mesh to be kept
         //---------------------------------------------------------------------
- 		int numElements = 0;
+                int numElements = 0;
         if (field->isFieldOnNodes())
         {
             numElements = pMesh->getNodes()->getNumberOfNodes();
@@ -305,7 +305,7 @@ void DecimationFilterGradAvg::getGradientInfo(
             numElements = profil->getSet().size();
         }
       
-		int numGaussPointsByElt = 0;
+                int numGaussPointsByElt = 0;
         if (field->isFieldOnNodes())
         {
             numGaussPointsByElt = 1;
@@ -429,36 +429,36 @@ Mesh* DecimationFilterTreshold::apply(Mesh* pMesh, const char* pArgv, const char
     if (pArgv == NULL) throw NullArgumentException("pArgv should not be NULL", __FILE__, __LINE__);
     if (pNameNewMesh == NULL) throw NullArgumentException("pNameNewMesh should not be NULL", __FILE__, __LINE__);
 
-    char	fieldName[MED_TAILLE_NOM + 1];
-    int		fieldIt;
-    double	threshold;
-	int		meshIt;
-	set<med_int> elementsToKeep[eMaxMedMesh];
+    char        fieldName[MED_TAILLE_NOM + 1];
+    int         fieldIt;
+    double      threshold;
+        int             meshIt;
+        set<med_int> elementsToKeep[eMaxMedMesh];
     Field*  field = NULL;
     
-	int ret = sscanf(pArgv, "%s %d %lf",
+        int ret = sscanf(pArgv, "%s %d %lf",
         fieldName,
         &fieldIt,
         &threshold);
 
-	if (ret != 3) throw IllegalArgumentException("wrong number of arguments for filter Treshold; expected 3 parameters", __FILE__, __LINE__);
-	
-	for (meshIt = 0; meshIt < eMaxMedMesh; ++meshIt)
-	{
-		//---------------------------------------------------------------------
-		// Retrieve field = for each point: get its coordinate and the value of the field
-		//---------------------------------------------------------------------
-		field = pMesh->getFieldByName(fieldName, (eMeshType)meshIt);
-		if (field == NULL) continue;
-		if ((fieldIt < 1) || (fieldIt > field->getNumberOfTimeSteps())) throw IllegalArgumentException("invalid field iteration", __FILE__, __LINE__);
-		
-		vector<PointOfField> points;
-		pMesh->getAllPointsOfField(field, fieldIt, points, (eMeshType)meshIt);
-		
-		//---------------------------------------------------------------------
-		// Collects elements of the mesh to be kept
-		//---------------------------------------------------------------------
-		int numElements = 0;
+        if (ret != 3) throw IllegalArgumentException("wrong number of arguments for filter Treshold; expected 3 parameters", __FILE__, __LINE__);
+        
+        for (meshIt = 0; meshIt < eMaxMedMesh; ++meshIt)
+        {
+                //---------------------------------------------------------------------
+                // Retrieve field = for each point: get its coordinate and the value of the field
+                //---------------------------------------------------------------------
+                field = pMesh->getFieldByName(fieldName, (eMeshType)meshIt);
+                if (field == NULL) continue;
+                if ((fieldIt < 1) || (fieldIt > field->getNumberOfTimeSteps())) throw IllegalArgumentException("invalid field iteration", __FILE__, __LINE__);
+                
+                vector<PointOfField> points;
+                pMesh->getAllPointsOfField(field, fieldIt, points, (eMeshType)meshIt);
+                
+                //---------------------------------------------------------------------
+                // Collects elements of the mesh to be kept
+                //---------------------------------------------------------------------
+                int numElements = 0;
         if (field->isFieldOnNodes())
         {
             numElements = pMesh->getNodes()->getNumberOfNodes();
@@ -474,7 +474,7 @@ Mesh* DecimationFilterTreshold::apply(Mesh* pMesh, const char* pArgv, const char
             numElements = profil->getSet().size();
         }
       
-		int numGaussPointsByElt = 0;
+                int numGaussPointsByElt = 0;
         if (field->isFieldOnNodes())
         {
             numGaussPointsByElt = 1;
@@ -483,34 +483,34 @@ Mesh* DecimationFilterTreshold::apply(Mesh* pMesh, const char* pArgv, const char
         {
             numGaussPointsByElt = points.size() / numElements;
         }
-		// for each element
-		for (int itElt = 0 ; itElt < numElements ; itElt++)
-		{
-			bool keepElement = false;
-			
-			// for each Gauss point of the current element
-			for (int itPtGauss = 0 ; itPtGauss < numGaussPointsByElt ; itPtGauss++)
-			{
-				const PointOfField& currentPt = points[itElt * numGaussPointsByElt + itPtGauss];
+                // for each element
+                for (int itElt = 0 ; itElt < numElements ; itElt++)
+                {
+                        bool keepElement = false;
+                        
+                        // for each Gauss point of the current element
+                        for (int itPtGauss = 0 ; itPtGauss < numGaussPointsByElt ; itPtGauss++)
+                        {
+                                const PointOfField& currentPt = points[itElt * numGaussPointsByElt + itPtGauss];
 
-				if (currentPt.mVal > threshold)
-				{
-					keepElement = true;
-					break;
-				}
-			}
-			
-			if (keepElement)
-			{
-				// add index of the element to keep (index must start at 1)
-				elementsToKeep[meshIt].insert(med_int(itElt + 1));
-			}
-		}
+                                if (currentPt.mVal > threshold)
+                                {
+                                        keepElement = true;
+                                        break;
+                                }
+                        }
+                        
+                        if (keepElement)
+                        {
+                                // add index of the element to keep (index must start at 1)
+                                elementsToKeep[meshIt].insert(med_int(itElt + 1));
+                        }
+                }
         if (field->isFieldOnNodes())
         {
             break;
         }
-	}
+        }
     //---------------------------------------------------------------------
     // Create the final mesh by extracting elements to keep from the current mesh
     //---------------------------------------------------------------------

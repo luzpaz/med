@@ -35,7 +35,7 @@ namespace MED
   MEDWRAPPER_FACTORY_EXPORT
   EVersion  
   GetVersionId(const std::string& theFileName,
-	       bool theDoPreCheckInSeparateProcess = false);
+               bool theDoPreCheckInSeparateProcess = false);
 
   MEDWRAPPER_FACTORY_EXPORT
     bool getMEDVersion( const std::string&, int&, int&, int& );
@@ -43,7 +43,7 @@ namespace MED
   MEDWRAPPER_FACTORY_EXPORT
   PWrapper 
   CrWrapper(const std::string& theFileName,
-	    bool theDoPreCheckInSeparateProcess = false);
+            bool theDoPreCheckInSeparateProcess = false);
 
   MEDWRAPPER_FACTORY_EXPORT
   PWrapper 

@@ -43,8 +43,8 @@ int main (int argc, char ** argv)
   // une taille nulle, négative puis positive
   try
   {
-	P.set(0);
-	ASSERT_MED((int *)P == NULL);
+        P.set(0);
+        ASSERT_MED((int *)P == NULL);
   }
   catch ( const std::exception &e )
   {
@@ -57,8 +57,8 @@ int main (int argc, char ** argv)
 
   try
   {
-	P.set(-1 * size);
-	ASSERT_MED((int *)P == NULL);
+        P.set(-1 * size);
+        ASSERT_MED((int *)P == NULL);
   }
   catch ( const std::exception &e )
   {
@@ -71,8 +71,8 @@ int main (int argc, char ** argv)
 
   try
   {
-	P.set(size);
-	ASSERT_MED((int *)P != NULL);
+        P.set(size);
+        ASSERT_MED((int *)P != NULL);
   }
   catch ( const std::exception &e )
   {
@@ -84,7 +84,7 @@ int main (int argc, char ** argv)
   }
   for (int i=0; i < size; i++)
   {
-	P[i]=i;
+        P[i]=i;
   }
 
   PointerOf<int> P2(10);
@@ -98,7 +98,7 @@ int main (int argc, char ** argv)
   int * p=new int [size];
   for (int i=0; i < size; i++)
   {
-	p[i]=i*10;
+        p[i]=i*10;
   }
   
   P2.set(p);

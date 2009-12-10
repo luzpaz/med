@@ -156,7 +156,7 @@ public:
      * Returns the number of timestamps for a given field.
      * Assumes this object encapsulates a sequential MED file.
      * \param  pFieldName name of any field.
-     * \param pPartList The list of parts to get the time stamps from (separator is '|').	 
+     * \param pPartList The list of parts to get the time stamps from (separator is '|').        
      * \return the number of timestamps for a given field; 0 if field not found.
      */
     int getTimeStamps(const char* pPartList, const char* pFieldName) const;
@@ -275,13 +275,13 @@ public:
         const char* pFilterName,
         const char* pFilterParams);
     
-	/**
-	 * Get mesh statistics.
-	 * \param pStats [the number of mesh] space [number of gauss points]
-	 * \param pPartName The path to the part.
-	 */
-	void getMEDInfo(char* pStats, char* pPartName);
-	
+        /**
+         * Get mesh statistics.
+         * \param pStats [the number of mesh] space [number of gauss points]
+         * \param pPartName The path to the part.
+         */
+        void getMEDInfo(char* pStats, char* pPartName);
+        
     //---------------------------------------------------------------------
     // I/O
     //---------------------------------------------------------------------

@@ -36,8 +36,8 @@
 namespace MEDMEM {
 class FAMILY;
 class MEDMEM_I_EXPORT FAMILY_i:
-		virtual public POA_SALOME_MED::FAMILY,
-		virtual public SUPPORT_i
+                virtual public POA_SALOME_MED::FAMILY,
+                virtual public SUPPORT_i
 {
 protected :
     FAMILY_i();
@@ -51,22 +51,22 @@ public :
     FAMILY_i(const ::MEDMEM::FAMILY * const f);
     FAMILY_i(const FAMILY_i & f);
 
-    CORBA::Long 	      getIdentifier()      
-				     throw (SALOME::SALOME_Exception);
+    CORBA::Long               getIdentifier()      
+                                     throw (SALOME::SALOME_Exception);
     CORBA::Long               getNumberOfAttributes() 
-				     throw (SALOME::SALOME_Exception);
+                                     throw (SALOME::SALOME_Exception);
     SALOME_MED::long_array*   getAttributesIdentifiers() 
-			      	     throw (SALOME::SALOME_Exception);
+                                     throw (SALOME::SALOME_Exception);
     CORBA::Long               getAttributeIdentifier(CORBA::Long i) 
-				     throw (SALOME::SALOME_Exception);
+                                     throw (SALOME::SALOME_Exception);
     SALOME_MED::long_array*   getAttributesValues() 
-				     throw (SALOME::SALOME_Exception);
-    CORBA::Long     	      getAttributeValue(CORBA::Long i) 
-				     throw (SALOME::SALOME_Exception);
+                                     throw (SALOME::SALOME_Exception);
+    CORBA::Long               getAttributeValue(CORBA::Long i) 
+                                     throw (SALOME::SALOME_Exception);
     SALOME_MED::string_array* getAttributesDescriptions() 
-				     throw (SALOME::SALOME_Exception);
-    char*  		      getAttributeDescription( CORBA::Long i) 
-				     throw (SALOME::SALOME_Exception);
+                                     throw (SALOME::SALOME_Exception);
+    char*                     getAttributeDescription( CORBA::Long i) 
+                                     throw (SALOME::SALOME_Exception);
     CORBA::Long               getNumberOfGroups()
                                      throw (SALOME::SALOME_Exception);
     char *                    getGroupName( CORBA::Long i)

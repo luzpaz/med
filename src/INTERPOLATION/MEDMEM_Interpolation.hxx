@@ -43,8 +43,8 @@ template <int DIMENSION=3> class INTERPOLATION
 {
 protected:
 
-  FIELD<double> *		  _fromField;
-  FIELD<double> *	          _toField;
+  FIELD<double> *                 _fromField;
+  FIELD<double> *                 _toField;
   MESH   *                        _fromMesh;
   MESH   *                        _toMesh;
   
@@ -55,8 +55,8 @@ protected:
 
 // only used when multi timestep are interpolated
 // but always coherent
-  int				  _iType;
-  int				  _isConvexFromMesh;
+  int                             _iType;
+  int                             _isConvexFromMesh;
   
 public :
 
@@ -117,7 +117,7 @@ template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const MESH & fr
   const char * LOC = "INTERPOLATION::INTERPOLATION(MESH * fromMesh ) : ";
   BEGIN_OF_MED(LOC);
   
-  init();	
+  init();       
   
   _fromMesh=const_cast<MESH * > (&fromMesh);
   
@@ -128,11 +128,11 @@ template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const MESH & fr
 
   _fromWrapper = new Meta_Wrapper<DIMENSION>(_fromMesh->getNumberOfNodes(),
                                              const_cast<double *> (_fromMesh->getCoordinates(MED_EN::MED_FULL_INTERLACE)),
-					     const_cast<CONNECTIVITY *> (_fromMesh->getConnectivityptr())
-					     );
+                                             const_cast<CONNECTIVITY *> (_fromMesh->getConnectivityptr())
+                                             );
 
   _mapping     = new  Meta_Mapping<DIMENSION> (_fromWrapper);
-					        
+                                                
   END_OF_MED(LOC);
 }; 
 
@@ -141,7 +141,7 @@ template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const MESH & fr
   const char * LOC = "INTERPOLATION::INTERPOLATION(MESH * fromMesh,,const MESH & toMesh) : ";
   BEGIN_OF_MED(LOC);
   
-  init();	
+  init();       
   
   _fromMesh = const_cast<MESH * > ( &fromMesh );
   _toMesh   = const_cast<MESH * > ( &toMesh   );
@@ -157,15 +157,15 @@ template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const MESH & fr
  
   _fromWrapper = new Meta_Wrapper<DIMENSION>(_fromMesh->getNumberOfNodes(),
                                              const_cast<double *> (_fromMesh->getCoordinates(MED_EN::MED_FULL_INTERLACE)),
-					     const_cast<CONNECTIVITY *> (_fromMesh->getConnectivityptr())
-					     );
+                                             const_cast<CONNECTIVITY *> (_fromMesh->getConnectivityptr())
+                                             );
 
   _toWrapper   = new Meta_Wrapper<DIMENSION>(_toMesh->getNumberOfNodes(),
                                              const_cast<double *> (_toMesh->getCoordinates(MED_EN::MED_FULL_INTERLACE))
-					     );
+                                             );
 
   _mapping     = new  Meta_Mapping<DIMENSION> (_fromWrapper);
-					        
+                                                
   END_OF_MED(LOC);
 };
 
@@ -188,19 +188,19 @@ template <int DIMENSION> INTERPOLATION<DIMENSION>::INTERPOLATION(const FIELD<dou
 
   _fromWrapper = new Meta_Wrapper<DIMENSION>(_fromMesh->getNumberOfNodes(),
                                              const_cast<double *> (_fromMesh->getCoordinates(MED_EN::MED_FULL_INTERLACE)),
-					     const_cast<MEDMEM::CONNECTIVITY *> (_fromMesh->getConnectivityptr()),
-					     const_cast<MEDMEM::FIELD<double> *>(_fromField)
-					     );
-					     
-					     
+                                             const_cast<MEDMEM::CONNECTIVITY *> (_fromMesh->getConnectivityptr()),
+                                             const_cast<MEDMEM::FIELD<double> *>(_fromField)
+                                             );
+                                             
+                                             
   _toWrapper   = new Meta_Wrapper<DIMENSION>(_toMesh->getNumberOfNodes(),
                                              const_cast<double *> (_toMesh->getCoordinates(MED_EN::MED_FULL_INTERLACE))
-					     );  
+                                             );  
 
   
   _mapping     = new  Meta_Mapping<DIMENSION> (_fromWrapper);
   
-					  
+                                          
   END_OF_MED(LOC);
 };
 
@@ -307,21 +307,21 @@ template <int DIMENSION> FIELD<double> * INTERPOLATION<DIMENSION>::interpolate(i
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Interpolation type "<<itype<<" not yet implemented !")) ;
     }
 
-  cout<<"On a fini l'interpolation"<<endl;	
+  cout<<"On a fini l'interpolation"<<endl;      
 
   _toField = new FIELD<double>;
   
-  _toField->setName		      ( _fromField->getName()			);
-  _toField->setDescription	      ( _fromField->getDescription()		);
-  _toField->setNumberOfComponents     ( _fromField->getNumberOfComponents()	);
-  _toField->setNumberOfValues	      ( _toMesh   ->getNumberOfNodes()  	);
+  _toField->setName                   ( _fromField->getName()                   );
+  _toField->setDescription            ( _fromField->getDescription()            );
+  _toField->setNumberOfComponents     ( _fromField->getNumberOfComponents()     );
+  _toField->setNumberOfValues         ( _toMesh   ->getNumberOfNodes()          );
   _toField->setComponentsNames        ( _fromField->getComponentsNames()        );
   _toField->setComponentsDescriptions ( _fromField->getComponentsDescriptions() );
-  _toField->setMEDComponentsUnits     ( _fromField->getMEDComponentsUnits()	);
+  _toField->setMEDComponentsUnits     ( _fromField->getMEDComponentsUnits()     );
   _toField->setIterationNumber        ( _fromField->getIterationNumber()        );
-  _toField->setTime		      ( _fromField->getTime()		        );
-  _toField->setOrderNumber	      ( _fromField->getOrderNumber()		);
-  //  _toField->setValueType	      ( MED_EN::MED_REEL64			);
+  _toField->setTime                   ( _fromField->getTime()                   );
+  _toField->setOrderNumber            ( _fromField->getOrderNumber()            );
+  //  _toField->setValueType          ( MED_EN::MED_REEL64                      );
 
   SUPPORT * mySupport(new SUPPORT(_toMesh,"support",MED_EN::MED_NODE));
   _toField->setSupport(mySupport);  
@@ -358,35 +358,35 @@ template <int DIMENSION> FIELD<double> * INTERPOLATION<DIMENSION>::interpolateNe
 
   // if the mesh are identical, the mapping is the same, if not, the mapping has to be re-calculated
   if (nextFromField.getSupport()->getMesh()->getName()!=_fromMesh->getName())
-  	{
-	
-	flagNewMapping=1;
-	
-	delete _mapping;
-	delete _fromWrapper;
+        {
+        
+        flagNewMapping=1;
+        
+        delete _mapping;
+        delete _fromWrapper;
 
         _fromField = const_cast<FIELD<double> *>(&nextFromField);
 
         _fromMesh = _fromField->getSupport()->getMesh();
 
-	_fromWrapper = new Meta_Wrapper<DIMENSION>(_fromMesh->getNumberOfNodes(),
-						   const_cast<double *> (_fromMesh->getCoordinates(MED_EN::MED_FULL_INTERLACE)),
-						   const_cast<MEDMEM::CONNECTIVITY *> (_fromMesh->getConnectivityptr()),
-						   const_cast<MEDMEM::FIELD<double> *>(_fromField)
-						   );
-  	_mapping     = new  Meta_Mapping<DIMENSION> (_fromWrapper);
-	
-	_mapping->Cree_Mapping(_toWrapper,_isConvexFromMesh);
-	
-	}
+        _fromWrapper = new Meta_Wrapper<DIMENSION>(_fromMesh->getNumberOfNodes(),
+                                                   const_cast<double *> (_fromMesh->getCoordinates(MED_EN::MED_FULL_INTERLACE)),
+                                                   const_cast<MEDMEM::CONNECTIVITY *> (_fromMesh->getConnectivityptr()),
+                                                   const_cast<MEDMEM::FIELD<double> *>(_fromField)
+                                                   );
+        _mapping     = new  Meta_Mapping<DIMENSION> (_fromWrapper);
+        
+        _mapping->Cree_Mapping(_toWrapper,_isConvexFromMesh);
+        
+        }
   else
-  	{
-	
-	flagNewMapping=0;
-	
-	_fromField = const_cast<MEDMEM::FIELD<double> *>(&nextFromField);
-	_fromWrapper->Change_Champ(const_cast<MEDMEM::FIELD<double> *>(_fromField));		
-	}
+        {
+        
+        flagNewMapping=0;
+        
+        _fromField = const_cast<MEDMEM::FIELD<double> *>(&nextFromField);
+        _fromWrapper->Change_Champ(const_cast<MEDMEM::FIELD<double> *>(_fromField));            
+        }
   
   return interpolate(_iType,_isConvexFromMesh);
 

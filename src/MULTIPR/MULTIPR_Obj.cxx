@@ -547,45 +547,45 @@ string Obj::evalDecimationParams(
 void Obj::getMEDInfo(char* pStats, char* pPartName)
 {
 
-	med_idt lMEDfile;
-	med_int lRet;
+        med_idt lMEDfile;
+        med_int lRet;
 
-	// Get the mesh path
-	MeshDisPart* curMeshDis = this->mMeshDis->findPart(pPartName);
-	if (curMeshDis == NULL)
-	{
-		throw IllegalStateException("Can't find part.", __FILE__, __LINE__);
-		return ;
-	}
-	const char* curMesh = curMeshDis->getMEDFileName();
-	if (curMesh == NULL)
-	{
-		throw IllegalStateException("Can't find mesh.", __FILE__, __LINE__);
-		return ;
-	}
-	
-	// open MED file for reading
-	lMEDfile = MEDouvrir(const_cast<char*>(curMesh), MED_LECTURE); 
-	if (lMEDfile <= 0)
-	{
-		throw IllegalStateException("Can't open file.", __FILE__, __LINE__);
-		return ;
-	}
-	const char* meshName = curMeshDis->getMeshName();
-	if (meshName == 0)
-	{
-		throw IllegalStateException("Can't find mesh name.", __FILE__, __LINE__);
-	}	
-	// Get the number of cells
-	for (int itCell = 0 ; itCell < MED_NBR_GEOMETRIE_MAILLE ; itCell++)
+        // Get the mesh path
+        MeshDisPart* curMeshDis = this->mMeshDis->findPart(pPartName);
+        if (curMeshDis == NULL)
+        {
+                throw IllegalStateException("Can't find part.", __FILE__, __LINE__);
+                return ;
+        }
+        const char* curMesh = curMeshDis->getMEDFileName();
+        if (curMesh == NULL)
+        {
+                throw IllegalStateException("Can't find mesh.", __FILE__, __LINE__);
+                return ;
+        }
+        
+        // open MED file for reading
+        lMEDfile = MEDouvrir(const_cast<char*>(curMesh), MED_LECTURE); 
+        if (lMEDfile <= 0)
+        {
+                throw IllegalStateException("Can't open file.", __FILE__, __LINE__);
+                return ;
+        }
+        const char* meshName = curMeshDis->getMeshName();
+        if (meshName == 0)
+        {
+                throw IllegalStateException("Can't find mesh name.", __FILE__, __LINE__);
+        }       
+        // Get the number of cells
+        for (int itCell = 0 ; itCell < MED_NBR_GEOMETRIE_MAILLE ; itCell++)
     {
-		lRet = MEDnEntMaa(lMEDfile, const_cast<char*>(meshName), MED_CONN, MED_MAILLE, CELL_TYPES[itCell], MED_NOD);
-		if (lRet > 0)
-		{
-			break;
-		}
-	}
-	sprintf(pStats, "%d", lRet);
+                lRet = MEDnEntMaa(lMEDfile, const_cast<char*>(meshName), MED_CONN, MED_MAILLE, CELL_TYPES[itCell], MED_NOD);
+                if (lRet > 0)
+                {
+                        break;
+                }
+        }
+        sprintf(pStats, "%d", lRet);
 }
 
 vector<string> Obj::getListParts() const

@@ -31,10 +31,10 @@ int main (int argc, char ** argv)
     /* process the arguments */
     if (argc != 2) 
     {
-	cerr << "Usage : " << argv[0] 
-	<< " Porflowfilename" << endl << endl
-	<< "-> lit le fichier Porflowfilename ,crée 2 fichiers : MED et VTK" << endl;
-	exit(-1);
+        cerr << "Usage : " << argv[0] 
+        << " Porflowfilename" << endl << endl
+        << "-> lit le fichier Porflowfilename ,crée 2 fichiers : MED et VTK" << endl;
+        exit(-1);
     }
 
     string porflowfilename  = argv[1];
@@ -95,7 +95,7 @@ int main (int argc, char ** argv)
     for(int i=0; i<NumberOfNodes ; i++) {
       cout << "Nodes " << i+1 << " : " ;
       for (int j=0; j<SpaceDimension ; j++)
-	cout << Coordinates[i*SpaceDimension+j] << " " ;
+        cout << Coordinates[i*SpaceDimension+j] << " " ;
       cout << endl ;
     }
 

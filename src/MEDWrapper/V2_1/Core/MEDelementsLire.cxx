@@ -22,15 +22,15 @@ namespace med_2_1{
 
 med_err
 MEDelementsLire(med_idt fid,char *maa,med_int mdim,med_int *connectivite,med_mode_switch mode_switch,
-	       char *nom,med_booleen *inom,med_int *num,med_booleen *inum,
-	       med_int *fam,med_int nele,med_entite_maillage typ_ent, 
-	       med_geometrie_element typ_geo,med_connectivite typ_conn)
+               char *nom,med_booleen *inom,med_int *num,med_booleen *inum,
+               med_int *fam,med_int nele,med_entite_maillage typ_ent, 
+               med_geometrie_element typ_geo,med_connectivite typ_conn)
 {
   med_err ret;
 
   /* Lecure de la connectivite */
   if ((ret = MEDconnLire(fid,maa,mdim,connectivite,mode_switch,0,MED_NOPF,
-			 typ_ent,typ_geo,typ_conn)) < 0)
+                         typ_ent,typ_geo,typ_conn)) < 0)
     return -1;
 
   /* Lecture des noms */

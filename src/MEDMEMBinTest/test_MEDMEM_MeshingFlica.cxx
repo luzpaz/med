@@ -146,12 +146,12 @@ int cpolygonsValue[92]=
 int bottom[4]={1,7,30,35}; MED_EN::medGeometryElement bottomTypes[2]={MED_EN::MED_QUAD4, MED_EN::MED_POLYGON }; int bottomIndex[3]={1,3,5}; int bottomNbOfElts[2]={2,2};
 int top[4]={21,26,46,50}; MED_EN::medGeometryElement topTypes[2]={MED_EN::MED_QUAD4, MED_EN::MED_POLYGON }; int topIndex[3]={1,3,5}; int topNbOfElts[2]={2,2};
 int side[24]={ 3, 6, 10, 11, 13, 16, 19, 20, 22, 25, 28, 29, 32, 33, 37, 38, 40, 41, 44, 45, 
-	       47, 48, 51, 52}; MED_EN::medGeometryElement sideTypes[2]={MED_EN::MED_QUAD4, MED_EN::MED_POLYGON }; int sideIndex[3]={1,13,25}; int sideNbOfElts[2]={12,12};
+               47, 48, 51, 52}; MED_EN::medGeometryElement sideTypes[2]={MED_EN::MED_QUAD4, MED_EN::MED_POLYGON }; int sideIndex[3]={1,13,25}; int sideNbOfElts[2]={12,12};
 
 using namespace MEDMEM;
 
 void addMedFacesGroup( MESHING& meshing, int nFaces, const int *groupValue,
-		       string groupName, const MED_EN::medGeometryElement *mytypes,  const int *index, const int *myNumberOfElements, int nbOfGeomTypes)
+                       string groupName, const MED_EN::medGeometryElement *mytypes,  const int *index, const int *myNumberOfElements, int nbOfGeomTypes)
   {
     GROUP faces ;
     faces.setName(groupName) ;
@@ -172,7 +172,7 @@ int main()
   const int nNodes=36;
   meshing->setNumberOfNodes(nNodes);
   meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
-			  MED_EN::MED_NO_INTERLACE);
+                          MED_EN::MED_NO_INTERLACE);
   string coordname[3] = { "x", "y", "z" };
   meshing->setCoordinatesNames(coordname);
   string coordunit[3] = { "m", "m", "m" };

@@ -43,7 +43,7 @@ private :
 public :
 
   GROUPClient(const SALOME_MED::GROUP_ptr S, 
-		MESH * M = NULL);
+                MESH * M = NULL);
   virtual ~GROUPClient();
 
   virtual void blankCopy();

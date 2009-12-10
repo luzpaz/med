@@ -39,7 +39,7 @@ class GROUP;
 
 class MEDMEM_I_EXPORT GROUP_i:
                 virtual public POA_SALOME_MED::GROUP,
-	        virtual public SUPPORT_i
+                virtual public SUPPORT_i
 {
 protected :
     GROUP_i();
@@ -53,12 +53,12 @@ public :
     GROUP_i(const ::MEDMEM::GROUP * const g);
     GROUP_i(const GROUP_i & g);
 
-    CORBA::Long    	      getNumberOfFamilies() 
-					throw (SALOME::SALOME_Exception);
-    SALOME_MED::Family_array* getFamilies() 	         
-					throw (SALOME::SALOME_Exception);
+    CORBA::Long               getNumberOfFamilies() 
+                                        throw (SALOME::SALOME_Exception);
+    SALOME_MED::Family_array* getFamilies()              
+                                        throw (SALOME::SALOME_Exception);
     SALOME_MED::FAMILY_ptr    getFamily(CORBA::Long i) 
-					throw (SALOME::SALOME_Exception);
+                                        throw (SALOME::SALOME_Exception);
 };
 }
 

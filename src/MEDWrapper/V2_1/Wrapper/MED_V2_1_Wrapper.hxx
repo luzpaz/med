@@ -76,8 +76,8 @@ namespace MED
   template<>
   TInt MED_V21_WRAPPER_EXPORT
   GetNbConn<eV2_1>(EGeometrieElement typmai,
-		   EEntiteMaillage typent,
-		   TInt mdim);
+                   EEntiteMaillage typent,
+                   TInt mdim);
   
   namespace V2_1
   {
@@ -106,103 +106,103 @@ namespace MED
       virtual
       void
       GetMeshInfo(TInt theMeshId, MED::TMeshInfo&,
-		  TErr* theErr = NULL);
+                  TErr* theErr = NULL);
 
       virtual 
       void
       SetMeshInfo(const MED::TMeshInfo& theInfo,
-		  TErr* theErr = NULL);
+                  TErr* theErr = NULL);
       
       void
       SetMeshInfo(const MED::TMeshInfo& theInfo,
-		  EModeAcces theMode,
-		  TErr* theErr = NULL);
+                  EModeAcces theMode,
+                  TErr* theErr = NULL);
       
       
       //----------------------------------------------------------------------------
       virtual
       TInt
       GetNbFamilies(const MED::TMeshInfo& theMeshInfo,
-		    TErr* theErr = NULL);
+                    TErr* theErr = NULL);
       virtual 
       TInt
       GetNbFamAttr(TInt theFamId, 
-		   const MED::TMeshInfo& theInfo,
-		   TErr* theErr = NULL);
+                   const MED::TMeshInfo& theInfo,
+                   TErr* theErr = NULL);
       virtual 
       TInt
       GetNbFamGroup(TInt theFamId, 
-		    const MED::TMeshInfo& theInfo,
-		    TErr* theErr = NULL);
+                    const MED::TMeshInfo& theInfo,
+                    TErr* theErr = NULL);
       
       virtual 
       void
       GetFamilyInfo(TInt theFamId, 
-		    MED::TFamilyInfo& theInfo,
-		    TErr* theErr = NULL);
+                    MED::TFamilyInfo& theInfo,
+                    TErr* theErr = NULL);
 
       virtual 
       void
       SetFamilyInfo(const MED::TFamilyInfo& theInfo,
-		    TErr* theErr = NULL);
+                    TErr* theErr = NULL);
       
       void
       SetFamilyInfo(const MED::TFamilyInfo& theInfo,
-		    EModeAcces theMode,
-		    TErr* theErr = NULL);
+                    EModeAcces theMode,
+                    TErr* theErr = NULL);
       
       
       //----------------------------------------------------------------------------
       virtual
       TInt
       GetNbNodes(const MED::TMeshInfo& theMeshInfo,
-		 TErr* theErr = NULL);
+                 TErr* theErr = NULL);
       
       virtual 
       void
       GetNodeInfo(MED::TNodeInfo& theInfo,
-		  TErr* theErr = NULL);
+                  TErr* theErr = NULL);
       
       virtual
       void
       SetNodeInfo(const MED::TNodeInfo& theInfo,
-		  TErr* theErr = NULL);
+                  TErr* theErr = NULL);
       
       void 
       SetNodeInfo(const MED::TNodeInfo& theInfo,
-		  EModeAcces theMode,
-		  TErr* theErr = NULL);
+                  EModeAcces theMode,
+                  TErr* theErr = NULL);
       
       
       //----------------------------------------------------------------------------
       virtual
       TEntityInfo
       GetEntityInfo(const MED::TMeshInfo& theMeshInfo,
-		    EConnectivite theConn = eNOD,
-		    TErr* theErr = NULL);
+                    EConnectivite theConn = eNOD,
+                    TErr* theErr = NULL);
       
       virtual
       TInt
       GetNbCells(const MED::TMeshInfo& theMeshInfo, 
-		 EEntiteMaillage, 
-		 EGeometrieElement, 
-		 EConnectivite theConn = eNOD,
-		 TErr* theErr = NULL);
+                 EEntiteMaillage, 
+                 EGeometrieElement, 
+                 EConnectivite theConn = eNOD,
+                 TErr* theErr = NULL);
       
       virtual 
       void
       GetCellInfo(MED::TCellInfo& theInfo,
-		  TErr* theErr = NULL);
+                  TErr* theErr = NULL);
       
       virtual
       void
       SetCellInfo(const MED::TCellInfo& theInfo,
-		  TErr* theErr = NULL);
+                  TErr* theErr = NULL);
       
       void 
       SetCellInfo(const MED::TCellInfo& theInfo,
-		  EModeAcces theMode,
-		  TErr* theErr = NULL);
+                  EModeAcces theMode,
+                  TErr* theErr = NULL);
 
       
       //----------------------------------------------------------------------------
@@ -213,23 +213,23 @@ namespace MED
       virtual
       TInt
       GetNbComp(TInt theFieldId,
-		TErr* theErr = NULL);
+                TErr* theErr = NULL);
       
       virtual 
       void
       GetFieldInfo(TInt theFieldId, 
-		   MED::TFieldInfo& theInfo,
-		   TErr* theErr = NULL);
+                   MED::TFieldInfo& theInfo,
+                   TErr* theErr = NULL);
 
       virtual 
       void
       SetFieldInfo(const MED::TFieldInfo& theInfo,
-		   TErr* theErr = NULL);
+                   TErr* theErr = NULL);
       
       void 
       SetFieldInfo(const MED::TFieldInfo& theInfo,
-		   EModeAcces theMode,
-		   TErr* theErr = NULL);
+                   EModeAcces theMode,
+                   TErr* theErr = NULL);
 
       
       //----------------------------------------------------------------------------
@@ -240,13 +240,13 @@ namespace MED
       virtual 
       TProfileInfo::TInfo
       GetProfilePreInfo(TInt theId, 
-			TErr* theErr = NULL);
+                        TErr* theErr = NULL);
       
       virtual 
       void
       GetProfileInfo(TInt theId, 
-		     TProfileInfo& theInfo,
-		     TErr* theErr = NULL);
+                     TProfileInfo& theInfo,
+                     TErr* theErr = NULL);
 
       virtual
       void
@@ -262,33 +262,33 @@ namespace MED
       virtual 
       TInt
       GetNbTimeStamps(const MED::TFieldInfo& theInfo, 
-		      const MED::TEntityInfo& theEntityInfo,
-		      EEntiteMaillage& theEntity,
-		      TGeom2Size& theGeom2Size,
-		      TErr* theErr = NULL);
+                      const MED::TEntityInfo& theEntityInfo,
+                      EEntiteMaillage& theEntity,
+                      TGeom2Size& theGeom2Size,
+                      TErr* theErr = NULL);
       
       virtual 
       void
       GetTimeStampInfo(TInt theTimeStampId, 
-		       MED::TTimeStampInfo& theInfo,
-		       TErr* theErr = NULL);
+                       MED::TTimeStampInfo& theInfo,
+                       TErr* theErr = NULL);
 
       virtual 
       void
       GetTimeStampValue(const PTimeStampValueBase& theTimeStampValue,
-			const TMKey2Profile& theMKey2Profile,
-			const TKey2Gauss& theKey2Gauss,
-			TErr* theErr = NULL);
+                        const TMKey2Profile& theMKey2Profile,
+                        const TKey2Gauss& theKey2Gauss,
+                        TErr* theErr = NULL);
       
       virtual 
       void
       SetTimeStampValue(const PTimeStampValueBase& theTimeStampValue,
-			TErr* theErr = NULL);
+                        TErr* theErr = NULL);
       
       void
       SetTimeStampValue(const PTimeStampValueBase& theTimeStampValue,
-			EModeAcces theMode,
-			TErr* theErr = NULL);
+                        EModeAcces theMode,
+                        TErr* theErr = NULL);
 
     protected:
       PFile myFile;

@@ -75,13 +75,13 @@ namespace med_2_1{
 
 med_err 
 MEDgro2famB (med_int nnoe,med_int nele,med_int *numnoe,med_int *numele,
-	     med_int ngn,med_int nge,med_int nindn,
-	     med_int ninde, char *nomgronoe,char *nomgroele, 
-	     int *indgronoe,int *indgroele,med_int *tabgronoe, 
-	     med_int *tabgroele,med_int nfamg,med_int nindf,
-	     med_int *newnumfam,med_int *newnumfamele, 
-	     med_int *newnumfamnoe,int *newindfamgro,
-	     char *newfamgro)
+             med_int ngn,med_int nge,med_int nindn,
+             med_int ninde, char *nomgronoe,char *nomgroele, 
+             int *indgronoe,int *indgroele,med_int *tabgronoe, 
+             med_int *tabgroele,med_int nfamg,med_int nindf,
+             med_int *newnumfam,med_int *newnumfamele, 
+             med_int *newnumfamnoe,int *newindfamgro,
+             char *newfamgro)
 {
   int i,j,k;
 
@@ -109,272 +109,272 @@ MEDgro2famB (med_int nnoe,med_int nele,med_int *numnoe,med_int *numele,
   if (nfamg > 1)
     {
       /* pour chaque noeud :
-	 1 - on dresse la liste des groupes de noeuds auquel il appartient
-	 2 - en la comparant avec les listes pre-existantes, on
+         1 - on dresse la liste des groupes de noeuds auquel il appartient
+         2 - en la comparant avec les listes pre-existantes, on
          estime s'il est necessaire de creer une nouvelle famille de noeuds.
-	 Si oui => - on cree le numero de famille que l'on reporte 
+         Si oui => - on cree le numero de famille que l'on reporte 
                      dans newnumfam
                    - on reporte ce numero dans newnumnoe
                    - on met a jour la table des noms des groupes des familles
                      ainsi que sa table d'index  
-	 Si non => on ne fait rien 
+         Si non => on ne fait rien 
          ATTENTION : pour la famille 0, on ne met a jour que les numeros */
       for (i=0;i<nnoe;i++)
-	{
-	  if ((tmp = (med_int*) malloc(sizeof(med_int)*ngn)) == NULL)
-	    return -1;
-	  num = *(numnoe+i);
-	  for (j=0;j<ngn;j++)
-	    {
-	      flag = 0;
-	      /* on regarde si le noeud appartient au groupe */
-	      for (k=0;k<*(indgronoe+j+1)-*(indgronoe+j);k++)
-		if (num == *(tabgronoe+*(indgronoe+j)+k))
-		  flag = 1;
-	      /* on met le flag a jour dans tmp */
-	      *(tmp+j) = flag;
-	    }
-	  /* on regarde si le numero de famille est 0 */
-	  estfam0 = 0;
-	  flag = 1;
-	  for (j=0;j<ngn;j++)
-	    if (*(tmp+j) == 1)
-	      flag = 0;
-	  if (flag == 1)
-	    {
-	      estfam0 = 1;
-	      *(newnumfamnoe+i) = 0;
-	    }
-	  if (flag == 1 && existfam0 == 0)
-	    existfam0 = 1;
-	  /* faut-il creer une nouvelle famille ? */
-	  if (famnoe == NULL)
-	    {
-	      exist = 0;
-	      if ((famnoe = (med_int *) malloc (sizeof(med_int)*ngn)) == NULL)
-		return -1;
-	      /* on met a jour la table d'indices */
-	      nfamn = 1;
-	      *(newindfamgro+nfamn) = *(newindfamgro+nfamn-1);
-	      for (j=0;j<ngn;j++)
-		{
-		  tmp1 = *(tmp+j);
-		  *(famnoe+j) = tmp1;
-		  if (tmp1 == 1)
-		    {
-		      strncpy(newfamgro+*(newindfamgro+nfamn),
-			      nomgronoe+j*MED_TAILLE_LNOM,MED_TAILLE_LNOM);
-		      *(newindfamgro+nfamn) = *(newindfamgro+nfamn) + 
-			MED_TAILLE_LNOM;
-		    }
-		}
-	      if (estfam0 == 0)
-		{
-		  newnumnoe = 1;
-		  *newnumfamnoe = newnumnoe;
-		  *newnumfam = newnumnoe;
-		}
-	      else
-		*newnumfam = 0;
-	    }
-	  else
-	    {
-	      for (j=0;j<nfamn;j++)
-		{
-		  p = famnoe + ngn*j;
-		  for (k=0;k<ngn;k++)
-		    {
-		      if (*(p+k) != *(tmp+k))
-			{
-			  exist = 0;
-			  break;
-			}
-		      else
-			exist = 1;
-		    }
-		  if (exist == 1)
-		    {
-		      if (estfam0 == 0)
-			*(newnumfamnoe+i) = *(newnumfam+j);
-		      break;
-		    }
-		}
-	      if (exist == 0)
-		{
-		  nfamn = nfamn + 1;
-		  *(newindfamgro+nfamn) = *(newindfamgro+nfamn-1);
-		  p = famnoe;
-		  if ((famnoe = (med_int*) malloc(sizeof(med_int)*ngn*nfamn))
-		      == NULL)
-		    return -1;
-		  for (j=0;j<nfamn-1;j++)
-		    for (k=0;k<ngn;k++)
-		      *(famnoe+j*ngn+k) = *(p+j*ngn+k);
-		  free(p);
-		  p = famnoe+(nfamn-1)*ngn;
-		  for (j=0;j<ngn;j++)
-		    {
-		      tmp1 = *(tmp+j);
-		      *(p+j) = tmp1;
-		      if (tmp1 == 1)
-			{
-			  strncpy(newfamgro+*(newindfamgro+nfamn), 
-				  nomgronoe+j*MED_TAILLE_LNOM,MED_TAILLE_LNOM);
-		      *(newindfamgro+nfamn) = *(newindfamgro + nfamn) 
-			+ MED_TAILLE_LNOM;
-			}
-		    }
-		  if (estfam0 == 0)
-		    {
-		      newnumnoe = newnumnoe + 1;
-		      *(newnumfamnoe+i) = newnumnoe;
-		      *(newnumfam+nfamn-1) = newnumnoe;
-		    }
-		  else
-		    *(newnumfam+nfamn-1) = 0;
-		}
-	    }
-	  free(tmp);
-	}
+        {
+          if ((tmp = (med_int*) malloc(sizeof(med_int)*ngn)) == NULL)
+            return -1;
+          num = *(numnoe+i);
+          for (j=0;j<ngn;j++)
+            {
+              flag = 0;
+              /* on regarde si le noeud appartient au groupe */
+              for (k=0;k<*(indgronoe+j+1)-*(indgronoe+j);k++)
+                if (num == *(tabgronoe+*(indgronoe+j)+k))
+                  flag = 1;
+              /* on met le flag a jour dans tmp */
+              *(tmp+j) = flag;
+            }
+          /* on regarde si le numero de famille est 0 */
+          estfam0 = 0;
+          flag = 1;
+          for (j=0;j<ngn;j++)
+            if (*(tmp+j) == 1)
+              flag = 0;
+          if (flag == 1)
+            {
+              estfam0 = 1;
+              *(newnumfamnoe+i) = 0;
+            }
+          if (flag == 1 && existfam0 == 0)
+            existfam0 = 1;
+          /* faut-il creer une nouvelle famille ? */
+          if (famnoe == NULL)
+            {
+              exist = 0;
+              if ((famnoe = (med_int *) malloc (sizeof(med_int)*ngn)) == NULL)
+                return -1;
+              /* on met a jour la table d'indices */
+              nfamn = 1;
+              *(newindfamgro+nfamn) = *(newindfamgro+nfamn-1);
+              for (j=0;j<ngn;j++)
+                {
+                  tmp1 = *(tmp+j);
+                  *(famnoe+j) = tmp1;
+                  if (tmp1 == 1)
+                    {
+                      strncpy(newfamgro+*(newindfamgro+nfamn),
+                              nomgronoe+j*MED_TAILLE_LNOM,MED_TAILLE_LNOM);
+                      *(newindfamgro+nfamn) = *(newindfamgro+nfamn) + 
+                        MED_TAILLE_LNOM;
+                    }
+                }
+              if (estfam0 == 0)
+                {
+                  newnumnoe = 1;
+                  *newnumfamnoe = newnumnoe;
+                  *newnumfam = newnumnoe;
+                }
+              else
+                *newnumfam = 0;
+            }
+          else
+            {
+              for (j=0;j<nfamn;j++)
+                {
+                  p = famnoe + ngn*j;
+                  for (k=0;k<ngn;k++)
+                    {
+                      if (*(p+k) != *(tmp+k))
+                        {
+                          exist = 0;
+                          break;
+                        }
+                      else
+                        exist = 1;
+                    }
+                  if (exist == 1)
+                    {
+                      if (estfam0 == 0)
+                        *(newnumfamnoe+i) = *(newnumfam+j);
+                      break;
+                    }
+                }
+              if (exist == 0)
+                {
+                  nfamn = nfamn + 1;
+                  *(newindfamgro+nfamn) = *(newindfamgro+nfamn-1);
+                  p = famnoe;
+                  if ((famnoe = (med_int*) malloc(sizeof(med_int)*ngn*nfamn))
+                      == NULL)
+                    return -1;
+                  for (j=0;j<nfamn-1;j++)
+                    for (k=0;k<ngn;k++)
+                      *(famnoe+j*ngn+k) = *(p+j*ngn+k);
+                  free(p);
+                  p = famnoe+(nfamn-1)*ngn;
+                  for (j=0;j<ngn;j++)
+                    {
+                      tmp1 = *(tmp+j);
+                      *(p+j) = tmp1;
+                      if (tmp1 == 1)
+                        {
+                          strncpy(newfamgro+*(newindfamgro+nfamn), 
+                                  nomgronoe+j*MED_TAILLE_LNOM,MED_TAILLE_LNOM);
+                      *(newindfamgro+nfamn) = *(newindfamgro + nfamn) 
+                        + MED_TAILLE_LNOM;
+                        }
+                    }
+                  if (estfam0 == 0)
+                    {
+                      newnumnoe = newnumnoe + 1;
+                      *(newnumfamnoe+i) = newnumnoe;
+                      *(newnumfam+nfamn-1) = newnumnoe;
+                    }
+                  else
+                    *(newnumfam+nfamn-1) = 0;
+                }
+            }
+          free(tmp);
+        }
       
       /* pour chaque element :
-	 1 - on dresse la liste des groupes de noeuds auquel il appartient
-	 2 - en la comparant avec les listes pre-existantes, on
+         1 - on dresse la liste des groupes de noeuds auquel il appartient
+         2 - en la comparant avec les listes pre-existantes, on
          estime s'il est necessaire de creer une nouvelle famille d'elements.
-	 Si oui => - on cree le numero de famille que l'on reporte 
+         Si oui => - on cree le numero de famille que l'on reporte 
                      dans newnumfam
                    - on reporte ce numero dans newnumele
                    - on met a jour la table des noms des groupes des familles
                      ainsi que sa table d'index  
-	 Si non => on ne fait rien 
+         Si non => on ne fait rien 
          ATTENTION : pour la famille 0, on ne met a jour que les numeros */
       for (i=0;i<nele;i++)
-	{
-	  if ((tmp = (med_int*) malloc(sizeof(med_int)*nge)) == NULL)
-	    return -1;
-	  num = *(numele+i);
-	  for (j=0;j<nge;j++)
-	    {
-	      flag = 0;
-	      /* on regarde si l'element appartient au groupe */
-	      for (k=0;k<*(indgroele+j+1)-*(indgroele+j);k++)
-		if (num == *(tabgroele+*(indgroele+j)+k))
-		  flag = 1;
-	      /* on met le flag a jour dans tmp */
-	      *(tmp+j) = flag;
-	    }
-	  /* on regarde si le numero de famille est 0 */
-	  estfam0 = 0;
-	  flag = 1;
-	  for (j=0;j<nge;j++)
-	    if (*(tmp+j) == 1)
-	      flag = 0;
-	  if (flag == 1)
-	    {
-	      estfam0 = 1;
-	      *(newnumfamele+i) = 0;
-	    }
-	  /* faut-il creer une nouvelle famille ? */
-	  if (famele == NULL)
-	    {
-	      if (!(estfam0&&existfam0))
-		{
-		  exist = 0;
-		  if ((famele = (med_int *) malloc (sizeof(med_int)*nge))
-		      == NULL)
-		    return -1;
-		  nfame = 1;
-		  *(newindfamgro+nfamn+nfame) = *(newindfamgro+nfamn+nfame-1);
-		  for (j=0;j<nge;j++)
-		    {
-		      tmp1 = *(tmp+j);
-		      *(famele+j) = tmp1;
-		      if (tmp1 == 1)
-			{
-			  strncpy(newfamgro+*(newindfamgro+nfamn+nfame),
-				  nomgroele+j*MED_TAILLE_LNOM,MED_TAILLE_LNOM);
-			  *(newindfamgro+nfamn+nfame) = *(newindfamgro+nfamn+nfame)
-			    + MED_TAILLE_LNOM;
-			}
-		    }
-		  if (estfam0 == 0)
-		    {
-		      newnumele = -1;
-		      *(newnumfamele+i) = newnumele;
-		      *(newnumfam+nfamn+nfame-1) = newnumele;
-		    }
-		  else
-		    {
-		      newnumele = 0;
-		      *(newnumfam+nfamn+nfame-1) = newnumele;
-		      existfam0 = 1;
-		    }
-		}
-	    }
-	  else
-	    {
-	      for (j=0;j<nfame;j++)
-		{
-		  p = famele + nge*j;
-		  for (k=0;k<nge;k++)
-		    {
-		      if (*(p+k) != *(tmp+k))
-			{
-			  exist = 0;
-			  break;
-			}
-		      else
-			exist = 1;
-		    }
-		  if (exist == 1)
-		    {
-		      if (estfam0 == 0)
-			*(newnumfamele+i) = *(newnumfam+nfamn+j);
-		      break;
-		    }
-		}
-	      if (exist == 0 && !(estfam0 && existfam0))
-		/* on cree une nouvelle famille */
-		{
-		  nfame = nfame + 1;
-		  *(newindfamgro+nfamn+nfame) = *(newindfamgro+nfamn+nfame-1);
-		  p = famele;
-		  if ((famele = (med_int*) malloc(sizeof(med_int)*nge*nfame))
-		      == NULL)
-		    return -1;
-		  for (j=0;j<nfame-1;j++)
-		    for (k=0;k<nge;k++)
-		      *(famele+j*nge+k) = *(p+j*nge+k);
-		  free(p);
-		  p = famele+(nfame-1)*nge;
-		  for (j=0;j<nge;j++)
-		    {
-		      tmp1 = *(tmp+j);
-		      *(p+j) = tmp1;
-		      if (tmp1 == 1)
-			{
-			  strncpy((newfamgro+*(newindfamgro+nfamn+nfame)), 
-				  nomgroele+j*MED_TAILLE_LNOM,MED_TAILLE_LNOM);
-			  *(newindfamgro+nfamn+nfame) =
-			    *(newindfamgro+nfamn+nfame) + MED_TAILLE_LNOM;
-			}
-		    }
-		  if (estfam0 == 0)
-		    {
-		      newnumele = newnumele - 1;
-		      *(newnumfamele+i) = newnumele;
-		      *(newnumfam+nfamn+nfame-1) = newnumele;
-		    }
-		  else
-		    if (existfam0 == 0)
-		      {
-			*(newnumfam+nfamn+nfame-1) = 0;
-			existfam0 =1;
-		      }
-		}
-	    }
-	  free(tmp);
-	}
+        {
+          if ((tmp = (med_int*) malloc(sizeof(med_int)*nge)) == NULL)
+            return -1;
+          num = *(numele+i);
+          for (j=0;j<nge;j++)
+            {
+              flag = 0;
+              /* on regarde si l'element appartient au groupe */
+              for (k=0;k<*(indgroele+j+1)-*(indgroele+j);k++)
+                if (num == *(tabgroele+*(indgroele+j)+k))
+                  flag = 1;
+              /* on met le flag a jour dans tmp */
+              *(tmp+j) = flag;
+            }
+          /* on regarde si le numero de famille est 0 */
+          estfam0 = 0;
+          flag = 1;
+          for (j=0;j<nge;j++)
+            if (*(tmp+j) == 1)
+              flag = 0;
+          if (flag == 1)
+            {
+              estfam0 = 1;
+              *(newnumfamele+i) = 0;
+            }
+          /* faut-il creer une nouvelle famille ? */
+          if (famele == NULL)
+            {
+              if (!(estfam0&&existfam0))
+                {
+                  exist = 0;
+                  if ((famele = (med_int *) malloc (sizeof(med_int)*nge))
+                      == NULL)
+                    return -1;
+                  nfame = 1;
+                  *(newindfamgro+nfamn+nfame) = *(newindfamgro+nfamn+nfame-1);
+                  for (j=0;j<nge;j++)
+                    {
+                      tmp1 = *(tmp+j);
+                      *(famele+j) = tmp1;
+                      if (tmp1 == 1)
+                        {
+                          strncpy(newfamgro+*(newindfamgro+nfamn+nfame),
+                                  nomgroele+j*MED_TAILLE_LNOM,MED_TAILLE_LNOM);
+                          *(newindfamgro+nfamn+nfame) = *(newindfamgro+nfamn+nfame)
+                            + MED_TAILLE_LNOM;
+                        }
+                    }
+                  if (estfam0 == 0)
+                    {
+                      newnumele = -1;
+                      *(newnumfamele+i) = newnumele;
+                      *(newnumfam+nfamn+nfame-1) = newnumele;
+                    }
+                  else
+                    {
+                      newnumele = 0;
+                      *(newnumfam+nfamn+nfame-1) = newnumele;
+                      existfam0 = 1;
+                    }
+                }
+            }
+          else
+            {
+              for (j=0;j<nfame;j++)
+                {
+                  p = famele + nge*j;
+                  for (k=0;k<nge;k++)
+                    {
+                      if (*(p+k) != *(tmp+k))
+                        {
+                          exist = 0;
+                          break;
+                        }
+                      else
+                        exist = 1;
+                    }
+                  if (exist == 1)
+                    {
+                      if (estfam0 == 0)
+                        *(newnumfamele+i) = *(newnumfam+nfamn+j);
+                      break;
+                    }
+                }
+              if (exist == 0 && !(estfam0 && existfam0))
+                /* on cree une nouvelle famille */
+                {
+                  nfame = nfame + 1;
+                  *(newindfamgro+nfamn+nfame) = *(newindfamgro+nfamn+nfame-1);
+                  p = famele;
+                  if ((famele = (med_int*) malloc(sizeof(med_int)*nge*nfame))
+                      == NULL)
+                    return -1;
+                  for (j=0;j<nfame-1;j++)
+                    for (k=0;k<nge;k++)
+                      *(famele+j*nge+k) = *(p+j*nge+k);
+                  free(p);
+                  p = famele+(nfame-1)*nge;
+                  for (j=0;j<nge;j++)
+                    {
+                      tmp1 = *(tmp+j);
+                      *(p+j) = tmp1;
+                      if (tmp1 == 1)
+                        {
+                          strncpy((newfamgro+*(newindfamgro+nfamn+nfame)), 
+                                  nomgroele+j*MED_TAILLE_LNOM,MED_TAILLE_LNOM);
+                          *(newindfamgro+nfamn+nfame) =
+                            *(newindfamgro+nfamn+nfame) + MED_TAILLE_LNOM;
+                        }
+                    }
+                  if (estfam0 == 0)
+                    {
+                      newnumele = newnumele - 1;
+                      *(newnumfamele+i) = newnumele;
+                      *(newnumfam+nfamn+nfame-1) = newnumele;
+                    }
+                  else
+                    if (existfam0 == 0)
+                      {
+                        *(newnumfam+nfamn+nfame-1) = 0;
+                        existfam0 =1;
+                      }
+                }
+            }
+          free(tmp);
+        }
       
       *(newfamgro+MED_TAILLE_LNOM*nindf) = '\0';
 
@@ -385,9 +385,9 @@ MEDgro2famB (med_int nnoe,med_int nele,med_int *numnoe,med_int *numele,
     {
       *newnumfam = 0;
       for (i=0;i<nele;i++)
-	*(newnumfamele+i) = 0;
+        *(newnumfamele+i) = 0;
       for (i=0;i<nnoe;i++)
-	*(newnumfamnoe+i) = 0;
+        *(newnumfamnoe+i) = 0;
     }
   
   return 0;

@@ -54,7 +54,7 @@ void affiche_support(const SUPPORT * mySupport)
       int NumberOfElements = mySupport->getNumberOfElements(Types[j]) ;
       const int * Number = mySupport->getNumber(Types[j]) ;
       for (int k=0; k<NumberOfElements;k++)
-	cout << Number[k] << " ";
+        cout << Number[k] << " ";
       cout << endl ;
     }
   } else
@@ -99,7 +99,7 @@ int main (int argc, char ** argv) {
 
   if (argc <3) { // after 3, ignored !
     cerr << "Usage : " << argv[0] 
-	 << " filename meshname" << endl << endl;
+         << " filename meshname" << endl << endl;
     exit(-1);
   }
 
@@ -149,10 +149,10 @@ int main (int argc, char ** argv) {
       TotalNumberOfElements=TotalNumberOfElements+myMesh->getNumberOfElements(MED_CELL,GeometricType[i]);
       NumberOfElements[i/2]=myMesh->getNumberOfElements(MED_CELL,GeometricType[i]);
       for (int j=0;j<myMesh->getNumberOfElements(MED_CELL,GeometricType[i]);j++)
-	{
-	  NumberValue[cmp]=myMesh->getGlobalNumberingIndex(MED_CELL)[i]+j;
-	  cmp=cmp+1;
-	}
+        {
+          NumberValue[cmp]=myMesh->getGlobalNumberingIndex(MED_CELL)[i]+j;
+          cmp=cmp+1;
+        }
       GeometricTypePartial[i/2]=GeometricType[i];
     }
 

@@ -47,7 +47,7 @@ namespace MED
     typedef std::vector<_Tp, _Alloc> superclass;
     typedef typename superclass::allocator_type allocator_type;
 
-    typedef _Tp	value_type;
+    typedef _Tp value_type;
     typedef value_type& reference;
     typedef const value_type& const_reference;
 
@@ -56,7 +56,7 @@ namespace MED
     check_range(size_type __n) const
     {
       if (__n >= this->size())
-	throw std::out_of_range("TVector [] access out of range");
+        throw std::out_of_range("TVector [] access out of range");
     }
 
     const_reference
@@ -78,7 +78,7 @@ namespace MED
     {}
     
     TVector(size_type __n, const value_type& __val,
-	    const allocator_type& __a = allocator_type()):
+            const allocator_type& __a = allocator_type()):
       superclass(__n, __val, __a)
     {}
     
@@ -93,7 +93,7 @@ namespace MED
 
     template<typename _InputIterator>
     TVector(_InputIterator __first, _InputIterator __last,
-	    const allocator_type& __a = allocator_type()):
+            const allocator_type& __a = allocator_type()):
       superclass(__first, __last, __a)
     {}
 

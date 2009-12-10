@@ -33,10 +33,10 @@ int main (int argc, char ** argv)
     /* process the arguments */
     if (argc != 2) 
     {
-	cerr << "Usage : " << argv[0] 
-	<< "Gibifilename" << endl << endl
-	<< "-> lit le fichier gibi filename ,crée 3 fichiers : MED 2.1, 2.2 et VTK" << endl;
-	exit(-1);
+        cerr << "Usage : " << argv[0] 
+        << "Gibifilename" << endl << endl
+        << "-> lit le fichier gibi filename ,crée 3 fichiers : MED 2.1, 2.2 et VTK" << endl;
+        exit(-1);
     }
 
     string gibifilename  = argv[1];

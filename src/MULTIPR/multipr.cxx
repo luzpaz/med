@@ -108,7 +108,7 @@ float g_decimThresholdMed   = 0.0f;
 float g_decimThresholdLow   = 0.0f;
 float g_decimRadius         = 0.0f;
 int   g_boxing              = 100;
-char  g_params[1024]		= "";
+char  g_params[1024]            = "";
 
 // merge
 std::vector<std::string> g_medFilenameSrc;
@@ -324,7 +324,7 @@ void parseCommandLine(int argc, char** argv)
         {
             g_usage = MULTIPR_USAGE_UNKNOWN; 
             g_errorCode = MULTIPR_APP_WRONG_NUMBER_OF_ARGUMENTS;
-			return ;
+                        return ;
         }
         else
         {
@@ -337,22 +337,22 @@ void parseCommandLine(int argc, char** argv)
             g_decimThresholdMed = atof(argv[7]);
             g_decimThresholdLow = atof(argv[8]);
         }
-		if (strcmp(g_filterName, "Filtre_GradientMoyen") == 0 && argc == 11)
-		{
+                if (strcmp(g_filterName, "Filtre_GradientMoyen") == 0 && argc == 11)
+                {
             g_decimRadius = atof(argv[9]);
             g_boxing = atoi(argv[10]);
-			sprintf(g_params, "%lf %lf %lf %d", g_decimThresholdMed, g_decimThresholdLow, g_decimRadius, g_boxing);
-		}
-		else if (strcmp(g_filterName, "Filtre_Direct") == 0)
-		{
-			sprintf(g_params, "%lf %lf", g_decimThresholdMed, g_decimThresholdLow);
-		}
-		else
-		{
-			g_usage = MULTIPR_USAGE_UNKNOWN; 
-			g_errorCode = MULTIPR_APP_ILLEGAL_ARGUMENT;
-		}
-		
+                        sprintf(g_params, "%lf %lf %lf %d", g_decimThresholdMed, g_decimThresholdLow, g_decimRadius, g_boxing);
+                }
+                else if (strcmp(g_filterName, "Filtre_Direct") == 0)
+                {
+                        sprintf(g_params, "%lf %lf", g_decimThresholdMed, g_decimThresholdLow);
+                }
+                else
+                {
+                        g_usage = MULTIPR_USAGE_UNKNOWN; 
+                        g_errorCode = MULTIPR_APP_ILLEGAL_ARGUMENT;
+                }
+                
     }
     else if (strcmp(argv[1],"--merge") == 0)
     {
@@ -566,7 +566,7 @@ int runPartition2()
  */
 int runDecimation()
 {
-    int		ret = MULTIPR_APP_OK;
+    int         ret = MULTIPR_APP_OK;
     try
     {
         multipr::decimePartition(
@@ -598,7 +598,7 @@ int runMerge()
     try
     {
 
-		multipr::merge(
+                multipr::merge(
             g_medFilenameSrc, 
             g_meshName,
             g_fieldName,
@@ -692,7 +692,7 @@ int runDumpMED()
             {
                 // display list of fields contained in the MED file
                 vector<pair<string,int> > res;
-				multipr::getListScalarFields(g_medFilename, res);
+                                multipr::getListScalarFields(g_medFilename, res);
                 cout << "List of scalar fields in this MED file:" << endl;
                 for (unsigned i = 0 ; i < res.size() ; i++)
                 {

@@ -46,7 +46,7 @@ namespace MED
 
     TFloat 
     GetCoord(TCCoordSlice& theCoordSlice, 
-	     TInt theCoordId);
+             TInt theCoordId);
   };
   typedef SharedPtr<TCoordHelper> PCoordHelper;
 

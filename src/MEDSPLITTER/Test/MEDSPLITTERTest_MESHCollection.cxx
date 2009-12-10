@@ -101,8 +101,8 @@ void MEDSPLITTERTest::testMESHCollection_constructor()
   //--------------------------Test READ ONLY part------------------------------//
 
   /////////////////////////////////////////////////////////////
-		//  TEST1a: Open not existing sequential and parallel file  //
-		/////////////////////////////////////////////////////////////
+                //  TEST1a: Open not existing sequential and parallel file  //
+                /////////////////////////////////////////////////////////////
     string meshname="non_existent";
     
     CPPUNIT_ASSERT_THROW(MESHCollection mc1(fileNotExist_rd, meshname), MEDEXCEPTION);
@@ -111,10 +111,10 @@ void MEDSPLITTERTest::testMESHCollection_constructor()
     
     CPPUNIT_ASSERT_THROW(MESHCollection mc3(filename_rd, meshname), MEDEXCEPTION);
 
-		//  //////////////////////////////////////////////
-		//  //  TEST1b: Open file with empty file name  ///
-		//  //////////////////////////////////////////////
-		//
+                //  //////////////////////////////////////////////
+                //  //  TEST1b: Open file with empty file name  ///
+                //  //////////////////////////////////////////////
+                //
     CPPUNIT_ASSERT_THROW(MESHCollection mc4(emptyfilename, meshname), MEDEXCEPTION);
     CPPUNIT_ASSERT_THROW(MESHCollection mc5(emptyfilename), MEDEXCEPTION);
 
@@ -133,14 +133,14 @@ void MEDSPLITTERTest::testMESHCollection_read_seq()
   aRemover.Register(filename_seq_wr);
   aRemover.Register(filename_seq_med);
   
-	//--------------------------Test READ ONLY part------------------------------//
+        //--------------------------Test READ ONLY part------------------------------//
 
-	//  /////////////////////////////////////////////
-	//  //  TEST2: Manipulation of a single MED file
-	//  /////////////////////////////////////////////
+        //  /////////////////////////////////////////////
+        //  //  TEST2: Manipulation of a single MED file
+        //  /////////////////////////////////////////////
   string meshname="maa1";
   MESHCollection collection(filename_rd,meshname);
-	collection.setDriverType(MEDSPLITTER::MedAscii);
+        collection.setDriverType(MEDSPLITTER::MedAscii);
   CPPUNIT_ASSERT_EQUAL(meshname,collection.getName());
   string newname = "New_name";
   collection.setName(newname);
@@ -149,7 +149,7 @@ void MEDSPLITTERTest::testMESHCollection_read_seq()
   CPPUNIT_ASSERT_EQUAL(systemname,collection.getSystem());
   CPPUNIT_ASSERT_EQUAL(3,collection.getMeshDimension());
   CPPUNIT_ASSERT_EQUAL(3,collection.getSpaceDimension());
-	
+        
   collection.write(filename_seq_wr);
   
   //Reading from the master file
@@ -302,8 +302,8 @@ void MEDSPLITTERTest::testMESHCollection_square()
   int dom1, dom2;
   med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
   med_2_3::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
-	CPPUNIT_ASSERT(strcmp(jn1,"joint_2")==0);
-	CPPUNIT_ASSERT(strcmp(jn2,"joint_1")==0);
+        CPPUNIT_ASSERT(strcmp(jn1,"joint_2")==0);
+        CPPUNIT_ASSERT(strcmp(jn2,"joint_1")==0);
   CPPUNIT_ASSERT_EQUAL(dom1,1);
   CPPUNIT_ASSERT_EQUAL(dom2,0);
   
@@ -320,7 +320,7 @@ void MEDSPLITTERTest::testMESHCollection_square()
     
   med_2_3::med_int tabreference1[6] = {2,1,3,4,6,5};
   for (int i=0; i<2*n1; i++)
-		CPPUNIT_ASSERT_EQUAL(tab[i],tabreference1[i]);
+                CPPUNIT_ASSERT_EQUAL(tab[i],tabreference1[i]);
 
   delete[] tab;
 
@@ -331,7 +331,7 @@ void MEDSPLITTERTest::testMESHCollection_square()
 
   med_2_3::med_int tabreference2[] = {1,2,4,3,5,6};
   for (int i=0; i<2*n1; i++)
-		CPPUNIT_ASSERT_EQUAL(tab[i],tabreference2[i]);
+                CPPUNIT_ASSERT_EQUAL(tab[i],tabreference2[i]);
   delete[] tab;
 
   //testing nodes global numbering
@@ -341,7 +341,7 @@ void MEDSPLITTERTest::testMESHCollection_square()
   med_2_3::med_int globnoderef1[] = {4,5,2,1,7,8};
 
   for (int i=0; i<6; i++)
-		CPPUNIT_ASSERT_EQUAL(num[i],globnoderef1[i]);
+                CPPUNIT_ASSERT_EQUAL(num[i],globnoderef1[i]);
   delete[] num;
 
   //testing nodes global numbering
@@ -621,7 +621,7 @@ void MEDSPLITTERTest::testMESHCollection_indivisible()
   string filename_wr_3              = makeTmpFile("carre_indivisible3.med");
   string filename_wr_4              = makeTmpFile("carre_indivisible4.med");
   
-	// To remove tmp files from disk
+        // To remove tmp files from disk
   MEDSPLITTERTest_TmpFilesRemover aRemover;
   aRemover.Register(filename_wr);
   aRemover.Register(filename_wr_xml);
@@ -803,7 +803,7 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
 
   med_2_3::med_int tabreference2[10] = {1,2,2,7,4,3,6,5,7,1};
   for (int i=0; i<2*n2; i++)
-		CPPUNIT_ASSERT_EQUAL(tab[i],tabreference2[i]);
+                CPPUNIT_ASSERT_EQUAL(tab[i],tabreference2[i]);
   delete[] tab;
 
   //testing nodes global numbering
@@ -812,7 +812,7 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
   med_2_3::med_int globnoderef1[7] = {4,5,2,1,8,9,6};
 
   for (int i=0; i<7; i++)
-		CPPUNIT_ASSERT_EQUAL(num[i],globnoderef1[i]);
+                CPPUNIT_ASSERT_EQUAL(num[i],globnoderef1[i]);
 
   delete[] num;
 
@@ -821,7 +821,7 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
   MEDglobalNumLire(fid2, meshname2, num, 7, typ_ent_loc, typ_geo_loc);
   med_2_3::med_int globnoderef2[7] = {5,6,3,2,7,8,4};
   for (int i=0; i<7; i++)
-		CPPUNIT_ASSERT_EQUAL(num[i],globnoderef2[i]);
+                CPPUNIT_ASSERT_EQUAL(num[i],globnoderef2[i]);
   delete[] num;
 
   //testing cell-cell correspondency
@@ -836,7 +836,7 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
 
   med_2_3::med_int tabreferencecell1[8] = {1,1,1,2,2,1,2,2};
   for (int i=0; i<2*n1; i++)
-		CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell1[i]);
+                CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell1[i]);
 
   n2 = med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
   delete[] tab;
@@ -846,7 +846,7 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
 
   med_2_3::med_int tabreferencecell2[8] = {1,1,1,2,2,1,2,2};
   for (int i=0; i<n2; i++)
-		CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell2[i]);
+                CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell2[i]);
   delete[] tab;
 
   //testing cells global numbering
@@ -914,7 +914,7 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
   CPPUNIT_FAIL("METIS is not available, further test execution is not possible.");
 #endif
   MESHCollection new_collection(collection, topo2);
-	new_collection.setDriverType(MEDSPLITTER::MedAscii);
+        new_collection.setDriverType(MEDSPLITTER::MedAscii);
   new_collection.write(filename_para_wr);
     
   MESHCollection new_collection2(filename_para_wr);
@@ -928,7 +928,7 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
 #endif
   MESHCollection new_collection3(new_collection2,topo3);
   CPPUNIT_ASSERT_EQUAL(topo3->nbCells(),topo2->nbCells());
-	new_collection3.setDriverType(MEDSPLITTER::MedAscii);
+        new_collection3.setDriverType(MEDSPLITTER::MedAscii);
   new_collection3.write(filename_para2_wr);
 
   MESHCollection new_collection4(filename_para2_wr);
@@ -967,7 +967,7 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polygon()
   
   // To remove tmp files from disk
   MEDSPLITTERTest_TmpFilesRemover aRemover;
-	aRemover.Register(filename_para_wr);
+        aRemover.Register(filename_para_wr);
   aRemover.Register(filename_para_med1);
   aRemover.Register(filename_para_med2);
   aRemover.Register(filename_para2_wr);
@@ -1083,8 +1083,8 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polyhedra()
 }
 
 /*! Testing a TRIO_U scenario with subzones defined as families
-	
-	
+        
+        
  */
 
 void MEDSPLITTERTest::testMESHCollection_families()
@@ -1109,7 +1109,7 @@ void MEDSPLITTERTest::testMESHCollection_families()
   MESHCollection* collection = new MESHCollection (filename_rd,meshname);
   MEDSPLITTER::Topology* topo = collection->createPartition(2,Graph::METIS);
   MESHCollection* new_collection = new MESHCollection (*collection, topo, true, true);
-	new_collection->setSubdomainBoundaryCreates(true);
+        new_collection->setSubdomainBoundaryCreates(true);
   //collection.write("/export/home/test_splitter");
   new_collection->write(filename_wr);
   new_collection->castAllFields(*collection);
@@ -1149,14 +1149,14 @@ void MEDSPLITTERTest::testMESHCollection_families()
   CPPUNIT_ASSERT_EQUAL(dom2,0);
   
 
-	int nbEdgesFamilies1= med_2_3::MEDnFam(fid1, meshname1);
-	int nbEdgesFamilies2= med_2_3::MEDnFam(fid2, meshname2);
+        int nbEdgesFamilies1= med_2_3::MEDnFam(fid1, meshname1);
+        int nbEdgesFamilies2= med_2_3::MEDnFam(fid2, meshname2);
 
-	CPPUNIT_ASSERT_EQUAL(nbEdgesFamilies1,7); // six initial families + a joint
-	CPPUNIT_ASSERT_EQUAL(nbEdgesFamilies2,7); // six initial families + a joint
+        CPPUNIT_ASSERT_EQUAL(nbEdgesFamilies1,7); // six initial families + a joint
+        CPPUNIT_ASSERT_EQUAL(nbEdgesFamilies2,7); // six initial families + a joint
 
-	string fam_name = mesh1.getFamily(MED_EN::MED_EDGE,1)->getName();
-	char test_name[MED_TAILLE_NOM]="Sortie";
-	CPPUNIT_ASSERT(strcmp(fam_name.c_str(),test_name)==0);
+        string fam_name = mesh1.getFamily(MED_EN::MED_EDGE,1)->getName();
+        char test_name[MED_TAILLE_NOM]="Sortie";
+        CPPUNIT_ASSERT(strcmp(fam_name.c_str(),test_name)==0);
        
 }

@@ -30,7 +30,7 @@
 
 template <class T>
 void MESHCollection::castFields (const MESHCollection& old_collection,
-				 const string& fieldname, int itnumber, int ordernumber)
+                                 const string& fieldname, int itnumber, int ordernumber)
 {
   char fieldchar[80];
   strcpy(fieldchar,fieldname.c_str());
@@ -129,25 +129,25 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
       MED_EN::MESH_ENTITIES::const_iterator currentEntity;
       std::list<MED_EN::medGeometryElement>::const_iterator iter;
       currentEntity  = MED_EN::meshEntities.find(MED_EN::MED_CELL);
-      for (iter = (*currentEntity).second.begin();iter != (*currentEntity).second.end(); iter++)	
+      for (iter = (*currentEntity).second.begin();iter != (*currentEntity).second.end(); iter++)        
       {
-	// getGaussLocalization throws an exception 
-	// if the GaussLocalization is not available
-	try
-	{
-	  MEDMEM::GAUSS_LOCALIZATION<FullInterlace> 
-	    gaussloc(old_fields[0]->getGaussLocalization(*iter));
-	  new_fields[inew]->setGaussLocalization(*iter,gaussloc);
+        // getGaussLocalization throws an exception 
+        // if the GaussLocalization is not available
+        try
+        {
+          MEDMEM::GAUSS_LOCALIZATION<FullInterlace> 
+            gaussloc(old_fields[0]->getGaussLocalization(*iter));
+          new_fields[inew]->setGaussLocalization(*iter,gaussloc);
 
-	  nbtypegeo++;
-	  gauss_pts_number.push_back(gaussloc.getNbGauss());
+          nbtypegeo++;
+          gauss_pts_number.push_back(gaussloc.getNbGauss());
 
-	  nb_elem.push_back(new_supports[inew]->getNumberOfElements(*iter));
-	}
-	catch(...)
-	{
-	  continue;
-	}
+          nb_elem.push_back(new_supports[inew]->getNumberOfElements(*iter));
+        }
+        catch(...)
+        {
+          continue;
+        }
       }
 
       // les tableaux nbelgeoc commencent a 1
@@ -158,21 +158,21 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
       nbgaussgeo[0]=-1;
       for (int i=1; i<=nbtypegeo;i++)
       {
-	size+=nb_elem[i-1];
-	nbelgeoc [i]=nb_elem[i-1]+nbelgeoc[i-1];
-	nbgaussgeo[i]=gauss_pts_number[i-1];	
+        size+=nb_elem[i-1];
+        nbelgeoc [i]=nb_elem[i-1]+nbelgeoc[i-1];
+        nbgaussgeo[i]=gauss_pts_number[i-1];    
       }
 
       //a MEDMEM_Array structure is created to contain 
       //the data on the Gauss points
 
       medarray[inew]=new MEDMEM::MEDMEM_Array<T,FullInterlaceGaussPolicy>
-	(new_fields[inew]->getNumberOfComponents(), size, nbtypegeo,
-	 static_cast<const int* const>(nbelgeoc),
-	 static_cast<const int* const> (nbgaussgeo));
+        (new_fields[inew]->getNumberOfComponents(), size, nbtypegeo,
+         static_cast<const int* const>(nbelgeoc),
+         static_cast<const int* const> (nbgaussgeo));
       new_fields[inew]->setArray(medarray[inew]);
-      // 			delete[] nbelgeoc;
-      // 			delete[] nbgaussgeo;
+      //                        delete[] nbelgeoc;
+      //                        delete[] nbgaussgeo;
     }
   }
 
@@ -189,7 +189,7 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
     {
       list_of_elems = new int[nbelem];
       for (int i=0; i<nbelem;i++)
-	list_of_elems[i]=i+1;
+        list_of_elems[i]=i+1;
     }
     else
       list_of_elems = const_cast<int*> (support->getNumber(MED_EN::MED_ALL_ELEMENTS));
@@ -231,29 +231,29 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
     if (!has_gauss_pts) {
       for (int i=0; i<size; i++)
       {
-	for (int j=0; j<nb_components;j++)
-	{
-	  T value = old_fields[idomain]->getValueIJ(initial_local[i],j+1);
+        for (int j=0; j<nb_components;j++)
+        {
+          T value = old_fields[idomain]->getValueIJ(initial_local[i],j+1);
 
-	  new_fields[ip[i]]->setValueIJ(local[i],j+1, value);
-	}
+          new_fields[ip[i]]->setValueIJ(local[i],j+1, value);
+        }
       }
     }
     else
     {
       for (int i=0; i<size; i++)
       {
-	MED_EN::medGeometryElement type =
-	  old_collection.m_mesh[idomain]->getElementType(entity,initial_local[i]);
-	int nb_gauss_points=old_fields[idomain]->getNumberOfGaussPoints(type);
-	for (int j=0; j<nb_components;j++)
-	  for (int k=0;k<nb_gauss_points; k++)
-	  {
-	    T value = old_fields[idomain]->getValueIJK(initial_local[i],j+1,k+1);
-	    medarray[ip[i]]->setIJK(local[i],j+1,k+1, value);
-	  }	
+        MED_EN::medGeometryElement type =
+          old_collection.m_mesh[idomain]->getElementType(entity,initial_local[i]);
+        int nb_gauss_points=old_fields[idomain]->getNumberOfGaussPoints(type);
+        for (int j=0; j<nb_components;j++)
+          for (int k=0;k<nb_gauss_points; k++)
+          {
+            T value = old_fields[idomain]->getValueIJK(initial_local[i],j+1,k+1);
+            medarray[ip[i]]->setIJK(local[i],j+1,k+1, value);
+          }     
       }
-    }	
+    }   
     delete[]array;
     delete[]ip;
     delete[]local;

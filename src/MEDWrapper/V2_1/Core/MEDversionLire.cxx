@@ -47,7 +47,7 @@ MEDversionLire(med_idt fid, med_int *majeur, med_int *mineur, med_int *release)
     /* On ferme tout */
     if ((ret = _MEDdatagroupFermer(gid)) < 0)
       return -1;
-  }							
+  }                                                     
 
   return ret;
 }

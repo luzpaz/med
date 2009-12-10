@@ -262,7 +262,7 @@ void    Profil::readProfilBinding(med_idt pMEDfile, char* pMeshName)
             entity, 
             geom, 
             1, 
-			&ngauss, 
+                        &ngauss, 
             &numdt, 
             &numo, 
             dtunit, 

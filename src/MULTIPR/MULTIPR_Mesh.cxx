@@ -97,21 +97,21 @@ char CELL_NAMES[MED_NBR_GEOMETRIE_MAILLE][MED_TAILLE_NOM + 1] =
 // ie the n first nodes.
 const int CELL_NB_NODE[MED_NBR_GEOMETRIE_MAILLE] =
 {
-    1,	//MED_POINT1
-    2,	//MED_SEG2
-    2,	//MED_SEG3
-    3,	//MED_TRIA3
-    3,	//MED_TRIA6
-    4,	//MED_QUAD4
-    4,	//MED_QUAD8
-    4,	//MED_TETRA4
-    4,	//MED_TETRA10
-    8,	//MED_HEXA8
-    8,	//MED_HEXA20
-    6,	//MED_PENTA6
-    6,	//MED_PENTA15
-    5,	//MED_PYRA5
-    5	//MED_PYRA13
+    1,  //MED_POINT1
+    2,  //MED_SEG2
+    2,  //MED_SEG3
+    3,  //MED_TRIA3
+    3,  //MED_TRIA6
+    4,  //MED_QUAD4
+    4,  //MED_QUAD8
+    4,  //MED_TETRA4
+    4,  //MED_TETRA10
+    8,  //MED_HEXA8
+    8,  //MED_HEXA20
+    6,  //MED_PENTA6
+    6,  //MED_PENTA15
+    5,  //MED_PYRA5
+    5   //MED_PYRA13
 };
 
 
@@ -305,7 +305,7 @@ int Mesh::getNumberOfElements(eMeshType pGeomType) const
 
 int Mesh::getNumberOfElements() const
 {
-    int	accum = 0;
+    int accum = 0;
 
     for (int i = 0; i < eMaxMedMesh; ++i)
     {
@@ -369,39 +369,39 @@ Mesh* Mesh::createFromSetOfElements(const std::set<med_int>* pSetOfElements, con
     // Build nodes and elements
     //---------------------------------------------------------------------
     // get all elements involved
-	for (int i = 0; i < eMaxMedMesh; ++i)
-	{
-		if (pSetOfElements[i].size() != 0)
-		{
-    		mesh->mElements[i] = mElements[i]->extractSubSet(pSetOfElements[i]);
-    		MULTIPR_LOG((*(mesh->mElements[i])) << endl);
-		}
-	}
+        for (int i = 0; i < eMaxMedMesh; ++i)
+        {
+                if (pSetOfElements[i].size() != 0)
+                {
+                mesh->mElements[i] = mElements[i]->extractSubSet(pSetOfElements[i]);
+                MULTIPR_LOG((*(mesh->mElements[i])) << endl);
+                }
+        }
     
     // get all nodes involved
-	set<med_int> setOfNodes;
-	for (int i = 0; i < eMaxMedMesh; ++i)
-	{
-		if (mElements[i] != NULL && mesh->mElements[i] != NULL)
-		{
-    		const set<med_int>& curSetOfNodes = mesh->mElements[i]->getSetOfNodes();
-			setOfNodes.insert(curSetOfNodes.begin(), curSetOfNodes.end());
-		}
-	}
+        set<med_int> setOfNodes;
+        for (int i = 0; i < eMaxMedMesh; ++i)
+        {
+                if (mElements[i] != NULL && mesh->mElements[i] != NULL)
+                {
+                const set<med_int>& curSetOfNodes = mesh->mElements[i]->getSetOfNodes();
+                        setOfNodes.insert(curSetOfNodes.begin(), curSetOfNodes.end());
+                }
+        }
     mesh->mNodes = mNodes->extractSubSet(setOfNodes);
     MULTIPR_LOG((*(mesh->mNodes)) << endl);
     
     //---------------------------------------------------------------------
     // Remap nodes
     //---------------------------------------------------------------------
-   	for (int i = 0; i < eMaxMedMesh; ++i)
-	{
-		if (mElements[i] != NULL && mesh->mElements[i] != NULL)
-		{
-			mesh->mElements[i]->remap(setOfNodes);
-			MULTIPR_LOG((*(mesh->mElements[i])) << endl);
-		}
-	}
+        for (int i = 0; i < eMaxMedMesh; ++i)
+        {
+                if (mElements[i] != NULL && mesh->mElements[i] != NULL)
+                {
+                        mesh->mElements[i]->remap(setOfNodes);
+                        MULTIPR_LOG((*(mesh->mElements[i])) << endl);
+                }
+        }
     
 
     //---------------------------------------------------------------------
@@ -426,14 +426,14 @@ Mesh* Mesh::createFromSetOfElements(const std::set<med_int>* pSetOfElements, con
     // get families of elements
     {
         set<med_int> famOfElt;
-		for (int i = 0; i < eMaxMedMesh; ++i)
-		{
-			if (mElements[i] != NULL && mesh->mElements[i] != NULL)
-			{
-				set<med_int> curSetOfFamilies = mesh->mElements[i]->getSetOfFamilies();
-				famOfElt.insert(curSetOfFamilies.begin(), curSetOfFamilies.end());
-			}
-		}
+                for (int i = 0; i < eMaxMedMesh; ++i)
+                {
+                        if (mElements[i] != NULL && mesh->mElements[i] != NULL)
+                        {
+                                set<med_int> curSetOfFamilies = mesh->mElements[i]->getSetOfFamilies();
+                                famOfElt.insert(curSetOfFamilies.begin(), curSetOfFamilies.end());
+                        }
+                }
         for (set<med_int>::iterator itFam = famOfElt.begin() ; itFam != famOfElt.end() ; itFam++)
         {
             Family* famSrc = mFamIdToFam[*itFam];
@@ -494,10 +494,10 @@ Mesh* Mesh::createFromSetOfElements(const std::set<med_int>* pSetOfElements, con
         }
         else
         {
-			if (pSetOfElements[currentField->getGeomIdx()].size() != 0)
-			{
-            	newField = currentField->extractSubSet(pSetOfElements[currentField->getGeomIdx()]);
-			}
+                        if (pSetOfElements[currentField->getGeomIdx()].size() != 0)
+                        {
+                newField = currentField->extractSubSet(pSetOfElements[currentField->getGeomIdx()]);
+                        }
         }
         
         if (newField != NULL && !newField->isEmpty())
@@ -568,42 +568,42 @@ Mesh* Mesh::createFromGroup(const Group* pGroup, const char* pNewMeshName)
     // Build nodes and elements
     //---------------------------------------------------------------------
     // Get all elements involved
-	std::set< med_int>* setOfEltList = new std::set< med_int>[eMaxMedMesh];
-	for (int i = 0; i < eMaxMedMesh; ++i)
-	{
-		if (mElements[i] != NULL)
-		{
-			const set<med_int> setOfElt = pGroup->getSetOfElt((eMeshType)i);
-			mesh->mElements[i] = mElements[i]->extractSubSet(setOfElt);
-			setOfEltList[i] = setOfElt;
-		}
-	}
+        std::set< med_int>* setOfEltList = new std::set< med_int>[eMaxMedMesh];
+        for (int i = 0; i < eMaxMedMesh; ++i)
+        {
+                if (mElements[i] != NULL)
+                {
+                        const set<med_int> setOfElt = pGroup->getSetOfElt((eMeshType)i);
+                        mesh->mElements[i] = mElements[i]->extractSubSet(setOfElt);
+                        setOfEltList[i] = setOfElt;
+                }
+        }
     
     // Get all nodes involved
-	// The nodes a common for all elements so we don't need to store them separately.
-	set<med_int> setOfNodes;
-	for (int i = 0; i < eMaxMedMesh; ++i)
-	{
-		if (mesh->mElements[i] != NULL)
-		{
-			const set<med_int>& curSetOfNodes = mesh->mElements[i]->getSetOfNodes();
-			setOfNodes.insert(curSetOfNodes.begin(), curSetOfNodes.end());
-		}
-	}
+        // The nodes a common for all elements so we don't need to store them separately.
+        set<med_int> setOfNodes;
+        for (int i = 0; i < eMaxMedMesh; ++i)
+        {
+                if (mesh->mElements[i] != NULL)
+                {
+                        const set<med_int>& curSetOfNodes = mesh->mElements[i]->getSetOfNodes();
+                        setOfNodes.insert(curSetOfNodes.begin(), curSetOfNodes.end());
+                }
+        }
     mesh->mNodes = mNodes->extractSubSet(setOfNodes);
-	
-	// We need this for the optimized memory management.
-	this->mGaussIndex.push_back(IndexPair(setOfEltList, setOfNodes));
+        
+        // We need this for the optimized memory management.
+        this->mGaussIndex.push_back(IndexPair(setOfEltList, setOfNodes));
     //---------------------------------------------------------------------
     // Remap nodes
     //---------------------------------------------------------------------
-	for (int i = 0; i < eMaxMedMesh; ++i)
-	{
-		if (mesh->mElements[i] != NULL)
-		{
-			mesh->mElements[i]->remap(setOfNodes);
-		}
-	}
+        for (int i = 0; i < eMaxMedMesh; ++i)
+        {
+                if (mesh->mElements[i] != NULL)
+                {
+                        mesh->mElements[i]->remap(setOfNodes);
+                }
+        }
 
     //---------------------------------------------------------------------
     // Build families
@@ -611,26 +611,26 @@ Mesh* Mesh::createFromGroup(const Group* pGroup, const char* pNewMeshName)
     MULTIPR_LOG("Build fam.:" << endl);
     // get families of nodes
     {
-		set<med_int> famOfNodes = mesh->mNodes->getSetOfFamilies();
-		for (set<med_int>::iterator itFam = famOfNodes.begin() ; itFam != famOfNodes.end() ; itFam++)
+                set<med_int> famOfNodes = mesh->mNodes->getSetOfFamilies();
+                for (set<med_int>::iterator itFam = famOfNodes.begin() ; itFam != famOfNodes.end() ; itFam++)
         {
             Family* famSrc = mFamIdToFam[*itFam];
             Family* famDest = famSrc->extractGroup(pGroup->getName().c_str());
             mesh->mFamilies.push_back(famDest);
         }
-	}
+        }
 
     // get families of elements
     {
-		set<med_int> famOfElt;
-		for (int i = 0; i < eMaxMedMesh; ++i)
-		{
-			if (mesh->mElements[i] != NULL)
-			{
-				set<med_int> curSetOfFamilies = mesh->mElements[i]->getSetOfFamilies();
-				famOfElt.insert(curSetOfFamilies.begin(), curSetOfFamilies.end());
-			}
-		}
+                set<med_int> famOfElt;
+                for (int i = 0; i < eMaxMedMesh; ++i)
+                {
+                        if (mesh->mElements[i] != NULL)
+                        {
+                                set<med_int> curSetOfFamilies = mesh->mElements[i]->getSetOfFamilies();
+                                famOfElt.insert(curSetOfFamilies.begin(), curSetOfFamilies.end());
+                        }
+                }
         for (set<med_int>::iterator itFam = famOfElt.begin() ; itFam != famOfElt.end() ; itFam++)
         {
             Family* famSrc = mFamIdToFam[*itFam];
@@ -687,10 +687,10 @@ Mesh* Mesh::createFromGroup(const Group* pGroup, const char* pNewMeshName)
         }
         else
         {
-			if (setOfEltList[currentField->getGeomIdx()].size() != 0)
-			{
-            	newField = currentField->extractSubSet(setOfEltList[currentField->getGeomIdx()]);
-			}
+                        if (setOfEltList[currentField->getGeomIdx()].size() != 0)
+                        {
+                newField = currentField->extractSubSet(setOfEltList[currentField->getGeomIdx()]);
+                        }
         }
         
         if (!newField->isEmpty())
@@ -699,25 +699,25 @@ Mesh* Mesh::createFromGroup(const Group* pGroup, const char* pNewMeshName)
             newField->getSetOfGaussLoc(newSetOfGauss);
         }
     }
-	// Get gauss locs for optimized fields reading.
-	if (mFields.size() == 0)
-	{
-		for (unsigned itGaussLoc = 0 ; itGaussLoc < mGaussLoc.size() ; itGaussLoc++)
-		{
-			const string& gaussLocName = mGaussLoc[itGaussLoc]->getName();
-			
-			if (gaussLocName.length() != 0)
-			{
-				newSetOfGauss.insert(gaussLocName);
-			}
-		}
-	}
+        // Get gauss locs for optimized fields reading.
+        if (mFields.size() == 0)
+        {
+                for (unsigned itGaussLoc = 0 ; itGaussLoc < mGaussLoc.size() ; itGaussLoc++)
+                {
+                        const string& gaussLocName = mGaussLoc[itGaussLoc]->getName();
+                        
+                        if (gaussLocName.length() != 0)
+                        {
+                                newSetOfGauss.insert(gaussLocName);
+                        }
+                }
+        }
     MULTIPR_LOG("Collect fields: ok: #gauss=" << newSetOfGauss.size() << endl);
 
     //---------------------------------------------------------------------
     // Build Gauss infos
     //---------------------------------------------------------------------
-	for (set<string>::iterator itSet = newSetOfGauss.begin() ; itSet != newSetOfGauss.end(); itSet++)
+        for (set<string>::iterator itSet = newSetOfGauss.begin() ; itSet != newSetOfGauss.end(); itSet++)
     {
         const string& keyName = (*itSet);
         
@@ -779,51 +779,51 @@ Mesh* Mesh::createFromFamily(const Family* pFamily, const char* pNewMeshName)
     // Build nodes and elements
     //---------------------------------------------------------------------
     // Get all elements involved
-	std::set< med_int>* setOfEltList = new std::set< med_int>[eMaxMedMesh];
-	for (int i = 0; i < eMaxMedMesh; ++i)
-	{
-		if (mElements[i] != NULL)
-		{
-			const set<med_int> setOfElt = pFamily->getSetOfElt((eMeshType)i);
-			mesh->mElements[i] = mElements[i]->extractSubSet(setOfElt);
-			setOfEltList[i] = setOfElt;
-		}
-	}
+        std::set< med_int>* setOfEltList = new std::set< med_int>[eMaxMedMesh];
+        for (int i = 0; i < eMaxMedMesh; ++i)
+        {
+                if (mElements[i] != NULL)
+                {
+                        const set<med_int> setOfElt = pFamily->getSetOfElt((eMeshType)i);
+                        mesh->mElements[i] = mElements[i]->extractSubSet(setOfElt);
+                        setOfEltList[i] = setOfElt;
+                }
+        }
     
     // Get all nodes involved
-	// The nodes a common for all elements so we don't need to store them separately.
-	set<med_int> setOfNodes;
-	for (int i = 0; i < eMaxMedMesh; ++i)
-	{
-		if (mesh->mElements[i] != NULL)
-		{
-			const set<med_int>& curSetOfNodes = mesh->mElements[i]->getSetOfNodes();
-			setOfNodes.insert(curSetOfNodes.begin(), curSetOfNodes.end());
-		}
-	}
+        // The nodes a common for all elements so we don't need to store them separately.
+        set<med_int> setOfNodes;
+        for (int i = 0; i < eMaxMedMesh; ++i)
+        {
+                if (mesh->mElements[i] != NULL)
+                {
+                        const set<med_int>& curSetOfNodes = mesh->mElements[i]->getSetOfNodes();
+                        setOfNodes.insert(curSetOfNodes.begin(), curSetOfNodes.end());
+                }
+        }
     mesh->mNodes = mNodes->extractSubSet(setOfNodes);
-	
-	// We need this for the optimized memory management.
-	this->mGaussIndex.push_back(IndexPair(setOfEltList, setOfNodes));
+        
+        // We need this for the optimized memory management.
+        this->mGaussIndex.push_back(IndexPair(setOfEltList, setOfNodes));
     //---------------------------------------------------------------------
     // Remap nodes
     //---------------------------------------------------------------------
-	for (int i = 0; i < eMaxMedMesh; ++i)
-	{
-		if (mesh->mElements[i] != NULL)
-		{
-			mesh->mElements[i]->remap(setOfNodes);
-		}
-	}
+        for (int i = 0; i < eMaxMedMesh; ++i)
+        {
+                if (mesh->mElements[i] != NULL)
+                {
+                        mesh->mElements[i]->remap(setOfNodes);
+                }
+        }
 
     //---------------------------------------------------------------------
     // Build families
     //---------------------------------------------------------------------
     MULTIPR_LOG("Build fam.:" << endl);
     // get families of nodes
-	Family*    lFam = new Family(*pFamily);
+        Family*    lFam = new Family(*pFamily);
     mesh->mFamilies.push_back(lFam);
-	    
+            
     MULTIPR_LOG("Finalize:");
     
     // fill families with elements and build groups
@@ -872,10 +872,10 @@ Mesh* Mesh::createFromFamily(const Family* pFamily, const char* pNewMeshName)
         }
         else
         {
-			if (setOfEltList[currentField->getGeomIdx()].size() != 0)
-			{
-            	newField = currentField->extractSubSet(setOfEltList[currentField->getGeomIdx()]);
-			}
+                        if (setOfEltList[currentField->getGeomIdx()].size() != 0)
+                        {
+                newField = currentField->extractSubSet(setOfEltList[currentField->getGeomIdx()]);
+                        }
         }
         
         if (!newField->isEmpty())
@@ -884,25 +884,25 @@ Mesh* Mesh::createFromFamily(const Family* pFamily, const char* pNewMeshName)
             newField->getSetOfGaussLoc(newSetOfGauss);
         }
     }
-	// Get gauss locs for optimized fields reading.
-	if (mFields.size() == 0)
-	{
-		for (unsigned itGaussLoc = 0 ; itGaussLoc < mGaussLoc.size() ; itGaussLoc++)
-		{
-			const string& gaussLocName = mGaussLoc[itGaussLoc]->getName();
-			
-			if (gaussLocName.length() != 0)
-			{
-				newSetOfGauss.insert(gaussLocName);
-			}
-		}
-	}
+        // Get gauss locs for optimized fields reading.
+        if (mFields.size() == 0)
+        {
+                for (unsigned itGaussLoc = 0 ; itGaussLoc < mGaussLoc.size() ; itGaussLoc++)
+                {
+                        const string& gaussLocName = mGaussLoc[itGaussLoc]->getName();
+                        
+                        if (gaussLocName.length() != 0)
+                        {
+                                newSetOfGauss.insert(gaussLocName);
+                        }
+                }
+        }
     MULTIPR_LOG("Collect fields: ok: #gauss=" << newSetOfGauss.size() << endl);
 
     //---------------------------------------------------------------------
     // Build Gauss infos
     //---------------------------------------------------------------------
-	for (set<string>::iterator itSet = newSetOfGauss.begin() ; itSet != newSetOfGauss.end(); itSet++)
+        for (set<string>::iterator itSet = newSetOfGauss.begin() ; itSet != newSetOfGauss.end(); itSet++)
     {
         const string& keyName = (*itSet);
         
@@ -1086,7 +1086,7 @@ MeshDis* Mesh::splitGroupsOfElements()
     // get prefix from the original MED filename
     string strPrefix = removeExtension(mMEDfilename, ".med");
     int numGroup = 1;
-	int numFam = 1;
+        int numFam = 1;
     
     // for each group
     for (unsigned itGroup = 0 ; itGroup < mGroups.size() ; itGroup++)
@@ -1096,37 +1096,37 @@ MeshDis* Mesh::splitGroupsOfElements()
         // skip this group if it is a group of nodes
         if (currentGroup->isGroupOfNodes()) 
         {
-			this->mGaussIndex.push_back(IndexPair());
-			continue;
+                        this->mGaussIndex.push_back(IndexPair());
+                        continue;
         }
         
         char strPartName[256];
         sprintf(strPartName, "%s_%d", mMeshName, numGroup);
         
         char strMEDfilename[256];
-		char strMedGroup[256];
-		int i;
-		for (i = 0; currentGroup->getName()[i] && currentGroup->getName()[i] != ' '; ++i)
-		{
-			strMedGroup[i] = currentGroup->getName()[i];
-		}
-		strMedGroup[i] = '\0';
+                char strMedGroup[256];
+                int i;
+                for (i = 0; currentGroup->getName()[i] && currentGroup->getName()[i] != ' '; ++i)
+                {
+                        strMedGroup[i] = currentGroup->getName()[i];
+                }
+                strMedGroup[i] = '\0';
         sprintf(strMEDfilename, "%s_%s.med", strPrefix.c_str(), strMedGroup);
 
         Mesh* mesh = createFromGroup(currentGroup, mMeshName);
         
         // skip the group which contain all the others groups, even if it contains only 1 group
-		if (mesh->getNumberOfElements() == this->getNumberOfElements())
-       	{
-			for (int i = 0; i < eMaxMedMesh; ++i)
-			{
-				this->mGaussIndex.back().first[i].clear();
-			}
-			this->mGaussIndex.back().second.clear();
+                if (mesh->getNumberOfElements() == this->getNumberOfElements())
+        {
+                        for (int i = 0; i < eMaxMedMesh; ++i)
+                        {
+                                this->mGaussIndex.back().first[i].clear();
+                        }
+                        this->mGaussIndex.back().second.clear();
             delete mesh;
-			mesh = NULL; 
-			continue;
-		}
+                        mesh = NULL; 
+                        continue;
+                }
         meshDis->addMesh(
             MeshDisPart::MULTIPR_WRITE_MESH,
             mMeshName,
@@ -1138,47 +1138,47 @@ MeshDis* Mesh::splitGroupsOfElements()
         
         numGroup++;
     }
-	if (mGroups.size() == 0)
-	{
-		for (unsigned itFam = 0; itFam < mFamilies.size(); ++itFam)
-		{
-			
-			Family* currentFam = mFamilies[itFam];
+        if (mGroups.size() == 0)
+        {
+                for (unsigned itFam = 0; itFam < mFamilies.size(); ++itFam)
+                {
+                        
+                        Family* currentFam = mFamilies[itFam];
         
-			// skip this family if it is a family of nodes
-			if (currentFam->isFamilyOfNodes()) 
-			{
-				this->mGaussIndex.push_back(IndexPair());
-				continue;
-			}
-			
-			char strPartName[256];
-			sprintf(strPartName, "%s_%d", mMeshName, numGroup);
-			
-			char strMEDfilename[256];
-			char strMedFam[256];
-			int i;
-			for (i = 0; currentFam->getName()[i] && currentFam->getName()[i] != ' '; ++i)
-			{
-				strMedFam[i] = currentFam->getName()[i];
-			}
-			strMedFam[i] = '\0';
-			sprintf(strMEDfilename, "%s_%s.med", strPrefix.c_str(), strMedFam);
-	
-			Mesh* mesh = createFromFamily(currentFam, mMeshName);
+                        // skip this family if it is a family of nodes
+                        if (currentFam->isFamilyOfNodes()) 
+                        {
+                                this->mGaussIndex.push_back(IndexPair());
+                                continue;
+                        }
+                        
+                        char strPartName[256];
+                        sprintf(strPartName, "%s_%d", mMeshName, numGroup);
+                        
+                        char strMEDfilename[256];
+                        char strMedFam[256];
+                        int i;
+                        for (i = 0; currentFam->getName()[i] && currentFam->getName()[i] != ' '; ++i)
+                        {
+                                strMedFam[i] = currentFam->getName()[i];
+                        }
+                        strMedFam[i] = '\0';
+                        sprintf(strMEDfilename, "%s_%s.med", strPrefix.c_str(), strMedFam);
+        
+                        Mesh* mesh = createFromFamily(currentFam, mMeshName);
 
-			meshDis->addMesh(
-				MeshDisPart::MULTIPR_WRITE_MESH,
-				mMeshName,
-				numFam,
-				strPartName,
-				"localhost",
-				strMEDfilename,
-				mesh);
-			
-			numFam++;
-		}
-	}
+                        meshDis->addMesh(
+                                MeshDisPart::MULTIPR_WRITE_MESH,
+                                mMeshName,
+                                numFam,
+                                strPartName,
+                                "localhost",
+                                strMEDfilename,
+                                mesh);
+                        
+                        numFam++;
+                }
+        }
     
     return meshDis;
 }
@@ -1511,8 +1511,8 @@ void Mesh::_readSequentialMED(const char* pMeshName, bool pReadFields)
     MULTIPR_LOG("OK\n");
 
     med_connectivite connectivite = MED_NOD; // NODAL CONNECTIVITY ONLY
-	// Read all the supported geometry type.
-	for (int itCell = 0; itCell < eMaxMedMesh ; ++itCell)
+        // Read all the supported geometry type.
+        for (int itCell = 0; itCell < eMaxMedMesh ; ++itCell)
     {
         med_int meshNumCells = MEDnEntMaa(
             mMEDfile, 
@@ -1522,16 +1522,16 @@ void Mesh::_readSequentialMED(const char* pMeshName, bool pReadFields)
             CELL_TYPES[itCell], 
             connectivite);
         
-			
-		//---------------------------------------------------------------------
-		// Read elements
-		//---------------------------------------------------------------------
+                        
+                //---------------------------------------------------------------------
+                // Read elements
+                //---------------------------------------------------------------------
         if (meshNumCells > 0)
         {
-			mElements[itCell] = new Elements();
-			mElements[itCell]->readMED(mMEDfile, mMeshName, mMeshDim, MED_MAILLE, CELL_TYPES[itCell]);
+                        mElements[itCell] = new Elements();
+                        mElements[itCell]->readMED(mMEDfile, mMeshName, mMeshDim, MED_MAILLE, CELL_TYPES[itCell]);
         }
-	}
+        }
     // everything is OK...
     
     //---------------------------------------------------------------------
@@ -1568,9 +1568,9 @@ void Mesh::_readSequentialMED(const char* pMeshName, bool pReadFields)
         // Read fields
         //---------------------------------------------------------------------
         if (pReadFields)
-		{
-			readFields();
-		}
+                {
+                        readFields();
+                }
     }
     
     //---------------------------------------------------------------------
@@ -1667,21 +1667,21 @@ void Mesh::writeMED(const char* pMEDfilename, const char* pMeshName)
     mNodes->writeMED(newMEDfile, aMeshName);
     MULTIPR_LOG("    Write nodes: ok" << endl);
     
-	for (int i = 0; i < eMaxMedMesh; ++i)
-	{
-		if (mElements[i] != NULL)
-		{
-			noMesh = false;
-			mElements[i]->writeMED(newMEDfile, aMeshName, mMeshDim);
-		}
-	}
-	if (noMesh == true)
-	{
-		//throw IllegalStateException("No mesh writen.", __FILE__, __LINE__);
-		return ;
-	}
-	
-	MULTIPR_LOG("    write elt: ok" << endl);
+        for (int i = 0; i < eMaxMedMesh; ++i)
+        {
+                if (mElements[i] != NULL)
+                {
+                        noMesh = false;
+                        mElements[i]->writeMED(newMEDfile, aMeshName, mMeshDim);
+                }
+        }
+        if (noMesh == true)
+        {
+                //throw IllegalStateException("No mesh writen.", __FILE__, __LINE__);
+                return ;
+        }
+        
+        MULTIPR_LOG("    write elt: ok" << endl);
     
     //---------------------------------------------------------------------
     // Write families (mesh must exist)
@@ -1708,7 +1708,7 @@ void Mesh::writeMED(const char* pMEDfilename, const char* pMeshName)
     for (unsigned itFam = 0 ; itFam < mFamilies.size() ; ++itFam)
     {
         Family* fam = mFamilies[itFam];
-		fam->writeMED(newMEDfile, aMeshName);
+                fam->writeMED(newMEDfile, aMeshName);
     }
     MULTIPR_LOG("    Write families: ok" << endl);
     
@@ -1812,8 +1812,8 @@ void Mesh::finalizeFamiliesAndGroups()
     {
         // get family of the ith nodes
         int famIdent = mNodes->getFamIdent(itNode - 1); // MED nodes start at 1
-		
-		map<med_int, Family*>::iterator itFam = mFamIdToFam.find(famIdent);
+                
+                map<med_int, Family*>::iterator itFam = mFamIdToFam.find(famIdent);
         
         if (itFam == mFamIdToFam.end()) 
         {
@@ -1831,32 +1831,32 @@ void Mesh::finalizeFamiliesAndGroups()
     //---------------------------------------------------------------------
     // Fill families of elements
     //---------------------------------------------------------------------
-	for (int itMesh = 0; itMesh < eMaxMedMesh; ++itMesh)
-	{
-		if (mElements[itMesh] != NULL)
-		{
-    		for (int itElt = 1 ; itElt <= mElements[itMesh]->getNumberOfElements() ; itElt++)
-    		{
-        		// get family of the ith element (MED index start at 1)
-        		int famIdent = mElements[itMesh]->getFamilyIdentifier(itElt - 1);
+        for (int itMesh = 0; itMesh < eMaxMedMesh; ++itMesh)
+        {
+                if (mElements[itMesh] != NULL)
+                {
+                for (int itElt = 1 ; itElt <= mElements[itMesh]->getNumberOfElements() ; itElt++)
+                {
+                        // get family of the ith element (MED index start at 1)
+                        int famIdent = mElements[itMesh]->getFamilyIdentifier(itElt - 1);
 
-				map<med_int, Family*>::iterator itFam = mFamIdToFam.find(famIdent);
+                                map<med_int, Family*>::iterator itFam = mFamIdToFam.find(famIdent);
         
-        		if (itFam == mFamIdToFam.end()) 
-        		{
-            		char msg[256];
-            		sprintf(msg, "wrong family of elements for element #%d: family %d not found", itElt, famIdent);
-            		throw IllegalStateException(msg, __FILE__, __LINE__);
-        		}
+                        if (itFam == mFamIdToFam.end()) 
+                        {
+                        char msg[256];
+                        sprintf(msg, "wrong family of elements for element #%d: family %d not found", itElt, famIdent);
+                        throw IllegalStateException(msg, __FILE__, __LINE__);
+                        }
         
-        		Family* fam = (*itFam).second;
+                        Family* fam = (*itFam).second;
         
-        		// add the current element to its family
-        		fam->insertElt( itElt, (eMeshType)itMesh); 
-        		fam->setIsFamilyOfNodes(false);
-    		}
-		}
-	}
+                        // add the current element to its family
+                        fam->insertElt( itElt, (eMeshType)itMesh); 
+                        fam->setIsFamilyOfNodes(false);
+                }
+                }
+        }
     //---------------------------------------------------------------------
     // Build groups
     //---------------------------------------------------------------------
@@ -1882,29 +1882,29 @@ void Mesh::readFields()
     // Iterate over fields
     //---------------------------------------------------------------------
     // for each field, read number of components and others infos
-	for (int itField = 1 ; itField <= numFields ; itField++)
+        for (int itField = 1 ; itField <= numFields ; itField++)
     {
-		for (int i = 0; i < eMaxMedMesh; ++i)
-		{
-        	Field* field = new Field();
-	        field->readMED(mMEDfile, itField, mMeshName, CELL_TYPES[i]);
+                for (int i = 0; i < eMaxMedMesh; ++i)
+                {
+                Field* field = new Field();
+                field->readMED(mMEDfile, itField, mMeshName, CELL_TYPES[i]);
         
-    	    // if the nth field does not apply on our mesh => slip it
-        	if (field->isEmpty())
-	        {
-	            delete field;
-	        }
-	        else
-	        {
-				mFields.push_back(field);
-				// ReadMed will always work with fields on node so we need to stop the first time.
-				// ie : CELL_TYPES[i] is not used in this case.
-				if (field->isFieldOnNodes())
-				{
-					break;
-				}
-	        }
-		}
+            // if the nth field does not apply on our mesh => slip it
+                if (field->isEmpty())
+                {
+                    delete field;
+                }
+                else
+                {
+                                mFields.push_back(field);
+                                // ReadMed will always work with fields on node so we need to stop the first time.
+                                // ie : CELL_TYPES[i] is not used in this case.
+                                if (field->isFieldOnNodes())
+                                {
+                                        break;
+                                }
+                }
+                }
     }
 }
 
@@ -1942,12 +1942,12 @@ ostream& operator<<(ostream& pOs, Mesh& pM)
     {
         cout << (*(pM.mNodes)) << endl;
         for (int i = 0; i < eMaxMedMesh; ++i)
-		{
-			if (pM.mElements[i] != NULL)
-			{
-        		cout << (*(pM.mElements[i])) << endl;
-			}
-		}
+                {
+                        if (pM.mElements[i] != NULL)
+                        {
+                        cout << (*(pM.mElements[i])) << endl;
+                        }
+                }
         
         pOs << "    Families : #=" << pM.mFamilies.size() << " (nodes=" << numFamOfNodes << " ; elements=" << (pM.mFamilies.size() - numFamOfNodes) << ")" << endl;
         for (unsigned i = 0 ; i < pM.mFamilies.size() ; i++)
@@ -1980,21 +1980,21 @@ ostream& operator<<(ostream& pOs, Mesh& pM)
             pOs << "    Nodes    : #=" << pM.mNodes->getNumberOfNodes() << endl;
         }
         for (int i = 0; i < eMaxMedMesh; ++i)
-		{
-			if (pM.mElements[i] != NULL)
-			{
-				const set<med_int>& setOfNodes = pM.mElements[i]->getSetOfNodes();
-				if (setOfNodes.size() == 0)
-				{
-					pOs << "    Elt      : #=" << pM.mElements[i]->getNumberOfElements() << endl;
-				}
-				else
-				{
-					set<med_int>::iterator itNode = setOfNodes.end();
-					itNode--;
-					pOs << "    Elt      : #=" << pM.mElements[i]->getNumberOfElements() << " node_id_min=" << (*(setOfNodes.begin())) << " node_id_max=" << (*itNode) << endl;
-				}
-			}
+                {
+                        if (pM.mElements[i] != NULL)
+                        {
+                                const set<med_int>& setOfNodes = pM.mElements[i]->getSetOfNodes();
+                                if (setOfNodes.size() == 0)
+                                {
+                                        pOs << "    Elt      : #=" << pM.mElements[i]->getNumberOfElements() << endl;
+                                }
+                                else
+                                {
+                                        set<med_int>::iterator itNode = setOfNodes.end();
+                                        itNode--;
+                                        pOs << "    Elt      : #=" << pM.mElements[i]->getNumberOfElements() << " node_id_min=" << (*(setOfNodes.begin())) << " node_id_max=" << (*itNode) << endl;
+                                }
+                        }
         }
         pOs << "    Families : #=" << pM.mFamilies.size() << " (nodes=" << numFamOfNodes << " ; elements=" << (pM.mFamilies.size() - numFamOfNodes) << ")" << endl;
         pOs << "    Groups   : #=" << pM.mGroups.size() << " (nodes=" << numGroupsOfNodes << " ; elements=" << (pM.mGroups.size() - numGroupsOfNodes) << ")" << endl;

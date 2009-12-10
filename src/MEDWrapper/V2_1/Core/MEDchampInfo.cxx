@@ -25,8 +25,8 @@ namespace med_2_1{
 
 med_err 
 MEDchampInfo(med_idt fid,int indice,char *champ,
-	     med_type_champ *type,char *comp,char *unit, 
-	     med_int ncomp)
+             med_type_champ *type,char *comp,char *unit, 
+             med_int ncomp)
 {
   med_err ret=0;
   med_idt gid;
@@ -70,10 +70,10 @@ MEDchampInfo(med_idt fid,int indice,char *champ,
   *type = (med_type_champ)aType;
   
   if ((ret = _MEDattrStringLire(gid,MED_NOM_NOM,ncomp*MED_TAILLE_PNOM,
-				comp)) < 0)
+                                comp)) < 0)
     return -1;
   if ((ret = _MEDattrStringLire(gid,MED_NOM_UNI,ncomp*MED_TAILLE_PNOM,
-				unit)) < 0)
+                                unit)) < 0)
     return -1;
 
   /*

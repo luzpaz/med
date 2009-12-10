@@ -54,7 +54,7 @@ void affiche_support(const SUPPORT * mySupport)
       int NumberOfElements = mySupport->getNumberOfElements(Types[j]) ;
       const int * Number = mySupport->getNumber(Types[j]) ;
       for (int k=0; k<NumberOfElements;k++)
-	cout << Number[k] << " ";
+        cout << Number[k] << " ";
       cout << endl ;
     }
   } else
@@ -89,7 +89,7 @@ int main (int argc, char ** argv) {
 
   if (argc <3) { // after 3, ignored !
     cerr << "Usage : " << argv[0] 
-	 << " filename meshname" << endl << endl;
+         << " filename meshname" << endl << endl;
     exit(-1);
   }
 

@@ -67,7 +67,7 @@ void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
 
 template <class INTERLACING_TAG>
 void affiche_fieldT(FIELD<double, INTERLACING_TAG> * myField,
-		    const SUPPORT * mySupport)
+                    const SUPPORT * mySupport)
 {
   affiche_field_((FIELD_ *) myField, mySupport);
 
@@ -79,7 +79,7 @@ void affiche_fieldT(FIELD<double, INTERLACING_TAG> * myField,
     for (int i=1; i<NumberOf+1; i++) {
       const double * value = myField->getRow(i) ;
       for (int j=0; j<NumberOfComponents; j++)
-	cout << value[j]<< " ";
+        cout << value[j]<< " ";
       cout<<endl;
     }
   }
@@ -87,7 +87,7 @@ void affiche_fieldT(FIELD<double, INTERLACING_TAG> * myField,
     for (int j=1; j<NumberOfComponents+1; j++) {
       const double * value = myField->getColumn(j) ;
       for (int i=0; i<NumberOf; i++)
-	cout << value[i]<< " ";
+        cout << value[i]<< " ";
       cout<<endl;
     }
   }
@@ -98,7 +98,7 @@ int main (int argc, char ** argv) {
 
   if ((argc !=3) && (argc != 4)) {
     cerr << "Usage : " << argv[0] 
-	 << " filename meshname fieldname" << endl << endl;
+         << " filename meshname fieldname" << endl << endl;
     exit(-1);
   }
 

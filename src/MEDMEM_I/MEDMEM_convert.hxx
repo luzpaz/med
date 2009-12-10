@@ -41,29 +41,29 @@ using namespace MED_EN;
 #include "MEDMEM_GenDriver.hxx"
 
 MEDMEM_I_EXPORT SALOME_MED::medGeometryElement convertMedEltToIdlElt(medGeometryElement element) 
-			       throw (SALOME::SALOME_Exception);
+                               throw (SALOME::SALOME_Exception);
 MEDMEM_I_EXPORT SALOME_MED::medEntityMesh      convertMedEntToIdlEnt(medEntityMesh entity) 
-			       throw (SALOME::SALOME_Exception);
+                               throw (SALOME::SALOME_Exception);
 MEDMEM_I_EXPORT SALOME_MED::medModeSwitch      convertMedModeToIdlMode(medModeSwitch mode) 
-			       throw (SALOME::SALOME_Exception);
+                               throw (SALOME::SALOME_Exception);
 MEDMEM_I_EXPORT SALOME_MED::medDriverTypes     convertMedDriverToIdlDriver(MEDMEM::driverTypes driverType)
-			       throw (SALOME::SALOME_Exception);
+                               throw (SALOME::SALOME_Exception);
 MEDMEM_I_EXPORT SALOME_MED::medConnectivity    convertMedConnToIdlConn(medConnectivity connectivite)
-			       throw (SALOME::SALOME_Exception);
+                               throw (SALOME::SALOME_Exception);
 
 MEDMEM_I_EXPORT medGeometryElement convertIdlEltToMedElt (SALOME_MED::medGeometryElement element) 
-		      throw (SALOME::SALOME_Exception);
+                      throw (SALOME::SALOME_Exception);
 MEDMEM_I_EXPORT medEntityMesh   convertIdlEntToMedEnt(SALOME_MED::medEntityMesh entity) 
-		      throw (SALOME::SALOME_Exception);
+                      throw (SALOME::SALOME_Exception);
 MEDMEM_I_EXPORT medModeSwitch       convertIdlModeToMedMode(SALOME_MED::medModeSwitch mode) 
-		      throw (SALOME::SALOME_Exception);
-MEDMEM_I_EXPORT MEDMEM::driverTypes 	      convertIdlDriverToMedDriver(SALOME_MED::medDriverTypes driverType)
-		      throw (SALOME::SALOME_Exception);
+                      throw (SALOME::SALOME_Exception);
+MEDMEM_I_EXPORT MEDMEM::driverTypes           convertIdlDriverToMedDriver(SALOME_MED::medDriverTypes driverType)
+                      throw (SALOME::SALOME_Exception);
 MEDMEM_I_EXPORT medConnectivity      convertIdlConnToMedConn(SALOME_MED::medConnectivity connectivite)
-		      throw (SALOME::SALOME_Exception);
+                      throw (SALOME::SALOME_Exception);
 
 
 MEDMEM_I_EXPORT bool verifieParam (SALOME_MED::medEntityMesh entity, SALOME_MED::medGeometryElement geomElement)
      throw (SALOME::SALOME_Exception);
 
-# endif 	/* # if ! defined ( __CONVERT_H__ ) */
+# endif         /* # if ! defined ( __CONVERT_H__ ) */

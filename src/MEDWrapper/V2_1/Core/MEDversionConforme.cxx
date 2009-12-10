@@ -48,7 +48,7 @@ MEDversionConforme(const char *nom) {
     return -1;
   
   if ((ret = _MEDattrEntierLire(gid,MED_NOM_MINEUR,&mineur)) < 0)
-    return -1;							
+    return -1;                                                  
   
   /* 
    * On ferme tout 

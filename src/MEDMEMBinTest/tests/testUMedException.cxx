@@ -31,25 +31,25 @@ using namespace MEDMEM;
 
 int main (int argc, char ** argv)
 {
-	MEDEXCEPTION a = MEDEXCEPTION("test med exception");
-	cout << a << endl;;
-	cout << a.what() << endl;;
+        MEDEXCEPTION a = MEDEXCEPTION("test med exception");
+        cout << a << endl;;
+        cout << a.what() << endl;;
 
-	MEDEXCEPTION b(a);
-	cout << b << endl;
-	cout << b.what() << endl;;
+        MEDEXCEPTION b(a);
+        cout << b << endl;
+        cout << b.what() << endl;;
 
-	MEDEXCEPTION c("test med exception",argv[0],14);
-	cout << c << endl;
-	cout << c.what() << endl;;
+        MEDEXCEPTION c("test med exception",argv[0],14);
+        cout << c << endl;
+        cout << c.what() << endl;;
 
-      	STRING msgErr;
-	msgErr << "ESSAI::ESSAI()!  "<< 4 << "ieme essai ";
+        STRING msgErr;
+        msgErr << "ESSAI::ESSAI()!  "<< 4 << "ieme essai ";
         cout << MEDEXCEPTION (LOCALIZED(msgErr)).what() << endl ;
 
-	const char * LOC = "toto" ;
+        const char * LOC = "toto" ;
         cout << MEDEXCEPTION (LOCALIZED(STRING(LOC)<<" et titi")).what() << endl ;
 
-	return EXIT_SUCCESS;	
+        return EXIT_SUCCESS;    
 
 };

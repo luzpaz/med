@@ -26,7 +26,7 @@ namespace med_2_1{
 
 med_err 
 MEDnumEcr(med_idt fid,char *maa, med_int *num, med_int n, med_mode_acces mode,
-	  med_entite_maillage type_ent,med_geometrie_element type_geo)
+          med_entite_maillage type_ent,med_geometrie_element type_geo)
 {
   med_idt root, maaid, entid, geoid, dataset;
   med_err ret;
@@ -69,11 +69,11 @@ MEDnumEcr(med_idt fid,char *maa, med_int *num, med_int n, med_mode_acces mode,
    if ((type_ent==MED_MAILLE)||(type_ent==MED_FACE)||(type_ent==MED_ARETE))
      {
        if ((ret = _MEDnomGeometrie(nom_geo,type_geo)) < 0)
-	 return -1;
+         return -1;
 
        if ((geoid = _MEDdatagroupOuvrir(entid,nom_geo)) < 0)
-	 if ((geoid = _MEDdatagroupCreer(entid,nom_geo)) < 0)
-	   return -1;
+         if ((geoid = _MEDdatagroupCreer(entid,nom_geo)) < 0)
+           return -1;
      }
    else 
      geoid = -1;
@@ -88,11 +88,11 @@ MEDnumEcr(med_idt fid,char *maa, med_int *num, med_int n, med_mode_acces mode,
    dimd[0] = n;
 #if defined(HAVE_F77INT64)
    if ((ret = _MEDdatasetNumEcrire(root,MED_NOM_NUM,MED_INT64,MED_NO_INTERLACE,MED_DIM1,MED_ALL,MED_NOPF,0,MED_NOPG,dimd,
-				(unsigned char*) num,mode)) < 0)
+                                (unsigned char*) num,mode)) < 0)
      return -1;
 #else
    if ((ret = _MEDdatasetNumEcrire(root,MED_NOM_NUM,MED_INT32,MED_NO_INTERLACE,MED_DIM1,MED_ALL,MED_NOPF,0,MED_NOPG,dimd,
-				(unsigned char*) num,mode)) < 0)
+                                (unsigned char*) num,mode)) < 0)
      return -1;
 #endif
 

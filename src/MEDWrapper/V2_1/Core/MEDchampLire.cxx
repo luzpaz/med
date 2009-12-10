@@ -28,8 +28,8 @@ namespace med_2_1{
 
 med_err 
 MEDchampLire(med_idt fid,char *maa, char *cha, unsigned char *val,med_mode_switch interlace,med_int numco,
-	     char *profil,med_entite_maillage type_ent, med_geometrie_element type_geo,
-	     med_int numdt, med_int numo)
+             char *profil,med_entite_maillage type_ent, med_geometrie_element type_geo,
+             med_int numdt, med_int numo)
      /* VERIFIER LA POSSIBILITE DE RELIRE L'UNITE DE PAS DE TEMPS (DS CHAMPINFO) */
 {
   med_err ret;
@@ -64,7 +64,7 @@ MEDchampLire(med_idt fid,char *maa, char *cha, unsigned char *val,med_mode_switc
   if ((type_ent != MED_NOEUD))
     {
       if ((ret = _MEDnomGeometrie(tmp1,type_geo)) < 0)
-	return -1;
+        return -1;
       strcat(nomdatagroup1,".");
       strcat(nomdatagroup1,tmp1);
     }
@@ -100,16 +100,16 @@ MEDchampLire(med_idt fid,char *maa, char *cha, unsigned char *val,med_mode_switc
     {
       strcpy(profil,pfltmp);
       if ( (i = MEDnValProfil(fid,profil)) < 0 )
-	return -1;
+        return -1;
       else
-	psize = i;
+        psize = i;
 
       pfltabtmp = (med_int *)   malloc (sizeof(med_int)*(size_t)psize);
       pfltab = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)psize);
       if ((ret = MEDprofilLire(fid,pfltabtmp,profil)) < 0)
-	return -1;
+        return -1;
       for (i=0;i<psize;i++)
-	pfltab[i] = (med_ssize) pfltabtmp[i];
+        pfltab[i] = (med_ssize) pfltabtmp[i];
        
     }
   else {
@@ -142,31 +142,31 @@ MEDchampLire(med_idt fid,char *maa, char *cha, unsigned char *val,med_mode_switc
     {
     case MED_REEL64 :
       if ((ret =  _MEDdatasetNumLire(datagroup2,MED_NOM_CO,MED_REEL64,
-				     interlace,ncomp,numco,
-				     psize,pfltab,ngauss,val))< 0)
-	return -1;
+                                     interlace,ncomp,numco,
+                                     psize,pfltab,ngauss,val))< 0)
+        return -1;
       break;
       
     case MED_INT32 :
 #if defined(HAVE_F77INT64) 
      if ((ret =  _MEDdatasetNumLire(datagroup2,MED_NOM_CO,MED_INT64,
-				     interlace,ncomp,numco,
-				     psize,pfltab,ngauss,val))< 0)
-	return -1;
+                                     interlace,ncomp,numco,
+                                     psize,pfltab,ngauss,val))< 0)
+        return -1;
 #else
      if ((ret =  _MEDdatasetNumLire(datagroup2,MED_NOM_CO,MED_INT32,
-				     interlace,ncomp,numco,
-				     psize, pfltab,ngauss,val))< 0)
-	return -1;
+                                     interlace,ncomp,numco,
+                                     psize, pfltab,ngauss,val))< 0)
+        return -1;
 #endif
      break;
 
     case MED_INT64 :
 #if defined(HAVE_F77INT64) 
      if ((ret =  _MEDdatasetNumLire(datagroup2,MED_NOM_CO,MED_INT64,
-				     interlace,ncomp,numco,
-				     psize,pfltab,ngauss,val))< 0)
-	return -1;
+                                     interlace,ncomp,numco,
+                                     psize,pfltab,ngauss,val))< 0)
+        return -1;
 #else
      return -1;
 #endif

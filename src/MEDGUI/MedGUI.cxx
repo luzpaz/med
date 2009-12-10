@@ -88,15 +88,15 @@ void MedGUI::createMedAction( const int id, const QString& po_id, const QString&
     icon = QIcon( pix );
 
   createAction( id, 
-		tr( (const char*)("TOP_" + po_id).toLatin1() ),
-		icon,
-		tr( (const char*)("MEN_" + po_id).toLatin1() ),
-		tr( (const char*)("STB_" + po_id).toLatin1() ),
-		0,
-		parent,
-		false,
-		this,
-		SLOT( onGUIEvent() ) );
+                tr( (const char*)("TOP_" + po_id).toLatin1() ),
+                icon,
+                tr( (const char*)("MEN_" + po_id).toLatin1() ),
+                tr( (const char*)("STB_" + po_id).toLatin1() ),
+                0,
+                parent,
+                false,
+                this,
+                SLOT( onGUIEvent() ) );
 
   if ( action( id ) )
     action( id )->setObjectName( QString( "Action %1" ).arg( id ) );
@@ -196,7 +196,7 @@ bool MedGUI::deactivateModule( SUIT_Study* study )
   setToolShown( false );
 
   disconnect( application()->desktop(), SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
-	     this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );
+             this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );
 
   EmitSignalCloseAllDialogs();
 
@@ -216,7 +216,7 @@ bool MedGUI::activateModule( SUIT_Study* study )
   setToolShown( true );
 
   connect( application()->desktop(), SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
-	  this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );
+          this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );
   return res;
 }
 
@@ -261,201 +261,201 @@ bool MedGUI::OnGUIEvent (int theCommandID)
     case 9031:
     case 931:
       {
-	MESSAGE("command " << theCommandID << " activated");
+        MESSAGE("command " << theCommandID << " activated");
 
-	QString myStudyName = myActiveStudy->studyName();
-	bool ok=FALSE;
-// 	int myStudyId = myActiveStudy->id();
+        QString myStudyName = myActiveStudy->studyName();
+        bool ok=FALSE;
+//      int myStudyId = myActiveStudy->id();
 
-	// load MED engine
-	SALOME_MED::MED_Gen_ptr medgen = InitMedGen();
+        // load MED engine
+        SALOME_MED::MED_Gen_ptr medgen = InitMedGen();
 
-	// Selection du Fichier
-	file = SUIT_FileDlg::getFileName(application()->desktop(),
-					"",
-					filtersList,
-					tr("MED_MEN_IMPORT"),
-					true);
+        // Selection du Fichier
+        file = SUIT_FileDlg::getFileName(application()->desktop(),
+                                        "",
+                                        filtersList,
+                                        tr("MED_MEN_IMPORT"),
+                                        true);
 
         // Selection du Maillage
-	if (!file.isEmpty() )
-	  {
-	    SCRUTE((const char*)file.toLatin1());
-	    QString meshName;
-	    meshName = QInputDialog::getText( application()->desktop(),
-					      tr("MED_INF_MESHNAME"),
-					      QString::null,
-					      QLineEdit::Normal,
-					      QString::null,
-					      &ok );
-	    if ( ok && !meshName.isEmpty() )
-	      {
-		  try
-		    {
-		      medgen->readMeshInFile( (const char*)file.toLatin1(),
-					      (const char*)myStudyName.toLatin1(),
-					      (const char*)meshName.toLatin1() );
-		      if (myActiveStudy->studyDS()->GetProperties()->IsLocked()) {
-			SUIT_MessageBox::warning ( application()->desktop(),
-					           tr("WRN_WARNING"),
-					           tr("WRN_STUDY_LOCKED") );
-			//QObject::tr("BUT_OK")); by default
-		      }
-		    }
-		  catch (const SALOME::SALOME_Exception & S_ex)
-		    {
-		      SalomeApp_Tools::QtCatchCorbaException(S_ex);
-		    }
-		}
-	        updateObjBrowser();
-	  }
-	break;
+        if (!file.isEmpty() )
+          {
+            SCRUTE((const char*)file.toLatin1());
+            QString meshName;
+            meshName = QInputDialog::getText( application()->desktop(),
+                                              tr("MED_INF_MESHNAME"),
+                                              QString::null,
+                                              QLineEdit::Normal,
+                                              QString::null,
+                                              &ok );
+            if ( ok && !meshName.isEmpty() )
+              {
+                  try
+                    {
+                      medgen->readMeshInFile( (const char*)file.toLatin1(),
+                                              (const char*)myStudyName.toLatin1(),
+                                              (const char*)meshName.toLatin1() );
+                      if (myActiveStudy->studyDS()->GetProperties()->IsLocked()) {
+                        SUIT_MessageBox::warning ( application()->desktop(),
+                                                   tr("WRN_WARNING"),
+                                                   tr("WRN_STUDY_LOCKED") );
+                        //QObject::tr("BUT_OK")); by default
+                      }
+                    }
+                  catch (const SALOME::SALOME_Exception & S_ex)
+                    {
+                      SalomeApp_Tools::QtCatchCorbaException(S_ex);
+                    }
+                }
+                updateObjBrowser();
+          }
+        break;
       }
     case 4032:
     case 9032:
     case 932:
       {
-	MESSAGE("command " << theCommandID << " activated");
+        MESSAGE("command " << theCommandID << " activated");
 
-	QString myStudyName = myActiveStudy->studyName();
-	bool ok=FALSE;
-// 	int myStudyId = myActiveStudy->id();
+        QString myStudyName = myActiveStudy->studyName();
+        bool ok=FALSE;
+//      int myStudyId = myActiveStudy->id();
 
-	// load MED engine
-	SALOME_MED::MED_Gen_ptr medgen = InitMedGen();
-	
-	// Selection du Fichier
-	QString anInitialPath = "";
-	if ( SUIT_FileDlg::getLastVisitedPath().isEmpty() )
-	  anInitialPath = QDir::currentPath();
+        // load MED engine
+        SALOME_MED::MED_Gen_ptr medgen = InitMedGen();
+        
+        // Selection du Fichier
+        QString anInitialPath = "";
+        if ( SUIT_FileDlg::getLastVisitedPath().isEmpty() )
+          anInitialPath = QDir::currentPath();
 
-	file = SUIT_FileDlg::getFileName(application()->desktop(),
-					anInitialPath,
-					filtersList,
-					tr("MED_MEN_IMPORT"),
-					true);
+        file = SUIT_FileDlg::getFileName(application()->desktop(),
+                                        anInitialPath,
+                                        filtersList,
+                                        tr("MED_MEN_IMPORT"),
+                                        true);
 
         // Selection du Maillage
-	if (!file.isEmpty() )
-	  {
-	    SCRUTE((const char*)file.toLatin1());
-	    QString fieldName;
-	    fieldName = QInputDialog::getText( application()->desktop(),
-					       tr("MED_INF_FIELDNAME"),
-					       QString::null,
-					       QLineEdit::Normal,
-					       QString::null,
-					       &ok );
-	    if ( ok && !fieldName.isEmpty())
-	      {
-		try
-		  {
-		    medgen->readFieldInFile( (const char*)file.toLatin1(),
-					     (const char*)myStudyName.toLatin1(),
-					     (const char*)fieldName.toLatin1(),
-					     -1,
-					     -1 );
-		    if (myActiveStudy->studyDS()->GetProperties()->IsLocked()) {
-		      SUIT_MessageBox::warning ( application()->desktop(),
-					         tr("WRN_WARNING"),
-					         tr("WRN_STUDY_LOCKED") );
-		      //tr("BUT_OK")); by default
-		    }
-		  }
-		catch (const SALOME::SALOME_Exception & S_ex)
-		  {
-		    SalomeApp_Tools::QtCatchCorbaException(S_ex);
-		  }
-		updateObjBrowser ();
-	      }
-	  }
-	break;
+        if (!file.isEmpty() )
+          {
+            SCRUTE((const char*)file.toLatin1());
+            QString fieldName;
+            fieldName = QInputDialog::getText( application()->desktop(),
+                                               tr("MED_INF_FIELDNAME"),
+                                               QString::null,
+                                               QLineEdit::Normal,
+                                               QString::null,
+                                               &ok );
+            if ( ok && !fieldName.isEmpty())
+              {
+                try
+                  {
+                    medgen->readFieldInFile( (const char*)file.toLatin1(),
+                                             (const char*)myStudyName.toLatin1(),
+                                             (const char*)fieldName.toLatin1(),
+                                             -1,
+                                             -1 );
+                    if (myActiveStudy->studyDS()->GetProperties()->IsLocked()) {
+                      SUIT_MessageBox::warning ( application()->desktop(),
+                                                 tr("WRN_WARNING"),
+                                                 tr("WRN_STUDY_LOCKED") );
+                      //tr("BUT_OK")); by default
+                    }
+                  }
+                catch (const SALOME::SALOME_Exception & S_ex)
+                  {
+                    SalomeApp_Tools::QtCatchCorbaException(S_ex);
+                  }
+                updateObjBrowser ();
+              }
+          }
+        break;
       }
     case 4033:
     case 933:
       {
-	MESSAGE("command " << theCommandID << " activated");
+        MESSAGE("command " << theCommandID << " activated");
 
-	QString myStudyName = myActiveStudy->studyName();
-// 	int myStudyId = myActiveStudy->id();
+        QString myStudyName = myActiveStudy->studyName();
+//      int myStudyId = myActiveStudy->id();
 
-	// load MED engine
-	SALOME_MED::MED_Gen_ptr medgen = InitMedGen();
+        // load MED engine
+        SALOME_MED::MED_Gen_ptr medgen = InitMedGen();
 
-	// Selection du Fichier
-	QString anInitialPath = "";
-	if ( SUIT_FileDlg::getLastVisitedPath().isEmpty() )
-	  anInitialPath = QDir::currentPath();
+        // Selection du Fichier
+        QString anInitialPath = "";
+        if ( SUIT_FileDlg::getLastVisitedPath().isEmpty() )
+          anInitialPath = QDir::currentPath();
 
-	file = SUIT_FileDlg::getFileName(application()->desktop(),
-					anInitialPath,
-					filtersList,
-					tr("MED_MEN_IMPORT"),
-					true);
-	if (!file.isEmpty() )
-	  {
-	    SCRUTE((const char*)file.toLatin1());
-	    try
-	      {
-//		medgen->readStructFile(file.latin1(),myStudyName);
-		medgen->readStructFileWithFieldType((const char*)file.toLatin1(),
+        file = SUIT_FileDlg::getFileName(application()->desktop(),
+                                        anInitialPath,
+                                        filtersList,
+                                        tr("MED_MEN_IMPORT"),
+                                        true);
+        if (!file.isEmpty() )
+          {
+            SCRUTE((const char*)file.toLatin1());
+            try
+              {
+//              medgen->readStructFile(file.latin1(),myStudyName);
+                medgen->readStructFileWithFieldType((const char*)file.toLatin1(),
                                                     (const char*)myStudyName.toLatin1());
 
-		MESSAGE("Ouais on est la !!!!");
+                MESSAGE("Ouais on est la !!!!");
 
-		if (myActiveStudy->studyDS()->GetProperties()->IsLocked()) {
+                if (myActiveStudy->studyDS()->GetProperties()->IsLocked()) {
 
-		  MESSAGE("Ouais on est la 1 !!!!");
+                  MESSAGE("Ouais on est la 1 !!!!");
 
-		  SUIT_MessageBox::warning (application()->desktop(),
+                  SUIT_MessageBox::warning (application()->desktop(),
                                             tr("WRN_WARNING"),
                                             tr("WRN_STUDY_LOCKED") );
-		  //QObject::tr("BUT_OK")); by default
-		}
-	      }
-	    catch (const SALOME::SALOME_Exception & S_ex)
-	      {
-		MESSAGE("Ouais on est la 2 !!!!");
+                  //QObject::tr("BUT_OK")); by default
+                }
+              }
+            catch (const SALOME::SALOME_Exception & S_ex)
+              {
+                MESSAGE("Ouais on est la 2 !!!!");
 
-		SalomeApp_Tools::QtCatchCorbaException(S_ex);
-	      }
+                SalomeApp_Tools::QtCatchCorbaException(S_ex);
+              }
 
-	    MESSAGE("Ouais on est la 3 !!!!");
+            MESSAGE("Ouais on est la 3 !!!!");
 
-	    updateObjBrowser ();
-	  }
-	break;
+            updateObjBrowser ();
+          }
+        break;
       }
 
     case 934:
       {
-	//Handle(SMESH_TypeFilter) aMeshFilter = new SMESH_TypeFilter( MESH );
+        //Handle(SMESH_TypeFilter) aMeshFilter = new SMESH_TypeFilter( MESH );
 
-	SALOME_ListIO list;
-	SalomeApp_Application* app = getApp();
-	LightApp_SelectionMgr* mgr = app ? app->selectionMgr() : NULL;
-	if( mgr )
-	  mgr->selectedObjects( list );
-	//Sel->AddFilter(aMeshFilter) ;
+        SALOME_ListIO list;
+        SalomeApp_Application* app = getApp();
+        LightApp_SelectionMgr* mgr = app ? app->selectionMgr() : NULL;
+        if( mgr )
+          mgr->selectedObjects( list );
+        //Sel->AddFilter(aMeshFilter) ;
 
-	int nbSel = list.Extent();
-	if ( nbSel == 1 )
-	  {
-	    //	    SMESH::SMESH_Mesh_var aM;
-	    SALOME_MED::MESH_var aMesh;
-	    Handle(SALOME_InteractiveObject) IObject = list.First();
-	    if ( IObject->hasEntry() )
-	      {
-		_PTR(SObject) aMorSM = aStudy->FindObjectID( IObject->getEntry() );
-		if ( aMorSM )
-		  {
-		    _PTR(GenericAttribute) anAttr;
-		    _PTR(AttributeIOR)     anIOR;
-		    if (aMorSM->FindAttribute(anAttr, "AttributeIOR"))
-		      {
-			anIOR = anAttr;
-			aMesh = SALOME_MED::MESH::_narrow( _orb->string_to_object(anIOR->Value().c_str()) );
-			if ( aMesh->_is_nil() )
+        int nbSel = list.Extent();
+        if ( nbSel == 1 )
+          {
+            //      SMESH::SMESH_Mesh_var aM;
+            SALOME_MED::MESH_var aMesh;
+            Handle(SALOME_InteractiveObject) IObject = list.First();
+            if ( IObject->hasEntry() )
+              {
+                _PTR(SObject) aMorSM = aStudy->FindObjectID( IObject->getEntry() );
+                if ( aMorSM )
+                  {
+                    _PTR(GenericAttribute) anAttr;
+                    _PTR(AttributeIOR)     anIOR;
+                    if (aMorSM->FindAttribute(anAttr, "AttributeIOR"))
+                      {
+                        anIOR = anAttr;
+                        aMesh = SALOME_MED::MESH::_narrow( _orb->string_to_object(anIOR->Value().c_str()) );
+                        if ( aMesh->_is_nil() )
                         {
                           SUIT_MessageBox::warning
                             ( application()->desktop(),
@@ -463,66 +463,66 @@ bool MedGUI::OnGUIEvent (int theCommandID)
                               tr ("MED_INF_NOTIMPL") );
                           break;
                         }
-  			DumpMesh( aMesh );
-			//Sel->ClearFilters() ;
-		      }
-		    else
-		      {
-			SUIT_MessageBox::warning
-			  ( application()->desktop(),
-			    tr ("MED_WRN_WARNING"),
-			    tr ("MED_INF_NOIOR") );
-			//tr ("MED_BUT_OK") ); by default
-			break;
-		      }
-		  }
-	      }
-	  }
-	break;
+                        DumpMesh( aMesh );
+                        //Sel->ClearFilters() ;
+                      }
+                    else
+                      {
+                        SUIT_MessageBox::warning
+                          ( application()->desktop(),
+                            tr ("MED_WRN_WARNING"),
+                            tr ("MED_INF_NOIOR") );
+                        //tr ("MED_BUT_OK") ); by default
+                        break;
+                      }
+                  }
+              }
+          }
+        break;
       }
 
     case 935:
       {
-	//Handle(SMESH_TypeFilter) aSubMeshFilter = new SMESH_TypeFilter( SUBMESH );
+        //Handle(SMESH_TypeFilter) aSubMeshFilter = new SMESH_TypeFilter( SUBMESH );
 
-	SALOME_ListIO list;
-	SalomeApp_Application* app = getApp();
-	LightApp_SelectionMgr* mgr = app ? app->selectionMgr() : NULL;
-	if( mgr )
-	  mgr->selectedObjects( list );
+        SALOME_ListIO list;
+        SalomeApp_Application* app = getApp();
+        LightApp_SelectionMgr* mgr = app ? app->selectionMgr() : NULL;
+        if( mgr )
+          mgr->selectedObjects( list );
 
-	//Sel->AddFilter(aSubMeshFilter) ;
+        //Sel->AddFilter(aSubMeshFilter) ;
 
-	int nbSel = list.Extent();
-	if ( nbSel == 1 )
-	  {
-	    //	    SMESH::SMESH_subMesh_var aSubM;
-	    SALOME_MED::FAMILY_var aFam;
-	    Handle(SALOME_InteractiveObject) IObject = list.First();
-	    if ( IObject->hasEntry() )
-	      {
-		_PTR(SObject) aMorSM = aStudy->FindObjectID( IObject->getEntry() );
-		if ( aMorSM )
-		  {
-		    _PTR(GenericAttribute) anAttr;
-		    _PTR(AttributeIOR)     anIOR;
-		    if (aMorSM->FindAttribute(anAttr, "AttributeIOR"))
-		      {
-			anIOR = anAttr;
-		      }
-		    else
-		      {
-			SUIT_MessageBox::warning
-			  ( application()->desktop(),
-			    tr ("MED_WRN_WARNING"),
-			    tr ("MED_INFNOIOR") );
-			//  tr ("MED_BUT_OK") ); by default
-			break;
-		      }
-		  }
-	      }
-	  }
-	break;
+        int nbSel = list.Extent();
+        if ( nbSel == 1 )
+          {
+            //      SMESH::SMESH_subMesh_var aSubM;
+            SALOME_MED::FAMILY_var aFam;
+            Handle(SALOME_InteractiveObject) IObject = list.First();
+            if ( IObject->hasEntry() )
+              {
+                _PTR(SObject) aMorSM = aStudy->FindObjectID( IObject->getEntry() );
+                if ( aMorSM )
+                  {
+                    _PTR(GenericAttribute) anAttr;
+                    _PTR(AttributeIOR)     anIOR;
+                    if (aMorSM->FindAttribute(anAttr, "AttributeIOR"))
+                      {
+                        anIOR = anAttr;
+                      }
+                    else
+                      {
+                        SUIT_MessageBox::warning
+                          ( application()->desktop(),
+                            tr ("MED_WRN_WARNING"),
+                            tr ("MED_INFNOIOR") );
+                        //  tr ("MED_BUT_OK") ); by default
+                        break;
+                      }
+                  }
+              }
+          }
+        break;
       }
     }
 
@@ -538,7 +538,7 @@ bool MedGUI::OnGUIEvent (int theCommandID)
  */
 //=============================================================================
 bool MedGUI::OnMousePress (QMouseEvent* pe ,
-			   SUIT_ViewWindow* wnd )
+                           SUIT_ViewWindow* wnd )
 {
   MESSAGE("MedGUI::OnMousePress");
   return true;
@@ -550,7 +550,7 @@ bool MedGUI::OnMousePress (QMouseEvent* pe ,
  */
 //=============================================================================
 bool MedGUI::OnMouseMove (QMouseEvent* pe ,
-			  SUIT_ViewWindow* wnd )
+                          SUIT_ViewWindow* wnd )
 {
   //   MESSAGE("MedGUI::OnMouseMouve");
   return true;
@@ -562,7 +562,7 @@ bool MedGUI::OnMouseMove (QMouseEvent* pe ,
  */
 //=============================================================================
 bool MedGUI::OnKeyPress (QKeyEvent* pe,
-			 SUIT_ViewWindow* wnd)
+                         SUIT_ViewWindow* wnd)
 {
   MESSAGE("MedGUI::OnKeyPress");
   return true;
@@ -596,13 +596,13 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
   while (lu < k ) {
     if (dim2==3)
       {
-    	MESSAGE ( " Coordinates  X = " << coords[i] << " Y = " << coords[i+1] << " Z = " << coords[i+2] );
-    	i = i + 3; // Only for triangles
+        MESSAGE ( " Coordinates  X = " << coords[i] << " Y = " << coords[i+1] << " Z = " << coords[i+2] );
+        i = i + 3; // Only for triangles
       }
     else
       {
-    	MESSAGE ( " Coordinates  X = " << coords[i] << " Y = " << coords[i+1] );
-    	i = i + 2;
+        MESSAGE ( " Coordinates  X = " << coords[i] << " Y = " << coords[i+1] );
+        i = i + 2;
       }
     lu=lu+1;
   }

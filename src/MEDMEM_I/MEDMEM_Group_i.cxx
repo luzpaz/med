@@ -44,7 +44,7 @@ using namespace MEDMEM;
  */
 //=============================================================================
 GROUP_i::GROUP_i():_group((::GROUP*)NULL),
-		   SUPPORT_i()
+                   SUPPORT_i()
 {
 };
 //=============================================================================
@@ -61,7 +61,7 @@ GROUP_i::~GROUP_i()
  */
 //=============================================================================
 GROUP_i::GROUP_i(const ::GROUP * const g):_group(g),
-		   SUPPORT_i(g)
+                   SUPPORT_i(g)
 {
 };
 //=============================================================================
@@ -70,7 +70,7 @@ GROUP_i::GROUP_i(const ::GROUP * const g):_group(g),
  */
 //=============================================================================
 GROUP_i::GROUP_i(const GROUP_i & g):_group(g._group),
-		   SUPPORT_i(g._group)
+                   SUPPORT_i(g._group)
 {
 };
 //=============================================================================
@@ -84,7 +84,7 @@ throw (SALOME::SALOME_Exception)
 {
         if (_group==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Group",\
-					     SALOME::INTERNAL_ERROR);
+                                             SALOME::INTERNAL_ERROR);
         try
         {
                 return _group->getNumberOfFamilies();
@@ -92,7 +92,7 @@ throw (SALOME::SALOME_Exception)
         catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to get number of families of the group");
-		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 };
 //=============================================================================
@@ -101,31 +101,31 @@ throw (SALOME::SALOME_Exception)
  */
 //=============================================================================
 
-SALOME_MED::Family_array* GROUP_i::getFamilies() 	 
+SALOME_MED::Family_array* GROUP_i::getFamilies()         
 throw (SALOME::SALOME_Exception)
 {
         if (_group==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Group",\
-					     SALOME::INTERNAL_ERROR);
-	SALOME_MED::Family_array_var myseq = new SALOME_MED::Family_array;
-	try
+                                             SALOME::INTERNAL_ERROR);
+        SALOME_MED::Family_array_var myseq = new SALOME_MED::Family_array;
+        try
         {
                 int nbfam= _group->getNumberOfFamilies();
-		myseq->length(nbfam);
-		vector<FAMILY*> fam(nbfam);
-	 	fam = _group->getFamilies();
-		for (int i=0;i<nbfam;i++)
+                myseq->length(nbfam);
+                vector<FAMILY*> fam(nbfam);
+                fam = _group->getFamilies();
+                for (int i=0;i<nbfam;i++)
                 {
-			FAMILY_i * f1=new FAMILY_i(fam[i]);
-			myseq[i] = f1->_this();
-		}
-	}
-	catch (MEDEXCEPTION &ex)
-	{
-                MESSAGE("Unable to access families");
-		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                        FAMILY_i * f1=new FAMILY_i(fam[i]);
+                        myseq[i] = f1->_this();
+                }
         }
-	return myseq._retn();
+        catch (MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to access families");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+        return myseq._retn();
 };
 //=============================================================================
 /*!
@@ -138,16 +138,16 @@ throw (SALOME::SALOME_Exception)
 {
         if (_group==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Group",\
-					     SALOME::INTERNAL_ERROR);
-	try
+                                             SALOME::INTERNAL_ERROR);
+        try
         {
-		FAMILY * fam=_group->getFamily(i);
-		FAMILY_i * f1=new FAMILY_i(fam);
-		return f1->_this();
-	}
-	catch (MEDEXCEPTION &ex)
-	{
+                FAMILY * fam=_group->getFamily(i);
+                FAMILY_i * f1=new FAMILY_i(fam);
+                return f1->_this();
+        }
+        catch (MEDEXCEPTION &ex)
+        {
                 MESSAGE("Unable to acces to the specified family");
-		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 };

@@ -37,10 +37,10 @@ int main (int argc, char ** argv)
     // Traitement arguments
     if (argc > 2) 
     {
-	cerr << "Usage : " << argv[0] 
-	<< " filenameRoot" << endl << endl
-	<< "-> creer un maillage et le sauve dans le fichier filenameRoot22.med sous le format Med Fichier V2.2 car il contient un polygon." << endl;
-	exit(-1);
+        cerr << "Usage : " << argv[0] 
+        << " filenameRoot" << endl << endl
+        << "-> creer un maillage et le sauve dans le fichier filenameRoot22.med sous le format Med Fichier V2.2 car il contient un polygon." << endl;
+        exit(-1);
     }
 
     string filenameRoot;
@@ -69,17 +69,17 @@ int main (int argc, char ** argv)
       int SpaceDimension = 2;
       int NumberOfNodes = 11;
       double Coordinates[2*11] = {
-	0.0, 0.0,
-	0.5, 0.0,
-	1.0, 0.0,
-	0.25, 0.5,
-	0.5, 0.5,
-	0.75, 0.5,
-	0.0, 1.0,
-	0.5, 1.0,
-	1.0, 1.0,
-	1.5, 0.0,
-	1.5, 1.0,
+        0.0, 0.0,
+        0.5, 0.0,
+        1.0, 0.0,
+        0.25, 0.5,
+        0.5, 0.5,
+        0.75, 0.5,
+        0.0, 1.0,
+        0.5, 1.0,
+        1.0, 1.0,
+        1.5, 0.0,
+        1.5, 1.0,
       };
 
       myMeshing.setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,"CARTESIAN",MED_FULL_INTERLACE);
@@ -103,19 +103,19 @@ int main (int argc, char ** argv)
       myMeshing.setNumberOfElements(NumberOfElements,MED_CELL);
 
       int ConnectivityTria[1*3]=
-	{
-	  7,4,1
-	};
+        {
+          7,4,1
+        };
 
       myMeshing.setConnectivity(ConnectivityTria,MED_CELL,MED_TRIA3);
 
       int ConnectivityQuad[4*4]=
-	{
-	  4,5,2,1,
-	  5,6,3,2,
-	  7,8,5,4,
-	  8,9,6,5
-	};
+        {
+          4,5,2,1,
+          5,6,3,2,
+          7,8,5,4,
+          8,9,6,5
+        };
   
       myMeshing.setConnectivity(ConnectivityQuad,MED_CELL,MED_QUAD4);
 
@@ -127,13 +127,13 @@ int main (int argc, char ** argv)
       // then define eventuel polygonal cells
 
       int ConnectivityPolygon[1*5]=
-	{
-	  9,11,10,3,6
-	};
+        {
+          9,11,10,3,6
+        };
       int ConnectivityPolygonIndex[2]=
-	{
-	  1,6
-	};
+        {
+          1,6
+        };
 
       myMeshing.setPolygonsConnectivity(ConnectivityPolygonIndex,ConnectivityPolygon,1,MED_CELL);
 
@@ -141,7 +141,7 @@ int main (int argc, char ** argv)
 
       medFileVersion version = getMedFileVersionForWriting();
       if (version == V21)
-	setMedFileVersionForWriting(V22);
+        setMedFileVersionForWriting(V22);
 
       int idMed22 = myMeshing.addDriver(MED_DRIVER,medfilename,myMeshing.getName());
       myMeshing.write(idMed22) ;

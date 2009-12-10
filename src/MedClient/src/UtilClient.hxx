@@ -28,8 +28,8 @@
 
 namespace MEDMEM {
 template <typename TLocal, 
-	  typename TCorbaSeq,
-	  typename Tint>
+          typename TCorbaSeq,
+          typename Tint>
 inline void convertCorbaArray (TLocal * & T, Tint &nT, const TCorbaSeq & S)
 {
   Tint i, n = S->length();
@@ -43,8 +43,8 @@ inline void convertCorbaArray (TLocal * & T, Tint &nT, const TCorbaSeq & S)
 }
 
 template <typename TLocal, 
-	  typename TCorbaSeq,
-	  typename Tint>
+          typename TCorbaSeq,
+          typename Tint>
 inline void convertCorbaArray2 (TLocal& tab, Tint &nT, const TCorbaSeq s)
 {
   Tint i, n = s.length();
@@ -57,10 +57,10 @@ inline void convertCorbaArray2 (TLocal& tab, Tint &nT, const TCorbaSeq s)
 }
 
 template <typename TCorba,
-	  typename TLocal,
-	  typename TCorbaSeq>
+          typename TLocal,
+          typename TCorbaSeq>
 inline void convertCorbaArray (TLocal * & T, long &nT, const TCorbaSeq & S,
-			       void *f)
+                               void *f)
 {
   int i, n = S->length();
   SCRUTE(n);
@@ -79,9 +79,9 @@ inline void convertCorbaArray (TLocal * & T, long &nT, const TCorbaSeq & S,
 }
 
 template <typename TLocal,
-	  typename TCorbaSeq>
+          typename TCorbaSeq>
 inline void convertCorbaArray (std::vector<TLocal> & T, int &nT, 
-			       const TCorbaSeq & S)
+                               const TCorbaSeq & S)
 {
   int i, n = S->length();
   SCRUTE(n);
@@ -98,11 +98,11 @@ inline void convertCorbaArray (std::vector<TLocal> & T, int &nT,
 
 
 template <typename TCorba,
-	  typename TLocal,
-	  typename TCorbaSeq>
+          typename TLocal,
+          typename TCorbaSeq>
 inline void convertCorbaArray (std::vector<TLocal> & T, int &nT, 
-			       const TCorbaSeq & S,
-			       void *f)
+                               const TCorbaSeq & S,
+                               void *f)
 {
   int i, n = S->length();
   SCRUTE(n);
@@ -123,12 +123,12 @@ inline void convertCorbaArray (std::vector<TLocal> & T, int &nT,
 
 
 template <typename TCorba,
-	  typename TLocal,
-	  typename TCorbaSeq,
-	  typename TInfo>
+          typename TLocal,
+          typename TCorbaSeq,
+          typename TInfo>
 inline void convertCorbaArray (std::vector<TLocal> & T, 
-			       const TCorbaSeq & S,
-			       void *f, TInfo M)
+                               const TCorbaSeq & S,
+                               void *f, TInfo M)
 {
   int i, n = S->length();
   SCRUTE(n);

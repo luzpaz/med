@@ -88,7 +88,7 @@ void multipr::partitionneDomaine(const char* pMEDfilename, const char* pMeshName
     
     try
     {
-        GaussIndexList*	lGaussList;
+        GaussIndexList* lGaussList;
         meshDis = mesh.splitGroupsOfElements();
         lGaussList = mesh.editGaussIndex();
         std::vector<Profil*>& lProfils = mesh.getProfils();
@@ -163,7 +163,7 @@ void multipr::decimePartition(
     const char* pFieldName,
     int         pFieldIt,
     const char* pFilterName,
-    const char*	pFilterParams)
+    const char* pFilterParams)
 {
     //---------------------------------------------------------------------
     // Check arguments
@@ -173,11 +173,11 @@ void multipr::decimePartition(
     if (pFieldName == NULL) throw NullArgumentException("pFieldName should not be NULL", __FILE__, __LINE__);
     if (pFieldIt < 1) throw IllegalArgumentException("pFieldIt: invalid field iteration; should be >= 1", __FILE__, __LINE__);
     /*
-	if (pTMed < 0.0) throw IllegalArgumentException("med res.: threshold must be > 0", __FILE__, __LINE__);
+        if (pTMed < 0.0) throw IllegalArgumentException("med res.: threshold must be > 0", __FILE__, __LINE__);
     if (pTMed >= pTLow) throw IllegalArgumentException("threshold for med res. must be < threshold for low res.", __FILE__, __LINE__);
     if (pRadius <= 0.0) throw IllegalArgumentException("radius should be > 0", __FILE__, __LINE__);
     if ((pBoxing < 1) || (pBoxing > 200)) throw IllegalArgumentException("boxing should be in [1..200]", __FILE__, __LINE__);
-	*/
+        */
     
     //cout << "--decim file=" << pMEDfilename << " part=" << pPartName << " filter=" << pFilterName << " tmed=" << pTMed << " tlow=" << pTLow << " radius=" << pRadius << endl;
     

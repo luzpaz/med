@@ -67,9 +67,9 @@ SUPPORT_i::SUPPORT_i() :_support((::SUPPORT *)NULL),_corbaIndex(SUPPORT_i::suppo
  */
 //=============================================================================
 SUPPORT_i::SUPPORT_i(const ::SUPPORT * const s) :_support(s),
-	           _corbaIndex(SUPPORT_i::supportIndex++)
+                   _corbaIndex(SUPPORT_i::supportIndex++)
 {
-	SUPPORT_i::supportMap[_corbaIndex]=(::SUPPORT *)_support;
+        SUPPORT_i::supportMap[_corbaIndex]=(::SUPPORT *)_support;
 }
 //=============================================================================
 /*!
@@ -77,9 +77,9 @@ SUPPORT_i::SUPPORT_i(const ::SUPPORT * const s) :_support(s),
  */
 //=============================================================================
 SUPPORT_i::SUPPORT_i(const SUPPORT_i &s) :_support(s._support),
-	                    _corbaIndex(SUPPORT_i::supportIndex++)
+                            _corbaIndex(SUPPORT_i::supportIndex++)
 {
-	SUPPORT_i::supportMap[_corbaIndex]=(::SUPPORT *)_support;
+        SUPPORT_i::supportMap[_corbaIndex]=(::SUPPORT *)_support;
 }
 //=============================================================================
 /*!
@@ -99,10 +99,10 @@ SUPPORT_i::~SUPPORT_i()
 CORBA::Long SUPPORT_i::getCorbaIndex()
 throw (SALOME::SALOME_Exception)
 {
-	if (_support==NULL)
-		THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
-				             SALOME::INTERNAL_ERROR);
-	return _corbaIndex;
+        if (_support==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+                                             SALOME::INTERNAL_ERROR);
+        return _corbaIndex;
 }
 
 //=============================================================================
@@ -111,21 +111,21 @@ throw (SALOME::SALOME_Exception)
  */
 //=============================================================================
 
-char * SUPPORT_i::getName() 	
+char * SUPPORT_i::getName()     
 throw (SALOME::SALOME_Exception)
 {
-	if (_support==NULL)
-		THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
-				             SALOME::INTERNAL_ERROR);
-	try
-	{
-		return CORBA::string_dup(_support->getName().c_str());
-	}
-	catch (MEDEXCEPTION &ex)
-	{
+        if (_support==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+                                             SALOME::INTERNAL_ERROR);
+        try
+        {
+                return CORBA::string_dup(_support->getName().c_str());
+        }
+        catch (MEDEXCEPTION &ex)
+        {
                 MESSAGE("Unable to access the name of the support ");
-		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
-	}
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
 
 }
 
@@ -138,18 +138,18 @@ throw (SALOME::SALOME_Exception)
 char*  SUPPORT_i::getDescription()
 throw (SALOME::SALOME_Exception)
 {
-	if (_support==NULL)
-		THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
-				             SALOME::INTERNAL_ERROR);
-	try
-	{
-  		return CORBA::string_dup(_support->getDescription().c_str());
-	}
-	catch (MEDEXCEPTION &ex)
-	{
+        if (_support==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+                                             SALOME::INTERNAL_ERROR);
+        try
+        {
+                return CORBA::string_dup(_support->getDescription().c_str());
+        }
+        catch (MEDEXCEPTION &ex)
+        {
                 MESSAGE("Unable to access the description of the support ");
-		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
-	}
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
 }
 
 //=============================================================================
@@ -251,28 +251,28 @@ SALOME_MED::MESH_ptr SUPPORT_i::getMesh()
 throw (SALOME::SALOME_Exception)
 {
 
-	if (_support==NULL)
-		THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
-				             SALOME::INTERNAL_ERROR);
+        if (_support==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+                                             SALOME::INTERNAL_ERROR);
         try
         {
-		MESH * mesh = _support->getMesh();
+                MESH * mesh = _support->getMesh();
 
-		SCRUTE(mesh) ;
+                SCRUTE(mesh) ;
 
-		MESH_i * m1 = new MESH_i(mesh);
-		SALOME_MED::MESH_ptr m2 = m1->_this();
-		MESSAGE("SALOME_MED::MESH_ptr SUPPORT_i::getMesh() checking des pointeurs CORBA");
+                MESH_i * m1 = new MESH_i(mesh);
+                SALOME_MED::MESH_ptr m2 = m1->_this();
+                MESSAGE("SALOME_MED::MESH_ptr SUPPORT_i::getMesh() checking des pointeurs CORBA");
 
-		SCRUTE(m1);
-		SCRUTE(m2);
+                SCRUTE(m1);
+                SCRUTE(m2);
 
-	        return (m2);
+                return (m2);
         }
         catch (MEDEXCEPTION &ex)
         {
                 MESSAGE("Unable to access the assoicated mesh");
-		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 
@@ -285,18 +285,18 @@ throw (SALOME::SALOME_Exception)
 CORBA::Boolean SUPPORT_i::isOnAllElements()
 throw (SALOME::SALOME_Exception)
 {
-	if (_support==NULL)
-		THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
-				             SALOME::INTERNAL_ERROR);
-	try
-	{
-		return _support->isOnAllElements();
-	}
-	catch (MEDEXCEPTION &ex)
-	{
+        if (_support==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+                                             SALOME::INTERNAL_ERROR);
+        try
+        {
+                return _support->isOnAllElements();
+        }
+        catch (MEDEXCEPTION &ex)
+        {
                 MESSAGE("Unable to access the type of the support");
-		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
-	}
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
 }
 
 //=============================================================================
@@ -335,7 +335,7 @@ throw (SALOME::SALOME_Exception)
 
   if (_support==NULL)
     THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
-				             SALOME::INTERNAL_ERROR);
+                                             SALOME::INTERNAL_ERROR);
   try
     {
       return convertMedEntToIdlEnt(_support->getEntity());
@@ -343,7 +343,7 @@ throw (SALOME::SALOME_Exception)
   catch (MEDEXCEPTION &ex)
     {
       MESSAGE("Unable to access support s entity");
-		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
     }
 }
 
@@ -356,26 +356,26 @@ throw (SALOME::SALOME_Exception)
 SALOME_MED::medGeometryElement_array * SUPPORT_i::getTypes() 
 throw (SALOME::SALOME_Exception)
 {
-	if (_support==NULL)
-		THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
-				             SALOME::INTERNAL_ERROR);
-	SALOME_MED::medGeometryElement_array_var myseq = new SALOME_MED::medGeometryElement_array;
-	try
-	{
-		int mySeqLength=_support->getNumberOfTypes();
-		myseq->length(mySeqLength);
-		const medGeometryElement * elemts = _support->getTypes();
-		for (int i=0;i<mySeqLength;i++)
-		{
-			myseq[i]=convertMedEltToIdlElt(elemts[i]);
-		}
-        }
-	catch (MEDEXCEPTION &ex)
+        if (_support==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+                                             SALOME::INTERNAL_ERROR);
+        SALOME_MED::medGeometryElement_array_var myseq = new SALOME_MED::medGeometryElement_array;
+        try
         {
-      		MESSAGE("Unable to access support different types");
-		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                int mySeqLength=_support->getNumberOfTypes();
+                myseq->length(mySeqLength);
+                const medGeometryElement * elemts = _support->getTypes();
+                for (int i=0;i<mySeqLength;i++)
+                {
+                        myseq[i]=convertMedEltToIdlElt(elemts[i]);
+                }
         }
-	return myseq._retn();
+        catch (MEDEXCEPTION &ex)
+        {
+                MESSAGE("Unable to access support different types");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
+        return myseq._retn();
 }
 
 //=============================================================================
@@ -391,18 +391,18 @@ throw (SALOME::SALOME_Exception)
   SCRUTE(geomElement);
   SCRUTE(SALOME_MED::MED_ALL_ELEMENTS);
 
-	if (_support==NULL)
-		THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
-				             SALOME::INTERNAL_ERROR);
+        if (_support==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+                                             SALOME::INTERNAL_ERROR);
         try
         {
-		return _support->getNumberOfElements(convertIdlEltToMedElt(geomElement));
-	}
-	catch (MEDEXCEPTION &ex)
+                return _support->getNumberOfElements(convertIdlEltToMedElt(geomElement));
+        }
+        catch (MEDEXCEPTION &ex)
         {
-      		MESSAGE("Unable to access the number of support different types");
-		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
-	}
+                MESSAGE("Unable to access the number of support different types");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+        }
 
 }
 
@@ -419,9 +419,9 @@ throw (SALOME::SALOME_Exception)
   SCRUTE(geomElement);
   SCRUTE(convertIdlEltToMedElt(geomElement));
 
-	if (_support==NULL)
-		THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
-				             SALOME::INTERNAL_ERROR);
+        if (_support==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+                                             SALOME::INTERNAL_ERROR);
         SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
         try
         {
@@ -439,11 +439,11 @@ SCRUTE(numbers[i]);
         }
         catch (MEDEXCEPTION &ex)
         {
-      		MESSAGE("Unable to access the support optionnal index");
-		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                MESSAGE("Unable to access the support optionnal index");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
         return myseq._retn();
-	
+        
 }
 
 //=============================================================================
@@ -458,9 +458,9 @@ throw (SALOME::SALOME_Exception)
   SCRUTE(geomElement);
   SCRUTE(convertIdlEltToMedElt(geomElement));
 
-	if (_support==NULL)
-		THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
-				             SALOME::INTERNAL_ERROR);
+        if (_support==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+                                             SALOME::INTERNAL_ERROR);
         SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
         try
         {
@@ -478,11 +478,11 @@ SCRUTE(numbers[i]);
         }
         catch (MEDEXCEPTION &ex)
         {
-      		MESSAGE("Unable to access the support optionnal index");
-		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                MESSAGE("Unable to access the support optionnal index");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
         return myseq._retn();
-	
+        
 }
 
 //=============================================================================
@@ -498,7 +498,7 @@ SALOME::SenderInt_ptr SUPPORT_i::getSenderForNumber(SALOME_MED::medGeometryEleme
   SCRUTE(convertIdlEltToMedElt(geomElement));
   if (_support==NULL)
     THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
-				 SALOME::INTERNAL_ERROR);
+                                 SALOME::INTERNAL_ERROR);
   SALOME::SenderInt_ptr ret;
   try
     {
@@ -512,7 +512,7 @@ SALOME::SenderInt_ptr SUPPORT_i::getSenderForNumber(SALOME_MED::medGeometryEleme
       THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
     }
   catch(MultiCommException &ex2)
-	  THROW_SALOME_CORBA_EXCEPTION(ex2.what(),SALOME::INTERNAL_ERROR);
+          THROW_SALOME_CORBA_EXCEPTION(ex2.what(),SALOME::INTERNAL_ERROR);
   return ret;
 }
 //=============================================================================
@@ -525,13 +525,13 @@ SALOME::SenderInt_ptr SUPPORT_i::getSenderForNumber(SALOME_MED::medGeometryEleme
 SALOME_MED::long_array *  SUPPORT_i::getNumberIndex()
 throw (SALOME::SALOME_Exception)
 {
-	if (_support==NULL)
-		THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
-				             SALOME::INTERNAL_ERROR);
+        if (_support==NULL)
+                THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
+                                             SALOME::INTERNAL_ERROR);
         SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
         try
         {
-		MESSAGE ("Nombre d'elements  mis de façon stupide a MED_ALL_ELEMENTS");
+                MESSAGE ("Nombre d'elements  mis de façon stupide a MED_ALL_ELEMENTS");
                 int nbelements=_support->getNumberOfElements(::MED_ALL_ELEMENTS);
                 myseq->length(nbelements);
                 const int * numbers=_support->getNumberIndex();
@@ -542,11 +542,11 @@ throw (SALOME::SALOME_Exception)
         }
         catch (MEDEXCEPTION &ex)
         {
-      		MESSAGE("Unable to access the support index");
-		THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                MESSAGE("Unable to access the support index");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
         return myseq._retn();
-	
+        
 }
 //=============================================================================
 /*!
@@ -559,7 +559,7 @@ SALOME::SenderInt_ptr SUPPORT_i::getSenderForNumberIndex()
 {
   if (_support==NULL)
     THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
-				 SALOME::INTERNAL_ERROR);
+                                 SALOME::INTERNAL_ERROR);
   SALOME::SenderInt_ptr ret;
   try
     {
@@ -574,7 +574,7 @@ SALOME::SenderInt_ptr SUPPORT_i::getSenderForNumberIndex()
       THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
     }
   catch(MultiCommException &ex2)
-	  THROW_SALOME_CORBA_EXCEPTION(ex2.what(),SALOME::INTERNAL_ERROR);
+          THROW_SALOME_CORBA_EXCEPTION(ex2.what(),SALOME::INTERNAL_ERROR);
   return ret;
 }
 //=============================================================================
@@ -613,7 +613,7 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   {
       MESSAGE("Support already in Study");
       THROW_SALOME_CORBA_EXCEPTION("Support already in Study", \
-				   SALOME::BAD_PARAM);
+                                   SALOME::BAD_PARAM);
   };
 
   if ( CORBA::is_nil(myStudy) )
@@ -655,7 +655,7 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
       if (isspace(meshNameStudy[pos])) meshNameStudy[pos] = '_';
     }
 
-		// seulement sous Med : il peut y avoir le meme sous SMESH !!!
+                // seulement sous Med : il peut y avoir le meme sous SMESH !!!
   SALOMEDS::SObject_var medsupportfather = myStudy->FindObject(meshName.c_str()); 
   if ( CORBA::is_nil(medsupportfather) ) 
     THROW_SALOME_CORBA_EXCEPTION("SObject Mesh in Support not Found",SALOME::INTERNAL_ERROR);

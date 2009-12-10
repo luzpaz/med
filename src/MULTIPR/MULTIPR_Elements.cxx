@@ -175,7 +175,7 @@ Elements* Elements::extractSubSet(const set<med_int>& pSetIndices) const
     for (int itElt = 0 ; itElt < subset->mNum && itSet != pSetIndices.end(); itElt++)
     {
         med_int srcIndex = (*itSet) - 1; // MED index start at 1
-		subset->mFamIdent[itElt] = mFamIdent[srcIndex]; 
+                subset->mFamIdent[itElt] = mFamIdent[srcIndex]; 
 
         med_int* srcCon = mCon + srcIndex * mNumNodesByElt;
         memcpy(destCon, srcCon, sizeof(med_int) * mNumNodesByElt);
@@ -279,7 +279,7 @@ set<med_int> Elements::getSetOfFamilies() const
 
 void Elements::remap() 
 {
-	int itNode, size;
+        int itNode, size;
     // build set of nodes if necessary
     if (mSetOfNodes.size() == 0)
     {
@@ -308,19 +308,19 @@ void Elements::remap()
 
 void Elements::remap(std::set<med_int>& pSetOfNodes)
 {
-	int itNode, size;
-	
-	// build the map for indices convertion
+        int itNode, size;
+        
+        // build the map for indices convertion
     map<med_int, med_int> mapOldIndexToNewIndex;
     med_int newIndex = 1; // MED index start at 1
-	itNode = 1;
+        itNode = 1;
     for (std::set<med_int>::iterator it = pSetOfNodes.begin(); it != pSetOfNodes.end(); ++it)
     {
         med_int oldIndex = *it;
         mapOldIndexToNewIndex.insert(make_pair(oldIndex, itNode));
-		++itNode;
+                ++itNode;
     }
-	// for each node referenced by this set of elements
+        // for each node referenced by this set of elements
     for (itNode = 0, size = mNum * mNumNodesByElt ; itNode < size ; itNode++)
     {
         // convert old index to new index (remap).

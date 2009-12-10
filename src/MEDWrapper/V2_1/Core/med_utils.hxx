@@ -51,11 +51,11 @@
 /* --- Pour afficher le nom du fichier source courant et le numero de la ligne courante --- */
 /* --- sur la stderr.                                                                   --- */
 
-# define ICI			{\
-					fflush(stdout);\
-					fprintf(stderr, "%s [%d] : " , __FILE__ , __LINE__ ) ;\
-					fflush(stderr) ;\
-				}
+# define ICI                    {\
+                                        fflush(stdout);\
+                                        fprintf(stderr, "%s [%d] : " , __FILE__ , __LINE__ ) ;\
+                                        fflush(stderr) ;\
+                                }
 
 
 
@@ -69,14 +69,14 @@
 # ifdef INFOS_COMPILATION
 # error INFOS_COMPILATION already defined
 # endif
-# define INFOS_COMPILATION	{\
-					fflush(stderr);\
-					fprintf(stdout, "%s [%d] : " , __FILE__ , __LINE__ ) ;\
-					fprintf(stdout,"Compilation le %s" , __DATE__);\
-					fprintf(stdout," a %s" , __TIME__ );\
-					fprintf(stdout,"\n\n\n" );\
-					fflush(stdout) ;\
-				}
+# define INFOS_COMPILATION      {\
+                                        fflush(stderr);\
+                                        fprintf(stdout, "%s [%d] : " , __FILE__ , __LINE__ ) ;\
+                                        fprintf(stdout,"Compilation le %s" , __DATE__);\
+                                        fprintf(stdout," a %s" , __TIME__ );\
+                                        fprintf(stdout,"\n\n\n" );\
+                                        fflush(stdout) ;\
+                                }
 
 
 
@@ -90,14 +90,14 @@
 # ifdef ATTENTE
 # error ATTENTE already defined
 # endif
-# define ATTENTE(secondes)	{\
-					ICI ;\
-					fprintf( stderr, "ATTENTE de %d secondes" , secondes);\
-					fflush(stderr) ;\
-					sleep(secondes) ;\
-					fprintf( stderr, "\n" );\
-					fflush(stderr) ;\
-				}
+# define ATTENTE(secondes)      {\
+                                        ICI ;\
+                                        fprintf( stderr, "ATTENTE de %d secondes" , secondes);\
+                                        fflush(stderr) ;\
+                                        sleep(secondes) ;\
+                                        fprintf( stderr, "\n" );\
+                                        fflush(stderr) ;\
+                                }
 
 
 
@@ -141,15 +141,15 @@
 
 /* --- Pour tracer sur la stderr l'execution d"une instruction.                         --- */
 
-# define EXECUTION(instruction)	{\
-					ICI ;\
-					fprintf( stderr,"INSTRUCTION %s" , #instruction ) ;\
-					fflush(stderr);\
-					instruction ;\
-					fflush(stdout);\
-					fprintf( stderr," FRANCHIE\n" ) ;\
-					fflush(stderr);\
-				}
+# define EXECUTION(instruction) {\
+                                        ICI ;\
+                                        fprintf( stderr,"INSTRUCTION %s" , #instruction ) ;\
+                                        fflush(stderr);\
+                                        instruction ;\
+                                        fflush(stdout);\
+                                        fprintf( stderr," FRANCHIE\n" ) ;\
+                                        fflush(stderr);\
+                                }
 
 
 
@@ -160,12 +160,12 @@
 /* --- Pour afficher un message d'interruption volontaire et retourner le code retour   --- */
 /* --- "code"                                                                           --- */
 
-# define INTERRUPTION(code)	{\
-					ICI ;\
-					fprintf( stderr," INTERRUPTION code = %d",code) ;\
-					fprintf(stderr,"\n") ;\
-					exit(code) ;\
-				}
+# define INTERRUPTION(code)     {\
+                                        ICI ;\
+                                        fprintf( stderr," INTERRUPTION code = %d",code) ;\
+                                        fprintf(stderr,"\n") ;\
+                                        exit(code) ;\
+                                }
 
 
 
@@ -177,12 +177,12 @@
 /* --- "condiiton".                                                                     --- */
 
 # ifndef ASSERT
-# define ASSERT(condition)	if( !(condition) ){\
-					ICI ;\
-					fprintf(stderr,"condition %s VIOLEE\n",#condition);\
-					INTERRUPTION(17);\
-				}
-# endif		/* # ifndef ASSERT */
+# define ASSERT(condition)      if( !(condition) ){\
+                                        ICI ;\
+                                        fprintf(stderr,"condition %s VIOLEE\n",#condition);\
+                                        INTERRUPTION(17);\
+                                }
+# endif         /* # ifndef ASSERT */
 
 
 
@@ -192,50 +192,50 @@
 
 /* --- Pour afficher sur la stderr la valeur d'une variable precedee de son nom.        --- */
 
-# define ISCRUTE(entier)	{\
-					ICI ;\
-					fprintf(stderr,"%s = %d\n",#entier,entier) ;\
-					fflush(stderr) ;\
-				}
-# define RSCRUTE(reel)		{\
-					ICI ;\
-					fprintf(stderr,"%s = %f\n",#reel,reel) ;\
-					fflush(stderr) ;\
-				}
-# define XSCRUTE(pointeur)		{\
-					ICI ;\
-					fprintf(stderr,"%s = %x\n",#pointeur,pointeur) ;\
-					fflush(stderr) ;\
-				}
-# define CSCRUTE(car)		{\
-					ICI ;\
-					fprintf(stderr,"%s = %c\n",#car,car) ;\
-					fflush(stderr) ;\
-				}
-# define SSCRUTE(chaine)	{\
-					ICI ;\
-					fprintf(stderr,"%s = \"%s\"\n",#chaine,chaine) ;\
-					fflush(stderr) ;\
-				}
-# define MESSAGE(chaine)	{\
-					ICI ;\
-					fprintf(stderr,"%s\n",chaine) ;\
-					fflush(stderr) ;\
-				}
-# define FIN(nom)		{\
-					ICI ;\
-					fprintf( stderr , "} FIN %s\n\n\n" , nom ) ;\
-					fflush(stderr) ;\
-				}
-# define DEBUT(nom)		{\
-					fprintf( stderr , "\n\n\n") ;\
-					ICI ;\
-					fprintf( stderr , "{ DEBUT %s\n" , nom ) ;\
-					fflush(stderr) ;\
-				}
+# define ISCRUTE(entier)        {\
+                                        ICI ;\
+                                        fprintf(stderr,"%s = %d\n",#entier,entier) ;\
+                                        fflush(stderr) ;\
+                                }
+# define RSCRUTE(reel)          {\
+                                        ICI ;\
+                                        fprintf(stderr,"%s = %f\n",#reel,reel) ;\
+                                        fflush(stderr) ;\
+                                }
+# define XSCRUTE(pointeur)              {\
+                                        ICI ;\
+                                        fprintf(stderr,"%s = %x\n",#pointeur,pointeur) ;\
+                                        fflush(stderr) ;\
+                                }
+# define CSCRUTE(car)           {\
+                                        ICI ;\
+                                        fprintf(stderr,"%s = %c\n",#car,car) ;\
+                                        fflush(stderr) ;\
+                                }
+# define SSCRUTE(chaine)        {\
+                                        ICI ;\
+                                        fprintf(stderr,"%s = \"%s\"\n",#chaine,chaine) ;\
+                                        fflush(stderr) ;\
+                                }
+# define MESSAGE(chaine)        {\
+                                        ICI ;\
+                                        fprintf(stderr,"%s\n",chaine) ;\
+                                        fflush(stderr) ;\
+                                }
+# define FIN(nom)               {\
+                                        ICI ;\
+                                        fprintf( stderr , "} FIN %s\n\n\n" , nom ) ;\
+                                        fflush(stderr) ;\
+                                }
+# define DEBUT(nom)             {\
+                                        fprintf( stderr , "\n\n\n") ;\
+                                        ICI ;\
+                                        fprintf( stderr , "{ DEBUT %s\n" , nom ) ;\
+                                        fflush(stderr) ;\
+                                }
 
 
-# else		/* # ifdef _DEBOG_ */
+# else          /* # ifdef _DEBOG_ */
 
 
 
@@ -255,7 +255,7 @@
 # define FIN(nom)
  
 
-# endif		/* # ifdef _DEBOG_ */
+# endif         /* # ifdef _DEBOG_ */
 
 
-# endif		/* # ifndef __UTILITES_H__ */
+# endif         /* # ifndef __UTILITES_H__ */

@@ -114,7 +114,7 @@ void decimePartition(
     const char* fieldName,
     int         fieldIt,
     const char* filterName,
-    const char*	filterParams);
+    const char* filterParams);
 
     
 /**

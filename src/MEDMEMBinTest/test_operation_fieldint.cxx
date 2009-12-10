@@ -93,11 +93,11 @@ void affiche_fieldT(FIELD<int> * myField, const SUPPORT * mySupport)
   try
   {
       for (int i=1; i<=myField->getNumberOfComponents(); ++i)
-	    std::cout << "Norme L2 - comp=" << i << " : " << myField->normL2(i) << endl;
+            std::cout << "Norme L2 - comp=" << i << " : " << myField->normL2(i) << endl;
       std::cout << "Norme L2          : " << myField->normL2() << endl;
 
       for (int i=1; i<=myField->getNumberOfComponents(); ++i)
-	    std::cout << "Norme L1 - comp=" << i << " : " << myField->normL1(i) << endl;
+            std::cout << "Norme L1 - comp=" << i << " : " << myField->normL1(i) << endl;
       std::cout << "Norme L1          : " << myField->normL1() << endl;
   }
   catch (MEDEXCEPTION &ex)
@@ -111,16 +111,16 @@ void affiche_valeur_field(const char * intitule, const int taille, const FIELD<i
     const int * value=f.getValue();
     std::cout << endl << intitule;
     for(int i=0;i<taille;i++)
- 	std::cout << setw(3) << value[i] << " ";
+        std::cout << setw(3) << value[i] << " ";
 }
 
 int main (int argc, char ** argv)
 {
     if (argc != 4) 
     {
-	cerr << "Usage : " << argv[0] 
-	<< " filename meshname fieldname" << endl << endl;
-	exit(-1);
+        cerr << "Usage : " << argv[0] 
+        << " filename meshname fieldname" << endl << endl;
+        exit(-1);
     }
     string filename = argv[1] ;
     string meshname = argv[2] ;
@@ -131,31 +131,31 @@ int main (int argc, char ** argv)
     FIELD<int> * myField1;
     try
     {
-	/* read MESH, SUPPORT and FIELD */
-	mySupport = new SUPPORT(myMesh,"Support on all Cells",MED_CELL);
-	myField1 = new FIELD<int>(mySupport,MED_DRIVER,filename,fieldname) ;
+        /* read MESH, SUPPORT and FIELD */
+        mySupport = new SUPPORT(myMesh,"Support on all Cells",MED_CELL);
+        myField1 = new FIELD<int>(mySupport,MED_DRIVER,filename,fieldname) ;
     }
     catch (MEDEXCEPTION &ex)
     {
-	delete mySupport ;
-	mySupport = new SUPPORT(myMesh,"On_all_node",MED_NODE);
-	try 
-	{
-	    myField1 = new FIELD<int>(mySupport,MED_DRIVER,filename,fieldname) ;
-	    myField1->setValueIJ(10,1,-9); // pour tester les normes max avec une valeur negative
-	}
-	catch (...) 
-	{
-	    cout << "Field int " << fieldname << " not found !!!" << endl ;
-	    exit (-1) ;
-	}
+        delete mySupport ;
+        mySupport = new SUPPORT(myMesh,"On_all_node",MED_NODE);
+        try 
+        {
+            myField1 = new FIELD<int>(mySupport,MED_DRIVER,filename,fieldname) ;
+            myField1->setValueIJ(10,1,-9); // pour tester les normes max avec une valeur negative
+        }
+        catch (...) 
+        {
+            cout << "Field int " << fieldname << " not found !!!" << endl ;
+            exit (-1) ;
+        }
     }
 
     FIELD<int> * myField2 = new FIELD<int>(* myField1);
     //myField1->setNumberOfValues(16); // PROVISOIRE !! BUG
     //myField2->setNumberOfValues(16); // PROVISOIRE !! BUG
-//	FIELD<int>* myField1_vol=myField1->getSupport()->getMesh()->getVolume(myField1->getSupport());
-//	affiche_fieldT(myField1_vol, myField1->getSupport());
+//      FIELD<int>* myField1_vol=myField1->getSupport()->getMesh()->getVolume(myField1->getSupport());
+//      affiche_fieldT(myField1_vol, myField1->getSupport());
 
     affiche_fieldT(myField1, myField1->getSupport());
     std::cout <<  endl << string(60,'-') << endl;
@@ -168,14 +168,14 @@ int main (int argc, char ** argv)
     myField1->setMEDComponentUnit(1,string("UniteBidon"));
     try
     {
-	std::cout << endl << string(60,'-') << endl;
-	std::cout<< "Test incompatibilité d'unité :" << endl;
-	FIELD<int> myFieldPlus = *myField1 + *myField2;
+        std::cout << endl << string(60,'-') << endl;
+        std::cout<< "Test incompatibilité d'unité :" << endl;
+        FIELD<int> myFieldPlus = *myField1 + *myField2;
     }
     catch (MEDEXCEPTION & ex)
     {
-	std::cout << "MEDEXCEPTION : " << ex.what() << endl;
-	myField1->setMEDComponentUnit(1,unite);
+        std::cout << "MEDEXCEPTION : " << ex.what() << endl;
+        myField1->setMEDComponentUnit(1,unite);
     }
 
     // numberOfComponents non compatibles
@@ -183,14 +183,14 @@ int main (int argc, char ** argv)
     myField1->setNumberOfComponents(4);
     try
     {
-	std::cout << endl << string(60,'-') << endl;
-	std::cout<< "Test incompatibilité nombre de composantes :" << endl;
-	FIELD<int> myFieldPlus = *myField1 + *myField2;
+        std::cout << endl << string(60,'-') << endl;
+        std::cout<< "Test incompatibilité nombre de composantes :" << endl;
+        FIELD<int> myFieldPlus = *myField1 + *myField2;
     }
     catch (MEDEXCEPTION & ex)
     {
-	std::cout << ex.what() << endl;
-	myField1->setNumberOfComponents(numberOfComponents);
+        std::cout << ex.what() << endl;
+        myField1->setNumberOfComponents(numberOfComponents);
     }
 
     // supports non compatibles
@@ -198,14 +198,14 @@ int main (int argc, char ** argv)
     myField1->setSupport(&mySupport2);
     try
     {
-	std::cout << endl << string(60,'-') << endl;
-	std::cout<< "Test incompatibilité des supports :" << endl;
-	FIELD<int> myFieldPlus = *myField1 + *myField2;
+        std::cout << endl << string(60,'-') << endl;
+        std::cout<< "Test incompatibilité des supports :" << endl;
+        FIELD<int> myFieldPlus = *myField1 + *myField2;
     }
     catch (MEDEXCEPTION & ex)
     {
-	std::cout << ex.what() << endl;
-	myField1->setSupport( myField2->getSupport() );
+        std::cout << ex.what() << endl;
+        myField1->setSupport( myField2->getSupport() );
     }
 
     // champs de taille nulle
@@ -213,23 +213,23 @@ int main (int argc, char ** argv)
     myField2->setNumberOfComponents(0);
     try
     {
-	std::cout << endl << string(60,'-') << endl;
-	std::cout<< "Test incompatibilité taille nulle :" << endl;
-	FIELD<int> myFieldPlus = *myField1 + *myField2;
+        std::cout << endl << string(60,'-') << endl;
+        std::cout<< "Test incompatibilité taille nulle :" << endl;
+        FIELD<int> myFieldPlus = *myField1 + *myField2;
     }
     catch (MEDEXCEPTION & ex)
     {
-	std::cout << ex.what() << endl;
+        std::cout << ex.what() << endl;
     }
     try
     {
-	myField1->norm2();
+        myField1->norm2();
     }
     catch (MEDEXCEPTION & ex)
     {
-	std::cout << ex.what() << endl;
-	myField1->setNumberOfComponents(numberOfComponents);
-	myField2->setNumberOfComponents(numberOfComponents);
+        std::cout << ex.what() << endl;
+        myField1->setNumberOfComponents(numberOfComponents);
+        myField2->setNumberOfComponents(numberOfComponents);
     }
 
     // Apres toutes ces exceptions, des opérations qui marchent!

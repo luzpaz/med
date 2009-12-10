@@ -372,7 +372,7 @@ void multipr::getListScalarFields(const char* pMEDfilename, vector<pair<string, 
         // add the pair(name, #time stamps) to the result
         pFields.push_back(make_pair(name, numTimeStamps));
     }
-	
+        
     //---------------------------------------------------------------------
     // Close the MED file
     //---------------------------------------------------------------------

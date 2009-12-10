@@ -45,19 +45,19 @@ _MEDnomGeometrie(char *nom_geo,med_geometrie_element type_geo)
      case MED_SEG2 :
        strcpy(nom_geo,MED_NOM_SE2);
        break;
-	   
+           
      case MED_SEG3 :
        strcpy(nom_geo,MED_NOM_SE3);
        break;
-	   
+           
      case MED_TRIA3 :
        strcpy(nom_geo,MED_NOM_TR3);
        break;
-	   
+           
      case MED_TRIA6 :
        strcpy(nom_geo,MED_NOM_TR6);
        break;
-	   
+           
      case MED_QUAD4 :
        strcpy(nom_geo,MED_NOM_QU4);
        break;
@@ -100,7 +100,7 @@ _MEDnomGeometrie(char *nom_geo,med_geometrie_element type_geo)
 
      default :
        return -1;
-	 }
+         }
    
    return 0;
 } 

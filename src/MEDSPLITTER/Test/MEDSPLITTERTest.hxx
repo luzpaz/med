@@ -42,7 +42,7 @@ class MEDSPLITTERTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testParallelTopology_graph_constructor);
   CPPUNIT_TEST( testMESHCollection_complete_sequence);
   CPPUNIT_TEST( testMESHCollection_complete_sequence_with_polygon);
-	CPPUNIT_TEST( testMESHCollection_families);
+        CPPUNIT_TEST( testMESHCollection_families);
 //  CPPUNIT_TEST( testMESHCollection_complete_sequence_with_polyhedra);
   CPPUNIT_TEST_SUITE_END();
 
@@ -61,7 +61,7 @@ public:
   void testMESHCollection_complete_sequence();
   void testMESHCollection_complete_sequence_with_polygon();
   void testMESHCollection_complete_sequence_with_polyhedra();
-	void testMESHCollection_families();
+        void testMESHCollection_families();
   void testParallelTopology_graph_constructor();
     
   std::string getResourceFile( const std::string& );

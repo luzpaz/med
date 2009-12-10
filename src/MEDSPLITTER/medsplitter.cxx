@@ -57,8 +57,8 @@ int main(int argc, char** argv)
   bool is_sequential = true;
   bool xml_output_master=true;
   bool creates_boundary_faces=false;  
-	bool split_families=false;
-	bool empty_groups=false;
+        bool split_families=false;
+        bool empty_groups=false;
 
   string input;
   string output;
@@ -86,8 +86,8 @@ int main(int argc, char** argv)
     ("ndomains",po::value<int>(&ndomains)->default_value(1),"number of subdomains in the output file")
     ("plain-master","creates a plain masterfile instead of an XML file")
     ("creates-boundary-faces","creates the necessary faces so that faces joints are created in the output files")
-		("family-splitting","preserves the family names instead of focusing on the groups")
-		("empty-groups","creates empty groups in zones that do not contain a group from the original domain");
+                ("family-splitting","preserves the family names instead of focusing on the groups")
+                ("empty-groups","creates empty groups in zones that do not contain a group from the original domain");
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc,argv,desc),vm);
@@ -136,11 +136,11 @@ int main(int argc, char** argv)
   if (vm.count("creates-boundary-faces"))
     creates_boundary_faces=true;
 
-	if (vm.count("split-families"))
-		split_families=true;
+        if (vm.count("split-families"))
+                split_families=true;
 
-	if (vm.count("empty-groups"))
-		empty_groups=true;
+        if (vm.count("empty-groups"))
+                empty_groups=true;
 
 #else // BOOST_PROGRAM_OPTIONS_LIB
 
@@ -161,7 +161,7 @@ int main(int argc, char** argv)
 #endif
                "\t--plain-master         : creates a plain masterfile instead of an XML file\n"
                "\t--creates-boundary-faces: creates the necessary faces so that faces joints are created in the output files\n"
-							 "\t--family-splitting       : preserves the family names instead of focusing on the groups\n"
+                                                         "\t--family-splitting       : preserves the family names instead of focusing on the groups\n"
                );
 
   if (argc < 4) {
@@ -207,9 +207,9 @@ int main(int argc, char** argv)
         cout << "\tsplit-method = " << library << endl; // tmp
       }
     }
-		else if (strncmp(argv[i],"--f",3) == 0) { //"--family-splitting"
-			split_families=true;
-			cout << "\tfamily-splitting true" << endl; // tmp
+                else if (strncmp(argv[i],"--f",3) == 0) { //"--family-splitting"
+                        split_families=true;
+                        cout << "\tfamily-splitting true" << endl; // tmp
     }
     else if (strncmp(argv[i],"--n",3) == 0) {
       if (strlen(argv[i]) > 11) { // "--ndomains="
@@ -225,7 +225,7 @@ int main(int argc, char** argv)
       creates_boundary_faces = true;
       cout << "\tcreates_boundary_faces = " << creates_boundary_faces << endl; // tmp
     }
-		else if (strncmp(argv[i],"--e",3) == 0) { // "--empty-groups"
+                else if (strncmp(argv[i],"--e",3) == 0) { // "--empty-groups"
       empty_groups = true;
       cout << "\tempty_groups = true" << endl; // tmp
     }
@@ -267,7 +267,7 @@ int main(int argc, char** argv)
 
   cout << "MEDSPLITTER - computing partition "<<endl;
 
-  // Creating the graph and partitioning it	  
+  // Creating the graph and partitioning it       
 #ifdef ENABLE_METIS
 #ifndef ENABLE_SCOTCH
   library = "metis";
@@ -287,11 +287,11 @@ int main(int argc, char** argv)
 
   // Creating a new mesh collection from the partitioning
   MEDSPLITTER::MESHCollection new_collection(*collection, new_topo, split_families, empty_groups);
-	if (mesh_only)
-		{
-			delete collection;
-			collection=0;
-		}
+        if (mesh_only)
+                {
+                        delete collection;
+                        collection=0;
+                }
 
   if (!xml_output_master)
     new_collection.setDriverType(MEDSPLITTER::MedAscii);
@@ -305,7 +305,7 @@ int main(int argc, char** argv)
   if (!mesh_only)
     new_collection.castAllFields(*collection);
 
-	
+        
   // Cleaning memory
   delete collection;
   delete new_topo;

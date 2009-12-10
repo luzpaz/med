@@ -28,8 +28,8 @@ namespace med_2_1{
 
 med_err 
 MEDconnEcr(med_idt fid,char *maa, med_int mdim, med_int *connectivite,med_mode_switch mode_switch,
-	   med_int nbre,med_mode_acces mode,med_entite_maillage type_ent,
-	   med_geometrie_element type_geo,med_connectivite type_conn)
+           med_int nbre,med_mode_acces mode,med_entite_maillage type_ent,
+           med_geometrie_element type_geo,med_connectivite type_conn)
 {
   med_idt maaid, entid, geoid, dataset;
   med_err ret;
@@ -108,11 +108,11 @@ MEDconnEcr(med_idt fid,char *maa, med_int mdim, med_int *connectivite,med_mode_s
    dimd[0] = nbre*taille;
 #if defined(HAVE_F77INT64)
    if ((ret = _MEDdatasetNumEcrire(geoid,nom_dataset,MED_INT64,mode_switch,(med_size)taille,MED_ALL,MED_NOPF,0,MED_NOPG,dimd,
-				    (unsigned char*) connectivite,mode)) < 0)
+                                    (unsigned char*) connectivite,mode)) < 0)
      return -1;
 #else
    if ((ret = _MEDdatasetNumEcrire(geoid,nom_dataset,MED_INT32,mode_switch,(med_size)taille,MED_ALL,MED_NOPF,0,MED_NOPG,dimd,
-				    (unsigned char*) connectivite,mode)) < 0)
+                                    (unsigned char*) connectivite,mode)) < 0)
      return -1;
 #endif
 

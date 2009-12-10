@@ -28,8 +28,8 @@ namespace med_2_1{
 
 med_err 
 MEDcoordLire(med_idt fid, char *maa, med_int mdim, med_float *coo,
-	     med_mode_switch mode_coo,med_int numco,
-	     med_int * pfltabtmp, med_size psize, med_repere *type_rep, char *nom, char *unit)
+             med_mode_switch mode_coo,med_int numco,
+             med_int * pfltabtmp, med_size psize, med_repere *type_rep, char *nom, char *unit)
 {
   med_idt   maaid, noeid, dataset;
   med_err   ret;
@@ -71,9 +71,9 @@ MEDcoordLire(med_idt fid, char *maa, med_int mdim, med_float *coo,
    * Lecture du Data Set "COO"
    */
   if ((ret = _MEDdatasetNumLire(noeid,MED_NOM_COO,MED_REEL64,
-				mode_coo,mdim,numco,
-				psize,pfltab,MED_NOPG,
-				(unsigned char*) coo)) < 0)
+                                mode_coo,mdim,numco,
+                                psize,pfltab,MED_NOPG,
+                                (unsigned char*) coo)) < 0)
     return -1;
 
   
@@ -96,14 +96,14 @@ MEDcoordLire(med_idt fid, char *maa, med_int mdim, med_float *coo,
    * Attribut "NOM"
    */
   if ((ret = _MEDattrStringLire(dataset,MED_NOM_NOM,mdim*MED_TAILLE_PNOM,
-				nom)) < 0)
+                                nom)) < 0)
     return -1;
 
   /*
    * Attribut "UNI"
    */
   if ((ret = _MEDattrStringLire(dataset,MED_NOM_UNI,mdim*MED_TAILLE_PNOM,
-				unit)) < 0)
+                                unit)) < 0)
     return -1;
 
   /*

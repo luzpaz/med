@@ -99,7 +99,7 @@ int main()
   addMedFacesGroup(*pmesh,1,&bottom,NomBottom);
   int id = pmesh->addDriver(MED_DRIVER, "coeur.med", pmesh->getName());
   pmesh->write(id) ;
-	pmesh->rmDriver(id);
+        pmesh->rmDriver(id);
   delete pmesh;
   //
   

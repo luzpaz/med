@@ -25,7 +25,7 @@ namespace med_2_1{
 
 med_err 
 MEDbodyFittedLire(med_idt fid, char *maa, med_int mdim, med_float *coo, med_mode_switch mode_coo,
-		  med_repere *repere, char *nomcoo, char *unicoo, med_int *fam, med_int nnoeuds )
+                  med_repere *repere, char *nomcoo, char *unicoo, med_int *fam, med_int nnoeuds )
 {
     med_idt maaid, noeid, dataset;
     char    chemin[MED_TAILLE_MAA+MED_TAILLE_NOM+1];

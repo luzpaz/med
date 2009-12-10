@@ -30,7 +30,7 @@ using namespace MEDMEM;
 //=============================================================================
 
 GROUPClient::GROUPClient(const SALOME_MED::GROUP_ptr G,
-			 MESH * M) 
+                         MESH * M) 
   : SUPPORTClient(G, M),
     GROUP(),
     IOR_Group(SALOME_MED::GROUP::_duplicate(G))

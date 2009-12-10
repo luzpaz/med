@@ -76,16 +76,16 @@ private:
 public:
   //Med_Gen_i();
   Med_Gen_i(CORBA::ORB_ptr orb,
-	    PortableServer::POA_ptr poa,
-	    PortableServer::ObjectId * contId,
-	    const char *instanceName,
-	    const char *interfaceName);
+            PortableServer::POA_ptr poa,
+            PortableServer::ObjectId * contId,
+            const char *instanceName,
+            const char *interfaceName);
   virtual ~Med_Gen_i();
 
   //
   SALOME_MED::MESH_ptr readMeshInFile(const char* fileName,
-				      const char* studyName,
-				      const char* meshName)
+                                      const char* studyName,
+                                      const char* meshName)
     throw(SALOME::SALOME_Exception);
 
   SALOME_MED::FIELD_ptr readFieldInFile(const char* fileName,
@@ -100,7 +100,7 @@ public:
     throw(SALOME::SALOME_Exception);
 
   void    readStructFileWithFieldType(const char* fileName,
-				      const char* studyName)
+                                      const char* studyName)
     throw(SALOME::SALOME_Exception);
 
   // Get last created instance of the class

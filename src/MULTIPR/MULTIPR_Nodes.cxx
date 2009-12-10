@@ -179,7 +179,7 @@ Nodes* Nodes::extractSubSet(const set<med_int>& pSetIndices) const
     {
         
         med_int srcIndex = (*itSet) - 1; // MED index start at 1
-		subset->mFamIdent[i] = mFamIdent[srcIndex];
+                subset->mFamIdent[i] = mFamIdent[srcIndex];
         med_float* srcCoo = mCoo + srcIndex * mDim;
         med_float* destCoo = subset->mCoo + i * subset->mDim;
         for (int itDim = 0 ; itDim < mDim ; itDim++)

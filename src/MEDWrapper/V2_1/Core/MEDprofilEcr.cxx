@@ -67,11 +67,11 @@ MEDprofilEcr(med_idt fid,med_int *pflval,med_int n,char *nom)
   dimd[0] = n;
 #if defined(HAVE_F77INT64)
   if ((ret =  _MEDdatasetNumEcrire(pid,MED_NOM_PFL,MED_INT64,MED_NO_INTERLACE,MED_DIM1,MED_ALL,MED_NOPF,0,MED_NOPG,dimd,
-				(unsigned char*) pflval,MED_REMP)) < 0)
+                                (unsigned char*) pflval,MED_REMP)) < 0)
     return -1;
 #else
   if ((ret =  _MEDdatasetNumEcrire(pid,MED_NOM_PFL,MED_INT32,MED_NO_INTERLACE,MED_DIM1,MED_ALL,MED_NOPF,0,MED_NOPG,dimd,
-				(unsigned char*) pflval,MED_REMP)) < 0)
+                                (unsigned char*) pflval,MED_REMP)) < 0)
     return -1;
 #endif
 

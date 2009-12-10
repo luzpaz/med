@@ -52,7 +52,7 @@
 
 namespace MEDMEM {
 class MEDMEM_I_EXPORT FIELD_i: public virtual POA_SALOME_MED::FIELD,
-	       public SALOME::GenericObj_i
+               public SALOME::GenericObj_i
 {
 public :
         static map < int, ::MEDMEM::FIELD_ * > fieldMap ;
@@ -64,7 +64,7 @@ protected :
     // are protected because it is not supposed to be instancied
 
     ::MEDMEM::FIELD_ * const  _fieldTptr;
-    const int	_corbaIndex;
+    const int   _corbaIndex;
     string  _FieldId;
     FIELD_i();
     FIELD_i(MEDMEM::FIELD_ * const field, bool ownCppPtr);
@@ -74,22 +74,22 @@ public :
     // Associated internal methods
     ~FIELD_i();
 
-    char *   		    getName() 	     throw (SALOME::SALOME_Exception);
+    char *                  getName()        throw (SALOME::SALOME_Exception);
     void                    setName(const char* theName)
-					     throw (SALOME::SALOME_Exception);
+                                             throw (SALOME::SALOME_Exception);
 
-    char *   		    getDescription() throw (SALOME::SALOME_Exception);
+    char *                  getDescription() throw (SALOME::SALOME_Exception);
     SALOME_MED::SUPPORT_ptr getSupport()     throw (SALOME::SALOME_Exception);
-    CORBA::Long             getNumberOfComponents()   	   
-					     throw (SALOME::SALOME_Exception);
+    CORBA::Long             getNumberOfComponents()        
+                                             throw (SALOME::SALOME_Exception);
     char *                  getComponentName(CORBA::Long i)   
-					     throw (SALOME::SALOME_Exception);
+                                             throw (SALOME::SALOME_Exception);
     char *                  getComponentUnit(CORBA::Long i)   
-					     throw (SALOME::SALOME_Exception);
+                                             throw (SALOME::SALOME_Exception);
     char *                  getComponentDescription(CORBA::Long i)   
-					     throw (SALOME::SALOME_Exception);
-    CORBA::Long             getIterationNumber()   	       
-					     throw (SALOME::SALOME_Exception);
+                                             throw (SALOME::SALOME_Exception);
+    CORBA::Long             getIterationNumber()               
+                                             throw (SALOME::SALOME_Exception);
     CORBA::Long             getOrderNumber() throw (SALOME::SALOME_Exception);
     CORBA::Boolean getGaussPresence();
     CORBA::Double           getTime()        throw (SALOME::SALOME_Exception);
@@ -110,12 +110,12 @@ public :
                                       SALOMEDS::StudyBuilder::LockProtection);
 
     CORBA::Long addDriver (SALOME_MED::medDriverTypes driverType, 
-			   const char* fileName, const char* fieldName)
-                    	                  throw (SALOME::SALOME_Exception);
+                           const char* fileName, const char* fieldName)
+                                          throw (SALOME::SALOME_Exception);
     void        rmDriver  (CORBA::Long i) throw (SALOME::SALOME_Exception);
     void        read      (CORBA::Long i) throw (SALOME::SALOME_Exception);
     void        write     (CORBA::Long i, const char* driverFieldName)
-                    		          throw (SALOME::SALOME_Exception);
+                                          throw (SALOME::SALOME_Exception);
     // Cuisine Interne
     MEDMEM::FIELD_ * constructConstField() const;
 

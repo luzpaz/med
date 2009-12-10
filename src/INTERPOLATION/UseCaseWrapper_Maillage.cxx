@@ -49,12 +49,12 @@ int nbr_mailles = maillage->DONNE_POINTEUR_NUAGEMAILLE()->SIZE();
 int nbr_faces;
 
 for (i=0;i<nbr_mailles;i++)
-	{
-	cout<<"Voisins de la maille "<<i<<" : "<<flush;
-	nbr_faces=maillage->DONNE_NBR_FACES_MAILLE(i); 
-	for (j=0;j<nbr_faces;j++) cout<<"["<<maillage->DONNE_VOISIN_DE_MAILLE(i,j)<<"]-("<<maillage->EST_AU_BORD_FACE_DE_MAILLE(i,j)<<") "<<flush;
-	cout<<endl;
-	}
+        {
+        cout<<"Voisins de la maille "<<i<<" : "<<flush;
+        nbr_faces=maillage->DONNE_NBR_FACES_MAILLE(i); 
+        for (j=0;j<nbr_faces;j++) cout<<"["<<maillage->DONNE_VOISIN_DE_MAILLE(i,j)<<"]-("<<maillage->EST_AU_BORD_FACE_DE_MAILLE(i,j)<<") "<<flush;
+        cout<<endl;
+        }
 
 }
 

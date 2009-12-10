@@ -43,38 +43,38 @@
 class Wrapper_Med_Connectivity
 {
 protected :
-	int * mailles;
-	int nbr_mailles;
-	vector<int> types;
-	vector< int* > premier_pointeur;
-	
-public :	
-	~Wrapper_Med_Connectivity() {if (mailles) delete [] mailles;}
-	Wrapper_Med_Connectivity():mailles(NULL) {}
-	Wrapper_Med_Connectivity(MEDMEM::CONNECTIVITY * maillesmed)
-		{
-		const int * tab_sommets_mailles=maillesmed->getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
-		const int * med_index=maillesmed->getValueIndex(MED_EN::MED_FULL_INTERLACE);
-		nbr_mailles=maillesmed->getNumberOf(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
-		int size=med_index[nbr_mailles]-med_index[0];
-		types.resize(nbr_mailles);
-		premier_pointeur.resize(nbr_mailles);
-		mailles=new int[size];
-		int i;
-		for (i=0;i<size;i++) 
-			{
-			mailles[i]=tab_sommets_mailles[i]-1;
-			}
-		for (i=0;i<nbr_mailles;i++)
-			{
-			types[i]=maillesmed->getElementType(MED_EN::MED_CELL,i+1); // A VERIFIER : le +1
-			premier_pointeur[i]=&mailles[med_index[i]-1]; // A VERIFIER : la formule
-			}
-		}
-	// Méthodes de la politique
-	inline int SIZE() {return nbr_mailles;}
-	inline int DONNE_TYPE_MAILLE(int i) {return types[i];}
-	inline int * DONNE_PREMIER_POINTEUR(int i) {return premier_pointeur[i];}
+        int * mailles;
+        int nbr_mailles;
+        vector<int> types;
+        vector< int* > premier_pointeur;
+        
+public :        
+        ~Wrapper_Med_Connectivity() {if (mailles) delete [] mailles;}
+        Wrapper_Med_Connectivity():mailles(NULL) {}
+        Wrapper_Med_Connectivity(MEDMEM::CONNECTIVITY * maillesmed)
+                {
+                const int * tab_sommets_mailles=maillesmed->getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
+                const int * med_index=maillesmed->getValueIndex(MED_EN::MED_FULL_INTERLACE);
+                nbr_mailles=maillesmed->getNumberOf(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+                int size=med_index[nbr_mailles]-med_index[0];
+                types.resize(nbr_mailles);
+                premier_pointeur.resize(nbr_mailles);
+                mailles=new int[size];
+                int i;
+                for (i=0;i<size;i++) 
+                        {
+                        mailles[i]=tab_sommets_mailles[i]-1;
+                        }
+                for (i=0;i<nbr_mailles;i++)
+                        {
+                        types[i]=maillesmed->getElementType(MED_EN::MED_CELL,i+1); // A VERIFIER : le +1
+                        premier_pointeur[i]=&mailles[med_index[i]-1]; // A VERIFIER : la formule
+                        }
+                }
+        // Méthodes de la politique
+        inline int SIZE() {return nbr_mailles;}
+        inline int DONNE_TYPE_MAILLE(int i) {return types[i];}
+        inline int * DONNE_PREMIER_POINTEUR(int i) {return premier_pointeur[i];}
 };
 
 

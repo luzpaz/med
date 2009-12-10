@@ -42,7 +42,7 @@ int main (int argc, char ** argv) {
 
   if (argc <3) { // after 3, ignored !
     cerr << "Usage : " << argv[0] 
-	 << " filename meshname" << endl << endl;
+         << " filename meshname" << endl << endl;
     exit(-1);
   }
 

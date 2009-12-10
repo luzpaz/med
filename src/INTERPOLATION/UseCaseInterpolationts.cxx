@@ -62,37 +62,37 @@ int main () {
     int flagNewMapping = 1;
 
     for (currentStep=pasDeTemps.begin();currentStep!=pasDeTemps.end();currentStep++)
-    	{
-    	FIELD_ * fromField_ = fromMED.getField(fromFieldName,(*currentStep).dt,(*currentStep).it) ; 
+        {
+        FIELD_ * fromField_ = fromMED.getField(fromFieldName,(*currentStep).dt,(*currentStep).it) ; 
 
-    	FIELD<double> * fromField = dynamic_cast<FIELD<double> *>(fromField_); 
+        FIELD<double> * fromField = dynamic_cast<FIELD<double> *>(fromField_); 
 
-    	fromField->getSupport()->getMesh()->read();
+        fromField->getSupport()->getMesh()->read();
         
-    	fromField->read(); 
-	
-	if (currentStep==pasDeTemps.begin())
-		{
-    		myInter = new INTERPOLATION<3>(*fromField,toMesh) ; 
+        fromField->read(); 
+        
+        if (currentStep==pasDeTemps.begin())
+                {
+                myInter = new INTERPOLATION<3>(*fromField,toMesh) ; 
 
-    		toField = myInter->interpolate(1,1); 
-		}
-	else
-		{
-    		toField = myInter->interpolateNextStep(*fromField,flagNewMapping); 
-		}
+                toField = myInter->interpolate(1,1); 
+                }
+        else
+                {
+                toField = myInter->interpolateNextStep(*fromField,flagNewMapping); 
+                }
     
-    	toField->addDriver(MED_DRIVER,resultFileName,toField->getName()); 
+        toField->addDriver(MED_DRIVER,resultFileName,toField->getName()); 
     
-    	toField->write(); 
+        toField->write(); 
     
-    	if (flagNewMapping==1)
-		{
-    		handle = toMesh.addDriver(MED_DRIVER,resultFileName,toMesh.getName()) ; 
+        if (flagNewMapping==1)
+                {
+                handle = toMesh.addDriver(MED_DRIVER,resultFileName,toMesh.getName()) ; 
     
-    		toMesh.write(handle); 
-		}
-	}
+                toMesh.write(handle); 
+                }
+        }
 
   } catch (MEDEXCEPTION& ex){
     MESSAGE_MED(ex.what()) ;

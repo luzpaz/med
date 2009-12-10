@@ -49,15 +49,15 @@ MEDprofilLire(med_idt fid,med_int *pflval, char *nom)
    */
 #if defined(HAVE_F77INT64)
   if ((ret =  _MEDdatasetNumLire(pid,MED_NOM_PFL,MED_INT64,
-				 MED_NO_INTERLACE,1,MED_ALL,
-				 MED_NOPF,0,MED_NOPG,
-				 (unsigned char *) pflval)) < 0)
+                                 MED_NO_INTERLACE,1,MED_ALL,
+                                 MED_NOPF,0,MED_NOPG,
+                                 (unsigned char *) pflval)) < 0)
     return -1;
 #else
   if ((ret =  _MEDdatasetNumLire(pid,MED_NOM_PFL,MED_INT32,
-				 MED_NO_INTERLACE,1,MED_ALL,
-				 MED_NOPF,0,MED_NOPG,
-				 (unsigned char *) pflval)) < 0)
+                                 MED_NO_INTERLACE,1,MED_ALL,
+                                 MED_NOPF,0,MED_NOPG,
+                                 (unsigned char *) pflval)) < 0)
     return -1;
 #endif
 

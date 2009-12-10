@@ -70,7 +70,7 @@ void Field::reset()
     mName[0]       = '\0';
     mEntity        = MED_NOEUD;
     mGeom          = MED_NONE;
-	mGeomIdx	   = eMaxMedMesh;
+        mGeomIdx           = eMaxMedMesh;
     mType          = MED_FLOAT64;
     mSizeOfType    = 8;
     mNumComponents = 0;
@@ -476,7 +476,7 @@ void Field::readMED(med_idt pMEDfile, med_int pIndex, char* pMeshName, med_geome
             fieldOnNodes = true;
             mEntity = MED_NOEUD;
             mGeom = (med_geometrie_element) 0;
-			mGeomIdx = eMaxMedMesh;
+                        mGeomIdx = eMaxMedMesh;
             readMEDtimeSteps(pMEDfile, numTimeStepNodes, pMeshName);
         }
     }
@@ -491,14 +491,14 @@ void Field::readMED(med_idt pMEDfile, med_int pIndex, char* pMeshName, med_geome
             MED_MAILLE, 
             pGeom);
         
-		for (int i = 0; i < eMaxMedMesh; ++i)
-		{
-			if (CELL_TYPES[i] == pGeom)
-			{
-				mGeomIdx = (eMeshType)i;
-				break;
-			}
-		}
+                for (int i = 0; i < eMaxMedMesh; ++i)
+                {
+                        if (CELL_TYPES[i] == pGeom)
+                        {
+                                mGeomIdx = (eMeshType)i;
+                                break;
+                        }
+                }
         if (numTimeStepElt  < 0) throw IOException("", __FILE__, __LINE__);    
         
         if (numTimeStepElt > 0)
@@ -547,7 +547,7 @@ void Field::readMEDtimeSteps(med_idt pMEDfile, med_int pNumberOfTimeSteps, char*
             mEntity, 
             mGeom, 
             itTimeStep, 
-			&ngauss, 
+                        &ngauss, 
             &numdt, 
             &numo, 
             dtunit, 
@@ -667,11 +667,11 @@ void Field::writeMED(med_idt pMEDfile, char* pMeshName, bool pCreateField)
     }
 }
 
-void	Field::writeMEDOptimized(std::vector<MeshDisPart*>* pParts, const char* pMeshName, GaussIndexList* pGaussList, int pGeomIdx, std::vector<med_int>& pFiles, std::map<std::string, Profil*>& pProfils)
+void    Field::writeMEDOptimized(std::vector<MeshDisPart*>* pParts, const char* pMeshName, GaussIndexList* pGaussList, int pGeomIdx, std::vector<med_int>& pFiles, std::map<std::string, Profil*>& pProfils)
 {
-	med_err					ret;
-	unsigned char*			lValue = NULL;
-	unsigned				lGaussIdx = 0;
+        med_err                                 ret;
+        unsigned char*                  lValue = NULL;
+        unsigned                                lGaussIdx = 0;
     bool                    lCreateField = false;
     med_int                 nbField;
     char                    lName[MED_TAILLE_NOM + 1];
@@ -683,43 +683,43 @@ void	Field::writeMEDOptimized(std::vector<MeshDisPart*>* pParts, const char* pMe
     bool                    completeProfil;
 
     // For each time step.
-	for (unsigned itTimeStep = 0;  itTimeStep < mNGauss.size(); ++itTimeStep)
-	{
-		lGaussIdx = 0;
+        for (unsigned itTimeStep = 0;  itTimeStep < mNGauss.size(); ++itTimeStep)
+        {
+                lGaussIdx = 0;
         // For each part.
-		for (unsigned itPart = 0 ; itPart < pParts->size() ; ++itPart)
-		{
-			// Skip empty part/mesh !
-			if ((*pParts)[itPart]->getMesh()->getNumberOfElements((eMeshType)pGeomIdx) == 0 &&
-				!this->isFieldOnNodes())
-			{
-				continue;
-			}
-			
-			// Get the index of the nodes or elements of this field. If the index is empty
+                for (unsigned itPart = 0 ; itPart < pParts->size() ; ++itPart)
+                {
+                        // Skip empty part/mesh !
+                        if ((*pParts)[itPart]->getMesh()->getNumberOfElements((eMeshType)pGeomIdx) == 0 &&
+                                !this->isFieldOnNodes())
+                        {
+                                continue;
+                        }
+                        
+                        // Get the index of the nodes or elements of this field. If the index is empty
             // the corresponding mesh was removed during domain split so we just skip it.
-			do
-			{
-				if (this->isFieldOnNodes())
-				{
+                        do
+                        {
+                                if (this->isFieldOnNodes())
+                                {
                     // Field is on nodes.
-					idxSet = &(*pGaussList)[lGaussIdx].second;
-				}
-				else
-				{
+                                        idxSet = &(*pGaussList)[lGaussIdx].second;
+                                }
+                                else
+                                {
                     // Field is on elements.
-					idxSet = &(*pGaussList)[lGaussIdx].first[pGeomIdx];
-				}
-				lGaussIdx++;
-			}
-			while (idxSet->size() == 0 && lGaussIdx < pGaussList->size());
-			
+                                        idxSet = &(*pGaussList)[lGaussIdx].first[pGeomIdx];
+                                }
+                                lGaussIdx++;
+                        }
+                        while (idxSet->size() == 0 && lGaussIdx < pGaussList->size());
+                        
             // Check if the gauss list is empty.
             if (lGaussIdx > pGaussList->size() || idxSet == 0)
-			{
-				// We should never go here...
-				throw IllegalStateException("Corrupted file !", __FILE__, __LINE__);
-			}
+                        {
+                                // We should never go here...
+                                throw IllegalStateException("Corrupted file !", __FILE__, __LINE__);
+                        }
             // We check if the field already exists in this MED file.
             // I guess we could ignore this and always create the field but it seems
             // to create corrupted MED files.
@@ -762,15 +762,15 @@ void	Field::writeMEDOptimized(std::vector<MeshDisPart*>* pParts, const char* pMe
             }
 
             // If the field doesn't exist we create it.
-			if (lCreateField == true)
+                        if (lCreateField == true)
             {
                 ret = MEDchampCr(
                     pFiles[itPart], 
-                    mName,									 // name of the field
-                    mType,									 // type of data (MED_FLOAT64, MED_INT32, etc.)
+                    mName,                                                                       // name of the field
+                    mType,                                                                       // type of data (MED_FLOAT64, MED_INT32, etc.)
                     const_cast<char*>(mStrComponent.c_str()),// name of components
-                    const_cast<char*>(mStrUnit.c_str()),	 // name of units
-                    mNumComponents);						 // number of components
+                    const_cast<char*>(mStrUnit.c_str()),         // name of units
+                    mNumComponents);                                             // number of components
             }
 
             int nval;
@@ -824,13 +824,13 @@ void	Field::writeMEDOptimized(std::vector<MeshDisPart*>* pParts, const char* pMe
                 delete[] lValue;
             }
 
-			if (ret != 0)
-			{
-				throw IOException("i/o error while writing field in MED file", __FILE__, __LINE__);
-			}
+                        if (ret != 0)
+                        {
+                                throw IOException("i/o error while writing field in MED file", __FILE__, __LINE__);
+                        }
 
-		}
-	}
+                }
+        }
 }
 
 ostream& operator<<(ostream& pOs, Field& pF)

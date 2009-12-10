@@ -58,9 +58,9 @@ throw (SALOME::SALOME_Exception)
     case MED_POLYHEDRA    :  return SALOME_MED::MED_POLYHEDRA;
     case MED_ALL_ELEMENTS :  return SALOME_MED::MED_ALL_ELEMENTS;
     default :
-	{ MESSAGE("Unknown Geometry Element");
-	  THROW_SALOME_CORBA_EXCEPTION("Unknown Geometry Element",
-					SALOME::INTERNAL_ERROR);
+        { MESSAGE("Unknown Geometry Element");
+          THROW_SALOME_CORBA_EXCEPTION("Unknown Geometry Element",
+                                        SALOME::INTERNAL_ERROR);
         } 
    }
 }
@@ -93,9 +93,9 @@ throw (SALOME::SALOME_Exception)
     case SALOME_MED::MED_POLYHEDRA    :  return MED_POLYHEDRA;
     case SALOME_MED::MED_ALL_ELEMENTS :  return MED_ALL_ELEMENTS;
     default :
-	{ MESSAGE("unknown Geometry Element");
-	  THROW_SALOME_CORBA_EXCEPTION("Unknown Geometry Element",
-					SALOME::INTERNAL_ERROR);
+        { MESSAGE("unknown Geometry Element");
+          THROW_SALOME_CORBA_EXCEPTION("Unknown Geometry Element",
+                                        SALOME::INTERNAL_ERROR);
         } 
    }
 }
@@ -111,9 +111,9 @@ throw (SALOME::SALOME_Exception)
     case MED_NODE    :  return SALOME_MED::MED_NODE;
     case MED_ALL_ENTITIES : return SALOME_MED::MED_ALL_ENTITIES;
     default :
-	{ MESSAGE("Unknown entity element");
-	  THROW_SALOME_CORBA_EXCEPTION("Unknown Entity Element",
-					SALOME::INTERNAL_ERROR);
+        { MESSAGE("Unknown entity element");
+          THROW_SALOME_CORBA_EXCEPTION("Unknown Entity Element",
+                                        SALOME::INTERNAL_ERROR);
         } 
    }
 }
@@ -129,9 +129,9 @@ throw (SALOME::SALOME_Exception)
     case SALOME_MED::MED_NODE    :  return MED_NODE;
     case SALOME_MED::MED_ALL_ENTITIES : return MED_ALL_ENTITIES;
     default :
-	{ MESSAGE("Unknown Entity Element");
-	  THROW_SALOME_CORBA_EXCEPTION("Unknown Entity Element",
-					SALOME::INTERNAL_ERROR);
+        { MESSAGE("Unknown Entity Element");
+          THROW_SALOME_CORBA_EXCEPTION("Unknown Entity Element",
+                                        SALOME::INTERNAL_ERROR);
         } 
    }
 }
@@ -145,9 +145,9 @@ throw (SALOME::SALOME_Exception)
     case SALOME_MED::MED_NO_INTERLACE         : return MED_NO_INTERLACE; 
     case SALOME_MED::MED_NO_INTERLACE_BY_TYPE : return MED_NO_INTERLACE_BY_TYPE; 
     default :
-	{ MESSAGE("Unknown interlace mode");
-	  THROW_SALOME_CORBA_EXCEPTION("Unknown interlace mode",
-					SALOME::INTERNAL_ERROR);
+        { MESSAGE("Unknown interlace mode");
+          THROW_SALOME_CORBA_EXCEPTION("Unknown interlace mode",
+                                        SALOME::INTERNAL_ERROR);
         } 
    }
 }
@@ -161,9 +161,9 @@ throw (SALOME::SALOME_Exception)
     case MED_NO_INTERLACE         :  return SALOME_MED::MED_NO_INTERLACE; 
     case MED_NO_INTERLACE_BY_TYPE :  return SALOME_MED::MED_NO_INTERLACE_BY_TYPE; 
     default :
-	{ MESSAGE("Unknown interlace mode");
-	  THROW_SALOME_CORBA_EXCEPTION("Unknown interlace mode",
-					SALOME::INTERNAL_ERROR);
+        { MESSAGE("Unknown interlace mode");
+          THROW_SALOME_CORBA_EXCEPTION("Unknown interlace mode",
+                                        SALOME::INTERNAL_ERROR);
         } 
    }
 }
@@ -172,12 +172,12 @@ throw (SALOME::SALOME_Exception)
 {
   switch (connectivite)
     {
-    case MED_NODAL  	 :  return SALOME_MED::MED_NODAL; 
+    case MED_NODAL       :  return SALOME_MED::MED_NODAL; 
     case MED_DESCENDING  :  return SALOME_MED::MED_DESCENDING; 
     default :
-	{ MESSAGE("Unknown connectivity type");
-	  THROW_SALOME_CORBA_EXCEPTION("Unknown connectivity type",
-					SALOME::INTERNAL_ERROR);
+        { MESSAGE("Unknown connectivity type");
+          THROW_SALOME_CORBA_EXCEPTION("Unknown connectivity type",
+                                        SALOME::INTERNAL_ERROR);
         } 
    }
 }
@@ -189,9 +189,9 @@ throw (SALOME::SALOME_Exception)
     case SALOME_MED::MED_NODAL       :  return MED_NODAL; 
     case SALOME_MED::MED_DESCENDING  :  return MED_DESCENDING; 
     default :
-	{ MESSAGE("Unknown connectivity type");
-	  THROW_SALOME_CORBA_EXCEPTION("Unknown connectivity type",
-					SALOME::INTERNAL_ERROR);
+        { MESSAGE("Unknown connectivity type");
+          THROW_SALOME_CORBA_EXCEPTION("Unknown connectivity type",
+                                        SALOME::INTERNAL_ERROR);
         } 
    }
 }
@@ -204,9 +204,9 @@ throw (SALOME::SALOME_Exception)
     case MEDMEM::VTK_DRIVER  :  return SALOME_MED::VTK_DRIVER; 
     case MEDMEM::NO_DRIVER   :  return SALOME_MED::NO_DRIVER;
     default :
-	{ MESSAGE("Unknown driver type");
-	  THROW_SALOME_CORBA_EXCEPTION("Unknown driver type",
-					SALOME::INTERNAL_ERROR);
+        { MESSAGE("Unknown driver type");
+          THROW_SALOME_CORBA_EXCEPTION("Unknown driver type",
+                                        SALOME::INTERNAL_ERROR);
         } 
    }
 }
@@ -220,9 +220,9 @@ throw (SALOME::SALOME_Exception)
     case SALOME_MED::VTK_DRIVER  :  return MEDMEM::VTK_DRIVER; 
     case SALOME_MED::NO_DRIVER   :  return MEDMEM::NO_DRIVER;
     default :
-	{ MESSAGE("Unknown driver type");
-	  THROW_SALOME_CORBA_EXCEPTION("Unknown driver type",
-					SALOME::INTERNAL_ERROR);
+        { MESSAGE("Unknown driver type");
+          THROW_SALOME_CORBA_EXCEPTION("Unknown driver type",
+                                        SALOME::INTERNAL_ERROR);
         } 
    }
 }
@@ -236,76 +236,76 @@ throw (SALOME::SALOME_Exception)
    { 
     case SALOME_MED::MED_FACE :
        {
-	 switch (geomElement)
+         switch (geomElement)
            {
-	   case SALOME_MED::MED_TRIA3	 : coherent=true;
-	   case SALOME_MED::MED_QUAD4	 : coherent=true;
-	   case SALOME_MED::MED_TRIA6	 : coherent=true;
-	   case SALOME_MED::MED_QUAD8	 : coherent=true;
-	   case SALOME_MED::MED_POLYGON	 : coherent=true;
+           case SALOME_MED::MED_TRIA3    : coherent=true;
+           case SALOME_MED::MED_QUAD4    : coherent=true;
+           case SALOME_MED::MED_TRIA6    : coherent=true;
+           case SALOME_MED::MED_QUAD8    : coherent=true;
+           case SALOME_MED::MED_POLYGON  : coherent=true;
            }
-	 break;
+         break;
        }
     case SALOME_MED::MED_CELL :
        {
-	 switch (geomElement)
+         switch (geomElement)
            {
-	   case SALOME_MED::MED_POINT1   : coherent=true;
-	   case SALOME_MED::MED_SEG2     : coherent=true;
-	   case SALOME_MED::MED_SEG3     : coherent=true;
-	   case SALOME_MED::MED_TRIA3    : coherent=true;
-	   case SALOME_MED::MED_TRIA6    : coherent=true;
-	   case SALOME_MED::MED_QUAD4	 : coherent=true;
-	   case SALOME_MED::MED_QUAD8	 : coherent=true;
-	   case SALOME_MED::MED_TETRA4	 : coherent=true;
-	   case SALOME_MED::MED_TETRA10  : coherent=true;
-	   case SALOME_MED::MED_HEXA8	 : coherent=true;
-	   case SALOME_MED::MED_HEXA20	 : coherent=true;
-	   case SALOME_MED::MED_PENTA6	 : coherent=true;
-	   case SALOME_MED::MED_PENTA15  : coherent=true;
-	   case SALOME_MED::MED_PYRA5	 : coherent=true;
-	   case SALOME_MED::MED_PYRA13	 : coherent=true;
-	   case SALOME_MED::MED_POLYGON	 : coherent=true;
-	   case SALOME_MED::MED_POLYHEDRA: coherent=true;
+           case SALOME_MED::MED_POINT1   : coherent=true;
+           case SALOME_MED::MED_SEG2     : coherent=true;
+           case SALOME_MED::MED_SEG3     : coherent=true;
+           case SALOME_MED::MED_TRIA3    : coherent=true;
+           case SALOME_MED::MED_TRIA6    : coherent=true;
+           case SALOME_MED::MED_QUAD4    : coherent=true;
+           case SALOME_MED::MED_QUAD8    : coherent=true;
+           case SALOME_MED::MED_TETRA4   : coherent=true;
+           case SALOME_MED::MED_TETRA10  : coherent=true;
+           case SALOME_MED::MED_HEXA8    : coherent=true;
+           case SALOME_MED::MED_HEXA20   : coherent=true;
+           case SALOME_MED::MED_PENTA6   : coherent=true;
+           case SALOME_MED::MED_PENTA15  : coherent=true;
+           case SALOME_MED::MED_PYRA5    : coherent=true;
+           case SALOME_MED::MED_PYRA13   : coherent=true;
+           case SALOME_MED::MED_POLYGON  : coherent=true;
+           case SALOME_MED::MED_POLYHEDRA: coherent=true;
            }
-	 break;
+         break;
        }
     case SALOME_MED::MED_EDGE :
        {
-	 switch (geomElement)
+         switch (geomElement)
            {
-	   case SALOME_MED::MED_SEG2	 : coherent=true;
-	   case SALOME_MED::MED_SEG3	 : coherent=true;
+           case SALOME_MED::MED_SEG2     : coherent=true;
+           case SALOME_MED::MED_SEG3     : coherent=true;
            }
-	 break;
+         break;
        }         
     case SALOME_MED::MED_NODE :
        {
-	 switch (geomElement)
+         switch (geomElement)
            {
-	   case SALOME_MED::MED_POINT1	 : coherent=true;
+           case SALOME_MED::MED_POINT1   : coherent=true;
            }
-	 break;
+         break;
        }
     case SALOME_MED::MED_ALL_ENTITIES :
        {
-	 switch (geomElement)
+         switch (geomElement)
            {
-	   case SALOME_MED::MED_NONE	 : coherent=true;
+           case SALOME_MED::MED_NONE     : coherent=true;
            }
-	 break;
+         break;
        }
     default :
-	{ MESSAGE("Unknown geometric entity");
-	  THROW_SALOME_CORBA_EXCEPTION("Unknown geometric entity",
-					SALOME::INTERNAL_ERROR);
+        { MESSAGE("Unknown geometric entity");
+          THROW_SALOME_CORBA_EXCEPTION("Unknown geometric entity",
+                                        SALOME::INTERNAL_ERROR);
         } 
-	 break;
+         break;
     } 
 
      switch (geomElement)
      {
-	   case SALOME_MED::MED_ALL_ELEMENTS	 : coherent=true;
+           case SALOME_MED::MED_ALL_ELEMENTS     : coherent=true;
      }
     return coherent;
 }

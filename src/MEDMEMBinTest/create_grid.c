@@ -124,11 +124,11 @@ int main (int argc, char **argv)
      dans un repere cartesien 
      - des noms (optionnel dans un fichier MED) 
      - des numeros (optionnel dans un fichier MED) 
-     - des numeros de familles des noeuds */	      
+     - des numeros de familles des noeuds */          
   if (ret == 0)
     ret = MEDnoeudsEcr(fid,maa,mdim,coo,MED_FULL_INTERLACE,MED_CART,
-		       nomcoo,unicoo,nomnoe,MED_VRAI,numnoe,MED_VRAI,
-		       nufano,nnoe);
+                       nomcoo,unicoo,nomnoe,MED_VRAI,numnoe,MED_VRAI,
+                       nufano,nnoe);
   printf("MEDnoeudsEcr : %d\n",ret);
 
   /* ecriture des mailles MED_QUAD4 :
@@ -138,8 +138,8 @@ int main (int argc, char **argv)
      - numeros des familles */
   if (ret == 0) 
     ret = MEDelementsEcr(fid,maa,mdim,quad4,MED_FULL_INTERLACE,
-			 nomquad4,MED_FAUX,numquad4,MED_VRAI,nufaquad4,nquad4,
-			 MED_MAILLE,MED_QUAD4,MED_NOD);
+                         nomquad4,MED_FAUX,numquad4,MED_VRAI,nufaquad4,nquad4,
+                         MED_MAILLE,MED_QUAD4,MED_NOD);
   printf("MEDelementsEcr : %d\n",ret);
 
   /* ecriture des familles */
@@ -158,7 +158,7 @@ int main (int argc, char **argv)
       strcpy(nomfam,"FAMILLE_0");
       numfam = 0;
       ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,0,
-		     gro,0);
+                     gro,0);
     }
   printf("MEDfamCr : %d \n",ret);
 
@@ -168,50 +168,50 @@ int main (int argc, char **argv)
     {
       nfame = 1;
       for (i=0;i<nfame;i++)
-	{
-	  if (ret == 0)
-	    {
-	      strcpy(nomfam,"FAMILLE_ELEMENT_");
-	      numfam = -(i+1);
-	      sprintf(nomfam,"%s%d",nomfam,-numfam);
-	      attide = 1;
-	      attval = numfam*100;
+        {
+          if (ret == 0)
+            {
+              strcpy(nomfam,"FAMILLE_ELEMENT_");
+              numfam = -(i+1);
+              sprintf(nomfam,"%s%d",nomfam,-numfam);
+              attide = 1;
+              attval = numfam*100;
               natt = 1;
-	      strcpy(attdes,"description attribut");
+              strcpy(attdes,"description attribut");
               strcpy(gro,"groupe1");
-	      ngro = 1;
+              ngro = 1;
               printf("%s - %d - %d - %d - %d \n",nomfam,numfam,attide,attval,
-		     ngro);
-	      ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,
-			     natt,gro,ngro);
+                     ngro);
+              ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,
+                             natt,gro,ngro);
               printf("MEDfamCr (elements) : %d\n",ret);
-	    }
-	}
+            }
+        }
     }
   
   if (ret == 0)
     {
       nfamn = 2;
       for (i=0;i<nfamn;i++)
-	{
-	  if(ret == 0)
-	    {
-	      strcpy(nomfam,"FAMILLE_NOEUD_");
-	      numfam = i+1;
-	      sprintf(nomfam,"%s%d",nomfam,numfam);
-	      attide = 1;
-	      attval = numfam*100;
+        {
+          if(ret == 0)
+            {
+              strcpy(nomfam,"FAMILLE_NOEUD_");
+              numfam = i+1;
+              sprintf(nomfam,"%s%d",nomfam,numfam);
+              attide = 1;
+              attval = numfam*100;
               natt = 1;
-	      strcpy(attdes,"description attribut");
+              strcpy(attdes,"description attribut");
               strcpy(gro,"groupe1");
-	      ngro = 1;
+              ngro = 1;
               printf("%s - %d - %d - %d - %d \n",nomfam,numfam,attide,attval,
-		     ngro);
-	      ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,
-			     natt,gro,ngro);
+                     ngro);
+              ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,
+                             natt,gro,ngro);
               printf("MEDfamCr (nodes) : %d\n",ret);
-	    }
-	}
+            }
+        }
     }
 
 
@@ -245,14 +245,14 @@ int main (int argc, char **argv)
      dans un repere cartesien 
      - des noms (optionnel dans un fichier MED) 
      - des numeros (optionnel dans un fichier MED) 
-     - des numeros de familles des noeuds */	      
+     - des numeros de familles des noeuds */          
 /*   if (ret == 0) */
 /*     ret = MEDstructureCoordEcr(fid,maa,mdim,nbr); */
 /*   printf("MEDstructureCoordEcr : %d\n",ret); */
 
   if (ret == 0)
     ret = MEDcoordEcr(fid,maa,mdim,coo,MED_FULL_INTERLACE,nnoe,MED_CART,
-		      nomcoo,unicoo);
+                      nomcoo,unicoo);
   printf("MEDcoordEcr : %d\n",ret);
 
   if (ret == 0)
@@ -295,7 +295,7 @@ int main (int argc, char **argv)
       strcpy(nomfam,"FAMILLE_0");
       numfam = 0;
       ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,0,
-		     gro,0);
+                     gro,0);
     }
   printf("MEDfamCr : %d\n",ret);
 
@@ -303,25 +303,25 @@ int main (int argc, char **argv)
     {
       nfamn = 2;
       for (i=0;i<nfamn;i++)
-	{
-	  if(ret == 0)
-	    {
-	      strcpy(nomfam,"FAMILLE_NOEUD_");
-	      numfam = i+1;
-	      sprintf(nomfam,"%s%d",nomfam,numfam);
-	      attide = 1;
-	      attval = numfam*100;
+        {
+          if(ret == 0)
+            {
+              strcpy(nomfam,"FAMILLE_NOEUD_");
+              numfam = i+1;
+              sprintf(nomfam,"%s%d",nomfam,numfam);
+              attide = 1;
+              attval = numfam*100;
               natt = 1;
-	      strcpy(attdes,"description attribut");
+              strcpy(attdes,"description attribut");
               strcpy(gro,"groupe1");
-	      ngro = 1;
+              ngro = 1;
               printf("%s - %d - %d - %d - %d \n",nomfam,numfam,attide,attval,
-		     ngro);
-	      ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,
-			     natt,gro,ngro);
+                     ngro);
+              ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,
+                             natt,gro,ngro);
               printf("MEDfamCr (nodes) : %d\n",ret);
-	    }
-	}
+            }
+        }
     }
 
   /* fermeture du fichier */
@@ -359,7 +359,7 @@ int main (int argc, char **argv)
     coo[3] = 1.4+i;
     if (ret == 0) {
       ret = MEDindicesCoordEcr(fid, maa, mdim, coo, nnoe, ip1,
-			       nomcooi, unicooi);
+                               nomcooi, unicooi);
     };
   };
   printf("MEDindicesCoordEcr : %d\n",ret);
@@ -402,7 +402,7 @@ int main (int argc, char **argv)
       strcpy(nomfam,"FAMILLE_0");
       numfam = 0;
       ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,0,
-		     gro,0);
+                     gro,0);
     }
   printf("MEDfamCr : %d \n",ret);
 
@@ -410,25 +410,25 @@ int main (int argc, char **argv)
     {
       nfamn = 9;
       for (i=0;i<nfamn;i++)
-	{
-	  if(ret == 0)
-	    {
-	      strcpy(nomfam,"FAMILLE_NOEUD_");
-	      numfam = i+1;
-	      sprintf(nomfam,"%s%d",nomfam,numfam);
-	      attide = 1;
-	      attval = numfam*100;
+        {
+          if(ret == 0)
+            {
+              strcpy(nomfam,"FAMILLE_NOEUD_");
+              numfam = i+1;
+              sprintf(nomfam,"%s%d",nomfam,numfam);
+              attide = 1;
+              attval = numfam*100;
               natt = 1;
-	      strcpy(attdes,"description attribut");
+              strcpy(attdes,"description attribut");
               strcpy(gro,"groupe1");
-	      ngro = 1;
+              ngro = 1;
               printf("%s - %d - %d - %d - %d \n",nomfam,numfam,attide,attval,
-		     ngro);
-	      ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,
-			     natt,gro,ngro);
+                     ngro);
+              ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,
+                             natt,gro,ngro);
               printf("MEDfamCr (nodes) : %d\n",ret);
-	    }
-	}
+            }
+        }
     }
 
   /* fermeture du fichier */

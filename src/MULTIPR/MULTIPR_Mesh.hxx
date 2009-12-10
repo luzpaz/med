@@ -85,9 +85,9 @@ enum eMeshType
     eMED_HEXA20,
     eMED_PENTA6,
     eMED_PENTA15,
-	eMED_PYRA5,
-	eMED_PYRA13,
-	eMaxMedMesh
+        eMED_PYRA5,
+        eMED_PYRA13,
+        eMaxMedMesh
 };
 
 //*****************************************************************************
@@ -131,32 +131,32 @@ public:
      */
     const char* getName() const { return mMeshName; }
     
-	/**
+        /**
      * Returns the groups of this Mesh.
      * \return the groups of this Mesh.
      */
-	std::vector<Group*>* getGroups() { return &mGroups; }
+        std::vector<Group*>* getGroups() { return &mGroups; }
 
-	/**
+        /**
      * Returns the nodes of this Mesh.
      * \return the nodes of this Mesh.
      */
-	const Nodes* getNodes() const { return mNodes; }
+        const Nodes* getNodes() const { return mNodes; }
 
-	/**
+        /**
      * Returns the elements of this Mesh.
      * \param pGeomIdx The index of the geometry.
      * \return the elements of this Mesh.
      */
-	const Elements* getElements(int pGeomIdx) const { return mElements[pGeomIdx]; }
+        const Elements* getElements(int pGeomIdx) const { return mElements[pGeomIdx]; }
 
-	/**
+        /**
      * Returns the gauss index of the splited meshes.
-	 * Only valid after a call to Mesh::splitGroupsOfElements().
+         * Only valid after a call to Mesh::splitGroupsOfElements().
      * \return the elements of this Mesh.
      */
-	GaussIndexList* editGaussIndex() { return &mGaussIndex; }
-		
+        GaussIndexList* editGaussIndex() { return &mGaussIndex; }
+                
     /**
      * Returns the name of all the scalar fields.
      * \return the name of all the scalar fields.
@@ -200,13 +200,13 @@ public:
      */
     int getNumberOfElements() const;
     
-	/**
-	 * Returns the number of elements for the specified geometry type.
-	 * \param pGeomType The type of geometry (eMED_TETRA4 OR eMED_HEXA20 OR etc)
-	 * \return the number of elements.
-	 */
-	int	getNumberOfElements(eMeshType pGeomType) const;
-	
+        /**
+         * Returns the number of elements for the specified geometry type.
+         * \param pGeomType The type of geometry (eMED_TETRA4 OR eMED_HEXA20 OR etc)
+         * \return the number of elements.
+         */
+        int     getNumberOfElements(eMeshType pGeomType) const;
+        
     /**
      * Add a profile to the mesh.
      * \param pProfil The profile to add.
@@ -256,7 +256,7 @@ public:
      * \throw  NullArgumentException if pGroup or pNewMeshName is NULL.
      */
     Mesh* createFromFamily(const Family* pFamily, const char* pNewMeshName);
-	    
+            
     /**
      * Creates a Mesh by merging this one with the given one.
      * Warning: not all the data are merged (e.g. bounding box if not computed and family/groups are partially filled).
@@ -294,7 +294,7 @@ public:
      * \param  pField      any field of this Mesh.
      * \param  pTimeStepIt time step iteration.
      * \param  pPoints     (out) list of points.
-	 * \param  pGeomType   Get the points from this type of geometry. If the values are on the node, this parameter is ignored.
+         * \param  pGeomType   Get the points from this type of geometry. If the values are on the node, this parameter is ignored.
      * \throw  NullArgumentException if pField is NULL.
      * \throw  IllegalArgumentException if pTimeStepIt is invalid.
      */
@@ -350,7 +350,7 @@ public:
      * \param pFlag new flag value.
      */
     void setPrintAll(bool pFlag) { mFlagPrintAll = pFlag; }
-	
+        
     /**
      * Dumps any Mesh to the given output stream.
      * \param  pOs any output stream.
@@ -500,11 +500,11 @@ private:
      */
     bool                              mFlagPrintAll;
     
-	/**
-	 * List of gauss points index for optimized domain split.
-	 */
-	GaussIndexList					  mGaussIndex;
-	
+        /**
+         * List of gauss points index for optimized domain split.
+         */
+        GaussIndexList                                    mGaussIndex;
+        
 private:
 
     // do not allow copy constructor

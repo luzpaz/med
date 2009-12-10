@@ -25,8 +25,8 @@ namespace MEDSPLITTER
 class MEDSPLITTER_FaceModel
 {
 public:
-	MEDSPLITTER_FaceModel():_conn(0){};
-	virtual ~MEDSPLITTER_FaceModel() {if (_conn!=0) delete[] _conn;}
+        MEDSPLITTER_FaceModel():_conn(0){};
+        virtual ~MEDSPLITTER_FaceModel() {if (_conn!=0) delete[] _conn;}
   MED_EN::medGeometryElement getType() const {return _type;}
   void setType(MED_EN::medGeometryElement type) {_type=type;}
   void setNbNodes(int nbnodes){_conn=new int[nbnodes];}

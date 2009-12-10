@@ -22,17 +22,17 @@ namespace med_2_1{
 
 med_err
 MEDnoeudsEcr(med_idt fid,char *maa,med_int mdim,med_float *coord,
-	     med_mode_switch mode_coo,
-	     med_repere repere,char *nomcoo, char *unicoo,char *nom,
-	     med_booleen inom,med_int *num,med_booleen inum,med_int *fam,
-	     med_int nnoeuds,med_mode_acces mode)
+             med_mode_switch mode_coo,
+             med_repere repere,char *nomcoo, char *unicoo,char *nom,
+             med_booleen inom,med_int *num,med_booleen inum,med_int *fam,
+             med_int nnoeuds,med_mode_acces mode)
 {
   med_err ret;
 
   /* ecriture des coordonnees */
   if ((ret = MEDcoordEcr(fid,maa,mdim,coord,mode_coo,
-			 nnoeuds,mode,repere,nomcoo,
-			 unicoo)) < 0)
+                         nnoeuds,mode,repere,nomcoo,
+                         unicoo)) < 0)
     return -1;
 
   /* ecriture des noms (facultatifs) */

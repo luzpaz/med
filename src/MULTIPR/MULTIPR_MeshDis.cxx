@@ -396,9 +396,9 @@ vector<string> MeshDis::getMeshes() const
 
 vector<string> MeshDis::getFields(const char* pPartList,  bool pAddNbGaussPoint) const
 {
-    vector<string>	res;
-    MeshDisPart*	curPart = NULL;
-    unsigned		i, pos, len;
+    vector<string>      res;
+    MeshDisPart*        curPart = NULL;
+    unsigned            i, pos, len;
 
     if (mParts.size() == 0)
     {
@@ -457,8 +457,8 @@ vector<string> MeshDis::getFields(const char* pPartList,  bool pAddNbGaussPoint)
 
 int MeshDis::getTimeStamps(const char* pPartList, const char* pFieldName) const
 {
-    MeshDisPart*	curPart = NULL;
-    unsigned		i, pos, len;
+    MeshDisPart*        curPart = NULL;
+    unsigned            i, pos, len;
 
     if (mParts.size() == 0)
     {
@@ -624,12 +624,12 @@ std::list<std::string> MeshDis::decimatePart (const char* pPartName,
                                               const char* pFilterName,
                                               const char* pFilterParams)
 {
-    char		stats[512];
-    float		lowResStat = 0.0f;
-    float		medResStat = 0.0f;
-    unsigned	lowResSize = 0;
-    unsigned	medResSize = 0;
-    struct stat	fileStat;
+    char                stats[512];
+    float               lowResStat = 0.0f;
+    float               medResStat = 0.0f;
+    unsigned    lowResSize = 0;
+    unsigned    medResSize = 0;
+    struct stat fileStat;
 
     fileStat.st_size = 0;
 
@@ -764,7 +764,7 @@ std::list<std::string> MeshDis::decimatePart (const char* pPartName,
       Mesh* meshLow = meshFull->decimate(pFilterName, argv, part->getMeshName());
       cout << (*meshLow) << endl;
       if (meshLow->getNumberOfElements())
-      {		
+      {         
         lowResStat = 1.0f - (float)meshLow->getNumberOfElements() / (float)meshFull->getNumberOfElements();
 
         // We write the file in /tmp to get it's size.
@@ -951,11 +951,11 @@ void MeshDis::readDistributedMED(const char* pMEDfilename)
             int ret = sscanf(strTag, "[SOURCE]=%s", strSequentialMEDFilename);
             if (ret == 1)
             {
-	        MED::EVersion aVersion = MED::GetVersionId(strSequentialMEDFilename, true);
-	        if ( aVersion == MED::eVUnknown ) {
-		    std::string aMessage = std::string("source file - '") + strSequentialMEDFilename + "' is not a valid MED file";	  
-		    throw IOException( aMessage.c_str(), __FILE__, __LINE__ );
-		}
+                MED::EVersion aVersion = MED::GetVersionId(strSequentialMEDFilename, true);
+                if ( aVersion == MED::eVUnknown ) {
+                    std::string aMessage = std::string("source file - '") + strSequentialMEDFilename + "' is not a valid MED file";       
+                    throw IOException( aMessage.c_str(), __FILE__, __LINE__ );
+                }
 
                 setSequentialMEDFilename(strSequentialMEDFilename);
             }
@@ -1002,11 +1002,11 @@ void MeshDis::readDistributedMED(const char* pMEDfilename)
     
         if (ret != 5) throw IOException("i/o error while reading MED master file; bad format", __FILE__, __LINE__);
 
-	MED::EVersion aVersion = MED::GetVersionId(lMEDFileName, true);
-	if ( aVersion == MED::eVUnknown ) {
-	    std::string aMessage = std::string("partition file - '") + lMEDFileName + "' is not a valid MED file" ;	  
-	    throw IOException( aMessage.c_str(), __FILE__, __LINE__ );
-	}
+        MED::EVersion aVersion = MED::GetVersionId(lMEDFileName, true);
+        if ( aVersion == MED::eVUnknown ) {
+            std::string aMessage = std::string("partition file - '") + lMEDFileName + "' is not a valid MED file" ;       
+            throw IOException( aMessage.c_str(), __FILE__, __LINE__ );
+        }
 
         //cout << "DBG: read: " << lMeshName << " " << lId << " " << lPartName << endl;
         addMesh(

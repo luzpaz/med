@@ -41,15 +41,15 @@ using namespace MED_EN;
 #define TIMORIZE(procedure,t) {double t0,t1;t0=CPUtime();procedure;t1=CPUtime();t=t1-t0;}
 
 double CPUtime()
-	{
-	#ifdef SYSTIMES
-	struct tms buf;
-  	if (times(&buf)!=-1)
-    		return ((double)buf.tms_utime+(double)buf.tms_stime)/(long) sysconf(_SC_CLK_TCK);
- 	else
-	#endif
-    	return ((double) clock())/CLOCKS_PER_SEC;
-	}
+        {
+        #ifdef SYSTIMES
+        struct tms buf;
+        if (times(&buf)!=-1)
+                return ((double)buf.tms_utime+(double)buf.tms_stime)/(long) sysconf(_SC_CLK_TCK);
+        else
+        #endif
+        return ((double) clock())/CLOCKS_PER_SEC;
+        }
 
 
 
@@ -113,62 +113,62 @@ Wrapper_Maille_Penta15 Penta15;Penta15.positionne(liste);cout<<"Penta15"<<endl;P
     int flagNewMapping = 1;
 
     for (currentStep=pasDeTemps.begin();currentStep!=pasDeTemps.end();currentStep++)
-    	{
+        {
         cout<<flag<<"Traitement du Step ( "<<flush<<(*currentStep).dt<<" ; "<<(*currentStep).it<<" )  : "<<endl;
-	
-    	cout<<flag<<"Lecture du FIELD_ "<<flush;
-    	FIELD_ * fromField_ = fromMED.getField(fromFieldName,(*currentStep).dt,(*currentStep).it);
-    	cout<<"OK !"<<endl;
+        
+        cout<<flag<<"Lecture du FIELD_ "<<flush;
+        FIELD_ * fromField_ = fromMED.getField(fromFieldName,(*currentStep).dt,(*currentStep).it);
+        cout<<"OK !"<<endl;
     
-    	cout<<flag<<"Transtypage en FIELD                      : "<<flush; 
-    	FIELD<double> * fromField = dynamic_cast<FIELD<double> *>(fromField_);
-    	cout<<"OK !"<<endl;
-	
-	if (currentStep==pasDeTemps.begin())
-		{
-    		//Utilisation completement débile, on ne devrait pas avoir a faire l'appel suivant
-    		RUN(fromField->getSupport()->getMesh()->read());
-		}
-	        
-    	cout<<flag<<"Lecture des valeurs du FIELD              : "<<flush; 
-	RUN(fromField->read()); 
-    	cout<<"OK !"<<endl;   
-	
-	if (currentStep==pasDeTemps.begin())
-		{
-    		cout<<flag<<"Préparation de l'interpolation pour le premier pas de temps  : "<<flush;
-    		RUN(myInter = new INTERPOLATION<3>(*fromField,toMesh));
-		cout<<"OK !"<<endl;	       
-    		cout<<flag<<"Interpolation effective du premier pas de temps              : "<<flush;
-    		RUN(toField = myInter->interpolate(1,1));
-    		cout<<"OK !"<<endl;    
-		}
-	else
-		{
-    		cout<<flag<<"Interpolation nextStep              : "<<flush;
-    		RUN(toField = myInter->interpolateNextStep(*fromField,flagNewMapping));
-    		cout<<"OK !"<<endl;    
-		}
+        cout<<flag<<"Transtypage en FIELD                      : "<<flush; 
+        FIELD<double> * fromField = dynamic_cast<FIELD<double> *>(fromField_);
+        cout<<"OK !"<<endl;
+        
+        if (currentStep==pasDeTemps.begin())
+                {
+                //Utilisation completement débile, on ne devrait pas avoir a faire l'appel suivant
+                RUN(fromField->getSupport()->getMesh()->read());
+                }
+                
+        cout<<flag<<"Lecture des valeurs du FIELD              : "<<flush; 
+        RUN(fromField->read()); 
+        cout<<"OK !"<<endl;   
+        
+        if (currentStep==pasDeTemps.begin())
+                {
+                cout<<flag<<"Préparation de l'interpolation pour le premier pas de temps  : "<<flush;
+                RUN(myInter = new INTERPOLATION<3>(*fromField,toMesh));
+                cout<<"OK !"<<endl;            
+                cout<<flag<<"Interpolation effective du premier pas de temps              : "<<flush;
+                RUN(toField = myInter->interpolate(1,1));
+                cout<<"OK !"<<endl;    
+                }
+        else
+                {
+                cout<<flag<<"Interpolation nextStep              : "<<flush;
+                RUN(toField = myInter->interpolateNextStep(*fromField,flagNewMapping));
+                cout<<"OK !"<<endl;    
+                }
     
-    	cout<<flag<<"Creation du driver d'écriture Field       : "<<flush;
-    	toField->addDriver(MED_DRIVER,resultFileName,toField->getName()); 
-    	cout<<"OK !"<<endl;
+        cout<<flag<<"Creation du driver d'écriture Field       : "<<flush;
+        toField->addDriver(MED_DRIVER,resultFileName,toField->getName()); 
+        cout<<"OK !"<<endl;
     
-    	cout<<flag<<"Ecriture du Field résultat                : "<<flush;
-    	toField->write(); 
-    	cout<<"OK !"<<endl;
+        cout<<flag<<"Ecriture du Field résultat                : "<<flush;
+        toField->write(); 
+        cout<<"OK !"<<endl;
     
-    	if (flagNewMapping==1)
-		{
-    		cout<<flag<<"Creation du driver d'écriture Mesh        : "<<flush; 
-    		handle = toMesh.addDriver(MED_DRIVER,resultFileName,toMesh.getName()) ; 
-    		cout<<"OK !"<<endl;
+        if (flagNewMapping==1)
+                {
+                cout<<flag<<"Creation du driver d'écriture Mesh        : "<<flush; 
+                handle = toMesh.addDriver(MED_DRIVER,resultFileName,toMesh.getName()) ; 
+                cout<<"OK !"<<endl;
     
-    		cout<<flag<<"Ecriture du Mesh résultat                 : "<<flush; 
-    		toMesh.write(handle); 
-    		cout<<"OK !"<<endl;
-		}
-	}
+                cout<<flag<<"Ecriture du Mesh résultat                 : "<<flush; 
+                toMesh.write(handle); 
+                cout<<"OK !"<<endl;
+                }
+        }
 
   } catch (MEDEXCEPTION& ex){
     MESSAGE_MED(ex.what()) ;

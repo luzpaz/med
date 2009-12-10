@@ -58,7 +58,7 @@ int main (int argc, char ** argv) {
     1, 6, 12, 7, 
     7, 12, 8, 
     10, 9, 8, 12, 11,
-				   
+                                   
     13, 14, 15, 3, 2, // Polyhedron 2
     13, 2, 8, 16, 
     14, 13, 16, 17, 
@@ -107,7 +107,7 @@ int main (int argc, char ** argv) {
   myMeshing.setNumberOfTypes(NumberOfTypes, MED_CELL);
 
   myMeshing.setCoordinates(SpaceDimension, NumberOfNodes, Coordinates,
-			   "CARTESIAN", MED_FULL_INTERLACE);
+                           "CARTESIAN", MED_FULL_INTERLACE);
   myMeshing.setSpaceDimension(SpaceDimension);
   myMeshing.setMeshDimension(MeshDimension);
   myMeshing.setTypes(Types, MED_CELL);
@@ -128,7 +128,7 @@ int main (int argc, char ** argv) {
   myMeshing.setConnectivity(ConnectivityTetra, MED_CELL, MED_TETRA4);
 
   myMeshing.setPolyhedraConnectivity(REFpolyIndex, REFfacesIndex, 
-				     REFnodalConnOfFaces, 2, MED_CELL);
+                                     REFnodalConnOfFaces, 2, MED_CELL);
 
 
   MESHING myPolygonMeshing;
@@ -143,7 +143,7 @@ int main (int argc, char ** argv) {
   myPolygonMeshing.setNumberOfTypes(NumberOfTypes, MED_CELL);
 
   myPolygonMeshing.setCoordinates(SpaceDimension, NumberOfNodes, PolygonCoordinates,
-			   "CARTESIAN", MED_FULL_INTERLACE);
+                           "CARTESIAN", MED_FULL_INTERLACE);
   myPolygonMeshing.setSpaceDimension(SpaceDimension);
   myPolygonMeshing.setMeshDimension(MeshDimension);
   myPolygonMeshing.setTypes(PolygonTypes, MED_CELL);

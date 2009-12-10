@@ -139,7 +139,7 @@ std::string realToString(med_float mV);
   * \throw  NullArgumentException if pMEDfilename is NULL.
   * \throw  IOException if any other error occurs while reading MED file.
   */
- void	getListScalarFields(const char* pMEDfilename, std::vector<std::pair<std::string, int> >& pFields, bool pAddNbGaussPoint = false, const char *pMeshName = NULL);
+ void   getListScalarFields(const char* pMEDfilename, std::vector<std::pair<std::string, int> >& pFields, bool pAddNbGaussPoint = false, const char *pMeshName = NULL);
 
 } // namespace MULTIPR
 

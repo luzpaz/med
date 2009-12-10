@@ -102,7 +102,7 @@ int main (int argc, char ** argv) {
   /*
   if ((argc !=3) && (argc != 4)) {
     cerr << "Usage : " << argv[0] 
-	 << " filename meshname fieldname" << endl << endl;
+         << " filename meshname fieldname" << endl << endl;
     exit(-1);
   }
   */

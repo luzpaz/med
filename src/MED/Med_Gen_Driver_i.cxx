@@ -509,10 +509,10 @@ void Med_Gen_Driver_i::Close (SALOMEDS::SComponent_ptr theComponent)
       SALOMEDS::SObject_var aSO = anIter->Value();
       SALOMEDS::GenericAttribute_var anAttr;
       if (aSO->FindAttribute(anAttr,"AttributeIOR")) {
-	CORBA::Object_var myIOR =
+        CORBA::Object_var myIOR =
           _driver_orb->string_to_object(SALOMEDS::AttributeIOR::_narrow(anAttr)->Value());
-	SALOME_MED::MESH_var myMesh = SALOME_MED::MESH::_narrow(myIOR);
-	// here must call method destroy of myMesh, but it not implemented yet
+        SALOME_MED::MESH_var myMesh = SALOME_MED::MESH::_narrow(myIOR);
+        // here must call method destroy of myMesh, but it not implemented yet
       }
     }
   }
@@ -589,9 +589,9 @@ char* Med_Gen_Driver_i::IORToLocalPersistentID (SALOMEDS::SObject_ptr theSObject
     a<< myField->getOrderNumber();
     b<< myField->getIterationNumber();
     CORBA::String_var aName((string("_MEDFIELD_")+ myField->getName() +
-			     string("_ORDRE_")+a.str()+
-			     string("_ITER_")+b.str() +
-			     ".med").c_str());
+                             string("_ORDRE_")+a.str()+
+                             string("_ITER_")+b.str() +
+                             ".med").c_str());
     return aName._retn();
   }
 

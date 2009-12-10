@@ -32,10 +32,10 @@ class TESTMEDCLIENT_Gen_i :
 {
 public:
   TESTMEDCLIENT_Gen_i(CORBA::ORB_ptr orb,
-	    PortableServer::POA_ptr poa,
-	    PortableServer::ObjectId * contId, 
-	    const char *instanceName, 
-	    const char *interfaceName);
+            PortableServer::POA_ptr poa,
+            PortableServer::ObjectId * contId, 
+            const char *instanceName, 
+            const char *interfaceName);
   virtual ~TESTMEDCLIENT_Gen_i();
 
   void go(SALOME_MED::MED_ptr objMed);

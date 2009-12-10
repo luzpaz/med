@@ -57,7 +57,7 @@ void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
 
 template <class INTERLACING_TAG>
 void affiche_fieldT(FIELD<double, INTERLACING_TAG> * myField,
-		    const SUPPORT * mySupport)
+                    const SUPPORT * mySupport)
 {
   const double * value = 0;
   const int    * number = 0;
@@ -76,11 +76,11 @@ void affiche_fieldT(FIELD<double, INTERLACING_TAG> * myField,
   if ( myField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE ) {
     for (int i=1; i<NumberOf+1; i++) {
       if (onAll)
-	value = myField->getRow(i) ;
+        value = myField->getRow(i) ;
       else
-	value = myField->getRow(number[i-1]);
+        value = myField->getRow(number[i-1]);
       for (int j=0; j<NumberOfComponents; j++)
-	cout << value[j]<< " ";
+        cout << value[j]<< " ";
       cout<<endl;
     }
   }
@@ -88,7 +88,7 @@ void affiche_fieldT(FIELD<double, INTERLACING_TAG> * myField,
     for (int j=1; j<NumberOfComponents+1; j++) {
       value = myField->getColumn(j) ;
       for (int i=0; i<NumberOf; i++)
-	cout << value[i]<< " ";
+        cout << value[i]<< " ";
       cout<<endl;
     }
   }
@@ -98,7 +98,7 @@ int main (int argc, char ** argv) {
 
   if ((argc !=3) && (argc != 5)) {
     cerr << "Usage : " << argv[0]
-	 << " filename fieldName [iterationNumber] [orderNumber]" << endl << endl;
+         << " filename fieldName [iterationNumber] [orderNumber]" << endl << endl;
     exit(-1);
   }
 
@@ -122,7 +122,7 @@ int main (int argc, char ** argv) {
     // pour effecuter la renumérotation.
     {
       FIELD<double> * myField1  = new FIELD<double>(MED_DRIVER,fileName,fieldName,
-						    iterationNumber, orderNumber);
+                                                    iterationNumber, orderNumber);
       affiche_fieldT(myField1, myField1->getSupport());
 
       // Pour éviter de modifier le fichier d'origine,
@@ -170,7 +170,7 @@ int main (int argc, char ** argv) {
 //       // un fichier que l'on vient de lire)
 //    {
 //      FIELD<double> * myField2  = new FIELD<double>(MED_DRIVER,fileName,fieldName,
-// 						   iterationNumber, orderNumber);
+//                                                 iterationNumber, orderNumber);
 
 //      meshName = myField2->getSupport()->getMeshName();
 //      MESH * myMesh2 = new MESH(MED_DRIVER,fileName,meshName);
@@ -214,13 +214,13 @@ int main (int argc, char ** argv) {
 //    {
 //      med_2_3::med_err err=-1;
 //      med_2_3::med_idt id = med_2_3::MEDouvrir(const_cast<char *> ( ("Copy_nomesh_"+fileName).c_str()),
-// 					      med_2_3::MED_LECTURE_ECRITURE);
+//                                            med_2_3::MED_LECTURE_ECRITURE);
 //      if (id <=0) cout << "Erreur dans MEDouvrir pour le fichier " << "Copy_nomesh_"+fileName <<endl;
 
 //      err=med_2_3::MEDlienEcr(id, const_cast<char *> ( ("Copy_withmesh_"+fileName).c_str()),
-// 			     const_cast<char *> (meshName.c_str()) );
+//                           const_cast<char *> (meshName.c_str()) );
 //      if (err !=0) cout << "Erreur dans MEDlienEcr pour le maillage distant " << meshName
-// 		       <<" contenu dans le fichier " << "Copy_withmesh_"+fileName <<endl;
+//                     <<" contenu dans le fichier " << "Copy_withmesh_"+fileName <<endl;
 
 
 //      err=med_2_3::MEDfermer(id);
@@ -228,7 +228,7 @@ int main (int argc, char ** argv) {
 //      MESH * myMesh3 = new MESH(MED_DRIVER,fileName,meshName);
 //      const SUPPORT * mySupport3= new SUPPORT(myMesh3,"Temporary Support",MED_CELL);
 //      FIELD<double> * myField3  = new FIELD<double>(mySupport3,MED_DRIVER,"Copy_nomesh_"+fileName,fieldName,
-// 						   iterationNumber, orderNumber);
+//                                                 iterationNumber, orderNumber);
 //      delete mySupport3; // Il est déjà possible de libérer ce SUPPORT
 
 //      //TEST à la réecriture :

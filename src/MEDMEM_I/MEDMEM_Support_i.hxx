@@ -45,8 +45,8 @@ namespace MEDMEM {
 class SUPPORT;
 
 class MEDMEM_I_EXPORT SUPPORT_i: virtual public POA_SALOME_MED::SUPPORT,
-		   virtual public SALOMEMultiComm,
-		   virtual public SALOME::GenericObj_i
+                   virtual public SALOMEMultiComm,
+                   virtual public SALOME::GenericObj_i
 {
 public :
     static std::map < int,::MEDMEM::SUPPORT *> supportMap;
@@ -70,17 +70,17 @@ public:
     SUPPORT_i(const SUPPORT_i & s);
 
     // IDL Methods
-    char *               getName() 	   throw (SALOME::SALOME_Exception);
+    char *               getName()         throw (SALOME::SALOME_Exception);
     char *               getDescription()  throw (SALOME::SALOME_Exception);
-    SALOME_MED::MESH_ptr getMesh() 	   throw (SALOME::SALOME_Exception);
+    SALOME_MED::MESH_ptr getMesh()         throw (SALOME::SALOME_Exception);
     CORBA::Boolean       isOnAllElements() throw (SALOME::SALOME_Exception);
     SALOME_MED::medEntityMesh getEntity()  throw (SALOME::SALOME_Exception);
-    CORBA::Long    	 getNumberOfElements(SALOME_MED::medGeometryElement geomElement) 
-					   throw (SALOME::SALOME_Exception);
+    CORBA::Long          getNumberOfElements(SALOME_MED::medGeometryElement geomElement) 
+                                           throw (SALOME::SALOME_Exception);
     CORBA::Long          getNumberOfTypes()
                                            throw (SALOME::SALOME_Exception);
     SALOME_MED::long_array* getNumber(SALOME_MED::medGeometryElement geomElement) 
-					   throw (SALOME::SALOME_Exception);
+                                           throw (SALOME::SALOME_Exception);
 
     SALOME_MED::long_array* getNumberFromFile(SALOME_MED::medGeometryElement geomElement) 
                                            throw (SALOME::SALOME_Exception);
@@ -88,30 +88,30 @@ public:
     SALOME::SenderInt_ptr getSenderForNumber(SALOME_MED::medGeometryElement geomElement) 
                                            throw (SALOME::SALOME_Exception);
     SALOME_MED::long_array* getNumberIndex() 
-					   throw (SALOME::SALOME_Exception);
+                                           throw (SALOME::SALOME_Exception);
     SALOME::SenderInt_ptr getSenderForNumberIndex() 
                                            throw (SALOME::SALOME_Exception);
     CORBA::Long          getNumberOfGaussPoint(SALOME_MED::medGeometryElement geomElement) 
-					   throw (SALOME::SALOME_Exception);
+                                           throw (SALOME::SALOME_Exception);
     SALOME_MED::long_array* getNumbersOfGaussPoint()
                                            throw (SALOME::SALOME_Exception);
 
     SALOME_MED::medGeometryElement_array* getTypes() 
-					   throw (SALOME::SALOME_Exception);
+                                           throw (SALOME::SALOME_Exception);
 
     void getBoundaryElements()             throw (SALOME::SALOME_Exception);
 
 
   // Others
   void           addInStudy (SALOMEDS::Study_ptr myStudy, 
-			  SALOME_MED::SUPPORT_ptr myIor)
+                          SALOME_MED::SUPPORT_ptr myIor)
     throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
 
   static std::string getEntryPath (const MEDMEM::SUPPORT * aSupport);
 
   void release();
-  //					Cuisine interne
-  CORBA::Long 	 getCorbaIndex()   throw (SALOME::SALOME_Exception);
+  //                                    Cuisine interne
+  CORBA::Long    getCorbaIndex()   throw (SALOME::SALOME_Exception);
   SALOME_MED::SUPPORT::supportInfos * getSupportGlobal()   throw (SALOME::SALOME_Exception);
 };
 }

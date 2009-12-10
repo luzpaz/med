@@ -59,31 +59,31 @@ public:
   // inherited methods from SALOMEDS::Driver
 
   SALOMEDS::TMPFile* Save(SALOMEDS::SComponent_ptr theComponent,
-			  const char* theURL,
-			  bool isMultiFile);
+                          const char* theURL,
+                          bool isMultiFile);
   SALOMEDS::TMPFile* SaveASCII(SALOMEDS::SComponent_ptr theComponent,
-			       const char* theURL,
-			       bool isMultiFile);
+                               const char* theURL,
+                               bool isMultiFile);
 
   CORBA::Boolean Load(SALOMEDS::SComponent_ptr theComponent,
-		      const SALOMEDS::TMPFile& theStream,
-		      const char* theURL,
-		      bool isMultiFile);
+                      const SALOMEDS::TMPFile& theStream,
+                      const char* theURL,
+                      bool isMultiFile);
   CORBA::Boolean LoadASCII(SALOMEDS::SComponent_ptr theComponent,
-			   const SALOMEDS::TMPFile& theStream,
-			   const char* theURL,
-			   bool isMultiFile);
+                           const SALOMEDS::TMPFile& theStream,
+                           const char* theURL,
+                           bool isMultiFile);
 
   void Close(SALOMEDS::SComponent_ptr theComponent);
 
   char* IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
-			       const char* IORString,
-			       CORBA::Boolean isMultiFile,
-			       CORBA::Boolean isASCII);
+                               const char* IORString,
+                               CORBA::Boolean isMultiFile,
+                               CORBA::Boolean isASCII);
   char* LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
-			       const char* aLocalPersistentID,
-			       CORBA::Boolean isMultiFile,
-			       CORBA::Boolean isASCII)
+                               const char* aLocalPersistentID,
+                               CORBA::Boolean isMultiFile,
+                               CORBA::Boolean isASCII)
     throw(SALOME::SALOME_Exception);
 
   bool CanPublishInStudy(CORBA::Object_ptr theIOR);
@@ -98,8 +98,8 @@ public:
 
   CORBA::Boolean CanPaste(const char* theComponentName, CORBA::Long theObjectID);
   SALOMEDS::SObject_ptr PasteInto(const SALOMEDS::TMPFile& theStream,
-				  CORBA::Long theObjectID,
-				  SALOMEDS::SObject_ptr theObject);
+                                  CORBA::Long theObjectID,
+                                  SALOMEDS::SObject_ptr theObject);
 
   // this method of SALOMEDS::Driver must be implemented in Component
   //char* ComponentDataType();

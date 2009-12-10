@@ -40,7 +40,7 @@ int main (int argc, char ** argv) {
 
   if (argc >2) {
     cerr << "Usage : " << argv[0] 
-	 << " filenameRoot" << endl;
+         << " filenameRoot" << endl;
     cerr << "        where filenameRoot is a root filename, the program will produce" << endl;
     cerr << "        3 files filenameRoot21.med filenameRoot22.med and filenameRoot.vtk" << endl << endl;
     exit(-1);
@@ -300,9 +300,9 @@ int main (int argc, char ** argv) {
       medGeometryElement myTypes[1] = {MED_TRIA3}; 
       int myNumberOfElements[1] = {2} ;
       int value[2]=
-	{
-	  1,3
-	} ;
+        {
+          1,3
+        } ;
       //    partialGroupOnFaces2.setNumber(index,value);
       partialGroupOnFaces2.setpartial("description",1,2,myTypes,myNumberOfElements,value);
     }

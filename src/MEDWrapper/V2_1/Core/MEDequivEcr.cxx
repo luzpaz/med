@@ -28,7 +28,7 @@ namespace med_2_1{
 
 med_err 
 MEDequivEcr(med_idt fid, char *maa, char *eq, med_int *corr, med_int n, 
-	    med_mode_acces mode, med_entite_maillage typ_ent, med_geometrie_element typ_geo)
+            med_mode_acces mode, med_entite_maillage typ_ent, med_geometrie_element typ_geo)
 {
   med_idt eqid, datagroup;
   med_err ret;
@@ -66,7 +66,7 @@ MEDequivEcr(med_idt fid, char *maa, char *eq, med_int *corr, med_int n,
   if ((typ_ent != MED_NOEUD))
     {
       if ((ret = _MEDnomGeometrie(tmp,typ_geo)) < 0)
-	return -1;
+        return -1;
       strcat(nomdatagroup,".");
       strcat(nomdatagroup,tmp);
     }
@@ -89,11 +89,11 @@ MEDequivEcr(med_idt fid, char *maa, char *eq, med_int *corr, med_int n,
 
 #if defined(HAVE_F77INT64)
   if ((ret =  _MEDdatasetNumEcrire(datagroup,MED_NOM_COR,MED_INT64,MED_NO_INTERLACE,MED_DIM1,MED_ALL,MED_NOPF,0,MED_NOPG,dimd,
-				(unsigned char*) corr,mode)) < 0)
+                                (unsigned char*) corr,mode)) < 0)
     return -1;
 #else
   if ((ret =  _MEDdatasetNumEcrire(datagroup,MED_NOM_COR,MED_INT32,MED_NO_INTERLACE,MED_DIM1,MED_ALL,MED_NOPF,0,MED_NOPG,dimd,
-				(unsigned char*) corr,mode)) < 0)
+                                (unsigned char*) corr,mode)) < 0)
     return -1;
 #endif
 

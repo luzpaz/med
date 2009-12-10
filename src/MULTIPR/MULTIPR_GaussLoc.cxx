@@ -120,7 +120,7 @@ void GaussLoc::reset()
 void GaussLoc::getCoordGaussPoints(
     const med_float* pCooElt,  
     med_float* pCooGaussPoints,
-	int nb_gauss) const
+        int nb_gauss) const
 {
     med_float*              pt    = const_cast<med_float*>(pCooElt);
     const med_float*        coeff = mGaussCoo;
@@ -128,18 +128,18 @@ void GaussLoc::getCoordGaussPoints(
 
     for (int i = 0; i < mNumGauss; ++i)
     {
-		for (int j = 0; j < mDim; ++j)
-		{
-			dest[j] = 0;
+                for (int j = 0; j < mDim; ++j)
+                {
+                        dest[j] = 0;
             for (int k = 1; k < nb_gauss; ++k)
             {
                 dest[j] += pt[k * mDim + j];
-			}
+                        }
             dest[j] /= nb_gauss;
-		}
+                }
         coeff += mDim;
         dest += mDim;
-	}
+        }
 }
 
 

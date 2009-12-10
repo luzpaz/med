@@ -192,16 +192,16 @@ public:
      */
     void remap(void);
     
-	
+        
     /**
      * Remaps this set of elements such that indices of nodes are continous 1 2 3 4 5 ... *
      * This method is intended to be used after extractSubSet().
-	 * This remap method allows to use the same set of nodes with several mesh type.
-	 * \param pSetOfNodes The set of nodes index extracted from the original med file.
+         * This remap method allows to use the same set of nodes with several mesh type.
+         * \param pSetOfNodes The set of nodes index extracted from the original med file.
      */
     void remap(std::set<med_int>& pSetOfNodes);
-	
-	
+        
+        
     /**
      * Builds a new set of elements by merging two set of elements (this and pElements) if possible.
      * Merge is partial because Id and Names are not take into account.

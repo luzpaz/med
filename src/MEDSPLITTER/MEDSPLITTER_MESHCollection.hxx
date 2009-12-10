@@ -44,14 +44,14 @@ typedef enum{MedAscii, MedXML, Undefined} DriverType;
 
 class MEDSPLITTER_EXPORT MESHCollection
 {
-	
+        
 public:
-	
+        
 //Default constructor
 MESHCollection();
 
 //Constructing from an existing mesh and a new topology
-	MESHCollection(const MESHCollection&, Topology*, bool family_splitting=false, bool create_empty_groups=false);
+        MESHCollection(const MESHCollection&, Topology*, bool family_splitting=false, bool create_empty_groups=false);
 
 //Constructing the mesh collection from a file
 MESHCollection(const std::string& filename);
@@ -67,21 +67,21 @@ void write(const std::string& filename);
 //getting the driver
 MESHCollectionDriver* retrieveDriver();
 MESHCollectionDriver* getDriver() const;
-	void setDriverType(MEDSPLITTER::DriverType type) {m_driver_type=type;}
+        void setDriverType(MEDSPLITTER::DriverType type) {m_driver_type=type;}
 
 //creation of the cell graph
 void buildCellGraph(MEDMEM::MEDSKYLINEARRAY* & array,int *& edgeweights );
 
 //creation and partition of the associated graph
   Topology* createPartition(int nbdomain, Graph::splitter_type type = Graph::METIS,
-			    const string& ="", int* edgeweights=0, int* verticesweights=0);
+                            const string& ="", int* edgeweights=0, int* verticesweights=0);
 
 //creation of a user specified partition
 Topology* createPartition(const int* partition);
 
 //retrieving list of types
 void getTypeList(int* cell_list,int nb_cells,MED_EN::medEntityMesh entity,
-				  MED_EN::medGeometryElement* type_list) const ;
+                                  MED_EN::medGeometryElement* type_list) const ;
 
 //getting list of coordinates
 void getCoordinates(int* node_list,int nb_nodes, double* coordinates) const ;
@@ -133,7 +133,7 @@ void setName(const string& name) {m_name=name;}
 //getting/setting the description of the global mesh
 string getDescription() const {return m_description;}
 void setDescription(const string& name) { m_description=name;}
-	
+        
 //!transfers families from an old MESHCollection to new mesh
 void castFamilies(const MESHCollection& old_collection);
 
@@ -159,11 +159,11 @@ bool isDimensionOK(MED_EN::medGeometryElement type, int dim)
 void setSubdomainBoundaryCreates(bool flag) {  m_subdomain_boundary_creates=flag;}
 bool getSubdomainBoundaryCreates(){return m_subdomain_boundary_creates;}
 
-	void setFamilySplitting(bool flag){m_family_splitting=flag;}
-	bool getFamilySplitting(){return m_family_splitting;}
+        void setFamilySplitting(bool flag){m_family_splitting=flag;}
+        bool getFamilySplitting(){return m_family_splitting;}
 
-	void setCreateEmptyGroups(bool flag){m_create_empty_groups=flag;}
-	bool getCreateEmptyGroups(){return m_create_empty_groups;}
+        void setCreateEmptyGroups(bool flag){m_create_empty_groups=flag;}
+        bool getCreateEmptyGroups(){return m_create_empty_groups;}
 private:
 //!creates connectivities for a domain and an entity (face or cell)
 void createNodalConnectivity(const MESHCollection & initial_collection, int idomain, MED_EN::medEntityMesh entity);
@@ -215,13 +215,13 @@ DriverType m_driver_type;
 so that they are written in joints*/
 bool m_subdomain_boundary_creates;
 
-	/*! flag specifying that families must be preserved by the
-		splitting*/
-	bool m_family_splitting;
+        /*! flag specifying that families must be preserved by the
+                splitting*/
+        bool m_family_splitting;
 
-	/*! flag specifying that groups must be created on all domains, 
-		even if they are empty*/
-	bool m_create_empty_groups;
+        /*! flag specifying that groups must be created on all domains, 
+                even if they are empty*/
+        bool m_create_empty_groups;
 };
 
 }//of namespace

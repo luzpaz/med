@@ -42,8 +42,8 @@ namespace MED
   MEDWRAPPER_EXPORT
   TEntity2TGeom2ElemInfo
   GetEntity2TGeom2ElemInfo(const PWrapper& theWrapper, 
-			   const PMeshInfo& theMeshInfo,
-			   const MED::TEntityInfo& theEntityInfo);
+                           const PMeshInfo& theMeshInfo,
+                           const MED::TEntityInfo& theEntityInfo);
 
 
   //---------------------------------------------------------------
@@ -53,7 +53,7 @@ namespace MED
   MEDWRAPPER_EXPORT
   TFamilyInfoSet
   GetFamilyInfoSet(const PWrapper& theWrapper, 
-		   const PMeshInfo& theMeshInfo);
+                   const PMeshInfo& theMeshInfo);
   
 
   //---------------------------------------------------------------
@@ -71,8 +71,8 @@ namespace MED
   MEDWRAPPER_EXPORT
   TEntity2FamilySet
   GetEntity2FamilySet(const PWrapper& theWrapper, 
-		      const TEntity2TGeom2ElemInfo& theEntity2TGeom2ElemInfo,
-		      const TFamilyInfoSet& theFamilyInfoSet);
+                      const TEntity2TGeom2ElemInfo& theEntity2TGeom2ElemInfo,
+                      const TFamilyInfoSet& theFamilyInfoSet);
   
 
   //---------------------------------------------------------------
@@ -92,8 +92,8 @@ namespace MED
   MEDWRAPPER_EXPORT
   TFieldInfo2TimeStampInfoSet
   GetFieldInfo2TimeStampInfoSet(const PWrapper& theWrapper, 
-				const PMeshInfo& theMeshInfo,
-				const MED::TEntityInfo& theEntityInfo);
+                                const PMeshInfo& theMeshInfo,
+                                const MED::TEntityInfo& theEntityInfo);
   
 
   //---------------------------------------------------------------
@@ -112,8 +112,8 @@ namespace MED
   MEDWRAPPER_EXPORT
   TKey2Gauss
   GetKey2Gauss(const PWrapper& theWrapper, 
-	       TErr* theErr = NULL,
-	       EModeSwitch theMode = eFULL_INTERLACE);
+               TErr* theErr = NULL,
+               EModeSwitch theMode = eFULL_INTERLACE);
 
 
   //---------------------------------------------------------------
@@ -121,9 +121,9 @@ namespace MED
   MEDWRAPPER_EXPORT
   PProfileInfo
   GetProfileInfo(const PWrapper& theWrapper, 
-		 const std::string& theProfileName,
-		 TErr* theErr = NULL,
-		 EModeProfil theMode = eCOMPACT);
+                 const std::string& theProfileName,
+                 TErr* theErr = NULL,
+                 EModeProfil theMode = eCOMPACT);
 
 
   //---------------------------------------------------------------
@@ -134,15 +134,15 @@ namespace MED
   MEDWRAPPER_EXPORT
   TMKey2Profile
   GetMKey2Profile(const PWrapper& theWrapper, 
-		  TErr* theErr = NULL,
-		  EModeProfil theMode = eCOMPACT);
+                  TErr* theErr = NULL,
+                  EModeProfil theMode = eCOMPACT);
 
   //---------------------------------------------------------------
   //! Get Entity for Grille by family id.
   MEDWRAPPER_EXPORT
   EEntiteMaillage
   GetEntityByFamilyId(PGrilleInfo& theInfo,
-		      TInt theId);
+                      TInt theId);
 
   typedef std::map<TInt,TInt> TFamilyID2NbCells;
   

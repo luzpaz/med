@@ -28,8 +28,8 @@ namespace med_2_1{
 
 med_err 
 MEDconnLire(med_idt fid,char *maa,med_int mdim,med_int *connectivite,med_mode_switch mode_switch,
-	    med_int * pfltabtmp, med_size psizetmp,
-	    med_entite_maillage type_ent, med_geometrie_element type_geo,med_connectivite type_conn)
+            med_int * pfltabtmp, med_size psizetmp,
+            med_entite_maillage type_ent, med_geometrie_element type_geo,med_connectivite type_conn)
 {
   med_idt maaid,entid,geoid;
   med_err ret;
@@ -103,10 +103,10 @@ MEDconnLire(med_idt fid,char *maa,med_int mdim,med_int *connectivite,med_mode_sw
        strcpy(nom_dataset,MED_NOM_DES);
        taille = nsup + ndes;
        if ( psizetmp != MED_NOPF ) {  
-	 psize = psizetmp;
-	 pfltab = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)psize);
-	 for (i=0;i<psizetmp;i++)
-	   pfltab[i] = (med_ssize) (pfltabtmp[i]);
+         psize = psizetmp;
+         pfltab = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)psize);
+         for (i=0;i<psizetmp;i++)
+           pfltab[i] = (med_ssize) (pfltabtmp[i]);
        };
        
        break;
@@ -118,15 +118,15 @@ MEDconnLire(med_idt fid,char *maa,med_int mdim,med_int *connectivite,med_mode_sw
 
 #if defined(HAVE_F77INT64)
    if ((ret = _MEDdatasetNumLire(geoid,nom_dataset,MED_INT64,
-				 mode_switch,(med_size)taille,MED_ALL,
-				 psize,pfltab,MED_NOPG,
-				 (unsigned char*) connectivite)) < 0)
+                                 mode_switch,(med_size)taille,MED_ALL,
+                                 psize,pfltab,MED_NOPG,
+                                 (unsigned char*) connectivite)) < 0)
      return -1;
 #else
    if ((ret = _MEDdatasetNumLire(geoid,nom_dataset,MED_INT32,
-				 mode_switch,(med_size) taille,MED_ALL,
-				 psize,pfltab,MED_NOPG,
-				 (unsigned char*) connectivite)) < 0)
+                                 mode_switch,(med_size) taille,MED_ALL,
+                                 psize,pfltab,MED_NOPG,
+                                 (unsigned char*) connectivite)) < 0)
      return -1;
 #endif 
 

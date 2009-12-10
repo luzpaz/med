@@ -61,7 +61,7 @@ MEDfichDesEcr(med_idt fid, char *des, med_mode_acces mode)
 
   if ((ret = _MEDdatagroupFermer(root)) < 0)
     return -1;
-	  
+          
   return 0; 
 }
 

@@ -54,17 +54,17 @@ int main () {
     
     toField->addDriver(MED_DRIVER,toFileName,toField->getName()) ;
 
-    cout<<"toField->getName()			= "<<toField->getName() 		 <<endl;
-    cout<<"toField->getDescription()		= "<<toField->getDescription()  	 <<endl;
-    cout<<"toField->getNumberOfComponents()	= "<<toField->getNumberOfComponents()	 <<endl;
-    cout<<"toField->getNumberOfValues() 	= "<<toField->getNumberOfValues()	 <<endl;
-    cout<<"toField->getComponentsNames()	= "<<toField->getComponentsNames()	 <<endl;
+    cout<<"toField->getName()                   = "<<toField->getName()                  <<endl;
+    cout<<"toField->getDescription()            = "<<toField->getDescription()           <<endl;
+    cout<<"toField->getNumberOfComponents()     = "<<toField->getNumberOfComponents()    <<endl;
+    cout<<"toField->getNumberOfValues()         = "<<toField->getNumberOfValues()        <<endl;
+    cout<<"toField->getComponentsNames()        = "<<toField->getComponentsNames()       <<endl;
     cout<<"toField->getComponentsDescriptions() = "<<toField->getComponentsDescriptions()<<endl;
-    cout<<"toField->getMEDComponentsUnits()	= "<<toField->getMEDComponentsUnits()	 <<endl;
-    cout<<"toField->getIterationNumber()	= "<<toField->getIterationNumber()	 <<endl;
-    cout<<"toField->getTime()			= "<<toField->getTime() 		 <<endl;
-    cout<<"toField->getOrderNumber()		= "<<toField->getOrderNumber()  	 <<endl;
-    cout<<"toField->getValueType()		= "<<toField->getValueType()		 <<endl;
+    cout<<"toField->getMEDComponentsUnits()     = "<<toField->getMEDComponentsUnits()    <<endl;
+    cout<<"toField->getIterationNumber()        = "<<toField->getIterationNumber()       <<endl;
+    cout<<"toField->getTime()                   = "<<toField->getTime()                  <<endl;
+    cout<<"toField->getOrderNumber()            = "<<toField->getOrderNumber()           <<endl;
+    cout<<"toField->getValueType()              = "<<toField->getValueType()             <<endl;
 
     toField->write();
 

@@ -193,11 +193,11 @@ void Med_Gen_i::addInStudy(SALOMEDS::Study_var myStudy)
       SALOME_ModuleCatalog::ModuleCatalog_var Catalogue  = SALOME_ModuleCatalog::ModuleCatalog::_narrow(objVarN);
       SALOME_ModuleCatalog::Acomponent_var Comp = Catalogue->GetComponent( "MED" );
       if ( !Comp->_is_nil() ) {
-	aName->SetValue( Comp->componentusername() );
+        aName->SetValue( Comp->componentusername() );
       }
 
-      //	    Utilisation de this  deconseillee par Paul ??
-      //	    myBuilder->DefineComponentInstance(medfather,POA_Engines::MED_Gen::_this());
+      //            Utilisation de this  deconseillee par Paul ??
+      //            myBuilder->DefineComponentInstance(medfather,POA_Engines::MED_Gen::_this());
       CORBA::Object_var myO = _poa->id_to_reference(*_id); // this ior...
       myBuilder->DefineComponentInstance(medfather,myO);
 
@@ -217,14 +217,14 @@ SALOME_MED::MED_ptr Med_Gen_i::readStructFile (const char* fileName,
 {
         beginService("Med_Gen_i::readStructFile");
 
-	SCRUTE(fileName);
-  	SALOMEDS::Study_var myStudy = studyName2Study(studyName) ;
+        SCRUTE(fileName);
+        SALOMEDS::Study_var myStudy = studyName2Study(studyName) ;
         //if (!_duringLoad) addInStudy(myStudy) ;
 
-	SALOME_MED::MED_ptr myMedIOR ;
-	try
-	{
-	  // we create a new MED_i and add in study
+        SALOME_MED::MED_ptr myMedIOR ;
+        try
+        {
+          // we create a new MED_i and add in study
           //SALOMEDS::SComponent_var theComponent = myStudy->FindComponent("MED");
           //MED_i * myMedI = 0;
           //if (CORBA::is_nil(theComponent))
@@ -232,12 +232,12 @@ SALOME_MED::MED_ptr Med_Gen_i::readStructFile (const char* fileName,
           //else
           //  myMedI = Med_Gen_Driver_i::GetMED(theComponent);
           MED_i * myMedI = new MED_i();
-	  myMedIOR = myMedI->_this() ;
-// 	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR) ;
-// 	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR,fileName) ;
-	  // create ::MED object, read all and add in study !
-	  myMedI->init(myStudy,MED_DRIVER,fileName) ;
-	}
+          myMedIOR = myMedI->_this() ;
+//        if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR) ;
+//        if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR,fileName) ;
+          // create ::MED object, read all and add in study !
+          myMedI->init(myStudy,MED_DRIVER,fileName) ;
+        }
         catch (const SALOMEDS::StudyBuilder::LockProtection & ) {}
         catch(...)
         {
@@ -247,7 +247,7 @@ SALOME_MED::MED_ptr Med_Gen_i::readStructFile (const char* fileName,
         }
 
         endService("Med_Gen_i::readStructFile");
-	return myMedIOR;
+        return myMedIOR;
 }
 
 //=============================================================================
@@ -257,17 +257,17 @@ SALOME_MED::MED_ptr Med_Gen_i::readStructFile (const char* fileName,
  */
 //=============================================================================
 void Med_Gen_i::readStructFileWithFieldType (const char* fileName,
-					     const char* studyName)
+                                             const char* studyName)
   throw (SALOME::SALOME_Exception)
 {
         beginService("Med_Gen_i::readStructFileWithFieldType");
-	SCRUTE(fileName);
-  	SALOMEDS::Study_var myStudy = studyName2Study(studyName) ;
-	if (!_duringLoad) addInStudy(myStudy) ;
+        SCRUTE(fileName);
+        SALOMEDS::Study_var myStudy = studyName2Study(studyName) ;
+        if (!_duringLoad) addInStudy(myStudy) ;
 
-	try
-	{
-	  // we create a new MED_i and add in study
+        try
+        {
+          // we create a new MED_i and add in study
           SALOMEDS::SComponent_var theComponent = myStudy->FindComponent("MED");
           //MED_i * myMedI = 0;
           //if (CORBA::is_nil(theComponent))
@@ -275,11 +275,11 @@ void Med_Gen_i::readStructFileWithFieldType (const char* fileName,
           //else
           //  myMedI = Med_Gen_Driver_i::GetMED(theComponent);
           MED_i * myMedI = new MED_i();
-	  SALOME_MED::MED_ptr myMedIOR = myMedI->_this();
-	  if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR,theComponent,fileName);
-	  // create ::MED object, read all and add in study !
-	  myMedI->initWithFieldType(myStudy,MED_DRIVER,fileName);
-	}
+          SALOME_MED::MED_ptr myMedIOR = myMedI->_this();
+          if (!_duringLoad) myMedI->addInStudy(myStudy,myMedIOR,theComponent,fileName);
+          // create ::MED object, read all and add in study !
+          myMedI->initWithFieldType(myStudy,MED_DRIVER,fileName);
+        }
         catch (const SALOMEDS::StudyBuilder::LockProtection & ) {}
         catch(...)
         {
@@ -298,44 +298,44 @@ void Med_Gen_i::readStructFileWithFieldType (const char* fileName,
 //=============================================================================
 SALOME_MED::MESH_ptr Med_Gen_i::readMeshInFile(const char* fileName,
                                                const char* studyName,
-					       const char* meshName)
+                                               const char* meshName)
 throw (SALOME::SALOME_Exception)
 {
         beginService("Med_Gen_i::readMeshInFile");
-	SCRUTE(fileName);
-  	SALOMEDS::Study_var myStudy = studyName2Study(studyName) ;
+        SCRUTE(fileName);
+        SALOMEDS::Study_var myStudy = studyName2Study(studyName) ;
 
-// 	if (!_duringLoad) addInStudy(myStudy) ;
+//      if (!_duringLoad) addInStudy(myStudy) ;
 
 // Creation du maillage
 
-	MESH * myMesh;
+        MESH * myMesh;
 
-	// skl for IPAL14240
-	// check mesh or grid:
-	try {
-	  MED med(MED_DRIVER,fileName);
-	  MESH* tmpMesh = med.getMesh(meshName);
-	  if(tmpMesh) {
-	    if(tmpMesh->getIsAGrid())
-	      myMesh = new GRID();
-	    else
-	      myMesh = new MESH() ;
-	  }
-	}
+        // skl for IPAL14240
+        // check mesh or grid:
+        try {
+          MED med(MED_DRIVER,fileName);
+          MESH* tmpMesh = med.getMesh(meshName);
+          if(tmpMesh) {
+            if(tmpMesh->getIsAGrid())
+              myMesh = new GRID();
+            else
+              myMesh = new MESH() ;
+          }
+        }
         catch (const std::exception & ex) {
-	  MESSAGE("Exception Interceptee : ");
-	  SCRUTE(ex.what());
-	  myMesh = new MESH() ;
+          MESSAGE("Exception Interceptee : ");
+          SCRUTE(ex.what());
+          myMesh = new MESH() ;
         };
 
-  	myMesh->setName(meshName);
-  	MED_MESH_RDONLY_DRIVER myMeshDriver(fileName,myMesh);
-	try
-	{
-  		myMeshDriver.setMeshName(meshName);
-		myMeshDriver.open();
-	}
+        myMesh->setName(meshName);
+        MED_MESH_RDONLY_DRIVER myMeshDriver(fileName,myMesh);
+        try
+        {
+                myMeshDriver.setMeshName(meshName);
+                myMeshDriver.open();
+        }
 #if defined(_DEBUG_) || defined(_DEBUG)
         catch (const std::exception & ex)
 #else
@@ -346,12 +346,12 @@ throw (SALOME::SALOME_Exception)
                 SCRUTE(ex.what());
                 THROW_SALOME_CORBA_EXCEPTION("Unable to find this mesh in this file",SALOME::BAD_PARAM);
         };
-	try
-	{
-		myMeshDriver.read();
+        try
+        {
+                myMeshDriver.read();
                 MESSAGE("apres read");
-		myMeshDriver.close();
-	}
+                myMeshDriver.close();
+        }
 #if defined(_DEBUG_) || defined(_DEBUG)
         catch (const std::exception & ex)
 #else
@@ -363,14 +363,14 @@ throw (SALOME::SALOME_Exception)
                 THROW_SALOME_CORBA_EXCEPTION("Unable to read this mesh in this file",SALOME::BAD_PARAM);
         };
 
-	MESH_i * meshi = new MESH_i(myMesh);
-	//SALOME_MED::MESH_var mesh = SALOME_MED::MESH::_narrow(meshi->_this());
-	SALOME_MED::MESH_ptr mesh = meshi->_this();
-	try
+        MESH_i * meshi = new MESH_i(myMesh);
+        //SALOME_MED::MESH_var mesh = SALOME_MED::MESH::_narrow(meshi->_this());
+        SALOME_MED::MESH_ptr mesh = meshi->_this();
+        try
         {
-	  // add the mesh object in study
-// 	  if (!_duringLoad) meshi->addInStudy(myStudy,mesh);
-	}
+          // add the mesh object in study
+//        if (!_duringLoad) meshi->addInStudy(myStudy,mesh);
+        }
         catch (const SALOMEDS::StudyBuilder::LockProtection & ) {}
 
         endService("Med_Gen_i::readMeshInFile");
@@ -390,98 +390,98 @@ SALOME_MED::FIELD_ptr Med_Gen_i::readFieldInFile(const char* fileName,
 throw (SALOME::SALOME_Exception)
 {
         beginService("Med_Gen_i::readFieldInFile");
-	SCRUTE(fileName);
-	string myStudyName(studyName);
+        SCRUTE(fileName);
+        string myStudyName(studyName);
 
         if (myStudyName.size() == 0)
-    		THROW_SALOME_CORBA_EXCEPTION("No Study Name given", \
+                THROW_SALOME_CORBA_EXCEPTION("No Study Name given", \
                                  SALOME::BAD_PARAM);
 
-	// Get StudyManager Reference, current study,
+        // Get StudyManager Reference, current study,
 
-	CORBA::Object_var obj = _NS->Resolve("/myStudyManager");
-  	SALOMEDS::StudyManager_var myStudyManager =
-    			SALOMEDS::StudyManager::_narrow(obj);
-  	ASSERT(! CORBA::is_nil(myStudyManager));
-  	SALOMEDS::Study_var myStudy =
-    		myStudyManager->GetStudyByName(myStudyName.c_str());
-  	if (CORBA::is_nil(myStudy))
-    	THROW_SALOME_CORBA_EXCEPTION("Wrong Study Name", \
+        CORBA::Object_var obj = _NS->Resolve("/myStudyManager");
+        SALOMEDS::StudyManager_var myStudyManager =
+                        SALOMEDS::StudyManager::_narrow(obj);
+        ASSERT(! CORBA::is_nil(myStudyManager));
+        SALOMEDS::Study_var myStudy =
+                myStudyManager->GetStudyByName(myStudyName.c_str());
+        if (CORBA::is_nil(myStudy))
+        THROW_SALOME_CORBA_EXCEPTION("Wrong Study Name", \
                                  SALOME::BAD_PARAM);
 
         SALOMEDS::StudyBuilder_var myBuilder = myStudy->NewBuilder();
         SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
         if (CORBA::is_nil(medfather))
         {
-		myBuilder->NewCommand();
+                myBuilder->NewCommand();
                 // mpv: component label must be created in spite of "Locked" study flag state
-	        bool aLocked = myStudy->GetProperties()->IsLocked();
-		if (aLocked) myStudy->GetProperties()->SetLocked(false);
+                bool aLocked = myStudy->GetProperties()->IsLocked();
+                if (aLocked) myStudy->GetProperties()->SetLocked(false);
 
                 medfather = myBuilder->NewComponent("MED");
-		SALOMEDS::AttributeName_var aName = SALOMEDS::AttributeName::_narrow(
+                SALOMEDS::AttributeName_var aName = SALOMEDS::AttributeName::_narrow(
                       myBuilder->FindOrCreateAttribute(medfather, "AttributeName"));
-		//NRI		aName->SetValue("Med");
+                //NRI           aName->SetValue("Med");
 
-		CORBA::Object_var objVarN = _NS->Resolve("/Kernel/ModulCatalog");
-		SALOME_ModuleCatalog::ModuleCatalog_var Catalogue  = SALOME_ModuleCatalog::ModuleCatalog::_narrow(objVarN);
-		SALOME_ModuleCatalog::Acomponent_var Comp = Catalogue->GetComponent( "MED" );
-		if ( !Comp->_is_nil() ) {
-		  aName->SetValue( Comp->componentusername() );
-		}
+                CORBA::Object_var objVarN = _NS->Resolve("/Kernel/ModulCatalog");
+                SALOME_ModuleCatalog::ModuleCatalog_var Catalogue  = SALOME_ModuleCatalog::ModuleCatalog::_narrow(objVarN);
+                SALOME_ModuleCatalog::Acomponent_var Comp = Catalogue->GetComponent( "MED" );
+                if ( !Comp->_is_nil() ) {
+                  aName->SetValue( Comp->componentusername() );
+                }
 
                 CORBA::Object_var myO = _poa->id_to_reference(*_id); // this ior...
                 myBuilder->DefineComponentInstance(medfather,myO);
 
-		if (aLocked) myStudy->GetProperties()->SetLocked(true);
-		myBuilder->CommitCommand();
+                if (aLocked) myStudy->GetProperties()->SetLocked(true);
+                myBuilder->CommitCommand();
 
         }
         else
                         MESSAGE("MED dejà dans l étude");
 
-	MESSAGE("Lecture du fichier ")
-	SCRUTE(fileName);
+        MESSAGE("Lecture du fichier ")
+        SCRUTE(fileName);
 
 // Creation du champ
 
-	FIELD_ * myField;
-	MED * mymed;
-	try
-	{
-	  mymed = new MED(MED_DRIVER,fileName) ;
-	}
-	catch (const std::exception & ex)
-	{
-	  MESSAGE("Exception Interceptee : ");
-	  SCRUTE(ex.what());
-	  THROW_SALOME_CORBA_EXCEPTION("Unable to find this file ",SALOME::BAD_PARAM);
-	}
+        FIELD_ * myField;
+        MED * mymed;
+        try
+        {
+          mymed = new MED(MED_DRIVER,fileName) ;
+        }
+        catch (const std::exception & ex)
+        {
+          MESSAGE("Exception Interceptee : ");
+          SCRUTE(ex.what());
+          THROW_SALOME_CORBA_EXCEPTION("Unable to find this file ",SALOME::BAD_PARAM);
+        }
 
-	try
-	{
-		deque<string> fieldsNames = mymed->getFieldNames() ;
-  		int numberOfFields = fieldsNames.size();
-		int i;
-		for (i=0; i<numberOfFields; i++)
-		{
-			if (fieldsNames[i]== fieldName) break;
-		}
-		if (i == numberOfFields)
-		{
-                	THROW_SALOME_CORBA_EXCEPTION("Unable to find this field ",SALOME::BAD_PARAM);
-		}
-		MESSAGE("trouve");
+        try
+        {
+                deque<string> fieldsNames = mymed->getFieldNames() ;
+                int numberOfFields = fieldsNames.size();
+                int i;
+                for (i=0; i<numberOfFields; i++)
+                {
+                        if (fieldsNames[i]== fieldName) break;
+                }
+                if (i == numberOfFields)
+                {
+                        THROW_SALOME_CORBA_EXCEPTION("Unable to find this field ",SALOME::BAD_PARAM);
+                }
+                MESSAGE("trouve");
 /*
-		deque<DT_IT_> myIteration = mymed->getFieldIteration (fieldName);
-		if (myIteration.size() != 1)
-		{
-			MESSAGE("WARNING : My iteration size is ")
-			SCRUTE(myIteration.size());
-		}
+                deque<DT_IT_> myIteration = mymed->getFieldIteration (fieldName);
+                if (myIteration.size() != 1)
+                {
+                        MESSAGE("WARNING : My iteration size is ")
+                        SCRUTE(myIteration.size());
+                }
 */
-		myField = mymed->getField(fieldName,ordre,iter);
-	}
+                myField = mymed->getField(fieldName,ordre,iter);
+        }
 #if defined(_DEBUG_) || defined(_DEBUG)
         catch (const std::exception & ex)
 #else
@@ -493,17 +493,17 @@ throw (SALOME::SALOME_Exception)
                 THROW_SALOME_CORBA_EXCEPTION("Unable to find this field in this file",SALOME::BAD_PARAM);
         };
 
-	SUPPORT * fieldSupport;
+        SUPPORT * fieldSupport;
         try
-	{
-		fieldSupport=(SUPPORT *)myField->getSupport() ;
-		ASSERT(fieldSupport != NULL);
-		MESH * myMesh=(MESH *)fieldSupport->getMesh();
-		ASSERT(myMesh != NULL);
-		myMesh->read();
-		SCRUTE(myMesh->getName());
-		fieldSupport->update();
-	}
+        {
+                fieldSupport=(SUPPORT *)myField->getSupport() ;
+                ASSERT(fieldSupport != NULL);
+                MESH * myMesh=(MESH *)fieldSupport->getMesh();
+                ASSERT(myMesh != NULL);
+                myMesh->read();
+                SCRUTE(myMesh->getName());
+                fieldSupport->update();
+        }
 #if defined(_DEBUG_) || defined(_DEBUG)
         catch (const std::exception & ex)
 #else
@@ -515,59 +515,59 @@ throw (SALOME::SALOME_Exception)
                 THROW_SALOME_CORBA_EXCEPTION("Unable to find associated support",SALOME::BAD_PARAM);
         };
 
-	med_type_champ type = myField->getValueType() ;
-	switch (type)
-	{
-      	 case MED_EN::MED_INT32:
-	 {
-		try
-		{
-			((FIELD<int>*)myField)->read() ;
-			FIELDTEMPLATE_I<int,FullInterlace> * myFieldIntI = new FIELDTEMPLATE_I<int,FullInterlace>((FIELD<int,FullInterlace>*)myField);
-        		SALOME_MED::FIELD_ptr myFieldIOR = myFieldIntI->_this();
-//         		if (!_duringLoad) myFieldIntI->addInStudy(myStudy,myFieldIOR) ;
-			endService("Med_Gen_i::readFieldInFile");
-        		return myFieldIOR;
-		}
-		catch (const SALOMEDS::StudyBuilder::LockProtection &) {}
+        med_type_champ type = myField->getValueType() ;
+        switch (type)
+        {
+         case MED_EN::MED_INT32:
+         {
+                try
+                {
+                        ((FIELD<int>*)myField)->read() ;
+                        FIELDTEMPLATE_I<int,FullInterlace> * myFieldIntI = new FIELDTEMPLATE_I<int,FullInterlace>((FIELD<int,FullInterlace>*)myField);
+                        SALOME_MED::FIELD_ptr myFieldIOR = myFieldIntI->_this();
+//                      if (!_duringLoad) myFieldIntI->addInStudy(myStudy,myFieldIOR) ;
+                        endService("Med_Gen_i::readFieldInFile");
+                        return myFieldIOR;
+                }
+                catch (const SALOMEDS::StudyBuilder::LockProtection &) {}
 #if defined(_DEBUG_) || defined(_DEBUG)
-        	catch (const std::exception & ex)
+                catch (const std::exception & ex)
 #else
-        	catch (const std::exception &)
+                catch (const std::exception &)
 #endif
-        	{
-               		MESSAGE("Exception Interceptee : ");
-                	SCRUTE(ex.what());
-                	THROW_SALOME_CORBA_EXCEPTION("Unable to read int field",SALOME::BAD_PARAM);
-        	};
-		break;
-	 }
-	 case MED_EN::MED_REEL64:
-	 {
-		try
-		{
-			((FIELD<double>*)myField)->read() ;
-			FIELDTEMPLATE_I<double,FullInterlace> * myFieldDoubleI = new FIELDTEMPLATE_I<double,FullInterlace>((FIELD<double,FullInterlace>*)myField);
-        		SALOME_MED::FIELD_ptr myFieldIOR = myFieldDoubleI->_this() ;
-//         		if (!_duringLoad) myFieldDoubleI->addInStudy(myStudy,myFieldIOR) ;
-			endService("Med_Gen_i::readFieldInFile");
-        		return myFieldIOR;
-		}
-		catch (const SALOMEDS::StudyBuilder::LockProtection &) {}
+                {
+                        MESSAGE("Exception Interceptee : ");
+                        SCRUTE(ex.what());
+                        THROW_SALOME_CORBA_EXCEPTION("Unable to read int field",SALOME::BAD_PARAM);
+                };
+                break;
+         }
+         case MED_EN::MED_REEL64:
+         {
+                try
+                {
+                        ((FIELD<double>*)myField)->read() ;
+                        FIELDTEMPLATE_I<double,FullInterlace> * myFieldDoubleI = new FIELDTEMPLATE_I<double,FullInterlace>((FIELD<double,FullInterlace>*)myField);
+                        SALOME_MED::FIELD_ptr myFieldIOR = myFieldDoubleI->_this() ;
+//                      if (!_duringLoad) myFieldDoubleI->addInStudy(myStudy,myFieldIOR) ;
+                        endService("Med_Gen_i::readFieldInFile");
+                        return myFieldIOR;
+                }
+                catch (const SALOMEDS::StudyBuilder::LockProtection &) {}
 
 #if defined(_DEBUG_) || defined(_DEBUG)
-        	catch (const std::exception & ex)
+                catch (const std::exception & ex)
 #else
-        	catch (const std::exception &)
+                catch (const std::exception &)
 #endif
-        	{
-               		MESSAGE("Exception Interceptee : ");
-                	SCRUTE(ex.what());
-                	THROW_SALOME_CORBA_EXCEPTION("Unable to read double field",SALOME::BAD_PARAM);
-        	};
-		break;
-	 }
-	}
+                {
+                        MESSAGE("Exception Interceptee : ");
+                        SCRUTE(ex.what());
+                        THROW_SALOME_CORBA_EXCEPTION("Unable to read double field",SALOME::BAD_PARAM);
+                };
+                break;
+         }
+        }
 
         return SALOME_MED::FIELD::_nil();
 }
@@ -599,11 +599,11 @@ char* Med_Gen_i::ComponentDataType()
 
 extern "C" MED_EXPORT 
   PortableServer::ObjectId * MEDEngine_factory(
-			       CORBA::ORB_ptr orb,
-			       PortableServer::POA_ptr poa,
-			       PortableServer::ObjectId * contId,
-			       const char *instanceName,
-		       	       const char *interfaceName)
+                               CORBA::ORB_ptr orb,
+                               PortableServer::POA_ptr poa,
+                               PortableServer::ObjectId * contId,
+                               const char *instanceName,
+                               const char *interfaceName)
 {
   MESSAGE("PortableServer::ObjectId * MedEngine_factory()");
   SCRUTE(interfaceName);

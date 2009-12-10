@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
   if (argc !=2)
     {
       cerr << "Usage : " << argv[0] 
-	   << " fileName.med where fileName.med should be a med file" << endl;
+           << " fileName.med where fileName.med should be a med file" << endl;
       cerr << "        It will then generate two med files fileNameAnal_V21.med (med V2.1 format)" << endl;
       cerr << "and fileNameAnal_V21.med (med V2.2 format)" << endl << endl;
       exit(-1);

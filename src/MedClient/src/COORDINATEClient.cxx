@@ -36,7 +36,7 @@ using namespace MED_EN;
 //=============================================================================
 
 COORDINATEClient::COORDINATEClient(const SALOME_MED::MESH_ptr m,
-				   medModeSwitch Mode) :
+                                   medModeSwitch Mode) :
   COORDINATE(m->getSpaceDimension(), 1, Mode),
   _complete(false),
   IOR_Mesh(SALOME_MED::MESH::_duplicate(m))

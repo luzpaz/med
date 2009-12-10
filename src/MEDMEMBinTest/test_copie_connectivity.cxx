@@ -59,7 +59,7 @@ void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myMesh)
     for (int j=0;j<NumberOfElements;j++){
       cout << "Element "<< j+1 <<" : " ;
       for (int k=0;k<NomberOfNodesPerCell;k++)
-	cout << connectivity[j*NomberOfNodesPerCell+k]<<" ";
+        cout << connectivity[j*NomberOfNodesPerCell+k]<<" ";
       cout << endl ;
     }
   }
@@ -121,7 +121,7 @@ void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myMesh)
     for (int i=0; i<NumberOfConstituents; i++) {
       cout << constituent <<i+1<<" : " ;
       for (int j=ReverseDescendingConnectivityIndex[i];j<ReverseDescendingConnectivityIndex[i+1];j++)
-	cout << ReverseDescendingConnectivity[j-1] << " " ;
+        cout << ReverseDescendingConnectivity[j-1] << " " ;
       cout << endl ;
     }
   }
@@ -141,7 +141,7 @@ int main (int argc, char ** argv) {
 
   if (argc <3) { // after 3, ignored !
     cerr << "Usage : " << argv[0] 
-	 << " filename meshname" << endl << endl;
+         << " filename meshname" << endl << endl;
     exit(-1);
   }
 

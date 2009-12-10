@@ -60,7 +60,7 @@ void affiche_support(const SUPPORT * mySupport)
       int NumberOfElements = mySupport->getNumberOfElements(Types[j]) ;
       const int * Number = mySupport->getNumber(Types[j]) ;
       for (int k=0; k<NumberOfElements;k++)
-	cout << Number[k] << " ";
+        cout << Number[k] << " ";
       cout << endl ;
     }
   } else
@@ -105,7 +105,7 @@ int main (int argc, char ** argv) {
 
   if ((argc !=3) && (argc != 4)) {
     cerr << "Usage : " << argv[0] 
-	 << " filename meshname [fieldname]" << endl << endl;
+         << " filename meshname [fieldname]" << endl << endl;
     exit(-1);
   }
 
@@ -166,7 +166,7 @@ int main (int argc, char ** argv) {
     for (int j=0;j<NumberOfElements;j++){
       cout << "Element "<< j+1 <<" : " ;
       for (int k=0;k<NomberOfNodesPerCell;k++)
-	cout << connectivity[j*NomberOfNodesPerCell+k]<<" ";
+        cout << connectivity[j*NomberOfNodesPerCell+k]<<" ";
       cout << endl ;
     }
   }
@@ -240,7 +240,7 @@ int main (int argc, char ** argv) {
     for (int i=0; i<NumberOfConstituents; i++) {
       cout << constituent <<i+1<<" : " ;
       for (int j=ReverseDescendingConnectivityIndex[i];j<ReverseDescendingConnectivityIndex[i+1];j++)
-	cout << ReverseDescendingConnectivity[j-1] << " " ;
+        cout << ReverseDescendingConnectivity[j-1] << " " ;
       cout << endl ;
     }
   }
@@ -303,12 +303,12 @@ int main (int argc, char ** argv) {
       maxlength = -infty;
       minlength = infty;
       for (int i = 1; i<=NumberOfConstituents;i++)
-	{
-	  length_value = length->getValueIJ(i,1) ;
-	  cout << "Length " << i << " " << length_value << endl;
-	  maxlength = dmax(maxlength,length_value);
-	  minlength = dmin(minlength,length_value);
-	}
+        {
+          length_value = length->getValueIJ(i,1) ;
+          cout << "Length " << i << " " << length_value << endl;
+          maxlength = dmax(maxlength,length_value);
+          minlength = dmin(minlength,length_value);
+        }
       cout << "Max Length " << maxlength << " Min Length " << minlength << endl;
 
       delete length ;
@@ -329,10 +329,10 @@ int main (int argc, char ** argv) {
   for (int i = 1; i<=NumberOfElements;i++)
     {
       if (SpaceDimension == 3)
-	cout << "Barycenter " << i << " " << barycenter->getValueIJ(i,1) << " " << barycenter->getValueIJ(i,2) << " " << barycenter->getValueIJ(i,3) << endl;
+        cout << "Barycenter " << i << " " << barycenter->getValueIJ(i,1) << " " << barycenter->getValueIJ(i,2) << " " << barycenter->getValueIJ(i,3) << endl;
 
       if (SpaceDimension == 2)
-	cout << "Barycenter " << i << " " << barycenter->getValueIJ(i,1) << " " << barycenter->getValueIJ(i,2) << endl;
+        cout << "Barycenter " << i << " " << barycenter->getValueIJ(i,1) << " " << barycenter->getValueIJ(i,2) << endl;
     }
 
   delete barycenter ;
@@ -353,12 +353,12 @@ int main (int argc, char ** argv) {
       minvol = infty;
       voltot = 0.0;
       for (int i = 1; i<=NumberOfElements;i++)
-	{
-	  cout << "Volume " << i << " " << volume->getValueIJ(i,1) << endl;
-	  maxvol = dmax(maxvol,volume->getValueIJ(i,1));
-	  minvol = dmin(minvol,volume->getValueIJ(i,1));
-	  voltot = voltot + volume->getValueIJ(i,1);
-	}
+        {
+          cout << "Volume " << i << " " << volume->getValueIJ(i,1) << endl;
+          maxvol = dmax(maxvol,volume->getValueIJ(i,1));
+          minvol = dmin(minvol,volume->getValueIJ(i,1));
+          voltot = voltot + volume->getValueIJ(i,1);
+        }
 
       cout << "Max Volume " << maxvol << " Min Volume " << minvol << endl;
       cout << "Support Volume " << voltot << endl;
@@ -378,12 +378,12 @@ int main (int argc, char ** argv) {
       minarea = infty;
       areatot = 0.0;
       for (int i = 1; i<=NumberOfElements;i++)
-	{
-	  cout << "Area " << i << " " << area->getValueIJ(i,1) << endl;
-	  maxarea = dmax(maxarea,area->getValueIJ(i,1));
-	  minarea = dmin(minarea,area->getValueIJ(i,1));
-	  areatot = areatot + area->getValueIJ(i,1);
-	}
+        {
+          cout << "Area " << i << " " << area->getValueIJ(i,1) << endl;
+          maxarea = dmax(maxarea,area->getValueIJ(i,1));
+          minarea = dmin(minarea,area->getValueIJ(i,1));
+          areatot = areatot + area->getValueIJ(i,1);
+        }
 
       cout << "Max Area " << maxarea << " Min Area " << minarea << endl;
       cout << "Support Area " << areatot << endl;

@@ -149,8 +149,8 @@ public:
      * Returns the mesh of this part.
      * \return the mesh of this part.
      */
-    const Mesh*	getMesh() const { return mMesh; }
-	
+    const Mesh* getMesh() const { return mMesh; }
+        
     /**
      * Returns the MED filename which contain this part.
      * \return the MED filename which contain this part.
@@ -436,12 +436,12 @@ public:
         const char* pFilterName,
         const char* pFilterParams);
     
-	/**
-	 * Get the statistics of the last decimation.
-	 * The format is : "lowres-compression-rate medres-compression-rate".
-	 */
-	std::string& getDecimationStatistics() { return mStats; }
-		
+        /**
+         * Get the statistics of the last decimation.
+         * The format is : "lowres-compression-rate medres-compression-rate".
+         */
+        std::string& getDecimationStatistics() { return mStats; }
+                
     //---------------------------------------------------------------------
     // I/O
     //---------------------------------------------------------------------

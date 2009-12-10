@@ -41,7 +41,7 @@ int main (int argc, char ** argv)
   cout << " _______________" << endl;
   for(int i=-10;i<15;i++)
   {
-    	cout <<"  - A[" << i <<"]="<<modulusArray[i]<<endl;
+        cout <<"  - A[" << i <<"]="<<modulusArray[i]<<endl;
   }
   cout << endl;
 
@@ -57,7 +57,7 @@ int main (int argc, char ** argv)
 
   try
   {
-  	ret=modulusArray2.compare(modulusArray);
+        ret=modulusArray2.compare(modulusArray);
   }
   catch ( const std::exception &e )
   {
@@ -79,7 +79,7 @@ int main (int argc, char ** argv)
   {
         cout << "-----------------------------------------------------" << endl;
         cout << " pb avec compare entre modulusArray et modulusArray2 " << endl;
-	cout << " Les deux tableaux sont identiques " << endl;
+        cout << " Les deux tableaux sont identiques " << endl;
         cout << "-----------------------------------------------------" << endl;
         return EXIT_FAILURE ;
   }
@@ -213,7 +213,7 @@ int main (int argc, char ** argv)
 
   for(int i=-10;i<15;i++)
   {
-    	cout <<"  - A[" << i <<"]="<<modulusArray6[i]<<endl;
+        cout <<"  - A[" << i <<"]="<<modulusArray6[i]<<endl;
   }
   cout << endl;
 
@@ -283,7 +283,7 @@ int main (int argc, char ** argv)
   {
         cout << "-----------------------------------------------------" << endl;
         cout << " pb avec compare entre modulusArray6 et modulusArray8" << endl;
-	cout << " Les deux tableaux sont  differents" << endl;
+        cout << " Les deux tableaux sont  differents" << endl;
         cout << "-----------------------------------------------------" << endl;
         return EXIT_FAILURE ;
   }
@@ -304,7 +304,7 @@ int main (int argc, char ** argv)
 
   for(int i=-10;i<15;i++)
   {
-    	cout <<"  - A[" << i <<"]="<<modulusArray60[i]<<endl;
+        cout <<"  - A[" << i <<"]="<<modulusArray60[i]<<endl;
   }
   cout << endl;
 
@@ -314,7 +314,7 @@ int main (int argc, char ** argv)
 
   try
   {
-	ret=modulusArray60.compare(modulusArray70);
+        ret=modulusArray60.compare(modulusArray70);
   }
   catch ( const std::exception &e )
   {

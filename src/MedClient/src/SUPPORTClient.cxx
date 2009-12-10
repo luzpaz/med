@@ -35,7 +35,7 @@ using namespace MED_EN;
 //=============================================================================
 
 SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
-			     MESH * M) : 
+                             MESH * M) : 
   SUPPORT(), 
   IOR_Support(SALOME_MED::SUPPORT::_duplicate(S)),_refCounter(1)
 {
@@ -63,27 +63,27 @@ void SUPPORTClient::blankCopy()
 
         _name = all->name;
         _description = all->description;
-	setAll(all->isOnAllElements);
-	setEntity(all->entity);
+        setAll(all->isOnAllElements);
+        setEntity(all->entity);
 // modifs PN 
         setNumberOfGeometricType(all->numberOfGeometricType);
-  	convertCorbaArray2(_geometricType, _numberOfGeometricType, all->types);
+        convertCorbaArray2(_geometricType, _numberOfGeometricType, all->types);
 
         SCRUTE(_name);
         SCRUTE(_description);
 
         int *nE = new int[_numberOfGeometricType];
         int i;
-  	for (i=0; i<_numberOfGeometricType; i++)
-	{
-    		nE[i] = all->nbEltTypes[i];
-  	}
-  	setNumberOfElements(nE);
+        for (i=0; i<_numberOfGeometricType; i++)
+        {
+                nE[i] = all->nbEltTypes[i];
+        }
+        setNumberOfElements(nE);
 
-	delete [] nE;
+        delete [] nE;
 
-  	SCRUTE(_totalNumberOfElements);
-  	_complete_support = false;
+        SCRUTE(_totalNumberOfElements);
+        _complete_support = false;
   }
   catch( const CORBA::Exception &ex )
   {

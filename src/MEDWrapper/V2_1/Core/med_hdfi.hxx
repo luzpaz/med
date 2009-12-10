@@ -55,20 +55,20 @@ med_err _MEDdatasetFermer(med_idt id);
 
 extern
 med_err _MEDdatasetNumEcrire (med_idt pere,char *nom, med_type_champ type,
-			     med_mode_switch interlace, med_size nbdim, med_size fixdim, 
-			     med_size psize, med_ssize * profil, med_int ngauss,
-			      med_size *size,  unsigned char *val, med_mode_acces mode);
+                             med_mode_switch interlace, med_size nbdim, med_size fixdim, 
+                             med_size psize, med_ssize * profil, med_int ngauss,
+                              med_size *size,  unsigned char *val, med_mode_acces mode);
 
 
 extern
 med_err _MEDdatasetNumLire(med_idt pere,char *nom,med_type_champ type,
-			   med_mode_switch interlace, med_size nbdim, med_size fixdim, 
-			   med_size psize, med_ssize * pfltab, med_int ngauss,
-			   unsigned char *val);
+                           med_mode_switch interlace, med_size nbdim, med_size fixdim, 
+                           med_size psize, med_ssize * pfltab, med_int ngauss,
+                           unsigned char *val);
 
 extern
 med_err _MEDdatasetStringEcrire(med_idt pere,char *nom,med_size *dimd,
-				char *val, med_mode_acces mode);
+                                char *val, med_mode_acces mode);
 
 extern
 med_err _MEDdatasetStringLire(med_idt pere,char *nom,char *val);

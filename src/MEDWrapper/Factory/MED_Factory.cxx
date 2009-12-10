@@ -47,7 +47,7 @@ namespace MED
 {
   
   EVersion GetVersionId(const std::string& theFileName,
-			bool theDoPreCheckInSeparateProcess)
+                        bool theDoPreCheckInSeparateProcess)
   {
     INITMSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'"<<std::endl);
     EVersion aVersion = eVUnknown;    
@@ -59,14 +59,14 @@ namespace MED
       // File name is in quotes for the case of space(s) inside it (PAL13009)
       aStr<<"bash -c \""<<getenv("MED_ROOT_DIR")<<"/bin/salome/mprint_version \'"<<theFileName<<"\'\"";
       if(!MYDEBUG)
-	aStr<<" 2>&1 > /dev/null";
+        aStr<<" 2>&1 > /dev/null";
       
       std::string aCommand = aStr.str();
       int aStatus = system(aCommand.c_str());
       
       BEGMSG(MYDEBUG,"aCommand = '"<<aCommand<<"'; aStatus = "<<aStatus<<std::endl);
       if(aStatus != 0)
-	return aVersion;
+        return aVersion;
     }
 #endif
 
@@ -80,10 +80,10 @@ namespace MED
       med_err aRet = MEDversionLire(aFid,&aMajor,&aMinor,&aRelease);
       INITMSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'; aRet = "<<aRet<<std::endl);
       if(aRet >= 0){
-	if(aMajor >= 2 && aMinor >= 2)
-	  aVersion = eV2_2;
-	else
-	  aVersion = eV2_1;
+        if(aMajor >= 2 && aMinor >= 2)
+          aVersion = eV2_2;
+        else
+          aVersion = eV2_1;
       }
     }
     MEDfermer(aFid);
@@ -110,7 +110,7 @@ namespace MED
   }
 
   PWrapper CrWrapper(const std::string& theFileName,
-		     bool theDoPreCheckInSeparateProcess)
+                     bool theDoPreCheckInSeparateProcess)
   {
     PWrapper aWrapper;
     EVersion aVersion = GetVersionId(theFileName,theDoPreCheckInSeparateProcess);

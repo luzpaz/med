@@ -43,17 +43,17 @@ int main(void) {
   bool test1ok = true;
   const double * myArray1Ptr = 0;
   const double array1Ref[]  = { 11 , 12 , 21 , 22 , 31 , 32 , 41 , 42 , 51 , 52 ,
-			       61 , 62 , 71 , 72 , 81 , 82 , 91 , 92 , 101 , 102 ,
-			       111 , 112 , 121 , 122 , 131 , 132 , 141 , 142 ,
-			       151 , 152 , 161 , 162 , 171 , 172 , 181 , 182 ,
-			       191 , 192 , 201 , 202 };
+                               61 , 62 , 71 , 72 , 81 , 82 , 91 , 92 , 101 , 102 ,
+                               111 , 112 , 121 , 122 , 131 , 132 , 141 , 142 ,
+                               151 , 152 , 161 , 162 , 171 , 172 , 181 , 182 ,
+                               191 , 192 , 201 , 202 };
 
   const double array2Ref[] = { 11 , 21 , 31 , 41 , 51 , 61 , 71 , 81 , 91 , 101
-			       , 111 , 121 , 131 , 141 , 151 , 161 , 171 , 181
-			       , 191 , 201 ,
-			       12 , 22 , 32 , 42 , 52 , 62 , 72 , 82 , 92 , 102
-			       , 112 , 122 , 132 , 142 , 152 , 162 , 172 , 182
-			       , 192 , 202 };
+                               , 111 , 121 , 131 , 141 , 151 , 161 , 171 , 181
+                               , 191 , 201 ,
+                               12 , 22 , 32 , 42 , 52 , 62 , 72 , 82 , 92 , 102
+                               , 112 , 122 , 132 , 142 , 152 , 162 , 172 , 182
+                               , 192 , 202 };
 
   MEDMEM_Array<double>  myArray1(mdim,nbelem1);
 
@@ -63,7 +63,7 @@ int main(void) {
 
   myArray1Ptr = myArray1.getPtr();
   for (int i =0; i < mdim*nbelem1; i++)
-	test1ok = test1ok && ( myArray1Ptr[i] == array1Ref[i] );
+        test1ok = test1ok && ( myArray1Ptr[i] == array1Ref[i] );
 
   std::cout << "- Egualité de myArray1 et de myArray1Ref : " << test1ok << std::endl ;
 
@@ -71,7 +71,7 @@ int main(void) {
   MEDMEM_Array<double> myArray1bis(myArray1, false);
   myArray1Ptr = myArray1bis.getPtr();
   for (int i =0; i < mdim*nbelem1; i++)
-	test1ok = test1ok && ( myArray1Ptr[i] == array1Ref[i] );
+        test1ok = test1ok && ( myArray1Ptr[i] == array1Ref[i] );
   std::cout << "- Constructeur par recopie en FullInterlace et NoGauss : " << test1ok << std::endl;
 
   test1ok = true;
@@ -79,7 +79,7 @@ int main(void) {
   myArray1ter = myArray1;
   myArray1Ptr = myArray1ter.getPtr();
   for (int i =0; i < mdim*nbelem1; i++)
-	test1ok = test1ok && ( myArray1Ptr[i] == array1Ref[i] );
+        test1ok = test1ok && ( myArray1Ptr[i] == array1Ref[i] );
   std::cout << "- Opérateur d'affectation en FullInterlace et NoGauss : " << test1ok << std::endl;
 
 
@@ -91,7 +91,7 @@ int main(void) {
     myArray1qua.setRow(i,&array1Ref[(i-1)*mdim]);
 
   for (int i =0; i < mdim*nbelem1; i++)
-	test1ok = test1ok && ( myArray1Ptr[i] == array1Ref[i] );
+        test1ok = test1ok && ( myArray1Ptr[i] == array1Ref[i] );
   std::cout << "- Méthode setRow en FullInterlace et NoGauss : " << test1ok << std::endl;
 
   std::cout << "- Test de levée d'exception pour getColumn : ";
@@ -109,12 +109,12 @@ int main(void) {
   for (int j=1; j <= mdim; j++)
     for (int  i=1; i <= nbelem1 ; i++ ) {
       test1ok = test1ok
-	&& (  myArray1cin->getIJ(i,j) ==  array2Ref[elemno] )
-	&& (  myArray1Ptr[elemno]     ==  array2Ref[elemno] );
+        && (  myArray1cin->getIJ(i,j) ==  array2Ref[elemno] )
+        && (  myArray1Ptr[elemno]     ==  array2Ref[elemno] );
       elemno++;
     }
   std::cout << "- Convertion du mode FullInterlaceNoGaussPolicy au mode NoInterlaceNoGaussPolicy : "
-	    << test1ok << std::endl;
+            << test1ok << std::endl;
 
 
 
@@ -134,7 +134,7 @@ int main(void) {
 
   myArray2Ptr = myArray2.getPtr();
   for (int i =0; i < mdim*nbelem1; i++)
-	test2ok = test2ok && ( myArray2Ptr[i] == array2Ref[i] );
+        test2ok = test2ok && ( myArray2Ptr[i] == array2Ref[i] );
 
   std::cout << "- Egualité de myArray2 et de myArray2Ref : " << test2ok << std::endl ;
 
@@ -142,7 +142,7 @@ int main(void) {
   MEDMEM_Array<double,NoInterlaceNoGaussPolicy> myArray2bis(myArray2, false);
   myArray2Ptr = myArray2bis.getPtr();
   for (int i =0; i < mdim*nbelem1; i++)
-	test2ok = test2ok && ( myArray2Ptr[i] == array2Ref[i] );
+        test2ok = test2ok && ( myArray2Ptr[i] == array2Ref[i] );
   std::cout << "- Constructeur par recopie en NoInterlace et NoGauss : " << test2ok << std::endl;
 
   test2ok = true;
@@ -150,7 +150,7 @@ int main(void) {
   myArray2ter = myArray2;
   myArray2Ptr = myArray2ter.getPtr();
   for (int i =0; i < mdim*nbelem1; i++)
-	test2ok = test2ok && ( myArray2Ptr[i] == array2Ref[i] );
+        test2ok = test2ok && ( myArray2Ptr[i] == array2Ref[i] );
   std::cout << "- Opérateur d'affectation en NoInterlace et NoGauss : " << test2ok << std::endl;
 
   test2ok = true;
@@ -161,7 +161,7 @@ int main(void) {
     myArray2qua.setColumn(j,&array2Ref[nbelem1*(j-1)]);
 
   for (int i =0; i < mdim*nbelem1; i++)
-	test2ok = test2ok && ( myArray2Ptr[i] == array2Ref[i] );
+        test2ok = test2ok && ( myArray2Ptr[i] == array2Ref[i] );
   std::cout << "- Méthode setColumn en NoInterlace et NoGauss : " << test2ok << std::endl;
 
   std::cout << "- Test de levée d'exception pour getRow : " ;
@@ -179,12 +179,12 @@ int main(void) {
   for (int  i=1; i <= nbelem1 ; i++ )
     for (int j=1; j <= mdim; j++) {
       test2ok = test2ok
-	&& (  myArray2cin->getIJ(i,j) ==  array1Ref[elemno] )
-	&& (  myArray2Ptr[elemno]     ==  array1Ref[elemno] );
+        && (  myArray2cin->getIJ(i,j) ==  array1Ref[elemno] )
+        && (  myArray2Ptr[elemno]     ==  array1Ref[elemno] );
       elemno++;
     }
   std::cout << "- Convertion du mode NoInterlaceNoGaussPolicy au mode FullInterlaceNoGaussPolicy : "
-	    << test2ok << std::endl;
+            << test2ok << std::endl;
 
 
   // TEST n°3   FullInterlace et Gauss
@@ -200,17 +200,17 @@ int main(void) {
   bool test3ok = true;
   const double * myArray3Ptr = 0;
   const double array3Ref[] = {1.11 , 1.12 , 1.21 , 1.22 , 
-			      2.11 , 2.12 , 2.21 , 2.22 , 
-			      13.11 , 13.12 , 13.21 , 13.22 , 13.31 , 13.32 , 
-			      14.11 , 14.12 , 14.21 , 14.22 , 14.31 , 14.32 , 
-			      15.11 , 15.12 , 15.21 , 15.22 , 15.31 , 15.32 };
+                              2.11 , 2.12 , 2.21 , 2.22 , 
+                              13.11 , 13.12 , 13.21 , 13.22 , 13.31 , 13.32 , 
+                              14.11 , 14.12 , 14.21 , 14.22 , 14.31 , 14.32 , 
+                              15.11 , 15.12 , 15.21 , 15.22 , 15.31 , 15.32 };
 
   const double array4Ref[] = { 1.11 , 1.21 , 2.11 , 2.21,
-			       13.11 , 13.21 , 13.31 , 14.11 , 14.21 , 14.31 ,
-			       15.11 , 15.21 , 15.31 ,
-			       1.12 , 1.22 , 2.12 , 2.22 ,
-			       13.12 , 13.22 , 13.32 , 14.12 , 14.22 , 14.32 ,
-			       15.12 , 15.22 , 15.32 };
+                               13.11 , 13.21 , 13.31 , 14.11 , 14.21 , 14.31 ,
+                               15.11 , 15.21 , 15.31 ,
+                               1.12 , 1.22 , 2.12 , 2.22 ,
+                               13.12 , 13.22 , 13.32 , 14.12 , 14.22 , 14.32 ,
+                               15.12 , 15.22 , 15.32 };
 
   MEDMEM_Array<double,FullInterlaceGaussPolicy> myArray3(mdim,nbelem2,nbtypegeo,nbelgeoc,nbgaussgeo);
 
@@ -218,9 +218,9 @@ int main(void) {
    for (int ntyp=1; ntyp <= nbtypegeo; ntyp++ ) {
     for (int  i=0; i < (nbelgeoc[ntyp]-nbelgeoc[ntyp-1]) ; i++ ) {
       for (int k=1; k <= nbgaussgeo[ntyp]; k++)
-	for (int j=1; j <= mdim; j++) {
-	  myArray3.setIJK(elemno,j,k,elemno+(ntyp-1)*10+0.1*k+0.01*j);
-	}
+        for (int j=1; j <= mdim; j++) {
+          myArray3.setIJK(elemno,j,k,elemno+(ntyp-1)*10+0.1*k+0.01*j);
+        }
       elemno++;
     }
   }
@@ -238,10 +238,10 @@ int main(void) {
   for (int  i=1; i < nbelgeoc[nbtypegeo] ; i++ )
     for (int k=1; k <= myArray3bis.getNbGauss(i); k++)
       for (int j=1; j <= mdim; j++) {
-	test3ok = test3ok
-	  && (  myArray3bis.getIJK(i,j,k)    ==	 array3Ref[elemno] )
-	  && (	myArray3Ptr[elemno]          ==  array3Ref[elemno] );
-	elemno++;
+        test3ok = test3ok
+          && (  myArray3bis.getIJK(i,j,k)    ==  array3Ref[elemno] )
+          && (  myArray3Ptr[elemno]          ==  array3Ref[elemno] );
+        elemno++;
       }
   std::cout << "- Constructeur par recopie en FullInterlace et Gauss : " << test3ok << std::endl;
 
@@ -254,10 +254,10 @@ int main(void) {
   for (int  i=1; i < nbelgeoc[nbtypegeo] ; i++ )
     for (int k=1; k <= myArray3ter.getNbGauss(i); k++)
       for (int j=1; j <= mdim; j++) {
-	test3ok = test3ok
-	  && (  myArray3ter.getIJK(i,j,k)    ==	 array3Ref[elemno] )
-	  && (	myArray3Ptr[elemno]          ==  array3Ref[elemno] );
-	elemno++;
+        test3ok = test3ok
+          && (  myArray3ter.getIJK(i,j,k)    ==  array3Ref[elemno] )
+          && (  myArray3Ptr[elemno]          ==  array3Ref[elemno] );
+        elemno++;
       }
 
   std::cout << "- Opérateur d'affectation en FullInterlace et Gauss : " << test3ok << std::endl;
@@ -265,7 +265,7 @@ int main(void) {
 
   test3ok = true;
   MEDMEM_Array<double,FullInterlaceGaussPolicy> myArray3qua(mdim,nbelem2,
-							    nbtypegeo,nbelgeoc,nbgaussgeo);
+                                                            nbtypegeo,nbelgeoc,nbgaussgeo);
   myArray3Ptr = myArray3qua.getPtr();
 
   int cumul = 0;
@@ -275,7 +275,7 @@ int main(void) {
   };
 
   for (int i =0; i < myArray3qua.getArraySize(); i++)
-	test3ok = test3ok && ( myArray3Ptr[i] == array3Ref[i] );
+        test3ok = test3ok && ( myArray3Ptr[i] == array3Ref[i] );
   std::cout << "- Méthode setRow en FullInterlace et Gauss : " << test3ok << std::endl;
 
   std::cout << "- Test de levée d'exception pour getColumn : " ;
@@ -293,13 +293,13 @@ int main(void) {
   for (int j=1; j <= mdim; j++)
     for (int  i=1; i < nbelgeoc[nbtypegeo] ; i++ )
       for (int k=1; k <= myArray3cin->getNbGauss(i); k++) {
-	test3ok = test3ok
-	  && (  myArray3cin->getIJK(i,j,k) ==  array4Ref[elemno] )
-	  && (	myArray3Ptr[elemno]        ==  array4Ref[elemno] );
-	elemno++;
+        test3ok = test3ok
+          && (  myArray3cin->getIJK(i,j,k) ==  array4Ref[elemno] )
+          && (  myArray3Ptr[elemno]        ==  array4Ref[elemno] );
+        elemno++;
       }
   std::cout << "- Convertion du mode FullInterlaceGaussPolicy au mode NoInterlaceGaussPolicy : " 
-	    << test3ok << std::endl;
+            << test3ok << std::endl;
 
 
   // TEST n°4   NoInterlace et Gauss
@@ -316,9 +316,9 @@ int main(void) {
    for (int ntyp=1; ntyp <= nbtypegeo; ntyp++ ) {
     for (int  i=0; i < (nbelgeoc[ntyp]-nbelgeoc[ntyp-1]) ; i++ ) {
       for (int k=1; k <= nbgaussgeo[ntyp]; k++)
-	for (int j=1; j <= mdim; j++) {
-	  myArray4.setIJK(elemno,j,k,elemno+(ntyp-1)*10+0.1*k+0.01*j);
-	}
+        for (int j=1; j <= mdim; j++) {
+          myArray4.setIJK(elemno,j,k,elemno+(ntyp-1)*10+0.1*k+0.01*j);
+        }
       elemno++;
     }
   }
@@ -336,10 +336,10 @@ int main(void) {
   for (int j=1; j <= mdim; j++)
     for (int  i=1; i < nbelgeoc[nbtypegeo] ; i++ )
       for (int k=1; k <= myArray4bis.getNbGauss(i); k++) {
-	test4ok = test4ok
-	  && (  myArray4bis.getIJK(i,j,k)    ==	 array4Ref[elemno] )
-	  && (	myArray4Ptr[elemno]          ==  array4Ref[elemno] );
-	elemno++;
+        test4ok = test4ok
+          && (  myArray4bis.getIJK(i,j,k)    ==  array4Ref[elemno] )
+          && (  myArray4Ptr[elemno]          ==  array4Ref[elemno] );
+        elemno++;
       }
   std::cout << "- Constructeur par recopie en NoInterlace et Gauss : " << test4ok << std::endl;
 
@@ -352,10 +352,10 @@ int main(void) {
   for (int j=1; j <= mdim; j++)
     for (int  i=1; i < nbelgeoc[nbtypegeo] ; i++ )
       for (int k=1; k <= myArray4ter.getNbGauss(i); k++) {
-	test4ok = test4ok
-	  && (  myArray4ter.getIJK(i,j,k)    ==	 array4Ref[elemno] )
-	  && (	myArray4Ptr[elemno]          ==  array4Ref[elemno] );
-	elemno++;
+        test4ok = test4ok
+          && (  myArray4ter.getIJK(i,j,k)    ==  array4Ref[elemno] )
+          && (  myArray4Ptr[elemno]          ==  array4Ref[elemno] );
+        elemno++;
       }
 
   std::cout << "- Opérateur d'affectation en NoInterlace et Gauss : " << test4ok << std::endl;
@@ -369,7 +369,7 @@ int main(void) {
     myArray4qua.setColumn(j,&array4Ref[(myArray4qua.getArraySize()/mdim)*(j-1)]);
 
   for (int i =0; i < myArray4qua.getArraySize(); i++)
-	test4ok = test4ok && ( myArray4Ptr[i] == array4Ref[i] );
+        test4ok = test4ok && ( myArray4Ptr[i] == array4Ref[i] );
   std::cout << "- Méthode setColumn en NoInterlace et Gauss : " << test4ok << std::endl;
 
   std::cout << "- Test de levée d'exception pour getRow : " ;
@@ -394,15 +394,15 @@ int main(void) {
   for (int  i=1; i < nbelgeoc[nbtypegeo] ; i++ )
     for (int k=1; k <= myArray4cin->getNbGauss(i); k++)
       for (int j=1; j <= mdim; j++) {
-	test4ok = test4ok
-	  && (  myArray4cin->getIJK(i,j,k)   ==	 array3Ref[elemno] )
-	  && (  myArray4cin->getIJK(i,j,k)   ==  myArray3.getIJK(i,j,k) )
-	  && (	myArray4Ptr[elemno]          ==  array3Ref[elemno] );
-	elemno++;
+        test4ok = test4ok
+          && (  myArray4cin->getIJK(i,j,k)   ==  array3Ref[elemno] )
+          && (  myArray4cin->getIJK(i,j,k)   ==  myArray3.getIJK(i,j,k) )
+          && (  myArray4Ptr[elemno]          ==  array3Ref[elemno] );
+        elemno++;
       }
 
   std::cout << "- Convertion du mode NoInterlaceGaussPolicy au mode FullInterlaceGaussPolicy : " 
-	    << test4ok << std::endl;
+            << test4ok << std::endl;
 
 
   //TEST DES METHODES D'INTERROGATION en NoInterlace et Gauss :
