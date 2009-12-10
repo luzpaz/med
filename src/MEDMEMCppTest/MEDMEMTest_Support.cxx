@@ -387,19 +387,19 @@ void MEDMEMTest::testSupport()
   CPPUNIT_ASSERT_THROW(aSupportOnFaces1.getNumberOfElements(MED_EN::MED_TRIA6), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aSupportOnFaces1.getNumberOfElements(MED_EN::MED_QUAD8), MEDEXCEPTION);
 
-        //checking makeMesh()
-        auto_ptr<MESH> meshFromSupport( aSupportOnFaces1.makeMesh() );
-        CPPUNIT_ASSERT_EQUAL(4,meshFromSupport->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_TRIA3));
-        CPPUNIT_ASSERT_EQUAL(4,meshFromSupport->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_QUAD4));
-        int nbnodes=  meshFromSupport->getNumberOfNodes();
-        const int* conn=meshFromSupport->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_EN::MED_NODAL, MED_EN::MED_CELL, MED_EN::MED_TRIA3);
-        for (int i=0; i<12;i++)
+  //checking makeMesh()
+  auto_ptr<MESH> meshFromSupport( aSupportOnFaces1.makeMesh() );
+  CPPUNIT_ASSERT_EQUAL(4,meshFromSupport->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_TRIA3));
+  CPPUNIT_ASSERT_EQUAL(4,meshFromSupport->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_QUAD4));
+  int nbnodes=  meshFromSupport->getNumberOfNodes();
+  const int* conn=meshFromSupport->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_EN::MED_NODAL, MED_EN::MED_CELL, MED_EN::MED_TRIA3);
+  for (int i=0; i<12;i++)
     CPPUNIT_ASSERT(conn[i]>0 && conn[i]<=nbnodes);
 
   SUPPORT nodal_support (aSupportOnFaces1.getMesh(), "nodal_support", MED_EN::MED_NODE);
   CPPUNIT_ASSERT_THROW(nodal_support.makeMesh(), MEDEXCEPTION);
 
-        //checking makeMesh() on polygonal support
+  //checking makeMesh() on polygonal support
   {
     // "poly3D" mesh contains:
     // 19 MED_NODE
@@ -542,6 +542,70 @@ void MEDMEMTest::testSupport()
   CPPUNIT_ASSERT_EQUAL(0, aSupportOnCells1.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
   CPPUNIT_ASSERT_EQUAL(0, aSupportOnCells1.getNumberOfTypes());
   CPPUNIT_ASSERT_THROW(aSupportOnCells1.getnumber(), MEDEXCEPTION);
+
+  
+  /////////////////////////////////////
+  // test SUPPORT* buildSupportOnNode()
+  /////////////////////////////////////
+
+  for (medEntityMesh entity = 0; entity < MED_ALL_ENTITIES; ++entity )
+  {
+    if ( entity != MED_NODE && !aMesh->existConnectivity( MED_NODAL, entity ))
+      continue;
+    // buildSupportOnNode() from full entity support
+    SUPPORT allEntitySupport(aMesh,"allEntitySupport",entity);
+    auto_ptr<SUPPORT> testSupport( allEntitySupport.buildSupportOnNode() );
+    CPPUNIT_ASSERT(testSupport->isOnAllElements());
+    CPPUNIT_ASSERT_EQUAL(1,testSupport->getNumberOfTypes());
+    CPPUNIT_ASSERT_EQUAL(19,testSupport->getNumberOfElements(MED_ALL_ELEMENTS));
+
+    // buildSupportOnNode() from partial support
+    SUPPORT partialSupport( allEntitySupport );
+    partialSupport.setAll( false );
+    partialSupport.setNumberOfGeometricType( 1 );
+    partialSupport.setGeometricType( allEntitySupport.getTypes() );
+
+    // no element numbers set
+    CPPUNIT_ASSERT_THROW(partialSupport.buildSupportOnNode(), MEDEXCEPTION);
+
+    int index[] = {1,2};
+    int numbers[] = {1};
+    partialSupport.setNumberOfElements(numbers);
+    partialSupport.setNumber( index, numbers );
+
+    // mesh not set
+    partialSupport.setMesh(0);
+    CPPUNIT_ASSERT_THROW(partialSupport.buildSupportOnNode(), MEDEXCEPTION);
+    partialSupport.setMesh(aMesh);
+
+    testSupport.reset( partialSupport.buildSupportOnNode() );
+    CPPUNIT_ASSERT(!testSupport->isOnAllElements());
+    CPPUNIT_ASSERT_EQUAL(1,testSupport->getNumberOfTypes());
+    int nbNodes = testSupport->getNumberOfElements(MED_ALL_ELEMENTS);
+    if ( entity == MED_NODE )
+      CPPUNIT_ASSERT_EQUAL(1, nbNodes);
+    else
+      CPPUNIT_ASSERT_EQUAL(aMesh->getCellsTypes(entity)[0].getNumberOfNodes(), nbNodes);
+    const int * nodes = testSupport->getNumber( MED_ALL_ELEMENTS );
+    switch ( entity )
+    {
+    case MED_CELL:
+      CPPUNIT_ASSERT_EQUAL(1,nodes[0]);
+      CPPUNIT_ASSERT_EQUAL(2,nodes[1]);
+      CPPUNIT_ASSERT_EQUAL(3,nodes[2]);
+      CPPUNIT_ASSERT_EQUAL(6,nodes[3]);
+      break;
+    case MED_FACE:
+      CPPUNIT_ASSERT_EQUAL(1,nodes[0]);
+      CPPUNIT_ASSERT_EQUAL(3,nodes[1]);
+      CPPUNIT_ASSERT_EQUAL(4,nodes[2]);
+      break;
+    case MED_NODE:
+      CPPUNIT_ASSERT_EQUAL(1,nodes[0]);
+      break;
+    default:;
+    }
+  }
 
   ////////////
   // TEST 2 //
