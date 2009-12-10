@@ -340,7 +340,7 @@ Support \a mySupport now contains a union of the elements originally
 contained in \a mySupport and \a myOtherSupport.
 */
 //-------------------
-void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
+void SUPPORT::blending(const SUPPORT * mySupport) throw (MEDEXCEPTION)
   //-------------------
 {
   const char * LOC="SUPPORT::blending(SUPPORT *) : ";
@@ -1144,6 +1144,33 @@ SUPPORT *MEDMEM::SUPPORT::getBoundaryElements(medEntityMesh Entity) const throw 
   {
     return _mesh->buildSupportOnElementsFromElementList(myElementsList,baseEntity);
   }
+}
+
+/*!
+ * \brief Builds a nodal SUPPORT basing on nodes of this one
+ */
+
+SUPPORT* SUPPORT::buildSupportOnNode() const throw (MEDEXCEPTION)
+{
+  const char * LOC = "SUPPORT *MEDMEM::SUPPORT::buildSupportOnNode() : ";
+  if ( !getMesh() )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"This SUPPORT has no mesh"));
+
+  string name("Support On Node built from ");
+  name += getName();
+
+  SUPPORT* nodalSupport = new SUPPORT( getMesh(), name, MED_NODE );
+  if ( !isOnAllElements() )
+    {
+      if ( !_numberOfElements )
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No element numbers in a partial support"));
+
+      nodalSupport->setEntity( getEntity() );
+      const int * nums = _numberOfElements;
+      list<int> elems( nums, nums + _totalNumberOfElements );
+      getMesh()->fillSupportOnNodeFromElementList( elems, nodalSupport );
+    }
+  return nodalSupport;
 }
 
 /*!
