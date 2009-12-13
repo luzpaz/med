@@ -39,6 +39,7 @@ public:
   void reverseTransfer(MEDMEM::FIELD<double>& source_field, const MEDMEM::FIELD<double>& target_field);
   MEDMEM::FIELD<double> * transferField(const MEDMEM::FIELD<double>& source_field);
   MEDMEM::FIELD<double> * reverseTransferField(const MEDMEM::FIELD<double>& target_field);
+  void printMatrixInfo();
   int setOptionDouble(const std::string& key, double value);
   int setOptionInt(const std::string& key, int value);
   int setOptionString(const std::string& key, std::string& value);
