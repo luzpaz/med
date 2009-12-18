@@ -428,8 +428,15 @@ inline int GRID::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGe
     if (entity==MED_EN::MED_FACE && (Type==MED_EN::MED_QUAD4 || Type==MED_EN::MED_ALL_ELEMENTS) && _spaceDimension>2)
         numberOfElements=(_iArrayLength-1)*(_jArrayLength-1);
 
-    else if (entity==MED_EN::MED_EDGE && (Type==MED_EN::MED_SEG2 || Type==MED_EN::MED_ALL_ELEMENTS) && _spaceDimension>1)
+    else if (entity==MED_EN::MED_EDGE && (Type==MED_EN::MED_SEG2 || Type==MED_EN::MED_ALL_ELEMENTS))
+      if ( _spaceDimension==2)
+        numberOfElements=_iArrayLength*(_jArrayLength-1) + (_iArrayLength-1)*_jArrayLength;
+      else if ( _spaceDimension==1)
         numberOfElements=_iArrayLength-1;
+      else // 3D
+        numberOfElements=
+          (_iArrayLength*(_jArrayLength-1) + (_iArrayLength-1)*_jArrayLength) * _kArrayLength +
+          _iArrayLength*_jArrayLength*(_kArrayLength-1);
 
     else if (entity==MED_EN::MED_NODE && (Type==MED_EN::MED_NONE || Type==MED_EN::MED_ALL_ELEMENTS) && _spaceDimension>0)
         numberOfElements=_numberOfNodes;
