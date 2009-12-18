@@ -250,18 +250,27 @@ void SUPPORT::update()
     if (_entity == MED_NODE)
     {
       _numberOfGeometricType=1 ;
-      _geometricType.set(1);
-      _geometricType[0]=MED_POINT1;
+      // BEGIN Isuue 0020633: [CEA] Pb with 3D field creation fron another
+      // Use setGeometricType() in order to get _profilNames updated
+      //_geometricType.set(1);
+      //_geometricType[0]=MED_POINT1;
+      const MED_EN::medGeometryElement type = MED_POINT1;
+      setGeometricType( & type );
+      // END Isuue 0020633: [CEA] Pb with 3D field creation fron another
       _numberOfElements.set(1);
       _numberOfElements[0]=_mesh->getNumberOfNodes(); // Vérifier le pointeur !
       _totalNumberOfElements=_numberOfElements[0];
     }
     else
-    { // we duplicate information from _mesh
+    { // we duplicate information from _mesh
       _numberOfGeometricType=_mesh->getNumberOfTypesWithPoly(_entity);
       SCRUTE_MED(_numberOfGeometricType);
       medGeometryElement *  allType = _mesh->getTypesWithPoly(_entity);
-      _geometricType.set(_numberOfGeometricType,allType );
+      // BEGIN Isuue 0020633: [CEA] Pb with 3D field creation fron another
+      // Use setGeometricType() in order to get _profilNames updated
+      //_geometricType.set(_numberOfGeometricType,allType );
+      setGeometricType( allType );
+      // END Isuue 0020633: [CEA] Pb with 3D field creation fron another
       _numberOfElements.set(_numberOfGeometricType);
       _totalNumberOfElements=0;
       for (int i=0;i<_numberOfGeometricType;i++)

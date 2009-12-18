@@ -438,6 +438,7 @@ inline void SUPPORT::setNumberOfGeometricType(int NumberOfGeometricType)
 
   _geometricType.set(0);
   _numberOfElements.set(0);
+  _profilNames.resize( NumberOfGeometricType, "" );
 }
 
 /*! set the attribute _geometricType to geometricType */
@@ -446,11 +447,9 @@ inline void SUPPORT::setGeometricType(const MED_EN::medGeometryElement *Geometri
 //---------------------------------------------------------------------
 {
   if (!_geometricType)
-    _geometricType.set(_numberOfGeometricType);
-  for (int i=0;i<_numberOfGeometricType;i++)
-    _geometricType[i] = GeometricType[i];
+    _geometricType.set(_numberOfGeometricType, GeometricType);
 
-  if (_profilNames.empty())
+  if (_profilNames.empty() || _profilNames[0].empty())
     {
       // giving a default value to profile names
       vector<string> prof_names( _numberOfGeometricType);
