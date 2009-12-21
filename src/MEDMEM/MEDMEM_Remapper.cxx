@@ -322,5 +322,5 @@ MEDMEM::FIELD<double>* MEDMEM_REMAPPER::getSupportVolumes(const MEDMEM::SUPPORT&
 
 void MEDMEM_REMAPPER::printMatrixInfo()
 {
-	std::cout << _matrix << std::endl;
+	std::cout << *_matrix << std::endl;
 }
