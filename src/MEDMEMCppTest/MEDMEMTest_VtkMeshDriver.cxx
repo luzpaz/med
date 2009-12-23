@@ -74,10 +74,7 @@ void MEDMEMTest::testVtkMeshDriver()
     CPPUNIT_ASSERT_THROW(aInvalidVtkDriver->open(), MEDEXCEPTION);
     CPPUNIT_ASSERT_THROW(aInvalidVtkDriver->openConst(), MEDEXCEPTION);
 
-    //#ifdef ENABLE_FORCED_FAILURES
-    // (BUG) In destructor of VTK_MESH_DRIVER: Exception after trying close not existing file
-    //CPPUNIT_ASSERT_NO_THROW(delete aInvalidVtkDriver);
-    //#endif
+    CPPUNIT_ASSERT_NO_THROW(delete aInvalidVtkDriver);
   }
 
   {
@@ -108,19 +105,14 @@ void MEDMEMTest::testVtkMeshDriver()
   CPPUNIT_ASSERT_NO_THROW(aVtkDriver->open());
 
   //Trying open file secondary
-  //#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) No exception on attempt to open a file for the second time
-  //CPPUNIT_ASSERT_THROW(aVtkDriver->open(), MEDEXCEPTION);
-  //#endif
+  // (NOT!!! BUG) No exception on attempt to open a file for the second time
+  //CPPUNIT_ASSERT_NO_THROW(aVtkDriver->open());
 
   //Test read method
   CPPUNIT_ASSERT_THROW(aVtkDriver->read(), MEDEXCEPTION);
 
   //Trying write empty mesh
-  //#ifdef ENABLE_FAULTS
-  // ? (BUG) ? In VTK_MESH_DRIVER::write() => Segmentation fault on attempt to write an empty mesh
-  //CPPUNIT_ASSERT_THROW(aVtkDriver->write(), MEDEXCEPTION);
-  //#endif
+  CPPUNIT_ASSERT_THROW(aVtkDriver->write(), MEDEXCEPTION);
 
   //Read mesh from Med file
   aMedMeshRdDriver22->read();
@@ -142,10 +134,7 @@ void MEDMEMTest::testVtkMeshDriver()
   VTK_MESH_DRIVER aVtkDriverCpy_1;
 
   //Test copy constructor
-  //#ifdef ENABLE_FAULTS
-  // (BUG) In copy constructor of VTK_MESH_DRIVER: Segmentation fault
   VTK_MESH_DRIVER aVtkDriverCpy_2 (*aVtkDriver);
-  //#endif
 
   //Test (bool operator ==) defined in GENDRIVER class
   //CPPUNIT_ASSERT(aVtkDriverCpy_2.GENDRIVER::operator==(aVtkDriver));

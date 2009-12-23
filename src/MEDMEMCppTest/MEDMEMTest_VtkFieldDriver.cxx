@@ -155,7 +155,6 @@ void MEDMEMTest::testVtkFieldDriver()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  //#ifdef ENABLE_FAULTS
   //Test write() method
   try
   {
@@ -169,8 +168,6 @@ void MEDMEMTest::testVtkFieldDriver()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-    // => Segmentation fault
-  //#endif
 
   //Test read() method for Vtk Field Driver
   CPPUNIT_ASSERT_THROW(aVtkFieldDriver_int->read(),MEDEXCEPTION);
@@ -230,7 +227,6 @@ void MEDMEMTest::testVtkFieldDriver()
 
   aVtkFieldDriver_double->setFieldName(fieldname_wr_double);
 
-  //#ifdef ENABLE_FAULTS
   //Test writeAppend() method
   try
   {
@@ -244,8 +240,6 @@ void MEDMEMTest::testVtkFieldDriver()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  // => Segmentation fault
-  //#endif
 
   try
   {
@@ -260,16 +254,124 @@ void MEDMEMTest::testVtkFieldDriver()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  //#ifdef ENABLE_FORCED_FAILURES
-  //VTK_FIELD_DRIVER<int> aVtkFieldDriver_intCpy_1;
-  //VTK_FIELD_DRIVER<int>.template VTK_FIELD_DRIVER<FullInterlace> aVtkFieldDriver_intCpy_1;
-  //CPPUNIT_FAIL("Compilation error: no matching function for call to 'MEDMEM::VTK_FIELD_DRIVER<int>::VTK_FIELD_DRIVER()");
-  //#endif
+  /////////////////////////
+  //  TEST BINARY FORMAT //
+  /////////////////////////
 
-  //#ifdef ENABLE_FAULTS
+  DRIVERFACTORY::setVtkBinaryFormatForWriting( true );
+
+  //BINARY: Test open() method
+  try
+  {
+    aVtkFieldDriver_int->open();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+  //BINARY: Test write() method
+  try
+  {
+    aVtkFieldDriver_int->write();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+  //BINARY: Test read() method for Vtk Field Driver
+  CPPUNIT_ASSERT_THROW(aVtkFieldDriver_int->read(),MEDEXCEPTION);
+
+  //BINARY: Test close() method
+  try
+  {
+    aVtkFieldDriver_int->close();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+  //BINARY: Test openAppend() method
+  try
+  {
+    aVtkFieldDriver_int->close();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+
+  /////////////////////////////////////////////////////////
+  //  BINARY: Test openAppend() and writeAppend() methods  //
+  /////////////////////////////////////////////////////////
+
+  try
+  {
+    aVtkFieldDriver_double->openAppend();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+  aVtkFieldDriver_double->setFieldName(fieldname_wr_double);
+
+  //BINARY: Test writeAppend() method
+  try
+  {
+    aVtkFieldDriver_double->writeAppend();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+  try
+  {
+    aVtkFieldDriver_double->close();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+  DRIVERFACTORY::setVtkBinaryFormatForWriting( false );
+
+  VTK_FIELD_DRIVER<int> aVtkFieldDriver_intCpy_1;
+
   //Test copy constructor
   VTK_FIELD_DRIVER<int> aVtkFieldDriver_intCpy_2 (*aVtkFieldDriver_int);
-  // => Segmentation fault after call Copy Constructor
 
   CPPUNIT_ASSERT_EQUAL(aVtkFieldDriver_intCpy_2, *aVtkFieldDriver_int);
   //Test (bool operator ==) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
@@ -282,15 +384,11 @@ void MEDMEMTest::testVtkFieldDriver()
 
   CPPUNIT_ASSERT(ostr1.str() != "");
   CPPUNIT_ASSERT(ostr1.str() == ostr2.str());
-  //#endif
 
   //Delete all objects
   delete aField;
   delete aField_1;
-  //#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) Exception in the destructor after trying close not existing file.
   delete aInvalidVtkFieldDriver_1;
-  //#endif
   delete aInvalidVtkFieldDriver_2;
   delete aMedRdFieldDriver22_int;
   delete aMedRdFieldDriver22_double;

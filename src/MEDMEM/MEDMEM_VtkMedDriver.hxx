@@ -47,13 +47,10 @@ class MEDMEM_EXPORT VTK_MED_DRIVER : public GENDRIVER
 protected:
   
   MED * const       _ptrMed ;     // Store 'VTK_DRIVER (0..n)----(1) VTK' associations
-  ofstream *        _vtkFile ;     // The _vtkFile used to write Meshes and Fields to _filename
+  //ofstream *        _vtkFile ;     // The _vtkFile used to write Meshes and Fields to _filename
   
 private:
   VTK_MED_DRIVER();
-
-  //writeField(FIELD * myField) ;
-  //writeMesh(MESH * myMesh) ;
 
   void open()   ;
   void close()  ;
@@ -75,8 +72,8 @@ public :
 
 private :
   void writeMesh(MESH * myMesh) const ;
-  void writeSupport(SUPPORT * mySupport) const ;
   void writeField(FIELD_ * myField,string name) const ;
+//   void writeSupport(SUPPORT * mySupport) const ;
 
 };
 }

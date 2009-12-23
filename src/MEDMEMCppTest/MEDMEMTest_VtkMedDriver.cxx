@@ -94,22 +94,34 @@ void MEDMEMTest::testVtkMedDriver()
     CPPUNIT_FAIL("Unknown exception");
   }
 
+  //Test BINARY write() method
+
+  DRIVERFACTORY::setVtkBinaryFormatForWriting( true );
+  try
+  {
+    aVtkMedDriver->write();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+  DRIVERFACTORY::setVtkBinaryFormatForWriting( false );
+  
+
   //Test copy constructor
   VTK_MED_DRIVER *aVtkMedDriverCpy = new VTK_MED_DRIVER(*aVtkMedDriver);
-  //#ifdef ENABLE_FORCED_FAILURES
   CPPUNIT_ASSERT_EQUAL(*aVtkMedDriverCpy, *aVtkMedDriver);
-  //#endif
 
   //Test (operator ==) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
-  //#ifdef ENABLE_FORCED_FAILURES
   CPPUNIT_ASSERT(*aVtkMedDriverCpy == *aVtkMedDriver);
-  //#endif
 
   //Test copy() function
   VTK_MED_DRIVER *aVtkMedDriverCpy_1 = (VTK_MED_DRIVER*)aVtkMedDriver->copy();
-  //#ifdef ENABLE_FORCED_FAILURES
   CPPUNIT_ASSERT_EQUAL(*aVtkMedDriverCpy_1, *aVtkMedDriver);
-  //#endif
 
   //Test (friend ostream & operator <<) defined GENDRIVER class in MEDMEM_GenDriver.hxx
   ostringstream ostr1, ostr2;
@@ -121,11 +133,8 @@ void MEDMEMTest::testVtkMedDriver()
 
   //Delete objects
   delete aMedMedRdDriver21;
-  //#ifdef ENABLE_FORCED_FAILURES
   delete aInvalidVtkMedDriver;
   delete aVtkMedDriver;
   delete aVtkMedDriverCpy;
   delete aVtkMedDriverCpy_1;
-  //MEDEXCEPTION in the destructor (after trying close file)
-  //#endif
 }

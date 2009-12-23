@@ -48,13 +48,16 @@ class MESH;
 class FAMILY;
 class GROUP;
 class CONNECTIVITY;
+class MEDMEM_EXPORT _VTK_BinaryWriter;
+
 class MEDMEM_EXPORT VTK_MESH_DRIVER : public GENDRIVER
 {
 protected:
 
-  MESH *   _ptrMesh;
-  ofstream *        _vtkFile ;     // The _vtkFile used to write Meshes and Fields to _filename
-  string         _meshName;
+  MESH *     _ptrMesh;
+  string     _meshName;
+  mutable ofstream *         _vtkFile ;     // The _vtkFile used to write Meshes to _filename
+  mutable _VTK_BinaryWriter* _binaryFile;
 
 public :
 
@@ -99,7 +102,59 @@ public :
 private:
   GENDRIVER * copy ( void ) const;
 
+  template <typename T>
+  void writeBinary(const T* data, int nbValues) const throw (MEDEXCEPTION);
 };
+
+class MEDMEM_EXPORT _VTK_BinaryWriter
+{
+  std::string _fileName;
+  int         _binaryFile;
+public:
+  _VTK_BinaryWriter(const std::string file);
+  bool open(bool append=false) const;
+  bool close() const;
+
+  template <typename T>
+  void write(const T* data, int nbValues) const throw (MEDEXCEPTION)
+  {
+    // DEBUG
+//     if ( sizeof(T) == sizeof(char))
+//       cout << data ;
+//     else
+//       for ( int i=0; i < nbValues;++i )
+//         cout << data[i] << " ";
+    const void* toWrite = (const void* ) data;
+    T* swappedData = 0;
+    if ( sizeof(T) != sizeof(char))
+      {
+        // inverse bytes
+        toWrite = (const void* )( swappedData = new T[ nbValues ]);
+        memcpy( swappedData, data, nbValues * sizeof(T));          
+        int* intBuf = ((int*) swappedData) - 1;
+        int* bufEnd = (int*)((char*) swappedData + nbValues * sizeof(T));
+        while ( ++intBuf < bufEnd )
+          *intBuf = swapBytes( *intBuf );
+      }
+#ifdef WNT
+    ssize_t nbWritten = ::_write( _binaryFile, toWrite, nbValues * sizeof(T));
+#else
+    ssize_t nbWritten = ::write( _binaryFile, toWrite, nbValues * sizeof(T));
+#endif
+    if ( swappedData )
+      delete [] swappedData;
+    if ( nbWritten < 0 )
+      throw MEDEXCEPTION(LOCALIZED(STRING("_VTK_BinaryWriter::Failed to write into ")<< _fileName));
+  }
+};
+
+template <typename T>
+void VTK_MESH_DRIVER::writeBinary(const T* data, int nbValues) const throw (MEDEXCEPTION)
+{
+  _binaryFile->write( data, nbValues );
 }
+
+}
+
 
 #endif /* VTK_MESH_DRIVER_HXX */
