@@ -66,6 +66,18 @@ void DRIVERFACTORY::setMedFileVersionForWriting(medFileVersion version)
   DRIVERFACTORY::globalMedFileVersionForWriting = version;
 }
 
+bool DRIVERFACTORY::globalVtkBinaryFormatForWriting = false;
+
+bool DRIVERFACTORY::getVtkBinaryFormatForWriting()
+{
+  return globalVtkBinaryFormatForWriting;
+}
+
+void DRIVERFACTORY::setVtkBinaryFormatForWriting(bool isBinary)
+{
+  globalVtkBinaryFormatForWriting = isBinary;
+}
+
 driverTypes DRIVERFACTORY::deduceDriverTypeFromFileName(const std::string & fileName)
 {
   string extension(fileName);

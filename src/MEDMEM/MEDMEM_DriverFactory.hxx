@@ -51,6 +51,12 @@ namespace MEDMEM {
 
     MEDMEM_EXPORT void setMedFileVersionForWriting(MED_EN::medFileVersion version);
 
+    MEDMEM_EXPORT extern bool globalVtkBinaryFormatForWriting;
+
+    MEDMEM_EXPORT bool getVtkBinaryFormatForWriting();
+
+    MEDMEM_EXPORT void setVtkBinaryFormatForWriting(bool isBinary);
+
     MEDMEM_EXPORT driverTypes deduceDriverTypeFromFileName(const std::string & fileName);
 
     driverTypes deduceDriverTypeFromFileName(const std::string & fileName);

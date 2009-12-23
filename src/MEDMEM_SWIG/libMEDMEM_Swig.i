@@ -435,6 +435,21 @@ void setMedFileVersionForWriting(medFileVersion version);
     }
 %}
 
+bool getVtkBinaryFormatForWriting();
+
+void setVtkBinaryFormatForWriting(bool isBinary);
+
+%{
+  bool getVtkBinaryFormatForWriting()
+    {
+      return DRIVERFACTORY::getVtkBinaryFormatForWriting();
+    }
+  void setVtkBinaryFormatForWriting(bool isBinary)
+    {
+      DRIVERFACTORY::setVtkBinaryFormatForWriting(isBinary);
+    }
+%}
+
 %extend DT_IT_ {
   int getdt()
     {

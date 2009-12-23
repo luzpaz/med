@@ -115,6 +115,20 @@ void MEDMEMTest::testDriverFactory()
   // restore default version preference
   DRIVERFACTORY::setMedFileVersionForWriting(aVersionSaved);
 
+  //////////////////////////////////////////////////////////////////////////
+  // Test 1b: getVtkBinaryFormatForWriting & setVtkBinaryFormatForWriting //
+  //////////////////////////////////////////////////////////////////////////
+
+  // save current format
+  bool wasBinary = DRIVERFACTORY::getVtkBinaryFormatForWriting();
+
+  // check changing format
+  DRIVERFACTORY::setVtkBinaryFormatForWriting( !wasBinary );
+  CPPUNIT_ASSERT(DRIVERFACTORY::getVtkBinaryFormatForWriting() == !wasBinary);
+
+  // restore default version preference
+  DRIVERFACTORY::setVtkBinaryFormatForWriting(wasBinary);
+
   //////////////////////////////////////////
   // Test 2: deduceDriverTypeFromFileName //
   //////////////////////////////////////////
