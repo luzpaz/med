@@ -809,18 +809,10 @@ private:
       int* intBuf = ((int*) buf) - 1;
       int* bufEnd = (int*)((char*) buf + nBytesRead);
       while ( ++intBuf < bufEnd )
-        *intBuf = InverseInt( *intBuf );
+        *intBuf = MEDMEM::swapBytes( *intBuf );
     }
 #endif
     return buf;
-  }
-  //!<  swap bytes of int
-  int InverseInt (const int theValue)
-  {
-    return (0 | (( theValue & 0x000000ff ) << 24 )
-            |   (( theValue & 0x0000ff00 ) << 8  )
-            |   (( theValue & 0x00ff0000 ) >> 8  )
-            |   (( theValue >> 24 ) & 0x000000ff ) );
   }
 };
 

@@ -28,48 +28,66 @@
 #ifndef WIN32
 #include <libgen.h>
 #endif
-inline std::string getBaseName( const std::string& dataname ) {
-  std::string aBaseName = "";
-#ifndef WIN32
-  aBaseName = basename((char*)dataname.c_str());
-#else
-  for ( int i = dataname.size()-1; i >= 0; i-- ) {
-    char aSymb = dataname[i];
-    if ( dataname[i] == '\\' || dataname[i] == '/' )
-      break;
-    aBaseName = dataname[i] + aBaseName;
-  }
-#endif
-  return aBaseName;
-}
 
-inline std::string getDirName(const std::string& dataname ) {
-  std::string aDirName = "";
+namespace MEDMEM
+{
+  inline std::string getBaseName( const std::string& dataname )
+  {
+    std::string aBaseName = "";
 #ifndef WIN32
-  aDirName = dirname((char*)dataname.c_str());
+    aBaseName = basename((char*)dataname.c_str());
 #else
-  bool aFindLine = false;
-  for ( int i = dataname.size()-1; i >= 0; i-- ) {
-    char aSymb = dataname[i];
+    for ( int i = dataname.size()-1; i >= 0; i-- ) {
+      char aSymb = dataname[i];
+      if ( dataname[i] == '\\' || dataname[i] == '/' )
+        break;
+      aBaseName = dataname[i] + aBaseName;
+    }
+#endif
+    return aBaseName;
+  }
+
+  inline std::string getDirName(const std::string& dataname )
+  {
+    std::string aDirName = "";
+#ifndef WIN32
+    aDirName = dirname((char*)dataname.c_str());
+#else
+    bool aFindLine = false;
+    for ( int i = dataname.size()-1; i >= 0; i-- ) {
+      char aSymb = dataname[i];
+      if ( !aFindLine )
+        aFindLine = dataname[i] == '\\' || dataname[i] == '/';
+      else
+        aDirName = dataname[i] + aDirName;
+    }
     if ( !aFindLine )
-      aFindLine = dataname[i] == '\\' || dataname[i] == '/';
-    else
-      aDirName = dataname[i] + aDirName;
-  }
-  if ( !aFindLine )
-    aDirName = '.';
+      aDirName = '.';
 #endif
-  return aDirName;
-}
+    return aDirName;
+  }
 
-/*!
-* \brief Make a name valid. So far, removes white spaces from name end
-*/
-inline std::string healName(const std::string& name ) {
-  size_t last = name.size()-1;
-  while ( last >= 0 && isspace( name[last] ))
-    last--;
-  return name.substr( 0, last + 1 );
+  /*!
+   * \brief Make a name valid. So far, removes white spaces from name end
+   */
+  inline std::string healName(const std::string& name )
+  {
+    size_t last = name.size()-1;
+    while ( last >= 0 && isspace( name[last] ))
+      last--;
+    return name.substr( 0, last + 1 );
+  }
+
+  /*!
+   * Change order of bytes for other endianness
+   */
+  inline int swapBytes(const int theValue)
+  {
+    return (0 | (( theValue & 0x000000ff ) << 24 )
+            |   (( theValue & 0x0000ff00 ) << 8  )
+            |   (( theValue & 0x00ff0000 ) >> 8  )
+            |   (( theValue >> 24 ) & 0x000000ff ) );
+  }
 }
 
 #  include <cstdlib>
