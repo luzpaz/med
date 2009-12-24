@@ -832,6 +832,8 @@ public:
   double normL1(const FIELD<double, FullInterlace> *
 		p_field_volume=NULL) const;
 
+  double integral(const SUPPORT* subSupport=0);
+
   void write(int index=0, const std::string& driverName="");
 
   void writeAppend(int index=0, const std::string& driverName="");
