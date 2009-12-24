@@ -441,7 +441,7 @@ and five MED_POLYGON, the number of the first polygonal element is 11.
 //-------------------
 void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
                          int TotalNumberOfElements,
-                         medGeometryElement *GeometricType,
+                         const medGeometryElement *GeometricType,
                          const int *NumberOfElements, const int *NumberValue)
   //-------------------
 {

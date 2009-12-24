@@ -214,7 +214,7 @@ public:
   // Les numéros d'entités dans les profils doivent être croissant
   // pour respecter la norme MED
   void setpartial(string Description, int NumberOfGeometricType,
-                  int TotalNumberOfEntity, MED_EN::medGeometryElement *GeometricType,
+                  int TotalNumberOfEntity, const MED_EN::medGeometryElement *GeometricType,
                   const int *NumberOfEntity, const int *NumberValue);
 
   void setpartial(MEDSKYLINEARRAY * number, bool shallowCopy=false) throw (MEDEXCEPTION);
