@@ -344,7 +344,7 @@ protected:
   static void _deepCheckFieldCompatibility(const FIELD_& m, const FIELD_& n, bool checkUnit=true) throw (MEDEXCEPTION);
   void _checkNormCompatibility(const FIELD<double>* p_field_volume=NULL,
                                const bool           nodalAllowed = false) const  throw (MEDEXCEPTION);
-  FIELD<double>* _getFieldSize() const;
+  FIELD<double>* _getFieldSize(const SUPPORT *subSupport=NULL) const;
 
 public:
 
@@ -964,6 +964,7 @@ public:
   double normL2(const FIELD<double,FullInterlace> * p_field_volume=NULL) const;
   double normL1(int component, const FIELD<double,FullInterlace> * p_field_volume=NULL) const;
   double normL1(const FIELD<double,FullInterlace> * p_field_volume=NULL) const;
+  double integral(const SUPPORT *subSupport=NULL) const throw (MEDEXCEPTION);
   FIELD* extract(const SUPPORT *subSupport) const throw (MEDEXCEPTION);
 
   friend class MED_FIELD_RDONLY_DRIVER21<T>;
@@ -1202,28 +1203,44 @@ FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
 
   //INITIALISATION DE _valueType DS LE CONSTRUCTEUR DE FIELD_
   ASSERT_MED(FIELD_::_valueType == MED_EN::MED_UNDEFINED_TYPE)
-  FIELD_::_valueType=SET_VALUE_TYPE<T>::_valueType;
+    FIELD_::_valueType=SET_VALUE_TYPE<T>::_valueType;
 
   //INITIALISATION DE _interlacingType DS LE CONSTRUCTEUR DE FIELD_
   ASSERT_MED(FIELD_::_interlacingType == MED_EN::MED_UNDEFINED_INTERLACE)
-  FIELD_::_interlacingType=SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType;
+    FIELD_::_interlacingType=SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType;
 
-  try {
-    // becarefull about the numbre of gauss point
-    _numberOfValues = Support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-  }
+  try
+    {
+      // becarefull about the numbre of gauss point
+      _numberOfValues = Support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+    }
 #if defined(_DEBUG_) || defined(_DEBUG)
-  catch (MEDEXCEPTION &ex) {
+  catch (MEDEXCEPTION &ex)
 #else
-  catch (MEDEXCEPTION ) {
+  catch (MEDEXCEPTION )
 #endif
-    MESSAGE_MED("No value defined ! ("<<ex.what()<<")");
-  }
+    {
+      MESSAGE_MED("No value defined ! ("<<ex.what()<<")");
+    }
   MESSAGE_MED("FIELD : constructeur : "<< _numberOfValues <<" et "<< NumberOfComponents);
-  if (0<_numberOfValues) {
-    _value = new ArrayNoGauss (_numberOfComponents,_numberOfValues);
-    _isRead = true ;
-  }
+  if ( _numberOfValues > 0 )
+    {
+      if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE )
+        {
+          const int * nbelgeo = Support->getNumberOfElements();
+          vector<int> nbelgeoc( Support->getNumberOfTypes() + 1 );
+          nbelgeoc[0] = 0;
+          for ( int t = 1; t < nbelgeoc.size(); ++t )
+            nbelgeoc[t] = nbelgeoc[t-1] + nbelgeo[t-1];
+          _value = new ArrayNoByType (_numberOfComponents,_numberOfValues,
+                                      Support->getNumberOfTypes(), &nbelgeoc[0]);
+        }
+      else
+        {
+          _value = new ArrayNoGauss (_numberOfComponents,_numberOfValues);
+        }
+      _isRead = true ;
+    }
   _mesh  = ( MESH* ) NULL;
 
   END_OF_MED(LOC);
@@ -2707,7 +2724,6 @@ double FIELD<T, INTERLACING_TAG>::normL1(const FIELD<double, FullInterlace> * p_
         integrale += std::abs( anArray->getIJ(i,j) * *p_vol );
       }
     }
-    //delete anArray;
   }
   else { // FULL_INTERLACE
     ArrayFull* anArray = dynamic_cast< ArrayFull * > ( getArrayNoGauss() );
@@ -2717,40 +2733,161 @@ double FIELD<T, INTERLACING_TAG>::normL1(const FIELD<double, FullInterlace> * p_
         integrale += std::abs( anArray->getIJ(i,j) * *p_vol );
       }
     }
-    //delete anArray;
   }
-  
-  
-  //const T * value     = NULL;
-  //ArrayNo * myArray   = NULL;
-  //if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
-  //  value = getValue();
-  //else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
-  //  myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
-  //  value   = myArray->getPtr();
-  //}
-  //else {
-  //  myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
-  //  value   = myArray->getPtr();
-  //}
-  
-  //double totVol=0.0;
-  //const double* p_vol=vol;
-  //for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
-  //  totVol+=*p_vol;
-  
-  //double integrale=0.0;
-  //for (int i=1; i<=getNumberOfComponents(); ++i) // compute integral on all components
-  //  for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol)
-  //    integrale += std::abs( static_cast<double>(*value) ) * (*p_vol);
-  
-  if(!p_field_volume) // if the user didn't supply the volume
-    delete p_field_size; // delete temporary volume field
-  //if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
+
   if( totVol <= 0)
     throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
-  
+
   return integrale/totVol;
+}
+
+/*!
+ * \brief Return integral of the field.
+ *  \param subSupport - optional part of a field to consider.
+ *  \retval double - value of integral
+ */
+template <class T, class INTERLACING_TAG>
+double FIELD<T, INTERLACING_TAG>::integral(const SUPPORT *subSupport) const throw (MEDEXCEPTION)
+{
+  const char* LOC = "FIELD<>::integral(subSupport): ";
+
+  // integral = SUM( value * cell_size )
+
+  double integrale = 0;
+
+  if (!subSupport ) subSupport = _support;
+
+  // check feasibility
+  if ( getGaussPresence() )
+    throw MEDEXCEPTION(STRING(LOC)<<"Gauss numbers greater than one are not yet implemented!");
+  if ( subSupport->getEntity() != _support->getEntity())
+    throw MEDEXCEPTION(STRING(LOC)<<"Different support entity of this field and subSupport");
+  if ( subSupport->getEntity() == MED_EN::MED_NODE )
+    throw MEDEXCEPTION(STRING(LOC)<<"Integral of nodal field not yet supported");
+
+  // analyze support
+  const int nbElems = subSupport->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+  const bool subOnAll = ( subSupport->isOnAllElements() );
+  const bool  myOnAll = ( _support->isOnAllElements() );
+  const int* subNums = !subOnAll ? subSupport->getNumber(MED_EN::MED_ALL_ELEMENTS) : 0;
+  const int*   myNums = !myOnAll ? _support->getNumber(MED_EN::MED_ALL_ELEMENTS) : 0;
+  if ( !subOnAll && !subNums )
+    throw MEDEXCEPTION(STRING(LOC)<<"Invalid support: no element numbers");
+  if ( !myOnAll && !myNums )
+    throw MEDEXCEPTION(STRING(LOC)<<"Invalid field support: no element numbers");
+  if ( subOnAll && !myOnAll )
+    return integral(NULL);
+
+  // get size of elements
+  const FIELD<double, FullInterlace> * cellSize=_getFieldSize(subSupport);
+  const double* size = cellSize->getValue();
+  const double* lastSize = size + nbElems; // pointing just after the end of size
+
+  const T* value = getValue();
+
+  // calculate integrale
+  if ( subOnAll && _support->isOnAllElements() || subSupport == _support )
+    {
+      const double* p_vol;
+      if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
+        {
+          for (int j=1; j<=getNumberOfComponents(); ++j)
+            for ( p_vol=size; p_vol != lastSize; ++value ,++p_vol)
+              integrale += std::abs( *value * *p_vol );
+        }
+      else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE )
+        {
+          typename ArrayNoByType::InterlacingPolicy* indexer =
+            dynamic_cast< typename ArrayNoByType::InterlacingPolicy * > ( getArrayNoGauss() );
+          for (int i, j=1; j<=getNumberOfComponents(); j++)
+            for (i = 1, p_vol=size; p_vol!=lastSize; i++, ++p_vol )
+              integrale += std::abs( value[indexer->getIndex(i,j)] * *p_vol );
+        }
+      else  // FULL_INTERLACE
+        {
+          for ( p_vol=size; p_vol != lastSize; ++p_vol)
+            for (int j=0; j<getNumberOfComponents(); ++j, ++value)
+              integrale += std::abs( *value * *p_vol );
+        }
+    }
+  else
+    {
+      // find index for each element of subSupport
+      PointerOf<int> index;
+      if ( _support->isOnAllElements() )
+        {
+          index.set( subNums );
+        }
+      else // find common of two partial supports
+        {
+          // hope that numbers are in increasing order
+          index.set( nbElems );
+          bool allNumsFound = true;
+          int i = 0, iSub = 0;
+          for ( ; iSub < nbElems; ++iSub )
+            {
+              while ( subNums[iSub] > myNums[i] && i < getNumberOfValues())
+                ++i;
+              if ( subNums[iSub] == myNums[i] ) // elem number found
+                index[iSub] = ++i; // -- index counts from 1
+              else if ( subNums[iSub] > myNums[i] ) // no more myNums
+                break;
+              else // subNums[iSub] < myNums[i]
+                allNumsFound = (index[iSub] = 0); // no such number in myNums
+            }
+          if ( iSub != nbElems || !allNumsFound )
+            {
+              // check if numbers are in increasing order
+              bool increasingOrder = true;
+              for ( iSub = 1; iSub < nbElems && increasingOrder; ++iSub )
+                increasingOrder = ( subNums[iSub-1] < subNums[iSub] );
+              for ( i = 1; i < getNumberOfValues() && increasingOrder; ++i )
+                increasingOrder = ( myNums[iSub-1] < myNums[iSub] );
+
+              if ( !increasingOrder )
+                for ( iSub = 0; iSub < nbElems; ++iSub )
+                  try
+                    {
+                      index[iSub] = _support->getValIndFromGlobalNumber( subNums[iSub] );
+                    }
+                  catch (MEDEXCEPTION)
+                    {
+                      index[iSub] = 0;
+                    }
+            }
+        }
+
+      // calculation
+      if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
+        {
+          for (int j=0; j<getNumberOfComponents(); ++j)
+            {
+              value = getValue() + j * getNumberOfValues();
+              for ( int i = 0; i < nbElems; ++i )
+                if ( index[i] )
+                  integrale += std::abs( value[ index[i]-1 ] * size[i] );
+            }
+        }
+      else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE )
+        {
+          typename ArrayNoByType::InterlacingPolicy* indexer =
+            dynamic_cast< typename ArrayNoByType::InterlacingPolicy * > ( getArrayNoGauss() );
+          for (int j=1; j<=getNumberOfComponents(); j++)
+            for ( int i = 0; i < nbElems; ++i )
+              if ( index[i] )
+                integrale += std::abs( value[indexer->getIndex(index[i],j)] * size[i] );
+        }
+      else  // FULL_INTERLACE
+        {
+          const int dim = getNumberOfComponents();
+          for ( int i = 0; i < nbElems; ++i )
+            if ( index[i] )
+              for (int j=0; j<dim; ++j)
+                integrale += std::abs( value[ dim*(index[i]-1) + j] * size[i] );
+        }
+    }
+
+  return integrale;
 }
 
 /*! Return a new field (to deallocate with delete) lying on subSupport that is included by
@@ -2768,7 +2905,7 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::extract(const SUPPORT *sub
                                                                  _numberOfComponents);
 
   if(!ret->_value)
-    throw MEDEXCEPTION("FIELD<T>::extract : unvalid support detected !");
+    throw MEDEXCEPTION("FIELD<T>::extract : invalid support detected !");
 
   T* valuesToSet=(T*)ret->getValue();
 
