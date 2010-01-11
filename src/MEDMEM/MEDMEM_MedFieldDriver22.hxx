@@ -650,7 +650,8 @@ MED_FIELD_DRIVER22<T>::createFieldSupportPart1(med_2_3::med_idt        id,
 
   //retrieves the right medmem entity type from field_dim and mesh_dim
   int mesh_dim = MED_FIELD_DRIVER22<T>::getMeshDimensionFromFile(id,meshName);
-  if (mesh_dim==2 && field_dim==2)
+  //if (mesh_dim==2 && field_dim==2) // 0020644: [CEA 384] Problem with 1D no structured meshing
+  if (mesh_dim==field_dim)
     entity=MED_CELL;
 
   if ( alreadyFoundAnEntity) {
