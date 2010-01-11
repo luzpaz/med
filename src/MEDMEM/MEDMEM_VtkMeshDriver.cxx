@@ -205,7 +205,7 @@ void VTK_MESH_DRIVER::read(void) throw (MEDEXCEPTION)
 
 void VTK_MESH_DRIVER::write(void) const
   throw (MEDEXCEPTION)
-{ 
+{
   const char * LOC = "void VTK_MESH_DRIVER::write(void) const : ";
   BEGIN_OF_MED(LOC);
 
@@ -232,17 +232,20 @@ void VTK_MESH_DRIVER::write(void) const
       // put points (all point are in 3D, so if we are in 1D or 2D, we complete by zero !
       (*_vtkFile) << "POINTS " << NumberOfNodes << " float" << endl ;
       const double *coordinate = _ptrMesh->getCoordinates(MED_FULL_INTERLACE) ;
-      string missingCoord = SpaceDimension==3 ? "" : SpaceDimension==2 ? "0 " : "0 0 ";
+      string missingCoord = SpaceDimension==3 ? "" : SpaceDimension==2 ? "0" : "0 0";
       for (int i=0;i<NumberOfNodes;i++)
-        for (int j=0;j<SpaceDimension;j++)
-          (*_vtkFile) << coordinate[i*SpaceDimension+j] << " " << missingCoord;
+        {
+          for (int j=0;j<SpaceDimension;j++)
+            (*_vtkFile) << coordinate[i*SpaceDimension+j] << " ";
+          (*_vtkFile) << missingCoord << endl;
+        }
     }
   else // BINARY
     {
       const char* format = "BINARY\n";
-      writeBinary( header, strlen(header) );
-      writeBinary( title, strlen(title) );
-      writeBinary( format, strlen(format) );
+      writeBinary( header,  strlen(header) );
+      writeBinary( title,   strlen(title) );
+      writeBinary( format,  strlen(format) );
       writeBinary( dataset, strlen(dataset) );
 
       // put points (all point are in 3D, so if we are in 1D or 2D, we complete by zero !
@@ -318,7 +321,6 @@ void VTK_MESH_DRIVER::write(void) const
   else
     writeBinary( buf, strlen(buf) );
 
-  // we put connectivity
   for (int i=0;i<cells_types_count;i++) {
     int *filter = (int*) NULL ; // index in vtk connectivity
     switch (cells_type[i].getType())
