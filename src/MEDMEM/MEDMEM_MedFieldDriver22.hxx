@@ -703,12 +703,30 @@ MED_FIELD_DRIVER22<T>::getMeshDimensionFromFile(med_2_3::med_idt id,
   const char* LOC = "MED_FIELD_DRIVER<T>::getMeshDimensionFromFile(...)";
   BEGIN_OF_MED(LOC);
 
+  // BEGIN Issue 0020620: [CEA 378] Abort during MED mesh reading
+  // Find out if mesh is structured and read its dim if it is
+  med_2_3::med_int      meshDim;
+  med_2_3::med_maillage meshType;
+  char                  meshNameInFile[MED_TAILLE_NOM+1]="";
+  char                  meshDescription[MED_TAILLE_DESC+1]="";
+  // find mesh <meshName>
+  int numberOfMeshes = med_2_3::MEDnMaa(id);
+  for (int i = 1; i <= numberOfMeshes; ++i )
+    {
+      med_2_3::MEDmaaInfo(id, i ,meshNameInFile, &meshDim, &meshType, meshDescription);
+      if ( meshName == meshNameInFile )
+        {
+          if ( meshType == med_2_3::MED_STRUCTURE )
+            return max( med_2_3::MEDdimLire(id, meshNameInFile),
+                        med_2_3::MEDdimEspaceLire(id, meshNameInFile));
+          break;
+        }
+    }
+  // END Issue 0020620: [CEA 378] Abort during MED mesh reading
+
   int numberOfGeometricType=0;
   MED_EN::medGeometryElement geometricType[MED_NBR_GEOMETRIE_MAILLE];
-  int numberOfElementsOfType [MED_NBR_GEOMETRIE_MAILLE];
-  int numberOfElementsOfTypeC[MED_NBR_GEOMETRIE_MAILLE+1];
   med_2_3::med_int   numberOfElements=0;
-  med_2_3::med_table quoi;
 
   /*in MED file, all entities are regarded as MED_CELL
     (except for those related to descending connectivities),
@@ -716,43 +734,35 @@ MED_FIELD_DRIVER22<T>::getMeshDimensionFromFile(med_2_3::med_idt id,
     it is therefore necessary to distinguish the MED-file entity
     that will be used for the call to MED-file
     and the MEDMEM entity*/
-  MED_EN::medEntityMesh entity=MED_EN::MED_CELL;
-  quoi=med_2_3::MED_CONN;
-
+  const MED_EN::medEntityMesh entity = MED_EN::MED_CELL;
 
   list<MED_EN::medGeometryElement>::const_iterator currentGeometry;
-  bool alreadyFoundAnEntity = false;
-  numberOfElementsOfTypeC[0]=0;
 
   for (currentGeometry  = (MED_EN::meshEntities[entity]).begin();
        currentGeometry != (MED_EN::meshEntities[entity]).end(); currentGeometry++)
-  {
-    numberOfElements =
-      med_2_3::MEDnEntMaa(id,
-                          const_cast<char*> (meshName.c_str()),
-                          med_2_3::MED_CONN,
-                          med_2_3::MED_MAILLE,
-                          (med_2_3::med_geometrie_element) *currentGeometry,
-                          med_2_3::MED_NOD);
-    if (numberOfElements <= 0)
-      continue;
+    {
+      numberOfElements =
+        med_2_3::MEDnEntMaa(id,
+                            const_cast<char*> (meshName.c_str()),
+                            med_2_3::MED_CONN,
+                            med_2_3::MED_MAILLE,
+                            (med_2_3::med_geometrie_element) *currentGeometry,
+                            med_2_3::MED_NOD);
+      if (numberOfElements <= 0)
+        continue;
 
-    alreadyFoundAnEntity = true;
-    numberOfElementsOfType[numberOfGeometricType] = numberOfElements;
-    numberOfElementsOfTypeC[numberOfGeometricType+1] =
-      numberOfElementsOfTypeC[numberOfGeometricType]+numberOfElements;
-    MED_EN::medGeometryElement geomType;
+      MED_EN::medGeometryElement geomType;
 
-    //MED_FILE uses MED_NONE as a geometricType to describe MED_NODE
-    //MEDMEM uses MED_POINT1
-    if ( *currentGeometry==MED_NONE)
-      geomType=MED_POINT1;
-    else
-      geomType=*currentGeometry;
-    geometricType[numberOfGeometricType] = geomType;
+      //MED_FILE uses MED_NONE as a geometricType to describe MED_NODE
+      //MEDMEM uses MED_POINT1
+      if ( *currentGeometry==MED_NONE)
+        geomType=MED_POINT1;
+      else
+        geomType=*currentGeometry;
+      geometricType[numberOfGeometricType] = geomType;
 
-    numberOfGeometricType++;
-  }
+      numberOfGeometricType++;
+    }
 
   //Because MEDFILE and MEDMEM differ on the definition of MED_CELL
   //it is necessary to remove the cells that do not
