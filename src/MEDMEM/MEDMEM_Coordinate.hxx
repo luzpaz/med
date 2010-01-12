@@ -51,31 +51,31 @@ class MEDMEM_EXPORT COORDINATE
 {
 
 protected:
-                                    /*! contains "CARTESIAN",
-                                        "CYLINDRICAL" or "SPHERICAL"*/
+				    /*! contains "CARTESIAN",
+					"CYLINDRICAL" or "SPHERICAL"*/
   string                       _coordinateSystem;
 
 
-                                     /*! _coordinate is a MEDARRAY<double> object : \n
-                                         - spaceDimension \n
-                                         - numberOfNodes \n
-                                         - default storage mode \n
-                                         - Up to 4 "PointerOf" to an array of size spaceDimension*NumberOfNodes\n
+				     /*! _coordinate is a MEDARRAY<double> object : \n
+					 - spaceDimension \n
+					 - numberOfNodes \n
+					 - default storage mode \n
+					 - Up to 4 "PointerOf" to an array of size spaceDimension*NumberOfNodes\n
 
-                                         Storing the object (not a pointer to this object) is more convenient for memory
-                                         management.
-                                         */
+					 Storing the object (not a pointer to this object) is more convenient for memory
+					 management.
+					 */
   mutable MEDARRAY<double>            _coordinate;
 
-                                     /*! PointerOf to an array of size spaceDimension storing axes names*/
+				     /*! PointerOf to an array of size spaceDimension storing axes names*/
   //PointerOf<string>          _coordinateName;
   vector<string>          _coordinateName;
 
-                                     /*! PointerOf to an array of size spaceDimension storing units */
+				     /*! PointerOf to an array of size spaceDimension storing units */
   //PointerOf<string>          _coordinateUnit;
   vector<string>          _coordinateUnit;
 
-                                     /*! PointerOf to an array of size NumberOfNodes : optional nodes numbers */
+				     /*! PointerOf to an array of size NumberOfNodes : optional nodes numbers */
   PointerOf<int>             _nodeNumber;
 
 

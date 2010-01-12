@@ -464,7 +464,7 @@ void MEDMEMTest::testGrid()
     {
       xyz[i].resize(i + 2);
       for ( int j = 0; j < i + 2; j++ )
-        xyz[i][j] = j;
+	xyz[i][j] = j;
     }
     vector<string> Coord_Names;
     Coord_Names.resize(nbCoords);
@@ -499,8 +499,8 @@ void MEDMEMTest::testGrid()
     map<int, bool> found;
     for ( int i1 = 0; i1 < xyz[0].size(); i1++ )
       for ( int i2 = 0; i2 < xyz[1].size(); i2++ )
-        for ( int i3 = 0; i3 < xyz[2].size(); i3++ )
-          found[int(xyz[0][i1] * 100 + xyz[1][i2] * 10 + xyz[2][i3])] = false;
+	for ( int i3 = 0; i3 < xyz[2].size(); i3++ )
+	  found[int(xyz[0][i1] * 100 + xyz[1][i2] * 10 + xyz[2][i3])] = false;
 
     COORDINATE* coords = (COORDINATE*)myGrid2->getCoordinateptr();
     CPPUNIT_ASSERT(coords);
@@ -578,7 +578,7 @@ void MEDMEMTest::testGrid()
     // Testing getArrayValue()
     for ( int ii = 1; ii <= nbCoords; ii++ )
       for ( int jj = 0; jj < ii + 1; jj++ )
-        CPPUNIT_ASSERT(myGrid2->getArrayValue(ii, jj) == xyz[ii - 1][jj]);
+	CPPUNIT_ASSERT(myGrid2->getArrayValue(ii, jj) == xyz[ii - 1][jj]);
 
     CPPUNIT_ASSERT_THROW(myGrid2->getArrayValue(nbCoords + 1, 0), MEDEXCEPTION);
     CPPUNIT_ASSERT_THROW(myGrid2->getArrayValue(1, myGrid2->getArrayLength(1) + 1), MEDEXCEPTION);

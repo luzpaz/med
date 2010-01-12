@@ -94,8 +94,8 @@ void VTK_MED_DRIVER::openConst() const {
 //    else
   if (!(*_vtkFile))
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
-                                     << _fileName)
-                          );
+				     << _fileName)
+			  );
   END_OF_MED(LOC);
 }
 
@@ -115,8 +115,8 @@ void VTK_MED_DRIVER::closeConst() const {
 //    else
 //  if (!(*_vtkFile))
 //    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close file "
-//                                   << _fileName)
-//                        );
+//				     << _fileName)
+//			  );
   END_OF_MED(LOC);
 }
 
@@ -136,7 +136,7 @@ void VTK_MED_DRIVER::write() const
 
   // could we put more than one Mesh ?????
   (*_vtkFile) << "# vtk DataFile Version 2.0" << endl 
-           << "maillage from MedMemory"  << endl ;
+	   << "maillage from MedMemory"  << endl ;
   // only ASCII for the moment (binary came later :-)
   (*_vtkFile) << "ASCII" << endl ;
 
@@ -162,19 +162,19 @@ void VTK_MED_DRIVER::write() const
       deque<DT_IT_> timeStep = _ptrMed->getFieldIteration(FieldNames[j]) ;
       deque<DT_IT_>::const_iterator currentTimeStep ;
       for ( currentTimeStep=timeStep.begin(); currentTimeStep!=timeStep.end(); currentTimeStep++) {
-        int dt = (*currentTimeStep).dt ;
-        int it = (*currentTimeStep).it ;
-        FIELD_ * myField = _ptrMed->getField(FieldNames[j],dt,it) ;
-        if( MeshNames[i] == myField->getSupport()->getMesh()->getName() ) { 
-          // rigth in all case : better compare pointeur ?
-          if (MED_NODE == myField->getSupport()->getEntity())
-            if (myField->getSupport()->isOnAllElements()) {
-              ostringstream name ; 
-              name << myField->getName() << "_" << dt << "_" << it ;
-              writeField(myField,name.str()) ;
-            } else
-              MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
-        }
+	int dt = (*currentTimeStep).dt ;
+	int it = (*currentTimeStep).it ;
+	FIELD_ * myField = _ptrMed->getField(FieldNames[j],dt,it) ;
+	if( MeshNames[i] == myField->getSupport()->getMesh()->getName() ) { 
+	  // rigth in all case : better compare pointeur ?
+	  if (MED_NODE == myField->getSupport()->getEntity())
+	    if (myField->getSupport()->isOnAllElements()) {
+	      ostringstream name ; 
+	      name << myField->getName() << "_" << dt << "_" << it ;
+	      writeField(myField,name.str()) ;
+	    } else
+	      MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
+	}
       }
     }
 
@@ -184,20 +184,20 @@ void VTK_MED_DRIVER::write() const
       deque<DT_IT_> timeStep = _ptrMed->getFieldIteration(FieldNames[j]) ;
       deque<DT_IT_>::const_iterator currentTimeStep ;
       for ( currentTimeStep=timeStep.begin(); currentTimeStep!=timeStep.end(); currentTimeStep++) {
-        int dt = (*currentTimeStep).dt;
-        int it = (*currentTimeStep).it;
-        FIELD_ * myField = _ptrMed->getField(FieldNames[j],dt,it) ;
-        if( MeshNames[i] == myField->getSupport()->getMesh()->getName() ) { 
-          // rigth in all case : better compare pointeur ?
-          if (MED_CELL == myField->getSupport()->getEntity())
-            if (myField->getSupport()->isOnAllElements()) {
-              ostringstream name ; 
-              name << myField->getName() << "_" << dt << "_" << it ;
-              writeField(myField,name.str()) ;
-            }
+	int dt = (*currentTimeStep).dt;
+	int it = (*currentTimeStep).it;
+	FIELD_ * myField = _ptrMed->getField(FieldNames[j],dt,it) ;
+	if( MeshNames[i] == myField->getSupport()->getMesh()->getName() ) { 
+	  // rigth in all case : better compare pointeur ?
+	  if (MED_CELL == myField->getSupport()->getEntity())
+	    if (myField->getSupport()->isOnAllElements()) {
+	      ostringstream name ; 
+	      name << myField->getName() << "_" << dt << "_" << it ;
+	      writeField(myField,name.str()) ;
+	    }
             else
-              MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" which is not on all cells !");
-        }
+	      MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" which is not on all cells !");
+	}
       }
     }
     
@@ -252,13 +252,13 @@ void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const {
     switch (cells_type[i].getType())
       {
       case MED_POINT1  : {
-        filter = new int[1] ;
-        filter[0] = 0 ;
+	filter = new int[1] ;
+	filter[0] = 0 ;
         break ;
       }
       case MED_SEG2    : {
         filter = new int[2] ;
-        filter[0] = 0 ;
+	filter[0] = 0 ;
         filter[1] = 1 ;
         break ;
       }
@@ -269,7 +269,7 @@ void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const {
         filter = new int[3] ;
         filter[0] = 0 ;
         filter[1] = 1 ;
-        filter[2] = 2 ;
+ 	filter[2] = 2 ;
         break ;
       }
       case MED_QUAD4   : {
@@ -277,7 +277,7 @@ void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const {
         filter[0] = 0 ;
         filter[1] = 1 ;
         filter[2] = 2 ;
-        filter[3] = 3 ;
+  	filter[3] = 3 ;
         break ;
       }
       case MED_TRIA6   : {
@@ -300,7 +300,7 @@ void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const {
         filter[1] = 3 ;  // 2nd element in med are 4th in vtk (array begin at 0 !)
         filter[2] = 2 ;
         filter[3] = 1 ;  // 4th element in med are 2nd in vtk (array begin at 0 !)
-        filter[4] = 4 ;
+  	filter[4] = 4 ;
         break ;
       }
       case MED_PENTA6  : {
@@ -310,8 +310,8 @@ void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const {
         filter[2] = 2 ;
         filter[3] = 3 ;
         filter[4] = 4 ;
-        filter[5] = 5 ;
-        break ;
+  	filter[5] = 5 ;
+	break ;
       }
       case MED_HEXA8   : {
         filter = new int[8] ;
@@ -321,8 +321,8 @@ void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const {
         filter[3] = 1 ;
         filter[4] = 4 ;
         filter[5] = 7 ;
-        filter[6] = 6 ;
-        filter[7] = 5 ;
+  	filter[6] = 6 ;
+	filter[7] = 5 ;
         break ;
       }
       case MED_TETRA10 : {
@@ -349,7 +349,7 @@ void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const {
     for (int j=0;j<numberOfCell;j++) {
       (*_vtkFile) << nodes_cell << " " ;
       for (int k=0;k<nodes_cell;k++)
-        (*_vtkFile) << connectivityArray[j*nodes_cell+filter[k]] - 1 << " " ;
+	(*_vtkFile) << connectivityArray[j*nodes_cell+filter[k]] - 1 << " " ;
       (*_vtkFile) << endl ;
     }
     if (filter != NULL)
@@ -363,67 +363,67 @@ void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const {
     switch (cells_type[i].getType())
       {
       case MED_POINT1  : {
-        vtkType = 1 ;
+	vtkType = 1 ;
         break ;
       }
       case MED_SEG2    : {
-        vtkType = 3 ;
+	vtkType = 3 ;
         break ;
       }
       case MED_SEG3    : {  
-        vtkType = 0 ;
+	vtkType = 0 ;
         break ;
       }
       case MED_TRIA3   : {
-        vtkType = 5 ;
+	vtkType = 5 ;
         break ;
       }
       case MED_QUAD4   : {
-        vtkType = 9 ;
+	vtkType = 9 ;
         break ;
       }
       case MED_TRIA6   : {
-        vtkType = 0 ;
+	vtkType = 0 ;
         break ;
       }
       case MED_QUAD8   : {
-        vtkType = 0 ;
+	vtkType = 0 ;
         break ;
       }
       case MED_TETRA4  : {
-        vtkType = 10 ;
+	vtkType = 10 ;
         break ;
       }
       case MED_PYRA5   : {
-        vtkType = 14 ;
+	vtkType = 14 ;
         break ;
       }
       case MED_PENTA6  : {
-        vtkType = 13 ;
-        break ;
+	vtkType = 13 ;
+	break ;
       }
       case MED_HEXA8   : {
-        vtkType = 12 ;
+	vtkType = 12 ;
         break ;
       }
       case MED_TETRA10 : {
-        vtkType = 0 ;
+	vtkType = 0 ;
         break ;
       }
       case MED_PYRA13  : {
-        vtkType = 0 ;
+	vtkType = 0 ;
         break ;
       }
       case MED_PENTA15 : {
-        vtkType = 0 ;
+	vtkType = 0 ;
         break ;
       }
       case MED_HEXA20  : {
-        vtkType = 0 ;
+	vtkType = 0 ;
         break ;
       }
       default : { 
-        vtkType = 0 ;
+	vtkType = 0 ;
         break ;
       }
       }
@@ -466,39 +466,39 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const
     case MED_INT32 : {
       MESSAGE_MED("MED_INT32");
       if (NumberOfComponents==3) {
-        (*_vtkFile) << "VECTORS " << name << " int" << endl ;
+	(*_vtkFile) << "VECTORS " << name << " int" << endl ;
       }
       else if (NumberOfComponents<=4) {
-        (*_vtkFile) << "SCALARS " << name << " int " << NumberOfComponents << endl ;
-        (*_vtkFile) << "LOOKUP_TABLE default" << endl ;
+	(*_vtkFile) << "SCALARS " << name << " int " << NumberOfComponents << endl ;
+	(*_vtkFile) << "LOOKUP_TABLE default" << endl ;
       }
       else {
-        MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
-        return ;
+	MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
+	return ;
       }
 
       const int * value;
       ArrayIntNo * myArray;
       if ( myField->getInterlacingType() == MED_FULL_INTERLACE ) {
-        myArray = ArrayConvert( *( dynamic_cast< FIELD<int,FullInterlace>* >
-                                   (myField)->getArrayNoGauss() 
-                                   )
-                                );
-        value = myArray->getPtr();
+	myArray = ArrayConvert( *( dynamic_cast< FIELD<int,FullInterlace>* >
+				   (myField)->getArrayNoGauss() 
+				   )
+				);
+	value = myArray->getPtr();
       } else if ( myField->getInterlacingType() == MED_NO_INTERLACE_BY_TYPE ) {
-        myArray = ArrayConvert2No( *( dynamic_cast< FIELD<int,NoInterlaceByType>* >
-                                   (myField)->getArrayNoGauss() 
-                                   )
-                                );
-        value = myArray->getPtr();
+	myArray = ArrayConvert2No( *( dynamic_cast< FIELD<int,NoInterlaceByType>* >
+				   (myField)->getArrayNoGauss() 
+				   )
+				);
+	value = myArray->getPtr();
       } else {
-        value = ((FIELD<int>*)myField)->getValue() ;
+	value = ((FIELD<int>*)myField)->getValue() ;
       }
 
       for (int i=0; i<NumberOfValue; i++) {
-        for(int j=0; j<NumberOfComponents; j++)
-          (*_vtkFile) << value[j*NumberOfValue+i] << " " ;
-        (*_vtkFile) << endl ;
+	for(int j=0; j<NumberOfComponents; j++)
+	  (*_vtkFile) << value[j*NumberOfValue+i] << " " ;
+	(*_vtkFile) << endl ;
       }
       // mkr : PAL13994 (commented the code below)
       if ( myField->getInterlacingType() != MED_NO_INTERLACE )
@@ -508,41 +508,41 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const
     case MED_REEL64 : {
       MESSAGE_MED("MED_REEL64");
       if (NumberOfComponents==3) {
-        (*_vtkFile) << "VECTORS " << name << " float" << endl ;
+	(*_vtkFile) << "VECTORS " << name << " float" << endl ;
       }
       else if (NumberOfComponents<=4) {
-        (*_vtkFile) << "SCALARS " << name << " float " << NumberOfComponents << endl ;
-        (*_vtkFile) << "LOOKUP_TABLE default" << endl ;
+	(*_vtkFile) << "SCALARS " << name << " float " << NumberOfComponents << endl ;
+	(*_vtkFile) << "LOOKUP_TABLE default" << endl ;
       }
       else {
-        MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
-        return ;
+	MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" there are more than 4 components !");
+	return ;
       }
 
       const double * value;
       ArrayDoubleNo * myArray;
       if ( myField->getInterlacingType() == MED_FULL_INTERLACE ) {
-        myArray = ArrayConvert( *( dynamic_cast< FIELD<double,FullInterlace>* >
-                                   (myField)->getArrayNoGauss()
-                                   )
-                                );
-        value = myArray->getPtr();
+	myArray = ArrayConvert( *( dynamic_cast< FIELD<double,FullInterlace>* >
+				   (myField)->getArrayNoGauss()
+				   )
+				);
+	value = myArray->getPtr();
       }
       else if ( myField->getInterlacingType() == MED_NO_INTERLACE_BY_TYPE ) {
-        myArray = ArrayConvert2No( *( dynamic_cast< FIELD<double,NoInterlaceByType>* >
-                                   (myField)->getArrayNoGauss()
-                                   )
-                                );
-        value = myArray->getPtr();
+	myArray = ArrayConvert2No( *( dynamic_cast< FIELD<double,NoInterlaceByType>* >
+				   (myField)->getArrayNoGauss()
+				   )
+				);
+	value = myArray->getPtr();
       }
       else {
-        value = ((FIELD<double>*)myField)->getValue() ;
+	value = ((FIELD<double>*)myField)->getValue() ;
       }
 
       for (int i=0; i<NumberOfValue; i++) {
-        for(int j=0; j<NumberOfComponents; j++)
-          (*_vtkFile) << value[j*NumberOfValue+i] << " " ;
-        (*_vtkFile) << endl ;
+	for(int j=0; j<NumberOfComponents; j++)
+	  (*_vtkFile) << value[j*NumberOfValue+i] << " " ;
+	(*_vtkFile) << endl ;
       }
       // mkr : PAL13994 (commented the code below)
       if ( myField->getInterlacingType() != MED_NO_INTERLACE )

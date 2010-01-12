@@ -75,9 +75,9 @@ public :
   const int * getFaceCorrespValue() const;
   int getFaceNumber() const;
   const int * getEntityCorrespIndex(MED_EN::medEntityMesh localEntity,
-                                    MED_EN::medEntityMesh distantEntity) const;
+			            MED_EN::medEntityMesh distantEntity) const;
   const int * getEntityCorrespValue(MED_EN::medEntityMesh localEntity,
-                                    MED_EN::medEntityMesh distantEntity) const;
+			            MED_EN::medEntityMesh distantEntity) const;
   int getEntityCorrespNumber(MED_EN::medEntityMesh localEntity,
                   MED_EN::medEntityMesh distantEntity) const;
   int getEntityCorrespLength(MED_EN::medEntityMesh localEntity,

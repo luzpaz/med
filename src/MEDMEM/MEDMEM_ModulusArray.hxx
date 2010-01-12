@@ -106,24 +106,24 @@ inline int MEDMODULUSARRAY::compare(const MEDMODULUSARRAY &modulusArray) const
     if ( _array[0] == modulusArray[i] ) {
       // we search if cycle is the same
       if (_array[1]==modulusArray[i+1]){ // positive order
-        ret=1;
-        for(int j=2;j<_length;j++)
-          if (_array[j]!=modulusArray[i+j]) {
-            ret = 0 ;
-            break ;
-          }
+	ret=1;
+	for(int j=2;j<_length;j++)
+	  if (_array[j]!=modulusArray[i+j]) {
+	    ret = 0 ;
+	    break ;
+	  }
       } else if(_array[1]==modulusArray[i-1]) { //negative order
-        ret=-1;
-        for(int j=2;j<_length;j++)
-          if (_array[j]!=modulusArray[i-j]) {
-            ret = 0 ;
-            break ;
-          }
+	ret=-1;
+	for(int j=2;j<_length;j++)
+	  if (_array[j]!=modulusArray[i-j]) {
+	    ret = 0 ;
+	    break ;
+	  }
       }
       if (ret!=0) {// we have found it !
         if ( !compareNotVertexNodes( modulusArray ) )
           ret = 0;
-        break ;
+	break ;
       }
       // else we continue if there is another start point i
     }

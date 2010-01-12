@@ -1406,13 +1406,13 @@ ostream & MEDMEM::operator<<(ostream &os,const CELLMODEL &my)
       os << "    - number of Constituents for this Dimension : " << my._numberOfConstituents[i] << endl ;
 
       for(int j=0;j<my._numberOfConstituents[i];j++)
-        {
-          os << "    - number of node for this constituent : " << my._numberOfNodeOfEachConstituent[i][j] << endl ;
-          os << "      - constituents " << j+1 << " of type "<< my._constituentsType[i][j] <<" : " ;
-          for(int k=0;k<my._numberOfNodeOfEachConstituent[i][j];k++)
-            os << my._constituents[i][j][k] << " " ;
-          os << endl ;
-        }
+	{
+	  os << "    - number of node for this constituent : " << my._numberOfNodeOfEachConstituent[i][j] << endl ;
+	  os << "      - constituents " << j+1 << " of type "<< my._constituentsType[i][j] <<" : " ;
+	  for(int k=0;k<my._numberOfNodeOfEachConstituent[i][j];k++)
+	    os << my._constituents[i][j][k] << " " ;
+	  os << endl ;
+	}
     }
   return os;
 }
@@ -1456,9 +1456,9 @@ map<medGeometryElement,int>  CELLMODEL::getNumberOfConstituentsForeachType() con
 //     for(itvec=constituentsType.begin();itvec!=constituentsType.end();itvec++) {
 //       itmap = numberOfConstituentsForeachType.find(*itvec);
 //       if (itmap==numberOfConstituentsForeachType.end()) // new element
-//      numberOfConstituentsForeachType[*itvec]=1 ;
+// 	numberOfConstituentsForeachType[*itvec]=1 ;
 //       else
-//      numberOfConstituentsForeachType[*itvec]++ ;
+// 	numberOfConstituentsForeachType[*itvec]++ ;
 //     }
 //   }
   return numberOfConstituentsForeachType ;
@@ -1500,7 +1500,7 @@ void CELLMODEL::init(const CELLMODEL &m)
       int * newArray = new int[numberOf2] ;
       int * oldArray = m._constituents[i][j] ;
       for(int k=0; k<numberOf2; k++)
-        newArray[k] = oldArray[k] ;
+	newArray[k] = oldArray[k] ;
       tmpArray[j] = newArray ;
       newArrayType[j] = oldArrayType[j] ;
     }
@@ -1515,7 +1515,7 @@ void CELLMODEL::clean()
     int numberOf = _numberOfConstituents[i] ;
     for(int j=0; j<numberOf; j++) {
       if (NULL!=_constituents[i][j])
-        delete[] _constituents[i][j] ;
+	delete[] _constituents[i][j] ;
     }
     if (NULL!=_constituentsType[i])
       delete[] _constituentsType[i] ;

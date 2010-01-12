@@ -111,7 +111,7 @@ void check_support(const SUPPORT * theSupport,
       int NumberOfElements = theSupport->getNumberOfElements(Types[j]);
       const int * Number = theSupport->getNumber(Types[j]);
       for (int k = 0; k < NumberOfElements; k++)
-        cout << Number[k] << " ";
+	cout << Number[k] << " ";
       cout << endl;
     }
   } else

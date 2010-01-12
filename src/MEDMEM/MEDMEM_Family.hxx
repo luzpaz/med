@@ -94,7 +94,7 @@ protected :
   vector<string> _groupName ;
 
 public:
-                        /*! Constructor. */
+			/*! Constructor. */
   FAMILY();
   /*!
     \if developper
@@ -102,22 +102,22 @@ public:
     \endif
   */
   FAMILY( MESH* Mesh, int Identifier, string Name, 
-          int NumberOfAttribute, int *AttributeIdentifier,
+	  int NumberOfAttribute, int *AttributeIdentifier,
           int *AttributeValue, string AttributeDescription,
           int NumberOfGroup,   string GroupName,
-          int * MEDArrayNodeFamily,
-          int ** MEDArrayCellFamily,
-          int ** MEDArrayFaceFamily,
-          int ** MEDArrayEdgeFamily
-          ) ;
+	  int * MEDArrayNodeFamily,
+	  int ** MEDArrayCellFamily,
+	  int ** MEDArrayFaceFamily,
+	  int ** MEDArrayEdgeFamily
+	  ) ;
 
-                        /*! Copy Constructor. */
+			/*! Copy Constructor. */
   FAMILY(const FAMILY & m);
 
-                        /*! Constructor with SUPPORT entry. */
+			/*! Constructor with SUPPORT entry. */
   FAMILY(const SUPPORT & s);
 
-                        /*! Destructor. */
+			/*! Destructor. */
   virtual ~FAMILY();
   FAMILY & operator=(const FAMILY &fam);
   friend ostream & operator<<(ostream &os, FAMILY &my) ;

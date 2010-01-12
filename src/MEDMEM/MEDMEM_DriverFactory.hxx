@@ -56,39 +56,39 @@ namespace MEDMEM {
     driverTypes deduceDriverTypeFromFileName(const std::string & fileName);
 
     MEDMEM_EXPORT GENDRIVER * buildDriverForMesh(driverTypes driverType,
-                                                 const std::string & fileName,
-                                                 MESH *mesh,const string &  driverName,
-                                                 MED_EN::med_mode_acces access);
+						 const std::string & fileName,
+						 MESH *mesh,const string &  driverName,
+						 MED_EN::med_mode_acces access);
 
     template<class T, class INTERLACING_TAG>
     GENDRIVER * buildDriverForField(driverTypes driverType,
-                                    const std::string & fileName,
-                                    FIELD<T,INTERLACING_TAG> *fielde,
-                                    MED_EN::med_mode_acces access);
+				    const std::string & fileName,
+				    FIELD<T,INTERLACING_TAG> *fielde,
+				    MED_EN::med_mode_acces access);
     MEDMEM_EXPORT GENDRIVER * buildDriverForMed(driverTypes driverType,
-                                                const std::string & fileName,
-                                                MED *mede,
-                                                MED_EN::med_mode_acces access);
+						const std::string & fileName,
+						MED *mede,
+						MED_EN::med_mode_acces access);
     MEDMEM_EXPORT GENDRIVER * buildMedDriverFromFile(const string & fileName,
-                                                     MED * const ptrMed,
-                                                     MED_EN::med_mode_acces access);
+						     MED * const ptrMed,
+						     MED_EN::med_mode_acces access);
     MEDMEM_EXPORT GENDRIVER * buildMeshDriverFromFile(const string & fileName,
-                                                      MESH * ptrMesh,
-                                                      MED_EN::med_mode_acces access);
+						      MESH * ptrMesh,
+						      MED_EN::med_mode_acces access);
     template<class T, class INTERLACING_TAG>
     GENDRIVER * buildFieldDriverFromFile(const string & fileName,
-                                         FIELD<T,INTERLACING_TAG> * ptrField,
-                                         MED_EN::med_mode_acces access);
+					 FIELD<T,INTERLACING_TAG> * ptrField,
+					 MED_EN::med_mode_acces access);
     MEDMEM_EXPORT GENDRIVER * buildConcreteMedDriverForMesh(const std::string & fileName,
-                                                            MESH *mesh,
-                                                            const string & driverName,
-                                                            MED_EN::med_mode_acces access,
-                                                            MED_EN::medFileVersion version);
+							    MESH *mesh,
+							    const string & driverName,
+							    MED_EN::med_mode_acces access,
+							    MED_EN::medFileVersion version);
     template<class T, class INTERLACING_TAG>
     GENDRIVER * buildConcreteMedDriverForField(const std::string & fileName,
-                                               FIELD<T,INTERLACING_TAG> *fielde,
-                                               MED_EN::med_mode_acces access,
-                                               MED_EN::medFileVersion version);
+					       FIELD<T,INTERLACING_TAG> *fielde,
+					       MED_EN::med_mode_acces access,
+					       MED_EN::medFileVersion version);
   }
 }
 
@@ -102,123 +102,123 @@ namespace MEDMEM {
 namespace MEDMEM {
   template<class T, class INTERLACING_TAG>
   GENDRIVER * DRIVERFACTORY::buildDriverForField(driverTypes driverType,
-                                                 const std::string & fileName,
-                                                 FIELD<T,INTERLACING_TAG> *field,
-                                                 MED_EN::med_mode_acces access)
+						 const std::string & fileName,
+						 FIELD<T,INTERLACING_TAG> *field,
+						 MED_EN::med_mode_acces access)
   {
     GENDRIVER *ret;
     switch(driverType)
       {
       case MED_DRIVER : {
-        switch(access)
-          {
-          case MED_EN::RDONLY : {
-            ret = new MED_FIELD_RDONLY_DRIVER<T>(fileName,field);
-            break;
-          }
-          case MED_EN::WRONLY : {
-            ret= new MED_FIELD_WRONLY_DRIVER<T>(fileName,field);
-            break;
-          }
-          case MED_EN::RDWR : {
-            ret = new MED_FIELD_RDWR_DRIVER<T>(fileName,field);
-            break;
-          }
-          default:
-            throw MED_EXCEPTION ("access type has not been properly specified to the method");
-          }
-        break;
+	switch(access)
+	  {
+	  case MED_EN::RDONLY : {
+	    ret = new MED_FIELD_RDONLY_DRIVER<T>(fileName,field);
+	    break;
+	  }
+	  case MED_EN::WRONLY : {
+	    ret= new MED_FIELD_WRONLY_DRIVER<T>(fileName,field);
+	    break;
+	  }
+	  case MED_EN::RDWR : {
+	    ret = new MED_FIELD_RDWR_DRIVER<T>(fileName,field);
+	    break;
+	  }
+	  default:
+	    throw MED_EXCEPTION ("access type has not been properly specified to the method");
+	  }
+	break;
       }
 
       case ENSIGHT_DRIVER : {
-        switch(access)
-          {
-          case MED_EN::RDONLY : {
-            ret = new ENSIGHT_FIELD_RDONLY_DRIVER(fileName,field);
-            break;
-          }
-          case MED_EN::WRONLY : {
-            ret=new ENSIGHT_FIELD_WRONLY_DRIVER(fileName,field);
-            break;
-          }
-          case MED_EN::RDWR : {
-            throw MED_EXCEPTION ("not yet implemented");
-            break ;
-          }
-          default:
-            throw MED_EXCEPTION ("access type has not been properly specified to the method");
-          }
-        break;
+	switch(access)
+	  {
+	  case MED_EN::RDONLY : {
+	    ret = new ENSIGHT_FIELD_RDONLY_DRIVER(fileName,field);
+	    break;
+	  }
+	  case MED_EN::WRONLY : {
+	    ret=new ENSIGHT_FIELD_WRONLY_DRIVER(fileName,field);
+	    break;
+	  }
+	  case MED_EN::RDWR : {
+	    throw MED_EXCEPTION ("not yet implemented");
+	    break ;
+	  }
+	  default:
+	    throw MED_EXCEPTION ("access type has not been properly specified to the method");
+	  }
+	break;
       }
 
       case VTK_DRIVER : {
-        switch(access)
-          {
-          case MED_EN::RDONLY : {
-            throw MED_EXCEPTION ("access mode other than MED_ECRI and MED_REMP has been specified with the VTK_DRIVER type which is not allowed because VTK_DRIVER is only a write access driver");
-            break;
-          }
-          case MED_EN::WRONLY : {
-            ret=new VTK_FIELD_DRIVER<T>(fileName,field);
-            break;
-          }
-          case MED_EN::RDWR : {
-            ret=new VTK_FIELD_DRIVER<T>(fileName,field);
-            break ;
-          }
-          default:
-            throw MED_EXCEPTION ("access type has not been properly specified to the method");
-          }
-        break;
+	switch(access)
+	  {
+	  case MED_EN::RDONLY : {
+	    throw MED_EXCEPTION ("access mode other than MED_ECRI and MED_REMP has been specified with the VTK_DRIVER type which is not allowed because VTK_DRIVER is only a write access driver");
+	    break;
+	  }
+	  case MED_EN::WRONLY : {
+	    ret=new VTK_FIELD_DRIVER<T>(fileName,field);
+	    break;
+	  }
+	  case MED_EN::RDWR : {
+	    ret=new VTK_FIELD_DRIVER<T>(fileName,field);
+	    break ;
+	  }
+	  default:
+	    throw MED_EXCEPTION ("access type has not been properly specified to the method");
+	  }
+	break;
       }
 
       case GIBI_DRIVER : {
-        throw MED_EXCEPTION ("driverType other than MED_DRIVER and VTK_DRIVER has been specified to the method which is not allowed for the object FIELD");
-        break;
+	throw MED_EXCEPTION ("driverType other than MED_DRIVER and VTK_DRIVER has been specified to the method which is not allowed for the object FIELD");
+	break;
       }
 
       case PORFLOW_DRIVER : {
-        throw MED_EXCEPTION ("driverType other than MED_DRIVER and VTK_DRIVER has been specified to the method which is not allowed for the object FIELD");
-        break;
+	throw MED_EXCEPTION ("driverType other than MED_DRIVER and VTK_DRIVER has been specified to the method which is not allowed for the object FIELD");
+	break;
       }
 
       case ASCII_DRIVER : {
-        switch(access)
-          {
-          case MED_EN::WRONLY : {
-            ret=new ASCII_FIELD_DRIVER<T>(fileName,field);
-            break;
-          }
-          default:
-            throw MED_EXCEPTION ("driver ASCII_DRIVER on FIELD only in write mod");
-          }
-        break;
+	switch(access)
+	  {
+	  case MED_EN::WRONLY : {
+	    ret=new ASCII_FIELD_DRIVER<T>(fileName,field);
+	    break;
+	  }
+	  default:
+	    throw MED_EXCEPTION ("driver ASCII_DRIVER on FIELD only in write mod");
+	  }
+	break;
       }
 
       case NO_DRIVER : {
-        throw MED_EXCEPTION ("driverType other than MED_DRIVER and VTK_DRIVER has been specified to the method which is not allowed for the object FIELD");
-        break;
+	throw MED_EXCEPTION ("driverType other than MED_DRIVER and VTK_DRIVER has been specified to the method which is not allowed for the object FIELD");
+	break;
       }
       default:
-        MED_EXCEPTION ("driverType other than MED_DRIVER and VTK_DRIVER has been specified to the method which is not allowed for the object FIELD");
+	MED_EXCEPTION ("driverType other than MED_DRIVER and VTK_DRIVER has been specified to the method which is not allowed for the object FIELD");
       }
     return ret;
   }
 
   template<class T, class INTERLACING_TAG>
   GENDRIVER * DRIVERFACTORY::buildFieldDriverFromFile(const string & fileName,
-                                                      FIELD<T,INTERLACING_TAG> * ptrField,
-                                                      MED_EN::med_mode_acces access)
+						      FIELD<T,INTERLACING_TAG> * ptrField,
+						      MED_EN::med_mode_acces access)
   {
     MED_EN::medFileVersion version;
 
     try
       {
-        version = getMedFileVersion(fileName);
+	version = getMedFileVersion(fileName);
       }
     catch (MEDEXCEPTION & )
       {
-        version = DRIVERFACTORY::globalMedFileVersionForWriting;
+	version = DRIVERFACTORY::globalMedFileVersionForWriting;
       }
 
     MESSAGE_MED("buildFieldDriverFromFile version of the file " << version);
@@ -228,36 +228,36 @@ namespace MEDMEM {
     switch(access)
       {
       case MED_EN::RDONLY : {
-        if (version == MED_EN::V21)
-          driver = new MED_FIELD_RDONLY_DRIVER21<T>(fileName,ptrField);
-        else if (version == MED_EN::V22)
-          driver = new MED_FIELD_RDONLY_DRIVER22<T>(fileName,ptrField);
-        return driver;
+	if (version == MED_EN::V21)
+	  driver = new MED_FIELD_RDONLY_DRIVER21<T>(fileName,ptrField);
+	else if (version == MED_EN::V22)
+	  driver = new MED_FIELD_RDONLY_DRIVER22<T>(fileName,ptrField);
+	return driver;
       }
       case MED_EN::WRONLY : {
-        if (version == MED_EN::V21)
-          driver = new MED_FIELD_WRONLY_DRIVER21<T>(fileName,ptrField);
-        else if (version == MED_EN::V22)
-          driver = new MED_FIELD_WRONLY_DRIVER22<T>(fileName,ptrField);
-        return driver;
+	if (version == MED_EN::V21)
+	  driver = new MED_FIELD_WRONLY_DRIVER21<T>(fileName,ptrField);
+	else if (version == MED_EN::V22)
+	  driver = new MED_FIELD_WRONLY_DRIVER22<T>(fileName,ptrField);
+	return driver;
       }
       case MED_EN::RDWR : {
-        if (version == MED_EN::V21)
-          driver = new MED_FIELD_RDWR_DRIVER21<T>(fileName,ptrField);
-        else if (version == MED_EN::V22)
-          driver = new MED_FIELD_RDWR_DRIVER22<T>(fileName,ptrField);
-        return driver;
+	if (version == MED_EN::V21)
+	  driver = new MED_FIELD_RDWR_DRIVER21<T>(fileName,ptrField);
+	else if (version == MED_EN::V22)
+	  driver = new MED_FIELD_RDWR_DRIVER22<T>(fileName,ptrField);
+	return driver;
       }
       default:
-        throw MED_EXCEPTION ("access type has not been properly specified to the method");
+	throw MED_EXCEPTION ("access type has not been properly specified to the method");
       }
   }
 
   template<class T, class INTERLACING_TAG>
   GENDRIVER * DRIVERFACTORY::buildConcreteMedDriverForField(const std::string & fileName,
-                                                            FIELD<T,INTERLACING_TAG> *ptrField,
-                                                            MED_EN::med_mode_acces access,
-                                                            MED_EN::medFileVersion version)
+							    FIELD<T,INTERLACING_TAG> *ptrField,
+							    MED_EN::med_mode_acces access,
+							    MED_EN::medFileVersion version)
   {
 
     MESSAGE_MED("buildConcreteMedDriverForField version of the file " << version);
@@ -267,28 +267,28 @@ namespace MEDMEM {
     switch(access)
       {
       case MED_EN::RDONLY : {
-        if (version == MED_EN::V21)
-          driver = new MED_FIELD_RDONLY_DRIVER21<T>(fileName,ptrField);
-        else if (version == MED_EN::V22)
-          driver = new MED_FIELD_RDONLY_DRIVER22<T>(fileName,ptrField);
-        return driver;
+	if (version == MED_EN::V21)
+	  driver = new MED_FIELD_RDONLY_DRIVER21<T>(fileName,ptrField);
+	else if (version == MED_EN::V22)
+	  driver = new MED_FIELD_RDONLY_DRIVER22<T>(fileName,ptrField);
+	return driver;
       }
       case MED_EN::WRONLY : {
-        if (version == MED_EN::V21)
-          driver = new MED_FIELD_WRONLY_DRIVER21<T>(fileName,ptrField);
-        else if (version == MED_EN::V22)
-          driver = new MED_FIELD_WRONLY_DRIVER22<T>(fileName,ptrField);
-        return driver;
+	if (version == MED_EN::V21)
+	  driver = new MED_FIELD_WRONLY_DRIVER21<T>(fileName,ptrField);
+	else if (version == MED_EN::V22)
+	  driver = new MED_FIELD_WRONLY_DRIVER22<T>(fileName,ptrField);
+	return driver;
       }
       case MED_EN::RDWR : {
-        if (version == MED_EN::V21)
-          driver = new MED_FIELD_RDWR_DRIVER21<T>(fileName,ptrField);
-        else if (version == MED_EN::V22)
-          driver = new MED_FIELD_RDWR_DRIVER22<T>(fileName,ptrField);
-        return driver;
+	if (version == MED_EN::V21)
+	  driver = new MED_FIELD_RDWR_DRIVER21<T>(fileName,ptrField);
+	else if (version == MED_EN::V22)
+	  driver = new MED_FIELD_RDWR_DRIVER22<T>(fileName,ptrField);
+	return driver;
       }
       default:
-        throw MED_EXCEPTION ("access type has not been properly specified to the method");
+	throw MED_EXCEPTION ("access type has not been properly specified to the method");
       }
   }
 }

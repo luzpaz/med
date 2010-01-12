@@ -82,14 +82,14 @@ string multipr::removeExtension(const char* pFilename, const char* pExtension)
 
 string multipr::getFilenameWithoutPath(const char* pFilename)
 {
-    const char* res = strrchr(pFilename, '/');
+    char* res = strrchr(pFilename, '/');
     if (res == NULL)
     {
         return pFilename;
     }
     else
     {
-        string name = res + 1;
+        char* name = res + 1;
         return name;
     }
 }

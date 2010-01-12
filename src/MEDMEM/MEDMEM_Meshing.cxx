@@ -140,10 +140,10 @@ myMeshing.setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,System,Mode);
 
 */
 void MESHING::setCoordinates(const int SpaceDimension,
-                                                                                                                 const int NumberOfNodes,
-                                                                                                                 const double * Coordinates,
-                                                                                                                 const string System,
-                                                                                                                 const MED_EN::medModeSwitch Mode)
+														 const int NumberOfNodes,
+														 const double * Coordinates,
+														 const string System,
+														 const MED_EN::medModeSwitch Mode)
 {
   setSpaceDimension(SpaceDimension);
   setNumberOfNodes(NumberOfNodes);
@@ -153,8 +153,8 @@ void MESHING::setCoordinates(const int SpaceDimension,
   //if (NULL != _coordinate) delete _coordinate;
 
   _coordinate = new COORDINATE(SpaceDimension,
-                               NumberOfNodes,
-                               Mode);
+			       NumberOfNodes,
+			       Mode);
   _coordinate->setCoordinates(Mode,Coordinates);
   _coordinate->setCoordinatesSystem(System);
 }
@@ -249,7 +249,7 @@ void MESHING::setCoordinateUnit(const string unit, const int i)
   MED_FACE connectivity before MED_CELL).
 */
 void MESHING::setNumberOfTypes(const int NumberOfTypes,
-                                                                                                                         const MED_EN::medEntityMesh Entity) 
+															 const MED_EN::medEntityMesh Entity) 
   throw (MEDEXCEPTION)
 {
   const char * LOC = "MESHING::setNumberOfTypes( medEntityMesh ) : ";
@@ -273,15 +273,15 @@ void MESHING::setNumberOfTypes(const int NumberOfTypes,
 
     if (MED_FACE == Entity)
       if (3 != getSpaceDimension())
-        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity on MED_FACE could be defined in non 3D space !"));
+	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity on MED_FACE could be defined in non 3D space !"));
     
     if (MED_EDGE == Entity)
       if (3 == getSpaceDimension()) {
-        if (!_connectivity->existConnectivity(MED_NODAL,MED_FACE))
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity on MED_FACE defined !"));
+	if (!_connectivity->existConnectivity(MED_NODAL,MED_FACE))
+	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity on MED_FACE defined !"));
       } else {
-        if (2 != getSpaceDimension())
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Could not set connectivity on MED_EDGE !"));
+	if (2 != getSpaceDimension())
+	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Could not set connectivity on MED_EDGE !"));
       }
     // all right, we could create connectivity !
     CONNECTIVITY * myConnectivity = new CONNECTIVITY(NumberOfTypes,Entity) ;
@@ -304,7 +304,7 @@ If \a entity is not defined, the method will throw an exception.
 */
 
 void MESHING::setTypes(const MED_EN::medGeometryElement * Types,
-                                                                                        const MED_EN::medEntityMesh entity)
+											const MED_EN::medEntityMesh entity)
   throw (MEDEXCEPTION)
 {
   if (entity == MED_NODE)
@@ -324,7 +324,7 @@ void MESHING::setTypes(const MED_EN::medGeometryElement * Types,
   this sets 12 triangles and 23 quadrangles.
 */
 void MESHING::setNumberOfElements(const int * NumberOfElements,
-                                  const MED_EN::medEntityMesh Entity)
+				  const MED_EN::medEntityMesh Entity)
   throw (MEDEXCEPTION)
 {
   const char * LOC = "MESHING::setNumberOfElements(const int *, medEntityMesh) : " ;
@@ -366,8 +366,8 @@ myMeshing.setConnectivity({1,3,4,5,4,5,7,8},MED_CELL,MED_QUAD4);
   Define 2 triangles face defined with nodes 1,2,3 and 1,4,2.
 */
 void MESHING::setConnectivity(const int * Connectivity,
-                              const MED_EN::medEntityMesh Entity,
-                              const MED_EN::medGeometryElement Type)
+			      const MED_EN::medEntityMesh Entity,
+			      const MED_EN::medGeometryElement Type)
   throw (MEDEXCEPTION)
 {
   const char * LOC = "MESHING::setConnectivity : " ;
@@ -413,9 +413,9 @@ meshing.setPolygonsConnectivity(conn_index, conn, nb_poly, MED_CELL)
 */
 
 void MESHING::setPolygonsConnectivity     (const int * ConnectivityIndex,
-                                           const int * Connectivity,
-                                           int nbOfPolygons,
-                                           const MED_EN::medEntityMesh Entity)
+					   const int * Connectivity,
+					   int nbOfPolygons,
+					   const MED_EN::medEntityMesh Entity)
   throw (MEDEXCEPTION)
 {
   if (_connectivity == (CONNECTIVITY*)NULL)
@@ -434,10 +434,10 @@ elements
 \param Entity deprecated parameter 
 */
 void MESHING::setPolyhedraConnectivity     (const int * PolyhedronIndex,
-                                            const int * FacesIndex,
-                                            const int * Nodes,
-                                            int nbOfPolyhedra,
-                                            const MED_EN::medEntityMesh Entity)
+					    const int * FacesIndex,
+					    const int * Nodes,
+					    int nbOfPolyhedra,
+					    const MED_EN::medEntityMesh Entity)
   throw (MEDEXCEPTION)
 {
   if (_connectivity == (CONNECTIVITY*)NULL)
@@ -456,9 +456,9 @@ void MESHING::setPolyhedraConnectivity     (const int * PolyhedronIndex,
   NOT YET IMPLEMENTED !! WARNING
 */
 void MESHING::setConnectivities (const int * ConnectivityIndex,
-                                 const int * ConnectivityValue,
-                                 const MED_EN::medConnectivity ConnectivityType,
-                                 const MED_EN::medEntityMesh Entity)
+				 const int * ConnectivityValue,
+				 const MED_EN::medConnectivity ConnectivityType,
+				 const MED_EN::medEntityMesh Entity)
   throw (MEDEXCEPTION)
 {
   const char * LOC = "MESHING::setConnectivities : " ;
@@ -474,10 +474,10 @@ void MESHING::setConnectivities (const int * ConnectivityIndex,
 */
 
 // void MESHING::setGroup(const string name,
-//                     const string description,
-//                     const int NumberOfElements,
-//                     const int * ElementsNumbers,
-//                     const medEntityMesh Entity)
+// 		       const string description,
+// 		       const int NumberOfElements,
+// 		       const int * ElementsNumbers,
+// 		       const medEntityMesh Entity)
 // {
 //   GROUP * myGroup = new GROUP() ;
 //   myGroup->setMesh(*this) ;

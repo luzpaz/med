@@ -66,57 +66,57 @@ namespace MEDMEM
   
     ~OptionManager()
     {
-                        std::map< std::string, OptionGeneric*>::iterator mi;
+			std::map< std::string, OptionGeneric*>::iterator mi;
       for(mi = _optionList.begin() ; mi != _optionList.end() ; mi++) delete (*mi).second;
     }
     
     template <class T> void  registerOption( T * var, const std::string& name, T defaut)
     {
       OptionGeneric  * newoption = new Option<T>( defaut, var);
-      _optionList.insert(make_pair(name, newoption));                   
+      _optionList.insert(make_pair(name, newoption));			
     }
 
     template <class T> void getOption(const std::string& name, T& var)
     {
       if(_optionList.find(name) != _optionList.end())  
-                                {
-                                        Option<T>* option_ptr = dynamic_cast<Option<T>*>(_optionList.find(name)->second);
-                                        var= option_ptr->getValue();
-                                }
-                        else throw MEDEXCEPTION 
-                                ("Option is not listed, please register the option before using the getOption command");
+				{
+					Option<T>* option_ptr = dynamic_cast<Option<T>*>(_optionList.find(name)->second);
+					var= option_ptr->getValue();
+				}
+			else throw MEDEXCEPTION 
+				("Option is not listed, please register the option before using the getOption command");
     }
-                
+		
     template <class T> void setOption(const std::string& name, T value)
     {
       if(_optionList.find(name) != _optionList.end())
-                                {
-                                        Option<T>* option_ptr = dynamic_cast<Option<T>*>(_optionList.find(name)->second);
-                                        if (option_ptr != 0 )
-                                                option_ptr->setValue(value);
-                                        else throw MEDEXCEPTION ("Error setOption: Option is registered with a different type");
-                                }
+				{
+					Option<T>* option_ptr = dynamic_cast<Option<T>*>(_optionList.find(name)->second);
+					if (option_ptr != 0 )
+						option_ptr->setValue(value);
+					else throw MEDEXCEPTION ("Error setOption: Option is registered with a different type");
+				}
       else throw MEDEXCEPTION 
-                                ("Option is not listed, please register the option before using the setOption command");
+				("Option is not listed, please register the option before using the setOption command");
     }
     
     void setOption(const std::string& name, int value)
     {
       if(_optionList.find(name) != _optionList.end())
-                                {
-                                        Option<double>* option_double_ptr = dynamic_cast<Option<double>*> (_optionList.find(name)->second);
-                                        if (option_double_ptr!=0)
-                                                setOption(name,(double) value);
-                                        else
-                                                {
-                                                        Option<int>* option_ptr =dynamic_cast<Option<int>*>(_optionList.find(name)->second);
-                                                        if (option_ptr != 0 )
-                                                                option_ptr->setValue(value);
-                                                        else throw MEDEXCEPTION ("Error setOption: Option is registered with a different type");
-                                                }
-                                }
+				{
+					Option<double>* option_double_ptr = dynamic_cast<Option<double>*> (_optionList.find(name)->second);
+					if (option_double_ptr!=0)
+						setOption(name,(double) value);
+					else
+						{
+							Option<int>* option_ptr =dynamic_cast<Option<int>*>(_optionList.find(name)->second);
+							if (option_ptr != 0 )
+								option_ptr->setValue(value);
+							else throw MEDEXCEPTION ("Error setOption: Option is registered with a different type");
+						}
+				}
       else throw MEDEXCEPTION 
-                                ("Option is not listed, please register the option before using the setOption command");
+				("Option is not listed, please register the option before using the setOption command");
     }
     
   };

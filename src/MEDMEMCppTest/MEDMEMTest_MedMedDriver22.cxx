@@ -148,7 +148,7 @@ void MEDMEMTest::testMedMedDriver22() {
   //Trying open() file twice
   //#ifdef  ENABLE_FORCED_FAILURES
   //CPPUNIT_ASSERT_THROW(aMedMedRdDriver22->open(),MEDEXCEPTION);
-        //  CPPUNIT_ASSERT_NO_THROW(aMedMedRdDriver22->open());
+	//  CPPUNIT_ASSERT_NO_THROW(aMedMedRdDriver22->open());
   //(BUG) No exception in this case.
   //#endif
 

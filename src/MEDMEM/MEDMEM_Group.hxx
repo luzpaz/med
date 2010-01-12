@@ -84,9 +84,9 @@ public:
   inline void setNumberOfFamilies(int numberOfFamilies);
   inline void setFamilies(vector<FAMILY*> Family);
   
-  inline int             getNumberOfFamilies() const ;
+  inline int 	         getNumberOfFamilies() const ;
   inline vector<FAMILY*> getFamilies() const ;
-  inline FAMILY *        getFamily(int i) const ;
+  inline FAMILY * 	 getFamily(int i) const ;
 
 };
 

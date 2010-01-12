@@ -66,8 +66,8 @@ public :
     Constructor.
   */
   TYPE_MESH_DRIVER(const std::string & fileName,  
-                  MESH * ptrMesh, 
-                  med_mode_acces accessMode) ;
+		  MESH * ptrMesh, 
+		  med_mode_acces accessMode) ;
   /*!
     Copy constructor.
   */

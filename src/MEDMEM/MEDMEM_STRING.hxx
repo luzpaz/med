@@ -36,7 +36,7 @@ using namespace std;
       STRING msgErr;
       msgErr << "This Object cannot be instanciated by now ! Try "<< 11 << "times just to see what happens ";
       throw SALOME_EXCEPTION (LOCALIZED(msgErr)) ;
-                                                                */
+								*/
 namespace MEDMEM {
   class MEDMEM_EXPORT STRING : public string
   {

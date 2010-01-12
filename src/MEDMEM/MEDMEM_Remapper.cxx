@@ -229,7 +229,7 @@ MEDMEM::FIELD<double> *  MEDMEM_REMAPPER::transferField(const MEDMEM::FIELD<doub
     else
       for(int comp = 0; comp < source_nbcomp; comp++)
         value_target[i*source_nbcomp+comp]=0.;
-        
+	
   return target_field;
 }
 
@@ -262,7 +262,7 @@ MEDMEM::FIELD<double> *  MEDMEM_REMAPPER::reverseTransferField(const MEDMEM::FIE
     else
       for(int comp = 0; comp < target_nbcomp; comp++)
         value_source[i*target_nbcomp+comp]=0.;
-        
+	
   return source_field;
 }
 

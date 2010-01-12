@@ -85,7 +85,7 @@ size of vector \a xyz_array.
  *\param type  grid type (MED_POLAR, MED_CARTESIAN)
 */
 GRID::GRID(const std::vector<std::vector<double> >& xyz_array,const std::vector<std::string>& coord_name, 
-                                         const std::vector<std::string>& coord_unit, const MED_EN::med_grid_type type) : _gridType(type)
+					 const std::vector<std::string>& coord_unit, const MED_EN::med_grid_type type) : _gridType(type)
 {
     init(); // PAL 12136
     _is_default_gridType = false;
@@ -96,36 +96,36 @@ GRID::GRID(const std::vector<std::vector<double> >& xyz_array,const std::vector<
     // compute & set _numberOfNodes
     int NumberOfNodes=1 ;
     for(int i=0;i!=xyz_array.size();++i)
-        NumberOfNodes*=xyz_array[i].size();
+	NumberOfNodes*=xyz_array[i].size();
     _numberOfNodes = NumberOfNodes ;
     
     // create a non allocated COORDINATE
     _coordinate = new COORDINATE(_spaceDimension, &coord_name[0], &coord_unit[0]);
     string coordinateSystem = "UNDEFINED";
     if( _gridType == MED_CARTESIAN) 
-        coordinateSystem = "CARTESIAN";
+	coordinateSystem = "CARTESIAN";
     else if ( _gridType == MED_POLAR) 
-        coordinateSystem = "CYLINDRICAL";
+	coordinateSystem = "CYLINDRICAL";
     _coordinate->setCoordinatesSystem(coordinateSystem);
 
     // set the GRID part
     if (_spaceDimension>=1)
     {
-        _iArrayLength=xyz_array[0].size();
-        _iArray=new double[_iArrayLength];
-        std::copy(xyz_array[0].begin(),xyz_array[0].end(),_iArray);
+	_iArrayLength=xyz_array[0].size();
+	_iArray=new double[_iArrayLength];
+	std::copy(xyz_array[0].begin(),xyz_array[0].end(),_iArray);
     }
     if (_spaceDimension>=2)
     {
-        _jArrayLength=xyz_array[1].size();
-        _jArray=new double[_jArrayLength];
-        std::copy(xyz_array[1].begin(),xyz_array[1].end(),_jArray);
+	_jArrayLength=xyz_array[1].size();
+	_jArray=new double[_jArrayLength];
+	std::copy(xyz_array[1].begin(),xyz_array[1].end(),_jArray);
     }
     if (_spaceDimension>=3)
     {
-        _kArrayLength=xyz_array[2].size();
-        _kArray=new double[_kArrayLength];
-        std::copy(xyz_array[2].begin(),xyz_array[2].end(),_kArray);
+	_kArrayLength=xyz_array[2].size();
+	_kArray=new double[_kArrayLength];
+	std::copy(xyz_array[2].begin(),xyz_array[2].end(),_kArray);
     }
 
     _is_coordinates_filled  = false;
@@ -237,16 +237,16 @@ const medGeometryElement * GRID::getTypes(MED_EN::medEntityMesh entity) const
     int i=0;
     if(entity==MED_CELL)
     {
-        i=3-_spaceDimension;
+	i=3-_spaceDimension;
     }
     else if(entity==MED_FACE && _spaceDimension>2 )
-        i=1;
+	i=1;
     else if(entity==MED_EDGE && _spaceDimension>1 )
-        i=2;
+	i=2;
     else if(entity==MED_NODE && _spaceDimension>0)
-        i=3;
+	i=3;
     else 
-        throw MEDEXCEPTION(LOCALIZED("CONNECTIVITY::getGeometricTypes : Entity not defined !"));
+	throw MEDEXCEPTION(LOCALIZED("CONNECTIVITY::getGeometricTypes : Entity not defined !"));
     return &_gridGeometry[i];
 }
 
@@ -366,11 +366,11 @@ void GRID::fillCoordinates() const
 //=======================================================================
 
 CONNECTIVITY * GRID::makeConnectivity (MED_EN::medEntityMesh           Entity,
-                                                                                                                                                         MED_EN::medGeometryElement Geometry,
-                                       int                NbEntities,
-                                       int                NbNodes,
-                                       int                nbMeshNodes,
-                                       const int *                    NodeNumbers)
+																			 MED_EN::medGeometryElement Geometry,
+				       int                NbEntities,
+				       int                NbNodes,
+				       int                nbMeshNodes,
+				       const int *                    NodeNumbers)
   const
 {
   CONNECTIVITY * Connectivity     = new CONNECTIVITY(Entity) ;
@@ -400,7 +400,7 @@ CONNECTIVITY * GRID::makeConnectivity (MED_EN::medEntityMesh           Entity,
   //skyLineArrayIndex, NodeNumbers);
 
   Connectivity->_nodal = new MEDSKYLINEARRAY (NbEntities, NbNodes,
-                                               skyLineArrayIndex, NodeNumbers);
+					       skyLineArrayIndex, NodeNumbers);
 
   delete [] skyLineArrayIndex;
 
@@ -727,8 +727,8 @@ void GRID::fillConnectivity() const
     //    CellCNCT->_descending->setMEDSKYLINEARRAY (nbCells, nbSub,
     //                                               skyLineArrayIndex, subNumbers);
     CellCNCT->_descending = new MEDSKYLINEARRAY (nbCells, nbSub,
-                                                 skyLineArrayIndex,
-                                                 subNumbers);
+						 skyLineArrayIndex,
+						 subNumbers);
     delete [] skyLineArrayIndex;
   }
   delete [] subNumbers;

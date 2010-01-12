@@ -72,7 +72,7 @@ public :
   template <class INTERLACING_TAG>
   VTK_FIELD_DRIVER():GENDRIVER(),
                      _ptrField((FIELD<T> *) 0), _fieldName(""),
-                     _fieldNum(MED_INVALID)
+		     _fieldNum(MED_INVALID)
   {
     const char * LOC = "VTK_FIELD_DRIVER::VTK_FIELD_DRIVER() ";
     BEGIN_OF_MED(LOC);
@@ -86,7 +86,7 @@ public :
   */
   template <class INTERLACING_TAG>
   VTK_FIELD_DRIVER(const string & fileName,
-                   FIELD<T, INTERLACING_TAG> * ptrField):
+		   FIELD<T, INTERLACING_TAG> * ptrField):
     GENDRIVER(fileName, MED_EN::WRONLY, VTK_DRIVER),
     _ptrField((FIELD<T> *) ptrField),
     _fieldName(fileName),_fieldNum(MED_INVALID) 
@@ -140,9 +140,9 @@ public :
 
     if ( _fileName == "" )
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-                                       << "_fileName is |\"\"|, please set a correct fileName before calling open()"
-                                       )
-                            );
+				       << "_fileName is |\"\"|, please set a correct fileName before calling open()"
+				       )
+			    );
 
     if (!(*_vtkFile).is_open())
       (*_vtkFile).open(_fileName.c_str()) ; 
@@ -158,8 +158,8 @@ public :
 
     if (!(*_vtkFile))
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
-                                       << _fileName)
-                            );
+				       << _fileName)
+			    );
   END_OF_MED(LOC);
   }
 
@@ -172,26 +172,26 @@ public :
 
     if ( _fileName == "" )
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-                                       << "_fileName is |\"\"|, please set a correct fileName before calling open()"
-                                       )
-                            );
+				       << "_fileName is |\"\"|, please set a correct fileName before calling open()"
+				       )
+			    );
 
     SCRUTE_MED((*_vtkFile).is_open());
 
     if (!(*_vtkFile).is_open())
       {
-        MESSAGE_MED(LOC<<"The file is already close and it is opened with the right option");
-        (*_vtkFile).open(_fileName.c_str(), ofstream::out | ofstream::app) ; 
+	MESSAGE_MED(LOC<<"The file is already close and it is opened with the right option");
+	(*_vtkFile).open(_fileName.c_str(), ofstream::out | ofstream::app) ; 
       }
     else
       {
-        MESSAGE_MED(LOC<<"The file is still open, it is closed to make sure that it will be opened with the right option");
-        //      closeConst();
+	MESSAGE_MED(LOC<<"The file is still open, it is closed to make sure that it will be opened with the right option");
+	//	closeConst();
 
 
-        (*_vtkFile).close() ;
+	(*_vtkFile).close() ;
 
-        _vtkFile->open(_fileName.c_str(), ofstream::out | ofstream::app) ; 
+	_vtkFile->open(_fileName.c_str(), ofstream::out | ofstream::app) ; 
       }
 //    if (*_vtkFile)
 //      _status = MED_OPENED ;
@@ -205,8 +205,8 @@ public :
 
     if (!(*_vtkFile))
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not open file "
-                                       << _fileName)
-                            );
+				       << _fileName)
+			    );
   END_OF_MED(LOC);
   }
 
@@ -242,8 +242,8 @@ public :
     if ( (*_vtkFile) && _vtkFile->is_open() )
       //if (!(*_vtkFile))
       throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) << "Could not close file "
-                                       << _fileName)
-                            );
+				       << _fileName)
+			    );
 
   END_OF_MED(LOC);
   }
@@ -336,7 +336,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
 
   // could we put more than one Mesh ?????
   (*_vtkFile) << "# vtk DataFile Version 2.0" << endl 
-           << "maillage from MedMemory"  << endl ;
+	   << "maillage from MedMemory"  << endl ;
   // only ASCII for the moment (binary came later :-)
   (*_vtkFile) << "ASCII" << endl ;
 
@@ -377,13 +377,13 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
     switch (cells_type[i].getType())
       {
       case MED_EN::MED_POINT1  : {
-        filter = new int[1] ;
-        filter[0] = 0 ;
+	filter = new int[1] ;
+	filter[0] = 0 ;
         break ;
       }
       case MED_EN::MED_SEG2    : {
         filter = new int[2] ;
-        filter[0] = 0 ;
+	filter[0] = 0 ;
         filter[1] = 1 ;
         break ;
       }
@@ -394,7 +394,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
         filter = new int[3] ;
         filter[0] = 0 ;
         filter[1] = 1 ;
-        filter[2] = 2 ;
+ 	filter[2] = 2 ;
         break ;
       }
       case MED_EN::MED_QUAD4   : {
@@ -402,7 +402,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
         filter[0] = 0 ;
         filter[1] = 1 ;
         filter[2] = 2 ;
-        filter[3] = 3 ;
+  	filter[3] = 3 ;
         break ;
       }
       case MED_EN::MED_TRIA6   : {
@@ -425,7 +425,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
         filter[1] = 3 ;  // 2nd element in med are 4th in vtk (array begin at 0 !)
         filter[2] = 2 ;
         filter[3] = 1 ;  // 4th element in med are 2nd in vtk (array begin at 0 !)
-        filter[4] = 4 ;
+  	filter[4] = 4 ;
         break ;
       }
       case MED_EN::MED_PENTA6  : {
@@ -435,8 +435,8 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
         filter[2] = 2 ;
         filter[3] = 3 ;
         filter[4] = 4 ;
-        filter[5] = 5 ;
-        break ;
+  	filter[5] = 5 ;
+	break ;
       }
       case MED_EN::MED_HEXA8   : {
         filter = new int[8] ;
@@ -446,8 +446,8 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
         filter[3] = 1 ;
         filter[4] = 4 ;
         filter[5] = 7 ;
-        filter[6] = 6 ;
-        filter[7] = 5 ;
+  	filter[6] = 6 ;
+	filter[7] = 5 ;
         break ;
       }
       case MED_EN::MED_TETRA10 : {
@@ -474,7 +474,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
     for (int j=0;j<numberOfCell;j++) {
       (*_vtkFile) << nodes_cell << " " ;
       for (int k=0;k<nodes_cell;k++)
-        (*_vtkFile) << connectivityArray[j*nodes_cell+filter[k]] - 1 << " " ;
+	(*_vtkFile) << connectivityArray[j*nodes_cell+filter[k]] - 1 << " " ;
       (*_vtkFile) << endl ;
     }
     if (filter != NULL)
@@ -488,67 +488,67 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
     switch (cells_type[i].getType())
       {
       case MED_EN::MED_POINT1  : {
-        vtkType = 1 ;
+	vtkType = 1 ;
         break ;
       }
       case MED_EN::MED_SEG2    : {
-        vtkType = 3 ;
+	vtkType = 3 ;
         break ;
       }
       case MED_EN::MED_SEG3    : {  
-        vtkType = 0 ;
+	vtkType = 0 ;
         break ;
       }
       case MED_EN::MED_TRIA3   : {
-        vtkType = 5 ;
+	vtkType = 5 ;
         break ;
       }
       case MED_EN::MED_QUAD4   : {
-        vtkType = 9 ;
+	vtkType = 9 ;
         break ;
       }
       case MED_EN::MED_TRIA6   : {
-        vtkType = 0 ;
+	vtkType = 0 ;
         break ;
       }
       case MED_EN::MED_QUAD8   : {
-        vtkType = 0 ;
+	vtkType = 0 ;
         break ;
       }
       case MED_EN::MED_TETRA4  : {
-        vtkType = 10 ;
+	vtkType = 10 ;
         break ;
       }
       case MED_EN::MED_PYRA5   : {
-        vtkType = 14 ;
+	vtkType = 14 ;
         break ;
       }
       case MED_EN::MED_PENTA6  : {
-        vtkType = 13 ;
-        break ;
+	vtkType = 13 ;
+	break ;
       }
       case MED_EN::MED_HEXA8   : {
-        vtkType = 12 ;
+	vtkType = 12 ;
         break ;
       }
       case MED_EN::MED_TETRA10 : {
-        vtkType = 0 ;
+	vtkType = 0 ;
         break ;
       }
       case MED_EN::MED_PYRA13  : {
-        vtkType = 0 ;
+	vtkType = 0 ;
         break ;
       }
       case MED_EN::MED_PENTA15 : {
-        vtkType = 0 ;
+	vtkType = 0 ;
         break ;
       }
       case MED_EN::MED_HEXA20  : {
-        vtkType = 0 ;
+	vtkType = 0 ;
         break ;
       }
       default : { 
-        vtkType = 0 ;
+	vtkType = 0 ;
         break ;
       }
       }
@@ -598,15 +598,15 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
     {
     case MED_EN::MED_INT32 :
       {
-        break ;
+	break ;
       }
     case MED_EN::MED_REEL64 :
       {
-        break ;
+	break ;
       }
     default :
       { 
-        throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<< name.str() <<" the type is not int or double !"));
+	throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<< name.str() <<" the type is not int or double !"));
       }
     }
 
@@ -644,7 +644,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
   for (int i=0; i<NomberOfValue; i++)
     {
       for(int j=0; j<NomberOfComponents; j++)
-        (*_vtkFile) << value[j*NomberOfValue+i] << " " ;
+	(*_vtkFile) << value[j*NomberOfValue+i] << " " ;
       (*_vtkFile) << endl ;
     }
   
@@ -708,15 +708,15 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
     {
     case MED_EN::MED_INT32 :
       {
-        break ;
+	break ;
       }
     case MED_EN::MED_REEL64 :
       {
-        break ;
+	break ;
       }
     default :
       { 
-        throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<< name.str() <<" the type is not int or double !"));
+	throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<< name.str() <<" the type is not int or double !"));
       }
     }
 
@@ -752,7 +752,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
   for (int i=0; i<NomberOfValue; i++)
     {
       for(int j=0; j<NomberOfComponents; j++)
-        (*_vtkFile) << value[j*NomberOfValue+i] << " " ;
+	(*_vtkFile) << value[j*NomberOfValue+i] << " " ;
       (*_vtkFile) << endl ;
     }
 

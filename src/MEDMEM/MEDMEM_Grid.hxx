@@ -71,8 +71,8 @@ class MEDMEM_EXPORT GRID: public MESH
   //-----------------------//
 
   CONNECTIVITY * makeConnectivity (const MED_EN::medEntityMesh Entity, const MED_EN::medGeometryElement Geometry,
-                                   const int NbEntities, int NbNodes, int nbMeshNodes,
-                                   const int * NodeNumbers) const ;
+				   const int NbEntities, int NbNodes, int nbMeshNodes,
+				   const int * NodeNumbers) const ;
   // creates nodal connectivity
 
   
@@ -244,39 +244,39 @@ class MEDMEM_EXPORT GRID: public MESH
   const int * getGlobalNumberingIndex(MED_EN::medEntityMesh Entity) const;
 
   inline int getNumberOfElements(MED_EN::medEntityMesh Entity,
-                                 MED_EN::medGeometryElement Type) const;
+				 MED_EN::medGeometryElement Type) const;
 
   inline int getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity,
-                                         MED_EN::medGeometryElement Type) const;
+					 MED_EN::medGeometryElement Type) const;
 
   inline bool existConnectivity(MED_EN::medConnectivity ConnectivityType,
-                                MED_EN::medEntityMesh Entity) const;
+				MED_EN::medEntityMesh Entity) const;
 
   inline MED_EN::medGeometryElement getElementType(MED_EN::medEntityMesh Entity,
-                                           int Number) const;
+					   int Number) const;
 
   inline MED_EN::medGeometryElement getElementTypeWithPoly(MED_EN::medEntityMesh Entity,
-                                                           int Number) const;
+							   int Number) const;
 
   inline void calculateConnectivity(MED_EN::medModeSwitch Mode,
-                                    MED_EN::medConnectivity ConnectivityType,
-                                    MED_EN::medEntityMesh Entity) const ;
+				    MED_EN::medConnectivity ConnectivityType,
+				    MED_EN::medEntityMesh Entity) const ;
 
   inline const CONNECTIVITY* getConnectivityptr() const;
 
   inline const int * getConnectivity(MED_EN::medModeSwitch Mode,
-                                     MED_EN::medConnectivity ConnectivityType,
-                                     MED_EN::medEntityMesh Entity, 
-                                     MED_EN::medGeometryElement Type) const;
+				     MED_EN::medConnectivity ConnectivityType,
+				     MED_EN::medEntityMesh Entity, 
+				     MED_EN::medGeometryElement Type) const;
 
   inline const int * getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
-                                          MED_EN::medEntityMesh Entity) const;
+					  MED_EN::medEntityMesh Entity) const;
 
   inline const int * getReverseConnectivity(MED_EN::medConnectivity ConnectivityType,
-                                            MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
+					    MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
 
   inline const int * getReverseConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
-                                                 MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
+						 MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
 
   //  Setting fields
 
@@ -442,16 +442,16 @@ inline int GRID::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGe
           _iArrayLength*_jArrayLength*(_kArrayLength-1);
 
     else if (entity==MED_EN::MED_NODE && (Type==MED_EN::MED_NONE || Type==MED_EN::MED_ALL_ELEMENTS) && _spaceDimension>0)
-        numberOfElements=_numberOfNodes;
+	numberOfElements=_numberOfNodes;
     
     else if (entity==MED_EN::MED_CELL && _spaceDimension==3 && (Type==MED_EN::MED_HEXA8 || Type==MED_EN::MED_ALL_ELEMENTS) )
-        numberOfElements=(_iArrayLength-1)*(_jArrayLength-1)*(_kArrayLength-1);
+	numberOfElements=(_iArrayLength-1)*(_jArrayLength-1)*(_kArrayLength-1);
     
     else if (entity==MED_EN::MED_CELL && _spaceDimension==2 && (Type==MED_EN::MED_QUAD4 || Type==MED_EN::MED_ALL_ELEMENTS))
-        numberOfElements=(_iArrayLength-1)*(_jArrayLength-1);
+	numberOfElements=(_iArrayLength-1)*(_jArrayLength-1);
     
     else if (entity==MED_EN::MED_CELL && _spaceDimension==1 && (Type==MED_EN::MED_SEG2 || Type==MED_EN::MED_ALL_ELEMENTS) )
-        numberOfElements=_iArrayLength-1;
+	numberOfElements=_iArrayLength-1;
 
     MESSAGE_MED("GRID::getNumberOfElements - entity=" << entity << " Type=" << Type);
     MESSAGE_MED("_spaceDimension=" << _spaceDimension << "  numberOfElements=" << numberOfElements);

@@ -154,7 +154,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
       deque<DT_IT_>::const_iterator dtit = timeSteps.begin();
       for ( ; dtit!=timeSteps.end(); dtit++)
       {
-        FIELD_ * field = _ptrMed->getField( FieldNames[j], dtit->dt, dtit->it );
+	FIELD_ * field = _ptrMed->getField( FieldNames[j], dtit->dt, dtit->it );
         MESH* supMesh = field->getSupport()->getMesh();
         if ( supMesh == mesh || mesh->getName() == field->getSupport()->getMeshName() ) {
           fieldDriver = new ENSIGHT_FIELD_WRONLY_DRIVER( _fileName, field );

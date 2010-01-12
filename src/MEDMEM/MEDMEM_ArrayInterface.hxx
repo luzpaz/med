@@ -37,10 +37,10 @@
 namespace MEDMEM {
 
 template < class ARRAY_ELEMENT_TYPE,
-           class INTERLACE_TAG,
-           class GAUSS_TAG,
-           class CHECKING_POLICY=IndexCheckPolicy>
-           //NoIndexCheckPolicy>
+	   class INTERLACE_TAG,
+	   class GAUSS_TAG,
+	   class CHECKING_POLICY=IndexCheckPolicy>
+	   //NoIndexCheckPolicy>
 class MEDMEM_EXPORT MEDMEM_ArrayInterface  {
 
 public:
@@ -64,8 +64,8 @@ public:
   };
 
   static inline void setPtr( ElementType * arrayptr,  Array & array, 
-                             bool shallowCopy=false,
-                             bool ownershipOfValues=false )  {
+			     bool shallowCopy=false,
+			     bool ownershipOfValues=false )  {
     array.setPtr(arrayptr,shallowCopy,ownershipOfValues);
   };
 

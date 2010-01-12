@@ -43,7 +43,7 @@ public :
   inline void checkInInclusiveRange(const std::string & classname, int min, int max, int index) const {
     if (index < min || index > max )
       throw MEDEXCEPTION(LOCALIZED(STRING("In ") << classname << ", index : " << index 
-                                           << " not in rang [" << min << "," << max <<"]"));
+					   << " not in rang [" << min << "," << max <<"]"));
   }
 
   inline void checkEquality(const std::string & classname, int a, int b) const {

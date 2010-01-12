@@ -65,7 +65,7 @@ public :
     Constructor.
   */
   MED_MED_DRIVER(const string & fileName,  MED * const ptrMed,
-                 MED_EN::med_mode_acces accessMode);
+		 MED_EN::med_mode_acces accessMode);
 
   // OPERATEUR DE RECOPIE AVEC _medIdt ??
   /*!
@@ -187,7 +187,7 @@ public :
 */
 
 class MEDMEM_EXPORT IMED_MED_RDWR_DRIVER : public virtual IMED_MED_RDONLY_DRIVER,
-                             public virtual IMED_MED_WRONLY_DRIVER
+			     public virtual IMED_MED_WRONLY_DRIVER
 {
 
 public :

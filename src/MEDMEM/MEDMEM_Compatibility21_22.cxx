@@ -47,26 +47,26 @@ int MEDMEM::getMedAccessMode(MED_EN::med_mode_acces mode,
     {
     case MED_LECT :
       if (access(nom,F_OK))
-        return -1;
+	return -1;
       else 
-        if ((fid = _MEDfichierOuvrir(nom,mode_acces)) < 0)
-          return -1;
+	if ((fid = _MEDfichierOuvrir(nom,mode_acces)) < 0)
+	  return -1;
       break;
 
     case MED_ECRI :
       if (access(nom,F_OK))
-        {
-          if ((fid = _MEDfichierCreer(nom)) < 0)
-            return -1;
-        }
+	{
+	  if ((fid = _MEDfichierCreer(nom)) < 0)
+	    return -1;
+	}
       else
-        if ((fid = _MEDfichierOuvrir(nom,mode_acces)) < 0)
-          return -1;
+	if ((fid = _MEDfichierOuvrir(nom,mode_acces)) < 0)
+	  return -1;
       break;
 
     case MED_REMP :
       if ((fid = _MEDfichierCreer(nom)) < 0)
-        return -1;
+	return -1;
       break;
 */
     switch ( mode ) {
