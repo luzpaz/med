@@ -53,11 +53,11 @@ using namespace MED_EN;
 \defgroup MESH_constructors MESH Constructors
 
 The MESH class provides only two constructors : a copy constructor and
-a constructor enabling creation from file reading. The creation of 
+a constructor enabling creation from file reading. The creation of
 a user-defined mesh implies the use of the MESHING class.
 
 \defgroup MESH_advanced MESH Advanced features
-These functions provide access to high-level manipulation of the meshes, giving 
+These functions provide access to high-level manipulation of the meshes, giving
 information about the cells or extracting supports from the mesh.
 
 \defgroup MESH_connectivity MESH Connectivity information
@@ -80,11 +80,11 @@ information for MED_POLYGON and MED_POLYHEDRON elements.
 \defgroup MESH_families Families and Groups handling
 
 The methods described in this section enable the manipulation of families and groups. These
-notions define subsets of MED elements in a mesh. They differ because families are non 
+notions define subsets of MED elements in a mesh. They differ because families are non
 overlapping (a mesh element is associated to zero or one family)  while groups are more general.
 
 \defgroup MESH_io Mesh I/O
-These methods describe how to read and write meshes. Generally speaking, meshes should be read 
+These methods describe how to read and write meshes. Generally speaking, meshes should be read
 via a constructor and should be written with the addDriver()/write() methods.
 
 */
@@ -226,7 +226,6 @@ MESH::MESH(MESH &m)
   _spaceDimension = m._spaceDimension;
   _meshDimension = m._meshDimension;
   _numberOfNodes = m._numberOfNodes;
-  _arePresentOptionnalNodesNumbers = m._arePresentOptionnalNodesNumbers;
 
   _arePresentOptionnalNodesNumbers = m._arePresentOptionnalNodesNumbers;
   _optionnalToCanonicNodesNumbers = m._optionnalToCanonicNodesNumbers;
@@ -290,7 +289,7 @@ MESH::MESH(MESH &m)
   //_drivers = m._drivers;  //Recopie des drivers?
 }
 
-/*! 
+/*!
 \if MEDMEM_ug
 @}
 \endif
@@ -478,7 +477,7 @@ MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string
 
   END_OF_MED(LOC);
 };
-/*!\if MEDMEM_ug 
+/*!\if MEDMEM_ug
   @}
 \endif
 */
@@ -490,7 +489,7 @@ MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string
 /*!
   Returns true if mesh \a other has same
   coordinates (to 1E-15 precision ) and same connectivity as the calling object.
-  Information like name or description is not taken into account 
+  Information like name or description is not taken into account
   for the comparison.
 */
 
@@ -628,8 +627,8 @@ void MESH::printMySelf(ostream &os) const
 
   Return -1 if not found.
 */
-int MESH::getElementNumber(MED_EN::medConnectivity ConnectivityType, 
-                           MED_EN::medEntityMesh Entity, 
+int MESH::getElementNumber(MED_EN::medConnectivity ConnectivityType,
+                           MED_EN::medEntityMesh Entity,
                            MED_EN::medGeometryElement Type,
                            int * connectivity) const
 {
@@ -692,7 +691,7 @@ int MESH::getElementNumber(MED_EN::medConnectivity ConnectivityType,
 @{
 The methods described in this section are algorithms that perform a computation
 and return a result in the form of a SUPPORT or a FIELD to the user. For large meshes,
-as the returned information is not stored in the mesh but is rather computed, the 
+as the returned information is not stored in the mesh but is rather computed, the
 computation time can be large.
 */
 
@@ -706,7 +705,7 @@ computation time can be large.
   WARNING: This method can recalculate descending connectivity from partial to full form,
   so that partial SUPPORT on d-1 dimension elements becomes invalid.
 
-  \param Entity entity on which the boundary is desired. It has to be either \a MED_NODE or the 
+  \param Entity entity on which the boundary is desired. It has to be either \a MED_NODE or the
   d-1 dimension entity type (MED_FACE in 3D, MED_EDGE in 2D).
 */
 SUPPORT * MESH::getBoundaryElements(MED_EN::medEntityMesh Entity)
@@ -752,7 +751,7 @@ SUPPORT * MESH::getBoundaryElements(MED_EN::medEntityMesh Entity)
   else
     return buildSupportOnElementsFromElementList(myElementsList,entityToParse);
 }
-/*! 
+/*!
   @}
 */
 
@@ -843,7 +842,7 @@ SUPPORT *MESH::buildSupportOnElementsFromElementList(const list<int>& listOfElt,
 \addtogroup MESH_advanced
 @{
 */
-/*! Retrieves the volume of all the elements contained in \a Support. This method returns 
+/*! Retrieves the volume of all the elements contained in \a Support. This method returns
   a FIELD structure based on this support. It only works on MED_CELL for 3D meshes.
 */
 FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support, bool isAbs) const throw (MEDEXCEPTION)
@@ -1088,7 +1087,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support, bool isAbs
 
   return Volume;
 }
-/*! Retrieves the area of all the elements contained in \a Support. This method returns 
+/*! Retrieves the area of all the elements contained in \a Support. This method returns
   a FIELD structure based on this support. It only works on MED_CELL for 2D meshes or MED_FACE
   for 3D meshes.
 */
@@ -1256,7 +1255,7 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
   }
   return Area;
 }
-/*! Retrieves the length of all the elements contained in \a Support. This method returns 
+/*! Retrieves the length of all the elements contained in \a Support. This method returns
   a FIELD structure based on this support. It only works on MED_EDGE supports.
 */
 FIELD<double, FullInterlace>* MESH::getLength(const SUPPORT * Support) const throw (MEDEXCEPTION)
@@ -1366,8 +1365,8 @@ FIELD<double, FullInterlace>* MESH::getLength(const SUPPORT * Support) const thr
 
 /*! Retrieves the normal for all elements contained in SUPPORT \a Support.
   The method is only functional for 2D supports for 3D meshes and 1D supports
-  for 2D meshes. It returns 
-  a FIELD for which the number of components is equal to the dimension of the 
+  for 2D meshes. It returns
+  a FIELD for which the number of components is equal to the dimension of the
   mesh and which represents coordinates of the vector normal to the element.
   The direction of the vector is undetermined.
 */
@@ -1563,7 +1562,7 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
 }
 /*!Returns the barycenter for each element in the support. The barycenter positions are returned
   as a field with a number of components equal to the mesh dimension.
-  The barycenter computed by this method is actually the barycenter of the set of nodes of the elements, each having the same weight. 
+  The barycenter computed by this method is actually the barycenter of the set of nodes of the elements, each having the same weight.
 */
 FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
@@ -1868,7 +1867,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
   //END_OF_MED();
   return Barycenter;
 }
-/*!  
+/*!
   @}
 */
 
@@ -1914,7 +1913,7 @@ Example :
 //...
 // Attaching the driver to file "output.med", meshname "Mesh"
 int driver_handle = mesh.addDriver(MED_DRIVER, "output.med", "Mesh");
-// Writing the content of mesh to the file 
+// Writing the content of mesh to the file
 mesh.write(driver_handle);
 \endverbatim
 */
@@ -2390,7 +2389,7 @@ const GROUP* MESH::getGroup(const string& name) const  throw (MEDEXCEPTION)
   cerr << "MESH::getGroup("<<name<<") : group "<<name <<" was not found"<<endl;
   throw MEDEXCEPTION("MESH::getGroup(name) : name not found");
 }
-/*! 
+/*!
   @}
 */
 
@@ -2426,11 +2425,11 @@ const GROUP* MESH::getGroup(MED_EN::medEntityMesh entity, int i) const
 }
 
 
-/*! 
+/*!
 \addtogroup MESH_families
 @{
 */
-/*! Returns the groups of type \a entity present in the mesh as a vector of pointers. The GROUP class inheriting from the SUPPORT class, the 
+/*! Returns the groups of type \a entity present in the mesh as a vector of pointers. The GROUP class inheriting from the SUPPORT class, the
   methods that can be used on these groups are explained in the related section.*/
 const vector<GROUP*> MESH::getGroups(MED_EN::medEntityMesh entity) const
 {
@@ -2455,7 +2454,7 @@ const vector<GROUP*> MESH::getGroups(MED_EN::medEntityMesh entity) const
   Create groups from families.
 
   It is used to create groups that have only one family
-  for meshes that come from codes that use families instead 
+  for meshes that come from codes that use families instead
   of groups to define a subregion.
 */
 void MESH::createGroups()
@@ -2756,7 +2755,7 @@ void MESH::convertToPoly()
 {
   if (getMeshDimension()!=3) return;
 
-  CONNECTIVITY* newpolygonconnectivity = new CONNECTIVITY(MED_EN::MED_FACE);  
+  CONNECTIVITY* newpolygonconnectivity = new CONNECTIVITY(MED_EN::MED_FACE);
   CONNECTIVITY* newpolyhedraconnectivity = new CONNECTIVITY(MED_EN::MED_CELL);
 
   {
@@ -2788,7 +2787,7 @@ void MESH::convertToPoly()
     int* newconn = new int[nbnodes];
     int* newconnindex= new int [oldnbtotalface+1];
 
-    //copying classical types connectivity  
+    //copying classical types connectivity
     memcpy(newconn, oldconn, sizeof(int)*(oldconnindex[oldnbface]-1) );
 
     //copying poly types connectivity
