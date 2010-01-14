@@ -1394,11 +1394,12 @@ public :
 
     PyObject * getTypesWithPoly(medEntityMesh Entity)
       {
-        medGeometryElement * array = self->getTypesWithPoly(Entity);
+        //medGeometryElement * array = self->getTypesWithPoly(Entity);
+        std::auto_ptr<medGeometryElement> array( self->getTypesWithPoly(Entity));
         int size = self->getNumberOfTypesWithPoly(Entity);
-        TYPEMAP_OUTPUT_ARRAY(array, size, PyInt_FromLong,
+        TYPEMAP_OUTPUT_ARRAY(array.get(), size, PyInt_FromLong,
 			     MESH::getTypesWithPoly);
-        delete [] array;
+        //delete [] array; - it is not reached as return goes before
       }
       
 
