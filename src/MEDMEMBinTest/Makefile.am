@@ -48,7 +48,10 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 AM_CPPFLAGS += $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
 	-I$(srcdir)/../MEDWrapper/Base \
-	-I$(srcdir)/../MEDWrapper/V2_1/Core -I$(srcdir)/../INTERPOLATION \
+	-I$(srcdir)/../MEDWrapper/V2_1/Core \
+	-I$(srcdir)/../INTERP_KERNEL \
+	-I$(srcdir)/../INTERP_KERNEL/Bases \
+	-I$(srcdir)/../INTERPOLATION \
 	-I$(srcdir)/../MEDMEM
 
 LDADD= $(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
@@ -62,7 +65,7 @@ endif
 
 
 bin_PROGRAMS= \
-	ensight2med med2ensight convertToPoly \
+	ensight2med med2ensight convertToPoly dumpInterpolation \
 	med2_1_To_med2_2 med2vtk duplicateMED medmembin_test duplicateMEDMESH test_write_groups_poly\
 	test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray \
 	test_MEDMEM_CellModel testUPointerOf testUCoordinate testUUnit \
@@ -87,6 +90,7 @@ TESTS = $(bin_PROGRAMS)
 
 # tests that fail because they require arguments
 XFAIL_TESTS = \
+	dumpInterpolation \
 	convertToPoly \
 	duplicateMED \
 	duplicateMEDMESH \
@@ -153,6 +157,7 @@ TESTS += $(SCRIPT_TESTS)
 #     LDADD+=-lSALOMEBasics
 #endif
 
+dist_dumpInterpolation_SOURCES= dumpInterpolation.cxx
 dist_convertToPoly_SOURCES= convertToPoly.cxx
 dist_ensight2med_SOURCES= ensight2med.cxx
 dist_med2ensight_SOURCES= med2ensight.cxx
