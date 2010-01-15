@@ -42,6 +42,7 @@
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_SkyLineArray.hxx"
 #include "MEDMEM_ConnectZone.hxx"
+#include "MEDMEM_MedMeshDriver.hxx"
 
 //MEDSPLITTER includes
 #include "MEDSPLITTER_Topology.hxx"
@@ -175,7 +176,14 @@ vector<int*>& nodeglobal, int idomain
   strcpy(meshname,meshstring.c_str());
   strcpy(file,m_filename[idomain].c_str());
   cout << "Reading "<<meshstring<<" in "<<m_filename[idomain]<<endl;
-  (m_collection->getMesh())[idomain]=new MEDMEM::MESH(MEDMEM::MED_DRIVER,file, meshname);
+  //(m_collection->getMesh())[idomain]=new MEDMEM::MESH(MEDMEM::MED_DRIVER,file, meshname);
+  (m_collection->getMesh())[idomain]=new MEDMEM::MESH();
+  MED_MESH_RDONLY_DRIVER driver(file, (m_collection->getMesh())[idomain]);
+  driver.setMeshName(meshname);
+  driver.desactivateFacesComputation();
+  driver.open();
+  driver.read();
+  driver.close();
   cout <<"End of Read"<<endl;
   //reading MEDSPLITTER::CONNECTZONEs NODE/NODE and CELL/CELL
   med_2_3::med_idt fid = med_2_3::MEDouvrir(file,med_2_3::MED_LECTURE);
