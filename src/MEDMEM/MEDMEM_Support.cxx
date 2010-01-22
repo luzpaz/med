@@ -1175,7 +1175,7 @@ SUPPORT* SUPPORT::buildSupportOnNode() const throw (MEDEXCEPTION)
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No element numbers in a partial support"));
 
       nodalSupport->setEntity( getEntity() );
-      const int * nums = _numberOfElements;
+      const int * nums = _number->getValue();
       list<int> elems( nums, nums + _totalNumberOfElements );
       getMesh()->fillSupportOnNodeFromElementList( elems, nodalSupport );
     }
