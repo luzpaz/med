@@ -1229,51 +1229,54 @@ namespace MED
         EGrilleType aGrilleType;
         TInt aNbNodes = 1;
         TInt aNbElem  = 1;
+        TInt aNbSub   = 0;
         TInt aDim = theMeshInfo.GetDim();
-        EGeometrieElement aGeom;
-        EEntiteMaillage anEntity = eMAILLE;
+        EGeometrieElement aGeom, aSubGeom;
+        EEntiteMaillage aSubEntity = eMAILLE;
+
+        GetGrilleType(theMeshInfo, aGrilleType);
+
+        TIntVector aStruct(aDim);
+        if(aGrilleType == eGRILLE_STANDARD)
+        {
+          GetGrilleStruct(theMeshInfo, aStruct, theErr);
+        }
+        else
+        { // eGRILLE_CARTESIENNE and eGRILLE_POLAIRE
+          ETable aTable[3] = { eCOOR_IND1, eCOOR_IND2, eCOOR_IND3 };
+          for(med_int anAxis = 0; anAxis < aDim; anAxis++)
+            aStruct[ anAxis ] = GetNbNodes(theMeshInfo, aTable[anAxis]);
+        }
+        for(med_int i = 0; i < aDim; i++){
+          aNbNodes = aNbNodes * aStruct[i];
+          aNbElem = aNbElem * (aStruct[i] - 1);
+        }
         switch(aDim){
         case 1:
           aGeom = eSEG2;
           break;
         case 2:
           aGeom = eQUAD4;
+          aSubGeom = eSEG2;
+          aSubEntity = eARETE;
+          aNbSub =
+            (aStruct[0]  ) * (aStruct[1]-1) +
+            (aStruct[0]-1) * (aStruct[1]  );
           break;
         case 3:
           aGeom = eHEXA8;
+          aSubGeom = eQUAD4;
+          aSubEntity = eFACE;
+          aNbSub =
+            (aStruct[0]  ) * (aStruct[1]-1) * (aStruct[2]-1) +
+            (aStruct[0]-1) * (aStruct[1]  ) * (aStruct[2]-1) +
+            (aStruct[0]-1) * (aStruct[1]-1) * (aStruct[2]  );
           break;
         }
-
-        GetGrilleType(theMeshInfo, aGrilleType);
-
-        if(aGrilleType == eGRILLE_STANDARD){
-          TIntVector aStruct(aDim);
-          GetGrilleStruct(theMeshInfo, aStruct, theErr);
-          for(med_int i = 0; i < aDim; i++){
-            aNbNodes = aNbNodes * aStruct[i];
-            aNbElem = aNbElem * (aStruct[i] - 1);
-          }
-        }else{ // eGRILLE_CARTESIENNE and eGRILLE_POLAIRE
-          ETable aTable;
-          for(med_int anAxis = 1; anAxis <= aDim; anAxis++){
-            switch(anAxis){
-            case 1 :
-              aTable = eCOOR_IND1;
-              break;
-            case 2 :
-              aTable = eCOOR_IND2;
-              break;
-            case 3 :
-              aTable = eCOOR_IND3;
-              break;
-            }
-            TInt aNbNodes = GetNbNodes(theMeshInfo, aTable);
-            aNbNodes = aNbNodes * aNbNodes;
-            aNbElem =  aNbElem * (aNbNodes - 1);
-          }
-        }
         anInfo[eNOEUD][ePOINT1] = aNbNodes;
-        anInfo[anEntity][aGeom] = aNbElem;
+        anInfo[eMAILLE][aGeom] = aNbElem;
+        if ( aDim > 1 )
+          anInfo[aSubEntity][aSubGeom] = aNbSub;
       }
       return anInfo;
     }
@@ -2377,6 +2380,7 @@ namespace MED
 
           theInfo.SetCoordName(anAxis-1, aCompNames);
           theInfo.SetCoordUnit(anAxis-1, anUnitNames);
+          theInfo.SetGrilleStructure(anAxis-1, aNbIndexes);
 
           if(theErr) 
             *theErr = aRet;
@@ -2398,7 +2402,23 @@ namespace MED
                         aNbCells,
                         med_entite_maillage(aEntity),
                         med_geometrie_element(aGeom));
+
+      if ( aMeshInfo.myDim == 3 )
+      {
+        aGeom = theInfo.GetSubGeom();
+        aEntity = theInfo.GetSubEntity();
+        aNbCells = theInfo.GetNbSubCells();
       
+        theInfo.myFamSubNum.resize(aNbCells,0);
+        TValueHolder<TElemNum, med_int> aFamNum(theInfo.myFamSubNum);
+      
+        MEDfamLire(myFile->Id(),
+                   &aMeshName,
+                   &aFamNum,
+                   aNbCells,
+                   med_entite_maillage(aEntity),
+                   med_geometrie_element(aGeom));
+      }
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0){
