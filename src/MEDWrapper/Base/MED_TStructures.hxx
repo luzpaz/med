@@ -22,7 +22,6 @@
 //  File   : 
 //  Author : 
 //  Module : 
-//  $Header$
 //
 #ifndef MED_TStructures_HeaderFile
 #define MED_TStructures_HeaderFile
@@ -1079,8 +1078,7 @@ namespace MED
         myCoordNames.resize(aDim*GetPNOMLength<eVersion>()+aDim);
         myCoordUnits.resize(aDim*GetPNOMLength<eVersion>()+aDim);
       }
-      
-      myGrilleStructure.resize(theMeshInfo->myDim);
+      myGrilleStructure.resize(aDim);
       myFamNumNode.resize(nnoeuds);
     }
 
@@ -1096,7 +1094,7 @@ namespace MED
         myCoordNames.resize(aDim*GetPNOMLength<eVersion>()+aDim);
         myCoordUnits.resize(aDim*GetPNOMLength<eVersion>()+aDim);
       }
-      TTGrilleInfo(theMeshInfo,type,0);
+      myGrilleStructure.resize(aDim);
     }
 
     TTGrilleInfo(const PMeshInfo& theMeshInfo,
@@ -1118,8 +1116,7 @@ namespace MED
         for(int aAxe=0;aAxe<nbNodeVec.size();aAxe++){
           myIndixes[aAxe].resize(nbNodeVec[aAxe]);
         }
-      
-      TTGrilleInfo(theMeshInfo,type,0);
+      myGrilleStructure.resize(aDim);
     }
 
     virtual
