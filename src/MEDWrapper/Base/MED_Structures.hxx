@@ -963,8 +963,8 @@ namespace MED
     TNodeCoord& GetNodeCoord();
     //! Gives coordinates for mesh node by its number, array index from 0
     TNodeCoord GetCoord(TInt theId);
-    //! Gives ids of nodes for mesh cell by its number, array index from 0
-    TIntVector GetConn(TInt theId);
+    //! Gives ids of nodes for mesh cell or sub-cell by its number, array index from 0
+    TIntVector GetConn(TInt theId, const bool isSub=false);
 
     EGrilleType myGrilleType; //!< Defines grille type (eGRILLE_CARTESIENNE,eGRILLE_POLAIRE,eGRILLE_STANDARD)
     //!Gets grille type (const version)
@@ -1004,12 +1004,14 @@ namespace MED
     
     TInt GetNbNodes();//! Return count of all points
     TInt GetNbCells();//! Return count of all cells
+    TInt GetNbSubCells();//! Return count of all entities of <mesh dimension-1>
     EGeometrieElement GetGeom();//! Return geometry of cells (calculated from mesh dimension)
+    EGeometrieElement GetSubGeom();//! Return geometry of subcells (calculated from mesh dimension)
     EEntiteMaillage GetEntity();//! Return entity (eMAILLE)
+    EEntiteMaillage GetSubEntity();//! Return sub entity
 
     /*!
      *Vector of grille structure (Example: {3,4,5}, 3 nodes in X axe, 4 nodes in Y axe, ...)
-     *Used only for eGRILLE_STANDARD
      */
     TIntVector myGrilleStructure;
     //!Gets grille structure(const version)
@@ -1027,6 +1029,15 @@ namespace MED
     TInt GetFamNum(TInt theId) const;
     //! Set number of a MED FAMILY for the mesh element with the  order number
     void SetFamNum(TInt theId, TInt theVal);
+    
+    /*!
+     *Defines sequence MED Family indexes for sub entites
+     */
+    TElemNum myFamSubNum; 
+    //! Get number of a MED FAMILY by order number of sub element
+    TInt GetFamSubNum(TInt theId) const;
+    //! Set number of a MED FAMILY for theId-th sub element
+    void SetFamSubNum(TInt theId, TInt theVal);
     
     /*!
      *Defines sequence MED Family indexes for corresponding mesh nodes
