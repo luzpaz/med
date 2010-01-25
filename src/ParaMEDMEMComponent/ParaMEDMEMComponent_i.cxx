@@ -54,6 +54,22 @@ void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling)
   }
 }
 
+void MPIMEDCouplingFieldDoubleServant::Register()
+{
+  if(_numproc == 0)
+    for(int ip=1;ip<_nbproc;ip++)
+      (SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface::_narrow((*_tior)[ip]))->Register();
+  MEDCouplingFieldDoubleServant::Register();
+}
+
+void MPIMEDCouplingFieldDoubleServant::Destroy()
+{
+  if(_numproc == 0)
+    for(int ip=1;ip<_nbproc;ip++)
+      (SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface::_narrow((*_tior)[ip]))->Destroy();
+  MEDCouplingFieldDoubleServant::Destroy();
+}
+
 ParaMEDMEMComponent_i::ParaMEDMEMComponent_i() : Engines_Component_i(), MPIObject_i(), _commgroup(NULL)
 {
   _interface = new ParaMEDMEM::CommInterface();

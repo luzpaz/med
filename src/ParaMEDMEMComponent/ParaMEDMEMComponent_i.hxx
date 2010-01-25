@@ -79,6 +79,9 @@ class MPIMEDCouplingFieldDoubleServant : public POA_SALOME_MED::MPIMEDCouplingFi
 public:
   MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,ParaMEDMEM::ParaFIELD* field);
   void getDataByMPI(const char* coupling);
+
+    void Register();
+    void Destroy();
 private:
   ParaMEDMEMComponent_i *_pcompo;
   ParaMEDMEM::ParaFIELD* _field;
