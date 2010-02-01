@@ -25,6 +25,7 @@ using namespace ParaMEDMEM;
 
 MEDCouplingUMesh *MEDCouplingUMeshClient::New(SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr meshPtr)
 {
+  meshPtr->Register();
   MEDCouplingUMesh *ret=MEDCouplingUMesh::New();
   //1st call to getTinyInfo to get tiny array of key integers value
   //to corectly resize local copy of distant instance adressed by 'meshPtr'

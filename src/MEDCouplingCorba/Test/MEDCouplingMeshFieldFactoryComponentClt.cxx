@@ -49,7 +49,9 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkBaseCorbaFetching()
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetching2D()
 {
   SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr meshPtr=_objC->get2DMesh();
+  SALOME_MED::MEDCouplingUMeshCorbaInterface::_duplicate(meshPtr);
   _mesh_from_distant=ParaMEDMEM::MEDCouplingUMeshClient::New(meshPtr);
+  meshPtr->Destroy();
   CPPUNIT_ASSERT_EQUAL(2,_mesh_from_distant->getSpaceDimension());
   CPPUNIT_ASSERT_EQUAL(2,_mesh_from_distant->getMeshDimension());
 }
@@ -67,7 +69,9 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkMultiFetchingToTestMem
   for(int i=0;i<1000;i++)
     {
       SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr meshPtr=_objC->get2DMesh();
+      SALOME_MED::MEDCouplingUMeshCorbaInterface::_duplicate(meshPtr);
       _mesh_from_distant=ParaMEDMEM::MEDCouplingUMeshClient::New(meshPtr);
+      meshPtr->Destroy();
       ParaMEDMEM::MEDCouplingUMesh *meshRef=SALOME_TEST::MEDCouplingCorbaServBasicsTest::build2DMesh();
       CPPUNIT_ASSERT(_mesh_from_distant->isEqual(meshRef,1e-12));
       meshRef->decrRef();
@@ -78,7 +82,9 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkMultiFetchingToTestMem
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetching3D()
 {
   SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr meshPtr=_objC->get3DMesh();
+  SALOME_MED::MEDCouplingUMeshCorbaInterface::_duplicate(meshPtr);
   _mesh_from_distant=ParaMEDMEM::MEDCouplingUMeshClient::New(meshPtr);
+  meshPtr->Destroy();
   CPPUNIT_ASSERT_EQUAL(3,_mesh_from_distant->getSpaceDimension());
   CPPUNIT_ASSERT_EQUAL(3,_mesh_from_distant->getMeshDimension());
 }
@@ -94,7 +100,9 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkContentOfFetched3DMesh
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetching3DSurf()
 {
   SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr meshPtr=_objC->get3DSurfMesh();
+  SALOME_MED::MEDCouplingUMeshCorbaInterface::_duplicate(meshPtr);
   _mesh_from_distant=ParaMEDMEM::MEDCouplingUMeshClient::New(meshPtr);
+  meshPtr->Destroy();
   CPPUNIT_ASSERT_EQUAL(3,_mesh_from_distant->getSpaceDimension());
   CPPUNIT_ASSERT_EQUAL(2,_mesh_from_distant->getMeshDimension());
 }
@@ -110,7 +118,9 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkContentOfFetched3DSurf
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetching0D()
 {
   SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr meshPtr=_objC->get0DMesh();
+  SALOME_MED::MEDCouplingUMeshCorbaInterface::_duplicate(meshPtr);
   _mesh_from_distant=ParaMEDMEM::MEDCouplingUMeshClient::New(meshPtr);
+  meshPtr->Destroy();
   ParaMEDMEM::MEDCouplingUMesh *meshRef=SALOME_TEST::MEDCouplingCorbaServBasicsTest::build0DMesh();
   CPPUNIT_ASSERT_EQUAL(3,_mesh_from_distant->getSpaceDimension());
   CPPUNIT_ASSERT_EQUAL(0,_mesh_from_distant->getMeshDimension());
@@ -122,7 +132,9 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetching0D()
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetchingM1D()
 {
   SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr meshPtr=_objC->getM1DMesh();
+  SALOME_MED::MEDCouplingUMeshCorbaInterface::_duplicate(meshPtr);
   _mesh_from_distant=ParaMEDMEM::MEDCouplingUMeshClient::New(meshPtr);
+  meshPtr->Destroy();
   ParaMEDMEM::MEDCouplingUMesh *meshRef=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildM1DMesh();
   CPPUNIT_ASSERT_EQUAL(-1,_mesh_from_distant->getMeshDimension());
   CPPUNIT_ASSERT(_mesh_from_distant->isEqual(meshRef,1e-12));
@@ -133,7 +145,9 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetchingM1D()
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaField2DNTFetching()
 {
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr fieldPtr=_objC->getFieldScalarOn2DNT();
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface::_duplicate(fieldPtr);
   ParaMEDMEM::MEDCouplingFieldDouble *fieldCpp=ParaMEDMEM::MEDCouplingFieldDoubleClient::New(fieldPtr);
+  fieldPtr->Destroy();
   ParaMEDMEM::MEDCouplingFieldDouble *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldScalarOn2DNT();
   CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
   CPPUNIT_ASSERT_THROW(fieldCpp->setTime(1.23,4,5),INTERP_KERNEL::Exception);
@@ -144,10 +158,11 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaField2DNTFetching
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaField2DNTMultiFetching()
 {
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr fieldPtr=_objC->getFieldScalarOn2DNT();
-  fieldPtr->Register();
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface::_duplicate(fieldPtr);
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface::_duplicate(fieldPtr);
   ParaMEDMEM::MEDCouplingFieldDouble *fieldCpp=ParaMEDMEM::MEDCouplingFieldDoubleClient::New(fieldPtr);
   ParaMEDMEM::MEDCouplingFieldDouble *fieldCpp2=ParaMEDMEM::MEDCouplingFieldDoubleClient::New(fieldPtr);
+  fieldPtr->Destroy();
   CPPUNIT_ASSERT(fieldCpp->isEqual(fieldCpp2,1.e-12,1.e-15));
   fieldCpp->decrRef();
   fieldCpp2->decrRef();
@@ -158,6 +173,7 @@ void *SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaField2DNTMultiFe
   char *stackS=(char *)stack;
   CORBA::Object_var obj=_orb->string_to_object(stackS);
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr fieldPtr=SALOME_MED::MEDCouplingFieldDoubleCorbaInterface::_narrow(obj);
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface::_duplicate(fieldPtr);
   ParaMEDMEM::MEDCouplingFieldDouble *fieldCpp=ParaMEDMEM::MEDCouplingFieldDoubleClient::New(fieldPtr);
   return fieldCpp;
 }
@@ -167,8 +183,6 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaField2DNTMultiFet
   const int nbOfThreads=8;
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr fieldPtr=_objC->getFieldScalarOn2DNT();
   //doing nbOfThreads-1 Register.
-  for(int i=1;i<nbOfThreads;i++)
-    fieldPtr->Register();
   char *ior=_orb->object_to_string(fieldPtr);
   pthread_t threads[nbOfThreads];
    ParaMEDMEM::MEDCouplingFieldDouble *rets[nbOfThreads];
@@ -180,6 +194,7 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaField2DNTMultiFet
     CPPUNIT_ASSERT(rets[i]->isEqual(rets[i+1],1.e-12,1.e-15));
   for(int i=0;i<nbOfThreads;i++)
     rets[i]->decrRef();
+  fieldPtr->Destroy();
   CORBA::release(fieldPtr);
   CORBA::string_free(ior);
 }
@@ -187,7 +202,9 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaField2DNTMultiFet
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFieldNode2DNTFetching()
 {
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr fieldPtr=_objC->getFieldNodeScalarOn2DNT();
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface::_duplicate(fieldPtr);
   ParaMEDMEM::MEDCouplingFieldDouble *fieldCpp=ParaMEDMEM::MEDCouplingFieldDoubleClient::New(fieldPtr);
+  fieldPtr->Destroy();
   ParaMEDMEM::MEDCouplingFieldDouble *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldNodeScalarOn2DNT();
   CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
   CPPUNIT_ASSERT_THROW(fieldCpp->setTime(1.23,4,5),INTERP_KERNEL::Exception);
@@ -198,7 +215,9 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFieldNode2DNTFetc
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaField3DNTFetching()
 {
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr fieldPtr=_objC->getFieldScalarOn3DNT();
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface::_duplicate(fieldPtr);
   ParaMEDMEM::MEDCouplingFieldDouble *fieldCpp=ParaMEDMEM::MEDCouplingFieldDoubleClient::New(fieldPtr);
+  fieldPtr->Destroy();
   ParaMEDMEM::MEDCouplingFieldDouble *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldScalarOn3DNT();
   CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
   CPPUNIT_ASSERT_THROW(fieldCpp->setTime(1.23,4,5),INTERP_KERNEL::Exception);
@@ -209,7 +228,9 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaField3DNTFetching
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaField3DSurfWTFetching()
 {
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr fieldPtr=_objC->getFieldScalarOn3DSurfWT();
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface::_duplicate(fieldPtr);
   ParaMEDMEM::MEDCouplingFieldDouble *fieldCpp=ParaMEDMEM::MEDCouplingFieldDoubleClient::New(fieldPtr);
+  fieldPtr->Destroy();
   ParaMEDMEM::MEDCouplingFieldDouble *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldScalarOn3DSurfWT();
   CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
   int dt,it;

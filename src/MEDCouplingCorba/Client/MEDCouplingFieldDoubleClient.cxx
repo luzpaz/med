@@ -26,6 +26,7 @@ using namespace ParaMEDMEM;
 
 MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr fieldPtr)
 {
+  fieldPtr->Register();
   //
   SALOME_MED::long_array *tinyL;
   SALOME_MED::double_array *tinyD;
@@ -54,7 +55,10 @@ MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplin
   TypeOfTimeDiscretization td=(TypeOfTimeDiscretization) tinyLV[1];
   MEDCouplingFieldDouble *ret=MEDCouplingFieldDouble::New(type,td);
   //2nd CORBA call to retrieves the mesh.
-  MEDCouplingMesh *mesh=MEDCouplingMeshClient::New(fieldPtr->getMesh());
+  SALOME_MED::MEDCouplingMeshCorbaInterface_ptr meshPtr=fieldPtr->getMesh();
+  SALOME_MED::MEDCouplingMeshCorbaInterface::_duplicate(meshPtr);
+  MEDCouplingMesh *mesh=MEDCouplingMeshClient::New(meshPtr);
+  meshPtr->Destroy();
   ret->setMesh(mesh);
   mesh->decrRef();
   std::vector<DataArrayDouble *> arrays;
