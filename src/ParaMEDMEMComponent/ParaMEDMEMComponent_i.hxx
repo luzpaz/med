@@ -27,7 +27,7 @@
 #include "MPIObject_i.hxx"
 #include "SALOME_Component_i.hxx"
 #include "Topology.hxx"
-#include "ParaFIELD.hxx"
+#include "MEDCouplingFieldDouble.hxx"
 #include "InterpKernelDEC.hxx"
 #include "MPIProcessorGroup.hxx"
 #include "CommInterface.hxx"
@@ -58,12 +58,12 @@ class ParaMEDMEMComponent_i : public POA_SALOME_MED::ParaMEDMEMComponent, public
 
   // Destructor
   ~ParaMEDMEMComponent_i();
-  void getOutputFieldCoupling(const char * coupling, ParaMEDMEM::ParaFIELD* field);
+  void getOutputFieldCoupling(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble* field);
 
 protected:
-  ParaMEDMEM::ProcessorGroup* _commgroup;
+  std::map<std::string,ParaMEDMEM::ProcessorGroup*> _commgroup;
   void initializeCoupling(const char * coupling);
-  void setInputFieldCoupling(const char * coupling, ParaMEDMEM::ParaFIELD* field);
+  void setInputFieldCoupling(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble* field);
   void terminateCoupling(const char * coupling);
 
 private:
@@ -77,13 +77,13 @@ class MPIMEDCouplingFieldDoubleServant : public POA_SALOME_MED::MPIMEDCouplingFi
                                          public MPIObject_i
 {
 public:
-  MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,ParaMEDMEM::ParaFIELD* field);
+  MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,ParaMEDMEM::MEDCouplingFieldDouble* field);
   void getDataByMPI(const char* coupling);
 
     void Register();
     void Destroy();
 private:
   ParaMEDMEMComponent_i *_pcompo;
-  ParaMEDMEM::ParaFIELD* _field;
+  ParaMEDMEM::MEDCouplingFieldDouble* _field;
 };
 #endif

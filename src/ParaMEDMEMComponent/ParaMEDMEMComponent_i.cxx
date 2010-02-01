@@ -23,7 +23,7 @@
 #include "utilities.h"
 using namespace std;
 
-MPIMEDCouplingFieldDoubleServant::MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,ParaMEDMEM::ParaFIELD* field):ParaMEDMEM::MEDCouplingFieldDoubleServant(field->getField()),MPIObject_i()
+MPIMEDCouplingFieldDoubleServant::MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,ParaMEDMEM::MEDCouplingFieldDouble* field):ParaMEDMEM::MEDCouplingFieldDoubleServant(field),MPIObject_i()
 {
   _pcompo = pcompo;
   _field = field;
@@ -70,7 +70,7 @@ void MPIMEDCouplingFieldDoubleServant::Destroy()
   MEDCouplingFieldDoubleServant::Destroy();
 }
 
-ParaMEDMEMComponent_i::ParaMEDMEMComponent_i() : Engines_Component_i(), MPIObject_i(), _commgroup(NULL)
+ParaMEDMEMComponent_i::ParaMEDMEMComponent_i() : Engines_Component_i(), MPIObject_i()
 {
   _interface = new ParaMEDMEM::CommInterface();
 }
@@ -82,7 +82,7 @@ ParaMEDMEMComponent_i::ParaMEDMEMComponent_i(int nbproc, int numproc,
                                              const char *instanceName,
                                              const char *interfaceName,
                                              bool regist)
-  : Engines_Component_i(orb,poa,contId,instanceName,interfaceName,false,regist), MPIObject_i(nbproc,numproc), _commgroup(NULL)
+  : Engines_Component_i(orb,poa,contId,instanceName,interfaceName,false,regist), MPIObject_i(nbproc,numproc)
 {
   _interface = new ParaMEDMEM::CommInterface();
 }
@@ -128,19 +128,19 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling)
     {
       _source[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,0,_nbproc-1,_gcom[coupling]);
       _target[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,_nbproc,gsize-1,_gcom[coupling]);
-      _commgroup = _source[coupling];
+      _commgroup[coupling] = _source[coupling];
     }
   else
     {
       _source[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,0,gsize-_nbproc-1,_gcom[coupling]);
       _target[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,gsize-_nbproc,gsize-1,_gcom[coupling]);
-      _commgroup = _target[coupling];
+      _commgroup[coupling] = _target[coupling];
     }
   
   _dec[coupling] = NULL;
 }
 
-void ParaMEDMEMComponent_i::setInputFieldCoupling(const char * coupling, ParaMEDMEM::ParaFIELD *field)
+void ParaMEDMEMComponent_i::setInputFieldCoupling(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble *field)
 {
   string service = coupling;
   if( service.size() == 0 )
@@ -176,7 +176,7 @@ void ParaMEDMEMComponent_i::setInputFieldCoupling(const char * coupling, ParaMED
   _dec[coupling]->recvData();
 }
 
-void ParaMEDMEMComponent_i::getOutputFieldCoupling(const char * coupling, ParaMEDMEM::ParaFIELD *field)
+void ParaMEDMEMComponent_i::getOutputFieldCoupling(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble *field)
 {
   string service = coupling;
   if( service.size() == 0 )
