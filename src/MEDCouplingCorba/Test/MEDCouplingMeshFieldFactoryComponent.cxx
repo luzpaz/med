@@ -203,6 +203,26 @@ namespace SALOME_TEST
     return fieldOnCells;
   }
 
+  ParaMEDMEM::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldScalarOn3DSurfCOTI()
+  {
+    ParaMEDMEM::MEDCouplingUMesh *mesh=build3DSurfMesh();
+    ParaMEDMEM::MEDCouplingFieldDouble *fieldOnCells=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::CONST_ON_TIME_INTERVAL);
+    fieldOnCells->setName("toto26");
+    fieldOnCells->setDescription("my wonderful 3D surf field toto26");
+    fieldOnCells->setMesh(mesh);
+    ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
+    array->alloc(mesh->getNumberOfCells(),3);
+    fieldOnCells->setArray(array);
+    double *tmp=array->getPointer();
+    array->decrRef();
+    std::fill(tmp,tmp+mesh->getNumberOfCells()*3,7.);
+    mesh->decrRef();
+    fieldOnCells->setStartTime(6.7,1,4);
+    fieldOnCells->setEndTime(7.2,2,8);
+    fieldOnCells->checkCoherency();
+    return fieldOnCells;
+  }
+
   std::string MEDCouplingCorbaServBasicsTest::buildFileNameForIOR()
   {
     std::string ret;

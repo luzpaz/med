@@ -241,6 +241,25 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaField3DSurfWTFetc
   fieldCpp->decrRef();
 }
 
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaField3DSurfCOTIFetching()
+{
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr fieldPtr=_objC->getFieldScalarOn3DSurfCOTI();
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface::_duplicate(fieldPtr);
+  ParaMEDMEM::MEDCouplingFieldDouble *fieldCpp=ParaMEDMEM::MEDCouplingFieldDoubleClient::New(fieldPtr);
+  fieldPtr->Destroy();
+  ParaMEDMEM::MEDCouplingFieldDouble *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldScalarOn3DSurfCOTI();
+  CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
+  int dt,it;
+  fieldCpp->getStartTime(dt,it);
+  CPPUNIT_ASSERT_EQUAL(1,dt);
+  CPPUNIT_ASSERT_EQUAL(4,it);
+  fieldCpp->getEndTime(dt,it);
+  CPPUNIT_ASSERT_EQUAL(2,dt);
+  CPPUNIT_ASSERT_EQUAL(8,it);
+  refField->decrRef();
+  fieldCpp->decrRef();
+}
+
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::shutdownServer()
 {
   _objC->shutdownOrb();

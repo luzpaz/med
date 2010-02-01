@@ -51,6 +51,7 @@ namespace SALOME_TEST
     CPPUNIT_TEST( checkCorbaFieldNode2DNTFetching );
     CPPUNIT_TEST( checkCorbaField3DNTFetching );
     CPPUNIT_TEST( checkCorbaField3DSurfWTFetching );
+    CPPUNIT_TEST( checkCorbaField3DSurfCOTIFetching );
     CPPUNIT_TEST( shutdownServer );
     CPPUNIT_TEST_SUITE_END();
   public:
@@ -70,6 +71,7 @@ namespace SALOME_TEST
     void checkCorbaFieldNode2DNTFetching();
     void checkCorbaField3DNTFetching();
     void checkCorbaField3DSurfWTFetching();
+    void checkCorbaField3DSurfCOTIFetching();
     void shutdownServer();
   private:
     static void *checkCorbaField2DNTMultiFetchingMTStatic(void *stack);
