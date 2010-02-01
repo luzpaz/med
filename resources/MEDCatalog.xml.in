@@ -42,6 +42,8 @@
   <objref name="SALOME_MED/FIELDINT" >
     <base>SALOME_MED/FIELD</base>
   </objref>
+  <objref name="SALOME_MED/MEDCouplingFieldDoubleCorbaInterface"/>
+  <objref name="SALOME_MED/MEDCouplingUMeshCorbaInterface"/>
 </type-list>
 
 <!-- Component list -->
