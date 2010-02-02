@@ -709,6 +709,7 @@ AC_OUTPUT([ \
         src/INTERP_KERNELTest/Makefile \
         src/MEDCoupling/Makefile \
         src/MEDCoupling/Test/Makefile \
+	src/MEDLoader/Makefile \
         src/MEDCoupling_Swig/Makefile \
         src/MEDCouplingCorba/Makefile \
         src/MEDCouplingCorba/Client/Makefile \
@@ -721,8 +722,8 @@ AC_OUTPUT([ \
         src/ParaMEDCouplingCorba/Makefile \
         src/ParaMEDMEM/Makefile \
         src/ParaMEDMEMComponent/Makefile \
-        src/ParaMEDMEM/MEDLoader/Makefile \
-        src/ParaMEDMEM/Test/Makefile \
+        src/ParaMEDLoader/Makefile \
+        src/ParaMEDMEMTest/Makefile \
         src/ParaMEDMEM_Swig/Makefile \
         src/MEDMEM_I/Makefile \
         src/MED/Makefile \

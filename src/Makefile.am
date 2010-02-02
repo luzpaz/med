@@ -36,13 +36,24 @@ if CPPUNIT_IS_OK
  INTERPTEST_SUBDIRS = INTERP_KERNELTest
 endif
 
+if MED_ENABLE_MED2
+  COMMON_SUBDIRS += MEDLoader
+endif
+
 ###
 # ParaMEDMEM is enabled if MPI is detected ok
 # In addition, ParaMEDMEM_Swig is not available in MICROMED mode
 ###
+PARAMEDMEM_SUBDIRS =
 
 if MPI_IS_OK
-  PARAMEDMEM_SUBDIRS = ParaMEDMEM
+PARAMEDMEM_SUBDIRS += ParaMEDMEM
+if MED_ENABLE_MED2
+PARAMEDMEM_SUBDIRS += ParaMEDLoader
+if CPPUNIT_IS_OK
+PARAMEDMEM_SUBDIRS += ParaMEDMEMTest
+endif
+endif
 endif
 
 ###
@@ -96,6 +107,6 @@ SUBDIRS = $(COMMON_SUBDIRS) $(PARAMEDMEM_SUBDIRS) $(BASE_SUBDIRS) $(INTERPTEST_S
           $(SPLITTER_SUBDIRS) $(RENUMBER_SUBDIRS) $(KERNEL_SUBDIRS) $(GUI_SUBDIRS)
 
 DIST_SUBDIRS= MEDWrapper INTERP_KERNEL MEDMEM MEDCoupling MEDCoupling_Swig INTERPOLATION MEDMEM_SWIG    \
-              MEDMEMBinTest MEDMEMCppTest INTERP_KERNELTest ParaMEDMEM ParaMEDMEM_Swig                  \
+              MEDMEMBinTest MEDMEMCppTest INTERP_KERNELTest ParaMEDMEM ParaMEDMEM_Swig MEDLoader        \
 	      MEDSPLITTER MEDSPLITTER_Swig RENUMBER MULTIPR MEDCouplingCorba MEDMEM_I MED MED_SWIG MedCorba_Swig \
-	      MedClient ParaMEDMEMComponent ParaMEDCouplingCorba MEDGUI
+	      ParaMEDLoader MedClient ParaMEDMEMComponent ParaMEDCouplingCorba MEDGUI ParaMEDMEMTest
