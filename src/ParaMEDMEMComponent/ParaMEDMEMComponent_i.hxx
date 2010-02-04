@@ -58,13 +58,13 @@ class ParaMEDMEMComponent_i : public POA_SALOME_MED::ParaMEDMEMComponent, public
 
   // Destructor
   ~ParaMEDMEMComponent_i();
-  void getOutputFieldCoupling(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble* field);
+  void _getOutputField(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble* field);
 
 protected:
   std::map<std::string,ParaMEDMEM::ProcessorGroup*> _commgroup;
-  void initializeCoupling(const char * coupling);
-  void setInputFieldCoupling(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble* field);
-  void terminateCoupling(const char * coupling);
+  void _initializeCoupling(const char * coupling);
+  void _setInputField(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble* field);
+  void _terminateCoupling(const char * coupling);
 
 private:
   ParaMEDMEM::CommInterface* _interface;

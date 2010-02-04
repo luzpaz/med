@@ -45,7 +45,7 @@ void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling)
     }
   }
 
-  _pcompo->getOutputFieldCoupling(coupling,_field);
+  _pcompo->_getOutputField(coupling,_field);
     
   if(_numproc == 0){
     for(int ip=1;ip<_nbproc;ip++)
@@ -93,7 +93,7 @@ ParaMEDMEMComponent_i::~ParaMEDMEMComponent_i()
   delete _interface;
 }
 
-void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling)
+void ParaMEDMEMComponent_i::_initializeCoupling(const char * coupling)
 {
   int gsize, grank;
   set<int> procs;
@@ -140,7 +140,7 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling)
   _dec[coupling] = NULL;
 }
 
-void ParaMEDMEMComponent_i::setInputFieldCoupling(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble *field)
+void ParaMEDMEMComponent_i::_setInputField(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble *field)
 {
   string service = coupling;
   if( service.size() == 0 )
@@ -176,7 +176,7 @@ void ParaMEDMEMComponent_i::setInputFieldCoupling(const char * coupling, ParaMED
   _dec[coupling]->recvData();
 }
 
-void ParaMEDMEMComponent_i::getOutputFieldCoupling(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble *field)
+void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble *field)
 {
   string service = coupling;
   if( service.size() == 0 )
@@ -212,7 +212,7 @@ void ParaMEDMEMComponent_i::getOutputFieldCoupling(const char * coupling, ParaME
   _dec[coupling]->sendData();
 }
 
-void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling)
+void ParaMEDMEMComponent_i::_terminateCoupling(const char * coupling)
 {
   string service = coupling;
   if( service.size() == 0 )
@@ -242,6 +242,7 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling)
   _target.erase(coupling);
   delete _dec[coupling];
   _dec.erase(coupling);
+  _commgroup.erase(coupling);
 }
 
 void *th_getdatabympi(void *s)
