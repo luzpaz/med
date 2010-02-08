@@ -32,7 +32,7 @@ MPIIDL_FILES = ParaMEDMEMComponent.idl ParaMEDCouplingCorbaServant.idl
 
 IDL_FILES = $(BASEIDL_FILES)
 if MPI_IS_OK
-  IDL_FILES += $(MPIIDL_FILES)
+IDL_FILES += $(MPIIDL_FILES)
 endif
 
 # This variable defines the files to be installed
@@ -100,7 +100,7 @@ MEDCouplingCorbaServantTestSK.cc : MEDCouplingCorbaServantTest.idl
 	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
 MEDCouplingCorbaServantTest.hh : MEDCouplingCorbaServantTestSK.cc
 
-install-exec-local: $(BASEIDL_FILES:%=$(top_srcdir)/idl/%)
+install-exec-local: $(IDL_FILES:%=$(top_srcdir)/idl/%)
 	$(INSTALL) -d  $(DESTDIR)$(salomepythondir)
 	ls $^ | while read file; do \
 	  $(OMNIORB_IDL) $(IDLPYFLAGS) -C$(DESTDIR)$(salomepythondir) $$file ; \
