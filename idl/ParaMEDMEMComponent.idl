@@ -43,7 +43,19 @@ module SALOME_MED
 
   interface ParaMEDMEMComponent:Engines::Component,Engines::MPIObject
   {
-  } ;
+    void setInterpolationOptions(in long print_level,
+				 in string intersedction_type,
+				 in double precision,
+				 in double median_plane,
+				 in boolean do_rotate,
+				 in double bounding_box_adjustment,
+				 in double bounding_box_adjustment_abs,
+				 in double max_distance_for_3Dsurf_intersect,
+				 in long orientation,
+				 in boolean measure_abs,
+				 in string splitting_policy,
+				 in boolean P1P0_bary_method ) raises (SALOME::SALOME_Exception);
+  };
 } ;
 #endif
 

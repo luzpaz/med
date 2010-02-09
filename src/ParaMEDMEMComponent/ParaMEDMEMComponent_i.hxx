@@ -29,9 +29,11 @@
 #include "Topology.hxx"
 #include "MEDCouplingFieldDouble.hxx"
 #include "InterpKernelDEC.hxx"
+#include "InterpolationOptions.hxx"
 #include "MPIProcessorGroup.hxx"
 #include "CommInterface.hxx"
 #include "MEDCouplingFieldDoubleServant.hxx"
+#include "Utils_CorbaException.hxx"
 #include <map>
 
 void * th_getdatabympi(void *st);
@@ -59,6 +61,18 @@ class ParaMEDMEMComponent_i : public POA_SALOME_MED::ParaMEDMEMComponent, public
   // Destructor
   ~ParaMEDMEMComponent_i();
   void _getOutputField(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble* field);
+  void setInterpolationOptions(long print_level,
+			       const char * intersection_type,
+			       double precision,
+			       double median_plane,
+			       bool do_rotate,
+			       double bounding_box_adjustment,
+			       double bounding_box_adjustment_abs,
+			       double max_distance_for_3Dsurf_intersect,
+			       long orientation,
+			       bool measure_abs,
+			       const char * splitting_policy,
+			       bool P1P0_bary_method ) throw(SALOME::SALOME_Exception);
 
 protected:
   std::map<std::string,ParaMEDMEM::ProcessorGroup*> _commgroup;
@@ -67,6 +81,21 @@ protected:
   void _terminateCoupling(const char * coupling);
 
 private:
+  // Interp Kernel options
+  bool _initInterpolationOptions;
+  int _print_level;
+  INTERP_KERNEL::IntersectionType _intersection_type;
+  double _precision;
+  double _median_plane;
+  bool _do_rotate;
+  double _bounding_box_adjustment;
+  double _bounding_box_adjustment_abs;
+  double _max_distance_for_3Dsurf_intersect;
+  int _orientation;
+  bool _measure_abs;
+  INTERP_KERNEL::SplittingPolicy _splitting_policy;
+  bool _P1P0_bary_method;
+  
   int _gsize, _grank;
   ParaMEDMEM::CommInterface* _interface;
   std::map<std::string,ParaMEDMEM::MPIProcessorGroup*> _source, _target;
