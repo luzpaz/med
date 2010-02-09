@@ -67,6 +67,7 @@ protected:
   void _terminateCoupling(const char * coupling);
 
 private:
+  int _gsize, _grank;
   ParaMEDMEM::CommInterface* _interface;
   std::map<std::string,ParaMEDMEM::MPIProcessorGroup*> _source, _target;
   std::map<std::string,ParaMEDMEM::InterpKernelDEC*> _dec;

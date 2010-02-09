@@ -95,7 +95,6 @@ ParaMEDMEMComponent_i::~ParaMEDMEMComponent_i()
 
 void ParaMEDMEMComponent_i::_initializeCoupling(const char * coupling)
 {
-  int gsize, grank;
   set<int> procs;
 
   string service = coupling;
@@ -119,21 +118,23 @@ void ParaMEDMEMComponent_i::_initializeCoupling(const char * coupling)
   throw POException(_numproc,"You have to use a MPI2 compliant mpi implementation !");
 #endif
 
-  MPI_Comm_size( _gcom[coupling], &gsize );
-  MPI_Comm_rank( _gcom[coupling], &grank );
-  MESSAGE("[" << grank << "] new communicator of " << gsize << " processes");
+  MPI_Comm_size( _gcom[coupling], &_gsize );
+  MPI_Comm_rank( _gcom[coupling], &_grank );
+  MESSAGE("[" << _grank << "] new communicator of " << _gsize << " processes");
 
   // Creation of processors group for ParaMEDMEM
-  if(_numproc==grank)
+  // source is always the lower processor numbers
+  // target is always the upper processor numbers
+  if(_numproc==_grank)
     {
       _source[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,0,_nbproc-1,_gcom[coupling]);
-      _target[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,_nbproc,gsize-1,_gcom[coupling]);
+      _target[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,_nbproc,_gsize-1,_gcom[coupling]);
       _commgroup[coupling] = _source[coupling];
     }
   else
     {
-      _source[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,0,gsize-_nbproc-1,_gcom[coupling]);
-      _target[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,gsize-_nbproc,gsize-1,_gcom[coupling]);
+      _source[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,0,_gsize-_nbproc-1,_gcom[coupling]);
+      _target[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,_gsize-_nbproc,_gsize-1,_gcom[coupling]);
       _commgroup[coupling] = _target[coupling];
     }
   
@@ -158,8 +159,12 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, ParaMEDMEM::ME
   if(!_dec[coupling])
     {
 
-      //Creating the intersection Data Exchange Channel
-      _dec[coupling] = new ParaMEDMEM::InterpKernelDEC(*_source[coupling], *_target[coupling]);
+      // Creating the intersection Data Exchange Channel
+      // Processors which received the field are always the second argument of InterpKernelDEC object
+      if(_numproc==_grank)
+	_dec[coupling] = new ParaMEDMEM::InterpKernelDEC(*_target[coupling], *_source[coupling]);
+      else
+	_dec[coupling] = new ParaMEDMEM::InterpKernelDEC(*_source[coupling], *_target[coupling]);
       
       //Attaching the field to the DEC
       _dec[coupling]->attachLocalField(field);
@@ -168,9 +173,9 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, ParaMEDMEM::ME
       _dec[coupling]->synchronize();
 
     }
-
+  else
   //Attaching the field to the DEC
-  _dec[coupling]->attachLocalField(field);
+    _dec[coupling]->attachLocalField(field);
   
   //Receiving data
   _dec[coupling]->recvData();
@@ -194,8 +199,12 @@ void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, ParaMEDMEM::M
   if(!_dec[coupling])
     {
 
-      //Creating the intersection Data Exchange Channel
-      _dec[coupling] = new ParaMEDMEM::InterpKernelDEC(*_source[coupling], *_target[coupling]);
+      // Creating the intersection Data Exchange Channel
+      // Processors which sent the field are always the first argument of InterpKernelDEC object
+      if(_numproc==_grank)
+	_dec[coupling] = new ParaMEDMEM::InterpKernelDEC(*_source[coupling], *_target[coupling]);
+      else
+	_dec[coupling] = new ParaMEDMEM::InterpKernelDEC(*_target[coupling], *_source[coupling]);
   
       //Attaching the field to the DEC
       _dec[coupling]->attachLocalField(field);
@@ -204,9 +213,9 @@ void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, ParaMEDMEM::M
       _dec[coupling]->synchronize();
 
     }
-
+  else
   //Attaching the field to the DEC
-  _dec[coupling]->attachLocalField(field);
+    _dec[coupling]->attachLocalField(field);
 
   //Sending data
   _dec[coupling]->sendData();
