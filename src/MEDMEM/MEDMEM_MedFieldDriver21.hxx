@@ -1395,12 +1395,12 @@ template <class T> void MED_FIELD_WRONLY_DRIVER21<T>::write(void) const
                                     NumberOfElements,
                                     NumberOfGaussPoints,
                                     MED_ALL,
-                                    MED_NOPFL,
+                                    (char*)MED_NOPFL,
                                     med_2_1::MED_REMP,  // PROFIL NON GERE, mode de remplacement non géré
                                     (med_2_1::med_entite_maillage)mySupport->getEntity(),
                                     (med_2_1::med_geometrie_element)Types[i],
-                                    MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber(),
-                                    "        ",
+				     MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber(),
+				    (char*)"        ",
                                     MED_FIELD_DRIVER<T>::_ptrField->getTime(),
                                     MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber()
                                     );
