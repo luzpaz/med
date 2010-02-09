@@ -22,24 +22,13 @@
 #ifndef MEDMEM_WRAPPER_MESH_HXX
 #define MEDMEM_WRAPPER_MESH_HXX
 
+#include "MEDMEM_define.hxx"
 #include "MEDMEM_WrapperCells.hxx"
 
 #include "stdio.h"
 #include "stdlib.h"
 
 #include <vector>
-
-#ifndef MED_UNDEFINED
-#define MED_UNDEFINED -1
-#endif
-
-#ifndef FAUX
-#define FAUX 0
-#endif
-
-#ifndef VRAI
-#define VRAI 1
-#endif
 
 //////////////////////////////////////////////////////////////////
 ///                                                            ///
@@ -178,7 +167,7 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
         
         voisins_de_maille.resize(nbr_mailles);
         faces_contenues.resize(nbr_mailles);
-        maille_au_bord.resize(nbr_mailles,MED_UNDEFINED);
+        maille_au_bord.resize(nbr_mailles,MED_EN::MED_UNDEFINED);
         
         type_retour sommets_face;
         
@@ -191,8 +180,8 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
         for (num_maille=0;num_maille<nbr_mailles;num_maille++)
                 {
                 tmp=(*mailles)[num_maille].DONNE_NBR_FACES();
-                voisins_de_maille[num_maille]=vector<int>(tmp,MED_UNDEFINED);
-                faces_contenues[num_maille]=vector<int>(tmp,MED_UNDEFINED);
+                voisins_de_maille[num_maille]=vector<int>(tmp,MED_EN::MED_UNDEFINED);
+                faces_contenues[num_maille]=vector<int>(tmp,MED_EN::MED_UNDEFINED);
                 approx_nbr_formants+=tmp;
                 }
                 
@@ -236,14 +225,14 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
         // (borné, par 8*4=32)                       
                                         
                                         num_loc=(*mailles)[num_maille_sec].DONNE_NUM_LOC_FACE_EGALE_A_FORMANT(sommets_face);                                    
-                                        if (num_loc>MED_UNDEFINED)
+                                        if (num_loc>MED_EN::MED_UNDEFINED)
                                                 {
                                                 
         // et dans ce cas, la maille secondaire est voisine de la maille primaire, on met à jour les tableaux
         // si on voulait construire le tableau des faces, c'est ici qu'il faudrait le faire -1-
                                                 
                                                   // MESSAGE_MED("La maille "<<num_maille<<" a pour voisin la maille "<<num_maille_sec<<" via la face "<<nbr_formants);
-                                                face_au_bord.push_back(FAUX);
+						  face_au_bord.push_back(MED_EN::MED_FAUX);
                                                 faces_contenues[num_maille][num_local_face]=nbr_formants;
                                                 voisins_de_maille[num_maille][num_local_face]=num_maille_sec;
                                                 faces_contenues[num_maille_sec][num_loc]=nbr_formants;
@@ -274,7 +263,7 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
                         
         // On regarde si tous les numéros globaux des faces sont définis
                         
-                        if (faces_contenues[num_maille][ind_num_cont]==MED_UNDEFINED)
+                        if (faces_contenues[num_maille][ind_num_cont]==MED_EN::MED_UNDEFINED)
                                 {
                                 
         // si un seul numéro n'est pas défini, la maille est au bord
@@ -283,8 +272,8 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
                                   // MESSAGE_MED("La maille "<<num_maille<<" est au bord via sa face "<<ind_num_cont);
                                 test_bord=1;
                                 faces_contenues[num_maille][ind_num_cont]=nbr_formants;
-                                maille_au_bord[num_maille]=VRAI;
-                                face_au_bord.push_back(VRAI);
+                                maille_au_bord[num_maille]=MED_EN::MED_VRAI;
+                                face_au_bord.push_back(MED_EN::MED_VRAI);
                                 nbr_faces_bord++;
                                 nbr_formants++;
                                 }
@@ -294,7 +283,7 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
                         
                 if (test_bord==0)
                         {
-                        maille_au_bord[num_maille]=FAUX;
+                        maille_au_bord[num_maille]=MED_EN::MED_FAUX;
                         }
                 }
         
@@ -310,10 +299,10 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
                 nf=0;
                 for (j=0;j<(int)faces_contenues[i].size();j++) 
                         {
-                        if (faces_contenues[i][j]==MED_UNDEFINED) verif++;
-                        if (voisins_de_maille[i][j]==MED_UNDEFINED) nf++;
+                        if (faces_contenues[i][j]==MED_EN::MED_UNDEFINED) verif++;
+                        if (voisins_de_maille[i][j]==MED_EN::MED_UNDEFINED) nf++;
                         }
-                if (maille_au_bord[i]==MED_UNDEFINED) cerr<<"Maille "<<i<<" non completement construite"<<endl;
+                if (maille_au_bord[i]==MED_EN::MED_UNDEFINED) cerr<<"Maille "<<i<<" non completement construite"<<endl;
                 if (nf==faces_contenues[i].size()) nbf++;
                 }
                 

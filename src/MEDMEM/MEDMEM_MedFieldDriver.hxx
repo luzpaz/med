@@ -66,7 +66,7 @@ public :
   MED_FIELD_DRIVER():
     GENDRIVER(MED_DRIVER),
     _ptrField((FIELD<T> *) MED_NULL),
-    _fieldName(""),_fieldNum(MED_INVALID)
+    _fieldName(""),_fieldNum(MED_EN::MED_INVALID)
   {}
   /*!
     Constructor.
@@ -76,7 +76,7 @@ public :
                    MED_EN::med_mode_acces accessMode)
     : GENDRIVER(fileName, accessMode, MED_DRIVER),
       _ptrField((FIELD<T> *) ptrField),
-      _fieldName(""),_fieldNum(MED_INVALID)
+      _fieldName(""),_fieldNum(MED_EN::MED_INVALID)
   {
   }
 

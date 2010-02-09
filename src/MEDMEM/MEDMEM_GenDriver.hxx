@@ -140,7 +140,7 @@ public:
   virtual void setFieldName   ( const string & fieldName);
   virtual string getFieldName() const;
 
-  void   setId       ( int id = MED_INVALID );
+  void   setId       ( int id = MED_EN::MED_INVALID );
   int    getId       ( void ) const ;
   string getFileName () const;
   virtual void setFileName ( const string & fileName);

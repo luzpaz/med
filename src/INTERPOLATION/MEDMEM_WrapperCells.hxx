@@ -22,6 +22,8 @@
 #ifndef WRAPPERS_CELLS_HXX
 #define WRAPPERS_CELLS_HXX
 
+#include "MEDMEM_define.hxx"
+
 #include "stdio.h"
 #include "stdlib.h"
 
@@ -30,21 +32,7 @@
 #include <vector>
 #include <map>
 
-#ifndef FAUX
-#define FAUX 0
-#endif
-
-#ifndef VRAI
-#define VRAI 1
-#endif
-
-#ifndef MED_UNDEFINED
-#define MED_UNDEFINED -1
-#endif
-
-#include "MEDMEM_define.hxx"
-
-#define MAXNBR 10
+const int MAXNBR_RETOUR = 10;
 
 //////////////////////////////////////////////////////////////////
 ///                                                            ///
@@ -58,7 +46,7 @@
 /*                                                       */
 /*********************************************************/
 
-#define NBR_MODELES_MAILLES_DEFINIS 15
+const int NBR_MODELES_MAILLES_DEFINIS = 15;
 static int Equivalence_Local_MED[NBR_MODELES_MAILLES_DEFINIS] = { MED_EN::MED_POINT1 ,
                                                            MED_EN::MED_SEG2   , MED_EN::MED_SEG3,
                                                            MED_EN::MED_TRIA3  , MED_EN::MED_TRIA6   , MED_EN::MED_QUAD4 , MED_EN::MED_QUAD8  ,
@@ -152,7 +140,7 @@ public :
 
 struct type_retour
         {
-        int quoi[MAXNBR];
+        int quoi[MAXNBR_RETOUR];
         int combien;
         };
         
@@ -265,7 +253,7 @@ int Comparaison_Informe(const type_retour &v1,const type_retour &v2)
         {
         int t1=v1.combien;
         int t2=v2.combien;
-        if (t1!=t2) return FAUX;
+        if (t1!=t2) return MED_EN::MED_FAUX;
         int i1,i2;
         int test;
         for (i1=0;i1<t1;i1++)
@@ -275,9 +263,9 @@ int Comparaison_Informe(const type_retour &v1,const type_retour &v2)
                         {
                         if (v1.quoi[i1]==v2.quoi[i2]) test=0;
                         }
-                if (test) return FAUX;
+                if (test) return MED_EN::MED_FAUX;
                 }
-        return VRAI;
+        return MED_EN::MED_VRAI;
         }
 
 /*********************************************************/
@@ -319,7 +307,7 @@ inline int  Wrapper_Maille::DONNE_NUM_LOC_FACE_EGALE_A_FORMANT(const type_retour
                 DONNE_FACE(num_face,face_loc);
                 if (Comparaison_Informe(face_loc,sommets_face)) return num_face;
                 }
-        return MED_UNDEFINED;
+        return MED_EN::MED_UNDEFINED;
         }
 inline int  Wrapper_Maille::DONNE_TYPE_MAILLE()     const
         {

@@ -25,17 +25,23 @@
 #include "MEDMEM_dTreeSommet.hxx"
 #include <list>
 
-#define DTREE_FANTOME -1
-#define DTREE_RACINE 0
-#define DTREE_TERMINAL 1
-#define DTREE_COURANT 2
+enum { 
+  DTREE_FANTOME  = -1,
+  DTREE_RACINE   =  0,
+  DTREE_TERMINAL =  1,
+  DTREE_COURANT  =  2
+};
+
 // etat_descendance
-#define DTREE_NON_CALCULE -1
-#define DTREE_AUCUNE 0
-#define DTREE_VALIDE 1
+enum {
+  DTREE_NON_CALCULE = -1,
+  DTREE_AUCUNE      =  0,
+  DTREE_VALIDE      =  1
+};
+
 // val min nbr noeud
-#define DTREE_NBR_MIN_NOEUDS 2
-#define DTREE_NBR_MAX_DESC 8
+const int DTREE_NBR_MIN_NOEUDS = 2;
+const int DTREE_NBR_MAX_DESC   = 8;
 // pour meilleu re lecture
 #define _TEMPLATE_ \
 template <class NOEUD,class NUAGENOEUD,int DIMENSION,int NBR_NOEUDS_PAR_CASE, int MAX_DEPTH> 

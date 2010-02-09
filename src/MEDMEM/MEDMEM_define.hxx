@@ -190,9 +190,9 @@ typedef double         med_float;
 
   }
 
-// valeurs des algos de connexites
-#define FRACT_ALGO 10
-#define MAX_LOOP 200
+  // valeurs des algos de connexites
+  const int FRACT_ALGO = 10;
+  const int MAX_LOOP   = 200;
 // fin
 
 // Valeurs de IO_MED
@@ -200,11 +200,11 @@ typedef double         med_float;
 //#define WRITE 1
 
 
-#define MED_CLOSED   0
-#define MED_OPENED   1
-#define MED_INVALID -1
-#define MED_ERROR   -1
-#define MED_VALID    0
+  const int MED_CLOSED   = 0;
+  const int MED_OPENED   = 1;
+  const int MED_INVALID  = -1;
+  const int MED_ERROR    = -1;
+  const int MED_VALID    = 0;
 //#define MED_NULL     NULL
 
 //#define MED_RDONLY RDONLY
@@ -218,12 +218,9 @@ typedef double         med_float;
 //#define MED_CREATE MED_CREA
 // Fin
 
-#define FAUX 0
-#define VRAI 1
-#define longueur_string 100
-#define PRECISION 0.0000001
-// #define undefined -1
-#define MED_UNDEFINED -1
+  const int longueur_string = 100;
+  const double PRECISION = 0.0000001;
+  const int MED_UNDEFINED = -1;
 
 // type des connectivites
 //#define CONN_NOD 0
@@ -231,25 +228,25 @@ typedef double         med_float;
 //#define CONN_DESC_TOT 2
 
 // valeurs de type_interpolation
-#define P1                 0
-#define pseudo_P2          1
-#define trilineaire        2
-#define P2_adapte          3
-#define VF_conservatif     4
-#define VF_non_conservatif 5
-// valeurs de type_mapping
-#define connexite   0
-#define conn_octree 1
-#define brutal      2
+  const int P1                 = 0;
+  const int pseudo_P2          = 1;
+  const int trilineaire        = 2;
+  const int P2_adapte          = 3;
+  const int VF_conservatif     = 4;
+  const int VF_non_conservatif = 5;
+  // valeurs de type_mapping
+  const int connexite   = 0;
+  const int conn_octree = 1;
+  const int brutal      = 2;
 // valeurs des type_support
-#define support_noeud 0
-#define support_maille 1
+  const int support_noeud = 0;
+  const int support_maille = 1;
 // retour des fonctions
-#define OK 0
-#define KO 1
+  //const int OK = 0;
+  //const int KO = 1;
 
 //maximum number of groups handled by the Family Group converter
-#define MAX_NB_GROUP 100000
+  const int MAX_NB_GROUP = 100000;
   /*
     enum definition for the used Med File version V2.1 or V2.2
     because of incompatibility between them.

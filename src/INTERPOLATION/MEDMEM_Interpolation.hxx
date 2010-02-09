@@ -106,8 +106,8 @@ template <int DIMENSION> void INTERPOLATION<DIMENSION>::init()
   _fromWrapper = ( Meta_Wrapper<DIMENSION> * ) NULL;
   _toWrapper   = ( Meta_Wrapper<DIMENSION> * ) NULL;
   _mapping     = ( Meta_Mapping<DIMENSION> * ) NULL;
-  _iType            = MED_UNDEFINED ;
-  _isConvexFromMesh = MED_UNDEFINED ;
+  _iType            = MED_EN::MED_UNDEFINED ;
+  _isConvexFromMesh = MED_EN::MED_UNDEFINED ;
   END_OF_MED(LOC);
 }
 
@@ -350,9 +350,9 @@ template <int DIMENSION> FIELD<double> * INTERPOLATION<DIMENSION>::interpolateNe
   if ( ! _fromField    ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"fromField  is a NULL pointer  !"     )) ;
   
   
-  if ( ! _toField                   ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"toField  is a NULL pointer, wrong use of interpolateNextStep"       )) ;
-  if ( _iType==MED_UNDEFINED            ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"_iType is not defined, wrong use of interpolateNextStep"            )) ;
-  if ( _isConvexFromMesh==MED_UNDEFINED ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"_isConvexFromMesh is not defined, wrong use of interpolateNextStep" )) ;  
+  if ( ! _toField                               ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"toField  is a NULL pointer, wrong use of interpolateNextStep"       )) ;
+  if ( _iType==MED_EN::MED_UNDEFINED            ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"_iType is not defined, wrong use of interpolateNextStep"            )) ;
+  if ( _isConvexFromMesh==MED_EN::MED_UNDEFINED ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"_isConvexFromMesh is not defined, wrong use of interpolateNextStep" )) ;  
 
   // delete _toField; ????????????????????????????
 

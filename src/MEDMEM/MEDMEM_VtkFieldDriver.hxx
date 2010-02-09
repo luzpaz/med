@@ -69,7 +69,7 @@ public :
     Constructor.
   */
   VTK_FIELD_DRIVER():GENDRIVER(VTK_DRIVER),
-                     _ptrField((FIELD<T> *) 0), _fieldName(""), _fieldNum(MED_INVALID),
+                     _ptrField((FIELD<T> *) 0), _fieldName(""), _fieldNum(MED_EN::MED_INVALID),
                       _vtkFile(0), _binaryFile(0)
   {
     const char * LOC = "VTK_FIELD_DRIVER::VTK_FIELD_DRIVER() ";
@@ -83,7 +83,7 @@ public :
   VTK_FIELD_DRIVER(const string &              fileName,
                    FIELD<T, INTERLACING_TAG> * ptrField):
     GENDRIVER(fileName, MED_EN::WRONLY, VTK_DRIVER),
-    _ptrField((FIELD<T> *) ptrField), _fieldName(fileName),_fieldNum(MED_INVALID),
+    _ptrField((FIELD<T> *) ptrField), _fieldName(fileName),_fieldNum(MED_EN::MED_INVALID),
     _vtkFile(0), _binaryFile(0)
   {
     const char* LOC = "VTK_FIELD_DRIVER::VTK_FIELD_DRIVER(const string & fileName, FIELD<T> * ptrField) ";

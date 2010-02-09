@@ -39,12 +39,11 @@
 #include <string.h>
 #include <fstream>
 
-#define PRECISION_IN_ASCII_FILE 10
-#define PRECISION_IN_COMPARE 1e-10
-#define SPACE_BETWEEN_NBS 19
-
 namespace MEDMEM {
 
+  const int    PRECISION_IN_ASCII_FILE = 10;
+  const double PRECISION_IN_COMPARE    = 1e-10;
+  const int    SPACE_BETWEEN_NBS       = 19;
 
   template<int N,unsigned int CODE>
   void fill(double *a, const double *b)

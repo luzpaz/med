@@ -273,7 +273,7 @@ public :
                                 nlpp = mapping->Get_Noeud_Le_Plus_Proche(i);
                                 //cout<<" | et dont le point le plus proche a pour numéro : "<<nlpp<<flush;
                                 //cout<<" | valeurs qui va etre assignée = "<<(*fromWrapper->Get_Champ())[nlpp]<<flush;
-                                if (nlpp!=MED_UNDEFINED) 
+                                if (nlpp!=MED_EN::MED_UNDEFINED) 
                                         {
                                         resultat[i]=(*fromWrapper->Get_Champ())[nlpp];
                                         ne++;
