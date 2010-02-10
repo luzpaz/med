@@ -70,9 +70,8 @@ void MPIMEDCouplingFieldDoubleServant::Destroy()
   MEDCouplingFieldDoubleServant::Destroy();
 }
 
-ParaMEDMEMComponent_i::ParaMEDMEMComponent_i() : Engines_Component_i(), MPIObject_i()
+ParaMEDMEMComponent_i::ParaMEDMEMComponent_i() : Engines_Component_i(), MPIObject_i(), InterpolationOptions()
 {
-  _initInterpolationOptions = false;
   _interface = new ParaMEDMEM::CommInterface();
 }
 
@@ -83,9 +82,8 @@ ParaMEDMEMComponent_i::ParaMEDMEMComponent_i(int nbproc, int numproc,
                                              const char *instanceName,
                                              const char *interfaceName,
                                              bool regist)
-  : Engines_Component_i(orb,poa,contId,instanceName,interfaceName,false,regist), MPIObject_i(nbproc,numproc)
+  : Engines_Component_i(orb,poa,contId,instanceName,interfaceName,false,regist), MPIObject_i(nbproc,numproc), InterpolationOptions()
 {
-  _initInterpolationOptions = false;
   _interface = new ParaMEDMEM::CommInterface();
 }
 
@@ -94,66 +92,6 @@ ParaMEDMEMComponent_i::~ParaMEDMEMComponent_i()
   MESSAGE("* [" << _numproc << "] ParaMEDMEMComponent destructor");
   delete _interface;
 }
-
-void ParaMEDMEMComponent_i::setInterpolationOptions(long print_level,
-						    const char * intersection_type,
-						    double precision,
-						    double median_plane,
-						    bool do_rotate,
-						    double bounding_box_adjustment,
-						    double bounding_box_adjustment_abs,
-						    double max_distance_for_3Dsurf_intersect,
-						    long orientation,
-						    bool measure_abs,
-						    const char * splitting_policy,
-						    bool P1P0_bary_method ) throw(SALOME::SALOME_Exception)
-{
-  _initInterpolationOptions=true;
-  string interType = intersection_type;
-  string splitPolicy = splitting_policy;
-
-  _print_level=print_level;
-  if( interType.find("Triangulation") != string::npos )
-    _intersection_type=INTERP_KERNEL::Triangulation;
-  else if( interType.find("Convex") != string::npos )
-    _intersection_type=INTERP_KERNEL::Convex;
-  else if( interType.find("Geometric2D") != string::npos )
-    _intersection_type=INTERP_KERNEL::Geometric2D;
-  else if( interType.find("PointLocator") != string::npos )
-    _intersection_type=INTERP_KERNEL::PointLocator;
-  else{
-    // exception
-    ostringstream msg;
-    msg << "Intersection type no valid";
-    MESSAGE(msg.str());
-    THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
-  }
-  _precision=precision;
-  _median_plane=median_plane;
-  _do_rotate=do_rotate;
-  _bounding_box_adjustment=bounding_box_adjustment;
-  _bounding_box_adjustment_abs=bounding_box_adjustment_abs;
-  _max_distance_for_3Dsurf_intersect=max_distance_for_3Dsurf_intersect;
-  _orientation=orientation;
-  _measure_abs=measure_abs;
-  if( splitPolicy.find("PLANAR_FACE_5") != string::npos )
-    _splitting_policy=INTERP_KERNEL::PLANAR_FACE_5;
-  else if( splitPolicy.find("PLANAR_FACE_6") != string::npos )
-    _splitting_policy=INTERP_KERNEL::PLANAR_FACE_6;
-  else if( splitPolicy.find("GENERAL_24") != string::npos )
-    _splitting_policy=INTERP_KERNEL::GENERAL_24;
-  else if( splitPolicy.find("GENERAL_48") != string::npos )
-    _splitting_policy=INTERP_KERNEL::GENERAL_48;
-  else{
-    // exception
-    ostringstream msg;
-    msg << "Splitting policy no valid";
-    MESSAGE(msg.str());
-    THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
-  }
-  _P1P0_bary_method=P1P0_bary_method;
-}
-
 
 void ParaMEDMEMComponent_i::_initializeCoupling(const char * coupling)
 {
@@ -203,6 +141,33 @@ void ParaMEDMEMComponent_i::_initializeCoupling(const char * coupling)
   _dec[coupling] = NULL;
 }
 
+void ParaMEDMEMComponent_i::setInterpolationOptions(long print_level,
+				      const char * intersection_type,
+				      double precision,
+				      double median_plane,
+				      bool do_rotate,
+				      double bounding_box_adjustment,
+				      double bounding_box_adjustment_abs,
+				      double max_distance_for_3Dsurf_intersect,
+				      long orientation,
+				      bool measure_abs,
+				      const char * splitting_policy,
+				      bool P1P0_bary_method )
+{
+  INTERP_KERNEL::InterpolationOptions::setInterpolationOptions(print_level,
+							       intersection_type,
+							       precision,
+							       median_plane,
+							       do_rotate,
+							       bounding_box_adjustment,
+							       bounding_box_adjustment_abs,
+							       max_distance_for_3Dsurf_intersect,
+							       orientation,
+							       measure_abs,
+							       splitting_policy,
+							       P1P0_bary_method );
+}
+
 void ParaMEDMEMComponent_i::_setInputField(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble *field)
 {
   string service = coupling;
@@ -228,7 +193,7 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, ParaMEDMEM::ME
       else
 	_dec[coupling] = new ParaMEDMEM::InterpKernelDEC(*_source[coupling], *_target[coupling]);
 
-      if(_initInterpolationOptions){
+      if(_setInterpolationOptions){
 	_dec[coupling]->setPrintLevel(_print_level);
 	_dec[coupling]->setIntersectionType(_intersection_type);
 	_dec[coupling]->setPrecision(_precision);
@@ -283,7 +248,7 @@ void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, ParaMEDMEM::M
       else
 	_dec[coupling] = new ParaMEDMEM::InterpKernelDEC(*_target[coupling], *_source[coupling]);
   
-      if(_initInterpolationOptions){
+      if(_setInterpolationOptions){
 	_dec[coupling]->setPrintLevel(_print_level);
 	_dec[coupling]->setIntersectionType(_intersection_type);
 	_dec[coupling]->setPrecision(_precision);

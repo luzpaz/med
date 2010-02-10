@@ -54,7 +54,7 @@ module SALOME_MED
 				 in long orientation,
 				 in boolean measure_abs,
 				 in string splitting_policy,
-				 in boolean P1P0_bary_method ) raises (SALOME::SALOME_Exception);
+				 in boolean P1P0_bary_method );
   };
 } ;
 #endif

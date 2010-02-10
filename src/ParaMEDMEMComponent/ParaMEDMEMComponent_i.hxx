@@ -44,7 +44,7 @@ typedef struct {
   Engines::IORTab* tior;
 } thread_st;
 
-class ParaMEDMEMComponent_i : public POA_SALOME_MED::ParaMEDMEMComponent, public Engines_Component_i, public MPIObject_i
+class ParaMEDMEMComponent_i : public POA_SALOME_MED::ParaMEDMEMComponent, public Engines_Component_i, public MPIObject_i, public INTERP_KERNEL::InterpolationOptions
 {
 
  public:
@@ -61,6 +61,13 @@ class ParaMEDMEMComponent_i : public POA_SALOME_MED::ParaMEDMEMComponent, public
   // Destructor
   ~ParaMEDMEMComponent_i();
   void _getOutputField(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble* field);
+
+protected:
+  std::map<std::string,ParaMEDMEM::ProcessorGroup*> _commgroup;
+  void _initializeCoupling(const char * coupling);
+  void _setInputField(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble* field);
+  void _terminateCoupling(const char * coupling);
+
   void setInterpolationOptions(long print_level,
 			       const char * intersection_type,
 			       double precision,
@@ -72,30 +79,8 @@ class ParaMEDMEMComponent_i : public POA_SALOME_MED::ParaMEDMEMComponent, public
 			       long orientation,
 			       bool measure_abs,
 			       const char * splitting_policy,
-			       bool P1P0_bary_method ) throw(SALOME::SALOME_Exception);
-
-protected:
-  std::map<std::string,ParaMEDMEM::ProcessorGroup*> _commgroup;
-  void _initializeCoupling(const char * coupling);
-  void _setInputField(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble* field);
-  void _terminateCoupling(const char * coupling);
-
+			       bool P1P0_bary_method );
 private:
-  // Interp Kernel options
-  bool _initInterpolationOptions;
-  int _print_level;
-  INTERP_KERNEL::IntersectionType _intersection_type;
-  double _precision;
-  double _median_plane;
-  bool _do_rotate;
-  double _bounding_box_adjustment;
-  double _bounding_box_adjustment_abs;
-  double _max_distance_for_3Dsurf_intersect;
-  int _orientation;
-  bool _measure_abs;
-  INTERP_KERNEL::SplittingPolicy _splitting_policy;
-  bool _P1P0_bary_method;
-  
   int _gsize, _grank;
   ParaMEDMEM::CommInterface* _interface;
   std::map<std::string,ParaMEDMEM::MPIProcessorGroup*> _source, _target;
