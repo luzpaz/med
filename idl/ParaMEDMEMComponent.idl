@@ -44,7 +44,7 @@ module SALOME_MED
   interface ParaMEDMEMComponent:Engines::Component,Engines::MPIObject
   {
     void setInterpolationOptions(in long print_level,
-				 in string intersedction_type,
+				 in string intersection_type,
 				 in double precision,
 				 in double median_plane,
 				 in boolean do_rotate,
