@@ -87,8 +87,14 @@ fi
 #   autom4te.cache (directory)
 echo "======================================================= aclocal"
 
-aclocal -I adm_local/unix/config_files \
-        -I ${CONFIGURE_SOURCE_DIR}/unix/config_files || exit 1
+if test -d "${GUI_ROOT_DIR}"; then
+  aclocal -I adm_local/unix/config_files \
+          -I ${CONFIGURE_SOURCE_DIR}/unix/config_files \
+          -I ${GUI_ROOT_DIR}/adm_local/unix/config_files || exit 1
+else
+  aclocal -I adm_local/unix/config_files \
+          -I ${CONFIGURE_SOURCE_DIR}/unix/config_files || exit 1
+fi
 
 # ____________________________________________________________________
 # libtoolize creates some configuration files (ltmain.sh,
