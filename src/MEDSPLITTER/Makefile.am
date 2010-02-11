@@ -72,7 +72,7 @@ if MED_ENABLE_SCOTCH
 endif
 
 libmedsplitter_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
-	$(BOOST_CPPFLAGS) $(LIBXML_CPPFLAGS) \
+	$(BOOST_CPPFLAGS) $(LIBXML_INCLUDES) \
 	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core
 
 libmedsplitter_la_LDFLAGS= 

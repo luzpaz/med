@@ -28,12 +28,8 @@ dist_admlocalm4_DATA =          \
     check_Med2.m4               \
     check_bft.m4                \
     check_fvm.m4                \
-    check_libxml.m4             \
     check_metis.m4              \
-    check_opengl.m4             \
-    check_qt.m4                 \
     check_scotch.m4             \
-    check_vtk.m4                \
     med_check_sizeof_medint.m4  \
     renumber.m4                 \
     splitter.m4                 \
