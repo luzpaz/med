@@ -19,26 +19,30 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef __PARAMEDCOUPLINGFIELDDOUBLESERVANT_HXX__
-#define __PARAMEDCOUPLINGFIELDDOUBLESERVANT_HXX__
+#ifndef __MPIMEDCOUPLINGFIELDDOUBLESERVANT_HXX__
+#define __MPIMEDCOUPLINGFIELDDOUBLESERVANT_HXX__
 
 #include "SALOMEconfig.h"
-#include CORBA_SERVER_HEADER(ParaMEDCouplingCorbaServant)
+#include CORBA_SERVER_HEADER(ParaMEDMEMComponent)
+#include "ParaMEDMEMComponent_i.hxx"
 #include "MPIObject_i.hxx"
 #include "MEDCouplingFieldDouble.hxx"
 #include "MEDCouplingFieldDoubleServant.hxx"
 
 namespace ParaMEDMEM
 {
-  class ParaMEDCouplingFieldDoubleServant : public POA_SALOME_MED::ParaMEDCouplingFieldDoubleCorbaInterface,
-					    public MEDCouplingFieldDoubleServant,
-					    public MPIObject_i
+  class MPIMEDCouplingFieldDoubleServant : public POA_SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface,
+					   public MEDCouplingFieldDoubleServant,
+					   public MPIObject_i
   {
   public:
-    ParaMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb, MEDCouplingFieldDouble* field);
-  public:
+    MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,MEDCouplingFieldDouble* field);
+    void getDataByMPI(const char* coupling);
     void Register();
     void Destroy();
+  private:
+    ParaMEDMEMComponent_i *_pcompo;
+    MEDCouplingFieldDouble* _field;
   };
 }
 #endif

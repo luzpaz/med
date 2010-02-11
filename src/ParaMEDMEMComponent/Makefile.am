@@ -24,9 +24,9 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 lib_LTLIBRARIES= libparamedmemcompo.la
 
-salomeinclude_HEADERS= ParaMEDMEMComponent_i.hxx
+salomeinclude_HEADERS= MPIMEDCouplingFieldDoubleServant.hxx ParaMEDMEMComponent_i.hxx
 
-dist_libparamedmemcompo_la_SOURCES= ParaMEDMEMComponent_i.cxx
+dist_libparamedmemcompo_la_SOURCES= MPIMEDCouplingFieldDoubleServant.cxx ParaMEDMEMComponent_i.cxx
 
 #libmedmem_la_LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 libparamedmemcompo_la_CPPFLAGS= $(KERNEL_CXXFLAGS) $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) $(MPI_INCLUDES) @CXXTMPDPTHFLAGS@ \

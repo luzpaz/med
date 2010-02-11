@@ -59,61 +59,49 @@ typedef struct {
   Engines::IORTab* tior;
 } thread_st;
 
-class ParaMEDMEMComponent_i : public POA_SALOME_MED::ParaMEDMEMComponent, public Engines_Component_i, public MPIObject_i, public INTERP_KERNEL::InterpolationOptions
+namespace ParaMEDMEM
 {
+  class ParaMEDMEMComponent_i : public POA_SALOME_MED::ParaMEDMEMComponent, public Engines_Component_i, public MPIObject_i, public INTERP_KERNEL::InterpolationOptions
+  {
 
- public:
-  // Constructor
-  ParaMEDMEMComponent_i();
-  ParaMEDMEMComponent_i(int nbproc, int numproc,
-                        CORBA::ORB_ptr orb,
-                        PortableServer::POA_ptr poa, 
-                        PortableServer::ObjectId * contId, 
-                        const char *instanceName,
-                        const char *interfaceName,
-                        bool regist);
-
-  // Destructor
-  ~ParaMEDMEMComponent_i();
-  void setInterpolationOptions(long print_level,
-			       const char * intersection_type,
-			       double precision,
-			       double median_plane,
-			       bool do_rotate,
-			       double bounding_box_adjustment,
-			       double bounding_box_adjustment_abs,
-			       double max_distance_for_3Dsurf_intersect,
-			       long orientation,
-			       bool measure_abs,
-			       const char * splitting_policy,
-			       bool P1P0_bary_method );
-  void initializeCoupling(const char * coupling) throw(SALOME::SALOME_Exception);
-  void terminateCoupling(const char * coupling) throw(SALOME::SALOME_Exception);
-  void _getOutputField(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble* field);
-
-protected:
-  std::map<std::string,ParaMEDMEM::ProcessorGroup*> _commgroup;
-  void _setInputField(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble* field);
-
-private:
-  int _gsize, _grank;
-  ParaMEDMEM::CommInterface* _interface;
-  std::map<std::string,ParaMEDMEM::MPIProcessorGroup*> _source, _target;
-  std::map<std::string,ParaMEDMEM::InterpKernelDEC*> _dec;
-};
-
-class MPIMEDCouplingFieldDoubleServant : public POA_SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface,
-                                         public ParaMEDMEM::MEDCouplingFieldDoubleServant,
-                                         public MPIObject_i
-{
-public:
-  MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,ParaMEDMEM::MEDCouplingFieldDouble* field);
-  void getDataByMPI(const char* coupling);
-
-    void Register();
-    void Destroy();
-private:
-  ParaMEDMEMComponent_i *_pcompo;
-  ParaMEDMEM::MEDCouplingFieldDouble* _field;
-};
+  public:
+    // Constructor
+    ParaMEDMEMComponent_i();
+    ParaMEDMEMComponent_i(int nbproc, int numproc,
+			  CORBA::ORB_ptr orb,
+			  PortableServer::POA_ptr poa, 
+			  PortableServer::ObjectId * contId, 
+			  const char *instanceName,
+			  const char *interfaceName,
+			  bool regist);
+    
+    // Destructor
+    ~ParaMEDMEMComponent_i();
+    void setInterpolationOptions(long print_level,
+				 const char * intersection_type,
+				 double precision,
+				 double median_plane,
+				 bool do_rotate,
+				 double bounding_box_adjustment,
+				 double bounding_box_adjustment_abs,
+				 double max_distance_for_3Dsurf_intersect,
+				 long orientation,
+				 bool measure_abs,
+				 const char * splitting_policy,
+				 bool P1P0_bary_method );
+    void initializeCoupling(const char * coupling) throw(SALOME::SALOME_Exception);
+    void terminateCoupling(const char * coupling) throw(SALOME::SALOME_Exception);
+    void _getOutputField(const char * coupling, MEDCouplingFieldDouble* field);
+    
+  protected:
+    std::map<std::string,ProcessorGroup*> _commgroup;
+    void _setInputField(const char * coupling, MEDCouplingFieldDouble* field);
+    
+  private:
+    int _gsize, _grank;
+    CommInterface* _interface;
+    std::map<std::string,MPIProcessorGroup*> _source, _target;
+    std::map<std::string,InterpKernelDEC*> _dec;
+  };
+}
 #endif

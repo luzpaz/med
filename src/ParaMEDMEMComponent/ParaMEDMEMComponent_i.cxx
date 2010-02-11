@@ -22,57 +22,11 @@
 #include "ParaMEDMEMComponent_i.hxx"
 #include "utilities.h"
 using namespace std;
-
-MPIMEDCouplingFieldDoubleServant::MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,ParaMEDMEM::MEDCouplingFieldDouble* field):ParaMEDMEM::MEDCouplingFieldDoubleServant(field),MPIObject_i()
-{
-  _pcompo = pcompo;
-  _field = field;
-  Engines::MPIObject_var pobj = POA_SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface::_this();
-  BCastIOR(orb,pobj,false);
-}
-
-void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling)
-{
-  pthread_t *th;
-  if(_numproc == 0){
-    th = new pthread_t[_nbproc];
-    for(int ip=1;ip<_nbproc;ip++){
-      thread_st *st = new thread_st;
-      st->ip = ip;
-      st->tior = _tior;
-      st->coupling = coupling;
-      pthread_create(&(th[ip]),NULL,th_getdatabympi,(void*)st);
-    }
-  }
-
-  _pcompo->_getOutputField(coupling,_field);
-    
-  if(_numproc == 0){
-    for(int ip=1;ip<_nbproc;ip++)
-      pthread_join(th[ip],NULL);
-    delete[] th;
-  }
-}
-
-void MPIMEDCouplingFieldDoubleServant::Register()
-{
-  if(_numproc == 0)
-    for(int ip=1;ip<_nbproc;ip++)
-      (SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface::_narrow((*_tior)[ip]))->Register();
-  MEDCouplingFieldDoubleServant::Register();
-}
-
-void MPIMEDCouplingFieldDoubleServant::Destroy()
-{
-  if(_numproc == 0)
-    for(int ip=1;ip<_nbproc;ip++)
-      (SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface::_narrow((*_tior)[ip]))->Destroy();
-  MEDCouplingFieldDoubleServant::Destroy();
-}
+using namespace ParaMEDMEM;
 
 ParaMEDMEMComponent_i::ParaMEDMEMComponent_i() : Engines_Component_i(), MPIObject_i(), InterpolationOptions()
 {
-  _interface = new ParaMEDMEM::CommInterface();
+  _interface = new CommInterface();
 }
 
 ParaMEDMEMComponent_i::ParaMEDMEMComponent_i(int nbproc, int numproc,
@@ -84,7 +38,7 @@ ParaMEDMEMComponent_i::ParaMEDMEMComponent_i(int nbproc, int numproc,
                                              bool regist)
   : Engines_Component_i(orb,poa,contId,instanceName,interfaceName,false,regist), MPIObject_i(nbproc,numproc), InterpolationOptions()
 {
-  _interface = new ParaMEDMEM::CommInterface();
+  _interface = new CommInterface();
 }
 
 ParaMEDMEMComponent_i::~ParaMEDMEMComponent_i()
@@ -140,14 +94,14 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
     // target is always the upper processor numbers
     if(_numproc==_grank)
       {
-	_source[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,0,_nbproc-1,_gcom[coupling]);
-	_target[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,_nbproc,_gsize-1,_gcom[coupling]);
+	_source[coupling] = new MPIProcessorGroup(*_interface,0,_nbproc-1,_gcom[coupling]);
+	_target[coupling] = new MPIProcessorGroup(*_interface,_nbproc,_gsize-1,_gcom[coupling]);
 	_commgroup[coupling] = _source[coupling];
       }
     else
       {
-	_source[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,0,_gsize-_nbproc-1,_gcom[coupling]);
-	_target[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,_gsize-_nbproc,_gsize-1,_gcom[coupling]);
+	_source[coupling] = new MPIProcessorGroup(*_interface,0,_gsize-_nbproc-1,_gcom[coupling]);
+	_target[coupling] = new MPIProcessorGroup(*_interface,_gsize-_nbproc,_gsize-1,_gcom[coupling]);
 	_commgroup[coupling] = _target[coupling];
       }
     
@@ -293,7 +247,7 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(long print_level,
   }
 }
 
-void ParaMEDMEMComponent_i::_setInputField(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble *field)
+void ParaMEDMEMComponent_i::_setInputField(const char * coupling, MEDCouplingFieldDouble *field)
 {
   string service = coupling;
   if( service.size() == 0 )
@@ -314,9 +268,9 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, ParaMEDMEM::ME
       // Creating the intersection Data Exchange Channel
       // Processors which received the field are always the second argument of InterpKernelDEC object
       if(_numproc==_grank)
-	_dec[coupling] = new ParaMEDMEM::InterpKernelDEC(*_target[coupling], *_source[coupling]);
+	_dec[coupling] = new InterpKernelDEC(*_target[coupling], *_source[coupling]);
       else
-	_dec[coupling] = new ParaMEDMEM::InterpKernelDEC(*_source[coupling], *_target[coupling]);
+	_dec[coupling] = new InterpKernelDEC(*_source[coupling], *_target[coupling]);
 
       if(_setInterpolationOptions){
 	_dec[coupling]->setPrintLevel(_print_level);
@@ -348,7 +302,7 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, ParaMEDMEM::ME
   _dec[coupling]->recvData();
 }
 
-void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble *field)
+void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, MEDCouplingFieldDouble *field)
 {
   string service = coupling;
   if( service.size() == 0 )
@@ -369,9 +323,9 @@ void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, ParaMEDMEM::M
       // Creating the intersection Data Exchange Channel
       // Processors which sent the field are always the first argument of InterpKernelDEC object
       if(_numproc==_grank)
-	_dec[coupling] = new ParaMEDMEM::InterpKernelDEC(*_source[coupling], *_target[coupling]);
+	_dec[coupling] = new InterpKernelDEC(*_source[coupling], *_target[coupling]);
       else
-	_dec[coupling] = new ParaMEDMEM::InterpKernelDEC(*_target[coupling], *_source[coupling]);
+	_dec[coupling] = new InterpKernelDEC(*_target[coupling], *_source[coupling]);
   
       if(_setInterpolationOptions){
 	_dec[coupling]->setPrintLevel(_print_level);
