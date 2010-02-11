@@ -93,67 +93,186 @@ ParaMEDMEMComponent_i::~ParaMEDMEMComponent_i()
   delete _interface;
 }
 
-void ParaMEDMEMComponent_i::_initializeCoupling(const char * coupling)
+void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALOME::SALOME_Exception)
 {
-  set<int> procs;
-
-  string service = coupling;
-  if( service.size() == 0 )
-    {
-      MESSAGE("[" << _numproc << "] You have to give a service name !");
-      throw POException(_numproc,"You have to give a service name !");
+  pthread_t *th;
+  if(_numproc == 0){
+    th = new pthread_t[_nbproc];
+    for(int ip=1;ip<_nbproc;ip++){
+      thread_st *st = new thread_st;
+      st->ip = ip;
+      st->tior = _tior;
+      st->coupling = coupling;
+      pthread_create(&(th[ip]),NULL,th_initializecoupling,(void*)st);
     }
+  }
 
-  if( _gcom.find(service) != _gcom.end() )
-    {
-      MESSAGE("[" << _numproc << "] service " << service << " already exist !");
-      throw POException(_numproc,"service " + service + " already exist !");
-    }
+  try{
+    set<int> procs;
 
-  // Connection to distributed parallel component
+    string service = coupling;
+    if( service.size() == 0 )
+      {
+	MESSAGE("[" << _numproc << "] You have to give a service name !");
+	throw POException(_numproc,"You have to give a service name !");
+      }
+    
+    if( _gcom.find(service) != _gcom.end() )
+      {
+	MESSAGE("[" << _numproc << "] service " << service << " already exist !");
+	throw POException(_numproc,"service " + service + " already exist !");
+      }
+
+    // Connection to distributed parallel component
 #ifdef HAVE_MPI2
-  remoteMPI2Connect(coupling);
+    remoteMPI2Connect(coupling);
 #else
-  MESSAGE("[" << _numproc << "] You have to use a MPI2 compliant mpi implementation !");
-  throw POException(_numproc,"You have to use a MPI2 compliant mpi implementation !");
+    MESSAGE("[" << _numproc << "] You have to use a MPI2 compliant mpi implementation !");
+    throw POException(_numproc,"You have to use a MPI2 compliant mpi implementation !");
 #endif
 
-  MPI_Comm_size( _gcom[coupling], &_gsize );
-  MPI_Comm_rank( _gcom[coupling], &_grank );
-  MESSAGE("[" << _grank << "] new communicator of " << _gsize << " processes");
+    MPI_Comm_size( _gcom[coupling], &_gsize );
+    MPI_Comm_rank( _gcom[coupling], &_grank );
+    MESSAGE("[" << _grank << "] new communicator of " << _gsize << " processes");
 
-  // Creation of processors group for ParaMEDMEM
-  // source is always the lower processor numbers
-  // target is always the upper processor numbers
-  if(_numproc==_grank)
-    {
-      _source[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,0,_nbproc-1,_gcom[coupling]);
-      _target[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,_nbproc,_gsize-1,_gcom[coupling]);
-      _commgroup[coupling] = _source[coupling];
+    // Creation of processors group for ParaMEDMEM
+    // source is always the lower processor numbers
+    // target is always the upper processor numbers
+    if(_numproc==_grank)
+      {
+	_source[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,0,_nbproc-1,_gcom[coupling]);
+	_target[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,_nbproc,_gsize-1,_gcom[coupling]);
+	_commgroup[coupling] = _source[coupling];
+      }
+    else
+      {
+	_source[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,0,_gsize-_nbproc-1,_gcom[coupling]);
+	_target[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,_gsize-_nbproc,_gsize-1,_gcom[coupling]);
+	_commgroup[coupling] = _target[coupling];
+      }
+    
+    _dec[coupling] = NULL;
+    
+  }
+  catch(const POException &ex){
+    // exception
+    ostringstream msg;
+    msg << ex.msg << " on process number " << ex.numproc;
+    MESSAGE(msg.str());
+    THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+  }
+  catch(const INTERP_KERNEL::Exception &ex){
+    MESSAGE(ex.what());
+    THROW_SALOME_CORBA_EXCEPTION(ex.what(),SALOME::INTERNAL_ERROR);
+  }
+  catch(...){
+    MESSAGE("Unknown exception");
+    THROW_SALOME_CORBA_EXCEPTION("Unknown exception",SALOME::INTERNAL_ERROR);
+  }
+
+  if(_numproc == 0){
+    for(int ip=1;ip<_nbproc;ip++)
+      pthread_join(th[ip],NULL);
+    delete[] th;
+  }
+}
+
+void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOME::SALOME_Exception)
+{
+  pthread_t *th;
+  if(_numproc == 0){
+    th = new pthread_t[_nbproc];
+    for(int ip=1;ip<_nbproc;ip++){
+      thread_st *st = new thread_st;
+      st->ip = ip;
+      st->tior = _tior;
+      st->coupling = coupling;
+      pthread_create(&(th[ip]),NULL,th_terminatecoupling,(void*)st);
     }
-  else
-    {
-      _source[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,0,_gsize-_nbproc-1,_gcom[coupling]);
-      _target[coupling] = new ParaMEDMEM::MPIProcessorGroup(*_interface,_gsize-_nbproc,_gsize-1,_gcom[coupling]);
-      _commgroup[coupling] = _target[coupling];
-    }
-  
-  _dec[coupling] = NULL;
+  }
+
+  try{
+    string service = coupling;
+    if( service.size() == 0 )
+      {
+	MESSAGE("[" << _numproc << "] You have to give a service name !");
+	throw POException(_numproc,"You have to give a service name !");
+      }
+
+    if( _gcom.find(service) == _gcom.end() )
+      {
+	MESSAGE("[" << _numproc << "] service " << service << " don't exist !");
+	throw POException(_numproc,"service " + service + " don't exist !");
+      }
+
+    // Disconnection to distributed parallel component
+#ifdef HAVE_MPI2
+    remoteMPI2Disconnect(coupling);
+#else
+    MESSAGE("[" << _numproc << "] You have to use a MPI2 compliant mpi implementation !");
+    throw POException(_numproc,"You have to use a MPI2 compliant mpi implementation !");
+#endif
+
+    /* Processors groups and DEC destruction */
+    delete _source[coupling];
+    _source.erase(coupling);
+    delete _target[coupling];
+    _target.erase(coupling);
+    delete _dec[coupling];
+    _dec.erase(coupling);
+    _commgroup.erase(coupling);
+  }
+  catch(const POException &ex){
+    // exception
+    ostringstream msg;
+    msg << ex.msg << " on process number " << ex.numproc;
+    MESSAGE(msg.str());
+    THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+  }
+
+  if(_numproc == 0){
+    for(int ip=1;ip<_nbproc;ip++)
+      pthread_join(th[ip],NULL);
+    delete[] th;
+  }
 }
 
 void ParaMEDMEMComponent_i::setInterpolationOptions(long print_level,
-				      const char * intersection_type,
-				      double precision,
-				      double median_plane,
-				      bool do_rotate,
-				      double bounding_box_adjustment,
-				      double bounding_box_adjustment_abs,
-				      double max_distance_for_3Dsurf_intersect,
-				      long orientation,
-				      bool measure_abs,
-				      const char * splitting_policy,
-				      bool P1P0_bary_method )
+						    const char * intersection_type,
+						    double precision,
+						    double median_plane,
+						    bool do_rotate,
+						    double bounding_box_adjustment,
+						    double bounding_box_adjustment_abs,
+						    double max_distance_for_3Dsurf_intersect,
+						    long orientation,
+						    bool measure_abs,
+						    const char * splitting_policy,
+						    bool P1P0_bary_method )
 {
+  pthread_t *th;
+  if(_numproc == 0){
+    th = new pthread_t[_nbproc];
+    for(int ip=1;ip<_nbproc;ip++){
+      thread_st *st = new thread_st;
+      st->ip = ip;
+      st->tior = _tior;
+      st->print_level = print_level;
+      st->intersection_type = intersection_type;
+      st->precision = precision;
+      st->median_plane = median_plane;
+      st->do_rotate = do_rotate;
+      st->bounding_box_adjustment = bounding_box_adjustment;
+      st->bounding_box_adjustment_abs = bounding_box_adjustment_abs;
+      st->max_distance_for_3Dsurf_intersect = max_distance_for_3Dsurf_intersect;
+      st->orientation = orientation;
+      st->measure_abs = measure_abs;
+      st->splitting_policy = splitting_policy;
+      st->P1P0_bary_method = P1P0_bary_method;
+      pthread_create(&(th[ip]),NULL,th_setinterpolationoptions,(void*)st);
+    }
+  }
+
   INTERP_KERNEL::InterpolationOptions::setInterpolationOptions(print_level,
 							       intersection_type,
 							       precision,
@@ -166,6 +285,12 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(long print_level,
 							       measure_abs,
 							       splitting_policy,
 							       P1P0_bary_method );
+
+  if(_numproc == 0){
+    for(int ip=1;ip<_nbproc;ip++)
+      pthread_join(th[ip],NULL);
+    delete[] th;
+  }
 }
 
 void ParaMEDMEMComponent_i::_setInputField(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble *field)
@@ -278,43 +403,55 @@ void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, ParaMEDMEM::M
   _dec[coupling]->sendData();
 }
 
-void ParaMEDMEMComponent_i::_terminateCoupling(const char * coupling)
-{
-  string service = coupling;
-  if( service.size() == 0 )
-    {
-      MESSAGE("[" << _numproc << "] You have to give a service name !");
-      throw POException(_numproc,"You have to give a service name !");
-    }
-
-  if( _gcom.find(service) == _gcom.end() )
-    {
-      MESSAGE("[" << _numproc << "] service " << service << " don't exist !");
-      throw POException(_numproc,"service " + service + " don't exist !");
-    }
-
-  // Disconnection to distributed parallel component
-#ifdef HAVE_MPI2
-  remoteMPI2Disconnect(coupling);
-#else
-  MESSAGE("[" << _numproc << "] You have to use a MPI2 compliant mpi implementation !");
-  throw POException(_numproc,"You have to use a MPI2 compliant mpi implementation !");
-#endif
-
-  /* Processors groups and DEC destruction */
-  delete _source[coupling];
-  _source.erase(coupling);
-  delete _target[coupling];
-  _target.erase(coupling);
-  delete _dec[coupling];
-  _dec.erase(coupling);
-  _commgroup.erase(coupling);
-}
-
 void *th_getdatabympi(void *s)
 {
   thread_st *st = (thread_st*)s;
   (SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface::_narrow((*(st->tior))[st->ip]))->getDataByMPI(st->coupling.c_str());
+  delete st;
+  return NULL;
+}
+
+void *th_setinterpolationoptions(void *s)
+{
+  thread_st *st = (thread_st*)s;
+  try{
+    (SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]))->setInterpolationOptions(st->print_level,
+											       st->intersection_type,
+											       st->precision,
+											       st->median_plane,
+											       st->do_rotate,
+											       st->bounding_box_adjustment,
+											       st->bounding_box_adjustment_abs,
+											       st->max_distance_for_3Dsurf_intersect,
+											       st->orientation,
+											       st->measure_abs,
+											       st->splitting_policy,
+											       st->P1P0_bary_method);
+  }
+  catch(...){
+    cerr << "Caught an exception in a thread on process: " << st->ip << endl;
+  }
+  delete st;
+  return NULL;
+}
+
+void *th_initializecoupling(void *s)
+{
+  thread_st *st = (thread_st*)s;
+  try{
+    (SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]))->initializeCoupling(st->coupling.c_str());
+  }
+  catch(...){
+    cerr << "Caught an exception in a thread on process: " << st->ip << endl;
+  }
+  delete st;
+  return NULL;
+}
+
+void *th_terminatecoupling(void *s)
+{
+  thread_st *st = (thread_st*)s;
+  (SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]))->terminateCoupling(st->coupling.c_str());
   delete st;
   return NULL;
 }

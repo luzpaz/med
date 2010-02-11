@@ -36,10 +36,25 @@
 #include "Utils_CorbaException.hxx"
 #include <map>
 
+void * th_setinterpolationoptions(void *st);
+void * th_initializecoupling(void *st);
+void * th_terminatecoupling(void *st);
 void * th_getdatabympi(void *st);
 
 typedef struct {
   int ip;
+  long print_level;
+  const char * intersection_type;
+  double precision;
+  double median_plane;
+  bool do_rotate;
+  double bounding_box_adjustment;
+  double bounding_box_adjustment_abs;
+  double max_distance_for_3Dsurf_intersect;
+  long orientation;
+  bool measure_abs;
+  const char * splitting_policy;
+  bool P1P0_bary_method;
   std::string coupling;
   Engines::IORTab* tior;
 } thread_st;
@@ -60,14 +75,6 @@ class ParaMEDMEMComponent_i : public POA_SALOME_MED::ParaMEDMEMComponent, public
 
   // Destructor
   ~ParaMEDMEMComponent_i();
-  void _getOutputField(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble* field);
-
-protected:
-  std::map<std::string,ParaMEDMEM::ProcessorGroup*> _commgroup;
-  void _initializeCoupling(const char * coupling);
-  void _setInputField(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble* field);
-  void _terminateCoupling(const char * coupling);
-
   void setInterpolationOptions(long print_level,
 			       const char * intersection_type,
 			       double precision,
@@ -80,6 +87,14 @@ protected:
 			       bool measure_abs,
 			       const char * splitting_policy,
 			       bool P1P0_bary_method );
+  void initializeCoupling(const char * coupling) throw(SALOME::SALOME_Exception);
+  void terminateCoupling(const char * coupling) throw(SALOME::SALOME_Exception);
+  void _getOutputField(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble* field);
+
+protected:
+  std::map<std::string,ParaMEDMEM::ProcessorGroup*> _commgroup;
+  void _setInputField(const char * coupling, ParaMEDMEM::MEDCouplingFieldDouble* field);
+
 private:
   int _gsize, _grank;
   ParaMEDMEM::CommInterface* _interface;
