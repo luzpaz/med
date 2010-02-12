@@ -7,6 +7,8 @@
 
 using namespace ParaMEDMEM;
 
+int mainCorbaServ(int argc, char **argv);
+
 int mainCorbaServ(int argc, char **argv)
 {
   CORBA::ORB_var orb=CORBA::ORB_init(argc,argv);
