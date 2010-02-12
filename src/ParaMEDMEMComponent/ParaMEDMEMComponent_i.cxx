@@ -24,7 +24,7 @@
 using namespace std;
 using namespace ParaMEDMEM;
 
-ParaMEDMEMComponent_i::ParaMEDMEMComponent_i() : Engines_Component_i(), MPIObject_i(), InterpolationOptions()
+ParaMEDMEMComponent_i::ParaMEDMEMComponent_i() : Engines_Component_i(), MPIObject_i()
 {
   _interface = new CommInterface();
 }
@@ -36,7 +36,7 @@ ParaMEDMEMComponent_i::ParaMEDMEMComponent_i(int nbproc, int numproc,
                                              const char *instanceName,
                                              const char *interfaceName,
                                              bool regist)
-  : Engines_Component_i(orb,poa,contId,instanceName,interfaceName,false,regist), MPIObject_i(nbproc,numproc), InterpolationOptions()
+  : Engines_Component_i(orb,poa,contId,instanceName,interfaceName,false,regist), MPIObject_i(nbproc,numproc)
 {
   _interface = new CommInterface();
 }
@@ -175,6 +175,10 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOM
     delete _dec[coupling];
     _dec.erase(coupling);
     _commgroup.erase(coupling);
+    if(_dec_options[coupling]){
+      delete _dec_options[coupling];
+      _dec_options.erase(coupling);
+    }
   }
   catch(const POException &ex){
     // exception
@@ -191,7 +195,8 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOM
   }
 }
 
-void ParaMEDMEMComponent_i::setInterpolationOptions(long print_level,
+void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
+						    long print_level,
 						    const char * intersection_type,
 						    double precision,
 						    double median_plane,
@@ -211,6 +216,7 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(long print_level,
       thread_st *st = new thread_st;
       st->ip = ip;
       st->tior = _tior;
+      st->coupling = coupling;
       st->print_level = print_level;
       st->intersection_type = intersection_type;
       st->precision = precision;
@@ -227,19 +233,22 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(long print_level,
     }
   }
 
-  INTERP_KERNEL::InterpolationOptions::setInterpolationOptions(print_level,
-							       intersection_type,
-							       precision,
-							       median_plane,
-							       do_rotate,
-							       bounding_box_adjustment,
-							       bounding_box_adjustment_abs,
-							       max_distance_for_3Dsurf_intersect,
-							       orientation,
-							       measure_abs,
-							       splitting_policy,
-							       P1P0_bary_method );
+  if(!_dec_options[coupling])
+    _dec_options[coupling] = new INTERP_KERNEL::InterpolationOptions();
 
+  _dec_options[coupling]->setInterpolationOptions(print_level,
+						  intersection_type,
+						  precision,
+						  median_plane,
+						  do_rotate,
+						  bounding_box_adjustment,
+						  bounding_box_adjustment_abs,
+						  max_distance_for_3Dsurf_intersect,
+						  orientation,
+						  measure_abs,
+						  splitting_policy,
+						  P1P0_bary_method );
+  
   if(_numproc == 0){
     for(int ip=1;ip<_nbproc;ip++)
       pthread_join(th[ip],NULL);
@@ -272,20 +281,8 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, MEDCouplingFie
       else
 	_dec[coupling] = new InterpKernelDEC(*_source[coupling], *_target[coupling]);
 
-      if(_setInterpolationOptions){
-	_dec[coupling]->setPrintLevel(_print_level);
-	_dec[coupling]->setIntersectionType(_intersection_type);
-	_dec[coupling]->setPrecision(_precision);
-	_dec[coupling]->setMedianPlane(_median_plane);
-	_dec[coupling]->setDoRotate(_do_rotate);
-	_dec[coupling]->setBoundingBoxAdjustment(_bounding_box_adjustment);
-	_dec[coupling]->setBoundingBoxAdjustmentAbs(_bounding_box_adjustment_abs);
-	_dec[coupling]->setMaxDistance3DSurfIntersect(_max_distance_for_3Dsurf_intersect);
-	_dec[coupling]->setOrientation(_orientation);
-	_dec[coupling]->setMeasureAbsStatus(_measure_abs);
-	_dec[coupling]->setSplittingPolicy(_splitting_policy);
-	_dec[coupling]->setP1P0BaryMethod(_P1P0_bary_method);
-      }
+      if(_dec_options[coupling])
+	_dec[coupling]->copyOptions(*(_dec_options[coupling]));
       
       //Attaching the field to the DEC
       _dec[coupling]->attachLocalField(field);
@@ -327,20 +324,8 @@ void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, MEDCouplingFi
       else
 	_dec[coupling] = new InterpKernelDEC(*_target[coupling], *_source[coupling]);
   
-      if(_setInterpolationOptions){
-	_dec[coupling]->setPrintLevel(_print_level);
-	_dec[coupling]->setIntersectionType(_intersection_type);
-	_dec[coupling]->setPrecision(_precision);
-	_dec[coupling]->setMedianPlane(_median_plane);
-	_dec[coupling]->setDoRotate(_do_rotate);
-	_dec[coupling]->setBoundingBoxAdjustment(_bounding_box_adjustment);
-	_dec[coupling]->setBoundingBoxAdjustmentAbs(_bounding_box_adjustment_abs);
-	_dec[coupling]->setMaxDistance3DSurfIntersect(_max_distance_for_3Dsurf_intersect);
-	_dec[coupling]->setOrientation(_orientation);
-	_dec[coupling]->setMeasureAbsStatus(_measure_abs);
-	_dec[coupling]->setSplittingPolicy(_splitting_policy);
-	_dec[coupling]->setP1P0BaryMethod(_P1P0_bary_method);
-      }
+      if(_dec_options[coupling])
+	_dec[coupling]->copyOptions(*(_dec_options[coupling]));
       
       //Attaching the field to the DEC
       _dec[coupling]->attachLocalField(field);
@@ -369,7 +354,8 @@ void *th_setinterpolationoptions(void *s)
 {
   thread_st *st = (thread_st*)s;
   try{
-    (SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]))->setInterpolationOptions(st->print_level,
+    (SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]))->setInterpolationOptions(st->coupling.c_str(),
+											       st->print_level,
 											       st->intersection_type,
 											       st->precision,
 											       st->median_plane,

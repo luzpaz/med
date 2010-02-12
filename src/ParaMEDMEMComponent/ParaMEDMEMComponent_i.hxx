@@ -61,7 +61,7 @@ typedef struct {
 
 namespace ParaMEDMEM
 {
-  class ParaMEDMEMComponent_i : public POA_SALOME_MED::ParaMEDMEMComponent, public Engines_Component_i, public MPIObject_i, public INTERP_KERNEL::InterpolationOptions
+  class ParaMEDMEMComponent_i : public POA_SALOME_MED::ParaMEDMEMComponent, public Engines_Component_i, public MPIObject_i
   {
 
   public:
@@ -77,7 +77,8 @@ namespace ParaMEDMEM
     
     // Destructor
     ~ParaMEDMEMComponent_i();
-    void setInterpolationOptions(long print_level,
+    void setInterpolationOptions(const char * coupling,
+				 long print_level,
 				 const char * intersection_type,
 				 double precision,
 				 double median_plane,
@@ -94,14 +95,15 @@ namespace ParaMEDMEM
     void _getOutputField(const char * coupling, MEDCouplingFieldDouble* field);
     
   protected:
-    std::map<std::string,ProcessorGroup*> _commgroup;
     void _setInputField(const char * coupling, MEDCouplingFieldDouble* field);
     
   private:
     int _gsize, _grank;
     CommInterface* _interface;
-    std::map<std::string,MPIProcessorGroup*> _source, _target;
     std::map<std::string,InterpKernelDEC*> _dec;
+    std::map<std::string,MPIProcessorGroup*> _source, _target;
+    std::map<std::string,ProcessorGroup*> _commgroup;
+    std::map<std::string,INTERP_KERNEL::InterpolationOptions*> _dec_options;
   };
 }
 #endif
