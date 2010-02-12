@@ -35,6 +35,4 @@ libmedcouplingclient_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) -I$(top_bu
 	-I$(srcdir)/../../MEDCoupling -I$(srcdir)/../../INTERP_KERNEL/Bases
 libmedcouplingclient_la_LDFLAGS= \
 	../../../idl/libSalomeIDLMED.la \
-	../../MEDCoupling/libmedcoupling.la \
-	$(MED2_LIBS) \
-	$(HDF5_LIBS)
+	../../MEDCoupling/libmedcoupling.la

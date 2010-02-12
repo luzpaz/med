@@ -45,10 +45,7 @@ dist_libmedcouplingcorba_la_SOURCES=       \
 
 libmedcouplingcorba_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) -I$(top_builddir)/idl ${KERNEL_CXXFLAGS} \
 	-I$(srcdir)/../MEDCoupling -I$(srcdir)/../INTERP_KERNEL/Bases
+
 libmedcouplingcorba_la_LDFLAGS= \
 	../../idl/libSalomeIDLMED.la \
-	../MEDCoupling/libmedcoupling.la \
-	$(MED2_LIBS) \
-	$(HDF5_LIBS)
-
-# ${KERNEL_LDFLAGS} -lSalomeLifeCycleCORBA -lSALOMELocalTrace -lSalomeCommunication -lSalomeGenericObj -lSalomeNS -lOpUtil
+	../MEDCoupling/libmedcoupling.la 
