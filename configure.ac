@@ -715,6 +715,8 @@ AC_OUTPUT([ \
         src/MEDCouplingCorba/Makefile \
         src/MEDCouplingCorba/Client/Makefile \
         src/MEDCouplingCorba/Test/Makefile \
+	src/MEDCouplingCorba_Swig/Makefile \
+	src/MEDCouplingCorba_Swig/Client/Makefile \
         src/MEDSPLITTER/Makefile \
         src/MEDSPLITTER/Test/Makefile \
         src/MEDSPLITTER_Swig/Makefile \

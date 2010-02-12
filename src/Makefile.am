@@ -89,7 +89,7 @@ if MED_ENABLE_RENUMBER
 endif
 
 if MED_ENABLE_KERNEL
-    KERNEL_SUBDIRS = $(MULTIPR_SUBDIRS) MEDCouplingCorba MEDMEM_I MED MedCorba_Swig MED_SWIG MedClient
+    KERNEL_SUBDIRS = $(MULTIPR_SUBDIRS) MEDCouplingCorba MEDCouplingCorba_Swig MEDMEM_I MED MedCorba_Swig MED_SWIG MedClient
 
 if MPI_IS_OK
   KERNEL_SUBDIRS += ParaMEDMEMComponent ParaMEDCouplingCorba
