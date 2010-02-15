@@ -357,7 +357,8 @@ void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, MEDCouplingFi
 void *th_getdatabympi(void *s)
 {
   thread_st *st = (thread_st*)s;
-  (SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface::_narrow((*(st->tior))[st->ip]))->getDataByMPI(st->coupling.c_str());
+  SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_var fieldPtr=SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface::_narrow((*(st->tior))[st->ip]);
+  fieldPtr->getDataByMPI(st->coupling.c_str());
   delete st;
   return NULL;
 }
@@ -367,19 +368,20 @@ void *th_setinterpolationoptions(void *s)
   thread_st *st = (thread_st*)s;
   try
     {
-      (SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]))->setInterpolationOptions(st->coupling.c_str(),
-                                                                                                 st->print_level,
-                                                                                                 st->intersection_type,
-                                                                                                 st->precision,
-                                                                                                 st->median_plane,
-                                                                                                 st->do_rotate,
-                                                                                                 st->bounding_box_adjustment,
-                                                                                                 st->bounding_box_adjustment_abs,
-                                                                                                 st->max_distance_for_3Dsurf_intersect,
-                                                                                                 st->orientation,
-                                                                                                 st->measure_abs,
-                                                                                                 st->splitting_policy,
-                                                                                                 st->P1P0_bary_method);
+      SALOME_MED::ParaMEDMEMComponent_var compo=SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]);
+      compo->setInterpolationOptions(st->coupling.c_str(),
+                                     st->print_level,
+                                     st->intersection_type,
+                                     st->precision,
+                                     st->median_plane,
+                                     st->do_rotate,
+                                     st->bounding_box_adjustment,
+                                     st->bounding_box_adjustment_abs,
+                                     st->max_distance_for_3Dsurf_intersect,
+                                     st->orientation,
+                                     st->measure_abs,
+                                     st->splitting_policy,
+                                     st->P1P0_bary_method);
     }
   catch(...)
     {
@@ -394,7 +396,8 @@ void *th_initializecoupling(void *s)
   thread_st *st = (thread_st*)s;
   try
     {
-      (SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]))->initializeCoupling(st->coupling.c_str());
+      SALOME_MED::ParaMEDMEMComponent_var compo=SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]);
+      compo->initializeCoupling(st->coupling.c_str());
     }
   catch(...)
     {
@@ -407,7 +410,8 @@ void *th_initializecoupling(void *s)
 void *th_terminatecoupling(void *s)
 {
   thread_st *st = (thread_st*)s;
-  (SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]))->terminateCoupling(st->coupling.c_str());
+  SALOME_MED::ParaMEDMEMComponent_var compo=SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]);
+  compo->terminateCoupling(st->coupling.c_str());
   delete st;
   return NULL;
 }

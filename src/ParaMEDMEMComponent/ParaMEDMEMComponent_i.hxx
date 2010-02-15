@@ -41,7 +41,8 @@ void * th_initializecoupling(void *st);
 void * th_terminatecoupling(void *st);
 void * th_getdatabympi(void *st);
 
-typedef struct {
+typedef struct
+{
   int ip;
   long print_level;
   const char * intersection_type;
