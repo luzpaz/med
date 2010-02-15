@@ -50,9 +50,10 @@ void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling) throw(
         }
     }
 
-  try{
-    _pcompo->_getOutputField(coupling,_field);
-  }
+  try
+    {
+      _pcompo->_getOutputField(coupling,_field);
+    }
   catch(const POException &ex)
     {
       // exception
@@ -73,12 +74,13 @@ void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling) throw(
         {
           pthread_join(th[ip],&ret_th);
           exception = (bool*)ret_th;
-          if(*exception){
-            // exception
-            ostringstream msg;
-            msg << "Error on get data by mpi on process " << ip;
-            THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
-          }
+          if(*exception)
+            {
+              // exception
+              ostringstream msg;
+              msg << "Error on get data by mpi on process " << ip;
+              THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+            }
           delete exception;
         }
       delete[] th;
