@@ -39,7 +39,6 @@
 void * th_setinterpolationoptions(void *st);
 void * th_initializecoupling(void *st);
 void * th_terminatecoupling(void *st);
-void * th_getdatabympi(void *st);
 
 typedef struct
 {

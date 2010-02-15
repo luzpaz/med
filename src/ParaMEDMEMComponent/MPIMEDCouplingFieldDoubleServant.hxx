@@ -29,6 +29,8 @@
 #include "MEDCouplingFieldDouble.hxx"
 #include "MEDCouplingFieldDoubleServant.hxx"
 
+void * th_getdatabympi(void *st);
+
 namespace ParaMEDMEM
 {
   class MPIMEDCouplingFieldDoubleServant : public POA_SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface,

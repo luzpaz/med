@@ -364,15 +364,6 @@ void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, MEDCouplingFi
   _dec[coupling]->sendData();
 }
 
-void *th_getdatabympi(void *s)
-{
-  thread_st *st = (thread_st*)s;
-  SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_var fieldPtr=SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface::_narrow((*(st->tior))[st->ip]);
-  fieldPtr->getDataByMPI(st->coupling.c_str());
-  delete st;
-  return NULL;
-}
-
 void *th_setinterpolationoptions(void *s)
 {
   thread_st *st = (thread_st*)s;
