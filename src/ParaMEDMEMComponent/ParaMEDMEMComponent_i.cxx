@@ -49,6 +49,8 @@ ParaMEDMEMComponent_i::~ParaMEDMEMComponent_i()
 
 void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALOME::SALOME_Exception)
 {
+  bool *exception;
+  void *ret_th;
   pthread_t *th;
   if(_numproc == 0)
     {
@@ -132,14 +134,25 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
 
   if(_numproc == 0)
     {
-      for(int ip=1;ip<_nbproc;ip++)
-        pthread_join(th[ip],NULL);
+      for(int ip=1;ip<_nbproc;ip++){
+        pthread_join(th[ip],&ret_th);
+        exception = (bool*)ret_th;
+        if(*exception){
+          // exception
+          ostringstream msg;
+          msg << "Error on initialize coupling on process " << ip;
+          THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+        }
+        delete exception;
+      }
       delete[] th;
     }
 }
 
 void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOME::SALOME_Exception)
 {
+  bool *exception;
+  void *ret_th;
   pthread_t *th;
   if(_numproc == 0)
     {
@@ -201,8 +214,17 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOM
 
   if(_numproc == 0)
     {
-      for(int ip=1;ip<_nbproc;ip++)
-        pthread_join(th[ip],NULL);
+      for(int ip=1;ip<_nbproc;ip++){
+        pthread_join(th[ip],&ret_th);
+        exception = (bool*)ret_th;
+        if(*exception){
+          // exception
+          ostringstream msg;
+          msg << "Error on terminate coupling on process " << ip;
+          THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+        }
+        delete exception;
+      }
       delete[] th;
     }
 }
@@ -221,6 +243,8 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
                                                     const char * splitting_policy,
                                                     bool P1P0_bary_method ) throw(SALOME::SALOME_Exception)
 {
+  bool *exception;
+  void *ret_th;
   pthread_t *th;
   if(_numproc == 0)
     {
@@ -267,15 +291,24 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
     {
       // exception
       ostringstream msg;
-      msg << "Error on setting options";
+      msg << "[" << _numproc << "] Error on setting options";
       MESSAGE(msg.str());
       THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
     }
   
   if(_numproc == 0)
     {
-      for(int ip=1;ip<_nbproc;ip++)
-        pthread_join(th[ip],NULL);
+      for(int ip=1;ip<_nbproc;ip++){
+        pthread_join(th[ip],&ret_th);
+        exception = (bool*)ret_th;
+        if(*exception){
+          // exception
+          ostringstream msg;
+          msg << "Error on setting options on process " << ip;
+          THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+        }
+        delete exception;
+      }
       delete[] th;
     }
 }
@@ -367,6 +400,8 @@ void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, MEDCouplingFi
 void *th_setinterpolationoptions(void *s)
 {
   thread_st *st = (thread_st*)s;
+  bool *exception = new bool;
+  *exception = false;
   try
     {
       SALOME_MED::ParaMEDMEMComponent_var compo=SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]);
@@ -386,15 +421,17 @@ void *th_setinterpolationoptions(void *s)
     }
   catch(...)
     {
-      cerr << "Caught an exception in a thread on process: " << st->ip << endl;
+      *exception = true;
     }
   delete st;
-  return NULL;
+  return((void*)exception);
 }
 
 void *th_initializecoupling(void *s)
 {
   thread_st *st = (thread_st*)s;
+  bool *exception = new bool;
+  *exception = false;
   try
     {
       SALOME_MED::ParaMEDMEMComponent_var compo=SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]);
@@ -402,18 +439,27 @@ void *th_initializecoupling(void *s)
     }
   catch(...)
     {
-      cerr << "Caught an exception in a thread on process: " << st->ip << endl;
+      *exception = true;
     }
   delete st;
-  return NULL;
+  return((void*)exception);
 }
 
 void *th_terminatecoupling(void *s)
 {
   thread_st *st = (thread_st*)s;
-  SALOME_MED::ParaMEDMEMComponent_var compo=SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]);
-  compo->terminateCoupling(st->coupling.c_str());
+  bool *exception = new bool;
+  *exception = false;
+  try
+    {
+      SALOME_MED::ParaMEDMEMComponent_var compo=SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]);
+      compo->terminateCoupling(st->coupling.c_str());
+    }
+  catch(...)
+    {
+      *exception = true;
+    }
   delete st;
-  return NULL;
+  return((void*)exception);
 }
 
