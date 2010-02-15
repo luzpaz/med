@@ -50,4 +50,4 @@ _libMEDCouplingCorba_Swig_la_LDFLAGS  = -module $(PYTHON_LIBS) \
 
 CLEANFILES = libMEDCouplingCorba_Swig_wrap.cxx libMEDCouplingCorba_Swig.py
 
-nodist_salomescript_DATA= libMEDCouplingCorba_Swig.py
+dist_salomescript_DATA= libMEDCouplingCorba_Swig.py

@@ -1,4 +1,168 @@
 from libMEDCoupling_Swig import *
+import os
+
+class MEDCouplingCorbaServBasicsTest:
+    def build2DMesh(self):
+        targetCoords=[-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 ];
+        targetConn=[0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4]
+        targetMesh=MEDCouplingUMesh.New();
+        targetMesh.setMeshDimension(2);
+        targetMesh.setName("MyMesh2D");
+        targetMesh.allocateCells(5);
+        targetMesh.insertNextCell(NORM_QUAD4,4,targetConn[0:4]);
+        targetMesh.insertNextCell(NORM_TRI3,3,targetConn[4:7]);
+        targetMesh.insertNextCell(NORM_TRI3,3,targetConn[7:10]);
+        targetMesh.insertNextCell(NORM_QUAD4,4,targetConn[10:14]);
+        targetMesh.insertNextCell(NORM_QUAD4,4,targetConn[14:18]);
+        targetMesh.finishInsertingCells();
+        myCoords=DataArrayDouble.New();
+        myCoords.setValues(targetCoords,9,2);
+        targetMesh.setCoords(myCoords);
+        return targetMesh;
+    
+    def build3DMesh(self):
+        targetCoords=[ 0., 0., 0., 50., 0., 0. , 200., 0., 0.  , 0., 50., 0., 50., 50., 0. , 200., 50., 0.,   0., 200., 0., 50., 200., 0. , 200., 200., 0. ,
+                       0., 0., 50., 50., 0., 50. , 200., 0., 50.  , 0., 50., 50., 50., 50., 50. , 200., 50., 50.,   0., 200., 50., 50., 200., 50. , 200., 200., 50. ,
+                       0., 0., 200., 50., 0., 200. , 200., 0., 200.  , 0., 50., 200., 50., 50., 200. , 200., 50., 200.,   0., 200., 200., 50., 200., 200. , 200., 200., 200. ];
+        targetConn=[0,1,4,3,9,10,13,12, 1,2,5,4,10,11,14,13, 3,4,7,6,12,13,16,15, 4,5,8,7,13,14,17,16,
+                    9,10,13,12,18,19,22,21, 10,11,14,13,19,20,23,22, 12,13,16,15,21,22,25,24, 13,14,17,16,22,23,26,25];
+        targetMesh=MEDCouplingUMesh.New();
+        targetMesh.setMeshDimension(3);
+        targetMesh.setName("MyMesh3D");
+        targetMesh.allocateCells(12);
+        for i in xrange(8):
+            targetMesh.insertNextCell(NORM_HEXA8,8,targetConn[8*i:8*(i+1)]);
+            pass
+        targetMesh.finishInsertingCells();
+        myCoords=DataArrayDouble.New();
+        myCoords.setValues(targetCoords,27,3);
+        targetMesh.setCoords(myCoords)
+        return targetMesh;
+
+    def build3DSurfMesh(self):
+        targetCoords=[-0.3,-0.3,0.5, 0.2,-0.3,1., 0.7,-0.3,1.5, -0.3,0.2,0.5, 0.2,0.2,1., 0.7,0.2,1.5, -0.3,0.7,0.5, 0.2,0.7,1., 0.7,0.7,1.5];
+        targetConn=[0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4];
+        targetMesh=MEDCouplingUMesh.New();
+        targetMesh.setMeshDimension(2);
+        targetMesh.setName("MyMesh3DSurf");
+        targetMesh.allocateCells(5);
+        targetMesh.insertNextCell(NORM_QUAD4,4,targetConn[0:4]);
+        targetMesh.insertNextCell(NORM_TRI3,3,targetConn[4:7]);
+        targetMesh.insertNextCell(NORM_TRI3,3,targetConn[7:10]);
+        targetMesh.insertNextCell(NORM_QUAD4,4,targetConn[10:14]);
+        targetMesh.insertNextCell(NORM_QUAD4,4,targetConn[14:18]);
+        targetMesh.finishInsertingCells();
+        myCoords=DataArrayDouble.New();
+        myCoords.setValues(targetCoords,9,3);
+        targetMesh.setCoords(myCoords);
+        myCoords.setInfoOnComponent(0,"X (m)");
+        myCoords.setInfoOnComponent(1,"X (dm)");
+        myCoords.setInfoOnComponent(2,"X (m)");
+        return targetMesh;
+
+    def build0DMesh(self):
+        targetCoords=[-0.3,-0.3,0.5, 0.2,-0.3,1., 0.7,-0.3,1.5, -0.3,0.2,0.5, 0.2,0.2,1., 0.7,0.2,1.5, -0.3,0.7,0.5, 0.2,0.7,1., 0.7,0.7,1.5];
+        targetMesh=MEDCouplingUMesh.New();
+        targetMesh.setMeshDimension(0);
+        targetMesh.allocateCells(8);
+        targetMesh.setName("Wonderfull 0D mesh");
+        targetConn=[]
+        targetMesh.insertNextCell(NORM_POINT0,0,targetConn);
+        targetMesh.insertNextCell(NORM_POINT0,0,targetConn);
+        targetMesh.insertNextCell(NORM_POINT0,0,targetConn);
+        targetMesh.insertNextCell(NORM_POINT0,0,targetConn);
+        targetMesh.insertNextCell(NORM_POINT0,0,targetConn);
+        targetMesh.insertNextCell(NORM_POINT0,0,targetConn);
+        targetMesh.insertNextCell(NORM_POINT0,0,targetConn);
+        targetMesh.insertNextCell(NORM_POINT0,0,targetConn);
+        targetMesh.finishInsertingCells();
+        myCoords=DataArrayDouble.New();
+        myCoords.setValues(targetCoords,9,3);
+        targetMesh.setCoords(myCoords);
+        myCoords.setInfoOnComponent(0,"X (m)");
+        myCoords.setInfoOnComponent(1,"YY (Pm)");
+        myCoords.setInfoOnComponent(2,"ZZZ (m)");
+        targetMesh.checkCoherency();
+        return targetMesh;
+
+    def buildM1DMesh(self):
+        meshM1D=MEDCouplingUMesh.New("wonderfull -1 D mesh",-1);
+        meshM1D.checkCoherency();
+        return meshM1D;
+
+    def buildFieldScalarOn2DNT(self):
+        mesh=self.build2DMesh();
+        fieldOnCells=MEDCouplingFieldDouble.New(ON_CELLS,NO_TIME);
+        fieldOnCells.setName("toto");
+        fieldOnCells.setMesh(mesh);
+        array=DataArrayDouble.New();
+        tmp=mesh.getNumberOfCells()*6*[7.]
+        array.setValues(tmp,mesh.getNumberOfCells(),6);
+        fieldOnCells.setArray(array)
+        fieldOnCells.checkCoherency();
+        return fieldOnCells;
+
+    def buildFieldNodeScalarOn2DNT(self):
+        mesh=self.build2DMesh();
+        fieldOnNodes=MEDCouplingFieldDouble.New(ON_NODES,NO_TIME);
+        fieldOnNodes.setName("toto2");
+        fieldOnNodes.setDescription("my wonderful field toto2");
+        fieldOnNodes.setMesh(mesh);
+        array=DataArrayDouble.New();
+        tmp=mesh.getNumberOfNodes()*5*[7.1234]
+        array.setValues(tmp,mesh.getNumberOfNodes(),5);
+        fieldOnNodes.setArray(array);
+        fieldOnNodes.checkCoherency();
+        return fieldOnNodes;
+
+    def buildFieldScalarOn3DNT(self):
+        mesh=self.build3DMesh();
+        fieldOnCells=MEDCouplingFieldDouble.New(ON_CELLS,NO_TIME);
+        fieldOnCells.setNature(ConservativeVolumic);
+        fieldOnCells.setName("toto");
+        fieldOnCells.setDescription("my wonderful 3D field toto2");
+        fieldOnCells.setMesh(mesh);
+        array=DataArrayDouble.New();
+        tmp=mesh.getNumberOfCells()*6*[7.]
+        array.setValues(tmp,mesh.getNumberOfCells(),6);
+        fieldOnCells.setArray(array);
+        fieldOnCells.checkCoherency();
+        return fieldOnCells;
+
+    def buildFieldScalarOn3DSurfWT(self):
+        mesh=self.build3DSurfMesh();
+        fieldOnCells=MEDCouplingFieldDouble.New(ON_CELLS,ONE_TIME);
+        fieldOnCells.setName("toto25");
+        fieldOnCells.setDescription("my wonderful 3D surf field toto25");
+        fieldOnCells.setMesh(mesh);
+        array=DataArrayDouble.New();
+        tmp=mesh.getNumberOfCells()*3*[7.]
+        array.setValues(tmp,mesh.getNumberOfCells(),3);
+        fieldOnCells.setArray(array);
+        fieldOnCells.setTime(6.7,1,4);
+        fieldOnCells.checkCoherency();
+        return fieldOnCells;
+
+    def buildFieldScalarOn3DSurfCOTI(self):
+        mesh=self.build3DSurfMesh();
+        fieldOnCells=MEDCouplingFieldDouble.New(ON_CELLS,CONST_ON_TIME_INTERVAL);
+        fieldOnCells.setName("toto26");
+        fieldOnCells.setDescription("my wonderful 3D surf field toto26");
+        fieldOnCells.setMesh(mesh);
+        array=DataArrayDouble.New();
+        tmp=mesh.getNumberOfCells()*3*[7.]
+        array.setValues(tmp,mesh.getNumberOfCells(),3);
+        fieldOnCells.setArray(array);
+        fieldOnCells.setStartTime(6.7,1,4);
+        fieldOnCells.setEndTime(7.2,2,8);
+        fieldOnCells.checkCoherency();
+        return fieldOnCells;
+
+    def buildFileNameForIOR(self):
+        ret=os.getenv("TMP");
+        ret+="/entryPointMEDCouplingCorba.ior";
+        return ret;
+    pass
 
 def testMesh():
     tab4=[1, 2, 8, 7, 2, 3, 9, 8, 3,
@@ -44,5 +208,3 @@ def testField():
     field.setArray(myCoords)
     return field
 
-FileIOR1="toto1.ior"
-FileIOR2="toto2.ior"
