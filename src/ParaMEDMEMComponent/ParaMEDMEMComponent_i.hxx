@@ -68,28 +68,28 @@ namespace ParaMEDMEM
     // Constructor
     ParaMEDMEMComponent_i();
     ParaMEDMEMComponent_i(int nbproc, int numproc,
-			  CORBA::ORB_ptr orb,
-			  PortableServer::POA_ptr poa, 
-			  PortableServer::ObjectId * contId, 
-			  const char *instanceName,
-			  const char *interfaceName,
-			  bool regist);
+                          CORBA::ORB_ptr orb,
+                          PortableServer::POA_ptr poa, 
+                          PortableServer::ObjectId * contId, 
+                          const char *instanceName,
+                          const char *interfaceName,
+                          bool regist);
     
     // Destructor
     ~ParaMEDMEMComponent_i();
     void setInterpolationOptions(const char * coupling,
-				 long print_level,
-				 const char * intersection_type,
-				 double precision,
-				 double median_plane,
-				 bool do_rotate,
-				 double bounding_box_adjustment,
-				 double bounding_box_adjustment_abs,
-				 double max_distance_for_3Dsurf_intersect,
-				 long orientation,
-				 bool measure_abs,
-				 const char * splitting_policy,
-				 bool P1P0_bary_method );
+                                 long print_level,
+                                 const char * intersection_type,
+                                 double precision,
+                                 double median_plane,
+                                 bool do_rotate,
+                                 double bounding_box_adjustment,
+                                 double bounding_box_adjustment_abs,
+                                 double max_distance_for_3Dsurf_intersect,
+                                 long orientation,
+                                 bool measure_abs,
+                                 const char * splitting_policy,
+                                 bool P1P0_bary_method );
     void initializeCoupling(const char * coupling) throw(SALOME::SALOME_Exception);
     void terminateCoupling(const char * coupling) throw(SALOME::SALOME_Exception);
     void _getOutputField(const char * coupling, MEDCouplingFieldDouble* field);

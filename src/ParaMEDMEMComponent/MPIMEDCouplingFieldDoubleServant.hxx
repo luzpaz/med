@@ -32,8 +32,8 @@
 namespace ParaMEDMEM
 {
   class MPIMEDCouplingFieldDoubleServant : public POA_SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface,
-					   public MEDCouplingFieldDoubleServant,
-					   public MPIObject_i
+                                           public MEDCouplingFieldDoubleServant,
+                                           public MPIObject_i
   {
   public:
     MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,MEDCouplingFieldDouble* field);

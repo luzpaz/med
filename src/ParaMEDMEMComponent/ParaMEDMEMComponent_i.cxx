@@ -26,7 +26,7 @@ using namespace ParaMEDMEM;
 
 ParaMEDMEMComponent_i::ParaMEDMEMComponent_i() : Engines_Component_i(), MPIObject_i()
 {
-  _interface = new CommInterface();
+  _interface = new CommInterface;
 }
 
 ParaMEDMEMComponent_i::ParaMEDMEMComponent_i(int nbproc, int numproc,
@@ -38,7 +38,7 @@ ParaMEDMEMComponent_i::ParaMEDMEMComponent_i(int nbproc, int numproc,
                                              bool regist)
   : Engines_Component_i(orb,poa,contId,instanceName,interfaceName,false,regist), MPIObject_i(nbproc,numproc)
 {
-  _interface = new CommInterface();
+  _interface = new CommInterface;
 }
 
 ParaMEDMEMComponent_i::~ParaMEDMEMComponent_i()
@@ -50,16 +50,18 @@ ParaMEDMEMComponent_i::~ParaMEDMEMComponent_i()
 void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALOME::SALOME_Exception)
 {
   pthread_t *th;
-  if(_numproc == 0){
-    th = new pthread_t[_nbproc];
-    for(int ip=1;ip<_nbproc;ip++){
-      thread_st *st = new thread_st;
-      st->ip = ip;
-      st->tior = _tior;
-      st->coupling = coupling;
-      pthread_create(&(th[ip]),NULL,th_initializecoupling,(void*)st);
+  if(_numproc == 0)
+    {
+      th = new pthread_t[_nbproc];
+      for(int ip=1;ip<_nbproc;ip++)
+        {
+          thread_st *st = new thread_st;
+          st->ip = ip;
+          st->tior = _tior;
+          st->coupling = coupling;
+          pthread_create(&(th[ip]),NULL,th_initializecoupling,(void*)st);
+        }
     }
-  }
 
   try{
     set<int> procs;
@@ -67,14 +69,14 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
     string service = coupling;
     if( service.size() == 0 )
       {
-	MESSAGE("[" << _numproc << "] You have to give a service name !");
-	throw POException(_numproc,"You have to give a service name !");
+        MESSAGE("[" << _numproc << "] You have to give a service name !");
+        throw POException(_numproc,"You have to give a service name !");
       }
     
     if( _gcom.find(service) != _gcom.end() )
       {
-	MESSAGE("[" << _numproc << "] service " << service << " already exist !");
-	throw POException(_numproc,"service " + service + " already exist !");
+        MESSAGE("[" << _numproc << "] service " << service << " already exist !");
+        throw POException(_numproc,"service " + service + " already exist !");
       }
 
     // Connection to distributed parallel component
@@ -94,69 +96,75 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
     // target is always the upper processor numbers
     if(_numproc==_grank)
       {
-	_source[coupling] = new MPIProcessorGroup(*_interface,0,_nbproc-1,_gcom[coupling]);
-	_target[coupling] = new MPIProcessorGroup(*_interface,_nbproc,_gsize-1,_gcom[coupling]);
-	_commgroup[coupling] = _source[coupling];
+        _source[coupling] = new MPIProcessorGroup(*_interface,0,_nbproc-1,_gcom[coupling]);
+        _target[coupling] = new MPIProcessorGroup(*_interface,_nbproc,_gsize-1,_gcom[coupling]);
+        _commgroup[coupling] = _source[coupling];
       }
     else
       {
-	_source[coupling] = new MPIProcessorGroup(*_interface,0,_gsize-_nbproc-1,_gcom[coupling]);
-	_target[coupling] = new MPIProcessorGroup(*_interface,_gsize-_nbproc,_gsize-1,_gcom[coupling]);
-	_commgroup[coupling] = _target[coupling];
+        _source[coupling] = new MPIProcessorGroup(*_interface,0,_gsize-_nbproc-1,_gcom[coupling]);
+        _target[coupling] = new MPIProcessorGroup(*_interface,_gsize-_nbproc,_gsize-1,_gcom[coupling]);
+        _commgroup[coupling] = _target[coupling];
       }
     
     _dec[coupling] = NULL;
     
   }
-  catch(const POException &ex){
-    // exception
-    ostringstream msg;
-    msg << ex.msg << " on process number " << ex.numproc;
-    MESSAGE(msg.str());
-    THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
-  }
-  catch(const INTERP_KERNEL::Exception &ex){
-    MESSAGE(ex.what());
-    THROW_SALOME_CORBA_EXCEPTION(ex.what(),SALOME::INTERNAL_ERROR);
-  }
-  catch(...){
-    MESSAGE("Unknown exception");
-    THROW_SALOME_CORBA_EXCEPTION("Unknown exception",SALOME::INTERNAL_ERROR);
-  }
+  catch(const POException &ex)
+    {
+      // exception
+      ostringstream msg;
+      msg << ex.msg << " on process number " << ex.numproc;
+      MESSAGE(msg.str());
+      THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+    }
+  catch(const INTERP_KERNEL::Exception &ex)
+    {
+      MESSAGE(ex.what());
+      THROW_SALOME_CORBA_EXCEPTION(ex.what(),SALOME::INTERNAL_ERROR);
+    }
+  catch(...)
+    {
+      MESSAGE("Unknown exception");
+      THROW_SALOME_CORBA_EXCEPTION("Unknown exception",SALOME::INTERNAL_ERROR);
+    }
 
-  if(_numproc == 0){
-    for(int ip=1;ip<_nbproc;ip++)
-      pthread_join(th[ip],NULL);
-    delete[] th;
-  }
+  if(_numproc == 0)
+    {
+      for(int ip=1;ip<_nbproc;ip++)
+        pthread_join(th[ip],NULL);
+      delete[] th;
+    }
 }
 
 void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOME::SALOME_Exception)
 {
   pthread_t *th;
-  if(_numproc == 0){
-    th = new pthread_t[_nbproc];
-    for(int ip=1;ip<_nbproc;ip++){
-      thread_st *st = new thread_st;
-      st->ip = ip;
-      st->tior = _tior;
-      st->coupling = coupling;
-      pthread_create(&(th[ip]),NULL,th_terminatecoupling,(void*)st);
+  if(_numproc == 0)
+    {
+      th = new pthread_t[_nbproc];
+      for(int ip=1;ip<_nbproc;ip++)
+        {
+          thread_st *st = new thread_st;
+          st->ip = ip;
+          st->tior = _tior;
+          st->coupling = coupling;
+          pthread_create(&(th[ip]),NULL,th_terminatecoupling,(void*)st);
+        }
     }
-  }
 
   try{
     string service = coupling;
     if( service.size() == 0 )
       {
-	MESSAGE("[" << _numproc << "] You have to give a service name !");
-	throw POException(_numproc,"You have to give a service name !");
+        MESSAGE("[" << _numproc << "] You have to give a service name !");
+        throw POException(_numproc,"You have to give a service name !");
       }
 
     if( _gcom.find(service) == _gcom.end() )
       {
-	MESSAGE("[" << _numproc << "] service " << service << " don't exist !");
-	throw POException(_numproc,"service " + service + " don't exist !");
+        MESSAGE("[" << _numproc << "] service " << service << " don't exist !");
+        throw POException(_numproc,"service " + service + " don't exist !");
       }
 
     // Disconnection to distributed parallel component
@@ -175,85 +183,91 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOM
     delete _dec[coupling];
     _dec.erase(coupling);
     _commgroup.erase(coupling);
-    if(_dec_options[coupling]){
-      delete _dec_options[coupling];
-      _dec_options.erase(coupling);
+    if(_dec_options[coupling])
+      {
+        delete _dec_options[coupling];
+        _dec_options.erase(coupling);
+      }
+  }
+  catch(const POException &ex)
+    {
+      // exception
+      ostringstream msg;
+      msg << ex.msg << " on process number " << ex.numproc;
+      MESSAGE(msg.str());
+      THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
     }
-  }
-  catch(const POException &ex){
-    // exception
-    ostringstream msg;
-    msg << ex.msg << " on process number " << ex.numproc;
-    MESSAGE(msg.str());
-    THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
-  }
 
-  if(_numproc == 0){
-    for(int ip=1;ip<_nbproc;ip++)
-      pthread_join(th[ip],NULL);
-    delete[] th;
-  }
+  if(_numproc == 0)
+    {
+      for(int ip=1;ip<_nbproc;ip++)
+        pthread_join(th[ip],NULL);
+      delete[] th;
+    }
 }
 
 void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
-						    long print_level,
-						    const char * intersection_type,
-						    double precision,
-						    double median_plane,
-						    bool do_rotate,
-						    double bounding_box_adjustment,
-						    double bounding_box_adjustment_abs,
-						    double max_distance_for_3Dsurf_intersect,
-						    long orientation,
-						    bool measure_abs,
-						    const char * splitting_policy,
-						    bool P1P0_bary_method )
+                                                    long print_level,
+                                                    const char * intersection_type,
+                                                    double precision,
+                                                    double median_plane,
+                                                    bool do_rotate,
+                                                    double bounding_box_adjustment,
+                                                    double bounding_box_adjustment_abs,
+                                                    double max_distance_for_3Dsurf_intersect,
+                                                    long orientation,
+                                                    bool measure_abs,
+                                                    const char * splitting_policy,
+                                                    bool P1P0_bary_method )
 {
   pthread_t *th;
-  if(_numproc == 0){
-    th = new pthread_t[_nbproc];
-    for(int ip=1;ip<_nbproc;ip++){
-      thread_st *st = new thread_st;
-      st->ip = ip;
-      st->tior = _tior;
-      st->coupling = coupling;
-      st->print_level = print_level;
-      st->intersection_type = intersection_type;
-      st->precision = precision;
-      st->median_plane = median_plane;
-      st->do_rotate = do_rotate;
-      st->bounding_box_adjustment = bounding_box_adjustment;
-      st->bounding_box_adjustment_abs = bounding_box_adjustment_abs;
-      st->max_distance_for_3Dsurf_intersect = max_distance_for_3Dsurf_intersect;
-      st->orientation = orientation;
-      st->measure_abs = measure_abs;
-      st->splitting_policy = splitting_policy;
-      st->P1P0_bary_method = P1P0_bary_method;
-      pthread_create(&(th[ip]),NULL,th_setinterpolationoptions,(void*)st);
+  if(_numproc == 0)
+    {
+      th = new pthread_t[_nbproc];
+      for(int ip=1;ip<_nbproc;ip++)
+        {
+          thread_st *st = new thread_st;
+          st->ip = ip;
+          st->tior = _tior;
+          st->coupling = coupling;
+          st->print_level = print_level;
+          st->intersection_type = intersection_type;
+          st->precision = precision;
+          st->median_plane = median_plane;
+          st->do_rotate = do_rotate;
+          st->bounding_box_adjustment = bounding_box_adjustment;
+          st->bounding_box_adjustment_abs = bounding_box_adjustment_abs;
+          st->max_distance_for_3Dsurf_intersect = max_distance_for_3Dsurf_intersect;
+          st->orientation = orientation;
+          st->measure_abs = measure_abs;
+          st->splitting_policy = splitting_policy;
+          st->P1P0_bary_method = P1P0_bary_method;
+          pthread_create(&(th[ip]),NULL,th_setinterpolationoptions,(void*)st);
+        }
     }
-  }
 
   if(!_dec_options[coupling])
-    _dec_options[coupling] = new INTERP_KERNEL::InterpolationOptions();
+    _dec_options[coupling] = new INTERP_KERNEL::InterpolationOptions;
 
   _dec_options[coupling]->setInterpolationOptions(print_level,
-						  intersection_type,
-						  precision,
-						  median_plane,
-						  do_rotate,
-						  bounding_box_adjustment,
-						  bounding_box_adjustment_abs,
-						  max_distance_for_3Dsurf_intersect,
-						  orientation,
-						  measure_abs,
-						  splitting_policy,
-						  P1P0_bary_method );
+                                                  intersection_type,
+                                                  precision,
+                                                  median_plane,
+                                                  do_rotate,
+                                                  bounding_box_adjustment,
+                                                  bounding_box_adjustment_abs,
+                                                  max_distance_for_3Dsurf_intersect,
+                                                  orientation,
+                                                  measure_abs,
+                                                  splitting_policy,
+                                                  P1P0_bary_method );
   
-  if(_numproc == 0){
-    for(int ip=1;ip<_nbproc;ip++)
-      pthread_join(th[ip],NULL);
-    delete[] th;
-  }
+  if(_numproc == 0)
+    {
+      for(int ip=1;ip<_nbproc;ip++)
+        pthread_join(th[ip],NULL);
+      delete[] th;
+    }
 }
 
 void ParaMEDMEMComponent_i::_setInputField(const char * coupling, MEDCouplingFieldDouble *field)
@@ -277,12 +291,12 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, MEDCouplingFie
       // Creating the intersection Data Exchange Channel
       // Processors which received the field are always the second argument of InterpKernelDEC object
       if(_numproc==_grank)
-	_dec[coupling] = new InterpKernelDEC(*_target[coupling], *_source[coupling]);
+        _dec[coupling] = new InterpKernelDEC(*_target[coupling], *_source[coupling]);
       else
-	_dec[coupling] = new InterpKernelDEC(*_source[coupling], *_target[coupling]);
+        _dec[coupling] = new InterpKernelDEC(*_source[coupling], *_target[coupling]);
 
       if(_dec_options[coupling])
-	_dec[coupling]->copyOptions(*(_dec_options[coupling]));
+        _dec[coupling]->copyOptions(*(_dec_options[coupling]));
       
       //Attaching the field to the DEC
       _dec[coupling]->attachLocalField(field);
@@ -292,7 +306,7 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, MEDCouplingFie
 
     }
   else
-  //Attaching the field to the DEC
+    //Attaching the field to the DEC
     _dec[coupling]->attachLocalField(field);
   
   //Receiving data
@@ -316,26 +330,24 @@ void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, MEDCouplingFi
 
   if(!_dec[coupling])
     {
-
       // Creating the intersection Data Exchange Channel
       // Processors which sent the field are always the first argument of InterpKernelDEC object
       if(_numproc==_grank)
-	_dec[coupling] = new InterpKernelDEC(*_source[coupling], *_target[coupling]);
+        _dec[coupling] = new InterpKernelDEC(*_source[coupling], *_target[coupling]);
       else
-	_dec[coupling] = new InterpKernelDEC(*_target[coupling], *_source[coupling]);
+        _dec[coupling] = new InterpKernelDEC(*_target[coupling], *_source[coupling]);
   
       if(_dec_options[coupling])
-	_dec[coupling]->copyOptions(*(_dec_options[coupling]));
+        _dec[coupling]->copyOptions(*(_dec_options[coupling]));
       
       //Attaching the field to the DEC
       _dec[coupling]->attachLocalField(field);
     
       // computing the interpolation matrix
       _dec[coupling]->synchronize();
-
     }
   else
-  //Attaching the field to the DEC
+    //Attaching the field to the DEC
     _dec[coupling]->attachLocalField(field);
 
   //Sending data
@@ -353,24 +365,26 @@ void *th_getdatabympi(void *s)
 void *th_setinterpolationoptions(void *s)
 {
   thread_st *st = (thread_st*)s;
-  try{
-    (SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]))->setInterpolationOptions(st->coupling.c_str(),
-											       st->print_level,
-											       st->intersection_type,
-											       st->precision,
-											       st->median_plane,
-											       st->do_rotate,
-											       st->bounding_box_adjustment,
-											       st->bounding_box_adjustment_abs,
-											       st->max_distance_for_3Dsurf_intersect,
-											       st->orientation,
-											       st->measure_abs,
-											       st->splitting_policy,
-											       st->P1P0_bary_method);
-  }
-  catch(...){
-    cerr << "Caught an exception in a thread on process: " << st->ip << endl;
-  }
+  try
+    {
+      (SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]))->setInterpolationOptions(st->coupling.c_str(),
+                                                                                                 st->print_level,
+                                                                                                 st->intersection_type,
+                                                                                                 st->precision,
+                                                                                                 st->median_plane,
+                                                                                                 st->do_rotate,
+                                                                                                 st->bounding_box_adjustment,
+                                                                                                 st->bounding_box_adjustment_abs,
+                                                                                                 st->max_distance_for_3Dsurf_intersect,
+                                                                                                 st->orientation,
+                                                                                                 st->measure_abs,
+                                                                                                 st->splitting_policy,
+                                                                                                 st->P1P0_bary_method);
+    }
+  catch(...)
+    {
+      cerr << "Caught an exception in a thread on process: " << st->ip << endl;
+    }
   delete st;
   return NULL;
 }
@@ -378,12 +392,14 @@ void *th_setinterpolationoptions(void *s)
 void *th_initializecoupling(void *s)
 {
   thread_st *st = (thread_st*)s;
-  try{
-    (SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]))->initializeCoupling(st->coupling.c_str());
-  }
-  catch(...){
-    cerr << "Caught an exception in a thread on process: " << st->ip << endl;
-  }
+  try
+    {
+      (SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]))->initializeCoupling(st->coupling.c_str());
+    }
+  catch(...)
+    {
+      cerr << "Caught an exception in a thread on process: " << st->ip << endl;
+    }
   delete st;
   return NULL;
 }

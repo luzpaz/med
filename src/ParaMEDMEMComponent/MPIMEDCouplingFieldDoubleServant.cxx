@@ -35,24 +35,27 @@ MPIMEDCouplingFieldDoubleServant::MPIMEDCouplingFieldDoubleServant(CORBA::ORB_pt
 void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling)
 {
   pthread_t *th;
-  if(_numproc == 0){
-    th = new pthread_t[_nbproc];
-    for(int ip=1;ip<_nbproc;ip++){
-      thread_st *st = new thread_st;
-      st->ip = ip;
-      st->tior = _tior;
-      st->coupling = coupling;
-      pthread_create(&(th[ip]),NULL,th_getdatabympi,(void*)st);
+  if(_numproc == 0)
+    {
+      th = new pthread_t[_nbproc];
+      for(int ip=1;ip<_nbproc;ip++)
+        {
+          thread_st *st = new thread_st;
+          st->ip = ip;
+          st->tior = _tior;
+          st->coupling = coupling;
+          pthread_create(&(th[ip]),NULL,th_getdatabympi,(void*)st);
+        }
     }
-  }
 
   _pcompo->_getOutputField(coupling,_field);
     
-  if(_numproc == 0){
-    for(int ip=1;ip<_nbproc;ip++)
-      pthread_join(th[ip],NULL);
-    delete[] th;
-  }
+  if(_numproc == 0)
+    {
+      for(int ip=1;ip<_nbproc;ip++)
+        pthread_join(th[ip],NULL);
+      delete[] th;
+    }
 }
 
 void MPIMEDCouplingFieldDoubleServant::Register()
