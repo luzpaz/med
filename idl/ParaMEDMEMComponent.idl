@@ -38,7 +38,7 @@ module SALOME_MED
 {
   interface MPIMEDCouplingFieldDoubleCorbaInterface:MEDCouplingFieldDoubleCorbaInterface,Engines::MPIObject
   {
-    void getDataByMPI(in string coupling);
+    void getDataByMPI(in string coupling) raises (SALOME::SALOME_Exception);
   };
 
   interface ParaMEDMEMComponent:Engines::Component,Engines::MPIObject

@@ -32,8 +32,10 @@ MPIMEDCouplingFieldDoubleServant::MPIMEDCouplingFieldDoubleServant(CORBA::ORB_pt
   BCastIOR(orb,pobj,false);
 }
 
-void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling)
+void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling) throw(SALOME::SALOME_Exception)
 {
+  bool *exception;
+  void *ret_th;
   pthread_t *th;
   if(_numproc == 0)
     {
@@ -48,12 +50,37 @@ void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling)
         }
     }
 
-  _pcompo->_getOutputField(coupling,_field);
+  try{
+    _pcompo->_getOutputField(coupling,_field);
+  }
+  catch(const POException &ex)
+    {
+      // exception
+      ostringstream msg;
+      msg << ex.msg << " on process number " << ex.numproc;
+      MESSAGE(msg.str());
+      THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+    }
+  catch(...)
+    {
+      MESSAGE("Unknown exception");
+      THROW_SALOME_CORBA_EXCEPTION("Unknown exception",SALOME::INTERNAL_ERROR);
+    }
     
   if(_numproc == 0)
     {
       for(int ip=1;ip<_nbproc;ip++)
-        pthread_join(th[ip],NULL);
+        {
+          pthread_join(th[ip],&ret_th);
+          exception = (bool*)ret_th;
+          if(*exception){
+            // exception
+            ostringstream msg;
+            msg << "Error on get data by mpi on process " << ip;
+            THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+          }
+          delete exception;
+        }
       delete[] th;
     }
 }
@@ -83,9 +110,18 @@ void MPIMEDCouplingFieldDoubleServant::Destroy()
 void *th_getdatabympi(void *s)
 {
   thread_st *st = (thread_st*)s;
-  SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_var fieldPtr=SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface::_narrow((*(st->tior))[st->ip]);
-  fieldPtr->getDataByMPI(st->coupling.c_str());
+  bool *exception = new bool;
+  *exception = false;
+  try
+    {
+      SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_var fieldPtr=SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface::_narrow((*(st->tior))[st->ip]);
+      fieldPtr->getDataByMPI(st->coupling.c_str());
+    }
+  catch(...)
+    {
+      *exception = true;
+    }
   delete st;
-  return NULL;
+  return((void*)exception);
 }
 

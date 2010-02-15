@@ -39,7 +39,7 @@ namespace ParaMEDMEM
   {
   public:
     MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,MEDCouplingFieldDouble* field);
-    void getDataByMPI(const char* coupling);
+    void getDataByMPI(const char* coupling) throw(SALOME::SALOME_Exception);
     void Register();
     void Destroy();
   private:
