@@ -108,6 +108,7 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
       }
     
     _dec[coupling] = NULL;
+    _dec_options[coupling] = NULL;
     
   }
   catch(const POException &ex)
@@ -218,7 +219,7 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
                                                     long orientation,
                                                     bool measure_abs,
                                                     const char * splitting_policy,
-                                                    bool P1P0_bary_method )
+                                                    bool P1P0_bary_method ) throw(SALOME::SALOME_Exception)
 {
   pthread_t *th;
   if(_numproc == 0)
@@ -249,18 +250,27 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
   if(!_dec_options[coupling])
     _dec_options[coupling] = new INTERP_KERNEL::InterpolationOptions;
 
-  _dec_options[coupling]->setInterpolationOptions(print_level,
-                                                  intersection_type,
-                                                  precision,
-                                                  median_plane,
-                                                  do_rotate,
-                                                  bounding_box_adjustment,
-                                                  bounding_box_adjustment_abs,
-                                                  max_distance_for_3Dsurf_intersect,
-                                                  orientation,
-                                                  measure_abs,
-                                                  splitting_policy,
-                                                  P1P0_bary_method );
+  bool ret = _dec_options[coupling]->setInterpolationOptions(print_level,
+                                                             intersection_type,
+                                                             precision,
+                                                             median_plane,
+                                                             do_rotate,
+                                                             bounding_box_adjustment,
+                                                             bounding_box_adjustment_abs,
+                                                             max_distance_for_3Dsurf_intersect,
+                                                             orientation,
+                                                             measure_abs,
+                                                             splitting_policy,
+                                                             P1P0_bary_method );
+
+  if(!ret)
+    {
+      // exception
+      ostringstream msg;
+      msg << "Error on setting options";
+      MESSAGE(msg.str());
+      THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+    }
   
   if(_numproc == 0)
     {

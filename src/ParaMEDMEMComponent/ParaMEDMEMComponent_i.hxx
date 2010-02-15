@@ -90,7 +90,7 @@ namespace ParaMEDMEM
                                  long orientation,
                                  bool measure_abs,
                                  const char * splitting_policy,
-                                 bool P1P0_bary_method );
+                                 bool P1P0_bary_method ) throw(SALOME::SALOME_Exception);
     void initializeCoupling(const char * coupling) throw(SALOME::SALOME_Exception);
     void terminateCoupling(const char * coupling) throw(SALOME::SALOME_Exception);
     void _getOutputField(const char * coupling, MEDCouplingFieldDouble* field);
