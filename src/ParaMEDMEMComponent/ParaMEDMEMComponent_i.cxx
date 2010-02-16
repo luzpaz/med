@@ -134,17 +134,19 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
 
   if(_numproc == 0)
     {
-      for(int ip=1;ip<_nbproc;ip++){
-        pthread_join(th[ip],&ret_th);
-        exception = (bool*)ret_th;
-        if(*exception){
-          // exception
-          ostringstream msg;
-          msg << "Error on initialize coupling on process " << ip;
-          THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+      for(int ip=1;ip<_nbproc;ip++)
+        {
+          pthread_join(th[ip],&ret_th);
+          exception = (bool*)ret_th;
+          if(*exception)
+            {
+              // exception
+              ostringstream msg;
+              msg << "Error on initialize coupling on process " << ip;
+              THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+            }
+          delete exception;
         }
-        delete exception;
-      }
       delete[] th;
     }
 }
@@ -214,17 +216,19 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOM
 
   if(_numproc == 0)
     {
-      for(int ip=1;ip<_nbproc;ip++){
-        pthread_join(th[ip],&ret_th);
-        exception = (bool*)ret_th;
-        if(*exception){
-          // exception
-          ostringstream msg;
-          msg << "Error on terminate coupling on process " << ip;
-          THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
-        }
-        delete exception;
-      }
+      for(int ip=1;ip<_nbproc;ip++)
+        {
+          pthread_join(th[ip],&ret_th);
+          exception = (bool*)ret_th;
+          if(*exception)
+            {
+              // exception
+              ostringstream msg;
+              msg << "Error on terminate coupling on process " << ip;
+              THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+            }
+          delete exception;
+        }x
       delete[] th;
     }
 }
@@ -298,17 +302,19 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
   
   if(_numproc == 0)
     {
-      for(int ip=1;ip<_nbproc;ip++){
-        pthread_join(th[ip],&ret_th);
-        exception = (bool*)ret_th;
-        if(*exception){
-          // exception
-          ostringstream msg;
-          msg << "Error on setting options on process " << ip;
-          THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+      for(int ip=1;ip<_nbproc;ip++)
+        {
+          pthread_join(th[ip],&ret_th);
+          exception = (bool*)ret_th;
+          if(*exception)
+            {
+              // exception
+              ostringstream msg;
+              msg << "Error on setting options on process " << ip;
+              THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+            }
+          delete exception;
         }
-        delete exception;
-      }
       delete[] th;
     }
 }
@@ -370,12 +376,13 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, SALOME_MED::MP
     {
       pthread_join(th,&ret_th);
       exception = (bool*)ret_th;
-      if(*exception){
-        // exception
-        ostringstream msg;
-        msg << "Error on get data by mpi";
-        THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
-      }
+      if(*exception)
+        {
+          // exception
+          ostringstream msg;
+          msg << "Error on get data by mpi";
+          THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+        }
       delete exception;
     }
 
