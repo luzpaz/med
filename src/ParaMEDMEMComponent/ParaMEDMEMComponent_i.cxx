@@ -228,7 +228,7 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOM
               THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
             }
           delete exception;
-        }x
+        }
       delete[] th;
     }
 }
