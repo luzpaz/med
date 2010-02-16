@@ -313,8 +313,19 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
     }
 }
 
-void ParaMEDMEMComponent_i::_setInputField(const char * coupling, MEDCouplingFieldDouble *field)
+void ParaMEDMEMComponent_i::_setInputField(const char * coupling, SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr, MEDCouplingFieldDouble *field)
 {
+  bool *exception;
+  void *ret_th;
+  pthread_t th;
+  if(_numproc == 0)
+    {
+      thread_st *st = new thread_st;
+      st->fieldptr = fieldptr;
+      st->coupling = coupling;
+      pthread_create(&th,NULL,th_getdata,(void*)st);
+    }
+
   string service = coupling;
   if( service.size() == 0 )
     {
@@ -354,6 +365,20 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, MEDCouplingFie
   
   //Receiving data
   _dec[coupling]->recvData();
+
+  if(_numproc == 0)
+    {
+      pthread_join(th,&ret_th);
+      exception = (bool*)ret_th;
+      if(*exception){
+        // exception
+        ostringstream msg;
+        msg << "Error on get data by mpi";
+        THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+      }
+      delete exception;
+    }
+
 }
 
 void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, MEDCouplingFieldDouble *field)
@@ -454,6 +479,23 @@ void *th_terminatecoupling(void *s)
     {
       SALOME_MED::ParaMEDMEMComponent_var compo=SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]);
       compo->terminateCoupling(st->coupling.c_str());
+    }
+  catch(...)
+    {
+      *exception = true;
+    }
+  delete st;
+  return((void*)exception);
+}
+
+void *th_getdata(void *s)
+{
+  thread_st *st = (thread_st*)s;
+  bool *exception = new bool;
+  *exception = false;
+  try
+    {
+      st->fieldptr->getDataByMPI(st->coupling.c_str());
     }
   catch(...)
     {

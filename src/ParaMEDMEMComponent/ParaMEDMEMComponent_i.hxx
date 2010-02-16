@@ -39,6 +39,7 @@
 void * th_setinterpolationoptions(void *st);
 void * th_initializecoupling(void *st);
 void * th_terminatecoupling(void *st);
+void * th_getdata(void *st);
 
 typedef struct
 {
@@ -57,6 +58,7 @@ typedef struct
   bool P1P0_bary_method;
   std::string coupling;
   Engines::IORTab* tior;
+  SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr;
 } thread_st;
 
 namespace ParaMEDMEM
@@ -95,7 +97,7 @@ namespace ParaMEDMEM
     void _getOutputField(const char * coupling, MEDCouplingFieldDouble* field);
     
   protected:
-    void _setInputField(const char * coupling, MEDCouplingFieldDouble* field);
+    void _setInputField(const char * coupling, SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr, MEDCouplingFieldDouble* field);
     
   private:
     int _gsize, _grank;
