@@ -159,9 +159,12 @@ libmedmem_la_CXXFLAGS= @CXXTMPDPTHFLAGS@
 
 # change motivated by the bug KERNEL4778.
 libmedmem_la_LDFLAGS=$(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
-	../MEDWrapper/Base/libMEDWrapperBase.la $(STDLIB) ../INTERP_KERNEL/libinterpkernel.la \
-	../MEDWrapper/Factory/libMEDWrapper.la ../MEDWrapper/V2_2/libMEDWrapper_V2_2.la \
+	../MEDWrapper/Base/libMEDWrapperBase.la $(STDLIB) ../INTERP_KERNEL/libinterpkernel.la
+if MED_ENABLE_KERNEL
+libmedmem_la_LDFLAGS+=../MEDWrapper/Factory/libMEDWrapper.la \
+	../MEDWrapper/V2_2/libMEDWrapper_V2_2.la \
 	../MEDWrapper/V2_1/Wrapper/libMEDWrapper_V2_1.la
+endif
 
 
 AM_CPPFLAGS+= $(libmedmem_la_CPPFLAGS)
