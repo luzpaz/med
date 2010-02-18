@@ -108,5 +108,8 @@ SUBDIRS = $(COMMON_SUBDIRS) $(PARAMEDMEM_SUBDIRS) $(BASE_SUBDIRS) $(INTERPTEST_S
 
 DIST_SUBDIRS= MEDWrapper INTERP_KERNEL MEDMEM MEDCoupling MEDCoupling_Swig INTERPOLATION MEDMEM_SWIG    \
               MEDMEMBinTest MEDMEMCppTest INTERP_KERNELTest ParaMEDMEM ParaMEDMEM_Swig MEDLoader        \
-	      MEDSPLITTER MEDSPLITTER_Swig RENUMBER MULTIPR MEDCouplingCorba MEDMEM_I MED MED_SWIG MedCorba_Swig \
-	      ParaMEDLoader MedClient ParaMEDMEMComponent ParaMEDCouplingCorba MEDGUI ParaMEDMEMTest
+	      MEDSPLITTER MEDSPLITTER_Swig RENUMBER MULTIPR MEDCouplingCorba MEDCouplingCorba_Swig      \
+	      MEDMEM_I MED MED_SWIG MedCorba_Swig ParaMEDLoader MedClient ParaMEDMEMComponent           \
+	      ParaMEDCouplingCorba MEDGUI ParaMEDMEMTest
+							
+							
