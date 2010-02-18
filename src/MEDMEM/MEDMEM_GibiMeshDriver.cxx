@@ -1219,6 +1219,36 @@ bool GIBI_MESH_RDONLY_DRIVER::getLine(char* & aLine)
 }
 
 //=======================================================================
+//function : initNameReading
+//purpose  :
+//=======================================================================
+
+void GIBI_MESH_RDONLY_DRIVER::initNameReading(int nbValues, int width)
+{
+  init( nbValues, 72 / ( width + 1 ), width, 1 );
+}
+
+//=======================================================================
+//function : initIntReading
+//purpose  :
+//=======================================================================
+
+void GIBI_MESH_RDONLY_DRIVER::initIntReading(int nbValues)
+{
+  init( nbValues, 10, 8 );
+}
+
+//=======================================================================
+//function : initDoubleReading
+//purpose  :
+//=======================================================================
+
+void GIBI_MESH_RDONLY_DRIVER::initDoubleReading(int nbValues)
+{
+  init( nbValues, 3, 22 );
+}
+
+//=======================================================================
 //function : init
 //purpose  :
 //=======================================================================
@@ -1272,6 +1302,16 @@ string GIBI_MESH_RDONLY_DRIVER::getName() const
   while (( _curPos[len-1] == ' ' || _curPos[len-1] == 0) && len > 0 )
     len--;
   return string( _curPos, len );
+}
+
+//=======================================================================
+//function : getInt
+//purpose  : int reading
+//=======================================================================
+
+int GIBI_MESH_RDONLY_DRIVER::getInt() const
+{
+  return atoi(str());
 }
 
 //=======================================================================

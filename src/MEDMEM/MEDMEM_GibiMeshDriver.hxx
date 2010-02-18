@@ -194,18 +194,15 @@ private:
     if ( raiseIfNot ) throw MEDEXCEPTION(LOCALIZED(STRING("Unexpected EOF on ln ")<<_lineNb));
     return false;
   }
-  void initNameReading(int nbValues, int width = 8)  // FORMAT(8(1X,A8))
-  { init( nbValues, 72 / ( width + 1 ), width, 1 ); }
-  void initIntReading(int nbValues) //  FORMAT(10I8)
-  { init( nbValues, 10, 8 ); }
-  void initDoubleReading(int nbValues) //  FORMAT(1P,3E22.14)
-  { init( nbValues, 3, 22 ); }
+  void initNameReading(int nbValues, int width = 8);  // FORMAT(8(1X,A8))
+  void initIntReading(int nbValues); //  FORMAT(10I8)
+  void initDoubleReading(int nbValues); //  FORMAT(1P,3E22.14)
   void init( int nbToRead, int nbPosInLine, int width, int shift = 0 );
   bool more() const { return ( _iRead < _nbToRead && _curPos ); }
   void next();
   char* str() const { return _curPos; }
   int index() const { return _iRead; }
-  int getInt() const { return atoi( str() ); }
+  int getInt() const;
   double getDouble() const;
   string getName() const;
 
