@@ -60,6 +60,7 @@ void MEDCouplingPointSetServant::getSerialisationData(SALOME_MED::long_array_out
       la->length(lgth);
       for(int i=0;i<lgth;i++)
         (*la)[i]=data[i];
+      array1->decrRef();
     }
   //
   da=new SALOME_MED::double_array;
@@ -71,7 +72,6 @@ void MEDCouplingPointSetServant::getSerialisationData(SALOME_MED::long_array_out
       for(int i=0;i<lgth;i++)
         (*da)[i]=data2[i];
       //
-      array1->decrRef();
       array2->decrRef();
     }
 }
