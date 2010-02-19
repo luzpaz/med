@@ -30,10 +30,10 @@ dist_libparamedmemcompo_la_SOURCES= MPIMEDCouplingFieldDoubleServant.cxx ParaMED
 
 #libmedmem_la_LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 libparamedmemcompo_la_CPPFLAGS= $(KERNEL_CXXFLAGS) $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) $(MPI_INCLUDES) @CXXTMPDPTHFLAGS@ \
-	-I$(srcdir)/../ParaMEDMEM -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases -I$(srcdir)/../INTERP_KERNEL/Geometric2D -I$(srcdir)/../MEDCoupling -I$(srcdir)/../MEDCouplingCorba -I$(top_builddir)/idl
+	-I$(srcdir)/../ParaMEDCouplingCorba -I$(srcdir)/../ParaMEDMEM -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases -I$(srcdir)/../INTERP_KERNEL/Geometric2D -I$(srcdir)/../MEDCoupling -I$(srcdir)/../MEDCouplingCorba -I$(top_builddir)/idl
 
 # change motivated by the bug KERNEL4778.
-libparamedmemcompo_la_LDFLAGS= ../ParaMEDMEM/libparamedmem.la $(MPI_LIBS)
+libparamedmemcompo_la_LDFLAGS= ../ParaMEDCouplingCorba/libparamedcouplingcorba.la ../ParaMEDMEM/libparamedmem.la $(MPI_LIBS)
 
 LDADD= -lm
 

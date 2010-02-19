@@ -25,23 +25,18 @@
 #include "SALOMEconfig.h"
 #include CORBA_SERVER_HEADER(ParaMEDMEMComponent)
 #include "ParaMEDMEMComponent_i.hxx"
-#include "MPIObject_i.hxx"
-#include "MEDCouplingFieldDouble.hxx"
-#include "MEDCouplingFieldDoubleServant.hxx"
+#include "ParaMEDCouplingFieldDoubleServant.hxx"
 
 void * th_getdatabympi(void *st);
 
 namespace ParaMEDMEM
 {
   class MPIMEDCouplingFieldDoubleServant : public POA_SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface,
-                                           public MEDCouplingFieldDoubleServant,
-                                           public MPIObject_i
+                                           public ParaMEDCouplingFieldDoubleServant
   {
   public:
     MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,MEDCouplingFieldDouble* field);
     void getDataByMPI(const char* coupling) throw(SALOME::SALOME_Exception);
-    void Register();
-    void Destroy();
   private:
     ParaMEDMEMComponent_i *_pcompo;
     MEDCouplingFieldDouble* _field;

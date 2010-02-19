@@ -24,7 +24,7 @@
 using namespace std;
 using namespace ParaMEDMEM;
 
-MPIMEDCouplingFieldDoubleServant::MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,MEDCouplingFieldDouble* field):MEDCouplingFieldDoubleServant(field),MPIObject_i()
+MPIMEDCouplingFieldDoubleServant::MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,MEDCouplingFieldDouble* field):ParaMEDCouplingFieldDoubleServant(orb,field)
 {
   _pcompo = pcompo;
   _field = field;
@@ -85,28 +85,6 @@ void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling) throw(
         }
       delete[] th;
     }
-}
-
-void MPIMEDCouplingFieldDoubleServant::Register()
-{
-  if(_numproc == 0)
-    for(int ip=1;ip<_nbproc;ip++)
-      {
-        SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_var fieldPtr=SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface::_narrow((*_tior)[ip]);
-        fieldPtr->Register();
-      }
-  MEDCouplingFieldDoubleServant::Register();
-}
-
-void MPIMEDCouplingFieldDoubleServant::Destroy()
-{
-  if(_numproc == 0)
-    for(int ip=1;ip<_nbproc;ip++)
-      {
-        SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_var fieldPtr=SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface::_narrow((*_tior)[ip]);
-        fieldPtr->Destroy();
-      }
-  MEDCouplingFieldDoubleServant::Destroy();
 }
 
 void *th_getdatabympi(void *s)

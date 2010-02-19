@@ -31,12 +31,12 @@
 namespace ParaMEDMEM
 {
   class ParaMEDCouplingFieldDoubleServant : public POA_SALOME_MED::ParaMEDCouplingFieldDoubleCorbaInterface,
-					    public MEDCouplingFieldDoubleServant,
-					    public MPIObject_i
+                                            public MEDCouplingFieldDoubleServant,
+                                            public MPIObject_i
   {
   public:
     ParaMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb, MEDCouplingFieldDouble* field);
-  public:
+
     void Register();
     void Destroy();
   };

@@ -31,12 +31,11 @@ This file contains the IDL definitions of the ParaMEDMEM component in %SALOME ap
 #define _SALOME_PARAMEDMEMCOMPO_IDL_
 
 #include "SALOME_Component.idl"
-#include "SALOME_MPIObject.idl"
-#include "MEDCouplingCorbaServant.idl"
+#include "ParaMEDCouplingCorbaServant.idl"
 
 module SALOME_MED
 {
-  interface MPIMEDCouplingFieldDoubleCorbaInterface:MEDCouplingFieldDoubleCorbaInterface,Engines::MPIObject
+  interface MPIMEDCouplingFieldDoubleCorbaInterface:ParaMEDCouplingFieldDoubleCorbaInterface
   {
     void getDataByMPI(in string coupling) raises (SALOME::SALOME_Exception);
   };

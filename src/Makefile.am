@@ -92,7 +92,7 @@ if MED_ENABLE_KERNEL
     KERNEL_SUBDIRS = $(MULTIPR_SUBDIRS) MEDCouplingCorba MEDCouplingCorba_Swig MEDMEM_I MED MedCorba_Swig MED_SWIG MedClient
 
 if MPI_IS_OK
-  KERNEL_SUBDIRS += ParaMEDMEMComponent ParaMEDCouplingCorba
+  KERNEL_SUBDIRS += ParaMEDCouplingCorba ParaMEDMEMComponent
 endif
 
 endif
@@ -111,5 +111,3 @@ DIST_SUBDIRS= MEDWrapper INTERP_KERNEL MEDMEM MEDCoupling MEDCoupling_Swig INTER
 	      MEDSPLITTER MEDSPLITTER_Swig RENUMBER MULTIPR MEDCouplingCorba MEDCouplingCorba_Swig      \
 	      MEDMEM_I MED MED_SWIG MedCorba_Swig ParaMEDLoader MedClient ParaMEDMEMComponent           \
 	      ParaMEDCouplingCorba MEDGUI ParaMEDMEMTest
-							
-							

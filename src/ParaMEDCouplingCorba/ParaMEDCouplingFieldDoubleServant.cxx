@@ -33,7 +33,10 @@ void ParaMEDCouplingFieldDoubleServant::Register()
 {
   if(_numproc == 0)
     for(int ip=1;ip<_nbproc;ip++)
-      (SALOME_MED::ParaMEDCouplingFieldDoubleCorbaInterface::_narrow((*_tior)[ip]))->Register();
+      {
+        SALOME_MED::ParaMEDCouplingFieldDoubleCorbaInterface_var fieldPtr=SALOME_MED::ParaMEDCouplingFieldDoubleCorbaInterface::_narrow((*_tior)[ip]);
+        fieldPtr->Register();
+      }
   MEDCouplingFieldDoubleServant::Register();
 }
 
@@ -41,6 +44,9 @@ void ParaMEDCouplingFieldDoubleServant::Destroy()
 {
   if(_numproc == 0)
     for(int ip=1;ip<_nbproc;ip++)
-      (SALOME_MED::ParaMEDCouplingFieldDoubleCorbaInterface::_narrow((*_tior)[ip]))->Destroy();
+      {
+        SALOME_MED::ParaMEDCouplingFieldDoubleCorbaInterface_var fieldPtr=SALOME_MED::ParaMEDCouplingFieldDoubleCorbaInterface::_narrow((*_tior)[ip]);
+        fieldPtr->Destroy();
+      }
   MEDCouplingFieldDoubleServant::Destroy();
 }

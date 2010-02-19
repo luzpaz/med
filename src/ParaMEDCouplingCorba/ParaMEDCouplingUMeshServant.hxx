@@ -30,12 +30,12 @@
 namespace ParaMEDMEM
 {
   class ParaMEDCouplingUMeshServant : public POA_SALOME_MED::ParaMEDCouplingUMeshCorbaInterface,
-				    public MEDCouplingUMeshServant,
-				    public MPIObject_i
+                                      public MEDCouplingUMeshServant,
+                                      public MPIObject_i
   {
   public:
     ParaMEDCouplingUMeshServant(CORBA::ORB_ptr orb, MEDCouplingUMesh* mesh);
-  public:
+
     void Register();
     void Destroy();
   };
