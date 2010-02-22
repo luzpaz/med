@@ -706,6 +706,7 @@ AC_OUTPUT([ \
         src/INTERP_KERNEL/Makefile \
         src/INTERP_KERNEL/Bases/Makefile \
         src/INTERP_KERNEL/Geometric2D/Makefile \
+	src/INTERP_KERNEL/ExprEval/Makefile \
         src/INTERP_KERNELTest/Makefile \
         src/MEDCoupling/Makefile \
         src/MEDCoupling/Test/Makefile \
