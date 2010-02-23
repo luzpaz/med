@@ -25,7 +25,7 @@ SUBDIRS = config_files
 
 EXTRA_DIST += SALOMEconfig.h.in
 
-if ! MED_ENABLE_KERNEL
+if !MED_ENABLE_KERNEL
   nodist_salomeinclude_HEADERS = SALOMEconfig.h
 endif
 
