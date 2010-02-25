@@ -41,6 +41,11 @@
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_VtkMeshDriver.hxx"
 
+#ifdef WNT
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
 #include <fcntl.h>
 
 /*!
@@ -381,7 +386,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
   if ( vtkFile > 0 )
   {
 #ifdef WNT
-    ssize_t fileSize = ::_lseek( vtkFile, 0, SEEK_END); ::lseek( vtkFile, 0, _SEEK_SET);
+    ssize_t fileSize = ::_lseek( vtkFile, 0, SEEK_END); ::lseek( vtkFile, 0, SEEK_SET);
     char* buf = new char[ fileSize ];
     ::_read (vtkFile, buf, fileSize );
 #else
