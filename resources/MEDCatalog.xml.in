@@ -42,8 +42,17 @@
   <objref name="SALOME_MED/FIELDINT" >
     <base>SALOME_MED/FIELD</base>
   </objref>
-  <objref name="SALOME_MED/MEDCouplingFieldDoubleCorbaInterface"/>
-  <objref name="SALOME_MED/MEDCouplingUMeshCorbaInterface"/>
+  <objref name="SALOME_MED/MEDCouplingFieldDoubleCorbaInterface" id="IDL:SALOME_MED/MEDCouplingFieldDoubleCorbaInterface:1.0"/>
+  <objref name="SALOME_MED/MEDCouplingUMeshCorbaInterface" id="IDL:SALOME_MED/MEDCouplingUMeshCorbaInterface:1.0"/>
+  <objref name="SALOME_MED/ParaMEDCouplingFieldDoubleCorbaInterface" id="IDL:SALOME_MED/ParaMEDCouplingFieldDoubleCorbaInterface:1.0">
+      <base>SALOME_MED/MEDCouplingFieldDoubleCorbaInterface</base>
+  </objref>
+  <objref name="SALOME_MED/ParaMEDCouplingUMeshCorbaInterface" id="IDL:SALOME_MED/ParaMEDCouplingUMeshCorbaInterface:1.0">
+      <base>SALOME_MED/MEDCouplingUMeshCorbaInterface</base>
+  </objref>
+  <objref name="SALOME_MED/MPIMEDCouplingFieldDoubleCorbaInterface" id="IDL:SALOME_MED/MPIMEDCouplingFieldDoubleCorbaInterface:1.0">
+    <base>SALOME_MED/ParaMEDCouplingFieldDoubleCorbaInterface</base>
+  </objref>
 </type-list>
 
 <!-- Component list -->
