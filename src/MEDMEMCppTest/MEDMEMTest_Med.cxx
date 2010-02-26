@@ -164,8 +164,8 @@ void MEDMEMTest::testMed()
   }
   CPPUNIT_ASSERT(field_names.size() != 0);
 
-  string field_names_1[nbFields];
-  string mesh_names_1[nbMeshes];
+  string* field_names_1 = new string[nbFields];
+  string* mesh_names_1 = new string[nbMeshes];
   //get field and mesh names
   try{
     myMed->getMeshNames(mesh_names_1);
@@ -438,4 +438,6 @@ void MEDMEMTest::testMed()
 
   delete myMed;
   delete myEmptyMed;
+  delete [] field_names_1;
+  delete [] mesh_names_1;
 }
