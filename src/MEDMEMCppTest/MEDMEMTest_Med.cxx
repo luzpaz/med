@@ -27,6 +27,10 @@
 #include <sstream>
 #include <cmath>
 
+#ifdef WNT
+#include <windows.h>
+#endif
+
 // use this define to enable lines, execution of which leads to Segmentation Fault
 //#define ENABLE_FAULTS
 
@@ -283,7 +287,11 @@ void MEDMEMTest::testMed()
   // write to file
   CPPUNIT_ASSERT_NO_THROW(myMed->write(idMedV21));
   // check, that the file is created on disk
+#ifdef WNT
+  CPPUNIT_ASSERT(GetFileAttributes(filenameout21.data()) & FILE_ATTRIBUTE_NORMAL);
+#else
   CPPUNIT_ASSERT(access(filenameout21.data(), F_OK) == 0);
+#endif
 
   // writeFrom
   CPPUNIT_ASSERT_THROW(myMed->writeFrom(idMedV21 + 1000), MEDEXCEPTION); // invalid driver index
@@ -297,7 +305,11 @@ void MEDMEMTest::testMed()
   // check, that the file is created on disk
   //#ifdef ENABLE_FORCED_FAILURES
   // ? (BUG) The file is not created.
+#ifdef WNT
+  CPPUNIT_ASSERT(GetFileAttributes(filenameout21_from.data()) & FILE_ATTRIBUTE_NORMAL);
+#else
   CPPUNIT_ASSERT(access(filenameout21_from.data(), F_OK) == 0);
+#endif
   // NOT a bug. writeFrom() should be removed from API
   //#endif
 

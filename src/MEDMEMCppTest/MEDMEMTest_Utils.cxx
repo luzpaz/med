@@ -25,6 +25,10 @@
 #include <list>
 #include <stdexcept>
 
+#ifdef WNT
+#include <windows.h>
+#endif
+
 //================================================================================
 /*!
  * \brief Get path to the resources file.
@@ -68,13 +72,18 @@ std::string getTmpDirectory()
   std::string path;
 
   std::list<std::string> dirs;
+  if ( getenv("TEMP") )   dirs.push_back( getenv("TEMP" ));
   if ( getenv("TMP") )    dirs.push_back( getenv("TMP" ));
   if ( getenv("TMPDIR") ) dirs.push_back( getenv("TMPDIR" ));
   dirs.push_back( "/tmp" );
 
   std::string tmpd = "";
   for ( std::list<std::string>::iterator dir = dirs.begin(); dir != dirs.end() && tmpd == "" ; ++dir ) {
+#ifdef WNT
+    if ( GetFileAttributes(dir->data()) & FILE_ATTRIBUTE_DIRECTORY ) {
+#else
     if ( access( dir->data(), W_OK ) == 0 ) {
+#endif
       tmpd = dir->data();
     }
   }
