@@ -21,6 +21,7 @@
 //
 #include "ParaMEDMEMComponent_i.hxx"
 #include "utilities.h"
+#include "Utils_SALOME_Exception.hxx"
 using namespace std;
 using namespace ParaMEDMEM;
 
@@ -52,6 +53,8 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
   bool *exception;
   void *ret_th;
   pthread_t *th;
+  ostringstream msg;
+
   if(_numproc == 0)
     {
       th = new pthread_t[_nbproc];
@@ -71,22 +74,22 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
     string service = coupling;
     if( service.size() == 0 )
       {
-        MESSAGE("[" << _numproc << "] You have to give a service name !");
-        throw POException(_numproc,"You have to give a service name !");
+        msg << "[" << _numproc << "] You have to give a service name !";
+        throw SALOME_Exception(msg.str().c_str());
       }
     
     if( _gcom.find(service) != _gcom.end() )
       {
-        MESSAGE("[" << _numproc << "] service " << service << " already exist !");
-        throw POException(_numproc,"service " + service + " already exist !");
+        msg << "[" << _numproc << "] service " << service << " already exist !";
+        throw SALOME_Exception(msg.str().c_str());
       }
 
     // Connection to distributed parallel component
 #ifdef HAVE_MPI2
     remoteMPI2Connect(coupling);
 #else
-    MESSAGE("[" << _numproc << "] You have to use a MPI2 compliant mpi implementation !");
-    throw POException(_numproc,"You have to use a MPI2 compliant mpi implementation !");
+    msg << "[" << _numproc << "] You have to use a MPI2 compliant mpi implementation !";
+    throw SALOME_Exception(msg.str.c_str());
 #endif
 
     MPI_Comm_size( _gcom[coupling], &_gsize );
@@ -113,23 +116,10 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
     _dec_options[coupling] = NULL;
     
   }
-  catch(const POException &ex)
-    {
-      // exception
-      ostringstream msg;
-      msg << ex.msg << " on process number " << ex.numproc;
-      MESSAGE(msg.str());
-      THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
-    }
-  catch(const INTERP_KERNEL::Exception &ex)
+  catch(const std::exception &ex)
     {
       MESSAGE(ex.what());
       THROW_SALOME_CORBA_EXCEPTION(ex.what(),SALOME::INTERNAL_ERROR);
-    }
-  catch(...)
-    {
-      MESSAGE("Unknown exception");
-      THROW_SALOME_CORBA_EXCEPTION("Unknown exception",SALOME::INTERNAL_ERROR);
     }
 
   if(_numproc == 0)
@@ -141,8 +131,7 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
           if(*exception)
             {
               // exception
-              ostringstream msg;
-              msg << "Error on initialize coupling on process " << ip;
+              msg << "[" << ip << "] Error on initialize coupling";
               THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
             }
           delete exception;
@@ -156,6 +145,8 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOM
   bool *exception;
   void *ret_th;
   pthread_t *th;
+  ostringstream msg;
+
   if(_numproc == 0)
     {
       th = new pthread_t[_nbproc];
@@ -173,22 +164,22 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOM
     string service = coupling;
     if( service.size() == 0 )
       {
-        MESSAGE("[" << _numproc << "] You have to give a service name !");
-        throw POException(_numproc,"You have to give a service name !");
+        msg << "[" << _numproc << "] You have to give a service name !";
+        throw SALOME_Exception(msg.str().c_str());
       }
 
     if( _gcom.find(service) == _gcom.end() )
       {
-        MESSAGE("[" << _numproc << "] service " << service << " don't exist !");
-        throw POException(_numproc,"service " + service + " don't exist !");
+        msg << "[" << _numproc << "] service " << service << " don't exist !";
+        throw SALOME_Exception(msg.str().c_str());
       }
 
     // Disconnection to distributed parallel component
 #ifdef HAVE_MPI2
     remoteMPI2Disconnect(coupling);
 #else
-    MESSAGE("[" << _numproc << "] You have to use a MPI2 compliant mpi implementation !");
-    throw POException(_numproc,"You have to use a MPI2 compliant mpi implementation !");
+    msg << "[" << _numproc << "] You have to use a MPI2 compliant mpi implementation !";
+    throw SALOME_Exception(msg.str.c_str());
 #endif
 
     /* Processors groups and DEC destruction */
@@ -205,13 +196,10 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOM
         _dec_options.erase(coupling);
       }
   }
-  catch(const POException &ex)
+  catch(const std::exception &ex)
     {
-      // exception
-      ostringstream msg;
-      msg << ex.msg << " on process number " << ex.numproc;
-      MESSAGE(msg.str());
-      THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+      MESSAGE(ex.what());
+      THROW_SALOME_CORBA_EXCEPTION(ex.what(),SALOME::INTERNAL_ERROR);
     }
 
   if(_numproc == 0)
@@ -250,6 +238,8 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
   bool *exception;
   void *ret_th;
   pthread_t *th;
+  ostringstream msg;
+
   if(_numproc == 0)
     {
       th = new pthread_t[_nbproc];
@@ -293,8 +283,6 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
 
   if(!ret)
     {
-      // exception
-      ostringstream msg;
       msg << "[" << _numproc << "] Error on setting options";
       MESSAGE(msg.str());
       THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
@@ -308,9 +296,7 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
           exception = (bool*)ret_th;
           if(*exception)
             {
-              // exception
-              ostringstream msg;
-              msg << "Error on setting options on process " << ip;
+              msg << "[" << ip << "] Error on setting options";
               THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
             }
           delete exception;
@@ -324,6 +310,8 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, SALOME_MED::MP
   bool *exception;
   void *ret_th;
   pthread_t th;
+  ostringstream msg;
+
   if(_numproc == 0)
     {
       thread_st *st = new thread_st;
@@ -335,14 +323,14 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, SALOME_MED::MP
   string service = coupling;
   if( service.size() == 0 )
     {
-      MESSAGE("[" << _numproc << "] You have to give a service name !");
-      throw POException(_numproc,"You have to give a service name !");
+      msg << "[" << _numproc << "] You have to give a service name !";
+      throw SALOME_Exception(msg.str().c_str());
     }
 
   if( _gcom.find(service) == _gcom.end() )
     {
-      MESSAGE("[" << _numproc << "] service " << service << " don't exist !");
-      throw POException(_numproc,"service " + service + " don't exist !");
+      msg << "[" << _numproc << "] service " << service << " don't exist !";
+      throw SALOME_Exception(msg.str().c_str());
     }
 
   if(!_dec[coupling])
@@ -379,7 +367,6 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, SALOME_MED::MP
       if(*exception)
         {
           // exception
-          ostringstream msg;
           msg << "Error on get data by mpi";
           THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
         }
@@ -391,16 +378,18 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, SALOME_MED::MP
 void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, MEDCouplingFieldDouble *field)
 {
   string service = coupling;
+  ostringstream msg;
+
   if( service.size() == 0 )
     {
-      MESSAGE("[" << _numproc << "] You have to give a service name !");
-      throw POException(_numproc,"You have to give a service name !");
+      msg << "[" << _numproc << "] You have to give a service name !";
+      throw SALOME_Exception(msg.str().c_str());
     }
 
   if( _gcom.find(service) == _gcom.end() )
     {
-      MESSAGE("[" << _numproc << "] service " << service << " don't exist !");
-      throw POException(_numproc,"service " + service + " don't exist !");
+      msg << "[" << _numproc << "] service " << service << " don't exist !";
+      throw SALOME_Exception(msg.str().c_str());
     }
 
   if(!_dec[coupling])

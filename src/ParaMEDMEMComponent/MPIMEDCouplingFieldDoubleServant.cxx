@@ -54,18 +54,10 @@ void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling) throw(
     {
       _pcompo->_getOutputField(coupling,_field);
     }
-  catch(const POException &ex)
+  catch(const std::exception &ex)
     {
-      // exception
-      ostringstream msg;
-      msg << ex.msg << " on process number " << ex.numproc;
-      MESSAGE(msg.str());
-      THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
-    }
-  catch(...)
-    {
-      MESSAGE("Unknown exception");
-      THROW_SALOME_CORBA_EXCEPTION("Unknown exception",SALOME::INTERNAL_ERROR);
+      MESSAGE(ex.what());
+      THROW_SALOME_CORBA_EXCEPTION(ex.what(),SALOME::INTERNAL_ERROR);
     }
     
   if(_numproc == 0)
