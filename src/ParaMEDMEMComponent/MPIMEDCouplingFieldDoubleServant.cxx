@@ -24,6 +24,12 @@
 using namespace std;
 using namespace ParaMEDMEM;
 
+typedef struct
+{
+  bool exception;
+  string msg;
+} except_st;
+
 MPIMEDCouplingFieldDoubleServant::MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,MEDCouplingFieldDouble* field):ParaMEDCouplingFieldDoubleServant(orb,field)
 {
   _pcompo = pcompo;
@@ -34,9 +40,10 @@ MPIMEDCouplingFieldDoubleServant::MPIMEDCouplingFieldDoubleServant(CORBA::ORB_pt
 
 void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling) throw(SALOME::SALOME_Exception)
 {
-  bool *exception;
+  except_st *est;
   void *ret_th;
   pthread_t *th;
+
   if(_numproc == 0)
     {
       th = new pthread_t[_nbproc];
@@ -65,15 +72,14 @@ void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling) throw(
       for(int ip=1;ip<_nbproc;ip++)
         {
           pthread_join(th[ip],&ret_th);
-          exception = (bool*)ret_th;
-          if(*exception)
+          est = (except_st*)ret_th;
+          if(est->exception)
             {
-              // exception
               ostringstream msg;
-              msg << "Error on get data by mpi on process " << ip;
+              msg << "[" << ip << "] " << est->msg;
               THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
             }
-          delete exception;
+          delete est;
         }
       delete[] th;
     }
@@ -81,19 +87,28 @@ void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling) throw(
 
 void *th_getdatabympi(void *s)
 {
+  ostringstream msg;
   thread_st *st = (thread_st*)s;
-  bool *exception = new bool;
-  *exception = false;
+  except_st *est = new except_st;
+  est->exception = false;
+
   try
     {
       SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_var fieldPtr=SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface::_narrow((*(st->tior))[st->ip]);
       fieldPtr->getDataByMPI(st->coupling.c_str());
     }
-  catch(...)
+  catch(const SALOME::SALOME_Exception &ex)
     {
-      *exception = true;
+      est->exception = true;
+      est->msg = ex.details.text;
+    }
+  catch(const CORBA::Exception &ex)
+    {
+      est->exception = true;
+      msg << "CORBA::Exception: " << ex;
+      est->msg = msg.str();
     }
   delete st;
-  return((void*)exception);
+  return((void*)est);
 }
 
