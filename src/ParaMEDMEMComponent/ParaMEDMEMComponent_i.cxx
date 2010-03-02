@@ -79,14 +79,11 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
 
     string service = coupling;
     if( service.size() == 0 )
-      {
-        msg << "[" << _numproc << "] You have to give a service name !";
-        throw SALOME_Exception(msg.str().c_str());
-      }
+      throw SALOME_Exception("You have to give a service name !");
     
     if( _gcom.find(service) != _gcom.end() )
       {
-        msg << "[" << _numproc << "] service " << service << " already exist !";
+        msg << "service " << service << " already exists !";
         throw SALOME_Exception(msg.str().c_str());
       }
 
@@ -94,8 +91,7 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
 #ifdef HAVE_MPI2
     remoteMPI2Connect(coupling);
 #else
-    msg << "[" << _numproc << "] You have to use a MPI2 compliant mpi implementation !";
-    throw SALOME_Exception(msg.str.c_str());
+    throw SALOME_Exception("You have to use a MPI2 compliant mpi implementation !");
 #endif
 
     MPI_Comm_size( _gcom[coupling], &_gsize );
@@ -168,14 +164,11 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOM
   try{
     string service = coupling;
     if( service.size() == 0 )
-      {
-        msg << "[" << _numproc << "] You have to give a service name !";
-        throw SALOME_Exception(msg.str().c_str());
-      }
+      throw SALOME_Exception("You have to give a service name !");
 
     if( _gcom.find(service) == _gcom.end() )
       {
-        msg << "[" << _numproc << "] service " << service << " don't exist !";
+        msg << "service " << service << " doesn't exist !";
         throw SALOME_Exception(msg.str().c_str());
       }
 
@@ -183,8 +176,7 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOM
 #ifdef HAVE_MPI2
     remoteMPI2Disconnect(coupling);
 #else
-    msg << "[" << _numproc << "] You have to use a MPI2 compliant mpi implementation !";
-    throw SALOME_Exception(msg.str.c_str());
+    throw SALOME_Exception("You have to use a MPI2 compliant mpi implementation !");
 #endif
 
     /* Processors groups and DEC destruction */
@@ -287,9 +279,8 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
 
   if(!ret)
     {
-      msg << "[" << _numproc << "] Error on setting options";
-      MESSAGE(msg.str());
-      THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+      MESSAGE("Error on setting options");
+      THROW_SALOME_CORBA_EXCEPTION("Error on setting options",SALOME::INTERNAL_ERROR);
     }
   
   if(_numproc == 0)
@@ -326,14 +317,11 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, SALOME_MED::MP
 
   string service = coupling;
   if( service.size() == 0 )
-    {
-      msg << "[" << _numproc << "] You have to give a service name !";
-      throw SALOME_Exception(msg.str().c_str());
-    }
+    throw SALOME_Exception("You have to give a service name !");
 
   if( _gcom.find(service) == _gcom.end() )
     {
-      msg << "[" << _numproc << "] service " << service << " don't exist !";
+      msg << "service " << service << " doesn't exist !";
       throw SALOME_Exception(msg.str().c_str());
     }
 
@@ -381,14 +369,11 @@ void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, MEDCouplingFi
   ostringstream msg;
 
   if( service.size() == 0 )
-    {
-      msg << "[" << _numproc << "] You have to give a service name !";
-      throw SALOME_Exception(msg.str().c_str());
-    }
+    throw SALOME_Exception("You have to give a service name !");
 
   if( _gcom.find(service) == _gcom.end() )
     {
-      msg << "[" << _numproc << "] service " << service << " don't exist !";
+      msg << "service " << service << " doesn't exist !";
       throw SALOME_Exception(msg.str().c_str());
     }
 
