@@ -279,8 +279,8 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
 
   if(!ret)
     {
-      MESSAGE("Error on setting options");
-      THROW_SALOME_CORBA_EXCEPTION("Error on setting options",SALOME::INTERNAL_ERROR);
+      MESSAGE("Error on setting interpolation options");
+      THROW_SALOME_CORBA_EXCEPTION("Error on setting interpolation options",SALOME::INTERNAL_ERROR);
     }
   
   if(_numproc == 0)
