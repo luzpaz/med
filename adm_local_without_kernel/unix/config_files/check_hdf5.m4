@@ -26,7 +26,7 @@ AC_REQUIRE([AC_PROG_CPP])dnl
 AC_CHECKING(for HDF5)
 
 AC_ARG_WITH(hdf5,
-    [  --with-hdf5=DIR                 root directory path to hdf5 installation ],
+    [AC_HELP_STRING([--with-hdf5=DIR],[root directory path to hdf5 installation])],
     [HDF5HOME="$withval"
       AC_MSG_RESULT("select $withval as path to hdf5")
     ])
@@ -43,17 +43,22 @@ hdf5_ok=no
 
 LOCAL_INCLUDES=""
 LOCAL_LIBS=""
+LOCAL_RLIBS=""
 
 if test -z $HDF5HOME
 then
    AC_MSG_WARN(undefined HDF5HOME variable which specify hdf5 installation directory)
+   AC_MSG_NOTICE(Trying native Hdf5...)
 else
    LOCAL_INCLUDES="-I$HDF5HOME/include"
    if test "x$HDF5HOME" = "x/usr"
    then
+      AC_MSG_NOTICE(Trying native Hdf5...)
       LOCAL_LIBS=""
    else
+      AC_MSG_NOTICE(Trying Hdf5 from $HDF5HOME ...)
       LOCAL_LIBS="-L$HDF5HOME/lib"
+      LOCAL_RLIBS="-R$HDF5HOME/lib"
    fi
 fi
 
@@ -80,8 +85,13 @@ fi
 if  test "x$hdf5_ok" = "xyes"
 then
   HDF5_INCLUDES="$LOCAL_INCLUDES"
-  HDF5_LIBS="$LOCAL_LIBS -lhdf5"
-  HDF5_MT_LIBS="$LOCAL_LIBS -lhdf5"
+  HDF5_LIBS="$LOCAL_LIBS -lhdf5 $LOCAL_RLIBS"
+  HDF5_MT_LIBS="$LOCAL_LIBS -lhdf5 $LOCAL_RLIBS"
+fi
+
+if  test "x$hdf5_ok" = "xyes"
+then
+  HDF5_INCLUDES="$HDF5_INCLUDES -DH5_USE_16_API"
 fi
 
 AC_MSG_RESULT(for hdf5: $hdf5_ok)
