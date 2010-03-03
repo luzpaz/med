@@ -100,7 +100,6 @@ namespace ParaMEDMEM
     void _setInputField(const char * coupling, SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr, MEDCouplingFieldDouble* field);
     
   private:
-    int _gsize, _grank;
     CommInterface* _interface;
     std::map<std::string,InterpKernelDEC*> _dec;
     std::map<std::string,MPIProcessorGroup*> _source, _target;

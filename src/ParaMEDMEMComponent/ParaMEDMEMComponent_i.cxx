@@ -56,6 +56,7 @@ ParaMEDMEMComponent_i::~ParaMEDMEMComponent_i()
 
 void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALOME::SALOME_Exception)
 {
+  int gsize, grank;
   except_st *est;
   void *ret_th;
   pthread_t *th;
@@ -94,23 +95,23 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
     throw SALOME_Exception("You have to use a MPI2 compliant mpi implementation !");
 #endif
 
-    MPI_Comm_size( _gcom[coupling], &_gsize );
-    MPI_Comm_rank( _gcom[coupling], &_grank );
-    MESSAGE("[" << _grank << "] new communicator of " << _gsize << " processes");
+    MPI_Comm_size( _gcom[coupling], &gsize );
+    MPI_Comm_rank( _gcom[coupling], &grank );
+    MESSAGE("[" << grank << "] new communicator of " << gsize << " processes");
 
     // Creation of processors group for ParaMEDMEM
     // source is always the lower processor numbers
     // target is always the upper processor numbers
-    if(_numproc==_grank)
+    if(_numproc==grank)
       {
         _source[coupling] = new MPIProcessorGroup(*_interface,0,_nbproc-1,_gcom[coupling]);
-        _target[coupling] = new MPIProcessorGroup(*_interface,_nbproc,_gsize-1,_gcom[coupling]);
+        _target[coupling] = new MPIProcessorGroup(*_interface,_nbproc,gsize-1,_gcom[coupling]);
         _commgroup[coupling] = _source[coupling];
       }
     else
       {
-        _source[coupling] = new MPIProcessorGroup(*_interface,0,_gsize-_nbproc-1,_gcom[coupling]);
-        _target[coupling] = new MPIProcessorGroup(*_interface,_gsize-_nbproc,_gsize-1,_gcom[coupling]);
+        _source[coupling] = new MPIProcessorGroup(*_interface,0,gsize-_nbproc-1,_gcom[coupling]);
+        _target[coupling] = new MPIProcessorGroup(*_interface,gsize-_nbproc,gsize-1,_gcom[coupling]);
         _commgroup[coupling] = _target[coupling];
       }
     
@@ -302,6 +303,7 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
 
 void ParaMEDMEMComponent_i::_setInputField(const char * coupling, SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr, MEDCouplingFieldDouble *field)
 {
+  int grank;
   except_st *est;
   void *ret_th;
   pthread_t th;
@@ -328,9 +330,11 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, SALOME_MED::MP
   if(!_dec[coupling])
     {
 
+      MPI_Comm_rank( _gcom[coupling], &grank );
+
       // Creating the intersection Data Exchange Channel
       // Processors which received the field are always the second argument of InterpKernelDEC object
-      if(_numproc==_grank)
+      if(_numproc==grank)
         _dec[coupling] = new InterpKernelDEC(*_target[coupling], *_source[coupling]);
       else
         _dec[coupling] = new InterpKernelDEC(*_source[coupling], *_target[coupling]);
@@ -365,6 +369,7 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, SALOME_MED::MP
 
 void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, MEDCouplingFieldDouble *field)
 {
+  int grank;
   string service = coupling;
   ostringstream msg;
 
@@ -379,9 +384,12 @@ void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, MEDCouplingFi
 
   if(!_dec[coupling])
     {
+
+      MPI_Comm_rank( _gcom[coupling], &grank );
+
       // Creating the intersection Data Exchange Channel
       // Processors which sent the field are always the first argument of InterpKernelDEC object
-      if(_numproc==_grank)
+      if(_numproc==grank)
         _dec[coupling] = new InterpKernelDEC(*_source[coupling], *_target[coupling]);
       else
         _dec[coupling] = new InterpKernelDEC(*_target[coupling], *_source[coupling]);
