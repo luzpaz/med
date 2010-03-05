@@ -49,6 +49,6 @@ namespace INTERP_KERNEL {
 
 std::list<int> PointLocator::locate(const double* x)
   {
-    return _point_locator->locates(x);
+    return _point_locator->locates(x,1e-12);
   }
 }
