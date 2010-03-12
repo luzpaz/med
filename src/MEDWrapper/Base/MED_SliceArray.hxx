@@ -62,7 +62,7 @@ namespace MED
       long int anId = -1;
       if(theId < mySlice.size()){
         anId = mySlice.start() + theId*mySlice.stride();
-        if(anId < mySourceSize)
+        if(anId < (long int)mySourceSize)
           return;
       }
       throw std::out_of_range("TCSlice::check_id");
