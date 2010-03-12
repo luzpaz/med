@@ -30,7 +30,8 @@ salomeinclude_HEADERS = Med_Gen_i.hxx Med_Gen_Driver_i.hxx
 
 libMEDEngine_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) ${KERNEL_CXXFLAGS} @CORBA_CXXFLAGS@ @CORBA_INCLUDES@ \
 	-I$(srcdir)/../MEDMEM_I -I$(top_builddir)/idl \
-	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core
+	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core\
+	-I$(srcdir)/../INTERP_KERNEL/Bases
 
 libMEDEngine_la_LDFLAGS=\
 	$(top_builddir)/idl/libSalomeIDLMED.la \

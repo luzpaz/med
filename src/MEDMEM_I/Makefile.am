@@ -47,7 +47,7 @@ dist_libMEDMEMImpl_la_SOURCES= \
 	MEDMEM_convert.cxx   
 
 libMEDMEMImpl_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) ${KERNEL_CXXFLAGS} \
-	-I$(srcdir)/../MEDMEM -I$(top_builddir)/idl -I$(srcdir)/../MEDWrapper/V2_1/Core
+	-I$(srcdir)/../MEDMEM -I$(top_builddir)/idl -I$(srcdir)/../MEDWrapper/V2_1/Core -I$(srcdir)/../INTERP_KERNEL/Bases
 libMEDMEMImpl_la_LDFLAGS= \
 	../../idl/libSalomeIDLMED.la \
 	../MEDMEM/libmedmem.la \
