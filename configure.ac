@@ -56,7 +56,7 @@ echo Build  root directory : $ROOT_BUILDDIR
 echo
 
 dnl remember MED_WITH_KERNEL set by build configure
-MED_WITH_KERNEL=yes
+MED_WITH_KERNEL=no
 old_with_kernel=${MED_WITH_KERNEL}
 
 dnl
@@ -699,7 +699,6 @@ AC_OUTPUT([ \
         src/MEDMEM/Doxyfile_med_devel \
         src/MEDMEM/Doxyfile_med_user \
         src/MEDMEM/Makefile \
-        src/INTERPOLATION/Makefile \
         src/MEDMEM_SWIG/Makefile \
         src/MEDMEMBinTest/Makefile \
         src/MEDMEMCppTest/Makefile \
