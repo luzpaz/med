@@ -2519,7 +2519,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read6ASCII(_InterMed & imed)
     }
   } // while ( !geoFile.eof() )
 
-  if ( haveStructuredParts && haveUnstructuredParts || haveStructuredParts > 1 )
+  if ( ( haveStructuredParts && haveUnstructuredParts ) || haveStructuredParts > 1 )
     imed.mergeNodesAndElements(TOLERANCE);
 
   END_OF_MED(LOC);
@@ -2806,7 +2806,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read6Binary(_InterMed & imed)
     }
   } // while ( !geoFile.eof() )
 
-  if ( haveStructuredParts && haveUnstructuredParts || haveStructuredParts > 1 )
+  if ( ( haveStructuredParts && haveUnstructuredParts ) || haveStructuredParts > 1 )
     imed.mergeNodesAndElements(TOLERANCE);
 
   END_OF_MED(LOC);

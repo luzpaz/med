@@ -685,10 +685,12 @@ MED_FIELD_DRIVER22<T>::getMEDMEMEntityFromMEDType(medGeometryElement type,
   if (elem_dim==3)
     return MED_CELL;
   if (elem_dim==2)
-    if (mesh_dim==2)
-      return MED_CELL;
-    else if (mesh_dim==3)
-      return MED_FACE;
+    {
+      if (mesh_dim==2)
+        return MED_CELL;
+      else if (mesh_dim==3)
+        return MED_FACE;
+    }
   if (elem_dim==1)
     return MED_EDGE;
   if(elem_dim==0)
@@ -1347,7 +1349,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   // to exclude array conversion
   med_2_3::med_mode_switch modswt = med_2_3::MED_FULL_INTERLACE;
   // NOTE: field can be either of 3 medModeSwitch'es, MED_NO_INTERLACE_BY_TYPE added (PAL17011)
-  if ( NumberOfTypes == 1 && !isFullInterlace || isNoInterlaceByType )
+  if ( ( NumberOfTypes == 1 && !isFullInterlace) || isNoInterlaceByType )
     modswt = med_2_3::MED_NO_INTERLACE;
 
   for (int typeNo=0; typeNo<NumberOfTypes; typeNo++) {

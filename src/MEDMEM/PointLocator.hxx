@@ -19,13 +19,19 @@
 #ifndef _POINT_LOCATOR_HXX_
 #define _POINT_LOCATOR_HXX_
 
-#include <list>
 #include "MEDNormalizedUnstructuredMesh.hxx"
 #include "MEDMEM.hxx"
+
+#include <list>
 
 namespace INTERP_KERNEL
 {
   class GenericMesh;
+  class GenericPointLocatorAlgos;
+}
+
+namespace MEDMEM
+{
   class GenericPointLocatorAlgos;
 
   class MEDMEM_EXPORT PointLocator
@@ -35,8 +41,8 @@ namespace INTERP_KERNEL
     virtual ~PointLocator();
     std::list<int> locate(const double* x);
   private:
-    GenericMesh* _medmesh;
-    GenericPointLocatorAlgos* _point_locator;
+    INTERP_KERNEL::GenericMesh *_medmesh;
+    INTERP_KERNEL::GenericPointLocatorAlgos* _point_locator;
   };
 }
 

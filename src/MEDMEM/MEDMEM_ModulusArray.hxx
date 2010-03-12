@@ -84,10 +84,12 @@ inline int MEDMODULUSARRAY::compare(const MEDMODULUSARRAY &modulusArray) const
     return ret ;
 
   if (_length==1)
-    if (_array[0]==modulusArray[0])
-      return 1;
-    else 
-      return 0;
+    {
+      if (_array[0]==modulusArray[0])
+        return 1;
+      else 
+        return 0;
+    }
 
   if (_length==2) {
     if ((_array[0]==modulusArray[0])&(_array[1]==modulusArray[1]))

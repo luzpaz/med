@@ -25,7 +25,6 @@
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_Field.hxx"
-#include "MEDMEM_InterpolationHighLevelObjects.hxx"
 
 #include <iomanip>
 #include <algorithm>
@@ -1296,7 +1295,7 @@ template<int DIM> int mergeNodes(double            tolerance,
                                  _intermediateMED& imed,
                                  vector< int > &   /*newNodeIDs*/)
 {
-  typedef dTree<__NOEUD,__NUAGENOEUD,DIM > DTree;
+  /*typedef dTree<__NOEUD,__NUAGENOEUD,DIM > DTree;
   __NUAGENOEUD aNUAGENOEUD( imed );
   DTree tree( &aNUAGENOEUD );
 
@@ -1330,7 +1329,8 @@ template<int DIM> int mergeNodes(double            tolerance,
       }
     }
   }
-  return nbRemoved;
+  return nbRemoved;*/
+  return 0;
 }
 //-----------------------------------------------------------------------
 // wrapper of _maille used after merging nodes to find equal mailles

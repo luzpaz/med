@@ -32,18 +32,8 @@
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_PolyhedronArray.hxx"
 #include "MEDMEM_CellModel.hxx"
-#ifndef WNT
-#include <ext/hash_map>
-#else
-#include <hash_map>
-#endif
 
-#ifndef WNT
-using namespace __gnu_cxx;
-#else
-using namespace std;
-using stdext::hash_map;
-#endif
+#include "InterpKernelHashMap.hxx"
 
 namespace MEDMEM {
 class MEDSKYLINEARRAY;
@@ -72,17 +62,18 @@ class MEDMEM_EXPORT CONNECTIVITY
                                 sum+=key[i];
                         return sum;
                 }
-#ifdef WNT
-    static const size_t bucket_size = 4;
-    static const size_t min_buckets = 8;
-                bool operator()(const vector<int>& key1, const vector<int>& key2) const
-                {
-      return ::size_t()(key1) < ::size_t()(key2);
-                }
-#endif          
+// #ifdef WNT
+//     static const size_t bucket_size = 4;
+//     static const size_t min_buckets = 8;
+//                 bool operator()(const vector<int>& key1, const vector<int>& key2) const
+//                 {
+//       return ::size_t()(key1) < ::size_t()(key2);
+//                 }
+// #endif  
+          
         };
 
-  typedef hash_map<vector<int>,int, myHashFn > CONNECTIVITY_HashMap;
+  typedef INTERP_KERNEL::HashMap<vector<int>,int, myHashFn > CONNECTIVITY_HashMap;
 
   /* ---------------------- */
   /*    Class Attributs     */
@@ -560,12 +551,14 @@ inline const int* CONNECTIVITY::getReverseConnectivity( MED_EN::medConnectivity 
 //------------------------------------------------------------------------------------------//
 {
   if(_entity==Entity)
-    if (ConnectivityType==MED_EN::MED_NODAL)
-      return getReverseNodalConnectivity();
-    else if (ConnectivityType==MED_EN::MED_DESCENDING)
-      return getReverseDescendingConnectivity();
-    else
-      throw MEDEXCEPTION("MESH::getReverseConnectivity : connectivity mode not supported !");
+    {
+      if (ConnectivityType==MED_EN::MED_NODAL)
+        return getReverseNodalConnectivity();
+      else if (ConnectivityType==MED_EN::MED_DESCENDING)
+        return getReverseDescendingConnectivity();
+      else
+        throw MEDEXCEPTION("MESH::getReverseConnectivity : connectivity mode not supported !");
+    }
 
   // other entity :
   if (NULL==_constituent)
@@ -581,12 +574,14 @@ inline const int* CONNECTIVITY::getReverseConnectivityIndex(MED_EN::medConnectiv
 //-----------------------------------------------------------------------------------------------//
 {
   if(_entity==Entity)
-    if (ConnectivityType==MED_EN::MED_NODAL)
-      return getReverseNodalConnectivityIndex();
-    else if (ConnectivityType==MED_EN::MED_DESCENDING)
-      return getReverseDescendingConnectivityIndex();
-    else
-      throw MEDEXCEPTION("MESH::getReverseConnectivityIndex : connectivity mode not supported !");
+    {
+      if (ConnectivityType==MED_EN::MED_NODAL)
+        return getReverseNodalConnectivityIndex();
+      else if (ConnectivityType==MED_EN::MED_DESCENDING)
+        return getReverseDescendingConnectivityIndex();
+      else
+        throw MEDEXCEPTION("MESH::getReverseConnectivityIndex : connectivity mode not supported !");
+    }
 
   // other entity :
   if (NULL==_constituent)

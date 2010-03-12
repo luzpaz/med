@@ -153,6 +153,7 @@ namespace MEDMEM_ENSIGHT
   /*!
    * \brief Add a driver to the registry and return true if was already in
    */
+  bool isToIgnore(const _CaseFileDriver_User* driver);
   bool isToIgnore(const _CaseFileDriver_User* driver)
   {
     return ! theCaseUsers.insert( driver ).second;
@@ -162,6 +163,7 @@ namespace MEDMEM_ENSIGHT
   /*!
    * \brief Remove a driver from the registry
    */
+  void unregister(const _CaseFileDriver_User* driver);
   void unregister(const _CaseFileDriver_User* driver)
   {
     theCaseUsers.erase( driver );
@@ -171,6 +173,7 @@ namespace MEDMEM_ENSIGHT
   /*!
    * \brief Return mesh data needed by field driver
    */
+  _InterMed* getMeshData( const string& key );
   _InterMed* getMeshData( const string& key )
   {
     // find existing data

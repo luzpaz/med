@@ -462,10 +462,12 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
   int elemDim = -1;
   for (int i=0;i<_numberOfGeometricType;i++) {
     if(GeometricType[i]/100 != elemDim)
-      if(i==0)
-        elemDim=GeometricType[i]/100;
-      else
-        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"unhomogeneous geometric types (dimension) !"));
+      {
+        if(i==0)
+          elemDim=GeometricType[i]/100;
+        else
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"unhomogeneous geometric types (dimension) !"));
+      }
     _geometricType[i] = GeometricType[i] ;
     _numberOfElements[i] = NumberOfElements[i] ;
     index[i+1] = index[i]+NumberOfElements[i] ;
@@ -954,6 +956,7 @@ bool MEDMEM::SUPPORT::belongsTo(const SUPPORT& other, bool deepCompare) const
 /*!
   Method used to sort array of id.
 */
+int compareId(const void *x, const void *y);
 int compareId(const void *x, const void *y)
 {
   const int *x1=(const int *)x;
@@ -1115,17 +1118,25 @@ SUPPORT *MEDMEM::SUPPORT::getBoundaryElements(medEntityMesh Entity) const throw 
   int spaceDimension=_mesh->getSpaceDimension();
   medEntityMesh baseEntity=Entity;
   if (spaceDimension == 3)
-    if (Entity!=MED_FACE)
-      if(Entity==MED_NODE)
-        baseEntity=MED_FACE;
-      else
-        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 3D mesh for entity "<<Entity<<" !"));
+    {
+      if (Entity!=MED_FACE)
+        {
+          if(Entity==MED_NODE)
+            baseEntity=MED_FACE;
+          else
+            throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 3D mesh for entity "<<Entity<<" !"));
+        }
+    }
   if (spaceDimension == 2)
-    if (Entity!=MED_EDGE)
-      if(Entity==MED_NODE)
-        baseEntity=MED_EDGE;
-      else
-        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 2D mesh for entity "<<Entity<<" !"));
+    {
+      if (Entity!=MED_EDGE)
+        {
+          if(Entity==MED_NODE)
+            baseEntity=MED_EDGE;
+          else
+            throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 2D mesh for entity "<<Entity<<" !"));
+        }
+    }
   if(_isOnAllElts)
     return _mesh->getBoundaryElements(Entity);
 

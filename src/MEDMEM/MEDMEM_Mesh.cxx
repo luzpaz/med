@@ -38,8 +38,9 @@
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_CellModel.hxx"
 #include "VolSurfFormulae.hxx"
-#include "MEDMEM_InterpolationHighLevelObjects.hxx"
 #include "MEDMEM_DriverFactory.hxx"
+
+#include "PointLocator.hxx"
 
 using namespace std;
 using namespace MEDMEM;
@@ -718,16 +719,20 @@ SUPPORT * MESH::getBoundaryElements(MED_EN::medEntityMesh Entity)
   medEntityMesh entityToParse=Entity;
   if(_spaceDimension == 3)
     if (Entity != MED_FACE)
-      if(Entity==MED_NODE)
-        entityToParse=MED_FACE;
-      else
-        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 3D mesh for entity "<<Entity<<" !"));
+      {
+        if(Entity==MED_NODE)
+          entityToParse=MED_FACE;
+        else
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 3D mesh for entity "<<Entity<<" !"));
+      }
   if(_spaceDimension == 2)
     if(Entity != MED_EDGE)
-      if(Entity==MED_NODE)
-        entityToParse=MED_EDGE;
-      else
-        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 2D mesh for entity "<<Entity<<" !"));
+      {
+        if(Entity==MED_NODE)
+          entityToParse=MED_EDGE;
+        else
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 2D mesh for entity "<<Entity<<" !"));
+      }
 
   // assure that descending connectivity is full
   if ( !_connectivity )
@@ -2725,26 +2730,13 @@ void MESH::createFamilies()
 
 int MESH::getElementContainingPoint(const double *coord)
 {
-  if(_spaceDimension==3)
-  {
-    Meta_Wrapper<3> fromWrapper(getNumberOfNodes(),const_cast<double *>(getCoordinates(MED_FULL_INTERLACE)),
-                                const_cast<CONNECTIVITY *>(getConnectivityptr()));
-    Meta_Wrapper<3> toWrapper(1,const_cast<double *>(coord));
-    Meta_Mapping<3> mapping(&fromWrapper,&toWrapper);
-    mapping.Cree_Mapping(1);
-    return mapping.Get_Mapping()[0]+1;
-  }
-  else if(_spaceDimension==2)
-  {
-    Meta_Wrapper<2> fromWrapper(getNumberOfNodes(),const_cast<double *>(getCoordinates(MED_FULL_INTERLACE)),
-                                const_cast<CONNECTIVITY *>(getConnectivityptr()));
-    Meta_Wrapper<2> toWrapper(1,const_cast<double *>(coord));
-    Meta_Mapping<2> mapping(&fromWrapper,&toWrapper);
-    mapping.Cree_Mapping(1);
-    return mapping.Get_Mapping()[0]+1;
-  }
-  else
+  if(_spaceDimension!=3 && _spaceDimension!=2)
     throw MEDEXCEPTION("MESH::getElementContainingPoint : invalid _spaceDimension must be equal to 2 or 3 !!!");
+  PointLocator loc(*this);
+  std::list<int> li=loc.locate(coord);
+  if(li.empty())
+    return -1;
+  return li.front();
 }
 
 //! Converts MED_CELL connectivity to polyhedra connectivity

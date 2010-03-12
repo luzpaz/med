@@ -276,12 +276,14 @@ void MESHING::setNumberOfTypes(const int NumberOfTypes,
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity on MED_FACE could be defined in non 3D space !"));
     
     if (MED_EDGE == Entity)
-      if (3 == getSpaceDimension()) {
-        if (!_connectivity->existConnectivity(MED_NODAL,MED_FACE))
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity on MED_FACE defined !"));
-      } else {
-        if (2 != getSpaceDimension())
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Could not set connectivity on MED_EDGE !"));
+      {
+        if (3 == getSpaceDimension()) {
+          if (!_connectivity->existConnectivity(MED_NODAL,MED_FACE))
+            throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity on MED_FACE defined !"));
+        } else {
+          if (2 != getSpaceDimension())
+            throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Could not set connectivity on MED_EDGE !"));
+        }
       }
     // all right, we could create connectivity !
     CONNECTIVITY * myConnectivity = new CONNECTIVITY(NumberOfTypes,Entity) ;

@@ -1191,7 +1191,7 @@ void ENSIGHT_FIELD_WRONLY_DRIVER::read (void)
  * \brief Return pointer to the value of the i-th element
  */
 //================================================================================
-
+const char* getValuePointer( int i, const FIELD_* field );
 const char* getValuePointer( int i, const FIELD_* field )
 {
   switch ( field->getInterlacingType() ) {

@@ -47,6 +47,8 @@ static inline void insert_vector(vector<int> &Vect, int Indice, int Element)
   Vect[Indice] = Element;
 }
 
+void mergeOrderedTabs(const int *tab1, int lgth1, const int *tab2, int lgth2, int *result, int& lgth);
+
 void mergeOrderedTabs(const int *tab1, int lgth1, const int *tab2, int lgth2, int *result, int& lgth)
 {
   int cpt[2]={0,0};
@@ -498,13 +500,15 @@ void CONNECTIVITY::calculateConnectivity(medConnectivity ConnectivityType, medEn
     throw MEDEXCEPTION("CONNECTIVITY::calculateConnectivity : Could not build EDGE !");
 
   if (Entity==_entity)
-    if (ConnectivityType==MED_NODAL)
-      calculateNodalConnectivity();
-    else
-      if (Entity==MED_CELL)
-        calculateDescendingConnectivity();
+    {
+      if (ConnectivityType==MED_NODAL)
+        calculateNodalConnectivity();
       else
-        throw MEDEXCEPTION("CONNECTIVITY::calculateConnectivity : Could not build DESCENDING !");
+        if (Entity==MED_CELL)
+          calculateDescendingConnectivity();
+        else
+          throw MEDEXCEPTION("CONNECTIVITY::calculateConnectivity : Could not build DESCENDING !");
+    }
   if (Entity!=_entity) {
     calculateDescendingConnectivity();
     if (_entityDimension == 2 || _entityDimension == 3)

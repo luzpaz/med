@@ -193,11 +193,12 @@ FIELD<double>* FIELD_::_getFieldSize(const SUPPORT *subSupport) const
 
   const SUPPORT* support = subSupport;
   if ( !support )
-    if ( getSupport()->getEntity() == MED_NODE )
-      support = new SUPPORT(getSupport()->getMesh());
-    else
-      support = getSupport();
-
+    {
+      if ( getSupport()->getEntity() == MED_NODE )
+        support = new SUPPORT(getSupport()->getMesh());
+      else
+        support = getSupport();
+    }
   switch (getSupport()->getEntity())
     {
     case MED_CELL :

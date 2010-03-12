@@ -473,10 +473,12 @@ inline void SUPPORT::setNumberOfElements(const int *NumberOfElements)
 //----------------------------------------------------------
 {
   if (_numberOfElements == NULL)
-    if (_numberOfGeometricType)
-      _numberOfElements.set(_numberOfGeometricType,NumberOfElements);
-    else
-      _numberOfElements.set(0);
+    {
+      if (_numberOfGeometricType)
+        _numberOfElements.set(_numberOfGeometricType,NumberOfElements);
+      else
+        _numberOfElements.set(0);
+    }
   _totalNumberOfElements = 0 ;
   for (int i=0;i<_numberOfGeometricType;i++)
     _totalNumberOfElements+=_numberOfElements[i];

@@ -38,7 +38,10 @@
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_DriverTools.hxx"
 
-class MEDMEM::FIELD_;
+namespace MEDMEM
+{
+class FIELD_;
+}
 
 #include <stdio.h>
 #include <fcntl.h>

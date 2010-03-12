@@ -2609,7 +2609,7 @@ double FIELD<T, INTERLACING_TAG>::normL1(int component,
 
     const FIELD<double,FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-        p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃƒÂ©mentation dans mesh]
+        p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃÃ‚©mentation dans mesh]
 
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
     const double* vol = p_field_size->getValue();
@@ -2786,7 +2786,7 @@ double FIELD<T, INTERLACING_TAG>::integral(const SUPPORT *subSupport) const thro
   const T* value = getValue();
 
   // calculate integrale
-  if ( subOnAll && _support->isOnAllElements() || subSupport == _support )
+  if ( (subOnAll && _support->isOnAllElements()) || subSupport == _support )
     {
       const double* p_vol;
       if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )

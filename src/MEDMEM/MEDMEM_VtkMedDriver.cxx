@@ -142,12 +142,14 @@ void VTK_MED_DRIVER::write() const
           if( MeshNames[i] == myField->getSupport()->getMesh()->getName() ) { 
             // rigth in all case : better compare pointeur ?
             if (MED_NODE == myField->getSupport()->getEntity())
-              if (myField->getSupport()->isOnAllElements()) {
-                ostringstream name ; 
-                name << myField->getName() << "_" << dt << "_" << it ;
-                writeField(myField,name.str()) ;
-              } else
-                MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
+              {
+                if (myField->getSupport()->isOnAllElements()) {
+                  ostringstream name ; 
+                  name << myField->getName() << "_" << dt << "_" << it ;
+                  writeField(myField,name.str()) ;
+                } else
+                  MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
+              }
           }
         }
       }
@@ -163,13 +165,15 @@ void VTK_MED_DRIVER::write() const
           if( MeshNames[i] == myField->getSupport()->getMesh()->getName() ) { 
             // rigth in all case : better compare pointeur ?
             if (MED_CELL == myField->getSupport()->getEntity())
-              if (myField->getSupport()->isOnAllElements()) {
-                ostringstream name ; 
-                name << myField->getName() << "_" << dt << "_" << it ;
-                writeField(myField,name.str()) ;
+              {
+                if (myField->getSupport()->isOnAllElements()) {
+                  ostringstream name ; 
+                  name << myField->getName() << "_" << dt << "_" << it ;
+                  writeField(myField,name.str()) ;
+                }
+                else
+                  MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" which is not on all cells !");
               }
-              else
-                MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" which is not on all cells !");
           }
         }
       }
