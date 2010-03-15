@@ -324,6 +324,9 @@ void ReadMed(const char* theFileName,
   CopyMed(theFileName,theFileName2,theVersion,theNbCopy);
 }
 
+#ifdef WNT
+#pragma warning(disable:4101) // exc unreferenced ... ??
+#endif
 
 int main(int argc, char** argv){ 
 #ifndef _DEBUG_

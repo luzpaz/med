@@ -30,6 +30,10 @@
 #include "MED_Common.hxx"
 #include "MED_Utilities.hxx"
 
+#ifdef WNT
+#pragma warning(disable:4251)
+#endif
+
 namespace MED
 {
 

@@ -28,6 +28,10 @@
 
 #include "MED_Structures.hxx"
 
+#ifdef WNT
+#pragma warning(disable:4250)
+#endif
+
 namespace MED
 {
   //---------------------------------------------------------------
@@ -1113,7 +1117,7 @@ namespace MED
       }
 
       if(type != eGRILLE_STANDARD)
-        for(int aAxe=0;aAxe<nbNodeVec.size();aAxe++){
+        for(unsigned int aAxe=0;aAxe<nbNodeVec.size();aAxe++){
           myIndixes[aAxe].resize(nbNodeVec[aAxe]);
         }
       myGrilleStructure.resize(aDim);
