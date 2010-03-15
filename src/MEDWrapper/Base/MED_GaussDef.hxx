@@ -34,7 +34,7 @@
 
 namespace MED
 {
-  struct TShapeFun;
+  class TShapeFun;
   typedef std::vector<double> TDoubleVector;
   /*!
    * \brief Description of family of integration points
