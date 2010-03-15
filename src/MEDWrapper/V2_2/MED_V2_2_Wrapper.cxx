@@ -37,11 +37,17 @@ extern "C"
 {
 #include <med.h>
 
-MEDC_EXPORT med_err
+#ifdef WNT
+MEDC_EXPORT
+#endif
+med_err
 MEDgaussInfo(med_idt fid, int indice, char * locname, med_geometrie_element * type_geo,
              med_int * ngauss );
 
-MEDC_EXPORT med_int
+#ifdef WNT
+MEDC_EXPORT
+#endif
+med_int
 MEDnMaa(med_idt fid);
 
 }
