@@ -28,11 +28,6 @@
 #define MED_SharedPtr_HeaderFile
 
 #include <boost/shared_ptr.hpp>
-#include <MED_WrapperBase.hxx>
-
-#ifdef WNT
-#pragma warning( disable : 4251 ) // To disable the non-dll for boost::shared_ptr
-#endif
 
 namespace MED
 {
@@ -43,7 +38,7 @@ namespace MED
     This class was introduced to provide correct and flexible memory management 
     for all of the MEDWrapper objects.
   */
-  template<class T> class MEDWRAPPER_EXPORT SharedPtr: public boost::shared_ptr<T>
+  template<class T> class SharedPtr: public boost::shared_ptr<T>
   {
   public:
     //! Default constructor
