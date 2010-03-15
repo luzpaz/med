@@ -46,6 +46,10 @@ extern "C"
 #include "MED_SharedPtr.hxx"
 #include "MED_SliceArray.hxx"
 
+#ifdef WNT
+#pragma warning(disable:4099)
+#endif
+
 namespace MED{
 
   enum EVersion {eVUnknown = -1, eV2_1, eV2_2};
@@ -170,7 +174,7 @@ namespace MED{
   struct TGaussInfo;
   typedef SharedPtr<TGaussInfo> PGaussInfo;
   
-  struct TGrilleInfo;
+  class TGrilleInfo;
   typedef SharedPtr<TGrilleInfo> PGrilleInfo;
 
   struct TTimeStampValueBase;
