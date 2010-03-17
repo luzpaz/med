@@ -58,7 +58,8 @@ libMULTIPR_API_la_CPPFLAGS= $(MED2_INCLUDES) @CXXTMPDPTHFLAGS@ -Wall -pthread $(
 	-I$(srcdir)/../MEDWrapper/Factory \
 	-I$(srcdir)/../MEDWrapper/Base \
 	-I$(srcdir)/../MEDMEM \
-	-I$(srcdir)/../MEDSPLITTER
+	-I$(srcdir)/../MEDSPLITTER \
+	-I$(srcdir)/../INTERP_KERNEL/Bases
 libMULTIPR_API_la_LDFLAGS= $(MED2_LIBS) -lm -lmed \
 	../MEDWrapper/Factory/libMEDWrapper.la \
 	../MEDWrapper/Base/libMEDWrapperBase.la \
