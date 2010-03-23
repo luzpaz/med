@@ -1139,6 +1139,7 @@ public :
   int getNumberOfGroups(medEntityMesh Entity);
 
   GROUP * getGroup(medEntityMesh Entity,int i);
+  GROUP*  getGroup(char* name);
 
   medGeometryElement getElementType(medEntityMesh Entity,int Number);
 
