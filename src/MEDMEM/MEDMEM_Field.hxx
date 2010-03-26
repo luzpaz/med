@@ -2822,16 +2822,22 @@ double FIELD<T, INTERLACING_TAG>::integral(const SUPPORT *subSupport) const thro
         {
           // hope that numbers are in increasing order
           index.set( nbElems );
+          for (int ii = 0; ii < nbElems; ii++)
+            index[ii] = 0;
           bool allNumsFound = true;
           int i = 0, iSub = 0;
           for ( ; iSub < nbElems; ++iSub )
             {
-              while ( subNums[iSub] > myNums[i] && i < getNumberOfValues())
+              while (i < getNumberOfValues() && subNums[iSub] > myNums[i])
                 ++i;
-              if ( subNums[iSub] == myNums[i] ) // elem number found
+              cout << "$$$ set i = " << iSub << endl;
+              if (i == getNumberOfValues() /*subNums[iSub] > myNums[i]*/) // no more myNums
+                {
+                  index[iSub] = 0; // no such number in myNums
+                  break;
+                }
+              else if ( subNums[iSub] == myNums[i] ) // elem number found
                 index[iSub] = ++i; // -- index counts from 1
-              else if ( subNums[iSub] > myNums[i] ) // no more myNums
-                break;
               else // subNums[iSub] < myNums[i]
                 allNumsFound = (index[iSub] = 0); // no such number in myNums
             }
@@ -2842,17 +2848,19 @@ double FIELD<T, INTERLACING_TAG>::integral(const SUPPORT *subSupport) const thro
               for ( iSub = 1; iSub < nbElems && increasingOrder; ++iSub )
                 increasingOrder = ( subNums[iSub-1] < subNums[iSub] );
               for ( i = 1; i < getNumberOfValues() && increasingOrder; ++i )
-                increasingOrder = ( myNums[iSub-1] < myNums[iSub] );
+                increasingOrder = ( myNums[i-1] < myNums[i] );
 
               if ( !increasingOrder )
                 for ( iSub = 0; iSub < nbElems; ++iSub )
                   try
                     {
+                      cout << "$$$ set order i = " << iSub << endl;
                       index[iSub] = _support->getValIndFromGlobalNumber( subNums[iSub] );
                     }
                   catch (MEDEXCEPTION)
                     {
                       index[iSub] = 0;
+                      cout << "$$$ set order i = " << iSub << endl;
                     }
             }
         }
@@ -2872,10 +2880,14 @@ double FIELD<T, INTERLACING_TAG>::integral(const SUPPORT *subSupport) const thro
         {
           typename ArrayNoByType::InterlacingPolicy* indexer =
             dynamic_cast< typename ArrayNoByType::InterlacingPolicy * > ( getArrayNoGauss() );
+          //cout << "i = " << i << ", getNumberOfValues() = " << getNumberOfValues();
+          //cout << ", iSub = " << iSub << ", nbElems = " << nbElems << endl;
           for (int j=1; j<=getNumberOfComponents(); j++)
-            for ( int i = 0; i < nbElems; ++i )
+            for ( int i = 0; i < nbElems; ++i ) {
+              cout << "$$$ get i = " << i << endl;
               if ( index[i] )
                 integrale += std::abs( value[indexer->getIndex(index[i],j)] * size[i] );
+            }
         }
       else  // FULL_INTERLACE
         {
