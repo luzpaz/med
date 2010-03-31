@@ -2089,7 +2089,7 @@ void MED_MESH_WRONLY_DRIVER22::write(void) const
       SCRUTE_MED(err);
 
       char familyName[MED_TAILLE_NOM+1];
-      //      strcpy(familyName,"FAMILLE_ZERO");
+      strcpy(familyName,"FAMILLE_ZERO");
       err = med_2_3::MEDfamCr( _medIdt,
                               const_cast <char *> ( _meshName.c_str() ),
                               familyName, 0,
