@@ -61,8 +61,8 @@ using namespace MED_EN;
  */
 void MEDMEMTest::testVtkFieldDriver()
 {
-  FIELD<int> *aField                = new FIELD<int> ();
-  FIELD<double> *aField_1           = new FIELD<double> ();
+  FIELD<int> *aField                = new FIELD<int>();
+  FIELD<double> *aField_1           = new FIELD<double>();
 
   string filename_rd                = getResourceFile("pointe_import22.med");
   string emptyfilename              = "";
@@ -108,15 +108,16 @@ void MEDMEMTest::testVtkFieldDriver()
   aMedRdFieldDriver22_int->setFieldName(fieldname_rd_int);
   aMedRdFieldDriver22_int->read();
   aMedRdFieldDriver22_int->close();
-  MESH mesh(MED_DRIVER,filename_rd,"maa1");
-  aField->getSupport()->setMesh(&mesh);
+  MESH *mesh=new MESH(MED_DRIVER,filename_rd,"maa1");
+  aField->getSupport()->setMesh(mesh);
 
   MED_FIELD_RDONLY_DRIVER22<double> *aMedRdFieldDriver22_double = new MED_FIELD_RDONLY_DRIVER22<double>(filename_rd, aField_1);
   aMedRdFieldDriver22_double->open();
   aMedRdFieldDriver22_double->setFieldName(fieldname_rd_double);
   aMedRdFieldDriver22_double->read();
   aMedRdFieldDriver22_double->close();
-  aField_1->getSupport()->setMesh(&mesh);
+  aField_1->getSupport()->setMesh(mesh);
+  mesh->removeReference();
   //Check fields
   CPPUNIT_ASSERT(aField);
 
@@ -386,8 +387,8 @@ void MEDMEMTest::testVtkFieldDriver()
   CPPUNIT_ASSERT(ostr1.str() == ostr2.str());
 
   //Delete all objects
-  delete aField;
-  delete aField_1;
+  aField->removeReference();
+  aField_1->removeReference();
   delete aInvalidVtkFieldDriver_1;
   delete aInvalidVtkFieldDriver_2;
   delete aMedRdFieldDriver22_int;

@@ -28,22 +28,23 @@ using namespace MED_EN;
 
 void addMedFacesGroup (MESHING& meshing, int nFaces, int *groupValue, string groupName)
 {
-  GROUP faces;
+  GROUP *faces=new GROUP;
   int myNumberOfElements[1];
   medGeometryElement mytypes[1];
   int index[2];
-  faces.setName(groupName);
-  faces.setMesh(&meshing);
-  faces.setEntity(MED_EN::MED_FACE);
-  faces.setNumberOfGeometricType(1);
+  faces->setName(groupName);
+  faces->setMesh(&meshing);
+  faces->setEntity(MED_EN::MED_FACE);
+  faces->setNumberOfGeometricType(1);
   mytypes[0] = MED_EN::MED_POLYGON;
-  faces.setGeometricType(mytypes);
+  faces->setGeometricType(mytypes);
   myNumberOfElements[0] = nFaces;
-  faces.setNumberOfElements(myNumberOfElements);
+  faces->setNumberOfElements(myNumberOfElements);
   index[0] = 1;
   index[1] = nFaces;
-  faces.setNumber(index, groupValue);
-  meshing.addGroup(faces);
+  faces->setNumber(index, groupValue);
+  meshing.addGroup(*faces);
+  faces->removeReference();
 }
 
 int main()

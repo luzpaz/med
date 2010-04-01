@@ -33,7 +33,7 @@ int main (int argc, char** argv)
   string filename = getResourceFile("pointe.med");
   string meshname = "maa1";
 
-  MESH * aMesh = new MESH();
+  MESH * aMesh = new MESH;
   aMesh->setName(meshname);
   MED_MESH_RDONLY_DRIVER aMeshDriver (filename, aMesh);
   aMeshDriver.setMeshName(meshname);
@@ -44,12 +44,13 @@ int main (int argc, char** argv)
   const FAMILY * aFamily1 = aMesh->getFamily(MED_EN::MED_NODE, 1);
 
   // check default constructor and operator=
-  FAMILY aFamily4;
+  FAMILY *aFamily4=new FAMILY;
 
   // (BUG) Wrong implementation or usage of PointerOf<string>.
   //       Do not use memcpy() with array of std::string!
   //       Impossible to use FAMILY::operator=!
-  aFamily4 = *aFamily1;
+  *aFamily4 = *aFamily1;
+  aFamily4->removeReference();
 
   /*{
     int nb = 3;
@@ -86,5 +87,5 @@ int main (int argc, char** argv)
   }
   */
 
-  delete aMesh;
+  aMesh->removeReference();
 }

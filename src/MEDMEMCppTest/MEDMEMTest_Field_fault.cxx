@@ -578,15 +578,15 @@ void testDrivers()
   aRemover.Register(filenamevtk_wr);
   aRemover.Register(filename_support_wr);
 
-  FIELD<int> aInvalidField;
+  FIELD<int> *aInvalidField=new FIELD<int>();
   //must throw becase only VTK_DRIVER or MED_DRIVER may be specified as driverType for FIELD
-  CPPUNIT_ASSERT_THROW(aInvalidField = FIELD<int>(NO_DRIVER, filename_rd, fieldname_nodeint_rd),
+  CPPUNIT_ASSERT_THROW(*aInvalidField = *(new FIELD<int>(NO_DRIVER, filename_rd, fieldname_nodeint_rd)),
                        MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aInvalidField = FIELD<int>(GIBI_DRIVER, filename_rd, fieldname_nodeint_rd),
+  CPPUNIT_ASSERT_THROW(*aInvalidField = *(new FIELD<int>(GIBI_DRIVER, filename_rd, fieldname_nodeint_rd)),
                        MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aInvalidField = FIELD<int>(PORFLOW_DRIVER, filename_rd, fieldname_nodeint_rd),
+  CPPUNIT_ASSERT_THROW(*aInvalidField = *(new FIELD<int>(PORFLOW_DRIVER, filename_rd, fieldname_nodeint_rd)),
                        MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aInvalidField = FIELD<int>(ASCII_DRIVER, filename_rd, fieldname_nodeint_rd),
+  CPPUNIT_ASSERT_THROW(*aInvalidField = *(new FIELD<int>(ASCII_DRIVER, filename_rd, fieldname_nodeint_rd)),
                        MEDEXCEPTION);
 
   //////////////////
@@ -628,7 +628,7 @@ void testDrivers()
   aFieldWrDriver21->setFieldName(aFieldSupport->getName() + "_copy");
   CPPUNIT_ASSERT_NO_THROW(IdDriver= aFieldSupport->addDriver(*aFieldWrDriver21));
   CPPUNIT_ASSERT_NO_THROW(aFieldSupport->write(IdDriver));
-  delete aFieldSupport;
+  aFieldSupport->removeReference();
   delete aFieldWrDriver21;
 //#endif    
 
@@ -705,7 +705,7 @@ void testDrivers()
 
   //Test writeAppend(int index) method
   //Create a vtk file
-  MESH * aMesh_1 = new MESH();
+  MESH * aMesh_1 = new MESH;
   MED_MESH_RDONLY_DRIVER22 *aMedMeshRdDriver22 = new MED_MESH_RDONLY_DRIVER22(filename22_rd, aMesh_1);
   aMedMeshRdDriver22->open();
   aMedMeshRdDriver22->setMeshName(meshname);
@@ -764,48 +764,48 @@ void testDrivers()
 
 
   //Delete objects
-  delete aField_1;
+  aField_1->removeReference();
   delete aMedRdFieldDriver21_1;
-  delete aField_2;
-  delete aField_3;
+  aField_2->removeReference();
+  aField_3->removeReference();
   delete aMedRdFieldDriver21_2;
-  delete aField_4;
+  aField_4->removeReference();
   delete aMedMeshRdDriver22;
   delete aMedWrFieldDriver21;
   delete aVtkDriver;
-  delete aMesh;
-  delete aMesh_1;
+  aMesh->removeReference();
+  aMesh_1->removeReference();
   delete aMedRdFieldDriver22;
-  delete aSupport;
+  aSupport->removeReference();
 }
 
 void MEDMEMTest_testField()
 {
-  SUPPORT anEmptySupport;
+  SUPPORT *anEmptySupport=new SUPPORT;
   ////////////////////
   // TEST 1: FIELD_ //
   ////////////////////
-  FIELD_ aField_;
+  FIELD_ *aField_=new FIELD_ ;
 
   // check set/get methods
   MED_EN::med_type_champ aValueType = MED_EN::MED_UNDEFINED_TYPE;
   MED_EN::medModeSwitch  anInterlace = MED_EN::MED_UNDEFINED_INTERLACE;
-  checkField_(&aField_, &anEmptySupport, aValueType, anInterlace);
+  checkField_(aField_, anEmptySupport, aValueType, anInterlace);
 
   // copy constructor
   // This fails (Segmentation fault) if not set:
   // _componentsNames or _componentsDescriptions, or _MEDComponentsUnits
-  FIELD_ aField_copy1 (aField_);
-  compareField_(&aField_, &aField_copy1, /*isFIELD = */false, /*isValue = */false);
+  FIELD_ *aField_copy1=new FIELD_(*aField_);
+  compareField_(aField_, aField_copy1, /*isFIELD = */false, /*isValue = */false);
 
   // operator=
 //#ifdef ENABLE_FAULTS
   // (BUG) This fails (Segmentation fault) if not set:
   // _componentsNames or _componentsDescriptions, or _componentsUnits, or _MEDComponentsUnits
   // (BUG) Code duplication with copyGlobalInfo(), called from copy constructor
-  FIELD_ aField_copy2;
-  aField_copy2 = aField_;
-  compareField_(&aField_, &aField_copy2, /*isFIELD = */false, /*isValue = */false);
+  FIELD_ *aField_copy2=new FIELD_;
+  *aField_copy2 = *aField_;
+  compareField_(aField_, aField_copy2, /*isFIELD = */false, /*isValue = */false);
 //#endif
 //#ifdef ENABLE_FORCED_FAILURES
 //  CPPUNIT_FAIL("FIELD_::operator=() fails if _componentsUnits is not set");
@@ -835,8 +835,8 @@ void MEDMEMTest_testField()
   ////////////////////////
   // TEST 2: FIELD<int> //
   ////////////////////////
-  FIELD<int> aFieldInt;
-  checkField(&aFieldInt, &anEmptySupport);
+  FIELD<int> *aFieldInt=new FIELD<int>();
+  checkField(aFieldInt, anEmptySupport);
 
   ////////////////////////////////////////
   // TEST 3: FIELD<double, NoInterlace> //
@@ -1232,55 +1232,59 @@ void MEDMEMTest_testField()
   // operators and add, sub, mul, div
 
   // +
-  FIELD<double> aSum = *aFieldOnGroup1 + *aFieldOnGroup2;
-  aSum.setName(aFieldOnGroup1->getName());
-  aSum.setDescription(aFieldOnGroup1->getDescription());
-  compareField_(aFieldOnGroup1, &aSum, true, true);
-  val_res = aSum.getValue();
+  FIELD<double> *aSum = *aFieldOnGroup1 + *aFieldOnGroup2;
+  aSum->setName(aFieldOnGroup1->getName());
+  aSum->setDescription(aFieldOnGroup1->getDescription());
+  compareField_(aFieldOnGroup1, aSum, true, true);
+  val_res = aSum->getValue();
   for (int i = 0; i < len; i++) {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(val1[i] + val2[i], val_res[i], 0.000001);
   }
+  aSum->removeReference();
 
   // -
-  FIELD<double> aDifference = *aFieldOnGroup1 - *aFieldOnGroup2;
-  aDifference.setName(aFieldOnGroup1->getName());
-  aDifference.setDescription(aFieldOnGroup1->getDescription());
-  compareField_(aFieldOnGroup1, &aDifference, true, true);
-  val_res = aDifference.getValue();
+  FIELD<double> *aDifference = *aFieldOnGroup1 - *aFieldOnGroup2;
+  aDifference->setName(aFieldOnGroup1->getName());
+  aDifference->setDescription(aFieldOnGroup1->getDescription());
+  compareField_(aFieldOnGroup1, aDifference, true, true);
+  val_res = aDifference->getValue();
   for (int i = 0; i < len; i++) {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(val1[i] - val2[i], val_res[i], 0.000001);
   }
+  aDifference->removeReference();
 
   // - (unary)
-  FIELD<double> aNegative = - *aFieldOnGroup1;
-  aNegative.setName(aFieldOnGroup1->getName());
-  aNegative.setDescription(aFieldOnGroup1->getDescription());
-  compareField_(aFieldOnGroup1, &aNegative, true, true);
-  val_res = aNegative.getValue();
+  FIELD<double> *aNegative = - *aFieldOnGroup1;
+  aNegative->setName(aFieldOnGroup1->getName());
+  aNegative->setDescription(aFieldOnGroup1->getDescription());
+  compareField_(aFieldOnGroup1, aNegative, true, true);
+  val_res = aNegative->getValue();
   for (int i = 0; i < len; i++) {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(- val1[i], val_res[i], 0.000001);
   }
+  aNegative->removeReference();
 
   // *
-  FIELD<double> aProduct = (*aFieldOnGroup1) * (*aFieldOnGroup2);
-  aProduct.setName(aFieldOnGroup1->getName());
-  aProduct.setDescription(aFieldOnGroup1->getDescription());
-  compareField_(aFieldOnGroup1, &aProduct, true, true);
-  val_res = aProduct.getValue();
+  FIELD<double> *aProduct = (*aFieldOnGroup1) * (*aFieldOnGroup2);
+  aProduct->setName(aFieldOnGroup1->getName());
+  aProduct->setDescription(aFieldOnGroup1->getDescription());
+  compareField_(aFieldOnGroup1, aProduct, true, true);
+  val_res = aProduct->getValue();
   for (int i = 0; i < len; i++) {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(val1[i] * val2[i], val_res[i], 0.000001);
   }
-
+  aProduct->removeReference();
   // /
-  FIELD<double> aQuotient = *aFieldOnGroup1 / *aFieldOnGroup2;
-  aQuotient.setName(aFieldOnGroup1->getName());
-  aQuotient.setDescription(aFieldOnGroup1->getDescription());
-  compareField_(aFieldOnGroup1, &aQuotient, true, true);
-  val_res = aQuotient.getValue();
+  FIELD<double> *aQuotient = *aFieldOnGroup1 / *aFieldOnGroup2;
+  aQuotient->setName(aFieldOnGroup1->getName());
+  aQuotient->setDescription(aFieldOnGroup1->getDescription());
+  compareField_(aFieldOnGroup1, aQuotient, true, true);
+  val_res = aQuotient->getValue();
   for (int i = 0; i < len; i++) {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(val1[i] / val2[i], val_res[i], 0.000001);
   }
-
+  aQuotient->removeReference();
+  
   double val22 = aFieldOnGroup2->getValueIJ(anElems[2], 2);
   aFieldOnGroup2->setValueIJ(anElems[2], 2, 0.);
 
@@ -1498,8 +1502,10 @@ void MEDMEMTest_testField()
     *aFieldOnGroup1 *= *aFieldOnGroup2;
     *aFieldOnGroup1 /= *aFieldOnGroup2;
 
-    FIELD<double> aPr = *aFieldOnGroup1 * *aFieldOnGroup2;
-    FIELD<double> aQu = *aFieldOnGroup1 / *aFieldOnGroup2;
+    FIELD<double> *aPr = *aFieldOnGroup1 * *aFieldOnGroup2;
+    FIELD<double> *aQu = *aFieldOnGroup1 / *aFieldOnGroup2;
+    aPr->removeReference();
+    aQu->removeReference();
   }
   catch (MEDEXCEPTION & ex) {
     CPPUNIT_FAIL(ex.what());
@@ -1519,7 +1525,7 @@ void MEDMEMTest_testField()
   CPPUNIT_ASSERT_THROW(aFieldOnGroup1->allocValue(/*dim*/5), MEDEXCEPTION);
 //#endif
 
-  delete aSubSupport1;
+  aSubSupport1->removeReference();
   delete [] anElems1;
 
   delete aScalarProduct;

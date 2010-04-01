@@ -1919,6 +1919,7 @@ void GIBI_MESH_RDONLY_DRIVER::updateSupports()
       string* attDescr = new string[1];
       attDescr[0] = "med_family";
       f->setAttributesDescriptions( attDescr );
+      delete [] attDescr;
       // limit a name length
       if ( f->getName().length() > 31 ) {
         ostringstream name;
@@ -3123,7 +3124,7 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
   if (_status!=MED_OPENED)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "file " << _fileName<<" is not opened." ));
 
-  _ptrMesh = new MESH();
+  _ptrMesh = new MESH;
 
   _intermediateMED medi;
   try {
@@ -3352,7 +3353,7 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
       nb_sub_list.push_back( nb_sub );
     }
   }
-
+  delete [] names;
   // write mesh
 
   //try {
@@ -3517,6 +3518,5 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
   me->writeMEDNames(listGIBItoMED_mail, listGIBItoMED_cham, listGIBItoMED_comp);
 
   me->writeLastRecord();
-  delete [] names;
   END_OF_MED(LOC);
 }

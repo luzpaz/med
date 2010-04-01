@@ -163,13 +163,11 @@ protected:
   */
 
   vector< string > _profilNames;
-
 public:
-
   SUPPORT();
   SUPPORT(MESH* Mesh, string Name="", MED_EN::medEntityMesh Entity=MED_EN::MED_CELL);
   SUPPORT(const SUPPORT & m);
-  virtual ~SUPPORT();
+public:
   friend MEDMEM_EXPORT ostream & operator<<(ostream &os,const SUPPORT &my);
 
   SUPPORT& operator=(const SUPPORT &support);
@@ -180,7 +178,6 @@ public:
   inline void setName(string Name);
   inline void setDescription(string Description);
   void setMesh(MESH *Mesh) const;
-  void setMeshDirectly(MESH *Mesh) const { _mesh=Mesh; }
   inline void setMeshName(const string & meshName);
   inline void setAll(bool All);
   inline void setEntity(MED_EN::medEntityMesh Entity);
@@ -240,11 +237,9 @@ public:
   void fillFromElementList(const list<int>& listOfElt) throw (MEDEXCEPTION);
   void clearDataOnNumbers();
   MESH* makeMesh();
-
-  //A.G. Addings for RC
-  virtual void addReference() const;
-  virtual void removeReference() const;
-protected:
+ protected:
+  virtual ~SUPPORT();
+ protected:
   static list<int> *sub(int start,int end,const int *idsToSuppress,int lgthIdsToSuppress);
   static list<int> *sub(const int *ids,int lgthIds,const int *idsToSuppress,int lgthIdsToSuppress);
 };

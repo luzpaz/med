@@ -54,7 +54,7 @@ using namespace MEDMEM;
  */
 void MEDMEMTest::testVtkMeshDriver()
 {
-  MESH * aMesh = new MESH();
+  MESH * aMesh = new MESH;
 
   string filename_rd               = getResourceFile("pointe_import22.med");
   string emptyfilename             = "";
@@ -149,5 +149,5 @@ void MEDMEMTest::testVtkMeshDriver()
   //Delete objects
   delete aVtkDriver;
   delete aMedMeshRdDriver22;
-  delete aMesh;
+  aMesh->removeReference();
 }

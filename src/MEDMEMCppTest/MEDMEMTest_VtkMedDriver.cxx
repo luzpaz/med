@@ -122,7 +122,7 @@ void MEDMEMTest::testVtkMedDriver()
   //Test copy() function
   VTK_MED_DRIVER *aVtkMedDriverCpy_1 = (VTK_MED_DRIVER*)aVtkMedDriver->copy();
   CPPUNIT_ASSERT_EQUAL(*aVtkMedDriverCpy_1, *aVtkMedDriver);
-
+  
   //Test (friend ostream & operator <<) defined GENDRIVER class in MEDMEM_GenDriver.hxx
   ostringstream ostr1, ostr2;
   ostr1<<*aVtkMedDriverCpy;
@@ -135,6 +135,7 @@ void MEDMEMTest::testVtkMedDriver()
   delete aMedMedRdDriver21;
   delete aInvalidVtkMedDriver;
   delete aVtkMedDriver;
-  delete aVtkMedDriverCpy;
-  delete aVtkMedDriverCpy_1;
+  //delete aVtkMedDriverCpy;
+  //delete aVtkMedDriverCpy_1;
+  delete aMed;
 }

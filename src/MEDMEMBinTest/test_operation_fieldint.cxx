@@ -132,16 +132,16 @@ int main (int argc, char ** argv)
     try
     {
         /* read MESH, SUPPORT and FIELD */
-        mySupport = new SUPPORT(myMesh,"Support on all Cells",MED_CELL);
-        myField1 = new FIELD<int>(mySupport,MED_DRIVER,filename,fieldname) ;
+      mySupport = new SUPPORT(myMesh,"Support on all Cells",MED_CELL);
+      myField1 = new FIELD<int>(mySupport,MED_DRIVER,filename,fieldname) ;
     }
     catch (MEDEXCEPTION &ex)
     {
-        delete mySupport ;
+        mySupport->removeReference();
         mySupport = new SUPPORT(myMesh,"On_all_node",MED_NODE);
         try 
         {
-            myField1 = new FIELD<int>(mySupport,MED_DRIVER,filename,fieldname) ;
+          myField1 = new FIELD<int>(mySupport,MED_DRIVER,filename,fieldname) ;
             myField1->setValueIJ(10,1,-9); // pour tester les normes max avec une valeur negative
         }
         catch (...) 
@@ -170,7 +170,8 @@ int main (int argc, char ** argv)
     {
         std::cout << endl << string(60,'-') << endl;
         std::cout<< "Test incompatibilité d'unité :" << endl;
-        FIELD<int> myFieldPlus = *myField1 + *myField2;
+        FIELD<int> *myFieldPlus = *myField1 + *myField2;
+        myFieldPlus->removeReference();
     }
     catch (MEDEXCEPTION & ex)
     {
@@ -185,7 +186,8 @@ int main (int argc, char ** argv)
     {
         std::cout << endl << string(60,'-') << endl;
         std::cout<< "Test incompatibilité nombre de composantes :" << endl;
-        FIELD<int> myFieldPlus = *myField1 + *myField2;
+        FIELD<int> *myFieldPlus = *myField1 + *myField2;
+        myFieldPlus->removeReference();
     }
     catch (MEDEXCEPTION & ex)
     {
@@ -194,13 +196,14 @@ int main (int argc, char ** argv)
     }
 
     // supports non compatibles
-    const SUPPORT mySupport2(myMesh,"On_all_node",MED_NODE);
-    myField1->setSupport(&mySupport2);
+    const SUPPORT *mySupport2=new SUPPORT(myMesh,"On_all_node",MED_NODE);
+    myField1->setSupport(mySupport2);
     try
     {
         std::cout << endl << string(60,'-') << endl;
         std::cout<< "Test incompatibilité des supports :" << endl;
-        FIELD<int> myFieldPlus = *myField1 + *myField2;
+        FIELD<int> *myFieldPlus = *myField1 + *myField2;
+        myFieldPlus->removeReference();
     }
     catch (MEDEXCEPTION & ex)
     {
@@ -215,7 +218,8 @@ int main (int argc, char ** argv)
     {
         std::cout << endl << string(60,'-') << endl;
         std::cout<< "Test incompatibilité taille nulle :" << endl;
-        FIELD<int> myFieldPlus = *myField1 + *myField2;
+        FIELD<int> *myFieldPlus = *myField1 + *myField2;
+        myFieldPlus->removeReference();
     }
     catch (MEDEXCEPTION & ex)
     {
@@ -234,12 +238,16 @@ int main (int argc, char ** argv)
 
     // Apres toutes ces exceptions, des opérations qui marchent!
 
-    FIELD<int> myFieldPlus = *myField1 + *myField2;
-    FIELD<int> myFieldMoins = *myField1 - *myField2;
-    FIELD<int> myFieldNeg = -(*myField1);
-    FIELD<int> myFieldFois = *myField1 * *myField2;
-    FIELD<int> myFieldDiv = *myField1 / *myField2;
-    FIELD<int> myFieldAsso = (*myField1)+(*myField2)*(*myField2);
+    FIELD<int> *myFieldPlus = *myField1 + *myField2;
+    FIELD<int> *myFieldMoins = *myField1 - *myField2;
+    myFieldMoins->removeReference();
+    FIELD<int> *myFieldNeg = -(*myField1);
+    FIELD<int> *myFieldFois = *myField1 * *myField2;
+    myFieldFois->removeReference();
+    FIELD<int> *myFieldDiv = *myField1 / *myField2;
+    myFieldDiv->removeReference();
+    FIELD<int> *myFieldAsso = (*myField1)+*((*myField2)*(*myField2));
+    myFieldAsso->removeReference();
     FIELD<int>* myFieldadd = FIELD<int>::add(*myField1, *myField2);
     FIELD<int>* myFieldsub = FIELD<int>::sub(*myField1, *myField2);
     FIELD<int>* myFieldmul = FIELD<int>::mul(*myField1, *myField2);
@@ -247,31 +255,30 @@ int main (int argc, char ** argv)
     FIELD<int>* myFieldDot = FIELD<int>::scalarProduct(*myField1, *myField2);
 
     std::cout <<  endl << string(60,'-') << endl << "f1+f2 :" << endl << endl;
-    affiche_fieldT(&myFieldPlus, myFieldPlus.getSupport());
+    affiche_fieldT(myFieldPlus, myFieldPlus->getSupport());
     std::cout <<  endl << string(60,'-') << endl << "add(f1,f2) :" << endl << endl;
     affiche_fieldT(myFieldadd, myFieldadd->getSupport());
     std::cout <<  endl << string(60,'-') << endl << "scalarProduct(f1,f2) :" << endl << endl;
     affiche_fieldT(myFieldDot, myFieldDot->getSupport());
     std::cout <<  endl << string(60,'-') << endl << " - f1 :" << endl << endl;
-    affiche_fieldT(&myFieldNeg, myFieldNeg.getSupport());
-
-    int size=myFieldPlus.getNumberOfValues()*myFieldPlus.getNumberOfComponents();
+    affiche_fieldT(myFieldNeg, myFieldNeg->getSupport());
+    int size=myFieldPlus->getNumberOfValues()*myFieldPlus->getNumberOfComponents();
   
     std::cout <<  endl << string(60,'-') << endl << "Tests opérations :" << endl << endl;
     affiche_valeur_field("  f1    :", size, *myField1);
     affiche_valeur_field("  f2    :", size, *myField2);
     std::cout << endl << "        " << string(4*size,'-');
 
-    affiche_valeur_field("  +     :", size, myFieldPlus);
+    affiche_valeur_field("  +     :", size, *myFieldPlus);
     affiche_valeur_field(" add    :", size, *myFieldadd);
-    affiche_valeur_field("  -     :", size, myFieldMoins);
+    affiche_valeur_field("  -     :", size, *myFieldMoins);
     affiche_valeur_field(" sub    :", size, *myFieldsub);
-    affiche_valeur_field("  *     :", size, myFieldFois);
+    affiche_valeur_field("  *     :", size, *myFieldFois);
     affiche_valeur_field(" mul    :", size, *myFieldmul);
-    affiche_valeur_field("  /     :", size, myFieldDiv);
+    affiche_valeur_field("  /     :", size, *myFieldDiv);
     affiche_valeur_field(" div    :", size, *myFielddiv);
-    affiche_valeur_field("f1+f2*f1:", size, myFieldAsso);
-    affiche_valeur_field("  - f1  :", size, myFieldNeg);
+    affiche_valeur_field("f1+f2*f1:", size, *myFieldAsso);
+    affiche_valeur_field("  - f1  :", size, *myFieldNeg);
 
     // Test applyLin
     std::cout << endl;
@@ -307,16 +314,16 @@ int main (int argc, char ** argv)
     std::cout << endl << endl; 
 
 
-    delete myFieldadd;
-    delete myFieldsub;
-    delete myFieldmul;
-    delete myFielddiv;
-    delete myFieldDot;
-//    delete myField1_vol;
+    myFieldadd->removeReference();
+    myFieldsub->removeReference();
+    myFieldmul->removeReference();
+    myFielddiv->removeReference();
+    myFieldDot->removeReference();
+//    myField1_vol->removeReference();
 
-    delete myField1;
-    delete myField2;
-    delete mySupport ;
-    delete myMesh ;
+    myField1->removeReference();
+    myField2->removeReference();
+    mySupport->removeReference();
+    myMesh->removeReference();
     return 0;
 }

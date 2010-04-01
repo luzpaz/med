@@ -258,8 +258,8 @@ void MEDMEMTest_testMeshAndMeshing()
   delete myMesh;
 
   //set a MESH object
-  MESHING myMeshing;
-  myMeshing.setName("meshing");
+  MESHING *myMeshing=new MESHING;
+  myMeshing->setName("meshing");
   // define coordinates
 
   int SpaceDimension = 3;
@@ -287,7 +287,7 @@ void MEDMEMTest_testMeshAndMeshing()
   };
   try
   {
-    myMeshing.setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,"CARTESIAN",MED_FULL_INTERLACE);
+    myMeshing->setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,"CARTESIAN",MED_FULL_INTERLACE);
   }
   catch (const std::exception &e)
   {
@@ -301,7 +301,7 @@ void MEDMEMTest_testMeshAndMeshing()
   string Names[3] = { "X","Y","Z" };
   try
   {
-    myMeshing.setCoordinatesNames(Names);
+    myMeshing->setCoordinatesNames(Names);
   }
   catch (const std::exception &e)
   {
@@ -315,7 +315,7 @@ void MEDMEMTest_testMeshAndMeshing()
   string Units[3] = { "cm","cm","cm" };
   try
   {
-    myMeshing.setCoordinatesUnits(Units);
+    myMeshing->setCoordinatesUnits(Units);
   }
   catch (const std::exception &e)
   {
@@ -334,11 +334,11 @@ void MEDMEMTest_testMeshAndMeshing()
   medGeometryElement Types[NumberOfTypes] = {MED_TETRA4,MED_PYRA5,MED_HEXA8};
   const int NumberOfElements[NumberOfTypes] = {12,2,2};
 
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setNumberOfTypes(NumberOfTypes,MED_CELL));
+  CPPUNIT_ASSERT_NO_THROW(myMeshing->setNumberOfTypes(NumberOfTypes,MED_CELL));
 
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setTypes(Types,MED_CELL));
+  CPPUNIT_ASSERT_NO_THROW(myMeshing->setTypes(Types,MED_CELL));
 
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setNumberOfElements(NumberOfElements,MED_CELL));
+  CPPUNIT_ASSERT_NO_THROW(myMeshing->setNumberOfElements(NumberOfElements,MED_CELL));
 
   const int sizeTetra = 12*4;
   int ConnectivityTetra[sizeTetra]=
@@ -357,7 +357,7 @@ void MEDMEMTest_testMeshAndMeshing()
     2,10,6,9
   };
 
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setConnectivity(ConnectivityTetra,MED_CELL,MED_TETRA4));
+  CPPUNIT_ASSERT_NO_THROW(myMeshing->setConnectivity(ConnectivityTetra,MED_CELL,MED_TETRA4));
 
   int ConnectivityPyra[2*5]=
   {
@@ -365,7 +365,7 @@ void MEDMEMTest_testMeshAndMeshing()
     15,18,17,16,19
   };
 
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setConnectivity(ConnectivityPyra,MED_CELL,MED_PYRA5));
+  CPPUNIT_ASSERT_NO_THROW(myMeshing->setConnectivity(ConnectivityPyra,MED_CELL,MED_PYRA5));
 
   int ConnectivityHexa[2*8]=
   {
@@ -373,16 +373,16 @@ void MEDMEMTest_testMeshAndMeshing()
     15,16,17,18,11,12,13,14
   };
 
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setConnectivity(ConnectivityHexa,MED_CELL,MED_HEXA8));
+  CPPUNIT_ASSERT_NO_THROW(myMeshing->setConnectivity(ConnectivityHexa,MED_CELL,MED_HEXA8));
 
   // face part
   const int NumberOfFacesTypes = 2;
   medGeometryElement FacesTypes[NumberOfFacesTypes] = {MED_TRIA3,MED_QUAD4};
   const int NumberOfFacesElements[NumberOfFacesTypes] = {4,4};
 
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setNumberOfTypes(NumberOfFacesTypes,MED_FACE));
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setTypes(FacesTypes,MED_FACE));
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setNumberOfElements(NumberOfFacesElements,MED_FACE));
+  CPPUNIT_ASSERT_NO_THROW(myMeshing->setNumberOfTypes(NumberOfFacesTypes,MED_FACE));
+  CPPUNIT_ASSERT_NO_THROW(myMeshing->setTypes(FacesTypes,MED_FACE));
+  CPPUNIT_ASSERT_NO_THROW(myMeshing->setNumberOfElements(NumberOfFacesElements,MED_FACE));
   const int nbTria = 4;
   const int sizeTria = nbTria*3;
   int ConnectivityTria[sizeTria]=
@@ -393,7 +393,7 @@ void MEDMEMTest_testMeshAndMeshing()
     1,3,6
   };
 
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setConnectivity(ConnectivityTria,MED_FACE,MED_TRIA3));
+  CPPUNIT_ASSERT_NO_THROW(myMeshing->setConnectivity(ConnectivityTria,MED_FACE,MED_TRIA3));
   const int nbQua = 4;
   int ConnectivityQua[nbQua*4]=
   {
@@ -403,12 +403,12 @@ void MEDMEMTest_testMeshAndMeshing()
     12,8,9,13
   };
 
-  CPPUNIT_ASSERT_NO_THROW(myMeshing.setConnectivity(ConnectivityQua,MED_FACE,MED_QUAD4));
+  CPPUNIT_ASSERT_NO_THROW(myMeshing->setConnectivity(ConnectivityQua,MED_FACE,MED_QUAD4));
 
   int meshDimension = SpaceDimension; // because there 3D cells in the mesh
   try
   {
-    myMeshing.setMeshDimension(meshDimension);
+    myMeshing->setMeshDimension(meshDimension);
   }
   catch (const std::exception &e)
   {
@@ -427,47 +427,49 @@ void MEDMEMTest_testMeshAndMeshing()
 
   // Node :
   {
-    GROUP myGroup;
-    myGroup.setName("SomeNodes");
-    myGroup.setMesh(&myMeshing);
-    myGroup.setEntity(MED_NODE);
-    myGroup.setNumberOfGeometricType(1);
+    GROUP *myGroup=new GROUP;
+    myGroup->setName("SomeNodes");
+    myGroup->setMesh(myMeshing);
+    myGroup->setEntity(MED_NODE);
+    myGroup->setNumberOfGeometricType(1);
     medGeometryElement myTypes[1] = {MED_NONE};
-    myGroup.setGeometricType(myTypes);
+    myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[1] = {4};
-    myGroup.setNumberOfElements(myNumberOfElements);
+    myGroup->setNumberOfElements(myNumberOfElements);
     const int index[1+1] = {1,5};
     const int value[4]= { 1,4,5,7};
-    myGroup.setNumber(index,value);
-    CPPUNIT_ASSERT_NO_THROW(myMeshing.addGroup(myGroup));
+    myGroup->setNumber(index,value);
+    CPPUNIT_ASSERT_NO_THROW(myMeshing->addGroup(*myGroup));
+    myGroup->removeReference();
   }
   {
-    GROUP myGroup;
-    myGroup.setName("OtherNodes");
-    myGroup.setMesh(&myMeshing);
-    myGroup.setEntity(MED_NODE);
-    myGroup.setNumberOfGeometricType(1);
+    GROUP *myGroup=new GROUP;
+    myGroup->setName("OtherNodes");
+    myGroup->setMesh(myMeshing);
+    myGroup->setEntity(MED_NODE);
+    myGroup->setNumberOfGeometricType(1);
     medGeometryElement myTypes[1] = {MED_NONE};
-    myGroup.setGeometricType(myTypes);
+    myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[1] = {3};
-    myGroup.setNumberOfElements(myNumberOfElements);
+    myGroup->setNumberOfElements(myNumberOfElements);
     const int index[1+1] = {1,4};
     const int value[3]= { 2,3,6};
-    myGroup.setNumber(index,value);
-    CPPUNIT_ASSERT_NO_THROW(myMeshing.addGroup(myGroup));
+    myGroup->setNumber(index,value);
+    CPPUNIT_ASSERT_NO_THROW(myMeshing->addGroup(*myGroup));
+    myGroup->removeReference();
   }
 
   // Cell :
   {
-    GROUP myGroup;
-    myGroup.setName("SomeCells");
-    myGroup.setMesh(&myMeshing);
-    myGroup.setEntity(MED_CELL);
-    myGroup.setNumberOfGeometricType(3);
+    GROUP *myGroup=new GROUP;
+    myGroup->setName("SomeCells");
+    myGroup->setMesh(myMeshing);
+    myGroup->setEntity(MED_CELL);
+    myGroup->setNumberOfGeometricType(3);
     medGeometryElement myTypes[3] = {MED_TETRA4,MED_PYRA5,MED_HEXA8};
-    myGroup.setGeometricType(myTypes);
+    myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[3] = {4,1,2};
-    myGroup.setNumberOfElements(myNumberOfElements);
+    myGroup->setNumberOfElements(myNumberOfElements);
     const int index[3+1] = {1,5,6,8};
     const int value[4+1+2]=
     {
@@ -475,72 +477,76 @@ void MEDMEMTest_testMeshAndMeshing()
       13,
       15,16
     };
-    myGroup.setNumber(index,value);
-    CPPUNIT_ASSERT_NO_THROW(myMeshing.addGroup(myGroup));
+    myGroup->setNumber(index,value);
+    CPPUNIT_ASSERT_NO_THROW(myMeshing->addGroup(*myGroup));
+    myGroup->removeReference();
   }
   {
-    GROUP myGroup;
-    myGroup.setName("OtherCells");
-    myGroup.setMesh(&myMeshing);
-    myGroup.setEntity(MED_CELL);
-    myGroup.setNumberOfGeometricType(2);
+    GROUP *myGroup=new GROUP;
+    myGroup->setName("OtherCells");
+    myGroup->setMesh(myMeshing);
+    myGroup->setEntity(MED_CELL);
+    myGroup->setNumberOfGeometricType(2);
     medGeometryElement myTypes[] = {MED_TETRA4,MED_PYRA5};
-    myGroup.setGeometricType(myTypes);
+    myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[] = {4,1};
-    myGroup.setNumberOfElements(myNumberOfElements);
+    myGroup->setNumberOfElements(myNumberOfElements);
     const int index[2+1] = {1,5,6};
     const int value[4+1]=
     {
       3,4,5,9,
       14
     };
-    myGroup.setNumber(index,value);
-    CPPUNIT_ASSERT_NO_THROW(myMeshing.addGroup(myGroup));
+    myGroup->setNumber(index,value);
+    CPPUNIT_ASSERT_NO_THROW(myMeshing->addGroup(*myGroup));
+    myGroup->removeReference();
   }
 
   // Face :
   {
-    GROUP myGroup;
-    myGroup.setName("SomeFaces");
-    myGroup.setMesh(&myMeshing);
-    myGroup.setEntity(MED_FACE);
-    myGroup.setNumberOfGeometricType(2);
+    GROUP *myGroup=new GROUP;
+    myGroup->setName("SomeFaces");
+    myGroup->setMesh(myMeshing);
+    myGroup->setEntity(MED_FACE);
+    myGroup->setNumberOfGeometricType(2);
     medGeometryElement myTypes[2] = {MED_TRIA3,MED_QUAD4};
-    myGroup.setGeometricType(myTypes);
+    myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[2] = {2,3};
-    myGroup.setNumberOfElements(myNumberOfElements);
+    myGroup->setNumberOfElements(myNumberOfElements);
     const int index[2+1] = {1,3,6};
     const int value[2+3]=
     {
       2,4,
       5,6,8
     };
-    myGroup.setNumber(index,value);
-    CPPUNIT_ASSERT_NO_THROW(myMeshing.addGroup(myGroup));
+    myGroup->setNumber(index,value);
+    CPPUNIT_ASSERT_NO_THROW(myMeshing->addGroup(*myGroup));
+    myGroup->removeReference();
   }
   {
-    GROUP myGroup;
-    myGroup.setName("OtherFaces");
-    myGroup.setMesh(&myMeshing);
-    myGroup.setEntity(MED_FACE);
-    myGroup.setNumberOfGeometricType(1);
+    GROUP *myGroup=new GROUP;
+    myGroup->setName("OtherFaces");
+    myGroup->setMesh(myMeshing);
+    myGroup->setEntity(MED_FACE);
+    myGroup->setNumberOfGeometricType(1);
     medGeometryElement myTypes[1] = {MED_TRIA3};
-    myGroup.setGeometricType(myTypes);
+    myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[1] = {2};
-    myGroup.setNumberOfElements(myNumberOfElements);
+    myGroup->setNumberOfElements(myNumberOfElements);
     const int index[1+1] = {1,3};
     const int value[2]=
     {
       1,3
     };
-    myGroup.setNumber(index,value);
-    CPPUNIT_ASSERT_NO_THROW(myMeshing.addGroup(myGroup));
+    myGroup->setNumber(index,value);
+    CPPUNIT_ASSERT_NO_THROW(myMeshing->addGroup(*myGroup));
+    myGroup->removeReference();
   }
 
   //test Mesh(MESH &m)
   {
-    MESH * myMesh2 = new MESH( myMeshing );
-    CPPUNIT_ASSERT(myMesh2->deepCompare(myMeshing));
+    MESH * myMesh2 = new MESH( *myMeshing );
+    CPPUNIT_ASSERT(myMesh2->deepCompare(*myMeshing));
 
     cout<<*myMesh2<<endl;
     ostringstream os;
@@ -872,8 +878,8 @@ void MEDMEMTest_testMeshAndMeshing()
 
   const int REFpolygonIndex[nbOfPolygons+1] = {1, 7, 12};
 
-  MESHING myMeshingPoly;
-  myMeshingPoly.setName("meshingpoly");
+  MESHING *myMeshingPoly=new MESHING;
+  myMeshingPoly->setName("meshingpoly");
 
   int MeshDimension = 3;
 
@@ -881,11 +887,11 @@ void MEDMEMTest_testMeshAndMeshing()
   medGeometryElement TypesPoly[NbOfTypes] = {MED_TETRA4};
   const int NbOfElements[NbOfTypes] = {1};
 
-  CPPUNIT_ASSERT_NO_THROW(myMeshingPoly.setNumberOfTypes(NbOfTypes, MED_CELL));
+  CPPUNIT_ASSERT_NO_THROW(myMeshingPoly->setNumberOfTypes(NbOfTypes, MED_CELL));
 
   try
   {
-    myMeshingPoly.setCoordinates(SpaceDimension, NumberOfNodes, CoordinatesPoly,
+    myMeshingPoly->setCoordinates(SpaceDimension, NumberOfNodes, CoordinatesPoly,
                                  "CARTESIAN", MED_FULL_INTERLACE);
   }
   catch (const std::exception &e)
@@ -899,7 +905,7 @@ void MEDMEMTest_testMeshAndMeshing()
 
   try
   {
-    myMeshingPoly.setSpaceDimension(SpaceDimension);
+    myMeshingPoly->setSpaceDimension(SpaceDimension);
   }
   catch (const std::exception &e)
   {
@@ -912,7 +918,7 @@ void MEDMEMTest_testMeshAndMeshing()
 
   try
   {
-    myMeshingPoly.setMeshDimension(MeshDimension);
+    myMeshingPoly->setMeshDimension(MeshDimension);
   }
   catch (const std::exception &e)
   {
@@ -923,15 +929,15 @@ void MEDMEMTest_testMeshAndMeshing()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  CPPUNIT_ASSERT_NO_THROW(myMeshingPoly.setTypes(TypesPoly, MED_CELL));
-  CPPUNIT_ASSERT_NO_THROW(myMeshingPoly.setNumberOfElements(NbOfElements, MED_CELL));
+  CPPUNIT_ASSERT_NO_THROW(myMeshingPoly->setTypes(TypesPoly, MED_CELL));
+  CPPUNIT_ASSERT_NO_THROW(myMeshingPoly->setNumberOfElements(NbOfElements, MED_CELL));
 
   string Unit ="cm";
   for(int i = 0; i < SpaceDimension; i++ )
   {
     try
     {
-      myMeshingPoly.setCoordinateName(Names[i],i);
+      myMeshingPoly->setCoordinateName(Names[i],i);
     }
     catch (const std::exception &e)
     {
@@ -943,7 +949,7 @@ void MEDMEMTest_testMeshAndMeshing()
     }
     try
     {
-      myMeshingPoly.setCoordinateUnit(Unit, i);
+      myMeshingPoly->setCoordinateUnit(Unit, i);
     }
     catch (const std::exception &e)
     {
@@ -960,24 +966,24 @@ void MEDMEMTest_testMeshAndMeshing()
     17, 9, 18, 19
   };
 
-  CPPUNIT_ASSERT_NO_THROW(myMeshingPoly.setConnectivity(ConnectivityTetraPoly, MED_CELL, MED_TETRA4));
+  CPPUNIT_ASSERT_NO_THROW(myMeshingPoly->setConnectivity(ConnectivityTetraPoly, MED_CELL, MED_TETRA4));
 
-  CPPUNIT_ASSERT_NO_THROW(myMeshingPoly.setPolyhedraConnectivity(REFpolyIndex, REFfacesIndex,
+  CPPUNIT_ASSERT_NO_THROW(myMeshingPoly->setPolyhedraConnectivity(REFpolyIndex, REFfacesIndex,
                                  REFnodalConnOfFaces, NumberOfPolyhedron, MED_CELL));
 
   bool PolyConn = false;
-  CPPUNIT_ASSERT_NO_THROW(PolyConn = myMeshingPoly.existPolyhedronConnectivity(MED_NODAL, MED_CELL));
+  CPPUNIT_ASSERT_NO_THROW(PolyConn = myMeshingPoly->existPolyhedronConnectivity(MED_NODAL, MED_CELL));
   if(PolyConn)
   {
-    CPPUNIT_ASSERT_EQUAL(myMeshingPoly.getNumberOfPolyhedron(),NumberOfPolyhedron);
-    CPPUNIT_ASSERT_EQUAL(myMeshingPoly.getNumberOfPolyhedronFaces(),NumberOfFaces);
-    CPPUNIT_ASSERT_NO_THROW(myMeshingPoly.getPolyhedronConnectivityLength(MED_NODAL));
+    CPPUNIT_ASSERT_EQUAL(myMeshingPoly->getNumberOfPolyhedron(),NumberOfPolyhedron);
+    CPPUNIT_ASSERT_EQUAL(myMeshingPoly->getNumberOfPolyhedronFaces(),NumberOfFaces);
+    CPPUNIT_ASSERT_NO_THROW(myMeshingPoly->getPolyhedronConnectivityLength(MED_NODAL));
     const int * PolyConn;
     const int * PolyFaceIdx;
     const int * PolyIdx;
-    CPPUNIT_ASSERT_NO_THROW(PolyConn = myMeshingPoly.getPolyhedronConnectivity(MED_NODAL));
-    CPPUNIT_ASSERT_NO_THROW(PolyFaceIdx = myMeshingPoly.getPolyhedronFacesIndex());
-    CPPUNIT_ASSERT_NO_THROW(PolyIdx = myMeshingPoly.getPolyhedronIndex(MED_NODAL));
+    CPPUNIT_ASSERT_NO_THROW(PolyConn = myMeshingPoly->getPolyhedronConnectivity(MED_NODAL));
+    CPPUNIT_ASSERT_NO_THROW(PolyFaceIdx = myMeshingPoly->getPolyhedronFacesIndex());
+    CPPUNIT_ASSERT_NO_THROW(PolyIdx = myMeshingPoly->getPolyhedronIndex(MED_NODAL));
     for(int i = 0; i<NumberOfPolyhedron; i++)
     {
       int FaceIdxBegin = PolyIdx[i];
@@ -992,17 +998,17 @@ void MEDMEMTest_testMeshAndMeshing()
     }
   }
 
-  MESHING myPolygonMeshing;
-  myPolygonMeshing.setName("PolygonMeshing");
+  MESHING *myPolygonMeshing=new MESHING;
+  myPolygonMeshing->setName("PolygonMeshing");
 
   medGeometryElement PolygonTypes[NbOfTypes] = {MED_TRIA3};
   const int PolygonNumberOfElements[NbOfTypes] = {2};
 
-  CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing.setNumberOfTypes(NbOfTypes, MED_CELL));
+  CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing->setNumberOfTypes(NbOfTypes, MED_CELL));
 
   try
   {
-    myPolygonMeshing.setCoordinates(SpaceDimension, NumberOfNodes, PolygonCoordinates,
+    myPolygonMeshing->setCoordinates(SpaceDimension, NumberOfNodes, PolygonCoordinates,
                     "CARTESIAN", MED_FULL_INTERLACE);
   }
   catch (const std::exception &e)
@@ -1018,19 +1024,19 @@ void MEDMEMTest_testMeshAndMeshing()
   SpaceDimension = 3;
   MeshDimension = 2;
 
-  myPolygonMeshing.setSpaceDimension(SpaceDimension);
-  CPPUNIT_ASSERT(myPolygonMeshing.getSpaceDimension() == 3);
-  myPolygonMeshing.setMeshDimension(MeshDimension);
-  CPPUNIT_ASSERT(myPolygonMeshing.getMeshDimension() == 2);
-  myPolygonMeshing.setNumberOfNodes(NumberOfNodes);
-  CPPUNIT_ASSERT(myPolygonMeshing.getNumberOfNodes() == 9);
-  CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing.setTypes(PolygonTypes, MED_CELL));
-  CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing.setNumberOfElements(PolygonNumberOfElements, MED_CELL));
-  CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing.setCoordinatesSystem("CARTESIAN"));
+  myPolygonMeshing->setSpaceDimension(SpaceDimension);
+  CPPUNIT_ASSERT(myPolygonMeshing->getSpaceDimension() == 3);
+  myPolygonMeshing->setMeshDimension(MeshDimension);
+  CPPUNIT_ASSERT(myPolygonMeshing->getMeshDimension() == 2);
+  myPolygonMeshing->setNumberOfNodes(NumberOfNodes);
+  CPPUNIT_ASSERT(myPolygonMeshing->getNumberOfNodes() == 9);
+  CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing->setTypes(PolygonTypes, MED_CELL));
+  CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing->setNumberOfElements(PolygonNumberOfElements, MED_CELL));
+  CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing->setCoordinatesSystem("CARTESIAN"));
 
   try
   {
-    myPolygonMeshing.setCoordinatesNames(Names);
+    myPolygonMeshing->setCoordinatesNames(Names);
   }
   catch (const std::exception &e)
   {
@@ -1043,7 +1049,7 @@ void MEDMEMTest_testMeshAndMeshing()
 
   try
   {
-    myPolygonMeshing.setCoordinatesUnits(Units);
+    myPolygonMeshing->setCoordinatesUnits(Units);
   }
   catch (const std::exception &e)
   {
@@ -1060,37 +1066,38 @@ void MEDMEMTest_testMeshAndMeshing()
     1, 7, 2, 3, 9, 4
   };
 
-  CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing.setConnectivity(ConnectivityTri, MED_CELL, MED_TRIA3));
-  CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing.setPolygonsConnectivity
+  CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing->setConnectivity(ConnectivityTri, MED_CELL, MED_TRIA3));
+  CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing->setPolygonsConnectivity
                           (REFpolygonIndex, REFpolygonFaces, nbOfPolygons, MED_CELL));
 
   bool PolygonConn = false;
-  CPPUNIT_ASSERT_NO_THROW(PolygonConn = myPolygonMeshing.existPolygonsConnectivity(MED_NODAL, MED_CELL));
+  CPPUNIT_ASSERT_NO_THROW(PolygonConn = myPolygonMeshing->existPolygonsConnectivity(MED_NODAL, MED_CELL));
   if(PolygonConn)
   {
     int Polytypes;
-    CPPUNIT_ASSERT_NO_THROW(Polytypes = myPolygonMeshing.getNumberOfTypesWithPoly(MED_CELL));
+    CPPUNIT_ASSERT_NO_THROW(Polytypes = myPolygonMeshing->getNumberOfTypesWithPoly(MED_CELL));
     CPPUNIT_ASSERT(NbOfTypes != Polytypes);
 
     const MED_EN::medGeometryElement * PolyTypes;
-    CPPUNIT_ASSERT_NO_THROW(PolyTypes = myPolygonMeshing.getTypesWithPoly(MED_CELL));
+    CPPUNIT_ASSERT_NO_THROW(PolyTypes = myPolygonMeshing->getTypesWithPoly(MED_CELL));
     CPPUNIT_ASSERT_EQUAL(PolyTypes[NbOfTypes],MED_POLYGON);
 
     for(int t = 0; t < Polytypes; t++)
     {
-      CPPUNIT_ASSERT_NO_THROW( myPolygonMeshing.getNumberOfElementsWithPoly(MED_CELL, PolyTypes[t]));
+      CPPUNIT_ASSERT_NO_THROW( myPolygonMeshing->getNumberOfElementsWithPoly(MED_CELL, PolyTypes[t]));
     }
 
     medGeometryElement geomPolyElem;
-    CPPUNIT_ASSERT_NO_THROW(geomPolyElem = myPolygonMeshing.getElementTypeWithPoly(MED_CELL, 1));
+    CPPUNIT_ASSERT_NO_THROW(geomPolyElem = myPolygonMeshing->getElementTypeWithPoly(MED_CELL, 1));
     CPPUNIT_ASSERT_EQUAL(geomPolyElem, MED_TRIA3);
 
-    CPPUNIT_ASSERT_EQUAL(myPolygonMeshing.getNumberOfPolygons(),nbOfPolygons);
-    CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing.getPolygonsConnectivityLength(MED_NODAL,MED_CELL));
+    CPPUNIT_ASSERT_EQUAL(myPolygonMeshing->getNumberOfPolygons(),nbOfPolygons);
+    CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing->getPolygonsConnectivityLength(MED_NODAL,MED_CELL));
+    myPolygonMeshing->removeReference();
     const int * PolygonConn;
     const int * PolygonIdx;
-    CPPUNIT_ASSERT_THROW(PolygonConn = myMeshingPoly.getPolygonsConnectivity(MED_NODAL,MED_CELL),MEDEXCEPTION);
-    CPPUNIT_ASSERT_THROW(PolygonIdx = myMeshingPoly.getPolygonsConnectivityIndex(MED_NODAL,MED_CELL),MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(PolygonConn = myMeshingPoly->getPolygonsConnectivity(MED_NODAL,MED_CELL),MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(PolygonIdx = myMeshingPoly->getPolygonsConnectivityIndex(MED_NODAL,MED_CELL),MEDEXCEPTION);
   }
 
   /////////////////////////////////////////////////////
@@ -1108,8 +1115,8 @@ void MEDMEMTest_testMeshAndMeshing()
     myMeshDriver.close();
 
     SUPPORT* sup = new SUPPORT(myMeshPointe);
-    delete sup;
-    delete myMeshPointe;
+    sup->removeReference();
+    myMeshPointe->removeReference();
   }
 //#endif
 //#ifdef ENABLE_FORCED_FAILURES
@@ -1313,9 +1320,9 @@ void MEDMEMTest_testMeshAndMeshing()
         CPPUNIT_FAIL("Unknown exception");
       }
 
-      delete skin;
-      delete copyMergeSkin;
-      delete copyIntersectSkin;
+      skin->removeReference();
+      copyMergeSkin->removeReference();
+      copyIntersectSkin->removeReference();
     }
 
     constituentEntity++;
@@ -1421,7 +1428,7 @@ void MEDMEMTest_testMeshAndMeshing()
 
     delete normal;
     delete length;
-    delete sup;
+    sup->removeReference();
 
 //#ifdef ENABLE_FAULTS
   {
@@ -1451,13 +1458,13 @@ void MEDMEMTest_testMeshAndMeshing()
       SUPPORT *MergeSup;
       CPPUNIT_ASSERT_NO_THROW(MergeSup = myMesh3->mergeSupports(myVectSup3));
       cout << *MergeSup << endl;
-      delete MergeSup;
+      MergeSup->removeReference();
 
       //method return a intersection of all SUPPORTs in IntersectSup
       SUPPORT *IntersectSup;
       CPPUNIT_ASSERT_NO_THROW(IntersectSup = myMesh3->intersectSupports(myVectSup3));
       if (IntersectSup != NULL) cout<< *IntersectSup <<endl;
-      delete IntersectSup;
+      IntersectSup->removeReference();
 
       FIELD<double> * length1 = myMeshing3->getLength(sup1);
       FIELD<double> * length2 = myMeshing3->getLength(sup2);
@@ -1470,8 +1477,8 @@ void MEDMEMTest_testMeshAndMeshing()
       CPPUNIT_ASSERT_NO_THROW(length12 = myMeshing3->mergeFields(myVect12));
       delete length12;
 
-      delete sup1;
-      delete sup2;
+      sup1->removeReference();
+      sup2->removeReference();
       delete length1;
       delete length2;
     }

@@ -212,7 +212,7 @@ void MEDMEMTest::testnArray()
       CPPUNIT_ASSERT(  myArray1Ptr[elemno]     ==  array2Ref[elemno] );
       elemno++;
     }
-
+  delete myArray1cin;
   /////////////////////////////////////
   // TEST 2   NoInterlace et NoGauss //
   /////////////////////////////////////
@@ -272,6 +272,7 @@ void MEDMEMTest::testnArray()
         elemno++;
       }
     }
+    delete myArray2cin;
   }
 
   ///////////////////////////////////////
@@ -391,7 +392,7 @@ void MEDMEMTest::testnArray()
         CPPUNIT_ASSERT_DOUBLES_EQUAL(myArray3Ptr[elemno], array4Ref[elemno], EPS );
         elemno++;
       }
-
+  delete myArray3cin;
   ////////////////////////////////////
   // TEST 4   NoInterlace et Gauss  //
   ////////////////////////////////////

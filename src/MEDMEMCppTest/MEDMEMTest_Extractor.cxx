@@ -64,9 +64,8 @@ void test_extractLine( Extractor* extractor,
 
     CPPUNIT_ASSERT_EQUAL( nbSegments, resField->getSupport()->getNumberOfElements(MED_ALL_ELEMENTS));
     CPPUNIT_ASSERT_EQUAL( nbSegments+1, resField->getSupport()->getMesh()->getNumberOfNodes());
+    resField->removeReference();
   }
-
-  delete resField;
 }
 
 void MEDMEMTest::testExtractor()
@@ -91,7 +90,7 @@ void MEDMEMTest::testExtractor()
   CPPUNIT_ASSERT_THROW( new Extractor(*aField1), MEDEXCEPTION);
 
   const SUPPORT * aSupport = aField1->getSupport();
-  MESH * aMesh = new MESH (MED_DRIVER, filename, aSupport->getMeshName());
+  MESH * aMesh = new MESH(MED_DRIVER, filename, aSupport->getMeshName());
   aSupport->setMesh(aMesh);
 
   Extractor* extractor = 0;
@@ -126,9 +125,9 @@ void MEDMEMTest::testExtractor()
   resField->write( drv );
 
   delete extractor; extractor=0;
-  delete aMesh; aMesh=0;
-  delete resField; resField=0;
-  delete aField1; aField1=0;
+  aMesh->removeReference(); aMesh=0;
+  resField->removeReference(); resField=0;
+  aField1->removeReference(); aField1=0;
 
   // ===================================================================================
   // TEST 2D->1D extraction in 3d space
@@ -239,11 +238,11 @@ void MEDMEMTest::testExtractor()
   resField->write( drv );
   cout << endl << "Write " << result_file << endl;
 
-  delete aSupport; aSupport=0;
-  delete myMeshing; myMeshing=0;
-  delete inField; inField=0;
+  aSupport->removeReference(); aSupport=0;
+  myMeshing->removeReference(); myMeshing=0;
+  inField->removeReference(); inField=0;
   delete extractor; extractor=0;
-  delete resField; resField=0;
+  resField->removeReference(); resField=0;
 
   // ======================================================================================
   // TEST 3D->1D extraction
@@ -341,14 +340,12 @@ void MEDMEMTest::testExtractor()
   for ( int i = 0; i < value.size(); ++i )
     value[i] = double (i+1);
   inField->setValue( &value[0] );
-
   // store input field
   drv = inField->addDriver(MED_DRIVER, result_file, fieldname);
   inField->write(drv);
   cout << endl << "Write " << result_file << endl;
 
   // Extraction
-
   CPPUNIT_ASSERT_NO_THROW( extractor = new Extractor(*inField));
   {
     // Test corner-corner intersection
@@ -418,9 +415,9 @@ void MEDMEMTest::testExtractor()
   }
 
   inField->setSupport(0);
-  delete aSupport; aSupport=0;
+  aSupport->removeReference(); aSupport=0;
   delete extractor; extractor=0;
-  delete myMeshing; myMeshing=0;
+  myMeshing->removeReference(); myMeshing=0;
   
   // ======================================================================================
   // TEST 3D->1D extraction on a large model
@@ -429,7 +426,7 @@ void MEDMEMTest::testExtractor()
   // read a mesh
   filename = getResourceFile("geomMesh22.med");
   meshname = "GeomMesh";
-  aMesh = new MESH (MED_DRIVER, filename, meshname);
+  aMesh = new MESH(MED_DRIVER, filename, meshname);
   aSupport = new SUPPORT( aMesh );
 
   // make a field
@@ -451,10 +448,10 @@ void MEDMEMTest::testExtractor()
   CPPUNIT_ASSERT( resField );
   CPPUNIT_ASSERT_EQUAL( 31, resField->getSupport()->getNumberOfElements(MED_ALL_ELEMENTS));
   CPPUNIT_ASSERT_EQUAL( 33, resField->getSupport()->getMesh()->getNumberOfNodes());
-
-  delete resField; resField=0;
-  delete aMesh; aMesh=0;
-  delete aSupport; aSupport=0;
-  delete inField; inField=0;
+  delete extractor;
+  resField->removeReference(); resField=0;
+  aMesh->removeReference(); aMesh=0;
+  aSupport->removeReference(); aSupport=0;
+  inField->removeReference(); inField=0;
 }
 

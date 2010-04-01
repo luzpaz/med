@@ -256,13 +256,13 @@ void MEDMEMTest::testDriverFactory()
   ////////////////////////////////
   // Test 4: buildDriverForMesh //
   ////////////////////////////////
-  MESH mesh;
+  MESH *mesh=new MESH;
 
   // 4.1: MED_DRIVER
 
   // rdonly
   aDriver = DRIVERFACTORY::buildDriverForMesh
-    (MED_DRIVER, "anyfile", &mesh, "my driver name", MED_EN::RDONLY);
+    (MED_DRIVER, "anyfile", mesh, "my driver name", MED_EN::RDONLY);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
@@ -276,7 +276,7 @@ void MEDMEMTest::testDriverFactory()
 
   // wronly
   aDriver = DRIVERFACTORY::buildDriverForMesh
-    (MED_DRIVER, "anyfile", &mesh, "my driver name", MED_EN::WRONLY);
+    (MED_DRIVER, "anyfile", mesh, "my driver name", MED_EN::WRONLY);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
@@ -288,7 +288,7 @@ void MEDMEMTest::testDriverFactory()
 
   // rdwr
   aDriver = DRIVERFACTORY::buildDriverForMesh
-    (MED_DRIVER, "anyfile", &mesh, "my driver name", MED_EN::RDWR);
+    (MED_DRIVER, "anyfile", mesh, "my driver name", MED_EN::RDWR);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
 
@@ -302,7 +302,7 @@ void MEDMEMTest::testDriverFactory()
 
   // rdonly
   aDriver = DRIVERFACTORY::buildDriverForMesh
-    (GIBI_DRIVER, "anyfile", &mesh, "my driver name", MED_EN::RDONLY);
+    (GIBI_DRIVER, "anyfile", mesh, "my driver name", MED_EN::RDONLY);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
@@ -317,7 +317,7 @@ void MEDMEMTest::testDriverFactory()
 //                                                          "my driver name", MED_EN::WRONLY),
 //                        MED_EXCEPTION);
   aDriver = DRIVERFACTORY::buildDriverForMesh
-    (GIBI_DRIVER, "anyfile", &mesh, "my driver name", MED_EN::WRONLY);
+    (GIBI_DRIVER, "anyfile", mesh, "my driver name", MED_EN::WRONLY);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
@@ -331,7 +331,7 @@ void MEDMEMTest::testDriverFactory()
 //                                                          "my driver name", MED_EN::RDWR),
 //                        MED_EXCEPTION);
   aDriver = DRIVERFACTORY::buildDriverForMesh
-    (GIBI_DRIVER, "anyfile", &mesh, "my driver name", MED_EN::RDWR);
+    (GIBI_DRIVER, "anyfile", mesh, "my driver name", MED_EN::RDWR);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
 
@@ -343,7 +343,7 @@ void MEDMEMTest::testDriverFactory()
 
   // rdonly
   aDriver = DRIVERFACTORY::buildDriverForMesh
-    (PORFLOW_DRIVER, "anyfile", &mesh, "my driver name", MED_EN::RDONLY);
+    (PORFLOW_DRIVER, "anyfile", mesh, "my driver name", MED_EN::RDONLY);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
@@ -353,24 +353,24 @@ void MEDMEMTest::testDriverFactory()
   delete aDriver;
 
   // wronly
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMesh(PORFLOW_DRIVER, "anyfile", &mesh,
+  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMesh(PORFLOW_DRIVER, "anyfile", mesh,
                                                          "my driver name", MED_EN::WRONLY),
                        MED_EXCEPTION);
   // rdwr
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMesh(PORFLOW_DRIVER, "anyfile", &mesh,
+  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMesh(PORFLOW_DRIVER, "anyfile", mesh,
                                                          "my driver name", MED_EN::RDWR),
                        MED_EXCEPTION);
 
   // 4.4: VTK_DRIVER
 
   // rdonly
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMesh(VTK_DRIVER, "anyfile", &mesh,
+  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMesh(VTK_DRIVER, "anyfile", mesh,
                                                          "my driver name", MED_EN::RDONLY),
                        MED_EXCEPTION);
 
   // wronly
   aDriver = DRIVERFACTORY::buildDriverForMesh
-    (VTK_DRIVER, "anyfile", &mesh, "my driver name", MED_EN::WRONLY);
+    (VTK_DRIVER, "anyfile", mesh, "my driver name", MED_EN::WRONLY);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
@@ -381,7 +381,7 @@ void MEDMEMTest::testDriverFactory()
 
   // rdwr
   aDriver = DRIVERFACTORY::buildDriverForMesh
-    (VTK_DRIVER, "anyfile", &mesh, "my driver name", MED_EN::RDWR);
+    (VTK_DRIVER, "anyfile", mesh, "my driver name", MED_EN::RDWR);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   // next string is commented by skl since VTK driver is 
   // created without mode
@@ -393,24 +393,24 @@ void MEDMEMTest::testDriverFactory()
   delete aDriver;
 
   // 4.5: ASCII_DRIVER
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMesh(ASCII_DRIVER, "anyfile", &mesh,
+  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMesh(ASCII_DRIVER, "anyfile", mesh,
                                                          "my driver name", MED_EN::RDONLY),
                        MED_EXCEPTION);
 
   // 4.6: NO_DRIVER
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMesh(NO_DRIVER, "anyfile", &mesh,
+  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMesh(NO_DRIVER, "anyfile", mesh,
                                                          "my driver name", MED_EN::RDONLY),
                        MED_EXCEPTION);
 
   /////////////////////////////////
   // Test 5: buildDriverForField //
   /////////////////////////////////
-  FIELD<double> field;
+  FIELD<double> *field=new FIELD<double>();
 
   // 5.1: MED_DRIVER
 
   // rdonly
-  aDriver = DRIVERFACTORY::buildDriverForField(MED_DRIVER, "anyfile", &field, MED_EN::RDONLY);
+  aDriver = DRIVERFACTORY::buildDriverForField(MED_DRIVER, "anyfile", field, MED_EN::RDONLY);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
@@ -421,7 +421,7 @@ void MEDMEMTest::testDriverFactory()
   delete aDriver;
 
   // wronly
-  aDriver = DRIVERFACTORY::buildDriverForField(MED_DRIVER, "anyfile", &field, MED_EN::WRONLY);
+  aDriver = DRIVERFACTORY::buildDriverForField(MED_DRIVER, "anyfile", field, MED_EN::WRONLY);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
@@ -432,7 +432,7 @@ void MEDMEMTest::testDriverFactory()
   delete aDriver;
 
   // rdwr
-  aDriver = DRIVERFACTORY::buildDriverForField(MED_DRIVER, "anyfile", &field, MED_EN::RDWR);
+  aDriver = DRIVERFACTORY::buildDriverForField(MED_DRIVER, "anyfile", field, MED_EN::RDWR);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
 //#ifdef ENABLE_FORCED_FAILURES
   // (BUG) Wrong access mode (WRONLY) passed to parent class!
@@ -450,38 +450,38 @@ void MEDMEMTest::testDriverFactory()
   // 5.2: GIBI_DRIVER
 
   // rdonly
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForField(GIBI_DRIVER, "anyfile", &field, MED_EN::RDONLY),
+  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForField(GIBI_DRIVER, "anyfile", field, MED_EN::RDONLY),
                        MED_EXCEPTION);
   // wronly
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForField(GIBI_DRIVER, "anyfile", &field, MED_EN::WRONLY),
+  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForField(GIBI_DRIVER, "anyfile", field, MED_EN::WRONLY),
                        MED_EXCEPTION);
   // rdwr
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForField(GIBI_DRIVER, "anyfile", &field, MED_EN::RDWR),
+  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForField(GIBI_DRIVER, "anyfile", field, MED_EN::RDWR),
                        MED_EXCEPTION);
 
   // 5.3: PORFLOW_DRIVER
 
   // rdonly
   CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForField(PORFLOW_DRIVER, "anyfile",
-                                                          &field, MED_EN::RDONLY),
+                                                          field, MED_EN::RDONLY),
                        MED_EXCEPTION);
   // wronly
   CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForField(PORFLOW_DRIVER, "anyfile",
-                                                          &field, MED_EN::WRONLY),
+                                                          field, MED_EN::WRONLY),
                        MED_EXCEPTION);
   // rdwr
   CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForField(PORFLOW_DRIVER, "anyfile",
-                                                          &field, MED_EN::RDWR),
+                                                          field, MED_EN::RDWR),
                        MED_EXCEPTION);
 
   // 5.4: VTK_DRIVER
 
   // rdonly
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForField(VTK_DRIVER, "anyfile", &field, MED_EN::RDONLY),
+  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForField(VTK_DRIVER, "anyfile", field, MED_EN::RDONLY),
                        MED_EXCEPTION);
 
   // wronly
-  aDriver = DRIVERFACTORY::buildDriverForField(VTK_DRIVER, "anyfile", &field, MED_EN::WRONLY);
+  aDriver = DRIVERFACTORY::buildDriverForField(VTK_DRIVER, "anyfile", field, MED_EN::WRONLY);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
@@ -491,7 +491,7 @@ void MEDMEMTest::testDriverFactory()
   delete aDriver;
 
   // rdwr
-  aDriver = DRIVERFACTORY::buildDriverForField(VTK_DRIVER, "anyfile", &field, MED_EN::RDWR);
+  aDriver = DRIVERFACTORY::buildDriverForField(VTK_DRIVER, "anyfile", field, MED_EN::RDWR);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   // next string is commented by skl since VTK driver is 
   // created without mode
@@ -505,22 +505,22 @@ void MEDMEMTest::testDriverFactory()
   // 5.5: ASCII_DRIVER
 
   // rdonly
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForField(ASCII_DRIVER, "anyfile", &field, MED_EN::RDONLY),
+  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForField(ASCII_DRIVER, "anyfile", field, MED_EN::RDONLY),
                        MED_EXCEPTION);
   // rdwr
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForField(ASCII_DRIVER, "anyfile", &field, MED_EN::RDWR),
+  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForField(ASCII_DRIVER, "anyfile", field, MED_EN::RDWR),
                        MED_EXCEPTION);
 
   // wronly
   // it throws on empty field
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForField(ASCII_DRIVER, "anyfile", &field, MED_EN::WRONLY),
+  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForField(ASCII_DRIVER, "anyfile", field, MED_EN::WRONLY),
                        MED_EXCEPTION);
 
   // now try with valid field
   string filename  = getResourceFile("pointe.med");
   string meshname  = "maa1";
   string fieldname = "fieldcelldoublescalar";
-  FIELD<double> * aField1 = new FIELD<double> (MED_DRIVER, filename, fieldname);
+  FIELD<double> * aField1 = new FIELD<double>(MED_DRIVER, filename, fieldname);
   const SUPPORT * aSupport = aField1->getSupport();
   MESH * aMesh = new MESH (MED_DRIVER, filename, aSupport->getMeshName());
   aSupport->setMesh(aMesh);
@@ -540,11 +540,11 @@ void MEDMEMTest::testDriverFactory()
 
   delete aDriver;
 
-  delete aField1;
-  delete aMesh;
+  aField1->removeReference();
+  aMesh->removeReference();
 
   // 5.6: NO_DRIVER
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForField(NO_DRIVER, "anyfile", &field, MED_EN::RDONLY),
+  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForField(NO_DRIVER, "anyfile", field, MED_EN::RDONLY),
                        MED_EXCEPTION);
 
   ////////////////////////////////////
@@ -653,7 +653,7 @@ void MEDMEMTest::testDriverFactory()
   // 7.1. Med file V2.1
   if (version1 == MED_EN::V21 || version2 == MED_EN::V21) {
     // rdonly
-    aDriver = DRIVERFACTORY::buildMeshDriverFromFile(aFileName21, &mesh, MED_EN::RDONLY);
+    aDriver = DRIVERFACTORY::buildMeshDriverFromFile(aFileName21, mesh, MED_EN::RDONLY);
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName21);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
@@ -663,7 +663,7 @@ void MEDMEMTest::testDriverFactory()
     delete aDriver;
 
     // wronly
-    aDriver = DRIVERFACTORY::buildMeshDriverFromFile(aFileName21, &mesh, MED_EN::WRONLY);
+    aDriver = DRIVERFACTORY::buildMeshDriverFromFile(aFileName21, mesh, MED_EN::WRONLY);
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName21);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
@@ -673,7 +673,7 @@ void MEDMEMTest::testDriverFactory()
     delete aDriver;
 
     // rdwr
-    aDriver = DRIVERFACTORY::buildMeshDriverFromFile(aFileName21, &mesh, MED_EN::RDWR);
+    aDriver = DRIVERFACTORY::buildMeshDriverFromFile(aFileName21, mesh, MED_EN::RDWR);
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName21);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
 
@@ -686,7 +686,7 @@ void MEDMEMTest::testDriverFactory()
   // 7.2. Med file V2.2
   if (version2 == MED_EN::V22 || version1 == MED_EN::V22) {
     // rdonly
-    aDriver = DRIVERFACTORY::buildMeshDriverFromFile(aFileName22, &mesh, MED_EN::RDONLY);
+    aDriver = DRIVERFACTORY::buildMeshDriverFromFile(aFileName22, mesh, MED_EN::RDONLY);
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName22);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
@@ -696,7 +696,7 @@ void MEDMEMTest::testDriverFactory()
     delete aDriver;
 
     // wronly
-    aDriver = DRIVERFACTORY::buildMeshDriverFromFile(aFileName22, &mesh, MED_EN::WRONLY);
+    aDriver = DRIVERFACTORY::buildMeshDriverFromFile(aFileName22, mesh, MED_EN::WRONLY);
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName22);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
@@ -706,7 +706,7 @@ void MEDMEMTest::testDriverFactory()
     delete aDriver;
 
     // rdwr
-    aDriver = DRIVERFACTORY::buildMeshDriverFromFile(aFileName22, &mesh, MED_EN::RDWR);
+    aDriver = DRIVERFACTORY::buildMeshDriverFromFile(aFileName22, mesh, MED_EN::RDWR);
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName22);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
 
@@ -723,7 +723,7 @@ void MEDMEMTest::testDriverFactory()
   // 8.1. Med file V2.1
   if (version1 == MED_EN::V21 || version2 == MED_EN::V21) {
     // rdonly
-    aDriver = DRIVERFACTORY::buildFieldDriverFromFile(aFileName21, &field, MED_EN::RDONLY);
+    aDriver = DRIVERFACTORY::buildFieldDriverFromFile(aFileName21, field, MED_EN::RDONLY);
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName21);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
@@ -734,7 +734,7 @@ void MEDMEMTest::testDriverFactory()
     delete aDriver;
 
     // wronly
-    aDriver = DRIVERFACTORY::buildFieldDriverFromFile(aFileName21, &field, MED_EN::WRONLY);
+    aDriver = DRIVERFACTORY::buildFieldDriverFromFile(aFileName21, field, MED_EN::WRONLY);
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName21);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
@@ -745,7 +745,7 @@ void MEDMEMTest::testDriverFactory()
     delete aDriver;
 
     // rdwr
-    aDriver = DRIVERFACTORY::buildFieldDriverFromFile(aFileName21, &field, MED_EN::RDWR);
+    aDriver = DRIVERFACTORY::buildFieldDriverFromFile(aFileName21, field, MED_EN::RDWR);
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName21);
     //CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR); // see MEDMEM_define.hxx
@@ -760,7 +760,7 @@ void MEDMEMTest::testDriverFactory()
   // 8.2. Med file V2.2
   if (version2 == MED_EN::V22 || version1 == MED_EN::V22) {
     // rdonly
-    aDriver = DRIVERFACTORY::buildFieldDriverFromFile(aFileName22, &field, MED_EN::RDONLY);
+    aDriver = DRIVERFACTORY::buildFieldDriverFromFile(aFileName22, field, MED_EN::RDONLY);
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName22);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
@@ -771,7 +771,7 @@ void MEDMEMTest::testDriverFactory()
     delete aDriver;
 
     // wronly
-    aDriver = DRIVERFACTORY::buildFieldDriverFromFile(aFileName22, &field, MED_EN::WRONLY);
+    aDriver = DRIVERFACTORY::buildFieldDriverFromFile(aFileName22, field, MED_EN::WRONLY);
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName22);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
@@ -782,7 +782,7 @@ void MEDMEMTest::testDriverFactory()
     delete aDriver;
 
     // rdwr
-    aDriver = DRIVERFACTORY::buildFieldDriverFromFile(aFileName22, &field, MED_EN::RDWR);
+    aDriver = DRIVERFACTORY::buildFieldDriverFromFile(aFileName22, field, MED_EN::RDWR);
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName22);
     //CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR); // see MEDMEM_define.hxx
@@ -801,7 +801,7 @@ void MEDMEMTest::testDriverFactory()
   // 9.1. V2.1
 
   // rdonly
-  aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", &mesh, "my driver name",
+  aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", mesh, "my driver name",
                                                          MED_EN::RDONLY, MED_EN::V21);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
@@ -813,7 +813,7 @@ void MEDMEMTest::testDriverFactory()
   delete aDriver;
 
   // wronly
-  aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", &mesh, "my driver name",
+  aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", mesh, "my driver name",
                                                          MED_EN::WRONLY, MED_EN::V21);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
@@ -825,7 +825,7 @@ void MEDMEMTest::testDriverFactory()
   delete aDriver;
 
   // rdwr
-  aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", &mesh, "my driver name",
+  aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", mesh, "my driver name",
                                                          MED_EN::RDWR, MED_EN::V21);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
@@ -839,7 +839,7 @@ void MEDMEMTest::testDriverFactory()
   // 9.2. V2.2
 
   // rdonly
-  aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", &mesh, "my driver name",
+  aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", mesh, "my driver name",
                                                          MED_EN::RDONLY, MED_EN::V22);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
@@ -851,7 +851,7 @@ void MEDMEMTest::testDriverFactory()
   delete aDriver;
 
   // wronly
-  aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", &mesh, "my driver name",
+  aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", mesh, "my driver name",
                                                          MED_EN::WRONLY, MED_EN::V22);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
@@ -863,7 +863,7 @@ void MEDMEMTest::testDriverFactory()
   delete aDriver;
 
   // rdwr
-  aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", &mesh, "my driver name",
+  aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", mesh, "my driver name",
                                                          MED_EN::RDWR, MED_EN::V22);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
@@ -871,7 +871,7 @@ void MEDMEMTest::testDriverFactory()
   MED_MESH_RDWR_DRIVER22 * aMeshRWDriverForMed22 = dynamic_cast<MED_MESH_RDWR_DRIVER22 *> (aDriver);
   CPPUNIT_ASSERT(aMeshRWDriverForMed22);
   CPPUNIT_ASSERT(aMeshRWDriverForMed22->getMeshName() == "my driver name");
-
+  mesh->removeReference();
   delete aDriver;
 
   /////////////////////////////////////////////
@@ -881,7 +881,7 @@ void MEDMEMTest::testDriverFactory()
   // 10.1. V2.1
 
   // rdonly
-  aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", &field, MED_EN::RDONLY, MED_EN::V21);
+  aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", field, MED_EN::RDONLY, MED_EN::V21);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
@@ -892,7 +892,7 @@ void MEDMEMTest::testDriverFactory()
   delete aDriver;
 
   // wronly
-  aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", &field, MED_EN::WRONLY, MED_EN::V21);
+  aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", field, MED_EN::WRONLY, MED_EN::V21);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
@@ -903,7 +903,7 @@ void MEDMEMTest::testDriverFactory()
   delete aDriver;
 
   // rdwr
-  aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", &field, MED_EN::RDWR, MED_EN::V21);
+  aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", field, MED_EN::RDWR, MED_EN::V21);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   //CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR); // see MEDMEM_define.hxx
@@ -917,7 +917,7 @@ void MEDMEMTest::testDriverFactory()
   // 10.2. V2.2
 
   // rdonly
-  aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", &field, MED_EN::RDONLY, MED_EN::V22);
+  aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", field, MED_EN::RDONLY, MED_EN::V22);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
@@ -928,7 +928,7 @@ void MEDMEMTest::testDriverFactory()
   delete aDriver;
 
   // wronly
-  aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", &field, MED_EN::WRONLY, MED_EN::V22);
+  aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", field, MED_EN::WRONLY, MED_EN::V22);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
@@ -939,7 +939,8 @@ void MEDMEMTest::testDriverFactory()
   delete aDriver;
 
   // rdwr
-  aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", &field, MED_EN::RDWR, MED_EN::V22);
+  aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", field, MED_EN::RDWR, MED_EN::V22);
+  field->removeReference();
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   //CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR); // see MEDMEM_define.hxx

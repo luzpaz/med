@@ -76,9 +76,9 @@
  */
 void MEDMEMTest::testMedFieldDriver21()
 {
-  FIELD<int> *aField                = new FIELD<int> ();
-  FIELD<int> *aField_1              = new FIELD<int> ();
-  FIELD<double> *aField_2           = new FIELD<double> ();
+  FIELD<int> *aField                = new FIELD<int>();
+  FIELD<int> *aField_1              = new FIELD<int>();
+  FIELD<double> *aField_2           = new FIELD<double>();
   string filename_rd                = getResourceFile("pointe.med");
   string filenameWithOutFileds      = getResourceFile("Mistrat.med");
   string filenameWithOutFileds_rdwr = makeTmpFile("Mistrat.med", filenameWithOutFileds);
@@ -361,7 +361,7 @@ void MEDMEMTest::testMedFieldDriver21()
   try {
     aMedWrFieldDriver21->write();
 
-    MESH* aMesh = new MESH();
+    MESH* aMesh = new MESH;
     aMesh->setName("maa1");
     MED_MESH_RDONLY_DRIVER aMeshDriver (filename_rd, aMesh);
     aMeshDriver.setMeshName("maa1");
@@ -370,6 +370,8 @@ void MEDMEMTest::testMedFieldDriver21()
     aMeshDriver.close();
     SUPPORT* sup = new SUPPORT(aMesh,"maa1",MED_EN::MED_NODE);// "fieldnodeint" is nodal field
     aField->setSupport(sup);
+    sup->removeReference();
+    aMesh->removeReference();
   }
   catch(MEDEXCEPTION &e) {
     CPPUNIT_FAIL(e.what());
@@ -633,9 +635,9 @@ void MEDMEMTest::testMedFieldDriver21()
   CPPUNIT_ASSERT(rwostr1.str() == rwostr2.str());
 
   //Delete all objects
-  delete aField;
-  delete aField_1;
-  delete aField_2;
+  aField->removeReference();
+  aField_1->removeReference();
+  aField_2->removeReference();
 
   delete aInvalidMedRdFieldDriver21_1;
   delete aInvalidMedRdFieldDriver21_2;

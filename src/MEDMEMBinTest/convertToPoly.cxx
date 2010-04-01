@@ -39,12 +39,13 @@ int main(int argc, char** argv)
       string meshname(argv[3]);
       string outputfilename(argv[2]);
       
-      MESH mesh(MED_DRIVER, filename, meshname);
+      MESH *mesh=new MESH(MED_DRIVER, filename, meshname);
 
-      mesh.convertToPoly();
+      mesh->convertToPoly();
 
-      int id = mesh.addDriver(MED_DRIVER,outputfilename,meshname);
-      mesh.write(id);
+      int id = mesh->addDriver(MED_DRIVER,outputfilename,meshname);
+      mesh->write(id);
+      mesh->removeReference();
       return 0;
     }
 }

@@ -316,7 +316,7 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
         string supportName="SupportOnAll_" ;
         supportName+=entNames[(*currentEntity).first] ;
         //(_ptrMed->_support)[meshName][(MED_EN::medEntityMesh)(*currentEntity).first]=new SUPPORT(ptrMesh,supportName,(MED_EN::medEntityMesh) (*currentEntity).first) ;
-        SUPPORT* mySupport = new SUPPORT() ;
+        SUPPORT* mySupport = new SUPPORT ;
         mySupport->setName(supportName);
         mySupport->setMesh(ptrMesh);
         mySupport->setEntity((MED_EN::medEntityMesh) (*currentEntity).first);
@@ -515,7 +515,7 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
 //                                      ) ;
                   // ptrField       =  new FIELD<med_2_1::med_int>   ( ptrSupport,numberOfComponents );   // Les valeurs du champ ne doivent pas être lue pour l'instant
 
-                  ptrField       =  new FIELD<int> ( );   // Les valeurs du champ ne doivent pas être lue pour l'instant
+                  ptrField       =  new FIELD<int>( );   // Les valeurs du champ ne doivent pas être lue pour l'instant
                   ((FIELD<int>*) ptrField)->setSupport(ptrSupport);
                   ((FIELD<int>*) ptrField)->setNumberOfComponents(numberOfComponents);
                   ((FIELD<int>*) ptrField)->setName(fieldName) ; //provisoire, pour debug
@@ -544,7 +544,7 @@ void MED_MED_RDONLY_DRIVER21::readFileStruct( void )
                 }
                 case med_2_1::MED_REEL64 : {
                   //              ptrField       =  new FIELD<med_2_1::med_float> ( ptrSupport,numberOfComponents );   // Les valeurs du champ ne doivent pas être lue pour l'instant
-                  ptrField       =  new FIELD<double> ( );   // Les valeurs du champ ne doivent pas être lue pour l'instant
+                  ptrField       =  new FIELD<double>( );   // Les valeurs du champ ne doivent pas être lue pour l'instant
                   ((FIELD<med_2_1::med_float>*) ptrField)->setSupport(ptrSupport);
                   ((FIELD<med_2_1::med_float>*) ptrField)->setNumberOfComponents(numberOfComponents);
                   ((FIELD<med_2_1::med_float>*) ptrField)->setName(fieldName) ; //provisoire, pour debug

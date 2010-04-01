@@ -27,6 +27,7 @@
 
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_Family.hxx"
+#include "MEDMEM_Mesh.hxx"
 
 using namespace std;
 using namespace MEDMEM;
@@ -54,7 +55,7 @@ GROUP & GROUP::operator=(const GROUP &group)
 
 ostream & MEDMEM::operator<<(ostream &os, GROUP &myGroup)
 {
-  os << (SUPPORT) myGroup;
+  os << (SUPPORT&) myGroup;
 
   int numberoffamilies = myGroup.getNumberOfFamilies();
   os << "  - Families ("<<numberoffamilies<<") :"<<endl;
@@ -79,6 +80,8 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   // first FAMILY to set all !
   FAMILY * myFamily = families.front() ;
   _mesh =  myFamily->getMesh() ;
+  if(_mesh)
+    _mesh->addReference();
   _entity = myFamily->getEntity() ;
   bool isOnAllElts = myFamily->isOnAllElements() ;
 

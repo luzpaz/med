@@ -229,7 +229,7 @@ int main (int argc, char ** argv)
     mySupport->setMesh(myMesh);
 
     FIELD<double> * myField2 = new FIELD<double>(* myField1);
-    FIELD<double> myFieldPlus = *myField1 + *myField2;
+    FIELD<double> *myFieldPlus = *myField1 + *myField2;
     if(verbose)  {
       // affichage des nprmes,des champs f1, f2, scalarProduct(f1,f2) et f1+f2
       FIELD<double>* myField1_vol=myField1->getSupport()->getMesh()->getVolume(myField1->getSupport());
@@ -239,7 +239,7 @@ int main (int argc, char ** argv)
       cout << "Norme L1 calculee en fournissant le volume : " << myField1->normL1(myField1_vol) << endl;
       for (int i=1; i<=myField1->getNumberOfComponents(); ++i)
         cout << "Norme L1 - comp=" << i << " : " << myField1->normL1(i,myField1_vol) << endl;
-      delete myField1_vol;
+      myField1_vol->removeReference();
 
       affiche_fieldT(myField1, myField1->getSupport());
       cout <<  endl << string(60,'-') << endl;
@@ -248,10 +248,11 @@ int main (int argc, char ** argv)
 
       FIELD<double>* myFieldDot = FIELD<double>::scalarProduct(*myField1, *myField2);
       affiche_fieldT(myFieldDot, myFieldDot->getSupport());
-      delete myFieldDot;
+      myFieldDot->removeReference();
       cout <<  endl << string(60,'-') << endl ;
-      affiche_fieldT(&myFieldPlus, myFieldPlus.getSupport());
+      affiche_fieldT(myFieldPlus, myFieldPlus->getSupport());
       cout <<  endl << string(60,'-') << endl << endl ;
+      myFieldPlus->removeReference();
     }
 
 
@@ -263,12 +264,13 @@ int main (int argc, char ** argv)
     ntest++; res=1;
     try
       {
-        FIELD<double> myFieldPlus = *myField1 + *myField2;
+        FIELD<double> *myFieldPlus = *myField1 + *myField2;
         if(verbose)
           {
             cout << endl << string(60,'-') << endl;
             cout<< "Test " << ntest << " : incompatibilitÃ© d'unitÃ© : " << endl << endl;
           }
+        myFieldPlus->removeReference();
       }
     catch (MEDEXCEPTION & ex)
       {
@@ -290,7 +292,8 @@ int main (int argc, char ** argv)
             cout << endl << string(60,'-') << endl;
             cout<< "Test " << ntest << " : incompatibilitÃ© nombre de composantes : " << endl << endl;
           }
-        FIELD<double> myFieldPlus = *myField1 + *myField2;
+        FIELD<double> *myFieldPlus = *myField1 + *myField2;
+        myFieldPlus->removeReference();
       }
     catch (MEDEXCEPTION & ex)
       {
@@ -302,14 +305,15 @@ int main (int argc, char ** argv)
     cout << res << endl;
 
     // test 3 : supports non compatibles
-    const SUPPORT mySupport2(myMesh,"On_all_node",MED_NODE);
-    myField1->setSupport(&mySupport2);
+    const SUPPORT *mySupport2=new SUPPORT(myMesh,"On_all_node",MED_NODE);
+    myField1->setSupport(mySupport2);
     ntest++; res=1;
     try
       {
         if(verbose)
           cout << endl << string(60,'-') << endl << "Test " << ntest << " : incompatibilitÃ© des supports"  << endl << endl;
-        FIELD<double> myFieldPlus = *myField1 + *myField2;
+        FIELD<double> *myFieldPlus = *myField1 + *myField2;
+        myFieldPlus->removeReference();
       }
     catch (MEDEXCEPTION & ex)
       {
@@ -328,7 +332,8 @@ int main (int argc, char ** argv)
       {
         if(verbose)
           cout<< endl << string(60,'-') << endl << "Test " << ntest << " : incompatibilitÃ© taille nulle" << endl << endl;
-        FIELD<double> myFieldPlus = *myField1 + *myField2;
+        FIELD<double> *myFieldPlus = *myField1 + *myField2;
+        myFieldPlus->removeReference();
       }
     catch (MEDEXCEPTION & ex)
       {
@@ -361,33 +366,36 @@ int main (int argc, char ** argv)
       }
 
     // Test du rÃ©sultats de certaines opÃ©rations et affichage si verbose
-    checkOperation(myFieldPlus, *myField1, *myField2, '+', " f1+f2    ", verbose);
+    checkOperation(*myFieldPlus, *myField1, *myField2, '+', " f1+f2    ", verbose);
     FIELD<double>* myFieldadd = FIELD<double>::add(*myField1, *myField2);
     checkOperation( *myFieldadd, *myField1, *myField2, '+', "add(f1,f2)", verbose);
-    delete myFieldadd;
+    myFieldadd->removeReference();
 
-    FIELD<double> myFieldMoins = *myField1 - *myField2;
-    checkOperation(myFieldMoins, *myField1, *myField2, '-', " f1-f2    ", verbose);
+    FIELD<double> *myFieldMoins = *myField1 - *myField2;
+    checkOperation(*myFieldMoins, *myField1, *myField2, '-', " f1-f2    ", verbose);
+    myFieldMoins->removeReference();
     FIELD<double>* myFieldsub = FIELD<double>::sub(*myField1, *myField2);
     checkOperation( *myFieldsub, *myField1, *myField2, '-', "sub(f1,f2)", verbose);
-    delete myFieldsub;
-    FIELD<double> myFieldNeg = -(*myField1);
-    checkOperation(myFieldNeg, *myField1, *myField1, 'n', " -f1      ", verbose);
-    
-    FIELD<double> myFieldFois = *myField1 * *myField2;
-    checkOperation(myFieldFois, *myField1, *myField2, '*', " f1*f2    ", verbose);
+    myFieldsub->removeReference();
+    FIELD<double> *myFieldNeg = -(*myField1);
+    checkOperation(*myFieldNeg, *myField1, *myField1, 'n', " -f1      ", verbose);
+    myFieldNeg->removeReference();
+    FIELD<double> *myFieldFois = *myField1 * *myField2;
+    checkOperation(*myFieldFois, *myField1, *myField2, '*', " f1*f2    ", verbose);
+    myFieldFois->removeReference();
     FIELD<double>* myFieldmul = FIELD<double>::mul(*myField1, *myField2);
     checkOperation( *myFieldmul, *myField1, *myField2, '*', "mul(f1,f2)", verbose);
     
-    FIELD<double> myFieldDiv = *myField1 / *myField2;
-    checkOperation(myFieldDiv, *myField1, *myField2, '/', " f1/f2    ", verbose);
+    FIELD<double> *myFieldDiv = *myField1 / *myField2;
+    checkOperation(*myFieldDiv, *myField1, *myField2, '/', " f1/f2    ", verbose);
+    myFieldDiv->removeReference();
     FIELD<double>* myFielddiv = FIELD<double>::div(*myField1, *myField2);
     checkOperation( *myFielddiv, *myField1, *myField2, '/', "div(f1,f2)", verbose);
-    delete myFielddiv;
+    myFielddiv->removeReference();
 
-    FIELD<double> myFieldAsso = (*myField1)+(*myField2)*(*myField2);
-    checkOperation(myFieldAsso, *myField1, *myField2, 'a', " f1+f2*f2 ", verbose);
-
+    FIELD<double> *myFieldAsso = (*myField1)+*((*myField2)*(*myField2));
+    checkOperation(*myFieldAsso, *myField1, *myField2, 'a', " f1+f2*f2 ", verbose);
+    myFieldAsso->removeReference();
     myField1->applyLin(4.0,1.0);
     checkOperation(*myField1, *myField2, *myField2, 'l', " 4.f1 + 1 ", verbose);
     myField1->applyFunc<myfunction1>();
@@ -403,13 +411,13 @@ int main (int argc, char ** argv)
     checkOperation(*myField1, *myField2, *myField2, '*', " f1*=f2   ", verbose);
     *myField1 /= *myField2;
     checkOperation(*myField1, *myFieldmul, *myField2, '/', " f1/=f2   ", verbose);
-    delete myFieldmul;
+    myFieldmul->removeReference();
 
 
-    delete myField1;
-    delete myField2;
-    delete mySupport ;
-    delete myMesh ;
+    myField1->removeReference();
+    myField2->removeReference();
+    mySupport->removeReference();
+    myMesh->removeReference();
 
   }
   catch ( MEDEXCEPTION & ex) {

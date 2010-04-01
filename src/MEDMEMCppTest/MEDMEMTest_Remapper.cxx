@@ -33,23 +33,23 @@
 
 void MEDMEMTest::test_RemapperP0P0() {
   std::string sourcename=getResourceFile("square1.med");
-  MEDMEM::MESH source_mesh (MED_DRIVER,sourcename,"Mesh_2");
+  MEDMEM::MESH *source_mesh=new MEDMEM::MESH (MED_DRIVER,sourcename,"Mesh_2");
 
   std::string targetname=getResourceFile("square2.med");
-  MEDMEM::MESH target_mesh (MED_DRIVER,targetname,"Mesh_3");
+  MEDMEM::MESH *target_mesh=new MEDMEM::MESH (MED_DRIVER,targetname,"Mesh_3");
 
   int nbcomp=3;
 
-  MEDMEM::SUPPORT source_support(&source_mesh,"on All support",MED_EN::MED_CELL);
-  MEDMEM::FIELD<double> source_field(&source_support,nbcomp);
-  double* sourcevalue=const_cast<double*>(source_field.getValue());
-  for (int i=0; i<source_support.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
+  MEDMEM::SUPPORT *source_support=new MEDMEM::SUPPORT(source_mesh,"on All support",MED_EN::MED_CELL);
+  MEDMEM::FIELD<double> *source_field=new MEDMEM::FIELD<double>(source_support,nbcomp);
+  double* sourcevalue=const_cast<double*>(source_field->getValue());
+  for (int i=0; i<source_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     sourcevalue[i]=1.0;
 
-  MEDMEM::SUPPORT target_support(&target_mesh,"on All support",MED_EN::MED_CELL);
-  MEDMEM::FIELD<double> target_field(&target_support,nbcomp);
-  double* targetvalue=const_cast<double*>(target_field.getValue());
-  for (int i=0; i<target_support.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
+  MEDMEM::SUPPORT *target_support=new MEDMEM::SUPPORT(target_mesh,"on All support",MED_EN::MED_CELL);
+  MEDMEM::FIELD<double> *target_field=new MEDMEM::FIELD<double>(target_support,nbcomp);
+  double* targetvalue=const_cast<double*>(target_field->getValue());
+  for (int i=0; i<target_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     targetvalue[i]=0.0;
 
 
@@ -59,25 +59,25 @@ void MEDMEMTest::test_RemapperP0P0() {
   remapper.setOptionDouble("Precision",1.e-8);
   remapper.setOptionString(intersectiontype,convex);
   remapper.setOptionInt("PrintLevel",1);
-  remapper.prepare(source_mesh,target_mesh,"P0P0");
-  remapper.transfer(source_field,target_field);
+  remapper.prepare(*source_mesh,*target_mesh,"P0P0");
+  remapper.transfer(*source_field,*target_field);
 
   //MN: Old tests
-  MEDMEM::FIELD<double> *source_areas=source_mesh.getArea(&source_support);
-  MEDMEM::FIELD<double> *target_areas=target_mesh.getArea(&target_support);
+  MEDMEM::FIELD<double> *source_areas=source_mesh->getArea(source_support);
+  MEDMEM::FIELD<double> *target_areas=target_mesh->getArea(target_support);
   //MEDMEMTest::absField(*source_areas); //absolute value
   //MEDMEMTest::absField(*target_areas); //absolute value
 
   //target square is in reverse order as compared to initial square
-  double source_integral=source_field.normL2(nbcomp,source_areas);
-  double target_integral=target_field.normL2(nbcomp,target_areas);
+  double source_integral=source_field->normL2(nbcomp,source_areas);
+  double target_integral=target_field->normL2(nbcomp,target_areas);
 
   CPPUNIT_ASSERT_DOUBLES_EQUAL(source_integral,target_integral,1e-10);
 
   //MN: Transfer test
   double max = -2;
   double min =  2;
-  for(int i = 0; i<target_support.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<target_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( targetvalue[i] >max) max = targetvalue[i];
       if( targetvalue[i] <min) min = targetvalue[i];
@@ -87,11 +87,11 @@ void MEDMEMTest::test_RemapperP0P0() {
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,min,1e-10);    
 
   //MN: Reverse transfer test
-  remapper.reverseTransfer(source_field,target_field);
+  remapper.reverseTransfer(*source_field,*target_field);
 
   max = -2;
   min =  2;
-  for(int i = 0; i<source_support.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<source_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( sourcevalue[i] >max) max = sourcevalue[i];
       if( sourcevalue[i] <min) min = sourcevalue[i];
@@ -101,13 +101,13 @@ void MEDMEMTest::test_RemapperP0P0() {
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,min,1e-10);    
 
   //MN: Hxx2salome transfer test
-  MEDMEM::FIELD<double> *newTargetField =remapper.transferField(source_field);
-  MEDMEM::FIELD<double> *newSourceField =remapper.reverseTransferField(target_field);
+  MEDMEM::FIELD<double> *newTargetField =remapper.transferField(*source_field);
+  MEDMEM::FIELD<double> *newSourceField =remapper.reverseTransferField(*target_field);
   sourcevalue=const_cast<double*>((*newSourceField).getValue());
   targetvalue=const_cast<double*>((*newTargetField).getValue());
   max = -2;
   min =  2;
-  for(int i = 0; i<source_support.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<source_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( sourcevalue[i] >max) max = sourcevalue[i];
       if( sourcevalue[i] <min) min = sourcevalue[i];
@@ -115,7 +115,7 @@ void MEDMEMTest::test_RemapperP0P0() {
 
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,max,1e-10);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,min,1e-10);    
-  for(int i = 0; i<target_support.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<target_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( targetvalue[i] >max) max = targetvalue[i];
       if( targetvalue[i] <min) min = targetvalue[i];
@@ -123,43 +123,47 @@ void MEDMEMTest::test_RemapperP0P0() {
 
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,max,1e-10);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,min,1e-10);    
-
-  delete newSourceField;
-  delete newTargetField;
-
-  delete source_areas;
-  delete target_areas;
+  source_field->removeReference();
+  newSourceField->removeReference();
+  newTargetField->removeReference();
+  target_mesh->removeReference();
+  source_areas->removeReference();
+  target_areas->removeReference();
+  target_field->removeReference();
+  target_support->removeReference();
+  source_support->removeReference();
+  source_mesh->removeReference();
 }
 
 void  MEDMEMTest::test_RemapperP1P1() {
   std::string sourcename=getResourceFile("square1.med");
-  MEDMEM::MESH source_mesh (MED_DRIVER,sourcename,"Mesh_2");
+  MEDMEM::MESH *source_mesh=new MEDMEM::MESH (MED_DRIVER,sourcename,"Mesh_2");
 
   std::string targetname=getResourceFile("square2.med");
-  MEDMEM::MESH target_mesh (MED_DRIVER,targetname,"Mesh_3");
+  MEDMEM::MESH *target_mesh=new MEDMEM::MESH (MED_DRIVER,targetname,"Mesh_3");
 
   int nbcomp=2;
 
-  MEDMEM::SUPPORT source_support(&source_mesh,"on All support",MED_EN::MED_NODE);
-  MEDMEM::FIELD<double> source_field(&source_support,nbcomp);
-  double* sourcevalue=const_cast<double*>(source_field.getValue());
-  for (int i=0; i<source_support.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
+  MEDMEM::SUPPORT *source_support=new MEDMEM::SUPPORT(source_mesh,"on All support",MED_EN::MED_NODE);
+  MEDMEM::FIELD<double> *source_field=new MEDMEM::FIELD<double>(source_support,nbcomp);
+  double* sourcevalue=const_cast<double*>(source_field->getValue());
+  for (int i=0; i<source_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     sourcevalue[i]=1.0;
 
-  MEDMEM::SUPPORT target_support(&target_mesh,"on All support",MED_EN::MED_NODE);
-  MEDMEM::FIELD<double> target_field(&target_support,nbcomp);
-  double* targetvalue=const_cast<double*>(target_field.getValue());
-  for (int i=0; i<target_support.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
+  MEDMEM::SUPPORT *target_support=new MEDMEM::SUPPORT(target_mesh,"on All support",MED_EN::MED_NODE);
+  MEDMEM::FIELD<double> *target_field=new MEDMEM::FIELD<double>(target_support,nbcomp);
+  double* targetvalue=const_cast<double*>(target_field->getValue());
+  for (int i=0; i<target_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     targetvalue[i]=-0.0001;
 
 
   MEDMEM_REMAPPER remapper;
-  remapper.prepare(source_mesh,target_mesh,"P1P1");
-  remapper.transfer(source_field,target_field);
+  remapper.prepare(*source_mesh,*target_mesh,"P1P1");
+  remapper.transfer(*source_field,*target_field);
 
   double max = -2;
   double min =  2;
-  for(int i = 0; i<target_support.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<target_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( targetvalue[i] >max) max = targetvalue[i];
       if( targetvalue[i] <min) min = targetvalue[i];
@@ -168,49 +172,56 @@ void  MEDMEMTest::test_RemapperP1P1() {
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,max,1e-10);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,min,1e-10);    
 
-  remapper.reverseTransfer(source_field,target_field);
+  remapper.reverseTransfer(*source_field,*target_field);
 
   max = -2;
   min =  2;
-  for(int i = 0; i<source_support.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<source_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( sourcevalue[i] >max) max = sourcevalue[i];
       if( sourcevalue[i] <min) min = sourcevalue[i];
     }
-
+  source_support->removeReference();
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,max,1e-10);
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(1,min,1e-10);    
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(1,min,1e-10);
+  source_field->removeReference();
+  source_mesh->removeReference();
+  target_field->removeReference();
+  target_mesh->removeReference();
+  target_support->removeReference();
 }
 
 
 void  MEDMEMTest::test_RemapperP1P0() {
   std::string sourcename=getResourceFile("square1.med");
-  MEDMEM::MESH source_mesh (MED_DRIVER,sourcename,"Mesh_2");
+  MEDMEM::MESH *source_mesh=new MEDMEM::MESH (MED_DRIVER,sourcename,"Mesh_2");
 
   std::string targetname=getResourceFile("square2.med");
-  MEDMEM::MESH target_mesh (MED_DRIVER,targetname,"Mesh_3");
+  MEDMEM::MESH *target_mesh=new MEDMEM::MESH (MED_DRIVER,targetname,"Mesh_3");
 
   int nbcomp=3;
-  MEDMEM::SUPPORT source_support(&source_mesh,"on All support",MED_EN::MED_NODE);
-  MEDMEM::FIELD<double> source_field(&source_support,nbcomp);
-  double* sourcevalue=const_cast<double*>(source_field.getValue());
-  for (int i=0; i<source_support.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
+  MEDMEM::SUPPORT *source_support=new MEDMEM::SUPPORT(source_mesh,"on All support",MED_EN::MED_NODE);
+  MEDMEM::FIELD<double> *source_field=new MEDMEM::FIELD<double>(source_support,nbcomp);
+  double* sourcevalue=const_cast<double*>(source_field->getValue());
+  for (int i=0; i<source_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     sourcevalue[i]=1.0;
 
-  MEDMEM::SUPPORT target_support(&target_mesh,"on All support",MED_EN::MED_CELL);
-  MEDMEM::FIELD<double> target_field(&target_support,nbcomp);
-  double* targetvalue=const_cast<double*>(target_field.getValue());
-  for (int i=0; i<target_support.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
+  MEDMEM::SUPPORT *target_support=new MEDMEM::SUPPORT(target_mesh,"on All support",MED_EN::MED_CELL);
+  MEDMEM::FIELD<double> *target_field=new MEDMEM::FIELD<double>(target_support,nbcomp);
+  double* targetvalue=const_cast<double*>(target_field->getValue());
+  for (int i=0; i<target_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     targetvalue[i]=0.0;
 
 
   MEDMEM_REMAPPER remapper;
-  remapper.prepare(source_mesh,target_mesh,"P1P0");
-  remapper.transfer(source_field,target_field);
+  remapper.prepare(*source_mesh,*target_mesh,"P1P0");
+  target_mesh->removeReference();
+  source_mesh->removeReference();
+  remapper.transfer(*source_field,*target_field);
 
   double max = -2;
   double min =  2;
-  for(int i = 0; i<target_support.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<target_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( targetvalue[i] >max) max = targetvalue[i];
       if( targetvalue[i] <min) min = targetvalue[i];
@@ -219,11 +230,10 @@ void  MEDMEMTest::test_RemapperP1P0() {
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,max,1e-10);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,min,1e-10);    
 
-  remapper.reverseTransfer(source_field,target_field);
-
+  remapper.reverseTransfer(*source_field,*target_field);
   max = -2;
   min =  2;
-  for(int i = 0; i<source_support.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<source_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( sourcevalue[i] >max) max = sourcevalue[i];
       if( sourcevalue[i] <min) min = sourcevalue[i];
@@ -231,36 +241,40 @@ void  MEDMEMTest::test_RemapperP1P0() {
 
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,max,1e-10);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,min,1e-10);
+  source_field->removeReference();
+  target_field->removeReference();
+  target_support->removeReference();
+  source_support->removeReference();
 }
 
 void  MEDMEMTest::test_RemapperP0P1() {
   std::string sourcename=getResourceFile("square1.med");
-  MEDMEM::MESH source_mesh (MED_DRIVER,sourcename,"Mesh_2");
+  MEDMEM::MESH *source_mesh=new MEDMEM::MESH (MED_DRIVER,sourcename,"Mesh_2");
 
   std::string targetname=getResourceFile("square2.med");
-  MEDMEM::MESH target_mesh (MED_DRIVER,targetname,"Mesh_3");
+  MEDMEM::MESH *target_mesh=new MEDMEM::MESH (MED_DRIVER,targetname,"Mesh_3");
 
   int nbcomp=4;
-  MEDMEM::SUPPORT source_support(&source_mesh,"on All support",MED_EN::MED_CELL);
-  MEDMEM::FIELD<double> source_field(&source_support,nbcomp);
-  double* sourcevalue=const_cast<double*>(source_field.getValue());
-  for (int i=0; i<source_support.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
+  MEDMEM::SUPPORT *source_support=new MEDMEM::SUPPORT(source_mesh,"on All support",MED_EN::MED_CELL);
+  MEDMEM::FIELD<double> *source_field=new MEDMEM::FIELD<double>(source_support,nbcomp);
+  double* sourcevalue=const_cast<double*>(source_field->getValue());
+  for (int i=0; i<source_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     sourcevalue[i]=1.0;
 
-  MEDMEM::SUPPORT target_support(&target_mesh,"on All support",MED_EN::MED_NODE);
-  MEDMEM::FIELD<double> target_field(&target_support,nbcomp);
-  double* targetvalue=const_cast<double*>(target_field.getValue());
-  for (int i=0; i<target_support.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
+  MEDMEM::SUPPORT *target_support=new MEDMEM::SUPPORT(target_mesh,"on All support",MED_EN::MED_NODE);
+  MEDMEM::FIELD<double> *target_field=new MEDMEM::FIELD<double>(target_support,nbcomp);
+  double* targetvalue=const_cast<double*>(target_field->getValue());
+  for (int i=0; i<target_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     targetvalue[i]=0.0;
 
 
   MEDMEM_REMAPPER remapper;
-  remapper.prepare(source_mesh,target_mesh,"P0P1");
-  remapper.transfer(source_field,target_field);
+  remapper.prepare(*source_mesh,*target_mesh,"P0P1");
+  remapper.transfer(*source_field,*target_field);
 
   double max = -2;
   double min =  2;
-  for(int i = 0; i<target_support.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<target_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( targetvalue[i] >max) max = targetvalue[i];
       if( targetvalue[i] <min) min = targetvalue[i];
@@ -269,18 +283,24 @@ void  MEDMEMTest::test_RemapperP0P1() {
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,max,1e-10);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,min,1e-10);    
 
-  remapper.reverseTransfer(source_field,target_field);
+  remapper.reverseTransfer(*source_field,*target_field);
 
   max = -2;
   min =  2;
-  for(int i = 0; i<source_support.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<source_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( sourcevalue[i] >max) max = sourcevalue[i];
       if( sourcevalue[i] <min) min = sourcevalue[i];
     }
 
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,max,1e-10);
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(1,min,1e-10);    
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(1,min,1e-10);
+  source_field->removeReference();
+  target_field->removeReference();
+  source_support->removeReference();
+  target_mesh->removeReference();
+  source_mesh->removeReference();
+  target_support->removeReference();
 }
 
 namespace {
@@ -532,22 +552,26 @@ void MEDMEMTest::test_remapper4()
 
   MESH *source=build3DSourceMesh1();
   MESH *target=build3DTargetMesh1();
-  SUPPORT supSrc(source,"Src",MED_EN::MED_NODE);
-  FIELD<double> f1(&supSrc,1);
-  double *val=(double *)f1.getValue();
+  SUPPORT *supSrc=new MEDMEM::SUPPORT(source,"Src",MED_EN::MED_NODE);
+  FIELD<double> *f1=new MEDMEM::FIELD<double>(supSrc,1);
+  double *val=(double *)f1->getValue();
   std::copy(valsSrc,valsSrc+28,val);
-  SUPPORT supTrg(target,"Trg",MED_EN::MED_NODE);
-  FIELD<double> f2(&supTrg,1);
+  SUPPORT *supTrg=new SUPPORT(target,"Trg",MED_EN::MED_NODE);
+  FIELD<double> *f2=new FIELD<double>(supTrg,1);
   //
   MEDMEM_REMAPPER remap;
   remap.prepare(*source,*target,"P1P1");
-  remap.transfer(f1,f2);
-  const double *tmp=f2.getValue();
+  remap.transfer(*f1,*f2);
+  const double *tmp=f2->getValue();
   for(int i=0;i<8;i++)
     CPPUNIT_ASSERT_DOUBLES_EQUAL(targetExpected[i],tmp[i],1e-12);
   //
-  delete source;
-  delete target;
+  source->removeReference();
+  target->removeReference();
+  supSrc->removeReference();
+  supTrg->removeReference();
+  f1->removeReference();
+  f2->removeReference();
 }
 
 void MEDMEMTest::test_remapper5()
@@ -634,8 +658,8 @@ void MEDMEMTest::test_remapper5()
   CPPUNIT_ASSERT_DOUBLES_EQUAL(3.75,res[7][9],1e-12);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(21.,sumAll(res),1e-12);
   //
-  delete targetMesh;
-  delete sourceMesh;
+  targetMesh->removeReference();
+  sourceMesh->removeReference();
 }
 
 void MEDMEMTest::test_remapper6()
@@ -672,8 +696,8 @@ void MEDMEMTest::test_remapper6()
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.,res[7][6],1e-12);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.,res[7][12],1e-12);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(21.,sumAll(res),1e-12);
-  delete targetMesh;
-  delete sourceMesh;
+  targetMesh->removeReference();
+  sourceMesh->removeReference();
 }
 
 void MEDMEMTest::test_remapper7()
@@ -712,8 +736,8 @@ void MEDMEMTest::test_remapper7()
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.,res[7][6],1e-12);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.,res[7][12],1e-12);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(21.,sumAll(res),1e-12);
-  delete targetMesh;
-  delete sourceMesh;
+  targetMesh->removeReference();
+  sourceMesh->removeReference();
 }
 
 void MEDMEMTest::test_remapper3DTo1D()
@@ -737,8 +761,8 @@ void MEDMEMTest::test_remapper3DTo1D()
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.,res[6][4],1e-12);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1.,res[7][8],1e-12);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(8.,sumAll(res),1e-12);
-  delete targetMesh;
-  delete sourceMesh;
+  targetMesh->removeReference();
+  sourceMesh->removeReference();
 }
 
 double MEDMEMTest::sumAll(const std::vector< std::map<int,double> >& matrix)

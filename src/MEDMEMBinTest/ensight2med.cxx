@@ -92,16 +92,17 @@ int main (int argc, char ** argv) {
       for ( deque<DT_IT_>::iterator d_i = dis.begin(); d_i != dis.end(); ++d_i )
       {
         FIELD_* f = myMed.getField( fieldNames[i], d_i->dt, d_i->it );
-        FIELD<int> intF(ENSIGHT_DRIVER, filenameIN, f->getName() );
+        FIELD<int> *intF=new FIELD<int>(ENSIGHT_DRIVER, filenameIN, f->getName() );
         // replace zero values as theses fields are used for division
-        int nbVals = intF.getValueLength();
-        int* values = const_cast<int*>(intF.getValue());
+        int nbVals = intF->getValueLength();
+        int* values = const_cast<int*>(intF->getValue());
         while ( nbVals-- ) {
           if ( values[nbVals]==0 )
             values[nbVals]= nbVals%5 + 1;
         }
-        int drv = intF.addDriver(MED_DRIVER, filenameOUT, f->getName() );
-        intF.write( drv );
+        int drv = intF->addDriver(MED_DRIVER, filenameOUT, f->getName() );
+        intF->write( drv );
+        intF->removeReference();
       }
     }
   }

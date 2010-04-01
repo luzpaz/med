@@ -21,7 +21,6 @@
 //
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
-
 #include <MEDMEM_MedMeshDriver22.hxx>
 #include <MEDMEM_Mesh.hxx>
 
@@ -72,8 +71,8 @@ using namespace MEDMEM;
  */
 void MEDMEMTest::testMedMeshDriver22()
 {
-  MESH *aMesh                      = new MESH();
-  MESH *aMesh_1                    = new MESH();
+  MESH *aMesh                      = new MESH;
+  MESH *aMesh_1                    = new MESH;
 
   string filename_rd               = getResourceFile("pointe_import22.med");
   string filename_wr               = makeTmpFile("myWr_pointe22.med");
@@ -518,6 +517,6 @@ void MEDMEMTest::testMedMeshDriver22()
   delete aRdWrDriver22;
   delete aTmpWrDriver22;
 
-  delete aMesh;
-  delete aMesh_1;
+  aMesh->removeReference();
+  aMesh_1->removeReference();
 }

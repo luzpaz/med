@@ -90,7 +90,8 @@ class MEDMEM_EXPORT GRID: public MESH
   //    * _coordinate->_coordinateSystem
   //    * _coordinate->_coordinateName
   //    * _coordinate->_coordinateUnit
-  
+ protected:
+  virtual ~GRID();
 
  public:
   //-----------------------//
@@ -106,7 +107,6 @@ class MEDMEM_EXPORT GRID: public MESH
        const std::vector<std::string>&          coord_unit,
        const MED_EN::med_grid_type              type=MED_EN::MED_CARTESIAN);
   GRID & operator=(const GRID &m);
-  virtual ~GRID();
   virtual void init();
 
   void fillCoordinates() const ;

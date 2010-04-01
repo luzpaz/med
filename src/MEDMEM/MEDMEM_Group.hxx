@@ -63,6 +63,9 @@ protected :
     \endif
   */
   vector<FAMILY*> _family ;
+ protected:
+  /*! Destructor. */
+  virtual ~GROUP();
   
 public:
   /*! Constructor. */
@@ -71,8 +74,6 @@ public:
   GROUP(const string & name, const list<FAMILY*> & family) throw (MEDEXCEPTION) ;
   /*! Copy Constructor. */
   GROUP(const GROUP & m);
-  /*! Destructor. */
-  virtual ~GROUP();
 
   /*! Copy operator. */
   // PN ATTention il n y a pas de copie du vecteur Family ????

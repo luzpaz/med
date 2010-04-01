@@ -33,15 +33,16 @@ using namespace MEDMEM;
 void addMedFacesGroup2( MESHING& meshing, int nFaces, const int *groupValue,
                         string groupName, const MED_EN::medGeometryElement *mytypes,  const int *index, const int *myNumberOfElements, int nbOfGeomTypes)
   {
-    GROUP faces ;
-    faces.setName(groupName) ;
-    faces.setMesh(&meshing) ;
-    faces.setEntity(MED_EN::MED_FACE) ;
-    faces.setNumberOfGeometricType(nbOfGeomTypes) ;
-    faces.setGeometricType(mytypes);
-    faces.setNumberOfElements(myNumberOfElements) ;
-    faces.setNumber(index, groupValue) ;
-    meshing.addGroup(faces) ;
+    GROUP *faces=new GROUP;
+    faces->setName(groupName) ;
+    faces->setMesh(&meshing) ;
+    faces->setEntity(MED_EN::MED_FACE) ;
+    faces->setNumberOfGeometricType(nbOfGeomTypes) ;
+    faces->setGeometricType(mytypes);
+    faces->setNumberOfElements(myNumberOfElements) ;
+    faces->setNumber(index, groupValue) ;
+    meshing.addGroup(*faces) ;
+    faces->removeReference();
   }
 
 void MEDMEMTest::testDesactivateFacesComputation()
@@ -188,6 +189,6 @@ void MEDMEMTest::testDesactivateFacesComputation()
   delete gibidriver;
   delete driver;
   //
-  delete meshing;
-  delete mesh;
+  meshing->removeReference();
+  mesh->removeReference();
 }

@@ -292,7 +292,7 @@ void checkCopyConnectivity()
   string meshname = "maa1";
 
   //Construction d'un maillage
-  MESH * myMesh = new MESH();
+  MESH * myMesh = new MESH;
   myMesh->setName(meshname);
   MED_MESH_RDONLY_DRIVER myMeshDriver (filename, myMesh);
   myMeshDriver.setMeshName(meshname);
@@ -329,7 +329,7 @@ void checkCopyConnectivity()
   CPPUNIT_ASSERT(myConnectivity2->deepCompare(*myConnectivity0));
 
   // Compare after deleting the initial connectivity
-  delete myMesh;
+  myMesh->removeReference();
   myMesh = NULL;
   myConnectivity0 = NULL;
 
@@ -418,6 +418,7 @@ void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
     string * aCellTypesNames = theC->getCellTypeNames(MED_EN::MED_CELL);
     CPPUNIT_ASSERT_MESSAGE(msg, aCellTypesNames[0] == "MED_PYRA5");
     CPPUNIT_ASSERT_MESSAGE(msg, aCellTypesNames[1] == "MED_HEXA8");
+    delete [] aCellTypesNames;
 
     // FACES: theC->_constituent
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 2, theC->getNumberOfTypes(MED_EN::MED_FACE));
@@ -437,7 +438,7 @@ void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
     CPPUNIT_ASSERT_MESSAGE(msg,
                            (aFaceTypesNames[0] == "MED_TRIA3" && aFaceTypesNames[1] == "MED_QUAD4") ||
                            (aFaceTypesNames[1] == "MED_TRIA3" && aFaceTypesNames[0] == "MED_QUAD4"));
-
+    delete [] aFaceTypesNames;
     // EDGES: theC->_constituent->_constituent
     //CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 1, theC->getNumberOfTypes(MED_EN::MED_EDGE));
     //const MED_EN::medGeometryElement * anEdgeTypesBack = theC->getGeometricTypes(MED_EN::MED_EDGE);
@@ -692,12 +693,13 @@ void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 3, theC->getNumberOfTypesWithPoly(MED_EN::MED_CELL));
 
       {
-        const MED_EN::medGeometryElement * aCellTypesBack = theC->getGeometricTypesWithPoly(MED_EN::MED_CELL);
+        MED_EN::medGeometryElement * aCellTypesBack = theC->getGeometricTypesWithPoly(MED_EN::MED_CELL);
         CPPUNIT_ASSERT_MESSAGE(msg, ((aCellTypesBack[0] == MED_EN::MED_PYRA5 &&
                                       aCellTypesBack[1] == MED_EN::MED_HEXA8) ||
                                      (aCellTypesBack[0] == MED_EN::MED_HEXA8 &&
                                       aCellTypesBack[1] == MED_EN::MED_PYRA5)));
         CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, MED_EN::MED_POLYHEDRA, aCellTypesBack[2]);
+        delete [] aCellTypesBack;
       }
 
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 2, theC->getNumberOfElementOfPolyType(MED_EN::MED_CELL));
@@ -913,12 +915,13 @@ void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
     {
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 3, theC->getNumberOfTypesWithPoly(MED_EN::MED_FACE));
 
-      const MED_EN::medGeometryElement * aFaceTypesBack = theC->getGeometricTypesWithPoly(MED_EN::MED_FACE);
+      MED_EN::medGeometryElement * aFaceTypesBack = theC->getGeometricTypesWithPoly(MED_EN::MED_FACE);
       CPPUNIT_ASSERT_MESSAGE(msg, ((aFaceTypesBack[0] == MED_EN::MED_TRIA3 &&
                                     aFaceTypesBack[1] == MED_EN::MED_QUAD4) ||
                                    (aFaceTypesBack[0] == MED_EN::MED_QUAD4 &&
                                     aFaceTypesBack[1] == MED_EN::MED_TRIA3)));
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, MED_EN::MED_POLYGON, aFaceTypesBack[2]);
+      delete [] aFaceTypesBack;
 
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 13, theC->getNumberOfElementOfPolyType(MED_EN::MED_FACE));
 
@@ -1356,10 +1359,10 @@ void MEDMEMTest::testConnectivity()
   // TEST 3 //
   ////////////
 
-  CONNECTIVITY aCells1 (/*numberOfTypes*/2, /*Entity*/MED_EN::MED_CELL);
-  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_CELL, aCells1.getEntity());
-  CPPUNIT_ASSERT_EQUAL(2, aCells1.getNumberOfTypes(MED_EN::MED_CELL));
-  CPPUNIT_ASSERT_EQUAL(2, aCells1.getNumberOfTypesWithPoly(MED_EN::MED_CELL));
+  CONNECTIVITY *aCells1=new CONNECTIVITY(/*numberOfTypes*/2, /*Entity*/MED_EN::MED_CELL);
+  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_CELL, aCells1->getEntity());
+  CPPUNIT_ASSERT_EQUAL(2, aCells1->getNumberOfTypes(MED_EN::MED_CELL));
+  CPPUNIT_ASSERT_EQUAL(2, aCells1->getNumberOfTypesWithPoly(MED_EN::MED_CELL));
 
   CONNECTIVITY aCells2 (/*numberOfTypes*/3/*, Entity=MED_EN::MED_CELL*/);
   CPPUNIT_ASSERT_EQUAL(MED_EN::MED_CELL, aCells2.getEntity());
@@ -1389,34 +1392,34 @@ void MEDMEMTest::testConnectivity()
   // It would be good to set EntityDimension automatically for EDGEs and FACEs,
   // and warn about not set EntityDimension for CELLs
   // (or calculate it by given geometric types)
-  aCells1.setEntityDimension(3);
+  aCells1->setEntityDimension(3);
   aCells2.setEntityDimension(2); // for 2D mesh
   anEdges1->setEntityDimension(1);
   anEdges2->setEntityDimension(1);
   aFaces1->setEntityDimension(2);
 
-  CPPUNIT_ASSERT_EQUAL(3, aCells1.getEntityDimension());
+  CPPUNIT_ASSERT_EQUAL(3, aCells1->getEntityDimension());
   CPPUNIT_ASSERT_EQUAL(2, aCells2.getEntityDimension());
   CPPUNIT_ASSERT_EQUAL(1, anEdges1->getEntityDimension());
   CPPUNIT_ASSERT_EQUAL(1, anEdges2->getEntityDimension());
   CPPUNIT_ASSERT_EQUAL(2, aFaces1->getEntityDimension());
 
   // getPolyTypeRelativeTo
-  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_POLYHEDRA, aCells1.getPolyTypeRelativeTo());
+  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_POLYHEDRA, aCells1->getPolyTypeRelativeTo());
   CPPUNIT_ASSERT_EQUAL(MED_EN::MED_POLYGON  , aCells2.getPolyTypeRelativeTo());
   CPPUNIT_ASSERT_EQUAL(MED_EN::MED_POLYGON  , aFaces1->getPolyTypeRelativeTo());
   // because there is no poly types for edges (2D entities)
   CPPUNIT_ASSERT_THROW(anEdges1->getPolyTypeRelativeTo(), MEDEXCEPTION);
 
   // setConstituent
-  CPPUNIT_ASSERT_THROW(aCells1.setConstituent(&aCells2), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aCells1.setConstituent(anEdges1), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aCells1->setConstituent(&aCells2), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aCells1->setConstituent(anEdges1), MEDEXCEPTION);
 
-  aCells1.setConstituent(aFaces1);
-  aCells1.setConstituent(anEdges1);
+  aCells1->setConstituent(aFaces1);
+  aCells1->setConstituent(anEdges1);
 
-  CPPUNIT_ASSERT_EQUAL(1, aCells1.getNumberOfTypes(MED_EN::MED_EDGE));
-  CPPUNIT_ASSERT_EQUAL(2, aCells1.getNumberOfTypes(MED_EN::MED_FACE));
+  CPPUNIT_ASSERT_EQUAL(1, aCells1->getNumberOfTypes(MED_EN::MED_EDGE));
+  CPPUNIT_ASSERT_EQUAL(2, aCells1->getNumberOfTypes(MED_EN::MED_FACE));
 
   aCells2.setConstituent(anEdges2);
   CPPUNIT_ASSERT_EQUAL(2, aCells2.getNumberOfTypes(MED_EN::MED_EDGE));
@@ -1429,10 +1432,10 @@ void MEDMEMTest::testConnectivity()
   MED_EN::medGeometryElement aFaceTypes2[2] =
     {MED_EN::MED_TRIA3, MED_EN::MED_QUAD4};
 
-  aCells1.setGeometricTypes(aCellTypes3D, MED_EN::MED_CELL);
-  aCells1.setGeometricTypes(aFaceTypes2, MED_EN::MED_FACE);
-  aCells1.setGeometricTypes(anEdgeTypes1, MED_EN::MED_EDGE);
-  CPPUNIT_ASSERT_THROW(aCells1.setGeometricTypes(anEdgeTypes1, MED_EN::MED_NODE), MEDEXCEPTION);
+  aCells1->setGeometricTypes(aCellTypes3D, MED_EN::MED_CELL);
+  aCells1->setGeometricTypes(aFaceTypes2, MED_EN::MED_FACE);
+  aCells1->setGeometricTypes(anEdgeTypes1, MED_EN::MED_EDGE);
+  CPPUNIT_ASSERT_THROW(aCells1->setGeometricTypes(anEdgeTypes1, MED_EN::MED_NODE), MEDEXCEPTION);
 
   aCells2.setGeometricTypes(aCellTypes2D, MED_EN::MED_CELL);
   anEdges2->setGeometricTypes(anEdgeTypes2, MED_EN::MED_EDGE);
@@ -1445,10 +1448,10 @@ void MEDMEMTest::testConnectivity()
   int countEdges2[3] = {1, 13, 21};
   int countFaces1[3] = {1, 9, 15};
 
-  aCells1.setCount(countCell3D, MED_EN::MED_CELL);
-  aCells1.setCount(countEdges1, MED_EN::MED_EDGE);
-  aCells1.setCount(countFaces1, MED_EN::MED_FACE);
-  CPPUNIT_ASSERT_THROW(aCells1.setCount(countEdges1, MED_EN::MED_NODE), MEDEXCEPTION);
+  aCells1->setCount(countCell3D, MED_EN::MED_CELL);
+  aCells1->setCount(countEdges1, MED_EN::MED_EDGE);
+  aCells1->setCount(countFaces1, MED_EN::MED_FACE);
+  CPPUNIT_ASSERT_THROW(aCells1->setCount(countEdges1, MED_EN::MED_NODE), MEDEXCEPTION);
 
   aCells2.setCount(countCell2D, MED_EN::MED_CELL);
   aCells2.setCount(countEdges2, MED_EN::MED_EDGE);
@@ -1477,8 +1480,8 @@ void MEDMEMTest::testConnectivity()
   int nodesCell3D_PYRA5[10] = {5,4,3,2,1, 6,7,8,9,10};
   int nodesCell3D_HEXA8[8] = {2,3,4,5, 6,7,8,9};
 
-  aCells1.setNodal(nodesCell3D_PYRA5, MED_EN::MED_CELL, MED_EN::MED_PYRA5);
-  aCells1.setNodal(nodesCell3D_HEXA8, MED_EN::MED_CELL, MED_EN::MED_HEXA8);
+  aCells1->setNodal(nodesCell3D_PYRA5, MED_EN::MED_CELL, MED_EN::MED_PYRA5);
+  aCells1->setNodal(nodesCell3D_HEXA8, MED_EN::MED_CELL, MED_EN::MED_HEXA8);
 
   int nodesFaces1_TRIA3[24] = {1,2,3, 1,3,4, 1,4,5, 1,5,2,
                                10,6,7, 10,7,8,  10,8,9, 10,9,6};
@@ -1486,35 +1489,35 @@ void MEDMEMTest::testConnectivity()
   // int nodesFaces1_TRIA6[6] = {11,12,13,14,15,16};
   // int nodesFaces1_QUAD8[8] = {15,14,13,17,18,19,20,21};
 
-  aCells1.setNodal(nodesFaces1_TRIA3, MED_EN::MED_FACE, MED_EN::MED_TRIA3);
-  aCells1.setNodal(nodesFaces1_QUAD4, MED_EN::MED_FACE, MED_EN::MED_QUAD4);
-  //aCells1.setNodal(nodesFaces1_TRIA6, MED_EN::MED_FACE, MED_EN::MED_TRIA6);
-  //aCells1.setNodal(nodesFaces1_QUAD8, MED_EN::MED_FACE, MED_EN::MED_QUAD8);
+  aCells1->setNodal(nodesFaces1_TRIA3, MED_EN::MED_FACE, MED_EN::MED_TRIA3);
+  aCells1->setNodal(nodesFaces1_QUAD4, MED_EN::MED_FACE, MED_EN::MED_QUAD4);
+  //aCells1->setNodal(nodesFaces1_TRIA6, MED_EN::MED_FACE, MED_EN::MED_TRIA6);
+  //aCells1->setNodal(nodesFaces1_QUAD8, MED_EN::MED_FACE, MED_EN::MED_QUAD8);
 
   int nodesEdges1_SEG2[40] = {1,2, 1,3, 1,4, 1,5, 10,6, 10,7, 10,8, 10,9,
                               2,3, 3,4, 4,5, 5,2,  6,7,  7,8,  8,9,  9,6,
                               2,6, 3,7, 4,8, 5,9};
 
-  aCells1.setNodal(nodesEdges1_SEG2, MED_EN::MED_EDGE, MED_EN::MED_SEG2);
+  aCells1->setNodal(nodesEdges1_SEG2, MED_EN::MED_EDGE, MED_EN::MED_SEG2);
 
   // setNumberOfNodes
   aCells2.setNumberOfNodes(20);
   anEdges2->setNumberOfNodes(20);
 
-  aCells1.setNumberOfNodes(10);
+  aCells1->setNumberOfNodes(10);
   anEdges1->setNumberOfNodes(10);
   aFaces1->setNumberOfNodes(10);
 
   // existConnectivity
-  CPPUNIT_ASSERT(aCells1.existConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL));
-  CPPUNIT_ASSERT(aCells1.existConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE));
-  CPPUNIT_ASSERT(aCells1.existConnectivity(MED_EN::MED_NODAL, MED_EN::MED_EDGE));
-  CPPUNIT_ASSERT(!aCells1.existConnectivity(MED_EN::MED_NODAL, MED_EN::MED_NODE));
+  CPPUNIT_ASSERT(aCells1->existConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL));
+  CPPUNIT_ASSERT(aCells1->existConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE));
+  CPPUNIT_ASSERT(aCells1->existConnectivity(MED_EN::MED_NODAL, MED_EN::MED_EDGE));
+  CPPUNIT_ASSERT(!aCells1->existConnectivity(MED_EN::MED_NODAL, MED_EN::MED_NODE));
 
-  CPPUNIT_ASSERT(!aCells1.existConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_CELL));
-  CPPUNIT_ASSERT(!aCells1.existConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_FACE));
-  CPPUNIT_ASSERT(!aCells1.existConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_EDGE));
-  CPPUNIT_ASSERT(!aCells1.existConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_NODE));
+  CPPUNIT_ASSERT(!aCells1->existConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_CELL));
+  CPPUNIT_ASSERT(!aCells1->existConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_FACE));
+  CPPUNIT_ASSERT(!aCells1->existConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_EDGE));
+  CPPUNIT_ASSERT(!aCells1->existConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_NODE));
 
   CPPUNIT_ASSERT(aCells2.existConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL));
   CPPUNIT_ASSERT(!aCells2.existConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE));
@@ -1527,13 +1530,13 @@ void MEDMEMTest::testConnectivity()
   CPPUNIT_ASSERT(!aCells2.existConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_NODE));
 
   // getNumberOfPolyType
-  CPPUNIT_ASSERT_EQUAL(0, aCells1.getNumberOfPolyType());
+  CPPUNIT_ASSERT_EQUAL(0, aCells1->getNumberOfPolyType());
   CPPUNIT_ASSERT_EQUAL(0, aCells2.getNumberOfPolyType());
 
   // getConnectivityOfAnElementWithPoly
   {
     int len_e1, len_e2, i;
-    const int * nc_e1 = aCells1.getConnectivityOfAnElementWithPoly
+    const int * nc_e1 = aCells1->getConnectivityOfAnElementWithPoly
       (MED_EN::MED_NODAL, MED_EN::MED_CELL, /*Number*/1, len_e1);
     CPPUNIT_ASSERT_EQUAL(5, len_e1); // PYRA5 {1,2,3,4,5}
     for (i = 0; i < len_e1; i++) {
@@ -1562,16 +1565,17 @@ void MEDMEMTest::testConnectivity()
   //     |               |     |
   //  anEdges1 (1 type)  |  anEdges2 (2 types)
   
-  MESH* mesh=new MESH(); //updateFamily method requires a pointer to the mesh 
-  mesh->setConnectivityptr(&aCells1);
+  MESH* mesh=new MESH; //updateFamily method requires a pointer to the mesh 
+  mesh->setConnectivityptr(aCells1);
   // updateFamily
   {
-    FAMILY aFamilyOnFaces;
-    aFamilyOnFaces.setEntity(MED_EN::MED_FACE);
-    aFamilyOnFaces.setMeshName("Mesh 1");
-    aFamilyOnFaces.setMesh(mesh);
-    aFamilyOnFaces.setName("Support On Faces 1");
-    //aFamilyOnFaces.setAll(true);
+    FAMILY *aFamilyOnFaces=new FAMILY;
+    aFamilyOnFaces->setEntity(MED_EN::MED_FACE);
+    aFamilyOnFaces->setMeshName("Mesh 1");
+    aFamilyOnFaces->setMesh(mesh);
+    mesh->removeReference();
+    aFamilyOnFaces->setName("Support On Faces 1");
+    //aFamilyOnFaces->setAll(true);
 
     int nbTypesFam1 = 2;
     MED_EN::medGeometryElement aSCTypes[4] = {MED_EN::MED_TRIA3, MED_EN::MED_QUAD4};
@@ -1584,13 +1588,13 @@ void MEDMEMTest::testConnectivity()
     //int indexSC[2] = {1,9}; // length = nb.types + 1
     //int valueSC[8] = {1,3,5,7,9,11,13,15}; // length = total nb. of elements
 
-    aFamilyOnFaces.setNumberOfGeometricType(nbTypesFam1);
-    aFamilyOnFaces.setGeometricType(aSCTypes);
-    aFamilyOnFaces.setNumberOfElements(nbEltsSC);
-    aFamilyOnFaces.setNumber(indexSC, valueSC);
+    aFamilyOnFaces->setNumberOfGeometricType(nbTypesFam1);
+    aFamilyOnFaces->setGeometricType(aSCTypes);
+    aFamilyOnFaces->setNumberOfElements(nbEltsSC);
+    aFamilyOnFaces->setNumber(indexSC, valueSC);
 
     vector<FAMILY*> aFamsOnFaces (1);
-    aFamsOnFaces[0] = &aFamilyOnFaces;
+    aFamsOnFaces[0] = aFamilyOnFaces;
 
 //#ifdef ENABLE_UPDATE_FAMILY
     // Attention!!! By default ENABLE_UPDATE_FAMILY is not defined!!!
@@ -1599,9 +1603,10 @@ void MEDMEMTest::testConnectivity()
 
     //cout << "aCells1:" << endl;
     //cout << aCells1 << endl;
-    CPPUNIT_ASSERT_NO_THROW(aCells1.updateFamily(aFamsOnFaces));
+    CPPUNIT_ASSERT_NO_THROW(aCells1->updateFamily(aFamsOnFaces));
     //cout << "aCells1:" << endl;
     //cout << aCells1 << endl;
+    aFamilyOnFaces->removeReference();
 //#endif
   }
 

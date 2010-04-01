@@ -152,14 +152,14 @@ MED::~MED()
       // cast in right type to delete it !
       switch ((*currentField).first->getValueType()) {
       case MED_INT32 : 
-        delete (FIELD<int>*) (*currentField).first ;
+        ((FIELD<int>*) (*currentField).first)->removeReference();
         break ;
       case MED_REEL64 :
-        delete (FIELD<double>*) (*currentField).first ;
+        ((FIELD<double>*) (*currentField).first)->removeReference();
         break ;
       default : 
         MESSAGE_MED(PREFIX_MED << "Field has type different of int or double, could not destroy its values array !") ;
-        delete (*currentField).first;
+        (*currentField).first->removeReference();
       }
     }
   }
@@ -169,17 +169,14 @@ MED::~MED()
     for ( itSupport=(*itSupportOnMesh).second.begin();itSupport!=(*itSupportOnMesh).second.end();itSupport++)
       if (! dynamic_cast<GROUP*>( (*itSupport).second ) &&
           ! dynamic_cast<FAMILY*>( (*itSupport).second ) )
-        delete (*itSupport).second ;
+        (*itSupport).second->removeReference();
   }
 
   //  map<MESH_NAME_,MESH*>::const_iterator  currentMesh;
   for ( currentMesh=_meshes.begin();currentMesh != _meshes.end(); currentMesh++ ) {
     if ( (*currentMesh).second != NULL)
       {
-        if (!((*currentMesh).second)->getIsAGrid())
-          delete (*currentMesh).second;
-        else
-          delete (GRID *) (*currentMesh).second;
+        (*currentMesh).second->removeReference();
       }
   }
 
@@ -879,7 +876,7 @@ void MED::updateSupport ()
       catch (MEDEXCEPTION & ex) {
         // entity not defined in mesh -> we remove support on it !
         MESSAGE_MED(PREFIX_MED<<ex.what());
-        delete (*itSupport).second ;
+        (*itSupport).second->removeReference();
         //(*itSupportOnMesh).second.erase(itSupport) ; // that's right ????
         //itSupport-- ;
         map<MED_EN::medEntityMesh,SUPPORT *>::iterator itSupportCurr = itSupport;
@@ -896,7 +893,7 @@ void MED::updateSupport ()
       MED_EN::medEntityMesh aKey = (*itSupport).first;
       SUPPORT* aData = (*itSupport).second;
       if( anEntity2Support.find( aKey ) == anEntity2Support.end() )
-        delete aData;
+        aData->removeReference();
     }
   }
 

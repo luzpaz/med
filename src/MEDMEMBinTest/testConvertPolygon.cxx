@@ -45,8 +45,8 @@ int main()
   file += "BoxTetra2.med";
   cout << "File to cnvert: " << file << endl;
   // convertion
-  MEDMEM::MESH mesh(MEDMEM::MED_DRIVER, file.c_str(), "BoxTetra2");
-  mesh.convertToPoly();
+  MEDMEM::MESH *mesh=new MEDMEM::MESH(MEDMEM::MED_DRIVER, file.c_str(), "BoxTetra2");
+  mesh->convertToPoly();
 
   // File to store conversion result
   if ( getenv("TMP") && access(getenv("TMP"),W_OK)==0 )
@@ -57,8 +57,8 @@ int main()
     file = "/tmp";
   file += "/pointe_testConvertPolygon.med";
 
-  int id=mesh.addDriver(MEDMEM::MED_DRIVER,file.c_str(),"mesh");
-  mesh.write(id);
+  int id=mesh->addDriver(MEDMEM::MED_DRIVER,file.c_str(),"mesh");
+  mesh->write(id);
 
   remove(file.c_str());
 

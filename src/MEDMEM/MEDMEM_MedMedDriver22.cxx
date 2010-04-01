@@ -330,7 +330,7 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
         for (currentEntity=meshEntities.begin();currentEntity != meshEntities.end(); currentEntity++) {
         string supportName="SupportOnAll_" ;
           supportName+=entNames[(MED_EN::medEntityMesh)(*currentEntity).first] ;
-        SUPPORT* mySupport = new SUPPORT() ;
+          SUPPORT* mySupport = new SUPPORT ;
         mySupport->setName(supportName);
         mySupport->setMesh(ptrMesh);
         mySupport->setEntity((MED_EN::medEntityMesh) (*currentEntity).first);
@@ -569,7 +569,7 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
                               throw MED_EXCEPTION(LOCALIZED(STRING(LOC) <<" The Field type of |" << fieldName <<"|, entity : |" << entNames[(med_2_3::med_entite_maillage) (*currentEntity).first] <<"|, geometric element of type |" << geoNames [(*currentGeometry)] << "| is  MED_INT64 but size of med_int is not equal to 8 bytes !"));
                             break;
                           case med_2_3::MED_INT32 : {
-                            ptrField =  new FIELD<int> ( );
+                            ptrField =  new FIELD<int>( );
                             // Les valeurs du champ ne doivent pas être lue
                             // pour l'instant
                             ((FIELD<int>*)
@@ -613,7 +613,7 @@ void MED_MED_RDONLY_DRIVER22::readFileStruct( void )
                             break;
                           }
                           case MED_EN::MED_REEL64 : {
-                            ptrField = new FIELD<double> ( );
+                            ptrField = new FIELD<double>( );
                             // Les valeurs du champ ne doivent pas être lue
                             // pour l'instant
                             ((FIELD<double>*)

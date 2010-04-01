@@ -61,7 +61,7 @@ int main (int argc, char ** argv) {
   }
 
 
-  MESH * myMesh= new MESH() ;
+  MESH * myMesh= new MESH;
   myMesh->setName(meshName);
   MED_MESH_RDONLY_DRIVER myMeshDriver(fileName,myMesh);
   try
@@ -181,5 +181,5 @@ int main (int argc, char ** argv) {
         }
     }
 
-  delete myMesh;
+  myMesh->removeReference();
 }

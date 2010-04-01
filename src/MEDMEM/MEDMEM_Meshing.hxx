@@ -40,9 +40,10 @@ namespace MEDMEM {
 
 class MEDMEM_EXPORT MESHING: public MESH
 {
-public :
-  MESHING();
+ protected:
   ~MESHING();
+ public :
+  MESHING();
 
   void setSpaceDimension   (const int SpaceDimension) ;
   void setMeshDimension    (const int MeshDimension) ;

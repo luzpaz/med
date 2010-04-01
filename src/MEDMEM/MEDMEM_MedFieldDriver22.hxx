@@ -919,18 +919,18 @@ MED_FIELD_DRIVER22<T>::getMeshGeometricTypeFromMESH( MESH * meshPtr,
   // Il est plus pratique de créer un support "onAll"
   // pour calculer les tableaux du nombre d'entités cumulées
 
-  SUPPORT mySupportFromMesh (meshPtr, "Temporary Support From Associated Mesh", entity);
-  geoType = vector<MED_EN::medGeometryElement>(mySupportFromMesh.getTypes(),
-                              mySupportFromMesh.getTypes()+mySupportFromMesh.getNumberOfTypes());
-  nbOfElOfType.resize(mySupportFromMesh.getNumberOfTypes());
-  nbOfElOfTypeC.resize(mySupportFromMesh.getNumberOfTypes()+1);
+  SUPPORT *mySupportFromMesh=new SUPPORT(meshPtr, "Temporary Support From Associated Mesh", entity);
+  geoType = vector<MED_EN::medGeometryElement>(mySupportFromMesh->getTypes(),
+                              mySupportFromMesh->getTypes()+mySupportFromMesh->getNumberOfTypes());
+  nbOfElOfType.resize(mySupportFromMesh->getNumberOfTypes());
+  nbOfElOfTypeC.resize(mySupportFromMesh->getNumberOfTypes()+1);
   nbOfElOfTypeC[0]=0;
 
-  for (int j=1; j<=mySupportFromMesh.getNumberOfTypes(); ++j) {
-    nbOfElOfType[j-1]=mySupportFromMesh.getNumberOfElements(geoType[j-1]);
+  for (int j=1; j<=mySupportFromMesh->getNumberOfTypes(); ++j) {
+    nbOfElOfType[j-1]=mySupportFromMesh->getNumberOfElements(geoType[j-1]);
     nbOfElOfTypeC[j]+=nbOfElOfTypeC[j-1]+nbOfElOfType[j-1];
   }
-
+  mySupportFromMesh->removeReference();
   END_OF_MED(LOC);
 }
 
@@ -1128,7 +1128,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   // Cherche le type d'entité, le nombre d'entité  par type géométrique sur le type d'entité
   // (MED_MAILLE ou MED_NOEUD uniquement car MEDMEMOIRE ne gère pas la connectivité descendante).
   // et crée le support correspondant.
-  SUPPORT *   mySupport = new SUPPORT();
+  SUPPORT *   mySupport = new SUPPORT;
   vector<int> numberOfElementsOfTypeC;
   vector<int> numberOfGaussPoint;
   int         totalNumberOfElWg=0;
@@ -1143,7 +1143,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 
 
   if ( !found ) {
-    delete mySupport; delete[] componentName; delete[] unitName;
+    mySupport->removeReference(); delete[] componentName; delete[] unitName;
     MED_FIELD_DRIVER<T>::_fieldNum = MED_INVALID ;
      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"  Can't find any entity for field |"
                                  << fieldName
@@ -1695,7 +1695,10 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
       if (aPN == aFN_suff) {
         isFound = true;
         //family found
+        if(MED_FIELD_DRIVER<T>::_ptrField->_support)
+          MED_FIELD_DRIVER<T>::_ptrField->_support->removeReference();
         MED_FIELD_DRIVER<T>::_ptrField->_support = aF; //Prévenir l'utilisateur ?
+        aF->addReference();
       }
     }
     if (!isFound) {
@@ -1708,7 +1711,10 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
         if (aPN == aGN_suff) {
           isFound = true;
           //group found
+          if(MED_FIELD_DRIVER<T>::_ptrField->_support)
+            MED_FIELD_DRIVER<T>::_ptrField->_support->removeReference();
           MED_FIELD_DRIVER<T>::_ptrField->_support = aG; //Prévenir l'utilisateur ?
+          aG->addReference();
         }
       }
     }
@@ -1757,9 +1763,12 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   if (!isFound) {
     // No corresponding support (family or group)
     // found in the mesh, use the newly created one
+    if(MED_FIELD_DRIVER<T>::_ptrField->_support)
+      MED_FIELD_DRIVER<T>::_ptrField->_support->removeReference();
     MED_FIELD_DRIVER<T>::_ptrField->_support = mySupport; //Prévenir l'utilisateur ?
   }
-
+  else
+    mySupport->removeReference();
   END_OF_MED(LOC);
 }
 

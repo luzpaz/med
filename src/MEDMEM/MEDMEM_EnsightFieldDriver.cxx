@@ -333,7 +333,7 @@ namespace {
     for ( int t = 0; t < nbTypes; ++t )
       nbElem[ t ] = index[ t+1 ] - index[ t ];
 
-    SUPPORT* newSup = new SUPPORT();
+    SUPPORT* newSup = new SUPPORT;
     newSup->setMesh                 ( support->getMesh() );
     newSup->setNumberOfGeometricType( nbTypes );
     newSup->setGeometricType        ( support->getTypes() );
@@ -1428,10 +1428,11 @@ void ENSIGHT_FIELD_WRONLY_DRIVER::write(void) const
                           << " in EnSight6 format, it's support " << support->getName()
                           << " is not stored in geo file, use EnSight Gold format instead");
     isPartial = " partial";
-    SUPPORT tmpSupport;
-    tmpSupport.setAll(true);
-    tmpSupport.setEntity( entity );
-    partNum = getPartNumber( &tmpSupport );
+    SUPPORT *tmpSupport=new SUPPORT;
+    tmpSupport->setAll(true);
+    tmpSupport->setEntity( entity );
+    partNum = getPartNumber( tmpSupport );
+    tmpSupport->removeReference();
   }
 
   // supports to write the field for

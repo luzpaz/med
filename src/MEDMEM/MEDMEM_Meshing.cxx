@@ -511,6 +511,10 @@ void MESHING::addGroup(const GROUP & Group)
   const char * LOC = "MESHING::addGroup : " ;
 
   GROUP * myGroup = new GROUP(Group) ;
+  if(myGroup->getMesh()==this)
+    {
+      removeReference();
+    }
   switch(Group.getEntity()){
   case MED_CELL : {
     _groupCell.push_back(myGroup);

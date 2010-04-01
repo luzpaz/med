@@ -280,7 +280,7 @@ FAMILY & FAMILY::operator=(const FAMILY &fam)
 ostream & MEDMEM::operator<<(ostream &os, FAMILY &myFamily)
 {
   // how do cast without duplicate ?
-  os << (SUPPORT) myFamily;
+  os << (SUPPORT&) myFamily;
 
   os << "  - Identifier : "<<myFamily.getIdentifier()<<endl;
   int numberofattributes = myFamily.getNumberOfAttributes();
@@ -298,7 +298,7 @@ ostream & MEDMEM::operator<<(ostream &os, FAMILY &myFamily)
 ostream & MEDMEM::operator<<(ostream &os, const FAMILY &myFamily)
 {
   // how do cast without duplicate ?
-  os << (SUPPORT) myFamily;
+  os << (const SUPPORT&) myFamily;
 
   os << "  - Identifier : "<<myFamily.getIdentifier()<<endl;
   int numberofattributes = myFamily.getNumberOfAttributes();

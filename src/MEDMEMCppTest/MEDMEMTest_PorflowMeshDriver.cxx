@@ -75,8 +75,8 @@ using namespace MEDMEM;
  */
 void MEDMEMTest::testPorflowMeshDriver()
 {
-  MESH *aMesh                      = new MESH();
-  MESH *aMesh_1                    = new MESH();
+  MESH *aMesh                      = new MESH;
+  MESH *aMesh_1                    = new MESH;
 
   string filename_rd               = getResourceFile("Case1.inp");
   string filename_wr               = makeTmpFile("myWr_Case1.inp");
@@ -308,6 +308,6 @@ void MEDMEMTest::testPorflowMeshDriver()
   }
 
   //Delete all objects
-  delete aMesh;
-  delete aMesh_1;
+  aMesh->removeReference();
+  aMesh_1->removeReference();
 }

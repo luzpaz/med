@@ -993,6 +993,7 @@ void _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     //new_group->setTotalNumberOfElements(mailleSet.size());
     new_group->setName(grp.nom);
     new_group->setMesh(_ptrMesh);
+    _ptrMesh->removeReference();
     new_group->setNumberOfGeometricType(nb_geometric_types);
     new_group->setGeometricType(tab_types_geometriques);
     new_group->setNumberOfElements(tab_nombres_elements);

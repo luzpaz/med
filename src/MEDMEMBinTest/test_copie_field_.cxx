@@ -87,7 +87,7 @@ int main (int argc, char ** argv) {
   string meshname = argv[2] ;
 
   //  MESH * myMesh= new MESH(MED_DRIVER,filename,meshname) ;
-  MESH * myMesh= new MESH() ;
+  MESH * myMesh= new MESH ;
   myMesh->setName(meshname);
   MED_MESH_RDONLY_DRIVER myMeshDriver(filename,myMesh) ;
   myMeshDriver.setMeshName(meshname);
@@ -125,7 +125,7 @@ int main (int argc, char ** argv) {
     myFieldDriver.read() ;
   } catch (...) {
     myField->setSupport(0);
-    delete mySupport ;
+    mySupport->removeReference();
     mySupport = new SUPPORT(myMesh,"On_all_node",MED_EN::MED_NODE);
     myField->setSupport(mySupport);
     try {
@@ -141,13 +141,13 @@ int main (int argc, char ** argv) {
   FIELD_ * pt_field_ = myField;
   affiche_field(pt_field_, mySupport);
   FIELD_ * pt_field_2 = new FIELD_(* pt_field_);
-  delete myField;
+  myField->removeReference();
   affiche_field(pt_field_2, pt_field_2->getSupport());
   
-  delete pt_field_2 ;
+  pt_field_2->removeReference();
 
-  delete mySupport ;
-  delete myMesh ;
+  mySupport->removeReference() ;
+  myMesh->removeReference() ;
 
   return 0;
 }

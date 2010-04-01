@@ -421,7 +421,7 @@ void MEDMEMTest::testMed()
   // add null field, exception should be raised
   CPPUNIT_ASSERT_THROW(myEmptyMed->addField(NULL), MEDEXCEPTION);
   //
-  FIELD_* myEmptyField = new FIELD_();
+  FIELD_* myEmptyField = new FIELD_;
   // add empty field, ensure exception is raised
   CPPUNIT_ASSERT_THROW(myEmptyMed->addField(myEmptyField), MEDEXCEPTION);
   //set field name

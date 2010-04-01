@@ -539,7 +539,7 @@ struct _InterMed : public _intermediateMED
 
   void addSubPart(const _SubPart& subPart);
 
-  ~_InterMed() { if ( _isOwnMedMesh ) { delete _medMesh; _medMesh=0; }}
+  ~_InterMed() { if ( _isOwnMedMesh ) { if(_medMesh) _medMesh->removeReference(); _medMesh=0; }}
 };
 
 // ==============================================================================

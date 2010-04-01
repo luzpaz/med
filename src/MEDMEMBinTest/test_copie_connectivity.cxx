@@ -149,7 +149,7 @@ int main (int argc, char ** argv) {
   string meshname = argv[2] ;
 
   //Construction d'un maillage
-  MESH * myMesh= new MESH() ;
+  MESH * myMesh= new MESH;
   myMesh->setName(meshname);
   MED_MESH_RDONLY_DRIVER myMeshDriver(filename,myMesh) ;
   myMeshDriver.setMeshName(meshname);
@@ -168,7 +168,7 @@ int main (int argc, char ** argv) {
   affiche_connectivity(myConnectivity3, myMesh);
   delete myConnectivity3;
 
-  delete myMesh ;
+  myMesh->removeReference();
 
   return 0;
 }

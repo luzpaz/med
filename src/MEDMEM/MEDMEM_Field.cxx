@@ -83,7 +83,14 @@ FIELD_& FIELD_::operator=(const FIELD_ &m) {
   _isMinMax           = m._isMinMax ;
   _name               = m._name;
   _description        = m._description;
-  _support            = m._support;   //Cf Opérateur de recopie du Support?
+  if(_support!=m._support)
+    {
+      if(_support)
+        _support->removeReference();
+      _support=m._support;   //Cf Opérateur de recopie du Support?
+      if(_support)
+        _support->addReference();
+    }
   _numberOfComponents = m._numberOfComponents;
   _numberOfValues     = m._numberOfValues;
 
@@ -176,10 +183,8 @@ FIELD_::~FIELD_()
       SCRUTE_MED(_drivers[index]);
       if ( _drivers[index] != NULL) delete _drivers[index];
     }
-  //CCAR: if _support is a SUPPORTClient remove reference
-  // This is correct but it's highlighting other problem
- // if(_support)
- //   _support->removeReference();
+  if(_support)
+    _support->removeReference();
 }
 
 /*! 
@@ -197,7 +202,10 @@ FIELD<double>* FIELD_::_getFieldSize(const SUPPORT *subSupport) const
       if ( getSupport()->getEntity() == MED_NODE )
         support = new SUPPORT(getSupport()->getMesh());
       else
-        support = getSupport();
+        {
+          support = getSupport();
+          support->addReference();
+        }
     }
   switch (getSupport()->getEntity())
     {
@@ -237,11 +245,11 @@ FIELD<double>* FIELD_::_getFieldSize(const SUPPORT *subSupport) const
             p_field_size=getSupport()->getMesh()->getVolume( support );
             break;
           }
-        if ( !subSupport )
-          delete support;
         break;
       }
     }
+  if(!subSupport)
+    support->removeReference();
   return p_field_size;
 }
 

@@ -105,7 +105,7 @@ int main (int argc, char ** argv) {
   string filename = argv[1] ;
   string meshname = argv[2] ;
 
-  MESH * myMesh= new MESH() ;
+  MESH * myMesh= new MESH;
   myMesh->setName(meshname);
   MED_MESH_RDONLY_DRIVER myMeshDriver(filename,myMesh) ;
   myMeshDriver.setMeshName(meshname);
@@ -123,7 +123,7 @@ int main (int argc, char ** argv) {
   try {
     myField = new FIELD<double>(mySupport,MED_DRIVER,filename,fieldname) ;
   } catch (...) {
-    delete mySupport ;
+    mySupport->removeReference() ;
     mySupport = new SUPPORT(myMesh,"On_all_node",MED_NODE);
     try {
       myField = new FIELD<double>(mySupport,MED_DRIVER,filename,fieldname) ;
@@ -135,23 +135,23 @@ int main (int argc, char ** argv) {
   
   affiche_fieldT(myField, mySupport);
   FIELD<double> * myField2 = new FIELD<double>(* myField); // Contructeur par recopie, sauf SUPPORT
-  delete myField; // Ne détruit pas le Support 
+  myField->removeReference(); // Ne détruit pas le Support 
   affiche_fieldT(myField2, myField2->getSupport());
   FIELD<double,NoInterlace>   * myField3  = FieldConvert( *myField2 );
-  delete myField2;
+  myField2->removeReference();
 
   affiche_fieldT(myField3, myField3->getSupport());
   FIELD<double,FullInterlace> * myField4  = FieldConvert( *myField3 );
-  delete myField3;
+  myField3->removeReference();
   affiche_fieldT(myField4, myField4->getSupport());
-  delete myField4;
+  myField4->removeReference();
 
   FIELD<double,NoInterlace> * myField5 = new FIELD<double,NoInterlace>(mySupport,MED_DRIVER,filename,fieldname) ;
   affiche_fieldT(myField5, myField5->getSupport());
-  delete myField5;
+  myField5->removeReference();
 
-  delete mySupport ;
-  delete myMesh ;
+  mySupport->removeReference();
+  myMesh->removeReference();
 
   return 0;
 }

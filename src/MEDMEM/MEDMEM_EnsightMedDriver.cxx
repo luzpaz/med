@@ -268,7 +268,7 @@ void ENSIGHT_MED_RDONLY_DRIVER::read()
       int nbSteps = caseFile.getNbVarSteps( i );
       for ( int step = 1; step <= nbSteps; ++step )
       {
-        FIELD_* field = new FIELD<double>;
+        FIELD_* field = new FIELD<double>();
         ENSIGHT_FIELD_RDONLY_DRIVER fieldDriver( _fileName, field );
         caseFile.setDataFileName( i, step, &fieldDriver );
         fieldDriver.open();
@@ -313,7 +313,7 @@ void ENSIGHT_MED_RDONLY_DRIVER::readFileStruct()
     int nbSteps = caseFile.getNbVarSteps( i );
     for ( int step = 1; step <= nbSteps; ++step )
     {
-      FIELD<double>* field = new FIELD<double>;
+      FIELD<double>* field = new FIELD<double>();
       ENSIGHT_FIELD_RDONLY_DRIVER fieldDriver( _fileName, field, step );
       int meshIndex = caseFile.setDataFileName( i, step, &fieldDriver ); // retrieve field name
       field->addDriver( fieldDriver );

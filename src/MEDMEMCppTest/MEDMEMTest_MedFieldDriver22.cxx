@@ -75,9 +75,9 @@
  */
 void MEDMEMTest::testMedFieldDriver22()
 {
-  FIELD<int> *aField                = new FIELD<int> ();
-  FIELD<int> *aField_1              = new FIELD<int> ();
-  FIELD<double> *aField_2           = new FIELD<double> ();
+  FIELD<int> *aField                = new FIELD<int>();
+  FIELD<int> *aField_1              = new FIELD<int>();
+  FIELD<double> *aField_2           = new FIELD<double>();
   string filename_rd                = getResourceFile("pointe_import22.med");
   string filenameWithOutFileds      = getResourceFile("mesh_import22.med");
   string filenameWithOutFileds_rdwr = makeTmpFile("mesh_import22.med", filenameWithOutFileds);
@@ -591,9 +591,9 @@ void MEDMEMTest::testMedFieldDriver22()
   CPPUNIT_ASSERT(rwostr1.str() == rwostr2.str());
 
   //Delete all objects
-  delete aField;
-  delete aField_1;
-  delete aField_2;
+  aField->removeReference();
+  aField_1->removeReference();
+  aField_2->removeReference();
 
   delete aInvalidMedRdFieldDriver22_1;
   delete aInvalidMedRdFieldDriver22_2;

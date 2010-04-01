@@ -72,8 +72,8 @@ using namespace MEDMEM;
  */
 void MEDMEMTest::testMedMeshDriver21()
 {
-  MESH *aMesh                      = new MESH();
-  MESH *aMesh_1                    = new MESH();
+  MESH *aMesh                      = new MESH;
+  MESH *aMesh_1                    = new MESH;
 
   string filename_rd               = getResourceFile("pointe.med");
   string filename_wr               = makeTmpFile("myWr_pointe21.med");
@@ -527,6 +527,6 @@ void MEDMEMTest::testMedMeshDriver21()
   delete aInvalidRdWrDriver21;
   delete aRdWrDriver21;
 
-  delete aMesh;
-  delete aMesh_1;
+  aMesh->removeReference();
+  aMesh_1->removeReference();
 }

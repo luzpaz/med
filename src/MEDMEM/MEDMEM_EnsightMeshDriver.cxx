@@ -299,19 +299,22 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
 
     if ( isToWriteEntity( MED_CELL, _ptrMesh ))
     {
-      SUPPORT allCells(_ptrMesh, getMeshName(), MED_CELL );
-      (this->*writePart)( ensightGeomFile, &allCells );
+      SUPPORT *allCells=new SUPPORT(_ptrMesh, getMeshName(), MED_CELL );
+      (this->*writePart)( ensightGeomFile, allCells );
+      allCells->removeReference();
     }
     // And meshdim-1 connectivity
     if ( isToWriteEntity( MED_FACE, _ptrMesh ))
     {
-      SUPPORT allFaces(_ptrMesh, string("SupportOnAll_")+entNames[MED_FACE], MED_FACE );
-      (this->*writePart)( ensightGeomFile, & allFaces);
+      SUPPORT *allFaces=new SUPPORT(_ptrMesh, string("SupportOnAll_")+entNames[MED_FACE], MED_FACE );
+      (this->*writePart)( ensightGeomFile, allFaces);
+      allFaces->removeReference();
     }
     else if ( isToWriteEntity(MED_EDGE, _ptrMesh))
     {
-      SUPPORT allEdges(_ptrMesh, string("SupportOnAll_")+entNames[MED_EDGE], MED_EDGE );
-      (this->*writePart)( ensightGeomFile, & allEdges);
+      SUPPORT *allEdges=new SUPPORT(_ptrMesh, string("SupportOnAll_")+entNames[MED_EDGE], MED_EDGE );
+      (this->*writePart)( ensightGeomFile, allEdges);
+      allEdges->removeReference();
     }
 
     // Write all groups as parts
@@ -377,19 +380,22 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
 
     if ( isToWriteEntity( MED_CELL, _ptrMesh ))
     {
-      SUPPORT allCells(_ptrMesh, getMeshName(), MED_CELL );
-      (this->*writePart)( ensightGeomFile, &allCells );
+      SUPPORT *allCells=new SUPPORT(_ptrMesh, getMeshName(), MED_CELL );
+      (this->*writePart)( ensightGeomFile, allCells );
+      allCells->removeReference();
     }
     // And meshdim-1 connectivity
     if ( isToWriteEntity( MED_FACE, _ptrMesh ))
     {
-      SUPPORT allFaces(_ptrMesh, string("SupportOnAll_")+entNames[MED_FACE], MED_FACE );
-      (this->*writePart)( ensightGeomFile, & allFaces);
+      SUPPORT *allFaces=new SUPPORT(_ptrMesh, string("SupportOnAll_")+entNames[MED_FACE], MED_FACE );
+      (this->*writePart)( ensightGeomFile, allFaces);
+      allFaces->removeReference();
     }
     else if ( isToWriteEntity(MED_EDGE, _ptrMesh))
     {
-      SUPPORT allEdges(_ptrMesh, string("SupportOnAll_")+entNames[MED_EDGE], MED_EDGE );
-      (this->*writePart)( ensightGeomFile, & allEdges);
+      SUPPORT *allEdges=new SUPPORT(_ptrMesh, string("SupportOnAll_")+entNames[MED_EDGE], MED_EDGE );
+      (this->*writePart)( ensightGeomFile, allEdges);
+      allEdges->removeReference();
     }
 
     // Write all groups as parts
@@ -3223,7 +3229,7 @@ GROUP* ENSIGHT_MESH_RDONLY_DRIVER::makeGroup( _groupe&     grp,
       equalGroupe = & g;
   }
   if ( equalGroupe ) {
-    delete grp.medGroup;
+    grp.medGroup->removeReference();
     grp.medGroup = equalGroupe->medGroup;
   }
   else { // new unique group

@@ -1488,6 +1488,12 @@ void CELLMODEL::init(const CELLMODEL &m)
     _numberOfNodeOfEachConstituent[i] = newArray ;
   }
   _constituents = new int**[_numberOfConstituentsDimension] ;
+  if(_constituentsType)
+    {
+      for(int i=0; i<_numberOfConstituentsDimension; i++)
+        delete [] _constituentsType[i];
+      delete [] _constituentsType;
+    }
   _constituentsType = new medGeometryElement*[_numberOfConstituentsDimension] ;
   for(int i=0; i<_numberOfConstituentsDimension; i++) {
     int numberOf = _numberOfConstituents[i] ;
@@ -1517,17 +1523,16 @@ void CELLMODEL::clean()
       if (NULL!=_constituents[i][j])
         delete[] _constituents[i][j] ;
     }
-    if (NULL!=_constituentsType[i])
-      delete[] _constituentsType[i] ;
+    if (NULL!=_constituentsType)
+      delete [] _constituentsType[i] ;
     if (NULL!=_constituents[i])
       delete[] _constituents[i] ;
     if (NULL!=_numberOfNodeOfEachConstituent[i])
       delete[] _numberOfNodeOfEachConstituent[i] ;
   }
+  delete [] _constituentsType; 
   if (NULL!=_numberOfConstituents)
     delete[]_numberOfConstituents ;
-  if (NULL!=_constituentsType)
-    delete[] _constituentsType ;
   if (NULL!=_constituents)
     delete[] _constituents ;
   if (NULL!=_numberOfNodeOfEachConstituent)

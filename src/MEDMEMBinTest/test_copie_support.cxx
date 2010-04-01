@@ -106,7 +106,7 @@ int main (int argc, char ** argv) {
   string filename = argv[1] ;
   string meshname = argv[2] ;
 
-  MESH * myMesh= new MESH() ;
+  MESH * myMesh= new MESH;
   myMesh->setName(meshname);
   MED_MESH_RDONLY_DRIVER myMeshDriver(filename,myMesh) ;
   myMeshDriver.setMeshName(meshname);
@@ -120,9 +120,9 @@ int main (int argc, char ** argv) {
   cout << "Show Support on all :"<<endl ;
   affiche_support(mySupport);
   SUPPORT * mySupport2 = new SUPPORT(* mySupport);
-  delete mySupport;
+  mySupport->removeReference();
   affiche_support(mySupport2);
-  delete mySupport2;
+  mySupport2->removeReference();
 
   //Construction d'un support partiel
   mySupport = new SUPPORT(myMesh,"Support on CELLs",MED_CELL);
@@ -165,9 +165,9 @@ int main (int argc, char ** argv) {
   cout << "Show Partial Support :"<<endl ;
   affiche_support(mySupport);
   mySupport2 = new SUPPORT(* mySupport);
-  delete mySupport;
+  mySupport->removeReference();
   affiche_support(mySupport2);
-  delete mySupport2;
+  mySupport2->removeReference();
 
   /*
   cout << "Show Family :"<<endl ;
@@ -183,7 +183,7 @@ int main (int argc, char ** argv) {
   affiche_groupe(myMesh,MED_EDGE);
   */
 
-  delete myMesh ;
+  myMesh->removeReference();
 
   return 0;
 }

@@ -101,7 +101,7 @@ int main (int argc, char ** argv) {
   string filename = argv[1] ;
   string meshname = argv[2] ;
 
-  MESH * myMesh= new MESH() ;
+  MESH * myMesh= new MESH;
   myMesh->setName(meshname);
   MED_MESH_RDONLY_DRIVER myMeshDriver(filename,myMesh) ;
   myMeshDriver.setMeshName(meshname);
@@ -136,10 +136,10 @@ int main (int argc, char ** argv) {
   cout << "Show Family2 :"<<endl ;
   affiche_famille(myFamily2);
   FAMILY * myFamily3 = new FAMILY(* myFamily2);
-  delete myFamily2;
+  myFamily2->removeReference();
   cout << "Show Family3 :"<<endl ;
   affiche_famille(myFamily3);
-  delete myFamily3;
+  myFamily3->removeReference();
 
   cout << "That's all"<<endl ;
 
@@ -151,7 +151,7 @@ int main (int argc, char ** argv) {
   affiche_groupe(myMesh,MED_EDGE);
   */
 
-  delete myMesh;
+  myMesh->removeReference();
 
   return 0;
 }

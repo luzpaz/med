@@ -137,7 +137,7 @@ int main (int argc, char ** argv) {
       MED_MESH_WRONLY_DRIVER myMeshDriver1("Copy_withmesh_"+fileName,myMesh);
       int current=myMesh->addDriver(myMeshDriver1);
       myMesh->write(current);
-      delete myMesh;
+      myMesh->removeReference();
 
       // On ajoute un driver en écriture, comme la relation SUPPORT-MESH n'est pas
       // initialisée, le driver doit trouver le maillage dans le fichier cible
@@ -145,7 +145,7 @@ int main (int argc, char ** argv) {
       MED_FIELD_WRONLY_DRIVER<double> myFieldDriver2("Copy_withmesh_"+fileName,myField1) ;
       current = myField1->addDriver(myFieldDriver2);
       myField1->write(current);
-      delete myField1;
+      myField1->removeReference();
     }
 
 //  mode2:

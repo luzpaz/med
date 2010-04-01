@@ -492,17 +492,19 @@ void checkField (FIELD<T, INTERLACING_TAG> * theField, const SUPPORT * theSuppor
   //#endif
 
   // copy constructor
-  FIELD<T, INTERLACING_TAG> aField_copy1 (*theField);
-  compareField(theField, &aField_copy1, /*isValue = */false);
+  FIELD<T, INTERLACING_TAG> *aField_copy1= new FIELD<T, INTERLACING_TAG>(*theField);
+  compareField(theField, aField_copy1, /*isValue = */false);
   //compareField(theField, &aField_copy1, /*isValue = */true);
+  aField_copy1->removeReference();
 
   // operator=
   //#ifdef ENABLE_FAULTS
   // (BUG) This fails (Segmentation fault) if not set:
   // _componentsNames or _componentsDescriptions, or _componentsUnits, or _MEDComponentsUnits
-  FIELD<T, INTERLACING_TAG> aField_copy2;
-  aField_copy2 = *theField;
-  compareField(theField, &aField_copy2, /*isValue = */false);
+  FIELD<T, INTERLACING_TAG> *aField_copy2=new FIELD<T, INTERLACING_TAG>();
+  *aField_copy2 = *theField;
+  compareField(theField, aField_copy2, /*isValue = */false);
+  aField_copy2->removeReference();
   //compareField(theField, &aField_copy2, /*isValue = */true);
   //#endif
   //#ifdef ENABLE_FORCED_FAILURES
@@ -514,7 +516,7 @@ template<class T>
 FIELD<T> * createFieldOnGroup(MESH* theMesh, const GROUP* theGroup,
                               const string theName, const string theDescr)
 {
-  FIELD<T> * aFieldOnGroup = new FIELD<T> (theGroup, /*NumberOfComponents = */2);
+  FIELD<T> * aFieldOnGroup = new FIELD<T>(theGroup, /*NumberOfComponents = */2);
 
   aFieldOnGroup->setName(theName);
   aFieldOnGroup->setDescription(theDescr);
@@ -580,17 +582,17 @@ void testDrivers()
   aRemover.Register(filenamevtk_wr);
   aRemover.Register(filename_support_wr);
 
-  FIELD<int> aInvalidField;
+  FIELD<int> *aInvalidField=new FIELD<int>();
   //must throw becase only VTK_DRIVER or MED_DRIVER may be specified as driverType for FIELD
-  CPPUNIT_ASSERT_THROW(aInvalidField = FIELD<int>(NO_DRIVER, filename_rd, fieldname_nodeint_rd),
+  CPPUNIT_ASSERT_THROW(*aInvalidField = *(new FIELD<int>(NO_DRIVER, filename_rd, fieldname_nodeint_rd)),
                        MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aInvalidField = FIELD<int>(GIBI_DRIVER, filename_rd, fieldname_nodeint_rd),
+  CPPUNIT_ASSERT_THROW(*aInvalidField = *(new FIELD<int>(GIBI_DRIVER, filename_rd, fieldname_nodeint_rd)),
                        MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aInvalidField = FIELD<int>(PORFLOW_DRIVER, filename_rd, fieldname_nodeint_rd),
+  CPPUNIT_ASSERT_THROW(*aInvalidField = *(new FIELD<int>(PORFLOW_DRIVER, filename_rd, fieldname_nodeint_rd)),
                        MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aInvalidField = FIELD<int>(ASCII_DRIVER, filename_rd, fieldname_nodeint_rd),
+  CPPUNIT_ASSERT_THROW(*aInvalidField = *(new FIELD<int>(ASCII_DRIVER, filename_rd, fieldname_nodeint_rd)),
                        MEDEXCEPTION);
-
+  aInvalidField->removeReference();
   //////////////////
   //TestRead Part//
   //////////////////
@@ -624,8 +626,9 @@ void testDrivers()
   FIELD<int> *aFieldSupport;
   //#ifdef ENABLE_FORCED_FAILURES  
   CPPUNIT_ASSERT_THROW(aFieldSupport = 
-                          new FIELD<int>(aSupport, MED_DRIVER,filename_rd,
-                                         fieldname_nodeint_rd), MEDMEM::MEDEXCEPTION);
+                       new FIELD<int>(aSupport, MED_DRIVER,filename_rd,
+                                       fieldname_nodeint_rd), MEDMEM::MEDEXCEPTION);
+  aSupport->removeReference();
   aSupport = new SUPPORT(aMesh, "aSupport",MED_NODE);
   CPPUNIT_ASSERT_NO_THROW(aFieldSupport = 
                           new FIELD<int>(aSupport, MED_DRIVER, filename_rd,
@@ -636,7 +639,7 @@ void testDrivers()
   aFieldWrDriver21->setFieldName(aFieldSupport->getName() + "_copy");
   CPPUNIT_ASSERT_NO_THROW(IdDriver= aFieldSupport->addDriver(*aFieldWrDriver21));
   CPPUNIT_ASSERT_NO_THROW(aFieldSupport->write(IdDriver));
-  delete aFieldSupport;
+  aFieldSupport->removeReference();
   delete aFieldWrDriver21;
   //#endif    
 
@@ -713,7 +716,7 @@ void testDrivers()
 
   //Test writeAppend(int index) method
   //Create a vtk file
-  MESH * aMesh_1 = new MESH();
+  MESH * aMesh_1 = new MESH;
   MED_MESH_RDONLY_DRIVER22 *aMedMeshRdDriver22 = new MED_MESH_RDONLY_DRIVER22(filename22_rd, aMesh_1);
   aMedMeshRdDriver22->open();
   aMedMeshRdDriver22->setMeshName(meshname);
@@ -768,52 +771,55 @@ void testDrivers()
   CPPUNIT_ASSERT_NO_THROW(aField_4->addDriver(*aVtkFieldDriver));
   //(BUG) => Segmentation fault after addDriver(const GENDRIVER &)
   CPPUNIT_ASSERT_THROW(aField_4->writeAppend(*aVtkFieldDriver),MEDEXCEPTION);
+  delete aVtkFieldDriver;
   //#endif
 
 
   //Delete objects
-  delete aField_1;
+  aField_1->removeReference();
   delete aMedRdFieldDriver21_1;
-  delete aField_2;
-  delete aField_3;
+  aField_2->removeReference();
+  aField_3->removeReference();
   delete aMedRdFieldDriver21_2;
-  delete aField_4;
+  aField_4->removeReference();
   delete aMedMeshRdDriver22;
   delete aMedWrFieldDriver21;
   delete aVtkDriver;
-  delete aMesh;
-  delete aMesh_1;
+  aMesh->removeReference();
+  aMesh_1->removeReference();
   delete aMedRdFieldDriver22;
-  delete aSupport;
+  aSupport->removeReference();
 }
 
 void MEDMEMTest::testField()
 {
-  SUPPORT anEmptySupport;
+  SUPPORT *anEmptySupport=new SUPPORT;
   ////////////////////
   // TEST 1: FIELD_ //
   ////////////////////
-  FIELD_ aField_;
+  FIELD_ *aField_=new FIELD_;
 
   // check set/get methods
   MED_EN::med_type_champ aValueType = MED_EN::MED_UNDEFINED_TYPE;
   MED_EN::medModeSwitch  anInterlace = MED_EN::MED_UNDEFINED_INTERLACE;
-  checkField_(&aField_, &anEmptySupport, aValueType, anInterlace);
+  checkField_(aField_, anEmptySupport, aValueType, anInterlace);
 
   // copy constructor
   // This fails (Segmentation fault) if not set:
   // _componentsNames or _componentsDescriptions, or _MEDComponentsUnits
-  FIELD_ aField_copy1 (aField_);
-  compareField_(&aField_, &aField_copy1, /*isFIELD = */false, /*isValue = */false);
-
+  FIELD_ *aField_copy1=new FIELD_(*aField_);
+  compareField_(aField_, aField_copy1, /*isFIELD = */false, /*isValue = */false);
+  aField_copy1->removeReference();
   // operator=
   //#ifdef ENABLE_FAULTS
   // (BUG) This fails (Segmentation fault) if not set:
   // _componentsNames or _componentsDescriptions, or _componentsUnits, or _MEDComponentsUnits
   // (BUG) Code duplication with copyGlobalInfo(), called from copy constructor
-  FIELD_ aField_copy2;
-  aField_copy2 = aField_;
-  compareField_(&aField_, &aField_copy2, /*isFIELD = */false, /*isValue = */false);
+  FIELD_ *aField_copy2=new FIELD_;
+  *aField_copy2 = *aField_;
+  compareField_(aField_, aField_copy2,/*isFIELD = */false, /*isValue = */false);
+  aField_copy2->removeReference();
+  aField_->removeReference();
   //#endif
   //#ifdef ENABLE_FORCED_FAILURES
   //CPPUNIT_FAIL("FIELD_::operator=() fails if _componentsUnits is not set");
@@ -844,18 +850,19 @@ void MEDMEMTest::testField()
   ////////////////////////
   // TEST 2: FIELD<int> //
   ////////////////////////
-  FIELD<int> aFieldInt;
-  checkField(&aFieldInt, &anEmptySupport);
-
+  FIELD<int> *aFieldInt=new FIELD<int>();
+  checkField(aFieldInt, anEmptySupport);
+  aFieldInt->removeReference();
+  anEmptySupport->removeReference();
   ////////////////////////////////////////
   // TEST 3: FIELD<double, NoInterlace> //
   ////////////////////////////////////////
   MESH * aMesh = MEDMEMTest_createTestMesh();
   const GROUP* aGroup = aMesh->getGroup(MED_EN::MED_FACE, 1);
 
-  FIELD<double, NoInterlace> aFieldDouble;
-  checkField(&aFieldDouble, aGroup);
-
+  FIELD<double, NoInterlace> *aFieldDouble=new FIELD<double, NoInterlace>();
+  checkField(aFieldDouble, aGroup);
+  aFieldDouble->removeReference();
   //////////////////////////////////////////
   // TEST 4: FIELD<double, FullInterlace> //
   //////////////////////////////////////////
@@ -1104,27 +1111,28 @@ void MEDMEMTest::testField()
     string filename  = getResourceFile("pointe_import22.med");
     string fieldname = "fieldnodedouble";
     string meshname  = "maa1";
-    FIELD<double> nodalField( MED_DRIVER, filename, fieldname);
-    MESH mesh( MED_DRIVER, filename, meshname);
-    nodalField.getSupport()->setMesh( &mesh );
+    FIELD<double> *nodalField=new FIELD<double>( MED_DRIVER, filename, fieldname);
+    MESH *mesh=new MESH( MED_DRIVER, filename, meshname);
+    nodalField->getSupport()->setMesh( mesh );
 
     // make a field on the nodes of first cell only
-    SUPPORT oneCellNodesSup(&mesh, "Sub-Support of nodes of 1 cell", MED_NODE);
-    int NumberOfElements[] = { mesh.getTypes(MED_CELL)[0]%100 };
+    SUPPORT *oneCellNodesSup=new SUPPORT(mesh, "Sub-Support of nodes of 1 cell", MED_NODE);
+    int NumberOfElements[] = { mesh->getTypes(MED_CELL)[0]%100 };
     medGeometryElement GeometricType[] = { MED_POINT1 };
-    oneCellNodesSup.setpartial("Support for sub-field of one cell nodes",
+    oneCellNodesSup->setpartial("Support for sub-field of one cell nodes",
                                /*NumberOfGeometricType=*/1,
                                /*TotalNumberOfElements=*/ *NumberOfElements,
                                GeometricType,
                                NumberOfElements,
-                               /*NumberValue=*/ mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,
-                                                                     MED_CELL,MED_ALL_ELEMENTS ));
-    FIELD<double, FullInterlace> * oneCellNodesField = nodalField.extract( &oneCellNodesSup );
-
+                               /*NumberValue=*/ mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,
+                                                                      MED_CELL,MED_ALL_ELEMENTS ));
+    FIELD<double, FullInterlace> * oneCellNodesField = nodalField->extract( oneCellNodesSup );
+    oneCellNodesSup->removeReference();
     // compute normL2 by avarage nodal value on the cell
 
-    SUPPORT allCellsSupport( &mesh );
-    FIELD<double>* volumeField = mesh.getVolume(&allCellsSupport);
+    SUPPORT *allCellsSupport=new SUPPORT( mesh );
+    FIELD<double>* volumeField = mesh->getVolume(allCellsSupport);
+    allCellsSupport->removeReference();
     // mdump output:
     // - Mailles de type MED_TETRA4 : 
     //  [     1 ] :          1          2          3          6
@@ -1140,13 +1148,14 @@ void MEDMEMTest::testField()
 
     CPPUNIT_ASSERT_THROW(oneCellNodesField->normL1(), MEDEXCEPTION);
     CPPUNIT_ASSERT_THROW(oneCellNodesField->normL1(1), MEDEXCEPTION);
-    CPPUNIT_ASSERT_THROW(oneCellNodesField->normL2(&nodalField), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(oneCellNodesField->normL2(nodalField), MEDEXCEPTION);
     CPPUNIT_ASSERT_THROW(oneCellNodesField->normL2(anAreaField), MEDEXCEPTION);
     CPPUNIT_ASSERT_THROW(oneCellNodesField->normL2(aSubField1), MEDEXCEPTION);
     CPPUNIT_ASSERT_THROW(oneCellNodesField->normL2(aFieldOnGroup1), MEDEXCEPTION);
-
-    delete volumeField;
-    delete oneCellNodesField;
+    nodalField->removeReference();
+    volumeField->removeReference();
+    oneCellNodesField->removeReference();
+    mesh->removeReference();
   }
 
   // double integral(SUPPORT*) - mantis issue 0020460:
@@ -1158,37 +1167,39 @@ void MEDMEMTest::testField()
     vector< vector<double> > xyz_array( dim, vector<double>( coord, coord + 3 ));
     vector<string> coord_name( dim, "coord_name");
     vector<string> coord_unit( dim, "m");
-    GRID mesh( xyz_array, coord_name, coord_unit );
+    GRID *mesh=new GRID( xyz_array, coord_name, coord_unit );
 
     // make supports on the grid
-    SUPPORT supOnAll(&mesh,"supOnAll");
-    SUPPORT sup123(&mesh,"sup123"); int nbEl123[] = {3}, elems123[] = { 1,2,3 };
-    SUPPORT sup12 (&mesh,"sup12");  int nbEl12 [] = {2}, elems12 [] = { 1,2 };
-    SUPPORT sup34 (&mesh,"sup34");  int nbEl34 [] = {2}, elems34 [] = { 3,4 };
+    SUPPORT *supOnAll=new SUPPORT(mesh,"supOnAll");
+    SUPPORT *sup123=new SUPPORT(mesh,"sup123"); int nbEl123[] = {3}, elems123[] = { 1,2,3 };
+    SUPPORT *sup12=new SUPPORT(mesh,"sup12");  int nbEl12 [] = {2}, elems12 [] = { 1,2 };
+    SUPPORT *sup34=new SUPPORT(mesh,"sup34");  int nbEl34 [] = {2}, elems34 [] = { 3,4 };
     const int nbGeomTypes = 1;
-    const medGeometryElement * geomType = mesh.getTypes(MED_EN::MED_CELL);
-    sup123.setpartial("test", nbGeomTypes, *nbEl123, geomType, nbEl123, elems123 );
-    sup12 .setpartial("test", nbGeomTypes, *nbEl12 , geomType, nbEl12 , elems12 );
-    sup34 .setpartial("test", nbGeomTypes, *nbEl34 , geomType, nbEl34 , elems34 );
+    const medGeometryElement * geomType = mesh->getTypes(MED_EN::MED_CELL);
+    mesh->removeReference();
+    sup123->setpartial("test", nbGeomTypes, *nbEl123, geomType, nbEl123, elems123 );
+    sup12->setpartial("test", nbGeomTypes, *nbEl12 , geomType, nbEl12 , elems12 );
+    sup34->setpartial("test", nbGeomTypes, *nbEl34 , geomType, nbEl34 , elems34 );
 
     // make vectorial fields with values of i-th elem { i, i*10, i*100 }
     const int nbComp = 3, nbElems = 4;
     const int mult[nbComp] = { 1, 10, 100 };
-    FIELD<int,NoInterlaceByType> fAllNoTy(&supOnAll, nbComp), f12NoTy(&sup12, nbComp);
-    FIELD<int,NoInterlace>       fAllNo  (&supOnAll, nbComp), f12No  (&sup12, nbComp);
-    FIELD<int,FullInterlace>     fAllFull(&supOnAll, nbComp), f12Full(&sup12, nbComp);
+    FIELD<int,NoInterlaceByType> *fAllNoTy=new FIELD<int,NoInterlaceByType>(supOnAll, nbComp), *f12NoTy=new FIELD<int,NoInterlaceByType>(sup12, nbComp);
+    FIELD<int,NoInterlace>       *fAllNo=new FIELD<int,NoInterlace>(supOnAll, nbComp), *f12No=new FIELD<int,NoInterlace>(sup12, nbComp);
+    FIELD<int,FullInterlace>     *fAllFull=new FIELD<int,FullInterlace>(supOnAll, nbComp), *f12Full=new FIELD<int,FullInterlace>(sup12, nbComp);
+    supOnAll->removeReference();
     int i, j;
     for ( i = 1; i <= nbElems; ++i )
       for ( j = 1; j <= nbComp; ++j )
         {
-          fAllFull.setValueIJ( i, j, i * mult[j-1]);
-          fAllNoTy.setValueIJ( i, j, i * mult[j-1]);
-          fAllNo  .setValueIJ( i, j, i * mult[j-1]);
+          fAllFull->setValueIJ( i, j, i * mult[j-1]);
+          fAllNoTy->setValueIJ( i, j, i * mult[j-1]);
+          fAllNo  ->setValueIJ( i, j, i * mult[j-1]);
           if ( i < 3 )
             {
-              f12Full.setValueIJ( i, j, i * mult[j-1]);
-              f12NoTy.setValueIJ( i, j, i * mult[j-1]);
-              f12No  .setValueIJ( i, j, i * mult[j-1]);
+              f12Full->setValueIJ( i, j, i * mult[j-1]);
+              f12NoTy->setValueIJ( i, j, i * mult[j-1]);
+              f12No  ->setValueIJ( i, j, i * mult[j-1]);
             }
         }
     // Test
@@ -1196,33 +1207,41 @@ void MEDMEMTest::testField()
     // Integral = SUM( area * (i*1 + i*10 + i*100)) == 111 * SUM( area * i )
     // elem area: { 1, 2, 2, 4 }
     integral = 111*( 1*1 + 2*2 + 2*3 + 4*4 );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllNoTy.integral(), preci );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllNo  .integral(), preci );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllFull.integral(), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllNoTy->integral(), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllNo  ->integral(), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllFull->integral(), preci );
     integral = 111*( 1*1 + 2*2 );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12NoTy.integral(), preci );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12No  .integral(), preci );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12Full.integral(), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12NoTy->integral(), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12No  ->integral(), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12Full->integral(), preci );
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllNoTy.integral(&sup12), preci );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllNo  .integral(&sup12), preci );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllFull.integral(&sup12), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllNoTy->integral(sup12), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllNo  ->integral(sup12), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllFull->integral(sup12), preci );
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12NoTy.integral(&sup12), preci );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12No  .integral(&sup12), preci );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12Full.integral(&sup12), preci );
-
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12NoTy.integral(&sup123), preci );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12No  .integral(&sup123), preci );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12Full.integral(&sup123), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12NoTy->integral(sup12), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12No  ->integral(sup12), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12Full->integral(sup12), preci );
+    sup12->removeReference();
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12NoTy->integral(sup123), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12No  ->integral(sup123), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12Full->integral(sup123), preci );
     integral = 111*( 1*1 + 2*2 + 2*3 );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllNoTy.integral(&sup123), preci );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllNo  .integral(&sup123), preci );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllFull.integral(&sup123), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllNoTy->integral(sup123), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllNo  ->integral(sup123), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllFull->integral(sup123), preci );
+    fAllNoTy->removeReference();
+    fAllNo->removeReference();
+    sup123->removeReference();
+    fAllFull->removeReference();
     integral = 0;
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12NoTy.integral(&sup34), preci );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12No  .integral(&sup34), preci );
-    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12Full.integral(&sup34), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12NoTy->integral(sup34), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12No  ->integral(sup34), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12Full->integral(sup34), preci );
+    sup34->removeReference();
+    f12NoTy->removeReference();
+    f12No->removeReference();
+    f12Full->removeReference();
   }
 
   // applyPow
@@ -1362,66 +1381,66 @@ void MEDMEMTest::testField()
   // operators and add, sub, mul, div
 
   // +
-  FIELD<double> aSum = *aFieldOnGroup1 + *aFieldOnGroup2;
-  aSum.setName(aFieldOnGroup1->getName());
-  aSum.setDescription(aFieldOnGroup1->getDescription());
-  compareField_(aFieldOnGroup1, &aSum, true, true);
-  val_res = aSum.getValue();
+  FIELD<double> *aSum = *aFieldOnGroup1 + *aFieldOnGroup2;
+  aSum->setName(aFieldOnGroup1->getName());
+  aSum->setDescription(aFieldOnGroup1->getDescription());
+  compareField_(aFieldOnGroup1, aSum, true, true);
+  val_res = aSum->getValue();
   for (int i = 0; i < len; i++) {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(val1[i] + val2[i], val_res[i], 0.000001);
   }
-
+  aSum->removeReference();
   // -
-  FIELD<double> aDifference = *aFieldOnGroup1 - *aFieldOnGroup2;
-  aDifference.setName(aFieldOnGroup1->getName());
-  aDifference.setDescription(aFieldOnGroup1->getDescription());
-  compareField_(aFieldOnGroup1, &aDifference, true, true);
-  val_res = aDifference.getValue();
+  FIELD<double> *aDifference = *aFieldOnGroup1 - *aFieldOnGroup2;
+  aDifference->setName(aFieldOnGroup1->getName());
+  aDifference->setDescription(aFieldOnGroup1->getDescription());
+  compareField_(aFieldOnGroup1, aDifference, true, true);
+  val_res = aDifference->getValue();
   for (int i = 0; i < len; i++) {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(val1[i] - val2[i], val_res[i], 0.000001);
   }
-
+  aDifference->removeReference();
   // - (unary)
-  FIELD<double> aNegative = - *aFieldOnGroup1;
-  aNegative.setName(aFieldOnGroup1->getName());
-  aNegative.setDescription(aFieldOnGroup1->getDescription());
-  compareField_(aFieldOnGroup1, &aNegative, true, true);
-  val_res = aNegative.getValue();
+  FIELD<double> *aNegative = - *aFieldOnGroup1;
+  aNegative->setName(aFieldOnGroup1->getName());
+  aNegative->setDescription(aFieldOnGroup1->getDescription());
+  compareField_(aFieldOnGroup1, aNegative, true, true);
+  val_res = aNegative->getValue();
   for (int i = 0; i < len; i++) {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(- val1[i], val_res[i], 0.000001);
   }
-
+  aNegative->removeReference();
   // *
-  FIELD<double> aProduct = (*aFieldOnGroup1) * (*aFieldOnGroup2);
-  aProduct.setName(aFieldOnGroup1->getName());
-  aProduct.setDescription(aFieldOnGroup1->getDescription());
-  compareField_(aFieldOnGroup1, &aProduct, true, true);
-  val_res = aProduct.getValue();
+  FIELD<double> *aProduct = (*aFieldOnGroup1) * (*aFieldOnGroup2);
+  aProduct->setName(aFieldOnGroup1->getName());
+  aProduct->setDescription(aFieldOnGroup1->getDescription());
+  compareField_(aFieldOnGroup1, aProduct, true, true);
+  val_res = aProduct->getValue();
   for (int i = 0; i < len; i++) {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(val1[i] * val2[i], val_res[i], 0.000001);
   }
-
+  aProduct->removeReference();
   // /
-  FIELD<double> aQuotient = *aFieldOnGroup1 / *aFieldOnGroup2;
-  aQuotient.setName(aFieldOnGroup1->getName());
-  aQuotient.setDescription(aFieldOnGroup1->getDescription());
-  compareField_(aFieldOnGroup1, &aQuotient, true, true);
-  val_res = aQuotient.getValue();
+  FIELD<double> *aQuotient = *aFieldOnGroup1 / *aFieldOnGroup2;
+  aQuotient->setName(aFieldOnGroup1->getName());
+  aQuotient->setDescription(aFieldOnGroup1->getDescription());
+  compareField_(aFieldOnGroup1, aQuotient, true, true);
+  val_res = aQuotient->getValue();
   for (int i = 0; i < len; i++) {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(val1[i] / val2[i], val_res[i], 0.000001);
   }
-
+  aQuotient->removeReference();
   double val22 = aFieldOnGroup2->getValueIJ(anElems[2], 2);
   aFieldOnGroup2->setValueIJ(anElems[2], 2, 0.);
 
-  CPPUNIT_ASSERT_THROW(*aFieldOnGroup1 / *aFieldOnGroup2, MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW((*aFieldOnGroup1 / *aFieldOnGroup2), MEDEXCEPTION);
   //#ifdef ENABLE_FORCED_FAILURES
   // (BUG) is it up to user to control validity of data to avoid division on zero?
   // YES: USER SHOULD CARE OF IT
   //CPPUNIT_ASSERT_THROW(*aFieldOnGroup1 /= *aFieldOnGroup2, MEDEXCEPTION);
   //#endif
-  CPPUNIT_ASSERT_THROW(FIELD<double>::div(*aFieldOnGroup1, *aFieldOnGroup2), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(FIELD<double>::divDeep(*aFieldOnGroup1, *aFieldOnGroup2), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(FIELD<double>::div(*aFieldOnGroup1, *aFieldOnGroup2)->removeReference(), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(FIELD<double>::divDeep(*aFieldOnGroup1, *aFieldOnGroup2)->removeReference(), MEDEXCEPTION);
 
   // restore value
   aFieldOnGroup2->setValueIJ(anElems[2], 2, val22);
@@ -1444,7 +1463,7 @@ void MEDMEMTest::testField()
   for (int i = 0; i < len; i++) {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(val1[i] + val2[i], val_res[i], 0.000001);
   }
-  delete aPtr;
+  aPtr->removeReference();
 
   // sub
   aPtr = FIELD<double>::sub(*aFieldOnGroup1, *aFieldOnGroup2);
@@ -1455,7 +1474,7 @@ void MEDMEMTest::testField()
   for (int i = 0; i < len; i++) {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(val1[i] - val2[i], val_res[i], 0.000001);
   }
-  delete aPtr;
+  aPtr->removeReference();
 
   // mul
   aPtr = FIELD<double>::mul(*aFieldOnGroup1, *aFieldOnGroup2);
@@ -1466,7 +1485,7 @@ void MEDMEMTest::testField()
   for (int i = 0; i < len; i++) {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(val1[i] * val2[i], val_res[i], 0.000001);
   }
-  delete aPtr;
+  aPtr->removeReference();
 
   // div
   aPtr = FIELD<double>::div(*aFieldOnGroup1, *aFieldOnGroup2);
@@ -1477,7 +1496,7 @@ void MEDMEMTest::testField()
   for (int i = 0; i < len; i++) {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(val1[i] / val2[i], val_res[i], 0.000001);
   }
-  delete aPtr;
+  aPtr->removeReference();
 
   // addDeep
   aPtr = FIELD<double>::addDeep(*aFieldOnGroup1, *aFieldOnGroup2);
@@ -1488,7 +1507,7 @@ void MEDMEMTest::testField()
   for (int i = 0; i < len; i++) {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(val1[i] + val2[i], val_res[i], 0.000001);
   }
-  delete aPtr;
+  aPtr->removeReference();
 
   // subDeep
   aPtr = FIELD<double>::subDeep(*aFieldOnGroup1, *aFieldOnGroup2);
@@ -1499,7 +1518,7 @@ void MEDMEMTest::testField()
   for (int i = 0; i < len; i++) {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(val1[i] - val2[i], val_res[i], 0.000001);
   }
-  delete aPtr;
+  aPtr->removeReference();
 
   // mulDeep
   aPtr = FIELD<double>::mulDeep(*aFieldOnGroup1, *aFieldOnGroup2);
@@ -1510,7 +1529,7 @@ void MEDMEMTest::testField()
   for (int i = 0; i < len; i++) {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(val1[i] * val2[i], val_res[i], 0.000001);
   }
-  delete aPtr;
+  aPtr->removeReference();
 
   // divDeep
   aPtr = FIELD<double>::divDeep(*aFieldOnGroup1, *aFieldOnGroup2);
@@ -1521,7 +1540,7 @@ void MEDMEMTest::testField()
   for (int i = 0; i < len; i++) {
     CPPUNIT_ASSERT_DOUBLES_EQUAL(val1[i] / val2[i], val_res[i], 0.000001);
   }
-  delete aPtr;
+  aPtr->removeReference();
 
   // +=
   *aFieldOnGroup1 += *aFieldOnGroup2;
@@ -1572,14 +1591,14 @@ void MEDMEMTest::testField()
     for (int i = 0; i < len; i++) {
       CPPUNIT_ASSERT_DOUBLES_EQUAL(val1[i] + val3[i], val_res[i], 0.000001);
     }
-    delete aPtr;
+    aPtr->removeReference();
 
     aPtr = FIELD<double>::subDeep(*aFieldOnGroup1, *aFieldOnGroup3);
-    delete aPtr;
+    aPtr->removeReference();
     aPtr = FIELD<double>::mulDeep(*aFieldOnGroup1, *aFieldOnGroup3);
-    delete aPtr;
+    aPtr->removeReference();
     aPtr = FIELD<double>::divDeep(*aFieldOnGroup1, *aFieldOnGroup3);
-    delete aPtr;
+    aPtr->removeReference();
   }
   catch (MEDEXCEPTION & ex) {
     CPPUNIT_FAIL(ex.what());
@@ -1618,19 +1637,21 @@ void MEDMEMTest::testField()
   //CPPUNIT_ASSERT_NO_THROW();
   try {
     aPtr = FIELD<double>::mul(*aFieldOnGroup1, *aFieldOnGroup2);
-    delete aPtr;
+    aPtr->removeReference();
     aPtr = FIELD<double>::div(*aFieldOnGroup1, *aFieldOnGroup2);
-    delete aPtr;
+    aPtr->removeReference();
     aPtr = FIELD<double>::mulDeep(*aFieldOnGroup1, *aFieldOnGroup2);
-    delete aPtr;
+    aPtr->removeReference();
     aPtr = FIELD<double>::divDeep(*aFieldOnGroup1, *aFieldOnGroup2);
-    delete aPtr;
+    aPtr->removeReference();
 
     *aFieldOnGroup1 *= *aFieldOnGroup2;
     *aFieldOnGroup1 /= *aFieldOnGroup2;
 
-    FIELD<double> aPr = *aFieldOnGroup1 * *aFieldOnGroup2;
-    FIELD<double> aQu = *aFieldOnGroup1 / *aFieldOnGroup2;
+    FIELD<double> *aPr = *aFieldOnGroup1 * *aFieldOnGroup2;
+    FIELD<double> *aQu = *aFieldOnGroup1 / *aFieldOnGroup2;
+    aPr->removeReference();
+    aQu->removeReference();
   }
   catch (MEDEXCEPTION & ex) {
     CPPUNIT_FAIL(ex.what());
@@ -1684,19 +1705,19 @@ void MEDMEMTest::testField()
   aFieldOnGroup1->allocValue(2, nbVals);
   // be carefull: aFieldOnGroup1 reallocated and contains random values
 
-  delete aSubSupport1;
+  aSubSupport1->removeReference();
   delete [] anElems1;
 
-  delete aScalarProduct;
-  delete aSubField1;
-  delete anAreaField;
-  delete barycenter;
-  delete aFieldOnGroup1;
-  delete aFieldOnGroup2;
-  delete aFieldOnGroup3;
+  aScalarProduct->removeReference();
+  aSubField1->removeReference();
+  anAreaField->removeReference();
+  barycenter->removeReference();
+  aFieldOnGroup1->removeReference();
+  aFieldOnGroup2->removeReference();
+  aFieldOnGroup3->removeReference();
 
-  delete aMesh;
-  delete aMeshOneMore;
+  aMesh->removeReference();
+  aMeshOneMore->removeReference();
 
   /////////////////////
   // TEST 5: Drivers //
@@ -1712,7 +1733,7 @@ void MEDMEMTest::testField()
 void MEDMEMTest::testFieldConvert()
 {
   // create an empty integer field 2x10
-  FIELD<int, FullInterlace> * aField_FING = new FIELD<int, FullInterlace> ();
+  FIELD<int, FullInterlace> * aField_FING = new FIELD<int, FullInterlace>();
 
   aField_FING->setName("Field_FING");
   aField_FING->setDescription("Field full interlace no gauss");
@@ -1744,7 +1765,7 @@ void MEDMEMTest::testFieldConvert()
   CPPUNIT_ASSERT(aCompsUnits[1].getName() == aCompUnitBack2->getName());
 
   // create one more field by copy
-  FIELD<int, FullInterlace> * aField_FIGG = new FIELD<int, FullInterlace> (*aField_FING);
+  FIELD<int, FullInterlace> * aField_FIGG = new FIELD<int, FullInterlace>(*aField_FING);
 
   // values
   int values_FING[20] = { 7,- 7, 14,-14, 21,-21, 28,-28, 35,-35,
@@ -1781,9 +1802,9 @@ void MEDMEMTest::testFieldConvert()
     }
   }
 
-  delete aField_FING;
-  delete aField_NING;
-  delete aField_FING_conv;
+  aField_FING->removeReference();
+  aField_NING->removeReference();
+  aField_FING_conv->removeReference();
 
   ///////////////////
   // TEST 2: Gauss //
@@ -1818,15 +1839,15 @@ void MEDMEMTest::testFieldConvert()
     }
   }
 
-  delete aField_FIGG;
-  delete aField_NIGG;
-  delete aField_FIGG_conv;
+  aField_FIGG->removeReference();
+  aField_NIGG->removeReference();
+  aField_FIGG_conv->removeReference();
 
   //#ifdef ENABLE_FAULTS
   // (BUG) in FieldConvert(), concerning FIELD_::operator=
   {
     // create an empty integer field 2x10
-    FIELD<int, FullInterlace> * aField = new FIELD<int, FullInterlace> ();
+    FIELD<int, FullInterlace> * aField = new FIELD<int, FullInterlace>();
 
     aField->setName("aField");
     aField->setDescription("Field full interlace no gauss");
@@ -1845,7 +1866,9 @@ void MEDMEMTest::testFieldConvert()
     // no need to delete anArray, because it will be deleted in destructor of aField
 
     FIELD<int, NoInterlace> * aField_conv = FieldConvert(*aField);
+    aField->removeReference();
     CPPUNIT_ASSERT(aField_conv);
+    aField_conv->removeReference();
   }
   //#endif
   //#ifdef ENABLE_FORCED_FAILURES
@@ -1874,47 +1897,53 @@ void MEDMEMTest::testReadFieldOnNodesAndCells()
 
   using namespace MED_EN;
 
-  auto_ptr<MEDMEM::MESH> mesh( MEDMEMTest_createTestMesh());
+  MEDMEM::MESH *mesh=MEDMEMTest_createTestMesh();
   int drv = mesh->addDriver( MED_DRIVER, outfile, mesh->getName());
   mesh->write(drv);
 
-  SUPPORT supportOnCells(mesh.get(),"On_All_Cells",MED_CELL);
-  SUPPORT supportOnNodes(mesh.get(),"On_All_Nodes",MED_NODE);
-  int numberOfCells = supportOnCells.getNumberOfElements(MED_ALL_ELEMENTS);
-  int numberOfNodes = supportOnNodes.getNumberOfElements(MED_ALL_ELEMENTS);
+  SUPPORT *supportOnCells=new SUPPORT(mesh,"On_All_Cells",MED_CELL);
+  SUPPORT *supportOnNodes=new SUPPORT(mesh,"On_All_Nodes",MED_NODE);
+  mesh->removeReference();
+  int numberOfCells = supportOnCells->getNumberOfElements(MED_ALL_ELEMENTS);
+  int numberOfNodes = supportOnNodes->getNumberOfElements(MED_ALL_ELEMENTS);
 
   PointerOf<double> cellValues( numberOfCells ), nodeValues( numberOfNodes );
   for ( int i = 0; i < numberOfCells; ++i ) cellValues[i] = i;
   for ( int i = 0; i < numberOfNodes; ++i ) nodeValues[i] = -i;
 
-  FIELD<double> wrFieldOnCells(&supportOnCells,1);
-  wrFieldOnCells.setName(fieldName);
-  wrFieldOnCells.setComponentName(1,"Vx");
-  wrFieldOnCells.setComponentDescription(1,"comp1");
-  wrFieldOnCells.setMEDComponentUnit(1,"unit1");
-  wrFieldOnCells.setValue( cellValues );
-  drv = wrFieldOnCells.addDriver(MED_DRIVER, outfile, fieldName);
-  wrFieldOnCells.write( drv );
+  FIELD<double> *wrFieldOnCells=new FIELD<double>(supportOnCells,1);
+  wrFieldOnCells->setName(fieldName);
+  wrFieldOnCells->setComponentName(1,"Vx");
+  wrFieldOnCells->setComponentDescription(1,"comp1");
+  wrFieldOnCells->setMEDComponentUnit(1,"unit1");
+  wrFieldOnCells->setValue( cellValues );
+  drv = wrFieldOnCells->addDriver(MED_DRIVER, outfile, fieldName);
+  wrFieldOnCells->write( drv );
+  wrFieldOnCells->removeReference();
 
-  FIELD<double> wrFieldOnNodes(&supportOnNodes,1);
-  wrFieldOnNodes.setName(fieldName);
-  wrFieldOnNodes.setComponentName(1,"Vx");
-  wrFieldOnNodes.setComponentDescription(1,"comp1");
-  wrFieldOnNodes.setMEDComponentUnit(1,"unit1");
-  wrFieldOnNodes.setValue( nodeValues );
-  drv = wrFieldOnNodes.addDriver(MED_DRIVER, outfile, fieldName);
-  wrFieldOnNodes.write( drv );
-
+  FIELD<double> *wrFieldOnNodes=new FIELD<double>(supportOnNodes,1);
+  wrFieldOnNodes->setName(fieldName);
+  wrFieldOnNodes->setComponentName(1,"Vx");
+  wrFieldOnNodes->setComponentDescription(1,"comp1");
+  wrFieldOnNodes->setMEDComponentUnit(1,"unit1");
+  wrFieldOnNodes->setValue( nodeValues );
+  drv = wrFieldOnNodes->addDriver(MED_DRIVER, outfile, fieldName);
+  wrFieldOnNodes->write( drv );
+  wrFieldOnNodes->removeReference();
 
   //  READ FIELDS BACK
 
   //  field on CELLs
-  FIELD<double> cellField(&supportOnCells, MED_DRIVER, outfile, fieldName, -1, -1 );
-  CPPUNIT_ASSERT_EQUAL( MED_CELL, cellField.getSupport()->getEntity());
-  CPPUNIT_ASSERT_DOUBLES_EQUAL( numberOfCells-1, cellField.getValueIJ( numberOfCells, 1 ),1e-20);
+  FIELD<double> *cellField=new FIELD<double>(supportOnCells, MED_DRIVER, outfile, fieldName, -1, -1 );
+  CPPUNIT_ASSERT_EQUAL( MED_CELL, cellField->getSupport()->getEntity());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL( numberOfCells-1, cellField->getValueIJ( numberOfCells, 1 ),1e-20);
+  cellField->removeReference();
 
   //  field on NODEs
-  FIELD<double> nodeField(&supportOnNodes, MED_DRIVER, outfile, fieldName, -1, -1 );
-  CPPUNIT_ASSERT_EQUAL( MED_NODE, nodeField.getSupport()->getEntity());
-  CPPUNIT_ASSERT_DOUBLES_EQUAL( -(numberOfNodes-1), nodeField.getValueIJ( numberOfNodes, 1 ),1e-20);
+  FIELD<double> *nodeField=new FIELD<double>(supportOnNodes, MED_DRIVER, outfile, fieldName, -1, -1 );
+  CPPUNIT_ASSERT_EQUAL( MED_NODE, nodeField->getSupport()->getEntity());
+  CPPUNIT_ASSERT_DOUBLES_EQUAL( -(numberOfNodes-1), nodeField->getValueIJ( numberOfNodes, 1 ),1e-20);
+  nodeField->removeReference();
+  supportOnCells->removeReference();
+  supportOnNodes->removeReference();
 }

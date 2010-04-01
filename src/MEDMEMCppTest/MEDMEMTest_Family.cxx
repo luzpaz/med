@@ -155,7 +155,7 @@ void MEDMEMTest::testFamily()
   string filename = getResourceFile("pointe.med");
   string meshname = "maa1";
 
-  MESH * aMesh = new MESH();
+  MESH * aMesh = new MESH;
   aMesh->setName(meshname);
   MED_MESH_RDONLY_DRIVER aMeshDriver (filename, aMesh);
   aMeshDriver.setMeshName(meshname);
@@ -204,7 +204,7 @@ void MEDMEMTest::testFamily()
 
   // One more copy
   FAMILY * aFamily3 = new FAMILY (* aFamily2);
-  delete aFamily2;
+  aFamily2->removeReference();
 
   // Dump
   ostringstream ostr3;
@@ -307,9 +307,9 @@ void MEDMEMTest::testFamily()
   // TEST 3: check default constructor and operator= //
   /////////////////////////////////////////////////////
   {
-    FAMILY aFamily4;
+    FAMILY *aFamily4=new FAMILY;
     //#ifdef ENABLE_FAULTS
-    aFamily4 = (const FAMILY &)*aFamily3;
+    *aFamily4 = (const FAMILY &)*aFamily3;
     //#endif
     //#ifdef ENABLE_FORCED_FAILURES
     // (BUG) Wrong implementation or usage of PointerOf<string>.
@@ -352,22 +352,25 @@ void MEDMEMTest::testFamily()
   }
   */
     //#endif
+    aFamily4->removeReference();
   }
 
   ///////////////////////////////////////////////////
   // TEST 4: check construction from given support //
   ///////////////////////////////////////////////////
   {
-    SUPPORT s1 (*aFamily3);
-    FAMILY  f1 (s1);
-    CPPUNIT_ASSERT_EQUAL(0, f1.getIdentifier());
-    CPPUNIT_ASSERT_EQUAL(0, f1.getNumberOfAttributes());
-    CPPUNIT_ASSERT_EQUAL(0, f1.getNumberOfGroups());
-    CPPUNIT_ASSERT(s1.deepCompare(f1));
+    SUPPORT *s1=new SUPPORT(*aFamily3);
+    FAMILY  *f1=new FAMILY(*s1);
+    CPPUNIT_ASSERT_EQUAL(0, f1->getIdentifier());
+    CPPUNIT_ASSERT_EQUAL(0, f1->getNumberOfAttributes());
+    CPPUNIT_ASSERT_EQUAL(0, f1->getNumberOfGroups());
+    CPPUNIT_ASSERT(s1->deepCompare(*f1));
+    s1->removeReference();
+    f1->removeReference();
   }
 
-  delete aFamily3;
-  delete aMesh;
+  aFamily3->removeReference();
+  aMesh->removeReference();
 
   /////////////////////////////////////////////////////////////////
   // TEST 5: check constructor, designed to use with med driver. //
@@ -424,49 +427,50 @@ void MEDMEMTest::testFamily()
     string groupNames = groupName1 + groupName2 + groupName3;
 
     // nodes family 1
-    FAMILY aNodesF1 (aTestMesh, /*Identifier*/1, "Nodes 1", 
-                     /*NumberOfAttribute*/2, attrId, attrVa, attrDescr,
-                     /*NumberOfGroup*/3, groupNames,
-                     aNodeFamily, aCellFamily, aFaceFamily, anEdgeFamily);
+    FAMILY *aNodesF1=new FAMILY(aTestMesh, /*Identifier*/1, "Nodes 1", 
+                                /*NumberOfAttribute*/2, attrId, attrVa, attrDescr,
+                                /*NumberOfGroup*/3, groupNames,
+                                aNodeFamily, aCellFamily, aFaceFamily, anEdgeFamily);
 
     //cout << "Show aNodesF1 :" << endl;
     //cout << aNodesF1 << endl;
 
-    CPPUNIT_ASSERT_EQUAL(1, aNodesF1.getIdentifier());
-    CPPUNIT_ASSERT(strcmp("Nodes 1", aNodesF1.getName().c_str()) == 0);
-    CPPUNIT_ASSERT(MED_EN::MED_NODE == aNodesF1.getEntity());
-    CPPUNIT_ASSERT(!aNodesF1.isOnAllElements());
-    CPPUNIT_ASSERT_EQUAL(7, aNodesF1.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_EQUAL(1, aNodesF1->getIdentifier());
+    CPPUNIT_ASSERT(strcmp("Nodes 1", aNodesF1->getName().c_str()) == 0);
+    CPPUNIT_ASSERT(MED_EN::MED_NODE == aNodesF1->getEntity());
+    CPPUNIT_ASSERT(!aNodesF1->isOnAllElements());
+    CPPUNIT_ASSERT_EQUAL(7, aNodesF1->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 
-    CPPUNIT_ASSERT_EQUAL(2, aNodesF1.getNumberOfAttributes());
-    CPPUNIT_ASSERT_EQUAL(1, aNodesF1.getAttributeIdentifier(1));
-    CPPUNIT_ASSERT_EQUAL(2, aNodesF1.getAttributeIdentifier(2));
-    CPPUNIT_ASSERT_EQUAL(7, aNodesF1.getAttributeValue(1));
-    CPPUNIT_ASSERT_EQUAL(8, aNodesF1.getAttributeValue(2));
-    CPPUNIT_ASSERT_EQUAL(attrDescr1, aNodesF1.getAttributeDescription(1));
-    CPPUNIT_ASSERT_EQUAL(attrDescr2, aNodesF1.getAttributeDescription(2));
+    CPPUNIT_ASSERT_EQUAL(2, aNodesF1->getNumberOfAttributes());
+    CPPUNIT_ASSERT_EQUAL(1, aNodesF1->getAttributeIdentifier(1));
+    CPPUNIT_ASSERT_EQUAL(2, aNodesF1->getAttributeIdentifier(2));
+    CPPUNIT_ASSERT_EQUAL(7, aNodesF1->getAttributeValue(1));
+    CPPUNIT_ASSERT_EQUAL(8, aNodesF1->getAttributeValue(2));
+    CPPUNIT_ASSERT_EQUAL(attrDescr1, aNodesF1->getAttributeDescription(1));
+    CPPUNIT_ASSERT_EQUAL(attrDescr2, aNodesF1->getAttributeDescription(2));
 
-    CPPUNIT_ASSERT_EQUAL(3, aNodesF1.getNumberOfGroups());
-    CPPUNIT_ASSERT_EQUAL(groupName1, aNodesF1.getGroupName(1));
-    CPPUNIT_ASSERT_EQUAL(groupName2, aNodesF1.getGroupName(2));
-    CPPUNIT_ASSERT_EQUAL(groupName3, aNodesF1.getGroupName(3));
+    CPPUNIT_ASSERT_EQUAL(3, aNodesF1->getNumberOfGroups());
+    CPPUNIT_ASSERT_EQUAL(groupName1, aNodesF1->getGroupName(1));
+    CPPUNIT_ASSERT_EQUAL(groupName2, aNodesF1->getGroupName(2));
+    CPPUNIT_ASSERT_EQUAL(groupName3, aNodesF1->getGroupName(3));
+    aNodesF1->removeReference();
 
     // faces family 7
-    FAMILY aFacesF7 (aTestMesh, /*Identifier*/7, "Faces All", 
-                     /*NumberOfAttribute*/2, attrId, attrVa, attrDescr,
-                     /*NumberOfGroup*/3, groupNames,
-                     aNodeFamily, aCellFamily, aFaceFamily, anEdgeFamily);
+    FAMILY *aFacesF7=new FAMILY(aTestMesh, /*Identifier*/7, "Faces All", 
+                                /*NumberOfAttribute*/2, attrId, attrVa, attrDescr,
+                                /*NumberOfGroup*/3, groupNames,
+                                aNodeFamily, aCellFamily, aFaceFamily, anEdgeFamily);
 
     cout << "Show aFacesF7 :" << endl;
-    cout << aFacesF7 << endl;
+    cout << *aFacesF7 << endl;
 
-    CPPUNIT_ASSERT_EQUAL(7, aFacesF7.getIdentifier());
-    CPPUNIT_ASSERT(strcmp("Faces All", aFacesF7.getName().c_str()) == 0);
-    CPPUNIT_ASSERT(MED_EN::MED_FACE == aFacesF7.getEntity());
+    CPPUNIT_ASSERT_EQUAL(7, aFacesF7->getIdentifier());
+    CPPUNIT_ASSERT(strcmp("Faces All", aFacesF7->getName().c_str()) == 0);
+    CPPUNIT_ASSERT(MED_EN::MED_FACE == aFacesF7->getEntity());
 
     CPPUNIT_ASSERT_EQUAL(8, aTestMesh->getNumberOfElementsWithPoly(MED_EN::MED_FACE,
                                                                    MED_EN::MED_ALL_ELEMENTS));
-    CPPUNIT_ASSERT_EQUAL(8, aFacesF7.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_EQUAL(8, aFacesF7->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 
 //#ifdef ENABLE_FORCED_FAILURES
     // ? (BUG) ? Why _isOnAllElts is set to true only for nodes and cells. What about faces?
@@ -475,23 +479,23 @@ void MEDMEMTest::testFamily()
     // -----------
     // _isOnAllElts of FACE family must be false.
     // For the reason see issue 0020305: [CEA - 332] family on all faces
-    CPPUNIT_ASSERT(!aFacesF7.isOnAllElements());
+    CPPUNIT_ASSERT(!aFacesF7->isOnAllElements());
 //#endif
 
-    CPPUNIT_ASSERT_EQUAL(2, aFacesF7.getNumberOfAttributes());
-    CPPUNIT_ASSERT_EQUAL(1, aFacesF7.getAttributeIdentifier(1));
-    CPPUNIT_ASSERT_EQUAL(2, aFacesF7.getAttributeIdentifier(2));
-    CPPUNIT_ASSERT_EQUAL(7, aFacesF7.getAttributeValue(1));
-    CPPUNIT_ASSERT_EQUAL(8, aFacesF7.getAttributeValue(2));
-    CPPUNIT_ASSERT_EQUAL(attrDescr1, aFacesF7.getAttributeDescription(1));
-    CPPUNIT_ASSERT_EQUAL(attrDescr2, aFacesF7.getAttributeDescription(2));
+    CPPUNIT_ASSERT_EQUAL(2, aFacesF7->getNumberOfAttributes());
+    CPPUNIT_ASSERT_EQUAL(1, aFacesF7->getAttributeIdentifier(1));
+    CPPUNIT_ASSERT_EQUAL(2, aFacesF7->getAttributeIdentifier(2));
+    CPPUNIT_ASSERT_EQUAL(7, aFacesF7->getAttributeValue(1));
+    CPPUNIT_ASSERT_EQUAL(8, aFacesF7->getAttributeValue(2));
+    CPPUNIT_ASSERT_EQUAL(attrDescr1, aFacesF7->getAttributeDescription(1));
+    CPPUNIT_ASSERT_EQUAL(attrDescr2, aFacesF7->getAttributeDescription(2));
 
-    CPPUNIT_ASSERT_EQUAL(3, aFacesF7.getNumberOfGroups());
-    CPPUNIT_ASSERT_EQUAL(groupName1, aFacesF7.getGroupName(1));
-    CPPUNIT_ASSERT_EQUAL(groupName2, aFacesF7.getGroupName(2));
-    CPPUNIT_ASSERT_EQUAL(groupName3, aFacesF7.getGroupName(3));
-
-    delete aTestMesh;
+    CPPUNIT_ASSERT_EQUAL(3, aFacesF7->getNumberOfGroups());
+    CPPUNIT_ASSERT_EQUAL(groupName1, aFacesF7->getGroupName(1));
+    CPPUNIT_ASSERT_EQUAL(groupName2, aFacesF7->getGroupName(2));
+    CPPUNIT_ASSERT_EQUAL(groupName3, aFacesF7->getGroupName(3));
+    aFacesF7->removeReference();
+    aTestMesh->removeReference();
 
     // Method build() is not tested directly, but it is called from constructor, tested here
   }

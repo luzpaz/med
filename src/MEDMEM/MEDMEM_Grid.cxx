@@ -325,7 +325,11 @@ void GRID::fillCoordinates() const
   
   // if coordonate has not been allocated, perform shalow copy, transfer ownership of matrix
   if(_coordinate->getSpaceDimension()*_coordinate->getNumberOfNodes() == 0)
-      _coordinate->setCoordinates(new MEDARRAY<double>(_spaceDimension,_numberOfNodes,MED_FULL_INTERLACE),true); 
+    {
+      MEDARRAY<double>* pt=new MEDARRAY<double>(_spaceDimension,_numberOfNodes,MED_FULL_INTERLACE);
+      _coordinate->setCoordinates(pt,false);
+      delete pt;
+    }
 
   double* myCoord = const_cast <double *> ( _coordinate->getCoordinates(MED_FULL_INTERLACE) );
 
@@ -379,7 +383,8 @@ CONNECTIVITY * GRID::makeConnectivity (MED_EN::medEntityMesh           Entity,
   
   int numberOfGeometricType    = 1;
   Connectivity->_numberOfTypes = numberOfGeometricType;
-
+  if(Connectivity->_count)
+    delete [] Connectivity->_count;
   Connectivity->_count    = new int [numberOfGeometricType + 1] ;
   Connectivity->_count[0] = 1;
   Connectivity->_count[1] = 1 + NbEntities;
@@ -769,7 +774,8 @@ void GRID::fillConnectivity() const
     else
       CellCNCT->_constituent = EdgeCNCT;
   }
-
+  if(MESH::_connectivity)
+    delete MESH::_connectivity;
   MESH::_connectivity  = CellCNCT;
 
   (const_cast <GRID *> (this))->_is_connectivity_filled = true;

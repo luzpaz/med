@@ -98,9 +98,9 @@ using namespace MED_EN;
 
 void MEDMEMTest::testGibiMeshDriver()
 {
-  MESH *aMesh                      = new MESH();
+  MESH *aMesh                      = new MESH;
   MESH *aMesh_NULL                 = NULL;
-  MESH *aMesh_2                    = new MESH();
+  MESH *aMesh_2                    = new MESH;
   MED  *aMed                       = new MED();
   MED  *aMed_1                     = NULL;
 
@@ -500,8 +500,8 @@ void MEDMEMTest::testGibiMeshDriver()
 
     delete aGibiMedWrDriver;
   }
-
+  delete aMed;
   //Delete all objects
-  delete aMesh;
-  delete aMesh_2;
+  aMesh->removeReference();
+  aMesh_2->removeReference();
 }

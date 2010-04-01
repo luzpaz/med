@@ -93,8 +93,8 @@ int main (int argc, char ** argv) {
 
   const int REFpolygonIndex[3] = {1, 7, 12};
 
-  MESHING myMeshing;
-  myMeshing.setName("meshing");
+  MESHING *myMeshing=new MESHING;
+  myMeshing->setName("meshing");
 
   int NumberOfNodes = 19;
   int SpaceDimension = 3;
@@ -104,20 +104,20 @@ int main (int argc, char ** argv) {
   medGeometryElement Types[NumberOfTypes] = {MED_TETRA4};
   const int NumberOfElements[NumberOfTypes] = {1};
 
-  myMeshing.setNumberOfTypes(NumberOfTypes, MED_CELL);
+  myMeshing->setNumberOfTypes(NumberOfTypes, MED_CELL);
 
-  myMeshing.setCoordinates(SpaceDimension, NumberOfNodes, Coordinates,
+  myMeshing->setCoordinates(SpaceDimension, NumberOfNodes, Coordinates,
                            "CARTESIAN", MED_FULL_INTERLACE);
-  myMeshing.setSpaceDimension(SpaceDimension);
-  myMeshing.setMeshDimension(MeshDimension);
-  myMeshing.setTypes(Types, MED_CELL);
-  myMeshing.setNumberOfElements(NumberOfElements, MED_CELL);
+  myMeshing->setSpaceDimension(SpaceDimension);
+  myMeshing->setMeshDimension(MeshDimension);
+  myMeshing->setTypes(Types, MED_CELL);
+  myMeshing->setNumberOfElements(NumberOfElements, MED_CELL);
 
   string Names[3] = {"X","Y","Z"};
-  myMeshing.setCoordinatesNames(Names);
+  myMeshing->setCoordinatesNames(Names);
 
   string Units[3] = {"cm","cm","cm"};
-  myMeshing.setCoordinatesUnits(Units);
+  myMeshing->setCoordinatesUnits(Units);
 
   const int sizeTetra = 4*1 ;
   int ConnectivityTetra[sizeTetra]=
@@ -125,14 +125,14 @@ int main (int argc, char ** argv) {
     17, 9, 18, 19
   };
   
-  myMeshing.setConnectivity(ConnectivityTetra, MED_CELL, MED_TETRA4);
+  myMeshing->setConnectivity(ConnectivityTetra, MED_CELL, MED_TETRA4);
 
-  myMeshing.setPolyhedraConnectivity(REFpolyIndex, REFfacesIndex, 
+  myMeshing->setPolyhedraConnectivity(REFpolyIndex, REFfacesIndex, 
                                      REFnodalConnOfFaces, 2, MED_CELL);
 
 
-  MESHING myPolygonMeshing;
-  myPolygonMeshing.setName("PolygonMeshing");
+  MESHING *myPolygonMeshing=new MESHING;
+  myPolygonMeshing->setName("PolygonMeshing");
 
   NumberOfNodes = 9;
   SpaceDimension = 3;
@@ -140,17 +140,17 @@ int main (int argc, char ** argv) {
   medGeometryElement PolygonTypes[NumberOfTypes] = {MED_TRIA3};
   const int PolygonNumberOfElements[NumberOfTypes] = {2};
 
-  myPolygonMeshing.setNumberOfTypes(NumberOfTypes, MED_CELL);
+  myPolygonMeshing->setNumberOfTypes(NumberOfTypes, MED_CELL);
 
-  myPolygonMeshing.setCoordinates(SpaceDimension, NumberOfNodes, PolygonCoordinates,
+  myPolygonMeshing->setCoordinates(SpaceDimension, NumberOfNodes, PolygonCoordinates,
                            "CARTESIAN", MED_FULL_INTERLACE);
-  myPolygonMeshing.setSpaceDimension(SpaceDimension);
-  myPolygonMeshing.setMeshDimension(MeshDimension);
-  myPolygonMeshing.setTypes(PolygonTypes, MED_CELL);
-  myPolygonMeshing.setNumberOfElements(PolygonNumberOfElements, MED_CELL);
+  myPolygonMeshing->setSpaceDimension(SpaceDimension);
+  myPolygonMeshing->setMeshDimension(MeshDimension);
+  myPolygonMeshing->setTypes(PolygonTypes, MED_CELL);
+  myPolygonMeshing->setNumberOfElements(PolygonNumberOfElements, MED_CELL);
 
-  myPolygonMeshing.setCoordinatesNames(Names);
-  myPolygonMeshing.setCoordinatesUnits(Units);
+  myPolygonMeshing->setCoordinatesNames(Names);
+  myPolygonMeshing->setCoordinatesUnits(Units);
 
   const int sizeTri = 3*2 ;
   int ConnectivityTri[sizeTri]=
@@ -158,10 +158,11 @@ int main (int argc, char ** argv) {
     1, 7, 2, 3, 9, 4
   };
 
-  myPolygonMeshing.setConnectivity(ConnectivityTri, MED_CELL, MED_TRIA3);
-  myPolygonMeshing.setPolygonsConnectivity(REFpolygonIndex, REFpolygonFaces, 2, MED_CELL);
-  SUPPORT *sup2 = new SUPPORT(&myPolygonMeshing);
-  FIELD<double> *areas = myPolygonMeshing.getArea(sup2);
+  myPolygonMeshing->setConnectivity(ConnectivityTri, MED_CELL, MED_TRIA3);
+  myPolygonMeshing->setPolygonsConnectivity(REFpolygonIndex, REFpolygonFaces, 2, MED_CELL);
+  SUPPORT *sup2 = new SUPPORT(myPolygonMeshing);
+  FIELD<double> *areas = myPolygonMeshing->getArea(sup2);
+  myPolygonMeshing->removeReference();
   const double *vals2 = areas->getValue();
   const double REFAreaOfPolyg[4] ={1.5, 2, 6, 6.5};
   int nbPts=0;
@@ -169,19 +170,19 @@ int main (int argc, char ** argv) {
   for(i=0;i<4;i++)
     if(fabs(REFAreaOfPolyg[i]-vals2[i])<1e-12)
       nbPts++;
-  delete areas;
-  delete sup2;
+  areas->removeReference();
+  sup2->removeReference();
 
-  SUPPORT *sup = new SUPPORT(&myMeshing);
-  FIELD<double> *vols = myMeshing.getVolume(sup,false);
+  SUPPORT *sup = new SUPPORT(myMeshing);
+  FIELD<double> *vols = myMeshing->getVolume(sup,false);
   const double *vals = vols->getValue();
   const double REFVolOfPolyHedron[3] = {2.333333333333333, -11.66666666666666, -13.83224131414673};
   for(i=0;i<3;i++)
     if(fabs(REFVolOfPolyHedron[i]-vals[i])<1e-12)
       nbPts++;
   
-  delete vols;
-  delete sup;
+  vols->removeReference();
+  sup->removeReference();
   if(nbPts==7)
     {
       cout << "ALL TESTS OK !!!" << endl;
@@ -192,9 +193,9 @@ int main (int argc, char ** argv) {
       return -1;
     }
   cout << "Writing test " << endl;
-  int idMed22 = myMeshing.addDriver(MED_DRIVER,"totoPoly_V22.med",myMeshing.getName());
-  myMeshing.write(idMed22);
-
+  int idMed22 = myMeshing->addDriver(MED_DRIVER,"totoPoly_V22.med",myMeshing->getName());
+  myMeshing->write(idMed22);
+  myMeshing->removeReference();
   if ( getenv("srcdir") )
     remove("totoPoly_V22.med");
   return 0;

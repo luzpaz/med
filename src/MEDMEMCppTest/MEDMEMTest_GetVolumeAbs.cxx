@@ -111,7 +111,7 @@ void MEDMEMTest::testGetVolumeAbs()
   CPPUNIT_ASSERT_DOUBLES_EQUAL(0.5,vals[3],1e-13);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(3.,vals[4],1e-13);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(3.,vals[5],1e-13);
-  delete volumes;
+  volumes->removeReference();
   volumes=meshing->getVolume(sup,false);
   vals=volumes->getValue();
   CPPUNIT_ASSERT_DOUBLES_EQUAL(0.5,vals[0],1e-13);
@@ -121,6 +121,7 @@ void MEDMEMTest::testGetVolumeAbs()
   CPPUNIT_ASSERT_DOUBLES_EQUAL(2.,vals[4],1e-13);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(2.,vals[5],1e-13);
   //
-  delete sup;
-  delete meshing;
+  volumes->removeReference();
+  sup->removeReference();
+  meshing->removeReference();
 }

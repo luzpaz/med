@@ -447,7 +447,7 @@ namespace MEDMEM
       li.push_back(SDForSorting<T,SPACEDIMENSION,SORTSTRATEGY>(temp,valsToSet+i*_nbComponents,_nbComponents));
     }
 
-    if (barycenterField) delete barycenterField;
+    if (barycenterField) barycenterField->removeReference();
     if (baryArrayTmp)    delete baryArrayTmp;
     if (tmpArray)        delete tmpArray;
 

@@ -153,20 +153,21 @@ using namespace MEDMEM;
 void addMedFacesGroup( MESHING& meshing, int nFaces, const int *groupValue,
                        string groupName, const MED_EN::medGeometryElement *mytypes,  const int *index, const int *myNumberOfElements, int nbOfGeomTypes)
   {
-    GROUP faces ;
-    faces.setName(groupName) ;
-    faces.setMesh(&meshing) ;
-    faces.setEntity(MED_EN::MED_FACE) ;
-    faces.setNumberOfGeometricType(nbOfGeomTypes) ;
-    faces.setGeometricType(mytypes);
-    faces.setNumberOfElements(myNumberOfElements) ;
-    faces.setNumber(index, groupValue) ;
-    meshing.addGroup(faces) ;
+    GROUP *faces=new GROUP;
+    faces->setName(groupName) ;
+    faces->setMesh(&meshing) ;
+    faces->setEntity(MED_EN::MED_FACE) ;
+    faces->setNumberOfGeometricType(nbOfGeomTypes) ;
+    faces->setGeometricType(mytypes);
+    faces->setNumberOfElements(myNumberOfElements) ;
+    faces->setNumber(index, groupValue) ;
+    meshing.addGroup(*faces) ;
+    faces->removeReference();
   }
 
 int main()
 {
-  MESHING* meshing = new MESHING();
+  MESHING* meshing = new MESHING;
   meshing->setName( "TESTMESH" );
   meshing->setSpaceDimension(3);
   const int nNodes=36;
@@ -210,7 +211,7 @@ int main()
   
   int id=meshing->addDriver(MED_DRIVER,medfile.c_str());
   meshing->write(id);
-  delete meshing;
+  meshing->removeReference();
 
   if ( getenv("srcdir") )
     remove(medfile.c_str());

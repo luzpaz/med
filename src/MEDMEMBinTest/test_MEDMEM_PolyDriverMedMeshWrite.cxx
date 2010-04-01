@@ -42,7 +42,7 @@ int main (int argc, char ** argv)
   string meshname = argv[2];
 
   // Lecture d'un fichier MED
-  MESH * myMesh = new MESH();
+  MESH * myMesh = new MESH;
   myMesh->setName(meshname);
   MED_MESH_RDONLY_DRIVER myMeshReadDriver(filename,myMesh);
   myMeshReadDriver.setMeshName(meshname);
@@ -59,6 +59,6 @@ int main (int argc, char ** argv)
   myMeshWriteDriver.close();
 
 
-  delete myMesh;
+  myMesh->removeReference();
   return 0;
 }

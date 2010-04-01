@@ -1,8 +1,5 @@
 //  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-//
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
 //  License as published by the Free Software Foundation; either
@@ -19,24 +16,25 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef __MEDMEM_RCBASE_HXX__
-#define __MEDMEM_RCBASE_HXX__
+#include "MEDMEM_RCBase.hxx"
 
-#include "MEDMEM.hxx"
-
-namespace MEDMEM {
-  
-  class MEDMEM_EXPORT RCBASE {
-  public:
-    RCBASE();
-    void addReference() const;
-    bool removeReference() const;
-  protected:
-    virtual ~RCBASE();
-  private:
-    mutable int _cnt;
-  };
-
+MEDMEM::RCBASE::RCBASE():_cnt(1)
+{
 }
 
-#endif
+MEDMEM::RCBASE::~RCBASE()
+{
+}
+
+void MEDMEM::RCBASE::addReference() const
+{
+  _cnt++;
+}
+
+bool MEDMEM::RCBASE::removeReference() const
+{
+  bool ret=((--_cnt)==0);
+  if(ret)
+    delete this;
+  return ret;
+}

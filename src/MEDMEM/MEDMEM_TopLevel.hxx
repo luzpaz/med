@@ -53,7 +53,7 @@ namespace MEDMEM
   template<class T>
   FIELD<T> *readFieldInFile(const std::string& fileName, const std::string& fieldName)
   {
-    FIELD<T> *ret=new FIELD<T>;
+    FIELD<T> *ret=new FIELD<T>();
     ret->setName(fieldName);
     driverTypes type=DRIVERFACTORY::deduceDriverTypeFromFileName(fileName);
     int id=ret->addDriver(type,fileName,fieldName);

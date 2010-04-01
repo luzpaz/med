@@ -96,7 +96,7 @@ void MEDMEMTest::testTopLevel()
       CPPUNIT_ASSERT_NO_THROW(aMesh = readMeshInFile(filename22_rd, meshname));
       //CPPUNIT_ASSERT_NO_THROW(aMesh = readMeshInFile(filename_rd, meshname));
       CPPUNIT_ASSERT(aMesh);
-      delete aMesh;
+      aMesh->removeReference();
     }
     //#endif
 
@@ -113,7 +113,7 @@ void MEDMEMTest::testTopLevel()
       //MEDEXCEPTION: can not open file, but file exist
       CPPUNIT_ASSERT_NO_THROW(aField = readFieldInFile<double>(filename22_rd, fieldname));
       CPPUNIT_ASSERT(aField);
-      delete aField;
+      aField->removeReference();
     }
     //#endif
   }
@@ -123,7 +123,7 @@ void MEDMEMTest::testTopLevel()
   ////////////////////
   {
     //Create a FIELD
-    FIELD<double> *aField_1 = new FIELD<double> ();
+    FIELD<double> *aField_1 = new FIELD<double>();
 
     MED_FIELD_RDONLY_DRIVER22<double> *aMedRdFieldDriver22 =
       new MED_FIELD_RDONLY_DRIVER22<double>(filename22_rd, aField_1);
@@ -157,8 +157,8 @@ void MEDMEMTest::testTopLevel()
     CPPUNIT_ASSERT_NO_THROW(writeMeshToFile(aMesh, filenameMesh_wr));
     CPPUNIT_ASSERT_NO_THROW(writeMedToFile(aMed, filenameMed_wr));
 
-    delete aField_1;
-    delete aMesh;
+    aField_1->removeReference();
+    aMesh->removeReference();
     delete aMed;
   }
 }

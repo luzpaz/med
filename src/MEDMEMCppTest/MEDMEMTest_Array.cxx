@@ -558,7 +558,7 @@ void MEDMEMTest::testArrayConvert()
       elemno++;
     }
   }
-
+  delete myArray1cin;
   // TEST n°2 : NoInterlaceNoGaussPolicy -> FullInterlaceNoGaussPolicy
 
   MEDMEM_Array<double, NoInterlaceNoGaussPolicy> myArray2 (mdim, nbelem1);
@@ -581,7 +581,7 @@ void MEDMEMTest::testArrayConvert()
       elemno++;
     }
   }
-
+  delete myArray2cin;
   // TEST n°3 : FullInterlaceGaussPolicy -> NoInterlaceGaussPolicy
 
   const int nbelem2 = 5;
@@ -631,7 +631,7 @@ void MEDMEMTest::testArrayConvert()
         CPPUNIT_ASSERT( abs(myArray3Ptr[elemno] - array4Ref[elemno]) < 10^-7);
         elemno++;
       }
-
+  delete myArray3cin;
   // TEST n°4 : NoInterlaceGaussPolicy -> FullInterlaceGaussPolicy
 
   const double * myArray4Ptr = 0;
@@ -666,8 +666,8 @@ void MEDMEMTest::testArrayConvert()
         CPPUNIT_ASSERT( abs(myArray4Ptr[elemno] - array3Ref[elemno]) < 10^-7);
         elemno++;
       }
+  delete myArray4cin;
 }
-
 /*!
  *  Check methods (not in spec), defined in MEDMEM_ArrayInterface.hxx:
  */

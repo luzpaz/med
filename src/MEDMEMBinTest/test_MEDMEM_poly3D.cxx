@@ -241,7 +241,7 @@ int main (int argc, char ** argv)
   for(i=0;i<3;i++)
     if(fabs(REFVolOfPolyHedron[i]-vals[i])<1e-12)
       nbOfPtsForTest++;
-  delete vol1;
+  vol1->removeReference();
   vol1=myMesh->getVolume(supOnCell, true);
   lgth=vol1->getValueLength();
   vals=vol1->getValue();
@@ -250,7 +250,7 @@ int main (int argc, char ** argv)
   for(i=0;i<3;i++)
     if(fabs(fabs(REFVolOfPolyHedron[i])-vals[i])<1e-12)
       nbOfPtsForTest++;
-  delete vol1;
+  vol1->removeReference();
   FIELD<double>* bary=myMesh->getBarycenter(supOnCell);
   lgth=bary->getValueLength();
   vals=bary->getValue();
@@ -260,8 +260,8 @@ int main (int argc, char ** argv)
   for(i=0;i<9;i++)
     if(fabs(REFBaryOfPolyHedron[i]-vals[i])<1e-12)
       nbOfPtsForTest++;
-  delete bary;
-  delete supOnCell;
+  bary->removeReference();
+  supOnCell->removeReference();
   //area
   vol1=myMesh->getArea(fam1);
   lgth=vol1->getValueLength();
@@ -283,7 +283,7 @@ int main (int argc, char ** argv)
   for(i=0;i<8;i++)
     if(fabs(REFAreaForQuad[i]-vals[i])<1e-12)
       nbOfPtsForTest++;
-  delete vol1;
+  vol1->removeReference();
 
   vol1=myMesh->getArea(fam3);
   lgth=vol1->getValueLength();
@@ -295,7 +295,7 @@ int main (int argc, char ** argv)
   for(i=0;i<6;i++)
     if(fabs(REFAreaForTri[i]-vals[i])<1e-12)
       nbOfPtsForTest++;
-  delete vol1;
+  vol1->removeReference();
   if(nbOfPtsForTest!=38)
     {
       cout << "TEST3 K0 ! : Error in calculation of basic properties !!!" << endl;
@@ -313,9 +313,9 @@ int main (int argc, char ** argv)
       cout << "TEST4 K0 ! : Error in getBoundaryElements probably due to Reverse descending !!!" << endl;
       return 1;
     }
-  delete bound;
+  bound->removeReference();
   ///////////
   cout << "ALL TESTS OK !!!" << endl;
-  delete myMesh;
+  myMesh->removeReference();
   return 0;
 }

@@ -68,7 +68,8 @@ SUPPORT::SUPPORT(): _name(""),  _description("None"), _mesh((MESH*)NULL),
                     _entity(MED_CELL), _numberOfGeometricType(0),
                     _isOnAllElts(false),
                     _totalNumberOfElements(0),
-                    _number((MEDSKYLINEARRAY*)NULL)
+                    _number((MEDSKYLINEARRAY*)NULL),
+                    _number_fromfile(0)
   //--------------------------------------------------------------------------
 {
   MESSAGE_MED("SUPPORT::SUPPORT()");
@@ -92,10 +93,12 @@ SUPPORT::SUPPORT(): _name(""),  _description("None"), _mesh((MESH*)NULL),
 SUPPORT::SUPPORT(MESH* Mesh, string Name/*=""*/, medEntityMesh Entity/*=MED_CELL*/):
   _name(Name), _description("None"), _mesh(Mesh), _entity(Entity),
   _numberOfGeometricType(0), _isOnAllElts(true),
-  _totalNumberOfElements(0), _number((MEDSKYLINEARRAY*)NULL)
+  _totalNumberOfElements(0), _number((MEDSKYLINEARRAY*)NULL),_number_fromfile(0)
   //--------------------------------------------------------------------------
 {
   MESSAGE_MED("SUPPORT::SUPPORT(MESH*Mesh,string Name,medEntityMesh Entity)");
+  if(_mesh)
+    _mesh->addReference();
   update() ;
 };
 
@@ -103,7 +106,7 @@ SUPPORT::SUPPORT(MESH* Mesh, string Name/*=""*/, medEntityMesh Entity/*=MED_CELL
   Copy constructor.
 */
 //--------------------------------------------------------------------------
-SUPPORT::SUPPORT(const SUPPORT & m)
+SUPPORT::SUPPORT(const SUPPORT & m):_number_fromfile(0)
   //--------------------------------------------------------------------------
 {
   const char* LOC = "SUPPORT::SUPPORT(SUPPORT & m) : ";
@@ -112,6 +115,8 @@ SUPPORT::SUPPORT(const SUPPORT & m)
   _name = m._name ;
   _description = m._description ;
   _mesh = m._mesh ; // on recopie uniquement l'adresse
+  if(_mesh)
+    _mesh->addReference();
   _entity = m._entity;
   _numberOfGeometricType = m._numberOfGeometricType;
 
@@ -134,6 +139,7 @@ SUPPORT::SUPPORT(const SUPPORT & m)
 
   END_OF_MED(LOC);
 };
+
 /*!
   @}
 */
@@ -153,7 +159,14 @@ SUPPORT & SUPPORT::operator=(const SUPPORT & m)
 
   _name = m._name;
   _description = m._description;
-  _mesh = m._mesh ; // on recopie uniquement l'adresse
+  if(m._mesh!=_mesh)//setMesh not used here due to _meshName update is this...
+    {
+      if(_mesh)
+        _mesh->removeReference();
+      _mesh=m._mesh;
+      if(_mesh)
+        _mesh->addReference();
+    }
   _entity = m._entity;
   _numberOfGeometricType = m._numberOfGeometricType;
   if (m._geometricType)
@@ -188,6 +201,8 @@ SUPPORT::~SUPPORT()
 {
   MESSAGE_MED("Destructeur ~SUPPORT()");
   clearDataOnNumbers();
+  if(_mesh)
+    _mesh->removeReference();
 }
 
 /*!
@@ -264,6 +279,13 @@ void SUPPORT::update()
     else
     { // we duplicate information from _mesh
       _numberOfGeometricType=_mesh->getNumberOfTypesWithPoly(_entity);
+      MED_EN::medGeometryElement *types=_mesh->getTypesWithPoly(_entity);
+      _geometricType.set(_numberOfGeometricType);
+      for (int i=0;i<_numberOfGeometricType;i++)
+        {
+          _geometricType[i]=types[i];
+        }
+      delete [] types;
       SCRUTE_MED(_numberOfGeometricType);
       medGeometryElement *  allType = _mesh->getTypesWithPoly(_entity);
       // BEGIN Isuue 0020633: [CEA] Pb with 3D field creation fron another
@@ -796,6 +818,11 @@ void MEDMEM::SUPPORT::clearDataOnNumbers()
     delete _number;
     _number=(MEDSKYLINEARRAY *) NULL;
   }
+  if(_number_fromfile)
+    {
+      delete _number_fromfile;
+      _number_fromfile=0;
+    }
 }
 
 /*!
@@ -1183,7 +1210,10 @@ SUPPORT* SUPPORT::buildSupportOnNode() const throw (MEDEXCEPTION)
   if ( !isOnAllElements() )
     {
       if ( !_numberOfElements )
-        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No element numbers in a partial support"));
+        {
+          nodalSupport->removeReference();
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No element numbers in a partial support"));
+        }
 
       nodalSupport->setEntity( getEntity() );
       const int * nums = _number->getValue();
@@ -1496,12 +1526,15 @@ MESH* SUPPORT::makeMesh()
 void SUPPORT::setMesh(MESH *Mesh) const
   //--------------------------------------
 {
-  if(_mesh)
-    _mesh->removeReference();
-  _mesh=Mesh;
-  _meshName = "";
-  if(_mesh)
-    _mesh->addReference();
+  if(_mesh!=Mesh)
+    {
+      if(_mesh)
+        _mesh->removeReference();
+      _mesh=Mesh;
+      _meshName = "";
+      if(_mesh)
+        _mesh->addReference();
+    }
 }
 
 /*! returns the mesh name  */
@@ -1513,18 +1546,4 @@ string SUPPORT::getMeshName() const
     return _mesh->getName();
   else
     return _meshName;
-}
-
-/*!
-  addReference : reference counter presently disconnected in C++ -> just connected for client.
-*/
-void MEDMEM::SUPPORT::addReference() const
-{
-}
-
-/*!
-  removeReference : reference counter presently disconnected in C++ -> just connected for client.
-*/
-void MEDMEM::SUPPORT::removeReference() const
-{
 }

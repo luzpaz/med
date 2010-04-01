@@ -56,7 +56,7 @@ namespace MEDMEM
    */
   public:
     Extractor(const FIELD<double>& inputField) throw (MEDEXCEPTION);
-
+    ~Extractor();
     /*!
      * \brief Creates a field by cutting inputField by a plane
      *  \param coords - give a point to pass through by the plane

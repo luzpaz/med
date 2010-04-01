@@ -61,8 +61,8 @@ int main (int argc, char ** argv)
     // Creation maillage
     //***********************************************************************************
 
-      MESHING myMeshing;
-      myMeshing.setName("myMeshing");
+      MESHING *myMeshing=new MESHING;
+      myMeshing->setName("myMeshing");
 
       //   define coordinates
 
@@ -82,13 +82,13 @@ int main (int argc, char ** argv)
         1.5, 1.0,
       };
 
-      myMeshing.setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,"CARTESIAN",MED_FULL_INTERLACE);
+      myMeshing->setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,"CARTESIAN",MED_FULL_INTERLACE);
 
       string Names[3] = { "X","Y","Z" };
-      myMeshing.setCoordinatesNames(Names);
+      myMeshing->setCoordinatesNames(Names);
 
       string Units[3] = { "cm","cm","cm" };
-      myMeshing.setCoordinatesUnits(Units);
+      myMeshing->setCoordinatesUnits(Units);
 
       //   define conectivities of classic types
 
@@ -98,16 +98,16 @@ int main (int argc, char ** argv)
       medGeometryElement Types[NumberOfTypes] = {MED_TRIA3,MED_QUAD4};
       const int NumberOfElements[NumberOfTypes] = {1,4};
 
-      myMeshing.setNumberOfTypes(NumberOfTypes,MED_CELL);
-      myMeshing.setTypes(Types,MED_CELL);
-      myMeshing.setNumberOfElements(NumberOfElements,MED_CELL);
+      myMeshing->setNumberOfTypes(NumberOfTypes,MED_CELL);
+      myMeshing->setTypes(Types,MED_CELL);
+      myMeshing->setNumberOfElements(NumberOfElements,MED_CELL);
 
       int ConnectivityTria[1*3]=
         {
           7,4,1
         };
 
-      myMeshing.setConnectivity(ConnectivityTria,MED_CELL,MED_TRIA3);
+      myMeshing->setConnectivity(ConnectivityTria,MED_CELL,MED_TRIA3);
 
       int ConnectivityQuad[4*4]=
         {
@@ -117,12 +117,12 @@ int main (int argc, char ** argv)
           8,9,6,5
         };
   
-      myMeshing.setConnectivity(ConnectivityQuad,MED_CELL,MED_QUAD4);
+      myMeshing->setConnectivity(ConnectivityQuad,MED_CELL,MED_QUAD4);
 
       int MeshDimension = SpaceDimension ;
       // because there are 2D cells in the mesh
 
-      myMeshing.setMeshDimension(MeshDimension) ;
+      myMeshing->setMeshDimension(MeshDimension) ;
 
       // then define eventuel polygonal cells
 
@@ -135,7 +135,7 @@ int main (int argc, char ** argv)
           1,6
         };
 
-      myMeshing.setPolygonsConnectivity(ConnectivityPolygonIndex,ConnectivityPolygon,1,MED_CELL);
+      myMeshing->setPolygonsConnectivity(ConnectivityPolygonIndex,ConnectivityPolygon,1,MED_CELL);
 
       // Ecriture fichier
 
@@ -143,11 +143,12 @@ int main (int argc, char ** argv)
       if (version == V21)
         setMedFileVersionForWriting(V22);
 
-      int idMed22 = myMeshing.addDriver(MED_DRIVER,medfilename,myMeshing.getName());
-      myMeshing.write(idMed22) ;
+      int idMed22 = myMeshing->addDriver(MED_DRIVER,medfilename,myMeshing->getName());
+      myMeshing->write(idMed22) ;
 
-      //      int idVtk = myMeshing.addDriver(VTK_DRIVER,"toto.vtk",myMeshing.getName());
-      //      myMeshing.write(idVtk) ;
+      //      int idVtk = myMeshing->addDriver(VTK_DRIVER,"toto.vtk",myMeshing->getName());
+      //      myMeshing->write(idVtk) ;
+      myMeshing->removeReference();
 
   //************************************************************************************
 

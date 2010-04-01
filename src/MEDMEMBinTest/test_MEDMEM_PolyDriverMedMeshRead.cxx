@@ -41,7 +41,7 @@ int main (int argc, char ** argv)
   string filename = argv[1];
   string meshname = argv[2];
 
-  MESH * myMesh = new MESH();
+  MESH * myMesh = new MESH;
   myMesh->setName(meshname);
   MED_MESH_RDONLY_DRIVER myMeshReadDriver(filename,myMesh);
   myMeshReadDriver.setMeshName(meshname);
@@ -51,6 +51,6 @@ int main (int argc, char ** argv)
 
   cout << * myMesh << endl;
 
-  delete myMesh;
+  myMesh->removeReference();
   return 0;
 }

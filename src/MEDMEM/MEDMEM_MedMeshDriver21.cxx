@@ -876,6 +876,8 @@ int MED_MESH_RDONLY_DRIVER21::getNodalConnectivity(CONNECTIVITY * Connectivity)
         // We use <tmp_cells_count> to calculate <Connectivity->_count> then we release it
         Connectivity->_geometricTypes = new MED_EN::medGeometryElement [Connectivity->_numberOfTypes]   ;  // Double emploi pour des raisons pratiques 
         Connectivity->_type           = new CELLMODEL                  [Connectivity->_numberOfTypes]   ;  //
+        if(Connectivity->_count)
+          delete [] Connectivity->_count;
         Connectivity->_count          = new int                        [Connectivity->_numberOfTypes+1] ;
         Connectivity->_count[0]       = 1;
         
@@ -1425,27 +1427,30 @@ int  MED_MESH_RDONLY_DRIVER21::getFAMILY()
 
         if (Family->getNumberOfTypes() == 0) {
           MESSAGE_MED(LOC<<"Nothing found for family "<<FamilyName<< " : skip");
-          delete Family;
+          Family->removeReference();
         } else
-          switch (Family->getEntity()) {
-          case MED_EN::MED_NODE :
-            NodeFamilyVector.push_back(Family) ;
-            numberOfNodesFamilies++ ;
-            break ;
-          case MED_EN::MED_CELL :
-            CellFamilyVector.push_back(Family) ;
-            numberOfCellsFamilies++ ;
-            break ;
-          case MED_EN::MED_FACE :
-            FaceFamilyVector.push_back(Family) ;
-            numberOfFacesFamilies++ ;
-            break ;
-          case MED_EN::MED_EDGE :
-            EdgeFamilyVector.push_back(Family) ;
-            numberOfEdgesFamilies++ ;
-            break ;
+          {
+            if(Family->getMesh()==_ptrMesh)
+              _ptrMesh->removeReference();
+            switch (Family->getEntity()) {
+            case MED_EN::MED_NODE :
+              NodeFamilyVector.push_back(Family) ;
+              numberOfNodesFamilies++ ;
+              break ;
+            case MED_EN::MED_CELL :
+              CellFamilyVector.push_back(Family) ;
+              numberOfCellsFamilies++ ;
+              break ;
+            case MED_EN::MED_FACE :
+              FaceFamilyVector.push_back(Family) ;
+              numberOfFacesFamilies++ ;
+              break ;
+            case MED_EN::MED_EDGE :
+              EdgeFamilyVector.push_back(Family) ;
+              numberOfEdgesFamilies++ ;
+              break ;
+            }
           }
-
         //      MESSAGE_MED(LOC << (*Family));
 
 

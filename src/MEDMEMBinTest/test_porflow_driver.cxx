@@ -50,7 +50,7 @@ int main (int argc, char ** argv)
     cout << meshName << endl;
 
     // lecture du fichier porflow
-    MESH * myMesh= new MESH() ; 
+    MESH * myMesh= new MESH; 
     PORFLOW_MESH_RDONLY_DRIVER myPorflowMeshDriver(porflowfilename, myMesh) ;
     myPorflowMeshDriver.open() ;
     myPorflowMeshDriver.read() ;
@@ -100,10 +100,10 @@ int main (int argc, char ** argv)
     }
 
     cout << "The END" << endl;
-    delete myMesh;
+    myMesh->removeReference();
 
     // remontée du fichier med en mémoire
     myMesh= new MESH(MED_DRIVER,medfile,meshName);
-    delete myMesh;
+    myMesh->removeReference();
 
 }

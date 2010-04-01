@@ -147,16 +147,18 @@ public :
   friend class VTK_MESH_DRIVER;
 
   friend class ENSIGHT_MESH_RDONLY_DRIVER;
-
-  void init();
+ public:
   MESH();
   MESH(MESH &m);
+  virtual ~MESH();
+  MESH( driverTypes driverType, const string & fileName="",
+        const string & meshName="") throw (MEDEXCEPTION);
+ public:
+  void init();
   MESH & operator=(const MESH &m);
   virtual bool operator==(const MESH& other) const;
   virtual bool deepCompare(const MESH& other) const;
-  MESH( driverTypes driverType, const string & fileName="",
-        const string & meshName="") throw (MEDEXCEPTION);
-  virtual ~MESH();
+  
   friend ostream & operator<<(ostream &os, const MESH &my);
   virtual void printMySelf(ostream &os) const;
 
@@ -324,12 +326,6 @@ public :
   template<class T> static
   FIELD<T> * mergeFields(const vector< FIELD<T> * > & others, bool meshCompare=false);
   void convertToPoly();
-
-  /*!
-   *For ref counter. Only for client
-   */
-  virtual void addReference() const;
-  virtual void removeReference() const;
 };
 
 // ---------------------------------------
@@ -344,7 +340,9 @@ inline const CONNECTIVITY* MESH::getConnectivityptr() const
 
 inline void MESH::setConnectivityptr(CONNECTIVITY* conn)
 {
-        _connectivity=conn;
+  if(_connectivity)
+    delete _connectivity;
+  _connectivity=conn;
 }
 // This method is MED specific : don't use it
 // must be private.
@@ -1198,6 +1196,8 @@ FIELD<T, FullInterlace> * MESH::mergeFields(const vector< FIELD<T, FullInterlace
             throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Merging error due to an error in merging support"));
         }
     }
+  if(retSup)
+    retSup->removeReference();
   delete [] tempValues;
   END_OF_MED(LOC);
   return ret;

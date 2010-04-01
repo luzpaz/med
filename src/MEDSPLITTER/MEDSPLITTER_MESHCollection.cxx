@@ -1346,10 +1346,10 @@ void MESHCollection::buildConnectZones()
           //creating a group for the faces constituting the joint
           ostringstream jointname ;
           jointname << "joint_"<<idistant+1;
-          MEDMEM::GROUP joint_group;
-          joint_group.setName(jointname.str().c_str());
-          joint_group.setMesh(meshing);
-          joint_group.setEntity(constituent_entity);
+          MEDMEM::GROUP* joint_group=new MEDMEM::GROUP;
+          joint_group->setName(jointname.str().c_str());
+          joint_group->setMesh(meshing);
+          joint_group->setEntity(constituent_entity);
           map<MED_EN::medGeometryElement, vector<int> > joint_types;
           
           for (int i=0; i<nbfaces; i++)
@@ -1360,7 +1360,7 @@ void MESHCollection::buildConnectZones()
               joint_types[type].push_back(localid);
               
             }                    
-          joint_group.setNumberOfGeometricType(joint_types.size());
+          joint_group->setNumberOfGeometricType(joint_types.size());
           MED_EN::medGeometryElement* types=new MED_EN::medGeometryElement[joint_types.size()];
           int* nb_in_types=new int[joint_types.size()];
           int* group_index=new int[joint_types.size()+1];
@@ -1380,13 +1380,14 @@ void MESHCollection::buildConnectZones()
                 for (int i=0; i<  (iterj->second).size(); i++)
                   group_value[iface++]=(iterj->second)[i];
                }
-          joint_group.setGeometricType(types);
-          joint_group.setNumberOfElements(nb_in_types);
-          joint_group.setNumber(group_index, group_value);             
+          joint_group->setGeometricType(types);
+          joint_group->setNumberOfElements(nb_in_types);
+          joint_group->setNumber(group_index, group_value);             
           delete[] types;
           delete[] nb_in_types;
           //delete[] group_index;
-          meshing->addGroup(joint_group);      
+          meshing->addGroup(*joint_group);      
+          joint_group->removeReference();
           delete[] group_index;
           delete[] group_value;  
           //end of group creation
@@ -1399,7 +1400,7 @@ void MESHCollection::buildConnectZones()
           if (cz!=0)  
             cz->setEntityCorresp(constituent_entity,constituent_entity,skarray);              
           else 
-            throw MEDEXCEPTION("MESHCollection::buildConnectZones() -A connect zone should exist");            
+            throw MEDEXCEPTION("MESHCollection::buildConnectZones() -A connect zone should exist");
         }
      }
      
@@ -1531,7 +1532,7 @@ void MESHCollection::castFamilies(const MESHCollection& old_collection)
                                         //so they can be safely deleted here
                                         for (int i=0; i<m_topology->nbDomain(); i++)
                                                 {
-                                                        delete new_groups[i];
+                                                  new_groups[i]->removeReference();
                                                 }
                 
                                 }// on groups

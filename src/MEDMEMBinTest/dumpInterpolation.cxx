@@ -63,12 +63,13 @@ int main(int argc, char** argv)
   string mesh_name1 = getMeshName( argv[1], (argc > 3) ? atoi(argv[3]) : 0 );
   string mesh_name2 = getMeshName( argv[2], (argc > 4) ? atoi(argv[4]) : 0 );
 
-  MESH mesh1(MED_DRIVER, argv[1], mesh_name1.data());
-  MESH mesh2(MED_DRIVER, argv[2], mesh_name2.data());
+  MESH *mesh1=new MESH(MED_DRIVER, argv[1], mesh_name1.data());
+  MESH *mesh2=new MESH(MED_DRIVER, argv[2], mesh_name2.data());
 
   MEDMEM_REMAPPER aREMAPPER;
-  aREMAPPER.prepare( mesh1, mesh2, "P0P0" );
+  aREMAPPER.prepare( *mesh1, *mesh2, "P0P0" );
   aREMAPPER.printMatrixInfo();
-
+  mesh1->removeReference();
+  mesh2->removeReference();
   return 0;
 }

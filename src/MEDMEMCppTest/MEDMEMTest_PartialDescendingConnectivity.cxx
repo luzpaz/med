@@ -99,5 +99,5 @@ void MEDMEMTest::testPartialDescendingConnectivity()
   for(i=0;i<7;i++)
     CPPUNIT_ASSERT_EQUAL(expected3[i],ConnFaceNodalIndex[i]);
   //
-  delete myMesh;
+  myMesh->removeReference();
 }

@@ -180,7 +180,16 @@ inline CELLMODEL::CELLMODEL():
     _constituentsType((MED_EN::medGeometryElement**)NULL)
 {
 }
-inline CELLMODEL::CELLMODEL(const CELLMODEL &m)
+inline CELLMODEL::CELLMODEL(const CELLMODEL &m):
+    _type(MED_EN::MED_NONE),
+    _dimension(0),
+    _numberOfNodes(0),
+    _numberOfVertexes(0),
+    _numberOfConstituentsDimension(0),
+    _numberOfConstituents((int*)NULL),
+    _numberOfNodeOfEachConstituent((int**)NULL),
+    _constituents((int***)NULL),
+    _constituentsType((MED_EN::medGeometryElement**)NULL)
 {
     init(m) ;
 }

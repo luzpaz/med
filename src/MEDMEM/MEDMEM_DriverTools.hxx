@@ -432,7 +432,8 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
     if ( !validSub ) {
       if ( hasCommonSupport() ) {
         if ( !res.empty() ) {
-          delete f;
+          if(f)
+            f->removeReference();
           res.clear();
         }
         return res;

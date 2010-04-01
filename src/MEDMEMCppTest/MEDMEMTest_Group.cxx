@@ -56,7 +56,7 @@ void MEDMEMTest::testGroup()
   string filename = getResourceFile("pointe.med") ;
   string meshname = "maa1";
 
-  MESH * myMesh= new MESH() ;
+  MESH * myMesh=new MESH;
   myMesh->setName(meshname);
   MED_MESH_RDONLY_DRIVER myMeshDriver(filename,myMesh);
   myMeshDriver.setMeshName(meshname);
@@ -97,9 +97,9 @@ void MEDMEMTest::testGroup()
   os << *myGroup2;
   CPPUNIT_ASSERT(os.str() != "");
 
-  GROUP myGroup3;
+  GROUP *myGroup3=new GROUP;
   try{
-    myGroup3 = *myGroup2;
+    *myGroup3 = *myGroup2;
   }
   catch (const std::exception &e)
   {
@@ -110,9 +110,10 @@ void MEDMEMTest::testGroup()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  CPPUNIT_ASSERT_EQUAL(myGroup3, *myGroup2);
+  CPPUNIT_ASSERT_EQUAL(*myGroup3, *myGroup2);
+  myGroup3->removeReference();
 
-  GROUP myGroup4;
+  GROUP *myGroup4=new GROUP;
   const GROUP * Group = myMesh->getGroup(MED_NODE,2);
   CPPUNIT_ASSERT(Group != NULL);
 
@@ -120,19 +121,20 @@ void MEDMEMTest::testGroup()
   CPPUNIT_ASSERT(NumberOfFamillies1 != 0);
   if(NumberOfFamillies1)
   {
-    myGroup4.setNumberOfFamilies(NumberOfFamillies1);
-    myGroup4.setFamilies(Group->getFamilies());
-    for(int i = 1; i <= myGroup4.getNumberOfFamilies(); i++ )
+    myGroup4->setNumberOfFamilies(NumberOfFamillies1);
+    myGroup4->setFamilies(Group->getFamilies());
+    for(int i = 1; i <= myGroup4->getNumberOfFamilies(); i++ )
     {
-      CPPUNIT_ASSERT_EQUAL(myGroup4.getFamily(i), Group->getFamily(i));
+      CPPUNIT_ASSERT_EQUAL(myGroup4->getFamily(i), Group->getFamily(i));
     }
   }
-
+  myGroup4->removeReference();
   if(aList.size())
   {
     try{
-      GROUP myGroup5("newFamily", aList);
-      cout<< myGroup5 <<endl;
+      GROUP *myGroup5=new GROUP("newFamily", aList);
+      cout<< *myGroup5 <<endl;
+      myGroup5->removeReference();
     }
     catch (const std::exception &e)
     {
@@ -143,7 +145,6 @@ void MEDMEMTest::testGroup()
       CPPUNIT_FAIL("Unknown exception");
     }
   }
-
-  delete myGroup2;
-  delete myMesh ;
+  myGroup2->removeReference();
+  myMesh->removeReference() ;
 }

@@ -180,8 +180,9 @@ void MESH::init()
   BEGIN_OF_MED(LOC);
 
   _name = "NOT DEFINED"; // A POSITIONNER EN FCT DES IOS ?
-
+  delete _coordinate;
   _coordinate   = (COORDINATE   *) NULL;
+  delete _connectivity;
   _connectivity = (CONNECTIVITY *) NULL;
 
   _spaceDimension        =          MED_INVALID; // 0 ?!?
@@ -235,56 +236,64 @@ MESH::MESH(MESH &m)
   for (int i=0; i<(int)m._familyNode.size(); i++)
   {
     _familyNode[i] = new FAMILY(* m._familyNode[i]);
-    _familyNode[i]->setMeshDirectly(this);
+    _familyNode[i]->setMesh(this);
+    removeReference();
   }
 
   _familyCell = m._familyCell;
   for (int i=0; i<(int)m._familyCell.size(); i++)
   {
     _familyCell[i] = new FAMILY(* m._familyCell[i]);
-    _familyCell[i]->setMeshDirectly(this);
+    _familyCell[i]->setMesh(this);
+    removeReference();
   }
 
   _familyFace = m._familyFace;
   for (int i=0; i<(int)m._familyFace.size(); i++)
   {
     _familyFace[i] = new FAMILY(* m._familyFace[i]);
-    _familyFace[i]->setMeshDirectly(this);
+    _familyFace[i]->setMesh(this);
+    removeReference();
   }
 
   _familyEdge = m._familyEdge;
   for (int i=0; i<(int)m._familyEdge.size(); i++)
   {
     _familyEdge[i] = new FAMILY(* m._familyEdge[i]);
-    _familyEdge[i]->setMeshDirectly(this);
+    _familyEdge[i]->setMesh(this);
+    removeReference();
   }
 
   _groupNode = m._groupNode;
   for (int i=0; i<(int)m._groupNode.size(); i++)
   {
     _groupNode[i] = new GROUP(* m._groupNode[i]);
-    _groupNode[i]->setMeshDirectly(this);
+    _groupNode[i]->setMesh(this);
+    removeReference();
   }
 
   _groupCell = m._groupCell;
   for (int i=0; i<(int)m._groupCell.size(); i++)
   {
     _groupCell[i] = new GROUP(* m._groupCell[i]);
-    _groupCell[i]->setMeshDirectly(this);
+    _groupCell[i]->setMesh(this);
+    removeReference();
   }
 
   _groupFace = m._groupFace;
   for (int i=0; i<(int)m._groupFace.size(); i++)
   {
     _groupFace[i] = new GROUP(* m._groupFace[i]);
-    _groupFace[i]->setMeshDirectly(this);
+    _groupFace[i]->setMesh(this);
+    removeReference();
   }
 
   _groupEdge = m._groupEdge;
   for (int i=0; i<(int)m._groupEdge.size(); i++)
   {
     _groupEdge[i] = new GROUP(* m._groupEdge[i]);
-    _groupEdge[i]->setMeshDirectly(this);
+    _groupEdge[i]->setMesh(this);
+    removeReference();
   }
 
   //_drivers = m._drivers;  //Recopie des drivers?
@@ -304,33 +313,33 @@ MESH::~MESH() {
   int size ;
   size = _familyNode.size() ;
   for (int i=0;i<size;i++)
-    delete _familyNode[i] ;
+    _familyNode[i]->removeReference();
   size = _familyCell.size() ;
   for (int i=0;i<size;i++)
-    delete _familyCell[i] ;
+    _familyCell[i]->removeReference();
   size = _familyFace.size() ;
   for (int i=0;i<size;i++)
-    delete _familyFace[i] ;
+    _familyFace[i]->removeReference();
   size = _familyEdge.size() ;
   for (int i=0;i<size;i++)
-    delete _familyEdge[i] ;
+    _familyEdge[i]->removeReference();
   size = _groupNode.size() ;
   for (int i=0;i<size;i++)
-    delete _groupNode[i] ;
+    _groupNode[i]->removeReference();
   size = _groupCell.size() ;
   for (int i=0;i<size;i++)
-    delete _groupCell[i] ;
+    _groupCell[i]->removeReference();
   size = _groupFace.size() ;
   for (int i=0;i<size;i++)
-    delete _groupFace[i] ;
+    _groupFace[i]->removeReference();
   size = _groupEdge.size() ;
   for (int i=0;i<size;i++)
-    delete _groupEdge[i] ;
+    _groupEdge[i]->removeReference();
 
   map<medEntityMesh,SUPPORT*>::iterator it = _entitySupport.begin();
   for(;it!=_entitySupport.end();it++)
     if((*it).second != NULL)
-      delete (*it).second;
+      (*it).second->removeReference();
 
   MESSAGE_MED("In this object MESH there is(are) " << _drivers.size() << " driver(s)");
 
@@ -461,13 +470,12 @@ bool MESH::operator==(const MESH& other) const
   Creates a %MESH object using a %MESH driver of type %driverTypes (MED_DRIVER, GIBI_DRIVER, ...) associated with file \a fileName. As several meshes can coexist in the same file (notably in MED files) , the constructor takes a third argument that specifies the name of the mesh.
   The constructor will throw an exception if the file does not exist, has no reading permissions or if the mesh does not exist in the file.
 */
-MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string &  driverName/*=""*/) throw (MEDEXCEPTION)
+MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string &  driverName/*=""*/) throw (MEDEXCEPTION):_coordinate(0),_connectivity(0)
 {
   const char * LOC = "MESH::MESH(driverTypes driverType, const string &  fileName="", const string &  driverName/="") : ";
   BEGIN_OF_MED(LOC);
 
   int current;
-
   init();
   GENDRIVER *myDriver=DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,driverName,RDONLY);
   current = addDriver(*myDriver);
@@ -796,7 +804,7 @@ void MESH::fillSupportOnNodeFromElementList(const list<int>& listOfElt, SUPPORT 
 {
   MED_EN::medEntityMesh entity=supportToFill->getEntity();
   supportToFill->setAll(false);
-  supportToFill->setMeshDirectly((MESH *)this);
+  supportToFill->setMesh((MESH *)this);
 
   int i;
   set<int> nodes;
@@ -2655,7 +2663,8 @@ void MESH::createFamilies()
       FAMILY* newFam = new FAMILY();
       //newFam->setTotalNumberOfElements(fam->second.size());
       newFam->setName(famName);
-      newFam->setMeshDirectly(this);
+      newFam->setMesh(this);
+      removeReference();
       newFam->setNumberOfGeometricType(tab_types_geometriques.size());
       newFam->setGeometricType(&tab_types_geometriques[0]); // we know the tab is not empy
       newFam->setNumberOfElements(&tab_nombres_elements[0]);
@@ -2704,6 +2713,7 @@ void MESH::createFamilies()
           groupNames[ng]=myGroups[*it]->getName();
         }
         newFam->setGroupsNames(groupNames);
+        delete [] groupNames;
       }
 
       MESSAGE_MED("  MESH::createFamilies() entity " << entity <<
@@ -2714,7 +2724,7 @@ void MESH::createFamilies()
 
     // delete old families
     for (unsigned int i=0;i<myOldFamilies.size();i++)
-      delete myOldFamilies[i] ;
+      myOldFamilies[i]->removeReference();
 
     // update references in groups
     for (unsigned int i=0;i<myGroups.size();i++)
@@ -2936,14 +2946,4 @@ vector< vector<double> > MESH::getBoundingBox() const
     }
   }
   return ret;
-}
-
-//Presently disconnected in C++
-void MESH::addReference() const
-{
-}
-
-//Presently disconnected in C++
-void MESH::removeReference() const
-{
 }

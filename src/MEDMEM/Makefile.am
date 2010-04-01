@@ -104,6 +104,7 @@ MEDNormalizedUnstructuredMesh.txx
 
 dist_libmedmem_la_SOURCES= \
 MEDMEM_Init.cxx \
+MEDMEM_RCBase.cxx \
 MEDMEM_CellModel.cxx \
 MEDMEM_Connectivity.cxx \
 MEDMEM_Coordinate.cxx \

@@ -1836,24 +1836,28 @@ int  MED_MESH_RDONLY_DRIVER22::getFAMILY()
               {
                 MESSAGE_MED(LOC<<"Nothing found for family "<<FamilyName<<
                         " : skip");
-                delete Family;
+                Family->removeReference();
               }
             else
               switch (Family->getEntity())
                 {
                 case MED_EN::MED_NODE :
+                  _ptrMesh->removeReference();
                   NodeFamilyVector.push_back(Family);
                   numberOfNodesFamilies++;
                   break;
                 case MED_EN::MED_CELL :
+                  _ptrMesh->removeReference();
                   CellFamilyVector.push_back(Family);
                   numberOfCellsFamilies++;
                   break;
                 case MED_EN::MED_FACE :
+                  _ptrMesh->removeReference();
                   FaceFamilyVector.push_back(Family);
                   numberOfFacesFamilies++;
                   break;
                 case MED_EN::MED_EDGE :
+                  _ptrMesh->removeReference();
                   EdgeFamilyVector.push_back(Family);
                   numberOfEdgesFamilies++;
                   break;
@@ -2982,7 +2986,7 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
                     SUPPORT* support;
                     support=mesh->buildSupportOnElementsFromElementList(numbers, entity);
                     myFamily=new FAMILY(*support);
-        delete support;
+                    support->removeReference();
                   }
                 else
                   {
@@ -3025,7 +3029,8 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
                 }
 
                 myFamily->setGroupsNames(groupnames,true);
-
+                if(myFamily->getMesh()==_ptrMesh)
+                  _ptrMesh->removeReference();
                 myFamilies.push_back(myFamily);
                 ifamily++;
         }
@@ -3048,6 +3053,8 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
                                         groupnames.push_back(myGroups[i]->getName());
                                         myFamily->setNumberOfGroups(1);
                                         myFamily->setGroupsNames(&groupnames[0]);
+                                        if(myFamily->getMesh()==_ptrMesh)
+                                          _ptrMesh->removeReference();
                                         myFamilies.push_back(myFamily);
                                 }
                 }

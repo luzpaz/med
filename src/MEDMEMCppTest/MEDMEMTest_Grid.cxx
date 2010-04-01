@@ -443,7 +443,7 @@ void MEDMEMTest::testGrid()
     CPPUNIT_ASSERT(!myGrid2->getArrayLength(1));
     CPPUNIT_ASSERT(!myGrid2->getArrayLength(2));
     CPPUNIT_ASSERT(!myGrid2->getArrayLength(3));
-    delete myGrid2;
+    myGrid2->removeReference();
   }
 
   // Constructor with grid type, setGridType()
@@ -452,7 +452,7 @@ void MEDMEMTest::testGrid()
     CPPUNIT_ASSERT(myGrid2->getGridType() == MED_POLAR);
     myGrid2->setGridType(MED_CARTESIAN);
     CPPUNIT_ASSERT(myGrid2->getGridType() == MED_CARTESIAN);
-    delete myGrid2;
+    myGrid2->removeReference();
   }
 
   // Constructor with coordinate values, getArrayValue(), init()
@@ -627,7 +627,7 @@ void MEDMEMTest::testGrid()
     //CPPUNIT_ASSERT(myGrid3->getGridType() == MED_POLAR);
     //#endif
 
-    delete myGrid3;
+    myGrid3->removeReference();
 
     //test init()
     CPPUNIT_ASSERT_NO_THROW(myGrid2->init());
@@ -644,7 +644,7 @@ void MEDMEMTest::testGrid()
     //CPPUNIT_FAIL("ERROR:makeUnstructured() - there is no check if grid is empty or not");
     //#endif
 
-    delete myGrid2;
+    myGrid2->removeReference();
   }
 
   //#ifdef ENABLE_FORCED_FAILURES
@@ -665,7 +665,7 @@ void MEDMEMTest::testGrid()
     int nbElem;
     CPPUNIT_ASSERT_NO_THROW(nbElem = myGrid2->getNumberOfElements(MED_CELL,types2[0]));
     CPPUNIT_ASSERT(nbElem);
-    delete myGrid2;
+    myGrid2->removeReference();
   }
   //#endif
 
@@ -698,6 +698,6 @@ void MEDMEMTest::testGrid()
     CPPUNIT_ASSERT(myGrid4->getArrayLength(2) != 0);
     CPPUNIT_ASSERT(myGrid4->getArrayLength(3) != 0);*/
 
-    delete myGrid4;
+    myGrid4->removeReference();
   }
 }

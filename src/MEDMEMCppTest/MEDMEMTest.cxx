@@ -343,8 +343,8 @@ void MEDMEMTest::testSTRING()
     MEDMEM::STRING medstr (*aMesh1);
     CPPUNIT_ASSERT(strcmp(medstr, ostr.str().c_str()) == 0);
   }
-
-  delete aMesh1;
+  if(aMesh1)
+    aMesh1->removeReference();
 }
 
 /*!
@@ -586,98 +586,104 @@ MEDMEM::MESH * MEDMEMTest_createTestMesh ()
 
   // groups of nodes
   {
-    MEDMEM::GROUP myGroup;
-    myGroup.setName("SomeNodes");
-    myGroup.setMesh(myMeshing);
-    myGroup.setEntity(MED_EN::MED_NODE);
-    myGroup.setNumberOfGeometricType(1);
+    MEDMEM::GROUP *myGroup=new MEDMEM::GROUP;
+    myGroup->setName("SomeNodes");
+    myGroup->setMesh(myMeshing);
+    myGroup->setEntity(MED_EN::MED_NODE);
+    myGroup->setNumberOfGeometricType(1);
     MED_EN::medGeometryElement myTypes[1] = {MED_EN::MED_NONE};
-    myGroup.setGeometricType(myTypes);
+    myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[1] = {4};
-    myGroup.setNumberOfElements(myNumberOfElements);
+    myGroup->setNumberOfElements(myNumberOfElements);
     const int index[1+1] = {1,5};
     const int value[4] = {1,4,5,7};
-    myGroup.setNumber(index,value);
-    myMeshing->addGroup(myGroup);
+    myGroup->setNumber(index,value);
+    myMeshing->addGroup(*myGroup);
+    myGroup->removeReference();
   }
   {
-    MEDMEM::GROUP myGroup;
-    myGroup.setName("OtherNodes");
-    myGroup.setMesh(myMeshing);
-    myGroup.setEntity(MED_EN::MED_NODE);
-    myGroup.setNumberOfGeometricType(1);
+    MEDMEM::GROUP *myGroup=new MEDMEM::GROUP;
+    myGroup->setName("OtherNodes");
+    myGroup->setMesh(myMeshing);
+    myGroup->setEntity(MED_EN::MED_NODE);
+    myGroup->setNumberOfGeometricType(1);
     MED_EN::medGeometryElement myTypes[1] = {MED_EN::MED_NONE};
-    myGroup.setGeometricType(myTypes);
+    myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[1] = {3};
-    myGroup.setNumberOfElements(myNumberOfElements);
+    myGroup->setNumberOfElements(myNumberOfElements);
     const int index[1+1] = {1,4};
     const int value[3] = {2,3,6};
-    myGroup.setNumber(index,value);
-    myMeshing->addGroup(myGroup);
+    myGroup->setNumber(index,value);
+    myMeshing->addGroup(*myGroup);
+    myGroup->removeReference();
   }
 
   // groups of cells
   {
-    MEDMEM::GROUP myGroup;
-    myGroup.setName("SomeCells");
-    myGroup.setMesh(myMeshing);
-    myGroup.setEntity(MED_EN::MED_CELL);
-    myGroup.setNumberOfGeometricType(3);
+    MEDMEM::GROUP *myGroup=new MEDMEM::GROUP;
+    myGroup->setName("SomeCells");
+    myGroup->setMesh(myMeshing);
+    myGroup->setEntity(MED_EN::MED_CELL);
+    myGroup->setNumberOfGeometricType(3);
     MED_EN::medGeometryElement myTypes[3] = {MED_EN::MED_TETRA4,MED_EN::MED_PYRA5,MED_EN::MED_HEXA8};
-    myGroup.setGeometricType(myTypes);
+    myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[3] = {4,1,2};
-    myGroup.setNumberOfElements(myNumberOfElements);
+    myGroup->setNumberOfElements(myNumberOfElements);
     const int index[3+1] = {1,5,6,8};
     const int value[4+1+2] = {2,7,8,12,  13,  15,16};
-    myGroup.setNumber(index,value);
-    myMeshing->addGroup(myGroup);
+    myGroup->setNumber(index,value);
+    myMeshing->addGroup(*myGroup);
+    myGroup->removeReference();
   }
   {
-    MEDMEM::GROUP myGroup;
-    myGroup.setName("OtherCells");
-    myGroup.setMesh(myMeshing);
-    myGroup.setEntity(MED_EN::MED_CELL);
-    myGroup.setNumberOfGeometricType(2);
+    MEDMEM::GROUP *myGroup=new MEDMEM::GROUP;
+    myGroup->setName("OtherCells");
+    myGroup->setMesh(myMeshing);
+    myGroup->setEntity(MED_EN::MED_CELL);
+    myGroup->setNumberOfGeometricType(2);
     MED_EN::medGeometryElement myTypes[] = {MED_EN::MED_TETRA4,MED_EN::MED_PYRA5};
-    myGroup.setGeometricType(myTypes);
+    myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[] = {4,1};
-    myGroup.setNumberOfElements(myNumberOfElements);
+    myGroup->setNumberOfElements(myNumberOfElements);
     const int index[2+1] = {1,5,6};
     const int value[4+1] = {3,4,5,9,  14};
-    myGroup.setNumber(index,value);
-    myMeshing->addGroup(myGroup);
+    myGroup->setNumber(index,value);
+    myMeshing->addGroup(*myGroup);
+    myGroup->removeReference();
   }
 
   // groups of faces
   {
-    MEDMEM::GROUP myGroup;
-    myGroup.setName("SomeFaces");
-    myGroup.setMesh(myMeshing);
-    myGroup.setEntity(MED_EN::MED_FACE);
-    myGroup.setNumberOfGeometricType(2);
+    MEDMEM::GROUP *myGroup=new MEDMEM::GROUP;
+    myGroup->setName("SomeFaces");
+    myGroup->setMesh(myMeshing);
+    myGroup->setEntity(MED_EN::MED_FACE);
+    myGroup->setNumberOfGeometricType(2);
     MED_EN::medGeometryElement myTypes[2] = {MED_EN::MED_TRIA3,MED_EN::MED_QUAD4};
-    myGroup.setGeometricType(myTypes);
+    myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[2] = {2,3};
-    myGroup.setNumberOfElements(myNumberOfElements);
+    myGroup->setNumberOfElements(myNumberOfElements);
     const int index[2+1] = {1,3,6};
     const int value[2+3] = {2,4,  5,6,8};
-    myGroup.setNumber(index,value);
-    myMeshing->addGroup(myGroup);
+    myGroup->setNumber(index,value);
+    myMeshing->addGroup(*myGroup);
+    myGroup->removeReference();
   }
   {
-    MEDMEM::GROUP myGroup;
-    myGroup.setName("OtherFaces");
-    myGroup.setMesh(myMeshing);
-    myGroup.setEntity(MED_EN::MED_FACE);
-    myGroup.setNumberOfGeometricType(1);
+    MEDMEM::GROUP *myGroup=new MEDMEM::GROUP;
+    myGroup->setName("OtherFaces");
+    myGroup->setMesh(myMeshing);
+    myGroup->setEntity(MED_EN::MED_FACE);
+    myGroup->setNumberOfGeometricType(1);
     MED_EN::medGeometryElement myTypes[1] = {MED_EN::MED_TRIA3};
-    myGroup.setGeometricType(myTypes);
+    myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[1] = {2};
-    myGroup.setNumberOfElements(myNumberOfElements);
+    myGroup->setNumberOfElements(myNumberOfElements);
     const int index[1+1] = {1,3};
     const int value[2] = {1,3};
-    myGroup.setNumber(index,value);
-    myMeshing->addGroup(myGroup);
+    myGroup->setNumber(index,value);
+    myMeshing->addGroup(*myGroup);
+    myGroup->removeReference();
   }
 
   return myMeshing;

@@ -185,7 +185,7 @@ void MEDMEMTest::testAsciiFieldDriver()
   // Test ASCII_FIELD_DRIVER
   FIELD<double> * aField1 = new FIELD<double> (MED_DRIVER, filename, fieldname);
   const SUPPORT * aSupport = aField1->getSupport();
-  MESH * aMesh = new MESH (MED_DRIVER, filename, aSupport->getMeshName());
+  MESH * aMesh = new MESH(MED_DRIVER, filename, aSupport->getMeshName());
   aSupport->setMesh(aMesh);
 
   // create an ASCII driver for a field
@@ -271,9 +271,9 @@ void MEDMEMTest::testAsciiFieldDriver()
   //Test copy() function
   ASCII_FIELD_DRIVER<double> *aDriver1_Cpy2 = (ASCII_FIELD_DRIVER<double>*)aDriver1->copy();
   CPPUNIT_ASSERT(aDriver1_Cpy2);
-
+  delete aDriver1_Cpy2;
   // free memory
   delete aDriver1;
-  delete aField1;
-  delete aMesh;
+  aField1->removeReference();
+  aMesh->removeReference();
 }

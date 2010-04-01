@@ -1365,7 +1365,7 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
   }
   else
   {
-    if (_descending==NULL && _polygonsDescending==NULL && _polyhedronDescending==NULL ||
+    if ( (_descending==NULL && _polygonsDescending==NULL && _polyhedronDescending==NULL) ||
         _isDescendingConnectivityPartial )
     {
       if (_nodal==NULL && _polygonsNodal==NULL && _polyhedronNodal==NULL)
@@ -1692,7 +1692,8 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
       if (_constituent->_numberOfTypes > 0)
         _constituent->_count[1]=tmp_NumberOfConstituentsForeachType[0]+1;
       delete [] tmp_NumberOfConstituentsForeachType;
-
+      if(_descending)
+        delete _descending;
       _descending = new MEDSKYLINEARRAY(_count[_numberOfTypes]-1,
                                         DescendingSize,
                                         descend_connectivity_index,
@@ -2182,7 +2183,8 @@ void CONNECTIVITY::calculatePartialDescendingConnectivity()
     }
     index.push_back(index[index.size()-1]+nb);
   }
-
+  if(_descending)
+    delete _descending;
   _descending = new MEDSKYLINEARRAY(index.size()-1, value.size(), &index[0], &value[0]);
   _isDescendingConnectivityPartial = true;
 }
@@ -2733,7 +2735,7 @@ int CONNECTIVITY::getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity, MED_
 
     if(Type==MED_POLYGON || Type==MED_POLYHEDRA)
     {
-      if(Type==MED_POLYGON && Entity==MED_CELL && _entityDimension==3 || Type==MED_POLYHEDRA && Entity==MED_FACE)
+      if((Type==MED_POLYGON && Entity==MED_CELL && _entityDimension==3) || (Type==MED_POLYHEDRA && Entity==MED_FACE))
         return 0;
       return getNumberOfElementOfPolyType(_entity);
     }

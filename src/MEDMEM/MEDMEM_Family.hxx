@@ -92,7 +92,9 @@ protected :
   */
   //PointerOf<string> _groupName ;
   vector<string> _groupName ;
-
+ protected:
+/*! Destructor. */
+  virtual ~FAMILY();
 public:
                         /*! Constructor. */
   FAMILY();
@@ -117,8 +119,7 @@ public:
                         /*! Constructor with SUPPORT entry. */
   FAMILY(const SUPPORT & s);
 
-                        /*! Destructor. */
-  virtual ~FAMILY();
+                        
   FAMILY & operator=(const FAMILY &fam);
   friend ostream & operator<<(ostream &os, FAMILY &my) ;
 

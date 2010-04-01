@@ -756,14 +756,14 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
   // Cherche le type d'entité, le nombre d'entité  par type géométrique sur le type d'entité
   // (MED_MAILLE ou MED_NOEUD uniquement car MEDMEMOIRE ne gère pas la connectivité descendante).
   // et crée le support correspondant.
-  SUPPORT * mySupport = new SUPPORT();
+  SUPPORT * mySupport = new SUPPORT;
   vector<int> numberOfGaussPoints;
   bool found = createFieldSupport(id,MED_FIELD_DRIVER<T>::_fieldName,
                                   MED_FIELD_DRIVER<T>::_ptrField->_iterationNumber,
                                   MED_FIELD_DRIVER<T>::_ptrField->_orderNumber,
                                   *mySupport, numberOfGaussPoints, meshName) ;
   if ( !found ) {
-    delete mySupport; delete[] componentName; delete[] unitName;
+    mySupport->removeReference(); delete[] componentName; delete[] unitName;
     MED_FIELD_DRIVER<T>::_fieldNum = MED_INVALID ;
      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"  Can't find any entity for field |"
                                  << MED_FIELD_DRIVER<T>::_fieldName
@@ -778,7 +778,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
   else {
     if ( mySupport->getEntity() != MED_FIELD_DRIVER<T>::_ptrField->getSupport()->getEntity() ) {
       MED_EN::medEntityMesh ent = mySupport->getEntity();
-      delete mySupport; delete[] componentName; delete[] unitName;
+      mySupport->removeReference(); delete[] componentName; delete[] unitName;
       MED_FIELD_DRIVER<T>::_fieldNum = MED_INVALID ;
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"  Given entity |"
                                    << MED_EN::entNames[MED_FIELD_DRIVER<T>::_ptrField->
@@ -1118,16 +1118,19 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
   }
   MED_FIELD_DRIVER<T>::_ptrField->_isRead = true ;
 
+  if(MED_FIELD_DRIVER<T>::_ptrField->_support)
+    MED_FIELD_DRIVER<T>::_ptrField->_support->removeReference();
   MED_FIELD_DRIVER<T>::_ptrField->_support=mySupport; //Prévenir l'utilisateur ?
 
   // check support entity and isOnAllElements
   if ( haveSupport && mySupport->getEntity() != MED_EN::MED_NODE ) {
     // check if support geometry corresponds to support entity in mesh
     MESH* mesh = mySupport->getMesh();
-    const MED_EN::medGeometryElement *meshGeoms, *endGeom, *foundGeom;
+    const MED_EN::medGeometryElement *endGeom, *foundGeom;
+    MED_EN::medGeometryElement *meshGeoms=0;
     meshGeoms = mesh->getTypesWithPoly( mySupport->getEntity() );
     endGeom = meshGeoms + mesh->getNumberOfTypesWithPoly( mySupport->getEntity() );
-    foundGeom = std::find( meshGeoms, endGeom, mySupport->getTypes()[ 0 ]);
+    foundGeom = std::find( (const MED_EN::medGeometryElement *) meshGeoms, endGeom, mySupport->getTypes()[ 0 ]);
     bool geomFound = ( foundGeom != endGeom );
     if ( !geomFound ) // support geom type is missing in types of the entity in mesh
     { // find entity corresponding to support geom type in the mesh
@@ -1136,9 +1139,10 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
         if ( ent_geoms->first == mySupport->getEntity() )
           continue;
         if ( mesh->getNumberOfElementsWithPoly( ent_geoms->first, MED_EN::MED_ALL_ELEMENTS)) {
+          delete [] meshGeoms; meshGeoms=0;
           meshGeoms = mesh->getTypesWithPoly( ent_geoms->first );
           endGeom = meshGeoms + mesh->getNumberOfTypesWithPoly( ent_geoms->first );
-          foundGeom = std::find( meshGeoms, endGeom, mySupport->getTypes()[ 0 ]);
+          foundGeom = std::find( (const MED_EN::medGeometryElement *)meshGeoms, endGeom, mySupport->getTypes()[ 0 ]);
           if ( foundGeom != endGeom ) { // geom type found
             mySupport->setEntity( ent_geoms->first );
             break;
@@ -1148,13 +1152,14 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
     }
     if ( !mySupport->isOnAllElements() ) {
       // recheck isAll
-      meshGeoType = vector<MED_EN::medGeometryElement>(meshGeoms, endGeom);
+      meshGeoType = vector<MED_EN::medGeometryElement>((const MED_EN::medGeometryElement *)meshGeoms, endGeom);
       bool isAll = ( meshGeoType == supGeoType );
       for ( int i = 0; ( isAll && i < supGeoType.size()); ++i )
         isAll = ( supNbOfElOfType[ i ] ==
                   mesh->getNumberOfElementsWithPoly( mySupport->getEntity(), supGeoType[ i ]));
       mySupport->setAll( isAll );
     }
+    delete [] meshGeoms; meshGeoms=0;
     if ( !geomFound ) { // initial entity was wrong
       // update support name
       string supportName;

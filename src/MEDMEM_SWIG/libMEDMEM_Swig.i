@@ -419,6 +419,15 @@ typedef struct { int dt; int it; } DT_IT_;
 
 typedef enum {V21 = 26, V22 = 75} medFileVersion;
 
+%feature("unref") SUPPORT "$this->removeReference();"
+%feature("unref") MESH "$this->removeReference();"
+%feature("unref") FIELDDOUBLE "$this->removeReference();"
+%feature("unref") FIELDINT "$this->removeReference();"
+%feature("unref") FIELDDOUBLENOINTERLACE "$this->removeReference();"
+%feature("unref") FIELDINTNOINTERLACE "$this->removeReference();"
+%feature("unref") FIELDDOUBLENOINTERLACEBYTYPE "$this->removeReference();"
+%feature("unref") FIELDINTNOINTERLACEBYTYPE "$this->removeReference();"
+
 medFileVersion getMedFileVersionForWriting();
 
 void setMedFileVersionForWriting(medFileVersion version);

@@ -81,6 +81,7 @@ void MEDMEMTest::testUnit()
   //Normal constructor
   UNIT *myUNIT1 = new UNIT(myName,myDescription);
   CPPUNIT_ASSERT(myUNIT1);
+  delete myUNIT1;
 
   //--------------------------------------------------------------------//
   //                        Tests des methodes                          //

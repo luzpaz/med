@@ -66,7 +66,7 @@ namespace { // local tools
   struct TSupport : public SUPPORT
   {
     TSupport(MESH* mesh): SUPPORT(mesh) {}
-    ~TSupport() { delete getMesh(); setMeshDirectly((MESH*)0); }
+    ~TSupport() { }
   };
   //================================================================================
   /*!
@@ -75,7 +75,7 @@ namespace { // local tools
   struct TField: public FIELD<double>
   {
     TField( const SUPPORT * Support, int nbComp ): FIELD<double>( Support, nbComp ) {}
-    ~TField() { if ( _support ) delete _support; _support = (SUPPORT*)0; }
+    ~TField() { }
   };
   //================================================================================
   /*!
@@ -350,6 +350,7 @@ namespace MEDMEM
 Extractor::Extractor(const FIELD<double>& inputField) throw (MEDEXCEPTION)
 : _myInputField( & inputField )    
 {
+  _myInputField->addReference();
   const char* LOC = "Extractor::Extractor(inputField) :";
 
   // Check if the input field complies with the conditions
@@ -369,17 +370,34 @@ Extractor::Extractor(const FIELD<double>& inputField) throw (MEDEXCEPTION)
 
   MESH* mesh = inputField.getSupport()->getMesh();
   if ( !mesh )
-    throw MEDEXCEPTION(STRING(LOC) << "InputField has support with NULL mesh");
+    {
+      _myInputField->removeReference();
+      throw MEDEXCEPTION(STRING(LOC) << "InputField has support with NULL mesh");
+    }
 
   if ( mesh->getSpaceDimension() < 2 )
-    throw MEDEXCEPTION(STRING(LOC) << "InputField with 1D support not acceptable");
+    {
+      _myInputField->removeReference();
+      throw MEDEXCEPTION(STRING(LOC) << "InputField with 1D support not acceptable");
+    }
 
   if ( mesh->getNumberOfPolygons() > 0 ||
        mesh->getNumberOfPolyhedron() > 0 )
-    throw MEDEXCEPTION(STRING(LOC) << "InputField has supporting mesh with poly elements");
+    {
+      _myInputField->removeReference();
+      throw MEDEXCEPTION(STRING(LOC) << "InputField has supporting mesh with poly elements");
+    }
 
   if ( mesh->getConnectivityptr()->getEntityDimension() < 2 )
-    throw MEDEXCEPTION(STRING(LOC) << "Invalid entity dimension of connectivity");
+    {
+      _myInputField->removeReference();
+      throw MEDEXCEPTION(STRING(LOC) << "Invalid entity dimension of connectivity");
+    }
+}
+
+Extractor::~Extractor()
+{
+  _myInputField->removeReference();
 }
 
 //================================================================================
@@ -417,7 +435,9 @@ FIELD<double>* Extractor::extractPlane(const double* coords, const double* norma
   MESH* mesh = divideEdges( coords, norm, new2oldCells );
   if ( !mesh ) return 0;
 
-  return makeField( new2oldCells, mesh );
+  FIELD<double>* ret=makeField( new2oldCells, mesh );
+  mesh->removeReference();
+  return ret;
 }
 
 //================================================================================
@@ -472,7 +492,9 @@ FIELD<double>* Extractor::extractLine(const double* coords, const double* direct
 
   if ( !mesh ) return 0;
     
-  return makeField( new2oldCells, mesh );
+  FIELD<double>*ret=makeField( new2oldCells, mesh );
+  mesh->removeReference();
+  return ret;
 }
 
 //================================================================================
@@ -488,7 +510,9 @@ FIELD<double>* Extractor::makeField( const map<int,set<int> >& new2oldCells,
 {
   // make new field
   int nbComp               = _myInputField->getNumberOfComponents();
-  FIELD<double> * outField = new TField( new TSupport( mesh ), nbComp );
+  SUPPORT *sup=new SUPPORT( mesh );
+  FIELD<double> * outField = new FIELD<double>( sup, nbComp );
+  sup->removeReference();
   double* outValues        = const_cast<double*>( outField->getValue() );
 
   outField->setComponentsNames       ( _myInputField->getComponentsNames() );
@@ -1033,6 +1057,88 @@ MESH* Extractor::transfixFaces( const double*       coords,
 } // namespace MEDMEM
 
 
+class MapGeoEdge : public map< medGeometryElement, vector<TEdge>* >
+{
+public:
+  MapGeoEdge();
+  ~MapGeoEdge();
+};
+
+MapGeoEdge::MapGeoEdge()
+{
+  std::vector<TEdge> *edges=(*this)[MED_TRIA3]=(*this)[MED_TRIA6]=new vector<TEdge>();
+  edges->reserve( 3 );
+  edges->push_back( TEdge( 0, 1 ));
+  edges->push_back( TEdge( 1, 2 ));
+  edges->push_back( TEdge( 2, 0 ));
+  edges=(*this)[MED_QUAD4]=(*this)[MED_QUAD8]=new vector<TEdge>();
+  edges->reserve( 4 );
+  edges->push_back( TEdge( 0, 1 ));
+  edges->push_back( TEdge( 1, 2 ));
+  edges->push_back( TEdge( 2, 3 ));
+  edges->push_back( TEdge( 3, 0 ));
+  edges=(*this)[MED_TETRA4]=(*this)[MED_TETRA10]=new vector<TEdge>();
+  edges->reserve( 6 );
+  edges->push_back( TEdge( 0, 1 ));
+  edges->push_back( TEdge( 1, 2 ));
+  edges->push_back( TEdge( 2, 0 ));
+  edges->push_back( TEdge( 0, 3 ));
+  edges->push_back( TEdge( 1, 3 ));
+  edges->push_back( TEdge( 2, 3 ));
+  edges=(*this)[MED_HEXA8]=(*this)[MED_HEXA20]=new vector<TEdge>();
+  edges->reserve( 12 );
+  edges->push_back( TEdge( 0, 1 ));
+  edges->push_back( TEdge( 1, 2 ));
+  edges->push_back( TEdge( 2, 3 ));
+  edges->push_back( TEdge( 3, 0 ));
+  edges->push_back( TEdge( 4, 5 ));
+  edges->push_back( TEdge( 5, 6 ));
+  edges->push_back( TEdge( 6, 7 ));
+  edges->push_back( TEdge( 7, 4 ));
+  edges->push_back( TEdge( 0, 4 ));
+  edges->push_back( TEdge( 1, 5 ));
+  edges->push_back( TEdge( 2, 6 ));
+  edges->push_back( TEdge( 3, 7 ));
+  edges=(*this)[MED_PYRA5]=(*this)[MED_PYRA13]=new vector<TEdge>();
+  edges->reserve( 8 );
+  edges->push_back( TEdge( 0, 1 ));
+  edges->push_back( TEdge( 1, 2 ));
+  edges->push_back( TEdge( 2, 3 ));
+  edges->push_back( TEdge( 3, 0 ));
+  edges->push_back( TEdge( 0, 4 ));
+  edges->push_back( TEdge( 1, 4 ));
+  edges->push_back( TEdge( 2, 4 ));
+  edges->push_back( TEdge( 3, 4 ));
+  edges=(*this)[MED_PENTA6]=(*this)[MED_PENTA15]=new vector<TEdge>();
+  edges->reserve( 9 );
+  edges->push_back( TEdge( 0, 1 ));
+  edges->push_back( TEdge( 1, 2 ));
+  edges->push_back( TEdge( 2, 0 ));
+  edges->push_back( TEdge( 3, 4 ));
+  edges->push_back( TEdge( 4, 5 ));
+  edges->push_back( TEdge( 5, 3 ));
+  edges->push_back( TEdge( 0, 4 ));
+  edges->push_back( TEdge( 1, 5 ));
+  edges->push_back( TEdge( 2, 3 ));
+  (*this)[MED_NONE]         = 0;
+  (*this)[MED_POINT1]       = 0;
+  (*this)[MED_SEG2]         = 0;
+  (*this)[MED_SEG3]         = 0;
+  (*this)[MED_POLYGON]      = 0;
+  (*this)[MED_POLYHEDRA]    = 0;
+  (*this)[MED_ALL_ELEMENTS] = 0;
+}
+
+MapGeoEdge::~MapGeoEdge()
+{
+  delete (*this)[MED_TRIA6];
+  delete (*this)[MED_QUAD8];
+  delete (*this)[MED_TETRA10];
+  delete (*this)[MED_HEXA20];
+  delete (*this)[MED_PYRA13];
+  delete (*this)[MED_PENTA15];
+}
+
 //================================================================================
 /*!
  * \brief Constructs TEdgeIterator on given classical cell type
@@ -1041,70 +1147,7 @@ MESH* Extractor::transfixFaces( const double*       coords,
 
 TEdgeIterator::TEdgeIterator(const medGeometryElement type)
 {
-  static map< medGeometryElement, vector<TEdge>* > _edgesByType;
-  if ( _edgesByType.empty() ) {
-    _edges = _edgesByType[ MED_TRIA3 ] = _edgesByType[ MED_TRIA6 ] = new vector<TEdge>();
-    _edges->reserve( 3 );
-    _edges->push_back( TEdge( 0, 1 ));
-    _edges->push_back( TEdge( 1, 2 ));
-    _edges->push_back( TEdge( 2, 0 ));
-    _edges = _edgesByType[ MED_QUAD4 ] = _edgesByType[ MED_QUAD8 ] = new vector<TEdge>();
-    _edges->reserve( 4 );
-    _edges->push_back( TEdge( 0, 1 ));
-    _edges->push_back( TEdge( 1, 2 ));
-    _edges->push_back( TEdge( 2, 3 ));
-    _edges->push_back( TEdge( 3, 0 ));
-    _edges = _edgesByType[ MED_TETRA4 ] = _edgesByType[ MED_TETRA10 ] = new vector<TEdge>();
-    _edges->reserve( 6 );
-    _edges->push_back( TEdge( 0, 1 ));
-    _edges->push_back( TEdge( 1, 2 ));
-    _edges->push_back( TEdge( 2, 0 ));
-    _edges->push_back( TEdge( 0, 3 ));
-    _edges->push_back( TEdge( 1, 3 ));
-    _edges->push_back( TEdge( 2, 3 ));
-    _edges = _edgesByType[ MED_HEXA8 ] = _edgesByType[ MED_HEXA20 ] = new vector<TEdge>();
-    _edges->reserve( 12 );
-    _edges->push_back( TEdge( 0, 1 ));
-    _edges->push_back( TEdge( 1, 2 ));
-    _edges->push_back( TEdge( 2, 3 ));
-    _edges->push_back( TEdge( 3, 0 ));
-    _edges->push_back( TEdge( 4, 5 ));
-    _edges->push_back( TEdge( 5, 6 ));
-    _edges->push_back( TEdge( 6, 7 ));
-    _edges->push_back( TEdge( 7, 4 ));
-    _edges->push_back( TEdge( 0, 4 ));
-    _edges->push_back( TEdge( 1, 5 ));
-    _edges->push_back( TEdge( 2, 6 ));
-    _edges->push_back( TEdge( 3, 7 ));
-    _edges = _edgesByType[ MED_PYRA5 ] = _edgesByType[ MED_PYRA13 ] = new vector<TEdge>();
-    _edges->reserve( 8 );
-    _edges->push_back( TEdge( 0, 1 ));
-    _edges->push_back( TEdge( 1, 2 ));
-    _edges->push_back( TEdge( 2, 3 ));
-    _edges->push_back( TEdge( 3, 0 ));
-    _edges->push_back( TEdge( 0, 4 ));
-    _edges->push_back( TEdge( 1, 4 ));
-    _edges->push_back( TEdge( 2, 4 ));
-    _edges->push_back( TEdge( 3, 4 ));
-    _edges = _edgesByType[ MED_PENTA6 ] = _edgesByType[ MED_PENTA15 ] = new vector<TEdge>();
-    _edges->reserve( 9 );
-    _edges->push_back( TEdge( 0, 1 ));
-    _edges->push_back( TEdge( 1, 2 ));
-    _edges->push_back( TEdge( 2, 0 ));
-    _edges->push_back( TEdge( 3, 4 ));
-    _edges->push_back( TEdge( 4, 5 ));
-    _edges->push_back( TEdge( 5, 3 ));
-    _edges->push_back( TEdge( 0, 4 ));
-    _edges->push_back( TEdge( 1, 5 ));
-    _edges->push_back( TEdge( 2, 3 ));
-    _edgesByType[ MED_NONE ]         = 0;
-    _edgesByType[ MED_POINT1 ]       = 0;
-    _edgesByType[ MED_SEG2 ]         = 0;
-    _edgesByType[ MED_SEG3 ]         = 0;
-    _edgesByType[ MED_POLYGON ]      = 0;
-    _edgesByType[ MED_POLYHEDRA ]    = 0;
-    _edgesByType[ MED_ALL_ELEMENTS ] = 0;
-  }
+  static MapGeoEdge _edgesByType;
   _edges = _edgesByType[type];
 }
 

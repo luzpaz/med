@@ -41,10 +41,14 @@ MEDMEM_REMAPPER::MEDMEM_REMAPPER():_matrix(0),_sourceMesh(0), _targetMesh(0), _s
 MEDMEM_REMAPPER::~MEDMEM_REMAPPER()
 {
   delete _matrix;
-  delete _sourceMesh;
-  delete _targetMesh;
-  delete _sourceSupport;
-  delete _targetSupport;
+  if(_sourceMesh)
+    _sourceMesh->removeReference();
+  if(_targetMesh)
+    _targetMesh->removeReference();
+  if(_sourceSupport)
+    _sourceSupport->removeReference();
+  if(_targetSupport)
+    _targetSupport->removeReference();
 }
 /*! This method computes the intersection matrix between 
  * source \a mesh_source and \a mesh_target. It is a preliminary step 
@@ -62,9 +66,11 @@ int MEDMEM_REMAPPER::prepare(const MEDMEM::MESH& mesh_source, const MEDMEM::MESH
   delete _matrix;
   _matrix= new INTERP_KERNEL::Matrix<double,INTERP_KERNEL::ALL_FORTRAN_MODE>;
 
-  delete _sourceMesh;
+  if(_sourceMesh)
+    _sourceMesh->removeReference();
   _sourceMesh= new MEDMEM::MESH((MEDMEM::MESH&)mesh_source);
-  delete _targetMesh;
+  if(_targetMesh)
+    _targetMesh->removeReference();
   _targetMesh= new MEDMEM::MESH((MEDMEM::MESH&)mesh_target);
 
   std::string methodC=method;
@@ -88,8 +94,10 @@ int MEDMEM_REMAPPER::prepare(const MEDMEM::MESH& mesh_source, const MEDMEM::MESH
     throw INTERP_KERNEL::Exception("MEDMEM_REMAPPER::prepare: Invalid method specified ! Must be in : \"P0P0\" \"P0P1\" \"P1P0\" or \"P1P1\"");
                 
 
-  delete _sourceSupport;
-  delete _targetSupport;
+  if(_sourceSupport)
+    _sourceSupport->removeReference();
+  if(_targetSupport)
+    _targetSupport->removeReference();
   if(     _sourceFieldType == "P0")
     _sourceSupport = new MEDMEM::SUPPORT((MEDMEM::MESH *)_sourceMesh,"on All support",MED_EN::MED_CELL);
   else

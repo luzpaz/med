@@ -96,7 +96,7 @@ int main (int argc, char ** argv) {
   string filename = argv[1] ;
   string meshname = argv[2] ;
 
-  MESH * myMesh= new MESH() ;
+  MESH * myMesh= new MESH;
   myMesh->setName(meshname);
   MED_MESH_RDONLY_DRIVER myMeshDriver(filename,myMesh) ;
   myMeshDriver.setMeshName(meshname);
@@ -111,11 +111,11 @@ int main (int argc, char ** argv) {
   //delete myGroup; // no because in mesh !!
   affiche_groupe(myGroup2);
   GROUP * myGroup3 = new GROUP(* myGroup2);
-  delete myGroup2;
+  myGroup2->removeReference();
   affiche_groupe(myGroup3);
-  delete myGroup3;
+  myGroup3->removeReference();
 
-  delete myMesh ;
+  myMesh->removeReference() ;
 
   return 0;
 }

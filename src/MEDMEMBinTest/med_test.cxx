@@ -113,7 +113,7 @@ int main (int argc, char ** argv) {
   string meshname = argv[2] ;
 
   //  MESH * myMesh= new MESH(MED_DRIVER,filename,meshname) ;
-  MESH * myMesh= new MESH() ;
+  MESH * myMesh= new MESH ;
   myMesh->setName(meshname);
   MED_MESH_RDONLY_DRIVER myMeshDriver(filename,myMesh) ;
   myMeshDriver.setMeshName(meshname);
@@ -291,7 +291,8 @@ int main (int argc, char ** argv) {
   }
   cout << "Max Norm " << maxnorm << " Min Norm " << minnorm << endl;
   
-  delete normal ;
+  if(normal)
+    normal->removeReference() ;
 
   if (SpaceDimension == 2)
     {
@@ -310,11 +311,11 @@ int main (int argc, char ** argv) {
           minlength = dmin(minlength,length_value);
         }
       cout << "Max Length " << maxlength << " Min Length " << minlength << endl;
-
-      delete length ;
+      if(length)
+        length->removeReference();
     }
-
-  delete support1 ;
+  if(support1)
+    support1->removeReference();
 
   cout << "Building of the Support on all space-dimensionned cells of the mesh :"<< endl ;
   SUPPORT * support = new SUPPORT(myMesh);
@@ -334,8 +335,8 @@ int main (int argc, char ** argv) {
       if (SpaceDimension == 2)
         cout << "Barycenter " << i << " " << barycenter->getValueIJ(i,1) << " " << barycenter->getValueIJ(i,2) << endl;
     }
-
-  delete barycenter ;
+  if(barycenter)
+    barycenter->removeReference();
 
   //FIELD<double>* volume = new FIELD<double>::FIELD();
   //FIELD<double>* area = new FIELD<double>::FIELD();
@@ -362,8 +363,8 @@ int main (int argc, char ** argv) {
 
       cout << "Max Volume " << maxvol << " Min Volume " << minvol << endl;
       cout << "Support Volume " << voltot << endl;
-
-      delete volume ;
+      if(volume)
+        volume->removeReference() ;
     }
   else if (SpaceDimension == 2)
     {
@@ -387,11 +388,11 @@ int main (int argc, char ** argv) {
 
       cout << "Max Area " << maxarea << " Min Area " << minarea << endl;
       cout << "Support Area " << areatot << endl;
-
-      delete area ;
+      if(area)
+        area->removeReference();
     }
-
-  delete support ;
+  if(support)
+    support->removeReference();
 
   //if (barycenter != NULL) delete barycenter;
   //if (volume != NULL ) delete volume;
@@ -420,7 +421,7 @@ int main (int argc, char ** argv) {
   try {
     myFieldDriver.read() ;
   } catch (...) {
-    delete mySupport ;
+    mySupport->removeReference();
     mySupport = new SUPPORT(myMesh,"On_all_node",MED_NODE);
     myField->setSupport(mySupport);
     try {
@@ -465,10 +466,10 @@ int main (int argc, char ** argv) {
   }
   cout<<endl;
   
-  delete myField;
-  delete mySupport;
+  myField->removeReference();
+  mySupport->removeReference();
 
-  delete myMesh ;
+  myMesh->removeReference();
 
   return 0;
 }

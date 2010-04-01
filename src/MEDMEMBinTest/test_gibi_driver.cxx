@@ -54,7 +54,7 @@ int main (int argc, char ** argv)
 
     // lecture du fichier gibi
     // MESH * myMesh= new MESH(GIBI_DRIVER,gibifilename);
-    MESH * myMesh= new MESH() ; 
+    MESH * myMesh= new MESH; 
     GIBI_MESH_RDONLY_DRIVER myGibiMeshDriver(gibifilename, myMesh) ;
     myGibiMeshDriver.open() ;
     myGibiMeshDriver.read() ;
@@ -84,7 +84,7 @@ int main (int argc, char ** argv)
     cout << "creation d'un fichier vtk : " << endl;
     int idVtk = myMesh->addDriver(VTK_DRIVER, vtkfile, meshName);
     myMesh->write(idVtk) ;
-    delete myMesh;
+    myMesh->removeReference();
 
     // remontée mémoire du fichier med 21
     myMesh= new MESH(MED_DRIVER,medfile21,meshName);
@@ -97,10 +97,10 @@ int main (int argc, char ** argv)
     //myMeshDriver.close() ;
     //cout << "Impression 2 de MESH : " << endl;
     //cout << *myMesh;
-    delete myMesh;
+    myMesh->removeReference();
 
     // remontée mémoire du fichier med 22
     myMesh= new MESH(MED_DRIVER,medfile22,meshName);
 
-    delete myMesh;
+    myMesh->removeReference();
 }
