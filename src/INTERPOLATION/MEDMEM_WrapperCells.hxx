@@ -74,14 +74,14 @@ protected :
         int                   type          ;
         int                   nbr_noeuds    ;
         int                   nbr_faces     ;
-        vector<int>           premier_noeud ;
-        vector< vector<int> > simplexe_base ;
-        vector< vector<int> > face          ;
+        std::vector<int>           premier_noeud ;
+        std::vector< std::vector<int> > simplexe_base ;
+        std::vector< std::vector<int> > face          ;
 public :
         inline int                 DONNE_NBR_NOEUDS()                        const { return nbr_noeuds;              }
         inline int                 DONNE_NBR_FACES()                         const { return nbr_faces;               }
-        inline const vector<int> & DONNE_SIMPLEXE_BASE(int num_face)         const { return simplexe_base[num_face]; }
-        inline const vector<int> & DONNE_FACE(int num_face)                  const { return face[num_face];          }
+        inline const std::vector<int> & DONNE_SIMPLEXE_BASE(int num_face)         const { return simplexe_base[num_face]; }
+        inline const std::vector<int> & DONNE_FACE(int num_face)                  const { return face[num_face];          }
         inline int                 DONNE_PREMIER_NOEUD_DE_FACE(int num_face) const { return premier_noeud[num_face]; }
         friend class Wrapper_Maille;
 };
@@ -122,7 +122,7 @@ public :
 class Connectivite_Generale
 {
 protected :
-        vector<Connectivite_Canonique_Base *> AllConn;
+        std::vector<Connectivite_Canonique_Base *> AllConn;
 public :
         Connectivite_Generale();
         ~Connectivite_Generale();
@@ -216,9 +216,9 @@ protected :
         Connectivite_Generale ConnGen;
         int nbr_mailles;
         // ATTENTION, c'est le type en numero local de modele, pour éviter une map, le numéro de modele MED correponsdant est donné par Equivalence_Local_MED
-        vector<int> types;
+        std::vector<int> types;
         // pointeur dans mailles du premier sommet de chaque maille (évite les calculs du au nombres éventuellement différents de sommets par maille)
-        vector< int * > premier_pointeur;
+        std::vector< int * > premier_pointeur;
         // maille_courante, est un Wrapper_Maille déja instancié utilisé par l'opérateur [] pour accelerer les acces
         Wrapper_Maille maille_courante;
 public :
@@ -284,13 +284,13 @@ inline int  Wrapper_Maille::DONNE_NBR_FACES()                                   
         }
 inline void Wrapper_Maille::DONNE_SIMPLEXE_BASE(int num_face,type_retour & simplexe) const
         {
-        const vector<int> & simplexelocal=modele->DONNE_SIMPLEXE_BASE(num_face);
+        const std::vector<int> & simplexelocal=modele->DONNE_SIMPLEXE_BASE(num_face);
         simplexe.combien=simplexelocal.size();
         for (int i=0;i<simplexe.combien;i++) simplexe.quoi[i]=sommets[simplexelocal[i]];
         }
 inline void Wrapper_Maille::DONNE_FACE(int num_face,type_retour & face)               const
         {
-        const vector<int> & facelocal=modele->DONNE_FACE(num_face);
+        const std::vector<int> & facelocal=modele->DONNE_FACE(num_face);
         face.combien=facelocal.size();
         for (int i=0;i<face.combien;i++) face.quoi[i]=sommets[facelocal[i]];
         }
@@ -373,10 +373,10 @@ public :
                 nbr_noeuds = 1;
                 nbr_faces = 0;          
                 
-                premier_noeud = vector<int>(0);
+                premier_noeud = std::vector<int>(0);
                 
-                simplexe_base = vector< vector<int> >(nbr_faces);
-                face          = vector< vector<int> >(nbr_faces);
+                simplexe_base = std::vector< std::vector<int> >(nbr_faces);
+                face          = std::vector< std::vector<int> >(nbr_faces);
                 
                 }
         ~Connectivite_Canonique_Point1() {}
@@ -405,15 +405,15 @@ public :
                 nbr_faces = 2;
                 
                 
-                premier_noeud = vector<int>(&pn[0],&pn[nbr_faces]);
+                premier_noeud = std::vector<int>(&pn[0],&pn[nbr_faces]);
                 
-                simplexe_base = vector< vector<int> >(nbr_faces);
-                face          = vector< vector<int> >(nbr_faces);
+                simplexe_base = std::vector< std::vector<int> >(nbr_faces);
+                face          = std::vector< std::vector<int> >(nbr_faces);
                 
                 int i;
                 
-                for (i=0;i<nbr_faces;i++) simplexe_base[i]=vector<int>(&sb[2*i],&sb[2*(i+1)]);
-                for (i=0;i<nbr_faces;i++) face[i]=vector<int>(&fa[po[i]],&fa[po[i+1]]);
+                for (i=0;i<nbr_faces;i++) simplexe_base[i]=std::vector<int>(&sb[2*i],&sb[2*(i+1)]);
+                for (i=0;i<nbr_faces;i++) face[i]=std::vector<int>(&fa[po[i]],&fa[po[i+1]]);
                 
                 }
         ~Connectivite_Canonique_Seg2() {}
@@ -441,15 +441,15 @@ public :
                 nbr_faces = 2;
                 
                 
-                premier_noeud = vector<int>(&pn[0],&pn[nbr_faces]);
+                premier_noeud = std::vector<int>(&pn[0],&pn[nbr_faces]);
                 
-                simplexe_base = vector< vector<int> >(nbr_faces);
-                face          = vector< vector<int> >(nbr_faces);
+                simplexe_base = std::vector< std::vector<int> >(nbr_faces);
+                face          = std::vector< std::vector<int> >(nbr_faces);
                 
                 int i;
                 
-                for (i=0;i<nbr_faces;i++) simplexe_base[i]=vector<int>(&sb[2*i],&sb[2*(i+1)]);
-                for (i=0;i<nbr_faces;i++) face[i]=vector<int>(&fa[po[i]],&fa[po[i+1]]);
+                for (i=0;i<nbr_faces;i++) simplexe_base[i]=std::vector<int>(&sb[2*i],&sb[2*(i+1)]);
+                for (i=0;i<nbr_faces;i++) face[i]=std::vector<int>(&fa[po[i]],&fa[po[i+1]]);
                 
                 }
         ~Connectivite_Canonique_Seg3() {}
@@ -478,15 +478,15 @@ public :
                 nbr_faces = 3;
                 
                 
-                premier_noeud = vector<int>(&pn[0],&pn[nbr_faces]);
+                premier_noeud = std::vector<int>(&pn[0],&pn[nbr_faces]);
                 
-                simplexe_base = vector< vector<int> >(nbr_faces);
-                face          = vector< vector<int> >(nbr_faces);
+                simplexe_base = std::vector< std::vector<int> >(nbr_faces);
+                face          = std::vector< std::vector<int> >(nbr_faces);
                 
                 int i;
                 
-                for (i=0;i<nbr_faces;i++) simplexe_base[i]=vector<int>(&sb[3*i],&sb[3*(i+1)]);
-                for (i=0;i<nbr_faces;i++) face[i]=vector<int>(&fa[po[i]],&fa[po[i+1]]);
+                for (i=0;i<nbr_faces;i++) simplexe_base[i]=std::vector<int>(&sb[3*i],&sb[3*(i+1)]);
+                for (i=0;i<nbr_faces;i++) face[i]=std::vector<int>(&fa[po[i]],&fa[po[i+1]]);
                 
                 }
         ~Connectivite_Canonique_Tria3() {}
@@ -514,15 +514,15 @@ public :
                 nbr_faces = 3;
                 
                 
-                premier_noeud = vector<int>(&pn[0],&pn[nbr_faces]);
+                premier_noeud = std::vector<int>(&pn[0],&pn[nbr_faces]);
                 
-                simplexe_base = vector< vector<int> >(nbr_faces);
-                face          = vector< vector<int> >(nbr_faces);
+                simplexe_base = std::vector< std::vector<int> >(nbr_faces);
+                face          = std::vector< std::vector<int> >(nbr_faces);
                 
                 int i;
                 
-                for (i=0;i<nbr_faces;i++) simplexe_base[i]=vector<int>(&sb[3*i],&sb[3*(i+1)]);
-                for (i=0;i<nbr_faces;i++) face[i]=vector<int>(&fa[po[i]],&fa[po[i+1]]);
+                for (i=0;i<nbr_faces;i++) simplexe_base[i]=std::vector<int>(&sb[3*i],&sb[3*(i+1)]);
+                for (i=0;i<nbr_faces;i++) face[i]=std::vector<int>(&fa[po[i]],&fa[po[i+1]]);
                 
                 }
         ~Connectivite_Canonique_Tria6() {}
@@ -550,15 +550,15 @@ public :
                 nbr_faces = 4;
                 
                 
-                premier_noeud = vector<int>(&pn[0],&pn[nbr_faces]);
+                premier_noeud = std::vector<int>(&pn[0],&pn[nbr_faces]);
                 
-                simplexe_base = vector< vector<int> >(nbr_faces);
-                face          = vector< vector<int> >(nbr_faces);
+                simplexe_base = std::vector< std::vector<int> >(nbr_faces);
+                face          = std::vector< std::vector<int> >(nbr_faces);
                 
                 int i;
                 
-                for (i=0;i<nbr_faces;i++) simplexe_base[i]=vector<int>(&sb[3*i],&sb[3*(i+1)]);
-                for (i=0;i<nbr_faces;i++) face[i]=vector<int>(&fa[po[i]],&fa[po[i+1]]);
+                for (i=0;i<nbr_faces;i++) simplexe_base[i]=std::vector<int>(&sb[3*i],&sb[3*(i+1)]);
+                for (i=0;i<nbr_faces;i++) face[i]=std::vector<int>(&fa[po[i]],&fa[po[i+1]]);
                 
                 }
         ~Connectivite_Canonique_Quad4() {}
@@ -587,15 +587,15 @@ public :
                 nbr_faces = 4;
                 
                 
-                premier_noeud = vector<int>(&pn[0],&pn[nbr_faces]);
+                premier_noeud = std::vector<int>(&pn[0],&pn[nbr_faces]);
                 
-                simplexe_base = vector< vector<int> >(nbr_faces);
-                face          = vector< vector<int> >(nbr_faces);
+                simplexe_base = std::vector< std::vector<int> >(nbr_faces);
+                face          = std::vector< std::vector<int> >(nbr_faces);
                 
                 int i;
                 
-                for (i=0;i<nbr_faces;i++) simplexe_base[i]=vector<int>(&sb[3*i],&sb[3*(i+1)]);
-                for (i=0;i<nbr_faces;i++) face[i]=vector<int>(&fa[po[i]],&fa[po[i+1]]);
+                for (i=0;i<nbr_faces;i++) simplexe_base[i]=std::vector<int>(&sb[3*i],&sb[3*(i+1)]);
+                for (i=0;i<nbr_faces;i++) face[i]=std::vector<int>(&fa[po[i]],&fa[po[i+1]]);
                 
                 }
         ~Connectivite_Canonique_Quad8() {}
@@ -623,15 +623,15 @@ public :
                 nbr_faces = 4;
                 
                 
-                premier_noeud = vector<int>(&pn[0],&pn[nbr_faces]);
+                premier_noeud = std::vector<int>(&pn[0],&pn[nbr_faces]);
                 
-                simplexe_base = vector< vector<int> >(nbr_faces);
-                face          = vector< vector<int> >(nbr_faces);
+                simplexe_base = std::vector< std::vector<int> >(nbr_faces);
+                face          = std::vector< std::vector<int> >(nbr_faces);
                 
                 int i;
                 
-                for (i=0;i<nbr_faces;i++) simplexe_base[i]=vector<int>(&sb[4*i],&sb[4*(i+1)]);
-                for (i=0;i<nbr_faces;i++) face[i]=vector<int>(&fa[po[i]],&fa[po[i+1]]);
+                for (i=0;i<nbr_faces;i++) simplexe_base[i]=std::vector<int>(&sb[4*i],&sb[4*(i+1)]);
+                for (i=0;i<nbr_faces;i++) face[i]=std::vector<int>(&fa[po[i]],&fa[po[i+1]]);
                 
                 }
         ~Connectivite_Canonique_Tetra4() {}
@@ -660,15 +660,15 @@ public :
                 nbr_faces = 4;
                 
                 
-                premier_noeud = vector<int>(&pn[0],&pn[nbr_faces]);
+                premier_noeud = std::vector<int>(&pn[0],&pn[nbr_faces]);
                 
-                simplexe_base = vector< vector<int> >(nbr_faces);
-                face          = vector< vector<int> >(nbr_faces);
+                simplexe_base = std::vector< std::vector<int> >(nbr_faces);
+                face          = std::vector< std::vector<int> >(nbr_faces);
                 
                 int i;
                 
-                for (i=0;i<nbr_faces;i++) simplexe_base[i]=vector<int>(&sb[4*i],&sb[4*(i+1)]);
-                for (i=0;i<nbr_faces;i++) face[i]=vector<int>(&fa[po[i]],&fa[po[i+1]]);
+                for (i=0;i<nbr_faces;i++) simplexe_base[i]=std::vector<int>(&sb[4*i],&sb[4*(i+1)]);
+                for (i=0;i<nbr_faces;i++) face[i]=std::vector<int>(&fa[po[i]],&fa[po[i+1]]);
                 
                 }
         ~Connectivite_Canonique_Tetra10() {}
@@ -696,15 +696,15 @@ public :
                 nbr_faces = 6;
                 
                 
-                premier_noeud = vector<int>(&pn[0],&pn[nbr_faces]);
+                premier_noeud = std::vector<int>(&pn[0],&pn[nbr_faces]);
                 
-                simplexe_base = vector< vector<int> >(nbr_faces);
-                face          = vector< vector<int> >(nbr_faces);
+                simplexe_base = std::vector< std::vector<int> >(nbr_faces);
+                face          = std::vector< std::vector<int> >(nbr_faces);
                 
                 int i;
                 
-                for (i=0;i<nbr_faces;i++) simplexe_base[i]=vector<int>(&sb[4*i],&sb[4*(i+1)]);
-                for (i=0;i<nbr_faces;i++) face[i]=vector<int>(&fa[po[i]],&fa[po[i+1]]);
+                for (i=0;i<nbr_faces;i++) simplexe_base[i]=std::vector<int>(&sb[4*i],&sb[4*(i+1)]);
+                for (i=0;i<nbr_faces;i++) face[i]=std::vector<int>(&fa[po[i]],&fa[po[i+1]]);
                 
                 }
         ~Connectivite_Canonique_Hexa8() {}
@@ -732,15 +732,15 @@ public :
                 nbr_faces = 6;
                 
                 
-                premier_noeud = vector<int>(&pn[0],&pn[nbr_faces]);
+                premier_noeud = std::vector<int>(&pn[0],&pn[nbr_faces]);
                 
-                simplexe_base = vector< vector<int> >(nbr_faces);
-                face          = vector< vector<int> >(nbr_faces);
+                simplexe_base = std::vector< std::vector<int> >(nbr_faces);
+                face          = std::vector< std::vector<int> >(nbr_faces);
                 
                 int i;
                 
-                for (i=0;i<nbr_faces;i++) simplexe_base[i]=vector<int>(&sb[4*i],&sb[4*(i+1)]);
-                for (i=0;i<nbr_faces;i++) face[i]=vector<int>(&fa[po[i]],&fa[po[i+1]]);
+                for (i=0;i<nbr_faces;i++) simplexe_base[i]=std::vector<int>(&sb[4*i],&sb[4*(i+1)]);
+                for (i=0;i<nbr_faces;i++) face[i]=std::vector<int>(&fa[po[i]],&fa[po[i+1]]);
                 
                 }
         ~Connectivite_Canonique_Hexa20() {}
@@ -768,15 +768,15 @@ public :
                 nbr_faces = 5;
                 
                 
-                premier_noeud = vector<int>(&pn[0],&pn[nbr_faces]);
+                premier_noeud = std::vector<int>(&pn[0],&pn[nbr_faces]);
                 
-                simplexe_base = vector< vector<int> >(nbr_faces);
-                face          = vector< vector<int> >(nbr_faces);
+                simplexe_base = std::vector< std::vector<int> >(nbr_faces);
+                face          = std::vector< std::vector<int> >(nbr_faces);
                 
                 int i;
                 
-                for (i=0;i<nbr_faces;i++) simplexe_base[i]=vector<int>(&sb[4*i],&sb[4*(i+1)]);
-                for (i=0;i<nbr_faces;i++) face[i]=vector<int>(&fa[po[i]],&fa[po[i+1]]);
+                for (i=0;i<nbr_faces;i++) simplexe_base[i]=std::vector<int>(&sb[4*i],&sb[4*(i+1)]);
+                for (i=0;i<nbr_faces;i++) face[i]=std::vector<int>(&fa[po[i]],&fa[po[i+1]]);
                 
                 }
         ~Connectivite_Canonique_Pyra5() {}
@@ -804,15 +804,15 @@ public :
                 nbr_faces = 5;
                 
                 
-                premier_noeud = vector<int>(&pn[0],&pn[nbr_faces]);
+                premier_noeud = std::vector<int>(&pn[0],&pn[nbr_faces]);
                 
-                simplexe_base = vector< vector<int> >(nbr_faces);
-                face          = vector< vector<int> >(nbr_faces);
+                simplexe_base = std::vector< std::vector<int> >(nbr_faces);
+                face          = std::vector< std::vector<int> >(nbr_faces);
                 
                 int i;
                 
-                for (i=0;i<nbr_faces;i++) simplexe_base[i]=vector<int>(&sb[4*i],&sb[4*(i+1)]);
-                for (i=0;i<nbr_faces;i++) face[i]=vector<int>(&fa[po[i]],&fa[po[i+1]]);
+                for (i=0;i<nbr_faces;i++) simplexe_base[i]=std::vector<int>(&sb[4*i],&sb[4*(i+1)]);
+                for (i=0;i<nbr_faces;i++) face[i]=std::vector<int>(&fa[po[i]],&fa[po[i+1]]);
                 
                 }
         ~Connectivite_Canonique_Pyra13() {}
@@ -840,15 +840,15 @@ public :
                 nbr_faces = 5;
                 
                 
-                premier_noeud = vector<int>(&pn[0],&pn[nbr_faces]);
+                premier_noeud = std::vector<int>(&pn[0],&pn[nbr_faces]);
                 
-                simplexe_base = vector< vector<int> >(nbr_faces);
-                face          = vector< vector<int> >(nbr_faces);
+                simplexe_base = std::vector< std::vector<int> >(nbr_faces);
+                face          = std::vector< std::vector<int> >(nbr_faces);
                 
                 int i;
                 
-                for (i=0;i<nbr_faces;i++) simplexe_base[i]=vector<int>(&sb[4*i],&sb[4*(i+1)]);
-                for (i=0;i<nbr_faces;i++) face[i]=vector<int>(&fa[po[i]],&fa[po[i+1]]);
+                for (i=0;i<nbr_faces;i++) simplexe_base[i]=std::vector<int>(&sb[4*i],&sb[4*(i+1)]);
+                for (i=0;i<nbr_faces;i++) face[i]=std::vector<int>(&fa[po[i]],&fa[po[i+1]]);
                 
                 }
         ~Connectivite_Canonique_Penta6() {}
@@ -876,15 +876,15 @@ public :
                 nbr_faces = 5;
                 
                 
-                premier_noeud = vector<int>(&pn[0],&pn[nbr_faces]);
+                premier_noeud = std::vector<int>(&pn[0],&pn[nbr_faces]);
                 
-                simplexe_base = vector< vector<int> >(nbr_faces);
-                face          = vector< vector<int> >(nbr_faces);
+                simplexe_base = std::vector< std::vector<int> >(nbr_faces);
+                face          = std::vector< std::vector<int> >(nbr_faces);
                 
                 int i;
                 
-                for (i=0;i<nbr_faces;i++) simplexe_base[i]=vector<int>(&sb[4*i],&sb[4*(i+1)]);
-                for (i=0;i<nbr_faces;i++) face[i]=vector<int>(&fa[po[i]],&fa[po[i+1]]);
+                for (i=0;i<nbr_faces;i++) simplexe_base[i]=std::vector<int>(&sb[4*i],&sb[4*(i+1)]);
+                for (i=0;i<nbr_faces;i++) face[i]=std::vector<int>(&fa[po[i]],&fa[po[i+1]]);
                 
                 }
         ~Connectivite_Canonique_Penta15() {}

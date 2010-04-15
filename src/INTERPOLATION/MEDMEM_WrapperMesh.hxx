@@ -59,19 +59,19 @@ protected :
         int nbr_noeuds;
         
         // liste des numéros globaux de faces contenues dans une maille
-        vector< vector<int> > faces_contenues;
+        std::vector< std::vector<int> > faces_contenues;
         // liste des numéros globaux de mailles qui contiennent un noeud
-        vector< vector<int> > mailles_contenant_noeud;
+        std::vector< std::vector<int> > mailles_contenant_noeud;
         // liste des numéros globaux de mailles voisines d'une maille donnée via une face
         // l'ordre du voisin dans la liste implique par quelle face dans le tableau faces_contenues il est voisin
-        vector< vector<int> > voisins_de_maille;
+        std::vector< std::vector<int> > voisins_de_maille;
         
         // liste des numéros globaux de faces qui sont au bord du maillage
         // Ce sont les faces qui n'ont qu'une seule maille de rattachement
-        vector<int> face_au_bord;
+        std::vector<int> face_au_bord;
         // liste des numéros globaux de mailles qui sont au bord
         // ce sont les mailles qui ont une face sans voisin
-        vector<int> maille_au_bord;
+        std::vector<int> maille_au_bord;
 
         // Méthode privée
         // construit le tableau mailles_contenant_noeud
@@ -180,8 +180,8 @@ template <class NUAGEMAILLE> Wrapper_Maillage<NUAGEMAILLE>::Wrapper_Maillage(NUA
         for (num_maille=0;num_maille<nbr_mailles;num_maille++)
                 {
                 tmp=(*mailles)[num_maille].DONNE_NBR_FACES();
-                voisins_de_maille[num_maille]=vector<int>(tmp,MED_EN::MED_UNDEFINED);
-                faces_contenues[num_maille]=vector<int>(tmp,MED_EN::MED_UNDEFINED);
+                voisins_de_maille[num_maille]=std::vector<int>(tmp,MED_EN::MED_UNDEFINED);
+                faces_contenues[num_maille]=std::vector<int>(tmp,MED_EN::MED_UNDEFINED);
                 approx_nbr_formants+=tmp;
                 }
                 

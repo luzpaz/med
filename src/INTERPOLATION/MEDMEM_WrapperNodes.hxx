@@ -92,11 +92,11 @@ public :
                 for (int i=0;i<DIMENSION;i++) if (A[i]!=B[i]) return 1;
                 return 0;
                 }
-        friend ostream & operator<<(ostream &os,const Wrapper_Noeud<DIMENSION> &A)
+        friend std::ostream & operator<<(std::ostream &os,const Wrapper_Noeud<DIMENSION> &A)
                 {
-                os<<"( "<<flush;
-                for (int i=0;i<DIMENSION;i++) os<<A[i]<<" "<<flush;
-                os<<")"<<flush;
+                os<<"( "<<std::flush;
+                for (int i=0;i<DIMENSION;i++) os<<A[i]<<" "<<std::flush;
+                os<<")"<<std::flush;
                 return os;
                 }
         };

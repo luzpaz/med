@@ -56,8 +56,8 @@ protected :
         NUAGENOEUD * noeuds_front;
         Coordonnees_Barycentriques<NUAGEMAILLE,NUAGENOEUD,NOEUD,DIMENSION> * CB;
         dTree<NOEUD,NUAGENOEUD,DIMENSION> * my_dTree;
-        vector<int> resultat_mapping;
-        vector<int> point_le_plus_proche;
+        std::vector<int> resultat_mapping;
+        std::vector<int> point_le_plus_proche;
         
 public :
         Mapping():maillage_back(NULL),mailles_back(NULL),noeuds_back(NULL),noeuds_front(NULL),CB(NULL),my_dTree(NULL) {}
@@ -71,7 +71,7 @@ public :
         void Cree_Mapping(int flag_convexe=0);                                             // SUPPOSE NON CONVEXE PAR DEFAUT
         void Cree_Mapping(NUAGENOEUD * nf, int flag_convexe=0);                            // SUPPOSE NON CONVEXE PAR DEFAUT
         inline int operator[](int i) const {return resultat_mapping[i];}                   // Renvoie la valeur mappé, si le mapping a été fait, sinon, n'importe quoi
-        inline vector<int> & Get_Mapping() {return resultat_mapping;}                        // Renvoie le vector contenant le mapping
+        inline std::vector<int> & Get_Mapping() {return resultat_mapping;}                        // Renvoie le vector contenant le mapping
         inline int Get_Noeud_Le_Plus_Proche(int i) const {return point_le_plus_proche[i];} // Invoque la méthode de d-Tree qui donne le noeud le plus proche
         inline int Exist_dTree() const {return (my_dTree);}                                // Teste si le dTree existe
         void affiche()
@@ -107,8 +107,8 @@ _TEMPLATE_ void _MAPPING_::Cree_Mapping(int flag_convexe)
                 int nbr_noeuds=noeuds_front->SIZE();
                 int num_maille_depart;
                 int nma=0;
-                resultat_mapping     = vector<int>(nbr_noeuds,MED_EN::MED_UNDEFINED);
-                point_le_plus_proche = vector<int>(nbr_noeuds,MED_EN::MED_UNDEFINED);
+                resultat_mapping     = std::vector<int>(nbr_noeuds,MED_EN::MED_UNDEFINED);
+                point_le_plus_proche = std::vector<int>(nbr_noeuds,MED_EN::MED_UNDEFINED);
         
                 // noeuds_back->affiche();
                 
@@ -153,7 +153,7 @@ _TEMPLATE_ _MAPPING_::Mapping(MAILLAGE * mb,NUAGENOEUD * nb,NUAGENOEUD * nf):mai
                 cout<<"MAPPING : VERIFICATION REDONDANCES DANS NUAGE NOEUD BACK"<<endl;
                 noeuds_back->affiche();
                 int i,j;                
-                vector<int> redondance(nnb,0);
+                std::vector<int> redondance(nnb,0);
                 for (i=0;i<nnb;i++) 
                         {
                         for (j=i+1;j<nnb;j++) if ((*noeuds_back)[i]==(*noeuds_back)[j]) 
@@ -179,7 +179,7 @@ _TEMPLATE_ _MAPPING_::Mapping(MAILLAGE * mb,NUAGENOEUD * nb,NUAGENOEUD * nf):mai
 // etat_face[i] =  1 si le point est extérieur via la face i et que le voisin i existe
 _TEMPLATE_ int _MAPPING_::Donne_Directions(int num_maille,const NOEUD &n,int etat_face[NBR_FACES_MAX])
         {
-        vector<double> ef=CB->Donne_Pseudo_Coord_Baryc(num_maille,n);
+        std::vector<double> ef=CB->Donne_Pseudo_Coord_Baryc(num_maille,n);
         int etat_int=MED_EN::MED_VRAI;
         int etat_ext_bord=MED_EN::MED_FAUX;
         int tf,tv,tb;

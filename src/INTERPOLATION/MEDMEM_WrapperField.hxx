@@ -184,11 +184,11 @@ template <class TYPE> double Valeur<TYPE>::NormeAbs()
   return tmp;
 }
 
-template <class TYPE> ostream &operator<<(ostream &os,Valeur<TYPE> v)
+template <class TYPE> std::ostream &operator<<(std::ostream &os,Valeur<TYPE> v)
         {       
-        os<<"("<<flush;
-        for (int i=0;i<v.SIZE();i++) os<<" "<<v[i]<<flush;
-        os<<" ) "<<flush;
+        os<<"("<<std::flush;
+        for (int i=0;i<v.SIZE();i++) os<<" "<<v[i]<<std::flush;
+        os<<" ) "<<std::flush;
         return os;
         }
 
@@ -225,12 +225,12 @@ public :
         double * Get_Valeurs() {return valeurs;}
         inline int Get_Nbr_Valeurs() const {return nbr_valeurs;}
         inline int Get_Nbr_Composantes() const {return nbr_composantes;}
-        friend ostream & operator<<(ostream &os, Wrapper_MED_Field);
+        friend std::ostream & operator<<(std::ostream &os, Wrapper_MED_Field);
 }; 
 
-inline ostream & operator<<(ostream &os, Wrapper_MED_Field wmf)
+inline std::ostream & operator<<(std::ostream &os, Wrapper_MED_Field wmf)
 {
-for (int i=0;i<wmf.nbr_valeurs;i++) os<<"Wrapper_MED_Field["<<i<<"] = "<<wmf[i]<<endl;
+for (int i=0;i<wmf.nbr_valeurs;i++) os<<"Wrapper_MED_Field["<<i<<"] = "<<wmf[i]<<std::endl;
 return os;
 }
 

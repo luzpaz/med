@@ -26,8 +26,6 @@
 #include <list>
 #include "MEDMEM_InterpolationHighLevelObjects.hxx"
 
-using namespace std;
-
 #define affiche(NOEUD) cout<<flush;for (int iii=0;iii<DIMENSION;iii++) cout<<NOEUD[iii]<<" "<<flush;
 
 int main (void) 
@@ -55,49 +53,49 @@ double * tmp1, * tmp2;
 
 for (i=0;i<NBR_NOEUDS;i++)
         {
-        cout<<"Noeud["<<i<<"] = ";
+        std::cout<<"Noeud["<<i<<"] = ";
         tmp1=&noeuds[DIMENSION*i];
         affiche(tmp1);
-        cout<<endl;
+        std::cout<<std::endl;
         }
 
 Meta_dTree<DIMENSION> Octree(NBR_NOEUDS,noeuds);
 
 for (i=0;i<NBR_INC;i++)
         {
-        cout<<"Noeud le plus proche de ";
+        std::cout<<"Noeud le plus proche de ";
         tmp1=&noeuds_inconnus[DIMENSION*i];
         affiche(tmp1);
-        cout<<" : ";
+        std::cout<<" : ";
         tmp2=&noeuds[DIMENSION*Octree.trouve_plus_proche_point(tmp1)];
         affiche(tmp2);
-        cout<<" ; Vérification par méthode bourrin : ";
+        std::cout<<" ; Vérification par méthode bourrin : ";
         tmp2=&noeuds[DIMENSION*Octree.trouve_plus_proche_point_bourrin(tmp1)];
         affiche(tmp2);
-        cout<<endl;
+        std::cout<<std::endl;
         }
 
  for (i=0;i<NBR_INC;i++)
  {
-   cout<<"****************"<<endl <<"Nodes close to ";
+   std::cout<<"****************"<<std::endl <<"Nodes close to ";
    tmp1=&noeuds_inconnus[DIMENSION*i];
    affiche(tmp1);
-   cout << endl;
+   std::cout << std::endl;
    for ( double toler = 0.3; toler < 3.5; toler+=0.5 )
    {
-     list<int> close;
+     std::list<int> close;
      int nb = Octree.get_all_close( tmp1, toler, close );
-     cout << "With tolerance " << toler << " - " << nb << endl;
-     list<int>::iterator n = close.begin();
+     std::cout << "With tolerance " << toler << " - " << nb << std::endl;
+     std::list<int>::iterator n = close.begin();
      while ( n != close.end() ) {
        int node = *n++;
        tmp2=&noeuds[DIMENSION*node];
-       cout<<"\t"<< node << " : ";
+       std::cout<<"\t"<< node << " : ";
         affiche(tmp2);
         double dist = 0;
         for ( int dim = 0; dim < DIMENSION; ++dim )
           dist += ( tmp1[dim] - tmp2[dim] ) * ( tmp1[dim] - tmp2[dim] );
-        cout << "\t distance: " << sqrt( dist ) << endl;
+        std::cout << "\t distance: " << sqrt( dist ) << std::endl;
      }
      if ( nb == NBR_NOEUDS )
        break; // no sens in increase toler as all nodes found

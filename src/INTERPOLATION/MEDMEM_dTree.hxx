@@ -101,7 +101,7 @@ protected :
         NUAGENOEUD * nuage;
         Ptr_dTree descendant[nbr_descendants];
         // numéro des noeuds contenus
-        vector<int> * noeud_contenu;
+        std::vector<int> * noeud_contenu;
         int etat;
         int niveau;
         dTree * pere;
@@ -120,7 +120,7 @@ public :
         dTree(const dTree &F);
         ~dTree();
         // Renvoie les numéros de noeuds contenus dans le dTree
-        void Get_Noeuds_Filtre(vector<int> &tmp);
+        void Get_Noeuds_Filtre(std::vector<int> &tmp);
         // renvoie les extrémités
         Sommet_dTree<DIMENSION> Get_Max() const;
         Sommet_dTree<DIMENSION> Get_Min() const;
@@ -152,7 +152,7 @@ public :
         int Get_Profondeur_Max() const;
 
         // return numbers of nodes close to P within tolerance d
-        int get_all_close(NOEUD P, double d, list<int> & closeNumbers) const;
+        int get_all_close(NOEUD P, double d, std::list<int> & closeNumbers) const;
 };
 
 
@@ -192,7 +192,7 @@ _TEMPLATE_ _DTREE_::dTree(NUAGENOEUD *n)
         init();
         nuage=n;
         etat=DTREE_RACINE;
-        noeud_contenu=new vector<int>(nuage->size());
+        noeud_contenu=new std::vector<int>(nuage->size());
         niveau=0;
         
         // calcule les extrémités du dTree pere
@@ -237,7 +237,7 @@ _TEMPLATE_ _DTREE_::dTree(const Sommet_dTree<DIMENSION> &A,const Sommet_dTree<DI
                 
                 etat=DTREE_COURANT;
                 
-                noeud_contenu=new vector<int>;
+                noeud_contenu=new std::vector<int>;
                 noeud_contenu->reserve((pere->noeud_contenu->size())/nbr_descendants);
                 
                 for (i=0;i<DIMENSION;i++)
@@ -294,7 +294,7 @@ _TEMPLATE_ _DTREE_::~dTree()
                 delete descendant[i];
                 }
         }
-_TEMPLATE_ void _DTREE_::Get_Noeuds_Filtre(vector<int> &tmp)
+_TEMPLATE_ void _DTREE_::Get_Noeuds_Filtre(std::vector<int> &tmp)
         {
         int i;
         switch (etat)
@@ -685,7 +685,7 @@ _TEMPLATE_ int _DTREE_::Get_Profondeur_Max() const
         }
 
 // return numbers of nodes close to P within tolerance d
-_TEMPLATE_ int _DTREE_::get_all_close(NOEUD P, double d, list<int> & closeNumbers) const
+_TEMPLATE_ int _DTREE_::get_all_close(NOEUD P, double d, std::list<int> & closeNumbers) const
 {
   int i, nbAdded = 0;
   if (Localise_Point(P,d))

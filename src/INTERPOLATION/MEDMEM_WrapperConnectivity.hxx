@@ -45,8 +45,8 @@ class Wrapper_Med_Connectivity
 protected :
         int * mailles;
         int nbr_mailles;
-        vector<int> types;
-        vector< int* > premier_pointeur;
+        std::vector<int> types;
+        std::vector< int* > premier_pointeur;
         
 public :        
         ~Wrapper_Med_Connectivity() {if (mailles) delete [] mailles;}

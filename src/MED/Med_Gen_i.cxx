@@ -57,7 +57,6 @@
 
 #include <HDFascii.hxx>
 
-using namespace std;
 using namespace MEDMEM;
 
 // Initialisation des variables statiques

@@ -72,7 +72,7 @@ _TEMPLATE_ class Calcul_Hybride
 {
 protected :
         NUAGEMAILLE * mailles;
-        map<int,Calcul_Interpolation<_PARAM_> *> fonctions;
+        std::map<int,Calcul_Interpolation<_PARAM_> *> fonctions;
 public : 
         Calcul_Hybride():mailles(NULL) {}
         Calcul_Hybride(NUAGENOEUD * nn,NUAGEMAILLE * nm,CHAMP * c);
