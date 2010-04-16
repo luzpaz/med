@@ -44,4 +44,9 @@
  #define MEDMEM_EXPORT
 #endif
 
+#ifdef WNT
+#pragma warning(disable:4251) // Warning DLL Interface ...
+#pragma warning(disable:4290) // Warning Exception ...
+#endif
+
 #endif
