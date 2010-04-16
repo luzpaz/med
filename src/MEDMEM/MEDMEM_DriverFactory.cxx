@@ -19,6 +19,12 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+#ifdef WNT
+// This file must be included first otherwise there is a conflict
+// with the symbol GROUP after when compiling the xdr support ...
+#include <winsock2.h> 
+#endif
+
 #include "MEDMEM_DriverFactory.hxx"
 #include "MEDMEM_MedMedDriver.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"

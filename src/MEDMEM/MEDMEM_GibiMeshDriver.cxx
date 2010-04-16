@@ -222,9 +222,15 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
     PILE_SOUS_MAILLAGE=1,
     PILE_NODES_FIELD  =2,
     PILE_TABLES       =10,
+    PILE_LREEL        =18,
+    PILE_LOGIQUES     =24,
+    PILE_FLOATS       =25,
+    PILE_INTEGERS     =26,
     PILE_STRINGS      =27,
+    PILE_LMOTS        =29,
     PILE_NOEUDS       =32,
     PILE_COORDONNEES  =33,
+    PILE_MODL         =38,
     PILE_FIELD        =39,
     PILE_LAST_READABLE=39
   };
@@ -232,9 +238,15 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
     PILE_SOUS_MAILLAGE,
     PILE_NODES_FIELD,
     PILE_TABLES,
+    PILE_LREEL,
+    PILE_LOGIQUES,
+    PILE_FLOATS,
+    PILE_INTEGERS,
     PILE_STRINGS,
+    PILE_LMOTS,
     PILE_NOEUDS,
     PILE_COORDONNEES,
+    PILE_MODL,
     PILE_FIELD,
     PILE_LAST_READABLE
   };
@@ -1083,6 +1095,14 @@ GIBI_MESH_RDONLY_DRIVER::~GIBI_MESH_RDONLY_DRIVER()
   BEGIN_OF_MED(LOC);
   if (_File >= 0)
   {
+#ifdef HAS_XDR
+    if(_is_xdr)
+      {
+        xdr_destroy(_xdrs);
+        free(_xdrs);
+        fclose(_xdrs_file);
+      }
+#endif
     ::close (_File);
     if (_start != 0L)
       delete [] _start;
@@ -1134,6 +1154,43 @@ void GIBI_MESH_RDONLY_DRIVER::open()
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Could not open file "<<_fileName
                                  << " fd: " << _File));
   }
+
+  // xdr
+  
+#ifdef HAS_XDR
+  _is_xdr = false;
+  _xdrs_file = fdopen(_File, "r");
+  _xdrs = (XDR *)malloc(sizeof(XDR));
+  
+  xdrstdio_create(_xdrs, _xdrs_file, XDR_DECODE);
+  
+  const int maxsize = 10;
+  char icha[maxsize+1];
+  char *icha2=icha;
+  bool_t xdr_test = xdr_string(_xdrs, &icha2, maxsize);
+  if(xdr_test)
+    {
+      icha[maxsize] = '\0';
+      if(!strcmp(icha, "CASTEM XDR"))
+        {
+          _is_xdr = true;
+        }
+    }
+  
+  if(! _is_xdr)
+    {
+      xdr_destroy(_xdrs);
+      free(_xdrs);
+      fclose(_xdrs_file);
+      ::close (_File);
+#ifdef WNT
+      _File = ::_open (_fileName.c_str(), _O_RDONLY|_O_BINARY);
+#else
+      _File = ::open (_fileName.c_str(), O_RDONLY);
+#endif
+    }
+#endif
+  
   END_OF_MED(LOC);
 }
 
@@ -1148,6 +1205,14 @@ void GIBI_MESH_RDONLY_DRIVER::close()
   BEGIN_OF_MED(LOC);
   if ( _status == MED_OPENED) {
     if (_File >= 0) {
+#ifdef HAS_XDR
+      if(_is_xdr)
+        {
+          xdr_destroy(_xdrs);
+          free(_xdrs);
+          fclose(_xdrs_file);
+        }
+#endif
       ::close (_File);
       if (_start != 0L)
         delete [] _start;
@@ -1165,6 +1230,9 @@ void GIBI_MESH_RDONLY_DRIVER::close()
 
 bool GIBI_MESH_RDONLY_DRIVER::getLine(char* & aLine)
 {
+#ifdef HAS_XDR
+  if (_is_xdr) return true;
+#endif
   bool aResult = true;
   // Check the state of the buffer;
   // if there is too little left, read the next portion of data
@@ -1225,6 +1293,19 @@ bool GIBI_MESH_RDONLY_DRIVER::getLine(char* & aLine)
 
 void GIBI_MESH_RDONLY_DRIVER::initNameReading(int nbValues, int width)
 {
+#ifdef HAS_XDR
+  if(_is_xdr)
+    {
+      _xdr_kind = _xdr_kind_char;
+      if(nbValues)
+        {
+          unsigned int nels = nbValues*width;
+          _xdr_cvals = (char*)malloc((nels+1)*sizeof(char));
+          xdr_string(_xdrs, &_xdr_cvals, nels);
+          _xdr_cvals[nels] = '\0';
+        }
+    }
+#endif
   init( nbValues, 72 / ( width + 1 ), width, 1 );
 }
 
@@ -1235,6 +1316,19 @@ void GIBI_MESH_RDONLY_DRIVER::initNameReading(int nbValues, int width)
 
 void GIBI_MESH_RDONLY_DRIVER::initIntReading(int nbValues)
 {
+#ifdef HAS_XDR
+  if(_is_xdr)
+    {
+      _xdr_kind = _xdr_kind_int;
+      if(nbValues)
+        {
+          unsigned int nels = nbValues;
+          unsigned int actual_nels;
+          _xdr_ivals = (int*)malloc(nels*sizeof(int));
+          xdr_array(_xdrs, (char **)&_xdr_ivals, &actual_nels, nels, sizeof(int), (xdrproc_t)xdr_int);
+        }
+    }
+#endif
   init( nbValues, 10, 8 );
 }
 
@@ -1245,6 +1339,19 @@ void GIBI_MESH_RDONLY_DRIVER::initIntReading(int nbValues)
 
 void GIBI_MESH_RDONLY_DRIVER::initDoubleReading(int nbValues)
 {
+#ifdef HAS_XDR
+  if(_is_xdr)
+    {
+      _xdr_kind = _xdr_kind_double;
+      if(nbValues)
+        {
+          unsigned int nels = nbValues;
+          unsigned int actual_nels;
+          _xdr_dvals = (double*)malloc(nels*sizeof(double));
+          xdr_array(_xdrs, (char **)&_xdr_dvals, &actual_nels, nels, sizeof(double), (xdrproc_t)xdr_double);
+        }
+    }
+#endif
   init( nbValues, 3, 22 );
 }
 
@@ -1255,6 +1362,17 @@ void GIBI_MESH_RDONLY_DRIVER::initDoubleReading(int nbValues)
 
 void GIBI_MESH_RDONLY_DRIVER::init( int nbToRead, int nbPosInLine, int width, int shift )
 {
+#ifdef HAS_XDR
+  if(_is_xdr)
+    {
+      if(_iRead < _nbToRead)
+        {
+          cout << "_iRead, _nbToRead : " << _iRead << " " << _nbToRead << endl;
+          cout << "Unfinished iteration before new one !" << endl;
+          throw MEDEXCEPTION("Unfinished iteration before new one !");
+        }
+    }
+#endif
   _nbToRead = nbToRead;
   _nbPosInLine = nbPosInLine;
   _width = width;
@@ -1266,6 +1384,28 @@ void GIBI_MESH_RDONLY_DRIVER::init( int nbToRead, int nbPosInLine, int width, in
   }
   else
     _curPos = 0;
+#ifdef HAS_XDR
+  if(_is_xdr && (_xdr_kind == _xdr_kind_char))
+    _curPos = _xdr_cvals;
+#endif
+}
+
+//=======================================================================
+//function : more
+//purpose  :
+//=======================================================================
+
+bool GIBI_MESH_RDONLY_DRIVER::more() const
+{
+  bool result = false;
+  if(_iRead < _nbToRead)
+    {
+      if(_curPos) result = true;
+#ifdef HAS_XDR
+      if(_is_xdr) result = true;
+#endif
+    }
+  return result;
 }
 
 //=======================================================================
@@ -1286,9 +1426,26 @@ void GIBI_MESH_RDONLY_DRIVER::next()
     }
     else
       _curPos = _curPos + _width + _shift;
+#ifdef HAS_XDR
+    if(_is_xdr && (_xdr_kind == _xdr_kind_char))
+      {
+        _curPos = _xdr_cvals + _iRead*_width;
+      }
+#endif
   }
   else
-    _curPos = 0;
+    {
+#ifdef HAS_XDR
+      if(_is_xdr)
+        {
+          if(_xdr_kind == _xdr_kind_char) free(_xdr_cvals);
+          if(_xdr_kind == _xdr_kind_int) free(_xdr_ivals);
+          if(_xdr_kind == _xdr_kind_double) free(_xdr_dvals);
+          _xdr_kind = _xdr_kind_null;
+        }
+#endif
+      _curPos = 0;
+    }
 }
 
 //=======================================================================
@@ -1311,7 +1468,40 @@ string GIBI_MESH_RDONLY_DRIVER::getName() const
 
 int GIBI_MESH_RDONLY_DRIVER::getInt() const
 {
+#ifdef HAS_XDR
+  if(_is_xdr)
+    {
+      if(_iRead < _nbToRead)
+        {
+          return _xdr_ivals[_iRead];
+        }
+      else
+        {
+          int result;
+          xdr_int(_xdrs, &result);
+          return result;
+        }
+    }
+#endif
   return atoi(str());
+}
+
+//=======================================================================
+//function : getFloat
+//purpose  : float reading
+//=======================================================================
+
+float GIBI_MESH_RDONLY_DRIVER::getFloat() const
+{
+#ifdef HAS_XDR
+  if(_is_xdr)
+    {
+      float result;
+      xdr_float(_xdrs, &result);
+      return result;
+    }
+#endif
+  return getDouble();
 }
 
 //=======================================================================
@@ -1321,6 +1511,22 @@ int GIBI_MESH_RDONLY_DRIVER::getInt() const
 
 double GIBI_MESH_RDONLY_DRIVER::getDouble() const
 {
+#ifdef HAS_XDR
+  if(_is_xdr)
+    {
+      if(_iRead < _nbToRead)
+        {
+          return _xdr_dvals[_iRead];
+        }
+      else
+        {
+          double result;
+          xdr_double(_xdrs, &result);
+          return result;
+        }
+    }
+#endif
+  
   //return atof(str());
 
   std::string aStr (str());
