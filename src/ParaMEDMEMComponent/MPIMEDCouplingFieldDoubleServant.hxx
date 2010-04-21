@@ -31,7 +31,7 @@ void * th_getdatabympi(void *st);
 
 namespace ParaMEDMEM
 {
-  class MPIMEDCouplingFieldDoubleServant : public POA_SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface,
+  class MPIMEDCouplingFieldDoubleServant : public virtual POA_SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface,
                                            public ParaMEDCouplingFieldDoubleServant
   {
   public:

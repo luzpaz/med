@@ -63,7 +63,7 @@ typedef struct
 
 namespace ParaMEDMEM
 {
-  class ParaMEDMEMComponent_i : public POA_SALOME_MED::ParaMEDMEMComponent, public Engines_Component_i, public MPIObject_i
+  class ParaMEDMEMComponent_i : public virtual POA_SALOME_MED::ParaMEDMEMComponent, public Engines_Component_i, public MPIObject_i
   {
 
   public:

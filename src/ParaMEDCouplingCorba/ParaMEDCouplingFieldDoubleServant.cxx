@@ -23,7 +23,7 @@
 #include "utilities.h"
 using namespace ParaMEDMEM;
 
-ParaMEDCouplingFieldDoubleServant::ParaMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,MEDCouplingFieldDouble* field):MEDCouplingFieldDoubleServant(field),MPIObject_i()
+ParaMEDCouplingFieldDoubleServant::ParaMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,MEDCouplingFieldDouble* field):MEDCouplingFieldDoubleServant(field)
 {
   Engines::MPIObject_var pobj = POA_SALOME_MED::ParaMEDCouplingFieldDoubleCorbaInterface::_this();
   BCastIOR(orb,pobj,false);

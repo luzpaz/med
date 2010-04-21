@@ -30,7 +30,7 @@
 
 namespace ParaMEDMEM
 {
-  class ParaMEDCouplingFieldDoubleServant : public POA_SALOME_MED::ParaMEDCouplingFieldDoubleCorbaInterface,
+  class ParaMEDCouplingFieldDoubleServant : public virtual POA_SALOME_MED::ParaMEDCouplingFieldDoubleCorbaInterface,
                                             public MEDCouplingFieldDoubleServant,
                                             public MPIObject_i
   {
