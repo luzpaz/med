@@ -55,7 +55,8 @@ if test "$WITHMPICH" = yes; then
   CPPFLAGS="$CPPFLAGS_old"
 
   if test "$WITHMPICH" = "yes";then
-     MPI_LIBS="$MPI_LIBS -lmpich -lpmpich"
+     #MPI_LIBS="$MPI_LIBS -lmpich -lpmpich"
+     MPI_LIBS="$MPI_LIBS -lmpich"
   fi
 
   if test "$WITHMPICH" = "yes";then
