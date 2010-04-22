@@ -275,7 +275,8 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
       continue; // "ENREGISTREMENT DE TYPE" non trouvé -> on lit la ligne suivante
 
     // lecture du numéro d'enregistrement
-    int numero_enregistrement = atoi( ligne + strlen(enregistrement_type) + 1 );
+    int numero_enregistrement;
+    numero_enregistrement = atoi( ligne + strlen(enregistrement_type) + 1 );
 
     enum { ENREG_TYPE_2=2, ENREG_TYPE_4=4}; // énumération des types d'enregistrement traités
     int numero_pile, nb_objets_nommes, nb_objets, nb_indices;
@@ -495,7 +496,8 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
       else if ( numero_pile == PILE_COORDONNEES )// PILE NUMERO  33
       {
         getNextLine( ligne );
-        unsigned nb_reels = atoi( ligne );
+        unsigned nb_reels;
+        nb_reels = atoi( ligne );
         // PROVISOIRE : certains fichier gibi n`ont
         if (nb_reels < numero_noeuds.size()*(space_dimension)) {
           INFOS_MED("Erreur de lecture dans enregistrement de pile " <<
@@ -854,7 +856,8 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
           // read tables "MED_MAIL", "MED_CHAM" and "MED_COMP", that keeps correspondence
           // between GIBI names (8 symbols) and MED names (possibly longer)
           getNextLine( ligne );
-          int nb_table_vals = atoi( ligne );
+          int nb_table_vals;
+          nb_table_vals = atoi( ligne );
           if (nb_table_vals < 0) {
             INFOS_MED("Erreur de lecture dans enregistrement de pile " <<
                       PILE_TABLES << DUMP_LINE_NB );
