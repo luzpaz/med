@@ -280,7 +280,7 @@ void MESHING::setNumberOfTypes(const int NumberOfTypes,
       if (3 == getSpaceDimension()) {
         if (3 == getMeshDimension() && !_connectivity->existConnectivity(MED_NODAL,MED_FACE))
           throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity on MED_FACE defined !"));
-        if (2 != getMeshDimension())
+        if (2 > getMeshDimension())
           throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Could not set connectivity on MED_EDGE !"));
       } else {
         if (2 != getSpaceDimension())
