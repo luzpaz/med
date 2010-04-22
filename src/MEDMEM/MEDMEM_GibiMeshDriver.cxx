@@ -577,16 +577,11 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         {
           if(_is_xdr)
             {
-              unsigned int nels = 1;
-              unsigned int actual_nels;
-              int vals[nels];
-              int *vals2 = vals;
-              bool_t xdr_test;
-              xdr_test = xdr_array(_xdrs, (char **)&vals2, &actual_nels, nels, sizeof(int), (xdrproc_t)xdr_int);
-              nels = vals[0];
-              int *ivals = (int*)malloc(nels*sizeof(int));
-              xdr_test = xdr_array(_xdrs, (char **)&ivals, &actual_nels, nels, sizeof(int), (xdrproc_t)xdr_int);
-              free(ivals);
+              initIntReading(1);
+              int nb_vals = getInt();
+              next();
+              initIntReading(nb_vals);
+              for(i=0; i<nb_vals; i++) next();
             }
         } // Fin case pile 24
       
@@ -597,16 +592,11 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         {
           if(_is_xdr)
             {
-              unsigned int nels = 1;
-              unsigned int actual_nels;
-              int vals[nels];
-              int *vals2 = vals;
-              bool_t xdr_test;
-              xdr_test = xdr_array(_xdrs, (char **)&vals2, &actual_nels, nels, sizeof(int), (xdrproc_t)xdr_int);
-              nels = vals[0];
-              double *dvals = (double*)malloc(nels*sizeof(double));
-              xdr_test = xdr_array(_xdrs, (char **)&dvals, &actual_nels, nels, sizeof(double), (xdrproc_t)xdr_double);
-              free(dvals);
+              initIntReading(1);
+              int nb_vals = getInt();
+              next();
+              initDoubleReading(nb_vals);
+              for(i=0; i<nb_vals; i++) next();
             }
         } // Fin case pile 25
       
@@ -617,16 +607,11 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         {
           if(_is_xdr)
             {
-              unsigned int nels = 1;
-              unsigned int actual_nels;
-              int vals[nels];
-              int *vals2 = vals;
-              bool_t xdr_test;
-              xdr_test = xdr_array(_xdrs, (char **)&vals2, &actual_nels, nels, sizeof(int), (xdrproc_t)xdr_int);
-              nels = vals[0];
-              int *ivals = (int*)malloc(nels*sizeof(int));
-              xdr_test = xdr_array(_xdrs, (char **)&ivals, &actual_nels, nels, sizeof(int), (xdrproc_t)xdr_int);
-              free(ivals);
+              initIntReading(1);
+              int nb_vals = getInt();
+              next();
+              initIntReading(nb_vals);
+              for(i=0; i<nb_vals; i++) next();
             }
         } // Fin case pile 26
       
