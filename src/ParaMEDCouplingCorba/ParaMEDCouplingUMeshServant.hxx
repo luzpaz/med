@@ -29,7 +29,7 @@
 
 namespace ParaMEDMEM
 {
-  class ParaMEDCouplingUMeshServant : public POA_SALOME_MED::ParaMEDCouplingUMeshCorbaInterface,
+  class ParaMEDCouplingUMeshServant : public virtual POA_SALOME_MED::ParaMEDCouplingUMeshCorbaInterface,
                                       public MEDCouplingUMeshServant,
                                       public MPIObject_i
   {
