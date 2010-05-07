@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 //  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 //  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -19,6 +19,7 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 /*
   File MEDMEM_Meshing.cxx
   $Header$
@@ -234,7 +235,7 @@ void MESHING::setCoordinateUnit(const string unit, const int i)
 
 /*! 
  \addtogroup MESHING_connectivity
- @{ 
+ @{
 */
 
 /*!
@@ -249,7 +250,7 @@ void MESHING::setCoordinateUnit(const string unit, const int i)
   MED_FACE connectivity before MED_CELL).
 */
 void MESHING::setNumberOfTypes(const int NumberOfTypes,
-                                                                                                                         const MED_EN::medEntityMesh Entity) 
+                               const MED_EN::medEntityMesh Entity) 
   throw (MEDEXCEPTION)
 {
   const char * LOC = "MESHING::setNumberOfTypes( medEntityMesh ) : ";
@@ -260,8 +261,8 @@ void MESHING::setNumberOfTypes(const int NumberOfTypes,
 
   if (MED_CELL == Entity) {
     SCRUTE_MED(_connectivity);
-//     if (_connectivity != (CONNECTIVITY *) NULL)
-//       delete _connectivity ;
+    //     if (_connectivity != (CONNECTIVITY *) NULL)
+    //       delete _connectivity ;
     _connectivity = new CONNECTIVITY(NumberOfTypes,Entity) ;
 
     _connectivity->setNumberOfNodes( _numberOfNodes );
@@ -274,11 +275,13 @@ void MESHING::setNumberOfTypes(const int NumberOfTypes,
     if (MED_FACE == Entity)
       if (3 != getSpaceDimension())
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity on MED_FACE could be defined in non 3D space !"));
-    
+
     if (MED_EDGE == Entity)
       if (3 == getSpaceDimension()) {
-        if (!_connectivity->existConnectivity(MED_NODAL,MED_FACE))
+        if (3 == getMeshDimension() && !_connectivity->existConnectivity(MED_NODAL,MED_FACE))
           throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity on MED_FACE defined !"));
+        if (2 > getMeshDimension())
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Could not set connectivity on MED_EDGE !"));
       } else {
         if (2 != getSpaceDimension())
           throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Could not set connectivity on MED_EDGE !"));

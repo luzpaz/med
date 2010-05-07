@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 //  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 //  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 
 #include <algorithm>
 #include <queue>
@@ -268,29 +269,80 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
   vector<_fieldBase*> node_fields;
   vector<_fieldBase*> cell_fields;
 
+#ifdef HAS_XDR
+  if ( _is_xdr)
+    {
+      _iRead = 0;
+      _nbToRead = 0;
+    }
+#endif
+
   while ( getNextLine(ligne, false)) // boucle externe de recherche de "ENREGISTREMENT DE TYPE"
   {
-    if ( !GIBI_EQUAL( ligne, enregistrement_type ))
-      continue; // "ENREGISTREMENT DE TYPE" non trouvé -> on lit la ligne suivante
+#ifdef HAS_XDR
+    if ( !_is_xdr)
+#endif
+      if ( !GIBI_EQUAL( ligne, enregistrement_type ))
+        continue; // "ENREGISTREMENT DE TYPE" non trouvé -> on lit la ligne suivante
 
     // lecture du numéro d'enregistrement
-    int numero_enregistrement = atoi( ligne + strlen(enregistrement_type) + 1 );
+    int numero_enregistrement;
+#ifdef HAS_XDR
+    if(_is_xdr)
+      numero_enregistrement = getInt();
+    else
+#endif
+      numero_enregistrement = atoi( ligne + strlen(enregistrement_type) + 1 );
 
     enum { ENREG_TYPE_2=2, ENREG_TYPE_4=4}; // énumération des types d'enregistrement traités
+#ifdef HAS_XDR
+    enum { ENREG_TYPE_5=5, ENREG_TYPE_7=7}; // (only for xdr)
+#endif
     int numero_pile, nb_objets_nommes, nb_objets, nb_indices;
     vector<int> indices_objets_nommes;
     vector<string> objets_nommes;
 
     if (numero_enregistrement == ENREG_TYPE_4)
     {
-      getNextLine(ligne);
-      const char* s = " NIVEAU  15 NIVEAU ERREUR   0 DIMENSION";
-      space_dimension = atoi( ligne + strlen( s ) + 1 );
-      if ( !GIBI_EQUAL( ligne, " NIVEAU" ) || space_dimension < 1 ) {
-        INFOS_MED( " Could not read file: syntax error in type 4 record" << DUMP_LINE_NB );
-        return false;
-      }
+#ifdef HAS_XDR
+      if(_is_xdr)
+        {
+          getInt(); // skip NIVEAU
+          getInt(); // skip ERREUR
+          space_dimension = getInt();
+          getFloat(); // skip DENSITE
+        }
+      else
+        {
+#endif
+          getNextLine(ligne);
+          const char* s = " NIVEAU  15 NIVEAU ERREUR   0 DIMENSION";
+          space_dimension = atoi( ligne + strlen( s ) + 1 );
+          if ( !GIBI_EQUAL( ligne, " NIVEAU" ) || space_dimension < 1 ) {
+            INFOS_MED( " Could not read file: syntax error in type 4 record" << DUMP_LINE_NB );
+            return false;
+          }
+#ifdef HAS_XDR
+        }
+#endif
     }
+#ifdef HAS_XDR
+    else if (numero_enregistrement == ENREG_TYPE_7)
+    {
+      if(_is_xdr)
+        {
+          getInt(); // skip NOMBRE INFO CASTEM2000
+          getInt(); // skip IFOUR
+          getInt(); // skip NIFOUR
+          getInt(); // skip IFOMOD
+          getInt(); // skip IECHO
+          getInt(); // skip IIMPI
+          getInt(); // skip IOSPI
+          getInt(); // skip ISOTYP
+          getInt(); // skip NSDPGE
+        }
+    }
+#endif
     else if (numero_enregistrement == ENREG_TYPE_2 )
     {
       if ( space_dimension == 0 ) {
@@ -299,17 +351,31 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
       }
       // FORMAT(' PILE NUMERO',I4,'NBRE OBJETS NOMMES',I8,'NBRE OBJETS',I8)
       getNextLine(ligne);
-      const char *s1 = " PILE NUMERO", *s2 = "NBRE OBJETS NOMMES", *s3 = "NBRE OBJETS";
-      if ( ! GIBI_EQUAL( ligne, s1 ) ) {
-        INFOS_MED( " Could not read file: error in type 2 record. " << ligne << DUMP_LINE_NB );
-        return false;
-      }
-      ligne = ligne + strlen(s1);
-      numero_pile = atoi( ligne );
-      ligne = ligne + 4 + strlen(s2);
-      nb_objets_nommes = atoi( ligne );
-      ligne = ligne + 8 + strlen(s3);
-      nb_objets = atoi( ligne );
+#ifdef HAS_XDR
+      if(_is_xdr)
+        {
+          initIntReading(3);
+          numero_pile = getInt(); next();
+          nb_objets_nommes = getInt(); next();
+          nb_objets = getInt(); next();
+        }
+      else
+        {
+#endif
+          const char *s1 = " PILE NUMERO", *s2 = "NBRE OBJETS NOMMES", *s3 = "NBRE OBJETS";
+          if ( ! GIBI_EQUAL( ligne, s1 ) ) {
+            INFOS_MED( " Could not read file: error in type 2 record. " << ligne << DUMP_LINE_NB );
+            return false;
+          }
+          ligne = ligne + strlen(s1);
+          numero_pile = atoi( ligne );
+          ligne = ligne + 4 + strlen(s2);
+          nb_objets_nommes = atoi( ligne );
+          ligne = ligne + 8 + strlen(s3);
+          nb_objets = atoi( ligne );
+#ifdef HAS_XDR
+        }
+#endif
       if ( nb_objets_nommes<0 || nb_objets<0  ) {
         INFOS_MED(" Could not read file: " << nb_objets << " " <<nb_objets_nommes << DUMP_LINE_NB );
         return false;
@@ -326,7 +392,18 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         if ( readable_Piles[ i ] == numero_pile )
           break;
       if ( readable_Piles[ i ] != numero_pile )
-        continue;
+#ifdef HAS_XDR
+        {
+          if(_is_xdr)
+            { 
+              cout << "XDR : NUMERO PILE " << numero_pile << " not implemented !!!" << endl ;
+              throw MEDEXCEPTION("XDR : NUMERO PILE not implemented !!!");
+            }
+#endif
+          continue;
+#ifdef HAS_XDR
+        }
+#endif
 
       // lecture des objets nommés et de leurs indices
       objets_nommes.resize(nb_objets_nommes);
@@ -361,6 +438,9 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
           unsigned nb_reference     = getInt(); next();
           unsigned nb_noeud         = getInt(); next();
           unsigned nb_elements      = getInt();
+#ifdef HAS_XDR
+          if(_is_xdr) next();
+#endif
 
           // le cas type_geom_castem=0 correspond aux maillages composites
           if (type_geom_castem<0) {
@@ -388,10 +468,22 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
           for ( i = 0; i < (int)nb_reference; i += 10 ) {// FORMAT(10I8)
             getNextLine(ligne);
           }
+#ifdef HAS_XDR
+          if(_is_xdr)
+            {
+              for (initIntReading(nb_reference); more(); next());
+            }
+#endif
           // lecture des couleurs (non utilisé pour MED)
           for ( i = 0; i < (int)nb_elements; i += 10 ) {
             getNextLine(ligne);
           }
+#ifdef HAS_XDR
+          if(_is_xdr)
+            {
+              for (initIntReading(nb_elements); more(); next());
+            }
+#endif
           // not a composit group
           if (type_geom_castem>0 && nb_sous_maillage==0)
           {
@@ -458,6 +550,143 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
 
       }// Fin case PILE_SOUS_MAILLAGE
 
+#ifdef HAS_XDR
+
+      // ---------------------------------
+      // ---------------------------------
+      
+      else if ( numero_pile == PILE_LREEL ) // PILE NUMERO  18
+        {
+          if(_is_xdr)
+            {
+              for (int objet=0; objet!=nb_objets; ++objet) // pour chaque groupe
+                {
+                  initIntReading(1);
+                  int nb_vals = getInt();
+                  next();
+                  initDoubleReading(nb_vals);
+                  for(i=0; i<nb_vals; i++) next();
+                }
+            }
+        } // Fin case pile 18
+      
+      // ---------------------------------
+      // ---------------------------------
+      
+      else if ( numero_pile == PILE_LOGIQUES ) // PILE NUMERO  24
+        {
+          if(_is_xdr)
+            {
+              initIntReading(1);
+              int nb_vals = getInt();
+              next();
+              initIntReading(nb_vals);
+              for(i=0; i<nb_vals; i++) next();
+            }
+        } // Fin case pile 24
+      
+      // ---------------------------------
+      // ---------------------------------
+      
+      else if ( numero_pile == PILE_FLOATS ) // PILE NUMERO  25
+        {
+          if(_is_xdr)
+            {
+              initIntReading(1);
+              int nb_vals = getInt();
+              next();
+              initDoubleReading(nb_vals);
+              for(i=0; i<nb_vals; i++) next();
+            }
+        } // Fin case pile 25
+      
+      // ---------------------------------
+      // ---------------------------------
+      
+      else if ( numero_pile == PILE_INTEGERS ) // PILE NUMERO  26
+        {
+          if(_is_xdr)
+            {
+              initIntReading(1);
+              int nb_vals = getInt();
+              next();
+              initIntReading(nb_vals);
+              for(i=0; i<nb_vals; i++) next();
+            }
+        } // Fin case pile 26
+      
+      // ---------------------------------
+      // ---------------------------------
+      
+      else if ( numero_pile == PILE_LMOTS ) // PILE NUMERO  29
+        {
+          if(_is_xdr)
+            {
+              for (int objet=0; objet!=nb_objets; ++objet) // pour chaque groupe
+                {
+                  initIntReading(2);
+                  int len = getInt();
+                  next();
+                  int nb_vals = getInt();
+                  next();
+                  int nb_char = len*nb_vals;
+                  int nb_char_tmp = 0;
+                  int fixed_length = 71;
+                  while (nb_char_tmp < nb_char)
+                    {
+                      int remain_len = nb_char - nb_char_tmp;
+                      int width;
+                      if ( remain_len > fixed_length )
+                        {
+                          width = fixed_length;
+                        }
+                      else
+                        {
+                          width = remain_len;
+                        }
+                      initNameReading(1, width);
+                      next();
+                      nb_char_tmp += width;
+                    }
+                }
+            }
+        } // Fin case pile 29
+      
+      // ---------------------------------
+      // ---------------------------------
+      
+      else if ( numero_pile == PILE_MODL ) // PILE NUMERO  38
+        {
+          if(_is_xdr)
+            {
+              for (int objet=0; objet!=nb_objets; ++objet) // pour chaque groupe
+                {
+                  // see wrmodl.eso
+                  initIntReading(10);
+                  int n1  = getInt() ; next();
+                  int nm2 = getInt() ; next();
+                  int nm3 = getInt() ; next();
+                  int nm4 = getInt() ; next();
+                  int nm5 = getInt() ; next();
+                  int n45 = getInt() ; next();
+                  int nm6 = getInt() ; next();
+                  int nm7 = getInt() ; next();
+                  next();
+                  next();
+                  int nm1 = n1 * n45;
+                  int nm9 = n1 * 16;
+                  for (initIntReading(nm1); more(); next());
+                  for (initIntReading(nm9); more(); next());
+                  for (initNameReading(nm5, 8); more(); next());
+                  for (initNameReading(nm2, 8); more(); next());
+                  for (initNameReading(nm3, 8); more(); next());
+                  for (initIntReading(nm4); more(); next());
+                }
+            }
+        } // Fin case pile 38
+
+#endif  // HAS_XDR
+      
       // ---------------------------------
       //                            NODES
       // ---------------------------------
@@ -466,7 +695,16 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
       {
         getNextLine( ligne );
         std::vector<int> place_noeuds;
-        nb_indices = atoi ( ligne );
+#ifdef HAS_XDR
+        if(_is_xdr) 
+          {
+            initIntReading(1);
+            nb_indices = getInt();
+            next();
+          }
+        else
+#endif
+          nb_indices = atoi ( ligne );
         if (nb_indices != nb_objets)
         {
           INFOS_MED("Erreur de lecture dans enregistrement de pile " <<
@@ -494,7 +732,17 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
       else if ( numero_pile == PILE_COORDONNEES )// PILE NUMERO  33
       {
         getNextLine( ligne );
-        unsigned nb_reels = atoi( ligne );
+        unsigned nb_reels;
+#ifdef HAS_XDR
+        if(_is_xdr) 
+          {
+            initIntReading(1);
+            nb_reels = getInt();
+            next();
+          }
+        else
+#endif
+          nb_reels = atoi( ligne );
         // PROVISOIRE : certains fichier gibi n`ont
         if (nb_reels < numero_noeuds.size()*(space_dimension)) {
           INFOS_MED("Erreur de lecture dans enregistrement de pile " <<
@@ -512,14 +760,33 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
           {
             for (unsigned j=0; j!=space_dimension; ++j, next())
               pIt->second.coord[j] = getDouble();
+#ifdef HAS_XDR
+            if(_is_xdr) getDouble(); // skip density
+#endif
             next(); // on ne conserve pas la densite
           }
           else // sinon, on passe au noeud suivant
           {
             for (unsigned j=0; j!=space_dimension+1; ++j)
-              next();
+#ifdef HAS_XDR
+              {
+                if(_is_xdr) getDouble(); // skip ...
+#endif
+                next();
+#ifdef HAS_XDR
+              }
+#endif
           }
         }
+#ifdef HAS_XDR
+        if(_is_xdr)
+          {
+            for(unsigned i=0; i!=nb_reels-numero_noeuds.size()*(space_dimension+1); ++i)
+              {
+                next(); // skip ...
+              }
+          }
+#endif
       }
 
       // ---------------------------------------
@@ -556,6 +823,9 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
           int i_comp, total_nb_comp = getInt(); next();
           next(); // ignore IFOUR
           int nb_attr = getInt();
+#ifdef HAS_XDR
+          if(_is_xdr) next();
+#endif
           if ( nb_sub < 0 || total_nb_comp < 0 || nb_attr < 0 ) {
             INFOS_MED("Error of field reading: wrong nb of components "
                   << nb_sub << " " << total_nb_comp << DUMP_LINE_NB);
@@ -611,8 +881,14 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
             ;
           // (5) TYPE ( ignored )
           getNextLine( ligne );
+#ifdef HAS_XDR
+          if(_is_xdr) for (initNameReading(1, 71); more(); next());
+#endif
           // (6) TITRE ( ignored )
           getNextLine( ligne );
+#ifdef HAS_XDR
+          if(_is_xdr) for (initNameReading(1, 71); more(); next());
+#endif
           // (7) attributes ( ignored )
           for ( initIntReading( nb_attr ); more(); next() )
             ;
@@ -689,18 +965,44 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
           }
           next(); next(); next(); // skip (1) <nb_sub> 2 6
           int title_length = getInt(); // <title length>
+#ifdef HAS_XDR
+          if(_is_xdr) next();
+#endif
           string description;
           if ( title_length ) {
-            getNextLine( ligne ); // (2) title
-            const int len = 72; // line length
-            // title is right justified
-            description = string(ligne + len - title_length, title_length);
+#ifdef HAS_XDR
+            if(_is_xdr)
+              {
+                initNameReading(1, title_length);
+                description = getName();
+                next();
+              }
+            else
+              {
+#endif
+                getNextLine( ligne ); // (2) title
+                const int len = 72; // line length
+                // title is right justified
+                description = string(ligne + len - title_length, title_length);
+              }
+#ifdef HAS_XDR
           }
+#endif
           // look for a line starting with '-' : <reference to support>
-          do {
-            initIntReading( nb_sub * 9 );
-          } while ( getInt() >= 0 );
-
+#ifdef HAS_XDR
+          if(_is_xdr)
+            {
+              initIntReading( nb_sub * 9 );
+            }
+          else
+            {
+#endif
+              do {
+                initIntReading( nb_sub * 9 );
+              } while ( getInt() >= 0 );
+#ifdef HAS_XDR
+            }
+#endif
           int total_nb_comp = 0;
           vector<int> support_ids( nb_sub ), nb_comp( nb_sub );
           for ( i_sub = 0; i_sub < nb_sub; ++i_sub )
@@ -775,9 +1077,17 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
             for ( int i_comp = 0; i_comp < nb_comp[ i_sub ]; ++i_comp )
             {
               // (9) nb of values
+#ifdef HAS_XDR
+              if(_is_xdr) initIntReading( 4 );
+              else        initIntReading( 2 );
+#else
               initIntReading( 2 );
+#endif
               int nb_val_by_elem = getInt(); next();
               int nb_values      = getInt();
+#ifdef HAS_XDR
+              if(_is_xdr) { next(); next(); next(); }
+#endif
               fbase->_sub[ i_sub ]._nb_gauss[ i_comp ] = nb_val_by_elem;
               // (10) values
               nb_values *= nb_val_by_elem;
@@ -847,13 +1157,26 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         }
         //if (noms_med_id < 0) continue;
         if (table_med_mail_id < 0 && table_med_cham_id < 0 && table_med_comp_id < 0)
-          continue;
+#ifdef HAS_XDR
+          if(!_is_xdr)
+#endif
+            continue;
 
         for (int itable = 1; itable <= nb_objets; itable++) {
           // read tables "MED_MAIL", "MED_CHAM" and "MED_COMP", that keeps correspondence
           // between GIBI names (8 symbols) and MED names (possibly longer)
           getNextLine( ligne );
-          int nb_table_vals = atoi( ligne );
+          int nb_table_vals;
+#ifdef HAS_XDR
+          if(_is_xdr)
+            {
+              initIntReading(1);
+              nb_table_vals = getInt();
+              next();
+            }
+          else
+#endif
+            nb_table_vals = atoi( ligne );
           if (nb_table_vals < 0) {
             INFOS_MED("Erreur de lecture dans enregistrement de pile " <<
                       PILE_TABLES << DUMP_LINE_NB );
@@ -928,20 +1251,46 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
           // error
         }
         string aWholeString;
-        string aCurrLine;
-        const int fixedLength = 71;
-        while (aWholeString.length() < stringLen) {
-          getNextLine( ligne );
-          int remainLen = stringLen - aWholeString.length();
-          if ( remainLen > fixedLength )
+#ifdef HAS_XDR
+        if(_is_xdr)
           {
-            aWholeString += ligne + 1;
+            const int fixedLength = 71;
+            while (aWholeString.length() < stringLen) {
+              int remainLen = stringLen - aWholeString.length();
+              int len;
+              if ( remainLen > fixedLength )
+                {
+                  len = fixedLength;
+                }
+              else
+                {
+                  len = remainLen;
+                }
+              initNameReading(1, len);
+              aWholeString += getName();
+              next();
+            }
           }
-          else
+        else
           {
-            aWholeString += ligne + ( 72 - remainLen );
+#endif
+            string aCurrLine;
+            const int fixedLength = 71;
+            while (aWholeString.length() < stringLen) {
+              getNextLine( ligne );
+              int remainLen = stringLen - aWholeString.length();
+              if ( remainLen > fixedLength )
+                {
+                  aWholeString += ligne + 1;
+                }
+              else
+                {
+                  aWholeString += ligne + ( 72 - remainLen );
+                }
+            }
+#ifdef HAS_XDR
           }
-        }
+#endif
         int prevOffset = 0;
         int currOffset = 0;
         initIntReading(nbSubStrings);
@@ -957,6 +1306,25 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
         break; // stop file reading
 
     } // Fin case ENREG_TYPE_2
+#ifdef HAS_XDR
+    else if (numero_enregistrement == ENREG_TYPE_5 )
+    {
+      if(_is_xdr)
+        {
+          break;
+        }
+    }
+#endif
+#ifdef HAS_XDR
+    else
+    {
+      if(_is_xdr)
+        {
+          cout << "XDR : ENREGISTREMENT DE TYPE " << numero_enregistrement << " not implemented !!!" << endl;
+          throw MEDEXCEPTION("XDR : ENREGISTREMENT DE TYPE not implemented !!!");
+        }
+    }
+#endif
   } //  fin de la boucle while de lecture externe
 
   // IMP 0020434: mapping GIBI names to MED names
