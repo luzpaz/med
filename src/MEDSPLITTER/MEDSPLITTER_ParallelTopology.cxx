@@ -573,9 +573,9 @@ void ParallelTopology::createNodeMapping(map<MED_EN::medGeometryElement,int*>& t
                       m_node_glob_to_loc.insert(make_pair(global,make_pair(idomain,local_index)));
                       //          cout << "node : global ="<<global<<" local =("<<idomain<<","<<local_index<<")"<<endl;         
                      }
-                   }
-              
-         
+                  }
+
+
           }
       }
 
@@ -583,8 +583,75 @@ void ParallelTopology::createNodeMapping(map<MED_EN::medGeometryElement,int*>& t
   m_nb_nodes[idomain]=local_index;
 }
 
+//================================================================================
+/*!
+ * \brief Return true if the domain mesh contains a cell based on given global nodes
+ */
+//================================================================================
+
+bool ParallelTopology::hasCellWithNodes( const MESHCollection& new_collection,
+                                         int                   domain,
+                                         const set<int>&       globNodes)
+{
+  // convert global nodes to local in the given domain
+  set<int> nodes;
+  set<int>::const_iterator n = globNodes.begin();
+  for ( ; n != globNodes.end(); ++n )
+    nodes.insert( convertGlobalNode( *n, domain ));
+
+  const MED_EN::medConnectivity connType = MED_EN::MED_NODAL;
+  const MED_EN::medEntityMesh   entity   = MED_EN::MED_CELL;
+
+  // loop on all types of cells
+  const MEDMEM::MESH* mesh = new_collection.getMesh( domain );
+  int nbTypes = mesh->getNumberOfTypesWithPoly( entity );
+  MED_EN::medGeometryElement * types = mesh->getTypesWithPoly( entity );
+  for ( int t = 0; t < nbTypes; ++t )
+  {
+    // get connectivity
+    if ( !mesh->existConnectivityWithPoly( connType, entity ))
+      continue;
+    int nbCell = mesh->getNumberOfElementsWithPoly( entity, types[t] );
+    const int *conn, *index;
+    switch ( types[t] )
+    {
+    case MED_EN::MED_POLYGON:
+      conn  = mesh->getPolygonsConnectivity( connType, entity );
+      index = mesh->getPolygonsConnectivityIndex( connType, entity );
+      break;
+    case MED_EN::MED_POLYHEDRA:
+      conn  = mesh->getPolyhedronConnectivity( connType );
+      index = mesh->getPolyhedronFacesIndex();
+      nbCell = mesh->getNumberOfPolyhedronFaces();
+      break;
+    default:
+      conn  = mesh->getConnectivity(MED_EN::MED_FULL_INTERLACE,connType, entity, types[t]);
+      index = mesh->getConnectivityIndex(connType, entity);
+    }
+    // find a cell containing the first of given nodes,
+    // then check if the found cell contains all the given nodes
+    const int firstNode = *nodes.begin();
+    for ( int i = 0; i < nbCell; ++i )
+    {
+      for ( int j = index[i]-1; j < index[i+1]-1; ++j )
+        if ( conn[j] == firstNode )
+        {
+          int nbSame = 0;
+          for ( j = index[i]-1; j < index[i+1]-1; ++j )
+            nbSame += nodes.count( conn[j] );
+          if ( nbSame == nodes.size() )
+            return true;
+          break;
+        }
+    }
+  }
+  delete [] types;
+  return false;
+}
+
 ////creating face mapping 
-void ParallelTopology::createFaceMapping(const MESHCollection& initial_collection)
+void ParallelTopology::createFaceMapping(const MESHCollection& initial_collection,
+                                         const MESHCollection& new_collection)
 {
   // containers for the new topology
   vector<int> new_counts(m_nb_domain,0);
@@ -714,6 +781,9 @@ void ParallelTopology::createFaceMapping(const MESHCollection& initial_collectio
           //     SCRUTE_MED(domain_counts[inew]);
           if(domain_counts[inew]==nbnodes)
           {
+            if ( !hasCellWithNodes( new_collection, inew, nodes ))
+              continue; // 0020861: EDF 1387 MED: Result of medsplitter gives standalone triangles
+
             new_counts[inew]++;
             m_face_glob_to_loc.insert(make_pair(global_face_number,make_pair(inew,new_counts[inew])));
             //m_face_loc_to_glob.insert(make_pair(make_pair(inew,new_counts[inew]),global_face_number));

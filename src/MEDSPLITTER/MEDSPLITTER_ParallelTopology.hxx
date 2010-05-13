@@ -86,7 +86,7 @@ namespace MEDSPLITTER {
                 //                                                 std::map<MED_EN::medGeometryElement,int>& present_type_numbers,
                 //                                                 int idomain);                                        
                                                         
-                void createFaceMapping(const MESHCollection &);
+                void createFaceMapping(const MESHCollection &, const MESHCollection&);
                 void createFaceMapping2ndversion(const MESHCollection &);
         
                 //!converting node global numberings to local numberings
@@ -304,7 +304,10 @@ namespace MEDSPLITTER {
      void recreateFaceMapping(vector<map<MED_EN::medGeometryElement, vector<MEDSPLITTER_FaceModel*> > >);
 
 
-    
+        private:
+
+          bool hasCellWithNodes( const MESHCollection&, int dom, const std::set<int>& nodes );
+
 
         private:
                 //!mapping global -> local
