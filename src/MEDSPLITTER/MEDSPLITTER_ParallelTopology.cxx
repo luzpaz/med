@@ -578,162 +578,158 @@ void ParallelTopology::createNodeMapping(map<MED_EN::medGeometryElement,int*>& t
          
           }
       }
-       
+
                 }
-        m_nb_nodes[idomain]=local_index;
+  m_nb_nodes[idomain]=local_index;
 }
 
 ////creating face mapping 
 void ParallelTopology::createFaceMapping(const MESHCollection& initial_collection)
-//                                                                               map<MED_EN::medGeometryElement,int*>& type_list,
-//                                                                               map<MED_EN::medGeometryElement,int>& present_type_numbers,
-//                                                                               int idomain
-                                                                                 
 {
-        // containers for the new topology
-        vector<int> new_counts(m_nb_domain,0);
-        vector<int> domain_counts(m_nb_domain,0);
-        const Topology* old_topology=initial_collection.getTopology();
-        int nb_domain_old=old_topology->nbDomain();
-        int global_index=old_topology->getFaceNumber();
-        set <pair<int, pair<int,int> > > global_treated;
-        
-        //definition of the d-1 constituent for the considered mesh dimension
-        MED_EN::medEntityMesh constituent_entity;
-        switch (m_mesh_dimension)
-                {
-                case 3:
-                        constituent_entity= MED_EN::MED_FACE;
-                        break;
-                case 2:
-                        constituent_entity = MED_EN::MED_EDGE;
-                        break;
-                }
+  // containers for the new topology
+  vector<int> new_counts(m_nb_domain,0);
+  vector<int> domain_counts(m_nb_domain,0);
+  const Topology* old_topology=initial_collection.getTopology();
+  int nb_domain_old=old_topology->nbDomain();
+  int global_index=old_topology->getFaceNumber();
+  set <pair<int, pair<int,int> > > global_treated;
 
-        for (int iold=0; iold<nb_domain_old;iold++)
-                {
-                        int nbplainface = initial_collection.getMesh(iold)->getNumberOfElements(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
-      int nbtotalface = initial_collection.getMesh(iold)->getNumberOfElementsWithPoly(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
-      SCRUTE_MED(nbplainface);
-      SCRUTE_MED(nbtotalface);  
-                        const int* face_conn;
-                        const int* face_offset;
-      const int* poly_conn;
-      const int* poly_index;
-                        if (nbtotalface >0)
-                                {
-          if (nbplainface >0)
+  //definition of the d-1 constituent for the considered mesh dimension
+  MED_EN::medEntityMesh constituent_entity;
+  switch (m_mesh_dimension)
+  {
+  case 3:
+    constituent_entity= MED_EN::MED_FACE;
+    break;
+  case 2:
+    constituent_entity = MED_EN::MED_EDGE;
+    break;
+  }
+
+  for (int iold=0; iold<nb_domain_old;iold++)
+  {
+    int nbplainface = initial_collection.getMesh(iold)->getNumberOfElements(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
+    int nbtotalface = initial_collection.getMesh(iold)->getNumberOfElementsWithPoly(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
+    SCRUTE_MED(nbplainface);
+    SCRUTE_MED(nbtotalface);
+    const int* face_conn;
+    const int* face_offset;
+    const int* poly_conn;
+    const int* poly_index;
+    if (nbtotalface >0)
+    {
+      if (nbplainface >0)
+      {
+        face_conn = initial_collection.getMesh(iold)->getConnectivity(MED_EN::MED_FULL_INTERLACE,
+                                                                      MED_EN::MED_NODAL,constituent_entity,MED_EN::MED_ALL_ELEMENTS);
+        face_offset = initial_collection.getMesh(iold)->getConnectivityIndex(MED_EN::MED_NODAL,constituent_entity);
+      }
+      if (nbtotalface > nbplainface)
+      {
+        poly_conn = initial_collection.getMesh(iold)->getPolygonsConnectivity(MED_EN::MED_NODAL,constituent_entity);
+        poly_index = initial_collection.getMesh(iold)->getPolygonsConnectivityIndex(MED_EN::MED_NODAL,constituent_entity);
+      }
+
+    }
+    else
+    {
+      face_conn=0;
+      face_offset=0;
+    }
+    for (int iface=0;iface<nbtotalface; iface++)
+    {
+      int global_face_number = old_topology->convertFaceToGlobal(iold,iface+1);
+
+      //                      int inode = face_offset[iface];
+      for (int i=0; i<m_nb_domain; i++) domain_counts[i]=0;
+      set <int> nodes;
+      int nbnodes;
+      if (iface<nbplainface)
+      {
+        nbnodes=face_offset[iface+1]-face_offset[iface];
+        for (int inode= face_offset[iface];inode < face_offset[iface+1]; inode++)
+        {
+          int node=face_conn[inode-1];
+
+          int global = old_topology->convertNodeToGlobal(iold,node);
+          //                              cout << "global node "<<global<<"ip "<<iold<< "noeud"<<node<<endl;
+          nodes.insert(global);
+          typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+          pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(global);
+
+          int ip;
+          for (mmiter it=range.first; it !=range.second; it++)
           {
-                                          face_conn = initial_collection.getMesh(iold)->getConnectivity(MED_EN::MED_FULL_INTERLACE,
-                                                                                                                                                                                                                                                                                                MED_EN::MED_NODAL,constituent_entity,MED_EN::MED_ALL_ELEMENTS);
-                                        face_offset = initial_collection.getMesh(iold)->getConnectivityIndex(MED_EN::MED_NODAL,constituent_entity);
+            ip=(it->second).first;
+            domain_counts[ip]++;
           }
-          if (nbtotalface > nbplainface)
+        }
+      }
+      else
+      {
+        nbnodes =poly_index[iface-nbplainface+1]- poly_index[iface-nbplainface];
+        for (int inode= poly_index[iface-nbplainface];inode < poly_index[iface-nbplainface+1]; inode++)
+        {
+          int node=poly_conn[inode-1];
+          //   SCRUTE_MED(node);
+          int global = old_topology->convertNodeToGlobal(iold,node);
+          //        cout << "global node "<<global<<"ip "<<iold<< "noeud"<<node<<endl;
+          // SCRUTE_MED(global);
+          nodes.insert(global);
+          typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+          pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(global);
+
+          int ip;
+          for (mmiter it=range.first; it !=range.second; it++)
           {
-            poly_conn = initial_collection.getMesh(iold)->getPolygonsConnectivity(MED_EN::MED_NODAL,constituent_entity);
-            poly_index = initial_collection.getMesh(iold)->getPolygonsConnectivityIndex(MED_EN::MED_NODAL,constituent_entity);
+            ip=(it->second).first;
+            domain_counts[ip]++;
           }
-          
-                                }
-                        else 
-                                {
-                                        face_conn=0;
-                                        face_offset=0;
-                                }
-                        for (int iface=0;iface<nbtotalface; iface++)
-                                {
-                                        int global_face_number = old_topology->convertFaceToGlobal(iold,iface+1);
-                        
-                                        //                      int inode = face_offset[iface];
-                                        for (int i=0; i<m_nb_domain; i++) domain_counts[i]=0;
-                                        set <int> nodes;
-          int nbnodes;
-          if (iface<nbplainface)
-          {
-            nbnodes=face_offset[iface+1]-face_offset[iface];
-                                        for (int inode= face_offset[iface];inode < face_offset[iface+1]; inode++)
-                                                {
-                                                        int node=face_conn[inode-1];
-                                
-                                                        int global = old_topology->convertNodeToGlobal(iold,node);
-                                                        //                              cout << "global node "<<global<<"ip "<<iold<< "noeud"<<node<<endl;
-                                                        nodes.insert(global);
-                                                        typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
-                                                        pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(global);
-                                
-                                                        int ip;
-                                                        for (mmiter it=range.first; it !=range.second; it++)
-                                                                {       
-                                                                        ip=(it->second).first;
-                                                                        domain_counts[ip]++;
-                                                                }
-                                                }
-          }
-          else 
-            {
-            nbnodes =poly_index[iface-nbplainface+1]- poly_index[iface-nbplainface];
-            for (int inode= poly_index[iface-nbplainface];inode < poly_index[iface-nbplainface+1]; inode++)
-              {
-                int node=poly_conn[inode-1];
-             //   SCRUTE_MED(node);
-                int global = old_topology->convertNodeToGlobal(iold,node);
-                //        cout << "global node "<<global<<"ip "<<iold<< "noeud"<<node<<endl;
-               // SCRUTE_MED(global);
-                nodes.insert(global);
-                typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
-                pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(global);
-          
-                int ip;
-                for (mmiter it=range.first; it !=range.second; it++)
-                  { 
-                    ip=(it->second).first;
-                    domain_counts[ip]++;
-                  }
-              }
-          }
-                                        set<int>::const_iterator iter_node = nodes.begin();
-                                        int numbers[3];
-                                        for (int i=0; i<3; i++)
-                                                {
-                                                        numbers[i]=*iter_node;
-                                                        iter_node++;
-                                                }
-                                        set <pair<int, pair<int,int> > > ::iterator iter_triplets;
-                                        pair<int, pair<int,int> > triplet = make_pair(numbers[0],make_pair(numbers[1],numbers[2]));
-                                        iter_triplets=global_treated.find(triplet);
-                                        if (iter_triplets==global_treated.end())
-                                                {
-                                                        global_treated.insert(triplet);
-                                                //      int nbnodes=face_offset[iface+1]-face_offset[iface];
-                                                        if (global_face_number == -1) 
-                                                                {
-                                                                        global_index++;
-                                                                        global_face_number=global_index;
-                                        
-                                                                }
-             //  SCRUTE_MED(nbnodes);
-               
-                                                        for (int inew=0;inew<m_nb_domain;inew++)
-                                                                {
-              //     SCRUTE_MED(domain_counts[inew]);
-                                                                        if(domain_counts[inew]==nbnodes)
-                                                                                {
-                                                                                        new_counts[inew]++;
-                                                                                        m_face_glob_to_loc.insert(make_pair(global_face_number,make_pair(inew,new_counts[inew])));
-                                                                                        //m_face_loc_to_glob.insert(make_pair(make_pair(inew,new_counts[inew]),global_face_number));
-                      m_face_loc_to_glob[inew].push_back(global_face_number);
-                                                                                }
-                                                                }
-                                                }
-                                }
-                }
-        
+        }
+      }
+      set<int>::const_iterator iter_node = nodes.begin();
+      int numbers[3];
+      for (int i=0; i<3; i++)
+      {
+        numbers[i]=*iter_node;
+        iter_node++;
+      }
+      set <pair<int, pair<int,int> > > ::iterator iter_triplets;
+      pair<int, pair<int,int> > triplet = make_pair(numbers[0],make_pair(numbers[1],numbers[2]));
+      iter_triplets=global_treated.find(triplet);
+      if (iter_triplets==global_treated.end())
+      {
+        global_treated.insert(triplet);
+        //      int nbnodes=face_offset[iface+1]-face_offset[iface];
+        if (global_face_number == -1) 
+        {
+          global_index++;
+          global_face_number=global_index;
+
+        }
+        //  SCRUTE_MED(nbnodes);
+
         for (int inew=0;inew<m_nb_domain;inew++)
-                {
-                        m_nb_faces[inew]=new_counts[inew];
-                        MESSAGE_MED(" Nb faces ["<<inew<<"]="<<m_nb_faces[inew]);
-                }
-        MESSAGE_MED(" total number of faces"<<getFaceNumber());
+        {
+          //     SCRUTE_MED(domain_counts[inew]);
+          if(domain_counts[inew]==nbnodes)
+          {
+            new_counts[inew]++;
+            m_face_glob_to_loc.insert(make_pair(global_face_number,make_pair(inew,new_counts[inew])));
+            //m_face_loc_to_glob.insert(make_pair(make_pair(inew,new_counts[inew]),global_face_number));
+            m_face_loc_to_glob[inew].push_back(global_face_number);
+          }
+        }
+      }
+    }
+  }
+
+  for (int inew=0;inew<m_nb_domain;inew++)
+  {
+    m_nb_faces[inew]=new_counts[inew];
+    MESSAGE_MED(" Nb faces ["<<inew<<"]="<<m_nb_faces[inew]);
+  }
+  MESSAGE_MED(" total number of faces"<<getFaceNumber());
 }
 
 ////creating node mapping 
