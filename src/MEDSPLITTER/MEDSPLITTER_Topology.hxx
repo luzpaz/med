@@ -81,7 +81,7 @@ namespace MEDSPLITTER {
                 //      virtual void createFaceMapping(std::map<MED_EN::medGeometryElement,int*>& type_connectivity,
                 //                                                                              std::map<MED_EN::medGeometryElement,int>& present_type_numbers,int domain)=0;
                 //                      
-                virtual void createFaceMapping(const MESHCollection&)=0;
+                virtual void createFaceMapping(const MESHCollection&, const MESHCollection&)=0;
 
                 //converting node global numberings to local numberings
                 virtual void convertToLocal(std::map<MED_EN::medGeometryElement,int*>& type_connectivity,
