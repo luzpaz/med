@@ -126,7 +126,7 @@ MESHCollection::MESHCollection(const MESHCollection& initial_collection, Topolog
                         mesh_builder->setSpaceDimension(initial_collection.getSpaceDimension());
                 }
         
-        m_topology->createFaceMapping(initial_collection);      
+        m_topology->createFaceMapping(initial_collection, *this);      
         for (int idomain=0; idomain<m_topology->nbDomain(); idomain++)
                 {
                         switch (getMeshDimension())
