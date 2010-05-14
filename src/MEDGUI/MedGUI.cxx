@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 //  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 //  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -19,6 +19,7 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  MED MEDGUI : MED component GUI implemetation
 //  File   : MedGUI.cxx
 //  Module : MED
@@ -56,8 +57,6 @@
 
 
 #include <MedGUI_Selection.h>
-
-using namespace std;
 
 static CORBA::ORB_var   _orb;
 
@@ -582,7 +581,7 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
     }
 
   //SALOME_MED::MESH_var MEDMesh = aMesh->GetMEDMesh();
-  string name = MEDMesh->getName();
+  std::string name = MEDMesh->getName();
   SCRUTE(name);
 
   int dim2 = MEDMesh->getSpaceDimension();
@@ -613,7 +612,7 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
 
   for (k=0;  k < nbfam; k++) {
     SCRUTE(k);
-    string nomFam=Families[k]->getName();
+    std::string nomFam=Families[k]->getName();
     SCRUTE(nomFam);
     SALOME_MED::long_array_var tabnoeuds=Families[k]->getNumber(SALOME_MED::MED_NONE);
     for (int l=0;l<(int)tabnoeuds->length();l++)

@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 //  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 //  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -19,6 +19,7 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 %module libMEDMEM_Swig
 
 %{
@@ -1148,6 +1149,7 @@ public :
   int getNumberOfGroups(medEntityMesh Entity);
 
   GROUP * getGroup(medEntityMesh Entity,int i);
+  GROUP*  getGroup(char* name);
 
   medGeometryElement getElementType(medEntityMesh Entity,int Number);
 

@@ -1,7 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-//
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +16,7 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
@@ -26,6 +24,10 @@
 
 #include <sstream>
 #include <cmath>
+
+#ifdef WNT
+#include <windows.h>
+#endif
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
 //#define ENABLE_FAULTS
@@ -164,8 +166,8 @@ void MEDMEMTest::testMed()
   }
   CPPUNIT_ASSERT(field_names.size() != 0);
 
-  string field_names_1[nbFields];
-  string mesh_names_1[nbMeshes];
+  string* field_names_1 = new string[nbFields];
+  string* mesh_names_1 = new string[nbMeshes];
   //get field and mesh names
   try{
     myMed->getMeshNames(mesh_names_1);
@@ -283,7 +285,11 @@ void MEDMEMTest::testMed()
   // write to file
   CPPUNIT_ASSERT_NO_THROW(myMed->write(idMedV21));
   // check, that the file is created on disk
+#ifdef WNT
+  CPPUNIT_ASSERT(GetFileAttributes(filenameout21.data()) & FILE_ATTRIBUTE_NORMAL);
+#else
   CPPUNIT_ASSERT(access(filenameout21.data(), F_OK) == 0);
+#endif
 
   // writeFrom
   CPPUNIT_ASSERT_THROW(myMed->writeFrom(idMedV21 + 1000), MEDEXCEPTION); // invalid driver index
@@ -297,7 +303,11 @@ void MEDMEMTest::testMed()
   // check, that the file is created on disk
   //#ifdef ENABLE_FORCED_FAILURES
   // ? (BUG) The file is not created.
+#ifdef WNT
+  CPPUNIT_ASSERT(GetFileAttributes(filenameout21_from.data()) & FILE_ATTRIBUTE_NORMAL);
+#else
   CPPUNIT_ASSERT(access(filenameout21_from.data(), F_OK) == 0);
+#endif
   // NOT a bug. writeFrom() should be removed from API
   //#endif
 
@@ -438,4 +448,6 @@ void MEDMEMTest::testMed()
 
   delete myMed;
   delete myEmptyMed;
+  delete [] field_names_1;
+  delete [] mesh_names_1;
 }

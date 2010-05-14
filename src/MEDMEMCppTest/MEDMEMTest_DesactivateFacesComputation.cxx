@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -16,6 +16,7 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "MEDMEMTest.hxx"
 
 #include "MEDMEM_Mesh.hxx"
@@ -26,6 +27,10 @@
 
 #include <cppunit/Message.h>
 #include <cppunit/TestAssert.h>
+
+#ifdef WNT
+#include <windows.h>
+#endif
 
 using namespace std;
 using namespace MEDMEM;
@@ -184,7 +189,11 @@ void MEDMEMTest::testDesactivateFacesComputation()
   MEDMEM::GIBI_MESH_WRONLY_DRIVER *gibidriver=new MEDMEM::GIBI_MESH_WRONLY_DRIVER(tmpGibiFile,mesh );
   id=mesh->addDriver(*gibidriver);
   mesh->write(id);
+#ifdef WNT
+  CPPUNIT_ASSERT( GetFileAttributes(tmpGibiFile.c_str()) & FILE_ATTRIBUTE_NORMAL );
+#else
   CPPUNIT_ASSERT( access(tmpGibiFile.c_str(), F_OK) == 0 );
+#endif
 
   delete gibidriver;
   delete driver;

@@ -1,7 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-//
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +16,7 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
@@ -34,6 +32,10 @@
 #include <sstream>
 #include <cmath>
 #include <stdexcept>
+
+#ifdef WNT
+#include <windows.h>
+#endif
 
 using namespace std;
 
@@ -697,7 +699,11 @@ MEDMEMTest_TmpFilesRemover::~MEDMEMTest_TmpFilesRemover()
 {
   set<string>::iterator it = myTmpFiles.begin();
   for (; it != myTmpFiles.end(); it++) {
+#ifdef WNT
+    if (GetFileAttributes((*it).data()) & FILE_ATTRIBUTE_NORMAL)
+#else
     if (access((*it).data(), F_OK) == 0)
+#endif
       remove((*it).data());
   }
   myTmpFiles.clear();

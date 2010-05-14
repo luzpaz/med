@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D
+//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -16,6 +16,7 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 /*!
  * API for the MEDSPLITTER tool 
  * 
@@ -42,18 +43,26 @@ using namespace std;
  * \param mesh name of the input mesh (only used for the sequential input file case)
  * \param outputfilename name out the master output file
  * \param is_distributed sequential input (0) or distributed input (1)
- * \param nprocs number of subdomains
+ * \param nbdomains number of subdomains
  * \param method METIS(0) or SCOTCH(1)
  * \param meshonly projects mesh and fields (0) or only the mesh (1) 
- */
+ * \param plainmaster creates a plain masterfile (1) instead of an XML file (0),
+ * \param createboundaryfaces creates the necessary faces so that face joints are created
+ * \param familysplitting preserves the family names (1) instead of focusing on the groups (0)
+ * \param emptygroups creates empty groups in zones that do not contain a group from the original domain
+*/
  
 int medsplitter(const char* inputfilename, 
                 const char* mesh,
                 const char* outputfilename,  
                 int is_distributed,
-                int nprocs,
+                int nbdomains,
                 int method,
-                int meshonly)
+                int meshonly,
+                int plainmaster,
+                int createboundaryfaces,
+                int familysplitting,
+                int emptygroups)
 {                        
 
   //Pointer to the initial collection
@@ -69,18 +78,21 @@ int medsplitter(const char* inputfilename,
     }
   else
     collection = new MEDSPLITTER::MESHCollection(input);
-          
+
   // Creating the graph and partitioning it       
   MEDSPLITTER::Topology* new_topo;
   if (method==0)
-    new_topo = collection->createPartition(nprocs,MEDSPLITTER::Graph::METIS);
+    new_topo = collection->createPartition(nbdomains,MEDSPLITTER::Graph::METIS);
   else
-    new_topo = collection->createPartition(nprocs,MEDSPLITTER::Graph::SCOTCH);
+    new_topo = collection->createPartition(nbdomains,MEDSPLITTER::Graph::SCOTCH);
   
   // Creating a new mesh collection from the partitioning 
-  MEDSPLITTER::MESHCollection new_collection(*collection, new_topo);
+  MEDSPLITTER::MESHCollection new_collection(*collection, new_topo, familysplitting, emptygroups);
  
   //Writing the output files (master + MED files)
+  if (plainmaster)
+    new_collection.setDriverType(MEDSPLITTER::MedAscii);
+  new_collection.setSubdomainBoundaryCreates(createboundaryfaces);
   string output(outputfilename);
   new_collection.write(output);
   

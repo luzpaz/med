@@ -1,7 +1,4 @@
-#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-#
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +16,7 @@
 #
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+
 #  MED MEDMEM : MED files in memory
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
@@ -150,7 +148,7 @@ MEDMEM_Remapper.cxx
 
 #libmedmem_la_LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 # libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@
-libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) \
+libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) $(XDR_CPPFLAGS) \
 	-I$(srcdir)/../MEDWrapper/Base \
 	-I$(srcdir)/../INTERP_KERNEL \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \
@@ -159,7 +157,7 @@ libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) \
 libmedmem_la_CXXFLAGS= @CXXTMPDPTHFLAGS@
 
 # change motivated by the bug KERNEL4778.
-libmedmem_la_LDFLAGS=$(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
+libmedmem_la_LDFLAGS=$(MED2_LIBS) $(HDF5_LIBS) $(XDR_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
 	../MEDWrapper/Base/libMEDWrapperBase.la $(STDLIB) ../INTERP_KERNEL/libinterpkernel.la
 if MED_ENABLE_KERNEL
 libmedmem_la_LDFLAGS+=../MEDWrapper/Factory/libMEDWrapper.la \

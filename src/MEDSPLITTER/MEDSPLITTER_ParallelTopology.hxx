@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D
+//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -16,6 +16,7 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef PARALLELTOPOLOGY_HXX_
 #define PARALLELTOPOLOGY_HXX_
 
@@ -85,7 +86,7 @@ namespace MEDSPLITTER {
                 //                                                 std::map<MED_EN::medGeometryElement,int>& present_type_numbers,
                 //                                                 int idomain);                                        
                                                         
-                void createFaceMapping(const MESHCollection &);
+                void createFaceMapping(const MESHCollection &, const MESHCollection&);
                 void createFaceMapping2ndversion(const MESHCollection &);
         
                 //!converting node global numberings to local numberings
@@ -303,7 +304,10 @@ namespace MEDSPLITTER {
      void recreateFaceMapping(vector<map<MED_EN::medGeometryElement, vector<MEDSPLITTER_FaceModel*> > >);
 
 
-    
+        private:
+
+          bool hasCellWithNodes( const MESHCollection&, int dom, const std::set<int>& nodes );
+
 
         private:
                 //!mapping global -> local

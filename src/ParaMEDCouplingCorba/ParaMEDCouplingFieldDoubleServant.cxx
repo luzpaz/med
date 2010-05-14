@@ -1,7 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-//
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -19,11 +16,12 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "ParaMEDCouplingFieldDoubleServant.hxx"
 #include "utilities.h"
 using namespace ParaMEDMEM;
 
-ParaMEDCouplingFieldDoubleServant::ParaMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,MEDCouplingFieldDouble* field):MEDCouplingFieldDoubleServant(field),MPIObject_i()
+ParaMEDCouplingFieldDoubleServant::ParaMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,MEDCouplingFieldDouble* field):MEDCouplingFieldDoubleServant(field)
 {
   Engines::MPIObject_var pobj = POA_SALOME_MED::ParaMEDCouplingFieldDoubleCorbaInterface::_this();
   BCastIOR(orb,pobj,false);

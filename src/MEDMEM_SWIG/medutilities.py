@@ -1,6 +1,6 @@
 # -*- coding: iso-8859-1 -*-
 # --
-# Copyright (C) CEA DEN
+# Copyright (C) 2009-2010 CEA DEN
 # Author : Erwan ADAM (CEA)
 # --
 

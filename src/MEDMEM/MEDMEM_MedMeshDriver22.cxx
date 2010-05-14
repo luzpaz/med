@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 //  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 //  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 
 #include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_GenDriver.hxx"
@@ -2093,7 +2094,7 @@ void MED_MESH_WRONLY_DRIVER22::write(void) const
       SCRUTE_MED(err);
 
       char familyName[MED_TAILLE_NOM+1];
-      //      strcpy(familyName,"FAMILLE_ZERO");
+      strcpy(familyName,"FAMILLE_ZERO");
       err = med_2_3::MEDfamCr( _medIdt,
                               const_cast <char *> ( _meshName.c_str() ),
                               familyName, 0,

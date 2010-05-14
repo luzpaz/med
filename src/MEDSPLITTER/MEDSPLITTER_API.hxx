@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D
+//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -16,17 +16,21 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef MEDSPLITTER_API_HXX_
 #define MEDSPLITTER_API_HXX_
 
 #include "MEDSPLITTER.hxx"
 MEDSPLITTER_EXPORT
-extern "C" int medsplitter(const char* inputfilename, 
+extern "C" int medsplitter(const char* inputfilename,
                            const char* mesh,
                            const char* outputfilename,  
                            int is_distributed,
-                           int nprocs,
+                           int nbdomains,
                            int method,
-                           int meshonly);
-
+                           int meshonly,
+                           int plainmaster,
+                           int createboundaryfaces,
+                           int familysplitting,
+                           int emptygroups);
 #endif

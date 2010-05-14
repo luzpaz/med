@@ -1,7 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-//
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +16,7 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef __PARAMEDMEMCOMPOCOMPONENT_I__
 #define __PARAMEMDEMCOMPOCOMPONENT_I__
 
@@ -63,7 +61,7 @@ typedef struct
 
 namespace ParaMEDMEM
 {
-  class ParaMEDMEMComponent_i : public POA_SALOME_MED::ParaMEDMEMComponent, public Engines_Component_i, public MPIObject_i
+  class ParaMEDMEMComponent_i : public virtual POA_SALOME_MED::ParaMEDMEMComponent, public Engines_Component_i, public MPIObject_i
   {
 
   public:
@@ -100,7 +98,6 @@ namespace ParaMEDMEM
     void _setInputField(const char * coupling, SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr, MEDCouplingFieldDouble* field);
     
   private:
-    int _gsize, _grank;
     CommInterface* _interface;
     std::map<std::string,InterpKernelDEC*> _dec;
     std::map<std::string,MPIProcessorGroup*> _source, _target;

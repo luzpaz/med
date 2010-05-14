@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 //  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 //  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 
 #ifndef GIBI_MESH_DRIVER_HXX
 #define GIBI_MESH_DRIVER_HXX
@@ -43,6 +44,14 @@
 #include <sstream>
 #include <iomanip>
 /////
+
+#ifdef WNT
+#else
+#define HAS_XDR
+#endif
+#ifdef HAS_XDR
+#include <rpc/xdr.h>
+#endif
 
 /*!
 
@@ -198,11 +207,12 @@ private:
   void initIntReading(int nbValues); //  FORMAT(10I8)
   void initDoubleReading(int nbValues); //  FORMAT(1P,3E22.14)
   void init( int nbToRead, int nbPosInLine, int width, int shift = 0 );
-  bool more() const { return ( _iRead < _nbToRead && _curPos ); }
+  bool more() const;
   void next();
   char* str() const { return _curPos; }
   int index() const { return _iRead; }
   int getInt() const;
+  float getFloat() const;
   double getDouble() const;
   string getName() const;
 
@@ -217,6 +227,24 @@ private:
   int _iPos, _nbPosInLine, _width, _shift;
   int _iRead, _nbToRead;
   char* _curPos;
+
+  // xdr
+#ifdef HAS_XDR
+  bool _is_xdr;
+  FILE* _xdrs_file;
+  XDR* _xdrs;
+  char* _xdr_cvals;
+  int* _xdr_ivals;
+  double* _xdr_dvals;
+  int _xdr_kind;
+  enum
+    {
+      _xdr_kind_null,
+      _xdr_kind_char,
+      _xdr_kind_int,
+      _xdr_kind_double,
+    };
+#endif
 };
 
 /*!

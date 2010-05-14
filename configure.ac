@@ -1,7 +1,4 @@
-#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-#
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -19,13 +16,14 @@
 #
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+
 # Author : Marc Tajchman (CEA)
 # Date : 28/06/2001
 # Modified by : Patrick GOLDBRONN (CEA)
 # Modified by : Marc Tajchman (CEA)
 # Modified by : Mikhail PONIKAROV (OCN)
 #
-AC_INIT([Salome2 Project MED module], [5.1.3], [webmaster.salome@opencascade.com], [SalomeMED])
+AC_INIT([Salome2 Project MED module], [5.1.4], [webmaster.salome@opencascade.com], [SalomeMED])
 AC_CONFIG_AUX_DIR(adm_local/unix/config_files)
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
@@ -277,18 +275,10 @@ CHECK_HTML_GENERATORS
 # Defaults
 ###
 
-openpbs_ok=no
-# CHECK_OPENPBS ONLY if MED_WITH_KERNEL is yes
-
-lsf_ok=no
-# CHECK_LSF ONLY if MED_WITH_KERNEL is yes
-
 gui_ok=no
-# CHECK_LSF ONLY if MED_WITH_KERNEL is yes
+# CHECK_GUI ONLY if MED_WITH_KERNEL is yes
 
 WITHIHM="no"
-WITHOPENPBS="no"
-WITH_LSF="no"
 
 ###
 # Other tests should be performed only in --with-interp-kernel-only=no mode
@@ -374,22 +364,6 @@ if test "$with_interp_kernel_only" != "yes" ; then
 
     if test "${MED_WITH_KERNEL}" = "yes"; then
         
-        echo
-        echo ---------------------------------------------
-        echo testing OpenPBS
-        echo ---------------------------------------------
-        echo
-        
-        CHECK_OPENPBS
-        
-        echo
-        echo ---------------------------------------------
-        echo testing LSF
-        echo ---------------------------------------------
-        echo
-        
-        CHECK_LSF
-        
       dnl
       dnl ---------------------------------------------
       dnl testing sockets
@@ -397,16 +371,6 @@ if test "$with_interp_kernel_only" != "yes" ; then
       dnl
         
       CHECK_SOCKETS
-        
-      dnl
-      dnl ---------------------------------------------
-      dnl testing Batch
-      dnl ---------------------------------------------
-      dnl
-        
-      WITH_BATCH=no
-      test x$openpbs_ok = xyes || test x$lsf_ok = xyes && WITH_BATCH=yes
-      AC_SUBST(WITH_BATCH)
         
       echo
       echo ---------------------------------------------
@@ -520,8 +484,6 @@ fi # "$with_interp_kernel_only" != "yes" ...
 ###
 
 AC_SUBST(WITHIHM)
-AC_SUBST(WITHOPENPBS)      
-AC_SUBST(WITH_LSF)      
 
 ###
 # Conditionals
@@ -537,8 +499,6 @@ AM_CONDITIONAL(MED_ENABLE_METIS,    [test "$ENABLE_METIS" = yes])
 AM_CONDITIONAL(MED_ENABLE_SCOTCH,   [test "$ENABLE_SCOTCH" = yes])
 AM_CONDITIONAL(MED_WITHMPI,         [test "$WITHMPI" = yes])
 AM_CONDITIONAL(MED_ENABLE_FVM,      [test "$ENABLE_FVM" = yes])
-AM_CONDITIONAL(WITH_OPENPBS,        [test "$WITHOPENPBS" = yes])
-AM_CONDITIONAL(WITH_LSF,            [test "$WITH_LSF" = yes])
 AM_CONDITIONAL(MED_ENABLE_MED2,     [test "$med2_ok" = yes])
 AM_CONDITIONAL(MED_ENABLE_RENUMBER, [test "$ENABLE_RENUMBER" = yes])
 AM_CONDITIONAL(BOOST_IS_OK,         [test "$boost_ok" = yes])
@@ -576,7 +536,7 @@ fi
 if test "$MED_WITH_KERNEL" = "yes" ; then 
     # --with-kernel=yes
     obligatory_vars="$obligatory_vars python_ok boost_ok swig_ok hdf5_ok med2_ok omniORB_ok $splitter_vars $renumber_vars"
-    optional_vars="$optional_vars openpbs_ok lsf_ok graphviz_ok Kernel_ok"
+    optional_vars="$optional_vars graphviz_ok Kernel_ok"
     if test "${gui_ok}" = "yes"; then
         # GUI is enabled
         gui_vars="lex_yacc_ok OpenGL_ok qt_ok vtk_ok sip_ok pyqt_ok qwt_ok occ_ok gui_ok"
@@ -705,6 +665,7 @@ AC_OUTPUT([ \
         src/INTERP_KERNEL/Makefile \
         src/INTERP_KERNEL/Bases/Makefile \
         src/INTERP_KERNEL/Geometric2D/Makefile \
+	src/INTERP_KERNEL/ExprEval/Makefile \
         src/INTERP_KERNELTest/Makefile \
         src/MEDCoupling/Makefile \
         src/MEDCoupling/Test/Makefile \
@@ -758,6 +719,8 @@ AC_OUTPUT([ \
         doc/salome/Makefile \
         doc/salome/tui/Makefile \
         doc/salome/tui/doxyfile \
+	doc/salome/tui/static/header.html \
         doc/doxygen/Makefile \
         doc/doxygen/Doxyfile_med_user \
+	doc/doxygen/static/header.html \
 ])

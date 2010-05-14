@@ -1,7 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-//
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -19,10 +16,18 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "ParaMEDMEMComponent_i.hxx"
 #include "utilities.h"
+#include "Utils_SALOME_Exception.hxx"
 using namespace std;
 using namespace ParaMEDMEM;
+
+typedef struct
+{
+  bool exception;
+  string msg;
+} except_st;
 
 ParaMEDMEMComponent_i::ParaMEDMEMComponent_i() : Engines_Component_i(), MPIObject_i()
 {
@@ -49,9 +54,12 @@ ParaMEDMEMComponent_i::~ParaMEDMEMComponent_i()
 
 void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALOME::SALOME_Exception)
 {
-  bool *exception;
+  int gsize, grank;
+  except_st *est;
   void *ret_th;
   pthread_t *th;
+  ostringstream msg;
+
   if(_numproc == 0)
     {
       th = new pthread_t[_nbproc];
@@ -70,42 +78,38 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
 
     string service = coupling;
     if( service.size() == 0 )
-      {
-        MESSAGE("[" << _numproc << "] You have to give a service name !");
-        throw POException(_numproc,"You have to give a service name !");
-      }
+      throw SALOME_Exception("You have to give a service name !");
     
     if( _gcom.find(service) != _gcom.end() )
       {
-        MESSAGE("[" << _numproc << "] service " << service << " already exist !");
-        throw POException(_numproc,"service " + service + " already exist !");
+        msg << "service " << service << " already exists !";
+        throw SALOME_Exception(msg.str().c_str());
       }
 
     // Connection to distributed parallel component
 #ifdef HAVE_MPI2
     remoteMPI2Connect(coupling);
 #else
-    MESSAGE("[" << _numproc << "] You have to use a MPI2 compliant mpi implementation !");
-    throw POException(_numproc,"You have to use a MPI2 compliant mpi implementation !");
+    throw SALOME_Exception("You have to use a MPI2 compliant mpi implementation !");
 #endif
 
-    MPI_Comm_size( _gcom[coupling], &_gsize );
-    MPI_Comm_rank( _gcom[coupling], &_grank );
-    MESSAGE("[" << _grank << "] new communicator of " << _gsize << " processes");
+    MPI_Comm_size( _gcom[coupling], &gsize );
+    MPI_Comm_rank( _gcom[coupling], &grank );
+    MESSAGE("[" << grank << "] new communicator of " << gsize << " processes");
 
     // Creation of processors group for ParaMEDMEM
     // source is always the lower processor numbers
     // target is always the upper processor numbers
-    if(_numproc==_grank)
+    if(_numproc==grank)
       {
         _source[coupling] = new MPIProcessorGroup(*_interface,0,_nbproc-1,_gcom[coupling]);
-        _target[coupling] = new MPIProcessorGroup(*_interface,_nbproc,_gsize-1,_gcom[coupling]);
+        _target[coupling] = new MPIProcessorGroup(*_interface,_nbproc,gsize-1,_gcom[coupling]);
         _commgroup[coupling] = _source[coupling];
       }
     else
       {
-        _source[coupling] = new MPIProcessorGroup(*_interface,0,_gsize-_nbproc-1,_gcom[coupling]);
-        _target[coupling] = new MPIProcessorGroup(*_interface,_gsize-_nbproc,_gsize-1,_gcom[coupling]);
+        _source[coupling] = new MPIProcessorGroup(*_interface,0,gsize-_nbproc-1,_gcom[coupling]);
+        _target[coupling] = new MPIProcessorGroup(*_interface,gsize-_nbproc,gsize-1,_gcom[coupling]);
         _commgroup[coupling] = _target[coupling];
       }
     
@@ -113,23 +117,10 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
     _dec_options[coupling] = NULL;
     
   }
-  catch(const POException &ex)
-    {
-      // exception
-      ostringstream msg;
-      msg << ex.msg << " on process number " << ex.numproc;
-      MESSAGE(msg.str());
-      THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
-    }
-  catch(const INTERP_KERNEL::Exception &ex)
+  catch(const std::exception &ex)
     {
       MESSAGE(ex.what());
       THROW_SALOME_CORBA_EXCEPTION(ex.what(),SALOME::INTERNAL_ERROR);
-    }
-  catch(...)
-    {
-      MESSAGE("Unknown exception");
-      THROW_SALOME_CORBA_EXCEPTION("Unknown exception",SALOME::INTERNAL_ERROR);
     }
 
   if(_numproc == 0)
@@ -137,15 +128,13 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
       for(int ip=1;ip<_nbproc;ip++)
         {
           pthread_join(th[ip],&ret_th);
-          exception = (bool*)ret_th;
-          if(*exception)
+          est = (except_st*)ret_th;
+          if(est->exception)
             {
-              // exception
-              ostringstream msg;
-              msg << "Error on initialize coupling on process " << ip;
+              msg << "[" << ip << "] " << est->msg;
               THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
             }
-          delete exception;
+          delete est;
         }
       delete[] th;
     }
@@ -153,9 +142,11 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
 
 void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOME::SALOME_Exception)
 {
-  bool *exception;
+  except_st *est;
   void *ret_th;
   pthread_t *th;
+  ostringstream msg;
+
   if(_numproc == 0)
     {
       th = new pthread_t[_nbproc];
@@ -172,23 +163,19 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOM
   try{
     string service = coupling;
     if( service.size() == 0 )
-      {
-        MESSAGE("[" << _numproc << "] You have to give a service name !");
-        throw POException(_numproc,"You have to give a service name !");
-      }
+      throw SALOME_Exception("You have to give a service name !");
 
     if( _gcom.find(service) == _gcom.end() )
       {
-        MESSAGE("[" << _numproc << "] service " << service << " don't exist !");
-        throw POException(_numproc,"service " + service + " don't exist !");
+        msg << "service " << service << " doesn't exist !";
+        throw SALOME_Exception(msg.str().c_str());
       }
 
     // Disconnection to distributed parallel component
 #ifdef HAVE_MPI2
     remoteMPI2Disconnect(coupling);
 #else
-    MESSAGE("[" << _numproc << "] You have to use a MPI2 compliant mpi implementation !");
-    throw POException(_numproc,"You have to use a MPI2 compliant mpi implementation !");
+    throw SALOME_Exception("You have to use a MPI2 compliant mpi implementation !");
 #endif
 
     /* Processors groups and DEC destruction */
@@ -205,13 +192,10 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOM
         _dec_options.erase(coupling);
       }
   }
-  catch(const POException &ex)
+  catch(const std::exception &ex)
     {
-      // exception
-      ostringstream msg;
-      msg << ex.msg << " on process number " << ex.numproc;
-      MESSAGE(msg.str());
-      THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+      MESSAGE(ex.what());
+      THROW_SALOME_CORBA_EXCEPTION(ex.what(),SALOME::INTERNAL_ERROR);
     }
 
   if(_numproc == 0)
@@ -219,15 +203,14 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOM
       for(int ip=1;ip<_nbproc;ip++)
         {
           pthread_join(th[ip],&ret_th);
-          exception = (bool*)ret_th;
-          if(*exception)
+          est = (except_st*)ret_th;
+          if(est->exception)
             {
-              // exception
               ostringstream msg;
-              msg << "Error on terminate coupling on process " << ip;
+              msg << "[" << ip << "] " << est->msg;
               THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
             }
-          delete exception;
+          delete est;
         }
       delete[] th;
     }
@@ -247,9 +230,11 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
                                                     const char * splitting_policy,
                                                     bool P1P0_bary_method ) throw(SALOME::SALOME_Exception)
 {
-  bool *exception;
+  except_st *est;
   void *ret_th;
   pthread_t *th;
+  ostringstream msg;
+
   if(_numproc == 0)
     {
       th = new pthread_t[_nbproc];
@@ -293,11 +278,8 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
 
   if(!ret)
     {
-      // exception
-      ostringstream msg;
-      msg << "[" << _numproc << "] Error on setting options";
-      MESSAGE(msg.str());
-      THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
+      MESSAGE("Error on setting interpolation options");
+      THROW_SALOME_CORBA_EXCEPTION("Error on setting interpolation options",SALOME::INTERNAL_ERROR);
     }
   
   if(_numproc == 0)
@@ -305,15 +287,13 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
       for(int ip=1;ip<_nbproc;ip++)
         {
           pthread_join(th[ip],&ret_th);
-          exception = (bool*)ret_th;
-          if(*exception)
+          est = (except_st*)ret_th;
+          if(est->exception)
             {
-              // exception
-              ostringstream msg;
-              msg << "Error on setting options on process " << ip;
+              msg << "[" << ip << "] " << est->msg;
               THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
             }
-          delete exception;
+          delete est;
         }
       delete[] th;
     }
@@ -321,9 +301,12 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
 
 void ParaMEDMEMComponent_i::_setInputField(const char * coupling, SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr, MEDCouplingFieldDouble *field)
 {
-  bool *exception;
+  int grank;
+  except_st *est;
   void *ret_th;
   pthread_t th;
+  ostringstream msg;
+
   if(_numproc == 0)
     {
       thread_st *st = new thread_st;
@@ -334,23 +317,22 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, SALOME_MED::MP
 
   string service = coupling;
   if( service.size() == 0 )
-    {
-      MESSAGE("[" << _numproc << "] You have to give a service name !");
-      throw POException(_numproc,"You have to give a service name !");
-    }
+    throw SALOME_Exception("You have to give a service name !");
 
   if( _gcom.find(service) == _gcom.end() )
     {
-      MESSAGE("[" << _numproc << "] service " << service << " don't exist !");
-      throw POException(_numproc,"service " + service + " don't exist !");
+      msg << "service " << service << " doesn't exist !";
+      throw SALOME_Exception(msg.str().c_str());
     }
 
   if(!_dec[coupling])
     {
 
+      MPI_Comm_rank( _gcom[coupling], &grank );
+
       // Creating the intersection Data Exchange Channel
       // Processors which received the field are always the second argument of InterpKernelDEC object
-      if(_numproc==_grank)
+      if(_numproc==grank)
         _dec[coupling] = new InterpKernelDEC(*_target[coupling], *_source[coupling]);
       else
         _dec[coupling] = new InterpKernelDEC(*_source[coupling], *_target[coupling]);
@@ -375,39 +357,37 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, SALOME_MED::MP
   if(_numproc == 0)
     {
       pthread_join(th,&ret_th);
-      exception = (bool*)ret_th;
-      if(*exception)
-        {
-          // exception
-          ostringstream msg;
-          msg << "Error on get data by mpi";
-          THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
-        }
-      delete exception;
+      est = (except_st*)ret_th;
+      if(est->exception)
+        throw SALOME_Exception(est->msg.c_str());
+      delete est;
     }
 
 }
 
 void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, MEDCouplingFieldDouble *field)
 {
+  int grank;
   string service = coupling;
+  ostringstream msg;
+
   if( service.size() == 0 )
-    {
-      MESSAGE("[" << _numproc << "] You have to give a service name !");
-      throw POException(_numproc,"You have to give a service name !");
-    }
+    throw SALOME_Exception("You have to give a service name !");
 
   if( _gcom.find(service) == _gcom.end() )
     {
-      MESSAGE("[" << _numproc << "] service " << service << " don't exist !");
-      throw POException(_numproc,"service " + service + " don't exist !");
+      msg << "service " << service << " doesn't exist !";
+      throw SALOME_Exception(msg.str().c_str());
     }
 
   if(!_dec[coupling])
     {
+
+      MPI_Comm_rank( _gcom[coupling], &grank );
+
       // Creating the intersection Data Exchange Channel
       // Processors which sent the field are always the first argument of InterpKernelDEC object
-      if(_numproc==_grank)
+      if(_numproc==grank)
         _dec[coupling] = new InterpKernelDEC(*_source[coupling], *_target[coupling]);
       else
         _dec[coupling] = new InterpKernelDEC(*_target[coupling], *_source[coupling]);
@@ -431,9 +411,10 @@ void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, MEDCouplingFi
 
 void *th_setinterpolationoptions(void *s)
 {
+  ostringstream msg;
   thread_st *st = (thread_st*)s;
-  bool *exception = new bool;
-  *exception = false;
+  except_st *est = new except_st;
+  est->exception = false;
   try
     {
       SALOME_MED::ParaMEDMEMComponent_var compo=SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]);
@@ -451,64 +432,98 @@ void *th_setinterpolationoptions(void *s)
                                      st->splitting_policy,
                                      st->P1P0_bary_method);
     }
-  catch(...)
+  catch(const SALOME::SALOME_Exception &ex)
     {
-      *exception = true;
+      est->exception = true;
+      est->msg = ex.details.text;
+    }
+  catch(const CORBA::Exception &ex)
+    {
+      est->exception = true;
+      msg << "CORBA::Exception: " << ex;
+      est->msg = msg.str();
     }
   delete st;
-  return((void*)exception);
+  return((void*)est);
 }
 
 void *th_initializecoupling(void *s)
 {
+  ostringstream msg;
   thread_st *st = (thread_st*)s;
-  bool *exception = new bool;
-  *exception = false;
+  except_st *est = new except_st;
+  est->exception = false;
+
   try
     {
       SALOME_MED::ParaMEDMEMComponent_var compo=SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]);
       compo->initializeCoupling(st->coupling.c_str());
     }
-  catch(...)
+  catch(const SALOME::SALOME_Exception &ex)
     {
-      *exception = true;
+      est->exception = true;
+      est->msg = ex.details.text;
+    }
+  catch(const CORBA::Exception &ex)
+    {
+      est->exception = true;
+      msg << "CORBA::Exception: " << ex;
+      est->msg = msg.str();
     }
   delete st;
-  return((void*)exception);
+  return((void*)est);
 }
 
 void *th_terminatecoupling(void *s)
 {
+  ostringstream msg;
   thread_st *st = (thread_st*)s;
-  bool *exception = new bool;
-  *exception = false;
+  except_st *est = new except_st;
+  est->exception = false;
+
   try
     {
       SALOME_MED::ParaMEDMEMComponent_var compo=SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]);
       compo->terminateCoupling(st->coupling.c_str());
     }
-  catch(...)
+  catch(const SALOME::SALOME_Exception &ex)
     {
-      *exception = true;
+      est->exception = true;
+      est->msg = ex.details.text;
+    }
+  catch(const CORBA::Exception &ex)
+    {
+      est->exception = true;
+      msg << "CORBA::Exception: " << ex;
+      est->msg = msg.str();
     }
   delete st;
-  return((void*)exception);
+  return((void*)est);
 }
 
 void *th_getdata(void *s)
 {
+  ostringstream msg;
   thread_st *st = (thread_st*)s;
-  bool *exception = new bool;
-  *exception = false;
+  except_st *est = new except_st;
+  est->exception = false;
+
   try
     {
       st->fieldptr->getDataByMPI(st->coupling.c_str());
     }
-  catch(...)
+  catch(const SALOME::SALOME_Exception &ex)
     {
-      *exception = true;
+      est->exception = true;
+      est->msg = ex.details.text;
+    }
+  catch(const CORBA::Exception &ex)
+    {
+      est->exception = true;
+      msg << "CORBA::Exception: " << ex;
+      est->msg = msg.str();
     }
   delete st;
-  return((void*)exception);
+  return((void*)est);
 }
 

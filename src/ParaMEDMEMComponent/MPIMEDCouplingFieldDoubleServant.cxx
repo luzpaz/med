@@ -1,7 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-//
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -19,10 +16,17 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "MPIMEDCouplingFieldDoubleServant.hxx"
 #include "utilities.h"
 using namespace std;
 using namespace ParaMEDMEM;
+
+typedef struct
+{
+  bool exception;
+  string msg;
+} except_st;
 
 MPIMEDCouplingFieldDoubleServant::MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,MEDCouplingFieldDouble* field):ParaMEDCouplingFieldDoubleServant(orb,field)
 {
@@ -34,9 +38,10 @@ MPIMEDCouplingFieldDoubleServant::MPIMEDCouplingFieldDoubleServant(CORBA::ORB_pt
 
 void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling) throw(SALOME::SALOME_Exception)
 {
-  bool *exception;
+  except_st *est;
   void *ret_th;
   pthread_t *th;
+
   if(_numproc == 0)
     {
       th = new pthread_t[_nbproc];
@@ -54,18 +59,10 @@ void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling) throw(
     {
       _pcompo->_getOutputField(coupling,_field);
     }
-  catch(const POException &ex)
+  catch(const std::exception &ex)
     {
-      // exception
-      ostringstream msg;
-      msg << ex.msg << " on process number " << ex.numproc;
-      MESSAGE(msg.str());
-      THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
-    }
-  catch(...)
-    {
-      MESSAGE("Unknown exception");
-      THROW_SALOME_CORBA_EXCEPTION("Unknown exception",SALOME::INTERNAL_ERROR);
+      MESSAGE(ex.what());
+      THROW_SALOME_CORBA_EXCEPTION(ex.what(),SALOME::INTERNAL_ERROR);
     }
     
   if(_numproc == 0)
@@ -73,15 +70,14 @@ void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling) throw(
       for(int ip=1;ip<_nbproc;ip++)
         {
           pthread_join(th[ip],&ret_th);
-          exception = (bool*)ret_th;
-          if(*exception)
+          est = (except_st*)ret_th;
+          if(est->exception)
             {
-              // exception
               ostringstream msg;
-              msg << "Error on get data by mpi on process " << ip;
+              msg << "[" << ip << "] " << est->msg;
               THROW_SALOME_CORBA_EXCEPTION(msg.str().c_str(),SALOME::INTERNAL_ERROR);
             }
-          delete exception;
+          delete est;
         }
       delete[] th;
     }
@@ -89,19 +85,28 @@ void MPIMEDCouplingFieldDoubleServant::getDataByMPI(const char* coupling) throw(
 
 void *th_getdatabympi(void *s)
 {
+  ostringstream msg;
   thread_st *st = (thread_st*)s;
-  bool *exception = new bool;
-  *exception = false;
+  except_st *est = new except_st;
+  est->exception = false;
+
   try
     {
       SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_var fieldPtr=SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface::_narrow((*(st->tior))[st->ip]);
       fieldPtr->getDataByMPI(st->coupling.c_str());
     }
-  catch(...)
+  catch(const SALOME::SALOME_Exception &ex)
     {
-      *exception = true;
+      est->exception = true;
+      est->msg = ex.details.text;
+    }
+  catch(const CORBA::Exception &ex)
+    {
+      est->exception = true;
+      msg << "CORBA::Exception: " << ex;
+      est->msg = msg.str();
     }
   delete st;
-  return((void*)exception);
+  return((void*)est);
 }
 

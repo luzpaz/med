@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D
+//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -16,6 +16,7 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include <vector>
 #include <string>
 #ifndef WNT
@@ -125,7 +126,7 @@ MESHCollection::MESHCollection(const MESHCollection& initial_collection, Topolog
                         mesh_builder->setSpaceDimension(initial_collection.getSpaceDimension());
                 }
         
-        m_topology->createFaceMapping(initial_collection);      
+        m_topology->createFaceMapping(initial_collection, *this);      
         for (int idomain=0; idomain<m_topology->nbDomain(); idomain++)
                 {
                         switch (getMeshDimension())

@@ -1,7 +1,4 @@
-#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-#
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
@@ -19,6 +16,7 @@
 #
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+
 # This Makefile is responsible of generating the client and server
 # implementation of IDL interfaces for both C++ and python usage.
 # The building process of the C++ files is in charge of each source
@@ -28,7 +26,7 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 BASEIDL_FILES = MED.idl MED_Gen.idl Compo1Py.idl MEDCouplingCorbaServant.idl MEDCouplingCorbaServantTest.idl
 
-MPIIDL_FILES = ParaMEDMEMComponent.idl ParaMEDCouplingCorbaServant.idl
+MPIIDL_FILES = ParaMEDCouplingCorbaServant.idl ParaMEDMEMComponent.idl
 
 IDL_FILES = $(BASEIDL_FILES)
 if MPI_IS_OK
@@ -44,7 +42,7 @@ lib_LTLIBRARIES = libSalomeIDLMED.la
 # Sources built from idl files
 BASEIDL_SOURCES = MEDSK.cc MED_GenSK.cc MEDCouplingCorbaServantSK.cc Compo1PySK.cc MEDCouplingCorbaServantTestSK.cc
 
-MPIIDL_SOURCES = ParaMEDMEMComponentSK.cc ParaMEDCouplingCorbaServantSK.cc
+MPIIDL_SOURCES = ParaMEDCouplingCorbaServantSK.cc ParaMEDMEMComponentSK.cc
 
 IDL_SOURCES = $(BASEIDL_SOURCES)
 if MPI_IS_OK
@@ -56,7 +54,7 @@ nodist_libSalomeIDLMED_la_SOURCES = $(IDL_SOURCES)
 # header files must be exported: other modules have to use this library
 nodist_salomeinclude_HEADERS = MED.hh MED_Gen.hh MEDCouplingCorbaServant.hh Compo1Py.hh MEDCouplingCorbaServantTest.hh
 if MPI_IS_OK
-  nodist_salomeinclude_HEADERS += ParaMEDMEMComponent.hh ParaMEDCouplingCorbaServant.hh
+  nodist_salomeinclude_HEADERS += ParaMEDCouplingCorbaServant.hh ParaMEDMEMComponent.hh
 endif
 
 libSalomeIDLMED_la_CPPFLAGS =			\

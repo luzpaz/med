@@ -1,7 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
-//
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
@@ -24,6 +21,10 @@
 #include <cstdlib>
 #include <list>
 #include <stdexcept>
+
+#ifdef WNT
+#include <windows.h>
+#endif
 
 //================================================================================
 /*!
@@ -68,13 +69,18 @@ std::string getTmpDirectory()
   std::string path;
 
   std::list<std::string> dirs;
+  if ( getenv("TEMP") )   dirs.push_back( getenv("TEMP" ));
   if ( getenv("TMP") )    dirs.push_back( getenv("TMP" ));
   if ( getenv("TMPDIR") ) dirs.push_back( getenv("TMPDIR" ));
   dirs.push_back( "/tmp" );
 
   std::string tmpd = "";
   for ( std::list<std::string>::iterator dir = dirs.begin(); dir != dirs.end() && tmpd == "" ; ++dir ) {
+#ifdef WNT
+    if ( GetFileAttributes(dir->data()) & FILE_ATTRIBUTE_DIRECTORY ) {
+#else
     if ( access( dir->data(), W_OK ) == 0 ) {
+#endif
       tmpd = dir->data();
     }
   }

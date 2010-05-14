@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 //  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 //  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -19,6 +19,7 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef VTK_FIELD_DRIVER_HXX
 #define VTK_FIELD_DRIVER_HXX
 
@@ -41,6 +42,11 @@
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_VtkMeshDriver.hxx"
 
+#ifdef WNT
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
 #include <fcntl.h>
 
 /*!
@@ -381,7 +387,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
   if ( vtkFile > 0 )
   {
 #ifdef WNT
-    ssize_t fileSize = ::_lseek( vtkFile, 0, SEEK_END); ::lseek( vtkFile, 0, _SEEK_SET);
+    ssize_t fileSize = ::_lseek( vtkFile, 0, SEEK_END); ::lseek( vtkFile, 0, SEEK_SET);
     char* buf = new char[ fileSize ];
     ::_read (vtkFile, buf, fileSize );
 #else
