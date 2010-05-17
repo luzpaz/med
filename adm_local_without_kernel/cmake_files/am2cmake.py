@@ -52,7 +52,7 @@ p_if = re.compile(r"""
 if         # an if
 \s+        # 1 or more space
 (?P<val>   # open the group val
-[^\s]+     # the group contain 1 or more non space characters
+.+         # the group contain 1 or more non space characters
 )          # close the group
 """, re.VERBOSE)
 
@@ -122,16 +122,6 @@ class CMakeFile(object):
         # Replace the composed lines separated by "\\n" by an unique line
         # --
         content = p_multiline.sub(r' ', content)
-        
-        # --
-        content = content.replace("-no-undefined -version-info=0:0:0", "")
-        content = content.replace("-include SALOMEconfig.h", "")
-
-        # --
-        # Compatibility medfile
-        # --
-        content = content.replace("-no-undefined -version-info 0:0:0", "")
-        content = content.replace("-no-undefined -version-info 2:5:1", "")
         
         # --
         # Compatibility netgen plugin
@@ -208,6 +198,11 @@ class CMakeFile(object):
             "XmlPlugin",
             "XmlTObjPlugin",
             "XmlXCAFPlugin",
+            ]
+        vtk_list = [
+            "vtkCommonPythonD",
+            "vtkGraphicsPythonD",
+            "vtkImagingPythonD",
             ]
         kernel_list  = [
             "DF",
@@ -328,6 +323,7 @@ class CMakeFile(object):
             "SalomeIDLMED",
             ]
         smesh_list = [
+            "GeomSelectionTools",
             "MEFISTO2D",
             "MeshDriverDAT",
             "MeshDriverMED",
@@ -348,12 +344,9 @@ class CMakeFile(object):
             "StdMeshersGUI",
             "StdMeshers",
             ]
-        full_list = cas_list + kernel_list + gui_list
+        full_list  = cas_list + vtk_list
+        full_list += kernel_list + gui_list
         full_list += geom_list + med_list + smesh_list
-        # --
-        full_list += [
-            "boost_thread",
-            ]
         # --
         # E.A. : sort by len before substitution ...
         # Why ? Thing to "-lMEDWrapper" then "-lMEDWrapper_V2_1" substition
@@ -404,15 +397,20 @@ class CMakeFile(object):
         self.finalize(newlines)
         
         # --
-        # Add a last CR at the end of the file
-        # --
-        newlines.append('\n')
-        
-        # --
         # Concatenate newlines into content
         # --
         content = '\n'.join(newlines)
-
+        
+        # --
+        # Add a CR at end if necessary
+        # --
+        lines = content.split('\n')
+        # lines = [ l.strip() for l in lines ]
+        if len(lines[-1]) != 0:
+            lines.append('')
+            pass
+        content = '\n'.join(lines)
+        
         # --
         self.content = content
         
@@ -440,6 +438,7 @@ class CMakeFile(object):
                 INCLUDE(${CMAKE_SOURCE_DIR}/salome_adm/cmake_files/FindLIBXML2.cmake)
                 INCLUDE(${CMAKE_SOURCE_DIR}/salome_adm/cmake_files/FindSWIG.cmake)
                 INCLUDE(${CMAKE_SOURCE_DIR}/salome_adm/cmake_files/FindCPPUNIT.cmake)
+                INCLUDE(${CMAKE_SOURCE_DIR}/salome_adm/cmake_files/FindDOXYGEN.cmake)
                 """)
                 pass
             else:
@@ -456,6 +455,7 @@ class CMakeFile(object):
                     INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindLIBXML2.cmake)
                     INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindSWIG.cmake)
                     INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindCPPUNIT.cmake)
+                    INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindDOXYGEN.cmake)
                     INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindKERNEL.cmake)
                     ELSE(KERNEL_ROOT_DIR)
                     INCLUDE(${CMAKE_SOURCE_DIR}/adm_local_without_kernel/cmake_files/FindPLATFORM.cmake)
@@ -474,6 +474,7 @@ class CMakeFile(object):
                     INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindLIBXML2.cmake)
                     INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindSWIG.cmake)
                     INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindCPPUNIT.cmake)
+                    INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindDOXYGEN.cmake)
                     INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindKERNEL.cmake)
                     """)
                     pass
@@ -502,6 +503,10 @@ class CMakeFile(object):
                     if self.module == "med":
                         newlines.append("""
                         INCLUDE(${CMAKE_SOURCE_DIR}/adm_local/cmake_files/FindMEDFILE.cmake)
+                        IF(WINDOWS)
+                        INCLUDE(${CMAKE_SOURCE_DIR}/adm_local/cmake_files/FindXDR.cmake)
+                        ENDIF(WINDOWS)
+                        INCLUDE(${CMAKE_SOURCE_DIR}/adm_local_without_kernel/cmake_files/FindMPI.cmake)
                         """)
                         pass
                     if self.module == "smesh":
@@ -535,21 +540,62 @@ class CMakeFile(object):
                         INCLUDE(${CMAKE_SOURCE_DIR}/adm_local/cmake_files/FindBLSURF.cmake)
                         """)
                         pass
+                    if self.module in ["ghs3dplugin", "hexoticplugin"]:
+                        newlines.append("""
+                        SET(GEOM_ROOT_DIR $ENV{GEOM_ROOT_DIR})
+                        SET(MED_ROOT_DIR $ENV{MED_ROOT_DIR})
+                        SET(SMESH_ROOT_DIR $ENV{SMESH_ROOT_DIR})
+                        INCLUDE(${GEOM_ROOT_DIR}/adm_local/cmake_files/FindGEOM.cmake)
+                        INCLUDE(${MED_ROOT_DIR}/adm_local/cmake_files/FindMED.cmake)
+                        INCLUDE(${SMESH_ROOT_DIR}/adm_local/cmake_files/FindSMESH.cmake)
+                        """)
+                        pass
+                    if self.module == "ghs3dprlplugin":
+                        newlines.append("""
+                        SET(GEOM_ROOT_DIR $ENV{GEOM_ROOT_DIR})
+                        SET(MED_ROOT_DIR $ENV{MED_ROOT_DIR})
+                        SET(SMESH_ROOT_DIR $ENV{SMESH_ROOT_DIR})
+                        INCLUDE(${GEOM_ROOT_DIR}/adm_local/cmake_files/FindGEOM.cmake)
+                        INCLUDE(${MED_ROOT_DIR}/adm_local/cmake_files/FindMEDFILE.cmake)
+                        INCLUDE(${MED_ROOT_DIR}/adm_local/cmake_files/FindMED.cmake)
+                        INCLUDE(${SMESH_ROOT_DIR}/adm_local/cmake_files/FindSMESH.cmake)
+                        """)
+                        pass
                     if self.module == "visu":
                         newlines.append("""
                         SET(MED_ROOT_DIR $ENV{MED_ROOT_DIR})
                         INCLUDE(${MED_ROOT_DIR}/adm_local/cmake_files/FindMED.cmake)
                         """)
                         pass
+                    if self.module == "yacs":
+                        newlines.append("""
+                        INCLUDE(${CMAKE_SOURCE_DIR}/adm/cmake/FindEXPAT.cmake)
+                        INCLUDE(${CMAKE_SOURCE_DIR}/adm/cmake/FindGRAPHVIZ.cmake)
+                        """)
+                        pass
                     pass
+                pass
+            # --
+            newlines.append("""
+            SET(DOXYGEN_IS_OK 0)
+            """)
+            if self.module not in ['med']:
+                newlines.append("""
+                IF(WINDOWS)
+                SET(CPPUNIT_IS_OK 0)
+                ENDIF(WINDOWS)
+                """)
                 pass
             # --
             if self.module == "kernel":
                 newlines.append("""
                 SET(WITH_LOCAL 1)
                 SET(WITH_BATCH 1)
-                set(VERSION 4.1.3)
-                set(XVERSION 0x040103)
+                set(VERSION 5.1.4)
+                set(XVERSION 0x050104)
+                SET(CALCIUM_IDL_INT_F77 long)
+                SET(CALCIUM_CORBA_INT_F77 CORBA::Long)
+                SET(LONG_OR_INT int)
                 """)
             elif self.module == "gui":
                 newlines.append("""
@@ -561,7 +607,9 @@ class CMakeFile(object):
                 SET(ENABLE_PLOT2DVIEWER ON)
                 SET(ENABLE_PYCONSOLE ON)
                 SET(ENABLE_SUPERVGRAPHVIEWER ON)
-                # SET(ENABLE_QXGRAPHVIEWER ON)
+                SET(ENABLE_QXGRAPHVIEWER ON)
+                set(VERSION 5.1.4)
+                set(XVERSION 0x050104)
                 """)
                 pass
             elif self.module == "geom":
@@ -586,6 +634,9 @@ class CMakeFile(object):
                 newlines.append("""
                 IF(KERNEL_ROOT_DIR)
                 SET(MED_ENABLE_KERNEL ON)
+                IF(NOT WINDOWS)
+                SET(MED_ENABLE_SPLITTER ON)
+                ENDIF(NOT WINDOWS)
                 ENDIF(KERNEL_ROOT_DIR)
                 IF(GUI_ROOT_DIR)
                 SET(MED_ENABLE_GUI ON)
@@ -613,15 +664,60 @@ class CMakeFile(object):
                 ENDIF(GUI_ROOT_DIR)
                 """)
                 pass
+            elif self.module == "ghs3dplugin":
+                newlines.append("""
+                IF(GUI_ROOT_DIR)
+                SET(GHS3DPLUGIN_ENABLE_GUI ON)
+                ENDIF(GUI_ROOT_DIR)
+                """)
+                pass
+            elif self.module == "hexoticplugin":
+                newlines.append("""
+                IF(GUI_ROOT_DIR)
+                SET(HEXOTICPLUGIN_ENABLE_GUI ON)
+                ENDIF(GUI_ROOT_DIR)
+                """)
+                pass
+            elif self.module == "ghs3dprlplugin":
+                newlines.append("""
+                IF(GUI_ROOT_DIR)
+                SET(GHS3DPRLPLUGIN_ENABLE_GUI ON)
+                ENDIF(GUI_ROOT_DIR)
+                """)
+                pass
+            elif self.module == "yacs":
+                newlines.append("""
+                SET(SALOME_KERNEL ON)
+                SET(HAS_GUI ON)
+                SET(WITH_QT4 ON)
+                """)
+                pass
             # --
             pass
         # --
         newlines.append("""
+        SET(VERSION_INFO 0.0.0)
+        SET(SOVERSION_INFO 0)
         SET(SUBDIRS)
         SET(AM_CPPFLAGS)
         SET(AM_CXXFLAGS)
         SET(LDADD)
         """)
+        if self.module == "kernel":
+            newlines.append(r'''
+            SET(AM_CPPFLAGS ${AM_CPPFLAGS} -DHAVE_SALOME_CONFIG -I${CMAKE_BINARY_DIR}/salome_adm/unix -include SALOMEconfig.h)
+            SET(AM_CXXFLAGS ${AM_CXXFLAGS} -DHAVE_SALOME_CONFIG -I${CMAKE_BINARY_DIR}/salome_adm/unix -include SALOMEconfig.h)
+            ''')
+        else:
+            if self.module not in ["yacs"]:
+                newlines.append(r'''
+                IF(KERNEL_ROOT_DIR)
+                SET(AM_CPPFLAGS ${AM_CPPFLAGS} -DHAVE_SALOME_CONFIG -I${KERNEL_ROOT_DIR}/include/salome -include SALOMEconfig.h)
+                SET(AM_CXXFLAGS ${AM_CXXFLAGS} -DHAVE_SALOME_CONFIG -I${KERNEL_ROOT_DIR}/include/salome -include SALOMEconfig.h)
+                ENDIF(KERNEL_ROOT_DIR)
+                ''')
+                pass
+            pass
         # --
         return
     
@@ -661,7 +757,7 @@ class CMakeFile(object):
             return
         
         # --
-        # A particuliar case
+        # A particuliar case where there are two ":" on the same line
         # --
         if line.find('install-exec-local:') == 0:
             newlines.append("# " + line)
@@ -673,6 +769,25 @@ class CMakeFile(object):
         if line.find("\t") == 0:
             newlines.append("# " + line)
             return
+        
+        # --
+        # --
+        key = "-version-info"
+        if line.find(key) >= 0:
+            # --
+            before = line.split(key)[0]
+            after = line[len(before)+len(key):]
+            sep = after[0]
+            after = after[1:]
+            version_info = after.split()[0]
+            line = line.replace(key+sep+version_info, "")
+            # --
+            version_info = version_info.replace(':', '.')
+            soversion_info = version_info.split('.')[0]
+            newlines.append("SET(VERSION_INFO " + version_info + ")")
+            newlines.append("SET(SOVERSION_INFO " + soversion_info + ")")
+            # --
+            pass
         
         # --
         # Replace the $(TOTO) by ${TOTO}
@@ -793,6 +908,12 @@ class CMakeFile(object):
         # --
         # Convert the .in files in build dir
         # --
+        if self.module == "yacs":
+            key = "salomegui"
+            if self.root[-len(key):] == key:
+                self.files.append("resources/YACSCatalog.xml.in")
+                pass
+            pass
         for f in self.files:
             if f[-3:] == ".in":
                 if f == "sstream.in":
@@ -844,7 +965,7 @@ class CMakeFile(object):
         
         # --
         # --
-        for key in ["bin_PROGRAMS"]:
+        for key in ["bin_PROGRAMS", "check_PROGRAMS"]:
             if self.__thedict__.has_key(key):
                 self.addBinTarget(key, newlines)
                 pass
@@ -866,6 +987,11 @@ class CMakeFile(object):
         
         key = "IDL_FILES"
         if self.__thedict__.has_key(key):
+            if self.module == "kernel":
+                newlines.append('''
+                SET(IDL_FILES ${IDL_FILES} Calcium_Ports.idl)
+                ''')
+                pass
             newlines.append('''
             FOREACH(input ${IDL_FILES})
             STRING(REGEX REPLACE ".idl" "" base ${input})
@@ -873,14 +999,34 @@ class CMakeFile(object):
             SET(outputs ${src})
             SET(dynsrc ${CMAKE_CURRENT_BINARY_DIR}/${base}DynSK.cc)
             SET(outputs ${outputs} ${dynsrc})
+            SET(inc ${CMAKE_CURRENT_BINARY_DIR}/${base}.hh)
+            SET(outputs ${outputs} ${inc})
+            IF(input STREQUAL Calcium_Ports.idl)
+            SET(input ${CMAKE_CURRENT_BINARY_DIR}/${input})
+            ELSE(input STREQUAL Calcium_Ports.idl)
+            SET(input ${CMAKE_CURRENT_SOURCE_DIR}/${input})
+            ENDIF(input STREQUAL Calcium_Ports.idl)
+            SET(flags ${IDLCXXFLAGS} ${OMNIORB_IDLCXXFLAGS})
+            STRING(REGEX MATCH "-bcxx" ISBCXX ${flags})
+            IF(NOT ISBCXX)
+            SET(flags -bcxx ${flags})
+            ENDIF(NOT ISBCXX)
             ADD_CUSTOM_COMMAND(
             OUTPUT ${outputs}
-            COMMAND ${OMNIORB_IDL} ${IDLCXXFLAGS} ${OMNIORB_IDLCXXFLAGS} ${CMAKE_CURRENT_SOURCE_DIR}/${input}
+            COMMAND ${OMNIORB_IDL} ${flags} ${input}
             MAIN_DEPENDENCY ${input}
             )
+            ''')
+            newlines.append('''
             install(FILES ${input} DESTINATION idl/salome)
-            SET(IDL_HEADER ${CMAKE_CURRENT_BINARY_DIR}/${base}.hh)
-            install(FILES ${IDL_HEADER} DESTINATION include/salome)
+            ''')
+            if self.module not in ["pyhello"]:
+                newlines.append('''
+                SET(IDL_HEADER ${CMAKE_CURRENT_BINARY_DIR}/${base}.hh)
+                install(FILES ${IDL_HEADER} DESTINATION include/salome)
+                ''')
+                pass
+            newlines.append('''
             INSTALL(CODE "SET(IDL_FILE ${input})")
             INSTALL(CODE "SET(DIR lib/python${PYTHON_VERSION}/site-packages/salome)")
             INSTALL(CODE "SET(CMAKE_CURRENT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})")
@@ -890,6 +1036,10 @@ class CMakeFile(object):
             FOREACH(f ${IDLPYFLAGS})
             SET(flags "${flags} ${f}")
             ENDFOREACH(f ${IDLPYFLAGS})
+            STRING(REGEX MATCH "-bpython" ISBPYTHON ${flags})
+            IF(NOT ISBPYTHON)
+            SET(flags "-bpython ${flags}")
+            ENDIF(NOT ISBPYTHON)
             SET(IDLPYFLAGS ${flags})
             STRING(REPLACE "\\\\" "/" IDLPYFLAGS ${IDLPYFLAGS})
             INSTALL(CODE "SET(IDLPYFLAGS ${IDLPYFLAGS})")
@@ -930,9 +1080,22 @@ class CMakeFile(object):
             ELSE(SWIG_SOURCES MATCHES ";")
             SET(SWIG_SOURCES_FIRST "${SWIG_SOURCES}")
             ENDIF(SWIG_SOURCES MATCHES ";")
+            SET(flags)
+            FOREACH(f ${SWIG_FLAGS} ${MY_SWIG_FLAGS})
+            SET(test ON)
+            IF(flags)
+            LIST(FIND flags ${f} index)
+            IF(NOT index EQUAL -1)
+            SET(test OFF)
+            ENDIF(NOT index EQUAL -1)
+            ENDIF(flags)
+            IF(test)
+            SET(flags ${flags} ${f})
+            ENDIF(test)
+            ENDFOREACH(f ${SWIG_FLAGS} ${MY_SWIG_FLAGS})
             ADD_CUSTOM_COMMAND(
             OUTPUT ${build_srcs}
-            COMMAND ${SWIG_EXECUTABLE} ${SWIG_FLAGS} ${MY_SWIG_FLAGS} -o ${build_srcs} ${CMAKE_CURRENT_SOURCE_DIR}/${SWIG_SOURCES_FIRST}
+            COMMAND ${SWIG_EXECUTABLE} ${flags} -o ${build_srcs} ${CMAKE_CURRENT_SOURCE_DIR}/${SWIG_SOURCES_FIRST}
             MAIN_DEPENDENCY ${SWIG_SOURCES}
             )
             ''')
@@ -940,11 +1103,39 @@ class CMakeFile(object):
         
         # --
         # --
+        if self.__thedict__.has_key("BUILT_SOURCES"):
+            newlines.append('''
+            FOREACH(f ${BUILT_SOURCES})
+            IF(f MATCHES "WRAP.cxx$")
+            # STRING(REGEX REPLACE "WRAP.cxx" "WRAP.h" inc ${f})
+            STRING(REGEX REPLACE "WRAP.cxx" ".i" input ${f})
+            ADD_CUSTOM_COMMAND(
+            OUTPUT ${f} # ${inc}
+            COMMAND ${SWIG_EXECUTABLE} ${SWIG_FLAGS} ${SWIG_PYTHON_INCLUDES} ${MYSWIG_FLAGS} -o ${f} ${CMAKE_CURRENT_SOURCE_DIR}/${input}
+            MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${input}
+            )
+            ENDIF(f MATCHES "WRAP.cxx$")
+            ENDFOREACH(f ${BUILT_SOURCES})
+            ''')
+            pass
+
+        # --
+        # --
         key = "MOC_FILES"
         if self.__thedict__.has_key(key):
             newlines.append('''
             FOREACH(output ${MOC_FILES})
-            STRING(REGEX REPLACE _moc.cxx .h input ${output})
+            ''')
+            if self.module == "yacs":
+                newlines.append('''
+                STRING(REGEX REPLACE _moc.cxx .hxx input ${output})
+                ''')
+            else:
+                newlines.append('''
+                STRING(REGEX REPLACE _moc.cxx .h input ${output})
+                ''')
+                pass
+            newlines.append('''
             SET(input ${CMAKE_CURRENT_SOURCE_DIR}/${input})
             SET(output ${CMAKE_CURRENT_BINARY_DIR}/${output})
             ADD_CUSTOM_COMMAND(
@@ -1037,6 +1228,7 @@ class CMakeFile(object):
             "nodist_salomescript_DATA"    :  "bin/salome",
             "salomepython_PYTHON"         :  "lib/python${PYTHON_VERSION}/site-packages/salome",
             "nodist_salomepython_PYTHON"  :  "lib/python${PYTHON_VERSION}/site-packages/salome",
+            "dist_salomepython_DATA"      :  "lib/python${PYTHON_VERSION}/site-packages/salome",
             "sharedpkgpython_PYTHON"      :  "lib/python${PYTHON_VERSION}/site-packages/salome/shared_modules",
             }
         if self.module == "medfile":
@@ -1064,14 +1256,6 @@ class CMakeFile(object):
         # --
         newlines.append(r'''
         IF(WINDOWS)
-        SET(libadd ${libadd} Userenv.lib Ws2_32.lib)
-        ELSE(WINDOWS)
-        SET(libadd ${libadd} -ldl -lpthread)
-        ENDIF(WINDOWS)
-        ''')
-        # --
-        newlines.append(r'''
-        IF(WINDOWS)
         SET(targets)
         SET(targets ${targets} MEFISTO2D)
         FOREACH(target ${targets})
@@ -1086,7 +1270,12 @@ class CMakeFile(object):
         ''')
         # --
         newlines.append(r'''
-        SET(libs ${${amname}_LIBADD} ${${amname}_LDADD} ${${amname}_LDFLAGS})
+        SET(libs ${PLATFORM_LIBADD} ${PLATFORM_LDFLAGS} ${${amname}_LIBADD} ${${amname}_LDADD} ${${amname}_LDFLAGS})
+        FOREACH(lib SALOMEBasics SalomeBatch)
+        IF(name STREQUAL lib)
+        SET(libs ${libs} ${PTHREAD_LIBS})
+        ENDIF(name STREQUAL lib)
+        ENDFOREACH(lib SALOMEBasics SalomeBatch)
         ''')
         if key == "bin_PROGRAMS":
             newlines.append(r'''
@@ -1099,55 +1288,44 @@ class CMakeFile(object):
         GET_FILENAME_COMPONENT(ext ${lib} EXT)
         IF(ext STREQUAL .la)
         GET_FILENAME_COMPONENT(lib ${lib} NAME_WE)
-        STRING(REPLACE "lib" "" lib ${lib})
+        STRING(REGEX REPLACE "^lib" "" lib ${lib})
         ENDIF(ext STREQUAL .la)
+        SET(vars)
+        SET(vars ${vars} -no-undefined)
+        SET(vars ${vars} -lvtkWidgets)
         IF(WINDOWS)
-        SET(vars -Xlinker -export-dynamic -module -Wl,-E)
-        SET(vars ${vars} -lutil -lm)
+        SET(vars ${vars} -module)
+        SET(vars ${vars} -Wl,-E)
+        SET(vars ${vars} -Xlinker)
+        SET(vars ${vars} -export-dynamic)
+        SET(vars ${vars} -lm)
+        SET(vars ${vars} -lboost_thread)
+        SET(vars ${vars} -lboost_signals)
+        SET(vars ${vars} -pthread -lpthread -ldl)
+        ENDIF(WINDOWS)
         FOREACH(v ${vars})
         IF(lib STREQUAL v)
         SET(lib)
         ENDIF(lib STREQUAL v)
         ENDFOREACH(v ${vars})
-        ENDIF(WINDOWS)
         SET(libadd ${libadd} ${lib})
         ENDFOREACH(lib ${libs})
-        TARGET_LINK_LIBRARIES(${name} ${PTHREADS_LIBRARY} ${libadd})
+        TARGET_LINK_LIBRARIES(${name} ${libadd})
         ''')
         # --
         newlines.append(r'''
         IF(WINDOWS)
         SET(targets)
-        SET(targets ${targets} SalomeHDFPersist)
-        SET(targets ${targets} medC)
-        SET(targets ${targets} medimport)
-        SET(targets ${targets} medimportcxx)
-        FOREACH(target ${targets})
-        IF(name STREQUAL ${target})
-        IF(CMAKE_BUILD_TYPE STREQUAL Release)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMT")
-        ELSE(CMAKE_BUILD_TYPE STREQUAL Release)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMTD")
-        ENDIF(CMAKE_BUILD_TYPE STREQUAL Release)
-        ENDIF(name STREQUAL ${target})
-        ENDFOREACH(target ${targets})
-        SET(targets)
         SET(targets ${targets} MEFISTO2D)
         FOREACH(target ${targets})
         IF(name STREQUAL ${target})
+        IF(CMAKE_BUILD_TYPE STREQUAL Debug)
         SET_TARGET_PROPERTIES(${name} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:MSVCRT")
+        ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
         ENDIF(name STREQUAL ${target})
         ENDFOREACH(target ${targets})
         ENDIF(WINDOWS)
         ''')
-        # --
-        if self.module == "med":
-            newlines.append(r'''
-            IF(WINDOWS)
-            SET_TARGET_PROPERTIES(${name} PROPERTIES LINK_FLAGS "/NODEFAULTLIB:LIBCMTD")
-            ENDIF(WINDOWS)
-            ''')
-            pass
         # --
         return
     
@@ -1158,6 +1336,7 @@ class CMakeFile(object):
         SET(targets)
         SET(targets ${targets} SalomeIDLKernel)
         SET(targets ${targets} SalomeDS)
+        SET(targets ${targets} SALOMEDSTest)
         SET(targets ${targets} SALOMEDS_Client_exe)
         SET(targets ${targets} SalomeIDLGEOM)
         SET(targets ${targets} GEOMEngine)
@@ -1172,6 +1351,14 @@ class CMakeFile(object):
         ENDIF(WINDOWS)
         ''')
         # --
+        if self.module in ["medfile", "yacs"]:
+            newlines.append(r'''
+            IF(WINDOWS)
+            SET(var ${var} -DNOGDI)
+            ENDIF(WINDOWS)
+            ''')
+            pass
+        # --
         newlines.append(r'''
         IF(WINDOWS)
         SET(targets)
@@ -1181,14 +1368,9 @@ class CMakeFile(object):
         SET(dir $ENV{F2CHOME})
         STRING(REPLACE "\\\\" "/" dir ${dir})
         SET(var ${var} -I${dir})
+        SET(var ${var} -DF2C_BUILD)
         ENDIF(name STREQUAL ${target})
         ENDFOREACH(target ${targets})
-        ENDIF(WINDOWS)
-        ''')
-        # --
-        newlines.append(r'''
-        IF(WINDOWS)
-        SET(var ${var} -D_USE_MATH_DEFINES)
         ENDIF(WINDOWS)
         ''')
         # --
@@ -1198,20 +1380,39 @@ class CMakeFile(object):
             SET(var ${var} -I${CMAKE_CURRENT_BINARY_DIR})
             ''')
             pass
-        if key == "bin_PROGRAMS":
+        newlines.append(r'''
+        SET(var ${var} ${AM_CPPFLAGS})
+        SET(var ${var} ${AM_CXXFLAGS})
+        ''')
+        if self.module == "yacs":
             newlines.append(r'''
-            SET(var ${var} ${AM_CPPFLAGS})
-            SET(var ${var} ${AM_CXXFLAGS})
+            SET(var ${var} -DYACS_PTHREAD)
+            SET(var ${var} -DCMAKE_BUILD)
+            SET(var ${var} -DSALOME_KERNEL)
+            SET(var ${var} -DDSC_PORTS)
+            SET(var ${var} -DOMNIORB)
             ''')
             pass
         newlines.append(r'''
 	SET(var ${var} ${PLATFORM_CPPFLAGS})
-	SET(var ${var} ${PTHREADS_INCLUDES})
+	SET(var ${var} ${PTHREAD_CFLAGS})
 	SET(var ${var} ${${amname}_CPPFLAGS})
 	SET(var ${var} ${${amname}_CXXFLAGS})
 	SET(var ${var} ${${amname}_CFLAGS})
+        SET(vars)
+        IF(WINDOWS)
+        SET(vars ${vars} -include SALOMEconfig.h)
+        SET(vars ${vars} -ftemplate-depth-32)
+        SET(vars ${vars} -fPIC)
+        SET(vars ${vars} -g)
+        ENDIF(WINDOWS)
         SET(flags)
         FOREACH(f ${var})
+        FOREACH(v ${vars})
+        IF(f STREQUAL v)
+        SET(f)
+        ENDIF(f STREQUAL v)
+        ENDFOREACH(v ${vars})
         SET(flags "${flags} ${f}")
         ENDFOREACH(f ${var})
         SET_TARGET_PROPERTIES(${name} PROPERTIES COMPILE_FLAGS "${flags}")
@@ -1268,6 +1469,15 @@ class CMakeFile(object):
         SET(type SHARED)
         ENDIF(ISIDL)
         ''')
+        if key == "noinst_LTLIBRARIES":
+            newlines.append(r'''
+            IF(WINDOWS)
+            SET(type STATIC)
+            ELSE(WINDOWS)
+            SET(type STATIC)
+            ENDIF(WINDOWS)
+            ''')
+            pass
         # --
         # Set sources for the library
         # --
@@ -1305,15 +1515,24 @@ class CMakeFile(object):
         ENDIF(ext STREQUAL .f)
         SET(srcs ${srcs} ${src})
         ENDFOREACH(src ${${amname}_SOURCES} ${dist_${amname}_SOURCES})
+        ''')
+        newlines.append(r'''
+        SET(l ${nodist_${amname}_SOURCES} ${UIC_FILES})
+        FOREACH(f ${l})
+        SET(src ${CMAKE_CURRENT_BINARY_DIR}/${f})
+        SET(srcs ${srcs} ${src})
+        ENDFOREACH(f ${l})
+        ''')
+        newlines.append(r'''
         SET(build_srcs)
-        FOREACH(f ${nodist_${amname}_SOURCES} ${BUILT_SOURCES})
+        SET(l ${nodist_${amname}_SOURCES} ${BUILT_SOURCES})
+        FOREACH(f ${l})
         GET_FILENAME_COMPONENT(ext ${f} EXT)
         IF(ext STREQUAL .py)
         ELSE(ext STREQUAL .py)
         SET(build_srcs ${build_srcs} ${CMAKE_CURRENT_BINARY_DIR}/${f})
         ENDIF(ext STREQUAL .py)
-        ENDFOREACH(f ${nodist_${amname}_SOURCES})
-        SET(srcs ${build_srcs} ${srcs})
+        ENDFOREACH(f ${l})
         ''')
         # --
         # Add the library to cmake
@@ -1327,155 +1546,12 @@ class CMakeFile(object):
         self.setCompilationFlags(key, newlines)
         # --
         newlines.append(r'''
-        SET_TARGET_PROPERTIES(${name} PROPERTIES VERSION 0.0.0 SOVERSION 0)
-        FOREACH(lib medC med)
-        IF(lib STREQUAL ${name})
-        SET_TARGET_PROPERTIES(${name} PROPERTIES VERSION 1.1.5 SOVERSION 1)
-        ENDIF(lib STREQUAL ${name})
-        ENDFOREACH(lib medC med)
-        ''')
-        # --
-        from os.path import basename
-        upper_name = basename(self.root).upper()
-        # --
-        if upper_name in ["2.1.X", "2.3.1"]:
-            upper_name = "D_" + upper_name
-            pass
-        # --
-        newlines.append(r'''
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL %s_EXPORTS)
-        '''%(upper_name))
-        # --
-        newlines.append(r'''
-        IF(name STREQUAL SalomeLauncher)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL SALOME%s_EXPORTS)
-        ENDIF(name STREQUAL SalomeLauncher)
-        '''%(upper_name))
-        newlines.append(r'''
-        IF(name STREQUAL SalomeResourcesManager)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL SALOME%s_EXPORTS)
-        ENDIF(name STREQUAL SalomeResourcesManager)
-        '''%(upper_name))
-        newlines.append(r'''
-        IF(name STREQUAL GEOMObject)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL GEOM_%s_EXPORTS)
-        ENDIF(name STREQUAL GEOMObject)
-        '''%(upper_name))
-        newlines.append(r'''
-        IF(name STREQUAL medC)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL MEDC_DLL_EXPORTS)
-        ENDIF(name STREQUAL medC)
-        ''')
-        newlines.append(r'''
-        IF(name STREQUAL med)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL MED_DLL_EXPORTS)
-        ENDIF(name STREQUAL med)
-        ''')
-        newlines.append(r'''
-        IF(name STREQUAL medimport)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL MEDIMPORT_DLL_EXPORTS)
-        ENDIF(name STREQUAL medimport)
-        ''')
-        newlines.append(r'''
-        IF(name STREQUAL medimportcxx)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL MEDIMPORTCXX_DLL_EXPORTS)
-        ENDIF(name STREQUAL medimportcxx)
-        ''')
-        # --
-        newlines.append(r'''
-        IF(name STREQUAL MEDWrapperBase)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL MEDWRAPPER_BASE_EXPORTS)
-        ENDIF(name STREQUAL MEDWrapperBase)
-        ''')
-        newlines.append(r'''
-        IF(name STREQUAL MEDWrapper_V2_1)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL MEDWRAPPER_V2_1_EXPORTS)
-        ENDIF(name STREQUAL MEDWrapper_V2_1)
-        ''')
-        newlines.append(r'''
-        IF(name STREQUAL med_V2_1)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL MEDWRAPPER_V2_1_CORE_EXPORTS)
-        ENDIF(name STREQUAL med_V2_1)
-        ''')
-        newlines.append(r'''
-        IF(name STREQUAL MEDWrapper_V2_2)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL MEDWRAPPER_V2_2_EXPORTS)
-        ENDIF(name STREQUAL MEDWrapper_V2_2)
-        ''')
-        newlines.append(r'''
-        IF(name STREQUAL MEDWrapper)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL MEDWRAPPER_FACTORY_EXPORTS)
-        ENDIF(name STREQUAL MEDWrapper)
-        ''')
-        newlines.append(r'''
-        IF(name STREQUAL interpkernelbases)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL INTERPKERNELBASES_EXPORTS)
-        ENDIF(name STREQUAL interpkernelbases)
-        IF(name STREQUAL InterpGeometric2DAlg)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL INTERPKERNELGEOMETRIC2D_EXPORTS)
-        ENDIF(name STREQUAL InterpGeometric2DAlg)
-        IF(name STREQUAL interpkernel)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL INTERPKERNEL_EXPORTS)
-        ENDIF(name STREQUAL interpkernel)
-        IF(name STREQUAL MEDClientcmodule)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL MEDCLIENT_EXPORTS)
-        ENDIF(name STREQUAL MEDClientcmodule)
-        ''')
-        # --
-        newlines.append(r'''
-        IF(name STREQUAL SMESHControls)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL SMESHCONTROLS_EXPORTS)
-        ENDIF(name STREQUAL SMESHControls)
-        ''')
-        newlines.append(r'''
-        IF(name STREQUAL MeshDriver)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL MESHDRIVER_EXPORTS)
-        ENDIF(name STREQUAL MeshDriver)
-        ''')
-        newlines.append(r'''
-        IF(name STREQUAL MeshDriverMED)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL MESHDRIVERMED_EXPORTS)
-        ENDIF(name STREQUAL MeshDriverMED)
-        ''')
-        newlines.append(r'''
-        IF(name STREQUAL MeshDriverDAT)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL MESHDRIVERDAT_EXPORTS)
-        ENDIF(name STREQUAL MeshDriverDAT)
-        ''')
-        newlines.append(r'''
-        IF(name STREQUAL MeshDriverUNV)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL MESHDRIVERUNV_EXPORTS)
-        ENDIF(name STREQUAL MeshDriverUNV)
-        ''')
-        newlines.append(r'''
-        IF(name STREQUAL MeshDriverSTL)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL MESHDRIVERSTL_EXPORTS)
-        ENDIF(name STREQUAL MeshDriverSTL)
-        ''')
-        newlines.append(r'''
-        IF(name STREQUAL MEFISTO2D)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL MEFISTO2D_EXPORTS)
-        ENDIF(name STREQUAL MEFISTO2D)
-        ''')
-        newlines.append(r'''
-        IF(name STREQUAL SMESHObject)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL SMESHOBJECT_EXPORTS)
-        ENDIF(name STREQUAL SMESHObject)
-        ''')
-        newlines.append(r'''
-        IF(name STREQUAL _libSMESH_Swig)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL SMESH_SWIG_EXPORTS)
-        ENDIF(name STREQUAL _libSMESH_Swig)
-        ''')
-        newlines.append(r'''
-        IF(name STREQUAL NETGENPluginGUI)
-        SET_TARGET_PROPERTIES(${name} PROPERTIES DEFINE_SYMBOL NETGENPLUGIN_GUI_EXPORTS)
-        ENDIF(name STREQUAL NETGENPluginGUI)
+        SET_TARGET_PROPERTIES(${name} PROPERTIES VERSION ${VERSION_INFO} SOVERSION ${SOVERSION_INFO})
         ''')
         # --
         self.setLibAdd(key, newlines)
         # --
-        if 1: # key != "noinst_LTLIBRARIES":
+        if key != "noinst_LTLIBRARIES":
             if self.module == "medfile":
                 newlines.append(r'''
                 SET(DEST lib)
@@ -1489,6 +1565,34 @@ class CMakeFile(object):
             IF(BEGIN_WITH_lib)
             INSTALL(TARGETS ${name} DESTINATION ${DEST})
             ''')
+            if self.module == "gui":
+                newlines.append(r'''
+                FOREACH(lib SalomePyQt)
+                IF(name STREQUAL lib)
+                IF(WINDOWS)
+                IF(CMAKE_BUILD_TYPE STREQUAL Release)
+                INSTALL(FILES ${CMAKE_INSTALL_PREFIX}/${DEST}/${name}.dll DESTINATION ${DEST} RENAME ${name}.pyd)
+                ELSE(CMAKE_BUILD_TYPE STREQUAL Release)
+                INSTALL(FILES ${CMAKE_INSTALL_PREFIX}/${DEST}/${name}.dll DESTINATION ${DEST} RENAME ${name}_d.pyd)
+                ENDIF(CMAKE_BUILD_TYPE STREQUAL Release)
+                ELSE(WINDOWS)
+                INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${name}.so DESTINATION ${DEST} RENAME ${name}.so)
+                ENDIF(WINDOWS)
+                ENDIF(name STREQUAL lib)
+                ENDFOREACH(lib SalomePyQt)
+                FOREACH(lib SalomePy)
+                IF(name STREQUAL lib)
+                IF(WINDOWS)
+                IF(CMAKE_BUILD_TYPE STREQUAL Release)
+                INSTALL(FILES ${CMAKE_INSTALL_PREFIX}/${DEST}/${name}.dll DESTINATION ${DEST} RENAME lib${name}.pyd)
+                ELSE(CMAKE_BUILD_TYPE STREQUAL Release)
+                INSTALL(FILES ${CMAKE_INSTALL_PREFIX}/${DEST}/${name}.dll DESTINATION ${DEST} RENAME lib${name}_d.pyd)
+                ENDIF(CMAKE_BUILD_TYPE STREQUAL Release)
+                ENDIF(WINDOWS)
+                ENDIF(name STREQUAL lib)
+                ENDFOREACH(lib SalomePy)
+                ''')
+                pass
             if self.module == "geom":
                 newlines.append(r'''
                 IF(WINDOWS)
@@ -1504,10 +1608,9 @@ class CMakeFile(object):
                 ''')
                 pass
             newlines.append(r'''
-            IF(name STREQUAL SalomePyQt)
-            INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${name}.so DESTINATION ${DEST} RENAME ${name}.so)
-            ENDIF(name STREQUAL SalomePyQt)
             ELSE(BEGIN_WITH_lib)
+            ''')
+            newlines.append(r'''
             IF(WINDOWS)
             INSTALL(TARGETS ${name} DESTINATION lib/python${PYTHON_VERSION}/site-packages/salome)
             IF(CMAKE_BUILD_TYPE STREQUAL Release)
@@ -1522,6 +1625,8 @@ class CMakeFile(object):
             INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${name}.so.${version} DESTINATION lib/python${PYTHON_VERSION}/site-packages/salome RENAME ${name}.so.${soversion})
             INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${name}.so.${version} DESTINATION lib/python${PYTHON_VERSION}/site-packages/salome RENAME ${name}.so)
             ENDIF(WINDOWS)
+            ''')
+            newlines.append(r'''
             ENDIF(BEGIN_WITH_lib)
             ''')
             pass
@@ -1535,12 +1640,34 @@ class CMakeFile(object):
     def addBinTarget(self, key, newlines):
         # --
         newlines.append(r'''
-        FOREACH(amname ${bin_PROGRAMS})
+        FOREACH(amname ${%s})
+        '''%(key))
+        # --
+        newlines.append(r'''
+        SET(test ON)
+        ''')
+        if key == "check_PROGRAMS":
+            newlines.append(r'''
+            IF(bin_PROGRAMS)
+            STRING(REGEX MATCH ${amname} is_present ${bin_PROGRAMS})
+            IF(is_present)
+            SET(test OFF)
+            ENDIF(is_present)
+            ENDIF(bin_PROGRAMS)
+            ''')
+            pass
+        newlines.append(r'''
+        IF(test)
         ''')
         # --
         newlines.append(r'''
         SET(name "${amname}_exe")
         SET(srcs ${${amname}_SOURCES} ${dist_${amname}_SOURCES})
+        SET(l ${nodist_${amname}_SOURCES})
+        FOREACH(f ${l})
+        SET(src ${CMAKE_CURRENT_BINARY_DIR}/${f})
+        SET(srcs ${srcs} ${src})
+        ENDFOREACH(f ${l})
         LIST(LENGTH srcs nb)
         IF(nb)
         ADD_EXECUTABLE(${name} ${srcs})
@@ -1560,27 +1687,32 @@ class CMakeFile(object):
             ''')
             pass
         # --
-        newlines.append(r'''
-        IF(WINDOWS)
-        INSTALL(TARGETS ${name} DESTINATION ${DEST})
-        INSTALL(FILES ${CMAKE_INSTALL_PREFIX}/${DEST}/${name}.exe DESTINATION ${DEST} RENAME ${amname}.exe)
-        INSTALL(CODE "FILE(REMOVE ${CMAKE_INSTALL_PREFIX}/${DEST}/${name}.exe)")
-        ELSE(WINDOWS)
-        SET(PERMS)
-        SET(PERMS ${PERMS} OWNER_READ OWNER_WRITE OWNER_EXECUTE)
-        SET(PERMS ${PERMS} GROUP_READ GROUP_EXECUTE)
-        SET(PERMS ${PERMS} WORLD_READ WORLD_EXECUTE)
-        INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name} DESTINATION ${DEST} PERMISSIONS ${PERMS} RENAME ${amname})
-        ENDIF(WINDOWS)
-        ''')
+        if key == "bin_PROGRAMS":
+            newlines.append(r'''
+            IF(WINDOWS)
+            INSTALL(TARGETS ${name} DESTINATION ${DEST})
+            INSTALL(FILES ${CMAKE_INSTALL_PREFIX}/${DEST}/${name}.exe DESTINATION ${DEST} RENAME ${amname}.exe)
+            INSTALL(CODE "FILE(REMOVE ${CMAKE_INSTALL_PREFIX}/${DEST}/${name}.exe)")
+            ELSE(WINDOWS)
+            SET(PERMS)
+            SET(PERMS ${PERMS} OWNER_READ OWNER_WRITE OWNER_EXECUTE)
+            SET(PERMS ${PERMS} GROUP_READ GROUP_EXECUTE)
+            SET(PERMS ${PERMS} WORLD_READ WORLD_EXECUTE)
+            INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name} DESTINATION ${DEST} PERMISSIONS ${PERMS} RENAME ${amname})
+            ENDIF(WINDOWS)
+            ''')
+            pass
         # --
         newlines.append(r'''
         ENDIF(nb)
         ''')
         # --
         newlines.append(r'''
-        ENDFOREACH(amname ${bin_PROGRAMS})
+        ENDIF(test)
         ''')
+        newlines.append(r'''
+        ENDFOREACH(amname ${%s})
+        '''%(key))
         # --
         return
     
@@ -1610,7 +1742,20 @@ class CMakeFile(object):
             ''')
         else:
             newlines.append(r'''
+            GET_FILENAME_COMPONENT(ext ${f} EXT)
+            IF(ext STREQUAL .py)
+            IF(DEST STREQUAL bin/salome)
+            SET(PERMS)
+            SET(PERMS ${PERMS} OWNER_READ OWNER_WRITE OWNER_EXECUTE)
+            SET(PERMS ${PERMS} GROUP_READ GROUP_EXECUTE)
+            SET(PERMS ${PERMS} WORLD_READ WORLD_EXECUTE)
+            INSTALL(FILES ${f} DESTINATION ${DEST} PERMISSIONS ${PERMS})
+            ELSE(DEST STREQUAL bin/salome)
             INSTALL(FILES ${f} DESTINATION ${DEST})
+            ENDIF(DEST STREQUAL bin/salome)
+            ELSE(ext STREQUAL .py)
+            INSTALL(FILES ${f} DESTINATION ${DEST})
+            ENDIF(ext STREQUAL .py)
             ''')
             pass
         newlines.append(r'''
@@ -1619,7 +1764,7 @@ class CMakeFile(object):
         IF(ext STREQUAL .qm)
         STRING(REGEX REPLACE .qm .ts input ${f})
         ''')
-        if self.module in ["kernel", "gui"]:
+        if self.module in ["kernel", "gui", "yacs"]:
             newlines.append(r'''
             SET(input ${CMAKE_CURRENT_SOURCE_DIR}/resources/${input})
             ''')
@@ -1641,6 +1786,33 @@ class CMakeFile(object):
         ENDIF(dummy)
         ENDIF(test_SALOMEconfig.h.in)
         ''')
+        newlines.append(r'''
+        GET_FILENAME_COMPONENT(ext ${f} EXT)
+        IF(ext STREQUAL .py)
+        INSTALL(CODE "SET(PYTHON_FILE ${f})")
+        INSTALL(CODE "SET(CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})")
+        INSTALL(CODE "SET(DEST ${DEST})")
+        INSTALL(CODE "SET(PYTHON_EXECUTABLE ${PYTHON_EXECUTABLE})")
+        ''')
+        if self.module == "kernel":
+            newlines.append('''
+            IF(f STREQUAL SALOME_ContainerPy.py)
+            ELSE(f STREQUAL SALOME_ContainerPy.py)
+            IF(f STREQUAL am2cmake.py)
+            ELSE(f STREQUAL am2cmake.py)
+            INSTALL(SCRIPT ${CMAKE_SOURCE_DIR}/salome_adm/cmake_files/install_and_compile_python_file.cmake)
+            ENDIF(f STREQUAL am2cmake.py)
+            ENDIF(f STREQUAL SALOME_ContainerPy.py)
+            ''')
+        else:
+            newlines.append('''
+            STRING(REPLACE "\\\\" "/" KERNEL_ROOT_DIR ${KERNEL_ROOT_DIR})
+            INSTALL(SCRIPT ${KERNEL_ROOT_DIR}/salome_adm/cmake_files/install_and_compile_python_file.cmake)
+            ''')
+            pass
+        newlines.append(r'''
+        ENDIF(ext STREQUAL .py)
+        ''') 
         newlines.append(r"ENDFOREACH(f ${%s})"%(key))
         return
     
@@ -1685,11 +1857,24 @@ if __name__ == "__main__":
     #
     from os import walk
     for root, dirs, files in walk(the_root):
-        from os.path import basename
-        if basename(root) == "CVS": continue
+        # --
+        # E.A. : Remove 'CVS' in dirs
+        # E.A. : It allows to not recurse in CVS dirs
+        # E.A. : See os module python documentation
+        # --
+        try:
+            dirs.remove('CVS')
+        except ValueError:
+            pass
+        # --
+        if "Makefile.am.cmake" in files:
+            if "Makefile.am" in files:
+                files.remove("Makefile.am")
+                pass
+            pass
+        # --
         for f in files:
-            from os.path import basename
-            if basename(f) == "Makefile.am":
+            if f in ["Makefile.am", "Makefile.am.cmake"]:
                 convertAmFile(the_root, root, dirs, files, f, module)
                 pass
             pass
