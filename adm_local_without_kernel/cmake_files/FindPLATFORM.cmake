@@ -1,5 +1,8 @@
 #  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 #
+#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+#
 #  This library is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU Lesser General Public
 #  License as published by the Free Software Foundation; either
@@ -56,7 +59,7 @@ SET(PLATFORM_CPPFLAGS)
 SET(PLATFORM_LDFLAGS)
 SET(PLATFORM_LIBADD)
 IF(WINDOWS)
-  # SET(PLATFORM_CPPFLAGS ${PLATFORM_CPPFLAGS} /W0)
+  SET(PLATFORM_CPPFLAGS ${PLATFORM_CPPFLAGS} /W0)
   SET(PLATFORM_CPPFLAGS ${PLATFORM_CPPFLAGS} -D_CRT_SECURE_NO_WARNINGS)  # To disable windows warnings for strcpy, fopen, ...
   SET(PLATFORM_CPPFLAGS ${PLATFORM_CPPFLAGS} -D_SCL_SECURE_NO_WARNINGS)  # To disable windows warnings std::copy, std::transform, ...
   SET(PLATFORM_CPPFLAGS ${PLATFORM_CPPFLAGS} -DWNT)
