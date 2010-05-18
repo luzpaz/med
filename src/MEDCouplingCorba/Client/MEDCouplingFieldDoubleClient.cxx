@@ -60,6 +60,7 @@ MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplin
   SALOME_MED::MEDCouplingMeshCorbaInterface::_duplicate(meshPtr);
   MEDCouplingMesh *mesh=MEDCouplingMeshClient::New(meshPtr);
   meshPtr->Destroy();
+  CORBA::release(meshPtr);
   ret->setMesh(mesh);
   mesh->decrRef();
   std::vector<DataArrayDouble *> arrays;
