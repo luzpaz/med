@@ -78,26 +78,6 @@ def convert(file_in, driver_in, driver_out, format=1, file_out=None):
         pass
     print file_out
     #
-    cl = None
-    if driver_in == "GIBI":
-        f = open(file_in)
-        l = f.readline()
-        if l[1:23] != "ENREGISTREMENT DE TYPE":
-            print "Not a sauv format file ..."
-            print "Trying to convert it."
-            from castemlauncher import CastemLauncher
-            dgibi_stream  = "\n"
-            dgibi_stream += "OPTI REST '%s' ;\n"%(file_in)
-            dgibi_stream += "REST ;\n"
-            file_in = "%s__format__"%(file_in)
-            dgibi_stream += "OPTI SAUV FORMAT '%s' ;\n"%(file_in)
-            dgibi_stream += "SAUV FORMAT ;\n"
-            cl = CastemLauncher(dgibi_stream)
-            cl.addTmpFiles(file_in, "UTILNOTI", "UTILPROC")
-            cl.run()
-            pass
-        pass
-    #
     med = MED()
     if driver_in == "GIBI":
         driver = GIBI_MED_RDONLY_DRIVER(file_in, med)
