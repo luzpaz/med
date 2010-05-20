@@ -1989,7 +1989,7 @@ static void getReverseVector (const medGeometryElement type,
   case MED_TETRA10:
     swapVec.resize(3);
     swapVec[0] = make_pair( 1, 2 );
-    swapVec[1] = make_pair( 4, 5 );
+    swapVec[1] = make_pair( 4, 6 );
     swapVec[2] = make_pair( 8, 9 );
     break;
   case MED_PYRA13:
