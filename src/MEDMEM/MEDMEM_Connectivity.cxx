@@ -677,7 +677,7 @@ void CONNECTIVITY::updateFamily(const vector<FAMILY*>& myFamilies)
 }
 
 //------------------------------------------------------------------------------------------------------------------//
-const int * MEDMEM::CONNECTIVITY::getConnectivity(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type)
+const int * MEDMEM::CONNECTIVITY::getConnectivity(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type) const
   //------------------------------------------------------------------------------------------------------------------//
 {
   const char * LOC = "CONNECTIVITY::getConnectivity";
@@ -717,7 +717,7 @@ const int * MEDMEM::CONNECTIVITY::getConnectivity(medConnectivity ConnectivityTy
 }
 
 //------------------------------------------------------------------------------------------------------------------//
-int CONNECTIVITY::getConnectivityLength(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type)
+int CONNECTIVITY::getConnectivityLength(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type) const
   //------------------------------------------------------------------------------------------------------------------//
 {
   const char * LOC = "CONNECTIVITY::getConnectivity";
@@ -771,7 +771,7 @@ int CONNECTIVITY::getConnectivityLength(medConnectivity ConnectivityType, medEnt
   - In C mode : Connectivity[ConnectivityIndex[i]-1+j-1]
   - In fortran mode : Connectivity[ConnectivityIndex[i]+j] */
 //-----------------------------------------------------------------------------------------------//
-const int * CONNECTIVITY::getConnectivityIndex(medConnectivity ConnectivityType, medEntityMesh Entity)
+const int * CONNECTIVITY::getConnectivityIndex(medConnectivity ConnectivityType, medEntityMesh Entity) const
   //-----------------------------------------------------------------------------------------------//
 {
   const char * LOC = "CONNECTIVITY::getConnectivityIndex";
@@ -798,7 +798,7 @@ const int * CONNECTIVITY::getConnectivityIndex(medConnectivity ConnectivityType,
 
 
 //-------------------------------------------------------------//
-const int* CONNECTIVITY::getPolygonsConnectivity(medConnectivity ConnectivityType, medEntityMesh Entity)
+const int* CONNECTIVITY::getPolygonsConnectivity(medConnectivity ConnectivityType, medEntityMesh Entity) const
   //-------------------------------------------------------------//
 {
   const char* LOC = "CONNECTIVITY::getPolygonsConnectivity";
@@ -830,7 +830,7 @@ const int* CONNECTIVITY::getPolygonsConnectivity(medConnectivity ConnectivityTyp
 
 
 //-------------------------------------------------------------//
-const int* CONNECTIVITY::getPolygonsConnectivityIndex(medConnectivity ConnectivityType, medEntityMesh Entity)
+const int* CONNECTIVITY::getPolygonsConnectivityIndex(medConnectivity ConnectivityType, medEntityMesh Entity) const
   //-------------------------------------------------------------//
 {
   const char* LOC = "CONNECTIVITY::getPolygonsConnectivityIndex";
@@ -1108,7 +1108,7 @@ int CONNECTIVITY::getNumberOf(medEntityMesh Entity, medGeometryElement Type) con
 /*! A DOCUMENTER */
 //--------------------------------------------------------------//
 const int* CONNECTIVITY::getValue(medConnectivity TypeConnectivity,
-                                  medGeometryElement Type)
+                                  medGeometryElement Type) const
   //--------------------------------------------------------------//
 {
   if (TypeConnectivity == MED_NODAL)
@@ -1134,7 +1134,7 @@ const int* CONNECTIVITY::getValue(medConnectivity TypeConnectivity,
 
 /*! A DOCUMENTER */
 //---------------------------------------------------------------------//
-const int* CONNECTIVITY:: getValueIndex(medConnectivity TypeConnectivity)
+const int* CONNECTIVITY:: getValueIndex(medConnectivity TypeConnectivity) const
   //---------------------------------------------------------------------//
 {
   if (TypeConnectivity == MED_NODAL)
@@ -1160,7 +1160,7 @@ const int* CONNECTIVITY:: getNeighbourhood() const
 /*! Returns an array which contains, for each node, all cells
   arround it. */
 //-------------------------------------------------//
-const int* CONNECTIVITY::getReverseNodalConnectivity()
+const int* CONNECTIVITY::getReverseNodalConnectivity() const
   //-------------------------------------------------//
 {
   calculateReverseNodalConnectivity();
@@ -1170,7 +1170,7 @@ const int* CONNECTIVITY::getReverseNodalConnectivity()
 /*!  Give index array to use with getReverseConnectivity(MED_NODAL).
   It is unusefull with MED_DESCENDING mode, because we have allways two cells.  */
 //-------------------------------------------------------//
-const int* CONNECTIVITY::getReverseNodalConnectivityIndex()
+const int* CONNECTIVITY::getReverseNodalConnectivityIndex() const
   //-------------------------------------------------------//
 {
   calculateReverseNodalConnectivity();
@@ -1181,7 +1181,7 @@ const int* CONNECTIVITY::getReverseNodalConnectivityIndex()
   the 2 cells of each side. First is cell which face normal is outgoing.
   arround it. */
 //------------------------------------------------------//
-const int* CONNECTIVITY::getReverseDescendingConnectivity()
+const int* CONNECTIVITY::getReverseDescendingConnectivity() const
   //------------------------------------------------------//
 {
   // it is in _constituent connectivity only if we are in MED_CELL
@@ -1200,7 +1200,7 @@ const int* CONNECTIVITY::getReverseDescendingConnectivity()
 /*! calculate the reverse descending Connectivity
   and returns the index  ( A DOCUMENTER MIEUX)*/
 //-----------------------------------------------------------//
-const int* CONNECTIVITY::getReverseDescendingConnectivityIndex()
+const int* CONNECTIVITY::getReverseDescendingConnectivityIndex() const
   //-----------------------------------------------------------//
 {
   // it is in _constituent connectivity only if we are in MED_CELL
@@ -1214,7 +1214,7 @@ const int* CONNECTIVITY::getReverseDescendingConnectivityIndex()
 
 /*! A DOCUMENTER (et a finir ???) */
 //--------------------------------------------//
-void CONNECTIVITY::calculateNodalConnectivity()
+void CONNECTIVITY::calculateNodalConnectivity() const
   //--------------------------------------------//
 {
   if (_nodal==NULL && _polygonsNodal==NULL && _polyhedronNodal==NULL)
@@ -1230,7 +1230,7 @@ void CONNECTIVITY::calculateNodalConnectivity()
 /*! If not yet done, calculate the nodal Connectivity
   and the reverse nodal Connectivity*/
 //---------------------------------------------------//
-void CONNECTIVITY::calculateReverseNodalConnectivity()
+void CONNECTIVITY::calculateReverseNodalConnectivity() const
   //---------------------------------------------------//
 {
   const char* LOC = "CONNECTIVITY::calculateReverseNodalConnectivity : ";
@@ -1320,7 +1320,7 @@ void CONNECTIVITY::calculateReverseNodalConnectivity()
 
 /*! If not yet done, calculate the Descending Connectivity */
 //-------------------------------------------------//
-void CONNECTIVITY::calculateDescendingConnectivity()
+void CONNECTIVITY::calculateDescendingConnectivity() const
   //-------------------------------------------------//
 {
   const char * LOC = "CONNECTIVITY::calculateDescendingConnectivity() : ";
@@ -1338,11 +1338,11 @@ void CONNECTIVITY::calculateDescendingConnectivity()
 
     if (_constituent != NULL && _constituent->_nodal != NULL)
     {
-      calculatePartialDescendingConnectivity();
+      const_cast<CONNECTIVITY*>(this)->calculatePartialDescendingConnectivity();
     }
     else
     {
-      calculateFullDescendingConnectivity(_entity);
+      const_cast<CONNECTIVITY*>(this)->calculateFullDescendingConnectivity(_entity);
     }
   }
 }
@@ -1948,7 +1948,7 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
 void CONNECTIVITY::addToDescendingConnectivity(const set<int>& nodes,
                                                multimap<int,int>& descending,
                                                int iglobal_cell,
-                                               const CONNECTIVITY_HashMap & face_map )
+                                               const CONNECTIVITY_HashMap & face_map ) const
 {
   int dimension = getEntityDimension();
   vector<int> signature (dimension);
@@ -2007,7 +2007,7 @@ void CONNECTIVITY::addToDescendingConnectivity(const set<int>& nodes,
   +----9----+----12---+
 */
 
-void CONNECTIVITY::calculatePartialDescendingConnectivity()
+void CONNECTIVITY::calculatePartialDescendingConnectivity() const
 {
   ////////////////////////////////////////////////////////////////////////////
   // First stage : creating hash_map referencing faces with the triplet
@@ -2638,7 +2638,7 @@ void CONNECTIVITY::invertConnectivityForAFace(int faceId, const int *nodalConnFo
   Method with 2 output : the connectivity required and its length 'lgth'.
   This method gives the connectivity independently it is a polygons/polyhedrons or normal element.
 */
-const int * CONNECTIVITY::getConnectivityOfAnElementWithPoly(MED_EN::medConnectivity ConnectivityType, MED_EN::medEntityMesh Entity, int Number, int &lgth)
+const int * CONNECTIVITY::getConnectivityOfAnElementWithPoly(MED_EN::medConnectivity ConnectivityType, MED_EN::medEntityMesh Entity, int Number, int &lgth) const
 {
   if(Entity==MED_EN::MED_NODE)
     throw  MEDEXCEPTION("No connectivity attached to a node entity");
