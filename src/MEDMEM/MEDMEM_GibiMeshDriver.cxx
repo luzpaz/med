@@ -272,6 +272,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
 #ifdef HAS_XDR
   if ( _is_xdr)
     {
+      _curPos = 0;
       _iRead = 0;
       _nbToRead = 0;
     }
