@@ -250,18 +250,27 @@ void SUPPORT::update()
     if (_entity == MED_NODE)
     {
       _numberOfGeometricType=1 ;
-      _geometricType.set(1);
-      _geometricType[0]=MED_POINT1;
+      // BEGIN Isuue 0020633: [CEA] Pb with 3D field creation fron another
+      // Use setGeometricType() in order to get _profilNames updated
+      //_geometricType.set(1);
+      //_geometricType[0]=MED_POINT1;
+      const MED_EN::medGeometryElement type = MED_POINT1;
+      setGeometricType( & type );
+      // END Isuue 0020633: [CEA] Pb with 3D field creation fron another
       _numberOfElements.set(1);
       _numberOfElements[0]=_mesh->getNumberOfNodes(); // Vérifier le pointeur !
       _totalNumberOfElements=_numberOfElements[0];
     }
     else
-    { // we duplicate information from _mesh
+    { // we duplicate information from _mesh
       _numberOfGeometricType=_mesh->getNumberOfTypesWithPoly(_entity);
       SCRUTE_MED(_numberOfGeometricType);
       medGeometryElement *  allType = _mesh->getTypesWithPoly(_entity);
-      _geometricType.set(_numberOfGeometricType,allType );
+      // BEGIN Isuue 0020633: [CEA] Pb with 3D field creation fron another
+      // Use setGeometricType() in order to get _profilNames updated
+      //_geometricType.set(_numberOfGeometricType,allType );
+      setGeometricType( allType );
+      // END Isuue 0020633: [CEA] Pb with 3D field creation fron another
       _numberOfElements.set(_numberOfGeometricType);
       _totalNumberOfElements=0;
       for (int i=0;i<_numberOfGeometricType;i++)
@@ -340,7 +349,7 @@ Support \a mySupport now contains a union of the elements originally
 contained in \a mySupport and \a myOtherSupport.
 */
 //-------------------
-void SUPPORT::blending(SUPPORT * mySupport) throw (MEDEXCEPTION)
+void SUPPORT::blending(const SUPPORT * mySupport) throw (MEDEXCEPTION)
   //-------------------
 {
   const char * LOC="SUPPORT::blending(SUPPORT *) : ";
@@ -432,7 +441,7 @@ and five MED_POLYGON, the number of the first polygonal element is 11.
 //-------------------
 void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
                          int TotalNumberOfElements,
-                         medGeometryElement *GeometricType,
+                         const medGeometryElement *GeometricType,
                          const int *NumberOfElements, const int *NumberValue)
   //-------------------
 {
@@ -1147,6 +1156,33 @@ SUPPORT *MEDMEM::SUPPORT::getBoundaryElements(medEntityMesh Entity) const throw 
 }
 
 /*!
+ * \brief Builds a nodal SUPPORT basing on nodes of this one
+ */
+
+SUPPORT* SUPPORT::buildSupportOnNode() const throw (MEDEXCEPTION)
+{
+  const char * LOC = "SUPPORT *MEDMEM::SUPPORT::buildSupportOnNode() : ";
+  if ( !getMesh() )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"This SUPPORT has no mesh"));
+
+  string name("Support On Node built from ");
+  name += getName();
+
+  SUPPORT* nodalSupport = new SUPPORT( getMesh(), name, MED_NODE );
+  if ( !isOnAllElements() )
+    {
+      if ( !_numberOfElements )
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No element numbers in a partial support"));
+
+      nodalSupport->setEntity( getEntity() );
+      const int * nums = _numberOfElements;
+      list<int> elems( nums, nums + _totalNumberOfElements );
+      getMesh()->fillSupportOnNodeFromElementList( elems, nodalSupport );
+    }
+  return nodalSupport;
+}
+
+/*!
   Method that fills this and updates all its attributes in order to lye on the the listOfNode.
 */
 void MEDMEM::SUPPORT::fillFromNodeList(const list<int>& listOfNode) throw (MEDEXCEPTION)
@@ -1481,3 +1517,5 @@ void MEDMEM::SUPPORT::addReference() const
 void MEDMEM::SUPPORT::removeReference() const
 {
 }
+
+

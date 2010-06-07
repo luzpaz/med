@@ -24,7 +24,7 @@
 
 #include "MEDMEM_FieldConvert.hxx"
 #include "MEDMEM_Field.hxx"
-#include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_Grid.hxx"
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_Support.hxx"
 #include <MEDMEM_VtkMeshDriver.hxx>
@@ -1149,6 +1149,82 @@ void MEDMEMTest::testField()
     delete oneCellNodesField;
   }
 
+  // double integral(SUPPORT*) - mantis issue 0020460:
+  // [CEA 352] Integral calculus on all field or on a field subarea (groupe or family)
+  {
+    // make 2D grid 2x2 with steps along axis 1.0, 2.0
+    const int dim = 2;
+    double coord[3] = { 0.0, 1.0, 3.0 };
+    vector< vector<double> > xyz_array( dim, vector<double>( coord, coord + 3 ));
+    vector<string> coord_name( dim, "coord_name");
+    vector<string> coord_unit( dim, "m");
+    GRID mesh( xyz_array, coord_name, coord_unit );
+
+    // make supports on the grid
+    SUPPORT supOnAll(&mesh,"supOnAll");
+    SUPPORT sup123(&mesh,"sup123"); int nbEl123[] = {3}, elems123[] = { 1,2,3 };
+    SUPPORT sup12 (&mesh,"sup12");  int nbEl12 [] = {2}, elems12 [] = { 1,2 };
+    SUPPORT sup34 (&mesh,"sup34");  int nbEl34 [] = {2}, elems34 [] = { 3,4 };
+    const int nbGeomTypes = 1;
+    const medGeometryElement * geomType = mesh.getTypes(MED_EN::MED_CELL);
+    sup123.setpartial("test", nbGeomTypes, *nbEl123, geomType, nbEl123, elems123 );
+    sup12 .setpartial("test", nbGeomTypes, *nbEl12 , geomType, nbEl12 , elems12 );
+    sup34 .setpartial("test", nbGeomTypes, *nbEl34 , geomType, nbEl34 , elems34 );
+
+    // make vectorial fields with values of i-th elem { i, i*10, i*100 }
+    const int nbComp = 3, nbElems = 4;
+    const int mult[nbComp] = { 1, 10, 100 };
+    FIELD<int,NoInterlaceByType> fAllNoTy(&supOnAll, nbComp), f12NoTy(&sup12, nbComp);
+    FIELD<int,NoInterlace>       fAllNo  (&supOnAll, nbComp), f12No  (&sup12, nbComp);
+    FIELD<int,FullInterlace>     fAllFull(&supOnAll, nbComp), f12Full(&sup12, nbComp);
+    int i, j;
+    for ( i = 1; i <= nbElems; ++i )
+      for ( j = 1; j <= nbComp; ++j )
+        {
+          fAllFull.setValueIJ( i, j, i * mult[j-1]);
+          fAllNoTy.setValueIJ( i, j, i * mult[j-1]);
+          fAllNo  .setValueIJ( i, j, i * mult[j-1]);
+          if ( i < 3 )
+            {
+              f12Full.setValueIJ( i, j, i * mult[j-1]);
+              f12NoTy.setValueIJ( i, j, i * mult[j-1]);
+              f12No  .setValueIJ( i, j, i * mult[j-1]);
+            }
+        }
+    // Test
+    double preci = 1e-18, integral;
+    // Integral = SUM( area * (i*1 + i*10 + i*100)) == 111 * SUM( area * i )
+    // elem area: { 1, 2, 2, 4 }
+    integral = 111*( 1*1 + 2*2 + 2*3 + 4*4 );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllNoTy.integral(), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllNo  .integral(), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllFull.integral(), preci );
+    integral = 111*( 1*1 + 2*2 );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12NoTy.integral(), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12No  .integral(), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12Full.integral(), preci );
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllNoTy.integral(&sup12), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllNo  .integral(&sup12), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllFull.integral(&sup12), preci );
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12NoTy.integral(&sup12), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12No  .integral(&sup12), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12Full.integral(&sup12), preci );
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12NoTy.integral(&sup123), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12No  .integral(&sup123), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12Full.integral(&sup123), preci );
+    integral = 111*( 1*1 + 2*2 + 2*3 );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllNoTy.integral(&sup123), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllNo  .integral(&sup123), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, fAllFull.integral(&sup123), preci );
+    integral = 0;
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12NoTy.integral(&sup34), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12No  .integral(&sup34), preci );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( integral, f12Full.integral(&sup34), preci );
+  }
+
   // applyPow
   aSubField1->applyPow(2.);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(196., aSubField1->getValueIJ(anElems1[0], 1), 0.000001); // 14*14
@@ -1842,3 +1918,5 @@ void MEDMEMTest::testReadFieldOnNodesAndCells()
   CPPUNIT_ASSERT_EQUAL( MED_NODE, nodeField.getSupport()->getEntity());
   CPPUNIT_ASSERT_DOUBLES_EQUAL( -(numberOfNodes-1), nodeField.getValueIJ( numberOfNodes, 1 ),1e-20);
 }
+
+

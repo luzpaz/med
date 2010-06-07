@@ -187,52 +187,61 @@ FIELD_::~FIELD_()
   PROVISOIRE : retourne des volumes, surfaces ou longueurs suivant les cas
   \endif
 */
-FIELD<double>* FIELD_::_getFieldSize() const
+FIELD<double>* FIELD_::_getFieldSize(const SUPPORT *subSupport) const
 {
-    FIELD<double>* p_field_size;
-    switch (getSupport()->getEntity())
-    {
-        case MED_CELL :
-            switch (getSupport()->getMesh()->getMeshDimension() ) 
-            {
-                case 1:
-                    p_field_size=getSupport()->getMesh()->getLength(getSupport() );
-                    break;
-                case 2:
-                    p_field_size=getSupport()->getMesh()->getArea(getSupport() );
-                    break;
-                case 3:
-                    p_field_size=getSupport()->getMesh()->getVolume(getSupport() );
-                    break;
-            }
-            break;
-            
-        case MED_FACE :
-            p_field_size=getSupport()->getMesh()->getArea(getSupport() );
-            break;
+  FIELD<double>* p_field_size;
 
-        case MED_EDGE :
-            p_field_size=getSupport()->getMesh()->getLength(getSupport() );
-            break;
-        case MED_NODE : // issue 0020120: [CEA 206] normL2 on NODE field
+  const SUPPORT* support = subSupport;
+  if ( !support )
+    if ( getSupport()->getEntity() == MED_NODE )
+      support = new SUPPORT(getSupport()->getMesh());
+    else
+      support = getSupport();
+
+  switch (getSupport()->getEntity())
+    {
+    case MED_CELL :
+      switch (getSupport()->getMesh()->getMeshDimension() ) 
+        {
+        case 1:
+          p_field_size=getSupport()->getMesh()->getLength( support );
+          break;
+        case 2:
+          p_field_size=getSupport()->getMesh()->getArea( support );
+          break;
+        case 3:
+          p_field_size=getSupport()->getMesh()->getVolume( support );
+          break;
+        }
+      break;
+
+    case MED_FACE :
+      p_field_size=getSupport()->getMesh()->getArea( support );
+      break;
+
+    case MED_EDGE :
+      p_field_size=getSupport()->getMesh()->getLength( support );
+      break;
+    case MED_NODE : // issue 0020120: [CEA 206] normL2 on NODE field
+      {
+        switch (getSupport()->getMesh()->getMeshDimension() ) 
           {
-            SUPPORT volSupport(getSupport()->getMesh());
-            switch (getSupport()->getMesh()->getMeshDimension() ) 
-            {
-                case 1:
-                    p_field_size=getSupport()->getMesh()->getLength( &volSupport );
-                    break;
-                case 2:
-                    p_field_size=getSupport()->getMesh()->getArea( &volSupport );
-                    break;
-                case 3:
-                    p_field_size=getSupport()->getMesh()->getVolume( &volSupport );
-                    break;
-            }
+          case 1:
+            p_field_size=getSupport()->getMesh()->getLength( support );
+            break;
+          case 2:
+            p_field_size=getSupport()->getMesh()->getArea( support );
+            break;
+          case 3:
+            p_field_size=getSupport()->getMesh()->getVolume( support );
             break;
           }
+        if ( !subSupport )
+          delete support;
+        break;
+      }
     }
-    return p_field_size;
+  return p_field_size;
 }
 
 
@@ -244,87 +253,87 @@ FIELD<double>* FIELD_::_getFieldSize() const
 void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume,
                                      const bool           nodalAllowed) const throw (MEDEXCEPTION)
 {
-    string diagnosis;
+  string diagnosis;
 
-    if( getSupport()->getEntity() == MED_NODE)
+  if( getSupport()->getEntity() == MED_NODE)
     {
       if ( !nodalAllowed )
-      {
-        diagnosis="Cannot compute sobolev norm on a field "+getName()+
+        {
+          diagnosis="Cannot compute sobolev norm on a field "+getName()+
             " : it has support on nodes!";
-        throw MEDEXCEPTION(diagnosis.c_str());
-      }
+          throw MEDEXCEPTION(diagnosis.c_str());
+        }
       if ( !getSupport()->getMesh() )
-      {
-        diagnosis="Cannot compute Lnorm of nodal field "+getName()+
-          " : it's support has no mesh reference";
-          throw MEDEXCEPTION(diagnosis.c_str());
-      }
-      if ( !getSupport()->getMesh()->existConnectivity(MED_NODAL,MED_CELL) )
-      {
-        diagnosis="Cannot compute Lnorm of nodal field"+getName()+
-          " : it's supporting mesh has no nodal connectivity data";
-          throw MEDEXCEPTION(diagnosis.c_str());
-      }
-    }
-        
-    if (getNumberOfValues()*getNumberOfComponents()<= 0) // Size of array has to be strictly positive
-    {
-        diagnosis="Cannot compute the norm of "+getName()+
-            " : it size is non positive!";
-        throw MEDEXCEPTION(diagnosis.c_str());
-    }
-
-    if( getSupport()->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS) != getNumberOfValues() ) {
-      diagnosis="Cannot compute Lnorm of "+getName()+
-        " : the suppors size not corresponded to number of elements!";
-      throw MEDEXCEPTION(diagnosis.c_str());
-    }
-
-    if (getGaussPresence() ) {
-      diagnosis="Cannot compute Lnorm of "+getName()+
-        " : Gauss numbers greater than one are not yet implemented!";
-      throw MEDEXCEPTION(diagnosis.c_str());
-    }
-
-    if(support_volume) // if the user has supplied the volume
-    {
-      if ( getSupport()->getEntity() == MED_NODE )
-      {
-        if (support_volume->getNumberOfValues()!=
-            getSupport()->getMesh()->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS))
         {
           diagnosis="Cannot compute Lnorm of nodal field "+getName()+
-            " : the volume furnished has wrong number of values";
+            " : it's support has no mesh reference";
           throw MEDEXCEPTION(diagnosis.c_str());
         }
-        return;
-      }
-        if(support_volume->getSupport()!=getSupport())
+      if ( !getSupport()->getMesh()->existConnectivity(MED_NODAL,MED_CELL) )
         {
-            diagnosis="Cannot compute Lnorm of "+getName()+
-            " : the volume furnished has not the same support!";
-            throw MEDEXCEPTION(diagnosis.c_str());
+          diagnosis="Cannot compute Lnorm of nodal field"+getName()+
+            " : it's supporting mesh has no nodal connectivity data";
+          throw MEDEXCEPTION(diagnosis.c_str());
         }
-        if(support_volume->getNumberOfValues()!=getNumberOfValues())
+    }
+
+  if (getNumberOfValues()*getNumberOfComponents()<= 0) // Size of array has to be strictly positive
+    {
+      diagnosis="Cannot compute the norm of "+getName()+
+        " : it size is non positive!";
+      throw MEDEXCEPTION(diagnosis.c_str());
+    }
+
+  if( getSupport()->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS) != getNumberOfValues() ) {
+    diagnosis="Cannot compute Lnorm of "+getName()+
+      " : the suppors size not corresponded to number of elements!";
+    throw MEDEXCEPTION(diagnosis.c_str());
+  }
+
+  if (getGaussPresence() ) {
+    diagnosis="Cannot compute Lnorm of "+getName()+
+      " : Gauss numbers greater than one are not yet implemented!";
+    throw MEDEXCEPTION(diagnosis.c_str());
+  }
+
+  if(support_volume) // if the user has supplied the volume
+    {
+      if ( getSupport()->getEntity() == MED_NODE )
         {
-            diagnosis="Cannot compute Lnorm of "+getName()+
-            " : the volume furnished has not the same number of values!";
-            throw MEDEXCEPTION(diagnosis.c_str());
+          if (support_volume->getNumberOfValues()!=
+              getSupport()->getMesh()->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS))
+            {
+              diagnosis="Cannot compute Lnorm of nodal field "+getName()+
+                " : the volume furnished has wrong number of values";
+              throw MEDEXCEPTION(diagnosis.c_str());
+            }
+          return;
         }
-        if( getSupport()->getNumberOfElements() != 
-            support_volume->getSupport()->getNumberOfElements() ) {
+      if(support_volume->getSupport()!=getSupport())
+        {
           diagnosis="Cannot compute Lnorm of "+getName()+
-            " : the supports have not the same number of elements!";
+            " : the volume furnished has not the same support!";
           throw MEDEXCEPTION(diagnosis.c_str());
         }
+      if(support_volume->getNumberOfValues()!=getNumberOfValues())
+        {
+          diagnosis="Cannot compute Lnorm of "+getName()+
+            " : the volume furnished has not the same number of values!";
+          throw MEDEXCEPTION(diagnosis.c_str());
+        }
+      if( getSupport()->getNumberOfElements() != 
+          support_volume->getSupport()->getNumberOfElements() ) {
+        diagnosis="Cannot compute Lnorm of "+getName()+
+          " : the supports have not the same number of elements!";
+        throw MEDEXCEPTION(diagnosis.c_str());
+      }
     }
 
 }
 
 /*! 
   \if developper
-   Check up the compatibility of fields before performing an arithmetic operation
+  Check up the compatibility of fields before performing an arithmetic operation
   \endif
 */
 void FIELD_::_checkFieldCompatibility(const FIELD_& m, const FIELD_& n, bool checkUnit) throw (MEDEXCEPTION)
@@ -507,3 +516,5 @@ void     FIELD_::copyGlobalInfo(const FIELD_& m)
   _time = m._time;
   _orderNumber = m._orderNumber;
 }
+
+

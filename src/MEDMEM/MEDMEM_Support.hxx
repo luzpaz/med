@@ -209,12 +209,12 @@ public:
   virtual inline const int *  getNumberIndex() const throw (MEDEXCEPTION);
   virtual int getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTION);
 
-  void blending(SUPPORT * mySupport) throw (MEDEXCEPTION) ;
+  void blending(const SUPPORT * mySupport) throw (MEDEXCEPTION) ;
 
   // Les numéros d'entités dans les profils doivent être croissant
   // pour respecter la norme MED
   void setpartial(string Description, int NumberOfGeometricType,
-                  int TotalNumberOfEntity, MED_EN::medGeometryElement *GeometricType,
+                  int TotalNumberOfEntity, const MED_EN::medGeometryElement *GeometricType,
                   const int *NumberOfEntity, const int *NumberValue);
 
   void setpartial(MEDSKYLINEARRAY * number, bool shallowCopy=false) throw (MEDEXCEPTION);
@@ -235,10 +235,11 @@ public:
   SUPPORT *getComplement() const;
   SUPPORT *substract(const SUPPORT& other) const throw (MEDEXCEPTION) ;
   SUPPORT *getBoundaryElements(MED_EN::medEntityMesh Entity) const throw (MEDEXCEPTION);
+  SUPPORT* buildSupportOnNode() const throw (MEDEXCEPTION);
   void fillFromNodeList(const list<int>& listOfNode) throw (MEDEXCEPTION);
   void fillFromElementList(const list<int>& listOfElt) throw (MEDEXCEPTION);
   void clearDataOnNumbers();
-        MESH* makeMesh();
+  MESH* makeMesh();
 
   //A.G. Addings for RC
   virtual void addReference() const;
@@ -437,6 +438,7 @@ inline void SUPPORT::setNumberOfGeometricType(int NumberOfGeometricType)
 
   _geometricType.set(0);
   _numberOfElements.set(0);
+  _profilNames.resize( NumberOfGeometricType, "" );
 }
 
 /*! set the attribute _geometricType to geometricType */
@@ -445,11 +447,9 @@ inline void SUPPORT::setGeometricType(const MED_EN::medGeometryElement *Geometri
 //---------------------------------------------------------------------
 {
   if (!_geometricType)
-    _geometricType.set(_numberOfGeometricType);
-  for (int i=0;i<_numberOfGeometricType;i++)
-    _geometricType[i] = GeometricType[i];
+    _geometricType.set(_numberOfGeometricType, GeometricType);
 
-  if (_profilNames.empty())
+  if (_profilNames.empty() || _profilNames[0].empty())
     {
       // giving a default value to profile names
       vector<string> prof_names( _numberOfGeometricType);
@@ -589,3 +589,5 @@ inline const MED_EN::medGeometryElement * SUPPORT::getTypes() const
 
 
 #endif /* SUPPORT_HXX */
+
+
