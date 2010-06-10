@@ -67,8 +67,7 @@ namespace ParaMEDMEM
   public:
     // Constructor
     ParaMEDMEMComponent_i();
-    ParaMEDMEMComponent_i(int nbproc, int numproc,
-                          CORBA::ORB_ptr orb,
+    ParaMEDMEMComponent_i(CORBA::ORB_ptr orb,
                           PortableServer::POA_ptr poa, 
                           PortableServer::ObjectId * contId, 
                           const char *instanceName,

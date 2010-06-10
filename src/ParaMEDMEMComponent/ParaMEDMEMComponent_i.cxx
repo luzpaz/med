@@ -29,19 +29,18 @@ typedef struct
   string msg;
 } except_st;
 
-ParaMEDMEMComponent_i::ParaMEDMEMComponent_i() : Engines_Component_i(), MPIObject_i()
+ParaMEDMEMComponent_i::ParaMEDMEMComponent_i()
 {
   _interface = new CommInterface;
 }
 
-ParaMEDMEMComponent_i::ParaMEDMEMComponent_i(int nbproc, int numproc,
-                                             CORBA::ORB_ptr orb,
+ParaMEDMEMComponent_i::ParaMEDMEMComponent_i(CORBA::ORB_ptr orb,
                                              PortableServer::POA_ptr poa, 
                                              PortableServer::ObjectId * contId, 
                                              const char *instanceName,
                                              const char *interfaceName,
                                              bool regist)
-  : Engines_Component_i(orb,poa,contId,instanceName,interfaceName,false,regist), MPIObject_i(nbproc,numproc)
+  : Engines_Component_i(orb,poa,contId,instanceName,interfaceName,false,regist)
 {
   _interface = new CommInterface;
 }
