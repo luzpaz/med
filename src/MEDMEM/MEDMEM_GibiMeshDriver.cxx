@@ -26,6 +26,12 @@
 
 #include "MEDMEM_GibiMeshDriver.hxx"
 
+#ifdef HAS_XDR
+// On windows, this file must be included first otherwise
+// there is a conflict with the symbol GROUP when compiling the xdr support ...
+#include <rpc/xdr.h>
+#endif
+
 #include "MEDMEM_DriversDef.hxx"
 
 #include "MEDMEM_Med.hxx"
@@ -272,6 +278,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
 #ifdef HAS_XDR
   if ( _is_xdr)
     {
+      _curPos = 0;
       _iRead = 0;
       _nbToRead = 0;
     }
@@ -1466,8 +1473,8 @@ GIBI_MESH_RDONLY_DRIVER::~GIBI_MESH_RDONLY_DRIVER()
 #ifdef HAS_XDR
     if(_is_xdr)
       {
-        xdr_destroy(_xdrs);
-        free(_xdrs);
+        xdr_destroy((XDR*)_xdrs);
+        free((XDR*)_xdrs);
         fclose(_xdrs_file);
       }
 #endif
@@ -1530,12 +1537,12 @@ void GIBI_MESH_RDONLY_DRIVER::open()
   _xdrs_file = fdopen(_File, "r");
   _xdrs = (XDR *)malloc(sizeof(XDR));
   
-  xdrstdio_create(_xdrs, _xdrs_file, XDR_DECODE);
+  xdrstdio_create((XDR*)_xdrs, _xdrs_file, XDR_DECODE);
   
   const int maxsize = 10;
   char icha[maxsize+1];
   char *icha2=icha;
-  bool_t xdr_test = xdr_string(_xdrs, &icha2, maxsize);
+  bool_t xdr_test = xdr_string((XDR*)_xdrs, &icha2, maxsize);
   if(xdr_test)
     {
       icha[maxsize] = '\0';
@@ -1547,8 +1554,8 @@ void GIBI_MESH_RDONLY_DRIVER::open()
   
   if(! _is_xdr)
     {
-      xdr_destroy(_xdrs);
-      free(_xdrs);
+      xdr_destroy((XDR*)_xdrs);
+      free((XDR*)_xdrs);
       fclose(_xdrs_file);
       ::close (_File);
 #ifdef WNT
@@ -1576,8 +1583,8 @@ void GIBI_MESH_RDONLY_DRIVER::close()
 #ifdef HAS_XDR
       if(_is_xdr)
         {
-          xdr_destroy(_xdrs);
-          free(_xdrs);
+          xdr_destroy((XDR*)_xdrs);
+          free((XDR*)_xdrs);
           fclose(_xdrs_file);
         }
 #endif
@@ -1669,7 +1676,7 @@ void GIBI_MESH_RDONLY_DRIVER::initNameReading(int nbValues, int width)
         {
           unsigned int nels = nbValues*width;
           _xdr_cvals = (char*)malloc((nels+1)*sizeof(char));
-          xdr_string(_xdrs, &_xdr_cvals, nels);
+          xdr_string((XDR*)_xdrs, &_xdr_cvals, nels);
           _xdr_cvals[nels] = '\0';
         }
     }
@@ -1693,7 +1700,7 @@ void GIBI_MESH_RDONLY_DRIVER::initIntReading(int nbValues)
           unsigned int nels = nbValues;
           unsigned int actual_nels;
           _xdr_ivals = (int*)malloc(nels*sizeof(int));
-          xdr_array(_xdrs, (char **)&_xdr_ivals, &actual_nels, nels, sizeof(int), (xdrproc_t)xdr_int);
+          xdr_array((XDR*)_xdrs, (char **)&_xdr_ivals, &actual_nels, nels, sizeof(int), (xdrproc_t)xdr_int);
         }
     }
 #endif
@@ -1716,7 +1723,7 @@ void GIBI_MESH_RDONLY_DRIVER::initDoubleReading(int nbValues)
           unsigned int nels = nbValues;
           unsigned int actual_nels;
           _xdr_dvals = (double*)malloc(nels*sizeof(double));
-          xdr_array(_xdrs, (char **)&_xdr_dvals, &actual_nels, nels, sizeof(double), (xdrproc_t)xdr_double);
+          xdr_array((XDR*)_xdrs, (char **)&_xdr_dvals, &actual_nels, nels, sizeof(double), (xdrproc_t)xdr_double);
         }
     }
 #endif
@@ -1846,7 +1853,7 @@ int GIBI_MESH_RDONLY_DRIVER::getInt() const
       else
         {
           int result;
-          xdr_int(_xdrs, &result);
+          xdr_int((XDR*)_xdrs, &result);
           return result;
         }
     }
@@ -1865,7 +1872,7 @@ float GIBI_MESH_RDONLY_DRIVER::getFloat() const
   if(_is_xdr)
     {
       float result;
-      xdr_float(_xdrs, &result);
+      xdr_float((XDR*)_xdrs, &result);
       return result;
     }
 #endif
@@ -1889,7 +1896,7 @@ double GIBI_MESH_RDONLY_DRIVER::getDouble() const
       else
         {
           double result;
-          xdr_double(_xdrs, &result);
+          xdr_double((XDR*)_xdrs, &result);
           return result;
         }
     }

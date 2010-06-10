@@ -49,9 +49,6 @@
 #else
 #define HAS_XDR
 #endif
-#ifdef HAS_XDR
-#include <rpc/xdr.h>
-#endif
 
 /*!
 
@@ -232,7 +229,7 @@ private:
 #ifdef HAS_XDR
   bool _is_xdr;
   FILE* _xdrs_file;
-  XDR* _xdrs;
+  void* _xdrs;
   char* _xdr_cvals;
   int* _xdr_ivals;
   double* _xdr_dvals;
