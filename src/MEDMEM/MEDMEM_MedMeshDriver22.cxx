@@ -92,16 +92,18 @@ void MED_MESH_DRIVER22::close()
   const char * LOC = "MED_MESH_DRIVER22::close() ";
   BEGIN_OF_MED(LOC);
   int err = 0;
-  if ( _status == MED_OPENED) {
+  if ( _status == MED_OPENED)
+  {
+    // make the file readable by another program before termination of this one (issue 0020891)
+    // TODO: with med-3.x.x, it should be replaced with calling MEDFlush()
+    H5Fflush(_medIdt,H5F_SCOPE_LOCAL);
+
     err = med_2_3::MEDfermer(_medIdt);
     // san -- MED5873 : Calling H5close() here leads to failure of SALOMEDS::StudyManager_i::_SaveAs()
     // method during study saving process. MEDfermer() seems sufficient for closing a file.
     //H5close(); // If we call H5close() all the files are closed.
     if (err != 0)
-      throw MEDEXCEPTION( LOCALIZED(STRING(LOC)
-                                    <<" Error when closing file !"
-                                    )
-                          );
+      throw MEDEXCEPTION( LOCALIZED(STRING(LOC)<<" Error when closing file !"));
     MESSAGE_MED(LOC <<": _medIdt= " << _medIdt );
     MESSAGE_MED(LOC<<": MEDfermer : err    = " << err );
     _status = MED_CLOSED;
