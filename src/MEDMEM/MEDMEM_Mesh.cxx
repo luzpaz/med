@@ -306,9 +306,14 @@ MESH::MESH(MESH &m)
 \endif
 */
 
-MESH::~MESH() {
-
+MESH::~MESH()
+{
   MESSAGE_MED("MESH::~MESH() : Destroying the Mesh");
+
+  // if this is an automatic variable, be sure that destructor will be no more called
+  // due to cyclic dependencies with child reference counters (groups and families)
+  clearRefCouner();
+
   if (_coordinate != ((COORDINATE *) NULL)) delete _coordinate ;
   if (_connectivity != ((CONNECTIVITY *) NULL)) delete _connectivity ;
   int size ;
