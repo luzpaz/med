@@ -1110,7 +1110,7 @@ void MEDSPLITTERTest::testMESHCollection_families()
   MESHCollection* collection = new MESHCollection (filename_rd,meshname);
   MEDSPLITTER::Topology* topo = collection->createPartition(2,Graph::METIS);
   MESHCollection* new_collection = new MESHCollection (*collection, topo, true, true);
-        new_collection->setSubdomainBoundaryCreates(true);
+  new_collection->setSubdomainBoundaryCreates(true);
   //collection.write("/export/home/test_splitter");
   new_collection->write(filename_wr);
   new_collection->castAllFields(*collection);
@@ -1127,9 +1127,9 @@ void MEDSPLITTERTest::testMESHCollection_families()
   int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
 
   CPPUNIT_ASSERT_EQUAL(nbelem1+nbelem2,2020);
-  
-  
-  
+
+
+
   //testing number of joints
   med_2_3::med_idt fid1 = med_2_3::MEDouvrir(const_cast<char*> (filename_wr_1.c_str()),med_2_3::MED_LECTURE);
   med_2_3::med_idt fid2 = med_2_3::MEDouvrir(const_cast<char*> (filename_wr_2.c_str()),med_2_3::MED_LECTURE);
@@ -1137,9 +1137,9 @@ void MEDSPLITTERTest::testMESHCollection_families()
   int nj2= med_2_3::MEDnJoint(fid2, meshname2);
   CPPUNIT_ASSERT_EQUAL(nj1,1);
   CPPUNIT_ASSERT_EQUAL(nj2,1);
-       
+
   //testing distant domains
-    
+
   char desc1[MED_TAILLE_DESC+1];
   char maa_dist1[MED_TAILLE_NOM+1], jn1[MED_TAILLE_NOM+1];
   char desc2[MED_TAILLE_DESC+1], maa_dist2[MED_TAILLE_NOM+1], jn2[MED_TAILLE_NOM+1];
@@ -1148,16 +1148,16 @@ void MEDSPLITTERTest::testMESHCollection_families()
   med_2_3::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
   CPPUNIT_ASSERT_EQUAL(dom1,1);
   CPPUNIT_ASSERT_EQUAL(dom2,0);
-  
 
-        int nbEdgesFamilies1= med_2_3::MEDnFam(fid1, meshname1);
-        int nbEdgesFamilies2= med_2_3::MEDnFam(fid2, meshname2);
 
-        CPPUNIT_ASSERT_EQUAL(nbEdgesFamilies1,7); // six initial families + a joint
-        CPPUNIT_ASSERT_EQUAL(nbEdgesFamilies2,7); // six initial families + a joint
+  int nbEdgesFamilies1= med_2_3::MEDnFam(fid1, meshname1);
+  int nbEdgesFamilies2= med_2_3::MEDnFam(fid2, meshname2);
 
-        string fam_name = mesh1.getFamily(MED_EN::MED_EDGE,1)->getName();
-        char test_name[MED_TAILLE_NOM]="Sortie";
-        CPPUNIT_ASSERT(strcmp(fam_name.c_str(),test_name)==0);
-       
+  CPPUNIT_ASSERT_EQUAL(nbEdgesFamilies1,7); // six initial families + a joint
+  CPPUNIT_ASSERT_EQUAL(nbEdgesFamilies2,7); // six initial families + a joint
+
+  string fam_name = mesh1.getFamily(MED_EN::MED_EDGE,1)->getName();
+  char test_name[MED_TAILLE_NOM]="Sortie";
+  CPPUNIT_ASSERT(strcmp(fam_name.c_str(),test_name)==0);
+
 }
