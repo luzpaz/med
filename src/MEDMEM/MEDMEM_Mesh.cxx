@@ -486,9 +486,18 @@ MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string
   GENDRIVER *myDriver=DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,driverName,RDONLY);
   current = addDriver(*myDriver);
   delete myDriver;
-  _drivers[current]->open();
-  _drivers[current]->read();
-  _drivers[current]->close();
+  try
+  {
+    _drivers[current]->open();
+    _drivers[current]->read();
+    _drivers[current]->close();
+  }
+  catch ( MED_EXCEPTION& e )
+  {
+    if ( _drivers[current] ) delete _drivers[current];
+    _drivers[current] = 0;
+    throw e;
+  }
 
   END_OF_MED(LOC);
 };
@@ -2511,6 +2520,7 @@ void MESH::createGroups()
       //creates a group with the family name and only one family
       GROUP* group=new GROUP((*myFamilies)[i]->getName(),fam_list);
       (*myGroups).push_back(group);
+      removeReference();
     }
   }
 }
