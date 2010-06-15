@@ -1115,7 +1115,7 @@ void MEDSPLITTERTest::testMESHCollection_families()
   new_collection->write(filename_wr);
   new_collection->castAllFields(*collection);
 
-
+  delete topo;
   delete collection;       
   delete new_collection;
 
