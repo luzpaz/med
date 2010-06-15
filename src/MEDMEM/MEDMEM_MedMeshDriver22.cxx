@@ -1920,6 +1920,7 @@ int  MED_MESH_RDONLY_DRIVER22::getNodesFamiliesNumber(int * MEDArrayNodeFamily)
       int i;
       for ( i = 0; i < _ptrMesh->getNumberOfNodes(); i++ )
          MEDArrayNodeFamily[i] = tmp_MEDArrayNodeFamily[i];
+      delete [] tmp_MEDArrayNodeFamily;
 #else
       err = MEDfamLire(_medIdt, const_cast <char *>
                        (_ptrMesh->_name.c_str()), MEDArrayNodeFamily,
