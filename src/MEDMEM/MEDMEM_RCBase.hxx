@@ -33,6 +33,7 @@ namespace MEDMEM {
     void addReference() const;
     bool removeReference() const;
   protected:
+    void clearRefCouner();
     virtual ~RCBASE();
   private:
     mutable int _cnt;

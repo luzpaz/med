@@ -25,6 +25,15 @@ MEDMEM::RCBASE::RCBASE():_cnt(1)
 MEDMEM::RCBASE::~RCBASE()
 {
 }
+/*!
+ * \brief To be called at destructor beginning to avoid recursive calls of destructor
+ * in case of cyclic dependencies between reference counters like e.g. between
+ * a MESH and a GROUP it contains
+ */
+void MEDMEM::RCBASE::clearRefCouner()
+{
+  _cnt = -1;
+}
 
 void MEDMEM::RCBASE::addReference() const
 {
