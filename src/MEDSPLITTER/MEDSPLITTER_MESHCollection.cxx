@@ -202,13 +202,21 @@ MESHCollection::MESHCollection(const string& filename, const string& meshname)
   char meshnamechar[256];
   strcpy(filenamechar,filename.c_str());
   strcpy(meshnamechar,meshname.c_str());
-  retrieveDriver()->readSeq (filenamechar,meshnamechar);
+  try // avoid memory leak in case of inexistent filename
+  {
+    retrieveDriver()->readSeq (filenamechar,meshnamechar);
+  }
+  catch ( MED_EXCEPTION& e )
+  {
+    if ( m_driver ) delete m_driver; m_driver=0;
+    throw e;
+  }
 }
 
 MESHCollection::~MESHCollection()
 {
   for (int i=0; i<m_mesh.size();i++)
-    if (m_mesh[i]!=0) {delete m_mesh[i]; }
+    if (m_mesh[i]!=0) {/*delete*/ m_mesh[i]->removeReference(); }
   for (int i=0; i<m_connect_zones.size();i++)
     if (m_connect_zones[i]!=0) {delete m_connect_zones[i];}
   if (m_driver !=0) {delete m_driver; m_driver=0;}
