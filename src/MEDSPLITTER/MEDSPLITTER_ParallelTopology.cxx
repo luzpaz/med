@@ -640,7 +640,7 @@ bool ParallelTopology::hasCellWithNodes( const MESHCollection& new_collection,
           for ( j = index[i]-1; j < index[i+1]-1; ++j )
             nbSame += nodes.count( conn[j] );
           if ( nbSame == nodes.size() )
-            return true;
+            return delete [] types, true;
           break;
         }
     }
