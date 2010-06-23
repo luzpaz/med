@@ -1491,6 +1491,33 @@ void MEDMEMTest::testMeshAndMeshing()
     constituentEntity++;
   }
 
+  // 0020911: [CEA 413] getBarycenter on polygons
+  {
+    MESHING polygonMesh;
+    polygonMesh.setName("polygonMesh");
+
+    const int spaceDim = 2, nbNodes = 6;
+    const double coords[spaceDim*nbNodes] = { 0,0, 1,0, 2,0,  0,1, 1,1, 2,1 };
+    polygonMesh.setCoordinates( spaceDim, nbNodes, coords, "CART", MED_EN::MED_FULL_INTERLACE);
+
+    const int nbPolygons = 2;
+    const int conn[nbPolygons*4] = { 1,2,5,4, 2,3,6,5 };
+    const int index[nbPolygons+1] = { 1,5,9 };
+    polygonMesh.setNumberOfTypes(0, MED_EN::MED_CELL);
+    polygonMesh.setPolygonsConnectivity( index, conn, nbPolygons, MED_EN::MED_CELL );
+    polygonMesh.setMeshDimension( 2 );
+
+    FIELD<double>* barycenter;
+    SUPPORT sup(&polygonMesh);
+    CPPUNIT_ASSERT_NO_THROW(barycenter = polygonMesh.getBarycenter(&sup));
+    CPPUNIT_ASSERT_EQUAL( 2, barycenter->getNumberOfValues() );
+    CPPUNIT_ASSERT_EQUAL( 2, barycenter->getNumberOfComponents() );
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.5, barycenter->getValueIJ(1,1), 1e-10);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.5, barycenter->getValueIJ(1,2), 1e-10);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.5, barycenter->getValueIJ(2,1), 1e-10);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL( 0.5, barycenter->getValueIJ(2,2), 1e-10);
+  }
+
 
   // Testing length and normal vectors on 1d elements
   {
