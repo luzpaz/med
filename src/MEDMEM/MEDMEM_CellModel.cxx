@@ -1383,6 +1383,18 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       _constituentsType[1]=tmpConstituentsType2 ;
       break;
     }
+    case MED_POLYGON  : {
+      _name="MED_POLYGON";
+      _type=t;
+      _dimension=2;
+      break;
+    }
+    case MED_POLYHEDRA  : {
+      _name="MED_POLYHEDRA";
+      _type=t;
+      _dimension=3;
+      break;
+    }
 //      default : 
 //        _type=0;
 //        break;
