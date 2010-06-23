@@ -256,13 +256,10 @@ void MEDMEMTest::testMeshAndMeshing()
   CPPUNIT_ASSERT(myMesh != NULL);
 
   //test operator <<
-  //#ifdef ENABLE_FAULTS
-  CPPUNIT_ASSERT_NO_THROW(cout << *myMesh << endl);
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("ERROR: operator << : if mesh is empty then attempt"
-  //             " to get values from null object causes error");
-  //#endif
+  {
+    ostringstream out;
+    CPPUNIT_ASSERT_NO_THROW(out << *myMesh << endl);
+  }
 
   //test operator =
   MESH myMesh1 = *myMesh;
@@ -569,7 +566,7 @@ void MEDMEMTest::testMeshAndMeshing()
     MESH * myMesh2 = new MESH( myMeshing );
     CPPUNIT_ASSERT(myMesh2->deepCompare(myMeshing));
 
-    cout<<*myMesh2<<endl;
+    //cout<<*myMesh2<<endl;
     ostringstream os;
     os << * myMesh2;
     CPPUNIT_ASSERT(os.str() != "");
@@ -710,16 +707,23 @@ void MEDMEMTest::testMeshAndMeshing()
       if(existConnect)
       {
         const int * connectivity;
-        const int * connectivity_index;
+        const int * connectivity_init;
         CPPUNIT_ASSERT_NO_THROW(connectivity = myMesh2->getConnectivity
                                 (MED_FULL_INTERLACE, myMedConnect, entity, Types1[t]));
-        connectivity_index = myMesh2->getConnectivityIndex(myMedConnect, entity);
-        for (int j = 0; j < NumberOfElements1; j++) {
-          cout<<"!!!!!!!!!!!!!!!"<<endl;
-          for (int k = connectivity_index[j]; k < connectivity_index[j+1]; k++)
-            cout << connectivity[k-1] << " ";
-          cout << endl;
-        }
+        connectivity_init = myMeshing.getConnectivity
+          (MED_FULL_INTERLACE, myMedConnect, entity, Types1[t]);
+        int connLen = myMesh2->getConnectivityLength( MED_FULL_INTERLACE, myMedConnect, entity, Types1[t]);
+        int connLen_init = myMeshing.getConnectivityLength( MED_FULL_INTERLACE, myMedConnect, entity, Types1[t]);
+        CPPUNIT_ASSERT_EQUAL( connLen, connLen_init );
+        vector<int> connVec( connectivity, connectivity + connLen );
+        vector<int> connVec_init( connectivity_init, connectivity_init + connLen );
+        CPPUNIT_ASSERT( connVec == connVec_init );
+//         for (int j = 0; j < NumberOfElements1; j++) {
+//           cout<<"!!!!!!!!!!!!!!!"<<endl;
+//           for (int k = connectivity_index[j]; k < connectivity_index[j+1]; k++)
+//             cout << connectivity[k-1] << " ";
+//           cout << endl;
+//         }
       }
     }
 
@@ -743,7 +747,7 @@ void MEDMEMTest::testMeshAndMeshing()
         CPPUNIT_ASSERT_THROW(myMesh2->getElementType(MED_FACE, myGlobalNbIdx[i]), MEDEXCEPTION);
         break;
       }
-      cout<<"Global number of first element of each geom type : "<<myGlobalNbIdx[i]<<endl;
+      //cout<<"Global number of first element of each geom type : "<<myGlobalNbIdx[i]<<endl;
     }
 
     {
@@ -764,12 +768,16 @@ void MEDMEMTest::testMeshAndMeshing()
       const int * ReverseNodalConnectivityIndex = myMesh2->getReverseConnectivityIndex(MED_NODAL, entity);
       const int ReverseIdxLength = myMesh2->getReverseConnectivityIndexLength(MED_NODAL, entity);
       CPPUNIT_ASSERT(ReverseIdxLength == NumberOfNodes+1);
-      for (int i = 0; i < NumberOfNodes; i++) {
-        cout << "Node "<< i+1 << " : ";
-        for (int j = ReverseNodalConnectivityIndex[i]; j < ReverseNodalConnectivityIndex[i+1]; j++)
-          cout << ReverseNodalConnectivity[j-1] << " ";
-        cout << endl;
-      }
+      const int * ReverseNodalConnectivityIndex_init = myMeshing.getReverseConnectivityIndex(MED_NODAL, entity);
+      vector<int> connVec( ReverseNodalConnectivityIndex, ReverseNodalConnectivityIndex + ReverseIdxLength);
+      vector<int> connVec_init( ReverseNodalConnectivityIndex_init, ReverseNodalConnectivityIndex_init + ReverseIdxLength);
+      CPPUNIT_ASSERT( connVec == connVec_init );
+//       for (int i = 0; i < NumberOfNodes; i++) {
+//         cout << "Node "<< i+1 << " : ";
+//         for (int j = ReverseNodalConnectivityIndex[i]; j < ReverseNodalConnectivityIndex[i+1]; j++)
+//           cout << ReverseNodalConnectivity[j-1] << " ";
+//         cout << endl;
+//       }
 
       // Show Descending Connectivity
       int NumberOfElements1;
@@ -785,12 +793,12 @@ void MEDMEMTest::testMeshAndMeshing()
         CPPUNIT_FAIL(m.what());
       }
 
-      for (int j = 0; j < NumberOfElements1; j++) {
-        cout << "Element " << j+1 << " : ";
-        for (int k = connectivity_index[j]; k < connectivity_index[j+1]; k++)
-          cout << connectivity[k-1] << " ";
-        cout << endl;
-      }
+//       for (int j = 0; j < NumberOfElements1; j++) {
+//         cout << "Element " << j+1 << " : ";
+//         for (int k = connectivity_index[j]; k < connectivity_index[j+1]; k++)
+//           cout << connectivity[k-1] << " ";
+//         cout << endl;
+//       }
 
       // getElementNumber
       if (myMesh2->existConnectivity(MED_NODAL, MED_FACE)) {
@@ -1179,12 +1187,12 @@ void MEDMEMTest::testMeshAndMeshing()
   CPPUNIT_ASSERT_NO_THROW(ReverseIdxLength = myMesh3->getReverseConnectivityIndexLength(MED_NODAL, MED_CELL));
   CPPUNIT_ASSERT(ReverseIdxLength == myMesh3->getNumberOfNodes()+1);
 
-  for (int i = 0; i < myMesh3->getNumberOfNodes(); i++) {
-    cout << "Node "<< i+1 << " : ";
-    for (int j = ReverseNodalConnectivityIndex[i]; j < ReverseNodalConnectivityIndex[i+1]; j++)
-      cout << ReverseNodalConnectivity[j-1] << " ";
-    cout << endl;
-  }
+//   for (int i = 0; i < myMesh3->getNumberOfNodes(); i++) {
+//     cout << "Node "<< i+1 << " : ";
+//     for (int j = ReverseNodalConnectivityIndex[i]; j < ReverseNodalConnectivityIndex[i+1]; j++)
+//       cout << ReverseNodalConnectivity[j-1] << " ";
+//     cout << endl;
+//   }
 
   // Show Descending Connectivity
   int NumberOfElements1;
@@ -1200,12 +1208,12 @@ void MEDMEMTest::testMeshAndMeshing()
     CPPUNIT_FAIL(m.what());
   }
 
-  for (int j = 0; j < NumberOfElements1; j++) {
-    cout << "Element " << j+1 << " : ";
-    for (int k = connectivity_index[j]; k < connectivity_index[j+1]; k++)
-      cout << connectivity[k-1] << " ";
-    cout << endl;
-    }
+//   for (int j = 0; j < NumberOfElements1; j++) {
+//     cout << "Element " << j+1 << " : ";
+//     for (int k = connectivity_index[j]; k < connectivity_index[j+1]; k++)
+//       cout << connectivity[k-1] << " ";
+//     cout << endl;
+//     }
 
   //test 3D mesh
   for(int ind = SpaceDim; ind > 1; ind-- )
@@ -1222,45 +1230,100 @@ void MEDMEMTest::testMeshAndMeshing()
       FIELD<double>* normal;
       CPPUNIT_ASSERT_NO_THROW(normal = myMesh3->getNormal(sup));
 
-      double normal_square, norm;
-      double maxnorm=0.;
-      double minnorm=0.;
-      double tmp_value;
-      for (int i = 1; i<=NumberOfElem; i++) {
-        normal_square = 0.;
-        cout << "Normal " << i << " ";
-        for (int j=1; j<=SpaceDim; j++) {
-          tmp_value = normal->getValueIJ(i,j);
-          normal_square += tmp_value*tmp_value;
-          cout << tmp_value << " ";
-        }
-        norm = sqrt(normal_square);
-        maxnorm = dmax(maxnorm,norm);
-        minnorm = dmin(minnorm,norm);
-        cout << ", Norm = " << norm << endl;
-      }
-      cout << "Max Norm " << maxnorm << " Min Norm " << minnorm << endl;
+      const int nbNormVals = 47*3;
+      double refNormals[nbNormVals] = {
+        0, 1, 0    ,// #1 
+        -1, 0, 0   ,// #2 
+        -0, 0, 2   ,// #3 
+        1, -1, -2  ,// #4 
+        -1, 0, 0   ,// #5 
+        0, 0, 2    ,// #6 
+        1, 1, -2   ,// #7 
+        0, -1, 0   ,// #8 
+        0, -0, 2   ,// #9 
+        -1, 1, -2  , // #10
+        0, 0, 2    , // #11
+        -1, -1, -2 , // #12
+        -1, 0, 1   , // #13
+        0, -1, 1   , // #14
+        1, 1, 0    , // #15
+        0, -1, 1   , // #16
+        1, -0, 1   , // #17
+        -1, 1, 0   , // #18
+        1, 0, 1    , // #19
+        0, 1, 1    , // #20
+        -1, -1, 0  , // #21
+        -0, 1, 1   , // #22
+        -1, 0, 1   , // #23
+        1, -1, 0   , // #24
+        -1, 0, 1   , // #25
+        1, 0, 1    , // #26
+        0, -1, 1   , // #27
+        -0, 1, 1   , // #28
+        1, 0, 1    , // #29
+        -1, 0, 1   , // #30
+        0, 1, 1    , // #31
+        0, -1, 1   , // #32
+        1, 0, 1    , // #33
+        0, -1, 1   , // #34
+        -1, 0, 1   , // #35
+        -0, 1, 1   , // #36
+        0, 0, 4    , // #37
+        -0, -0, -4 , // #38
+        0, 0, 4    , // #39
+        0, 2, 0    , // #40
+        -2, -0, -0 , // #41
+        0, -2, 0   , // #42
+        2, -0, 0   , // #43
+        0, 2, 0    , // #44
+        -2, -0, -0 , // #45
+        0, -2, 0   , // #46
+        2, -0, 0     // #47
+      };
+      for ( int i = 0; i < nbNormVals; ++i )
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( refNormals[i], normal->getValue()[i], 1e-6);
+//       double normal_square, norm;
+//       double maxnorm=0.;
+//       double minnorm=0.;
+//       double tmp_value;
+//       for (int i = 1; i<=NumberOfElem; i++) {
+//         normal_square = 0.;
+//         cout << "Normal " << i << " ";
+//         for (int j=1; j<=SpaceDim; j++) {
+//           tmp_value = normal->getValueIJ(i,j);
+//           normal_square += tmp_value*tmp_value;
+//           cout << tmp_value << " ";
+//         }
+//         norm = sqrt(normal_square);
+//         maxnorm = dmax(maxnorm,norm);
+//         minnorm = dmin(minnorm,norm);
+//         cout << ", Norm = " << norm << endl;
+//       }
+//       cout << "Max Norm " << maxnorm << " Min Norm " << minnorm << endl;
       delete normal;
 
       // test of area(for 2d elements)
       FIELD<double>* area;
       CPPUNIT_ASSERT_NO_THROW(area = myMesh3->getArea(sup));
 
-      double maxarea,minarea,areatot;
-      maxarea = 0.;
-      minarea = 0.;
-      areatot = 0.0;
-      for (int i = 1; i<=NumberOfElem;i++)
-      {
-        cout << "Area " << i << " " << area->getValueIJ(i,1) << endl;
-        maxarea = dmax(maxarea,area->getValueIJ(i,1));
-        minarea = dmin(minarea,area->getValueIJ(i,1));
-        areatot = areatot + area->getValueIJ(i,1);
-      }
+//       double maxarea,minarea,areatot;
+//       maxarea = 0.;
+//       minarea = 0.;
+//       areatot = 0.0;
+//       for (int i = 1; i<=NumberOfElem;i++)
+//       {
+//         cout << "Area " << i << " " << area->getValueIJ(i,1) << endl;
+//         maxarea = dmax(maxarea,area->getValueIJ(i,1));
+//         minarea = dmin(minarea,area->getValueIJ(i,1));
+//         areatot = areatot + area->getValueIJ(i,1);
+//       }
 
-      cout << "Max Area " << maxarea << " Min Area " << minarea << endl;
-      cout << "Support Area " << areatot << endl;
-
+//       cout << "Max Area " << maxarea << " Min Area " << minarea << endl;
+//       cout << "Support Area " << areatot << endl;
+      const int nbAreas = 47;
+      double refArea [nbAreas] = { 1, 1, 2, 2.44949, 1, 2, 2.44949, 1, 2,  2.44949,  2,  2.44949,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  1.41421,  4,  4,  4,  2,  2,  2,  2,  2,  2,  2,  2 };
+      for ( int i = 0; i < nbAreas; ++i )
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( refArea[i], area->getValue()[i], 1e-5);
       delete area;
     }
 
@@ -1269,15 +1332,90 @@ void MEDMEMTest::testMeshAndMeshing()
     CPPUNIT_ASSERT_NO_THROW(barycenter = myMesh3->getBarycenter(sup));
 
     CPPUNIT_ASSERT_NO_THROW(NumberOfElem = myMesh3->getNumberOfElements(constituentEntity,MED_ALL_ELEMENTS));
-
-    for (int i = 1; i<=NumberOfElem;i++)
+    if ( ind == 3 )
     {
-      if (ind == 3)
-    cout << "Barycenter " << i << " " << barycenter->getValueIJ(i,1) << " " << barycenter->getValueIJ(i,2) << " " << barycenter->getValueIJ(i,3) << endl;
-
-      if (ind == 2)
-    cout << "Barycenter " << i << " " << barycenter->getValueIJ(i,1) << " " << barycenter->getValueIJ(i,2) << endl;
+      double refBC[16*3] = {
+        0.5, -0.5, 0.75    ,// #1 
+        0.5, 0.5, 0.75     ,// #2 
+        -0.5, 0.5, 0.75    ,// #3 
+        -0.5, -0.5, 0.75   ,// #4 
+        0.75, 0.75, 1.25   ,// #5 
+        -0.75, 0.75, 1.25  ,// #6 
+        -0.75, -0.75, 1.25 ,// #7 
+        0.75, -0.75, 1.25  ,// #8 
+        1, 0, 1.5          ,// #9 
+        0, 1, 1.5          , // #10
+        -1, 0, 1.5         , // #11
+        0, -1, 1.5         , // #12
+        0, 0, 1.8          , // #13
+        0, 0, 4.2          , // #14
+        0, 0, 2.5          , // #15
+        0, 0, 3.5          , // #16
+      };
+      for ( int i = 0; i < 16*3; ++i )
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( refBC[i], barycenter->getValue()[i], 1e-6);
     }
+    if ( ind == 2 )
+    {
+      double refBC[47*3] = {
+        0.666667, 0, 0.666667          ,// #1 
+        0, -0.666667, 0.666667         ,// #2 
+        0.666667, -0.666667, 1         ,// #3 
+        0.666667, -0.666667, 0.666667  ,// #4 
+        0, 0.666667, 0.666667          ,// #5 
+        0.666667, 0.666667, 1          ,// #6 
+        0.666667, 0.666667, 0.666667   ,// #7 
+        -0.666667, 0, 0.666667         ,// #8 
+        -0.666667, 0.666667, 1         ,// #9 
+        -0.666667, 0.666667, 0.666667 , // #10
+        -0.666667, -0.666667, 1       , // #11
+        -0.666667, -0.666667, 0.666667, // #12
+        0.333333, 1, 1.33333          , // #13
+        1, 0.333333, 1.33333          , // #14
+        1, 1, 1.33333                 , // #15
+        -1, 0.333333, 1.33333         , // #16
+        -0.333333, 1, 1.33333         , // #17
+        -1, 1, 1.33333                , // #18
+        -0.333333, -1, 1.33333        , // #19
+        -1, -0.333333, 1.33333        , // #20
+        -1, -1, 1.33333               , // #21
+        1, -0.333333, 1.33333         , // #22
+        0.333333, -1, 1.33333         , // #23
+        1, -1, 1.33333                , // #24
+        0.666667, 0, 1.66667          , // #25
+        1.33333, 0, 1.66667           , // #26
+        0, 0.666667, 1.66667          , // #27
+        0, 1.33333, 1.66667           , // #28
+        -0.666667, 0, 1.66667         , // #29
+        -1.33333, 0, 1.66667          , // #30
+        0, -0.666667, 1.66667         , // #31
+        0, -1.33333, 1.66667          , // #32
+        0.666667, 0, 4.33333          , // #33
+        0, -0.666667, 4.33333         , // #34
+        -0.666667, 0, 4.33333         , // #35
+        0, 0.666667, 4.33333          , // #36
+        0, 0, 2                       , // #37
+        0, 0, 4                       , // #38
+        0, 0, 3                       , // #39
+        0, 1, 2.5                     , // #40
+        -1, 0, 2.5                    , // #41
+        0, -1, 2.5                    , // #42
+        1, 0, 2.5                     , // #43
+        0, 1, 3.5                     , // #44
+        -1, 0, 3.5                    , // #45
+        0, -1, 3.5                    , // #46
+        1, 0, 3.5                     , // #47
+      };
+      for ( int i = 0; i < 47*3; ++i )
+      {
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( refBC[i], barycenter->getValue()[i], 1e-5);
+      }
+    }
+//     for (int i = 1; i<=NumberOfElem;i++)
+//     {
+//     cout << "Barycenter " << i << " " << barycenter->getValueIJ(i,1) << " " << barycenter->getValueIJ(i,2) << " " << barycenter->getValueIJ(i,3) << endl;
+//     }
+    
     delete barycenter;
 
     // test of volume(for 3d elements)
@@ -1286,21 +1424,25 @@ void MEDMEMTest::testMeshAndMeshing()
       FIELD<double>* volume;
       CPPUNIT_ASSERT_NO_THROW(volume= myMesh3->getVolume(sup));
 
-      double maxvol,minvol,voltot;
-      maxvol = 0.;
-      minvol = 0.;
-      voltot = 0.0;
-      for (int i = 1; i<=NumberOfElem;i++)
-      {
-        cout << "Volume " << i << " " << volume->getValueIJ(i,1) << endl;
-        maxvol = dmax(maxvol,volume->getValueIJ(i,1));
-        minvol = dmin(minvol,volume->getValueIJ(i,1));
-        voltot = voltot + volume->getValueIJ(i,1);
-      }
+//       double maxvol,minvol,voltot;
+//       maxvol = 0.;
+//       minvol = 0.;
+//       voltot = 0.0;
+//       for (int i = 1; i<=NumberOfElem;i++)
+//       {
+//         cout << "Volume " << i << " " << volume->getValueIJ(i,1) << endl;
+//         maxvol = dmax(maxvol,volume->getValueIJ(i,1));
+//         minvol = dmin(minvol,volume->getValueIJ(i,1));
+//         voltot = voltot + volume->getValueIJ(i,1);
+//       }
 
-      cout << "Max Volume " << maxvol << " Min Volume " << minvol << endl;
-      cout << "Support Volume " << voltot << endl;
+//       cout << "Max Volume " << maxvol << " Min Volume " << minvol << endl;
+//       cout << "Support Volume " << voltot << endl;
 
+      double refVol[16] = { 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667,  0.666667,  0.666667,  0.666667,  1.333333,  1.333333,  4,  4 };
+      for ( int i = 0; i < 16; ++i )
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( refVol[i], volume->getValue()[i], 1e-6);
+      
       delete volume;
 
       // test of skin
@@ -1400,7 +1542,7 @@ void MEDMEMTest::testMeshAndMeshing()
     myMeshing3->setMeshDimension(2);
 
     //test 2D mesh
-    int NumberOfElem = myMeshing3->getNumberOfElements (MED_EDGE, MED_ALL_ELEMENTS);
+    //int NumberOfElem = myMeshing3->getNumberOfElements (MED_EDGE, MED_ALL_ELEMENTS);
 
     SUPPORT * sup = new SUPPORT (myMeshing3, "", MED_EDGE);
 
@@ -1408,39 +1550,51 @@ void MEDMEMTest::testMeshAndMeshing()
     FIELD<double>* normal;
     CPPUNIT_ASSERT_NO_THROW(normal = myMeshing3->getNormal(sup));
 
-    double normal_square, norm;
-    double maxnorm=0.;
-    double minnorm=0.;
-    double tmp_value;
-    for (int i = 1; i<=NumberOfElem; i++) {
-      normal_square = 0.;
-      cout << "Normal " << i << " ";
-      for (int j=1; j<=/*SpaceDimension*/2; j++) {
-        tmp_value = normal->getValueIJ(i,j);
-        normal_square += tmp_value*tmp_value;
-        cout << tmp_value << " ";
-      }
-      norm = sqrt(normal_square);
-      maxnorm = dmax(maxnorm,norm);
-      minnorm = dmin(minnorm,norm);
-      cout << ", Norm = " << norm << endl;
+//     double normal_square, norm;
+//     double maxnorm=0.;
+//     double minnorm=0.;
+//     double tmp_value;
+//     for (int i = 1; i<=NumberOfElem; i++) {
+//       normal_square = 0.;
+//       cout << "Normal " << i << " ";
+//       for (int j=1; j<=/*SpaceDimension*/2; j++) {
+//         tmp_value = normal->getValueIJ(i,j);
+//         normal_square += tmp_value*tmp_value;
+//         cout << tmp_value << " ";
+//       }
+//       norm = sqrt(normal_square);
+//       maxnorm = dmax(maxnorm,norm);
+//       minnorm = dmin(minnorm,norm);
+//       cout << ", Norm = " << norm << endl;
+//     }
+//     cout << "Max Norm " << maxnorm << " Min Norm " << minnorm << endl;
+    {
+      double refNormals[8] = {
+        -1, 1 ,
+        -0, -1,
+         1, 1 ,
+        -0, -1
+      };
+      for ( int i = 0; i < 8; ++i )
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( refNormals[i], normal->getValue()[i], 1e-6);
     }
-    cout << "Max Norm " << maxnorm << " Min Norm " << minnorm << endl;
-
     // test of length(for 1d elements)
     FIELD<double>* length;
     CPPUNIT_ASSERT_NO_THROW(length = myMeshing3->getLength(sup));
 
-    double length_value,maxlength,minlength;
-    maxlength = 0;
-    minlength = 0;
-    for (int i = 1; i<=NumberOfElem;i++) {
-      length_value = length->getValueIJ(i,1);
-      cout << "Length " << i << " " << length_value << endl;
-      maxlength = dmax(maxlength,length_value);
-      minlength = dmin(minlength,length_value);
-    }
-    cout << "Max Length " << maxlength << " Min Length " << minlength << endl;
+//     double length_value,maxlength,minlength;
+//     maxlength = 0;
+//     minlength = 0;
+//     for (int i = 1; i<=NumberOfElem;i++) {
+//       length_value = length->getValueIJ(i,1);
+//       cout << "Length " << i << " " << length_value << endl;
+//       maxlength = dmax(maxlength,length_value);
+//       minlength = dmin(minlength,length_value);
+//     }
+//     cout << "Max Length " << maxlength << " Min Length " << minlength << endl;
+    double refLen[4] = { 1.41421,1,1.41421,1 };
+    for ( int i = 0; i < 4; ++i )
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( refLen[i], length->getValue()[i], 1e-5);
 
     vector< FIELD<double> *> myVectField1;
     myVectField1.push_back(normal);
@@ -1478,13 +1632,19 @@ void MEDMEMTest::testMeshAndMeshing()
       //method return a MergeSup on the union of all SUPPORTs in Supports.
       SUPPORT *MergeSup;
       CPPUNIT_ASSERT_NO_THROW(MergeSup = myMesh3->mergeSupports(myVectSup3));
-      cout << *MergeSup << endl;
+      {
+        ostringstream out;
+        out << *MergeSup << endl;
+      }
       delete MergeSup;
 
       //method return a intersection of all SUPPORTs in IntersectSup
       SUPPORT *IntersectSup;
       CPPUNIT_ASSERT_NO_THROW(IntersectSup = myMesh3->intersectSupports(myVectSup3));
-      if (IntersectSup != NULL) cout<< *IntersectSup <<endl;
+      {
+        ostringstream out;
+        if (IntersectSup != NULL) out<< *IntersectSup <<endl;
+      }
       delete IntersectSup;
 
       FIELD<double> * length1 = myMeshing3->getLength(sup1);
@@ -1674,12 +1834,14 @@ void MEDMEMTest::testMeshAndMeshing()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  cout<<"Bounding box for createTestMesh()"<<endl;
-  for(int i = 0; i < myBndBox.size(); i++)
+  //cout<<"Bounding box for createTestMesh()"<<endl;
+  double refBox[6] = { -2, -2, 0, 2, 2, 5 };
+  for(int i = 0, iB = 0; i < myBndBox.size(); i++)
   {
     for(int j = 0; j < myBndBox[i].size(); j++)
-      cout<<" "<< myBndBox[i][j]<<" ";
-    cout<<endl;
+      CPPUNIT_ASSERT_DOUBLES_EQUAL( refBox[iB++], myBndBox[i][j], 1e-6);
+      //cout<<" "<< myBndBox[i][j]<<" ";
+      //cout<<endl;
   }
 
   double CoorPoint[3] = {0.0,  0.0, 1.0}; //n2
@@ -1835,10 +1997,10 @@ void MEDMEMTest::testMeshAndMeshing()
   const int *conn=mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_FACE,MED_ALL_ELEMENTS);
   for (int j = 0; j < nFaces; j++) {
     for (int k = 0; k < 4; k++) {
-      cout << conn[4*j+k] << " ";
+      //cout << conn[4*j+k] << " ";
       CPPUNIT_ASSERT_EQUAL(conn[4*j+k], connQuad4[4*j+k]);
     }
-    cout << endl;
+    //cout << endl;
   }
 
   //////////////////////////////////////////////////////////
