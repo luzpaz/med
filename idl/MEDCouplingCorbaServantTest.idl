@@ -38,6 +38,7 @@ module SALOME_TEST
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface getFieldScalarOn3DNT();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface getFieldScalarOn3DSurfWT();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface getFieldScalarOn3DSurfCOTI();
+    SALOME_MED::MEDCouplingFieldDoubleCorbaInterface getFieldScalarOn2DLT();
   };
 };
 

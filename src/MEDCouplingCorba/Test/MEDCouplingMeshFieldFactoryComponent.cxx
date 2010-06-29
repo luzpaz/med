@@ -224,6 +224,34 @@ namespace SALOME_TEST
     return fieldOnCells;
   }
 
+  ParaMEDMEM::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldScalarOn2DLT()
+  {
+    ParaMEDMEM::MEDCouplingUMesh *mesh=build2DMesh();
+    ParaMEDMEM::MEDCouplingFieldDouble *fieldOnCells=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::LINEAR_TIME);
+    fieldOnCells->setName("toto27");
+    fieldOnCells->setDescription("my wonderful 2D field toto27");
+    fieldOnCells->setMesh(mesh);
+    ParaMEDMEM::DataArrayDouble *array1=ParaMEDMEM::DataArrayDouble::New();
+    array1->alloc(mesh->getNumberOfCells(),4);
+    fieldOnCells->setArray(array1);
+    double *tmp=array1->getPointer();
+    array1->decrRef();
+    const double arr1[20]={1.2,1.02,1.002,1.0002, 3.4,3.04,3.004,3.0004, 5.6,5.06,5.006,5.0006, 7.8,7.08,7.008,7.0008, 9.1,9.01,9.001,9.0001};
+    std::copy(arr1,arr1+20,tmp);
+    ParaMEDMEM::DataArrayDouble *array2=ParaMEDMEM::DataArrayDouble::New();
+    array2->alloc(mesh->getNumberOfCells(),4);
+    fieldOnCells->setEndArray(array2);
+    tmp=array2->getPointer();
+    array2->decrRef();
+    mesh->decrRef();
+    const double arr2[20]={71.2,71.02,71.002,71.0002, 73.4,73.04,73.004,73.0004, 75.6,75.06,75.006,75.0006, 77.8,77.08,77.008,77.0008, 79.1,79.01,79.001,79.0001};
+    std::copy(arr2,arr2+20,tmp);
+    fieldOnCells->setStartTime(6.7,25,26);
+    fieldOnCells->setEndTime(17.2,125,126);
+    fieldOnCells->checkCoherency();
+    return fieldOnCells;
+  }
+
   std::string MEDCouplingCorbaServBasicsTest::buildFileNameForIOR()
   {
     std::string ret;

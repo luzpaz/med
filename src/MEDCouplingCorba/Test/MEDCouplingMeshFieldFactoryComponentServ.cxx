@@ -131,4 +131,13 @@ namespace SALOME_TEST
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
     return ret;
   }
+
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldScalarOn2DLT()
+  {
+    ParaMEDMEM::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldScalarOn2DLT();
+    ParaMEDMEM::MEDCouplingFieldDoubleServant *m=new ParaMEDMEM::MEDCouplingFieldDoubleServant(field);
+    field->decrRef();
+    SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
+    return ret;
+  }
 }

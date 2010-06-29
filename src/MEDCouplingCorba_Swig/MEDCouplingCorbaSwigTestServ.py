@@ -80,9 +80,14 @@ class MEDCouplingMeshFieldFactoryComponentPy(MEDCouplingCorbaServantTest_idl._0_
         field=test.buildFieldScalarOn3DSurfWT()
         return MEDCouplingFieldDoubleServant._this(field)
     
-    def getFieldScalarOn3DSurfCOTI(selfx):
+    def getFieldScalarOn3DSurfCOTI(self):
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         field=test.buildFieldScalarOn3DSurfCOTI()
+        return MEDCouplingFieldDoubleServant._this(field)
+    
+    def getFieldScalarOn2DLT(self):
+        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
+        field=test.buildFieldScalarOn2DLT()
         return MEDCouplingFieldDoubleServant._this(field)
     pass
 

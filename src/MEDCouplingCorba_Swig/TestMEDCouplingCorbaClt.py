@@ -178,6 +178,15 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
         refField=test.buildFieldScalarOn3DSurfCOTI();
         self.failUnless(fieldCpp.isEqual(refField,1.e-12,1.e-15));
         pass
+
+    def testCorbaField2DLTFetching(self):
+        fieldPtr=self._objC.getFieldScalarOn2DLT();
+        fieldCpp=MEDCouplingFieldDoubleClient.New(fieldPtr);
+        fieldPtr.Destroy();
+        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
+        refField=test.buildFieldScalarOn2DLT();
+        self.failUnless(fieldCpp.isEqual(refField,1.e-12,1.e-15));
+        pass
     
     def testShutdownServer(self):
         self._objC.shutdownOrb()

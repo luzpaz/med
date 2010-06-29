@@ -43,6 +43,7 @@ namespace SALOME_TEST
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldScalarOn3DNT();
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldScalarOn3DSurfWT();
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldScalarOn3DSurfCOTI();
+    static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldScalarOn2DLT();
     static std::string buildFileNameForIOR();
   };
 }

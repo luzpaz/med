@@ -274,6 +274,33 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaField3DSurfCOTIFe
   fieldCpp->decrRef();
 }
 
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaField2DLTFetching()
+{
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr fieldPtr=_objC->getFieldScalarOn2DLT();
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface::_duplicate(fieldPtr);
+  ParaMEDMEM::MEDCouplingFieldDouble *fieldCpp=ParaMEDMEM::MEDCouplingFieldDoubleClient::New(fieldPtr);
+  fieldPtr->Destroy();
+  CORBA::release(fieldPtr);
+  double res[4];
+  const double pos[2]={0.3,-0.2};
+  fieldCpp->getValueOn(pos,10.,res);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(25.4,res[0],1e-14);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(25.04,res[1],1e-14);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(25.004,res[2],1e-14);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(25.0004,res[3],1e-14);
+  ParaMEDMEM::MEDCouplingFieldDouble *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldScalarOn2DLT();
+  CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
+  int dt,it;
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(6.7,fieldCpp->getStartTime(dt,it),1e-14);
+  CPPUNIT_ASSERT_EQUAL(25,dt);
+  CPPUNIT_ASSERT_EQUAL(26,it);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(17.2,fieldCpp->getEndTime(dt,it),1e-14);
+  CPPUNIT_ASSERT_EQUAL(125,dt);
+  CPPUNIT_ASSERT_EQUAL(126,it);
+  refField->decrRef();
+  fieldCpp->decrRef();
+}
+
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::shutdownServer()
 {
   _objC->shutdownOrb();
