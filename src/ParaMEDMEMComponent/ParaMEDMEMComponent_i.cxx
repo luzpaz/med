@@ -73,8 +73,6 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
     }
 
   try{
-    set<int> procs;
-
     string service = coupling;
     if( service.size() == 0 )
       throw SALOME_Exception("You have to give a service name !");
