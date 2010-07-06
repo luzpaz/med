@@ -3934,7 +3934,7 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
       nb_sub_list.push_back( nb_sub );
     }
   }
-  delete [] names;
+  // Mantis issue 0020923 //delete [] names;
   // write mesh
 
   //try {
@@ -4099,5 +4099,8 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
   me->writeMEDNames(listGIBItoMED_mail, listGIBItoMED_cham, listGIBItoMED_comp);
 
   me->writeLastRecord();
+
+  delete [] names; // Mantis issue 0020923
+
   END_OF_MED(LOC);
 }
