@@ -1531,11 +1531,17 @@ void CELLMODEL::clean()
     if (NULL!=_numberOfNodeOfEachConstituent[i])
       delete[] _numberOfNodeOfEachConstituent[i] ;
   }
-  delete [] _constituentsType; 
-  if (NULL!=_numberOfConstituents)
-    delete[]_numberOfConstituents ;
-  if (NULL!=_constituents)
-    delete[] _constituents ;
-  if (NULL!=_numberOfNodeOfEachConstituent)
-    delete[] _numberOfNodeOfEachConstituent ;
+  delete [] _constituentsType; _constituentsType = NULL;
+  if (NULL != _numberOfConstituents) {
+    delete [] _numberOfConstituents;
+    _numberOfConstituents = NULL;
+  }
+  if (NULL != _constituents) {
+    delete [] _constituents;
+    _constituents = NULL;
+  }
+  if (NULL != _numberOfNodeOfEachConstituent) {
+    delete [] _numberOfNodeOfEachConstituent;
+    _numberOfNodeOfEachConstituent = NULL;
+  }
 }
