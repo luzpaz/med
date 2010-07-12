@@ -284,10 +284,10 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaField2DLTFetching
   double res[4];
   const double pos[2]={0.3,-0.2};
   fieldCpp->getValueOn(pos,10.,res);
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(25.4,res[0],1e-14);
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(25.04,res[1],1e-14);
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(25.004,res[2],1e-14);
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(25.0004,res[3],1e-14);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(25.4,res[0],1e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(25.04,res[1],1e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(25.004,res[2],1e-12);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(25.0004,res[3],1e-12);
   ParaMEDMEM::MEDCouplingFieldDouble *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldScalarOn2DLT();
   CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
   int dt,it;
