@@ -1,5 +1,8 @@
 dnl  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 dnl
+dnl  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+dnl  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+dnl
 dnl  This library is free software; you can redistribute it and/or
 dnl  modify it under the terms of the GNU Lesser General Public
 dnl  License as published by the Free Software Foundation; either
@@ -79,6 +82,12 @@ if test x"$MPIREQUESTED" = xyes; then
     mpi_ok=no
   fi
 
+  if test "$WITHMPI2" = "yes";then
+    mpi2_ok=yes
+  else
+    mpi2_ok=no
+  fi
+
 fi
 
 if test "$WITHMPI" = no; then
@@ -124,5 +133,8 @@ AC_SUBST(WITHMPI)
 AC_SUBST(MPI_INCLUDES)
 AC_SUBST(MPI_LIBS)
 AC_SUBST(mpi_ok)
+AC_SUBST(mpi2_ok)
 AM_CONDITIONAL(MPI_IS_OK, [test x"$mpi_ok" = xyes])
+AM_CONDITIONAL(MPI2_IS_OK, [test x"$mpi2_ok" = xyes])
+
 ])dnl

@@ -31,7 +31,11 @@ if test "$WITHOPENMPI" = yes; then
   OPENMPI_HOME=$withval
 
   if test "$OPENMPI_HOME"; then
-    MPI_INCLUDES="-I${OPENMPI_HOME}/include"
+    if test -f "${OPENMPI_HOME}/include/mpi.h"; then
+      MPI_INCLUDES="-I${OPENMPI_HOME}/include"
+    else  
+      MPI_INCLUDES=`$OPENMPI_HOME/bin/mpicxx --showme:compile`
+    fi
     MPI_LIBS=`$OPENMPI_HOME/bin/mpicxx --showme:link`
   fi
 
@@ -40,12 +44,22 @@ if test "$WITHOPENMPI" = yes; then
   AC_CHECK_HEADER(mpi.h,WITHOPENMPI="yes",WITHOPENMPI="no")
   CPPFLAGS="$CPPFLAGS_old"
 
+  LIBS_old="$LIBS"
+  LIBS="-L${OPENMPI_HOME}/lib $LIBS"
+  AC_CHECK_LIB(mpi,MPI_Publish_name,WITHMPI2="yes",WITHMPI2="no")
+  LIBS="$LIBS_old"
+
   AC_MSG_CHECKING(for openmpi)
   if test "$WITHOPENMPI" = "yes";then
      mpi_ok=yes
+     mpi2_ok=$WITHMPI2
+     WITHMPI=yes
+     CPPFLAGS="-DOMPI_IGNORE_CXX_SEEK -DWITHOPENMPI $CPPFLAGS"
      AC_MSG_RESULT(yes)
   else
      mpi_ok=no
+     mpi2_ok=no
+     WITHMPI=no
      AC_MSG_RESULT(no)
   fi
 fi
