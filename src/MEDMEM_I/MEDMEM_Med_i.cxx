@@ -682,13 +682,13 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for meshes names
  */
 //=============================================================================
-SALOME_MED::string_array * MED_i::getMeshNames()      
+SALOME_TYPES::ListOfString * MED_i::getMeshNames()      
 throw (SALOME::SALOME_Exception)
 {
         if (_med==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Med object",\
                                              SALOME::INTERNAL_ERROR);
-        SALOME_MED::string_array_var myseq = new SALOME_MED::string_array;
+        SALOME_TYPES::ListOfString_var myseq = new SALOME_TYPES::ListOfString;
         try
         {
                 int nbMeshes=_med->getNumberOfMeshes();
@@ -714,13 +714,13 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for fields names
  */
 //=============================================================================
-SALOME_MED::string_array * MED_i::getFieldNames()     
+SALOME_TYPES::ListOfString * MED_i::getFieldNames()     
   throw (SALOME::SALOME_Exception)
 {
   if (_med==NULL)
     THROW_SALOME_CORBA_EXCEPTION("No associated Med object",\
                                              SALOME::INTERNAL_ERROR);
-  SALOME_MED::string_array_var myseq = new SALOME_MED::string_array;
+  SALOME_TYPES::ListOfString_var myseq = new SALOME_TYPES::ListOfString;
   try
     {
       deque<string> nameFields = _med->getFieldNames();
@@ -832,14 +832,14 @@ CORBA::Long MED_i::getFieldNumberOfIteration(const char* fieldName)
  * of a given field by its name and its number (sequence of two long integers).
  */
 //=============================================================================
-SALOME_MED::long_array * MED_i::getFieldIteration(const char* fieldName,CORBA::Long i) 
+SALOME_TYPES::ListOfLong * MED_i::getFieldIteration(const char* fieldName,CORBA::Long i) 
   throw (SALOME::SALOME_Exception)
 {
   if (_med==NULL)
     THROW_SALOME_CORBA_EXCEPTION("No associated Med object",\
                                  SALOME::INTERNAL_ERROR);
 
-  SALOME_MED::long_array_var myseq = new SALOME_MED::long_array;
+  SALOME_TYPES::ListOfLong_var myseq = new SALOME_TYPES::ListOfLong;
   try
     {
       deque<DT_IT_> fieldIteration = _med->getFieldIteration(string(fieldName));
@@ -866,14 +866,14 @@ SALOME_MED::long_array * MED_i::getFieldIteration(const char* fieldName,CORBA::L
  * of a given field by its name (sequence of two by iteration number long integers).
  */
 //=============================================================================
-SALOME_MED::long_array * MED_i::getFieldIterations(const char* fieldName) 
+SALOME_TYPES::ListOfLong * MED_i::getFieldIterations(const char* fieldName) 
   throw (SALOME::SALOME_Exception)
 {
   if (_med==NULL)
     THROW_SALOME_CORBA_EXCEPTION("No associated Med object",\
                                  SALOME::INTERNAL_ERROR);
 
-  SALOME_MED::long_array_var myseq = new SALOME_MED::long_array;
+  SALOME_TYPES::ListOfLong_var myseq = new SALOME_TYPES::ListOfLong;
   try
     {
       deque<DT_IT_> fieldIteration = _med->getFieldIteration(string(fieldName));

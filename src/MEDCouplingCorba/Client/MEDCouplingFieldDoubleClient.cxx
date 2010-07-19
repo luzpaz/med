@@ -29,9 +29,9 @@ MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplin
 {
   fieldPtr->Register();
   //
-  SALOME_MED::long_array *tinyL;
-  SALOME_MED::double_array *tinyD;
-  SALOME_MED::string_array *tinyS;
+  SALOME_TYPES::ListOfLong *tinyL;
+  SALOME_TYPES::ListOfDouble *tinyD;
+  SALOME_TYPES::ListOfString *tinyS;
   //1st CORBA call : getting all tiny info of all types (int, double string).
   fieldPtr->getTinyInfo(tinyL,tinyD,tinyS);
   int tinyLgth=tinyL->length();
@@ -65,13 +65,13 @@ MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplin
   mesh->decrRef();
   std::vector<DataArrayDouble *> arrays;
   ret->resizeForUnserialization(tinyLV,arrays);
-  SALOME_MED::double_array2 *bigArr;
+  SALOME_TYPES::ListOfDouble2 *bigArr;
   //3rd CORBA invokation to get big content
   fieldPtr->getSerialisationData(bigArr);
   tinyLgth=arrays.size();
   for(int i=0;i<tinyLgth;i++)
     {
-      SALOME_MED::double_array& oneArr=(*bigArr)[i];
+      SALOME_TYPES::ListOfDouble& oneArr=(*bigArr)[i];
       DataArrayDouble *curArrToFill=arrays[i];
       double *pt=curArrToFill->getPointer();
       int lgth=curArrToFill->getNbOfElems();

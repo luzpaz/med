@@ -20,14 +20,11 @@
 #ifndef __MEDCOUPLINGCORBASERVANT_IDL__
 #define __MEDCOUPLINGCORBASERVANT_IDL__
 
+#include "SALOME_Types.idl"
 #include "SALOME_GenericObj.idl"
 
 module SALOME_MED
 {
-  typedef sequence<long> long_array;
-  typedef sequence<double> double_array;
-  typedef sequence<string> string_array;
-  typedef sequence<double_array> double_array2;
 
   interface MEDCouplingMeshCorbaInterface : SALOME::GenericObj
   {
@@ -36,8 +33,8 @@ module SALOME_MED
   interface MEDCouplingPointSetCorbaInterface : MEDCouplingMeshCorbaInterface
   {
     //!CORBA inplementation of MEDCouplingPointSet::getTinySerializationInformation
-    void getTinyInfo(out long_array la, out string_array sa);
-    void getSerialisationData(out long_array la, out double_array da);
+    void getTinyInfo(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfString sa);
+    void getSerialisationData(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfDouble da);
   };
 
   interface MEDCouplingUMeshCorbaInterface : MEDCouplingPointSetCorbaInterface
@@ -52,8 +49,8 @@ module SALOME_MED
   interface MEDCouplingFieldDoubleCorbaInterface : MEDCouplingFieldCorbaInterface
   {
     //!returns the 3 tiny arrays to prepare the new instance locally.
-    void getTinyInfo(out long_array la, out double_array da, out string_array sa);
-    void getSerialisationData(out double_array2 da2);
+    void getTinyInfo(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfDouble da, out SALOME_TYPES::ListOfString sa);
+    void getSerialisationData(out SALOME_TYPES::ListOfDouble2 da2);
   };
 };
 

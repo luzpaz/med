@@ -96,9 +96,9 @@ public :
     CORBA::Double           getTime()        throw (SALOME::SALOME_Exception);
     CORBA::Long             getCorbaIndex()  throw (SALOME::SALOME_Exception);
 
-    SALOME_MED::string_array * getComponentsNames()  throw (SALOME::SALOME_Exception);
-    SALOME_MED::string_array * getComponentsUnits()  throw (SALOME::SALOME_Exception);
-    SALOME_MED::string_array * getComponentsDescriptions()  throw (SALOME::SALOME_Exception);
+    SALOME_TYPES::ListOfString * getComponentsNames()  throw (SALOME::SALOME_Exception);
+    SALOME_TYPES::ListOfString * getComponentsUnits()  throw (SALOME::SALOME_Exception);
+    SALOME_TYPES::ListOfString * getComponentsDescriptions()  throw (SALOME::SALOME_Exception);
 
     void addInStudy(SALOMEDS::Study_ptr myStudy,
                     SALOME_MED::FIELD_ptr myIor)

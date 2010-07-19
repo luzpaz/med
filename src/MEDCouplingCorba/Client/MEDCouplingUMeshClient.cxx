@@ -32,8 +32,8 @@ MEDCouplingUMesh *MEDCouplingUMeshClient::New(SALOME_MED::MEDCouplingUMeshCorbaI
   //to corectly resize local copy of distant instance adressed by 'meshPtr'
   //1st value of returned array is the type of instance. Thanks to
   //CORBA and its type-check no use of this value is necessary.
-  SALOME_MED::long_array *tinyI;
-  SALOME_MED::string_array *tinyS;
+  SALOME_TYPES::ListOfLong *tinyI;
+  SALOME_TYPES::ListOfString *tinyS;
   meshPtr->getTinyInfo(tinyI,tinyS);
   int tinyLgth=tinyI->length();
   std::vector<int> tinyV(tinyLgth);
@@ -51,8 +51,8 @@ MEDCouplingUMesh *MEDCouplingUMeshClient::New(SALOME_MED::MEDCouplingUMeshCorbaI
   std::vector<std::string> uselessVector;
   //vector 'uselessVector' is useless thanks to CORBA that , contrary to MPI, does not need to allocate right length of arrays before invokation
   ret->resizeForUnserialization(tinyV,a1,a2,uselessVector);
-  SALOME_MED::long_array *a1Corba;
-  SALOME_MED::double_array *a2Corba;
+  SALOME_TYPES::ListOfLong *a1Corba;
+  SALOME_TYPES::ListOfDouble *a2Corba;
   meshPtr->getSerialisationData(a1Corba,a2Corba);
   int myLgth=a1Corba->length();
   int *ptToFill=a1->getPointer();

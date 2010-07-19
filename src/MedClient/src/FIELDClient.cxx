@@ -42,7 +42,7 @@ FIELDClient<T,INTERLACING_TAG>::FIELDClient(typename FIELDI_TRAITS<T,INTERLACING
 
   string * _s = new string[nc];
 
-  SALOME_MED::string_array_var s;
+  SALOME_TYPES::ListOfString_var s;
   s = _fieldPtr->getComponentsNames();
   for (int i=0; i<nc; i++)
     _s[i] = s[i];

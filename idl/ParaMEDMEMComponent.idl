@@ -22,7 +22,7 @@
 // $Header$
 //
 /*!
-This file contains the IDL definitions of the ParaMEDMEM component in %SALOME application.
+  This file contains the IDL definitions of the ParaMEDMEM component in %SALOME application.
 */
 
 #ifndef _SALOME_PARAMEDMEMCOMPO_IDL_
@@ -41,21 +41,20 @@ module SALOME_MED
   interface ParaMEDMEMComponent:Engines::Component,Engines::MPIObject
   {
     void setInterpolationOptions(in string coupling,
-				 in long print_level,
-				 in string intersection_type,
-				 in double precision,
-				 in double median_plane,
-				 in boolean do_rotate,
-				 in double bounding_box_adjustment,
-				 in double bounding_box_adjustment_abs,
-				 in double max_distance_for_3Dsurf_intersect,
-				 in long orientation,
-				 in boolean measure_abs,
-				 in string splitting_policy,
-				 in boolean P1P0_bary_method) raises (SALOME::SALOME_Exception);
+                                 in long print_level,
+                                 in string intersection_type,
+                                 in double precision,
+                                 in double median_plane,
+                                 in boolean do_rotate,
+                                 in double bounding_box_adjustment,                                              in double bounding_box_adjustment_abs,
+                                 in double max_distance_for_3Dsurf_intersect,
+                                 in long orientation,
+                                 in boolean measure_abs,
+                                 in string splitting_policy,
+                                 in boolean P1P0_bary_method) raises (SALOME::SALOME_Exception);
     void initializeCoupling(in string coupling) raises (SALOME::SALOME_Exception);
     void terminateCoupling(in string coupling) raises (SALOME::SALOME_Exception);
   };
 } ;
-#endif
 
+#endif

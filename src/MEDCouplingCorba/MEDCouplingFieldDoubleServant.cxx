@@ -26,23 +26,23 @@ MEDCouplingFieldDoubleServant::MEDCouplingFieldDoubleServant(const MEDCouplingFi
 {
 }
 
-void MEDCouplingFieldDoubleServant::getTinyInfo(SALOME_MED::long_array_out la, SALOME_MED::double_array_out da, SALOME_MED::string_array_out sa)
+void MEDCouplingFieldDoubleServant::getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da, SALOME_TYPES::ListOfString_out sa)
 {
-  la=new SALOME_MED::long_array;
+  la=new SALOME_TYPES::ListOfLong;
   std::vector<int> tinyInfo;
   getPointer()->getTinySerializationIntInformation(tinyInfo);
   la->length(tinyInfo.size());
   for(int i=0;i<tinyInfo.size();i++)
     (*la)[i]=tinyInfo[i];
   //
-  da=new SALOME_MED::double_array;
+  da=new SALOME_TYPES::ListOfDouble;
   std::vector<double> tinyInfo2;
   getPointer()->getTinySerializationDbleInformation(tinyInfo2);
   da->length(tinyInfo2.size());
   for(int i=0;i<tinyInfo2.size();i++)
     (*da)[i]=tinyInfo2[i];
   //
-  sa=new SALOME_MED::string_array;
+  sa=new SALOME_TYPES::ListOfString;
   std::vector<std::string> tinyInfo3;
   getPointer()->getTinySerializationStrInformation(tinyInfo3);
   sa->length(tinyInfo3.size());
@@ -50,16 +50,16 @@ void MEDCouplingFieldDoubleServant::getTinyInfo(SALOME_MED::long_array_out la, S
     (*sa)[i]=CORBA::string_dup(tinyInfo3[i].c_str());
 }
 
-void MEDCouplingFieldDoubleServant::getSerialisationData(SALOME_MED::double_array2_out da2)
+void MEDCouplingFieldDoubleServant::getSerialisationData(SALOME_TYPES::ListOfDouble2_out da2)
 {
   std::vector<DataArrayDouble *> arrays;
   getPointer()->serialize(arrays);
-  da2=new SALOME_MED::double_array2;
+  da2=new SALOME_TYPES::ListOfDouble2;
   int lgth=arrays.size();
   da2->length(lgth);
   for(int i=0;i<lgth;i++)
     {
-      SALOME_MED::double_array& locCorbaArr=(*da2)[i];
+      SALOME_TYPES::ListOfDouble& locCorbaArr=(*da2)[i];
       DataArrayDouble *locArr=arrays[i];
       int lgth2=locArr->getNbOfElems();
       locCorbaArr.length(lgth2);

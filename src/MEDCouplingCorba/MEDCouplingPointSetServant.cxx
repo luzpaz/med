@@ -31,9 +31,9 @@ MEDCouplingPointSetServant::~MEDCouplingPointSetServant()
 {
 }
 
-void MEDCouplingPointSetServant::getTinyInfo(SALOME_MED::long_array_out la, SALOME_MED::string_array_out sa)
+void MEDCouplingPointSetServant::getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfString_out sa)
 {
-  la=new SALOME_MED::long_array;
+  la=new SALOME_TYPES::ListOfLong;
   std::vector<int> tinyInfoI;
   std::vector<std::string> tinyInfoS;
   getPointer()->getTinySerializationInformation(tinyInfoI,tinyInfoS);
@@ -41,19 +41,19 @@ void MEDCouplingPointSetServant::getTinyInfo(SALOME_MED::long_array_out la, SALO
   for(int i=0;i<tinyInfoI.size();i++)
     (*la)[i]=tinyInfoI[i];
   //
-  sa=new SALOME_MED::string_array;
+  sa=new SALOME_TYPES::ListOfString;
   int nbOfSts=tinyInfoS.size();
   sa->length(nbOfSts);
   for(int i=0;i<nbOfSts;i++)
     (*sa)[i]=CORBA::string_dup(tinyInfoS[i].c_str());
 }
 
-void MEDCouplingPointSetServant::getSerialisationData(SALOME_MED::long_array_out la, SALOME_MED::double_array_out da)
+void MEDCouplingPointSetServant::getSerialisationData(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da)
 {
   DataArrayInt *array1;
   DataArrayDouble *array2;
   getPointer()->serialize(array1,array2);
-  la=new SALOME_MED::long_array;
+  la=new SALOME_TYPES::ListOfLong;
   if(array1)
     {
       int lgth=array1->getNbOfElems();
@@ -64,7 +64,7 @@ void MEDCouplingPointSetServant::getSerialisationData(SALOME_MED::long_array_out
       array1->decrRef();
     }
   //
-  da=new SALOME_MED::double_array;
+  da=new SALOME_TYPES::ListOfDouble;
   if(array2)
     {
       int lgth=array2->getNbOfElems();

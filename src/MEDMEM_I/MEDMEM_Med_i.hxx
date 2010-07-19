@@ -90,17 +90,17 @@ public:
     // IDL Methods 
     CORBA::Long             getNumberOfMeshes() throw (SALOME::SALOME_Exception);
     CORBA::Long             getNumberOfFields() throw (SALOME::SALOME_Exception);
-    SALOME_MED::string_array * getMeshNames()      throw (SALOME::SALOME_Exception);
-    SALOME_MED::string_array * getFieldNames()     throw (SALOME::SALOME_Exception);
+    SALOME_TYPES::ListOfString * getMeshNames()      throw (SALOME::SALOME_Exception);
+    SALOME_TYPES::ListOfString * getFieldNames()     throw (SALOME::SALOME_Exception);
     SALOME_MED::MESH_ptr    getMeshByName(const char* meshName) 
                                                 throw (SALOME::SALOME_Exception);
     SALOME_MED::MESH_ptr    getMesh(SALOME_MED::FIELD_ptr fieldPtr) 
                                                 throw (SALOME::SALOME_Exception);
     CORBA::Long getFieldNumberOfIteration(const char* fieldName) 
       throw (SALOME::SALOME_Exception);
-    SALOME_MED::long_array * getFieldIteration(const char* fieldName, CORBA::Long i) 
+    SALOME_TYPES::ListOfLong * getFieldIteration(const char* fieldName, CORBA::Long i) 
       throw (SALOME::SALOME_Exception);
-    SALOME_MED::long_array * getFieldIterations(const char* fieldName) 
+    SALOME_TYPES::ListOfLong * getFieldIterations(const char* fieldName) 
       throw (SALOME::SALOME_Exception);
     SALOME_MED::FIELD_ptr   getField(const char* fieldName,
                                      CORBA::Long pasTemps, 

@@ -80,21 +80,21 @@ public:
                                            throw (SALOME::SALOME_Exception);
     CORBA::Long          getNumberOfTypes()
                                            throw (SALOME::SALOME_Exception);
-    SALOME_MED::long_array* getNumber(SALOME_MED::medGeometryElement geomElement) 
+    SALOME_TYPES::ListOfLong* getNumber(SALOME_MED::medGeometryElement geomElement) 
                                            throw (SALOME::SALOME_Exception);
 
-    SALOME_MED::long_array* getNumberFromFile(SALOME_MED::medGeometryElement geomElement) 
+    SALOME_TYPES::ListOfLong* getNumberFromFile(SALOME_MED::medGeometryElement geomElement) 
                                            throw (SALOME::SALOME_Exception);
 
     SALOME::SenderInt_ptr getSenderForNumber(SALOME_MED::medGeometryElement geomElement) 
                                            throw (SALOME::SALOME_Exception);
-    SALOME_MED::long_array* getNumberIndex() 
+    SALOME_TYPES::ListOfLong* getNumberIndex() 
                                            throw (SALOME::SALOME_Exception);
     SALOME::SenderInt_ptr getSenderForNumberIndex() 
                                            throw (SALOME::SALOME_Exception);
     CORBA::Long          getNumberOfGaussPoint(SALOME_MED::medGeometryElement geomElement) 
                                            throw (SALOME::SALOME_Exception);
-    SALOME_MED::long_array* getNumbersOfGaussPoint()
+    SALOME_TYPES::ListOfLong* getNumbersOfGaussPoint()
                                            throw (SALOME::SALOME_Exception);
 
     SALOME_MED::medGeometryElement_array* getTypes() 
