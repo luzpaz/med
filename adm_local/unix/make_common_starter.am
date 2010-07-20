@@ -88,11 +88,13 @@ tests: unittest
 
 unittest: $(UNIT_TEST_PROG)
 	@if test "x$(UNIT_TEST_PROG)" != "x"; then   \
-	    env top_srcdir=@top_srcdir@ ./$(UNIT_TEST_PROG);             \
-	    if [[ `awk '{ print $$1 }' UnitTestsResult` != "OK" ]]; then \
-	    	cat UnitTestsResult;                 \
-	    	exit 10;                             \
-	    fi;                                      \
+	    for exe in $(UNIT_TEST_PROG) ; do \
+	        env top_srcdir=@top_srcdir@ ./$$exe;             \
+	        if [[ `awk '{ print $$1 }' UnitTestsResult` != "OK" ]]; then \
+	    	    cat UnitTestsResult;                 \
+	    	    exit 10;                             \
+	        fi;                                      \
+	    done; \
 	fi;
 
 # documentation
