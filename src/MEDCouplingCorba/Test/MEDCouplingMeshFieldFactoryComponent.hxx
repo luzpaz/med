@@ -26,6 +26,7 @@ namespace ParaMEDMEM
 {
   class MEDCouplingUMesh;
   class MEDCouplingFieldDouble;
+  class MEDCouplingExtrudedMesh;
 }
 
 namespace SALOME_TEST
@@ -33,11 +34,13 @@ namespace SALOME_TEST
   class MEDCouplingCorbaServBasicsTest
   {
   public:
+    static ParaMEDMEM::MEDCouplingUMesh *build1DMesh();
     static ParaMEDMEM::MEDCouplingUMesh *build2DMesh();
     static ParaMEDMEM::MEDCouplingUMesh *build3DMesh();
     static ParaMEDMEM::MEDCouplingUMesh *build3DSurfMesh();
     static ParaMEDMEM::MEDCouplingUMesh *build0DMesh();
     static ParaMEDMEM::MEDCouplingUMesh *buildM1DMesh();
+    static ParaMEDMEM::MEDCouplingExtrudedMesh *buildExtrudedMesh(ParaMEDMEM::MEDCouplingUMesh *&m2D);
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldScalarOn2DNT();
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldNodeScalarOn2DNT();
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldScalarOn3DNT();

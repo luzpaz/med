@@ -33,6 +33,7 @@ namespace ParaMEDMEM
   {
   public:
     static MEDCouplingMesh *New(SALOME_MED::MEDCouplingMeshCorbaInterface_ptr mesh);
+    static void fillMeshFromCorbaData(MEDCouplingMesh *meshCpp, SALOME_MED::MEDCouplingMeshCorbaInterface_ptr meshPtr);
   };
 }
 

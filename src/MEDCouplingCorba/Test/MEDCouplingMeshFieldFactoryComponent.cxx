@@ -18,13 +18,41 @@
 //
 
 #include "MEDCouplingMeshFieldFactoryComponent.hxx"
+#include "MEDCouplingExtrudedMesh.hxx"
 #include "MEDCouplingFieldDouble.hxx"
 #include "MEDCouplingUMesh.hxx"
 
+#include <cmath>
 #include <algorithm>
 
 namespace SALOME_TEST
 {
+  ParaMEDMEM::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::build1DMesh()
+  {
+    double coords[4]={ 0.0, 0.3, 0.75, 1.0 };
+    int conn[2*3]={ 0,1, 1,2, 2,3 };
+    ParaMEDMEM::MEDCouplingUMesh *mesh=ParaMEDMEM::MEDCouplingUMesh::New("1DMeshForCorba",1);
+    mesh->allocateCells(3);
+    mesh->insertNextCell(INTERP_KERNEL::NORM_SEG2,2,conn);
+    mesh->insertNextCell(INTERP_KERNEL::NORM_SEG2,2,conn+2);
+    mesh->insertNextCell(INTERP_KERNEL::NORM_SEG2,2,conn+4);
+    mesh->finishInsertingCells();
+    ParaMEDMEM::DataArrayDouble *myCoords=ParaMEDMEM::DataArrayDouble::New();
+    myCoords->alloc(4,1);
+    std::copy(coords,coords+4,myCoords->getPointer());
+    mesh->setCoords(myCoords);
+    myCoords->decrRef();
+    mesh->changeSpaceDimension(3);
+    myCoords=mesh->getCoords();
+    myCoords->setInfoOnComponent(0,"X1D(m)");
+    myCoords->setInfoOnComponent(1,"Y1D (dm)");
+    myCoords->setInfoOnComponent(2,"Z1D (pm)");
+    double center[3]={0.,0.,0.};
+    double vector[3]={0,1,0};
+    mesh->rotate(center,vector,-M_PI/2.);
+    return mesh;
+  }
+
   ParaMEDMEM::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::build2DMesh()
   {
     double targetCoords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
@@ -129,6 +157,19 @@ namespace SALOME_TEST
     ParaMEDMEM::MEDCouplingUMesh *meshM1D=ParaMEDMEM::MEDCouplingUMesh::New("wonderfull -1 D mesh",-1);
     meshM1D->checkCoherency();
     return meshM1D;
+  }
+
+  ParaMEDMEM::MEDCouplingExtrudedMesh *MEDCouplingCorbaServBasicsTest::buildExtrudedMesh(ParaMEDMEM::MEDCouplingUMesh *&m2D)
+  {
+    m2D=build2DMesh();
+    m2D->changeSpaceDimension(3);
+    ParaMEDMEM::MEDCouplingUMesh *m1D=build1DMesh();
+    ParaMEDMEM::MEDCouplingUMesh *retu=m2D->buildExtrudedMeshFromThis(m1D,0);
+    m1D->decrRef();
+    ParaMEDMEM::MEDCouplingExtrudedMesh *ret=ParaMEDMEM::MEDCouplingExtrudedMesh::New(retu,m2D,2);
+    ret->setName("ExtrudedTestForCorbaTest");
+    retu->decrRef();
+    return ret;
   }
 
   ParaMEDMEM::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldScalarOn2DNT()

@@ -20,8 +20,10 @@
 #include "MEDCouplingMeshFieldFactoryComponentServ.hxx"
 #include "MEDCouplingMeshFieldFactoryComponent.hxx"
 #include "MEDCouplingFieldDoubleServant.hxx"
+#include "MEDCouplingExtrudedMeshServant.hxx"
 #include "MEDCouplingUMeshServant.hxx"
 #include "MEDCouplingFieldDouble.hxx"
+#include "MEDCouplingExtrudedMesh.hxx"
 #include "MEDCouplingUMesh.hxx"
 
 namespace SALOME_TEST
@@ -40,6 +42,15 @@ namespace SALOME_TEST
   void MEDCouplingMeshFieldFactoryComponent::shutdownOrb()
   {
     _orb->shutdown(0);
+  }
+
+  SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::get1DMesh()
+  {
+    ParaMEDMEM::MEDCouplingUMesh *m1=MEDCouplingCorbaServBasicsTest::build1DMesh();
+    ParaMEDMEM::MEDCouplingUMeshServant *m=new ParaMEDMEM::MEDCouplingUMeshServant(m1);
+    m1->decrRef();
+    SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr ret=m->_this();
+    return ret;
   }
 
   SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::get2DMesh()
@@ -84,6 +95,17 @@ namespace SALOME_TEST
     ParaMEDMEM::MEDCouplingUMeshServant *m=new ParaMEDMEM::MEDCouplingUMeshServant(m1);
     m1->decrRef();
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr ret=m->_this();
+    return ret;
+  }
+
+  SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getExtrudedMesh()
+  {
+    ParaMEDMEM::MEDCouplingUMesh *m2D;
+    ParaMEDMEM::MEDCouplingExtrudedMesh *m1=MEDCouplingCorbaServBasicsTest::buildExtrudedMesh(m2D);
+    m2D->decrRef();
+    ParaMEDMEM::MEDCouplingExtrudedMeshServant *m=new ParaMEDMEM::MEDCouplingExtrudedMeshServant(m1);
+    m1->decrRef();
+    SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_ptr ret=m->_this();
     return ret;
   }
 

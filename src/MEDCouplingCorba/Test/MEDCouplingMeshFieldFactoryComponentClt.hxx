@@ -37,6 +37,7 @@ namespace SALOME_TEST
   {
     CPPUNIT_TEST_SUITE(MEDCouplingCorbaServBasicsTestClt);
     CPPUNIT_TEST( checkBaseCorbaFetching );
+    CPPUNIT_TEST( checkContentOfFetched1DMesh );
     CPPUNIT_TEST( checkCorbaFetching2D );
     CPPUNIT_TEST( checkContentOfFetched2DMesh );
     CPPUNIT_TEST( checkMultiFetchingToTestMemoryManagement );
@@ -46,6 +47,7 @@ namespace SALOME_TEST
     CPPUNIT_TEST( checkContentOfFetched3DSurfMesh );
     CPPUNIT_TEST( checkCorbaFetching0D );
     CPPUNIT_TEST( checkCorbaFetchingM1D );
+    CPPUNIT_TEST( checkCorbaFetchingExtruded );
     CPPUNIT_TEST( checkCorbaField2DNTFetching );
     CPPUNIT_TEST( checkCorbaField2DNTMultiFetching );
     CPPUNIT_TEST( checkCorbaField2DNTMultiFetchingMT );
@@ -58,6 +60,7 @@ namespace SALOME_TEST
     CPPUNIT_TEST_SUITE_END();
   public:
     void checkBaseCorbaFetching();
+    void checkContentOfFetched1DMesh();
     void checkCorbaFetching2D();
     void checkContentOfFetched2DMesh();
     void checkMultiFetchingToTestMemoryManagement();
@@ -67,6 +70,7 @@ namespace SALOME_TEST
     void checkContentOfFetched3DSurfMesh();
     void checkCorbaFetching0D();
     void checkCorbaFetchingM1D();
+    void checkCorbaFetchingExtruded();
     void checkCorbaField2DNTFetching();
     void checkCorbaField2DNTMultiFetching();
     void checkCorbaField2DNTMultiFetchingMT();

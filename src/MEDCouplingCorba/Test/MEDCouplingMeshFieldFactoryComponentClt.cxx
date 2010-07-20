@@ -21,6 +21,8 @@
 #include "MEDCouplingMeshFieldFactoryComponent.hxx"
 #include "MEDCouplingUMesh.hxx"
 #include "MEDCouplingUMeshClient.hxx"
+#include "MEDCouplingExtrudedMesh.hxx"
+#include "MEDCouplingExtrudedMeshClient.hxx"
 #include "MEDCouplingFieldDouble.hxx"
 #include "MEDCouplingFieldDoubleClient.hxx"
 #include <fstream>
@@ -45,6 +47,23 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkBaseCorbaFetching()
   CORBA::Object_var obj=_orb->string_to_object(ior.c_str());
   _objC=SALOME_TEST::MEDCouplingMeshFieldFactory::_narrow(obj);
   CPPUNIT_ASSERT(!CORBA::is_nil(_objC));
+}
+
+
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkContentOfFetched1DMesh()
+{
+  SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr meshPtr=_objC->get1DMesh();
+  SALOME_MED::MEDCouplingUMeshCorbaInterface::_duplicate(meshPtr);
+  _mesh_from_distant=ParaMEDMEM::MEDCouplingUMeshClient::New(meshPtr);
+  meshPtr->Destroy();
+  CORBA::release(meshPtr);
+  CPPUNIT_ASSERT_EQUAL(3,_mesh_from_distant->getSpaceDimension());
+  CPPUNIT_ASSERT_EQUAL(1,_mesh_from_distant->getMeshDimension());
+  ParaMEDMEM::MEDCouplingUMesh *meshRef=SALOME_TEST::MEDCouplingCorbaServBasicsTest::build1DMesh();
+  CPPUNIT_ASSERT(_mesh_from_distant->isEqual(meshRef,1e-12));
+  meshRef->decrRef();
+  _mesh_from_distant->decrRef();
 }
 
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetching2D()
@@ -147,6 +166,22 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetchingM1D()
   CPPUNIT_ASSERT(_mesh_from_distant->isEqual(meshRef,1e-12));
   meshRef->decrRef();
   _mesh_from_distant->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetchingExtruded()
+{
+  SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_ptr meshPtr=_objC->getExtrudedMesh();
+  SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface::_duplicate(meshPtr);
+  ParaMEDMEM::MEDCouplingExtrudedMesh *meshFromDistant=ParaMEDMEM::MEDCouplingExtrudedMeshClient::New(meshPtr);
+  meshPtr->Destroy();
+  CORBA::release(meshPtr);
+  ParaMEDMEM::MEDCouplingUMesh *meshRef2;
+  ParaMEDMEM::MEDCouplingExtrudedMesh *meshRef=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildExtrudedMesh(meshRef2);
+  CPPUNIT_ASSERT(meshFromDistant->isEqual(meshRef,1e-12));
+  CPPUNIT_ASSERT(meshFromDistant->getMesh2D()->isEqual(meshRef2,1e-12));
+  meshRef2->decrRef();
+  meshRef->decrRef();
+  meshFromDistant->decrRef();
 }
 
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaField2DNTFetching()

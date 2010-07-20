@@ -41,9 +41,6 @@ namespace ParaMEDMEM
     ~MEDCouplingPointSetServant();
   private:
     const MEDCouplingPointSet *getPointer() const { return (const MEDCouplingPointSet *)(_cpp_pointer); }
-  protected:
-    void getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfString_out sa);
-    void getSerialisationData(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da);
   };
 }
 

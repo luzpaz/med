@@ -17,27 +17,27 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef __MEDCOUPLINGMESHSERVANT_HXX__
-#define __MEDCOUPLINGMESHSERVANT_HXX__
+#ifndef __MEDCOUPLINGCMESHSERVANT_HXX__
+#define __MEDCOUPLINGCMESHSERVANT_HXX__
 
 #include "SALOMEconfig.h"
 
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
-#include "MEDCouplingRefCountServant.hxx"
+#include "MEDCouplingMeshServant.hxx"
 #include "MEDCouplingCorba.hxx"
 
 namespace ParaMEDMEM
 {
-  class MEDCouplingMesh;
+  class MEDCouplingCMesh;
 
-  class MEDCOUPLINGCORBA_EXPORT MEDCouplingMeshServant : public MEDCouplingRefCountServant , public virtual POA_SALOME_MED::MEDCouplingMeshCorbaInterface
+  class MEDCouplingCMeshServant : MEDCouplingMeshServant, public virtual POA_SALOME_MED::MEDCouplingCMeshCorbaInterface
   {
+  public:
+    MEDCouplingCMeshServant(const MEDCouplingCMesh *cppPointerOfMesh);
   protected:
-    MEDCouplingMeshServant(const MEDCouplingMesh *cppPointerOfMesh);
-    const MEDCouplingMesh *getPointer() const { return (const MEDCouplingMesh *)(_cpp_pointer); }
-  protected:
-    void getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfString_out sa);
-    void getSerialisationData(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da);
+    ~MEDCouplingCMeshServant();
+  private:
+    const MEDCouplingCMesh *getPointer() const { return (const MEDCouplingCMesh *)(_cpp_pointer); }
   };
 }
 

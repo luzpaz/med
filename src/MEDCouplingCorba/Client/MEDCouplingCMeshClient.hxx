@@ -17,27 +17,22 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef __MEDCOUPLINGMESHSERVANT_HXX__
-#define __MEDCOUPLINGMESHSERVANT_HXX__
+#ifndef __MEDCOUPLINGCMESHCLIENT_HXX__
+#define __MEDCOUPLINGCMESHCLIENT_HXX__
 
 #include "SALOMEconfig.h"
 
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
-#include "MEDCouplingRefCountServant.hxx"
-#include "MEDCouplingCorba.hxx"
+#include "MEDCouplingClient.hxx"
 
 namespace ParaMEDMEM
 {
-  class MEDCouplingMesh;
+  class MEDCouplingCMesh;
 
-  class MEDCOUPLINGCORBA_EXPORT MEDCouplingMeshServant : public MEDCouplingRefCountServant , public virtual POA_SALOME_MED::MEDCouplingMeshCorbaInterface
+  class MEDCOUPLINGCLIENT_EXPORT MEDCouplingCMeshClient
   {
-  protected:
-    MEDCouplingMeshServant(const MEDCouplingMesh *cppPointerOfMesh);
-    const MEDCouplingMesh *getPointer() const { return (const MEDCouplingMesh *)(_cpp_pointer); }
-  protected:
-    void getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfString_out sa);
-    void getSerialisationData(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da);
+  public:
+    static MEDCouplingCMesh *New(SALOME_MED::MEDCouplingCMeshCorbaInterface_ptr mesh);
   };
 }
 

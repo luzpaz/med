@@ -38,11 +38,13 @@ namespace SALOME_TEST
     MEDCouplingMeshFieldFactoryComponent(CORBA::ORB_ptr orb);
     void destroyFactory();
     void shutdownOrb();
+    SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr get1DMesh();
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr get2DMesh();
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr get3DMesh();
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr get3DSurfMesh();
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr get0DMesh();
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr getM1DMesh();
+    SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_ptr getExtrudedMesh();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldScalarOn2DNT();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldNodeScalarOn2DNT();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldScalarOn3DNT();
