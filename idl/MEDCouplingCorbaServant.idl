@@ -28,16 +28,24 @@ module SALOME_MED
 
   interface MEDCouplingMeshCorbaInterface : SALOME::GenericObj
   {
-  };
-
-  interface MEDCouplingPointSetCorbaInterface : MEDCouplingMeshCorbaInterface
-  {
     //!CORBA inplementation of MEDCouplingPointSet::getTinySerializationInformation
     void getTinyInfo(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfString sa);
     void getSerialisationData(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfDouble da);
   };
 
+  interface MEDCouplingPointSetCorbaInterface : MEDCouplingMeshCorbaInterface
+  {
+  };
+
   interface MEDCouplingUMeshCorbaInterface : MEDCouplingPointSetCorbaInterface
+  {
+  };
+
+  interface MEDCouplingExtrudedMeshCorbaInterface : MEDCouplingMeshCorbaInterface
+  {
+  };
+
+  interface MEDCouplingCMeshCorbaInterface : MEDCouplingMeshCorbaInterface
   {
   };
 
