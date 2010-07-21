@@ -34,6 +34,11 @@ class MEDCouplingMeshFieldFactoryComponentPy(MEDCouplingCorbaServantTest_idl._0_
         
     def shutdownOrb(self):
         self._orb.shutdown(0)
+
+    def get1DMesh(self):
+        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
+        mesh=test.build1DMesh()
+        return MEDCouplingUMeshServant._this(mesh)
     
     def get2DMesh(self):
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
@@ -59,6 +64,11 @@ class MEDCouplingMeshFieldFactoryComponentPy(MEDCouplingCorbaServantTest_idl._0_
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         mesh=test.buildM1DMesh()
         return MEDCouplingUMeshServant._this(mesh)
+
+    def getExtrudedMesh(self):
+        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
+        mesh=test.buildExtrudedMesh()
+        return MEDCouplingExtrudedMeshServant._this(mesh)
     
     def getFieldScalarOn2DNT(self):
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()

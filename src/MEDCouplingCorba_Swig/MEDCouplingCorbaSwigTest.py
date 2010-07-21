@@ -18,9 +18,32 @@
 #
 
 from libMEDCoupling_Swig import *
+import math
 import os
 
 class MEDCouplingCorbaServBasicsTest:
+    def build1DMesh(self):
+        coords=[ 0.0, 0.3, 0.75, 1.0 ]
+        conn=[ 0,1, 1,2, 2,3 ]
+        mesh=MEDCouplingUMesh.New("1DMeshForCorba",1);
+        mesh.allocateCells(3);
+        mesh.insertNextCell(NORM_SEG2,2,conn[0:2]);
+        mesh.insertNextCell(NORM_SEG2,2,conn[2:4]);
+        mesh.insertNextCell(NORM_SEG2,2,conn[4:6]);
+        mesh.finishInsertingCells();
+        myCoords=DataArrayDouble.New();
+        myCoords.setValues(coords,4,1);
+        mesh.setCoords(myCoords);
+        mesh.changeSpaceDimension(3);
+        myCoords=mesh.getCoords();
+        myCoords.setInfoOnComponent(0,"X1D(m)");
+        myCoords.setInfoOnComponent(1,"Y1D (dm)");
+        myCoords.setInfoOnComponent(2,"Z1D (pm)");
+        center=[0.,0.,0.]
+        vector=[0.,1.,0.]
+        mesh.rotate(center,vector,-math.pi/2.);
+        return mesh
+        
     def build2DMesh(self):
         targetCoords=[-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 ];
         targetConn=[0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4]
@@ -108,6 +131,15 @@ class MEDCouplingCorbaServBasicsTest:
         meshM1D=MEDCouplingUMesh.New("wonderfull -1 D mesh",-1);
         meshM1D.checkCoherency();
         return meshM1D;
+
+    def buildExtrudedMesh(self):
+        m2D=self.build2DMesh();
+        m2D.changeSpaceDimension(3);
+        m1D=self.build1DMesh();
+        retu=m2D.buildExtrudedMeshFromThis(m1D,0);
+        ret=MEDCouplingExtrudedMesh.New(retu,m2D,2);
+        ret.setName("ExtrudedTestForCorbaTest");
+        return ret;
 
     def buildFieldScalarOn2DNT(self):
         mesh=self.build2DMesh();

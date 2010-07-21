@@ -30,6 +30,17 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
         self.failUnless(not CORBA.is_nil(self._objC))
         pass
 
+    def testContentOfFetched1DMesh(self):
+        meshPtr=self._objC.get1DMesh();
+        _mesh_from_distant=MEDCouplingUMeshClient.New(meshPtr);
+        meshPtr.Destroy();
+        self.failUnless(_mesh_from_distant.getSpaceDimension()==3);
+        self.failUnless(_mesh_from_distant.getMeshDimension()==1);
+        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
+        meshRef=test.build1DMesh()
+        self.failUnless(_mesh_from_distant.isEqual(meshRef,1e-12));
+        pass
+
     def testCorbaFetching2D(self):
         meshPtr=self._objC.get2DMesh();
         _mesh_from_distant=MEDCouplingUMeshClient.New(meshPtr);
@@ -102,6 +113,15 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
         meshRef=test.buildM1DMesh();
         self.failUnless(-1==_mesh_from_distant.getMeshDimension());
         self.failUnless(_mesh_from_distant.isEqual(meshRef,1e-12));
+        pass
+
+    def testCorbaFetchingExtruded(self):
+        meshPtr=self._objC.getExtrudedMesh();
+        _mesh_from_distant=MEDCouplingExtrudedMeshClient.New(meshPtr);
+        meshPtr.Destroy();
+        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
+        meshRef=test.buildExtrudedMesh();
+        self.failUnless(_mesh_from_distant.isEqual(meshRef,1e-12))
         pass
     
     def testCorbaField2DNTFetching(self):
