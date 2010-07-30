@@ -25,6 +25,7 @@ from libMEDCouplingCorba_Swig import *
 class MEDCouplingMeshFieldFactoryComponentPy(MEDCouplingCorbaServantTest_idl._0_SALOME_TEST__POA.MEDCouplingMeshFieldFactory):
     def __init__(self,orb):
         self._orb=orb
+        self._test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         pass
     
     def destroyFactory(self):
@@ -36,68 +37,63 @@ class MEDCouplingMeshFieldFactoryComponentPy(MEDCouplingCorbaServantTest_idl._0_
         self._orb.shutdown(0)
 
     def get1DMesh(self):
-        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
-        mesh=test.build1DMesh()
+        mesh=self._test.build1DMesh()
         return MEDCouplingUMeshServant._this(mesh)
     
     def get2DMesh(self):
-        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
-        mesh=test.build2DMesh()
+        mesh=self._test.build2DMesh()
         return MEDCouplingUMeshServant._this(mesh)
     
     def get3DMesh(self):
-        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
-        mesh=test.build3DMesh()
+        mesh=self._test.build3DMesh()
         return MEDCouplingUMeshServant._this(mesh)
     
     def get3DSurfMesh(self):
-        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
-        mesh=test.build3DSurfMesh()
+        mesh=self._test.build3DSurfMesh()
         return MEDCouplingUMeshServant._this(mesh)
     
     def get0DMesh(self):
-        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
-        mesh=test.build0DMesh()
+        mesh=self._test.build0DMesh()
         return MEDCouplingUMeshServant._this(mesh)
     
     def getM1DMesh(self):
-        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
-        mesh=test.buildM1DMesh()
+        mesh=self._test.buildM1DMesh()
         return MEDCouplingUMeshServant._this(mesh)
 
     def getExtrudedMesh(self):
-        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
-        mesh=test.buildExtrudedMesh()
+        mesh=self._test.buildExtrudedMesh()
         return MEDCouplingExtrudedMeshServant._this(mesh)
     
     def getFieldScalarOn2DNT(self):
-        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
-        field=test.buildFieldScalarOn2DNT()
+        field=self._test.buildFieldScalarOn2DNT()
         return MEDCouplingFieldDoubleServant._this(field)
     
     def getFieldNodeScalarOn2DNT(self):
-        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
-        field=test.buildFieldNodeScalarOn2DNT()
+        field=self._test.buildFieldNodeScalarOn2DNT()
         return MEDCouplingFieldDoubleServant._this(field)
     
     def getFieldScalarOn3DNT(self):
-        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
-        field=test.buildFieldScalarOn3DNT()
+        field=self._test.buildFieldScalarOn3DNT()
         return MEDCouplingFieldDoubleServant._this(field)
     
     def getFieldScalarOn3DSurfWT(self):
-        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
-        field=test.buildFieldScalarOn3DSurfWT()
+        field=self._test.buildFieldScalarOn3DSurfWT()
         return MEDCouplingFieldDoubleServant._this(field)
     
     def getFieldScalarOn3DSurfCOTI(self):
-        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
-        field=test.buildFieldScalarOn3DSurfCOTI()
+        field=self._test.buildFieldScalarOn3DSurfCOTI()
         return MEDCouplingFieldDoubleServant._this(field)
     
     def getFieldScalarOn2DLT(self):
-        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
-        field=test.buildFieldScalarOn2DLT()
+        field=self._test.buildFieldScalarOn2DLT()
+        return MEDCouplingFieldDoubleServant._this(field)
+
+    def getFieldGaussPt2DWT(self):
+        field=self._test.buildFieldGaussPt2DWT()
+        return MEDCouplingFieldDoubleServant._this(field)
+    
+    def getFieldGaussPtNE2DWT(self):
+        field=self._test.buildFieldGaussPtNE2DWT()
         return MEDCouplingFieldDoubleServant._this(field)
     pass
 

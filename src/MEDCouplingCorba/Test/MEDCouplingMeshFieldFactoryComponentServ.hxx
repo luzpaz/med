@@ -51,6 +51,8 @@ namespace SALOME_TEST
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldScalarOn3DSurfWT();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldScalarOn3DSurfCOTI();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldScalarOn2DLT();
+    SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldGaussPt2DWT();
+    SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldGaussPtNE2DWT();
   private:
     CORBA::ORB_ptr _orb;
   };

@@ -228,6 +228,61 @@ class MEDCouplingCorbaServBasicsTest:
         fieldOnCells.checkCoherency();
         return fieldOnCells;
 
+    def buildFieldGaussPt2DWT(self):
+        _a=0.446948490915965;
+        _b=0.091576213509771;
+        _p1=0.11169079483905;
+        _p2=0.0549758718227661;
+        refCoo1=[ 0.,0., 1.,0., 0.,1. ]
+        gsCoo1=[ 2*_b-1, 1-4*_b, 2*_b-1, 2.07*_b-1, 1-4*_b,
+                 2*_b-1, 1-4*_a, 2*_a-1, 2*_a-1, 1-4*_a, 2*_a-1, 2*_a-1]
+        wg1=[ 4*_p2, 4*_p2, 4*_p2, 4*_p1, 4*_p1, 4*_p1 ]
+        _refCoo1=refCoo1
+        _gsCoo1=gsCoo1
+        _wg1=wg1
+        m=self.build2DMesh();
+        f=MEDCouplingFieldDouble.New(ON_GAUSS_PT,ONE_TIME);
+        f.setTime(6.7,1,4);
+        f.setMesh(m);
+        f.setGaussLocalizationOnType(NORM_TRI3,_refCoo1,_gsCoo1,_wg1);
+        refCoo2=[ 0.,0., 1.,0., 1.,1., 0.,1. ]
+        _refCoo2=refCoo2
+        _gsCoo1=_gsCoo1[0:4]
+        _wg1=_wg1[0:2]
+        f.setGaussLocalizationOnType(NORM_QUAD4,_refCoo2,_gsCoo1,_wg1);
+        array=DataArrayDouble.New();
+        ptr=18*2*[None]
+        for i in xrange(18*2):
+            ptr[i]=float(i+1);
+            pass
+        array.setValues(ptr,18,2);
+        array.setInfoOnComponent(0,"Power(MW)");
+        array.setInfoOnComponent(1,"Density (kg/m^3)");
+        f.setArray(array);
+        f.setName("MyFirstFieldOnGaussPoint");
+        f.setDescription("mmmmmmmmmmmm");
+        f.checkCoherency();
+        return f;
+
+    def buildFieldGaussPtNE2DWT(self):
+        m=self.build2DMesh();
+        f=MEDCouplingFieldDouble.New(ON_GAUSS_NE,ONE_TIME);
+        f.setTime(6.8,11,8);
+        f.setMesh(m);
+        f.setName("MyFirstFieldOnNE");
+        f.setDescription("MyDescriptionNE");
+        array=DataArrayDouble.New();
+        ptr=18*2*[None]
+        for i in xrange(18*2):
+            ptr[i]=float(i+7)
+        array.setValues(ptr,18,2);
+        array.setInfoOnComponent(0,"Power(MW)");
+        array.setInfoOnComponent(1,"Density (kg/m^3)");
+        f.setArray(array);
+        #
+        f.checkCoherency();
+        return f;
+
     def buildFileNameForIOR(self):
         ret=os.getenv("TMP");
         ret+="/entryPointMEDCouplingCorba.ior";

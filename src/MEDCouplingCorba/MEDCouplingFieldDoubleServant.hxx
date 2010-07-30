@@ -44,7 +44,7 @@ namespace ParaMEDMEM
     const MEDCouplingFieldDouble *getPointer() const { return (const MEDCouplingFieldDouble *)(_cpp_pointer); }
   protected:
     void getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da, SALOME_TYPES::ListOfString_out sa);
-    void getSerialisationData(SALOME_TYPES::ListOfDouble2_out da2);
+    void getSerialisationData(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble2_out da2);
   };
 }
 

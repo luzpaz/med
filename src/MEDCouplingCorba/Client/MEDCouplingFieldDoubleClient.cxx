@@ -63,11 +63,21 @@ MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplin
   CORBA::release(meshPtr);
   ret->setMesh(mesh);
   mesh->decrRef();
+  DataArrayInt *array0;
   std::vector<DataArrayDouble *> arrays;
-  ret->resizeForUnserialization(tinyLV,arrays);
+  ret->resizeForUnserialization(tinyLV,array0,arrays);
+  SALOME_TYPES::ListOfLong *bigArr0;
   SALOME_TYPES::ListOfDouble2 *bigArr;
   //3rd CORBA invokation to get big content
-  fieldPtr->getSerialisationData(bigArr);
+  fieldPtr->getSerialisationData(bigArr0,bigArr);
+  if(bigArr0->length()!=0)
+    {
+      int *pt=array0->getPointer();
+      int lgth=array0->getNbOfElems();
+      for(int i=0;i<lgth;i++)
+        pt[i]=(*bigArr0)[i];
+    }
+  delete bigArr0;
   tinyLgth=arrays.size();
   for(int i=0;i<tinyLgth;i++)
     {

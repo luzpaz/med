@@ -293,6 +293,67 @@ namespace SALOME_TEST
     return fieldOnCells;
   }
 
+  ParaMEDMEM::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldGaussPt2DWT()
+  {
+    const double _a=0.446948490915965;
+    const double _b=0.091576213509771;
+    const double _p1=0.11169079483905;
+    const double _p2=0.0549758718227661;
+    const double refCoo1[6]={ 0.,0., 1.,0., 0.,1. };
+    const double gsCoo1[12]={ 2*_b-1, 1-4*_b, 2*_b-1, 2.07*_b-1, 1-4*_b,
+                              2*_b-1, 1-4*_a, 2*_a-1, 2*_a-1, 1-4*_a, 2*_a-1, 2*_a-1 };
+    const double wg1[6]={ 4*_p2, 4*_p2, 4*_p2, 4*_p1, 4*_p1, 4*_p1 };
+    std::vector<double> _refCoo1(refCoo1,refCoo1+6);
+    std::vector<double> _gsCoo1(gsCoo1,gsCoo1+12);
+    std::vector<double> _wg1(wg1,wg1+6);
+    ParaMEDMEM::MEDCouplingUMesh *m=build2DMesh();
+    ParaMEDMEM::MEDCouplingFieldDouble *f=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_GAUSS_PT,ParaMEDMEM::ONE_TIME);
+    f->setTime(6.7,1,4);
+    f->setMesh(m);
+    m->decrRef();
+    f->setGaussLocalizationOnType(INTERP_KERNEL::NORM_TRI3,_refCoo1,_gsCoo1,_wg1);
+    const double refCoo2[8]={ 0.,0., 1.,0., 1.,1., 0.,1. };
+    std::vector<double> _refCoo2(refCoo2,refCoo2+8);
+    _gsCoo1.resize(4); _wg1.resize(2);
+    f->setGaussLocalizationOnType(INTERP_KERNEL::NORM_QUAD4,_refCoo2,_gsCoo1,_wg1);
+    ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
+    array->alloc(18,2);
+    array->setInfoOnComponent(0,"Power(MW)");
+    array->setInfoOnComponent(1,"Density (kg/m^3)");
+    double *ptr=array->getPointer();
+    for(int i=0;i<18*2;i++)
+      ptr[i]=(double)(i+1);
+    f->setArray(array);
+    f->setName("MyFirstFieldOnGaussPoint");
+    f->setDescription("mmmmmmmmmmmm");
+    array->decrRef();
+    f->checkCoherency();
+    return f;
+  }
+
+  ParaMEDMEM::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldGaussPtNE2DWT()
+  {
+    ParaMEDMEM::MEDCouplingUMesh *m=build2DMesh();
+    ParaMEDMEM::MEDCouplingFieldDouble *f=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_GAUSS_NE,ParaMEDMEM::ONE_TIME);
+    f->setTime(6.8,11,8);
+    f->setMesh(m);
+    f->setName("MyFirstFieldOnNE");
+    f->setDescription("MyDescriptionNE");
+    ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
+    array->alloc(18,2);
+    array->setInfoOnComponent(0,"Power(MW)");
+    array->setInfoOnComponent(1,"Density (kg/m^3)");
+    double *ptr=array->getPointer();
+    for(int i=0;i<18*2;i++)
+      ptr[i]=(double)(i+7);
+    f->setArray(array);
+    array->decrRef();
+    //
+    f->checkCoherency();
+    m->decrRef();
+    return f;
+  }
+
   std::string MEDCouplingCorbaServBasicsTest::buildFileNameForIOR()
   {
     std::string ret;

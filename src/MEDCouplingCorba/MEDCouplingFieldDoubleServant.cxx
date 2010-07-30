@@ -50,10 +50,24 @@ void MEDCouplingFieldDoubleServant::getTinyInfo(SALOME_TYPES::ListOfLong_out la,
     (*sa)[i]=CORBA::string_dup(tinyInfo3[i].c_str());
 }
 
-void MEDCouplingFieldDoubleServant::getSerialisationData(SALOME_TYPES::ListOfDouble2_out da2)
+void MEDCouplingFieldDoubleServant::getSerialisationData(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble2_out da2)
 {
   std::vector<DataArrayDouble *> arrays;
-  getPointer()->serialize(arrays);
+  DataArrayInt *dataInt;
+  getPointer()->serialize(dataInt,arrays);
+  //
+  la=new SALOME_TYPES::ListOfLong;
+  if(dataInt)
+    {
+      int lgth=dataInt->getNbOfElems();
+      const int *ptr=dataInt->getConstPointer();
+      la->length(lgth);
+      for(int i=0;i<lgth;i++)
+        (*la)[i]=ptr[i];
+    }
+  else
+    la->length(0);
+  //
   da2=new SALOME_TYPES::ListOfDouble2;
   int lgth=arrays.size();
   da2->length(lgth);

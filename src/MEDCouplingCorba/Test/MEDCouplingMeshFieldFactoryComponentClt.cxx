@@ -336,6 +336,34 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaField2DLTFetching
   fieldCpp->decrRef();
 }
 
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFieldGaussPt2DWTFetching()
+{
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr fieldPtr=_objC->getFieldGaussPt2DWT();
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface::_duplicate(fieldPtr);
+  ParaMEDMEM::MEDCouplingFieldDouble *fieldCpp=ParaMEDMEM::MEDCouplingFieldDoubleClient::New(fieldPtr);
+  fieldPtr->Destroy();
+  CORBA::release(fieldPtr);
+  //
+  ParaMEDMEM::MEDCouplingFieldDouble *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldGaussPt2DWT();
+  CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
+  refField->decrRef();
+  fieldCpp->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFieldGaussPtNE2DWTFetching()
+{
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr fieldPtr=_objC->getFieldGaussPtNE2DWT();
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface::_duplicate(fieldPtr);
+  ParaMEDMEM::MEDCouplingFieldDouble *fieldCpp=ParaMEDMEM::MEDCouplingFieldDoubleClient::New(fieldPtr);
+  fieldPtr->Destroy();
+  CORBA::release(fieldPtr);
+  //
+  ParaMEDMEM::MEDCouplingFieldDouble *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldGaussPtNE2DWT();
+  CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
+  refField->decrRef();
+  fieldCpp->decrRef();
+}
+
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::shutdownServer()
 {
   _objC->shutdownOrb();

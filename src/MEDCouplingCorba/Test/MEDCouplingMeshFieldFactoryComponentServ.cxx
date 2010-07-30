@@ -162,4 +162,22 @@ namespace SALOME_TEST
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
     return ret;
   }
+
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldGaussPt2DWT()
+  {
+    ParaMEDMEM::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldGaussPt2DWT();
+    ParaMEDMEM::MEDCouplingFieldDoubleServant *m=new ParaMEDMEM::MEDCouplingFieldDoubleServant(field);
+    field->decrRef();
+    SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
+    return ret;
+  }
+
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldGaussPtNE2DWT()
+  {
+    ParaMEDMEM::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldGaussPtNE2DWT();
+    ParaMEDMEM::MEDCouplingFieldDoubleServant *m=new ParaMEDMEM::MEDCouplingFieldDoubleServant(field);
+    field->decrRef();
+    SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
+    return ret;
+  }
 }
