@@ -283,6 +283,28 @@ class MEDCouplingCorbaServBasicsTest:
         f.checkCoherency();
         return f;
 
+    def buildFieldVectorOnExtrudedWT(self):
+        ext=self.buildExtrudedMesh();
+        #
+        f=MEDCouplingFieldDouble.New(ON_CELLS,ONE_TIME);
+        f.setTime(6.8,11,8);
+        f.setMesh(ext);
+        f.setName("MyFieldOnExtruM");
+        f.setDescription("desc of MyFiOnExtruM");
+        array=DataArrayDouble.New();
+        nbOfCells=ext.getNumberOfCells();
+        ptr=2*nbOfCells*[None]
+        for i in range(nbOfCells*2):
+            ptr[i]=float(i/2+7)+float((i%2)*1000);
+            pass
+        array.setValues(ptr,nbOfCells,2);
+        array.setInfoOnComponent(0,"Power(MW)");
+        array.setInfoOnComponent(1,"Density (kg/m^3)");
+        f.setArray(array);
+        #
+        f.checkCoherency();
+        return f
+
     def buildFileNameForIOR(self):
         ret=os.getenv("TMP");
         ret+="/entryPointMEDCouplingCorba.ior";

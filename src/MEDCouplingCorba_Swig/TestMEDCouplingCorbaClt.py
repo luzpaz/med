@@ -225,6 +225,15 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
         refField=test.buildFieldGaussPtNE2DWT();
         self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
         pass
+
+    def testCorbaFieldVectorOnExtrudedWT(self):
+        fieldPtr=self._objC.getFieldVectorOnExtrudedWT();
+        fieldCpp=MEDCouplingFieldDoubleClient.New(fieldPtr);
+        fieldPtr.Destroy();
+        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
+        refField=test.buildFieldVectorOnExtrudedWT();
+        self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
+        pass
     
     def testShutdownServer(self):
         self._objC.shutdownOrb()

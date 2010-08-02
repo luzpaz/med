@@ -180,4 +180,13 @@ namespace SALOME_TEST
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
     return ret;
   }
+
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldVectorOnExtrudedWT()
+  {
+    ParaMEDMEM::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldVectorOnExtrudedWT();
+    ParaMEDMEM::MEDCouplingFieldDoubleServant *m=new ParaMEDMEM::MEDCouplingFieldDoubleServant(field);
+    field->decrRef();
+    SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
+    return ret;
+  }
 }

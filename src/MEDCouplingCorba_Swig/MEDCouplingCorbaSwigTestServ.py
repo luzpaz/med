@@ -95,21 +95,8 @@ class MEDCouplingMeshFieldFactoryComponentPy(MEDCouplingCorbaServantTest_idl._0_
     def getFieldGaussPtNE2DWT(self):
         field=self._test.buildFieldGaussPtNE2DWT()
         return MEDCouplingFieldDoubleServant._this(field)
+
+    def getFieldVectorOnExtrudedWT(self):
+        field=self._test.buildFieldVectorOnExtrudedWT()
+        return MEDCouplingFieldDoubleServant._this(field)
     pass
-
-
-## f=MEDCouplingCorbaSwigTest.testField()
-## fCorbaIOR=MEDCouplingFieldDoubleServant._this(f)
-## import CORBA
-## orb=CORBA.ORB_init([''])
-## s=orb.object_to_string(fCorbaIOR)
-## fi=file(MEDCouplingCorbaSwigTest.FileIOR1,"w")
-## fi.write(s)
-## fi.close()
-## mesh=MEDCouplingCorbaSwigTest.testMesh()
-## meshCorba=MEDCouplingUMeshServant._this(mesh)
-## s=orb.object_to_string(meshCorba)
-## fi=file(MEDCouplingCorbaSwigTest.FileIOR2,"w")
-## fi.write(s)
-## fi.close()
-## orb.run()

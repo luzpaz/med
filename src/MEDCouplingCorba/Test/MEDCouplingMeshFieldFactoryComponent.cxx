@@ -354,6 +354,34 @@ namespace SALOME_TEST
     return f;
   }
 
+  ParaMEDMEM::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldVectorOnExtrudedWT()
+  {
+    ParaMEDMEM::MEDCouplingUMesh *m2D=0;
+    ParaMEDMEM::MEDCouplingExtrudedMesh *ext=buildExtrudedMesh(m2D);
+    //
+    ParaMEDMEM::MEDCouplingFieldDouble *f=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::ONE_TIME);
+    f->setTime(6.8,11,8);
+    f->setMesh(ext);
+    f->setName("MyFieldOnExtruM");
+    f->setDescription("desc of MyFiOnExtruM");
+    ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
+    int nbOfCells=ext->getNumberOfCells();
+    array->alloc(nbOfCells,2);
+    array->setInfoOnComponent(0,"Power(MW)");
+    array->setInfoOnComponent(1,"Density (kg/m^3)");
+    double *ptr=array->getPointer();
+    for(int i=0;i<nbOfCells*2;i++)
+      ptr[i]=(double)(i/2+7)+(double)((i%2)*1000);
+    f->setArray(array);
+    array->decrRef();
+    //
+    f->checkCoherency();
+    //
+    m2D->decrRef();
+    ext->decrRef();
+    return f;
+  }
+
   std::string MEDCouplingCorbaServBasicsTest::buildFileNameForIOR()
   {
     std::string ret;

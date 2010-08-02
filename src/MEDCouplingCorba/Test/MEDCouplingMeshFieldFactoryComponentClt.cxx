@@ -364,6 +364,20 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFieldGaussPtNE2DW
   fieldCpp->decrRef();
 }
 
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFieldVectorOnExtrudedWT()
+{
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr fieldPtr=_objC->getFieldVectorOnExtrudedWT();
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface::_duplicate(fieldPtr);
+  ParaMEDMEM::MEDCouplingFieldDouble *fieldCpp=ParaMEDMEM::MEDCouplingFieldDoubleClient::New(fieldPtr);
+  fieldPtr->Destroy();
+  CORBA::release(fieldPtr);
+  //
+  ParaMEDMEM::MEDCouplingFieldDouble *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldVectorOnExtrudedWT();
+  CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
+  refField->decrRef();
+  fieldCpp->decrRef();
+}
+
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::shutdownServer()
 {
   _objC->shutdownOrb();
