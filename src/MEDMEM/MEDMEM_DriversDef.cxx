@@ -119,7 +119,7 @@ MESH_ENTITIES::MESH_ENTITIES () : map<int, const list<MED_EN::medGeometryElement
       MED_POLYGON,
       MED_POLYHEDRA};
 
-    static const list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
+    list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
     (*this)[MED_CELL] = geomList;
   }
   
@@ -131,7 +131,7 @@ MESH_ENTITIES::MESH_ENTITIES () : map<int, const list<MED_EN::medGeometryElement
       MED_QUAD8,
       MED_POLYGON};
 
-    static const list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
+    list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
     (*this)[MED_FACE] = geomList; 
   }
   
@@ -140,14 +140,14 @@ MESH_ENTITIES::MESH_ENTITIES () : map<int, const list<MED_EN::medGeometryElement
       MED_SEG2,
       MED_SEG3 };
 
-    static const list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
+    list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
     (*this)[MED_EDGE] = geomList; 
   }
   
   {
     //    const med_geometrie_element T[] =  { MED_NONE };
     const MED_EN::medGeometryElement T[] =  { (MED_EN::medGeometryElement)0 };
-    static const list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
+    list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
     (*this)[MED_NODE] = geomList; 
   }
   
