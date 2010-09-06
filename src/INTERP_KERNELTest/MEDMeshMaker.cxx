@@ -23,7 +23,6 @@
 MEDMEM::MESH* MEDMeshMaker(int dim, int nbedge, MED_EN::medGeometryElement type)
 {
   MEDMEM::MESHING* mesh=new MEDMEM::MESHING();
-  mesh->setSpaceDimension(dim);
   int nbnodes;
   int nbelems;
   switch (dim)
@@ -94,8 +93,7 @@ MEDMEM::MESH* MEDMeshMaker(int dim, int nbedge, MED_EN::medGeometryElement type)
               conn [ielem*8+7]=ix*(nbedge+1)*(nbedge+1)+(iy+1)*(nbedge+1)+iz+1+1;
             }
     }
-  mesh->setConnectivity(conn, MED_EN::MED_CELL,type);
+  mesh->setConnectivity(MED_EN::MED_CELL,type,conn);
   delete [] conn;
-  mesh->setMeshDimension(dim);
   return mesh;
 }
