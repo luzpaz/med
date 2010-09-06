@@ -41,15 +41,15 @@ dist_salomeres_DATA = \
     titi.cnc \
     titi.inp \
     titi.xyz \
-    carre_en_quad4_import22.med \
     carre_en_quad4.med \
-    carre_en_quad4_seg2_import22.med \
+    carre_en_quad4_V21.med \
+    carre_en_quad4_seg2_V21.med \
     carre_en_quad4_seg2.med \
     cas_defaut_domaine_fluide.med \
     ChampsDarcy.med \
-    cube_hexa8_import22.med \
+    cube_hexa8_V21.med \
     cube_hexa8.med \
-    cube_hexa8_quad4_import22.med \
+    cube_hexa8_quad4_V21.med \
     cube_hexa8_quad4.med \
     darcy_1.1_res.med \
     darcy_1.3_resCASTEM.med \
@@ -104,7 +104,7 @@ dist_salomeres_DATA = \
     maillage_chemvalIV_cas1_100elts.sauve \
     maillage_chemvalIV_cas1_40elts.med \
     maillage_chemvalIV_cas1_40elts.sauve \
-    maillage_UniSegFam_import22.med \
+    maillage_UniSegFam_V21.med \
     maillage_UniSegFam.med \
     mail_test1-1-qua.sauve \
     mail_test1-1-tri.sauve \
@@ -112,9 +112,9 @@ dist_salomeres_DATA = \
     mail_test1-2-tri.sauve \
     mail-test1-4-1.sauve \
     mail-test1-4-2.sauve \
-    mesh_import22.med \
+    mesh_V21.med \
     mesh.med \
-    Mistrat_import22.med \
+    Mistrat_V21.med \
     Mistrat.med \
     Old_ChampsDarcy.med \
     Old_darcy_1.1_res.med \
@@ -136,7 +136,7 @@ dist_salomeres_DATA = \
     Old_H_Traces_I129_COUPLEX1.med \
     Old_H_Traces_Se79_COUPLEX1.med \
     Old_maillage_chemvalIV_cas1_40elts.med \
-    pointe_import22.med \
+    pointe_V21.med \
     pointe.med \
     poly3D.med \
     polyedres.med \
@@ -145,7 +145,7 @@ dist_salomeres_DATA = \
     test19.med \
     test_2D.med \
     trio_2D.med \
-    TimeStamps_import22.med \
+    TimeStamps_V21.med \
     TimeStamps.med \
     zzzz121b.med \
     zzzz121b_without_tr6.med \
@@ -211,7 +211,8 @@ dist_salomeres_DATA = \
     blow5_ascii_cd_displacement \
     blow5_ascii_cd_thickness \
     blow5_ascii_pd_displacement \
-    blow5_ascii_pd_thickness
+    blow5_ascii_pd_thickness \
+    test_2D.sauve
 
 if !MED_ENABLE_MICROMED
   dist_salomeres_DATA += \
