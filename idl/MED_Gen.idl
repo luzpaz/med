@@ -46,8 +46,8 @@ module SALOME_MED
       it returns a Corba pointer %MESH on the mesh stored in the .med file
       <VAR>fileName</VAR> with the name <VAR>meshName</VAR>.
      */
-    SALOME_MED::MESH readMeshInFile(in string fileName, in string studyName,
-				    in string meshName)
+    SALOME_MED::GMESH readMeshInFile(in string fileName, in string studyName,
+                                     in string meshName)
       raises(SALOME::SALOME_Exception);
 
     /*!
