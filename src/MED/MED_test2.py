@@ -53,7 +53,7 @@ print mesh.getNumberOfNodes()
 
 medFile = os.path.join(filePath,"pointe.med")
 try:
-  field=med.readFieldInFile(medFile,salome.myStudyName,"fieldcelldouble",-1,-1)
+  field=med.readFieldInFile(medFile,salome.myStudyName,"fieldcelldoublescalar",-1,-1)
 except SALOME.SALOME_Exception, ex:
   print ex.details
   print ex.details.type
