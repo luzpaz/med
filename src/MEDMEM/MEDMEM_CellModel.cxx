@@ -1383,6 +1383,34 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       _constituentsType[1]=tmpConstituentsType2 ;
       break;
     }
+    case MED_POLYGON:
+      _name="MED_POLYGON" ;
+      _type=t;
+      _dimension=2;
+      _numberOfConstituentsDimension=1 ;
+      _numberOfConstituents=new int[_numberOfConstituentsDimension] ;
+      _numberOfConstituents[0]=0 ;
+      _numberOfNodeOfEachConstituent=new int*[_numberOfConstituentsDimension] ;
+      _numberOfNodeOfEachConstituent[0]=0;
+      _constituentsType = new medGeometryElement*[_numberOfConstituentsDimension] ;
+      _constituentsType[0]=0 ;
+      _constituents = new int**[_numberOfConstituentsDimension] ;
+      _constituents[0]=0;
+     break;
+    case MED_POLYHEDRA:
+      _name="MED_POLYHEDRA" ;
+      _type=t;
+      _dimension=3;
+      _numberOfConstituentsDimension=2 ;
+      _numberOfConstituents=new int[_numberOfConstituentsDimension] ;
+      _numberOfConstituents[0]=_numberOfConstituents[1]=0;
+      _numberOfNodeOfEachConstituent=new int*[_numberOfConstituentsDimension] ;
+      _numberOfNodeOfEachConstituent[0]=_numberOfNodeOfEachConstituent[1]=0;
+      _constituentsType = new medGeometryElement*[_numberOfConstituentsDimension] ;
+      _constituentsType[0]=_constituentsType[1]=0 ;
+      _constituents = new int**[_numberOfConstituentsDimension] ;
+      _constituents[0]=_constituents[1]=0;
+      break;
 //      default : 
 //        _type=0;
 //        break;
@@ -1538,4 +1566,9 @@ void CELLMODEL::clean()
     delete[] _constituents ;
   if (NULL!=_numberOfNodeOfEachConstituent)
     delete[] _numberOfNodeOfEachConstituent ;
+
+  _constituentsType = 0;
+  _numberOfConstituents = 0;
+  _constituents = 0;
+  _numberOfNodeOfEachConstituent = 0;
 }
