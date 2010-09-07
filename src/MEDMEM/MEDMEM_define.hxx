@@ -33,6 +33,12 @@ extern "C"{
 #include <hdf5.h>
 }
 
+namespace med_2_3 {
+  extern "C" { 
+    #include <med.h>
+    #include <med_proto.h>
+  }
+}
 
 namespace MED_EN {
   extern "C" { // on est la
