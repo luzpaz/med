@@ -90,29 +90,35 @@ PORFLOW_MESH_DRIVER::PORFLOW_MESH_DRIVER():
 }
 
 PORFLOW_MESH_DRIVER::PORFLOW_MESH_DRIVER(const string & fileName,
-                                   MESH * ptrMesh,
-                                   MED_EN::med_mode_acces accessMode): 
+                                         GMESH *        ptrMesh,
+                                         MED_EN::med_mode_acces accessMode): 
   GENDRIVER(fileName, accessMode, PORFLOW_DRIVER),
-  _ptrMesh(ptrMesh)
+  _ptrMesh(0)
 {
-    // mesh name construction from fileName
-    const string ext=".inp"; // expected extension
-    string::size_type pos=fileName.find(ext,0);
-    string::size_type pos1=fileName.rfind('/');
-    _meshName = string(fileName,pos1+1,pos-pos1-1); //get rid of directory & extension
-    SCRUTE_MED(_meshName);
+  if (ptrMesh)
+    _ptrMesh = const_cast<MESH*>( ptrMesh->convertInMESH() );
+  // mesh name construction from fileName
+  const string ext=".inp"; // expected extension
+  string::size_type pos=fileName.find(ext,0);
+  string::size_type pos1=fileName.rfind('/');
+  _meshName = string(fileName,pos1+1,pos-pos1-1); //get rid of directory & extension
+  SCRUTE_MED(_meshName);
 }
-  
+
 PORFLOW_MESH_DRIVER::PORFLOW_MESH_DRIVER(const PORFLOW_MESH_DRIVER & driver): 
   GENDRIVER(driver),
   _ptrMesh(driver._ptrMesh),
   // A VOIR _medIdt(MED_INVALID), 
   _meshName(driver._meshName)
 {
+  if (_ptrMesh)
+    _ptrMesh->addReference();
 }
 
 PORFLOW_MESH_DRIVER::~PORFLOW_MESH_DRIVER()
 {
+  if (_ptrMesh)
+    _ptrMesh->removeReference();
 }
 
 void PORFLOW_MESH_DRIVER::open()
@@ -655,9 +661,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
     {
         _ptrMesh->_name = _meshName;
         _ptrMesh->_spaceDimension = medi.points.begin()->second.coord.size();
-        _ptrMesh->_meshDimension = medi.getMeshDimension();
         _ptrMesh->_numberOfNodes = medi.points.size();
-        _ptrMesh->_isAGrid = 0;
         _ptrMesh->_coordinate = medi.getCoordinate();
 
         //Construction des groupes
@@ -700,7 +704,7 @@ PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER():PORFLOW_MESH_DRIVER()
 }
   
 PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const string & fileName,
-                                                 MESH * ptrMesh):
+                                                       GMESH *        ptrMesh):
   PORFLOW_MESH_DRIVER(fileName,ptrMesh,WRONLY)
 {
   MESSAGE_MED("PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
