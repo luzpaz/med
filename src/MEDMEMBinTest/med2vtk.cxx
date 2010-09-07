@@ -26,8 +26,9 @@
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 
-#include "MEDMEM_Med.hxx"
+#include "MEDMEM_MedFileBrowser.hxx"
 #include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_Grid.hxx"
 #include "MEDMEM_Family.hxx"
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Field.hxx"
@@ -42,7 +43,8 @@ void usage(char * name)
   exit(-1);
 }
 
-int main (int argc, char ** argv) {
+int main (int argc, char ** argv)
+{
   if (argc != 3) usage(argv[0]);
   
   string filenameIN = argv[1] ;
@@ -52,52 +54,80 @@ int main (int argc, char ** argv) {
     /////////////////////////////////////////////////
     // we read all meshes and fields in filenameIN //
     /////////////////////////////////////////////////
-    MED myMed(MED_DRIVER,filenameIN) ;
-    
+    MEDFILEBROWSER myMed(filenameIN) ;
+    vector< FIELD_* > fields;
+    vector< GMESH* > meshes;
+
     // read all meshes
     ////////////////////
 
     cout << "Read all meshes "  ;
     int NumberOfMeshes = myMed.getNumberOfMeshes() ;
     cout << "( "<<NumberOfMeshes << " ) :" << endl ;
-    deque<string> MeshName = myMed.getMeshNames() ;
+    vector<string> MeshName = myMed.getMeshNames() ;
     for (int i=0; i<NumberOfMeshes; i++) {
-      myMed.getMesh(MeshName[i])->read() ;
+      GMESH* mesh = myMed.isStructuredMesh( MeshName[i] ) ? (GMESH*) new GRID : (GMESH*) new MESH;
+      mesh->addDriver(MED_DRIVER, filenameIN, MeshName[i] );
+      mesh->read();
       cout << "  - Mesh "<<i+1<<", named "<<MeshName[i]<<" is read !" << endl;
+      meshes.push_back( mesh );
     }
 
-    // PROVISOIRE
-    ///////////////
-
-    // set support : support must be calculated with mesh information !!!
-    myMed.updateSupport() ;
-    
     // read all fields
     ////////////////////
 
     cout << "Read all fields " ;
     int NumberOfFields = myMed.getNumberOfFields() ;
     cout << "( "<<NumberOfFields << " ) :" << endl;
-    deque<string> FieldName = myMed.getFieldNames() ;
+    vector<string> FieldName = myMed.getFieldNames() ;
     for (int i=0; i<NumberOfFields; i++) {
-      deque<DT_IT_> FieldIteration = myMed.getFieldIteration(FieldName[i]) ;
+      vector<DT_IT_> FieldIteration = myMed.getFieldIteration(FieldName[i]) ;
       cout << "  - Field "<<i+1<<", named "<<FieldName[i] << " :" << endl ;
       int NumberOfIteration = FieldIteration.size() ;
       cout << "    Number of iteration pair : "<< NumberOfIteration << endl;
       for (int j=0; j<NumberOfIteration; j++) {
-        FIELD_ * myField = myMed.getField(FieldName[i],FieldIteration[j].dt,FieldIteration[j].it) ;
-        
+        FIELD_ * myField = 0;
+        switch( myMed.getFieldType( FieldName[j] ))
+        {
+        case MED_REEL64: myField = new FIELD<double>; break;
+        case MED_INT32:  
+        case MED_INT64:  myField = new FIELD<int>; break;
+        default:
+          cout << "Unknown value type - skipped" << endl;
+          continue;
+        }
+        myField->setIterationNumber( FieldIteration[j].dt );
+        myField->setOrderNumber( FieldIteration[j].it );
+        myField->addDriver( MED_DRIVER, filenameIN, FieldName[i]);
         myField->read() ;
         cout << "    * Iteration "<<FieldIteration[j].dt<<" and  order number "<<FieldIteration[j].it<<" ) is read !" << endl;
+        fields.push_back( myField );
+        string meshName = myMed.getMeshName( FieldName[j] );
+        for ( int m = 0; m < meshes.size(); ++m)
+          if ( meshes[m]->getName() == meshName )
+            myField->getSupport()->setMesh( meshes[m] );
       }
     }
 
     //////////////////////////////////////////
     // we write all in VTK file filenameOUT //
     /////////////////////////////////////////
-    int id = myMed.addDriver(VTK_DRIVER,filenameOUT) ;
-    myMed.write(id) ;
+    if ( !fields.empty() )
+    {
+      vector< const FIELD_* > constFields( fields.begin(), fields.end() );
+      VTK_MED_DRIVER medDriver( filenameOUT, constFields );
+      medDriver.write();
+    }
+    else if ( !meshes.empty() )
+    {
+      VTK_MESH_DRIVER meshDriver( filenameOUT, meshes[0] );
+      meshDriver.write() ;
+    }
 
+    for ( int i = 0; i < meshes.size(); ++ i)
+      meshes[i]->removeReference();
+    for ( int i = 0; i < fields.size(); ++ i)
+      fields[i]->removeReference();
   } 
   catch (MEDEXCEPTION& ex){
     cout << ex.what() << endl ;

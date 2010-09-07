@@ -24,7 +24,7 @@
 // Created   : Mon Jan 11 16:46:10 2010
 // Author    : Edward AGAPOV (eap)
 //
-#include <MEDMEM_Med.hxx>
+#include <MEDMEM_MedFileBrowser.hxx>
 #include <MEDMEM_Remapper.hxx>
 
 using namespace MEDMEM;
@@ -33,20 +33,19 @@ using namespace std;
 
 string getMeshName(const char* file, int mesh_index)
 {
-  MED med(MED_DRIVER, file);
+  MEDFILEBROWSER med(file);
   if ( mesh_index >= med.getNumberOfMeshes() )
     {
       cout << "Invalid index of mesh, it must be less than " << med.getNumberOfMeshes() << endl;
       return "Invalid mesh index";
     }
-  vector<string> mesh_names(med.getNumberOfMeshes());
-  med.getMeshNames( &mesh_names[0] );
+  vector<string> mesh_names = med.getMeshNames();
   return mesh_names[mesh_index];
 }
 
 //================================================================================
 /*!
- * \brief Perform interpolation of two meshes and dumps result (for format of output,
+ * \brief Perform interpolation of two meshes and dumps result. For format of output,
  * see comment to operator<<() in InterpKernelMatrix.hxx
  */
 //================================================================================

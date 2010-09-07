@@ -26,50 +26,45 @@
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 
-#include "MEDMEM_Med.hxx"
 #include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_Grid.hxx"
 #include "MEDMEM_Family.hxx"
 #include "MEDMEM_Support.hxx"
 
 #include "MEDMEM_GenDriver.hxx"
-#include "MEDMEM_MedMedDriver.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"
+#include "MEDMEM_MedFileBrowser.hxx"
 
 using namespace std;
 using namespace MEDMEM;
-int main (int argc, char ** argv) {
-
+int main (int argc, char ** argv)
+{
   if ( argc < 3 ) {
     cout << "Usage: " << argv[0] << "<input med file> <output med file>" << endl;
     return -1;
   }
   string filenameIN = argv[1] ;
-    string filenameOUT = argv[2] ;
+  string filenameOUT = argv[2] ;
     
-    MED * myMed = new MED() ;
-    MED_MED_RDONLY_DRIVER myMedDriver(filenameIN,myMed) ;
+  MEDFILEBROWSER myMed(filenameIN);
 
   // we read all meshes in filenameIN 
   try {
     
-    //int read ; !! UNUSED VARIABLE !!
-    myMedDriver.open();
-    myMedDriver.readFileStruct();
-    myMedDriver.close();
-    
     // read all mesh
     MESSAGE_MED("Read all meshes :") ;
-    int NumberOfMeshes = myMed->getNumberOfMeshes() ;
+    int NumberOfMeshes = myMed.getNumberOfMeshes() ;
     MESSAGE_MED("Number of meshes : "<<NumberOfMeshes) ;
-    deque<string> MeshName = myMed->getMeshNames() ;
-    map<string,MESH*> _meshes ;
-    for (int i=0; i<NumberOfMeshes; i++) {
-      _meshes[MeshName[i]]=myMed->getMesh(MeshName[i]) ;
-      _meshes[MeshName[i]]->read();
-      MESSAGE_MED("  - Mesh "<<i+1<<", named "<<MeshName[i]<<" read !");
-      MED_MESH_WRONLY_DRIVER myMeshDriver(filenameOUT,_meshes[MeshName[i]]);
+    vector<string> meshNames = myMed.getMeshNames() ;
+    for (int i=0; i<NumberOfMeshes; i++)
+    {
+      GMESH* mesh = myMed.isStructuredMesh( meshNames[i] ) ? (GMESH*) new GRID : (GMESH*) new MESH;
+      int drv = mesh->addDriver(MED_DRIVER, filenameIN, meshNames[i] );
+      mesh->read(drv);
+      MESSAGE_MED("  - Mesh "<<i+1<<", named "<<meshNames[i]<<" read !");
+      MED_MESH_WRONLY_DRIVER myMeshDriver(filenameOUT,mesh);
       MESSAGE_MED("After declaration of MED_MESH_DRIVER");
-      myMeshDriver.setMeshName(MeshName[i]);
+      myMeshDriver.setMeshName(meshNames[i]);
       MESSAGE_MED("After setMeshName");
       myMeshDriver.open() ;
       MESSAGE_MED("After open");
@@ -77,10 +72,8 @@ int main (int argc, char ** argv) {
       MESSAGE_MED("After write");
       myMeshDriver.close() ;
       MESSAGE_MED("After close");
+      mesh->removeReference();
     }
-
-    // set support : support must be calculated with mesh information !!!
-    myMed->updateSupport() ;
 
   } catch (MEDEXCEPTION& ex){
     MESSAGE_MED(ex.what()) ;
