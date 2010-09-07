@@ -157,25 +157,6 @@ FIELD_::FIELD_(const FIELD_ &m)
 FIELD_::~FIELD_()
 {
   MESSAGE_MED("~FIELD_()");
-  //if ( _componentsTypes !=NULL)
-  //  delete[] _componentsTypes ;
-  //if ( _componentsNames !=NULL)
-  //  delete[] _componentsNames ;
-  //if ( _componentsDescriptions !=NULL)
-  //  delete[] _componentsDescriptions ;
-  //if ( _componentsUnits !=NULL)
-  //  delete[] _componentsUnits ;
-  //if ( _MEDComponentsUnits !=NULL)
-  //  delete[] _MEDComponentsUnits ;
-  // delete driver
-//   vector<GENDRIVER *>::const_iterator it ;
-//   SCRUTE_MED(_drivers.size());
-//   int i=0;
-//   for (it=_drivers.begin();it!=_drivers.end();it++) {
-//     i++;
-//     SCRUTE_MED(i);
-//     delete (*it) ;
-
 
   MESSAGE_MED("In this object FIELD_ there is(are) " << _drivers.size() << " driver(s)");
 
@@ -184,8 +165,10 @@ FIELD_::~FIELD_()
       SCRUTE_MED(_drivers[index]);
       if ( _drivers[index] != NULL) delete _drivers[index];
     }
+  _drivers.clear();
   if(_support)
     _support->removeReference();
+  _support=0;
 }
 
 /*! 
@@ -208,42 +191,43 @@ FIELD<double>* FIELD_::_getFieldSize(const SUPPORT *subSupport) const
           support->addReference();
         }
     }
+  const GMESH* mesh = getSupport()->getMesh();
   switch (getSupport()->getEntity())
     {
     case MED_CELL :
-      switch (getSupport()->getMesh()->getMeshDimension() ) 
+      switch (mesh->getMeshDimension() ) 
         {
         case 1:
-          p_field_size=getSupport()->getMesh()->getLength( support );
+          p_field_size=mesh->getLength( support );
           break;
         case 2:
-          p_field_size=getSupport()->getMesh()->getArea( support );
+          p_field_size=mesh->getArea( support );
           break;
         case 3:
-          p_field_size=getSupport()->getMesh()->getVolume( support );
+          p_field_size=mesh->getVolume( support );
           break;
         }
       break;
 
     case MED_FACE :
-      p_field_size=getSupport()->getMesh()->getArea( support );
+      p_field_size=mesh->getArea( support );
       break;
 
     case MED_EDGE :
-      p_field_size=getSupport()->getMesh()->getLength( support );
+      p_field_size=mesh->getLength( support );
       break;
     case MED_NODE : // issue 0020120: [CEA 206] normL2 on NODE field
       {
-        switch (getSupport()->getMesh()->getMeshDimension() ) 
+        switch (mesh->getMeshDimension() ) 
           {
           case 1:
-            p_field_size=getSupport()->getMesh()->getLength( support );
+            p_field_size=mesh->getLength( support );
             break;
           case 2:
-            p_field_size=getSupport()->getMesh()->getArea( support );
+            p_field_size=mesh->getArea( support );
             break;
           case 3:
-            p_field_size=getSupport()->getMesh()->getVolume( support );
+            p_field_size=mesh->getVolume( support );
             break;
           }
         break;
@@ -279,7 +263,8 @@ void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume,
             " : it's support has no mesh reference";
           throw MEDEXCEPTION(diagnosis.c_str());
         }
-      if ( !getSupport()->getMesh()->existConnectivity(MED_NODAL,MED_CELL) )
+      if ( !getSupport()->getMesh()->getIsAGrid() &&
+           !( (const MESH*)getSupport()->getMesh() )->existConnectivity(MED_NODAL,MED_CELL) )
         {
           diagnosis="Cannot compute Lnorm of nodal field"+getName()+
             " : it's supporting mesh has no nodal connectivity data";

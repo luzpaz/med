@@ -26,9 +26,14 @@
 
 #include "MEDMEM_GibiMeshDriver.hxx"
 
+#ifdef HAS_XDR
+// On windows, this file must be included first otherwise
+// there is a conflict with the symbol GROUP when compiling the xdr support ...
+#include <rpc/xdr.h>
+#endif
+
 #include "MEDMEM_DriversDef.hxx"
 
-#include "MEDMEM_Med.hxx"
 #include "MEDMEM_Family.hxx"
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_Group.hxx"
@@ -275,6 +280,7 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
 #ifdef HAS_XDR
   if ( _is_xdr)
     {
+      _curPos = 0;
       _iRead = 0;
       _nbToRead = 0;
     }
@@ -672,8 +678,8 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
                   int nm4 = getInt() ; next();
                   int nm5 = getInt() ; next();
                   int n45 = getInt() ; next();
-                  int nm6 = getInt() ; next();
-                  int nm7 = getInt() ; next();
+                  /*int nm6 =*/ getInt() ; next();
+                  /*int nm7 =*/ getInt() ; next();
                   next();
                   next();
                   int nm1 = n1 * n45;
@@ -1400,34 +1406,31 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
 
 GIBI_MESH_DRIVER::GIBI_MESH_DRIVER():
        GENDRIVER(GIBI_DRIVER),
-       _ptrMesh(( MESH *) NULL),
-       // A VOIR _medIdt(MED_INVALID),
+       _mesh(( GMESH *) NULL),
        _meshName("")
 {
   MESSAGE_MED("GIBI_MESH_DRIVER()");
 }
 
-GIBI_MESH_DRIVER::GIBI_MESH_DRIVER(const string & fileName,
-                                   MESH * ptrMesh,
+GIBI_MESH_DRIVER::GIBI_MESH_DRIVER(const string &         fileName,
+                                   GMESH *                ptrMesh,
                                    MED_EN::med_mode_acces accessMode):
   GENDRIVER(fileName, accessMode, GIBI_DRIVER),
-  _ptrMesh(ptrMesh)
-  // A VOIR _medIdt(MED_INVALID),
+  _mesh(ptrMesh)
 {
   MESSAGE_MED( "GIBI_MESH_DRIVER(" << fileName <<","<<accessMode );
-//   _meshName=fileName.substr(0,fileName.rfind("."));
-    // mesh name construction from fileName
-    const string ext=".sauve"; // expected extension
-    string::size_type pos=fileName.find(ext,0);
-    string::size_type pos1=fileName.rfind('/');
-    _meshName = string(fileName,pos1+1,pos-pos1-1); //get rid of directory & extension
-    SCRUTE_MED(_meshName);
+  //   _meshName=fileName.substr(0,fileName.rfind("."));
+  // mesh name construction from fileName
+  const string ext=".sauve"; // expected extension
+  string::size_type pos=fileName.find(ext,0);
+  string::size_type pos1=fileName.rfind('/');
+  _meshName = string(fileName,pos1+1,pos-pos1-1); //get rid of directory & extension
+  SCRUTE_MED(_meshName);
 }
 
 GIBI_MESH_DRIVER::GIBI_MESH_DRIVER(const GIBI_MESH_DRIVER & driver):
   GENDRIVER(driver),
-  _ptrMesh(driver._ptrMesh),
-  // A VOIR _medIdt(MED_INVALID),
+  _mesh(driver._mesh),
   _meshName(driver._meshName)
 {
   MESSAGE_MED("GIBI_MESH_DRIVER(const GIBI_MESH_DRIVER & driver)");
@@ -1441,25 +1444,26 @@ void    GIBI_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = mes
 string  GIBI_MESH_DRIVER::getMeshName() const { return _meshName; };
 
 
-//---------------------------------- RDONLY PART -------------------------------------------------------------
+//---------------------------------- RDONLY PART ------------------------------------------
 
 GIBI_MESH_RDONLY_DRIVER::GIBI_MESH_RDONLY_DRIVER():
-       GIBI_MESH_DRIVER(),
-       _File (-1),_start(0L),_ptr  (0L),_eptr (0L)
+  GIBI_MESH_DRIVER(),
+  _File (-1),_start(0L),_ptr  (0L),_eptr (0L)
 {
 }
 GIBI_MESH_RDONLY_DRIVER::GIBI_MESH_RDONLY_DRIVER(const string & fileName,MESH * ptrMesh):
-       GIBI_MESH_DRIVER(fileName,ptrMesh,RDONLY),
-       _File (-1),_start(0L),_ptr  (0L),_eptr (0L)
+  GIBI_MESH_DRIVER(fileName,ptrMesh,RDONLY),
+  _File (-1),_start(0L),_ptr  (0L),_eptr (0L)
 {
-    MESSAGE_MED("GIBI_MESH_RDONLY_DRIVER::GIBI_MESH_RDONLY_DRIVER"
-            "(const string & fileName, MESH * ptrMesh) has been created, "
-            << fileName << ", " << RDONLY);
+  MESSAGE_MED("GIBI_MESH_RDONLY_DRIVER::GIBI_MESH_RDONLY_DRIVER"
+              "(const string & fileName, MESH * ptrMesh) has been created, "
+              << fileName << ", " << RDONLY);
 }
 GIBI_MESH_RDONLY_DRIVER::GIBI_MESH_RDONLY_DRIVER(const GIBI_MESH_RDONLY_DRIVER & driver):
-GIBI_MESH_DRIVER(driver)
+  GIBI_MESH_DRIVER(driver)
 {
 }
+
 GIBI_MESH_RDONLY_DRIVER::~GIBI_MESH_RDONLY_DRIVER()
 {
   const char* LOC = "~GIBI_MESH_RDONLY_DRIVER()";
@@ -1469,8 +1473,8 @@ GIBI_MESH_RDONLY_DRIVER::~GIBI_MESH_RDONLY_DRIVER()
 #ifdef HAS_XDR
     if(_is_xdr)
       {
-        xdr_destroy(_xdrs);
-        free(_xdrs);
+        xdr_destroy((XDR*)_xdrs);
+        free((XDR*)_xdrs);
         fclose(_xdrs_file);
       }
 #endif
@@ -1533,12 +1537,12 @@ void GIBI_MESH_RDONLY_DRIVER::open()
   _xdrs_file = fdopen(_File, "r");
   _xdrs = (XDR *)malloc(sizeof(XDR));
   
-  xdrstdio_create(_xdrs, _xdrs_file, XDR_DECODE);
+  xdrstdio_create((XDR*)_xdrs, _xdrs_file, XDR_DECODE);
   
   const int maxsize = 10;
   char icha[maxsize+1];
   char *icha2=icha;
-  bool_t xdr_test = xdr_string(_xdrs, &icha2, maxsize);
+  bool_t xdr_test = xdr_string((XDR*)_xdrs, &icha2, maxsize);
   if(xdr_test)
     {
       icha[maxsize] = '\0';
@@ -1550,8 +1554,8 @@ void GIBI_MESH_RDONLY_DRIVER::open()
   
   if(! _is_xdr)
     {
-      xdr_destroy(_xdrs);
-      free(_xdrs);
+      xdr_destroy((XDR*)_xdrs);
+      free((XDR*)_xdrs);
       fclose(_xdrs_file);
       ::close (_File);
 #ifdef WNT
@@ -1579,8 +1583,8 @@ void GIBI_MESH_RDONLY_DRIVER::close()
 #ifdef HAS_XDR
       if(_is_xdr)
         {
-          xdr_destroy(_xdrs);
-          free(_xdrs);
+          xdr_destroy((XDR*)_xdrs);
+          free((XDR*)_xdrs);
           fclose(_xdrs_file);
         }
 #endif
@@ -1672,7 +1676,7 @@ void GIBI_MESH_RDONLY_DRIVER::initNameReading(int nbValues, int width)
         {
           unsigned int nels = nbValues*width;
           _xdr_cvals = (char*)malloc((nels+1)*sizeof(char));
-          xdr_string(_xdrs, &_xdr_cvals, nels);
+          xdr_string((XDR*)_xdrs, &_xdr_cvals, nels);
           _xdr_cvals[nels] = '\0';
         }
     }
@@ -1696,7 +1700,7 @@ void GIBI_MESH_RDONLY_DRIVER::initIntReading(int nbValues)
           unsigned int nels = nbValues;
           unsigned int actual_nels;
           _xdr_ivals = (int*)malloc(nels*sizeof(int));
-          xdr_array(_xdrs, (char **)&_xdr_ivals, &actual_nels, nels, sizeof(int), (xdrproc_t)xdr_int);
+          xdr_array((XDR*)_xdrs, (char **)&_xdr_ivals, &actual_nels, nels, sizeof(int), (xdrproc_t)xdr_int);
         }
     }
 #endif
@@ -1719,7 +1723,7 @@ void GIBI_MESH_RDONLY_DRIVER::initDoubleReading(int nbValues)
           unsigned int nels = nbValues;
           unsigned int actual_nels;
           _xdr_dvals = (double*)malloc(nels*sizeof(double));
-          xdr_array(_xdrs, (char **)&_xdr_dvals, &actual_nels, nels, sizeof(double), (xdrproc_t)xdr_double);
+          xdr_array((XDR*)_xdrs, (char **)&_xdr_dvals, &actual_nels, nels, sizeof(double), (xdrproc_t)xdr_double);
         }
     }
 #endif
@@ -1849,7 +1853,7 @@ int GIBI_MESH_RDONLY_DRIVER::getInt() const
       else
         {
           int result;
-          xdr_int(_xdrs, &result);
+          xdr_int((XDR*)_xdrs, &result);
           return result;
         }
     }
@@ -1868,7 +1872,7 @@ float GIBI_MESH_RDONLY_DRIVER::getFloat() const
   if(_is_xdr)
     {
       float result;
-      xdr_float(_xdrs, &result);
+      xdr_float((XDR*)_xdrs, &result);
       return result;
     }
 #endif
@@ -1892,7 +1896,7 @@ double GIBI_MESH_RDONLY_DRIVER::getDouble() const
       else
         {
           double result;
-          xdr_double(_xdrs, &result);
+          xdr_double((XDR*)_xdrs, &result);
           return result;
         }
     }
@@ -1937,7 +1941,7 @@ void GIBI_MESH_RDONLY_DRIVER::read(void) throw (MEDEXCEPTION)
   if (_status!=MED_OPENED)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "The _idt of file " << _fileName << " is : "
                                  <<  " (the file is not opened)." ));
-  if ( ! _ptrMesh->isEmpty() )
+  if ( ! _mesh->isEmpty() )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Mesh object not empty : can't fill it!"));
 
   _intermediateMED medi;
@@ -1992,7 +1996,7 @@ static void getReverseVector (const medGeometryElement type,
   case MED_TETRA10:
     swapVec.resize(3);
     swapVec[0] = make_pair( 1, 2 );
-    swapVec[1] = make_pair( 4, 5 );
+    swapVec[1] = make_pair( 4, 6 );
     swapVec[2] = make_pair( 8, 9 );
     break;
   case MED_PYRA13:
@@ -2436,7 +2440,8 @@ void GIBI_MESH_RDONLY_DRIVER::fillMesh(_intermediateMED* _ptrMedi)
   const char* LOC = "GIBI_MESH_RDONLY_DRIVER::fillMesh(_intermediateMED* _ptrMedi) : ";
   BEGIN_OF_MED(LOC);
 
-  _ptrMesh->_name = _meshName;
+  MESH* mesh = (MESH*)_mesh;
+  mesh->_name = _meshName;
 
   if (_ptrMedi)
   {
@@ -2449,19 +2454,17 @@ void GIBI_MESH_RDONLY_DRIVER::fillMesh(_intermediateMED* _ptrMedi)
     // fix element orientation
     orientElements( *_ptrMedi );
 
-    _ptrMesh->_spaceDimension = _ptrMedi->points.begin()->second.coord.size();
-    _ptrMesh->_meshDimension  = _ptrMedi->getMeshDimension();
-    _ptrMesh->_numberOfNodes  = _ptrMedi->points.size();
-    _ptrMesh->_isAGrid        = 0;
-    _ptrMesh->_coordinate     = _ptrMedi->getCoordinate();
+    mesh->_spaceDimension = _ptrMedi->points.begin()->second.coord.size();
+    mesh->_numberOfNodes  = _ptrMedi->points.size();
+    mesh->_coordinate     = _ptrMedi->getCoordinate();
 
     //Construction des groupes
-    _ptrMedi->getGroups(_ptrMesh->_groupCell,
-                        _ptrMesh->_groupFace,
-                        _ptrMesh->_groupEdge,
-                        _ptrMesh->_groupNode, _ptrMesh);
+    _ptrMedi->getGroups(mesh->_groupCell,
+                        mesh->_groupFace,
+                        mesh->_groupEdge,
+                        mesh->_groupNode, mesh);
 
-    _ptrMesh->_connectivity = _ptrMedi->getConnectivity();
+    mesh->_connectivity = _ptrMedi->getConnectivity();
   }
   END_OF_MED(LOC);
 }
@@ -2474,15 +2477,15 @@ void GIBI_MESH_RDONLY_DRIVER::fillMesh(_intermediateMED* _ptrMedi)
 
 void GIBI_MESH_RDONLY_DRIVER::updateSupports()
 {
-  _ptrMesh->createFamilies();
+  _mesh->createFamilies();
 
   // add attributes to families
   set<string> famNames;
   for (medEntityMesh entity=MED_CELL; entity<MED_ALL_ENTITIES; ++entity)
   {
-    int i, nb = _ptrMesh->getNumberOfFamilies(entity);
+    int i, nb = _mesh->getNumberOfFamilies(entity);
     for ( i = 1; i <= nb; ++i ) {
-      FAMILY* f = const_cast<FAMILY*>( _ptrMesh->getFamily( entity, i ));
+      FAMILY* f = const_cast<FAMILY*>( _mesh->getFamily( entity, i ));
       f->setNumberOfAttributes( 1 );
       int* attIDs = new int[1];
       attIDs[0] = 1;
@@ -2501,15 +2504,15 @@ void GIBI_MESH_RDONLY_DRIVER::updateSupports()
         f->setName( name.str());
       }
       // check if family is on the whole mesh entity
-      if (_ptrMesh->getNumberOfElements( entity, MED_ALL_ELEMENTS ) ==
+      if (_mesh->getNumberOfElements( entity, MED_ALL_ELEMENTS ) ==
           f->getNumberOfElements( MED_ALL_ELEMENTS ))
         f->setAll( true );
     }
     // setAll() for groups
-    nb = _ptrMesh->getNumberOfGroups(entity);
+    nb = _mesh->getNumberOfGroups(entity);
     for ( i = 1; i <= nb; ++i ) {
-      GROUP * g = const_cast<GROUP*>( _ptrMesh->getGroup( entity, i ));
-      if (_ptrMesh->getNumberOfElements( entity, MED_ALL_ELEMENTS ) ==
+      GROUP * g = const_cast<GROUP*>( _mesh->getGroup( entity, i ));
+      if (_mesh->getNumberOfElements( entity, MED_ALL_ELEMENTS ) ==
           g->getNumberOfElements( MED_ALL_ELEMENTS ))
         g->setAll( true );
     }
@@ -2529,7 +2532,7 @@ GIBI_MESH_WRONLY_DRIVER::GIBI_MESH_WRONLY_DRIVER():GIBI_MESH_DRIVER()
 {
 }
 GIBI_MESH_WRONLY_DRIVER::GIBI_MESH_WRONLY_DRIVER(const string & fileName,
-                                                 MESH * ptrMesh):
+                                                 GMESH *        ptrMesh):
   GIBI_MESH_DRIVER(fileName,ptrMesh,WRONLY)
 {
   MESSAGE_MED("GIBI_MESH_WRONLY_DRIVER::GIBI_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
@@ -2698,8 +2701,10 @@ bool GIBI_MESH_WRONLY_DRIVER::addSupport( const SUPPORT * support )
   if ( su != _supports.end() )
     return ( su->second.getNumberOfTypes() > 0 );
 
-  if ( support->getMesh() != _ptrMesh )
+  if ( support->getMesh() != _mesh )
     throw MEDEXCEPTION(LOCALIZED(STRING("cant write support of other mesh" )));
+
+  MESH* mesh = (MESH*)_mesh;
 
   // get sub-supports and define a support type name
   string supType;
@@ -2728,7 +2733,7 @@ bool GIBI_MESH_WRONLY_DRIVER::addSupport( const SUPPORT * support )
   // check if it is a writtable support, i.e.
   // nodal connectivity for a support entity exists
   medEntityMesh entity = support->getEntity();
-  if ( entity != MED_NODE && !_ptrMesh->existConnectivity( MED_NODAL, entity )) {
+  if ( entity != MED_NODE && !mesh->existConnectivity( MED_NODAL, entity )) {
     INFOS_MED("Do not save " << supType << " of entity " << entity
           << " named <" << data._cleanName << "> nodal connectivity not defined");
     return false;
@@ -2743,14 +2748,14 @@ bool GIBI_MESH_WRONLY_DRIVER::addSupport( const SUPPORT * support )
     if ( !onAll )
       nbTypes = (*sIt)->getNumberOfTypes();
     else
-      nbTypes = _ptrMesh->getNumberOfTypes( entity );
+      nbTypes = _mesh->getNumberOfTypes( entity );
     if ( nbTypes == 0 )
       continue;
     const medGeometryElement* types = 0;
     if ( !onAll )
       types = (*sIt)->getTypes();
     else if ( entity != MED_NODE )
-      types = _ptrMesh->getTypes( entity );
+      types = _mesh->getTypes( entity );
     for ( int iType = 0; iType < nbTypes; ++iType )
     {
       if ( types && types[ iType ] > MED_HEXA20 )
@@ -2759,8 +2764,8 @@ bool GIBI_MESH_WRONLY_DRIVER::addSupport( const SUPPORT * support )
       const int * ptrElemIDs = 0;
       int elemID1 = 0, nbElems = 0;
       if ( onAll ) {
-        nbElems = _ptrMesh->getNumberOfElements( entity, geomType );
-        elemID1 = (entity == MED_NODE) ? 1 : _ptrMesh->getGlobalNumberingIndex (entity)[ iType ];
+        nbElems = _mesh->getNumberOfElements( entity, geomType );
+        elemID1 = (entity == MED_NODE) ? 1 : mesh->getGlobalNumberingIndex (entity)[ iType ];
       }
       else {
         nbElems = (*sIt)->getNumberOfElements( geomType );
@@ -2984,7 +2989,7 @@ void GIBI_MESH_WRONLY_DRIVER::addName(map<string,int>& nameMap,
 //   VOLUM002
 void GIBI_MESH_WRONLY_DRIVER::addName (map<string,int>& nameMap,
                                        map<string,int>& namePrefixesMap,
-                                       string&          theName,
+                                       const string&    theName,
                                        int              index)
 {
   string name = cleanName(theName);
@@ -3121,21 +3126,25 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh(list<nameGIBItoMED>& listGIBI
 
   if (_status!=MED_OPENED)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "file " << _fileName<<  " is not opened." ));
-  if (!_ptrMesh)
+  if (!_mesh)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "can't write a NULL mesh" ));
-  if (!_ptrMesh->getConnectivityptr())
+
+  const MESH* mesh = _mesh->convertInMESH();
+  AutoDeref meshDeref( mesh );
+
+  if (!mesh->getConnectivityptr()) 
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "can't write a mesh with NULL connectivity" ));
 
   // fill _supports with families and groups
   medEntityMesh entity;
   for (entity=MED_CELL; entity<MED_ALL_ENTITIES; ++entity)
   {
-    int i, nb = _ptrMesh->getNumberOfGroups(entity);
+    int i, nb = _mesh->getNumberOfGroups(entity);
     for ( i = 1; i <= nb; ++i )
-      addSupport( _ptrMesh->getGroup( entity, i ));
-//     nb = _ptrMesh->getNumberOfFamilies(entity);
+      addSupport( _mesh->getGroup( entity, i ));
+//     nb = _mesh->getNumberOfFamilies(entity);
 //     for ( i = 1; i <= nb; ++i )
-//       addSupport( _ptrMesh->getFamily( entity, i ));
+//       addSupport( _mesh->getFamily( entity, i ));
   }
 
   // --------------------------------------------------------------------
@@ -3192,17 +3201,17 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh(list<nameGIBItoMED>& listGIBI
 
   // count types of mesh elements that are not all in _supports
   int iType, nbTypes;
-  entity = _ptrMesh->getConnectivityptr()->getEntity();
+  entity = mesh->getConnectivityptr()->getEntity();
   for ( ; entity < MED_NODE; entity++ )
   {
-    nbTypes = _ptrMesh->getNumberOfTypes( entity );
-    if ( nbTypes == 0 || !_ptrMesh->existConnectivity( MED_NODAL, entity ))
+    nbTypes = _mesh->getNumberOfTypes( entity );
+    if ( nbTypes == 0 || !mesh->existConnectivity( MED_NODAL, entity ))
       continue;
-    const medGeometryElement* types = _ptrMesh->getTypes( entity );
+    const medGeometryElement* types = _mesh->getTypes( entity );
     for ( iType = 0; iType < nbTypes; ++iType )
     {
       int nbElemInSups = nbSuppElemsByType[ types[ iType ]];
-      int nbElemInMesh = _ptrMesh->getNumberOfElements(entity, types[ iType ]);
+      int nbElemInMesh = _mesh->getNumberOfElements(entity, types[ iType ]);
       if ( nbElemInSups < nbElemInMesh ) {
         nb_objects++;
         nbSuppElemsByType[ types[ iType ]] = -1; // to keep written elements of _supports
@@ -3216,7 +3225,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh(list<nameGIBItoMED>& listGIBI
 
   // Premier paquet dont le nombre de lignes ne varie pas.
   // On y trouve des indications g鮩rales.
-  const int dim = _ptrMesh->getSpaceDimension();
+  const int dim = _mesh->getSpaceDimension();
   _gibi << " ENREGISTREMENT DE TYPE   4" << endl;
   _gibi << " NIVEAU  15 NIVEAU ERREUR   0 DIMENSION   " << dim <<endl;
   _gibi << " DENSITE  .00000E+00" << endl;
@@ -3274,11 +3283,11 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh(list<nameGIBItoMED>& listGIBI
     entity = supIt->first->getEntity();
     const int * nodalConnect = 0, * nodalConnectIndex = 0;
     if ( entity != MED_NODE ) {
-      nodalConnect = _ptrMesh->getConnectivity (MED_FULL_INTERLACE,
-                                                MED_NODAL,
-                                                entity,
-                                                MED_ALL_ELEMENTS);
-      nodalConnectIndex = _ptrMesh->getConnectivityIndex (MED_NODAL,entity);
+      nodalConnect = mesh->getConnectivity (MED_FULL_INTERLACE,
+                                            MED_NODAL,
+                                            entity,
+                                            MED_ALL_ELEMENTS);
+      nodalConnectIndex = mesh->getConnectivityIndex (MED_NODAL,entity);
     }
     supportData::typeIterator tIt = data._types.begin();
     for ( ; tIt != data._types.end(); ++tIt )
@@ -3293,20 +3302,20 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh(list<nameGIBItoMED>& listGIBI
   // Write elements that are not in _supports
 
   supportData data;
-  entity = _ptrMesh->getConnectivityptr()->getEntity();
+  entity = mesh->getConnectivityptr()->getEntity();
   for ( ; entity < MED_NODE; entity++ )
   {
-    int nbTypes = _ptrMesh->getNumberOfTypes( entity );
-    if ( nbTypes == 0 || !_ptrMesh->existConnectivity( MED_NODAL, entity ))
+    int nbTypes = _mesh->getNumberOfTypes( entity );
+    if ( nbTypes == 0 || !mesh->existConnectivity( MED_NODAL, entity ))
       continue;
-    const medGeometryElement* types = _ptrMesh->getTypes( entity );
-    const int * nbIndex = _ptrMesh->getGlobalNumberingIndex (entity);
+    const medGeometryElement* types = _mesh->getTypes( entity );
+    const int * nbIndex = mesh->getGlobalNumberingIndex (entity);
     const int * nodalConnect = 0, * nodalConnectIndex = 0;
-    nodalConnect = _ptrMesh->getConnectivity (MED_FULL_INTERLACE,
-                                              MED_NODAL,
-                                              entity,
-                                              MED_ALL_ELEMENTS);
-    nodalConnectIndex = _ptrMesh->getConnectivityIndex (MED_NODAL,entity);
+    nodalConnect = mesh->getConnectivity (MED_FULL_INTERLACE,
+                                          MED_NODAL,
+                                          entity,
+                                          MED_ALL_ELEMENTS);
+    nodalConnectIndex = mesh->getConnectivityIndex (MED_NODAL,entity);
 
     for ( int iType = 1; iType <= nbTypes; ++iType )
     {
@@ -3327,7 +3336,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh(list<nameGIBItoMED>& listGIBI
 
   // D颵t de la pile 32 (celle des points)
 
-  int nbNodes = _ptrMesh->getNumberOfNodes();
+  int nbNodes = _mesh->getNumberOfNodes();
   _gibi << " ENREGISTREMENT DE TYPE   2" << endl;
   _gibi << " PILE NUMERO  32NBRE OBJETS NOMMES       0" <<
     "NBRE OBJETS" << setw(8) << nbNodes << endl;
@@ -3358,7 +3367,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh(list<nameGIBItoMED>& listGIBI
   _gibi.precision(14);
   _gibi.setf( ios_base::scientific, ios_base::floatfield );
   _gibi.setf( ios_base::uppercase );
-  const double * coords = _ptrMesh->getCoordinates(MED_FULL_INTERLACE);
+  const double * coords = mesh->getCoordinates(MED_FULL_INTERLACE);
   int j = 0;
   const double precision = 1.e-99; // PAL12077
   for ( fcount.init(3),i = 0; i < nbNodes; ++i, j += dim )
@@ -3664,21 +3673,25 @@ void GIBI_MESH_RDWR_DRIVER::close()
 //============================== FIELD Reading Driver ==============================
 //============================== ====================================================
 
-GIBI_MED_RDONLY_DRIVER::GIBI_MED_RDONLY_DRIVER():GIBI_MESH_RDONLY_DRIVER()
+GIBI_MED_RDONLY_DRIVER::GIBI_MED_RDONLY_DRIVER():GIBI_MESH_RDONLY_DRIVER(),_fields(0)
 {
 }
-GIBI_MED_RDONLY_DRIVER::GIBI_MED_RDONLY_DRIVER(const string & fileName, MED * ptrMed):
-       GIBI_MESH_RDONLY_DRIVER(fileName,NULL), _med( ptrMed )
+GIBI_MED_RDONLY_DRIVER::GIBI_MED_RDONLY_DRIVER(const string & fileName, vector<FIELD_*>& ptrFields):
+  GIBI_MESH_RDONLY_DRIVER(fileName,NULL), _fields( &ptrFields )
 {
-  MESSAGE_MED("GIBI_MED_RDONLY_DRIVER(const string & fileName, MED * ptrMed) has been created");
+  MESSAGE_MED("GIBI_MED_RDONLY_DRIVER(const string & fileName, vector<FIELD_*>&) has been created");
   _fileName = fileName;
   _accessMode = RDONLY;
 }
-GIBI_MED_RDONLY_DRIVER::GIBI_MED_RDONLY_DRIVER(const GIBI_MED_RDONLY_DRIVER & driver)
+GIBI_MED_RDONLY_DRIVER::GIBI_MED_RDONLY_DRIVER(const GIBI_MED_RDONLY_DRIVER & driver):
+  GIBI_MESH_RDONLY_DRIVER( driver ), _fields( driver._fields )
 {
 }
- GIBI_MED_RDONLY_DRIVER::~GIBI_MED_RDONLY_DRIVER()
+
+GIBI_MED_RDONLY_DRIVER::~GIBI_MED_RDONLY_DRIVER()
 {
+  if ( _mesh )
+    _mesh->removeReference();
 }
 GENDRIVER * GIBI_MED_RDONLY_DRIVER::copy ( void ) const
 {
@@ -3698,7 +3711,7 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
   if (_status!=MED_OPENED)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "file " << _fileName<<" is not opened." ));
 
-  _ptrMesh = new MESH;
+  _mesh = new MESH;
 
   _intermediateMED medi;
   try {
@@ -3715,10 +3728,8 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
     updateSupports(); // create families from groups etc.
     MESSAGE_MED( "nb fields: " << fields.size() );
 
-    if ( _ptrMesh->getName().empty() )
-      _ptrMesh->setName( "MESH" );
-
-    _med->addMesh( _ptrMesh );
+    if ( _mesh->getName().empty() )
+      _mesh->setName( "MESH" );
 
     list< FIELD_* >::iterator it = fields.begin();
     for ( ; it != fields.end(); it++ )
@@ -3734,6 +3745,8 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
         }
         fld->setComponentsUnits(compoUnits);
         fld->setMEDComponentsUnits(MEDcompoUnits);
+        delete [] compoUnits;
+        delete [] MEDcompoUnits;
       }
       // 0020466: [CEA] sauv2med : bad conversion
       // Provide profile names for a partial field
@@ -3745,7 +3758,7 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
           prof_names[itype]=STRING( sup->getName())<<"_type_"<<sup->getTypes()[itype];
         ((SUPPORT*) sup)->setProfilNames( prof_names );
       }
-      _med->addField( *it );
+      _fields->push_back( *it );
     }
   }
   catch (MEDEXCEPTION &ex)
@@ -3756,6 +3769,21 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
   END_OF_MED(LOC);
 }
 
+//================================================================================
+/*!
+ * \brief Return a mesh created while reading fields.
+ *        Call removeReference() after finishing using it.
+ */
+//================================================================================
+
+MESH* GIBI_MED_RDONLY_DRIVER::getMesh() const
+{
+  if ( _mesh )
+    _mesh->addReference();
+  return (MESH*) _mesh;
+}
+
+
 //============================== ====================================================
 //============================== FIELD Writting Driver ==============================
 //============================== ====================================================
@@ -3763,22 +3791,24 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
 GIBI_MED_WRONLY_DRIVER::GIBI_MED_WRONLY_DRIVER():GIBI_MESH_WRONLY_DRIVER()
 {
 }
-GIBI_MED_WRONLY_DRIVER::GIBI_MED_WRONLY_DRIVER(const string & fileName,
-                                                   MED * ptrMed,
-                                                   MESH * ptrMesh)
-     :GIBI_MESH_WRONLY_DRIVER(fileName,ptrMesh), _med( ptrMed )
+GIBI_MED_WRONLY_DRIVER::GIBI_MED_WRONLY_DRIVER(const string &               fileName,
+                                               const vector<const FIELD_*>& fields,
+                                               GMESH *                      ptrMesh)
+  :GIBI_MESH_DRIVER(fileName,ptrMesh,WRONLY),
+   GIBI_MESH_WRONLY_DRIVER(fileName,ptrMesh),
+   _fields( fields )
 {
-  const char * LOC =
-    "GIBI_MED_WRONLY_DRIVER(const string & fileName, MED * ptrMed, MESH * ptrMesh)";
+  const char * LOC = "GIBI_MED_WRONLY_DRIVER( fileName, vector<FIELD_*>&, MESH *)";
   BEGIN_OF_MED(LOC);
 
+  if ( !_mesh )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << " Bad mesh " << _mesh ));
   _fileName = fileName;
   _accessMode = WRONLY;
-  _ptrMesh = ptrMesh;
-  if ( !_med || !_ptrMesh )
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << " Bad params " << ptrMed << " " << ptrMesh ));
 }
-GIBI_MED_WRONLY_DRIVER::GIBI_MED_WRONLY_DRIVER(const GIBI_MED_WRONLY_DRIVER & driver)
+
+GIBI_MED_WRONLY_DRIVER::GIBI_MED_WRONLY_DRIVER(const GIBI_MED_WRONLY_DRIVER & driver):
+  GIBI_MESH_WRONLY_DRIVER( driver ), _fields( driver._fields )
 {
 }
 GIBI_MED_WRONLY_DRIVER::~GIBI_MED_WRONLY_DRIVER()
@@ -3795,10 +3825,10 @@ GENDRIVER * GIBI_MED_WRONLY_DRIVER::copy ( void ) const
 //=======================================================================
 
 template< class T, class INTERLACING_TAG>
-static void writeDataSection (fstream&                    file,
-                              FIELD<T, INTERLACING_TAG> * field,
-                              const int                   id1,
-                              const int                   id2) throw (MEDEXCEPTION)
+static void writeDataSection (fstream&                          file,
+                              const FIELD<T, INTERLACING_TAG> * field,
+                              const int                         id1,
+                              const int                         id2) throw (MEDEXCEPTION)
 {
   const char * LOC="writeDataSection (.....) :";
   BEGIN_OF_MED(LOC);
@@ -3876,9 +3906,9 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
   // we are going to modify the _gibi field
   GIBI_MED_WRONLY_DRIVER * me = const_cast<GIBI_MED_WRONLY_DRIVER *>(this);
 
-  // get all fields on _ptrMesh and add their support to be written
-  list<FIELD_*> fields;
-  int iField, nbFields = _med->getNumberOfFields();
+  // get all fields on _mesh and add their support to be written
+  list<const FIELD_*> fields;
+  int iField, nbFields = _fields.size(); // _med->getNumberOfFields()
   int nb_obj = 0;
   list<int> nb_sub_list;
   map<string,int> nameNbMap;
@@ -3892,42 +3922,34 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
   list<nameGIBItoMED> listGIBItoMED_cham;
   list<nameGIBItoMED> listGIBItoMED_comp;
 
-  string *names=new string[ nbFields ];
-  _med->getFieldNames( names );
   for ( iField = 0; iField < nbFields; ++iField )
   {
     int nb_sub = 0;
-    deque<DT_IT_> dtit = _med->getFieldIteration( names[ iField ]);
-    deque<DT_IT_>::iterator fIt = dtit.begin();
-    for ( ; fIt != dtit.end(); fIt++ )
+    const FIELD_ * f = _fields[ iField ];
+    if ( f->getValueType() != MED_EN::MED_REEL64 )
     {
-      FIELD_ * f = _med->getField( names[ iField ], fIt->dt, fIt->it );
-      if ( f->getValueType() != MED_EN::MED_REEL64 )
-      {
-        MESSAGE_MED("GIBI_MED_WRONLY_DRIVER::write( FIELD< int > ) not implemented");
-        continue;
-      }
-      const SUPPORT * sup = f->getSupport();
-      if ( me->addSupport( sup ) ) {
-        fields.push_back( f );
-        nb_sub += getSubMeshIdAndSize( sup, subIdSizeList );
-      }
+      MESSAGE_MED("GIBI_MED_WRONLY_DRIVER::write( FIELD< int > ) not implemented");
+      continue;
+    }
+    const SUPPORT * sup = f->getSupport();
+    if ( me->addSupport( sup ) ) {
+      fields.push_back( f );
+      nb_sub += getSubMeshIdAndSize( sup, subIdSizeList );
     }
     if ( nb_sub ) {
       //addName( nameNbMap, names[ iField ], ++nb_obj, "F" );
-      addName(nameNbMap, namePrefixMap, names[ iField ], ++nb_obj);
+      addName(nameNbMap, namePrefixMap, f->getName(), ++nb_obj);
 
       // IMP 0020434: mapping GIBI names to MED names
       nameGIBItoMED aMEDName;
       aMEDName.gibi_pile = 39; // PILE_FIELD
       aMEDName.gibi_id = nb_obj;
-      aMEDName.med_name = names[ iField ];
+      aMEDName.med_name = f->getName();
       listGIBItoMED_cham.push_back(aMEDName);
 
       nb_sub_list.push_back( nb_sub );
     }
   }
-  delete [] names;
   // write mesh
 
   //try {
@@ -3953,7 +3975,7 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
 
     me->writeNames( nameNbMap );
 
-    list<FIELD_*>::iterator itF = fields.begin();
+    list<const FIELD_*>::iterator itF = fields.begin();
     list<int>::iterator itNbSub = nb_sub_list.begin();
     int nb_sub = 0, cur_nb_sub = 0;
     for ( iField = 0; itF != fields.end(); itF++, iField++ )
@@ -3975,14 +3997,14 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
         gibi << setw(72) << " " << endl;
 
         // Sub Components section
-        list<FIELD_*>::iterator itF2 = itF;
+        list<const FIELD_*>::iterator itF2 = itF;
         vector<int> vals( 9, 0 );
         vals[8] = 2;
         fcount.init(10);
         cur_nb_sub = 0;
         while ( itF2 != fields.end() && cur_nb_sub < nb_sub )
         {
-          FIELD_* f = *itF2++;
+          const FIELD_* f = *itF2++;
           vals[2] = f->getNumberOfComponents();
           getSubMeshIdAndSize( f->getSupport(), subIdSizeList );
           for ( idsize = subIdSizeList.begin(); idsize != subIdSizeList.end(); idsize++ )
@@ -4005,7 +4027,7 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
         fcount.stop();
       }
 
-      FIELD_* f = *itF;
+      const FIELD_* f = *itF;
       int id1 = 1;
       int iComp, nbComp = f->getNumberOfComponents();
 
@@ -4036,7 +4058,7 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
           mapMedToGibi[compMedName] = compGibiName;
         }
 
-        compMedName = names[iField] + "." + compMedName;
+        compMedName = f->getName() + "." + compMedName;
         nameGIBItoMED aMEDName;
         aMEDName.med_name = compMedName;
         aMEDName.gibi_pile = 27; // PILE_STRINGS
@@ -4077,11 +4099,11 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
         //throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "GibiDriver don't support Field with Gauss point"));
 
         if ( f->getInterlacingType() == MED_NO_INTERLACE )
-          writeDataSection( gibi, static_cast<FIELD<double,NoInterlace  > * >(f), id1, id2 );
+          writeDataSection( gibi, static_cast<const FIELD<double,NoInterlace  > * >(f), id1, id2 );
         else if ( f->getInterlacingType() == MED_FULL_INTERLACE )
-          writeDataSection( gibi, static_cast<FIELD<double,FullInterlace> * >(f), id1, id2 );
+          writeDataSection( gibi, static_cast<const FIELD<double,FullInterlace> * >(f), id1, id2 );
         else
-          writeDataSection( gibi, static_cast<FIELD<double,NoInterlaceByType> * >(f), id1, id2 );
+          writeDataSection( gibi, static_cast<const FIELD<double,NoInterlaceByType> * >(f), id1, id2 );
 
         id1 = id2;
       }

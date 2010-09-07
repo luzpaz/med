@@ -863,10 +863,8 @@ inline MED_EN::med_type_champ FIELD_::getValueType () const
 
 namespace MEDMEM {
 
-  template<class T2> class MED_FIELD_RDONLY_DRIVER21;
-  template<class T2> class MED_FIELD_WRONLY_DRIVER21;
-  template<class T2> class MED_FIELD_RDONLY_DRIVER22;
-  template<class T2> class MED_FIELD_WRONLY_DRIVER22;
+  template<class T2> class MED_FIELD_RDONLY_DRIVER;
+  template<class T2> class MED_FIELD_WRONLY_DRIVER;
   template<class T2> class VTK_FIELD_DRIVER;
 
 
@@ -892,7 +890,7 @@ protected:
 
   // MESH, to be used for field reading from a file (if desired to link
   // to existing support instead of new support creation for the field)
-  MESH* _mesh;
+  GMESH* _mesh;
 
   // extrema values
   T _vmin;
@@ -918,7 +916,7 @@ public:
   FIELD(driverTypes driverType,
         const string & fileName, const string & fieldDriverName,
         const int iterationNumber=-1, const int orderNumber=-1,
-        MESH* mesh = 0)
+        GMESH* mesh = 0)
     throw (MEDEXCEPTION);
   FIELD(const SUPPORT * Support, driverTypes driverType,
         const string & fileName="", const string & fieldName="",
@@ -971,10 +969,8 @@ public:
   double integral(const SUPPORT *subSupport=NULL) const throw (MEDEXCEPTION);
   FIELD* extract(const SUPPORT *subSupport) const throw (MEDEXCEPTION);
 
-  friend class MED_FIELD_RDONLY_DRIVER21<T>;
-  friend class MED_FIELD_WRONLY_DRIVER21<T>;
-  friend class MED_FIELD_RDONLY_DRIVER22<T>;
-  friend class MED_FIELD_WRONLY_DRIVER22<T>;
+  friend class MED_FIELD_RDONLY_DRIVER<T>;
+  friend class MED_FIELD_WRONLY_DRIVER<T>;
   friend class VTK_FIELD_DRIVER<T>;
   //friend class MED_FIELD_RDWR_DRIVER  <T>;
 
@@ -994,8 +990,9 @@ public:
 
   inline void read(int index=0);
   inline void read(const GENDRIVER & genDriver);
-  inline void write(int index=0, const string & driverName = "");
+  inline void write(int index=0);
   inline void write(const GENDRIVER &);
+  inline void write(driverTypes driverType, const std::string& filename);
 
   inline void writeAppend(int index=0, const string & driverName = "");
   inline void writeAppend(const GENDRIVER &);
@@ -2477,7 +2474,7 @@ double FIELD<T, INTERLACING_TAG>::normL2(int component,
       //Most frequently the FIELD is on the whole mesh and
       // there is no need in optimizing iterations from supporting nodes-> back to cells,
       // so we iterate just on all cells
-      MESH * mesh = getSupport()->getMesh();
+      const MESH * mesh = getSupport()->getMesh()->convertInMESH();
       const int nbCells = mesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
       const int *C = mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
       const int *iC = mesh->getConnectivityIndex(MED_NODAL,MED_CELL);
@@ -2498,6 +2495,7 @@ double FIELD<T, INTERLACING_TAG>::normL2(int component,
         integrale += (curCellValue * curCellValue) * std::abs(*vol);
         totVol+=std::abs(*vol);
       }
+      mesh->removeReference();
     }
     else
     {
@@ -2560,7 +2558,7 @@ double FIELD<T, INTERLACING_TAG>::normL2(const FIELD<double, FullInterlace> * p_
       //Most frequently the FIELD is on the whole mesh and
       // there is no need in optimizing iterations from supporting nodes-> back to cells,
       // so we iterate just on all cells
-      MESH * mesh = getSupport()->getMesh();
+      const MESH * mesh = getSupport()->getMesh()->convertInMESH();
       const int nbCells = mesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
       const int *C = mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
       const int *iC = mesh->getConnectivityIndex(MED_NODAL,MED_CELL);
@@ -2585,6 +2583,7 @@ double FIELD<T, INTERLACING_TAG>::normL2(const FIELD<double, FullInterlace> * p_
         }
         totVol+=std::abs(*vol);
       }
+      mesh->removeReference();
       if ( nbCells > 0 && totVol == 0.)
         throw MEDEXCEPTION("can't compute sobolev norm : "
                            "none of elements has values on all it's nodes");
@@ -3040,12 +3039,12 @@ FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
   was created by MEDMEM, and so name of profile contains name of corresponding support.
 */
 template <class T, class INTERLACING_TAG>
-FIELD<T,INTERLACING_TAG>::FIELD(driverTypes driverType,
+FIELD<T,INTERLACING_TAG>::FIELD(driverTypes    driverType,
                                 const string & fileName,
                                 const string & fieldDriverName,
-                                const int iterationNumber,
-                                const int orderNumber,
-                                MESH* mesh)
+                                const int      iterationNumber,
+                                const int      orderNumber,
+                                GMESH*         mesh)
   throw (MEDEXCEPTION) :FIELD_()
 {
   int current;
@@ -3098,12 +3097,14 @@ template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::~FIELD()
   const char* LOC = " Destructeur FIELD<T, INTERLACING_TAG>::~FIELD()";
   BEGIN_OF_MED(LOC);
   SCRUTE_MED(this);
-  if (_value) delete _value;
+  if (_value) delete _value; _value=0;
   locMap::const_iterator it;
   for ( it = _gaussModel.begin();it != _gaussModel.end(); it++ )
     delete (*it).second;
+  _gaussModel.clear();
   if(_mesh)
     _mesh->removeReference();
+  _mesh=0;
   END_OF_MED(LOC);
 }
 
@@ -3366,14 +3367,13 @@ int driver_handle = mesh.addDriver(MED_DRIVER, "output.med", "Mesh");
 mesh.write(driver_handle);
 \endverbatim
 */
-template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::write(int index/*=0*/, const string & driverName /*= ""*/)
+template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::write(int index/*=0*/)
 {
   const char * LOC = "FIELD<T,INTERLACING_TAG>::write(int index=0, const string & driverName = \"\") : ";
   BEGIN_OF_MED(LOC);
 
   if( index>=0 && index<_drivers.size() && _drivers[index] ) {
     _drivers[index]->open();
-    if (driverName != "") _drivers[index]->setFieldName(driverName);
     _drivers[index]->write();
     _drivers[index]->close();
   }
@@ -3411,25 +3411,45 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
 }
 
 /*!
-  \internal
-  Write FIELD with the driver which is equal to the given driver.
-
-  Use by MED object.
+  Write FIELD with the given driver.
 */
-template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::write(const GENDRIVER & genDriver)
+template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::write(const GENDRIVER & driver)
 {
   const char* LOC = " FIELD<T, INTERLACING_TAG>::write(const GENDRIVER &) : ";
   BEGIN_OF_MED(LOC);
 
-  for (unsigned int index=0; index < _drivers.size(); index++ )
-    if ( *_drivers[index] == genDriver ) {
-      _drivers[index]->open();
-      _drivers[index]->write();
-      _drivers[index]->close();
-    }
+  // For the case where driver does not know about me since it has been created through
+  // constructor witout parameters: create newDriver knowing me and get missing data
+  // from driver using merge()
+  GENDRIVER* newDriver = DRIVERFACTORY::buildDriverForField(driver.getDriverType(),
+                                                            driver.getFileName(), this, WRONLY);
+  _drivers.push_back(newDriver); // if newDriver->write() throws, we have a chance to delete it
+
+  newDriver->merge( driver );
+
+  newDriver->open();
+  newDriver->write();
+  newDriver->close();
 
   END_OF_MED(LOC);
+}
 
+/*!
+  Write FIELD with driver of the given type.
+*/
+template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::write(driverTypes driverType, const std::string& filename)
+{
+  const char* LOC = " FIELD<T, INTERLACING_TAG>::write(driverTypes driverType, const std::string& filename) : ";
+  BEGIN_OF_MED(LOC);
+
+  GENDRIVER* newDriver = DRIVERFACTORY::buildDriverForField(driverType, filename, this, WRONLY);
+  _drivers.push_back(newDriver); // if newDriver->write() throws, we have a chance to delete it
+
+  newDriver->open();
+  newDriver->write();
+  newDriver->close();
+
+  END_OF_MED(LOC);
 }
 
 /*!
@@ -3654,14 +3674,14 @@ template <class T,class INTERLACING_TAG> inline
 const T*
 FIELD<T,INTERLACING_TAG>::getRow(int i) const throw (MEDEXCEPTION)
 {
-  const char * LOC = "FIELD<T,INTERLACING_TAG>::getRow(int i) : ";
+  const char* LOC; LOC = "FIELD<T,INTERLACING_TAG>::getRow(int i) : ";
   //BEGIN_OF_MED(LOC);
 
   int valIndex=-1;
   if (_support)
     valIndex = _support->getValIndFromGlobalNumber(i);
   else
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not define |" ));
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
 
   //cout << endl << "getRow Valindex : " << valIndex << endl;
   if ( getGaussPresence() )
@@ -3764,10 +3784,10 @@ inline int FIELD<T, INTERLACIN_TAG>::getValueByTypeLength(int t) const throw (ME
 template <class T, class INTERLACIN_TAG>
 inline const T* FIELD<T, INTERLACIN_TAG>::getValueByType(int t) const throw (MEDEXCEPTION)
 {
-  const char * LOC ="getValueByType() : ";
+  //const char * LOC ="getValueByType() : ";
   //BEGIN_OF_MED(LOC);
   if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE_BY_TYPE )
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"not MED_NO_INTERLACE_BY_TYPE field" ));
+    throw MEDEXCEPTION(LOCALIZED("getValueByType() : not MED_NO_INTERLACE_BY_TYPE field" ));
 
   if ( getGaussPresence() ) {
     ArrayNoByTypeGauss* array = static_cast<ArrayNoByTypeGauss *>(_value);
@@ -4268,7 +4288,7 @@ void FIELD<T, INTERLACING_TAG>::fillFromAnalytic(myFuncType f) throw (MEDEXCEPTI
   if (_support == (SUPPORT *) NULL)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No Support defined."));
 
-  MESH * mesh = _support->getMesh();
+  GMESH * mesh = _support->getMesh();
   int spaceDim = mesh->getSpaceDimension();
   const double * coord;
 
@@ -4279,15 +4299,16 @@ void FIELD<T, INTERLACING_TAG>::fillFromAnalytic(myFuncType f) throw (MEDEXCEPTI
   bool deallocateXyz=false;
   if(_support->getEntity()==MED_EN::MED_NODE)
     {
+      const MESH * unstructured = _support->getMesh()->convertInMESH();
       if (_support->isOnAllElements())
         {
-          coord=mesh->getCoordinates(MED_EN::MED_NO_INTERLACE);
+          coord=unstructured->getCoordinates(MED_EN::MED_NO_INTERLACE);
           for(i=0; i<spaceDim; i++)
             xyz[i]=(double *)coord+i*_numberOfValues;
         }
       else
         {
-          coord = mesh->getCoordinates(MED_EN::MED_FULL_INTERLACE);
+          coord = unstructured->getCoordinates(MED_EN::MED_FULL_INTERLACE);
           const int * nodesNumber=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
           for(i=0; i<spaceDim; i++)
             xyz[i]=new double[_numberOfValues];
@@ -4298,6 +4319,7 @@ void FIELD<T, INTERLACING_TAG>::fillFromAnalytic(myFuncType f) throw (MEDEXCEPTI
                 xyz[j][i]=coord[(nodesNumber[i]-1)*spaceDim+j];
             }
         }
+      unstructured->removeReference();
     }
   else
     {
