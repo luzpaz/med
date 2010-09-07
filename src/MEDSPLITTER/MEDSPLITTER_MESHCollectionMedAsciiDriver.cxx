@@ -37,7 +37,6 @@
 //MEDMEM includes
 #include "MEDMEM_DriversDef.hxx"
 #include "MEDMEM_Mesh.hxx"
-#include "MEDMEM_Med.hxx"
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_CellModel.hxx"

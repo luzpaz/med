@@ -84,9 +84,6 @@ def add_one(i):
 fileNames.append("mesh.med")
 meshNames.append("Mesh 1")
 
-fileNames.append("mesh_import22.med")
-meshNames.append("Mesh 1")
-
 #
 # from other source including LGLS ones
 #
@@ -94,19 +91,10 @@ meshNames.append("Mesh 1")
 fileNames.append("maillage_UniSegFam.med")
 meshNames.append("maillage_CHEMVAL_100elts")
 
-fileNames.append("maillage_UniSegFam_import22.med")
-meshNames.append("maillage_CHEMVAL_100elts")
-
 fileNames.append("carre_en_quad4.med")
 meshNames.append("carre_en_quad4")
 
-fileNames.append("carre_en_quad4_import22.med")
-meshNames.append("carre_en_quad4")
-
 fileNames.append("cube_hexa8.med")
-meshNames.append("CUBE_EN_HEXA8")
-
-fileNames.append("cube_hexa8_import22.med")
 meshNames.append("CUBE_EN_HEXA8")
 
 ##fileNames.append("test19.med")
@@ -121,25 +109,13 @@ meshNames.append("CUBE_EN_HEXA8")
 fileNames.append("carre_en_quad4_seg2.med")
 meshNames.append("carre_en_quad4_seg2")
 
-fileNames.append("carre_en_quad4_seg2_import22.med")
-meshNames.append("carre_en_quad4_seg2")
-
 fileNames.append("cube_hexa8_quad4.med")
-meshNames.append("CUBE_EN_HEXA8_QUAD4")
-
-fileNames.append("cube_hexa8_quad4_import22.med")
 meshNames.append("CUBE_EN_HEXA8_QUAD4")
 
 fileNames.append("pointe.med")
 meshNames.append("maa1")
 
-fileNames.append("pointe_import22.med")
-meshNames.append("maa1")
-
 fileNames.append("Mistrat.med")
-meshNames.append("Mistrat_Hexa")
-
-fileNames.append("Mistrat_import22.med")
 meshNames.append("Mistrat_Hexa")
 
 ##fileNames.append("TimeStamps.med")
@@ -676,20 +652,11 @@ for i in range(nbOfFiles):
 
 
     print "Saving in file the mesh under the med and vtk format"
-    medFileVersion = getMedFileVersionForWriting()
-    print "Med File Version For Writing ",medFileVersion
+    #medFileVersion = getMedFileVersionForWriting()
+    #print "Med File Version For Writing ",medFileVersion
     print "Med V21 file = ",medV21FileName
     print "Med V22 file = ",medV22FileName
     print "vtk file = ",vtkFileName
-
-    if (medFileVersion == V22):
-        setMedFileVersionForWriting(V21)
-
-    idMedV21 = mesh.addDriver(MED_DRIVER,medV21FileName,mesh.getName(),RDWR)
-    mesh.write(idMedV21)
-
-    if (medFileVersion == V21):
-        setMedFileVersionForWriting(V22)
 
     idMedV22 = mesh.addDriver(MED_DRIVER,medV22FileName,mesh.getName(),RDWR)
     mesh.write(idMedV22)
@@ -709,21 +676,12 @@ for i in range(nbOfFiles):
     print ""
 
     print "Saving in file the cell barycenter field under the med and vtk format"
-    medFileVersion = getMedFileVersionForWriting()
-    print "Med File Version For Writing ",medFileVersion
+    #medFileVersion = getMedFileVersionForWriting()
+    #print "Med File Version For Writing ",medFileVersion
 
-    print "Med V21 file = ",medV21FileName
+    #print "Med V21 file = ",medV21FileName
     print "Med V22 file = ",medV22FileName
     print "vtk file = ",vtkFileName
-
-    if (medFileVersion == V22):
-        setMedFileVersionForWriting(V21)
-
-    idMedV21 = barycenter.addDriver(MED_DRIVER,medV21FileName,barycenter.getName())
-    barycenter.write(idMedV21)
-
-    if (medFileVersion == V21):
-        setMedFileVersionForWriting(V22)
 
     idMedV22 = barycenter.addDriver(MED_DRIVER,medV22FileName,barycenter.getName())
     barycenter.write(idMedV22)
@@ -744,20 +702,11 @@ for i in range(nbOfFiles):
         print ""
 
         print "Saving in file the cell volume field under the med and vtk format"
-        medFileVersion = getMedFileVersionForWriting()
-        print "Med File Version For Writing ",medFileVersion
-        print "Med V21 file = ",medV21FileName
+        #medFileVersion = getMedFileVersionForWriting()
+        #print "Med File Version For Writing ",medFileVersion
+        #print "Med V21 file = ",medV21FileName
         print "Med V22 file = ",medV22FileName
         print "vtk file = ",vtkFileName
-
-        if (medFileVersion == V22):
-            setMedFileVersionForWriting(V21)
-
-        idMedV21 = volume.addDriver(MED_DRIVER,medV21FileName,volume.getName())
-        volume.write(idMedV21)
-
-        if (medFileVersion == V21):
-            setMedFileVersionForWriting(V22)
 
         idMedV22 = volume.addDriver(MED_DRIVER,medV22FileName,volume.getName())
         volume.write(idMedV22)
@@ -787,19 +736,10 @@ for i in range(nbOfFiles):
         print ""
 
         print "Saving in file the face normal field under the med format"
-        medFileVersion = getMedFileVersionForWriting()
-        print "Med File Version For Writing ",medFileVersion
-        print "Med V21 file = ",medV21FileName
+        #medFileVersion = getMedFileVersionForWriting()
+        #print "Med File Version For Writing ",medFileVersion
+        #print "Med V21 file = ",medV21FileName
         print "Med V22 file = ",medV22FileName
-
-        if (medFileVersion == V22):
-            setMedFileVersionForWriting(V21)
-
-        idMedV21 = normal.addDriver(MED_DRIVER,medV21FileName,normal.getName())
-        normal.write(idMedV21)
-
-        if (medFileVersion == V21):
-            setMedFileVersionForWriting(V22)
 
         idMedV22 = normal.addDriver(MED_DRIVER,medV22FileName,normal.getName())
         normal.write(idMedV22)
@@ -819,22 +759,12 @@ for i in range(nbOfFiles):
         print ""
 
         print "Saving in file the cell area field under the med and vtk format"
-        medFileVersion = getMedFileVersionForWriting()
-        print "Med File Version For Writing ",medFileVersion
-        print "Med V21 file = ",medV21FileName
+        #medFileVersion = getMedFileVersionForWriting()
+        #print "Med File Version For Writing ",medFileVersion
+        #print "Med V21 file = ",medV21FileName
         print "Med V22 file = ",medV22FileName
         print "vtk file = ",vtkFileName
 
-
-        if (medFileVersion == V22):
-            setMedFileVersionForWriting(V21)
-
-        idMedV21 = area.addDriver(MED_DRIVER,medV21FileName,area.getName())
-        area.write(idMedV21)
-
-
-        if (medFileVersion == V21):
-            setMedFileVersionForWriting(V22)
 
         idMedV22 = area.addDriver(MED_DRIVER,medV22FileName,area.getName())
         area.write(idMedV22)
@@ -863,20 +793,10 @@ for i in range(nbOfFiles):
         print ""
 
         print "Saving in file the face normal field under the med format"
-        medFileVersion = getMedFileVersionForWriting()
-        print "Med File Version For Writing ",medFileVersion
-        print "Med V21 file = ",medV21FileName
+        #medFileVersion = getMedFileVersionForWriting()
+        #print "Med File Version For Writing ",medFileVersion
+        #print "Med V21 file = ",medV21FileName
         print "Med V22 file = ",medV22FileName
-
-        if (medFileVersion == V22):
-            setMedFileVersionForWriting(V21)
-
-        idMedV21 = normal.addDriver(MED_DRIVER,medV21FileName,normal.getName())
-        normal.write(idMedV21)
-
-
-        if (medFileVersion == V21):
-            setMedFileVersionForWriting(V22)
 
         idMedV22 = normal.addDriver(MED_DRIVER,medV22FileName,normal.getName())
         normal.write(idMedV22)
@@ -915,13 +835,8 @@ for i in range(nbOfFiles):
     print ""
 
     if (extensionFile == "med"):
-        md = MED()
+        md = MEDFILEBROWSER(fileFull)
 
-        mdDriver = MED_MED_RDONLY_DRIVER(fileFull,md)
-
-        mdDriver.open()
-        mdDriver.readFileStruct()
-        mdDriver.close()
         nbMeshes = md.getNumberOfMeshes()
         nbFields = md.getNumberOfFields()
 
@@ -945,31 +860,28 @@ for i in range(nbOfFiles):
 
 #        mesh_name = md.getMeshName(0)
         mesh_name = meshNames[i]
-        mesh = md.getMesh(mesh_name)
-        mesh.read()
+        if md.isStructuredMesh( mesh_name ):
+            mesh = GRID(MED_DRIVER,md.getFileName(),mesh_name)
+        else:
+            mesh = MESH(MED_DRIVER,md.getFileName(),mesh_name)
         spaceDim = mesh.getSpaceDimension()
         meshDim = mesh.getMeshDimension()
         nbNodes = mesh.getNumberOfNodes()
         print "The first mesh",mesh_name,"is a",spaceDim,"D mesh on a",meshDim,"D geometry and has",nbNodes,"Nodes"
 
         if (nbFields>0):
-            print "Updating supports in the Med Object"
-            md.updateSupport()
             print "Field(s) Analysis "
             for ifld in range(nbFields):
                 field_name = md.getFieldName(ifld)
-                nbOfIt = md.getFieldNumberOfIteration(field_name)
-                print "The",print_ord(ifld),"field is",field_name,"with",nbOfIt,"iteration(s)"
-                for j in range(nbOfIt):
-                    dtitfield = md.getFieldIteration(field_name,j)
+                dtits = md.getFieldIteration(field_name)
+                print "The",print_ord(ifld),"field is",field_name,"with",len(dtits),"iteration(s)"
+                for dtitfield in dtits:
                     dt = dtitfield.getdt()
                     it = dtitfield.getit()
-                    field = md.getField(field_name,dt,it)
-                    type = field.getValueType()
+                    type = md.getFieldType(field_name)
                     print "     * Iteration:",dt,"Order number:",it,"Type:",type
                     if type == MED_INT32:
-                        fieldint = createFieldIntFromField(field)
-                        fieldint.read()
+                        fieldint = FIELDINT(MED_DRIVER,md.getFileName(),field_name,dt,it,mesh)
                         name = fieldint.getName()
                         desc = fieldint.getDescription()
                         nbOfComp = fieldint.getNumberOfComponents()
@@ -1181,8 +1093,7 @@ for i in range(nbOfFiles):
                         fieldint2.applyPyFunc(add_one)
                         print " CB:f2+1: ",fieldint2.getValue()
                     elif type == MED_REEL64:
-                        fielddouble = createFieldDoubleFromField(field)
-                        fielddouble.read()
+                        fielddouble = FIELDDOUBLE(MED_DRIVER,md.getFileName(),field_name,dt,it,mesh)
                         name = fielddouble.getName()
                         desc = fielddouble.getDescription()
                         nbOfComp = fielddouble.getNumberOfComponents()

@@ -92,7 +92,7 @@ void getNodeConnectivity( const int*  cell_list,int nb_cells,MED_EN::medEntityMe
 void getPolygonNodeConnectivity(const int* cell_list,int nb_cells,MED_EN::medEntityMesh entity,
                                 vector<int>& type_connectivity, vector<int>& connectivity_index) const;
 void getPolyhedraNodeConnectivity(const int* cell_list,int nb_cells,MED_EN::medEntityMesh entity,
-                                  vector<int>& type_connectivity, vector<int>& connectivity_index, vector<int>& face_connectivity_index) const;
+                                  vector<int>& type_connectivity, vector<int>& connectivity_index/*, vector<int>& face_connectivity_index*/) const;
 
 void getFaceConnectivity( const int*  cell_list,int nb_cells,MED_EN::medEntityMesh,MED_EN::medGeometryElement type, int* type_connectivity) const ;
 

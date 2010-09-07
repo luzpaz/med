@@ -112,7 +112,7 @@ namespace MEDSPLITTER {
                 inline  int convertNodeToGlobal(int ip,int icell) const
                 {
                         //return m_node_loc_to_glob.find(make_pair(ip,icell))->second;
-      return m_node_loc_to_glob[ip][icell-1];
+                  return icell < 1 ? icell : m_node_loc_to_glob[ip][icell-1];
                 }
 
                 //!converting face local numbering to global
@@ -137,8 +137,9 @@ namespace MEDSPLITTER {
 
                 inline  void convertNodeToGlobal(int ip, const int* local, int n, int* global)const
                 {
-                        for (int i=0; i<n; i++)
-        global[i]=m_node_loc_to_glob[ip][local[i]-1];
+                  for (int i=0; i<n; i++)
+                    //global[i]=m_node_loc_to_glob[ip][local[i]-1];
+                    global[i]=convertNodeToGlobal(ip,local[i]);
                                 //global[i]=m_node_loc_to_glob.find(make_pair(ip,local[i]))->second;
                 }
 

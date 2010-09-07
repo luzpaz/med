@@ -27,7 +27,7 @@ import os
 print "reading files"
 
 data_dir = os.getenv("MED_ROOT_DIR")
-filename_rd = os.path.join( data_dir, "share/salome/resources/med/pointe_import22.med")
+filename_rd = os.path.join( data_dir, "share/salome/resources/med/pointe.med")
 meshname="maa1"
 
 collection = MESHCollection(filename_rd,meshname)

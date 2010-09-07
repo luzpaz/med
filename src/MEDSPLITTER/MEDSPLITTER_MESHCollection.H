@@ -280,7 +280,7 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
   {
     cout << "old field deletion" <<endl;
     old_fields[i]->removeReference();
-    old_supports[i]->removeReference();
+    //old_supports[i]->removeReference();//as we did not addReference() neither created it
   }
 }
 

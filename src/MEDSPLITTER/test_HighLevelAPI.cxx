@@ -25,7 +25,7 @@ int main()
 {
         string testname="MEDSPLITTER - test #3 -";
         
-        char filename[100] = "../../share/salome/resources/med/carre_en_quad4_import22.med";
+        char filename[100] = "../../share/salome/resources/med/carre_en_quad4.med";
         char meshname[20]  = "carre_en_quad4";
         char output[100]="./tests/API_test";
         int is_distributed=0;

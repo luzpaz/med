@@ -38,9 +38,8 @@ namespace MEDSPLITTER {
 class Graph {
 public:
   typedef enum {METIS,SCOTCH} splitter_type;
-  %extend {
-    Graph() {return 0;}
-  }
+private:
+  Graph();
 };
 }
 

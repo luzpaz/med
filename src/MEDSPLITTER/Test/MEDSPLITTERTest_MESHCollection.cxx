@@ -94,7 +94,7 @@ using namespace MEDMEM;
  
 void MEDSPLITTERTest::testMESHCollection_constructor()
 {
-  string filename_rd                = getResourceFile("carre_en_quad4_import22.med");
+  string filename_rd                = getResourceFile("carre_en_quad4.med");
   string fileNotExist_rd            = "notExist22.med";
   string emptyfilename              = "";
 
@@ -125,7 +125,7 @@ void MEDSPLITTERTest::testMESHCollection_constructor()
 //! Testing basic manipulation for a sequential file 
 void MEDSPLITTERTest::testMESHCollection_read_seq()
 {
-  string filename_rd                = getResourceFile("pointe_import22.med");
+  string filename_rd                = getResourceFile("pointe.med");
   string filename_seq_wr            = makeTmpFile("myWrField_seq_pointe22");
   string filename_seq_med           = makeTmpFile("myWrField_seq_pointe221.med");
   
@@ -167,7 +167,7 @@ void MEDSPLITTERTest::testMESHCollection_read_seq()
 
 void MEDSPLITTERTest::testMESHCollection_read_para()
 {
-  string filename_rd                = getResourceFile("pointe_import22.med");
+  string filename_rd                = getResourceFile("pointe.med");
   string filename_para_wr           = makeTmpFile("myWrField_para_pointe22_");
   string filename_xml               = makeTmpFile("myWrField_para_pointe22_.xml");
   string filename_para_med0         = makeTmpFile("myWrField_para_pointe22_1.med");
@@ -246,7 +246,7 @@ void MEDSPLITTERTest::testMESHCollection_read_para()
 
 void MEDSPLITTERTest::testMESHCollection_square()
 {
-  string filename_rd                = getResourceFile("carre_en_quad4_import22.med");
+  string filename_rd                = getResourceFile("carre_en_quad4.med");
   string filename_wr                = makeTmpFile("carre_split");
   string filename_wr_1              = makeTmpFile("carre_split1.med");
   string filename_wr_2              = makeTmpFile("carre_split2.med");
@@ -407,7 +407,7 @@ void MEDSPLITTERTest::testMESHCollection_square()
 
 void MEDSPLITTERTest::testMESHCollection_square_with_faces()
 {
-  string filename_rd                = getResourceFile("carre_en_quad4_import22.med");
+  string filename_rd                = getResourceFile("carre_en_quad4.med");
   string filename_wr                = makeTmpFile("carre_split_faces");
   string filename_wr_1              = makeTmpFile("carre_split_faces1.med");
   string filename_wr_2              = makeTmpFile("carre_split_faces2.med");
@@ -710,7 +710,7 @@ void MEDSPLITTERTest::testMESHCollection_indivisible()
 
 void MEDSPLITTERTest::testMESHCollection_user_partition()
 {
-  string filename_rd                = getResourceFile("carre_en_quad4_import22.med");
+  string filename_rd                = getResourceFile("carre_en_quad4.med");
   string filename_wr                = makeTmpFile("carre_split_user");
   string filename_wr_1              = makeTmpFile("carre_split_user1.med");
   string filename_wr_2              = makeTmpFile("carre_split_user2.med");
@@ -879,7 +879,7 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
  
 void MEDSPLITTERTest::testMESHCollection_complete_sequence()
 {
-  string filename_rd                = getResourceFile("pointe_import22.med");
+  string filename_rd                = getResourceFile("pointe.med");
   string filename_para_wr           = makeTmpFile("myWrField_para1_pointe22_");
   string filename_para_med1         = makeTmpFile("myWrField_para1_pointe22_1.med");
   string filename_para_med2         = makeTmpFile("myWrField_para1_pointe22_2.med");
@@ -903,8 +903,8 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
   aRemover.Register(filename_seq_wr);
   aRemover.Register(filename_seq_wr+".xml");
   aRemover.Register(filename_seq_med);
-  
-  
+
+
   string meshname="maa1";
   MESHCollection collection(filename_rd,meshname);
   Topology* topo2;
@@ -915,9 +915,9 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
   CPPUNIT_FAIL("METIS is not available, further test execution is not possible.");
 #endif
   MESHCollection new_collection(collection, topo2);
-        new_collection.setDriverType(MEDSPLITTER::MedAscii);
+  new_collection.setDriverType(MEDSPLITTER::MedAscii);
   new_collection.write(filename_para_wr);
-    
+
   MESHCollection new_collection2(filename_para_wr);
   CPPUNIT_ASSERT_EQUAL(collection.getName(),new_collection2.getName());
   Topology* topo3;
@@ -929,7 +929,7 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
 #endif
   MESHCollection new_collection3(new_collection2,topo3);
   CPPUNIT_ASSERT_EQUAL(topo3->nbCells(),topo2->nbCells());
-        new_collection3.setDriverType(MEDSPLITTER::MedAscii);
+  new_collection3.setDriverType(MEDSPLITTER::MedAscii);
   new_collection3.write(filename_para2_wr);
 
   MESHCollection new_collection4(filename_para2_wr);
@@ -1110,12 +1110,12 @@ void MEDSPLITTERTest::testMESHCollection_families()
   MESHCollection* collection = new MESHCollection (filename_rd,meshname);
   MEDSPLITTER::Topology* topo = collection->createPartition(2,Graph::METIS);
   MESHCollection* new_collection = new MESHCollection (*collection, topo, true, true);
-        new_collection->setSubdomainBoundaryCreates(true);
+  new_collection->setSubdomainBoundaryCreates(true);
   //collection.write("/export/home/test_splitter");
   new_collection->write(filename_wr);
   new_collection->castAllFields(*collection);
 
-
+  delete topo;
   delete collection;       
   delete new_collection;
 
@@ -1127,9 +1127,9 @@ void MEDSPLITTERTest::testMESHCollection_families()
   int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
 
   CPPUNIT_ASSERT_EQUAL(nbelem1+nbelem2,2020);
-  
-  
-  
+
+
+
   //testing number of joints
   med_2_3::med_idt fid1 = med_2_3::MEDouvrir(const_cast<char*> (filename_wr_1.c_str()),med_2_3::MED_LECTURE);
   med_2_3::med_idt fid2 = med_2_3::MEDouvrir(const_cast<char*> (filename_wr_2.c_str()),med_2_3::MED_LECTURE);
@@ -1137,9 +1137,9 @@ void MEDSPLITTERTest::testMESHCollection_families()
   int nj2= med_2_3::MEDnJoint(fid2, meshname2);
   CPPUNIT_ASSERT_EQUAL(nj1,1);
   CPPUNIT_ASSERT_EQUAL(nj2,1);
-       
+
   //testing distant domains
-    
+
   char desc1[MED_TAILLE_DESC+1];
   char maa_dist1[MED_TAILLE_NOM+1], jn1[MED_TAILLE_NOM+1];
   char desc2[MED_TAILLE_DESC+1], maa_dist2[MED_TAILLE_NOM+1], jn2[MED_TAILLE_NOM+1];
@@ -1148,16 +1148,16 @@ void MEDSPLITTERTest::testMESHCollection_families()
   med_2_3::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
   CPPUNIT_ASSERT_EQUAL(dom1,1);
   CPPUNIT_ASSERT_EQUAL(dom2,0);
-  
 
-        int nbEdgesFamilies1= med_2_3::MEDnFam(fid1, meshname1);
-        int nbEdgesFamilies2= med_2_3::MEDnFam(fid2, meshname2);
 
-        CPPUNIT_ASSERT_EQUAL(nbEdgesFamilies1,7); // six initial families + a joint
-        CPPUNIT_ASSERT_EQUAL(nbEdgesFamilies2,7); // six initial families + a joint
+  int nbEdgesFamilies1= med_2_3::MEDnFam(fid1, meshname1);
+  int nbEdgesFamilies2= med_2_3::MEDnFam(fid2, meshname2);
 
-        string fam_name = mesh1.getFamily(MED_EN::MED_EDGE,1)->getName();
-        char test_name[MED_TAILLE_NOM]="Sortie";
-        CPPUNIT_ASSERT(strcmp(fam_name.c_str(),test_name)==0);
-       
+  CPPUNIT_ASSERT_EQUAL(nbEdgesFamilies1,7); // six initial families + a joint
+  CPPUNIT_ASSERT_EQUAL(nbEdgesFamilies2,7); // six initial families + a joint
+
+  string fam_name = mesh1.getFamily(MED_EN::MED_EDGE,1)->getName();
+  char test_name[MED_TAILLE_NOM]="Sortie";
+  CPPUNIT_ASSERT(strcmp(fam_name.c_str(),test_name)==0);
+
 }
