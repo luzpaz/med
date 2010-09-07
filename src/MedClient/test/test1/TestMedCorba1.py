@@ -25,24 +25,17 @@ import os
 BASE = os.environ["MED_ROOT_DIR"]
 BASE = os.path.join( BASE, 'share', 'salome', 'resources', 'med' )
 
+fileName = os.path.join( BASE, 'test_hydro_darcy1a_out.med' )
 fileName = os.path.join( BASE, 'pointe.med' )
 fileName = os.path.join( BASE, 'carre_en_quad4_seg2.med' )
-fileName = os.path.join( BASE, 'test_hydro_darcy1a_out.med' )
 
 # MED Mesh read from a (local) file
 
 from libMEDMEM_Swig import *
 
-md = MED()
+md = MEDFILEBROWSER(fileName)
 
-mdDriver = MED_MED_RDONLY_DRIVER(fileName, md)
-
-mdDriver.open()
-mdDriver.readFileStruct()
-mdDriver.close()
-
-mLocal = md.getMesh(md.getMeshName(0))
-mLocal.read()
+mLocal = MESH(MED_DRIVER,fileName,md.getMeshName(0))
 
 # MED Mesh recieved from a distant component (via CORBA)
 
