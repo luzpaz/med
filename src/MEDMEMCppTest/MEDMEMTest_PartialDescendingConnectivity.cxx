@@ -22,7 +22,6 @@
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_Field.hxx"
-#include "MEDMEM_Med.hxx"
 
 #include <numeric>
 
@@ -39,9 +38,7 @@ void MEDMEMTest::testPartialDescendingConnectivity()
 
   MESHING* myMesh = new MESHING;
   myMesh->setName( "TESTMESH" );
-  myMesh->setSpaceDimension(3);
   const int nNodes=8;
-  myMesh->setNumberOfNodes(nNodes);
   myMesh->setCoordinates(3, nNodes, coords, "CARTESIAN", MED_EN::MED_FULL_INTERLACE);
   string coordname[3] = { "x", "y", "z" };
   myMesh->setCoordinatesNames(coordname);
@@ -53,7 +50,6 @@ void MEDMEMTest::testPartialDescendingConnectivity()
   myMesh->setNumberOfTypes(1,MED_EN::MED_CELL);
   myMesh->setTypes(classicalTypesCell,MED_EN::MED_CELL);
   myMesh->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
-  myMesh->setMeshDimension(3);
   //Face connectivity info for classical elts
   const MED_EN::medGeometryElement classicalTypesFace[1]={MED_EN::MED_QUAD4};
   const int nbOfFaceElts[1]={6};
@@ -67,14 +63,14 @@ void MEDMEMTest::testPartialDescendingConnectivity()
   myMesh->setTypes(classicalTypesEdge,MED_EN::MED_EDGE);
   myMesh->setNumberOfElements(nbOfEdgeElts,MED_EN::MED_EDGE);
   //All cell conn
-  myMesh->setConnectivity(connNodalCellClassical,MED_EN::MED_CELL,MED_EN::MED_HEXA8);
+  myMesh->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_HEXA8,connNodalCellClassical);
   //All face conn
-  myMesh->setConnectivity(connNodalFaceClassical,MED_EN::MED_FACE,MED_EN::MED_QUAD4);
+  myMesh->setConnectivity(MED_EN::MED_FACE,MED_EN::MED_QUAD4,connNodalFaceClassical);
   //All edge conn
-  myMesh->setConnectivity(connNodalEdgeClassical,MED_EN::MED_EDGE,MED_EN::MED_SEG2);
+  myMesh->setConnectivity(MED_EN::MED_EDGE,MED_EN::MED_SEG2,connNodalEdgeClassical);
   //
-  const int *ConnNodal = myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
-  const int *ConnNodalIndex = myMesh->getConnectivityIndex(MED_NODAL,MED_CELL);
+  /*const int *ConnNodal = */myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
+  /*const int *ConnNodalIndex = */myMesh->getConnectivityIndex(MED_NODAL,MED_CELL);
 
   const int *Conn      = myMesh->getConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS);
   const int *ConnIndex = myMesh->getConnectivityIndex(MED_DESCENDING,MED_CELL);

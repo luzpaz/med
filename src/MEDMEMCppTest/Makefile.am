@@ -45,19 +45,14 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_GibiMeshDriver.cxx \
 	MEDMEMTest_Grid.cxx \
 	MEDMEMTest_Group.cxx \
-	MEDMEMTest_Med.cxx \
-	MEDMEMTest_MedFieldDriver21.cxx \
-	MEDMEMTest_MedFieldDriver22.cxx \
-	MEDMEMTest_MedMedDriver21.cxx \
-	MEDMEMTest_MedMedDriver22.cxx \
-	MEDMEMTest_MedMeshDriver21.cxx \
-	MEDMEMTest_MedMeshDriver22.cxx \
+	MEDMEMTest_MedFileBrowser.cxx \
+	MEDMEMTest_MedFieldDriver.cxx \
+	MEDMEMTest_MedMeshDriver.cxx \
 	MEDMEMTest_MedVersion.cxx \
 	MEDMEMTest_MeshAndMeshing.cxx \
 	MEDMEMTest_ModulusArray.cxx \
 	MEDMEMTest_PartialDescendingConnectivity.cxx \
 	MEDMEMTest_PointerOf.cxx \
-	MEDMEMTest_PolyhedronArray.cxx \
 	MEDMEMTest_PorflowMeshDriver.cxx \
 	MEDMEMTest_Remapper.cxx \
 	MEDMEMTest_SkyLineArray.cxx \
@@ -90,9 +85,6 @@ bin_PROGRAMS = \
 	MEDMEMTest_Family_fault \
 	MEDMEMTest_Field_fault \
 	MEDMEMTest_Grid_fault \
-	MEDMEMTest_MedFieldDriver21_fault \
-	MEDMEMTest_MedMedDriver21_fault \
-	MEDMEMTest_MedMedDriver22_fault \
 	MEDMEMTest_MeshAndMeshing_fault \
 	MEDMEMTest_Support_fault \
 	MEDMEMTest_VtkFieldDriver_fault \
@@ -105,9 +97,6 @@ dist_MEDMEMTest_Coordinate_fault_SOURCES= MEDMEMTest_Coordinate_fault.cxx
 dist_MEDMEMTest_Family_fault_SOURCES= MEDMEMTest_Family_fault.cxx
 dist_MEDMEMTest_Field_fault_SOURCES= MEDMEMTest_Field_fault.cxx
 dist_MEDMEMTest_Grid_fault_SOURCES= MEDMEMTest_Grid_fault.cxx
-dist_MEDMEMTest_MedFieldDriver21_fault_SOURCES= MEDMEMTest_MedFieldDriver21_fault.cxx
-dist_MEDMEMTest_MedMedDriver21_fault_SOURCES= MEDMEMTest_MedMedDriver21_fault.cxx
-dist_MEDMEMTest_MedMedDriver22_fault_SOURCES= MEDMEMTest_MedMedDriver22_fault.cxx
 dist_MEDMEMTest_MeshAndMeshing_fault_SOURCES= MEDMEMTest_MeshAndMeshing_fault.cxx
 dist_MEDMEMTest_Support_fault_SOURCES= MEDMEMTest_Support_fault.cxx
 dist_MEDMEMTest_VtkFieldDriver_fault_SOURCES= MEDMEMTest_VtkFieldDriver_fault.cxx

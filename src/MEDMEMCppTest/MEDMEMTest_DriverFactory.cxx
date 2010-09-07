@@ -25,15 +25,7 @@
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_GibiMeshDriver.hxx"
-#include "MEDMEM_MedFieldDriver21.hxx"
-#include "MEDMEM_MedFieldDriver22.hxx"
 #include "MEDMEM_MedFieldDriver.hxx"
-#include "MEDMEM_Med.hxx"
-#include "MEDMEM_MedMedDriver21.hxx"
-#include "MEDMEM_MedMedDriver22.hxx"
-#include "MEDMEM_MedMedDriver.hxx"
-#include "MEDMEM_MedMeshDriver21.hxx"
-#include "MEDMEM_MedMeshDriver22.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_PorflowMeshDriver.hxx"
@@ -102,16 +94,16 @@ void MEDMEMTest::testDriverFactory()
   ///////////////////////////////////////////////////////////////////////
 
   // save current version preference
-  MED_EN::medFileVersion aVersionSaved = DRIVERFACTORY::getMedFileVersionForWriting();
+//   MED_EN::medFileVersion aVersionSaved = DRIVERFACTORY::getMedFileVersionForWriting();
 
-  // check version preference changing
-  MED_EN::medFileVersion aVersionToSet =
-    (aVersionSaved == MED_EN::V22) ? MED_EN::V21 : MED_EN::V22;
-  DRIVERFACTORY::setMedFileVersionForWriting(aVersionToSet);
-  CPPUNIT_ASSERT(aVersionToSet == DRIVERFACTORY::getMedFileVersionForWriting());
+//   // check version preference changing
+//   MED_EN::medFileVersion aVersionToSet =
+//     (aVersionSaved == MED_EN::V22) ? MED_EN::V21 : MED_EN::V22;
+//   DRIVERFACTORY::setMedFileVersionForWriting(aVersionToSet);
+//   CPPUNIT_ASSERT(aVersionToSet == DRIVERFACTORY::getMedFileVersionForWriting());
 
-  // restore default version preference
-  DRIVERFACTORY::setMedFileVersionForWriting(aVersionSaved);
+//   // restore default version preference
+//   DRIVERFACTORY::setMedFileVersionForWriting(aVersionSaved);
 
   //////////////////////////////////////////////////////////////////////////
   // Test 1b: getVtkBinaryFormatForWriting & setVtkBinaryFormatForWriting //
@@ -145,111 +137,111 @@ void MEDMEMTest::testDriverFactory()
   ////////////////////////////////////////////////////////
   GENDRIVER * aDriver = NULL;
 
-  ///////////////////////////////
-  // Test 3: buildDriverForMed //
-  ///////////////////////////////
-  MED med;
+//   ///////////////////////////////
+//   // Test 3: buildDriverForMed //
+//   ///////////////////////////////
+//   //MED med;
 
-  // 3.1: MED_DRIVER
+//   // 3.1: MED_DRIVER
 
-  // rdonly
-  aDriver = DRIVERFACTORY::buildDriverForMed(MED_DRIVER, "anyfile", &med, MED_EN::RDONLY);
-//#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) See more details below for the same problem of MED_MESH_RDONLY_DRIVER
-  CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
-  CPPUNIT_ASSERT_EQUAL(MED_EN::RDONLY, aDriver->getAccessMode());
-//#endif
+//   // rdonly
+//   aDriver = DRIVERFACTORY::buildDriverForMed(MED_DRIVER, "anyfile", &med, MED_EN::RDONLY);
+// //#ifdef ENABLE_FORCED_FAILURES
+//   // (BUG) See more details below for the same problem of MED_MESH_RDONLY_DRIVER
+//   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
+//   CPPUNIT_ASSERT_EQUAL(MED_EN::RDONLY, aDriver->getAccessMode());
+// //#endif
 
-  MED_MED_RDONLY_DRIVER * aMedRDriverForMed = dynamic_cast<MED_MED_RDONLY_DRIVER *> (aDriver);
-  CPPUNIT_ASSERT(aMedRDriverForMed);
+//   MED_MED_RDONLY_DRIVER * aMedRDriverForMed = dynamic_cast<MED_MED_RDONLY_DRIVER *> (aDriver);
+//   CPPUNIT_ASSERT(aMedRDriverForMed);
 
-  delete aDriver;
+//   delete aDriver; aDriver=0;
 
-  // wronly
-  aDriver = DRIVERFACTORY::buildDriverForMed(MED_DRIVER, "anyfile", &med, MED_EN::WRONLY);
-//#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) See more details below for the same problem of MED_MESH_RDONLY_DRIVER
-  CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
-  CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
-//#endif
+//   // wronly
+//   aDriver = DRIVERFACTORY::buildDriverForMed(MED_DRIVER, "anyfile", &med, MED_EN::WRONLY);
+// //#ifdef ENABLE_FORCED_FAILURES
+//   // (BUG) See more details below for the same problem of MED_MESH_RDONLY_DRIVER
+//   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
+//   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
+// //#endif
 
-  MED_MED_WRONLY_DRIVER * aMedWDriverForMed = dynamic_cast<MED_MED_WRONLY_DRIVER *> (aDriver);
-  CPPUNIT_ASSERT(aMedWDriverForMed);
+//   MED_MED_WRONLY_DRIVER * aMedWDriverForMed = dynamic_cast<MED_MED_WRONLY_DRIVER *> (aDriver);
+//   CPPUNIT_ASSERT(aMedWDriverForMed);
 
-  delete aDriver;
+//   delete aDriver; aDriver=0;
 
-  // rdwr
-  aDriver = DRIVERFACTORY::buildDriverForMed(MED_DRIVER, "anyfile", &med, MED_EN::RDWR);
-//#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) See more details below for the same problem of MED_MESH_RDONLY_DRIVER
-  CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
-  CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
-//#endif
+//   // rdwr
+//   aDriver = DRIVERFACTORY::buildDriverForMed(MED_DRIVER, "anyfile", &med, MED_EN::RDWR);
+// //#ifdef ENABLE_FORCED_FAILURES
+//   // (BUG) See more details below for the same problem of MED_MESH_RDONLY_DRIVER
+//   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
+//   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
+// //#endif
 
-  MED_MED_RDWR_DRIVER * aMedRWDriverForMed = dynamic_cast<MED_MED_RDWR_DRIVER *> (aDriver);
-  CPPUNIT_ASSERT(aMedRWDriverForMed);
+//   MED_MED_RDWR_DRIVER * aMedRWDriverForMed = dynamic_cast<MED_MED_RDWR_DRIVER *> (aDriver);
+//   CPPUNIT_ASSERT(aMedRWDriverForMed);
 
-  delete aDriver;
+//   delete aDriver; aDriver=0;
 
-  // 3.2: GIBI_DRIVER
+//   // 3.2: GIBI_DRIVER
 
-  // rdonly
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMed(GIBI_DRIVER, "anyfile", &med, MED_EN::RDONLY),
-                       MED_EXCEPTION);
-  // wronly
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMed(GIBI_DRIVER, "anyfile", &med, MED_EN::WRONLY),
-                       MED_EXCEPTION);
-  // rdwr
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMed(GIBI_DRIVER, "anyfile", &med, MED_EN::RDWR),
-                       MED_EXCEPTION);
+//   // rdonly
+//   CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMed(GIBI_DRIVER, "anyfile", &med, MED_EN::RDONLY),
+//                        MED_EXCEPTION);
+//   // wronly
+//   CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMed(GIBI_DRIVER, "anyfile", &med, MED_EN::WRONLY),
+//                        MED_EXCEPTION);
+//   // rdwr
+//   CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMed(GIBI_DRIVER, "anyfile", &med, MED_EN::RDWR),
+//                        MED_EXCEPTION);
 
-  // 3.3: PORFLOW_DRIVER
+//   // 3.3: PORFLOW_DRIVER
 
-  // rdonly
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMed(PORFLOW_DRIVER, "anyfile", &med, MED_EN::RDONLY),
-                       MED_EXCEPTION);
-  // wronly
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMed(PORFLOW_DRIVER, "anyfile", &med, MED_EN::WRONLY),
-                       MED_EXCEPTION);
-  // rdwr
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMed(PORFLOW_DRIVER, "anyfile", &med, MED_EN::RDWR),
-                       MED_EXCEPTION);
+//   // rdonly
+//   CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMed(PORFLOW_DRIVER, "anyfile", &med, MED_EN::RDONLY),
+//                        MED_EXCEPTION);
+//   // wronly
+//   CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMed(PORFLOW_DRIVER, "anyfile", &med, MED_EN::WRONLY),
+//                        MED_EXCEPTION);
+//   // rdwr
+//   CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMed(PORFLOW_DRIVER, "anyfile", &med, MED_EN::RDWR),
+//                        MED_EXCEPTION);
 
-  // 3.4: VTK_DRIVER
+//   // 3.4: VTK_DRIVER
 
-  // rdonly
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMed(VTK_DRIVER, "anyfile", &med, MED_EN::RDONLY),
-                       MED_EXCEPTION);
+//   // rdonly
+//   CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMed(VTK_DRIVER, "anyfile", &med, MED_EN::RDONLY),
+//                        MED_EXCEPTION);
 
-  // wronly
-  aDriver = DRIVERFACTORY::buildDriverForMed(VTK_DRIVER, "anyfile", &med, MED_EN::WRONLY);
-  CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
-  // next string is commented by skl since VTK driver is
-  // created without mode
-  //CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
+//   // wronly
+//   aDriver = DRIVERFACTORY::buildDriverForMed(VTK_DRIVER, "anyfile", &med, MED_EN::WRONLY);
+//   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
+//   // next string is commented by skl since VTK driver is
+//   // created without mode
+//   //CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
-  VTK_MED_DRIVER * aVtkDriverForMed = dynamic_cast<VTK_MED_DRIVER *> (aDriver);
-  CPPUNIT_ASSERT(aVtkDriverForMed);
+//   VTK_MED_DRIVER * aVtkDriverForMed = dynamic_cast<VTK_MED_DRIVER *> (aDriver);
+//   CPPUNIT_ASSERT(aVtkDriverForMed);
 
-  delete aDriver;
+//   delete aDriver; aDriver=0;
 
-  // rdwr
-  aDriver = DRIVERFACTORY::buildDriverForMed(VTK_DRIVER, "anyfile", &med, MED_EN::RDWR);
-  CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
-  CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
+//   // rdwr
+//   aDriver = DRIVERFACTORY::buildDriverForMed(VTK_DRIVER, "anyfile", &med, MED_EN::RDWR);
+//   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
+//   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
 
-  aVtkDriverForMed = dynamic_cast<VTK_MED_DRIVER *> (aDriver);
-  CPPUNIT_ASSERT(aVtkDriverForMed);
+//   aVtkDriverForMed = dynamic_cast<VTK_MED_DRIVER *> (aDriver);
+//   CPPUNIT_ASSERT(aVtkDriverForMed);
 
-  delete aDriver;
+//   delete aDriver; aDriver=0;
 
-  // 3.5: ASCII_DRIVER
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMed(ASCII_DRIVER, "anyfile", &med, MED_EN::RDONLY),
-                       MED_EXCEPTION);
+//   // 3.5: ASCII_DRIVER
+//   CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMed(ASCII_DRIVER, "anyfile", &med, MED_EN::RDONLY),
+//                        MED_EXCEPTION);
 
-  // 3.6: NO_DRIVER
-  CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMed(NO_DRIVER, "anyfile", &med, MED_EN::RDONLY),
-                       MED_EXCEPTION);
+//   // 3.6: NO_DRIVER
+//   CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMed(NO_DRIVER, "anyfile", &med, MED_EN::RDONLY),
+//                        MED_EXCEPTION);
 
   ////////////////////////////////
   // Test 4: buildDriverForMesh //
@@ -270,7 +262,7 @@ void MEDMEMTest::testDriverFactory()
   CPPUNIT_ASSERT(aMedRDriverForMesh->getMeshName() == "my driver name");
 
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // wronly
   aDriver = DRIVERFACTORY::buildDriverForMesh
@@ -282,7 +274,7 @@ void MEDMEMTest::testDriverFactory()
   CPPUNIT_ASSERT(aMedWDriverForMesh);
   CPPUNIT_ASSERT(aMedWDriverForMesh->getMeshName() == "my driver name");
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // rdwr
   aDriver = DRIVERFACTORY::buildDriverForMesh
@@ -294,7 +286,7 @@ void MEDMEMTest::testDriverFactory()
   CPPUNIT_ASSERT(aMedRWDriverForMesh);
   CPPUNIT_ASSERT(aMedRWDriverForMesh->getMeshName() == "my driver name");
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // 4.2: GIBI_DRIVER
 
@@ -307,7 +299,7 @@ void MEDMEMTest::testDriverFactory()
   GIBI_MESH_RDONLY_DRIVER * aGibiDriverForMesh = dynamic_cast<GIBI_MESH_RDONLY_DRIVER *> (aDriver);
   CPPUNIT_ASSERT(aGibiDriverForMesh);
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // wronly
   // 0020412: [CEA 343] GIBI Driver is not usable using MESH::addDriver
@@ -321,7 +313,7 @@ void MEDMEMTest::testDriverFactory()
 
   GIBI_MESH_WRONLY_DRIVER * aGibiWRDriverForMesh = dynamic_cast<GIBI_MESH_WRONLY_DRIVER*>(aDriver);
   CPPUNIT_ASSERT(aGibiWRDriverForMesh);
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // rdwr
   // 0020412: [CEA 343] GIBI Driver is not usable using MESH::addDriver
@@ -335,7 +327,7 @@ void MEDMEMTest::testDriverFactory()
 
   GIBI_MESH_RDWR_DRIVER * aGibiRWDriverForMesh = dynamic_cast<GIBI_MESH_RDWR_DRIVER*>(aDriver);
   CPPUNIT_ASSERT(aGibiRWDriverForMesh);
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // 4.3: PORFLOW_DRIVER
 
@@ -348,7 +340,7 @@ void MEDMEMTest::testDriverFactory()
   PORFLOW_MESH_RDONLY_DRIVER * aPorflowDriverForMesh = dynamic_cast<PORFLOW_MESH_RDONLY_DRIVER *> (aDriver);
   CPPUNIT_ASSERT(aPorflowDriverForMesh);
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // wronly
   CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMesh(PORFLOW_DRIVER, "anyfile", mesh,
@@ -375,7 +367,7 @@ void MEDMEMTest::testDriverFactory()
   VTK_MESH_DRIVER * aVtkDriverForMesh = dynamic_cast<VTK_MESH_DRIVER *> (aDriver);
   CPPUNIT_ASSERT(aVtkDriverForMesh);
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // rdwr
   aDriver = DRIVERFACTORY::buildDriverForMesh
@@ -388,7 +380,7 @@ void MEDMEMTest::testDriverFactory()
   aVtkDriverForMesh = dynamic_cast<VTK_MESH_DRIVER *> (aDriver);
   CPPUNIT_ASSERT(aVtkDriverForMesh);
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // 4.5: ASCII_DRIVER
   CPPUNIT_ASSERT_THROW(DRIVERFACTORY::buildDriverForMesh(ASCII_DRIVER, "anyfile", mesh,
@@ -416,7 +408,7 @@ void MEDMEMTest::testDriverFactory()
     dynamic_cast<MED_FIELD_RDONLY_DRIVER<double> *> (aDriver);
   CPPUNIT_ASSERT(aMedRDriverForField);
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // wronly
   aDriver = DRIVERFACTORY::buildDriverForField(MED_DRIVER, "anyfile", field, MED_EN::WRONLY);
@@ -427,7 +419,7 @@ void MEDMEMTest::testDriverFactory()
     dynamic_cast<MED_FIELD_WRONLY_DRIVER<double> *> (aDriver);
   CPPUNIT_ASSERT(aMedWDriverForField);
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // rdwr
   aDriver = DRIVERFACTORY::buildDriverForField(MED_DRIVER, "anyfile", field, MED_EN::RDWR);
@@ -443,7 +435,7 @@ void MEDMEMTest::testDriverFactory()
     dynamic_cast<MED_FIELD_RDWR_DRIVER<double> *> (aDriver);
   CPPUNIT_ASSERT(aMedRWDriverForField);
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // 5.2: GIBI_DRIVER
 
@@ -486,7 +478,7 @@ void MEDMEMTest::testDriverFactory()
   VTK_FIELD_DRIVER<double> * aVtkDriverForField = dynamic_cast<VTK_FIELD_DRIVER<double> *> (aDriver);
   CPPUNIT_ASSERT(aVtkDriverForField);
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // rdwr
   aDriver = DRIVERFACTORY::buildDriverForField(VTK_DRIVER, "anyfile", field, MED_EN::RDWR);
@@ -498,7 +490,7 @@ void MEDMEMTest::testDriverFactory()
   aVtkDriverForField = dynamic_cast<VTK_FIELD_DRIVER<double> *> (aDriver);
   CPPUNIT_ASSERT(aVtkDriverForField);
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // 5.5: ASCII_DRIVER
 
@@ -536,7 +528,7 @@ void MEDMEMTest::testDriverFactory()
     dynamic_cast<ASCII_FIELD_DRIVER<double> *> (aDriver);
   CPPUNIT_ASSERT(anAsciiDriverForField);
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   aField1->removeReference();
   aMesh->removeReference();
@@ -555,13 +547,13 @@ void MEDMEMTest::testDriverFactory()
   try {
     version1 = getMedFileVersion(aFileName1);
   } catch (MEDEXCEPTION & ex) {
-    version1 = DRIVERFACTORY::globalMedFileVersionForWriting;
+    version1 = MED_EN::V22;/*DRIVERFACTORY::globalMedFileVersionForWriting;*/
   }
 
   try {
     version2 = getMedFileVersion(aFileName2);
   } catch (MEDEXCEPTION & ex) {
-    version2 = DRIVERFACTORY::globalMedFileVersionForWriting;
+    version2 = MED_EN::V22;//DRIVERFACTORY::globalMedFileVersionForWriting;
   }
 
   // 6.1. Med file V2.1
@@ -570,78 +562,78 @@ void MEDMEMTest::testDriverFactory()
     if (version1 == MED_EN::V22)
       aFileName21 = aFileName2;
 
-    // rdonly
-    aDriver = DRIVERFACTORY::buildMedDriverFromFile(aFileName21, &med, MED_EN::RDONLY);
-    CPPUNIT_ASSERT(aDriver->getFileName() == aFileName21);
-    CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
+//     // rdonly
+//     aDriver = DRIVERFACTORY::buildMedDriverFromFile(aFileName21, &med, MED_EN::RDONLY);
+//     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName21);
+//     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
-    MED_MED_RDONLY_DRIVER21 * aMedRDriverForMed21 = dynamic_cast<MED_MED_RDONLY_DRIVER21 *> (aDriver);
-    CPPUNIT_ASSERT(aMedRDriverForMed21);
+// //     MED_MED_RDONLY_DRIVER21 * aMedRDriverForMed21 = dynamic_cast<MED_MED_RDONLY_DRIVER21 *> (aDriver);
+// //     CPPUNIT_ASSERT(aMedRDriverForMed21);
 
-    delete aDriver;
+//     delete aDriver; aDriver=0;
 
-    // wronly
-    aDriver = DRIVERFACTORY::buildMedDriverFromFile(aFileName21, &med, MED_EN::WRONLY);
-    CPPUNIT_ASSERT(aDriver->getFileName() == aFileName21);
-    CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
+//     // wronly
+//     aDriver = DRIVERFACTORY::buildMedDriverFromFile(aFileName21, &med, MED_EN::WRONLY);
+//     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName21);
+//     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
-    MED_MED_WRONLY_DRIVER21 * aMedWDriverForMed21 = dynamic_cast<MED_MED_WRONLY_DRIVER21 *> (aDriver);
-    CPPUNIT_ASSERT(aMedWDriverForMed21);
+// //     MED_MED_WRONLY_DRIVER21 * aMedWDriverForMed21 = dynamic_cast<MED_MED_WRONLY_DRIVER21 *> (aDriver);
+// //     CPPUNIT_ASSERT(aMedWDriverForMed21);
 
-    delete aDriver;
+//     delete aDriver; aDriver=0;
 
-    // rdwr
-    aDriver = DRIVERFACTORY::buildMedDriverFromFile(aFileName21, &med, MED_EN::RDWR);
-    CPPUNIT_ASSERT(aDriver->getFileName() == aFileName21);
-    CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
+//     // rdwr
+//     aDriver = DRIVERFACTORY::buildMedDriverFromFile(aFileName21, &med, MED_EN::RDWR);
+//     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName21);
+//     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
 
-    MED_MED_RDWR_DRIVER21 * aMedRWDriverForMed21 = dynamic_cast<MED_MED_RDWR_DRIVER21 *> (aDriver);
-    CPPUNIT_ASSERT(aMedRWDriverForMed21);
+// //     MED_MED_RDWR_DRIVER21 * aMedRWDriverForMed21 = dynamic_cast<MED_MED_RDWR_DRIVER21 *> (aDriver);
+// //     CPPUNIT_ASSERT(aMedRWDriverForMed21);
 
-    delete aDriver;
+//     delete aDriver; aDriver=0;
   }
 
-  // 6.2. Med file V2.2
+//   // 6.2. Med file V2.2
   string aFileName22 = aFileName2;
   if (version2 == MED_EN::V22 || version1 == MED_EN::V22) {
     if (version2 == MED_EN::V21)
       aFileName22 = aFileName1;
 
-    // rdonly
-    aDriver = DRIVERFACTORY::buildMedDriverFromFile(aFileName22, &med, MED_EN::RDONLY);
-    CPPUNIT_ASSERT(aDriver->getFileName() == aFileName22);
-    CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
+//     // rdonly
+//     aDriver = DRIVERFACTORY::buildMedDriverFromFile(aFileName22, &med, MED_EN::RDONLY);
+//     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName22);
+//     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
-    MED_MED_RDONLY_DRIVER22 * aMedRDriverForMed22 = dynamic_cast<MED_MED_RDONLY_DRIVER22 *> (aDriver);
-    CPPUNIT_ASSERT(aMedRDriverForMed22);
+//     MED_MED_RDONLY_DRIVER22 * aMedRDriverForMed22 = dynamic_cast<MED_MED_RDONLY_DRIVER22 *> (aDriver);
+//     CPPUNIT_ASSERT(aMedRDriverForMed22);
 
-    delete aDriver;
+//     delete aDriver; aDriver=0;
 
-    // wronly
-    aDriver = DRIVERFACTORY::buildMedDriverFromFile(aFileName22, &med, MED_EN::WRONLY);
-    CPPUNIT_ASSERT(aDriver->getFileName() == aFileName22);
-    CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
+//     // wronly
+//     aDriver = DRIVERFACTORY::buildMedDriverFromFile(aFileName22, &med, MED_EN::WRONLY);
+//     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName22);
+//     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
-    MED_MED_WRONLY_DRIVER22 * aMedWDriverForMed22 = dynamic_cast<MED_MED_WRONLY_DRIVER22 *> (aDriver);
-    CPPUNIT_ASSERT(aMedWDriverForMed22);
+//     MED_MED_WRONLY_DRIVER22 * aMedWDriverForMed22 = dynamic_cast<MED_MED_WRONLY_DRIVER22 *> (aDriver);
+//     CPPUNIT_ASSERT(aMedWDriverForMed22);
 
-    delete aDriver;
+//     delete aDriver; aDriver=0;
 
-    // rdwr
-    aDriver = DRIVERFACTORY::buildMedDriverFromFile(aFileName22, &med, MED_EN::RDWR);
-    CPPUNIT_ASSERT(aDriver->getFileName() == aFileName22);
-    CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
+//     // rdwr
+//     aDriver = DRIVERFACTORY::buildMedDriverFromFile(aFileName22, &med, MED_EN::RDWR);
+//     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName22);
+//     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
 
-    MED_MED_RDWR_DRIVER22 * aMedRWDriverForMed22 = dynamic_cast<MED_MED_RDWR_DRIVER22 *> (aDriver);
-    CPPUNIT_ASSERT(aMedRWDriverForMed22);
+//     MED_MED_RDWR_DRIVER22 * aMedRWDriverForMed22 = dynamic_cast<MED_MED_RDWR_DRIVER22 *> (aDriver);
+//     CPPUNIT_ASSERT(aMedRWDriverForMed22);
 
-    delete aDriver;
-  }
-  else {
-    CPPUNIT_FAIL("Cannot check building of drivers from file for V2.2");
-  }
-  if (version1 != MED_EN::V21 && version2 != MED_EN::V21) {
-    CPPUNIT_FAIL("Cannot check building of drivers from file for V2.1");
+//     delete aDriver; aDriver=0;
+//   }
+//   else {
+//     CPPUNIT_FAIL("Cannot check building of drivers from file for V2.2");
+//   }
+//   if (version1 != MED_EN::V21 && version2 != MED_EN::V21) {
+//     //CPPUNIT_FAIL("Cannot check building of drivers from file for V2.1");
   }
 
   /////////////////////////////////////
@@ -655,30 +647,30 @@ void MEDMEMTest::testDriverFactory()
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName21);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
-    MED_MESH_RDONLY_DRIVER21 * aMeshRDriverForMed21 = dynamic_cast<MED_MESH_RDONLY_DRIVER21 *> (aDriver);
-    CPPUNIT_ASSERT(aMeshRDriverForMed21);
+//     MED_MESH_RDONLY_DRIVER21 * aMeshRDriverForMed21 = dynamic_cast<MED_MESH_RDONLY_DRIVER21 *> (aDriver);
+//     CPPUNIT_ASSERT(aMeshRDriverForMed21);
 
-    delete aDriver;
+    delete aDriver; aDriver=0;
 
     // wronly
     aDriver = DRIVERFACTORY::buildMeshDriverFromFile(aFileName21, mesh, MED_EN::WRONLY);
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName21);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
-    MED_MESH_WRONLY_DRIVER21 * aMeshWDriverForMed21 = dynamic_cast<MED_MESH_WRONLY_DRIVER21 *> (aDriver);
-    CPPUNIT_ASSERT(aMeshWDriverForMed21);
+//     MED_MESH_WRONLY_DRIVER21 * aMeshWDriverForMed21 = dynamic_cast<MED_MESH_WRONLY_DRIVER21 *> (aDriver);
+//     CPPUNIT_ASSERT(aMeshWDriverForMed21);
 
-    delete aDriver;
+    delete aDriver; aDriver=0;
 
     // rdwr
     aDriver = DRIVERFACTORY::buildMeshDriverFromFile(aFileName21, mesh, MED_EN::RDWR);
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName21);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
 
-    MED_MESH_RDWR_DRIVER21 * aMeshRWDriverForMed21 = dynamic_cast<MED_MESH_RDWR_DRIVER21 *> (aDriver);
-    CPPUNIT_ASSERT(aMeshRWDriverForMed21);
+//     MED_MESH_RDWR_DRIVER21 * aMeshRWDriverForMed21 = dynamic_cast<MED_MESH_RDWR_DRIVER21 *> (aDriver);
+//     CPPUNIT_ASSERT(aMeshRWDriverForMed21);
 
-    delete aDriver;
+    delete aDriver; aDriver=0;
   }
 
   // 7.2. Med file V2.2
@@ -688,30 +680,30 @@ void MEDMEMTest::testDriverFactory()
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName22);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
-    MED_MESH_RDONLY_DRIVER22 * aMeshRDriverForMed22 = dynamic_cast<MED_MESH_RDONLY_DRIVER22 *> (aDriver);
+    MED_MESH_RDONLY_DRIVER * aMeshRDriverForMed22 = dynamic_cast<MED_MESH_RDONLY_DRIVER *> (aDriver);
     CPPUNIT_ASSERT(aMeshRDriverForMed22);
 
-    delete aDriver;
+    delete aDriver; aDriver=0;
 
     // wronly
     aDriver = DRIVERFACTORY::buildMeshDriverFromFile(aFileName22, mesh, MED_EN::WRONLY);
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName22);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
-    MED_MESH_WRONLY_DRIVER22 * aMeshWDriverForMed22 = dynamic_cast<MED_MESH_WRONLY_DRIVER22 *> (aDriver);
+    MED_MESH_WRONLY_DRIVER * aMeshWDriverForMed22 = dynamic_cast<MED_MESH_WRONLY_DRIVER *> (aDriver);
     CPPUNIT_ASSERT(aMeshWDriverForMed22);
 
-    delete aDriver;
+    delete aDriver; aDriver=0;
 
     // rdwr
     aDriver = DRIVERFACTORY::buildMeshDriverFromFile(aFileName22, mesh, MED_EN::RDWR);
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName22);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
 
-    MED_MESH_RDWR_DRIVER22 * aMeshRWDriverForMed22 = dynamic_cast<MED_MESH_RDWR_DRIVER22 *> (aDriver);
+    MED_MESH_RDWR_DRIVER * aMeshRWDriverForMed22 = dynamic_cast<MED_MESH_RDWR_DRIVER *> (aDriver);
     CPPUNIT_ASSERT(aMeshRWDriverForMed22);
 
-    delete aDriver;
+    delete aDriver; aDriver=0;
   }
 
   //////////////////////////////////////
@@ -725,22 +717,22 @@ void MEDMEMTest::testDriverFactory()
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName21);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
-    MED_FIELD_RDONLY_DRIVER21<double> * aFieldRDriverForMed21 =
-      dynamic_cast<MED_FIELD_RDONLY_DRIVER21<double> *> (aDriver);
-    CPPUNIT_ASSERT(aFieldRDriverForMed21);
+//     MED_FIELD_RDONLY_DRIVER21<double> * aFieldRDriverForMed21 =
+//       dynamic_cast<MED_FIELD_RDONLY_DRIVER21<double> *> (aDriver);
+//     CPPUNIT_ASSERT(aFieldRDriverForMed21);
 
-    delete aDriver;
+    delete aDriver; aDriver=0;
 
     // wronly
     aDriver = DRIVERFACTORY::buildFieldDriverFromFile(aFileName21, field, MED_EN::WRONLY);
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName21);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
-    MED_FIELD_WRONLY_DRIVER21<double> * aFieldWDriverForMed21 =
-      dynamic_cast<MED_FIELD_WRONLY_DRIVER21<double> *> (aDriver);
-    CPPUNIT_ASSERT(aFieldWDriverForMed21);
+//     MED_FIELD_WRONLY_DRIVER21<double> * aFieldWDriverForMed21 =
+//       dynamic_cast<MED_FIELD_WRONLY_DRIVER21<double> *> (aDriver);
+//     CPPUNIT_ASSERT(aFieldWDriverForMed21);
 
-    delete aDriver;
+    delete aDriver; aDriver=0;
 
     // rdwr
     aDriver = DRIVERFACTORY::buildFieldDriverFromFile(aFileName21, field, MED_EN::RDWR);
@@ -748,11 +740,11 @@ void MEDMEMTest::testDriverFactory()
     //CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR); // see MEDMEM_define.hxx
 
-    MED_FIELD_RDWR_DRIVER21<double> * aFieldRWDriverForMed21 =
-      dynamic_cast<MED_FIELD_RDWR_DRIVER21<double> *> (aDriver);
-    CPPUNIT_ASSERT(aFieldRWDriverForMed21);
+//     MED_FIELD_RDWR_DRIVER21<double> * aFieldRWDriverForMed21 =
+//       dynamic_cast<MED_FIELD_RDWR_DRIVER21<double> *> (aDriver);
+//     CPPUNIT_ASSERT(aFieldRWDriverForMed21);
 
-    delete aDriver;
+    delete aDriver; aDriver=0;
   }
 
   // 8.2. Med file V2.2
@@ -762,22 +754,22 @@ void MEDMEMTest::testDriverFactory()
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName22);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
-    MED_FIELD_RDONLY_DRIVER22<double> * aFieldRDriverForMed22 =
-      dynamic_cast<MED_FIELD_RDONLY_DRIVER22<double> *> (aDriver);
+    MED_FIELD_RDONLY_DRIVER<double> * aFieldRDriverForMed22 =
+      dynamic_cast<MED_FIELD_RDONLY_DRIVER<double> *> (aDriver);
     CPPUNIT_ASSERT(aFieldRDriverForMed22);
 
-    delete aDriver;
+    delete aDriver; aDriver=0;
 
     // wronly
     aDriver = DRIVERFACTORY::buildFieldDriverFromFile(aFileName22, field, MED_EN::WRONLY);
     CPPUNIT_ASSERT(aDriver->getFileName() == aFileName22);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
-    MED_FIELD_WRONLY_DRIVER22<double> * aFieldWDriverForMed22 =
-      dynamic_cast<MED_FIELD_WRONLY_DRIVER22<double> *> (aDriver);
+    MED_FIELD_WRONLY_DRIVER<double> * aFieldWDriverForMed22 =
+      dynamic_cast<MED_FIELD_WRONLY_DRIVER<double> *> (aDriver);
     CPPUNIT_ASSERT(aFieldWDriverForMed22);
 
-    delete aDriver;
+    delete aDriver; aDriver=0;
 
     // rdwr
     aDriver = DRIVERFACTORY::buildFieldDriverFromFile(aFileName22, field, MED_EN::RDWR);
@@ -785,11 +777,11 @@ void MEDMEMTest::testDriverFactory()
     //CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
     CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR); // see MEDMEM_define.hxx
 
-    MED_FIELD_RDWR_DRIVER22<double> * aFieldRWDriverForMed22 =
-      dynamic_cast<MED_FIELD_RDWR_DRIVER22<double> *> (aDriver);
+    MED_FIELD_RDWR_DRIVER<double> * aFieldRWDriverForMed22 =
+      dynamic_cast<MED_FIELD_RDWR_DRIVER<double> *> (aDriver);
     CPPUNIT_ASSERT(aFieldRWDriverForMed22);
 
-    delete aDriver;
+    delete aDriver; aDriver=0;
   }
 
   ///////////////////////////////////////////
@@ -799,40 +791,43 @@ void MEDMEMTest::testDriverFactory()
   // 9.1. V2.1
 
   // rdonly
-  aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", mesh, "my driver name",
-                                                         MED_EN::RDONLY, MED_EN::V21);
-  CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
-  CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
+  CPPUNIT_ASSERT_THROW(aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", mesh, "my driver name",
+                                                                              MED_EN::RDONLY, MED_EN::V21),
+                       MED_EXCEPTION);
+  //CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
+  //CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
-  MED_MESH_RDONLY_DRIVER21 * aMeshRDriverForMed21 = dynamic_cast<MED_MESH_RDONLY_DRIVER21 *> (aDriver);
-  CPPUNIT_ASSERT(aMeshRDriverForMed21);
-  CPPUNIT_ASSERT(aMeshRDriverForMed21->getMeshName() == "my driver name");
+//   MED_MESH_RDONLY_DRIVER21 * aMeshRDriverForMed21 = dynamic_cast<MED_MESH_RDONLY_DRIVER21 *> (aDriver);
+//   CPPUNIT_ASSERT(aMeshRDriverForMed21);
+//   CPPUNIT_ASSERT(aMeshRDriverForMed21->getMeshName() == "my driver name");
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // wronly
-  aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", mesh, "my driver name",
-                                                         MED_EN::WRONLY, MED_EN::V21);
-  CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
-  CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
+  CPPUNIT_ASSERT_THROW(aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", mesh, "my driver name",
+                                                                              MED_EN::WRONLY, MED_EN::V21),
+                       MED_EXCEPTION);
+  //CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
+  //CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
-  MED_MESH_WRONLY_DRIVER21 * aMeshWDriverForMed21 = dynamic_cast<MED_MESH_WRONLY_DRIVER21 *> (aDriver);
-  CPPUNIT_ASSERT(aMeshWDriverForMed21);
-  CPPUNIT_ASSERT(aMeshWDriverForMed21->getMeshName() == "my driver name");
+//   MED_MESH_WRONLY_DRIVER21 * aMeshWDriverForMed21 = dynamic_cast<MED_MESH_WRONLY_DRIVER21 *> (aDriver);
+//   CPPUNIT_ASSERT(aMeshWDriverForMed21);
+//   CPPUNIT_ASSERT(aMeshWDriverForMed21->getMeshName() == "my driver name");
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // rdwr
-  aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", mesh, "my driver name",
-                                                         MED_EN::RDWR, MED_EN::V21);
-  CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
-  CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
+  CPPUNIT_ASSERT_THROW(aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", mesh, "my driver name",
+                                                                              MED_EN::RDWR, MED_EN::V21),
+                       MED_EXCEPTION);
+  //CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
+  //CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
 
-  MED_MESH_RDWR_DRIVER21 * aMeshRWDriverForMed21 = dynamic_cast<MED_MESH_RDWR_DRIVER21 *> (aDriver);
-  CPPUNIT_ASSERT(aMeshRWDriverForMed21);
-  CPPUNIT_ASSERT(aMeshRWDriverForMed21->getMeshName() == "my driver name");
+//   MED_MESH_RDWR_DRIVER21 * aMeshRWDriverForMed21 = dynamic_cast<MED_MESH_RDWR_DRIVER21 *> (aDriver);
+//   CPPUNIT_ASSERT(aMeshRWDriverForMed21);
+//   CPPUNIT_ASSERT(aMeshRWDriverForMed21->getMeshName() == "my driver name");
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // 9.2. V2.2
 
@@ -842,11 +837,11 @@ void MEDMEMTest::testDriverFactory()
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
-  MED_MESH_RDONLY_DRIVER22 * aMeshRDriverForMed22 = dynamic_cast<MED_MESH_RDONLY_DRIVER22 *> (aDriver);
+  MED_MESH_RDONLY_DRIVER * aMeshRDriverForMed22 = dynamic_cast<MED_MESH_RDONLY_DRIVER *> (aDriver);
   CPPUNIT_ASSERT(aMeshRDriverForMed22);
   CPPUNIT_ASSERT(aMeshRDriverForMed22->getMeshName() == "my driver name");
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // wronly
   aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", mesh, "my driver name",
@@ -854,11 +849,11 @@ void MEDMEMTest::testDriverFactory()
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
-  MED_MESH_WRONLY_DRIVER22 * aMeshWDriverForMed22 = dynamic_cast<MED_MESH_WRONLY_DRIVER22 *> (aDriver);
+  MED_MESH_WRONLY_DRIVER * aMeshWDriverForMed22 = dynamic_cast<MED_MESH_WRONLY_DRIVER *> (aDriver);
   CPPUNIT_ASSERT(aMeshWDriverForMed22);
   CPPUNIT_ASSERT(aMeshWDriverForMed22->getMeshName() == "my driver name");
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // rdwr
   aDriver = DRIVERFACTORY::buildConcreteMedDriverForMesh("anyfile", mesh, "my driver name",
@@ -866,11 +861,11 @@ void MEDMEMTest::testDriverFactory()
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
 
-  MED_MESH_RDWR_DRIVER22 * aMeshRWDriverForMed22 = dynamic_cast<MED_MESH_RDWR_DRIVER22 *> (aDriver);
+  MED_MESH_RDWR_DRIVER * aMeshRWDriverForMed22 = dynamic_cast<MED_MESH_RDWR_DRIVER *> (aDriver);
   CPPUNIT_ASSERT(aMeshRWDriverForMed22);
   CPPUNIT_ASSERT(aMeshRWDriverForMed22->getMeshName() == "my driver name");
   mesh->removeReference();
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   /////////////////////////////////////////////
   // Test 10: buildConcreteMedDriverForField //
@@ -879,38 +874,40 @@ void MEDMEMTest::testDriverFactory()
   // 10.1. V2.1
 
   // rdonly
-  aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", field, MED_EN::RDONLY, MED_EN::V21);
-  CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
-  CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
+  CPPUNIT_ASSERT_THROW(aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", field, MED_EN::RDONLY, MED_EN::V21),
+                       MED_EXCEPTION);
+  //CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
+  //CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
-  MED_FIELD_RDONLY_DRIVER21<double> * aFieldRDriverForMed21 =
-    dynamic_cast<MED_FIELD_RDONLY_DRIVER21<double> *> (aDriver);
-  CPPUNIT_ASSERT(aFieldRDriverForMed21);
+//   MED_FIELD_RDONLY_DRIVER21<double> * aFieldRDriverForMed21 =
+//     dynamic_cast<MED_FIELD_RDONLY_DRIVER21<double> *> (aDriver);
+//   CPPUNIT_ASSERT(aFieldRDriverForMed21);
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // wronly
-  aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", field, MED_EN::WRONLY, MED_EN::V21);
-  CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
-  CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
+  CPPUNIT_ASSERT_THROW(aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", field, MED_EN::WRONLY, MED_EN::V21),
+                       MED_EXCEPTION);
+  //CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
+  //CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
-  MED_FIELD_WRONLY_DRIVER21<double> * aFieldWDriverForMed21 =
-    dynamic_cast<MED_FIELD_WRONLY_DRIVER21<double> *> (aDriver);
-  CPPUNIT_ASSERT(aFieldWDriverForMed21);
+//   MED_FIELD_WRONLY_DRIVER21<double> * aFieldWDriverForMed21 =
+//     dynamic_cast<MED_FIELD_WRONLY_DRIVER21<double> *> (aDriver);
+//   CPPUNIT_ASSERT(aFieldWDriverForMed21);
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // rdwr
-  aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", field, MED_EN::RDWR, MED_EN::V21);
-  CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
+  CPPUNIT_ASSERT_THROW(aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", field, MED_EN::RDWR, MED_EN::V21), MED_EXCEPTION);
+  //CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   //CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
-  CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR); // see MEDMEM_define.hxx
+  //CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR); // see MEDMEM_define.hxx
 
-  MED_FIELD_RDWR_DRIVER21<double> * aFieldRWDriverForMed21 =
-    dynamic_cast<MED_FIELD_RDWR_DRIVER21<double> *> (aDriver);
-  CPPUNIT_ASSERT(aFieldRWDriverForMed21);
+//   MED_FIELD_RDWR_DRIVER21<double> * aFieldRWDriverForMed21 =
+//     dynamic_cast<MED_FIELD_RDWR_DRIVER21<double> *> (aDriver);
+//   CPPUNIT_ASSERT(aFieldRWDriverForMed21);
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // 10.2. V2.2
 
@@ -919,22 +916,22 @@ void MEDMEMTest::testDriverFactory()
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDONLY);
 
-  MED_FIELD_RDONLY_DRIVER22<double> * aFieldRDriverForMed22 =
-    dynamic_cast<MED_FIELD_RDONLY_DRIVER22<double> *> (aDriver);
+  MED_FIELD_RDONLY_DRIVER<double> * aFieldRDriverForMed22 =
+    dynamic_cast<MED_FIELD_RDONLY_DRIVER<double> *> (aDriver);
   CPPUNIT_ASSERT(aFieldRDriverForMed22);
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // wronly
   aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", field, MED_EN::WRONLY, MED_EN::V22);
   CPPUNIT_ASSERT(aDriver->getFileName() == "anyfile");
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::WRONLY);
 
-  MED_FIELD_WRONLY_DRIVER22<double> * aFieldWDriverForMed22 =
-    dynamic_cast<MED_FIELD_WRONLY_DRIVER22<double> *> (aDriver);
+  MED_FIELD_WRONLY_DRIVER<double> * aFieldWDriverForMed22 =
+    dynamic_cast<MED_FIELD_WRONLY_DRIVER<double> *> (aDriver);
   CPPUNIT_ASSERT(aFieldWDriverForMed22);
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 
   // rdwr
   aDriver = DRIVERFACTORY::buildConcreteMedDriverForField("anyfile", field, MED_EN::RDWR, MED_EN::V22);
@@ -943,9 +940,9 @@ void MEDMEMTest::testDriverFactory()
   //CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR);
   CPPUNIT_ASSERT(aDriver->getAccessMode() == MED_EN::RDWR); // see MEDMEM_define.hxx
 
-  MED_FIELD_RDWR_DRIVER22<double> * aFieldRWDriverForMed22 =
-    dynamic_cast<MED_FIELD_RDWR_DRIVER22<double> *> (aDriver);
+  MED_FIELD_RDWR_DRIVER<double> * aFieldRWDriverForMed22 =
+    dynamic_cast<MED_FIELD_RDWR_DRIVER<double> *> (aDriver);
   CPPUNIT_ASSERT(aFieldRWDriverForMed22);
 
-  delete aDriver;
+  delete aDriver; aDriver=0;
 }

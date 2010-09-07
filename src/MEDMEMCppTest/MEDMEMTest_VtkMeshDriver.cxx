@@ -21,7 +21,7 @@
 #include <cppunit/TestAssert.h>
 
 #include <MEDMEM_VtkMeshDriver.hxx>
-#include <MEDMEM_MedMeshDriver22.hxx>
+#include <MEDMEM_MedMeshDriver.hxx>
 #include <MEDMEM_Mesh.hxx>
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
@@ -54,7 +54,7 @@ void MEDMEMTest::testVtkMeshDriver()
 {
   MESH * aMesh = new MESH;
 
-  string filename_rd               = getResourceFile("pointe_import22.med");
+  string filename_rd               = getResourceFile("pointe.med");
   string emptyfilename             = "";
   string meshname_rd               = "maa1";
   string meshname                  = "MyMesh";
@@ -91,7 +91,7 @@ void MEDMEMTest::testVtkMeshDriver()
   CPPUNIT_ASSERT(aVtkDriver);
 
   //Create a Mesh
-  MED_MESH_RDONLY_DRIVER22 *aMedMeshRdDriver22 = new MED_MESH_RDONLY_DRIVER22(filename_rd, aMesh);
+  MED_MESH_RDONLY_DRIVER *aMedMeshRdDriver22 = new MED_MESH_RDONLY_DRIVER(filename_rd, aMesh);
   aMedMeshRdDriver22->open();
   aMedMeshRdDriver22->setMeshName(meshname_rd);
 

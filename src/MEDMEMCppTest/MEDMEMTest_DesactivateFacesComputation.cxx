@@ -22,7 +22,7 @@
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_Meshing.hxx"
-#include "MEDMEM_MedMeshDriver22.hxx"
+#include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_GibiMeshDriver.hxx"
 
 #include <cppunit/Message.h>
@@ -144,9 +144,7 @@ void MEDMEMTest::testDesactivateFacesComputation()
 
   MESHING* meshing = new MESHING;
   meshing->setName( "TESTMESH" );
-  meshing->setSpaceDimension(3);
   const int nNodes=36;
-  meshing->setNumberOfNodes(nNodes);
   meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
                           MED_EN::MED_NO_INTERLACE);
   string coordname[3] = { "x", "y", "z" };
@@ -159,7 +157,6 @@ void MEDMEMTest::testDesactivateFacesComputation()
   meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
   meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
   meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
-  meshing->setMeshDimension(3);
   //Face connectivity info for classical elts
   const MED_EN::medGeometryElement classicalTypesFace[1]={MED_EN::MED_QUAD4};
   const int nbOfFaceElts[1]={14};
@@ -167,9 +164,9 @@ void MEDMEMTest::testDesactivateFacesComputation()
   meshing->setTypes(classicalTypesFace,MED_EN::MED_FACE);
   meshing->setNumberOfElements(nbOfFaceElts,MED_EN::MED_FACE);
   //All cell conn
-  meshing->setConnectivity(connNodalCellClassical,MED_EN::MED_CELL,MED_EN::MED_HEXA8);
+  meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_HEXA8,connNodalCellClassical);
   //All face conn
-  meshing->setConnectivity(connNodalFaceClassical,MED_EN::MED_FACE,MED_EN::MED_QUAD4);
+  meshing->setConnectivity(MED_EN::MED_FACE,MED_EN::MED_QUAD4,connNodalFaceClassical);
   int nbOfTypes=meshing->getNumberOfTypes(MED_EN::MED_EDGE);
   addMedFacesGroup2( *meshing, 2,  bottom, "Bottom",bottomTypes,bottomIndex,bottomNbOfElts,1) ;
   addMedFacesGroup2( *meshing, 4,  top,    "TopFace",topTypes,topIndex,topNbOfElts,1) ;
@@ -180,7 +177,7 @@ void MEDMEMTest::testDesactivateFacesComputation()
   //
   MESH *mesh=new MESH;
   mesh->setName(meshing->getName());
-  MEDMEM::MED_MESH_RDONLY_DRIVER22 *driver=new MEDMEM::MED_MESH_RDONLY_DRIVER22(tmpfile,mesh);
+  MEDMEM::MED_MESH_RDONLY_DRIVER *driver=new MEDMEM::MED_MESH_RDONLY_DRIVER(tmpfile,mesh);
   driver->desactivateFacesComputation();
   id=mesh->addDriver(*driver);
   mesh->read(id);

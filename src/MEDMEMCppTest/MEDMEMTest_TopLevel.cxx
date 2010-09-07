@@ -21,9 +21,8 @@
 #include <cppunit/TestAssert.h>
 
 #include <MEDMEM_TopLevel.hxx>
-#include <MEDMEM_MedFieldDriver22.hxx>
+#include <MEDMEM_MedFieldDriver.hxx>
 #include <MEDMEM_Field.hxx>
-#include <MEDMEM_Med.hxx>
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
 //#define ENABLE_FAULTS
@@ -47,10 +46,10 @@ using namespace MED_EN;
  */
 void MEDMEMTest::testTopLevel()
 {
-  MED * aMed = NULL;
+  //MED * aMed = NULL;
 
   string filename_rd                = getResourceFile("pointe.med");
-  string filename22_rd              = getResourceFile("pointe_import22.med");
+  string filename22_rd              = getResourceFile("pointe.med");
   string filenameMesh_wr            = makeTmpFile("myMesh.med");
   string filenameMed_wr             = makeTmpFile("myMed.med");
   string filenameField_wr           = makeTmpFile("myField.med");
@@ -73,7 +72,7 @@ void MEDMEMTest::testTopLevel()
   {
     //Trying read from not existing file
     //#ifdef ENABLE_FORCED_FAILURES
-    CPPUNIT_ASSERT_THROW(readMedInFile(fileNotExist_rd), MEDEXCEPTION);
+    //CPPUNIT_ASSERT_THROW(readMedInFile(fileNotExist_rd), MEDEXCEPTION);
     // (BUG) No exception in this case
     //#endif
     CPPUNIT_ASSERT_THROW(readMeshInFile(fileNotExist_rd, meshname), MEDEXCEPTION);
@@ -99,10 +98,10 @@ void MEDMEMTest::testTopLevel()
     //#endif
 
     //Test readMedInFile() method
-    {
-      CPPUNIT_ASSERT_NO_THROW(aMed = readMedInFile(filename_rd));
-      CPPUNIT_ASSERT(aMed);
-    }
+//     {
+//       CPPUNIT_ASSERT_NO_THROW(aMed = readMedInFile(filename_rd));
+//       CPPUNIT_ASSERT(aMed);
+//     }
 
     //Test readFieldInFile() method
     //#ifdef ENABLE_FORCED_FAILURES
@@ -123,8 +122,8 @@ void MEDMEMTest::testTopLevel()
     //Create a FIELD
     FIELD<double> *aField_1 = new FIELD<double>();
 
-    MED_FIELD_RDONLY_DRIVER22<double> *aMedRdFieldDriver22 =
-      new MED_FIELD_RDONLY_DRIVER22<double>(filename22_rd, aField_1);
+    MED_FIELD_RDONLY_DRIVER<double> *aMedRdFieldDriver22 =
+      new MED_FIELD_RDONLY_DRIVER<double>(filename22_rd, aField_1);
     aMedRdFieldDriver22->setFieldName(fieldname);
     aMedRdFieldDriver22->open();
     aMedRdFieldDriver22->read();
@@ -133,7 +132,7 @@ void MEDMEMTest::testTopLevel()
     //Trying write objects in the not existing file
     //#ifdef ENABLE_FORCED_FAILURES
     // (BUG) No exception in this case
-    CPPUNIT_ASSERT_THROW(writeMedToFile(aMed, fileNotExist_wr), MEDEXCEPTION);
+    //CPPUNIT_ASSERT_THROW(writeMedToFile(aMed, fileNotExist_wr), MEDEXCEPTION);
     //#endif
 
     //Create a MESH
@@ -153,10 +152,10 @@ void MEDMEMTest::testTopLevel()
     //Test writeMedToFile() and writeMeshToFile() methods
     aMesh->setName(meshname);
     CPPUNIT_ASSERT_NO_THROW(writeMeshToFile(aMesh, filenameMesh_wr));
-    CPPUNIT_ASSERT_NO_THROW(writeMedToFile(aMed, filenameMed_wr));
+    //CPPUNIT_ASSERT_NO_THROW(writeMedToFile(aMed, filenameMed_wr));
 
     aField_1->removeReference();
     aMesh->removeReference();
-    delete aMed;
+    //delete aMed;
   }
 }

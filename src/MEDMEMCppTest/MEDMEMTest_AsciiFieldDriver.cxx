@@ -20,7 +20,6 @@
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
-#include "MEDMEM_Compatibility21_22.hxx"
 #include "MEDMEM_AsciiFieldDriver.hxx"
 #include "MEDMEM_STRING.hxx"
 
@@ -139,9 +138,9 @@ void MEDMEMTest::testAsciiFieldDriver()
     CPPUNIT_ASSERT_EQUAL(aa[2], bb[0]);
   }
 
-  printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-  printf("1\n");
-  printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+//   printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+//   printf("1\n");
+//   printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
   // template<int N> bool compare(const double* a, const double* b)
   {
     {

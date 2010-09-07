@@ -83,9 +83,7 @@ void MEDMEMTest::tearDown()
 // #24: MEDMEM_Init.cxx                 }  MEDMEMTest.cxx
 // #25: MEDMEM_InterlacingPolicy.hxx    }  MEDMEMTest.cxx (-)
 // #26: MEDMEM_InterlacingTraits.hxx    }  MEDMEMTest.cxx (-)
-// #27: MEDMEM_MedFieldDriver21.hxx     }  MEDMEMTest_MedFieldDriver21.cxx
-// #28: MEDMEM_MedFieldDriver22.hxx     }  MEDMEMTest_MedFieldDriver22.cxx
-// #29: MEDMEM_MedFieldDriver.hxx       }  MEDMEMTest.cxx (-)
+// #28: MEDMEM_MedFieldDriver.hxx       }  MEDMEMTest_MedFieldDriver.cxx
 // #30: MEDMEM_Med.hxx                  }  MEDMEMTest_Med.cxx
 // #31: MEDMEM_MedMedDriver21.hxx       }  MEDMEMTest_MedMedDriver21.cxx
 // #32: MEDMEM_MedMedDriver22.hxx       }  MEDMEMTest_MedMedDriver22.cxx
@@ -93,16 +91,13 @@ void MEDMEMTest::tearDown()
 // #34: MEDMEM_MEDMEMchampLire.hxx      }  MEDMEMTest.cxx (-)
 // #35: MEDMEM_MEDMEMgaussEcr.hxx       }  MEDMEMTest.cxx (-)
 // #36: MEDMEM_MEDMEMprofilEcr.hxx      }  MEDMEMTest.cxx (-)
-// #37: MEDMEM_MedMeshDriver21.hxx      }  MEDMEMTest_MedMeshDriver21.cxx
-// #38: MEDMEM_MedMeshDriver22.hxx      }  MEDMEMTest_MedMeshDriver22.cxx
-// #39: MEDMEM_MedMeshDriver.hxx        }  MEDMEMTest.cxx (-)
+// #37: MEDMEM_MedMeshDriver.hxx        }  MEDMEMTest_MedMeshDriver.cxx
 // #40: MEDMEM_MedVersion.hxx           }  MEDMEMTest_MedVersion.cxx
 // #41: MEDMEM_Mesh.hxx                 \
 // #42: MEDMEM_Meshing.hxx              /  MEDMEMTest_MeshAndMeshing.cxx
 // #43: MEDMEM_ModulusArray.hxx         }  MEDMEMTest_ModulusArray.cxx
 // #44: MEDMEM_nArray.hxx               }  MEDMEMTest_nArray.cxx
 // #45: MEDMEM_PointerOf.hxx            }  MEDMEMTest_PointerOf.cxx
-// #46: MEDMEM_PolyhedronArray.hxx      }  MEDMEMTest_PolyhedronArray.cxx
 // #47: MEDMEM_PorflowMeshDriver.hxx    }  MEDMEMTest_PorflowMeshDriver.cxx
 // #48: MEDMEM_RCBase.hxx               }  MEDMEMTest.cxx (-)
 // #49: MEDMEM_SetInterlacingType.hxx   }  MEDMEMTest.cxx (-)
@@ -473,7 +468,6 @@ MEDMEM::MESH * MEDMEMTest_createTestMesh ()
 {
   // MESH DATA
   int SpaceDimension = 3;
-  int meshDimension = SpaceDimension; // because there 3D cells in the mesh
 
   // coordinates
   int NumberOfNodes = 19;
@@ -569,19 +563,16 @@ MEDMEM::MESH * MEDMEMTest_createTestMesh ()
   myMeshing->setTypes(CellTypes, MED_EN::MED_CELL);
   myMeshing->setNumberOfElements(NumberOfCells, MED_EN::MED_CELL);
 
-  myMeshing->setConnectivity(ConnectivityTetra, MED_EN::MED_CELL, MED_EN::MED_TETRA4);
-  myMeshing->setConnectivity(ConnectivityPyra, MED_EN::MED_CELL, MED_EN::MED_PYRA5);
-  myMeshing->setConnectivity(ConnectivityHexa, MED_EN::MED_CELL, MED_EN::MED_HEXA8);
+  myMeshing->setConnectivity(MED_EN::MED_CELL, MED_EN::MED_TETRA4, ConnectivityTetra );
+  myMeshing->setConnectivity(MED_EN::MED_CELL, MED_EN::MED_PYRA5 , ConnectivityPyra  );
+  myMeshing->setConnectivity(MED_EN::MED_CELL, MED_EN::MED_HEXA8 , ConnectivityHexa  );
 
   myMeshing->setNumberOfTypes(NumberOfFaceTypes, MED_EN::MED_FACE);
   myMeshing->setTypes(FaceTypes, MED_EN::MED_FACE);
   myMeshing->setNumberOfElements(NumberOfFaces, MED_EN::MED_FACE);
 
-  myMeshing->setConnectivity(ConnectivityTria, MED_EN::MED_FACE, MED_EN::MED_TRIA3);
-  myMeshing->setConnectivity(ConnectivityQua, MED_EN::MED_FACE, MED_EN::MED_QUAD4);
-
-  // mesh dimension
-  myMeshing->setMeshDimension(meshDimension);
+  myMeshing->setConnectivity(MED_EN::MED_FACE, MED_EN::MED_TRIA3,ConnectivityTria);
+  myMeshing->setConnectivity(MED_EN::MED_FACE, MED_EN::MED_QUAD4,ConnectivityQua);
 
   // edges connectivities
   // not yet implemented : if set, results are unpredictable.

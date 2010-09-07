@@ -193,7 +193,8 @@ void MEDMEMTest::testSkyLineArray()
 
   delete[] index ;
   delete[] value ;
+  ostringstream out;
   MEDSKYLINEARRAY myEmptyArray;
-  cout<<myEmptyArray<<endl;
+  out<<myEmptyArray<<endl;
 }
 

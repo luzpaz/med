@@ -25,7 +25,6 @@
 #include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Support.hxx"
-#include "MEDMEM_Compatibility21_22.hxx"
 
 #include <sstream>
 #include <cmath>
@@ -100,20 +99,20 @@ void check_support(const SUPPORT * theSupport,
   CPPUNIT_ASSERT_EQUAL(theEntity, anEntity);
   CPPUNIT_ASSERT_EQUAL(theNbTypes, aNbGeomTypes);
 
-  cout << "  - Entities list : " << endl;
-  if (!(theSupport->isOnAllElements())) {
-    cout << "  - NumberOfTypes : " << aNbGeomTypes << endl;
-    const MED_EN::medGeometryElement * Types = theSupport->getTypes();
-    for (int j = 0; j < aNbGeomTypes; j++) {
-      cout << "    * Type " << Types[j] << " : ";
-      int NumberOfElements = theSupport->getNumberOfElements(Types[j]);
-      const int * Number = theSupport->getNumber(Types[j]);
-      for (int k = 0; k < NumberOfElements; k++)
-        cout << Number[k] << " ";
-      cout << endl;
-    }
-  } else
-    cout << "    Is on all entities !" << endl;
+//   cout << "  - Entities list : " << endl;
+//   if (!(theSupport->isOnAllElements())) {
+//     cout << "  - NumberOfTypes : " << aNbGeomTypes << endl;
+//     const MED_EN::medGeometryElement * Types = theSupport->getTypes();
+//     for (int j = 0; j < aNbGeomTypes; j++) {
+//       cout << "    * Type " << Types[j] << " : ";
+//       int NumberOfElements = theSupport->getNumberOfElements(Types[j]);
+//       const int * Number = theSupport->getNumber(Types[j]);
+//       for (int k = 0; k < NumberOfElements; k++)
+//         cout << Number[k] << " ";
+//       cout << endl;
+//     }
+//   } else
+//     cout << "    Is on all entities !" << endl;
 }
 
 void check_famille(const FAMILY * theFamily,
@@ -131,18 +130,18 @@ void check_famille(const FAMILY * theFamily,
     CPPUNIT_ASSERT_EQUAL(theNbAttributes, nbAttributes);
     CPPUNIT_ASSERT_EQUAL(theNbGroups, nbGroups);
 
-    // attributes
-    cout << "  - Attributes (" << nbAttributes << ") :" << endl;
-    for (int j = 1; j < nbAttributes + 1; j++)
-      cout << "    * "
-           << theFamily->getAttributeIdentifier(j) << " : "
-           << theFamily->getAttributeValue(j) << ", "
-           << theFamily->getAttributeDescription(j).c_str() << endl;
+//     // attributes
+//     cout << "  - Attributes (" << nbAttributes << ") :" << endl;
+//     for (int j = 1; j < nbAttributes + 1; j++)
+//       cout << "    * "
+//            << theFamily->getAttributeIdentifier(j) << " : "
+//            << theFamily->getAttributeValue(j) << ", "
+//            << theFamily->getAttributeDescription(j).c_str() << endl;
 
-    // groups
-    cout << "  - Groups (" << nbGroups << ") :" << endl;
-    for (int j = 1; j < nbGroups + 1; j++)
-      cout << "    * " << theFamily->getGroupName(j).c_str() << endl;
+//     // groups
+//     cout << "  - Groups (" << nbGroups << ") :" << endl;
+//     for (int j = 1; j < nbGroups + 1; j++)
+//       cout << "    * " << theFamily->getGroupName(j).c_str() << endl;
 }
 
 void MEDMEMTest::testFamily()
@@ -179,7 +178,7 @@ void MEDMEMTest::testFamily()
   ostr1 << *aFamily1;
   CPPUNIT_ASSERT(ostr1.str() != "");
 
-  cout << "Show Family1 :" << endl;
+  //cout << "Show Family1 :" << endl;
   check_famille(aFamily1,
                 aName, aDescr, anEntity, aNbGeomTypes,
                 id, nbAttributes, nbGroups);
@@ -195,7 +194,7 @@ void MEDMEMTest::testFamily()
   // Compare supports
   CPPUNIT_ASSERT(aFamily2->deepCompare(*aFamily1));
 
-  cout << "Show Family2 :" << endl;
+  //cout << "Show Family2 :" << endl;
   check_famille(aFamily2,
                 aName, aDescr, anEntity, aNbGeomTypes,
                 id, nbAttributes, nbGroups);
@@ -209,12 +208,12 @@ void MEDMEMTest::testFamily()
   ostr3 << *aFamily3;
   CPPUNIT_ASSERT(ostr1.str() == ostr3.str());
 
-  cout << "Show Family3 :" << endl;
+  //cout << "Show Family3 :" << endl;
   check_famille(aFamily3,
                 aName, aDescr, anEntity, aNbGeomTypes,
                 id, nbAttributes, nbGroups);
 
-  cout << "That's all" << endl;
+  //cout << "That's all" << endl;
 
   ////////////
   // TEST 2 //
@@ -459,15 +458,15 @@ void MEDMEMTest::testFamily()
                                 /*NumberOfGroup*/3, groupNames,
                                 aNodeFamily, aCellFamily, aFaceFamily, anEdgeFamily);
 
-    cout << "Show aFacesF7 :" << endl;
-    cout << *aFacesF7 << endl;
+    //cout << "Show aFacesF7 :" << endl;
+    //cout << *aFacesF7 << endl;
 
     CPPUNIT_ASSERT_EQUAL(7, aFacesF7->getIdentifier());
     CPPUNIT_ASSERT(strcmp("Faces All", aFacesF7->getName().c_str()) == 0);
     CPPUNIT_ASSERT(MED_EN::MED_FACE == aFacesF7->getEntity());
 
-    CPPUNIT_ASSERT_EQUAL(8, aTestMesh->getNumberOfElementsWithPoly(MED_EN::MED_FACE,
-                                                                   MED_EN::MED_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_EQUAL(8, aTestMesh->getNumberOfElements(MED_EN::MED_FACE,
+                                                           MED_EN::MED_ALL_ELEMENTS));
     CPPUNIT_ASSERT_EQUAL(8, aFacesF7->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 
 //#ifdef ENABLE_FORCED_FAILURES

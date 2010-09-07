@@ -414,18 +414,18 @@ void MEDMEMTest::testSupport()
     meshDrv.open();
     meshDrv.read();
     meshDrv.close();
-    if ( poly_mesh->getNumberOfElementsWithPoly(MED_EN::MED_FACE, MED_EN::MED_ALL_ELEMENTS) != 17 )
+    if ( poly_mesh->getNumberOfElements(MED_EN::MED_FACE, MED_EN::MED_ALL_ELEMENTS) != 17 )
       CPPUNIT_FAIL("Nb of faces in mesh from 'poly3D.med' resource file != 17");
 
     // support on 3 cells and the mesh made from it
     SUPPORT *poly_supp=new SUPPORT( poly_mesh, "poly_supp");
     MESH *poly_supp_mesh=poly_supp->makeMesh();
-    CPPUNIT_ASSERT_EQUAL(3,poly_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,
-                                                                       MED_EN::MED_ALL_ELEMENTS));
-    CPPUNIT_ASSERT_EQUAL(1,poly_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,
-                                                                       MED_EN::MED_TETRA4));
-    CPPUNIT_ASSERT_EQUAL(2,poly_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,
-                                                                       MED_EN::MED_POLYHEDRA));
+    CPPUNIT_ASSERT_EQUAL(3,poly_supp_mesh->getNumberOfElements(MED_EN::MED_CELL,
+                                                               MED_EN::MED_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_EQUAL(1,poly_supp_mesh->getNumberOfElements(MED_EN::MED_CELL,
+                                                               MED_EN::MED_TETRA4));
+    CPPUNIT_ASSERT_EQUAL(2,poly_supp_mesh->getNumberOfElements(MED_EN::MED_CELL,
+                                                               MED_EN::MED_POLYHEDRA));
     int nbnodes=poly_supp_mesh->getNumberOfNodes();
     const int* conn=poly_supp_mesh->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_EN::MED_NODAL,
                                                     MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
@@ -433,24 +433,26 @@ void MEDMEMTest::testSupport()
     for (int i=0; i<con_len;i++)
       CPPUNIT_ASSERT(conn[i]>0 && conn[i]<=nbnodes);
 
-    conn = poly_supp_mesh->getPolyhedronConnectivity(MED_EN::MED_NODAL);
-    con_len = poly_supp_mesh->getPolyhedronConnectivityLength(MED_EN::MED_NODAL);
+    conn = poly_supp_mesh->getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,
+                                           MED_EN::MED_CELL,MED_EN::MED_POLYHEDRA);
+    con_len = poly_supp_mesh->getConnectivityLength(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,
+                                                    MED_EN::MED_CELL,MED_EN::MED_POLYHEDRA);
     for (int i=0; i<con_len;i++)
-      CPPUNIT_ASSERT(conn[i]>0 && conn[i]<=nbnodes);
+      CPPUNIT_ASSERT((conn[i]>0 && conn[i]<=nbnodes) || conn[i]==-1 );
     poly_supp_mesh->removeReference();
     poly_supp->removeReference();
     // support on 17 faces and the mesh made from it
     SUPPORT *polygon_supp=new SUPPORT( poly_mesh, "polygon_supp", MED_EN::MED_FACE);
     poly_mesh->removeReference();
     MESH *polygon_supp_mesh=polygon_supp->makeMesh();
-    CPPUNIT_ASSERT_EQUAL(17,polygon_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,
-                                                                           MED_EN::MED_ALL_ELEMENTS));
-    CPPUNIT_ASSERT_EQUAL(6,polygon_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,
-                                                                          MED_EN::MED_TRIA3));
-    CPPUNIT_ASSERT_EQUAL(8,polygon_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,
-                                                                          MED_EN::MED_QUAD4));
-    CPPUNIT_ASSERT_EQUAL(3,polygon_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,
-                                                                          MED_EN::MED_POLYGON));
+    CPPUNIT_ASSERT_EQUAL(17,polygon_supp_mesh->getNumberOfElements(MED_EN::MED_CELL,
+                                                                   MED_EN::MED_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_EQUAL(6,polygon_supp_mesh->getNumberOfElements(MED_EN::MED_CELL,
+                                                                  MED_EN::MED_TRIA3));
+    CPPUNIT_ASSERT_EQUAL(8,polygon_supp_mesh->getNumberOfElements(MED_EN::MED_CELL,
+                                                                  MED_EN::MED_QUAD4));
+    CPPUNIT_ASSERT_EQUAL(3,polygon_supp_mesh->getNumberOfElements(MED_EN::MED_CELL,
+                                                                  MED_EN::MED_POLYGON));
     nbnodes = polygon_supp_mesh->getNumberOfNodes();
     conn=polygon_supp_mesh->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_EN::MED_NODAL,
                                             MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
@@ -458,8 +460,10 @@ void MEDMEMTest::testSupport()
     for (int i=0; i<con_len;i++)
       CPPUNIT_ASSERT(conn[i]>0 && conn[i]<=nbnodes);
 
-    conn = polygon_supp_mesh->getPolygonsConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL);
-    con_len = polygon_supp_mesh->getPolygonsConnectivityLength(MED_EN::MED_NODAL,MED_EN::MED_CELL);
+    conn = polygon_supp_mesh->getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,
+                                              MED_EN::MED_CELL,MED_EN::MED_POLYGON);
+    con_len = polygon_supp_mesh->getConnectivityLength(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,
+                                                       MED_EN::MED_CELL,MED_EN::MED_POLYGON);
     for (int i=0; i<con_len;i++)
       CPPUNIT_ASSERT(conn[i]>0 && conn[i]<=nbnodes);
     polygon_supp_mesh->removeReference();
@@ -477,10 +481,10 @@ void MEDMEMTest::testSupport()
     // make mesh from partial support containing polygons
     MESH *partial_supp_mesh=polygon_supp->makeMesh();
     polygon_supp->removeReference();
-    CPPUNIT_ASSERT_EQUAL(6,partial_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,
-                                                                          MED_EN::MED_ALL_ELEMENTS));
-    CPPUNIT_ASSERT_EQUAL(4,partial_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,types[0]));
-    CPPUNIT_ASSERT_EQUAL(2,partial_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,types[1]));
+    CPPUNIT_ASSERT_EQUAL(6,partial_supp_mesh->getNumberOfElements(MED_EN::MED_CELL,
+                                                                  MED_EN::MED_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_EQUAL(4,partial_supp_mesh->getNumberOfElements(MED_EN::MED_CELL,types[0]));
+    CPPUNIT_ASSERT_EQUAL(2,partial_supp_mesh->getNumberOfElements(MED_EN::MED_CELL,types[1]));
 
     nbnodes = partial_supp_mesh->getNumberOfNodes();
     int spaceDimension = partial_supp_mesh->getSpaceDimension();
@@ -500,8 +504,10 @@ void MEDMEMTest::testSupport()
     for (int i=0; i<con_len;i++)
       CPPUNIT_ASSERT_EQUAL(connExpected[i],conn[i]);
 
-    conn = partial_supp_mesh->getPolygonsConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL);
-    con_len = partial_supp_mesh->getPolygonsConnectivityLength(MED_EN::MED_NODAL,MED_EN::MED_CELL);
+    conn = partial_supp_mesh->getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,
+                                              MED_EN::MED_CELL,MED_EN::MED_POLYGON);
+    con_len = partial_supp_mesh->getConnectivityLength(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,
+                                                       MED_EN::MED_CELL,MED_EN::MED_POLYGON);
     int connExpectedP[10]={7, 3, 2, 10, 8, 12, 11, 15, 4, 1};
     for (int i=0; i<con_len;i++)
       CPPUNIT_ASSERT_EQUAL(connExpectedP[i],conn[i]);
@@ -826,18 +832,16 @@ void MEDMEMTest::testSupport()
   int renumberingFromOldToNew[10] = {10,9,8,7,6,5,4,3,2,1};
 
   CPPUNIT_ASSERT_THROW(aPartialCells->changeElementsNbs
-                       (MED_EN::MED_NODE, renumberingFromOldToNew, 10), MEDEXCEPTION);
+                       (MED_EN::MED_NODE, renumberingFromOldToNew), MEDEXCEPTION);
 
-  aPartialCells->changeElementsNbs(MED_EN::MED_CELL, renumberingFromOldToNew, 10);
+  aPartialCells->changeElementsNbs(MED_EN::MED_CELL, renumberingFromOldToNew);
   CPPUNIT_ASSERT_EQUAL(3, aPartialCells->getValIndFromGlobalNumber(9));
   CPPUNIT_ASSERT_EQUAL(2, aPartialCells->getValIndFromGlobalNumber(8));
   CPPUNIT_ASSERT_EQUAL(1, aPartialCells->getValIndFromGlobalNumber(7));
 
   // {1,2,3,4,5,6,7} -> {1,3,5,7,2,4,6}, {8,9,10,11} -> {8,10,9,11}
-  int renumberingFromOldToNewP[7] = {1,3,5,7,2,4,6};
-  int renumberingFromOldToNewPolyP[4] = {8,10,9,11};
-  aPartialCells->changeElementsNbs(MED_EN::MED_CELL, renumberingFromOldToNewP,
-                                   7, renumberingFromOldToNewPolyP);
+  int renumberingFromOldToNewP[11] = {1,3,5,7,2,4,6,8,10,9,11};
+  aPartialCells->changeElementsNbs(MED_EN::MED_CELL, renumberingFromOldToNewP);
   CPPUNIT_ASSERT_EQUAL(3, aPartialCells->getValIndFromGlobalNumber(10));
   CPPUNIT_ASSERT_EQUAL(2, aPartialCells->getValIndFromGlobalNumber(8));
   CPPUNIT_ASSERT_EQUAL(1, aPartialCells->getValIndFromGlobalNumber(6));
