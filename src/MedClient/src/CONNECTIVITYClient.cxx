@@ -270,10 +270,10 @@ int CONNECTIVITYClient::getNumberOf(medEntityMesh Entity,
 const int * CONNECTIVITYClient::getConnectivity
                       (medConnectivity ConnectivityType, 
                        medEntityMesh Entity,
-                       medGeometryElement Type)
+                       medGeometryElement Type) const
 {
   if (!_complete)
-    fillCopy();
+    (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
   const int * c = CONNECTIVITY::getConnectivity
     (ConnectivityType, Entity, Type);
@@ -287,10 +287,10 @@ const int * CONNECTIVITYClient::getConnectivity
 //=============================================================================
 const int * CONNECTIVITYClient::getConnectivityIndex
                       (medConnectivity ConnectivityType,
-                       medEntityMesh Entity)
+                       medEntityMesh Entity) const
 {
   if (!_complete)
-    fillCopy();
+    (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
   const int *c = CONNECTIVITY::getConnectivityIndex
     (ConnectivityType, Entity);
@@ -360,10 +360,10 @@ bool CONNECTIVITYClient::existConnectivity(medConnectivity ConnectivityType,
 //=============================================================================
 const int * CONNECTIVITYClient::getReverseConnectivity
                       (medConnectivity ConnectivityType, 
-                       medEntityMesh Entity) throw (MEDEXCEPTION)
+                       medEntityMesh Entity) const throw (MEDEXCEPTION)
 {
   if (!_complete)
-    fillCopy();
+    (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
   const int *c = CONNECTIVITY::getReverseConnectivity
     (ConnectivityType, Entity);
@@ -377,10 +377,10 @@ const int * CONNECTIVITYClient::getReverseConnectivity
 //=============================================================================
 const int * CONNECTIVITYClient::getReverseConnectivityIndex
                       (medConnectivity ConnectivityType,
-                       medEntityMesh Entity) throw (MEDEXCEPTION)
+                       medEntityMesh Entity) const throw (MEDEXCEPTION)
 {
   if (!_complete)
-    fillCopy();
+    (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
   const int *c =  CONNECTIVITY::getReverseConnectivityIndex
     (ConnectivityType, Entity);
@@ -393,10 +393,10 @@ const int * CONNECTIVITYClient::getReverseConnectivityIndex
  */
 //=============================================================================
 const int* CONNECTIVITYClient::getValue(medConnectivity TypeConnectivity, 
-                        medGeometryElement Type)
+					medGeometryElement Type) const
 {
   if (!_complete)
-    fillCopy();
+    (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
   const int * c =  CONNECTIVITY::getValue(TypeConnectivity, Type);
 
@@ -407,10 +407,10 @@ const int* CONNECTIVITYClient::getValue(medConnectivity TypeConnectivity,
 /*!
  */
 //=============================================================================
-const int* CONNECTIVITYClient::getValueIndex(medConnectivity TypeConnectivity)
+const int* CONNECTIVITYClient::getValueIndex(medConnectivity TypeConnectivity) const
 {
   if (!_complete)
-    fillCopy();
+    (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
   const int * c =  CONNECTIVITY::getValueIndex(TypeConnectivity);
 
@@ -469,10 +469,10 @@ bool CONNECTIVITYClient::existPolyhedronConnectivity(medConnectivity connectivit
 //=======================================================================
 
 const int* CONNECTIVITYClient::getPolygonsConnectivity(medConnectivity ConnectivityType,
-                                                       medEntityMesh Entity)
+                                                       medEntityMesh Entity) const
 {
   if (!_complete)
-    fillCopy();
+    (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
   const int * c = CONNECTIVITY::getPolygonsConnectivity (ConnectivityType, Entity);
 
@@ -485,10 +485,10 @@ const int* CONNECTIVITYClient::getPolygonsConnectivity(medConnectivity Connectiv
 //=======================================================================
 
 const int* CONNECTIVITYClient::getPolygonsConnectivityIndex(medConnectivity ConnectivityType,
-                                                            medEntityMesh Entity)
+                                                            medEntityMesh Entity) const
 {
   if (!_complete)
-    fillCopy();
+    (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
   const int * c = CONNECTIVITY::getPolygonsConnectivityIndex (ConnectivityType, Entity);
 

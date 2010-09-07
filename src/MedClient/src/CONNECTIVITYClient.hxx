@@ -53,9 +53,9 @@ public:
 
   const int * getConnectivity      (medConnectivity ConnectivityType, 
                                         medEntityMesh Entity,
-                                        medGeometryElement Type);
+                                        medGeometryElement Type) const;
   const int * getConnectivityIndex (medConnectivity ConnectivityType,
-                                        medEntityMesh Entity);
+                                        medEntityMesh Entity) const;
   
   void  calculateConnectivity (medConnectivity connectivityType, 
                                medEntityMesh Entity);
@@ -68,17 +68,17 @@ public:
                          medEntityMesh Entity) const;
 
   const int* getReverseConnectivity (medConnectivity ConnectivityType, 
-                                         medEntityMesh Entity=MED_CELL)
+                                         medEntityMesh Entity=MED_CELL) const
     throw (MEDEXCEPTION);
 
   const int* getReverseConnectivityIndex (medConnectivity ConnectivityType,
-                                              medEntityMesh Entity=MED_CELL)
+                                              medEntityMesh Entity=MED_CELL) const
     throw (MEDEXCEPTION);
 
   const int* getValue (medConnectivity TypeConnectivity, 
-                           medGeometryElement Type);
+                           medGeometryElement Type) const;
  
-  const int* getValueIndex        (medConnectivity TypeConnectivity);
+  const int* getValueIndex        (medConnectivity TypeConnectivity) const;
   const int* getNeighbourhood() const;
 
   
@@ -88,9 +88,9 @@ public:
   bool       existPolyhedronConnectivity(medConnectivity connectivityType,
                                          medEntityMesh   Entity) const;
   const int* getPolygonsConnectivity(medConnectivity ConnectivityType,
-                                     medEntityMesh   Entity);
+                                     medEntityMesh   Entity) const;
   const int* getPolygonsConnectivityIndex(medConnectivity ConnectivityType,
-                                          medEntityMesh   Entity);
+                                          medEntityMesh   Entity) const;
   const int* getPolyhedronConnectivity(medConnectivity ConnectivityType) const;
   const int* getPolyhedronIndex(medConnectivity ConnectivityType) const;
   const int* getPolyhedronFacesIndex() const;
