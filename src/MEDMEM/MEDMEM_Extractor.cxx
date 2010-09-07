@@ -351,7 +351,6 @@ namespace MEDMEM
 Extractor::Extractor(const FIELD<double>& inputField) throw (MEDEXCEPTION)
 : _myInputField( & inputField )    
 {
-  _myInputField->addReference();
   const char* LOC = "Extractor::Extractor(inputField) :";
 
   // Check if the input field complies with the conditions
@@ -369,36 +368,28 @@ Extractor::Extractor(const FIELD<double>& inputField) throw (MEDEXCEPTION)
   if ( inputField.getGaussPresence() && inputField.getNumberOfGaussPoints()[0] > 1 )
     throw MEDEXCEPTION(STRING(LOC) << "InputField is not constant be element");
 
-  MESH* mesh = inputField.getSupport()->getMesh();
+  GMESH* mesh = inputField.getSupport()->getMesh();
   if ( !mesh )
-    {
-      _myInputField->removeReference();
       throw MEDEXCEPTION(STRING(LOC) << "InputField has support with NULL mesh");
-    }
 
   if ( mesh->getSpaceDimension() < 2 )
-    {
-      _myInputField->removeReference();
       throw MEDEXCEPTION(STRING(LOC) << "InputField with 1D support not acceptable");
-    }
 
-  if ( mesh->getNumberOfPolygons() > 0 ||
-       mesh->getNumberOfPolyhedron() > 0 )
-    {
-      _myInputField->removeReference();
+  if ( mesh->getNumberOfElements(MED_CELL, MED_POLYGON) > 0 ||
+       mesh->getNumberOfElements(MED_CELL, MED_POLYHEDRA) > 0 )
       throw MEDEXCEPTION(STRING(LOC) << "InputField has supporting mesh with poly elements");
-    }
 
-  if ( mesh->getConnectivityptr()->getEntityDimension() < 2 )
-    {
-      _myInputField->removeReference();
+  if ( mesh->getMeshDimension() < 2 )
       throw MEDEXCEPTION(STRING(LOC) << "Invalid entity dimension of connectivity");
-    }
+
+  _myInputField->addReference();
+  _myInputMesh = mesh->convertInMESH();
 }
 
 Extractor::~Extractor()
 {
   _myInputField->removeReference();
+  _myInputMesh->removeReference();
 }
 
 //================================================================================
@@ -560,7 +551,7 @@ MESH* Extractor::divideEdges(const double*       coords,
 
   const SUPPORT* support            = _myInputField->getSupport();
   medEntityMesh entity              = support->getEntity();
-  MESH* inMesh                      = support->getMesh();
+  const MESH* inMesh                = _myInputMesh;//support->getMesh();
   const medGeometryElement* inTypes = support->getTypes();
 
   const int* inConn      = inMesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
@@ -744,7 +735,7 @@ MESH* Extractor::divideEdges(const double*       coords,
   // Make mesh
   // ----------
 
-  // count classical types
+  // count types
   vector< medGeometryElement > types;
   vector< int > nbCellByType;
   map< int, vector< int > >::iterator nbNoConn, ncEnd =newConnByNbNodes.end();
@@ -752,12 +743,19 @@ MESH* Extractor::divideEdges(const double*       coords,
   {
     int nbNodesPerCell = nbNoConn->first;
     int connSize = nbNoConn->second.size();
-    if ( nbNodesPerCell >= 2 && nbNodesPerCell <= 4 && connSize > 0 ) {
+    if ( connSize == 0 ) continue;
+    if ( nbNodesPerCell >= 2 && nbNodesPerCell <= 4 )
+    {
       nbCellByType.push_back( connSize / nbNodesPerCell );
       types.push_back( medGeometryElement( (meshDim-1)*100 + nbNodesPerCell ));
     }
+    else
+    {
+      nbCellByType.push_back( nbNodesPerPolygon.size() );
+      types.push_back( MED_POLYGON );
+    }
   }
-  if ( types.empty() && newConnByNbNodes[_POLYGON].empty() )
+  if ( types.empty() )
     return 0;
 
   MESHING* meshing = new MESHING();
@@ -769,25 +767,24 @@ MESH* Extractor::divideEdges(const double*       coords,
   meshing->setTypes( &types[0], MED_CELL );
   meshing->setNumberOfElements( &nbCellByType[0], MED_CELL);
   for ( int i = 0; i < types.size(); ++i )
-    meshing->setConnectivity( & newConnByNbNodes[ types[i]%100 ].front(), MED_CELL, types[i]);
-  meshing->setMeshDimension( spaceDim /*meshDim-1*/ );
+    if ( types[i] != MED_POLYGON )
+    {
+      meshing->setConnectivity( MED_CELL, types[i], & newConnByNbNodes[ types[i]%100 ].front());
+    }
+    else
+    {
+      // make index
+      vector<int> index;
+      index.reserve( nbNodesPerPolygon.size()+1 );
+      index.push_back( 1 );
+      list<int>::iterator nbNodes = nbNodesPerPolygon.begin(), nnEnd = nbNodesPerPolygon.end();
+      for ( ; nbNodes != nnEnd; ++nbNodes )
+        index.push_back( index.back() + *nbNodes );
+    
+      meshing->setConnectivity( MED_CELL, types[i], & newConnByNbNodes[ _POLYGON ].front(),
+                                & index[0]);
+    }
 
-  // polygons
-  if ( !newConnByNbNodes[_POLYGON].empty() )
-  {
-    // make index
-    vector<int> index;
-    index.reserve( newConnByNbNodes[_POLYGON].size() / 5 );
-    index.push_back( 1 );
-    list<int>::iterator nbNodes = nbNodesPerPolygon.begin(), nnEnd = nbNodesPerPolygon.end();
-    for ( ; nbNodes != nnEnd; ++nbNodes )
-      index.push_back( index.back() + *nbNodes );
-
-    meshing->setPolygonsConnectivity( & index[0],
-                                      & newConnByNbNodes[_POLYGON][0],
-                                      index.size()-1,
-                                      MED_CELL );
-  }
   return meshing;
 }
 
@@ -800,7 +797,7 @@ MESH* Extractor::divideEdges(const double*       coords,
 void Extractor::computeDistanceOfNodes(const double* point,
                                        const double* normal)
 {
-  const MESH* mesh     = _myInputField->getSupport()->getMesh();
+  const MESH* mesh     = _myInputMesh; //_myInputField->getSupport()->getMesh();
   const double * coord = mesh->getCoordinates(MED_FULL_INTERLACE);
   const int spaceDim   = mesh->getSpaceDimension();
 
@@ -949,7 +946,7 @@ MESH* Extractor::transfixFaces( const double*       coords,
                                 const double*       direction,
                                 map<int,set<int> >& new2oldCells)
 {
-  MESH* inMesh = _myInputField->getSupport()->getMesh();
+  const MESH* inMesh = _myInputMesh; //_myInputField->getSupport()->getMesh();
   TMeshData inMeshData( *inMesh );
   TLine line( direction, coords );
 
@@ -1044,13 +1041,11 @@ MESH* Extractor::transfixFaces( const double*       coords,
 
   meshing->setName(STRING("Cut of ") << inMesh->getName());
   meshing->setNumberOfTypes( 1, MED_CELL );
-  //meshing->setMeshDimension( dim );
   meshing->setCoordinates( dim, nbNodes, &resCoords[0],
                            inMesh->getCoordinatesSystem(), MED_FULL_INTERLACE );
   meshing->setTypes( &MED_SEG2, MED_CELL );
   meshing->setNumberOfElements( &nbSegments, MED_CELL);
-  meshing->setConnectivity( & resConn[0], MED_CELL, MED_SEG2);
-  meshing->setMeshDimension( dim );
+  meshing->setConnectivity( MED_CELL, MED_SEG2, & resConn[0]);
 
   return meshing;
 }

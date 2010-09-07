@@ -420,9 +420,11 @@ public:
   static bool isTimeStepEnd(const char* line)
   { return ( strncmp( line, TIME_STEP_END, TIME_STEP_END_LEN ) == 0 ); }
 
-  static bool isToWriteEntity(const medEntityMesh entity, const MESH* mesh);
+  static bool isToWriteEntity(const medEntityMesh entity, const GMESH* mesh);
 
   ~_CaseFileDriver_User();
+
+  void merge( const GENDRIVER& driver);
 
 private:
 
@@ -526,11 +528,11 @@ struct _Support
 
 struct _InterMed : public _intermediateMED
 {
-  MESH * _medMesh;
-  bool   _isOwnMedMesh; //!< whether to delete _medMesh
-  int    _nbUsers;      //!< to know when to delete _medMesh
+  MESH* _medMesh;
+  bool  _isOwnMedMesh; //!< whether to delete _medMesh
+  int   _nbUsers;      //!< to know when to delete _medMesh
 
-  bool   _needSubParts; //!< true if there are fields needing _SubPart data
+  bool  _needSubParts; //!< true if there are fields needing _SubPart data
 
   map< _SubPartDesc, _SubPart > _subPartDescribed;
 
@@ -538,7 +540,7 @@ struct _InterMed : public _intermediateMED
 
   void addSubPart(const _SubPart& subPart);
 
-  ~_InterMed() { if ( _isOwnMedMesh ) { if(_medMesh) _medMesh->removeReference(); _medMesh=0; }}
+  ~_InterMed();
 };
 
 // ==============================================================================

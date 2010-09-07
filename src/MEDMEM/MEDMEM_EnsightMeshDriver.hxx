@@ -31,7 +31,7 @@
 
 namespace MEDMEM {
 
-  class MESH;
+  class GMESH;
   class SUPPORT;
 
 // ==============================================================================
@@ -46,15 +46,15 @@ class MEDMEM_EXPORT ENSIGHT_MESH_DRIVER : public MEDMEM_ENSIGHT::_CaseFileDriver
 {
 protected:
 
-  MESH *       _ptrMesh;
+  GMESH *      _ptrMesh;
   std::string  _meshName;
 
   virtual void openConst(bool checkDataFile=false) const;
 
 public :
   ENSIGHT_MESH_DRIVER() ;
-  ENSIGHT_MESH_DRIVER(const std::string & fileName,  MESH * ptrMesh) ;
-  ENSIGHT_MESH_DRIVER(const std::string & fileName,  MESH * ptrMesh,
+  ENSIGHT_MESH_DRIVER(const std::string & fileName,  GMESH * ptrMesh) ;
+  ENSIGHT_MESH_DRIVER(const std::string & fileName,  GMESH * ptrMesh,
                       MED_EN::med_mode_acces accessMode);
   ENSIGHT_MESH_DRIVER(const ENSIGHT_MESH_DRIVER & driver) ;
   virtual ~ENSIGHT_MESH_DRIVER() ;
@@ -65,7 +65,7 @@ public :
   virtual void        setMeshName(const string & meshName);
   virtual std::string getMeshName() const;
 
-  MESH* getMesh() { return _ptrMesh; }
+  GMESH* getMesh() { return _ptrMesh; }
 };
 
 // ==============================================================================
@@ -123,7 +123,9 @@ class MEDMEM_EXPORT ENSIGHT_MESH_WRONLY_DRIVER : public virtual ENSIGHT_MESH_DRI
 public :
   //!< write a mesh;
   // to be appended, a mesh mush have same nb of groups and dimension as already present ones
-  ENSIGHT_MESH_WRONLY_DRIVER(const std::string & fileName,  MESH * ptrMesh, bool append=false);
+  ENSIGHT_MESH_WRONLY_DRIVER(const std::string & fileName,
+                             const GMESH * ptrMesh,
+                             bool append=false);
 
   ENSIGHT_MESH_WRONLY_DRIVER();
   ENSIGHT_MESH_WRONLY_DRIVER(const ENSIGHT_MESH_WRONLY_DRIVER & driver);
