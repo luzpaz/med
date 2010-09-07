@@ -105,10 +105,10 @@ int main (int argc, char **argv)
   med_int ngro;
   char gro[MED_TAILLE_LNOM+1];
   char gro2[MED_TAILLE_LNOM*2+1];
-  char gro3[MED_TAILLE_LNOM*3+1];
+  //char gro3[MED_TAILLE_LNOM*3+1];
   int i;
   int nfame = 3; 
-  int nfamn = 2;
+  //int nfamn = 2;
 
 
   /*

@@ -123,7 +123,7 @@ int main (int argc, char **argv)
   /* Mailles POLYEDRE */
   med_int npolyhedron = 2;
   med_int npolyhedronfaces = 19;
-  med_int npolyhedronnodes = 74;
+  //med_int npolyhedronnodes = 74;
   med_int polyhedronconnectivity[74] = {1,2,3,4,5,6,1,7,8,2,2,8,9,3,4,3,9,10,5,4,10,11,6,5,11,12,1,6,12,7,7,12,8,10,9,8,12,11,
                                         13,14,15,3,2,13,2,8,16,14,13,16,17,15,14,17,15,17,18,15,18,9,3,15,9,2,3,9,8,8,9,17,16,9,18,17};
   med_int polyhedronfacesindex[20] = {1,7,11,15,19,23,27,31,34,
@@ -146,14 +146,14 @@ int main (int argc, char **argv)
   char nomfam[MED_TAILLE_NOM+1];
   med_int numfam;
   char attdes[MED_TAILLE_DESC+1];
-  med_int natt;
+  //med_int natt;
   med_int attide;
   med_int attval;
-  med_int ngro;
+  //med_int ngro;
   char gro[MED_TAILLE_LNOM+1];
-  int i;
-  int nfame = 2;
-  int nfamn = 1;
+  //int i;
+  //int nfame = 2;
+  //int nfamn = 1;
 
   /*
     Some fields : 2 on nodes : one int and one double , one on cells : double

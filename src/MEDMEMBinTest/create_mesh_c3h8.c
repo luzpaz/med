@@ -106,7 +106,7 @@ int main (int argc, char **argv)
   int i;
   int nfame = 1; 
   int nfamn = 1;
-  int nfamf = 1;
+  //int nfamf = 1;
 
   /*
     Some fields : 2 on nodes : one int and one double , one on cells : double
