@@ -21,9 +21,9 @@
 //
 
 #include "MEDMEM_define.hxx"
-#include "MEDMEM_Med.hxx"
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_Field.hxx"
 
 #include "MEDMEM_EnsightMedDriver.hxx"
 #include "MEDMEM_EnsightFieldDriver.hxx"
@@ -39,24 +39,18 @@ using namespace MEDMEM_ENSIGHT;
 // ================================================================================
 namespace MEDMEM {
 
-ENSIGHT_MED_DRIVER::ENSIGHT_MED_DRIVER():
-  _CaseFileDriver_User(),_ptrMed((MED *)MED_NULL)
-{}
-
-ENSIGHT_MED_DRIVER::ENSIGHT_MED_DRIVER(const string & fileName,  MED * ptrMed):
-  _CaseFileDriver_User(fileName,RDONLY), _ptrMed(ptrMed)
+ENSIGHT_MED_DRIVER::ENSIGHT_MED_DRIVER():_CaseFileDriver_User()
 {
 }
 
 ENSIGHT_MED_DRIVER::ENSIGHT_MED_DRIVER(const string & fileName,
-                                       MED *          ptrMed,
                                        med_mode_acces accessMode):
-  _CaseFileDriver_User(fileName,accessMode), _ptrMed(ptrMed)
+  _CaseFileDriver_User(fileName,accessMode)
 {
 }
 
 ENSIGHT_MED_DRIVER::ENSIGHT_MED_DRIVER(const ENSIGHT_MED_DRIVER & driver):
-  _CaseFileDriver_User(driver), _ptrMed(driver._ptrMed)
+  _CaseFileDriver_User(driver)
 {
 }
 
@@ -77,10 +71,12 @@ void ENSIGHT_MED_DRIVER::openConst() const
   END_OF_MED(LOC);
 }
 
-void ENSIGHT_MED_DRIVER::open() {
+void ENSIGHT_MED_DRIVER::open()
+{
   openConst();
 }
-void ENSIGHT_MED_DRIVER::close() {
+void ENSIGHT_MED_DRIVER::close()
+{
 }
 
 ENSIGHT_MED_DRIVER::~ENSIGHT_MED_DRIVER()
@@ -92,17 +88,18 @@ ENSIGHT_MED_DRIVER::~ENSIGHT_MED_DRIVER()
 // WRONLY
 // ================================================================================
 
-ENSIGHT_MED_WRONLY_DRIVER::ENSIGHT_MED_WRONLY_DRIVER() : ENSIGHT_MED_DRIVER()
+ENSIGHT_MED_WRONLY_DRIVER::ENSIGHT_MED_WRONLY_DRIVER() : ENSIGHT_MED_DRIVER(), _fields(0)
 {
 }
 
-ENSIGHT_MED_WRONLY_DRIVER::ENSIGHT_MED_WRONLY_DRIVER(const string & fileName,  MED * ptrMed)
-  : ENSIGHT_MED_DRIVER(fileName, ptrMed, MED_EN::WRONLY )
+ENSIGHT_MED_WRONLY_DRIVER::ENSIGHT_MED_WRONLY_DRIVER(const string & fileName,
+                                                     const vector< const FIELD_* >& fields)
+  : ENSIGHT_MED_DRIVER(fileName, MED_EN::WRONLY ), _fields( fields )
 {
 }
 
 ENSIGHT_MED_WRONLY_DRIVER::ENSIGHT_MED_WRONLY_DRIVER(const ENSIGHT_MED_WRONLY_DRIVER & driver)
-  : ENSIGHT_MED_DRIVER(driver)
+  : ENSIGHT_MED_DRIVER(driver), _fields( driver._fields )
 {
 }
 
@@ -115,7 +112,8 @@ GENDRIVER * ENSIGHT_MED_WRONLY_DRIVER::copy() const
   return new ENSIGHT_MED_WRONLY_DRIVER(*this) ;
 }
 
-void ENSIGHT_MED_WRONLY_DRIVER::read() throw (MEDEXCEPTION) {
+void ENSIGHT_MED_WRONLY_DRIVER::read() throw (MEDEXCEPTION)
+{
   throw MEDEXCEPTION("ENSIGHT_MED_WRONLY_DRIVER::read : Can't read with a WRONLY driver !");
 }
 
@@ -128,11 +126,9 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
 
   _CaseFileDriver caseFile( getCaseFileName(), this );
 
-  int NumberOfMeshes = _ptrMed->getNumberOfMeshes() ;
-  deque<string> MeshNames = _ptrMed->getMeshNames() ;
-
-  int NumberOfFields = _ptrMed->getNumberOfFields() ;
-  deque<string> FieldNames = _ptrMed->getFieldNames() ;
+  map< const GMESH*, vector< const FIELD_* > > mesh2fields;
+  for (int i = 0; i < _fields.size(); ++i )
+    mesh2fields[ _fields[i]->getSupport()->getMesh() ].push_back( _fields[i] );
 
   // Create drivers for all meshes and fields
   // and add them to be written to Case file
@@ -141,28 +137,21 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
   ENSIGHT_MESH_WRONLY_DRIVER *  meshDriver;
   ENSIGHT_FIELD_WRONLY_DRIVER * fieldDriver;
 
-  for (int i=0; i<NumberOfMeshes; i++)
+  map< const GMESH*, vector< const FIELD_* > >::iterator m_ff = mesh2fields.begin();
+  for (; m_ff != mesh2fields.end(); ++m_ff )
   {
-    MESH * mesh = _ptrMed->getMesh(MeshNames[i]) ;
+    const GMESH * mesh = m_ff->first ;
     meshDriver = new ENSIGHT_MESH_WRONLY_DRIVER( _fileName, mesh );
     caseFile.addMesh( meshDriver );
     drivers.push_back( meshDriver );
 
-    // get all fields on this mesh
-    for (int j=0; j<NumberOfFields; j++)
+    // all fields on this mesh
+    const vector< const FIELD_*> & fields = m_ff->second;
+    for (int j=0; j<fields.size(); j++)
     {
-      deque<DT_IT_> timeSteps = _ptrMed->getFieldIteration(FieldNames[j]) ;
-      deque<DT_IT_>::const_iterator dtit = timeSteps.begin();
-      for ( ; dtit!=timeSteps.end(); dtit++)
-      {
-        FIELD_ * field = _ptrMed->getField( FieldNames[j], dtit->dt, dtit->it );
-        MESH* supMesh = field->getSupport()->getMesh();
-        if ( supMesh == mesh || mesh->getName() == field->getSupport()->getMeshName() ) {
-          fieldDriver = new ENSIGHT_FIELD_WRONLY_DRIVER( _fileName, field );
-          caseFile.addField( fieldDriver );
-          drivers.push_back( fieldDriver );
-        }
-      }
+      fieldDriver = new ENSIGHT_FIELD_WRONLY_DRIVER( _fileName, fields[j] );
+      caseFile.addField( fieldDriver );
+      drivers.push_back( fieldDriver );
     }
   }
 
@@ -187,17 +176,20 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
 // ================================================================================
 
 ENSIGHT_MED_RDONLY_DRIVER::ENSIGHT_MED_RDONLY_DRIVER() :
-  ENSIGHT_MED_DRIVER(), _isFileStructRead(false)
+  ENSIGHT_MED_DRIVER(), _fields(0), _isFileStructRead(false)
 {
 }
 
-ENSIGHT_MED_RDONLY_DRIVER::ENSIGHT_MED_RDONLY_DRIVER(const string & fileName,  MED * ptrMed)
-  : ENSIGHT_MED_DRIVER( fileName, ptrMed, MED_EN::RDONLY), _isFileStructRead(false)
+ENSIGHT_MED_RDONLY_DRIVER::ENSIGHT_MED_RDONLY_DRIVER(const string &     fileName,
+                                                     vector< FIELD_* >& fields)
+  : ENSIGHT_MED_DRIVER( fileName, MED_EN::RDONLY), _fields( & fields ), _isFileStructRead(false)
 {
 }
 
 ENSIGHT_MED_RDONLY_DRIVER::ENSIGHT_MED_RDONLY_DRIVER(const ENSIGHT_MED_RDONLY_DRIVER & driver)
-  : ENSIGHT_MED_DRIVER(driver), _isFileStructRead(false)
+  : ENSIGHT_MED_DRIVER(driver),
+    _fields( driver._fields ),
+    _isFileStructRead(driver._isFileStructRead)
 {
 }
 
@@ -210,7 +202,8 @@ GENDRIVER * ENSIGHT_MED_RDONLY_DRIVER::copy() const
   return new ENSIGHT_MED_RDONLY_DRIVER(*this) ;
 }
 
-void ENSIGHT_MED_RDONLY_DRIVER::write() const throw (MEDEXCEPTION) {
+void ENSIGHT_MED_RDONLY_DRIVER::write() const throw (MEDEXCEPTION)
+{
   throw MEDEXCEPTION("ENSIGHT_MED_RDONLY_DRIVER::write : Can't write with a RDONLY driver !");
 }
 
@@ -219,51 +212,43 @@ void ENSIGHT_MED_RDONLY_DRIVER::read()
   const char * LOC = "ENSIGHT_MED_RDONLY_DRIVER::read() : " ;
   BEGIN_OF_MED(LOC);
 
-  if ( _isFileStructRead ) {
-
-    int NumberOfMeshes = _ptrMed->getNumberOfMeshes() ;
-    deque<string> MeshNames = _ptrMed->getMeshNames() ;
-
-    int NumberOfFields = _ptrMed->getNumberOfFields() ;
-    deque<string> FieldNames = _ptrMed->getFieldNames() ;
-
-    for (int i=0; i<NumberOfMeshes; i++)
+  if ( _isFileStructRead )
+  {
+    for ( int i = 0; i < _fields->size(); ++i )
     {
-      MESH * mesh = _ptrMed->getMesh(MeshNames[i]) ;
-      mesh->read( getId() ); 
-    }
-    // read fields
-    for (int j=0; j<NumberOfFields; j++)
-    {
-      deque<DT_IT_> timeSteps = _ptrMed->getFieldIteration(FieldNames[j]) ;
-      deque<DT_IT_>::const_iterator dtit = timeSteps.begin();
-      for ( ; dtit!=timeSteps.end(); dtit++)
-      {
-        FIELD_ * field = _ptrMed->getField( FieldNames[j], dtit->dt, dtit->it );
-        field->read( getId() );
-      }
+      GMESH* mesh = _fields->at(i)->getSupport()->getMesh();
+      if ( mesh->getNumberOfNodes() < 1 )
+        mesh->read( getId() );
+      _fields->at(i)->read( getId() );
     }
   }
-  else {
-
+  else
+  {
     open(); // check if can open the case file
 
     _CaseFileDriver caseFile( getCaseFileName(), this );
 
     caseFile.read();
 
+    _fields->clear();
+    int nbOfFields = caseFile.getNbVariables();
+    if ( nbOfFields < 1 )
+      return;
+
     int nbOfMeshes = caseFile.getNbMeshes();
+    vector<MESH*> meshes;
     for ( int i = 1; i <= nbOfMeshes; ++i )
     {
       MESH* mesh = new MESH;
-      ENSIGHT_MESH_RDONLY_DRIVER meshDriver(_fileName, mesh);
+      ENSIGHT_MESH_RDONLY_DRIVER meshDriver(_fileName, mesh, i);
       caseFile.setDataFileName( i, &meshDriver );
-      meshDriver.open();
-      meshDriver.read();
-      _ptrMed->addMesh( mesh );
+      int drv = mesh->addDriver( meshDriver );
+//       meshDriver.open();
+//       meshDriver.read();
+      mesh->read( drv );
+      meshes.push_back( mesh );
     }
 
-    int nbOfFields = caseFile.getNbVariables();
     for ( int i = 1; i <= nbOfFields; i++ )
     {
       int nbSteps = caseFile.getNbVarSteps( i );
@@ -271,14 +256,21 @@ void ENSIGHT_MED_RDONLY_DRIVER::read()
       {
         FIELD_* field = new FIELD<double>();
         ENSIGHT_FIELD_RDONLY_DRIVER fieldDriver( _fileName, field );
-        caseFile.setDataFileName( i, step, &fieldDriver );
+        /*int meshIndex =*/ caseFile.setDataFileName( i, step, &fieldDriver );
         fieldDriver.open();
         fieldDriver.read();
-        _ptrMed->addField( field );
+        _fields->push_back( field );
+//         if ( meshIndex <= meshes.size() && field->getSupport()->getMesh() != meshes[ meshIndex-1])
+//         {
+//           if ( field->getSupport()->getMesh() )
+//             field->getSupport()->getMesh()->addReference(); // let the mesh live
+//           field->getSupport()->setMesh( meshes[ meshIndex-1 ]);
+//         }
       }
     }
   }
 }
+
 //================================================================================
 /*!
  * \brief Create all meshes and fields but not read them
@@ -304,10 +296,10 @@ void ENSIGHT_MED_RDONLY_DRIVER::readFileStruct()
     ENSIGHT_MESH_RDONLY_DRIVER meshDriver(_fileName, mesh, i);
     caseFile.setDataFileName( i, &meshDriver ); // retrieve mesh name
     setId( mesh->addDriver( meshDriver ));
-    _ptrMed->addMesh( mesh );
   }
   _isFileStructRead = true;
 
+  _fields->clear();
   int nbOfFields = caseFile.getNbVariables();
   for ( int i = 1; i <= nbOfFields; i++ )
   {
@@ -323,7 +315,7 @@ void ENSIGHT_MED_RDONLY_DRIVER::readFileStruct()
           meshIndex = 1;
         ((SUPPORT*) sup)->setMesh( meshes[ meshIndex ]);
       }
-      _ptrMed->addField( field );
+      _fields->push_back( field );
     }
   }
 }

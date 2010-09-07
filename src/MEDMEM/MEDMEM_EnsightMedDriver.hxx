@@ -39,7 +39,6 @@ namespace MEDMEM {
 class MESH;
 class SUPPORT;
 class FIELD_;
-class MED;
 
 // ==============================================================================
 /*!
@@ -51,15 +50,11 @@ class MEDMEM_EXPORT ENSIGHT_MED_DRIVER : public MEDMEM_ENSIGHT::_CaseFileDriver_
 {
 protected:
   
-  MED * _ptrMed;          // Store 'ENSIGHT_DRIVER (0..n)----(1) ENSIGHT' associations
- 
   virtual void openConst()  const;
 
 public :
   ENSIGHT_MED_DRIVER();
-  ENSIGHT_MED_DRIVER(const string & fileName, MED * ptrMed);
-  ENSIGHT_MED_DRIVER(const string & fileName, MED * ptrMed,
-                     MED_EN::med_mode_acces accessMode);
+  ENSIGHT_MED_DRIVER(const string & fileName, MED_EN::med_mode_acces accessMode);
   ENSIGHT_MED_DRIVER(const ENSIGHT_MED_DRIVER & driver);
   virtual ~ENSIGHT_MED_DRIVER();
 
@@ -77,7 +72,7 @@ class MEDMEM_EXPORT ENSIGHT_MED_RDONLY_DRIVER : public virtual ENSIGHT_MED_DRIVE
 {
 public :
   ENSIGHT_MED_RDONLY_DRIVER();
-  ENSIGHT_MED_RDONLY_DRIVER(const string & fileName,  MED * ptrMed);
+  ENSIGHT_MED_RDONLY_DRIVER(const string & fileName, std::vector< FIELD_* >& fields);
   ENSIGHT_MED_RDONLY_DRIVER(const ENSIGHT_MED_RDONLY_DRIVER & driver);
   virtual ~ENSIGHT_MED_RDONLY_DRIVER();
   virtual void write          ( void ) const throw (MEDEXCEPTION) ;
@@ -87,6 +82,7 @@ public :
 private:
 
   bool _isFileStructRead;
+  std::vector< FIELD_* > * _fields;
 };
 
 // ==============================================================================
@@ -100,14 +96,14 @@ private:
 
 class MEDMEM_EXPORT ENSIGHT_MED_WRONLY_DRIVER : public virtual ENSIGHT_MED_DRIVER
 {
+  const std::vector< const FIELD_* > _fields;
 public :
   ENSIGHT_MED_WRONLY_DRIVER();
-  ENSIGHT_MED_WRONLY_DRIVER(const string & fileName,  MED * ptrMed);
+  ENSIGHT_MED_WRONLY_DRIVER(const string & fileName, const std::vector< const FIELD_* >& fields);
   ENSIGHT_MED_WRONLY_DRIVER(const ENSIGHT_MED_WRONLY_DRIVER & driver);
   virtual ~ENSIGHT_MED_WRONLY_DRIVER();
   virtual void write          ( void ) const throw (MEDEXCEPTION) ;
   virtual void read           ( void ) throw (MEDEXCEPTION) ;
-  //virtual void readFileStruct ( void ) throw (MEDEXCEPTION) ;
   GENDRIVER * copy ( void ) const;
 };
 
