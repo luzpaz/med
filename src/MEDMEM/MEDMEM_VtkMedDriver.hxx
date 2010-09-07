@@ -33,12 +33,13 @@
 #include "MEDMEM_GenDriver.hxx"
 
 #include <fstream>
+#include <vector>
 
 using namespace std ;
 
 
 namespace MEDMEM {
-class MESH;
+class GMESH;
 class SUPPORT;
 class FIELD_;
 class MED;
@@ -46,9 +47,8 @@ class MED;
 class MEDMEM_EXPORT VTK_MED_DRIVER : public GENDRIVER
 {
 protected:
-  
-  MED * const       _ptrMed ;     // Store 'VTK_DRIVER (0..n)----(1) VTK' associations
-  //ofstream *        _vtkFile ;     // The _vtkFile used to write Meshes and Fields to _filename
+
+  const std::vector< const FIELD_* > *_fields;
   
 private:
   VTK_MED_DRIVER();
@@ -59,7 +59,7 @@ private:
   void closeConst() const ;
 
 public :
-  VTK_MED_DRIVER(const string & fileName,  MED * const ptrMed);
+  VTK_MED_DRIVER(const string & fileName, const std::vector< const FIELD_* >& fields);
   VTK_MED_DRIVER(const VTK_MED_DRIVER & driver);
   ~VTK_MED_DRIVER();
   // OPERATEUR DE RECOPIE AVEC _vtkFile ??
@@ -72,8 +72,8 @@ public :
   GENDRIVER * copy (void ) const ;
 
 private :
-  void writeMesh(MESH * myMesh) const ;
-  void writeField(FIELD_ * myField,string name) const ;
+  void writeMesh(const GMESH * myMesh) const ;
+  void writeField(const FIELD_ * myField, std::string name) const ;
 //   void writeSupport(SUPPORT * mySupport) const ;
 
 };
