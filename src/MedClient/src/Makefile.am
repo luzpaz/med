@@ -25,6 +25,7 @@ salomeinclude_HEADERS = \
 	MEDClient.hxx \
 	COORDINATEClient.hxx \
 	CONNECTIVITYClient.hxx \
+	GMESHClient.hxx \
 	MESHClient.hxx \
 	SUPPORTClient.hxx \
 	FAMILYClient.hxx \
@@ -57,6 +58,7 @@ lib_LTLIBRARIES = libMEDClientcmodule.la _libMEDClient.la
 dist_libMEDClientcmodule_la_SOURCES = \
 	COORDINATEClient.cxx \
 	CONNECTIVITYClient.cxx \
+	GMESHClient.cxx \
 	MESHClient.cxx \
 	SUPPORTClient.cxx \
 	FAMILYClient.cxx \
