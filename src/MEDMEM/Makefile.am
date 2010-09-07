@@ -45,6 +45,7 @@ MEDMEM_Group.hxx \
 MEDMEM_Array.hxx \
 MEDMEM_Exception.hxx \
 MEDMEM_MedFieldDriver.hxx \
+MEDMEM_MedFieldDriver.txx \
 MEDMEM_AsciiFieldDriver.hxx \
 MEDMEM_MedMeshDriver.hxx \
 MEDMEM_GibiMeshDriver.hxx \
