@@ -47,21 +47,13 @@ def print_ord(i):
     else:
         return `i`+'th'
 
-md = MED()
-
-mdDriver = MED_MED_RDONLY_DRIVER(medFile,md)
-
-mdDriver.open()
-mdDriver.readFileStruct()
-mdDriver.close()
-
+md = MEDFILEBROWSER(medFile)
 nbMeshes = md.getNumberOfMeshes()
 
 print "The med file", medFile, "contains", nbMeshes, "mesh(es)"
 
 mesh_name = md.getMeshName(0)
-mesh = md.getMesh(mesh_name)
-mesh.read()
+mesh = MESH(MED_DRIVER,medFile,mesh_name)
 spaceDim = mesh.getSpaceDimension()
 meshDim = mesh.getMeshDimension()
 nbNodes = mesh.getNumberOfNodes()
