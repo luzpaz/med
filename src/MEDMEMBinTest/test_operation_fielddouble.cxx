@@ -252,7 +252,6 @@ int main (int argc, char ** argv)
       cout <<  endl << string(60,'-') << endl ;
       affiche_fieldT(myFieldPlus, myFieldPlus->getSupport());
       cout <<  endl << string(60,'-') << endl << endl ;
-      myFieldPlus->removeReference();
     }
 
 
@@ -307,6 +306,7 @@ int main (int argc, char ** argv)
     // test 3 : supports non compatibles
     const SUPPORT *mySupport2=new SUPPORT(myMesh,"On_all_node",MED_NODE);
     myField1->setSupport(mySupport2);
+    mySupport2->removeReference();
     ntest++; res=1;
     try
       {
@@ -414,6 +414,7 @@ int main (int argc, char ** argv)
     myFieldmul->removeReference();
 
 
+    myFieldPlus->removeReference();
     myField1->removeReference();
     myField2->removeReference();
     mySupport->removeReference();

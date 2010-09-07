@@ -394,6 +394,7 @@ int main (int argc, char ** argv) {
     }
   if(support)
     support->removeReference();
+  myMesh->removeReference();
 
   //if (barycenter != NULL) delete barycenter;
   //if (volume != NULL ) delete volume;
