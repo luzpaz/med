@@ -76,7 +76,7 @@ GROUP * convertGroup(const SALOME_MED::GROUP_ptr &F, MESH *M)
 //=============================================================================
 void MESHClient::blankCopy()
 {
-  SALOME_MED::MESH::meshInfos_var all = IOR_Mesh->getMeshGlobal();
+  SALOME_MED::GMESH::meshInfos_var all = IOR_Mesh->getMeshGlobal();
 
   //CORBA::String_var s;
   //s= IOR_Mesh->getName(); _name = s;
@@ -86,7 +86,6 @@ void MESHClient::blankCopy()
   
   _name           = all->name;
   _spaceDimension = all->spaceDimension;
-  _meshDimension  = all->meshDimension;
   _numberOfNodes  = all->numberOfNodes;
 
   COORDINATEClient *_coord 
