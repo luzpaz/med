@@ -77,8 +77,8 @@ int main (int argc, char ** argv) {
     cout << endl ;
   }
 
-  delete mySupport;
-  delete myMesh;
+  mySupport->removeReference();
+  myMesh->removeReference();
 
   return 0 ;
 }

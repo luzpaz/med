@@ -32,7 +32,7 @@ main () {
   const char * fileName   = "pointe.med";
   const char * fileName2  = "Field&MeshGeneratedPointe.med";
   const char * fileName3  = "MedGeneratedPointe.med";
-  const char * fieldName1  = "fieldcelldouble";
+  const char * fieldName1  = "fieldcelldoublescalar";
   const char * fieldName2  = "fieldcelldoublebis";
   const char * meshName1   = "maa1";
   const char * meshName2   = "maa1bis";
@@ -45,15 +45,9 @@ main () {
     myMesh.setName(meshName2);
     myMesh.rmDriver();
 
-    MED  myMed(MED_DRIVER,fileName);
-    myMed.read();
-    myMed.addMesh(&myMesh);
-    int myMedDriver = myMed.addDriver(MED_DRIVER,fileName3);
-    myMed.write(myMedDriver);
-
     // FAIRE LE TEST AVEC LES CHAMPS AUSSI !.
 
   } catch (MEDEXCEPTION& ex){
-    MESSAGE(ex.what()) ;
+    MESSAGE_MED(ex.what()) ;
   }
 }

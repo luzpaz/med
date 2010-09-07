@@ -150,32 +150,3 @@ else:
         pass
     pass
 
-nbPolygons = myMesh.getNumberOfPolygons()
-if nbPolygons > 0 :
-    print ""
-    print "     Show Connectivity (Nodal) of POLYGONS:"
-    print ""
-    connectivity = myMesh.getPolygonsConnectivity(MED_NODAL,MED_CELL)
-    index = myMesh.getPolygonsConnectivityIndex(MED_NODAL,MED_CELL)
-    for j in range(nbPolygons):
-        print "       Polygon",(j+1)," ",connectivity[ index[j]-1 : index[j+1]-1 ]
-        pass
-    pass
-
-nbPolyhedrons = myMesh.getNumberOfPolyhedron()
-if nbPolyhedrons > 0 :
-    print ""
-    print "     Show Connectivity (Nodal) of POLYHEDRONS:"
-    print ""
-    connectivity = myMesh.getPolyhedronConnectivity(MED_NODAL)
-    fIndex = myMesh.getPolyhedronFacesIndex()
-    index = myMesh.getPolyhedronIndex(MED_NODAL)
-    for j in range(nbPolyhedrons):
-        print     "       Polyhedra",(j+1)
-        iF1, iF2 = index[ j ]-1, index[ j+1 ]-1
-        for f in range( iF2 - iF1 ):
-            iN1, iN2 = fIndex[ iF1+f ]-1, fIndex[ iF1+f+1 ]-1
-            print "         Face",f+1," ",connectivity[ iN1 : iN2 ]
-            pass
-        pass
-    pass

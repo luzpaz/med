@@ -31,26 +31,22 @@ from libMEDMEM_Swig import *
 
 medFile = "pointe.med"
 medFile2 = "fieldCellDoubleOfpointe.me"
-fieldName = "fieldcelldouble"
+fieldName = "fieldcelldoublescalar"
 meshName = "maa1"
 
 try:
-    myField = FIEDLDOUBLE()
+    myField = FIELDDOUBLE()
 
-    myDriver1 = myField->addDriver(MED_DRIVER,medFile,fieldName)
+    myDriver1 = myField.addDriver(MED_DRIVER,medFile,fieldName)
     myField.rmDriver()
 
-    myDriver2 = myField->addDriver(MED_DRIVER,medFile2,fieldName)
+    myDriver2 = myField.addDriver(MED_DRIVER,medFile2,fieldName)
     myField.rmDriver(myDriver2)
 
     myMesh = MESH()
-    myDriver3 = myMesh->addDriver(MED_DRIVER,medFile,meshName)
+    myDriver3 = myMesh.addDriver(MED_DRIVER,medFile,meshName)
     myMesh.read()
     myMesh.rmDriver()
-
-    myMed = MED()
-    myMed.readFileStruct()
-    myMed.rmDriver()
 
 except:
     print "There is a problem somewhere !!"
