@@ -46,8 +46,6 @@ MEDMEM_Array.hxx \
 MEDMEM_Exception.hxx \
 MEDMEM_MedFieldDriver.hxx \
 MEDMEM_AsciiFieldDriver.hxx \
-MEDMEM_Med.hxx \
-MEDMEM_MedMedDriver.hxx \
 MEDMEM_MedMeshDriver.hxx \
 MEDMEM_GibiMeshDriver.hxx \
 MEDMEM_PorflowMeshDriver.hxx \
@@ -66,14 +64,7 @@ MEDMEM_Grid.hxx \
 MEDMEM_RCBase.hxx \
 MEDMEM_medimport_src.hxx \
 MEDMEM_MedVersion.hxx \
-MEDMEM_Compatibility21_22.hxx \
-MEDMEM_MedFieldDriver21.hxx \
-MEDMEM_MedMeshDriver21.hxx \
-MEDMEM_MedMedDriver21.hxx \
-MEDMEM_PolyhedronArray.hxx \
-MEDMEM_MedFieldDriver22.hxx \
-MEDMEM_MedMedDriver22.hxx \
-MEDMEM_MedMeshDriver22.hxx \
+MEDMEM_MedFieldDriver.hxx \
 MEDMEM_TopLevel.hxx \
 MEDMEM_Utilities.hxx \
 MEDMEM_ArrayInterface.hxx \
@@ -98,7 +89,9 @@ MEDMEM_Extractor.hxx \
 MEDMEM_Remapper.hxx \
 PointLocator.hxx \
 MEDNormalizedUnstructuredMesh.hxx \
-MEDNormalizedUnstructuredMesh.txx
+MEDNormalizedUnstructuredMesh.txx \
+MEDMEM_GMesh.hxx \
+MEDMEM_MedFileBrowser.hxx
 
 dist_libmedmem_la_SOURCES= \
 MEDMEM_Init.cxx \
@@ -112,9 +105,7 @@ MEDMEM_Family.cxx \
 MEDMEM_Field.cxx \
 MEDMEM_GenDriver.cxx \
 MEDMEM_Group.cxx \
-MEDMEM_Med.cxx \
 MEDMEM_Exception.cxx \
-MEDMEM_MedMedDriver.cxx \
 MEDMEM_MedMeshDriver.cxx \
 MEDMEM_GibiMeshDriver.cxx \
 MEDMEM_PorflowMeshDriver.cxx \
@@ -127,24 +118,21 @@ MEDMEM_VtkMedDriver.cxx \
 MEDMEM_VtkMeshDriver.cxx \
 MEDMEM_Grid.cxx \
 MEDMEM_MedVersion.cxx \
-MEDMEM_Compatibility21_22.cxx \
-MEDMEM_MedMeshDriver21.cxx \
-MEDMEM_MedMedDriver21.cxx \
 MEDMEM_medimport_src.cxx \
 MEDMEM_PolyhedronArray.cxx \
-MEDMEM_MedMedDriver22.cxx \
-MEDMEM_MedMeshDriver22.cxx \
 MEDMEM_TopLevel.cxx \
 MEDMEM_ConnectZone.cxx \
+MEDMEM_EnsightMedDriver.cxx \
 MEDMEM_EnsightFieldDriver.cxx \
 MEDMEM_EnsightUtils.cxx \
-MEDMEM_EnsightMedDriver.cxx \
 MEDMEM_EnsightMeshDriver.cxx \
 MEDMEM_DriverTools.cxx \
 MEDMEM_GaussLocalization.cxx \
 MEDMEM_Extractor.cxx \
 PointLocator.cxx \
-MEDMEM_Remapper.cxx
+MEDMEM_Remapper.cxx \
+MEDMEM_GMesh.cxx \
+MEDMEM_MedFileBrowser.cxx
 
 #libmedmem_la_LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 # libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@
