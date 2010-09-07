@@ -95,13 +95,7 @@ def print_ord(i):
     else:
         return `i`+'th'
 
-md = MED()
-
-mdDriver = MED_MED_RDONLY_DRIVER(medFile,md)
-
-mdDriver.open()
-mdDriver.readFileStruct()
-mdDriver.close()
+md = MEDFILEBROWSER(medFile)
 
 nbMeshes = md.getNumberOfMeshes()
 
@@ -129,8 +123,7 @@ if (nbMeshes>0):
     print "Mesh(es) Analysis "
     for i in range(nbMeshes):
         mesh_name = md.getMeshName(i)
-        mesh = md.getMesh(mesh_name)
-        mesh.read()
+        mesh = MESH(MED_DRIVER,md.getFileName(),mesh_name)
         spaceDim = mesh.getSpaceDimension()
         meshDim = mesh.getMeshDimension()
         print "The",print_ord(i), "mesh, '",mesh_name,"', is a",spaceDim,"D mesh on a",meshDim,"D geometry"
@@ -384,19 +377,8 @@ if (nbMeshes>0):
         fieldsMeshName = "Fields Mesh"
         fieldsMesh.setName(fieldsMeshName)
 
-        medFileVersion = getMedFileVersionForWriting()
-        if (medFileVersion == V22):
-            setMedFileVersionForWriting(V21)
-
-        index21Mesh = fieldsMesh.addDriver(MED_DRIVER,writeMed21File,fieldsMeshName)
-        fieldsMesh.write(index21Mesh,"")
-
-        medFileVersion = getMedFileVersionForWriting()
-        if (medFileVersion == V21):
-            setMedFileVersionForWriting(V22)
-
         index22Mesh = fieldsMesh.addDriver(MED_DRIVER,writeMed22File,fieldsMeshName)
-        fieldsMesh.write(index22Mesh,"")
+        fieldsMesh.write(index22Mesh)
 
         AnalyzeField(barycenter)
 
@@ -404,19 +386,8 @@ if (nbMeshes>0):
 
         barycenterName = barycenter.getName()
 
-        medFileVersion = getMedFileVersionForWriting()
-        if (medFileVersion == V22):
-            setMedFileVersionForWriting(V21)
-
-        index21FieldBarycenter = barycenter.addDriver(MED_DRIVER,writeMed21File,barycenterName)
-        barycenter.write(index21FieldBarycenter,"")
-
-        medFileVersion = getMedFileVersionForWriting()
-        if (medFileVersion == V21):
-            setMedFileVersionForWriting(V22)
-
         index22FieldBarycenter = barycenter.addDriver(MED_DRIVER,writeMed22File,barycenterName)
-        barycenter.write(index22FieldBarycenter,"")
+        barycenter.write(index22FieldBarycenter)
 
         print ""
         if spaceDim == 3 :
@@ -436,19 +407,8 @@ if (nbMeshes>0):
 
             volumeName = volume.getName()
 
-            medFileVersion = getMedFileVersionForWriting()
-            if (medFileVersion == V22):
-                setMedFileVersionForWriting(V21)
-
-            index21FieldVolume = volume.addDriver(MED_DRIVER,writeMed21File,volumeName)
-            volume.write(index21FieldVolume,"")
-
-            medFileVersion = getMedFileVersionForWriting()
-            if (medFileVersion == V21):
-                setMedFileVersionForWriting(V22)
-
             index22FieldVolume = volume.addDriver(MED_DRIVER,writeMed22File,volumeName)
-            volume.write(index22FieldVolume,"")
+            volume.write(index22FieldVolume)
 
             print ""
             print "Building of the support on all Faces of the mesh."
@@ -476,19 +436,8 @@ if (nbMeshes>0):
 
             normalName = normal.getName()
 
-            medFileVersion = getMedFileVersionForWriting()
-            if (medFileVersion == V22):
-                setMedFileVersionForWriting(V21)
-
-            index21FieldNormal = normal.addDriver(MED_DRIVER,writeMed21File,normalName)
-            normal.write(index21FieldNormal,"")
-
-            medFileVersion = getMedFileVersionForWriting()
-            if (medFileVersion == V21):
-                setMedFileVersionForWriting(V22)
-
             index22FieldNormal = normal.addDriver(MED_DRIVER,writeMed22File,normalName)
-            normal.write(index22FieldNormal,"")
+            normal.write(index22FieldNormal)
 
         elif spaceDim == 2:
             print "Getting area on all Cells of the mesh:"
@@ -507,19 +456,8 @@ if (nbMeshes>0):
 
             areaName = area.getName()
 
-            medFileVersion = getMedFileVersionForWriting()
-            if (medFileVersion == V22):
-                setMedFileVersionForWriting(V21)
-
-            index21FieldArea = area.addDriver(MED_DRIVER,writeMed21File,areaName)
-            area.write(index21FieldArea,"")
-
-            medFileVersion = getMedFileVersionForWriting()
-            if (medFileVersion == V21):
-                setMedFileVersionForWriting(V22)
-
             index22FieldArea = area.addDriver(MED_DRIVER,writeMed22File,areaName)
-            area.write(index22FieldArea,"")
+            area.write(index22FieldArea)
 
             print ""
             print "Building of the support on all Edges of the mesh."
@@ -546,19 +484,8 @@ if (nbMeshes>0):
 
             normalName = normal.getName()
 
-            medFileVersion = getMedFileVersionForWriting()
-            if (medFileVersion == V22):
-                setMedFileVersionForWriting(V21)
-
-            index21FieldNormal = normal.addDriver(MED_DRIVER,writeMed21File,normalName)
-            normal.write(index21FieldNormal,"")
-
-            medFileVersion = getMedFileVersionForWriting()
-            if (medFileVersion == V21):
-                setMedFileVersionForWriting(V22)
-
             index22FieldNormal = normal.addDriver(MED_DRIVER,writeMed22File,normalName)
-            normal.write(index22FieldNormal,"")
+            normal.write(index22FieldNormal)
         print ""
 
 print "END of the Pyhton script ..... Ctrl D to exit"

@@ -34,21 +34,14 @@ filePath=os.path.join(filePath, "share", "salome", "resources", "med")
 
 medFile = os.path.join(filePath, "cube_hexa8_quad4.med")
 
-md = MED()
-
-mdDriver = MED_MED_RDONLY_DRIVER(medFile,md)
-
 print ""
 print "Read file", medFile
 print ""
 
-mdDriver.open()
-mdDriver.readFileStruct()
-mdDriver.close()
+md = MEDFILEBROWSER(medFile)
 
 mesh_name = md.getMeshName(0)
-mesh = md.getMesh(mesh_name)
-mesh.read()
+mesh = MESH(MED_DRIVER,medFile,mesh_name)
 
 print "Building the support on all (8) Cells of the mesh."
 supportCell = SUPPORT(mesh)

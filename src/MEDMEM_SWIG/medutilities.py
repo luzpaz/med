@@ -78,39 +78,34 @@ def convert(file_in, driver_in, driver_out, format=1, file_out=None):
         pass
     print file_out
     #
-    cl = None
+    meshes = []
+    fields = []
     if driver_in == "GIBI":
-        f = open(file_in)
-        l = f.readline()
-        if l[1:23] != "ENREGISTREMENT DE TYPE":
-            print "Not a sauv format file ..."
-            print "Trying to convert it."
-            from castemlauncher import CastemLauncher
-            dgibi_stream  = "\n"
-            dgibi_stream += "OPTI REST '%s' ;\n"%(file_in)
-            dgibi_stream += "REST ;\n"
-            file_in = "%s__format__"%(file_in)
-            dgibi_stream += "OPTI SAUV FORMAT '%s' ;\n"%(file_in)
-            dgibi_stream += "SAUV FORMAT ;\n"
-            cl = CastemLauncher(dgibi_stream)
-            cl.addTmpFiles(file_in, "UTILNOTI", "UTILPROC")
-            cl.run()
-            pass
-        pass
-    #
-    med = MED()
-    if driver_in == "GIBI":
-        driver = GIBI_MED_RDONLY_DRIVER(file_in, med)
-        driver.open()
-        driver.read()
-        driver.close()
+        driver = GIBI_MED_RDONLY_DRIVER(file_in)
+        fields = driver.read()
+        mesh = driver.getMesh()
+        if mesh:
+            meshes.append( mesh )
     elif driver_in == "MED":
-        driver = MED_MED_RDONLY_DRIVER(file_in, med)
-        driver.open()
-        # 020499: [CEA 356] Pb to retrieve MED field from sauv file
-        #driver.readFileStruct()
-        driver.read()
-        driver.close()
+        med = MEDFILEBROWSER(file_in)
+        for mesh_name in med.getMeshNames():
+            if med.isStructuredMesh( mesh_name ):
+                mesh = GRID( MED_DRIVER, file_in, mesh_name )
+            else:
+                mesh = MESH( MED_DRIVER, file_in, mesh_name )
+            meshes.append( mesh )
+        for field_name in med.getFieldNames():
+            mesh_name = med.getMeshName( field_name )
+            mesh = 0
+            for m in meshes:
+                if m.getName() == mesh_name:
+                    mesh = m; break
+            for dtit in med.getFieldIteration( field_name ):
+                if med.getFieldType( field_name ) == MED_REEL64:
+                    field = FIELDDOUBLE(MED_DRIVER, file_in, field_name, dtit.dt, dtit.it, mesh )
+                else:
+                    field = FIELDINT(MED_DRIVER, file_in, field_name, dtit.dt, dtit.it, mesh )
+                fields.append( field )
     else:
         msg = "Driver in %s is unknown"%(driver_in)
         raise NotImplementedError(msg)
@@ -118,18 +113,16 @@ def convert(file_in, driver_in, driver_out, format=1, file_out=None):
     my_remove(file_out)
     #
     if driver_out == "GIBI":
-        mesh_name = med.getMeshName(0)
-        mesh = med.getMesh(mesh_name)
-        if driver_in == "MED":
-            # 020499: [CEA 356] Pb to retrieve MED field from sauv file
-            #mesh.read()
-            pass
+        mesh = meshes[0]
         mesh_dim = mesh.getSpaceDimension()
         if format == 0:
             file_out = file_out+'__format__'
             my_remove(file_out)
             pass
-        driver = GIBI_MED_WRONLY_DRIVER(file_out, med, mesh)
+        if fields:
+            driver = GIBI_MED_WRONLY_DRIVER(file_out, fields, mesh)
+        else:
+            driver = GIBI_MESH_WRONLY_DRIVER(file_out, mesh)
         driver.open()
         driver.write()
         driver.close()
@@ -172,10 +165,11 @@ def convert(file_in, driver_in, driver_out, format=1, file_out=None):
             pass
         return
     #
-    driver = MED_MED_WRONLY_DRIVER(file_out, med)
-    driver.open()
-    driver.write()
-    driver.close()
+    for mesh in meshes:
+        mesh.write(MED_DRIVER, file_out)
+    for field in fields:
+        typedField = field.castToTypedField();
+        typedField.write(MED_DRIVER, file_out)
     #
     return
 
