@@ -42,14 +42,10 @@ dist_salomeres_DATA = \
     titi.inp \
     titi.xyz \
     carre_en_quad4.med \
-    carre_en_quad4_V21.med \
-    carre_en_quad4_seg2_V21.med \
     carre_en_quad4_seg2.med \
     cas_defaut_domaine_fluide.med \
     ChampsDarcy.med \
-    cube_hexa8_V21.med \
     cube_hexa8.med \
-    cube_hexa8_quad4_V21.med \
     cube_hexa8_quad4.med \
     darcy_1.1_res.med \
     darcy_1.3_resCASTEM.med \
@@ -104,7 +100,6 @@ dist_salomeres_DATA = \
     maillage_chemvalIV_cas1_100elts.sauve \
     maillage_chemvalIV_cas1_40elts.med \
     maillage_chemvalIV_cas1_40elts.sauve \
-    maillage_UniSegFam_V21.med \
     maillage_UniSegFam.med \
     mail_test1-1-qua.sauve \
     mail_test1-1-tri.sauve \
@@ -114,7 +109,6 @@ dist_salomeres_DATA = \
     mail-test1-4-2.sauve \
     mesh_V21.med \
     mesh.med \
-    Mistrat_V21.med \
     Mistrat.med \
     Old_ChampsDarcy.med \
     Old_darcy_1.1_res.med \
@@ -145,7 +139,6 @@ dist_salomeres_DATA = \
     test19.med \
     test_2D.med \
     trio_2D.med \
-    TimeStamps_V21.med \
     TimeStamps.med \
     zzzz121b.med \
     zzzz121b_without_tr6.med \
