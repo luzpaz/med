@@ -31,9 +31,7 @@
 from libMEDMEM_Swig import *
 
 # files name to save the generated MESH(ING) in different format
-# Med V2.1 Med V2.2 and vtk
-
-med21FileName = "toto21.med"
+# Med V2.2 and vtk
 
 med22FileName = "toto22.med"
 
@@ -227,7 +225,7 @@ connectivityTetra.append(connectivity[1])
 connectivityTetra.append(connectivity[2])
 connectivityTetra.append(connectivity[3])
 
-myMeshing.setConnectivity(connectivityTetra,entity,types[0])
+myMeshing.setConnectivity(entity,types[0],connectivityTetra)
 
 connectivityPyra = []
 connectivity =  [7,8,9,10,2]
@@ -243,7 +241,7 @@ connectivityPyra.append(connectivity[2])
 connectivityPyra.append(connectivity[3])
 connectivityPyra.append(connectivity[4])
 
-myMeshing.setConnectivity(connectivityPyra,entity,types[1])
+myMeshing.setConnectivity(entity,types[1],connectivityPyra)
 
 connectivityHexa = []
 connectivity =  [11,12,13,14,7,8,9,10]
@@ -265,7 +263,7 @@ connectivityHexa.append(connectivity[5])
 connectivityHexa.append(connectivity[6])
 connectivityHexa.append(connectivity[7])
 
-myMeshing.setConnectivity(connectivityHexa,entity,types[2])
+myMeshing.setConnectivity(entity,types[2],connectivityHexa)
 
 # face part
 
@@ -303,7 +301,7 @@ connectivityTria.append(connectivity[0])
 connectivityTria.append(connectivity[1])
 connectivityTria.append(connectivity[2])
 
-myMeshing.setConnectivity(connectivityTria,entity,types[0])
+myMeshing.setConnectivity(entity,types[0],connectivityTria)
 
 connectivityQuad = []
 connectivity =  [7,8,9,10]
@@ -327,10 +325,7 @@ connectivityQuad.append(connectivity[1])
 connectivityQuad.append(connectivity[2])
 connectivityQuad.append(connectivity[3])
 
-myMeshing.setConnectivity(connectivityQuad,entity,types[1])
-
-meshDimension = spaceDimension # because there 3D cells in the mesh
-myMeshing.setMeshDimension(meshDimension)
+myMeshing.setConnectivity(entity,types[1],connectivityQuad)
 
 # edge part
 
@@ -461,26 +456,11 @@ myGroup.setNumber(index,values)
 
 myMeshing.addGroup(myGroup)
 
-# saving of the generated mesh in MED 2.1, 2.2 and VTK format
+# saving of the generated mesh in MED and VTK format
 
-medFileVersion = getMedFileVersionForWriting()
-print "Med File Version For Writing ",medFileVersion
+myMeshing.write(MED_DRIVER,med22FileName)
 
-if (medFileVersion == V22):
-    setMedFileVersionForWriting(V21)
-
-idMedV21 = myMeshing.addDriver(MED_DRIVER,med21FileName,myMeshing.getName())
-myMeshing.write(idMedV21)
-
-medFileVersion = getMedFileVersionForWriting()
-if (medFileVersion == V21):
-    setMedFileVersionForWriting(V22)
-
-idMedV22 = myMeshing.addDriver(MED_DRIVER,med22FileName,myMeshing.getName())
-myMeshing.write(idMedV22)
-
-idVtk = myMeshing.addDriver(VTK_DRIVER,vtkFileName,myMeshing.getName())
-myMeshing.write(idVtk)
+myMeshing.write(VTK_DRIVER,vtkFileName)
 
 # we build now 8 fields : 4 fields double (integer) :
 #                         2 fields on nodes (cells) :
@@ -633,40 +613,6 @@ for i in range(numberOfCells):
     fieldIntVectorOnCells.setValueIJ(i+1,1,valueInt1)
     fieldIntVectorOnCells.setValueIJ(i+1,2,valueInt2)
     fieldIntVectorOnCells.setValueIJ(i+1,3,valueInt3)
-
-medFileVersion = getMedFileVersionForWriting()
-print "Med File Version For Writing ",medFileVersion
-
-if (medFileVersion == V22):
-    setMedFileVersionForWriting(V21)
-
-idMedV21 = fieldDoubleScalarOnNodes.addDriver(MED_DRIVER,med21FileName,fieldDoubleScalarOnNodes.getName())
-fieldDoubleScalarOnNodes.write(idMedV21)
-
-idMedV21 = fieldIntScalarOnNodes.addDriver(MED_DRIVER,med21FileName,fieldIntScalarOnNodes.getName())
-fieldIntScalarOnNodes.write(idMedV21)
-
-idMedV21 = fieldDoubleVectorOnNodes.addDriver(MED_DRIVER,med21FileName,fieldDoubleVectorOnNodes.getName())
-fieldDoubleVectorOnNodes.write(idMedV21)
-
-idMedV21 = fieldIntVectorOnNodes.addDriver(MED_DRIVER,med21FileName,fieldIntVectorOnNodes.getName())
-fieldIntVectorOnNodes.write(idMedV21)
-
-idMedV21 = fieldDoubleScalarOnCells.addDriver(MED_DRIVER,med21FileName,fieldDoubleScalarOnCells.getName())
-fieldDoubleScalarOnCells.write(idMedV21)
-
-idMedV21 = fieldIntScalarOnCells.addDriver(MED_DRIVER,med21FileName,fieldIntScalarOnCells.getName())
-fieldIntScalarOnCells.write(idMedV21)
-
-idMedV21 = fieldDoubleVectorOnCells.addDriver(MED_DRIVER,med21FileName,fieldDoubleVectorOnCells.getName())
-fieldDoubleVectorOnCells.write(idMedV21)
-
-idMedV21 = fieldIntVectorOnCells.addDriver(MED_DRIVER,med21FileName,fieldIntVectorOnCells.getName())
-fieldIntVectorOnCells.write(idMedV21)
-
-medFileVersion = getMedFileVersionForWriting()
-if (medFileVersion == V21):
-    setMedFileVersionForWriting(V22)
 
 idMedV22 = fieldDoubleScalarOnNodes.addDriver(MED_DRIVER,med22FileName,fieldDoubleScalarOnNodes.getName())
 fieldDoubleScalarOnNodes.write(idMedV22)
