@@ -31,7 +31,7 @@ infile=${srcdir}/../../resources/pointe.med
 
 outfile=$outdir/duplicateMED_pointe.med
 
-./duplicateMED $infile $outfile
+./duplicateMED $infile $outfile   >& /dev/null
 
 ok=$?
 

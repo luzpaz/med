@@ -27,9 +27,9 @@ else
  fi
 fi
 
-infile=${srcdir}/../../resources/pointe_import22.med
+infile=${srcdir}/../../resources/pointe.med
 
-./test_MEDMEM_PolyDriverMedMeshRead $infile maa1
+./test_MEDMEM_PolyDriverMedMeshRead $infile maa1   >& /dev/null
 
 exit
 

@@ -31,7 +31,7 @@ infile=${srcdir}/../../resources/blow5_ascii.case
 
 outfile=${outdir}/ensight2med.med
 
-./ensight2med $infile $outfile
+./ensight2med $infile $outfile   >& /dev/null
 
 ok=$?
 
