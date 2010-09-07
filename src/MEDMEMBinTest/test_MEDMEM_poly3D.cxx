@@ -121,7 +121,7 @@ int main (int argc, char ** argv)
   //Test 1 : test if connectivity of poly3D mesh is OK
   if(myMesh->getMeshDimension()==3 && myMesh->getSpaceDimension()==3)
     nbOfPtsForTest++;
-  if(myMesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,MED_EN::MED_TETRA4)==1 && myMesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,MED_EN::MED_POLYHEDRA)==2)
+  if(myMesh->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_TETRA4)==1 && myMesh->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_POLYHEDRA)==2)
     nbOfPtsForTest++;
   const int REFnodalConnForTetra[4]={17, 9, 18, 19};
   const int *connForTetraToTest=myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_TETRA4);
@@ -130,40 +130,35 @@ int main (int argc, char ** argv)
     if(connForTetraToTest[i]==REFnodalConnForTetra[i])
       nbOfPtsForTest++;
   //6
-  const int *globIndex=myMesh->getPolyhedronIndex(MED_NODAL);
-  const int *nodalConnOfFaces=myMesh->getPolyhedronConnectivity(MED_NODAL);
-  const int *facesIndex=myMesh->getPolyhedronFacesIndex();
-  if(globIndex[1]-globIndex[0]==9 && globIndex[2]-globIndex[1]==10)// resp 9 faces and 10 faces are in polyh 1 and 2.
+  const int *globIndex=connIndForTetraToTest + 1; // skip 1 tetra
+  const int *nodalConnOfFaces=myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_POLYHEDRA);
+  if(globIndex[1]-globIndex[0]==46 && globIndex[2]-globIndex[1]==45)// resp 46 nodes and 45 nodes are in polyh 1 and 2.
     nbOfPtsForTest++;
   //7
-  const int REFfacesIndex[20]={1, 7, 11, 15, 19, 23, 27, 31, 34, 39, 44, 48, 52, 55, 58, 61, 64, 68, 72, 75};
-  const int REFnodalConnOfFaces[74]={1, 2, 3, 4, 5, 6, // Polyhedron 1
-                                     1, 7, 8, 2, 
-                                     2, 8, 9, 3, 
-                                     4, 3, 9, 10, 
-                                     5, 4, 10, 11, 
-                                     6, 5, 11, 12, 
-                                     1, 6, 12, 7, 
-                                     7, 12, 8, 10, 
-                                     9, 8, 12, 11,
+  const int REFnodalConnOfFaces[91]={1, 2, 3, 4, 5, 6, -1,// Polyhedron 1
+                                     1, 7, 8, 2,       -1,
+                                     2, 8, 9, 3,       -1,
+                                     4, 3, 9, 10,      -1,
+                                     5, 4, 10, 11,     -1,
+                                     6, 5, 11, 12,     -1,
+                                     1, 6, 12, 7,      -1,
+                                     7, 12, 8,         -1,
+                                     10, 9, 8, 12, 11,     
 
-                                     13, 14, 15, 3, 2, // Polyhedron 2
-                                     13, 2, 8, 16, 
-                                     14, 13, 16, 17, 
-                                     15, 14, 17, 15, 
-                                     17, 18, 15, 
-                                     18, 9, 3, 
-                                     15, 9, 2, 
-                                     3, 9, 8, 
-                                     8, 9, 17, 16, 
+                                     13, 14, 15, 3, 2, -1,// Polyhedron 2
+                                     13, 2, 8, 16,     -1,
+                                     14, 13, 16, 17,   -1,
+                                     15, 14, 17,       -1,
+                                     15, 17, 18,       -1,
+                                     15, 18, 9,        -1,
+                                     3, 15, 9,         -1,
+                                     2, 3, 9, 8,       -1,
+                                     8, 9, 17, 16,     -1,
                                      9, 18, 17 };
-  for(i=0;i<20;i++)
-    if(REFfacesIndex[i]==facesIndex[i])
-      nbOfPtsForTest++;
   for(i=0;i<74;i++)
     if(REFnodalConnOfFaces[i]==nodalConnOfFaces[i])
       nbOfPtsForTest++;
-  if(nbOfPtsForTest!=101)
+  if(nbOfPtsForTest!=7+74)
     {
       cout << "TEST1 K0 ! : Invalid Globaldata in memory..." << endl;
       return 1;
@@ -188,7 +183,7 @@ int main (int argc, char ** argv)
   for(i=0;i<3;i++)
     {
       int lgth;
-      const int *conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElementWithPoly(MED_NODAL,MED_FACE,nbs[i],lgth);
+      const int *conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElement(MED_NODAL,MED_FACE,nbs[i],lgth);
       if(test1.isIncludedAndNotAlreadyConsumed(conn))
         nbOfPtsForTest++;
     }
@@ -203,7 +198,7 @@ int main (int argc, char ** argv)
   for(i=0;i<8;i++)
     {
       int lgth;
-      const int *conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElementWithPoly(MED_NODAL,MED_FACE,nbs[i],lgth);
+      const int *conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElement(MED_NODAL,MED_FACE,nbs[i],lgth);
       if(test2.isIncludedAndNotAlreadyConsumed(conn))
         nbOfPtsForTest++;
     }
@@ -218,7 +213,7 @@ int main (int argc, char ** argv)
   for(i=0;i<6;i++)
     {
       int lgth;
-      const int *conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElementWithPoly(MED_NODAL,MED_FACE,nbs[i],lgth);
+      const int *conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElement(MED_NODAL,MED_FACE,nbs[i],lgth);
       if(test3.isIncludedAndNotAlreadyConsumed(conn))
         nbOfPtsForTest++;
     }
@@ -272,6 +267,7 @@ int main (int argc, char ** argv)
   for(i=0;i<3;i++)
     if(fabs(REFAreaForPolyg[i]-vals[i])<1e-12)
       nbOfPtsForTest++;
+  vol1->removeReference();
 
   vol1=myMesh->getArea(fam2);
   lgth=vol1->getValueLength();

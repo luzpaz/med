@@ -131,7 +131,7 @@ int main (int argc, char ** argv) {
     2,10,6,9
   };
   
-  myMeshing->setConnectivity(ConnectivityTetra,MED_CELL,MED_TETRA4);
+  myMeshing->setConnectivity(MED_CELL,MED_TETRA4,ConnectivityTetra);
 
   int ConnectivityPyra[2*5]=
   {
@@ -139,7 +139,7 @@ int main (int argc, char ** argv) {
     15,18,17,16,19
   };
 
-  myMeshing->setConnectivity(ConnectivityPyra,MED_CELL,MED_PYRA5);
+  myMeshing->setConnectivity(MED_CELL,MED_PYRA5,ConnectivityPyra);
 
   int ConnectivityHexa[2*8]=
   {
@@ -147,7 +147,7 @@ int main (int argc, char ** argv) {
     15,16,17,18,11,12,13,14
   };
 
-  myMeshing->setConnectivity(ConnectivityHexa,MED_CELL,MED_HEXA8);
+  myMeshing->setConnectivity(MED_CELL,MED_HEXA8,ConnectivityHexa);
 
   // face part
 
@@ -168,7 +168,7 @@ int main (int argc, char ** argv) {
     1,3,6
   };
   
-  myMeshing->setConnectivity(ConnectivityTria,MED_FACE,MED_TRIA3);
+  myMeshing->setConnectivity(MED_FACE,MED_TRIA3,ConnectivityTria);
 
   int ConnectivityQua[4*4]=
   {
@@ -178,10 +178,7 @@ int main (int argc, char ** argv) {
     12,8,9,13
   };
 
-  myMeshing->setConnectivity(ConnectivityQua,MED_FACE,MED_QUAD4);
-
-  int meshDimension = SpaceDimension; // because there 3D cells in the mesh
-  myMeshing->setMeshDimension(meshDimension);
+  myMeshing->setConnectivity(MED_FACE,MED_QUAD4,ConnectivityQua);
 
   // edge part
 
@@ -307,19 +304,8 @@ int main (int argc, char ** argv) {
 
   // all right, we save it in Med 2.1 2.2 and vtk !
 
-  medFileVersion version = getMedFileVersionForWriting();
-  if (version == V21)
-    setMedFileVersionForWriting(V22);
-
   int idMed22 = myMeshing->addDriver(MED_DRIVER,filenameMed22,myMeshing->getName());
   myMeshing->write(idMed22) ;
-
-  version = getMedFileVersionForWriting();
-  if (version == V22)
-    setMedFileVersionForWriting(V21);
-
-  int idMed21 = myMeshing->addDriver(MED_DRIVER,filenameMed21,myMeshing->getName());
-  myMeshing->write(idMed21) ;
 
   int idVtk = myMeshing->addDriver(VTK_DRIVER,filenameVtk,myMeshing->getName());
   myMeshing->write(idVtk) ;
@@ -553,39 +539,6 @@ int main (int argc, char ** argv) {
       fieldDoubleVectorOnPartialFaces->setValueIJ(number[i],1,i+1);
       fieldDoubleVectorOnPartialFaces->setValueIJ(number[i],2,-i-1);
     }
-
-  version = getMedFileVersionForWriting();
-  if (version == V22)
-    setMedFileVersionForWriting(V21);
-
-  idMed21 = fieldDoubleScalarOnNodes->addDriver(MED_DRIVER,filenameMed21,fieldDoubleScalarOnNodes->getName(),WRONLY);
-  fieldDoubleScalarOnNodes->write(idMed21) ;
-
-  idMed21 = fieldIntScalarOnNodes->addDriver(MED_DRIVER,filenameMed21,fieldIntScalarOnNodes->getName(),WRONLY);
-  fieldIntScalarOnNodes->write(idMed21) ;
-
-  idMed21 = fieldDoubleVectorOnNodes->addDriver(MED_DRIVER,filenameMed21,fieldDoubleVectorOnNodes->getName(),WRONLY);
-  fieldDoubleVectorOnNodes->write(idMed21) ;
-
-  idMed21 = fieldIntVectorOnNodes->addDriver(MED_DRIVER,filenameMed21,fieldIntVectorOnNodes->getName(),WRONLY);
-  fieldIntVectorOnNodes->write(idMed21) ;
-
-  idMed21 = fieldDoubleScalarOnCells->addDriver(MED_DRIVER,filenameMed21,fieldDoubleScalarOnCells->getName(),WRONLY);
-  fieldDoubleScalarOnCells->write(idMed21) ;
-
-  idMed21 = fieldIntScalarOnCells->addDriver(MED_DRIVER,filenameMed21,fieldIntScalarOnCells->getName(),WRONLY);
-  fieldIntScalarOnCells->write(idMed21) ;
-
-  idMed21 = fieldDoubleVectorOnCells->addDriver(MED_DRIVER,filenameMed21,fieldDoubleVectorOnCells->getName(),WRONLY);
-  fieldDoubleVectorOnCells->write(idMed21) ;
-
-  idMed21 = fieldIntVectorOnCells->addDriver(MED_DRIVER,filenameMed21,fieldIntVectorOnCells->getName(),WRONLY);
-  fieldIntVectorOnCells->write(idMed21) ;
-
-
-  version = getMedFileVersionForWriting();
-  if (version == V21)
-    setMedFileVersionForWriting(V22);
 
   idMed22 = fieldDoubleScalarOnNodes->addDriver(MED_DRIVER,filenameMed22,fieldDoubleScalarOnNodes->getName());
   fieldDoubleScalarOnNodes->write(idMed22) ;
