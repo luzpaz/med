@@ -41,10 +41,14 @@
 #include CORBA_SERVER_HEADER(SALOMEDS)
 #include CORBA_SERVER_HEADER(SALOMEDS_Attributes)
 
-#include "MEDMEM_Med.hxx"
+#include "MEDMEM_MedFileBrowser.hxx"
+#include "MEDMEM_GenDriver.hxx"
 
 namespace MEDMEM {
-typedef map<DT_IT_, SALOME_MED::FIELD_ptr, LT_DT_IT_ > MAP_IOR_DT_IT_; 
+typedef map<DT_IT_, SALOME_MED::FIELD_ptr, LT_DT_IT_ > MAP_IOR_DT_IT_;
+  
+class GMESH;
+class FIELD_;
 
 class MEDMEM_I_EXPORT MED_i: public POA_SALOME_MED::MED,
              public SALOME::GenericObj_i
@@ -55,10 +59,13 @@ private :
 protected:
     // C++ object containing values
   //::MED * const _med;
-  ::MEDMEM::MED * _med;
+  //::MEDMEM::MED * _med;
+  MEDFILEBROWSER                 _med;
+  map<string, ::MEDMEM::GMESH* > _medmem_meshes;
+  vector< ::MEDMEM::FIELD_* >    _medmem_fields;
   string _medId;
 
-  map<string,SALOME_MED::MESH_ptr>    _meshes;   // We can't have two MESHes with the same name.  
+  map<string,SALOME_MED::GMESH_ptr>    _meshes;   // We can't have two MESHes with the same name.  
 
   map<string,map<MED_EN::medEntityMesh,SALOME_MED::SUPPORT_ptr> > _supports; 
 
@@ -83,7 +90,8 @@ public:
     throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
 
   SALOME_MED::SUPPORT_ptr getSupport(string                meshName,
-                                     MED_EN::medEntityMesh entity)
+                                     MED_EN::medEntityMesh entity,
+                                     const string          name="")
     throw (SALOME::SALOME_Exception);
 
 
@@ -92,9 +100,9 @@ public:
     CORBA::Long             getNumberOfFields() throw (SALOME::SALOME_Exception);
     SALOME_MED::string_array * getMeshNames()      throw (SALOME::SALOME_Exception);
     SALOME_MED::string_array * getFieldNames()     throw (SALOME::SALOME_Exception);
-    SALOME_MED::MESH_ptr    getMeshByName(const char* meshName) 
+    SALOME_MED::GMESH_ptr    getMeshByName(const char* meshName) 
                                                 throw (SALOME::SALOME_Exception);
-    SALOME_MED::MESH_ptr    getMesh(SALOME_MED::FIELD_ptr fieldPtr) 
+    SALOME_MED::GMESH_ptr    getMesh(SALOME_MED::FIELD_ptr fieldPtr) 
                                                 throw (SALOME::SALOME_Exception);
     CORBA::Long getFieldNumberOfIteration(const char* fieldName) 
       throw (SALOME::SALOME_Exception);
@@ -117,7 +125,7 @@ public:
                                                 throw (SALOME::SALOME_Exception);
     void                    write(CORBA::Long i) 
                                                 throw (SALOME::SALOME_Exception);
-    void                    addMesh(SALOME_MED::MESH_ptr ptrMesh) 
+    void                    addMesh(SALOME_MED::GMESH_ptr ptrMesh) 
                                                 throw (SALOME::SALOME_Exception);
     void                    addField(SALOME_MED::FIELD_ptr ptrField) 
                                                 throw (SALOME::SALOME_Exception);
