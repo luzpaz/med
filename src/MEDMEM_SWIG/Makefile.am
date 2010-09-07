@@ -50,9 +50,9 @@ libMEDMEM_Swig.py: libMEDMEM_Swig_wrap.cxx
 libMEDMEM_Swig_wrap.cxx: $(SWIG_DEF)
 	$(SWIG) $(SWIG_FLAGS) -o $@  $<
 
-_libMEDMEM_Swig_la_CPPFLAGS = $(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
+_libMEDMEM_Swig_la_CPPFLAGS = $(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) $(XDR_CPPFLAGS) @CXXTMPDPTHFLAGS@ \
 	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases
-_libMEDMEM_Swig_la_LDFLAGS  = -module $(MED2_LIBS) $(HDF5_LIBS) $(PYTHON_LIBS) \
+_libMEDMEM_Swig_la_LDFLAGS  = -module $(MED2_LIBS) $(HDF5_LIBS) $(PYTHON_LIBS) $(XDR_LIBS) \
 	../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la
 
 CLEANFILES = libMEDMEM_Swig_wrap.cxx libMEDMEM_Swig.py
@@ -73,14 +73,14 @@ dist_salomescript_DATA   = \
 		   test_porflow.py \
 		   testDriverAscii.py \
 		   testGaussLocalization.py \
-		   testMedObj.py \
 		   test_profil_MedFieldDriver.py \
 		   testWriteAndFam.py \
 		   testMedMemGeneral.py \
 		   testMedMemCxxTests.py \
 		   dumpMEDMEM.py \
 		   ensightMedEnsight_test.py \
-		   medEnsightMed_test.py
+		   medEnsightMed_test.py \
+		   medNumPy_test.py
 
 dist_salomescript_SCRIPTS = \
 		   med2sauv \
@@ -89,6 +89,9 @@ dist_salomescript_SCRIPTS = \
 
 dist_salomepython_DATA = \
 		   medutilities.py
+
+TESTS = medMeshing_test.py medNumPy_test.py 
+TESTS_ENVIRONMENT = $(PYTHON)
 
 install-data-hook:
 	@for f in $(dist_salomescript_SCRIPTS) ; do \
