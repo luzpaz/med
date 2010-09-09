@@ -1791,7 +1791,7 @@ int  MED_MESH_RDONLY_DRIVER::getCellsFamiliesNumber(int **MEDArrayFamily,
                        med_2_3::MED_MAILLE,
                        (med_2_3::med_geometrie_element)types[i]);
         if (err != MED_VALID)
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<Connectivity->_entity<<" and geometric type "<<types[i]));
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<entity<<" and geometric type "<<types[i]));
       }
 #endif
     }
