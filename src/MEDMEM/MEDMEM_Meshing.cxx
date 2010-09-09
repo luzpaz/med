@@ -314,7 +314,7 @@ void MESHING::setNumberOfElements(const int * NumberOfElements,
   Sets the nodal connectivity for geometric type \a Type of  entity \a Entity.
   The nodal connectivity must be defined one element type at a time :
   \a MED_ALL_ELEMENTS is not a valid \a Type argument.
-  To define connectivity of MED_POLYGON and MED_POLYHEDRA, \a PolyConnectivityIndex
+  To define connectivity of \a MED_POLYGON and \a MED_POLYHEDRA, \a PolyConnectivityIndex
   is also necessary, which defines index of the first node of each element.
   Connectiviy of polyhedron must contain -1 as a separator of faces. For example,
   a tetrahedron with connectivity {1,2,3,4} can be represented as a polyhedron by the following arrays:<br>
@@ -326,7 +326,6 @@ Connectivity_index : {1,16}
 \verbatim
 MESHING myMeshing ;
 myMeshing.setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,System,Mode);
-
 myMeshing.setNumberOfTypes(2,MED_CELL);
 myMeshing.setTypes({MED_TRIA3,MED_QUAD4},MED_CELL);
 myMeshing.setNumberOfElements({3,2},MED_CELL); // 3 MED_TRIA3 and 2 MED_QUAD4

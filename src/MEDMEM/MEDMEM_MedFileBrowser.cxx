@@ -33,10 +33,21 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
+
+/*!
+Class giving access to names of meshes and fields contained in the med file  
+
+\defgroup MED_constructors Initialization
+
+\defgroup MED_query Query methods
+These methods enable the user to retrieve information
+about a MED file structure, i.e. the meshes and fields it contains.
+
+*/
 namespace 
 {
   /*!
-   * \brief structure to open a med file and to close it at destruction
+   * \brief Structure to open a med file and to close it at destruction
    * (especially useful when we throw an exception)
    */
   struct MED_FILE
@@ -54,10 +65,14 @@ namespace
      operator med_2_3::med_idt() const { return _id; }
   };
 }
-
+/*! \if MEDMEM_ug 
+\addtogroup MED_constructors
+@{
+\endif
+*/
 //================================================================================
 /*!
- * \brief Constructor of an empty MEDFILEBROWSER to be filled with readFileStruct(file)
+ * \brief Constructor of an empty MEDFILEBROWSER to be filled with \ref readFileStruct()
  */
 //================================================================================
 
@@ -67,7 +82,7 @@ MEDFILEBROWSER::MEDFILEBROWSER()
 
 //================================================================================
 /*!
- * This constructor constructs the MEDFILEBROWSER object from the file \a filename.
+ * \brief This constructor constructs the MEDFILEBROWSER object from the file \a filename.
  * Names of meshes and fields are read.
  */
 //================================================================================
@@ -232,10 +247,17 @@ void MEDFILEBROWSER::readFileStruct(const string & fileName) throw (MEDEXCEPTION
 
   END_OF_MED(LOC);
 }
+/*! \if MEDMEM_ug @} \endif */
+
+/*! \if MEDMEM_ug
+\addtogroup MED_query
+@{
+\endif
+*/
 
 //================================================================================
 /*!
- * \brief Returns the name of browsed file
+ * \brief Returns the name of a browsed file
  */
 //================================================================================
 
@@ -246,7 +268,7 @@ std::string MEDFILEBROWSER::getFileName() const
 
 //================================================================================
 /*!
-  Gets the number of meshes in med file.
+  \brief Gets the number of meshes in med file.
 */
 //================================================================================
 
@@ -257,7 +279,7 @@ int MEDFILEBROWSER::getNumberOfMeshes ( void ) const
     
 //================================================================================
 /*!
-  Gets the number of fields in med file.
+  \brief Gets the number of fields in med file.
 */
 //================================================================================
 
@@ -268,7 +290,7 @@ int MEDFILEBROWSER::getNumberOfFields ( void ) const
 
 //================================================================================
 /*!
-  Gets the names of all meshes.
+  \brief Gets the names of all meshes.
 
   meshNames is an in/out argument.
 
@@ -287,7 +309,7 @@ void MEDFILEBROWSER::getMeshNames      ( string * meshNames ) const
 
 //================================================================================
 /*!
-  Gets the names of all MESH objects.
+  \brief Gets the names of all MESH objects.
 
   Returns a vector<string> object which contain the name of all MESH objects.
 */
@@ -304,7 +326,7 @@ vector<string> MEDFILEBROWSER::getMeshNames      () const
 
 //================================================================================
 /*!
-  Gets the names of all fields.
+  \brief Gets the names of all fields.
 
   fieldNames is an in/out argument.
 
@@ -323,7 +345,7 @@ void MEDFILEBROWSER::getFieldNames     ( string * fieldNames ) const
 
 //================================================================================
 /*!
-  Gets the names of all fields.
+  \brief Gets the names of all fields.
 */
 //================================================================================
 
@@ -397,8 +419,10 @@ std::string MEDFILEBROWSER::getMeshName (const string & fieldName) const throw (
 
 //================================================================================
 /*!
-  Returns a vector<DT_IT_> which contain all iteration step for the FIELD 
-  identified by its name. DT_IT_ definition is 
+  \brief Returns a vector<DT_IT_> which contain all iteration step for the FIELD 
+  identified by its name.
+
+  DT_IT_ definition is 
 \verbatim
 typedef struct { int dt; int it; } DT_IT_;
 \endverbatim
@@ -422,3 +446,4 @@ vector<DT_IT_> MEDFILEBROWSER::getFieldIteration (const string & fieldName) cons
 
   return name_data->second._vec_dtit;
 }
+/*!\if MEDMEM_ug @} \endif */

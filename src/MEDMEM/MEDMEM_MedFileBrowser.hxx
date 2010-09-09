@@ -47,7 +47,7 @@ struct MEDMEM_EXPORT LT_DT_IT_
 typedef std::vector<DT_IT_> VEC_DT_IT_;
 
 /*!
- * \brief Class giving access to names of mesh and fields contained in the med file
+ * \brief Class giving access to names of meshes and fields contained in the med file
  */
 class MEDMEM_EXPORT MEDFILEBROWSER
 {

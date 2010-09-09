@@ -34,6 +34,23 @@ using namespace MEDMEM;
 using namespace MED_EN;
 using namespace std;
 
+/*!
+\defgroup GMESH_general MESH General information
+These methods are related to the retrieval of general information about the mesh.
+
+\defgroup MESH_families Families and Groups handling
+The methods described in this section enable the manipulation of families and groups. These
+notions define subsets of MED elements in a mesh. They differ because families are non
+overlapping (a mesh element is associated to zero or one family)  while groups are more general.
+
+\defgroup MESH_io Mesh I/O
+These methods describe how to read and write meshes. Generally speaking, meshes should be read
+via a constructor and should be written with the write() method.
+
+\defgroup GMESH_advanced Mesh general advanced features
+These functions provide access to high-level manipulation of the supports.
+*/
+
 //================================================================================
 /*! Create an empty GMESH. */
 //================================================================================
@@ -136,7 +153,7 @@ GMESH::~GMESH()
 
   for (int i=0;i<_familyNode.size();i++)
   {
-    // it another object refers to a family and it survive now,
+    // if another object refers to a family and it survive now,
     // it sould not refer to a dead mesh
     _familyNode[i]->setMesh(0);
     _familyNode[i]->removeReference();
@@ -255,6 +272,11 @@ ostream & MEDMEM::operator<<(ostream &os, const GMESH &myMesh)
   return os;
 }
 
+/*! \if MEDMEM_ug
+\addtogroup MESH_io
+@{
+\endif
+*/
 //================================================================================
 /*!
  * \brief Add a %MESH driver of type %driverTypes (MED_DRIVER, ....) associated
@@ -366,12 +388,6 @@ void GMESH::read(int index)
   END_OF_MED(LOC);
 }
 
-//virtual void read(GENDRIVER & genDriver);
-
-/*!
-\addtogroup MESH_io
-@{
-*/
 //================================================================================
 /*! Writes all the content of the MESH using driver referenced by the integer handle returned by a \a addDriver call.
 
@@ -386,15 +402,14 @@ mesh.write(driver_handle);
 */
 //================================================================================
 
-void GMESH::write(int index/*=0*/, const string & driverName/* = ""*/) const
+void GMESH::write(int index) const
 {
-  const char * LOC = "GMESH::write(int index=0, const string & driverName = \"\") : ";
+  const char * LOC = "GMESH::write(int index=0) : ";
   BEGIN_OF_MED(LOC);
 
-  if ( _drivers[index] )
+  if ( index > -1 && index < _drivers.size() && _drivers[index] )
   {
     _drivers[index]->open();
-    if (driverName != "") _drivers[index]->setMeshName(driverName);
     _drivers[index]->write();
     _drivers[index]->close();
   }
@@ -450,8 +465,12 @@ void GMESH::write(driverTypes driverType, const std::string& filename) const
 
   delete newDriver;
 }
-/*!
-  @}
+/*! \if MEDMEM_ug @} \endif */
+
+/*! \if MEDMEM_ug
+\addtogroup MESH_general
+@{
+\endif
 */
 
 //================================================================================
@@ -465,12 +484,6 @@ void GMESH::setName(string name)
 {
   _name=name; //NOM interne à la classe
 }
-
-/*! \if MEDMEM_ug
-\addtogroup MESH_general
-@{
-\endif
-*/
 
 //================================================================================
 /*!
@@ -526,6 +539,11 @@ This example illustrates how to retrieve the name, description, mesh and space d
 \endif
 */
 
+/*! \if MEDMEM_ug
+\addtogroup MESH_families
+@{
+\endif
+*/
 //================================================================================
 /*!
   Retrieves the number of families in the mesh for entity type \a entity
@@ -602,10 +620,6 @@ int GMESH::getNumberOfGroups (MED_EN::medEntityMesh entity) const
     throw MEDEXCEPTION("MESH::getNumberOfGroups : Unknown entity");
   }
 }
-/*!
-\addtogroup MESH_families
-@{
-*/
 //================================================================================
 /*! Returns the groups of type \a entity present in the mesh as a vector of pointers. The GROUP class inheriting from the SUPPORT class, the
   methods that can be used on these groups are explained in the related section.*/
@@ -622,16 +636,13 @@ const vector<GROUP*> GMESH::getGroups(MED_EN::medEntityMesh entity) const
     throw MEDEXCEPTION("MESH::getGroups : Unknown entity");
   }
 }
-/*!
-  @}
-*/
 
 //================================================================================
 /*!
  * \brief Return a group
  *  \param entity - entity of the group
  *  \param i - index of the group
- *  \retval const MEDMEM::FAMILY* - pointer to the group
+ *  \retval const GROUP* - pointer to the group
  */
 //================================================================================
 
@@ -654,9 +665,6 @@ const GROUP* GMESH::getGroup(MED_EN::medEntityMesh entity, int i) const
   return (*Group)[i-1];
 }
 
-/*!\addtogroup MESH_families
-  @{
-*/
 //================================================================================
 /*! Retrieves the group named \a name.
   The method browses all the entities in order to find the group.
@@ -680,13 +688,10 @@ const GROUP* GMESH::getGroup(const string& name) const  throw (MEDEXCEPTION)
   cerr << "MESH::getGroup("<<name<<") : group "<<name <<" was not found"<<endl;
   throw MEDEXCEPTION("MESH::getGroup(name) : name not found");
 }
-/*!
-  @}
-*/
 
 //================================================================================
 /*!
-  Method return a reference on a support define on all the element of an entity.
+  Method returns a reference on a support defined on all the elements of an entity.
 */
 //================================================================================
 
@@ -714,13 +719,16 @@ SUPPORT * GMESH::getSupportOnAll(medEntityMesh entity) throw(MEDEXCEPTION)
   }
 }
 
-/*!
-\addtogroup MESH_advanced
+/*! \if MEDMEM_ug @} \endif */
+
+/*! \if MEDMEM_ug
+\addtogroup GMESH_advanced
 @{
+\endif
 */
 //================================================================================
 /*!
-  return a SUPPORT pointer on the union of all SUPPORTs in Supports.
+  Return a SUPPORT pointer on the union of all SUPPORTs in Supports.
   You should delete this pointer after use to avoid memory leaks.
 */
 //================================================================================
@@ -980,10 +988,11 @@ SUPPORT * GMESH::intersectSupports(const vector<SUPPORT *> Supports) throw (MEDE
   END_OF_MED(LOC);
   return returnedSupport;
 }
-/*!
-  @}
-*/
 
+/*! \if MEDMEM_ug
+  @}
+\endif
+*/
 /*!
   Method created to factorize code. This method creates a new support on entity 'entity' (to deallocate) containing all the entities contained in
   elements 'listOfElt' of entity 'entity'.
@@ -1275,4 +1284,3 @@ void GMESH::createGroups()
     }
   }
 }
-

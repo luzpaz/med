@@ -41,10 +41,9 @@ namespace MEDMEM {
 
 class MEDMEM_EXPORT MESHING: public MESH
 {
- protected:
-  ~MESHING();
  public :
   MESHING();
+  ~MESHING();
 
   void setCoordinates      (const int SpaceDimension,
                             const int NumberOfNodes,

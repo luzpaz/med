@@ -33,6 +33,8 @@
 #include "MEDMEM_SkyLineArray.hxx"
 #include "MEDMEM_DriverFactory.hxx"
 
+#include <memory>
+
 using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
@@ -131,6 +133,31 @@ GRID::GRID(const std::vector<std::vector<double> >& xyz_array,const std::vector<
         std::copy(xyz_array[2].begin(),xyz_array[2].end(),_kArray);
     }
 }
+
+//================================================================================
+/*!
+ * \brief Reads a GRID form the file
+ *  \param driverType - type of driver to read the specified file
+ *  \param fileName - the file name to read
+ *  \param driverName - name of a grid to read
+ */
+//================================================================================
+
+GRID::GRID(driverTypes driverType, const string &  fileName, const string &  driverName)
+{
+  
+  const char* LOC = "GRID::GRID(driverTypes , const string &  , const string &) : ";
+  BEGIN_OF_MED(LOC);
+  
+  init();
+  auto_ptr<GENDRIVER> myDriver (DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,driverName,RDONLY));
+  myDriver->open();
+  myDriver->read();
+  myDriver->close();
+
+  END_OF_MED(LOC);
+};
+
 /*!\if MEDMEM_ug @} \endif */
 
 //=======================================================================
@@ -288,35 +315,9 @@ void GRID::printMySelf(std::ostream &os) const
   cout << "NOT IMPLEMENTED" << endl;
 }
 
-//=======================================================================
-//function : GRID
-//purpose  : Create a GRID object using a MESH driver of type
-//           (MED_DRIVER, ....) associated with file <fileName>. 
-//=======================================================================
-
-GRID::GRID(driverTypes driverType, const string &  fileName, const string &  driverName)
-{
-  
-  const char* LOC = "GRID::GRID(driverTypes , const string &  , const string &) : ";
-  BEGIN_OF_MED(LOC);
-  
-  init();
-  GENDRIVER *myDriver=DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,driverName,RDONLY);
-  //int current = addDriver(*myDriver);
-//   _drivers[current]->open();
-//   _drivers[current]->read();
-//   _drivers[current]->close();
-  myDriver->open();
-  myDriver->read();
-  myDriver->close();
-  delete myDriver;
-
-  END_OF_MED(LOC);
-};
-
 //================================================================================
 /*!
- * \brief Create an unstructured MESH
+ * \brief Create an unstructured MESH. Call removeReference() after having finished using it!!!
  */
 //================================================================================
 

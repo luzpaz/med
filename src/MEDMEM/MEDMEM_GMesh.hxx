@@ -78,13 +78,6 @@ class MEDMEM_EXPORT GMESH: public RCBASE
   friend class MED_MESH_RDONLY_DRIVER;
   friend class MED_MESH_WRONLY_DRIVER;
 
-  friend class MED_MED_RDONLY_DRIVER21;
-  friend class MED_MED_WRONLY_DRIVER21;
-  friend class MED_MED_RDWR_DRIVER21;
-  friend class MED_MED_RDONLY_DRIVER22;
-  friend class MED_MED_WRONLY_DRIVER22;
-  friend class MED_MED_RDWR_DRIVER22;
-
   friend class GIBI_MESH_RDONLY_DRIVER;
   friend class GIBI_MESH_WRONLY_DRIVER;
   friend class GIBI_MESH_RDWR_DRIVER;
@@ -121,7 +114,7 @@ class MEDMEM_EXPORT GMESH: public RCBASE
   virtual void read(int index=0);
   //virtual void read(GENDRIVER & genDriver);
 
-  virtual void write(int index=0, const std::string & driverName = "") const ;
+  virtual void write(int index=0) const ;
   virtual void write(const GENDRIVER & genDriver) const;
   virtual void write(driverTypes driverType, const std::string& filename) const;
 

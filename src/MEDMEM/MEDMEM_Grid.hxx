@@ -103,7 +103,7 @@ class MEDMEM_EXPORT GRID: public GMESH
   GRID();
   GRID(const MED_EN::med_grid_type type);
   GRID(const GRID &m);
-  GRID( driverTypes driverType, const string & fileName="",const string & meshName="");
+  GRID( driverTypes driverType, const string & fileName,const string & meshName);
   GRID(const std::vector<std::vector<double> >& xyz_array,
        const std::vector<std::string>&          coord_name,
        const std::vector<std::string>&          coord_unit,

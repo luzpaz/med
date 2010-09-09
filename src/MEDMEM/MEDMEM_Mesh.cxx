@@ -69,20 +69,6 @@ from the mesh.
 \defgroup MESH_nodes MESH Nodes information
 These methods are related to the extraction of information about the mesh nodes.
 
-\defgroup MESH_general MESH General information
-
-These methods are related to the retrieval of general information about the mesh.
-
-\defgroup MESH_families Families and Groups handling
-
-The methods described in this section enable the manipulation of families and groups. These
-notions define subsets of MED elements in a mesh. They differ because families are non
-overlapping (a mesh element is associated to zero or one family)  while groups are more general.
-
-\defgroup MESH_io Mesh I/O
-These methods describe how to read and write meshes. Generally speaking, meshes should be read
-via a constructor and should be written with the addDriver()/write() methods.
-
 */
 
 void MESH::init()
@@ -241,10 +227,6 @@ MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string
 */
 
 /*!
-\addtogroup MESH_general
-@{
-*/
-/*!
   Returns true if mesh \a other has same
   coordinates (to 1E-15 precision ) and same connectivity as the calling object.
   Information like name or description is not taken into account
@@ -286,9 +268,6 @@ bool MESH::deepCompare(const GMESH& gother) const
   }
   return ret;
 }
-/*!
-  @}
-*/
 
 /*!
  * \brief print my contents
