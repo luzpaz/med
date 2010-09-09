@@ -38,7 +38,7 @@ clean-local:
 
 EXTRA_DIST += figures \
 	      main.dox \
-	      MED_class.dox \
+	      MEDFILEBROWSER_class.dox \
 	      biblio.dox \
 	      field.dox \
 	      grid.dox \
