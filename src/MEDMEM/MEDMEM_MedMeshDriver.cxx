@@ -1111,7 +1111,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
                                            med_2_3::MED_NOD);
                 if (err2 != MED_VALID)
                 {
-                  MESSAGE_MED(LOC<<": MEDpolyedreConnLire returns "<<err4);
+                  MESSAGE_MED(LOC<<": MEDpolyedreConnLire returns "<<err2);
                   return MED_ERROR;
                 }
                 // insert face separators
@@ -1141,7 +1141,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
                                med_2_3::MED_NOD);
               if ( err2 != MED_VALID)
               {
-                MESSAGE_MED(LOC<<": MEDconnLire returns "<<err);
+                MESSAGE_MED(LOC<<": MEDconnLire returns "<<err2);
                 return MED_ERROR;
               }
               int NumberOfNodeByCell = Connectivity->_type[i].getNumberOfNodes();
