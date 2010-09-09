@@ -95,7 +95,6 @@ int main (int argc, char ** argv) {
 
   int NumberOfNodes = 19;
   int SpaceDimension = 3;
-  int MeshDimension = 3;
 
   const int NumberOfTypes = 2;
   medGeometryElement Types[NumberOfTypes] = {MED_TETRA4, MED_POLYHEDRA};
@@ -130,7 +129,6 @@ int main (int argc, char ** argv) {
 
   NumberOfNodes = 9;
   SpaceDimension = 3;
-  MeshDimension = 2;
   medGeometryElement PolygonTypes[NumberOfTypes] = {MED_TRIA3,MED_POLYGON};
   const int PolygonNumberOfElements[NumberOfTypes] = {2,2};
 
@@ -185,10 +183,9 @@ int main (int argc, char ** argv) {
       return -1;
     }
   cout << "Writing test " << endl;
-  int idMed22 = myMeshing->addDriver(MED_DRIVER,"totoPoly_V22.med",myMeshing->getName());
-  myMeshing->write(idMed22);
+  myMeshing->write(MED_DRIVER,"totoPoly_V22.med");
   myMeshing->removeReference();
-  if ( getenv("srcdir") )
+  if ( getenv("srcdir") ) // performing 'make check'?
     remove("totoPoly_V22.med");
   return 0;
 }
