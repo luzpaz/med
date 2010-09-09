@@ -13,7 +13,9 @@ to suit the needs of its user. Instructions for configuring and installing the l
 
 \section outline Outline
 This user guide contains three different chapters that covers the core %MEDMEM library, the %ParaMEDMEM library and the %MEDSPLITTER tool: 
-- Chapter \ref medmem covers the %MEDMEM core library, i.e. the implementation of meshes, supports and fields and the associated drivers (for MED-file, VTK, GIBI).
+- Chapter \ref medmem covers the %MEDMEM core library, i.e. the
+implementation of meshes, supports and fields and the associated
+drivers (for MED-file, VTK, GIBI, etc).
 - Chapter \ref interpkernel describes the interpolation and
 localization library.
 - Chapter \ref medcoupling describes DataStructures used for cross
