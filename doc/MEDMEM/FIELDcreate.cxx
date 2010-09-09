@@ -34,7 +34,6 @@ int main (int argc, char ** argv) {
 
   /* read MESH */
   MESH * myMesh = new MESH(MED_DRIVER,MedFile,MeshName) ;
-  //  myMesh->read() ;
 
   // we need a support :
   SUPPORT * mySupport = new SUPPORT(myMesh,"Support on all CELLs",MED_CELL);
@@ -83,7 +82,7 @@ int main (int argc, char ** argv) {
     }
   
   // save this new field
-  int id = myField.addDriver(MED_DRIVER) ;
+  //myField.write(MED_DRIVER,filename) ;
 
   return 0 ;
 }
