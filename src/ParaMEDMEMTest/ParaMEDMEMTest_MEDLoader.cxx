@@ -34,7 +34,7 @@ using namespace ParaMEDMEM;
 
 void ParaMEDMEMTest::testMEDLoaderRead1()
 {
-  string fileName=getResourceFile("pointe_import22.med");
+  string fileName=getResourceFile("pointe.med");
   vector<string> meshNames=MEDLoader::GetMeshNames(fileName.c_str());
   CPPUNIT_ASSERT_EQUAL(1,(int)meshNames.size());
   MEDCouplingUMesh *mesh=MEDLoader::ReadUMeshFromFile(fileName.c_str(),meshNames[0].c_str(),0);
