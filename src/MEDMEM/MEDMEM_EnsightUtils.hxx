@@ -362,7 +362,7 @@ private:
  */
 // ==============================================================================
 
-class _CaseFileDriver_User: public GENDRIVER
+class MEDMEM_EXPORT _CaseFileDriver_User: public GENDRIVER
 {
 protected:
 
