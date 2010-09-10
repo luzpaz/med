@@ -1095,7 +1095,7 @@ throw (SALOME::SALOME_Exception)
                                              SALOME::INTERNAL_ERROR);
         try
         {
-                _mesh->write(i,driverMeshName);
+                _mesh->write(i);
         }
         catch (MEDEXCEPTION &ex)
         {
