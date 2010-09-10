@@ -53,7 +53,9 @@ public :
   void fillCopy();
 //   virtual void addReference() const;
 //   virtual void removeReference() const;
-  virtual void write(int index=0, const string & driverName = "");
+  virtual void write(int index=0);
+  virtual void write(const GENDRIVER & genDriver);
+  virtual void write(driverTypes driverType, const std::string& filename);
   virtual void printMySelf(ostream &os) const;
 
   virtual bool isEmpty() const;

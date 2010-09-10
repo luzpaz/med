@@ -246,14 +246,38 @@ GMESHClient::~GMESHClient()
 
 //=============================================================================
 /*!
- * Write all the content of the MESH using driver referenced by the integer handler index
+ * Write all the content of the GMESH using driver referenced by the integer handler index
  */
 //=============================================================================
 
-void GMESHClient::write(int index/*=0*/, const string & driverName/* = ""*/)
+void GMESHClient::write(int index/*=0*/)
 {
   this->fillCopy();
-  GMESH::write(index,driverName);
+  GMESH::write(index);
+}
+
+//=============================================================================
+/*!
+ * Write all the content of the GMESH using genDriver
+ */
+//=============================================================================
+
+void GMESHClient::write(const GENDRIVER & genDriver)
+{
+  this->fillCopy();
+  GMESH::write(genDriver);
+}
+
+//=============================================================================
+/*!
+ * Write all the content of the GMESH
+ */
+//=============================================================================
+
+void GMESHClient::write(driverTypes driverType, const std::string& filename)
+{
+  this->fillCopy();
+  GMESH::write(driverType, filename);
 }
 
 //================================================================================

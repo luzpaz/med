@@ -270,10 +270,34 @@ void MESHClient::removeReference() const
  */
 //=============================================================================
 
-void MESHClient::write(int index/*=0*/, const string & driverName/* = ""*/)
+void MESHClient::write(int index/*=0*/)
 {
   this->fillCopy();
-  MESH::write(index,driverName);
+  GMESH::write(index);
+}
+
+//=============================================================================
+/*!
+ * Write all the content of the GMESH using genDriver
+ */
+//=============================================================================
+
+void MESHClient::write(const GENDRIVER & genDriver)
+{
+  this->fillCopy();
+  GMESH::write(genDriver);
+}
+
+//=============================================================================
+/*!
+ * Write all the content of the GMESH
+ */
+//=============================================================================
+
+void MESHClient::write(driverTypes driverType, const std::string& filename)
+{
+  this->fillCopy();
+  GMESH::write(driverType, filename);
 }
 
 //================================================================================
