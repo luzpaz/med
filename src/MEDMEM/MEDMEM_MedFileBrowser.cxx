@@ -33,17 +33,6 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-
-/*!
-Class giving access to names of meshes and fields contained in the med file  
-
-\defgroup MED_constructors Initialization
-
-\defgroup MED_query Query methods
-These methods enable the user to retrieve information
-about a MED file structure, i.e. the meshes and fields it contains.
-
-*/
 namespace 
 {
   /*!
@@ -65,8 +54,18 @@ namespace
      operator med_2_3::med_idt() const { return _id; }
   };
 }
+/*!
+
+\defgroup MEDFILEBROWSER_constructors Initialization
+
+\defgroup MEDFILEBROWSER_query Query methods
+These methods enable the user to retrieve information
+about a MED file structure, i.e. the meshes and fields it contains.
+
+*/
+
 /*! \if MEDMEM_ug 
-\addtogroup MED_constructors
+\addtogroup MEDFILEBROWSER_constructors
 @{
 \endif
 */
@@ -87,7 +86,7 @@ MEDFILEBROWSER::MEDFILEBROWSER()
  */
 //================================================================================
 
-MEDFILEBROWSER::MEDFILEBROWSER(const string & fileName) throw (MED_EXCEPTION)
+MEDFILEBROWSER::MEDFILEBROWSER(const std::string & fileName) throw (MED_EXCEPTION)
 {
   readFileStruct( fileName );
 }
@@ -98,7 +97,7 @@ MEDFILEBROWSER::MEDFILEBROWSER(const string & fileName) throw (MED_EXCEPTION)
  */
 //================================================================================
 
-void MEDFILEBROWSER::readFileStruct(const string & fileName) throw (MEDEXCEPTION)
+void MEDFILEBROWSER::readFileStruct(const std::string & fileName) throw (MEDEXCEPTION)
 {
   const char * LOC = "MEDFILEBROWSER::readFileStruct() : ";
   BEGIN_OF_MED(LOC);
@@ -250,7 +249,7 @@ void MEDFILEBROWSER::readFileStruct(const string & fileName) throw (MEDEXCEPTION
 /*! \if MEDMEM_ug @} \endif */
 
 /*! \if MEDMEM_ug
-\addtogroup MED_query
+\addtogroup MEDFILEBROWSER_query
 @{
 \endif
 */
@@ -300,7 +299,7 @@ int MEDFILEBROWSER::getNumberOfFields ( void ) const
 */
 //================================================================================
 
-void MEDFILEBROWSER::getMeshNames      ( string * meshNames ) const
+void MEDFILEBROWSER::getMeshNames      ( std::string * meshNames ) const
 {
   map< string, bool >::const_iterator name_isstruct = _meshes.begin();
   for ( int i=0; name_isstruct != _meshes.end(); ++i, ++name_isstruct )
@@ -336,7 +335,7 @@ vector<string> MEDFILEBROWSER::getMeshNames      () const
 */
 //================================================================================
 
-void MEDFILEBROWSER::getFieldNames     ( string * fieldNames ) const
+void MEDFILEBROWSER::getFieldNames     ( std::string * fieldNames ) const
 {
   map< string, FIELD_DATA_ >::const_iterator name_data = _fields.begin();
   for( int i = 0; name_data != _fields.end(); ++name_data, ++i )
@@ -364,7 +363,7 @@ vector<string> MEDFILEBROWSER::getFieldNames     () const
  */
 //================================================================================
 
-bool MEDFILEBROWSER::isStructuredMesh(const string & meshName) const throw (MEDEXCEPTION)
+bool MEDFILEBROWSER::isStructuredMesh(const std::string & meshName) const throw (MEDEXCEPTION)
 {
   const char* LOC="MEDFILEBROWSER::isStructuredMesh(meshName)";
 
@@ -383,7 +382,7 @@ bool MEDFILEBROWSER::isStructuredMesh(const string & meshName) const throw (MEDE
  */
 //================================================================================
 
-med_type_champ MEDFILEBROWSER::getFieldType (const string & fieldName) const throw (MEDEXCEPTION)
+med_type_champ MEDFILEBROWSER::getFieldType(const std::string & fieldName) const throw (MEDEXCEPTION)
 {
   const char* LOC="MEDFILEBROWSER::getFieldIteration (fieldName)";
 
@@ -403,7 +402,7 @@ med_type_champ MEDFILEBROWSER::getFieldType (const string & fieldName) const thr
  */
 //================================================================================
 
-std::string MEDFILEBROWSER::getMeshName (const string & fieldName) const throw (MEDEXCEPTION)
+std::string MEDFILEBROWSER::getMeshName (const std::string & fieldName) const throw (MEDEXCEPTION)
 {
   const char* LOC="MEDFILEBROWSER::getMeshName (fieldName)";
 
@@ -432,7 +431,7 @@ the inner iteration number.
 */
 //================================================================================
 
-vector<DT_IT_> MEDFILEBROWSER::getFieldIteration (const string & fieldName) const
+vector<DT_IT_> MEDFILEBROWSER::getFieldIteration (const std::string & fieldName) const
   throw (MED_EXCEPTION)
 {
   const char* LOC="MEDFILEBROWSER::getFieldIteration (fieldName)";
