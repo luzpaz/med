@@ -560,6 +560,12 @@ inline const int * MESH::getConnectivityIndex(MED_EN::medConnectivity    Connect
 }
 
 /*!
+\if MEDMEM_ug
+@}
+\endif
+ */
+
+/*!
   Returns the corresponding length of the array returned by MESH::getReverseConnectivity with exactly the same arguments.
   Used particulary for wrapping CORBA and python.
  */
