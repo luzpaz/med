@@ -59,7 +59,6 @@ The description of MESH methods is given by the following sections :
 - The methods retrieving family information are given in \ref MESH_families.
 - The IO methods are given in \ref MESH_io. 
 - The methods for an advanced usage (applying algorithms to meshes)
-are given in \ref MESH_advanced. Some advanced methods are provided by
-the base GMESH in \ref GMESH_advanced.
+are given in \ref MESH_advanced.
 
 */
