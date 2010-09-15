@@ -361,6 +361,11 @@ void MESH::printMySelf(ostream &os) const
   }
 }
 
+/*! \if MEDMEM_ug
+\addtogroup MESH_general
+@{
+\endif
+*/
 /*! Gets the dimension of the mesh (2 for 2D- and 3D-surfaces, 3 for volumes). */
 int MESH::getMeshDimension() const
 {
@@ -371,6 +376,7 @@ int MESH::getMeshDimension() const
         dim = _connectivity->getCellsTypes(MED_EN::MED_CELL)[i].getDimension();
   return dim;
 }
+/*! \if MEDMEM_ug @} \endif */
 
 /*!
   Get global number of element which have same connectivity than connectivity argument.
