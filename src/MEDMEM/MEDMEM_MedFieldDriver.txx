@@ -1155,7 +1155,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
   MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues=0 ;
  
   // PAL16681 (Read no interlace field from file) ->
-  // use medModeSwitch of a field in MEDMEMchampLire() if there is one geometric type
+  // use medModeSwitch of a field in MEDchampLire() if there is one geometric type
   // to exclude array conversion
   med_2_3::med_mode_switch modswt = med_2_3::MED_FULL_INTERLACE;
   // NOTE: field can be either of 3 medModeSwitch'es, MED_NO_INTERLACE_BY_TYPE added (PAL17011)
