@@ -47,8 +47,6 @@ overlapping (a mesh element is associated to zero or one family)  while groups a
 These methods describe how to read and write meshes. Generally speaking, meshes should be read
 via a constructor and should be written with the write() method.
 
-\defgroup GMESH_advanced Mesh general advanced features
-These functions provide access to high-level manipulation of the supports.
 */
 
 //================================================================================
@@ -480,7 +478,7 @@ void GMESH::write(driverTypes driverType, const std::string& filename) const
 */
 //================================================================================
 
-void GMESH::setName(string name)
+void GMESH::setName(std::string name)
 {
   _name=name; //NOM interne à la classe
 }
@@ -503,7 +501,7 @@ Sets the MESH description. Description should not exceed MED_TAILLE_DESC length 
 \endif */
 //================================================================================
 
-void GMESH::setDescription(string description)
+void GMESH::setDescription(std::string description)
 {
   _description = description; //NOM interne à la classe
 }
@@ -722,7 +720,7 @@ SUPPORT * GMESH::getSupportOnAll(medEntityMesh entity) throw(MEDEXCEPTION)
 /*! \if MEDMEM_ug @} \endif */
 
 /*! \if MEDMEM_ug
-\addtogroup GMESH_advanced
+\addtogroup MESH_advanced
 @{
 \endif
 */
@@ -733,7 +731,7 @@ SUPPORT * GMESH::getSupportOnAll(medEntityMesh entity) throw(MEDEXCEPTION)
 */
 //================================================================================
 
-SUPPORT * GMESH::mergeSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPTION)
+SUPPORT * GMESH::mergeSupports(const std::vector<SUPPORT *> Supports) throw (MEDEXCEPTION)
 {
   const char * LOC = "GMESH::mergeSupports(const vector<SUPPORT *> ) : " ;
   BEGIN_OF_MED(LOC) ;
@@ -860,7 +858,7 @@ SUPPORT * GMESH::mergeSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEP
 */
 //================================================================================
 
-SUPPORT * GMESH::intersectSupports(const vector<SUPPORT *> Supports) throw (MEDEXCEPTION)
+SUPPORT * GMESH::intersectSupports(const std::vector<SUPPORT *> Supports) throw (MEDEXCEPTION)
 {
   const char* LOC = "MESH:::intersectSupports(const vector<SUPPORT *> ) : ";
   BEGIN_OF_MED(LOC);
