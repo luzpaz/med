@@ -63,6 +63,10 @@ class MEDCouplingMeshFieldFactoryComponentPy(MEDCouplingCorbaServantTest_idl._0_
     def getExtrudedMesh(self):
         mesh=self._test.buildExtrudedMesh()
         return MEDCouplingExtrudedMeshServant._this(mesh)
+
+    def getCMesh(self):
+        mesh=self._test.buildCMesh()
+        return MEDCouplingCMeshServant._this(mesh)
     
     def getFieldScalarOn2DNT(self):
         field=self._test.buildFieldScalarOn2DNT()
@@ -98,5 +102,9 @@ class MEDCouplingMeshFieldFactoryComponentPy(MEDCouplingCorbaServantTest_idl._0_
 
     def getFieldVectorOnExtrudedWT(self):
         field=self._test.buildFieldVectorOnExtrudedWT()
+        return MEDCouplingFieldDoubleServant._this(field)
+
+    def getFieldVectorOnCMeshWT(self):
+        field=self._test.buildFieldVectorOnCMeshWT()
         return MEDCouplingFieldDoubleServant._this(field)
     pass

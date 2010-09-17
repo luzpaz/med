@@ -23,6 +23,7 @@
 #include "MEDCouplingFieldDoubleServant.hxx"  
 #include "MEDCouplingUMeshServant.hxx"
 #include "MEDCouplingExtrudedMeshServant.hxx"
+#include "MEDCouplingCMeshServant.hxx"
 
 using namespace ParaMEDMEM;
 %}
@@ -110,6 +111,38 @@ namespace ParaMEDMEM
            PortableServer::POAManager_var mgr=poa->the_POAManager();
            mgr->activate();
            SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_var ret=serv->_this();
+           char *ior=orb->object_to_string(ret);
+           PyObject *iorPython=PyString_FromString(ior);
+           PyObject* pdict=PyDict_New();
+           PyDict_SetItemString(pdict, "__builtins__", PyEval_GetBuiltins());
+           PyRun_String("import MEDCouplingCorbaServant_idl", Py_single_input, pdict, pdict);
+           PyRun_String("import CORBA", Py_single_input, pdict, pdict);
+           PyRun_String("orbTmp15634=CORBA.ORB_init([''])",Py_single_input,pdict, pdict);
+           PyObject* orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
+           PyObject *corbaObj=PyObject_CallMethod(orbPython,(char*)"string_to_object",(char*)"O",iorPython);
+           Py_DECREF(pdict);
+           Py_DECREF(iorPython);
+           CORBA::string_free(ior);
+           return corbaObj;
+         }
+       }
+  };
+
+  class MEDCouplingCMeshServant
+  {
+  public:
+    %extend
+       {
+         static PyObject *_this(const MEDCouplingCMesh *cppPointerOfMesh)
+         {
+           int argc=0;
+           MEDCouplingCMeshServant *serv=new MEDCouplingCMeshServant(cppPointerOfMesh);
+           CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
+           CORBA::Object_var obj=orb->resolve_initial_references("RootPOA");
+           PortableServer::POA_var poa=PortableServer::POA::_narrow(obj);
+           PortableServer::POAManager_var mgr=poa->the_POAManager();
+           mgr->activate();
+           SALOME_MED::MEDCouplingCMeshCorbaInterface_var ret=serv->_this();
            char *ior=orb->object_to_string(ret);
            PyObject *iorPython=PyString_FromString(ior);
            PyObject* pdict=PyDict_New();

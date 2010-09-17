@@ -34,7 +34,6 @@ namespace ParaMEDMEM
   {
   public:
     MEDCouplingCMeshServant(const MEDCouplingCMesh *cppPointerOfMesh);
-  protected:
     ~MEDCouplingCMeshServant();
   private:
     const MEDCouplingCMesh *getPointer() const { return (const MEDCouplingCMesh *)(_cpp_pointer); }

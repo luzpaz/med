@@ -123,6 +123,15 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
         meshRef=test.buildExtrudedMesh();
         self.assertTrue(_mesh_from_distant.isEqual(meshRef,1e-12))
         pass
+
+    def testCorbaFetchingCMesh(self):
+        meshPtr=self._objC.getCMesh();
+        _mesh_from_distant=MEDCouplingCMeshClient.New(meshPtr);
+        meshPtr.Destroy();
+        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
+        meshRef=test.buildCMesh();
+        self.assertTrue(_mesh_from_distant.isEqual(meshRef,1e-12))
+        pass
     
     def testCorbaField2DNTFetching(self):
         fieldPtr=self._objC.getFieldScalarOn2DNT();
@@ -232,6 +241,15 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
         fieldPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildFieldVectorOnExtrudedWT();
+        self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
+        pass
+
+    def testCorbaFieldVectorOnCMeshWT(self):
+        fieldPtr=self._objC.getFieldVectorOnCMeshWT();
+        fieldCpp=MEDCouplingFieldDoubleClient.New(fieldPtr);
+        fieldPtr.Destroy();
+        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
+        refField=test.buildFieldVectorOnCMeshWT();
         self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
         pass
     

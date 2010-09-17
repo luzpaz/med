@@ -141,6 +141,26 @@ class MEDCouplingCorbaServBasicsTest:
         ret.setName("ExtrudedTestForCorbaTest");
         return ret;
 
+    def buildCMesh(self):
+        targetMesh=MEDCouplingCMesh.New();
+        targetMesh.setName("Example of CMesh");
+        a1=DataArrayDouble.New();
+        a1Data=[3.,4.,5.,6.,7.]
+        a1.setValues(a1Data,5,1);
+        a1.setInfoOnComponent(0,"SmthX");
+        a2=DataArrayDouble.New();
+        a2Data=[2.78,3.,4.,5.,6.,7.]
+        a2.setValues(a2Data,6,1);
+        a2.setInfoOnComponent(0,"SmthZ");
+        #
+        targetMesh.setCoordsAt(0,a1);
+        targetMesh.setCoordsAt(2,a2);
+        #
+        #
+        targetMesh.checkCoherency();
+        #
+        return targetMesh;
+
     def buildFieldScalarOn2DNT(self):
         mesh=self.build2DMesh();
         fieldOnCells=MEDCouplingFieldDouble.New(ON_CELLS,NO_TIME);
@@ -299,6 +319,28 @@ class MEDCouplingCorbaServBasicsTest:
             pass
         array.setValues(ptr,nbOfCells,2);
         array.setInfoOnComponent(0,"Power(MW)");
+        array.setInfoOnComponent(1,"Density (kg/m^3)");
+        f.setArray(array);
+        #
+        f.checkCoherency();
+        return f
+
+    def buildFieldVectorOnCMeshWT(self):
+        ext=self.buildCMesh();
+        #
+        f=MEDCouplingFieldDouble.New(ON_CELLS,ONE_TIME);
+        f.setTime(6.8,11,8);
+        f.setMesh(ext);
+        f.setName("MyFieldOnCMesh");
+        f.setDescription("desc of MyFiOnCMesh");
+        array=DataArrayDouble.New();
+        nbOfCells=ext.getNumberOfCells();
+        ptr=2*nbOfCells*[None]
+        for i in range(nbOfCells*2):
+            ptr[i]=float(i/2+7)+float((i%2)*1000);
+            pass
+        array.setValues(ptr,nbOfCells,2);
+        array.setInfoOnComponent(0,"Power(GW)");
         array.setInfoOnComponent(1,"Density (kg/m^3)");
         f.setArray(array);
         #
