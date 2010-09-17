@@ -21,10 +21,12 @@
 #include "MEDCouplingMeshFieldFactoryComponent.hxx"
 #include "MEDCouplingFieldDoubleServant.hxx"
 #include "MEDCouplingExtrudedMeshServant.hxx"
+#include "MEDCouplingCMeshServant.hxx"
 #include "MEDCouplingUMeshServant.hxx"
 #include "MEDCouplingFieldDouble.hxx"
 #include "MEDCouplingExtrudedMesh.hxx"
 #include "MEDCouplingUMesh.hxx"
+#include "MEDCouplingCMesh.hxx"
 
 namespace SALOME_TEST
 {
@@ -109,6 +111,15 @@ namespace SALOME_TEST
     return ret;
   }
 
+  SALOME_MED::MEDCouplingCMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getCMesh()
+  {
+    ParaMEDMEM::MEDCouplingCMesh *m1=MEDCouplingCorbaServBasicsTest::buildCMesh();
+    ParaMEDMEM::MEDCouplingCMeshServant *m=new ParaMEDMEM::MEDCouplingCMeshServant(m1);
+    m1->decrRef();
+    SALOME_MED::MEDCouplingCMeshCorbaInterface_ptr ret=m->_this();
+    return ret;
+  }
+
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldScalarOn2DNT()
   {
     ParaMEDMEM::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldScalarOn2DNT();
@@ -184,6 +195,15 @@ namespace SALOME_TEST
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldVectorOnExtrudedWT()
   {
     ParaMEDMEM::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldVectorOnExtrudedWT();
+    ParaMEDMEM::MEDCouplingFieldDoubleServant *m=new ParaMEDMEM::MEDCouplingFieldDoubleServant(field);
+    field->decrRef();
+    SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
+    return ret;
+  }
+
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldVectorOnCMeshWT()
+  {
+    ParaMEDMEM::MEDCouplingFieldDouble *field=MEDCouplingCorbaServBasicsTest::buildFieldVectorOnCMeshWT();
     ParaMEDMEM::MEDCouplingFieldDoubleServant *m=new ParaMEDMEM::MEDCouplingFieldDoubleServant(field);
     field->decrRef();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();

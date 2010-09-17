@@ -48,6 +48,7 @@ namespace SALOME_TEST
     CPPUNIT_TEST( checkCorbaFetching0D );
     CPPUNIT_TEST( checkCorbaFetchingM1D );
     CPPUNIT_TEST( checkCorbaFetchingExtruded );
+    CPPUNIT_TEST( checkCorbaFetchingCMesh );
     CPPUNIT_TEST( checkCorbaField2DNTFetching );
     CPPUNIT_TEST( checkCorbaField2DNTMultiFetching );
     CPPUNIT_TEST( checkCorbaField2DNTMultiFetchingMT );
@@ -59,6 +60,7 @@ namespace SALOME_TEST
     CPPUNIT_TEST( checkCorbaFieldGaussPt2DWTFetching );
     CPPUNIT_TEST( checkCorbaFieldGaussPtNE2DWTFetching );
     CPPUNIT_TEST( checkCorbaFieldVectorOnExtrudedWT );
+    CPPUNIT_TEST( checkCorbaFieldVectorOnCMeshWT );
     CPPUNIT_TEST( shutdownServer );
     CPPUNIT_TEST_SUITE_END();
   public:
@@ -74,6 +76,7 @@ namespace SALOME_TEST
     void checkCorbaFetching0D();
     void checkCorbaFetchingM1D();
     void checkCorbaFetchingExtruded();
+    void checkCorbaFetchingCMesh();
     void checkCorbaField2DNTFetching();
     void checkCorbaField2DNTMultiFetching();
     void checkCorbaField2DNTMultiFetchingMT();
@@ -85,6 +88,7 @@ namespace SALOME_TEST
     void checkCorbaFieldGaussPt2DWTFetching();
     void checkCorbaFieldGaussPtNE2DWTFetching();
     void checkCorbaFieldVectorOnExtrudedWT();
+    void checkCorbaFieldVectorOnCMeshWT();
     void shutdownServer();
   private:
     static void *checkCorbaField2DNTMultiFetchingMTStatic(void *stack);

@@ -21,6 +21,7 @@
 #include "MEDCouplingExtrudedMesh.hxx"
 #include "MEDCouplingFieldDouble.hxx"
 #include "MEDCouplingUMesh.hxx"
+#include "MEDCouplingCMesh.hxx"
 
 #include <cmath>
 #include <algorithm>
@@ -170,6 +171,32 @@ namespace SALOME_TEST
     ret->setName("ExtrudedTestForCorbaTest");
     retu->decrRef();
     return ret;
+  }
+
+  ParaMEDMEM::MEDCouplingCMesh *MEDCouplingCorbaServBasicsTest::buildCMesh()
+  {
+    ParaMEDMEM::MEDCouplingCMesh *targetMesh=ParaMEDMEM::MEDCouplingCMesh::New();
+    targetMesh->setName("Example of CMesh");
+    ParaMEDMEM::DataArrayDouble *a1=ParaMEDMEM::DataArrayDouble::New();
+    a1->alloc(5,1);
+    a1->setInfoOnComponent(0,"SmthX");
+    const double a1Data[5]={3.,4.,5.,6.,7.};
+    std::copy(a1Data,a1Data+5,a1->getPointer());
+    ParaMEDMEM::DataArrayDouble *a2=ParaMEDMEM::DataArrayDouble::New();
+    a2->alloc(6,1);
+    a2->setInfoOnComponent(0,"SmthZ");
+    const double a2Data[6]={2.78,3.,4.,5.,6.,7.};
+    std::copy(a2Data,a2Data+6,a2->getPointer());
+    //
+    targetMesh->setCoordsAt(0,a1);
+    targetMesh->setCoordsAt(2,a2);
+    //
+    a1->decrRef();
+    a2->decrRef();
+    //
+    targetMesh->checkCoherency();
+    //
+    return targetMesh;
   }
 
   ParaMEDMEM::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldScalarOn2DNT()
@@ -379,6 +406,31 @@ namespace SALOME_TEST
     //
     m2D->decrRef();
     ext->decrRef();
+    return f;
+  }
+
+  ParaMEDMEM::MEDCouplingFieldDouble *MEDCouplingCorbaServBasicsTest::buildFieldVectorOnCMeshWT()
+  {
+    ParaMEDMEM::MEDCouplingCMesh *m=buildCMesh();
+    ParaMEDMEM::MEDCouplingFieldDouble *f=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::ONE_TIME);
+    f->setTime(6.8,11,8);
+    f->setMesh(m);
+    m->decrRef();
+    f->setName("MyFieldOnCMesh");
+    f->setDescription("desc of MyFiOnCMesh");
+    ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
+    int nbOfCells=m->getNumberOfCells();
+    array->alloc(nbOfCells,2);
+    array->setInfoOnComponent(0,"Power(GW)");
+    array->setInfoOnComponent(1,"Density (kg/m^3)");
+    double *ptr=array->getPointer();
+    for(int i=0;i<nbOfCells*2;i++)
+      ptr[i]=(double)(i/2+7)+(double)((i%2)*1000);
+    f->setArray(array);
+    array->decrRef();
+    //
+    f->checkCoherency();
+    //
     return f;
   }
 

@@ -45,6 +45,7 @@ namespace SALOME_TEST
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr get0DMesh();
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr getM1DMesh();
     SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_ptr getExtrudedMesh();
+    SALOME_MED::MEDCouplingCMeshCorbaInterface_ptr getCMesh();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldScalarOn2DNT();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldNodeScalarOn2DNT();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldScalarOn3DNT();
@@ -54,6 +55,7 @@ namespace SALOME_TEST
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldGaussPt2DWT();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldGaussPtNE2DWT();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldVectorOnExtrudedWT();
+    SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldVectorOnCMeshWT();
   private:
     CORBA::ORB_ptr _orb;
   };

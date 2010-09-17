@@ -23,6 +23,8 @@
 #include "MEDCouplingUMeshClient.hxx"
 #include "MEDCouplingExtrudedMesh.hxx"
 #include "MEDCouplingExtrudedMeshClient.hxx"
+#include "MEDCouplingCMesh.hxx"
+#include "MEDCouplingCMeshClient.hxx"
 #include "MEDCouplingFieldDouble.hxx"
 #include "MEDCouplingFieldDoubleClient.hxx"
 #include <fstream>
@@ -180,6 +182,19 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetchingExtruded(
   CPPUNIT_ASSERT(meshFromDistant->isEqual(meshRef,1e-12));
   CPPUNIT_ASSERT(meshFromDistant->getMesh2D()->isEqual(meshRef2,1e-12));
   meshRef2->decrRef();
+  meshRef->decrRef();
+  meshFromDistant->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetchingCMesh()
+{
+  SALOME_MED::MEDCouplingCMeshCorbaInterface_ptr meshPtr=_objC->getCMesh();
+  SALOME_MED::MEDCouplingCMeshCorbaInterface::_duplicate(meshPtr);
+  ParaMEDMEM::MEDCouplingCMesh *meshFromDistant=ParaMEDMEM::MEDCouplingCMeshClient::New(meshPtr);
+  meshPtr->Destroy();
+  CORBA::release(meshPtr);
+  ParaMEDMEM::MEDCouplingCMesh *meshRef=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildCMesh();
+  CPPUNIT_ASSERT(meshFromDistant->isEqual(meshRef,1e-12));
   meshRef->decrRef();
   meshFromDistant->decrRef();
 }
@@ -373,6 +388,20 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFieldVectorOnExtr
   CORBA::release(fieldPtr);
   //
   ParaMEDMEM::MEDCouplingFieldDouble *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldVectorOnExtrudedWT();
+  CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
+  refField->decrRef();
+  fieldCpp->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFieldVectorOnCMeshWT()
+{
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr fieldPtr=_objC->getFieldVectorOnCMeshWT();
+  SALOME_MED::MEDCouplingFieldDoubleCorbaInterface::_duplicate(fieldPtr);
+  ParaMEDMEM::MEDCouplingFieldDouble *fieldCpp=ParaMEDMEM::MEDCouplingFieldDoubleClient::New(fieldPtr);
+  fieldPtr->Destroy();
+  CORBA::release(fieldPtr);
+  //
+  ParaMEDMEM::MEDCouplingFieldDouble *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldVectorOnCMeshWT();
   CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
   refField->decrRef();
   fieldCpp->decrRef();

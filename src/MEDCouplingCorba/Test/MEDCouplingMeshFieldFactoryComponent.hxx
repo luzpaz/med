@@ -27,6 +27,7 @@ namespace ParaMEDMEM
   class MEDCouplingUMesh;
   class MEDCouplingFieldDouble;
   class MEDCouplingExtrudedMesh;
+  class MEDCouplingCMesh;
 }
 
 namespace SALOME_TEST
@@ -41,6 +42,7 @@ namespace SALOME_TEST
     static ParaMEDMEM::MEDCouplingUMesh *build0DMesh();
     static ParaMEDMEM::MEDCouplingUMesh *buildM1DMesh();
     static ParaMEDMEM::MEDCouplingExtrudedMesh *buildExtrudedMesh(ParaMEDMEM::MEDCouplingUMesh *&m2D);
+    static ParaMEDMEM::MEDCouplingCMesh *buildCMesh();
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldScalarOn2DNT();
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldNodeScalarOn2DNT();
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldScalarOn3DNT();
@@ -50,6 +52,7 @@ namespace SALOME_TEST
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldGaussPt2DWT();
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldGaussPtNE2DWT();
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldVectorOnExtrudedWT();
+    static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldVectorOnCMeshWT();
     static std::string buildFileNameForIOR();
   };
 }
