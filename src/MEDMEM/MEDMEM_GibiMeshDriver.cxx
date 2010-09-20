@@ -1421,9 +1421,11 @@ GIBI_MESH_DRIVER::GIBI_MESH_DRIVER(const string &         fileName,
   MESSAGE_MED( "GIBI_MESH_DRIVER(" << fileName <<","<<accessMode );
   //   _meshName=fileName.substr(0,fileName.rfind("."));
   // mesh name construction from fileName
-  const string ext=".sauve"; // expected extension
+  const string ext=".sauv"; // expected extension
   string::size_type pos=fileName.find(ext,0);
   string::size_type pos1=fileName.rfind('/');
+  if ( pos == string::npos ) pos = fileName.size();
+  if ( pos1 == string::npos ) pos1 = -1;
   _meshName = string(fileName,pos1+1,pos-pos1-1); //get rid of directory & extension
   SCRUTE_MED(_meshName);
 }
@@ -3617,17 +3619,21 @@ void GIBI_MESH_WRONLY_DRIVER::writeLastRecord()
 
 /*--------------------- RDWR PART -------------------------------*/
 
-GIBI_MESH_RDWR_DRIVER::GIBI_MESH_RDWR_DRIVER():GIBI_MESH_DRIVER()
+GIBI_MESH_RDWR_DRIVER::GIBI_MESH_RDWR_DRIVER()
+  :GIBI_MESH_DRIVER(), GIBI_MESH_RDONLY_DRIVER(), GIBI_MESH_WRONLY_DRIVER()
 {
 }
-GIBI_MESH_RDWR_DRIVER::GIBI_MESH_RDWR_DRIVER(const string & fileName,
-                                             MESH * ptrMesh):
-       GIBI_MESH_DRIVER(fileName,ptrMesh,RDWR)
+GIBI_MESH_RDWR_DRIVER::GIBI_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh):
+  GIBI_MESH_DRIVER(fileName,ptrMesh,RDWR),
+  GIBI_MESH_RDONLY_DRIVER(fileName,ptrMesh),
+  GIBI_MESH_WRONLY_DRIVER(fileName,ptrMesh)
 {
   MESSAGE_MED("GIBI_MESH_RDWR_DRIVER::GIBI_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
 GIBI_MESH_RDWR_DRIVER::GIBI_MESH_RDWR_DRIVER(const GIBI_MESH_RDWR_DRIVER & driver):
-  GIBI_MESH_RDONLY_DRIVER::GIBI_MESH_DRIVER(driver)
+  GIBI_MESH_DRIVER(driver),
+  GIBI_MESH_RDONLY_DRIVER(driver),
+  GIBI_MESH_WRONLY_DRIVER(driver)
 {
   MESSAGE_MED("GIBI_MESH_RDWR_DRIVER::GIBI_MESH_RDWR_DRIVER(driver) has been created");
 }
