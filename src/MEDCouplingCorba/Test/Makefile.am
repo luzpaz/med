@@ -24,7 +24,7 @@ bin_PROGRAMS= TestMEDCouplingCorbaServ TestMEDCouplingCorbaClt
 TestMEDCouplingCorbaServ_CPPFLAGS=$(CORBA_CXXFLAGS) $(CORBA_INCLUDES) @CPPUNIT_INCLUDES@ -I$(srcdir)/.. -I$(srcdir)/../../INTERP_KERNEL/Bases -I$(srcdir)/../../INTERP_KERNELTest -I$(srcdir)/../../INTERP_KERNEL \
 	-I$(srcdir)/../../INTERP_KERNEL/Geometric2D -I$(srcdir)/../../MEDCoupling -I$(top_builddir)/idl ${KERNEL_CXXFLAGS}
 
-TestMEDCouplingCorbaServ_LDFLAGS = @CPPUNIT_LIBS@ ../libmedcouplingcorba.la ../Client/libmedcouplingclient.la
+TestMEDCouplingCorbaServ_LDFLAGS = @CPPUNIT_LIBS@ ../libmedcouplingcorba.la ../Client/libmedcouplingclient.la ../../../idl/libSalomeIDLMEDTests.la
 
 dist_TestMEDCouplingCorbaServ_SOURCES = TestMEDCouplingCorbaServ.cxx MEDCouplingMeshFieldFactoryComponent.cxx MEDCouplingMeshFieldFactoryComponentServ.cxx \
 	MEDCouplingMeshFieldFactoryComponent.hxx MEDCouplingMeshFieldFactoryComponentServ.hxx
@@ -32,7 +32,7 @@ dist_TestMEDCouplingCorbaServ_SOURCES = TestMEDCouplingCorbaServ.cxx MEDCoupling
 TestMEDCouplingCorbaClt_CPPFLAGS=$(PTHREAD_CFLAGS) $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) @CPPUNIT_INCLUDES@ -I$(srcdir)/../Client -I$(srcdir)/../../INTERP_KERNEL/Bases -I$(srcdir)/../../INTERP_KERNELTest -I$(srcdir)/../../INTERP_KERNEL \
 	-I$(srcdir)/../../INTERP_KERNEL/Geometric2D -I$(srcdir)/../../MEDCoupling -I$(top_builddir)/idl ${KERNEL_CXXFLAGS}
 
-TestMEDCouplingCorbaClt_LDFLAGS = $(PTHREAD_LIBS) @CPPUNIT_LIBS@ ../Client/libmedcouplingclient.la
+TestMEDCouplingCorbaClt_LDFLAGS = $(PTHREAD_LIBS) @CPPUNIT_LIBS@ ../Client/libmedcouplingclient.la ../../../idl/libSalomeIDLMEDTests.la
 
 dist_TestMEDCouplingCorbaClt_SOURCES = TestMEDCouplingCorbaClt.cxx MEDCouplingMeshFieldFactoryComponent.cxx MEDCouplingMeshFieldFactoryComponentClt.cxx \
 	MEDCouplingMeshFieldFactoryComponent.hxx MEDCouplingMeshFieldFactoryComponentClt.hxx
