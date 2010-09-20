@@ -35,7 +35,7 @@ void MEDCouplingMeshServant::getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME
   std::vector<std::string> tinyInfoS;
   getPointer()->getTinySerializationInformation(tinyInfoI,tinyInfoS);
   la->length(tinyInfoI.size());
-  for(int i=0;i<tinyInfoI.size();i++)
+  for(int i=0;i<(int)tinyInfoI.size();i++)
     (*la)[i]=tinyInfoI[i];
   //
   sa=new SALOME_TYPES::ListOfString;

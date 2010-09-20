@@ -70,7 +70,7 @@ void MEDCouplingMeshClient::fillMeshFromCorbaData(MEDCouplingMesh *meshCpp, SALO
   for(int i=0;i<tinyLgth;i++)
     tinyV[i]=(*tinyI)[i];
   std::vector<std::string> sts(tinyS->length());
-  for(int i=0;i<sts.size();i++)
+  for(int i=0;i<(int)sts.size();i++)
     sts[i]=(*tinyS)[i];
   delete tinyS;
   delete tinyI;

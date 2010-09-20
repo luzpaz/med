@@ -32,21 +32,21 @@ void MEDCouplingFieldDoubleServant::getTinyInfo(SALOME_TYPES::ListOfLong_out la,
   std::vector<int> tinyInfo;
   getPointer()->getTinySerializationIntInformation(tinyInfo);
   la->length(tinyInfo.size());
-  for(int i=0;i<tinyInfo.size();i++)
+  for(int i=0;i<(int)tinyInfo.size();i++)
     (*la)[i]=tinyInfo[i];
   //
   da=new SALOME_TYPES::ListOfDouble;
   std::vector<double> tinyInfo2;
   getPointer()->getTinySerializationDbleInformation(tinyInfo2);
   da->length(tinyInfo2.size());
-  for(int i=0;i<tinyInfo2.size();i++)
+  for(int i=0;i<(int)tinyInfo2.size();i++)
     (*da)[i]=tinyInfo2[i];
   //
   sa=new SALOME_TYPES::ListOfString;
   std::vector<std::string> tinyInfo3;
   getPointer()->getTinySerializationStrInformation(tinyInfo3);
   sa->length(tinyInfo3.size());
-  for(int i=0;i<tinyInfo3.size();i++)
+  for(int i=0;i<(int)tinyInfo3.size();i++)
     (*sa)[i]=CORBA::string_dup(tinyInfo3[i].c_str());
 }
 
