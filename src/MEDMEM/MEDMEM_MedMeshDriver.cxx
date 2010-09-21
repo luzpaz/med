@@ -1057,7 +1057,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
             }
             size += connSizeByType.back();
             typeNumber++;
-            MESSAGE_MED(LOC << Connectivity->_count[typeNumber]-1 << " cells of type "
+            MESSAGE_MED(LOC << Connectivity->_count[typeNumber-1]-1 << " cells of type "
                         << tmp_cell_models[i].getName() );
           }
 
