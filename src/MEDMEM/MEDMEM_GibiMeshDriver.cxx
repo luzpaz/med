@@ -1462,7 +1462,8 @@ GIBI_MESH_RDONLY_DRIVER::GIBI_MESH_RDONLY_DRIVER(const string & fileName,MESH * 
               << fileName << ", " << RDONLY);
 }
 GIBI_MESH_RDONLY_DRIVER::GIBI_MESH_RDONLY_DRIVER(const GIBI_MESH_RDONLY_DRIVER & driver):
-  GIBI_MESH_DRIVER(driver)
+  GIBI_MESH_DRIVER(driver),
+  _File (-1),_start(0L),_ptr  (0L),_eptr (0L)
 {
 }
 
