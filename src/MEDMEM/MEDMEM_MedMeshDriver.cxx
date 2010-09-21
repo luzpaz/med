@@ -1058,7 +1058,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
             size += connSizeByType.back();
             typeNumber++;
             MESSAGE_MED(LOC << Connectivity->_count[typeNumber]-1 << " cells of type "
-                        << all_cell_type_tab[i] );
+                        << tmp_cell_models[i].getName() );
           }
 
           // Creation of the MEDSKYLINEARRAY
