@@ -1422,10 +1422,10 @@ GIBI_MESH_DRIVER::GIBI_MESH_DRIVER(const string &         fileName,
   //   _meshName=fileName.substr(0,fileName.rfind("."));
   // mesh name construction from fileName
   const string ext=".sauv"; // expected extension
-  string::size_type pos=fileName.find(ext,0);
-  string::size_type pos1=fileName.rfind('/');
-  if ( pos == string::npos ) pos = fileName.size();
-  if ( pos1 == string::npos ) pos1 = -1;
+  int pos=fileName.find(ext,0);
+  int pos1=fileName.rfind('/');
+  if ( pos < 0 || pos > fileName.size() ) pos = fileName.size();
+  if ( pos < 0 || pos > fileName.size() ) pos1 = -1;
   _meshName = string(fileName,pos1+1,pos-pos1-1); //get rid of directory & extension
   SCRUTE_MED(_meshName);
 }
