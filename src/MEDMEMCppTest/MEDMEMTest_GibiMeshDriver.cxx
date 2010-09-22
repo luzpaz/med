@@ -136,6 +136,11 @@ void MEDMEMTest::testGibiMeshDriver()
       //Creation of an incorrect read only driver
       GIBI_MESH_RDONLY_DRIVER *aInvalidGibiRdDriver =
         new GIBI_MESH_RDONLY_DRIVER(fileNotExistsName_rd, aMesh);
+      /************************************************************************/
+      // WARNING: if you have memory access error just after this constructor,
+      // this means that MEDMEMCppTest has been compiled w/o -DHAS_XDR
+      // while MEDMEM, with -DHAS_XDR
+      /************************************************************************/
 
       //Trying open not existing file
       CPPUNIT_ASSERT_THROW(aInvalidGibiRdDriver->open(), MEDEXCEPTION);
