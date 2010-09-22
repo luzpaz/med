@@ -1425,7 +1425,10 @@ GIBI_MESH_DRIVER::GIBI_MESH_DRIVER(const string &         fileName,
   int pos=fileName.find(ext,0);
   int pos1=fileName.rfind('/');
   if ( pos < 0 || pos > fileName.size() ) pos = fileName.size();
-  if ( pos < 0 || pos > fileName.size() ) pos1 = -1;
+#ifdef WNT
+  if ( pos1 < 0 || pos1 > fileName.size() ) pos1 = fileName.rfind('\\');
+#endif
+  if ( pos1 < 0 || pos1 > fileName.size() ) pos1 = -1;
   _meshName = string(fileName,pos1+1,pos-pos1-1); //get rid of directory & extension
   SCRUTE_MED(_meshName);
 }
@@ -1560,10 +1563,10 @@ void GIBI_MESH_RDONLY_DRIVER::open()
       xdr_destroy((XDR*)_xdrs);
       free((XDR*)_xdrs);
       fclose(_xdrs_file);
-      ::close (_File);
 #ifdef WNT
-      _File = ::_open (_fileName.c_str(), _O_RDONLY|_O_BINARY);
+	  _File = ::_open (_fileName.c_str(), _O_RDONLY|_O_BINARY);
 #else
+      ::close (_File);
       _File = ::open (_fileName.c_str(), O_RDONLY);
 #endif
     }
