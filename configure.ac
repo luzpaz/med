@@ -726,3 +726,5 @@ AC_OUTPUT([ \
         doc/doxygen/Doxyfile_med_user \
 	doc/doxygen/static/header.html \
 ])
+
+AC_HACK_LIBTOOL
