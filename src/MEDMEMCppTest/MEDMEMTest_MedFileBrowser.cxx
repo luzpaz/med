@@ -64,7 +64,7 @@ namespace
 {
   void check_bad_file( MEDFILEBROWSER& myMed )
   {
-    vector<string> names;
+    vector<string> names(1);
     CPPUNIT_ASSERT_EQUAL( 0, myMed.getNumberOfMeshes() );
     CPPUNIT_ASSERT_EQUAL( 0, myMed.getNumberOfFields() );
     CPPUNIT_ASSERT_NO_THROW( myMed.getMeshNames( & names[0] ));
