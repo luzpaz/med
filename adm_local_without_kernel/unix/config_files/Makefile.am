@@ -45,6 +45,7 @@ dist_admlocalwithoutkernelm4_DATA = \
     enable_pthreads.m4 \
     production.m4 \
     python.m4 \
-    local_install.m4
+    local_install.m4 \
+    hack_libtool.m4
 
 EXTRA_DIST += DEPRECATED
