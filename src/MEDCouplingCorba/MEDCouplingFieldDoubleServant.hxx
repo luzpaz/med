@@ -21,11 +21,13 @@
 #define __MEDCOUPLINGFIELDDOUBLESERVANT_HXX__
 
 #include "SALOMEconfig.h"
-
+#ifdef WNT
+#define NOMINMAX
+#endif
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
 #include "MEDCouplingCorba.hxx"
 #include "MEDCouplingFieldServant.hxx"
-#include "MEDCouplingUMeshServant.hxx"
+#include "MEDCouplingMeshServant.hxx"
 
 #include <vector>
 

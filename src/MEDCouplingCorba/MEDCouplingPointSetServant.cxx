@@ -19,7 +19,6 @@
 
 #include "MEDCouplingPointSetServant.hxx"
 #include "MEDCouplingPointSet.hxx"
-#include "MEDCouplingMemArray.hxx"
 
 using namespace ParaMEDMEM;
 
