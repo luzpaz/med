@@ -22,7 +22,9 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 #include "SALOMEconfig.h"
-
+#ifdef WNT
+#define NOMINMAX
+#endif
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServantTest)
 
 namespace ParaMEDMEM

@@ -21,7 +21,9 @@
 #define __MEDCOUPLINGCORBAFIELDFACTORYCOMPONENTCLT_HXX__
 
 #include "SALOMEconfig.h"
-
+#ifdef WNT
+#define NOMINMAX
+#endif
 #include CORBA_CLIENT_HEADER(MEDCouplingCorbaServantTest)
 
 #include <cppunit/extensions/HelperMacros.h>
