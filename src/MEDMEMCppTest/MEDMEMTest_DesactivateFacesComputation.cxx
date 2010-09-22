@@ -187,7 +187,7 @@ void MEDMEMTest::testDesactivateFacesComputation()
   id=mesh->addDriver(*gibidriver);
   mesh->write(id);
 #ifdef WNT
-  CPPUNIT_ASSERT( GetFileAttributes(tmpGibiFile.c_str()) & FILE_ATTRIBUTE_NORMAL );
+  CPPUNIT_ASSERT( GetFileAttributes(tmpGibiFile.c_str()) != INVALID_FILE_ATTRIBUTES );
 #else
   CPPUNIT_ASSERT( access(tmpGibiFile.c_str(), F_OK) == 0 );
 #endif
