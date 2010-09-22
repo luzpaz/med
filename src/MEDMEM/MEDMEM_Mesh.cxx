@@ -418,7 +418,7 @@ int MESH::getElementNumber(MED_EN::medConnectivity ConnectivityType,
 
   for (int i=1; i<numberOfValue; i++) {
     int connectivity_i = connectivity[i] ;
-    for (itList=cellsList.begin();itList!=cellsList.end();itList++) {
+    for (itList=cellsList.begin();itList!=cellsList.end();/*itList++*/) {
       bool find = false ;
       for (int j=myReverseConnectivityIndex[connectivity_i-1]; j<myReverseConnectivityIndex[connectivity_i]; j++) {
         if ((*itList)==myReverseConnectivityValue[j-1]) {
@@ -427,8 +427,11 @@ int MESH::getElementNumber(MED_EN::medConnectivity ConnectivityType,
         }
       }
       if (!find) {
-        itList=cellsList.erase(itList);
-        itList--; // well : rigth if itList = cellsList.begin() ??
+        itList=cellsList.erase(itList++);
+        //itList--; // well : rigth if itList = cellsList.begin() ??
+      }
+      else {
+        itList++;
       }
     }
   }
