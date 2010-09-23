@@ -1688,7 +1688,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER<T>::write(void) const
 
   SCRUTE_MED(fieldName);
   if ( fieldName.size() > MED_TAILLE_NOM ) {
-    fieldName.substr(0,MED_TAILLE_NOM);
+    fieldName = fieldName.substr(0,MED_TAILLE_NOM);
     MESSAGE_MED( "Be careful <fieldName> size must not be > MED_TAILLE_NOM, using fieldName : |"<< fieldName <<"|." );
   }
 
