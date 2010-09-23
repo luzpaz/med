@@ -27,5 +27,6 @@
 MEDMEMCPPTEST_EXPORT std::string getResourceFile( const std::string& );
 MEDMEMCPPTEST_EXPORT std::string getTmpDirectory();
 MEDMEMCPPTEST_EXPORT std::string makeTmpFile( const std::string&, const std::string& = "" );
+MEDMEMCPPTEST_EXPORT std::string fixSlashes( const std::string& path);
 
 #endif
