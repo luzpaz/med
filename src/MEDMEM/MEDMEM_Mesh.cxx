@@ -426,13 +426,10 @@ int MESH::getElementNumber(MED_EN::medConnectivity ConnectivityType,
           break ;
         }
       }
-      if (!find) {
+      if (!find)
         itList=cellsList.erase(itList++);
-        //itList--; // well : rigth if itList = cellsList.begin() ??
-      }
-      else {
+      else
         itList++;
-      }
     }
   }
 

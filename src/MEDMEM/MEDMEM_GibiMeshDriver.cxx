@@ -1564,9 +1564,9 @@ void GIBI_MESH_RDONLY_DRIVER::open()
       free((XDR*)_xdrs);
       fclose(_xdrs_file);
 #ifdef WNT
-	  _File = ::_open (_fileName.c_str(), _O_RDONLY|_O_BINARY);
+      _File = ::_open (_fileName.c_str(), _O_RDONLY|_O_BINARY);
 #else
-      ::close (_File);
+      ::close (_File); // ? needed ?
       _File = ::open (_fileName.c_str(), O_RDONLY);
 #endif
     }
