@@ -728,8 +728,8 @@ MESH* Extractor::divideEdges(const double*       coords,
   // --------------------
   // Sort nodes of cells
   // --------------------
-
-  sortNodes( newConnByNbNodes, &resCoords[0], coords, normal, nbNodesPerPolygon );
+  if ( nbNodes > 0 )
+    sortNodes( newConnByNbNodes, &resCoords[0], coords, normal, nbNodesPerPolygon );
 
   // ----------
   // Make mesh
