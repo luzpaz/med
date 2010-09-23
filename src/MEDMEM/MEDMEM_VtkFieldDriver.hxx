@@ -487,7 +487,9 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
       // (at least paraview shows wrong values)
       if ( fieldType == MED_EN::MED_REEL64 )
         {
-          vector<float> floatValue( value, value + NomberOfValue * NomberOfComponents );
+          vector<float> floatValue(NomberOfValue * NomberOfComponents );
+          for ( int i = 0; i < floatValue.size(); ++i )
+            floatValue[i]=float( value[i] );
           _binaryFile->write( &floatValue[0], NomberOfValue * NomberOfComponents );
         }
       else
