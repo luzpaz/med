@@ -691,7 +691,8 @@ MEDMEMTest_TmpFilesRemover::~MEDMEMTest_TmpFilesRemover()
   set<string>::iterator it = myTmpFiles.begin();
   for (; it != myTmpFiles.end(); it++) {
 #ifdef WNT
-    if (GetFileAttributes((*it).data()) & FILE_ATTRIBUTE_NORMAL)
+    //if (GetFileAttributes((*it).data()) & FILE_ATTRIBUTE_NORMAL)
+    if (GetFileAttributes((*it).data()) != INVALID_FILE_ATTRIBUTES)
 #else
     if (access((*it).data(), F_OK) == 0)
 #endif
