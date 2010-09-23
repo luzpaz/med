@@ -387,7 +387,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
     string dirName;
     string::size_type pos=_fileName.rfind('/');
 #ifdef WNT
-    if (pos == string::npos ) pos=fileName.rfind('\\');
+    if (pos == string::npos ) pos=_fileName.rfind('\\');
 #endif
     if (pos != string::npos )
         dirName=string(_fileName, 0, pos+1);
