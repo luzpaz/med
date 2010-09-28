@@ -1498,7 +1498,7 @@ void MEDMEMTest::testMeshAndMeshing()
   myMeshDriver.setMeshName(meshname);
 
   //Mesh has no driver->segmentation violation
-  //CPPUNIT_ASSERT_THROW(myMesh4->read(), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(myMesh4->read(), MEDEXCEPTION);
 
   //Add an existing MESH driver.
   int myDriver4;
@@ -1538,34 +1538,45 @@ void MEDMEMTest::testMeshAndMeshing()
     CPPUNIT_ASSERT(myGrid);
   }
 
-  //ensure two meshes constracted from one file in two different ways are equal
+  //ensure two meshes constructed from one file in two different ways are equal
   CPPUNIT_ASSERT(myMesh5->deepCompare(*myMesh4));
+
+  // test other variants of read() and write()
+  {
+    const string otherName1("otherName1"), otherName2("otherName2");
+    MESH mesh1, mesh2;
+
+    //myMesh5 -> filenameout21
+    // GMESH::write(driverTypes driverType, const string& filename,const string& meshname)
+    myMesh5->write( MED_DRIVER, filenameout21, otherName1);
+    CPPUNIT_ASSERT_THROW( myMesh5->write(myMeshDriver), MEDEXCEPTION); // write with RDONLY driver
+
+    //filenameout21 -> mesh1
+    // GMESH::read(driverTypes driverType, const string& filename, const string& meshname);
+    CPPUNIT_ASSERT_THROW( mesh1.read(VTK_DRIVER,filenameout21,otherName1), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW( mesh1.read(MED_DRIVER, filenameout21,otherName2), MEDEXCEPTION);
+    mesh1.read(MED_DRIVER,filenameout21,otherName1);
+    CPPUNIT_ASSERT(myMesh5->deepCompare(mesh1));
+
+    MED_MESH_RDWR_DRIVER driver;
+    driver.setFileName( filenameout21 );
+    driver.setMeshName( otherName2 );
+
+    // mesh1 -> filenameout21
+    // GMESH::write( const GENDRIVER& )
+    mesh1.write( driver );
+    
+    // filenameout21 -> mesh2
+    // GMESH::read( const GENDRIVER& )
+    mesh2.read( driver );
+    CPPUNIT_ASSERT(myMesh5->deepCompare(mesh2));
+  }
 
   int myDriver6;
   MESH* myMesh6 = new MESH();
-  try{
-    myDriver6 = myMesh6->addDriver(MED_DRIVER, filename, meshname, RDONLY);
-  }
-  catch (const std::exception &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
-  catch (...)
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+  myDriver6 = myMesh6->addDriver(MED_DRIVER, filename, meshname, RDONLY);
 
-  try{
-    myMesh6->read(myDriver6);
-  }
-  catch (const std::exception &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
-  catch (...)
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+  myMesh6->read(myDriver6);
 
   //ensure two meshes constracted from one file in two different ways are equal
   CPPUNIT_ASSERT(myMesh6->deepCompare(*myMesh4));
@@ -1624,17 +1635,7 @@ void MEDMEMTest::testMeshAndMeshing()
   mySupportOnNode->removeReference();
   
   //sets mesh fields to initial values
-  try{
-    myMesh6->init();
-  }
-  catch (const std::exception &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
-  catch (...)
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+  myMesh6->init();
 
   //ensure two meshes constracted from one file in two different ways are equal
   CPPUNIT_ASSERT(!myMesh6->deepCompare(*myMesh4));
