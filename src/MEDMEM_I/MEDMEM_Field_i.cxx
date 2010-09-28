@@ -647,7 +647,7 @@ throw (SALOME::SALOME_Exception)
                                              SALOME::INTERNAL_ERROR);
         try
         {
-                _fieldTptr->write(i,driverFieldName);
+                _fieldTptr->write(i);
         }
         catch (MEDEXCEPTION &)
         {
