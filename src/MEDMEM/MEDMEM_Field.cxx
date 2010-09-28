@@ -461,11 +461,13 @@ int      FIELD_::addDriver     (GENDRIVER & driver)
 
 void     FIELD_::openAppend    ( void )                               {}
 void     FIELD_::write         (const GENDRIVER &)                    {}
+void     FIELD_::write         (driverTypes driverType, const std::string & fileName){}
 void     FIELD_::writeAppend   (const GENDRIVER &)                    {}
-void     FIELD_::read          (const GENDRIVER &)                    {}
-void     FIELD_::write         (int , const string & ) {}
+void     FIELD_::write         (int ) {}
 void     FIELD_::writeAppend   (int , const string & ) {}
 void     FIELD_::read          (int )                                  {}
+void     FIELD_::read          (const GENDRIVER &)                    {}
+void     FIELD_::read          (driverTypes driverType, const std::string & fileName){}
 void     FIELD_::copyGlobalInfo(const FIELD_& m)
 {  
 

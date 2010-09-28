@@ -372,10 +372,18 @@ void GMESH::read(int index)
   const char * LOC = "GMESH::read(int index=0) : ";
   BEGIN_OF_MED(LOC);
 
-  if (_drivers[index])
+  if (index >= 0 && index < _drivers.size() && _drivers[index])
   {
     _drivers[index]->open();
-    _drivers[index]->read();
+    try
+    {
+      _drivers[index]->read();
+    }
+    catch ( const MEDEXCEPTION& ex )
+    {
+      _drivers[index]->close();
+      throw ex;
+    }
     _drivers[index]->close();
   }
   else
@@ -387,9 +395,68 @@ void GMESH::read(int index)
 }
 
 //================================================================================
+/*!
+  Reads GMESH using the given driver.
+*/
+//================================================================================
+
+void GMESH::read(const GENDRIVER & driver)
+{
+  // For the case where driver does not know about me since it has been created through
+  // constructor witout parameters: create newDriver knowing me and get missing data
+  // from driver using merge()
+  auto_ptr<GENDRIVER> newDriver( DRIVERFACTORY::buildDriverForMesh(driver.getDriverType(),
+                                                                   driver.getFileName(),
+                                                                   this,
+                                                                   driver.getMeshName(),
+                                                                   driver.getAccessMode()));
+  newDriver->merge( driver );
+
+  newDriver->open();
+  try
+  {
+    newDriver->read();
+  }
+  catch ( const MEDEXCEPTION& ex )
+  {
+    newDriver->close();
+    throw ex;
+  }
+  newDriver->close();
+}
+
+//================================================================================
+/*!
+ * \brief Reads the GMESH
+ *  \param driverType - type of driver to use for reading
+ *  \param filename - file to read from
+ *  \param meshname - name of a mesh to read
+ */
+//================================================================================
+
+void GMESH::read(driverTypes        driverType,
+                 const std::string& filename,
+                 const std::string& meshname)
+{
+  auto_ptr<GENDRIVER> newDriver( DRIVERFACTORY::buildDriverForMesh(driverType, filename,
+                                                                   this, meshname, RDONLY));
+  newDriver->open();
+  try
+  {
+    newDriver->read();
+  }
+  catch ( const MEDEXCEPTION& ex )
+  {
+    newDriver->close();
+    throw ex;
+  }
+  newDriver->close();
+}
+
+//================================================================================
 /*! Writes all the content of the MESH using driver referenced by the integer handle returned by a \a addDriver call.
 
-Example :
+  Example :
 \verbatim
 //...
 // Attaching the driver to file "output.med", meshname "Mesh"
@@ -408,7 +475,15 @@ void GMESH::write(int index) const
   if ( index > -1 && index < _drivers.size() && _drivers[index] )
   {
     _drivers[index]->open();
-    _drivers[index]->write();
+    try
+    {
+      _drivers[index]->write();
+    }
+    catch ( const MEDEXCEPTION& ex )
+    {
+      _drivers[index]->close();
+      throw ex;
+    }
     _drivers[index]->close();
   }
   else
@@ -430,18 +505,24 @@ void GMESH::write(const GENDRIVER & driver) const
   // For the case where driver does not know about me since it has been created through
   // constructor witout parameters: create newDriver knowing me and get missing data
   // from driver using merge()
-  GENDRIVER* newDriver = DRIVERFACTORY::buildDriverForMesh(driver.getDriverType(),
-                                                           driver.getFileName(),
-                                                           const_cast<GMESH*>( this ),
-                                                           driver.getMeshName(),
-                                                           driver.getAccessMode());
+  auto_ptr<GENDRIVER> newDriver( DRIVERFACTORY::buildDriverForMesh(driver.getDriverType(),
+                                                                   driver.getFileName(),
+                                                                   const_cast<GMESH*>( this ),
+                                                                   driver.getMeshName(),
+                                                                   driver.getAccessMode()));
   newDriver->merge( driver );
 
   newDriver->open();
-  newDriver->write();
+  try
+  {
+    newDriver->write();
+  }
+  catch ( const MEDEXCEPTION& ex )
+  {
+    newDriver->close();
+    throw ex;
+  }
   newDriver->close();
-
-  delete newDriver;
 }
 
 //================================================================================
@@ -449,19 +530,30 @@ void GMESH::write(const GENDRIVER & driver) const
  * \brief Writes all the content of the GMESH
  *  \param driverType - type of driver to use for writing
  *  \param filename - file to write into
+ *  \param meshname - mesh name
  */
 //================================================================================
 
-void GMESH::write(driverTypes driverType, const std::string& filename) const
+void GMESH::write(driverTypes        driverType,
+                  const std::string& filename,
+                  const std::string& meshname) const
 {
-  GENDRIVER* newDriver = DRIVERFACTORY::buildDriverForMesh(driverType, filename,
-                                                           const_cast<GMESH*> ( this ),
-                                                           _name, WRONLY);
+  auto_ptr<GENDRIVER> newDriver
+    ( DRIVERFACTORY::buildDriverForMesh(driverType, filename,
+                                        const_cast<GMESH*> ( this ),
+                                        meshname.empty() ? _name : meshname,
+                                        WRONLY));
   newDriver->open();
-  newDriver->write();
+  try
+  {
+    newDriver->write();
+  }
+  catch ( const MEDEXCEPTION& ex )
+  {
+    newDriver->close();
+    throw ex;
+  }
   newDriver->close();
-
-  delete newDriver;
 }
 /*! \if MEDMEM_ug @} \endif */
 

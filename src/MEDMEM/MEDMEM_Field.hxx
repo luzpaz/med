@@ -83,27 +83,14 @@ Fields can be read or written to/from MED files.
 
  For reading a field a typical use consists in :
 - reading the mesh associated on which the field lies
-- retrieve the support on which the field will be defined
 - read the field, specifying its time step and order number
 
 As an example :
 \verbatim
 //reading mesh from file
 MESH mesh(MED_DRIVER, "file.med", "my_Mesh");
-//retrieving group in the mesh structure
-GROUP* group= mesh->getGroup("myGroup");
 //reading the field from the file
-FIELD<double> field(group,MED_DRIVER,"file.med","my_Field",1,1);
-\endverbatim
-
-If the field is defined on all elements, one could have :
-\verbatim
-//reading mesh from file
-MESH mesh(MED_DRIVER, "file.med", "my_Mesh");
-//creating a support on all faces
-SUPPORT support (mesh,"mySupport",MED_FACE);
-//reading the field from the file
-FIELD<double> field(&support,MED_DRIVER,"file.med","my_FieldOnFaces",1,1);
+FIELD<double> field(group,MED_DRIVER,"file.med","my_Field",1,1,&mesh);
 \endverbatim
 
 It is also possible to read a field without specifying its support. In this case, the field constructor 
@@ -117,14 +104,12 @@ See also \ref FIELD_constructors
 
 \par Writing fields
 
-When it comes to write fields, it is necessary to use addDriver and then write.
+When it comes to write fields, it is enough to call write() method.
 A typical use will be :
 
 \verbatim
-mesh.addDriver(MED_DRIVER, "myResultFile.med", "myMesh");
-mesh.write();
-field.addDriver(MED_DRIVER, "myResultFile.med, "myField");
-field.write();
+mesh.write(MED_DRIVER, "myResultFile.med");
+field.write(MED_DRIVER, "myResultFile.med");
 \endverbatim
 
 \defgroup FIELD_constructors
@@ -400,14 +385,16 @@ public:
                               MED_EN::med_mode_acces access=MED_EN::RDWR) ;
 
   virtual  int      addDriver( GENDRIVER & driver);
+  virtual  void     read (driverTypes driverType, const std::string & fileName);
   virtual  void     read (const GENDRIVER &);
   virtual  void     read(int index=0);
   virtual  void     openAppend( void );
   virtual  void     write(const GENDRIVER &);
+  virtual  void     write(driverTypes driverType, const std::string & fileName);
 
   /*! Triggers the writing of the field with respect to the driver handle
     \a index given by \a addDriver(...) method. */
-  virtual  void     write(int index=0, const string & driverName="");
+  virtual  void     write(int index=0);
   /*!\if MEDMEM_ug @} \endif */
 
   virtual  void     writeAppend(const GENDRIVER &);
@@ -990,6 +977,7 @@ public:
 
   inline void read(int index=0);
   inline void read(const GENDRIVER & genDriver);
+  inline void read(driverTypes driverType, const std::string& filename);
   inline void write(int index=0);
   inline void write(const GENDRIVER &);
   inline void write(driverTypes driverType, const std::string& filename);
@@ -3270,6 +3258,95 @@ int FIELD<T, INTERLACING_TAG>::addDriver(driverTypes driverType,
 
   return current;
 }
+
+/*!
+  Read FIELD in the file specified in the driver given by its index.
+*/
+template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::read(int index/*=0*/)
+{
+  const char * LOC = "FIELD<T, INTERLACING_TAG>::read(int index=0) : ";
+  BEGIN_OF_MED(LOC);
+
+  if ( index>=0 && index<_drivers.size() && _drivers[index] ) {
+    _drivers[index]->open();
+    try
+    {
+      _drivers[index]->read();
+    }
+    catch ( const MEDEXCEPTION& ex )
+    {
+      _drivers[index]->close();
+      throw ex;
+    }
+    _drivers[index]->close();
+  }
+  else
+    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
+                                     << "The index given is invalid, index must be between  0 and |"
+                                     << _drivers.size()
+                                     )
+                          );
+  END_OF_MED(LOC);
+}
+
+/*!
+  Read FIELD with the driver. Additional information (name etc.) to select a field
+  must be set to the field.
+*/
+template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::read(const GENDRIVER & driver )
+{
+  const char* LOC = " FIELD<T, INTERLACING_TAG>::read(const GENDRIVER &) : ";
+  BEGIN_OF_MED(LOC);
+
+  // For the case where driver does not know about me since it has been created through
+  // constructor witout parameters: create newDriver knowing me and get missing data
+  // from driver using merge()
+  std::auto_ptr<GENDRIVER> newDriver( DRIVERFACTORY::buildDriverForField(driver.getDriverType(),
+                                                                         driver.getFileName(),
+                                                                         this, RDONLY));
+  newDriver->merge( driver );
+
+  newDriver->open();
+  try
+  {
+    newDriver->read();
+  }
+  catch ( const MEDEXCEPTION& ex )
+  {
+    newDriver->close();
+    throw ex;
+  }
+  newDriver->close();
+
+  END_OF_MED(LOC);
+}
+
+/*!
+  Read FIELD with driver of the given type. Additional information (name etc.) to select a field
+  must be set to the field.
+*/
+template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::read(driverTypes driverType, const std::string& filename)
+{
+  const char* LOC = " FIELD<T, INTERLACING_TAG>::write(driverTypes driverType, const std::string& filename) : ";
+  BEGIN_OF_MED(LOC);
+
+  std::auto_ptr<GENDRIVER> newDriver( DRIVERFACTORY::buildDriverForField(driverType, filename,
+                                                                         this, RDONLY));
+  newDriver->open();
+  try
+  {
+    newDriver->read();
+  }
+  catch ( const MEDEXCEPTION& ex )
+  {
+    newDriver->close();
+    throw ex;
+  }
+  newDriver->close();
+
+  END_OF_MED(LOC);
+}
+
 /*! \if MEDMEM_ug @} \endif */
 
 /*!
@@ -3328,28 +3405,6 @@ void FIELD<T, INTERLACING_TAG>::rmDriver (int index/*=0*/)
   END_OF_MED(LOC);
 }
 
-/*!
-  Read FIELD in the file specified in the driver given by its index.
-*/
-template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::read(int index/*=0*/)
-{
-  const char * LOC = "FIELD<T, INTERLACING_TAG>::read(int index=0) : ";
-  BEGIN_OF_MED(LOC);
-
-  if ( index>=0 && index<_drivers.size() && _drivers[index] ) {
-    _drivers[index]->open();
-    _drivers[index]->read();
-    _drivers[index]->close();
-  }
-  else
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
-                                     << "The index given is invalid, index must be between  0 and |"
-                                     << _drivers.size()
-                                     )
-                          );
-  END_OF_MED(LOC);
-}
-
 /*! \if MEDMEM_ug
 \addtogroup FIELD_io
 @{
@@ -3374,7 +3429,15 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
 
   if( index>=0 && index<_drivers.size() && _drivers[index] ) {
     _drivers[index]->open();
-    _drivers[index]->write();
+    try
+    {
+      _drivers[index]->write();
+    }
+    catch ( const MEDEXCEPTION& ex )
+    {
+      _drivers[index]->close();
+      throw ex;
+    }
     _drivers[index]->close();
   }
   else
@@ -3385,31 +3448,6 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
                           );
   END_OF_MED(LOC);
 }
-/*! \if MEDMEM_ug @} \endif */
-/*!
-  Write FIELD in the file specified in the driver given by its index. Use this
-  method for ASCII drivers (e.g. VTK_DRIVER)
-*/
-template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::writeAppend(int index/*=0*/, const string & driverName /*= ""*/)
-{
-  const char * LOC = "FIELD<T,INTERLACING_TAG>::write(int index=0, const string & driverName = \"\") : ";
-  BEGIN_OF_MED(LOC);
-
-  if( index>=0 && index<_drivers.size() && _drivers[index] ) {
-    _drivers[index]->openAppend();
-    if (driverName != "") _drivers[index]->setFieldName(driverName);
-    _drivers[index]->writeAppend();
-    _drivers[index]->close();
-  }
-  else
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
-                                     << "The index given is invalid, index must be between  0 and |"
-                                     << _drivers.size()
-                                     )
-                          );
-  END_OF_MED(LOC);
-}
-
 /*!
   Write FIELD with the given driver.
 */
@@ -3421,14 +3459,21 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
   // For the case where driver does not know about me since it has been created through
   // constructor witout parameters: create newDriver knowing me and get missing data
   // from driver using merge()
-  GENDRIVER* newDriver = DRIVERFACTORY::buildDriverForField(driver.getDriverType(),
-                                                            driver.getFileName(), this, WRONLY);
-  _drivers.push_back(newDriver); // if newDriver->write() throws, we have a chance to delete it
-
+  std::auto_ptr<GENDRIVER> newDriver( DRIVERFACTORY::buildDriverForField(driver.getDriverType(),
+                                                                         driver.getFileName(),
+                                                                         this, WRONLY));
   newDriver->merge( driver );
 
   newDriver->open();
-  newDriver->write();
+  try
+  {
+    newDriver->write();
+  }
+  catch ( const MEDEXCEPTION& ex )
+  {
+    newDriver->close();
+    throw ex;
+  }
   newDriver->close();
 
   END_OF_MED(LOC);
@@ -3442,13 +3487,53 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
   const char* LOC = " FIELD<T, INTERLACING_TAG>::write(driverTypes driverType, const std::string& filename) : ";
   BEGIN_OF_MED(LOC);
 
-  GENDRIVER* newDriver = DRIVERFACTORY::buildDriverForField(driverType, filename, this, WRONLY);
-  _drivers.push_back(newDriver); // if newDriver->write() throws, we have a chance to delete it
-
+  std::auto_ptr<GENDRIVER> newDriver( DRIVERFACTORY::buildDriverForField(driverType, filename,
+                                                                         this, WRONLY));
   newDriver->open();
-  newDriver->write();
+  try
+  {
+    newDriver->write();
+  }
+  catch ( const MEDEXCEPTION& ex )
+  {
+    newDriver->close();
+    throw ex;
+  }
   newDriver->close();
 
+  END_OF_MED(LOC);
+}
+
+/*! \if MEDMEM_ug @} \endif */
+/*!
+  Write FIELD in the file specified in the driver given by its index. Use this
+  method for ASCII drivers (e.g. VTK_DRIVER)
+*/
+template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::writeAppend(int index/*=0*/, const string & driverName /*= ""*/)
+{
+  const char * LOC = "FIELD<T,INTERLACING_TAG>::write(int index=0, const string & driverName = \"\") : ";
+  BEGIN_OF_MED(LOC);
+
+  if( index>=0 && index<_drivers.size() && _drivers[index] ) {
+    _drivers[index]->openAppend();
+    if (driverName != "") _drivers[index]->setFieldName(driverName);
+    try
+    {
+      _drivers[index]->writeAppend();
+    }
+    catch ( const MEDEXCEPTION& ex )
+    {
+      _drivers[index]->close();
+      throw ex;
+    }
+    _drivers[index]->close();
+  }
+  else
+    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
+                                     << "The index given is invalid, index must be between  0 and |"
+                                     << _drivers.size()
+                                     )
+                          );
   END_OF_MED(LOC);
 }
 
@@ -3466,29 +3551,15 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
   for (unsigned int index=0; index < _drivers.size(); index++ )
     if ( *_drivers[index] == genDriver ) {
       _drivers[index]->openAppend();
-      _drivers[index]->writeAppend();
-      _drivers[index]->close();
-    }
-
-  END_OF_MED(LOC);
-
-}
-
-/*!
-  \internal
-  Read FIELD with the driver which is equal to the given driver.
-
-  Use by MED object.
-*/
-template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::read(const GENDRIVER & genDriver)
-{
-  const char* LOC = " FIELD<T, INTERLACING_TAG>::read(const GENDRIVER &) : ";
-  BEGIN_OF_MED(LOC);
-
-  for (unsigned int index=0; index < _drivers.size(); index++ )
-    if ( *_drivers[index] == genDriver ) {
-      _drivers[index]->open();
-      _drivers[index]->read();
+      try
+      {
+        _drivers[index]->writeAppend();
+      }
+      catch ( const MEDEXCEPTION& ex )
+      {
+        _drivers[index]->close();
+        throw ex;
+      }
       _drivers[index]->close();
     }
 
@@ -3499,7 +3570,7 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
 /*!
   Fills in already allocated retValues array the values related to eltIdInSup.
   If the element does not exist in this->_support false is returned, true otherwise.
- */
+*/
 template <class T, class INTERLACING_TAG>
 bool FIELD<T, INTERLACING_TAG>::getValueOnElement(int eltIdInSup,T* retValues)
   const throw (MEDEXCEPTION)
