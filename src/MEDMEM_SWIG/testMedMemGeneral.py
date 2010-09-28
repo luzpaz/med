@@ -375,10 +375,8 @@ for i in range(nbOfFiles):
             print "the file ",fileName,"has an unknow extension"
             sys.exit(1)
 
-        meshDriver.open()
-        meshDriver.read()
+        mesh.read(meshDriver)
     except:
-        meshDriver.close()
         print "The mesh stored in the file ",fileName," is perhaps a GRID."
         try:
             print "... of MED_CARTESIAN type ?"
