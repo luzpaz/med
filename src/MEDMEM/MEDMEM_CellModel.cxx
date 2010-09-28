@@ -1549,22 +1549,22 @@ void CELLMODEL::clean()
   for(int i=0; i<_numberOfConstituentsDimension; i++) {
     int numberOf = _numberOfConstituents[i] ;
     for(int j=0; j<numberOf; j++) {
-      if (NULL!=_constituents[i][j])
+      if (_constituents[i][j])
         delete[] _constituents[i][j] ;
     }
-    if (NULL!=_constituentsType)
+    if (_constituentsType)
       delete [] _constituentsType[i] ;
-    if (NULL!=_constituents[i])
+    if (_constituents[i])
       delete[] _constituents[i] ;
-    if (NULL!=_numberOfNodeOfEachConstituent[i])
+    if (_numberOfNodeOfEachConstituent[i])
       delete[] _numberOfNodeOfEachConstituent[i] ;
   }
   delete [] _constituentsType; 
-  if (NULL!=_numberOfConstituents)
+  if (_numberOfConstituents)
     delete[]_numberOfConstituents ;
-  if (NULL!=_constituents)
+  if (_constituents)
     delete[] _constituents ;
-  if (NULL!=_numberOfNodeOfEachConstituent)
+  if (_numberOfNodeOfEachConstituent)
     delete[] _numberOfNodeOfEachConstituent ;
 
   _constituentsType = 0;
