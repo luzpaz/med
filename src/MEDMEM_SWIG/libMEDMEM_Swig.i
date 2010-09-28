@@ -653,11 +653,11 @@ class FAMILY : public SUPPORT
 
   void setAttributesValues(int * AttributeValue);
 
-  void setAttributesDescriptions(string * AttributeDescription);
+  void setAttributesDescriptions(std::string * AttributeDescription);
 
   void setNumberOfGroups(int NumberOfGroups);
 
-  void setGroupsNames(string * GroupName);
+  void setGroupsNames(std::string * GroupName);
 
   int getIdentifier() const;
 
@@ -703,6 +703,26 @@ class FAMILY : public SUPPORT
   }
 };
 
+class GENDRIVER
+{
+  GENDRIVER();
+public:
+  void open();
+  void write();
+  void read ();
+  void close();
+
+  std::string getFileName () const;
+  void setFileName ( const std::string & fileName);
+
+  void setMeshName    ( const std::string & meshName);
+  std::string getMeshName();
+
+  void setFieldName   ( const std::string & fieldName);
+  std::string getFieldName() const;
+
+};
+
 class FIELD_
 {
 public:
@@ -711,6 +731,16 @@ public:
   ~FIELD_();
 
   void rmDriver(int index=0);
+
+  void read (driverTypes driverType, const std::string & fileName);
+  void read (const GENDRIVER &);
+  void read(int index=0);
+
+  void write(const GENDRIVER& driver);
+  void write(driverTypes driverType, const char* filename);
+  void write(int index=0);
+
+  void writeAppend(int index=0, const std::string& driverName="");
 
   void setIterationNumber (int IterationNumber);
   int getIterationNumber() const;
@@ -819,8 +849,6 @@ public:
   FIELD(driverTypes driverType,	const char* fileName, const char* fieldName,
         int iterationNumber, int orderNumber, GMESH* mesh=0);
 
-  void read(int index=0);
-
   T1 getValueIJ(int i,int j) const;
 
   T1 getValueIJK(int i,int j, int k) const;
@@ -868,12 +896,6 @@ public:
 		p_field_volume=NULL) const;
 
   double integral(const SUPPORT* subSupport=0);
-
-  void write(const MED_FIELD_WRONLY_DRIVER<T1> & driver);
-  void write(driverTypes driverType, const char* filename);
-  void write(int index=0);
-
-  void writeAppend(int index=0, const std::string& driverName="");
 
   bool getGaussPresence();
 
@@ -1152,10 +1174,16 @@ public :
   void rmDriver(int index=0);
 
   void read(int index=0);
+  void read(const GENDRIVER & genDriver);
+  void read(driverTypes        driverType,
+            const std::string& filename,
+            const std::string& meshname);
 
   void write(int index=0);
-  void write(const MED_MESH_WRONLY_DRIVER & driver);
-  void write(driverTypes driverType, const std::string& filename);
+  void write(const GENDRIVER & driver);
+  void write(driverTypes        driverType,
+             const std::string& filename,
+             const std::string& meshname="");
 
   void setName(char * name);
 
@@ -1464,6 +1492,8 @@ class GRID : public GMESH
  public:
   GRID();
 
+  GRID(driverTypes driverType, const char * fileName="", const char * meshName="");
+
   GRID(const GRID &m);
 
   ~GRID();
@@ -1485,10 +1515,6 @@ class GRID : public GMESH
   void setGridType(med_grid_type gridType);
 
   %extend {
-    GRID(driverTypes driverType, const char * fileName="", const char * meshName="")
-      {
-	return new GRID(driverType, string(fileName), string(meshName));
-      }
 
     PyObject * getEntityPosition(const medEntityMesh Entity, const int Number)
     {
@@ -1641,28 +1667,18 @@ class MEDFILEBROWSER
   API de GIBI_MESH_[RDONLY,WRONLY,RDWR]_DRIVER
 */
 
-class GIBI_MESH_RDONLY_DRIVER
+class GIBI_MESH_RDONLY_DRIVER : public GENDRIVER
 {
 public :
   GIBI_MESH_RDONLY_DRIVER() ;
 
   GIBI_MESH_RDONLY_DRIVER(const GIBI_MESH_RDONLY_DRIVER & driver) ;
 
+  GIBI_MESH_RDONLY_DRIVER(const char* fileName, MESH * ptrMesh);
+
   ~GIBI_MESH_RDONLY_DRIVER() ;
 
-  void open();
-
-  void write( void );
-
-  void read ( void );
-
-  void close();
-
   %extend {
-    GIBI_MESH_RDONLY_DRIVER(char * fileName, MESH * ptrMesh)
-      {
-	return new GIBI_MESH_RDONLY_DRIVER(string(fileName), ptrMesh) ;
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -1671,45 +1687,21 @@ public :
 	mess << "Python Printing GIBI_MESH_RDONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
       }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    %newobject getMeshName();
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
   }
 };
 
-class GIBI_MESH_WRONLY_DRIVER
+class GIBI_MESH_WRONLY_DRIVER : public GENDRIVER
 {
 public :
   GIBI_MESH_WRONLY_DRIVER() ;
 
   GIBI_MESH_WRONLY_DRIVER(const GIBI_MESH_WRONLY_DRIVER & driver) ;
 
+  GIBI_MESH_WRONLY_DRIVER(const char* fileName, GMESH * ptrMesh);
+
   ~GIBI_MESH_WRONLY_DRIVER() ;
 
-  void open();
-
-  void write( void );
-
-  void read ( void );
-
-  void close();
-
   %extend {
-    GIBI_MESH_WRONLY_DRIVER(char * fileName, GMESH * ptrMesh)
-      {
-	return new GIBI_MESH_WRONLY_DRIVER(string(fileName), ptrMesh) ;
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -1717,20 +1709,6 @@ public :
 	ostringstream mess;
 	mess << "Python Printing GIBI_MESH_WRONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
-      }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    %newobject getMeshName();
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
       }
   }
 };
@@ -1743,21 +1721,11 @@ public :
 
   GIBI_MESH_RDWR_DRIVER(const GIBI_MESH_RDWR_DRIVER & driver) ;
 
+  GIBI_MESH_RDWR_DRIVER(const char* fileName, MESH * ptrMesh);
+
   ~GIBI_MESH_RDWR_DRIVER() ;
 
-  void open();
-
-  void write( void );
-
-  void read ( void );
-
-  void close();
-
   %extend {
-    GIBI_MESH_RDWR_DRIVER(char * fileName, MESH * ptrMesh)
-      {
-	return new GIBI_MESH_RDWR_DRIVER(string(fileName), ptrMesh) ;
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -1766,33 +1734,15 @@ public :
 	mess << "Python Printing GIBI_MESH_RDWR_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
       }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    %newobject getMeshName();
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
   }
 };
 
-class GIBI_MED_RDONLY_DRIVER
+class GIBI_MED_RDONLY_DRIVER : public GENDRIVER
 {
 public :
   GIBI_MED_RDONLY_DRIVER() ;
 
   GIBI_MED_RDONLY_DRIVER(const GIBI_MED_RDONLY_DRIVER & driver) ;
-
-  void open();
-
-  void close();
 
   MESH* getMesh();
 
@@ -1836,7 +1786,7 @@ public :
   }
 };
 
-class GIBI_MED_WRONLY_DRIVER
+class GIBI_MED_WRONLY_DRIVER : public GENDRIVER
 {
 public :
   GIBI_MED_WRONLY_DRIVER() ;
@@ -1846,14 +1796,6 @@ public :
   GIBI_MED_WRONLY_DRIVER(const char*                  fileName,
                          std::vector< const FIELD_* > fields,
                          GMESH *                      ptrMesh) ;
-
-  void open();
-
-  void write( void );
-
-  void read ( void );
-
-  void close();
 
   %extend {
     %newobject __str__();
@@ -1871,28 +1813,18 @@ public :
   API de PORFLOW_MESH_[RDONLY,WRONLY,RDWR]_DRIVER
 */
 
-class PORFLOW_MESH_RDONLY_DRIVER
+class PORFLOW_MESH_RDONLY_DRIVER : public GENDRIVER
 {
 public :
   PORFLOW_MESH_RDONLY_DRIVER() ;
 
   PORFLOW_MESH_RDONLY_DRIVER(const PORFLOW_MESH_RDONLY_DRIVER & driver) ;
 
+  PORFLOW_MESH_RDONLY_DRIVER(const char* fileName, MESH * ptrMesh);
+
   ~PORFLOW_MESH_RDONLY_DRIVER() ;
 
-  void open();
-
-  void write( void );
-
-  void read ( void );
-
-  void close();
-
   %extend {
-    PORFLOW_MESH_RDONLY_DRIVER(char * fileName, MESH * ptrMesh)
-      {
-	return new PORFLOW_MESH_RDONLY_DRIVER(string(fileName), ptrMesh) ;
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -1901,45 +1833,21 @@ public :
 	mess << "Python Printing PORFLOW_MESH_RDONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
       }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    %newobject getMeshName();
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
   }
 };
 
-class PORFLOW_MESH_WRONLY_DRIVER
+class PORFLOW_MESH_WRONLY_DRIVER : public GENDRIVER
 {
 public :
   PORFLOW_MESH_WRONLY_DRIVER() ;
 
   PORFLOW_MESH_WRONLY_DRIVER(const PORFLOW_MESH_WRONLY_DRIVER & driver) ;
 
+  PORFLOW_MESH_WRONLY_DRIVER(char * fileName, GMESH * ptrMesh);
+
   ~PORFLOW_MESH_WRONLY_DRIVER() ;
 
-  void open();
-
-  void write( void );
-
-  void read ( void );
-
-  void close();
-
   %extend {
-    PORFLOW_MESH_WRONLY_DRIVER(char * fileName, GMESH * ptrMesh)
-      {
-	return new PORFLOW_MESH_WRONLY_DRIVER(string(fileName), ptrMesh) ;
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -1947,20 +1855,6 @@ public :
 	ostringstream mess;
 	mess << "Python Printing PORFLOW_MESH_WRONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
-      }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    %newobject getMeshName();
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
       }
   }
 };
@@ -1973,21 +1867,11 @@ public :
 
   PORFLOW_MESH_RDWR_DRIVER(const PORFLOW_MESH_RDWR_DRIVER & driver) ;
 
+  PORFLOW_MESH_RDWR_DRIVER(const char * fileName, MESH * ptrMesh);
+
   ~PORFLOW_MESH_RDWR_DRIVER() ;
 
-  void open();
-
-  void write( void );
-
-  void read ( void );
-
-  void close();
-
   %extend {
-    PORFLOW_MESH_RDWR_DRIVER(char * fileName, MESH * ptrMesh)
-      {
-	return new PORFLOW_MESH_RDWR_DRIVER(string(fileName), ptrMesh) ;
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -1996,20 +1880,6 @@ public :
 	mess << "Python Printing PORFLOW_MESH_RDWR_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
       }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    %newobject getMeshName();
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
   }
 };
 
@@ -2017,29 +1887,19 @@ public :
   API de MED_MESH_[RDONLY,WRONLY,RDWR]_DRIVER
 */
 
-class MED_MESH_RDONLY_DRIVER
+class MED_MESH_RDONLY_DRIVER : public GENDRIVER
 {
  public :
 
+  MED_MESH_RDONLY_DRIVER(const char * fileName,  GMESH * ptrMesh);
+
   ~MED_MESH_RDONLY_DRIVER();
-
-  void open();
-
-  void close();
-
-  void write( void ) ;
-
-  void read ( void ) ;
 
   void desactivateFacesComputation();
 
   void activateFacesComputation();
 
   %extend {
-    MED_MESH_RDONLY_DRIVER(char * fileName,  GMESH * ptrMesh)
-      {
-	return new MED_MESH_RDONLY_DRIVER(string(fileName), ptrMesh);
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -2048,41 +1908,17 @@ class MED_MESH_RDONLY_DRIVER
 	mess << "Python Printing MED_MESH_RDONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
       }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    %newobject getMeshName();
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
   }
 };
 
-class MED_MESH_WRONLY_DRIVER
+class MED_MESH_WRONLY_DRIVER : public GENDRIVER
 {
  public :
   ~MED_MESH_WRONLY_DRIVER();
 
-  void write( void ) const ;
-
-  void read ( void ) ;
-
-  void open();
-
-  void close();
+  MED_MESH_WRONLY_DRIVER(const char * fileName,  GMESH * ptrMesh);
 
   %extend {
-    MED_MESH_WRONLY_DRIVER(char * fileName,  GMESH * ptrMesh)
-      {
-	return new MED_MESH_WRONLY_DRIVER(string(fileName), ptrMesh);
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -2090,20 +1926,6 @@ class MED_MESH_WRONLY_DRIVER
 	ostringstream mess;
 	mess << "Python Printing MED_MESH_WRONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
-      }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    %newobject getMeshName();
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
       }
   }
 };
@@ -2115,19 +1937,9 @@ class MED_MESH_RDWR_DRIVER : public virtual MED_MESH_RDONLY_DRIVER,
 
   ~MED_MESH_RDWR_DRIVER();
 
-  void write(void) const ;
-
-  void read (void)       ;
-
-  void open();
-
-  void close();
+  MED_MESH_RDWR_DRIVER(const char * fileName,  GMESH * ptrMesh);
 
   %extend {
-    MED_MESH_RDWR_DRIVER(char * fileName,  GMESH * ptrMesh)
-      {
-	return new MED_MESH_RDWR_DRIVER(string(fileName), ptrMesh);
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -2135,20 +1947,6 @@ class MED_MESH_RDWR_DRIVER : public virtual MED_MESH_RDONLY_DRIVER,
 	ostringstream mess;
 	mess << "Python Printing MED_MESH_RDWR_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
-      }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    %newobject getMeshName();
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
       }
   }
 };
@@ -2158,25 +1956,15 @@ class MED_MESH_RDWR_DRIVER : public virtual MED_MESH_RDONLY_DRIVER,
 */
 
 template< class T1 >
-class MED_FIELD_RDONLY_DRIVER
+class MED_FIELD_RDONLY_DRIVER : public GENDRIVER
 {
 public:
 
+  MED_FIELD_RDONLY_DRIVER(const char * fileName, FIELD<T1, FullInterlace > * ptrField);
+
   ~MED_FIELD_RDONLY_DRIVER();
 
-  void open();
-
-  void close();
-
-  void write( void ) const ;
-
-  void read ( void ) ;
-
   %extend {
-    MED_FIELD_RDONLY_DRIVER(char * fileName, FIELD<T1, FullInterlace > * ptrField)
-      {
-	return new MED_FIELD_RDONLY_DRIVER< T1 >(string(fileName), ptrField);
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -2185,20 +1973,6 @@ public:
 	mess << "Python Printing MED_FIELD_RDONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
       }
-
-    void setFieldName(char * fieldName)
-      {
-	self->setFieldName(string(fieldName));
-      }
-
-    %newobject getFieldName();
-    char * getFieldName()
-      {
-	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
   }
 };
 %template ( MED_FIELDDOUBLE_RDONLY_DRIVER ) MED_FIELD_RDONLY_DRIVER< double >;
@@ -2206,46 +1980,21 @@ public:
 
 
 template < class T1 >
-class MED_FIELD_WRONLY_DRIVER
+class MED_FIELD_WRONLY_DRIVER : public GENDRIVER
 {
 public:
 
+  MED_FIELD_WRONLY_DRIVER(const char * fileName, FIELD<T1, FullInterlace> * ptrField);
+
   ~MED_FIELD_WRONLY_DRIVER();
 
-  void open();
-
-  void close();
-
-  void write( void ) const ;
-
-  void read ( void ) ;
-
   %extend {
-    MED_FIELD_WRONLY_DRIVER(char * fileName, FIELD<T1, FullInterlace> * ptrField)
-      {
-	return new MED_FIELD_WRONLY_DRIVER< T1 >(string(fileName), ptrField);
-      }
-
     %newobject __str__();
     const char* __str__()
       {
 	ostringstream mess;
 	mess << "Python Printing MED_FIELD_WRONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
-      }
-
-    void setFieldName(char * fieldName)
-      {
-	self->setFieldName(string(fieldName));
-      }
-
-    %newobject getFieldName();
-    char * getFieldName()
-      {
-	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
       }
   }
 };
@@ -2258,21 +2007,11 @@ class MED_FIELD_RDWR_DRIVER : public virtual MED_FIELD_RDONLY_DRIVER< T1 >, publ
 {
 public:
 
+  MED_FIELD_RDWR_DRIVER(const char * fileName, FIELD<T1, FullInterlace> * ptrField);
+
   ~MED_FIELD_RDWR_DRIVER();
 
-  void open();
-
-  void close();
-
-  void write( void ) const ;
-
-  void read ( void ) ;
-
   %extend {
-    MED_FIELD_RDWR_DRIVER(char * fileName, FIELD<T1, FullInterlace> * ptrField)
-      {
-	return new MED_FIELD_RDWR_DRIVER< T1 >(string(fileName), ptrField);
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -2281,20 +2020,6 @@ public:
 	mess << "Python Printing MED_FIELD_RDWR_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
       }
-
-    void setFieldName(char * fieldName)
-      {
-	self->setFieldName(string(fieldName));
-      }
-
-    %newobject getFieldName();
-    char * getFieldName()
-      {
-	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
   }
 };
 %template ( MED_FIELDDOUBLE_RDWR_DRIVER ) MED_FIELD_RDWR_DRIVER< double >;
@@ -2302,23 +2027,11 @@ public:
 
 
 template< class T1 >
-class ASCII_FIELD_DRIVER {
+class ASCII_FIELD_DRIVER  : public GENDRIVER
+{
 public:
+  ASCII_FIELD_DRIVER(const char *fileName, FIELD<T1, FullInterlace> * ptrField, med_sort_direc direction, const char *priority);
   ~ASCII_FIELD_DRIVER();
-
-  void open();
-
-  void close();
-
-  void write( void ) const ;
-
-
-  %extend {
-    ASCII_FIELD_DRIVER(const char *fileName, FIELD<T1, FullInterlace> * ptrField, med_sort_direc direction, const char *priority)
-      {
-	return new ASCII_FIELD_DRIVER<T1>(string(fileName), ptrField, (MED_EN::med_sort_direc)direction, priority);
-      }
-  }
 };
 
 %template (ASCII_FIELDDOUBLE_DRIVER) ASCII_FIELD_DRIVER< double >;
@@ -2346,7 +2059,7 @@ void setIgnoreIncompatibility(bool toIgnore=true);
 // ---------------------------------------------------------------
 //!< EnSight reading driver reads all meshes and fields
 
-class ENSIGHT_MED_RDONLY_DRIVER
+class ENSIGHT_MED_RDONLY_DRIVER : public GENDRIVER
 {
 public:
 
@@ -2379,7 +2092,7 @@ public:
 // ---------------------------------------------------------------
 //!< EnSight writing driver
 
-class ENSIGHT_MED_WRONLY_DRIVER
+class ENSIGHT_MED_WRONLY_DRIVER : public GENDRIVER
 {
 public :
   ENSIGHT_MED_WRONLY_DRIVER(const std::string & fileName, const vector< const FIELD_* > fields);
@@ -2388,7 +2101,7 @@ public :
 // ---------------------------------------------------------------
 //!< EnSight mesh reading driver
 
-class ENSIGHT_MESH_RDONLY_DRIVER
+class ENSIGHT_MESH_RDONLY_DRIVER : public GENDRIVER
 {
 public :
   //!< to read mesh of index-th time step
@@ -2398,7 +2111,7 @@ public :
 // ---------------------------------------------------------------
 //!< Writing EnSight mesh driver.
 
-class ENSIGHT_MESH_WRONLY_DRIVER
+class ENSIGHT_MESH_WRONLY_DRIVER : public GENDRIVER
 {
 public :
   ENSIGHT_MESH_WRONLY_DRIVER(const std::string & fileName, GMESH * ptrMesh, bool append=false);
@@ -2407,11 +2120,11 @@ public :
 // ---------------------------------------------------------------
 //!< EnSight field reading driver
 
-class ENSIGHT_FIELD_RDONLY_DRIVER
+class ENSIGHT_FIELD_RDONLY_DRIVER : public GENDRIVER
 {
 public :
   //!< Set the name of the FIELD in EnSight file
-  void setFieldName(const string & fieldName);
+  void setFieldName(const std::string & fieldName);
   //!<  read the field of a specified name and index-th time step.
   ENSIGHT_FIELD_RDONLY_DRIVER(const std::string & fileName, FIELD_ * ptrField, int step=1);
   void read();
@@ -2419,7 +2132,7 @@ public :
 // ---------------------------------------------------------------
 //!< Writing EnSight field driver.
 
-class ENSIGHT_FIELD_WRONLY_DRIVER
+class ENSIGHT_FIELD_WRONLY_DRIVER : public GENDRIVER
 {
 public :
   //!< Set the name of the FIELD in EnSight file
