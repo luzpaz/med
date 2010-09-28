@@ -1492,7 +1492,7 @@ class GRID : public GMESH
  public:
   GRID();
 
-  GRID(driverTypes driverType, const char * fileName="", const char * meshName="");
+  GRID(driverTypes driverType, const char * fileName, const char * meshName);
 
   GRID(const GRID &m);
 
