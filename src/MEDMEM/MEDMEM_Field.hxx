@@ -32,6 +32,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <memory>
 #include <math.h>
 #include <cmath>
 #include <float.h>
