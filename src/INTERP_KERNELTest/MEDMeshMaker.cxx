@@ -17,6 +17,8 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
+#include "MEDMeshMaker.hxx"
+
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Meshing.hxx"
 
