@@ -746,7 +746,7 @@ double MEDMEMTest::sumAll(const std::vector< std::map<int,double> >& matrix)
   return ret;
 }
 
-void absField(MEDMEM::FIELD<double>& field)
+void MEDMEMTest::absField(MEDMEM::FIELD<double>& field)
 {
   double* areas=const_cast<double*>(field.getValue());
   for (int i=0; i< field.getNumberOfValues();i++)
