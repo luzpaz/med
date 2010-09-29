@@ -332,11 +332,12 @@ void MESHCollectionDriver::writeSubdomain(int idomain, int nbdomains, char* dist
          correspond. The chosen order is the natural ordering on the domain
          with lowest proc id*/
       if (m_collection->getSubdomainBoundaryCreates())
+      {
         if (idomain<idistant)
           jointSort(node_corresp, nbnodes, true);
         else
           jointSort(node_corresp, nbnodes, false);
-
+      }
       error=
         med_2_3::MEDjointEcr(fid, mesh_name, joint_name, node_corresp, nbnodes,
                              med_2_3::MED_NOEUD, med_2_3::MED_POINT1,med_2_3::MED_NOEUD, med_2_3::MED_POINT1);
