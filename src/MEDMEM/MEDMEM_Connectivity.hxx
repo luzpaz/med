@@ -465,13 +465,14 @@ inline const int* CONNECTIVITY::getReverseConnectivity( MED_EN::medConnectivity 
 //------------------------------------------------------------------------------------------//
 {
   if(_entity==Entity)
+  {
     if (ConnectivityType==MED_EN::MED_NODAL)
       return getReverseNodalConnectivity();
     else if (ConnectivityType==MED_EN::MED_DESCENDING)
       return getReverseDescendingConnectivity();
     else
       throw MEDEXCEPTION("MESH::getReverseConnectivity : connectivity mode not supported !");
-
+  }
   // other entity :
   if (NULL==_constituent)
     calculateDescendingConnectivity();
@@ -486,13 +487,14 @@ inline const int* CONNECTIVITY::getReverseConnectivityIndex(MED_EN::medConnectiv
 //-----------------------------------------------------------------------------------------------//
 {
   if(_entity==Entity)
+  {
     if (ConnectivityType==MED_EN::MED_NODAL)
       return getReverseNodalConnectivityIndex();
     else if (ConnectivityType==MED_EN::MED_DESCENDING)
       return getReverseDescendingConnectivityIndex();
     else
       throw MEDEXCEPTION("MESH::getReverseConnectivityIndex : connectivity mode not supported !");
-
+  }
   // other entity :
   if (NULL==_constituent)
     calculateDescendingConnectivity();

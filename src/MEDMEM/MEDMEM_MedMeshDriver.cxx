@@ -964,6 +964,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
             if (Connectivity->_entityDimension == dimension)
               Connectivity->_numberOfTypes++;
             if (Connectivity->_entityDimension > dimension)
+            {
               if (dimension == 2 )
               {
                 faceTypes.push_back( tmp_cell_models[i].getType() );
@@ -980,6 +981,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
               {
                 tmp_cells_count[i] = 0;
               }
+            }
           }
         }
 
@@ -987,7 +989,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
         med_2_3::med_int polygonConnSize, polyhedraFacesIndexSize, polyhedraConnSize;
         int polyhedraConnSizeWithFaceSeparators;
         if ( tmp_cell_models.back().getType() == MED_EN::MED_POLYGON ||
-             !faceTypes.empty() && faceTypes.back() == MED_EN::MED_POLYGON )
+             (!faceTypes.empty() && faceTypes.back() == MED_EN::MED_POLYGON ))
         {
           med_2_3::med_err err1 = MEDpolygoneInfo(_medIdt,
                                                   const_cast <char *> (_ptrMesh->_name.c_str()),
