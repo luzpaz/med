@@ -65,7 +65,6 @@ MEDMEM_Grid.hxx \
 MEDMEM_RCBase.hxx \
 MEDMEM_medimport_src.hxx \
 MEDMEM_MedVersion.hxx \
-MEDMEM_MedFieldDriver.hxx \
 MEDMEM_TopLevel.hxx \
 MEDMEM_Utilities.hxx \
 MEDMEM_ArrayInterface.hxx \
