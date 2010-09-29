@@ -24,9 +24,10 @@ AC_DEFUN([CHECK_SWIG],[
 AC_REQUIRE([CHECK_PYTHON])dnl
 
 swig_ok=yes
+numpy_ok=no
 
 AC_ARG_WITH(swig,
-    [  --with-swig=EXEC swig executable ],
+    [AC_HELP_STRING([--with-swig=EXEC],[swig executable])],
     [SWIG="$withval"
       AC_MSG_RESULT("select $withval as swig executable")
     ], [
@@ -55,6 +56,14 @@ EOF
    fi
    rm -f conftest*
    AC_MSG_RESULT($swig_ok) 
+fi
+
+numpydir=`$PYTHON -c "import numpy;print numpy.get_include()" 2>/dev/null`
+if test -d "$numpydir"; then
+   numpy_ok=yes
+   PYTHON_INCLUDES="$PYTHON_INCLUDES -I$numpydir"
+   SWIG_FLAGS="$SWIG_FLAGS -DWITH_NUMPY=WITH_NUMPY "
+   AC_DEFINE([WITH_NUMPY], [], [Python has numpy extension])
 fi
 
 AC_SUBST(SWIG_FLAGS)
