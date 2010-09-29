@@ -36,7 +36,7 @@
 
 using namespace std;
 using namespace MEDMEM;
-void usage(char * name)
+static void usage(char * name)
 {
   cout << "  " << name << " <input med file> <output vtk file> " <<endl ;
   cout << "    " << "(the two file name are mandatory)" << endl ;

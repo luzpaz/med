@@ -35,7 +35,7 @@
 using namespace std;
 using namespace MEDMEM;
 
-void addMedFacesGroup2( MESHING& meshing, int nFaces, const int *groupValue,
+static void addMedFacesGroup2( MESHING& meshing, int nFaces, const int *groupValue,
                         string groupName, const MED_EN::medGeometryElement *mytypes,  const int *index, const int *myNumberOfElements, int nbOfGeomTypes)
   {
     GROUP *faces=new GROUP;

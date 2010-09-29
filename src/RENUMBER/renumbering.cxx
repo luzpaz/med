@@ -39,6 +39,9 @@ using namespace std;
 using namespace MED_EN;
 using namespace MED_RENUMBER;
 
+namespace
+{
+
 void computeNeighbour(const MESH* mesh,const medGeometryElement& Type, vector<list<int> >& neighbour, int& ntot,int& nb_cell)
 {
   CONNECTIVITY* conn = (CONNECTIVITY*)mesh->getConnectivityptr();
@@ -186,6 +189,7 @@ void changeFamily(MESH* mesh, const medGeometryElement& Type, const vector<int>&
         }
     }
 }
+} // namespace
 
 int main (int argc, char** argv)
 {

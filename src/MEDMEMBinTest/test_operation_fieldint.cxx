@@ -40,18 +40,20 @@
 using namespace MEDMEM;
 using namespace MED_EN;
 
+int myfunction1(int x);
 int myfunction1(int x)
 {
     return 2*x;
 }
 
+int myfunction2(int x);
 int myfunction2(int x)
 {
     return x/2;
 }
 
 using namespace std;
-void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
+static void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
 {
   cout << "Field "<< myField->getName() << " : " <<myField->getDescription() <<  endl ;
   int NumberOfComponents = myField->getNumberOfComponents() ;
@@ -73,7 +75,7 @@ void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
   cout << "- Adresse support : " << mySupport << endl;
 }
 
-void affiche_fieldT(FIELD<int> * myField, const SUPPORT * mySupport)
+static void affiche_fieldT(FIELD<int> * myField, const SUPPORT * mySupport)
 {
   affiche_field_((FIELD_ *) myField, mySupport);
 
@@ -106,7 +108,7 @@ void affiche_fieldT(FIELD<int> * myField, const SUPPORT * mySupport)
   }
 }
 
-void affiche_valeur_field(const char * intitule, const int taille, const FIELD<int>& f)
+static void affiche_valeur_field(const char * intitule, const int taille, const FIELD<int>& f)
 {
     const int * value=f.getValue();
     std::cout << endl << intitule;

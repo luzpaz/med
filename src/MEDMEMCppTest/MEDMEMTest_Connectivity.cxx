@@ -156,7 +156,7 @@ using namespace MEDMEM;
  *              MEDMEM/test_copie_connectivity.cxx
  *  }
  */
-void showConnectivity(CONNECTIVITY * myConnectivity,
+static void showConnectivity(CONNECTIVITY * myConnectivity,
                       int MeshDimension, int NumberOfNodes, MED_EN::medEntityMesh Entity,
                       int NumberOfTypes)
 {
@@ -284,7 +284,7 @@ void showConnectivity(CONNECTIVITY * myConnectivity,
 /////////////////////////////////////////
 // TEST 2: test_copie_connectivity.cxx //
 /////////////////////////////////////////
-void checkCopyConnectivity()
+static void checkCopyConnectivity()
 {
   string filename = getResourceFile("pointe.med");
   string meshname = "maa1";
@@ -364,7 +364,7 @@ void checkCopyConnectivity()
   delete myConnectivity3;
 }
 
-void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
+static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
 {
   // Preconditions: Entity and NumberOfTypes
   CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, MED_EN::MED_CELL, theC->getEntity());
@@ -886,7 +886,7 @@ void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
         for (int i = 0; i < 14; i++) {
           // nb. poly faces = 13, because one face is common for two polyhedra
           // nb. standard faces < poly-face id <= 27 (27 = 14 + 13)
-          CPPUNIT_ASSERT_MESSAGE(msg, 14 < labs(polyhDesceConn[i]) <= 27);
+          CPPUNIT_ASSERT_MESSAGE(msg, 14 < labs(polyhDesceConn[i]) && labs(polyhDesceConn[i]) <= 27);
         }
       } // Polyhedron-specific methods
 

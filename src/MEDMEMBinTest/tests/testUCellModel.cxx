@@ -34,7 +34,7 @@ using namespace MED_EN;
 
 #define MED_NBR_GEOMETRIE_MAILLE 15
 
-void usage(char * name)
+static void usage(char * name)
 {
   cout << "    " << name << endl;
 }

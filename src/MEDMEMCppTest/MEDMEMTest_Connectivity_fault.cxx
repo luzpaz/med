@@ -35,7 +35,7 @@
 using namespace std;
 using namespace MEDMEM;
 
-void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
+static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
 {
 //   // Preconditions: Entity and NumberOfTypes
 //   CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, MED_EN::MED_CELL, theC->getEntity());

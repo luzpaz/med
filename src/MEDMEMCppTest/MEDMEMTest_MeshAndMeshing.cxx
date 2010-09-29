@@ -42,11 +42,11 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-double dmax(double x, double y) { return (x>y)?x:y;}
+static double dmax(double x, double y) { return (x>y)?x:y;}
 
-double dmin(double x, double y) { return (x>y)?y:x;}
+static double dmin(double x, double y) { return (x>y)?y:x;}
 
-void addMedFacesGroup (MESHING& meshing, int nFaces, const int *groupValue,
+static void addMedFacesGroup (MESHING& meshing, int nFaces, const int *groupValue,
                        string groupName, const MED_EN::medGeometryElement *mytypes,
                        const int *index, const int *myNumberOfElements, int nbOfGeomTypes)
 {
@@ -62,15 +62,15 @@ void addMedFacesGroup (MESHING& meshing, int nFaces, const int *groupValue,
   faces->removeReference();
 }
 
-void addMedFacesGroupAll (MESHING& meshing, string groupName)
-{
-  GROUP *faces=new GROUP;
-  faces->setName(groupName);
-  faces->setMesh(&meshing);
-  faces->setEntity(MED_EN::MED_FACE);
-  meshing.addGroup(*faces);
-  faces->removeReference();
-}
+// static void addMedFacesGroupAll (MESHING& meshing, string groupName)
+// {
+//   GROUP *faces=new GROUP;
+//   faces->setName(groupName);
+//   faces->setMesh(&meshing);
+//   faces->setEntity(MED_EN::MED_FACE);
+//   meshing.addGroup(*faces);
+//   faces->removeReference();
+// }
 
 /*!
  *  Check methods (18), defined in MEDMEM_Meshing.hxx:

@@ -113,7 +113,7 @@ using namespace MED_EN;
  *   (+) inline void setGridType(MED_EN::med_grid_type gridType);
  *  }
  */
-void MEDMEMTest_testGrid()
+static void MEDMEMTest_testGrid()
 {
   string filename      = getResourceFile("test19.med") ;
   string filenameout21 = makeTmpFile("myGridWrite_grid21.med");

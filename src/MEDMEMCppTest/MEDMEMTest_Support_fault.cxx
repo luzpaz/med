@@ -120,7 +120,7 @@ using namespace MEDMEM;
  *   (reference counter presently disconnected in C++) virtual void removeReference() const;
  *  }
  */
-void MEDMEMTest_testSupport()
+static void MEDMEMTest_testSupport()
 {
 //   // cells connectivities
 //   //const int NumberOfCellTypes = 3;

@@ -86,7 +86,7 @@ using namespace MEDMEM;
  *
  *  Use code of MEDMEM/test_copie_family.cxx
  */
-void check_support(const SUPPORT * theSupport,
+static void check_support(const SUPPORT * theSupport,
                    string theName, string theDescr, MED_EN::medEntityMesh theEntity, int theNbTypes)
 {
   string aName  = theSupport->getName();
@@ -115,7 +115,7 @@ void check_support(const SUPPORT * theSupport,
 //     cout << "    Is on all entities !" << endl;
 }
 
-void check_famille(const FAMILY * theFamily,
+static void check_famille(const FAMILY * theFamily,
                    string theName, string theDescr, MED_EN::medEntityMesh theEntity, int theNbTypes,
                    int theID, int theNbAttributes, int theNbGroups)
 {

@@ -40,9 +40,9 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-double dmax(double x, double y) { return (x>y)?x:y;}
+static inline double dmax(double x, double y) { return (x>y)?x:y;}
 
-double dmin(double x, double y) { return (x>y)?y:x;}
+static inline double dmin(double x, double y) { return (x>y)?y:x;}
 
 /*!
  *  Check methods (18), defined in MEDMEM_Meshing.hxx:
@@ -207,7 +207,7 @@ double dmin(double x, double y) { return (x>y)?y:x;}
  *   (Presently disconnected in C++) virtual void removeReference() const;
  *  }
  */
-void MEDMEMTest_testMeshAndMeshing()
+static void MEDMEMTest_testMeshAndMeshing()
 {
 //   string filename = getResourceFile("pointe.med");
 //   string meshname = "maa1";

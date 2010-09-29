@@ -224,7 +224,7 @@ using namespace MEDMEM;
  *              test_copie_field_.cxx
  *              test_copie_fieldT.cxx
  */
-void compareField_(const FIELD_ * theField_1, const FIELD_ * theField_2, bool isFIELD, bool isValue)
+static void compareField_(const FIELD_ * theField_1, const FIELD_ * theField_2, bool isFIELD, bool isValue)
 {
   // name, description, support
   CPPUNIT_ASSERT_EQUAL(theField_1->getName(), theField_2->getName());
@@ -270,7 +270,7 @@ void compareField_(const FIELD_ * theField_1, const FIELD_ * theField_2, bool is
   }
 }
 
-void checkField_(FIELD_ * theField_, const SUPPORT * theSupport,
+static void checkField_(FIELD_ * theField_, const SUPPORT * theSupport,
                  MED_EN::med_type_champ theValueType,
                  MED_EN::medModeSwitch theInterlace)
 {
@@ -530,6 +530,7 @@ FIELD<T> * createFieldOnGroup(MESH* theMesh, const GROUP* theGroup,
   return aFieldOnGroup;
 }
 
+double plus13 (double val);
 double plus13 (double val)
 {
   return val + 13;
@@ -539,7 +540,7 @@ double plus13 (double val)
 // typedef void (*myFuncType)(const double * temp, T* output);
 // size of temp array = space dim = 3
 // size of output array = nb. comps = 2
-void proj2d (const double * temp, double* output)
+static void proj2d (const double * temp, double* output)
 {
   // dimetric projection with coefficients:
   // 1.0 along Oy and Oz, 0.5 along Ox
@@ -559,7 +560,7 @@ void proj2d (const double * temp, double* output)
   output[1] = temp[2] - dx;
 }
 
-void testDrivers()
+static void testDrivers()
 {
   string filename_rd                  = getResourceFile("pointe.med");
   string filename_wr                  = makeTmpFile("myMedFieldfile.med", filename_rd);

@@ -37,7 +37,8 @@
 
 using namespace std;
 using namespace MEDMEM;
-void usage(char * name)
+
+static void usage(char * name)
 {
   cout << " ERROR ABOUT SYNTAX " << endl ;
   cout << "  " << name << " <input ensight file> <output med file> [I - to read into MED_INT32 fields]"

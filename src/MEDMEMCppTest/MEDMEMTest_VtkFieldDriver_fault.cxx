@@ -56,7 +56,7 @@ using namespace MED_EN;
  *   (+) void writeAppend(void) const throw (MEDEXCEPTION);
  *  }
  */
-void MEDMEMTest_testVtkFieldDriver()
+static void MEDMEMTest_testVtkFieldDriver()
 {
   FIELD<int> *aField                = new FIELD<int>();
   FIELD<double> *aField_1           = new FIELD<double>();

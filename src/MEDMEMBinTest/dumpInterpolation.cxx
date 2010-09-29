@@ -31,7 +31,7 @@ using namespace MEDMEM;
 using namespace std;
 
 
-string getMeshName(const char* file, int mesh_index)
+static string getMeshName(const char* file, int mesh_index)
 {
   MEDFILEBROWSER med(file);
   if ( mesh_index >= med.getNumberOfMeshes() )

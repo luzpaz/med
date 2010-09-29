@@ -65,7 +65,8 @@ MEDEXCEPTION::MEDEXCEPTION( void ): exception() , _text(0)
   INTERRUPTION_MED(1) ;
 }
 
-
+namespace
+{
 /*!
   \internal
   Function used to elaborate the text of the MEDEXCEPTION
@@ -102,6 +103,7 @@ char *makeText( const char *text, const char *fileName, const unsigned int lineN
    }
   ASSERT_MED(newText) ;
   return newText ;
+}
 }
 
 /*!

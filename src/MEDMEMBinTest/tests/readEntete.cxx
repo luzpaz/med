@@ -31,7 +31,7 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-void usage(char * name)
+static void usage(char * name)
 {
   cout << "    " << name <<" <file name>"<< " <mesh name> " << " <interlace mode>" << endl;
   cout << "    " << "displays all Nodes Coordinates in mdump mode" << endl;

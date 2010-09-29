@@ -40,13 +40,13 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-double dmax(double x, double y) { return (x>y)?x:y;}
+static double dmax(double x, double y) { return (x>y)?x:y;}
 
-double dmin(double x, double y) { return (x>y)?y:x;}
+static double dmin(double x, double y) { return (x>y)?y:x;}
 
-double infty = 1.e20;
+static double infty = 1.e20;
 
-void affiche_support(const SUPPORT * mySupport) 
+static void affiche_support(const SUPPORT * mySupport) 
 {
   cout << "  - Name : "<<mySupport->getName().c_str()<<endl ;
   cout << "  - Description : "<<mySupport->getDescription().c_str()<<endl ;
@@ -69,7 +69,7 @@ void affiche_support(const SUPPORT * mySupport)
 }
 
 
-void affiche_famille(MESH *myMesh,medEntityMesh Entity) 
+static void affiche_famille(MESH *myMesh,medEntityMesh Entity) 
 {
   int NumberOfFamilies = myMesh->getNumberOfFamilies(Entity) ;
   cout << "NumberOfFamilies : "<<NumberOfFamilies<<endl;
@@ -88,7 +88,7 @@ void affiche_famille(MESH *myMesh,medEntityMesh Entity)
   }
 }
 
-void affiche_groupe(MESH *myMesh,medEntityMesh Entity) 
+static void affiche_groupe(MESH *myMesh,medEntityMesh Entity) 
 {
   int NumberOfGroups = myMesh->getNumberOfGroups(Entity) ;
   cout << "NumberOfGroups : "<<NumberOfGroups<<endl;

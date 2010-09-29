@@ -42,7 +42,7 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myMesh)
+static void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myMesh)
 {
   int MeshDimension  = myMesh->getMeshDimension() ;
   int NumberOfNodes  = myMesh->getNumberOfNodes() ;

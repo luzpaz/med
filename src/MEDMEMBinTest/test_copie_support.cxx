@@ -39,7 +39,7 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-void affiche_support(const SUPPORT * mySupport) 
+static void affiche_support(const SUPPORT * mySupport) 
 {
   cout << "  - Name : "<<mySupport->getName().c_str()<<endl ;
   cout << "  - Description : "<<mySupport->getDescription().c_str()<<endl ;
@@ -62,38 +62,38 @@ void affiche_support(const SUPPORT * mySupport)
 }
 
 
-void affiche_famille(MESH *myMesh,medEntityMesh Entity) 
-{
-  int NumberOfFamilies = myMesh->getNumberOfFamilies(Entity) ;
-  cout << "NumberOfFamilies : "<<NumberOfFamilies<<endl;
-  for (int i=1; i<NumberOfFamilies+1;i++) {
-    const FAMILY* myFamily = myMesh->getFamily(Entity,i);
-    affiche_support(myFamily);
-    cout << "  - Identifier : "<<myFamily->getIdentifier()<<endl ;
-    int NumberOfAttributes = myFamily->getNumberOfAttributes() ;
-    cout << "  - Attributes ("<<NumberOfAttributes<<") :"<<endl;
-    for (int j=1;j<NumberOfAttributes+1;j++)
-      cout << "    * "<<myFamily->getAttributeIdentifier(j)<<" : "<<myFamily->getAttributeValue(j)<<", "<<myFamily->getAttributeDescription(j).c_str()<<endl ;
-    int NumberOfGroups = myFamily->getNumberOfGroups() ;
-    cout << "  - Groups ("<<NumberOfGroups<<") :"<<endl;
-    for (int j=1;j<NumberOfGroups+1;j++)
-      cout << "    * "<<myFamily->getGroupName(j).c_str()<<endl ;
-  }
-}
+// static void affiche_famille(MESH *myMesh,medEntityMesh Entity) 
+// {
+//   int NumberOfFamilies = myMesh->getNumberOfFamilies(Entity) ;
+//   cout << "NumberOfFamilies : "<<NumberOfFamilies<<endl;
+//   for (int i=1; i<NumberOfFamilies+1;i++) {
+//     const FAMILY* myFamily = myMesh->getFamily(Entity,i);
+//     affiche_support(myFamily);
+//     cout << "  - Identifier : "<<myFamily->getIdentifier()<<endl ;
+//     int NumberOfAttributes = myFamily->getNumberOfAttributes() ;
+//     cout << "  - Attributes ("<<NumberOfAttributes<<") :"<<endl;
+//     for (int j=1;j<NumberOfAttributes+1;j++)
+//       cout << "    * "<<myFamily->getAttributeIdentifier(j)<<" : "<<myFamily->getAttributeValue(j)<<", "<<myFamily->getAttributeDescription(j).c_str()<<endl ;
+//     int NumberOfGroups = myFamily->getNumberOfGroups() ;
+//     cout << "  - Groups ("<<NumberOfGroups<<") :"<<endl;
+//     for (int j=1;j<NumberOfGroups+1;j++)
+//       cout << "    * "<<myFamily->getGroupName(j).c_str()<<endl ;
+//   }
+// }
 
-void affiche_groupe(MESH *myMesh,medEntityMesh Entity) 
-{
-  int NumberOfGroups = myMesh->getNumberOfGroups(Entity) ;
-  cout << "NumberOfGroups : "<<NumberOfGroups<<endl;
-  for (int i=1; i<NumberOfGroups+1;i++) {
-    const GROUP* myGroup = myMesh->getGroup(Entity,i);
-    affiche_support(myGroup);
-    int NumberOfFamillies = myGroup->getNumberOfFamilies() ;
-    cout << "  - Families ("<<NumberOfFamillies<<") :"<<endl;
-    for (int j=1;j<NumberOfFamillies+1;j++)
-      cout << "    * "<<myGroup->getFamily(j)->getName().c_str()<<endl ;
-  }
-}
+// static void affiche_groupe(MESH *myMesh,medEntityMesh Entity) 
+// {
+//   int NumberOfGroups = myMesh->getNumberOfGroups(Entity) ;
+//   cout << "NumberOfGroups : "<<NumberOfGroups<<endl;
+//   for (int i=1; i<NumberOfGroups+1;i++) {
+//     const GROUP* myGroup = myMesh->getGroup(Entity,i);
+//     affiche_support(myGroup);
+//     int NumberOfFamillies = myGroup->getNumberOfFamilies() ;
+//     cout << "  - Families ("<<NumberOfFamillies<<") :"<<endl;
+//     for (int j=1;j<NumberOfFamillies+1;j++)
+//       cout << "    * "<<myGroup->getFamily(j)->getName().c_str()<<endl ;
+//   }
+// }
 
 int main (int argc, char ** argv) {
 

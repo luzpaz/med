@@ -39,7 +39,7 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-void affiche_support(const SUPPORT * mySupport) 
+static void affiche_support(const SUPPORT * mySupport) 
 {
   cout << "  - Name : "<<mySupport->getName().c_str()<<endl ;
   cout << "  - Description : "<<mySupport->getDescription().c_str()<<endl ;
@@ -62,21 +62,21 @@ void affiche_support(const SUPPORT * mySupport)
 }
 
 
-void affiche_famille(const FAMILY * myFamily)
-{
-    affiche_support(myFamily);
-    cout << "  - Identifier : "<<myFamily->getIdentifier()<<endl ;
-    int NumberOfAttributes = myFamily->getNumberOfAttributes() ;
-    cout << "  - Attributes ("<<NumberOfAttributes<<") :"<<endl;
-    for (int j=1;j<NumberOfAttributes+1;j++)
-      cout << "    * "<<myFamily->getAttributeIdentifier(j)<<" : "<<myFamily->getAttributeValue(j)<<", "<<myFamily->getAttributeDescription(j).c_str()<<endl ;
-    int NumberOfGroups = myFamily->getNumberOfGroups() ;
-    cout << "  - Groups ("<<NumberOfGroups<<") :"<<endl;
-    for (int j=1;j<NumberOfGroups+1;j++)
-      cout << "    * "<<myFamily->getGroupName(j).c_str()<<endl ;
-}
+// static void affiche_famille(const FAMILY * myFamily)
+// {
+//     affiche_support(myFamily);
+//     cout << "  - Identifier : "<<myFamily->getIdentifier()<<endl ;
+//     int NumberOfAttributes = myFamily->getNumberOfAttributes() ;
+//     cout << "  - Attributes ("<<NumberOfAttributes<<") :"<<endl;
+//     for (int j=1;j<NumberOfAttributes+1;j++)
+//       cout << "    * "<<myFamily->getAttributeIdentifier(j)<<" : "<<myFamily->getAttributeValue(j)<<", "<<myFamily->getAttributeDescription(j).c_str()<<endl ;
+//     int NumberOfGroups = myFamily->getNumberOfGroups() ;
+//     cout << "  - Groups ("<<NumberOfGroups<<") :"<<endl;
+//     for (int j=1;j<NumberOfGroups+1;j++)
+//       cout << "    * "<<myFamily->getGroupName(j).c_str()<<endl ;
+// }
 
-void affiche_groupe(const GROUP * myGroup) 
+static void affiche_groupe(const GROUP * myGroup) 
 {
     affiche_support(myGroup);
     int NumberOfFamillies = myGroup->getNumberOfFamilies() ;

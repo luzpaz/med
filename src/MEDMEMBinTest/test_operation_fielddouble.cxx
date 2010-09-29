@@ -37,6 +37,7 @@
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
 
+double myfunction1(double x);
 double myfunction1(double x)
 {
     return 0.25*(x-1.0);
@@ -47,7 +48,7 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
+static void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
 {
   cout << "Field "<< myField->getName() << " : " <<myField->getDescription() <<  endl ;
   int NumberOfComponents = myField->getNumberOfComponents() ;
@@ -69,7 +70,7 @@ void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
   cout << "- Adresse support : " << mySupport << endl;
 }
 
-void affiche_fieldT(FIELD<double> * myField, const SUPPORT * mySupport)
+static void affiche_fieldT(FIELD<double> * myField, const SUPPORT * mySupport)
 {
   affiche_field_((FIELD_ *) myField, mySupport);
 
@@ -102,7 +103,7 @@ void affiche_fieldT(FIELD<double> * myField, const SUPPORT * mySupport)
     }
 }
 
-void affiche_valeur_field(const FIELD<double>& f)
+static void affiche_valeur_field(const FIELD<double>& f)
 {
   const int tailleMax=12;
   const int taille=f.getNumberOfValues()*f.getNumberOfComponents();
@@ -120,7 +121,7 @@ void affiche_valeur_field(const FIELD<double>& f)
     }
 }
 
-void checkOperation(const FIELD<double>& resOp, const FIELD<double>& f1, const FIELD<double>& f2,
+static void checkOperation(const FIELD<double>& resOp, const FIELD<double>& f1, const FIELD<double>& f2,
                     char Op, const char* intitule, int verbose)
 {
   int res=0;

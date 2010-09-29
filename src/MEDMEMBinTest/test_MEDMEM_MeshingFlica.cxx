@@ -159,7 +159,7 @@ int sideNbOfElts[2]={12,12};
 
 using namespace MEDMEM;
 
-void addMedFacesGroup( MESHING& meshing, int nFaces, const int *groupValue,
+static void addMedFacesGroup( MESHING& meshing, int nFaces, const int *groupValue,
                        string groupName, const MED_EN::medGeometryElement *mytypes,  const int *index, const int *myNumberOfElements, int nbOfGeomTypes)
   {
     GROUP *faces=new GROUP;

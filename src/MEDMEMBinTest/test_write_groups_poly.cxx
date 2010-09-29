@@ -26,7 +26,7 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-void addMedFacesGroup (MESHING& meshing, int nFaces, int *groupValue, string groupName)
+static void addMedFacesGroup (MESHING& meshing, int nFaces, int *groupValue, string groupName)
 {
   GROUP *faces=new GROUP;
   int myNumberOfElements[1];

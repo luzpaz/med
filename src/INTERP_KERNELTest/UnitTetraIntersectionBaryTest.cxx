@@ -34,7 +34,7 @@ using namespace INTERP_KERNEL;
 
 namespace INTERP_TEST
 {
-  void fill_UnitTetraIntersectionBary(UnitTetraIntersectionBary& bary, double nodes[][3])
+  static void fill_UnitTetraIntersectionBary(UnitTetraIntersectionBary& bary, double nodes[][3])
   {
     int faceConn[4][3] = { { 0, 1, 2 },// inverse order
                            { 0, 3, 1 },

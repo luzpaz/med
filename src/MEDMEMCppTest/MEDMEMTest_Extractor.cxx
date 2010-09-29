@@ -42,7 +42,7 @@ using namespace MEDMEM;
  */
 //================================================================================
 
-void test_extractLine( Extractor* extractor,
+static void test_extractLine( Extractor* extractor,
                        const double* coords, const double* direction,
                        int nbSegments,
                        const char* name,
