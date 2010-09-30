@@ -38,11 +38,11 @@ libMEDSPLITTER_Swig_wrap.cxx: $(SWIG_DEF)
 	$(SWIG) $(SWIG_FLAGS) -o $@  $<
 
 _libMEDSPLITTER_Swig_la_CPPFLAGS = $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) $(PYTHON_INCLUDES) \
-	$(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ $(BOOST_CPPFLAGS) \
-	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core -I$(srcdir)/../INTERP_KERNEL \
+	$(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@  \
+	-I$(srcdir)/../MEDMEM -I$(srcdir)/../INTERP_KERNEL \
 	-I$(srcdir)/../MEDSPLITTER -I$(srcdir)/../INTERP_KERNEL/Bases
 
-_libMEDSPLITTER_Swig_la_LDFLAGS  = -module $(MED2_LIBS) $(HDF5_LIBS) $(PYTHON_LIBS) $(BOOST_LIBS) \
+_libMEDSPLITTER_Swig_la_LDFLAGS  = -module $(MED2_LIBS) $(HDF5_LIBS) $(PYTHON_LIBS) \
 	../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la \
 	../MEDSPLITTER/libmedsplitter.la
 

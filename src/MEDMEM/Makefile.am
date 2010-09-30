@@ -137,22 +137,14 @@ MEDMEM_MedFileBrowser.cxx
 #libmedmem_la_LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
 # libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@
 libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) $(XDR_CPPFLAGS) \
-	-I$(srcdir)/../MEDWrapper/Base \
 	-I$(srcdir)/../INTERP_KERNEL \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \
-	-I$(srcdir)/../INTERP_KERNEL/Geometric2D \
-	-I$(srcdir)/../MEDWrapper/V2_1/Core -I$(srcdir)/../INTERPOLATION
+	-I$(srcdir)/../INTERP_KERNEL/Geometric2D
 libmedmem_la_CXXFLAGS= @CXXTMPDPTHFLAGS@
 
 # change motivated by the bug KERNEL4778.
-libmedmem_la_LDFLAGS=$(MED2_LIBS) $(HDF5_LIBS) $(XDR_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
-	../MEDWrapper/Base/libMEDWrapperBase.la $(STDLIB) ../INTERP_KERNEL/libinterpkernel.la
-if MED_ENABLE_KERNEL
-libmedmem_la_LDFLAGS+=../MEDWrapper/Factory/libMEDWrapper.la \
-	../MEDWrapper/V2_2/libMEDWrapper_V2_2.la \
-	../MEDWrapper/V2_1/Wrapper/libMEDWrapper_V2_1.la
-endif
-
+libmedmem_la_LDFLAGS=$(MED2_LIBS) $(HDF5_LIBS) $(XDR_LIBS) \
+	$(STDLIB) ../INTERP_KERNEL/libinterpkernel.la
 
 AM_CPPFLAGS+= $(libmedmem_la_CPPFLAGS)
 AM_CXXFLAGS+= $(libmedmem_la_CXXFLAGS)

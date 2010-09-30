@@ -45,15 +45,13 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 #endif
 
 AM_CPPFLAGS += $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
-	-I$(srcdir)/../MEDWrapper/Base \
-	-I$(srcdir)/../MEDWrapper/V2_1/Core \
 	-I$(srcdir)/../INTERP_KERNEL \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../INTERPOLATION \
 	-I$(srcdir)/../MEDMEM
 
-LDADD= $(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
-	../MEDWrapper/Base/libMEDWrapperBase.la $(STDLIB) ../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la
+LDADD= $(MED2_LIBS) $(HDF5_LIBS)  \
+	$(STDLIB) ../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la
 
 
 if MED_ENABLE_KERNEL

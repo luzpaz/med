@@ -67,7 +67,7 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_Utils.cxx
 
 libMEDMEMCppTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED2_INCLUDES) $(HDF5_INCLUDES) \
-	-I$(srcdir)/../MEDMEM -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases -I$(srcdir)/../MEDWrapper/V2_1/Core
+	-I$(srcdir)/../MEDMEM -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases
 libMEDMEMCppTest_la_LDFLAGS= $(MED2_LIBS) @CPPUNIT_LIBS@ \
 	../MEDMEM/libmedmem.la
 
@@ -103,7 +103,7 @@ dist_MEDMEMTest_VtkFieldDriver_fault_SOURCES= MEDMEMTest_VtkFieldDriver_fault.cx
 dist_MEDMEMTest_VtkMeshDriver_fault_SOURCES= MEDMEMTest_VtkMeshDriver_fault.cxx
 
 LDADD= $(MED2_LIBS) $(libMEDMEMCppTest_la_LDFLAGS) -lm \
-	../MEDWrapper/V2_1/Core/libmed_V2_1.la ../MEDMEM/libmedmem.la \
+	 ../MEDMEM/libmedmem.la \
 	../INTERP_KERNEL/libinterpkernel.la libMEDMEMCppTest.la
 if MED_ENABLE_KERNEL
      LDADD+= -lSALOMEBasics
