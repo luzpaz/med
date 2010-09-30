@@ -470,7 +470,7 @@ void setVtkBinaryFormatForWriting(bool isBinary);
     }
 }
 
-%typecheck(SWIG_TYPECHECK_POINTER) vector< SUPPORT * >, const vector< SUPPORT * >
+%typecheck(SWIG_TYPECHECK_POINTER) vector< SUPPORT * >, const vector< SUPPORT * >, vector< const FIELD_* >
 {
   $1 = ($input != 0);
 }
@@ -1357,7 +1357,7 @@ public :
 
   const double getCoordinate(int Number, int Axis);
 
-  void calculateConnectivity(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh Entity);
+  void calculateConnectivity(medConnectivity ConnectivityType,medEntityMesh Entity);
 
   int getElementNumber(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type, int * connectivity);
 
@@ -1391,14 +1391,12 @@ public :
 #endif
       }
 
-    PyObject * getConnectivity(medModeSwitch Mode,
-			       medConnectivity ConnectivityType,
+    PyObject * getConnectivity(medConnectivity ConnectivityType,
 			       medEntityMesh Entity,
 			       medGeometryElement Type)
       {
-	const int * connectivity = self->getConnectivity(Mode,ConnectivityType,
-						   Entity,Type);
-	int size = self->getConnectivityLength(Mode,ConnectivityType,Entity,Type);
+	const int * connectivity = self->getConnectivity(ConnectivityType, Entity,Type);
+	int size = self->getConnectivityLength(ConnectivityType,Entity,Type);
 #ifdef WITH_NUMPY
         return TYPEMAP_OUTPUT_PY_ARRAY( connectivity, size );
 #else
@@ -1793,9 +1791,9 @@ public :
 
   GIBI_MED_WRONLY_DRIVER(const GIBI_MED_WRONLY_DRIVER & driver) ;
 
-  GIBI_MED_WRONLY_DRIVER(const char*                  fileName,
-                         std::vector< const FIELD_* > fields,
-                         GMESH *                      ptrMesh) ;
+  GIBI_MED_WRONLY_DRIVER(const char*             fileName,
+                         vector< const FIELD_* > fields,
+                         GMESH *                 ptrMesh) ;
 
   %extend {
     %newobject __str__();
