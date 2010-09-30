@@ -1036,8 +1036,7 @@ void MEDMEMTest::testField()
                                /*TotalNumberOfElements=*/ *NumberOfElements,
                                GeometricType,
                                NumberOfElements,
-                               /*NumberValue=*/ mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,
-                                                                      MED_CELL,MED_ALL_ELEMENTS ));
+                               /*NumberValue=*/ mesh->getConnectivity(MED_NODAL,MED_CELL,MED_ALL_ELEMENTS ));
     FIELD<double, FullInterlace> * oneCellNodesField = nodalField->extract( oneCellNodesSup );
     oneCellNodesSup->removeReference();
     // compute normL2 by avarage nodal value on the cell

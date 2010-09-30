@@ -126,7 +126,7 @@ void MEDNormalizedUnstructuredMesh<SPACEDIM,MESHDIM>::prepare()
 //   int nbElt2=_meshInMedMode->getNumberOfElementsWithPoly(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
 //   if(nbElt1==nbElt2)
     {//no poly
-      _conn_for_interp=(int *)_meshInMedMode->getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+      _conn_for_interp=(int *)_meshInMedMode->getConnectivity(MED_EN::MED_NODAL,MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
       _own_conn_for_interp=false;
       _conn_index_for_interp=(int *)_meshInMedMode->getConnectivityIndex(MED_EN::MED_NODAL, MED_EN::MED_CELL);
       _own_conn_index_for_interp=false;

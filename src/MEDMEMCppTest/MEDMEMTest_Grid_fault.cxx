@@ -264,13 +264,13 @@ static void MEDMEMTest_testGrid()
     bool existConnect = false;
     CPPUNIT_ASSERT_NO_THROW(existConnect = mesh->existConnectivity(MED_NODAL, MED_CELL));
     if (!existConnect) {
-      CPPUNIT_ASSERT_NO_THROW(mesh->calculateConnectivity(MED_FULL_INTERLACE, MED_NODAL, MED_CELL));
+      CPPUNIT_ASSERT_NO_THROW(mesh->calculateConnectivity( MED_NODAL, MED_CELL));
       CPPUNIT_ASSERT(mesh->existConnectivity(MED_NODAL, MED_CELL));
     }
 
     const int* Connectivity;
     const int* connectivity_index;
-    CPPUNIT_ASSERT_NO_THROW(Connectivity = mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
+    CPPUNIT_ASSERT_NO_THROW(Connectivity = mesh->getConnectivity( MED_NODAL,
                                                                  MED_CELL, types[0]));
     CPPUNIT_ASSERT_NO_THROW(connectivity_index = mesh->getConnectivityIndex(MED_NODAL, MED_CELL));
     out << "Nodal connectivity" << endl;
@@ -308,13 +308,13 @@ static void MEDMEMTest_testGrid()
 
     CPPUNIT_ASSERT_NO_THROW(existConnect = mesh->existConnectivity(MED_DESCENDING, MED_CELL));
     if (!existConnect) {
-      CPPUNIT_ASSERT_NO_THROW(mesh->calculateConnectivity(MED_FULL_INTERLACE, MED_DESCENDING, MED_CELL));
+      CPPUNIT_ASSERT_NO_THROW(mesh->calculateConnectivity( MED_DESCENDING, MED_CELL));
       CPPUNIT_ASSERT(mesh->existConnectivity(MED_DESCENDING, MED_CELL));
     }
 
     const int* ConnectivityDes;
     const int* connectivity_index_des;
-    CPPUNIT_ASSERT_NO_THROW(ConnectivityDes = mesh->getConnectivity(MED_FULL_INTERLACE, MED_DESCENDING,
+    CPPUNIT_ASSERT_NO_THROW(ConnectivityDes = mesh->getConnectivity( MED_DESCENDING,
                                                                     MED_CELL, MED_ALL_ELEMENTS));
     CPPUNIT_ASSERT_NO_THROW(connectivity_index_des =
                             mesh->getConnectivityIndex(MED_DESCENDING, MED_CELL));
@@ -401,7 +401,7 @@ static void MEDMEMTest_testGrid()
     const int* body_connectivity_index;
     int ijkNodeBody[3];
     const MESH* mesh = myGrid1->convertInMESH();
-    CPPUNIT_ASSERT_NO_THROW(BodyConnectivity = mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
+    CPPUNIT_ASSERT_NO_THROW(BodyConnectivity = mesh->getConnectivity( MED_NODAL,
                                                                      MED_CELL, types1[0]));
     CPPUNIT_ASSERT_NO_THROW(body_connectivity_index = mesh->getConnectivityIndex(MED_NODAL, MED_CELL));
     out<<"Nodal connectivity"<<endl;

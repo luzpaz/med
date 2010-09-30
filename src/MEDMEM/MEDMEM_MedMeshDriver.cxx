@@ -455,7 +455,6 @@ void MED_MESH_RDONLY_DRIVER::getGRID()
       err = MEDcoordLire(_medIdt,
                          const_cast <char *> (_ptrMesh->_name.c_str()),
                          _ptrMesh->_spaceDimension,
-                         //const_cast <double *> ( _ptrMesh->_coordinate->_coordinate->get(MED_EN::MED_FULL_INTERLACE) ),
                          const_cast <double *> ( ptrGrid->_coordinate->_coordinate.get(MED_EN::MED_FULL_INTERLACE) ),
                          med_2_3::MED_FULL_INTERLACE,
                          MED_ALL, // we read all the coordinates
@@ -2368,10 +2367,8 @@ int MED_MESH_WRONLY_DRIVER::writeConnectivities(medEntityMesh entity) const
       for (int i=0; i<numberOfTypes; i++)
         {
           int numberOfElements = ptrMesh->getNumberOfElements(entity,types[i]);
-          const int * connectivity = ptrMesh->getConnectivity(MED_EN::MED_FULL_INTERLACE,
-                                                               MED_NODAL, entity, types[i]);
-          int size = ptrMesh->getConnectivityLength(MED_EN::MED_FULL_INTERLACE,
-                                                     MED_NODAL, entity, types[i]);
+          const int * connectivity = ptrMesh->getConnectivity(MED_NODAL, entity, types[i]);
+          int size = ptrMesh->getConnectivityLength(MED_NODAL, entity, types[i]);
 
           switch ( types[i] )
             {
@@ -2405,8 +2402,7 @@ int MED_MESH_WRONLY_DRIVER::writeConnectivities(medEntityMesh entity) const
                 vector< med_2_3::med_int > PolyhedronIndex, PolyhedronFacesIndex, PolyhedronConnectivity;
                 PolyhedronIndex.push_back(1);
                 PolyhedronFacesIndex.push_back(1);
-                connectivity = ptrMesh->getConnectivity(MED_EN::MED_FULL_INTERLACE,
-                                                         MED_NODAL, entity, MED_ALL_ELEMENTS);
+                connectivity = ptrMesh->getConnectivity(MED_NODAL, entity, MED_ALL_ELEMENTS);
                 int nbStdCells = ptrMesh->getGlobalNumberingIndex(entity)[i]-1;
                 for ( int j = nbStdCells; j < nbStdCells+numberOfElements; ++j )
                   {
@@ -2462,10 +2458,10 @@ int MED_MESH_WRONLY_DRIVER::writeConnectivities(medEntityMesh entity) const
       for (int i=0; i<numberOfTypes; i++)
         {
           int    numberOfElements = ptrMesh->getNumberOfElements (entity,types[i]);
-          const int * connectivity = ptrMesh->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_DESCENDING, entity, types[i]);
+          const int * connectivity = ptrMesh->getConnectivity(MED_DESCENDING, entity, types[i]);
 
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-          int lgth = ptrMesh->getConnectivityLength(MED_EN::MED_FULL_INTERLACE, MED_DESCENDING, entity, types[i]);
+          int lgth = ptrMesh->getConnectivityLength(MED_DESCENDING, entity, types[i]);
           vector< med_2_3::med_int > tmp_Connectivity( connectivity, connectivity + lgth );
           err = med_2_3::MEDconnEcr(_medIdt,
                                     const_cast <char *> ( _meshName.c_str()),

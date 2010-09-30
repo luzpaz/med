@@ -625,7 +625,7 @@ int CONNECTIVITY::getConnectivityLength(medConnectivity ConnectivityType, medEnt
 }
 
 /*!  Give morse index array to use with
-  getConnectivity(MED_FULL_INTERLACE,mode,entity,MED_ALL_ELEMENTS).
+  getConnectivity(mode,entity,MED_ALL_ELEMENTS).
 
   Each value give start index for corresponding entity in connectivity array.
 

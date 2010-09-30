@@ -248,7 +248,7 @@ for i in range(nbOfMeshes):
             type = types[k]
             nbElemType = meshLocalCopy.getNumberOfElements(MED_CELL,type)
             print "     For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
-            connectivity = meshLocalCopy.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS)
+            connectivity = meshLocalCopy.getConnectivity(MED_NODAL,MED_CELL,MED_ALL_ELEMENTS)
             index = meshLocalCopy.getConnectivityIndex(MED_NODAL,MED_CELL)
             if type == MED_POLYHEDRA:
                 pass

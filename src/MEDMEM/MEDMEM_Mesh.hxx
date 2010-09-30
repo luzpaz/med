@@ -151,15 +151,12 @@ protected :
 
   virtual inline MED_EN::medGeometryElement getElementType(MED_EN::medEntityMesh Entity,
                                                            int Number) const;
-  virtual inline void calculateConnectivity(MED_EN::medModeSwitch Mode,
-                                            MED_EN::medConnectivity ConnectivityType,
+  virtual inline void calculateConnectivity(MED_EN::medConnectivity ConnectivityType,
                                             MED_EN::medEntityMesh Entity) const ;
-  virtual inline int getConnectivityLength(MED_EN::medModeSwitch Mode,
-                                           MED_EN::medConnectivity ConnectivityType,
+  virtual inline int getConnectivityLength(MED_EN::medConnectivity ConnectivityType,
                                            MED_EN::medEntityMesh Entity,
                                            MED_EN::medGeometryElement Type) const;
-  virtual inline const int * getConnectivity(MED_EN::medModeSwitch Mode,
-                                             MED_EN::medConnectivity ConnectivityType,
+  virtual inline const int * getConnectivity(MED_EN::medConnectivity ConnectivityType,
                                              MED_EN::medEntityMesh Entity,
                                              MED_EN::medGeometryElement Type) const;
   virtual inline const int * getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
@@ -493,19 +490,15 @@ inline MED_EN::medGeometryElement MESH::getElementType(MED_EN::medEntityMesh Ent
   done. Do nothing if connectivity already exist.
  */
 
-inline void MESH::calculateConnectivity(MED_EN::medModeSwitch Mode,MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity) const
+inline void MESH::calculateConnectivity(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity) const
 {
-  //  checkGridFillConnectivity();
-  if (Mode==MED_EN::MED_FULL_INTERLACE)
-    _connectivity->calculateConnectivity(ConnectivityType,entity);
-  else
-    throw MEDEXCEPTION(LOCALIZED("MESH::calculateConnectivity : only for MED_FULL_INTERLACE mode"));
+  _connectivity->calculateConnectivity(ConnectivityType,entity);
 }
 /*!
  Returns the corresponding length of the array returned by MESH::getConnectivity with exactly the same arguments.
  Used particulary for wrapping CORBA and python.
  */
-inline int MESH::getConnectivityLength(MED_EN::medModeSwitch Mode,MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
+inline int MESH::getConnectivityLength(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
 {
   int nbOfElm = getNumberOfElements(entity,Type);
   int size;
@@ -536,11 +529,9 @@ inline int MESH::getConnectivityLength(MED_EN::medModeSwitch Mode,MED_EN::medCon
   and \a Type=MED_ALL_ELEMENTS.
   You must also get the corresponding index array.
  */
-inline const int * MESH::getConnectivity(MED_EN::medModeSwitch Mode,MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
+inline const int * MESH::getConnectivity(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
 {
-  if (Mode==MED_EN::MED_FULL_INTERLACE)
-    return _connectivity->getConnectivity(ConnectivityType,entity,Type);
-  throw MEDEXCEPTION(LOCALIZED("MESH::getConnectivity : only for MED_FULL_INTERLACE mode"));
+  return _connectivity->getConnectivity(ConnectivityType,entity,Type);
 }
 /*!
   Returns the required index array for a connectivity received in

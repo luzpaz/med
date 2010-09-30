@@ -723,8 +723,7 @@ void MEDMEMTest::testMeshAndMeshing()
         ostringstream out;
         const int * connectivity;
         const int * connectivity_index;
-        CPPUNIT_ASSERT_NO_THROW(connectivity = myMesh2->getConnectivity
-                                (MED_FULL_INTERLACE, myMedConnect, entity, Types1[t]));
+        CPPUNIT_ASSERT_NO_THROW(connectivity = myMesh2->getConnectivity (myMedConnect, entity, Types1[t]));
         connectivity_index = myMesh2->getConnectivityIndex(myMedConnect, entity);
         for (int j = 0; j < NumberOfElements1; j++) {
           out<<"!!!!!!!!!!!!!!!"<<endl;
@@ -788,10 +787,10 @@ void MEDMEMTest::testMeshAndMeshing()
       int NumberOfElements1;
       const int * connectivity;
       const int * connectivity_index;
-      myMesh2->calculateConnectivity(MED_FULL_INTERLACE, MED_DESCENDING, entity);
+      myMesh2->calculateConnectivity( MED_DESCENDING, entity);
       try {
         NumberOfElements1 = myMesh2->getNumberOfElements(entity, MED_ALL_ELEMENTS);
-        connectivity = myMesh2->getConnectivity(MED_FULL_INTERLACE, MED_DESCENDING, entity, MED_ALL_ELEMENTS);
+        connectivity = myMesh2->getConnectivity( MED_DESCENDING, entity, MED_ALL_ELEMENTS);
         connectivity_index = myMesh2->getConnectivityIndex(MED_DESCENDING, entity);
       }
       catch (MEDEXCEPTION m) {
@@ -994,13 +993,12 @@ void MEDMEMTest::testMeshAndMeshing()
   {
     CPPUNIT_ASSERT_EQUAL(NumberOfPolyhedron,
                          myMeshingPoly->getNumberOfElements(MED_CELL,MED_POLYHEDRA));
-    CPPUNIT_ASSERT_NO_THROW( myMeshingPoly->calculateConnectivity
-                             (MED_FULL_INTERLACE,MED_NODAL,MED_FACE));
+    CPPUNIT_ASSERT_NO_THROW( myMeshingPoly->calculateConnectivity (MED_NODAL,MED_FACE));
     CPPUNIT_ASSERT_EQUAL(NumberOfFaces-1, myMeshingPoly->getNumberOfElements(MED_FACE,MED_POLYGON)); // -1: one face is shared with tetra
-    CPPUNIT_ASSERT_EQUAL(91,myMeshingPoly->getConnectivityLength(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_POLYHEDRA));
+    CPPUNIT_ASSERT_EQUAL(91,myMeshingPoly->getConnectivityLength(MED_NODAL,MED_CELL,MED_POLYHEDRA));
     const int * PolyConn;
     const int * PolyIdx;
-    CPPUNIT_ASSERT_NO_THROW(PolyConn = myMeshingPoly->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_NO_THROW(PolyConn = myMeshingPoly->getConnectivity(MED_NODAL,MED_CELL,MED_ALL_ELEMENTS));
     CPPUNIT_ASSERT_NO_THROW(PolyIdx = myMeshingPoly->getConnectivityIndex(MED_NODAL,MED_CELL));
     for(int i = NbOfElements[0], iRef=0; i<NbOfElements[0]+NumberOfPolyhedron; i++)
     {
@@ -1096,10 +1094,10 @@ void MEDMEMTest::testMeshAndMeshing()
     CPPUNIT_ASSERT_EQUAL(MED_TRIA3,geomPolyElem);
 
     CPPUNIT_ASSERT_EQUAL(myPolygonMeshing->getNumberOfElements(MED_CELL,MED_POLYGON),nbOfPolygons);
-    CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing->getConnectivityLength(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_POLYGON));
+    CPPUNIT_ASSERT_NO_THROW(myPolygonMeshing->getConnectivityLength(MED_NODAL,MED_CELL,MED_POLYGON));
     myPolygonMeshing->removeReference();
     const int * PolygonConn;
-    CPPUNIT_ASSERT_THROW(PolygonConn = myMeshingPoly->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_POLYGON),MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(PolygonConn = myMeshingPoly->getConnectivity(MED_NODAL,MED_CELL,MED_POLYGON),MEDEXCEPTION);
   }
   myMeshingPoly->removeReference();
   /////////////////////////////////////////////////////
@@ -1172,10 +1170,10 @@ void MEDMEMTest::testMeshAndMeshing()
   int NumberOfElements1;
   const int * connectivity;
   const int * connectivity_index;
-  myMesh3->calculateConnectivity(MED_FULL_INTERLACE, MED_DESCENDING, MED_EN::MED_CELL);
+  myMesh3->calculateConnectivity(MED_DESCENDING, MED_EN::MED_CELL);
   try {
     NumberOfElements1 = myMesh3->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);
-    connectivity = myMesh3->getConnectivity(MED_FULL_INTERLACE, MED_DESCENDING, MED_CELL, MED_ALL_ELEMENTS);
+    connectivity = myMesh3->getConnectivity( MED_DESCENDING, MED_CELL, MED_ALL_ELEMENTS);
     connectivity_index = myMesh3->getConnectivityIndex(MED_DESCENDING, MED_CELL);
   }
   catch (MEDEXCEPTION m) {
@@ -1766,8 +1764,7 @@ void MEDMEMTest::testMeshAndMeshing()
   meshing->setName( "TESTMESH" );
   const int nFaces=20;
   const int nNodes=18;
-  meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
-                          MED_EN::MED_FULL_INTERLACE);
+  meshing->setCoordinates(3, nNodes, coords, "CARTESIAN", MED_EN::MED_FULL_INTERLACE);
   string coordname[3] = { "x", "y", "z" };
   meshing->setCoordinatesNames(coordname);
   string coordunit[3] = { "m", "m", "m" };
@@ -1817,7 +1814,7 @@ void MEDMEMTest::testMeshAndMeshing()
   drv.setMeshName("TESTMESH");
   mesh.addDriver(drv);
   mesh.read();
-  const int *conn=mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_FACE,MED_ALL_ELEMENTS);
+  const int *conn=mesh.getConnectivity(MED_NODAL,MED_FACE,MED_ALL_ELEMENTS);
   for (int j = 0; j < nFaces; j++) {
     for (int k = 0; k < 4; k++)
       CPPUNIT_ASSERT_EQUAL(conn[4*j+k], connQuad4[4*j+k]);

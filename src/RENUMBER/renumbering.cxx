@@ -148,7 +148,7 @@ void changeConnectivity(MESH& mesh, const medGeometryElement& Type, const int& n
 //     }
 //   else
     {
-      const int *conn_init=mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,Type);
+      const int *conn_init=mesh.getConnectivity(MED_NODAL,MED_CELL,Type);
       const int *conn_index_init=mesh.getConnectivityIndex(MED_NODAL,MED_CELL);
       int *conn_renum=new int[conn_index_init[nb_cell]-1];
       int *conn_index_renum=new int[nb_cell+1];

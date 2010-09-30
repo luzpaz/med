@@ -48,11 +48,7 @@ int main (int argc, char ** argv)
     medGeometryElement myType = Types[i] ;
     int NumberOfElements = myMesh.getNumberOfElements(MED_CELL,myType);
     int NomberOfNodesPerCell = Types[i]%100 ;
-    const int * Connectivity = 
-      myMesh.getConnectivity(MED_FULL_INTERLACE,
-                             MED_NODAL,
-                             MED_CELL,
-                             myType);
+    const int * Connectivity = myMesh.getConnectivity(MED_NODAL,MED_CELL,myType);
     for (int j=0; j<NumberOfElements; j++){
       cout << "Element "<< j+1 <<" : " ;
       for (int k=0; k<NomberOfNodesPerCell; k++)
@@ -81,10 +77,7 @@ int main (int argc, char ** argv)
   // this example use global access with index array
   int NumberOfElements = myMesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
   const int * DescendingConnectivity =  
-    myMesh.getConnectivity(MED_FULL_INTERLACE,
-                           MED_DESCENDING,
-                           MED_CELL,
-                           MED_ALL_ELEMENTS);
+    myMesh.getConnectivity(MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS);
   const int * DescendingConnectivityIndex =
     myMesh.getConnectivityIndex(MED_DESCENDING,MED_CELL);
   for (int i=0; i<NumberOfElements; i++) {
@@ -138,10 +131,7 @@ int main (int argc, char ** argv)
   cout << "Show "<< Constituent <<" Connectivity (Nodal) :" << endl ;
   // this example use global access with index array
   const int * ConstituentConnectivity =  
-    myMesh.getConnectivity(MED_FULL_INTERLACE,
-                           MED_NODAL,
-                           ConstituentEntity,
-                           MED_ALL_ELEMENTS);
+    myMesh.getConnectivity(MED_NODAL,ConstituentEntity,MED_ALL_ELEMENTS);
   const int * ConstituentConnectivityIndex =
     myMesh.getConnectivityIndex(MED_NODAL,ConstituentEntity);
   for (int i=0; i<NumberOfConstituents; i++) {

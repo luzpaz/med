@@ -625,12 +625,12 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support, bool isAbs
     {
       if (onAll)
       {
-        global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
+        global_connectivity = getConnectivity(MED_NODAL,support_entity,type);
       }
       else
       {
         const int * supp_number = Support->getNumber(type);
-        const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+        const int * connectivity = getConnectivity(MED_NODAL,support_entity,MED_ALL_ELEMENTS);
         const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
         int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
 
@@ -874,12 +874,12 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
       global_connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
       if (onAll)
       {
-        global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
+        global_connectivity = getConnectivity(MED_NODAL,support_entity,type);
       }
       else
       {
         const int * supp_number = Support->getNumber(type);
-        const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+        const int * connectivity = getConnectivity(MED_NODAL,support_entity,MED_ALL_ELEMENTS);
         int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
 
         for (int k_type = 0; k_type<nb_entity_type; k_type++) {
@@ -1026,13 +1026,13 @@ FIELD<double, FullInterlace>* MESH::getLength(const SUPPORT * Support) const thr
     if (onAll)
     {
       nb_entity_type = getNumberOfElements(support_entity,type);
-      global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
+      global_connectivity = getConnectivity(MED_NODAL,support_entity,type);
     }
     else
     {
       nb_entity_type = Support->getNumberOfElements(type);
       const int * supp_number = Support->getNumber(type);
-      const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+      const int * connectivity = getConnectivity(MED_NODAL,support_entity,MED_ALL_ELEMENTS);
       const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
       int* global_connectivity_tmp = new int[(type%100)*nb_entity_type];
 
@@ -1158,12 +1158,12 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
     {
       if (onAll)
       {
-        global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
+        global_connectivity = getConnectivity(MED_NODAL,support_entity,type);
       }
       else
       {
         const int * supp_number = Support->getNumber(type);
-        const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+        const int * connectivity = getConnectivity(MED_NODAL,support_entity,MED_ALL_ELEMENTS);
         const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
         int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
 
@@ -1328,12 +1328,12 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
     {
       if (onAll)
       {
-        global_connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
+        global_connectivity = getConnectivity(MED_NODAL,support_entity,type);
       }
       else
       {
         const int * supp_number = Support->getNumber(type);
-        const int * connectivity = getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+        const int * connectivity = getConnectivity(MED_NODAL,support_entity,MED_ALL_ELEMENTS);
         int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
 
         for (int k_type = 0; k_type<nb_entity_type; k_type++) {
@@ -1679,8 +1679,7 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
     map<int,int> FaceNbEncounterNb;
 
     int * myConnectivityValue = const_cast <int *>
-      (getConnectivity(MED_FULL_INTERLACE, MED_DESCENDING,
-                       MED_CELL, MED_ALL_ELEMENTS));
+      (getConnectivity(MED_DESCENDING,MED_CELL, MED_ALL_ELEMENTS));
     int * myConnectivityIndex = const_cast <int *> (getConnectivityIndex(MED_DESCENDING, MED_CELL));
     int * myCellNbs = const_cast <int *> (Support3D->getnumber()->getValue());
     int nbCells = Support3D->getnumber()->getLength();
@@ -1827,7 +1826,7 @@ void MESH::convertToPoly()
       const int count[] = { 1, oldnbface + 1 };
       newpolygonconnectivity->setCount( count, MED_FACE );
 
-      const int* oldconn = getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL, MED_EN::MED_FACE, MED_EN::MED_ALL_ELEMENTS);
+      const int* oldconn = getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE, MED_EN::MED_ALL_ELEMENTS);
       const int* oldconnindex= getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_FACE);
       newpolygonconnectivity->setNodal( oldconn, MED_FACE, type, oldconnindex );
 
@@ -1844,7 +1843,7 @@ void MESH::convertToPoly()
 
     int nboldtypes=getNumberOfTypes(MED_EN::MED_CELL);
     const MED_EN::medGeometryElement* oldtypes = getTypes(MED_EN::MED_CELL);
-    const int* oldconn = getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
+    const int* oldconn = getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
     const int* oldconnindex= getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_CELL);
     int oldnbelem = getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
 

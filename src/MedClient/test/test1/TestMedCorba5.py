@@ -94,10 +94,8 @@ for i in [MED_CELL,
             if (T1[j] != T2[j]):
                 raise RuntimeError, "MESH::getTypes()"
 
-            c1 = mLocal.getConnectivity(MED_FULL_INTERLACE, MED_NODAL, \
-                                        i, T1[j]);
-            c2 = mDistant.getConnectivity(MED_FULL_INTERLACE, MED_NODAL, \
-                                        i, T2[j]);
+            c1 = mLocal.getConnectivity(MED_NODAL, i, T1[j]);
+            c2 = mDistant.getConnectivity( MED_NODAL, i, T2[j]);
 
             print "connectivity (local)   : ", T1[j], " : ", c1;
             print "connectivity (distant) : ", T2[j], " : ", c2;

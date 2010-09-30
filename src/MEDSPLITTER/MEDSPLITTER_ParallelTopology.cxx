@@ -132,7 +132,7 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
       m_nb_total_nodes=meshes[idomain]->getNumberOfNodes();
       m_nb_nodes[0]=m_nb_total_nodes;
 
-      //                      meshes[idomain]->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS); 
+      //                      meshes[idomain]->getConnectivity( MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS); 
       int nbfaces=meshes[idomain]->getNumberOfElements(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
       m_face_loc_to_glob[idomain].resize(nbfaces);
       for (int i=0; i<nbfaces; i++)
@@ -209,7 +209,7 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
 
     //creating  dimension d-1 component mappings
 
-    //              meshes[idomain]->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS); 
+    //              meshes[idomain]->getConnectivity( MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS); 
     m_nb_faces[idomain]=meshes[idomain]->getNumberOfElements(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
     MESSAGE_MED ("Nb faces domain " << idomain<<m_nb_faces[idomain]);
     m_face_loc_to_glob[idomain].resize(m_nb_faces[idomain]);
@@ -637,7 +637,7 @@ bool ParallelTopology::hasCellWithNodes( const MESHCollection& new_collection,
       continue;
     int nbCell = mesh->getNumberOfElements( entity, types[t] );
     const int *conn, *index;
-    conn  = mesh->getConnectivity(MED_EN::MED_FULL_INTERLACE,connType, entity, types[t]);
+    conn  = mesh->getConnectivity(connType, entity, types[t]);
     index = mesh->getConnectivityIndex(connType, entity);
     // find a cell containing the first of given nodes,
     // then check if the found cell contains all the given nodes
@@ -691,7 +691,7 @@ void ParallelTopology::createFaceMapping(const MESHCollection& initial_collectio
     const int* face_offset = 0;
     if (nbtotalface >0)
     {
-      face_conn = initial_collection.getMesh(iold)->getConnectivity(MED_EN::MED_FULL_INTERLACE,
+      face_conn = initial_collection.getMesh(iold)->getConnectivity(
                                                                     MED_EN::MED_NODAL,constituent_entity,MED_EN::MED_ALL_ELEMENTS);
       face_offset = initial_collection.getMesh(iold)->getConnectivityIndex(MED_EN::MED_NODAL,constituent_entity);
     }
@@ -802,8 +802,7 @@ void ParallelTopology::createFaceMapping2ndversion(const MESHCollection& initial
     int nbcell=old_topology->getCellNumber(iold);
 
     const int* face_conn = initial_collection.getMesh(iold)->
-      getConnectivity(MED_EN::MED_FULL_INTERLACE,
-                      MED_EN::MED_DESCENDING,MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+      getConnectivity(MED_EN::MED_DESCENDING,MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
     const int* face_offset = initial_collection.getMesh(iold)->
       getConnectivityIndex(MED_EN::MED_DESCENDING,MED_EN::MED_CELL);
     MESSAGE_MED("end of connectivity calculation");

@@ -1947,7 +1947,6 @@ void _CaseFileDriver_User::getSupportNodes(const SUPPORT* support, map<int, int>
 {
   medEntityMesh entity = support->getEntity();
 
-  const medModeSwitch conMode       = MED_FULL_INTERLACE;
   const medConnectivity conType     = MED_NODAL;
   const medGeometryElement allGeoms = MED_ALL_ELEMENTS;
   const int * connectivity          = 0;
@@ -1968,8 +1967,8 @@ void _CaseFileDriver_User::getSupportNodes(const SUPPORT* support, map<int, int>
     else {
       const MESH* mesh = support->getMesh()->convertInMESH();
       int conLength = 0;
-      connectivity = mesh->getConnectivity      (conMode, conType, entity, allGeoms);
-      conLength    = mesh->getConnectivityLength(conMode, conType, entity, allGeoms);
+      connectivity = mesh->getConnectivity      (conType, entity, allGeoms);
+      conLength    = mesh->getConnectivityLength(conType, entity, allGeoms);
       while ( conLength-- ) nodeIds[ *connectivity++ ];
       mesh->removeReference();
     }
@@ -1988,8 +1987,8 @@ void _CaseFileDriver_User::getSupportNodes(const SUPPORT* support, map<int, int>
   number           = support->getNumber(MED_ALL_ELEMENTS);
   int numberOfCell = support->getNumberOfElements(MED_ALL_ELEMENTS);
   const MESH* mesh = support->getMesh()->convertInMESH();
-  index        = mesh->getConnectivityIndex(MED_FULL_INTERLACE, entity);
-  connectivity = mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL, entity, MED_ALL_ELEMENTS);
+  index        = mesh->getConnectivityIndex( MED_NODAL, entity);
+  connectivity = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
   for ( j = 0; j < numberOfCell; ++j )
   {
     int elem = number[j];

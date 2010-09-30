@@ -2465,7 +2465,7 @@ double FIELD<T, INTERLACING_TAG>::normL2(int component,
       // so we iterate just on all cells
       const MESH * mesh = getSupport()->getMesh()->convertInMESH();
       const int nbCells = mesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
-      const int *C = mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
+      const int *C = mesh->getConnectivity(MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
       const int *iC = mesh->getConnectivityIndex(MED_NODAL,MED_CELL);
       for (int i = 0; i < nbCells; ++i, ++vol) {
         // calculate integral on current element as average summ of values on all it's nodes
@@ -2549,7 +2549,7 @@ double FIELD<T, INTERLACING_TAG>::normL2(const FIELD<double, FullInterlace> * p_
       // so we iterate just on all cells
       const MESH * mesh = getSupport()->getMesh()->convertInMESH();
       const int nbCells = mesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
-      const int *C = mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
+      const int *C = mesh->getConnectivity(MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
       const int *iC = mesh->getConnectivityIndex(MED_NODAL,MED_CELL);
       int nbComp = getNumberOfComponents();
       for (int i = 0; i < nbCells; ++i, ++vol) {

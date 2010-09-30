@@ -208,7 +208,7 @@ n4 = grid.getNodeNumber(1,0,0)
 
 conn1 = [n1,n2,n3,n4]
 
-Connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,types[0])
+Connectivity = mesh.getConnectivity(MED_NODAL,MED_CELL,types[0])
 print "connectivity =", Connectivity
 
 print "Cell 1 nodes:", conn1, Connectivity[0:4]
@@ -227,12 +227,12 @@ if end-beg != 4:
 if ReverseConnectivity[beg] != 1:
   raise  RuntimeError, "Wrong reverse connectivity"
 
-edgfecon = mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_EDGE,MED_ALL_ELEMENTS)
+edgfecon = mesh.getConnectivity(MED_NODAL,MED_EDGE,MED_ALL_ELEMENTS)
 print edgfecon
 print len(edgfecon)
 
-mesh.calculateConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL)
-Connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS)
+mesh.calculateConnectivity(MED_DESCENDING,MED_CELL)
+Connectivity = mesh.getConnectivity(MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS)
 ConnectivityIndex = mesh.getConnectivityIndex(MED_DESCENDING,MED_CELL)
 n = 1
 beg = ConnectivityIndex[n-1]-1
@@ -312,7 +312,7 @@ print "Nb cells =", nbElemType
 if nbElemType != 1:
   raise  RuntimeError, "Wrong Nb cells"
 
-Connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,types[0])
+Connectivity = mesh.getConnectivity(MED_NODAL,MED_CELL,types[0])
 print "connectivity =", Connectivity
 n1 = grid.getNodeNumber(0,0,0)
 n2 = grid.getNodeNumber(0,1,0)

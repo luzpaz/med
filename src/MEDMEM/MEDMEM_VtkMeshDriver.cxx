@@ -423,7 +423,7 @@ void VTK_MESH_DRIVER::write(void) const
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": MED element type not supported yet : " << cells_type[i].getName() ) ) ;
     int nodes_cell = cells_type[i].getNumberOfNodes();
     int numberOfCell = mesh->getNumberOfElements(MED_CELL,cells_type[i].getType()) ;
-    const int * connectivityArray = mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,cells_type[i].getType());
+    const int * connectivityArray = mesh->getConnectivity(MED_NODAL,MED_CELL,cells_type[i].getType());
     if ( _vtkFile )
       {
         for (int j=0;j<numberOfCell;j++)

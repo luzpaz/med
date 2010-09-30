@@ -192,10 +192,9 @@ SALOME::SenderDouble_ptr MESH_i::getSenderForCoordinates(SALOME_MED::medModeSwit
  * CORBA: Accessor for connectivities
  */
 //=============================================================================
-SALOME_MED::long_array *  MESH_i::getConnectivity(SALOME_MED::medModeSwitch typeSwitch,
-                                               SALOME_MED::medConnectivity mode, 
-                                               SALOME_MED::medEntityMesh entity, 
-                                               SALOME_MED::medGeometryElement geomElement)
+SALOME_MED::long_array *  MESH_i::getConnectivity(SALOME_MED::medConnectivity mode, 
+                                                  SALOME_MED::medEntityMesh entity, 
+                                                  SALOME_MED::medGeometryElement geomElement)
 throw (SALOME::SALOME_Exception)
 {
         if (_mesh==NULL)
@@ -227,8 +226,7 @@ MESSAGE("MED_NODAL");
 //                              convertIdlConnToMedConn(mode),
 //                              convertIdlEntToMedEnt(entity));
                         nbelements = ((::MESH*)_mesh)->getConnectivityLength
-                          (convertIdlModeToMedMode(typeSwitch),
-                           convertIdlConnToMedConn(mode),
+                          (convertIdlConnToMedConn(mode),
                            convertIdlEntToMedEnt(entity),
                            convertIdlEltToMedElt(geomElement));
                         //nbelements = elt1*(convertIdlEltToMedElt(geomElement)%100);
@@ -238,10 +236,9 @@ SCRUTE(entity);
 SCRUTE(geomElement);
 SCRUTE(nbelements);
                 myseq->length(nbelements);
-                const int * numbers=((::MESH*)_mesh)->getConnectivity(convertIdlModeToMedMode(typeSwitch),
-                                                     convertIdlConnToMedConn(mode),
-                                                     convertIdlEntToMedEnt(entity),
-                                                     convertIdlEltToMedElt(geomElement));
+                const int * numbers=((::MESH*)_mesh)->getConnectivity(convertIdlConnToMedConn(mode),
+                                                                      convertIdlEntToMedEnt(entity),
+                                                                      convertIdlEltToMedElt(geomElement));
                 for (int i=0;i<nbelements;i++)
                 {
                         myseq[i]=numbers[i];
@@ -259,10 +256,9 @@ SCRUTE(nbelements);
  * CORBA: 2nd Accessor for connectivities
  */
 //=============================================================================
-SALOME::SenderInt_ptr MESH_i::getSenderForConnectivity(SALOME_MED::medModeSwitch typeSwitch,
-                                               SALOME_MED::medConnectivity mode, 
-                                               SALOME_MED::medEntityMesh entity, 
-                                               SALOME_MED::medGeometryElement geomElement)
+SALOME::SenderInt_ptr MESH_i::getSenderForConnectivity(SALOME_MED::medConnectivity mode, 
+                                                       SALOME_MED::medEntityMesh entity, 
+                                                       SALOME_MED::medGeometryElement geomElement)
 throw (SALOME::SALOME_Exception)
 {
   if (_mesh==NULL)
@@ -274,14 +270,12 @@ throw (SALOME::SALOME_Exception)
   SALOME::SenderInt_ptr ret;
   try
     {
-      int nbelements=((::MESH*)_mesh)->getConnectivityLength(convertIdlModeToMedMode(typeSwitch),
-                                                 convertIdlConnToMedConn(mode),
-                                                 convertIdlEntToMedEnt(entity),
-                                                 convertIdlEltToMedElt(geomElement));
-      const int * numbers=((::MESH*)_mesh)->getConnectivity(convertIdlModeToMedMode(typeSwitch),
-                                                 convertIdlConnToMedConn(mode),
-                                                 convertIdlEntToMedEnt(entity),
-                                                 convertIdlEltToMedElt(geomElement));
+      int nbelements=((::MESH*)_mesh)->getConnectivityLength(convertIdlConnToMedConn(mode),
+                                                             convertIdlEntToMedEnt(entity),
+                                                             convertIdlEltToMedElt(geomElement));
+      const int * numbers=((::MESH*)_mesh)->getConnectivity(convertIdlConnToMedConn(mode),
+                                                            convertIdlEntToMedEnt(entity),
+                                                            convertIdlEltToMedElt(geomElement));
       ret=SenderFactory::buildSender(*this,numbers,nbelements);
     }
   catch (MEDEXCEPTION &ex)
@@ -515,8 +509,7 @@ SALOME_MED::MESH::connectivityInfos * MESH_i::getConnectGlobal (SALOME_MED::medE
       all->meshTypes[i]=convertMedEltToIdlElt(types[i]);
       all->numberOfElements[i]=((::MESH*)_mesh)->getNumberOfElements(anEntity,types[i]);
       all->nodalConnectivityLength[i]=
-        ((::MESH*)_mesh)->getConnectivityLength(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,
-                                     anEntity,types[i]);
+        ((::MESH*)_mesh)->getConnectivityLength(MED_EN::MED_NODAL,anEntity,types[i]);
     }
   }
   catch (MEDEXCEPTION &ex)

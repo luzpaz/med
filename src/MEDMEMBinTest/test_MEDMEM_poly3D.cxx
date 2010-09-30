@@ -124,14 +124,14 @@ int main (int argc, char ** argv)
   if(myMesh->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_TETRA4)==1 && myMesh->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_POLYHEDRA)==2)
     nbOfPtsForTest++;
   const int REFnodalConnForTetra[4]={17, 9, 18, 19};
-  const int *connForTetraToTest=myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_TETRA4);
+  const int *connForTetraToTest=myMesh->getConnectivity(MED_NODAL,MED_CELL,MED_TETRA4);
   const int *connIndForTetraToTest=myMesh->getConnectivityIndex(MED_NODAL,MED_CELL);
   for(i=connIndForTetraToTest[0]-1;i<connIndForTetraToTest[1]-1;i++)
     if(connForTetraToTest[i]==REFnodalConnForTetra[i])
       nbOfPtsForTest++;
   //6
   const int *globIndex=connIndForTetraToTest + 1; // skip 1 tetra
-  const int *nodalConnOfFaces=myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_POLYHEDRA);
+  const int *nodalConnOfFaces=myMesh->getConnectivity(MED_NODAL,MED_CELL,MED_POLYHEDRA);
   if(globIndex[1]-globIndex[0]==46 && globIndex[2]-globIndex[1]==45)// resp 46 nodes and 45 nodes are in polyh 1 and 2.
     nbOfPtsForTest++;
   //7

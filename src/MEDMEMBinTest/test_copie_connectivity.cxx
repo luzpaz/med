@@ -54,7 +54,7 @@ static void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myM
   for (int i=0; i<NumberOfTypes; i++) {
     cout << "For type " << Types[i] << " : " << endl ;
     int NumberOfElements = myMesh->getNumberOfElements(MED_CELL,Types[i]);
-    const int * connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,Types[i]);
+    const int * connectivity =  myMesh->getConnectivity(MED_NODAL,MED_CELL,Types[i]);
     int NomberOfNodesPerCell = Types[i]%100 ;
     for (int j=0;j<NumberOfElements;j++){
       cout << "Element "<< j+1 <<" : " ;
@@ -78,10 +78,10 @@ static void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myM
   int NumberOfElements ;
   const int * connectivity ;
   const int * connectivity_index ;
-  myMesh->calculateConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL);
+  myMesh->calculateConnectivity(MED_DESCENDING,MED_CELL);
   try {
     NumberOfElements = myMesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
-    connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS);
+    connectivity =  myMesh->getConnectivity(MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS);
     connectivity_index =  myMesh->getConnectivityIndex(MED_DESCENDING,MED_CELL);
   }
   catch (MEDEXCEPTION& m) {
@@ -126,7 +126,7 @@ static void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myM
     }
   }
   cout << "Show "<<constituent<<" Connectivity (Nodal) :" << endl ;
-  const int * face_connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,constituentEntity,MED_ALL_ELEMENTS);
+  const int * face_connectivity =  myMesh->getConnectivity(MED_NODAL,constituentEntity,MED_ALL_ELEMENTS);
   const int * face_connectivity_index =  myMesh->getConnectivityIndex(MED_NODAL,constituentEntity);
   for (int i=0; i<NumberOfConstituents; i++) {
     cout << constituent <<i+1<<" : " ;

@@ -1382,7 +1382,7 @@ MESH* SUPPORT::makeMesh()
 
     // get connectivity info
     int shift = 1; // to pass from elem number to array index
-    const int* conn = mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,_entity,MED_ALL_ELEMENTS);
+    const int* conn = mesh->getConnectivity(MED_NODAL,_entity,MED_ALL_ELEMENTS);
     const int* index = mesh->getConnectivityIndex(MED_NODAL,_entity);
     int t = 0;
     while ( type != all_mesh_types[t] ) ++t;

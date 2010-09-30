@@ -490,25 +490,23 @@ Internal Corba method.
       You must give a %medEntityMesh (ie:MED_EDGE) and a
       %medGeometryElement (ie:MED_SEG3).
     */
-    SALOME_MED::long_array getConnectivity(in medModeSwitch typeSwitch,
-					in medConnectivity mode,
-					in medEntityMesh entity,
-					in medGeometryElement geomElement)
+    SALOME_MED::long_array getConnectivity(in medConnectivity mode,
+                                           in medEntityMesh entity,
+                                           in medGeometryElement geomElement)
       raises (SALOME::SALOME_Exception);
 
     /*!
       Idem getConnectivity but return a Sender.\n
       It could be used in a Client code using the MED Client classes.
      */
-    SALOME::SenderInt getSenderForConnectivity(in medModeSwitch typeSwitch,
-					in medConnectivity mode,
-					in medEntityMesh entity,
-					in medGeometryElement geomElement)
+    SALOME::SenderInt getSenderForConnectivity(in medConnectivity mode,
+                                               in medEntityMesh entity,
+                                               in medGeometryElement geomElement)
       raises (SALOME::SALOME_Exception);
 
     /*!
       Give morse index array to use with
-      getConnectivity(MED_FULL_INTERLACE,mode,entity,MED_ALL_ELEMENTS).
+      getConnectivity(mode,entity,MED_ALL_ELEMENTS).
 
       Each value give start index for corresponding entity in
       connectivity array.

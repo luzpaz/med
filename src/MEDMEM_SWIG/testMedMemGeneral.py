@@ -482,7 +482,7 @@ for i in range(nbOfFiles):
             type = types[k]
             nbElemType = mesh.getNumberOfElements(MED_CELL,type)
             print "For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
-            connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,type)
+            connectivity = mesh.getConnectivity(MED_NODAL,MED_CELL,type)
             nbNodesPerCell = type%100
             for j in range(nbElemType):
                 print "Element",(j+1)," ",connectivity[j*nbNodesPerCell:(j+1)*nbNodesPerCell]
@@ -499,9 +499,9 @@ for i in range(nbOfFiles):
 
     print ""
     print "Show the Cell Descending Connectivity:"
-    mesh.calculateConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL)
+    mesh.calculateConnectivity(MED_DESCENDING,MED_CELL)
     nbElemts = mesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)
-    Connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS)
+    Connectivity = mesh.getConnectivity(MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS)
     ConnectivityIndex = mesh.getConnectivityIndex(MED_DESCENDING,MED_CELL)
     print ""
     for j in range(nbElemts):
@@ -526,7 +526,7 @@ for i in range(nbOfFiles):
             type = types[k]
             nbElemType = mesh.getNumberOfElements(constituent,type)
             print "For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
-            connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,constituent,type)
+            connectivity = mesh.getConnectivity(MED_NODAL,constituent,type)
             nbNodesPerConst = type%100
             for j in range(nbElemType):
                 print "Element",(j+1)," ",connectivity[j*nbNodesPerConst:(j+1)*nbNodesPerConst]
@@ -545,9 +545,9 @@ for i in range(nbOfFiles):
         print ""
         try:
             print "Show the Face/Edge Descending Connectivity:"
-            mesh.calculateConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,constituent)
+            mesh.calculateConnectivity(MED_DESCENDING,constituent)
             nbElemts = mesh.getNumberOfElements(constituent,MED_ALL_ELEMENTS)
-            Connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,constituent,MED_ALL_ELEMENTS)
+            Connectivity = mesh.getConnectivity(MED_DESCENDING,constituent,MED_ALL_ELEMENTS)
             ConnectivityIndex = mesh.getConnectivityIndex(MED_DESCENDING,constituent)
             print ""
             for j in range(nbElemts):

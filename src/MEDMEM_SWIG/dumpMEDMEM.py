@@ -79,7 +79,7 @@ def _showNodalConnectivity(mesh,entity,type,elems,tablevel,showOnly=SHOW_ALL):
     if showOnly > 0:
         elems = elems[:showOnly]
     nbShow = len( elems )
-    connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,entity,MED_ALL_ELEMENTS)
+    connectivity = mesh.getConnectivity(MED_NODAL,entity,MED_ALL_ELEMENTS)
     index = mesh.getConnectivityIndex(MED_NODAL,entity)
     if debugShowConn: print "CONN:",connectivity,"\nIND:",index
     elemShift = 0

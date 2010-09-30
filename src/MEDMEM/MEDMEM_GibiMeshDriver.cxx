@@ -3289,10 +3289,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh(list<nameGIBItoMED>& listGIBI
     entity = supIt->first->getEntity();
     const int * nodalConnect = 0, * nodalConnectIndex = 0;
     if ( entity != MED_NODE ) {
-      nodalConnect = mesh->getConnectivity (MED_FULL_INTERLACE,
-                                            MED_NODAL,
-                                            entity,
-                                            MED_ALL_ELEMENTS);
+      nodalConnect = mesh->getConnectivity (MED_NODAL,entity,MED_ALL_ELEMENTS);
       nodalConnectIndex = mesh->getConnectivityIndex (MED_NODAL,entity);
     }
     supportData::typeIterator tIt = data._types.begin();
@@ -3317,10 +3314,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh(list<nameGIBItoMED>& listGIBI
     const medGeometryElement* types = _mesh->getTypes( entity );
     const int * nbIndex = mesh->getGlobalNumberingIndex (entity);
     const int * nodalConnect = 0, * nodalConnectIndex = 0;
-    nodalConnect = mesh->getConnectivity (MED_FULL_INTERLACE,
-                                          MED_NODAL,
-                                          entity,
-                                          MED_ALL_ELEMENTS);
+    nodalConnect = mesh->getConnectivity (MED_NODAL,entity,MED_ALL_ELEMENTS);
     nodalConnectIndex = mesh->getConnectivityIndex (MED_NODAL,entity);
 
     for ( int iType = 1; iType <= nbTypes; ++iType )

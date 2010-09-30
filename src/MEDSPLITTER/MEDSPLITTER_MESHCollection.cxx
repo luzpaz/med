@@ -269,8 +269,7 @@ void MESHCollection::getNodeConnectivity(const int* cell_list,int nb_cells,MED_E
     int nb_elem = m_mesh[i]->getNumberOfElements(entity,type);
     if (nb_elem>0)
     {
-      conn_ip[i]=m_mesh[i]->getConnectivity(MED_EN::MED_FULL_INTERLACE,
-                                            MED_EN::MED_NODAL,entity,MED_EN::MED_ALL_ELEMENTS);
+      conn_ip[i]=m_mesh[i]->getConnectivity(MED_EN::MED_NODAL,entity,MED_EN::MED_ALL_ELEMENTS);
       conn_index_ip[i] = m_mesh[i]->getConnectivityIndex(MED_EN::MED_NODAL,entity);
       //       global_index= m_mesh[i]->getGlobalNumberingIndex(entity);
     }
@@ -344,7 +343,7 @@ void MESHCollection::getPolygonNodeConnectivity(const int* cell_list,int nb_cell
     int nb_elem = m_mesh[i]->getNumberOfElements(entity,MED_EN::MED_POLYGON);
     if (nb_elem>0)
     {
-      conn_ip[i]=m_mesh[i]->getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,entity,MED_EN::MED_ALL_ELEMENTS);
+      conn_ip[i]=m_mesh[i]->getConnectivity(MED_EN::MED_NODAL,entity,MED_EN::MED_ALL_ELEMENTS);
       conn_index_ip[i] = m_mesh[i]->getConnectivityIndex(MED_EN::MED_NODAL,entity);
     }
     else
@@ -416,7 +415,7 @@ void MESHCollection::getPolyhedraNodeConnectivity(const int* cell_list,int nb_ce
     int nb_elem = m_mesh[i]->getNumberOfElements(entity,MED_EN::MED_POLYHEDRA);
     if (nb_elem>0)
     {
-      conn_ip[i]=m_mesh[i]->getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+      conn_ip[i]=m_mesh[i]->getConnectivity(MED_EN::MED_NODAL,MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
       conn_index_ip[i] = m_mesh[i]->getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_CELL);
       //conn_face_index_ip[i]= m_mesh[i]->getPolyhedronFacesIndex();
     }
@@ -613,7 +612,7 @@ void MESHCollection::getFaceConnectivity(const int* cell_list,int nb_cells,MED_E
   {
     int nb_elem = m_mesh[i]->getNumberOfElements(entity,type);
     if (nb_elem>0)
-      conn_ip[i]=m_mesh[i]->getConnectivity(MED_EN::MED_FULL_INTERLACE,
+      conn_ip[i]=m_mesh[i]->getConnectivity(
                                             MED_EN::MED_DESCENDING,entity,type);                               
     else
       conn_ip[i]=0;
@@ -817,7 +816,7 @@ void MESHCollection::buildCellGraph(MEDMEM::MEDSKYLINEARRAY* & array,int *& edge
       const int* conn_index = m_mesh[idomain]->getConnectivityIndex(MED_EN::MED_NODAL,
                                                                     MED_EN::MED_CELL);
 
-      const int* conn =   m_mesh[idomain]->getConnectivity(MED_EN::MED_FULL_INTERLACE,
+      const int* conn =   m_mesh[idomain]->getConnectivity(
                                                            MED_EN::MED_NODAL,
                                                            MED_EN::MED_CELL,
                                                            MED_EN::MED_ALL_ELEMENTS);
@@ -1969,7 +1968,7 @@ void MESHCollection::getFaces(int idomain,
 
   int nbtypes  = m_mesh[idomain]->getNumberOfTypes(constituent_entity);
   const int* global_numbering= m_mesh[idomain]->getGlobalNumberingIndex(constituent_entity);
-  int* conn = const_cast<int*> (m_mesh[idomain]->getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,constituent_entity, MED_EN::MED_ALL_ELEMENTS));
+  int* conn = const_cast<int*> (m_mesh[idomain]->getConnectivity(MED_EN::MED_NODAL,constituent_entity, MED_EN::MED_ALL_ELEMENTS));
   for (int itype=0; itype<nbtypes; itype++)
   {
     for (int iface=global_numbering[itype]; iface<global_numbering[itype+1]; iface++)
@@ -2005,12 +2004,12 @@ MEDSPLITTER_FaceModel* MESHCollection::getCommonFace(int ip1,int ilocal1,int ip2
   MEDMEM::CELLMODEL celltype1 (type1);
 
   const int* conn_index1 =  m_mesh[ip1]->getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_CELL);
-  const int* conn1 = m_mesh[ip1]->getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+  const int* conn1 = m_mesh[ip1]->getConnectivity(MED_EN::MED_NODAL,MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
 
   // MED_EN::medGeometryElement type2 = m_mesh[ip2]->getElementType(MED_EN::MED_CELL,ilocal2);
   //MEDMEM::CELLTYPE celltype2 (type2);
   const int* conn_index2 =  m_mesh[ip2]->getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_CELL);
-  const int* conn2 = m_mesh[ip2]->getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+  const int* conn2 = m_mesh[ip2]->getConnectivity(MED_EN::MED_NODAL,MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
 
   vector<int> nodes1;
   vector<int> nodes2;

@@ -97,7 +97,7 @@ class medNumPyTest(unittest.TestCase):
                               2,10,6,9]
 
         myMeshing.setConnectivity(entity,types[0], array( connectivityTetra ))
-        conn = myMeshing.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,entity,MED_ALL_ELEMENTS)
+        conn = myMeshing.getConnectivity(MED_NODAL,entity,MED_ALL_ELEMENTS)
         self.assertTrue( isinstance( conn, ndarray ))
 
         myGroup = GROUP()

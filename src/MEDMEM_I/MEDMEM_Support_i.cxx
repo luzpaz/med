@@ -188,7 +188,7 @@ SALOME_MED::SUPPORT::supportInfos * SUPPORT_i::getSupportGlobal()
       case MED_EN::MED_POLYGON: 
       case MED_EN::MED_POLYHEDRA: {
         if (_support->isOnAllElements() ) {
-          connLength = mesh->getConnectivityLength(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,
+          connLength = mesh->getConnectivityLength(MED_EN::MED_NODAL,
                                                    _support->getEntity(),MED_EN::MED_ALL_ELEMENTS);
         }
         else {

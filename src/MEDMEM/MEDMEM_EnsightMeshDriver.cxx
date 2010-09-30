@@ -547,8 +547,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldBinary(_BinaryFileWriter& ensightG
 
       if ( nbCellNodes > 1 ) // STANDARD ELEMENTS connectivity
       {
-        connectivity = mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                             entity, medType);
+        connectivity = mesh->getConnectivity( MED_NODAL, entity, medType);
         nodeIds.reserve( numberOfCell * nbCellNodes);
         for (j = 0 ; j < numberOfCell; j++, connectivity += nbCellNodes)
           for (int k=0; k<nbCellNodes; k++)
@@ -567,11 +566,9 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldBinary(_BinaryFileWriter& ensightG
       else if ( medType == MED_POLYGON ) // POLYGONs connectivity
       {
         int nbStdCells = mesh->getGlobalNumberingIndex(entity)[i]-1;
-        connectivity   = mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                               entity, medType);
-        int connLength = mesh->getConnectivityLength(MED_FULL_INTERLACE, MED_NODAL,
-                                                     entity, medType);
-        index          = mesh->getConnectivityIndex(MED_FULL_INTERLACE, entity);
+        connectivity   = mesh->getConnectivity( MED_NODAL, entity, medType);
+        int connLength = mesh->getConnectivityLength( MED_NODAL, entity, medType);
+        index          = mesh->getConnectivityIndex(MED_NODAL, entity);
 
         // number of nodes in each element
         {
@@ -584,10 +581,9 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldBinary(_BinaryFileWriter& ensightG
       }
       else // POLYHEDRA connectivity
       {
-        connectivity   = mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                               entity, medType);
+        connectivity   = mesh->getConnectivity( MED_NODAL, entity, medType);
         int nbStdCells = mesh->getGlobalNumberingIndex(entity)[i]-1;
-        index          = mesh->getConnectivityIndex(MED_FULL_INTERLACE, entity) + nbStdCells;
+        index          = mesh->getConnectivityIndex(MED_NODAL, entity) + nbStdCells;
 
         vector<int> nbFacesInPolyhedron, nbNodesInFace, faceConn;
         for ( int j = 0; j < numberOfCell; ++j )
@@ -627,9 +623,8 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldBinary(_BinaryFileWriter& ensightG
 #endif
       if ( nbCellNodes > 1 ) // STANDARD ELEMENTS connectivity
       {
-        connectivity = mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                             entity, MED_ALL_ELEMENTS);
-        index = mesh->getConnectivityIndex(MED_FULL_INTERLACE, entity);
+        connectivity = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
+        index = mesh->getConnectivityIndex(MED_NODAL, entity);
 
         nodeIds.reserve( numberOfCell * nbCellNodes);
         for (j=0; j<numberOfCell; j++) {
@@ -652,9 +647,8 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldBinary(_BinaryFileWriter& ensightG
       }
       else if ( medType == MED_POLYGON ) // POLYGONs connectivity
       {
-        connectivity = mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                             entity, MED_ALL_ELEMENTS);
-        index = mesh->getConnectivityIndex(MED_FULL_INTERLACE, entity);
+        connectivity = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
+        index = mesh->getConnectivityIndex(MED_NODAL, entity);
 
         // number of nodes in each element
         {
@@ -675,9 +669,8 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldBinary(_BinaryFileWriter& ensightG
       }
       else // POLYHEDRA connectivity
       {
-        connectivity = mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                             entity, MED_ALL_ELEMENTS);
-        index = mesh->getConnectivityIndex(MED_FULL_INTERLACE, entity);
+        connectivity = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
+        index = mesh->getConnectivityIndex(MED_NODAL, entity);
         vector<int> nbFacesInPolyhedron, nbNodesInFace, faceConn;
         for ( int j = 0; j < numberOfCell; ++j )
         {
@@ -828,7 +821,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldASCII(ofstream&      ensightGeomFi
 
       if ( nbCellNodes > 1 ) // STANDARD ELEMENTS connectivity
       {
-        connectivity = mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL, entity, medType);
+        connectivity = mesh->getConnectivity( MED_NODAL, entity, medType);
         for (j = 0 ; j < numberOfCell; j++, connectivity += nbCellNodes) {
           for (int k=0; k<nbCellNodes; k++)
             ensightGeomFile << setw(iw) << connectivity[ ensightType._medIndex[k] ];
@@ -843,8 +836,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldASCII(ofstream&      ensightGeomFi
       else if ( medType == MED_POLYGON ) // POLYGONs connectivity
       {
         int nbStdCells = mesh->getGlobalNumberingIndex(entity)[i]-1;
-        connectivity   = mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                               entity, MED_ALL_ELEMENTS);
+        connectivity   = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
         index          = mesh->getConnectivityIndex(MED_NODAL, entity) + nbStdCells;
         // number of nodes in each element
         const int* ind = index;
@@ -862,7 +854,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldASCII(ofstream&      ensightGeomFi
       else // POLYHEDRA connectivity
       {
         int nbStdCells = mesh->getGlobalNumberingIndex(entity)[i]-1;
-        connectivity   = mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL, entity, medType);
+        connectivity   = mesh->getConnectivity( MED_NODAL, entity, medType);
         index          = mesh->getConnectivityIndex(MED_NODAL, entity) + nbStdCells;
         ostringstream nbNodesInFace, faceConn;
         for ( j = 0; j < numberOfCell; ++j )
@@ -900,9 +892,8 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldASCII(ofstream&      ensightGeomFi
 #endif
       if ( nbCellNodes > 1 ) // STANDARD ELEMENTS connectivity
       {
-        connectivity = mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                             entity, MED_ALL_ELEMENTS);
-        index = mesh->getConnectivityIndex(MED_FULL_INTERLACE, entity);
+        connectivity = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
+        index = mesh->getConnectivityIndex(MED_NODAL, entity);
 
         for (j=0; j<numberOfCell; j++) {
           int elem = number[j];
@@ -923,9 +914,8 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldASCII(ofstream&      ensightGeomFi
       }
       else if ( medType == MED_POLYGON ) // POLYGONs connectivity
       {
-        connectivity   = mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                               entity, MED_ALL_ELEMENTS);
-        index          = mesh->getConnectivityIndex(MED_FULL_INTERLACE, entity);
+        connectivity   = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
+        index          = mesh->getConnectivityIndex(MED_NODAL, entity);
         // number of nodes in each element
         for (j = 0 ; j < numberOfCell; j++) {
           int elem = number[j];
@@ -943,7 +933,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldASCII(ofstream&      ensightGeomFi
       }
       else // POLYHEDRA connectivity
       {
-        connectivity   = mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL, entity, medType);
+        connectivity   = mesh->getConnectivity( MED_NODAL, entity, medType);
         index          = mesh->getConnectivityIndex(MED_NODAL, entity);
         ostringstream nbNodesInFace, faceConn;
         for ( j = 0; j < numberOfCell; ++j )
@@ -1005,8 +995,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePart6Binary(_BinaryFileWriter& ensightGeom
   int j = 1;
   const int * connectivity = 0;
   if ( entity != MED_NODE )
-    connectivity = mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                         entity, MED_ALL_ELEMENTS);
+    connectivity = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
   const int * elemConnectivity = connectivity;
 
   // CONNECTIVITY                                                       Ensight 6 binary
@@ -1063,7 +1052,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePart6Binary(_BinaryFileWriter& ensightGeom
         ensightGeomFile.addInt( number, numberOfCell );
       }
       else {
-        const int* index = mesh->getConnectivityIndex(MED_FULL_INTERLACE, entity);
+        const int* index = mesh->getConnectivityIndex(MED_NODAL, entity);
 
         nodeIds.reserve( numberOfCell * nbCellNodes);
         for (j=0; j<numberOfCell; j++) {
@@ -1112,8 +1101,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePart6ASCII(ofstream&      ensightGeomFile,
   int j = 1;
   const int * connectivity = 0;
   if ( entity != MED_NODE )
-    connectivity = mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                         entity, MED_ALL_ELEMENTS);
+    connectivity = mesh->getConnectivity( MED_NODAL,entity, MED_ALL_ELEMENTS);
   const int * elemConnectivity = connectivity;
 
   // CONNECTIVITY                                                        Ensight 6 ASCII
@@ -1170,7 +1158,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePart6ASCII(ofstream&      ensightGeomFile,
         }
       }
       else {
-        const int* index = mesh->getConnectivityIndex(MED_FULL_INTERLACE, entity);
+        const int* index = mesh->getConnectivityIndex(MED_NODAL, entity);
 
         for (j=0; j<numberOfCell; j++) {
           int elem = number[j];
@@ -1807,8 +1795,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldASCII(_InterMed & imed)
       }
 
       // store connectivity 
-      const int * conn = unstruct->getConnectivity( MED_FULL_INTERLACE, MED_NODAL,
-                                                    MED_CELL, MED_ALL_ELEMENTS );
+      const int * conn = unstruct->getConnectivity( MED_NODAL, MED_CELL, MED_ALL_ELEMENTS );
       medGeometryElement elemType = grid.getElementType( MED_CELL, 1 );
       int  nbElemNodes = elemType % 100;
 
@@ -2297,8 +2284,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldBinary(_InterMed & imed)
       }
 
       // store connectivity 
-      const int * conn = unstruct->getConnectivity( MED_FULL_INTERLACE, MED_NODAL,
-                                                    MED_CELL, MED_ALL_ELEMENTS );
+      const int * conn = unstruct->getConnectivity( MED_NODAL, MED_CELL, MED_ALL_ELEMENTS );
       medGeometryElement elemType = grid.getElementType( MED_CELL, 1 );
       int  nbElemNodes = elemType % 100;
 
@@ -2518,8 +2504,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read6ASCII(_InterMed & imed)
       if ( K < 2 ) { grid._spaceDimension--; grid._kArrayLength = 0; }
 
       const MESH* unstruct = grid.convertInMESH();
-      const int * conn = unstruct->getConnectivity( MED_FULL_INTERLACE, MED_NODAL,
-                                                    MED_CELL, MED_ALL_ELEMENTS );
+      const int * conn = unstruct->getConnectivity( MED_NODAL, MED_CELL, MED_ALL_ELEMENTS );
       medGeometryElement elemType = grid.getElementType( MED_CELL, 1 );
       int  nbElemNodes = elemType % 100;
       int      nbElems = grid.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);
@@ -2801,8 +2786,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read6Binary(_InterMed & imed)
       if ( K < 2 ) { grid._spaceDimension--; grid._kArrayLength = 0; }
 
       const MESH* unstruct = grid.convertInMESH();
-      const int * conn = unstruct->getConnectivity( MED_FULL_INTERLACE, MED_NODAL,
-                                                    MED_CELL, MED_ALL_ELEMENTS );
+      const int * conn = unstruct->getConnectivity( MED_NODAL, MED_CELL, MED_ALL_ELEMENTS );
       medGeometryElement elemType = grid.getElementType( MED_CELL, 1 );
       int  nbElemNodes = elemType % 100;
       int      nbElems = grid.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);

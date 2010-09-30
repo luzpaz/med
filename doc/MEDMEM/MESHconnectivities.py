@@ -51,8 +51,7 @@ for i in range(numberOfTypes):
     type = cellType.getType()
     numberOfElements = myMesh.getNumberOfElements(MED_CELL,type)
     numberOfNodesPerCell = cellType.getNumberOfNodes()
-    connectivity = myMesh.getConnectivity(MED_FULL_INTERLACE,
-                                          MED_NODAL,MED_CELL,type)
+    connectivity = myMesh.getConnectivity(MED_NODAL,MED_CELL,type)
     print "For Type ",nameType," : "
     for j in range(numberOfElements):
         print "Element ",(j+1)," : ",connectivity[j*numberOfNodesPerCell:
@@ -81,11 +80,8 @@ print "Show Connectivity (Descending) :"
 # This example use global access with index array
 
 numberOfElements = myMesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)
-descendingConnectivity = myMesh.getConnectivity(MED_FULL_INTERLACE,
-                                                MED_DESCENDING,MED_CELL,
-                                                MED_ALL_ELEMENTS)
-descendingConnectivityIndex = myMesh.getConnectivityIndex(MED_DESCENDING,
-                                                          MED_CELL)
+descendingConnectivity = myMesh.getConnectivity(MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS)
+descendingConnectivityIndex = myMesh.getConnectivityIndex(MED_DESCENDING,MED_CELL)
 
 for i in range(numberOfElements):
     indexBegin = descendingConnectivityIndex[i]
@@ -132,12 +128,8 @@ else:
 
     print "Show ",constituent," Connectivity (Nodal) :"
 
-    constituentConnectivity = myMesh.getConnectivity(MED_FULL_INTERLACE,
-                                                     MED_NODAL,
-                                                     constituentEntity,
-                                                     MED_ALL_ELEMENTS)
-    constituentConnectivityIndex = myMesh.getConnectivityIndex(MED_NODAL,
-                                                               constituentEntity)
+    constituentConnectivity = myMesh.getConnectivity(MED_NODAL,constituentEntity,MED_ALL_ELEMENTS)
+    constituentConnectivityIndex = myMesh.getConnectivityIndex(MED_NODAL,constituentEntity)
 
     for i in range(numberOfConstituents):
         indexBegin = constituentConnectivityIndex[i]

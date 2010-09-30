@@ -241,16 +241,13 @@ namespace { // local tools
       _tolerance      = getTolerance(&mesh);
       _dim            = mesh.getSpaceDimension();
       _coord          = mesh.getCoordinates(MED_FULL_INTERLACE);
-      _cellConn       = mesh.getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                            MED_CELL, MED_ALL_ELEMENTS);
+      _cellConn       = mesh.getConnectivity( MED_NODAL, MED_CELL, MED_ALL_ELEMENTS);
       _cellConnIndex  = mesh.getConnectivityIndex(MED_NODAL, MED_CELL);
-      _cell2Face      = mesh.getConnectivity(MED_FULL_INTERLACE, MED_DESCENDING,
-                                            MED_CELL, MED_ALL_ELEMENTS);
+      _cell2Face      = mesh.getConnectivity( MED_DESCENDING, MED_CELL, MED_ALL_ELEMENTS);
       _cell2FaceIndex = mesh.getConnectivityIndex( MED_DESCENDING, MED_CELL );
       _face2Cell      = mesh.getReverseConnectivity( MED_DESCENDING );
       _face2CellIndex = mesh.getReverseConnectivityIndex( MED_DESCENDING );
-      _faceConn       = mesh.getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                            MED_FACE, MED_ALL_ELEMENTS);
+      _faceConn       = mesh.getConnectivity( MED_NODAL, MED_FACE, MED_ALL_ELEMENTS);
       _faceConnIndex  = mesh.getConnectivityIndex(MED_NODAL, MED_FACE);
       _node2Cell      = mesh.getReverseConnectivity( MED_NODAL );
       _node2CellIndex = mesh.getReverseConnectivityIndex( MED_NODAL );
@@ -554,8 +551,7 @@ MESH* Extractor::divideEdges(const double*       coords,
   const MESH* inMesh                = _myInputMesh;//support->getMesh();
   const medGeometryElement* inTypes = support->getTypes();
 
-  const int* inConn      = inMesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                                   entity, MED_ALL_ELEMENTS);
+  const int* inConn      = inMesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
   const int* inConnIndex = inMesh->getConnectivityIndex(MED_NODAL, entity);
   const int spaceDim     = inMesh->getSpaceDimension();
   const int meshDim      = inTypes[ support->getNumberOfTypes()-1 ] / 100;

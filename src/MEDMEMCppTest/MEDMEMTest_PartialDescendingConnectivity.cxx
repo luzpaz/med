@@ -69,12 +69,12 @@ void MEDMEMTest::testPartialDescendingConnectivity()
   //All edge conn
   myMesh->setConnectivity(MED_EN::MED_EDGE,MED_EN::MED_SEG2,connNodalEdgeClassical);
   //
-  /*const int *ConnNodal = */myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
+  /*const int *ConnNodal = */myMesh->getConnectivity(MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
   /*const int *ConnNodalIndex = */myMesh->getConnectivityIndex(MED_NODAL,MED_CELL);
 
-  const int *Conn      = myMesh->getConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS);
+  const int *Conn      = myMesh->getConnectivity(MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS);
   const int *ConnIndex = myMesh->getConnectivityIndex(MED_DESCENDING,MED_CELL);
-  int lgth=myMesh->getConnectivityLength(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS);
+  int lgth=myMesh->getConnectivityLength(MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS);
   CPPUNIT_ASSERT_EQUAL(6,lgth);
   CPPUNIT_ASSERT_EQUAL(1,ConnIndex[0]);
   CPPUNIT_ASSERT_EQUAL(7,ConnIndex[1]);
@@ -87,7 +87,7 @@ void MEDMEMTest::testPartialDescendingConnectivity()
   CPPUNIT_ASSERT_EQUAL(6, *max_element(ConnTmp,ConnTmp+6));
   CPPUNIT_ASSERT_EQUAL(1, *min_element(ConnTmp,ConnTmp+6));
   //
-  const int *ConnFaceNodal = myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_FACE,MED_ALL_ELEMENTS);
+  const int *ConnFaceNodal = myMesh->getConnectivity(MED_NODAL,MED_FACE,MED_ALL_ELEMENTS);
   const int *ConnFaceNodalIndex = myMesh->getConnectivityIndex(MED_NODAL,MED_FACE);
   const int expected3[7]={1,5,9,13,17,21,25};
   int i;

@@ -129,7 +129,7 @@ namespace ParaMEDMEM
 
         fvm_lnum_t nbelems = mesh->getNumberOfElements(MED_EN::MED_CELL, types[itype]);
         fvm_lnum_t* conn = new fvm_lnum_t[nbelems*(types[itype]%100)];
-        const int* mesh_conn =mesh->getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL, MED_EN::MED_CELL, types[itype]);
+        const int* mesh_conn =mesh->getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL, types[itype]);
         for (int i=0; i<nbelems*(types[itype]%100); i++)
           conn[i]=mesh_conn[i]; 
         //swapping trias
@@ -224,7 +224,7 @@ namespace ParaMEDMEM
               }
           }
         //retrieving original mesh connectivity
-        fvm_lnum_t* conn = const_cast<fvm_lnum_t*> (mesh->getConnectivity(MED_EN::MED_FULL_INTERLACE,MED_EN::MED_NODAL,entity, types[itype]));
+        fvm_lnum_t* conn = const_cast<fvm_lnum_t*> (mesh->getConnectivity(MED_EN::MED_NODAL,entity, types[itype]));
        
         // adding the elements to the FVM structure 
         fvm_nodal_append_by_transfer(fvm_nodal, nbelems, fvm_type,0,0,0,conn,elem_numbers);
