@@ -231,6 +231,10 @@ MEDCouplingField::~MEDCouplingField()
   delete _type;
 }
 
+MEDCouplingField::MEDCouplingField(MEDCouplingFieldDiscretization *type):_mesh(0),_type(type)
+{
+}
+
 MEDCouplingField::MEDCouplingField(TypeOfField type):_mesh(0),_type(MEDCouplingFieldDiscretization::New(type))
 {
 }

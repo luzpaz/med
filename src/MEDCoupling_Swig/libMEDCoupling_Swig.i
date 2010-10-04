@@ -60,6 +60,15 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::MEDCouplingField::buildWeightingField;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::New;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::mergeFields;
+%newobject ParaMEDMEM::MEDCouplingFieldDouble::doublyContractedProduct;
+%newobject ParaMEDMEM::MEDCouplingFieldDouble::determinant;
+%newobject ParaMEDMEM::MEDCouplingFieldDouble::eigenValues;
+%newobject ParaMEDMEM::MEDCouplingFieldDouble::eigenVectors;
+%newobject ParaMEDMEM::MEDCouplingFieldDouble::inverse;
+%newobject ParaMEDMEM::MEDCouplingFieldDouble::trace;
+%newobject ParaMEDMEM::MEDCouplingFieldDouble::deviator;
+%newobject ParaMEDMEM::MEDCouplingFieldDouble::magnitude;
+%newobject ParaMEDMEM::MEDCouplingFieldDouble::maxPerTuple;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::dotFields;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::dot;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::crossProductFields;
@@ -80,6 +89,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayInt::deepCopy;
 %newobject ParaMEDMEM::DataArrayInt::performCpy;
 %newobject ParaMEDMEM::DataArrayInt::substr;
+%newobject ParaMEDMEM::DataArrayInt::changeNbOfComponents;
 %newobject ParaMEDMEM::DataArrayInt::selectByTupleId;
 %newobject ParaMEDMEM::DataArrayDouble::aggregate;
 %newobject ParaMEDMEM::DataArrayDouble::dot;
@@ -89,9 +99,19 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayDouble::multiply;
 %newobject ParaMEDMEM::DataArrayDouble::divide;
 %newobject ParaMEDMEM::DataArrayDouble::substr;
+%newobject ParaMEDMEM::DataArrayDouble::changeNbOfComponents;
 %newobject ParaMEDMEM::DataArrayDouble::getIdsInRange;
 %newobject ParaMEDMEM::DataArrayDouble::selectByTupleId;
 %newobject ParaMEDMEM::DataArrayDouble::applyFunc;
+%newobject ParaMEDMEM::DataArrayDouble::doublyContractedProduct;
+%newobject ParaMEDMEM::DataArrayDouble::determinant;
+%newobject ParaMEDMEM::DataArrayDouble::eigenValues;
+%newobject ParaMEDMEM::DataArrayDouble::eigenVectors;
+%newobject ParaMEDMEM::DataArrayDouble::inverse;
+%newobject ParaMEDMEM::DataArrayDouble::trace;
+%newobject ParaMEDMEM::DataArrayDouble::deviator;
+%newobject ParaMEDMEM::DataArrayDouble::magnitude;
+%newobject ParaMEDMEM::DataArrayDouble::maxPerTuple;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::clone;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::cloneWithMesh;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::buildNewTimeReprFromThis;
@@ -164,7 +184,7 @@ namespace ParaMEDMEM
   class DataArrayDouble;
   class MEDCouplingFieldDouble;
 
-  class MEDCOUPLING_EXPORT MEDCouplingMesh : public RefCountObject, public TimeLabel
+  class MEDCouplingMesh : public RefCountObject, public TimeLabel
   {
   public:
     void setName(const char *name) { _name=name; }
@@ -200,6 +220,11 @@ namespace ParaMEDMEM
     static MEDCouplingMesh *mergeMeshes(const MEDCouplingMesh *mesh1, const MEDCouplingMesh *mesh2);
     %extend
        {
+         std::string __str__() const
+         {
+           return self->simpleRepr();
+         }
+
          void renumberCells(PyObject *li, bool check) throw(INTERP_KERNEL::Exception)
          {
            int size;
@@ -242,7 +267,7 @@ namespace ParaMEDMEM
       double getCaracteristicDimension() const;
       void translate(const double *vector);
       void scale(const double *point, double factor);
-      void changeSpaceDimension(int newSpaceDim) throw(INTERP_KERNEL::Exception);
+      void changeSpaceDimension(int newSpaceDim, double dftVal=0.) throw(INTERP_KERNEL::Exception);
       void tryToShareSameCoords(const MEDCouplingPointSet& other, double epsilon) throw(INTERP_KERNEL::Exception);
       virtual void tryToShareSameCoordsPermute(const MEDCouplingPointSet& other, double epsilon) throw(INTERP_KERNEL::Exception) = 0;
       static DataArrayDouble *mergeNodesArray(const MEDCouplingPointSet *m1, const MEDCouplingPointSet *m2);
@@ -264,6 +289,11 @@ namespace ParaMEDMEM
       virtual DataArrayInt *zipCoordsTraducer() = 0;
       %extend 
          {
+           std::string __str__() const
+           {
+             return self->simpleRepr();
+           }
+           
            PyObject *buildNewNumberingFromCommNodesFrmt(const DataArrayInt *comm, const DataArrayInt *commIndex) const
            {
              int newNbOfNodes;
@@ -421,6 +451,11 @@ namespace ParaMEDMEM
     bool isPresenceOfQuadratic() const;
     void convertQuadraticCellsToLinear() throw(INTERP_KERNEL::Exception);
     %extend {
+      std::string __str__() const
+      {
+        return self->simpleRepr();
+      }
+
       int getCellContainingPoint(PyObject *p, double eps) const
       {
         int sz;
@@ -616,6 +651,10 @@ namespace ParaMEDMEM
     static MEDCouplingExtrudedMesh *New(const MEDCouplingUMesh *mesh3D, MEDCouplingUMesh *mesh2D, int cell2DId) throw(INTERP_KERNEL::Exception);
     MEDCouplingUMesh *build3DUnstructuredMesh() const;
     %extend {
+      std::string __str__() const
+      {
+        return self->simpleRepr();
+      }
       PyObject *getMesh2D() const
       {
         MEDCouplingUMesh *ret=self->getMesh2D();
@@ -645,11 +684,22 @@ namespace ParaMEDMEM
                    DataArrayDouble *coordsY=0,
                    DataArrayDouble *coordsZ=0);
     void setCoordsAt(int i, DataArrayDouble *arr) throw(INTERP_KERNEL::Exception);
+    %extend {
+      std::string __str__() const
+      {
+        return self->simpleRepr();
+      }
+    }
   };
 }
 
 %extend ParaMEDMEM::DataArrayDouble
  {
+   std::string __str__() const
+   {
+     return self->repr();
+   }
+
    void setValues(PyObject *li, int nbOfTuples, int nbOfElsPerTuple)
    {
      int sz;
@@ -666,6 +716,11 @@ namespace ParaMEDMEM
 
 %extend ParaMEDMEM::DataArrayInt
  {
+   std::string __str__() const
+   {
+     return self->repr();
+   }
+
    void setValues(PyObject *li, int nbOfTuples, int nbOfElsPerTuple)
    {
      int size;
@@ -780,9 +835,9 @@ namespace ParaMEDMEM
     double getIJK(int cellId, int nodeIdInCell, int compoId) const;
     void setArray(DataArrayDouble *array) throw(INTERP_KERNEL::Exception);
     void setEndArray(DataArrayDouble *array) throw(INTERP_KERNEL::Exception);
-    void setTime(double val, int dt, int it) throw(INTERP_KERNEL::Exception);
-    void setStartTime(double val, int dt, int it) throw(INTERP_KERNEL::Exception);
-    void setEndTime(double val, int dt, int it) throw(INTERP_KERNEL::Exception);
+    void setTime(double val, int iteration, int order) throw(INTERP_KERNEL::Exception);
+    void setStartTime(double val, int iteration, int order) throw(INTERP_KERNEL::Exception);
+    void setEndTime(double val, int iteration, int order) throw(INTERP_KERNEL::Exception);
     DataArrayDouble *getArray() const throw(INTERP_KERNEL::Exception);
     DataArrayDouble *getEndArray() const throw(INTERP_KERNEL::Exception);
     void applyLin(double a, double b, int compoId) throw(INTERP_KERNEL::Exception);
@@ -795,6 +850,17 @@ namespace ParaMEDMEM
     void changeUnderlyingMesh(const MEDCouplingMesh *other, int levOfCheck, double prec) throw(INTERP_KERNEL::Exception);
     void substractInPlaceDM(const MEDCouplingFieldDouble *f, int levOfCheck, double prec) throw(INTERP_KERNEL::Exception);
     bool mergeNodes(double eps) throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *doublyContractedProduct() const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *determinant() const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *eigenValues() const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *eigenVectors() const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *inverse() const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *trace() const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *deviator() const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *magnitude() const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *maxPerTuple() const throw(INTERP_KERNEL::Exception);
+    void changeNbOfComponents(int newNbOfComp, double dftValue=0.) throw(INTERP_KERNEL::Exception);
+    void sortPerTuple(bool asc) throw(INTERP_KERNEL::Exception);
     void applyFunc(int nbOfComp, const char *func) throw(INTERP_KERNEL::Exception);
     void applyFunc(const char *func) throw(INTERP_KERNEL::Exception);
     void applyFuncFast32(const char *func) throw(INTERP_KERNEL::Exception);
@@ -827,6 +893,10 @@ namespace ParaMEDMEM
     MEDCouplingFieldDouble *operator/(const MEDCouplingFieldDouble& other) const throw(INTERP_KERNEL::Exception);
     const MEDCouplingFieldDouble &operator/=(const MEDCouplingFieldDouble& other) throw(INTERP_KERNEL::Exception);
     %extend {
+      std::string __str__() const
+      {
+        return self->simpleRepr();
+      }
       PyObject *getValueOn(PyObject *sl) const throw(INTERP_KERNEL::Exception)
       {
         int sz;

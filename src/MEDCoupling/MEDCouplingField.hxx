@@ -71,6 +71,7 @@ namespace ParaMEDMEM
   protected:
     MEDCouplingField(TypeOfField type);
     MEDCouplingField(const MEDCouplingField& other);
+    MEDCouplingField(MEDCouplingFieldDiscretization *type);
     virtual ~MEDCouplingField();
   protected:
     std::string _name;
