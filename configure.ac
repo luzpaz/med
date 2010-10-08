@@ -332,6 +332,14 @@ if test "$with_interp_kernel_only" != "yes" ; then
         
         echo  
         echo --------------------------------------------- 
+        echo testing ParMETIS 
+        echo ---------------------------------------------
+        echo 
+        parmetis_ok=no 
+        CHECK_PARMETIS dnl parmetis_ok is set to yes by CHECK_PARMETIS
+        
+        echo  
+        echo --------------------------------------------- 
         echo testing SCOTCH 
         echo ---------------------------------------------
         echo scotch_ok=no 
@@ -496,6 +504,7 @@ AM_CONDITIONAL(MED_ENABLE_SSTREAM,  [test "$HAVE_SSTREAM" = yes])
 AM_CONDITIONAL(MED_SWIG_1_3_21,     [test "$SWIG_VERSION" = 1.3.21])
 AM_CONDITIONAL(MED_ENABLE_SPLITTER, [test "$ENABLE_SPLITTER" = yes])
 AM_CONDITIONAL(MED_ENABLE_METIS,    [test "$ENABLE_METIS" = yes])
+AM_CONDITIONAL(MED_ENABLE_PARMETIS, [test "$ENABLE_PARMETIS" = yes])
 AM_CONDITIONAL(MED_ENABLE_SCOTCH,   [test "$ENABLE_SCOTCH" = yes])
 AM_CONDITIONAL(MED_WITHMPI,         [test "$WITHMPI" = yes])
 AM_CONDITIONAL(MED_ENABLE_FVM,      [test "$ENABLE_FVM" = yes])
@@ -525,7 +534,7 @@ optional_vars="mpi_ok fvm_ok cppunit_ok"
 gui_vars=""
 
 if test "x$ENABLE_SPLITTER" = "xyes" ; then
-  splitter_vars="metis_ok scotch_ok libxml_ok"
+  splitter_vars="metis_ok parmetis_ok scotch_ok libxml_ok"
 fi
 
 if test "x$ENABLE_RENUMBER" = "xyes" ; then
