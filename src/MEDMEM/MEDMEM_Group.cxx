@@ -22,7 +22,6 @@
 
 /*
  File Group.cxx
- $Header$
 */
 #include <list>
 

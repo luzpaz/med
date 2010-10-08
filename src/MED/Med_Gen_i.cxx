@@ -24,7 +24,6 @@
 //  File   : Med_Gen_i.cxx
 //  Author : Paul RASCLE, EDF
 //  Module : MED
-//  $Header$
 //
 #include "Med_Gen_i.hxx"
 

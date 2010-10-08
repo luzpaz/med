@@ -22,7 +22,6 @@
 
 /*
  File Coordinate.hxx
- $Header$
 */
 
 #ifndef COORDINATE_HXX

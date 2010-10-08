@@ -22,7 +22,6 @@
 
 /*
  File Group.hxx
- $Header$
 */
 
 #ifndef GROUP_HXX

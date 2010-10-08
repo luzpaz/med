@@ -22,7 +22,6 @@
 
 /*
  File Support.cxx
- $Header$
 */
 
 #include <set>

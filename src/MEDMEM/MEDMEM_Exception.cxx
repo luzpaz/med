@@ -22,7 +22,6 @@
 
 /*
  File MedException.cxx
- $Header$
 */
 
 #include "MEDMEM_Utilities.hxx"

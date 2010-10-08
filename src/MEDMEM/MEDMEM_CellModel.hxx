@@ -22,7 +22,6 @@
 
 /*
  File MEDMEM_CellModel.hxx
- $Header$
 */
 
 #ifndef CELLMODEL_HXX

@@ -22,7 +22,6 @@
 
 /*
   File MEDMEM_Meshing.hxx
-  $Header$
 */
 
 #ifndef MESHING_HXX

@@ -22,7 +22,6 @@
 
 /*
  File MEDMEM_Family.cxx
- $Header$
 */
 
 #include "MEDMEM_Mesh.hxx"

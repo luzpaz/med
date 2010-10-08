@@ -22,7 +22,6 @@
 
 /*
  File MEDMEM_CellModel.cxx
- $Header$
 */
 
 #include "MEDMEM_CellModel.hxx"
