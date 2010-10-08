@@ -287,6 +287,22 @@ void CONNECTIVITY::setConstituent(CONNECTIVITY * Constituent)
   }
 }
 
+/*!
+   Return _constituent of given entity
+*/
+//----------------------------------------------------------//
+const CONNECTIVITY* CONNECTIVITY::getConstituent (const MED_EN::medEntityMesh Entity) const
+                                        throw (MEDEXCEPTION)
+//----------------------------------------------------------//
+{
+  if (Entity == _entity )
+    return this;
+  
+  if (_constituent == NULL)
+    throw MEDEXCEPTION(LOCALIZED("CONNECTIVITY::getConstituent() : Entity not found !"));
+  return _constituent->getConstituent( Entity );
+}
+
 /*! Duplicated Types array in CONNECTIVITY object. */
 //--------------------------------------------------------------------//
 void CONNECTIVITY::setGeometricTypes(const medGeometryElement * Types,
