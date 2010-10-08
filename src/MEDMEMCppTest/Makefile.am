@@ -69,7 +69,8 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_VtkMeshDriver.cxx \
 	MEDMEMTest_nArray.cxx \
 	MEDMEMTest_Utils.hxx \
-	MEDMEMTest_Utils.cxx
+	MEDMEMTest_Utils.cxx \
+	MEDMEMTest_MeshFuse.cxx
 
 libMEDMEMCppTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED2_INCLUDES) $(HDF5_INCLUDES) \
 	-I$(srcdir)/../MEDMEM -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases -I$(srcdir)/../MEDWrapper/V2_1/Core
@@ -82,8 +83,7 @@ if MED_ENABLE_KERNEL
 endif
 
 # Executables targets
-bin_PROGRAMS = \
-	TestMEDMEM \
+bin_PROGRAMS = TestMEDMEM \
 	MEDMEMTest_Array_fault \
 	MEDMEMTest_Connectivity_fault \
 	MEDMEMTest_Coordinate_fault \

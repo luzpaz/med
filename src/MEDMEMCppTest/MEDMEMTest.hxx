@@ -104,6 +104,7 @@ class MEDMEMCPPTEST_EXPORT MEDMEMTest : public CppUnit::TestFixture
   //CPPUNIT_TEST( testmedimport_src /* not in spec */ );
   //60
   CPPUNIT_TEST( testExtractor );
+  CPPUNIT_TEST( testMeshFuse );
   CPPUNIT_TEST( testDesactivateFacesComputation ); // issue 0020411
   CPPUNIT_TEST( testGetVolumeAbs );
   CPPUNIT_TEST( test_remapper4 );
@@ -186,6 +187,7 @@ public:
   //void testmedimport_src() /* not in spec */;
   //60
   void testExtractor();
+  void testMeshFuse();
   void testDesactivateFacesComputation(); // issue 0020411
   void testGetVolumeAbs();
   void test_RemapperP0P0();
