@@ -22,7 +22,6 @@
 
 /*
   File MEDMEM_Meshing.cxx
-  $Header$
 */
 
 #include <string>
@@ -309,7 +308,7 @@ If \a entity is not defined, the method will throw an exception.
 */
 
 void MESHING::setTypes(const MED_EN::medGeometryElement * Types,
-                                                                                        const MED_EN::medEntityMesh entity)
+                       const MED_EN::medEntityMesh        entity)
   throw (MEDEXCEPTION)
 {
   if (entity == MED_NODE)
@@ -318,7 +317,10 @@ void MESHING::setTypes(const MED_EN::medGeometryElement * Types,
   if (_connectivity == NULL)
     throw MEDEXCEPTION(LOCALIZED("MESHING::setTypes : No connectivity defined !"));
 
-  _connectivity->setGeometricTypes(Types,entity) ;
+  if ( entity == MED_EN::MED_CELL && getNumberOfTypes( entity ) > 0 )
+    setMeshDimension( Types[0] / 100 );
+
+   _connectivity->setGeometricTypes(Types,entity) ;
 }
 
 /*!
@@ -417,15 +419,17 @@ meshing.setPolygonsConnectivity(conn_index, conn, nb_poly, MED_CELL)
 
 */
 
-void MESHING::setPolygonsConnectivity     (const int * ConnectivityIndex,
-                                           const int * Connectivity,
-                                           int nbOfPolygons,
-                                           const MED_EN::medEntityMesh Entity)
+void MESHING::setPolygonsConnectivity(const int * ConnectivityIndex,
+                                      const int * Connectivity,
+                                      int nbOfPolygons,
+                                      const MED_EN::medEntityMesh Entity)
   throw (MEDEXCEPTION)
 {
   if (_connectivity == (CONNECTIVITY*)NULL)
     throw MEDEXCEPTION("No connectivity defined !");
   
+  setMeshDimension( Entity == MED_EN::MED_CELL ? 2 : 3 );
+
   _connectivity->setPolygonsConnectivity(MED_NODAL, Entity, Connectivity, ConnectivityIndex,ConnectivityIndex[nbOfPolygons]-1,nbOfPolygons) ;
 }
 
