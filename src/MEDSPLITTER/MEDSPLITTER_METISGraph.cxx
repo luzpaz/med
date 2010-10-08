@@ -81,7 +81,7 @@ void METISGraph::partGraph(int                 ndomain,
       ParMETIS_PartKway( vtxdist, xadj, adjncy, vwgt, adjwgt, &wgtflag,
                          &base, &nparts, options, &edgecut, partition, &comm );
 #else
-      throw MEDEXCEPTION("ParMETIS is not available. Check your products, please.");
+      throw MED_EXCEPTION("ParMETIS is not available. Check your products, please.");
 #endif
     }
     else
