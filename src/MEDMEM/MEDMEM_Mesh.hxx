@@ -200,7 +200,7 @@ public :
   virtual MED_EN::medGeometryElement * getTypesWithPoly(MED_EN::medEntityMesh Entity) const;
   virtual inline const CELLMODEL * getCellsTypes(MED_EN::medEntityMesh Entity) const;
   virtual inline string * getCellTypeNames(MED_EN::medEntityMesh Entity) const;
-  virtual const int * getGlobalNumberingIndex(MED_EN::medEntityMesh Entity) const;
+  virtual inline const int * getGlobalNumberingIndex(MED_EN::medEntityMesh Entity) const;
   virtual inline int getNumberOfElements(MED_EN::medEntityMesh Entity,
                                          MED_EN::medGeometryElement Type) const;
   virtual int getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity,
