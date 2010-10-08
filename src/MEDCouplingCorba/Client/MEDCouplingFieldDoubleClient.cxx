@@ -57,7 +57,6 @@ MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplin
   MEDCouplingFieldDouble *ret=MEDCouplingFieldDouble::New(type,td);
   //2nd CORBA call to retrieves the mesh.
   SALOME_MED::MEDCouplingMeshCorbaInterface_ptr meshPtr=fieldPtr->getMesh();
-  SALOME_MED::MEDCouplingMeshCorbaInterface::_duplicate(meshPtr);
   MEDCouplingMesh *mesh=MEDCouplingMeshClient::New(meshPtr);
   meshPtr->Destroy();
   CORBA::release(meshPtr);
@@ -92,8 +91,6 @@ MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplin
   //
   //notify server that the servant is no more used.
   fieldPtr->Destroy();
-  //decrements the local CORBA pointer.
-  CORBA::release(fieldPtr);
   //
   ret->finishUnserialization(tinyLV,tinyLD,tinyLS);
   //
