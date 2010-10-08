@@ -326,6 +326,8 @@ inline const int * SUPPORT::getNumber(MED_EN::medGeometryElement GeometricType) 
 {
   if (_isOnAllElts)
     throw MEDEXCEPTION("Support::getNumber : Not defined, support is on all entity !") ;
+  if (!_number)
+    throw MEDEXCEPTION("Support::getNumber : Not defined, support is empty !") ;
   if (GeometricType==MED_EN::MED_ALL_ELEMENTS)
     return _number->getValue() ;
   for (int i=0;i<_numberOfGeometricType;i++)
