@@ -20,23 +20,25 @@
 //                    MED files with a partitioning specified 
 //                    by an external tool
 //  File   : medsplitter.cxx
-//  Author : Vincent BERGEAUD (CEA-DEN/DANS/DM2S/SFME/LGLS)
 //  Module : MED
 //
+
+#include "MEDSPLITTER_MESHCollection.hxx"
+#include "MEDSPLITTER_Topology.hxx"
+#include "MEDSPLITTER_ParaDomainSelector.hxx"
+
+#include "MEDMEM_STRING.hxx"
+
+#ifdef HAVE_MPI2
+#include <mpi.h>
+#endif
+
+#include <fstream>
+
 #ifdef BOOST_PROGRAM_OPTIONS_LIB
 #include <boost/program_options.hpp>
 namespace po=boost::program_options;
 #endif
-
-#include <string>
-#include <fstream>
-
-#include "MEDMEM_define.hxx"
-#include "MEDMEM_Mesh.hxx"
-#include "MEDMEM_Family.hxx"
-#include "MEDSPLITTER_Graph.hxx"
-#include "MEDSPLITTER_MESHCollection.hxx"
-#include "MEDSPLITTER_Topology.hxx"
 
 using namespace std;
 
@@ -44,21 +46,22 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-#ifndef ENABLE_METIS
-#ifndef ENABLE_SCOTCH
-  cout << "Sorry, no one split method is available. Please, compile with METIS or SCOTCH."<<endl;
+#ifndef ENABLE_PARMETIS
+#ifndef ENABLE_PTSCOTCH
+  cout << "Sorry, no one split method is available. Please, compile with ParMETIS or PT-SCOTCH."<<endl;
   return 1;
 #endif
 #endif
 
   // Defining options
   // by parsing the command line
-  bool mesh_only = false;
-  bool is_sequential = true;
+  //bool mesh_only = false;
+  //bool is_sequential = true;
   bool xml_output_master=true;
   bool creates_boundary_faces=false;  
-  bool split_families=false;
+  bool split_family=false;
   bool empty_groups=false;
+  bool mesure_memory=false;
 
   string input;
   string output;
@@ -73,13 +76,13 @@ int main(int argc, char** argv)
   po::options_description desc("Available options");
   desc.add_options()
     ("help","produces this help message")
-    ("mesh-only","prevents the splitter from creating the fields contained in the original file(s)")
-    ("distributed","specifies that the input file is distributed")
+    //("mesh-only","prevents the splitter from creating the fields contained in the original file(s)")
+    //("distributed","specifies that the input file is distributed")
     ("input-file",po::value<string>(),"name of the input MED file")
     ("output-file",po::value<string>(),"name of the resulting file")
-    ("meshname",po::value<string>(),"name of the input mesh")
-#ifdef ENABLE_METIS
-#ifdef ENABLE_SCOTCH
+    //("meshname",po::value<string>(),"name of the input mesh")
+#ifdef ENABLE_PARMETIS
+#ifdef ENABLE_PTSCOTCH
     ("split-method",po::value<string>(&library)->default_value("metis"),"name of the splitting library (metis,scotch)")
 #endif
 #endif
@@ -87,7 +90,8 @@ int main(int argc, char** argv)
     ("plain-master","creates a plain masterfile instead of an XML file")
     ("creates-boundary-faces","creates the necessary faces so that faces joints are created in the output files")
     ("family-splitting","preserves the family names instead of focusing on the groups")
-    ("empty-groups","creates empty groups in zones that do not contain a group from the original domain");
+    ("empty-groups","creates empty groups in zones that do not contain a group from the original domain")
+    ("dump-cpu-memory","dumps passed CPU time and maximal increase of used memory");
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc,argv,desc),vm);
@@ -112,23 +116,23 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  if (!vm.count("distributed") && !vm.count("meshname") )
-  {
-    cout << "MEDSPLITTER : for a serial MED file, mesh name must be selected with --meshname=..."<<endl;
-    return 1;
-  }
+//   if (!vm.count("distributed") && !vm.count("meshname") )
+//   {
+//     cout << "MEDSPLITTER : for a serial MED file, mesh name must be selected with --meshname=..."<<endl;
+//     return 1;
+//   }
 
   input = vm["input-file"].as<string>();
   output = vm["output-file"].as<string>();
 
-  if (vm.count("mesh-only"))
-    mesh_only=true;
+//   if (vm.count("mesh-only"))
+//     mesh_only=true;
 
-  if (vm.count("distributed"))
-    is_sequential=false;
+//   if (vm.count("distributed"))
+//     is_sequential=false;
 
-  if (is_sequential)
-    meshname = vm["meshname"].as<string>();
+//   if (is_sequential)
+//     meshname = vm["meshname"].as<string>();
 
   if (vm.count("plain-master"))
     xml_output_master=false;
@@ -137,33 +141,36 @@ int main(int argc, char** argv)
     creates_boundary_faces=true;
 
   if (vm.count("split-families"))
-    split_families=true;
+    split_family=true;
 
   if (vm.count("empty-groups"))
     empty_groups=true;
+
+  if (vm.count("dump-cpu-memory"))
+    mesure_memory=true;
 
 #else // BOOST_PROGRAM_OPTIONS_LIB
 
   // Primitive parsing of command-line options
 
   string desc ("Available options:\n"
-               "\t--help                 : produces this help message\n"
-               "\t--mesh-only            : do not create the fields contained in the original file(s)\n"
-               "\t--distributed          : specifies that the input file is distributed\n"
-               "\t--input-file=<string>  : name of the input MED file\n"
-               "\t--output-file=<string> : name of the resulting file\n"
-               "\t--meshname=<string>    : name of the input mesh (not used with --distributed option)\n"
-               "\t--ndomains=<number>    : number of subdomains in the output file, default is 1\n"
-#ifdef ENABLE_METIS
-#ifdef ENABLE_SCOTCH
-               "\t--split-method=<string>: name of the splitting library (metis/scotch), default is metis\n"
+               "\t--help                  : produces this help message\n"
+               //"\t--mesh-only            : do not create the fields contained in the original file(s)\n"
+               //"\t--distributed          : specifies that the input file is distributed\n"
+               "\t--input-file=<string>   : name of the input MED file\n"
+               "\t--output-file=<string>  : name of the resulting file\n"
+               //"\t--meshname=<string>    : name of the input mesh (not used with --distributed option)\n"
+               "\t--ndomains=<number>     : number of subdomains in the output file, default is 1\n"
+#ifdef ENABLE_PARMETIS
+#ifdef ENABLE_PTSCOTCH
+               "\t--split-method=<string> : name of the splitting library (metis/scotch), default is metis\n"
 #endif
 #endif
-               "\t--plain-master         : creates a plain masterfile instead of an XML file\n"
+               "\t--plain-master          : creates a plain masterfile instead of an XML file\n"
                "\t--creates-boundary-faces: creates the necessary faces so that faces joints are created in the output files\n"
-               "\t--family-splitting     : preserves the family names instead of focusing on the groups\n"
-               "\t--empty-groups         : creates empty groups in zones that do not contain a group from the original domain"
-                );
+               "\t--family-splitting      : preserves the family names instead of focusing on the groups\n"
+               "\t--dump-cpu-memory       : dumps passed CPU time and maximal increase of used memory\n"
+               );
 
   if (argc < 4) {
     cout << desc.c_str() << endl;
@@ -176,7 +183,7 @@ int main(int argc, char** argv)
       return 1;
     }
 
-    if (strncmp(argv[i],"--m",3) == 0) {
+/*    if (strncmp(argv[i],"--m",3) == 0) {
       if (strcmp(argv[i],"--mesh-only") == 0) {
         mesh_only = true;
         cout << "\tmesh-only = " << mesh_only << endl; // tmp
@@ -190,7 +197,7 @@ int main(int argc, char** argv)
       is_sequential = false;
       cout << "\tis_sequential = " << is_sequential << endl; // tmp
     }
-    else if (strncmp(argv[i],"--i",3) == 0) {
+    else */if (strncmp(argv[i],"--i",3) == 0) {
       if (strlen(argv[i]) > 13) { // "--input-file="
         input = (argv[i] + 13);
         cout << "\tinput-file = " << input << endl; // tmp
@@ -209,7 +216,7 @@ int main(int argc, char** argv)
       }
     }
     else if (strncmp(argv[i],"--f",3) == 0) { //"--family-splitting"
-      split_families=true;
+      split_family=true;
       cout << "\tfamily-splitting true" << endl; // tmp
     }
     else if (strncmp(argv[i],"--n",3) == 0) {
@@ -230,17 +237,21 @@ int main(int argc, char** argv)
       empty_groups = true;
       cout << "\tempty_groups = true" << endl; // tmp
     }
+    else if (strncmp(argv[i],"--d",3) == 0) { // "--dump-cpu-memory"
+      mesure_memory = true;
+      cout << "\tdump-cpu-memory = true" << endl; // tmp
+    }
     else {
       cout << desc.c_str() << endl;
       return 1;
     }
   }
 
-  if (is_sequential && meshname.empty()) {
-    cout << "Mesh name must be given for sequential(not distributed) input file." << endl;
-    cout << desc << endl;
-    return 1;
-  }
+//   if (is_sequential && meshname.empty()) {
+//     cout << "Mesh name must be given for sequential(not distributed) input file." << endl;
+//     cout << desc << endl;
+//     return 1;
+//   }
 
 #endif // BOOST_PROGRAM_OPTIONS_LIB
 
@@ -252,25 +263,24 @@ int main(int argc, char** argv)
   { 
     cout << "MEDSPLITTER : output-file directory does not exist or is in read-only access" << endl;
     return 1;
-  };
+  }
   //deletes test file
   remove(outputtest.c_str());
 
   // Beginning of the computation
 
-  // Loading the mesh collection
-  MEDSPLITTER::MESHCollection* collection;
-  cout << "MEDSPLITTER - reading input files "<<endl;
-  if (is_sequential)
-    collection = new MEDSPLITTER::MESHCollection(input,meshname);
-  else
-    collection = new MEDSPLITTER::MESHCollection(input);
+  MPI_Init(&argc,&argv);
+  
 
-  cout << "MEDSPLITTER - computing partition "<<endl;
+  // Loading the mesh collection
+  cout << "MEDSPLITTER - reading input files "<<endl;
+  MEDSPLITTER::ParaDomainSelector parallelizer(mesure_memory);
+  MEDSPLITTER::MESHCollection collection(input,parallelizer);
 
   // Creating the graph and partitioning it   
-#ifdef ENABLE_METIS
-#ifndef ENABLE_SCOTCH
+  cout << "MEDSPLITTER - computing partition "<<endl;
+#ifdef ENABLE_PARMETIS
+#ifndef ENABLE_PTSCOTCH
   library = "metis";
 #endif
 #else
@@ -278,21 +288,17 @@ int main(int argc, char** argv)
 #endif
   cout << "\tsplit-method = " << library << endl; // tmp
 
-  MEDSPLITTER::Topology* new_topo;
+  auto_ptr< MEDSPLITTER::Topology > new_topo;
   if (library == "metis")
-    new_topo = collection->createPartition(ndomains,MEDSPLITTER::Graph::METIS);
+    new_topo.reset( collection.createPartition(ndomains,MEDSPLITTER::Graph::METIS));
   else
-    new_topo = collection->createPartition(ndomains,MEDSPLITTER::Graph::SCOTCH);
-
-  cout << "MEDSPLITTER - creating new meshes"<<endl;
+    new_topo.reset( collection.createPartition(ndomains,MEDSPLITTER::Graph::SCOTCH));
+  parallelizer.evaluateMemory();
 
   // Creating a new mesh collection from the partitioning
-  MEDSPLITTER::MESHCollection new_collection(*collection, new_topo, split_families, empty_groups);
-  if (mesh_only)
-  {
-    delete collection;
-    collection=0;
-  }
+  cout << "MEDSPLITTER - creating new meshes"<<endl;
+  MEDSPLITTER::MESHCollection new_collection(collection,new_topo.get(),split_family,empty_groups);
+  parallelizer.evaluateMemory();
 
   if (!xml_output_master)
     new_collection.setDriverType(MEDSPLITTER::MedAscii);
@@ -302,14 +308,19 @@ int main(int argc, char** argv)
   cout << "MEDSPLITTER - writing output files "<<endl;
   new_collection.write(output);
 
+  if ( mesure_memory )
+    if ( parallelizer.isOnDifferentHosts() || parallelizer.rank()==0 )
+    {
+      MEDMEM::STRING text("proc ");
+      text << parallelizer.rank() << ": elapsed time = " << parallelizer.getPassedTime()
+           << ", max memory usage = " << parallelizer.evaluateMemory() << " KB";
+      cout << text << endl;
+    }
   // Casting the fields on the new collection
-  if (!mesh_only)
-    new_collection.castAllFields(*collection);
+//   if (!mesh_only)
+//     new_collection.castAllFields(*collection);
 
-
-  // Cleaning memory
-  delete collection;
-  delete new_topo;
+  MPI_Finalize();
 
   return 0;
 }

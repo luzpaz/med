@@ -21,6 +21,7 @@
 #define MEDSPLITTER_API_HXX_
 
 #include "MEDSPLITTER.hxx"
+
 MEDSPLITTER_EXPORT
 extern "C" int medsplitter(const char* inputfilename,
                            const char* mesh,
@@ -33,4 +34,13 @@ extern "C" int medsplitter(const char* inputfilename,
                            int createboundaryfaces,
                            int familysplitting,
                            int emptygroups);
+
+MEDSPLITTER_EXPORT
+extern "C" int medsplitter_para(const char* inputfilename, 
+                                const char* outputfilename,  
+                                const int   nprocs,
+                                const int   method,
+                                const       bool create_boundary_faces,
+                                const       bool family_splitting);
+
 #endif

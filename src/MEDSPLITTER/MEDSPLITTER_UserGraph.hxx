@@ -16,11 +16,11 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-
 #ifndef MEDSPLITTER_USERGRAPH_HXX_
 #define MEDSPLITTER_USERGRAPH_HXX_
 
 #include "MEDSPLITTER.hxx"
+#include "MEDSPLITTER_Graph.hxx"
 
 namespace MEDSPLITTER
 {
@@ -29,7 +29,7 @@ namespace MEDSPLITTER
   public:
     UserGraph(MEDMEM::MEDSKYLINEARRAY*, const int*, int);
     virtual ~UserGraph();
-    void partGraph(int, const string& options="");
+    void partGraph(int, const string& options="", ParaDomainSelector* sel=0);
   };
 }
 

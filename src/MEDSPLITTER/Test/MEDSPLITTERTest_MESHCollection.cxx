@@ -297,14 +297,14 @@ void MEDSPLITTERTest::testMESHCollection_square()
        
   //testing distant domains
     
-  char desc1[MED_TAILLE_DESC];
-  char maa_dist1[MED_TAILLE_NOM], jn1[MED_TAILLE_NOM];
-  char desc2[MED_TAILLE_DESC], maa_dist2[MED_TAILLE_NOM], jn2[MED_TAILLE_NOM];
+  char desc1[MED_TAILLE_DESC+1];
+  char maa_dist1[MED_TAILLE_NOM+1], jn1[MED_TAILLE_NOM+1];
+  char desc2[MED_TAILLE_DESC+1], maa_dist2[MED_TAILLE_NOM+1], jn2[MED_TAILLE_NOM+1];
   int dom1, dom2;
   med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
   med_2_3::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
-        CPPUNIT_ASSERT(strcmp(jn1,"joint_2")==0);
-        CPPUNIT_ASSERT(strcmp(jn2,"joint_1")==0);
+  CPPUNIT_ASSERT(strcmp(jn1,"joint_2")==0);
+  CPPUNIT_ASSERT(strcmp(jn2,"joint_1")==0);
   CPPUNIT_ASSERT_EQUAL(dom1,1);
   CPPUNIT_ASSERT_EQUAL(dom2,0);
   
@@ -464,9 +464,9 @@ void MEDSPLITTERTest::testMESHCollection_square_with_faces()
        
   //testing distant domains
     
-  char desc1[MED_TAILLE_DESC];
-  char maa_dist1[MED_TAILLE_NOM], jn1[MED_TAILLE_NOM];
-  char desc2[MED_TAILLE_DESC], maa_dist2[MED_TAILLE_NOM], jn2[MED_TAILLE_NOM];
+  char desc1[MED_TAILLE_DESC+1];
+  char maa_dist1[MED_TAILLE_NOM+1], jn1[MED_TAILLE_NOM+1];
+  char desc2[MED_TAILLE_DESC+1], maa_dist2[MED_TAILLE_NOM+1], jn2[MED_TAILLE_NOM+1];
   int dom1, dom2;
   med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
   med_2_3::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
@@ -480,6 +480,7 @@ void MEDSPLITTERTest::testMESHCollection_square_with_faces()
   med_2_3::med_geometrie_element typ_geo_dist= med_2_3::MED_POINT1;
     
   int n1 =med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  CPPUNIT_ASSERT_EQUAL(3,n1);
   med_2_3::med_int* tab = new med_2_3::med_int[2*n1];
    
   med_2_3::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
@@ -770,10 +771,10 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
 
   //testing distant domains
 
-  char desc1[MED_TAILLE_DESC];
-  char maa_dist1[MED_TAILLE_NOM], jn1[MED_TAILLE_NOM];
+  char desc1[MED_TAILLE_DESC+1];
+  char maa_dist1[MED_TAILLE_NOM+1], jn1[MED_TAILLE_NOM+1];
   char desc2[MED_TAILLE_DESC];
-  char maa_dist2[MED_TAILLE_NOM], jn2[MED_TAILLE_NOM];
+  char maa_dist2[MED_TAILLE_NOM+1], jn2[MED_TAILLE_NOM+1];
   //int dom1, dom2;
   med_2_3::med_int dom1, dom2;
   med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
@@ -788,6 +789,7 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
   med_2_3::med_geometrie_element typ_geo_dist= med_2_3::MED_POINT1;
 
   int n1 = med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  CPPUNIT_ASSERT_EQUAL(5,n1);
   med_2_3::med_int* tab = new med_2_3::med_int[2*n1];
 
   med_2_3::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
