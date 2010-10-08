@@ -40,6 +40,14 @@ if test "$WITHOPENMPI" = yes; then
   AC_CHECK_HEADER(mpi.h,WITHOPENMPI="yes",WITHOPENMPI="no")
   CPPFLAGS="$CPPFLAGS_old"
 
+  if test "$WITHOPENMPI" = "yes";then
+    LDFLAGS_old="$LDFLAGS"
+    LDFLAGS="$MPI_LIBS $LDFLAGS"
+    AC_CHECK_LIB(mpi,MPI_Init,WITHOPENMPI="yes",WITHOPENMPI="no")
+    AC_CHECK_LIB(mpi,MPI_Publish_name,WITHMPI2="yes",WITHMPI2="no")
+    LDFLAGS="$LDFLAGS_old"
+  fi
+
   AC_MSG_CHECKING(for openmpi)
   if test "$WITHOPENMPI" = "yes";then
      mpi_ok=yes
