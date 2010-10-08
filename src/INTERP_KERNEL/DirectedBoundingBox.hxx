@@ -92,7 +92,7 @@ namespace INTERP_KERNEL
 
   inline bool DirectedBoundingBox::isLocalOut(const double* pLoc) const
     {
-      for ( int i = 0; i < _dim; ++i )
+      for ( unsigned i = 0; i < _dim; ++i )
         if ( pLoc[i] < _minmax[i*2] || pLoc[i] > _minmax[i*2+1] )
           return true;
       return false;
@@ -106,10 +106,10 @@ namespace INTERP_KERNEL
 
   inline void DirectedBoundingBox::addPointToBox(const double* coord)
   {
-    for ( int i = 0; i < _dim; ++i )
+    for ( unsigned i = 0; i < _dim; ++i )
       {
         double c = 0;
-        for ( int j = 0; j < _dim; ++j ) c += coord[j]*_axes[i*_dim+j];
+        for ( unsigned j = 0; j < _dim; ++j ) c += coord[j]*_axes[i*_dim+j];
         if ( c < _minmax[i*2] )   _minmax[i*2] = c;
         if ( c > _minmax[i*2+1] ) _minmax[i*2+1] = c;
       }

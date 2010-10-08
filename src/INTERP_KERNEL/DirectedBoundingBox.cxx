@@ -237,9 +237,9 @@ namespace INTERP_KERNEL
     if ( dim > 1 )
       {
         for ( coord = pts; coord < coordEnd; )
-          for ( int i = 0; i < dim; ++i )
+          for ( unsigned i = 0; i < dim; ++i )
             gc[i] += *coord++;
-        for ( int j = 0; j < dim; ++j )
+        for ( unsigned j = 0; j < dim; ++j )
           gc[j] /= numPts;
 
       }
@@ -309,9 +309,9 @@ namespace INTERP_KERNEL
     if ( dim > 1 )
       {
         for ( unsigned i = 0; i < numPts; ++i )
-          for ( int j = 0; j < dim; ++j )
+          for ( unsigned j = 0; j < dim; ++j )
             gc[j] += pts[i][j];
-        for ( int j = 0; j < dim; ++j )
+        for ( unsigned j = 0; j < dim; ++j )
           gc[j] /= numPts;
       }
 
@@ -568,7 +568,7 @@ namespace INTERP_KERNEL
                                        const double*        minmax) const
   {
     int iC, nbCorners = 1;
-    for ( int i=0;i<_dim;++i ) nbCorners *= 2;
+    for ( unsigned i=0;i<_dim;++i ) nbCorners *= 2;
     corners.resize( nbCorners * _dim );
     // each coordinate is filled with either min or max, nbSwap is number of corners
     // after which min and max swap
@@ -657,7 +657,7 @@ namespace INTERP_KERNEL
       for ( int iC = 0, nC = cornersThis.size()/_dim; iC < nC; ++iC)
         {
           fromLocalCS( &cornersThis[iC*_dim], globCorner );
-          for ( int i = 0; i < _dim; ++i )
+          for ( unsigned i = 0; i < _dim; ++i )
             {
               if ( globCorner[i] < mmBox._minmax[i*2] )   mmBox._minmax[i*2] = globCorner[i];
               if ( globCorner[i] > mmBox._minmax[i*2+1] ) mmBox._minmax[i*2+1] = globCorner[i];
@@ -710,7 +710,7 @@ namespace INTERP_KERNEL
       data.insert( data.end(), &_axes[0], &_axes[0] + _axes.size());
       data.insert( data.end(), &_minmax[0], &_minmax[0] + _minmax.size());
     }
-    if ( data.size() < dataSize( _dim ))
+    if ( int(data.size()) < dataSize( _dim ))
       data.resize( dataSize( _dim ), 0 );
     return data;
   }

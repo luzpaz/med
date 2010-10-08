@@ -60,7 +60,7 @@ namespace INTERP_KERNEL
   {
     std::vector<typename BASE_INTERSECTOR::TDualSegment> segmentsT;
     BASE_INTERSECTOR::getDualSegments( icellT, BASE_INTERSECTOR::_meshT, segmentsT);
-    for ( int t = 0; t < segmentsT.size(); ++t )
+    for ( unsigned t = 0; t < segmentsT.size(); ++t )
       {
         typename MyMatrix::value_type& resRow = res[ OTT<ConnType,numPol>::ind2C( segmentsT[t]._nodeId )];
         for(typename std::vector<ConnType>::const_iterator

@@ -171,8 +171,7 @@ const char WHITE_SPACES[]=" \n";
  */
 MEDLoader::MEDConnOfOneElemType::MEDConnOfOneElemType(INTERP_KERNEL::NormalizedCellType type, int *conn, int *index, int *fam, int lgth, int connLgth):_lgth(lgth),_fam(fam),
                                                                                                                                                        _conn(conn),_index(index),
-                                                                                                                                                       _global(0),_type(type),
-                                                                                                                                                       _conn_lgth(connLgth)
+                                                                                                                                                       _global(0),_conn_lgth(connLgth), _type(type)
 {
 }
 
