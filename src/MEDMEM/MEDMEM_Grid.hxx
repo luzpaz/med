@@ -432,7 +432,7 @@ inline int GRID::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGe
         (_iArrayLength-1)*(_jArrayLength  )*(_kArrayLength-1)+
         (_iArrayLength  )*(_jArrayLength-1)*(_kArrayLength-1);
 
-    else if (entity==MED_EN::MED_EDGE && (Type==MED_EN::MED_SEG2 || Type==MED_EN::MED_ALL_ELEMENTS))
+    else if (entity==MED_EN::MED_EDGE && (Type==MED_EN::MED_SEG2 || Type==MED_EN::MED_ALL_ELEMENTS) && _spaceDimension>1)
       if ( _spaceDimension==2)
         numberOfElements=_iArrayLength*(_jArrayLength-1) + (_iArrayLength-1)*_jArrayLength;
       else if ( _spaceDimension==1)
@@ -486,11 +486,12 @@ inline bool GRID::existConnectivity(MED_EN::medConnectivity connectivityType, ME
  */
 inline MED_EN::medGeometryElement GRID::getElementType(MED_EN::medEntityMesh Entity,int Number) const
 {
-  fillConnectivity();
+  return getTypes(Entity)[0];
+//   fillConnectivity();
 
-  if (_connectivity==(CONNECTIVITY*)NULL)
-    throw MEDEXCEPTION("GRID::getElementType(medEntityMesh,int) : no connectivity defined !");
-  return _connectivity->getElementType(Entity,Number);
+//   if (_connectivity==(CONNECTIVITY*)NULL)
+//     throw MEDEXCEPTION("GRID::getElementType(medEntityMesh,int) : no connectivity defined !");
+//   return _connectivity->getElementType(Entity,Number);
 }
 
 inline MED_EN::medGeometryElement GRID::getElementTypeWithPoly(MED_EN::medEntityMesh Entity,int Number) const
