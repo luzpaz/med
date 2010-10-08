@@ -2899,7 +2899,7 @@ void MED_MESH_WRONLY_DRIVER22::groupFamilyConverter(const vector <GROUP*>& myGro
                         }
                 }
                 //otherwise getNumber() gives the appropriate number of items
-                else
+                else if ( myGroups[igroup]->getNumberOfElements() > 0 )
                 {
                         const int*Number = myGroups[igroup]->getNumber(MED_ALL_ELEMENTS);
                         for (int ielem = 0; ielem< myGroups[igroup]->getNumberOfElements(MED_ALL_ELEMENTS); ielem++)
@@ -3363,7 +3363,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
         if ((*myFamilies)[i]->isOnAllElements())
           for (int ii=0; ii<numberOfFamilyElements; ii++)
             familyArray[ii]=familyNumber;
-        else {
+        else if ( numberOfFamilyElements ) {
           const int * myFamilyElements = (*myFamilies)[i]->getNumber(MED_ALL_ELEMENTS);
           for (int ii=0;ii<numberOfFamilyElements;ii++)
             familyArray[myFamilyElements[ii]-1]=familyNumber;
