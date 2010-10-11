@@ -63,21 +63,6 @@ class MEDMEM_EXPORT GRID: public GMESH
   // 3. is _gridType a true value or just a default one
   bool              _is_default_gridType;
 
-  //-----------------------//
-  //   Protected Methods
-  //-----------------------//
-
-  CONNECTIVITY * makeConnectivity (const MED_EN::medEntityMesh      Entity,
-                                   const MED_EN::medGeometryElement Geometry,
-                                   const int NbEntities, int NbNodes, int nbMeshNodes,
-                                   const int * NodeNumbers) const ;
-  // creates nodal connectivity
-
-  void fillCoordinates() const ;
-  void fillConnectivity() const ;
-  // fill _coordinates and _connectivity of MESH if not yet done
-
-  
   // Suppose a READ Driver to do the following except filling _[ijk]Array's
   // 1) fill GMESH fields:
   //    * _name
