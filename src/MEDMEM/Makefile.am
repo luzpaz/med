@@ -119,7 +119,6 @@ MEDMEM_VtkMeshDriver.cxx \
 MEDMEM_Grid.cxx \
 MEDMEM_MedVersion.cxx \
 MEDMEM_medimport_src.cxx \
-MEDMEM_PolyhedronArray.cxx \
 MEDMEM_TopLevel.cxx \
 MEDMEM_ConnectZone.cxx \
 MEDMEM_EnsightMedDriver.cxx \
