@@ -207,7 +207,7 @@ void MEDMEMTest::testExtractor()
   inField->setMEDComponentsUnits( &str );
 
   vector<double> value( NumberOfElements[0] );
-  for ( int i = 0; i < value.size(); ++i )
+  for ( unsigned i = 0; i < value.size(); ++i )
     value[i] = double ( i % 10 );
   inField->setValue( &value[0] );
 
@@ -334,7 +334,7 @@ void MEDMEMTest::testExtractor()
   inField->setMEDComponentsUnits( &str );
 
   value.resize( NumberOfElements[0] );
-  for ( int i = 0; i < value.size(); ++i )
+  for ( unsigned i = 0; i < value.size(); ++i )
     value[i] = double (i+1);
   inField->setValue( &value[0] );
   // store input field

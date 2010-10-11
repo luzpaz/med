@@ -111,7 +111,7 @@ void VTK_MED_DRIVER::write() const
   {
     GMESH * myMesh = _fields->at(i)->getSupport()->getMesh();
     writeMesh(myMesh) ;
-    for (int j=0; j<_fields->size(); j++)
+    for (unsigned j=0; j<_fields->size(); j++)
     {
       const FIELD_ * myField = _fields->at(j);
       if( myMesh == myField->getSupport()->getMesh() )
@@ -131,7 +131,7 @@ void VTK_MED_DRIVER::write() const
     }
 
     // second : field on cell
-    for (int j=0; j<_fields->size(); j++)
+    for (unsigned j=0; j<_fields->size(); j++)
     {
       const FIELD_ * myField = _fields->at(j);
       if( myMesh == myField->getSupport()->getMesh() )

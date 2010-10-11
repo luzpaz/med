@@ -88,12 +88,13 @@ void MESH::init()
   _arePresentOptionnalNodesNumbers = 0;
 
   END_OF_MED(LOC);
-};
+}
 
 /*! Create an empty MESH. */
-MESH::MESH():GMESH(),_coordinate(NULL),_connectivity(NULL) {
+MESH::MESH():GMESH(),_coordinate(NULL),_connectivity(NULL)
+{
   init();
-};
+}
 
 /*! \if MEDMEM_ug
   \addtogroup MESH_constructors
@@ -220,7 +221,7 @@ MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string
   }
 
   END_OF_MED(LOC);
-};
+}
 /*!\if MEDMEM_ug
   @}
 \endif

@@ -127,7 +127,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
   _CaseFileDriver caseFile( getCaseFileName(), this );
 
   map< const GMESH*, vector< const FIELD_* > > mesh2fields;
-  for (int i = 0; i < _fields.size(); ++i )
+  for (unsigned i = 0; i < _fields.size(); ++i )
     mesh2fields[ _fields[i]->getSupport()->getMesh() ].push_back( _fields[i] );
 
   // Create drivers for all meshes and fields
@@ -147,7 +147,7 @@ void ENSIGHT_MED_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
 
     // all fields on this mesh
     const vector< const FIELD_*> & fields = m_ff->second;
-    for (int j=0; j<fields.size(); j++)
+    for (unsigned j=0; j<fields.size(); j++)
     {
       fieldDriver = new ENSIGHT_FIELD_WRONLY_DRIVER( _fileName, fields[j] );
       caseFile.addField( fieldDriver );
@@ -214,7 +214,7 @@ void ENSIGHT_MED_RDONLY_DRIVER::read()
 
   if ( _isFileStructRead )
   {
-    for ( int i = 0; i < _fields->size(); ++i )
+    for ( unsigned i = 0; i < _fields->size(); ++i )
     {
       GMESH* mesh = _fields->at(i)->getSupport()->getMesh();
       if ( mesh->getNumberOfNodes() < 1 )

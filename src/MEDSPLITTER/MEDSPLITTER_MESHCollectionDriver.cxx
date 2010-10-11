@@ -121,7 +121,7 @@ void MESHCollectionDriver::readFileStruct(vector <string>&  field_names,vector<i
   for (int ifield = 0; ifield < nb_fields; ifield++)
   {
     MEDMEM::VEC_DT_IT_ dtit=med_struct.getFieldIteration(names[ifield]);
-    for (int i = 0; i < dtit.size(); i++)
+    for (unsigned i = 0; i < dtit.size(); i++)
     {
       field_names.push_back(names[ifield]);
       iternumber.push_back(dtit[i].dt);
@@ -298,7 +298,7 @@ void MESHCollectionDriver::writeSubdomain(int idomain, int nbdomains, char* dist
   int index_joint=0;
 
 
-  for (int icz=0; icz<(m_collection->getCZ()).size(); icz++)
+  for (unsigned icz=0; icz<(m_collection->getCZ()).size(); icz++)
   {
     if ((m_collection->getCZ())[icz]->getLocalDomainNumber()==idomain)
     {

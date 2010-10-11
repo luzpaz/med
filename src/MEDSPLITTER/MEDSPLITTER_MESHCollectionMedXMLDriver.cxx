@@ -305,7 +305,7 @@ void MESHCollectionMedXMLDriver::write(char* filename)
         //Splitting tag
         node=xmlNewChild(root_node,0,BAD_CAST "splitting",0);
         node2=xmlNewChild(node,0,BAD_CAST "subdomain",0);
-        sprintf(buff, "%d", m_collection->getMesh().size());
+        sprintf(buff, "%d", (int)m_collection->getMesh().size());
         xmlNewProp(node2, BAD_CAST "number", BAD_CAST buff);
         node2=xmlNewChild(node,0,BAD_CAST "global_numbering",0);
         xmlNewProp(node2, BAD_CAST "present", BAD_CAST "yes");

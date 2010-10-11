@@ -70,7 +70,7 @@ int main (int argc, char ** argv) {
     if ( !fields.empty() )
     {
       set<GMESH*> uniqueMeshes;
-      for ( int i = 0; i < fields.size(); ++i )
+      for ( unsigned i = 0; i < fields.size(); ++i )
         uniqueMeshes.insert( fields[i]->getSupport()->getMesh() );
       meshes.assign( uniqueMeshes.begin(), uniqueMeshes.end() );
     }
@@ -94,16 +94,16 @@ int main (int argc, char ** argv) {
 
     // Write
 
-    for ( int i = 0; i < meshes.size(); ++i )
+    for ( unsigned i = 0; i < meshes.size(); ++i )
     {
       meshes[i]->write(MED_DRIVER,filenameOUT);
     }
-    for ( int i = 0; i < fields.size(); ++i )
+    for ( unsigned i = 0; i < fields.size(); ++i )
     {
       fields[i]->write(MED_DRIVER,filenameOUT);
       fields[i]->removeReference();
     }
-    for ( int i = 0; i < meshes.size(); ++i )
+    for ( unsigned i = 0; i < meshes.size(); ++i )
       meshes[i]->removeReference();
   }
   else if ( argc == 4 && strncmp(argv[3], "I", 1 )==0 )
@@ -133,7 +133,7 @@ int main (int argc, char ** argv) {
     mesh->write(MED_DRIVER, filenameOUT );
 
     // read-write fields
-    for ( int i = 0; i < fields.size(); ++i )
+    for ( unsigned i = 0; i < fields.size(); ++i )
     {
       for ( int timeStep = 1; ; ++timeStep )
       {

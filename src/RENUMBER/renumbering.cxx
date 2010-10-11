@@ -302,10 +302,10 @@ int main (int argc, char** argv)
   cout.flush();
   bool exist_type;
   vector<string> field_names = med_struct.getFieldNames();
-  for(int ifield=0;ifield<field_names.size();++ifield)
+  for(unsigned ifield=0;ifield<field_names.size();++ifield)
     {
       VEC_DT_IT_ dtit = med_struct.getFieldIteration( field_names[ifield]);
-      for ( int i = 0; i < dtit.size(); ++i )
+      for ( unsigned i = 0; i < dtit.size(); ++i )
         {
           exist_type=false;
           FIELD<double> myField(MED_DRIVER,filename_in,field_names[ifield],dtit[i].dt,dtit[i].it);

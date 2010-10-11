@@ -224,7 +224,7 @@ typedef FIELD <int   , NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
 %define TYPEMAP_OUTPUT_ARRAY(arrayvar, size, type_converter, method)
 {
   PyObject *py_list = PyList_New(size);
-  for (int i=0; i < size; i++)
+  for (int i=0; i < int(size); i++)
     {
       int err = PyList_SetItem(py_list, i, type_converter( arrayvar[ i ]));
       if(err)
@@ -1641,7 +1641,7 @@ class MEDFILEBROWSER
       {
         VEC_DT_IT_ vec_dtit = self->getFieldIteration (fieldName);
         PyObject *py_list = PyList_New(vec_dtit.size());
-        for (int i=0; i < vec_dtit.size(); i++)
+        for (unsigned i=0; i < vec_dtit.size(); i++)
         {
           DT_IT_* dtit = new DT_IT_(vec_dtit[i]);
           PyObject * pyDTIT= SWIG_NewPointerObj((void *) dtit, $descriptor(DT_IT_*), 1);
@@ -1763,7 +1763,7 @@ public :
 
       PyObject* py_list = PyList_New(fields.size());
 
-      for (int i=0;i<fields.size();i++)
+      for (unsigned i=0;i<fields.size();i++)
       {
         PyObject * f = SWIG_NewPointerObj((void*)fields.at(i),$descriptor(FIELD_*),1);
         PyList_SetItem(py_list,i,f);
@@ -2076,7 +2076,7 @@ public:
 
       PyObject* py_list = PyList_New(fields.size());
 
-      for (int i=0;i<fields.size();i++)
+      for (unsigned i=0;i<fields.size();i++)
       {
         PyObject * f = SWIG_NewPointerObj((void*)fields.at(i),$descriptor(FIELD_*),1);
         PyList_SetItem(py_list,i,f);

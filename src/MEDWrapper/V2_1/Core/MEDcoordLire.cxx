@@ -63,7 +63,7 @@ MEDcoordLire(med_idt fid, char *maa, med_int mdim, med_float *coo,
    */
   if ( psize != MED_NOPF ) {  
     pfltab = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)psize);
-    for (i=0;i<psize;i++)
+    for (i=0;i<int(psize);i++)
       pfltab[i] = (med_ssize) pfltabtmp[i];
   }
 

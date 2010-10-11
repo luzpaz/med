@@ -46,7 +46,7 @@
 #include <iostream>
 #include <errno.h>
 
-extern int errno;
+//extern int errno;
 
 using namespace std;
 

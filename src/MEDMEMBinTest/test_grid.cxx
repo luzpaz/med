@@ -53,7 +53,7 @@ int main (int argc, char ** argv) {
     {
         XYZ_Array[i].resize(nMaille[i]+1); // nbre de noeuds = nbre de mailles +1
         XYZ_Array[i][0]=Origine[i];
-        for(int j=1;j!=XYZ_Array[i].size();++j)
+        for(int j=1;j!=(int)XYZ_Array[i].size();++j)
             XYZ_Array[i][j]=XYZ_Array[i][j-1] + pas[i];
     }
     

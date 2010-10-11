@@ -1024,19 +1024,19 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
 
   if (meshGeoType.size() != MESHgeoType.size())
     {
-      for (int i = 0; i<meshGeoType.size();i++)
+      for (unsigned i = 0; i<meshGeoType.size();i++)
         MESSAGE_MED("debug meshGeotype " << meshGeoType[i]);
 
-      for (int i = 0; i<MESHgeoType.size();i++)
+      for (unsigned i = 0; i<MESHgeoType.size();i++)
         MESSAGE_MED("debug MESHgeoType. " << MESHgeoType[i]);
     }
 
   if (meshNbOfElOfTypeC.size() == MESHnbOfElOfTypeC.size())
     {
-      for (int i = 0; i<meshNbOfElOfTypeC.size();i++)
+      for (unsigned i = 0; i<meshNbOfElOfTypeC.size();i++)
         MESSAGE_MED("debug meshNbOfElOfTypeC " << meshNbOfElOfTypeC[i]);
 
-      for (int i = 0; i<MESHnbOfElOfTypeC.size();i++)
+      for (unsigned i = 0; i<MESHnbOfElOfTypeC.size();i++)
         MESSAGE_MED("debug MESHnbOfElOfTypeC " << MESHnbOfElOfTypeC[i]);
     }
 
@@ -1337,7 +1337,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
 //      cout << "meshNbOfElOfTypeC["<<meshTypeNo<<"]=" << meshNbOfElOfTypeC[meshTypeNo] <<endl;
 
         // Transformer les numéros locaux d'entités medfichier en numéro global medmémoire
-        for (int i = 0; i < profilList[typeNo].size(); i++) {
+        for (unsigned i = 0; i < profilList[typeNo].size(); i++) {
           // Les numéros des entités commencent à 1 dans MEDfichier comme dans MEDmémoire
           // meshNbOfElOfTypeC[0]=0 ...meshNbOfEltOfTypeC[meshTypeNo]=
           // meshNbOfElOfTypeC[meshTypeNo-1]+nbrOfElem of meshTypeNo type
@@ -1374,9 +1374,9 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
     for( int typeNo=0; typeNo < NumberOfTypes; typeNo++ )
       index[typeNo+1]=index[typeNo]+profilSize[typeNo];
     skyLine->setIndex(&index[0]);
-    for (int i=1; i <= profilList.size() ; i++) {
+    for (int i=1; i <= (int)profilList.size() ; i++) {
       vector<int> aTmp(profilList[i-1].size()); // IPAL13481
-      for (int j=0; j < profilList[i-1].size(); j++)
+      for (unsigned j=0; j < profilList[i-1].size(); j++)
         aTmp[j] = (int) profilList[i-1][j];
       skyLine->setI(i,&aTmp[0]);
       //skyLine->setI(i,&profilList[i-1][0]);
@@ -1384,9 +1384,9 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
 
     MEDSKYLINEARRAY * skyLineFromFile = new MEDSKYLINEARRAY(profilListFromFile.size(), profilSizeC );
     skyLineFromFile->setIndex(&index[0]);
-    for (int i=1; i <= profilListFromFile.size() ; i++) {
+    for (int i=1; i <= (int)profilListFromFile.size() ; i++) {
       vector<int> aTmp(profilListFromFile[i-1].size()); // IPAL13481
-      for (int j=0; j < profilListFromFile[i-1].size(); j++)
+      for (unsigned j=0; j < profilListFromFile[i-1].size(); j++)
         aTmp[j] = (int) profilListFromFile[i-1][j];
       skyLineFromFile->setI(i,&aTmp[0]);
       //skyLineFromFile->setI(i,&profilListFromFile[i-1][0]);
@@ -1499,7 +1499,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
     //- If the field profile name is toto_PFL and a family toto exists,
     //  the field will point to the corresponding FAMILY object.
     const vector<FAMILY*> aFams = aMesh->getFamilies(entityType);
-    for (int fi = 0; fi < aFams.size() && !isFound; fi++) {
+    for (unsigned fi = 0; fi < aFams.size() && !isFound; fi++) {
       FAMILY* aF = aFams[fi];
       string aFN_suff = aF->getName() + aSuff;
       if (aPN == aFN_suff) {
@@ -1515,7 +1515,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
       // - If no family was found, lookup the groups and if a group toto
       //   exists, the field will point to the corresponding GROUP object.
       const vector<GROUP*> aGrps = aMesh->getGroups(entityType);
-      for (int gi = 0; gi < aGrps.size() && !isFound; gi++) {
+      for (unsigned gi = 0; gi < aGrps.size() && !isFound; gi++) {
         GROUP* aG = aGrps[gi];
         string aGN_suff = aG->getName() + aSuff;
         if (aPN == aGN_suff) {
@@ -1975,7 +1975,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER<T>::write(void) const
         meshTypeNo = meshTypeNoIt -  meshGeoType.begin();
       }
 
-      if ( profilName == MED_NOPFL && profil.size() != meshNbOfElOfType[meshTypeNo] )
+      if ( profilName == MED_NOPFL && (int)profil.size() != meshNbOfElOfType[meshTypeNo] )
         throw MEDEXCEPTION(LOCALIZED( STRING(LOC) <<": Error while creating profil for FIELD "<< fieldName 
                                       << " on entity " << MED_EN::entNames[entityType]
                                       << " and geometric type " << MED_EN::geoNames[types[typeNo]] << " with (it,or) = ("
@@ -2169,8 +2169,8 @@ template <class INTERLACING_TAG>
 MED_FIELD_RDWR_DRIVER<T>::MED_FIELD_RDWR_DRIVER(const string &              fileName,
                                                 FIELD<T, INTERLACING_TAG> * ptrField):
   MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDWR),
-  MED_FIELD_WRONLY_DRIVER<T>(fileName,ptrField),
-  MED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField)
+  MED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField),
+  MED_FIELD_WRONLY_DRIVER<T>(fileName,ptrField)
 {
   const char* LOC = "MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T,INTERLACING_TAG> * ptrField)";
   BEGIN_OF_MED(LOC);
@@ -2184,8 +2184,8 @@ MED_FIELD_RDWR_DRIVER<T>::MED_FIELD_RDWR_DRIVER(const string &              file
 template <class T> 
 MED_FIELD_RDWR_DRIVER<T>::MED_FIELD_RDWR_DRIVER(const MED_FIELD_RDWR_DRIVER<T> & fieldDriver):
   MED_FIELD_DRIVER<T>(fieldDriver),
-  MED_FIELD_WRONLY_DRIVER<T>(fieldDriver),
-  MED_FIELD_RDONLY_DRIVER<T>(fieldDriver)
+  MED_FIELD_RDONLY_DRIVER<T>(fieldDriver),
+  MED_FIELD_WRONLY_DRIVER<T>(fieldDriver)
 {}
 
 /*!

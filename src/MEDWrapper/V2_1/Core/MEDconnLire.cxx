@@ -105,7 +105,7 @@ MEDconnLire(med_idt fid,char *maa,med_int mdim,med_int *connectivite,med_mode_sw
        if ( psizetmp != MED_NOPF ) {  
          psize = psizetmp;
          pfltab = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)psize);
-         for (i=0;i<psizetmp;i++)
+         for (i=0;i<int(psizetmp);i++)
            pfltab[i] = (med_ssize) (pfltabtmp[i]);
        };
        

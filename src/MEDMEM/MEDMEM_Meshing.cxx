@@ -399,5 +399,5 @@ void MESHING::addGroup(const GROUP & Group)
   }
 }
 
-};
+}
 /*!  @}  */

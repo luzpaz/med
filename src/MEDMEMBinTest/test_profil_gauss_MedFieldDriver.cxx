@@ -36,8 +36,8 @@ using namespace MEDMEM;
 using namespace MED_EN;
 
 #define INTERLACING_MODE FullInterlace
-static int fct2(int i,const int * number) { return i;};
-static int fct1(int i,const int * number) { return number[i]; };
+static int fct2(int i,const int * number) { return i;}
+static int fct1(int i,const int * number) { return number[i]; }
 
 static void affiche_field_(FIELD_ * myField)
 {
@@ -226,7 +226,7 @@ void affiche_fieldT(FIELD<double, NoInterlace> * myField)
 
 template <class T, class INTERLACING_TAG>
 void affiche_fieldT2(FIELD< T,  INTERLACING_TAG> * myField)
-{};
+{}
 
 
 // Spécialisation du traitement pour le mode FullInterlace

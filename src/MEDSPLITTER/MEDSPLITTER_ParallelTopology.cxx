@@ -153,7 +153,7 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
     m_nb_nodes[idomain]=meshes[idomain]->getNumberOfNodes();
     hash_map <int,pair<int,int> > local2distant;
     m_node_loc_to_glob[idomain].resize(m_nb_nodes[idomain]);
-    for (int icz=0; icz<cz.size(); icz++)
+    for (unsigned icz=0; icz<cz.size(); icz++)
     {
       if (cz[icz]->getLocalDomainNumber() == idomain && 
           cz[icz]->getLocalDomainNumber()>cz[icz]->getDistantDomainNumber())
@@ -214,7 +214,7 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
     MESSAGE_MED ("Nb faces domain " << idomain<<m_nb_faces[idomain]);
     m_face_loc_to_glob[idomain].resize(m_nb_faces[idomain]);
     local2distant.clear();
-    for (int icz=0; icz<cz.size(); icz++)
+    for (unsigned icz=0; icz<cz.size(); icz++)
     {
       if (cz[icz]->getLocalDomainNumber() == idomain && 
           cz[icz]->getLocalDomainNumber()>cz[icz]->getDistantDomainNumber())
@@ -282,8 +282,8 @@ ParallelTopology::ParallelTopology(vector<MEDMEM::MESH*> meshes,
 //!constructing ParallelTopology from an old topology and a graph
 ParallelTopology::ParallelTopology(boost::shared_ptr<Graph> graph, int nb_domain, int mesh_dimension):
   m_nb_domain(nb_domain),
-  m_nb_cells(graph->nbVertices()),
   m_mesh_dimension(mesh_dimension),
+  m_nb_cells(graph->nbVertices()),
   m_graph(graph)
 {
   m_nb_cells.resize(m_nb_domain);
@@ -535,7 +535,7 @@ void ParallelTopology::createNodeMapping(map<MED_EN::medGeometryElement,int*>& t
     }
     else if (type== MED_EN::MED_POLYGON)
     {
-      for ( int i = 0; i < polygon_conn.size(); ++i )
+      for ( unsigned i = 0; i < polygon_conn.size(); ++i )
       {
         int global=polygon_conn[i];
         if(local_numbers.find(global)==local_numbers.end())
@@ -567,7 +567,7 @@ void ParallelTopology::createNodeMapping(map<MED_EN::medGeometryElement,int*>& t
     }
     else if (type==MED_EN::MED_POLYHEDRA)
     {
-      for ( int i = 0; i < polyhedron_conn.size(); ++i )
+      for ( unsigned i = 0; i < polyhedron_conn.size(); ++i )
       {
         int global=polyhedron_conn[i];
         if(local_numbers.find(global)==local_numbers.end())
@@ -647,7 +647,7 @@ bool ParallelTopology::hasCellWithNodes( const MESHCollection& new_collection,
       for ( int j = index[i]-1; j < index[i+1]-1; ++j )
         if ( conn[j] == firstNode )
         {
-          int nbSame = 0;
+          unsigned nbSame = 0;
           for ( j = index[i]-1; j < index[i+1]-1; ++j )
             nbSame += nodes.count( conn[j] );
           if ( nbSame == nodes.size() )
@@ -1102,7 +1102,7 @@ void ParallelTopology::recreateFaceMapping(vector<map<MED_EN::medGeometryElement
     map<MED_EN::medGeometryElement, vector<MEDSPLITTER_FaceModel*> >::const_iterator iter = face_map[idomain].begin();
     for (; iter != face_map[idomain].end(); iter++)
     {
-      for (int i=0; i< (iter->second).size(); i++)
+      for (unsigned i=0; i< (iter->second).size(); i++)
       {
         MEDSPLITTER_FaceModel* face = (iter->second)[i];
         //cout << "global :"<<face->getGlobal()<<" - "<<ilocal<<endl;

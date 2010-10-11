@@ -69,6 +69,9 @@ string MED::PrefixPrinter::GetPrefix()
 
 static MED::TEntity2GeomSet Entity2GeomSet;
 
+bool InitEntity2GeomSet();
+static bool anIsInited = InitEntity2GeomSet();
+
 bool InitEntity2GeomSet()
 {
   using namespace MED;
@@ -97,11 +100,11 @@ bool InitEntity2GeomSet()
   aGeomMAILLESet.insert(ePENTA15);
   aGeomMAILLESet.insert(eHEXA20);
   aGeomMAILLESet.insert(ePOLYEDRE);
+
+  anIsInited = false;
   
   return true;
 }
-
-static bool anIsInited = InitEntity2GeomSet();
 
 const MED::TEntity2GeomSet& MED::GetEntity2GeomSet()
 {

@@ -64,7 +64,7 @@ namespace INTERP_TEST
   const double _triangle10[6]= {84.8575,98.2042, 80,100, 82.2601,95.7202};
   const double _triangle11[6]= {80,100, 76.6659,91.9804, 85.3912,92.5061 };
   
-  //  Two diamonds intersecting without degeneracy (two distinct crossing points)
+  /*/  Two diamonds intersecting without degeneracy (two distinct crossing points)
   //             /\  /\
   //            /  \/  \
   //           /   /\   \
@@ -73,7 +73,7 @@ namespace INTERP_TEST
   //           \   \/   /
   //            \  /\  /
   //             \/  \/
-
+  */
 
   // \brief Status : pass
   void SingleElementPlanarTests::diamondsBasic()
@@ -107,7 +107,7 @@ namespace INTERP_TEST
   }
   
   
-  //  Two diamonds with overlapping edges in an exclusion configuration
+  /*/  Two diamonds with overlapping edges in an exclusion configuration
   //                   /\
   //                  /  \
   //             /\  /    \
@@ -119,6 +119,7 @@ namespace INTERP_TEST
   //            \  /  
   //             \/  
   // \brief Status : pass
+  */
   void SingleElementPlanarTests::tangentDiamonds() 
   {
     INTERP_KERNEL::PolygonAlgorithms<2> intersector (_Epsilon, _Precision);;
@@ -184,7 +185,7 @@ namespace INTERP_TEST
                            (INTERP_KERNEL::checkEqualPolygons<std::vector<double>,2>(&actual_result, &expected_result, _Epsilon)));
   }
 
-  //  Two diamonds sharing a vertex in an exclusion configuration
+  /*/  Two diamonds sharing a vertex in an exclusion configuration
   //             /\      /\
   //            /  \    /  \
   //           /    \  /    \
@@ -193,7 +194,7 @@ namespace INTERP_TEST
   //           \    /  \    /
   //            \  /    \  /
   //             \/      \/
-
+  */
 
   // \brief Status : pass
   void SingleElementPlanarTests::diamondsSharingVertex1()
@@ -256,7 +257,7 @@ namespace INTERP_TEST
     CPPUNIT_ASSERT_MESSAGE("Identical squares test failed (TRIANGULATION)", 
                            (INTERP_KERNEL::checkEqualPolygons<std::vector<double>,2>(&actual_result, &expected_result, _Epsilon)));
   }
-  //  Square and diamond intersecting with no degeneracy
+  /*/  Square and diamond intersecting with no degeneracy
   //               /\
   //              /  \  
   //             /    \      
@@ -274,6 +275,7 @@ namespace INTERP_TEST
   //              \  /
   //               \/
   // \brief Status : pass
+  */
   void SingleElementPlanarTests::squareAndDiamondBasic()
   {
     INTERP_KERNEL::PolygonAlgorithms<2> intersector (_Epsilon, _Precision);;
@@ -362,7 +364,7 @@ namespace INTERP_TEST
 //     CPPUNIT_ASSERT_MESSAGE("Square and diamond basic test failed (TRIANGULATION) maybe not significant (0,0) should be removed", 
 //                            (INTERP_KERNEL::checkEqualPolygons<vector<double>,2>(&actual_result, &expected_result, _Epsilon)));
   }
-  //  Two diamonds intersecting at one vertex on edge and one double vertex
+  /*/  Two diamonds intersecting at one vertex on edge and one double vertex
   //             /\   /\
   //            /  \ /  \
   //           /    ¤    \
@@ -371,7 +373,7 @@ namespace INTERP_TEST
   //           \    *    /
   //            \  / \  /
   //             \/   \/ 
-
+  */
 
   // \brief Status : pass
   void SingleElementPlanarTests::diamondsCritical()
@@ -495,7 +497,7 @@ namespace INTERP_TEST
     CPPUNIT_ASSERT_MESSAGE("Square and diamond critical tangency test failed (TRIANGULATION)", 
                            (INTERP_KERNEL::checkEqualPolygons<std::vector<double>,2>(&actual_result, &expected_result, _Epsilon)));
   }  //  square and diamond intersecting at four degenerated pointss 
-  //    
+  /*/    
   //      ²/²\  
   //          ² / ² \ 
   //           ²  /  ²  \
@@ -503,7 +505,7 @@ namespace INTERP_TEST
   //          ² \ ² /
   //      ²\²/
   // \brief Status : pass
-
+  */
   void SingleElementPlanarTests::diamondsCritical2()
   {
     INTERP_KERNEL::PolygonAlgorithms<2> intersector (_Epsilon, _Precision);;
@@ -536,7 +538,7 @@ namespace INTERP_TEST
                            (INTERP_KERNEL::checkEqualPolygons<std::vector<double>,2>(&actual_result, &expected_result, _Epsilon)));
   }
 
-  //  Two tangent hexagons with double vertices and a critical starting vertex on edge
+  /*/  Two tangent hexagons with double vertices and a critical starting vertex on edge
   //      _________ 
   //             /         \²²²
   //            ²           \² 
@@ -546,7 +548,7 @@ namespace INTERP_TEST
   //           \ ²         ² /
   //            \           /
   //             \²_______²/
-
+  */
 
   // \brief Status : pass
   void SingleElementPlanarTests::hexagonsCritical1()
@@ -592,7 +594,7 @@ namespace INTERP_TEST
                            (INTERP_KERNEL::checkEqualPolygons<std::vector<double>,2>(&actual_result, &expected_result, _Epsilon)));
   }
 
-  //  Two tangent hexagons with double vertices and a critical starting vertex on edge
+  /*/  Two tangent hexagons with double vertices and a critical starting vertex on edge
   //              _______
   //             /       \
   //            /         \ 
@@ -602,7 +604,7 @@ namespace INTERP_TEST
   //            /         \ 
   //            \         /
   //             \_______/
-
+  */
 
   // \brief Status : pass
   void SingleElementPlanarTests::hexagonsCritical2()
@@ -661,7 +663,7 @@ namespace INTERP_TEST
     CPPUNIT_ASSERT_MESSAGE("Identical squares test failed (TRIANGULATION)", 
                            (INTERP_KERNEL::checkEqualPolygons<std::vector<double>,2>(&actual_result, &expected_result, _Epsilon)));
   }
-  //  Two diamonds sharing a vertex in an exclusion configuration
+  /*/  Two diamonds sharing a vertex in an exclusion configuration
   //             /\   
   //            /  \    
   //           /    \  
@@ -678,7 +680,7 @@ namespace INTERP_TEST
   //           \    /      
   //            \  /      
   //             \/      
-
+  */
 
   // \brief Status : pass
   void SingleElementPlanarTests:: diamondsSharingVertex2()
@@ -702,7 +704,7 @@ namespace INTERP_TEST
                            (INTERP_KERNEL::checkEqualPolygons<std::vector<double>,2>(&actual_result, &expected_result, _Epsilon)));
   }
 
-  //  Triangle and diamond with a critical crossing at double starting vertex
+  /*/  Triangle and diamond with a critical crossing at double starting vertex
   //               ____  
   //             /|\  / 
   //            / | \/    
@@ -712,7 +714,7 @@ namespace INTERP_TEST
   //           \     /      
   //            \   /      
   //             \ /      
-
+  */
   // \brief Status : pass
   void SingleElementPlanarTests:: triangleAndDiamondCritical()
   {
@@ -742,7 +744,7 @@ namespace INTERP_TEST
                            (INTERP_KERNEL::checkEqualPolygons<std::vector<double>,2>(&actual_result, &expected_result, _Epsilon)));
   }
 
-  //  Basic triangle and square intersection (two distinct points) 
+  /*/  Basic triangle and square intersection (two distinct points) 
   //           __________
   //     |          |
   //     |       |\ |
@@ -754,7 +756,7 @@ namespace INTERP_TEST
   //     |       | /|
   //     |       |/ |
   //     |__________|
-
+  */
   // \brief Status : pass
   void SingleElementPlanarTests::triangleAndSquareBasic()
   {
@@ -788,13 +790,13 @@ namespace INTERP_TEST
     CPPUNIT_ASSERT_MESSAGE("Identical squares test failed (TRIANGULATION)", 
                            (INTERP_KERNEL::checkEqualPolygons<std::vector<double>,2>(&actual_result, &expected_result, _Epsilon)));
   }
-  //  Two triangles with a starting vertex on edge
+  /*/  Two triangles with a starting vertex on edge
 
   //             /\ ²²²²  
   //            /  ²  ²  
   //           /  ² ²  
   //          /__²___\   
-
+  */
   // \brief Status : pass
   void SingleElementPlanarTests::trianglesCritical()
   {
@@ -830,13 +832,13 @@ namespace INTERP_TEST
                            (INTERP_KERNEL::checkEqualPolygons<std::vector<double>,2>(&actual_result, &expected_result, _Epsilon)));
   }
   
-  //  Two tangent paralellograms intersecting at 3 double vertices (one being a starting vertex)
+  /*/  Two tangent paralellograms intersecting at 3 double vertices (one being a starting vertex)
   //              _______ 
   //             /\      /\
   //            /  \    /  \
   //           /    \  /    \
   //          /______\/______\      
-
+  */
 
   // \brief Status : pass
   void SingleElementPlanarTests::paralellogramsCritical1()
@@ -947,7 +949,7 @@ namespace INTERP_TEST
                            (INTERP_KERNEL::checkEqualPolygons<std::vector<double>,2>(&actual_result, &expected_result, _Epsilon)));
   }
 
-  //  Two triangles with double starting point in an outer tangency configuration
+  /*/  Two triangles with double starting point in an outer tangency configuration
   //             /\   
   //            /  \    
   //           /    \  
@@ -956,7 +958,7 @@ namespace INTERP_TEST
   //           \    /      
   //            \  /      
   //             \/      
-
+  */
 
   // \brief Status : pass
   void SingleElementPlanarTests::trianglesTangencyCritical2()

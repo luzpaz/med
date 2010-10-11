@@ -216,13 +216,13 @@ DriverType m_driver_type;
 so that they are written in joints*/
 bool m_subdomain_boundary_creates;
 
-        /*! flag specifying that families must be preserved by the
-                splitting*/
-        bool m_family_splitting;
+/*! flag specifying that families must be preserved by the
+        splitting*/
+bool m_family_splitting;
 
-        /*! flag specifying that groups must be created on all domains, 
-                even if they are empty*/
-        bool m_create_empty_groups;
+/*! flag specifying that groups must be created on all domains, 
+        even if they are empty*/
+bool m_create_empty_groups;
 };
 
 }//of namespace

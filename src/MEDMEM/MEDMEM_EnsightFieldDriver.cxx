@@ -553,7 +553,7 @@ ENSIGHT_FIELD_DRIVER::~ENSIGHT_FIELD_DRIVER()
 void ENSIGHT_FIELD_DRIVER::setFieldName(const string & fieldName) throw (MEDEXCEPTION)
 {
   const char* LOC = "ENSIGHT_FIELD_DRIVER::setFieldName(): ";
-  if ( fieldName.size() > MAX_FIELD_NAME_LENGTH )
+  if ( (int)fieldName.size() > MAX_FIELD_NAME_LENGTH )
     throw MEDEXCEPTION( compatibilityPb(LOC) << "too long name (> " <<
                         MAX_FIELD_NAME_LENGTH << "): " << fieldName);
 

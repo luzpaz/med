@@ -60,10 +60,10 @@ void MEDMEMTest::testVtkMedDriver()
   aMed->readFileStruct( filename_rd );
   MESH mesh(MED_DRIVER, aMed->getFileName(), aMed->getMeshNames()[0] );
   vector<string> fieldsNames = aMed->getFieldNames();
-  for ( int i = 0; i < fieldsNames.size(); ++i )
+  for ( unsigned i = 0; i < fieldsNames.size(); ++i )
   {
     VEC_DT_IT_ vecDtIt = aMed->getFieldIteration( fieldsNames[i] );
-    for ( int j = 0; j < vecDtIt.size(); ++j )
+    for ( unsigned j = 0; j < vecDtIt.size(); ++j )
       if ( aMed->getFieldType( fieldsNames[i] ) == MED_REEL64 )
         fields.push_back( new FIELD<double>(MED_DRIVER, filename_rd, fieldsNames[i],
                                             vecDtIt[j].dt, vecDtIt[j].it, &mesh));
@@ -125,6 +125,6 @@ void MEDMEMTest::testVtkMedDriver()
   delete aVtkMedDriverCpy_1;
   delete aMed;
 
-  for ( int i = 0; i < fields.size(); ++i )
+  for ( unsigned i = 0; i < fields.size(); ++i )
     fields[i]->removeReference();
 }

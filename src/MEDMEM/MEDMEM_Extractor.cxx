@@ -646,7 +646,7 @@ MESH* Extractor::divideEdges(const double*       coords,
         // Associate new and old cells
         int newCell = new2oldCells.size() + 1;
         // detect equal new cells on boundaries of old cells
-        if ( newNodes.empty() && oldNodes.size() == nbEdgesOnPlane + int(meshDim==2)) {
+        if ( newNodes.empty() && (int)oldNodes.size() == nbEdgesOnPlane + int(meshDim==2)) {
           pair < map< set<int>, int>::iterator, bool > it_unique =
             oldNodes2newCell.insert( make_pair( oldNodes, newCell ));
           if ( !it_unique.second ) { // equal new faces
@@ -762,7 +762,7 @@ MESH* Extractor::divideEdges(const double*       coords,
                            inMesh->getCoordinatesSystem(), MED_FULL_INTERLACE );
   meshing->setTypes( &types[0], MED_CELL );
   meshing->setNumberOfElements( &nbCellByType[0], MED_CELL);
-  for ( int i = 0; i < types.size(); ++i )
+  for ( unsigned i = 0; i < types.size(); ++i )
     if ( types[i] != MED_POLYGON )
     {
       meshing->setConnectivity( MED_CELL, types[i], & newConnByNbNodes[ types[i]%100 ].front());
@@ -838,7 +838,7 @@ void Extractor::sortNodes( map< int, vector< int > >& connByNbNodes,
       // select ordinate to check
       int ind = (fabs(normal[0]) < fabs(normal[1])) ? 1 : 0;
       // sorting
-      for ( int i = 0; i < conn.size(); i += 2) {
+      for ( unsigned i = 0; i < conn.size(); i += 2) {
         const double* p1 = nodeCoords + spaceDim*(conn[i]-1);
         const double* p2 = nodeCoords + spaceDim*(conn[i+1]-1);
         if ( p1[ind] > p2[ind] )
@@ -852,7 +852,7 @@ void Extractor::sortNodes( map< int, vector< int > >& connByNbNodes,
         if ( conn[0] == conn[2] || conn[0] == conn[3] )
           std::swap( conn[0], conn[1] );
         int i;
-        for ( i = 2; i < conn.size()-2; i += 2) {
+        for ( i = 2; i < (int)conn.size()-2; i += 2) {
           if ( conn[i-1] == conn[i+1] )
             std::swap( conn[i], conn[i+1] );
           else if ( conn[i] == conn[i+2] || conn[i] == conn[i+3] )
@@ -987,7 +987,7 @@ MESH* Extractor::transfixFaces( const double*       coords,
         while ( nodes.more() && !isOut ) {
           double coord = inMeshData.getNodeCoord( nodes.next() )[ line._maxDir ];
           bool isIn = false;
-          for ( int i = 0; i < ranges.size() && !isIn; ++i ) {
+          for ( unsigned i = 0; i < ranges.size() && !isIn; ++i ) {
             const pair< double, double > & minMax = ranges[i];
             isIn = ( minMax.first < coord && coord < minMax.second );
           }
@@ -1015,7 +1015,7 @@ MESH* Extractor::transfixFaces( const double*       coords,
   double* coord = & resCoords[0];
   const size_t cooSize = size_t( sizeof(double)*dim );
 
-  for ( int i = 0; i < chains.size(); ++i ) {
+  for ( unsigned i = 0; i < chains.size(); ++i ) {
     TIntersection* section = chains[i];
     while ( section ) {
       memcpy( coord, section->_point, cooSize );

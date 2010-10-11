@@ -74,7 +74,7 @@ SUPPORT::SUPPORT(): _name(""),  _description("None"), _mesh((GMESH*)NULL),
   //--------------------------------------------------------------------------
 {
   MESSAGE_MED("SUPPORT::SUPPORT()");
-};
+}
 
 /*!
 \addtogroup SUPPORT_constructors
@@ -101,7 +101,7 @@ SUPPORT::SUPPORT(GMESH* Mesh, string Name/*=""*/, medEntityMesh Entity/*=MED_CEL
   if(_mesh)
     _mesh->addReference();
   update() ;
-};
+}
 
 /*!
   Copy constructor.
@@ -140,7 +140,7 @@ SUPPORT::SUPPORT(const SUPPORT & m):_number_fromfile(0)
   _profilNames=m._profilNames;
 
   END_OF_MED(LOC);
-};
+}
 
 /*!
   @}
@@ -302,7 +302,7 @@ void SUPPORT::update()
     }
   }
   END_OF_MED(LOC);
-};
+}
 /*!
   Get the field value index (in fortran mode) from the support global number.
   Becareful, it doesn't take care of the field number of components
@@ -507,7 +507,7 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
   setProfilNames(prof_names);
 
   END_OF_MED(LOC);
-};
+}
 
 /*! @}  */
 
@@ -554,7 +554,7 @@ void SUPPORT::setpartial(MEDSKYLINEARRAY * number, bool shallowCopy) throw (MEDE
   // cout << *_number << endl;
 
   END_OF_MED(LOC);
-};
+}
 
 void SUPPORT::setpartial_fromfile(MEDSKYLINEARRAY * number, bool shallowCopy) throw (MEDEXCEPTION)
   //-------------------
@@ -568,7 +568,7 @@ void SUPPORT::setpartial_fromfile(MEDSKYLINEARRAY * number, bool shallowCopy) th
     _number_fromfile = new MEDSKYLINEARRAY(*number);
 
   END_OF_MED(LOC);
-};
+}
 
 void SUPPORT::setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION){
 
@@ -588,8 +588,8 @@ void SUPPORT::setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION){
                                  << " a profil number list before setting"
                                  << " the associated profil name list" )) ;
 
-  if ( ( profilNames.size() != _number->getNumberOf() ) &&
-       ( profilNames.size() !=_numberOfGeometricType ) ) {
+  if ( ( (int)profilNames.size() != _number->getNumberOf() ) &&
+       ( (int)profilNames.size() !=_numberOfGeometricType ) ) {
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The profil name list size : "<< profilNames.size()
                                  << " must be equal to the number of geometric type : " 
                                  <<  _numberOfGeometricType << " (_number->getNumberOf() : "
@@ -602,12 +602,12 @@ void SUPPORT::setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION){
 
   END_OF_MED(LOC);
 
-};
+}
 
 vector<string> SUPPORT::getProfilNames() const throw (MEDEXCEPTION)
 {
   return _profilNames;
-};
+}
 
 /*!
 \addtogroup SUPPORT_advanced
@@ -798,7 +798,7 @@ void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
     clearDataOnNumbers();
   }
   END_OF_MED(LOC);
-};
+}
 /*!  @}  */
 
 /*!
@@ -868,7 +868,7 @@ bool MEDMEM::SUPPORT::operator == (const SUPPORT &support) const
   END_OF_MED(LOC);
 
   return operatorReturn;
-};
+}
 
 void SUPPORT::changeElementsNbs(medEntityMesh entity, const int *renumberingFromOldToNew)
 {

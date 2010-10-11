@@ -500,10 +500,10 @@ static void MEDMEMTest_testGrid()
     // "true" in some map element during iteration means duplicated node position.
     // "false" in some map element after iteration means empty node position.
     map<int, bool> found;
-    for ( int i1 = 0; i1 < xyz[0].size(); i1++ )
-      for ( int i2 = 0; i2 < xyz[1].size(); i2++ )
-        for ( int i3 = 0; i3 < xyz[2].size(); i3++ )
-          found[int(xyz[0][i1] * 100 + xyz[1][i2] * 10 + xyz[2][i3])] = false;
+    for ( unsigned i1 = 0; i1 < xyz[0].size(); i1++ )
+      for ( unsigned i2 = 0; i2 < xyz[1].size(); i2++ )
+        for ( unsigned i3 = 0; i3 < xyz[2].size(); i3++ )
+          found[ xyz[0][i1] * 100 + xyz[1][i2] * 10 + xyz[2][i3] ] = false;
 
     const MESH* mesh = myGrid2->convertInMESH();
     COORDINATE* coords = (COORDINATE*)mesh->getCoordinateptr();

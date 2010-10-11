@@ -237,7 +237,7 @@ private:
       _xdr_kind_null,
       _xdr_kind_char,
       _xdr_kind_int,
-      _xdr_kind_double,
+      _xdr_kind_double
     };
 #endif
 };

@@ -39,8 +39,8 @@ namespace MEDMEM {
 
 // avoid coping sortedNodeIDs
 _maille::_maille(const _maille& ma)
-  : sommets(ma.sommets), geometricType(ma.geometricType), _ordre(ma._ordre),
-    reverse(ma.reverse), sortedNodeIDs(0)
+  : sommets(ma.sommets), geometricType(ma.geometricType), 
+    reverse(ma.reverse), sortedNodeIDs(0), _ordre(ma._ordre)
 {
 }
 
@@ -108,8 +108,8 @@ const int* _maille::getSortedNodes() const
 
 _link _maille::link(int i) const
 {
-  ASSERT_MED ( i >= 0 && i < sommets.size() );
-  int i2 = ( i + 1 == sommets.size() ) ? 0 : i + 1;
+  ASSERT_MED ( i >= 0 && i < (int)sommets.size() );
+  int i2 = ( i + 1 == (int)sommets.size() ) ? 0 : i + 1;
   if ( reverse )
     return make_pair( sommets[i2]->first, sommets[i]->first );
   else
@@ -144,7 +144,7 @@ MED_EN::medEntityMesh _maille::getEntity(const int meshDimension) const throw (M
 return entity;
 
 //END_OF_MED(LOC);
-};
+}
 
 void _maillageByDimIterator::init(const int dim, const bool convertPoly )
 {
@@ -159,12 +159,12 @@ std::ostream& operator << (std::ostream& os, const _maille& ma)
 {
     os << "maille " << ma.ordre() << " (" << ma.geometricType << ") : < ";
     os << ma.nodeNum(0);
-    for( int i=1; i!=ma.sommets.size(); ++i)
+    for( unsigned i=1; i!=ma.sommets.size(); ++i)
         os << ", " << ma.nodeNum( i );
     os << " > sortedNodeIDs: ";
     if ( ma.sortedNodeIDs ) {
       os << "< ";
-      for( int i=0; i!=ma.sommets.size(); ++i)
+      for( unsigned i=0; i!=ma.sommets.size(); ++i)
         os << ( i ? ", " : "" ) << ma.sortedNodeIDs[ i ];
       os << " >";
     }
@@ -454,7 +454,7 @@ void _intermediateMED::numerotationMaillage()
         if ( prevNbElems != 0 ) {
           if ( minOrdre == 1 )
             renumEntity = true;
-          else if ( prevNbElems+1 != minOrdre )
+          else if ( prevNbElems+1 != (int)minOrdre )
             ok = false;
         }
         prevNbElems += typeSize;
@@ -681,7 +681,7 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
             const _maille * poly = (*pfnIter)->first;
             const vector<int> & nbFaceNodes = (*pfnIter)->second;
             int nbNodes = 0;
-            for ( int iFace = 0; iFace < nbFaceNodes.size(); ++iFace )
+            for ( unsigned iFace = 0; iFace < nbFaceNodes.size(); ++iFace )
             {
               for ( int j = 0, nbFNodes = nbFaceNodes[iFace]; j < nbFNodes; ++j )
                 *conn++ = poly->nodeNum( nbNodes++ );
@@ -810,7 +810,7 @@ void _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
             mailleSet.insert( *maIt );
         }
       }
-      if ( nb_elem != mailleSet.size() ) { // Self intersecting compound group
+      if ( nb_elem != (int)mailleSet.size() ) { // Self intersecting compound group
         isSelfIntersect = true;
         INFOS_MED("Self intersecting group: " << i << " <" << grp.nom << ">"
               << ", mailleSet.size = " << mailleSet.size() << ", sum nb elems = " << nb_elem);
@@ -827,7 +827,7 @@ void _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
           std::set<int> sub_grps;
           for ( fIt = fields.begin(); fIt != fields.end(); ++fIt ) {
             _fieldBase * field = (*fIt);
-            if ( field->_group_id == i ) {
+            if ( field->_group_id == (int)i ) {
               field->_group_id = -1; // -> a field by support
               field->getGroupIds( sub_grps, false );
             }
@@ -876,7 +876,7 @@ void _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
         if ( allMailles.dim() > 0 )
           totalNbElements += allMailles.sizeWithoutMerged();
     }
-    const bool isOnAll = ( mailleSet.size() == totalNbElements );
+    const bool isOnAll = ((int) mailleSet.size() == totalNbElements );
 
     // if !isOnAll, build a map _maille::ordre() -> index in GROUP.getNumber(MED_ALL_ELEMENTS).
     // It is used while fields building.

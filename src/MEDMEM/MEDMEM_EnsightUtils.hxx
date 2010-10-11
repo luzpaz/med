@@ -795,14 +795,14 @@ private:
   template <typename T> T* get(int nb, bool inverseBytes=false)
   {
     size_t bufSize = nb * sizeof( T );
-    if ( bufSize > _maxPos - _pos )
+    if ( int(bufSize) > _maxPos - _pos )
       throw _exception;
     T* buf = new T[ nb ];
 #ifdef WNT
 #else
     ssize_t nBytesRead = ::read (_file, buf, bufSize );
     _pos += nBytesRead;
-    if ( nBytesRead < bufSize ) {
+    if ( int(nBytesRead) < int(bufSize) ) {
       delete buf;
       throw _exception;
     }

@@ -131,9 +131,9 @@ ENSIGHT_MESH_DRIVER::~ENSIGHT_MESH_DRIVER()
   MESSAGE_MED("ENSIGHT_MESH_DRIVER::~ENSIGHT_MESH_DRIVER() has been destroyed");
 }
 
-void    ENSIGHT_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; };
+void    ENSIGHT_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; }
 
-string  ENSIGHT_MESH_DRIVER::getMeshName() const { return _meshName; };
+string  ENSIGHT_MESH_DRIVER::getMeshName() const { return _meshName; }
 
 void ENSIGHT_MESH_DRIVER::openConst(bool checkDataFile) const
 {
@@ -237,13 +237,13 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
   // of 79 chars length maximum, while MED mesh description is up to 200 chars
   const char* line1 = theDescriptionPrefix;
   string      line2 = _ptrMesh->getDescription();
-  for ( int i = 0; i < line2.size(); ++i ) { // protect from gabage
+  for ( unsigned i = 0; i < line2.size(); ++i ) { // protect from gabage
     if ( !line2[ i ] || !isascii( line2[ i ])) {
       line2.resize( i );
       break;
     }
   }
-  if ( line2.size() >= MAX_LINE_LENGTH )
+  if ((int) line2.size() >= MAX_LINE_LENGTH )
     line2.resize( MAX_LINE_LENGTH );
 
   // EnSight will assign node/element visible numbers it-self
@@ -1470,7 +1470,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldASCII(_InterMed & imed)
       vector<int> elemIds;
       if ( haveElemIds ) {
         elemIds.reserve( nbElems );
-        while ( elemIds.size() < nbElems )
+        while ((int) elemIds.size() < nbElems )
           elemIds.push_back( geoFile.getInt() ); // id_e
       }
       if ( isGhost ) { // do not store ghost elements (?)
@@ -1554,7 +1554,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldASCII(_InterMed & imed)
       for ( int i = 0; i < nbElems; ++i ) {
         _ValueIterator<int> medIndex = medIndexIt;
         nbElemNodes = nbElemNodesIt.next();
-        if ( ma.sommets.size() != nbElemNodes )
+        if ((int) ma.sommets.size() != nbElemNodes )
           ma.sommets.resize( nbElemNodes );
         for ( n = 0; n < nbElemNodes; ++n ) {
           int nodeID = geoFile.getInt(); // nn_ei
@@ -1602,7 +1602,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldASCII(_InterMed & imed)
       vector<int> nodeIds;
       if ( haveNodeIds ) {
         nodeIds.reserve( nbNodes );
-        while ( nodeIds.size() < nbNodes )
+        while ((int) nodeIds.size() < nbNodes )
           nodeIds.push_back( geoFile.getInt() ); // id_n
       }
 
@@ -1664,7 +1664,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldASCII(_InterMed & imed)
       if ( partName.empty() )
         partName = "Part_" + restLine;
 
-      if ( imed.groupes.capacity() - imed.groupes.size() < theMaxNbTypes )
+      if (int( imed.groupes.capacity() - imed.groupes.size() ) < theMaxNbTypes )
         imed.groupes.reserve( size_t( 1.5 * imed.groupes.size() ));
       imed.groupes.push_back(_groupe());
       partGroupe = & imed.groupes.back();
@@ -2030,7 +2030,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldBinary(_InterMed & imed)
       for ( int i = 0; i < nbElems; ++i ) {
         _ValueIterator<int> medIndex = medIndexIt;
         nbElemNodes = nbElemNodesIt.next();
-        if ( ma.sommets.size() != nbElemNodes )
+        if ((int) ma.sommets.size() != nbElemNodes )
           ma.sommets.resize( nbElemNodes );
         for ( n = 0; n < nbElemNodes; ++n, ++nodeID ) {
           if ( haveCoords )
@@ -2138,7 +2138,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldBinary(_InterMed & imed)
       if ( partName.empty() )
         partName = "Part_" + restLine;
 
-      if ( imed.groupes.capacity() - imed.groupes.size() < theMaxNbTypes )
+      if (int( imed.groupes.capacity() - imed.groupes.size()) < theMaxNbTypes )
         imed.groupes.reserve( size_t( 1.5 * imed.groupes.size() ));
       imed.groupes.push_back(_groupe());
       partGroupe = & imed.groupes.back();
@@ -2450,7 +2450,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read6ASCII(_InterMed & imed)
       if ( partName.empty() )
         partName = "Part_" + restLine;
 
-      if ( imed.groupes.capacity() - imed.groupes.size() < theMaxNbTypes )
+      if (int( imed.groupes.capacity() - imed.groupes.size()) < theMaxNbTypes )
         imed.groupes.reserve( size_t( 1.5 * imed.groupes.size() ));
       imed.groupes.push_back(_groupe());
       partGroupe = & imed.groupes.back();
@@ -2731,7 +2731,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read6Binary(_InterMed & imed)
       if ( partName.empty() )
         partName = "Part_" + restLine;
 
-      if ( imed.groupes.capacity() - imed.groupes.size() < theMaxNbTypes )
+      if (int( imed.groupes.capacity() - imed.groupes.size()) < theMaxNbTypes )
         imed.groupes.reserve( size_t( 1.5 * imed.groupes.size() ));
       imed.groupes.push_back(_groupe());
       partGroupe = & imed.groupes.back();

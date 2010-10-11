@@ -117,8 +117,8 @@ namespace MED
       
     public:
       TFile(const std::string& theFileName): 
-        myFid(-1), 
         myCount(0),
+        myFid(-1), 
         myFileName(theFileName)
       {}
       
@@ -155,9 +155,9 @@ namespace MED
       }
 
     protected:
-      std::string myFileName;
       TInt myCount;
       TIdt myFid;
+      std::string myFileName;
     };
 
 

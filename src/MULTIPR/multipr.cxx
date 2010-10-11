@@ -342,11 +342,11 @@ void parseCommandLine(int argc, char** argv)
                 {
             g_decimRadius = atof(argv[9]);
             g_boxing = atoi(argv[10]);
-                        sprintf(g_params, "%lf %lf %lf %d", g_decimThresholdMed, g_decimThresholdLow, g_decimRadius, g_boxing);
+                        sprintf(g_params, "%f %f %f %d", g_decimThresholdMed, g_decimThresholdLow, g_decimRadius, g_boxing);
                 }
                 else if (strcmp(g_filterName, "Filtre_Direct") == 0)
                 {
-                        sprintf(g_params, "%lf %lf", g_decimThresholdMed, g_decimThresholdLow);
+                        sprintf(g_params, "%f %f", g_decimThresholdMed, g_decimThresholdLow);
                 }
                 else
                 {

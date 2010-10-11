@@ -228,7 +228,7 @@ void        Elements::extractSubSetFromNodes(const std::set<med_int>& pSetOfNode
 {
     if (&pSetOfNodes == &pSubSetOfElements) throw IllegalStateException("pSetOfNodes and pSubSetOfElements must be different !", __FILE__, __LINE__);
     
-    int     numOfNodes = pSetOfNodes.size();
+    //int     numOfNodes = pSetOfNodes.size();
     bool    keepElt = false;
     for (int itElt = 0; itElt < mNum; ++itElt)
     {
@@ -313,7 +313,7 @@ void Elements::remap(std::set<med_int>& pSetOfNodes)
         
         // build the map for indices convertion
     map<med_int, med_int> mapOldIndexToNewIndex;
-    med_int newIndex = 1; // MED index start at 1
+    //med_int newIndex = 1; // MED index start at 1
         itNode = 1;
     for (std::set<med_int>::iterator it = pSetOfNodes.begin(); it != pSetOfNodes.end(); ++it)
     {

@@ -173,7 +173,7 @@ void multipr::printArray2D(
 string multipr::realToString(med_float mV)
 {
     char str[32];
-    sprintf(str, "%lf", mV);
+    sprintf(str, "%f", mV);
     trim(str, '0');
     int len = strlen(str);
     if (str[len - 1] == '.')

@@ -96,7 +96,7 @@ namespace CppUnit
     static std::string toString( const MEDMEM::VEC_DT_IT_& x )
     {
       MEDMEM::STRING ost("{ ");
-      for ( int i = 0; i < x.size(); ++i )
+      for ( unsigned i = 0; i < x.size(); ++i )
         ost << "{ " << x[i].dt << ", " << x[i].it << " }" << ( i+1==x.size() ? " " : ", ");
       return ost << "}";
     }
@@ -262,7 +262,7 @@ void MEDMEMTest::testMedFileBrowser()
   CPPUNIT_ASSERT_THROW( pointe_med.getMeshName( "fieldName" ), MEDEXCEPTION);
   CPPUNIT_ASSERT_NO_THROW( pointe_med.getMeshName( "fieldnodeint" ));
   names = pointe_med.getFieldNames();
-  for ( int i = 0;i < names.size(); ++i )
+  for ( unsigned i = 0; i < names.size(); ++i )
     CPPUNIT_ASSERT_EQUAL( maa1, pointe_med.getMeshName( names[i] ));
 
   // 14. VEC_DT_IT_  getFieldIteration (const std::string & fieldName) const throw (MEDEXCEPTION)

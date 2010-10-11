@@ -211,7 +211,7 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
 
             for (dim=firstdim; dim < lastdim; dim++) {
               
-              for (i=0; i < psize; i++)              /* i balaye les élements du profil */
+              for (i=0; i < int(psize); i++)              /* i balaye les élements du profil */
                 for (j=0; j < ngauss; j++) {         
                   index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
                   pflmem[index] = (pfltab[i]-1)*ngauss*nbdim + j*nbdim+dim;
@@ -252,7 +252,7 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
             
             for (dim=firstdim; dim < lastdim; dim++) {
               
-              for (i=0; i < psize; i++)              /* i balaye les élements du profil */
+              for (i=0; i < int(psize); i++)              /* i balaye les élements du profil */
                 for (j=0; j < ngauss; j++) {         
                   index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
                   pflmem[index] = i*ngauss*nbdim + j*nbdim+dim;
@@ -346,7 +346,7 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
             
             for (dim=firstdim; dim < lastdim; dim++) {
               
-              for (i=0; i < psize; i++)              /* i balaye le nbre d'élements du profil                */
+              for (i=0; i < int(psize); i++)              /* i balaye le nbre d'élements du profil                */
                 for (j=0; j < ngauss; j++) { 
                   index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
                   pfldsk[index] = dim*count[0]+(pfltab[i]-1)*ngauss+j;      
@@ -388,7 +388,7 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
             
             for (dim=firstdim; dim < lastdim; dim++) {
               
-              for (i=0; i < psize; i++)              /* i balaye le nbre d'élements du profil                */
+              for (i=0; i < int(psize); i++)              /* i balaye le nbre d'élements du profil                */
                 for (j=0; j < ngauss; j++) {
                   index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
                   pflmem[index] = dim*(psize*ngauss) + (pfltab[i]-1)*ngauss+j;

@@ -341,6 +341,10 @@ namespace MEDSPLITTER {
     
                 //map<pair<int,int>,int> m_face_loc_to_glob;
         
+                int m_nb_domain;
+        
+                int m_mesh_dimension;
+        
                 vector<int> m_nb_cells;
         
                 vector<int> m_nb_nodes;
@@ -352,10 +356,6 @@ namespace MEDSPLITTER {
                 int m_nb_total_nodes;
         
                 int m_nb_total_faces;
-        
-                int m_nb_domain;
-        
-                int m_mesh_dimension;
         
                 boost::shared_ptr<Graph> m_graph;
         };

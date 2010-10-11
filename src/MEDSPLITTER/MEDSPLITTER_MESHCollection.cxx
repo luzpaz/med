@@ -99,11 +99,11 @@ MESHCollection::MESHCollection()
  */
 
 MESHCollection::MESHCollection(const MESHCollection& initial_collection, Topology* topology, bool family_splitting, bool create_empty_groups)
-  : m_name(initial_collection.m_name),
-    m_topology(topology),
+  : m_topology(topology),
     m_owns_topology(false),
     m_cell_graph(topology->getGraph()),
     m_driver(0),
+    m_name(initial_collection.m_name),
     m_driver_type(MEDSPLITTER::MedXML),
     m_subdomain_boundary_creates(false),
     m_family_splitting(family_splitting),
@@ -187,10 +187,10 @@ MESHCollection::MESHCollection(const string& filename)
  * \param meshname name of the mesh that is to be read
  */
 MESHCollection::MESHCollection(const string& filename, const string& meshname)
-  : m_name(meshname),
-    m_topology(0),
+  : m_topology(0),
     m_owns_topology(true),
     m_driver(0),
+    m_name(meshname),
     m_driver_type(MEDSPLITTER::MedXML),
     m_subdomain_boundary_creates(false),
     m_family_splitting(false),
@@ -213,9 +213,9 @@ MESHCollection::MESHCollection(const string& filename, const string& meshname)
 
 MESHCollection::~MESHCollection()
 {
-  for (int i=0; i<m_mesh.size();i++)
+  for (unsigned i=0; i<m_mesh.size();i++)
     if (m_mesh[i]!=0) {/*delete*/ m_mesh[i]->removeReference(); }
-  for (int i=0; i<m_connect_zones.size();i++)
+  for (unsigned i=0; i<m_connect_zones.size();i++)
     if (m_connect_zones[i]!=0) {delete m_connect_zones[i];}
   if (m_driver !=0) {delete m_driver; m_driver=0;}
   if (m_topology!=0 && m_owns_topology) {delete m_topology; m_topology=0;}
@@ -746,7 +746,7 @@ void MESHCollection::treatIndivisibleRegions(int* indivisible_tag)
   //treating cell groups          
   for (int idomain=0; idomain<m_topology->nbDomain();idomain++)
     for (int igroup=0; igroup<m_mesh[idomain]->getNumberOfGroups(MED_EN::MED_CELL); igroup++)
-      for (int i=0; i<m_indivisible_regions.size(); i++)
+      for (unsigned i=0; i<m_indivisible_regions.size(); i++)
       {
         const MEDMEM::GROUP* group = m_mesh[idomain]->getGroup(MED_EN::MED_CELL,igroup+1);
         string groupname = group->getName();
@@ -934,11 +934,11 @@ void MESHCollection::buildCellGraph(MEDMEM::MEDSKYLINEARRAY* & array,int *& edge
     //              cells_neighbours[*iter]++;
     //        }*/
 
-    for (int inode=0; inode< cell2node[i+1].size(); inode++)
+    for (unsigned inode=0; inode< cell2node[i+1].size(); inode++)
     {
       int nodeid=cell2node[i+1][inode];
       //   cout << "size node2cell "<<node2cell[nodeid].size()<<endl;
-      for (int icell=0; icell<node2cell[nodeid].size();icell++)
+      for (unsigned icell=0; icell<node2cell[nodeid].size();icell++)
         cells_neighbours[node2cell[nodeid][icell]]++;
     }
     size[i]=0;
@@ -1160,7 +1160,7 @@ void MESHCollection::buildConnectZones(int idomain)
     if (cell_cell_correspondency[idistant]!=0)
     {
       MEDMEM::CONNECTZONE* cz=0;
-      for (int icz=0; icz<m_connect_zones.size();icz++)
+      for (unsigned icz=0; icz<m_connect_zones.size();icz++)
         if (m_connect_zones[icz]->getLocalDomainNumber()==idomain &&
             m_connect_zones[icz]->getDistantDomainNumber()==idistant)
           cz = m_connect_zones[icz];
@@ -1326,7 +1326,7 @@ void MESHCollection::buildConnectZones()
         int nbfaces = (iter->second).size();   
         vector<int> face_joint(nbfaces*2);
         MEDMEM::CONNECTZONE* cz=0;
-        for (int icz=0; icz<m_connect_zones.size();icz++)
+        for (unsigned icz=0; icz<m_connect_zones.size();icz++)
           if (m_connect_zones[icz]->getLocalDomainNumber()==idomain &&
               m_connect_zones[icz]->getDistantDomainNumber()==idistant)
             cz = m_connect_zones[icz];
@@ -1392,7 +1392,7 @@ void MESHCollection::buildConnectZones()
           types[itype]=iterj->first;
           itype++;
           group_index[itype]=group_index[itype-1]+(iterj->second).size();
-          for (int i=0; i<  (iterj->second).size(); i++)
+          for (unsigned i=0; i<  (iterj->second).size(); i++)
             group_value[iface++]=(iterj->second)[i];
         }
         joint_group->setGeometricType(types);
@@ -1422,7 +1422,7 @@ void MESHCollection::buildConnectZones()
     for (int idomain=0; idomain<m_topology->nbDomain(); idomain++)
       for (map <medGeometryElement, vector<MEDSPLITTER_FaceModel*> >::const_iterator iter= face_map[idomain].begin();
            iter != face_map[idomain].end(); iter ++)
-        for (int i=0; i<(iter->second).size();i++)
+        for (unsigned i=0; i<(iter->second).size();i++)
           delete (iter->second)[i];
   }
 
@@ -1441,7 +1441,7 @@ void MESHCollection::buildConnectZones()
       if (cell_cell_correspondency[idistant]!=0)
       {
         MEDMEM::CONNECTZONE* cz=0;
-        for (int icz=0; icz<m_connect_zones.size();icz++)
+        for (unsigned icz=0; icz<m_connect_zones.size();icz++)
           if (m_connect_zones[icz]->getLocalDomainNumber()==idomain &&
               m_connect_zones[icz]->getDistantDomainNumber()==idistant)
             cz = m_connect_zones[icz];
@@ -1558,7 +1558,7 @@ void MESHCollection::castFamilies(const MESHCollection& old_collection)
 void MESHCollection::castSupport(const MESHCollection& old_collection, vector<const MEDMEM::SUPPORT*> old_support, vector<MEDMEM::SUPPORT*> new_support)
 {
 
-  if (old_collection.m_topology->nbDomain() != old_support.size())
+  if (old_collection.m_topology->nbDomain() != (int)old_support.size())
   {
     throw MED_EXCEPTION(STRING("Error : wrong call to MESHCollection::castSupport"));
   }
@@ -1681,7 +1681,7 @@ void MESHCollection::castAllFields(const MESHCollection& initial_collection)
   vector <int> types;
   initial_collection.getDriver()->readFileStruct(field_names,iternumber,ordernumber,types);
 
-  for (int i=0; i<field_names.size(); i++)
+  for (unsigned i=0; i<field_names.size(); i++)
   {
     char field_char[80];
     strcpy(field_char,field_names[i].c_str());
@@ -2032,7 +2032,7 @@ MEDSPLITTER_FaceModel* MESHCollection::getCommonFace(int ip1,int ilocal1,int ip2
     int dimension=getMeshDimension();
     for (int i=0; i<nbnodes;i++)
     {
-      for (int i2=0; i2<nodes2.size(); i2++)
+      for (unsigned i2=0; i2<nodes2.size(); i2++)
       {
         if (nodes1[nodes[i]-1]==nodes2[i2]) common_nodes++;
       }

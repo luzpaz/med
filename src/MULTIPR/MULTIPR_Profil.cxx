@@ -187,7 +187,7 @@ void    Profil::readProfilBinding(med_idt pMEDfile, char* pMeshName)
     char            profilName[MED_TAILLE_NOM + 1];
     int             sizeOfData;
     int             sizeOfType;
-    unsigned char*  fieldData;
+    //unsigned char*  fieldData;
     bool            fieldOnNodes = false;
     med_entite_maillage     entity;
     med_geometrie_element   geom;

@@ -187,8 +187,8 @@ void VTK_MESH_DRIVER::close() {
   closeConst() ;
 }
 
-void    VTK_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; };
-string  VTK_MESH_DRIVER::getMeshName() const { return _meshName; };
+void    VTK_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; }
+string  VTK_MESH_DRIVER::getMeshName() const { return _meshName; }
 
 void VTK_MESH_DRIVER::read(void) throw (MEDEXCEPTION)
 {

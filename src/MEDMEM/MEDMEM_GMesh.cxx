@@ -149,7 +149,7 @@ GMESH::~GMESH()
   // due to cyclic dependencies with child reference counters (groups and families)
   clearRefCouner();
 
-  for (int i=0;i<_familyNode.size();i++)
+  for (unsigned i=0;i<_familyNode.size();i++)
   {
     // if another object refers to a family and it survive now,
     // it sould not refer to a dead mesh
@@ -157,43 +157,43 @@ GMESH::~GMESH()
     _familyNode[i]->removeReference();
   }
   _familyNode.clear();
-  for (int i=0;i<_familyCell.size();i++)
+  for (unsigned i=0;i<_familyCell.size();i++)
   {
     _familyCell[i]->setMesh(0);
     _familyCell[i]->removeReference();
   }
   _familyCell.clear();
-  for (int i=0;i<_familyFace.size();i++)
+  for (unsigned i=0;i<_familyFace.size();i++)
   {
     _familyFace[i]->setMesh(0);
     _familyFace[i]->removeReference();
   }
   _familyFace.clear();
-  for (int i=0;i<_familyEdge.size();i++)
+  for (unsigned i=0;i<_familyEdge.size();i++)
   {
     _familyEdge[i]->setMesh(0);
     _familyEdge[i]->removeReference();
   }
   _familyEdge.clear();
-  for (int i=0;i<_groupNode.size();i++)
+  for (unsigned i=0;i<_groupNode.size();i++)
   {
     _groupNode[i]->setMesh(0);
     _groupNode[i]->removeReference();
   }
   _groupNode.clear();
-  for (int i=0;i<_groupCell.size();i++)
+  for (unsigned i=0;i<_groupCell.size();i++)
   {
     _groupCell[i]->setMesh(0);
     _groupCell[i]->removeReference();
   }
   _groupCell.clear();
-  for (int i=0;i<_groupFace.size();i++)
+  for (unsigned i=0;i<_groupFace.size();i++)
   {
     _groupFace[i]->setMesh(0);
     _groupFace[i]->removeReference();
   }
   _groupFace.clear();
-  for (int i=0;i<_groupEdge.size();i++)
+  for (unsigned i=0;i<_groupEdge.size();i++)
   {
     _groupEdge[i]->setMesh(0);
     _groupEdge[i]->removeReference();
@@ -347,7 +347,7 @@ void GMESH::rmDriver (int index/*=0*/)
   const char * LOC = "GMESH::rmDriver (int index=0): ";
   BEGIN_OF_MED(LOC);
 
-  if (index >= 0 && index < _drivers.size() && _drivers[index])
+  if (index >= 0 && index < (int)_drivers.size() && _drivers[index])
   {
     delete _drivers[index];
     _drivers[index] = 0;
@@ -372,7 +372,7 @@ void GMESH::read(int index)
   const char * LOC = "GMESH::read(int index=0) : ";
   BEGIN_OF_MED(LOC);
 
-  if (index >= 0 && index < _drivers.size() && _drivers[index])
+  if (index >= 0 && index < (int)_drivers.size() && _drivers[index])
   {
     _drivers[index]->open();
     try
@@ -472,7 +472,7 @@ void GMESH::write(int index) const
   const char * LOC = "GMESH::write(int index=0) : ";
   BEGIN_OF_MED(LOC);
 
-  if ( index > -1 && index < _drivers.size() && _drivers[index] )
+  if ( index > -1 && index < (int)_drivers.size() && _drivers[index] )
   {
     _drivers[index]->open();
     try
@@ -768,7 +768,7 @@ const GROUP* GMESH::getGroup(const string& name) const  throw (MEDEXCEPTION)
 {
   const vector<GROUP*>* group_vectors [4]={&_groupNode, &_groupEdge,&_groupFace,&_groupCell};
   for (int ientity=0;ientity<4;ientity++)
-    for (int igroup=0; igroup< group_vectors[ientity]->size();igroup++)
+    for (unsigned igroup=0; igroup< group_vectors[ientity]->size();igroup++)
     {
       const vector<GROUP*>& group_vect = *group_vectors[ientity];
       GROUP* group=group_vect[igroup];
@@ -1217,7 +1217,7 @@ void GMESH::createFamilies()
         continue; // it is just a truncated long family name
 
       // scan family cells and fill the tab that are needed by the create a MED FAMILY
-      for( int i=0; i!=fam->second.size(); ++i)
+      for( unsigned i=0; i!=fam->second.size(); ++i)
       {
         int ncell=fam->second[i]-1;
         if(tab_cell[ncell].geometricType != geometrictype)
@@ -1364,7 +1364,7 @@ void GMESH::createGroups()
     }
 
 
-    for (int i=0; i< myFamilies->size(); i++)
+    for (unsigned i=0; i< myFamilies->size(); i++)
     {
       list <FAMILY*> fam_list;
       fam_list.push_back((*myFamilies)[i]);

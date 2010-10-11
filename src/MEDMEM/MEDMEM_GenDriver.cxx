@@ -142,9 +142,9 @@ ostream & MEDMEM::operator<<(ostream &os,const GENDRIVER & drv)
     case RDWR :
       os<<"C'est un IO d'READ/WRITE"<<endl;
       break;
-      //case MED_REMP :
-      //os <<"C'est un IO de remplacement"<<endl;
-      //break;
+    case WRONLY :
+      os<<"C'est un IO d'WRITE"<<endl;
+      break;
     }
   switch (drv._status)
     {

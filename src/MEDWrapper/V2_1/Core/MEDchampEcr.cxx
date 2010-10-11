@@ -181,7 +181,7 @@ MEDchampEcr(med_idt fid, char *maa, char *cha,unsigned char *val,med_mode_switch
     pfltab    = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)psize);
     if ((ret = MEDprofilLire(fid,pfltabtmp,pflname)) < 0)
       return -1;
-    for (i=0;i<psize;i++)
+    for (i=0;i<int(psize);i++)
       pfltab[i] = (med_ssize) pfltabtmp[i];
     
   }

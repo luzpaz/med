@@ -1220,7 +1220,7 @@ FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
           const int * nbelgeo = Support->getNumberOfElements();
           vector<int> nbelgeoc( Support->getNumberOfTypes() + 1 );
           nbelgeoc[0] = 0;
-          for ( int t = 1; t < nbelgeoc.size(); ++t )
+          for ( int t = 1; t < (int)nbelgeoc.size(); ++t )
             nbelgeoc[t] = nbelgeoc[t-1] + nbelgeo[t-1];
           _value = new ArrayNoByType (_numberOfComponents,_numberOfValues,
                                       Support->getNumberOfTypes(), &nbelgeoc[0]);
@@ -3268,7 +3268,7 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
   const char * LOC = "FIELD<T, INTERLACING_TAG>::read(int index=0) : ";
   BEGIN_OF_MED(LOC);
 
-  if ( index>=0 && index<_drivers.size() && _drivers[index] ) {
+  if ( index>=0 && index<(int)_drivers.size() && _drivers[index] ) {
     _drivers[index]->open();
     try
     {
@@ -3391,7 +3391,7 @@ void FIELD<T, INTERLACING_TAG>::rmDriver (int index/*=0*/)
   const char * LOC = "FIELD<T, INTERLACING_TAG>::rmDriver (int index=0): ";
   BEGIN_OF_MED(LOC);
 
-  if ( index>=0 && index<_drivers.size() && _drivers[index] ) {
+  if ( index>=0 && index<(int)_drivers.size() && _drivers[index] ) {
     //_drivers.erase(&_drivers[index]);
     // why not ????
     MESSAGE_MED ("detruire");
@@ -3428,7 +3428,7 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
   const char * LOC = "FIELD<T,INTERLACING_TAG>::write(int index=0, const string & driverName = \"\") : ";
   BEGIN_OF_MED(LOC);
 
-  if( index>=0 && index<_drivers.size() && _drivers[index] ) {
+  if( index>=0 && index<(int)_drivers.size() && _drivers[index] ) {
     _drivers[index]->open();
     try
     {
@@ -3515,7 +3515,7 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
   const char * LOC = "FIELD<T,INTERLACING_TAG>::write(int index=0, const string & driverName = \"\") : ";
   BEGIN_OF_MED(LOC);
 
-  if( index>=0 && index<_drivers.size() && _drivers[index] ) {
+  if( index>=0 && index<(int)_drivers.size() && _drivers[index] ) {
     _drivers[index]->openAppend();
     if (driverName != "") _drivers[index]->setFieldName(driverName);
     try

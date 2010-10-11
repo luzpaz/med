@@ -143,6 +143,7 @@ namespace MED
     case eV2_1:
       aWrapper.reset(new MED::V2_1::TVWrapper(theFileName));
       break;
+    default:;
     }
     return aWrapper;
   }

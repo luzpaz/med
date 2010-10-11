@@ -100,7 +100,7 @@ int main (int argc, char ** argv) {
         fields.push_back( myField );
         // set mesh to myField
         string meshName = myField->getSupport()->getMeshName();
-        for ( int i = 0; i < meshes.size(); ++ i)
+        for ( unsigned i = 0; i < meshes.size(); ++ i)
           if ( meshes[i]->getName() == meshName )
             myField->getSupport()->setMesh( meshes[i] );
       }
@@ -118,9 +118,9 @@ int main (int argc, char ** argv) {
       meshDriver.write() ;
     }
 
-    for ( int i = 0; i < meshes.size(); ++ i)
+    for ( unsigned i = 0; i < meshes.size(); ++ i)
       meshes[i]->removeReference();
-    for ( int i = 0; i < fields.size(); ++ i)
+    for ( unsigned i = 0; i < fields.size(); ++ i)
       fields[i]->removeReference();
   }
   else usage(argv[0]);

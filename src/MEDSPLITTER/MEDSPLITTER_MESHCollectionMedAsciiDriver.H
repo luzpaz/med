@@ -35,7 +35,7 @@
 template <class T>
 void MESHCollectionMedAsciiDriver::_readFields(vector<MEDMEM::FIELD<T>* >& fields,char* fieldname, int itnumber, int ordernumber)
 {
-  for (int i=0; i<m_collection->getMesh().size(); i++)
+  for (unsigned i=0; i<m_collection->getMesh().size(); i++)
     {
       char filename[256];
       strcpy(filename,m_filename[i].c_str());
@@ -54,7 +54,7 @@ void MESHCollectionMedAsciiDriver::_readFields(vector<MEDMEM::FIELD<T>* >& field
 template <class T>
 void MESHCollectionMedAsciiDriver::_writeFields(vector<MEDMEM::FIELD<T>* >& fields,char* fieldname)
 {
-  for (int i=0; i<m_collection->getMesh().size(); i++)
+  for (unsigned i=0; i<m_collection->getMesh().size(); i++)
     {
       char filename[256];
       strcpy(filename,m_filename[i].c_str());

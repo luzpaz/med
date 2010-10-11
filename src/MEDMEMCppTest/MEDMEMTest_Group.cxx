@@ -69,7 +69,7 @@ void MEDMEMTest::testGroup()
   CPPUNIT_ASSERT(NumberOfFamillies != 0);
 
   vector<FAMILY*> aFamilies = myGroup->getFamilies();
-  CPPUNIT_ASSERT(NumberOfFamillies == aFamilies.size());
+  CPPUNIT_ASSERT(NumberOfFamillies == (int)aFamilies.size());
   list<FAMILY*> aList;
 
   for (int j=1;j<=NumberOfFamillies;j++)

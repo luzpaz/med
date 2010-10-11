@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+/*/  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 //  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 //  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -18,10 +18,11 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+/*/
 
 #include <med.h>
 #include <string.h>
+#include <stdlib.h>
 
 int main (int argc, char **argv)
 {
@@ -105,10 +106,10 @@ int main (int argc, char **argv)
   med_int ngro;
   char gro[MED_TAILLE_LNOM+1];
   char gro2[MED_TAILLE_LNOM*2+1];
-  //char gro3[MED_TAILLE_LNOM*3+1];
+  /*char gro3[MED_TAILLE_LNOM*3+1];*/
   int i;
   int nfame = 3; 
-  //int nfamn = 2;
+  /*int nfamn = 2;*/
 
 
   /*

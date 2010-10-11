@@ -1501,7 +1501,7 @@ void CONNECTIVITY::calculateFullDescendingConnectivity(MED_EN::medEntityMesh Ent
         Constituentpolygonsnodalvalue.clear();
         Constituentnodalindex.reserve( Constituentnodalindex.size() + NumberOfNewFaces );
         int indexShift = Constituentnodalindex.back() - Constituentpolygonsnodalindex.front();
-        for ( int i = 1; i < Constituentpolygonsnodalindex.size(); ++i )
+        for ( unsigned i = 1; i < Constituentpolygonsnodalindex.size(); ++i )
           Constituentnodalindex.push_back( Constituentpolygonsnodalindex[i] + indexShift );
         Constituentpolygonsnodalindex.clear();
         _constituent->_geometricTypes[ _constituent->_numberOfTypes-1 ] = MED_POLYGON;

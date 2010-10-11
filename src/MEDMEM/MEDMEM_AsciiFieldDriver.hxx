@@ -199,7 +199,7 @@ namespace MEDMEM {
           }
       else
         {
-          if(_spaceDimension!=strlen(priority))
+          if(_spaceDimension != (int)strlen(priority))
             throw MEDEXCEPTION("ASCII_FIELD_DRIVER : Coordinate priority invalid with spaceDim");
           for(i=_spaceDimension-1;i>=0;i--)
             {
@@ -216,14 +216,14 @@ namespace MEDMEM {
   template <class T>
   ASCII_FIELD_DRIVER<T>::ASCII_FIELD_DRIVER(const ASCII_FIELD_DRIVER<T>& other):
     GENDRIVER(ASCII_DRIVER),
+    _mesh(other._mesh),
+    _support(other._support),
     _ptrField(other._ptrField),
     _fileName(other._fileName),
-    _direc(other._direc),
-    _mesh(other._mesh),
-    _nbComponents(other._nbComponents),
     _code(other._code),
-    _spaceDimension(other._spaceDimension),
-    _support(other._support)
+    _direc(other._direc),
+    _nbComponents(other._nbComponents),
+    _spaceDimension(other._spaceDimension)
   {
   }
 

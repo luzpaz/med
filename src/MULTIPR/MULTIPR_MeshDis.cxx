@@ -759,7 +759,7 @@ std::list<std::string> MeshDis::decimatePart (const char* pPartName,
     }
 
     // *** create a new mesh = LOW resolution ***
-    sprintf(argv, "%s %d %lf %lf %d", pFieldName, pFieldIt, lTLow, lRadius, lBoxing);
+    sprintf(argv, "%s %d %f %f %d", pFieldName, pFieldIt, lTLow, lRadius, lBoxing);
     sprintf(newPartName, "%s_LOW", pPartName);
     {
       Mesh* meshLow = meshFull->decimate(pFilterName, argv, part->getMeshName());
@@ -799,7 +799,7 @@ std::list<std::string> MeshDis::decimatePart (const char* pPartName,
     std::string filename = part->getMEDFileName();
     stat(filename.c_str(), &fileStat);
 
-    snprintf(stats, 512, "Mesh compression : Low resolution=%.1f\%%. Medium resolution=%.1f%%.\nFile compression :   Low resolution=%.1f%%. Medium resolution=%.1f%%.", 
+    snprintf(stats, 512, "Mesh compression : Low resolution=%.1f%%. Medium resolution=%.1f%%.\nFile compression :   Low resolution=%.1f%%. Medium resolution=%.1f%%.", 
              lowResStat * 100.0f, medResStat * 100.0f, 
              (1.0f - (float)lowResSize / (float)fileStat.st_size) * 100.0f,
              (1.0f - (float)medResSize / (float)fileStat.st_size) * 100.0f);

@@ -159,8 +159,8 @@ void PORFLOW_MESH_DRIVER::close()
   END_OF_MED(LOC);
 }
 
-void    PORFLOW_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; };
-string  PORFLOW_MESH_DRIVER::getMeshName() const { return _meshName; };
+void    PORFLOW_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; }
+string  PORFLOW_MESH_DRIVER::getMeshName() const { return _meshName; }
 
 
 //---------------------------------- RDONLY PART -------------------------------------------------------------
@@ -285,7 +285,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::readPorflowCoordinateFile(const string & coorFi
         buf >> node.number;
         if (!buf) // for spaces at the end of the file
           break;
-        for (unsigned i=0; i!=space_dimension; ++i)
+        for (int i=0; i!=space_dimension; ++i)
           buf >> node.coord[i];
         medi.points.insert(make_pair(node.number,node));
       }
@@ -598,7 +598,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
     //     - in the PAIR case, we have to create the corresponding 2D/1D faces
     // scan groups
     //for( std::vector<_groupe>::iterator i=medi.groupes.begin(); i!=medi.groupes.end(); ++i)
-    for( int i=0; i!=medi.groupes.size(); ++i)
+    for( unsigned i=0; i!=medi.groupes.size(); ++i)
     {
         if ( isGroupAList[i] ) 
         {

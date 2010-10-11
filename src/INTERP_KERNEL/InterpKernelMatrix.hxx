@@ -58,13 +58,13 @@ namespace INTERP_KERNEL
       Row (const Row& row)
       {
         this->resize(row.size());
-        for (int i=0; i<this->size(); i++)
+        for (unsigned i=0; i<this->size(); i++)
           (*this)[i]=row[i];
       }
       Row& operator= (const Row& row)
       {
         this->resize(row.size());
-        for (int i=0; i<this->size(); i++)
+        for (unsigned i=0; i<this->size(); i++)
           (*this)[i]=row[i];
         return *this;
       }
@@ -90,10 +90,10 @@ namespace INTERP_KERNEL
   public:
     typedef Row value_type;
   public:
-    Matrix():_coeffs(0), _cols(0), _nb_rows(0), _is_configured(false)
+    Matrix():_nb_rows(0), _coeffs(0), _cols(0), _is_configured(false)
     { }
-    Matrix(int nbrows):_coeffs(0), _cols(0), _is_configured(false)
-    { _nb_rows=nbrows; }
+    Matrix(int nbrows):_nb_rows(nbrows), _coeffs(0), _cols(0), _is_configured(false)
+    { }
     Matrix(std::vector<std::map<int,T> > & matrix) :
       _coeffs(0), _cols(0), _is_configured(false)
     {
@@ -209,7 +209,7 @@ namespace INTERP_KERNEL
       if (!_is_configured)
         configure();
       
-      for (int i=0; i< _nb_rows; i++)
+      for (unsigned i=0; i< _nb_rows; i++)
         {
           for(int comp = 0; comp < nb_comp; comp++)
             output[i*nb_comp+comp]=0.;
@@ -265,7 +265,7 @@ namespace INTERP_KERNEL
         for(int comp = 0; comp < nb_comp; comp++)
           output[icol*nb_comp+comp]=0.;
 
-      for (int i=0; i< _nb_rows; i++)
+      for (unsigned i=0; i< _nb_rows; i++)
         {
           for (unsigned int j=_ncols_offset[i]; j< _ncols_offset[i+1]; j++)
             {
@@ -286,7 +286,7 @@ namespace INTERP_KERNEL
         configure();
       for (int icol=0; icol< nb_cols; icol++)
         output[icol]=0.;
-      for (int i=0; i< _nb_rows; i++)
+      for (unsigned i=0; i< _nb_rows; i++)
         {
           for (unsigned int j=_ncols_offset[i]; j< _ncols_offset[i+1]; j++)
             {
@@ -304,7 +304,7 @@ namespace INTERP_KERNEL
     {
       if (!_is_configured)
         configure();
-      for (int i=0; i< _nb_rows; i++)
+      for (unsigned i=0; i< _nb_rows; i++)
         {
           output[i]=0;
           for (unsigned int j=_ncols_offset[i]; j< _ncols_offset[i+1]; j++) 

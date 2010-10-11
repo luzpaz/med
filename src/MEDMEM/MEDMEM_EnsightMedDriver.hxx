@@ -81,8 +81,8 @@ public :
   GENDRIVER * copy ( void ) const;
 private:
 
-  bool _isFileStructRead;
   std::vector< FIELD_* > * _fields;
+  bool _isFileStructRead;
 };
 
 // ==============================================================================

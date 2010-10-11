@@ -35,8 +35,8 @@ using namespace MEDMEM;
   CONNECTZONE::CONNECTZONE():
   _name("")
   ,_description("")
-  ,_distantDomainNumber(0)
   ,_localDomainNumber(0)
+  ,_distantDomainNumber(0)
   ,_nodeCorresp(0)
   ,_faceCorresp(0)
   {
@@ -56,8 +56,8 @@ using namespace MEDMEM;
   CONNECTZONE::CONNECTZONE(const CONNECTZONE & myConnectZone):
   _name(myConnectZone._name)
   ,_description(myConnectZone._description)
-  ,_distantDomainNumber(myConnectZone._distantDomainNumber)
   ,_localDomainNumber(myConnectZone._localDomainNumber)
+  ,_distantDomainNumber(myConnectZone._distantDomainNumber)
   ,_nodeCorresp(myConnectZone._nodeCorresp)
   ,_faceCorresp(myConnectZone._faceCorresp)
   ,_entityCorresp(myConnectZone._entityCorresp)

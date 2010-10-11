@@ -96,8 +96,11 @@ size of vector \a xyz_array.
  *\param coord_unit names of the different coordinate units
  *\param type  grid type (MED_POLAR, MED_CARTESIAN)
 */
-GRID::GRID(const std::vector<std::vector<double> >& xyz_array,const std::vector<std::string>& coord_name, 
-                                         const std::vector<std::string>& coord_unit, const MED_EN::med_grid_type type) : _gridType(type)
+GRID::GRID(const std::vector<std::vector<double> >& xyz_array,
+           const std::vector<std::string>&          coord_name,
+           const std::vector<std::string>&          coord_unit,
+           const MED_EN::med_grid_type              type)
+  :_gridType(type)
 {
     init(); // PAL 12136
     _is_default_gridType = false;
@@ -156,7 +159,7 @@ GRID::GRID(driverTypes driverType, const string &  fileName, const string &  dri
   myDriver->close();
 
   END_OF_MED(LOC);
-};
+}
 
 /*!\if MEDMEM_ug @} \endif */
 
@@ -497,7 +500,7 @@ const MESH * GRID::convertInMESH() const
 
   const vector<GROUP*>* groups[] = { &_groupNode, &_groupCell, &_groupFace, &_groupEdge };
   for ( i = 0; i < 4; ++i )
-    for ( j = 0; j < groups[i]->size(); ++j )
+    for ( j = 0; j < (int)groups[i]->size(); ++j )
       mesh->addGroup( * groups[i]->at( j ));
 
   return mesh;

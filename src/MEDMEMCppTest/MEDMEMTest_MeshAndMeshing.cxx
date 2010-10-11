@@ -1586,7 +1586,7 @@ void MEDMEMTest::testMeshAndMeshing()
 
   vector<FAMILY*> families4;
   CPPUNIT_ASSERT_NO_THROW(families4 = myMesh6->getFamilies(MED_CELL));
-  CPPUNIT_ASSERT(families4.size() == NumberOfFamilies4);
+  CPPUNIT_ASSERT((int)families4.size() == NumberOfFamilies4);
   for(int nb = 1; nb <= NumberOfFamilies4; nb++ )
   {
     const FAMILY* family;
@@ -1662,9 +1662,9 @@ void MEDMEMTest::testMeshAndMeshing()
   }
 
   out<<"Bounding box for createTestMesh()"<<endl;
-  for(int i = 0; i < myBndBox.size(); i++)
+  for(unsigned i = 0; i < myBndBox.size(); i++)
   {
-    for(int j = 0; j < myBndBox[i].size(); j++)
+    for(unsigned j = 0; j < myBndBox[i].size(); j++)
       out<<" "<< myBndBox[i][j]<<" ";
     out<<endl;
   }

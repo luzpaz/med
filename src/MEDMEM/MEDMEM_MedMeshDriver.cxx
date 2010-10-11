@@ -957,7 +957,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
         {
           Connectivity->_numberOfTypes=0;
 
-          for ( i=0;i<tmp_cell_models.size();i++)
+          for ( i=0;i<int(tmp_cell_models.size());i++)
           {
             int dimension = tmp_cell_models[i].getDimension();
             if (Connectivity->_entityDimension == dimension)
@@ -1032,7 +1032,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
           int size = 0;
           int typeNumber=1;
           vector<int> connSizeByType;
-          for ( i=0; i < tmp_cells_count.size(); i++)
+          for ( i=0; i < (int)tmp_cells_count.size(); i++)
           { // no point1 cell type (?)
             if ( !tmp_cells_count[i] ) continue; // faces or edges
 
@@ -1213,7 +1213,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
 
           int size = 0;
           vector<int> connSizeByType;
-          for ( i=0; i < faceTypes.size(); i++)
+          for ( i=0; i < (int)faceTypes.size(); i++)
           {
             constituent->_count[i+1] = constituent->_count[i] + tmpFaceCount[i];
             constituent->_type[i] = CELLMODEL_Map::retrieveCellModel( faceTypes[i] );
@@ -1325,7 +1325,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
           constituent->_count[0]=1;
 
           int size = 0;
-          for ( i=0; i<edgeTypes.size(); i++)
+          for ( i=0; i<(int)edgeTypes.size(); i++)
           {
             constituent->_count[i+1]=constituent->_count[i]+tmpEdgeCount[i];
             constituent->_type[i]=CELLMODEL_Map::retrieveCellModel( edgeTypes[i] );
@@ -2377,7 +2377,7 @@ int MED_MESH_WRONLY_DRIVER::writeConnectivities(medEntityMesh entity) const
                 int nbStdCells = ptrMesh->getGlobalNumberingIndex(entity)[i]-1;
                 vector< med_2_3::med_int > connectivityArray( connectivity, connectivity + size );
                 vector< med_2_3::med_int > tmp_Index( numberOfElements+1 );
-                for ( int j = 0; j < tmp_Index.size(); ++ j )
+                for ( unsigned j = 0; j < tmp_Index.size(); ++ j )
                   tmp_Index[j] = index[ nbStdCells + j ] - index[ nbStdCells ] + 1;
 
                 err = MEDpolygoneConnEcr(_medIdt,
@@ -2527,7 +2527,7 @@ void MED_MESH_WRONLY_DRIVER::groupFamilyConverter(const vector <GROUP*>& myGroup
 //
  //mapping elements to all the groups containing it
   std::multimap <int,int> elem2groups;
-  for (int igroup=0; igroup< myGroups.size(); igroup++)
+  for (int igroup=0; igroup< (int)myGroups.size(); igroup++)
   {
     // if the support is on all Mesh elements
     //all the items from 1 to nb are in the group
@@ -2665,7 +2665,7 @@ void MED_MESH_WRONLY_DRIVER::groupFamilyConverter(const vector <GROUP*>& myGroup
     //myFamily->getGroupsNames();
     //groupnames.set(key.size());
 
-    for (int igroup=0; igroup<key.size(); igroup++)
+    for (int igroup=0; igroup<(int)key.size(); igroup++)
     {
       groupnames[igroup]=myGroups[key[igroup]]->getName();
     }
@@ -2678,7 +2678,7 @@ void MED_MESH_WRONLY_DRIVER::groupFamilyConverter(const vector <GROUP*>& myGroup
   }
 
   //adding empty families corresponding to empty groups
-  for (int i=0; i<myGroups.size(); i++)
+  for (size_t i=0; i<myGroups.size(); i++)
   {
     if (myGroups[i]->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)==0)
     {

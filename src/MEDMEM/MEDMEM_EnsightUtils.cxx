@@ -385,7 +385,7 @@ namespace MEDMEM_ENSIGHT
 
 _CaseFileDriver::_CaseFileDriver(const string &              fileName,
                                  const _CaseFileDriver_User* creator)
-  : _user( creator ), _fileName( fileName ), _directory(".")
+  : _fileName( fileName ), _directory("."), _user( creator )
 {
   // Find out if the driver is blocked
   _blocked = isToIgnore( creator );
@@ -654,7 +654,7 @@ void _CaseFileDriver::read() throw (MEDEXCEPTION)
         list<string>::iterator t = times.begin();
         for ( i = 0; i < nbTimes; ++i, ++t )
           timeSet->_times[i] = *t;
-        while ( nbTimes != timeSet->_times.size() ) {
+        while ( nbTimes != (int)timeSet->_times.size() ) {
           value = reader.getLine();
           ++lineNb;
           nbTimes += reader.split( value, times );
@@ -664,7 +664,7 @@ void _CaseFileDriver::read() throw (MEDEXCEPTION)
             timeSet->_times[i] = *t;
           }
         }
-        if ( nbTimes != timeSet->_times.size() ) {
+        if ( nbTimes != (int)timeSet->_times.size() ) {
           errorMsg << "incorrect number of times in time set " << timeSet->_number;
           RAISE_EXCEPTION;
         }
@@ -724,7 +724,7 @@ void _CaseFileDriver::read() throw (MEDEXCEPTION)
         while ( !file.eof() )
           numbers.push_back( file.getWord() );
         int nb = numbers.size();
-        if ( nb != timeSet->_times.size() ) {
+        if ( nb != (int)timeSet->_times.size() ) {
           errorMsg << "incorrect number of values in file " << value;
           RAISE_EXCEPTION;
         }
@@ -1181,7 +1181,7 @@ int _CaseFileDriver::setDataFileName(const int                    varIndex,
       while ( !cvfile.eof() )
         fileData_parts.push_back( cvfile.getWord() );
     }
-    if ( fileData_parts.size() < stepIndex )
+    if ( (int)fileData_parts.size() < stepIndex )
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "can't find value for step " << stepIndex
                                    << " of " << var._type << " " << var._name));
     list<string>::iterator value = fileData_parts.begin();
@@ -1268,11 +1268,11 @@ int  _CaseFileDriver::fixWildCardName(const int      timeStep,
   if ( indexWidth > 0 || !ts.empty() || timeStep > 1 ) {
     int tsId = ts.empty() ? 1 : _ATOI( ts );
     const _TimeSet& timeSet = _timeSets[ tsId ];
-    if ( timeStep > timeSet._times.size() )
+    if ( timeStep > (int)timeSet._times.size() )
       throw MEDEXCEPTION(LOCALIZED(badFile << "Cant'f find time for time step " <<
                                    timeStep << " in time set " << ts ));
     time = timeSet._times[ timeStep-1 ];
-    if ( timeStep-1 < timeSet._fileIndex.size()  )
+    if ( timeStep-1 < (int)timeSet._fileIndex.size()  )
       fileIndex = timeSet._fileIndex[ timeStep-1 ];
     if ( !indexInFile )
       indexInFile = 1;
@@ -1285,7 +1285,7 @@ int  _CaseFileDriver::fixWildCardName(const int      timeStep,
                                    timeStep << " in time set <" << ts <<
                                    "> and file set <" << fs << ">"));
     }
-    if ( indexWidth == fileIndex.size() ) {
+    if ( indexWidth ==  (int)fileIndex.size() ) {
       fileName = head + fileIndex + queue;
     }
     else {
@@ -1455,7 +1455,7 @@ void _CaseFileDriver::write() throw (MEDEXCEPTION)
           }
         }
       }
-      int digitPos = (int) _model._fileName.find('*');
+      string::size_type digitPos = _model._fileName.find('*');
       bool isSeveralFiles = ( digitPos != _model._fileName.npos );
       int nbDigits = defaultNbDigits;
       if ( isSeveralFiles ) {
@@ -1587,11 +1587,11 @@ void _CaseFileDriver::write() throw (MEDEXCEPTION)
     }
     FDriverByDouble * sortedDrivers;
     FDriverByDouble::iterator tDrv;
-    if ( timeMap.size() == nbNewSteps )
+    if ( (int)timeMap.size() == nbNewSteps )
       sortedDrivers = & timeMap;
-    else if ( iterMap.size() == nbNewSteps )
+    else if ( (int)iterMap.size() == nbNewSteps )
       sortedDrivers = & iterMap;
-    else if ( orderMap.size() == nbNewSteps )
+    else if ( (int)orderMap.size() == nbNewSteps )
       sortedDrivers = & orderMap;
     else {
       timeMap.clear();
@@ -1744,8 +1744,8 @@ void _CaseFileDriver::write() throw (MEDEXCEPTION)
                << "number of steps:\t" << ts._times.size() << endl;
       if ( !ts._fileIndex.empty() ) {
         STRING numbers( "filename numbers:" );
-        for ( int i = 0; i < ts._fileIndex.size(); ++i ) {
-          if ( numbers.size() + ts._fileIndex[i].size() + 2 > MAX_LINE_LENGTH ) {
+        for ( unsigned i = 0; i < ts._fileIndex.size(); ++i ) {
+          if (int( numbers.size() + ts._fileIndex[i].size() + 2) > MAX_LINE_LENGTH ) {
             caseFile << numbers << endl;
             numbers = STRING();
           }
@@ -1754,8 +1754,8 @@ void _CaseFileDriver::write() throw (MEDEXCEPTION)
         caseFile << numbers << endl;
       }
       STRING times( "time values:" );
-      for ( int i = 0; i < ts._times.size(); ++i ) {
-        if ( times.size() + ts._times[i].size() + 2 > MAX_LINE_LENGTH ) {
+      for ( unsigned i = 0; i < ts._times.size(); ++i ) {
+        if (int( times.size() + ts._times[i].size() + 2 ) > MAX_LINE_LENGTH ) {
           caseFile << times << endl;
           times = STRING();
         }
@@ -2908,7 +2908,7 @@ _BinaryFileWriter::~_BinaryFileWriter()
 void _BinaryFileWriter::addString(const char* str) throw (MEDEXCEPTION)
 {
   size_t len = strlen( str );
-  if ( len > MAX_LINE_LENGTH )
+  if ((int) len > MAX_LINE_LENGTH )
     throw MEDEXCEPTION
       (LOCALIZED(STRING("_BinaryFileWriter::addString(), too long string (>80):\n") << str));
 

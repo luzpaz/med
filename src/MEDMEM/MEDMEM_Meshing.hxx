@@ -71,6 +71,6 @@ class MEDMEM_EXPORT MESHING: public MESH
 
   void addGroup            (const GROUP & Group)                throw (MEDEXCEPTION) ;
 };
-};
+}
 
 #endif /* MESHING_HXX */

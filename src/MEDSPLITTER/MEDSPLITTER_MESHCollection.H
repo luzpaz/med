@@ -276,7 +276,7 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
     new_supports[i]->removeReference();
     //delete medarray[i];
   }
-  for (int i=0; i<old_fields.size(); i++)
+  for (unsigned i=0; i<old_fields.size(); i++)
   {
     cout << "old field deletion" <<endl;
     old_fields[i]->removeReference();

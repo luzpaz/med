@@ -57,6 +57,7 @@ void MEDMEMTest::tearDown()
 {
 }
 
+/*
 // #1: MEDMEM_Array.hxx                \
 // #2: MEDMEM_ArrayConvert.hxx          }  MEDMEMTest_Array.cxx
 // #3: MEDMEM_ArrayInterface.hxx (-)   /
@@ -112,7 +113,7 @@ void MEDMEMTest::tearDown()
 // #58: MEDMEM_VtkMedDriver.hxx         }  MEDMEMTest_VtkMedDriver.cxx
 // #59: MEDMEM_VtkMeshDriver.hxx        }  MEDMEMTest_VtkMeshDriver.cxx
 // #60: MEDMEM_medimport_src.hxx        }  MEDMEMTest.cxx (-)
-
+*/
 
 /*!
  *  Check methods (not in spec), defined in MEDMEM_CellModel.hxx:

@@ -28,7 +28,7 @@
 
 namespace MEDSPLITTER {
   class MESH;
-};
+}
 
 class MEDSPLITTERTest : public CppUnit::TestFixture
 {
@@ -97,6 +97,6 @@ void MEDSPLITTERTest_DumpArray (std::ostream & stream, const T* array, const int
     }
   }
   stream << "}" << std::endl;
-};
+}
 
 #endif

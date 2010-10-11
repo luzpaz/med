@@ -103,7 +103,7 @@ int main (int argc, char ** argv)
         cout << "    * Iteration "<<FieldIteration[j].dt<<" and  order number "<<FieldIteration[j].it<<" ) is read !" << endl;
         fields.push_back( myField );
         string meshName = myMed.getMeshName( FieldName[j] );
-        for ( int m = 0; m < meshes.size(); ++m)
+        for ( unsigned m = 0; m < meshes.size(); ++m)
           if ( meshes[m]->getName() == meshName )
             myField->getSupport()->setMesh( meshes[m] );
       }
@@ -124,9 +124,9 @@ int main (int argc, char ** argv)
       meshDriver.write() ;
     }
 
-    for ( int i = 0; i < meshes.size(); ++ i)
+    for ( unsigned i = 0; i < meshes.size(); ++ i)
       meshes[i]->removeReference();
-    for ( int i = 0; i < fields.size(); ++ i)
+    for ( unsigned i = 0; i < fields.size(); ++ i)
       fields[i]->removeReference();
   } 
   catch (MEDEXCEPTION& ex){

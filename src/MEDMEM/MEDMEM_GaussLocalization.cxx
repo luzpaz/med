@@ -39,9 +39,9 @@ namespace // matters used by GAUSS_LOCALIZATION_::makeDefaultLocalization()
   //---------------------------------------------------------------
   struct TShapeFun
   {
-    TDoubleVector myRefCoord;
     TInt myDim;
     TInt myNbRef;
+    TDoubleVector myRefCoord;
 
     TShapeFun(TInt theDim = 0, TInt theNbRef = 0)
       :myDim(theDim),myNbRef(theNbRef),myRefCoord(theNbRef*theDim) {}

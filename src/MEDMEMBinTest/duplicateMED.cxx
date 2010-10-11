@@ -49,7 +49,7 @@ int main (int argc, char ** argv) {
 
     std::vector< std::string > meshNames = myMed.getMeshNames ();
     //std::map< std::string, GMESH* > name2mesh;
-    for ( int i = 0; i < meshNames.size(); ++i )
+    for ( unsigned i = 0; i < meshNames.size(); ++i )
     {
       GMESH* mesh = myMed.isStructuredMesh( meshNames[i] ) ? (GMESH*) new GRID : (GMESH*) new MESH;
       int drv = mesh->addDriver(MED_DRIVER, filenameIN, meshNames[i] );
@@ -61,10 +61,10 @@ int main (int argc, char ** argv) {
     }
     
     vector<string> FieldName = myMed.getFieldNames() ;
-    for (int i=0; i<FieldName.size(); i++)
+    for (unsigned i=0; i<FieldName.size(); i++)
     {
       vector<DT_IT_> FieldIteration = myMed.getFieldIteration(FieldName[i]) ;
-      for (int j=0; j<FieldIteration.size(); j++)
+      for (unsigned j=0; j<FieldIteration.size(); j++)
       {
         FIELD_ * myField = 0;
         switch( myMed.getFieldType( FieldName[i] ))
