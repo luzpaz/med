@@ -41,7 +41,7 @@ using namespace MED_EN;
 
 
 /*!
- *  Check methods (44), defined in MEDMEM_Grid.hxx:
+ *  Check methods (23), defined in MEDMEM_Grid.hxx:
  *  class GRID: public MESH {
  *   (+) GRID();
  *   (+) GRID(const MED_EN::med_grid_type type);
@@ -54,15 +54,7 @@ using namespace MED_EN;
  *   (NOT IMPLEMENTED) GRID & operator=(const GRID &m);
  *   (+) virtual ~GRID();
  *   (+) virtual void init();
- *   (tested together with getCoordinateptr() as it is called
- *    internally from there first of all.
- *    Moreover, fillCoordinates should be made private to avoid
- *    ambiguity druing in GRID class usage.) void fillCoordinates() const;
- *   (tested together with getConnectivityptr()) void fillConnectivity() const;
- *   (+) inline void makeUnstructured();//fill coordinates and connectivity of MESH
- *   (+) void fillMeshAfterRead();
- *   (+) void writeUnstructured(int index=0, const string & driverName = "");
- *   (+) void read(int index=0);
+ *   (+) virtual const MESH * convertInMESH() const
  *   (+) inline int getNodeNumber(const int i, const int j=0, const int k=0) const;
  *   (+) inline int getCellNumber(const int i, const int j=0, const int k=0) const;
  *   (+) int getEdgeNumber
@@ -78,38 +70,12 @@ using namespace MED_EN;
  *   (+) inline MED_EN::med_grid_type getGridType() const;
  *   (+) int getArrayLength(const int Axis) const throw (MEDEXCEPTION);
  *   (+) const double getArrayValue (const int Axis, const int i) const throw (MEDEXCEPTION);
- *   (+) inline const COORDINATE * getCoordinateptr() const;
- *   (+) inline const double * getCoordinates(MED_EN::medModeSwitch Mode) const;
- *   (+) inline const double getCoordinate(int Number,int Axis) const;
  *   (+) inline int getNumberOfTypes(MED_EN::medEntityMesh Entity) const;
- *   (+) inline int getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const;
  *   (+) inline const MED_EN::medGeometryElement * getTypes(MED_EN::medEntityMesh Entity) const;
- *   (+) MED_EN::medGeometryElement * getTypesWithPoly(MED_EN::medEntityMesh Entity) const;
- *   (+) inline const CELLMODEL * getCellsTypes(MED_EN::medEntityMesh Entity) const;
- *   (+) const int * getGlobalNumberingIndex(MED_EN::medEntityMesh Entity) const;
  *   (+) inline int getNumberOfElements
  *                (MED_EN::medEntityMesh Entity, MED_EN::medGeometryElement Type) const;
- *   (+) inline int getNumberOfElementsWithPoly
- *                (MED_EN::medEntityMesh Entity, MED_EN::medGeometryElement Type) const;
- *   (+) inline bool existConnectivity
- *                (MED_EN::medConnectivity ConnectivityType, MED_EN::medEntityMesh Entity) const;
  *   (+) inline MED_EN::medGeometryElement getElementType
  *                (MED_EN::medEntityMesh Entity, int Number) const;
- *   (+) inline MED_EN::medGeometryElement getElementTypeWithPoly
- *                (MED_EN::medEntityMesh Entity, int Number) const;
- *   (+) inline void calculateConnectivity(MED_EN::medModeSwitch Mode,
- *                                             MED_EN::medConnectivity ConnectivityType,
- *                                               MED_EN::medEntityMesh Entity) const;
- *   (+) inline const CONNECTIVITY* getConnectivityptr() const;
- *   (+) inline const int * getConnectivity
- *             (MED_EN::medModeSwitch Mode, MED_EN::medConnectivity ConnectivityType,
- *                MED_EN::medEntityMesh Entity, MED_EN::medGeometryElement Type) const;
- *   (+) inline const int * getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
- *                                          MED_EN::medEntityMesh Entity) const;
- *   (+) inline const int * getReverseConnectivity(MED_EN::medConnectivity ConnectivityType,
- *                                            MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
- *   (+) inline const int * getReverseConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
- *                                                 MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
  *   (+) inline void setGridType(MED_EN::med_grid_type gridType);
  *  }
  */
@@ -301,11 +267,9 @@ void MEDMEMTest::testGrid()
         CPPUNIT_ASSERT_THROW(myGrid->getElementType(MED_CELL, myGlobalNbIdx[i]), MEDEXCEPTION);
         break;
       }
-      medGeometryElement aElem, geomPolyElem;
+      medGeometryElement aElem;
       CPPUNIT_ASSERT_NO_THROW(aElem = myGrid->getElementType(MED_CELL, myGlobalNbIdx[i]));
-      CPPUNIT_ASSERT_NO_THROW(geomPolyElem = myGrid->getElementType(MED_CELL, myGlobalNbIdx[i]));
       CPPUNIT_ASSERT(types[0] == aElem);
-      CPPUNIT_ASSERT(geomPolyElem == aElem);
     }
 
     CPPUNIT_ASSERT_NO_THROW(existConnect = mesh->existConnectivity(MED_DESCENDING, MED_CELL));
@@ -341,25 +305,6 @@ void MEDMEMTest::testGrid()
     }
     mesh->removeReference();
 
-    //TEST POLY
-//     {
-//       int nbPolytypes;
-//       //test getNumberOfTypesWithPoly() - a grid has one type
-//       CPPUNIT_ASSERT_NO_THROW(nbPolytypes = myGrid->getNumberOfTypesWithPoly(MED_CELL));
-//       CPPUNIT_ASSERT(nbPolytypes == 1 );
-
-//       const MED_EN::medGeometryElement * PolyTypes, *Types;
-//       CPPUNIT_ASSERT_NO_THROW(PolyTypes = myGrid->getTypesWithPoly(MED_CELL));
-//       CPPUNIT_ASSERT_NO_THROW(Types = myGrid->getTypes(MED_CELL));
-//       CPPUNIT_ASSERT_EQUAL(PolyTypes[nbPolytypes-1],Types[nbPolytypes-1]);
-
-//       for (int t = 0; t < nbPolytypes; t++) {
-//         int nbElPoly, nbEl;
-//         CPPUNIT_ASSERT_NO_THROW(nbElPoly = myGrid->getNumberOfElementsWithPoly(MED_CELL, PolyTypes[t]));
-//         CPPUNIT_ASSERT_NO_THROW(nbEl = myGrid->getNumberOfElements(MED_CELL, PolyTypes[t]));
-//         CPPUNIT_ASSERT(nbElPoly == nbEl);
-//       }
-//     }
   }
 
   //////////////////////////////
@@ -495,7 +440,7 @@ void MEDMEMTest::testGrid()
       CPPUNIT_FAIL("Unknown exception");
     }
 
-    // testing getCoordinateptr() and fillCoordinates()
+    // testing convertInMESH()
     // We fill a map of all possible coordinate triples.
     // After iteration through all coordinates, this map should contain only "true" as data.
     // "true" in some map element during iteration means duplicated node position.

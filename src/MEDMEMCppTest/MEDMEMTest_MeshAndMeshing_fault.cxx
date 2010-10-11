@@ -45,44 +45,32 @@ static inline double dmax(double x, double y) { return (x>y)?x:y;}
 static inline double dmin(double x, double y) { return (x>y)?y:x;}
 
 /*!
- *  Check methods (18), defined in MEDMEM_Meshing.hxx:
+ *  Check methods (12), defined in MEDMEM_Meshing.hxx:
  *  class MESHING: public MESH {
  *   (+) MESHING();
  *   (+) ~MESHING();
- *   (+) void setSpaceDimension (const int SpaceDimension);
- *   (+) void setNumberOfNodes (const int NumberOfNodes);
  *   (+) void setCoordinates (const int SpaceDimension, const int NumberOfNodes,
- *                                const double * Coordinates,
- *                                const string System, const MED_EN::medModeSwitch Mode);
- *   (+) void setCoordinatesSystem(const string System) throw (MEDEXCEPTION);
+ *                            const double * Coordinates,
+ *                            const string System, const MED_EN::medModeSwitch Mode);
  *   (+) void setCoordinatesNames (const string * names);
  *   (+) void setCoordinateName (const string name, const int i);
  *   (+) void setCoordinatesUnits (const string * units);
  *   (+) void setCoordinateUnit (const string unit, const int i);
  *   (+) void setNumberOfTypes (const int NumberOfTypes,
- *                                  const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
+ *                              const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
  *   (+) void setTypes (const MED_EN::medGeometryElement * Types,
- *                          const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
+ *                      const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
  *   (+) void setNumberOfElements (const int * NumberOfElements,
  *                                 const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
  *   (+) void setConnectivity (const int * Connectivity, const MED_EN::medEntityMesh Entity,
- *                             const MED_EN::medGeometryElement Type) throw (MEDEXCEPTION);
- *   (+) void setPolygonsConnectivity (const int * ConnectivityIndex, const int * ConnectivityValue,
- *                                     int nbOfPolygons,
- *                                     const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
- *   (+) void setPolyhedraConnectivity (const int * PolyhedronIndex, const int * FacesIndex,
- *                                      const int * Nodes, int nbOfPolyhedra,
- *                                      const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
- *   (NOT YET IMPLEMENTED!!!) void setConnectivities (const int * ConnectivityIndex,
- *                                   const int * ConnectivityValue,
- *                                   const MED_EN::medConnectivity ConnectivityType,
- *                                   const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION);
+ *                             const MED_EN::medGeometryElement Type,
+ *                             const int * PolyConnectivityIndex=0) throw (MEDEXCEPTION);
  *   (+) void addGroup (const GROUP & Group) throw (MEDEXCEPTION);
  *  }
  */
 
 /*!
- *  Check methods (87), defined in MEDMEM_Mesh.hxx:
+ *  Check methods (67), defined in MEDMEM_Mesh.hxx:
  *  class MESH : public RCBASE {
  *   (+) void init();
  *   (+) MESH();
@@ -119,25 +107,15 @@ static inline double dmin(double x, double y) { return (x>y)?y:x;}
  *   (+) inline const string *             getCoordinatesNames() const;
  *   (+) inline const string *             getCoordinatesUnits() const;
  *   (+) virtual inline int getNumberOfTypes(MED_EN::medEntityMesh Entity) const;
- *   (+) virtual int getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const;
  *   (+) virtual inline const MED_EN::medGeometryElement * getTypes(MED_EN::medEntityMesh Entity) const;
- *   (+) virtual MED_EN::medGeometryElement * getTypesWithPoly(MED_EN::medEntityMesh Entity) const;
  *   (+) virtual inline const CELLMODEL * getCellsTypes(MED_EN::medEntityMesh Entity) const;
  *   (+) virtual inline string * getCellTypeNames(MED_EN::medEntityMesh Entity) const;
  *   (+) virtual const int * getGlobalNumberingIndex(MED_EN::medEntityMesh Entity) const;
  *   (+) virtual inline int getNumberOfElements(MED_EN::medEntityMesh Entity,
  *                                        MED_EN::medGeometryElement Type) const;
- *   (+) virtual int getNumberOfElementsWithPoly(MED_EN::medEntityMesh Entity,
- *                                        MED_EN::medGeometryElement Type) const;
  *   (+) virtual inline bool existConnectivity(MED_EN::medConnectivity ConnectivityType,
  *                                       MED_EN::medEntityMesh Entity) const;
- *   (+) inline bool existPolygonsConnectivity(MED_EN::medConnectivity ConnectivityType,
- *                                       MED_EN::medEntityMesh Entity) const;
- *   (+) inline bool existPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType,
- *                                         MED_EN::medEntityMesh Entity) const;
  *   (+) virtual inline MED_EN::medGeometryElement getElementType
- *           (MED_EN::medEntityMesh Entity, int Number) const;
- *   (+) virtual inline MED_EN::medGeometryElement getElementTypeWithPoly
  *           (MED_EN::medEntityMesh Entity, int Number) const;
  *   (+) virtual inline void calculateConnectivity(MED_EN::medModeSwitch Mode,
  *                                            MED_EN::medConnectivity ConnectivityType,
@@ -152,19 +130,6 @@ static inline double dmin(double x, double y) { return (x>y)?y:x;}
  *                                             MED_EN::medGeometryElement Type) const;
  *   (+) virtual inline const int * getConnectivityIndex
  *           (MED_EN::medConnectivity ConnectivityType, MED_EN::medEntityMesh Entity) const;
- *   (+) inline int getPolygonsConnectivityLength
- *           (MED_EN::medConnectivity ConnectivityType, MED_EN::medEntityMesh Entity) const;
- *   (+) inline const int * getPolygonsConnectivity
- *           (MED_EN::medConnectivity ConnectivityType, MED_EN::medEntityMesh Entity) const;
- *   (+) inline const int * getPolygonsConnectivityIndex
- *           (MED_EN::medConnectivity ConnectivityType, MED_EN::medEntityMesh Entity) const;
- *   (+) inline int getNumberOfPolygons(MED_EN::medEntityMesh Entity=MED_EN::MED_ALL_ENTITIES) const;
- *   (+) inline int getPolyhedronConnectivityLength(MED_EN::medConnectivity ConnectivityType) const;
- *   (+) inline const int * getPolyhedronConnectivity(MED_EN::medConnectivity ConnectivityType) const;
- *   (+) inline const int * getPolyhedronFacesIndex() const;
- *   (+) inline const int * getPolyhedronIndex(MED_EN::medConnectivity ConnectivityType) const;
- *   (+) inline int getNumberOfPolyhedronFaces() const;
- *   (+) inline int getNumberOfPolyhedron() const;
  *   (+) virtual int getElementNumber(MED_EN::medConnectivity ConnectivityType,
  *                                    MED_EN::medEntityMesh Entity, MED_EN::medGeometryElement Type,
  *                                    int * connectivity) const;
