@@ -243,8 +243,6 @@ void ENSIGHT_MED_RDONLY_DRIVER::read()
       ENSIGHT_MESH_RDONLY_DRIVER meshDriver(_fileName, mesh, i);
       caseFile.setDataFileName( i, &meshDriver );
       int drv = mesh->addDriver( meshDriver );
-//       meshDriver.open();
-//       meshDriver.read();
       mesh->read( drv );
       meshes.push_back( mesh );
     }
@@ -260,12 +258,6 @@ void ENSIGHT_MED_RDONLY_DRIVER::read()
         fieldDriver.open();
         fieldDriver.read();
         _fields->push_back( field );
-//         if ( meshIndex <= meshes.size() && field->getSupport()->getMesh() != meshes[ meshIndex-1])
-//         {
-//           if ( field->getSupport()->getMesh() )
-//             field->getSupport()->getMesh()->addReference(); // let the mesh live
-//           field->getSupport()->setMesh( meshes[ meshIndex-1 ]);
-//         }
       }
     }
   }

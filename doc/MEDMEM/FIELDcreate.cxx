@@ -82,7 +82,7 @@ int main (int argc, char ** argv) {
     }
   
   // save this new field
-  //myField.write(MED_DRIVER,filename) ;
+  myField.write(MED_DRIVER,filename) ;
 
   return 0 ;
 }

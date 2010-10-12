@@ -25,7 +25,6 @@
 
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_Mesh.hxx"
-#include "MEDMEM_Med.hxx"
 
 main () {
   

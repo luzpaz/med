@@ -24,7 +24,6 @@
 // File      : MEDMEM_Med_i.hxx
 // Project   : SALOME
 // Author    : EDF
-// $Header: /export/home/PAL/MED_SRC/src/MEDMEM_I/MEDMEM_Med_i.hxx
 //=============================================================================
 //
 #ifndef _MED_MED_I_HXX_
@@ -58,8 +57,6 @@ private :
 
 protected:
     // C++ object containing values
-  //::MED * const _med;
-  //::MEDMEM::MED * _med;
   MEDFILEBROWSER                 _med;
   map<string, ::MEDMEM::GMESH* > _medmem_meshes;
   vector< ::MEDMEM::FIELD_* >    _medmem_fields;
@@ -74,8 +71,6 @@ protected:
 public:
     // Constructors and associated internal methods
     MED_i();
-  //    MED_i(::MED * const m);
-  //    MED_i(MED_i & m);
     ~MED_i();
 
   // Analyse the file <fileName> by calling readFileStruct

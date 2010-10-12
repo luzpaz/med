@@ -62,20 +62,6 @@ static void affiche_support(const SUPPORT * mySupport)
 }
 
 
-// static void affiche_famille(const FAMILY * myFamily)
-// {
-//     affiche_support(myFamily);
-//     cout << "  - Identifier : "<<myFamily->getIdentifier()<<endl ;
-//     int NumberOfAttributes = myFamily->getNumberOfAttributes() ;
-//     cout << "  - Attributes ("<<NumberOfAttributes<<") :"<<endl;
-//     for (int j=1;j<NumberOfAttributes+1;j++)
-//       cout << "    * "<<myFamily->getAttributeIdentifier(j)<<" : "<<myFamily->getAttributeValue(j)<<", "<<myFamily->getAttributeDescription(j).c_str()<<endl ;
-//     int NumberOfGroups = myFamily->getNumberOfGroups() ;
-//     cout << "  - Groups ("<<NumberOfGroups<<") :"<<endl;
-//     for (int j=1;j<NumberOfGroups+1;j++)
-//       cout << "    * "<<myFamily->getGroupName(j).c_str()<<endl ;
-// }
-
 static void affiche_groupe(const GROUP * myGroup) 
 {
     affiche_support(myGroup);
@@ -108,7 +94,6 @@ int main (int argc, char ** argv) {
   cout << "Show Group :"<<endl ;
   affiche_groupe(myGroup);
   GROUP * myGroup2 = new GROUP(* myGroup);
-  //delete myGroup; // no because in mesh !!
   affiche_groupe(myGroup2);
   GROUP * myGroup3 = new GROUP(* myGroup2);
   myGroup2->removeReference();

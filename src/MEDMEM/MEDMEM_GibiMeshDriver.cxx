@@ -155,11 +155,9 @@ static int getGroupId(const vector<int>& support_ids, _intermediateMED*  medi)
       // no such a group, add a new one
       medi->groupes.push_back( _groupe() );
       _groupe& new_grp = medi->groupes.back();
-      //new_grp.nom = string( group_id % 10 + 1, 'G' );
       new_grp.groupes.reserve( sup_set.size() );
       for ( set<int>::iterator it = sup_set.begin(); it != sup_set.end(); it++ ) {
         new_grp.groupes.push_back( *it );
-        //new_grp.nom += "_" + medi->groupes[ *it - 1 ].nom;
       }
     }
   }
@@ -1419,7 +1417,6 @@ GIBI_MESH_DRIVER::GIBI_MESH_DRIVER(const string &         fileName,
   _mesh(ptrMesh)
 {
   MESSAGE_MED( "GIBI_MESH_DRIVER(" << fileName <<","<<accessMode );
-  //   _meshName=fileName.substr(0,fileName.rfind("."));
   // mesh name construction from fileName
   const string ext=".sauv"; // expected extension
   int pos=fileName.find(ext,0);

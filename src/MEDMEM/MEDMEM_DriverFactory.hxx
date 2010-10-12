@@ -41,17 +41,6 @@ namespace MEDMEM {
 
   namespace DRIVERFACTORY {
 
-    /*
-      definition of static variable across the Med Memory of a Med File version
-      for the writing of Med File set to V22
-    */
-
-//     MEDMEM_EXPORT extern MED_EN::medFileVersion globalMedFileVersionForWriting;
-
-//     MEDMEM_EXPORT MED_EN::medFileVersion getMedFileVersionForWriting();
-
-//     MEDMEM_EXPORT void setMedFileVersionForWriting(MED_EN::medFileVersion version);
-
     MEDMEM_EXPORT extern bool globalVtkBinaryFormatForWriting;
 
     MEDMEM_EXPORT bool getVtkBinaryFormatForWriting();
@@ -72,13 +61,6 @@ namespace MEDMEM {
                                     const std::string & fileName,
                                     FIELD<T,INTERLACING_TAG> *fielde,
                                     MED_EN::med_mode_acces access);
-//     MEDMEM_EXPORT GENDRIVER * buildDriverForMed(driverTypes driverType,
-//                                                 const std::string & fileName,
-//                                                 MED *mede,
-//                                                 MED_EN::med_mode_acces access);
-//     MEDMEM_EXPORT GENDRIVER * buildMedDriverFromFile(const string & fileName,
-//                                                      MED * const ptrMed,
-//                                                      MED_EN::med_mode_acces access);
     MEDMEM_EXPORT GENDRIVER * buildMeshDriverFromFile(const string & fileName,
                                                       GMESH * ptrMesh,
                                                       MED_EN::med_mode_acces access);

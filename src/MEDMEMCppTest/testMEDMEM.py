@@ -64,15 +64,6 @@ ret = os.spawnvp(os.P_WAIT, command[0], command)
 command = ['MEDMEMTest_Grid_fault']
 ret = os.spawnvp(os.P_WAIT, command[0], command)
 
-command = ['MEDMEMTest_MedFieldDriver21_fault']
-ret = os.spawnvp(os.P_WAIT, command[0], command)
-
-command = ['MEDMEMTest_MedMedDriver21_fault']
-ret = os.spawnvp(os.P_WAIT, command[0], command)
-
-command = ['MEDMEMTest_MedMedDriver22_fault']
-ret = os.spawnvp(os.P_WAIT, command[0], command)
-
 command = ['MEDMEMTest_MeshAndMeshing_fault']
 ret = os.spawnvp(os.P_WAIT, command[0], command)
 

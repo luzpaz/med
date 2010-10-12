@@ -355,7 +355,6 @@ for i in range(nbOfFiles):
 
     rootFileFull = os.path.join(tmpDir, rootFile)
 
-    medV21FileName = rootFileFull + "V21_test.med"
     medV22FileName = rootFileFull + "V22_test.med"
     vtkFileName    = rootFileFull + "_test.vtk"
 
@@ -650,9 +649,6 @@ for i in range(nbOfFiles):
 
 
     print "Saving in file the mesh under the med and vtk format"
-    #medFileVersion = getMedFileVersionForWriting()
-    #print "Med File Version For Writing ",medFileVersion
-    print "Med V21 file = ",medV21FileName
     print "Med V22 file = ",medV22FileName
     print "vtk file = ",vtkFileName
 
@@ -674,10 +670,6 @@ for i in range(nbOfFiles):
     print ""
 
     print "Saving in file the cell barycenter field under the med and vtk format"
-    #medFileVersion = getMedFileVersionForWriting()
-    #print "Med File Version For Writing ",medFileVersion
-
-    #print "Med V21 file = ",medV21FileName
     print "Med V22 file = ",medV22FileName
     print "vtk file = ",vtkFileName
 
@@ -700,9 +692,6 @@ for i in range(nbOfFiles):
         print ""
 
         print "Saving in file the cell volume field under the med and vtk format"
-        #medFileVersion = getMedFileVersionForWriting()
-        #print "Med File Version For Writing ",medFileVersion
-        #print "Med V21 file = ",medV21FileName
         print "Med V22 file = ",medV22FileName
         print "vtk file = ",vtkFileName
 
@@ -734,9 +723,6 @@ for i in range(nbOfFiles):
         print ""
 
         print "Saving in file the face normal field under the med format"
-        #medFileVersion = getMedFileVersionForWriting()
-        #print "Med File Version For Writing ",medFileVersion
-        #print "Med V21 file = ",medV21FileName
         print "Med V22 file = ",medV22FileName
 
         idMedV22 = normal.addDriver(MED_DRIVER,medV22FileName,normal.getName())
@@ -757,9 +743,6 @@ for i in range(nbOfFiles):
         print ""
 
         print "Saving in file the cell area field under the med and vtk format"
-        #medFileVersion = getMedFileVersionForWriting()
-        #print "Med File Version For Writing ",medFileVersion
-        #print "Med V21 file = ",medV21FileName
         print "Med V22 file = ",medV22FileName
         print "vtk file = ",vtkFileName
 
@@ -791,9 +774,6 @@ for i in range(nbOfFiles):
         print ""
 
         print "Saving in file the face normal field under the med format"
-        #medFileVersion = getMedFileVersionForWriting()
-        #print "Med File Version For Writing ",medFileVersion
-        #print "Med V21 file = ",medV21FileName
         print "Med V22 file = ",medV22FileName
 
         idMedV22 = normal.addDriver(MED_DRIVER,medV22FileName,normal.getName())

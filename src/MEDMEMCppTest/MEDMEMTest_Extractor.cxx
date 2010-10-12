@@ -48,7 +48,6 @@ static void test_extractLine( Extractor* extractor,
                        const char* name,
                        const string& result_file)
 {
-  //cout << name << endl;
   FIELD<double>* resField =0;
   CPPUNIT_ASSERT_NO_THROW( resField = extractor->extractLine(coords,direction));
   CPPUNIT_ASSERT( bool( resField ) == bool( nbSegments > 0 ));
@@ -235,7 +234,6 @@ void MEDMEMTest::testExtractor()
   // store extracted field
   drv = resField->addDriver(MED_DRIVER, result_file, resField->getName());
   resField->write( drv );
-  //cout << endl << "Write " << result_file << endl;
 
   aSupport->removeReference(); aSupport=0;
   myMeshing->removeReference(); myMeshing=0;
@@ -340,7 +338,6 @@ void MEDMEMTest::testExtractor()
   // store input field
   drv = inField->addDriver(MED_DRIVER, result_file, fieldname);
   inField->write(drv);
-  //cout << endl << "Write " << result_file << endl;
 
   // Extraction
   CPPUNIT_ASSERT_NO_THROW( extractor = new Extractor(*inField));

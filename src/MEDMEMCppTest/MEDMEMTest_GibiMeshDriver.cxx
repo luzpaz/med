@@ -98,8 +98,6 @@ void MEDMEMTest::testGibiMeshDriver()
   MESH *aMesh                      = new MESH;
   MESH *aMesh_NULL                 = NULL;
   MESH *aMesh_2                    = new MESH;
-  //MED  *aMed                       = new MED();
-  //MED  *aMed_1                     = NULL;
   vector<FIELD_*>       rdFields;
   vector<const FIELD_*> wrFields;
 
@@ -162,12 +160,7 @@ void MEDMEMTest::testGibiMeshDriver()
     CPPUNIT_ASSERT_NO_THROW(aGibiRdDriver->open());
 
     //Trying open file secondary.
-    //#ifdef ENABLE_FORCED_FAILURES
-    //This case is not work, seems it BUG
-    // SHOULD THROW
-    //CPPUNIT_ASSERT_THROW(aGibiRdDriver->open(), MEDEXCEPTION);
     CPPUNIT_ASSERT_NO_THROW(aGibiRdDriver->open());
-    //#endif
 
     //Test setMeshName() and getMeshName() methods
     CPPUNIT_ASSERT_NO_THROW(aGibiRdDriver->setMeshName(meshname));
@@ -175,13 +168,6 @@ void MEDMEMTest::testGibiMeshDriver()
 
     //Test read() method
     CPPUNIT_ASSERT_NO_THROW(aGibiRdDriver->read());
-    // Source and destination overlap in memcpy(0x35DBF040, 0x35DBF06D, 101)
-    //  at 0x3414D97E: memcpy (mac_replace_strmem.c:113)
-    //  by 0x3492EDE9: MEDMEM::GIBI_MESH_RDONLY_DRIVER::getLine(char*&) (MEDMEM_GibiMeshDriver.cxx:942)
-    //  by 0x349407FD: MEDMEM::GIBI_MESH_RDONLY_DRIVER::getNextLine(char*&, bool) (MEDMEM_GibiMeshDriver.hxx:168)
-    //  by 0x349268B1: MEDMEM::GIBI_MESH_RDONLY_DRIVER::readFile(MEDMEM::_intermediateMED*, bool) (MEDMEM_GibiMeshDriver.cxx:209)
-    //  by 0x3492F58B: MEDMEM::GIBI_MESH_RDONLY_DRIVER::read() (MEDMEM_GibiMeshDriver.cxx:1058)
-    //  by 0x3436DEA6: MEDMEMTest::testGibiMeshDriver() (MEDMEMTest_GibiMeshDriver.cxx:168)
 
     //Trying fill not empty mesh
     CPPUNIT_ASSERT_THROW(aGibiRdDriver->read(), MEDEXCEPTION);
@@ -254,12 +240,7 @@ void MEDMEMTest::testGibiMeshDriver()
     //Test open() method
     CPPUNIT_ASSERT_NO_THROW(aGibiWrDriver->open());
 
-    //Trying open file secondary.
-    //#ifdef ENABLE_FORCED_FAILURES
-    // (BUG) No exception on attempt to open an opened file for the second time
-    //CPPUNIT_ASSERT_THROW(aGibiWrDriver->open(), MEDEXCEPTION);
     CPPUNIT_ASSERT_NO_THROW(aGibiWrDriver->open());
-    //#endif
 
     //Test setMeshName() and getMeshName() methods
     CPPUNIT_ASSERT_NO_THROW(aGibiWrDriver->setMeshName(newmeshname));

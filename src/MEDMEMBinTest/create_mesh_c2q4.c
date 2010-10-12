@@ -56,7 +56,6 @@ int main (int argc, char **argv)
   };
   char nomcoo[2*MED_TAILLE_PNOM+1] = "x               y               ";
   char unicoo[2*MED_TAILLE_PNOM+1] = "cm              cm              ";
-  /*  char nomnoe[19*MED_TAILLE_PNOM+1] = "nom1    nom2    nom3    nom4";*/
   char *nomnoe ;
   med_int numnoe[9] = {1,2,3,4,5,6,7,8,9};
   med_int nufano[9] = {0,0,0,0,0,0,0,0,0};

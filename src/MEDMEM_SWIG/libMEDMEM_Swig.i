@@ -427,22 +427,6 @@ typedef enum {V21 = 26, V22 = 75} medFileVersion;
 %feature("unref") FIELDDOUBLENOINTERLACEBYTYPE "$this->removeReference();"
 %feature("unref") FIELDINTNOINTERLACEBYTYPE "$this->removeReference();"
 
-// medFileVersion getMedFileVersionForWriting();
-
-// void setMedFileVersionForWriting(medFileVersion version);
-
-// %{
-//   medFileVersion getMedFileVersionForWriting()
-//     {
-//       return (medFileVersion) DRIVERFACTORY::getMedFileVersionForWriting();
-//     }
-
-//   void setMedFileVersionForWriting(medFileVersion version)
-//     {
-//       DRIVERFACTORY::setMedFileVersionForWriting((medFileVersion) version);
-//     }
-// %}
-
 bool getVtkBinaryFormatForWriting();
 
 void setVtkBinaryFormatForWriting(bool isBinary);
@@ -553,8 +537,6 @@ class SUPPORT
   void setGeometricType(medGeometryElement *GeometricType);
 
   void setNumberOfElements(int *NumberOfElements);
-
-  //void setTotalNumberOfElements(int TotalNumberOfElements);
 
   void getBoundaryElements();
 
@@ -1085,7 +1067,6 @@ public:
       }
 
     // this method replaces getValueI() in FullInterlace mode
-    /* %newobject getRow(int );*/
     PyObject * getRow(int index)
       {
 	int size = self->getNumberOfComponents() * self->getNbGaussI( index );
@@ -1097,7 +1078,6 @@ public:
       }
 
     // this method replaces getValueI() in NoInterlace mode
-    /*%newobject getColum(int );*/
     PyObject * getColumn(int index)
       {
 	int size = (self->getSupport())->getNumberOfElements(MED_ALL_ELEMENTS);
@@ -1107,23 +1087,6 @@ public:
         TYPEMAP_OUTPUT_ARRAY(value, size, Binding< T1 >::Traducer,
 			     FIELD::getColumn);
       }
-
-    /*
-    %newobject getValueI(int );
-    PyObject * getValueI(int index)
-      {
-	int size = self->getNumberOfComponents();
-
-	medModeSwitch  Mode = self->getInterlacingType();
-
-	if ( Mode == MED_NO_INTERLACE ) size = (self->getSupport())->getNumberOfElements(MED_ALL_ELEMENTS);
-
-	const T1 * value = self->getValueI(index);
-
-        TYPEMAP_OUTPUT_ARRAY(value, size, Binding< T1 >::Traducer,
-			     FIELD::getValueI);
-      }
-    */
 
     void allocValue2(int NumberOfComponents, int LengthValue)
       {
@@ -1139,11 +1102,9 @@ public:
   }
 };
 
-/*%template(FIELDDOUBLEFULLINTERLACE) FIELD<double, FullInterlace>;*/
 %template(FIELDDOUBLE) FIELD<double, FullInterlace>;
 %template(FIELDDOUBLENOINTERLACE) FIELD<double, NoInterlace>;
 %template(FIELDDOUBLENOINTERLACEBYTYPE) FIELD<double, NoInterlaceByType>;
-/*%template(FIELDINTFULLINTERLACE) FIELD<int, FullInterlace>;*/
 %template(FIELDINT) FIELD<int, FullInterlace>;
 %template(FIELDINTNOINTERLACE) FIELD<int, NoInterlace>;
 %template(FIELDINTNOINTERLACEBYTYPE) FIELD<int, NoInterlaceByType>;

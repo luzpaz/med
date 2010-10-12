@@ -22,7 +22,6 @@
 
 /*
  File Support.cxx
- $Header$
 */
 
 #include <set>
@@ -312,7 +311,6 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
   //-------------------
 {
   const char * LOC="getValIndFromGlobalNumber(const int number) : ";
-  //BEGIN_OF_MED(LOC);
 
   if (_isOnAllElts) return number;
 
@@ -333,9 +331,6 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
     else
       iThis++;
 
-  //if (!_isOnAllElts)
-  //cout << "----Contenu du skyline : ---------------------" << *_number << endl;
-
   if(!found)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't find the global number |"
                                  << number << "| in Support |"
@@ -343,8 +338,6 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
 
   // It should never arrive here !!
   return 0;
-
-  //END_OF_MED();
 }
 
 /*!
@@ -551,8 +544,6 @@ void SUPPORT::setpartial(MEDSKYLINEARRAY * number, bool shallowCopy) throw (MEDE
   else
     _number = new MEDSKYLINEARRAY(*number);
 
-  // cout << *_number << endl;
-
   END_OF_MED(LOC);
 }
 
@@ -671,7 +662,6 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
   medGeometryElement* geometricType ;
   int * geometricTypeNumber ;
   int * numberOfElements ;
-  //MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY() ;
   int * mySkyLineArrayIndex ;
 
   int numberOfType = mesh->getNumberOfTypes(_entity) ;
@@ -699,7 +689,6 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
     }
     numberOfGeometricType = theType.size() ;
     geometricType = new medGeometryElement[numberOfGeometricType] ;
-    //const medGeometryElement *  allType = mesh->getTypes(_entity); !! UNUSED VARIABLE !!
     geometricTypeNumber = new int[numberOfGeometricType] ; // not use, but initialized to nothing
     numberOfElements = new int[numberOfGeometricType] ;
     mySkyLineArrayIndex = new int[numberOfGeometricType+1] ;
@@ -714,19 +703,11 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
       index++ ;
     }
   }
-  //mySkyLineArray->setMEDSKYLINEARRAY(numberOfGeometricType,size,mySkyLineArrayIndex,myListArray) ;
   MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY(numberOfGeometricType,size,mySkyLineArrayIndex,myListArray) ;
 
   setNumberOfGeometricType(numberOfGeometricType) ;
   setGeometricType(geometricType) ;
-  //for (int i=0;i<numberOfGeometricType;i++)
-  //   {
-  //     _geometricType[i] = geometricType[i];
-  //   }
-
   setNumberOfElements(numberOfElements) ;
-  //setTotalNumberOfElements(size) ;
-  //  setNumber(mySkyLineArray) ;
 
   _number = new MEDSKYLINEARRAY(numberOfGeometricType,size);
 
@@ -1254,7 +1235,6 @@ void MEDMEM::SUPPORT::fillFromNodeList(const list<int>& listOfNode) throw (MEDEX
   setNumberOfGeometricType(numberOfGeometricType);
   setGeometricType(geometricType);
   setNumberOfElements(numberOfElements);
-  //setTotalNumberOfElements(numberOfElements[0]);
   setNumber(mySkyLineArray);
 
   delete[] numberOfElements;
@@ -1331,7 +1311,6 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
   setNumberOfGeometricType(numberOfGeometricType) ;
   setGeometricType(geometricType) ;
   setNumberOfElements(numberOfElements) ;
-  //setTotalNumberOfElements(size) ;
   setNumber(mySkyLineArray) ;
 
   delete[] numberOfElements;

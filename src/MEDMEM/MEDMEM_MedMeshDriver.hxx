@@ -54,7 +54,6 @@ protected:
   GMESH *             _ptrMesh;
   mutable std::string _meshName;
   med_2_3::med_idt    _medIdt ;
-  //int             _meshNum;     // INUTILE ?
   
 
 

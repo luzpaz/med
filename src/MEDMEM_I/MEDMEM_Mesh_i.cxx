@@ -215,22 +215,16 @@ SCRUTE(elt1);
                 {
 MESSAGE("MED_DESCENDING");
                   int elt2 =(((::MESH*)_mesh)->getCellsTypes(MED_CELL))->getNumberOfConstituents(1);
-                   //int elt2 =(((::MESH*)_mesh)->getTypes(convertIdlEltToMedElt(geomElement)))->getNumberOfConstituents(1);
                    nbelements= elt2 * elt1;
 SCRUTE(elt2);
                 }
                 else
                 {
 MESSAGE("MED_NODAL");
-//                      const int * tab=((::MESH*)_mesh)->getConnectivityIndex(
-//                              convertIdlConnToMedConn(mode),
-//                              convertIdlEntToMedEnt(entity));
                         nbelements = ((::MESH*)_mesh)->getConnectivityLength
                           (convertIdlConnToMedConn(mode),
                            convertIdlEntToMedEnt(entity),
                            convertIdlEltToMedElt(geomElement));
-                        //nbelements = elt1*(convertIdlEltToMedElt(geomElement)%100);
-                        //                      nbelements = tab[elt1 ] - 1 ;
                 }
 SCRUTE(entity);
 SCRUTE(geomElement);

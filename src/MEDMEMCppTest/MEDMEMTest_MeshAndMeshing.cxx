@@ -62,16 +62,6 @@ static void addMedFacesGroup (MESHING& meshing, int nFaces, const int *groupValu
   faces->removeReference();
 }
 
-// static void addMedFacesGroupAll (MESHING& meshing, string groupName)
-// {
-//   GROUP *faces=new GROUP;
-//   faces->setName(groupName);
-//   faces->setMesh(&meshing);
-//   faces->setEntity(MED_EN::MED_FACE);
-//   meshing.addGroup(*faces);
-//   faces->removeReference();
-// }
-
 /*!
  *  Check methods (12), defined in MEDMEM_Meshing.hxx:
  *  class MESHING: public MESH {
@@ -223,30 +213,19 @@ void MEDMEMTest::testMeshAndMeshing()
   CPPUNIT_ASSERT(myMesh != NULL);
 
   //test operator <<
-  //#ifdef ENABLE_FAULTS
   {
     ostringstream out;
     CPPUNIT_ASSERT_NO_THROW(out << *myMesh << endl);
   }
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("ERROR: operator << : if mesh is empty then attempt"
-  //             " to get values from null object causes error");
-  //#endif
 
   //test operator =
   MESH *myMesh1 =new MESH( *myMesh);
 
   //deepCompare
-  //#ifdef ENABLE_FAULTS
   bool isEqual = false;
   CPPUNIT_ASSERT_NO_THROW(isEqual = myMesh1->deepCompare(*myMesh));
   CPPUNIT_ASSERT(isEqual);
   myMesh1->removeReference();
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("ERROR: deepCompare(...) fails if mesh is empty");
-  //#endif
 
   //ensure it imposible to compare meshes
   MESH *myMeshPointer =  myMesh;
@@ -725,15 +704,7 @@ void MEDMEMTest::testMeshAndMeshing()
     {
       const int * ReverseNodalConnectivity;
 
-      // Show Reverse Nodal Connectivity
-      //#ifndef ENABLE_FAULTS
-      // (BUG) CONNECTIVITY::_numberOfNodes is not set
       ((CONNECTIVITY*)myConnectivity)->setNumberOfNodes(NumberOfNodes);
-      //#endif
-      //#ifdef ENABLE_FORCED_FAILURES
-      //CPPUNIT_FAIL("ERROR in CONNECTIVITY::calculateReverseNodalConnectivity()"
-      //             " because myMesh2->_connectivity->_numberOfNodes is not set");
-      //#endif
 
       CPPUNIT_ASSERT_NO_THROW(ReverseNodalConnectivity = myMesh2->getReverseConnectivity(MED_NODAL, entity));
       CPPUNIT_ASSERT_NO_THROW(myMesh2->getReverseConnectivityLength(MED_NODAL, entity));
@@ -876,8 +847,6 @@ void MEDMEMTest::testMeshAndMeshing()
 
   MESHING *myMeshingPoly=new MESHING;
   myMeshingPoly->setName("meshingpoly");
-
-  //int MeshDimension = 3;
 
   const int NbOfTypes = 2;
   medGeometryElement TypesPoly[NbOfTypes] = {MED_TETRA4, MED_POLYHEDRA};
@@ -1069,7 +1038,6 @@ void MEDMEMTest::testMeshAndMeshing()
   // TEST : SUPPORT* sup = new SUPPORT(myMeshPointe) //
   /////////////////////////////////////////////////////
 
-  //#ifdef ENABLE_FAULTS
   {
     MESH * myMeshPointe = new MESH();
     myMeshPointe->setName(meshname);
@@ -1083,10 +1051,6 @@ void MEDMEMTest::testMeshAndMeshing()
     sup->removeReference();
     myMeshPointe->removeReference();
   }
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("ERROR: can not create SUPPORT on mesh, read from pointe.med");
-  //#endif
 
   ////////////////////////////////////////////////////////
   // TEST 3: test MESH on  MEDMEMTest::createTestMesh()//
@@ -1342,8 +1306,6 @@ void MEDMEMTest::testMeshAndMeshing()
 
     myMeshing3->setConnectivity( MED_EDGE, MED_SEG2,ConnectivityEdge);
 
-    // mesh dimension
-
     //test 2D mesh
     int NumberOfElem = myMeshing3->getNumberOfElements (MED_EDGE, MED_ALL_ELEMENTS);
 
@@ -1395,13 +1357,10 @@ void MEDMEMTest::testMeshAndMeshing()
     normal->removeReference();
     length->removeReference();
 
-    //#ifdef ENABLE_FAULTS
     {
-    // (BUG) Segmentation fault if vector is empty
-    vector<SUPPORT *> myVectSupEmpty;
-    CPPUNIT_ASSERT_THROW(myMesh3->mergeSupports(myVectSupEmpty), MEDEXCEPTION);
+      vector<SUPPORT *> myVectSupEmpty;
+      CPPUNIT_ASSERT_THROW(myMesh3->mergeSupports(myVectSupEmpty), MEDEXCEPTION);
     }
-    //#endif
 
     // test mergeFields method: Fields have the same value type
     //intersectSupports and mergeSupports methods
@@ -1487,11 +1446,9 @@ void MEDMEMTest::testMeshAndMeshing()
 
   // remove driver from mesh
   CPPUNIT_ASSERT_NO_THROW(myMesh4->rmDriver(myDriver4));
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("ERROR: driver with index idMedV21 has not been removed");
-  //#endif
+
   // ensure exception is raised on second attempt to remove driver
-  //CPPUNIT_ASSERT_THROW(myMesh4->rmDriver(myDriver4),MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(myMesh4->rmDriver(myDriver4),MEDEXCEPTION);
 
   // Create a MESH object using a MESH driver of type MED_DRIVER associated with file fileName.
   MESH* myMesh5;

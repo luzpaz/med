@@ -84,9 +84,6 @@ public :
 
 protected:
   virtual GENDRIVER * copy ( void ) const = 0 ;
-//   friend class MED_FIELD_RDWR_DRIVER<T>;
-//   friend class MED_FIELD_RDONLY_DRIVER<T>;
-//   friend class MED_FIELD_WRONLY_DRIVER<T>;
 
   bool createFieldSupportPart1(med_2_3::med_idt id,
                                const std::string &   fieldName,

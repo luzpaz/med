@@ -793,7 +793,7 @@ MESH* Extractor::divideEdges(const double*       coords,
 void Extractor::computeDistanceOfNodes(const double* point,
                                        const double* normal)
 {
-  const MESH* mesh     = _myInputMesh; //_myInputField->getSupport()->getMesh();
+  const MESH* mesh     = _myInputMesh;
   const double * coord = mesh->getCoordinates(MED_FULL_INTERLACE);
   const int spaceDim   = mesh->getSpaceDimension();
 
@@ -942,7 +942,7 @@ MESH* Extractor::transfixFaces( const double*       coords,
                                 const double*       direction,
                                 map<int,set<int> >& new2oldCells)
 {
-  const MESH* inMesh = _myInputMesh; //_myInputField->getSupport()->getMesh();
+  const MESH* inMesh = _myInputMesh;
   TMeshData inMeshData( *inMesh );
   TLine line( direction, coords );
 

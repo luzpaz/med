@@ -22,7 +22,6 @@
 
 /*
  File MEDMEM_Family.cxx
- $Header$
 */
 
 #include "MEDMEM_Mesh.hxx"
@@ -271,11 +270,9 @@ FAMILY & FAMILY::operator=(const FAMILY &fam)
     _numberOfAttribute = fam._numberOfAttribute; 
     _attributeIdentifier.set(_numberOfAttribute, fam._attributeIdentifier) ;
     _attributeValue.set(_numberOfAttribute, fam._attributeValue) ;
-    //_attributeDescription.set(_numberOfAttribute, fam._attributeDescription) ;
     _attributeDescription.clear();
     _attributeDescription = fam._attributeDescription;
     _numberOfGroup = fam._numberOfGroup;
-    //_groupName.set(_numberOfGroup, fam._groupName) ;
     _groupName.clear();
     _groupName = fam._groupName;
     return *this;
@@ -330,7 +327,6 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
   
   medGeometryElement * tmp_Types    = new medGeometryElement[numberOfTypes];
   int ** tmp_ElementsLists          = new int*[numberOfTypes] ;
-  //const int *  GlobalNumberingIndex = _mesh->getGlobalNumberingIndex(Entity);
   int elementNumber                 = 1;
   
 
@@ -346,9 +342,7 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
 
     for (int i=0; i<NumberOfElements; i++, elementNumber++)
       {
-        //      SCRUTE_MED(ElementsOfThisFamilyNumber[i]);
         if (_identifier == ElementsOfThisFamilyNumber[i]) {
-          //tmp_ElementsList[NumberOfElementsInThisFamily]=i+GlobalNumberingIndex[TypeNumber] ;
           tmp_ElementsList[NumberOfElementsInThisFamily]=elementNumber;
           NumberOfElementsInThisFamily++;
         }
@@ -357,15 +351,12 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
     if (NumberOfElementsInThisFamily>0) {// we have found some elements
       numberOfElementsInFamily[numberOfElementTypesInFamily]=NumberOfElementsInThisFamily;
 
-      //int * ElementsList = tmp_ElementsList.resize(NumberOfElementsInThisFamily);
       int * ElementsList = new int[NumberOfElementsInThisFamily] ;
       memcpy(ElementsList,tmp_ElementsList,sizeof(int)*NumberOfElementsInThisFamily); // RESIZE de tmp_NodesList serait plus efficace !!!!!!!!
         
       tmp_ElementsLists[numberOfElementTypesInFamily]=ElementsList ;
       tmp_Types[numberOfElementTypesInFamily]=types[TypeNumber];
-      //      GeometricTypeNumber[numberOfElementTypesInFamily]=TypeNumber+1;
       numberOfElementTypesInFamily++;
-      //      delete [] ElementsList;
     }
     delete[] tmp_ElementsList;
   }
@@ -382,20 +373,11 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
     _numberOfElements.set(numberOfElementTypesInFamily) ;
     _totalNumberOfElements=0;
 
-    //_numberOfGaussPoint = new int[numberOfElementTypesInFamily] ;
-
-    //int * numberIndex = new int[numberOfElementTypesInFamily+1];
-    //numberIndex[0]=1;
     for (int i=0; i<numberOfElementTypesInFamily; i++) {
       _geometricType[i]=tmp_Types[i] ;
-      //numberIndex[i+1]=numberIndex[i]+numberOfElementsInFamily[i];
       _numberOfElements[i]=numberOfElementsInFamily[i]; // plutot un resize !!
       _totalNumberOfElements+=_numberOfElements[i];
-      //_numberOfGaussPoint[i]=1;
     }
-    //    delete[] numberOfElementsInFamily;
-    //    delete[] tmp_Types;
-    //    delete[] GeometricTypeNumber;
       
     // family on all ELEMENT ?
     if (_totalNumberOfElements == _mesh->getNumberOfElements(Entity,MED_ALL_ELEMENTS)

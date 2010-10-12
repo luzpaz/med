@@ -542,28 +542,10 @@ void ParallelTopology::createNodeMapping(map<MED_EN::medGeometryElement,int*>& t
         {
           local_index++;
           local_numbers.insert(global);
-          //m_node_loc_to_glob.insert(make_pair(make_pair(idomain,local_index),global));
           m_node_loc_to_glob[idomain].push_back(global);
           m_node_glob_to_loc.insert(make_pair(global,make_pair(idomain,local_index)));
         }
       }
-//       for (int icell=0; icell<polygon_conn_index.size()-1; icell++)
-//       {
-//         for (int inode=polygon_conn_index[icell]; inode<polygon_conn_index[icell+1]; inode++)
-//         {
-//           int global=polygon_conn[inode-1];
-//           if(local_numbers.find(global)==local_numbers.end())
-//           {
-//             local_index++;
-//             local_numbers.insert(global);
-//             //m_node_loc_to_glob.insert(make_pair(make_pair(idomain,local_index),global));
-//             m_node_loc_to_glob[idomain].push_back(global);
-//             m_node_glob_to_loc.insert(make_pair(global,make_pair(idomain,local_index)));
-//             //          cout << "node : global ="<<global<<" local =("<<idomain<<","<<local_index<<")"<<endl;         
-//           }
-//         }
-
-//       }
     }
     else if (type==MED_EN::MED_POLYHEDRA)
     {
@@ -574,33 +556,10 @@ void ParallelTopology::createNodeMapping(map<MED_EN::medGeometryElement,int*>& t
         {
           local_index++;
           local_numbers.insert(global);
-          //m_node_loc_to_glob.insert(make_pair(make_pair(idomain,local_index),global));
           m_node_loc_to_glob[idomain].push_back(global);
           m_node_glob_to_loc.insert(make_pair(global,make_pair(idomain,local_index)));
         }
       }
-//       for (int icell=0; icell<polyhedron_conn_index.size()-1; icell++)
-//       {
-//         for (int iface = polyhedron_conn_index[icell];
-//              iface < polyhedron_conn_index[icell+1];
-//              iface++)
-//           for (int inode=polyhedron_face_index[iface-1];
-//                inode<polyhedron_face_index[iface]; inode++)
-//           {
-//             int global=polyhedron_conn[inode-1];
-//             if(local_numbers.find(global)==local_numbers.end())
-//             {
-//               local_index++;
-//               local_numbers.insert(global);
-//               //m_node_loc_to_glob.insert(make_pair(make_pair(idomain,local_index),global));
-//               m_node_loc_to_glob[idomain].push_back(global);
-//               m_node_glob_to_loc.insert(make_pair(global,make_pair(idomain,local_index)));
-//               //          cout << "node : global ="<<global<<" local =("<<idomain<<","<<local_index<<")"<<endl;         
-//             }
-//           }
-
-
-//       }
     }
 
   }
@@ -703,7 +662,6 @@ void ParallelTopology::createFaceMapping(const MESHCollection& initial_collectio
       for (int i=0; i<m_nb_domain; i++) domain_counts[i]=0;
       set <int> nodes;
       int nbnodes;
-      //if (iface<nbplainface)
       {
         nbnodes=face_offset[iface+1]-face_offset[iface];
         for (int inode= face_offset[iface];inode < face_offset[iface+1]; inode++)

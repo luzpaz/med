@@ -48,7 +48,6 @@ int main (int argc, char ** argv) {
     MEDFILEBROWSER myMed(filenameIN) ;
 
     std::vector< std::string > meshNames = myMed.getMeshNames ();
-    //std::map< std::string, GMESH* > name2mesh;
     for ( unsigned i = 0; i < meshNames.size(); ++i )
     {
       GMESH* mesh = myMed.isStructuredMesh( meshNames[i] ) ? (GMESH*) new GRID : (GMESH*) new MESH;
@@ -56,7 +55,6 @@ int main (int argc, char ** argv) {
       mesh->read(drv);
       drv = mesh->addDriver(MED_DRIVER, filenameOUT, meshNames[i] );
       mesh->write(drv);
-      //name2mesh.insert( make_pair( mesh->getName(), mesh ));
       mesh->removeReference();
     }
     

@@ -113,14 +113,14 @@ using namespace MEDMEM;
  *  Use code of MEDMEM/test_copie_connectivity.cxx
  *  }
  */
-static void showConnectivity(CONNECTIVITY * myConnectivity,
-                      int MeshDimension, int NumberOfNodes, MED_EN::medEntityMesh Entity,
-                      int NumberOfTypes)
+static void checkConnectivity(CONNECTIVITY * myConnectivity,
+                              int MeshDimension, int NumberOfNodes,
+                              MED_EN::medEntityMesh Entity,
+                              int NumberOfTypes)
 {
   int entityDim = myConnectivity->getEntityDimension();
-  CPPUNIT_ASSERT_EQUAL(MeshDimension, entityDim); //?
+  CPPUNIT_ASSERT_EQUAL(MeshDimension, entityDim);
 
-  //int nodesNb = myConnectivity->getNumberOfElements(MED_EN::MED_NODE, MED_EN::MED_NONE);
   int nodesNb = myConnectivity->getNumberOf(MED_EN::MED_NODE, MED_EN::MED_NONE);
   CPPUNIT_ASSERT_EQUAL(NumberOfNodes, nodesNb); //?
 
@@ -132,39 +132,9 @@ static void showConnectivity(CONNECTIVITY * myConnectivity,
   CPPUNIT_ASSERT_EQUAL(NumberOfTypes, typesNb);
 
   const MED_EN::medGeometryElement * Types = myConnectivity->getGeometricTypes(Entity);
+  CPPUNIT_ASSERT( Types );
 
-  // Show Nodal Connectivity
-  //cout << "Show Nodal Connectivity :" << endl;
-  for (int i = 0; i < NumberOfTypes; i++) {
-    //cout << "For type " << Types[i] << " : " << endl;
-    //int NumberOfElements = myConnectivity->getNumberOf(Entity, Types[i]);
-    //const int * connectivity =
-      myConnectivity->getConnectivity(MED_EN::MED_NODAL, Entity, Types[i]);
-      //int NomberOfNodesPerCell = Types[i]%100;
-    //for (int j = 0; j < NumberOfElements; j++) {
-      //cout << "Element " << j+1 << " : ";
-      //for (int k = 0; k < NomberOfNodesPerCell; k++) {
-      //cout << connectivity[j*NomberOfNodesPerCell + k] << " ";
-      //}
-      //cout << endl;
-    //}
-  }
-
-  // Show Reverse Nodal Connectivity
-  //cout << "Show Reverse Nodal Connectivity :" << endl;
-  //const int * ReverseNodalConnectivity =
-    myConnectivity->getReverseConnectivity(MED_EN::MED_NODAL, Entity);
-    //const int * ReverseNodalConnectivityIndex =
-    myConnectivity->getReverseConnectivityIndex(MED_EN::MED_NODAL, Entity);
-//   for (int i = 0; i < NumberOfNodes; i++) {
-//     cout << "Node "<< i+1 << " : ";
-//     for (int j = ReverseNodalConnectivityIndex[i]; j < ReverseNodalConnectivityIndex[i+1]; j++)
-//       cout << ReverseNodalConnectivity[j-1] << " ";
-//     cout << endl;
-//   }
-
-  // Show Descending Connectivity
-  //cout << "Show Connectivity (Descending) :" << endl;
+  // TODO: implement some more checks
   int NumberOfElements;
   const int * connectivity;
   const int * connectivity_index;
@@ -178,13 +148,6 @@ static void showConnectivity(CONNECTIVITY * myConnectivity,
   catch (MEDEXCEPTION m) {
     CPPUNIT_FAIL(m.what());
   }
-
-//   for (int j = 0; j < NumberOfElements; j++) {
-//     cout << "Element " << j+1 << " : ";
-//     for (int k = connectivity_index[j]; k < connectivity_index[j+1]; k++)
-//       cout << connectivity[k-1] << " ";
-//     cout << endl;
-//   }
 
   // Get constituent entity type and quantity
   int NumberOfConstituents  = 0;
@@ -207,35 +170,12 @@ static void showConnectivity(CONNECTIVITY * myConnectivity,
     return;
   }
 
-  // Show Reverse Descending Connectivity
-  //cout << "Show Reverse Descending Connectivity :" << endl;
-  //const int * ReverseDescendingConnectivity =
-    myConnectivity->getReverseConnectivity(MED_EN::MED_DESCENDING, Entity);
-    //const int * ReverseDescendingConnectivityIndex =
-    myConnectivity->getReverseConnectivityIndex(MED_EN::MED_DESCENDING, Entity);
+  myConnectivity->getReverseConnectivity(MED_EN::MED_DESCENDING, Entity);
+  myConnectivity->getReverseConnectivityIndex(MED_EN::MED_DESCENDING, Entity);
 
   NumberOfConstituents = myConnectivity->getNumberOf(constituentEntity, MED_EN::MED_ALL_ELEMENTS);
-//   for (int i = 0; i < NumberOfConstituents; i++) {
-//     cout << constituent << i+1 << " : ";
-//     for (int j = ReverseDescendingConnectivityIndex[i];
-//          j < ReverseDescendingConnectivityIndex[i+1]; j++) {
-//       cout << ReverseDescendingConnectivity[j-1] << " ";
-//     }
-//     cout << endl;
-//   }
-
-  // Show <constituent> Nodal Connectivity
-  //cout << "Show " << constituent << " Connectivity (Nodal) :" << endl;
-  //const int * face_connectivity =
-    myConnectivity->getConnectivity(MED_EN::MED_NODAL, constituentEntity, MED_EN::MED_ALL_ELEMENTS);
-    //const int * face_connectivity_index =
-    myConnectivity->getConnectivityIndex(MED_EN::MED_NODAL, constituentEntity);
-//   for (int i = 0; i < NumberOfConstituents; i++) {
-//     cout << constituent << i+1 << " : ";
-//     for (int j = face_connectivity_index[i]; j < face_connectivity_index[i+1]; j++)
-//       cout << face_connectivity[j-1] << " ";
-//     cout << endl;
-//   }
+  myConnectivity->getConnectivity(MED_EN::MED_NODAL, constituentEntity, MED_EN::MED_ALL_ELEMENTS);
+  myConnectivity->getConnectivityIndex(MED_EN::MED_NODAL, constituentEntity);
 }
 
 /////////////////////////////////////////
@@ -266,12 +206,7 @@ static void checkCopyConnectivity()
 
   int nbOfTypes = myConnectivity0->getNumberOfTypes(anEntity0);
 
-  // Show
-  //cout << "myConnectivity1 BEGIN" << endl;
-  //cout << *myConnectivity1 << endl;
-  //cout << "myConnectivity1 END" << endl;
-  showConnectivity(myConnectivity1, aMeshDimension, aNumberOfNodes, anEntity0, nbOfTypes);
-  //cout << "myConnectivity1 END 2" << endl;
+  checkConnectivity(myConnectivity1, aMeshDimension, aNumberOfNodes, anEntity0, nbOfTypes);
 
   ostringstream ostr1;
   ostr1 << *myConnectivity1;
@@ -291,11 +226,7 @@ static void checkCopyConnectivity()
   MED_EN::medEntityMesh anEntity2 = myConnectivity2->getEntity();
   CPPUNIT_ASSERT_EQUAL(anEntity0, anEntity2);
 
-  //cout << "myConnectivity2 BEGIN" << endl;
-  //cout << *myConnectivity2 << endl;
-  //cout << "myConnectivity2 END" << endl;
-  showConnectivity(myConnectivity2, aMeshDimension, aNumberOfNodes, anEntity0, nbOfTypes);
-  //cout << "myConnectivity2 END 2" << endl;
+  checkConnectivity(myConnectivity2, aMeshDimension, aNumberOfNodes, anEntity0, nbOfTypes);
 
   ostringstream ostr2;
   ostr2 << *myConnectivity2;
@@ -308,11 +239,7 @@ static void checkCopyConnectivity()
   MED_EN::medEntityMesh anEntity3 = myConnectivity3->getEntity();
   CPPUNIT_ASSERT_EQUAL(anEntity0, anEntity3);
 
-  //cout << "myConnectivity3 BEGIN" << endl;
-  //cout << *myConnectivity3 << endl;
-  //cout << "myConnectivity3 END" << endl;
-  showConnectivity(myConnectivity3, aMeshDimension, aNumberOfNodes, anEntity0, nbOfTypes);
-  //cout << "myConnectivity3 END 2" << endl;
+  checkConnectivity(myConnectivity3, aMeshDimension, aNumberOfNodes, anEntity0, nbOfTypes);
 
   ostringstream ostr3;
   ostr3 << *myConnectivity3;
@@ -663,7 +590,6 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
   else {
     // CELLS(3D): theC
     {
-      //CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 1, theC->getNumberOfPolyType());
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 3, theC->getNumberOfTypes(MED_EN::MED_CELL));
 
       {
@@ -675,7 +601,6 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
         CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, MED_EN::MED_POLYHEDRA, aCellTypesBack[2]);
       }
 
-      //CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 2, theC->getNumberOfElementOfPolyType(MED_EN::MED_CELL));
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 2, theC->getNumberOf(MED_EN::MED_CELL,
                                                              MED_EN::MED_POLYHEDRA));
       //checking that 0 is returned if polygons are asked as cells instead of faces
@@ -941,11 +866,6 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
             CPPUNIT_ASSERT_MESSAGE(msg, (curNodes.insert(pgConn[j - 1])).second);
           }
         }
-
-        //CPPUNIT_ASSERT_THROW(theC->getPolygonsConnectivity(MED_EN::MED_DESCENDING,
-        //                                                   MED_EN::MED_FACE), MEDEXCEPTION);
-        //CPPUNIT_ASSERT_THROW(theC->getPolygonsConnectivityIndex(MED_EN::MED_DESCENDING,
-        //                                                        MED_EN::MED_FACE), MEDEXCEPTION);
       }
     } // FACES: theC->_constituent
 
@@ -961,10 +881,6 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
     //N-2 Connectivity not supported in MEDMEM
     //CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 1, theC->getNumberOfTypes(MED_EN::MED_EDGE));
 
-
-    //cout << "^^^^^" << endl;
-    //cout <<  *theC  << endl;
-    //cout << "^^^^^" << endl;
   }
   else {
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, MED_EN::MED_POLYHEDRA, theC->getPolyTypeRelativeTo());
@@ -1430,12 +1346,6 @@ void MEDMEMTest::testConnectivity()
     }
   }
 
-  //cout << "aCells2: " << endl;
-  //cout << aCells2 << endl;
-
-  //cout << "aCells1:" << endl;
-  //cout << aCells1 << endl;
-
   //  aCells1 (2 types)  |
   //     |               |
   //  aFaces1 (4 types)  |  aCells2 (3 types)
@@ -1473,18 +1383,12 @@ void MEDMEMTest::testConnectivity()
     vector<FAMILY*> aFamsOnFaces (1);
     aFamsOnFaces[0] = aFamilyOnFaces;
 
-//#ifdef ENABLE_UPDATE_FAMILY
     // Attention!!! By default ENABLE_UPDATE_FAMILY is not defined!!!
     // I do not undestand, what this method should do
     // and what I must give to it to obtain good result
 
-    //cout << "aCells1:" << endl;
-    //cout << aCells1 << endl;
     CPPUNIT_ASSERT_NO_THROW(aCells1->updateFamily(aFamsOnFaces));
-    //cout << "aCells1:" << endl;
-    //cout << aCells1 << endl;
     aFamilyOnFaces->removeReference();
-//#endif
   }
 
   ////////////
@@ -1500,10 +1404,6 @@ void MEDMEMTest::testConnectivity()
   // invertConnectivityForAFace
   int nbFacesC2 = c2->getNumberOf(MED_EN::MED_FACE, MED_EN::MED_ALL_ELEMENTS);
   for (int faceId = 1; faceId <= nbFacesC2; faceId++) {
-    //cout << "^^^^^ not inverted ^^^^^" << endl;
-    //showConnectivity(c2, 3, 20, MED_EN::MED_CELL, 2);
-    //cout <<  *c2  << endl;
-    //cout << "^^^^^ not inverted ^^^^^" << endl;
 
     // this face nodal connectivity before inversion:
     int oldLen, newLen;
@@ -1549,11 +1449,6 @@ void MEDMEMTest::testConnectivity()
     }
     c2->invertConnectivityForAFace(faceId, newNodesForFace);
 
-    //cout << "^^^^^ inverted ^^^^^" << endl;
-    //showConnectivity(c2, 3, 20, MED_EN::MED_CELL, 2);
-    //cout <<  *c2  << endl;
-    //cout << "^^^^^ inverted ^^^^^" << endl;
-
     // reverse descending connectivity after inversion:
     const int * after_ReverseDescendingConnectivity =
       c2->getReverseConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_CELL);
@@ -1563,10 +1458,7 @@ void MEDMEMTest::testConnectivity()
     // Faces, which are on bound (have one neighbouring), are not inverted.
     bool isOnBound = false;
 
-    //cout << "faceId = " << faceId << endl;
-    //cout << "oldLen = " << oldLen << endl;
     for (int i = 0; i < nbFacesC2; i++) {
-      //cout << "i = " << i << endl;
       int plus = after_ReverseDescendingConnectivityIndex[i] - 1;
       // always two neighbourings
       if ((i + 1) == faceId) {

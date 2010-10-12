@@ -152,19 +152,6 @@ void MEDMEMTest::testGrid()
 
     const medGeometryElement* types;
     CPPUNIT_ASSERT_NO_THROW(types = myGrid->getTypes(MED_CELL));
-    //#ifdef ENABLE_FORCED_FAILURES
-    // Compilation warning about GRID::getTypes():
-    // "inline function
-    // `virtual const MED_EN::medGeometryElement* MEDMEM::GRID::getTypes(MED_EN::medEntityMesh) const'
-    // used but never defined".
-    // In MEDMEM_Grid.hxx:
-    // inline const MED_EN::medGeometryElement * getTypes(MED_EN::medEntityMesh Entity) const;
-    // But implemented in MEDMEM_Grid.cxx:
-    //        const MED_EN::medGeometryElement * GRID::getTypes(MED_EN::medEntityMesh entity) const
-    //
-    // EAP: inline removed
-    //CPPUNIT_FAIL("Problem with GRID::getTypes() method implementation.");
-    //#endif
     CPPUNIT_ASSERT(types[0] == MED_QUAD4);
 
     int nbElem = 0;
@@ -598,13 +585,8 @@ void MEDMEMTest::testGrid()
     mesh->removeReference();
   }
 
-  //#ifdef ENABLE_FORCED_FAILURES
   {
     GRID* myGrid2;
-    // ? (BUG) ? MED Exception in /dn20/salome/jfa/V3/SRC/MED_SRC/src/MEDMEM/MEDMEM_MedM
-    //eshDriver21.cxx [430] : MED_MESH_RDONLY_DRIVER21::getCOORDINATE() : The number 
-    //of nodes |0| seems to be incorrect for the mesh : |bodyfitted|
-    // Not clear what is wrong
     CPPUNIT_ASSERT_NO_THROW(myGrid2 = new GRID(MED_DRIVER, filename, mesh_names[1]));
 
     // Check if something has been read - full mesh data testing is above
@@ -618,7 +600,6 @@ void MEDMEMTest::testGrid()
     CPPUNIT_ASSERT(nbElem);
     myGrid2->removeReference();
   }
-  //#endif
 
   {
     GRID* myGrid4 = new GRID();
@@ -631,23 +612,11 @@ void MEDMEMTest::testGrid()
     int driver;
     CPPUNIT_ASSERT_NO_THROW(driver = myGrid4->addDriver(myMeshDriver));
 
-    // ??? ERROR:myGrid4->fillMeshAfterRead()- this method is incomplete:
-    // currently it only resets _is_coordinates_filled and _is_connectivity_filled
-    // flags that leads to grid reconstruction
-
     // MED Exception : MED_MESH_RDONLY_DRIVER21::getGRID() : The number
     // of nodes |-1| seems to be incorrect for the mesh : |maa1|
     // But this exception seems to be correct reaction on attempt
     // to read a grid from a file, which does not contain it.
     CPPUNIT_ASSERT_THROW(myGrid4->read(driver), MEDEXCEPTION);
-    //CPPUNIT_ASSERT_NO_THROW(myGrid4->read(driver));
-    /*CPPUNIT_ASSERT(myGrid4->getArrayLength(1) == 0);
-    CPPUNIT_ASSERT(myGrid4->getArrayLength(2) == 0);
-    CPPUNIT_ASSERT(myGrid4->getArrayLength(3) == 0);
-    myGrid4->fillMeshAfterRead();
-    CPPUNIT_ASSERT(myGrid4->getArrayLength(1) != 0);
-    CPPUNIT_ASSERT(myGrid4->getArrayLength(2) != 0);
-    CPPUNIT_ASSERT(myGrid4->getArrayLength(3) != 0);*/
 
     myGrid4->removeReference();
   }

@@ -169,8 +169,10 @@ using namespace MEDMEM;
  *
  *   (+)     inline void read(int index=0);
  *   (+)     inline void read(const GENDRIVER & genDriver);
- *   (+)     inline void write(int index=0, const string & driverName = "");
+ *   (+)     inline void read(driverTypes driverType, const std::string& filename);
+ *   (+)     inline void write(int index=0);
  *   (+)     inline void write(const GENDRIVER &);
+ *   (+)     inline void write(driverTypes driverType, const std::string& filename);
  *   (+)     inline void writeAppend(int index=0, const string & driverName = "");
  *   (+) inline void writeAppend(const GENDRIVER &);
  *
@@ -300,10 +302,8 @@ static void checkField_(FIELD_ * theField_, const SUPPORT * theSupport,
 
   theField_->setComponentsNames(aCompsNames);
 
-  //#ifdef ENABLE_FAULTS
   try {
     theField_->setNumberOfComponents(7);
-    // Segmentation fault here because array of components names is not resized
     for (int i = 1; i <= 7; i++) {
       theField_->setComponentName(i, "AnyComponent");
     }
@@ -317,10 +317,6 @@ static void checkField_(FIELD_ * theField_, const SUPPORT * theSupport,
   // restore components names
   theField_->setNumberOfComponents(aNbComps);
   theField_->setComponentsNames(aCompsNames);
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("FIELD_::_componentsNames bad management");
-  //#endif
 
   theField_->setComponentsDescriptions(aCompsDescs);
   theField_->setMEDComponentsUnits(aCompsUnits);
@@ -360,19 +356,12 @@ static void checkField_(FIELD_ * theField_, const SUPPORT * theSupport,
   CPPUNIT_ASSERT_EQUAL(aCompsUnitsBack2[1], theField_->getMEDComponentUnit(2));
   CPPUNIT_ASSERT_EQUAL(aCompsUnitsBack2[1], aCompUnit2);
 
-  //#ifdef ENABLE_FAULTS
-  // (BUG) No index checking
-  // It's normal: performance reason
   CPPUNIT_ASSERT_THROW(theField_->setComponentName(0, "str"), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(theField_->setComponentName(aNbComps + 1, "str"), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(theField_->setComponentDescription(0, "str"), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(theField_->setComponentDescription(aNbComps + 1, "str"), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(theField_->setMEDComponentUnit(0, "str"), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(theField_->setMEDComponentUnit(aNbComps + 1, "str"), MEDEXCEPTION);
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("FIELD::setComponentXXX() does not check component index");
-  //#endif
 
   // iteration information
   int anIterNumber = 10; // set value to MED_NOPDT if undefined (default)
@@ -430,45 +419,12 @@ void checkField (FIELD<T, INTERLACING_TAG> * theField, const SUPPORT * theSuppor
     theField->deallocValue();
     theField->allocValue(/*NumberOfComponents = */spaceDim + 1);
 
-    //  0020142: [CEA 315] Unused function in MEDMEM::FIELD
-    // getVolume() etc. does nothing
-    //
-//     CPPUNIT_ASSERT_THROW(theField->getVolume(), MEDEXCEPTION);
-//     CPPUNIT_ASSERT_THROW(theField->getArea(), MEDEXCEPTION);
-//     CPPUNIT_ASSERT_THROW(theField->getLength(), MEDEXCEPTION);
-//     if (aMesh) {
-//       CPPUNIT_ASSERT_THROW(theField->getNormal(), MEDEXCEPTION);
-//       CPPUNIT_ASSERT_THROW(theField->getBarycenter(), MEDEXCEPTION);
-//     }
-
     theField->deallocValue();
     theField->allocValue(/*NumberOfComponents = */1);
-    //  0020142: [CEA 315] Unused function in MEDMEM::FIELD
-    // getVolume() etc. does nothing
-//     if (aValueType == MED_EN::MED_REEL64) {
-//       CPPUNIT_ASSERT_NO_THROW(theField->getVolume());
-//       CPPUNIT_ASSERT_NO_THROW(theField->getArea());
-//       CPPUNIT_ASSERT_NO_THROW(theField->getLength());
-//     }
-//     else {
-//       CPPUNIT_ASSERT_THROW(theField->getVolume(), MEDEXCEPTION);
-//       CPPUNIT_ASSERT_THROW(theField->getArea(), MEDEXCEPTION);
-//       CPPUNIT_ASSERT_THROW(theField->getLength(), MEDEXCEPTION);
-//     }
 
     if (aMesh) {
       theField->deallocValue();
       theField->allocValue(/*NumberOfComponents = */spaceDim);
-    //  0020142: [CEA 315] Unused function in MEDMEM::FIELD
-    // getVolume() etc. does nothing
-//       if (aValueType == MED_EN::MED_REEL64) {
-//         CPPUNIT_ASSERT_NO_THROW(theField->getNormal());
-//         CPPUNIT_ASSERT_NO_THROW(theField->getBarycenter());
-//       }
-//       else {
-//         CPPUNIT_ASSERT_THROW(theField->getNormal(), MEDEXCEPTION);
-//         CPPUNIT_ASSERT_THROW(theField->getBarycenter(), MEDEXCEPTION);
-//       }
     }
   }
 
@@ -478,36 +434,19 @@ void checkField (FIELD<T, INTERLACING_TAG> * theField, const SUPPORT * theSuppor
   int nbElemSupport = theSupport->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
   CPPUNIT_ASSERT_EQUAL(nbElemSupport, theField->getNumberOfValues());
 
-  //#ifdef ENABLE_FAULTS
-  // (BUG) FIELD::deallocValue() does not nullify _value pointer,
-  // that is why there can be failures in other methods
-  // (even if simply call deallocValue() two times)
   theField->deallocValue();
   CPPUNIT_ASSERT_THROW(theField->getGaussPresence(), MEDEXCEPTION);
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("FIELD::deallocValue() does not nullify _value pointer");
-  //#endif
 
   // copy constructor
   FIELD<T, INTERLACING_TAG> *aField_copy1= new FIELD<T, INTERLACING_TAG>(*theField);
   compareField(theField, aField_copy1, /*isValue = */false);
-  //compareField(theField, &aField_copy1, /*isValue = */true);
   aField_copy1->removeReference();
 
   // operator=
-  //#ifdef ENABLE_FAULTS
-  // (BUG) This fails (Segmentation fault) if not set:
-  // _componentsNames or _componentsDescriptions, or _componentsUnits, or _MEDComponentsUnits
   FIELD<T, INTERLACING_TAG> *aField_copy2=new FIELD<T, INTERLACING_TAG>();
   *aField_copy2 = *theField;
   compareField(theField, aField_copy2, /*isValue = */false);
   aField_copy2->removeReference();
-  //compareField(theField, &aField_copy2, /*isValue = */true);
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("FIELD_::operator=() fails if _componentsUnits is not set");
-  //#endif
 }
 
 template<class T>
@@ -628,7 +567,6 @@ static void testDrivers()
   MESH *aMesh = new MESH(MED_DRIVER,filename_rd,meshname);
   SUPPORT *aSupport = new SUPPORT(aMesh, "aSupport",MED_CELL);
   FIELD<int> *aFieldSupport;
-  //#ifdef ENABLE_FORCED_FAILURES  
   CPPUNIT_ASSERT_THROW(aFieldSupport = 
                        new FIELD<int>(aSupport, MED_DRIVER,filename_rd,
                                        fieldname_nodeint_rd), MEDMEM::MEDEXCEPTION);
@@ -723,41 +661,11 @@ void MEDMEMTest::testField()
   compareField_(aField_, aField_copy1, /*isFIELD = */false, /*isValue = */false);
   aField_copy1->removeReference();
   // operator=
-  //#ifdef ENABLE_FAULTS
-  // (BUG) This fails (Segmentation fault) if not set:
-  // _componentsNames or _componentsDescriptions, or _componentsUnits, or _MEDComponentsUnits
-  // (BUG) Code duplication with copyGlobalInfo(), called from copy constructor
   FIELD_ *aField_copy2=new FIELD_;
   *aField_copy2 = *aField_;
   compareField_(aField_, aField_copy2,/*isFIELD = */false, /*isValue = */false);
   aField_copy2->removeReference();
   aField_->removeReference();
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("FIELD_::operator=() fails if _componentsUnits is not set");
-  //#endif
-
-  // following test is commented since method
-  // setTotalNumberOfElements() is removed.
-  /*
-  // construction on a given support
-  {
-    anEmptySupport.setTotalNumberOfElements(11);
-    // CASE1:
-    FIELD_ aField_case1 (&anEmptySupport, 10);
-    // CASE2:
-    // Invalid API usage
-//     FIELD_ aField_case2;
-//     aField_case2.setSupport(&anEmptySupport);
-//     aField_case2.setNumberOfComponents(10);
-
-// #ifdef ENABLE_FORCED_FAILURES
-//     CPPUNIT_ASSERT_EQUAL_MESSAGE("No correspondance between CASE1 and CASE2",
-//                                  aField_case1.getNumberOfValues(),
-//                                  aField_case2.getNumberOfValues());
-// #endif
-  }
-  */
 
   ////////////////////////
   // TEST 2: FIELD<int> //
@@ -1193,11 +1101,7 @@ void MEDMEMTest::testField()
   aSubField1->setColumn(1, col);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(-7., aSubField1->getValueIJ(anElems1[0], 1), 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(-3., aSubField1->getValueIJ(anElems1[0], 2), 0.000001);
-  //#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) in MEDMEM_Array::setColumn()
-  // WAIT FOR DECISION
   CPPUNIT_ASSERT_DOUBLES_EQUAL(-9., aSubField1->getValueIJ(anElems1[1], 1), 0.000001);
-  //#endif
   CPPUNIT_ASSERT_DOUBLES_EQUAL( 1., aSubField1->getValueIJ(anElems1[1], 2), 0.000001);
   // out of range
   CPPUNIT_ASSERT_THROW(aSubField1->setColumn(3, col), MEDEXCEPTION);
@@ -1210,17 +1114,10 @@ void MEDMEMTest::testField()
       new MEDMEM_ArrayInterface<double,FullInterlace,Gauss>::Array
       (/*dim*/2, /*nbelem*/2, /*nbtypegeo*/1, /*nbelgeoc*/nbelgeoc, /*nbgaussgeo*/nbgaussgeo);
 
-    //#ifdef ENABLE_FAULTS
     aNewArrayGauss->setIJ(1, 1, -4.);
     aNewArrayGauss->setIJ(1, 2, -2.);
     aNewArrayGauss->setIJ(2, 1, -5.);
     aNewArrayGauss->setIJ(2, 2, -1.);
-    //#endif
-    //#ifdef ENABLE_FORCED_FAILURES
-    // ? (BUG) in FullInterlaceGaussPolicy::getIndex(int i,int j)
-    // FullInterlaceGaussPolicy::getIndex(2,2) returns 4!!!
-    //CPPUNIT_FAIL("? Bug in FullInterlaceGaussPolicy::getIndex(int i,int j) ?");
-    //#endif
 
     aNewArrayGauss->setIJK(1, 1, 1, -4.);
     aNewArrayGauss->setIJK(1, 2, 1, -2.);
@@ -1231,19 +1128,10 @@ void MEDMEMTest::testField()
     // no need to delete aNewArrayGauss, because it will be deleted
     // in destructor or in deallocValue() method of aSubField1
 
-    //#ifdef ENABLE_FAULTS
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-4., aSubField1->getValueIJ(anElems1[0], 1), 0.000001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-2., aSubField1->getValueIJ(anElems1[0], 2), 0.000001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-5., aSubField1->getValueIJ(anElems1[1], 1), 0.000001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-1., aSubField1->getValueIJ(anElems1[1], 2), 0.000001);
-    //#endif
-    //#ifdef ENABLE_FORCED_FAILURES
-    // ? (BUG) in FullInterlaceGaussPolicy::getIndex(int i,int j)
-    // Must be   : return _G[i-1]-1 + (j-1);
-    // Instead of: return _G[i-1]-1 + (j-1)*_dim;
-    // TODO: THINK YOUR-SELF
-    //CPPUNIT_FAIL("? Bug in FullInterlaceGaussPolicy::getIndex(int i,int j) ?");
-    //#endif
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-4., aSubField1->getValueIJK(anElems1[0], 1, 1), 0.000001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-2., aSubField1->getValueIJK(anElems1[0], 2, 1), 0.000001);
@@ -1754,8 +1642,6 @@ void MEDMEMTest::testFieldConvert()
   aField_NIGG->removeReference();
   aField_FIGG_conv->removeReference();
 
-  //#ifdef ENABLE_FAULTS
-  // (BUG) in FieldConvert(), concerning FIELD_::operator=
   {
     // create an empty integer field 2x10
     FIELD<int, FullInterlace> * aField = new FIELD<int, FullInterlace>();
@@ -1781,11 +1667,6 @@ void MEDMEMTest::testFieldConvert()
     CPPUNIT_ASSERT(aField_conv);
     aField_conv->removeReference();
   }
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  // STD::vector
-  //CPPUNIT_FAIL("FieldConvert() fails if _componentsUnits is not set, because it calls FIELD_::operator=");
-  //#endif
 }
 
 //================================================================================

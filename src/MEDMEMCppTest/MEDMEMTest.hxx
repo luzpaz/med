@@ -69,7 +69,6 @@ class MEDMEMCPPTEST_EXPORT MEDMEMTest : public CppUnit::TestFixture
   //CPPUNIT_TEST( testMedFieldDriver /* not in spec */ );
   CPPUNIT_TEST( testMedFileBrowser );
   //30
-  //CPPUNIT_TEST( testMedMedDriver /* not in spec */ );
   //CPPUNIT_TEST( testMEDMEMchampLire /* not in spec */ );
   //CPPUNIT_TEST( testMEDMEMgaussEcr /* not in spec */ );
   //CPPUNIT_TEST( testMEDMEMprofilEcr /* not in spec */ );
@@ -82,7 +81,6 @@ class MEDMEMCPPTEST_EXPORT MEDMEMTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testnArray );
   CPPUNIT_TEST( testPartialDescendingConnectivity );
   CPPUNIT_TEST( testPointerOf );
-  //CPPUNIT_TEST( testPolyhedronArray );
   CPPUNIT_TEST( testPorflowMeshDriver );
   //CPPUNIT_TEST( testRCBase /* not in spec */ );
   //CPPUNIT_TEST( testSetInterlacingType /* not in spec */ );
@@ -147,7 +145,6 @@ public:
   //void testMedFieldDriver /* not in spec */();
   void testMedFileBrowser();
   //30
-  //void testMedMedDriver() /* not in spec */;
   //void testMEDMEMchampLire() /* not in spec */;
   //void testMEDMEMgaussEcr() /* not in spec */;
   //void testMEDMEMprofilEcr() /* not in spec */;
@@ -160,7 +157,6 @@ public:
   void testnArray();
   void testPartialDescendingConnectivity();
   void testPointerOf();
-  //void testPolyhedronArray();
   void testPorflowMeshDriver();
   //void testRCBase() /* not in spec */;
   //void testSetInterlacingType /*  IMED_MESH_RDWR_DRIVER(driver), not in spec */();

@@ -96,21 +96,6 @@ void MED_i::init(SALOMEDS::Study_ptr myStudy,driverTypes /*driverType*/, const s
   
   MED_EN::MESH_ENTITIES::const_iterator currentEntity; 
 
-//   for (int i=0; i<numberOfMeshes; i++) 
-//   {
-//     map<MED_EN::medEntityMesh,::SUPPORT*> mySupports = _med.getSupports(meshesNames[i]);
-//     map<MED_EN::medEntityMesh,::SUPPORT*>::const_iterator itSupport;
-//     map<MED_EN::medEntityMesh, SALOME_MED::SUPPORT_ptr> & mySupportsIOR 
-//       = _supports[meshesNames[i]];
-//     for ( itSupport = mySupports.begin(); itSupport != mySupports.end(); itSupport++ ) 
-//     {
-//       SUPPORT_i * mySupportI = new SUPPORT_i((*itSupport).second);
-//       SALOME_MED::SUPPORT_ptr mySupportIOR = mySupportI->_this();
-//       mySupportsIOR[(*itSupport).first] = mySupportIOR;
-//       //                  mySupportI->addInStudy(myStudy,mySupportIOR);
-//     }
-//   }
-
   // FIELDS :
   vector<string> fieldsNames = _med.getFieldNames();
   for (int i=0; i<fieldsNames.size(); i++) 
@@ -227,9 +212,6 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes /*driverTy
         {
           FAMILY_i * myFamilyI = new FAMILY_i(*familyVectorIt);
           SALOME_MED::FAMILY_ptr myFamilyIOR = myFamilyI->_this();
-          //if ( !persistence ||
-          //     isPublishedObject( myStudy, SUPPORT_i::getEntryPath
-          //                        ((const SUPPORT *)*familyVectorIt)))
           myFamilyI->addInStudy(myStudy,myFamilyIOR);
         }
 
@@ -243,31 +225,10 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes /*driverTy
         {
           GROUP_i * myGroupI = new GROUP_i(*groupVectorIt);
           SALOME_MED::GROUP_ptr myGroupIOR = myGroupI->_this();
-          //if ( !persistence ||
-          //     isPublishedObject( myStudy, SUPPORT_i::getEntryPath
-          //                        ((const SUPPORT *)*groupVectorIt)))
           myGroupI->addInStudy(myStudy,myGroupIOR);
         }
       }
     }
-
-//         for (int i=0; i<numberOfMeshes; i++) 
-//         {
-//             map<MED_EN::medEntityMesh,::SUPPORT*> mySupports = _med.getSupports(meshesNames[i]);
-//             map<MED_EN::medEntityMesh,::SUPPORT*>::const_iterator itSupport;
-//             map<MED_EN::medEntityMesh,SALOME_MED::SUPPORT_ptr> & 
-//                         mySupportsIOR = _supports[meshesNames[i]];
-//             for (itSupport=mySupports.begin(); itSupport!=mySupports.end(); itSupport++ ) 
-//             {
-//                  SUPPORT_i * mySupportI = new SUPPORT_i((*itSupport).second);
-//                  SALOME_MED::SUPPORT_ptr mySupportIOR = mySupportI->_this();
-//                  mySupportsIOR[(*itSupport).first]= mySupportIOR;
-//                  //if ( !persistence ||
-//                  //     isPublishedObject( myStudy,
-//                  //                        SUPPORT_i::getEntryPath (itSupport->second)))
-//                  mySupportI->addInStudy(myStudy,mySupportIOR);
-//             }
-//         }
   }
 
   // FIELDS :
@@ -332,7 +293,6 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes /*driverTy
         {
           SUPPORT_i * mySupportI = new SUPPORT_i( myField->getSupport() );
           SALOME_MED::SUPPORT_ptr mySupportIOR = mySupportI->_this();
-          //mySupportsIOR[(*itSupport).first]= mySupportIOR;
           mySupportI->addInStudy(myStudy,mySupportIOR);
         }
       }
@@ -704,20 +664,6 @@ throw (SALOME::SALOME_Exception)
 CORBA::Long MED_i::addDriver(SALOME_MED::medDriverTypes driverType, const char* fileName) 
 throw (SALOME::SALOME_Exception)
 {
-//         if (_med==NULL)
-//                 THROW_SALOME_CORBA_EXCEPTION("No associated Med object",\
-//                                              SALOME::INTERNAL_ERROR);
-//         try
-//         {
-//                 int driv=_med.addDriver(convertIdlDriverToMedDriver(driverType),
-//                                         fileName);
-//                 return driv;
-//         }
-//         catch (MEDEXCEPTION &ex)
-//         {
-//                 MESSAGE("Unable to add a driver to the med object");
-//                 THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
-//         }
   return 0;
 }
 
@@ -729,18 +675,6 @@ throw (SALOME::SALOME_Exception)
 void MED_i::rmDriver(CORBA::Long i) 
 throw (SALOME::SALOME_Exception)
 {
-//         if (_med==NULL)
-//                 THROW_SALOME_CORBA_EXCEPTION("No associated Med object",\
-//                                              SALOME::INTERNAL_ERROR);
-//         try
-//         {
-//                 _med.rmDriver(i);
-//         }
-//         catch (MEDEXCEPTION &ex)
-//         {
-//                 MESSAGE("Unable to unlink the driver from the med object");
-//                 THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
-//         }
 }
 
 //=======================================================================
@@ -751,18 +685,6 @@ throw (SALOME::SALOME_Exception)
 void MED_i::readFileStruct(CORBA::Long i) 
 throw (SALOME::SALOME_Exception)
 {
-//         if (_med==NULL)
-//                 THROW_SALOME_CORBA_EXCEPTION("No associated Med object",\
-//                                              SALOME::INTERNAL_ERROR);
-//         try
-//         {
-//                 _med.readFileStruct(i);
-//         }
-//         catch (MEDEXCEPTION &ex)
-//         {
-//                 MESSAGE("Unable to read the structure of this file ");
-//                 THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
-//         }
 }
 
 //=======================================================================
@@ -773,18 +695,6 @@ throw (SALOME::SALOME_Exception)
 void MED_i::writeFrom(CORBA::Long i) 
 throw (SALOME::SALOME_Exception)
 {
-//         if (_med==NULL)
-//                 THROW_SALOME_CORBA_EXCEPTION("No associated Med object",\
-//                                              SALOME::INTERNAL_ERROR);
-//         try
-//         {
-//                 _med.writeFrom(i);
-//         }
-//         catch (MEDEXCEPTION &ex)
-//         {
-//                 MESSAGE("Unable to write this driver ");
-//                 THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
-//         }
 }
 
 //=======================================================================
@@ -795,18 +705,6 @@ throw (SALOME::SALOME_Exception)
 void MED_i::write(CORBA::Long i) 
 throw (SALOME::SALOME_Exception)
 {
-//         if (_med==NULL)
-//                 THROW_SALOME_CORBA_EXCEPTION("No associated Med object",\
-//                                              SALOME::INTERNAL_ERROR);
-//         try
-//         {
-//                 _med.write(i);
-//         }
-//         catch (MEDEXCEPTION &ex)
-//         {
-//                 MESSAGE("Unable to write this file ");
-//                 THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
-//         }
 }
 
 //=======================================================================
@@ -982,24 +880,6 @@ void MED_i::addInStudy (SALOMEDS::Study_ptr myStudy,
 
         _medId = medObj->GetID();
         myBuilder->CommitCommand();
-
-//      char * medObjName1;
-//      lenName = 26 + strlen(fileNameShort.c_str());
-//      medObjName1 = new char[lenName];
-//      medObjName1 = strcpy(medObjName1,"/MED/MED_OBJECT_FROM_FILE_");
-//      medObjName1 = strcat(medObjName1,fileNameShort.c_str());
-
-//      SALOMEDS::SObject_var medEntry = myStudy->FindObjectByPath(medObjName1);
-//      if (!CORBA::is_nil(medEntry))
-//        {
-//          MESSAGE("MED_Mesh_i::addInStudy(myStudy, myIor, fileName) : The reuse in Med of Object MED from Study is OK");
-//        }
-//      else
-//        {
-//          MESSAGE("MED_Mesh_i::addInStudy(myStudy, myIor, fileName) : the reuse in Med of Object MED is not OK and there was a problem in the storage in the study");
-//        }
-
-//      delete [] medObjName1;
 
         // register the Corba pointer: increase the referrence count
         MESSAGE("Registering of the Corba Med pointer");

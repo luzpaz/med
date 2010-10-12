@@ -203,7 +203,7 @@ badFiles = [ # files that can't be read by MEDMEM
     ,"Deff_fdt_5.8_castem_vf_diff_conc_dom.med"
     ]
 
-#medFiles = listdir( inDir )
+medFiles = listdir( inDir )
 
 
 for medFile in medFiles: # loop on med files in inDir

@@ -594,13 +594,10 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support, bool isAbs
   int index;
   FIELD<double, FullInterlace>* Volume =
     new FIELD<double, FullInterlace>(Support,1);
-  //  double *volume = new double [length_values];
   Volume->setName("VOLUME");
   Volume->setDescription("cells volume");
   Volume->setComponentName(1,"volume");
   Volume->setComponentDescription(1,"desc-comp");
-
-  /*  string MEDComponentUnit(MED_TAILLE_PNOM,' ');*/
 
   string MEDComponentUnit = myMesh->getCoordinatesUnits()[0]+"*"+myMesh->getCoordinatesUnits()[1]+"*"+myMesh->getCoordinatesUnits()[2];
 
@@ -610,7 +607,6 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support, bool isAbs
   Volume->setOrderNumber(0);
   Volume->setTime(0.0);
 
-  //const double *volume = Volume->getValue(MED_FULL_INTERLACE);
   typedef  MEDMEM_ArrayInterface<double,FullInterlace,NoGauss>::Array ArrayNoGauss;
   ArrayNoGauss  *volume = Volume->getArrayNoGauss();
 
@@ -1010,9 +1006,7 @@ FIELD<double, FullInterlace>* MESH::getLength(const SUPPORT * Support) const thr
   FIELD<double, FullInterlace>* Length;
 
   Length = new FIELD<double, FullInterlace>(Support,1);
-  //  double *length = new double [length_values];
 
-  //const double *length = Length->getValue(MED_FULL_INTERLACE);
   typedef  MEDMEM_ArrayInterface<double,FullInterlace,NoGauss>::Array ArrayNoGauss;
   ArrayNoGauss * length = Length->getArrayNoGauss();
 
@@ -1584,7 +1578,6 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
       if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
         delete [] global_connectivity;
   }
-  //END_OF_MED();
   return Barycenter;
 }
 /*!
@@ -1594,7 +1587,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 bool MESH::isEmpty() const
 {
   bool notempty = _name != "NOT DEFINED"                || _coordinate != NULL           || _connectivity != NULL ||
-    _spaceDimension !=MED_INVALID || //_meshDimension !=MED_INVALID  ||
+    _spaceDimension !=MED_INVALID || 
     _numberOfNodes !=MED_INVALID  || _groupNode.size() != 0   ||
     _familyNode.size() != 0       || _groupCell.size() != 0   ||
     _familyCell.size() != 0       || _groupFace.size() != 0   ||
@@ -1658,7 +1651,6 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
   if ( !_connectivity )
     throw MEDEXCEPTION(STRING(LOC) << "no connectivity defined in MESH !");
   _connectivity->calculateFullDescendingConnectivity(MED_CELL);
-  //calculateConnectivity(MED_FULL_INTERLACE, MED_DESCENDING, MED_CELL);
   if (Support3D->isOnAllElements())
   {
     const int* value = getReverseConnectivity(MED_DESCENDING);
@@ -1692,7 +1684,6 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
       for (j = faceFirst; j < faceLast; ++j)
       {
         int faceNb = abs( myConnectivityValue [ j-1 ] );
-        //MESSAGE_MED( "Cell # " << i << " -- Face: " << faceNb);
         if (FaceNbEncounterNb.find( faceNb ) == FaceNbEncounterNb.end())
           FaceNbEncounterNb[ faceNb ] = 1;
         else
@@ -1722,7 +1713,6 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
   medGeometryElement* geometricType ;
   int * geometricTypeNumber ;
   int * numberOfEntities ;
-  //  MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY() ;
   int * mySkyLineArrayIndex ;
 
   int numberOfType = getNumberOfTypes(MED_FACE) ;
@@ -1750,7 +1740,6 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
     }
     numberOfGeometricType = theType.size() ;
     geometricType = new medGeometryElement[numberOfGeometricType] ;
-    //const medGeometryElement *  allType = getTypes(MED_FACE); !! UNUSED VARIABLE !!
     geometricTypeNumber = new int[numberOfGeometricType] ; // not use, but initialized to nothing
     numberOfEntities = new int[numberOfGeometricType] ;
     mySkyLineArrayIndex = new int[numberOfGeometricType+1] ;
@@ -1765,14 +1754,11 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
       index++ ;
     }
   }
-  //  mySkyLineArray->setMEDSKYLINEARRAY(numberOfGeometricType,size,mySkyLineArrayIndex,myListArray) ;
   MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY(numberOfGeometricType,size,mySkyLineArrayIndex,myListArray) ;
 
   mySupport->setNumberOfGeometricType(numberOfGeometricType) ;
   mySupport->setGeometricType(geometricType) ;
-  //  mySupport->setGeometricTypeNumber(geometricTypeNumber) ;
   mySupport->setNumberOfElements(numberOfEntities) ;
-  //mySupport->setTotalNumberOfElements(size) ;
   mySupport->setNumber(mySkyLineArray) ;
 
   delete[] numberOfEntities;
@@ -1780,7 +1766,6 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
   delete[] geometricType;
   delete[] mySkyLineArrayIndex;
   delete[] myListArray;
-  //   delete mySkyLineArray;
 
   END_OF_MED(LOC);
   return mySupport ;
@@ -1808,7 +1793,7 @@ void MESH::convertToPoly()
 {
   if (getMeshDimension()!=3) return;
 
-  CONNECTIVITY* newpolygonconnectivity = 0;// = new CONNECTIVITY(MED_EN::MED_FACE);
+  CONNECTIVITY* newpolygonconnectivity = 0;
   CONNECTIVITY* newpolyhedraconnectivity = new CONNECTIVITY(MED_EN::MED_CELL);
 
   {

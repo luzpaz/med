@@ -63,7 +63,6 @@ void MEDMEMTest::tearDown()
 // #3: MEDMEM_ArrayInterface.hxx (-)   /
 // #4: MEDMEM_AsciiFieldDriver.hxx      }  MEDMEMTest_AsciiFieldDriver.cxx
 // #5: MEDMEM_CellModel.hxx             }  MEDMEMTest.cxx (-)
-// #6: MEDMEM_Compatibility21_22.hxx    }  nothing to test
 // #7: MEDMEM_Connectivity.hxx          }  MEDMEMTest_Connectivity.cxx
 // #8: MEDMEM_Coordinate.hxx            }  MEDMEMTest_Coordinate.cxx
 // #9: MEDMEM_DriverFactory.hxx         }  MEDMEMTest_DriverFactory.cxx
@@ -85,10 +84,6 @@ void MEDMEMTest::tearDown()
 // #25: MEDMEM_InterlacingPolicy.hxx    }  MEDMEMTest.cxx (-)
 // #26: MEDMEM_InterlacingTraits.hxx    }  MEDMEMTest.cxx (-)
 // #28: MEDMEM_MedFieldDriver.hxx       }  MEDMEMTest_MedFieldDriver.cxx
-// #30: MEDMEM_Med.hxx                  }  MEDMEMTest_Med.cxx
-// #31: MEDMEM_MedMedDriver21.hxx       }  MEDMEMTest_MedMedDriver21.cxx
-// #32: MEDMEM_MedMedDriver22.hxx       }  MEDMEMTest_MedMedDriver22.cxx
-// #33: MEDMEM_MedMedDriver.hxx         }  MEDMEMTest.cxx (-)
 // #34: MEDMEM_MEDMEMchampLire.hxx      }  MEDMEMTest.cxx (-)
 // #35: MEDMEM_MEDMEMgaussEcr.hxx       }  MEDMEMTest.cxx (-)
 // #36: MEDMEM_MEDMEMprofilEcr.hxx      }  MEDMEMTest.cxx (-)
@@ -114,30 +109,6 @@ void MEDMEMTest::tearDown()
 // #59: MEDMEM_VtkMeshDriver.hxx        }  MEDMEMTest_VtkMeshDriver.cxx
 // #60: MEDMEM_medimport_src.hxx        }  MEDMEMTest.cxx (-)
 */
-
-/*!
- *  Check methods (not in spec), defined in MEDMEM_CellModel.hxx:
- */
-//void MEDMEMTest::testCellModel()
-//{
-//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-//}
-
-/*!
- *  Check methods (not in spec), defined in MEDMEM_DriversDef.hxx:
- */
-//void MEDMEMTest::testDriversDef()
-//{
-//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-//}
-
-/*!
- *  Check methods (not in spec), defined in MEDMEM_DriverTools.hxx:
- */
-//void MEDMEMTest::testDriverTools()
-//{
-//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-//}
 
 /*!
  *  Check methods (4), defined in MEDMEM_IndexCheckingPolicy.hxx:
@@ -225,14 +196,6 @@ void MEDMEMTest::testInit()
  *  Check methods (not in spec), defined in MEDMEM_MedFieldDriver.hxx:
  */
 //void MEDMEMTest::testMedFieldDriver()
-//{
-//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-//}
-
-/*!
- *  Check methods (not in spec), defined in MEDMEM_MedMedDriver.hxx:
- */
-//void MEDMEMTest::testMedMedDriver()
 //{
 //  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
 //}

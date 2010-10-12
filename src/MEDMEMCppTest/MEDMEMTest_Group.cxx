@@ -90,7 +90,6 @@ void MEDMEMTest::testGroup()
 
   GROUP* myGroup2 = new GROUP(*myGroup);
 
-  //cout<<*myGroup2<<endl;
   ostringstream os;
   os << *myGroup2;
   CPPUNIT_ASSERT(os.str() != "");
@@ -131,7 +130,6 @@ void MEDMEMTest::testGroup()
   {
     try{
       GROUP *myGroup5=new GROUP("newFamily", aList);
-      //cout<< *myGroup5 <<endl;
       myGroup5->removeReference();
     }
     catch (const std::exception &e)

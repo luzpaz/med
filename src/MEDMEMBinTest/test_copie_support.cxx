@@ -62,39 +62,6 @@ static void affiche_support(const SUPPORT * mySupport)
 }
 
 
-// static void affiche_famille(MESH *myMesh,medEntityMesh Entity) 
-// {
-//   int NumberOfFamilies = myMesh->getNumberOfFamilies(Entity) ;
-//   cout << "NumberOfFamilies : "<<NumberOfFamilies<<endl;
-//   for (int i=1; i<NumberOfFamilies+1;i++) {
-//     const FAMILY* myFamily = myMesh->getFamily(Entity,i);
-//     affiche_support(myFamily);
-//     cout << "  - Identifier : "<<myFamily->getIdentifier()<<endl ;
-//     int NumberOfAttributes = myFamily->getNumberOfAttributes() ;
-//     cout << "  - Attributes ("<<NumberOfAttributes<<") :"<<endl;
-//     for (int j=1;j<NumberOfAttributes+1;j++)
-//       cout << "    * "<<myFamily->getAttributeIdentifier(j)<<" : "<<myFamily->getAttributeValue(j)<<", "<<myFamily->getAttributeDescription(j).c_str()<<endl ;
-//     int NumberOfGroups = myFamily->getNumberOfGroups() ;
-//     cout << "  - Groups ("<<NumberOfGroups<<") :"<<endl;
-//     for (int j=1;j<NumberOfGroups+1;j++)
-//       cout << "    * "<<myFamily->getGroupName(j).c_str()<<endl ;
-//   }
-// }
-
-// static void affiche_groupe(MESH *myMesh,medEntityMesh Entity) 
-// {
-//   int NumberOfGroups = myMesh->getNumberOfGroups(Entity) ;
-//   cout << "NumberOfGroups : "<<NumberOfGroups<<endl;
-//   for (int i=1; i<NumberOfGroups+1;i++) {
-//     const GROUP* myGroup = myMesh->getGroup(Entity,i);
-//     affiche_support(myGroup);
-//     int NumberOfFamillies = myGroup->getNumberOfFamilies() ;
-//     cout << "  - Families ("<<NumberOfFamillies<<") :"<<endl;
-//     for (int j=1;j<NumberOfFamillies+1;j++)
-//       cout << "    * "<<myGroup->getFamily(j)->getName().c_str()<<endl ;
-//   }
-// }
-
 int main (int argc, char ** argv) {
 
   if (argc <3) { // after 3, ignored !
@@ -128,18 +95,10 @@ int main (int argc, char ** argv) {
   mySupport = new SUPPORT(myMesh,"Support on CELLs",MED_CELL);
   mySupport->setAll(false);
 
-  //  int NumberOfGeometricType = 1;
   int NumberOfGeometricType = 0;
-  //  int TotalNumberOfEntity = 2;
-  //  medGeometryElement * GeometricTypePartial = new medGeometryElement[NumberOfGeometricType];
-  //  GeometricTypePartial[0] = MED_HEXA8;
   int TotalNumberOfElements = 0;
   int * NumberOfElements = new int[myMesh->getNumberOfTypes(MED_CELL)];
-  //  NumberOfEntity[0] = 2;
-  //  int * NumberValue = new int[TotalNumberOfEntity];
   int * NumberValue = new int[myMesh->getGlobalNumberingIndex(MED_CELL)[myMesh->getNumberOfTypes(MED_CELL)]-1];
-  //  NumberValue[0] = 14;
-  //  NumberValue[1] = 15;
   int cmp = 0;
   medGeometryElement * GeometricTypePartial = new medGeometryElement[myMesh->getNumberOfTypes(MED_CELL)];
   const medGeometryElement * GeometricType = myMesh->getTypes(MED_CELL);
@@ -168,20 +127,6 @@ int main (int argc, char ** argv) {
   mySupport->removeReference();
   affiche_support(mySupport2);
   mySupport2->removeReference();
-
-  /*
-  cout << "Show Family :"<<endl ;
-  affiche_famille(myMesh,MED_NODE);
-  affiche_famille(myMesh,MED_CELL);
-  affiche_famille(myMesh,MED_FACE);
-  affiche_famille(myMesh,MED_EDGE);
-
-  cout << "Show Group :"<<endl ;
-  affiche_groupe(myMesh,MED_NODE);
-  affiche_groupe(myMesh,MED_CELL);
-  affiche_groupe(myMesh,MED_FACE);
-  affiche_groupe(myMesh,MED_EDGE);
-  */
 
   myMesh->removeReference();
 

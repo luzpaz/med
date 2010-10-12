@@ -285,8 +285,6 @@ def ShowMesh(mesh, nodes2Show=0, entity2Show=[0,0,0]):
             if nbElemType == 0:
                 continue
             d = 1
-#             if type==MED_POLYGON or type==MED_POLYHEDRA:
-#                 d += mesh.getNumberOfElements(entity,MED_ALL_ELEMENTS)
             number = range (d, nbElemType+d)
             _showNodalConnectivity(mesh,entity,type,number,2,entity2Show[ i ])
             pass
