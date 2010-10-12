@@ -1861,9 +1861,9 @@ int GIBI_MESH_RDONLY_DRIVER::getInt() const
   // fix for two glued ints (issue 0021009):
   // Line nb    |   File contents
   // ------------------------------------------------------------------------------------
-  // 53619905 	|       1       2       6       8
-  // 53619906 	|                                                                SCALAIRE
-  // 53619907 	|    -63312600499       1       0       0       0      -2       0       2
+  // 53619905   |       1       2       6       8
+  // 53619906   |                                                                SCALAIRE
+  // 53619907   |    -63312600499       1       0       0       0      -2       0       2
   //   where -63312600499 is actualy -633 and 12600499
   char hold=_curPos[_width];
   _curPos[_width] = '\0';
