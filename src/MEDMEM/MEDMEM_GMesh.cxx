@@ -500,7 +500,7 @@ void GMESH::write(int index) const
 */
 //================================================================================
 
-void GMESH::write(const GENDRIVER & driver) const
+void GMESH::write(const GENDRIVER & driver, MED_EN::med_mode_acces medMode/*=MED_EN::WRONLY*/) const
 {
   // For the case where driver does not know about me since it has been created through
   // constructor witout parameters: create newDriver knowing me and get missing data
@@ -509,8 +509,10 @@ void GMESH::write(const GENDRIVER & driver) const
                                                                    driver.getFileName(),
                                                                    const_cast<GMESH*>( this ),
                                                                    driver.getMeshName(),
-                                                                   driver.getAccessMode()));
+                                                                   MED_EN::WRONLY));
   newDriver->merge( driver );
+  if ( newDriver->getDriverType() == MED_DRIVER )
+    newDriver->setAccessMode( medMode );
 
   newDriver->open();
   try
@@ -536,13 +538,18 @@ void GMESH::write(const GENDRIVER & driver) const
 
 void GMESH::write(driverTypes        driverType,
                   const std::string& filename,
-                  const std::string& meshname) const
+                  const std::string& meshname,
+                  MED_EN::med_mode_acces medMode/*=MED_EN::WRONLY*/) const
 {
   auto_ptr<GENDRIVER> newDriver
     ( DRIVERFACTORY::buildDriverForMesh(driverType, filename,
                                         const_cast<GMESH*> ( this ),
                                         meshname.empty() ? _name : meshname,
-                                        WRONLY));
+                                        MED_EN::WRONLY));
+
+  if ( newDriver->getDriverType() == MED_DRIVER )
+    newDriver->setAccessMode( medMode );
+
   newDriver->open();
   try
   {

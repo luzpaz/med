@@ -118,10 +118,12 @@ class MEDMEM_EXPORT GMESH: public RCBASE
                     const std::string& meshname);
 
   virtual void write(int index=0) const ;
-  virtual void write(const GENDRIVER & genDriver) const;
+  virtual void write(const GENDRIVER & genDriver,
+                     MED_EN::med_mode_acces medMode=MED_EN::WRONLY) const;
   virtual void write(driverTypes        driverType,
                      const std::string& filename,
-                     const std::string& meshname="") const;
+                     const std::string& meshname="",
+                     MED_EN::med_mode_acces medMode=MED_EN::WRONLY) const;
 
   void                               setName(std::string name);
   std::string                        getName() const;

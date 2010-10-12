@@ -35,11 +35,6 @@ FIELD_::FIELD_():
   _isMinMax(false),
   _name(""), _description(""), _support((SUPPORT *)NULL),
   _numberOfComponents(0), _numberOfValues(0),
-  //_componentsTypes((int *)NULL),
-  //_componentsNames((string *)NULL), 
-  //_componentsDescriptions((string *)NULL),
-  //_componentsUnits((UNIT*)NULL),
-  //_MEDComponentsUnits((string *)NULL),
   _iterationNumber(-1),_time(0.0),_orderNumber(-1),
   _valueType(MED_EN::MED_UNDEFINED_TYPE),
   _interlacingType(MED_EN::MED_UNDEFINED_INTERLACE)
@@ -59,11 +54,6 @@ FIELD_::FIELD_(const SUPPORT * Support, const int NumberOfComponents):
   MESSAGE_MED("FIELD_(const SUPPORT * Support, const int NumberOfComponents)");
 
   _numberOfValues = Support->getNumberOfElements(MED_ALL_ELEMENTS);
-  //_componentsTypes = new int[NumberOfComponents] ;
-  //_componentsNames = new string[NumberOfComponents];
-  //_componentsDescriptions = new string[NumberOfComponents];
-  //_componentsUnits = new UNIT[NumberOfComponents];
-  //_MEDComponentsUnits = new string[NumberOfComponents];
   _componentsTypes.resize(NumberOfComponents);
   _componentsNames.resize(NumberOfComponents);
   _componentsDescriptions.resize(NumberOfComponents);
@@ -95,12 +85,6 @@ FIELD_& FIELD_::operator=(const FIELD_ &m) {
   _numberOfComponents = m._numberOfComponents;
   _numberOfValues     = m._numberOfValues;
 
-  //if (m._componentsTypes != NULL) {
-  //  _componentsTypes = new int[m._numberOfComponents] ;
-  //  memcpy(_componentsTypes,m._componentsTypes,sizeof(int)*m._numberOfComponents);
-  //} else 
-  //  _componentsTypes = (int *) NULL;
-
   _componentsTypes.resize(_numberOfComponents);
   for (int i=0; i<m._numberOfComponents; i++)
     {_componentsTypes[i]=m._componentsTypes[i];}
@@ -110,17 +94,13 @@ FIELD_& FIELD_::operator=(const FIELD_ &m) {
   _componentsUnits.resize(_numberOfComponents);
   _MEDComponentsUnits.resize(_numberOfComponents);
 
-  //_componentsNames = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     {_componentsNames[i]=m._componentsNames[i];}
-  //_componentsDescriptions = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     {_componentsDescriptions[i]=m._componentsDescriptions[i];}
-  //_componentsUnits = new UNIT[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     {_componentsUnits[i] = m._componentsUnits[i];}
   // L'operateur '=' est defini dans la classe UNIT
-  //_MEDComponentsUnits = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     {_MEDComponentsUnits[i] = m._MEDComponentsUnits[i];}
 
@@ -460,12 +440,15 @@ int      FIELD_::addDriver     (GENDRIVER & driver)
 }
 
 void     FIELD_::openAppend    ( void )                               {}
-void     FIELD_::write         (const GENDRIVER &)                    {}
-void     FIELD_::write         (driverTypes driverType, const std::string & fileName){}
+void     FIELD_::write         (const GENDRIVER &,
+                                MED_EN::med_mode_acces)               {}
+void     FIELD_::write         (driverTypes driverType,
+                                const std::string & fileName,
+                                MED_EN::med_mode_acces medMode)       {}
 void     FIELD_::writeAppend   (const GENDRIVER &)                    {}
 void     FIELD_::write         (int ) {}
 void     FIELD_::writeAppend   (int , const string & ) {}
-void     FIELD_::read          (int )                                  {}
+void     FIELD_::read          (int )                                 {}
 void     FIELD_::read          (const GENDRIVER &)                    {}
 void     FIELD_::read          (driverTypes driverType, const std::string & fileName){}
 void     FIELD_::copyGlobalInfo(const FIELD_& m)
@@ -480,32 +463,15 @@ void     FIELD_::copyGlobalInfo(const FIELD_& m)
   for (int i=0; i<m._numberOfComponents; i++)
     {_componentsTypes[i]=m._componentsTypes[i];}
 
-  //if (m._componentsTypes != NULL)
-  //  {
-  //    _componentsTypes = new int[m._numberOfComponents] ;
-  //    memcpy(_componentsTypes,m._componentsTypes,sizeof(int)*m._numberOfComponents);
-  //  }
-  //else
-  //  _componentsTypes = (int *) NULL;
-
-  //_componentsNames = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     _componentsNames[i]=m._componentsNames[i];
-  //_componentsDescriptions = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     _componentsDescriptions[i]=m._componentsDescriptions[i];
 
-  //if (m._componentsUnits != NULL)
-  //  {
-  //    _componentsUnits = new UNIT[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     _componentsUnits[i] = m._componentsUnits[i];
-  //  }
-  //else
-  //  _componentsUnits=(UNIT*)NULL;
   
   // L'operateur '=' est defini dans la classe UNIT
-  //_MEDComponentsUnits = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     {_MEDComponentsUnits[i] = m._MEDComponentsUnits[i];}
 
