@@ -325,7 +325,6 @@ def avs2med_one_file(file_in, file_out, mesh_name, field_name):
             pass
         pass
     # -----------
-    meshing.setMeshDimension(mesh_dimension)
     meshing.write(meshing.addDriver(MED_DRIVER,file_out,meshing.getName()))
     # -----------
     flag = -1
