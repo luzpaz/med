@@ -51,7 +51,6 @@ MED_MESH_DRIVER::MED_MESH_DRIVER():
   _ptrMesh(( GMESH *)MED_NULL),
   _meshName(""),
   _medIdt(MED_INVALID)
-  //_meshNum(MED_INVALID)
 {
 }
 
@@ -62,7 +61,6 @@ MED_MESH_DRIVER::MED_MESH_DRIVER(const std::string &    fileName,
   _ptrMesh(ptrMesh), 
   _meshName(""),
   _medIdt(MED_INVALID)
-  //_meshNum(MED_INVALID)
 {
 }
 
@@ -71,7 +69,6 @@ MED_MESH_DRIVER::MED_MESH_DRIVER(const MED_MESH_DRIVER & driver):
   _ptrMesh(driver._ptrMesh),
   _meshName(driver._meshName),
   _medIdt(driver._medIdt)
-  //_meshNum(driver._meshNum)
 {
 
 }
@@ -96,11 +93,16 @@ void MED_MESH_DRIVER::open()
   const char * LOC = "MED_MESH_DRIVER::open()";
   BEGIN_OF_MED(LOC);
 
-  int accessMode = _accessMode;//getMedAccessMode( _accessMode, MED_EN::V22 );
-  if ( _accessMode == MED_EN::RDWR )
-    accessMode = med_2_3::MED_LECTURE_ECRITURE;
+  med_2_3::med_mode_acces accessMode;
+  switch ( _accessMode ) {
+  case MED_EN::RDONLY: accessMode = med_2_3::MED_LECTURE; break;
+  case MED_EN::WRONLY: accessMode = med_2_3::MED_CREATION; break;
+  case MED_EN::RDWR:   accessMode = med_2_3::MED_LECTURE_ECRITURE; break;
+  default:
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Invalid access mode "<<_accessMode));
+  }
   MESSAGE_MED(LOC<<" : _fileName.c_str : "<< _fileName.c_str()<<",mode : "<< accessMode);
-  _medIdt = med_2_3::MEDouvrir( (const_cast <char *> (_fileName.c_str())),(med_2_3::med_mode_acces) accessMode);
+  _medIdt = med_2_3::MEDouvrir( (const_cast <char *> (_fileName.c_str())), accessMode);
   MESSAGE_MED(LOC<<" _medIdt : "<< _medIdt );
   if (_medIdt > 0)
     _status = MED_OPENED;
@@ -239,18 +241,7 @@ void MED_MESH_RDONLY_DRIVER::read(void)
 
   SCRUTE_MED(_ptrMesh->getIsAGrid());
 
-  if (_ptrMesh->getIsAGrid())
-  {
-    getGRID();
-    {
-      if (getFAMILY() != MED_VALID)
-        throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getFAMILY when the mesh is a grid"));
-      buildAllGroups(_ptrMesh->_groupNode, _ptrMesh->_familyNode);
-    }
-    END_OF_MED(LOC);
-    return;
-  }
-  else // check that the mesh is really unstructured (PAL14113)
+  // check mesh nature, unstructured or not (PAL14113)
   {
     char                  meshName[MED_TAILLE_NOM+1] = "";
     char                  meshDescription[MED_TAILLE_DESC+1] = "";
@@ -261,16 +252,33 @@ void MED_MESH_RDONLY_DRIVER::read(void)
     for (int i = 1; i <= numberOfMeshes; i++)
     {
       MEDmaaInfo(_medIdt, i, meshName, &meshDim, &meshType, meshDescription);
-      if (_meshName == string(meshName)) {
-        if (meshType == med_2_3::MED_STRUCTURE) {
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<
-                                       "class GRID must be used for a structured mesh"));
+      if (_meshName == string(meshName))
+      {
+        if ((meshType == med_2_3::MED_STRUCTURE) != _ptrMesh->getIsAGrid())
+        {
+          if ( _ptrMesh->getIsAGrid() )
+            throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Mesh type mismatch. "
+                                         "class MESH must be used for an unstructured mesh"));
+          else
+            throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Mesh type mismatch. "
+                                         "class GRID must be used for a structured mesh"));
         }
         else {
           break;
         }
       }
     }
+  }
+  if (_ptrMesh->getIsAGrid())
+  {
+    getGRID();
+    {
+      if (getFAMILY() != MED_VALID)
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "ERREUR in getFAMILY when the mesh is a grid"));
+      buildAllGroups(_ptrMesh->_groupNode, _ptrMesh->_familyNode);
+    }
+    END_OF_MED(LOC);
+    return;
   }
 
   if (getCOORDINATE() != MED_VALID)
@@ -300,13 +308,6 @@ void MED_MESH_RDONLY_DRIVER::read(void)
     buildAllGroups(_ptrMesh->_groupEdge,_ptrMesh->_familyEdge);
 
   _ptrMesh->_name = healName( _ptrMesh->_name );
-//   MESSAGE_MED(LOC<<"Checking of CellModel !!!!!!!");
-
-//   int nbOfTypes =  _ptrMesh->_connectivity->_numberOfTypes;
-//    for(int i=0;i<nbOfTypes;i++)
-//      {
-//        MESSAGE_MED(LOC << _ptrMesh->_connectivity->_type[i]);
-//      }
 
   END_OF_MED(LOC);
 }
@@ -339,7 +340,6 @@ void MED_MESH_RDONLY_DRIVER::getGRID()
     {
       char meshName[MED_TAILLE_NOM+1]="";
       char meshDescription[MED_TAILLE_DESC+1]="";
-//CCRT      int meshDim;
       med_2_3::med_int meshDim;
       med_2_3::med_maillage meshType;
 
@@ -380,8 +380,6 @@ void MED_MESH_RDONLY_DRIVER::getGRID()
                                  MeshDimension << "| seems to be incorrect " <<
                                  "for the mesh : |" << _meshName << "|"));
 
-  //_ptrMesh->_meshDimension = MeshDimension;
-
   // Read or get the dimension of the space for the mesh <_meshName>
   int SpaceDimension = MeshDimension;
 
@@ -411,7 +409,6 @@ void MED_MESH_RDONLY_DRIVER::getGRID()
   //  if (gridType == MED_EN::MED_GRILLE_STANDARD)
   if (gridType == MED_EN::MED_BODY_FITTED)
     {
-//CCRT      int * structure = new int[MeshDimension];
       med_2_3::med_int * structure = new med_2_3::med_int[MeshDimension];
 
       err = med_2_3::MEDstructureCoordLire(_medIdt,
@@ -433,13 +430,6 @@ void MED_MESH_RDONLY_DRIVER::getGRID()
         }
 
       delete [] structure;
-
-//       NumberOfNodes = MED_FR::MEDnEntMaa(_medIdt,
-//                                       const_cast <char *>
-//                                       (_ptrMesh->_name.c_str()),
-//                                       MED_FR::MED_COOR,MED_FR::MED_NOEUD,
-//                                       (MED_FR::med_geometrie_element) 0,
-//                                       (MED_FR::med_connectivite) 0);
 
       if ( NumberOfNodes == MED_INVALID )
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"The number of nodes |" <<
@@ -583,7 +573,6 @@ int  MED_MESH_RDONLY_DRIVER::getCOORDINATE()
     {
       char meshName[MED_TAILLE_NOM+1]="";
       char meshDescription[MED_TAILLE_DESC+1]="";
-//CCRT      int meshDim;
       med_2_3::med_int meshDim;
       med_2_3::med_maillage meshType;
 
@@ -606,8 +595,6 @@ int  MED_MESH_RDONLY_DRIVER::getCOORDINATE()
     if ( MeshDimension == MED_INVALID )
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "The mesh dimension |" << MeshDimension
                                    << "| seems to be incorrect for the mesh : |" << _meshName << "|"));
-
-    //_ptrMesh->_meshDimension = MeshDimension;
 
     // Read or get the dimension of the space for the mesh <_meshName>
     int SpaceDimension = MeshDimension;
@@ -717,9 +704,6 @@ int  MED_MESH_RDONLY_DRIVER::getCOORDINATE()
     err=MEDnumLire(_medIdt,const_cast <char*> (_ptrMesh->_name.c_str()),
                    tmp_node_number,NumberOfNodes,med_2_3::MED_NOEUD,(med_2_3::med_geometrie_element)0);
     if (err == MED_VALID) {
-      // INFOS_MED(LOC<<"WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING");
-      // INFOS_MED(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : WARNING : Nodes have numbers but we do not take care of them !");
-      // INFOS_MED(LOC<<"WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING - WARNING");
       MESSAGE_MED(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : Nodes have numbers, we DO TAKE care of them !");
       ptrMesh->_coordinate->_nodeNumber.set(NumberOfNodes);
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
@@ -788,8 +772,6 @@ int MED_MESH_RDONLY_DRIVER::getCONNECTIVITY()
 
       if (Connectivity->_entityDimension != _ptrMesh->getMeshDimension())
         MESSAGE_MED(LOC << "Small mesh dimension problem on the med file mounted in memory : diim stored " << _ptrMesh->getMeshDimension() << " dim computed using the connectivity " << Connectivity->_entityDimension);
-
-      //_ptrMesh->_meshDimension = Connectivity->_entityDimension;
 
       // At this point Connectivity->_typeConnectivity is either NODAL or DESCENDING
       // If both connectivities are found Connectivity->_typeConnectivity is NODAL
@@ -876,24 +858,8 @@ int MED_MESH_RDONLY_DRIVER::getCONNECTIVITY()
         delete ptrMesh->_connectivity;
       ptrMesh->_connectivity  = Connectivity;
 
-      // all right !
 
-      // we have read all connectivity in file, now we must build descending connectivity if necessary !
-
-      // If connectivity descending is defined, we have nothing to do, all constituent are defined !
-      // If connectivity is only nodal, we must rebuild descending if we have some contituent !
-
-      //A FAIRE !!!!
-//        if (Connectivity->_descending == NULL)
-//      if (Connectivity->_constituent != NULL){
-//        // update Connectivity->_constituent
-//        CONNECTIVITY * myConstituentOld = Connectivity->_constituent;
-//        Connectivity->_constituent = (CONNECTIVITY *)NULL;
-//        Connectivity->calculateDescendingConnectivity();
-
-//      }
-
-  END_OF_MED(LOC);
+      END_OF_MED(LOC);
       return MED_VALID;
     }
   return MED_ERROR;
@@ -1243,11 +1209,9 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
             MESSAGE_MED(LOC << "Med file version used here " << major << " " << minor << " " << release);
 
             if ((major == 2) && (minor <= 1))
-              //CCRT      tmp_constituentArray = new int[(NumberOfNodeByFace+1)*tmp_numberOfFaces];
               tmp_constituentArray.set( connSizeByType[i] + tmpFaceCount[i] );
             else if ((major >= 2) && (minor >= 2))
             {
-              //CCRT      tmp_constituentArray = new int[NumberOfNodeByFace*tmp_numberOfFaces];
               tmp_constituentArray.set( connSizeByType[i] );
               MESSAGE_MED(LOC<<": WE ARE USING MED2.2 so there is no +1 for calculating the size of  tmp_constituentArray !");
             }
@@ -1354,17 +1318,14 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
             // Il faut ajouter 1 pour le zero a la lecture !!!
 
             // ATTENTION UNIQUEMENT POUR MED < 2.2.x
-            //CCRT            int * tmp_constituentArray = NULL;
             med_2_3::med_int * tmp_constituentArray = NULL;
 
             MESSAGE_MED(LOC << "Med file version used here " << major << " " << minor << " " << release);
 
             if ((major == 2) && (minor <= 1))
-              //CCRT              tmp_constituentArray = new int[(NumberOfNodeByEdge+1)*tmp_numberOfEdges];
               tmp_constituentArray = new med_2_3::med_int[(NumberOfNodeByEdge+1)*tmp_numberOfEdges];
             else if ((major == 2) && (minor >= 2))
             {
-              //CCRT                tmp_constituentArray = new int[NumberOfNodeByEdge*tmp_numberOfEdges];
               tmp_constituentArray = new med_2_3::med_int[NumberOfNodeByEdge*tmp_numberOfEdges];
               MESSAGE_MED(LOC<<": WE ARE USING MED2.2 so there is no +1 for calculating the size of  tmp_constituentArray !");
             }
@@ -1665,7 +1626,6 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
             numberOfEdgesFamilies++;
             break;
           }
-        //  MESSAGE_MED(LOC << (*Family));
       }
 
       delete [] AttributesIdentifier;
@@ -1741,7 +1701,6 @@ int  MED_MESH_RDONLY_DRIVER::getNodesFamiliesNumber(int * MEDArrayNodeFamily)
 }
 
 int  MED_MESH_RDONLY_DRIVER::getCellsFamiliesNumber(int **MEDArrayFamily,
-                                                    //CONNECTIVITY *Connectivity,
                                                     MED_EN::medEntityMesh entity)
 {
   const char * LOC = "MED_MESH_RDONLY_DRIVER::getCellsFamiliesNumber ";
@@ -1817,16 +1776,11 @@ void MED_MESH_RDONLY_DRIVER::buildAllGroups(vector<GROUP*> & Groups, vector<FAMI
   BEGIN_OF_MED(LOC);
 
   int numberOfFamilies = Families.size() ;
-  //SCRUTE_MED(numberOfFamilies);
   map< string,list<FAMILY*> > groupsNames ;
   for(int i=0; i<numberOfFamilies; i++) {
     FAMILY * myFamily = Families[i] ;
     int numberOfGroups_ = myFamily->getNumberOfGroups();
-    //SCRUTE_MED(i);
-    //SCRUTE_MED(numberOfGroups_);
     for (int j=0; j<numberOfGroups_; j++) {
-      //SCRUTE_MED(j);
-      //SCRUTE_MED(myFamily->getGroupName(j+1));
       groupsNames[myFamily->getGroupName(j+1)].push_back(myFamily);
     }
   }
@@ -1838,13 +1792,7 @@ void MED_MESH_RDONLY_DRIVER::buildAllGroups(vector<GROUP*> & Groups, vector<FAMI
   for(currentGroup=groupsNames.begin();currentGroup!=groupsNames.end();currentGroup++) {
     GROUP * myGroup = new GROUP(healName((*currentGroup).first),(*currentGroup).second) ;
     _ptrMesh->removeReference();
-//     GROUP * myGroup = new GROUP() ;
-//     myGroup->setName((*currentGroup).first);
-//     SCRUTE_MED(myGroup->getName());
-//     //myGroup->setMesh(_ptrMesh);
-//     myGroup->init((*currentGroup).second);
     Groups[it]=myGroup;
-    //SCRUTE_MED(it);
     it++;
   }
 
@@ -1970,7 +1918,6 @@ void MED_MESH_WRONLY_DRIVER::write(void) const
       err = med_2_3::MEDfamCr( _medIdt,
                               const_cast <char *> ( _meshName.c_str() ),
                               familyName, 0,
-//CCRT                        (int*)NULL, (int*)NULL, (char*)NULL, 0,
                               (med_2_3::med_int*)NULL, (med_2_3::med_int*)NULL, (char*)NULL, 0,
                               (char*)NULL, 0);
 
@@ -2111,15 +2058,11 @@ int MED_MESH_WRONLY_DRIVER::writeGRID() const
   if (gridType == MED_EN::MED_BODY_FITTED)
     {
       // Write Coordinates and families
-//       double * coo = const_cast <double *>
-//      (ptrGrid->_coordinate->getCoordinates(MED_EN::MED_FULL_INTERLACE));
 
       err = MEDcoordEcr(_medIdt, const_cast <char *> (_meshName.c_str()),
                         ptrGrid->_spaceDimension,
-                        //const_cast <double *> ( ptrGrid->_coordinate->_coordinate->get(MED_EN::MED_FULL_INTERLACE) ),
                         const_cast <double *> ( ptrGrid->_coordinate->_coordinate.get(MED_EN::MED_FULL_INTERLACE) ),
                         med_2_3::MED_FULL_INTERLACE, ptrGrid->getNumberOfNodes(),
-                        //  ptrGrid->_coordinate->_numberOfNodes
                         rep, const_cast <char *> (tmp_name.c_str()),
                         const_cast <char *> (tmp_unit.c_str()));
 
@@ -2130,7 +2073,6 @@ int MED_MESH_WRONLY_DRIVER::writeGRID() const
                                      << "| and units |"       << tmp_unit
                                      << " |"));
 
-//CCRT      int* structure = new int [meshDimension];
       med_2_3::med_int* structure = new med_2_3::med_int [meshDimension];
 
       for (int idim = 0; idim < meshDimension; ++idim)
@@ -2273,24 +2215,10 @@ int MED_MESH_WRONLY_DRIVER::writeCoordinates() const {
                                  << ptrMesh->_coordinate->_coordinateSystem
                                  << "|" ));
 
-//   err = MEDcoordEcr(_medIdt, const_cast <char *> (_meshName.c_str()),
-//                  ptrMesh->_spaceDimension,
-//                  //const_cast <double *> ( ptrMesh->_coordinate->_coordinate->get(MED_EN::MED_FULL_INTERLACE) ),
-//                  const_cast <double *> ( ptrMesh->_coordinate->_coordinate.get(MED_EN::MED_FULL_INTERLACE) ),
-//                  MED_FR::MED_FULL_INTERLACE,
-//                  ptrMesh->_numberOfNodes,                 //  ptrMesh->_coordinate->_numberOfNodes
-//                  MED_FR::MED_LECTURE_ECRITURE,
-//                  rep,
-//                  const_cast <char *> (tmp_name.c_str()),
-//                  const_cast <char *> (tmp_unit.c_str())
-//                  );
-
   err = MEDcoordEcr(_medIdt, const_cast <char *> (_meshName.c_str()),
                     ptrMesh->_spaceDimension,
-                    //const_cast <double *> ( ptrMesh->_coordinate->_coordinate->get(MED_EN::MED_FULL_INTERLACE) ),
                     const_cast <double *> ( ptrMesh->_coordinate->_coordinate.get(MED_EN::MED_FULL_INTERLACE) ),
                     med_2_3::MED_FULL_INTERLACE, ptrMesh->getNumberOfNodes(),
-                    //  ptrMesh->_coordinate->_numberOfNodes
                     rep, const_cast <char *> (tmp_name.c_str()),
                     const_cast <char *> (tmp_unit.c_str()));
 
@@ -2662,8 +2590,6 @@ void MED_MESH_WRONLY_DRIVER::groupFamilyConverter(const vector <GROUP*>& myGroup
     myFamily->setName( healName( family_name ));
 
     string* groupnames=new string[key.size()];
-    //myFamily->getGroupsNames();
-    //groupnames.set(key.size());
 
     for (int igroup=0; igroup<(int)key.size(); igroup++)
     {
@@ -2720,7 +2646,6 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
     // family 0 by default
     for (int i=0; i<NumberOfNodes; i++)
       MEDArrayNodeFamily[i]=0;
-    //vector<FAMILY*> myFamilies = _ptrMesh->getFamilies(MED_NODE);
     vector<FAMILY*> * myFamilies = &_ptrMesh->_familyNode;
     int NumberOfNodesFamilies = myFamilies->size();
     if (0 == NumberOfNodesFamilies) {
@@ -2731,8 +2656,6 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
       NumberOfNodesFamilies=myFamilies->size();
     }
     for (int i=0; i<NumberOfNodesFamilies; i++) {
-      //SCRUTE_MED(i);
-      //SCRUTE_MED(myFamilies[i]->getName());
       int FamilyIdentifier = (*myFamilies)[i]->getIdentifier();
       int TotalNumber = (*myFamilies)[i]->getNumberOfElements(MED_ALL_ELEMENTS);
       if ((*myFamilies)[i]->isOnAllElements())
@@ -2767,7 +2690,6 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
       const medGeometryElement  * types = _ptrMesh->getTypes(entity);
 
       // We build the array from the families list objects :
-      //int NumberOfElements = _ptrMesh->getNumberOfElements(entity, MED_ALL_ELEMENTS);
       int NumberOfElements = _ptrMesh->getNumberOfElements(entity, MED_ALL_ELEMENTS);
       int * MEDArrayFamily = new int[NumberOfElements];
       // family 0 by default
@@ -2843,7 +2765,6 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
         familyArray[i]=0;
 
       int numberOfFamilies = _ptrMesh->getNumberOfFamilies(entity);
-      //vector<FAMILY*> myFamilies = _ptrMesh->getFamilies(entity);
       vector<FAMILY*> * myFamilies = &_ptrMesh->_familyFace;
       if (0 == numberOfFamilies) {
         vector<GROUP*> myGroups = _ptrMesh->getGroups(entity);
@@ -2868,7 +2789,6 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
       for (int i=0;i<numberOfElements;i++)
         SCRUTE_MED(familyArray[i]);
 
-//CCRT Clutter
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
       vector< med_2_3::med_int > temp( familyArray, familyArray + numberOfElements);
 #endif
@@ -2901,7 +2821,6 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
   if (!_ptrMesh->getIsAGrid() || _ptrMesh->getMeshDimension() > 1 ) // for grid - only in 3D and 2D mesh
 
   { // EDGE RELATED BLOCK
-    //medEntityMesh entity=MED_EN::MED_FACE;
     medEntityMesh entity=MED_EN::MED_EDGE;
     // SOLUTION TEMPORAIRE CAR _ptrMesh->_MEDArray____Family DOIT ETRE ENLEVER DE LA CLASSE MESH
     if  ((_ptrMesh->getIsAGrid()) || // PAL18712, GRID::existConnectivity() calls GRID::fillConnectivity() but it is not needed for writing GRID
@@ -2913,12 +2832,10 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
 
       int numberOfElements = _ptrMesh->getNumberOfElements(entity, MED_ALL_ELEMENTS);
       int * familyArray = new int[numberOfElements];
-      //      med_2_3::med_int * familyArray = new int[numberOfElements];
       for (int i=0;i<numberOfElements;i++)
         familyArray[i]=0;
 
       int numberOfFamilies = _ptrMesh->getNumberOfFamilies(entity);
-      //vector<FAMILY*> myFamilies = _ptrMesh->getFamilies(entity);
       vector<FAMILY*> * myFamilies = &_ptrMesh->_familyEdge;
       if (0 == numberOfFamilies) {
         vector<GROUP*> myGroups = _ptrMesh->getGroups(entity);
@@ -2948,7 +2865,6 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
 
 
       int typeCount = 0;
-//CCRT : clutter :
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
       vector< med_2_3::med_int > temp (familyArray, familyArray+numberOfElements );
 #endif
@@ -3058,8 +2974,6 @@ int MED_MESH_WRONLY_DRIVER::writeFamilies(vector<FAMILY*> & families ) const
       MESSAGE_MED(LOC<<"families[i]->getIdentifier() : "<<families[i]->getIdentifier());
       MESSAGE_MED(LOC<<"numberOfAttributes : "<<numberOfAttributes);
 
-      //MESSAGE_MED(LOC<<"families[i]->getAttributesIdentifiers() : "<<families[i]->getAttributesIdentifiers()[0]);
-      //MESSAGE_MED(LOC<<"families[i]->getAttributesValues() : "<<families[i]->getAttributesValues()[0]);
       MESSAGE_MED(LOC<<"attributesDescriptions.c_str() : "<<attributesDescriptions.c_str());
       MESSAGE_MED(LOC<<"numberOfGroups : "<<numberOfGroups);
       MESSAGE_MED(LOC<<"groupsNames.c_str() : "<<groupsNames.c_str());
@@ -3113,8 +3027,6 @@ int MED_MESH_WRONLY_DRIVER::writeFamilies(vector<FAMILY*> & families ) const
   return MED_VALID;
 }
 
-
-// A FAIRE POUR LES NOEUDS ET LES ELEMENTS ret = MEDfamEcr(
 
 
 
