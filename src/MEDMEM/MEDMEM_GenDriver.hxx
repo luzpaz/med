@@ -53,13 +53,13 @@ namespace MEDMEM {
 
 protected :
 
-  int            _id;         // MED_INVALID : if the driver hasn't been created by a MedMedDriver
-                              // the MedMedDriver index of the driver vector in the MED object where it has been created
+    int            _id; // position in a vector of drivers in GMESH or FIELD_
+
   /*File related part*/
   string         _fileName;   // The name of the file currently in use.
   MED_EN::med_mode_acces _accessMode; // The file access mode set by the adequate construtor.
   int            _status;     // The file status {MED_INVALID, MED_OPENED, MED_CLOSED } 
-  driverTypes    _driverType; //  A FAIRE LE POSITIONNER DS TOUTES LES SS CLASSES !!
+  driverTypes    _driverType;
 
 
 public:
@@ -124,11 +124,11 @@ public:
   virtual GENDRIVER * copy ( void ) const = 0 ;
 
   // Take missing data from other driver.
-  // Is for object->read( genDriver ) if object was not passed to genDriver
+  // Intended for object->read( genDriver ) if object was not passed to genDriver
   // (i.e. genDriver has been created through constructor without parameters),
   // then object asks driverFactory to create a driver initialized by object
   // and fills the new driver up using merge( genDriver ).
-  // Needed for drivers possessing own data
+  // Needed for drivers possessing specific data
   virtual void merge ( const GENDRIVER &genDriver );
 
   // MED  related part
@@ -146,6 +146,7 @@ public:
   string getFileName () const;
   virtual void setFileName ( const string & fileName);
   virtual MED_EN::med_mode_acces getAccessMode() const;
+  virtual void setAccessMode(MED_EN::med_mode_acces mode);
   driverTypes getDriverType() const { return _driverType; }
 };
 }

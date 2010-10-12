@@ -121,8 +121,6 @@ void GENDRIVER::setFileName(const string & fileName)
 
   END_OF_MED(LOC);
 }
-       
-
 
 med_mode_acces GENDRIVER::getAccessMode() const
 {
@@ -130,6 +128,11 @@ med_mode_acces GENDRIVER::getAccessMode() const
   BEGIN_OF_MED(LOC);
 
   return _accessMode;
+}
+
+void GENDRIVER::setAccessMode(med_mode_acces mode)
+{
+  _accessMode = mode;
 }
 
 ostream & MEDMEM::operator<<(ostream &os,const GENDRIVER & drv)
