@@ -83,3 +83,13 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
   return version;
 }
 
+med_2_3::med_mode_acces MEDMEM::getMedAccessMode(MED_EN::med_mode_acces mode)
+{
+  switch ( mode ) {
+  case MED_EN::RDONLY: return med_2_3::MED_LECTURE;
+  case MED_EN::WRONLY: return med_2_3::MED_CREATION;
+  case MED_EN::RDWR:   return med_2_3::MED_LECTURE_ECRITURE;
+  default:
+    return med_2_3::med_mode_acces( mode );
+  }
+}
