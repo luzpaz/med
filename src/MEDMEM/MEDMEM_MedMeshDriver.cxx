@@ -253,10 +253,10 @@ void MED_MESH_RDONLY_DRIVER::read(void)
         {
           if ( _ptrMesh->getIsAGrid() )
             throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Mesh type mismatch. "
-                                         "class MESH must be used for an unstructured mesh"));
+                                         "Class MESH must be used for an unstructured mesh"));
           else
             throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Mesh type mismatch. "
-                                         "class GRID must be used for a structured mesh"));
+                                         "Class GRID must be used for a structured mesh"));
         }
         else {
           break;
