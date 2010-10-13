@@ -38,6 +38,7 @@
 #include <float.h>
 
 #include "MEDMEM_Utilities.hxx"
+#include "MEDMEM_MedVersion.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Support.hxx"
@@ -3312,7 +3313,7 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
                                                                          this, WRONLY));
   newDriver->merge( driver );
   if ( newDriver->getDriverType() == MED_DRIVER )
-    newDriver->setAccessMode( medMode );
+    newDriver->setAccessMode( MED_EN::med_mode_acces( getMedAccessMode( medMode ) ));
 
   newDriver->open();
   try
@@ -3340,7 +3341,7 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
   std::auto_ptr<GENDRIVER> newDriver( DRIVERFACTORY::buildDriverForField(driverType, filename,
                                                                          this, WRONLY));
   if ( newDriver->getDriverType() == MED_DRIVER )
-    newDriver->setAccessMode( medMode );
+    newDriver->setAccessMode( MED_EN::med_mode_acces( getMedAccessMode( medMode ) ));
 
   newDriver->open();
   try

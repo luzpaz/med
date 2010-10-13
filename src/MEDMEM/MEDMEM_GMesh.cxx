@@ -512,7 +512,7 @@ void GMESH::write(const GENDRIVER & driver, MED_EN::med_mode_acces medMode/*=MED
                                                                    MED_EN::WRONLY));
   newDriver->merge( driver );
   if ( newDriver->getDriverType() == MED_DRIVER )
-    newDriver->setAccessMode( medMode );
+    newDriver->setAccessMode( MED_EN::med_mode_acces( getMedAccessMode( medMode )));
 
   newDriver->open();
   try
@@ -548,7 +548,7 @@ void GMESH::write(driverTypes        driverType,
                                         MED_EN::WRONLY));
 
   if ( newDriver->getDriverType() == MED_DRIVER )
-    newDriver->setAccessMode( medMode );
+    newDriver->setAccessMode( MED_EN::med_mode_acces( getMedAccessMode( medMode ) ));
 
   newDriver->open();
   try

@@ -90,19 +90,14 @@ string  MED_MESH_DRIVER::getMeshName() const
 
 void MED_MESH_DRIVER::open()
 {
-  const char * LOC = "MED_MESH_DRIVER::open()";
+const char * LOC = "MED_MESH_DRIVER::open()";
   BEGIN_OF_MED(LOC);
 
-  med_2_3::med_mode_acces accessMode;
-  switch ( _accessMode ) {
-  case MED_EN::RDONLY: accessMode = med_2_3::MED_LECTURE; break;
-  case MED_EN::WRONLY: accessMode = med_2_3::MED_CREATION; break;
-  case MED_EN::RDWR:   accessMode = med_2_3::MED_LECTURE_ECRITURE; break;
-  default:
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Invalid access mode "<<_accessMode));
-  }
+  int accessMode = _accessMode;
+  if ( _accessMode == MED_EN::RDWR )
+    accessMode = med_2_3::MED_LECTURE_ECRITURE;
   MESSAGE_MED(LOC<<" : _fileName.c_str : "<< _fileName.c_str()<<",mode : "<< accessMode);
-  _medIdt = med_2_3::MEDouvrir( (const_cast <char *> (_fileName.c_str())), accessMode);
+  _medIdt = med_2_3::MEDouvrir( (const_cast <char *> (_fileName.c_str())),(med_2_3::med_mode_acces) accessMode);
   MESSAGE_MED(LOC<<" _medIdt : "<< _medIdt );
   if (_medIdt > 0)
     _status = MED_OPENED;

@@ -113,16 +113,11 @@ void MED_FIELD_DRIVER<T>::open() throw (MEDEXCEPTION)
   if ( MED_FIELD_DRIVER<T>::_status==MED_OPENED )
     return;
 
-  med_2_3::med_mode_acces accessMode;
-  switch ( _accessMode ) {
-  case MED_EN::RDONLY: accessMode = med_2_3::MED_LECTURE; break;
-  case MED_EN::WRONLY: accessMode = med_2_3::MED_CREATION; break;
-  case MED_EN::RDWR:   accessMode = med_2_3::MED_LECTURE_ECRITURE; break;
-  default:
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Invalid access mode "<<_accessMode));
-  }
+  int accessMode = MED_FIELD_DRIVER<T>::_accessMode;
+  if ( accessMode == MED_EN::RDWR )
+    accessMode = med_2_3::MED_LECTURE_ECRITURE;
   MESSAGE_MED(LOC<<"_fileName.c_str : "<< MED_FIELD_DRIVER<T>::_fileName.c_str()<<",mode : "<< MED_FIELD_DRIVER<T>::_accessMode);
-  MED_FIELD_DRIVER<T>::_medIdt = med_2_3::MEDouvrir( (const_cast <char *> (MED_FIELD_DRIVER<T>::_fileName.c_str())),accessMode);
+  MED_FIELD_DRIVER<T>::_medIdt = med_2_3::MEDouvrir( (const_cast <char *> (MED_FIELD_DRIVER<T>::_fileName.c_str())),(med_2_3::med_mode_acces) accessMode);
   MESSAGE_MED(LOC<<"_medIdt : "<< MED_FIELD_DRIVER<T>::_medIdt );
   if (MED_FIELD_DRIVER<T>::_medIdt > 0)
     MED_FIELD_DRIVER<T>::_status=MED_OPENED;
