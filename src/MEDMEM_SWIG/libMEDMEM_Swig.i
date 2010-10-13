@@ -718,9 +718,9 @@ public:
   void read (const GENDRIVER &);
   void read(int index=0);
 
-  void write(const GENDRIVER& driver, MED_EN::med_mode_acces medMode=MED_EN::RDWR);
+  void write(const GENDRIVER& driver, med_mode_acces medMode=RDWR);
   void write(driverTypes driverType, const char* filename,
-             MED_EN::med_mode_acces medMode=MED_EN::RDWR);
+             med_mode_acces medMode=RDWR);
   void write(int index=0);
 
   void writeAppend(int index=0, const std::string& driverName="");
@@ -1143,11 +1143,11 @@ public :
 
   void write(int index=0);
   void write(const GENDRIVER & driver,
-             MED_EN::med_mode_acces medMode=MED_EN::WRONLY);
+             med_mode_acces medMode=WRONLY);
   void write(driverTypes        driverType,
              const std::string& filename,
              const std::string& meshname="",
-             MED_EN::med_mode_acces medMode=MED_EN::WRONLY);
+             med_mode_acces medMode=WRONLY);
 
   void setName(char * name);
 
