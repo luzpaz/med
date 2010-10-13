@@ -107,9 +107,14 @@ static void addMedFacesGroup (MESHING& meshing, int nFaces, const int *groupValu
  *   (+) int  addDriver(GENDRIVER & driver);
  *   (+) void rmDriver(int index=0);
  *   (+) virtual void read(int index=0);
- *   (must be private) inline void read(const GENDRIVER & genDriver);
- *   (+) inline void write(int index=0, const string & driverName = "");
- *   (must be private) inline void write(const GENDRIVER & genDriver);
+ *   (+) inline void read(const GENDRIVER & genDriver);
+ *   (+) inline void write(int index=0);
+ *   (+) inline void write(const GENDRIVER & genDriver,
+ *                         MED_EN::med_mode_acces medMode=MED_EN::WRONLY);
+ *   (+) inline void write(driverTypes        driverType,
+ *                         const std::string& filename,
+ *                         const std::string& meshname="",
+ *                         MED_EN::med_mode_acces medMode=MED_EN::WRONLY) const;
  *   (+) inline void setName(string name);
  *   (+) inline void setDescription(string description);
  *   (+) inline string getName() const;
@@ -1049,6 +1054,7 @@ void MEDMEMTest::testMeshAndMeshing()
 
     SUPPORT* sup = new SUPPORT(myMeshPointe);
     sup->removeReference();
+    myMeshPointe->createGroups(); // check GMESH::createGroups()
     myMeshPointe->removeReference();
   }
 
@@ -1464,7 +1470,7 @@ void MEDMEMTest::testMeshAndMeshing()
   // test other variants of read() and write()
   {
     const string otherName1("otherName1"), otherName2("otherName2");
-    MESH mesh1, mesh2;
+    MESH mesh1, mesh2, mesh3;
 
     //myMesh5 -> filenameout21
     // GMESH::write(driverTypes driverType, const string& filename,const string& meshname)
@@ -1490,6 +1496,11 @@ void MEDMEMTest::testMeshAndMeshing()
     // GMESH::read( const GENDRIVER& )
     mesh2.read( driver );
     CPPUNIT_ASSERT(myMesh5->deepCompare(mesh2));
+    // check that GMESH::write() clears the file by default
+    CPPUNIT_ASSERT_THROW( mesh3.read( MED_DRIVER, filenameout21,otherName1), MEDEXCEPTION);
+    // write by adding a mesh
+    myMesh5->write( MED_DRIVER, filenameout21, otherName1, MED_EN::RDWR );
+    CPPUNIT_ASSERT_NO_THROW( mesh3.read( MED_DRIVER, filenameout21,otherName1));
   }
 
   int myDriver6;

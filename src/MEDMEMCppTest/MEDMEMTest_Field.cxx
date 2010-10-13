@@ -171,8 +171,10 @@ using namespace MEDMEM;
  *   (+)     inline void read(const GENDRIVER & genDriver);
  *   (+)     inline void read(driverTypes driverType, const std::string& filename);
  *   (+)     inline void write(int index=0);
- *   (+)     inline void write(const GENDRIVER &);
- *   (+)     inline void write(driverTypes driverType, const std::string& filename);
+ *   (+)     inline void write(const GENDRIVER &,
+ *                             MED_EN::med_mode_acces medMode=MED_EN::RDWR);
+ *   (+)     inline void write(driverTypes driverType, const std::string& filename,
+ *                             MED_EN::med_mode_acces medMode=MED_EN::RDWR);
  *   (+)     inline void writeAppend(int index=0, const string & driverName = "");
  *   (+) inline void writeAppend(const GENDRIVER &);
  *
@@ -589,7 +591,7 @@ static void testDrivers()
 
   CPPUNIT_ASSERT_NO_THROW(aField_3->rmDriver(IdDriver1));
 
-  //Test write(const GENDRIVER &);
+  //Test write(const GENDRIVER &, MED_EN::med_mode_acces medMode=MED_EN::RDWR);
   {
     MED_FIELD_WRONLY_DRIVER<int> aMedWrFieldDriver;
     aMedWrFieldDriver.setFileName(filename_wr);
@@ -601,15 +603,24 @@ static void testDrivers()
     aField_3_RD.read(MED_DRIVER,filename_wr);
   }
 
-  // Test write(driverTypes driverType, const std::string& filename)
+  // Test write(driverTypes driverType, const std::string& filename
+  //            MED_EN::med_mode_acces medMode=MED_EN::RDWR)
   aField_3->setName(fieldname_nodeint_wr1);
+  // wrong mode
+  CPPUNIT_ASSERT_THROW(aField_3->write(MED_DRIVER,filename_wr,MED_EN::RDONLY), MEDEXCEPTION);
   aField_3->write(MED_DRIVER,filename_wr);
   {
     FIELD<double> aField_3_RD;
     aField_3_RD.setName(fieldname_nodeint_wr1);
     aField_3_RD.read(MED_DRIVER,filename_wr);
   }
-
+  aField_3->setName("fieldname_nodeint_wr1");
+  aField_3->write(MED_DRIVER,filename_wr, MED_EN::WRONLY);// overwrite filename_wr
+  {
+    FIELD<double> aField_3_RD;
+    aField_3_RD.setName(fieldname_nodeint_wr1);
+    CPPUNIT_ASSERT_THROW(aField_3_RD.read(MED_DRIVER,filename_wr),MEDEXCEPTION);
+  }
   //Test writeAppend(int index) method
   //Create a vtk file
   MESH * aMesh_1 = new MESH(MED_DRIVER,filename22_rd, meshname);
