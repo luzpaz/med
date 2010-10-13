@@ -141,6 +141,7 @@ VTKNormalizedUnstructuredMesh.hxx	\
 VTKNormalizedUnstructuredMesh.txx	\
 VectorUtils.hxx                         \
 VolSurfFormulae.hxx                     \
+GenMathFormulae.hxx                     \
 VolSurfUser.hxx                         \
 VolSurfUser.txx                         \
 CurveIntersector.hxx                    \
@@ -177,12 +178,13 @@ VolSurfUser.txx
 # Libraries targets
 
 dist_libinterpkernel_la_SOURCES = \
-	TransformedTriangle.cxx\
-	TransformedTriangleIntersect.cxx\
-	TransformedTriangleMath.cxx\
+	TransformedTriangle.cxx \
+	TransformedTriangleIntersect.cxx \
+	TransformedTriangleMath.cxx \
 	BoundingBox.cxx \
-	TetraAffineTransform.cxx\
-	CellModel.cxx\
+	TranslationRotationMatrix.cxx \
+	TetraAffineTransform.cxx \
+	CellModel.cxx \
 	UnitTetraIntersectionBary.cxx \
 	InterpolationOptions.cxx \
 	DirectedBoundingBox.cxx

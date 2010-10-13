@@ -17,32 +17,6 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef __PARAMEDMEM_MEDCOUPLINGNATUREOFFIELD_HXX__
-#define __PARAMEDMEM_MEDCOUPLINGNATUREOFFIELD_HXX__
+#include "TranslationRotationMatrix.hxx"
 
-#include "MEDCoupling.hxx"
-#include "InterpKernelException.hxx"
-
-namespace ParaMEDMEM
-{
-  typedef enum
-    {
-      NoNature               = 17,
-      ConservativeVolumic    = 26,
-      Integral               = 32,
-      IntegralGlobConstraint = 35,
-      RevIntegral            = 37
-    } NatureOfField;
-
-  class MEDCouplingNatureOfField
-  {
-  public:
-    MEDCOUPLING_EXPORT static const char *getRepr(NatureOfField nat) throw(INTERP_KERNEL::Exception);
-  private:
-    static const int NB_OF_POSSIBILITIES=5;
-    static const char *REPR_OF_NATUREOFFIELD[NB_OF_POSSIBILITIES];
-    static const int POS_OF_NATUREOFFIELD[NB_OF_POSSIBILITIES];
-  };
-}
-
-#endif
+const double INTERP_KERNEL::TranslationRotationMatrix::EPS=1e-12;
