@@ -1378,6 +1378,7 @@ void GMESH::createGroups()
       //creates a group with the family name and only one family
       GROUP* group=new GROUP((*myFamilies)[i]->getName(),fam_list);
       (*myGroups).push_back(group);
+      removeReference();
     }
   }
 }
