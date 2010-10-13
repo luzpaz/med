@@ -67,6 +67,7 @@ void MESHCollectionMedXMLDriver::_writeFields(vector<MEDMEM::FIELD<T>* >& fields
         xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(BAD_CAST "//mapping/mesh", xpathCtx);
         //assuming there is only one mesh in the XML file
         xmlNodePtr mesh_node= xpathObj->nodesetval->nodeTab[0];
+        xmlXPathFreeObject(xpathObj);
 
         //adds the field to the master file if necessary
         bool exist_field =false;
@@ -79,6 +80,7 @@ void MESHCollectionMedXMLDriver::_writeFields(vector<MEDMEM::FIELD<T>* >& fields
                         if ( strcmp((const char*)xpathObj->nodesetval->nodeTab[i]->properties->children->content, fieldname)==0)
                                 exist_field = true;
                 }
+        xmlXPathFreeObject(xpathObj);
 
         xmlNodePtr field_node;
         if (!exist_field)

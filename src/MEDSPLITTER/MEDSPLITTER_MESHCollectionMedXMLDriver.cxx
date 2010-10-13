@@ -112,7 +112,10 @@ int MESHCollectionMedXMLDriver::read(char* filename)
     xmlXPathContextPtr xpathCtx = xmlXPathNewContext(master_doc);
     xmlXPathObjectPtr xpathObj = xmlXPathEvalExpression(BAD_CAST "//splitting/subdomain", xpathCtx);
     if (xpathObj==0 || xpathObj->nodesetval->nodeNr ==0)
+    {
+      xmlXPathFreeObject(xpathObj);
       throw MEDEXCEPTION("MEDSPLITTER read - XML Master File does not contain /MED/splitting/subdomain node");
+    }
 
     /* as subdomain has only one property which is "number"
      * it suffices to take the content of its first child */
@@ -122,9 +125,13 @@ int MESHCollectionMedXMLDriver::read(char* filename)
     //////////////////
     //mesh name
     //////////////////
+    xmlXPathFreeObject(xpathObj);
     xpathObj = xmlXPathEvalExpression(BAD_CAST "//content/mesh", xpathCtx);
     if (xpathObj==0 || xpathObj->nodesetval->nodeNr ==0)
+    {
+      xmlXPathFreeObject(xpathObj);
       throw MEDEXCEPTION("MEDSPLITTER read - XML Master File does not contain /MED/content/mesh node");
+    }
     m_collection->setName( (const char*)xpathObj->nodesetval->nodeTab[0]->properties->children->content);
 
     cout << "nb domain" << nbdomain << endl;
@@ -137,9 +144,13 @@ int MESHCollectionMedXMLDriver::read(char* filename)
 
     // retrieving the node which contains the file names
     const char filechar[]="//files/subfile";
+    xmlXPathFreeObject(xpathObj);
     xpathObj = xmlXPathEvalExpression(BAD_CAST filechar, xpathCtx);
     if (xpathObj==0 || xpathObj->nodesetval->nodeNr ==0)
+    {
+      xmlXPathFreeObject(xpathObj);
       throw MEDEXCEPTION("MEDSPLITTER read - XML Master File does not contain /MED/files/subfile nodes");
+    }
     int nbfiles = xpathObj->nodesetval ->nodeNr;
 
     for (int i=0; i<nbfiles;i++)
