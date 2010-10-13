@@ -85,6 +85,13 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
 
 med_2_3::med_mode_acces MEDMEM::getMedAccessMode(MED_EN::med_mode_acces mode)
 {
+/*
+  from med.h:
+   MED_LECTURE          : Ouverture en lecture seule
+   MED_LECTURE_ECRITURE : Ouverture en lecture/ecriture, si un élément existe il est écrasé
+   MED_LECTURE_AJOUT    : Ouverture en lecture/ecriture, si un élément existe une erreur est générée
+   MED_CREATION         : Créer le fichier s'il n'existe pas, l'écrase sinon
+*/
   switch ( mode ) {
   case MED_EN::RDONLY: return med_2_3::MED_LECTURE;
   case MED_EN::WRONLY: return med_2_3::MED_CREATION;
