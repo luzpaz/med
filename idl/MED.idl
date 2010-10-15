@@ -45,6 +45,7 @@ This file contains the main IDL definitions of the %MED component in %SALOME app
 #include "SALOME_Types.idl"
 #include "SALOMEDS.idl"
 #include "SALOME_Comm.idl"
+#include "MEDOP.idl"
 
 module SALOME_MED {
 
@@ -1090,6 +1091,8 @@ Internal Corba method.
     void addField (in FIELD  ptrField  ) raises (SALOME::SALOME_Exception);
 
     void addInStudy (in SALOMEDS::Study myStudy, in MED medPtr) raises (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
+
+    SALOME_MED::MEDOP createMedOperator() raises (SALOME::SALOME_Exception);
   };
   
   /*! \brief A structure containing information about MED file

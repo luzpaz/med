@@ -41,6 +41,8 @@
 #include "MEDMEM_Family.hxx"
 #include "MEDMEM_Group.hxx"
 
+#include "MEDMEM_MedOp_i.hxx"
+
 #include "MEDMEM_DriversDef.hxx"
 #include "utilities.h"
 #include "Utils_CorbaException.hxx"
@@ -1272,4 +1274,20 @@ void MED_i::addInStudy (SALOMEDS::Study_ptr myStudy,
         MESSAGE("Registering of the Corba Med pointer");
         Register();
 
+}
+
+
+//=============================================================================
+/*!
+ *  Med Operations
+ */
+//=============================================================================
+SALOME_MED::MEDOP_ptr MED_i::createMedOperator()
+  throw (SALOME::SALOME_Exception)
+{
+  // An object linked to the MEDMEM::MED data structure is created
+  // here to process the fields operations.
+  MEDOP_i * medop_i = new MEDOP_i(_med);
+  SALOME_MED::MEDOP_ptr medop = medop_i->_this();
+  return medop;
 }

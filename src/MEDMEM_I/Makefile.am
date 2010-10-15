@@ -33,16 +33,18 @@ salomeinclude_HEADERS= \
   MEDMEM_Group_i.hxx \
   MEDMEM_Mesh_i.hxx \
   MEDMEM_Support_i.hxx \
+  MEDMEM_MedOp_i.hxx \
   MEDMEM_I.hxx
 
 dist_libMEDMEMImpl_la_SOURCES= \
 	MEDMEM_Med_i.cxx \
+	MEDMEM_MedOp_i.cxx \
 	MEDMEM_Family_i.cxx \
 	MEDMEM_Field_i.cxx \
 	MEDMEM_Group_i.cxx \
 	MEDMEM_Mesh_i.cxx \
 	MEDMEM_Support_i.cxx \
-	MEDMEM_convert.cxx   
+	MEDMEM_convert.cxx
 
 libMEDMEMImpl_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) ${KERNEL_CXXFLAGS} \
 	-I$(srcdir)/../MEDMEM -I$(top_builddir)/idl -I$(srcdir)/../MEDWrapper/V2_1/Core

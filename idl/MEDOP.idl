@@ -1,0 +1,14 @@
+
+#ifndef MEDOP_IDL
+#define MEDOP_IDL
+
+#include "SALOME_GenericObj.idl"
+#include "SALOME_Exception.idl"
+
+module SALOME_MED {
+  interface MEDOP : SALOME::GenericObj {
+    long  test() raises (SALOME::SALOME_Exception);
+  };
+};
+
+#endif

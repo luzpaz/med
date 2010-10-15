@@ -38,6 +38,7 @@
 
 #include "SALOME_GenericObj_i.hh"
 #include CORBA_SERVER_HEADER(MED)
+#include CORBA_SERVER_HEADER(MEDOP)
 #include CORBA_SERVER_HEADER(SALOMEDS)
 #include CORBA_SERVER_HEADER(SALOMEDS_Attributes)
 
@@ -125,6 +126,9 @@ public:
                                        SALOME_MED::MED_ptr myIor) 
                                                 throw (SALOME::SALOME_Exception,
                                                        SALOMEDS::StudyBuilder::LockProtection);
+
+    SALOME_MED::MEDOP_ptr createMedOperator() throw (SALOME::SALOME_Exception);
+
 };
 }
 

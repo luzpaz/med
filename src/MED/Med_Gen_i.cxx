@@ -590,7 +590,6 @@ char* Med_Gen_i::ComponentDataType()
 }
 
 
-
 //=============================================================================
 /*!
  * C factory, accessible with dlsym, after dlopen
