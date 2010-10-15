@@ -47,6 +47,7 @@ MEDMEM_Exception.hxx \
 MEDMEM_MedFieldDriver.hxx \
 MEDMEM_AsciiFieldDriver.hxx \
 MEDMEM_Med.hxx \
+MEDMEM_MedDataManager.hxx \
 MEDMEM_MedMedDriver.hxx \
 MEDMEM_MedMeshDriver.hxx \
 MEDMEM_GibiMeshDriver.hxx \
@@ -112,6 +113,7 @@ MEDMEM_Field.cxx \
 MEDMEM_GenDriver.cxx \
 MEDMEM_Group.cxx \
 MEDMEM_Med.cxx \
+MEDMEM_MedDataManager.cxx \
 MEDMEM_Exception.cxx \
 MEDMEM_MedMedDriver.cxx \
 MEDMEM_MedMeshDriver.cxx \
@@ -182,3 +184,16 @@ OBSOLETE_FILES = \
 	DataTest
 
 EXTRA_DIST += $(OBSOLETE_FILES)
+
+
+# Program targets (for test purposes)
+bin_PROGRAMS = \
+	MEDMEM_MedDataManager_test
+
+MEDMEM_MedDataManager_test_SOURCES = \
+	MEDMEM_MedDataManager_test.cxx
+
+MEDMEM_MedDataManager_test_CPPFLAGS = $(AM_CPPFLAGS)
+
+MEDMEM_MedDataManager_test_LDFLAGS = $(LDADD)
+

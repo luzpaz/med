@@ -469,6 +469,7 @@ void     FIELD_::openAppend    ( void )                               {}
 void     FIELD_::write         (const GENDRIVER &)                    {}
 void     FIELD_::writeAppend   (const GENDRIVER &)                    {}
 void     FIELD_::read          (const GENDRIVER &)                    {}
+bool     FIELD_::isRead() { return _isRead;}
 void     FIELD_::write         (int , const string & ) {}
 void     FIELD_::writeAppend   (int , const string & ) {}
 void     FIELD_::read          (int )                                  {}

@@ -1894,6 +1894,7 @@ void MESH::read(int index)
     _drivers[index]->open();
     _drivers[index]->read();
     _drivers[index]->close();
+    _isRead[index] = true;
   }
   else
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
@@ -1902,6 +1903,10 @@ void MESH::read(int index)
                                      )
                           );
   END_OF_MED(LOC);
+}
+
+bool MESH::isRead(int index) {
+  return _isRead[index];
 }
 
 /*!

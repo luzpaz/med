@@ -107,7 +107,7 @@ protected :
   // list of all Group
 
   vector<GENDRIVER *> _drivers; // Storage of the drivers currently in use
-
+  map<int,bool>   _isRead;
   bool           _isAGrid;      // am I a GRID or not
 
   map<MED_EN::medEntityMesh,SUPPORT*> _entitySupport;
@@ -170,6 +170,7 @@ public :
 
   virtual void read(int index=0);
   inline void read(const GENDRIVER & genDriver);
+  bool isRead(int index=0);
   //inline void write(int index=0, const string & driverName = "");
   virtual void write(int index=0, const string & driverName = "");
   inline void write(const GENDRIVER & genDriver);

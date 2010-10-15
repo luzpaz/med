@@ -32,6 +32,8 @@
 
 #include <MEDMEM_I.hxx>
 #include "MEDMEM_Med.hxx"
+#include "MEDMEM_MedDataManager.hxx"
+#include "MEDMEM_Field.hxx"
 
 #include <string>
 
@@ -39,6 +41,7 @@
 
 #include "SALOME_GenericObj_i.hh"
 #include CORBA_SERVER_HEADER(MEDOP)
+#include CORBA_SERVER_HEADER(MED)
 
 namespace MEDMEM {
 
@@ -47,7 +50,10 @@ class MEDMEM_I_EXPORT MEDOP_i: public POA_SALOME_MED::MEDOP,
 {
 
 private :
-  MED * _med;
+  MEDMEM::MED * _med;
+  MedDataManager * _medDataManager;
+
+  MEDMEM::FIELD<double> * _getFieldDouble(SALOME_MED::FIELD_ptr field_ptr);
 
 protected:
   
@@ -57,7 +63,8 @@ public:
   ~MEDOP_i();
 
   CORBA::Long test();
-
+  SALOME_MED::FIELD_ptr addition(SALOME_MED::FIELD_ptr f1, SALOME_MED::FIELD_ptr f2);
+  
 };
 }
 

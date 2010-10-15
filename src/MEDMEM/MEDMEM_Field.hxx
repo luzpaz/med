@@ -402,6 +402,7 @@ public:
   virtual  int      addDriver( GENDRIVER & driver);
   virtual  void     read (const GENDRIVER &);
   virtual  void     read(int index=0);
+  bool     isRead();
   virtual  void     openAppend( void );
   virtual  void     write(const GENDRIVER &);
 

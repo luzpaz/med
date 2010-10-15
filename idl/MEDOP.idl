@@ -4,10 +4,16 @@
 
 #include "SALOME_GenericObj.idl"
 #include "SALOME_Exception.idl"
+//#include "MED.idl"
 
 module SALOME_MED {
+  interface FIELD;
+
   interface MEDOP : SALOME::GenericObj {
     long  test() raises (SALOME::SALOME_Exception);
+    
+    FIELD addition(in FIELD f1, in FIELD f2) raises (SALOME::SALOME_Exception);
+    
   };
 };
 
