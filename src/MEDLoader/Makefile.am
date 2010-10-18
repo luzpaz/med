@@ -17,28 +17,39 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+#  MED MEDMEM_SWIG : binding of C++ implementation and Python
+#
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-if !MED_ENABLE_MICROMED
-  SUBDIRS = . Swig
-endif
+lib_LTLIBRARIES = _libMEDLoader_Swig.la
 
-#DIST_SUBDIRS = Swig
+salomeinclude_HEADERS =  \
+	libMEDLoader_Swig.i MEDLoaderTypemaps.i
 
-lib_LTLIBRARIES = libmedloader.la
+SWIG_DEF = libMEDLoader_Swig.i MEDLoaderTypemaps.i
 
-salomeinclude_HEADERS= \
-MEDLoader.hxx MEDLoaderBase.hxx
+SWIG_FLAGS = @SWIG_FLAGS@ -I$(srcdir) -I$(srcdir)/.. -I$(srcdir)/../../MEDCoupling -I$(srcdir)/../../MEDCoupling_Swig \
+	-I$(srcdir)/../../INTERP_KERNEL -I$(srcdir)/../../INTERP_KERNEL/Bases
 
-dist_libmedloader_la_SOURCES= \
-MEDLoader.cxx MEDLoaderBase.cxx
+dist__libMEDLoader_Swig_la_SOURCES   = $(SWIG_DEF)
+nodist__libMEDLoader_Swig_la_SOURCES = libMEDLoader_Swig_wrap.cxx
+libMEDLoader_Swig.py: libMEDLoader_Swig_wrap.cxx
 
-libmedloader_la_CPPFLAGS= $(MPI_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
-	-I$(srcdir)/../INTERP_KERNEL \
-	-I$(srcdir)/../INTERP_KERNEL/Geometric2D \
-	-I$(srcdir)/../INTERP_KERNEL/Bases \
-	-I$(srcdir)/../MEDCoupling
+libMEDLoader_Swig_wrap.cxx: $(SWIG_DEF)
+	$(SWIG) $(SWIG_FLAGS) -o $@  $<
 
-# change motivated by the bug KERNEL4778.
-libmedloader_la_LDFLAGS= ../MEDCoupling/libmedcoupling.la \
-../INTERP_KERNEL/libinterpkernel.la $(MPI_LIBS) $(MED2_LIBS) $(HDF5_LIBS)
+_libMEDLoader_Swig_la_CPPFLAGS = $(PYTHON_INCLUDES) \
+	$(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
+	-I$(srcdir)/../../INTERP_KERNEL \
+	-I$(srcdir)/.. -I$(srcdir)/../../MEDCoupling_Swig -I$(srcdir)/../../INTERP_KERNEL/Bases \
+	-I$(srcdir)/../../MEDCoupling
+
+_libMEDLoader_Swig_la_LDFLAGS  = -module $(MED2_LIBS) $(HDF5_LIBS) $(PYTHON_LIBS) \
+	../../MEDCoupling/libmedcoupling.la ../../INTERP_KERNEL/libinterpkernel.la \
+	../libmedloader.la
+
+CLEANFILES = libMEDLoader_Swig_wrap.cxx libMEDLoader_Swig.py
+
+dist_salomescript_DATA= libMEDLoader_Swig.py MEDLoaderDataForTest.py MEDLoaderTest.py MEDLoaderTest2.py
+
+UNIT_TEST_PROG = MEDLoaderTest.py MEDLoaderTest2.py
