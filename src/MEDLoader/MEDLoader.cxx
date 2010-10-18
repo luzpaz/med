@@ -1089,13 +1089,15 @@ void MEDLoaderNS::readUMeshDataInMedFile(med_idt fid, med_int meshId, DataArrayD
   med_int numdt,numit;
   med_float dt;
   med_bool changement,transformation;
-  MEDmeshComputationStepInfo(fid,nommaa,1,&numdt,&numit,&dt);
   // endlimitation
-  int spaceDim=std::max((int)Mdim,(int)Sdim);
-  int nCoords=MEDmeshnEntity(fid,nommaa,numdt,numit,MED_NODE,MED_NONE,MED_COORDINATE,MED_NO_CMODE,&changement,&transformation);
+  Sdim=MEDmeshnAxis(fid,1);
   char *comp=MEDLoaderBase::buildEmptyString(Sdim*MED_SNAME_SIZE);
   char *unit=MEDLoaderBase::buildEmptyString(Sdim*MED_SNAME_SIZE);
   MEDmeshInfo(fid,meshId,nommaa,&Sdim,&Mdim,&type_maillage,maillage_description,dt_unit,&sortingType,&nstep,&axisType,comp,unit);
+  delete [] dt_unit;
+  MEDmeshComputationStepInfo(fid,nommaa,1,&numdt,&numit,&dt);
+  int spaceDim=std::max((int)Mdim,(int)Sdim);
+  int nCoords=MEDmeshnEntity(fid,nommaa,numdt,numit,MED_NODE,MED_NONE,MED_COORDINATE,MED_NO_CMODE,&changement,&transformation);
   // limitation
   if(nstep!=1)
     {
@@ -1128,7 +1130,7 @@ void MEDLoaderNS::readUMeshDataInMedFile(med_idt fid, med_int meshId, DataArrayD
           MEDLoader::MEDConnOfOneElemType elem(typmai2[i],connTab,0,fam,curNbOfElem,-1);
           int *tmp=new int[curNbOfElem];
           char *noms=new char[MED_SNAME_SIZE*curNbOfElem+1];
-          med_bool withname,withnumber,withfam;
+          med_bool withname=MED_FALSE,withnumber=MED_FALSE,withfam=MED_FALSE;
           int *globArr=new int[curNbOfElem];
           MEDmeshElementRd(fid,nommaa,numdt,numit,whichEntity,curMedType,MED_NODAL,MED_FULL_INTERLACE,connTab,&withname,noms,&withnumber,globArr,&withfam,fam);
           delete [] tmp;
