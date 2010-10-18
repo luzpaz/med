@@ -846,11 +846,12 @@ void MEDLoaderNS::readFieldDoubleDataInMedFile(const char *fileName, const char 
       med_int nbPdt;
       MEDfieldInfo(fid,i+1,nomcha,maa_ass,&localmesh,&typcha,comp,unit,dt_unit,&nbPdt);
       std::string curMeshName=MEDLoaderBase::buildStringFromFortran(maa_ass,MED_NAME_SIZE+1);
+      delete [] maa_ass;
+      delete [] dt_unit;
       if(curMeshName!=meshName)
         {
           delete [] comp;
           delete [] unit;
-          delete [] maa_ass;
           throw INTERP_KERNEL::Exception("Invalid meshname on field !");
         }
       std::string curFieldName=MEDLoaderBase::buildStringFromFortran(nomcha,MED_NAME_SIZE+1);
@@ -860,61 +861,59 @@ void MEDLoaderNS::readFieldDoubleDataInMedFile(const char *fileName, const char 
           for(int i=0;i<ncomp;i++)
             infos[i]=MEDLoaderBase::buildUnionUnit(comp+i*MED_SNAME_SIZE,MED_SNAME_SIZE,unit+i*MED_SNAME_SIZE,MED_SNAME_SIZE);
           bool found=false;
+          bool found2=false;
+          med_int numdt=0,numo=0;
+          med_float dt=0.0;
+          for(int k=0;k<nbPdt && !found2;k++)
+            {
+              MEDfieldComputingStepInfo(fid,fieldName,k+1,&numdt,&numo,&dt);
+              found2=(numdt==iteration && numo==order);
+              if(found2)
+                time=dt;
+            }
+          if(!found2)
+            {
+              std::ostringstream oss; oss << "FieldDouble in file \""<< fileName<< "\" with name \"" << fieldName << "\" on mesh \"" <<  meshName;
+              oss << "\" does not have such time step : iteration=" << iteration << " order=" << order << std::endl;
+              delete [] comp;
+              delete [] unit;
+              MEDfileClose(fid);
+              throw INTERP_KERNEL::Exception(oss.str().c_str());
+            }
           for(int j=0;j<tabTypeLgth[typeOfOutField] && !found;j++)
             {
               if(nbPdt>0)
                 {
-                  int nval;
-                  //
-                  med_int numdt=0,numo=0;
-                  med_float dt=0.0;
-                  bool found2=false;
-                  for(int k=0;k<nbPdt && !found2;k++)
+                  int profilesize,nbi;
+                  int nval=MEDfieldnValueWithProfile(fid,fieldName,numdt,numo,tabEnt[typeOfOutField],tabType[typeOfOutField][j],1,MED_COMPACT_PFLMODE,pflname,&profilesize,locname,&nbi);
+                  if(nval>0)
                     {
-                      MEDfieldComputingStepInfo(fid,fieldName,k+1,&numdt,&numo,&dt);
-                      nval=MEDfieldnValue(fid,fieldName,numdt,numo,tabEnt[typeOfOutField],tabType[typeOfOutField][j]);
-                      found2=(numdt==iteration && numo==order);
-                      if(found2)
-                        time=dt;
+                      double *valr=new double[ncomp*nval];
+                      MEDfieldValueWithProfileRd(fid,fieldName,iteration,order,tabEnt[typeOfOutField],tabType[typeOfOutField][j],MED_COMPACT_PFLMODE,
+                                                 pflname,MED_FULL_INTERLACE,MED_ALL_CONSTITUENT,(unsigned char*)valr);
+                      std::string tmp(locname);
+                      if((locname[0]!='\0' && (typeOfOutField!=ON_GAUSS_PT && typeOfOutField!=ON_GAUSS_NE))
+                         || (tmp!=MED_GAUSS_ELNO && typeOfOutField==ON_GAUSS_NE)
+                         || (locname[0]=='\0' && typeOfOutField==ON_GAUSS_PT)
+                         || (tmp==MED_GAUSS_ELNO && typeOfOutField==ON_GAUSS_PT))
+                        {
+                          delete [] valr;
+                          continue;
+                        }
+                      int *pfl=0;
+                      if(pflname[0]!='\0')
+                        {
+                          pfl=new int[nval];
+                          MEDprofileRd(fid,pflname,pfl);
+                        }
+                      field.push_back(MEDLoader::MEDFieldDoublePerCellType(typmai2[j],valr,ncomp,nval,pfl,locname));
+                      delete [] pfl;
                     }
-                  if(!found2)
-                    {
-                      std::ostringstream oss; oss << "FieldDouble in file \""<< fileName<< "\" with name \"" << fieldName << "\" on mesh \"" <<  meshName;
-                      oss << "\" does not have such time step : iteration=" << iteration << " order=" << order << std::endl;
-                      delete [] comp;
-                      delete [] unit;
-                      MEDfileClose(fid);
-                      throw INTERP_KERNEL::Exception(oss.str().c_str());
-                    }
-                  double *valr=new double[ncomp*nval];
-                  MEDfieldValueWithProfileRd(fid,fieldName,iteration,order,tabEnt[typeOfOutField],tabType[typeOfOutField][j],MED_COMPACT_PFLMODE,
-                                             pflname,MED_FULL_INTERLACE,MED_ALL_CONSTITUENT,(unsigned char*)valr);
-                  std::string tmp(locname);
-                  if((locname[0]!='\0' && (typeOfOutField!=ON_GAUSS_PT && typeOfOutField!=ON_GAUSS_NE))
-                     || (tmp!=MED_GAUSS_ELNO && typeOfOutField==ON_GAUSS_NE)
-                     || (locname[0]=='\0' && typeOfOutField==ON_GAUSS_PT)
-                     || (tmp==MED_GAUSS_ELNO && typeOfOutField==ON_GAUSS_PT))
-                    {
-                      delete [] dt_unit;
-                      delete [] maa_ass;
-                      delete [] valr;
-                      continue;
-                    }
-                  int *pfl=0;
-                  if(pflname[0]!='\0')
-                    {
-                      pfl=new int[nval];
-                      MEDprofileRd(fid,pflname,pfl);
-                    }
-                  field.push_back(MEDLoader::MEDFieldDoublePerCellType(typmai2[j],valr,ncomp,nval,pfl,locname));
-                  delete [] pfl;
                 }
             }
         }
-      delete [] maa_ass;
       delete [] comp;
       delete [] unit;
-      delete [] dt_unit;
     }
   MEDfileClose(fid);
 }
@@ -1032,8 +1031,9 @@ int MEDLoaderNS::readUMeshDimFromFile(const char *fileName, const char *meshName
   med_sorting_type sortingType;
   med_int nstep;
   med_axis_type axisType;
-  char *axisname=MEDLoaderBase::buildEmptyString(MED_SNAME_SIZE);
-  char *axisunit=MEDLoaderBase::buildEmptyString(MED_SNAME_SIZE);
+  int naxis=MEDmeshnAxis(fid,meshId);
+  char *axisname=MEDLoaderBase::buildEmptyString(naxis*MED_SNAME_SIZE);
+  char *axisunit=MEDLoaderBase::buildEmptyString(naxis*MED_SNAME_SIZE);
   MEDmeshInfo(fid,meshId,nommaa,&Sdim,&Mdim,&type_maillage,maillage_description,dt_unit,&sortingType,&nstep,&axisType,axisname,axisunit);
   // limitation
   if(nstep!=1)
@@ -1133,6 +1133,8 @@ void MEDLoaderNS::readUMeshDataInMedFile(med_idt fid, med_int meshId, DataArrayD
           med_bool withname=MED_FALSE,withnumber=MED_FALSE,withfam=MED_FALSE;
           int *globArr=new int[curNbOfElem];
           MEDmeshElementRd(fid,nommaa,numdt,numit,whichEntity,curMedType,MED_NODAL,MED_FULL_INTERLACE,connTab,&withname,noms,&withnumber,globArr,&withfam,fam);
+          if(!withfam)
+            std::fill(fam,fam+curNbOfElem,0);
           delete [] tmp;
           delete [] noms;
           //trying to read global numbering
@@ -1158,18 +1160,19 @@ void MEDLoaderNS::readUMeshDataInMedFile(med_idt fid, med_int meshId, DataArrayD
       int *globArr=new int[curNbOfPolyElem];
       MEDLoader::MEDConnOfOneElemType elem(INTERP_KERNEL::NORM_POLYGON,locConn,index,fam,curNbOfPolyElem,arraySize);
       MEDmeshPolygonRd(fid,nommaa,numdt,numit,MED_CELL,MED_NODAL,index,locConn);
-      MEDmeshEntityFamilyNumberRd(fid,nommaa,numdt,numit,whichPolyEntity,MED_POLYGON,fam);
+      if(MEDmeshEntityFamilyNumberRd(fid,nommaa,numdt,numit,whichPolyEntity,MED_POLYGON,fam)!=0)
+        std::fill(fam,fam+curNbOfPolyElem,0);
       if(MEDmeshEntityNumberRd(fid,nommaa,numdt,numit,whichPolyEntity,MED_POLYGON,globArr)==0)
         elem.setGlobal(globArr);
       else
         delete [] globArr;
       conn.push_back(elem);
     }
-  curNbOfPolyElem=MEDmeshnEntity(fid,nommaa,numdt,numit,MED_CELL,MED_POLYHEDRON,MED_INDEX_NODE,MED_NODAL,&changement,&transformation)-1;
+  curNbOfPolyElem=MEDmeshnEntity(fid,nommaa,numdt,numit,MED_CELL,MED_POLYHEDRON,MED_INDEX_FACE,MED_NODAL,&changement,&transformation)-1;
   if(curNbOfPolyElem>0)
     {
       med_int indexFaceLgth,connFaceLgth;
-      indexFaceLgth=MEDmeshnEntity(fid,nommaa,numdt,numit,MED_CELL,MED_POLYHEDRON,MED_INDEX_FACE,MED_NODAL,&changement,&transformation);
+      indexFaceLgth=MEDmeshnEntity(fid,nommaa,numdt,numit,MED_CELL,MED_POLYHEDRON,MED_INDEX_NODE,MED_NODAL,&changement,&transformation);
       connFaceLgth=MEDmeshnEntity(fid,nommaa,numdt,numit,MED_CELL,MED_POLYHEDRON,MED_CONNECTIVITY,MED_NODAL,&changement,&transformation);
       int *index=new int[curNbOfPolyElem+1];
       int *indexFace=new int[indexFaceLgth];
@@ -1177,7 +1180,11 @@ void MEDLoaderNS::readUMeshDataInMedFile(med_idt fid, med_int meshId, DataArrayD
       int *fam=new int[curNbOfPolyElem];
       int *globArr=new int[curNbOfPolyElem];
       MEDmeshPolyhedronRd(fid,nommaa,numdt,numit,MED_CELL,MED_NODAL,index,indexFace,locConn);
-      MEDmeshEntityFamilyNumberRd(fid,nommaa,numdt,numit,whichPolyEntity,MED_POLYHEDRON,fam);
+      if(MEDmeshnEntity(fid,nommaa,numdt,numit,whichPolyEntity,MED_POLYHEDRON,MED_FAMILY_NUMBER,MED_NO_CMODE,&changement,&transformation)==0)
+        //if(MEDmeshEntityFamilyNumberRd(fid,nommaa,numdt,numit,whichPolyEntity,MED_POLYHEDRON,fam)!=0)
+        std::fill(fam,fam+curNbOfPolyElem,0);
+      else
+        MEDmeshEntityFamilyNumberRd(fid,nommaa,numdt,numit,whichPolyEntity,MED_POLYHEDRON,fam);
       int arraySize=connFaceLgth;
       for(int i=0;i<curNbOfPolyElem;i++)
         arraySize+=index[i+1]-index[i]-1;
@@ -2127,7 +2134,15 @@ med_idt MEDLoaderNS::appendFieldSimpleAtt(const char *fileName, const ParaMEDMEM
       MEDLoaderBase::safeStrCpy(c.c_str(),MED_SNAME_SIZE-1,comp+i*MED_SNAME_SIZE,MEDLoader::_TOO_LONG_STR);
       MEDLoaderBase::safeStrCpy(u.c_str(),MED_SNAME_SIZE-1,unit+i*MED_SNAME_SIZE,MEDLoader::_TOO_LONG_STR);
     }
-  MEDfieldCr(fid,f->getName(),MED_FLOAT64,nbComp,comp,unit,"",f->getMesh()->getName());
+  char *dt_unit=MEDLoaderBase::buildEmptyString(MED_LNAME_SIZE);
+  char *maaname=MEDLoaderBase::buildEmptyString(MED_NAME_SIZE);
+  char *fname=MEDLoaderBase::buildEmptyString(MED_NAME_SIZE);
+  MEDLoaderBase::safeStrCpy(f->getName(),MED_NAME_SIZE,fname,MEDLoader::_TOO_LONG_STR);
+  MEDLoaderBase::safeStrCpy(f->getMesh()->getName(),MED_NAME_SIZE,maaname,MEDLoader::_TOO_LONG_STR);
+  MEDfieldCr(fid,fname,MED_FLOAT64,nbComp,comp,unit,dt_unit,maaname);
+  delete [] fname;
+  delete [] maaname;
+  delete [] dt_unit;
   ParaMEDMEM::TypeOfTimeDiscretization td=f->getTimeDiscretization();
   if(td==ParaMEDMEM::NO_TIME)
     {

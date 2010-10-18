@@ -37,18 +37,18 @@ namespace ParaMEDMEM
     CPPUNIT_TEST( testMesh3DRW );
     CPPUNIT_TEST( testFieldRW1 );
     CPPUNIT_TEST( testFieldRW2 );
-    CPPUNIT_TEST( testFieldRW3 );
-    CPPUNIT_TEST( testMultiMeshRW1 );
+    // CPPUNIT_TEST( testFieldRW3 );
+    // CPPUNIT_TEST( testMultiMeshRW1 );
     CPPUNIT_TEST( testFieldProfilRW1 );
     CPPUNIT_TEST( testFieldNodeProfilRW1 );
-    CPPUNIT_TEST( testFieldGaussRW1 );
-    CPPUNIT_TEST( testFieldGaussNERW1 );
+    // CPPUNIT_TEST( testFieldGaussRW1 );
+    // CPPUNIT_TEST( testFieldGaussNERW1 );
     CPPUNIT_TEST( testLittleStrings1 );
-    CPPUNIT_TEST( testMesh3DSurfShuffleRW );
-    CPPUNIT_TEST( testFieldShuffleRW1 );
-    CPPUNIT_TEST( testMultiFieldShuffleRW1 );
-    CPPUNIT_TEST( testWriteUMeshesRW1 );
-    CPPUNIT_TEST( testMixCellAndNodesFieldRW1 );
+    // CPPUNIT_TEST( testMesh3DSurfShuffleRW );
+    // CPPUNIT_TEST( testFieldShuffleRW1 );
+    // CPPUNIT_TEST( testMultiFieldShuffleRW1 );
+    // CPPUNIT_TEST( testWriteUMeshesRW1 );
+    // CPPUNIT_TEST( testMixCellAndNodesFieldRW1 );
     CPPUNIT_TEST_SUITE_END();
   public:
     void testMesh1DRW();
