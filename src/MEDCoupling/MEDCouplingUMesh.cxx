@@ -25,6 +25,7 @@
 #include "PointLocatorAlgos.txx"
 #include "BBTree.txx"
 #include "DirectedBoundingBox.hxx"
+#include "InterpKernelMeshQuality.hxx"
 #include "MEDCouplingAutoRefCountObjectPtr.hxx"
 
 #include <sstream>
@@ -80,6 +81,12 @@ MEDCouplingUMesh::MEDCouplingUMesh():_iterator(-1),_mesh_dim(-2),
 {
 }
 
+/*!
+ * This method checks that this is correctly designed. For example le coordinates are set, nodal connectivity.
+ * When this method returns without throwing any exception, 'this' is expected to be writable, exchangeable and to be 
+ * available for most of algorithm. When a mesh has been constructed from scratch it is a good habits to call this method to check
+ * that all is in order in 'this'.
+ */
 void MEDCouplingUMesh::checkCoherency() const throw(INTERP_KERNEL::Exception)
 {
   if(_mesh_dim<-1)
@@ -887,44 +894,58 @@ void MEDCouplingUMesh::tryToShareSameCoordsPermute(const MEDCouplingPointSet& ot
 }
 
 /*!
- * build a sub part of 'this'. This sub part is defined by the cell ids contained in the array in [start,end).
- * @param start start of array containing the cell ids to keep.
+ * build a sub part of 'this'. This sub part is defined by the cell ids contained in the array in [begin,end).
+ * @param begin begin of array containing the cell ids to keep.
  * @param end end of array of cell ids to keep. \b WARNING end param is \b not included ! Idem STL standard definitions.
  * @param keepCoords that specifies if you want or not to keep coords as this or zip it (see zipCoords)
  */
-MEDCouplingPointSet *MEDCouplingUMesh::buildPartOfMySelf(const int *start, const int *end, bool keepCoords) const
+MEDCouplingPointSet *MEDCouplingUMesh::buildPartOfMySelf(const int *begin, const int *end, bool keepCoords) const
 {
   if(getMeshDimension()!=-1)
     {
-      MEDCouplingUMesh *ret=buildPartOfMySelfKeepCoords(start,end);
+      MEDCouplingUMesh *ret=buildPartOfMySelfKeepCoords(begin,end);
       if(!keepCoords)
         ret->zipCoords();
       return ret;
     }
   else
     {
-      if(end-start!=1)
+      if(end-begin!=1)
         throw INTERP_KERNEL::Exception("-1D mesh has only one cell !");
-      if(start[0]!=0)
+      if(begin[0]!=0)
         throw INTERP_KERNEL::Exception("-1D mesh has only one cell : 0 !");
       incrRef();
       return (MEDCouplingUMesh *)this;
     }
 }
 
-/*!
- * Keeps from 'this' only cells which constituing point id are in the ids specified by ['start','end').
- * The return newly allocated mesh will share the same coordinates as 'this'.
- * Parameter 'fullyIn' specifies if a cell that has part of its nodes in ids array is kept or not.
- * If 'fullyIn' is true only cells whose ids are \b fully contained in ['start','end') tab will be kept.
- */
-MEDCouplingPointSet *MEDCouplingUMesh::buildPartOfMySelfNode(const int *start, const int *end, bool fullyIn) const
+DataArrayInt *MEDCouplingUMesh::getCellIdsFullyIncludedInNodeIds(const int *partBg, const int *partEnd) const
 {
-  std::set<int> fastFinder(start,end);
+  std::vector<int> cellIdsKept;
+  fillCellIdsToKeepFromNodeIds(partBg,partEnd,true,cellIdsKept);
+  DataArrayInt *ret=DataArrayInt::New();
+  ret->alloc(cellIdsKept.size(),1);
+  std::copy(cellIdsKept.begin(),cellIdsKept.end(),ret->getPointer());
+  return ret;
+}
+
+/*!
+ * Keeps from 'this' only cells which constituing point id are in the ids specified by ['begin','end').
+ * The resulting cell ids are stored at the end of the 'cellIdsKept' parameter.
+ * Parameter 'fullyIn' specifies if a cell that has part of its nodes in ids array is kept or not.
+ * If 'fullyIn' is true only cells whose ids are \b fully contained in ['begin','end') tab will be kept.
+ *
+ * @param begin input start of array of node ids.
+ * @param end input end of array of node ids.
+ * @param fullyIn input that specifies if all node ids must be in ['begin','end') array to consider cell to be in.
+ * @param cellIdsKept in/out array where all candidate cell ids are put at the end.
+ */
+void MEDCouplingUMesh::fillCellIdsToKeepFromNodeIds(const int *begin, const int *end, bool fullyIn, std::vector<int>& cellIdsKept) const
+{
+  std::set<int> fastFinder(begin,end);
+  int nbOfCells=getNumberOfCells();
   const int *conn=getNodalConnectivity()->getConstPointer();
   const int *connIndex=getNodalConnectivityIndex()->getConstPointer();
-  int nbOfCells=getNumberOfCells();
-  std::vector<int> cellIdsKept;
   for(int i=0;i<nbOfCells;i++)
     {
       std::set<int> connOfCell(conn+connIndex[i]+1,conn+connIndex[i+1]);
@@ -936,22 +957,34 @@ MEDCouplingPointSet *MEDCouplingUMesh::buildPartOfMySelfNode(const int *start, c
       if(((int)locMerge.size()==refLgth && fullyIn) || (locMerge.size()!=0 && !fullyIn))
         cellIdsKept.push_back(i);
     }
+}
+
+/*!
+ * Keeps from 'this' only cells which constituing point id are in the ids specified by ['begin','end').
+ * The return newly allocated mesh will share the same coordinates as 'this'.
+ * Parameter 'fullyIn' specifies if a cell that has part of its nodes in ids array is kept or not.
+ * If 'fullyIn' is true only cells whose ids are \b fully contained in ['begin','end') tab will be kept.
+ */
+MEDCouplingPointSet *MEDCouplingUMesh::buildPartOfMySelfNode(const int *begin, const int *end, bool fullyIn) const
+{
+  std::vector<int> cellIdsKept;
+  fillCellIdsToKeepFromNodeIds(begin,end,fullyIn,cellIdsKept);
   return buildPartOfMySelf(&cellIdsKept[0],&cellIdsKept[0]+cellIdsKept.size(),true);
 }
 
 /*!
- * Contrary to MEDCouplingUMesh::buildPartOfMySelfNode method this method a mesh with a meshDimension equal to
+ * Contrary to MEDCouplingUMesh::buildPartOfMySelfNode method this method builds a mesh with a meshDimension equal to
  * this->getMeshDimension()-1. The return newly allocated mesh will share the same coordinates as 'this'.
  * Parameter 'fullyIn' specifies if a face that has part of its nodes in ids array is kept or not.
- * If 'fullyIn' is true only faces whose ids are \b fully contained in ['start','end') tab will be kept.
+ * If 'fullyIn' is true only faces whose ids are \b fully contained in ['begin','end') tab will be kept.
  */
-MEDCouplingPointSet *MEDCouplingUMesh::buildFacePartOfMySelfNode(const int *start, const int *end, bool fullyIn) const
+MEDCouplingPointSet *MEDCouplingUMesh::buildFacePartOfMySelfNode(const int *begin, const int *end, bool fullyIn) const
 {
   DataArrayInt *desc,*descIndx,*revDesc,*revDescIndx;
   desc=DataArrayInt::New(); descIndx=DataArrayInt::New(); revDesc=DataArrayInt::New(); revDescIndx=DataArrayInt::New();
   MEDCouplingUMesh *subMesh=buildDescendingConnectivity(desc,descIndx,revDesc,revDescIndx);
   desc->decrRef(); descIndx->decrRef(); revDesc->decrRef(); revDescIndx->decrRef();
-  MEDCouplingUMesh *ret=(MEDCouplingUMesh *)subMesh->buildPartOfMySelfNode(start,end,fullyIn);
+  MEDCouplingUMesh *ret=(MEDCouplingUMesh *)subMesh->buildPartOfMySelfNode(begin,end,fullyIn);
   subMesh->decrRef();
   return ret;
 }
@@ -1506,10 +1539,10 @@ void MEDCouplingUMesh::unserialization(const std::vector<int>& tinyInfo, const D
 
 /*!
  * This is the low algorithm of buildPartOfMySelf. 
- * Keeps from 'this' only cells which constituing point id are in the ids specified by ['start','end').
+ * Keeps from 'this' only cells which constituing point id are in the ids specified by ['begin','end').
  * The return newly allocated mesh will share the same coordinates as 'this'.
  */
-MEDCouplingUMesh *MEDCouplingUMesh::buildPartOfMySelfKeepCoords(const int *start, const int *end) const
+MEDCouplingUMesh *MEDCouplingUMesh::buildPartOfMySelfKeepCoords(const int *begin, const int *end) const
 {
   checkFullyDefined();
   MEDCouplingUMesh *ret=MEDCouplingUMesh::New();
@@ -1526,18 +1559,18 @@ MEDCouplingUMesh *MEDCouplingUMesh::buildPartOfMySelfKeepCoords(const int *start
     ret->setName(getName());
   ret->_mesh_dim=_mesh_dim;
   ret->setCoords(_coords);
-  int nbOfElemsRet=end-start;
+  int nbOfElemsRet=end-begin;
   int *connIndexRet=new int[nbOfElemsRet+1];
   connIndexRet[0]=0;
   const int *conn=_nodal_connec->getConstPointer();
   const int *connIndex=_nodal_connec_index->getConstPointer();
   int newNbring=0;
-  for(const int *work=start;work!=end;work++,newNbring++)
+  for(const int *work=begin;work!=end;work++,newNbring++)
     connIndexRet[newNbring+1]=connIndexRet[newNbring]+connIndex[*work+1]-connIndex[*work];
   int *connRet=new int[connIndexRet[nbOfElemsRet]];
   int *connRetWork=connRet;
   std::set<INTERP_KERNEL::NormalizedCellType> types;
-  for(const int *work=start;work!=end;work++)
+  for(const int *work=begin;work!=end;work++)
     {
       types.insert((INTERP_KERNEL::NormalizedCellType)conn[connIndex[*work]]);
       connRetWork=std::copy(conn+connIndex[*work],conn+connIndex[*work+1],connRetWork);
@@ -1674,15 +1707,15 @@ MEDCouplingFieldDouble *MEDCouplingUMesh::buildOrthogonalField() const
 }
 
 /*!
- * This methods returns a vector newly created field on cells that represents the director vector of each 1D cell of this.
+ * This methods returns a vector newly created field on cells that represents the direction vector of each 1D cell of this.
  * This method is only callable on mesh with meshdim == 1 containing only SEG2.
  */
-MEDCouplingFieldDouble *MEDCouplingUMesh::buildLinearField() const
+MEDCouplingFieldDouble *MEDCouplingUMesh::buildDirectionVectorField() const
 {
    if(getMeshDimension()!=1)
-    throw INTERP_KERNEL::Exception("Expected a umesh with meshDim == 1 for buildLinearField !");
+    throw INTERP_KERNEL::Exception("Expected a umesh with meshDim == 1 for buildDirectionVectorField !");
    if(_types.size()!=1 || *(_types.begin())!=INTERP_KERNEL::NORM_SEG2)
-     throw INTERP_KERNEL::Exception("Expected a umesh with only NORM_SEG2 type of elements for buildLinearField !");
+     throw INTERP_KERNEL::Exception("Expected a umesh with only NORM_SEG2 type of elements for buildDirectionVectorField !");
    MEDCouplingFieldDouble *ret=MEDCouplingFieldDouble::New(ON_CELLS,NO_TIME);
    DataArrayDouble *array=DataArrayDouble::New();
    int nbOfCells=getNumberOfCells();
@@ -1720,7 +1753,7 @@ void MEDCouplingUMesh::project1D(const double *pt, const double *v, double eps, 
      throw INTERP_KERNEL::Exception("Expected a umesh with only NORM_SEG2 type of elements for project1D !");
    if(getSpaceDimension()!=3)
      throw INTERP_KERNEL::Exception("Expected a umesh with spaceDim==3 for project1D !");
-   MEDCouplingFieldDouble *f=buildLinearField();
+   MEDCouplingFieldDouble *f=buildDirectionVectorField();
    const double *fPtr=f->getArray()->getConstPointer();
    double tmp[3];
    for(int i=0;i<getNumberOfCells();i++)
@@ -1866,6 +1899,8 @@ void MEDCouplingUMesh::getCellsContainingPoints(const double *pos, int nbOfPoint
 /*!
  * This method is only available for a mesh with meshDim==2 and spaceDim==2||spaceDim==3.
  * This method returns a vector 'cells' where all detected butterfly cells have been added to cells.
+ * A 2D cell is considered to be butterfly if it exists at least one pair of distinct edges of it that intersect each other
+ * anywhere excepted their extremities. An INTERP_KERNEL::NORM_NORI3 could \b not be butterfly.
  */
 void MEDCouplingUMesh::checkButterflyCells(std::vector<int>& cells) const
 {
@@ -2241,15 +2276,231 @@ void MEDCouplingUMesh::orientCorrectlyPolyhedrons() throw(INTERP_KERNEL::Excepti
  * @param vec output of size at least 3 used to store the normal vector (with norm equal to Area ) of searched plane.
  * @param pos output of size at least 3 used to store a point owned of searched plane.
  */
-void MEDCouplingUMesh::getFastMiddlePlaneOfThis(double *vec, double *pos) const throw(INTERP_KERNEL::Exception)
+void MEDCouplingUMesh::getFastAveragePlaneOfThis(double *vec, double *pos) const throw(INTERP_KERNEL::Exception)
 {
   if(getMeshDimension()!=2 || getSpaceDimension()!=3)
-    throw INTERP_KERNEL::Exception("Invalid mesh to apply getFastMiddlePlaneOfThis on it : must be meshDim==2 and spaceDim==3 !");
+    throw INTERP_KERNEL::Exception("Invalid mesh to apply getFastAveragePlaneOfThis on it : must be meshDim==2 and spaceDim==3 !");
   const int *conn=_nodal_connec->getConstPointer();
   const int *connI=_nodal_connec_index->getConstPointer();
   const double *coordsPtr=_coords->getConstPointer();
   INTERP_KERNEL::areaVectorOfPolygon<int,INTERP_KERNEL::ALL_C_MODE>(conn+1,connI[1]-connI[0]-1,coordsPtr,vec);
   std::copy(coordsPtr+3*conn[1],coordsPtr+3*conn[1]+3,pos);
+}
+
+/*!
+ * The returned newly created field has to be managed by the caller.
+ * This method returns a field on cell with no time lying on 'this'. The meshdimension and spacedimension of this are expected to be both in [2,3]. If not an exception will be thrown.
+ * This method for the moment only deals with NORM_TRI3, NORM_QUAD4 and NORM_TETRA4 geometric types.
+ * If a cell has an another type an exception will be thrown.
+ */
+MEDCouplingFieldDouble *MEDCouplingUMesh::getEdgeRatioField() const throw(INTERP_KERNEL::Exception)
+{
+  checkCoherency();
+  int spaceDim=getSpaceDimension();
+  int meshDim=getMeshDimension();
+  if(spaceDim!=2 && spaceDim!=3)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getEdgeRatioField : SpaceDimension must be equal to 2 or 3 !");
+  if(meshDim!=2 && meshDim!=3)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getEdgeRatioField : MeshDimension must be equal to 2 or 3 !");
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(ON_CELLS,NO_TIME);
+  ret->setMesh(this);
+  int nbOfCells=getNumberOfCells();
+  DataArrayDouble *arr=DataArrayDouble::New();
+  arr->alloc(nbOfCells,1);
+  double *pt=arr->getPointer();
+  ret->setArray(arr);//In case of throw to avoid mem leaks arr will be used after decrRef.
+  arr->decrRef();
+  const int *conn=_nodal_connec->getConstPointer();
+  const int *connI=_nodal_connec_index->getConstPointer();
+  const double *coo=_coords->getConstPointer();
+  double tmp[12];
+  for(int i=0;i<nbOfCells;i++,pt++)
+    {
+      INTERP_KERNEL::NormalizedCellType t=(INTERP_KERNEL::NormalizedCellType)*conn;
+      switch(t)
+        {
+          case INTERP_KERNEL::NORM_TRI3:
+            {
+              fillInCompact3DMode(spaceDim,3,conn+1,coo,tmp);
+              *pt=INTERP_KERNEL::triEdgeRatio(tmp);
+              break;
+            }
+          case INTERP_KERNEL::NORM_QUAD4:
+            {
+              fillInCompact3DMode(spaceDim,4,conn+1,coo,tmp);
+              *pt=INTERP_KERNEL::quadEdgeRatio(tmp);
+              break;
+            }
+          case INTERP_KERNEL::NORM_TETRA4:
+            {
+              fillInCompact3DMode(spaceDim,4,conn+1,coo,tmp);
+              *pt=INTERP_KERNEL::tetraEdgeRatio(tmp);
+              break;
+            }
+        default:
+          throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getEdgeRatioField : A cell with not manged type (NORM_TRI3, NORM_QUAD4 and NORM_TETRA4) has been detected !");
+        }
+      conn+=connI[i+1]-connI[i];
+    }
+  ret->setName("EdgeRatio");
+  ret->incrRef();
+  return ret;
+}
+
+/*!
+ * The returned newly created field has to be managed by the caller.
+ * This method returns a field on cell with no time lying on 'this'. The meshdimension and spacedimension of this are expected to be both in [2,3]. If not an exception will be thrown.
+ * This method for the moment only deals with NORM_TRI3, NORM_QUAD4 and NORM_TETRA4 geometric types.
+ * If a cell has an another type an exception will be thrown.
+ */
+MEDCouplingFieldDouble *MEDCouplingUMesh::getAspectRatioField() const throw(INTERP_KERNEL::Exception)
+{
+  checkCoherency();
+  int spaceDim=getSpaceDimension();
+  int meshDim=getMeshDimension();
+  if(spaceDim!=2 && spaceDim!=3)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getAspectRatioField : SpaceDimension must be equal to 2 or 3 !");
+  if(meshDim!=2 && meshDim!=3)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getAspectRatioField : MeshDimension must be equal to 2 or 3 !");
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(ON_CELLS,NO_TIME);
+  ret->setMesh(this);
+  int nbOfCells=getNumberOfCells();
+  DataArrayDouble *arr=DataArrayDouble::New();
+  arr->alloc(nbOfCells,1);
+  double *pt=arr->getPointer();
+  ret->setArray(arr);//In case of throw to avoid mem leaks arr will be used after decrRef.
+  arr->decrRef();
+  const int *conn=_nodal_connec->getConstPointer();
+  const int *connI=_nodal_connec_index->getConstPointer();
+  const double *coo=_coords->getConstPointer();
+  double tmp[12];
+  for(int i=0;i<nbOfCells;i++,pt++)
+    {
+      INTERP_KERNEL::NormalizedCellType t=(INTERP_KERNEL::NormalizedCellType)*conn;
+      switch(t)
+        {
+          case INTERP_KERNEL::NORM_TRI3:
+            {
+              fillInCompact3DMode(spaceDim,3,conn+1,coo,tmp);
+              *pt=INTERP_KERNEL::triAspectRatio(tmp);
+              break;
+            }
+          case INTERP_KERNEL::NORM_QUAD4:
+            {
+              fillInCompact3DMode(spaceDim,4,conn+1,coo,tmp);
+              *pt=INTERP_KERNEL::quadAspectRatio(tmp);
+              break;
+            }
+          case INTERP_KERNEL::NORM_TETRA4:
+            {
+              fillInCompact3DMode(spaceDim,4,conn+1,coo,tmp);
+              *pt=INTERP_KERNEL::tetraAspectRatio(tmp);
+              break;
+            }
+        default:
+          throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getAspectRatioField : A cell with not manged type (NORM_TRI3, NORM_QUAD4 and NORM_TETRA4) has been detected !");
+        }
+      conn+=connI[i+1]-connI[i];
+    }
+  ret->setName("AspectRatio");
+  ret->incrRef();
+  return ret;
+}
+
+/*!
+ * The returned newly created field has to be managed by the caller.
+ * This method returns a field on cell with no time lying on 'this'. The meshdimension must be equal to 2 and the spacedimension must be equal to 3. If not an exception will be thrown.
+ * This method for the moment only deals with NORM_QUAD4 geometric type.
+ * If a cell has an another type an exception will be thrown.
+ */
+MEDCouplingFieldDouble *MEDCouplingUMesh::getWarpField() const throw(INTERP_KERNEL::Exception)
+{
+  checkCoherency();
+  int spaceDim=getSpaceDimension();
+  int meshDim=getMeshDimension();
+  if(spaceDim!=3)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getWarpField : SpaceDimension must be equal to 3 !");
+  if(meshDim!=2)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getWarpField : MeshDimension must be equal to 2 !");
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(ON_CELLS,NO_TIME);
+  ret->setMesh(this);
+  int nbOfCells=getNumberOfCells();
+  DataArrayDouble *arr=DataArrayDouble::New();
+  arr->alloc(nbOfCells,1);
+  double *pt=arr->getPointer();
+  ret->setArray(arr);//In case of throw to avoid mem leaks arr will be used after decrRef.
+  arr->decrRef();
+  const int *conn=_nodal_connec->getConstPointer();
+  const int *connI=_nodal_connec_index->getConstPointer();
+  const double *coo=_coords->getConstPointer();
+  double tmp[12];
+  for(int i=0;i<nbOfCells;i++,pt++)
+    {
+      INTERP_KERNEL::NormalizedCellType t=(INTERP_KERNEL::NormalizedCellType)*conn;
+      switch(t)
+        {
+          case INTERP_KERNEL::NORM_QUAD4:
+            {
+              fillInCompact3DMode(3,4,conn+1,coo,tmp);
+              *pt=INTERP_KERNEL::quadWarp(tmp);
+              break;
+            }
+        default:
+          throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getWarpField : A cell with not manged type (NORM_QUAD4) has been detected !");
+        }
+      conn+=connI[i+1]-connI[i];
+    }
+  ret->setName("Warp");
+  ret->incrRef();
+  return ret;
+}
+
+/*!
+ * The returned newly created field has to be managed by the caller.
+ * This method returns a field on cell with no time lying on 'this'. The meshdimension must be equal to 2 and the spacedimension must be equal to 3. If not an exception will be thrown.
+ * This method for the moment only deals with NORM_QUAD4 geometric type.
+ * If a cell has an another type an exception will be thrown.
+ */
+MEDCouplingFieldDouble *MEDCouplingUMesh::getSkewField() const throw(INTERP_KERNEL::Exception)
+{
+  checkCoherency();
+  int spaceDim=getSpaceDimension();
+  int meshDim=getMeshDimension();
+  if(spaceDim!=3)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getSkewField : SpaceDimension must be equal to 3 !");
+  if(meshDim!=2)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getSkewField : MeshDimension must be equal to 2 !");
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(ON_CELLS,NO_TIME);
+  ret->setMesh(this);
+  int nbOfCells=getNumberOfCells();
+  DataArrayDouble *arr=DataArrayDouble::New();
+  arr->alloc(nbOfCells,1);
+  double *pt=arr->getPointer();
+  ret->setArray(arr);//In case of throw to avoid mem leaks arr will be used after decrRef.
+  arr->decrRef();
+  const int *conn=_nodal_connec->getConstPointer();
+  const int *connI=_nodal_connec_index->getConstPointer();
+  const double *coo=_coords->getConstPointer();
+  double tmp[12];
+  for(int i=0;i<nbOfCells;i++,pt++)
+    {
+      INTERP_KERNEL::NormalizedCellType t=(INTERP_KERNEL::NormalizedCellType)*conn;
+      switch(t)
+        {
+          case INTERP_KERNEL::NORM_QUAD4:
+            {
+              fillInCompact3DMode(3,4,conn+1,coo,tmp);
+              *pt=INTERP_KERNEL::quadSkew(tmp);
+              break;
+            }
+        default:
+          throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getSkewField : A cell with not manged type (NORM_QUAD4) has been detected !");
+        }
+      conn+=connI[i+1]-connI[i];
+    }
+  ret->setName("Skew");
+  ret->incrRef();
+  return ret;
 }
 
 /*!
@@ -2350,7 +2601,7 @@ bool MEDCouplingUMesh::checkConsecutiveCellTypesAndOrder(const INTERP_KERNEL::No
  * The mesh after this call will pass the test of MEDCouplingUMesh::checkConsecutiveCellTypesAndOrder with the same inputs.
  * The returned array minimizes the permutations that is to say the order of cells inside same geometric type remains the same.
  */
-DataArrayInt *MEDCouplingUMesh::getRenumArrForConsctvCellTypesSpe(const INTERP_KERNEL::NormalizedCellType *orderBg, const INTERP_KERNEL::NormalizedCellType *orderEnd) const
+DataArrayInt *MEDCouplingUMesh::getRenumArrForConsecutiveCellTypesSpec(const INTERP_KERNEL::NormalizedCellType *orderBg, const INTERP_KERNEL::NormalizedCellType *orderEnd) const
 {
   checkFullyDefined();
   int nbOfCells=getNumberOfCells();
@@ -2438,13 +2689,13 @@ std::vector<MEDCouplingUMesh *> MEDCouplingUMesh::splitByType() const
   for(const int *i=connI;i!=connI+nbOfCells;)
     {
       INTERP_KERNEL::NormalizedCellType curType=(INTERP_KERNEL::NormalizedCellType)conn[*i];
-      int startCellId=std::distance(connI,i);
+      int beginCellId=std::distance(connI,i);
       i=std::find_if(i+1,connI+nbOfCells,ParaMEDMEMImpl::ConnReader(conn,(int)curType));
       int endCellId=std::distance(connI,i);
-      int sz=endCellId-startCellId;
+      int sz=endCellId-beginCellId;
       int *cells=new int[sz];
       for(int j=0;j<sz;j++)
-        cells[j]=startCellId+j;
+        cells[j]=beginCellId+j;
       MEDCouplingUMesh *m=(MEDCouplingUMesh *)buildPartOfMySelf(cells,cells+sz,true);
       delete [] cells;
       ret.push_back(m);
@@ -2856,4 +3107,26 @@ void MEDCouplingUMesh::tryToCorrectPolyhedronOrientation(int *begin, int *end, c
           bgFace=endFace+1;
         }
     }
+}
+
+/*!
+ * This method put in zip format into parameter 'zipFrmt' in full interlace mode.
+ * This format is often asked by INTERP_KERNEL algorithms to avoid many indirections into coordinates array.
+ */
+void MEDCouplingUMesh::fillInCompact3DMode(int spaceDim, int nbOfNodesInCell, const int *conn, const double *coo, double *zipFrmt) throw(INTERP_KERNEL::Exception)
+{
+  double *w=zipFrmt;
+  if(spaceDim==3)
+    for(int i=0;i<nbOfNodesInCell;i++)
+      w=std::copy(coo+3*conn[i],coo+3*conn[i]+3,w);
+  else if(spaceDim==2)
+    {
+      for(int i=0;i<nbOfNodesInCell;i++)
+        {
+          w=std::copy(coo+2*conn[i],coo+2*conn[i]+2,w);
+          *w++=0.;
+        }
+    }
+  else
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::fillInCompact3DMode : Invalid spaceDim specified : must be 2 or 3 !");
 }

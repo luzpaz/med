@@ -164,7 +164,7 @@ DataArrayInt *MEDCouplingPointSet::buildPermArrayForMergeNode(int limitNodeId, d
   DataArrayInt *comm,*commI;
   findCommonNodes(limitNodeId,precision,comm,commI);
   int oldNbOfNodes=getNumberOfNodes();
-  DataArrayInt *ret=buildNewNumberingFromCommNodesFrmt(comm,commI,newNbOfNodes);
+  DataArrayInt *ret=buildNewNumberingFromCommonNodesFormat(comm,commI,newNbOfNodes);
   areNodesMerged=(oldNbOfNodes!=newNbOfNodes);
   comm->decrRef();
   commI->decrRef();
@@ -222,8 +222,8 @@ void MEDCouplingPointSet::findCommonNodes(int limitNodeId, double prec, DataArra
  * @param commI in param in the same format than one returned by findCommonNodes method.
  * @return the old to new correspondance array.
  */
-DataArrayInt *MEDCouplingPointSet::buildNewNumberingFromCommNodesFrmt(const DataArrayInt *comm, const DataArrayInt *commIndex,
-                                                                      int& newNbOfNodes) const
+DataArrayInt *MEDCouplingPointSet::buildNewNumberingFromCommonNodesFormat(const DataArrayInt *comm, const DataArrayInt *commIndex,
+                                                                          int& newNbOfNodes) const
 {
   DataArrayInt *ret=DataArrayInt::New();
   int nbNodesOld=getNumberOfNodes();
@@ -693,7 +693,7 @@ MEDCouplingMesh *MEDCouplingPointSet::buildPart(const int *start, const int *end
 /*!
  * This method implements pure virtual method MEDCouplingMesh::buildPartAndReduceNodes.
  * This method build a part of 'this' by simply keeping cells whose ids are in ['start','end') \b and potentially reduces the nodes set
- * behind returned mesh. This cause an overhead but it is more little in memory.
+ * behind returned mesh. This cause an overhead but it is lesser in memory.
  * This method returns an array too. This array allows to the caller to know the mapping between nodeids in 'this' and nodeids in 
  * returned mesh. This is quite usefull for MEDCouplingFieldDouble on nodes for example...
  * The returned mesh has to be managed by the caller.
