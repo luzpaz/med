@@ -149,7 +149,7 @@ FIELD_::FIELD_(const FIELD_ &m)
 
 FIELD_::~FIELD_()
 {
-  MESSAGE_MED("~FIELD_()");
+  MESSAGE_MED("~FIELD_(): name = " << this->getName());
   //if ( _componentsTypes !=NULL)
   //  delete[] _componentsTypes ;
   //if ( _componentsNames !=NULL)

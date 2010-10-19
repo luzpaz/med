@@ -902,7 +902,10 @@ SALOME_TYPES::ListOfLong * MED_i::getFieldIterations(const char* fieldName)
 }
 //=============================================================================
 /*!
- * CORBA: Accessor for a specific field
+ * CORBA: Accessor for a specific field. Note that the values for all
+ * fields are loaded during initialization of this structure
+ * MED_i. Then this function recycles the references to theses
+ * fields, there is no need to matter with the loading of data.
  */
 //=============================================================================
 SALOME_MED::FIELD_ptr MED_i::getField(const char* fieldName, 
@@ -918,16 +921,23 @@ throw (SALOME::SALOME_Exception)
 
         map<string,MAP_IOR_DT_IT_>::const_iterator itFields = _fields.find(fieldName);
 
-        if ( itFields == _fields.end() ) 
+        if ( itFields == _fields.end() ) {
                 THROW_SALOME_CORBA_EXCEPTION("Field not found !", SALOME::INTERNAL_ERROR);
+        }
   
         const MAP_IOR_DT_IT_ & map_dtIt = (*itFields).second;
         MAP_IOR_DT_IT_::const_iterator itMap_dtIt =  map_dtIt.find(dtIt);
   
-        if ( itMap_dtIt == map_dtIt.end() )
+        if ( itMap_dtIt == map_dtIt.end() ) {
                 THROW_SALOME_CORBA_EXCEPTION("Iteration not found !", SALOME::INTERNAL_ERROR);
-  
-        return (*itMap_dtIt).second;
+        }
+
+        SALOME_MED::FIELD_ptr field_ptr = (*itMap_dtIt).second;
+        if ( CORBA::is_nil(field_ptr) ) {
+          THROW_SALOME_CORBA_EXCEPTION("The field servant is nil !", SALOME::INTERNAL_ERROR);
+        }
+
+        return SALOME_MED::FIELD::_duplicate(field_ptr);
 
 }
 

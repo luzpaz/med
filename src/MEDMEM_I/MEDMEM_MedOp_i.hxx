@@ -36,12 +36,17 @@
 #include "MEDMEM_Field.hxx"
 
 #include <string>
+#include <ext/hash_map>
+using namespace __gnu_cxx;
 
 #include <SALOMEconfig.h>
 
 #include "SALOME_GenericObj_i.hh"
 #include CORBA_SERVER_HEADER(MEDOP)
 #include CORBA_SERVER_HEADER(MED)
+
+/*! This map is used for lifecycle management of fields used in this operator */
+typedef hash_map<const char *,FIELD<double>*> FIELDDOUBLE_HashMap;
 
 namespace MEDMEM {
 
@@ -52,8 +57,10 @@ class MEDMEM_I_EXPORT MEDOP_i: public POA_SALOME_MED::MEDOP,
 private :
   MEDMEM::MED * _med;
   MedDataManager * _medDataManager;
+  FIELDDOUBLE_HashMap _fielddouble_map;
 
   MEDMEM::FIELD<double> * _getFieldDouble(SALOME_MED::FIELD_ptr field_ptr);
+  const string _getKeyIdentifier(MEDMEM::FIELD_ * field);
 
 protected:
   

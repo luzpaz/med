@@ -39,6 +39,16 @@
 using namespace std;
 using namespace MEDMEM;
 
+// Template function for type conversions.
+#include <sstream>
+template < class T >
+string ToString(const T &arg)
+{
+  stringstream out;
+  out << arg;
+  return(out.str());
+}
+
 //=============================================================================
 /*!
  * Default constructor
@@ -55,32 +65,9 @@ MEDOP_i::MEDOP_i(MEDMEM::MED * med)
 
 MEDOP_i::~MEDOP_i()
 {
+  delete _medDataManager;
+  // __GBO__: Is the map FIELDDOUBLE_HashMap automatically deleted?
 }
-
-//   // We analyse the mathematical type of values in the field to
-//   // create a "typed" field that can receive the physical data.
-//   med_type_champ type = myFieldDescr->getValueType();
-//     switch (type) {
-//     case MED_EN::MED_INT32 : 
-//       {
-//         FIELD<double> *field = (FIELD<double> *)
-//         break;
-//       }
-
-//     case MED_EN::MED_REEL64: 
-//       {
-//         break;
-//       }
-//     default:
-//       {
-//         break;
-//       }
-//     }
-
-//   }
-  
-//   return myFieldDescr;
-// }
 
 //=============================================================================
 /*!
@@ -103,6 +90,11 @@ CORBA::Long MEDOP_i::test()
   return 1;
 }
 
+/*!
+ * This function retrieves the original MEDMEM::FIELD object embedded
+ * in the servant pointed by the specified field_ptr. This works only
+ * for usage in the container that embed the MED data structure.
+ */
 MEDMEM::FIELD<double> * MEDOP_i::_getFieldDouble(SALOME_MED::FIELD_ptr field_ptr) {
   string name = field_ptr->getName();
   long dt = field_ptr->getOrderNumber();
@@ -112,14 +104,51 @@ MEDMEM::FIELD<double> * MEDOP_i::_getFieldDouble(SALOME_MED::FIELD_ptr field_ptr
   return field;
 }
 
+/*!
+ * This function creates a unique string identifier for the specified
+ * field. For internal usage and for management purpose.
+ */
+const string MEDOP_i::_getKeyIdentifier(MEDMEM::FIELD_ * field) {
+  string key = field->getName() + "_" +
+    ToString(field->getOrderNumber()) + "_" +
+    ToString(field->getIterationNumber());
+  return key;
+}
 
+/*!
+ * This function realizes the physical addition of the MEDMEM::FIELD
+ * objects embedded in the servants specified by there CORBA
+ * pointers. It returns a pointer to the servant that embeds the
+ * resulting MEDMEM::FIELD. Note that the servant of a FIELD
+ * containing values is an instance of the class
+ * FIELDTEMPLATE_I<double/int>.
+ */
 SALOME_MED::FIELD_ptr MEDOP_i::addition(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr) {
   MEDMEM::FIELD<double> * f1 = _getFieldDouble(f1_ptr);
   MEDMEM::FIELD<double> * f2 = _getFieldDouble(f2_ptr);
+  
+  FIELD<double> * field_addition = FIELD<double>::add(*f1, *f2);
+  // Note that a "new" is done behind the scene of this addition. Then
+  // the life cycle of this object has to be managed by the
+  // application.
+  
+  //
+  // The field is automatically added to the med data structure so
+  // that it could be reused in a future operation (in particular for
+  // a manipulation that combine several operation as "r = f1+f2+f3",
+  // the operator will try to make the addition f1+f2 and then
+  // resultof(f1+f2) + f3. This last operation will fail if the field
+  // resultof(f1+f2) is not in the med data structure)
+  //
+  _med->addField(field_addition);
 
-  FIELD<double> field_addition = *f1 + *f2;
-  field_addition.setName("toto");
+  //
+  // We keep a trace of this object in a map whose key is a global
+  // name including the name of the field and the order and iteration
+  // numbers, so that we can manage the life cycle.
+  //string key = this->_getKeyIdentifier(&field_addition);
+  //_fielddouble_map[key.c_str()] = field_addition;
 
-  FIELDTEMPLATE_I<double> *field_addition_i = new FIELDTEMPLATE_I<double>(&field_addition);
+  FIELDTEMPLATE_I<double> *field_addition_i = new FIELDTEMPLATE_I<double>(field_addition);
   return field_addition_i->_this();
 }

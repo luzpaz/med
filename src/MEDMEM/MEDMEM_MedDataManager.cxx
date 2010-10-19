@@ -39,7 +39,7 @@ MedDataManager::MedDataManager(MED * med) {
 }
 
 
-/**
+/*!
  * This function returns the specified field and manage the loading of
  * physical data if needed. This required the isRead() improvment on
  * classe FIELD_ of MEDMEM (CVS branch BR_medop).

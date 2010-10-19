@@ -44,6 +44,7 @@
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Family.hxx"
 #include "MEDMEM_Med.hxx"
+#include "MEDMEM_MedDataManager.hxx"
 #include "MEDMEM_Unit.hxx"
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_FieldConvert.hxx"
@@ -752,6 +753,8 @@ public:
                 const std::string& driverName="Default Field Name",
 		med_mode_acces access=RDWR);
 
+  bool isRead();
+
   %extend {
     %newobject getSupportAndOwner();
     SUPPORT * getSupportAndOwner()
@@ -1110,6 +1113,8 @@ public :
   void rmDriver(int index=0);
 
   void read(int index=0);
+
+  bool isRead(int index=0);
 
   int getSpaceDimension();
 
@@ -1726,6 +1731,32 @@ class MED
 	return self->getSupport(string(meshName),entity);
       }
   }
+};
+
+
+class MedDataManager
+{
+ public:
+  ~MedDataManager();
+  void printFieldDouble(FIELD<double,FullInterlace> * field);
+
+  %extend {
+    MedDataManager(char * fileName)
+      {
+	return new MedDataManager(string(fileName));
+      }
+    MedDataManager(MED * med)
+      {
+        return new MedDataManager(med);
+      }
+
+    %newobject getFieldDouble(const char * fieldName, const int dt, const int it);
+    FIELD<double, FullInterlace> * getFieldDouble(const char * fieldName, const int dt, const int it)
+      {
+	return (FIELD<double, FullInterlace> *) self->getFieldDouble(string(fieldName), dt, it);
+      }
+  }
+
 };
 
 /*
