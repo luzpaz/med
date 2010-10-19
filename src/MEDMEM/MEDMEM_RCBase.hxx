@@ -39,6 +39,22 @@ namespace MEDMEM {
     mutable int _cnt;
   };
 
+  /*!
+   * \brief Class calling RCBASE::removeReference() at distruction.
+   * Useful to avoid memory leaks in case of exceptions;
+   * helps not to forget to delete anything, etc.
+   */
+  class MEDMEM_EXPORT AutoDeref
+  {
+  public:
+    AutoDeref(const RCBASE* obj);
+    ~AutoDeref();
+  private:
+    const RCBASE* _obj;
+    AutoDeref(const AutoDeref&);
+    AutoDeref& operator=(const AutoDeref&);
+  };    
+
 }
 
 #endif

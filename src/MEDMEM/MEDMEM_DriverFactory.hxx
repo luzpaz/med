@@ -35,22 +35,11 @@
 
 namespace MEDMEM {
 
-  class MESH;
-  class MED;
+  class GMESH;
+  //class MED;
   class GENDRIVER;
 
   namespace DRIVERFACTORY {
-
-    /*
-      definition of static variable across the Med Memory of a Med File version
-      for the writing of Med File set to V22
-    */
-
-    MEDMEM_EXPORT extern MED_EN::medFileVersion globalMedFileVersionForWriting;
-
-    MEDMEM_EXPORT MED_EN::medFileVersion getMedFileVersionForWriting();
-
-    MEDMEM_EXPORT void setMedFileVersionForWriting(MED_EN::medFileVersion version);
 
     MEDMEM_EXPORT extern bool globalVtkBinaryFormatForWriting;
 
@@ -64,7 +53,7 @@ namespace MEDMEM {
 
     MEDMEM_EXPORT GENDRIVER * buildDriverForMesh(driverTypes driverType,
                                                  const std::string & fileName,
-                                                 MESH *mesh,const string &  driverName,
+                                                 GMESH *mesh,const string &  driverName,
                                                  MED_EN::med_mode_acces access);
 
     template<class T, class INTERLACING_TAG>
@@ -72,22 +61,15 @@ namespace MEDMEM {
                                     const std::string & fileName,
                                     FIELD<T,INTERLACING_TAG> *fielde,
                                     MED_EN::med_mode_acces access);
-    MEDMEM_EXPORT GENDRIVER * buildDriverForMed(driverTypes driverType,
-                                                const std::string & fileName,
-                                                MED *mede,
-                                                MED_EN::med_mode_acces access);
-    MEDMEM_EXPORT GENDRIVER * buildMedDriverFromFile(const string & fileName,
-                                                     MED * const ptrMed,
-                                                     MED_EN::med_mode_acces access);
     MEDMEM_EXPORT GENDRIVER * buildMeshDriverFromFile(const string & fileName,
-                                                      MESH * ptrMesh,
+                                                      GMESH * ptrMesh,
                                                       MED_EN::med_mode_acces access);
     template<class T, class INTERLACING_TAG>
     GENDRIVER * buildFieldDriverFromFile(const string & fileName,
                                          FIELD<T,INTERLACING_TAG> * ptrField,
                                          MED_EN::med_mode_acces access);
     MEDMEM_EXPORT GENDRIVER * buildConcreteMedDriverForMesh(const std::string & fileName,
-                                                            MESH *mesh,
+                                                            GMESH *mesh,
                                                             const string & driverName,
                                                             MED_EN::med_mode_acces access,
                                                             MED_EN::medFileVersion version);
@@ -101,8 +83,6 @@ namespace MEDMEM {
 
 #include "MEDMEM_VtkFieldDriver.hxx"
 #include "MEDMEM_MedFieldDriver.hxx"
-#include "MEDMEM_MedFieldDriver21.hxx"
-#include "MEDMEM_MedFieldDriver22.hxx"
 #include "MEDMEM_AsciiFieldDriver.hxx"
 #include "MEDMEM_EnsightFieldDriver.hxx"
 
@@ -217,7 +197,7 @@ namespace MEDMEM {
                                                       FIELD<T,INTERLACING_TAG> * ptrField,
                                                       MED_EN::med_mode_acces access)
   {
-    MED_EN::medFileVersion version;
+    MED_EN::medFileVersion version = MED_EN::V22;
 
     try
       {
@@ -225,39 +205,39 @@ namespace MEDMEM {
       }
     catch (MEDEXCEPTION & )
       {
-        version = DRIVERFACTORY::globalMedFileVersionForWriting;
       }
 
     MESSAGE_MED("buildFieldDriverFromFile version of the file " << version);
 
-    GENDRIVER * driver;
+    GENDRIVER * driver=0;
 
     switch(access)
       {
       case MED_EN::RDONLY : {
         if (version == MED_EN::V21)
-          driver = new MED_FIELD_RDONLY_DRIVER21<T>(fileName,ptrField);
+          throw MED_EXCEPTION ("med-2.1 files are no more supported");
         else if (version == MED_EN::V22)
-          driver = new MED_FIELD_RDONLY_DRIVER22<T>(fileName,ptrField);
+          driver = new MED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField);
         return driver;
       }
       case MED_EN::WRONLY : {
         if (version == MED_EN::V21)
-          driver = new MED_FIELD_WRONLY_DRIVER21<T>(fileName,ptrField);
+          throw MED_EXCEPTION ("med-2.1 files are no more supported");
         else if (version == MED_EN::V22)
-          driver = new MED_FIELD_WRONLY_DRIVER22<T>(fileName,ptrField);
+          driver = new MED_FIELD_WRONLY_DRIVER<T>(fileName,ptrField);
         return driver;
       }
       case MED_EN::RDWR : {
         if (version == MED_EN::V21)
-          driver = new MED_FIELD_RDWR_DRIVER21<T>(fileName,ptrField);
+          throw MED_EXCEPTION ("med-2.1 files are no more supported");
         else if (version == MED_EN::V22)
-          driver = new MED_FIELD_RDWR_DRIVER22<T>(fileName,ptrField);
+          driver = new MED_FIELD_RDWR_DRIVER<T>(fileName,ptrField);
         return driver;
       }
       default:
         throw MED_EXCEPTION ("access type has not been properly specified to the method");
       }
+    return driver;
   }
 
   template<class T, class INTERLACING_TAG>
@@ -269,34 +249,29 @@ namespace MEDMEM {
 
     MESSAGE_MED("buildConcreteMedDriverForField version of the file " << version);
 
-    GENDRIVER * driver;
+    if (version == MED_EN::V21)
+      throw MED_EXCEPTION ("med-2.1 files are no more supported");
+
+    GENDRIVER * driver=0;
 
     switch(access)
       {
       case MED_EN::RDONLY : {
-        if (version == MED_EN::V21)
-          driver = new MED_FIELD_RDONLY_DRIVER21<T>(fileName,ptrField);
-        else if (version == MED_EN::V22)
-          driver = new MED_FIELD_RDONLY_DRIVER22<T>(fileName,ptrField);
+        driver = new MED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField);
         return driver;
       }
       case MED_EN::WRONLY : {
-        if (version == MED_EN::V21)
-          driver = new MED_FIELD_WRONLY_DRIVER21<T>(fileName,ptrField);
-        else if (version == MED_EN::V22)
-          driver = new MED_FIELD_WRONLY_DRIVER22<T>(fileName,ptrField);
+        driver = new MED_FIELD_WRONLY_DRIVER<T>(fileName,ptrField);
         return driver;
       }
       case MED_EN::RDWR : {
-        if (version == MED_EN::V21)
-          driver = new MED_FIELD_RDWR_DRIVER21<T>(fileName,ptrField);
-        else if (version == MED_EN::V22)
-          driver = new MED_FIELD_RDWR_DRIVER22<T>(fileName,ptrField);
+        driver = new MED_FIELD_RDWR_DRIVER<T>(fileName,ptrField);
         return driver;
       }
       default:
         throw MED_EXCEPTION ("access type has not been properly specified to the method");
       }
+    return driver;
   }
 }
 

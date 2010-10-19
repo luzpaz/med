@@ -524,7 +524,7 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
       // store values
       const std::vector< T > & values = comp_values[ i_comp_tot++ ];
       bool oneValue = ( values.size() == 1 );
-      ASSERT_MED( oneValue || values.size() == nb_supp_elems * nb_gauss );
+      ASSERT_MED( oneValue || (int)values.size() == nb_supp_elems * nb_gauss );
       for ( int k = 0; k < nb_supp_elems; ++k )
       {
         const T& val = oneValue ? values[ 0 ] : values[ k * elem_step ];

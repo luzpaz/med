@@ -39,8 +39,8 @@ namespace MEDMEM {
 
 // avoid coping sortedNodeIDs
 _maille::_maille(const _maille& ma)
-  : sommets(ma.sommets), geometricType(ma.geometricType), _ordre(ma._ordre),
-    reverse(ma.reverse), sortedNodeIDs(0)
+  : sommets(ma.sommets), geometricType(ma.geometricType), 
+    reverse(ma.reverse), sortedNodeIDs(0), _ordre(ma._ordre)
 {
 }
 
@@ -108,8 +108,8 @@ const int* _maille::getSortedNodes() const
 
 _link _maille::link(int i) const
 {
-  ASSERT_MED ( i >= 0 && i < sommets.size() );
-  int i2 = ( i + 1 == sommets.size() ) ? 0 : i + 1;
+  ASSERT_MED ( i >= 0 && i < (int)sommets.size() );
+  int i2 = ( i + 1 == (int)sommets.size() ) ? 0 : i + 1;
   if ( reverse )
     return make_pair( sommets[i2]->first, sommets[i]->first );
   else
@@ -144,7 +144,7 @@ MED_EN::medEntityMesh _maille::getEntity(const int meshDimension) const throw (M
 return entity;
 
 //END_OF_MED(LOC);
-};
+}
 
 void _maillageByDimIterator::init(const int dim, const bool convertPoly )
 {
@@ -159,12 +159,12 @@ std::ostream& operator << (std::ostream& os, const _maille& ma)
 {
     os << "maille " << ma.ordre() << " (" << ma.geometricType << ") : < ";
     os << ma.nodeNum(0);
-    for( int i=1; i!=ma.sommets.size(); ++i)
+    for( unsigned i=1; i!=ma.sommets.size(); ++i)
         os << ", " << ma.nodeNum( i );
     os << " > sortedNodeIDs: ";
     if ( ma.sortedNodeIDs ) {
       os << "< ";
-      for( int i=0; i!=ma.sommets.size(); ++i)
+      for( unsigned i=0; i!=ma.sommets.size(); ++i)
         os << ( i ? ", " : "" ) << ma.sortedNodeIDs[ i ];
       os << " >";
     }
@@ -454,7 +454,7 @@ void _intermediateMED::numerotationMaillage()
         if ( prevNbElems != 0 ) {
           if ( minOrdre == 1 )
             renumEntity = true;
-          else if ( prevNbElems+1 != minOrdre )
+          else if ( prevNbElems+1 != (int)minOrdre )
             ok = false;
         }
         prevNbElems += typeSize;
@@ -559,8 +559,6 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
   // renumerote les points de 1 a n (pour le cas ou certains points ne sont pas presents dans le maillage d'origine)
   numerotationPoints();
 
-  // STANDARD types connectivity
-
   // loop on entities
   for ( int dim = 0; dim <= 3; ++dim )
   {
@@ -583,7 +581,7 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
     // in this case we store POINT1 elems as MED_NODE and
     // elems of all the rest types as MED_CELL
     int iterDim = hasMixedCells ? -1 : dim;
-    _maillageByDimIterator entityMailles( *this, iterDim );
+    _maillageByDimIterator entityMailles( *this, iterDim, /*convertPoly=*/true );
 
     // count nb of types and nb mailles of each type
     int dimension=0;
@@ -597,7 +595,7 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
     else {
       while ( entityMailles.nextType() )
       {
-        if ( entityMailles.dim() > 3 ) break; // ignore poly
+        //if ( entityMailles.dim() > 3 ) break; // ignore poly
 
         dimension = entityMailles.dim();
         if ( dimension == 0 ) continue; // if hasMixedCells, iterator returns all types
@@ -626,33 +624,109 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
     {
       set<_maille> & typeMailles = maillageByType[ types[k] ];
       i = typeMailles.begin(), iEnd = typeMailles.end();
-      // copie des sommets dans connectivity et set dans Connectivity
-      int nbSommetsParMaille = i->sommets.size();
       int nbMailles = count[k+1]-count[k];
-      int nbSommets = nbMailles * nbSommetsParMaille;
-      int* connectivity = new int[ nbSommets ];
-      if ( entity==MED_NODE ) {
-        for (int l=0; l!=nbSommets; ++l) {
-          connectivity[l] = l+1;
+      int* connectivity = 0, *index = 0;
+
+      switch ( types[k] )
+      {
+      case MED_POLYGON:
+        {
+          // put polygones in order of increasing number
+          vector<const _maille*> orderedPoly( nbMailles );
+          for ( ; i != iEnd; ++i )
+            if ( !i->isMerged() )
+              orderedPoly[ i->ordre() - prevNbElems ] = &(*i);
+
+          // make index
+          int* polyIndex = index = new int[ nbMailles + 1 ];
+          vector<const _maille*>::iterator poly = orderedPoly.begin(), polyEnd = orderedPoly.end();
+          for ( *polyIndex++ = 1; polyIndex < index+nbMailles+1; ++poly, ++polyIndex)
+            *polyIndex = polyIndex[-1] + (*poly)->sommets.size();
+
+          // make connectivity
+          int nbNodes = polyIndex[-1];
+          int* conn = connectivity = new int[ nbNodes ];
+          for ( poly = orderedPoly.begin(); poly != polyEnd; ++poly) {
+            for ( int j = 0, nbNodes = (*poly)->sommets.size(); j < nbNodes; ++j )
+              *conn++ = (*poly)->nodeNum( j );
+          }
+          break;
+        }
+
+      case MED_POLYHEDRA:
+        {
+          if ( typeMailles.size() != polyherdalNbFaceNodes.size() )
+            throw MEDEXCEPTION (LOCALIZED(STRING(LOC) << "Missing info on polyhedron faces"));
+
+          typedef TPolyherdalNbFaceNodes::iterator TPolyFaNoIter;
+          TPolyFaNoIter polyFaNo, polyFaNoEnd = polyherdalNbFaceNodes.end();
+
+          // put poly's in order of increasing number and count size of connectivity
+          vector<TPolyFaNoIter> orderedPolyFaNo( nbMailles );
+          int connSize = 0;
+          for ( polyFaNo = polyherdalNbFaceNodes.begin(); polyFaNo != polyFaNoEnd; ++polyFaNo )
+            if ( !polyFaNo->first->isMerged() )
+            {
+              orderedPolyFaNo[ polyFaNo->first->ordre() - prevNbElems ] = polyFaNo;
+              connSize += polyFaNo->first->sommets.size() + polyFaNo->second.size() - 1;
+            }
+          vector<TPolyFaNoIter>::iterator pfnIter, pfnEnd = orderedPolyFaNo.end();
+
+          // make index and connectivity
+          int* conn = connectivity = new int[ connSize ];
+          int* ind  = index        = new int[ nbMailles+1 ];
+          *ind++ = 1;
+          for ( pfnIter = orderedPolyFaNo.begin(); pfnIter != pfnEnd; ++pfnIter)
+          {
+            const _maille * poly = (*pfnIter)->first;
+            const vector<int> & nbFaceNodes = (*pfnIter)->second;
+            int nbNodes = 0;
+            for ( unsigned iFace = 0; iFace < nbFaceNodes.size(); ++iFace )
+            {
+              for ( int j = 0, nbFNodes = nbFaceNodes[iFace]; j < nbFNodes; ++j )
+                *conn++ = poly->nodeNum( nbNodes++ );
+              *conn++ = -1;
+            }
+            conn--;
+            *ind = ind[-1] + nbNodes;
+            ++ind;
+          }
+          break;
+        }
+
+      default: // CLASSIC TYPES
+
+        // copie des sommets dans connectivity et set dans Connectivity
+        int nbSommetsParMaille = i->sommets.size();
+        int nbSommets = nbMailles * nbSommetsParMaille;
+        connectivity = new int[ nbSommets ];
+        if ( entity==MED_NODE )
+        {
+          for (int l=0; l!=nbSommets; ++l)
+            connectivity[l] = l+1;
+        }
+        else
+        {
+          for ( ; i != iEnd; ++i ) { // loop on elements of geom type
+            if ( i->isMerged() )
+              continue;
+            int* mailleConn = connectivity + nbSommetsParMaille * ( i->ordre() - prevNbElems );
+            if ( i->reverse )
+              for ( int n=nbSommetsParMaille-1; n!=-1; --n)
+                *mailleConn++ = i->nodeNum( n );
+            else
+              for ( int n=0; n != nbSommetsParMaille; ++n)
+                *mailleConn++ = i->nodeNum( n );
+          }
+          // DO NOT ERASE, maillage will be used while fields construction
+          //maillage.erase(j);    ; // dangereux, mais optimise la memoire consommee!
         }
       }
-      else {
-        for ( ; i != iEnd; ++i ) { // loop on elements of geom type
-          if ( i->isMerged() )
-            continue;
-          int* mailleConn = connectivity + nbSommetsParMaille * ( i->ordre() - prevNbElems );
-          if ( i->reverse )
-            for ( int n=nbSommetsParMaille-1; n!=-1; --n)
-              *mailleConn++ = i->nodeNum( n );
-          else
-            for ( int n=0; n != nbSommetsParMaille; ++n)
-              *mailleConn++ = i->nodeNum( n );
-        }
-        // DO NOT ERASE, maillage will be used while fields construction
-        //maillage.erase(j);    ; // dangereux, mais optimise la mémoire consommée!
-      }
-      Connectivity->setNodal (connectivity, entity, types[k]);
+
+      Connectivity->setNodal (connectivity, entity, types[k], index);
       delete [] connectivity;
+      delete [] index; index = 0;
+
       prevNbElems += nbMailles;
     }
 
@@ -663,116 +737,6 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
 
     if ( entity == MED_CELL )
       break; // necessary if hasMixedCells
-  }
-
-  // POLYGONAL connectivity
-
-  set<_maille > & polygones = maillageByType[ MED_POLYGON ];
-  if ( !polygones.empty() )
-  {
-    // create connectivity if necessary
-    entity = ( meshDim == 2 ) ? MED_CELL : MED_FACE;
-    if ( !Connectivity || Connectivity->getEntity() > entity ) {
-      Connectivity = new CONNECTIVITY ( 0, entity );
-      Connectivity->setEntityDimension( 2 );
-      Connectivity->setNumberOfNodes  ( numberOfNodes );
-      if ( Constituent )
-        Connectivity->setConstituent (Constituent);
-      Constituent = Connectivity;
-    }
-
-    // put polygones in order of increasing number
-    int numShift = 1 + Connectivity->getNumberOf( entity, MED_ALL_ELEMENTS );
-    int nbPoly = polygones.size() - nbMerged( MED_POLYGON );
-    vector<const _maille*> orderedPoly( nbPoly );
-    for ( i = polygones.begin(), iEnd = polygones.end(); i != iEnd; ++i )
-      if ( !i->isMerged() )
-        orderedPoly[ i->ordre() - numShift ] = &(*i);
-
-    // make index
-    vector<int> polyIndex;
-    polyIndex.reserve( nbPoly + 1 );
-    vector<const _maille*>::iterator poly = orderedPoly.begin(), polyEnd = orderedPoly.end();
-    for ( polyIndex.push_back( 1 ); poly != polyEnd; ++poly)
-      polyIndex.push_back( polyIndex.back() + (*poly)->sommets.size() );
-
-    // make connectivity
-    int nbNodes = polyIndex.back() - 1;
-    vector<int> polyConn( nbNodes );
-    vector<int>::iterator conn = polyConn.begin();
-    for ( poly = orderedPoly.begin(); poly != polyEnd; ++poly) {
-      for ( int j = 0, nbNodes = (*poly)->sommets.size(); j < nbNodes; ++j )
-        *conn++ = (*poly)->nodeNum( j );
-    }
-    Connectivity->setPolygonsConnectivity(MED_NODAL, entity,
-                                          &polyConn[0], &polyIndex[0],
-                                          polyConn.size(), nbPoly );
-  }
-
-  // POLYHEDRAL connectivity
-
-  set<_maille > & pHedra = maillageByType[ MED_POLYHEDRA ];
-  if ( !pHedra.empty() )
-  {
-    if ( pHedra.size() != polyherdalNbFaceNodes.size() )
-      throw MEDEXCEPTION (LOCALIZED(STRING(LOC) << "Missing info on polyhedron faces"));
-
-    // create connectivity if necessary
-    entity = MED_CELL;
-    if ( !Connectivity || Connectivity->getEntity() != entity ) {
-      Connectivity = new CONNECTIVITY ( 0, entity );
-      Connectivity->setEntityDimension( 3 );
-      Connectivity->setNumberOfNodes  ( numberOfNodes );
-      if ( Constituent )
-        Connectivity->setConstituent (Constituent);
-    }
-    typedef TPolyherdalNbFaceNodes::iterator TPolyFaNoIter;
-    TPolyFaNoIter polyFaNo, polyFaNoEnd = polyherdalNbFaceNodes.end();
-
-    // put poly's in order of increasing number
-    int numShift = 1 + Connectivity->getNumberOf( entity, MED_ALL_ELEMENTS );
-    int nbPoly = pHedra.size() - nbMerged( MED_POLYHEDRA );
-    vector<TPolyFaNoIter> orderedPolyFaNo( nbPoly );
-    for ( polyFaNo = polyherdalNbFaceNodes.begin(); polyFaNo != polyFaNoEnd; ++polyFaNo )
-      if ( !polyFaNo->first->isMerged() )
-        orderedPolyFaNo[ polyFaNo->first->ordre() - numShift ] = polyFaNo;
-
-    vector<TPolyFaNoIter>::iterator pfnIter, pfnEnd = orderedPolyFaNo.end();
-
-    // make index pointing to faces of a polyhedron
-    vector<int> polyIndex;
-    polyIndex.reserve( nbPoly + 1 );
-    polyIndex.push_back( 1 );
-    for ( pfnIter = orderedPolyFaNo.begin(); pfnIter != pfnEnd; ++pfnIter) {
-      int nbFaces = (*pfnIter)->second.size();
-      polyIndex.push_back( polyIndex.back() + nbFaces );
-    }
-
-    // make face index pointing to nodes of a face
-    int nbFaces = polyIndex.back() - 1;
-    vector<int> faceIndex;
-    faceIndex.reserve( polyIndex.back() );
-    faceIndex.push_back( 1 );
-    for ( pfnIter = orderedPolyFaNo.begin(); pfnIter != pfnEnd; ++pfnIter) {
-      vector<int> & faceNodes = (*pfnIter)->second;
-      vector<int>::iterator nbNodes = faceNodes.begin(), nbEnd = faceNodes.end();
-      for ( ; nbNodes != nbEnd; ++nbNodes )
-        faceIndex.push_back( faceIndex.back() + *nbNodes );
-    }
-
-    // make connectivity
-    int nbNodes = faceIndex.back() - 1;
-    vector<int> polyConn( nbNodes );
-    vector<int>::iterator conn = polyConn.begin();
-    for ( pfnIter = orderedPolyFaNo.begin(); pfnIter != pfnEnd; ++pfnIter) {
-      const _maille * poly = (*pfnIter)->first;
-      for ( int j = 0, nbNodes = poly->sommets.size(); j < nbNodes; ++j )
-        *conn++ = poly->nodeNum( j );
-    }
-    Connectivity->setPolyhedronConnectivity(MED_NODAL,
-                                            &polyConn[0], &polyIndex[0],
-                                            polyConn.size(), nbPoly,
-                                            &faceIndex[0], nbFaces );
   }
 
   END_OF_MED(LOC);
@@ -846,7 +810,7 @@ void _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
             mailleSet.insert( *maIt );
         }
       }
-      if ( nb_elem != mailleSet.size() ) { // Self intersecting compound group
+      if ( nb_elem != (int)mailleSet.size() ) { // Self intersecting compound group
         isSelfIntersect = true;
         INFOS_MED("Self intersecting group: " << i << " <" << grp.nom << ">"
               << ", mailleSet.size = " << mailleSet.size() << ", sum nb elems = " << nb_elem);
@@ -863,7 +827,7 @@ void _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
           std::set<int> sub_grps;
           for ( fIt = fields.begin(); fIt != fields.end(); ++fIt ) {
             _fieldBase * field = (*fIt);
-            if ( field->_group_id == i ) {
+            if ( field->_group_id == (int)i ) {
               field->_group_id = -1; // -> a field by support
               field->getGroupIds( sub_grps, false );
             }
@@ -912,7 +876,7 @@ void _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
         if ( allMailles.dim() > 0 )
           totalNbElements += allMailles.sizeWithoutMerged();
     }
-    const bool isOnAll = ( mailleSet.size() == totalNbElements );
+    const bool isOnAll = ((int) mailleSet.size() == totalNbElements );
 
     // if !isOnAll, build a map _maille::ordre() -> index in GROUP.getNumber(MED_ALL_ELEMENTS).
     // It is used while fields building.
@@ -994,7 +958,8 @@ void _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     //new_group->setTotalNumberOfElements(mailleSet.size());
     new_group->setName(grp.nom);
     new_group->setMesh(_ptrMesh);
-    _ptrMesh->removeReference();
+    if ( _ptrMesh )
+      _ptrMesh->removeReference();
     new_group->setNumberOfGeometricType(nb_geometric_types);
     new_group->setGeometricType(tab_types_geometriques);
     new_group->setNumberOfElements(tab_nombres_elements);

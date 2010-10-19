@@ -90,29 +90,41 @@ PORFLOW_MESH_DRIVER::PORFLOW_MESH_DRIVER():
 }
 
 PORFLOW_MESH_DRIVER::PORFLOW_MESH_DRIVER(const string & fileName,
-                                   MESH * ptrMesh,
-                                   MED_EN::med_mode_acces accessMode): 
+                                         GMESH *        ptrMesh,
+                                         MED_EN::med_mode_acces accessMode): 
   GENDRIVER(fileName, accessMode, PORFLOW_DRIVER),
-  _ptrMesh(ptrMesh)
+  _ptrMesh(0)
 {
-    // mesh name construction from fileName
-    const string ext=".inp"; // expected extension
-    string::size_type pos=fileName.find(ext,0);
-    string::size_type pos1=fileName.rfind('/');
+  if (ptrMesh)
+    _ptrMesh = const_cast<MESH*>( ptrMesh->convertInMESH() );
+  // mesh name construction from fileName
+  const string ext=".inp"; // expected extension
+  string::size_type pos=fileName.find(ext,0);
+  string::size_type pos1=fileName.rfind('/');
+#ifdef WNT
+  if (pos1 == string::npos ) pos1=fileName.rfind('\\');
+#endif
+  if (pos1 != string::npos )
     _meshName = string(fileName,pos1+1,pos-pos1-1); //get rid of directory & extension
-    SCRUTE_MED(_meshName);
+  else
+    _meshName = string(fileName,0,pos); //get rid of directory & extension
+  SCRUTE_MED(_meshName);
 }
-  
+
 PORFLOW_MESH_DRIVER::PORFLOW_MESH_DRIVER(const PORFLOW_MESH_DRIVER & driver): 
   GENDRIVER(driver),
   _ptrMesh(driver._ptrMesh),
   // A VOIR _medIdt(MED_INVALID), 
   _meshName(driver._meshName)
 {
+  if (_ptrMesh)
+    _ptrMesh->addReference();
 }
 
 PORFLOW_MESH_DRIVER::~PORFLOW_MESH_DRIVER()
 {
+  if (_ptrMesh)
+    _ptrMesh->removeReference();
 }
 
 void PORFLOW_MESH_DRIVER::open()
@@ -147,8 +159,8 @@ void PORFLOW_MESH_DRIVER::close()
   END_OF_MED(LOC);
 }
 
-void    PORFLOW_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; };
-string  PORFLOW_MESH_DRIVER::getMeshName() const { return _meshName; };
+void    PORFLOW_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; }
+string  PORFLOW_MESH_DRIVER::getMeshName() const { return _meshName; }
 
 
 //---------------------------------- RDONLY PART -------------------------------------------------------------
@@ -157,10 +169,9 @@ PORFLOW_MESH_RDONLY_DRIVER::PORFLOW_MESH_RDONLY_DRIVER(): PORFLOW_MESH_DRIVER()
 {
 }
   
-PORFLOW_MESH_RDONLY_DRIVER::PORFLOW_MESH_RDONLY_DRIVER(const string & fileName,
-                                                 MESH * ptrMesh):
+PORFLOW_MESH_RDONLY_DRIVER::PORFLOW_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh):
   PORFLOW_MESH_DRIVER(fileName,ptrMesh,RDONLY)
-{ 
+{
   MESSAGE_MED("PORFLOW_MESH_RDONLY_DRIVER::PORFLOW_MESH_RDONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
   
@@ -274,7 +285,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::readPorflowCoordinateFile(const string & coorFi
         buf >> node.number;
         if (!buf) // for spaces at the end of the file
           break;
-        for (unsigned i=0; i!=space_dimension; ++i)
+        for (int i=0; i!=space_dimension; ++i)
           buf >> node.coord[i];
         medi.points.insert(make_pair(node.number,node));
       }
@@ -375,6 +386,9 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
     // the directory name will be used to locate the files included in _fileName.
     string dirName;
     string::size_type pos=_fileName.rfind('/');
+#ifdef WNT
+    if (pos == string::npos ) pos=_fileName.rfind('\\');
+#endif
     if (pos != string::npos )
         dirName=string(_fileName, 0, pos+1);
 
@@ -584,7 +598,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
     //     - in the PAIR case, we have to create the corresponding 2D/1D faces
     // scan groups
     //for( std::vector<_groupe>::iterator i=medi.groupes.begin(); i!=medi.groupes.end(); ++i)
-    for( int i=0; i!=medi.groupes.size(); ++i)
+    for( unsigned i=0; i!=medi.groupes.size(); ++i)
     {
         if ( isGroupAList[i] ) 
         {
@@ -655,9 +669,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
     {
         _ptrMesh->_name = _meshName;
         _ptrMesh->_spaceDimension = medi.points.begin()->second.coord.size();
-        _ptrMesh->_meshDimension = medi.getMeshDimension();
         _ptrMesh->_numberOfNodes = medi.points.size();
-        _ptrMesh->_isAGrid = 0;
         _ptrMesh->_coordinate = medi.getCoordinate();
 
         //Construction des groupes
@@ -700,7 +712,7 @@ PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER():PORFLOW_MESH_DRIVER()
 }
   
 PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const string & fileName,
-                                                 MESH * ptrMesh):
+                                                       GMESH *        ptrMesh):
   PORFLOW_MESH_DRIVER(fileName,ptrMesh,WRONLY)
 {
   MESSAGE_MED("PORFLOW_MESH_WRONLY_DRIVER::PORFLOW_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
@@ -742,19 +754,25 @@ void PORFLOW_MESH_WRONLY_DRIVER::write(void) const
 
 /*--------------------- RDWR PART -------------------------------*/
 
-PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER():PORFLOW_MESH_DRIVER()
+PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER():
+  PORFLOW_MESH_DRIVER(),
+  PORFLOW_MESH_RDONLY_DRIVER(),
+  PORFLOW_MESH_WRONLY_DRIVER()
 {
 }
 
-PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const string & fileName,
-                                           MESH * ptrMesh):
-  PORFLOW_MESH_DRIVER(fileName,ptrMesh,RDWR)
+PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const string & fileName,MESH * ptrMesh):
+  PORFLOW_MESH_DRIVER(fileName,ptrMesh,RDWR),
+  PORFLOW_MESH_RDONLY_DRIVER(fileName,ptrMesh),
+  PORFLOW_MESH_WRONLY_DRIVER(fileName,ptrMesh)
 {
   MESSAGE_MED("PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
 }
 
 PORFLOW_MESH_RDWR_DRIVER::PORFLOW_MESH_RDWR_DRIVER(const PORFLOW_MESH_RDWR_DRIVER & driver): 
-  PORFLOW_MESH_RDONLY_DRIVER::PORFLOW_MESH_DRIVER(driver)
+  PORFLOW_MESH_DRIVER(driver),
+  PORFLOW_MESH_RDONLY_DRIVER(driver),
+  PORFLOW_MESH_WRONLY_DRIVER(driver)
 {
 }
 

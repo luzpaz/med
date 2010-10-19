@@ -33,6 +33,42 @@ extern "C"{
 #include <hdf5.h>
 }
 
+namespace med_2_3 {
+  extern "C" { 
+    #include <med.h>
+        med_err MEDfieldComputingStepInfo(const med_idt fid,
+                                    const char * const fieldname,
+                                    const int csit,
+                                    med_int * const numdt,
+                                    med_int * const numit,
+                                    med_float * const dt);
+  
+  med_err MEDmeshEntityFamilyNumberRd(const med_idt               fid,
+                                      const char*  const          meshname,
+                                      const med_int               numdt,
+                                      const med_int               numit,
+                                      const med_entity_type       entitype,
+                                      const med_geometry_type     geotype,
+                                      med_int * const             number);
+
+  med_err MEDmeshEntityNumberRd(const med_idt               fid,
+                                const char*  const          meshname,
+                                const med_int               numdt,
+                                const med_int               numit,
+                                const med_entity_type       entitype,
+                                const med_geometry_type     geotype,
+                                med_int * const             number);
+
+  med_err MEDfieldCr( const med_idt fid,
+                      const char * const fieldname,
+                      const med_field_type fieldtype,
+                      const med_int nbofcomponent,
+                      const char * const componentname,
+                      const char * const componentunit,
+                      const char * const dtunit,
+                      const char * const meshname);
+  }
+}
 
 namespace MED_EN {
   extern "C" { // on est la

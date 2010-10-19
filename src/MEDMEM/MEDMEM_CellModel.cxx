@@ -22,6 +22,7 @@
 
 /*
  File MEDMEM_CellModel.cxx
+ $Header$
 */
 
 #include "MEDMEM_CellModel.hxx"
@@ -1382,6 +1383,34 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       _constituentsType[1]=tmpConstituentsType2 ;
       break;
     }
+    case MED_POLYGON:
+      _name="MED_POLYGON" ;
+      _type=t;
+      _dimension=2;
+      _numberOfConstituentsDimension=1 ;
+      _numberOfConstituents=new int[_numberOfConstituentsDimension] ;
+      _numberOfConstituents[0]=0 ;
+      _numberOfNodeOfEachConstituent=new int*[_numberOfConstituentsDimension] ;
+      _numberOfNodeOfEachConstituent[0]=0;
+      _constituentsType = new medGeometryElement*[_numberOfConstituentsDimension] ;
+      _constituentsType[0]=0 ;
+      _constituents = new int**[_numberOfConstituentsDimension] ;
+      _constituents[0]=0;
+     break;
+    case MED_POLYHEDRA:
+      _name="MED_POLYHEDRA" ;
+      _type=t;
+      _dimension=3;
+      _numberOfConstituentsDimension=2 ;
+      _numberOfConstituents=new int[_numberOfConstituentsDimension] ;
+      _numberOfConstituents[0]=_numberOfConstituents[1]=0;
+      _numberOfNodeOfEachConstituent=new int*[_numberOfConstituentsDimension] ;
+      _numberOfNodeOfEachConstituent[0]=_numberOfNodeOfEachConstituent[1]=0;
+      _constituentsType = new medGeometryElement*[_numberOfConstituentsDimension] ;
+      _constituentsType[0]=_constituentsType[1]=0 ;
+      _constituents = new int**[_numberOfConstituentsDimension] ;
+      _constituents[0]=_constituents[1]=0;
+      break;
 //      default : 
 //        _type=0;
 //        break;
@@ -1520,27 +1549,26 @@ void CELLMODEL::clean()
   for(int i=0; i<_numberOfConstituentsDimension; i++) {
     int numberOf = _numberOfConstituents[i] ;
     for(int j=0; j<numberOf; j++) {
-      if (NULL!=_constituents[i][j])
+      if (_constituents[i][j])
         delete[] _constituents[i][j] ;
     }
-    if (NULL!=_constituentsType)
+    if (_constituentsType)
       delete [] _constituentsType[i] ;
-    if (NULL!=_constituents[i])
+    if (_constituents[i])
       delete[] _constituents[i] ;
-    if (NULL!=_numberOfNodeOfEachConstituent[i])
+    if (_numberOfNodeOfEachConstituent[i])
       delete[] _numberOfNodeOfEachConstituent[i] ;
   }
-  delete [] _constituentsType; _constituentsType = NULL;
-  if (NULL != _numberOfConstituents) {
-    delete [] _numberOfConstituents;
-    _numberOfConstituents = NULL;
-  }
-  if (NULL != _constituents) {
-    delete [] _constituents;
-    _constituents = NULL;
-  }
-  if (NULL != _numberOfNodeOfEachConstituent) {
-    delete [] _numberOfNodeOfEachConstituent;
-    _numberOfNodeOfEachConstituent = NULL;
-  }
+  delete [] _constituentsType; 
+  if (_numberOfConstituents)
+    delete[]_numberOfConstituents ;
+  if (_constituents)
+    delete[] _constituents ;
+  if (_numberOfNodeOfEachConstituent)
+    delete[] _numberOfNodeOfEachConstituent ;
+
+  _constituentsType = 0;
+  _numberOfConstituents = 0;
+  _constituents = 0;
+  _numberOfNodeOfEachConstituent = 0;
 }

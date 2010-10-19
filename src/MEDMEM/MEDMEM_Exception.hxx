@@ -22,6 +22,7 @@
 
 /*
  File MedException.hxx
+ $Header$
 */
 
 #ifndef MEDEXCEPTION_HXX
@@ -38,7 +39,7 @@ using namespace std;
 #define LOCALIZED(message) static_cast<const char *> (message) , __FILE__ , __LINE__
 #endif
 
-#define MED_EXCEPTION MEDMEM::MEDEXCEPTION
+#define MED_EXCEPTION MEDEXCEPTION
 
 /*!
   Class used to throws exception.\n

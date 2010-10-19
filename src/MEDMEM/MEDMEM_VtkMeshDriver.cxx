@@ -50,8 +50,7 @@ VTK_MESH_DRIVER::VTK_MESH_DRIVER(): GENDRIVER(VTK_DRIVER),
   // _driverType ???
 }
 
-VTK_MESH_DRIVER::VTK_MESH_DRIVER(const string & fileName,
-                                 MESH * ptrMesh) :
+VTK_MESH_DRIVER::VTK_MESH_DRIVER(const string & fileName, const GMESH *  ptrMesh) :
   GENDRIVER(fileName, WRONLY, VTK_DRIVER),
   _ptrMesh(ptrMesh)
 {
@@ -188,8 +187,8 @@ void VTK_MESH_DRIVER::close() {
   closeConst() ;
 }
 
-void    VTK_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; };
-string  VTK_MESH_DRIVER::getMeshName() const { return _meshName; };
+void    VTK_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; }
+string  VTK_MESH_DRIVER::getMeshName() const { return _meshName; }
 
 void VTK_MESH_DRIVER::read(void) throw (MEDEXCEPTION)
 {
@@ -210,6 +209,9 @@ void VTK_MESH_DRIVER::write(void) const
   const char * LOC = "void VTK_MESH_DRIVER::write(void) const : ";
   BEGIN_OF_MED(LOC);
 
+  if ( !_ptrMesh )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Mesh is NULL"));
+
   // Well we must open vtk file first, because there are
   // no other driver than MED for VTK that do it !
 
@@ -220,6 +222,7 @@ void VTK_MESH_DRIVER::write(void) const
 
   openConst();
 
+  const MESH* mesh = _ptrMesh->convertInMESH();
   char buf[256];
   const char* header = "# vtk DataFile Version 2.0\n";
   const char* title  = "maillage from MedMemory\n";
@@ -232,7 +235,7 @@ void VTK_MESH_DRIVER::write(void) const
       (*_vtkFile) << dataset ;
       // put points (all point are in 3D, so if we are in 1D or 2D, we complete by zero !
       (*_vtkFile) << "POINTS " << NumberOfNodes << " float" << endl ;
-      const double *coordinate = _ptrMesh->getCoordinates(MED_FULL_INTERLACE) ;
+      const double *coordinate = mesh->getCoordinates(MED_FULL_INTERLACE) ;
       string missingCoord = SpaceDimension==3 ? "" : SpaceDimension==2 ? "0" : "0 0";
       for (int i=0;i<NumberOfNodes;i++)
         {
@@ -253,7 +256,7 @@ void VTK_MESH_DRIVER::write(void) const
       //sprintf(buf,"POINTS %d double\n", NumberOfNodes);
       sprintf(buf,"POINTS %d float\n", NumberOfNodes);
       writeBinary( buf, strlen(buf) );
-      const double *coordinate = _ptrMesh->getCoordinates(MED_FULL_INTERLACE) ;
+      const double *coordinate = mesh->getCoordinates(MED_FULL_INTERLACE) ;
       //PointerOf<double> coordBuf( SpaceDimension==3 ? 0 : NumberOfNodes * 3 );
       //double * toCoord = coordBuf;
       PointerOf<float> coordBuf( NumberOfNodes * 3 );
@@ -309,11 +312,11 @@ void VTK_MESH_DRIVER::write(void) const
 
   // we put connectivity
   // how many cells and how many value in connectivity :
-  int cells_types_count        = _ptrMesh->getNumberOfTypes(MED_CELL) ;
-  int cells_sum                = _ptrMesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) ;
-  const CELLMODEL * cells_type = _ptrMesh->getCellsTypes(MED_CELL) ;
+  int cells_types_count        = mesh->getNumberOfTypes(MED_CELL) ;
+  int cells_sum                = mesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) ;
+  const CELLMODEL * cells_type = mesh->getCellsTypes(MED_CELL) ;
 
-  const int * connectivityIndex = _ptrMesh->getConnectivityIndex(MED_NODAL,MED_CELL) ;
+  const int * connectivityIndex = mesh->getConnectivityIndex(MED_NODAL,MED_CELL) ;
   int          connectivity_sum =  connectivityIndex[cells_sum]-1 ;
 
   sprintf(buf,"\nCELLS %d %d\n", cells_sum, connectivity_sum+cells_sum);
@@ -419,8 +422,8 @@ void VTK_MESH_DRIVER::write(void) const
     if (filter==NULL) 
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": MED element type not supported yet : " << cells_type[i].getName() ) ) ;
     int nodes_cell = cells_type[i].getNumberOfNodes();
-    int numberOfCell = _ptrMesh->getNumberOfElements(MED_CELL,cells_type[i].getType()) ;
-    const int * connectivityArray = _ptrMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,cells_type[i].getType());
+    int numberOfCell = mesh->getNumberOfElements(MED_CELL,cells_type[i].getType()) ;
+    const int * connectivityArray = mesh->getConnectivity(MED_NODAL,MED_CELL,cells_type[i].getType());
     if ( _vtkFile )
       {
         for (int j=0;j<numberOfCell;j++)
@@ -475,7 +478,7 @@ void VTK_MESH_DRIVER::write(void) const
       }
     if (vtkType == 0)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": MED element type not supported yet : " << cells_type[i].getType() ) ) ;
-    int numberOfCell = _ptrMesh->getNumberOfElements(MED_CELL,cells_type[i].getType()) ;
+    int numberOfCell = mesh->getNumberOfElements(MED_CELL,cells_type[i].getType()) ;
     if ( _vtkFile )
       {
         for (int j=0;j<numberOfCell;j++)
@@ -487,6 +490,7 @@ void VTK_MESH_DRIVER::write(void) const
         writeBinary( &type[0], type.size() );
       }
   }
+  mesh->removeReference();
 
   closeConst();
 

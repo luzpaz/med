@@ -103,17 +103,22 @@ ENSIGHT_MESH_DRIVER::ENSIGHT_MESH_DRIVER(): _CaseFileDriver_User(), _ptrMesh((ME
 }
 
 ENSIGHT_MESH_DRIVER::ENSIGHT_MESH_DRIVER(const string & fileName,
-                                         MESH *         ptrMesh)
-  :_CaseFileDriver_User(fileName,MED_EN::RDWR), _ptrMesh(ptrMesh),
-   _meshName(ptrMesh->getName())
+                                         GMESH *        ptrMesh)
+  :_CaseFileDriver_User(fileName,MED_EN::RDWR), _ptrMesh(ptrMesh)
 {
+  if ( !_ptrMesh )
+    throw MEDEXCEPTION("ENSIGHT_MESH_DRIVER(fileName, ptrMesh) : mesh is NULL");
+  _meshName = _ptrMesh->getName();
 }
 
 ENSIGHT_MESH_DRIVER::ENSIGHT_MESH_DRIVER(const string & fileName,
-                                         MESH *         ptrMesh,
+                                         GMESH *        ptrMesh,
                                          med_mode_acces accessMode)
-  :_CaseFileDriver_User(fileName,accessMode), _ptrMesh(ptrMesh), _meshName(ptrMesh->getName())
+  :_CaseFileDriver_User(fileName,accessMode), _ptrMesh(ptrMesh)
 {
+  if ( !_ptrMesh )
+    throw MEDEXCEPTION("ENSIGHT_MESH_DRIVER(fileName, ptrMesh) : mesh is NULL");
+  _meshName = _ptrMesh->getName();
 }
 
 ENSIGHT_MESH_DRIVER::ENSIGHT_MESH_DRIVER(const ENSIGHT_MESH_DRIVER & driver)
@@ -126,9 +131,9 @@ ENSIGHT_MESH_DRIVER::~ENSIGHT_MESH_DRIVER()
   MESSAGE_MED("ENSIGHT_MESH_DRIVER::~ENSIGHT_MESH_DRIVER() has been destroyed");
 }
 
-void    ENSIGHT_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; };
+void    ENSIGHT_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; }
 
-string  ENSIGHT_MESH_DRIVER::getMeshName() const { return _meshName; };
+string  ENSIGHT_MESH_DRIVER::getMeshName() const { return _meshName; }
 
 void ENSIGHT_MESH_DRIVER::openConst(bool checkDataFile) const
 {
@@ -173,14 +178,15 @@ void ENSIGHT_MESH_DRIVER::close() {
 // WRONLY
 // ================================================================================
 
-ENSIGHT_MESH_WRONLY_DRIVER::ENSIGHT_MESH_WRONLY_DRIVER() : ENSIGHT_MESH_DRIVER()
+ENSIGHT_MESH_WRONLY_DRIVER::ENSIGHT_MESH_WRONLY_DRIVER() :
+  ENSIGHT_MESH_DRIVER(), _append(0)
 {
 }
 
 ENSIGHT_MESH_WRONLY_DRIVER::ENSIGHT_MESH_WRONLY_DRIVER(const string & fileName,
-                                                       MESH *         ptrMesh,
+                                                       const GMESH *  ptrMesh,
                                                        bool           append)
-  : ENSIGHT_MESH_DRIVER( fileName, ptrMesh, WRONLY ), _append(append)
+  : ENSIGHT_MESH_DRIVER( fileName, (GMESH*)ptrMesh, WRONLY ), _append(append)
 {
 }
 
@@ -231,13 +237,13 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
   // of 79 chars length maximum, while MED mesh description is up to 200 chars
   const char* line1 = theDescriptionPrefix;
   string      line2 = _ptrMesh->getDescription();
-  for ( int i = 0; i < line2.size(); ++i ) { // protect from gabage
+  for ( unsigned i = 0; i < line2.size(); ++i ) { // protect from gabage
     if ( !line2[ i ] || !isascii( line2[ i ])) {
       line2.resize( i );
       break;
     }
   }
-  if ( line2.size() >= MAX_LINE_LENGTH )
+  if ((int) line2.size() >= MAX_LINE_LENGTH )
     line2.resize( MAX_LINE_LENGTH );
 
   // EnSight will assign node/element visible numbers it-self
@@ -247,6 +253,8 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
 #else
   const char* line4 = "element id assign";
 #endif
+
+  MESH* mesh = const_cast<MESH*>( _ptrMesh->convertInMESH() ) ; // we write unstructured only
 
   if ( isBinaryEnSightFormatForWriting() )
   {
@@ -276,11 +284,11 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
       writePart = & ENSIGHT_MESH_WRONLY_DRIVER::writePart6Binary;
 
       // All point are in 3D, so if we are in 1D or 2D, we complete by zero !
-      int SpaceDimension = _ptrMesh->getSpaceDimension() ;
-      int NumberOfNodes  = _ptrMesh->getNumberOfNodes() ;
+      int SpaceDimension = mesh->getSpaceDimension() ;
+      int NumberOfNodes  = mesh->getNumberOfNodes() ;
       ensightGeomFile.addString("coordinates");
       ensightGeomFile.addInt( NumberOfNodes );
-      const double *coordinate = _ptrMesh->getCoordinates(MED_FULL_INTERLACE) ;
+      const double *coordinate = mesh->getCoordinates(MED_FULL_INTERLACE) ;
       if ( SpaceDimension == 3 ) {
         ensightGeomFile.addReal(coordinate, NumberOfNodes * SpaceDimension );
       }
@@ -298,22 +306,22 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
 
     // We put connectivity
 
-    if ( isToWriteEntity( MED_CELL, _ptrMesh ))
+    if ( isToWriteEntity( MED_CELL, mesh ))
     {
-      SUPPORT *allCells=new SUPPORT(_ptrMesh, getMeshName(), MED_CELL );
+      SUPPORT *allCells=new SUPPORT(mesh, getMeshName(), MED_CELL );
       (this->*writePart)( ensightGeomFile, allCells );
       allCells->removeReference();
     }
     // And meshdim-1 connectivity
-    if ( isToWriteEntity( MED_FACE, _ptrMesh ))
+    if ( isToWriteEntity( MED_FACE, mesh ))
     {
-      SUPPORT *allFaces=new SUPPORT(_ptrMesh, string("SupportOnAll_")+entNames[MED_FACE], MED_FACE );
+      SUPPORT *allFaces=new SUPPORT(mesh, string("SupportOnAll_")+entNames[MED_FACE], MED_FACE );
       (this->*writePart)( ensightGeomFile, allFaces);
       allFaces->removeReference();
     }
-    else if ( isToWriteEntity(MED_EDGE, _ptrMesh))
+    else if ( isToWriteEntity(MED_EDGE, mesh))
     {
-      SUPPORT *allEdges=new SUPPORT(_ptrMesh, string("SupportOnAll_")+entNames[MED_EDGE], MED_EDGE );
+      SUPPORT *allEdges=new SUPPORT(mesh, string("SupportOnAll_")+entNames[MED_EDGE], MED_EDGE );
       (this->*writePart)( ensightGeomFile, allEdges);
       allEdges->removeReference();
     }
@@ -323,10 +331,10 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
     for ( int ent = MED_CELL; ent < MED_ALL_ENTITIES; ++ent )
     {
       medEntityMesh entity = (medEntityMesh) ent;
-      int nbGroups = _ptrMesh->getNumberOfGroups(entity);
+      int nbGroups = mesh->getNumberOfGroups(entity);
       for ( int i=1; i<=nbGroups; i++)
       {
-        const GROUP* group = _ptrMesh->getGroup( entity, i );
+        const GROUP* group = mesh->getGroup( entity, i );
         (this->*writePart)( ensightGeomFile, group );
       }
     }
@@ -360,14 +368,14 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
       writePart = & ENSIGHT_MESH_WRONLY_DRIVER::writePart6ASCII;
 
       // Put points (all point are in 3D, so if we are in 1D or 2D, we complete by zero !
-      int SpaceDimension = _ptrMesh->getSpaceDimension() ;
-      int NumberOfNodes  = _ptrMesh->getNumberOfNodes() ;
+      int SpaceDimension = mesh->getSpaceDimension() ;
+      int NumberOfNodes  = mesh->getNumberOfNodes() ;
       string zeros;
       if (SpaceDimension==2) zeros = " 0.00000e+00";
       if (SpaceDimension==1) zeros = " 0.00000e+00 0.00000e+00";
       ensightGeomFile << "coordinates" << endl
                       << setw(8) << NumberOfNodes << endl ;
-      const double *coordinate = _ptrMesh->getCoordinates(MED_FULL_INTERLACE) ;
+      const double *coordinate = mesh->getCoordinates(MED_FULL_INTERLACE) ;
       for (int i=0; i<NumberOfNodes; i++)
       {
         //ensightGeomFile << setw(8) << i+1 ; // node id
@@ -379,22 +387,22 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
 
     // We put connectivity
 
-    if ( isToWriteEntity( MED_CELL, _ptrMesh ))
+    if ( isToWriteEntity( MED_CELL, mesh ))
     {
-      SUPPORT *allCells=new SUPPORT(_ptrMesh, getMeshName(), MED_CELL );
+      SUPPORT *allCells=new SUPPORT(mesh, getMeshName(), MED_CELL );
       (this->*writePart)( ensightGeomFile, allCells );
       allCells->removeReference();
     }
     // And meshdim-1 connectivity
-    if ( isToWriteEntity( MED_FACE, _ptrMesh ))
+    if ( isToWriteEntity( MED_FACE, mesh ))
     {
-      SUPPORT *allFaces=new SUPPORT(_ptrMesh, string("SupportOnAll_")+entNames[MED_FACE], MED_FACE );
+      SUPPORT *allFaces=new SUPPORT(mesh, string("SupportOnAll_")+entNames[MED_FACE], MED_FACE );
       (this->*writePart)( ensightGeomFile, allFaces);
       allFaces->removeReference();
     }
-    else if ( isToWriteEntity(MED_EDGE, _ptrMesh))
+    else if ( isToWriteEntity(MED_EDGE, mesh))
     {
-      SUPPORT *allEdges=new SUPPORT(_ptrMesh, string("SupportOnAll_")+entNames[MED_EDGE], MED_EDGE );
+      SUPPORT *allEdges=new SUPPORT(mesh, string("SupportOnAll_")+entNames[MED_EDGE], MED_EDGE );
       (this->*writePart)( ensightGeomFile, allEdges);
       allEdges->removeReference();
     }
@@ -404,15 +412,17 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
     for ( int ent = MED_CELL; ent < MED_ALL_ENTITIES; ++ent )
     {
       medEntityMesh entity = (medEntityMesh) ent;
-      int nbGroups = _ptrMesh->getNumberOfGroups(entity);
+      int nbGroups = mesh->getNumberOfGroups(entity);
       for ( int i=1; i<=nbGroups; i++)
       {
-        const GROUP* group = _ptrMesh->getGroup( entity, i );
+        const GROUP* group = mesh->getGroup( entity, i );
         (this->*writePart)( ensightGeomFile, group );
       }
     }
 
     ensightGeomFile.close();
+
+    mesh->removeReference();
 
   } // end ASCII format
 
@@ -447,6 +457,8 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldBinary(_BinaryFileWriter& ensightG
   const int * index = 0;
   int j;
 
+  const MESH* mesh = support->getMesh()->convertInMESH() ; // we write unstructured only
+
   // COORDINATES                                                             Gold binary
   // ===================================================================================
   // In Ensight, coordinates of nodes of support elements are in MED_NO_INTERLACE mode.
@@ -464,7 +476,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldBinary(_BinaryFileWriter& ensightG
     ensightGeomFile.addInt( NumberOfNodes );
 
     // coordinates
-    const double *coordinate = _ptrMesh->getCoordinates(MED_FULL_INTERLACE);
+    const double *coordinate = mesh->getCoordinates(MED_FULL_INTERLACE);
     typedef _ValueIterator< double > TComponentIt;
     vector< TComponentIt > coordCompIt( 1 );
     for (int j=0; j<SPACE_DIM; j++, coordinate++) { // loop on dimensions
@@ -489,7 +501,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldBinary(_BinaryFileWriter& ensightG
     for ( j=0; j < SPACE_DIM; j++) { // loop on dimensions
       medEnsIt = med2ensIds.begin();
       if ( j < SpaceDimension ) {
-        const double *coordinate = _ptrMesh->getCoordinates(MED_FULL_INTERLACE) + j;
+        const double *coordinate = mesh->getCoordinates(MED_FULL_INTERLACE) + j;
         for (int i=0; i<NumberOfNodes; i++, ++medEnsIt )
           floatCoords[ i ] = (float) coordinate[ (medEnsIt->first-1) * SpaceDimension];
       }
@@ -535,8 +547,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldBinary(_BinaryFileWriter& ensightG
 
       if ( nbCellNodes > 1 ) // STANDARD ELEMENTS connectivity
       {
-        connectivity = _ptrMesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                                 entity, medType);
+        connectivity = mesh->getConnectivity( MED_NODAL, entity, medType);
         nodeIds.reserve( numberOfCell * nbCellNodes);
         for (j = 0 ; j < numberOfCell; j++, connectivity += nbCellNodes)
           for (int k=0; k<nbCellNodes; k++)
@@ -554,12 +565,14 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldBinary(_BinaryFileWriter& ensightG
       }
       else if ( medType == MED_POLYGON ) // POLYGONs connectivity
       {
-        connectivity   = _ptrMesh->getPolygonsConnectivity(MED_NODAL, entity);
-        index          = _ptrMesh->getPolygonsConnectivityIndex(MED_NODAL, entity);
-        int connLength = _ptrMesh->getPolygonsConnectivityLength(MED_NODAL, entity);
+        int nbStdCells = mesh->getGlobalNumberingIndex(entity)[i]-1;
+        connectivity   = mesh->getConnectivity( MED_NODAL, entity, medType);
+        int connLength = mesh->getConnectivityLength( MED_NODAL, entity, medType);
+        index          = mesh->getConnectivityIndex(MED_NODAL, entity);
+
         // number of nodes in each element
         {
-          TIntOwner nbNodesInPoly( getNumbersByIndex( index, numberOfCell ));
+          TIntOwner nbNodesInPoly( getNumbersByIndex( index+nbStdCells, numberOfCell ));
           ensightGeomFile.addInt( nbNodesInPoly.myValues, numberOfCell );
         } // nbNodesInPoly is deleted here
 
@@ -568,23 +581,36 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldBinary(_BinaryFileWriter& ensightG
       }
       else // POLYHEDRA connectivity
       {
-        connectivity       = _ptrMesh->getPolyhedronConnectivity(MED_NODAL);
-        index              = _ptrMesh->getPolyhedronIndex(MED_NODAL);
-        const int * fIndex = _ptrMesh->getPolyhedronFacesIndex();
-        int connLength     = _ptrMesh->getPolyhedronConnectivityLength(MED_NODAL);
-        int nbFaces        = _ptrMesh->getNumberOfPolyhedronFaces();
+        connectivity   = mesh->getConnectivity( MED_NODAL, entity, medType);
+        int nbStdCells = mesh->getGlobalNumberingIndex(entity)[i]-1;
+        index          = mesh->getConnectivityIndex(MED_NODAL, entity) + nbStdCells;
+
+        vector<int> nbFacesInPolyhedron, nbNodesInFace, faceConn;
+        for ( int j = 0; j < numberOfCell; ++j )
+        {
+          int nbFaces = 0, nbNodes = 0;
+          for ( int k = index[j]; k < index[j+1]; ++k )
+            if ( connectivity[k-1] == -1 )
+            {
+              nbNodesInFace.push_back( nbNodes );
+              nbNodes = 0;
+              ++nbFaces;
+            }
+            else
+            {
+              faceConn.push_back( connectivity[k-1] );
+              ++nbNodes;
+            }
+          nbNodesInFace.push_back( nbNodes );
+          nbFacesInPolyhedron.push_back( nbFaces+1 );
+        }
+
         // nb of faces in each polyhedron
-        {
-          TIntOwner nbFacesInPoly( getNumbersByIndex( index, numberOfCell ));
-          ensightGeomFile.addInt( nbFacesInPoly.myValues, numberOfCell );
-        }
+        ensightGeomFile.addInt( nbFacesInPolyhedron );
         // number of nodes in each face
-        {
-          TIntOwner nbNodesInFace( getNumbersByIndex( fIndex, nbFaces ));
-          ensightGeomFile.addInt( nbNodesInFace.myValues, nbFaces );
-        }
+        ensightGeomFile.addInt( nbNodesInFace );
         // connectivity
-        ensightGeomFile.addInt( connectivity, connLength );
+        ensightGeomFile.addInt( faceConn );
       }
     }
     // -------------------------------------------------
@@ -597,9 +623,8 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldBinary(_BinaryFileWriter& ensightG
 #endif
       if ( nbCellNodes > 1 ) // STANDARD ELEMENTS connectivity
       {
-        connectivity = _ptrMesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                                 entity, MED_ALL_ELEMENTS);
-        index = _ptrMesh->getConnectivityIndex(MED_FULL_INTERLACE, entity);
+        connectivity = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
+        index = mesh->getConnectivityIndex(MED_NODAL, entity);
 
         nodeIds.reserve( numberOfCell * nbCellNodes);
         for (j=0; j<numberOfCell; j++) {
@@ -622,21 +647,19 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldBinary(_BinaryFileWriter& ensightG
       }
       else if ( medType == MED_POLYGON ) // POLYGONs connectivity
       {
-        connectivity   = _ptrMesh->getPolygonsConnectivity(MED_NODAL, entity);
-        index          = _ptrMesh->getPolygonsConnectivityIndex(MED_NODAL, entity);
-        int connLength = _ptrMesh->getPolygonsConnectivityLength(MED_NODAL, entity);
-        int nbStdElems = _ptrMesh->getNumberOfElements(entity,MED_ALL_ELEMENTS);
+        connectivity = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
+        index = mesh->getConnectivityIndex(MED_NODAL, entity);
+
         // number of nodes in each element
         {
-          TIntOwner nbNodesInPoly( getNumbersByIndex( index-nbStdElems, numberOfCell, number ));
+          TIntOwner nbNodesInPoly( getNumbersByIndex( index, numberOfCell, number ));
           ensightGeomFile.addInt( nbNodesInPoly.myValues, numberOfCell );
         } // nbNodesInPoly is deleted here
 
         // connectivity
-        nodeIds.reserve( connLength );
         for ( j = 0; j < numberOfCell; ++j )
         {
-          int elem = number[ j ] - nbStdElems;
+          int elem = number[ j ];
           elemConnectivity   = connectivity + index[ elem-1 ]-1;
           const int* connEnd = connectivity + index[ elem   ]-1;
           while ( elemConnectivity < connEnd )
@@ -646,37 +669,41 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldBinary(_BinaryFileWriter& ensightG
       }
       else // POLYHEDRA connectivity
       {
-        connectivity       = _ptrMesh->getPolyhedronConnectivity(MED_NODAL);
-        index              = _ptrMesh->getPolyhedronIndex(MED_NODAL);
-        const int * fIndex = _ptrMesh->getPolyhedronFacesIndex();
-        int connLength     = _ptrMesh->getPolyhedronConnectivityLength(MED_NODAL);
-        int nbStdElems     = _ptrMesh->getNumberOfElements(entity,MED_ALL_ELEMENTS);
+        connectivity = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
+        index = mesh->getConnectivityIndex(MED_NODAL, entity);
+        vector<int> nbFacesInPolyhedron, nbNodesInFace, faceConn;
+        for ( int j = 0; j < numberOfCell; ++j )
+        {
+          int elem    = number[ j ];
+          int nbFaces = 0, nbNodes = 0;
+          for ( int k = index[elem]; k < index[elem+1]; ++k )
+            if ( connectivity[k-1] == -1 )
+            {
+              nbNodesInFace.push_back( nbNodes );
+              nbNodes = 0;
+              ++nbFaces;
+            }
+            else
+            {
+              faceConn.push_back( connectivity[k-1] );
+              ++nbNodes;
+            }
+          nbNodesInFace.push_back( nbNodes );
+          nbFacesInPolyhedron.push_back( nbFaces+1 );
+        }
+
         // nb of faces in each polyhedron
-        {
-          TIntOwner nbFacesInPoly( getNumbersByIndex( index-nbStdElems, numberOfCell, number ));
-          ensightGeomFile.addInt( nbFacesInPoly.myValues, numberOfCell );
-        }
+        ensightGeomFile.addInt( nbFacesInPolyhedron );
         // number of nodes in each face
-        nodeIds.reserve( connLength );
-        for ( j = 0; j < numberOfCell; ++j )
-        {
-          int elem    = number[ j ] - nbStdElems;
-          int f1      = index[ elem-1 ] - 1, f2 = index[ elem ] - 1;
-          int nbFaces = f2 - f1;
-          {
-            TIntOwner nbNodesInFace( getNumbersByIndex( &fIndex[ f1 ], nbFaces ));
-            ensightGeomFile.addInt( nbNodesInFace.myValues, nbFaces );
-          }
-          elemConnectivity   = connectivity + fIndex[ f1 ] - 1;
-          const int* connEnd = connectivity + fIndex[ f2 ] - 1;
-          while ( elemConnectivity < connEnd )
-            nodeIds.push_back( med2ensIds[ *elemConnectivity++ ]);
-        }
+        ensightGeomFile.addInt( nbNodesInFace );
         // connectivity
-        ensightGeomFile.addInt( nodeIds );
+        ensightGeomFile.addInt( faceConn );
       }
     }
   }
+
+  mesh->removeReference();
+
 } // writePartGoldBinary()
 
 //================================================================================
@@ -710,6 +737,8 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldASCII(ofstream&      ensightGeomFi
   const int * index = 0;
   int j;
 
+  const MESH* mesh = support->getMesh()->convertInMESH() ; // we write unstructured only
+
   // COORDINATES                                                              Gold ASCII 
   // ===================================================================================
   // In Ensight, coordinates of nodes of support elements are in MED_NO_INTERLACE mode.
@@ -717,8 +746,8 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldASCII(ofstream&      ensightGeomFi
   // nodal connectivity should refer to these nodes.
   map<int, int> med2ensIds;
   map<int, int>::iterator medEnsIt;
-  int SpaceDimension = _ptrMesh->getSpaceDimension() ;
-  int NumberOfNodes  = _ptrMesh->getNumberOfNodes() ;
+  int SpaceDimension = mesh->getSpaceDimension() ;
+  int NumberOfNodes  = mesh->getNumberOfNodes() ;
   string zeroStr = " 0.00000e+00";
   // -----------------------------------
   if ( support->isOnAllElements() )
@@ -730,7 +759,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldASCII(ofstream&      ensightGeomFi
     // coordinates
     for (j=0; j<SPACE_DIM; j++) { // loop on dimensions
       if ( j < SpaceDimension ) {
-        const double *coordinate = _ptrMesh->getCoordinates(MED_FULL_INTERLACE) + j;
+        const double *coordinate = mesh->getCoordinates(MED_FULL_INTERLACE) + j;
         for (int i=0; i<NumberOfNodes; i++, coordinate += SpaceDimension)
           ensightGeomFile << setw(12) << (float) *coordinate << endl;
       }
@@ -753,7 +782,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldASCII(ofstream&      ensightGeomFi
     for ( j=0; j<SPACE_DIM; j++) { // loop on dimensions
       medEnsIt = med2ensIds.begin();
       if ( j < SpaceDimension ) {
-        const double *coordinate = _ptrMesh->getCoordinates(MED_FULL_INTERLACE) + j;
+        const double *coordinate = mesh->getCoordinates(MED_FULL_INTERLACE) + j;
         for (int i=0; i<NumberOfNodes; i++, ++medEnsIt )
           ensightGeomFile << setw(12)
                           << (float) coordinate[ (medEnsIt->first-1) * SpaceDimension] << endl;
@@ -792,8 +821,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldASCII(ofstream&      ensightGeomFi
 
       if ( nbCellNodes > 1 ) // STANDARD ELEMENTS connectivity
       {
-        connectivity = _ptrMesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                                 entity, medType);
+        connectivity = mesh->getConnectivity( MED_NODAL, entity, medType);
         for (j = 0 ; j < numberOfCell; j++, connectivity += nbCellNodes) {
           for (int k=0; k<nbCellNodes; k++)
             ensightGeomFile << setw(iw) << connectivity[ ensightType._medIndex[k] ];
@@ -807,13 +835,14 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldASCII(ofstream&      ensightGeomFi
       }
       else if ( medType == MED_POLYGON ) // POLYGONs connectivity
       {
-        connectivity   = _ptrMesh->getPolygonsConnectivity(MED_NODAL, entity);
-        index          = _ptrMesh->getPolygonsConnectivityIndex(MED_NODAL, entity);
+        int nbStdCells = mesh->getGlobalNumberingIndex(entity)[i]-1;
+        connectivity   = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
+        index          = mesh->getConnectivityIndex(MED_NODAL, entity) + nbStdCells;
         // number of nodes in each element
         const int* ind = index;
         for (j = 0 ; j < numberOfCell; j++, ++ind)
           ensightGeomFile << setw(iw) << ( ind[1] - ind[0] ) << endl;
-        
+
         // connectivity
         for (j = 0; j < numberOfCell; j++, ++index) {
           nbCellNodes = index[1] - index[0];
@@ -824,25 +853,32 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldASCII(ofstream&      ensightGeomFi
       }
       else // POLYHEDRA connectivity
       {
-        connectivity       = _ptrMesh->getPolyhedronConnectivity(MED_NODAL);
-        index              = _ptrMesh->getPolyhedronIndex(MED_NODAL);
-        const int * fIndex = _ptrMesh->getPolyhedronFacesIndex();
-        int nbFaces        = _ptrMesh->getNumberOfPolyhedronFaces();
-        // nb of faces in each polyhedron
-        const int* ind = index;
-        for (j = 0 ; j < numberOfCell; j++, ++ind)
-          ensightGeomFile << setw(iw) << ( ind[1] - ind[0] ) << endl ;
-        // number of nodes in each face
-        ind = fIndex;
-        for (j = 0 ; j < nbFaces; j++, ++ind)
-          ensightGeomFile << setw(iw) << ( ind[1] - ind[0] ) << endl ;
-        // connectivity of each face
-        for (j = 0 ; j < nbFaces; j++, ++fIndex) {
-          int nbFaceNodes = fIndex[1] - fIndex[0];
-          for (int k=0; k<nbFaceNodes; k++, ++connectivity)
-            ensightGeomFile << setw(iw) << *connectivity;
-          ensightGeomFile << endl ;
+        int nbStdCells = mesh->getGlobalNumberingIndex(entity)[i]-1;
+        connectivity   = mesh->getConnectivity( MED_NODAL, entity, medType);
+        index          = mesh->getConnectivityIndex(MED_NODAL, entity) + nbStdCells;
+        ostringstream nbNodesInFace, faceConn;
+        for ( j = 0; j < numberOfCell; ++j )
+        {
+          int nbFaces = 0, nbNodes = 0;
+          for ( int k = index[j]; k < index[j+1]; ++k )
+            if ( connectivity[k-1] == -1 )
+            {
+              faceConn << endl;
+              nbNodesInFace << setw(iw) << nbNodes << endl;
+              nbNodes = 0;
+              ++nbFaces;
+            }
+            else
+            {
+              faceConn << setw(iw) << connectivity[k-1] ;
+              ++nbNodes;
+            }
+          faceConn << endl;
+          nbNodesInFace << setw(iw) << nbNodes << endl;
+          ensightGeomFile << setw(iw) << nbFaces+1 << endl ;// nb of faces in each polyhedron
         }
+        ensightGeomFile << nbNodesInFace.str();// number of nodes in each face
+        ensightGeomFile << faceConn.str();// connectivity of each face
       }
     }
     // -----------------------------------
@@ -856,9 +892,8 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldASCII(ofstream&      ensightGeomFi
 #endif
       if ( nbCellNodes > 1 ) // STANDARD ELEMENTS connectivity
       {
-        connectivity = _ptrMesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                                 entity, MED_ALL_ELEMENTS);
-        index = _ptrMesh->getConnectivityIndex(MED_FULL_INTERLACE, entity);
+        connectivity = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
+        index = mesh->getConnectivityIndex(MED_NODAL, entity);
 
         for (j=0; j<numberOfCell; j++) {
           int elem = number[j];
@@ -879,17 +914,16 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldASCII(ofstream&      ensightGeomFi
       }
       else if ( medType == MED_POLYGON ) // POLYGONs connectivity
       {
-        connectivity   = _ptrMesh->getPolygonsConnectivity(MED_NODAL, entity);
-        index          = _ptrMesh->getPolygonsConnectivityIndex(MED_NODAL, entity);
-        int nbStdElems = _ptrMesh->getNumberOfElements(entity,MED_ALL_ELEMENTS);
+        connectivity   = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
+        index          = mesh->getConnectivityIndex(MED_NODAL, entity);
         // number of nodes in each element
         for (j = 0 ; j < numberOfCell; j++) {
-          int elem = number[j] - nbStdElems;
+          int elem = number[j];
           ensightGeomFile << setw(iw) << ( index[elem] - index[elem-1] ) << endl;
         }
         // connectivity
         for ( j = 0; j < numberOfCell; ++j ) {
-          int elem = number[ j ] - nbStdElems;
+          int elem = number[ j ];
           elemConnectivity   = connectivity + index[ elem-1 ]-1;
           const int* connEnd = connectivity + index[ elem   ]-1;
           while ( elemConnectivity < connEnd )
@@ -899,39 +933,38 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldASCII(ofstream&      ensightGeomFi
       }
       else // POLYHEDRA connectivity
       {
-        connectivity       = _ptrMesh->getPolyhedronConnectivity(MED_NODAL);
-        index              = _ptrMesh->getPolyhedronIndex(MED_NODAL);
-        const int * fIndex = _ptrMesh->getPolyhedronFacesIndex();
-        int nbStdElems     = _ptrMesh->getNumberOfElements(entity,MED_ALL_ELEMENTS);
-        // nb of faces in each polyhedron
-        for (j = 0 ; j < numberOfCell; j++) {
-          int elem = number[j] - nbStdElems;
-          ensightGeomFile << setw(iw) << ( index[elem] - index[elem-1] ) << endl;
+        connectivity   = mesh->getConnectivity( MED_NODAL, entity, medType);
+        index          = mesh->getConnectivityIndex(MED_NODAL, entity);
+        ostringstream nbNodesInFace, faceConn;
+        for ( j = 0; j < numberOfCell; ++j )
+        {
+          int elem = number[j];
+          int nbFaces = 0, nbNodes = 0;
+          for ( int k = index[elem]; k < index[elem+1]; ++k )
+            if ( connectivity[k-1] == -1 )
+            {
+              faceConn << endl;
+              nbNodesInFace << setw(iw) << nbNodes << endl;
+              nbNodes = 0;
+              ++nbFaces;
+            }
+            else
+            {
+              faceConn << setw(iw) << connectivity[k-1] ;
+              ++nbNodes;
+            }
+          faceConn << endl;
+          nbNodesInFace << setw(iw) << nbNodes << endl;
+          ensightGeomFile << setw(iw) << nbFaces+1 << endl ;// nb of faces in each polyhedron
         }
-        // number of nodes in each face
-        for ( j = 0; j < numberOfCell; ++j ) {
-          int elem = number[ j ] - nbStdElems;
-          int f1   = index[ elem-1 ], f2 = index[ elem ];
-          while ( f1 < f2 ) {
-            ensightGeomFile << setw(iw) << ( fIndex[f1] - fIndex[f1-1] ) << endl;
-            ++f1;
-          }
-        }
-        // connectivity of each face
-        for ( j = 0; j < numberOfCell; ++j ) {
-          int elem = number[ j ] - nbStdElems;
-          int f1   = index[ elem-1 ] - 1, f2 = index[ elem ] - 1;
-          while ( f1 < f2 ) {
-            int n1 = fIndex[f1]-1, n2 = fIndex[f1+1]-1;
-            ++f1;
-            while ( n1 < n2 )
-              ensightGeomFile << setw(iw) << connectivity[ n1++ ];
-            ensightGeomFile << endl ;
-          }
-        }
+        ensightGeomFile << nbNodesInFace.str();// number of nodes in each face
+        ensightGeomFile << faceConn.str();// connectivity of each face
       }
     }
   }
+
+  mesh->removeReference();
+
 }  // writePartGoldASCII()
 
 //================================================================================
@@ -957,11 +990,12 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePart6Binary(_BinaryFileWriter& ensightGeom
   int nbTypes = support->getNumberOfTypes();
   const medGeometryElement* geoType = support->getTypes();
 
+  const MESH* mesh = support->getMesh()->convertInMESH() ; // we write unstructured only
+
   int j = 1;
   const int * connectivity = 0;
   if ( entity != MED_NODE )
-    connectivity = _ptrMesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                             entity, MED_ALL_ELEMENTS);
+    connectivity = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
   const int * elemConnectivity = connectivity;
 
   // CONNECTIVITY                                                       Ensight 6 binary
@@ -1018,7 +1052,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePart6Binary(_BinaryFileWriter& ensightGeom
         ensightGeomFile.addInt( number, numberOfCell );
       }
       else {
-        const int* index = _ptrMesh->getConnectivityIndex(MED_FULL_INTERLACE, entity);
+        const int* index = mesh->getConnectivityIndex(MED_NODAL, entity);
 
         nodeIds.reserve( numberOfCell * nbCellNodes);
         for (j=0; j<numberOfCell; j++) {
@@ -1031,6 +1065,9 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePart6Binary(_BinaryFileWriter& ensightGeom
       }
     }
   } // loop on types
+
+  mesh->removeReference();
+
 
 } // writePart6Binary()
 
@@ -1059,11 +1096,12 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePart6ASCII(ofstream&      ensightGeomFile,
   int nbTypes = support->getNumberOfTypes();
   const medGeometryElement* geoType = support->getTypes();
 
+  const MESH* mesh = support->getMesh()->convertInMESH() ; // we write unstructured only
+
   int j = 1;
   const int * connectivity = 0;
   if ( entity != MED_NODE )
-    connectivity = _ptrMesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                             entity, MED_ALL_ELEMENTS);
+    connectivity = mesh->getConnectivity( MED_NODAL,entity, MED_ALL_ELEMENTS);
   const int * elemConnectivity = connectivity;
 
   // CONNECTIVITY                                                        Ensight 6 ASCII
@@ -1120,7 +1158,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePart6ASCII(ofstream&      ensightGeomFile,
         }
       }
       else {
-        const int* index = _ptrMesh->getConnectivityIndex(MED_FULL_INTERLACE, entity);
+        const int* index = mesh->getConnectivityIndex(MED_NODAL, entity);
 
         for (j=0; j<numberOfCell; j++) {
           int elem = number[j];
@@ -1137,6 +1175,9 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePart6ASCII(ofstream&      ensightGeomFile,
       }
     }
   } // loop on types
+
+  mesh->removeReference();
+
 
 } // writePart6ASCII()
 
@@ -1228,8 +1269,10 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read() throw (MEDEXCEPTION)
 
   cout << "-> Entering into the geometry file " << getDataFileName() << endl  ;
 
+  MESH* mesh = (MESH*) getMesh();
+
   _InterMed* imed = new _InterMed();
-  imed->_medMesh = getMesh();
+  imed->_medMesh = mesh;
   imed->_isOwnMedMesh = false;
   imed->_needSubParts = ( caseFile.getNbVariables() > 0 );
   imed->groupes.reserve(1000);
@@ -1262,36 +1305,34 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read() throw (MEDEXCEPTION)
   }
 
   if ( _isMadeByMed && !imed->groupes.empty() ) {
-    _ptrMesh->_name = imed->groupes[0].nom;
+    mesh->_name = imed->groupes[0].nom;
     imed->groupes[0].nom = "SupportOnAll_";
     imed->groupes[0].nom += entNames[MED_CELL];
   }
   else {
-    _ptrMesh->_name = theDefaultMeshName;
+    mesh->_name = theDefaultMeshName;
   }
-  _ptrMesh->_spaceDimension = SPACE_DIM;
-  _ptrMesh->_meshDimension  = _ptrMesh->_spaceDimension;
-  _ptrMesh->_numberOfNodes  = imed->points.size() - imed->nbMerged( MED_POINT1 );
-  _ptrMesh->_isAGrid        = 0;
-  _ptrMesh->_coordinate     = imed->getCoordinate();
+  mesh->_spaceDimension = SPACE_DIM;
+  mesh->_numberOfNodes  = imed->points.size() - imed->nbMerged( MED_POINT1 );
+  mesh->_coordinate     = imed->getCoordinate();
 
   //Construction des groupes
-  imed->getGroups(_ptrMesh->_groupCell,
-                  _ptrMesh->_groupFace,
-                  _ptrMesh->_groupEdge,
-                  _ptrMesh->_groupNode, _ptrMesh);
+  imed->getGroups(mesh->_groupCell,
+                  mesh->_groupFace,
+                  mesh->_groupEdge,
+                  mesh->_groupNode, mesh);
 
-  _ptrMesh->_connectivity = imed->getConnectivity();
+  mesh->_connectivity = imed->getConnectivity();
 
-  _ptrMesh->createFamilies();
+  mesh->createFamilies();
 
   // add attributes to families
   set<string> famNames;
   for (medEntityMesh entity=MED_CELL; entity<MED_ALL_ENTITIES; ++entity)
   {
-    int i, nb = _ptrMesh->getNumberOfFamilies(entity);
+    int i, nb = mesh->getNumberOfFamilies(entity);
     for ( i = 1; i <= nb; ++i ) {
-      FAMILY* f = const_cast<FAMILY*>( _ptrMesh->getFamily( entity, i ));
+      FAMILY* f = const_cast<FAMILY*>( mesh->getFamily( entity, i ));
       f->setNumberOfAttributes( 1 );
       int* attIDs = new int[1];
       attIDs[0] = 1;
@@ -1302,20 +1343,21 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read() throw (MEDEXCEPTION)
       string* attDescr = new string[1];
       attDescr[0] = "med_family";
       f->setAttributesDescriptions( attDescr );
+      delete [] attDescr;
       if ( f->getName().length() > 31 ) // limit a name length
         f->setName( STRING("FAM_") << f->getIdentifier());
       // check if family is on the whole mesh entity
-      if (_ptrMesh->getNumberOfElements( entity, MED_ALL_ELEMENTS ) ==
+      if (mesh->getNumberOfElements( entity, MED_ALL_ELEMENTS ) ==
           f->getNumberOfElements( MED_ALL_ELEMENTS ))
       {
         f->setAll( true );
         *(f->getnumber()) = MEDSKYLINEARRAY();
       }
       // setAll() for groups
-      nb = _ptrMesh->getNumberOfGroups(entity);
+      nb = mesh->getNumberOfGroups(entity);
       for ( i = 1; i <= nb; ++i ) {
-        GROUP * g = const_cast<GROUP*>( _ptrMesh->getGroup( entity, i ));
-        if (_ptrMesh->getNumberOfElements( entity, MED_ALL_ELEMENTS ) ==
+        GROUP * g = const_cast<GROUP*>( mesh->getGroup( entity, i ));
+        if (mesh->getNumberOfElements( entity, MED_ALL_ELEMENTS ) ==
             g->getNumberOfElements( MED_ALL_ELEMENTS ))
         {
           g->setAll( true );
@@ -1324,6 +1366,9 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read() throw (MEDEXCEPTION)
       }
     }
   }
+
+  if ( !imed->_needSubParts )
+    delete imed;
 
   END_OF_MED(LOC);
 }
@@ -1371,14 +1416,14 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldASCII(_InterMed & imed)
   // ----------------------------------------
 
   // EnSight User Manual (for v8) says:
-//    You do not have to assign node IDs. If you do, the element connectivities are
-//    based on the node numbers. If you let EnSight assign the node IDs, the nodes
-//    are considered to be sequential starting at node 1, and element connectivity is
-//    done accordingly. If node IDs are set to off, they are numbered internally;
-//    however, you will not be able to display or query on them. If you have node
-//    IDs in your data, you can have EnSight ignore them by specifying "node id
-//    ignore." Using this option may reduce some of the memory taken up by the
-//    Client and Server, but display and query on the nodes will not be available.
+  //    You do not have to assign node IDs. If you do, the element connectivities are
+  //    based on the node numbers. If you let EnSight assign the node IDs, the nodes
+  //    are considered to be sequential starting at node 1, and element connectivity is
+  //    done accordingly. If node IDs are set to off, they are numbered internally;
+  //    however, you will not be able to display or query on them. If you have node
+  //    IDs in your data, you can have EnSight ignore them by specifying "node id
+  //    ignore." Using this option may reduce some of the memory taken up by the
+  //    Client and Server, but display and query on the nodes will not be available.
 
   // read "node|element id <off|given|assign|ignore>"
   geoFile.getWord(); geoFile.getWord();
@@ -1425,7 +1470,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldASCII(_InterMed & imed)
       vector<int> elemIds;
       if ( haveElemIds ) {
         elemIds.reserve( nbElems );
-        while ( elemIds.size() < nbElems )
+        while ((int) elemIds.size() < nbElems )
           elemIds.push_back( geoFile.getInt() ); // id_e
       }
       if ( isGhost ) { // do not store ghost elements (?)
@@ -1509,13 +1554,13 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldASCII(_InterMed & imed)
       for ( int i = 0; i < nbElems; ++i ) {
         _ValueIterator<int> medIndex = medIndexIt;
         nbElemNodes = nbElemNodesIt.next();
-        if ( ma.sommets.size() != nbElemNodes )
+        if ((int) ma.sommets.size() != nbElemNodes )
           ma.sommets.resize( nbElemNodes );
         for ( n = 0; n < nbElemNodes; ++n ) {
           int nodeID = geoFile.getInt(); // nn_ei
           if ( haveCoords )
             node = points.find( nodeID + nodeShift );
-          else 
+          else
             node = points.insert( make_pair( nodeID + nodeShift, _noeud())).first;
           ma.sommets[ medIndex.next() ] = node;
         }
@@ -1557,7 +1602,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldASCII(_InterMed & imed)
       vector<int> nodeIds;
       if ( haveNodeIds ) {
         nodeIds.reserve( nbNodes );
-        while ( nodeIds.size() < nbNodes )
+        while ((int) nodeIds.size() < nbNodes )
           nodeIds.push_back( geoFile.getInt() ); // id_n
       }
 
@@ -1619,7 +1664,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldASCII(_InterMed & imed)
       if ( partName.empty() )
         partName = "Part_" + restLine;
 
-      if ( imed.groupes.capacity() - imed.groupes.size() < theMaxNbTypes )
+      if (int( imed.groupes.capacity() - imed.groupes.size() ) < theMaxNbTypes )
         imed.groupes.reserve( size_t( 1.5 * imed.groupes.size() ));
       imed.groupes.push_back(_groupe());
       partGroupe = & imed.groupes.back();
@@ -1670,7 +1715,6 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldASCII(_InterMed & imed)
       grid._iArrayLength   = I;
       grid._jArrayLength   = J;
       grid._kArrayLength   = K;
-      grid._numberOfNodes  = NumberOfNodes ;
       grid._spaceDimension = SPACE_DIM;
       if ( J < 2 ) { grid._spaceDimension--; grid._jArrayLength = 0; }
       if ( K < 2 ) { grid._spaceDimension--; grid._kArrayLength = 0; }
@@ -1682,7 +1726,8 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldASCII(_InterMed & imed)
           for ( INoeud in = firstNode; in != endNode; ++in )
             in->second.coord[ j ] = geoFile.getReal();
         }
-        grid._gridType = MED_BODY_FITTED;
+        grid._gridType   = MED_BODY_FITTED;
+        grid._coordinate = new COORDINATE(3, 1, 0); // to avoid exception in convertInMESH()
       }
       else if ( rectilinear ) // read delta vectors with non-regular spacing 
       {
@@ -1730,10 +1775,11 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldASCII(_InterMed & imed)
         geoFile.skip( nbElems, /*nbPerLine =*/ 1, INT_WIDTH_GOLD);
       }
 
-      if ( !curvilinear ) // let GRID compute all coordinates
+      // let GRID compute all coordinates and connectivity
+      const MESH* unstruct = grid.convertInMESH();
+      if ( !curvilinear )
       {
-        grid._coordinate = new COORDINATE;
-        const double * coo = grid.getCoordinates(MED_FULL_INTERLACE);
+        const double * coo = unstruct->getCoordinates(MED_FULL_INTERLACE);
         typedef _ValueIterator< double > TCoordIt;
         TCoordIt xCoo( coo+0, grid._spaceDimension);
         TCoordIt yCoo( coo+1, grid._spaceDimension);
@@ -1748,10 +1794,8 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldASCII(_InterMed & imed)
         }
       }
 
-      // let GRID calculate connectivity 
-
-      const int * conn = grid.getConnectivity( MED_FULL_INTERLACE, MED_NODAL,
-                                               MED_CELL, MED_ALL_ELEMENTS );
+      // store connectivity 
+      const int * conn = unstruct->getConnectivity( MED_NODAL, MED_CELL, MED_ALL_ELEMENTS );
       medGeometryElement elemType = grid.getElementType( MED_CELL, 1 );
       int  nbElemNodes = elemType % 100;
 
@@ -1767,13 +1811,14 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldASCII(_InterMed & imed)
         //ma.ordre = ++order;
         partGroupe->mailles[i] = imed.insert(ma);
       }
-
       _SubPart subPart( partNum, "block" );
       subPart.myNbCells    = nbElems;
       subPart.myNbNodes    = NumberOfNodes;
       subPart.myFirstNode  = firstNode;
       subPart.myCellGroupIndex = imed.groupes.size();
       imed.addSubPart( subPart );
+
+      unstruct->removeReference();
     }
     else
     {
@@ -1856,14 +1901,14 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldBinary(_InterMed & imed)
   // ----------------------------------------
 
   // EnSight User Manual (for v8) says:
-//    You do not have to assign node IDs. If you do, the element connectivities are
-//    based on the node numbers. If you let EnSight assign the node IDs, the nodes
-//    are considered to be sequential starting at node 1, and element connectivity is
-//    done accordingly. If node IDs are set to off, they are numbered internally;
-//    however, you will not be able to display or query on them. If you have node
-//    IDs in your data, you can have EnSight ignore them by specifying "node id
-//    ignore." Using this option may reduce some of the memory taken up by the
-//    Client and Server, but display and query on the nodes will not be available.
+  //    You do not have to assign node IDs. If you do, the element connectivities are
+  //    based on the node numbers. If you let EnSight assign the node IDs, the nodes
+  //    are considered to be sequential starting at node 1, and element connectivity is
+  //    done accordingly. If node IDs are set to off, they are numbered internally;
+  //    however, you will not be able to display or query on them. If you have node
+  //    IDs in your data, you can have EnSight ignore them by specifying "node id
+  //    ignore." Using this option may reduce some of the memory taken up by the
+  //    Client and Server, but display and query on the nodes will not be available.
 
   // read "node|element id <off|given|assign|ignore>"
   bool haveNodeIds, haveElemIds;
@@ -1985,7 +2030,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldBinary(_InterMed & imed)
       for ( int i = 0; i < nbElems; ++i ) {
         _ValueIterator<int> medIndex = medIndexIt;
         nbElemNodes = nbElemNodesIt.next();
-        if ( ma.sommets.size() != nbElemNodes )
+        if ((int) ma.sommets.size() != nbElemNodes )
           ma.sommets.resize( nbElemNodes );
         for ( n = 0; n < nbElemNodes; ++n, ++nodeID ) {
           if ( haveCoords )
@@ -2093,7 +2138,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldBinary(_InterMed & imed)
       if ( partName.empty() )
         partName = "Part_" + restLine;
 
-      if ( imed.groupes.capacity() - imed.groupes.size() < theMaxNbTypes )
+      if (int( imed.groupes.capacity() - imed.groupes.size()) < theMaxNbTypes )
         imed.groupes.reserve( size_t( 1.5 * imed.groupes.size() ));
       imed.groupes.push_back(_groupe());
       partGroupe = & imed.groupes.back();
@@ -2142,7 +2187,6 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldBinary(_InterMed & imed)
       grid._iArrayLength   = I;
       grid._jArrayLength   = J;
       grid._kArrayLength   = K;
-      grid._numberOfNodes  = NumberOfNodes ;
       grid._spaceDimension = SPACE_DIM;
       if ( J < 2 ) { grid._spaceDimension--; grid._jArrayLength = 0; }
       if ( K < 2 ) { grid._spaceDimension--; grid._kArrayLength = 0; }
@@ -2161,7 +2205,8 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldBinary(_InterMed & imed)
           node.coord[ 1 ] = *y++;
           node.coord[ 2 ] = *z++;
         }
-        grid._gridType = MED_BODY_FITTED;
+        grid._gridType   = MED_BODY_FITTED;
+        grid._coordinate = new COORDINATE(3, 1, 0); // to avoid exception in convertInMESH()
       }
       else if ( rectilinear ) // read delta vectors with non-regular spacing 
       {
@@ -2219,10 +2264,11 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldBinary(_InterMed & imed)
         }
       }
 
-      if ( !curvilinear ) // let GRID compute all coordinates
+      // let GRID compute all coordinates and connectivity
+      const MESH* unstruct = grid.convertInMESH();
+      if ( !curvilinear )
       {
-        grid._coordinate = new COORDINATE;
-        const double * coo = grid.getCoordinates(MED_FULL_INTERLACE);
+        const double * coo = unstruct->getCoordinates(MED_FULL_INTERLACE);
         typedef _ValueIterator< double > TCoordIt;
         TCoordIt xCoo( coo+0, grid._spaceDimension);
         TCoordIt yCoo( coo+1, grid._spaceDimension);
@@ -2237,10 +2283,8 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldBinary(_InterMed & imed)
         }
       }
 
-      // let GRID calculate connectivity 
-
-      const int * conn = grid.getConnectivity( MED_FULL_INTERLACE, MED_NODAL,
-                                               MED_CELL, MED_ALL_ELEMENTS );
+      // store connectivity 
+      const int * conn = unstruct->getConnectivity( MED_NODAL, MED_CELL, MED_ALL_ELEMENTS );
       medGeometryElement elemType = grid.getElementType( MED_CELL, 1 );
       int  nbElemNodes = elemType % 100;
 
@@ -2263,6 +2307,8 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldBinary(_InterMed & imed)
       subPart.myFirstNode  = firstNode;
       subPart.myCellGroupIndex = imed.groupes.size();
       imed.addSubPart( subPart );
+
+      unstruct->removeReference();
     }
     else if ( word == "extents" )
     {
@@ -2326,14 +2372,14 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read6ASCII(_InterMed & imed)
   // ----------------------------------------
 
   // EnSight User Manual (for v8) says:
-//    You do not have to assign node IDs. If you do, the element connectivities are
-//    based on the node numbers. If you let EnSight assign the node IDs, the nodes
-//    are considered to be sequential starting at node 1, and element connectivity is
-//    done accordingly. If node IDs are set to off, they are numbered internally;
-//    however, you will not be able to display or query on them. If you have node
-//    IDs in your data, you can have EnSight ignore them by specifying "node id
-//    ignore." Using this option may reduce some of the memory taken up by the
-//    Client and Server, but display and query on the nodes will not be available.
+  //    You do not have to assign node IDs. If you do, the element connectivities are
+  //    based on the node numbers. If you let EnSight assign the node IDs, the nodes
+  //    are considered to be sequential starting at node 1, and element connectivity is
+  //    done accordingly. If node IDs are set to off, they are numbered internally;
+  //    however, you will not be able to display or query on them. If you have node
+  //    IDs in your data, you can have EnSight ignore them by specifying "node id
+  //    ignore." Using this option may reduce some of the memory taken up by the
+  //    Client and Server, but display and query on the nodes will not be available.
 
   // read "node|element id <off|given|assign|ignore>"
   geoFile.getWord(); geoFile.getWord();
@@ -2404,7 +2450,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read6ASCII(_InterMed & imed)
       if ( partName.empty() )
         partName = "Part_" + restLine;
 
-      if ( imed.groupes.capacity() - imed.groupes.size() < theMaxNbTypes )
+      if (int( imed.groupes.capacity() - imed.groupes.size()) < theMaxNbTypes )
         imed.groupes.reserve( size_t( 1.5 * imed.groupes.size() ));
       imed.groupes.push_back(_groupe());
       partGroupe = & imed.groupes.back();
@@ -2448,17 +2494,17 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read6ASCII(_InterMed & imed)
 
       // let GRID calculate connectivity 
       GRID grid;
-      grid._numberOfNodes = NumberOfNodes ;
       grid._iArrayLength  = I;
       grid._jArrayLength  = J;
       grid._kArrayLength  = K;
       grid._gridType      = MED_BODY_FITTED;
       grid._spaceDimension= SPACE_DIM;
+      grid._coordinate    = new COORDINATE(3, 1, 0); // to avoid exception in convertInMESH()
       if ( J < 2 ) { grid._spaceDimension--; grid._jArrayLength = 0; }
       if ( K < 2 ) { grid._spaceDimension--; grid._kArrayLength = 0; }
 
-      const int * conn = grid.getConnectivity( MED_FULL_INTERLACE, MED_NODAL,
-                                               MED_CELL, MED_ALL_ELEMENTS );
+      const MESH* unstruct = grid.convertInMESH();
+      const int * conn = unstruct->getConnectivity( MED_NODAL, MED_CELL, MED_ALL_ELEMENTS );
       medGeometryElement elemType = grid.getElementType( MED_CELL, 1 );
       int  nbElemNodes = elemType % 100;
       int      nbElems = grid.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);
@@ -2482,6 +2528,8 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read6ASCII(_InterMed & imed)
       subPart.myFirstNode  = firstNode;
       subPart.myCellGroupIndex = imed.groupes.size();
       imed.addSubPart( subPart );
+
+      unstruct->removeReference();
     }
     else if ( word == "coordinates" )
     {
@@ -2600,14 +2648,14 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read6Binary(_InterMed & imed)
   // ----------------------------------------
 
   // EnSight User Manual (for v8) says:
-//    You do not have to assign node IDs. If you do, the element connectivities are
-//    based on the node numbers. If you let EnSight assign the node IDs, the nodes
-//    are considered to be sequential starting at node 1, and element connectivity is
-//    done accordingly. If node IDs are set to off, they are numbered internally;
-//    however, you will not be able to display or query on them. If you have node
-//    IDs in your data, you can have EnSight ignore them by specifying "node id
-//    ignore." Using this option may reduce some of the memory taken up by the
-//    Client and Server, but display and query on the nodes will not be available.
+  //    You do not have to assign node IDs. If you do, the element connectivities are
+  //    based on the node numbers. If you let EnSight assign the node IDs, the nodes
+  //    are considered to be sequential starting at node 1, and element connectivity is
+  //    done accordingly. If node IDs are set to off, they are numbered internally;
+  //    however, you will not be able to display or query on them. If you have node
+  //    IDs in your data, you can have EnSight ignore them by specifying "node id
+  //    ignore." Using this option may reduce some of the memory taken up by the
+  //    Client and Server, but display and query on the nodes will not be available.
 
   // read "node|element id <off|given|assign|ignore>"
   bool haveNodeIds, haveElemIds;
@@ -2683,7 +2731,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read6Binary(_InterMed & imed)
       if ( partName.empty() )
         partName = "Part_" + restLine;
 
-      if ( imed.groupes.capacity() - imed.groupes.size() < theMaxNbTypes )
+      if (int( imed.groupes.capacity() - imed.groupes.size()) < theMaxNbTypes )
         imed.groupes.reserve( size_t( 1.5 * imed.groupes.size() ));
       imed.groupes.push_back(_groupe());
       partGroupe = & imed.groupes.back();
@@ -2728,17 +2776,17 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read6Binary(_InterMed & imed)
 
       // let GRID calculate connectivity 
       GRID grid;
-      grid._numberOfNodes = NumberOfNodes ;
       grid._iArrayLength  = I;
       grid._jArrayLength  = J;
       grid._kArrayLength  = K;
       grid._gridType      = MED_BODY_FITTED;
       grid._spaceDimension= SPACE_DIM;
+      grid._coordinate    = new COORDINATE(3, 1, 0); // to avoid exception in convertInMESH()
       if ( J < 2 ) { grid._spaceDimension--; grid._jArrayLength = 0; }
       if ( K < 2 ) { grid._spaceDimension--; grid._kArrayLength = 0; }
 
-      const int * conn = grid.getConnectivity( MED_FULL_INTERLACE, MED_NODAL,
-                                               MED_CELL, MED_ALL_ELEMENTS );
+      const MESH* unstruct = grid.convertInMESH();
+      const int * conn = unstruct->getConnectivity( MED_NODAL, MED_CELL, MED_ALL_ELEMENTS );
       medGeometryElement elemType = grid.getElementType( MED_CELL, 1 );
       int  nbElemNodes = elemType % 100;
       int      nbElems = grid.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);
@@ -2762,6 +2810,8 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read6Binary(_InterMed & imed)
       subPart.myFirstNode  = points.find( nodeShift + 1 );
       subPart.myCellGroupIndex = imed.groupes.size();
       imed.addSubPart( subPart );
+
+      unstruct->removeReference();
     }
     else if ( word == "coordinates" )
     {
@@ -3215,7 +3265,8 @@ GROUP* ENSIGHT_MESH_RDONLY_DRIVER::makeGroup( _groupe&     grp,
   grp.medGroup = 0; // the new GROUP should appear in grp.medGroup
   grp.nom = "TMP";
   vector<GROUP *> tmp;
-  imed.getGroups( tmp, tmp, tmp, tmp, imed._medMesh );
+  MESH* mesh = imed._isOwnMedMesh ? (MESH*) 0 : imed._medMesh;
+  imed.getGroups( tmp, tmp, tmp, tmp, mesh );
   if ( !grp.medGroup )
     throw MEDEXCEPTION(LOCALIZED("Can't create a GROUP from _groupe"));
 
@@ -3230,6 +3281,8 @@ GROUP* ENSIGHT_MESH_RDONLY_DRIVER::makeGroup( _groupe&     grp,
       equalGroupe = & g;
   }
   if ( equalGroupe ) {
+    if ( grp.medGroup->getMesh() )
+      grp.medGroup->getMesh()->addReference(); // let the mesh survive
     grp.medGroup->removeReference();
     grp.medGroup = equalGroupe->medGroup;
   }

@@ -30,7 +30,7 @@
 
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_DriversDef.hxx"
-#include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_GMesh.hxx"
 #include "MEDMEM_Meshing.hxx"
 
 using namespace std;
@@ -64,7 +64,7 @@ very simple, for the element list is implicitly defined.
   Constructor.
 */
 //--------------------------------------------------------------------------
-SUPPORT::SUPPORT(): _name(""),  _description("None"), _mesh((MESH*)NULL),
+SUPPORT::SUPPORT(): _name(""),  _description("None"), _mesh((GMESH*)NULL),
                     _entity(MED_CELL), _numberOfGeometricType(0),
                     _isOnAllElts(false),
                     _totalNumberOfElements(0),
@@ -73,7 +73,7 @@ SUPPORT::SUPPORT(): _name(""),  _description("None"), _mesh((MESH*)NULL),
   //--------------------------------------------------------------------------
 {
   MESSAGE_MED("SUPPORT::SUPPORT()");
-};
+}
 
 /*!
 \addtogroup SUPPORT_constructors
@@ -90,7 +90,7 @@ SUPPORT::SUPPORT(): _name(""),  _description("None"), _mesh((MESH*)NULL),
 \param Entity Entity type of the support (MED_CELL,MED_FACE,MED_EDGE, MED_NODE)
 */
 //--------------------------------------------------------------------------
-SUPPORT::SUPPORT(MESH* Mesh, string Name/*=""*/, medEntityMesh Entity/*=MED_CELL*/):
+SUPPORT::SUPPORT(GMESH* Mesh, string Name/*=""*/, medEntityMesh Entity/*=MED_CELL*/):
   _name(Name), _description("None"), _mesh(Mesh), _entity(Entity),
   _numberOfGeometricType(0), _isOnAllElts(true),
   _totalNumberOfElements(0), _number((MEDSKYLINEARRAY*)NULL),_number_fromfile(0)
@@ -100,7 +100,7 @@ SUPPORT::SUPPORT(MESH* Mesh, string Name/*=""*/, medEntityMesh Entity/*=MED_CELL
   if(_mesh)
     _mesh->addReference();
   update() ;
-};
+}
 
 /*!
   Copy constructor.
@@ -117,6 +117,7 @@ SUPPORT::SUPPORT(const SUPPORT & m):_number_fromfile(0)
   _mesh = m._mesh ; // on recopie uniquement l'adresse
   if(_mesh)
     _mesh->addReference();
+  _meshName = m._meshName;
   _entity = m._entity;
   _numberOfGeometricType = m._numberOfGeometricType;
 
@@ -138,7 +139,7 @@ SUPPORT::SUPPORT(const SUPPORT & m):_number_fromfile(0)
   _profilNames=m._profilNames;
 
   END_OF_MED(LOC);
-};
+}
 
 /*!
   @}
@@ -283,40 +284,24 @@ void SUPPORT::update()
     else
     { // we duplicate information from _mesh
       // BEGIN Issue 0020804: [CEA 399] Memory corruption ... in MEDMEMCppTest
-      // VSR: commented next line as result of merge from V5_1_main
-      // since in V6_main there seems another solution
-      // setNumberOfGeometricType(_mesh->getNumberOfTypesWithPoly(_entity));
+      setNumberOfGeometricType(_mesh->getNumberOfTypes(_entity));
       // END Issue 0020804
-      _numberOfGeometricType=_mesh->getNumberOfTypesWithPoly(_entity);
-      MED_EN::medGeometryElement *types=_mesh->getTypesWithPoly(_entity);
-      _geometricType.set(_numberOfGeometricType);
-      for (int i=0;i<_numberOfGeometricType;i++)
-        {
-          _geometricType[i]=types[i];
-        }
-      delete [] types;
-      SCRUTE_MED(_numberOfGeometricType);
-      medGeometryElement *  allType = _mesh->getTypesWithPoly(_entity);
+      const medGeometryElement *  allType = _mesh->getTypes(_entity);
       // BEGIN Issue 0020633: [CEA] Pb with 3D field creation fron another
       // Use setGeometricType() in order to get _profilNames updated
-      //_geometricType.set(_numberOfGeometricType,allType );
       setGeometricType( allType );
       // END Issue 0020633: [CEA] Pb with 3D field creation fron another
       _numberOfElements.set(_numberOfGeometricType);
       _totalNumberOfElements=0;
       for (int i=0;i<_numberOfGeometricType;i++)
       {
-        _numberOfElements[i]=_mesh->getNumberOfElementsWithPoly(_entity,_geometricType[i]) ;
+        _numberOfElements[i]=_mesh->getNumberOfElements(_entity,_geometricType[i]) ;
         _totalNumberOfElements+=_numberOfElements[i];
       }
-      delete [] allType;
     }
-
-    SCRUTE_MED(_name);
-    SCRUTE_MED(_numberOfGeometricType);
   }
   END_OF_MED(LOC);
-};
+}
 /*!
   Get the field value index (in fortran mode) from the support global number.
   Becareful, it doesn't take care of the field number of components
@@ -326,7 +311,6 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
   //-------------------
 {
   const char * LOC="getValIndFromGlobalNumber(const int number) : ";
-  //BEGIN_OF_MED(LOC);
 
   if (_isOnAllElts) return number;
 
@@ -347,9 +331,6 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
     else
       iThis++;
 
-  //if (!_isOnAllElts)
-  //cout << "----Contenu du skyline : ---------------------" << *_number << endl;
-
   if(!found)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't find the global number |"
                                  << number << "| in Support |"
@@ -357,8 +338,6 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
 
   // It should never arrive here !!
   return 0;
-
-  //END_OF_MED();
 }
 
 /*!
@@ -434,7 +413,7 @@ void SUPPORT::blending(const SUPPORT * mySupport) throw (MEDEXCEPTION)
 /*!
   This function allows the user to set a support not on all entities Entity,
   it should be used after an initialisation with the constructor
-  SUPPORT(MESH* Mesh, string Name="", medEntityMesh Entity=MED_CELL).
+  SUPPORT(GMESH* Mesh, string Name="", medEntityMesh Entity=MED_CELL).
   It allocates and initialises all the attributs of the class SUPPORT.
 
 \param Description string describing the support for information purposes (should not exceed MED_TAILLE_DESC length - i.e. 200 characters)
@@ -521,7 +500,7 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
   setProfilNames(prof_names);
 
   END_OF_MED(LOC);
-};
+}
 
 /*! @}  */
 
@@ -529,10 +508,10 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
 \ifnot MEDMEM_ug
 This function allows the user to set a support not on all entities Entity,
 it should be used after an initialisation of :
-SUPPORT(MESH* Mesh, string Name="", medEntityMesh Entity=MED_CELL) and
+SUPPORT(GMESH* Mesh, string Name="", medEntityMesh Entity=MED_CELL) and
 after calling  at least setGeometricType and perharps setEntity.
 It allocates and initialises all the attributs of the class SUPPORT but
-doesn't set a description, a SUPPORT name, a meshName and an associated MESH.
+doesn't set a description, a SUPPORT name, a meshName and an associated GMESH.
 \endif
 */
 
@@ -565,10 +544,8 @@ void SUPPORT::setpartial(MEDSKYLINEARRAY * number, bool shallowCopy) throw (MEDE
   else
     _number = new MEDSKYLINEARRAY(*number);
 
-  // cout << *_number << endl;
-
   END_OF_MED(LOC);
-};
+}
 
 void SUPPORT::setpartial_fromfile(MEDSKYLINEARRAY * number, bool shallowCopy) throw (MEDEXCEPTION)
   //-------------------
@@ -582,7 +559,7 @@ void SUPPORT::setpartial_fromfile(MEDSKYLINEARRAY * number, bool shallowCopy) th
     _number_fromfile = new MEDSKYLINEARRAY(*number);
 
   END_OF_MED(LOC);
-};
+}
 
 void SUPPORT::setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION){
 
@@ -602,8 +579,8 @@ void SUPPORT::setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION){
                                  << " a profil number list before setting"
                                  << " the associated profil name list" )) ;
 
-  if ( ( profilNames.size() != _number->getNumberOf() ) &&
-       ( profilNames.size() !=_numberOfGeometricType ) ) {
+  if ( ( (int)profilNames.size() != _number->getNumberOf() ) &&
+       ( (int)profilNames.size() !=_numberOfGeometricType ) ) {
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The profil name list size : "<< profilNames.size()
                                  << " must be equal to the number of geometric type : " 
                                  <<  _numberOfGeometricType << " (_number->getNumberOf() : "
@@ -616,12 +593,12 @@ void SUPPORT::setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION){
 
   END_OF_MED(LOC);
 
-};
+}
 
 vector<string> SUPPORT::getProfilNames() const throw (MEDEXCEPTION)
 {
   return _profilNames;
-};
+}
 
 /*!
 \addtogroup SUPPORT_advanced
@@ -630,8 +607,8 @@ vector<string> SUPPORT::getProfilNames() const throw (MEDEXCEPTION)
 
 /*!
   This method gets the boundary elements of the mesh. The support has to be
-  build using the constructor SUPPORT(MESH *,string, medEntityMesh) or
-  SUPPORT() followed by setMesh(MESH*) setName(string) and
+  build using the constructor SUPPORT(GMESH *,string, medEntityMesh) or
+  SUPPORT() followed by setMesh(GMESH*) setName(string) and
   setEntity(medEntityMesh) before using this method.
 */
 //-------------------
@@ -641,7 +618,7 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
   const char * LOC = "SUPPORT::getBoundaryElements() : " ;
   BEGIN_OF_MED(LOC) ;
 
-  if (_mesh == (MESH*)NULL) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"You shlould use the appropriate SUPPORT Constructor before calling this method"));
+  if (_mesh == (GMESH*)NULL) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"You shlould use the appropriate SUPPORT Constructor before calling this method"));
 
   int spaceDimension = _mesh->getSpaceDimension();
 
@@ -654,11 +631,12 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
 
   setAll(false);
 
+  const MESH* mesh = _mesh->convertInMESH();
   const_cast<CONNECTIVITY*>
-    (_mesh->getConnectivityptr())->calculateFullDescendingConnectivity(MED_CELL);
-  const int * myConnectivityValue = _mesh->getReverseConnectivity(MED_DESCENDING) ;
-  const int * myConnectivityIndex = _mesh->getReverseConnectivityIndex(MED_DESCENDING) ;
-  int numberOf = _mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS) ;
+    (mesh->getConnectivityptr())->calculateFullDescendingConnectivity(MED_CELL);
+  const int * myConnectivityValue = mesh->getReverseConnectivity(MED_DESCENDING) ;
+  const int * myConnectivityIndex = mesh->getReverseConnectivityIndex(MED_DESCENDING) ;
+  int numberOf = mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS) ;
   list<int> myElementsList ;
   int size = 0 ;
   SCRUTE_MED(numberOf) ;
@@ -684,14 +662,13 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
   medGeometryElement* geometricType ;
   int * geometricTypeNumber ;
   int * numberOfElements ;
-  //MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY() ;
   int * mySkyLineArrayIndex ;
 
-  int numberOfType = _mesh->getNumberOfTypes(_entity) ;
+  int numberOfType = mesh->getNumberOfTypes(_entity) ;
   if (numberOfType == 1) { // wonderfull : it's easy !
     numberOfGeometricType = 1 ;
     geometricType = new medGeometryElement[1] ;
-    const medGeometryElement *  allType = _mesh->getTypes(_entity);
+    const medGeometryElement *  allType = mesh->getTypes(_entity);
     geometricType[0] = allType[0] ;
     geometricTypeNumber = new int[1] ; // not use, but initialized to nothing
     geometricTypeNumber[0] = 0 ;
@@ -704,7 +681,7 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
   else {// hemmm
     map<medGeometryElement,int> theType ;
     for (myElementsListIt=myElementsList.begin();myElementsListIt!=myElementsList.end();myElementsListIt++) {
-      medGeometryElement myType = _mesh->getElementType(_entity,*myElementsListIt) ;
+      medGeometryElement myType = mesh->getElementType(_entity,*myElementsListIt) ;
       if (theType.find(myType) != theType.end() )
         theType[myType]+=1 ;
       else
@@ -712,7 +689,6 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
     }
     numberOfGeometricType = theType.size() ;
     geometricType = new medGeometryElement[numberOfGeometricType] ;
-    //const medGeometryElement *  allType = _mesh->getTypes(_entity); !! UNUSED VARIABLE !!
     geometricTypeNumber = new int[numberOfGeometricType] ; // not use, but initialized to nothing
     numberOfElements = new int[numberOfGeometricType] ;
     mySkyLineArrayIndex = new int[numberOfGeometricType+1] ;
@@ -727,19 +703,11 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
       index++ ;
     }
   }
-  //mySkyLineArray->setMEDSKYLINEARRAY(numberOfGeometricType,size,mySkyLineArrayIndex,myListArray) ;
   MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY(numberOfGeometricType,size,mySkyLineArrayIndex,myListArray) ;
 
   setNumberOfGeometricType(numberOfGeometricType) ;
   setGeometricType(geometricType) ;
-  //for (int i=0;i<numberOfGeometricType;i++)
-  //   {
-  //     _geometricType[i] = geometricType[i];
-  //   }
-
   setNumberOfElements(numberOfElements) ;
-  //setTotalNumberOfElements(size) ;
-  //  setNumber(mySkyLineArray) ;
 
   _number = new MEDSKYLINEARRAY(numberOfGeometricType,size);
 
@@ -756,6 +724,8 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
   delete[] mySkyLineArrayIndex;
   delete[] myListArray;
   delete mySkyLineArray;
+
+  mesh->removeReference();
 
   END_OF_MED(LOC);
 }
@@ -809,7 +779,7 @@ void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
     clearDataOnNumbers();
   }
   END_OF_MED(LOC);
-};
+}
 /*!  @}  */
 
 /*!
@@ -879,9 +849,9 @@ bool MEDMEM::SUPPORT::operator == (const SUPPORT &support) const
   END_OF_MED(LOC);
 
   return operatorReturn;
-};
+}
 
-void SUPPORT::changeElementsNbs(medEntityMesh entity, const int *renumberingFromOldToNew, int limitNbClassicPoly, const int *renumberingFromOldToNewPoly)
+void SUPPORT::changeElementsNbs(medEntityMesh entity, const int *renumberingFromOldToNew)
 {
   if(entity != _entity)
     throw MEDEXCEPTION("SUPPORT::changeElementsNbs : Renumbering on a mismatch entity");
@@ -890,13 +860,7 @@ void SUPPORT::changeElementsNbs(medEntityMesh entity, const int *renumberingFrom
   {
     const int *oldNbs=_number->getValue();
     for(int i=0;i<_totalNumberOfElements;i++)
-    {
-      int globNb=oldNbs[i];
-      if(globNb<=limitNbClassicPoly)
-        newNbs.push_back(renumberingFromOldToNew[globNb-1]);
-      else
-        newNbs.push_back(renumberingFromOldToNewPoly[globNb-limitNbClassicPoly-1]);
-    }
+      newNbs.push_back(renumberingFromOldToNew[oldNbs[i]-1]);
     newNbs.sort();
     fillFromElementList(newNbs);
   }
@@ -932,6 +896,9 @@ bool MEDMEM::SUPPORT::deepCompare(const SUPPORT &support) const
       }
     }
   }
+  if(operatorReturn)
+    operatorReturn = ( bool(_mesh) == bool(support._mesh));
+
   if(operatorReturn)
   {
     if(!(*_mesh == *support._mesh))
@@ -1176,9 +1143,10 @@ SUPPORT *MEDMEM::SUPPORT::getBoundaryElements(medEntityMesh Entity) const throw 
   if(_isOnAllElts)
     return _mesh->getBoundaryElements(Entity);
 
-  const int * myConnectivityValue=_mesh->getReverseConnectivity(MED_DESCENDING);
-  const int * myConnectivityIndex=_mesh->getReverseConnectivityIndex(MED_DESCENDING);
-  int numberOf=_mesh->getNumberOfElements(baseEntity,MED_ALL_ELEMENTS);
+  const MESH* mesh = _mesh->convertInMESH();
+  const int * myConnectivityValue=mesh->getReverseConnectivity(MED_DESCENDING);
+  const int * myConnectivityIndex=mesh->getReverseConnectivityIndex(MED_DESCENDING);
+  int numberOf=mesh->getNumberOfElements(baseEntity,MED_ALL_ELEMENTS);
   const int *ids=_number->getValue();
   set<int> idsSet(ids,ids+_totalNumberOfElements);
   list<int> myElementsList;
@@ -1192,13 +1160,15 @@ SUPPORT *MEDMEM::SUPPORT::getBoundaryElements(medEntityMesh Entity) const throw 
     if(nbOfDP1EntitySharing==1)
       myElementsList.push_back(i+1);
   }
+  mesh->removeReference();
+
   if(Entity==MED_NODE)
   {
-    return _mesh->buildSupportOnNodeFromElementList(myElementsList,baseEntity);
+    return mesh->buildSupportOnNodeFromElementList(myElementsList,baseEntity);
   }
   else
   {
-    return _mesh->buildSupportOnElementsFromElementList(myElementsList,baseEntity);
+    return mesh->buildSupportOnElementsFromElementList(myElementsList,baseEntity);
   }
 }
 
@@ -1265,7 +1235,6 @@ void MEDMEM::SUPPORT::fillFromNodeList(const list<int>& listOfNode) throw (MEDEX
   setNumberOfGeometricType(numberOfGeometricType);
   setGeometricType(geometricType);
   setNumberOfElements(numberOfElements);
-  //setTotalNumberOfElements(numberOfElements[0]);
   setNumber(mySkyLineArray);
 
   delete[] numberOfElements;
@@ -1280,8 +1249,9 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
 {
   clearDataOnNumbers();
   int size=listOfElt.size();
-  int totalNbInMesh=_mesh->getNumberOfElementsWithPoly(_entity,MED_ALL_ELEMENTS);
-  if(totalNbInMesh==size){
+  int totalNbInMesh=_mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS);
+  if(totalNbInMesh==size)
+  {
     _isOnAllElts=true;
     update();
     return;
@@ -1299,23 +1269,24 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
   int * numberOfElements ;
   int * mySkyLineArrayIndex ;
 
-  int numberOfType = _mesh->getNumberOfTypesWithPoly(_entity) ;
-  if (numberOfType == 1) {
+  int numberOfType = _mesh->getNumberOfTypes(_entity) ;
+  if (numberOfType == 1)
+  {
     numberOfGeometricType = 1 ;
     geometricType = new medGeometryElement[1] ;
-    medGeometryElement *  allType = _mesh->getTypesWithPoly(_entity);
-    geometricType[0] = allType[0] ;
+    geometricType[0] = _mesh->getTypes(_entity)[0];
     numberOfElements = new int[1] ;
     numberOfElements[0] = size ;
     mySkyLineArrayIndex = new int[2] ;
     mySkyLineArrayIndex[0]=1 ;
     mySkyLineArrayIndex[1]=1+size ;
-    delete [] allType;
   }
-  else {// hemmm
+  else // hemmm
+  {
     map<medGeometryElement,int> theType ;
-    for (myElementsListIt=listOfElt.begin();myElementsListIt!=listOfElt.end();myElementsListIt++) {
-      medGeometryElement myType = _mesh->getElementTypeWithPoly(_entity,*myElementsListIt) ;
+    for (myElementsListIt=listOfElt.begin();myElementsListIt!=listOfElt.end();myElementsListIt++)
+    {
+      medGeometryElement myType = _mesh->getElementType(_entity,*myElementsListIt) ;
       if (theType.find(myType) != theType.end() )
         theType[myType]+=1 ;
       else
@@ -1328,18 +1299,18 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
     int index = 0 ;
     mySkyLineArrayIndex[0]=1 ;
     map<medGeometryElement,int>::iterator theTypeIt ;
-    for (theTypeIt=theType.begin();theTypeIt!=theType.end();theTypeIt++) {
+    for (theTypeIt=theType.begin();theTypeIt!=theType.end();theTypeIt++)
+    {
       geometricType[index] = (*theTypeIt).first ;
       numberOfElements[index] = (*theTypeIt).second ;
       mySkyLineArrayIndex[index+1]=mySkyLineArrayIndex[index]+numberOfElements[index] ;
       index++ ;
     }
   }
-  MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY(numberOfGeometricType,size,mySkyLineArrayIndex,myListArray,true) ;
+  MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY(numberOfGeometricType,size,mySkyLineArrayIndex,myListArray,/*shallowCopy=*/true) ;
   setNumberOfGeometricType(numberOfGeometricType) ;
   setGeometricType(geometricType) ;
   setNumberOfElements(numberOfElements) ;
-  //setTotalNumberOfElements(size) ;
   setNumber(mySkyLineArray) ;
 
   delete[] numberOfElements;
@@ -1350,7 +1321,7 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
 
 \brief creates a MESH that contains only the elements in the current support.
 
-The output mesh has no group, nor elements of connectivity lesser than that of the present support. The method does not handle polygon or polyhedral elements. Nodes are renumbered so that they are numberd from 1 to N in the new mesh. The order of the elements in the new mesh corresponds to that of the elements in the original support.
+The output mesh has no group, nor elements of connectivity lesser than that of the present support. Nodes are renumbered so that they are numberd from 1 to N in the new mesh. The order of the elements in the new mesh corresponds to that of the elements in the original support.
 */
 MESH* SUPPORT::makeMesh()
 {
@@ -1360,9 +1331,6 @@ MESH* SUPPORT::makeMesh()
   if ( _entity == MED_NODE )
     throw MED_EXCEPTION(STRING(LOC)<<" unavailable for support on nodes");
 
-  // define mesh dimension
-  int mesh_dim = (_entity == MED_CELL) ? _mesh->getMeshDimension() : (_entity == MED_FACE) ? 2 : 1;
-
   //Creating the new mesh
 
   MESHING* newmesh = new MESHING();
@@ -1371,21 +1339,20 @@ MESH* SUPPORT::makeMesh()
   // set types info
   const medGeometryElement* types = getTypes();
   int nb_types = _numberOfGeometricType;
-  if ( types[nb_types-1] == MED_POLYGON || types[nb_types-1] == MED_POLYHEDRA )
-    --nb_types;
   newmesh->setNumberOfTypes   ( nb_types, MED_CELL );
   newmesh->setTypes           ( types, MED_CELL );
   newmesh->setNumberOfElements( _numberOfElements, MED_CELL);
-  newmesh->setSpaceDimension  ( _mesh->getSpaceDimension() );
-  newmesh->setMeshDimension   ( mesh_dim );
 
   // browsing through elements to create a mapping between
   // the new nodes and the old nodes and to create nodal connectivity
 
-  const medGeometryElement* all_mesh_types = _mesh->getTypes( _entity );
-  const int *                    num_index = _mesh->getGlobalNumberingIndex( _entity );
+  const MESH* mesh = _mesh->convertInMESH();
+  const medGeometryElement* all_mesh_types = mesh->getTypes( _entity );
+  const int *                    num_index = mesh->getGlobalNumberingIndex( _entity );
 
   map<int,int> oldnodes; // map old to new nodes
+  if ( types[nb_types-1] == MED_POLYHEDRA )
+    oldnodes.insert( make_pair( -1, -1 )); // for face separators
   int newid=1;
   for (int itype=0; itype < _numberOfGeometricType;itype++)
   {
@@ -1393,44 +1360,18 @@ MESH* SUPPORT::makeMesh()
     int nbelems = getNumberOfElements(type);
 
     // get connectivity info
-    const int *conn, *index, *findex;
     int shift = 1; // to pass from elem number to array index
-    switch ( type )
-    {
-    case MED_POLYGON:
-      conn  = _mesh->getPolygonsConnectivity     (MED_NODAL,_entity);
-      index = _mesh->getPolygonsConnectivityIndex(MED_NODAL,_entity);
-      shift+= _mesh->getNumberOfElements         (_entity, MED_ALL_ELEMENTS);
-      break;
-    case MED_POLYHEDRA:
-      conn   = _mesh->getPolyhedronConnectivity(MED_NODAL);
-      index  = _mesh->getPolyhedronIndex       (MED_NODAL);
-      findex = _mesh->getPolyhedronFacesIndex  ();
-      shift += _mesh->getNumberOfElements      (_entity, MED_ALL_ELEMENTS);
-      break;
-    default:
-      conn  = _mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,_entity,MED_ALL_ELEMENTS);
-      index = _mesh->getConnectivityIndex(MED_NODAL,_entity);
-      int t = 0;
-      while ( type != all_mesh_types[t] ) ++t;
-      shift+= num_index[ t ] - num_index[0];
-      index+= num_index[ t ] - num_index[0];
-    }
+    const int* conn = mesh->getConnectivity(MED_NODAL,_entity,MED_ALL_ELEMENTS);
+    const int* index = mesh->getConnectivityIndex(MED_NODAL,_entity);
+    int t = 0;
+    while ( type != all_mesh_types[t] ) ++t;
+    shift+= num_index[ t ] - num_index[0];
+    index+= num_index[ t ] - num_index[0];
 
     // make and set new connectivity
     if ( _isOnAllElts  && _entity == MED_CELL )
     {
-      switch ( type )
-      {
-      case MED_POLYGON:
-        newmesh->setPolygonsConnectivity( index, conn, nbelems, MED_CELL );
-        break;
-      case MED_POLYHEDRA:
-        newmesh->setPolyhedraConnectivity( index, findex, conn, nbelems );
-        break;
-      default:
-        newmesh->setConnectivity( conn, MED_CELL, type );
-      }
+      newmesh->setConnectivity( MED_CELL, type, conn, index );
     }
     else // partial support or support of sub-entities
     {
@@ -1441,71 +1382,35 @@ MESH* SUPPORT::makeMesh()
 
       const int * nums = _isOnAllElts ? 0 : getNumber( type );
 
-      if ( type == MED_POLYHEDRA )
+      for (int i=0; i<nbelems; i++)
       {
-        vector<int> new_findex;
-        new_findex.push_back(1);
-
-        for (int i=0; i<nbelems;i++) // loop on polyhedrons
+        int ielem = nums ? nums[i]-shift : i;
+        const int* elem_node = conn + index[ ielem   ] - 1;
+        const int* nodes_end = conn + index[ ielem+1 ] - 1;
+        for ( ; elem_node < nodes_end; ++elem_node )
         {
-          int ielem = nums ? nums[i]-shift : i;
-          int elem_face = index[ ielem   ] - 1;
-          int faces_end = index[ ielem+1 ] - 1;
-          new_index.push_back( new_index.back() + faces_end - elem_face );
-          for ( ; elem_face < faces_end; ++elem_face )
-          {
-            const int* face_node = conn + findex[ elem_face   ] - 1;
-            const int* nodes_end = conn + findex[ elem_face+1 ] - 1;
-            new_findex.push_back( new_findex.back() + nodes_end - face_node );
-            for ( ; face_node < nodes_end; ++face_node )
-            {
-              // make new connectivity
-              map<int,int>::iterator old_new=oldnodes.insert(make_pair( *face_node, newid )).first;
-              new_conn.push_back( old_new->second );
-              if ( old_new->second == newid )
-                newid++;
-            }
-          }
+          // make new connectivity
+          map<int,int>::iterator old_new = oldnodes.insert(make_pair( *elem_node, newid )).first;
+          new_conn.push_back( old_new->second );
+          if ( old_new->second == newid )
+            newid++;
         }
-        // set new connectivity
-        newmesh->setPolyhedraConnectivity( &new_index[0], &new_findex[0], &new_conn[0], nbelems);
+        new_index.push_back( new_index.back() + index[ ielem+1 ] - index[ ielem ] );
       }
-      else // MED_POLYGON and classical types
-      {
-        for (int i=0; i<nbelems;i++)
-        {
-          int ielem = nums ? nums[i]-shift : i;
-          const int* elem_node = conn + index[ ielem   ] - 1;
-          const int* nodes_end = conn + index[ ielem+1 ] - 1;
-          for ( ; elem_node < nodes_end; ++elem_node )
-          {
-            // make new connectivity
-            map<int,int>::iterator old_new = oldnodes.insert(make_pair( *elem_node, newid )).first;
-            new_conn.push_back( old_new->second );
-            if ( old_new->second == newid )
-              newid++;
-          }
-          if ( type == MED_POLYGON )
-            new_index.push_back( new_index.back() + index[ ielem+1 ] - index[ ielem ] );
-        }
-        // set new connectivity
-        if ( type == MED_POLYGON )
-          newmesh->setPolygonsConnectivity( & new_index[0], & new_conn[0], nbelems, MED_CELL );
-        else
-          newmesh->setConnectivity( & new_conn[0], MED_CELL, type );
-      }
+      // set new connectivity
+      newmesh->setConnectivity( MED_CELL, type, & new_conn[0], & new_index[0] );
     }
   }
 
   //definition of coordinates
 
-  int nb_nodes, spacedim = _mesh->getSpaceDimension();  
-  const double*oldcoords = _mesh->getCoordinates(MED_FULL_INTERLACE);
+  int nb_nodes, spacedim = mesh->getSpaceDimension();  
+  const double*oldcoords = mesh->getCoordinates(MED_FULL_INTERLACE);
   PointerOf<double> newcoords;
 
   if ( _isOnAllElts && _entity == MED_CELL )
   {
-    nb_nodes = _mesh->getNumberOfNodes();
+    nb_nodes = mesh->getNumberOfNodes();
     newcoords.set( oldcoords );
   }
   else
@@ -1513,16 +1418,16 @@ MESH* SUPPORT::makeMesh()
     nb_nodes = oldnodes.size();
     newcoords.set( nb_nodes * spacedim);
     for (std::map<int,int>::const_iterator iter=oldnodes.begin(); iter!=oldnodes.end();iter++)
-    {
-      std::copy( oldcoords+(iter->first-1)*spacedim, oldcoords+iter->first*spacedim,newcoords+((*iter).second-1)*spacedim);
-    }
+      std::copy( oldcoords+(iter->first-1 )*spacedim,
+                 oldcoords+(iter->first   )*spacedim,
+                 newcoords+(iter->second-1)*spacedim);
   }
   newmesh->setCoordinates(spacedim, nb_nodes, newcoords,
-                          _mesh->getCoordinatesSystem(), MED_FULL_INTERLACE);
-  newmesh->setCoordinatesNames ( _mesh->getCoordinatesNames() );
-  newmesh->setCoordinatesUnits ( _mesh->getCoordinatesUnits() );
+                          mesh->getCoordinatesSystem(), MED_FULL_INTERLACE);
+  newmesh->setCoordinatesNames ( mesh->getCoordinatesNames() );
+  newmesh->setCoordinatesUnits ( mesh->getCoordinatesUnits() );
 
-  ((CONNECTIVITY*) newmesh->getConnectivityptr() )->setNumberOfNodes( nb_nodes );
+  mesh->removeReference();
 
   return newmesh;
 }
@@ -1532,7 +1437,7 @@ MESH* SUPPORT::makeMesh()
 
 /*! set the reference _mesh to Mesh */
 //--------------------------------------
-void SUPPORT::setMesh(MESH *Mesh) const
+void SUPPORT::setMesh(GMESH *Mesh) const
   //--------------------------------------
 {
   if(_mesh!=Mesh)

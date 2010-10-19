@@ -255,27 +255,38 @@ often.
 class MEDMEM_EXPORT CELLMODEL_Map
 {
 public:
-        static const MEDMEM::CELLMODEL& retrieveCellModel(MED_EN::medGeometryElement type);
+  static const MEDMEM::CELLMODEL& retrieveCellModel(MED_EN::medGeometryElement type);
 private:
-        static CELLMODEL_Map *getInstance();
-        static CELLMODEL_Map *_singleton;
- std::map<MED_EN::medGeometryElement,MEDMEM::CELLMODEL> _cell_models;
+  static CELLMODEL_Map *getInstance();
+  static CELLMODEL_Map *_singleton;
+  std::map<MED_EN::medGeometryElement,MEDMEM::CELLMODEL> _cell_models;
         
-        CELLMODEL_Map(){
-                _cell_models.insert(make_pair(MED_EN::MED_TRIA3,CELLMODEL(MED_EN::MED_TRIA3)));
-                _cell_models.insert(make_pair(MED_EN::MED_QUAD4,CELLMODEL(MED_EN::MED_QUAD4)));
-                _cell_models.insert(make_pair(MED_EN::MED_TETRA4,CELLMODEL(MED_EN::MED_TETRA4)));
-                _cell_models.insert(make_pair(MED_EN::MED_HEXA8,CELLMODEL(MED_EN::MED_HEXA8)));
-                _cell_models.insert(make_pair(MED_EN::MED_PYRA5,CELLMODEL(MED_EN::MED_PYRA5)));
-                _cell_models.insert(make_pair(MED_EN::MED_PENTA6,CELLMODEL(MED_EN::MED_PENTA6)));
-                
-        };
-        ~CELLMODEL_Map(){ if(_singleton) delete _singleton;};
+  CELLMODEL_Map(){
+    _cell_models.insert(make_pair(MED_EN::MED_NONE     ,CELLMODEL(MED_EN::MED_NONE     )));
+    _cell_models.insert(make_pair(MED_EN::MED_POINT1   ,CELLMODEL(MED_EN::MED_POINT1   )));
+    _cell_models.insert(make_pair(MED_EN::MED_SEG2     ,CELLMODEL(MED_EN::MED_SEG2     )));
+    _cell_models.insert(make_pair(MED_EN::MED_SEG3     ,CELLMODEL(MED_EN::MED_SEG3     )));
+    _cell_models.insert(make_pair(MED_EN::MED_TRIA3    ,CELLMODEL(MED_EN::MED_TRIA3    )));
+    _cell_models.insert(make_pair(MED_EN::MED_QUAD4    ,CELLMODEL(MED_EN::MED_QUAD4    )));
+    _cell_models.insert(make_pair(MED_EN::MED_TRIA6    ,CELLMODEL(MED_EN::MED_TRIA6    )));
+    _cell_models.insert(make_pair(MED_EN::MED_QUAD8    ,CELLMODEL(MED_EN::MED_QUAD8    )));
+    _cell_models.insert(make_pair(MED_EN::MED_TETRA4   ,CELLMODEL(MED_EN::MED_TETRA4   )));
+    _cell_models.insert(make_pair(MED_EN::MED_PYRA5    ,CELLMODEL(MED_EN::MED_PYRA5    )));
+    _cell_models.insert(make_pair(MED_EN::MED_PENTA6   ,CELLMODEL(MED_EN::MED_PENTA6   )));
+    _cell_models.insert(make_pair(MED_EN::MED_HEXA8    ,CELLMODEL(MED_EN::MED_HEXA8    )));
+    _cell_models.insert(make_pair(MED_EN::MED_TETRA10  ,CELLMODEL(MED_EN::MED_TETRA10  )));
+    _cell_models.insert(make_pair(MED_EN::MED_PYRA13   ,CELLMODEL(MED_EN::MED_PYRA13   )));
+    _cell_models.insert(make_pair(MED_EN::MED_PENTA15  ,CELLMODEL(MED_EN::MED_PENTA15  )));
+    _cell_models.insert(make_pair(MED_EN::MED_HEXA20   ,CELLMODEL(MED_EN::MED_HEXA20   )));
+    _cell_models.insert(make_pair(MED_EN::MED_POLYGON  ,CELLMODEL(MED_EN::MED_POLYGON  )));
+    _cell_models.insert(make_pair(MED_EN::MED_POLYHEDRA,CELLMODEL(MED_EN::MED_POLYHEDRA)));
+  };
+  ~CELLMODEL_Map(){ if(_singleton) delete _singleton;};
         
-        const MEDMEM::CELLMODEL& getCellModel(MED_EN::medGeometryElement type)
-        {
-                return _cell_models[type];
-        };
+  const MEDMEM::CELLMODEL& getCellModel(MED_EN::medGeometryElement type)
+  {
+    return _cell_models[type];
+  };
 
 };
 

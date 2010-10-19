@@ -121,8 +121,6 @@ void GENDRIVER::setFileName(const string & fileName)
 
   END_OF_MED(LOC);
 }
-       
-
 
 med_mode_acces GENDRIVER::getAccessMode() const
 {
@@ -130,6 +128,11 @@ med_mode_acces GENDRIVER::getAccessMode() const
   BEGIN_OF_MED(LOC);
 
   return _accessMode;
+}
+
+void GENDRIVER::setAccessMode(med_mode_acces mode)
+{
+  _accessMode = mode;
 }
 
 ostream & MEDMEM::operator<<(ostream &os,const GENDRIVER & drv)
@@ -142,9 +145,9 @@ ostream & MEDMEM::operator<<(ostream &os,const GENDRIVER & drv)
     case RDWR :
       os<<"C'est un IO d'READ/WRITE"<<endl;
       break;
-      //case MED_REMP :
-      //os <<"C'est un IO de remplacement"<<endl;
-      //break;
+    case WRONLY :
+      os<<"C'est un IO d'WRITE"<<endl;
+      break;
     }
   switch (drv._status)
     {

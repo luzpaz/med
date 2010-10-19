@@ -354,7 +354,8 @@ namespace {
   {
     medEntityMesh entity = field->getSupport()->getEntity();
     SUPPORT* support = interSupport->medSupport( entity );
-    field->setSupport( support );
+    field->setSupport( new SUPPORT( *support ));
+    field->getSupport()->removeReference(); // support belongs to field only
 
     int j, nbComponents = field->getNumberOfComponents();
     int      nbElements = field->getSupport()->getNumberOfElements(MED_ALL_ELEMENTS);
@@ -552,7 +553,7 @@ ENSIGHT_FIELD_DRIVER::~ENSIGHT_FIELD_DRIVER()
 void ENSIGHT_FIELD_DRIVER::setFieldName(const string & fieldName) throw (MEDEXCEPTION)
 {
   const char* LOC = "ENSIGHT_FIELD_DRIVER::setFieldName(): ";
-  if ( fieldName.size() > MAX_FIELD_NAME_LENGTH )
+  if ( (int)fieldName.size() > MAX_FIELD_NAME_LENGTH )
     throw MEDEXCEPTION( compatibilityPb(LOC) << "too long name (> " <<
                         MAX_FIELD_NAME_LENGTH << "): " << fieldName);
 
@@ -677,29 +678,33 @@ void ENSIGHT_FIELD_RDONLY_DRIVER::read (void)
   const char * LOC = "ENSIGHT_FIELD_RDONLY_DRIVER::read() : " ;
   BEGIN_OF_MED(LOC);
 
-  openConst(false); // check if can read case file
-
   _CaseFileDriver caseFile( getCaseFileName(), this);
-  caseFile.read();
 
-  // find out index of variable to read
-  int variableIndex = caseFile.getVariableIndex( _fieldName );
-  if ( !variableIndex )
-    variableIndex = caseFile.getVariableIndex( _ptrField->getName() );
-  if ( !variableIndex ) {
-    if ( !_fieldName.empty() )
-      throw MEDEXCEPTION
-        (LOCALIZED(STRING(LOC) << "no field found by name |" << _fieldName << "|"));
-    else
-      throw MEDEXCEPTION
-        (LOCALIZED(STRING(LOC) << "no field found by name |" << _ptrField->getName() << "|"));
+  if ( getDataFileName().empty() ) // find out what to read
+  {
+    openConst(false); // check if can read case file
+
+    caseFile.read();
+
+    // find out index of variable to read
+    int variableIndex = caseFile.getVariableIndex( _fieldName );
+    if ( !variableIndex )
+      variableIndex = caseFile.getVariableIndex( _ptrField->getName() );
+    if ( !variableIndex ) {
+      if ( !_fieldName.empty() )
+        throw MEDEXCEPTION
+          (LOCALIZED(STRING(LOC) << "no field found by name |" << _fieldName << "|"));
+      else
+        throw MEDEXCEPTION
+          (LOCALIZED(STRING(LOC) << "no field found by name |" << _ptrField->getName() << "|"));
+    }
+
+    //  here data from Case File is passed:
+    // * field name
+    // * number of components
+    // * etc.
+    caseFile.setDataFileName( variableIndex, _fieldStep, this );
   }
-
-  //  here data from Case File is passed:
-  // * field name
-  // * number of components
-  // * etc.
-  caseFile.setDataFileName( variableIndex, _fieldStep, this );
 
   openConst(true); // check if can read data file
 
@@ -1138,8 +1143,8 @@ ENSIGHT_FIELD_WRONLY_DRIVER::ENSIGHT_FIELD_WRONLY_DRIVER()
 //=======================================================================
 
 ENSIGHT_FIELD_WRONLY_DRIVER::ENSIGHT_FIELD_WRONLY_DRIVER(const string & fileName,
-                                                         FIELD_ *       ptrField)
-  :ENSIGHT_FIELD_DRIVER(fileName,ptrField,MED_EN::WRONLY)
+                                                         const FIELD_ * ptrField)
+  :ENSIGHT_FIELD_DRIVER(fileName,(FIELD_*)ptrField,MED_EN::WRONLY)
 {
 }
 
@@ -1388,7 +1393,7 @@ void ENSIGHT_FIELD_WRONLY_DRIVER::write(void) const
 
   const FIELD_* field     = _ptrField;
   const SUPPORT * support = field->getSupport();
-  const MESH * mesh       = support->getMesh();
+  const GMESH * mesh      = support->getMesh();
 
   int dt              = field->getIterationNumber();
   int it              = field->getOrderNumber();
