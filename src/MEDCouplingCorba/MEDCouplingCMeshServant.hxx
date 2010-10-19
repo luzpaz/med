@@ -17,25 +17,26 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef __MEDCOUPLINGFIELDDOUBLECLIENT_HXX__
-#define __MEDCOUPLINGFIELDDOUBLECLIENT_HXX__
+#ifndef __MEDCOUPLINGCMESHSERVANT_HXX__
+#define __MEDCOUPLINGCMESHSERVANT_HXX__
 
 #include "SALOMEconfig.h"
-#ifdef WNT
-#define NOMINMAX
-#endif
+
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
-#include "MEDCouplingClient.hxx"
-#include "MEDCouplingFieldDouble.hxx"
+#include "MEDCouplingMeshServant.hxx"
+#include "MEDCouplingCorba.hxx"
 
 namespace ParaMEDMEM
 {
-  class MEDCouplingFieldDoubleClient : public MEDCouplingFieldDouble
+  class MEDCouplingCMesh;
+
+  class MEDCOUPLINGCORBA_EXPORT MEDCouplingCMeshServant : MEDCouplingMeshServant, public virtual POA_SALOME_MED::MEDCouplingCMeshCorbaInterface
   {
   public:
-    MEDCOUPLINGCLIENT_EXPORT static MEDCouplingFieldDouble *New(SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr field);
+    MEDCouplingCMeshServant(const MEDCouplingCMesh *cppPointerOfMesh);
+    ~MEDCouplingCMeshServant();
   private:
-    MEDCouplingFieldDoubleClient();
+    const MEDCouplingCMesh *getPointer() const { return (const MEDCouplingCMesh *)(_cpp_pointer); }
   };
 }
 

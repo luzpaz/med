@@ -25,11 +25,15 @@ salomeinclude_HEADERS=                    \
 	MEDCouplingClient.hxx             \
 	MEDCouplingMeshClient.hxx         \
 	MEDCouplingUMeshClient.hxx        \
+	MEDCouplingExtrudedMeshClient.hxx \
+	MEDCouplingCMeshClient.hxx        \
 	MEDCouplingFieldDoubleClient.hxx
 
 dist_libmedcouplingclient_la_SOURCES=     \
 	MEDCouplingMeshClient.cxx         \
 	MEDCouplingUMeshClient.cxx        \
+	MEDCouplingExtrudedMeshClient.cxx \
+	MEDCouplingCMeshClient.cxx        \
 	MEDCouplingFieldDoubleClient.cxx
 
 libmedcouplingclient_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) -I$(top_builddir)/idl ${KERNEL_CXXFLAGS} \

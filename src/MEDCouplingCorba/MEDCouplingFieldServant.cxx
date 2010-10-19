@@ -19,8 +19,12 @@
 
 #include "MEDCouplingFieldServant.hxx"
 #include "MEDCouplingUMeshServant.hxx"
+#include "MEDCouplingCMeshServant.hxx"
+#include "MEDCouplingExtrudedMeshServant.hxx"
 #include "MEDCouplingField.hxx"
 #include "MEDCouplingUMesh.hxx"
+#include "MEDCouplingCMesh.hxx"
+#include "MEDCouplingExtrudedMesh.hxx"
 
 using namespace ParaMEDMEM;
 
@@ -35,6 +39,18 @@ SALOME_MED::MEDCouplingMeshCorbaInterface_ptr MEDCouplingFieldServant::getMesh()
   if(uMesh)
     {
       MEDCouplingUMeshServant *retServ=new MEDCouplingUMeshServant(uMesh);
+      return retServ->_this();
+    }
+  const MEDCouplingCMesh *cMesh=dynamic_cast<const MEDCouplingCMesh *>(mesh);
+  if(cMesh)
+    {
+      MEDCouplingCMeshServant *retServ=new MEDCouplingCMeshServant(cMesh);
+      return retServ->_this();
+    }
+  const MEDCouplingExtrudedMesh *eMesh=dynamic_cast<const MEDCouplingExtrudedMesh *>(mesh);
+  if(eMesh)
+    {
+      MEDCouplingExtrudedMeshServant *retServ=new MEDCouplingExtrudedMeshServant(eMesh);
       return retServ->_this();
     }
   throw INTERP_KERNEL::Exception("Not dealt mesh type !");

@@ -21,7 +21,9 @@
 #define __MEDCOUPLINGUMESHSERVANT_HXX__
 
 #include "SALOMEconfig.h"
-
+#ifdef WNT
+#define NOMINMAX
+#endif
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
 #include "MEDCouplingPointSetServant.hxx"
 #include "MEDCouplingCorba.hxx"

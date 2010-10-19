@@ -17,8 +17,8 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef __MEDCOUPLINGFIELDDOUBLECLIENT_HXX__
-#define __MEDCOUPLINGFIELDDOUBLECLIENT_HXX__
+#ifndef __MEDCOUPLINGEXTRUDEDMESHCLIENT_HXX__
+#define __MEDCOUPLINGEXTRUDEDMESHCLIENT_HXX__
 
 #include "SALOMEconfig.h"
 #ifdef WNT
@@ -26,16 +26,15 @@
 #endif
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
 #include "MEDCouplingClient.hxx"
-#include "MEDCouplingFieldDouble.hxx"
 
 namespace ParaMEDMEM
 {
-  class MEDCouplingFieldDoubleClient : public MEDCouplingFieldDouble
+  class MEDCouplingExtrudedMesh;
+
+  class MEDCOUPLINGCLIENT_EXPORT MEDCouplingExtrudedMeshClient
   {
   public:
-    MEDCOUPLINGCLIENT_EXPORT static MEDCouplingFieldDouble *New(SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr field);
-  private:
-    MEDCouplingFieldDoubleClient();
+    static MEDCouplingExtrudedMesh *New(SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_ptr mesh);
   };
 }
 
