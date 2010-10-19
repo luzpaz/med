@@ -17,39 +17,35 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-#  MED MEDMEM_SWIG : binding of C++ implementation and Python
-#
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-lib_LTLIBRARIES = _libMEDLoader_Swig.la
+MEDLOADER_SUBDIRS =
 
-salomeinclude_HEADERS =  \
-	libMEDLoader_Swig.i MEDLoaderTypemaps.i
+if !MED_ENABLE_MICROMED
+   MEDLOADER_SUBDIRS += . Swig
+if CPPUNIT_IS_OK
+   MEDLOADER_SUBDIRS += Test
+endif
+endif
 
-SWIG_DEF = libMEDLoader_Swig.i MEDLoaderTypemaps.i
+SUBDIRS = $(MEDLOADER_SUBDIRS)
 
-SWIG_FLAGS = @SWIG_FLAGS@ -I$(srcdir) -I$(srcdir)/.. -I$(srcdir)/../../MEDCoupling -I$(srcdir)/../../MEDCoupling_Swig \
-	-I$(srcdir)/../../INTERP_KERNEL -I$(srcdir)/../../INTERP_KERNEL/Bases
+#DIST_SUBDIRS = Swig
 
-dist__libMEDLoader_Swig_la_SOURCES   = $(SWIG_DEF)
-nodist__libMEDLoader_Swig_la_SOURCES = libMEDLoader_Swig_wrap.cxx
-libMEDLoader_Swig.py: libMEDLoader_Swig_wrap.cxx
+lib_LTLIBRARIES = libmedloader.la
 
-libMEDLoader_Swig_wrap.cxx: $(SWIG_DEF)
-	$(SWIG) $(SWIG_FLAGS) -o $@  $<
+salomeinclude_HEADERS= \
+MEDLoaderDefines.hxx \
+MEDLoader.hxx MEDLoaderBase.hxx
 
-_libMEDLoader_Swig_la_CPPFLAGS = $(PYTHON_INCLUDES) \
-	$(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
-	-I$(srcdir)/../../INTERP_KERNEL \
-	-I$(srcdir)/.. -I$(srcdir)/../../MEDCoupling_Swig -I$(srcdir)/../../INTERP_KERNEL/Bases \
-	-I$(srcdir)/../../MEDCoupling
+dist_libmedloader_la_SOURCES= \
+MEDLoader.cxx MEDLoaderBase.cxx
 
-_libMEDLoader_Swig_la_LDFLAGS  = -module $(MED2_LIBS) $(HDF5_LIBS) $(PYTHON_LIBS) \
-	../../MEDCoupling/libmedcoupling.la ../../INTERP_KERNEL/libinterpkernel.la \
-	../libmedloader.la
+libmedloader_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
+	-I$(srcdir)/../INTERP_KERNEL \
+	-I$(srcdir)/../INTERP_KERNEL/Geometric2D \
+	-I$(srcdir)/../INTERP_KERNEL/Bases \
+	-I$(srcdir)/../MEDCoupling
 
-CLEANFILES = libMEDLoader_Swig_wrap.cxx libMEDLoader_Swig.py
-
-dist_salomescript_DATA= libMEDLoader_Swig.py MEDLoaderDataForTest.py MEDLoaderTest.py MEDLoaderTest2.py
-
-UNIT_TEST_PROG = MEDLoaderTest.py MEDLoaderTest2.py
+libmedloader_la_LDFLAGS= ../MEDCoupling/libmedcoupling.la \
+../INTERP_KERNEL/libinterpkernel.la $(MED2_LIBS) $(HDF5_LIBS)
