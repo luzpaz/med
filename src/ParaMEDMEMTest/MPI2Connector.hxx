@@ -16,32 +16,33 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// ICoCo file common to several codes
-// ICoCoField.cpp
-// version 1.2 10/05/2010
 
-#include <ICoCoField.hxx>
+#ifndef __MPI2CONNECTOR_HXX__
+#define __MPI2CONNECTOR_HXX__
+
+#include <mpi.h>
 #include <string>
+#include <sstream>
 
-using namespace ICoCo;
-using std::string;
+class MPI2Connector
+{
+public:
+  MPI2Connector();
+  ~MPI2Connector();
+  // MPI2 connection
+  MPI_Comm remoteMPI2Connect(const std::string& service);
+  // MPI2 disconnection
+  void remoteMPI2Disconnect(const std::string& service);
+private:
+  // Processus id
+  int _num_proc;
+  // Processus size
+  int _nb_proc;
+  MPI_Comm _gcom;
+  bool _srv;
+  std::string _port_name;
+private:
+  static const int TIMEOUT=5;
+};
 
-Field::Field() {
-  _name=new string;
-}
-
-Field::~Field() {
-  delete _name;
-}
-
-void Field::setName(const string& name) {
-  *_name=name;
-}
-
-const string& Field::getName() const {
-  return *_name;
-}
-
-const char* Field::getCharName() const {
-  return _name->c_str();
-}
+#endif
