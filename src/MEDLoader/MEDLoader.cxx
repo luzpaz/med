@@ -888,7 +888,7 @@ void MEDLoaderNS::readFieldDoubleDataInMedFile(const char *fileName, const char 
                   int nval=MEDfieldnValueWithProfile(fid,fieldName,numdt,numo,tabEnt[typeOfOutField],tabType[typeOfOutField][j],1,MED_COMPACT_PFLMODE,pflname,&profilesize,locname,&nbi);
                   if(nval>0)
                     {
-                      double *valr=new double[ncomp*nval];
+                      double *valr=new double[ncomp*nval*nbi];
                       MEDfieldValueWithProfileRd(fid,fieldName,iteration,order,tabEnt[typeOfOutField],tabType[typeOfOutField][j],MED_COMPACT_PFLMODE,
                                                  pflname,MED_FULL_INTERLACE,MED_ALL_CONSTITUENT,(unsigned char*)valr);
                       std::string tmp(locname);
@@ -906,7 +906,7 @@ void MEDLoaderNS::readFieldDoubleDataInMedFile(const char *fileName, const char 
                           pfl=new int[nval];
                           MEDprofileRd(fid,pflname,pfl);
                         }
-                      field.push_back(MEDLoader::MEDFieldDoublePerCellType(typmai2[j],valr,ncomp,nval,pfl,locname));
+                      field.push_back(MEDLoader::MEDFieldDoublePerCellType(typmai2[j],valr,ncomp,nval*nbi,pfl,locname));
                       delete [] pfl;
                     }
                 }
@@ -2218,13 +2218,17 @@ void MEDLoaderNS::appendFieldDirectly(const char *fileName, const ParaMEDMEM::ME
             MEDLoaderBase::safeStrCpy(oss.str().c_str(),MED_NAME_SIZE,nomGauss,MEDLoader::_TOO_LONG_STR);
             int id=f->getGaussLocalizationIdOfOneType((*iter).getType());
             const MEDCouplingGaussLocalization& gl=f->getGaussLocalization(id);
-            MEDlocalizationWr(fid,nomGauss,typmai3[(int)(*iter).getType()],mesh->getSpaceDimension(),&gl.getGaussCoords()[0],MED_FULL_INTERLACE,
-                              gl.getNumberOfGaussPt(),&gl.getRefCoords()[0],&gl.getWeights()[0]);
-            int nbOfValues=gl.getNumberOfGaussPt()*f->getMesh()->getNumberOfCellsWithType((*iter).getType());
-            MEDfieldValueWithProfileWr(fid,f->getName(),numdt,numo,dt,MED_CELL,typmai3[(int)(*iter).getType()],MED_COMPACT_PFLMODE,
-                                       MED_ALLENTITIES_PROFILE,nomGauss,MED_FULL_INTERLACE,MED_ALL_CONSTITUENT,nbOfValues,(const unsigned char*)pt);
-            pt+=nbOfValues*nbComp;
+            MEDlocalizationWr(fid,nomGauss,typmai3[(int)(*iter).getType()],mesh->getMeshDimension(),&gl.getRefCoords()[0],MED_FULL_INTERLACE,
+                              gl.getNumberOfGaussPt(),&gl.getGaussCoords()[0],&gl.getWeights()[0]);
+            int nbOfEntity=f->getMesh()->getNumberOfCellsWithType((*iter).getType());
+            int nbOfValues=gl.getNumberOfGaussPt()*nbOfEntity;
+            char *fieldname=MEDLoaderBase::buildEmptyString(MED_NAME_SIZE);
+            MEDLoaderBase::safeStrCpy(f->getName(),MED_NAME_SIZE,fieldname,MEDLoader::_TOO_LONG_STR);
+            MEDfieldValueWithProfileWr(fid,fieldname,numdt,numo,dt,MED_CELL,typmai3[(int)(*iter).getType()],MED_COMPACT_PFLMODE,
+                                       MED_ALLENTITIES_PROFILE,nomGauss,MED_FULL_INTERLACE,MED_ALL_CONSTITUENT,nbOfEntity,(const unsigned char*)pt);
+            delete [] fieldname;
             delete [] nomGauss;
+            pt+=nbOfValues*nbComp;
           }
         break;
       }
