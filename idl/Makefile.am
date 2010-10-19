@@ -37,10 +37,10 @@ endif
 dist_salomeidl_DATA = $(IDL_FILES)
 
 # GUI idl common library
-lib_LTLIBRARIES = libSalomeIDLMED.la
+lib_LTLIBRARIES = libSalomeIDLMED.la libSalomeIDLMEDTests.la
 
 # Sources built from idl files
-BASEIDL_SOURCES = MEDSK.cc MED_GenSK.cc MEDCouplingCorbaServantSK.cc Compo1PySK.cc MEDCouplingCorbaServantTestSK.cc
+BASEIDL_SOURCES = MEDSK.cc MED_GenSK.cc MEDCouplingCorbaServantSK.cc Compo1PySK.cc 
 
 MPIIDL_SOURCES = ParaMEDCouplingCorbaServantSK.cc ParaMEDMEMComponentSK.cc
 
@@ -62,6 +62,10 @@ libSalomeIDLMED_la_CPPFLAGS =			\
 	@CORBA_CXXFLAGS@ @CORBA_INCLUDES@ @KERNEL_CXXFLAGS@
 libSalomeIDLMED_la_LDFLAGS = -no-undefined -version-info=0:0:0
 libSalomeIDLMED_la_LIBADD  = @CORBA_LIBS@ $(KERNEL_LDFLAGS) -lSalomeIDLKernel
+
+nodist_libSalomeIDLMEDTests_la_SOURCES = MEDCouplingCorbaServantTestSK.cc
+libSalomeIDLMEDTests_la_CPPFLAGS = $(libSalomeIDLMED_la_CPPFLAGS)
+libSalomeIDLMEDTests_la_LIBADD = libSalomeIDLMED.la
 
 # These variables defines the building process of CORBA files
 OMNIORB_IDL         = @OMNIORB_IDL@
