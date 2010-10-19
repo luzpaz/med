@@ -56,7 +56,7 @@ MED_MESH_DRIVER::MED_MESH_DRIVER():
 
 MED_MESH_DRIVER::MED_MESH_DRIVER(const std::string &    fileName,
                                  GMESH *                ptrMesh,
-                                 MED_EN::med_access_mode accessMode): 
+                                 MED_EN::med_mode_acces accessMode): 
   GENDRIVER(fileName, accessMode, MED_DRIVER),
   _ptrMesh(ptrMesh), 
   _meshName(""),
@@ -95,9 +95,9 @@ const char * LOC = "MED_MESH_DRIVER::open()";
 
   int accessMode = _accessMode;
   if ( _accessMode == MED_EN::RDWR )
-    accessMode = med_2_3::MED_LECTURE_ECRITURE;
+    accessMode = med_2_3::MED_ACC_RDWR;
   MESSAGE_MED(LOC<<" : _fileName.c_str : "<< _fileName.c_str()<<",mode : "<< accessMode);
-  _medIdt = med_2_3::MEDouvrir( (const_cast <char *> (_fileName.c_str())),(med_2_3::med_access_mode) accessMode);
+  _medIdt = med_2_3::MEDfileOpen(_fileName.c_str(),(med_2_3::med_access_mode) accessMode);
   MESSAGE_MED(LOC<<" _medIdt : "<< _medIdt );
   if (_medIdt > 0)
     _status = MED_OPENED;
@@ -116,7 +116,7 @@ void MED_MESH_DRIVER::close()
   BEGIN_OF_MED(LOC);
   int err = 0;
   if ( _status == MED_OPENED) {
-    err = med_2_3::MEDfermer(_medIdt);
+    err = med_2_3::MEDfileClose(_medIdt);
     // san -- MED5873 : Calling H5close() here leads to failure of SALOMEDS::StudyManager_i::_SaveAs()
     // method during study saving process. MEDfermer() seems sufficient for closing a file.
     //H5close(); // If we call H5close() all the files are closed.
@@ -134,7 +134,7 @@ void MED_MESH_DRIVER::close()
 }
 
 //A FAIRE UTILISER LES MAPS...
-const med_2_3::med_geometrie_element  MED_MESH_DRIVER::all_cell_type[MED_NBR_GEOMETRIE_MAILLE]=
+const med_2_3::med_geometry_type  MED_MESH_DRIVER::all_cell_type[MED_NBR_GEOMETRIE_MAILLE]=
   { med_2_3::MED_POINT1,med_2_3::MED_SEG2,med_2_3::MED_SEG3,med_2_3::MED_TRIA3,med_2_3::MED_QUAD4,med_2_3::MED_TRIA6,med_2_3::MED_QUAD8,
     med_2_3::MED_TETRA4,med_2_3::MED_PYRA5,med_2_3::MED_PENTA6,med_2_3::MED_HEXA8,med_2_3::MED_TETRA10,med_2_3::MED_PYRA13,
     med_2_3::MED_PENTA15, med_2_3::MED_HEXA20};
@@ -208,7 +208,7 @@ void MED_MESH_RDONLY_DRIVER::read(void)
   if ( ( _meshName.empty() ) && ( !_ptrMesh->_name.empty() ) )
     _meshName = _ptrMesh->_name;
 
-  if ( _meshName.size() > MED_TAILLE_NOM )
+  if ( _meshName.size() > MED_NAME_SIZE )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
                                  <<" <meshName> size in object driver MESH is > MED_TAILLE_NOM ."));
 
@@ -218,10 +218,9 @@ void MED_MESH_RDONLY_DRIVER::read(void)
   // 0020058: An assertion happens in MEDcoordLire(), if this version
   // 0020058: is higher than the currently used version of med product.
   med_2_3::med_int aMajor, aMinor, aRelease;
-  med_2_3::med_int aMajorCurr, aMinorCurr, aReleaseCurr;
+  med_2_3::med_int aMajorCurr=3, aMinorCurr=1, aReleaseCurr=0;
 
-  med_err aRet = med_2_3::MEDversionLire(_medIdt, &aMajor, &aMinor, &aRelease);
-  med_2_3::MEDversionDonner(&aMajorCurr, &aMinorCurr, &aReleaseCurr);
+  med_err aRet = med_2_3::MEDfileNumVersionRd(_medIdt, &aMajor, &aMinor, &aRelease);
 
   int aVersionHex     = (aMajor << 16 | aMinor << 8 | aRelease);
   int aVersionHexCurr = (aMajorCurr << 16 | aMinorCurr << 8 | aReleaseCurr);
@@ -238,18 +237,27 @@ void MED_MESH_RDONLY_DRIVER::read(void)
 
   // check mesh nature, unstructured or not (PAL14113)
   {
-    char                  meshName[MED_TAILLE_NOM+1] = "";
-    char                  meshDescription[MED_TAILLE_DESC+1] = "";
-    med_2_3::med_int      meshDim;
-    med_2_3::med_maillage meshType;
-    int                   numberOfMeshes = med_2_3::MEDnMaa(_medIdt);
+    char                  meshName[MED_NAME_SIZE+1] = "";
+    char                  meshDescription[MED_COMMENT_SIZE+1] = "";
+    med_2_3::med_int      meshDim,spaceDimp3;
+    med_2_3::med_mesh_type meshType;
+    int                   numberOfMeshes = med_2_3::MEDnMesh(_medIdt);
 
     for (int i = 1; i <= numberOfMeshes; i++)
     {
-      MEDmaaInfo(_medIdt, i, meshName, &meshDim, &meshType, meshDescription);
+      char dtunitp3[MED_LNAME_SIZE+1];
+      med_2_3::med_axis_type axtypp3;
+      med_2_3::med_sorting_type stypep3;
+      med_2_3::med_int nsteppp3;
+      int naxis=med_2_3::MEDmeshnAxis(_medIdt,i);
+      char *annp3=new char[naxis*MED_SNAME_SIZE+1];
+      char *auup3=new char[naxis*MED_SNAME_SIZE+1];
+      med_2_3::MEDmeshInfo(_medIdt, i, meshName, &spaceDimp3, &meshDim, &meshType, meshDescription, dtunitp3,&stypep3,&nsteppp3,&axtypp3,annp3,auup3);
+      delete [] annp3;
+      delete [] auup3;
       if (_meshName == string(meshName))
       {
-        if ((meshType == med_2_3::MED_STRUCTURE) != _ptrMesh->getIsAGrid())
+        if ((meshType == med_2_3::MED_STRUCTURED_MESH ) != _ptrMesh->getIsAGrid())
         {
           if ( _ptrMesh->getIsAGrid() )
             throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Mesh type mismatch. "
@@ -326,20 +334,19 @@ void MED_MESH_RDONLY_DRIVER::getGRID()
 
   int err, i;
 
-  int numberOfMeshesInFile = med_2_3::MEDnMaa(_medIdt);
+  int numberOfMeshesInFile = med_2_3::MEDnMesh(_medIdt);
 
   if (numberOfMeshesInFile == MED_INVALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Problem in File where the mesh " << _meshName << " is supposed to be stored"));
 
   for (int index = 0; index < numberOfMeshesInFile; index++)
     {
-      char meshName[MED_TAILLE_NOM+1]="";
-      char meshDescription[MED_TAILLE_DESC+1]="";
+      char meshName[MED_NAME_SIZE+1]="";
+      char meshDescription[MED_COMMENT_SIZE+1]="";
       med_2_3::med_int meshDim;
-      med_2_3::med_maillage meshType;
+      med_2_3::med_mesh_type meshType;
 
-      err = med_2_3::MEDmaaInfo(_medIdt, (index+1),meshName, &meshDim,
-                               &meshType, meshDescription);
+      err = med_2_3::MEDmaaInfo(_medIdt, (index+1),meshName, &meshDim,&meshType, meshDescription);
 
       MESSAGE_MED(LOC<<": Mesh n°"<< (index+1) <<" nammed "<< meshName << " with the description " << meshDescription << " is structured");
 
@@ -566,8 +573,8 @@ int  MED_MESH_RDONLY_DRIVER::getCOORDINATE()
 
     for (int index = 0; index < numberOfMeshesInFile; index++)
     {
-      char meshName[MED_TAILLE_NOM+1]="";
-      char meshDescription[MED_TAILLE_DESC+1]="";
+      char meshName[MED_NAME_SIZE+1]="";
+      char meshDescription[MED_COMMENT_SIZE+1]="";
       med_2_3::med_int meshDim;
       med_2_3::med_maillage meshType;
 
@@ -1514,7 +1521,7 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
         throw MEDEXCEPTION("MED_MESH_RDONLY_DRIVER::getFAMILY() : NumberOfGroups" );
 
       int FamilyIdentifier;
-      string FamilyName(MED_TAILLE_NOM,'\0');
+      string FamilyName(MED_NAME_SIZE,'\0');
       // 0020071: Crash of V4_1_4rc2 (of testMedMemGeneral.py)
       // Pb with Mistrat_import22.med: it's zero family has non-empty AttributesIdentifier's and
       // AttributesValues' but MEDnAttribut() returns 0 (0 is hardcoded for zero family).
@@ -1523,7 +1530,7 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
       const int iSafe = 10;
       int *  AttributesIdentifier = new int[NumberOfAttributes+iSafe];
       int *  AttributesValues     = new int[NumberOfAttributes+iSafe];
-      string AttributesDescription(MED_TAILLE_DESC*(NumberOfAttributes+iSafe),' ');
+      string AttributesDescription(MED_COMMENT_SIZE*(NumberOfAttributes+iSafe),' ');
       string GroupsNames(MED_TAILLE_LNOM*NumberOfGroups+1,'\0');
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
       med_2_3::med_int tmp_FamilyIdentifier;
@@ -1820,7 +1827,7 @@ MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER():MED_MESH_DRIVER()
 
 MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER(const string &         fileName,
                                                GMESH *                ptrMesh,
-                                               MED_EN::med_access_mode access):
+                                               MED_EN::med_mode_acces access):
   MED_MESH_DRIVER(fileName,ptrMesh,access)
 {
   MESSAGE_MED("MED_MESH_WRONLY_DRIVER::MED_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) has been created");
@@ -1871,9 +1878,9 @@ void MED_MESH_WRONLY_DRIVER::write(void) const
   if ( ( _meshName.empty() ) && ( !_ptrMesh->_name.empty() )    )
     _meshName = healName(_ptrMesh->_name );
 
-  if ( _meshName.size() > MED_TAILLE_NOM )
+  if ( _meshName.size() > MED_NAME_SIZE )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
-                                 <<" <meshName> size in object driver MESH is > MED_TAILLE_NOM ."));
+                                 <<" <meshName> size in object driver MESH is > MED_NAME_SIZE ."));
 
 
   if (_ptrMesh->getIsAGrid())
@@ -1908,7 +1915,7 @@ void MED_MESH_WRONLY_DRIVER::write(void) const
     if ( err < MED_VALID ) {
       SCRUTE_MED(err);
 
-      char familyName[MED_TAILLE_NOM+1];
+      char familyName[MED_NAME_SIZE+1];
       strcpy(familyName,"FAMILLE_ZERO");
       err = med_2_3::MEDfamCr( _medIdt,
                               const_cast <char *> ( _meshName.c_str() ),
@@ -1986,7 +1993,7 @@ int MED_MESH_WRONLY_DRIVER::writeGRID() const
 
   if ((spaceDimension <= MED_VALID) && (meshDimension <= MED_VALID))
     {
-      _ptrMesh->_description.resize(MED_TAILLE_DESC+1,'\0');
+      _ptrMesh->_description.resize(MED_COMMENT_SIZE+1,'\0');
       err = MEDmaaCr(_medIdt,
                      const_cast <char *> (_meshName.c_str()),
                      _ptrMesh->getMeshDimension(),med_2_3::MED_STRUCTURE,
@@ -2167,7 +2174,7 @@ int MED_MESH_WRONLY_DRIVER::writeCoordinates() const {
 
   if ((spaceDimension != MED_VALID) && (meshDimension < MED_VALID))
     {
-      ptrMesh->_description.resize(MED_TAILLE_DESC+1,'\0');
+      ptrMesh->_description.resize(MED_COMMENT_SIZE+1,'\0');
       err = MEDmaaCr(_medIdt, const_cast <char *> (_meshName.c_str()),
                      ptrMesh->getMeshDimension(), med_2_3::MED_NON_STRUCTURE,
                      const_cast <char *> (ptrMesh->_description.c_str()));
@@ -2564,7 +2571,7 @@ void MED_MESH_WRONLY_DRIVER::groupFamilyConverter(const vector <GROUP*>& myGroup
     // the identifier and the groups are set
     myFamily->setIdentifier(ifamily);
     myFamily->setNumberOfGroups(key.size());
-    char family_name[MED_TAILLE_NOM];
+    char family_name[MED_NAME_SIZE];
 
     //if the family has one group to which only one family
     //is associated, the name of the family underlying the group
@@ -2576,8 +2583,8 @@ void MED_MESH_WRONLY_DRIVER::groupFamilyConverter(const vector <GROUP*>& myGroup
       myGroups[key[0]]->setFamilies(families);
       //it is necessary to use strncpy because group and family
       //have different name sizes
-      strncpy(family_name,myGroups[key[0]]->getName().c_str(),MED_TAILLE_NOM);
-      family_name[MED_TAILLE_NOM-1]='\0';
+      strncpy(family_name,myGroups[key[0]]->getName().c_str(),MED_NAME_SIZE);
+      family_name[MED_NAME_SIZE-1]='\0';
     }
     else
       sprintf(family_name,"family%d",ifamily);
@@ -2604,11 +2611,11 @@ void MED_MESH_WRONLY_DRIVER::groupFamilyConverter(const vector <GROUP*>& myGroup
     if (myGroups[i]->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)==0)
     {
       FAMILY* myFamily=new FAMILY(*(myGroups[i]));
-      char family_name[MED_TAILLE_NOM];
+      char family_name[MED_NAME_SIZE];
       //it is necessary to use strncpy because group and family
       //have different name sizes
-      strncpy(family_name,myGroups[i]->getName().c_str(),MED_TAILLE_NOM);
-      family_name[MED_TAILLE_NOM-1]='\0';
+      strncpy(family_name,myGroups[i]->getName().c_str(),MED_NAME_SIZE);
+      family_name[MED_NAME_SIZE-1]='\0';
       myFamily->setName( healName( family_name ));
       myFamily->setIdentifier(ifamily);
       ifamily++;
@@ -2906,22 +2913,22 @@ int MED_MESH_WRONLY_DRIVER::writeFamilies(vector<FAMILY*> & families ) const
   for (unsigned int i=0; i< families.size(); i++) {
 
     int      numberOfAttributes = families[i]->getNumberOfAttributes ();
-    string   attributesDescriptions (numberOfAttributes*MED_TAILLE_DESC,'\0');
+    string   attributesDescriptions (numberOfAttributes*MED_COMMENT_SIZE,'\0');
 
     // Recompose the attributes descriptions arg for MED
     for (int j=0; j < numberOfAttributes; j++)
     {
       string attributeDescription = families[i]->getAttributeDescription(j+1);
 
-      if ( attributeDescription.size() > MED_TAILLE_DESC )
+      if ( attributeDescription.size() > MED_COMMENT_SIZE )
         throw MEDEXCEPTION( LOCALIZED(STRING(LOC) << "The size of the attribute description n° |"
                                       << j+1 << "| of the family |" << families[i]->getName()
                                       << "| with identifier |" << families[i]->getIdentifier()
                                       << "| is |" << attributeDescription.size()
-                                      <<"| and is more than |" <<  MED_TAILLE_DESC << "|"));
+                                      <<"| and is more than |" <<  MED_COMMENT_SIZE << "|"));
 
       int length = min(MED_TAILLE_LNOM,(int)attributeDescription.size());
-      attributesDescriptions.replace(j*MED_TAILLE_DESC,length, attributeDescription,0,length);
+      attributesDescriptions.replace(j*MED_COMMENT_SIZE,length, attributeDescription,0,length);
     }
 
 
@@ -2956,13 +2963,13 @@ int MED_MESH_WRONLY_DRIVER::writeFamilies(vector<FAMILY*> & families ) const
     err = med_2_3::_MEDdatagroupOuvrir(_medIdt,const_cast <char *> (dataGroupFam.c_str()) );
     if ( err < MED_VALID ) {
       SCRUTE_MED(err);
-      if ( families[i]->getName().size() > MED_TAILLE_NOM )
+      if ( families[i]->getName().size() > MED_NAME_SIZE )
         throw MEDEXCEPTION
           ( LOCALIZED(STRING(LOC) << "The size of the name of the family |" << i+1
                       << "| |" << families[i]->getName()
                       << "| with identifier |" << families[i]->getIdentifier()  << "| is |"
                       <<  families[i]->getName().size()  <<"| and is more than |"
-                      << MED_TAILLE_NOM << "|"));
+                      << MED_NAME_SIZE << "|"));
 
       MESSAGE_MED(LOC<<"families[i]->getName().c_str() : "<<families[i]->getName().c_str());
       MESSAGE_MED(LOC<<"_meshName.c_str() : "<<_meshName.c_str());
