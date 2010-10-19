@@ -622,7 +622,7 @@ void MEDLoaderTest::testMixCellAndNodesFieldRW1()
     1060.,1160.,1070.,1170.,1080.,1180.,1090.,1190.,1091.,1191.,1092.,1192.
   };
   std::copy(arr2,arr2+24,tmp);
-  f2->setTime(3.17,2,7);
+  f2->setTime(3.14,2,7);
   f2->checkCoherency();
   //
   MEDLoader::WriteField(fileName,f1,true);
