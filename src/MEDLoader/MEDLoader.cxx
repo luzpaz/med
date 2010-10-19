@@ -832,7 +832,7 @@ void MEDLoaderNS::readFieldDoubleDataInMedFile(const char *fileName, const char 
   tabEnt[ON_GAUSS_PT]=MED_CELL;
   tabType[ON_GAUSS_PT]=typmai;
   tabTypeLgth[ON_GAUSS_PT]=MED_NBR_GEOMETRIE_MAILLE+2;
-  tabEnt[ON_GAUSS_NE]=MED_CELL;
+  tabEnt[ON_GAUSS_NE]=MED_NODE_ELEMENT;
   tabType[ON_GAUSS_NE]=typmai;
   tabTypeLgth[ON_GAUSS_NE]=MED_NBR_GEOMETRIE_MAILLE+2;
   //
@@ -892,10 +892,8 @@ void MEDLoaderNS::readFieldDoubleDataInMedFile(const char *fileName, const char 
                       MEDfieldValueWithProfileRd(fid,fieldName,iteration,order,tabEnt[typeOfOutField],tabType[typeOfOutField][j],MED_COMPACT_PFLMODE,
                                                  pflname,MED_FULL_INTERLACE,MED_ALL_CONSTITUENT,(unsigned char*)valr);
                       std::string tmp(locname);
-                      if((locname[0]!='\0' && (typeOfOutField!=ON_GAUSS_PT && typeOfOutField!=ON_GAUSS_NE))
-                         || (tmp!=MED_GAUSS_ELNO && typeOfOutField==ON_GAUSS_NE)
-                         || (locname[0]=='\0' && typeOfOutField==ON_GAUSS_PT)
-                         || (tmp==MED_GAUSS_ELNO && typeOfOutField==ON_GAUSS_PT))
+                      if((locname[0]!='\0' && (typeOfOutField!=ON_GAUSS_PT))
+                         || (locname[0]=='\0' && typeOfOutField==ON_GAUSS_PT))
                         {
                           delete [] valr;
                           continue;
@@ -2239,9 +2237,10 @@ void MEDLoaderNS::appendFieldDirectly(const char *fileName, const ParaMEDMEM::ME
         for(std::list<MEDLoader::MEDFieldDoublePerCellType>::const_iterator iter=split.begin();iter!=split.end();iter++)
           {
             int nbPtPerCell=(int)INTERP_KERNEL::CellModel::getCellModel((*iter).getType()).getNumberOfNodes();
-            int nbOfValues=nbPtPerCell*f->getMesh()->getNumberOfCellsWithType((*iter).getType());
+            int nbOfEntity=f->getMesh()->getNumberOfCellsWithType((*iter).getType());
+            int nbOfValues=nbPtPerCell*nbOfEntity;
             MEDfieldValueWithProfileWr(fid,f->getName(),numdt,numo,dt,MED_NODE_ELEMENT,typmai3[(int)(*iter).getType()],MED_COMPACT_PFLMODE,
-                                       MED_ALLENTITIES_PROFILE,MED_NO_LOCALIZATION,MED_FULL_INTERLACE,MED_ALL_CONSTITUENT,nbOfValues,(const unsigned char*)pt);
+                                       MED_ALLENTITIES_PROFILE,MED_NO_LOCALIZATION,MED_FULL_INTERLACE,MED_ALL_CONSTITUENT,nbOfEntity,(const unsigned char*)pt);
             pt+=nbOfValues*nbComp;
           }
         break;
