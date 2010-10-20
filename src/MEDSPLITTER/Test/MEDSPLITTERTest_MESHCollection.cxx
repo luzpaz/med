@@ -94,7 +94,7 @@ using namespace MEDMEM;
  
 void MEDSPLITTERTest::testMESHCollection_constructor()
 {
-  string filename_rd                = getResourceFile("carre_en_quad4_import22.med");
+  string filename_rd                = getResourceFile("carre_en_quad4.med");
   string fileNotExist_rd            = "notExist22.med";
   string emptyfilename              = "";
 
@@ -125,7 +125,7 @@ void MEDSPLITTERTest::testMESHCollection_constructor()
 //! Testing basic manipulation for a sequential file 
 void MEDSPLITTERTest::testMESHCollection_read_seq()
 {
-  string filename_rd                = getResourceFile("pointe_import22.med");
+  string filename_rd                = getResourceFile("pointe.med");
   string filename_seq_wr            = makeTmpFile("myWrField_seq_pointe22");
   string filename_seq_med           = makeTmpFile("myWrField_seq_pointe221.med");
   
@@ -167,7 +167,7 @@ void MEDSPLITTERTest::testMESHCollection_read_seq()
 
 void MEDSPLITTERTest::testMESHCollection_read_para()
 {
-  string filename_rd                = getResourceFile("pointe_import22.med");
+  string filename_rd                = getResourceFile("pointe.med");
   string filename_para_wr           = makeTmpFile("myWrField_para_pointe22_");
   string filename_xml               = makeTmpFile("myWrField_para_pointe22_.xml");
   string filename_para_med0         = makeTmpFile("myWrField_para_pointe22_1.med");
@@ -246,7 +246,7 @@ void MEDSPLITTERTest::testMESHCollection_read_para()
 
 void MEDSPLITTERTest::testMESHCollection_square()
 {
-  string filename_rd                = getResourceFile("carre_en_quad4_import22.med");
+  string filename_rd                = getResourceFile("carre_en_quad4.med");
   string filename_wr                = makeTmpFile("carre_split");
   string filename_wr_1              = makeTmpFile("carre_split1.med");
   string filename_wr_2              = makeTmpFile("carre_split2.med");
@@ -297,14 +297,14 @@ void MEDSPLITTERTest::testMESHCollection_square()
        
   //testing distant domains
     
-  char desc1[MED_TAILLE_DESC+1];
-  char maa_dist1[MED_TAILLE_NOM+1], jn1[MED_TAILLE_NOM+1];
-  char desc2[MED_TAILLE_DESC+1], maa_dist2[MED_TAILLE_NOM+1], jn2[MED_TAILLE_NOM+1];
+  char desc1[MED_TAILLE_DESC];
+  char maa_dist1[MED_TAILLE_NOM], jn1[MED_TAILLE_NOM];
+  char desc2[MED_TAILLE_DESC], maa_dist2[MED_TAILLE_NOM], jn2[MED_TAILLE_NOM];
   int dom1, dom2;
   med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
   med_2_3::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
-  CPPUNIT_ASSERT(strcmp(jn1,"joint_2")==0);
-  CPPUNIT_ASSERT(strcmp(jn2,"joint_1")==0);
+        CPPUNIT_ASSERT(strcmp(jn1,"joint_2")==0);
+        CPPUNIT_ASSERT(strcmp(jn2,"joint_1")==0);
   CPPUNIT_ASSERT_EQUAL(dom1,1);
   CPPUNIT_ASSERT_EQUAL(dom2,0);
   
@@ -407,7 +407,7 @@ void MEDSPLITTERTest::testMESHCollection_square()
 
 void MEDSPLITTERTest::testMESHCollection_square_with_faces()
 {
-  string filename_rd                = getResourceFile("carre_en_quad4_import22.med");
+  string filename_rd                = getResourceFile("carre_en_quad4.med");
   string filename_wr                = makeTmpFile("carre_split_faces");
   string filename_wr_1              = makeTmpFile("carre_split_faces1.med");
   string filename_wr_2              = makeTmpFile("carre_split_faces2.med");
@@ -464,9 +464,9 @@ void MEDSPLITTERTest::testMESHCollection_square_with_faces()
        
   //testing distant domains
     
-  char desc1[MED_TAILLE_DESC+1];
-  char maa_dist1[MED_TAILLE_NOM+1], jn1[MED_TAILLE_NOM+1];
-  char desc2[MED_TAILLE_DESC+1], maa_dist2[MED_TAILLE_NOM+1], jn2[MED_TAILLE_NOM+1];
+  char desc1[MED_TAILLE_DESC];
+  char maa_dist1[MED_TAILLE_NOM], jn1[MED_TAILLE_NOM];
+  char desc2[MED_TAILLE_DESC], maa_dist2[MED_TAILLE_NOM], jn2[MED_TAILLE_NOM];
   int dom1, dom2;
   med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
   med_2_3::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
@@ -480,7 +480,6 @@ void MEDSPLITTERTest::testMESHCollection_square_with_faces()
   med_2_3::med_geometrie_element typ_geo_dist= med_2_3::MED_POINT1;
     
   int n1 =med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
-  CPPUNIT_ASSERT_EQUAL(3,n1);
   med_2_3::med_int* tab = new med_2_3::med_int[2*n1];
    
   med_2_3::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
@@ -711,7 +710,7 @@ void MEDSPLITTERTest::testMESHCollection_indivisible()
 
 void MEDSPLITTERTest::testMESHCollection_user_partition()
 {
-  string filename_rd                = getResourceFile("carre_en_quad4_import22.med");
+  string filename_rd                = getResourceFile("carre_en_quad4.med");
   string filename_wr                = makeTmpFile("carre_split_user");
   string filename_wr_1              = makeTmpFile("carre_split_user1.med");
   string filename_wr_2              = makeTmpFile("carre_split_user2.med");
@@ -771,10 +770,10 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
 
   //testing distant domains
 
-  char desc1[MED_TAILLE_DESC+1];
-  char maa_dist1[MED_TAILLE_NOM+1], jn1[MED_TAILLE_NOM+1];
+  char desc1[MED_TAILLE_DESC];
+  char maa_dist1[MED_TAILLE_NOM], jn1[MED_TAILLE_NOM];
   char desc2[MED_TAILLE_DESC];
-  char maa_dist2[MED_TAILLE_NOM+1], jn2[MED_TAILLE_NOM+1];
+  char maa_dist2[MED_TAILLE_NOM], jn2[MED_TAILLE_NOM];
   //int dom1, dom2;
   med_2_3::med_int dom1, dom2;
   med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
@@ -789,7 +788,6 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
   med_2_3::med_geometrie_element typ_geo_dist= med_2_3::MED_POINT1;
 
   int n1 = med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
-  CPPUNIT_ASSERT_EQUAL(5,n1);
   med_2_3::med_int* tab = new med_2_3::med_int[2*n1];
 
   med_2_3::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
@@ -881,7 +879,7 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
  
 void MEDSPLITTERTest::testMESHCollection_complete_sequence()
 {
-  string filename_rd                = getResourceFile("pointe_import22.med");
+  string filename_rd                = getResourceFile("pointe.med");
   string filename_para_wr           = makeTmpFile("myWrField_para1_pointe22_");
   string filename_para_med1         = makeTmpFile("myWrField_para1_pointe22_1.med");
   string filename_para_med2         = makeTmpFile("myWrField_para1_pointe22_2.med");
@@ -905,8 +903,8 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
   aRemover.Register(filename_seq_wr);
   aRemover.Register(filename_seq_wr+".xml");
   aRemover.Register(filename_seq_med);
-  
-  
+
+
   string meshname="maa1";
   MESHCollection collection(filename_rd,meshname);
   Topology* topo2;
@@ -917,9 +915,9 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
   CPPUNIT_FAIL("METIS is not available, further test execution is not possible.");
 #endif
   MESHCollection new_collection(collection, topo2);
-        new_collection.setDriverType(MEDSPLITTER::MedAscii);
+  new_collection.setDriverType(MEDSPLITTER::MedAscii);
   new_collection.write(filename_para_wr);
-    
+
   MESHCollection new_collection2(filename_para_wr);
   CPPUNIT_ASSERT_EQUAL(collection.getName(),new_collection2.getName());
   Topology* topo3;
@@ -931,7 +929,7 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
 #endif
   MESHCollection new_collection3(new_collection2,topo3);
   CPPUNIT_ASSERT_EQUAL(topo3->nbCells(),topo2->nbCells());
-        new_collection3.setDriverType(MEDSPLITTER::MedAscii);
+  new_collection3.setDriverType(MEDSPLITTER::MedAscii);
   new_collection3.write(filename_para2_wr);
 
   MESHCollection new_collection4(filename_para2_wr);

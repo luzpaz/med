@@ -43,7 +43,7 @@ private :
 public :
 
   FAMILYClient(const SALOME_MED::FAMILY_ptr S, 
-                MESH * M = NULL);
+               GMESH * M = NULL);
   virtual ~FAMILYClient();
 
   virtual void blankCopy(bool blankSupport = true);

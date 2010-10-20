@@ -84,7 +84,7 @@ public:
   virtual ~Med_Gen_i();
 
   //
-  SALOME_MED::MESH_ptr readMeshInFile(const char* fileName,
+  SALOME_MED::GMESH_ptr readMeshInFile(const char* fileName,
                                       const char* studyName,
                                       const char* meshName)
     throw(SALOME::SALOME_Exception);

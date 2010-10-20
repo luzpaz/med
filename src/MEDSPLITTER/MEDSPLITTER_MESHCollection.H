@@ -16,8 +16,8 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef __MEDSPLITTER_MESHCOLLECTION_H__
-#define __MEDSPLITTER_MESHCOLLECTION_H__
+#ifndef MEDSPLITTER_MESHCOLLECTION_H_
+#define MEDSPLITTER_MESHCOLLECTION_H_
 
 /*! Projects an integer or double field onto a new mesh
  * 
@@ -35,10 +35,10 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
   char fieldchar[80];
   strcpy(fieldchar,fieldname.c_str());
 
-  int nb_old_domains=old_collection._topology->nbDomain();
-  int nb_new_domains=_topology->nbDomain();
+  int nb_old_domains=old_collection.m_topology->nbDomain();
+  int nb_new_domains=m_topology->nbDomain();
 
-  vector <list<int> > element_array  (_topology->nbDomain());
+  vector <list<int> > element_array  (m_topology->nbDomain());
 
   vector <MEDMEM::FIELD<T> *> old_fields ;
 
@@ -176,7 +176,7 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
     }
   }
 
-  for (int idomain=0; idomain < old_collection._topology->nbDomain(); idomain++)
+  for (int idomain=0; idomain < old_collection.m_topology->nbDomain(); idomain++)
   {
     //retrieves the group igroup on domain idomain
 
@@ -209,19 +209,19 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
       local=new int[nbelem];
       initial_local=list_of_elems;
       old_collection.getTopology()->convertCellToGlobal(idomain,list_of_elems,nbelem,array);
-      _topology->convertGlobalCellList(array,nbelem,local,ip);
+      m_topology->convertGlobalCellList(array,nbelem,local,ip);
       size=nbelem;
       break;
     case MED_EN::MED_FACE :
       old_collection.getTopology()->convertFaceToGlobal(idomain,list_of_elems,nbelem,array);
-      _topology->convertGlobalFaceListWithTwins(array,nbelem,local,ip,full_array,size);
+      m_topology->convertGlobalFaceListWithTwins(array,nbelem,local,ip,full_array,size);
       initial_local=new int[size];
       old_collection.getTopology()->convertGlobalFaceList(full_array,size,initial_local,idomain);
       delete[] full_array;
       break;
     case MED_EN::MED_NODE :
       old_collection.getTopology()->convertNodeToGlobal(idomain,list_of_elems,nbelem,array);
-      _topology->convertGlobalNodeListWithTwins(array,nbelem,local,ip,full_array,size);
+      m_topology->convertGlobalNodeListWithTwins(array,nbelem,local,ip,full_array,size);
       initial_local=new int[size];
       old_collection.getTopology()->convertGlobalNodeList(full_array,size,initial_local,idomain);
       delete[] full_array;
@@ -244,7 +244,7 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
       for (int i=0; i<size; i++)
       {
         MED_EN::medGeometryElement type =
-    old_collection._mesh[idomain]->getElementType(entity,initial_local[i]);
+          old_collection.m_mesh[idomain]->getElementType(entity,initial_local[i]);
         int nb_gauss_points=old_fields[idomain]->getNumberOfGaussPoints(type);
         for (int j=0; j<nb_components;j++)
           for (int k=0;k<nb_gauss_points; k++)
@@ -276,7 +276,7 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
     new_supports[i]->removeReference();
     //delete medarray[i];
   }
-  for (int i=0; i<old_fields.size(); i++)
+  for (unsigned i=0; i<old_fields.size(); i++)
   {
     cout << "old field deletion" <<endl;
     old_fields[i]->removeReference();

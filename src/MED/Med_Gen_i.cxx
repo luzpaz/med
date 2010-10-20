@@ -24,6 +24,7 @@
 //  File   : Med_Gen_i.cxx
 //  Author : Paul RASCLE, EDF
 //  Module : MED
+//  $Header$
 //
 #include "Med_Gen_i.hxx"
 
@@ -35,8 +36,7 @@
 #include "MEDMEM_Mesh_i.hxx"
 #include "MEDMEM_Field.hxx"
 
-#include "MEDMEM_Med.hxx"
-#include "MEDMEM_MedMedDriver.hxx"
+#include "MEDMEM_MedFileBrowser.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_define.hxx"
@@ -295,9 +295,9 @@ void Med_Gen_i::readStructFileWithFieldType (const char* fileName,
  *  Sert un Maillage
  */
 //=============================================================================
-SALOME_MED::MESH_ptr Med_Gen_i::readMeshInFile(const char* fileName,
-                                               const char* studyName,
-                                               const char* meshName)
+SALOME_MED::GMESH_ptr Med_Gen_i::readMeshInFile(const char* fileName,
+                                                const char* studyName,
+                                                const char* meshName)
 throw (SALOME::SALOME_Exception)
 {
         beginService("Med_Gen_i::readMeshInFile");
@@ -308,19 +308,15 @@ throw (SALOME::SALOME_Exception)
 
 // Creation du maillage
 
-        MESH * myMesh;
+        GMESH * myMesh;
 
         // skl for IPAL14240
         // check mesh or grid:
         try {
-          MED med(MED_DRIVER,fileName);
-          MESH* tmpMesh = med.getMesh(meshName);
-          if(tmpMesh) {
-            if(tmpMesh->getIsAGrid())
-              myMesh = new GRID();
-            else
-              myMesh = new MESH() ;
-          }
+          if ( MEDFILEBROWSER( fileName ).isStructuredMesh( meshName ) )
+            myMesh = new GRID();
+          else
+            myMesh = new MESH() ;
         }
         catch (const std::exception & ex) {
           MESSAGE("Exception Interceptee : ");
@@ -362,9 +358,9 @@ throw (SALOME::SALOME_Exception)
                 THROW_SALOME_CORBA_EXCEPTION("Unable to read this mesh in this file",SALOME::BAD_PARAM);
         };
 
-        MESH_i * meshi = new MESH_i(myMesh);
+        GMESH_i * meshi = new GMESH_i(myMesh);
         //SALOME_MED::MESH_var mesh = SALOME_MED::MESH::_narrow(meshi->_this());
-        SALOME_MED::MESH_ptr mesh = meshi->_this();
+        SALOME_MED::GMESH_ptr mesh = meshi->_this();
         try
         {
           // add the mesh object in study
@@ -388,187 +384,190 @@ SALOME_MED::FIELD_ptr Med_Gen_i::readFieldInFile(const char* fileName,
                                                  CORBA::Long iter)
 throw (SALOME::SALOME_Exception)
 {
-        beginService("Med_Gen_i::readFieldInFile");
-        SCRUTE(fileName);
-        string myStudyName(studyName);
+  beginService("Med_Gen_i::readFieldInFile");
+  SCRUTE(fileName);
+  string myStudyName(studyName);
 
-        if (myStudyName.size() == 0)
-                THROW_SALOME_CORBA_EXCEPTION("No Study Name given", \
+  if (myStudyName.size() == 0)
+    THROW_SALOME_CORBA_EXCEPTION("No Study Name given", \
                                  SALOME::BAD_PARAM);
 
-        // Get StudyManager Reference, current study,
+  // Get StudyManager Reference, current study,
 
-        CORBA::Object_var obj = _NS->Resolve("/myStudyManager");
-        SALOMEDS::StudyManager_var myStudyManager =
-                        SALOMEDS::StudyManager::_narrow(obj);
-        ASSERT(! CORBA::is_nil(myStudyManager));
-        SALOMEDS::Study_var myStudy =
-                myStudyManager->GetStudyByName(myStudyName.c_str());
-        if (CORBA::is_nil(myStudy))
-        THROW_SALOME_CORBA_EXCEPTION("Wrong Study Name", \
+  CORBA::Object_var obj = _NS->Resolve("/myStudyManager");
+  SALOMEDS::StudyManager_var myStudyManager =
+    SALOMEDS::StudyManager::_narrow(obj);
+  ASSERT(! CORBA::is_nil(myStudyManager));
+  SALOMEDS::Study_var myStudy =
+    myStudyManager->GetStudyByName(myStudyName.c_str());
+  if (CORBA::is_nil(myStudy))
+    THROW_SALOME_CORBA_EXCEPTION("Wrong Study Name",    \
                                  SALOME::BAD_PARAM);
 
-        SALOMEDS::StudyBuilder_var myBuilder = myStudy->NewBuilder();
-        SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
-        if (CORBA::is_nil(medfather))
-        {
-                myBuilder->NewCommand();
-                // mpv: component label must be created in spite of "Locked" study flag state
-                bool aLocked = myStudy->GetProperties()->IsLocked();
-                if (aLocked) myStudy->GetProperties()->SetLocked(false);
+  SALOMEDS::StudyBuilder_var myBuilder = myStudy->NewBuilder();
+  SALOMEDS::SComponent_var medfather = myStudy->FindComponent("MED");
+  if (CORBA::is_nil(medfather))
+  {
+    myBuilder->NewCommand();
+    // mpv: component label must be created in spite of "Locked" study flag state
+    bool aLocked = myStudy->GetProperties()->IsLocked();
+    if (aLocked) myStudy->GetProperties()->SetLocked(false);
 
-                medfather = myBuilder->NewComponent("MED");
-                SALOMEDS::AttributeName_var aName = SALOMEDS::AttributeName::_narrow(
-                      myBuilder->FindOrCreateAttribute(medfather, "AttributeName"));
-                //NRI           aName->SetValue("Med");
+    medfather = myBuilder->NewComponent("MED");
+    SALOMEDS::AttributeName_var aName = SALOMEDS::AttributeName::_narrow(
+                                                                         myBuilder->FindOrCreateAttribute(medfather, "AttributeName"));
+    //NRI           aName->SetValue("Med");
 
-                CORBA::Object_var objVarN = _NS->Resolve("/Kernel/ModulCatalog");
-                SALOME_ModuleCatalog::ModuleCatalog_var Catalogue  = SALOME_ModuleCatalog::ModuleCatalog::_narrow(objVarN);
-                SALOME_ModuleCatalog::Acomponent_var Comp = Catalogue->GetComponent( "MED" );
-                if ( !Comp->_is_nil() ) {
-                  aName->SetValue( Comp->componentusername() );
-                }
+    CORBA::Object_var objVarN = _NS->Resolve("/Kernel/ModulCatalog");
+    SALOME_ModuleCatalog::ModuleCatalog_var Catalogue  = SALOME_ModuleCatalog::ModuleCatalog::_narrow(objVarN);
+    SALOME_ModuleCatalog::Acomponent_var Comp = Catalogue->GetComponent( "MED" );
+    if ( !Comp->_is_nil() ) {
+      aName->SetValue( Comp->componentusername() );
+    }
 
-                CORBA::Object_var myO = _poa->id_to_reference(*_id); // this ior...
-                myBuilder->DefineComponentInstance(medfather,myO);
+    CORBA::Object_var myO = _poa->id_to_reference(*_id); // this ior...
+    myBuilder->DefineComponentInstance(medfather,myO);
 
-                if (aLocked) myStudy->GetProperties()->SetLocked(true);
-                myBuilder->CommitCommand();
+    if (aLocked) myStudy->GetProperties()->SetLocked(true);
+    myBuilder->CommitCommand();
 
-        }
-        else
-                        MESSAGE("MED dejà dans l étude");
+  }
+  else
+    MESSAGE("MED dejà dans l étude");
 
-        MESSAGE("Lecture du fichier ")
-        SCRUTE(fileName);
+  MESSAGE("Lecture du fichier ")
+    SCRUTE(fileName);
 
-// Creation du champ
+  // Creation du champ
 
-        FIELD_ * myField;
-        MED * mymed;
-        try
-        {
-          mymed = new MED(MED_DRIVER,fileName) ;
-        }
-        catch (const std::exception & ex)
+  FIELD_ * myField;
+  MEDFILEBROWSER mymed;
+  try
+  {
+    mymed.readFileStruct(fileName) ;
+  }
+  catch (const std::exception & ex)
+  {
+    MESSAGE("Exception Interceptee : ");
+    SCRUTE(ex.what());
+    THROW_SALOME_CORBA_EXCEPTION("Unable to find this file ",SALOME::BAD_PARAM);
+  }
+
+  try
+  {
+    vector<string> fieldsNames = mymed.getFieldNames() ;
+    int numberOfFields = fieldsNames.size();
+    int i;
+    for (i=0; i<numberOfFields; i++)
+    {
+      if (fieldsNames[i]== fieldName) break;
+    }
+    if (i == numberOfFields)
+    {
+      THROW_SALOME_CORBA_EXCEPTION("Unable to find this field ",SALOME::BAD_PARAM);
+    }
+    MESSAGE("trouve");
+
+    switch( mymed.getFieldType( fieldName ))
+    {
+    case MED_REEL64: myField = new FIELD<double>; break;
+    case MED_INT32:  
+    case MED_INT64:  myField = new FIELD<int>; break;
+    default:
+      THROW_SALOME_CORBA_EXCEPTION("Invalid field type",SALOME::BAD_PARAM);
+    }
+    myField->setIterationNumber( iter );
+    myField->setOrderNumber( ordre );
+    myField->addDriver( MED_DRIVER, fileName, fieldName);
+
+  }
+#if defined(_DEBUG_) || defined(_DEBUG)
+  catch (const std::exception & ex)
+#else
+  catch (const std::exception &)
+#endif
+  {
+    MESSAGE("Exception Interceptee : ");
+    SCRUTE(ex.what());
+    THROW_SALOME_CORBA_EXCEPTION("Unable to find this field in this file",SALOME::BAD_PARAM);
+  };
+
+  GMESH* myMesh=0;
+  try {
+    string MeshName = mymed.getMeshName( fieldName );
+    myMesh = mymed.isStructuredMesh( MeshName ) ? (GMESH*) new GRID : (GMESH*) new MESH;
+    myMesh->addDriver(MED_DRIVER, fileName, MeshName );
+    myMesh->read();
+    SCRUTE(myMesh->getName());
+  }
+#if defined(_DEBUG_) || defined(_DEBUG)
+  catch (const std::exception & ex)
+#else
+  catch (const std::exception &)
+#endif
+  {
+    MESSAGE("Exception Interceptee : ");
+    SCRUTE(ex.what());
+    THROW_SALOME_CORBA_EXCEPTION("Unable to find associated mesh",SALOME::BAD_PARAM);
+  };
+
+  med_type_champ type = myField->getValueType() ;
+  switch (type)
+  {
+  case MED_EN::MED_INT32:
+    {
+      try
+      {
+        ((FIELD<int>*)myField)->read() ;
+        myField->getSupport()->setMesh( myMesh );
+        FIELDTEMPLATE_I<int,FullInterlace> * myFieldIntI = new FIELDTEMPLATE_I<int,FullInterlace>((FIELD<int,FullInterlace>*)myField);
+        SALOME_MED::FIELD_ptr myFieldIOR = myFieldIntI->_this();
+        //                      if (!_duringLoad) myFieldIntI->addInStudy(myStudy,myFieldIOR) ;
+        endService("Med_Gen_i::readFieldInFile");
+        return myFieldIOR;
+      }
+      catch (const SALOMEDS::StudyBuilder::LockProtection &) {}
+#if defined(_DEBUG_) || defined(_DEBUG)
+      catch (const std::exception & ex)
+#else
+        catch (const std::exception &)
+#endif
         {
           MESSAGE("Exception Interceptee : ");
           SCRUTE(ex.what());
-          THROW_SALOME_CORBA_EXCEPTION("Unable to find this file ",SALOME::BAD_PARAM);
-        }
+          THROW_SALOME_CORBA_EXCEPTION("Unable to read int field",SALOME::BAD_PARAM);
+        };
+      break;
+    }
+  case MED_EN::MED_REEL64:
+    {
+      try
+      {
+        ((FIELD<double>*)myField)->read() ;
+        myField->getSupport()->setMesh( myMesh );
+        FIELDTEMPLATE_I<double,FullInterlace> * myFieldDoubleI = new FIELDTEMPLATE_I<double,FullInterlace>((FIELD<double,FullInterlace>*)myField);
+        SALOME_MED::FIELD_ptr myFieldIOR = myFieldDoubleI->_this() ;
+        //                      if (!_duringLoad) myFieldDoubleI->addInStudy(myStudy,myFieldIOR) ;
+        endService("Med_Gen_i::readFieldInFile");
+        return myFieldIOR;
+      }
+      catch (const SALOMEDS::StudyBuilder::LockProtection &) {}
 
-        try
-        {
-                deque<string> fieldsNames = mymed->getFieldNames() ;
-                int numberOfFields = fieldsNames.size();
-                int i;
-                for (i=0; i<numberOfFields; i++)
-                {
-                        if (fieldsNames[i]== fieldName) break;
-                }
-                if (i == numberOfFields)
-                {
-                        THROW_SALOME_CORBA_EXCEPTION("Unable to find this field ",SALOME::BAD_PARAM);
-                }
-                MESSAGE("trouve");
-/*
-                deque<DT_IT_> myIteration = mymed->getFieldIteration (fieldName);
-                if (myIteration.size() != 1)
-                {
-                        MESSAGE("WARNING : My iteration size is ")
-                        SCRUTE(myIteration.size());
-                }
-*/
-                myField = mymed->getField(fieldName,ordre,iter);
-        }
 #if defined(_DEBUG_) || defined(_DEBUG)
-        catch (const std::exception & ex)
+      catch (const std::exception & ex)
 #else
         catch (const std::exception &)
 #endif
         {
-                MESSAGE("Exception Interceptee : ");
-                SCRUTE(ex.what());
-                THROW_SALOME_CORBA_EXCEPTION("Unable to find this field in this file",SALOME::BAD_PARAM);
+          MESSAGE("Exception Interceptee : ");
+          SCRUTE(ex.what());
+          THROW_SALOME_CORBA_EXCEPTION("Unable to read double field",SALOME::BAD_PARAM);
         };
+      break;
+    }
+  }
 
-        SUPPORT * fieldSupport;
-        try
-        {
-                fieldSupport=(SUPPORT *)myField->getSupport() ;
-                ASSERT(fieldSupport != NULL);
-                MESH * myMesh=(MESH *)fieldSupport->getMesh();
-                ASSERT(myMesh != NULL);
-                myMesh->read();
-                SCRUTE(myMesh->getName());
-                fieldSupport->update();
-        }
-#if defined(_DEBUG_) || defined(_DEBUG)
-        catch (const std::exception & ex)
-#else
-        catch (const std::exception &)
-#endif
-        {
-                MESSAGE("Exception Interceptee : ");
-                SCRUTE(ex.what());
-                THROW_SALOME_CORBA_EXCEPTION("Unable to find associated support",SALOME::BAD_PARAM);
-        };
-
-        med_type_champ type = myField->getValueType() ;
-        switch (type)
-        {
-         case MED_EN::MED_INT32:
-         {
-                try
-                {
-                        ((FIELD<int>*)myField)->read() ;
-                        FIELDTEMPLATE_I<int,FullInterlace> * myFieldIntI = new FIELDTEMPLATE_I<int,FullInterlace>((FIELD<int,FullInterlace>*)myField);
-                        SALOME_MED::FIELD_ptr myFieldIOR = myFieldIntI->_this();
-//                      if (!_duringLoad) myFieldIntI->addInStudy(myStudy,myFieldIOR) ;
-                        endService("Med_Gen_i::readFieldInFile");
-                        return myFieldIOR;
-                }
-                catch (const SALOMEDS::StudyBuilder::LockProtection &) {}
-#if defined(_DEBUG_) || defined(_DEBUG)
-                catch (const std::exception & ex)
-#else
-                catch (const std::exception &)
-#endif
-                {
-                        MESSAGE("Exception Interceptee : ");
-                        SCRUTE(ex.what());
-                        THROW_SALOME_CORBA_EXCEPTION("Unable to read int field",SALOME::BAD_PARAM);
-                };
-                break;
-         }
-         case MED_EN::MED_REEL64:
-         {
-                try
-                {
-                        ((FIELD<double>*)myField)->read() ;
-                        FIELDTEMPLATE_I<double,FullInterlace> * myFieldDoubleI = new FIELDTEMPLATE_I<double,FullInterlace>((FIELD<double,FullInterlace>*)myField);
-                        SALOME_MED::FIELD_ptr myFieldIOR = myFieldDoubleI->_this() ;
-//                      if (!_duringLoad) myFieldDoubleI->addInStudy(myStudy,myFieldIOR) ;
-                        endService("Med_Gen_i::readFieldInFile");
-                        return myFieldIOR;
-                }
-                catch (const SALOMEDS::StudyBuilder::LockProtection &) {}
-
-#if defined(_DEBUG_) || defined(_DEBUG)
-                catch (const std::exception & ex)
-#else
-                catch (const std::exception &)
-#endif
-                {
-                        MESSAGE("Exception Interceptee : ");
-                        SCRUTE(ex.what());
-                        THROW_SALOME_CORBA_EXCEPTION("Unable to read double field",SALOME::BAD_PARAM);
-                };
-                break;
-         }
-        }
-
-        return SALOME_MED::FIELD::_nil();
+  return SALOME_MED::FIELD::_nil();
 }
 
 

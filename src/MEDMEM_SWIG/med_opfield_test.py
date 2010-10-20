@@ -49,16 +49,8 @@ def print_ord(i):
     else:
         return `i`+'th'
 
-md = MED()
-
-mdDriver = MED_MED_RDONLY_DRIVER(medFile,md)
-
-mdDriver.open()
-mdDriver.readFileStruct()
-mdDriver.close()
-
+md = MEDFILEBROWSER(medFile)
 nbMeshes = md.getNumberOfMeshes()
-
 nbFields = md.getNumberOfFields()
 
 print "The med file", medFile, "contains", nbMeshes, "mesh(es) and", nbFields, "field(s)"
@@ -80,35 +72,29 @@ if (nbFields>0):
 print ""
 
 mesh_name = md.getMeshName(0)
-mesh = md.getMesh(mesh_name)
-mesh.read()
+mesh = MESH(MED_DRIVER,md.getFileName(),mesh_name)
 spaceDim = mesh.getSpaceDimension()
 meshDim = mesh.getMeshDimension()
 nbNodes = mesh.getNumberOfNodes()
 print "The mesh",mesh_name,"is a",spaceDim,"D mesh on a",meshDim,"D geometry and has",nbNodes,"Nodes"
 
 if (nbFields>0):
-    print "Updating supports in the Med Object"
-    md.updateSupport()
     print ""
     print "Field(s) Analysis "
     for i in range(nbFields):
         print ""
         field_name = md.getFieldName(i)
-        nbOfIt = md.getFieldNumberOfIteration(field_name)
+        dtits = md.getFieldIteration(field_name)
+        nbOfIt = len(dtits)
         print "The",print_ord(i),"field is",field_name,"with",nbOfIt,"iteration(s)"
-        for j in range(nbOfIt):
+        for dtitfield in dtits:
             print ""
-            dtitfield = md.getFieldIteration(field_name,j)
             dt = dtitfield.getdt()
             it = dtitfield.getit()
-            field = md.getField(field_name,dt,it)
-            type = field.getValueType()
+            type = md.getFieldType(field_name)
             print "     * Iteration:",dt,"Order number:",it,"Type:",type
             if type == MED_INT32:
-                fieldint = createFieldIntFromField(field)
-                fieldint.read()
-                fieldint.getSupport().update()
+                fieldint = FIELDINT(MED_DRIVER,md.getFileName(),field_name,dt,it,mesh)
                 name = fieldint.getName()
                 desc = fieldint.getDescription()
                 nbOfComp = fieldint.getNumberOfComponents()
@@ -279,9 +265,7 @@ if (nbFields>0):
                 except:
                     print "fieldintdiv = fieldint / fieldint2 catch/except error"
             elif type == MED_REEL64:
-                fielddouble = createFieldDoubleFromField(field)
-                fielddouble.read()
-                fielddouble.getSupport().update()
+                fielddouble = FIELDDOUBLE(MED_DRIVER,md.getFileName(),field_name,dt,it,mesh)
                 name = fielddouble.getName()
                 desc = fielddouble.getDescription()
                 nbOfComp = fielddouble.getNumberOfComponents()
@@ -450,7 +434,7 @@ if (nbFields>0):
                     print "     Values:",nbOf
                     for k in range(nbOf):
                         valueI = fielddoublediv.getRow(k+1)
-                    print "     *",valueI[:nbOfComp]
+                        print "     *",valueI[:nbOfComp]
                 except:
                     print "fielddoublediv = fielddouble / fielddouble2 catch/except error"
             else:

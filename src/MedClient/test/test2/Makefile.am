@@ -50,7 +50,7 @@ nodist__libCompo2_la_SOURCES = libCompo2_wrap.cxx
 _libCompo2_la_CPPFLAGS = $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) \
 	${MED2_INCLUDES} ${HDF5_INCLUDES} ${PYTHON_INCLUDES} ${KERNEL_CXXFLAGS} \
 	-I$(srcdir)/../../../MEDMEM_I -I$(srcdir)/../../../MEDMEM -I$(top_builddir)/idl \
-	-I$(srcdir)/../../../MEDWrapper/V2_1/Core -I$(srcdir)/../../../MEDMEM_SWIG -I$(srcdir)/../../../MED -I$(srcdir)/../../src \
+	-I$(srcdir)/../../../MEDMEM_SWIG -I$(srcdir)/../../../MED -I$(srcdir)/../../src \
 	-I$(srcdir)/../../../INTERP_KERNEL -I$(srcdir)/../../../INTERP_KERNEL/Bases
 _libCompo2_la_LDFLAGS  = ${PYTHON_LIBS} -module ${KERNEL_LDFLAGS}  ${MED2_LIBS} ${HDF5_LIBS} \
 	../../../MEDMEM/libmedmem.la ../../../MEDMEM_I/libMEDMEMImpl.la ../../../INTERP_KERNEL/libinterpkernel.la \

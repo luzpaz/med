@@ -48,7 +48,7 @@ protected:
 public :
 
   SUPPORTClient(const SALOME_MED::SUPPORT_ptr S, 
-                MESH * M = NULL);
+                GMESH * M = NULL);
 
   void blankCopy();
   void fillCopy();

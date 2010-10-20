@@ -34,17 +34,12 @@ typedef enum{MedAscii, MedXML, Undefined} DriverType;
 
 %include "my_typemap.i"
 
-%typecheck(SWIG_TYPECHECK_POINTER) const int* {
-   $1 = PyList_Check($input) ? 1 : 0;
-}
-
 namespace MEDSPLITTER {
 class Graph {
 public:
   typedef enum {METIS,SCOTCH} splitter_type;
-  %extend {
-    Graph() {return 0;}
-  }
+private:
+  Graph();
 };
 }
 

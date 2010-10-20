@@ -36,13 +36,7 @@ medFile = os.path.join(filePath, "test_2D.med")
 
 asciiFile = "tyst.txt"
 
-md=MED()
-dr=MED_MED_RDONLY_DRIVER(medFile,md)
-
-dr.open()
-dr.readFileStruct()
-dr.read()
-dr.close()
+md=MEDFILEBROWSER(medFile)
 
 nbMeshes = md.getNumberOfMeshes()
 
@@ -50,17 +44,11 @@ nbFields = md.getNumberOfFields()
 
 print "The med file", medFile, "contains", nbMeshes, "mesh(es) and", nbFields, "field(s)"
 f1Name=md.getFieldName(0)
-f1It=md.getFieldNumberOfIteration(f1Name)
-it=md.getFieldIteration(f1Name,0)
-f1=md.getField(f1Name,it.dt,it.it)
-f1=createFieldDoubleFromField(f1)
-#f1.read()
+mesh_name=md.getMeshName(f1Name)
+mesh=MESH(MED_DRIVER,medFile,mesh_name)
+it=md.getFieldIteration(f1Name)[0]
+f1=FIELDDOUBLE(MED_DRIVER,medFile,f1Name,it.dt,it.it,mesh)
 id2=f1.addDriver(ASCII_DRIVER,asciiFile,"Default Field Name",MED_ECRI)
-#dr=ASCII_FIELDDOUBLE_DRIVER(asciiFile,f1,DESCENDING)
-#dr.open()
-#dr.write()
-#dr.close()
-##print f1It
 f1.write(id2)
 
 print "END of the Pyhton script ..... Ctrl D to exit"

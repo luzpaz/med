@@ -1126,14 +1126,12 @@ void MEDLoaderNS::readUMeshDataInMedFile(med_idt fid, med_int meshId, DataArrayD
           int *connTab=new int[(curMedType%100)*curNbOfElem];
           int *fam=new int[curNbOfElem];
           MEDLoader::MEDConnOfOneElemType elem(typmai2[i],connTab,0,fam,curNbOfElem,-1);
-          int *tmp=new int[curNbOfElem];
           char *noms=new char[MED_SNAME_SIZE*curNbOfElem+1];
           med_bool withname=MED_FALSE,withnumber=MED_FALSE,withfam=MED_FALSE;
           int *globArr=new int[curNbOfElem];
           MEDmeshElementRd(fid,nommaa,numdt,numit,whichEntity,curMedType,MED_NODAL,MED_FULL_INTERLACE,connTab,&withname,noms,&withnumber,globArr,&withfam,fam);
           if(!withfam)
             std::fill(fam,fam+curNbOfElem,0);
-          delete [] tmp;
           delete [] noms;
           //trying to read global numbering
           if(withnumber)

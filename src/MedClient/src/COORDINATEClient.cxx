@@ -53,7 +53,7 @@ void COORDINATEClient::blankCopy()
 {
   std::string *tA;
   long nA;
-  SALOME_MED::MESH::coordinateInfos_var all;
+  SALOME_MED::GMESH::coordinateInfos_var all;
   try
   {
         all = IOR_Mesh->getCoordGlobal();

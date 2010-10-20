@@ -25,6 +25,10 @@
 
 #include "MEDMEM_Exception.hxx"
 
+#ifdef WITH_NUMPY
+#include <numpy/arrayobject.h>
+#endif
+
 template<class T>
   struct Binding {
 //     static T Checker(PyObject *a);
@@ -39,6 +43,9 @@ template<>
     static PyObject * Traducer( double value ) { return Py_BuildValue("d", value ); }
     static double Functor(PyObject *func, double value)
   { return Traducer( PyObject_CallFunction( func, (char *)"f", value )); }
+#ifdef WITH_NUMPY
+  static NPY_TYPES numpy_type() { return NPY_DOUBLE; }
+#endif
   };
 
 template<>
@@ -49,6 +56,9 @@ template<>
     static PyObject * Traducer( int value ) { return Py_BuildValue("i", value ); }
     static int Functor(PyObject *func, int value)
   { return Traducer( PyObject_CallFunction( func, (char *)"i", value )); }
+#ifdef WITH_NUMPY
+  static NPY_TYPES numpy_type() { return NPY_INT; }
+#endif
   };
 
 template<class T, class U>

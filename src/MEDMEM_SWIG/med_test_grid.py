@@ -39,13 +39,7 @@ filePath=os.path.join(filePath, "share", "salome", "resources", "med")
 medFile = os.path.join(filePath, "test19.med")
 print "Read file", medFile
 
-md = MED()
-
-mdDriver = MED_MED_RDONLY_DRIVER(medFile,md)
-
-mdDriver.open()
-mdDriver.readFileStruct()
-mdDriver.close()
+md = MEDFILEBROWSER(medFile)
 
 nbMeshes = md.getNumberOfMeshes()
 print "Nb meshes:", nbMeshes
@@ -57,14 +51,11 @@ if nbMeshes == 0:
 ##############################
 
 mesh_name = md.getMeshName(0)
-mesh = md.getMesh(mesh_name)
 print "Read", mesh_name
-mesh.read()
+grid = GRID(MED_DRIVER,medFile,mesh_name)
 
-if mesh.getIsAGrid() == 0:
+if grid.getIsAGrid() == 0:
   raise  RuntimeError, "Mesh 0 is not a grid"
-
-grid = createGridFromMesh(mesh)
 
 I = grid.getArrayLength(1)
 print "_iArrayLength", I
@@ -106,11 +97,14 @@ print "coordSyst =", coordSyst
 if coordSyst != "CARTESIAN":
   raise  RuntimeError, "Wrong coordinates system"
 
-coordinates = grid.getCoordinates(MED_FULL_INTERLACE)
+mesh = grid.convertInMESH()
+coordinates = mesh.getCoordinates(MED_FULL_INTERLACE)
 print "coordinates =", coordinates
 xy = [ grid.getArrayValue(1, I-1 ) , grid.getArrayValue(2, J-1 ) ]
 xy2 = coordinates[(nbNodes-1)*spaceDim:(nbNodes*spaceDim)]
-if xy != xy2:
+print list(xy)
+print xy2
+if not list(xy) == list(xy2):
   raise  RuntimeError, "Error in grid.getCoordinates(MED_FULL_INTERLACE)"
 
 nbTypesCell = grid.getNumberOfTypes(MED_CELL)
@@ -208,22 +202,22 @@ print "getFaceNumber 1,1,1,0 = ", n2, " : ", o2
 
 print "Connectivity"
 n1 = grid.getNodeNumber(0,0,0)
-n2 = grid.getNodeNumber(1,0,0)
+n2 = grid.getNodeNumber(0,1,0)
 n3 = grid.getNodeNumber(1,1,0)
-n4 = grid.getNodeNumber(0,1,0)
+n4 = grid.getNodeNumber(1,0,0)
 
 conn1 = [n1,n2,n3,n4]
 
-Connectivity = grid.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,types[0])
+Connectivity = mesh.getConnectivity(MED_NODAL,MED_CELL,types[0])
 print "connectivity =", Connectivity
 
 print "Cell 1 nodes:", conn1, Connectivity[0:4]
-if conn1 != Connectivity[0:4]:
+if list(conn1) != list(Connectivity[0:4]):
   raise  RuntimeError, "Wrong nodal connectivity"
 
 
-ReverseConnectivity = grid.getReverseConnectivity(MED_NODAL)
-ReverseConnectivityIndex = grid.getReverseConnectivityIndex(MED_NODAL)
+ReverseConnectivity = mesh.getReverseConnectivity(MED_NODAL)
+ReverseConnectivityIndex = mesh.getReverseConnectivityIndex(MED_NODAL)
 n = 6
 beg = ReverseConnectivityIndex[n-1]-1
 end = ReverseConnectivityIndex[n]-1
@@ -233,33 +227,35 @@ if end-beg != 4:
 if ReverseConnectivity[beg] != 1:
   raise  RuntimeError, "Wrong reverse connectivity"
 
+edgfecon = mesh.getConnectivity(MED_NODAL,MED_EDGE,MED_ALL_ELEMENTS)
+print edgfecon
+print len(edgfecon)
 
-grid.calculateConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL)
-Connectivity = grid.getConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS)
+mesh.calculateConnectivity(MED_DESCENDING,MED_CELL)
+Connectivity = mesh.getConnectivity(MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS)
 ConnectivityIndex = mesh.getConnectivityIndex(MED_DESCENDING,MED_CELL)
 n = 1
 beg = ConnectivityIndex[n-1]-1
 end = ConnectivityIndex[n]-1
 print "Element",n,"descending connectivity -->",Connectivity[beg:end]
-if Connectivity[beg:end] != [1, 4, 13, 14]:
+if list(Connectivity[beg:end]) != [1, 16, 2, 13]:
   raise  RuntimeError, "Wrong descending  connectivity"
 
-print "getReverseConnectivity(MED_DESCENDING)", grid.getReverseConnectivity(MED_DESCENDING)
-print "grid.getReverseConnectivityIndex(MED_DESCENDING)",grid.getReverseConnectivityIndex(MED_DESCENDING)
+print "getReverseConnectivity(MED_DESCENDING)", mesh.getReverseConnectivity(MED_DESCENDING)
+print "grid.getReverseConnectivityIndex(MED_DESCENDING)",mesh.getReverseConnectivityIndex(MED_DESCENDING)
 
 ##############################
 # test "bodyfitted"
 ##############################
 
 mesh_name = md.getMeshName(1)
-mesh = md.getMesh(mesh_name)
 print "Read", mesh_name
-mesh.read()
+grid = GRID(MED_DRIVER,medFile,mesh_name)
 
-if mesh.getIsAGrid() == 0:
+if grid.getIsAGrid() == 0:
   raise  RuntimeError, "Mesh 1 is not a grid"
 
-grid = createGridFromMesh(mesh)
+mesh = grid.convertInMESH()
 
 I = grid.getArrayLength(1)
 print "_iArrayLength", I
@@ -316,15 +312,15 @@ print "Nb cells =", nbElemType
 if nbElemType != 1:
   raise  RuntimeError, "Wrong Nb cells"
 
-Connectivity = grid.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,types[0])
+Connectivity = mesh.getConnectivity(MED_NODAL,MED_CELL,types[0])
 print "connectivity =", Connectivity
 n1 = grid.getNodeNumber(0,0,0)
-n2 = grid.getNodeNumber(1,0,0)
+n2 = grid.getNodeNumber(0,1,0)
 n3 = grid.getNodeNumber(1,1,0)
-n4 = grid.getNodeNumber(0,1,0)
+n4 = grid.getNodeNumber(1,0,0)
 conn1 = [n1,n2,n3,n4]
 print "Cell 1 nodes:", conn1, Connectivity[0:4]
-if conn1 != Connectivity[0:4]:
+if conn1 != list(Connectivity[0:4]):
   raise  RuntimeError, "Wrong nodal connectivity"
 
 ##############################################
@@ -332,9 +328,9 @@ if conn1 != Connectivity[0:4]:
 ##############################################
 
 mesh_name = md.getMeshName(2)
-mesh = md.getMesh(mesh_name)
+
 print "Read", mesh_name
-mesh.read()
+mesh = MESH(MED_DRIVER,md.getFileName(),mesh_name)
 
 if mesh.getIsAGrid() == 0:
   print "Mesh ",mesh_name," is not a grid"

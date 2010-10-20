@@ -31,8 +31,8 @@ dist_libMEDSPLITTERTest_la_SOURCES= \
 salomeinclude_HEADERS = MEDSPLITTERTest.hxx
 
 libMEDSPLITTERTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED2_INCLUDES) \
-	$(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ $(BOOST_CPPFLAGS) $(LIBXML_CXXFLAGS) \
-	-I$(srcdir)/.. -I$(srcdir)/../../MEDWrapper/V2_1/Core -I$(srcdir)/../../MEDMEM \
+	$(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ $(LIBXML_CXXFLAGS) \
+	-I$(srcdir)/.. -I$(srcdir)/../../MEDMEM \
 	-I$(srcdir)/../../MEDMEMCppTest -I$(srcdir)/../../INTERP_KERNEL/Bases
 libMEDSPLITTERTest_la_LDFLAGS= $(MED2_LIBS) @CPPUNIT_LIBS@
 
@@ -57,7 +57,7 @@ TestMEDSPLITTER_SOURCES= TestMEDSPLITTER.cxx
 
 TestMEDSPLITTER_CPPFLAGS= $(libMEDSPLITTERTest_la_CPPFLAGS) 
 TestMEDSPLITTER_LDADD= $(MED2_LIBS) $(libMEDSPLITTERTest_la_LDFLAGS) -lm \
-	libMEDSPLITTERTest.la ../../MEDWrapper/V2_1/Core/libmed_V2_1.la \
+	libMEDSPLITTERTest.la \
 	../../MEDMEM/libmedmem.la ../../INTERP_KERNEL/libinterpkernel.la \
 	../libmedsplitter.la 
 if MED_ENABLE_KERNEL

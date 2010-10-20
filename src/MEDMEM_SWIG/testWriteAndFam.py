@@ -94,25 +94,6 @@ for i in range(nbOfFiles):
             pass
         pass
     
-    medFileVersion = getMedFileVersionForWriting()
-
-    if (medFileVersion == V22):
-        setMedFileVersionForWriting(V21)
-        pass
-
-    print ""
-    print "  adding a Med file V2.1 format driver to the mesh with the file ",medFileOut21
-    idMedV21 = mesh.addDriver(MED_DRIVER,medFileOut21,mesh.getName())
-
-    print ""
-    print "  writing the mesh in Med file V2.1 format"
-    mesh.write(idMedV21)
-
-    medFileVersion = getMedFileVersionForWriting()
-    if (medFileVersion == V21):
-        setMedFileVersionForWriting(V22)
-        pass
-
     print ""
     print "  adding a Med file V2.2 format driver to the mesh with the file ",medFileOut22
     idMedV22 = mesh.addDriver(MED_DRIVER,medFileOut22,mesh.getName())
@@ -128,10 +109,8 @@ medFiles2 = []
 for i in range(nbOfFiles):
     medFile = medFiles[i]
     rootFile = string.split(medFile,".")[0]
-    medFileOut21 = rootFile + "Out21.med"
     medFileOut22 = rootFile + "Out22.med"
 
-    medFiles2.append(medFileOut21)
     medFiles2.append(medFileOut22)
     pass
 
