@@ -27,9 +27,9 @@ else
  fi
 fi
 
-infile=${srcdir}/../../resources/pointe_import22.med
+infile=${srcdir}/../../resources/pointe.med
 
-./test_operation_fielddouble $infile maa1 fieldcelldoublescalar
+./test_operation_fielddouble $infile maa1 fieldcelldoublescalar   >& /dev/null
 
 exit
 

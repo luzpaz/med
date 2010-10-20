@@ -20,7 +20,6 @@
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
-#include "MEDMEM_Compatibility21_22.hxx"
 #include "MEDMEM_AsciiFieldDriver.hxx"
 #include "MEDMEM_STRING.hxx"
 
@@ -139,9 +138,6 @@ void MEDMEMTest::testAsciiFieldDriver()
     CPPUNIT_ASSERT_EQUAL(aa[2], bb[0]);
   }
 
-  printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-  printf("1\n");
-  printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
   // template<int N> bool compare(const double* a, const double* b)
   {
     {
@@ -235,11 +231,8 @@ void MEDMEMTest::testAsciiFieldDriver()
     CPPUNIT_ASSERT_THROW(ASCII_FIELD_DRIVER<double> aDriver4
                          ("anyfile4", aField1, MED_EN::ASCENDING, "XY"), MEDEXCEPTION);
     // invalid
-//#ifdef ENABLE_FORCED_FAILURES
-    // (BUG) This assert fails because 'A'(and 'B', and 'C') < 'X'
     CPPUNIT_ASSERT_THROW(ASCII_FIELD_DRIVER<double> aDriver5
                          ("anyfile5", aField1, MED_EN::ASCENDING, "ABC"), MEDEXCEPTION);
-//#endif
   }
   else if (spaceDimension == 2) {
     // good
@@ -252,11 +245,8 @@ void MEDMEMTest::testAsciiFieldDriver()
     CPPUNIT_ASSERT_THROW(ASCII_FIELD_DRIVER<double> aDriver4
                          ("anyfile4", aField1, MED_EN::ASCENDING, "X"), MEDEXCEPTION);
     // invalid
-//#ifdef ENABLE_FORCED_FAILURES
-    // (BUG) Invalid string is accepted for priority
     CPPUNIT_ASSERT_THROW(ASCII_FIELD_DRIVER<double> aDriver5
                          ("anyfile5", aField1, MED_EN::ASCENDING, "AB"), MEDEXCEPTION);
-//#endif
   }
   else {
     CPPUNIT_FAIL("Cannot test ASCII_FIELD_DRIVER because file pointe.med"

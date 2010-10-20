@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+/*/  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 //  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 //  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -18,7 +18,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+/*/
 
 /*
   creation d'une geometrie 2d : un cube [0,1]^2
@@ -30,6 +30,7 @@
 
 #include <med.h>
 #include <string.h>
+#include <stdlib.h>
 
 int main (int argc, char **argv)
 {
@@ -55,7 +56,6 @@ int main (int argc, char **argv)
   };
   char nomcoo[2*MED_TAILLE_PNOM+1] = "x               y               ";
   char unicoo[2*MED_TAILLE_PNOM+1] = "cm              cm              ";
-  /*  char nomnoe[19*MED_TAILLE_PNOM+1] = "nom1    nom2    nom3    nom4";*/
   char *nomnoe ;
   med_int numnoe[9] = {1,2,3,4,5,6,7,8,9};
   med_int nufano[9] = {0,0,0,0,0,0,0,0,0};
@@ -81,9 +81,6 @@ int main (int argc, char **argv)
   med_int attval;
   med_int ngro;
   char gro[MED_TAILLE_LNOM+1];
-  int i;
-  int nfame = 1; 
-  int nfamn = 1;
 
   /*
     Some fields : 2 on nodes : one int and one double , one on cells : double

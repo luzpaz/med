@@ -42,7 +42,7 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-void affiche_tableau(const double * myArray, int nb_lignes, int nb_colonnes)
+static void affiche_tableau(const double * myArray, int nb_lignes, int nb_colonnes)
 {
   cout << "Nombre de lignes : " << nb_lignes << endl;
   cout << "Nombre de colonnes : " << nb_colonnes << endl;
@@ -54,7 +54,7 @@ void affiche_tableau(const double * myArray, int nb_lignes, int nb_colonnes)
     cout << endl;}
 }
 
-void affiche_coordinate(COORDINATE & myCoordinate, int _numberofNodes, int _spaceDimension)
+static void affiche_coordinate(COORDINATE & myCoordinate, int _numberofNodes, int _spaceDimension)
 {
   cout << "- Système de coordonnées : " << myCoordinate.getCoordinatesSystem() << endl;
   cout << "- Tableau des coordonnées : " << endl;

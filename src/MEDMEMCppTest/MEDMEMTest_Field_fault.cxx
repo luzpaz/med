@@ -25,8 +25,8 @@
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_Support.hxx"
-#include <MEDMEM_VtkMeshDriver.hxx>
-#include <MEDMEM_MedMeshDriver22.hxx>
+#include "MEDMEM_VtkMeshDriver.hxx"
+#include "MEDMEM_MedMeshDriver.hxx"
 
 
 #include <sstream>
@@ -224,7 +224,7 @@ using namespace MEDMEM;
  *              test_copie_field_.cxx
  *              test_copie_fieldT.cxx
  */
-void compareField_(const FIELD_ * theField_1, const FIELD_ * theField_2, bool isFIELD, bool isValue)
+static void compareField_(const FIELD_ * theField_1, const FIELD_ * theField_2, bool isFIELD, bool isValue)
 {
   // name, description, support
   CPPUNIT_ASSERT_EQUAL(theField_1->getName(), theField_2->getName());
@@ -270,7 +270,7 @@ void compareField_(const FIELD_ * theField_1, const FIELD_ * theField_2, bool is
   }
 }
 
-void checkField_(FIELD_ * theField_, const SUPPORT * theSupport,
+static void checkField_(FIELD_ * theField_, const SUPPORT * theSupport,
                  MED_EN::med_type_champ theValueType,
                  MED_EN::medModeSwitch theInterlace)
 {
@@ -423,7 +423,7 @@ void checkField (FIELD<T, INTERLACING_TAG> * theField, const SUPPORT * theSuppor
   // nb. of components must be equal 1 (for Volume, Area, Length) or
   // space dimension (for Normal, Barycenter, )
   {
-    MESH* aMesh = theSupport->getMesh();
+    GMESH* aMesh = theSupport->getMesh();
     int spaceDim = 3;
     if (aMesh) spaceDim = aMesh->getSpaceDimension();
     theField->deallocValue();
@@ -526,6 +526,7 @@ FIELD<T> * createFieldOnGroup(MESH* theMesh, const GROUP* theGroup,
   return aFieldOnGroup;
 }
 
+double plus13 (double val);
 double plus13 (double val)
 {
   return val + 13;
@@ -535,7 +536,7 @@ double plus13 (double val)
 // typedef void (*myFuncType)(const double * temp, T* output);
 // size of temp array = space dim = 3
 // size of output array = nb. comps = 2
-void proj2d (const double * temp, double* output)
+static void proj2d (const double * temp, double* output)
 {
   // dimetric projection with coefficients:
   // 1.0 along Oy and Oz, 0.5 along Ox
@@ -555,12 +556,12 @@ void proj2d (const double * temp, double* output)
   output[1] = temp[2] - dx;
 }
 
-void testDrivers()
+static void testDrivers()
 {
   string filename_rd                  = getResourceFile("pointe.med");
   string filename_wr                  = makeTmpFile("myMedFieldfile.med", filename_rd);
   string filename_support_wr          = makeTmpFile("myMedSupportFiledfile.med");
-  string filename22_rd                = getResourceFile("pointe_import22.med");
+  string filename22_rd                = getResourceFile("pointe.med");
   string filenamevtk_wr               = makeTmpFile("myMedFieldfile22.vtk");
 
   string fieldname_celldouble_rd      = "fieldcelldoublescalar";
@@ -602,13 +603,12 @@ void testDrivers()
 
   //Test read(GENDRIVER & genDriver) method
   //Creation a Driver
-  MED_FIELD_RDONLY_DRIVER21<int> *aMedRdFieldDriver21_1 =
-    new MED_FIELD_RDONLY_DRIVER21<int>();
+  MED_FIELD_RDONLY_DRIVER<int> *aMedRdFieldDriver_1 = new MED_FIELD_RDONLY_DRIVER<int>();
   //Creation a Field
   FIELD<int> *aField_2 = new FIELD<int>();
   aField_2->setName(fieldname_nodeint_rd);
-  aField_2->addDriver(*aMedRdFieldDriver21_1);
-  aField_2->read(*aMedRdFieldDriver21_1);
+  aField_2->addDriver(*aMedRdFieldDriver_1);
+  aField_2->read(*aMedRdFieldDriver_1);
 
   ///////////////////
   //Test Write Part//
@@ -621,23 +621,23 @@ void testDrivers()
   CPPUNIT_ASSERT_NO_THROW(aFieldSupport = 
                           new FIELD<int>(aSupport, MED_DRIVER,filename_support_wr,fieldname_nodeint_rd));
   //(BUG) Can not open file
-  MED_FIELD_WRONLY_DRIVER21<int> * aFieldWrDriver21 = 
-    new MED_FIELD_WRONLY_DRIVER21<int>(filename_support_wr,aFieldSupport);
-  aFieldWrDriver21->setFieldName(aFieldSupport->getName() + "_copy");
-  CPPUNIT_ASSERT_NO_THROW(IdDriver= aFieldSupport->addDriver(*aFieldWrDriver21));
+  MED_FIELD_WRONLY_DRIVER<int> * aFieldWrDriver = 
+    new MED_FIELD_WRONLY_DRIVER<int>(filename_support_wr,aFieldSupport);
+  aFieldWrDriver->setFieldName(aFieldSupport->getName() + "_copy");
+  CPPUNIT_ASSERT_NO_THROW(IdDriver= aFieldSupport->addDriver(*aFieldWrDriver));
   CPPUNIT_ASSERT_NO_THROW(aFieldSupport->write(IdDriver));
   aFieldSupport->removeReference();
-  delete aFieldWrDriver21;
+  delete aFieldWrDriver;
 //#endif    
 
   //Create fileds
   FIELD<double> * aField_3 = new FIELD<double>();
-  MED_FIELD_RDONLY_DRIVER21<double> *aMedRdFieldDriver21_2 =
-    new MED_FIELD_RDONLY_DRIVER21<double>(filename_rd, aField_3);
-  aMedRdFieldDriver21_2->open();
-  aMedRdFieldDriver21_2->setFieldName(fieldname_celldouble_rd);
-  aMedRdFieldDriver21_2->read();
-  aMedRdFieldDriver21_2->close();
+  MED_FIELD_RDONLY_DRIVER<double> *aMedRdFieldDriver_2 =
+    new MED_FIELD_RDONLY_DRIVER<double>(filename_rd, aField_3);
+  aMedRdFieldDriver_2->open();
+  aMedRdFieldDriver_2->setFieldName(fieldname_celldouble_rd);
+  aMedRdFieldDriver_2->read();
+  aMedRdFieldDriver_2->close();
 
   //Test write(int index) method
   //Add drivers to FIELDs
@@ -656,7 +656,7 @@ void testDrivers()
   }
   //Trying call write(int index) method with incorrect index
 //#ifdef ENABLE_FAULTS
-  CPPUNIT_ASSERT_THROW(aField_3->write(IdDriver1+1, fieldname_celldouble_wr),MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aField_3->write(IdDriver1+1),MEDEXCEPTION);
   // => Segmentation fault
 //#endif
 
@@ -664,7 +664,7 @@ void testDrivers()
 //#ifdef ENABLE_FAULTS
   try
   {
-    aField_3->write(IdDriver1, fieldname_celldouble_wr);
+    aField_3->write(IdDriver1);
     // => Segmentation fault
   }
   catch(MEDEXCEPTION &e)
@@ -681,16 +681,15 @@ void testDrivers()
 
   //Test write(const GENDRIVER &);
   //Create a driver
-  MED_FIELD_WRONLY_DRIVER21<int> *aMedWrFieldDriver21 =
-    new MED_FIELD_WRONLY_DRIVER21<int>();
-  aMedWrFieldDriver21->setFileName(filename_wr);
+  MED_FIELD_WRONLY_DRIVER<int> *aMedWrFieldDriver = new MED_FIELD_WRONLY_DRIVER<int>();
+  aMedWrFieldDriver->setFileName(filename_wr);
   aField_2->setName(fieldname_nodeint_wr1);
   //Add driver to a field
-  aField_2->addDriver(*aMedWrFieldDriver21);
+  aField_2->addDriver(*aMedWrFieldDriver);
 
   try
   {
-  aField_2->write(*aMedWrFieldDriver21);
+  aField_2->write(*aMedWrFieldDriver);
   }
   catch(MEDEXCEPTION &e)
   {
@@ -704,7 +703,7 @@ void testDrivers()
   //Test writeAppend(int index) method
   //Create a vtk file
   MESH * aMesh_1 = new MESH;
-  MED_MESH_RDONLY_DRIVER22 *aMedMeshRdDriver22 = new MED_MESH_RDONLY_DRIVER22(filename22_rd, aMesh_1);
+  MED_MESH_RDONLY_DRIVER *aMedMeshRdDriver22 = new MED_MESH_RDONLY_DRIVER(filename22_rd, aMesh_1);
   aMedMeshRdDriver22->open();
   aMedMeshRdDriver22->setMeshName(meshname);
   aMedMeshRdDriver22->read();
@@ -716,8 +715,8 @@ void testDrivers()
 
   //Create a field
   FIELD<int> * aField_4 = new FIELD<int>();
-  MED_FIELD_RDONLY_DRIVER22<int> *aMedRdFieldDriver22 =
-    new MED_FIELD_RDONLY_DRIVER22<int>(filename22_rd, aField_2);
+  MED_FIELD_RDONLY_DRIVER<int> *aMedRdFieldDriver22 =
+    new MED_FIELD_RDONLY_DRIVER<int>(filename22_rd, aField_2);
   aMedRdFieldDriver22->open();
   aMedRdFieldDriver22->setFieldName(fieldname_nodeint_rd);
   aMedRdFieldDriver22->read();
@@ -763,13 +762,13 @@ void testDrivers()
 
   //Delete objects
   aField_1->removeReference();
-  delete aMedRdFieldDriver21_1;
+  delete aMedRdFieldDriver_1;
   aField_2->removeReference();
   aField_3->removeReference();
-  delete aMedRdFieldDriver21_2;
+  delete aMedRdFieldDriver_2;
   aField_4->removeReference();
   delete aMedMeshRdDriver22;
-  delete aMedWrFieldDriver21;
+  delete aMedWrFieldDriver;
   delete aVtkDriver;
   aMesh->removeReference();
   aMesh_1->removeReference();
@@ -777,7 +776,7 @@ void testDrivers()
   aSupport->removeReference();
 }
 
-void MEDMEMTest_testField()
+static void MEDMEMTest_testField()
 {
   SUPPORT *anEmptySupport=new SUPPORT;
   ////////////////////

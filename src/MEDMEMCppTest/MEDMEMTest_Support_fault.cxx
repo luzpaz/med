@@ -101,8 +101,7 @@ using namespace MEDMEM;
  *
  *   (+)     void getBoundaryElements() throw (MEDEXCEPTION);
  *
- *   (+)     void changeElementsNbs(MED_EN::medEntityMesh entity, const int *renumberingFromOldToNew,
- *                                  int limitNbClassicPoly, const int *renumberingFromOldToNewPoly=0);
+ *   (+)     void changeElementsNbs(MED_EN::medEntityMesh entity, const int *renumberingFromOldToNew);
  *   (+)     void intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION);
  *   (+)     bool belongsTo(const SUPPORT& other, bool deepCompare=false) const;
  *
@@ -120,7 +119,7 @@ using namespace MEDMEM;
  *   (reference counter presently disconnected in C++) virtual void removeReference() const;
  *  }
  */
-void MEDMEMTest_testSupport()
+static void MEDMEMTest_testSupport()
 {
   // cells connectivities
   //const int NumberOfCellTypes = 3;
@@ -632,18 +631,16 @@ void MEDMEMTest_testSupport()
   int renumberingFromOldToNew[10] = {10,9,8,7,6,5,4,3,2,1};
 
   CPPUNIT_ASSERT_THROW(aPartialCells->changeElementsNbs
-                       (MED_EN::MED_NODE, renumberingFromOldToNew, 10), MEDEXCEPTION);
+                       (MED_EN::MED_NODE, renumberingFromOldToNew), MEDEXCEPTION);
 
-  aPartialCells->changeElementsNbs(MED_EN::MED_CELL, renumberingFromOldToNew, 10);
+  aPartialCells->changeElementsNbs(MED_EN::MED_CELL, renumberingFromOldToNew);
   CPPUNIT_ASSERT_EQUAL(3, aPartialCells->getValIndFromGlobalNumber(9));
   CPPUNIT_ASSERT_EQUAL(2, aPartialCells->getValIndFromGlobalNumber(8));
   CPPUNIT_ASSERT_EQUAL(1, aPartialCells->getValIndFromGlobalNumber(7));
 
   // {1,2,3,4,5,6,7} -> {1,3,5,7,2,4,6}, {8,9,10,11} -> {8,10,9,11}
-  int renumberingFromOldToNewP[7] = {1,3,5,7,2,4,6};
-  int renumberingFromOldToNewPolyP[4] = {8,10,9,11};
-  aPartialCells->changeElementsNbs(MED_EN::MED_CELL, renumberingFromOldToNewP,
-                                  7, renumberingFromOldToNewPolyP);
+  int renumberingFromOldToNewP[11] = {1,3,5,7,2,4,6,8,10,9,11};
+  aPartialCells->changeElementsNbs(MED_EN::MED_CELL, renumberingFromOldToNewP);
   CPPUNIT_ASSERT_EQUAL(3, aPartialCells->getValIndFromGlobalNumber(10));
   CPPUNIT_ASSERT_EQUAL(2, aPartialCells->getValIndFromGlobalNumber(8));
   CPPUNIT_ASSERT_EQUAL(1, aPartialCells->getValIndFromGlobalNumber(6));

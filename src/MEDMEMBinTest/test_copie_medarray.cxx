@@ -42,7 +42,7 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-void affiche_medarray(MEDARRAY<double> & myMedArray)
+static void affiche_medarray(MEDARRAY<double> & myMedArray)
 {
   int numberof ;
   MESSAGE_MED("Show all 1 :");

@@ -49,33 +49,29 @@ int main (int argc, char ** argv) {
     6.0, 0.0, -1.0,
     5.0, 1.0, -3.0};
 
-  const int REFnodalConnOfFaces[74] = {
-    1, 2, 3, 4, 5, 6, // Polyhedron 1
-    1, 7, 8, 2, 
-    2, 8, 9, 3, 
-    4, 3, 9, 10, 
-    5, 4, 10, 11, 
-    6, 5, 11, 12, 
-    1, 6, 12, 7, 
-    7, 12, 8, 
+  const int REFnodalConnOfFaces[91] = {
+    1, 2, 3, 4, 5, 6, -1,// Polyhedron 1
+    1, 7, 8, 2,       -1,
+    2, 8, 9, 3,       -1,
+    4, 3, 9, 10,      -1,
+    5, 4, 10, 11,     -1,
+    6, 5, 11, 12,     -1,
+    1, 6, 12, 7,      -1,
+    7, 12, 8,         -1,
     10, 9, 8, 12, 11,
                                    
-    13, 14, 15, 3, 2, // Polyhedron 2
-    13, 2, 8, 16, 
-    14, 13, 16, 17, 
-    15, 14, 17, 
-    15, 17, 18, 
-    15, 18, 9, 
-    3, 15, 9, 
-    2, 3, 9, 8, 
-    8, 9, 17, 16, 
+    13, 14, 15, 3, 2, -1, // Polyhedron 2
+    13, 2, 8, 16,     -1,
+    14, 13, 16, 17,   -1,
+    15, 14, 17,       -1,
+    15, 17, 18,       -1,
+    15, 18, 9,        -1,
+    3, 15, 9,         -1,
+    2, 3, 9, 8,       -1,
+    8, 9, 17, 16,     -1,
     9, 18, 17};
 
-  const int REFfacesIndex[20] = {
-    1, 7, 11, 15, 19, 23, 27, 31, 34, 
-    39, 44, 48, 52, 55, 58, 61, 64, 68, 72, 75};
-
-  const int REFpolyIndex[3] = {1, 10, 20};
+  const int REFpolyIndex[3] = {1, 47, 92 };
 
   double PolygonCoordinates[27] = {
     2.0, 3.0, 12.0,
@@ -99,18 +95,15 @@ int main (int argc, char ** argv) {
 
   int NumberOfNodes = 19;
   int SpaceDimension = 3;
-  int MeshDimension = 3;
 
-  const int NumberOfTypes = 1;
-  medGeometryElement Types[NumberOfTypes] = {MED_TETRA4};
-  const int NumberOfElements[NumberOfTypes] = {1};
+  const int NumberOfTypes = 2;
+  medGeometryElement Types[NumberOfTypes] = {MED_TETRA4, MED_POLYHEDRA};
+  const int NumberOfElements[NumberOfTypes] = {1,2};
 
   myMeshing->setNumberOfTypes(NumberOfTypes, MED_CELL);
 
   myMeshing->setCoordinates(SpaceDimension, NumberOfNodes, Coordinates,
                            "CARTESIAN", MED_FULL_INTERLACE);
-  myMeshing->setSpaceDimension(SpaceDimension);
-  myMeshing->setMeshDimension(MeshDimension);
   myMeshing->setTypes(Types, MED_CELL);
   myMeshing->setNumberOfElements(NumberOfElements, MED_CELL);
 
@@ -126,10 +119,9 @@ int main (int argc, char ** argv) {
     17, 9, 18, 19
   };
   
-  myMeshing->setConnectivity(ConnectivityTetra, MED_CELL, MED_TETRA4);
+  myMeshing->setConnectivity(MED_CELL, MED_TETRA4, ConnectivityTetra);
 
-  myMeshing->setPolyhedraConnectivity(REFpolyIndex, REFfacesIndex, 
-                                     REFnodalConnOfFaces, 2, MED_CELL);
+  myMeshing->setConnectivity(MED_CELL, MED_POLYHEDRA, REFnodalConnOfFaces, REFpolyIndex);
 
 
   MESHING *myPolygonMeshing=new MESHING;
@@ -137,16 +129,13 @@ int main (int argc, char ** argv) {
 
   NumberOfNodes = 9;
   SpaceDimension = 3;
-  MeshDimension = 2;
-  medGeometryElement PolygonTypes[NumberOfTypes] = {MED_TRIA3};
-  const int PolygonNumberOfElements[NumberOfTypes] = {2};
+  medGeometryElement PolygonTypes[NumberOfTypes] = {MED_TRIA3,MED_POLYGON};
+  const int PolygonNumberOfElements[NumberOfTypes] = {2,2};
 
   myPolygonMeshing->setNumberOfTypes(NumberOfTypes, MED_CELL);
 
   myPolygonMeshing->setCoordinates(SpaceDimension, NumberOfNodes, PolygonCoordinates,
-                           "CARTESIAN", MED_FULL_INTERLACE);
-  myPolygonMeshing->setSpaceDimension(SpaceDimension);
-  myPolygonMeshing->setMeshDimension(MeshDimension);
+                                   "CARTESIAN", MED_FULL_INTERLACE);
   myPolygonMeshing->setTypes(PolygonTypes, MED_CELL);
   myPolygonMeshing->setNumberOfElements(PolygonNumberOfElements, MED_CELL);
 
@@ -159,8 +148,8 @@ int main (int argc, char ** argv) {
     1, 7, 2, 3, 9, 4
   };
 
-  myPolygonMeshing->setConnectivity(ConnectivityTri, MED_CELL, MED_TRIA3);
-  myPolygonMeshing->setPolygonsConnectivity(REFpolygonIndex, REFpolygonFaces, 2, MED_CELL);
+  myPolygonMeshing->setConnectivity(MED_CELL, MED_TRIA3,   ConnectivityTri);
+  myPolygonMeshing->setConnectivity(MED_CELL, MED_POLYGON, REFpolygonFaces, REFpolygonIndex);
   SUPPORT *sup2 = new SUPPORT(myPolygonMeshing);
   FIELD<double> *areas = myPolygonMeshing->getArea(sup2);
   myPolygonMeshing->removeReference();
@@ -194,10 +183,9 @@ int main (int argc, char ** argv) {
       return -1;
     }
   cout << "Writing test " << endl;
-  int idMed22 = myMeshing->addDriver(MED_DRIVER,"totoPoly_V22.med",myMeshing->getName());
-  myMeshing->write(idMed22);
+  myMeshing->write(MED_DRIVER,"totoPoly_V22.med");
   myMeshing->removeReference();
-  if ( getenv("srcdir") )
+  if ( getenv("srcdir") ) // performing 'make check'?
     remove("totoPoly_V22.med");
   return 0;
 }

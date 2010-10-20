@@ -1,4 +1,4 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+/*/  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 //  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 //  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -18,10 +18,11 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+/*/
 
 #include <med.h>
 #include <string.h>
+#include <stdlib.h>
 
 int main (int argc, char **argv)
 {
@@ -54,7 +55,6 @@ int main (int argc, char **argv)
   };
   char nomcoo[3*MED_TAILLE_PNOM+1] = "x               y               z               ";
   char unicoo[3*MED_TAILLE_PNOM+1] = "cm              cm              cm              ";
-  /*  char nomnoe[19*MED_TAILLE_PNOM+1] = "nom1    nom2    nom3    nom4";*/
   char *nomnoe ;
   med_int numnoe[19] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19};
   med_int nufano[19] = {1,1,3,3,0,0,2,0,4,0,4,2,4,2,4,2,4,1,3};
@@ -105,10 +105,8 @@ int main (int argc, char **argv)
   med_int ngro;
   char gro[MED_TAILLE_LNOM+1];
   char gro2[MED_TAILLE_LNOM*2+1];
-  char gro3[MED_TAILLE_LNOM*3+1];
   int i;
   int nfame = 3; 
-  int nfamn = 2;
 
 
   /*

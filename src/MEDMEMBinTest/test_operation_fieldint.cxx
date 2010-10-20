@@ -40,18 +40,20 @@
 using namespace MEDMEM;
 using namespace MED_EN;
 
+int myfunction1(int x);
 int myfunction1(int x)
 {
     return 2*x;
 }
 
+int myfunction2(int x);
 int myfunction2(int x)
 {
     return x/2;
 }
 
 using namespace std;
-void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
+static void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
 {
   cout << "Field "<< myField->getName() << " : " <<myField->getDescription() <<  endl ;
   int NumberOfComponents = myField->getNumberOfComponents() ;
@@ -73,7 +75,7 @@ void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
   cout << "- Adresse support : " << mySupport << endl;
 }
 
-void affiche_fieldT(FIELD<int> * myField, const SUPPORT * mySupport)
+static void affiche_fieldT(FIELD<int> * myField, const SUPPORT * mySupport)
 {
   affiche_field_((FIELD_ *) myField, mySupport);
 
@@ -106,7 +108,7 @@ void affiche_fieldT(FIELD<int> * myField, const SUPPORT * mySupport)
   }
 }
 
-void affiche_valeur_field(const char * intitule, const int taille, const FIELD<int>& f)
+static void affiche_valeur_field(const char * intitule, const int taille, const FIELD<int>& f)
 {
     const int * value=f.getValue();
     std::cout << endl << intitule;
@@ -198,6 +200,7 @@ int main (int argc, char ** argv)
     // supports non compatibles
     const SUPPORT *mySupport2=new SUPPORT(myMesh,"On_all_node",MED_NODE);
     myField1->setSupport(mySupport2);
+    mySupport2->removeReference();
     try
     {
         std::cout << endl << string(60,'-') << endl;
@@ -240,14 +243,10 @@ int main (int argc, char ** argv)
 
     FIELD<int> *myFieldPlus = *myField1 + *myField2;
     FIELD<int> *myFieldMoins = *myField1 - *myField2;
-    myFieldMoins->removeReference();
     FIELD<int> *myFieldNeg = -(*myField1);
     FIELD<int> *myFieldFois = *myField1 * *myField2;
-    myFieldFois->removeReference();
     FIELD<int> *myFieldDiv = *myField1 / *myField2;
-    myFieldDiv->removeReference();
     FIELD<int> *myFieldAsso = (*myField1)+*((*myField2)*(*myField2));
-    myFieldAsso->removeReference();
     FIELD<int>* myFieldadd = FIELD<int>::add(*myField1, *myField2);
     FIELD<int>* myFieldsub = FIELD<int>::sub(*myField1, *myField2);
     FIELD<int>* myFieldmul = FIELD<int>::mul(*myField1, *myField2);
@@ -279,6 +278,13 @@ int main (int argc, char ** argv)
     affiche_valeur_field(" div    :", size, *myFielddiv);
     affiche_valeur_field("f1+f2*f1:", size, *myFieldAsso);
     affiche_valeur_field("  - f1  :", size, *myFieldNeg);
+
+    myFieldPlus->removeReference();
+    myFieldMoins->removeReference();
+    myFieldFois->removeReference();
+    myFieldDiv->removeReference();
+    myFieldAsso->removeReference();
+    myFieldNeg->removeReference();
 
     // Test applyLin
     std::cout << endl;

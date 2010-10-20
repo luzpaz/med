@@ -32,10 +32,10 @@ fi
 infile=${srcdir}/../../resources/blow5_ascii.case
 outfile=${outdir}/test_operation_fieldint.med
 
-./ensight2med $infile $outfile I
+./ensight2med $infile $outfile I >& /dev/null
 
 # main test
-./test_operation_fieldint $outfile EnsightMesh displacement_c
+./test_operation_fieldint $outfile EnsightMesh displacement_c  >& /dev/null
 
 ok=$?
 

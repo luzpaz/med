@@ -33,7 +33,7 @@
 
 namespace MEDMEM {
   class MESH;
-};
+}
 
 class MEDMEMCPPTEST_EXPORT MEDMEMTest : public CppUnit::TestFixture
 {
@@ -64,20 +64,15 @@ class MEDMEMCPPTEST_EXPORT MEDMEMTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testInit /* cxx */ );
   //CPPUNIT_TEST( testInterlacingPolicy /* not in spec */ );
   //CPPUNIT_TEST( testInterlacingTraits /* not in spec */ );
-  CPPUNIT_TEST( testMedFieldDriver21 );
-  CPPUNIT_TEST( testMedFieldDriver22 );
+  CPPUNIT_TEST( testMedFieldDriver );
   CPPUNIT_TEST( testReadFieldOnNodesAndCells );
   //CPPUNIT_TEST( testMedFieldDriver /* not in spec */ );
-  CPPUNIT_TEST( testMed );
+  CPPUNIT_TEST( testMedFileBrowser );
   //30
-  CPPUNIT_TEST( testMedMedDriver21 );
-  CPPUNIT_TEST( testMedMedDriver22 );
-  //CPPUNIT_TEST( testMedMedDriver /* not in spec */ );
   //CPPUNIT_TEST( testMEDMEMchampLire /* not in spec */ );
   //CPPUNIT_TEST( testMEDMEMgaussEcr /* not in spec */ );
   //CPPUNIT_TEST( testMEDMEMprofilEcr /* not in spec */ );
-  CPPUNIT_TEST( testMedMeshDriver21 );
-  CPPUNIT_TEST( testMedMeshDriver22 );
+  CPPUNIT_TEST( testMedMeshDriver );
   //CPPUNIT_TEST( testMedMeshDriver /* not in spec */ );
   CPPUNIT_TEST( testMedVersion );
   //40
@@ -86,7 +81,6 @@ class MEDMEMCPPTEST_EXPORT MEDMEMTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testnArray );
   CPPUNIT_TEST( testPartialDescendingConnectivity );
   CPPUNIT_TEST( testPointerOf );
-  CPPUNIT_TEST( testPolyhedronArray );
   CPPUNIT_TEST( testPorflowMeshDriver );
   //CPPUNIT_TEST( testRCBase /* not in spec */ );
   //CPPUNIT_TEST( testSetInterlacingType /* not in spec */ );
@@ -104,7 +98,6 @@ class MEDMEMCPPTEST_EXPORT MEDMEMTest : public CppUnit::TestFixture
   //CPPUNIT_TEST( testmedimport_src /* not in spec */ );
   //60
   CPPUNIT_TEST( testExtractor );
-  CPPUNIT_TEST( testMeshFuse );
   CPPUNIT_TEST( testDesactivateFacesComputation ); // issue 0020411
   CPPUNIT_TEST( testGetVolumeAbs );
   CPPUNIT_TEST( test_remapper4 );
@@ -147,20 +140,15 @@ public:
   void testInit() /* cxx */;
   //void testInterlacingPolicy() /* not in spec */;
   //void testInterlacingTraits() /* not in spec */;
-  void testMedFieldDriver21();
-  void testMedFieldDriver22();
+  void testMedFieldDriver();
   void testReadFieldOnNodesAndCells();
   //void testMedFieldDriver /* not in spec */();
-  void testMed();
+  void testMedFileBrowser();
   //30
-  void testMedMedDriver21();
-  void testMedMedDriver22();
-  //void testMedMedDriver() /* not in spec */;
   //void testMEDMEMchampLire() /* not in spec */;
   //void testMEDMEMgaussEcr() /* not in spec */;
   //void testMEDMEMprofilEcr() /* not in spec */;
-  void testMedMeshDriver21();
-  void testMedMeshDriver22();
+  void testMedMeshDriver();
   //void testMedMeshDriver() /* not in spec */;
   void testMedVersion();
   //40
@@ -169,7 +157,6 @@ public:
   void testnArray();
   void testPartialDescendingConnectivity();
   void testPointerOf();
-  void testPolyhedronArray();
   void testPorflowMeshDriver();
   //void testRCBase() /* not in spec */;
   //void testSetInterlacingType /*  IMED_MESH_RDWR_DRIVER(driver), not in spec */();
@@ -187,7 +174,6 @@ public:
   //void testmedimport_src() /* not in spec */;
   //60
   void testExtractor();
-  void testMeshFuse();
   void testDesactivateFacesComputation(); // issue 0020411
   void testGetVolumeAbs();
   void test_RemapperP0P0();
@@ -235,6 +221,6 @@ void MEDMEMTest_DumpArray (std::ostream & stream, const T* array, const int leng
     }
   }
   stream << "}" << std::endl;
-};
+}
 
 #endif

@@ -326,11 +326,8 @@ namespace {
                          9, 21, 3, 2, 24, 11, 2, 7, 9, 11, 9, 18, 2};
     MESHING* meshing = new MESHING;
     meshing->setName( "TESTMESH" );
-    meshing->setSpaceDimension(3);
     const int nNodes=28;
-    meshing->setNumberOfNodes(nNodes);
-    meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
-                            MED_EN::MED_FULL_INTERLACE);
+    meshing->setCoordinates(3, nNodes, coords, "CARTESIAN", MED_EN::MED_FULL_INTERLACE);
     std::string coordname[3] = { "x", "y", "z" };
     meshing->setCoordinatesNames(coordname);
     std::string coordunit[3] = { "m", "m", "m" };
@@ -341,9 +338,8 @@ namespace {
     meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
     meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
     meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
-    meshing->setMeshDimension(3);
     //All cell conn
-    meshing->setConnectivity(conn,MED_EN::MED_CELL,MED_EN::MED_TETRA4);
+    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_TETRA4,conn);
     return meshing;
   }
 
@@ -356,11 +352,8 @@ namespace {
 
     MESHING* meshing = new MESHING;
     meshing->setName( "TESTMESH" );
-    meshing->setSpaceDimension(3);
     const int nNodes=8;
-    meshing->setNumberOfNodes(nNodes);
-    meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
-                            MED_EN::MED_FULL_INTERLACE);
+    meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",MED_EN::MED_FULL_INTERLACE);
     std::string coordname[3] = { "x", "y", "z" };
     meshing->setCoordinatesNames(coordname);
     std::string coordunit[3] = { "m", "m", "m" };
@@ -371,9 +364,8 @@ namespace {
     meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
     meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
     meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
-    meshing->setMeshDimension(3);
     //All cell conn
-    meshing->setConnectivity(conn,MED_EN::MED_CELL,MED_EN::MED_TETRA4);
+    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_TETRA4,conn);
     return meshing;
   }
 
@@ -384,11 +376,8 @@ namespace {
     const int conn[16]={1, 2, 2, 3, 4, 5, 5, 6, 7, 8, 8, 9, 10, 11, 11, 12};
     MESHING* meshing = new MESHING;
     meshing->setName( "TESTMESH" );
-    meshing->setSpaceDimension(3);
     const int nNodes=12;
-    meshing->setNumberOfNodes(nNodes);
-    meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
-                            MED_EN::MED_FULL_INTERLACE);
+    meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",MED_EN::MED_FULL_INTERLACE);
     string coordname[3] = { "x", "y", "z" };
     meshing->setCoordinatesNames(coordname);
     string coordunit[3] = { "m", "m", "m" };
@@ -399,9 +388,8 @@ namespace {
     meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
     meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
     meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
-    meshing->setMeshDimension(1);
     //All cell conn
-    meshing->setConnectivity(conn,MED_EN::MED_CELL,MED_EN::MED_SEG2);
+    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_SEG2,conn);
     return meshing;
   }
 
@@ -412,11 +400,8 @@ namespace {
     int conn[48]={9, 2, 8, 4, 7, 1, 9, 3, 8, 5, 6, 9, 7, 9, 5, 8, 7, 9, 1, 5, 7, 9, 8, 4, 9, 2, 4, 1, 5, 2, 6, 9, 2, 8, 6, 9, 1, 4, 9, 3, 9, 2, 1, 5, 4, 7, 9, 3};
     MESHING* meshing = new MESHING;
     meshing->setName( "TESTMESH" );
-    meshing->setSpaceDimension(3);
     const int nNodes=9;
-    meshing->setNumberOfNodes(nNodes);
-    meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
-                            MED_EN::MED_FULL_INTERLACE);
+    meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",MED_EN::MED_FULL_INTERLACE);
     string coordname[3] = { "x", "y", "z" };
     meshing->setCoordinatesNames(coordname);
     string coordunit[3] = { "m", "m", "m" };
@@ -427,7 +412,6 @@ namespace {
     meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
     meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
     meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
-    meshing->setMeshDimension(3);
     //
     const MED_EN::medGeometryElement classicalTypesFace[1]={MED_EN::MED_TRIA3};
     const int nbOfFaceElts[1]={1};
@@ -435,8 +419,8 @@ namespace {
     meshing->setTypes(classicalTypesFace,MED_EN::MED_FACE);
     meshing->setNumberOfElements(nbOfFaceElts,MED_EN::MED_FACE);
     //All cell conn
-    meshing->setConnectivity(conn,MED_EN::MED_CELL,MED_EN::MED_TETRA4);
-    meshing->setConnectivity(conn,MED_EN::MED_FACE,MED_EN::MED_TRIA3);
+    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_TETRA4,conn);
+    meshing->setConnectivity(MED_EN::MED_FACE,MED_EN::MED_TRIA3,conn);
     return meshing;
   }
 
@@ -449,11 +433,8 @@ namespace {
                         17, 10, 11, 14, 13, 19, 20, 23, 22, 11, 12, 15, 14, 20, 21, 24, 23, 13, 14, 17, 16, 22, 23, 26, 25, 14, 15, 18, 17, 23, 24, 27, 26};
     MESHING* meshing = new MESHING;
     meshing->setName( "TESTMESH" );
-    meshing->setSpaceDimension(3);
     const int nNodes=27;
-    meshing->setNumberOfNodes(nNodes);
-    meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
-                            MED_EN::MED_FULL_INTERLACE);
+    meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",MED_EN::MED_FULL_INTERLACE);
     string coordname[3] = { "x", "y", "z" };
     meshing->setCoordinatesNames(coordname);
     string coordunit[3] = { "m", "m", "m" };
@@ -464,7 +445,6 @@ namespace {
     meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
     meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
     meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
-    meshing->setMeshDimension(3);
     //
     const MED_EN::medGeometryElement classicalTypesFace[1]={MED_EN::MED_QUAD4};
     const int nbOfFaceElts[1]={1};
@@ -472,8 +452,8 @@ namespace {
     meshing->setTypes(classicalTypesFace,MED_EN::MED_FACE);
     meshing->setNumberOfElements(nbOfFaceElts,MED_EN::MED_FACE);
     //All cell conn
-    meshing->setConnectivity(conn,MED_EN::MED_CELL,MED_EN::MED_HEXA8);
-    meshing->setConnectivity(conn,MED_EN::MED_FACE,MED_EN::MED_QUAD4);
+    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_HEXA8,conn);
+    meshing->setConnectivity(MED_EN::MED_FACE,MED_EN::MED_QUAD4,conn);
     return meshing;
   }
 
@@ -482,30 +462,26 @@ namespace {
     double coords[27]={ 0.0, 0.0, 200.0, 0.0, 0.0, 0.0, 0.0, 200.0, 200.0, 0.0, 200.0, 0.0, 200.0, 0.0, 200.0,
                             200.0, 0.0, 0.0, 200.0, 200.0, 200.0, 200.0, 200.0, 0.0, 100.0, 100.0, 100.0 };
     int conn[40]={9, 2, 8, 4, 7, 1, 9, 3, 8, 5, 6, 9, 7, 9, 5, 8, 7, 9, 1, 5, 7, 9, 8, 4, 9, 2, 4, 1, 5, 2, 6, 9, 2, 8, 6, 9, 1, 4, 9, 3};
-    int connPoly1[3]={1,5,9};
-    int connPoly2[9]={1,4,7,10,13,16,19,22,25};
-    int connPoly3[24]={9, 2, 1, 9, 5, 2, 2, 5, 1, 1, 5, 9,   4, 7, 9, 4, 3, 7, 7, 3, 9, 9, 3, 4};
+    int connPoly1[3]={1,16,31};
+    int connPoly2[30]={9, 2, 1, -1, 9, 5, 2, -1, 2, 5, 1, -1, 1, 5, 9,
+                       4, 7, 9, -1, 4, 3, 7, -1, 7, 3, 9, -1, 9, 3, 4};
     MESHING* meshing = new MESHING;
     meshing->setName( "TESTMESH" );
-    meshing->setSpaceDimension(3);
     const int nNodes=9;
-    meshing->setNumberOfNodes(nNodes);
-    meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
-                            MED_EN::MED_FULL_INTERLACE);
+    meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",MED_EN::MED_FULL_INTERLACE);
     string coordname[3] = { "x", "y", "z" };
     meshing->setCoordinatesNames(coordname);
     string coordunit[3] = { "m", "m", "m" };
     meshing->setCoordinatesUnits(coordunit);
     //Cell connectivity info for classical elts
-    const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MED_TETRA4};
-    const int nbOfCellElts[1]={10};
-    meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
-    meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
+    const MED_EN::medGeometryElement typesCell[2]={MED_EN::MED_TETRA4,MED_EN::MED_POLYHEDRA};
+    const int nbOfCellElts[2]={10,2};
+    meshing->setNumberOfTypes(2,MED_EN::MED_CELL);
+    meshing->setTypes(typesCell,MED_EN::MED_CELL);
     meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
-    meshing->setMeshDimension(3);
     //All cell conn
-    meshing->setConnectivity(conn,MED_EN::MED_CELL,MED_EN::MED_TETRA4);
-    meshing->setPolyhedraConnectivity(connPoly1,connPoly2,connPoly3,2,MED_EN::MED_CELL);
+    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_TETRA4,conn);
+    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_POLYHEDRA,connPoly2,connPoly1);
     return meshing;
   }
   
@@ -516,30 +492,25 @@ namespace {
                         0., 0., 200., 50., 0., 200. , 200., 0., 200.  , 0., 50., 200., 50., 50., 200. , 200., 50., 200.,   0., 200., 200., 50., 200., 200. , 200., 200., 200. };
     int conn[56]={1, 2, 5, 4, 10, 11, 14, 13, 2, 3, 6, 5, 11, 12, 15, 14, 4, 5, 8, 7, 13, 14, 17, 16, 5, 6, 9, 8, 14, 15, 18,
                   17, 10, 11, 14, 13, 19, 20, 23, 22, 11, 12, 15, 14, 20, 21, 24, 23, 13, 14, 17, 16, 22, 23, 26, 25};
-    int connPoly1[2]={1,7};
-    int connPoly2[7]={1,5,9,13,17,21,25};
-    int connPoly3[24]={ 14, 15, 18, 17, 23, 26, 27, 24, 14, 23, 24, 15, 15, 24, 27, 18, 18, 27, 26, 17, 17, 26, 23, 14};
+    int connPoly1[2]={1,30};
+    int connPoly3[29]={ 14, 15, 18, 17, -1, 23, 26, 27, 24, -1, 14, 23, 24, 15, -1, 15, 24, 27, 18, -1, 18, 27, 26, 17, -1, 17, 26, 23, 14};
     MESHING* meshing = new MESHING;
     meshing->setName( "TESTMESH" );
-    meshing->setSpaceDimension(3);
     const int nNodes=27;
-    meshing->setNumberOfNodes(nNodes);
-    meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
-                            MED_EN::MED_FULL_INTERLACE);
+    meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",MED_EN::MED_FULL_INTERLACE);
     string coordname[3] = { "x", "y", "z" };
     meshing->setCoordinatesNames(coordname);
     string coordunit[3] = { "m", "m", "m" };
     meshing->setCoordinatesUnits(coordunit);
     //Cell connectivity info for classical elts
-    const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MED_HEXA8};
-    const int nbOfCellElts[1]={7};
-    meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
-    meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
+    const MED_EN::medGeometryElement typesCell[2]={MED_EN::MED_HEXA8,MED_EN::MED_POLYHEDRA};
+    const int nbOfCellElts[2]={7,1};
+    meshing->setNumberOfTypes(2,MED_EN::MED_CELL);
+    meshing->setTypes(typesCell,MED_EN::MED_CELL);
     meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
-    meshing->setMeshDimension(3);
     //All cell conn
-    meshing->setConnectivity(conn,MED_EN::MED_CELL,MED_EN::MED_HEXA8);
-    meshing->setPolyhedraConnectivity(connPoly1,connPoly2,connPoly3,1,MED_EN::MED_CELL);
+    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_HEXA8,conn);
+    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_POLYHEDRA,connPoly3,connPoly1);
     return meshing;
   }
   
@@ -775,7 +746,7 @@ double MEDMEMTest::sumAll(const std::vector< std::map<int,double> >& matrix)
   return ret;
 }
 
-void absField(MEDMEM::FIELD<double>& field)
+void MEDMEMTest::absField(MEDMEM::FIELD<double>& field)
 {
   double* areas=const_cast<double*>(field.getValue());
   for (int i=0; i< field.getNumberOfValues();i++)

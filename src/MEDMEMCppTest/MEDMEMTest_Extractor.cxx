@@ -42,20 +42,20 @@ using namespace MEDMEM;
  */
 //================================================================================
 
-void test_extractLine( Extractor* extractor,
+static void test_extractLine( Extractor* extractor,
                        const double* coords, const double* direction,
                        int nbSegments,
                        const char* name,
                        const string& result_file)
 {
-  cout << name << endl;
   FIELD<double>* resField =0;
   CPPUNIT_ASSERT_NO_THROW( resField = extractor->extractLine(coords,direction));
   CPPUNIT_ASSERT( bool( resField ) == bool( nbSegments > 0 ));
 
   // store extracted field
-  if ( resField ) {
-    MESH* mesh = resField->getSupport()->getMesh();
+  if ( resField )
+  {
+    GMESH* mesh = resField->getSupport()->getMesh();
     mesh->setName( name );
     int drv = mesh->addDriver( MED_DRIVER, result_file, name );
     mesh->write( drv );
@@ -113,7 +113,7 @@ void MEDMEMTest::testExtractor()
   CPPUNIT_ASSERT_NO_THROW( resField = extractor->extractPlane(coords,normal ));
 
   // store extracted mesh
-  MESH* mesh = resField->getSupport()->getMesh();
+  GMESH* mesh = resField->getSupport()->getMesh();
   int drv = mesh->addDriver( MED_DRIVER, result_file, mesh->getName() );
   mesh->write( drv );
   CPPUNIT_ASSERT_EQUAL( 2, mesh->getNumberOfTypes(MED_CELL));
@@ -148,7 +148,6 @@ void MEDMEMTest::testExtractor()
   };
   MESHING* myMeshing  = new MESHING();
   myMeshing->setName("shell") ;
-  //myMeshing->setMeshDimension( 3 );
 
   myMeshing->setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,
                            "CARTESIAN",MED_FULL_INTERLACE);
@@ -182,8 +181,7 @@ void MEDMEMTest::testExtractor()
     8, 4, 7, 
     4, 3, 7 
   };
-  myMeshing->setConnectivity(ConnectivityTria,MED_CELL,MED_TRIA3);
-  myMeshing->setMeshDimension( 3 );
+  myMeshing->setConnectivity(MED_CELL,MED_TRIA3,ConnectivityTria);
 
   // store input mesh
 
@@ -208,7 +206,7 @@ void MEDMEMTest::testExtractor()
   inField->setMEDComponentsUnits( &str );
 
   vector<double> value( NumberOfElements[0] );
-  for ( int i = 0; i < value.size(); ++i )
+  for ( unsigned i = 0; i < value.size(); ++i )
     value[i] = double ( i % 10 );
   inField->setValue( &value[0] );
 
@@ -236,7 +234,6 @@ void MEDMEMTest::testExtractor()
   // store extracted field
   drv = resField->addDriver(MED_DRIVER, result_file, resField->getName());
   resField->write( drv );
-  cout << endl << "Write " << result_file << endl;
 
   aSupport->removeReference(); aSupport=0;
   myMeshing->removeReference(); myMeshing=0;
@@ -283,7 +280,6 @@ void MEDMEMTest::testExtractor()
       100, 100, 100,
     };
     myMeshing->setName("box") ;
-    //myMeshing->setMeshDimension( 3 );
 
     myMeshing->setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,
                               "CARTESIAN",MED_FULL_INTERLACE);
@@ -312,8 +308,7 @@ void MEDMEMTest::testExtractor()
       23, 13, 5, 18, 27, 22, 14, 26, 
       12, 25, 27, 21, 4, 19, 24, 11 
     };
-    myMeshing->setConnectivity(ConnectivityHex,MED_CELL,MED_HEXA8);
-    myMeshing->setMeshDimension( 3 );
+    myMeshing->setConnectivity(MED_CELL,MED_HEXA8,ConnectivityHex);
   }
   // store input mesh
 
@@ -337,13 +332,12 @@ void MEDMEMTest::testExtractor()
   inField->setMEDComponentsUnits( &str );
 
   value.resize( NumberOfElements[0] );
-  for ( int i = 0; i < value.size(); ++i )
+  for ( unsigned i = 0; i < value.size(); ++i )
     value[i] = double (i+1);
   inField->setValue( &value[0] );
   // store input field
   drv = inField->addDriver(MED_DRIVER, result_file, fieldname);
   inField->write(drv);
-  cout << endl << "Write " << result_file << endl;
 
   // Extraction
   CPPUNIT_ASSERT_NO_THROW( extractor = new Extractor(*inField));

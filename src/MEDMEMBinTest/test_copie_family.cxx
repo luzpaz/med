@@ -39,7 +39,7 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-void affiche_support(const SUPPORT * mySupport) 
+static void affiche_support(const SUPPORT * mySupport) 
 {
   cout << "  - Name : "<<mySupport->getName().c_str()<<endl ;
   cout << "  - Description : "<<mySupport->getDescription().c_str()<<endl ;
@@ -62,7 +62,7 @@ void affiche_support(const SUPPORT * mySupport)
 }
 
 
-void affiche_famille(const FAMILY * myFamily)
+static void affiche_famille(const FAMILY * myFamily)
 {
     affiche_support(myFamily);
     cout << "  - Identifier : "<<myFamily->getIdentifier()<<endl ;
@@ -74,20 +74,6 @@ void affiche_famille(const FAMILY * myFamily)
     cout << "  - Groups ("<<NumberOfGroups<<") :"<<endl;
     for (int j=1;j<NumberOfGroups+1;j++)
       cout << "    * "<<myFamily->getGroupName(j).c_str()<<endl ;
-}
-
-void affiche_groupe(MESH *myMesh,medEntityMesh Entity) 
-{
-  int NumberOfGroups = myMesh->getNumberOfGroups(Entity) ;
-  cout << "NumberOfGroups : "<<NumberOfGroups<<endl;
-  for (int i=1; i<NumberOfGroups+1;i++) {
-    const GROUP* myGroup = myMesh->getGroup(Entity,i);
-    affiche_support(myGroup);
-    int NumberOfFamillies = myGroup->getNumberOfFamilies() ;
-    cout << "  - Families ("<<NumberOfFamillies<<") :"<<endl;
-    for (int j=1;j<NumberOfFamillies+1;j++)
-      cout << "    * "<<myGroup->getFamily(j)->getName().c_str()<<endl ;
-  }
 }
 
 int main (int argc, char ** argv) {
@@ -110,24 +96,6 @@ int main (int argc, char ** argv) {
   myMeshDriver.close() ;
 
   const FAMILY * myFamily = myMesh->getFamily(MED_NODE,1);
-  //On renseigne les attributs spécifiques à FAMILY (p/r à SUPPORT) et non renseignés lors de la lecture du maillage
-//    int  NumberOfAttribute = 3;
-//    int *AttributeIdentifier = new int[NumberOfAttribute];
-//    int *AttributeValue = new int[NumberOfAttribute];
-//    string *AttributeDescription = new string[NumberOfAttribute];
-//    char *tmp;
-//    for (int i=0;i<NumberOfAttribute;i++)
-//      {
-//        AttributeIdentifier[i]=i+1;
-//        AttributeValue[i]=(i+1)*10;
-//        sprintf(tmp,"Attribut N° %d",i+1);
-//        AttributeDescription[i]=tmp;
-//      }
-
-//    myFamily->setNumberOfAttributes(NumberOfAttribute);
-//    myFamily->setAttributesIdentifiers (AttributeIdentifier);
-//    myFamily->setAttributesValues (AttributeValue);
-//    myFamily->setAttributesDescriptions (AttributeDescription);
 
   cout << "Show Family :"<<endl ;
   affiche_famille(myFamily);
@@ -142,14 +110,6 @@ int main (int argc, char ** argv) {
   myFamily3->removeReference();
 
   cout << "That's all"<<endl ;
-
-  /*
-  cout << "Show Group :"<<endl ;
-  affiche_groupe(myMesh,MED_NODE);
-  affiche_groupe(myMesh,MED_CELL);
-  affiche_groupe(myMesh,MED_FACE);
-  affiche_groupe(myMesh,MED_EDGE);
-  */
 
   myMesh->removeReference();
 

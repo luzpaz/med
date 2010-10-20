@@ -42,7 +42,7 @@ using namespace MEDMEM;
 using namespace MED_EN;
 
 
-void affiche_field(FIELD_ * myField, const SUPPORT * mySupport)
+static void affiche_field(FIELD_ * myField, const SUPPORT * mySupport)
 {
   cout << "Field "<< myField->getName() << " : " <<myField->getDescription() <<  endl ;
   int NumberOfComponents = myField->getNumberOfComponents() ;

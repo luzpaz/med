@@ -24,7 +24,6 @@
 #include <exception>
 
 #include <MEDMEM_MedVersion.hxx>
-#include "MEDMEM_Compatibility21_22.hxx"
 
 using namespace std;
 using namespace MEDMEM;
@@ -39,42 +38,14 @@ using namespace MED_EN;
 
 void MEDMEMTest::testMedVersion()
 {
-  string filename = getResourceFile("pointe.med");
+  string filename = getResourceFile("pointe_V21.med");
   string notExistFileName = "anyfile";
   medFileVersion myFileVersion;
-  medFileVersion myEmptyFileVersion = (medFileVersion)-22;
 
   // Test - getMedFileVersion
   CPPUNIT_ASSERT_THROW(getMedFileVersion(notExistFileName),MEDEXCEPTION);
 
-  try
-  {
-    myFileVersion = getMedFileVersion(filename);
-    CPPUNIT_ASSERT(myFileVersion == V21);
-  }
-  catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
-  catch(...)
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+  CPPUNIT_ASSERT_NO_THROW(myFileVersion = getMedFileVersion(filename));
+  CPPUNIT_ASSERT(myFileVersion == V21);
 
-  //Test - getMedAccessMode
-  CPPUNIT_ASSERT_THROW(getMedAccessMode(RDWR,myEmptyFileVersion),MEDEXCEPTION);
-
-  try
-  {
-    CPPUNIT_ASSERT_EQUAL(med_2_1::MED_ECRI/*REMP*/,
-                         (med_2_1::med_mode_acces)getMedAccessMode(RDWR,myFileVersion));
-  }
-  catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
-  catch(...)
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
 }

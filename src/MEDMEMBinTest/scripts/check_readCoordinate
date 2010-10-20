@@ -29,7 +29,7 @@ fi
 
 infile=${srcdir}/../../resources/pointe.med
 
-./readCoordinate $infile maa1
+./readCoordinate $infile maa1   >& /dev/null
 
 exit
 

@@ -617,7 +617,7 @@ void MEDMEMTest::testArrayConvert()
   }
   myArray3Ptr = myArray3.getPtr();
   for (int i = 0; i < myArray3.getArraySize(); i++)
-    CPPUNIT_ASSERT( abs(myArray3Ptr[i] - array3Ref[i]) < 10^-7);
+    CPPUNIT_ASSERT( abs(myArray3Ptr[i] - array3Ref[i]) < 1e-7);
 
   MEDMEM_Array<double, NoInterlaceGaussPolicy> * myArray3cin = ArrayConvert(myArray3);
   myArray3Ptr = myArray3cin->getPtr();
@@ -625,8 +625,8 @@ void MEDMEMTest::testArrayConvert()
   for (int j = 1; j <= mdim; j++)
     for (int i = 1; i < nbelgeoc[nbtypegeo]; i++)
       for (int k = 1; k <= myArray3cin->getNbGauss(i); k++) {
-        CPPUNIT_ASSERT( abs(myArray3cin->getIJK(i,j,k) - array4Ref[elemno]) < 10^-7);
-        CPPUNIT_ASSERT( abs(myArray3Ptr[elemno] - array4Ref[elemno]) < 10^-7);
+        CPPUNIT_ASSERT( abs(myArray3cin->getIJK(i,j,k) - array4Ref[elemno]) < 1e-7);
+        CPPUNIT_ASSERT( abs(myArray3Ptr[elemno] - array4Ref[elemno]) < 1e-7);
         elemno++;
       }
   delete myArray3cin;
@@ -651,7 +651,7 @@ void MEDMEMTest::testArrayConvert()
   myArray4Ptr = myArray4.getPtr();
 
   for (int i = 0; i < myArray4.getArraySize(); i++)
-    CPPUNIT_ASSERT( abs(myArray4Ptr[i] - array4Ref[i]) < 10^-7);
+    CPPUNIT_ASSERT( abs(myArray4Ptr[i] - array4Ref[i]) < 1e-7);
 
   MEDMEM_Array<double, FullInterlaceGaussPolicy> * myArray4cin = ArrayConvert(myArray4);
   myArray4Ptr = myArray4cin->getPtr();
@@ -659,9 +659,9 @@ void MEDMEMTest::testArrayConvert()
   for (int i = 1; i < nbelgeoc[nbtypegeo]; i++)
     for (int k = 1; k <= myArray4cin->getNbGauss(i); k++)
       for (int j = 1; j <= mdim; j++) {
-        CPPUNIT_ASSERT( abs(myArray4cin->getIJK(i,j,k) - array3Ref[elemno]) < 10^-7);
-        CPPUNIT_ASSERT( abs(myArray4cin->getIJK(i,j,k) - myArray3.getIJK(i,j,k)) < 10^-7);
-        CPPUNIT_ASSERT( abs(myArray4Ptr[elemno] - array3Ref[elemno]) < 10^-7);
+        CPPUNIT_ASSERT( abs(myArray4cin->getIJK(i,j,k) - array3Ref[elemno]) < 1e-7);
+        CPPUNIT_ASSERT( abs(myArray4cin->getIJK(i,j,k) - myArray3.getIJK(i,j,k)) < 1e-7);
+        CPPUNIT_ASSERT( abs(myArray4Ptr[elemno] - array3Ref[elemno]) < 1e-7);
         elemno++;
       }
   delete myArray4cin;

@@ -22,11 +22,11 @@
 
 #include "MEDMEM_FieldConvert.hxx"
 #include "MEDMEM_Field.hxx"
+#include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_Grid.hxx"
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_Support.hxx"
 #include <MEDMEM_VtkMeshDriver.hxx>
-#include <MEDMEM_MedMeshDriver22.hxx>
 
 
 #include <sstream>
@@ -169,8 +169,12 @@ using namespace MEDMEM;
  *
  *   (+)     inline void read(int index=0);
  *   (+)     inline void read(const GENDRIVER & genDriver);
- *   (+)     inline void write(int index=0, const string & driverName = "");
- *   (+)     inline void write(const GENDRIVER &);
+ *   (+)     inline void read(driverTypes driverType, const std::string& filename);
+ *   (+)     inline void write(int index=0);
+ *   (+)     inline void write(const GENDRIVER &,
+ *                             MED_EN::med_mode_acces medMode=MED_EN::RDWR);
+ *   (+)     inline void write(driverTypes driverType, const std::string& filename,
+ *                             MED_EN::med_mode_acces medMode=MED_EN::RDWR);
  *   (+)     inline void writeAppend(int index=0, const string & driverName = "");
  *   (+) inline void writeAppend(const GENDRIVER &);
  *
@@ -224,7 +228,7 @@ using namespace MEDMEM;
  *              test_copie_field_.cxx
  *              test_copie_fieldT.cxx
  */
-void compareField_(const FIELD_ * theField_1, const FIELD_ * theField_2, bool isFIELD, bool isValue)
+static void compareField_(const FIELD_ * theField_1, const FIELD_ * theField_2, bool isFIELD, bool isValue)
 {
   // name, description, support
   CPPUNIT_ASSERT_EQUAL(theField_1->getName(), theField_2->getName());
@@ -270,7 +274,7 @@ void compareField_(const FIELD_ * theField_1, const FIELD_ * theField_2, bool is
   }
 }
 
-void checkField_(FIELD_ * theField_, const SUPPORT * theSupport,
+static void checkField_(FIELD_ * theField_, const SUPPORT * theSupport,
                  MED_EN::med_type_champ theValueType,
                  MED_EN::medModeSwitch theInterlace)
 {
@@ -300,10 +304,8 @@ void checkField_(FIELD_ * theField_, const SUPPORT * theSupport,
 
   theField_->setComponentsNames(aCompsNames);
 
-  //#ifdef ENABLE_FAULTS
   try {
     theField_->setNumberOfComponents(7);
-    // Segmentation fault here because array of components names is not resized
     for (int i = 1; i <= 7; i++) {
       theField_->setComponentName(i, "AnyComponent");
     }
@@ -317,10 +319,6 @@ void checkField_(FIELD_ * theField_, const SUPPORT * theSupport,
   // restore components names
   theField_->setNumberOfComponents(aNbComps);
   theField_->setComponentsNames(aCompsNames);
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("FIELD_::_componentsNames bad management");
-  //#endif
 
   theField_->setComponentsDescriptions(aCompsDescs);
   theField_->setMEDComponentsUnits(aCompsUnits);
@@ -360,19 +358,12 @@ void checkField_(FIELD_ * theField_, const SUPPORT * theSupport,
   CPPUNIT_ASSERT_EQUAL(aCompsUnitsBack2[1], theField_->getMEDComponentUnit(2));
   CPPUNIT_ASSERT_EQUAL(aCompsUnitsBack2[1], aCompUnit2);
 
-  //#ifdef ENABLE_FAULTS
-  // (BUG) No index checking
-  // It's normal: performance reason
   CPPUNIT_ASSERT_THROW(theField_->setComponentName(0, "str"), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(theField_->setComponentName(aNbComps + 1, "str"), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(theField_->setComponentDescription(0, "str"), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(theField_->setComponentDescription(aNbComps + 1, "str"), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(theField_->setMEDComponentUnit(0, "str"), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(theField_->setMEDComponentUnit(aNbComps + 1, "str"), MEDEXCEPTION);
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("FIELD::setComponentXXX() does not check component index");
-  //#endif
 
   // iteration information
   int anIterNumber = 10; // set value to MED_NOPDT if undefined (default)
@@ -424,51 +415,18 @@ void checkField (FIELD<T, INTERLACING_TAG> * theField, const SUPPORT * theSuppor
   // nb. of components must be equal 1 (for Volume, Area, Length) or
   // space dimension (for Normal, Barycenter, )
   {
-    MESH* aMesh = theSupport->getMesh();
+    GMESH* aMesh = theSupport->getMesh();
     int spaceDim = 3;
     if (aMesh) spaceDim = aMesh->getSpaceDimension();
     theField->deallocValue();
     theField->allocValue(/*NumberOfComponents = */spaceDim + 1);
 
-    //  0020142: [CEA 315] Unused function in MEDMEM::FIELD
-    // getVolume() etc. does nothing
-    //
-//     CPPUNIT_ASSERT_THROW(theField->getVolume(), MEDEXCEPTION);
-//     CPPUNIT_ASSERT_THROW(theField->getArea(), MEDEXCEPTION);
-//     CPPUNIT_ASSERT_THROW(theField->getLength(), MEDEXCEPTION);
-//     if (aMesh) {
-//       CPPUNIT_ASSERT_THROW(theField->getNormal(), MEDEXCEPTION);
-//       CPPUNIT_ASSERT_THROW(theField->getBarycenter(), MEDEXCEPTION);
-//     }
-
     theField->deallocValue();
     theField->allocValue(/*NumberOfComponents = */1);
-    //  0020142: [CEA 315] Unused function in MEDMEM::FIELD
-    // getVolume() etc. does nothing
-//     if (aValueType == MED_EN::MED_REEL64) {
-//       CPPUNIT_ASSERT_NO_THROW(theField->getVolume());
-//       CPPUNIT_ASSERT_NO_THROW(theField->getArea());
-//       CPPUNIT_ASSERT_NO_THROW(theField->getLength());
-//     }
-//     else {
-//       CPPUNIT_ASSERT_THROW(theField->getVolume(), MEDEXCEPTION);
-//       CPPUNIT_ASSERT_THROW(theField->getArea(), MEDEXCEPTION);
-//       CPPUNIT_ASSERT_THROW(theField->getLength(), MEDEXCEPTION);
-//     }
 
     if (aMesh) {
       theField->deallocValue();
       theField->allocValue(/*NumberOfComponents = */spaceDim);
-    //  0020142: [CEA 315] Unused function in MEDMEM::FIELD
-    // getVolume() etc. does nothing
-//       if (aValueType == MED_EN::MED_REEL64) {
-//         CPPUNIT_ASSERT_NO_THROW(theField->getNormal());
-//         CPPUNIT_ASSERT_NO_THROW(theField->getBarycenter());
-//       }
-//       else {
-//         CPPUNIT_ASSERT_THROW(theField->getNormal(), MEDEXCEPTION);
-//         CPPUNIT_ASSERT_THROW(theField->getBarycenter(), MEDEXCEPTION);
-//       }
     }
   }
 
@@ -478,36 +436,19 @@ void checkField (FIELD<T, INTERLACING_TAG> * theField, const SUPPORT * theSuppor
   int nbElemSupport = theSupport->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
   CPPUNIT_ASSERT_EQUAL(nbElemSupport, theField->getNumberOfValues());
 
-  //#ifdef ENABLE_FAULTS
-  // (BUG) FIELD::deallocValue() does not nullify _value pointer,
-  // that is why there can be failures in other methods
-  // (even if simply call deallocValue() two times)
   theField->deallocValue();
   CPPUNIT_ASSERT_THROW(theField->getGaussPresence(), MEDEXCEPTION);
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("FIELD::deallocValue() does not nullify _value pointer");
-  //#endif
 
   // copy constructor
   FIELD<T, INTERLACING_TAG> *aField_copy1= new FIELD<T, INTERLACING_TAG>(*theField);
   compareField(theField, aField_copy1, /*isValue = */false);
-  //compareField(theField, &aField_copy1, /*isValue = */true);
   aField_copy1->removeReference();
 
   // operator=
-  //#ifdef ENABLE_FAULTS
-  // (BUG) This fails (Segmentation fault) if not set:
-  // _componentsNames or _componentsDescriptions, or _componentsUnits, or _MEDComponentsUnits
   FIELD<T, INTERLACING_TAG> *aField_copy2=new FIELD<T, INTERLACING_TAG>();
   *aField_copy2 = *theField;
   compareField(theField, aField_copy2, /*isValue = */false);
   aField_copy2->removeReference();
-  //compareField(theField, &aField_copy2, /*isValue = */true);
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("FIELD_::operator=() fails if _componentsUnits is not set");
-  //#endif
 }
 
 template<class T>
@@ -530,6 +471,7 @@ FIELD<T> * createFieldOnGroup(MESH* theMesh, const GROUP* theGroup,
   return aFieldOnGroup;
 }
 
+double plus13 (double val);
 double plus13 (double val)
 {
   return val + 13;
@@ -539,7 +481,7 @@ double plus13 (double val)
 // typedef void (*myFuncType)(const double * temp, T* output);
 // size of temp array = space dim = 3
 // size of output array = nb. comps = 2
-void proj2d (const double * temp, double* output)
+static void proj2d (const double * temp, double* output)
 {
   // dimetric projection with coefficients:
   // 1.0 along Oy and Oz, 0.5 along Ox
@@ -559,12 +501,12 @@ void proj2d (const double * temp, double* output)
   output[1] = temp[2] - dx;
 }
 
-void testDrivers()
+static void testDrivers()
 {
   string filename_rd                  = getResourceFile("pointe.med");
   string filename_wr                  = makeTmpFile("myMedFieldfile.med", filename_rd);
   string filename_support_wr          = makeTmpFile("myMedSupportFiledfile.med");
-  string filename22_rd                = getResourceFile("pointe_import22.med");
+  string filename22_rd                = getResourceFile("pointe.med");
   string filenamevtk_wr               = makeTmpFile("myMedFieldfile22.vtk");
 
   string fieldname_celldouble_rd      = "fieldcelldoublescalar";
@@ -602,27 +544,31 @@ void testDrivers()
   int IdDriver_rd = aField_1->addDriver(MED_DRIVER,filename_rd,fieldname_celldouble_rd);
   // TODO: throw if read for the second time
   // (BUG) Cannot open file, but file exist
-  CPPUNIT_ASSERT_THROW(aField_1->read(IdDriver_rd),MEDEXCEPTION);
+  // EAP: no more pb with opening the file for the second time with "weaker" mode,
+  // but why to re-read the field?
+  //CPPUNIT_ASSERT_THROW(aField_1->read(IdDriver_rd),MEDEXCEPTION);
+  CPPUNIT_ASSERT_NO_THROW(aField_1->read(IdDriver_rd));
 
   //Test read(GENDRIVER & genDriver) method
-  //Creation a Driver
-  MED_FIELD_RDONLY_DRIVER21<int> *aMedRdFieldDriver21_1 =
-    new MED_FIELD_RDONLY_DRIVER21<int>();
-  aMedRdFieldDriver21_1->setFileName(filename_rd);
-  //Creation a Field
   FIELD<int> *aField_2 = new FIELD<int>();
   aField_2->setName(fieldname_nodeint_rd);
-  aField_2->addDriver(*aMedRdFieldDriver21_1);
-  aField_2->read(*aMedRdFieldDriver21_1);
+  {
+    MED_FIELD_RDONLY_DRIVER<int> aMedRdFieldDriver;
+    aMedRdFieldDriver.setFileName(filename_rd);
+    aField_2->read( aMedRdFieldDriver );
+  }
+  //Test read(driverTypes driverType, const std::string & fileName);
+  FIELD<double> * aField_3 = new FIELD<double>();
+  aField_3->setName(fieldname_celldouble_rd);
+  aField_3->read( MED_DRIVER, filename_rd);
 
   ///////////////////
   //Test Write Part//
   ///////////////////
-  int IdDriver;
+  //int IdDriver;
   MESH *aMesh = new MESH(MED_DRIVER,filename_rd,meshname);
   SUPPORT *aSupport = new SUPPORT(aMesh, "aSupport",MED_CELL);
   FIELD<int> *aFieldSupport;
-  //#ifdef ENABLE_FORCED_FAILURES  
   CPPUNIT_ASSERT_THROW(aFieldSupport = 
                        new FIELD<int>(aSupport, MED_DRIVER,filename_rd,
                                        fieldname_nodeint_rd), MEDMEM::MEDEXCEPTION);
@@ -631,161 +577,78 @@ void testDrivers()
   CPPUNIT_ASSERT_NO_THROW(aFieldSupport = 
                           new FIELD<int>(aSupport, MED_DRIVER, filename_rd,
                                          fieldname_nodeint_rd));
-  //(BUG) Can not open file
-  MED_FIELD_WRONLY_DRIVER21<int> * aFieldWrDriver21 = 
-    new MED_FIELD_WRONLY_DRIVER21<int>(filename_support_wr,aFieldSupport);
-  aFieldWrDriver21->setFieldName(aFieldSupport->getName() + "_copy");
-  CPPUNIT_ASSERT_NO_THROW(IdDriver= aFieldSupport->addDriver(*aFieldWrDriver21));
-  CPPUNIT_ASSERT_NO_THROW(aFieldSupport->write(IdDriver));
   aFieldSupport->removeReference();
-  delete aFieldWrDriver21;
-  //#endif    
-
-  //Create fileds
-  FIELD<double> * aField_3 = new FIELD<double>();
-  MED_FIELD_RDONLY_DRIVER21<double> *aMedRdFieldDriver21_2 =
-    new MED_FIELD_RDONLY_DRIVER21<double>(filename_rd, aField_3);
-  aMedRdFieldDriver21_2->open();
-  aMedRdFieldDriver21_2->setFieldName(fieldname_celldouble_rd);
-  aMedRdFieldDriver21_2->read();
-  aMedRdFieldDriver21_2->close();
 
   //Test write(int index) method
-  //Add drivers to FIELDs
-  int IdDriver1 = -1;
-  try
-  {
-    IdDriver1 = aField_3->addDriver(MED_DRIVER,filename_wr,fieldname_celldouble_wr);
-  }
-  catch(MEDEXCEPTION &e)
-  {
-    e.what();
-  }
-  catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+  // Add drivers to FIELDs
+  int IdDriver1 = aField_3->addDriver(MED_DRIVER,filename_wr,fieldname_celldouble_wr);
+
   //Trying call write(int index) method with incorrect index
-  //#ifdef ENABLE_FAULTS
-  CPPUNIT_ASSERT_THROW(aField_3->write(IdDriver1+1, fieldname_celldouble_wr),MEDEXCEPTION);
-  // => Segmentation fault
-  //#endif
+  CPPUNIT_ASSERT_THROW(aField_3->write(IdDriver1+1),MEDEXCEPTION);
 
   //Write field to file
-  //#ifdef ENABLE_FAULTS
-  try
-  {
-    aField_3->write(IdDriver1, fieldname_celldouble_wr);
-    // => Segmentation fault
-  }
-  catch(MEDEXCEPTION &e)
-  {
-    e.what();
-  }
-  catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
-  //#endif
+  aField_3->write(IdDriver1);
 
   CPPUNIT_ASSERT_NO_THROW(aField_3->rmDriver(IdDriver1));
 
-  //Test write(const GENDRIVER &);
-  //Create a driver
-  MED_FIELD_WRONLY_DRIVER21<int> *aMedWrFieldDriver21 =
-    new MED_FIELD_WRONLY_DRIVER21<int>();
-  aMedWrFieldDriver21->setFileName(filename_wr);
-  aField_2->setName(fieldname_nodeint_wr1);
-  //Add driver to a field
-  aField_2->addDriver(*aMedWrFieldDriver21);
+  //Test write(const GENDRIVER &, MED_EN::med_mode_acces medMode=MED_EN::RDWR);
+  {
+    MED_FIELD_WRONLY_DRIVER<int> aMedWrFieldDriver;
+    aMedWrFieldDriver.setFileName(filename_wr);
 
-  try
-  {
-  aField_2->write(*aMedWrFieldDriver21);
-  }
-  catch(MEDEXCEPTION &e)
-  {
-    e.what();
-  }
-  catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
+    aField_3->setName(fieldname_nodeint_wr);
+    aField_3->write(aMedWrFieldDriver);
+    FIELD<double> aField_3_RD;
+    aField_3_RD.setName(fieldname_nodeint_wr);
+    aField_3_RD.read(MED_DRIVER,filename_wr);
   }
 
+  // Test write(driverTypes driverType, const std::string& filename
+  //            MED_EN::med_mode_acces medMode=MED_EN::RDWR)
+  aField_3->setName(fieldname_nodeint_wr1);
+  // wrong mode
+  CPPUNIT_ASSERT_THROW(aField_3->write(MED_DRIVER,filename_wr,MED_EN::RDONLY), MEDEXCEPTION);
+  aField_3->write(MED_DRIVER,filename_wr);
+  {
+    FIELD<double> aField_3_RD;
+    aField_3_RD.setName(fieldname_nodeint_wr1);
+    aField_3_RD.read(MED_DRIVER,filename_wr);
+  }
+  aField_3->setName("fieldname_nodeint_wr1");
+  aField_3->write(MED_DRIVER,filename_wr, MED_EN::WRONLY);// overwrite filename_wr
+  {
+    FIELD<double> aField_3_RD;
+    aField_3_RD.setName(fieldname_nodeint_wr1);
+    CPPUNIT_ASSERT_THROW(aField_3_RD.read(MED_DRIVER,filename_wr),MEDEXCEPTION);
+  }
   //Test writeAppend(int index) method
   //Create a vtk file
-  MESH * aMesh_1 = new MESH;
-  MED_MESH_RDONLY_DRIVER22 *aMedMeshRdDriver22 = new MED_MESH_RDONLY_DRIVER22(filename22_rd, aMesh_1);
-  aMedMeshRdDriver22->open();
-  aMedMeshRdDriver22->setMeshName(meshname);
-  aMedMeshRdDriver22->read();
-  aMedMeshRdDriver22->close();
-  VTK_MESH_DRIVER *aVtkDriver = new VTK_MESH_DRIVER(filenamevtk_wr, aMesh_1);
-  aVtkDriver->open();
-  aVtkDriver->write();
-  aVtkDriver->close();
-
+  MESH * aMesh_1 = new MESH(MED_DRIVER,filename22_rd, meshname);
+  aMesh_1->write(VTK_DRIVER, filenamevtk_wr);
   //Create a field
-  FIELD<int> * aField_4 = new FIELD<int>();
-  MED_FIELD_RDONLY_DRIVER22<int> *aMedRdFieldDriver22 =
-    new MED_FIELD_RDONLY_DRIVER22<int>(filename22_rd, aField_4);
-  aMedRdFieldDriver22->open();
-  aMedRdFieldDriver22->setFieldName(fieldname_nodeint_rd);
-  aMedRdFieldDriver22->read();
-  aMedRdFieldDriver22->close();
-
+  FIELD<int> * aField_4 =
+    new FIELD<int>(MED_DRIVER,filename22_rd,fieldname_nodeint_rd,-1,-1,aMesh_1);
   //Add Driver to a field
-  int IdDriver2;
-  try
-  {
-    IdDriver2 = aField_4->addDriver(VTK_DRIVER, filenamevtk_wr ,fieldname_nodeint_wr);
-  }
-  catch(MEDEXCEPTION &e)
-  {
-    e.what();
-  }
-  catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
-  //#ifdef ENABLE_FAULTS
+  int IdDriver2 = aField_4->addDriver(VTK_DRIVER, filenamevtk_wr ,fieldname_nodeint_wr);
   //Trying call writeAppend() method with incorrect index
   CPPUNIT_ASSERT_THROW(aField_4->writeAppend(IdDriver2+1,fieldname_nodeint_wr),MEDEXCEPTION);
-  // => Segmentation fault
-  //#endif
 
-  //#ifdef ENABLE_FAULTS
-  // (BUG) => Segmentation fault
-  CPPUNIT_ASSERT_THROW(aField_4->writeAppend(IdDriver2, fieldname_nodeint_wr),MEDEXCEPTION);
-  //#endif
+  CPPUNIT_ASSERT_NO_THROW(aField_4->writeAppend(IdDriver2, fieldname_nodeint_wr));
   
   //Test writeAppend(const GENDRIVER &) method
   aField_4->setName(fieldname_nodeint_wr1);
- 
-  //Add driver to a field
-  //#ifdef ENABLE_FAULTS
-  //Create a driver
-  VTK_FIELD_DRIVER<int> *aVtkFieldDriver = new VTK_FIELD_DRIVER<int>(filenamevtk_wr, aField_4);
-  CPPUNIT_ASSERT_NO_THROW(aField_4->addDriver(*aVtkFieldDriver));
-  //(BUG) => Segmentation fault after addDriver(const GENDRIVER &)
-  CPPUNIT_ASSERT_THROW(aField_4->writeAppend(*aVtkFieldDriver),MEDEXCEPTION);
-  delete aVtkFieldDriver;
-  //#endif
-
+  {
+    VTK_FIELD_DRIVER<int> aVtkFieldDriver(filenamevtk_wr, aField_4);
+    CPPUNIT_ASSERT_NO_THROW(aField_4->writeAppend(aVtkFieldDriver));
+  }
 
   //Delete objects
   aField_1->removeReference();
-  delete aMedRdFieldDriver21_1;
   aField_2->removeReference();
   aField_3->removeReference();
-  delete aMedRdFieldDriver21_2;
   aField_4->removeReference();
-  delete aMedMeshRdDriver22;
-  delete aMedWrFieldDriver21;
-  delete aVtkDriver;
   aMesh->removeReference();
   aMesh_1->removeReference();
-  delete aMedRdFieldDriver22;
   aSupport->removeReference();
 }
 
@@ -809,41 +672,11 @@ void MEDMEMTest::testField()
   compareField_(aField_, aField_copy1, /*isFIELD = */false, /*isValue = */false);
   aField_copy1->removeReference();
   // operator=
-  //#ifdef ENABLE_FAULTS
-  // (BUG) This fails (Segmentation fault) if not set:
-  // _componentsNames or _componentsDescriptions, or _componentsUnits, or _MEDComponentsUnits
-  // (BUG) Code duplication with copyGlobalInfo(), called from copy constructor
   FIELD_ *aField_copy2=new FIELD_;
   *aField_copy2 = *aField_;
   compareField_(aField_, aField_copy2,/*isFIELD = */false, /*isValue = */false);
   aField_copy2->removeReference();
   aField_->removeReference();
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("FIELD_::operator=() fails if _componentsUnits is not set");
-  //#endif
-
-  // following test is commented since method
-  // setTotalNumberOfElements() is removed.
-  /*
-  // construction on a given support
-  {
-    anEmptySupport.setTotalNumberOfElements(11);
-    // CASE1:
-    FIELD_ aField_case1 (&anEmptySupport, 10);
-    // CASE2:
-    // Invalid API usage
-//     FIELD_ aField_case2;
-//     aField_case2.setSupport(&anEmptySupport);
-//     aField_case2.setNumberOfComponents(10);
-
-// #ifdef ENABLE_FORCED_FAILURES
-//     CPPUNIT_ASSERT_EQUAL_MESSAGE("No correspondance between CASE1 and CASE2",
-//                                  aField_case1.getNumberOfValues(),
-//                                  aField_case2.getNumberOfValues());
-// #endif
-  }
-  */
 
   ////////////////////////
   // TEST 2: FIELD<int> //
@@ -1106,7 +939,7 @@ void MEDMEMTest::testField()
   // check normL2() on nodal field (issue 0020120)
   {
     // read nodal field from pointe_import22.med
-    string filename  = getResourceFile("pointe_import22.med");
+    string filename  = getResourceFile("pointe.med");
     string fieldname = "fieldnodedouble";
     string meshname  = "maa1";
     FIELD<double> *nodalField=new FIELD<double>( MED_DRIVER, filename, fieldname);
@@ -1122,8 +955,7 @@ void MEDMEMTest::testField()
                                /*TotalNumberOfElements=*/ *NumberOfElements,
                                GeometricType,
                                NumberOfElements,
-                               /*NumberValue=*/ mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,
-                                                                      MED_CELL,MED_ALL_ELEMENTS ));
+                               /*NumberValue=*/ mesh->getConnectivity(MED_NODAL,MED_CELL,MED_ALL_ELEMENTS ));
     FIELD<double, FullInterlace> * oneCellNodesField = nodalField->extract( oneCellNodesSup );
     oneCellNodesSup->removeReference();
     // compute normL2 by avarage nodal value on the cell
@@ -1165,7 +997,7 @@ void MEDMEMTest::testField()
     vector< vector<double> > xyz_array( dim, vector<double>( coord, coord + 3 ));
     vector<string> coord_name( dim, "coord_name");
     vector<string> coord_unit( dim, "m");
-    GRID *mesh=new GRID( xyz_array, coord_name, coord_unit );
+    MESH *mesh= const_cast<MESH*>( GRID( xyz_array, coord_name, coord_unit ).convertInMESH());
 
     // make supports on the grid
     SUPPORT *supOnAll=new SUPPORT(mesh,"supOnAll");
@@ -1280,11 +1112,7 @@ void MEDMEMTest::testField()
   aSubField1->setColumn(1, col);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(-7., aSubField1->getValueIJ(anElems1[0], 1), 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(-3., aSubField1->getValueIJ(anElems1[0], 2), 0.000001);
-  //#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) in MEDMEM_Array::setColumn()
-  // WAIT FOR DECISION
   CPPUNIT_ASSERT_DOUBLES_EQUAL(-9., aSubField1->getValueIJ(anElems1[1], 1), 0.000001);
-  //#endif
   CPPUNIT_ASSERT_DOUBLES_EQUAL( 1., aSubField1->getValueIJ(anElems1[1], 2), 0.000001);
   // out of range
   CPPUNIT_ASSERT_THROW(aSubField1->setColumn(3, col), MEDEXCEPTION);
@@ -1297,17 +1125,10 @@ void MEDMEMTest::testField()
       new MEDMEM_ArrayInterface<double,FullInterlace,Gauss>::Array
       (/*dim*/2, /*nbelem*/2, /*nbtypegeo*/1, /*nbelgeoc*/nbelgeoc, /*nbgaussgeo*/nbgaussgeo);
 
-    //#ifdef ENABLE_FAULTS
     aNewArrayGauss->setIJ(1, 1, -4.);
     aNewArrayGauss->setIJ(1, 2, -2.);
     aNewArrayGauss->setIJ(2, 1, -5.);
     aNewArrayGauss->setIJ(2, 2, -1.);
-    //#endif
-    //#ifdef ENABLE_FORCED_FAILURES
-    // ? (BUG) in FullInterlaceGaussPolicy::getIndex(int i,int j)
-    // FullInterlaceGaussPolicy::getIndex(2,2) returns 4!!!
-    //CPPUNIT_FAIL("? Bug in FullInterlaceGaussPolicy::getIndex(int i,int j) ?");
-    //#endif
 
     aNewArrayGauss->setIJK(1, 1, 1, -4.);
     aNewArrayGauss->setIJK(1, 2, 1, -2.);
@@ -1318,19 +1139,10 @@ void MEDMEMTest::testField()
     // no need to delete aNewArrayGauss, because it will be deleted
     // in destructor or in deallocValue() method of aSubField1
 
-    //#ifdef ENABLE_FAULTS
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-4., aSubField1->getValueIJ(anElems1[0], 1), 0.000001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-2., aSubField1->getValueIJ(anElems1[0], 2), 0.000001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-5., aSubField1->getValueIJ(anElems1[1], 1), 0.000001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-1., aSubField1->getValueIJ(anElems1[1], 2), 0.000001);
-    //#endif
-    //#ifdef ENABLE_FORCED_FAILURES
-    // ? (BUG) in FullInterlaceGaussPolicy::getIndex(int i,int j)
-    // Must be   : return _G[i-1]-1 + (j-1);
-    // Instead of: return _G[i-1]-1 + (j-1)*_dim;
-    // TODO: THINK YOUR-SELF
-    //CPPUNIT_FAIL("? Bug in FullInterlaceGaussPolicy::getIndex(int i,int j) ?");
-    //#endif
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-4., aSubField1->getValueIJK(anElems1[0], 1, 1), 0.000001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-2., aSubField1->getValueIJK(anElems1[0], 2, 1), 0.000001);
@@ -1841,8 +1653,6 @@ void MEDMEMTest::testFieldConvert()
   aField_NIGG->removeReference();
   aField_FIGG_conv->removeReference();
 
-  //#ifdef ENABLE_FAULTS
-  // (BUG) in FieldConvert(), concerning FIELD_::operator=
   {
     // create an empty integer field 2x10
     FIELD<int, FullInterlace> * aField = new FIELD<int, FullInterlace>();
@@ -1868,11 +1678,6 @@ void MEDMEMTest::testFieldConvert()
     CPPUNIT_ASSERT(aField_conv);
     aField_conv->removeReference();
   }
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  // STD::vector
-  //CPPUNIT_FAIL("FieldConvert() fails if _componentsUnits is not set, because it calls FIELD_::operator=");
-  //#endif
 }
 
 //================================================================================

@@ -35,7 +35,7 @@
 using namespace std;
 using namespace MEDMEM;
 
-void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
+static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
 {
   // Preconditions: Entity and NumberOfTypes
   CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, MED_EN::MED_CELL, theC->getEntity());
@@ -85,21 +85,17 @@ void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
 
   // 2 POLYHEDRA
   const int nbPolyhedron = 2;
-  const int nbPolyFaces = 14;
-  const int nbPolyNodes = 52;
+  const int nbPolyNodes = 52 + 14 - 2; // = 64
 
-  int aPolyhedronIndex[nbPolyhedron + 1] = {1,8,15};
-
-  int aPolyhedronFacesIndex[nbPolyFaces + 1] = {1,7,10,14,17,20,24, 27,33,36,40,43,46,50,53};
+  int aPolyhedronIndex[nbPolyhedron + 1] = {1,33, 65};
 
   int aPolyhedronNodalConnectivity[nbPolyNodes] = {
-    11,15,19,20,17,13, 11,13,14, 14,13,17,18, 18,17,20, 11,14,15, 15,14,18,19, 19,18,20,
-    11,13,17,20,19,15, 11,12,13, 13,12,16,17, 17,16,20, 11,15,12, 12,15,19,16, 16,19,20};
+    11,15,19,20,17,13,-1, 11,13,14,-1,  14,13,17,18,-1,  18,17,20,-1,  11,14,15,-1,  15,14,18,19,-1,  19,18,20,
+    11,13,17,20,19,15,-1, 11,12,13,-1,  13,12,16,17,-1,  17,16,20,-1,  11,15,12,-1,  12,15,19,16,-1,  16,19,20};
 
   if (create) {
-    theC->setPolyhedronConnectivity(MED_EN::MED_NODAL, aPolyhedronNodalConnectivity,
-                                    aPolyhedronIndex, nbPolyNodes, nbPolyhedron,
-                                    aPolyhedronFacesIndex, nbPolyFaces);
+    theC->setNodal(aPolyhedronNodalConnectivity,
+                   MED_EN::MED_CELL, MED_EN::MED_POLYHEDRA, aPolyhedronIndex);
   }
   else {
     // CELLS(3D): theC

@@ -376,6 +376,8 @@ void MEDMEMTest::testCoordinate()
     CPPUNIT_ASSERT_EQUAL(anEmptyA.getNumberOfNodes(),  0);
 
     MEDARRAY<double> mcc (3, 7, MED_EN::MED_NO_INTERLACE);
+    { vector<double> val(3*7,0); // avoid usage of not initialized memory
+      mcc.set(MED_EN::MED_NO_INTERLACE, &val[0]); }
     anEmptyA.setCoordinates(&mcc, false);
 
     CPPUNIT_ASSERT_EQUAL(anEmptyA.getSpaceDimension(), 3);
