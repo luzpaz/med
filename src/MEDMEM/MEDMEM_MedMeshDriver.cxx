@@ -338,44 +338,57 @@ void MED_MESH_RDONLY_DRIVER::getGRID()
 
   if (numberOfMeshesInFile == MED_INVALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Problem in File where the mesh " << _meshName << " is supposed to be stored"));
-
+  int MeshDimension;
+  int SpaceDimensionRead;
+  string tmp_nom_coord (MED_SNAME_SIZE*(_ptrMesh->_spaceDimension)+1,' ');
+  string tmp_unit_coord(MED_SNAME_SIZE*(_ptrMesh->_spaceDimension)+1,' ');
+  char * tmp_nom = (const_cast <char *> ( tmp_nom_coord.c_str())  );
+  char * tmp_unit= (const_cast <char *> ( tmp_unit_coord.c_str()) );
+  med_2_3::med_axis_type rep;
+  med_2_3::med_int dtp3,itp3;
+  med_2_3::med_float ttpp3;
   for (int index = 0; index < numberOfMeshesInFile; index++)
     {
       char meshName[MED_NAME_SIZE+1]="";
       char meshDescription[MED_COMMENT_SIZE+1]="";
       med_2_3::med_int meshDim;
       med_2_3::med_mesh_type meshType;
-
-      err = med_2_3::MEDmaaInfo(_medIdt, (index+1),meshName, &meshDim,&meshType, meshDescription);
-
+      med_2_3::med_int spaceDimp3;
+      char dtunittp3[MED_LNAME_SIZE+1];
+      med_2_3::med_sorting_type stypp3;
+      med_2_3::med_int nstepp3;
+      int naxis=med_2_3::MEDmeshnAxis(_medIdt,(index+1));
+      char *axisnamep3=new char[naxis*MED_SNAME_SIZE+1];
+      char *axisunitp3=new char[naxis*MED_SNAME_SIZE+1];
+      med_2_3::med_axis_type axtpp3;
+      err = med_2_3::MEDmeshInfo(_medIdt,(index+1),meshName, &spaceDimp3, &meshDim,&meshType, meshDescription, dtunittp3,&stypp3,&nstepp3,&axtpp3,axisnamep3,axisunitp3);
       MESSAGE_MED(LOC<<": Mesh n°"<< (index+1) <<" nammed "<< meshName << " with the description " << meshDescription << " is structured");
-
       if (_meshName == string(meshName))
         {
           _ptrMesh->_description = meshDescription;
           _ptrMesh->_name = meshName;
+          MeshDimension=meshDim;
+          SpaceDimensionRead=spaceDimp3;
+          rep=axtpp3;
+          strncpy(tmp_nom,axisnamep3,naxis*_ptrMesh->_spaceDimension+1);
+          strncpy(tmp_unit,axisunitp3,naxis*_ptrMesh->_spaceDimension+1);
+          med_2_3::MEDmeshComputationStepInfo(_medIdt,meshName,1,&dtp3,&itp3,&ttpp3);
         }
+      delete [] axisnamep3;
+      delete [] axisunitp3;
     }
 
   MED_EN::med_grid_type gridType = ptrGrid->getGridType();
   if ( ptrGrid->_is_default_gridType )
   {
-    med_2_3::med_type_grille type;
-    err = med_2_3::MEDnatureGrilleLire(_medIdt,
-                                       const_cast <char *>(_meshName.c_str()),
-                                       &type);
-    if (err != MED_VALID)
-      throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << ": can't get the nature of the grid which is the mesh n°" << i << " of the file |" << _fileName << "| !"));
-
+    med_2_3::med_grid_type type;
+    MEDmeshGridTypeRd(_medIdt,_ptrMesh->_name.c_str(),&type);
     gridType = ptrGrid->_gridType = (MED_EN::med_grid_type) type;
     ptrGrid->_is_default_gridType = false;
   }
 
   MESSAGE_MED(LOC<<": Mesh processed is nammed "<< _ptrMesh->_name << " with the description " << _ptrMesh->_description << " is structured with the type " << gridType);
 
-  // Read the dimension of the mesh <_meshName>
-  int MeshDimension = med_2_3::MEDdimLire(_medIdt, const_cast <char *>
-                                         (_meshName.c_str()));
 
   if (MeshDimension == MED_INVALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "The mesh dimension |" <<
@@ -385,19 +398,10 @@ void MED_MESH_RDONLY_DRIVER::getGRID()
   // Read or get the dimension of the space for the mesh <_meshName>
   int SpaceDimension = MeshDimension;
 
-  int SpaceDimensionRead = med_2_3::MEDdimEspaceLire(_medIdt,
-                                                    const_cast <char *>
-                                                    (_meshName.c_str()));
-
   if (SpaceDimensionRead != MED_INVALID) SpaceDimension = SpaceDimensionRead;
 
   _ptrMesh->_spaceDimension = SpaceDimension;
 
-  med_2_3::med_repere rep;
-  string tmp_nom_coord (MED_TAILLE_PNOM*(_ptrMesh->_spaceDimension)+1,' ');
-  string tmp_unit_coord(MED_TAILLE_PNOM*(_ptrMesh->_spaceDimension)+1,' ');
-  char * tmp_nom = (const_cast <char *> ( tmp_nom_coord.c_str())  );
-  char * tmp_unit= (const_cast <char *> ( tmp_unit_coord.c_str()) );
 
   // Read Array length
   int * ArrayLen[] = { & ptrGrid->_iArrayLength,
@@ -413,10 +417,7 @@ void MED_MESH_RDONLY_DRIVER::getGRID()
     {
       med_2_3::med_int * structure = new med_2_3::med_int[MeshDimension];
 
-      err = med_2_3::MEDstructureCoordLire(_medIdt,
-                                          const_cast <char *>
-                                          (_ptrMesh->_name.c_str()),
-                                          MeshDimension,structure);
+      err = med_2_3::MEDmeshGridStructRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,structure);
 
       if (err != MED_VALID)
         throw MEDEXCEPTION(STRING(LOC) <<"Error in reading the structure of grid : |" << _meshName << "|" );
@@ -444,15 +445,7 @@ void MED_MESH_RDONLY_DRIVER::getGRID()
       ptrGrid->_coordinate = new COORDINATE(SpaceDimension,NumberOfNodes,
                                             MED_EN::MED_FULL_INTERLACE);
 
-      err = MEDcoordLire(_medIdt,
-                         const_cast <char *> (_ptrMesh->_name.c_str()),
-                         _ptrMesh->_spaceDimension,
-                         const_cast <double *> ( ptrGrid->_coordinate->_coordinate.get(MED_EN::MED_FULL_INTERLACE) ),
-                         med_2_3::MED_FULL_INTERLACE,
-                         MED_ALL, // we read all the coordinates
-                         NULL,    // we don't use a profile
-                         0,       // so the profile's size is 0
-                         &rep,tmp_nom,tmp_unit);
+      err = med_2_3::MEDmeshNodeCoordinateRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_FULL_INTERLACE,const_cast<double *>(ptrGrid->_coordinate->_coordinate.get(MED_EN::MED_FULL_INTERLACE)));
 
       if (err != MED_VALID)
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Can't read coordinates of the |" <<
@@ -472,16 +465,14 @@ void MED_MESH_RDONLY_DRIVER::getGRID()
 
       for (int idim = 0; idim < _ptrMesh->getMeshDimension(); ++idim)
         {
-          med_2_3::med_table table;
-          if (idim == 0) table = med_2_3::MED_COOR_IND1;
-          else if (idim == 1) table = med_2_3::MED_COOR_IND2;
-          else if (idim == 2) table = med_2_3::MED_COOR_IND3;
+          med_2_3::med_data_type table;
+          if (idim == 0) table = med_2_3::MED_COORDINATE_AXIS1;
+          else if (idim == 1) table = med_2_3::MED_COORDINATE_AXIS2;
+          else if (idim == 2) table = med_2_3::MED_COORDINATE_AXIS3;
+          
+          med_2_3::med_bool chgtpp3,trsfpp3;
+          int length = med_2_3::MEDmeshnEntity(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_NODE,med_2_3::MED_NONE,table,med_2_3::MED_NO_CMODE,&chgtpp3,&trsfpp3);
 
-          int length = med_2_3::MEDnEntMaa(_medIdt,
-                                          const_cast <char *> (_ptrMesh->_name.c_str()),
-                                          table,med_2_3::MED_NOEUD,
-                                          med_2_3::MED_NONE,
-                                          med_2_3::MED_NOD);
           if ( length <= MED_VALID )
             throw MEDEXCEPTION(STRING(LOC) <<"The number of nodes |" << length <<
                                "| seems to be incorrect "
@@ -492,12 +483,7 @@ void MED_MESH_RDONLY_DRIVER::getGRID()
 
           Array [idim] = new double [ length ];
 
-          err = med_2_3::MEDindicesCoordLire(_medIdt, const_cast <char *>
-                                            (_ptrMesh->_name.c_str()),
-                                            _ptrMesh->getMeshDimension(),
-                                            Array [idim], length, (idim+1),
-                                            tmp_nom+(idim*MED_TAILLE_PNOM),
-                                            tmp_unit+(idim*MED_TAILLE_PNOM));
+          err = med_2_3::MEDmeshGridIndexCoordinateRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,idim+1,Array [idim]);
 
           if (err != MED_VALID)
             throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Error in reading coordinates indices " <<
@@ -514,11 +500,11 @@ void MED_MESH_RDONLY_DRIVER::getGRID()
                                             MED_EN::MED_FULL_INTERLACE);
 
       if (gridType == MED_EN::MED_CARTESIAN)
-        rep = med_2_3::MED_CART;
+        rep = med_2_3::MED_CARTESIAN;
       else if (gridType == MED_EN::MED_POLAR)
         {
-          if (SpaceDimension == 2) rep = med_2_3::MED_CYL;
-          else if (SpaceDimension == 3) rep = med_2_3::MED_SPHER;
+          if (SpaceDimension == 2) rep = med_2_3::MED_CYLINDRICAL;
+          else if (SpaceDimension == 3) rep = med_2_3::MED_SPHERICAL;
         }
     }
   else
@@ -528,23 +514,23 @@ void MED_MESH_RDONLY_DRIVER::getGRID()
 
   for (i=0; i<_ptrMesh->_spaceDimension; ++i )
   {
-    string myStringName(tmp_nom_coord,i*MED_TAILLE_PNOM,MED_TAILLE_PNOM);
-    string myStringUnit(tmp_unit_coord,i*MED_TAILLE_PNOM,MED_TAILLE_PNOM);
+    string myStringName(tmp_nom_coord,i*MED_SNAME_SIZE,MED_SNAME_SIZE);
+    string myStringUnit(tmp_unit_coord,i*MED_SNAME_SIZE,MED_SNAME_SIZE);
     // suppress space at the end
     int j;
-    for(j=MED_TAILLE_PNOM-1;j>=0;j--)
+    for(j=MED_SNAME_SIZE-1;j>=0;j--)
       if (myStringName[j] != ' ') break;
     ptrGrid->_coordinate->_coordinateName[i]=string(myStringName,0,j+1);
-    for(j=MED_TAILLE_PNOM-1;j>=0;j--)
+    for(j=MED_SNAME_SIZE-1;j>=0;j--)
       if (myStringUnit[j] != ' ') break;
     ptrGrid->_coordinate->_coordinateUnit[i]=string(myStringUnit,0,j+1);
   }
 
   string coordinateSystem = "UNDEFINED";
 
-  if( rep == med_2_3::MED_CART) coordinateSystem = "CARTESIAN";
-  else if ( rep == med_2_3::MED_CYL) coordinateSystem = "CYLINDRICAL";
-  else if ( rep == med_2_3::MED_SPHER) coordinateSystem = "SPHERICAL";
+  if( rep == med_2_3::MED_CARTESIAN) coordinateSystem = "CARTESIAN";
+  else if ( rep == med_2_3::MED_CYLINDRICAL) coordinateSystem = "CYLINDRICAL";
+  else if ( rep == med_2_3::MED_SPHERICAL) coordinateSystem = "SPHERICAL";
 
   ptrGrid->_coordinate->setCoordinatesSystem(coordinateSystem);
 
@@ -564,35 +550,32 @@ int  MED_MESH_RDONLY_DRIVER::getCOORDINATE()
   if (_status==MED_OPENED)
   {
     int err;
-
-    int numberOfMeshesInFile = med_2_3::MEDnMaa(_medIdt);
+    int MeshDimension;
+    int SpaceDimensionRead;
+    med_2_3::med_mesh_type meshTypepp3;
+    char meshDescription[MED_COMMENT_SIZE+1]="";
+    char dtunit[MED_LNAME_SIZE+1];
+    med_2_3::med_sorting_type sortTypepp3;
+    int nstepp3;
+    med_2_3::med_axis_type axtypepp3;
+    
+    int numberOfMeshesInFile = med_2_3::MEDnMesh(_medIdt);
 
     if (numberOfMeshesInFile == MED_INVALID)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Problem in File where the mesh " << _meshName
                                    << " is supposed to be stored"));
-
-    for (int index = 0; index < numberOfMeshesInFile; index++)
-    {
-      char meshName[MED_NAME_SIZE+1]="";
-      char meshDescription[MED_COMMENT_SIZE+1]="";
-      med_2_3::med_int meshDim;
-      med_2_3::med_maillage meshType;
-
-      err = med_2_3::MEDmaaInfo(_medIdt, (index+1), meshName, &meshDim,
-                                &meshType, meshDescription);
-
-      MESSAGE_MED(LOC<<": Mesh n°"<< (index+1) <<" nammed "<< meshName
-                  << " with the description " << meshDescription << " is structured");
-
-      if (_meshName == string(meshName))
-      {
-        _ptrMesh->_description = meshDescription;
-      }
-    }
-
-    // Read the dimension of the mesh <_meshName>
-    int MeshDimension = med_2_3::MEDdimLire(_medIdt, const_cast <char *>
-                                            (_meshName.c_str()));
+    int naxis=med_2_3::MEDmeshnAxisByName(_medIdt,_meshName.c_str());
+    //
+    string tmp_nom_coord (MED_SNAME_SIZE*naxis+1,'\0');
+    string tmp_unit_coord(MED_SNAME_SIZE*naxis+1,'\0');
+    char * tmp_nom = (const_cast <char *> ( tmp_nom_coord.c_str())  );
+    char * tmp_unit= (const_cast <char *> ( tmp_unit_coord.c_str()) );
+    //
+    err=med_2_3::MEDmeshInfoByName(_medIdt,_meshName.c_str(),&SpaceDimensionRead,&MeshDimension,&meshTypepp3,meshDescription,dtunit,&sortTypepp3,&nstepp3,
+                          &axtypepp3,tmp_nom,tmp_unit);
+    int dtp3,itp3;
+    med_2_3::med_float ttpp3;
+    med_2_3::MEDmeshComputationStepInfo(_medIdt,_meshName.c_str(),1,&dtp3,&itp3,&ttpp3);
 
     if ( MeshDimension == MED_INVALID )
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "The mesh dimension |" << MeshDimension
@@ -600,10 +583,6 @@ int  MED_MESH_RDONLY_DRIVER::getCOORDINATE()
 
     // Read or get the dimension of the space for the mesh <_meshName>
     int SpaceDimension = MeshDimension;
-
-    int SpaceDimensionRead = med_2_3::MEDdimEspaceLire(_medIdt,
-                                                       const_cast <char *>
-                                                       (_meshName.c_str()));
 
     if (SpaceDimensionRead  != MED_INVALID)
       SpaceDimension = SpaceDimensionRead;
@@ -614,12 +593,9 @@ int  MED_MESH_RDONLY_DRIVER::getCOORDINATE()
 
     // Read the number of nodes used in the mesh <_meshName>
     // to be able to create a COORDINATE object
-    int NumberOfNodes=MEDnEntMaa(_medIdt,
-                                 const_cast <char *> (_meshName.c_str()),
-                                 med_2_3::MED_COOR,
-                                 med_2_3::MED_NOEUD,
-                                 (med_2_3::med_geometrie_element) MED_NONE,
-                                 (med_2_3::med_connectivite)      MED_NONE);
+    med_2_3::med_bool chgtpp3,trsfpp3;
+    int NumberOfNodes = med_2_3::MEDmeshnEntity(_medIdt,_meshName.c_str(),dtp3,itp3,med_2_3::MED_NODE,med_2_3::MED_NONE,med_2_3::MED_COORDINATE,med_2_3::MED_NO_CMODE,&chgtpp3,&trsfpp3);
+
     if ( NumberOfNodes <= MED_VALID )
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"The number of nodes |" << NumberOfNodes
                                    << "| seems to be incorrect for the mesh : |" << _meshName << "|" ));
@@ -630,21 +606,10 @@ int  MED_MESH_RDONLY_DRIVER::getCOORDINATE()
       delete ptrMesh->_coordinate;
     ptrMesh->_coordinate = new COORDINATE(SpaceDimension, NumberOfNodes, MED_EN::MED_FULL_INTERLACE);
 
-    med_2_3::med_repere rep; // ATTENTION ---> DOIT ETRE INTEGRE DS MESH EF: FAIT NON?
-    string tmp_nom_coord (MED_TAILLE_PNOM*(_ptrMesh->_spaceDimension)+1,'\0');
-    string tmp_unit_coord(MED_TAILLE_PNOM*(_ptrMesh->_spaceDimension)+1,'\0');
-    char * tmp_nom = (const_cast <char *> ( tmp_nom_coord.c_str())  );
-    char * tmp_unit= (const_cast <char *> ( tmp_unit_coord.c_str()) );
+    med_2_3::med_axis_type rep=axtypepp3; // ATTENTION ---> DOIT ETRE INTEGRE DS MESH EF: FAIT NON?
 
-    err=MEDcoordLire(_medIdt,
-                     const_cast <char *> (_ptrMesh->_name.c_str()),
-                     _ptrMesh->_spaceDimension,
-                     const_cast<double *>(ptrMesh->_coordinate->_coordinate.get(MED_EN::MED_FULL_INTERLACE)),
-                     med_2_3::MED_FULL_INTERLACE,
-                     MED_ALL,                      // we read all the coordinates
-                     NULL,                         // we don't use a profile
-                     0,                            // so the profile's size is 0
-                     &rep,tmp_nom,tmp_unit);
+    err=MEDmeshNodeCoordinateRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_FULL_INTERLACE,const_cast<double *>(ptrMesh->_coordinate->_coordinate.get(MED_EN::MED_FULL_INTERLACE)));
+
     if (err != MED_VALID)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Can't read coordinates of the |" << NumberOfNodes
                                    << "| nodes for the mesh : |" << _meshName
@@ -654,14 +619,14 @@ int  MED_MESH_RDONLY_DRIVER::getCOORDINATE()
                                    << " |"));
 
     for (int i=0;i<_ptrMesh->_spaceDimension;i++) {
-      string myStringName(tmp_nom_coord,i*MED_TAILLE_PNOM,MED_TAILLE_PNOM);
-      string myStringUnit(tmp_unit_coord,i*MED_TAILLE_PNOM,MED_TAILLE_PNOM);
+      string myStringName(tmp_nom_coord,i*MED_SNAME_SIZE,MED_SNAME_SIZE);
+      string myStringUnit(tmp_unit_coord,i*MED_SNAME_SIZE,MED_SNAME_SIZE);
       // suppress space at the end
       int j;
-      for(j=MED_TAILLE_PNOM-1;j>=0;j--)
+      for(j=MED_SNAME_SIZE-1;j>=0;j--)
         if (myStringName[j] != ' ') break;
       ptrMesh->_coordinate->_coordinateName[i]=string(myStringName,0,j+1);
-      for(j=MED_TAILLE_PNOM-1;j>=0;j--)
+      for(j=MED_SNAME_SIZE-1;j>=0;j--)
         if (myStringUnit[j] != ' ') break;
       ptrMesh->_coordinate->_coordinateUnit[i]=string(myStringUnit,0,j+1);
     }
@@ -669,17 +634,17 @@ int  MED_MESH_RDONLY_DRIVER::getCOORDINATE()
     // Pourquoi le stocker sous forme de chaîne ?
     switch (rep)
     {
-    case med_2_3::MED_CART :
+    case med_2_3::MED_CARTESIAN :
       {
         ptrMesh->_coordinate->_coordinateSystem = "CARTESIAN";
         break;
       }
-    case med_2_3::MED_CYL :
+    case med_2_3::MED_CYLINDRICAL :
       {
         ptrMesh->_coordinate->_coordinateSystem = "CYLINDRICAL";
         break;
       }
-    case med_2_3::MED_SPHER :
+    case med_2_3::MED_SPHERICAL  :
       {
         ptrMesh->_coordinate->_coordinateSystem = "SPHERICAL";
         break;
@@ -692,27 +657,22 @@ int  MED_MESH_RDONLY_DRIVER::getCOORDINATE()
     }
 
     // Read the unused optional node Names
-    char * tmp_node_name = new char[NumberOfNodes*MED_TAILLE_PNOM+1];
-    tmp_node_name[NumberOfNodes]='\0';
-    err=MEDnomLire(_medIdt,const_cast <char*> (_ptrMesh->_name.c_str()),
-                   tmp_node_name,NumberOfNodes*MED_TAILLE_PNOM,med_2_3::MED_NOEUD,
-                   (med_2_3::med_geometrie_element) MED_NONE);
-    if (err == MED_VALID)
+    if(MEDmeshnEntity(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_NODE,med_2_3::MED_NONE,med_2_3::MED_NAME,med_2_3::MED_NO_CMODE,&chgtpp3,&trsfpp3)>0)
       MESSAGE_MED(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : WARNING : Nodes have names but we do not read them !");
-    delete[] tmp_node_name;
 
     // ??? Read the unused optional node Numbers ???
     med_2_3::med_int * tmp_node_number = new med_2_3::med_int[NumberOfNodes];
-    err=MEDnumLire(_medIdt,const_cast <char*> (_ptrMesh->_name.c_str()),
-                   tmp_node_number,NumberOfNodes,med_2_3::MED_NOEUD,(med_2_3::med_geometrie_element)0);
-    if (err == MED_VALID) {
-      MESSAGE_MED(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : Nodes have numbers, we DO TAKE care of them !");
-      ptrMesh->_coordinate->_nodeNumber.set(NumberOfNodes);
+    if(MEDmeshnEntity(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_NODE,med_2_3::MED_NONE,med_2_3::MED_NUMBER,med_2_3::MED_NO_CMODE,&chgtpp3,&trsfpp3)>0)
+      {
+        err=MEDmeshEntityNumberRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_NODE,med_2_3::MED_NONE,tmp_node_number);
+
+        MESSAGE_MED(LOC<<"MED_MESH_RDONLY_DRIVER::getNoeuds() : Nodes have numbers, we DO TAKE care of them !");
+        ptrMesh->_coordinate->_nodeNumber.set(NumberOfNodes);
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-      for(med_2_3::med_int i2=0;i2<NumberOfNodes;i2++)
-        ptrMesh->_coordinate->_nodeNumber[i2]=(int)(tmp_node_number[i2]);
+        for(med_2_3::med_int i2=0;i2<NumberOfNodes;i2++)
+          ptrMesh->_coordinate->_nodeNumber[i2]=(int)(tmp_node_number[i2]);
 #else
-      memcpy((int*)ptrMesh->_coordinate->_nodeNumber,tmp_node_number,sizeof(int)*NumberOfNodes);
+        memcpy((int*)ptrMesh->_coordinate->_nodeNumber,tmp_node_number,sizeof(int)*NumberOfNodes);
 #endif
 
       //////////////////////////////////////////////////////////////////////////////////////
@@ -871,13 +831,15 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
 {
   const char * LOC = "MED_MESH_RDONLY_DRIVER::getNodalConnectivity : ";
   BEGIN_OF_MED(LOC);
-
+  med_2_3::med_bool chgtp3,trfp3;
   if (_status==MED_OPENED)
     {
       int spaceDimension = _ptrMesh->_spaceDimension;
-
+      int dtp3,itp3;
+      med_2_3::med_float ttpp3;
+      med_2_3::MEDmeshComputationStepInfo(_medIdt,_meshName.c_str(),1,&dtp3,&itp3,&ttpp3);
       // Get the type of entity to work on (previously set in the Connectivity Object)
-      med_2_3::med_entite_maillage Entity = (med_2_3::med_entite_maillage) Connectivity->getEntity();
+      med_2_3::med_entity_type Entity = (med_2_3::med_entity_type) Connectivity->getEntity();
 
       // Get the number of cells of each type & store it in <tmp_cells_count>.
       vector<int> tmp_cells_count;
@@ -887,9 +849,18 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
       list<MED_EN::medGeometryElement>::const_iterator type_iter;
       for ( type_iter = all_cell_type.begin(); type_iter != all_cell_type.end(); ++type_iter )
       {
-        int nb_cells=MEDnEntMaa(_medIdt,(const_cast <char *> (_ptrMesh->_name.c_str())),
-                                med_2_3::MED_CONN,Entity,
-                                med_2_3::med_geometrie_element(*type_iter),med_2_3::MED_NOD);
+        int nb_cells;
+        if(med_2_3::med_geometry_type(*type_iter)!=med_2_3::MED_POLYGON && med_2_3::med_geometry_type(*type_iter)!=med_2_3::MED_POLYHEDRON)
+          nb_cells=med_2_3::MEDmeshnEntity(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_CELL,med_2_3::med_geometry_type(*type_iter),
+                                           med_2_3::MED_CONNECTIVITY,med_2_3::MED_NODAL,&chgtp3,&trfp3);
+        else if(med_2_3::med_geometry_type(*type_iter)==med_2_3::MED_POLYGON)
+          nb_cells=med_2_3::MEDmeshnEntity(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_CELL,med_2_3::MED_POLYGON,
+                                           med_2_3::MED_INDEX_NODE,med_2_3::MED_NODAL,&chgtp3,&trfp3)-1;
+        else
+          nb_cells=med_2_3::MEDmeshnEntity(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_CELL,med_2_3::MED_POLYHEDRON,
+                                           med_2_3::MED_INDEX_FACE,med_2_3::MED_NODAL,&chgtp3,&trfp3)-1;
+        /*med_2_3::MED_CONN,Entity,
+          med_2_3::med_geometry_type(*type_iter),med_2_3::MED_NOD);*/
 
         // Get the greatest dimension of the cells : Connectivity->_entityDimension
         // We suppose there is no cells used as faces in MED 2.2.x , this is forbidden !!!
@@ -910,7 +881,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
 
         med_2_3::med_int major, minor, release;
 
-        if ( med_2_3::MEDversionLire(_medIdt, &major, &minor, &release) != 0 )
+        if ( med_2_3::MEDfileNumVersionRd(_medIdt, &major, &minor, &release) != 0 )
           // error : we suppose we have not a good med file !
           return MED_ERROR;
 
@@ -921,7 +892,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
 
         vector<int> tmpEdgeCount, tmpFaceCount;
         vector<MED_EN::medGeometryElement> edgeTypes, faceTypes;
-        if (Entity==med_2_3::MED_MAILLE)
+        if (Entity==med_2_3::MED_CELL)
         {
           Connectivity->_numberOfTypes=0;
 
@@ -958,29 +929,13 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
         if ( tmp_cell_models.back().getType() == MED_EN::MED_POLYGON ||
              (!faceTypes.empty() && faceTypes.back() == MED_EN::MED_POLYGON ))
         {
-          med_2_3::med_err err1 = MEDpolygoneInfo(_medIdt,
-                                                  const_cast <char *> (_ptrMesh->_name.c_str()),
-                                                  med_2_3::MED_MAILLE,
-                                                  med_2_3::MED_NOD,
-                                                  &polygonConnSize);
-          if (err1 != MED_VALID)
-          {
-            MESSAGE_MED(LOC<<": MEDpolygoneInfo returns "<<err1);
-            return MED_ERROR;
-          }
+          polygonConnSize = med_2_3::MEDmeshnEntity(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_CELL,med_2_3::MED_POLYGON,med_2_3::MED_CONNECTIVITY,med_2_3::MED_NODAL,&chgtp3,&trfp3);
         }
         if ( tmp_cell_models.back().getType() == MED_EN::MED_POLYHEDRA )
         {
-          med_2_3::med_err err3 = MEDpolyedreInfo(_medIdt,
-                                                  const_cast <char *> (_ptrMesh->_name.c_str()),
-                                                  med_2_3::MED_NOD,
-                                                  &polyhedraFacesIndexSize,
-                                                  &polyhedraConnSize);
-          if (err3 != MED_VALID)
-          {
-            MESSAGE_MED(LOC<<": MEDpolyhedreInfo returns "<<err3);
-            return MED_ERROR;
-          }
+          polyhedraFacesIndexSize=MEDmeshnEntity(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_CELL,med_2_3::MED_POLYHEDRON,med_2_3::MED_INDEX_NODE,med_2_3::MED_NODAL,&chgtp3,&trfp3);
+          polyhedraConnSize=MEDmeshnEntity(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_CELL,med_2_3::MED_POLYHEDRON,med_2_3::MED_CONNECTIVITY,med_2_3::MED_NODAL,&chgtp3,&trfp3);
+
           int nbPolyherda = tmp_cells_count.back();
           int nbFaces     = polyhedraFacesIndexSize - 1;
           // connectivity of each but last face of each polyhedron ends with -1
@@ -1971,8 +1926,8 @@ int MED_MESH_WRONLY_DRIVER::writeGRID() const
 
   med_2_3::med_err err = MED_ERROR;
   med_2_3::med_repere rep;
-  string tmp_name(_ptrMesh->_spaceDimension*MED_TAILLE_PNOM,' ');
-  string tmp_unit(_ptrMesh->_spaceDimension*MED_TAILLE_PNOM,' ');
+  string tmp_name(_ptrMesh->_spaceDimension*MED_SNAME_SIZE,' ');
+  string tmp_unit(_ptrMesh->_spaceDimension*MED_SNAME_SIZE,' ');
 
   // Test if the mesh <_meshName> already exists
   // If it doesn't exists create it
@@ -2031,11 +1986,11 @@ int MED_MESH_WRONLY_DRIVER::writeGRID() const
   for (int i=0;i<_ptrMesh->_spaceDimension;i++) {
     SCRUTE_MED(i);
     valueString = ptrGrid->_coordinate->_coordinateName[i];
-    lengthString = (MED_TAILLE_PNOM<valueString.size())?MED_TAILLE_PNOM:valueString.size();
-    tmp_name.replace(i*MED_TAILLE_PNOM,i*MED_TAILLE_PNOM+lengthString,valueString,0,lengthString);
+    lengthString = (MED_SNAME_SIZE<valueString.size())?MED_SNAME_SIZE:valueString.size();
+    tmp_name.replace(i*MED_SNAME_SIZE,i*MED_SNAME_SIZE+lengthString,valueString,0,lengthString);
     valueString = ptrGrid->_coordinate->_coordinateUnit[i];
-    lengthString = (MED_TAILLE_PNOM<valueString.size())?MED_TAILLE_PNOM:valueString.size();
-    tmp_unit.replace(i*MED_TAILLE_PNOM,i*MED_TAILLE_PNOM+lengthString,valueString,0,lengthString);
+    lengthString = (MED_SNAME_SIZE<valueString.size())?MED_SNAME_SIZE:valueString.size();
+    tmp_unit.replace(i*MED_SNAME_SIZE,i*MED_SNAME_SIZE+lengthString,valueString,0,lengthString);
   }
 
   // Pourquoi le stocker sous forme de chaîne ?
@@ -2101,10 +2056,10 @@ int MED_MESH_WRONLY_DRIVER::writeGRID() const
 
       for (int idim = 0; idim < _ptrMesh->getMeshDimension(); ++idim)
         {
-          string str_name = string (tmp_name,idim*MED_TAILLE_PNOM,
-                                    MED_TAILLE_PNOM);
-          string str_unit = string (tmp_unit,idim*MED_TAILLE_PNOM,
-                                    MED_TAILLE_PNOM);
+          string str_name = string (tmp_name,idim*MED_SNAME_SIZE,
+                                    MED_SNAME_SIZE);
+          string str_unit = string (tmp_unit,idim*MED_SNAME_SIZE,
+                                    MED_SNAME_SIZE);
 
           err = med_2_3::MEDindicesCoordEcr(_medIdt, const_cast <char *>
                                            (_meshName.c_str()),
@@ -2140,19 +2095,19 @@ int MED_MESH_WRONLY_DRIVER::writeCoordinates() const {
 
   med_2_3::med_err err = MED_ERROR;
   med_2_3::med_repere rep;
-  string tmp_name(ptrMesh->_spaceDimension*MED_TAILLE_PNOM,' ');
-  string tmp_unit(ptrMesh->_spaceDimension*MED_TAILLE_PNOM,' ');
+  string tmp_name(ptrMesh->_spaceDimension*MED_SNAME_SIZE,' ');
+  string tmp_unit(ptrMesh->_spaceDimension*MED_SNAME_SIZE,' ');
 
   // Recompose the <_spaceDimension> strings in 1 string
   int lengthString;
   string valueString;
   for (int i=0;i<ptrMesh->_spaceDimension;i++) {
     valueString = ptrMesh->_coordinate->_coordinateName[i];
-    lengthString = (MED_TAILLE_PNOM<valueString.size())?MED_TAILLE_PNOM:valueString.size();
-    tmp_name.replace(i*MED_TAILLE_PNOM,i*MED_TAILLE_PNOM+lengthString,valueString,0,lengthString);
+    lengthString = (MED_SNAME_SIZE<valueString.size())?MED_SNAME_SIZE:valueString.size();
+    tmp_name.replace(i*MED_SNAME_SIZE,i*MED_SNAME_SIZE+lengthString,valueString,0,lengthString);
     valueString = ptrMesh->_coordinate->_coordinateUnit[i];
-    lengthString = (MED_TAILLE_PNOM<valueString.size())?MED_TAILLE_PNOM:valueString.size();
-    tmp_unit.replace(i*MED_TAILLE_PNOM,i*MED_TAILLE_PNOM+lengthString,valueString,0,lengthString);
+    lengthString = (MED_SNAME_SIZE<valueString.size())?MED_SNAME_SIZE:valueString.size();
+    tmp_unit.replace(i*MED_SNAME_SIZE,i*MED_SNAME_SIZE+lengthString,valueString,0,lengthString);
   }
 
   // Test if the mesh <_meshName> already exists
