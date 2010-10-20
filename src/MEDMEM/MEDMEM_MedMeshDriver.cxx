@@ -834,7 +834,6 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
   med_2_3::med_bool chgtp3,trfp3;
   if (_status==MED_OPENED)
     {
-      int spaceDimension = _ptrMesh->_spaceDimension;
       int dtp3,itp3;
       med_2_3::med_float ttpp3;
       med_2_3::MEDmeshComputationStepInfo(_medIdt,_meshName.c_str(),1,&dtp3,&itp3,&ttpp3);
@@ -1003,13 +1002,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
             case MED_EN::MED_POLYGON:
               {
                 PointerOf <med_2_3::med_int> PolygonsConnIndex( tmp_numberOfCells+1 );
-                err2 = MEDpolygoneConnLire(_medIdt,
-                                           const_cast <char *> (_ptrMesh->_name.c_str()),
-                                           PolygonsConnIndex,
-                                           tmp_numberOfCells+1,
-                                           tmp_ConnectivityArray,
-                                           med_2_3::MED_MAILLE,
-                                           med_2_3::MED_NOD);
+                err2=med_2_3::MEDmeshPolygonRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_CELL,med_2_3::MED_NODAL,PolygonsConnIndex,tmp_ConnectivityArray);
                 if (err2 != MED_VALID)
                 {
                   MESSAGE_MED(LOC<<": MEDpolygoneConnLire returns "<<err2);
@@ -1025,14 +1018,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
               {
                 PointerOf< med_2_3::med_int> FacesIndex( polyhedraFacesIndexSize );
                 PointerOf< med_2_3::med_int> PolyhedronIndex( tmp_numberOfCells+1 );
-                err2 = MEDpolyedreConnLire(_medIdt,
-                                           const_cast <char *> (_ptrMesh->_name.c_str()),
-                                           PolyhedronIndex,
-                                           tmp_numberOfCells+1,
-                                           FacesIndex,
-                                           polyhedraFacesIndexSize,
-                                           tmp_ConnectivityArray,
-                                           med_2_3::MED_NOD);
+                err2=med_2_3::MEDmeshPolyhedronRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_CELL,med_2_3::MED_NODAL,PolyhedronIndex,FacesIndex,tmp_ConnectivityArray);
                 if (err2 != MED_VALID)
                 {
                   MESSAGE_MED(LOC<<": MEDpolyedreConnLire returns "<<err2);
@@ -1057,12 +1043,17 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
                 //break;
               }
             default:
-
-              err2=MEDconnLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
-                               spaceDimension,tmp_ConnectivityArray,
-                               med_2_3::MED_FULL_INTERLACE,NULL,0,Entity,
-                               med_2_3::med_geometrie_element(Connectivity->_geometricTypes[i]),
-                               med_2_3::MED_NOD);
+              med_2_3::med_bool withname=med_2_3::MED_FALSE,withnumber=med_2_3::MED_FALSE,withfam=med_2_3::MED_FALSE;
+              int curNbOfElemp3=med_2_3::MEDmeshnEntity(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_CELL,med_2_3::med_geometry_type(Connectivity->_geometricTypes[i]),
+                                                        med_2_3::MED_CONNECTIVITY,med_2_3::MED_NODAL,&chgtp3,&trfp3);
+              char *nomsp3=new char[MED_SNAME_SIZE*curNbOfElemp3+1];
+              int *globArrp3=new int[curNbOfElemp3];
+              int *famp3=new int[curNbOfElemp3];
+              err2=med_2_3::MEDmeshElementRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_CELL,med_2_3::med_geometry_type(Connectivity->_geometricTypes[i]),
+                                             med_2_3::MED_NODAL,med_2_3::MED_FULL_INTERLACE,tmp_ConnectivityArray,&withname,nomsp3,&withnumber,globArrp3,&withfam,famp3);
+              delete [] nomsp3;
+              delete [] globArrp3;
+              delete [] famp3;
               if ( err2 != MED_VALID)
               {
                 MESSAGE_MED(LOC<<": MEDconnLire returns "<<err2);
@@ -1176,13 +1167,8 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
             if ( constituent->_geometricTypes[i] == MED_EN::MED_POLYGON )
             {
               PointerOf< med_2_3::med_int> PolygonsConnIndex( tmpFaceCount[i]+1 );
-              int err2 = MEDpolygoneConnLire(_medIdt,
-                                             const_cast <char *> (_ptrMesh->_name.c_str()),
-                                             PolygonsConnIndex,
-                                             tmpFaceCount[i]+1,
-                                             tmp_constituentArray,
-                                             med_2_3::MED_MAILLE,
-                                             med_2_3::MED_NOD);
+              int err2 = med_2_3::MEDmeshPolygonRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_CELL,med_2_3::MED_NODAL,PolygonsConnIndex,tmp_constituentArray);
+
               if (err2 != MED_VALID)
               {
                 MESSAGE_MED(LOC<<": MEDpolygoneConnLire returns "<<err2);
@@ -1196,13 +1182,22 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
             }
             else
             {
-              med_2_3::med_geometrie_element med_type =
-                (med_2_3::med_geometrie_element) constituent->_type[i].getType();
+              med_2_3::med_geometry_type med_type =
+                (med_2_3::med_geometry_type) constituent->_type[i].getType();
 
-              int err=MEDconnLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
-                                  Connectivity->_entityDimension,tmp_constituentArray,
-                                  med_2_3::MED_FULL_INTERLACE,NULL,0,med_2_3::MED_MAILLE,med_type,med_2_3::MED_NOD);
-
+              
+              med_2_3::med_bool withname=med_2_3::MED_FALSE,withnumber=med_2_3::MED_FALSE,withfam=med_2_3::MED_FALSE;
+              int curNbOfElemp3=med_2_3::MEDmeshnEntity(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_CELL,med_type,
+                                                        med_2_3::MED_CONNECTIVITY,med_2_3::MED_NODAL,&chgtp3,&trfp3);
+              char *nomsp3=new char[MED_SNAME_SIZE*curNbOfElemp3+1];
+              int *globArrp3=new int[curNbOfElemp3];
+              int *famp3=new int[curNbOfElemp3];
+              int err=med_2_3::MEDmeshElementRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_CELL,med_type,
+                                                med_2_3::MED_NODAL,med_2_3::MED_FULL_INTERLACE,tmp_constituentArray,&withname,nomsp3,&withnumber,globArrp3,&withfam,famp3);
+              delete [] nomsp3;
+              delete [] globArrp3;
+              delete [] famp3;
+              
               if ( err != MED_VALID)
               {
                 MESSAGE_MED(LOC<<": MEDconnLire returns "<<err);
@@ -1263,8 +1258,8 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
           // Fill the MEDSKYLINEARRAY by reading the MED file.
           for ( i=0; i<constituent->_numberOfTypes; i++)
           {
-            med_2_3::med_geometrie_element med_type =
-              (med_2_3::med_geometrie_element) constituent->_type[i].getType();
+            med_2_3::med_geometry_type med_type =
+              (med_2_3::med_geometry_type) constituent->_type[i].getType();
             int NumberOfNodeByEdge = constituent->_type[i].getNumberOfNodes();
 
             // initialise index
@@ -1287,9 +1282,19 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
               MESSAGE_MED(LOC<<": WE ARE USING MED2.2 so there is no +1 for calculating the size of  tmp_constituentArray !");
             }
 
-            int err=MEDconnLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
-                                spaceDimension,tmp_constituentArray,
-                                med_2_3::MED_FULL_INTERLACE,NULL,0,med_2_3::MED_MAILLE,med_type,med_2_3::MED_NOD);
+
+            med_2_3::med_bool withname=med_2_3::MED_FALSE,withnumber=med_2_3::MED_FALSE,withfam=med_2_3::MED_FALSE;
+            int curNbOfElemp3=med_2_3::MEDmeshnEntity(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_CELL,med_type,
+                                                      med_2_3::MED_CONNECTIVITY,med_2_3::MED_NODAL,&chgtp3,&trfp3);
+            char *nomsp3=new char[MED_SNAME_SIZE*curNbOfElemp3+1];
+            int *globArrp3=new int[curNbOfElemp3];
+            int *famp3=new int[curNbOfElemp3];
+            int err=med_2_3::MEDmeshElementRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_CELL,med_type,
+                                              med_2_3::MED_NODAL,med_2_3::MED_FULL_INTERLACE,tmp_constituentArray,&withname,nomsp3,&withnumber,globArrp3,&withfam,famp3);
+            delete [] nomsp3;
+            delete [] globArrp3;
+            delete [] famp3;
+
             if ( err != MED_VALID)
             {
               MESSAGE_MED(LOC<<": MEDconnLire returns "<<err);
@@ -1426,8 +1431,7 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
       MESSAGE_MED(LOC << "error returned from getCellsFamiliesNumber for Edges " << err);
     }
 
-    int NumberOfFamilies = med_2_3::MEDnFam(_medIdt, const_cast <char *>
-                                            (_meshName.c_str()));
+    int NumberOfFamilies = med_2_3::MEDnFamily(_medIdt,_meshName.c_str());
 
     if ( NumberOfFamilies < 1 ) // at least family 0 must exist
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"There is no FAMILY, FAMILY 0 must exists" ));
@@ -1444,32 +1448,24 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
     int numberOfFacesFamilies = 0;
     int numberOfEdgesFamilies = 0;
 
+
     for (int i=0;i<NumberOfFamilies;i++)
     {
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-      med_2_3::med_int tmp_NumberOfAttributes = med_2_3::MEDnAttribut(_medIdt,
-                                                                      const_cast <char *>(_meshName.c_str()),
-                                                                      (i+1));
+      med_2_3::med_int tmp_NumberOfAttributes = med_2_3::MEDnFamily23Attribute(_medIdt,_meshName.c_str(),i+1);
       med_2_3::med_int NumberOfAttributes = tmp_NumberOfAttributes;
 #else
-      int NumberOfAttributes = med_2_3::MEDnAttribut(_medIdt,
-                                                     const_cast <char *>
-                                                     (_meshName.c_str()),
-                                                     (i+1));
+      int NumberOfAttributes = med_2_3::MEDnFamily23Attribute(_medIdt,_meshName.c_str(),(i+1));
 #endif
 
       if (NumberOfAttributes < 0)
         throw MEDEXCEPTION("MED_MESH_RDONLY_DRIVER::getFAMILY() : NumberOfAttributes" );
 
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-      med_2_3::med_int tmp_NumberOfGroups = med_2_3::MEDnGroupe(_medIdt,
-                                                                const_cast <char *>(_meshName.c_str()),
-                                                                (i+1));
+      med_2_3::med_int tmp_NumberOfGroups = med_2_3::MEDnFamilyGroup(_medIdt,_meshName.c_str(),i+1);
       int NumberOfGroups = tmp_NumberOfGroups;
 #else
-      int NumberOfGroups = med_2_3::MEDnGroupe(_medIdt,
-                                               const_cast <char *>(_meshName.c_str()),
-                                               (i+1));
+      int NumberOfGroups = med_2_3::MEDnFamilyGroup(_medIdt,_meshName.c_str(),i+1);
 #endif
 
       if (NumberOfGroups < 0)
@@ -1486,22 +1482,15 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
       int *  AttributesIdentifier = new int[NumberOfAttributes+iSafe];
       int *  AttributesValues     = new int[NumberOfAttributes+iSafe];
       string AttributesDescription(MED_COMMENT_SIZE*(NumberOfAttributes+iSafe),' ');
-      string GroupsNames(MED_TAILLE_LNOM*NumberOfGroups+1,'\0');
+      string GroupsNames(MED_LNAME_SIZE*NumberOfGroups+1,'\0');
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
       med_2_3::med_int tmp_FamilyIdentifier;
       med_2_3::med_int *  tmp_AttributesIdentifier = new med_2_3::med_int[NumberOfAttributes+iSafe];
       med_2_3::med_int *  tmp_AttributesValues     = new med_2_3::med_int[NumberOfAttributes+iSafe];
-      err = med_2_3::MEDfamInfo(_medIdt,
-                                const_cast <char *>(_meshName.c_str()),
-                                (i+1),
-                                const_cast <char *>(FamilyName.c_str()),
-                                &tmp_FamilyIdentifier,
-                                tmp_AttributesIdentifier,
-                                tmp_AttributesValues,
-                                const_cast <char *>(AttributesDescription.c_str()),
-                                &tmp_NumberOfAttributes,
-                                const_cast <char *>(GroupsNames.c_str()),
-                                &tmp_NumberOfGroups);
+
+      err=med_2_3::MEDfamily23Info(_medIdt,_meshName.c_str(),i+1,const_cast <char *>(FamilyName.c_str()),
+                                   tmp_AttributesIdentifier,tmp_AttributesValues,const_cast <char *>(AttributesDescription.c_str()),&tmp_FamilyIdentifier,const_cast <char *>(GroupsNames.c_str()));
+
       FamilyIdentifier = tmp_FamilyIdentifier;
       int ii;
       for ( ii = 0; ii < NumberOfAttributes; ii++ ) {
@@ -1513,15 +1502,8 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
       delete [] tmp_AttributesIdentifier;
       delete [] tmp_AttributesValues;
 #else
-      err = med_2_3::MEDfamInfo(_medIdt,const_cast <char *>
-                                (_meshName.c_str()),
-                                (i+1),const_cast <char *>
-                                (FamilyName.c_str()), &FamilyIdentifier,
-                                AttributesIdentifier,AttributesValues,
-                                const_cast <char *>
-                                (AttributesDescription.c_str()),
-                                &NumberOfAttributes, const_cast <char *>
-                                (GroupsNames.c_str()),&NumberOfGroups);
+      err = med_2_3::MEDfamily23Info(_medIdt,_meshName.c_str(),i+1,const_cast <char *>(FamilyName.c_str()),
+                                     AttributesIdentifier,AttributesValues,const_cast <char *>(AttributesDescription.c_str()),&FamilyIdentifier,const_cast <char *>(GroupsNames.c_str()));
 #endif
 
 
@@ -1627,24 +1609,22 @@ int  MED_MESH_RDONLY_DRIVER::getNodesFamiliesNumber(int * MEDArrayNodeFamily)
   BEGIN_OF_MED(LOC);
 
   if (_status==MED_OPENED)
-    {
-    int err = 0;
+    { 
+
+      int dtp3,itp3;
+      med_2_3::med_float ttpp3;
+      med_2_3::MEDmeshComputationStepInfo(_medIdt,_ptrMesh->_name.c_str(),1,&dtp3,&itp3,&ttpp3);
+      int err = 0;
 
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
       med_2_3::med_int * tmp_MEDArrayNodeFamily = new med_2_3::med_int[_ptrMesh->getNumberOfNodes()];
-      err = MEDfamLire(_medIdt, const_cast <char *>
-                       (_ptrMesh->_name.c_str()), tmp_MEDArrayNodeFamily,
-                       _ptrMesh->getNumberOfNodes(), med_2_3::MED_NOEUD,
-                       (med_2_3::med_geometrie_element) MED_NONE);
+      err=med_2_3::MEDmeshEntityFamilyNumberRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_NODE,med_2_3::MED_NONE,tmp_MEDArrayNodeFamily);
       int i;
       for ( i = 0; i < _ptrMesh->getNumberOfNodes(); i++ )
          MEDArrayNodeFamily[i] = tmp_MEDArrayNodeFamily[i];
       delete [] tmp_MEDArrayNodeFamily;
 #else
-      err = MEDfamLire(_medIdt, const_cast <char *>
-                       (_ptrMesh->_name.c_str()), MEDArrayNodeFamily,
-                       _ptrMesh->getNumberOfNodes(), med_2_3::MED_NOEUD,
-                       (med_2_3::med_geometrie_element) MED_NONE);
+      err=med_2_3::MEDmeshEntityFamilyNumberRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_NODE,med_2_3::MED_NONE,MEDArrayNodeFamily);
 #endif
 
       if ( err != MED_VALID)
@@ -1666,25 +1646,21 @@ int  MED_MESH_RDONLY_DRIVER::getCellsFamiliesNumber(int **MEDArrayFamily,
 
   if (_status==MED_OPENED)
   {
+    int dtp3,itp3;
+    med_2_3::med_float ttpp3;
+    med_2_3::MEDmeshComputationStepInfo(_medIdt,_ptrMesh->_name.c_str(),1,&dtp3,&itp3,&ttpp3);
     int i, err = 0;
     const MED_EN::medGeometryElement *types=_ptrMesh->getTypes(entity);
     for (i=0;i<_ptrMesh->getNumberOfTypes(entity);i++)
     {
-      int NumberOfCell=_ptrMesh->getNumberOfElements(entity,types[i]);
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
+      int NumberOfCell=_ptrMesh->getNumberOfElements(entity,types[i]);
       med_2_3::med_int * tmp_MEDArrayFamily = new med_2_3::med_int[NumberOfCell];
-      err=MEDfamLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
-                     tmp_MEDArrayFamily,NumberOfCell,
-                     (med_2_3::med_entite_maillage) entity,
-                     (med_2_3::med_geometrie_element)types[i]);
+      err=med_2_3::MEDmeshEntityFamilyNumberRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,(med_2_3::med_entity_type) entity,(med_2_3::med_geometry_type)types[i],tmp_MEDArrayFamily);
       if (err != MED_VALID
           && !_ptrMesh->getIsAGrid()) // it's normal for a grid (PAL14113)
       {
-        err=MEDfamLire(_medIdt,const_cast <char *>
-                       (_ptrMesh->_name.c_str()),
-                       tmp_MEDArrayFamily,NumberOfCell,
-                       med_2_3::MED_MAILLE,
-                       (med_2_3::med_geometrie_element)types[i]);
+        err=med_2_3::MEDmeshEntityFamilyNumberRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_CELL,(med_2_3::med_geometry_type)types[i],tmp_MEDArrayFamily);
         if (err != MED_VALID )
           throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<entity<<" and geometric type "<<types[i]));
       }
@@ -1695,18 +1671,13 @@ int  MED_MESH_RDONLY_DRIVER::getCellsFamiliesNumber(int **MEDArrayFamily,
       }
       delete [] tmp_MEDArrayFamily;
 #else
-      err=MEDfamLire(_medIdt,const_cast <char *> (_ptrMesh->_name.c_str()),
-                     MEDArrayFamily[i],NumberOfCell,
-                     (med_2_3::med_entite_maillage) entity,
-                     (med_2_3::med_geometrie_element)types[i]);
+      err=med_2_3::MEDmeshEntityFamilyNumberRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,(med_2_3::med_entity_type) entity,(med_2_3::med_geometry_type)types[i],MEDArrayFamily[i]);
+
       if (err != MED_VALID
           && !_ptrMesh->getIsAGrid() ) // it's normal for a grid (PAL14113)
       {
-        err=MEDfamLire(_medIdt,const_cast <char *>
-                       (_ptrMesh->_name.c_str()),
-                       MEDArrayFamily[i],NumberOfCell,
-                       med_2_3::MED_MAILLE,
-                       (med_2_3::med_geometrie_element)types[i]);
+        err=med_2_3::MEDmeshEntityFamilyNumberRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_CELL,(med_2_3::med_geometry_type)types[i],MEDArrayFamily[i]);
+
         if (err != MED_VALID)
           throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<entity<<" and geometric type "<<types[i]));
       }
@@ -1872,11 +1843,7 @@ void MED_MESH_WRONLY_DRIVER::write(void) const
 
       char familyName[MED_NAME_SIZE+1];
       strcpy(familyName,"FAMILLE_ZERO");
-      err = med_2_3::MEDfamCr( _medIdt,
-                              const_cast <char *> ( _meshName.c_str() ),
-                              familyName, 0,
-                              (med_2_3::med_int*)NULL, (med_2_3::med_int*)NULL, (char*)NULL, 0,
-                              (char*)NULL, 0);
+      err = med_2_3::MEDfamilyCr(_medIdt,_meshName.c_str(),familyName,0,0,0);
 
       SCRUTE_MED(familyName);
 
@@ -1925,7 +1892,7 @@ int MED_MESH_WRONLY_DRIVER::writeGRID() const
   GRID * ptrGrid = (GRID*) _ptrMesh;
 
   med_2_3::med_err err = MED_ERROR;
-  med_2_3::med_repere rep;
+  med_2_3::med_axis_type rep;
   string tmp_name(_ptrMesh->_spaceDimension*MED_SNAME_SIZE,' ');
   string tmp_unit(_ptrMesh->_spaceDimension*MED_SNAME_SIZE,' ');
 
@@ -1935,24 +1902,49 @@ int MED_MESH_WRONLY_DRIVER::writeGRID() const
   // as <_ptrMesh->_spaceDimension>, <_ptrMesh->getMeshDimension()> respectively
   // rem : <_meshName> is the driver meshName not <ptrMesh->_meshName>
 
-  int spaceDimension = med_2_3::MEDdimEspaceLire(_medIdt, const_cast <char *>
-                                                (_meshName.c_str()) );
+  med_2_3::med_int dtpp3,itpp3;
+  med_2_3::med_float ttpp3;
+  err=med_2_3::MEDmeshComputationStepInfo(_medIdt,_meshName.c_str(),1,&dtpp3,&itpp3,&ttpp3);
 
-  int meshDimension = med_2_3::MEDdimLire(_medIdt, const_cast <char *>
-                                         (_meshName.c_str()) );
+  int spaceDimension=-1;
+  int meshDimension=-1;
+  if(err!=0)
+    {
+      med_2_3::med_mesh_type ttmp3;
+      char commentp3[MED_COMMENT_SIZE+1];
+      char dtunittp3[MED_LNAME_SIZE+1];
+      med_2_3::med_sorting_type sttp3;
+      int nstep;
+      med_2_3::med_axis_type axtypp3;
+      int naxis=med_2_3::MEDmeshnAxisByName(_medIdt,_meshName.c_str());
+      char *t1pp3=new char[naxis*MED_SNAME_SIZE+1];
+      char *t2pp3=new char[naxis*MED_SNAME_SIZE+1];
+      med_2_3::MEDmeshInfoByName(_medIdt,_meshName.c_str(),&spaceDimension,&meshDimension,&ttmp3,commentp3,dtunittp3,&sttp3,&nstep,&axtypp3,t1pp3,t2pp3);
+      delete [] t1pp3;
+      delete [] t2pp3;
+    }
+  // Recompose the <_spaceDimension> strings in 1 string
+  int lengthString;
+  string valueString;
+  for (int i=0;i<_ptrMesh->_spaceDimension;i++) {
+    SCRUTE_MED(i);
+    valueString = ptrGrid->_coordinate->_coordinateName[i];
+    lengthString = (MED_SNAME_SIZE<valueString.size())?MED_SNAME_SIZE:valueString.size();
+    tmp_name.replace(i*MED_SNAME_SIZE,i*MED_SNAME_SIZE+lengthString,valueString,0,lengthString);
+    valueString = ptrGrid->_coordinate->_coordinateUnit[i];
+    lengthString = (MED_SNAME_SIZE<valueString.size())?MED_SNAME_SIZE:valueString.size();
+    tmp_unit.replace(i*MED_SNAME_SIZE,i*MED_SNAME_SIZE+lengthString,valueString,0,lengthString);
+  }
 
-
-  MESSAGE_MED(LOC << "spacedim " << spaceDimension << " meshdim " << meshDimension);
-
-  MESSAGE_MED(LOC << "From the mesh spacedim " << _ptrMesh->_spaceDimension << " meshdim " << _ptrMesh->getMeshDimension());
-
-  if ((spaceDimension <= MED_VALID) && (meshDimension <= MED_VALID))
+  if (err!=0)
     {
       _ptrMesh->_description.resize(MED_COMMENT_SIZE+1,'\0');
-      err = MEDmaaCr(_medIdt,
-                     const_cast <char *> (_meshName.c_str()),
-                     _ptrMesh->getMeshDimension(),med_2_3::MED_STRUCTURE,
-                     const_cast <char *> (_ptrMesh->_description.c_str()));
+      char dtunitp3[MED_LNAME_SIZE+1];
+      std::fill(dtunitp3,dtunitp3+MED_LNAME_SIZE+1,'\0');
+
+      err = med_2_3::MEDmeshCr(_medIdt,_meshName.c_str(),_ptrMesh->getSpaceDimension(),_ptrMesh->getMeshDimension(),med_2_3::MED_STRUCTURED_MESH,
+                               _ptrMesh->_description.c_str(),dtunitp3,med_2_3::MED_SORT_DTIT,
+                               (med_2_3::med_axis_type)ptrGrid->getGridType(),const_cast <char *> (tmp_name.c_str()),const_cast <char *> (tmp_unit.c_str()));
 
       meshDimension =  _ptrMesh->getMeshDimension();
 
@@ -1973,34 +1965,17 @@ int MED_MESH_WRONLY_DRIVER::writeGRID() const
 
   MED_EN::med_grid_type gridType = ptrGrid->getGridType();
 
-  err = med_2_3::MEDnatureGrilleEcr(_medIdt,
-                                   const_cast <char *> (_meshName.c_str()),
-                                   (med_2_3::med_type_grille) gridType);
-
   if (err != MED_VALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Unable to write the type of the Grid"));
-
-  // Recompose the <_spaceDimension> strings in 1 string
-  int lengthString;
-  string valueString;
-  for (int i=0;i<_ptrMesh->_spaceDimension;i++) {
-    SCRUTE_MED(i);
-    valueString = ptrGrid->_coordinate->_coordinateName[i];
-    lengthString = (MED_SNAME_SIZE<valueString.size())?MED_SNAME_SIZE:valueString.size();
-    tmp_name.replace(i*MED_SNAME_SIZE,i*MED_SNAME_SIZE+lengthString,valueString,0,lengthString);
-    valueString = ptrGrid->_coordinate->_coordinateUnit[i];
-    lengthString = (MED_SNAME_SIZE<valueString.size())?MED_SNAME_SIZE:valueString.size();
-    tmp_unit.replace(i*MED_SNAME_SIZE,i*MED_SNAME_SIZE+lengthString,valueString,0,lengthString);
-  }
 
   // Pourquoi le stocker sous forme de chaîne ?
   const string & coordinateSystem = ptrGrid->_coordinate->_coordinateSystem;
   if      (coordinateSystem  == "CARTESIAN")
-    rep = med_2_3::MED_CART;
+    rep = med_2_3::MED_CARTESIAN;
   else if ( coordinateSystem == "CYLINDRICAL")
-    rep = med_2_3::MED_CYL;
+    rep = med_2_3::MED_CYLINDRICAL;
   else if ( coordinateSystem == "SPHERICAL" )
-    rep = med_2_3::MED_SPHER;
+    rep = med_2_3::MED_SPHERICAL;
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Grid |" << _meshName.c_str() <<
                                  "| doesn't have a valid coordinate system : |"
@@ -2016,12 +1991,7 @@ int MED_MESH_WRONLY_DRIVER::writeGRID() const
     {
       // Write Coordinates and families
 
-      err = MEDcoordEcr(_medIdt, const_cast <char *> (_meshName.c_str()),
-                        ptrGrid->_spaceDimension,
-                        const_cast <double *> ( ptrGrid->_coordinate->_coordinate.get(MED_EN::MED_FULL_INTERLACE) ),
-                        med_2_3::MED_FULL_INTERLACE, ptrGrid->getNumberOfNodes(),
-                        rep, const_cast <char *> (tmp_name.c_str()),
-                        const_cast <char *> (tmp_unit.c_str()));
+      err = med_2_3::MEDmeshNodeCoordinateWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,MED_NO_DT,med_2_3::MED_FULL_INTERLACE,ptrGrid->getNumberOfNodes(),ptrGrid->_coordinate->_coordinate.get(MED_EN::MED_FULL_INTERLACE));
 
       if (err != MED_VALID)
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Can't write coordinates of the grid |" << _meshName.c_str() << "| in file |" << _fileName
@@ -2036,9 +2006,7 @@ int MED_MESH_WRONLY_DRIVER::writeGRID() const
         structure[idim] = ArrayLen [idim];
 
 
-      err = med_2_3::MEDstructureCoordEcr(_medIdt, const_cast <char *>
-                                         (_meshName.c_str()), meshDimension,
-                                         structure);
+      err = med_2_3::MEDmeshGridStructWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,MED_NO_DT,structure);
 
       if (err != MED_VALID)
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"error in writing the structure of the grid |" << _meshName.c_str()));
@@ -2061,14 +2029,8 @@ int MED_MESH_WRONLY_DRIVER::writeGRID() const
           string str_unit = string (tmp_unit,idim*MED_SNAME_SIZE,
                                     MED_SNAME_SIZE);
 
-          err = med_2_3::MEDindicesCoordEcr(_medIdt, const_cast <char *>
-                                           (_meshName.c_str()),
-                                           _ptrMesh->getMeshDimension(),
-                                           Array[idim], ArrayLen[idim],
-                                           (idim+1), const_cast <char *>
-                                           (str_name.c_str()),
-                                           const_cast <char *>
-                                           (str_unit.c_str()));
+          err = med_2_3::MEDmeshGridIndexCoordinateWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,MED_NO_DT,idim+1,ArrayLen[idim],Array[idim]);
+
 
           if (err != MED_VALID)
             throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<
@@ -2094,7 +2056,7 @@ int MED_MESH_WRONLY_DRIVER::writeCoordinates() const {
   MESH * ptrMesh = (MESH*) _ptrMesh;
 
   med_2_3::med_err err = MED_ERROR;
-  med_2_3::med_repere rep;
+  med_2_3::med_axis_type rep;
   string tmp_name(ptrMesh->_spaceDimension*MED_SNAME_SIZE,' ');
   string tmp_unit(ptrMesh->_spaceDimension*MED_SNAME_SIZE,' ');
 
@@ -2109,45 +2071,63 @@ int MED_MESH_WRONLY_DRIVER::writeCoordinates() const {
     lengthString = (MED_SNAME_SIZE<valueString.size())?MED_SNAME_SIZE:valueString.size();
     tmp_unit.replace(i*MED_SNAME_SIZE,i*MED_SNAME_SIZE+lengthString,valueString,0,lengthString);
   }
-
+  // Pourquoi le stocker sous forme de chaîne ?
+  const string & coordinateSystem = ptrMesh->_coordinate->_coordinateSystem;
+  if      (coordinateSystem  == "CARTESIAN")
+    rep = med_2_3::MED_CARTESIAN;
+  else if ( coordinateSystem == "CYLINDRICAL")
+    rep = med_2_3::MED_CYLINDRICAL;
+  else if ( coordinateSystem == "SPHERICAL" )
+    rep = med_2_3::MED_SPHERICAL;
+  else
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Mesh |" << _meshName.c_str() << "| doesn't have a valid coordinate system : |"
+                                 << ptrMesh->_coordinate->_coordinateSystem
+                                 << "|" ));
   // Test if the mesh <_meshName> already exists
   // If it doesn't exists create it
   // If it already exists verify if its space and mesh dimensions are the same
   // as <ptrMesh->_spaceDimension>, <ptrMesh->getMeshDimension()> respectively
   // rem : <_meshName> is the driver meshName not <ptrMesh->_meshName>
 
-  int spaceDimension = med_2_3::MEDdimEspaceLire(_medIdt, const_cast <char *>
-                                                (_meshName.c_str()));
-
-  int meshDimension = med_2_3::MEDdimLire(_medIdt, const_cast <char *>
-                                         (_meshName.c_str()) );
-
+  med_2_3::med_int dtpp3,itpp3;
+  med_2_3::med_float ttpp3;
+  err=med_2_3::MEDmeshComputationStepInfo(_medIdt,_meshName.c_str(),1,&dtpp3,&itpp3,&ttpp3);
+  int spaceDimension=-1;
+  int meshDimension=-1;
+  if(err!=0)
+    {
+      med_2_3::med_mesh_type ttmp3;
+      char commentp3[MED_COMMENT_SIZE+1];
+      char dtunittp3[MED_LNAME_SIZE+1];
+      med_2_3::med_sorting_type sttp3;
+      int nstep;
+      med_2_3::med_axis_type axtypp3;
+      int naxis=med_2_3::MEDmeshnAxisByName(_medIdt,_meshName.c_str());
+      char *t1pp3=new char[naxis*MED_SNAME_SIZE+1];
+      char *t2pp3=new char[naxis*MED_SNAME_SIZE+1];
+      med_2_3::MEDmeshInfoByName(_medIdt,_meshName.c_str(),&spaceDimension,&meshDimension,&ttmp3,commentp3,dtunittp3,&sttp3,&nstep,&axtypp3,t1pp3,t2pp3);
+      delete [] t1pp3;
+      delete [] t2pp3;
+    }
   SCRUTE_MED(spaceDimension);
   SCRUTE_MED(meshDimension);
   SCRUTE_MED(ptrMesh->_spaceDimension);
   SCRUTE_MED(ptrMesh->getMeshDimension());
 
-  if ((spaceDimension != MED_VALID) && (meshDimension < MED_VALID))
+  if (err!=0)
     {
-      ptrMesh->_description.resize(MED_COMMENT_SIZE+1,'\0');
-      err = MEDmaaCr(_medIdt, const_cast <char *> (_meshName.c_str()),
-                     ptrMesh->getMeshDimension(), med_2_3::MED_NON_STRUCTURE,
-                     const_cast <char *> (ptrMesh->_description.c_str()));
+      _ptrMesh->_description.resize(MED_COMMENT_SIZE+1,'\0');
+      char dtunitp3[MED_LNAME_SIZE+1];
+      std::fill(dtunitp3,dtunitp3+MED_LNAME_SIZE+1,'\0');
+
+      err = med_2_3::MEDmeshCr(_medIdt,_meshName.c_str(),_ptrMesh->getSpaceDimension(),_ptrMesh->getMeshDimension(),med_2_3::MED_UNSTRUCTURED_MESH,
+                               _ptrMesh->_description.c_str(),dtunitp3,med_2_3::MED_SORT_DTIT,
+                               rep,const_cast <char *> (tmp_name.c_str()),const_cast <char *> (tmp_unit.c_str()));
 
       if (err < MED_VALID)
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Unable to create Mesh : |" << _meshName << "|"));
       else
         MESSAGE_MED(LOC<<"Mesh "<<_meshName<<" created in file "<<_fileName<<" !");
-
-      // PAL14544. Write _spaceDimension if _spaceDimension != getMeshDimension()
-      if ( ptrMesh->_spaceDimension != ptrMesh->getMeshDimension() )
-      {
-        err = med_2_3::MEDdimEspaceCr(_medIdt, const_cast <char *> (_meshName.c_str()),
-                                      ptrMesh->_spaceDimension);
-        if (err < MED_VALID)
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Can't write spaceDimension of Mesh : |"
-                                       << _meshName << "|"));
-      }
     }
   else if ((spaceDimension != ptrMesh->_spaceDimension)  &&
            (meshDimension != ptrMesh->getMeshDimension()))
@@ -2158,26 +2138,9 @@ int MED_MESH_WRONLY_DRIVER::writeCoordinates() const {
                                  "| but the space dimension and the mesh dimension of the mesh we want to write are respectively |"
                                  << ptrMesh->_spaceDimension <<"|" <<
                                  ptrMesh->getMeshDimension() << "|"));
-
-  // Pourquoi le stocker sous forme de chaîne ?
-  const string & coordinateSystem = ptrMesh->_coordinate->_coordinateSystem;
-  if      (coordinateSystem  == "CARTESIAN")
-    rep = med_2_3::MED_CART;
-  else if ( coordinateSystem == "CYLINDRICAL")
-    rep = med_2_3::MED_CYL;
-  else if ( coordinateSystem == "SPHERICAL" )
-    rep = med_2_3::MED_SPHER;
-  else
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Mesh |" << _meshName.c_str() << "| doesn't have a valid coordinate system : |"
-                                 << ptrMesh->_coordinate->_coordinateSystem
-                                 << "|" ));
-
-  err = MEDcoordEcr(_medIdt, const_cast <char *> (_meshName.c_str()),
-                    ptrMesh->_spaceDimension,
-                    const_cast <double *> ( ptrMesh->_coordinate->_coordinate.get(MED_EN::MED_FULL_INTERLACE) ),
-                    med_2_3::MED_FULL_INTERLACE, ptrMesh->getNumberOfNodes(),
-                    rep, const_cast <char *> (tmp_name.c_str()),
-                    const_cast <char *> (tmp_unit.c_str()));
+  
+  err=med_2_3::MEDmeshNodeCoordinateWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,MED_NO_DT,med_2_3::MED_FULL_INTERLACE,ptrMesh->getNumberOfNodes(),
+                                       const_cast <double *> ( ptrMesh->_coordinate->_coordinate.get(MED_EN::MED_FULL_INTERLACE)));
 
   if (err<0)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Can't write coordinates of mesh |" << _meshName.c_str() << "| in file |" << _fileName
@@ -2203,16 +2166,12 @@ int MED_MESH_WRONLY_DRIVER::writeCoordinates() const {
         int ii;
         for ( ii = 0; ii < ptrMesh->getNumberOfNodes(); ii++ )
            tmp_NodesNumbers[ii] = NodesNumbers[ii];
-        err =  MEDnumEcr(_medIdt, const_cast <char *> (_meshName.c_str()),
-                         tmp_NodesNumbers ,
-                         ptrMesh->getNumberOfNodes(), med_2_3::MED_NOEUD,
-                         med_2_3::med_geometrie_element(0) );
+        err=med_2_3::MEDmeshEntityNumberWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,med_2_3::MED_NODE,med_2_3::MED_NONE,ptrMesh->getNumberOfNodes(),
+                                           tmp_NodesNumbers);
         delete [] tmp_NodesNumbers;
 #else
-        err =  MEDnumEcr(_medIdt, const_cast <char *> (_meshName.c_str()),
-                         const_cast <med_int *> (ptrMesh->_coordinate->getNodesNumbers() ),
-                         ptrMesh->getNumberOfNodes(), med_2_3::MED_NOEUD,
-                         med_2_3::med_geometrie_element(0) );
+        err=med_2_3::MEDmeshEntityNumberWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,med_2_3::MED_NODE,med_2_3::MED_NONE,ptrMesh->getNumberOfNodes(),
+                                           const_cast<med_int *>(ptrMesh->_coordinate->getNodesNumbers()));
 #endif
 
         if (err != MED_VALID)
@@ -2264,16 +2223,7 @@ int MED_MESH_WRONLY_DRIVER::writeConnectivities(medEntityMesh entity) const
                 vector< med_2_3::med_int > tmp_Index( numberOfElements+1 );
                 for ( unsigned j = 0; j < tmp_Index.size(); ++ j )
                   tmp_Index[j] = index[ nbStdCells + j ] - index[ nbStdCells ] + 1;
-
-                err = MEDpolygoneConnEcr(_medIdt,
-                                         const_cast <char *> (_meshName.c_str()),
-                                         &tmp_Index[0],
-                                         numberOfElements + 1,
-                                         &connectivityArray[0],
-                                         //(med_2_3::med_entite_maillage) entity,
-                                         //because Med Memory works only in Nodal connectivity
-                                         (med_2_3::med_entite_maillage) MED_CELL,
-                                         med_2_3::MED_NOD);
+                err=med_2_3::MEDmeshPolygonWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,MED_NO_DT,med_2_3::MED_CELL,med_2_3::MED_NODAL,numberOfElements+1,&tmp_Index[0],&connectivityArray[0]);
 
                 if (err<0)
                   throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Can't write polygons nodal connectivities of mesh |"
@@ -2299,14 +2249,8 @@ int MED_MESH_WRONLY_DRIVER::writeConnectivities(medEntityMesh entity) const
                     PolyhedronIndex.push_back( PolyhedronFacesIndex.size()+1 );
                     PolyhedronFacesIndex.push_back( PolyhedronConnectivity.size()+1 );
                   }
-                err = MEDpolyedreConnEcr(_medIdt,
-                                         const_cast <char *> (_meshName.c_str()),
-                                         &PolyhedronIndex[0],
-                                         PolyhedronIndex.size(),
-                                         &PolyhedronFacesIndex[0],
-                                         PolyhedronFacesIndex.size(),
-                                         &PolyhedronConnectivity[0],
-                                         med_2_3::MED_NOD);
+                err=med_2_3::MEDmeshPolyhedronWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,MED_NO_DT,med_2_3::MED_CELL,med_2_3::MED_NODAL,PolyhedronFacesIndex.size(),
+                                                 &PolyhedronFacesIndex[0],PolyhedronIndex.size(),&PolyhedronIndex[0],&PolyhedronConnectivity[0]);
                 if (err<0)
                   throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Can't write polyhedron nodal connectivities of mesh |"
                                                << _meshName.c_str() << "| in file |" << _fileName
@@ -2317,20 +2261,15 @@ int MED_MESH_WRONLY_DRIVER::writeConnectivities(medEntityMesh entity) const
             default:
 
               vector< med_2_3::med_int > connectivityArray( connectivity, connectivity + size );
-              err = MEDconnEcr(_medIdt, const_cast <char *> (_meshName.c_str()),
-                               ptrMesh->_spaceDimension, &connectivityArray[0],
-                               med_2_3::MED_FULL_INTERLACE, numberOfElements,
-                               //(med_2_3::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
-                               (med_2_3::med_entite_maillage  ) MED_CELL,
-                               (med_2_3::med_geometrie_element) types[i], med_2_3::MED_NOD);
+              err=med_2_3::MEDmeshElementConnectivityWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,MED_NO_DT,med_2_3::MED_CELL,(med_2_3::med_geometry_type)types[i],
+                                                        med_2_3::MED_NODAL,med_2_3::MED_FULL_INTERLACE,numberOfElements,&connectivityArray[0]);
+
               if (err<0) // ETENDRE LES EXPLICATIONS
                 throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Can't write connectivities of mesh |"
                                              << _meshName.c_str() << "| in file |" << _fileName
                                              << "| with dimension |"  << ptrMesh->_spaceDimension <<"| and"));
             }
         }
-      err = med_2_3::MEDdimEspaceCr
-        (_medIdt, const_cast<char *>(_meshName.c_str()), ptrMesh->_spaceDimension);
     }
 
 
@@ -2348,29 +2287,11 @@ int MED_MESH_WRONLY_DRIVER::writeConnectivities(medEntityMesh entity) const
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
           int lgth = ptrMesh->getConnectivityLength(MED_DESCENDING, entity, types[i]);
           vector< med_2_3::med_int > tmp_Connectivity( connectivity, connectivity + lgth );
-          err = med_2_3::MEDconnEcr(_medIdt,
-                                    const_cast <char *> ( _meshName.c_str()),
-                                    ptrMesh->_spaceDimension,
-                                    &tmp_Connectivity[0],
-                                    med_2_3::MED_FULL_INTERLACE,
-                                    numberOfElements,
-                                    //(med_2_3::med_entite_maillage  ) entity,
-                                    //because Med Memory works only in Nodal connectivity
-                                    (med_2_3::med_entite_maillage  ) MED_CELL,
-                                    (med_2_3::med_geometrie_element) types[i],
-                                    med_2_3::MED_DESC);
+          err=med_2_3::MEDmeshElementConnectivityWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,MED_NO_DT,med_2_3::MED_CELL,(med_2_3::med_geometry_type)types[i],
+                                                    med_2_3::MED_DESCENDING,med_2_3::MED_FULL_INTERLACE,numberOfElements,&tmp_Connectivity[0]);
 #else
-          err = med_2_3::MEDconnEcr(_medIdt,
-                                    const_cast <char *> ( _meshName.c_str()),
-                                    ptrMesh->_spaceDimension,
-                                    const_cast <int *> (connectivity),
-                                    med_2_3::MED_FULL_INTERLACE,
-                                    numberOfElements,
-                                    //(med_2_3::med_entite_maillage  ) entity,
-                                    //because Med Memory works only in Nodal connectivity
-                                    (med_2_3::med_entite_maillage  ) MED_CELL,
-                                    (med_2_3::med_geometrie_element) types[i],
-                                    med_2_3::MED_DESC);
+          err=med_2_3::MEDmeshElementConnectivityWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,MED_NO_DT,med_2_3::MED_CELL,(med_2_3::med_geometry_type)types[i],
+                                                    med_2_3::MED_DESCENDING,med_2_3::MED_FULL_INTERLACE,numberOfElements, const_cast<int *>(connectivity));
 #endif
 
           if (err<0) // ETENDRE LES EXPLICATIONS
@@ -2624,10 +2545,8 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
           MEDArrayNodeFamily[Number[j]-1]=FamilyIdentifier;
       }
     }
+    err=med_2_3::MEDmeshEntityFamilyNumberWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,med_2_3::MED_NODE,med_2_3::MED_NONE,NumberOfNodes,MEDArrayNodeFamily);
 
-    err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
-                    MEDArrayNodeFamily, NumberOfNodes, med_2_3::MED_NOEUD,
-                    (med_2_3::med_geometrie_element) MED_NONE);
 
     if ( err != MED_VALID)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Can't write node family for the |"<< NumberOfNodes
@@ -2680,17 +2599,9 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
       {
         int typeNumberOfElements=_ptrMesh->getNumberOfElements(entity,types[i]);
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-        err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
-                        (&temp[0]+offset), typeNumberOfElements,
-                        (med_2_3::med_entite_maillage) MED_CELL,
-                        (med_2_3::med_geometrie_element) types[i]);
+        err=med_2_3::MEDmeshEntityFamilyNumberWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,med_2_3::MED_CELL,(med_2_3::med_geometry_type) types[i],typeNumberOfElements,&temp[0]+offset));
 #else
-        err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
-                        (MEDArrayFamily+offset),
-                        typeNumberOfElements,
-//                      (med_2_3::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
-                        (med_2_3::med_entite_maillage) MED_CELL,
-                        (med_2_3::med_geometrie_element) types[i]);
+        err=med_2_3::MEDmeshEntityFamilyNumberWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,med_2_3::MED_CELL,(med_2_3::med_geometry_type) types[i],typeNumberOfElements,MEDArrayFamily+offset);
 #endif
         MESSAGE_MED("OK "<<i);
         if ( err != MED_VALID)
@@ -2754,16 +2665,9 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
       {
         int typeNumberOfElements = _ptrMesh->getNumberOfElements(entity,types[i]);
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-        err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
-                        (&temp[0]+offset), typeNumberOfElements,
-                        (med_2_3::med_entite_maillage) MED_CELL,
-                        (med_2_3::med_geometrie_element) types[i]);
+        err=med_2_3::MEDmeshEntityFamilyNumberWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,med_2_3::MED_CELL,(med_2_3::med_geometry_type) types[i],typeNumberOfElements,&temp[0]+offset));
 #else
-        err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
-                        (familyArray+offset), typeNumberOfElements,
-//                      (med_2_3::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
-                        (med_2_3::med_entite_maillage) MED_CELL,
-                        (med_2_3::med_geometrie_element) types[i]);
+        err=med_2_3::MEDmeshEntityFamilyNumberWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,med_2_3::MED_CELL,(med_2_3::med_geometry_type) types[i],typeNumberOfElements,familyArray+offset);
 #endif
         if ( err != MED_VALID)
           throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Can't write family for the |"<< typeNumberOfElements
@@ -2830,16 +2734,9 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
       {
         int typeNumberOfElements = _ptrMesh->getNumberOfElements(entity, types[i]);
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-        err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
-                        (&temp[0]+typeCount), typeNumberOfElements,
-                        (med_2_3::med_entite_maillage) MED_CELL,
-                        (med_2_3::med_geometrie_element) types[i]);
+        err=med_2_3::MEDmeshEntityFamilyNumberWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,med_2_3::MED_CELL,(med_2_3::med_geometry_type) types[i],typeNumberOfElements,&temp[0]+offset));
 #else
-        err = MEDfamEcr(_medIdt, const_cast <char *> ( _meshName.c_str() ),
-                        (familyArray+typeCount), typeNumberOfElements,
-//                      (med_2_3::med_entite_maillage) entity, because Med Memory works only in Nodal connectivity
-                        (med_2_3::med_entite_maillage) MED_CELL,
-                        (med_2_3::med_geometrie_element) types[i]);
+        err=med_2_3::MEDmeshEntityFamilyNumberWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,med_2_3::MED_CELL,(med_2_3::med_geometry_type) types[i],typeNumberOfElements,familyArray+typeCount);
 #endif
         if ( err != MED_VALID)
           throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Can't write family for the |"<< _ptrMesh->getNumberOfElements(entity, types[i])
@@ -2882,28 +2779,28 @@ int MED_MESH_WRONLY_DRIVER::writeFamilies(vector<FAMILY*> & families ) const
                                       << "| is |" << attributeDescription.size()
                                       <<"| and is more than |" <<  MED_COMMENT_SIZE << "|"));
 
-      int length = min(MED_TAILLE_LNOM,(int)attributeDescription.size());
+      int length = min(MED_COMMENT_SIZE,(int)attributeDescription.size());
       attributesDescriptions.replace(j*MED_COMMENT_SIZE,length, attributeDescription,0,length);
     }
 
 
     int      numberOfGroups  = families[i]->getNumberOfGroups();
-    string   groupsNames(numberOfGroups*MED_TAILLE_LNOM,'\0');
+    string   groupsNames(numberOfGroups*MED_LNAME_SIZE,'\0');
 
     // Recompose the groups names arg for MED
     for (int j=0; j < numberOfGroups; j++)
     {
       string groupName = families[i]->getGroupName(j+1);
 
-      if ( groupName.size() > MED_TAILLE_LNOM )
+      if ( groupName.size() > MED_LNAME_SIZE )
         throw MEDEXCEPTION( LOCALIZED(STRING(LOC) << "The size of the group name  n° |"
                                       << j+1 << "| of the family |" << families[i]->getName()
                                       << "| with identifier |" << families[i]->getIdentifier()
                                       << "| is |" << groupName.size()
-                                      <<"| and is more than |" << MED_TAILLE_LNOM << "|"));
+                                      <<"| and is more than |" << MED_LNAME_SIZE  << "|"));
 
-      int length = min(MED_TAILLE_LNOM,(int)groupName.size());
-      groupsNames.replace(j*MED_TAILLE_LNOM,length, groupName,0,length);
+      int length = min(MED_LNAME_SIZE,(int)groupName.size());
+      groupsNames.replace(j*MED_LNAME_SIZE,length, groupName,0,length);
     }
 
     // test if the family already exists (HDF trick waiting a MED evolution to be replaced)
@@ -2943,7 +2840,9 @@ int MED_MESH_WRONLY_DRIVER::writeFamilies(vector<FAMILY*> & families ) const
           AttributesIdentifier2[i2]=(med_2_3::med_int)(families[i]->getAttributesIdentifiers()[i2]);
           AttributesValues2[i2]=(med_2_3::med_int)(families[i]->getAttributesValues()[i2]);
         }
-      err = med_2_3::MEDfamCr( _medIdt,
+      err = med_2_3::MEDfamilyCr(_medIdt,_meshName.c_str(),healName(families[i]->getName()).c_str(),
+                                 families[i]->getIdentifier(),numberOfGroups,groupsNames.c_str());
+      /*err = med_2_3::MEDfamCr( _medIdt,
                               const_cast <char *> ( _meshName.c_str() ),
                               const_cast <char *> ( healName(families[i]->getName()).c_str() ),
                               families[i]->getIdentifier(),
@@ -2952,20 +2851,20 @@ int MED_MESH_WRONLY_DRIVER::writeFamilies(vector<FAMILY*> & families ) const
                               const_cast <char *> (attributesDescriptions.c_str()),
                               numberOfAttributes,
                               const_cast <char *> (groupsNames.c_str()),
-                              numberOfGroups);
+                              numberOfGroups);*/
       delete [] AttributesIdentifier2;
       delete [] AttributesValues2;
 #else
-      err = med_2_3::MEDfamCr( _medIdt,
-                              const_cast <char *> ( _meshName.c_str() ),
-                              const_cast <char *> ( healName(families[i]->getName()).c_str() ),
-                              families[i]->getIdentifier(),
-                              (med_2_3::med_int*)families[i]->getAttributesIdentifiers(),
-                              (med_2_3::med_int*)families[i]->getAttributesValues(),
-                              const_cast <char *> (attributesDescriptions.c_str()),
-                              numberOfAttributes,
-                              const_cast <char *> (groupsNames.c_str()),
-                              numberOfGroups);
+      err = med_2_3::MEDfamilyCr(_medIdt,_meshName.c_str(),healName(families[i]->getName()).c_str(),
+                                 families[i]->getIdentifier(),numberOfGroups,groupsNames.c_str());
+      /*const_cast <char *> ( healName(families[i]->getName()).c_str() ),
+        families[i]->getIdentifier(),
+        (med_2_3::med_int*)families[i]->getAttributesIdentifiers(),
+        (med_2_3::med_int*)families[i]->getAttributesValues(),
+        const_cast <char *> (attributesDescriptions.c_str()),
+        numberOfAttributes,
+        const_cast <char *> (groupsNames.c_str()),
+        numberOfGroups); -------- attributes for MED3 ...*/
 #endif
       SCRUTE_MED(err);
       if (err != MED_VALID)
