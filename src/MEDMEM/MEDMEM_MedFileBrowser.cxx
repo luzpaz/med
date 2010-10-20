@@ -44,14 +44,14 @@ namespace
     med_2_3::med_idt _id;
     MED_FILE(const string fileName)
     {
-      _id = med_2_3::MEDouvrir( (const_cast <char *> (fileName.c_str())),med_2_3::MED_LECTURE );
+      _id = med_2_3::MEDfileOpen(fileName.c_str(),med_2_3::MED_ACC_RDONLY);
     }
     ~MED_FILE()
     {
       if ( _id > 0 )
-        med_2_3::MEDfermer(_id);
+        med_2_3::MEDfileClose(_id);
     }
-     operator med_2_3::med_idt() const { return _id; }
+    operator med_2_3::med_idt() const { return _id; }
   };
 }
 /*!
@@ -131,20 +131,29 @@ void MEDFILEBROWSER::readFileStruct(const std::string & fileName) throw (MEDEXCE
   // 2. Read number of meshes and their names
   // =========================================
   {
-    char                  meshName[MED_TAILLE_NOM+1]="";
-    char                  meshDescription[MED_TAILLE_DESC+1]="";
+    char                  meshName[MED_NAME_SIZE+1]="";
+    char                  meshDescription[MED_COMMENT_SIZE+1]="";
     med_2_3::med_int      meshDim;
-    med_2_3::med_maillage meshType;
+    med_2_3::med_mesh_type meshType;
 
-    int numberOfMeshes = med_2_3::MEDnMaa(medIdt) ;
+    int numberOfMeshes = med_2_3::MEDnMesh(medIdt) ;
     if ( numberOfMeshes <= 0 ) 
       MESSAGE_MED(LOC << "Be careful there is no mesh in file |"<<_fileName<<"| !");
 
     for (i=1;i<=numberOfMeshes;i++)
     {
       //get information on the i^th mesh
-      err = med_2_3::MEDmaaInfo(medIdt, i, meshName, &meshDim, &meshType, meshDescription) ;
-
+      int spaceDim;
+      int naxis=med_2_3::MEDmeshnAxis(medIdt,i+1);
+      med_2_3::med_axis_type axistype;
+      med_2_3::med_sorting_type stype;
+      char *axisname=new char[naxis*MED_SNAME_SIZE+1];
+      char *axisunit=new char[naxis*MED_SNAME_SIZE+1];
+      int nstep;
+      char dtunit[MED_COMMENT_SIZE+1];
+      err = med_2_3::MEDmeshInfo(medIdt, i, meshName, &spaceDim, &meshDim, &meshType, meshDescription, dtunit, &stype, &nstep, &axistype, axisname, axisunit) ;
+      delete [] axisname;
+      delete [] axisunit;
       if (err != MED_VALID)
         throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << ": can't get information about the mesh #" << i << " of the file |" << _fileName << "| !"));
 
@@ -153,7 +162,7 @@ void MEDFILEBROWSER::readFileStruct(const std::string & fileName) throw (MEDEXCE
 //           meshType != med_2_3::MED_NON_STRUCTURE )
 //         throw MEDEXCEPTION
 //           (LOCALIZED(STRING(LOC) << "Bad mesh type of mesh #"<<i <<" in file |"<<_fileName<<"|"));
-      _meshes.insert( make_pair( string(meshName), meshType == med_2_3::MED_STRUCTURE ));
+      _meshes.insert( make_pair( string(meshName), meshType == med_2_3::MED_STRUCTURED_MESH ));
     }
   }
 
@@ -161,33 +170,31 @@ void MEDFILEBROWSER::readFileStruct(const std::string & fileName) throw (MEDEXCE
   // 3. Read number of fields and their (timeStepNumber,iterationNumber)
   // ===================================================================
   {
-    //    char                          fieldName[MED_TAILLE_NOM+1] = "";
-    char                          fieldName[MED_TAILLE_LNOM+1] ; // to avoid a crash if the field name is longer than MED_TAILLE_NOM
+    //    char                          fieldName[MED_NAME_SIZE+1] = "";
+    char                          fieldName[MED_NAME_SIZE+1] ; // to avoid a crash if the field name is longer than MED_NAME_SIZE....
     char                          * componentName              = (char *) MED_NULL;
     char                          * unitName                   = (char *) MED_NULL;
-    char                          meshName[MED_TAILLE_NOM+1]  ;
-    med_2_3::med_type_champ       type;
+    char                          meshName[MED_NAME_SIZE+1]  ;
+    med_2_3::med_field_type       type;
     MESH_ENTITIES::const_iterator currentEntity; 
     list<MED_EN::medGeometryElement>::const_iterator currentGeometry;
-    med_2_3::med_int              NbOfGaussPts                 =  0;
     med_2_3::med_int              timeStepNumber               =  -1;
-    char                          timeStepUnit[MED_TAILLE_PNOM+1] ;
+    char                          timeStepUnit[MED_LNAME_SIZE+1] ;
     double                        timeStep                     = 0.0;
     med_2_3::med_int              orderNumber                  =  -1;
-    med_2_3::med_int              numberOfRefMesh = 0;
-    med_2_3::med_booleen          meshLink;
+    med_2_3::med_bool             meshLink;
 
-    int numberOfFields = med_2_3::MEDnChamp(medIdt,0) ;
+    int numberOfFields = med_2_3::MEDnField(medIdt) ;
 
     for (i=1;i<=numberOfFields;i++)
     {
-      int numberOfComponents = med_2_3::MEDnChamp(medIdt,i) ;
+      int numberOfComponents = med_2_3::MEDfieldnComponent(medIdt,i) ;
 
-      componentName = new char[numberOfComponents*MED_TAILLE_PNOM+1] ;
-      unitName      = new char[numberOfComponents*MED_TAILLE_PNOM+1] ;   
-
-      err = MEDchampInfo(medIdt, i, fieldName, &type, componentName, 
-                         unitName, numberOfComponents) ;
+      componentName = new char[numberOfComponents*MED_SNAME_SIZE+1] ;
+      unitName      = new char[numberOfComponents*MED_SNAME_SIZE+1] ;
+      int nstepsp3;
+      err = med_2_3::MEDfieldInfo(medIdt, i, fieldName, meshName, &meshLink, &type, componentName, 
+                                  unitName, timeStepUnit, &nstepsp3) ;
       delete[] componentName ;
       delete[] unitName ;
 
@@ -205,39 +212,20 @@ void MEDFILEBROWSER::readFileStruct(const std::string & fileName) throw (MEDEXCE
       // find all dtid of this field
       set<DT_IT_, LT_DT_IT_> set_dtit;
 
-      for (currentEntity=meshEntities.begin();currentEntity != meshEntities.end(); currentEntity++)
-      {
-        for (currentGeometry  = (*currentEntity).second.begin();
-             currentGeometry != (*currentEntity).second.end();
-             currentGeometry++)
+      for (j=1;j <= nstepsp3; j++)
         {
-          int numberOfTimeSteps =
-            MEDnPasdetemps(medIdt, fieldName,
-                           (med_2_3::med_entite_maillage)(*currentEntity).first,
-                           (med_2_3::med_geometrie_element) (*currentGeometry) );
-
-          for (j=1;j <= numberOfTimeSteps; j++)
-          {
-            err = MEDpasdetempsInfo(medIdt, fieldName,
-                                    (med_2_3::med_entite_maillage) (*currentEntity).first,
-                                    (med_2_3::med_geometrie_element) (*currentGeometry),
-                                    j,
-                                    &NbOfGaussPts,
-                                    &timeStepNumber, &orderNumber, timeStepUnit, &timeStep,
-                                    meshName, &meshLink, &numberOfRefMesh);
-
-            if (err == MED_VALID) // we have found for (*currentEntity).first and (*currentGeometry)
+          err = med_2_3::MEDfieldComputingStepInfo(medIdt, fieldName, j, &timeStepNumber, &orderNumber, &timeStep);
+          
+          if (err == MED_VALID) // we have found for (*currentEntity).first and (*currentGeometry)
             {
               DT_IT_ dtIt;
               if (timeStepNumber<0)  timeStepNumber=-1 ;
               dtIt.dt  = timeStepNumber;
               dtIt.it  = orderNumber;
-
+              
               set_dtit.insert( dtIt );
             }
-          }
         }
-      }
       fieldData._meshName = meshName;
       fieldData._vec_dtit.assign( set_dtit.begin(), set_dtit.end() );
 
