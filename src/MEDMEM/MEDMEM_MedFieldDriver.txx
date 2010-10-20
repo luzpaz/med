@@ -563,7 +563,7 @@ MED_FIELD_DRIVER<T>::getMeshDimensionFromFile(med_2_3::med_idt id,
       med_2_3::med_bool chp3,trp3;
       med_2_3::MEDmeshComputationStepInfo(id,meshName.c_str(),1,&dtp3,&itp3,&dtfp3);
       numberOfElements =
-        med_2_3::MEDmeshnEntity(id,meshName.c_str(),dtp3,itp3,med_2_3::MED_CELL,(med_2_3::med_geometry_type) *currentGeometry,med_2_3::MED_CONNECTIVITY,MED_NODAL,&chp3,&trp3);
+        med_2_3::MEDmeshnEntity(id,meshName.c_str(),dtp3,itp3,med_2_3::MED_CELL,(med_2_3::med_geometry_type) *currentGeometry,med_2_3::MED_CONNECTIVITY,med_2_3::MED_NODAL,&chp3,&trp3);
       if (numberOfElements <= 0)
         continue;
 
@@ -655,7 +655,7 @@ MED_FIELD_DRIVER<T>::getMeshGeometricTypeFromFile(med_2_3::med_idt      id,
     med_2_3::med_bool chp3,trp3;
     med_2_3::MEDmeshComputationStepInfo(id,meshName.c_str(),1,&dtp3,&itp3,&dtfp3);
     numberOfElements =
-      med_2_3::MEDmeshnEntity(id,meshName.c_str(),dtp3,itp3,(med_2_3::med_entity_type) medfile_entity,(med_2_3::med_geometry_type) *currentGeometry,quoi,MED_NODAL,&chp3,&trp3);
+      med_2_3::MEDmeshnEntity(id,meshName.c_str(),dtp3,itp3,(med_2_3::med_entity_type) medfile_entity,(med_2_3::med_geometry_type) *currentGeometry,quoi,med_2_3::MED_NODAL,&chp3,&trp3);
 
     if (numberOfElements <= 0)
       continue;
@@ -2077,14 +2077,14 @@ template <class T> void MED_FIELD_WRONLY_DRIVER<T>::write(void) const
         const GAUSS_LOCALIZATION<FullInterlace> & loc=*(static_cast<const GAUSS_LOCALIZATION<FullInterlace> * >(locPtr));
         ngauss = loc.getNbGauss();
         locName=healName( loc.getName() );
-        err=med_2_3::MEDlocalizationWr(id,locName.c_str(),(med_2_3::med_geometry_type)loc.getType(),mdim,loc.getRefCoo().getPtr(),MED_FULL_INTERLACE,ngauss,
+        err=med_2_3::MEDlocalizationWr(id,locName.c_str(),(med_2_3::med_geometry_type)loc.getType(),mdim,loc.getRefCoo().getPtr(),med_2_3::MED_FULL_INTERLACE,ngauss,
                                        loc.getGsCoo().getPtr(),&loc.getWeight()[0]);
 
       } else {
         const GAUSS_LOCALIZATION<NoInterlace> & loc=*(static_cast<const GAUSS_LOCALIZATION<NoInterlace> * >(locPtr));
         ngauss = loc.getNbGauss();
         locName=healName( loc.getName() );
-        err=med_2_3::MEDlocalizationWr(id,locName.c_str(),(med_2_3::med_geometry_type)loc.getType(),mdim,loc.getRefCoo().getPtr(),MED_NO_INTERLACE,ngauss,
+        err=med_2_3::MEDlocalizationWr(id,locName.c_str(),(med_2_3::med_geometry_type)loc.getType(),mdim,loc.getRefCoo().getPtr(),med_2_3::MED_NO_INTERLACE,ngauss,
                                        loc.getGsCoo().getPtr(),&loc.getWeight()[0]);
       };
 

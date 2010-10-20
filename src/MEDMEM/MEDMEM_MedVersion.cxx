@@ -39,19 +39,18 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
   med_2_3::med_int minor22;
   med_2_3::med_int release22;
 
-  med_2_3::med_mode_acces access22 = med_2_3::MED_LECTURE;
+  med_2_3::med_access_mode access22 = med_2_3::MED_ACC_RDONLY;
 
   /*
     Med Version 2.3 access to the file
   */
 
-  fid22 = med_2_3::MEDouvrir((const_cast <char *> (fileName.c_str())),
-                             access22);
+  fid22 = med_2_3::MEDfileOpen(fileName.c_str(),access22);
 
   if (fid22 < 0)
     throw MEDEXCEPTION("Problem in getMedFileVersion(const string &) Med file V2.2 access");
 
-  ret22 = med_2_3::MEDversionLire(fid22,&major22,&minor22,&release22);
+  ret22 = med_2_3::MEDfileNumVersionRd(fid22,&major22,&minor22,&release22);
 
   if (ret22 < 0)
     throw MEDEXCEPTION("Problem in getMedFileVersion(const string &) Med file V2.2 version numbers reading");
@@ -63,7 +62,7 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
       release22 = 5;
     }
 
-  ret22 = med_2_3::MEDfermer(fid22);
+  ret22 = med_2_3::MEDfileClose(fid22);
 
   if (ret22 < 0)
     throw MEDEXCEPTION("Problem in getMedFileVersion(const string &) Med file V2.2 file closing");
@@ -83,7 +82,7 @@ medFileVersion MEDMEM::getMedFileVersion(const string & fileName)
   return version;
 }
 
-med_2_3::med_mode_acces MEDMEM::getMedAccessMode(MED_EN::med_mode_acces mode)
+med_2_3::med_access_mode MEDMEM::getMedAccessMode(MED_EN::med_mode_acces mode)
 {
 /*
   from med.h:
@@ -93,10 +92,10 @@ med_2_3::med_mode_acces MEDMEM::getMedAccessMode(MED_EN::med_mode_acces mode)
    MED_CREATION         : Créer le fichier s'il n'existe pas, l'écrase sinon
 */
   switch ( mode ) {
-  case MED_EN::RDONLY: return med_2_3::MED_LECTURE;
-  case MED_EN::WRONLY: return med_2_3::MED_CREATION;
-  case MED_EN::RDWR:   return med_2_3::MED_LECTURE_ECRITURE;
+  case MED_EN::RDONLY: return med_2_3::MED_ACC_RDONLY;
+  case MED_EN::WRONLY: return med_2_3::MED_ACC_CREAT;
+  case MED_EN::RDWR:   return med_2_3::MED_ACC_RDWR;
   default:
-    return med_2_3::med_mode_acces( mode );
+    return med_2_3::med_access_mode( mode );
   }
 }

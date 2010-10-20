@@ -1242,13 +1242,13 @@ void GMESH::createFamilies()
 
       // family name sould not be longer than MED_TAILLE_NOM
       string famName = fam->first;
-      if ( famName.size() > MED_TAILLE_NOM ) {
+      if ( famName.size() > MED_NAME_SIZE ) {
         // try to cut off "FAM_" from the head
-        if ( famName.size() - 4 <= MED_TAILLE_NOM ) {
+        if ( famName.size() - 4 <= MED_NAME_SIZE ) {
           famName = famName.substr(4);
         }
         else { // try to make a unique name by cutting off char by char from the tail
-          famName = famName.substr(0, MED_TAILLE_NOM);
+          famName = famName.substr(0, MED_NAME_SIZE);
           map< string,vector<int> >::iterator foundName = tab_families.find( famName );
           while ( !famName.empty() &&
                   ( foundName != tab_families.end() || famName[ famName.size()-1 ] == ' ' ))

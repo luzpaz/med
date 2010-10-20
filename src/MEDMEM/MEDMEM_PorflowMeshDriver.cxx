@@ -318,7 +318,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::readPorflowConnectivityFile(bool hybride,const 
           connFile >> code;
           connFile >> nodes_number;
           maille.geometricType = geomPORFLOWtoMED[code-1];
-          if(maille.geometricType%100!=nodes_number) // following incohenrences founded in some porflow files!
+          if(maille.geometricType%100!=(int)nodes_number) // following incohenrences founded in some porflow files!
           {
               MESSAGE_MED("WARNING : the read node number don't seem to be compatible with geometric type!");
               SCRUTE_MED(maille.geometricType);
