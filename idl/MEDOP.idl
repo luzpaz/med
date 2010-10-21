@@ -13,7 +13,11 @@ module SALOME_MED {
     long  test() raises (SALOME::SALOME_Exception);
     
     FIELD addition(in FIELD f1, in FIELD f2) raises (SALOME::SALOME_Exception);
-    
+    FIELD substraction(in FIELD f1, in FIELD f2) raises (SALOME::SALOME_Exception);
+    FIELD multiplication(in FIELD f1, in FIELD f2) raises (SALOME::SALOME_Exception);
+    FIELD division(in FIELD f1, in FIELD f2) raises (SALOME::SALOME_Exception);
+    FIELD pow(in FIELD f1, in long power) raises (SALOME::SALOME_Exception);
+    FIELD lin(in FIELD f1, in double factor, in double offset) raises (SALOME::SALOME_Exception);
   };
 };
 

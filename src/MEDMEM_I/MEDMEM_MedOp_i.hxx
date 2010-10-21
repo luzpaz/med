@@ -1,8 +1,5 @@
 //  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-//
 //  This library is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU Lesser General Public
 //  License as published by the Free Software Foundation; either
@@ -24,7 +21,6 @@
 // File      : MEDMEM_MedOp_i.hxx
 // Project   : SALOME
 // Author    : EDF
-// $Header: /export/home/PAL/MED_SRC/src/MEDMEM_I/MEDMEM_Med_i.hxx
 //=============================================================================
 //
 #ifndef _MED_MEDOP_I_HXX_
@@ -62,6 +58,8 @@ private :
   MEDMEM::FIELD<double> * _getFieldDouble(SALOME_MED::FIELD_ptr field_ptr);
   const string _getKeyIdentifier(MEDMEM::FIELD_ * field);
 
+  
+
 protected:
   
 public:
@@ -70,8 +68,13 @@ public:
   ~MEDOP_i();
 
   CORBA::Long test();
-  SALOME_MED::FIELD_ptr addition(SALOME_MED::FIELD_ptr f1, SALOME_MED::FIELD_ptr f2);
-  
+
+  SALOME_MED::FIELD_ptr addition(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr);
+  SALOME_MED::FIELD_ptr substraction(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr);
+  SALOME_MED::FIELD_ptr multiplication(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr);
+  SALOME_MED::FIELD_ptr division(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr);
+  SALOME_MED::FIELD_ptr pow(SALOME_MED::FIELD_ptr f1_ptr, long power);
+  SALOME_MED::FIELD_ptr lin(SALOME_MED::FIELD_ptr f1_ptr, double factor, double offset);
 };
 }
 
