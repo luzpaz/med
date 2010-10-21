@@ -18,9 +18,32 @@
 #
 
 from libMEDCoupling_Swig import *
+import math
 import os
 
 class MEDCouplingCorbaServBasicsTest:
+    def build1DMesh(self):
+        coords=[ 0.0, 0.3, 0.75, 1.0 ]
+        conn=[ 0,1, 1,2, 2,3 ]
+        mesh=MEDCouplingUMesh.New("1DMeshForCorba",1);
+        mesh.allocateCells(3);
+        mesh.insertNextCell(NORM_SEG2,2,conn[0:2]);
+        mesh.insertNextCell(NORM_SEG2,2,conn[2:4]);
+        mesh.insertNextCell(NORM_SEG2,2,conn[4:6]);
+        mesh.finishInsertingCells();
+        myCoords=DataArrayDouble.New();
+        myCoords.setValues(coords,4,1);
+        mesh.setCoords(myCoords);
+        mesh.changeSpaceDimension(3);
+        myCoords=mesh.getCoords();
+        myCoords.setInfoOnComponent(0,"X1D(m)");
+        myCoords.setInfoOnComponent(1,"Y1D (dm)");
+        myCoords.setInfoOnComponent(2,"Z1D (pm)");
+        center=[0.,0.,0.]
+        vector=[0.,1.,0.]
+        mesh.rotate(center,vector,-math.pi/2.);
+        return mesh
+        
     def build2DMesh(self):
         targetCoords=[-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 ];
         targetConn=[0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4]
@@ -109,6 +132,35 @@ class MEDCouplingCorbaServBasicsTest:
         meshM1D.checkCoherency();
         return meshM1D;
 
+    def buildExtrudedMesh(self):
+        m2D=self.build2DMesh();
+        m2D.changeSpaceDimension(3);
+        m1D=self.build1DMesh();
+        retu=m2D.buildExtrudedMeshFromThis(m1D,0);
+        ret=MEDCouplingExtrudedMesh.New(retu,m2D,2);
+        ret.setName("ExtrudedTestForCorbaTest");
+        return ret;
+
+    def buildCMesh(self):
+        targetMesh=MEDCouplingCMesh.New();
+        targetMesh.setName("Example of CMesh");
+        a1=DataArrayDouble.New();
+        a1Data=[3.,4.,5.,6.,7.]
+        a1.setValues(a1Data,5,1);
+        a1.setInfoOnComponent(0,"SmthX");
+        a2=DataArrayDouble.New();
+        a2Data=[2.78,3.,4.,5.,6.,7.]
+        a2.setValues(a2Data,6,1);
+        a2.setInfoOnComponent(0,"SmthZ");
+        #
+        targetMesh.setCoordsAt(0,a1);
+        targetMesh.setCoordsAt(2,a2);
+        #
+        #
+        targetMesh.checkCoherency();
+        #
+        return targetMesh;
+
     def buildFieldScalarOn2DNT(self):
         mesh=self.build2DMesh();
         fieldOnCells=MEDCouplingFieldDouble.New(ON_CELLS,NO_TIME);
@@ -176,6 +228,124 @@ class MEDCouplingCorbaServBasicsTest:
         fieldOnCells.setEndTime(7.2,2,8);
         fieldOnCells.checkCoherency();
         return fieldOnCells;
+
+    def buildFieldScalarOn2DLT(self):
+        mesh=self.build2DMesh()
+        fieldOnCells=MEDCouplingFieldDouble.New(ON_CELLS,LINEAR_TIME)
+        fieldOnCells.setName("toto27");
+        fieldOnCells.setDescription("my wonderful 2D field toto27");
+        fieldOnCells.setMesh(mesh);
+        array=DataArrayDouble.New();
+        arr1=[1.2,1.02,1.002,1.0002, 3.4,3.04,3.004,3.0004, 5.6,5.06,5.006,5.0006, 7.8,7.08,7.008,7.0008, 9.1,9.01,9.001,9.0001]
+        array.setValues(arr1,mesh.getNumberOfCells(),4);
+        fieldOnCells.setArray(array);
+        array=DataArrayDouble.New();
+        arr2=[71.2,71.02,71.002,71.0002, 73.4,73.04,73.004,73.0004, 75.6,75.06,75.006,75.0006, 77.8,77.08,77.008,77.0008, 79.1,79.01,79.001,79.0001]
+        array.setValues(arr2,mesh.getNumberOfCells(),4);
+        fieldOnCells.setEndArray(array)
+        fieldOnCells.setStartTime(6.7,25,26);
+        fieldOnCells.setEndTime(17.2,125,126);
+        fieldOnCells.checkCoherency();
+        return fieldOnCells;
+
+    def buildFieldGaussPt2DWT(self):
+        _a=0.446948490915965;
+        _b=0.091576213509771;
+        _p1=0.11169079483905;
+        _p2=0.0549758718227661;
+        refCoo1=[ 0.,0., 1.,0., 0.,1. ]
+        gsCoo1=[ 2*_b-1, 1-4*_b, 2*_b-1, 2.07*_b-1, 1-4*_b,
+                 2*_b-1, 1-4*_a, 2*_a-1, 2*_a-1, 1-4*_a, 2*_a-1, 2*_a-1]
+        wg1=[ 4*_p2, 4*_p2, 4*_p2, 4*_p1, 4*_p1, 4*_p1 ]
+        _refCoo1=refCoo1
+        _gsCoo1=gsCoo1
+        _wg1=wg1
+        m=self.build2DMesh();
+        f=MEDCouplingFieldDouble.New(ON_GAUSS_PT,ONE_TIME);
+        f.setTime(6.7,1,4);
+        f.setMesh(m);
+        f.setGaussLocalizationOnType(NORM_TRI3,_refCoo1,_gsCoo1,_wg1);
+        refCoo2=[ 0.,0., 1.,0., 1.,1., 0.,1. ]
+        _refCoo2=refCoo2
+        _gsCoo1=_gsCoo1[0:4]
+        _wg1=_wg1[0:2]
+        f.setGaussLocalizationOnType(NORM_QUAD4,_refCoo2,_gsCoo1,_wg1);
+        array=DataArrayDouble.New();
+        ptr=18*2*[None]
+        for i in xrange(18*2):
+            ptr[i]=float(i+1);
+            pass
+        array.setValues(ptr,18,2);
+        array.setInfoOnComponent(0,"Power(MW)");
+        array.setInfoOnComponent(1,"Density (kg/m^3)");
+        f.setArray(array);
+        f.setName("MyFirstFieldOnGaussPoint");
+        f.setDescription("mmmmmmmmmmmm");
+        f.checkCoherency();
+        return f;
+
+    def buildFieldGaussPtNE2DWT(self):
+        m=self.build2DMesh();
+        f=MEDCouplingFieldDouble.New(ON_GAUSS_NE,ONE_TIME);
+        f.setTime(6.8,11,8);
+        f.setMesh(m);
+        f.setName("MyFirstFieldOnNE");
+        f.setDescription("MyDescriptionNE");
+        array=DataArrayDouble.New();
+        ptr=18*2*[None]
+        for i in xrange(18*2):
+            ptr[i]=float(i+7)
+        array.setValues(ptr,18,2);
+        array.setInfoOnComponent(0,"Power(MW)");
+        array.setInfoOnComponent(1,"Density (kg/m^3)");
+        f.setArray(array);
+        #
+        f.checkCoherency();
+        return f;
+
+    def buildFieldVectorOnExtrudedWT(self):
+        ext=self.buildExtrudedMesh();
+        #
+        f=MEDCouplingFieldDouble.New(ON_CELLS,ONE_TIME);
+        f.setTime(6.8,11,8);
+        f.setMesh(ext);
+        f.setName("MyFieldOnExtruM");
+        f.setDescription("desc of MyFiOnExtruM");
+        array=DataArrayDouble.New();
+        nbOfCells=ext.getNumberOfCells();
+        ptr=2*nbOfCells*[None]
+        for i in range(nbOfCells*2):
+            ptr[i]=float(i/2+7)+float((i%2)*1000);
+            pass
+        array.setValues(ptr,nbOfCells,2);
+        array.setInfoOnComponent(0,"Power(MW)");
+        array.setInfoOnComponent(1,"Density (kg/m^3)");
+        f.setArray(array);
+        #
+        f.checkCoherency();
+        return f
+
+    def buildFieldVectorOnCMeshWT(self):
+        ext=self.buildCMesh();
+        #
+        f=MEDCouplingFieldDouble.New(ON_CELLS,ONE_TIME);
+        f.setTime(6.8,11,8);
+        f.setMesh(ext);
+        f.setName("MyFieldOnCMesh");
+        f.setDescription("desc of MyFiOnCMesh");
+        array=DataArrayDouble.New();
+        nbOfCells=ext.getNumberOfCells();
+        ptr=2*nbOfCells*[None]
+        for i in range(nbOfCells*2):
+            ptr[i]=float(i/2+7)+float((i%2)*1000);
+            pass
+        array.setValues(ptr,nbOfCells,2);
+        array.setInfoOnComponent(0,"Power(GW)");
+        array.setInfoOnComponent(1,"Density (kg/m^3)");
+        f.setArray(array);
+        #
+        f.checkCoherency();
+        return f
 
     def buildFileNameForIOR(self):
         ret=os.getenv("TMP");
