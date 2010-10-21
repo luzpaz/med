@@ -64,7 +64,7 @@ f.rmDriver(id)
 nbcell2dboost=m.getNumberOfElementsWithPoly(MED_CELL,MED_ALL_ELEMENTS)
 connectivite=[2,6,13,11,11,13,14,12,6,5,15,13,12,14,10,4,13,15,16,14,5,1,7,15,14,16,9,10,15,7,8,16,16,8,3,9]
 connectivite_index=[1,5,9,13,17,21,25,29,33,37]
-conn=m.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_QUAD4)
+conn=m.getConnectivity(MED_NODAL,MED_CELL,MED_QUAD4)
 conn_index=m.getConnectivityIndex(MED_NODAL,MED_CELL);
 conn2dboost=(len(conn)==len(connectivite))
 if conn2dboost:
@@ -86,7 +86,7 @@ m = MESH(MED_DRIVER,dir_mesh+"/out_"+filename,meshname)
 nbcell2dmetis=m.getNumberOfElementsWithPoly(MED_CELL,MED_ALL_ELEMENTS)
 connectivite=[12,14,10,4,2,6,13,11,11,13,14,12,16,8,3,9,5,1,7,15,15,7,8,16,14,16,9,10,6,5,15,13,13,15,16,14]
 connectivite_index=[1,5,9,13,17,21,25,29,33,37]
-conn=m.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_QUAD4)
+conn=m.getConnectivity(MED_NODAL,MED_CELL,MED_QUAD4)
 conn_index=m.getConnectivityIndex(MED_NODAL,MED_CELL);
 conn2dmetis=(len(conn)==len(connectivite))
 if conn2dmetis:
@@ -113,8 +113,8 @@ m = MESH(MED_DRIVER,dir_mesh+"/out_"+filename,meshname)
 nbcell2dpolyboost=m.getNumberOfElementsWithPoly(MED_CELL,MED_ALL_ELEMENTS)
 connectivite=[2,5,9,10,11,10,9,12,5,6,8,9,4,11,12,16,12,9,8,13,6,1,7,8,16,12,13,15,13,8,7,14,15,13,14,3]
 connectivite_index=[1,5,9,13,17,21,25,29,33,37]
-conn=m.getPolygonsConnectivity(MED_FULL_INTERLACE,MED_CELL)
-conn_index=m.getPolygonsConnectivityIndex(MED_FULL_INTERLACE,MED_CELL);
+conn=m.getPolygonsConnectivity(MED_CELL)
+conn_index=m.getPolygonsConnectivityIndex(MED_CELL);
 conn2dpolyboost=(len(conn)==len(connectivite))
 if conn2dpolyboost:
     for i in range(0,len(connectivite)):
@@ -134,8 +134,8 @@ m = MESH(MED_DRIVER,dir_mesh+"/out_"+filename,meshname)
 nbcell2dpolymetis=m.getNumberOfElementsWithPoly(MED_CELL,MED_ALL_ELEMENTS)
 connectivite=[6,1,7,8,2,5,9,10,5,6,8,9,15,13,14,3,4,11,12,16,16,12,13,15,11,10,9,12,12,9,8,13,13,8,7,14]
 connectivite_index=[1,5,9,13,17,21,25,29,33,37]
-conn=m.getPolygonsConnectivity(MED_FULL_INTERLACE,MED_CELL)
-conn_index=m.getPolygonsConnectivityIndex(MED_FULL_INTERLACE,MED_CELL);
+conn=m.getPolygonsConnectivity(MED_CELL)
+conn_index=m.getPolygonsConnectivityIndex(MED_CELL);
 conn2dpolymetis=(len(conn)==len(connectivite))
 if conn2dpolymetis:
     for i in range(0,len(connectivite)):
@@ -165,7 +165,7 @@ m = MESH(MED_DRIVER,dir_mesh+"/out_"+filename,meshname)
 nbcell3dboost=m.getNumberOfElementsWithPoly(MED_CELL,MED_ALL_ELEMENTS)
 connectivite=[23,13,5,18,27,22,14,26,17,6,13,23,25,16,22,27,27,22,14,26,24,15,7,20,9,23,18,1,21,27,26,10,25,16,22,27,19,8,15,24,2,17,23,9,12,25,27,21,21,27,26,10,11,24,20,3,12,25,27,21,4,19,24,11]
 connectivite_index=[1,9,17,25,33,41,49,57,65]
-conn=m.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_HEXA8)
+conn=m.getConnectivity(MED_NODAL,MED_CELL,MED_HEXA8)
 conn_index=m.getConnectivityIndex(MED_NODAL,MED_CELL);
 conn3dboost=(len(conn)==len(connectivite))
 if conn3dboost:
@@ -187,7 +187,7 @@ m = MESH(MED_DRIVER,dir_mesh+"/out_"+filename,meshname)
 nbcell3dmetis=m.getNumberOfElementsWithPoly(MED_CELL,MED_ALL_ELEMENTS)
 connectivite=[12,25,27,21,4,19,24,11,27,22,14,26,24,15,7,20,17,6,13,23,25,16,22,27,9,23,18,1,21,27,26,10,23,13,5,18,27,22,14,26,25,16,22,27,19,8,15,24,2,17,23,9,12,25,27,21,21,27,26,10,11,24,20,3]
 connectivite_index=[1,9,17,25,33,41,49,57,65]
-conn=m.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_HEXA8)
+conn=m.getConnectivity(MED_NODAL,MED_CELL,MED_HEXA8)
 conn_index=m.getConnectivityIndex(MED_NODAL,MED_CELL);
 conn3dmetis=(len(conn)==len(connectivite))
 if conn3dmetis:

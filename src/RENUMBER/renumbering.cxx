@@ -29,8 +29,7 @@
 #include "MEDMEM_Connectivity.hxx"
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_DriversDef.hxx"
-#include "MEDMEM_Med.hxx"
-#include "MEDMEM_MedMeshDriver22.hxx"
+#include "MEDMEM_MedFileBrowser.hxx"
 
 #include "RenumberingFactory.hxx"
 
@@ -40,15 +39,18 @@ using namespace std;
 using namespace MED_EN;
 using namespace MED_RENUMBER;
 
+namespace
+{
+
 void computeNeighbour(const MESH* mesh,const medGeometryElement& Type, vector<list<int> >& neighbour, int& ntot,int& nb_cell)
 {
   CONNECTIVITY* conn = (CONNECTIVITY*)mesh->getConnectivityptr();
   conn->calculateFullDescendingConnectivity(MED_CELL);
   const int* rev_conn=mesh->getReverseConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_CELL);
   const int* rev_conn_index=mesh->getReverseConnectivityIndex(MED_EN::MED_DESCENDING, MED_EN::MED_CELL);
-  int nb_face= mesh->getNumberOfElementsWithPoly(MED_FACE,MED_ALL_ELEMENTS);
-  int nb_edge = mesh->getNumberOfElementsWithPoly(MED_EDGE,MED_ALL_ELEMENTS);
-  nb_cell= mesh->getNumberOfElementsWithPoly(MED_CELL,Type);
+  int nb_face= mesh->getNumberOfElements(MED_FACE,MED_ALL_ELEMENTS);
+  int nb_edge = mesh->getNumberOfElements(MED_EDGE,MED_ALL_ELEMENTS);
+  nb_cell= mesh->getNumberOfElements(MED_CELL,Type);
 
   int nb_constituent;
   if(mesh->getMeshDimension()==2)
@@ -79,74 +81,8 @@ void computeNeighbour(const MESH* mesh,const medGeometryElement& Type, vector<li
 
 void changeConnectivity(MESH& mesh, const medGeometryElement& Type, const int& nb_cell, const vector<int>& iperm)
 {
-  if(Type==MED_POLYHEDRA)
     {
-      int *conn_face_index_init=(int*)mesh.getPolyhedronFacesIndex();
-      int *conn_index_init=(int*)mesh.getPolyhedronIndex(MED_FULL_INTERLACE);
-      int *conn_init=(int*)mesh.getPolyhedronConnectivity(MED_FULL_INTERLACE);
-
-      int *conn_index_renum=new int[nb_cell+1];
-      int *conn_face_index_renum=new int[conn_index_init[nb_cell]];
-      int *conn_renum=new int[conn_face_index_init[conn_index_init[nb_cell]-1]-1];
-
-      int i_cell,i_face,i_conn;
-      int iter_face=0;
-      int iter_conn=0;
-      int i2;
-      conn_index_renum[0]=1;
-      conn_face_index_renum[0]=1;
-      for(i_cell=0;i_cell<nb_cell;++i_cell)
-        {
-          i2=iperm[i_cell]-1;
-          for(i_face=conn_index_init[i2]-1;i_face<conn_index_init[i2+1]-1;++i_face)
-            {
-              for(i_conn=conn_face_index_init[i_face]-1;i_conn<conn_face_index_init[i_face+1]-1;++i_conn)
-                {
-                  conn_renum[iter_conn]=conn_init[i_conn];
-                  ++iter_conn;
-                }
-              conn_face_index_renum[iter_face+1]=iter_conn+1;
-              ++iter_face;
-            }
-          conn_index_renum[i_cell+1]=iter_face+1;
-        }
-      memcpy(conn_face_index_init,conn_face_index_renum,sizeof(int)*conn_index_init[nb_cell]);
-      memcpy(conn_index_init,conn_index_renum,sizeof(int)*(nb_cell+1));
-      memcpy(conn_init,conn_renum, sizeof(int)*(conn_face_index_init[conn_index_init[nb_cell]-1]-1));
-
-      delete[] conn_index_renum;
-      delete[] conn_face_index_renum;
-      delete[] conn_renum;
-    }
-  else if (Type==MED_POLYGON)
-    {
-      int *conn_init=(int*)mesh.getPolygonsConnectivity(MED_FULL_INTERLACE,MED_CELL);
-      int *conn_index_init=(int*)mesh.getPolygonsConnectivityIndex(MED_FULL_INTERLACE,MED_CELL);
-      int *conn_index_renum=new int[nb_cell+1];
-      int *conn_renum=new int[conn_index_init[nb_cell]-1];
-
-      int iter=0;
-      int i2;
-      conn_index_renum[0]=1;
-      for(int i=0;i<nb_cell;++i)
-        {
-          i2=iperm[i]-1;
-          for(int k=conn_index_init[i2];k<conn_index_init[i2+1];++k)
-            {
-              conn_renum[iter]=conn_init[k-1];
-              ++iter;
-            }
-          conn_index_renum[i+1]=iter+1;
-        }
-      memcpy(conn_index_init,conn_index_renum,sizeof(int)*(nb_cell+1));
-      memcpy(conn_init,conn_renum, sizeof(int)*(conn_index_init[nb_cell]-1));
-
-      delete[] conn_renum;
-      delete[] conn_index_renum;
-    }
-  else
-    {
-      const int *conn_init=mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,Type);
+      const int *conn_init=mesh.getConnectivity(MED_NODAL,MED_CELL,Type);
       const int *conn_index_init=mesh.getConnectivityIndex(MED_NODAL,MED_CELL);
       int *conn_renum=new int[conn_index_init[nb_cell]-1];
       int *conn_index_renum=new int[nb_cell+1];
@@ -166,7 +102,7 @@ void changeConnectivity(MESH& mesh, const medGeometryElement& Type, const int& n
         }
 
       CONNECTIVITY* myConnectivity=(CONNECTIVITY*)mesh.getConnectivityptr();
-      myConnectivity->setNodal(conn_renum,MED_CELL,Type);
+      myConnectivity->setNodal(conn_renum,MED_CELL,Type,conn_index_renum);
       delete[] conn_renum;
       delete[] conn_index_renum;
     }
@@ -187,6 +123,7 @@ void changeFamily(MESH* mesh, const medGeometryElement& Type, const vector<int>&
         }
     }
 }
+} // namespace
 
 int main (int argc, char** argv)
 {
@@ -213,64 +150,35 @@ int main (int argc, char** argv)
   system(s.c_str());
 
   // Reading file structure
-  const MED med_struct (MED_DRIVER,filename_in);
-  int nb_mesh, nb_fields;
-  deque<string> mesh_names,f_names;
-  nb_mesh=med_struct.getNumberOfMeshes();
-  nb_fields=med_struct.getNumberOfFields();
-  mesh_names=med_struct.getMeshNames();
-  f_names=med_struct.getFieldNames();
-  if(nb_mesh!=1)
+  const MEDFILEBROWSER med_struct (filename_in);
+  if(med_struct.getNumberOfMeshes()!=1)
     {
       cout << "There are many meshes in the file" << endl;
       return -1;
     }
-  if(mesh_names[0].c_str()!=meshname)
+  if(med_struct.getMeshNames()[0]!=meshname)
     {
       cout << "Mesh name does not match" << endl;
       return -1;
-    }
-  vector<string> field_names;
-  vector<int> iternumber;
-  vector<int> ordernumber;
-  vector<int> types;
-  int nb_fields_tot=0;
-  for (int ifield = 0; ifield < nb_fields; ifield++)
-    {
-      deque<DT_IT_> dtit=med_struct.getFieldIteration(f_names[ifield]);
-      for (deque<DT_IT_>::const_iterator iter =dtit.begin(); iter!=dtit.end(); iter++)
-        {
-          field_names.push_back(f_names[ifield]);
-          iternumber.push_back(iter->dt);
-          ordernumber.push_back(iter->it);
-          ++nb_fields_tot;
-          FIELD_* field = med_struct.getField(f_names[ifield],iter->dt,iter->it);
-          if (dynamic_cast<FIELD<double>*>(field))
-            types.push_back(1);
-          else
-            types.push_back(0);
-
-        }
     }
   t_read_st=clock();
 
   // Reading mesh
   MESH myMesh;
   myMesh.setName(meshname);
-  MED_MESH_RDONLY_DRIVER22 *drv22=new MED_MESH_RDONLY_DRIVER22(filename_in,&myMesh);
+  MED_MESH_RDONLY_DRIVER *drv22=new MED_MESH_RDONLY_DRIVER(filename_in,&myMesh);
   drv22->desactivateFacesComputation();
   int newDrv=myMesh.addDriver(*drv22);
   delete drv22;
   myMesh.read(newDrv);
-  int nb_type=myMesh.getNumberOfTypesWithPoly(MED_CELL);
+  int nb_type=myMesh.getNumberOfTypes(MED_CELL);
   if (nb_type!=1)
     {
       cout << "Mesh must have only one type of cell" << endl;
       return -1;
     }
-  medGeometryElement *Types = myMesh.getTypesWithPoly(MED_CELL);
+  const medGeometryElement *Types = myMesh.getTypes(MED_CELL);
   medGeometryElement Type=Types[0];
-  delete[] Types;
 
   t_read_mesh=clock();
   MESH* workMesh=new MESH(myMesh);
@@ -327,33 +235,38 @@ int main (int argc, char** argv)
   cout << "Computing fields      ";
   cout.flush();
   bool exist_type;
-  for(int ifield=0;ifield<nb_fields_tot;++ifield)
+  vector<string> field_names = med_struct.getFieldNames();
+  for(unsigned ifield=0;ifield<field_names.size();++ifield)
     {
-      exist_type=false;
-      FIELD<double> myField(MED_DRIVER,filename_in,field_names[ifield],iternumber[ifield],ordernumber[ifield]);
-      FIELD<double> newField(myField);
-      const SUPPORT* mySupport=newField.getSupport();
-      const medGeometryElement *typesOfSupport = mySupport->getTypes();
-      for(int t=0;t<mySupport->getNumberOfTypes();++t)
+      VEC_DT_IT_ dtit = med_struct.getFieldIteration( field_names[ifield]);
+      for ( unsigned i = 0; i < dtit.size(); ++i )
         {
-          if(typesOfSupport[t]==Type)
+          exist_type=false;
+          FIELD<double> myField(MED_DRIVER,filename_in,field_names[ifield],dtit[i].dt,dtit[i].it);
+          FIELD<double> newField(myField);
+          const SUPPORT* mySupport=newField.getSupport();
+          const medGeometryElement *typesOfSupport = mySupport->getTypes();
+          for(int t=0;t<mySupport->getNumberOfTypes();++t)
             {
-              exist_type=true;
-              break;
-            }
-        }
-      if(exist_type)
-        {
-          for(int i=0;i<mySupport->getNumberOfElements(Type);++i)
-            {
-              for(int j=0;j<newField.getNumberOfComponents();++j)
+              if(typesOfSupport[t]==Type)
                 {
-                  newField.setValueIJ(i+1,j+1,myField.getValueIJ(iperm[i],j+1));
+                  exist_type=true;
+                  break;
                 }
             }
+          if(exist_type)
+            {
+              for(int i=0;i<mySupport->getNumberOfElements(Type);++i)
+                {
+                  for(int j=0;j<newField.getNumberOfComponents();++j)
+                    {
+                      newField.setValueIJ(i+1,j+1,myField.getValueIJ(iperm[i],j+1));
+                    }
+                }
+            }
+          int drv=newField.addDriver(MED_DRIVER,filename_out,field_names[ifield]);
+          newField.write(drv);
         }
-      int drv=newField.addDriver(MED_DRIVER,filename_out,field_names[ifield]);
-      newField.write(drv);
     }
   t_field=clock();
   cout << " : " << (t_field-t_family)/(double) CLOCKS_PER_SEC << "s" << endl;
