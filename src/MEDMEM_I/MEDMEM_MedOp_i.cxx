@@ -125,7 +125,7 @@ const string MEDOP_i::_getKeyIdentifier(MEDMEM::FIELD_ * field) {
  * containing values is an instance of the class
  * FIELDTEMPLATE_I<double/int>.
  */
-SALOME_MED::FIELD_ptr MEDOP_i::addition(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr) {
+SALOME_MED::FIELD_ptr MEDOP_i::add(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr) {
 
   // __GBO__ in the final version, we should process here the
   // numerical type of the values (int or double). For this demo
@@ -168,7 +168,7 @@ SALOME_MED::FIELD_ptr MEDOP_i::addition(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED
  * containing values is an instance of the class
  * FIELDTEMPLATE_I<double/int>.
  */
-SALOME_MED::FIELD_ptr MEDOP_i::substraction(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr) {
+SALOME_MED::FIELD_ptr MEDOP_i::sub(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr) {
   MEDMEM::FIELD<double> * f1 = _getFieldDouble(f1_ptr);
   MEDMEM::FIELD<double> * f2 = _getFieldDouble(f2_ptr);
   
@@ -187,7 +187,7 @@ SALOME_MED::FIELD_ptr MEDOP_i::substraction(SALOME_MED::FIELD_ptr f1_ptr, SALOME
  * containing values is an instance of the class
  * FIELDTEMPLATE_I<double/int>.
  */
-SALOME_MED::FIELD_ptr MEDOP_i::multiplication(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr) {
+SALOME_MED::FIELD_ptr MEDOP_i::mul(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr) {
   MEDMEM::FIELD<double> * f1 = _getFieldDouble(f1_ptr);
   MEDMEM::FIELD<double> * f2 = _getFieldDouble(f2_ptr);
   
@@ -206,7 +206,7 @@ SALOME_MED::FIELD_ptr MEDOP_i::multiplication(SALOME_MED::FIELD_ptr f1_ptr, SALO
  * containing values is an instance of the class
  * FIELDTEMPLATE_I<double/int>.
  */
-SALOME_MED::FIELD_ptr MEDOP_i::division(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr) {
+SALOME_MED::FIELD_ptr MEDOP_i::div(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr) {
   MEDMEM::FIELD<double> * f1 = _getFieldDouble(f1_ptr);
   MEDMEM::FIELD<double> * f2 = _getFieldDouble(f2_ptr);
   
@@ -224,13 +224,19 @@ SALOME_MED::FIELD_ptr MEDOP_i::division(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED
  * MEDMEM::FIELD. Note that the servant of a FIELD containing values
  * is an instance of the class FIELDTEMPLATE_I<double/int>.
  */
-SALOME_MED::FIELD_ptr MEDOP_i::pow(SALOME_MED::FIELD_ptr f1_ptr, long power) {
-  MEDMEM::FIELD<double> * f1 = _getFieldDouble(f1_ptr);
+SALOME_MED::FIELD_ptr MEDOP_i::pow(SALOME_MED::FIELD_ptr f_ptr, long power) {
+  MEDMEM::FIELD<double> * field = _getFieldDouble(f_ptr);
   
   // The MEDMEM pow operation modifies the original field (that is not
   // what we want). So we have first to make a copy.
-  FIELD<double> * field_result = new FIELD<double>(*f1);
+  FIELD<double> * field_result = new FIELD<double>(*field);
   field_result->applyPow(power);
+  // create a specific name (the default is the same as field)
+  string name = field->getName();
+  name.append("^");
+  name.append(ToString(power));
+  field_result->setName(name);
+  // and add the field to the med data structure
   _med->addField(field_result);
 
   FIELDTEMPLATE_I<double> *field_result_i = new FIELDTEMPLATE_I<double>(field_result);
@@ -246,14 +252,51 @@ SALOME_MED::FIELD_ptr MEDOP_i::pow(SALOME_MED::FIELD_ptr f1_ptr, long power) {
  * MEDMEM::FIELD. Note that the servant of a FIELD containing values
  * is an instance of the class FIELDTEMPLATE_I<double/int>.
  */
-SALOME_MED::FIELD_ptr MEDOP_i::lin(SALOME_MED::FIELD_ptr f1_ptr, double factor, double offset) {
-  MEDMEM::FIELD<double> * f1 = _getFieldDouble(f1_ptr);
+SALOME_MED::FIELD_ptr MEDOP_i::lin(SALOME_MED::FIELD_ptr f_ptr, double factor, double offset) {
+  MEDMEM::FIELD<double> * field = _getFieldDouble(f_ptr);
   
   // The MEDMEM operation applyLin modifies the original field (that
   // is not what we want). So we have first to make a copy.
-  FIELD<double> * field_result = new FIELD<double>(*f1);
-  *field_result+=*f1;
+  FIELD<double> * field_result = new FIELD<double>(*field);
+  *field_result=0.0;
+  *field_result+=*field;
   field_result->applyLin(factor, offset);
+  // create a specific name (the default is the same as field)
+  string name = string("lin(");
+  name.append(field->getName());
+  name.append(",");
+  name.append(ToString(factor));
+  name.append(",");
+  name.append(ToString(offset));
+  name.append(")");
+  field_result->setName(name);
+  // and add the field to the med data structure
+  _med->addField(field_result);
+
+  FIELDTEMPLATE_I<double> *field_result_i = new FIELDTEMPLATE_I<double>(field_result);
+  return field_result_i->_this();
+}
+
+/*!
+ * This function creates a new field as the duplicate of the
+ * MEDMEM::FIELD object embedded in the given servant specified by its
+ * CORBA pointers.
+ * It returns a pointer to the servant that embeds the resulting
+ * MEDMEM::FIELD. Note that the servant of a FIELD containing values
+ * is an instance of the class FIELDTEMPLATE_I<double/int>.
+ */
+SALOME_MED::FIELD_ptr MEDOP_i::dup(SALOME_MED::FIELD_ptr f_ptr) {
+  MEDMEM::FIELD<double> * field = _getFieldDouble(f_ptr);
+  
+  FIELD<double> * field_result = new FIELD<double>(*field);
+  *field_result=0.0;
+  *field_result+=*field;
+  // create a specific name (the default is the same as field)
+  string name = string("dup(");
+  name.append(field->getName());
+  name.append(")");
+  field_result->setName(name);
+  // and add the field to the med data structure
   _med->addField(field_result);
 
   FIELDTEMPLATE_I<double> *field_result_i = new FIELDTEMPLATE_I<double>(field_result);

@@ -12,12 +12,26 @@ module SALOME_MED {
   interface MEDOP : SALOME::GenericObj {
     long  test() raises (SALOME::SALOME_Exception);
     
-    FIELD addition(in FIELD f1, in FIELD f2) raises (SALOME::SALOME_Exception);
-    FIELD substraction(in FIELD f1, in FIELD f2) raises (SALOME::SALOME_Exception);
-    FIELD multiplication(in FIELD f1, in FIELD f2) raises (SALOME::SALOME_Exception);
-    FIELD division(in FIELD f1, in FIELD f2) raises (SALOME::SALOME_Exception);
-    FIELD pow(in FIELD f1, in long power) raises (SALOME::SALOME_Exception);
-    FIELD lin(in FIELD f1, in double factor, in double offset) raises (SALOME::SALOME_Exception);
+    /* Note that the following functions return a new field resulting
+       from the requested algebric operation. It does not affect the
+       fields in arguments. */
+
+    /*! Addition of the fields f1 and f2 ( f1+f2) */
+    FIELD add(in FIELD f1, in FIELD f2) raises (SALOME::SALOME_Exception);
+    /*! Substraction of the fields f1 and f2 (f1-f2) */
+    FIELD sub(in FIELD f1, in FIELD f2) raises (SALOME::SALOME_Exception);
+    /*! Multiplication of the fields f1 by f2 (f1*f2) */
+    FIELD mul(in FIELD f1, in FIELD f2) raises (SALOME::SALOME_Exception);
+    /*! Division of the fields f1 by f2 (f1/f2) */
+    FIELD div(in FIELD f1, in FIELD f2) raises (SALOME::SALOME_Exception);
+    /*! Power of the field f (f^power) */
+    FIELD pow(in FIELD f, in long power) raises (SALOME::SALOME_Exception);
+    /*! Linear transformation of the field f (factor*f+offset) */
+    FIELD lin(in FIELD f, in double factor, in double offset) raises (SALOME::SALOME_Exception);
+    /*! Dublication of the field f */
+    FIELD dup(in FIELD f) raises (SALOME::SALOME_Exception);
+    /*! Creation of a field whose values are initialized with the specified double */
+    /* FIELD ini(in double value) raises (SALOME::SALOME_Exception); */
   };
 };
 

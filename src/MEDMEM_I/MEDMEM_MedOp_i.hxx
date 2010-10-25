@@ -69,13 +69,15 @@ public:
 
   CORBA::Long test();
 
-  SALOME_MED::FIELD_ptr addition(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr);
-  SALOME_MED::FIELD_ptr substraction(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr);
-  SALOME_MED::FIELD_ptr multiplication(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr);
-  SALOME_MED::FIELD_ptr division(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr);
-  SALOME_MED::FIELD_ptr pow(SALOME_MED::FIELD_ptr f1_ptr, long power);
-  SALOME_MED::FIELD_ptr lin(SALOME_MED::FIELD_ptr f1_ptr, double factor, double offset);
+  SALOME_MED::FIELD_ptr add(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr);
+  SALOME_MED::FIELD_ptr sub(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr);
+  SALOME_MED::FIELD_ptr mul(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr);
+  SALOME_MED::FIELD_ptr div(SALOME_MED::FIELD_ptr f1_ptr, SALOME_MED::FIELD_ptr f2_ptr);
+  SALOME_MED::FIELD_ptr pow(SALOME_MED::FIELD_ptr f_ptr, long power);
+  SALOME_MED::FIELD_ptr lin(SALOME_MED::FIELD_ptr f_ptr, double factor, double offset);
+  SALOME_MED::FIELD_ptr dup(SALOME_MED::FIELD_ptr f_ptr);
+  //SALOME_MED::FIELD_ptr ini(double value);
 };
 }
 
-#endif /* _MED_MED_I_HXX_ */
+#endif /* _MED_MEDOP_I_HXX_ */
