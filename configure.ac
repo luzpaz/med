@@ -632,6 +632,19 @@ AC_OUTPUT_COMMANDS([ \
       chmod +x ./bin/* \
 ])
 
+AC_CONFIG_COMMANDS([hack_libtool],[
+sed -i "s%^CC=\"\(.*\)\"%hack_libtool (){ \n\
+  if test \"\$(echo \$[@] | grep -E '\\\-L/usr/lib(/../lib)?(64)? ')\" == \"\" \n\
+  then\n\
+    cmd=\"\1 \$[@]\"\n\
+  else\n\
+    cmd=\"\1 \"\`echo \$[@] | sed -r -e 's|(.*)-L/usr/lib(/../lib)?(64)? (.*)|\\\1\\\4 -L/usr/lib\\\3|g'\`\n\
+  fi\n\
+  \$cmd\n\
+}\n\
+CC=\"hack_libtool\"%g" libtool
+],[])
+
 AC_OUTPUT([ \
         adm_local_without_kernel/unix/SALOMEconfig.h \
         Makefile \
@@ -726,5 +739,3 @@ AC_OUTPUT([ \
         doc/doxygen/Doxyfile_med_user \
 	doc/doxygen/static/header.html \
 ])
-
-AC_HACK_LIBTOOL
