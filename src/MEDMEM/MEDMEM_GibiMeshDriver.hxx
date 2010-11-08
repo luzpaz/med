@@ -205,7 +205,7 @@ private:
   void next();
   char* str() const { return _curPos; }
   int index() const { return _iRead; }
-  int getInt() const { return atoi( str() ); }
+  int getInt() const;
   double getDouble() const;
   string getName() const;
 
