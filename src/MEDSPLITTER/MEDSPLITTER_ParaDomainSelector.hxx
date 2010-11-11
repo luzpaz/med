@@ -28,6 +28,7 @@
 
 #include <MEDMEM_define.hxx>
 
+#include <memory>
 #include <vector>
 
 namespace MEDMEM

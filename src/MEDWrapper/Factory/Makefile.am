@@ -54,4 +54,4 @@ MED_Test_LDADD= $(libMEDWrapper_la_LDFLAGS) ../Base/libMEDWrapperBase.la ../V2_1
 dist_mprint_version_SOURCES= mprint_version.cxx
 mprint_version_CPPFLAGS= $(libMEDWrapper_la_CPPFLAGS)
 mprint_version_LDADD= $(libMEDWrapper_la_LDFLAGS) ../Base/libMEDWrapperBase.la ../V2_1/Core/libmed_V2_1.la \
-	$(BOOST_LIB_THREAD) libMEDWrapper.la
+	$(BOOST_LIB_THREAD) libMEDWrapper.la $(MED2_LIBS)
