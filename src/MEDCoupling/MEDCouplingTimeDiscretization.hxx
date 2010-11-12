@@ -47,6 +47,7 @@ namespace ParaMEDMEM
     virtual bool areStrictlyCompatible(const MEDCouplingTimeDiscretization *other) const;
     virtual bool areStrictlyCompatibleForMul(const MEDCouplingTimeDiscretization *other) const;
     virtual bool isEqual(const MEDCouplingTimeDiscretization *other, double prec) const;
+    virtual bool isEqualWithoutConsideringStr(const MEDCouplingTimeDiscretization *other, double prec) const;
     virtual MEDCouplingTimeDiscretization *buildNewTimeReprFromThis(const MEDCouplingTimeDiscretization *other,
                                                                     TypeOfTimeDiscretization type, bool deepCpy) const;
     virtual std::string getStringRepr() const = 0;
@@ -104,13 +105,15 @@ namespace ParaMEDMEM
     virtual MEDCouplingTimeDiscretization *maxPerTuple() const throw(INTERP_KERNEL::Exception);
     virtual void changeNbOfComponents(int newNbOfComp, double dftValue) throw(INTERP_KERNEL::Exception);
     virtual void sortPerTuple(bool asc) throw(INTERP_KERNEL::Exception);
+    virtual void setUniformValue(int nbOfTuple, double value);
     virtual void applyLin(double a, double b, int compoId);
     virtual void applyFunc(int nbOfComp, FunctionToEvaluate func);
     virtual void applyFunc(int nbOfComp, const char *func);
     virtual void applyFunc(const char *func);
     virtual void applyFuncFast32(const char *func);
     virtual void applyFuncFast64(const char *func);
-    
+    virtual void fillFromAnalytic(const DataArrayDouble *loc, int nbOfComp, FunctionToEvaluate func) throw(INTERP_KERNEL::Exception);
+    virtual void fillFromAnalytic(const DataArrayDouble *loc, int nbOfComp, const char *func) throw(INTERP_KERNEL::Exception);
     //
     virtual ~MEDCouplingTimeDiscretization();
   protected:
@@ -141,6 +144,7 @@ namespace ParaMEDMEM
     MEDCouplingTimeDiscretization *divide(const MEDCouplingTimeDiscretization *other) const;
     void divideEqual(const MEDCouplingTimeDiscretization *other);
     bool isEqual(const MEDCouplingTimeDiscretization *other, double prec) const;
+    bool isEqualWithoutConsideringStr(const MEDCouplingTimeDiscretization *other, double prec) const;
     bool areCompatible(const MEDCouplingTimeDiscretization *other) const;
     bool areStrictlyCompatible(const MEDCouplingTimeDiscretization *other) const;
     bool areStrictlyCompatibleForMul(const MEDCouplingTimeDiscretization *other) const;
@@ -187,6 +191,7 @@ namespace ParaMEDMEM
     MEDCouplingTimeDiscretization *divide(const MEDCouplingTimeDiscretization *other) const;
     void divideEqual(const MEDCouplingTimeDiscretization *other);
     bool isEqual(const MEDCouplingTimeDiscretization *other, double prec) const;
+    bool isEqualWithoutConsideringStr(const MEDCouplingTimeDiscretization *other, double prec) const;
     bool areCompatible(const MEDCouplingTimeDiscretization *other) const;
     bool areStrictlyCompatible(const MEDCouplingTimeDiscretization *other) const;
     bool areStrictlyCompatibleForMul(const MEDCouplingTimeDiscretization *other) const;
@@ -230,6 +235,7 @@ namespace ParaMEDMEM
     bool areStrictlyCompatible(const MEDCouplingTimeDiscretization *other) const;
     bool areStrictlyCompatibleForMul(const MEDCouplingTimeDiscretization *other) const;
     bool isEqual(const MEDCouplingTimeDiscretization *other, double prec) const;
+    bool isEqualWithoutConsideringStr(const MEDCouplingTimeDiscretization *other, double prec) const;
     std::vector< const DataArrayDouble *> getArraysForTime(double time) const throw(INTERP_KERNEL::Exception);
     void getValueForTime(double time, const std::vector<double>& vals, double *res) const;
     void getValueOnTime(int eltId, double time, double *value) const throw(INTERP_KERNEL::Exception);
@@ -282,6 +288,7 @@ namespace ParaMEDMEM
     DataArrayDouble *getEndArray() const;
     void checkCoherency() const throw(INTERP_KERNEL::Exception);
     bool isEqual(const MEDCouplingTimeDiscretization *other, double prec) const;
+    bool isEqualWithoutConsideringStr(const MEDCouplingTimeDiscretization *other, double prec) const;
     void checkNoTimePresence() const throw(INTERP_KERNEL::Exception);
     void checkTimePresence(double time) const throw(INTERP_KERNEL::Exception);
     void getArrays(std::vector<DataArrayDouble *>& arrays) const;

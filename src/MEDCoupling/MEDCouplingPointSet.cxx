@@ -119,6 +119,16 @@ bool MEDCouplingPointSet::isEqual(const MEDCouplingMesh *other, double prec) con
   return true;
 }
 
+bool MEDCouplingPointSet::isEqualWithoutConsideringStr(const MEDCouplingMesh *other, double prec) const
+{
+  const MEDCouplingPointSet *otherC=dynamic_cast<const MEDCouplingPointSet *>(other);
+  if(!otherC)
+    return false;
+  if(!areCoordsEqualWithoutConsideringStr(*otherC,prec))
+    return false;
+  return true;
+}
+
 bool MEDCouplingPointSet::areCoordsEqual(const MEDCouplingPointSet& other, double prec) const
 {
   if(_coords==0 && other._coords==0)
@@ -128,6 +138,17 @@ bool MEDCouplingPointSet::areCoordsEqual(const MEDCouplingPointSet& other, doubl
   if(_coords==other._coords)
     return true;
   return _coords->isEqual(*other._coords,prec);
+}
+
+bool MEDCouplingPointSet::areCoordsEqualWithoutConsideringStr(const MEDCouplingPointSet& other, double prec) const
+{
+  if(_coords==0 && other._coords==0)
+    return true;
+  if(_coords==0 || other._coords==0)
+    return false;
+  if(_coords==other._coords)
+    return true;
+  return _coords->isEqualWithoutConsideringStr(*other._coords,prec);
 }
 
 /*!
@@ -143,7 +164,7 @@ DataArrayInt *MEDCouplingPointSet::buildPermArrayForMergeNode(int limitNodeId, d
   DataArrayInt *comm,*commI;
   findCommonNodes(limitNodeId,precision,comm,commI);
   int oldNbOfNodes=getNumberOfNodes();
-  DataArrayInt *ret=buildNewNumberingFromCommNodesFrmt(comm,commI,newNbOfNodes);
+  DataArrayInt *ret=buildNewNumberingFromCommonNodesFormat(comm,commI,newNbOfNodes);
   areNodesMerged=(oldNbOfNodes!=newNbOfNodes);
   comm->decrRef();
   commI->decrRef();
@@ -201,8 +222,8 @@ void MEDCouplingPointSet::findCommonNodes(int limitNodeId, double prec, DataArra
  * @param commI in param in the same format than one returned by findCommonNodes method.
  * @return the old to new correspondance array.
  */
-DataArrayInt *MEDCouplingPointSet::buildNewNumberingFromCommNodesFrmt(const DataArrayInt *comm, const DataArrayInt *commIndex,
-                                                                      int& newNbOfNodes) const
+DataArrayInt *MEDCouplingPointSet::buildNewNumberingFromCommonNodesFormat(const DataArrayInt *comm, const DataArrayInt *commIndex,
+                                                                          int& newNbOfNodes) const
 {
   DataArrayInt *ret=DataArrayInt::New();
   int nbNodesOld=getNumberOfNodes();
@@ -415,7 +436,7 @@ void MEDCouplingPointSet::tryToShareSameCoords(const MEDCouplingPointSet& other,
     throw INTERP_KERNEL::Exception("Current instance has no coords whereas other has !");
   if(!other._coords)
     throw INTERP_KERNEL::Exception("Other instance has no coords whereas current has !");
-  if(!_coords->isEqual(*other._coords,epsilon))
+  if(!_coords->isEqualWithoutConsideringStr(*other._coords,epsilon))
     throw INTERP_KERNEL::Exception("Coords are not the same !");
   setCoords(other._coords);
 }
@@ -672,7 +693,7 @@ MEDCouplingMesh *MEDCouplingPointSet::buildPart(const int *start, const int *end
 /*!
  * This method implements pure virtual method MEDCouplingMesh::buildPartAndReduceNodes.
  * This method build a part of 'this' by simply keeping cells whose ids are in ['start','end') \b and potentially reduces the nodes set
- * behind returned mesh. This cause an overhead but it is more little in memory.
+ * behind returned mesh. This cause an overhead but it is lesser in memory.
  * This method returns an array too. This array allows to the caller to know the mapping between nodeids in 'this' and nodeids in 
  * returned mesh. This is quite usefull for MEDCouplingFieldDouble on nodes for example...
  * The returned mesh has to be managed by the caller.

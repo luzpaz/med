@@ -23,6 +23,7 @@
 
 #include <cmath>
 #include <iterator>
+#include <functional>
 
 using namespace ParaMEDMEM;
 
@@ -137,6 +138,15 @@ bool MEDCouplingTimeDiscretization::isEqual(const MEDCouplingTimeDiscretization 
   if(_array==other->_array)
     return true;
   return _array->isEqual(*other->_array,prec);
+}
+
+bool MEDCouplingTimeDiscretization::isEqualWithoutConsideringStr(const MEDCouplingTimeDiscretization *other, double prec) const
+{
+  if(!areStrictlyCompatible(other))
+    return false;
+  if(_array==other->_array)
+    return true;
+  return _array->isEqualWithoutConsideringStr(*other->_array,prec);
 }
 
 MEDCouplingTimeDiscretization *MEDCouplingTimeDiscretization::buildNewTimeReprFromThis(const MEDCouplingTimeDiscretization *other,
@@ -483,6 +493,33 @@ void MEDCouplingTimeDiscretization::sortPerTuple(bool asc) throw(INTERP_KERNEL::
     }
 }
 
+void MEDCouplingTimeDiscretization::setUniformValue(int nbOfTuple, double value)
+{
+  std::vector<DataArrayDouble *> arrays;
+  getArrays(arrays);
+  std::vector< MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> > arrays2(arrays.size());
+  for(int j=0;j<(int)arrays.size();j++)
+    {
+      if(arrays[j])
+        {
+          arrays[j]->incrRef();
+          arrays[j]->fillWithValue(value);
+          arrays2[j]=arrays[j];
+        }
+      else
+        {
+          DataArrayDouble *tmp=DataArrayDouble::New();
+          tmp->alloc(nbOfTuple,1);
+          tmp->fillWithValue(value);
+          arrays2[j]=tmp;
+        }
+    }
+  std::vector<DataArrayDouble *> arrays3(arrays.size());
+  for(int j=0;j<(int)arrays.size();j++)
+    arrays3[j]=arrays2[j];
+  setArrays(arrays3,0);
+}
+
 void MEDCouplingTimeDiscretization::applyLin(double a, double b, int compoId)
 {
   std::vector<DataArrayDouble *> arrays;
@@ -570,6 +607,32 @@ void MEDCouplingTimeDiscretization::applyFuncFast64(const char *func)
     }
 }
 
+void MEDCouplingTimeDiscretization::fillFromAnalytic(const DataArrayDouble *loc, int nbOfComp, FunctionToEvaluate func) throw(INTERP_KERNEL::Exception)
+{
+  std::vector<DataArrayDouble *> arrays;
+  getArrays(arrays);
+  std::vector< MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> > arrays2(arrays.size());
+  for(int j=0;j<(int)arrays.size();j++)
+    arrays2[j]=loc->applyFunc(nbOfComp,func);
+  std::vector<DataArrayDouble *> arrays3(arrays.size());
+  for(int j=0;j<(int)arrays.size();j++)
+    arrays3[j]=arrays2[j];
+  setArrays(arrays3,0);
+}
+
+void MEDCouplingTimeDiscretization::fillFromAnalytic(const DataArrayDouble *loc, int nbOfComp, const char *func) throw(INTERP_KERNEL::Exception)
+{
+  std::vector<DataArrayDouble *> arrays;
+  getArrays(arrays);
+  std::vector< MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> > arrays2(arrays.size());
+  for(int j=0;j<(int)arrays.size();j++)
+    arrays2[j]=loc->applyFunc(nbOfComp,func);
+  std::vector<DataArrayDouble *> arrays3(arrays.size());
+  for(int j=0;j<(int)arrays.size();j++)
+    arrays3[j]=arrays2[j];
+  setArrays(arrays3,0);
+}
+
 MEDCouplingNoTimeLabel::MEDCouplingNoTimeLabel()
 {
 }
@@ -615,6 +678,14 @@ bool MEDCouplingNoTimeLabel::isEqual(const MEDCouplingTimeDiscretization *other,
   if(!otherC)
     return false;
   return MEDCouplingTimeDiscretization::isEqual(other,prec);
+}
+
+bool MEDCouplingNoTimeLabel::isEqualWithoutConsideringStr(const MEDCouplingTimeDiscretization *other, double prec) const
+{
+  const MEDCouplingNoTimeLabel *otherC=dynamic_cast<const MEDCouplingNoTimeLabel *>(other);
+  if(!otherC)
+    return false;
+  return MEDCouplingTimeDiscretization::isEqualWithoutConsideringStr(other,prec);
 }
 
 MEDCouplingTimeDiscretization *MEDCouplingNoTimeLabel::aggregate(const MEDCouplingTimeDiscretization *other) const
@@ -891,6 +962,20 @@ bool MEDCouplingWithTimeStep::isEqual(const MEDCouplingTimeDiscretization *other
   if(std::fabs(_time-otherC->_time)>_time_tolerance)
     return false;
   return MEDCouplingTimeDiscretization::isEqual(other,prec);
+}
+
+bool MEDCouplingWithTimeStep::isEqualWithoutConsideringStr(const MEDCouplingTimeDiscretization *other, double prec) const
+{
+  const MEDCouplingWithTimeStep *otherC=dynamic_cast<const MEDCouplingWithTimeStep *>(other);
+  if(!otherC)
+    return false;
+  if(_iteration!=otherC->_iteration)
+    return false;
+  if(_order!=otherC->_order)
+    return false;
+  if(std::fabs(_time-otherC->_time)>_time_tolerance)
+    return false;
+  return MEDCouplingTimeDiscretization::isEqualWithoutConsideringStr(other,prec);
 }
 
 void MEDCouplingWithTimeStep::copyTinyAttrFrom(const MEDCouplingTimeDiscretization& other)
@@ -1240,6 +1325,26 @@ bool MEDCouplingConstOnTimeInterval::isEqual(const MEDCouplingTimeDiscretization
   return MEDCouplingTimeDiscretization::isEqual(other,prec);
 }
 
+bool MEDCouplingConstOnTimeInterval::isEqualWithoutConsideringStr(const MEDCouplingTimeDiscretization *other, double prec) const
+{
+  const MEDCouplingConstOnTimeInterval *otherC=dynamic_cast<const MEDCouplingConstOnTimeInterval *>(other);
+  if(!otherC)
+    return false;
+  if(_start_iteration!=otherC->_start_iteration)
+    return false;
+  if(_start_order!=otherC->_start_order)
+    return false;
+  if(std::fabs(_start_time-otherC->_start_time)>_time_tolerance)
+    return false;
+  if(_end_iteration!=otherC->_end_iteration)
+    return false;
+  if(_end_order!=otherC->_end_order)
+    return false;
+  if(std::fabs(_end_time-otherC->_end_time)>_time_tolerance)
+    return false;
+  return MEDCouplingTimeDiscretization::isEqualWithoutConsideringStr(other,prec);
+}
+
 void MEDCouplingConstOnTimeInterval::getValueOnTime(int eltId, double time, double *value) const throw(INTERP_KERNEL::Exception)
 {
   if(time>_start_time-_time_tolerance && time<_end_time+_time_tolerance)
@@ -1521,6 +1626,29 @@ bool MEDCouplingTwoTimeSteps::isEqual(const MEDCouplingTimeDiscretization *other
     if(!_end_array->isEqual(*otherC->_end_array,prec))
       return false;
   return MEDCouplingTimeDiscretization::isEqual(other,prec);
+}
+
+bool MEDCouplingTwoTimeSteps::isEqualWithoutConsideringStr(const MEDCouplingTimeDiscretization *other, double prec) const
+{
+  const MEDCouplingTwoTimeSteps *otherC=dynamic_cast<const MEDCouplingTwoTimeSteps *>(other);
+  if(!otherC)
+    return false;
+  if(_start_iteration!=otherC->_start_iteration)
+    return false;
+  if(_end_iteration!=otherC->_end_iteration)
+    return false;
+  if(_start_order!=otherC->_start_order)
+    return false;
+  if(_end_order!=otherC->_end_order)
+    return false;
+  if(std::fabs(_start_time-otherC->_start_time)>_time_tolerance)
+    return false;
+  if(std::fabs(_end_time-otherC->_end_time)>_time_tolerance)
+    return false;
+  if(_end_array!=otherC->_end_array)
+    if(!_end_array->isEqualWithoutConsideringStr(*otherC->_end_array,prec))
+      return false;
+  return MEDCouplingTimeDiscretization::isEqualWithoutConsideringStr(other,prec);
 }
 
 MEDCouplingTwoTimeSteps::MEDCouplingTwoTimeSteps():_start_time(0.),_end_time(0.),_start_iteration(-1),_end_iteration(-1),_start_order(-1),_end_order(-1),_end_array(0)

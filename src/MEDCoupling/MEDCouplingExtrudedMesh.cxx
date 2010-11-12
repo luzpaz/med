@@ -168,10 +168,32 @@ bool MEDCouplingExtrudedMesh::isEqual(const MEDCouplingMesh *other, double prec)
   return true;
 }
 
+bool MEDCouplingExtrudedMesh::isEqualWithoutConsideringStr(const MEDCouplingMesh *other, double prec) const
+{
+  const MEDCouplingExtrudedMesh *otherC=dynamic_cast<const MEDCouplingExtrudedMesh *>(other);
+  if(!otherC)
+    return false;
+  if(!_mesh2D->isEqualWithoutConsideringStr(otherC->_mesh2D,prec))
+    return false;
+  if(!_mesh1D->isEqualWithoutConsideringStr(otherC->_mesh1D,prec))
+    return false;
+  if(!_mesh3D_ids->isEqualWithoutConsideringStr(*otherC->_mesh3D_ids))
+    return false;
+  if(_cell_2D_id!=otherC->_cell_2D_id)
+    return false;
+  return true;
+}
+
 void MEDCouplingExtrudedMesh::checkDeepEquivalWith(const MEDCouplingMesh *other, int cellCompPol, double prec,
                                                    DataArrayInt *&cellCor, DataArrayInt *&nodeCor) const throw(INTERP_KERNEL::Exception)
 {
   throw INTERP_KERNEL::Exception("MEDCouplingExtrudedMesh::checkDeepEquivalWith : not implemented yet !");
+}
+
+void MEDCouplingExtrudedMesh::checkDeepEquivalOnSameNodesWith(const MEDCouplingMesh *other, int cellCompPol, double prec,
+                                                              DataArrayInt *&cellCor) const throw(INTERP_KERNEL::Exception)
+{
+  throw INTERP_KERNEL::Exception("MEDCouplingExtrudedMesh::checkDeepEquivalOnSameNodesWith : not implemented yet !");
 }
 
 INTERP_KERNEL::NormalizedCellType MEDCouplingExtrudedMesh::getTypeOfCell(int cellId) const
@@ -538,6 +560,12 @@ void MEDCouplingExtrudedMesh::translate(const double *vector)
 {
   _mesh2D->translate(vector);
   _mesh1D->translate(vector);
+}
+
+void MEDCouplingExtrudedMesh::scale(const double *point, double factor)
+{
+  _mesh2D->scale(point,factor);
+  _mesh1D->scale(point,factor);
 }
 
 MEDCouplingMesh *MEDCouplingExtrudedMesh::buildPart(const int *start, const int *end) const

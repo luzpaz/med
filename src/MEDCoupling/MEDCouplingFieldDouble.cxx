@@ -18,7 +18,7 @@
 //
 
 #include "MEDCouplingFieldDouble.hxx"
-#include "MEDCouplingPointSet.hxx"
+#include "MEDCouplingUMesh.hxx"
 #include "MEDCouplingTimeDiscretization.hxx"
 #include "MEDCouplingFieldDiscretization.hxx"
 #include "MEDCouplingAutoRefCountObjectPtr.hxx"
@@ -84,7 +84,14 @@ std::string MEDCouplingFieldDouble::simpleRepr() const
   ret << "FieldDouble time discretization is : " << _time_discr->getStringRepr() << "\n";
   ret << "FieldDouble nature of field is : " << MEDCouplingNatureOfField::getRepr(_nature) << "\n";
   if(getArray())
-    ret << "FieldDouble default array has " << getArray()->getNumberOfComponents() << " components and " << getArray()->getNumberOfTuples() << " tuples.\n";
+    {
+      int nbOfCompo=getArray()->getNumberOfComponents();
+      ret << "FieldDouble default array has " << nbOfCompo << " components and " << getArray()->getNumberOfTuples() << " tuples.\n";
+      ret << "FieldDouble default array has following info on components : ";
+      for(int i=0;i<nbOfCompo;i++)
+        ret << "\"" << getArray()->getInfoOnComponent(i) << "\" ";
+      ret << "\n";
+    }
   if(_mesh)
     ret << "Mesh support information :\n__________________________\n" << _mesh->simpleRepr();
   else
@@ -130,6 +137,20 @@ bool MEDCouplingFieldDouble::isEqual(const MEDCouplingField *other, double meshP
   if(!MEDCouplingField::isEqual(other,meshPrec,valsPrec))
     return false;
   if(!_time_discr->isEqual(otherC->_time_discr,valsPrec))
+    return false;
+  return true;
+}
+
+bool MEDCouplingFieldDouble::isEqualWithoutConsideringStr(const MEDCouplingField *other, double meshPrec, double valsPrec) const
+{
+  const MEDCouplingFieldDouble *otherC=dynamic_cast<const MEDCouplingFieldDouble *>(other);
+  if(!otherC)
+    return false;
+  if(_nature!=otherC->_nature)
+    return false;
+  if(!MEDCouplingField::isEqualWithoutConsideringStr(other,meshPrec,valsPrec))
+    return false;
+  if(!_time_discr->isEqualWithoutConsideringStr(otherC->_time_discr,valsPrec))
     return false;
   return true;
 }
@@ -247,7 +268,8 @@ void MEDCouplingFieldDouble::renumberNodesWithoutMesh(const int *old2NewBg) thro
   std::vector<DataArrayDouble *> arrays;
   _time_discr->getArrays(arrays);
   for(std::vector<DataArrayDouble *>::const_iterator iter=arrays.begin();iter!=arrays.end();iter++)
-    _type->renumberValuesOnNodes(old2NewBg,*iter);
+    if(*iter)
+      _type->renumberValuesOnNodes(old2NewBg,*iter);
 }
 
 /*!
@@ -393,6 +415,38 @@ double MEDCouplingFieldDouble::getMaxValue() const throw(INTERP_KERNEL::Exceptio
 }
 
 /*!
+ * This method is an extension of ParaMEDMEM::MEDCouplingFieldDouble::getMaxValue method because the returned 
+ * value is the same but this method also returns to you a tupleIds object which the caller have the responsibility
+ * to deal with. The main difference is that the returned tupleIds is those corresponding the first set array.
+ * If you have more than one array set (in LINEAR_TIME instance for example) only the first not null array will be used
+ * to compute tupleIds.
+ */
+double MEDCouplingFieldDouble::getMaxValue2(DataArrayInt*& tupleIds) const throw(INTERP_KERNEL::Exception)
+{
+  std::vector<DataArrayDouble *> arrays;
+  _time_discr->getArrays(arrays);
+  double ret=-std::numeric_limits<double>::max();
+  bool isExistingArr=false;
+  tupleIds=0;
+  for(std::vector<DataArrayDouble *>::const_iterator iter=arrays.begin();iter!=arrays.end();iter++)
+    {
+      if(*iter)
+        {
+          isExistingArr=true;
+          DataArrayInt *tmp;
+          ret=std::max(ret,(*iter)->getMaxValue2(tmp));
+          if(!tupleIds)
+            tupleIds=tmp;
+          else
+            tmp->decrRef();
+        }
+    }
+  if(!isExistingArr)
+    throw INTERP_KERNEL::Exception("getMaxValue2 : No arrays defined !");
+  return ret;
+}
+
+/*!
  * This method returns the min value in 'this'. 'This' is expected to be a field with exactly \b one component. If not an exception will be thrown.
  * To getMinValue on vector field applyFunc is needed before. This method looks only on all arrays stored in 'this->_time_discr'.
  * If no arrays exists, an exception will be thrown.
@@ -418,6 +472,38 @@ double MEDCouplingFieldDouble::getMinValue() const throw(INTERP_KERNEL::Exceptio
 }
 
 /*!
+ * This method is an extension of ParaMEDMEM::MEDCouplingFieldDouble::getMinValue method because the returned 
+ * value is the same but this method also returns to you a tupleIds object which the caller have the responsibility
+ * to deal with. The main difference is that the returned tupleIds is those corresponding the first set array.
+ * If you have more than one array set (in LINEAR_TIME instance for example) only the first not null array will be used
+ * to compute tupleIds.
+ */
+double MEDCouplingFieldDouble::getMinValue2(DataArrayInt*& tupleIds) const throw(INTERP_KERNEL::Exception)
+{
+  std::vector<DataArrayDouble *> arrays;
+  _time_discr->getArrays(arrays);
+  double ret=-std::numeric_limits<double>::max();
+  bool isExistingArr=false;
+  tupleIds=0;
+  for(std::vector<DataArrayDouble *>::const_iterator iter=arrays.begin();iter!=arrays.end();iter++)
+    {
+      if(*iter)
+        {
+          isExistingArr=true;
+          DataArrayInt *tmp;
+          ret=std::max(ret,(*iter)->getMinValue2(tmp));
+          if(!tupleIds)
+            tupleIds=tmp;
+          else
+            tmp->decrRef();
+        }
+    }
+  if(!isExistingArr)
+    throw INTERP_KERNEL::Exception("getMinValue2 : No arrays defined !");
+  return ret;
+}
+
+/*!
  * This method returns the average value in 'this'. 'This' is expected to be a field with exactly \b one component. If not an exception will be thrown.
  * To getAverageValue on vector field applyFunc is needed before. This method looks only \b default array \b and \b only \b default.
  * If default array does not exist, an exception will be thrown.
@@ -430,7 +516,7 @@ double MEDCouplingFieldDouble::getAverageValue() const throw(INTERP_KERNEL::Exce
 }
 
 /*!
- * This method returns the average value in 'this' weighted by ParaMEDMEM::MEDCouplingField::buildWeightingField.
+ * This method returns the average value in 'this' weighted by ParaMEDMEM::MEDCouplingField::buildMeasureField.
  * 'This' is expected to be a field with exactly \b one component. If not an exception will be thrown.
  * To getAverageValue on vector field applyFunc is needed before. This method looks only \b default array \b and \b only \b default.
  * If default array does not exist, an exception will be thrown.
@@ -439,7 +525,7 @@ double MEDCouplingFieldDouble::getWeightedAverageValue() const throw(INTERP_KERN
 {
   if(getArray()==0)
     throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::getWeightedAverageValue : no default array defined !");
-  MEDCouplingFieldDouble *w=buildWeightingField(true);
+  MEDCouplingFieldDouble *w=buildMeasureField(true);
   double deno=w->getArray()->accumulate(0);
   w->getArray()->multiplyEqual(getArray());
   double res=w->getArray()->accumulate(0);
@@ -620,6 +706,46 @@ void MEDCouplingFieldDouble::applyLin(double a, double b, int compoId)
 }
 
 /*!
+ * This method sets 'this' to a uniform scalar field with one component.
+ * All tuples will have the same value 'value'.
+ * An exception is thrown if no underlying mesh is defined.
+ */
+MEDCouplingFieldDouble &MEDCouplingFieldDouble::operator=(double value) throw(INTERP_KERNEL::Exception)
+{
+  if(!_mesh)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::operator= : no mesh defined !");
+  int nbOfTuple=_type->getNumberOfTuples(_mesh);
+  _time_discr->setUniformValue(nbOfTuple,value);
+  return *this;
+}
+
+/*!
+ * This method is very similar to this one MEDCouplingMesh::fillFromAnalytic.
+ * The main difference is that the field as been started to be constructed here.
+ * An exception is throw if no underlying mesh is set before the call of this method.
+ */
+void MEDCouplingFieldDouble::fillFromAnalytic(int nbOfComp, FunctionToEvaluate func) throw(INTERP_KERNEL::Exception)
+{
+  if(!_mesh)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::fillFromAnalytic : no mesh defined !");
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> loc=_type->getLocalizationOfDiscValues(_mesh);
+  _time_discr->fillFromAnalytic(loc,nbOfComp,func);
+}
+
+/*!
+ * This method is very similar to this one MEDCouplingMesh::fillFromAnalytic.
+ * The main difference is that the field as been started to be constructed here.
+ * An exception is throw if no underlying mesh is set before the call of this method.
+ */
+void MEDCouplingFieldDouble::fillFromAnalytic(int nbOfComp, const char *func) throw(INTERP_KERNEL::Exception)
+{
+  if(!_mesh)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::fillFromAnalytic : no mesh defined !");
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> loc=_type->getLocalizationOfDiscValues(_mesh);
+  _time_discr->fillFromAnalytic(loc,nbOfComp,func);
+}
+
+/*!
  * Applyies the function specified by pointer 'func' on each tuples on all arrays contained in _time_discr.
  * If '*func' returns false during one evaluation an exception will be thrown.
  */
@@ -651,13 +777,18 @@ void MEDCouplingFieldDouble::applyFunc(const char *func)
 /*!
  * Applyies the function specified by the string repr 'func' on each tuples on all arrays contained in _time_discr.
  * The field will contain exactly the same number of components after the call.
- * Use is not warranted and can cause SIGSEGV !
+ * Use is not warranted for the moment !
  */
 void MEDCouplingFieldDouble::applyFuncFast32(const char *func) throw(INTERP_KERNEL::Exception)
 {
   _time_discr->applyFuncFast32(func);
 }
 
+/*!
+ * Applyies the function specified by the string repr 'func' on each tuples on all arrays contained in _time_discr.
+ * The field will contain exactly the same number of components after the call.
+ * Use is not warranted for the moment !
+ */
 void MEDCouplingFieldDouble::applyFuncFast64(const char *func) throw(INTERP_KERNEL::Exception)
 {
   _time_discr->applyFuncFast64(func);
@@ -863,7 +994,7 @@ bool MEDCouplingFieldDouble::mergeNodes(double eps) throw(INTERP_KERNEL::Excepti
 {
   const MEDCouplingPointSet *meshC=dynamic_cast<const MEDCouplingPointSet *>(_mesh);
   if(!meshC)
-    throw INTERP_KERNEL::Exception("Invalid mesh to apply mergeNodes on it !");
+    throw INTERP_KERNEL::Exception("Invalid support mesh to apply mergeNodes on it : must be a MEDCouplingPointSet one !");
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingPointSet> meshC2((MEDCouplingPointSet *)meshC->deepCpy());
   bool ret;
   int ret2;
@@ -873,9 +1004,60 @@ bool MEDCouplingFieldDouble::mergeNodes(double eps) throw(INTERP_KERNEL::Excepti
   std::vector<DataArrayDouble *> arrays;
   _time_discr->getArrays(arrays);
   for(std::vector<DataArrayDouble *>::const_iterator iter=arrays.begin();iter!=arrays.end();iter++)
-    _type->renumberValuesOnNodes(arr->getConstPointer(),*iter);
+    if(*iter)
+      _type->renumberValuesOnNodes(arr->getConstPointer(),*iter);
   setMesh(meshC2);
   return true;
+}
+
+/*!
+ * This method applyies ParaMEDMEM::MEDCouplingPointSet::zipCoords method on 'this->_mesh' that should be set and of type ParaMEDMEM::MEDCouplingPointSet.
+ * If some nodes have disappeared true is returned.
+ */
+bool MEDCouplingFieldDouble::zipCoords() throw(INTERP_KERNEL::Exception)
+{
+  const MEDCouplingPointSet *meshC=dynamic_cast<const MEDCouplingPointSet *>(_mesh);
+  if(!meshC)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::zipCoords : Invalid support mesh to apply zipCoords on it : must be a MEDCouplingPointSet one !");
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingPointSet> meshC2((MEDCouplingPointSet *)meshC->deepCpy());
+  int oldNbOfNodes=meshC2->getNumberOfNodes();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> arr=meshC2->zipCoordsTraducer();
+  if(meshC2->getNumberOfNodes()!=oldNbOfNodes)
+    {
+      std::vector<DataArrayDouble *> arrays;
+      _time_discr->getArrays(arrays);
+      for(std::vector<DataArrayDouble *>::const_iterator iter=arrays.begin();iter!=arrays.end();iter++)
+        if(*iter)
+          _type->renumberValuesOnNodes(arr->getConstPointer(),*iter);
+      setMesh(meshC2);
+      return true;
+    }
+  return false;
+}
+
+/*!
+ * This method applyies ParaMEDMEM::MEDCouplingUMesh::zipConnectivityTraducer on 'this->_mesh' that should be set and of type ParaMEDMEM::MEDCouplingUMesh.
+ * The semantic of 'compType' is given in ParaMEDMEM::MEDCouplingUMesh::zipConnectivityTraducer method.
+ */
+bool MEDCouplingFieldDouble::zipConnectivity(int compType) throw(INTERP_KERNEL::Exception)
+{
+  const MEDCouplingUMesh *meshC=dynamic_cast<const MEDCouplingUMesh *>(_mesh);
+  if(!meshC)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::zipCoords : Invalid support mesh to apply zipCoords on it : must be a MEDCouplingPointSet one !");
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> meshC2((MEDCouplingUMesh *)meshC->deepCpy());
+  int oldNbOfCells=meshC2->getNumberOfCells();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> arr=meshC2->zipConnectivityTraducer(compType);
+  if(meshC2->getNumberOfCells()!=oldNbOfCells)
+    {
+      std::vector<DataArrayDouble *> arrays;
+      _time_discr->getArrays(arrays);
+      for(std::vector<DataArrayDouble *>::const_iterator iter=arrays.begin();iter!=arrays.end();iter++)
+        if(*iter)
+          _type->renumberValuesOnCells(meshC,arr->getConstPointer(),*iter);
+      setMesh(meshC2);
+      return true;
+    }
+  return false;
 }
 
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::doublyContractedProduct() const throw(INTERP_KERNEL::Exception)

@@ -17,32 +17,21 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef __PARAMEDMEM_MEDCOUPLINGNATUREOFFIELD_HXX__
-#define __PARAMEDMEM_MEDCOUPLINGNATUREOFFIELD_HXX__
+#ifndef __INTERPKERNELMESHQUALITY_HXX_
+#define __INTERPKERNELMESHQUALITY_HXX__
 
-#include "MEDCoupling.hxx"
-#include "InterpKernelException.hxx"
+#include "INTERPKERNELDefines.hxx"
 
-namespace ParaMEDMEM
+namespace INTERP_KERNEL
 {
-  typedef enum
-    {
-      NoNature               = 17,
-      ConservativeVolumic    = 26,
-      Integral               = 32,
-      IntegralGlobConstraint = 35,
-      RevIntegral            = 37
-    } NatureOfField;
-
-  class MEDCouplingNatureOfField
-  {
-  public:
-    MEDCOUPLING_EXPORT static const char *getRepr(NatureOfField nat) throw(INTERP_KERNEL::Exception);
-  private:
-    static const int NB_OF_POSSIBILITIES=5;
-    static const char *REPR_OF_NATUREOFFIELD[NB_OF_POSSIBILITIES];
-    static const int POS_OF_NATUREOFFIELD[NB_OF_POSSIBILITIES];
-  };
+  INTERPKERNEL_EXPORT double quadSkew(const double *coo);
+  INTERPKERNEL_EXPORT double quadEdgeRatio(const double *coo);
+  INTERPKERNEL_EXPORT double quadAspectRatio(const double *coo);
+  INTERPKERNEL_EXPORT double quadWarp(const double *coo);
+  INTERPKERNEL_EXPORT double triEdgeRatio(const double *coo);
+  INTERPKERNEL_EXPORT double triAspectRatio(const double *coo);
+  INTERPKERNEL_EXPORT double tetraEdgeRatio(const double *coo);
+  INTERPKERNEL_EXPORT double tetraAspectRatio(const double *coo);
 }
 
 #endif

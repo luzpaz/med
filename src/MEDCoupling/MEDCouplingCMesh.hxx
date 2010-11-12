@@ -26,6 +26,7 @@
 namespace ParaMEDMEM
 {
   class DataArrayDouble;
+  class MEDCouplingUMesh;
 
   class MEDCOUPLING_EXPORT MEDCouplingCMesh : public MEDCouplingMesh
   {
@@ -37,8 +38,11 @@ namespace ParaMEDMEM
     MEDCouplingMeshType getType() const { return CARTESIAN; }
     void copyTinyStringsFrom(const MEDCouplingMesh *other) throw(INTERP_KERNEL::Exception);
     bool isEqual(const MEDCouplingMesh *other, double prec) const;
+    bool isEqualWithoutConsideringStr(const MEDCouplingMesh *other, double prec) const;
     void checkDeepEquivalWith(const MEDCouplingMesh *other, int cellCompPol, double prec,
                               DataArrayInt *&cellCor, DataArrayInt *&nodeCor) const throw(INTERP_KERNEL::Exception);
+    void checkDeepEquivalOnSameNodesWith(const MEDCouplingMesh *other, int cellCompPol, double prec,
+                                         DataArrayInt *&cellCor) const throw(INTERP_KERNEL::Exception);
     void checkCoherency() const throw(INTERP_KERNEL::Exception);
     int getNumberOfCells() const;
     int getNumberOfNodes() const;
@@ -59,6 +63,7 @@ namespace ParaMEDMEM
                    DataArrayDouble *coordsY=0,
                    DataArrayDouble *coordsZ=0);
     // tools
+    MEDCouplingUMesh *buildUnstructured() const;
     MEDCouplingMesh *buildPart(const int *start, const int *end) const;
     MEDCouplingMesh *buildPartAndReduceNodes(const int *start, const int *end, DataArrayInt*& arr) const;
     void getBoundingBox(double *bbox) const;
@@ -68,10 +73,14 @@ namespace ParaMEDMEM
     int getCellContainingPoint(const double *pos, double eps) const;
     void rotate(const double *center, const double *vector, double angle);
     void translate(const double *vector);
+    void scale(const double *point, double factor);
     MEDCouplingMesh *mergeMyselfWith(const MEDCouplingMesh *other) const;
     DataArrayDouble *getCoordinatesAndOwner() const;
     DataArrayDouble *getBarycenterAndOwner() const;
     void renumberCells(const int *old2NewBg, bool check) throw(INTERP_KERNEL::Exception);
+    void fill1DUnstructuredMesh(MEDCouplingUMesh *m) const;
+    void fill2DUnstructuredMesh(MEDCouplingUMesh *m) const;
+    void fill3DUnstructuredMesh(MEDCouplingUMesh *m) const;
     //some useful methods
     void getSplitCellValues(int *res) const;
     void getSplitNodeValues(int *res) const;

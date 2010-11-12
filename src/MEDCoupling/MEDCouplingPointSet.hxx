@@ -50,12 +50,14 @@ namespace ParaMEDMEM
     DataArrayDouble *getCoordinatesAndOwner() const;
     void copyTinyStringsFrom(const MEDCouplingMesh *other) throw(INTERP_KERNEL::Exception);
     bool isEqual(const MEDCouplingMesh *other, double prec) const;
+    bool isEqualWithoutConsideringStr(const MEDCouplingMesh *other, double prec) const;
     bool areCoordsEqual(const MEDCouplingPointSet& other, double prec) const;
+    bool areCoordsEqualWithoutConsideringStr(const MEDCouplingPointSet& other, double prec) const;
     virtual DataArrayInt *mergeNodes(double precision, bool& areNodesMerged, int& newNbOfNodes) = 0;
     DataArrayInt *buildPermArrayForMergeNode(int limitNodeId, double precision, bool& areNodesMerged, int& newNbOfNodes) const;
     void findCommonNodes(int limitNodeId, double prec, DataArrayInt *&comm, DataArrayInt *&commIndex) const;
-    DataArrayInt *buildNewNumberingFromCommNodesFrmt(const DataArrayInt *comm, const DataArrayInt *commIndex,
-                                                     int& newNbOfNodes) const;
+    DataArrayInt *buildNewNumberingFromCommonNodesFormat(const DataArrayInt *comm, const DataArrayInt *commIndex,
+                                                         int& newNbOfNodes) const;
     void getBoundingBox(double *bbox) const;
     void zipCoords();
     double getCaracteristicDimension() const;

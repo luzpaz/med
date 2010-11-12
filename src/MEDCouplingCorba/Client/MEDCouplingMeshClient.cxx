@@ -100,5 +100,4 @@ void MEDCouplingMeshClient::fillMeshFromCorbaData(MEDCouplingMesh *meshCpp, SALO
   a2->decrRef();
   //
   meshPtr->Destroy();
-  CORBA::release(meshPtr);
 }

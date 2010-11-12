@@ -38,8 +38,11 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT void updateTime();
     MEDCOUPLING_EXPORT MEDCouplingMeshType getType() const { return UNSTRUCTURED; }
     MEDCOUPLING_EXPORT bool isEqual(const MEDCouplingMesh *other, double prec) const;
+    MEDCOUPLING_EXPORT bool isEqualWithoutConsideringStr(const MEDCouplingMesh *other, double prec) const;
     MEDCOUPLING_EXPORT void checkDeepEquivalWith(const MEDCouplingMesh *other, int cellCompPol, double prec,
                                                  DataArrayInt *&cellCor, DataArrayInt *&nodeCor) const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void checkDeepEquivalOnSameNodesWith(const MEDCouplingMesh *other, int cellCompPol, double prec,
+                                                            DataArrayInt *&cellCor) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void checkFastEquivalWith(const MEDCouplingMesh *other, double prec) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void checkCoherency() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void setMeshDimension(int meshDim);
@@ -53,6 +56,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT INTERP_KERNEL::NormalizedCellType getTypeOfCell(int cellId) const;
     MEDCOUPLING_EXPORT int getNumberOfCellsWithType(INTERP_KERNEL::NormalizedCellType type) const;
     MEDCOUPLING_EXPORT void getNodeIdsOfCell(int cellId, std::vector<int>& conn) const;
+    MEDCOUPLING_EXPORT DataArrayInt *getCellIdsFullyIncludedInNodeIds(const int *partBg, const int *partEnd) const;
     MEDCOUPLING_EXPORT void getCoordinatesOfNode(int nodeId, std::vector<double>& coo) const;
     MEDCOUPLING_EXPORT std::string simpleRepr() const;
     MEDCOUPLING_EXPORT std::string advancedRepr() const;
@@ -81,9 +85,9 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT MEDCouplingUMesh *buildDescendingConnectivity(DataArrayInt *desc, DataArrayInt *descIndx, DataArrayInt *revDesc, DataArrayInt *revDescIndx) const;
     MEDCOUPLING_EXPORT DataArrayInt *mergeNodes(double precision, bool& areNodesMerged, int& newNbOfNodes);
     MEDCOUPLING_EXPORT void tryToShareSameCoordsPermute(const MEDCouplingPointSet& other, double epsilon) throw(INTERP_KERNEL::Exception);
-    MEDCOUPLING_EXPORT MEDCouplingPointSet *buildPartOfMySelf(const int *start, const int *end, bool keepCoords) const;
-    MEDCOUPLING_EXPORT MEDCouplingPointSet *buildPartOfMySelfNode(const int *start, const int *end, bool fullyIn) const;
-    MEDCOUPLING_EXPORT MEDCouplingPointSet *buildFacePartOfMySelfNode(const int *start, const int *end, bool fullyIn) const;
+    MEDCOUPLING_EXPORT MEDCouplingPointSet *buildPartOfMySelf(const int *begin, const int *end, bool keepCoords) const;
+    MEDCOUPLING_EXPORT MEDCouplingPointSet *buildPartOfMySelfNode(const int *begin, const int *end, bool fullyIn) const;
+    MEDCOUPLING_EXPORT MEDCouplingPointSet *buildFacePartOfMySelfNode(const int *begin, const int *end, bool fullyIn) const;
     MEDCOUPLING_EXPORT void findBoundaryNodes(std::vector<int>& nodes) const;
     MEDCOUPLING_EXPORT MEDCouplingPointSet *buildBoundaryMesh(bool keepCoords) const;
     MEDCOUPLING_EXPORT void renumberNodes(const int *newNodeNumbers, int newNbOfNodes);
@@ -93,7 +97,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT MEDCouplingFieldDouble *getMeasureField(bool isAbs) const;
     MEDCOUPLING_EXPORT MEDCouplingFieldDouble *getMeasureFieldOnNode(bool isAbs) const;
     MEDCOUPLING_EXPORT MEDCouplingFieldDouble *buildOrthogonalField() const;
-    MEDCOUPLING_EXPORT MEDCouplingFieldDouble *buildLinearField() const;
+    MEDCOUPLING_EXPORT MEDCouplingFieldDouble *buildDirectionVectorField() const;
     MEDCOUPLING_EXPORT void project1D(const double *pt, const double *v, double eps, double *res) const;
     MEDCOUPLING_EXPORT int getCellContainingPoint(const double *pos, double eps) const;
     MEDCOUPLING_EXPORT void getCellsContainingPoint(const double *pos, double eps, std::vector<int>& elts) const;
@@ -108,11 +112,16 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT void orientCorrectly2DCells(const double *vec, bool polyOnly) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void arePolyhedronsNotCorrectlyOriented(std::vector<int>& cells) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void orientCorrectlyPolyhedrons() throw(INTERP_KERNEL::Exception);
-    MEDCOUPLING_EXPORT void getFastMiddlePlaneOfThis(double *vec, double *pos) const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void getFastAveragePlaneOfThis(double *vec, double *pos) const throw(INTERP_KERNEL::Exception);
+    //Mesh quality
+    MEDCOUPLING_EXPORT MEDCouplingFieldDouble *getEdgeRatioField() const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT MEDCouplingFieldDouble *getAspectRatioField() const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT MEDCouplingFieldDouble *getWarpField() const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT MEDCouplingFieldDouble *getSkewField() const throw(INTERP_KERNEL::Exception);
     //utilities for MED File RW
     MEDCOUPLING_EXPORT bool checkConsecutiveCellTypes() const;
     MEDCOUPLING_EXPORT bool checkConsecutiveCellTypesAndOrder(const INTERP_KERNEL::NormalizedCellType *orderBg, const INTERP_KERNEL::NormalizedCellType *orderEnd) const;
-    MEDCOUPLING_EXPORT DataArrayInt *getRenumArrForConsctvCellTypesSpe(const INTERP_KERNEL::NormalizedCellType *orderBg, const INTERP_KERNEL::NormalizedCellType *orderEnd) const;
+    MEDCOUPLING_EXPORT DataArrayInt *getRenumArrForConsecutiveCellTypesSpec(const INTERP_KERNEL::NormalizedCellType *orderBg, const INTERP_KERNEL::NormalizedCellType *orderEnd) const;
     MEDCOUPLING_EXPORT DataArrayInt *rearrange2ConsecutiveCellTypes();
     MEDCOUPLING_EXPORT std::vector<MEDCouplingUMesh *> splitByType() const;
     MEDCOUPLING_EXPORT DataArrayInt *convertCellArrayPerGeoType(const DataArrayInt *da) const throw(INTERP_KERNEL::Exception);
@@ -134,15 +143,17 @@ namespace ParaMEDMEM
     void reprConnectivityOfThisLL(std::ostringstream& stream) const;
     //tools
     void renumberNodesInConn(const int *newNodeNumbers);
+    void fillCellIdsToKeepFromNodeIds(const int *begin, const int *end, bool fullyIn, std::vector<int>& cellIdsKept) const;
     MEDCouplingUMesh *buildExtrudedMeshFromThisLowLev(int nbOfNodesOf1Lev, bool isQuad) const;
     DataArrayDouble *fillExtCoordsUsingTranslation(const MEDCouplingUMesh *mesh1D, bool isQuad) const;
     template<int SPACEDIM>
     void findCommonCellsBase(int compType, std::vector<int>& res, std::vector<int>& resI) const;
     bool areCellsEqualInPool(const std::vector<int>& candidates, int compType, std::vector<int>& result) const;
-    MEDCouplingUMesh *buildPartOfMySelfKeepCoords(const int *start, const int *end) const;
+    MEDCouplingUMesh *buildPartOfMySelfKeepCoords(const int *begin, const int *end) const;
     template<int SPACEDIM>
     void getCellsContainingPointsAlg(const double *coords, const double *pos, int nbOfPoints,
                                      double eps, std::vector<int>& elts, std::vector<int>& eltsIndex) const;
+    static void fillInCompact3DMode(int spaceDim, int nbOfNodesInCell, const int *conn, const double *coo, double *zipFrmt) throw(INTERP_KERNEL::Exception);
     static void appendExtrudedCell(const int *connBg, const int *connEnd, int nbOfNodesPerLev, bool isQuad, std::vector<int>& ret);
   private:
     //! this iterator stores current position in _nodal_connec array.

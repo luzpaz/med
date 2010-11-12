@@ -44,6 +44,7 @@ namespace ParaMEDMEM
     virtual bool areCompatibleForMerge(const MEDCouplingField *other) const;
     virtual bool areStrictlyCompatible(const MEDCouplingField *other) const;
     virtual bool isEqual(const MEDCouplingField *other, double meshPrec, double valsPrec) const;
+    virtual bool isEqualWithoutConsideringStr(const MEDCouplingField *other, double meshPrec, double valsPrec) const;
     void setMesh(const ParaMEDMEM::MEDCouplingMesh *mesh);
     const ParaMEDMEM::MEDCouplingMesh *getMesh() const { return _mesh; }
     void setName(const char *name) { _name=name; }
@@ -51,7 +52,7 @@ namespace ParaMEDMEM
     void setDescription(const char *desc) { _desc=desc; }
     const char *getName() const { return _name.c_str(); }
     TypeOfField getTypeOfField() const;
-    MEDCouplingFieldDouble *buildWeightingField(bool isAbs) const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *buildMeasureField(bool isAbs) const throw(INTERP_KERNEL::Exception);
     MEDCouplingMesh *buildSubMeshData(const int *start, const int *end, DataArrayInt *&di) const;
     MEDCouplingFieldDiscretization *getDiscretization() const { return _type; }
     // Gauss point specific methods

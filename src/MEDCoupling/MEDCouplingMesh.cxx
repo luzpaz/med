@@ -21,9 +21,9 @@
 #include "MEDCouplingMemArray.hxx"
 #include "MEDCouplingFieldDouble.hxx"
 #include "MEDCouplingFieldDiscretization.hxx"
+#include "MEDCouplingAutoRefCountObjectPtr.hxx"
 
-#include "InterpKernelExprParser.hxx"
-
+#include <set>
 #include <sstream>
 #include <iterator>
 
@@ -55,7 +55,9 @@ bool MEDCouplingMesh::isEqual(const MEDCouplingMesh *other, double prec) const
  * Possible values for levOfCheck :
  *   - 0 for strict equality. This is the strongest level. 'cellCor' and 'nodeCor' params are never informed.
  *   - 10,11,12 for less strict equality. Two meshes are compared geometrically. In case of success 'cellCor' and 'nodeCor' are informed. Warning ! These equivalences are CPU/Mem costly. The 3 values correspond respectively to policy used for cell comparison (see MEDCouplingUMesh::zipConnectivityTraducer to have more details)
+ *   - 20,21,22, for less strict equality. Two meshes are compared geometrically. The difference with the previous version is that nodes(coordinates) are expected to be the same between this and other. In case of success 'cellCor' is informed. Warning ! These equivalences are CPU/Mem costly. The 3 values correspond respectively to policy used for cell comparison (see MEDCouplingUMesh::zipConnectivityTraducer to have more details)
  *   - 1 for fast 'equality'. This is a lazy level. Just number of cells and number of nodes are considered here and 3 cells (begin,middle,end)
+ *   - 2 for deep 'equality' as 0 option except that no control is done on all strings in mesh.
  */
 void MEDCouplingMesh::checkGeoEquivalWith(const MEDCouplingMesh *other, int levOfCheck, double prec,
                                           DataArrayInt *&cellCor, DataArrayInt *&nodeCor) const throw(INTERP_KERNEL::Exception)
@@ -79,14 +81,54 @@ void MEDCouplingMesh::checkGeoEquivalWith(const MEDCouplingMesh *other, int levO
         checkDeepEquivalWith(other,levOfCheck-10,prec,cellCor,nodeCor);
         return ;
       }
+    case 20:
+    case 21:
+    case 22:
+      {
+        checkDeepEquivalOnSameNodesWith(other,levOfCheck-20,prec,cellCor);
+        return ;
+      }
     case 1:
       {
         checkFastEquivalWith(other,prec);
         return;
       }
+    case 2:
+      {
+        if(!isEqualWithoutConsideringStr(other,prec))
+          throw INTERP_KERNEL::Exception("checkGeoFitWith : Meshes are not equal without considering strings !");
+        return ;
+      }
     default:
-      throw INTERP_KERNEL::Exception("checkGeoFitWith : Invalid levOfCheck specified ! Value must be in 0,1,10,11 or 12.");
+      throw INTERP_KERNEL::Exception("checkGeoFitWith : Invalid levOfCheck specified ! Value must be in 0,1,2,10,11 or 12.");
     }
+}
+
+/*!
+ * Given a nodeIds range ['partBg','partEnd'), this method returns the set of cell ids in ascendant order whose connectivity of
+ * these cells are fully included in the range. As a consequence the returned set of cell ids does \b not \b always fit the nodes in ['partBg','partEnd')
+ * This method returns the corresponding cells in a newly created array that the caller has the responsability.
+ */
+DataArrayInt *MEDCouplingMesh::getCellIdsFullyIncludedInNodeIds(const int *partBg, const int *partEnd) const
+{
+  std::vector<int> crest;
+  std::set<int> p(partBg,partEnd);
+  int nbOfCells=getNumberOfCells();
+  for(int i=0;i<nbOfCells;i++)
+    {
+      std::vector<int> conn;
+      getNodeIdsOfCell(i,conn);
+      bool cont=true;
+      for(std::vector<int>::const_iterator iter=conn.begin();iter!=conn.end() && cont;iter++)
+        if(p.find(*iter)==p.end())
+          cont=false;
+      if(cont)
+        crest.push_back(i);
+    }
+  DataArrayInt *ret=DataArrayInt::New();
+  ret->alloc(crest.size(),1);
+  std::copy(crest.begin(),crest.end(),ret->getPointer());
+  return ret;
 }
 
 /*!
@@ -127,32 +169,10 @@ bool MEDCouplingMesh::areCompatibleForMerge(const MEDCouplingMesh *other) const
  */
 MEDCouplingFieldDouble *MEDCouplingMesh::fillFromAnalytic(TypeOfField t, int nbOfComp, FunctionToEvaluate func) const
 {
-  MEDCouplingFieldDouble *ret=MEDCouplingFieldDouble::New(t);
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(t,NO_TIME);
   ret->setMesh(this);
-  DataArrayDouble *loc=ret->getDiscretization()->getLocalizationOfDiscValues(this);
-  DataArrayDouble *array=DataArrayDouble::New();
-  int nbOfTuple=loc->getNumberOfTuples();
-  int nbCompIn=loc->getNumberOfComponents();
-  const double *locPtr=loc->getConstPointer();
-  array->alloc(nbOfTuple,nbOfComp);
-  double *ptToFill=array->getPointer();
-  for(int i=0;i<nbOfTuple;i++)
-    {
-      if(!func(locPtr+nbCompIn*i,ptToFill))
-        {
-          std::ostringstream oss; oss << "For tuple # " << i << " localized on (";
-          std::copy(locPtr+nbCompIn*i,locPtr+nbCompIn*(i+1),std::ostream_iterator<double>(oss,", "));
-          oss << ") : Evaluation of function failed !";
-          loc->decrRef();
-          array->decrRef();
-          ret->decrRef();
-          throw INTERP_KERNEL::Exception(oss.str().c_str());
-        }
-      ptToFill+=nbOfComp;
-    }
-  loc->decrRef();
-  ret->setArray(array);
-  array->decrRef();
+  ret->fillFromAnalytic(nbOfComp,func);
+  ret->incrRef();
   return ret;
 }
 
@@ -177,50 +197,10 @@ void MEDCouplingMesh::copyTinyStringsFrom(const MEDCouplingMesh *other) throw(IN
  */
 MEDCouplingFieldDouble *MEDCouplingMesh::fillFromAnalytic(TypeOfField t, int nbOfComp, const char *func) const
 {
-  INTERP_KERNEL::ExprParser expr(func);
-  expr.parse();
-  std::set<std::string> vars;
-  expr.getTrueSetOfVars(vars);
-  if((int)vars.size()>getSpaceDimension())
-    {
-      std::ostringstream oss; oss << "The mesh has a spaceDim==" << getSpaceDimension() << " and there are ";
-      oss << vars.size() << " variables : ";
-      std::copy(vars.begin(),vars.end(),std::ostream_iterator<std::string>(oss," "));
-      throw INTERP_KERNEL::Exception(oss.str().c_str());
-    }
-  std::vector<std::string> varsV(vars.begin(),vars.end());
-  expr.prepareExprEvaluation(varsV);
-  //
-  MEDCouplingFieldDouble *ret=MEDCouplingFieldDouble::New(t);
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(t,NO_TIME);
   ret->setMesh(this);
-  DataArrayDouble *loc=ret->getDiscretization()->getLocalizationOfDiscValues(this);
-  DataArrayDouble *array=DataArrayDouble::New();
-  int nbOfTuple=loc->getNumberOfTuples();
-  int nbCompIn=loc->getNumberOfComponents();
-  const double *locPtr=loc->getConstPointer();
-  array->alloc(nbOfTuple,nbOfComp);
-  double *ptToFill=array->getPointer();
-  for(int i=0;i<nbOfTuple;i++)
-    {
-      try
-        {
-          expr.evaluateExpr(nbOfComp,locPtr+nbCompIn*i,ptToFill);
-        }
-      catch(INTERP_KERNEL::Exception& e)
-        {
-          std::ostringstream oss; oss << "For tuple # " << i << " localized on (";
-          std::copy(locPtr+nbCompIn*i,locPtr+nbCompIn*(i+1),std::ostream_iterator<double>(oss,", "));
-          oss << ") : Evaluation of function failed ! " << e.what();
-          loc->decrRef();
-          array->decrRef();
-          ret->decrRef();
-          throw INTERP_KERNEL::Exception(oss.str().c_str());
-        }
-      ptToFill+=nbOfComp;
-    }
-  loc->decrRef();
-  ret->setArray(array);
-  array->decrRef();
+  ret->fillFromAnalytic(nbOfComp,func);
+  ret->incrRef();
   return ret;
 }
 

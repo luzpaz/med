@@ -50,8 +50,12 @@ public:
   static void setTooLongStrPolicy(int val) throw(INTERP_KERNEL::Exception);
   static void CheckFileForRead(const char *fileName) throw(INTERP_KERNEL::Exception);
   static std::vector<std::string> GetMeshNames(const char *fileName) throw(INTERP_KERNEL::Exception);
+  static std::vector<std::string> GetMeshNamesOnField(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
   static std::vector<std::string> GetMeshGroupsNames(const char *fileName, const char *meshName) throw(INTERP_KERNEL::Exception);
   static std::vector<std::string> GetMeshFamiliesNames(const char *fileName, const char *meshName) throw(INTERP_KERNEL::Exception);
+  static std::vector<std::string> GetAllFieldNamesOnMesh(const char *fileName, const char *meshName) throw(INTERP_KERNEL::Exception);
+  static std::vector<std::string> GetAllFieldNames(const char *fileName) throw(INTERP_KERNEL::Exception);
+  static std::vector<std::string> GetFieldNamesOnMesh(ParaMEDMEM::TypeOfField type, const char *fileName, const char *meshName) throw(INTERP_KERNEL::Exception);
   static std::vector<std::string> GetCellFieldNamesOnMesh(const char *fileName, const char *meshName) throw(INTERP_KERNEL::Exception);
   static std::vector<std::string> GetNodeFieldNamesOnMesh(const char *fileName, const char *meshName) throw(INTERP_KERNEL::Exception);
   %extend
@@ -121,6 +125,15 @@ public:
          std::vector<ParaMEDMEM::MEDCouplingUMesh *> v=convertFieldDoubleVecFromPy(li);
          std::vector<const ParaMEDMEM::MEDCouplingUMesh *> v2(v.begin(),v.end());
          MEDLoader::WriteUMeshes(fileName,v2,writeFromScratch);
+       }
+       static PyObject *GetTypesOfField(const char *fileName, const char *fieldName, const char *meshName) throw(INTERP_KERNEL::Exception)
+       {
+         std::vector< ParaMEDMEM::TypeOfField > v=MEDLoader::GetTypesOfField(fileName,fieldName,meshName);
+         int size=v.size();
+         PyObject *ret=PyList_New(size);
+         for(int i=0;i<size;i++)
+           PyList_SetItem(ret,i,PyInt_FromLong((int)v[i]));
+         return ret;
        }
      }
   static ParaMEDMEM::MEDCouplingUMesh *ReadUMeshFromFamilies(const char *fileName, const char *meshName, int meshDimRelToMax, const std::vector<std::string>& fams) throw(INTERP_KERNEL::Exception);
