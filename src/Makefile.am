@@ -34,7 +34,7 @@ if CPPUNIT_IS_OK
 endif
 
 if MED_ENABLE_MED2
-  COMMON_SUBDIRS += MEDLoader MEDCalculator
+  COMMON_SUBDIRS += MEDLoader
 endif
 
 ###
