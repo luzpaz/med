@@ -279,13 +279,13 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for Coordinates
  */
 //=============================================================================
-SALOME_MED::double_array * MESH_i::getCoordinates(SALOME_MED::medModeSwitch typeSwitch)
+SALOME_TYPES::ListOfDouble * MESH_i::getCoordinates(SALOME_MED::medModeSwitch typeSwitch)
 throw (SALOME::SALOME_Exception)
 {
         if (_mesh==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
                                              SALOME::INTERNAL_ERROR);
-        SALOME_MED::double_array_var myseq = new SALOME_MED::double_array;
+        SALOME_TYPES::ListOfDouble_var myseq = new SALOME_TYPES::ListOfDouble;
         try
         {
                 int spaceDimension=_mesh->getSpaceDimension();
@@ -339,13 +339,13 @@ SALOME::SenderDouble_ptr MESH_i::getSenderForCoordinates(SALOME_MED::medModeSwit
  * CORBA: Accessor for Coordinates Names
  */
 //=============================================================================
-SALOME_MED::string_array  * MESH_i::getCoordinatesNames() 
+SALOME_TYPES::ListOfString  * MESH_i::getCoordinatesNames() 
 throw (SALOME::SALOME_Exception)
 {
         if (_mesh==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
                                              SALOME::INTERNAL_ERROR);
-        SALOME_MED::string_array_var myseq = new SALOME_MED::string_array;
+        SALOME_TYPES::ListOfString_var myseq = new SALOME_TYPES::ListOfString;
         try
         {
                 int spaceDimension=_mesh->getSpaceDimension();
@@ -369,13 +369,13 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for Coordinates Units
  */
 //=============================================================================
-SALOME_MED::string_array *  MESH_i::getCoordinatesUnits()
+SALOME_TYPES::ListOfString *  MESH_i::getCoordinatesUnits()
 throw (SALOME::SALOME_Exception)
 {
         if (_mesh==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
                                              SALOME::INTERNAL_ERROR);
-        SALOME_MED::string_array_var myseq = new SALOME_MED::string_array;
+        SALOME_TYPES::ListOfString_var myseq = new SALOME_TYPES::ListOfString;
         try
         {
                 int spaceDimension=_mesh->getSpaceDimension();
@@ -532,7 +532,7 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for connectivities
  */
 //=============================================================================
-SALOME_MED::long_array *  MESH_i::getConnectivity(SALOME_MED::medModeSwitch typeSwitch,
+SALOME_TYPES::ListOfLong *  MESH_i::getConnectivity(SALOME_MED::medModeSwitch typeSwitch,
                                                SALOME_MED::medConnectivity mode, 
                                                SALOME_MED::medEntityMesh entity, 
                                                SALOME_MED::medGeometryElement geomElement)
@@ -544,7 +544,7 @@ throw (SALOME::SALOME_Exception)
         if (verifieParam(entity,geomElement)==false)
                 THROW_SALOME_CORBA_EXCEPTION("parameters don't match",\
                                              SALOME::BAD_PARAM);
-        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
+        SALOME_TYPES::ListOfLong_var myseq= new SALOME_TYPES::ListOfLong;
         try
         {
                 int nbelements; 
@@ -790,14 +790,14 @@ SALOME::SenderInt_ptr MESH_i::getSenderForPolyhedronFacesIndex()
  * CORBA: Accessor for connectivities
  */
 //=============================================================================
-SALOME_MED::long_array* MESH_i::getConnectivityIndex(SALOME_MED::medConnectivity mode, 
+SALOME_TYPES::ListOfLong* MESH_i::getConnectivityIndex(SALOME_MED::medConnectivity mode, 
                                                   SALOME_MED::medEntityMesh entity) 
 throw (SALOME::SALOME_Exception)
 {
         if (_mesh==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
                                              SALOME::INTERNAL_ERROR);
-        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
+        SALOME_TYPES::ListOfLong_var myseq= new SALOME_TYPES::ListOfLong;
         try
         {
                 int nbelements = _mesh->getNumberOfElements(
@@ -823,13 +823,13 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for connectivities
  */
 //=============================================================================
-SALOME_MED::long_array* MESH_i::getGlobalNumberingIndex( SALOME_MED::medEntityMesh entity)
+SALOME_TYPES::ListOfLong* MESH_i::getGlobalNumberingIndex( SALOME_MED::medEntityMesh entity)
 throw (SALOME::SALOME_Exception)
 {
         if (_mesh==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
                                              SALOME::INTERNAL_ERROR);
-        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
+        SALOME_TYPES::ListOfLong_var myseq= new SALOME_TYPES::ListOfLong;
         try
         {
                 int nbelements = _mesh->getNumberOfTypes( convertIdlEntToMedEnt(entity)) + 1;
@@ -858,7 +858,7 @@ throw (SALOME::SALOME_Exception)
 CORBA::Long MESH_i::getElementNumber(SALOME_MED::medConnectivity mode,
                                      SALOME_MED::medEntityMesh entity,
                                      SALOME_MED::medGeometryElement type,
-                                     const SALOME_MED::long_array& connectivity)
+                                     const SALOME_TYPES::ListOfLong& connectivity)
   throw (SALOME::SALOME_Exception)
 {
   if (_mesh==NULL)
@@ -886,13 +886,13 @@ CORBA::Long MESH_i::getElementNumber(SALOME_MED::medConnectivity mode,
  * not implemented for MED_ALL_ENTITIES and MED_MAILLE
  */
 //=============================================================================
-SALOME_MED::long_array* MESH_i::getReverseConnectivity(SALOME_MED::medConnectivity mode)
+SALOME_TYPES::ListOfLong* MESH_i::getReverseConnectivity(SALOME_MED::medConnectivity mode)
 throw (SALOME::SALOME_Exception)
 {
         if (_mesh==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
                                              SALOME::INTERNAL_ERROR);
-        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
+        SALOME_TYPES::ListOfLong_var myseq= new SALOME_TYPES::ListOfLong;
         try
         {
                 int nbelements=_mesh->getReverseConnectivityLength(convertIdlConnToMedConn(mode));
@@ -916,13 +916,13 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for connectivities
  */
 //=============================================================================
-SALOME_MED::long_array* MESH_i::getReverseConnectivityIndex(SALOME_MED::medConnectivity mode)
+SALOME_TYPES::ListOfLong* MESH_i::getReverseConnectivityIndex(SALOME_MED::medConnectivity mode)
 throw (SALOME::SALOME_Exception)
 {
         if (_mesh==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Mesh", \
                                              SALOME::INTERNAL_ERROR);
-        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
+        SALOME_TYPES::ListOfLong_var myseq= new SALOME_TYPES::ListOfLong;
         try
         {
                 int nbelements=_mesh->getReverseConnectivityIndexLength(convertIdlConnToMedConn(mode));

@@ -1854,6 +1854,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
               pts[iPts]=(double *)coord+dim_space*(connectivity[connectivity_index[polygs]+iPts-1]-1);
             INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,size,dim_space,barycenter+dim_space*index);
             delete [] pts;
+            index++;
           }
         }
         else
@@ -1871,9 +1872,9 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
               pts[iPts]=(double *)coord+dim_space*(connectivity[connectivity_index[localPolygsNbP1-1]+iPts-1]-1);
             INTERP_KERNEL::calculateBarycenterDyn((const double **)pts,size,dim_space,barycenter+dim_space*index);
             delete [] pts;
+            index++;
           }
         }
-        index++;
         break;
       }
     case MED_EN::MED_POLYHEDRA:
@@ -2455,30 +2456,30 @@ const GROUP* MESH::getGroup(MED_EN::medEntityMesh entity, int i) const
   const char * LOC = "MESH::getGroup(medEntityMesh entity, int i) : ";
   if (i<=0)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"argument i must be > 0"));
-  vector<GROUP*> Group;
+  vector<GROUP*> const * Group;
   switch (entity) {
   case MED_EN::MED_NODE : {
-    Group = _groupNode;
+    Group = &_groupNode;
     break;
   }
   case MED_EN::MED_CELL : {
-    Group = _groupCell;
+    Group = &_groupCell;
     break;
   }
   case MED_EN::MED_FACE : {
-    Group = _groupFace;
+    Group = &_groupFace;
     break;
   }
   case MED_EN::MED_EDGE : {
-    Group = _groupEdge;
+    Group = &_groupEdge;
     break;
   }
   default :
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Unknown entity"));
   }
-  if (i>(int)Group.size())
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"argument i="<<i<<" must be <= _numberOfGroups="<<Group.size()));
-  return Group[i-1];
+  if (i>(int)Group->size())
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"argument i="<<i<<" must be <= _numberOfGroups="<<Group->size()));
+  return Group->operator[](i-1);
 }
 
 

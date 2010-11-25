@@ -75,20 +75,20 @@ namespace ParaMEDMEM
                           bool regist);
     
     // Destructor
-    ~ParaMEDMEMComponent_i();
+    virtual ~ParaMEDMEMComponent_i();
     void setInterpolationOptions(const char * coupling,
-                                 long print_level,
+                                 CORBA::Long print_level,
                                  const char * intersection_type,
-                                 double precision,
-                                 double median_plane,
-                                 bool do_rotate,
-                                 double bounding_box_adjustment,
-                                 double bounding_box_adjustment_abs,
-                                 double max_distance_for_3Dsurf_intersect,
-                                 long orientation,
-                                 bool measure_abs,
+                                 CORBA::Double precision,
+                                 CORBA::Double median_plane,
+                                 CORBA::Boolean do_rotate,
+                                 CORBA::Double bounding_box_adjustment,
+                                 CORBA::Double bounding_box_adjustment_abs,
+                                 CORBA::Double max_distance_for_3Dsurf_intersect,
+                                 CORBA::Long orientation,
+                                 CORBA::Boolean measure_abs,
                                  const char * splitting_policy,
-                                 bool P1P0_bary_method ) throw(SALOME::SALOME_Exception);
+                                 CORBA::Boolean P1P0_bary_method ) throw(SALOME::SALOME_Exception);
     void initializeCoupling(const char * coupling) throw(SALOME::SALOME_Exception);
     void terminateCoupling(const char * coupling) throw(SALOME::SALOME_Exception);
     void _getOutputField(const char * coupling, MEDCouplingFieldDouble* field);

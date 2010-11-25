@@ -494,10 +494,11 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
   for (int i=0;i<_numberOfGeometricType;i++) {
     if(GeometricType[i]/100 != elemDim)
       {
-        if(i==0)
-          elemDim=GeometricType[i]/100;
-        else
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"unhomogeneous geometric types (dimension) !"));
+	if(i==0)
+	  elemDim=GeometricType[i]/100;
+	else if ( CELLMODEL_Map::retrieveCellModel( GeometricType[i] ).getDimension() !=
+		  CELLMODEL_Map::retrieveCellModel( GeometricType[0] ).getDimension() )
+	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"unhomogeneous geometric types (dimension) !"));
       }
     _geometricType[i] = GeometricType[i] ;
     _numberOfElements[i] = NumberOfElements[i] ;

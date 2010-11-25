@@ -25,7 +25,7 @@
 
 using namespace ParaMEDMEM;
 
-MEDCouplingRefCountServant::MEDCouplingRefCountServant(const RefCountObject *pointer):_cpp_pointer(pointer),_ref_counter(1)
+MEDCouplingRefCountServant::MEDCouplingRefCountServant(const RefCountObject *pointer):_ref_counter(1),_cpp_pointer(pointer)
 {
   if(_cpp_pointer)
     _cpp_pointer->incrRef();

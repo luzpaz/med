@@ -59,7 +59,7 @@ void FAMILYClient::blankCopy(bool blankSupport)
   nAttr = IOR_Family->getNumberOfAttributes();
   setNumberOfAttributes(nAttr);
 
-  SALOME_MED::long_array* attrId= IOR_Family->getAttributesIdentifiers();
+  SALOME_TYPES::ListOfLong* attrId= IOR_Family->getAttributesIdentifiers();
   convertCorbaArray(i, n, attrId);
   delete attrId;
   ASSERT(n == nAttr);
@@ -72,7 +72,7 @@ void FAMILYClient::blankCopy(bool blankSupport)
   ASSERT(n == _numberOfAttribute);
   setAttributesValues(i);
 
-  SALOME_MED::string_array * attrDesc=IOR_Family->getAttributesDescriptions();
+  SALOME_TYPES::ListOfString * attrDesc=IOR_Family->getAttributesDescriptions();
   convertCorbaArray(s, n, attrDesc);
   delete attrDesc;
   ASSERT(n == _numberOfAttribute);

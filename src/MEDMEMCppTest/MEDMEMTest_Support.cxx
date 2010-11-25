@@ -474,6 +474,11 @@ void MEDMEMTest::testSupport()
     polygon_supp->setGeometricType( types );
     polygon_supp->setpartial( array, /*shallowCopy=*/true);
 
+    // 0020912: [CEA 414] setPartial and polygons/polyhedra
+    // do the same but using another version of setpartial()
+    const int nb_of_elems[nb_types] = { 4, 2 };
+    polygon_supp->setpartial("issue 0020912",nb_types, nb_elems, types, nb_of_elems, elems);
+
     // make mesh from partial support containing polygons
     MESH *partial_supp_mesh=polygon_supp->makeMesh();
     polygon_supp->removeReference();

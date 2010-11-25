@@ -49,8 +49,8 @@ struct FIELDI_TRAITS<double, FullInterlace>
   typedef SALOME_MED::FIELDDOUBLEFULL_ptr FieldCorbaPtrType;
   typedef SALOME_MED::FIELDDOUBLE_ptr SimpleFieldCorbaPtrType;
   typedef SALOME_MED::FIELDDOUBLE SimpleFieldGlobalType;
-  typedef SALOME_MED::double_array SeqType;
-  typedef SALOME_MED::double_array_var SeqVarType;
+  typedef SALOME_TYPES::ListOfDouble SeqType;
+  typedef SALOME_TYPES::ListOfDouble_var SeqVarType;
   typedef SALOME::SenderDouble_ptr SenderPtrType;
   typedef SALOME::SenderDouble_var SenderVarType;
 };
@@ -62,8 +62,8 @@ struct FIELDI_TRAITS<double, NoInterlace>
   typedef SALOME_MED::FIELDDOUBLENO_ptr FieldCorbaPtrType;
   typedef SALOME_MED::FIELDDOUBLE_ptr SimpleFieldCorbaPtrType;
   typedef SALOME_MED::FIELDDOUBLE SimpleFieldGlobalType;
-  typedef SALOME_MED::double_array SeqType;
-  typedef SALOME_MED::double_array_var SeqVarType;
+  typedef SALOME_TYPES::ListOfDouble SeqType;
+  typedef SALOME_TYPES::ListOfDouble_var SeqVarType;
   typedef SALOME::SenderDouble_ptr SenderPtrType;
   typedef SALOME::SenderDouble_var SenderVarType;
 };
@@ -75,8 +75,8 @@ struct FIELDI_TRAITS<double, NoInterlaceByType>
   typedef SALOME_MED::FIELDDOUBLENOBYTYPE_ptr FieldCorbaPtrType;
   typedef SALOME_MED::FIELDDOUBLE_ptr SimpleFieldCorbaPtrType;
   typedef SALOME_MED::FIELDDOUBLE SimpleFieldGlobalType;
-  typedef SALOME_MED::double_array SeqType;
-  typedef SALOME_MED::double_array_var SeqVarType;
+  typedef SALOME_TYPES::ListOfDouble SeqType;
+  typedef SALOME_TYPES::ListOfDouble_var SeqVarType;
   typedef SALOME::SenderDouble_ptr SenderPtrType;
   typedef SALOME::SenderDouble_var SenderVarType;
 };
@@ -88,8 +88,8 @@ struct FIELDI_TRAITS<int, FullInterlace>
   typedef SALOME_MED::FIELDINTFULL_ptr FieldCorbaPtrType;
   typedef SALOME_MED::FIELDINT_ptr SimpleFieldCorbaPtrType;
   typedef SALOME_MED::FIELDINT SimpleFieldGlobalType;
-  typedef SALOME_MED::long_array SeqType;
-  typedef SALOME_MED::long_array_var SeqVarType;
+  typedef SALOME_TYPES::ListOfLong SeqType;
+  typedef SALOME_TYPES::ListOfLong_var SeqVarType;
   typedef SALOME::SenderInt_ptr SenderPtrType;
   typedef SALOME::SenderInt_var SenderVarType;
 };
@@ -101,8 +101,8 @@ struct FIELDI_TRAITS<int, NoInterlace>
   typedef SALOME_MED::FIELDINTNO_ptr FieldCorbaPtrType;
   typedef SALOME_MED::FIELDINT_ptr SimpleFieldCorbaPtrType;
   typedef SALOME_MED::FIELDINT SimpleFieldGlobalType;
-  typedef SALOME_MED::long_array SeqType;
-  typedef SALOME_MED::long_array_var SeqVarType;
+  typedef SALOME_TYPES::ListOfLong SeqType;
+  typedef SALOME_TYPES::ListOfLong_var SeqVarType;
   typedef SALOME::SenderInt_ptr SenderPtrType;
   typedef SALOME::SenderInt_var SenderVarType;
 };
@@ -114,8 +114,8 @@ struct FIELDI_TRAITS<int, NoInterlaceByType>
   typedef SALOME_MED::FIELDINTNOBYTYPE_ptr FieldCorbaPtrType;
   typedef SALOME_MED::FIELDINT_ptr SimpleFieldCorbaPtrType;
   typedef SALOME_MED::FIELDINT SimpleFieldGlobalType;
-  typedef SALOME_MED::long_array SeqType;
-  typedef SALOME_MED::long_array_var SeqVarType;
+  typedef SALOME_TYPES::ListOfLong SeqType;
+  typedef SALOME_TYPES::ListOfLong_var SeqVarType;
   typedef SALOME::SenderInt_ptr SenderPtrType;
   typedef SALOME::SenderInt_var SenderVarType;
 };

@@ -87,7 +87,7 @@ public:
   char *          getCoordinatesSystem() 
                          throw (SALOME::SALOME_Exception);
   
-  SALOME_MED::double_array* getCoordinates(SALOME_MED::medModeSwitch typeSwitch)
+  SALOME_TYPES::ListOfDouble* getCoordinates(SALOME_MED::medModeSwitch typeSwitch)
                          throw (SALOME::SALOME_Exception);
 
   SALOME::SenderDouble_ptr getSenderForCoordinates(SALOME_MED::medModeSwitch typeSwitch)
@@ -96,10 +96,10 @@ public:
   CORBA::Double  getCoordinate(CORBA::Long Number, CORBA::Long Axis)
                          throw (SALOME::SALOME_Exception);
 
-  SALOME_MED::string_array* getCoordinatesNames() 
+  SALOME_TYPES::ListOfString* getCoordinatesNames() 
                          throw (SALOME::SALOME_Exception);
   
-  SALOME_MED::string_array* getCoordinatesUnits()
+  SALOME_TYPES::ListOfString* getCoordinatesUnits()
                          throw (SALOME::SALOME_Exception); 
   
   CORBA::Long     getNumberOfNodes() 
@@ -120,7 +120,7 @@ public:
                                        SALOME_MED::medGeometryElement geomElement) 
                          throw (SALOME::SALOME_Exception);
   
-  SALOME_MED::long_array*   getConnectivity(SALOME_MED::medModeSwitch typeSwitch, 
+  SALOME_TYPES::ListOfLong*   getConnectivity(SALOME_MED::medModeSwitch typeSwitch, 
                                          SALOME_MED::medConnectivity mode, 
                                          SALOME_MED::medEntityMesh entity, 
                                          SALOME_MED::medGeometryElement geomElement)
@@ -132,11 +132,11 @@ public:
                                               SALOME_MED::medGeometryElement geomElement)
                          throw (SALOME::SALOME_Exception);
   
-  SALOME_MED::long_array*   getConnectivityIndex(SALOME_MED::medConnectivity mode,
+  SALOME_TYPES::ListOfLong*   getConnectivityIndex(SALOME_MED::medConnectivity mode,
                                               SALOME_MED::medEntityMesh entity)
                          throw (SALOME::SALOME_Exception);
   
-  SALOME_MED::long_array*   getGlobalNumberingIndex(SALOME_MED::medEntityMesh entity)
+  SALOME_TYPES::ListOfLong*   getGlobalNumberingIndex(SALOME_MED::medEntityMesh entity)
                          throw (SALOME::SALOME_Exception);
 
   SALOME::SenderInt_ptr getSenderForPolygonsConnectivity(SALOME_MED::medConnectivity mode,
@@ -156,13 +156,13 @@ public:
   CORBA::Long            getElementNumber(SALOME_MED::medConnectivity mode,
                                           SALOME_MED::medEntityMesh entity,
                                           SALOME_MED::medGeometryElement type,
-                                          const SALOME_MED::long_array& connectivity)
+                                          const SALOME_TYPES::ListOfLong& connectivity)
                          throw  (SALOME::SALOME_Exception);
 
-  SALOME_MED::long_array*   getReverseConnectivity(SALOME_MED::medConnectivity mode)
+  SALOME_TYPES::ListOfLong*   getReverseConnectivity(SALOME_MED::medConnectivity mode)
                          throw  (SALOME::SALOME_Exception);
 
-  SALOME_MED::long_array*   getReverseConnectivityIndex(SALOME_MED::medConnectivity mode)
+  SALOME_TYPES::ListOfLong*   getReverseConnectivityIndex(SALOME_MED::medConnectivity mode)
                          throw        (SALOME::SALOME_Exception);
 
     // Family and Group

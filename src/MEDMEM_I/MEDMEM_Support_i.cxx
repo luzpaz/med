@@ -413,7 +413,7 @@ throw (SALOME::SALOME_Exception)
  */
 //=============================================================================
 
-SALOME_MED::long_array *  SUPPORT_i::getNumber(SALOME_MED::medGeometryElement geomElement) 
+SALOME_TYPES::ListOfLong *  SUPPORT_i::getNumber(SALOME_MED::medGeometryElement geomElement) 
 throw (SALOME::SALOME_Exception)
 {
   SCRUTE(_support);
@@ -423,7 +423,7 @@ throw (SALOME::SALOME_Exception)
         if (_support==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
                                              SALOME::INTERNAL_ERROR);
-        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
+        SALOME_TYPES::ListOfLong_var myseq= new SALOME_TYPES::ListOfLong;
         try
         {
                 int nbelements=_support->getNumberOfElements(convertIdlEltToMedElt(geomElement));
@@ -452,7 +452,7 @@ SCRUTE(numbers[i]);
  * CORBA: get Nodes from file
  */
 //=============================================================================
-SALOME_MED::long_array *  SUPPORT_i::getNumberFromFile(SALOME_MED::medGeometryElement geomElement) 
+SALOME_TYPES::ListOfLong *  SUPPORT_i::getNumberFromFile(SALOME_MED::medGeometryElement geomElement) 
 throw (SALOME::SALOME_Exception)
 {
   SCRUTE(_support);
@@ -462,7 +462,7 @@ throw (SALOME::SALOME_Exception)
         if (_support==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
                                              SALOME::INTERNAL_ERROR);
-        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
+        SALOME_TYPES::ListOfLong_var myseq= new SALOME_TYPES::ListOfLong;
         try
         {
                 int nbelements=_support->getNumberOfElements(convertIdlEltToMedElt(geomElement));
@@ -523,13 +523,13 @@ SALOME::SenderInt_ptr SUPPORT_i::getSenderForNumber(SALOME_MED::medGeometryEleme
  */
 //=============================================================================
 
-SALOME_MED::long_array *  SUPPORT_i::getNumberIndex()
+SALOME_TYPES::ListOfLong *  SUPPORT_i::getNumberIndex()
 throw (SALOME::SALOME_Exception)
 {
         if (_support==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Support", \
                                              SALOME::INTERNAL_ERROR);
-        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
+        SALOME_TYPES::ListOfLong_var myseq= new SALOME_TYPES::ListOfLong;
         try
         {
                 MESSAGE ("Nombre d'elements  mis de façon stupide a MED_ALL_ELEMENTS");

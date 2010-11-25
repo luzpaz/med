@@ -29,9 +29,9 @@ MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplin
 {
   fieldPtr->Register();
   //
-  SALOME_MED::long_array *tinyL;
-  SALOME_MED::double_array *tinyD;
-  SALOME_MED::string_array *tinyS;
+  SALOME_TYPES::ListOfLong *tinyL;
+  SALOME_TYPES::ListOfDouble *tinyD;
+  SALOME_TYPES::ListOfString *tinyS;
   //1st CORBA call : getting all tiny info of all types (int, double string).
   fieldPtr->getTinyInfo(tinyL,tinyD,tinyS);
   int tinyLgth=tinyL->length();
@@ -57,21 +57,30 @@ MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplin
   MEDCouplingFieldDouble *ret=MEDCouplingFieldDouble::New(type,td);
   //2nd CORBA call to retrieves the mesh.
   SALOME_MED::MEDCouplingMeshCorbaInterface_ptr meshPtr=fieldPtr->getMesh();
-  SALOME_MED::MEDCouplingMeshCorbaInterface::_duplicate(meshPtr);
   MEDCouplingMesh *mesh=MEDCouplingMeshClient::New(meshPtr);
   meshPtr->Destroy();
   CORBA::release(meshPtr);
   ret->setMesh(mesh);
   mesh->decrRef();
+  DataArrayInt *array0;
   std::vector<DataArrayDouble *> arrays;
-  ret->resizeForUnserialization(tinyLV,arrays);
-  SALOME_MED::double_array2 *bigArr;
+  ret->resizeForUnserialization(tinyLV,array0,arrays);
+  SALOME_TYPES::ListOfLong *bigArr0;
+  SALOME_TYPES::ListOfDouble2 *bigArr;
   //3rd CORBA invokation to get big content
-  fieldPtr->getSerialisationData(bigArr);
+  fieldPtr->getSerialisationData(bigArr0,bigArr);
+  if(bigArr0->length()!=0)
+    {
+      int *pt=array0->getPointer();
+      int lgth=array0->getNbOfElems();
+      for(int i=0;i<lgth;i++)
+        pt[i]=(*bigArr0)[i];
+    }
+  delete bigArr0;
   tinyLgth=arrays.size();
   for(int i=0;i<tinyLgth;i++)
     {
-      SALOME_MED::double_array& oneArr=(*bigArr)[i];
+      SALOME_TYPES::ListOfDouble& oneArr=(*bigArr)[i];
       DataArrayDouble *curArrToFill=arrays[i];
       double *pt=curArrToFill->getPointer();
       int lgth=curArrToFill->getNbOfElems();
@@ -82,8 +91,6 @@ MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplin
   //
   //notify server that the servant is no more used.
   fieldPtr->Destroy();
-  //decrements the local CORBA pointer.
-  CORBA::release(fieldPtr);
   //
   ret->finishUnserialization(tinyLV,tinyLD,tinyLS);
   //

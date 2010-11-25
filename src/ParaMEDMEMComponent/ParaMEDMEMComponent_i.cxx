@@ -73,8 +73,6 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
     }
 
   try{
-    set<int> procs;
-
     string service = coupling;
     if( service.size() == 0 )
       throw SALOME_Exception("You have to give a service name !");
@@ -216,18 +214,18 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOM
 }
 
 void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
-                                                    long print_level,
+                                                    CORBA::Long print_level,
                                                     const char * intersection_type,
-                                                    double precision,
-                                                    double median_plane,
-                                                    bool do_rotate,
-                                                    double bounding_box_adjustment,
-                                                    double bounding_box_adjustment_abs,
-                                                    double max_distance_for_3Dsurf_intersect,
-                                                    long orientation,
-                                                    bool measure_abs,
+                                                    CORBA::Double precision,
+                                                    CORBA::Double median_plane,
+                                                    CORBA::Boolean do_rotate,
+                                                    CORBA::Double bounding_box_adjustment,
+                                                    CORBA::Double bounding_box_adjustment_abs,
+                                                    CORBA::Double max_distance_for_3Dsurf_intersect,
+                                                    CORBA::Long orientation,
+                                                    CORBA::Boolean measure_abs,
                                                     const char * splitting_policy,
-                                                    bool P1P0_bary_method ) throw(SALOME::SALOME_Exception)
+                                                    CORBA::Boolean P1P0_bary_method ) throw(SALOME::SALOME_Exception)
 {
   except_st *est;
   void *ret_th;

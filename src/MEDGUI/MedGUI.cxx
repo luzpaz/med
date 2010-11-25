@@ -589,7 +589,7 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
 
   int k = MEDMesh->getNumberOfNodes() ;
   SCRUTE(k);
-  SALOME_MED::double_array_var coords = MEDMesh->getCoordinates( SALOME_MED::MED_FULL_INTERLACE );
+  SALOME_TYPES::ListOfDouble_var coords = MEDMesh->getCoordinates( SALOME_MED::MED_FULL_INTERLACE );
   int i = 0;
   int lu = 0;
   while (lu < k ) {
@@ -614,7 +614,7 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
     SCRUTE(k);
     std::string nomFam=Families[k]->getName();
     SCRUTE(nomFam);
-    SALOME_MED::long_array_var tabnoeuds=Families[k]->getNumber(SALOME_MED::MED_NONE);
+    SALOME_TYPES::ListOfLong_var tabnoeuds=Families[k]->getNumber(SALOME_MED::MED_NONE);
     for (int l=0;l<(int)tabnoeuds->length();l++)
       SCRUTE(tabnoeuds[l]);
   }
@@ -626,7 +626,7 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
   //     SCRUTE(nomFam);
   //     int identfam=Family->getIdentifier();
   //     SCRUTE(identfam);
-  //     SALOME_MED::long_array_var tabnoeuds=Family->getNumber(SALOME_MED::MED_NONE);
+  //     SALOME_TYPES::ListOfLong_var tabnoeuds=Family->getNumber(SALOME_MED::MED_NONE);
   //     for (int l=0;l<tabnoeuds->length();l++)
   //       SCRUTE(tabnoeuds[l]);
 
@@ -644,7 +644,7 @@ bool MedGUI::DumpSubMesh( SALOME_MED::FAMILY_var Fam )
   if ( Fam->_is_nil() )
     return false;
 
-  SALOME_MED::long_array_var tabnoeuds=Fam->getNumber(SALOME_MED::MED_NONE);
+  SALOME_TYPES::ListOfLong_var tabnoeuds=Fam->getNumber(SALOME_MED::MED_NONE);
   for (int l=0;l<(int)tabnoeuds->length();l++)
     SCRUTE(tabnoeuds[l]);
 

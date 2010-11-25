@@ -365,13 +365,13 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for Fields's Components names
  */
 //=============================================================================
-SALOME_MED::string_array * FIELD_i::getComponentsNames()
+SALOME_TYPES::ListOfString * FIELD_i::getComponentsNames()
 throw (SALOME::SALOME_Exception)    
 {
         if (_fieldTptr==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
                                              SALOME::INTERNAL_ERROR);
-        SALOME_MED::string_array_var myseq = new SALOME_MED::string_array;
+        SALOME_TYPES::ListOfString_var myseq = new SALOME_TYPES::ListOfString;
         try
         {
                 int nbcom = _fieldTptr->getNumberOfComponents();
@@ -394,13 +394,13 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for Fields's Components units
  */
 //=============================================================================
-SALOME_MED::string_array * FIELD_i::getComponentsUnits()
+SALOME_TYPES::ListOfString * FIELD_i::getComponentsUnits()
 throw (SALOME::SALOME_Exception)
 {
         if (_fieldTptr==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
                                              SALOME::INTERNAL_ERROR);
-        SALOME_MED::string_array_var myseq = new SALOME_MED::string_array;
+        SALOME_TYPES::ListOfString_var myseq = new SALOME_TYPES::ListOfString;
         try
         {
                 int nbcom = _fieldTptr->getNumberOfComponents();
@@ -423,13 +423,13 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for Fields's Components descriptions
  */
 //=============================================================================
-SALOME_MED::string_array * FIELD_i::getComponentsDescriptions()
+SALOME_TYPES::ListOfString * FIELD_i::getComponentsDescriptions()
 throw (SALOME::SALOME_Exception)    
 {
         if (_fieldTptr==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
                                              SALOME::INTERNAL_ERROR);
-        SALOME_MED::string_array_var myseq = new SALOME_MED::string_array;
+        SALOME_TYPES::ListOfString_var myseq = new SALOME_TYPES::ListOfString;
         try
         {
                 int nbcom = _fieldTptr->getNumberOfComponents();

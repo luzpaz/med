@@ -306,20 +306,31 @@ class CMakeFile(object):
             "TransformationGUI",
             ]
         med_list = [
-            "InterpGeometric2DAlg",
-            "interpkernelbases",
             "interpkernel",
+            "InterpKernelTest",
             "MEDClientcmodule",
+            "medcouplingclient",
+            "medcouplingcorba",
+            "medcouplingremapper",
             "medcoupling",
             "MEDEngine",
+            "medloader",
+            "MEDMEMCppTest",
             "MEDMEMImpl",
             "medmem",
             "MED",
+            "medsplitter",
+            "MEDSPLITTERTest",
             "med_V2_1",
             "MEDWrapperBase",
             "MEDWrapper",
             "MEDWrapper_V2_1",
             "MEDWrapper_V2_2",
+            "paramedcouplingcorba",
+            "paramedloader",
+            "paramedmemcompo",
+            "paramedmem",
+            "ParaMEDMEMTest",
             "SalomeIDLMED",
             ]
         smesh_list = [
@@ -425,6 +436,10 @@ class CMakeFile(object):
             IF(COMMAND cmake_policy)
             cmake_policy(SET CMP0003 NEW)
             ENDIF(COMMAND cmake_policy)
+            """)
+            # --
+            newlines.append("""
+            ENABLE_TESTING()
             """)
             # --
             if self.module == "kernel":
@@ -575,6 +590,13 @@ class CMakeFile(object):
                         INCLUDE(${CMAKE_SOURCE_DIR}/adm/cmake/FindGRAPHVIZ.cmake)
                         """)
                         pass
+                    if self.module == "hxx2salome":
+                        newlines.append("""
+                        SET(MED_ROOT_DIR $ENV{MED_ROOT_DIR})
+                        INCLUDE(${MED_ROOT_DIR}/adm_local/cmake_files/FindMEDFILE.cmake)
+                        INCLUDE(${MED_ROOT_DIR}/adm_local/cmake_files/FindMED.cmake)
+                        """)
+                        pass
                     pass
                 pass
             # --
@@ -593,8 +615,8 @@ class CMakeFile(object):
                 newlines.append("""
                 SET(WITH_LOCAL 1)
                 SET(WITH_BATCH 1)
-                set(VERSION 5.1.4)
-                set(XVERSION 0x050104)
+                set(VERSION 5.1.5)
+                set(XVERSION 0x050105)
                 SET(CALCIUM_IDL_INT_F77 long)
                 SET(CALCIUM_CORBA_INT_F77 CORBA::Long)
                 SET(LONG_OR_INT int)
@@ -610,8 +632,8 @@ class CMakeFile(object):
                 SET(ENABLE_PYCONSOLE ON)
                 SET(ENABLE_SUPERVGRAPHVIEWER ON)
                 SET(ENABLE_QXGRAPHVIEWER ON)
-                set(VERSION 5.1.4)
-                set(XVERSION 0x050104)
+                set(VERSION 5.1.5)
+                set(XVERSION 0x050105)
                 """)
                 pass
             elif self.module == "geom":
@@ -650,6 +672,15 @@ class CMakeFile(object):
                 IF(GUI_ROOT_DIR)
                 SET(SMESH_ENABLE_GUI ON)
                 ENDIF(GUI_ROOT_DIR)
+                """)
+                pass
+            elif self.module == "netgen":
+                newlines.append("""
+                SET(OCCFLAGS ${CAS_CPPFLAGS})
+                SET(OCCLIBS ${CAS_LDPATH})
+                SET(OCCLIBS ${OCCLIBS} ${TKernel} ${TKGeomBase} ${TKMath} ${TKG2d} ${TKG3d} ${TKXSBase} ${TKOffset} ${TKFillet} ${TKShHealing})
+                SET(OCCLIBS ${OCCLIBS} ${TKMesh} ${TKMeshVS} ${TKTopAlgo} ${TKGeomAlgo} ${TKBool} ${TKPrim} ${TKBO} ${TKIGES} ${TKBRep})
+                SET(OCCLIBS ${OCCLIBS} ${TKSTEPBase} ${TKSTEP} ${TKSTL} ${TKSTEPAttr} ${TKSTEP209} ${TKXDESTEP} ${TKXDEIGES} ${TKXCAF} ${TKLCAF} ${FWOSPlugin})
                 """)
                 pass
             elif self.module == "netgenplugin":
@@ -705,7 +736,11 @@ class CMakeFile(object):
         SET(AM_CXXFLAGS)
         SET(LDADD)
         """)
-        if self.module == "kernel":
+        if self.module == "netgen":
+            newlines.append(r'''
+            SET(AM_CXXFLAGS ${AM_CXXFLAGS} -DNO_PARALLEL_THREADS -DOCCGEOMETRY -I${CMAKE_BINARY_DIR} -I${CMAKE_CURRENT_SOURCE_DIR})
+            ''')
+        elif self.module == "kernel":
             newlines.append(r'''
             SET(AM_CPPFLAGS ${AM_CPPFLAGS} -DHAVE_SALOME_CONFIG -I${CMAKE_BINARY_DIR}/salome_adm/unix -include SALOMEconfig.h)
             SET(AM_CXXFLAGS ${AM_CXXFLAGS} -DHAVE_SALOME_CONFIG -I${CMAKE_BINARY_DIR}/salome_adm/unix -include SALOMEconfig.h)
@@ -718,6 +753,23 @@ class CMakeFile(object):
                 SET(AM_CXXFLAGS ${AM_CXXFLAGS} -DHAVE_SALOME_CONFIG -I${KERNEL_ROOT_DIR}/include/salome -include SALOMEconfig.h)
                 ENDIF(KERNEL_ROOT_DIR)
                 ''')
+                pass
+            if self.module == "hxx2salome":
+                key = "_SRC"
+                if self.the_root[-len(key):] != key:
+                    msg = "Source dir must finished with %s !"%(key)
+                    raise Exception(msg)
+                hxxmodule = self.the_root[:-len(key)]
+                from os.path import basename
+                hxxmodule = basename(hxxmodule)
+                hxxmodule = hxxmodule.lower()
+                self.hxxmodule = hxxmodule
+                newlines.append(r'''
+                SET(HXXCPP_ROOT_DIR $ENV{%sCPP_ROOT_DIR})
+                SET(AM_CPPFLAGS ${AM_CPPFLAGS} -I${HXXCPP_ROOT_DIR}/include)
+                SET(AM_CXXFLAGS ${AM_CXXFLAGS} -I${HXXCPP_ROOT_DIR}/include)
+                SET(LDADD ${LDADD} -L${HXXCPP_ROOT_DIR}/lib)
+                '''%(hxxmodule.upper()))
                 pass
             pass
         # --
@@ -1207,10 +1259,51 @@ class CMakeFile(object):
             ENDFOREACH(input ${SIP_FILES})
             ''')
             pass
+
+        # --
+        # For make check
+        # --
+        for key in ["TESTS"]:
+            if self.__thedict__.has_key(key):
+                newlines.append('''
+                SET(UNIT_TEST_PROG ${%s})
+                '''%(key))
+                self.__thedict__["UNIT_TEST_PROG"] = self.__thedict__[key]
+                pass
+            pass
+        key = "UNIT_TEST_PROG"
+        if self.__thedict__.has_key(key):
+            newlines.append('''
+            FOREACH(input ${UNIT_TEST_PROG})
+            GET_FILENAME_COMPONENT(ext ${input} EXT)
+            IF(ext STREQUAL .py)
+            SET(test ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/${input})
+            ELSE(ext STREQUAL .py)
+            IF(WINDOWS)
+            SET(test ${CMAKE_CURRENT_BINARY_DIR}/${input}_exe.exe)
+            ELSE()
+            SET(test ${CMAKE_CURRENT_BINARY_DIR}/${input}_exe)
+            ENDIF()
+            ENDIF(ext STREQUAL .py)
+            ADD_TEST(${input} ${test})
+            SET(fail_regex "KO")
+            SET_PROPERTY(TEST ${input} PROPERTY FAIL_REGULAR_EXPRESSION "${fail_regex}")
+            # IF(NOT WINDOWS)
+            # ADD_TEST(${input}_valgrind valgrind ${test})
+            # SET_PROPERTY(TEST ${input}_valgrind PROPERTY FAIL_REGULAR_EXPRESSION "${fail_regex}")
+            # SET_PROPERTY(TEST ${input}_valgrind PROPERTY PASS_REGULAR_EXPRESSION "no leaks are possible")
+            # ENDIF()
+            ENDFOREACH(input ${UNIT_TEST_PROG})
+            ''')
+            pass
         
         # --
         # Treat the install targets
         # --
+        resdir = self.module
+        if resdir == "hxx2salome":
+            resdir = self.hxxmodule
+            pass
         d = {
             "salomeadmux_DATA"            :  "salome_adm/unix",
             "dist_salomeadmux_DATA"       :  "salome_adm/unix",
@@ -1221,9 +1314,9 @@ class CMakeFile(object):
             "dist_admlocal_cmake_DATA"    :  "adm_local/cmake_files",
             "salomeinclude_DATA"          :  "include/salome",
             "salomeinclude_HEADERS"       :  "include/salome",
-            "dist_salomeres_DATA"         :  "share/salome/resources/%s"%(self.module),
-            "nodist_salomeres_DATA"       :  "share/salome/resources/%s"%(self.module),
-            "nodist_salomeres_SCRIPTS"    :  "share/salome/resources/%s"%(self.module),
+            "dist_salomeres_DATA"         :  "share/salome/resources/%s"%(resdir),
+            "nodist_salomeres_DATA"       :  "share/salome/resources/%s"%(resdir),
+            "nodist_salomeres_SCRIPTS"    :  "share/salome/resources/%s"%(resdir),
             "dist_salomescript_SCRIPTS"   :  "bin/salome",
             "dist_salomescript_DATA"      :  "bin/salome",
             "dist_salomescript_PYTHON"    :  "bin/salome",
@@ -1239,6 +1332,14 @@ class CMakeFile(object):
                 "nodist_include_HEADERS" :  "include",
                 "bin_SCRIPTS"            :  "bin",
                 "doc_DATA"               :  "${docdir}",
+                }
+            pass
+        if self.module == "netgen":
+            d = {
+                "include_HEADERS"        :  "include",
+                "noinst_HEADERS"         :  "share/netgen/include",
+                "dist_pkgdata_DATA"      :  "share/netgen",
+                "dist_doc_DATA"          :  "share/doc/netgen",
                 }
             pass
         for key, value in d.items():
@@ -1272,18 +1373,13 @@ class CMakeFile(object):
         ''')
         # --
         newlines.append(r'''
-        SET(libs ${PLATFORM_LIBADD} ${PLATFORM_LDFLAGS} ${${amname}_LIBADD} ${${amname}_LDADD} ${${amname}_LDFLAGS})
+        SET(libs ${PLATFORM_LIBADD} ${PLATFORM_LDFLAGS} ${LDADD} ${${amname}_LIBADD} ${${amname}_LDADD} ${${amname}_LDFLAGS})
         FOREACH(lib SALOMEBasics SalomeBatch)
         IF(name STREQUAL lib)
         SET(libs ${libs} ${PTHREAD_LIBS})
         ENDIF(name STREQUAL lib)
         ENDFOREACH(lib SALOMEBasics SalomeBatch)
         ''')
-        if key == "bin_PROGRAMS":
-            newlines.append(r'''
-            SET(libs ${libs} ${LDADD})
-            ''')
-            pass
         # --
         newlines.append(r'''
         FOREACH(lib ${libs})
@@ -1386,6 +1482,13 @@ class CMakeFile(object):
         SET(var ${var} ${AM_CPPFLAGS})
         SET(var ${var} ${AM_CXXFLAGS})
         ''')
+        # --
+        newlines.append(r'''
+        IF(type STREQUAL STATIC)
+        SET(var ${var} -fPIC)
+        ENDIF(type STREQUAL STATIC)
+        ''')
+        # --
         if self.module == "yacs":
             newlines.append(r'''
             SET(var ${var} -DYACS_PTHREAD)
@@ -1415,7 +1518,24 @@ class CMakeFile(object):
         SET(f)
         ENDIF(f STREQUAL v)
         ENDFOREACH(v ${vars})
+        IF(f)
+        string(REGEX MATCH "^-I" test_include ${f})
+        if(test_include)
+        string(REGEX REPLACE "^-I" "" include_dir ${f})
+        if(include_dir)
+        if(include_dir STREQUAL /usr/include)
+        else(include_dir STREQUAL /usr/include)
+        string(REGEX MATCH "^\\." test_dot ${include_dir})
+        if(test_dot)
+        set(include_dir ${CMAKE_CURRENT_BINARY_DIR}/${include_dir})
+        endif(test_dot)
+        include_directories(${include_dir})
+        endif(include_dir STREQUAL /usr/include)
+        endif(include_dir)
+        else(test_include)
         SET(flags "${flags} ${f}")
+        endif(test_include)
+        ENDIF(f)
         ENDFOREACH(f ${var})
         SET_TARGET_PROPERTIES(${name} PROPERTIES COMPILE_FLAGS "${flags}")
         ''')
@@ -1493,9 +1613,15 @@ class CMakeFile(object):
         STRING(REPLACE ".f" ".c" src ${src})
         SET(src ${CMAKE_CURRENT_BINARY_DIR}/${src})
         SET(output ${src})
+        SET(cmd f2c)
+        IF(NOT WINDOWS)
+        IF(CMAKE_SIZEOF_VOID_P STREQUAL 8)
+        SET(cmd valgrind f2c)  # f2c seems to be buggy on 64 bits ... but with valgrind, it works :)
+        ENDIF()
+        ENDIF(NOT WINDOWS)
         ADD_CUSTOM_COMMAND(
         OUTPUT ${output}
-        COMMAND f2c ${input}
+        COMMAND ${cmd} ${input}
         MAIN_DEPENDENCY ${input}
         )
         ELSE(src STREQUAL trte.f)
@@ -1553,8 +1679,29 @@ class CMakeFile(object):
         # --
         self.setLibAdd(key, newlines)
         # --
-        if key != "noinst_LTLIBRARIES":
-            if self.module == "medfile":
+        if 1: # key != "noinst_LTLIBRARIES":
+            newlines.append(r'''
+            SET(key %s)
+            '''%(key))
+            newlines.append(r'''
+            SET(test ON)
+            IF(${key} STREQUAL noinst_LTLIBRARIES)
+            SET(test OFF)
+            ENDIF(${key} STREQUAL noinst_LTLIBRARIES)
+            ''')
+            if self.module == "netgen" :
+                newlines.append(r'''
+                IF(${key} STREQUAL noinst_LTLIBRARIES)
+                IF(WINDOWS)
+                SET(test ON)
+                ENDIF(WINDOWS)
+                ENDIF(${key} STREQUAL noinst_LTLIBRARIES)
+                ''')
+                pass
+            newlines.append(r'''
+            IF(test)
+            ''')
+            if self.module in ["medfile", "netgen"]:
                 newlines.append(r'''
                 SET(DEST lib)
                 ''')
@@ -1631,6 +1778,9 @@ class CMakeFile(object):
             newlines.append(r'''
             ENDIF(BEGIN_WITH_lib)
             ''')
+            newlines.append(r'''
+            ENDIF(test)
+            ''')
             pass
         # --
         newlines.append(r'''
@@ -1679,7 +1829,7 @@ class CMakeFile(object):
         # --
         self.setLibAdd(key, newlines)
         # --
-        if self.module == "medfile":
+        if self.module in ["medfile", "netgen"]:
             newlines.append(r'''
             SET(DEST bin)
             ''')
@@ -1857,6 +2007,8 @@ if __name__ == "__main__":
     from os import getcwd
     the_root = getcwd()
     #
+    nok = 0
+    #
     from os import walk
     for root, dirs, files in walk(the_root):
         # --
@@ -1878,12 +2030,20 @@ if __name__ == "__main__":
         from sys import stdout
         for f in files:
             if f in ["Makefile.am", "Makefile.am.cmake"]:
-                stdout.write("Scanning %s %s ..."%(root, f))
-                stdout.flush()
                 convertAmFile(the_root, root, dirs, files, f, module)
-                stdout.write(" done.\n")
+                nok += 1
                 pass
             pass
         pass
     #
+    if nok:
+        if nok == 1:
+            msg = "%s file has been converted to cmake"%(nok)
+        else:
+            msg = "%s files have been converted to cmake"%(nok)
+            pass
+        stdout.write(msg)
+        stdout.write("\n")
+        stdout.flush()
+        pass
     pass

@@ -27,19 +27,23 @@ endif
 
 lib_LTLIBRARIES= libmedcouplingcorba.la
 
-salomeinclude_HEADERS=                    \
-	MEDCouplingCorba.hxx              \
-	MEDCouplingRefCountServant.hxx    \
-	MEDCouplingMeshServant.hxx        \
-	MEDCouplingPointSetServant.hxx    \
-	MEDCouplingUMeshServant.hxx       \
-	MEDCouplingFieldServant.hxx       \
+salomeinclude_HEADERS=                      \
+	MEDCouplingCorba.hxx                \
+	MEDCouplingRefCountServant.hxx      \
+	MEDCouplingMeshServant.hxx          \
+	MEDCouplingPointSetServant.hxx      \
+	MEDCouplingExtrudedMeshServant.hxx  \
+	MEDCouplingCMeshServant.hxx  \
+	MEDCouplingUMeshServant.hxx         \
+	MEDCouplingFieldServant.hxx         \
 	MEDCouplingFieldDoubleServant.hxx
 
 dist_libmedcouplingcorba_la_SOURCES=       \
 	MEDCouplingRefCountServant.cxx     \
 	MEDCouplingMeshServant.cxx         \
 	MEDCouplingPointSetServant.cxx     \
+	MEDCouplingExtrudedMeshServant.cxx \
+	MEDCouplingCMeshServant.cxx \
 	MEDCouplingUMeshServant.cxx        \
 	MEDCouplingFieldServant.cxx        \
 	MEDCouplingFieldDoubleServant.cxx  

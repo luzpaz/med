@@ -117,13 +117,13 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for attributes identifiers
  */
 //=============================================================================
-SALOME_MED::long_array*  FAMILY_i::getAttributesIdentifiers() 
+SALOME_TYPES::ListOfLong*  FAMILY_i::getAttributesIdentifiers() 
 throw (SALOME::SALOME_Exception)
 {
         if (_family==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Family",\
                                              SALOME::INTERNAL_ERROR);
-        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
+        SALOME_TYPES::ListOfLong_var myseq= new SALOME_TYPES::ListOfLong;
         try
         {
                 int nbAttribute=_family->getNumberOfAttributes();
@@ -168,13 +168,13 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for attributes values
  */
 //=============================================================================
-SALOME_MED::long_array*  FAMILY_i::getAttributesValues() 
+SALOME_TYPES::ListOfLong*  FAMILY_i::getAttributesValues() 
 throw (SALOME::SALOME_Exception)
 {
         if (_family==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Family",\
                                              SALOME::INTERNAL_ERROR);
-        SALOME_MED::long_array_var myseq= new SALOME_MED::long_array;
+        SALOME_TYPES::ListOfLong_var myseq= new SALOME_TYPES::ListOfLong;
         try
         {
                 int nbAttribute=_family->getNumberOfAttributes();
@@ -218,14 +218,14 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for attributes desriptions
  */
 //=============================================================================
-SALOME_MED::string_array * FAMILY_i::getAttributesDescriptions() 
+SALOME_TYPES::ListOfString * FAMILY_i::getAttributesDescriptions() 
 throw (SALOME::SALOME_Exception)
 {
         if (_family==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Family",\
                                              SALOME::INTERNAL_ERROR);
         
-        SALOME_MED::string_array_var myseq = new SALOME_MED::string_array;
+        SALOME_TYPES::ListOfString_var myseq = new SALOME_TYPES::ListOfString;
         try
         {
                 int nbAttribute=_family->getNumberOfAttributes();
@@ -292,14 +292,14 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for groups names
  */
 //=============================================================================
-SALOME_MED::string_array * FAMILY_i::getGroupsNames()
+SALOME_TYPES::ListOfString * FAMILY_i::getGroupsNames()
 throw (SALOME::SALOME_Exception)
 {
         if (_family==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Family",\
                                              SALOME::INTERNAL_ERROR);
 
-        SALOME_MED::string_array_var myseq = new SALOME_MED::string_array;
+        SALOME_TYPES::ListOfString_var myseq = new SALOME_TYPES::ListOfString;
         try
         {
                 int nbGroups=_family->getNumberOfGroups();

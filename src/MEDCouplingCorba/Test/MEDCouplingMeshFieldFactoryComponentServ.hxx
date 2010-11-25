@@ -22,7 +22,9 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 #include "SALOMEconfig.h"
-
+#ifdef WNT
+#define NOMINMAX
+#endif
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServantTest)
 
 namespace ParaMEDMEM
@@ -38,16 +40,24 @@ namespace SALOME_TEST
     MEDCouplingMeshFieldFactoryComponent(CORBA::ORB_ptr orb);
     void destroyFactory();
     void shutdownOrb();
+    SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr get1DMesh();
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr get2DMesh();
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr get3DMesh();
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr get3DSurfMesh();
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr get0DMesh();
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr getM1DMesh();
+    SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_ptr getExtrudedMesh();
+    SALOME_MED::MEDCouplingCMeshCorbaInterface_ptr getCMesh();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldScalarOn2DNT();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldNodeScalarOn2DNT();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldScalarOn3DNT();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldScalarOn3DSurfWT();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldScalarOn3DSurfCOTI();
+    SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldScalarOn2DLT();
+    SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldGaussPt2DWT();
+    SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldGaussPtNE2DWT();
+    SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldVectorOnExtrudedWT();
+    SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldVectorOnCMeshWT();
   private:
     CORBA::ORB_ptr _orb;
   };
