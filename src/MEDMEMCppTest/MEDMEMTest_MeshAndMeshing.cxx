@@ -719,10 +719,10 @@ void MEDMEMTest::testMeshAndMeshing()
         const int * connectivity_init;
         CPPUNIT_ASSERT_NO_THROW(connectivity = myMesh2->getConnectivity
                                 (MED_FULL_INTERLACE, myMedConnect, entity, Types1[t]));
-        connectivity_init = myMeshing->getConnectivity
+        connectivity_init = myMesh2->getConnectivity
           (MED_FULL_INTERLACE, myMedConnect, entity, Types1[t]);
         int connLen = myMesh2->getConnectivityLength( MED_FULL_INTERLACE, myMedConnect, entity, Types1[t]);
-        int connLen_init = myMeshing->getConnectivityLength( MED_FULL_INTERLACE, myMedConnect, entity, Types1[t]);
+        int connLen_init = myMesh2->getConnectivityLength( MED_FULL_INTERLACE, myMedConnect, entity, Types1[t]);
         CPPUNIT_ASSERT_EQUAL( connLen, connLen_init );
         vector<int> connVec( connectivity, connectivity + connLen );
         vector<int> connVec_init( connectivity_init, connectivity_init + connLen );
@@ -777,7 +777,7 @@ void MEDMEMTest::testMeshAndMeshing()
       const int * ReverseNodalConnectivityIndex = myMesh2->getReverseConnectivityIndex(MED_NODAL, entity);
       const int ReverseIdxLength = myMesh2->getReverseConnectivityIndexLength(MED_NODAL, entity);
       CPPUNIT_ASSERT(ReverseIdxLength == NumberOfNodes+1);
-      const int * ReverseNodalConnectivityIndex_init = myMeshing->getReverseConnectivityIndex(MED_NODAL, entity);
+      const int * ReverseNodalConnectivityIndex_init = myMesh2->getReverseConnectivityIndex(MED_NODAL, entity);
       vector<int> connVec( ReverseNodalConnectivityIndex, ReverseNodalConnectivityIndex + ReverseIdxLength);
       vector<int> connVec_init( ReverseNodalConnectivityIndex_init, ReverseNodalConnectivityIndex_init + ReverseIdxLength);
       CPPUNIT_ASSERT( connVec == connVec_init );
