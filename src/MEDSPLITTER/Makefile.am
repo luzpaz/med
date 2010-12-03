@@ -77,7 +77,7 @@ if MED_ENABLE_SCOTCH
     dist_libmedsplitter_la_SOURCES+= MEDSPLITTER_SCOTCHGraph.cxx
 endif
 
-libmedsplitter_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
+libmedsplitter_la_CPPFLAGS= $(MPI_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
 	$(BOOST_CPPFLAGS) $(LIBXML_INCLUDES) \
 	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core \
 	-I$(srcdir)/../INTERP_KERNEL/Bases
@@ -103,7 +103,7 @@ if MED_ENABLE_KERNEL
   libmedsplitter_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
 endif
 
-libmedsplitter_la_LDFLAGS+= $(MED2_LIBS) $(HDF5_LIBS) $(STDLIB) $(LIBXML_LIBS) \
+libmedsplitter_la_LDFLAGS+= $(MED2_LIBS) $(HDF5_LIBS) $(STDLIB) $(LIBXML_LIBS) $(MPI_LIBS) \
 	../MEDMEM/libmedmem.la ../MEDWrapper/V2_1/Core/libmed_V2_1.la ../INTERP_KERNEL/libinterpkernel.la
 
 # Executables targets
