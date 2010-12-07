@@ -18,7 +18,7 @@
 #
 
 import MEDCouplingCorbaSwigTest
-from libMEDCouplingClient_Swig import *
+from MEDCouplingClient import *
 
 import MEDCouplingCorbaServant_idl
 import CORBA

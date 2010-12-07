@@ -17,7 +17,7 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-%module libMEDCouplingClient_Swig
+%module MEDCouplingClient
 
 %{
 #include "MEDCouplingFieldDoubleClient.hxx"
@@ -30,7 +30,7 @@
 using namespace ParaMEDMEM;
 %}
 
-%include "libMEDCoupling_Swig.i"
+%include "MEDCoupling.i"
 
 %newobject ParaMEDMEM::MEDCouplingFieldDoubleClient::New;
 %newobject ParaMEDMEM::MEDCouplingUMeshClient::New;
