@@ -20,3 +20,5 @@
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 SUBDIRS = unix
+
+EXTRA_DIST += cmake_files

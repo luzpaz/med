@@ -62,7 +62,7 @@ DISTCLEANFILES = a.out aclocal.m4 configure local-install.sh hack_libtool
 
 salomeinclude_DATA = MED_version.h
 
-EXTRA_DIST += build_configure clean_configure LICENCE INSTALL README
+EXTRA_DIST += build_configure clean_configure LICENCE INSTALL README build_cmake build_cmake.bat
 
 dist-hook:
 	rm -rf `find $(distdir) -name CVS`
