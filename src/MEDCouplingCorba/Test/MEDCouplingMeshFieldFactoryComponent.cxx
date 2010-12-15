@@ -165,7 +165,7 @@ namespace SALOME_TEST
     m2D=build2DMesh();
     m2D->changeSpaceDimension(3);
     ParaMEDMEM::MEDCouplingUMesh *m1D=build1DMesh();
-    ParaMEDMEM::MEDCouplingUMesh *retu=m2D->buildExtrudedMeshFromThis(m1D,0);
+    ParaMEDMEM::MEDCouplingUMesh *retu=m2D->buildExtrudedMesh(m1D,0);
     m1D->decrRef();
     ParaMEDMEM::MEDCouplingExtrudedMesh *ret=ParaMEDMEM::MEDCouplingExtrudedMesh::New(retu,m2D,2);
     ret->setName("ExtrudedTestForCorbaTest");

@@ -136,7 +136,7 @@ class MEDCouplingCorbaServBasicsTest:
         m2D=self.build2DMesh();
         m2D.changeSpaceDimension(3);
         m1D=self.build1DMesh();
-        retu=m2D.buildExtrudedMeshFromThis(m1D,0);
+        retu=m2D.buildExtrudedMesh(m1D,0);
         ret=MEDCouplingExtrudedMesh.New(retu,m2D,2);
         ret.setName("ExtrudedTestForCorbaTest");
         return ret;
