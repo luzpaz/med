@@ -21,7 +21,7 @@ import unittest
 import CORBA
 import MEDCouplingCorbaServantTest_idl
 import MEDCouplingCorbaSwigTest
-from libMEDCouplingClient_Swig import *
+from MEDCouplingClient import *
 import MEDCouplingCorbaServant_idl
 import threading
 

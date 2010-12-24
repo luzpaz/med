@@ -19,34 +19,34 @@
 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-lib_LTLIBRARIES = _libMEDCouplingClient_Swig.la
+lib_LTLIBRARIES = _MEDCouplingClient.la
 
-salomeinclude_HEADERS = libMEDCouplingClient_Swig.i
+salomeinclude_HEADERS = MEDCouplingClient.i
 
-SWIG_DEF = libMEDCouplingClient_Swig.i
+SWIG_DEF = MEDCouplingClient.i
 
 SWIG_FLAGS = @SWIG_FLAGS@ -I$(srcdir) -I$(srcdir)/../../MEDCouplingClient -I$(srcdir)/../../MEDCoupling -I$(srcdir)/../../MEDCoupling_Swig -I$(srcdir)/../../INTERP_KERNEL -I$(srcdir)/../../INTERP_KERNEL/Bases
 
-dist__libMEDCouplingClient_Swig_la_SOURCES   = $(SWIG_DEF)
+dist__MEDCouplingClient_la_SOURCES   = $(SWIG_DEF)
 
-nodist__libMEDCouplingClient_Swig_la_SOURCES = libMEDCouplingClient_Swig_wrap.cxx
+nodist__MEDCouplingClient_la_SOURCES = MEDCouplingClient_wrap.cxx
 
-libMEDCouplingClient_Swig.py: libMEDCouplingClient_Swig_wrap.cxx
+MEDCouplingClient.py : MEDCouplingClient_wrap.cxx
 
-libMEDCouplingClient_Swig_wrap.cxx: $(SWIG_DEF)
+MEDCouplingClient_wrap.cxx: $(SWIG_DEF)
 	$(SWIG) $(SWIG_FLAGS) -o $@  $<
 
-_libMEDCouplingClient_Swig_la_CPPFLAGS = $(PYTHON_INCLUDES) \
+_MEDCouplingClient_la_CPPFLAGS = $(PYTHON_INCLUDES) \
 	$(CORBA_CXXFLAGS) $(CORBA_INCLUDES) -I$(top_builddir)/idl ${KERNEL_CXXFLAGS} @CXXTMPDPTHFLAGS@ \
 	-I$(srcdir)/../../INTERP_KERNEL -I$(srcdir)/../../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../../MEDCoupling_Swig -I$(srcdir)/../../MEDCoupling \
 	-I$(srcdir)/../../MEDCouplingCorba/Client -I$(srcdir)/..
 
-_libMEDCouplingClient_Swig_la_LDFLAGS  = -module $(PYTHON_LIBS) \
+_MEDCouplingClient_la_LDFLAGS  = -module $(PYTHON_LIBS) \
 	../../MEDCouplingCorba/Client/libmedcouplingclient.la \
 	../../MEDCoupling/libmedcoupling.la ../../INTERP_KERNEL/libinterpkernel.la \
 	../../../idl/libSalomeIDLMED.la
 
-CLEANFILES = libMEDCouplingClient_Swig_wrap.cxx libMEDCouplingClient_Swig.py
+CLEANFILES = MEDCouplingClient_wrap.cxx MEDCouplingClient.py
 
-dist_salomescript_DATA= libMEDCouplingClient_Swig.py
+dist_salomescript_DATA= MEDCouplingClient.py
