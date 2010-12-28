@@ -25,6 +25,10 @@
 #include "MEDMEM_Grid.hxx"
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_Support.hxx"
+#include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_Meshing.hxx"
+#include "MEDMEM_GaussLocalization.hxx"
+
 #include <MEDMEM_VtkMeshDriver.hxx>
 #include <MEDMEM_MedMeshDriver22.hxx>
 
@@ -205,6 +209,7 @@ using namespace MEDMEM;
  *   (+)     bool        isOnAllElements() const throw (MEDEXCEPTION);
  *
  *   (+)     inline void setArray(MEDMEM_Array_ *value) throw (MEDEXCEPTION);
+ *   (+)     FIELD<double, FullInterlace>* getGaussPointsCoordinates() const throw (MEDEXCEPTION);
  *   (+)     inline void setValue(T* value) throw (MEDEXCEPTION);
  *   (+)     inline void setRow(int i, T* value) throw (MEDEXCEPTION);
  *   (+)     inline void setColumn(int i, T* value) throw (MEDEXCEPTION);
@@ -1944,4 +1949,737 @@ void MEDMEMTest::testReadFieldOnNodesAndCells()
   nodeField->removeReference();
   supportOnCells->removeReference();
   supportOnNodes->removeReference();
+}
+
+
+//================================================================================
+/*!
+ * \brief 0021052: [CEA 431] Computation of Gauss point location
+ *
+ * Check method GetGaussPointsCoordinates() defined in MEDMEM_Field.hxx:
+ */
+//================================================================================
+void MEDMEMTest::testGetGaussPointsCoordinates() {
+  const int spaceDimension = 3;
+  const int numberOfNodes = 56;
+
+  string names[3] = { "X","Y","Z" };
+  string units[3] = { "cm","cm","cm" };
+
+  const int numberOfCellTypes = 14;
+
+  double coordinates [ spaceDimension*numberOfNodes ] = { 
+
+    0.0,     0.0,      0.0,   //N1
+    0.5,     0.5,      0.5,   //N2
+    1.0,     1.0,      1.0,   //N3
+
+    1.0,     1.0,      0.0,   //N4
+    2.0,     2.5,      0.0,   //N5
+    6.0,     1.5,      0.0,   //N6
+    1.0,     2.0,      0.0,   //N7
+    4.5,     2.5,      0.0,   //N8
+    4.0,     0.5,      0.0,   //N9
+
+    0.0,     4.0,      0.0,   //N10
+    4.0,     4.0,      0.0,   //N11
+    4.0,     0.0,      0.0,   //N12
+    0.0,     2.0,      0.0,   //N13
+    2.0,     4.0,      0.0,   //N14
+    4.0,     2.0,      0.0,   //N15
+    2.0,     0.0,      0.0,   //N16
+
+    0.0,     6.0,      0.0,   //N17
+    3.0,     3.0,      0.0,   //N18
+    1.3,     3.0,      3.0,   //N19
+
+    0.0,     3.0,      0.0,   //N20
+    1.5,     4.5,      0.0,   //N21
+    1.5,     1.5,      0.0,   //N22
+    0.65,    1.5,      1.5,   //N23
+    0.65,    4.5,      1.5,   //N24
+    2.15,    3.0,      1.5,   //N25
+
+    2.0,     2.0,      2.0,   //N26
+    3.0,     1.0,      1.0,   //N27
+    3.0,     3.0,      1.0,   //N28
+    1.0,     3.0,      1.0,   //N29
+    1.0,     1.0,      1.0,   //N30
+
+    0.0,     3.0,      0.0,   //N31 
+    2.0,     0.0,      0.0,   //N32 
+    0.0,     0.0,      6.0,   //N33 
+    0.0,     3.0,      6.0,   //N34 
+    3.0,     0.0,      6.0,   //N35 
+
+    0.0,     1.5,      0.0,   //N36 
+    1.5,     1.5,      0.0,   //N37 
+    1.5,     0.0,      0.0,   //N38 
+    0.0,     1.5,      6.0,   //N39 
+    1.5,     1.5,      6.0,   //N40 
+    1.5,     0.0,      6.0,   //N41 
+    0.0,     0.0,      3.0,   //N42
+    0.0,     3.0,      3.0,   //N43
+    3.0,     0.0,      3.0,   //N44
+
+    0.0,     0.0,      4.0,   //N45
+    0.0,     4.0,      4.0,   //N46
+    4.0,     4.0,      4.0,   //N47
+    4.0,     0.0,      4.0,   //N48
+    0.0,     2.0,      4.0,   //N49 
+    2.0,     4.0,      4.0,   //N50
+    4.0,     2.0,      4.0,   //N51
+    2.0,     0.0,      4.0,   //N52
+    0.0,     0.0,      2.0,   //N53
+    0.0,     4.0,      2.0,   //N54
+    4.0,     4.0,      2.0,   //N55
+    4.0,     0.0,      2.0,   //N56
+    
+  };
+
+  MED_EN::medGeometryElement cellTypes[ numberOfCellTypes ] = {
+    MED_EN::MED_SEG2,
+    MED_EN::MED_SEG3,
+    MED_EN::MED_TRIA3,
+    MED_EN::MED_TRIA6,
+    MED_EN::MED_QUAD4,
+    MED_EN::MED_QUAD8,
+    MED_EN::MED_TETRA4,
+    MED_EN::MED_TETRA10,
+    MED_EN::MED_PYRA5,
+    MED_EN::MED_PYRA13,
+    MED_EN::MED_PENTA6,
+    MED_EN::MED_PENTA15,
+    MED_EN::MED_HEXA8,
+    MED_EN::MED_HEXA20
+  };
+  
+  const int numberOfCells[numberOfCellTypes] = {
+    1, 1,                   //1D
+    1, 1, 1, 1,             //2D 
+    1, 1, 1, 1, 1, 1, 1, 1  //3D
+  };
+
+  //Seg2 Connectivity
+  int seg2C [ 2 ] = {
+    1,3
+  };
+
+  //Seg3 Connectivity
+  int seg3C [ 3 ] = {
+    1,3,2
+  };
+
+  //Tria3 Connectivity
+  int tria3C [ 3 ] = {
+    4,5,6
+  };
+
+  //Tria6 Connectivity
+  int tria6C [ 6 ] = {
+    4,5,6,7,8,9
+  };
+
+  //Quad4 Connectivity
+  int quad4C [4] = {
+    1, 10, 11, 12
+  };
+
+  //Quad8 Connectivity
+  int quad8C [8] = {
+    1, 10, 11, 12, 13, 14, 15, 16
+  };
+
+  //Tetra4 Connectivity
+  int tetra4C [4] = {
+    1, 17, 18, 19
+  };
+
+  //Tetra10 Connectivity
+  int tetra10C [10] = {
+    1, 17, 18, 19, 20, 21, 22, 23, 24, 25
+  };
+
+  //Pyra13 Connectivity
+  int pyra5C [5] = {
+    1, 12, 11, 10, 26
+  };
+
+  //Pyra13 Connectivity
+  int pyra13C [13] = {
+    1, 12, 11, 10, 26, 16, 15, 14, 13, 27, 28, 29, 30
+  };
+
+  //Penta6 Connectivity
+  int penta6C [6] = {
+    1, 31, 32, 33, 34, 35
+  };
+
+  //Penta6 Connectivity
+  int penta15C [15] = {
+    1, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44
+  };
+
+  //Hexa8 Connectivity 
+  int hexa8C[8] = {
+    1, 10, 11, 12, 45, 46, 47, 48
+  };
+
+  //Hexa20 Connectivity 
+  int hexa20C[20] = {
+    1, 10, 11, 12, 45, 46, 47, 48, 13, 14, 15, 16, 49, 50, 51, 52, 53, 54, 55, 56
+  };
+
+
+
+  MEDMEM::MESHING* mesh = new MEDMEM::MESHING;
+  mesh->setCoordinates(spaceDimension, numberOfNodes, coordinates,
+		       "CARTESIAN", MED_EN::MED_FULL_INTERLACE);
+
+  mesh->setCoordinates(spaceDimension, numberOfNodes, coordinates,
+		       "CARTESIAN", MED_EN::MED_FULL_INTERLACE);
+  mesh->setCoordinatesNames(names);
+  mesh->setCoordinatesUnits(units);
+
+  //connectivities
+  mesh->setNumberOfTypes(numberOfCellTypes, MED_EN::MED_CELL);
+  mesh->setTypes(cellTypes, MED_EN::MED_CELL);
+  mesh->setNumberOfElements(numberOfCells, MED_EN::MED_CELL);
+  
+  mesh->setConnectivity(seg2C , MED_EN::MED_CELL, MED_EN::MED_SEG2);
+  mesh->setConnectivity(seg3C , MED_EN::MED_CELL, MED_EN::MED_SEG3);
+  mesh->setConnectivity(tria3C , MED_EN::MED_CELL, MED_EN::MED_TRIA3);
+  mesh->setConnectivity(tria6C , MED_EN::MED_CELL, MED_EN::MED_TRIA6);
+  mesh->setConnectivity(quad4C , MED_EN::MED_CELL, MED_EN::MED_QUAD4);
+  mesh->setConnectivity(quad8C , MED_EN::MED_CELL, MED_EN::MED_QUAD8);
+  mesh->setConnectivity(tetra4C , MED_EN::MED_CELL, MED_EN::MED_TETRA4);
+  mesh->setConnectivity(tetra10C , MED_EN::MED_CELL, MED_EN::MED_TETRA10);
+  mesh->setConnectivity(pyra5C , MED_EN::MED_CELL, MED_EN::MED_PYRA5);
+  mesh->setConnectivity(pyra13C , MED_EN::MED_CELL, MED_EN::MED_PYRA13);
+  mesh->setConnectivity(penta6C , MED_EN::MED_CELL, MED_EN::MED_PENTA6);
+  mesh->setConnectivity(penta15C , MED_EN::MED_CELL, MED_EN::MED_PENTA15);
+  mesh->setConnectivity(hexa8C , MED_EN::MED_CELL, MED_EN::MED_HEXA8);
+  mesh->setConnectivity(hexa20C , MED_EN::MED_CELL, MED_EN::MED_HEXA20);
+
+
+  //Support definition 
+  SUPPORT* sup = new SUPPORT(mesh, "Test support", MED_EN::MED_CELL);
+  sup->setNumberOfGeometricType(numberOfCellTypes);
+  sup->setGeometricType(cellTypes);
+  sup->setNumberOfElements(numberOfCells);
+  sup->setAll(true);
+
+  //Create test field
+  FIELD<int>* aField = new FIELD<int>(sup,1);
+
+  //Gauss Localization definition:
+  double v[1] =   { 0.3 };
+  double v_2[2] = { 0.3, 0.3 };
+  double v_3[3] = { 0.3, 0.3, 0.3 };
+  double v_4[4] = { 0.3, 0.3, 0.3, 0.3 };
+
+  //              --------- Seg2 localization ---------
+  //              Nb of the gauss points = 1 
+  double seg2CooRef[2] = { 
+    -1.0 , 1.0 
+  };
+  double seg2CooGauss[1] = { 
+    0.2
+  };
+
+  GAUSS_LOCALIZATION<>* aseg2L = new GAUSS_LOCALIZATION<>("Seg2 Gauss localization",
+							  MED_EN::MED_SEG2,
+							  1,
+							  seg2CooRef,
+							  seg2CooGauss,
+							  v);
+
+  //              --------- Seg3 localization ---------
+  //              Nb of the gauss points = 1
+  double seg3CooRef[3] = { 
+    -1.0, 1.0, 0.0 
+  };
+  double seg3CooGauss[1] = { 
+    0.2
+  };
+
+  GAUSS_LOCALIZATION<>* aseg3L = new GAUSS_LOCALIZATION<>("Seg3 Gauss localization",
+							  MED_EN::MED_SEG3,
+							  1,
+							  seg3CooRef,
+							  seg3CooGauss,
+							  v);
+  //              --------- Tria3 localization ---------
+  //              Nb of the gauss points = 2
+  double tria3CooRef[6] = { 
+    0.0, 0.0, 1.0 , 0.0, 0.0, 1.0
+  };
+  
+  double tria3CooGauss[4] = { 
+    0.1, 0.8, 0.2, 0.7
+  };
+
+  GAUSS_LOCALIZATION<>* atria3L = new GAUSS_LOCALIZATION<>("Tria3 Gauss localization",
+							  MED_EN::MED_TRIA3,
+							  2,
+							  tria3CooRef,
+							  tria3CooGauss,
+							  v_2);
+
+  //              --------- Tria6 localization ---------
+  //              Nb of the gauss points = 3
+  double tria6CooRef[12] = { 
+    0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.5, 0.0, 0.5, 0.5, 0.0, 0.5
+  };
+  
+  double tria6CooGauss[6] = { 
+    0.3, 0.2, 0.2, 0.1, 0.2, 0.4
+  };
+
+  GAUSS_LOCALIZATION<>* atria6L = new GAUSS_LOCALIZATION<>("Tria6 Gauss localization",
+							   MED_EN::MED_TRIA6,
+							   3,
+							   tria6CooRef,
+							   tria6CooGauss,
+							   v_3);
+  //              --------- Quad4 localization ---------
+  //              Nb of the gauss points = 4
+  double quad4CooRef[8] = { 
+    -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0
+  };
+  
+  double quad4CooGauss[8] = { //Size is type/10*NbGauss = (204/100)*4 = 8
+    0.3, 0.2, 0.2, 0.1, 0.2, 0.4, 0.15, 0.27
+  };
+
+  GAUSS_LOCALIZATION<>* aquad4L = new GAUSS_LOCALIZATION<>("Quad8 Gauss localization",
+							   MED_EN::MED_QUAD4,
+							   4,
+							   quad4CooRef,
+							   quad4CooGauss,
+							   v_4);
+  //              --------- Quad8 localization ---------
+  //              Nb of the gauss points = 4
+  double quad8CooRef[16] = { 
+    -1.0, -1.0,
+     1.0, -1.0,
+     1.0,  1.0,
+    -1.0,  1.0,
+     0.0, -1.0,
+     1.0,  0.0,
+     0.0,  1.0,
+    -1.0,  0.0
+  };
+  
+  double quad8CooGauss[8] = { 
+    0.34, 0.16, 0.21, 0.3, 0.23, 0.4, 0.14, 0.37
+  };
+
+  GAUSS_LOCALIZATION<>* aquad8L = new GAUSS_LOCALIZATION<>("Quad8 Gauss localization",
+							   MED_EN::MED_QUAD8,
+							   4,
+							   quad8CooRef,
+							   quad8CooGauss,
+							   v_4);
+
+  //              --------- Tetra4 localization
+  //              Nb of the gauss points = 1
+  double tetra4CooRef[12] = { 
+    0.0,  1.0,  0.0,
+    0.0,  0.0,  1.0, 
+    0.0,  0.0,  0.0,
+    1.0,  0.0,  0.0
+  };
+  
+  double tetra4CooGauss[3] = { 
+    0.34, 0.16, 0.21
+  };
+
+  GAUSS_LOCALIZATION<>* atetra4L = new GAUSS_LOCALIZATION<>("Tetra4 Gauss localization",
+							   MED_EN::MED_TETRA4,
+							   1,
+							   tetra4CooRef,
+							   tetra4CooGauss,
+							   v);
+
+  //              --------- Tetra10 localization
+  //              Nb of the gauss points = 1
+  double tetra10CooRef[30] = { 
+    0.0, 1.0, 0.0,
+    0.0, 0.0, 0.0,
+    0.0, 0.0, 1.0,
+    1.0, 0.0, 0.0,
+    0.0, 0.5, 0.0,
+    0.0, 0.0, 0.5,
+    0.0, 0.5, 0.5,
+    0.5, 0.5, 0.0,
+    0.5, 0.0, 0.0,
+    0.5, 0.0, 0.5,
+  };
+  
+  double tetra10CooGauss[3] = { 
+    0.2, 0.3, 0.1
+  };
+
+  GAUSS_LOCALIZATION<>* atetra10L = new GAUSS_LOCALIZATION<>("Tetra10 Gauss localization",
+							   MED_EN::MED_TETRA10,
+							   1,
+							   tetra10CooRef,
+							   tetra10CooGauss,
+							   v);
+  //              --------- Pyra5 localization
+  //              Nb of the gauss points = 1
+  double pyra5CooRef[15] = { 
+    1.0,  0.0,  0.0,
+    0.0,  1.0,  0.0,
+   -1.0,  0.0,  0.0,
+    0.0, -1.0,  0.0,
+    0.0,  0.0,  1.0
+  };
+  
+  double pyra5CooGauss[3] = { 
+    0.2, 0.3, 0.1
+  };
+
+  GAUSS_LOCALIZATION<>* apyra5L = new GAUSS_LOCALIZATION<>("Pyra5 Gauss localization",
+							  MED_EN::MED_PYRA5,
+							  1,
+							  pyra5CooRef,
+							  pyra5CooGauss,
+							  v);
+
+  //              --------- Pyra13 localization
+  //              Nb of the gauss points = 1
+  double pyra13CooRef[39] = { 
+    1.0,  0.0, 0.0,
+    0.0,  1.0, 0.0,
+   -1.0,  0.0, 0.0,
+    0.0, -1.0, 0.0,
+    0.0,  0.0, 1.0,
+    0.5,  0.5, 0.0,
+   -0.5,  0.5, 0.0,
+   -0.5, -0.5, 0.0,
+    0.5, -0.5, 0.0,
+    0.5,  0.0, 0.5,
+    0.0,  0.5, 0.5,
+   -0.5,  0.0, 0.5,
+    0.0, -0.5, 0.5
+  };
+  
+  double pyra13CooGauss[3] = { 
+    0.1, 0.2, 0.7
+  };
+
+  GAUSS_LOCALIZATION<>* apyra13L = new GAUSS_LOCALIZATION<>("Pyra13 Gauss localization",
+							  MED_EN::MED_PYRA13,
+							  1,
+							  pyra13CooRef,
+							  pyra13CooGauss,
+							  v);
+  //              --------- Penta6 localization
+  //              Nb of the gauss points = 1
+  double penta6CooRef[18] = { 
+   -1.0,   1.0,   0.0,
+   -1.0,  -0.0,   1.0,
+   -1.0,   0.0,   0.0,
+    1.0,   1.0,   0.0,
+    1.0,   0.0,   1.0,
+    1.0,   0.0,   0.0
+  };
+  
+  double penta6CooGauss[3] = { 
+    0.2, 0.3, 0.1
+  };
+
+  GAUSS_LOCALIZATION<>* apenta6L = new GAUSS_LOCALIZATION<>("Penta6 Gauss localization",
+							    MED_EN::MED_PENTA6,
+							    1,
+							    penta6CooRef,
+							    penta6CooGauss,
+							    v);
+
+  //              --------- Penta15 localization
+  //              Nb of the gauss points = 1
+  double penta15CooRef[45] = { 
+   -1.0,  1.0,   0.0,
+   -1.0,  0.0,   1.0,
+   -1.0,  0.0,   0.0,
+    1.0,  1.0,   0.0,
+    1.0,  0.0,   1.0,
+    1.0,  0.0,   0.0,
+   -1.0,  0.5,   0.5,
+   -1.0,  0.0,   0.5,
+   -1.0,  0.5,   0.0,
+    0.0,  1.0,   0.0,
+    0.0,  0.0,   1.0,
+    0.0,  0.0,   0.0,
+    1.0,  0.5,   0.5,
+    1.0,  0.0,   0.5,
+    1.0,  0.5,   0.0
+  };
+  
+  double penta15CooGauss[3] = {
+    0.2, 0.3, 0.15
+  };
+
+  GAUSS_LOCALIZATION<>* apenta15L = new GAUSS_LOCALIZATION<>("Penta15 Gauss localization",
+							     MED_EN::MED_PENTA15,
+							     1,
+							     penta15CooRef,
+							     penta15CooGauss,
+							     v);
+
+  //              --------- Hexa8 localization
+  //              Nb of the gauss points = 1
+  double hexa8CooRef [24] = {
+   -1.0,  -1.0,  -1.0,
+    1.0,  -1.0,  -1.0,
+    1.0,   1.0,  -1.0,
+   -1.0,   1.0,  -1.0,
+   -1.0,  -1.0,   1.0,
+    1.0,  -1.0,   1.0,
+    1.0,   1.0,   1.0,
+   -1.0,   1.0,   1.0
+  };
+  
+  double hexa8CooGauss[3] = {
+    0.2, 0.3, 0.15
+  };
+
+  GAUSS_LOCALIZATION<>* ahexa8L = new GAUSS_LOCALIZATION<>("Hexa8 Gauss localization",
+							     MED_EN::MED_HEXA8,
+							     1,
+							     hexa8CooRef,
+							     hexa8CooGauss,
+							     v);
+
+  //              --------- Hexa20 localization
+  //              Nb of the gauss points = 1
+  double hexa20CooRef[60] = { 
+    -1.0,  -1.0,  -1.0,
+     1.0,  -1.0,  -1.0,
+     1.0,   1.0,  -1.0,
+    -1.0,   1.0,  -1.0,
+    -1.0,  -1.0,   1.0,
+     1.0,  -1.0,   1.0,
+     1.0,   1.0,   1.0,
+    -1.0,   1.0,   1.0,
+     0.0,  -1.0,  -1.0,
+     1.0,   0.0,  -1.0,
+     0.0,   1.0,  -1.0,
+    -1.0,   0.0,  -1.0,
+    -1.0,  -1.0,   0.0,
+     1.0,  -1.0,   0.0,
+     1.0,   1.0,   0.0,
+    -1.0,   1.0,   0.0,
+     0.0,  -1.0,   1.0,
+     1.0,   0.0,   1.0,
+     0.0,   1.0,   1.0,
+    -1.0,   0.0,   1.0
+  };
+  
+  double hexa20CooGauss[3] = {
+    0.11, 0.3, 0.55
+  };
+
+  GAUSS_LOCALIZATION<>* ahexa20L = new GAUSS_LOCALIZATION<>("Hexa20 Gauss localization",
+							     MED_EN::MED_HEXA20,
+							     1,
+							     hexa20CooRef,
+							     hexa20CooGauss,
+							     v);
+
+
+  
+  aField->setGaussLocalization(MED_EN::MED_SEG2, aseg2L);
+  aField->setGaussLocalization(MED_EN::MED_SEG3, aseg3L);
+  aField->setGaussLocalization(MED_EN::MED_TRIA3, atria3L);
+  aField->setGaussLocalization(MED_EN::MED_TRIA6, atria6L);
+  aField->setGaussLocalization(MED_EN::MED_QUAD4, aquad4L);
+  aField->setGaussLocalization(MED_EN::MED_QUAD8, aquad8L);
+  aField->setGaussLocalization(MED_EN::MED_TETRA4, atetra4L);
+  aField->setGaussLocalization(MED_EN::MED_TETRA10, atetra10L);
+  aField->setGaussLocalization(MED_EN::MED_PYRA5, apyra5L);
+  aField->setGaussLocalization(MED_EN::MED_PYRA13, apyra13L);
+  aField->setGaussLocalization(MED_EN::MED_PENTA6, apenta6L);
+  aField->setGaussLocalization(MED_EN::MED_PENTA15, apenta15L);
+  aField->setGaussLocalization(MED_EN::MED_HEXA8, ahexa8L);
+  aField->setGaussLocalization(MED_EN::MED_HEXA20, ahexa20L);
+
+  FIELD<double>* aGaussCoords = aField->getGaussPointsCoordinates();
+
+
+  //Coordinates to check result
+  double seg2Coord[3] = {0.6,0.6,0.6};
+  double seg3Coord[3] = {0.6,0.6,0.6};
+  
+  double tria3Coord[3*2]  = {
+    5.1, 1.55, 0.0,   //First GP Coordinates 
+    4.7, 1.65, 0.0    //Second GP Coordinates
+  };
+  
+  double tria6Coord[3*3] = {
+    2.32, 1.52, 0.0, //First GP Coordinates  
+    1.6 , 1.32, 0.0, //Second GP Coordinates  
+    3.52, 1.26, 0.0  //Third GP Coordinates
+  };
+  
+  double quad4Coord[4*3] = {
+    2.6, 1.6,  0.0,
+    2.4, 1.8,  0.0,
+    2.4, 1.2,  0.0,
+    2.3, 1.46, 0.0
+  };
+
+  double quad8Coord[4*3] = {
+    2.32, 2.68,  0.0,
+    2.6,  2.42,  0.0,
+    2.8,  2.46,  0.0,
+    2.74, 2.28,  0.0
+  };
+
+  double tetra4Coord[3] = {
+    1.312, 3.15, 1.02
+  };
+
+  double tetra10Coord[3] = {
+    0.56, 3.3, 0.6
+  };
+
+  double pyra5Coord [3]= {
+    2.18, 1.1, 0.2
+  };
+
+  double pyra13Coord [3] = {
+    1.18, 1.54, 0.98
+  };
+  
+  double penta6Coord [3] = {
+    1.56, 0.3, 3.6
+  };
+
+  double penta15Coord [3] = {
+    1.613, 0.801, 4.374
+  };
+
+  double hexa8Coord [3] = {
+    2.6, 2.4, 2.3
+  };
+
+  double hexa20Coord [3] = {
+    2.31232, 2.3934, 1.55326
+  };
+
+  //Check result of the calculation
+  int ElemId = 1;
+  double EPS = 0.000001;
+  int idx = 0;
+    
+  //Seg2:
+  for(int j = 1; j<=3;j++) {
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(aGaussCoords->getValueIJK(ElemId,j,1),
+				 seg2Coord[j-1], EPS);
+  }
+
+  //Seg3:
+  ElemId++;
+  for(int j = 1; j<=3;j++) {
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(aGaussCoords->getValueIJK(ElemId,j,1),
+				 seg3Coord[j-1], EPS);
+  }
+
+  //Tria3
+  ElemId++;
+  for(int k = 1; k <=2 ; k++) {
+    for(int j = 1; j<=3;j++) {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(aGaussCoords->getValueIJK(ElemId,j,k),
+				   tria3Coord[idx++], EPS);
+    }
+  }
+
+  //Tria6
+  ElemId++;
+  idx=0;
+  for(int k = 1; k <=3 ; k++) {
+    for(int j = 1; j<=3;j++) {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(aGaussCoords->getValueIJK(ElemId,j,k),
+				   tria6Coord[idx++], EPS);
+    }
+  }  
+  
+  //Quad4
+  ElemId++;
+  idx=0;
+  for(int k = 1; k <=4 ; k++) {
+    for(int j = 1; j<=3;j++) {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(aGaussCoords->getValueIJK(ElemId,j,k),
+				   quad4Coord[idx++], EPS);
+    }
+  }
+  
+  //Quad8
+  ElemId++;
+  idx=0;
+  for(int k = 1; k <=4 ; k++) {
+    for(int j = 1; j<=3;j++) {
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(aGaussCoords->getValueIJK(ElemId,j,k),
+				   quad8Coord[idx++], EPS);
+    }
+  }
+
+  //Tetra4
+  ElemId++;
+  for(int j = 1; j<=3;j++) {
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(aGaussCoords->getValueIJK(ElemId,j,1),
+				 tetra4Coord[j-1], EPS);
+  }
+
+  //Tetra10
+  ElemId++;
+  for(int j = 1; j<=3;j++) {
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(aGaussCoords->getValueIJK(ElemId,j,1),
+				 tetra10Coord[j-1], EPS);
+  }
+
+  //Pyra5
+  ElemId++;
+  for(int j = 1; j<=3;j++) {
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(aGaussCoords->getValueIJK(ElemId,j,1),
+				 pyra5Coord[j-1], EPS);
+  }
+
+  //Penta15
+  ElemId++;
+  for(int j = 1; j<=3;j++) {
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(aGaussCoords->getValueIJK(ElemId,j,1),
+				 pyra13Coord[j-1], EPS);
+  }
+
+  //Penta6
+  ElemId++;
+  for(int j = 1; j<=3;j++) {
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(aGaussCoords->getValueIJK(ElemId,j,1),
+				 penta6Coord[j-1], EPS);
+  }
+
+  //Penta15
+  ElemId++;
+  for(int j = 1; j<=3;j++) {
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(aGaussCoords->getValueIJK(ElemId,j,1),
+				 penta15Coord[j-1], EPS);
+  }
+
+  //Hexa8
+  ElemId++;
+  for(int j = 1; j<=3;j++) {
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(aGaussCoords->getValueIJK(ElemId,j,1),
+				 hexa8Coord[j-1], EPS);
+  }
+
+  //Hexa20
+  ElemId++;
+  for(int j = 1; j<=3;j++) {
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(aGaussCoords->getValueIJK(ElemId,j,1),
+				 hexa20Coord[j-1], 0.0001);
+  }
 }

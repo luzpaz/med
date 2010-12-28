@@ -155,6 +155,7 @@ libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) $(XDR_CPPFLAGS) \
 	-I$(srcdir)/../INTERP_KERNEL \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../INTERP_KERNEL/Geometric2D \
+	-I$(srcdir)/../INTERP_KERNEL/GaussPoints \
 	-I$(srcdir)/../MEDWrapper/V2_1/Core -I$(srcdir)/../INTERPOLATION
 libmedmem_la_CXXFLAGS= @CXXTMPDPTHFLAGS@
 
