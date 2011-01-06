@@ -70,7 +70,7 @@ if CPPUNIT_IS_OK
 endif
 
 if MED_ENABLE_SPLITTER
-    SPLITTER_SUBDIRS = MEDSPLITTER MEDSPLITTER_Swig
+    SPLITTER_SUBDIRS = MEDSPLITTER MEDSPLITTER_Swig MEDPartitioner
 
 if MED_ENABLE_METIS
       MULTIPR_SUBDIRS = MULTIPR
@@ -107,4 +107,4 @@ DIST_SUBDIRS= MEDWrapper INTERP_KERNEL MEDMEM MEDCoupling MEDCoupling_Swig MEDME
               MEDMEMBinTest MEDMEMCppTest INTERP_KERNELTest ParaMEDMEM ParaMEDMEM_Swig MEDLoader        \
 	      MEDSPLITTER MEDSPLITTER_Swig RENUMBER MULTIPR MEDCouplingCorba MEDCouplingCorba_Swig      \
 	      MEDMEM_I MED MED_SWIG MedCorba_Swig ParaMEDLoader MedClient ParaMEDMEMComponent           \
-	      ParaMEDCouplingCorba MEDGUI ParaMEDMEMTest
+	      ParaMEDCouplingCorba MEDGUI ParaMEDMEMTest MEDPartitioner
