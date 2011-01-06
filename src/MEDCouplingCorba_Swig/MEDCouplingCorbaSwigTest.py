@@ -109,14 +109,14 @@ class MEDCouplingCorbaServBasicsTest:
         targetMesh.allocateCells(8);
         targetMesh.setName("Wonderfull 0D mesh");
         targetConn=[]
-        targetMesh.insertNextCell(NORM_POINT0,0,targetConn);
-        targetMesh.insertNextCell(NORM_POINT0,0,targetConn);
-        targetMesh.insertNextCell(NORM_POINT0,0,targetConn);
-        targetMesh.insertNextCell(NORM_POINT0,0,targetConn);
-        targetMesh.insertNextCell(NORM_POINT0,0,targetConn);
-        targetMesh.insertNextCell(NORM_POINT0,0,targetConn);
-        targetMesh.insertNextCell(NORM_POINT0,0,targetConn);
-        targetMesh.insertNextCell(NORM_POINT0,0,targetConn);
+        targetMesh.insertNextCell(NORM_POINT1,1,[0]);
+        targetMesh.insertNextCell(NORM_POINT1,1,[1]);
+        targetMesh.insertNextCell(NORM_POINT1,1,[2]);
+        targetMesh.insertNextCell(NORM_POINT1,1,[3]);
+        targetMesh.insertNextCell(NORM_POINT1,1,[4]);
+        targetMesh.insertNextCell(NORM_POINT1,1,[5]);
+        targetMesh.insertNextCell(NORM_POINT1,1,[7]);
+        targetMesh.insertNextCell(NORM_POINT1,1,[6]);
         targetMesh.finishInsertingCells();
         myCoords=DataArrayDouble.New();
         myCoords.setValues(targetCoords,9,3);
