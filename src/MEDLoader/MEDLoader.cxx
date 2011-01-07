@@ -62,7 +62,7 @@ med_geometrie_element typmai[MED_NBR_GEOMETRIE_MAILLE+2] = { MED_POINT1,
 
 med_geometrie_element typmainoeud[1] = { MED_NONE };
 
-INTERP_KERNEL::NormalizedCellType typmai2[MED_NBR_GEOMETRIE_MAILLE+2] = { INTERP_KERNEL::NORM_POINT0,
+INTERP_KERNEL::NormalizedCellType typmai2[MED_NBR_GEOMETRIE_MAILLE+2] = { INTERP_KERNEL::NORM_POINT1,
                                                                           INTERP_KERNEL::NORM_SEG2,
                                                                           INTERP_KERNEL::NORM_SEG3,
                                                                           INTERP_KERNEL::NORM_TRI3,
@@ -185,7 +185,7 @@ namespace MEDLoaderNS
   void prepareCellFieldDoubleForWriting(const ParaMEDMEM::MEDCouplingFieldDouble *f, const int *cellIds, std::list<MEDLoader::MEDFieldDoublePerCellType>& split);
   void fillGaussDataOnField(const char *fileName, const std::list<MEDLoader::MEDFieldDoublePerCellType>& data, MEDCouplingFieldDouble *f);
   void writeUMeshesDirectly(const char *fileName, const std::vector<const ParaMEDMEM::MEDCouplingUMesh *>& mesh, const std::vector<const DataArrayInt *>& families, bool forceFromScratch, bool &isRenumbering);
-  void writeUMeshesPartitionDirectly(const char *fileName, const char *meshName, const std::vector<ParaMEDMEM::MEDCouplingUMesh *>& meshes, bool forceFromScratch);
+  void writeUMeshesPartitionDirectly(const char *fileName, const char *meshName, const std::vector<const ParaMEDMEM::MEDCouplingUMesh *>& meshes, bool forceFromScratch);
   void writeFieldAndMeshDirectly(const char *fileName, const ParaMEDMEM::MEDCouplingFieldDouble *f, bool forceFromScratch);
   void writeFieldTryingToFitExistingMesh(const char *fileName, const ParaMEDMEM::MEDCouplingFieldDouble *f);
 }
@@ -2214,7 +2214,7 @@ void MEDLoaderNS::writeUMeshesDirectly(const char *fileName, const std::vector<c
  * In this method meshes are assumed to shared the same coords.
  * This method makes the assumption that 'meshes' is not empty, no check on that is done (responsability of the caller)
  */
-void MEDLoaderNS::writeUMeshesPartitionDirectly(const char *fileName, const char *meshName, const std::vector<ParaMEDMEM::MEDCouplingUMesh *>& meshes, bool forceFromScratch)
+void MEDLoaderNS::writeUMeshesPartitionDirectly(const char *fileName, const char *meshName, const std::vector<const ParaMEDMEM::MEDCouplingUMesh *>& meshes, bool forceFromScratch)
 {
   std::string meshNameCpp(meshName);
   char *maa=MEDLoaderBase::buildEmptyString(MED_TAILLE_NOM);
@@ -2222,10 +2222,11 @@ void MEDLoaderNS::writeUMeshesPartitionDirectly(const char *fileName, const char
   if(meshNameCpp=="")
     throw INTERP_KERNEL::Exception("writeUMeshesPartitionDirectly : Invalid meshName : Must be different from \"\" !");
   std::vector< DataArrayInt * > corr;
-  MEDCouplingUMesh *m=ParaMEDMEM::MEDCouplingUMesh::fuseUMeshesOnSameCoords(meshes,0,corr);
+  MEDCouplingUMesh *m=ParaMEDMEM::MEDCouplingUMesh::FuseUMeshesOnSameCoords(meshes,0,corr);
   m->setName(meshName);
   std::vector< std::vector<int> > fidsOfGroups;
-  DataArrayInt *arr2=DataArrayInt::makePartition(corr,m->getNumberOfCells(),fidsOfGroups);
+  std::vector< const DataArrayInt * > corr2(corr.begin(),corr.end());
+  DataArrayInt *arr2=DataArrayInt::MakePartition(corr2,m->getNumberOfCells(),fidsOfGroups);
   for(std::vector< DataArrayInt * >::iterator it=corr.begin();it!=corr.end();it++)
     (*it)->decrRef();
   bool isRenumbering;
@@ -2547,7 +2548,7 @@ void MEDLoaderNS::writeFieldTryingToFitExistingMesh(const char *fileName, const 
       throw INTERP_KERNEL::Exception(oss.str().c_str());
     }
   MEDCouplingUMesh *m=MEDLoader::ReadUMeshFromFile(fileName,f->getMesh()->getName(),f2);
-  MEDCouplingUMesh *m2=MEDCouplingUMesh::mergeUMeshes(m,(MEDCouplingUMesh *)f->getMesh());
+  MEDCouplingUMesh *m2=MEDCouplingUMesh::MergeUMeshes(m,(MEDCouplingUMesh *)f->getMesh());
   bool areNodesMerged;
   int newNbOfNodes;
   DataArrayInt *da=m2->mergeNodes(MEDLoader::_EPS_FOR_NODE_COMP,areNodesMerged,newNbOfNodes);
@@ -2666,7 +2667,7 @@ void MEDLoader::WriteUMeshDep(const char *fileName, const ParaMEDMEM::MEDCouplin
     MEDLoaderNS::writeUMeshesDirectly(fileName,meshV,famV,false,isRenumbering);
 }
 
-void MEDLoader::WriteUMeshesPartition(const char *fileName, const char *meshNameC, const std::vector<ParaMEDMEM::MEDCouplingUMesh *>& meshes, bool writeFromScratch) throw(INTERP_KERNEL::Exception)
+void MEDLoader::WriteUMeshesPartition(const char *fileName, const char *meshNameC, const std::vector<const ParaMEDMEM::MEDCouplingUMesh *>& meshes, bool writeFromScratch) throw(INTERP_KERNEL::Exception)
 {
   std::string meshName(meshNameC);
   if(meshName.empty())
@@ -2680,11 +2681,11 @@ void MEDLoader::WriteUMeshesPartition(const char *fileName, const char *meshName
   if(meshes.empty())
     throw INTERP_KERNEL::Exception("List of meshes must be not empty !");
   DataArrayDouble *coords=meshes.front()->getCoords();
-  for(std::vector<ParaMEDMEM::MEDCouplingUMesh *>::const_iterator iter=meshes.begin();iter!=meshes.end();iter++)
+  for(std::vector<const ParaMEDMEM::MEDCouplingUMesh *>::const_iterator iter=meshes.begin();iter!=meshes.end();iter++)
     if(coords!=(*iter)->getCoords())
       throw INTERP_KERNEL::Exception("Meshes does not not share the same coordinates : try method MEDCouplingPointSet::tryToShareSameCoords !");
   std::set<std::string> tmp;
-  for(std::vector<ParaMEDMEM::MEDCouplingUMesh *>::const_iterator iter=meshes.begin();iter!=meshes.end();iter++)
+  for(std::vector<const ParaMEDMEM::MEDCouplingUMesh *>::const_iterator iter=meshes.begin();iter!=meshes.end();iter++)
     {
       if(tmp.find((*iter)->getName())==tmp.end())
         tmp.insert((*iter)->getName());
@@ -2716,7 +2717,7 @@ void MEDLoader::WriteUMeshesPartition(const char *fileName, const char *meshName
     }
 }
 
-void MEDLoader::WriteUMeshesPartitionDep(const char *fileName, const char *meshNameC, const std::vector<ParaMEDMEM::MEDCouplingUMesh *>& meshes, bool writeFromScratch) throw(INTERP_KERNEL::Exception)
+void MEDLoader::WriteUMeshesPartitionDep(const char *fileName, const char *meshNameC, const std::vector<const ParaMEDMEM::MEDCouplingUMesh *>& meshes, bool writeFromScratch) throw(INTERP_KERNEL::Exception)
 {
   std::string meshName(meshNameC);
   if(meshName.empty())
@@ -2730,11 +2731,11 @@ void MEDLoader::WriteUMeshesPartitionDep(const char *fileName, const char *meshN
   if(meshes.empty())
     throw INTERP_KERNEL::Exception("List of meshes must be not empty !");
   DataArrayDouble *coords=meshes.front()->getCoords();
-  for(std::vector<ParaMEDMEM::MEDCouplingUMesh *>::const_iterator iter=meshes.begin();iter!=meshes.end();iter++)
+  for(std::vector<const ParaMEDMEM::MEDCouplingUMesh *>::const_iterator iter=meshes.begin();iter!=meshes.end();iter++)
     if(coords!=(*iter)->getCoords())
       throw INTERP_KERNEL::Exception("Meshes does not not share the same coordinates : try method MEDCouplingPointSet::tryToShareSameCoords !");
   std::set<std::string> tmp;
-  for(std::vector<ParaMEDMEM::MEDCouplingUMesh *>::const_iterator iter=meshes.begin();iter!=meshes.end();iter++)
+  for(std::vector<const ParaMEDMEM::MEDCouplingUMesh *>::const_iterator iter=meshes.begin();iter!=meshes.end();iter++)
     {
       if(tmp.find((*iter)->getName())==tmp.end())
         tmp.insert((*iter)->getName());

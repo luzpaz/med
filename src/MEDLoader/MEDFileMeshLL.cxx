@@ -174,7 +174,7 @@ void MEDFileUMeshL2::readFamiliesAndGrps(med_idt fid, const char *meshName, std:
     }
 }
 
-void MEDFileUMeshL2::writeFamiliesAndGrps(med_idt fid, const char *mname, const std::map<std::string,int>& fams, const std::map<std::string, std::vector<std::string> >& grps)
+void MEDFileUMeshL2::writeFamiliesAndGrps(med_idt fid, const char *mname, const std::map<std::string,int>& fams, const std::map<std::string, std::vector<std::string> >& grps, int tooLongStrPol)
 {
   for(std::map<std::string,int>::const_iterator it=fams.begin();it!=fams.end();it++)
     {
@@ -188,9 +188,9 @@ void MEDFileUMeshL2::writeFamiliesAndGrps(med_idt fid, const char *mname, const 
       INTERP_KERNEL::AutoPtr<char> groName=MEDLoaderBase::buildEmptyString(MED_TAILLE_LNOM*ngro);
       int i=0;
       for(std::vector<std::string>::const_iterator it2=grpsOfFam.begin();it2!=grpsOfFam.end();it2++,i++)
-        MEDLoaderBase::safeStrCpy((*it2).c_str(),MED_TAILLE_LNOM-1,groName+i*MED_TAILLE_LNOM,0);//tony too long
+        MEDLoaderBase::safeStrCpy((*it2).c_str(),MED_TAILLE_LNOM-1,groName+i*MED_TAILLE_LNOM,tooLongStrPol);
       INTERP_KERNEL::AutoPtr<char> famName=MEDLoaderBase::buildEmptyString(MED_TAILLE_NOM);
-      MEDLoaderBase::safeStrCpy((*it).first.c_str(),MED_TAILLE_NOM,famName,0);//tony too long
+      MEDLoaderBase::safeStrCpy((*it).first.c_str(),MED_TAILLE_NOM,famName,tooLongStrPol);
       MEDfamCr(fid,(char *)mname,famName,(*it).second,0,0,0,0,groName,ngro);
     }
 }
@@ -238,7 +238,7 @@ MEDFileUMeshSplitL1::MEDFileUMeshSplitL1(const MEDFileUMeshL2& l2, const char *m
   if(v.empty())
     return;
   int sz=v.size();
-  std::vector<MEDCouplingUMesh *> ms(sz);
+  std::vector<const MEDCouplingUMesh *> ms(sz);
   for(int i=0;i<sz;i++)
     {
       MEDCouplingUMesh *tmp=MEDCouplingUMesh::New("",v[i]->getDim());
@@ -247,7 +247,7 @@ MEDFileUMeshSplitL1::MEDFileUMeshSplitL1(const MEDFileUMeshL2& l2, const char *m
       tmp->setConnectivity(const_cast<DataArrayInt *>(v[i]->getNodal()),const_cast<DataArrayInt *>(v[i]->getNodalIndex()));
       ms[i]=tmp;
     }
-  _m_by_types=MEDCouplingUMesh::mergeUMeshesOnSameCoords(ms);
+  _m_by_types=MEDCouplingUMesh::MergeUMeshesOnSameCoords(ms);
   _m_by_types->setName(mName);
   if(l2.isFamDefinedOnLev(id))
     {
@@ -266,26 +266,51 @@ MEDFileUMeshSplitL1::MEDFileUMeshSplitL1(const MEDFileUMeshL2& l2, const char *m
       int *w=_num->getPointer();
       for(int i=0;i<sz;i++)
         w=std::copy(v[i]->getNum()->getConstPointer(),v[i]->getNum()->getConstPointer()+v[i]->getNum()->getNumberOfTuples(),w);
+      computeRevNum();
       _m=(MEDCouplingUMesh *)_m_by_types->deepCpy();
       _m->renumberCells(_num->getConstPointer(),true);
     }
   else
     _m=_m_by_types;
   for(int i=0;i<sz;i++)
-    ms[i]->decrRef();
+    (const_cast<MEDCouplingUMesh *>(ms[i]))->decrRef();//const cast under control to avoid a copy of array
 }
 
 MEDFileUMeshSplitL1::MEDFileUMeshSplitL1(MEDCouplingUMesh *m)
 {
-  m->incrRef();
-  _m=m;
-  _m_by_types=(MEDCouplingUMesh *)_m->deepCpy();
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> da=_m_by_types->getRenumArrForConsecutiveCellTypesSpec(typmai2,typmai2+MED_NBR_GEOMETRIE_MAILLE+2);
-  _num=da->invertArrayO2N2N2O(m->getNumberOfCells());
+  assignMesh(m,true);
+}
+
+MEDFileUMeshSplitL1::MEDFileUMeshSplitL1(MEDCouplingUMesh *m, bool newOrOld)
+{
+  assignMesh(m,newOrOld);
+}
+
+void MEDFileUMeshSplitL1::assignMesh(MEDCouplingUMesh *m, bool newOrOld) throw(INTERP_KERNEL::Exception)
+{
+  if(newOrOld)
+    {
+      m->incrRef();
+      _m=m;
+      _m_by_types=(MEDCouplingUMesh *)_m->deepCpy();
+      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> da=_m_by_types->getRenumArrForConsecutiveCellTypesSpec(typmai2,typmai2+MED_NBR_GEOMETRIE_MAILLE+2);
+      if(!da->isIdentity())
+        {
+          _num=da->invertArrayO2N2N2O(m->getNumberOfCells());
+          computeRevNum();
+          _m_by_types->renumberCells(da->getConstPointer(),false);
+        }
+    }
+  else
+    {
+      if(!m->checkConsecutiveCellTypesAndOrder(typmai2,typmai2+MED_NBR_GEOMETRIE_MAILLE+2))
+        throw INTERP_KERNEL::Exception("MEDFileUMeshSplitL1::assignMesh : the mode of mesh setting expects to follow the MED file numbering convention ! it is not the case !");
+      m->incrRef();
+      _m_by_types=m;
+    }
   _fam=DataArrayInt::New();
   _fam->alloc(m->getNumberOfCells(),1);
   _fam->fillWithValue(0);
-  _m_by_types->renumberCells(da->getConstPointer(),false);
 }
 
 bool MEDFileUMeshSplitL1::empty() const
@@ -296,6 +321,13 @@ bool MEDFileUMeshSplitL1::empty() const
 int MEDFileUMeshSplitL1::getMeshDimension() const
 {
   return _m_by_types->getMeshDimension();
+}
+
+int MEDFileUMeshSplitL1::getSize() const throw(INTERP_KERNEL::Exception)
+{
+  if((const MEDCouplingUMesh *)_m_by_types==0)
+    throw INTERP_KERNEL::Exception("MEDFileUMeshSplitL1::getSize : no mesh specified at level !");
+  return _m_by_types->getNumberOfCells();
 }
 
 MEDCouplingUMesh *MEDFileUMeshSplitL1::getFamilyPart(const std::vector<int>& ids, bool renum) const
@@ -309,9 +341,10 @@ MEDCouplingUMesh *MEDFileUMeshSplitL1::getFamilyPart(const std::vector<int>& ids
 
 DataArrayInt *MEDFileUMeshSplitL1::getFamilyPartArr(const std::vector<int>& ids, bool renum) const
 {
-  DataArrayInt *da=_fam->getIdsEqualList(ids);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> da=_fam->getIdsEqualList(ids);
   if(renum)
     return renumIfNeededArr(da);
+  da->incrRef();
   return da;
 }
 
@@ -326,17 +359,38 @@ MEDCouplingUMesh *MEDFileUMeshSplitL1::getWholeMesh(bool renum) const
   return tmp;
 }
 
+const DataArrayInt *MEDFileUMeshSplitL1::getFamilyField() const
+{
+  return _fam;
+}
+
+const DataArrayInt *MEDFileUMeshSplitL1::getNumberField() const
+{
+  return _num;
+}
+
+const DataArrayInt *MEDFileUMeshSplitL1::getRevNumberField() const
+{
+  return _rev_num;
+}
+
+void MEDFileUMeshSplitL1::eraseFamilyField()
+{
+  _fam->fillWithZero();
+}
+
 /*!
  * This method ignores _m and _m_by_types.
  */
-void MEDFileUMeshSplitL1::setGroupsFromScratch(const std::vector<MEDCouplingUMesh *>& ms, std::map<std::string,int>& familyIds,
+void MEDFileUMeshSplitL1::setGroupsFromScratch(const std::vector<const MEDCouplingUMesh *>& ms, std::map<std::string,int>& familyIds,
                                                std::map<std::string, std::vector<std::string> >& groups) throw(INTERP_KERNEL::Exception)
 {
   int sz=ms.size();
   std::vector< DataArrayInt * > corr;
-  _m=MEDCouplingUMesh::fuseUMeshesOnSameCoords(ms,0,corr);
+  _m=MEDCouplingUMesh::FuseUMeshesOnSameCoords(ms,0,corr);
   std::vector< std::vector<int> > fidsOfGroups;
-  _fam=DataArrayInt::makePartition(corr,_m->getNumberOfCells(),fidsOfGroups);
+  std::vector< const DataArrayInt * > corr2(corr.begin(),corr.end());
+  _fam=DataArrayInt::MakePartition(corr2,_m->getNumberOfCells(),fidsOfGroups);
   int nbOfCells=_m->getNumberOfCells();
   std::map<int,std::string> newfams;
   std::map<int,int> famIdTrad;
@@ -371,33 +425,51 @@ void MEDFileUMeshSplitL1::write(med_idt fid, const char *mName, int mdim) const
     }
 }
 
-MEDCouplingUMesh *MEDFileUMeshSplitL1::renumIfNeeded(MEDCouplingUMesh *m, const int *cellIds) const
+void MEDFileUMeshSplitL1::setFamilyArr(DataArrayInt *famArr)
 {
-  if((const DataArrayInt *)_num==0)
+  famArr->incrRef();
+  _fam=famArr;
+}
+
+void MEDFileUMeshSplitL1::setRenumArr(DataArrayInt *renumArr)
+{
+  renumArr->incrRef();
+  _num=renumArr;
+  computeRevNum();
+}
+
+MEDCouplingUMesh *MEDFileUMeshSplitL1::Renumber2(const DataArrayInt *renum, MEDCouplingUMesh *m, const int *cellIds)
+{
+  if(renum==0)
     return m;
   if(cellIds==0)
-    m->renumberCells(_num->getConstPointer(),true);
+    m->renumberCells(renum->getConstPointer(),true);
   else
     {
-      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> locnum=_num->selectByTupleId(cellIds,cellIds+m->getNumberOfCells());
+      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> locnum=renum->selectByTupleId(cellIds,cellIds+m->getNumberOfCells());
       m->renumberCells(locnum->getConstPointer(),true);
     }
   return m;
 }
 
-DataArrayInt *MEDFileUMeshSplitL1::renumber(const DataArrayInt *renum, DataArrayInt *da)
+MEDCouplingUMesh *MEDFileUMeshSplitL1::renumIfNeeded(MEDCouplingUMesh *m, const int *cellIds) const
 {
-  if((const DataArrayInt *)renum==0)
-    return da;
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> locnum=renum->selectByTupleId(da->getConstPointer(),da->getConstPointer()+da->getNumberOfTuples());
-  da->decrRef();
-  locnum->incrRef();
-  return locnum;
+  return Renumber2(_num,m,cellIds);
 }
 
-DataArrayInt *MEDFileUMeshSplitL1::renumIfNeededArr(DataArrayInt *da) const
+DataArrayInt *MEDFileUMeshSplitL1::Renumber(const DataArrayInt *renum, const DataArrayInt *da)
 {
-  return renumber(_num,da);
+  if((const DataArrayInt *)renum==0)
+    {
+      da->incrRef();
+      return const_cast<DataArrayInt *>(da);
+    }
+  return renum->selectByTupleId(da->getConstPointer(),da->getConstPointer()+da->getNumberOfTuples());
+}
+
+DataArrayInt *MEDFileUMeshSplitL1::renumIfNeededArr(const DataArrayInt *da) const
+{
+  return Renumber(_num,da);
 }
 
 std::vector<int> MEDFileUMeshSplitL1::getNewFamiliesNumber(int nb, const std::map<std::string,int>& families)
@@ -418,4 +490,11 @@ void MEDFileUMeshSplitL1::traduceFamilyNumber(const std::vector< std::vector<int
 {
   std::set<int> allfids;
   
+}
+
+void MEDFileUMeshSplitL1::computeRevNum() const
+{
+  int pos;
+  int maxValue=_num->getMaxValue(pos);
+  _rev_num=_num->invertArrayN2O2O2N(maxValue+1);
 }
