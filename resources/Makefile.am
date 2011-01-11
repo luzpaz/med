@@ -205,7 +205,7 @@ dist_salomeres_DATA = \
     testStructCart3D.med \
     Mesh3D_10_2d1.med \
     Mesh3D_10_2d2.med \
-    Mesh3D_11.med \    
+    Mesh3D_11.med \
     Pol1.fig Pol2.fig Pol3.fig  Pol4.fig \
     blow5_ascii.case \
     blow5_ascii.geo \
