@@ -174,6 +174,16 @@ namespace ParaMEDMEM
     CPPUNIT_TEST( testBuildOrthogonalField2 );
     CPPUNIT_TEST( testUMInsertNextCell1 );
     CPPUNIT_TEST( testFieldOperatorDivDiffComp1 );
+    CPPUNIT_TEST( testDARearrange1 );
+    CPPUNIT_TEST( testGetDifferentValues1 );
+    CPPUNIT_TEST( testDAIBuildPermutationArr1 );
+    CPPUNIT_TEST( testAreCellsIncludedIn2 );
+    CPPUNIT_TEST( testUMeshGetPartBarycenterAndOwner1 );
+    CPPUNIT_TEST( testUMeshGetPartMeasureField1 );
+    CPPUNIT_TEST( testUMeshBuildPartOrthogonalField1 );
+    CPPUNIT_TEST( testUMeshGetTypesOfPart1 );
+    CPPUNIT_TEST( testUMeshKeepCellIdsByType1 );
+    CPPUNIT_TEST( testDAIAggregateMulti1 );
     //MEDCouplingBasicsTestInterp.cxx
     CPPUNIT_TEST( test2DInterpP0P0_1 );
     CPPUNIT_TEST( test2DInterpP0P0PL_1 );
@@ -376,6 +386,16 @@ namespace ParaMEDMEM
     void testBuildOrthogonalField2();
     void testUMInsertNextCell1();
     void testFieldOperatorDivDiffComp1();
+    void testDARearrange1();
+    void testGetDifferentValues1();
+    void testDAIBuildPermutationArr1();
+    void testAreCellsIncludedIn2();
+    void testUMeshGetPartBarycenterAndOwner1();
+    void testUMeshGetPartMeasureField1();
+    void testUMeshBuildPartOrthogonalField1();
+    void testUMeshGetTypesOfPart1();
+    void testUMeshKeepCellIdsByType1();
+    void testDAIAggregateMulti1();
     //MEDCouplingBasicsTestInterp.cxx
     void test2DInterpP0P0_1();
     void test2DInterpP0P0PL_1();
