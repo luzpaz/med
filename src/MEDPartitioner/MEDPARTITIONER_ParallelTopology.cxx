@@ -49,7 +49,7 @@ ParallelTopology::ParallelTopology():m_nb_domain(0),m_mesh_dimension(0)
 
 //!constructing topology according to mesh collection
 ParallelTopology::ParallelTopology(const vector<ParaMEDMEM::MEDCouplingUMesh*>& meshes, 
-																	 const vector<MEDPARTITIONER::CONNECTZONE*>& cz,
+                                   const vector<MEDPARTITIONER::CONNECTZONE*>& cz,
                                    vector<int*>& cellglobal,
                                    vector<int*>& nodeglobal,
                                    vector<int*>& faceglobal):m_nb_domain(meshes.size())/*,m_mesh_dimension(meshes[0]->getMeshDimension())*/
@@ -61,11 +61,11 @@ ParallelTopology::ParallelTopology(const vector<ParaMEDMEM::MEDCouplingUMesh*>& 
 
   m_nb_cells.resize(m_nb_domain);
   m_nb_nodes.resize(m_nb_domain);
-	//  m_nb_faces.resize(m_nb_domain);
+  //  m_nb_faces.resize(m_nb_domain);
 
   m_loc_to_glob.resize(m_nb_domain);
   m_node_loc_to_glob.resize(m_nb_domain);
-	//  m_face_loc_to_glob.resize(m_nb_domain);
+  //  m_face_loc_to_glob.resize(m_nb_domain);
 
   //MED_EN::medEntityMesh constituent_entity;
 

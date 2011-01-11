@@ -30,7 +30,9 @@
 namespace ParaMEDMEM
 {
   class MEDCouplingUMesh;
+  class DataArrayInt;
 }
+
 
 namespace MEDPARTITIONER
 {
@@ -128,23 +130,26 @@ namespace MEDPARTITIONER
      ParaMEDMEM::MEDCouplingUMesh* getFaceMesh(int idomain);
      std::vector<ParaMEDMEM::MEDCouplingUMesh*>& getGroupMeshes(int idomain);
 
-//     //getting a reference to a domain mesh
-//     MEDMEM::MESH* getMesh(int) const;
+     std::vector<ParaMEDMEM::DataArrayInt*>& getCellFamilyIds() {return _cellFamilyIds;}
+     std::vector<ParaMEDMEM::DataArrayInt*>& getFaceFamilyIds() {return _faceFamilyIds;}
 
+     std::map<std::string,int>& getFamilyInfo(){return _familyInfo;}
+     std::map<std::string, std::vector<std::string> >& getGroupInfo(){return _groupInfo;}
+ 
 //     //getting a reference to connect zones vector
     std::vector<MEDPARTITIONER::CONNECTZONE*>& getCZ();
 
     //getting a pointer to topology
     Topology* getTopology() const ;
-
-
-    //settig a new topology
+   
+  //settig a new topology
     void setTopology(Topology* topology);
 
     //getting/setting the name of the global mesh (as opposed 
     //to the name of a subdomain \a nn, which is name_nn) 
     std::string getName() const {return _name;}
-    void setName(const std::string& name) {_name=name;}
+    void setName(const std::string& name){_name=name;}
+    void setDomainNames(const std::string& name);
 
     //getting/setting the description of the global mesh
     std::string getDescription() const {return _description;}
@@ -157,10 +162,11 @@ namespace MEDPARTITIONER
     void castFaceMeshes( MESHCollection& initialCollection,const std::multimap<std::pair<int,int>,std::pair<int,int> >& nodeMapping);
 
     //creates faces on the new collection
-    void castMeshes(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshCastFrom,std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshCastTo,   MESHCollection& initialCollection,const std::multimap<std::pair<int,int>,std::pair<int,int> >& nodeMapping);
+    void castMeshes(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshCastFrom,std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshCastTo,   MESHCollection& initialCollection,const std::multimap<std::pair<int,int>,std::pair<int,int> >& nodeMapping, std::vector<std::vector<std::vector<int> > >& old2newIds);
+    
 
     //!transfers families from an old MESHCollection to new mesh
-		//    void castFamilies(const MESHCollection& old_collection);
+   //    void castFamilies(const MESHCollection& old_collection);
 
     //void castSupport(const MESHCollection& old_collection, std::vector<const MEDMEM::SUPPORT*>& old_support, std::vector<MEDMEM::SUPPORT*>& new_support);
 
@@ -199,15 +205,17 @@ namespace MEDPARTITIONER
  //    //!creates connectivities for a domain and an entity (face or cell)
 //     void createNodalConnectivity(const MESHCollection & initial_collection, int idomain, MED_EN::medEntityMesh entity);
 
-//     //!creates the tags for indivisible groups
-//     void treatIndivisibleRegions(int* tag);
 
 //     //!projects a field from an old collection to the present one
 //     //!field is identified by (name, dt, it)
-//     template <class T>
-//     void castFields(const MESHCollection& old_collection, const string& fieldname, int itnumber, int ordernumber);
 
-//     void getFaces(int idomain, std::map<MED_EN::medGeometryElement, std::vector<MEDPARTITIONER_FaceModel*> >&);
+    
+    void castIntField(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastFrom,std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastTo,  std::vector<ParaMEDMEM::DataArrayInt*>& arrayFrom,  std::vector<ParaMEDMEM::DataArrayInt*>& arrayTo, std::vector<std::vector< std::vector<int> > > & old2newMapping);
+
+  //     template <class T>
+    //     void castFields(const MESHCollection& old_collection, const string& fieldname, int itnumber, int ordernumber);
+    
+    //     void getFaces(int idomain, std::map<MED_EN::medGeometryElement, std::vector<MEDPARTITIONER_FaceModel*> >&);
 
 //     MEDPARTITIONER_FaceModel* getCommonFace(int ip1,int ilocal1,int ip2,int ilocal2,int face_index);
 
@@ -232,14 +240,21 @@ namespace MEDPARTITIONER
     //!links to meshes
     std::vector<ParaMEDMEM::MEDCouplingUMesh*>        _mesh;
     std::vector<ParaMEDMEM::MEDCouplingUMesh*>        _faceMesh;
-    std::vector< std::vector<ParaMEDMEM::MEDCouplingUMesh*> >        _groupMesh;
-    
-    //!index of a non empty mesh within _mesh (in parallel mode all of meshes can be empty)
+   
+ //!index of a non empty mesh within _mesh (in parallel mode all of meshes can be empty)
     int                               _i_non_empty_mesh;
 
     //!links to connectzones
     std::vector<MEDPARTITIONER::CONNECTZONE*> _connect_zones;
 
+    //!family ids storages
+    std::vector<ParaMEDMEM::DataArrayInt*> _cellFamilyIds;
+    std::vector<ParaMEDMEM::DataArrayInt*> _faceFamilyIds;
+
+    //!group family conversion
+    std::map<std::string,int> _familyInfo;
+    std::map<std::string, std::vector<std::string> > _groupInfo;
+  
     //!list of groups that are not to be splitted
     std::vector<std::string>          _indivisible_regions;
 

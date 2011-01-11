@@ -20,6 +20,10 @@
 #include "MEDMEM_Exception.hxx"
 
 #include "MEDCouplingUMesh.hxx"
+#include "MEDCouplingNormalizedUnstructuredMesh.hxx"
+#include "MEDCouplingMemArray.hxx"
+#include "PointLocator3DIntersectorP0P0.hxx"
+
 #include "MEDPARTITIONER_utils.hxx" 
 
 #include "MEDPARTITIONER_Graph.hxx"
@@ -37,6 +41,7 @@
 #include "MEDPARTITIONER_MESHCollectionMedAsciiDriver.hxx"
 
 #include "MEDPARTITIONER_UserGraph.hxx"
+
 
 #ifdef ENABLE_METIS
 #include "MEDPARTITIONER_METISGraph.hxx"
@@ -67,7 +72,7 @@ using namespace std;
 #endif
 
 //template inclusion
-//#include "MEDPARTITIONER_MESHCollection.H"
+//#include "MEDPARTITIONER_MESHCollection.txx"
 
 MESHCollection::MESHCollection()
   : _topology(0),
@@ -93,46 +98,52 @@ MESHCollection::MESHCollection()
  * \param topology topology containing the cell mappings
  */
 
-MESHCollection::MESHCollection(MESHCollection& initial_collection, Topology* topology, bool family_splitting, bool create_empty_groups)
-  : _name(initial_collection._name),
+MESHCollection::MESHCollection(MESHCollection& initialCollection, Topology* topology, bool family_splitting, bool create_empty_groups)
+  : _name(initialCollection._name),
     _topology(topology),
     _owns_topology(false),
     _driver(0),
-    _domain_selector( initial_collection._domain_selector ),
+    _domain_selector( initialCollection._domain_selector ),
     _i_non_empty_mesh(-1),
     _driver_type(MEDPARTITIONER::MedXML),
     _subdomain_boundary_creates(false),
     _family_splitting(family_splitting),
     _create_empty_groups(create_empty_groups)
 {
-  string mesh_name = initial_collection.getName();
-  _mesh.resize(_topology->nbDomain());
-	
-	//splitting the initial domains into smaller bits
   
-	std::vector<std::vector<ParaMEDMEM::MEDCouplingUMesh*> > splitMeshes;
+  _mesh.resize(_topology->nbDomain());
+  
+  //splitting the initial domains into smaller bits
+  
+  std::vector<std::vector<ParaMEDMEM::MEDCouplingUMesh*> > splitMeshes;
   splitMeshes.resize(topology->nbDomain());
   for (int inew=0; inew<topology->nbDomain();inew++)
-    splitMeshes[inew].resize(initial_collection.getTopology()->nbDomain());
+    splitMeshes[inew].resize(initialCollection.getTopology()->nbDomain());
   
-  for (int iold=0; iold<initial_collection.getTopology()->nbDomain();iold++)
+  std::vector<std::vector<std::vector<int> > > new2oldIds(initialCollection.getTopology()->nbDomain());
+
+  for (int iold=0; iold<initialCollection.getTopology()->nbDomain();iold++)
     {
-      if (!isParallelMode() || initial_collection._domain_selector->isMyDomain(iold))
+      if (!isParallelMode() || initialCollection._domain_selector->isMyDomain(iold))
         {
-          int size=(initial_collection._mesh)[iold]->getNumberOfCells();
+          int size=(initialCollection._mesh)[iold]->getNumberOfCells();
           std::vector<int> globalids(size);
-          initial_collection.getTopology()->getCellList(iold, &globalids[0]);
+          initialCollection.getTopology()->getCellList(iold, &globalids[0]);
           std::vector<int> ilocalnew(size);
           std::vector<int> ipnew(size);
           topology->convertGlobalCellList(&globalids[0],size,&ilocalnew[0],&ipnew[0]);
-          std::vector<std::vector<int> > ids(topology->nbDomain());
+          new2oldIds[iold].resize(topology->nbDomain());
           for (int i=0; i<ilocalnew.size();i++)
             {
-              ids[ipnew[i]].push_back(i);
+              new2oldIds[iold][ipnew[i]].push_back(i);
             }
           for (int inew=0;inew<topology->nbDomain();inew++)
             {
-              splitMeshes[inew][iold]=(ParaMEDMEM::MEDCouplingUMesh*)(initial_collection.getMesh())[iold]->buildPartOfMySelf(&ids[inew][0],&ids[inew][0]+ids[inew].size(),true);
+              //               cout <<"inew:"<<inew<<" iold:"<<iold<<endl;
+              //               for (int i=0; i<new2oldIds[iold][inew].size();i++)
+              //                 cout<<new2oldIds[iold][inew][i]<<" ";
+              //               cout<<endl;
+              splitMeshes[inew][iold]=(ParaMEDMEM::MEDCouplingUMesh*)(initialCollection.getMesh())[iold]->buildPartOfMySelf(&new2oldIds[iold][inew][0],&new2oldIds[iold][inew][0]+new2oldIds[iold][inew].size(),true);
               //              cout <<"small domain "<<iold<<" "<<inew<<" has "<<splitMeshes[inew][iold]->getNumberOfCells()<<" cells"<<endl;
             }
         }
@@ -144,7 +155,7 @@ MESHCollection::MESHCollection(MESHCollection& initial_collection, Topology* top
     }
   
   //fusing the split meshes
-  for (int inew=0; inew<topology->nbDomain()	;inew++)
+  for (int inew=0; inew<topology->nbDomain()  ;inew++)
     {
       std::vector<const ParaMEDMEM::MEDCouplingUMesh*> meshes(splitMeshes[inew].size());
       for (int i=0; i< splitMeshes[inew].size();i++)
@@ -152,29 +163,59 @@ MESHCollection::MESHCollection(MESHCollection& initial_collection, Topology* top
       
       if (!isParallelMode()||_domain_selector->isMyDomain(inew))
         {
-          _mesh[inew]=ParaMEDMEM::MEDCouplingUMesh::mergeUMeshes(meshes);
+          _mesh[inew]=ParaMEDMEM::MEDCouplingUMesh::MergeUMeshes(meshes);
           _mesh[inew]->zipCoords();
          
           //          std::cout<<"creating mesh #"<<inew+1<<" with "<<_mesh[inew]->getNumberOfCells()<<" cells and "<<_mesh[inew]->getNumberOfNodes()<<" nodes"<<std::endl;
         }
       for (int i=0; i< splitMeshes[inew].size();i++)
         splitMeshes[inew][i]->decrRef();
-    }	
+    }  
+  //casting cell families on new meshes
+  _cellFamilyIds.resize(topology->nbDomain());
+  castIntField(initialCollection.getMesh(), this->getMesh(),initialCollection.getCellFamilyIds(),_cellFamilyIds, new2oldIds);
+
+  //defining the name for the collection and the underlying meshes
+  setName(initialCollection.getName());
+
+  /////////////////:
+  // treating faces
+  /////////////////
+
   std::multimap<pair<int,int>, pair<int,int> > nodeMapping;
-  createNodeMapping(initial_collection, nodeMapping);
-  castMeshes(initial_collection.getFaceMesh(), this->getFaceMesh(),initial_collection, nodeMapping);
-  int nbOfGroups =  initial_collection.getGroupMeshes(0).size();
-  _groupMesh.resize(nbOfGroups);
-  for (int igroup=0; igroup<nbOfGroups; igroup++)
+  createNodeMapping(initialCollection, nodeMapping);
+  std::vector<std::vector<std::vector<int> > > new2oldFaceIds;
+  castMeshes(initialCollection.getFaceMesh(), this->getFaceMesh(),initialCollection, nodeMapping, new2oldFaceIds);
+
+
+  _faceFamilyIds.resize(topology->nbDomain());
+
+  //allocating family ids arrays
+  for (int inew=0; inew<topology->nbDomain();inew++)
     {
-      castMeshes((initial_collection.getGroupMeshes())[igroup],
-                 (this->getGroupMeshes())[igroup],
-                 initial_collection, nodeMapping);
-      for (int inew=0; inew<_topology->nbDomain(); inew++)
-        _groupMesh[igroup][inew]->setName((initial_collection.getGroupMeshes())[igroup][0]->getName());
+      _cellFamilyIds[inew]=ParaMEDMEM::DataArrayInt::New();
+      int* ptrCellIds=new int[_mesh[inew]->getNumberOfCells()];
+      _cellFamilyIds[inew]->useArray(ptrCellIds,true, ParaMEDMEM::CPP_DEALLOC,_mesh[inew]->getNumberOfCells(),1);
+      _faceFamilyIds[inew]=ParaMEDMEM::DataArrayInt::New();
+      int* ptrFaceIds=new int[_faceMesh[inew]->getNumberOfCells()];
+      _faceFamilyIds[inew]->useArray(ptrFaceIds,true, ParaMEDMEM::CPP_DEALLOC,_faceMesh[inew]->getNumberOfCells(),1); 
     }
+
+  castIntField(initialCollection.getFaceMesh(), this->getFaceMesh(),initialCollection.getFaceFamilyIds(),_faceFamilyIds,new2oldFaceIds);
+
+
+  ///////////////////////
+  ////treating groups
+  //////////////////////
+  _familyInfo=initialCollection.getFamilyInfo();
+  _groupInfo=initialCollection.getGroupInfo();
+
 }
 
+/*!
+  \param initialCollection source mesh collection 
+  \param nodeMapping structure containing the correspondency between nodes in the initial collection and the node(s) in the new collection
+*/
 void MESHCollection::createNodeMapping( MESHCollection& initialCollection, std::multimap<pair<int,int>,pair<int,int> >& nodeMapping)
 {
   for (int iold=0; iold<initialCollection.getTopology()->nbDomain();iold++)
@@ -204,11 +245,11 @@ void MESHCollection::createNodeMapping( MESHCollection& initialCollection, std::
 }
 
 /*!
-creates the face meshes on the new domains from the faces on the old domain and the node mapping
-faces at the interface are duplicated
+  creates the face meshes on the new domains from the faces on the old domain and the node mapping
+  faces at the interface are duplicated
 */
 
-void MESHCollection::castMeshes(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastFrom,std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastTo, MESHCollection& initialCollection,const multimap<pair<int,int>,pair<int,int> >& nodeMapping)
+void MESHCollection::castMeshes(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastFrom,std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastTo, MESHCollection& initialCollection,const multimap<pair<int,int>,pair<int,int> >& nodeMapping, std::vector<std::vector<std::vector<int> > >& new2oldIds)
 {
 
   //splitMeshes structure will contain the partition of 
@@ -225,11 +266,13 @@ void MESHCollection::castMeshes(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& mesh
     }
 
 
+  new2oldIds.resize(meshesCastFrom.size());
   //loop over the old domains to analyse the faces and decide 
   //on which new domain they belong
-         for (int iold=0; iold<meshesCastFrom.size();iold++)
+
+  for (int iold=0; iold<meshesCastFrom.size();iold++)
     {
-      vector<vector<int> > newFaceMeshesIds(newSize);
+      new2oldIds[iold].resize(newSize);
       for (int ielem=0;ielem<meshesCastFrom[iold]->getNumberOfCells();ielem++)
         {
           std::vector<int> nodes;
@@ -258,22 +301,22 @@ void MESHCollection::castMeshes(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& mesh
                iter++)
             {
               if (iter->second==nodes.size())
-                newFaceMeshesIds[iter->first].push_back(ielem);
+                new2oldIds[iold][iter->first].push_back(ielem);
             }
         }        
       
       //creating the splitMeshes from the face ids
       for (int inew=0;inew<_topology->nbDomain();inew++)
         {
-          //          cout<<"nb faces "<<newFaceMeshesIds[inew].size()<<endl;
-          splitMeshes[inew][iold]=(ParaMEDMEM::MEDCouplingUMesh*)(meshesCastFrom[iold]->buildPartOfMySelf(&newFaceMeshesIds[inew][0],&newFaceMeshesIds[inew][0]+newFaceMeshesIds[inew].size(),true));
+          cout<<"nb faces "<<new2oldIds[iold][inew].size()<<endl;
+          splitMeshes[inew][iold]=(ParaMEDMEM::MEDCouplingUMesh*)(meshesCastFrom[iold]->buildPartOfMySelf(&new2oldIds[iold][inew][0],&new2oldIds[iold][inew][0]+new2oldIds[iold][inew].size(),true));
         }
     }
       
-// send/receive stuff
+  // send/receive stuff
 
 
-//recollecting the bits of splitMeshes to fuse them into one
+  //recollecting the bits of splitMeshes to fuse them into one
   meshesCastTo.resize(newSize);
   for (int inew=0; inew < newSize;inew++)
     {
@@ -286,11 +329,27 @@ void MESHCollection::castMeshes(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& mesh
           cout<<"dimension "<<splitMeshes[inew][iold]->getMeshDimension()<<endl;
           
         }
-      meshesCastTo[inew]=ParaMEDMEM::MEDCouplingUMesh::mergeUMeshes(myMeshes);
+      meshesCastTo[inew]=ParaMEDMEM::MEDCouplingUMesh::MergeUMeshes(myMeshes);
+      meshesCastTo[inew]->checkCoherency();
       meshesCastTo[inew]->zipCoords();
+      meshesCastTo[inew]->checkCoherency();
       for (int iold=0; iold < meshesCastFrom.size();iold++)
-             splitMeshes[inew][iold]->decrRef();
+        splitMeshes[inew][iold]->decrRef();
       cout<<"creating face mesh #"<<inew<<" with "<<meshesCastTo[inew]->getNumberOfCells()<<" cells and "<<meshesCastTo[inew]->getNumberOfNodes()<<" nodes"<<endl;
+    }
+}
+
+void MESHCollection::castIntField(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastFrom,std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastTo,  std::vector<ParaMEDMEM::DataArrayInt*>& arrayFrom,  std::vector<ParaMEDMEM::DataArrayInt*>& arrayTo, std::vector< std::vector< std::vector<int> > >& new2oldMapping)
+{
+  for (int inew=0; inew < meshesCastTo.size();inew++)
+    {
+      vector<const ParaMEDMEM::DataArrayInt*> splitIds;
+      for (int iold=0; iold < meshesCastFrom.size();iold++)
+        {
+          int* ptr=&(new2oldMapping[iold][inew][0]);
+          splitIds.push_back(arrayFrom[iold]->selectByTupleId(ptr,ptr+new2oldMapping[iold][inew].size()));
+        }
+      arrayTo[inew]=ParaMEDMEM::DataArrayInt::Aggregate(splitIds);
     }
 }
 
@@ -425,9 +484,6 @@ MESHCollection::~MESHCollection()
     if (_mesh[i]!=0) {/*delete*/ _mesh[i]->decrRef(); }
   for (int i=0; i<_faceMesh.size();i++)
     if (_mesh[i]!=0) {/*delete*/ _faceMesh[i]->decrRef(); }
-  for (int i=0; i<_groupMesh.size();i++)
-    for (int j=0; j<_groupMesh[i].size(); j++)
-      _groupMesh[i][j]->decrRef();
   for (int i=0; i<_connect_zones.size();i++)
     if (_connect_zones[i]!=0) {delete _connect_zones[i];}
   if (_driver !=0) {delete _driver; _driver=0;}
@@ -449,8 +505,8 @@ void MESHCollection::write(const string& filename)
 {
   //building the connect zones necessary for writing joints
   cout<<"Building Connect Zones"<<endl;
-//   if (_topology->nbDomain()>1)
-//     buildConnectZones();
+  //   if (_topology->nbDomain()>1)
+  //     buildConnectZones();
   cout <<"End of connect zones building"<<endl;
   //suppresses link with driver so that it can be changed for writing
   if (_driver!=0)delete _driver;
@@ -492,23 +548,19 @@ MESHCollectionDriver* MESHCollection::getDriver() const
   return _driver;
 }
 // /*! retrieves the mesh dimension*/
- int MESHCollection::getMeshDimension() const
- {
-   return _i_non_empty_mesh < 0 ? -1 : _mesh[_i_non_empty_mesh]->getMeshDimension();
- }
+int MESHCollection::getMeshDimension() const
+{
+  return _i_non_empty_mesh < 0 ? -1 : _mesh[_i_non_empty_mesh]->getMeshDimension();
+}
 
- vector<ParaMEDMEM::MEDCouplingUMesh*>& MESHCollection::getMesh() 
- {
-   return _mesh;
- }
- vector<ParaMEDMEM::MEDCouplingUMesh*>& MESHCollection::getFaceMesh() 
- {
-   return _faceMesh;
- }
-vector<vector<ParaMEDMEM::MEDCouplingUMesh*> >& MESHCollection::getGroupMeshes() 
- {
-   return _groupMesh;
- }
+vector<ParaMEDMEM::MEDCouplingUMesh*>& MESHCollection::getMesh() 
+{
+  return _mesh;
+}
+vector<ParaMEDMEM::MEDCouplingUMesh*>& MESHCollection::getFaceMesh() 
+{
+  return _faceMesh;
+}
 ParaMEDMEM::MEDCouplingUMesh* MESHCollection::getMesh(int idomain)
 {
   return _mesh[idomain];
@@ -518,29 +570,25 @@ ParaMEDMEM::MEDCouplingUMesh* MESHCollection::getFaceMesh(int idomain)
 {
   return _faceMesh[idomain];
 }
-vector<ParaMEDMEM::MEDCouplingUMesh*>& MESHCollection::getGroupMeshes(int idomain)
+vector<MEDPARTITIONER::CONNECTZONE*>& MESHCollection::getCZ()
 {
-  return _groupMesh[idomain];
+  return _connect_zones;
 }
- vector<MEDPARTITIONER::CONNECTZONE*>& MESHCollection::getCZ()
- {
-   return _connect_zones;
- }
 
 Topology* MESHCollection::getTopology() const 
- {
-   return _topology;
- }
+{
+  return _topology;
+}
 
 void MESHCollection::setTopology(Topology* topo)
- {
-   if (_topology!=0)
-   {
-     throw MEDMEM::MEDEXCEPTION("Erreur : topology is already set");
-   }
-   else
-     _topology = topo;
- }
+{
+  if (_topology!=0)
+    {
+      throw MEDMEM::MEDEXCEPTION("Erreur : topology is already set");
+    }
+  else
+    _topology = topo;
+}
 
 
 /*! Method creating the cell graph
@@ -635,199 +683,199 @@ void MESHCollection::buildCellGraph(MEDPARTITIONER::MEDSKYLINEARRAY* & array,int
 
   array=new MEDPARTITIONER::MEDSKYLINEARRAY(index,value);
   cout<<"taille du graphe créé "<<array->getNumberOf()<<endl;
-//   int cell_number=1;
-//   int node_number=1;
-//   for (int i=0; i<_topology->nbDomain(); i++)
-//     {
-//       cell_number+=_topology->getCellNumber(i);
-//       node_number+=_topology->getNodeNumber(i);
-//     }
-//   //list of cells for a given node
-//   //vector< vector<int> > node2cell(node_number);
-//   map< int, vector<int> > node2cell;
+  //   int cell_number=1;
+  //   int node_number=1;
+  //   for (int i=0; i<_topology->nbDomain(); i++)
+  //     {
+  //       cell_number+=_topology->getCellNumber(i);
+  //       node_number+=_topology->getNodeNumber(i);
+  //     }
+  //   //list of cells for a given node
+  //   //vector< vector<int> > node2cell(node_number);
+  //   map< int, vector<int> > node2cell;
 
-//   //list of nodes for a given cell
-//   //vector< vector <int> > cell2node(cell_number);
-//   map< int, vector <int> > cell2node;
+  //   //list of nodes for a given cell
+  //   //vector< vector <int> > cell2node(cell_number);
+  //   map< int, vector <int> > cell2node;
 
-//   //  map<MED_EN::medGeometryElement,int*> type_cell_list;
+  //   //  map<MED_EN::medGeometryElement,int*> type_cell_list;
 
-//   //tagging for the indivisible regions
-//   int* indivisible_tag=0;
-//   bool has_indivisible_regions=false;
-// //   if (!_indivisible_regions.empty())
-// //     {
-// //       has_indivisible_regions=true;
-// //       indivisible_tag=new int[_topology->nbCells()];
-// //       treatIndivisibleRegions(indivisible_tag);
-// //     }
+  //   //tagging for the indivisible regions
+  //   int* indivisible_tag=0;
+  //   bool has_indivisible_regions=false;
+  // //   if (!_indivisible_regions.empty())
+  // //     {
+  // //       has_indivisible_regions=true;
+  // //       indivisible_tag=new int[_topology->nbCells()];
+  // //       treatIndivisibleRegions(indivisible_tag);
+  // //     }
 
-//   fillGlobalConnectivity(node2cell, cell2node );
+  //   fillGlobalConnectivity(node2cell, cell2node );
 
-//   cout << "beginning of skyline creation"<<endl;
-//   //creating the MEDMEMSKYLINEARRAY containing the graph
+  //   cout << "beginning of skyline creation"<<endl;
+  //   //creating the MEDMEMSKYLINEARRAY containing the graph
 
-//   int* size = new int[_topology->nbCells()];
-//   int** temp=new int*[_topology->nbCells()];
-//   int** temp_edgeweight=0;
-// //   if (has_indivisible_regions)
-// //     temp_edgeweight=new int*[_topology->nbCells()];
+  //   int* size = new int[_topology->nbCells()];
+  //   int** temp=new int*[_topology->nbCells()];
+  //   int** temp_edgeweight=0;
+  // //   if (has_indivisible_regions)
+  // //     temp_edgeweight=new int*[_topology->nbCells()];
 
-//   int cell_glob_shift = 0;
+  //   int cell_glob_shift = 0;
 
-//   // Get connection to cells on other procs
-//   multimap< int, int > loc2dist; // global cell ids on this proc -> other proc cells
-//   if ( isParallelMode() )
-//     {
-//       cell_glob_shift = _domain_selector->getProcShift();
+  //   // Get connection to cells on other procs
+  //   multimap< int, int > loc2dist; // global cell ids on this proc -> other proc cells
+  //   if ( isParallelMode() )
+  //     {
+  //       cell_glob_shift = _domain_selector->getProcShift();
 
-//       set<int> loc_domains; // domains on this proc
-//       for ( int idom = 0; idom < _mesh.size(); ++idom )
-//         if ( _mesh[ idom ] )
-//           loc_domains.insert( idom );
+  //       set<int> loc_domains; // domains on this proc
+  //       for ( int idom = 0; idom < _mesh.size(); ++idom )
+  //         if ( _mesh[ idom ] )
+  //           loc_domains.insert( idom );
 
-//       for ( int idom = 0; idom < _mesh.size(); ++idom )
-//         {
-//           if ( !_mesh[idom] ) continue;
-//           vector<int> loc2glob_corr; // pairs of corresponding cells (loc_loc & glob_dist)
-//           retrieveDriver()->readLoc2GlobCellConnect(idom, loc_domains, _domain_selector, loc2glob_corr);
-//           //MEDMEM::STRING out;
-//           for ( int i = 0; i < loc2glob_corr.size(); i += 2 )
-//             {
-//               int glob_here  = _topology->convertCellToGlobal(idom,loc2glob_corr[i]); 
-//               int glob_there = loc2glob_corr[i+1]; 
-//               loc2dist.insert ( make_pair( glob_here, glob_there));
-//               //out << glob_here << "-" << glob_there << " ";
-//             }
-//           //cout << "\nRank " << _domain_selector->rank() << ": BndCZ: " << out << endl;
-//         }
-//     }
+  //       for ( int idom = 0; idom < _mesh.size(); ++idom )
+  //         {
+  //           if ( !_mesh[idom] ) continue;
+  //           vector<int> loc2glob_corr; // pairs of corresponding cells (loc_loc & glob_dist)
+  //           retrieveDriver()->readLoc2GlobCellConnect(idom, loc_domains, _domain_selector, loc2glob_corr);
+  //           //MEDMEM::STRING out;
+  //           for ( int i = 0; i < loc2glob_corr.size(); i += 2 )
+  //             {
+  //               int glob_here  = _topology->convertCellToGlobal(idom,loc2glob_corr[i]); 
+  //               int glob_there = loc2glob_corr[i+1]; 
+  //               loc2dist.insert ( make_pair( glob_here, glob_there));
+  //               //out << glob_here << "-" << glob_there << " ";
+  //             }
+  //           //cout << "\nRank " << _domain_selector->rank() << ": BndCZ: " << out << endl;
+  //         }
+  //     }
 
-//   //going across all cells
+  //   //going across all cells
 
-//   map<int,int> cells_neighbours;
-//   for (int i=0; i< _topology->nbCells(); i++)
-//     {
+  //   map<int,int> cells_neighbours;
+  //   for (int i=0; i< _topology->nbCells(); i++)
+  //     {
 
 
-//       vector<int> cells(50);
+  //       vector<int> cells(50);
 
-//       //     /*// cout << "size cell2node "<<cell2node[i+1].size()<<endl;
-//       //      for (vector<int>::const_iterator iternode=cell2node[i+1].begin();
-//       //            iternode!=cell2node[i+1].end();
-//       //            iternode++)
-//       //        {
-//       //          int nodeid=*iternode;
-//       //       //   cout << "size node2cell "<<node2cell[nodeid].size()<<endl;
-//       //          for (vector<int>::const_iterator iter=node2cell[nodeid].begin();
-//       //             iter != node2cell[nodeid].end();
-//       //             iter++)
-//       //              cells_neighbours[*iter]++;
-//       //        }*/
+  //       //     /*// cout << "size cell2node "<<cell2node[i+1].size()<<endl;
+  //       //      for (vector<int>::const_iterator iternode=cell2node[i+1].begin();
+  //       //            iternode!=cell2node[i+1].end();
+  //       //            iternode++)
+  //       //        {
+  //       //          int nodeid=*iternode;
+  //       //       //   cout << "size node2cell "<<node2cell[nodeid].size()<<endl;
+  //       //          for (vector<int>::const_iterator iter=node2cell[nodeid].begin();
+  //       //             iter != node2cell[nodeid].end();
+  //       //             iter++)
+  //       //              cells_neighbours[*iter]++;
+  //       //        }*/
 
-//       for (int inode=0; inode< cell2node[i+1].size(); inode++)
-//         {
-//           int nodeid=cell2node[i+1][inode];
-//           //   cout << "size node2cell "<<node2cell[nodeid].size()<<endl;
-//           for (int icell=0; icell<node2cell[nodeid].size();icell++)
-//             cells_neighbours[node2cell[nodeid][icell]]++;
-//         }
-//       size[i]=0;
-//       int dimension = getMeshDimension();
-//       cells.clear();
+  //       for (int inode=0; inode< cell2node[i+1].size(); inode++)
+  //         {
+  //           int nodeid=cell2node[i+1][inode];
+  //           //   cout << "size node2cell "<<node2cell[nodeid].size()<<endl;
+  //           for (int icell=0; icell<node2cell[nodeid].size();icell++)
+  //             cells_neighbours[node2cell[nodeid][icell]]++;
+  //         }
+  //       size[i]=0;
+  //       int dimension = getMeshDimension();
+  //       cells.clear();
 
-//       for (map<int,int>::const_iterator iter=cells_neighbours.begin(); iter != cells_neighbours.end(); iter++)  
-//         {
-//           if (iter->second >= dimension && iter->first != i+1) 
-//             {
-//               cells.push_back(iter->first + cell_glob_shift);
-//               //       cells[isize++]=iter->first;
-//             }
-//         }
-//       // add neighbour cells from distant domains
-//       multimap< int, int >::iterator loc_dist = loc2dist.find( i+1 );
-//       for (; loc_dist!=loc2dist.end() && loc_dist->first==( i+1 ); ++loc_dist )
-//         cells.push_back( loc_dist->second );
+  //       for (map<int,int>::const_iterator iter=cells_neighbours.begin(); iter != cells_neighbours.end(); iter++)  
+  //         {
+  //           if (iter->second >= dimension && iter->first != i+1) 
+  //             {
+  //               cells.push_back(iter->first + cell_glob_shift);
+  //               //       cells[isize++]=iter->first;
+  //             }
+  //         }
+  //       // add neighbour cells from distant domains
+  //       multimap< int, int >::iterator loc_dist = loc2dist.find( i+1 );
+  //       for (; loc_dist!=loc2dist.end() && loc_dist->first==( i+1 ); ++loc_dist )
+  //         cells.push_back( loc_dist->second );
 
-//       size[i]=cells.size();
-//       //   size[i]=isize;
+  //       size[i]=cells.size();
+  //       //   size[i]=isize;
 
-//       //cout << cells.size()<<endl;
-//       //cout << cells_neighbours.size()<<endl;
+  //       //cout << cells.size()<<endl;
+  //       //cout << cells_neighbours.size()<<endl;
 
-//       temp[i]=new int[size[i]];
-// //       if (has_indivisible_regions)
-// //         temp_edgeweight[i]=new int[size[i]];
-//       //    
-//       int itemp=0;
+  //       temp[i]=new int[size[i]];
+  // //       if (has_indivisible_regions)
+  // //         temp_edgeweight[i]=new int[size[i]];
+  //       //    
+  //       int itemp=0;
 
-//       // memcpy(temp[i],cells,isize*sizeof(int));
+  //       // memcpy(temp[i],cells,isize*sizeof(int));
 
-//       for (vector<int>::const_iterator iter=cells.begin(); iter!=cells.end();iter++)
-//         //for(int j=0; j<isize; j++)
-//         {
-//           temp[i][itemp]=*iter;
-//           //temp[i][itemp]=cells[j];
-//  //          if (has_indivisible_regions)
-// //             {
-// //               int tag1 = indivisible_tag[(i+1)-1];
-// //               //int tag2 = indivisible_tag[iter->first-1];
-// //               int tag2 = indivisible_tag[*iter-1];
-// //               if (tag1==tag2 && tag1!=0)
-// //                 temp_edgeweight[i][itemp]=_topology->nbCells()*100000;
-// //               else
-// //                 temp_edgeweight[i][itemp]=1;
-// //             } 
-//           itemp++;
-//         }
-//       cells_neighbours.clear();
-//     }
-//   cout <<"end of graph definition"<<endl;
-//   int* index=new int[_topology->nbCells()+1];
-//   index[0]=1;
-//   for (int i=0; i<_topology->nbCells(); i++)
-//     index[i+1]=index[i]+size[i];
+  //       for (vector<int>::const_iterator iter=cells.begin(); iter!=cells.end();iter++)
+  //         //for(int j=0; j<isize; j++)
+  //         {
+  //           temp[i][itemp]=*iter;
+  //           //temp[i][itemp]=cells[j];
+  //  //          if (has_indivisible_regions)
+  // //             {
+  // //               int tag1 = indivisible_tag[(i+1)-1];
+  // //               //int tag2 = indivisible_tag[iter->first-1];
+  // //               int tag2 = indivisible_tag[*iter-1];
+  // //               if (tag1==tag2 && tag1!=0)
+  // //                 temp_edgeweight[i][itemp]=_topology->nbCells()*100000;
+  // //               else
+  // //                 temp_edgeweight[i][itemp]=1;
+  // //             } 
+  //           itemp++;
+  //         }
+  //       cells_neighbours.clear();
+  //     }
+  //   cout <<"end of graph definition"<<endl;
+  //   int* index=new int[_topology->nbCells()+1];
+  //   index[0]=1;
+  //   for (int i=0; i<_topology->nbCells(); i++)
+  //     index[i+1]=index[i]+size[i];
 
-//   node2cell.clear();
-//   cell2node.clear();
-//   // if (indivisible_tag!=0) delete [] indivisible_tag;
+  //   node2cell.clear();
+  //   cell2node.clear();
+  //   // if (indivisible_tag!=0) delete [] indivisible_tag;
 
-//   //SKYLINEARRAY structure holding the cell graph
-//   array= new MEDMEM::MEDSKYLINEARRAY(_topology->nbCells(),index[_topology->nbCells()]-index[0]);
-//   array->setIndex(index);
+  //   //SKYLINEARRAY structure holding the cell graph
+  //   array= new MEDMEM::MEDSKYLINEARRAY(_topology->nbCells(),index[_topology->nbCells()]-index[0]);
+  //   array->setIndex(index);
 
-//   for (int i=0; i<_topology->nbCells(); i++)
-//     {
-//       array->setI(i+1,temp[i]);
-//       delete[]temp[i];
-//     }
+  //   for (int i=0; i<_topology->nbCells(); i++)
+  //     {
+  //       array->setI(i+1,temp[i]);
+  //       delete[]temp[i];
+  //     }
 
-//   {// DEBUG
-//     //     MEDMEM::STRING out;
-//     //     const int* index= array->getIndex();
-//     //     const int* value =array->getValue();
-//     //     out << "\nRank " << (_domain_selector?_domain_selector->rank():0) << ": Index: ";
-//     //     for ( int i = 0; i <= array->getNumberOf(); ++i )
-//     //       out << index[i] << " ";
-//     //     out << "\nRank " << (_domain_selector?_domain_selector->rank():0) << ": Value: ";
-//     //     for ( int i = 0; i < array->getLength(); ++i )
-//     //       out << value[i] << " ";
-//     //     cout << out << endl;
-//   }
-// //   if (has_indivisible_regions)
-// //     {
-// //       edgeweights=new int[array->getLength()];
-// //       for (int i=0; i<_topology->nbCells(); i++)
-// //         {
-// //           for (int j=index[i]; j<index[i+1];j++)
-// //             edgeweights[j-1]=temp_edgeweight[i][j-index[i]];
-// //           delete[] temp_edgeweight[i];  
-// //         }
-// //       delete[]temp_edgeweight;
-// //     }
-//   delete[] index;
-//   delete[] temp;
-//   delete[] size;
+  //   {// DEBUG
+  //     //     MEDMEM::STRING out;
+  //     //     const int* index= array->getIndex();
+  //     //     const int* value =array->getValue();
+  //     //     out << "\nRank " << (_domain_selector?_domain_selector->rank():0) << ": Index: ";
+  //     //     for ( int i = 0; i <= array->getNumberOf(); ++i )
+  //     //       out << index[i] << " ";
+  //     //     out << "\nRank " << (_domain_selector?_domain_selector->rank():0) << ": Value: ";
+  //     //     for ( int i = 0; i < array->getLength(); ++i )
+  //     //       out << value[i] << " ";
+  //     //     cout << out << endl;
+  //   }
+  // //   if (has_indivisible_regions)
+  // //     {
+  // //       edgeweights=new int[array->getLength()];
+  // //       for (int i=0; i<_topology->nbCells(); i++)
+  // //         {
+  // //           for (int j=index[i]; j<index[i+1];j++)
+  // //             edgeweights[j-1]=temp_edgeweight[i][j-index[i]];
+  // //           delete[] temp_edgeweight[i];  
+  // //         }
+  // //       delete[]temp_edgeweight;
+  // //     }
+  //   delete[] index;
+  //   delete[] temp;
+  //   delete[] size;
 
   cout<< "end of graph creation"<<endl;
 }
@@ -1767,7 +1815,7 @@ Topology* MESHCollection::createPartition(const int* partition)
 // void MESHCollection::createNodalConnectivity(const MESHCollection& initial_collection,int idomain, int entity)
 // {
 
-	
+  
 //   int dimension=0;
 //   int nb_elems=0;
 //   ParaMEDMEM::MEDCouplingUMesh* mesh_builder = m_mesh[idomain];
@@ -1884,10 +1932,10 @@ Topology* MESHCollection::createPartition(const int* partition)
 
 //   //Treating nodes
 
-// 	DataArrayInt* conn_index = (initial_collection.getMesh())[idomain].getConnIndex();
-// 	DataArrayInt* index=(initial_collection.getMesh())[idomain].getIndex();
-	
-	
+//   DataArrayInt* conn_index = (initial_collection.getMesh())[idomain].getConnIndex();
+//   DataArrayInt* index=(initial_collection.getMesh())[idomain].getIndex();
+  
+  
 //   _topology->convertGlobalCellList(cell_list,nb_cells,local,ip);
 //   for (iter = type_numbers.begin();iter != type_numbers.end(); iter++)  
 //   {
@@ -2157,3 +2205,12 @@ Topology* MESHCollection::createPartition(const int* partition)
 
 //   return face_model;
 // }
+void MESHCollection::setDomainNames(const std::string& name)
+{
+  for (int i=0; i<_topology->nbDomain(); i++)
+    {
+      ostringstream oss;
+      oss<<name<<"_"<<i;
+      _mesh[i]->setName(oss.str().c_str());
+    }
+}
