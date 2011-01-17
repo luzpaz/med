@@ -54,7 +54,6 @@ MEDCouplingFieldTemplate *MEDCouplingFieldTemplateClient::New(SALOME_MED::MEDCou
   delete tinyS;
   //
   TypeOfField type=(TypeOfField) tinyLV[0];
-  TypeOfTimeDiscretization td=(TypeOfTimeDiscretization) tinyLV[1];
   MEDCouplingFieldTemplate *ret=MEDCouplingFieldTemplate::New(type);
   //2nd CORBA call to retrieves the mesh.
   SALOME_MED::MEDCouplingMeshCorbaInterface_ptr meshPtr=fieldPtr->getMesh();
