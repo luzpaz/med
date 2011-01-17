@@ -252,6 +252,42 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
         refField=test.buildFieldVectorOnCMeshWT();
         self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
         pass
+
+    def testCorbaFieldTemplateCellOn2D(self):
+        fieldPtr=self._objC.getFieldTemplateCellOn2D();
+        fieldCpp=MEDCouplingFieldTemplateClient.New(fieldPtr);
+        fieldPtr.Destroy();
+        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
+        refField=test.buildFieldTemplateCellOn2D();
+        self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
+        pass
+    
+    def testCorbaFieldTemplateNodeOn2D(self):
+        fieldPtr=self._objC.getFieldTemplateNodeOn2D();
+        fieldCpp=MEDCouplingFieldTemplateClient.New(fieldPtr);
+        fieldPtr.Destroy();
+        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
+        refField=test.buildFieldTemplateNodeOn2D();
+        self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
+        pass
+    
+    def testCorbaFieldTemplateGaussPtOn2D(self):
+        fieldPtr=self._objC.getFieldTemplateGaussPtOn2D();
+        fieldCpp=MEDCouplingFieldTemplateClient.New(fieldPtr);
+        fieldPtr.Destroy();
+        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
+        refField=test.buildFieldTemplateGaussPtOn2D();
+        self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
+        pass
+    
+    def testCorbaFieldTemplateGaussNEOn2D(self):
+        fieldPtr=self._objC.getFieldTemplateGaussNEOn2D();
+        fieldCpp=MEDCouplingFieldTemplateClient.New(fieldPtr);
+        fieldPtr.Destroy();
+        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
+        refField=test.buildFieldTemplateGaussNEOn2D();
+        self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
+        pass
     
     def testShutdownServer(self):
         self._objC.shutdownOrb()

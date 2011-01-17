@@ -347,6 +347,30 @@ class MEDCouplingCorbaServBasicsTest:
         f.checkCoherency();
         return f
 
+    def buildFieldTemplateCellOn2D(self):
+        f1=self.buildFieldScalarOn2DNT();
+        f2=MEDCouplingFieldTemplate.New(f1);
+        f2.setNature(NoNature);
+        return f2
+    
+    def buildFieldTemplateNodeOn2D(self):
+        f1=self.buildFieldNodeScalarOn2DNT();
+        f2=MEDCouplingFieldTemplate.New(f1);
+        f2.setNature(ConservativeVolumic);
+        return f2
+            
+    def buildFieldTemplateGaussPtOn2D(self):
+        f1=self.buildFieldGaussPt2DWT();
+        f2=MEDCouplingFieldTemplate.New(f1);
+        f2.setNature(Integral);
+        return f2
+
+    def buildFieldTemplateGaussNEOn2D(self):
+        f1=self.buildFieldGaussPtNE2DWT();
+        f2=MEDCouplingFieldTemplate.New(f1);
+        f2.setNature(IntegralGlobConstraint);
+        return f2
+
     def buildFileNameForIOR(self):
         ret=os.getenv("TMP");
         ret+="/entryPointMEDCouplingCorba.ior";

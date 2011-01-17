@@ -107,4 +107,20 @@ class MEDCouplingMeshFieldFactoryComponentPy(MEDCouplingCorbaServantTest_idl._0_
     def getFieldVectorOnCMeshWT(self):
         field=self._test.buildFieldVectorOnCMeshWT()
         return MEDCouplingFieldDoubleServant._this(field)
+
+    def getFieldTemplateCellOn2D(self):
+        field=self._test.buildFieldTemplateCellOn2D()
+        return MEDCouplingFieldTemplateServant._this(field)
+    
+    def getFieldTemplateNodeOn2D(self):
+        field=self._test.buildFieldTemplateNodeOn2D()
+        return MEDCouplingFieldTemplateServant._this(field)
+    
+    def getFieldTemplateGaussPtOn2D(self):
+        field=self._test.buildFieldTemplateGaussPtOn2D()
+        return MEDCouplingFieldTemplateServant._this(field)
+    
+    def getFieldTemplateGaussNEOn2D(self):
+        field=self._test.buildFieldTemplateGaussNEOn2D()
+        return MEDCouplingFieldTemplateServant._this(field)
     pass

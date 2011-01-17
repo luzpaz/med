@@ -21,20 +21,22 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 lib_LTLIBRARIES= libmedcouplingclient.la
 
-salomeinclude_HEADERS=                    \
-	MEDCouplingClient.hxx             \
-	MEDCouplingMeshClient.hxx         \
-	MEDCouplingUMeshClient.hxx        \
-	MEDCouplingExtrudedMeshClient.hxx \
-	MEDCouplingCMeshClient.hxx        \
-	MEDCouplingFieldDoubleClient.hxx
+salomeinclude_HEADERS=                      \
+	MEDCouplingClient.hxx               \
+	MEDCouplingMeshClient.hxx           \
+	MEDCouplingUMeshClient.hxx          \
+	MEDCouplingExtrudedMeshClient.hxx   \
+	MEDCouplingCMeshClient.hxx          \
+	MEDCouplingFieldDoubleClient.hxx    \
+	MEDCouplingFieldTemplateClient.hxx
 
-dist_libmedcouplingclient_la_SOURCES=     \
-	MEDCouplingMeshClient.cxx         \
-	MEDCouplingUMeshClient.cxx        \
-	MEDCouplingExtrudedMeshClient.cxx \
-	MEDCouplingCMeshClient.cxx        \
-	MEDCouplingFieldDoubleClient.cxx
+dist_libmedcouplingclient_la_SOURCES=       \
+	MEDCouplingMeshClient.cxx           \
+	MEDCouplingUMeshClient.cxx          \
+	MEDCouplingExtrudedMeshClient.cxx   \
+	MEDCouplingCMeshClient.cxx          \
+	MEDCouplingFieldDoubleClient.cxx    \
+	MEDCouplingFieldTemplateClient.cxx
 
 libmedcouplingclient_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) -I$(top_builddir)/idl ${KERNEL_CXXFLAGS} \
 	-I$(srcdir)/../../MEDCoupling -I$(srcdir)/../../INTERP_KERNEL/Bases

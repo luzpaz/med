@@ -53,6 +53,13 @@ module SALOME_MED
   {
     MEDCouplingMeshCorbaInterface getMesh();
   };
+  
+  interface MEDCouplingFieldTemplateCorbaInterface : MEDCouplingFieldCorbaInterface
+  {
+    //!returns the 3 tiny arrays to prepare the new instance locally.
+    void getTinyInfo(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfDouble da, out SALOME_TYPES::ListOfString sa);
+    void getSerialisationData(out SALOME_TYPES::ListOfLong la);
+  };
 
   interface MEDCouplingFieldDoubleCorbaInterface : MEDCouplingFieldCorbaInterface
   {

@@ -21,6 +21,7 @@
 
 %{
 #include "MEDCouplingFieldDoubleClient.hxx"
+#include "MEDCouplingFieldTemplateClient.hxx"
 #include "MEDCouplingUMeshClient.hxx"
 #include "MEDCouplingExtrudedMeshClient.hxx"
 #include "MEDCouplingCMeshClient.hxx"
@@ -33,6 +34,7 @@ using namespace ParaMEDMEM;
 %include "MEDCoupling.i"
 
 %newobject ParaMEDMEM::MEDCouplingFieldDoubleClient::New;
+%newobject ParaMEDMEM::MEDCouplingFieldTemplateClient::New;
 %newobject ParaMEDMEM::MEDCouplingUMeshClient::New;
 %newobject ParaMEDMEM::MEDCouplingExtrudedMeshClient::New;
 %newobject ParaMEDMEM::MEDCouplingCMeshClient::New;
@@ -65,6 +67,35 @@ namespace ParaMEDMEM
             std::cerr << "error corba pointer is not a SALOME_MED.MEDCouplingFieldDoubleCorbaInterface_ptr !" << std::endl;
           Py_DECREF(pdict);
           MEDCouplingFieldDouble *ret=MEDCouplingFieldDoubleClient::New(fieldPtrCppC);
+          return ret;
+        } 
+      }
+  };
+
+  class MEDCouplingFieldTemplateClient
+  {
+  public:
+    %extend
+      {
+        static MEDCouplingFieldTemplate *New(PyObject *fieldPtr)
+        {
+          PyObject* pdict=PyDict_New();
+          PyDict_SetItemString(pdict,"__builtins__",PyEval_GetBuiltins());
+          PyRun_String("import MEDCouplingCorbaServant_idl",Py_single_input,pdict, pdict);
+          PyRun_String("import CORBA",Py_single_input,pdict, pdict);
+          PyRun_String("orbTmp15634=CORBA.ORB_init([''])", Py_single_input,pdict, pdict);
+          PyObject *orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
+          // Ask omniORBpy to transform SUPPORT (python Corba) ptr to IOR string
+          PyObject *iorField=PyObject_CallMethod(orbPython,(char*)"object_to_string",(char*)"O",fieldPtr);
+          char *ior=PyString_AsString(iorField);
+          int argc=0;
+          CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
+          CORBA::Object_var fieldPtrCpp=orb->string_to_object(ior);
+          SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr fieldPtrCppC=SALOME_MED::MEDCouplingFieldTemplateCorbaInterface::_narrow(fieldPtrCpp);
+          if(CORBA::is_nil(fieldPtrCppC))
+            std::cerr << "error corba pointer is not a SALOME_MED.MEDCouplingFieldTemplateCorbaInterface_ptr !" << std::endl;
+          Py_DECREF(pdict);
+          MEDCouplingFieldTemplate *ret=MEDCouplingFieldTemplateClient::New(fieldPtrCppC);
           return ret;
         } 
       }

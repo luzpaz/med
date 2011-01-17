@@ -27,6 +27,8 @@
 #include "MEDCouplingCMeshClient.hxx"
 #include "MEDCouplingFieldDouble.hxx"
 #include "MEDCouplingFieldDoubleClient.hxx"
+#include "MEDCouplingFieldTemplate.hxx"
+#include "MEDCouplingFieldTemplateClient.hxx"
 #include <fstream>
 #include <pthread.h>
 
@@ -383,6 +385,58 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFieldVectorOnCMes
   CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
   refField->decrRef();
   fieldCpp->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFieldTemplateCellOn2D()
+{
+  SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr fieldPtr=_objC->getFieldTemplateCellOn2D();
+  ParaMEDMEM::MEDCouplingFieldTemplate *fieldCpp=ParaMEDMEM::MEDCouplingFieldTemplateClient::New(fieldPtr);
+  fieldPtr->Destroy();
+  CORBA::release(fieldPtr);
+  //
+  ParaMEDMEM::MEDCouplingFieldTemplate *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldTemplateCellOn2D();
+  CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
+  refField->decrRef();
+  fieldCpp->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFieldTemplateNodeOn2D()
+{
+  SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr fieldPtr=_objC->getFieldTemplateNodeOn2D();
+  ParaMEDMEM::MEDCouplingFieldTemplate *fieldCpp=ParaMEDMEM::MEDCouplingFieldTemplateClient::New(fieldPtr);
+  fieldPtr->Destroy();
+  CORBA::release(fieldPtr);
+  //
+  ParaMEDMEM::MEDCouplingFieldTemplate *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldTemplateNodeOn2D();
+  CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
+  refField->decrRef();
+  fieldCpp->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFieldTemplateGaussPtOn2D()
+{
+  SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr fieldPtr=_objC->getFieldTemplateGaussPtOn2D();
+  ParaMEDMEM::MEDCouplingFieldTemplate *fieldCpp=ParaMEDMEM::MEDCouplingFieldTemplateClient::New(fieldPtr);
+  fieldPtr->Destroy();
+  CORBA::release(fieldPtr);
+  //
+  ParaMEDMEM::MEDCouplingFieldTemplate *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldTemplateGaussPtOn2D();
+  CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
+  refField->decrRef();
+  fieldCpp->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFieldTemplateGaussNEOn2D()
+{
+  SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr fieldPtr=_objC->getFieldTemplateGaussNEOn2D();
+  ParaMEDMEM::MEDCouplingFieldTemplate *fieldCpp=ParaMEDMEM::MEDCouplingFieldTemplateClient::New(fieldPtr);
+  fieldPtr->Destroy();
+  CORBA::release(fieldPtr);
+  //
+  ParaMEDMEM::MEDCouplingFieldTemplate *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldTemplateGaussNEOn2D();
+  CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
+  refField->decrRef();
+  fieldCpp->decrRef(); 
 }
 
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::shutdownServer()

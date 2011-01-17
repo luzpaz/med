@@ -27,26 +27,28 @@ endif
 
 lib_LTLIBRARIES= libmedcouplingcorba.la
 
-salomeinclude_HEADERS=                      \
-	MEDCouplingCorba.hxx                \
-	MEDCouplingRefCountServant.hxx      \
-	MEDCouplingMeshServant.hxx          \
-	MEDCouplingPointSetServant.hxx      \
-	MEDCouplingExtrudedMeshServant.hxx  \
-	MEDCouplingCMeshServant.hxx  \
-	MEDCouplingUMeshServant.hxx         \
-	MEDCouplingFieldServant.hxx         \
-	MEDCouplingFieldDoubleServant.hxx
+salomeinclude_HEADERS=                        \
+	MEDCouplingCorba.hxx                  \
+	MEDCouplingRefCountServant.hxx        \
+	MEDCouplingMeshServant.hxx            \
+	MEDCouplingPointSetServant.hxx        \
+	MEDCouplingExtrudedMeshServant.hxx    \
+	MEDCouplingCMeshServant.hxx           \
+	MEDCouplingUMeshServant.hxx           \
+	MEDCouplingFieldServant.hxx           \
+	MEDCouplingFieldDoubleServant.hxx     \
+	MEDCouplingFieldTemplateServant.hxx
 
-dist_libmedcouplingcorba_la_SOURCES=       \
-	MEDCouplingRefCountServant.cxx     \
-	MEDCouplingMeshServant.cxx         \
-	MEDCouplingPointSetServant.cxx     \
-	MEDCouplingExtrudedMeshServant.cxx \
-	MEDCouplingCMeshServant.cxx \
-	MEDCouplingUMeshServant.cxx        \
-	MEDCouplingFieldServant.cxx        \
-	MEDCouplingFieldDoubleServant.cxx  
+dist_libmedcouplingcorba_la_SOURCES=         \
+	MEDCouplingRefCountServant.cxx       \
+	MEDCouplingMeshServant.cxx           \
+	MEDCouplingPointSetServant.cxx       \
+	MEDCouplingExtrudedMeshServant.cxx   \
+	MEDCouplingCMeshServant.cxx          \
+	MEDCouplingUMeshServant.cxx          \
+	MEDCouplingFieldServant.cxx          \
+	MEDCouplingFieldDoubleServant.cxx    \
+	MEDCouplingFieldTemplateServant.cxx
 
 libmedcouplingcorba_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) -I$(top_builddir)/idl ${KERNEL_CXXFLAGS} \
 	-I$(srcdir)/../MEDCoupling -I$(srcdir)/../INTERP_KERNEL/Bases

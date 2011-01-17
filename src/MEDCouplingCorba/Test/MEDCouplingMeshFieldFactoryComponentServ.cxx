@@ -20,10 +20,12 @@
 #include "MEDCouplingMeshFieldFactoryComponentServ.hxx"
 #include "MEDCouplingMeshFieldFactoryComponent.hxx"
 #include "MEDCouplingFieldDoubleServant.hxx"
+#include "MEDCouplingFieldTemplateServant.hxx"
 #include "MEDCouplingExtrudedMeshServant.hxx"
 #include "MEDCouplingCMeshServant.hxx"
 #include "MEDCouplingUMeshServant.hxx"
 #include "MEDCouplingFieldDouble.hxx"
+#include "MEDCouplingFieldTemplate.hxx"
 #include "MEDCouplingExtrudedMesh.hxx"
 #include "MEDCouplingUMesh.hxx"
 #include "MEDCouplingCMesh.hxx"
@@ -207,6 +209,42 @@ namespace SALOME_TEST
     ParaMEDMEM::MEDCouplingFieldDoubleServant *m=new ParaMEDMEM::MEDCouplingFieldDoubleServant(field);
     field->decrRef();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
+    return ret;
+  }
+  
+  SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldTemplateCellOn2D()
+  {
+    ParaMEDMEM::MEDCouplingFieldTemplate *field=MEDCouplingCorbaServBasicsTest::buildFieldTemplateCellOn2D();
+    ParaMEDMEM::MEDCouplingFieldTemplateServant *m=new ParaMEDMEM::MEDCouplingFieldTemplateServant(field);
+    field->decrRef();
+    SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr ret=m->_this();
+    return ret;
+  }
+  
+  SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldTemplateNodeOn2D()
+  {
+    ParaMEDMEM::MEDCouplingFieldTemplate *field=MEDCouplingCorbaServBasicsTest::buildFieldTemplateNodeOn2D();
+    ParaMEDMEM::MEDCouplingFieldTemplateServant *m=new ParaMEDMEM::MEDCouplingFieldTemplateServant(field);
+    field->decrRef();
+    SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr ret=m->_this();
+    return ret;
+  }
+  
+  SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldTemplateGaussPtOn2D()
+  {
+    ParaMEDMEM::MEDCouplingFieldTemplate *field=MEDCouplingCorbaServBasicsTest::buildFieldTemplateGaussPtOn2D();
+    ParaMEDMEM::MEDCouplingFieldTemplateServant *m=new ParaMEDMEM::MEDCouplingFieldTemplateServant(field);
+    field->decrRef();
+    SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr ret=m->_this();
+    return ret;
+  }
+
+  SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldTemplateGaussNEOn2D()
+  {
+    ParaMEDMEM::MEDCouplingFieldTemplate *field=MEDCouplingCorbaServBasicsTest::buildFieldTemplateGaussNEOn2D();
+    ParaMEDMEM::MEDCouplingFieldTemplateServant *m=new ParaMEDMEM::MEDCouplingFieldTemplateServant(field);
+    field->decrRef();
+    SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr ret=m->_this();
     return ret;
   }
 }
