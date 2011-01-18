@@ -249,7 +249,7 @@ void MESHCollectionMedXMLDriver::write(char* filename, ParaDomainSelector* domai
   time_t present;
   time( &present);
   struct tm *time_asc = localtime(&present);
-  char date[6];
+  char date[1024];
   sprintf(date,"%02d%02d%02d",time_asc->tm_year
           ,time_asc->tm_mon+1
           ,time_asc->tm_mday);
