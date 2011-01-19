@@ -34,7 +34,8 @@ libMEDSPLITTERTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED2_INCLUDES) \
 	$(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ $(BOOST_CPPFLAGS) $(LIBXML_CXXFLAGS) \
 	-I$(srcdir)/.. -I$(srcdir)/../../MEDWrapper/V2_1/Core -I$(srcdir)/../../MEDMEM \
 	-I$(srcdir)/../../MEDMEMCppTest -I$(srcdir)/../../INTERP_KERNEL/Bases \
-	-I$(srcdir)/../../INTERP_KERNEL/GaussPoints
+	-I$(srcdir)/../../INTERP_KERNEL/GaussPoints \
+	-I$(srcdir)/../../INTERP_KERNEL
 libMEDSPLITTERTest_la_LDFLAGS= $(MED2_LIBS) @CPPUNIT_LIBS@
 
 if MED_ENABLE_KERNEL
