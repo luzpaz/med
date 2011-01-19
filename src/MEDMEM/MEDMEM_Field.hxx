@@ -1049,6 +1049,8 @@ definition (i.e., fields having one value per element).
  \if MEDMEM_ug @} \endif */
 
   bool                getValueOnElement(int eltIdInSup,T* retValues) const throw (MEDEXCEPTION);
+  void                getValueOnPoint(const double* coords, double* output) const throw (MEDEXCEPTION);
+  void                getValueOnPoints(int nb_points, const double* coords, double* output) const throw (MEDEXCEPTION);
 
   const int   getNumberOfGeometricTypes() const throw (MEDEXCEPTION);
   const GAUSS_LOCALIZATION<INTERLACING_TAG> & getGaussLocalization(MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION);
@@ -1151,6 +1153,8 @@ the components.
 }
 
 #include "MEDMEM_DriverFactory.hxx"
+#include "PointLocator.hxx"
+#include "InterpolationUtils.hxx"
 
 namespace MEDMEM {
 
@@ -3524,6 +3528,108 @@ bool FIELD<T, INTERLACING_TAG>::getValueOnElement(int eltIdInSup,T* retValues)
     }
 }
 
+  /*!
+   * \brief Retrieve value in a given point
+   *  \param coords - point coordinates
+   *  \param output - output buffer
+   */
+  template <class T, class INTERLACING_TAG>
+  void FIELD<T, INTERLACING_TAG>::getValueOnPoint(const double* coords, double* output) const throw (MEDEXCEPTION)
+  {
+    getValueOnPoints(1, coords, output);
+  }
+
+  /*!
+   * \brief Retrieve values in given points
+   *  \param nb_points - number of points
+   *  \param coords - point coordinates
+   *  \param output - output buffer
+   */
+  template <class T, class INTERLACING_TAG>
+  void FIELD<T, INTERLACING_TAG>::getValueOnPoints(int nb_points, const double* coords, double* output) const throw (MEDEXCEPTION)
+  {
+    const char* LOC = " FIELD<T, INTERLACING_TAG>::getValueOnPoints(int nb_points, const double* coords, double* output) : ";
+    // check operation feasibility
+    if ( !getSupport() ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"NULL Support"));
+    if ( !getSupport()->getMesh() ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"NULL Mesh"));
+    if ( !_value ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"NULL _value"));
+    if ( getGaussPresence() ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not implemeneted for Gauss points"));
+
+    MED_EN::medEntityMesh entity = getSupport()->getEntity();
+    if ( entity != MED_EN::MED_CELL &&
+         entity != MED_EN::MED_NODE )
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support must be on CELLs or NODEs"));
+
+    // initialize output value
+    for ( int j = 0; j < nb_points*getNumberOfComponents(); ++j )
+      output[j] = 0.0;
+
+    MEDMEM::MESH* mesh = getSupport()->getMesh();
+
+    const double* point = coords;
+    double* value = output;
+
+    if ( entity == MED_EN::MED_CELL )
+    {
+      MEDMEM::PointLocator pLocator (*mesh);
+      for ( int i = 0; i < nb_points; ++i)
+      {
+        // find the cell enclosing the point
+        std::list<int> cellIds = pLocator.locate( point );
+        int nbCells = cellIds.size();
+        if ( nbCells < 1 )
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Point is out of mesh"));
+
+        // retrieve value
+        std::list<int>::iterator iCell = cellIds.begin();
+        for ( ; iCell != cellIds.end(); ++iCell )
+          for ( int j = 1; j <= getNumberOfComponents(); ++j )
+            value[j-1] += getValueIJ( *iCell, j ) / nbCells;
+
+        // next point
+        point += mesh->getSpaceDimension();
+        value += getNumberOfComponents();
+      }
+    }
+    else // MED_EN::MED_NODE
+    {
+      const double * allCoords = mesh->getCoordinates( MED_EN::MED_FULL_INTERLACE );
+
+      MEDMEM::PointLocatorInSimplex pLocator (*mesh);
+      for ( int i = 0; i < nb_points; ++i)
+      {
+        // find nodes of the simplex enclosing the point
+        std::list<int> nodeIds = pLocator.locate( point );
+        int nbNodes = nodeIds.size();
+        if ( nbNodes < 1 )
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Point is out of mesh"));
+        if ( nbNodes != mesh->getMeshDimension() + 1 )
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Invalid nb of points of simplex: "<<nbNodes));
+
+        // get coordinates of simplex nodes
+        std::vector<const double*> nodeCoords( nbNodes );
+        std::list<int>::iterator iNode = nodeIds.begin();
+        int n = 0;
+        for ( ; n < nbNodes; ++iNode, ++n )
+          nodeCoords[n] = allCoords + (*iNode-1) * mesh->getSpaceDimension();
+
+        // compute wegths of simplex nodes
+        double nodeWgt[4];
+        INTERP_KERNEL::barycentric_coords( nodeCoords, coords, nodeWgt );
+
+        // retrieve value
+        for ( n = 0, iNode = nodeIds.begin(); iNode != nodeIds.end(); ++iNode, ++n )
+          for ( int j = 1; j <= getNumberOfComponents(); ++j )
+            value[j-1] += getValueIJ( *iNode, j ) * nodeWgt[ n ];
+
+        // next point
+        point += mesh->getSpaceDimension();
+        value += getNumberOfComponents();
+      }
+    }
+  }
+  
+
 /*!
   \if developper
   Return the coordinates of the gauss points
@@ -3584,7 +3690,7 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACING_TAG>::getGaussPointsCoordinat
     int idx = 0;
     for( int i = 1 ; i <= coord.getNbElem() ; i++ ) {
       for( int j = 1 ; j <= coord.getDim() ; j++ ) {
-	gaussCoord[idx++] = coord.getIJ(i,j);
+        gaussCoord[idx++] = coord.getIJ(i,j);
       }
     }
 
@@ -3593,7 +3699,7 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACING_TAG>::getGaussPointsCoordinat
     double* refCoord = new double[ref.getNbElem()*ref.getDim()];
     for( int i = 1 ; i <= ref.getNbElem() ; i++ ) {
       for( int j = 1 ; j <= ref.getDim() ; j++ ) {
-	refCoord[idx++] = ref.getIJ(i,j);
+        refCoord[idx++] = ref.getIJ(i,j);
       }
     }
       
@@ -3606,12 +3712,12 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACING_TAG>::getGaussPointsCoordinat
     }
       
     calculator.addGaussInfo(normType,
-			    elem_type/100,
-			    gaussCoord,
-			    gaussLock->getNbGauss(),
-			    refCoord,
-			    elem_type%100
-			    );
+                            elem_type/100,
+                            gaussCoord,
+                            gaussLock->getNbGauss(),
+                            refCoord,
+                            elem_type%100
+                            );
     //Preapre Info for the gauss array
     nbelgeoc  [ iType+1 ] = nbelgeoc[ iType ] + getSupport()->getNumberOfElements(elem_type);
     nbgaussgeo [ iType+1 ] = gaussLock->getNbGauss();
@@ -3649,7 +3755,7 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACING_TAG>::getGaussPointsCoordinat
   gpCoord->setTime(getTime());
 
   TArrayGauss *arrayGauss = new TArrayGauss(spaceDim, length_values,
-					    nb_type, & nbelgeoc[0], & nbgaussgeo[0]);
+                                            nb_type, & nbelgeoc[0], & nbgaussgeo[0]);
   gpCoord->setArray(arrayGauss);
 
 
@@ -3684,9 +3790,9 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACING_TAG>::getGaussPointsCoordinat
       int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
       
       for (int k_type = 0; k_type<nb_entity_type; k_type++) {
-	for (int j_ent = 0; j_ent<(type%100); j_ent++) {
-	  global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[connectivityIndex[supp_number[k_type]-1]+j_ent-1];
-	}
+        for (int j_ent = 0; j_ent<(type%100); j_ent++) {
+          global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[connectivityIndex[supp_number[k_type]-1]+j_ent-1];
+        }
       }
       global_connectivity = global_connectivity_tmp;
     }
@@ -3699,19 +3805,19 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACING_TAG>::getGaussPointsCoordinat
       int elem_index = nbNodes*elem;
       Ni = new int[nbNodes];
       for( int idx = 0 ; idx < nbNodes; idx++ ) {
-	Ni[idx] = global_connectivity[ elem_index+idx ] - 1;
+        Ni[idx] = global_connectivity[ elem_index+idx ] - 1;
       }
       
       gCoord = calculator.CalculateCoords(normType,
-					  coord,
-					  spaceDim,
-					  Ni);
+                                          coord,
+                                          spaceDim,
+                                          Ni);
       int resultIndex = 0;
       for( int k = 0; k < gaussLock->getNbGauss(); k++ ) {
-	for( int dimId = 1; dimId <= spaceDim; dimId++ ) {
-	  gpCoord->setValueIJK(index,dimId,(k+1),gCoord[resultIndex]);
-	  resultIndex++;
-	}
+        for( int dimId = 1; dimId <= spaceDim; dimId++ ) {
+          gpCoord->setValueIJK(index,dimId,(k+1),gCoord[resultIndex]);
+          resultIndex++;
+        }
       }
       delete [] gCoord;
       delete [] Ni;
