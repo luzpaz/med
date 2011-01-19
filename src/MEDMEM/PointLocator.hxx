@@ -33,7 +33,7 @@ namespace INTERP_KERNEL
 
 namespace MEDMEM
 {
-  class GenericPointLocatorAlgos;
+  //class GenericPointLocatorAlgos;
 
   class MEDMEM_EXPORT PointLocator
   {
@@ -41,9 +41,16 @@ namespace MEDMEM
     PointLocator(const MEDMEM::MESH& mesh);
     virtual ~PointLocator();
     std::list<int> locate(const double* x);
-  private:
+  protected:
+    PointLocator() {}
     INTERP_KERNEL::GenericMesh *_medmesh;
     INTERP_KERNEL::GenericPointLocatorAlgos* _point_locator;
+  };
+
+  class MEDMEM_EXPORT PointLocatorInSimplex : public PointLocator
+  {
+  public:
+    PointLocatorInSimplex(const MEDMEM::MESH& mesh);
   };
 }
 

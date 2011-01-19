@@ -54,3 +54,20 @@ std::list<int> MEDMEM::PointLocator::locate(const double* x)
   return _point_locator->locates(x,1e-12);
 }
 
+MEDMEM::PointLocatorInSimplex::PointLocatorInSimplex(const MEDMEM::MESH& mesh)
+{
+  int meshdim=mesh.getMeshDimension();
+  int spacedim=mesh.getSpaceDimension();
+  if (meshdim != spacedim) throw MEDMEM::MEDEXCEPTION("Locator is not implemented for meshdim != spacedim");
+  switch (meshdim)
+      {
+      case 2:
+        _medmesh = new MEDNormalizedUnstructuredMesh<2,2> (&mesh);
+        _point_locator=new INTERP_KERNEL::PointLocatorInSimplex<MEDNormalizedUnstructuredMesh<2,2> >(*(static_cast<MEDNormalizedUnstructuredMesh<2,2>* >(_medmesh)));
+        break;
+      case 3:
+        _medmesh = new MEDNormalizedUnstructuredMesh<3,3> (&mesh);
+        _point_locator=new INTERP_KERNEL::PointLocatorInSimplex<MEDNormalizedUnstructuredMesh<3,3> >(*(static_cast<MEDNormalizedUnstructuredMesh<3,3>* >(_medmesh)));
+        break;
+      }
+}
