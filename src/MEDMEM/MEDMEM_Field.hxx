@@ -1154,7 +1154,6 @@ the components.
 
 #include "MEDMEM_DriverFactory.hxx"
 #include "PointLocator.hxx"
-#include "InterpolationUtils.hxx"
 
 namespace MEDMEM {
 
@@ -2471,7 +2470,7 @@ double FIELD<T, INTERLACING_TAG>::normL2(int component,
 
     const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-        p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃ©mentation dans mesh]
+      p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃ©mentation dans mesh]
     else
       p_field_size->addReference();
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
@@ -2555,7 +2554,7 @@ double FIELD<T, INTERLACING_TAG>::normL2(const FIELD<double, FullInterlace> * p_
     _checkNormCompatibility(p_field_volume, /*nodalAllowed=*/true); // may throw exception
     const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-        p_field_size=_getFieldSize(); // we calculate the volume
+      p_field_size=_getFieldSize(); // we calculate the volume
     else
       p_field_size->addReference();
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
@@ -2654,7 +2653,7 @@ double FIELD<T, INTERLACING_TAG>::normL1(int component,
 
     const FIELD<double,FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-        p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃÃÅ mentation dans mesh]
+      p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃÃÅ mentation dans mesh]
     else
       p_field_size->addReference();
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
@@ -3615,7 +3614,7 @@ bool FIELD<T, INTERLACING_TAG>::getValueOnElement(int eltIdInSup,T* retValues)
 
         // compute wegths of simplex nodes
         double nodeWgt[4];
-        INTERP_KERNEL::barycentric_coords( nodeCoords, coords, nodeWgt );
+        pLocator.getNodeWightsInSimplex( nodeCoords, coords, nodeWgt );
 
         // retrieve value
         for ( n = 0, iNode = nodeIds.begin(); iNode != nodeIds.end(); ++iNode, ++n )

@@ -71,3 +71,9 @@ MEDMEM::PointLocatorInSimplex::PointLocatorInSimplex(const MEDMEM::MESH& mesh)
         break;
       }
 }
+
+void MEDMEM::PointLocatorInSimplex::getNodeWightsInSimplex( const std::vector<const double*>& nodes,
+                                                            const double* p, double* weghts )
+{
+  INTERP_KERNEL::barycentric_coords( nodes, p, weghts );
+}

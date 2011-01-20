@@ -20,10 +20,10 @@
 #ifndef _POINT_LOCATOR_HXX_
 #define _POINT_LOCATOR_HXX_
 
-#include "MEDNormalizedUnstructuredMesh.hxx"
 #include "MEDMEM.hxx"
 
 #include <list>
+#include <vector>
 
 namespace INTERP_KERNEL
 {
@@ -33,7 +33,7 @@ namespace INTERP_KERNEL
 
 namespace MEDMEM
 {
-  //class GenericPointLocatorAlgos;
+  class MESH;
 
   class MEDMEM_EXPORT PointLocator
   {
@@ -51,6 +51,9 @@ namespace MEDMEM
   {
   public:
     PointLocatorInSimplex(const MEDMEM::MESH& mesh);
+
+    static void getNodeWightsInSimplex( const std::vector<const double*>& nodes,
+                                        const double* p, double* weghts );
   };
 }
 
