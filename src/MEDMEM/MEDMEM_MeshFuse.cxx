@@ -593,7 +593,8 @@ int MeshFuse::appendConnectivity( MeshFuse::TConnData& data,
       int rm_i = 0, nb_rm = 0;
       for ( int i = 0; i < nb_elem; ++i )
       {
-        bool is_merged = ( rm_i < merged.size() && i == merged[rm_i] && equalo[rm_i]);
+        bool is_merged = ( rm_i < merged.size() && i == merged[rm_i] &&
+                           rm_i < equalo.size() && equalo[rm_i] );
         if ( is_merged )
         {
           data._nb_elems--;
