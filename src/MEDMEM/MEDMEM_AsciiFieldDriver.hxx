@@ -102,7 +102,7 @@ namespace MEDMEM {
 
   public:
     template <class INTERLACING_TAG>
-    ASCII_FIELD_DRIVER():GENDRIVER(),
+    ASCII_FIELD_DRIVER():GENDRIVER(ASCII_DRIVER),
                          _ptrField((FIELD<T>)MED_NULL),
                          _fileName("") {}
 

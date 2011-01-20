@@ -23,6 +23,8 @@
 #ifndef VTK_MESH_DRIVER_HXX
 #define VTK_MESH_DRIVER_HXX
 
+#include <cstring>
+
 #include "MEDMEM.hxx"
 
 #include <string>

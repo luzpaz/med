@@ -759,10 +759,11 @@ template <class T> void MED_FIELD_RDONLY_DRIVER21<T>::read(void)
   // et crée le support correspondant.
   SUPPORT * mySupport = new SUPPORT;
   vector<int> numberOfGaussPoints;
-  bool found = createFieldSupport(id,MED_FIELD_DRIVER<T>::_fieldName,
-                                  MED_FIELD_DRIVER<T>::_ptrField->_iterationNumber,
-                                  MED_FIELD_DRIVER<T>::_ptrField->_orderNumber,
-                                  *mySupport, numberOfGaussPoints, meshName) ;
+  bool found =
+    MED_FIELD_DRIVER21<T>::createFieldSupport(id,MED_FIELD_DRIVER<T>::_fieldName,
+                                              MED_FIELD_DRIVER<T>::_ptrField->_iterationNumber,
+                                              MED_FIELD_DRIVER<T>::_ptrField->_orderNumber,
+                                              *mySupport, numberOfGaussPoints, meshName) ;
   if ( !found ) {
     mySupport->removeReference(); delete[] componentName; delete[] unitName;
     MED_FIELD_DRIVER<T>::_fieldNum = MED_INVALID ;
