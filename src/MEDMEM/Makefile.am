@@ -38,6 +38,7 @@ MEDMEM_Coordinate.hxx \
 MEDMEM_define.hxx \
 MEDMEM_DriversDef.hxx \
 MEDMEM_DriverFactory.hxx \
+MEDMEM_DriverFactory.ixx \
 MEDMEM_Family.hxx \
 MEDMEM_Field.hxx \
 MEDMEM_GenDriver.hxx \
@@ -156,7 +157,7 @@ libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) $(XDR_CPPFLAGS) \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../INTERP_KERNEL/Geometric2D \
 	-I$(srcdir)/../INTERP_KERNEL/GaussPoints \
-	-I$(srcdir)/../MEDWrapper/V2_1/Core -I$(srcdir)/../INTERPOLATION
+	-I$(srcdir)/../MEDWrapper/V2_1/Core
 libmedmem_la_CXXFLAGS= @CXXTMPDPTHFLAGS@
 
 # change motivated by the bug KERNEL4778.
