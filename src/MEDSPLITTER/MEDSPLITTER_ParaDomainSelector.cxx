@@ -97,6 +97,8 @@ bool ParaDomainSelector::isOnDifferentHosts() const
                (void*)&name_there[0], MPI_MAX_PROCESSOR_NAME, MPI_CHAR, prev_proc, tag,
                MPI_COMM_WORLD, &status);
   return string(name_here) != string(name_there);
+#else
+  return false;
 #endif
 }
 
@@ -531,19 +533,19 @@ void ParaDomainSelector::gatherNbCellPairs()
 
 void ParaDomainSelector::exchangeJoint( JointExchangeData* joint ) const
 {
+#ifdef HAVE_MPI2
   vector<int> send_data, recv_data( joint->serialize( send_data ));
 
   int dest = getProccessorID( joint->distantDomain() );
   int tag  = 1001 + jointId( joint->localDomain(), joint->distantDomain() );
   
-#ifdef HAVE_MPI2
   MPI_Status status;
   MPI_Sendrecv((void*)&send_data[0], send_data.size(), MPI_INT, dest, tag,
                (void*)&recv_data[0], recv_data.size(), MPI_INT, dest, tag,
                MPI_COMM_WORLD, &status);  
-#endif
 
   joint->deserialize( recv_data );
+#endif
 }
 
 //================================================================================
@@ -581,15 +583,15 @@ int* ParaDomainSelector::exchangeSubentityIds( int loc_domain, int dist_domain,
                                                const vector<int>& loc_ids_here ) const
 {
   int* loc_ids_dist = new int[ loc_ids_here.size()];
+#ifdef HAVE_MPI2
   int dest = getProccessorID( dist_domain );
   int tag  = 2002 + jointId( loc_domain, dist_domain );
-#ifdef HAVE_MPI2
   MPI_Status status;
   MPI_Sendrecv((void*)&loc_ids_here[0], loc_ids_here.size(), MPI_INT, dest, tag,
                (void*) loc_ids_dist,    loc_ids_here.size(), MPI_INT, dest, tag,
                MPI_COMM_WORLD, &status);  
-#endif
   evaluateMemory();
+#endif
 
   return loc_ids_dist;
 }
