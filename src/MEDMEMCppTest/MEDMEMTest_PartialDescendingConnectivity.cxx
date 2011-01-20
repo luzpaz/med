@@ -73,8 +73,8 @@ void MEDMEMTest::testPartialDescendingConnectivity()
   //All edge conn
   myMesh->setConnectivity(connNodalEdgeClassical,MED_EN::MED_EDGE,MED_EN::MED_SEG2);
   //
-  const int *ConnNodal = myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
-  const int *ConnNodalIndex = myMesh->getConnectivityIndex(MED_NODAL,MED_CELL);
+  /*const int *ConnNodal = */myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
+  /*const int *ConnNodalIndex = */myMesh->getConnectivityIndex(MED_NODAL,MED_CELL);
 
   const int *Conn      = myMesh->getConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS);
   const int *ConnIndex = myMesh->getConnectivityIndex(MED_DESCENDING,MED_CELL);
