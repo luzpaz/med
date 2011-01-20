@@ -50,7 +50,6 @@ AM_CPPFLAGS += $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
 	-I$(srcdir)/../INTERP_KERNEL \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../INTERP_KERNEL/GaussPoints \
-	-I$(srcdir)/../INTERPOLATION \
 	-I$(srcdir)/../MEDMEM
 
 LDADD= $(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
