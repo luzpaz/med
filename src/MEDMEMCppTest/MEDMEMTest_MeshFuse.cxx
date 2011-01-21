@@ -40,7 +40,7 @@ using namespace std;
 
 namespace
 {
-  const char* bnd_elem_name = "Boundary elements";
+  const char* bnd_elem_name = "Bnd elems";
 
   /*!
    * \brief Class allowing to add groups to GRID
@@ -299,7 +299,7 @@ void MEDMEMTest::testMeshFuse()
     CPPUNIT_ASSERT_EQUAL( expect_nb_bnd, bnd_faces->getNumberOfElements(MED_ALL_ELEMENTS));
 
     // check families
-    CPPUNIT_ASSERT_EQUAL( 3, fusion.getNumberOfFamilies( sub_entity ));
+    CPPUNIT_ASSERT_EQUAL( 4, fusion.getNumberOfFamilies( sub_entity ));
   }
 
 
@@ -349,7 +349,7 @@ void MEDMEMTest::testMeshFuse()
     CPPUNIT_ASSERT_EQUAL( expect_nb_bnd, bnd_faces->getNumberOfElements(MED_ALL_ELEMENTS));
 
     // check families
-    CPPUNIT_ASSERT_EQUAL( 3, fusion.getNumberOfFamilies( sub_entity ));
+    CPPUNIT_ASSERT_EQUAL( 4, fusion.getNumberOfFamilies( sub_entity ));
   }
 
   grid_left->removeReference();
