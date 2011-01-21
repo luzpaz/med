@@ -224,6 +224,19 @@ void MeshFuse::expandConnectivity(int final_nb_nodes)
   const medConnectivity nodal   = MED_NODAL;
   const medModeSwitch interlace = MED_FULL_INTERLACE;
 
+  // fill in _nb_index[ INIT_OLD ]
+  for ( medEntityMesh entity = MED_CELL; entity < MED_ALL_ENTITIES; ++entity )
+  {
+    if ( existConnectivity( nodal, entity ))
+    {
+      const int *               index = this->getGlobalNumberingIndex(entity);
+      const medGeometryElement* types = this->getTypes(entity);
+      int                    nb_types = this->getNumberOfTypes(entity);
+      for ( int t = 0; t < nb_types; ++t )
+        _nb_index[ INIT_OLD ][ entity ][ types[t] ] = index[t+1]-index[0];
+    }
+  }
+
   CONNECTIVITY *prev_connectivity = 0, *cell_connectivity = 0;
 
   // loop on all entities
@@ -588,13 +601,14 @@ int MeshFuse::appendConnectivity( MeshFuse::TConnData& data,
       // find old elements equal to merged, if no equal exist there is zero in array
       vector<int>& equalo = _equalo_of_type[ type ];
       findEqualOldElements( entity, type, equalo );
+      if ( equalo.size() < merged.size() )
+        equalo.resize( merged.size(), 0 );
 
       // fill connectivity
       int rm_i = 0, nb_rm = 0;
       for ( int i = 0; i < nb_elem; ++i )
       {
-        bool is_merged = ( rm_i < merged.size() && i == merged[rm_i] &&
-                           rm_i < equalo.size() && equalo[rm_i] );
+        bool is_merged = ( rm_i < merged.size() && i == merged[rm_i] && equalo[rm_i] );
         if ( is_merged )
         {
           data._nb_elems--;
@@ -1017,15 +1031,36 @@ void MeshFuse::findEqualOldElements(medEntityMesh      entity,
                                     vector< int > &    old_ids)
 {
   //const char* LOC = "MeshFuse::findEqualOldElements(): ";
+  // this method is called after expandConnectivity() and this mesh already contains all elements
+  //int add_nb_elems = _mesh->getNumberOfElements( entity, type );
+  //int old_nb_elems =  this->getNumberOfElements( entity, type ) - add_nb_elems + merged_i.size();
+  int old_nb_elems = 
+    getElemNbShift( entity, type, INIT_OLD, /*prev=*/false) -
+    getElemNbShift( entity, type, INIT_OLD, /*prev=*/true);
+
   const int *old_conn, *old_index, *add_conn, *add_index;
   if ( type == MED_POLYGON )
   {
-    if ( !_mesh->getNumberOfPolygons() || !this->getNumberOfPolygons() )
+    if ( !_mesh->getNumberOfPolygons(entity) /*|| !this->getNumberOfPolygons(entity)*/ )
       return;
     add_conn  = _mesh->getPolygonsConnectivity(MED_NODAL, entity );
-    old_conn  =  this->getPolygonsConnectivity(MED_NODAL, entity );
     add_index = _mesh->getPolygonsConnectivityIndex(MED_NODAL, entity );
-    old_index =  this->getPolygonsConnectivityIndex(MED_NODAL, entity );
+
+    if ( this->getNumberOfPolygons(entity) )
+    {
+      old_conn  =  this->getPolygonsConnectivity(MED_NODAL, entity );
+      old_index =  this->getPolygonsConnectivityIndex(MED_NODAL, entity );
+    }
+    else if ( this->getNumberOfElements(entity, MED_ALL_ELEMENTS) )
+    {
+      old_conn  =  this->getConnectivity( MED_NODAL, MED_FULL_INTERLACE, entity, MED_ALL_ELEMENTS );
+      old_index =  this->getConnectivityIndex( MED_NODAL, entity );
+      old_nb_elems = getElemNbShift( entity, MED_ALL_ELEMENTS, INIT_OLD, /*prev=*/false);
+    }
+    else
+    {
+      return;
+    }
   }
   else // case of POLYHEDRON is omitted yet
   {
@@ -1041,13 +1076,6 @@ void MeshFuse::findEqualOldElements(medEntityMesh      entity,
 
   const vector<int>& merged_i = _merged_of_type[ type ];
   vector<int>::const_iterator rm_i = merged_i.begin();
-
-  // this method is called after expandConnectivity() and this mesh already contains all elements
-  //int add_nb_elems = _mesh->getNumberOfElements( entity, type );
-  //int old_nb_elems =  this->getNumberOfElements( entity, type ) - add_nb_elems + merged_i.size();
-  int old_nb_elems = 
-    getElemNbShift( entity, type, INIT_OLD, /*prev=*/false) -
-    getElemNbShift( entity, type, INIT_OLD, /*prev=*/true);
 
   old_ids.reserve( merged_i.size() );
 
