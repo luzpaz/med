@@ -173,6 +173,7 @@ class MEDCouplingCorbaServBasicsTest:
     def buildFieldScalarOn2DNT(self):
         mesh=self.build2DMesh();
         fieldOnCells=MEDCouplingFieldDouble.New(ON_CELLS,NO_TIME);
+        fieldOnCells.setTimeUnit("ms");
         fieldOnCells.setName("toto");
         fieldOnCells.setMesh(mesh);
         array=DataArrayDouble.New();
@@ -186,6 +187,7 @@ class MEDCouplingCorbaServBasicsTest:
         mesh=self.build2DMesh();
         fieldOnNodes=MEDCouplingFieldDouble.New(ON_NODES,NO_TIME);
         fieldOnNodes.setName("toto2");
+        fieldOnNodes.setTimeUnit("s");
         fieldOnNodes.setDescription("my wonderful field toto2");
         fieldOnNodes.setMesh(mesh);
         array=DataArrayDouble.New();
@@ -214,6 +216,7 @@ class MEDCouplingCorbaServBasicsTest:
         fieldOnCells=MEDCouplingFieldDouble.New(ON_CELLS,ONE_TIME);
         fieldOnCells.setName("toto25");
         fieldOnCells.setDescription("my wonderful 3D surf field toto25");
+        fieldOnCells.setTimeUnit("us");
         fieldOnCells.setMesh(mesh);
         array=DataArrayDouble.New();
         tmp=mesh.getNumberOfCells()*3*[7.]
@@ -228,6 +231,7 @@ class MEDCouplingCorbaServBasicsTest:
         fieldOnCells=MEDCouplingFieldDouble.New(ON_CELLS,CONST_ON_TIME_INTERVAL);
         fieldOnCells.setName("toto26");
         fieldOnCells.setDescription("my wonderful 3D surf field toto26");
+        fieldOnCells.setTimeUnit("us");
         fieldOnCells.setMesh(mesh);
         array=DataArrayDouble.New();
         tmp=mesh.getNumberOfCells()*3*[7.]
@@ -243,6 +247,7 @@ class MEDCouplingCorbaServBasicsTest:
         fieldOnCells=MEDCouplingFieldDouble.New(ON_CELLS,LINEAR_TIME)
         fieldOnCells.setName("toto27");
         fieldOnCells.setDescription("my wonderful 2D field toto27");
+        fieldOnCells.setTimeUnit("ms");
         fieldOnCells.setMesh(mesh);
         array=DataArrayDouble.New();
         arr1=[1.2,1.02,1.002,1.0002, 3.4,3.04,3.004,3.0004, 5.6,5.06,5.006,5.0006, 7.8,7.08,7.008,7.0008, 9.1,9.01,9.001,9.0001]
@@ -289,6 +294,7 @@ class MEDCouplingCorbaServBasicsTest:
         array.setInfoOnComponent(1,"Density (kg/m^3)");
         f.setArray(array);
         f.setName("MyFirstFieldOnGaussPoint");
+        f.setTimeUnit("ms");
         f.setDescription("mmmmmmmmmmmm");
         f.checkCoherency();
         return f;
@@ -298,6 +304,7 @@ class MEDCouplingCorbaServBasicsTest:
         f=MEDCouplingFieldDouble.New(ON_GAUSS_NE,ONE_TIME);
         f.setTime(6.8,11,8);
         f.setMesh(m);
+        f.setTimeUnit("ms");
         f.setName("MyFirstFieldOnNE");
         f.setDescription("MyDescriptionNE");
         array=DataArrayDouble.New();

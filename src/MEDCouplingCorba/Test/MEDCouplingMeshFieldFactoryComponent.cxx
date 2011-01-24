@@ -216,6 +216,7 @@ namespace SALOME_TEST
   {
     ParaMEDMEM::MEDCouplingUMesh *mesh=build2DMesh();
     ParaMEDMEM::MEDCouplingFieldDouble *fieldOnCells=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::NO_TIME);
+    fieldOnCells->setTimeUnit("ms");
     fieldOnCells->setName("toto");
     fieldOnCells->setMesh(mesh);
     ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
@@ -234,6 +235,7 @@ namespace SALOME_TEST
     ParaMEDMEM::MEDCouplingUMesh *mesh=build2DMesh();
     ParaMEDMEM::MEDCouplingFieldDouble *fieldOnNodes=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_NODES,ParaMEDMEM::NO_TIME);
     fieldOnNodes->setName("toto2");
+    fieldOnNodes->setTimeUnit("s");
     fieldOnNodes->setDescription("my wonderful field toto2");
     fieldOnNodes->setMesh(mesh);
     ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
@@ -272,6 +274,7 @@ namespace SALOME_TEST
     ParaMEDMEM::MEDCouplingFieldDouble *fieldOnCells=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::ONE_TIME);
     fieldOnCells->setName("toto25");
     fieldOnCells->setDescription("my wonderful 3D surf field toto25");
+    fieldOnCells->setTimeUnit("us");
     fieldOnCells->setMesh(mesh);
     ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
     array->alloc(mesh->getNumberOfCells(),3);
@@ -291,6 +294,7 @@ namespace SALOME_TEST
     ParaMEDMEM::MEDCouplingFieldDouble *fieldOnCells=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::CONST_ON_TIME_INTERVAL);
     fieldOnCells->setName("toto26");
     fieldOnCells->setDescription("my wonderful 3D surf field toto26");
+    fieldOnCells->setTimeUnit("us");
     fieldOnCells->setMesh(mesh);
     ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
     array->alloc(mesh->getNumberOfCells(),3);
@@ -311,6 +315,7 @@ namespace SALOME_TEST
     ParaMEDMEM::MEDCouplingFieldDouble *fieldOnCells=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::LINEAR_TIME);
     fieldOnCells->setName("toto27");
     fieldOnCells->setDescription("my wonderful 2D field toto27");
+    fieldOnCells->setTimeUnit("ms");
     fieldOnCells->setMesh(mesh);
     ParaMEDMEM::DataArrayDouble *array1=ParaMEDMEM::DataArrayDouble::New();
     array1->alloc(mesh->getNumberOfCells(),4);
@@ -365,6 +370,7 @@ namespace SALOME_TEST
       ptr[i]=(double)(i+1);
     f->setArray(array);
     f->setName("MyFirstFieldOnGaussPoint");
+    f->setTimeUnit("ms");
     f->setDescription("mmmmmmmmmmmm");
     array->decrRef();
     f->checkCoherency();
@@ -377,6 +383,7 @@ namespace SALOME_TEST
     ParaMEDMEM::MEDCouplingFieldDouble *f=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_GAUSS_NE,ParaMEDMEM::ONE_TIME);
     f->setTime(6.8,11,8);
     f->setMesh(m);
+    f->setTimeUnit("ms");
     f->setName("MyFirstFieldOnNE");
     f->setDescription("MyDescriptionNE");
     ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
