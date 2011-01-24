@@ -38,9 +38,10 @@ namespace ParaMEDMEM
   class DataArrayInt;
   class DataArrayDouble;
 
-  class MEDCOUPLINGCORBA_EXPORT MEDCouplingFieldDoubleServant : public MEDCouplingFieldServant , public virtual POA_SALOME_MED::MEDCouplingFieldDoubleCorbaInterface
+  class MEDCOUPLINGCORBA_EXPORT MEDCouplingFieldDoubleServant : public MEDCouplingFieldServant, public virtual POA_SALOME_MED::MEDCouplingFieldDoubleCorbaInterface
   {
   public:
+    typedef MEDCouplingFieldDouble CppType;
     MEDCouplingFieldDoubleServant(const MEDCouplingFieldDouble *cppPointerOfMesh);
   protected:
     const MEDCouplingFieldDouble *getPointer() const { return (const MEDCouplingFieldDouble *)(_cpp_pointer); }

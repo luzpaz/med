@@ -22,9 +22,14 @@
 %{
 #include "MEDCouplingFieldDoubleServant.hxx"  
 #include "MEDCouplingFieldTemplateServant.hxx"
+#include "MEDCouplingMultiFieldsServant.hxx"
+#include "MEDCouplingFieldOverTimeServant.hxx"
 #include "MEDCouplingUMeshServant.hxx"
 #include "MEDCouplingExtrudedMeshServant.hxx"
 #include "MEDCouplingCMeshServant.hxx"
+#include "DataArrayDoubleServant.hxx"
+#include "DataArrayIntServant.hxx"
+#include "MEDCouplingCorbaTypemaps.i"
 
 using namespace ParaMEDMEM;
 %}
@@ -40,27 +45,7 @@ namespace ParaMEDMEM
        {
          static PyObject *_this(const MEDCouplingFieldDouble *cppPointerOfMesh)
          {
-           int argc=0;
-           MEDCouplingFieldDoubleServant *serv=new MEDCouplingFieldDoubleServant(cppPointerOfMesh);
-           CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
-           CORBA::Object_var obj=orb->resolve_initial_references("RootPOA");
-           PortableServer::POA_var poa=PortableServer::POA::_narrow(obj);
-           PortableServer::POAManager_var mgr=poa->the_POAManager();
-           mgr->activate();
-           SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_var ret=serv->_this();
-           char *ior=orb->object_to_string(ret);
-           PyObject *iorPython=PyString_FromString(ior);
-           PyObject* pdict=PyDict_New();
-           PyDict_SetItemString(pdict, "__builtins__", PyEval_GetBuiltins());
-           PyRun_String("import MEDCouplingCorbaServant_idl", Py_single_input, pdict, pdict);
-           PyRun_String("import CORBA", Py_single_input, pdict, pdict);
-           PyRun_String("orbTmp15634=CORBA.ORB_init([''])",Py_single_input,pdict, pdict);
-           PyObject* orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
-           PyObject *corbaObj=PyObject_CallMethod(orbPython,(char*)"string_to_object",(char*)"O",iorPython);
-           Py_DECREF(pdict);
-           Py_DECREF(iorPython);
-           CORBA::string_free(ior);
-           return corbaObj;
+           return buildServantAndActivate<MEDCouplingFieldDoubleServant>(cppPointerOfMesh);
          }
        }
   };
@@ -72,27 +57,31 @@ namespace ParaMEDMEM
        {
          static PyObject *_this(const MEDCouplingFieldTemplate *cppPointerOfMesh)
          {
-           int argc=0;
-           MEDCouplingFieldTemplateServant *serv=new MEDCouplingFieldTemplateServant(cppPointerOfMesh);
-           CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
-           CORBA::Object_var obj=orb->resolve_initial_references("RootPOA");
-           PortableServer::POA_var poa=PortableServer::POA::_narrow(obj);
-           PortableServer::POAManager_var mgr=poa->the_POAManager();
-           mgr->activate();
-           SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_var ret=serv->_this();
-           char *ior=orb->object_to_string(ret);
-           PyObject *iorPython=PyString_FromString(ior);
-           PyObject* pdict=PyDict_New();
-           PyDict_SetItemString(pdict, "__builtins__", PyEval_GetBuiltins());
-           PyRun_String("import MEDCouplingCorbaServant_idl", Py_single_input, pdict, pdict);
-           PyRun_String("import CORBA", Py_single_input, pdict, pdict);
-           PyRun_String("orbTmp15634=CORBA.ORB_init([''])",Py_single_input,pdict, pdict);
-           PyObject* orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
-           PyObject *corbaObj=PyObject_CallMethod(orbPython,(char*)"string_to_object",(char*)"O",iorPython);
-           Py_DECREF(pdict);
-           Py_DECREF(iorPython);
-           CORBA::string_free(ior);
-           return corbaObj;
+           return buildServantAndActivate<MEDCouplingFieldTemplateServant>(cppPointerOfMesh);
+         }
+       }
+  };
+
+  class MEDCouplingMultiFieldsServant
+  {
+  public:
+    %extend
+       {
+         static PyObject *_this(const MEDCouplingMultiFields *cppPointerOfMesh)
+         {
+           return buildServantAndActivate<MEDCouplingMultiFieldsServant>(cppPointerOfMesh);
+         }
+       }
+  };
+
+  class MEDCouplingFieldOverTimeServant
+  {
+  public:
+    %extend
+       {
+         static PyObject *_this(const MEDCouplingFieldOverTime *cppPointerOfMesh)
+         {
+           return buildServantAndActivate<MEDCouplingFieldOverTimeServant>(cppPointerOfMesh);
          }
        }
   };
@@ -104,27 +93,7 @@ namespace ParaMEDMEM
        {
          static PyObject *_this(const MEDCouplingUMesh *cppPointerOfMesh)
          {
-           int argc=0;
-           MEDCouplingUMeshServant *serv=new MEDCouplingUMeshServant(cppPointerOfMesh);
-           CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
-           CORBA::Object_var obj=orb->resolve_initial_references("RootPOA");
-           PortableServer::POA_var poa=PortableServer::POA::_narrow(obj);
-           PortableServer::POAManager_var mgr=poa->the_POAManager();
-           mgr->activate();
-           SALOME_MED::MEDCouplingUMeshCorbaInterface_var ret=serv->_this();
-           char *ior=orb->object_to_string(ret);
-           PyObject *iorPython=PyString_FromString(ior);
-           PyObject* pdict=PyDict_New();
-           PyDict_SetItemString(pdict, "__builtins__", PyEval_GetBuiltins());
-           PyRun_String("import MEDCouplingCorbaServant_idl", Py_single_input, pdict, pdict);
-           PyRun_String("import CORBA", Py_single_input, pdict, pdict);
-           PyRun_String("orbTmp15634=CORBA.ORB_init([''])",Py_single_input,pdict, pdict);
-           PyObject* orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
-           PyObject *corbaObj=PyObject_CallMethod(orbPython,(char*)"string_to_object",(char*)"O",iorPython);
-           Py_DECREF(pdict);
-           Py_DECREF(iorPython);
-           CORBA::string_free(ior);
-           return corbaObj;
+           return buildServantAndActivate<MEDCouplingUMeshServant>(cppPointerOfMesh);
          }
        }
   };
@@ -136,27 +105,7 @@ namespace ParaMEDMEM
        {
          static PyObject *_this(const MEDCouplingExtrudedMesh *cppPointerOfMesh)
          {
-           int argc=0;
-           MEDCouplingExtrudedMeshServant *serv=new MEDCouplingExtrudedMeshServant(cppPointerOfMesh);
-           CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
-           CORBA::Object_var obj=orb->resolve_initial_references("RootPOA");
-           PortableServer::POA_var poa=PortableServer::POA::_narrow(obj);
-           PortableServer::POAManager_var mgr=poa->the_POAManager();
-           mgr->activate();
-           SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_var ret=serv->_this();
-           char *ior=orb->object_to_string(ret);
-           PyObject *iorPython=PyString_FromString(ior);
-           PyObject* pdict=PyDict_New();
-           PyDict_SetItemString(pdict, "__builtins__", PyEval_GetBuiltins());
-           PyRun_String("import MEDCouplingCorbaServant_idl", Py_single_input, pdict, pdict);
-           PyRun_String("import CORBA", Py_single_input, pdict, pdict);
-           PyRun_String("orbTmp15634=CORBA.ORB_init([''])",Py_single_input,pdict, pdict);
-           PyObject* orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
-           PyObject *corbaObj=PyObject_CallMethod(orbPython,(char*)"string_to_object",(char*)"O",iorPython);
-           Py_DECREF(pdict);
-           Py_DECREF(iorPython);
-           CORBA::string_free(ior);
-           return corbaObj;
+           return buildServantAndActivate<MEDCouplingExtrudedMeshServant>(cppPointerOfMesh);
          }
        }
   };
@@ -168,27 +117,31 @@ namespace ParaMEDMEM
        {
          static PyObject *_this(const MEDCouplingCMesh *cppPointerOfMesh)
          {
-           int argc=0;
-           MEDCouplingCMeshServant *serv=new MEDCouplingCMeshServant(cppPointerOfMesh);
-           CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
-           CORBA::Object_var obj=orb->resolve_initial_references("RootPOA");
-           PortableServer::POA_var poa=PortableServer::POA::_narrow(obj);
-           PortableServer::POAManager_var mgr=poa->the_POAManager();
-           mgr->activate();
-           SALOME_MED::MEDCouplingCMeshCorbaInterface_var ret=serv->_this();
-           char *ior=orb->object_to_string(ret);
-           PyObject *iorPython=PyString_FromString(ior);
-           PyObject* pdict=PyDict_New();
-           PyDict_SetItemString(pdict, "__builtins__", PyEval_GetBuiltins());
-           PyRun_String("import MEDCouplingCorbaServant_idl", Py_single_input, pdict, pdict);
-           PyRun_String("import CORBA", Py_single_input, pdict, pdict);
-           PyRun_String("orbTmp15634=CORBA.ORB_init([''])",Py_single_input,pdict, pdict);
-           PyObject* orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
-           PyObject *corbaObj=PyObject_CallMethod(orbPython,(char*)"string_to_object",(char*)"O",iorPython);
-           Py_DECREF(pdict);
-           Py_DECREF(iorPython);
-           CORBA::string_free(ior);
-           return corbaObj;
+           return buildServantAndActivate<MEDCouplingCMeshServant>(cppPointerOfMesh);
+         }
+       }
+  };
+
+  class DataArrayDoubleServant
+  {
+  public:
+    %extend
+       {
+         static PyObject *_this(const DataArrayDouble *cppPointerOfMesh)
+         {
+           return buildServantAndActivate<DataArrayDoubleServant>(cppPointerOfMesh);
+         }
+       }
+  };
+
+  class DataArrayIntServant
+  {
+  public:
+    %extend
+       {
+         static PyObject *_this(const DataArrayInt *cppPointerOfMesh)
+         {
+           return buildServantAndActivate<DataArrayIntServant>(cppPointerOfMesh);
          }
        }
   };

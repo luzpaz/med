@@ -28,7 +28,11 @@ salomeinclude_HEADERS=                      \
 	MEDCouplingExtrudedMeshClient.hxx   \
 	MEDCouplingCMeshClient.hxx          \
 	MEDCouplingFieldDoubleClient.hxx    \
-	MEDCouplingFieldTemplateClient.hxx
+	MEDCouplingFieldTemplateClient.hxx  \
+	MEDCouplingMultiFieldsClient.hxx    \
+	MEDCouplingFieldOverTimeClient.hxx  \
+	DataArrayDoubleClient.hxx           \
+	DataArrayIntClient.hxx
 
 dist_libmedcouplingclient_la_SOURCES=       \
 	MEDCouplingMeshClient.cxx           \
@@ -36,7 +40,11 @@ dist_libmedcouplingclient_la_SOURCES=       \
 	MEDCouplingExtrudedMeshClient.cxx   \
 	MEDCouplingCMeshClient.cxx          \
 	MEDCouplingFieldDoubleClient.cxx    \
-	MEDCouplingFieldTemplateClient.cxx
+	MEDCouplingFieldTemplateClient.cxx  \
+	MEDCouplingMultiFieldsClient.cxx    \
+	MEDCouplingFieldOverTimeClient.cxx  \
+	DataArrayDoubleClient.cxx           \
+	DataArrayIntClient.cxx
 
 libmedcouplingclient_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) -I$(top_builddir)/idl ${KERNEL_CXXFLAGS} \
 	-I$(srcdir)/../../MEDCoupling -I$(srcdir)/../../INTERP_KERNEL/Bases

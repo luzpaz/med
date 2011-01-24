@@ -33,6 +33,7 @@ namespace ParaMEDMEM
   class MEDCOUPLINGCORBA_EXPORT MEDCouplingExtrudedMeshServant : MEDCouplingMeshServant, public virtual POA_SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface
   {
   public:
+    typedef MEDCouplingExtrudedMesh CppType;
     MEDCouplingExtrudedMeshServant(const MEDCouplingExtrudedMesh *cppPointerOfMesh);
     ~MEDCouplingExtrudedMeshServant();
   private:

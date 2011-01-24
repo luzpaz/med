@@ -23,9 +23,9 @@ SUBDIRS = Client
 
 lib_LTLIBRARIES = _MEDCouplingCorba.la
 
-salomeinclude_HEADERS = MEDCouplingCorba.i
+salomeinclude_HEADERS = MEDCouplingCorba.i MEDCouplingCorbaTypemaps.i
 
-SWIG_DEF = MEDCouplingCorba.i
+SWIG_DEF = MEDCouplingCorba.i MEDCouplingCorbaTypemaps.i
 
 SWIG_FLAGS = @SWIG_FLAGS@ -I$(srcdir) -I$(srcdir)/../MEDCouplingCorba -I$(srcdir)/../MEDCoupling -I$(srcdir)/../MEDCoupling_Swig -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases
 

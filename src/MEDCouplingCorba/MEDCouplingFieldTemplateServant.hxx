@@ -41,6 +41,7 @@ namespace ParaMEDMEM
   class MEDCOUPLINGCORBA_EXPORT MEDCouplingFieldTemplateServant : public MEDCouplingFieldServant , public virtual POA_SALOME_MED::MEDCouplingFieldTemplateCorbaInterface
   {
   public:
+    typedef MEDCouplingFieldTemplate CppType;
     MEDCouplingFieldTemplateServant(const MEDCouplingFieldTemplate *cppPointerOfMesh);
   protected:
     const MEDCouplingFieldTemplate *getPointer() const { return (const MEDCouplingFieldTemplate *)(_cpp_pointer); }

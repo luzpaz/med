@@ -29,6 +29,10 @@ namespace ParaMEDMEM
   class MEDCouplingFieldTemplate;
   class MEDCouplingExtrudedMesh;
   class MEDCouplingCMesh;
+  class DataArrayDouble;
+  class DataArrayInt;
+  class MEDCouplingMultiFields;
+  class MEDCouplingFieldOverTime;
 }
 
 namespace SALOME_TEST
@@ -58,6 +62,14 @@ namespace SALOME_TEST
     static ParaMEDMEM::MEDCouplingFieldTemplate *buildFieldTemplateNodeOn2D();
     static ParaMEDMEM::MEDCouplingFieldTemplate *buildFieldTemplateGaussPtOn2D();
     static ParaMEDMEM::MEDCouplingFieldTemplate *buildFieldTemplateGaussNEOn2D();
+    static ParaMEDMEM::MEDCouplingMultiFields *buildMultiFields1();
+    static ParaMEDMEM::DataArrayDouble *buildArrayDouble1();
+    static ParaMEDMEM::DataArrayDouble *buildArrayDouble2();
+    static ParaMEDMEM::DataArrayDouble *buildArrayDouble3();
+    static ParaMEDMEM::DataArrayInt *buildArrayInt1();
+    static ParaMEDMEM::DataArrayInt *buildArrayInt2();
+    static ParaMEDMEM::DataArrayInt *buildArrayInt3();
+    static ParaMEDMEM::MEDCouplingFieldOverTime *buildMultiFields2();
     static std::string buildFileNameForIOR();
   };
 }

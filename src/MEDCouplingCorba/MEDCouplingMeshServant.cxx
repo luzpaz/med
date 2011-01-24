@@ -24,7 +24,7 @@
 
 using namespace ParaMEDMEM;
 
-MEDCouplingMeshServant::MEDCouplingMeshServant(const MEDCouplingMesh *cppPointerOfMesh):MEDCouplingRefCountServant(cppPointerOfMesh)
+MEDCouplingMeshServant::MEDCouplingMeshServant(const MEDCouplingMesh *cppPointerOfMesh):MEDCouplingRefCountServant(cppPointerOfMesh,cppPointerOfMesh)
 {
 }
 

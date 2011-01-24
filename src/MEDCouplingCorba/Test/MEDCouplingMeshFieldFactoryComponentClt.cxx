@@ -29,6 +29,12 @@
 #include "MEDCouplingFieldDoubleClient.hxx"
 #include "MEDCouplingFieldTemplate.hxx"
 #include "MEDCouplingFieldTemplateClient.hxx"
+#include "MEDCouplingMultiFields.hxx"
+#include "MEDCouplingMultiFieldsClient.hxx"
+#include "MEDCouplingFieldOverTime.hxx"
+#include "MEDCouplingFieldOverTimeClient.hxx"
+#include "DataArrayDoubleClient.hxx"
+#include "DataArrayIntClient.hxx"
 #include <fstream>
 #include <pthread.h>
 
@@ -436,7 +442,133 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFieldTemplateGaus
   ParaMEDMEM::MEDCouplingFieldTemplate *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildFieldTemplateGaussNEOn2D();
   CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
   refField->decrRef();
-  fieldCpp->decrRef(); 
+  fieldCpp->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaMultiFields1()
+{
+  SALOME_MED::MEDCouplingMultiFieldsCorbaInterface_ptr fieldPtr=_objC->getMultiFields1();
+  ParaMEDMEM::MEDCouplingMultiFields *fieldCpp=ParaMEDMEM::MEDCouplingMultiFieldsClient::New(fieldPtr);
+  fieldPtr->Destroy();
+  CORBA::release(fieldPtr);
+  //
+  ParaMEDMEM::MEDCouplingMultiFields *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildMultiFields1();
+  CPPUNIT_ASSERT(fieldCpp->isEqual(refField,1.e-12,1.e-15));
+  refField->decrRef();
+  fieldCpp->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaArrayDouble1()
+{
+  SALOME_MED::DataArrayDoubleCorbaInterface_ptr fieldPtr=_objC->getArrayDouble1();
+  ParaMEDMEM::DataArrayDouble *fieldCpp=ParaMEDMEM::DataArrayDoubleClient::New(fieldPtr);
+  fieldPtr->Destroy();
+  CORBA::release(fieldPtr);
+  //
+  ParaMEDMEM::DataArrayDouble *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildArrayDouble1();
+  CPPUNIT_ASSERT(fieldCpp->isEqual(*refField,1.e-12));
+  refField->decrRef();
+  fieldCpp->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaArrayDouble2()
+{
+  SALOME_MED::DataArrayDoubleCorbaInterface_ptr fieldPtr=_objC->getArrayDouble2();
+  ParaMEDMEM::DataArrayDouble *fieldCpp=ParaMEDMEM::DataArrayDoubleClient::New(fieldPtr);
+  fieldPtr->Destroy();
+  CORBA::release(fieldPtr);
+  //
+  ParaMEDMEM::DataArrayDouble *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildArrayDouble2();
+  CPPUNIT_ASSERT(fieldCpp->isEqual(*refField,1.e-12));
+  refField->decrRef();
+  fieldCpp->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaArrayDouble3()
+{
+  SALOME_MED::DataArrayDoubleCorbaInterface_ptr fieldPtr=_objC->getArrayDouble3();
+  ParaMEDMEM::DataArrayDouble *fieldCpp=ParaMEDMEM::DataArrayDoubleClient::New(fieldPtr);
+  fieldPtr->Destroy();
+  CORBA::release(fieldPtr);
+  //
+  ParaMEDMEM::DataArrayDouble *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildArrayDouble3();
+  CPPUNIT_ASSERT(fieldCpp->isEqual(*refField,1.e-12));
+  refField->decrRef();
+  fieldCpp->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaArrayInt1()
+{
+  SALOME_MED::DataArrayIntCorbaInterface_ptr fieldPtr=_objC->getArrayInt1();
+  ParaMEDMEM::DataArrayInt *fieldCpp=ParaMEDMEM::DataArrayIntClient::New(fieldPtr);
+  fieldPtr->Destroy();
+  CORBA::release(fieldPtr);
+  //
+  ParaMEDMEM::DataArrayInt *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildArrayInt1();
+  CPPUNIT_ASSERT(fieldCpp->isEqual(*refField));
+  refField->decrRef();
+  fieldCpp->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaArrayInt2()
+{
+  SALOME_MED::DataArrayIntCorbaInterface_ptr fieldPtr=_objC->getArrayInt2();
+  ParaMEDMEM::DataArrayInt *fieldCpp=ParaMEDMEM::DataArrayIntClient::New(fieldPtr);
+  fieldPtr->Destroy();
+  CORBA::release(fieldPtr);
+  //
+  ParaMEDMEM::DataArrayInt *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildArrayInt2();
+  CPPUNIT_ASSERT(fieldCpp->isEqual(*refField));
+  refField->decrRef();
+  fieldCpp->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaArrayInt3()
+{
+  SALOME_MED::DataArrayIntCorbaInterface_ptr fieldPtr=_objC->getArrayInt3();
+  ParaMEDMEM::DataArrayInt *fieldCpp=ParaMEDMEM::DataArrayIntClient::New(fieldPtr);
+  fieldPtr->Destroy();
+  CORBA::release(fieldPtr);
+  //
+  ParaMEDMEM::DataArrayInt *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildArrayInt3();
+  CPPUNIT_ASSERT(fieldCpp->isEqual(*refField));
+  refField->decrRef();
+  fieldCpp->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetchingCoords1()
+{
+  SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr meshPtr=_objC->get3DSurfMesh();
+  SALOME_MED::DataArrayDoubleCorbaInterface_ptr cooPtr=meshPtr->getCoords();
+  meshPtr->Destroy();
+  CORBA::release(meshPtr);
+  ParaMEDMEM::DataArrayDouble *cooCpp=ParaMEDMEM::DataArrayDoubleClient::New(cooPtr);
+  ParaMEDMEM::MEDCouplingUMesh *meshRef=SALOME_TEST::MEDCouplingCorbaServBasicsTest::build3DSurfMesh();
+  //
+  CPPUNIT_ASSERT(meshRef->getCoords()->isEqual(*cooCpp,1e-12));
+  //
+  cooPtr->Destroy();
+  CORBA::release(cooPtr);
+  cooCpp->decrRef();
+  meshRef->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaMultiFields2()
+{
+  SALOME_MED::MEDCouplingFieldOverTimeCorbaInterface_ptr fotPtr=_objC->getMultiFields2();
+  ParaMEDMEM::MEDCouplingFieldOverTimeClient *fotc=ParaMEDMEM::MEDCouplingFieldOverTimeClient::New(fotPtr);
+  fotPtr->Destroy();
+  CORBA::release(fotPtr);
+  //
+  ParaMEDMEM::MEDCouplingFieldOverTime *refField=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildMultiFields2();
+  CPPUNIT_ASSERT(fotc->isEqual(refField,1.e-12,1.e-15));
+  refField->decrRef();
+  std::vector<double> ts=fotc->getTimeSteps();
+  CPPUNIT_ASSERT_EQUAL(6,(int)ts.size());
+  const double expected[6]={0.2,0.7,1.2,1.35,1.7,2.7};
+  for(int i=0;i<6;i++)
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(expected[i],ts[i],1e-12);
+  fotc->decrRef();
 }
 
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::shutdownServer()

@@ -19,6 +19,7 @@
 
 #include "MEDCouplingPointSetServant.hxx"
 #include "MEDCouplingPointSet.hxx"
+#include "DataArrayDoubleServant.hxx"
 
 using namespace ParaMEDMEM;
 
@@ -28,4 +29,11 @@ MEDCouplingPointSetServant::MEDCouplingPointSetServant(const MEDCouplingPointSet
 
 MEDCouplingPointSetServant::~MEDCouplingPointSetServant()
 {
+}
+
+SALOME_MED::DataArrayDoubleCorbaInterface_ptr MEDCouplingPointSetServant::getCoords()
+{
+  const DataArrayDouble *da=getPointer()->getCoords();
+  DataArrayDoubleServant *daServ=new DataArrayDoubleServant(da);
+  return daServ->_this();
 }

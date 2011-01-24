@@ -21,6 +21,9 @@
 #include "MEDCouplingExtrudedMesh.hxx"
 #include "MEDCouplingFieldDouble.hxx"
 #include "MEDCouplingFieldTemplate.hxx"
+#include "MEDCouplingMultiFields.hxx"
+#include "MEDCouplingFieldOverTime.hxx"
+#include "MEDCouplingMemArray.hxx"
 #include "MEDCouplingUMesh.hxx"
 #include "MEDCouplingCMesh.hxx"
 
@@ -469,6 +472,216 @@ namespace SALOME_TEST
     f2->setNature(ParaMEDMEM::IntegralGlobConstraint);
     f1->decrRef();
     return f2;
+  }
+
+  ParaMEDMEM::MEDCouplingMultiFields *MEDCouplingCorbaServBasicsTest::buildMultiFields1()
+  {
+    ParaMEDMEM::MEDCouplingUMesh *m1=build2DMesh();
+    m1->setName("m1");
+    ParaMEDMEM::MEDCouplingUMesh *m2=build2DMesh();
+    m2->setName("m2");
+    const double vals0[]={-0.7,-1.,-2.,-3.,-4.};
+    const double vals1[]={0.,1.,2.,3.,4.,0.1,0.2,0.3,0.4};
+    const double vals1_1[]={170.,171.,172.,173.,174.,170.1,170.2,170.3,170.4};
+    const double vals2[]={5.,6.,7.,8.,9.};
+    const double vals4[]={15.,16.,17.,18.,19.};
+    //
+    ParaMEDMEM::DataArrayDouble *d0=ParaMEDMEM::DataArrayDouble::New(); d0->alloc(5,1); std::copy(vals0,vals0+5,d0->getPointer());
+    ParaMEDMEM::DataArrayDouble *d1=ParaMEDMEM::DataArrayDouble::New(); d1->alloc(9,1); std::copy(vals1,vals1+9,d1->getPointer());
+    ParaMEDMEM::DataArrayDouble *d1_1=ParaMEDMEM::DataArrayDouble::New(); d1_1->alloc(9,1); std::copy(vals1_1,vals1_1+9,d1_1->getPointer());
+    ParaMEDMEM::DataArrayDouble *d2=ParaMEDMEM::DataArrayDouble::New(); d2->alloc(5,1); std::copy(vals2,vals2+5,d2->getPointer());
+    ParaMEDMEM::DataArrayDouble *d4=ParaMEDMEM::DataArrayDouble::New(); d4->alloc(5,1); std::copy(vals4,vals4+5,d4->getPointer());
+    //
+    d0->setName("d0"); d1->setName("d1"); d1_1->setName("d1_1"); d2->setName("d2"); d4->setName("d4");
+    d0->setInfoOnComponent(0,"c1");
+    d1->setInfoOnComponent(0,"c6");
+    d1_1->setInfoOnComponent(0,"c9");
+    d2->setInfoOnComponent(0,"c5");
+    d4->setInfoOnComponent(0,"c7");
+    //
+    ParaMEDMEM::MEDCouplingFieldDouble *f0=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::ONE_TIME);
+    f0->setMesh(m1);
+    f0->setArray(d0);
+    f0->setTime(0.2,5,6);
+    f0->setName("f0");
+    ParaMEDMEM::MEDCouplingFieldDouble *f1=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_NODES,ParaMEDMEM::LINEAR_TIME);
+    f1->setMesh(m1);
+    std::vector<ParaMEDMEM::DataArrayDouble *> d1s(2); d1s[0]=d1; d1s[1]=d1_1;
+    f1->setArrays(d1s);
+    f1->setStartTime(0.7,7,8);
+    f1->setEndTime(1.2,9,10);
+    f1->setName("f1");
+    ParaMEDMEM::MEDCouplingFieldDouble *f2=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::CONST_ON_TIME_INTERVAL);
+    f2->setMesh(m2);
+    f2->setArray(d2);
+    f2->setTime(1.2,11,12);
+    f2->setEndTime(1.5,13,14);
+    f2->setName("f2");
+    ParaMEDMEM::MEDCouplingFieldDouble *f3=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::ONE_TIME);
+    f3->setMesh(m1);
+    f3->setArray(d2);
+    f3->setTime(1.7,15,16);
+    f3->setName("f3");
+    ParaMEDMEM::MEDCouplingFieldDouble *f4=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::NO_TIME);
+    f4->setMesh(m2);
+    f4->setArray(d4);
+    f4->setName("f4");
+    //
+    std::vector<ParaMEDMEM::MEDCouplingFieldDouble *> fs(5);
+    fs[0]=f0; fs[1]=f1; fs[2]=f2; fs[3]=f3; fs[4]=f4;
+    ParaMEDMEM::MEDCouplingMultiFields *ret=ParaMEDMEM::MEDCouplingMultiFields::New(fs);
+    //
+    m1->decrRef();
+    m2->decrRef();
+    d0->decrRef();
+    d1->decrRef();
+    d1_1->decrRef();
+    d2->decrRef();
+    d4->decrRef();
+    f0->decrRef();
+    f1->decrRef();
+    f2->decrRef();
+    f3->decrRef();
+    f4->decrRef();
+    //
+    return ret;
+  }
+
+  ParaMEDMEM::DataArrayDouble *MEDCouplingCorbaServBasicsTest::buildArrayDouble1()
+  {
+    ParaMEDMEM::DataArrayDouble *ret=ParaMEDMEM::DataArrayDouble::New();
+    ret->alloc(4,3);
+    const double vals[12]={2.4,3.2,5.6,9.6,47.6,20.4,24.6,278.1,2.01,3.3,2.4,9.4};
+    std::copy(vals,vals+12,ret->getPointer());
+    ret->setName("toto");
+    ret->setInfoOnComponent(0,"sss");
+    ret->setInfoOnComponent(1,"ppp");
+    ret->setInfoOnComponent(2,"ttt");
+    return ret;
+  }
+
+  ParaMEDMEM::DataArrayDouble *MEDCouplingCorbaServBasicsTest::buildArrayDouble2()
+  {
+    ParaMEDMEM::DataArrayDouble *ret=ParaMEDMEM::DataArrayDouble::New();
+    ret->setName("titi");
+    return ret;
+  }
+
+  ParaMEDMEM::DataArrayDouble *MEDCouplingCorbaServBasicsTest::buildArrayDouble3()
+  {
+    ParaMEDMEM::DataArrayDouble *ret=ParaMEDMEM::DataArrayDouble::New();
+    ret->setName("titi");
+    ret->alloc(0,3);
+    ret->setInfoOnComponent(0,"sss");
+    ret->setInfoOnComponent(1,"ppp");
+    ret->setInfoOnComponent(2,"ttt");
+    return ret;
+  }
+
+  ParaMEDMEM::DataArrayInt *MEDCouplingCorbaServBasicsTest::buildArrayInt1()
+  {
+    ParaMEDMEM::DataArrayInt *ret=ParaMEDMEM::DataArrayInt::New();
+    ret->alloc(4,3);
+    const int vals[12]={2,3,5,9,47,20,24,278,2,3,2,9};
+    std::copy(vals,vals+12,ret->getPointer());
+    ret->setName("toto");
+    ret->setInfoOnComponent(0,"sss");
+    ret->setInfoOnComponent(1,"ppp");
+    ret->setInfoOnComponent(2,"ttt");
+    return ret;
+  }
+
+  ParaMEDMEM::DataArrayInt *MEDCouplingCorbaServBasicsTest::buildArrayInt2()
+  {
+    ParaMEDMEM::DataArrayInt *ret=ParaMEDMEM::DataArrayInt::New();
+    ret->setName("titi");
+    return ret;
+  }
+
+  ParaMEDMEM::DataArrayInt *MEDCouplingCorbaServBasicsTest::buildArrayInt3()
+  {
+    ParaMEDMEM::DataArrayInt *ret=ParaMEDMEM::DataArrayInt::New();
+    ret->setName("titi");
+    ret->alloc(0,3);
+    ret->setInfoOnComponent(0,"sss");
+    ret->setInfoOnComponent(1,"ppp");
+    ret->setInfoOnComponent(2,"ttt");
+    return ret;
+  }
+
+  ParaMEDMEM::MEDCouplingFieldOverTime *MEDCouplingCorbaServBasicsTest::buildMultiFields2()
+  {
+    ParaMEDMEM::MEDCouplingUMesh *m1=build2DMesh();
+    m1->setName("m1");
+    ParaMEDMEM::MEDCouplingUMesh *m2=build2DMesh();
+    m2->setName("m2");
+    const double vals0[]={-0.7,-1.,-2.,-3.,-4.};
+    const double vals1[]={0.,1.,2.,3.,4.};
+    const double vals1_1[]={170.,171.,172.,173.,174.};
+    const double vals2[]={5.,6.,7.,8.,9.};
+    const double vals4[]={15.,16.,17.,18.,19.};
+    //
+    ParaMEDMEM::DataArrayDouble *d0=ParaMEDMEM::DataArrayDouble::New(); d0->alloc(5,1); std::copy(vals0,vals0+5,d0->getPointer());
+    ParaMEDMEM::DataArrayDouble *d1=ParaMEDMEM::DataArrayDouble::New(); d1->alloc(5,1); std::copy(vals1,vals1+5,d1->getPointer());
+    ParaMEDMEM::DataArrayDouble *d1_1=ParaMEDMEM::DataArrayDouble::New(); d1_1->alloc(5,1); std::copy(vals1_1,vals1_1+5,d1_1->getPointer());
+    ParaMEDMEM::DataArrayDouble *d2=ParaMEDMEM::DataArrayDouble::New(); d2->alloc(5,1); std::copy(vals2,vals2+5,d2->getPointer());
+    ParaMEDMEM::DataArrayDouble *d4=ParaMEDMEM::DataArrayDouble::New(); d4->alloc(5,1); std::copy(vals4,vals4+5,d4->getPointer());
+    //
+    d0->setName("d0"); d1->setName("d1"); d1_1->setName("d1_1"); d2->setName("d2"); d4->setName("d4");
+    d0->setInfoOnComponent(0,"c1");
+    d1->setInfoOnComponent(0,"c6");
+    d1_1->setInfoOnComponent(0,"c9");
+    d2->setInfoOnComponent(0,"c5");
+    d4->setInfoOnComponent(0,"c7");
+    //
+    ParaMEDMEM::MEDCouplingFieldDouble *f0=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::ONE_TIME);
+    f0->setMesh(m1);
+    f0->setArray(d0);
+    f0->setTime(0.2,5,6);
+    f0->setName("f0");
+    ParaMEDMEM::MEDCouplingFieldDouble *f1=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::LINEAR_TIME);
+    f1->setMesh(m1);
+    std::vector<ParaMEDMEM::DataArrayDouble *> d1s(2); d1s[0]=d1; d1s[1]=d1_1;
+    f1->setArrays(d1s);
+    f1->setStartTime(0.7,7,8);
+    f1->setEndTime(1.2,9,10);
+    f1->setName("f1");
+    ParaMEDMEM::MEDCouplingFieldDouble *f2=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::CONST_ON_TIME_INTERVAL);
+    f2->setMesh(m2);
+    f2->setArray(d2);
+    f2->setTime(1.2,11,12);
+    f2->setEndTime(1.5,13,14);
+    f2->setName("f2");
+    ParaMEDMEM::MEDCouplingFieldDouble *f3=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::ONE_TIME);
+    f3->setMesh(m1);
+    f3->setArray(d2);
+    f3->setTime(1.7,15,16);
+    f3->setName("f3");
+    ParaMEDMEM::MEDCouplingFieldDouble *f4=ParaMEDMEM::MEDCouplingFieldDouble::New(ParaMEDMEM::ON_CELLS,ParaMEDMEM::ONE_TIME);
+    f4->setMesh(m2);
+    f4->setArray(d4);
+    f4->setName("f4");
+    f4->setTime(2.7,25,26);
+    //
+    std::vector<ParaMEDMEM::MEDCouplingFieldDouble *> fs(5);
+    fs[0]=f0; fs[1]=f1; fs[2]=f2; fs[3]=f3; fs[4]=f4;
+    ParaMEDMEM::MEDCouplingFieldOverTime *ret=ParaMEDMEM::MEDCouplingFieldOverTime::New(fs);
+    ret->checkCoherency();
+    //
+    m1->decrRef();
+    m2->decrRef();
+    d0->decrRef();
+    d1->decrRef();
+    d1_1->decrRef();
+    d2->decrRef();
+    d4->decrRef();
+    f0->decrRef();
+    f1->decrRef();
+    f2->decrRef();
+    f3->decrRef();
+    f4->decrRef();
+    //
+    return ret;
   }
 
   std::string MEDCouplingCorbaServBasicsTest::buildFileNameForIOR()

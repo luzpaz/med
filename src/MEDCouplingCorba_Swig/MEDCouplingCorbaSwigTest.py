@@ -371,6 +371,166 @@ class MEDCouplingCorbaServBasicsTest:
         f2.setNature(IntegralGlobConstraint);
         return f2
 
+    def buildMultiFields1(self):
+        m1=self.build2DMesh();
+        m1.setName("m1");
+        m2=self.build2DMesh();
+        m2.setName("m2");
+        vals0=[-0.7,-1.,-2.,-3.,-4.];
+        vals1=[0.,1.,2.,3.,4.,0.1,0.2,0.3,0.4];
+        vals1_1=[170.,171.,172.,173.,174.,170.1,170.2,170.3,170.4];
+        vals2=[5.,6.,7.,8.,9.];
+        vals4=[15.,16.,17.,18.,19.];
+        d0=DataArrayDouble.New();
+        d0.setValues(vals0,5,1);
+        d1=DataArrayDouble.New();
+        d1.setValues(vals1,9,1);
+        d1_1=DataArrayDouble.New();
+        d1_1.setValues(vals1_1,9,1);
+        d2=DataArrayDouble.New();
+        d2.setValues(vals2,5,1);
+        d4=DataArrayDouble.New();
+        d4.setValues(vals4,5,1);
+        d0.setName("d0"); d1.setName("d1"); d1_1.setName("d1_1"); d2.setName("d2"); d4.setName("d4");
+        d0.setInfoOnComponent(0,"c1");
+        d1.setInfoOnComponent(0,"c6");
+        d1_1.setInfoOnComponent(0,"c9");
+        d2.setInfoOnComponent(0,"c5");
+        d4.setInfoOnComponent(0,"c7");
+        f0=MEDCouplingFieldDouble.New(ON_CELLS,ONE_TIME);
+        f0.setMesh(m1);
+        f0.setArray(d0);
+        f0.setTime(0.2,5,6);
+        f0.setName("f0");
+        f1=MEDCouplingFieldDouble.New(ON_NODES,LINEAR_TIME);
+        f1.setMesh(m1);
+        f1.setArrays([d1,d1_1]);
+        f1.setStartTime(0.7,7,8);
+        f1.setEndTime(1.2,9,10);
+        f1.setName("f1");
+        f2=MEDCouplingFieldDouble.New(ON_CELLS,CONST_ON_TIME_INTERVAL);
+        f2.setMesh(m2);
+        f2.setArray(d2);
+        f2.setTime(1.2,11,12);
+        f2.setEndTime(1.5,13,14);
+        f2.setName("f2");
+        f3=MEDCouplingFieldDouble.New(ON_CELLS,ONE_TIME);
+        f3.setMesh(m1);
+        f3.setArray(d2);
+        f3.setTime(1.7,15,16);
+        f3.setName("f3");
+        f4=MEDCouplingFieldDouble.New(ON_CELLS,NO_TIME);
+        f4.setMesh(m2);
+        f4.setArray(d4);
+        f4.setName("f4");
+        ret=MEDCouplingMultiFields.New([f0,f1,f2,f3,f4]);
+        return ret;
+    
+    def buildArrayDouble1(self):
+        ret=DataArrayDouble.New();
+        vals=[2.4,3.2,5.6,9.6,47.6,20.4,24.6,278.1,2.01,3.3,2.4,9.4];
+        ret.setValues(vals,4,3);
+        ret.setName("toto");
+        ret.setInfoOnComponent(0,"sss");
+        ret.setInfoOnComponent(1,"ppp");
+        ret.setInfoOnComponent(2,"ttt");
+        return ret;
+
+    def buildArrayDouble2(self):
+        ret=DataArrayDouble.New();
+        ret.setName("titi");
+        return ret;
+
+    def buildArrayDouble3(self):
+        ret=DataArrayDouble.New();
+        ret.setName("titi");
+        ret.alloc(0,3);
+        ret.setInfoOnComponent(0,"sss");
+        ret.setInfoOnComponent(1,"ppp");
+        ret.setInfoOnComponent(2,"ttt");
+        return ret;
+
+    def buildArrayInt1(self):
+        ret=DataArrayInt.New();
+        vals=[2,3,5,9,47,20,24,278,2,3,2,9];
+        ret.setValues(vals,4,3);
+        ret.setName("toto");
+        ret.setInfoOnComponent(0,"sss");
+        ret.setInfoOnComponent(1,"ppp");
+        ret.setInfoOnComponent(2,"ttt");
+        return ret;
+
+    def buildArrayInt2(self):
+        ret=DataArrayInt.New();
+        ret.setName("titi");
+        return ret;
+
+    def buildArrayInt3(self):
+        ret=DataArrayInt.New();
+        ret.setName("titi");
+        ret.alloc(0,3);
+        ret.setInfoOnComponent(0,"sss");
+        ret.setInfoOnComponent(1,"ppp");
+        ret.setInfoOnComponent(2,"ttt");
+        return ret;
+
+    def buildMultiFields2(self):
+        m1=self.build2DMesh();
+        m1.setName("m1");
+        m2=self.build2DMesh();
+        m2.setName("m2");
+        vals0=[-0.7,-1.,-2.,-3.,-4.];
+        vals1=[0.,1.,2.,3.,4.,0.1,0.2,0.3,0.4];
+        vals1_1=[170.,171.,172.,173.,174.];
+        vals2=[5.,6.,7.,8.,9.];
+        vals4=[15.,16.,17.,18.,19.];
+        d0=DataArrayDouble.New();
+        d0.setValues(vals0,5,1);
+        d1=DataArrayDouble.New();
+        d1.setValues(vals1,5,1);
+        d1_1=DataArrayDouble.New();
+        d1_1.setValues(vals1_1,5,1);
+        d2=DataArrayDouble.New();
+        d2.setValues(vals2,5,1);
+        d4=DataArrayDouble.New();
+        d4.setValues(vals4,5,1);
+        d0.setName("d0"); d1.setName("d1"); d1_1.setName("d1_1"); d2.setName("d2"); d4.setName("d4");
+        d0.setInfoOnComponent(0,"c1");
+        d1.setInfoOnComponent(0,"c6");
+        d1_1.setInfoOnComponent(0,"c9");
+        d2.setInfoOnComponent(0,"c5");
+        d4.setInfoOnComponent(0,"c7");
+        f0=MEDCouplingFieldDouble.New(ON_CELLS,ONE_TIME);
+        f0.setMesh(m1);
+        f0.setArray(d0);
+        f0.setTime(0.2,5,6);
+        f0.setName("f0");
+        f1=MEDCouplingFieldDouble.New(ON_CELLS,LINEAR_TIME);
+        f1.setMesh(m1);
+        f1.setArrays([d1,d1_1]);
+        f1.setStartTime(0.7,7,8);
+        f1.setEndTime(1.2,9,10);
+        f1.setName("f1");
+        f2=MEDCouplingFieldDouble.New(ON_CELLS,CONST_ON_TIME_INTERVAL);
+        f2.setMesh(m2);
+        f2.setArray(d2);
+        f2.setTime(1.2,11,12);
+        f2.setEndTime(1.5,13,14);
+        f2.setName("f2");
+        f3=MEDCouplingFieldDouble.New(ON_CELLS,ONE_TIME);
+        f3.setMesh(m1);
+        f3.setArray(d2);
+        f3.setTime(1.7,15,16);
+        f3.setName("f3");
+        f4=MEDCouplingFieldDouble.New(ON_CELLS,ONE_TIME);
+        f4.setMesh(m2);
+        f4.setArray(d4);
+        f4.setName("f4");
+        f4.setTime(2.7,25,26);
+        ret=MEDCouplingFieldOverTime.New([f0,f1,f2,f3,f4]);
+        ret.checkCoherency();
+        return ret;
+
     def buildFileNameForIOR(self):
         ret=os.getenv("TMP");
         ret+="/entryPointMEDCouplingCorba.ior";

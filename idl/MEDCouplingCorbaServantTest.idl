@@ -50,6 +50,14 @@ module SALOME_TEST
     SALOME_MED::MEDCouplingFieldTemplateCorbaInterface getFieldTemplateNodeOn2D();
     SALOME_MED::MEDCouplingFieldTemplateCorbaInterface getFieldTemplateGaussPtOn2D();
     SALOME_MED::MEDCouplingFieldTemplateCorbaInterface getFieldTemplateGaussNEOn2D();
+    SALOME_MED::MEDCouplingMultiFieldsCorbaInterface getMultiFields1();
+    SALOME_MED::DataArrayDoubleCorbaInterface getArrayDouble1();
+    SALOME_MED::DataArrayDoubleCorbaInterface getArrayDouble2();
+    SALOME_MED::DataArrayDoubleCorbaInterface getArrayDouble3();
+    SALOME_MED::DataArrayIntCorbaInterface getArrayInt1();
+    SALOME_MED::DataArrayIntCorbaInterface getArrayInt2();
+    SALOME_MED::DataArrayIntCorbaInterface getArrayInt3();
+    SALOME_MED::MEDCouplingFieldOverTimeCorbaInterface getMultiFields2();
   };
 };
 

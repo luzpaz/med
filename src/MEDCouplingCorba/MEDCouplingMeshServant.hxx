@@ -32,7 +32,8 @@ namespace ParaMEDMEM
 {
   class MEDCouplingMesh;
 
-  class MEDCOUPLINGCORBA_EXPORT MEDCouplingMeshServant : public MEDCouplingRefCountServant , public virtual POA_SALOME_MED::MEDCouplingMeshCorbaInterface
+  class MEDCOUPLINGCORBA_EXPORT MEDCouplingMeshServant : public MEDCouplingRefCountServant,
+                                                         public virtual POA_SALOME_MED::MEDCouplingMeshCorbaInterface
   {
   protected:
     MEDCouplingMeshServant(const MEDCouplingMesh *cppPointerOfMesh);
