@@ -37,6 +37,7 @@ namespace SALOME_TEST
     double coords[4]={ 0.0, 0.3, 0.75, 1.0 };
     int conn[2*3]={ 0,1, 1,2, 2,3 };
     ParaMEDMEM::MEDCouplingUMesh *mesh=ParaMEDMEM::MEDCouplingUMesh::New("1DMeshForCorba",1);
+    mesh->setDescription("build1DMesh");
     mesh->allocateCells(3);
     mesh->insertNextCell(INTERP_KERNEL::NORM_SEG2,2,conn);
     mesh->insertNextCell(INTERP_KERNEL::NORM_SEG2,2,conn+2);
@@ -65,6 +66,7 @@ namespace SALOME_TEST
     ParaMEDMEM::MEDCouplingUMesh *targetMesh=ParaMEDMEM::MEDCouplingUMesh::New();
     targetMesh->setMeshDimension(2);
     targetMesh->setName("MyMesh2D");
+    targetMesh->setDescription("build2DMesh");
     targetMesh->allocateCells(5);
     targetMesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,targetConn);
     targetMesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3,targetConn+4);
@@ -90,6 +92,7 @@ namespace SALOME_TEST
     ParaMEDMEM::MEDCouplingUMesh *targetMesh=ParaMEDMEM::MEDCouplingUMesh::New();
     targetMesh->setMeshDimension(3);
     targetMesh->setName("MyMesh3D");
+    targetMesh->setDescription("build3DMesh");
     targetMesh->allocateCells(12);
     for(int i=0;i<8;i++)
       targetMesh->insertNextCell(INTERP_KERNEL::NORM_HEXA8,8,targetConn+8*i);
@@ -98,6 +101,7 @@ namespace SALOME_TEST
     myCoords->alloc(27,3);
     std::copy(targetCoords,targetCoords+81,myCoords->getPointer());
     targetMesh->setCoords(myCoords);
+    myCoords->setName("check in case");
     myCoords->decrRef();
     return targetMesh;
   }
@@ -109,6 +113,7 @@ namespace SALOME_TEST
     ParaMEDMEM::MEDCouplingUMesh *targetMesh=ParaMEDMEM::MEDCouplingUMesh::New();
     targetMesh->setMeshDimension(2);
     targetMesh->setName("MyMesh3DSurf");
+    targetMesh->setDescription("build3DSurfMesh");
     targetMesh->allocateCells(5);
     targetMesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,targetConn);
     targetMesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3,targetConn+4);
@@ -135,6 +140,7 @@ namespace SALOME_TEST
     targetMesh->setMeshDimension(0);
     targetMesh->allocateCells(8);
     targetMesh->setName("Wonderfull 0D mesh");
+    targetMesh->setDescription("build0DMesh");
     targetMesh->insertNextCell(INTERP_KERNEL::NORM_POINT1,1,targetConn);
     targetMesh->insertNextCell(INTERP_KERNEL::NORM_POINT1,1,targetConn+1);
     targetMesh->insertNextCell(INTERP_KERNEL::NORM_POINT1,1,targetConn+2);
@@ -160,6 +166,7 @@ namespace SALOME_TEST
   ParaMEDMEM::MEDCouplingUMesh *MEDCouplingCorbaServBasicsTest::buildM1DMesh()
   {
     ParaMEDMEM::MEDCouplingUMesh *meshM1D=ParaMEDMEM::MEDCouplingUMesh::New("wonderfull -1 D mesh",-1);
+    meshM1D->setDescription("buildM1DMesh");
     meshM1D->checkCoherency();
     return meshM1D;
   }
@@ -173,6 +180,7 @@ namespace SALOME_TEST
     m1D->decrRef();
     ParaMEDMEM::MEDCouplingExtrudedMesh *ret=ParaMEDMEM::MEDCouplingExtrudedMesh::New(retu,m2D,2);
     ret->setName("ExtrudedTestForCorbaTest");
+    ret->setDescription("buildExtrudedMesh");
     retu->decrRef();
     return ret;
   }
@@ -181,6 +189,7 @@ namespace SALOME_TEST
   {
     ParaMEDMEM::MEDCouplingCMesh *targetMesh=ParaMEDMEM::MEDCouplingCMesh::New();
     targetMesh->setName("Example of CMesh");
+    targetMesh->setDescription("buildCMesh");
     ParaMEDMEM::DataArrayDouble *a1=ParaMEDMEM::DataArrayDouble::New();
     a1->alloc(5,1);
     a1->setInfoOnComponent(0,"SmthX");

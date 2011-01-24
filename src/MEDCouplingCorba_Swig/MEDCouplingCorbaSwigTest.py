@@ -26,6 +26,7 @@ class MEDCouplingCorbaServBasicsTest:
         coords=[ 0.0, 0.3, 0.75, 1.0 ]
         conn=[ 0,1, 1,2, 2,3 ]
         mesh=MEDCouplingUMesh.New("1DMeshForCorba",1);
+        mesh.setDescription("build1DMesh");
         mesh.allocateCells(3);
         mesh.insertNextCell(NORM_SEG2,2,conn[0:2]);
         mesh.insertNextCell(NORM_SEG2,2,conn[2:4]);
@@ -50,6 +51,7 @@ class MEDCouplingCorbaServBasicsTest:
         targetMesh=MEDCouplingUMesh.New();
         targetMesh.setMeshDimension(2);
         targetMesh.setName("MyMesh2D");
+        targetMesh.setDescription("build2DMesh");
         targetMesh.allocateCells(5);
         targetMesh.insertNextCell(NORM_QUAD4,4,targetConn[0:4]);
         targetMesh.insertNextCell(NORM_TRI3,3,targetConn[4:7]);
@@ -71,6 +73,7 @@ class MEDCouplingCorbaServBasicsTest:
         targetMesh=MEDCouplingUMesh.New();
         targetMesh.setMeshDimension(3);
         targetMesh.setName("MyMesh3D");
+        targetMesh.setDescription("build3DMesh");
         targetMesh.allocateCells(12);
         for i in xrange(8):
             targetMesh.insertNextCell(NORM_HEXA8,8,targetConn[8*i:8*(i+1)]);
@@ -79,6 +82,7 @@ class MEDCouplingCorbaServBasicsTest:
         myCoords=DataArrayDouble.New();
         myCoords.setValues(targetCoords,27,3);
         targetMesh.setCoords(myCoords)
+        myCoords.setName("check in case")
         return targetMesh;
 
     def build3DSurfMesh(self):
@@ -87,6 +91,7 @@ class MEDCouplingCorbaServBasicsTest:
         targetMesh=MEDCouplingUMesh.New();
         targetMesh.setMeshDimension(2);
         targetMesh.setName("MyMesh3DSurf");
+        targetMesh.setDescription("build3DSurfMesh");
         targetMesh.allocateCells(5);
         targetMesh.insertNextCell(NORM_QUAD4,4,targetConn[0:4]);
         targetMesh.insertNextCell(NORM_TRI3,3,targetConn[4:7]);
@@ -108,6 +113,7 @@ class MEDCouplingCorbaServBasicsTest:
         targetMesh.setMeshDimension(0);
         targetMesh.allocateCells(8);
         targetMesh.setName("Wonderfull 0D mesh");
+        targetMesh.setDescription("build0DMesh");
         targetConn=[]
         targetMesh.insertNextCell(NORM_POINT1,1,[0]);
         targetMesh.insertNextCell(NORM_POINT1,1,[1]);
@@ -129,6 +135,7 @@ class MEDCouplingCorbaServBasicsTest:
 
     def buildM1DMesh(self):
         meshM1D=MEDCouplingUMesh.New("wonderfull -1 D mesh",-1);
+        meshM1D.setDescription("buildM1DMesh");
         meshM1D.checkCoherency();
         return meshM1D;
 
@@ -139,11 +146,13 @@ class MEDCouplingCorbaServBasicsTest:
         retu=m2D.buildExtrudedMesh(m1D,0);
         ret=MEDCouplingExtrudedMesh.New(retu,m2D,2);
         ret.setName("ExtrudedTestForCorbaTest");
+        ret.setDescription("buildExtrudedMesh");
         return ret;
 
     def buildCMesh(self):
         targetMesh=MEDCouplingCMesh.New();
         targetMesh.setName("Example of CMesh");
+        targetMesh.setDescription("buildCMesh");
         a1=DataArrayDouble.New();
         a1Data=[3.,4.,5.,6.,7.]
         a1.setValues(a1Data,5,1);
