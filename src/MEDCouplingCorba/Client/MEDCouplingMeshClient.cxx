@@ -35,21 +35,21 @@ MEDCouplingMesh *MEDCouplingMeshClient::New(SALOME_MED::MEDCouplingMeshCorbaInte
   if(!CORBA::is_nil(umeshPtr))
     {
       MEDCouplingMesh *ret=MEDCouplingUMeshClient::New(umeshPtr);
-      CORBA::release(meshPtr);
+      CORBA::release(umeshPtr);
       return ret;
     }
   SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_ptr emeshPtr=SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface::_narrow(meshPtr);
   if(!CORBA::is_nil(emeshPtr))
     {
       MEDCouplingMesh *ret=MEDCouplingExtrudedMeshClient::New(emeshPtr);
-      CORBA::release(meshPtr);
+      CORBA::release(emeshPtr);
       return ret;
     }
   SALOME_MED::MEDCouplingCMeshCorbaInterface_ptr cmeshPtr=SALOME_MED::MEDCouplingCMeshCorbaInterface::_narrow(meshPtr);
   if(!CORBA::is_nil(cmeshPtr))
     {
       MEDCouplingMesh *ret=MEDCouplingCMeshClient::New(cmeshPtr);
-      CORBA::release(meshPtr);
+      CORBA::release(cmeshPtr);
       return ret;
     }
   return 0;
