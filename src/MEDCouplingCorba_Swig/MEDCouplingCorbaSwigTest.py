@@ -29,6 +29,7 @@ class MEDCouplingCorbaServBasicsTest:
         mesh.setDescription("build1DMesh");
         mesh.allocateCells(3);
         mesh.setTime(5.6,7,8);
+        mesh.setTimeUnit("ms");
         mesh.insertNextCell(NORM_SEG2,2,conn[0:2]);
         mesh.insertNextCell(NORM_SEG2,2,conn[2:4]);
         mesh.insertNextCell(NORM_SEG2,2,conn[4:6]);
@@ -153,6 +154,7 @@ class MEDCouplingCorbaServBasicsTest:
     def buildCMesh(self):
         targetMesh=MEDCouplingCMesh.New();
         targetMesh.setTime(2.3,4,5);
+        targetMesh.setTimeUnit("us");
         targetMesh.setName("Example of CMesh");
         targetMesh.setDescription("buildCMesh");
         a1=DataArrayDouble.New();
