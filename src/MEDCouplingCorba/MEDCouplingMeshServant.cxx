@@ -28,13 +28,18 @@ MEDCouplingMeshServant::MEDCouplingMeshServant(const MEDCouplingMesh *cppPointer
 {
 }
 
-void MEDCouplingMeshServant::getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfString_out sa)
+void MEDCouplingMeshServant::getTinyInfo(SALOME_TYPES::ListOfDouble_out da, SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfString_out sa)
 {
+  da=new SALOME_TYPES::ListOfDouble;
   la=new SALOME_TYPES::ListOfLong;
+  std::vector<double> tinyInfoD;
   std::vector<int> tinyInfoI;
   std::vector<std::string> tinyInfoS;
-  getPointer()->getTinySerializationInformation(tinyInfoI,tinyInfoS);
+  getPointer()->getTinySerializationInformation(tinyInfoD,tinyInfoI,tinyInfoS);
+  da->length(tinyInfoD.size());
   la->length(tinyInfoI.size());
+  for(int i=0;i<(int)tinyInfoD.size();i++)
+    (*da)[i]=tinyInfoD[i];
   for(int i=0;i<(int)tinyInfoI.size();i++)
     (*la)[i]=tinyInfoI[i];
   //

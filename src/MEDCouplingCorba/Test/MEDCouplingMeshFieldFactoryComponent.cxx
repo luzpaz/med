@@ -39,6 +39,7 @@ namespace SALOME_TEST
     ParaMEDMEM::MEDCouplingUMesh *mesh=ParaMEDMEM::MEDCouplingUMesh::New("1DMeshForCorba",1);
     mesh->setDescription("build1DMesh");
     mesh->allocateCells(3);
+    mesh->setTime(5.6,7,8);
     mesh->insertNextCell(INTERP_KERNEL::NORM_SEG2,2,conn);
     mesh->insertNextCell(INTERP_KERNEL::NORM_SEG2,2,conn+2);
     mesh->insertNextCell(INTERP_KERNEL::NORM_SEG2,2,conn+4);
@@ -188,6 +189,7 @@ namespace SALOME_TEST
   ParaMEDMEM::MEDCouplingCMesh *MEDCouplingCorbaServBasicsTest::buildCMesh()
   {
     ParaMEDMEM::MEDCouplingCMesh *targetMesh=ParaMEDMEM::MEDCouplingCMesh::New();
+    targetMesh->setTime(2.3,4,5);
     targetMesh->setName("Example of CMesh");
     targetMesh->setDescription("buildCMesh");
     ParaMEDMEM::DataArrayDouble *a1=ParaMEDMEM::DataArrayDouble::New();

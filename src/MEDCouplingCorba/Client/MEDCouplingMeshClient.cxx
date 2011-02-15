@@ -62,18 +62,24 @@ void MEDCouplingMeshClient::fillMeshFromCorbaData(MEDCouplingMesh *meshCpp, SALO
   //to corectly resize local copy of distant instance adressed by 'meshPtr'
   //1st value of returned array is the type of instance. Thanks to
   //CORBA and its type-check no use of this value is necessary.
+  SALOME_TYPES::ListOfDouble *tinyD;
   SALOME_TYPES::ListOfLong *tinyI;
   SALOME_TYPES::ListOfString *tinyS;
-  meshPtr->getTinyInfo(tinyI,tinyS);
+  meshPtr->getTinyInfo(tinyD,tinyI,tinyS);
   int tinyLgth=tinyI->length();
   std::vector<int> tinyV(tinyLgth);
   for(int i=0;i<tinyLgth;i++)
     tinyV[i]=(*tinyI)[i];
+  int tinyLgth2=tinyD->length();
+  std::vector<double> tinyV2(tinyLgth2);
+  for(int i=0;i<tinyLgth2;i++)
+    tinyV2[i]=(*tinyD)[i];
   std::vector<std::string> sts(tinyS->length());
   for(int i=0;i<(int)sts.size();i++)
     sts[i]=(*tinyS)[i];
   delete tinyS;
   delete tinyI;
+  delete tinyD;
   DataArrayInt* a1=DataArrayInt::New();
   DataArrayDouble* a2=DataArrayDouble::New();
   //thanks to the entry point tinyV get from the 1st CORBA invokation,
@@ -95,7 +101,7 @@ void MEDCouplingMeshClient::fillMeshFromCorbaData(MEDCouplingMesh *meshCpp, SALO
     ptToFill2[i]=(*a2Corba)[i];
   delete a2Corba;
   //
-  meshCpp->unserialization(tinyV,a1,a2,sts);
+  meshCpp->unserialization(tinyV2,tinyV,a1,a2,sts);
   a1->decrRef();
   a2->decrRef();
   //
