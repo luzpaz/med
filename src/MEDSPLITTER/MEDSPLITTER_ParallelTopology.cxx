@@ -19,11 +19,8 @@
 #include <set>
 #include <map>
 #include <vector>
-#ifndef WNT
-# include <ext/hash_map>
-#else
-# include <hash_map>
-#endif
+
+#include "InterpKernelHashMap.hxx"
 
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_ConnectZone.hxx"
@@ -39,11 +36,7 @@
 #include "MEDSPLITTER_Graph.hxx"
 #include "MEDSPLITTER_ParallelTopology.hxx"
 
-#ifndef WNT
-using namespace __gnu_cxx;
-#else
-using namespace std;
-#endif
+using namespace INTERP_KERNEL;
 
 using namespace MEDSPLITTER;
 
@@ -151,7 +144,7 @@ ParallelTopology::ParallelTopology(const vector<MEDMEM::MESH*>& meshes,
 
     //creating node maps
     m_nb_nodes[idomain]=meshes[idomain]->getNumberOfNodes();
-    hash_map <int,pair<int,int> > local2distant;
+    HashMap <int,pair<int,int> > local2distant;
     m_node_loc_to_glob[idomain].resize(m_nb_nodes[idomain]);
     for (int icz=0; icz<cz.size(); icz++)
     {
@@ -357,7 +350,7 @@ void ParallelTopology::convertGlobalNodeList(const int* node_list, int nbnode, i
 
   for (int i=0; i< nbnode; i++)
   {
-    typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+    typedef HashMultiMap<int,pair<int,int> >::iterator mmiter;
     pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(node_list[i]);
     for (mmiter it=range.first; it !=range.second; it++)
     { 
@@ -393,7 +386,7 @@ void ParallelTopology::convertGlobalNodeListWithTwins(const int* node_list, int 
   full_array=new int[size];
   for (int i=0; i< nbnode; i++)
   {
-    typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+    typedef HashMultiMap<int,pair<int,int> >::iterator mmiter;
     pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(node_list[i]);
     for (mmiter it=range.first; it !=range.second; it++)
     { 
@@ -427,7 +420,7 @@ void ParallelTopology::convertGlobalFaceListWithTwins(const int* face_list, int 
   full_array=new int[size];
   for (int i=0; i< nbface; i++)
   {
-    typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+    typedef HashMultiMap<int,pair<int,int> >::iterator mmiter;
     pair<mmiter,mmiter> range=m_face_glob_to_loc.equal_range(face_list[i]);
     for (mmiter it=range.first; it !=range.second; it++)
     { 
@@ -446,7 +439,7 @@ void ParallelTopology::convertGlobalCellList(const int* cell_list, int nbcell, i
 {
   for (int i=0; i< nbcell; i++)
   {
-    hash_map<int, pair<int,int> >::const_iterator iter = m_glob_to_loc.find(cell_list[i]);
+    HashMap<int, pair<int,int> >::const_iterator iter = m_glob_to_loc.find(cell_list[i]);
     ip[i]=(iter->second).first;
     local[i]=(iter->second).second;
   }
@@ -459,7 +452,7 @@ void ParallelTopology::convertGlobalFaceList(const int* face_list, int nbface, i
 {
   for (int i=0; i< nbface; i++)
   {
-    hash_map<int, pair<int,int> >::const_iterator iter = m_face_glob_to_loc.find(face_list[i]);
+    HashMap<int, pair<int,int> >::const_iterator iter = m_face_glob_to_loc.find(face_list[i]);
     if (iter == m_face_glob_to_loc.end())
     {
       throw MED_EXCEPTION("convertGlobalFaceList - Face  not found");
@@ -481,7 +474,7 @@ void ParallelTopology::convertGlobalFaceList(const int* face_list, int nbface, i
 {
   for (int i=0; i< nbface; i++)
   {
-    typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+    typedef HashMultiMap<int,pair<int,int> >::iterator mmiter;
     pair<mmiter,mmiter> range=m_face_glob_to_loc.equal_range(face_list[i]);
     for (mmiter it=range.first; it !=range.second; it++)
     { 
@@ -731,7 +724,7 @@ void ParallelTopology::createFaceMapping(const MESHCollection& initial_collectio
           int global = old_topology->convertNodeToGlobal(iold,node);
           //        cout << "global node "<<global<<"ip "<<iold<< "noeud"<<node<<endl;
           nodes.insert(global);
-          typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+          typedef HashMultiMap<int,pair<int,int> >::iterator mmiter;
           pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(global);
 
           int ip;
@@ -753,7 +746,7 @@ void ParallelTopology::createFaceMapping(const MESHCollection& initial_collectio
           //        cout << "global node "<<global<<"ip "<<iold<< "noeud"<<node<<endl;
           // SCRUTE_MED(global);
           nodes.insert(global);
-          typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+          typedef HashMultiMap<int,pair<int,int> >::iterator mmiter;
           pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(global);
 
           int ip;
@@ -915,7 +908,7 @@ void ParallelTopology::convertToLocal(map<MED_EN::medGeometryElement,int*>& type
     {
       //      cout <<" inode :"<<inode<< " global = "<<type_connectivity[type][inode];
       int global = type_connectivity[type][inode];
-      typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+      typedef HashMultiMap<int,pair<int,int> >::iterator mmiter;
       pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(global);
       for (mmiter it=range.first; it !=range.second; it++)
       {
@@ -937,7 +930,7 @@ void ParallelTopology::convertToLocal2ndVersion(int* nodes, int nbnodes, int ido
   {
     //      cout <<" inode :"<<inode<< " global = "<<type_connectivity[type][inode];
     int global = nodes[inode];
-    typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+    typedef HashMultiMap<int,pair<int,int> >::iterator mmiter;
     pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(global);
     for (mmiter it=range.first; it !=range.second; it++)
     {
@@ -962,7 +955,7 @@ void ParallelTopology::computeNodeNodeCorrespondencies(int idomain, vector<MEDME
   {
     //int global = (m_node_loc_to_glob.find(make_pair(idomain,inode+1)))->second;
     int global = m_node_loc_to_glob[idomain][inode];
-    typedef hash_multimap<int,pair<int,int> >::const_iterator mm;
+    typedef HashMultiMap<int,pair<int,int> >::const_iterator mm;
     pair<mm,mm> range = m_node_glob_to_loc.equal_range(global);
     for (mm it=range.first; it !=range.second; it++)
     {
@@ -986,7 +979,7 @@ void ParallelTopology::computeNodeNodeCorrespondencies(int idomain, vector<MEDME
   {
     //int global = (m_node_loc_to_glob.find(make_pair(idomain,inode+1)))->second;
     int global = m_node_loc_to_glob[idomain][inode];
-    typedef hash_multimap<int,pair<int,int> >::const_iterator mm;
+    typedef HashMultiMap<int,pair<int,int> >::const_iterator mm;
     pair<mm,mm> range = m_node_glob_to_loc.equal_range(global);
     for (mm it=range.first; it !=range.second; it++)
     {
@@ -1034,7 +1027,7 @@ void ParallelTopology::computeCellCellCorrespondencies(int idomain, vector<MEDME
     values[i]=0;
   }
 
-  vector <hash_multimap<int,int> > cell_corresp;
+  vector <HashMultiMap<int,int> > cell_corresp;
   //TODO : remplacer int* par une map <int,int>
   //  vector<int*  > number_of_connections(m_nb_domain);
   //  vector<map<int,int> > number_of_connections;
@@ -1103,14 +1096,14 @@ void ParallelTopology::computeCellCellCorrespondencies(int idomain, vector<MEDME
 
     int value_i=0;
 
-    //      hash_multimap<int,int>::iterator iter=cell_corresp[inew].begin();
+    //      HashMultiMap<int,int>::iterator iter=cell_corresp[inew].begin();
 
     for (int i=0; i<m_nb_cells[idomain]; i++)
     {
       //          for (int j=new_index[i];j<new_index[i+1];j++,value_i++,iter++)
       //            new_value[value_i]=iter->second;
 
-      typedef hash_multimap<int,int>::iterator mmiter;
+      typedef HashMultiMap<int,int>::iterator mmiter;
       pair<mmiter,mmiter> range=cell_corresp[inew].equal_range(i+1);
       for (mmiter it=range.first; it!=range.second; it++)
       {

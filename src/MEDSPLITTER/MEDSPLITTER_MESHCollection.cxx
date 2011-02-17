@@ -54,13 +54,10 @@
 #include "MEDSPLITTER_SCOTCHGraph.hxx"
 #endif
 
+#include "InterpKernelHashMap.hxx"
+
 #include <vector>
 #include <string>
-#ifndef WNT
-# include <ext/hash_map>
-#else
-# include <hash_map>
-#endif
 #include <set>
 
 #include <iostream>
@@ -68,11 +65,7 @@
 
 using namespace MEDSPLITTER;
 
-#ifndef WNT
-using namespace __gnu_cxx;
-#else
-using namespace std;
-#endif
+using namespace INTERP_KERNEL;
 
 //template inclusion
 #include "MEDSPLITTER_MESHCollection.H"

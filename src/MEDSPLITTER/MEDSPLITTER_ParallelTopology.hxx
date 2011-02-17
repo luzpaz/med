@@ -20,12 +20,12 @@
 #define PARALLELTOPOLOGY_HXX_
 
 #include <set>
-#include <ext/hash_map>
+#include "InterpKernelHashMap.hxx"
 #include "boost/shared_ptr.hpp"
 
 #include "MEDSPLITTER_Topology.hxx"
 
-namespace __gnu_cxx
+namespace INTERP_KERNEL
 {
   template<> struct hash< pair<int,int> >
   {
@@ -196,7 +196,7 @@ namespace MEDSPLITTER {
     {
       if (m_node_glob_to_loc.empty()) return 0;
       set <int> keys;
-      for (__gnu_cxx::hash_multimap<int, pair<int,int> >::const_iterator iter= m_node_glob_to_loc.begin();
+      for (INTERP_KERNEL::HashMultiMap<int, pair<int,int> >::const_iterator iter= m_node_glob_to_loc.begin();
            iter!=m_node_glob_to_loc.end();
            iter++) {
         keys.insert(iter->first);
@@ -266,7 +266,7 @@ namespace MEDSPLITTER {
     {
       if (m_face_glob_to_loc.empty()) return 0;
       set <int> keys;
-      for (__gnu_cxx::hash_multimap<int, pair<int,int> >::const_iterator iter= m_face_glob_to_loc.begin();
+      for (INTERP_KERNEL::HashMultiMap<int, pair<int,int> >::const_iterator iter= m_face_glob_to_loc.begin();
            iter!=m_face_glob_to_loc.end();
            iter++) {
         keys.insert(iter->first);
@@ -294,7 +294,7 @@ namespace MEDSPLITTER {
 
     inline int convertGlobalFace(int iglobal, int idomain)
     {
-      typedef __gnu_cxx::hash_multimap<int, pair<int,int> >::const_iterator MMiter;
+      typedef INTERP_KERNEL::HashMultiMap<int, pair<int,int> >::const_iterator MMiter;
       pair<MMiter,MMiter> eq = m_face_glob_to_loc.equal_range(iglobal);
       for (MMiter it=eq.first; it != eq.second; it++)
       {
@@ -308,7 +308,7 @@ namespace MEDSPLITTER {
 
     inline int convertGlobalNode(int iglobal, int idomain)
     {
-      typedef __gnu_cxx::hash_multimap<int, pair<int,int> >::const_iterator MMiter;
+      typedef INTERP_KERNEL::HashMultiMap<int, pair<int,int> >::const_iterator MMiter;
       pair<MMiter,MMiter> eq = m_node_glob_to_loc.equal_range(iglobal);
       for (MMiter it=eq.first; it != eq.second; it++)
       {
@@ -346,7 +346,7 @@ namespace MEDSPLITTER {
 
   private:
     //!mapping global -> local
-    typedef __gnu_cxx::hash_map<int,pair<int,int> > TGlob2DomainLoc;
+    typedef INTERP_KERNEL::HashMap<int,pair<int,int> > TGlob2DomainLoc;
     TGlob2DomainLoc m_glob_to_loc;
 
     //  bool is_equal_pair (pair<int,int> a, pair<int,int> b){
@@ -356,14 +356,14 @@ namespace MEDSPLITTER {
     //map<pair<int,int>,int> m_loc_to_glob;
 
     //
-    //__gnu_cxx::hash_map<pair<int,int>,int, __gnu_cxx::hash<pair<int,int> > > m_loc_to_glob;
+    //INTERP_KERNEL::HashMap<pair<int,int>,int, INTERP_KERNEL::hash<pair<int,int> > > m_loc_to_glob;
     vector<vector<int> >  m_loc_to_glob;
     //!mapping global -> local
-    __gnu_cxx::hash_multimap<int,pair<int,int> > m_node_glob_to_loc;
+    INTERP_KERNEL::HashMultiMap<int,pair<int,int> > m_node_glob_to_loc;
 
     //!mapping local -> global
     //  map<pair<int,int>,int> m_node_loc_to_glob;
-    //__gnu_cxx::hash_map<pair<int,int>,int, __gnu_cxx::hash<pair<int,int> > > m_node_loc_to_glob;
+    //INTERP_KERNEL::HashMap<pair<int,int>,int, INTERP_KERNEL::hash<pair<int,int> > > m_node_loc_to_glob;
     vector<vector <int> > m_node_loc_to_glob;
 
     // global numbers in parallel mode
@@ -372,11 +372,11 @@ namespace MEDSPLITTER {
 
 
     //!mapping global -> local
-    typedef __gnu_cxx::hash_multimap<int,pair<int,int> > TGlob2LocsMap;
+    typedef INTERP_KERNEL::HashMultiMap<int,pair<int,int> > TGlob2LocsMap;
     TGlob2LocsMap m_face_glob_to_loc;
 
     //!mapping local -> global
-    //__gnu_cxx::hash_map<pair<int,int>,int, __gnu_cxx::hash<pair<int,int> > > m_face_loc_to_glob;
+    //INTERP_KERNEL::HashMap<pair<int,int>,int, INTERP_KERNEL::hash<pair<int,int> > > m_face_loc_to_glob;
     vector<vector <int> > m_face_loc_to_glob;
 
     //map<pair<int,int>,int> m_face_loc_to_glob;
