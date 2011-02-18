@@ -3569,65 +3569,65 @@ bool FIELD<T, INTERLACING_TAG>::getValueOnElement(int eltIdInSup,T* retValues)
     double* value = output;
 
     if ( entity == MED_EN::MED_CELL )
-    {
-      MEDMEM::PointLocator pLocator (*mesh);
-      for ( int i = 0; i < nb_points; ++i)
       {
-        // find the cell enclosing the point
-        std::list<int> cellIds = pLocator.locate( point );
-        int nbCells = cellIds.size();
-        if ( nbCells < 1 )
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Point is out of mesh"));
+        MEDMEM::PointLocator pLocator (*mesh);
+        for ( int i = 0; i < nb_points; ++i)
+          {
+            // find the cell enclosing the point
+            std::list<int> cellIds = pLocator.locate( point );
+            int nbCells = cellIds.size();
+            if ( nbCells < 1 )
+              throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Point is out of mesh"));
 
-        // retrieve value
-        std::list<int>::iterator iCell = cellIds.begin();
-        for ( ; iCell != cellIds.end(); ++iCell )
-          for ( int j = 1; j <= getNumberOfComponents(); ++j )
-            value[j-1] += getValueIJ( *iCell, j ) / nbCells;
+            // retrieve value
+            std::list<int>::iterator iCell = cellIds.begin();
+            for ( ; iCell != cellIds.end(); ++iCell )
+              for ( int j = 1; j <= getNumberOfComponents(); ++j )
+                value[j-1] += getValueIJ( *iCell, j ) / nbCells;
 
-        // next point
-        point += mesh->getSpaceDimension();
-        value += getNumberOfComponents();
+            // next point
+            point += mesh->getSpaceDimension();
+            value += getNumberOfComponents();
+          }
       }
-    }
     else // MED_EN::MED_NODE
-    {
-      const double * allCoords = mesh->getCoordinates( MED_EN::MED_FULL_INTERLACE );
-
-      MEDMEM::PointLocatorInSimplex pLocator (*mesh);
-      for ( int i = 0; i < nb_points; ++i)
       {
-        // find nodes of the simplex enclosing the point
-        std::list<int> nodeIds = pLocator.locate( point );
-        int nbNodes = nodeIds.size();
-        if ( nbNodes < 1 )
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Point is out of mesh"));
-        if ( nbNodes != mesh->getMeshDimension() + 1 )
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Invalid nb of points of simplex: "<<nbNodes));
+        const double * allCoords = mesh->getCoordinates( MED_EN::MED_FULL_INTERLACE );
 
-        // get coordinates of simplex nodes
-        std::vector<const double*> nodeCoords( nbNodes );
-        std::list<int>::iterator iNode = nodeIds.begin();
-        int n = 0;
-        for ( ; n < nbNodes; ++iNode, ++n )
-          nodeCoords[n] = allCoords + (*iNode-1) * mesh->getSpaceDimension();
+        MEDMEM::PointLocatorInSimplex pLocator (*mesh);
+        for ( int i = 0; i < nb_points; ++i)
+          {
+            // find nodes of the simplex enclosing the point
+            std::list<int> nodeIds = pLocator.locate( point );
+            int nbNodes = nodeIds.size();
+            if ( nbNodes < 1 )
+              throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Point is out of mesh"));
+            if ( nbNodes != mesh->getMeshDimension() + 1 )
+              throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Invalid nb of points of simplex: "<<nbNodes));
 
-        // compute wegths of simplex nodes
-        double nodeWgt[4];
-        pLocator.getNodeWightsInSimplex( nodeCoords, coords, nodeWgt );
+            // get coordinates of simplex nodes
+            std::vector<const double*> nodeCoords( nbNodes );
+            std::list<int>::iterator iNode = nodeIds.begin();
+            int n = 0;
+            for ( ; n < nbNodes; ++iNode, ++n )
+              nodeCoords[n] = allCoords + (*iNode-1) * mesh->getSpaceDimension();
 
-        // retrieve value
-        for ( n = 0, iNode = nodeIds.begin(); iNode != nodeIds.end(); ++iNode, ++n )
-          for ( int j = 1; j <= getNumberOfComponents(); ++j )
-            value[j-1] += getValueIJ( *iNode, j ) * nodeWgt[ n ];
+            // compute wegths of simplex nodes
+            double nodeWgt[4];
+            pLocator.getNodeWightsInSimplex( nodeCoords, coords, nodeWgt );
 
-        // next point
-        point += mesh->getSpaceDimension();
-        value += getNumberOfComponents();
+            // retrieve value
+            for ( n = 0, iNode = nodeIds.begin(); iNode != nodeIds.end(); ++iNode, ++n )
+              for ( int j = 1; j <= getNumberOfComponents(); ++j )
+                value[j-1] += getValueIJ( *iNode, j ) * nodeWgt[ n ];
+
+            // next point
+            point += mesh->getSpaceDimension();
+            value += getNumberOfComponents();
+          }
       }
-    }
   }
-  
+
 
 /*!
   \if developper
