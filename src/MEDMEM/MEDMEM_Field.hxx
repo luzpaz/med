@@ -29,13 +29,6 @@
 
 #include "MEDMEM.hxx"
 
-#include <vector>
-#include <map>
-#include <algorithm>
-#include <math.h>
-#include <cmath>
-#include <float.h>
-
 #include "MEDMEM_Utilities.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
@@ -49,7 +42,14 @@
 #include "MEDMEM_FieldForward.hxx"
 #include "MEDMEM_GaussLocalization.hxx"
 #include "GaussCoords.hxx"
+#include "PointLocator.hxx"
 
+#include <vector>
+#include <map>
+#include <algorithm>
+#include <math.h>
+#include <cmath>
+#include <float.h>
 
 namespace MEDMEM {
 
@@ -1153,7 +1153,6 @@ the components.
 }
 
 #include "MEDMEM_DriverFactory.hxx"
-#include "PointLocator.hxx"
 
 namespace MEDMEM {
 
