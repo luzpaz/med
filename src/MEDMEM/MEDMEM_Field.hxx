@@ -41,7 +41,7 @@
 #include "MEDMEM_SetInterlacingType.hxx"
 #include "MEDMEM_FieldForward.hxx"
 #include "MEDMEM_GaussLocalization.hxx"
-#include "GaussCoords.hxx"
+#include "InterpKernelGaussCoords.hxx"
 #include "PointLocator.hxx"
 
 #include <vector>
@@ -3806,7 +3806,7 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACING_TAG>::getGaussPointsCoordinat
         Ni[idx] = global_connectivity[ elem_index+idx ] - 1;
       }
       
-      gCoord = calculator.CalculateCoords(normType,
+      gCoord = calculator.calculateCoords(normType,
                                           coord,
                                           spaceDim,
                                           Ni);
