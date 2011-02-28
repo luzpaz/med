@@ -26,7 +26,7 @@
 module Compo1Py_ORB
 {
  
-  interface Compo1Py : Engines::Component
+  interface Compo1Py : Engines::EngineComponent
   {
     void Initialise(in string medFile);
     SALOME_MED::MESH Calcul1();

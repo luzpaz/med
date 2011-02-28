@@ -18,12 +18,11 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
 
 //  MED MEDGUI : MED component GUI implemetation
 //  File   : MedGUI.cxx
 //  Module : MED
-//
+
 #include "MedGUI.h"
 
 // SALOME Includes
@@ -659,7 +658,7 @@ bool MedGUI::DumpSubMesh( SALOME_MED::FAMILY_var Fam )
 SALOME_MED::MED_Gen_ptr MedGUI::InitMedGen() const
 {
   SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( application() );
-  Engines::Component_var comp =
+  Engines::EngineComponent_var comp =
     SALOME_LifeCycleCORBA(app->namingService()).FindOrLoad_Component( "FactoryServer", "MED" );
 
   MESSAGE("_________________________________________");

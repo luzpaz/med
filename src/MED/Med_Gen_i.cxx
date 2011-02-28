@@ -18,13 +18,12 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
 
 //  MED MED : implemetation of MED idl descriptions
 //  File   : Med_Gen_i.cxx
 //  Author : Paul RASCLE, EDF
 //  Module : MED
-//
+
 #include "Med_Gen_i.hxx"
 
 #include "MEDMEM_Mesh.hxx"
@@ -577,7 +576,7 @@ throw (SALOME::SALOME_Exception)
  *  from Driver
  */
 //=============================================================================
-Engines::Component_ptr Med_Gen_i::GetComponentInstance()
+Engines::EngineComponent_ptr Med_Gen_i::GetComponentInstance()
 {
   return MED_Gen::_this();
 }

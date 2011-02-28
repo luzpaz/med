@@ -18,13 +18,12 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
 
 //  MED MED : implemetation of MED idl descriptions
 //  File   : Med_Gen_Driver_i.hxx
 //  Author : Paul RASCLE, EDF
 //  Module : MED
-//
+
 #ifndef _MED_GEN_DRIVER_I_HXX_
 #define _MED_GEN_DRIVER_I_HXX_
 
@@ -106,7 +105,7 @@ public:
   //char* ComponentDataType();
 
   // to be defined in Component
-  virtual Engines::Component_ptr GetComponentInstance() = 0;
+  virtual Engines::EngineComponent_ptr GetComponentInstance() = 0;
 
 private:
   static std::map<std::string, MEDMEM::MED_i*> _MedCorbaObj;

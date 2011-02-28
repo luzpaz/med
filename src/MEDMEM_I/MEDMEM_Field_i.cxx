@@ -18,16 +18,14 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
 
 //=============================================================================
 // File      : MEDMEM_Field_i.cxx
 // Created   : mer fév 20 15:47:57 CET 2002
 // Author    : EDF
 // Project   : SALOME
-// $Header   : $
 //=============================================================================
-//
+
 #include "MEDMEM_Field_i.hxx"
 
 #include "SALOME_NamingService.hxx"
@@ -767,7 +765,7 @@ SALOMEDS::SComponent_ptr FIELD_i::PublishMedComponent(SALOMEDS::Study_ptr theStu
   SALOMEDS::AttributeName_var aName = SALOMEDS::AttributeName::_narrow(anAttr);
   aName->SetValue( aComp->componentusername() );
   
-  Engines::Component_var aMedComponent = lcc->FindOrLoad_Component("FactoryServer", "MED");
+  Engines::EngineComponent_var aMedComponent = lcc->FindOrLoad_Component("FactoryServer", "MED");
   SALOME_MED::MED_Gen_var aMedEngine = SALOME_MED::MED_Gen::_narrow( aMedComponent );
   aBuilder->DefineComponentInstance(medfather, aMedEngine);
   

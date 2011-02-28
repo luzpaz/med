@@ -15,12 +15,10 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
 
 // File: ParaMEDMEMComponent.idl
 // Project: SALOME
-// $Header$
-//
+
 /*!
   This file contains the IDL definitions of the ParaMEDMEM component in %SALOME application.
 */
@@ -38,7 +36,7 @@ module SALOME_MED
     void getDataByMPI(in string coupling) raises (SALOME::SALOME_Exception);
   };
 
-  interface ParaMEDMEMComponent:Engines::Component,Engines::MPIObject
+  interface ParaMEDMEMComponent:Engines::EngineComponent,Engines::MPIObject
   {
     void setInterpolationOptions(in string coupling,
                                  in long print_level,
