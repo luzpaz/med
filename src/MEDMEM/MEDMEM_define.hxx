@@ -29,9 +29,7 @@
 #include <assert.h>
 
 // UTILE AUX DEUX NAMESPACES
-extern "C"{
 #include <hdf5.h>
-}
 
 
 namespace MED_EN {

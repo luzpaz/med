@@ -34,10 +34,7 @@
 #include <set>
 #include <map>
 
-extern "C"
-{
 #include <hdf5.h>
-}  
 
 #include <boost/tuple/tuple.hpp>
 
