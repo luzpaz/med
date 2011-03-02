@@ -38,13 +38,18 @@ AC_ARG_WITH(scotch,
             [SCOTCHDIR="$withval"
              AC_MSG_RESULT("select $withval as path to SCOTCH library")])
 
+if test "x${SCOTCHDIR}" = "x" ; then
+  AC_CHECK_FILE(/usr/include/scotch/scotch.h,
+                SCOTCHDIR=/usr)
+fi
+
 AC_MSG_RESULT(\$SCOTCHDIR = ${SCOTCHDIR})
 
 CPPFLAGS_old="${CPPFLAGS}"
 LIBS_old=$LIBS
 
 if test "x${SCOTCHDIR}" != "x" ; then
-  SCOTCH_CPPFLAGS="-DENABLE_SCOTCH -I${SCOTCHDIR}"
+  SCOTCH_CPPFLAGS="-DENABLE_SCOTCH -I${SCOTCHDIR} -I${SCOTCHDIR}/bin -I${SCOTCHDIR}/include/scotch ${MPI_INCLUDES}"
   SCOTCH_LIBS="-L${SCOTCHDIR}/bin -lscotch -lscotcherr"
 fi
 
@@ -60,12 +65,14 @@ scotch_include_dir_ok=yes
 if test "x${SCOTCHDIR}" != "x" ; then
   AC_CHECK_FILE(${SCOTCHDIR}/bin/scotch.h,
                 scotch_include_dir_ok=yes,
-                scotch_include_dir_ok=no)
+                AC_CHECK_FILE(${SCOTCHDIR}/include/scotch/scotch.h,
+                              scotch_include_dir_ok=yes,
+                              scotch_include_dir_ok=no))
 fi
 
 if test "x${scotch_include_dir_ok}" = "xyes" ; then
   AC_TRY_COMPILE([#include <stdio.h>
-		  #include <bin/scotch.h>],
+		  #include <scotch.h>],
                  [SCOTCH_Graph* graph;
 		  SCOTCH_graphInit(graph)],
                  scotch_headers_ok=yes,
@@ -89,7 +96,7 @@ if test "x${scotch_headers_ok}" = "xyes" ; then
                   scotch_lib_dir_ok=no)
     if test "x${scotch_lib_dir_ok}" = "xno" ; then
       SCOTCH_LIBSUFFIX=""
-      AC_CHECK_FILE(${SCOTCHDIR}/bin/libscotch.a,
+      AC_CHECK_FILE(${SCOTCHDIR}/lib/libscotch.so,
                     scotch_lib_dir_ok=yes,
                     scotch_lib_dir_ok=no)
     fi
@@ -97,7 +104,7 @@ if test "x${scotch_headers_ok}" = "xyes" ; then
   if test "x${scotch_lib_dir_ok}" = "xyes" ; then
     LIBS="${LIBS_old} ${SCOTCH_LIBS}"
     AC_TRY_LINK([#include <stdio.h>
-		#include <bin/scotch.h>],
+		#include <scotch.h>],
                   [SCOTCH_Graph* graph;
 		  SCOTCH_graphInit(graph)],
                 scotch_binaries_ok=yes,
@@ -106,7 +113,7 @@ if test "x${scotch_headers_ok}" = "xyes" ; then
       SCOTCH_LIBSUFFIX=""
       LIBS="${LIBS_old} ${SCOTCH_LIBS} "
       AC_TRY_LINK([#include <stdio.h>
-		   #include <bin/scotch.h>],
+		   #include <scotch.h>],
                   [SCOTCH_Graph* graph;
 		  SCOTCH_graphInit(graph)],
                   scotch_binaries_ok=yes,
