@@ -21,7 +21,8 @@
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-lib_LTLIBRARIES = _libMEDMEM_Swig.la
+salomepython_PYTHON = libMEDMEM_Swig.py
+salomepyexec_LTLIBRARIES = _libMEDMEM_Swig.la
 
 salomeinclude_HEADERS =  \
 	libMEDMEM_Swig.i \
@@ -57,7 +58,6 @@ _libMEDMEM_Swig_la_LDFLAGS  = -module $(MED2_LIBS) $(HDF5_LIBS) $(PYTHON_LIBS) $
 
 CLEANFILES = libMEDMEM_Swig_wrap.cxx libMEDMEM_Swig.py
 
-nodist_salomescript_DATA = libMEDMEM_Swig.py
 dist_salomescript_DATA   = \
 		   medmem.py \
 		   med_test1.py \

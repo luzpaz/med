@@ -21,7 +21,8 @@
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-lib_LTLIBRARIES = _libParaMEDMEM_Swig.la
+salomepython_PYTHON = libParaMEDMEM_Swig.py
+salomepyexec_LTLIBRARIES = _libParaMEDMEM_Swig.la
 
 salomeinclude_HEADERS =  \
 	libParaMEDMEM_Swig.i

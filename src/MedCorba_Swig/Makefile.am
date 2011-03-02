@@ -21,7 +21,8 @@
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-lib_LTLIBRARIES = _libMedCorba_Swig.la
+salomepython_PYTHON = libMedCorba_Swig.py
+salomepyexec_LTLIBRARIES = _libMedCorba_Swig.la
 
 if MED_SWIG_1_3_21
 SWIG_DEF = libMedCorba_Swig.i dummy.i
@@ -59,6 +60,5 @@ _libMedCorba_Swig_la_LDFLAGS  = -module $(PYTHON_LIBS) $(MED2_LIBS) $(HDF5_LIBS)
 ###  ../MEDMEM_SWIG/_libMEDMEM_Swig.la
 
 dist_salomescript_DATA   = medcorba_test.py batchmode_medcorba_test.py batchmode_medcorba_test1.py
-nodist_salomescript_DATA = libMedCorba_Swig.py
 
 CLEANFILES = libMedCorba_Swig.py libMedCorba_Swig_wrap.cxx
