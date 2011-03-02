@@ -69,3 +69,8 @@ dist-hook:
 
 dev_docs:
 	(cd doc && $(MAKE) $(AM_MAKEFLAGS) dev_docs)
+
+docs: usr_docs
+
+usr_docs:
+	(cd doc && $(MAKE) $(AM_MAKEFLAGS) usr_docs)
