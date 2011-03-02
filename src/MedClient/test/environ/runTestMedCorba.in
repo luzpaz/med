@@ -26,7 +26,7 @@ PYTHON_VERSION=python@PYTHON_VERSION@
 if test -n $MED_ROOT_DIR
 then
   export PATH=$MED_ROOT_DIR/bin/salome:${PATH}
-  export LD_LIBRARY_PATH=$MED_ROOT_DIR/lib@LIB_LOCATION_SUFFIX@/salome:${LD_LIBRARY_PATH}
+  export LD_LIBRARY_PATH=$MED_ROOT_DIR/lib@LIB_LOCATION_SUFFIX@/salome${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
   export PYTHONPATH=${MED_ROOT_DIR}/lib@LIB_LOCATION_SUFFIX@/salome:${MED_ROOT_DIR}/lib@LIB_LOCATION_SUFFIX@/$PYTHON_VERSION/site-packages/salome:${MED_ROOT_DIR}/share/salome/resources/med:${PYTHONPATH}
   # add bin, because some script are in (SALOME_SWIG) !!!!
   export PYTHONPATH=${MED_ROOT_DIR}/bin/salome:${PYTHONPATH}
@@ -34,7 +34,7 @@ fi
 if test -n $MED_ROOT_DIR
 then
   export PATH=$MED_ROOT_DIR/bin/salome:${PATH}
-  export LD_LIBRARY_PATH=$MED_ROOT_DIR/lib@LIB_LOCATION_SUFFIX@/salome:${LD_LIBRARY_PATH}
+  export LD_LIBRARY_PATH=$MED_ROOT_DIR/lib@LIB_LOCATION_SUFFIX@/salome${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
   export PYTHONPATH=${MED_ROOT_DIR}/lib@LIB_LOCATION_SUFFIX@/salome:${MED_ROOT_DIR}/lib@LIB_LOCATION_SUFFIX@/$PYTHON_VERSION/site-packages/salome:${MED_ROOT_DIR}/share/salome/resources/med:${PYTHONPATH}
 fi
 
