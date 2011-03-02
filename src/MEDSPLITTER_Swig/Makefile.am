@@ -21,7 +21,8 @@
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-lib_LTLIBRARIES = _libMEDSPLITTER_Swig.la
+salomepython_PYTHON = libMEDSPLITTER_Swig.py
+salomepyexec_LTLIBRARIES = _libMEDSPLITTER_Swig.la
 
 salomeinclude_HEADERS =  \
 	libMEDSPLITTER_Swig.i
@@ -53,5 +54,4 @@ endif
 
 CLEANFILES = libMEDSPLITTER_Swig_wrap.cxx libMEDSPLITTER_Swig.py
 
-nodist_salomescript_DATA = libMEDSPLITTER_Swig.py
 dist_salomescript_DATA   = MEDSPLITTER.py test_MEDSPLITTER.py
