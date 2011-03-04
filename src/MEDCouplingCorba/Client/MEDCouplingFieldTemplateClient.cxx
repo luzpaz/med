@@ -58,7 +58,7 @@ MEDCouplingFieldTemplate *MEDCouplingFieldTemplateClient::New(SALOME_MED::MEDCou
   //2nd CORBA call to retrieves the mesh.
   SALOME_MED::MEDCouplingMeshCorbaInterface_ptr meshPtr=fieldPtr->getMesh();
   MEDCouplingMesh *mesh=MEDCouplingMeshClient::New(meshPtr);
-  meshPtr->Destroy();
+  meshPtr->UnRegister();
   CORBA::release(meshPtr);
   ret->setMesh(mesh);
   mesh->decrRef();
@@ -77,7 +77,7 @@ MEDCouplingFieldTemplate *MEDCouplingFieldTemplateClient::New(SALOME_MED::MEDCou
   delete bigArr0;
   //
   //notify server that the servant is no more used.
-  fieldPtr->Destroy();
+  fieldPtr->UnRegister();
   //
   ret->finishUnserialization(tinyLV,tinyLD,tinyLS);
   //

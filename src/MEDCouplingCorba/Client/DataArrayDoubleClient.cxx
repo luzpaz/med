@@ -53,7 +53,7 @@ DataArrayDouble *DataArrayDoubleClient::New(SALOME_MED::DataArrayDoubleCorbaInte
         pt[j]=(*tinyD)[j];
       delete tinyD; tinyD=0;
     }
-  dadPtr->Destroy();
+  dadPtr->UnRegister();
   ret->finishUnserialization(v1,v3);
   return ret;
 }

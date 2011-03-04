@@ -36,7 +36,7 @@ namespace ParaMEDMEM
     ParaMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb, MEDCouplingFieldDouble* field);
 
     void Register();
-    void Destroy();
+    void UnRegister();
   };
 }
 #endif

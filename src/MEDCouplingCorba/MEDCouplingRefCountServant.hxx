@@ -37,7 +37,7 @@ namespace ParaMEDMEM
     ~MEDCouplingRefCountServant();
   protected:
     void Register();
-    void Destroy();
+    void UnRegister();
     CORBA::Long getTimeLabel();
   protected:
     int _ref_counter;

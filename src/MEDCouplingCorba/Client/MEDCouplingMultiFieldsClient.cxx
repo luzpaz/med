@@ -34,7 +34,7 @@ MEDCouplingMultiFields *MEDCouplingMultiFieldsClient::New(SALOME_MED::MEDCouplin
   fieldPtr->Register();
   BuildFullMultiFieldsCorbaFetch(ret,fieldPtr);
   //notify server that the servant is no more used.
-  fieldPtr->Destroy();
+  fieldPtr->UnRegister();
   return ret;
 }
 
@@ -64,7 +64,7 @@ void MEDCouplingMultiFieldsClient::BuildFullMultiFieldsCorbaFetch(MEDCouplingMul
   for(CORBA::Long i=0;i<nbOfMeshes;i++)
     {
       cppms[i]=MEDCouplingMeshClient::New((*meshes)[i]);
-      (*meshes)[i]->Destroy();
+      (*meshes)[i]->UnRegister();
     }
   delete meshes;
   //
@@ -73,7 +73,7 @@ void MEDCouplingMultiFieldsClient::BuildFullMultiFieldsCorbaFetch(MEDCouplingMul
     {
       SALOME_MED::DataArrayDoubleCorbaInterface_ptr daPtr=fieldPtr->getArray(i);
       cppdas[i]=DataArrayDoubleClient::New(daPtr);
-      daPtr->Destroy();
+      daPtr->UnRegister();
       CORBA::release(daPtr);
     }
   //

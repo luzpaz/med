@@ -38,7 +38,7 @@ MEDCouplingFieldOverTimeClient::MEDCouplingFieldOverTimeClient(SALOME_MED::MEDCo
 
 MEDCouplingFieldOverTimeClient::~MEDCouplingFieldOverTimeClient()
 {
-  _field_ptr->Destroy();
+  _field_ptr->UnRegister();
   delete _df;
 }
 

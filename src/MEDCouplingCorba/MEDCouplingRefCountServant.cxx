@@ -58,7 +58,7 @@ void MEDCouplingRefCountServant::Register()
   _ref_counter++;
 }
 
-void MEDCouplingRefCountServant::Destroy()
+void MEDCouplingRefCountServant::UnRegister()
 {
   if(_cpp_pointer)
     ((RefCountObject *)_cpp_pointer)->decrRef();

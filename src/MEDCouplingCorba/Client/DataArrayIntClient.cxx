@@ -52,7 +52,7 @@ DataArrayInt *DataArrayIntClient::New(SALOME_MED::DataArrayIntCorbaInterface_ptr
         pt[j]=(*tinyL)[j];
       delete tinyL; tinyL=0;
     }
-  dadPtr->Destroy();
+  dadPtr->UnRegister();
   ret->finishUnserialization(v1,v3);
   return ret;
 }

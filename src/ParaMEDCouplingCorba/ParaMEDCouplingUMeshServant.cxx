@@ -38,13 +38,13 @@ void ParaMEDCouplingUMeshServant::Register()
   MEDCouplingUMeshServant::Register();
 }
 
-void ParaMEDCouplingUMeshServant::Destroy()
+void ParaMEDCouplingUMeshServant::UnRegister()
 {
   if(_numproc == 0)
     for(int ip=1;ip<_nbproc;ip++)
       {
         SALOME_MED::ParaMEDCouplingUMeshCorbaInterface_var meshPtr=SALOME_MED::ParaMEDCouplingUMeshCorbaInterface::_narrow((*_tior)[ip]);
-        meshPtr->Destroy();
+        meshPtr->UnRegister();
       }
-  MEDCouplingUMeshServant::Destroy();
+  MEDCouplingUMeshServant::UnRegister();
 }

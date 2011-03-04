@@ -124,7 +124,7 @@ void SUPPORTClient::fillCopy()
 //=============================================================================
 SUPPORTClient::~SUPPORTClient()
 {
-  IOR_Support->Destroy();
+  IOR_Support->UnRegister();
   if(_mesh)
     _mesh->removeReference();
 }

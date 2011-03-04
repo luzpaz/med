@@ -237,7 +237,7 @@ bool MESHClient::operator==(const MESH& other) const
 
 MESHClient::~MESHClient()
 {
-  IOR_Mesh->Destroy();
+  IOR_Mesh->UnRegister();
 }
 
 //=============================================================================

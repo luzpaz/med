@@ -35,7 +35,7 @@ namespace ParaMEDMEM
     ParaMEDCouplingUMeshServant(CORBA::ORB_ptr orb, MEDCouplingUMesh* mesh);
 
     void Register();
-    void Destroy();
+    void UnRegister();
   };
 }
 #endif

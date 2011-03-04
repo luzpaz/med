@@ -38,13 +38,13 @@ void ParaMEDCouplingFieldDoubleServant::Register()
   MEDCouplingFieldDoubleServant::Register();
 }
 
-void ParaMEDCouplingFieldDoubleServant::Destroy()
+void ParaMEDCouplingFieldDoubleServant::UnRegister()
 {
   if(_numproc == 0)
     for(int ip=1;ip<_nbproc;ip++)
       {
         SALOME_MED::ParaMEDCouplingFieldDoubleCorbaInterface_var fieldPtr=SALOME_MED::ParaMEDCouplingFieldDoubleCorbaInterface::_narrow((*_tior)[ip]);
-        fieldPtr->Destroy();
+        fieldPtr->UnRegister();
       }
-  MEDCouplingFieldDoubleServant::Destroy();
+  MEDCouplingFieldDoubleServant::UnRegister();
 }
