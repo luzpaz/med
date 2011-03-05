@@ -351,18 +351,19 @@ void MED::readFileStruct (int index/*=0*/)
 {
   const char * LOC = "MED::readFileStruct (int index=0): ";
   BEGIN_OF_MED(LOC);
-  
-  if (_drivers[index]) {
-    _drivers[index]->open(); 
-    _drivers[index]->readFileStruct(); 
-    _drivers[index]->close(); 
-  }
+
+  if (index < _drivers.size() && _drivers[index])
+    {
+      _drivers[index]->open();
+      _drivers[index]->readFileStruct();
+      _drivers[index]->close();
+    }
   else
     throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
                                      << "The index given is invalid, index must be between 0 and |" 
                                      << _drivers.size()
                                      )
-                          );   
+                          );
 }
 
 /*!
