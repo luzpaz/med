@@ -679,8 +679,8 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
                   int nm4 = getInt() ; next();
                   int nm5 = getInt() ; next();
                   int n45 = getInt() ; next();
-                  int nm6 = getInt() ; next();
-                  int nm7 = getInt() ; next();
+                  /*int nm6 =*/ getInt() ; next();
+                  /*int nm7 = */getInt() ; next();
                   next();
                   next();
                   int nm1 = n1 * n45;
