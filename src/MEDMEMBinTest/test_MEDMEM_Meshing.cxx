@@ -37,30 +37,33 @@ using namespace MEDMEM;
 using namespace MED_EN;
 using namespace DRIVERFACTORY;
 
-int main (int argc, char ** argv) {
+int main (int argc, char ** argv)
+{
 
-  if (argc >2) {
-    cerr << "Usage : " << argv[0] 
-         << " filenameRoot" << endl;
-    cerr << "        where filenameRoot is a root filename, the program will produce" << endl;
-    cerr << "        3 files filenameRoot21.med filenameRoot22.med and filenameRoot.vtk" << endl << endl;
-    exit(-1);
-  }
+  if (argc >2)
+    {
+      cerr << "Usage : " << argv[0] 
+           << " filenameRoot" << endl;
+      cerr << "        where filenameRoot is a root filename, the program will produce" << endl;
+      cerr << "        3 files filenameRoot21.med filenameRoot22.med and filenameRoot.vtk" << endl << endl;
+      exit(-1);
+    }
 
   string filenameRoot;
-  if (argc==1) {
+  if (argc==1)
+    {
       // filename to save the generated MESH
-    if ( getenv("TMP") && access(getenv("TMP"),W_OK)==0 )
-      filenameRoot=getenv("TMP");
-    else if (getenv("TMPDIR") && access(getenv("TMPDIR"),W_OK)==0 )
-      filenameRoot=getenv("TMPDIR");
-    else
-      filenameRoot="/tmp";
-    filenameRoot += "/test_MEDMEM_Meshing" ;
-  }
+      if ( getenv("TMP") && access(getenv("TMP"),W_OK)==0 )
+        filenameRoot=getenv("TMP");
+      else if (getenv("TMPDIR") && access(getenv("TMPDIR"),W_OK)==0 )
+        filenameRoot=getenv("TMPDIR");
+      else
+        filenameRoot="/tmp";
+      filenameRoot += "/test_MEDMEM_Meshing" ;
+    }
   else
     filenameRoot=argv[1];
-    
+
   string filenameMed21 = filenameRoot+"_V21.med";
   string filenameMed22 = filenameRoot+"_V22.med";
   string filenameVtk = filenameRoot+".vtk";
@@ -72,40 +75,47 @@ int main (int argc, char ** argv) {
 
   int SpaceDimension = 3 ;
   int NumberOfNodes = 19 ;
-  double Coordinates[57] = {
-    0.0, 0.0, 0.0, 
-    0.0, 0.0, 1.0, 
-    2.0, 0.0, 1.0, 
-    0.0, 2.0, 1.0, 
-    -2.0, 0.0, 1.0, 
-    0.0, -2.0, 1.0, 
-    1.0, 1.0, 2.0, 
-    -1.0, 1.0, 2.0, 
-    -1.0, -1.0, 2.0, 
-    1.0, -1.0, 2.0, 
-    1.0, 1.0, 3.0, 
-    -1.0, 1.0, 3.0, 
-    -1.0, -1.0, 3.0, 
-    1.0, -1.0, 3.0, 
-    1.0, 1.0, 4.0, 
-    -1.0, 1.0, 4.0, 
-    -1.0, -1.0, 4.0, 
-    1.0, -1.0, 4.0,
-    0.0, 0.0, 5.0
-  };
+  double Coordinates[57] =
+    {
+      0.0, 0.0, 0.0, 
+      0.0, 0.0, 1.0, 
+      2.0, 0.0, 1.0, 
+      0.0, 2.0, 1.0, 
+      -2.0, 0.0, 1.0, 
+      0.0, -2.0, 1.0, 
+      1.0, 1.0, 2.0, 
+      -1.0, 1.0, 2.0, 
+      -1.0, -1.0, 2.0, 
+      1.0, -1.0, 2.0, 
+      1.0, 1.0, 3.0, 
+      -1.0, 1.0, 3.0, 
+      -1.0, -1.0, 3.0, 
+      1.0, -1.0, 3.0, 
+      1.0, 1.0, 4.0, 
+      -1.0, 1.0, 4.0, 
+      -1.0, -1.0, 4.0, 
+      1.0, -1.0, 4.0,
+      0.0, 0.0, 5.0
+    };
 
   myMeshing->setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,"CARTESIAN",MED_FULL_INTERLACE);
 
-  string Names[3] = { "X","Y","Z" } ;
+  string Names[3] =
+    {
+      "X","Y","Z"
+    } ;
   myMeshing->setCoordinatesNames(Names);
 
-  string Units[3] = { "cm","cm","cm" } ;
+  string Units[3] =
+    {
+      "cm","cm","cm"
+    } ;
   myMeshing->setCoordinatesUnits(Units) ;
 
   // define conectivities
 
   // cell part
-  
+
   const int NumberOfTypes = 3 ;
   medGeometryElement Types[NumberOfTypes] = {MED_TETRA4,MED_PYRA5,MED_HEXA8} ;
   const int NumberOfElements[NumberOfTypes] = {12,2,2} ;
@@ -116,44 +126,50 @@ int main (int argc, char ** argv) {
 
   const int sizeTetra = 12*4 ;
   int ConnectivityTetra[sizeTetra]=
-  {
-    1,2,3,6,
-    1,2,4,3,
-    1,2,5,4,
-    1,2,6,5,
-    2,7,4,3,
-    2,8,5,4,
-    2,9,6,5,
-    2,10,3,6,
-    2,7,3,10,
-    2,8,4,7,
-    2,9,5,8,
-    2,10,6,9
-  };
-  
+    {
+      1,2,3,6,
+      1,2,4,3,
+      1,2,5,4,
+      1,2,6,5,
+      2,7,4,3,
+      2,8,5,4,
+      2,9,6,5,
+      2,10,3,6,
+      2,7,3,10,
+      2,8,4,7,
+      2,9,5,8,
+      2,10,6,9
+    };
+
   myMeshing->setConnectivity(ConnectivityTetra,MED_CELL,MED_TETRA4);
 
   int ConnectivityPyra[2*5]=
-  {
-    7,8,9,10,2,
-    15,18,17,16,19
-  };
+    {
+      7,8,9,10,2,
+      15,18,17,16,19
+    };
 
   myMeshing->setConnectivity(ConnectivityPyra,MED_CELL,MED_PYRA5);
 
   int ConnectivityHexa[2*8]=
-  {
-    11,12,13,14,7,8,9,10,
-    15,16,17,18,11,12,13,14
-  };
+    {
+      11,12,13,14,7,8,9,10,
+      15,16,17,18,11,12,13,14
+    };
 
   myMeshing->setConnectivity(ConnectivityHexa,MED_CELL,MED_HEXA8);
 
   // face part
 
   const int NumberOfFacesTypes = 2 ;
-  medGeometryElement FacesTypes[NumberOfFacesTypes] = {MED_TRIA3,MED_QUAD4} ;
-  const int NumberOfFacesElements[NumberOfFacesTypes] = {4,4} ;
+  medGeometryElement FacesTypes[NumberOfFacesTypes] =
+    {
+      MED_TRIA3,MED_QUAD4
+    } ;
+  const int NumberOfFacesElements[NumberOfFacesTypes] =
+    {
+      4,4
+    } ;
 
   myMeshing->setNumberOfTypes(NumberOfFacesTypes,MED_FACE);
   myMeshing->setTypes(FacesTypes,MED_FACE);
@@ -161,22 +177,22 @@ int main (int argc, char ** argv) {
 
   const int sizeTria = 3*4 ;
   int ConnectivityTria[sizeTria]=
-  {
-    1,4,3,
-    1,5,4,
-    1,6,5,
+    {
+      1,4,3,
+      1,5,4,
+      1,6,5,
     1,3,6
   };
-  
+
   myMeshing->setConnectivity(ConnectivityTria,MED_FACE,MED_TRIA3);
 
   int ConnectivityQua[4*4]=
-  {
-    7,8,9,10,
-    11,12,13,14,
-    11,7,8,12,
-    12,8,9,13
-  };
+    {
+      7,8,9,10,
+      11,12,13,14,
+      11,7,8,12,
+      12,8,9,13
+    };
 
   myMeshing->setConnectivity(ConnectivityQua,MED_FACE,MED_QUAD4);
 
@@ -190,37 +206,37 @@ int main (int argc, char ** argv) {
   // Some groups :
 
   // Node :
-  
+
   GROUP *partialGroupOnNodes=new GROUP;
   {
-  partialGroupOnNodes->setName("SomeNodes");
-  partialGroupOnNodes->setMesh(myMeshing);
-  partialGroupOnNodes->setEntity(MED_NODE);
-  partialGroupOnNodes->setNumberOfGeometricType(1);
-  medGeometryElement myTypes[1] = {MED_NONE};
-  partialGroupOnNodes->setGeometricType(myTypes);
-  const int myNumberOfElements[1] = {4} ;
-  partialGroupOnNodes->setNumberOfElements(myNumberOfElements);
-  const int index[1+1] = {1,5} ;
-  const int value[4]= { 1,4,5,7} ;
-  partialGroupOnNodes->setNumber(index,value);
-  }  
+    partialGroupOnNodes->setName("SomeNodes");
+    partialGroupOnNodes->setMesh(myMeshing);
+    partialGroupOnNodes->setEntity(MED_NODE);
+    partialGroupOnNodes->setNumberOfGeometricType(1);
+    medGeometryElement myTypes[1] = {MED_NONE};
+    partialGroupOnNodes->setGeometricType(myTypes);
+    const int myNumberOfElements[1] = {4} ;
+    partialGroupOnNodes->setNumberOfElements(myNumberOfElements);
+    const int index[1+1] = {1,5} ;
+    const int value[4]= { 1,4,5,7} ;
+    partialGroupOnNodes->setNumber(index,value);
+  }
   GROUP *partialGroupOnNodes2=new GROUP;
   {
-  partialGroupOnNodes2->setName("OtherNodes");
-  partialGroupOnNodes2->setMesh(myMeshing);
-  partialGroupOnNodes2->setEntity(MED_NODE);
-  partialGroupOnNodes2->setNumberOfGeometricType(1);
-  medGeometryElement myTypes[1] = {MED_NONE};
-  partialGroupOnNodes2->setGeometricType(myTypes);
-  const int myNumberOfElements[1] = {3} ;
-  partialGroupOnNodes2->setNumberOfElements(myNumberOfElements);
-  const int index[1+1] = {1,4} ;
-  const int value[3]= { 2,3,6} ;
-  partialGroupOnNodes2->setNumber(index,value);
+    partialGroupOnNodes2->setName("OtherNodes");
+    partialGroupOnNodes2->setMesh(myMeshing);
+    partialGroupOnNodes2->setEntity(MED_NODE);
+    partialGroupOnNodes2->setNumberOfGeometricType(1);
+    medGeometryElement myTypes[1] = {MED_NONE};
+    partialGroupOnNodes2->setGeometricType(myTypes);
+    const int myNumberOfElements[1] = {3} ;
+    partialGroupOnNodes2->setNumberOfElements(myNumberOfElements);
+    const int index[1+1] = {1,4} ;
+    const int value[3]= { 2,3,6} ;
+    partialGroupOnNodes2->setNumber(index,value);
   }
   myMeshing->addGroup(*partialGroupOnNodes2);
-  
+
 
   // Cell :
   
@@ -328,10 +344,10 @@ int main (int argc, char ** argv) {
   //                         2 fields on nodes (cells) :
   //                         1 scalar (vector)
 
-  SUPPORT * supportOnNodes = new SUPPORT(myMeshing,"On_All_Nodes",MED_NODE);
+  const SUPPORT * supportOnNodes = myMeshing->getSupportOnAll(MED_NODE);
   int numberOfNodes = supportOnNodes->getNumberOfElements(MED_ALL_ELEMENTS);
 
-  SUPPORT * supportOnCells = new SUPPORT(myMeshing,"On_All_Cells",MED_CELL);
+  const SUPPORT * supportOnCells = myMeshing->getSupportOnAll(MED_CELL);
   myMeshing->removeReference();
   int numberOfCells = supportOnCells->getNumberOfElements(MED_ALL_ELEMENTS);
 
@@ -668,8 +684,6 @@ int main (int argc, char ** argv) {
   fieldDoubleScalarOnPartialFaces->removeReference();
   fieldDoubleVectorOnPartialFaces->removeReference();
  
-  supportOnNodes->removeReference();
-  supportOnCells->removeReference();
   partialGroupOnNodes->removeReference();
   partialGroupOnNodes2->removeReference();
   partialGroupOnCells->removeReference();

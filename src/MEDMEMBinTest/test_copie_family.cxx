@@ -109,25 +109,30 @@ int main (int argc, char ** argv) {
   myMeshDriver.read() ;
   myMeshDriver.close() ;
 
+  if ( myMesh->getNumberOfFamilies(MED_NODE) < 1 )
+    {
+      cerr << "No nodal families in the file" << endl;
+      return 1;
+    }
   const FAMILY * myFamily = myMesh->getFamily(MED_NODE,1);
   //On renseigne les attributs spécifiques à FAMILY (p/r à SUPPORT) et non renseignés lors de la lecture du maillage
-//    int  NumberOfAttribute = 3;
-//    int *AttributeIdentifier = new int[NumberOfAttribute];
-//    int *AttributeValue = new int[NumberOfAttribute];
-//    string *AttributeDescription = new string[NumberOfAttribute];
-//    char *tmp;
-//    for (int i=0;i<NumberOfAttribute;i++)
-//      {
-//        AttributeIdentifier[i]=i+1;
-//        AttributeValue[i]=(i+1)*10;
-//        sprintf(tmp,"Attribut N° %d",i+1);
-//        AttributeDescription[i]=tmp;
-//      }
+  //    int  NumberOfAttribute = 3;
+  //    int *AttributeIdentifier = new int[NumberOfAttribute];
+  //    int *AttributeValue = new int[NumberOfAttribute];
+  //    string *AttributeDescription = new string[NumberOfAttribute];
+  //    char *tmp;
+  //    for (int i=0;i<NumberOfAttribute;i++)
+  //      {
+  //        AttributeIdentifier[i]=i+1;
+  //        AttributeValue[i]=(i+1)*10;
+  //        sprintf(tmp,"Attribut N° %d",i+1);
+  //        AttributeDescription[i]=tmp;
+  //      }
 
-//    myFamily->setNumberOfAttributes(NumberOfAttribute);
-//    myFamily->setAttributesIdentifiers (AttributeIdentifier);
-//    myFamily->setAttributesValues (AttributeValue);
-//    myFamily->setAttributesDescriptions (AttributeDescription);
+  //    myFamily->setNumberOfAttributes(NumberOfAttribute);
+  //    myFamily->setAttributesIdentifiers (AttributeIdentifier);
+  //    myFamily->setAttributesValues (AttributeValue);
+  //    myFamily->setAttributesDescriptions (AttributeDescription);
 
   cout << "Show Family :"<<endl ;
   affiche_famille(myFamily);

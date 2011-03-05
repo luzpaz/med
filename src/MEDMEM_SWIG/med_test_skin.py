@@ -51,8 +51,7 @@ mesh = md.getMesh(mesh_name)
 mesh.read()
 
 print "Building the support on all (8) Cells of the mesh."
-supportCell = SUPPORT(mesh)
-supportCell.update()
+supportCell = mesh.getSupportOnAll(MED_CELL)
 
 print "Getting skin of an all cell support"
 
@@ -63,6 +62,7 @@ if faceNumbers != [2, 3, 6, 8, 10, 11, 12, 13, 16, 17, 19, 20, 22, 23, 24, 27, 2
   raise  RuntimeError, "Wrong skin of an all cell support"
   
 print "Build the support on 1 Cell (#8) of the mesh."
+supportCell = SUPPORT( supportCell )
 supportCell.setAll( 0 )
 nbGeomTypes = 1
 nbTotalEntity = 1

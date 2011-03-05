@@ -22,11 +22,6 @@
 /* Programme de test du constructeur de copies de la classe FIELD_ de MEDMEM
    jroy - 12/12/2002 */
 
-#include<string>
-
-#include <math.h>
-#include <stdlib.h>
-
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Family.hxx"
@@ -38,6 +33,12 @@
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
 
+#include<string>
+
+#include <math.h>
+#include <stdlib.h>
+
+
 using namespace MEDMEM;
 using namespace MED_EN;
 
@@ -47,12 +48,13 @@ void affiche_field(FIELD_ * myField, const SUPPORT * mySupport)
   cout << "Field "<< myField->getName() << " : " <<myField->getDescription() <<  endl ;
   int NumberOfComponents = myField->getNumberOfComponents() ;
   cout << "- Nombre de composantes : "<< NumberOfComponents << endl ;
-  for (int i=1; i<NumberOfComponents+1; i++) {
-    cout << "  - composante "<<i<<" :"<<endl ;
-    cout << "      - nom         : "<<myField->getComponentName(i)<< endl;
-    cout << "      - description : "<<myField->getComponentDescription(i) << endl;
-    cout << "      - units       : "<<myField->getMEDComponentUnit(i) << endl;
-  }
+  for (int i=1; i<NumberOfComponents+1; i++)
+    {
+      cout << "  - composante "<<i<<" :"<<endl ;
+      cout << "      - nom         : "<<myField->getComponentName(i)<< endl;
+      cout << "      - description : "<<myField->getComponentDescription(i) << endl;
+      cout << "      - units       : "<<myField->getMEDComponentUnit(i) << endl;
+    }
   cout << "- iteration :" << endl ;
   cout << "    - numero : " << myField->getIterationNumber()<< endl  ;
   cout << "    - ordre  : " << myField->getOrderNumber()<< endl  ;
@@ -60,48 +62,33 @@ void affiche_field(FIELD_ * myField, const SUPPORT * mySupport)
 
   cout << "- Type : " << myField->getValueType()<< endl;
   /*
-  cout << "- Valeurs :"<<endl;
-  int NumberOf = mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
+    cout << "- Valeurs :"<<endl;
+    int NumberOf = mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
 
-  for (int i=1; i<NumberOf+1; i++) {
+    for (int i=1; i<NumberOf+1; i++) {
     double * value = myField->getValueI(MED_FULL_INTERLACE,i) ;
     for (int j=0; j<NumberOfComponents; j++)
-      cout << value[j]<< " ";
+    cout << value[j]<< " ";
     cout<<endl;
-  }
+    }
   */
   cout << "- Adresse support : " << mySupport << endl;
 }
 
 
-int main (int argc, char ** argv) {
-  // int read; !! UNUSED VARIABLE !!
-
-  if ((argc !=3) && (argc != 4)) {
-    cerr << "Usage : " << argv[0] 
-         << " filename meshname fieldname" << endl << endl;
-    exit(-1);
-  }
+int main (int argc, char ** argv)
+{
+  if ((argc !=3) && (argc != 4))
+    {
+      cerr << "Usage : " << argv[0] 
+           << " filename meshname fieldname" << endl << endl;
+      exit(-1);
+    }
 
   string filename = argv[1] ;
   string meshname = argv[2] ;
 
-  //  MESH * myMesh= new MESH(MED_DRIVER,filename,meshname) ;
-  MESH * myMesh= new MESH ;
-  myMesh->setName(meshname);
-  MED_MESH_RDONLY_DRIVER myMeshDriver(filename,myMesh) ;
-  myMeshDriver.setMeshName(meshname);
-  myMeshDriver.open() ;
-  myMeshDriver.read() ;
-  myMeshDriver.close() ;
-
-  //    int drv = myMesh->addDriver(MED_DRIVER,"sortie.med",meshname);
-  //    myMesh->write(drv); 
-
-
-  
-
-  // if (argc < 4) return 0;
+  MESH * myMesh= new MESH(MED_DRIVER,filename,meshname) ;
 
   // read field :
 
@@ -111,8 +98,7 @@ int main (int argc, char ** argv) {
   string fieldname = argv[3];
 
 
-  //  SUPPORT * mySupport = new SUPPORT(myMesh,"On_all_node",MED_NODE);
-  SUPPORT * mySupport = new SUPPORT(myMesh,"On_all_cell",MED_EN::MED_CELL);
+  const SUPPORT * mySupport = myMesh->getSupportOnAll(MED_EN::MED_CELL);
   FIELD<double> * myField = new FIELD<double>() ;
 
   myField->setName(fieldname);
@@ -121,21 +107,26 @@ int main (int argc, char ** argv) {
   myFieldDriver.setFieldName(fieldname);
   myFieldDriver.open() ;
 
-  try {
-    myFieldDriver.read() ;
-  } catch (...) {
-    myField->setSupport(0);
-    mySupport->removeReference();
-    mySupport = new SUPPORT(myMesh,"On_all_node",MED_EN::MED_NODE);
-    myField->setSupport(mySupport);
-    try {
+  try
+    {
       myFieldDriver.read() ;
-    } catch (...) {
-      cout << "Field " << fieldname << " not found !!!" << endl ;
-      exit (-1) ;
     }
-  }
-  
+  catch (...)
+    {
+      myField->setSupport(0);
+      mySupport = myMesh->getSupportOnAll(MED_EN::MED_NODE);
+      myField->setSupport(mySupport);
+      try
+        {
+          myFieldDriver.read() ;
+        }
+      catch (...)
+        {
+          cout << "Field " << fieldname << " not found !!!" << endl ;
+          exit (-1) ;
+        }
+    }
+
   myFieldDriver.close() ;
 
   FIELD_ * pt_field_ = myField;
@@ -143,10 +134,8 @@ int main (int argc, char ** argv) {
   FIELD_ * pt_field_2 = new FIELD_(* pt_field_);
   myField->removeReference();
   affiche_field(pt_field_2, pt_field_2->getSupport());
-  
-  pt_field_2->removeReference();
 
-  mySupport->removeReference() ;
+  pt_field_2->removeReference();
   myMesh->removeReference() ;
 
   return 0;

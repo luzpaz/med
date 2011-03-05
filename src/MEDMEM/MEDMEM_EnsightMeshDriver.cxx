@@ -300,22 +300,30 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
 
     if ( isToWriteEntity( MED_CELL, _ptrMesh ))
     {
-      SUPPORT *allCells=new SUPPORT(_ptrMesh, getMeshName(), MED_CELL );
-      (this->*writePart)( ensightGeomFile, allCells );
-      allCells->removeReference();
+      SUPPORT *allCells = const_cast<SUPPORT*>( _ptrMesh->getSupportOnAll( MED_CELL ));
+      string oldName = allCells->getName();
+      allCells->setName( _ptrMesh->getName() );
+      try
+      {
+        (this->*writePart)( ensightGeomFile, allCells );
+      }
+      catch (MED_EXCEPTION& ex)
+      {
+        allCells->setName( oldName );
+        throw ex;
+      }
+      allCells->setName( oldName );
     }
     // And meshdim-1 connectivity
     if ( isToWriteEntity( MED_FACE, _ptrMesh ))
     {
-      SUPPORT *allFaces=new SUPPORT(_ptrMesh, string("SupportOnAll_")+entNames[MED_FACE], MED_FACE );
+      const SUPPORT *allFaces = _ptrMesh->getSupportOnAll( MED_FACE );
       (this->*writePart)( ensightGeomFile, allFaces);
-      allFaces->removeReference();
     }
     else if ( isToWriteEntity(MED_EDGE, _ptrMesh))
     {
-      SUPPORT *allEdges=new SUPPORT(_ptrMesh, string("SupportOnAll_")+entNames[MED_EDGE], MED_EDGE );
+      const SUPPORT *allEdges = _ptrMesh->getSupportOnAll( MED_EDGE );
       (this->*writePart)( ensightGeomFile, allEdges);
-      allEdges->removeReference();
     }
 
     // Write all groups as parts
@@ -381,22 +389,30 @@ void ENSIGHT_MESH_WRONLY_DRIVER::write() const throw (MEDEXCEPTION)
 
     if ( isToWriteEntity( MED_CELL, _ptrMesh ))
     {
-      SUPPORT *allCells=new SUPPORT(_ptrMesh, getMeshName(), MED_CELL );
-      (this->*writePart)( ensightGeomFile, allCells );
-      allCells->removeReference();
+      SUPPORT *allCells = const_cast<SUPPORT*>( _ptrMesh->getSupportOnAll( MED_CELL ));
+      string oldName = allCells->getName();
+      allCells->setName( _ptrMesh->getName() );
+      try
+      {
+        (this->*writePart)( ensightGeomFile, allCells );
+      }
+      catch (MED_EXCEPTION& ex)
+      {
+        allCells->setName( oldName );
+        throw ex;
+      }
+      allCells->setName( oldName );
     }
     // And meshdim-1 connectivity
     if ( isToWriteEntity( MED_FACE, _ptrMesh ))
     {
-      SUPPORT *allFaces=new SUPPORT(_ptrMesh, string("SupportOnAll_")+entNames[MED_FACE], MED_FACE );
+      const SUPPORT *allFaces = _ptrMesh->getSupportOnAll( MED_FACE );
       (this->*writePart)( ensightGeomFile, allFaces);
-      allFaces->removeReference();
     }
     else if ( isToWriteEntity(MED_EDGE, _ptrMesh))
     {
-      SUPPORT *allEdges=new SUPPORT(_ptrMesh, string("SupportOnAll_")+entNames[MED_EDGE], MED_EDGE );
+      const SUPPORT *allEdges = _ptrMesh->getSupportOnAll( MED_EDGE );
       (this->*writePart)( ensightGeomFile, allEdges);
-      allEdges->removeReference();
     }
 
     // Write all groups as parts

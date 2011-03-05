@@ -18,13 +18,13 @@
 //
 
 #include "MEDMEMTest.hxx"
-#include <cppunit/TestAssert.h>
 
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_STRING.hxx"
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"
 
+#include <cppunit/TestAssert.h>
 #include <sstream>
 #include <cmath>
 
@@ -41,7 +41,8 @@ using namespace MEDMEM;
 
 /*!
  *  Check methods (48), defined in MEDMEM_Support.hxx:
- *  class SUPPORT : public RCBASE {
+ *  class SUPPORT : public RCBASE 
+{
  *   (+)     SUPPORT();
  *   (+)     SUPPORT(MESH* Mesh, string Name="", MED_EN::medEntityMesh Entity=MED_EN::MED_CELL);
  *   (+)     SUPPORT(const SUPPORT & m);
@@ -119,21 +120,11 @@ using namespace MEDMEM;
  *
  *   (reference counter presently disconnected in C++) virtual void addReference() const;
  *   (reference counter presently disconnected in C++) virtual void removeReference() const;
- *  }
+ *  
+}
  */
-void MEDMEMTest::testSupport()
+ void MEDMEMTest::testSupport()
 {
-  // cells connectivities
-  //const int NumberOfCellTypes = 3;
-  //MED_EN::medGeometryElement CellTypes[NumberOfCellTypes] =
-  //  {MED_EN::MED_TETRA4, MED_EN::MED_PYRA5, MED_EN::MED_HEXA8};
-  //const int NumberOfCells[NumberOfCellTypes] = {12, 2, 2};
-
-  // faces connectivities
-  //const int NumberOfFaceTypes = 2;
-  //MED_EN::medGeometryElement FaceTypes[NumberOfFaceTypes] = {MED_EN::MED_TRIA3, MED_EN::MED_QUAD4};
-  //const int NumberOfFaces[NumberOfFaceTypes] = {4, 4};
-
   MESH * aMesh = MEDMEMTest_createTestMesh();
   MESH * aMeshOneMore = MEDMEMTest_createTestMesh();
 
@@ -141,13 +132,26 @@ void MEDMEMTest::testSupport()
   // TEST 1 //
   ////////////
 
-  SUPPORT *aSupportOnFaces1=new SUPPORT (aMesh, "Support On Faces 1", MED_EN::MED_FACE);
-  SUPPORT *aSupportOnCells1=new SUPPORT (aMesh, "Support On Cells 1"/*, MED_EN::MED_CELL*/);
+  SUPPORT *aSupportOnFaces1 = new SUPPORT;
+  aSupportOnFaces1->setMesh( aMesh );
+  aSupportOnFaces1->setEntity( MED_EN::MED_FACE );
+  aSupportOnFaces1->setAll( true );
+  aSupportOnFaces1->update();
+
+  SUPPORT *aSupportOnCells1 = new SUPPORT;
+  aSupportOnCells1->setMesh( aMesh );
+  aSupportOnCells1->setAll( true );
+  aSupportOnCells1->update();
 
   SUPPORT *aSupportOnFaces2=new SUPPORT;
   SUPPORT *aSupportOnCells2=new SUPPORT;
 
-  SUPPORT *aSupportOnFaces3=new SUPPORT (aMeshOneMore, "Support On Faces 3", MED_EN::MED_FACE);
+  SUPPORT *aSupportOnFaces3 = new SUPPORT;
+  aSupportOnFaces3->setMesh( aMeshOneMore );
+  aSupportOnFaces3->setName( "Support On Faces 3" );
+  aSupportOnFaces3->setEntity( MED_EN::MED_FACE );
+  aSupportOnFaces3->setAll( true );
+  aSupportOnFaces3->update();
   // entity
   CPPUNIT_ASSERT_EQUAL(MED_EN::MED_FACE, aSupportOnFaces1->getEntity());
   CPPUNIT_ASSERT_EQUAL(MED_EN::MED_CELL, aSupportOnCells1->getEntity());
@@ -188,6 +192,28 @@ void MEDMEMTest::testSupport()
   CPPUNIT_ASSERT(aSupportOnFaces2->getMesh() == aMesh);
   CPPUNIT_ASSERT(aSupportOnCells1->getMesh() == NULL);
   CPPUNIT_ASSERT(aSupportOnCells2->getMesh() == NULL);
+
+  // _number
+  {
+    int iElem = 1, nbTypes = aSupportOnFaces1->getNumberOfTypes();
+    const MED_EN::medGeometryElement* types = aSupportOnFaces1->getTypes();
+    for ( int iType = 0; iType < nbTypes; ++iType )
+      {
+        const int nb = aSupportOnFaces1->getNumberOfElements( types[iType] );
+        const int* nums = aSupportOnFaces1->getNumber       ( types[iType] );
+        for ( int i = 0; i < nb; ++i )
+          CPPUNIT_ASSERT_EQUAL( iElem++, nums[i] );
+      }
+    iElem = 1, nbTypes = aSupportOnCells1->getNumberOfTypes();
+    types = aSupportOnCells1->getTypes();
+    for ( int iType = 0; iType < nbTypes; ++iType )
+      {
+        const int nb = aSupportOnCells1->getNumberOfElements( types[iType] );
+        const int* nums = aSupportOnCells1->getNumber       ( types[iType] );
+        for ( int i = 0; i < nb; ++i )
+          CPPUNIT_ASSERT_EQUAL( iElem++, nums[i] );
+      }
+  }
 
   // operator ==
   aSupportOnFaces2->setName("Support On Faces 2");
@@ -251,13 +277,14 @@ void MEDMEMTest::testSupport()
   CPPUNIT_ASSERT_EQUAL(3, aSupportOnCells1->getNumberOfTypes());
   CPPUNIT_ASSERT(aSupportOnCells1->getTypes() != NULL);
 
-  //const int * nbEltsSC_old = aSupportOnCells1->getNumberOfElements(); // {12, 2, 2}
-
   aSupportOnCells1->setNumberOfGeometricType(0);
   CPPUNIT_ASSERT_EQUAL(0, aSupportOnCells1->getNumberOfTypes());
   CPPUNIT_ASSERT(aSupportOnCells1->getTypes() == NULL);
 
-  MED_EN::medGeometryElement aSCTypes[2] = {MED_EN::MED_PYRA5, MED_EN::MED_PENTA15};
+  MED_EN::medGeometryElement aSCTypes[2] = 
+    {
+      MED_EN::MED_PYRA5, MED_EN::MED_PENTA15
+    };
   aSupportOnCells1->setNumberOfGeometricType(2);
   aSupportOnCells1->setGeometricType(aSCTypes);
 
@@ -265,7 +292,10 @@ void MEDMEMTest::testSupport()
   CPPUNIT_ASSERT(aSupportOnCells1->getTypes() != NULL);
   CPPUNIT_ASSERT(aSupportOnCells1->getNumberOfElements() == NULL); // reset by setNumberOfGeometricType
 
-  int nbEltsSC[2] = {2, 1};
+  int nbEltsSC[2] = 
+    {
+      2, 1
+    };
   aSupportOnCells1->setNumberOfElements(nbEltsSC);
 
   const int * nbEltsSCBack = aSupportOnCells1->getNumberOfElements();
@@ -280,8 +310,14 @@ void MEDMEMTest::testSupport()
   CPPUNIT_ASSERT_THROW(aSupportOnCells1->getNumberOfElements(MED_EN::MED_HEXA8), MEDEXCEPTION);
 
   //_number= new MEDSKYLINEARRAY(_numberOfGeometricType,_totalNumberOfElements,index,value,shallowCopy);
-  int indexSC[3] = {1,3,4}; // length = nb.types + 1
-  int valueSC[3] = {21,22,47}; // length = total nb. of elements
+  int indexSC[3] = 
+    {
+      1,3,4
+    }; // length = nb.types + 1
+  int valueSC[3] = 
+    {
+      21,22,47
+    }; // length = total nb. of elements
   aSupportOnCells1->setNumber(indexSC, valueSC);
 
   // check number
@@ -394,9 +430,8 @@ void MEDMEMTest::testSupport()
   for (int i=0; i<12;i++)
     CPPUNIT_ASSERT(conn[i]>0 && conn[i]<=nbnodes);
   meshFromSupport->removeReference();
-  SUPPORT *nodal_support=new SUPPORT (aSupportOnFaces1->getMesh(), "nodal_support", MED_EN::MED_NODE);
+  const SUPPORT *nodal_support=aSupportOnFaces1->getMesh()->getSupportOnAll( MED_EN::MED_NODE );
   CPPUNIT_ASSERT_THROW(nodal_support->makeMesh(), MEDEXCEPTION);
-  nodal_support->removeReference();
   //checking makeMesh() on polygonal support
   {
     // "poly3D" mesh contains:
@@ -418,7 +453,7 @@ void MEDMEMTest::testSupport()
       CPPUNIT_FAIL("Nb of faces in mesh from 'poly3D.med' resource file != 17");
 
     // support on 3 cells and the mesh made from it
-    SUPPORT *poly_supp=new SUPPORT( poly_mesh, "poly_supp");
+    const SUPPORT *poly_supp=poly_mesh->getSupportOnAll( MED_CELL );
     MESH *poly_supp_mesh=poly_supp->makeMesh();
     CPPUNIT_ASSERT_EQUAL(3,poly_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,
                                                                        MED_EN::MED_ALL_ELEMENTS));
@@ -438,9 +473,8 @@ void MEDMEMTest::testSupport()
     for (int i=0; i<con_len;i++)
       CPPUNIT_ASSERT(conn[i]>0 && conn[i]<=nbnodes);
     poly_supp_mesh->removeReference();
-    poly_supp->removeReference();
     // support on 17 faces and the mesh made from it
-    SUPPORT *polygon_supp=new SUPPORT( poly_mesh, "polygon_supp", MED_EN::MED_FACE);
+    SUPPORT *polygon_supp= new SUPPORT( *poly_mesh->getSupportOnAll( MED_EN::MED_FACE ));
     poly_mesh->removeReference();
     MESH *polygon_supp_mesh=polygon_supp->makeMesh();
     CPPUNIT_ASSERT_EQUAL(17,polygon_supp_mesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,
@@ -466,9 +500,18 @@ void MEDMEMTest::testSupport()
     // make polygon_supp patrial: make it contain 4 QUAD4 and 2 POLYGON
     const int nb_types = 2;
     const int nb_elems = 4 + 2;
-    int index[nb_types+1] = { 1, 1+4, 1+4+2 };
-    int elems[nb_elems] = { 8, 10, 11, 13,  16, 17 };
-    MED_EN::medGeometryElement types[nb_types] = { MED_EN::MED_QUAD4, MED_EN::MED_POLYGON };
+    int index[nb_types+1] = 
+      {
+        1, 1+4, 1+4+2 
+      };
+    int elems[nb_elems] = 
+      {
+        8, 10, 11, 13,  16, 17 
+      };
+    MED_EN::medGeometryElement types[nb_types] = 
+      {
+        MED_EN::MED_QUAD4, MED_EN::MED_POLYGON 
+      };
     MEDSKYLINEARRAY* array = new MEDSKYLINEARRAY(nb_types, nb_elems, index, elems);
     polygon_supp->setNumberOfGeometricType( nb_types );
     polygon_supp->setGeometricType( types );
@@ -476,7 +519,10 @@ void MEDMEMTest::testSupport()
 
     // 0020912: [CEA 414] setPartial and polygons/polyhedra
     // do the same but using another version of setpartial()
-    const int nb_of_elems[nb_types] = { 4, 2 };
+    const int nb_of_elems[nb_types] = 
+      {
+        4, 2 
+      };
     polygon_supp->setpartial("issue 0020912",nb_types, nb_elems, types, nb_of_elems, elems);
 
     // make mesh from partial support containing polygons
@@ -491,8 +537,11 @@ void MEDMEMTest::testSupport()
     int spaceDimension = partial_supp_mesh->getSpaceDimension();
     int meshDimension = partial_supp_mesh->getMeshDimension();
     const double *coords = partial_supp_mesh->getCoordinates(MED_FULL_INTERLACE);
-    const double coordsExpected[45]={3., 2., 2., 3., 2., 0., 4., 1., 0., 4., 1., 2., 0., 1., 2., 2., 0., 2., 2., 0., 0., 0.,
-                                     1., 0., 1., 2., 2., 1., 2., 0., 7., 2., 2., 5., 3., 2., 6., 3., 0., 7., 2., 0., 6., 0., 2.};
+    const double coordsExpected[45]=
+      {
+        3., 2., 2., 3., 2., 0., 4., 1., 0., 4., 1., 2., 0., 1., 2., 2., 0., 2., 2., 0., 0., 0.,
+        1., 0., 1., 2., 2., 1., 2., 0., 7., 2., 2., 5., 3., 2., 6., 3., 0., 7., 2., 0., 6., 0., 2.
+      };
     CPPUNIT_ASSERT_EQUAL(3,spaceDimension);
     CPPUNIT_ASSERT_EQUAL(2,meshDimension);
     CPPUNIT_ASSERT_EQUAL(15,nbnodes);
@@ -501,31 +550,38 @@ void MEDMEMTest::testSupport()
     conn=partial_supp_mesh->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_EN::MED_NODAL,
                                             MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
     con_len = 4 * MED_EN::MED_QUAD4 % 100;
-    int connExpected[16]={1, 2, 3, 4, 5, 6, 7, 8, 9, 5, 8, 10, 11, 12, 13, 14};
+    int connExpected[16]=
+      {
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 5, 8, 10, 11, 12, 13, 14
+      };
     for (int i=0; i<con_len;i++)
       CPPUNIT_ASSERT_EQUAL(connExpected[i],conn[i]);
 
     conn = partial_supp_mesh->getPolygonsConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL);
     con_len = partial_supp_mesh->getPolygonsConnectivityLength(MED_EN::MED_NODAL,MED_EN::MED_CELL);
-    int connExpectedP[10]={7, 3, 2, 10, 8, 12, 11, 15, 4, 1};
+    int connExpectedP[10]=
+      {
+        7, 3, 2, 10, 8, 12, 11, 15, 4, 1
+      };
     for (int i=0; i<con_len;i++)
       CPPUNIT_ASSERT_EQUAL(connExpectedP[i],conn[i]);
     partial_supp_mesh->removeReference();
   }
-    
-        
+
+
   // check number
-  CPPUNIT_ASSERT_THROW(aSupportOnFaces1->getNumberIndex(), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aSupportOnFaces1->getNumber(MED_EN::MED_TRIA3), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aSupportOnFaces1->getNumber(MED_EN::MED_QUAD4), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aSupportOnFaces1->getNumber(MED_EN::MED_ALL_ELEMENTS), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aSupportOnFaces1->getnumber(), MEDEXCEPTION);
+  CPPUNIT_ASSERT_NO_THROW(aSupportOnFaces1->getNumberIndex());
+  CPPUNIT_ASSERT_NO_THROW(aSupportOnFaces1->getNumber(MED_EN::MED_TRIA3));
+  CPPUNIT_ASSERT_NO_THROW(aSupportOnFaces1->getNumber(MED_EN::MED_QUAD4));
+  CPPUNIT_ASSERT_NO_THROW(aSupportOnFaces1->getNumber(MED_EN::MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_NO_THROW(aSupportOnFaces1->getnumber());
 
   // getValIndFromGlobalNumber
   CPPUNIT_ASSERT_EQUAL(8, aMesh->getNumberOfElements(MED_EN::MED_FACE, MED_EN::MED_ALL_ELEMENTS));
-  for (int i = 1; i <= 8; i++) {
-    CPPUNIT_ASSERT_EQUAL(i, aSupportOnFaces1->getValIndFromGlobalNumber(i));
-  }
+  for (int i = 1; i <= 8; i++) 
+    {
+      CPPUNIT_ASSERT_EQUAL(i, aSupportOnFaces1->getValIndFromGlobalNumber(i));
+    }
 
   //#ifdef ENABLE_FORCED_FAILURES
   // Why methods setNumber do not throw exception in case "isOnAllElements == true",
@@ -550,73 +606,78 @@ void MEDMEMTest::testSupport()
   CPPUNIT_ASSERT_EQUAL(0, aSupportOnCells1->getNumberOfTypes());
   CPPUNIT_ASSERT_THROW(aSupportOnCells1->getnumber(), MEDEXCEPTION);
   aSupportOnCells1->removeReference();
-  
+
   /////////////////////////////////////
   // test SUPPORT* buildSupportOnNode()
   /////////////////////////////////////
 
   for (medEntityMesh entity = 0; entity < MED_ALL_ENTITIES; ++entity )
-  {
-    if ( entity != MED_NODE && !aMesh->existConnectivity( MED_NODAL, entity ))
-      continue;
-    // buildSupportOnNode() from full entity support
-    SUPPORT *allEntitySupport=new SUPPORT(aMesh,"allEntitySupport",entity);
-    SUPPORT *testSupport=allEntitySupport->buildSupportOnNode();
-    CPPUNIT_ASSERT(testSupport->isOnAllElements());
-    CPPUNIT_ASSERT_EQUAL(1,testSupport->getNumberOfTypes());
-    CPPUNIT_ASSERT_EQUAL(19,testSupport->getNumberOfElements(MED_ALL_ELEMENTS));
-
-    // buildSupportOnNode() from partial support
-    SUPPORT *partialSupport=new SUPPORT(*allEntitySupport);
-    partialSupport->setAll( false );
-    partialSupport->setNumberOfGeometricType( 1 );
-    partialSupport->setGeometricType( allEntitySupport->getTypes() );
-    allEntitySupport->removeReference();
-
-    // no element numbers set
-    CPPUNIT_ASSERT_THROW(partialSupport->buildSupportOnNode(), MEDEXCEPTION);
-
-    int index[] = {1,2};
-    int numbers[] = {1};
-    partialSupport->setNumberOfElements(numbers);
-    partialSupport->setNumber( index, numbers );
-
-    // mesh not set
-    partialSupport->setMesh(0);
-    CPPUNIT_ASSERT_THROW(partialSupport->buildSupportOnNode(), MEDEXCEPTION);
-    partialSupport->setMesh(aMesh);
-
-    testSupport->removeReference();
-    testSupport =( partialSupport->buildSupportOnNode() );
-    partialSupport->removeReference();
-    CPPUNIT_ASSERT(!testSupport->isOnAllElements());
-    CPPUNIT_ASSERT_EQUAL(1,testSupport->getNumberOfTypes());
-    int nbNodes = testSupport->getNumberOfElements(MED_ALL_ELEMENTS);
-    if ( entity == MED_NODE )
-      CPPUNIT_ASSERT_EQUAL(1, nbNodes);
-    else
-      CPPUNIT_ASSERT_EQUAL(aMesh->getCellsTypes(entity)[0].getNumberOfNodes(), nbNodes);
-    const int * nodes = testSupport->getNumber( MED_ALL_ELEMENTS );
-    switch ( entity )
     {
-    case MED_CELL:
-      CPPUNIT_ASSERT_EQUAL(1,nodes[0]);
-      CPPUNIT_ASSERT_EQUAL(2,nodes[1]);
-      CPPUNIT_ASSERT_EQUAL(3,nodes[2]);
-      CPPUNIT_ASSERT_EQUAL(6,nodes[3]);
-      break;
-    case MED_FACE:
-      CPPUNIT_ASSERT_EQUAL(1,nodes[0]);
-      CPPUNIT_ASSERT_EQUAL(3,nodes[1]);
-      CPPUNIT_ASSERT_EQUAL(4,nodes[2]);
-      break;
-    case MED_NODE:
-      CPPUNIT_ASSERT_EQUAL(1,nodes[0]);
-      break;
-    default:;
+      if ( entity != MED_NODE && !aMesh->existConnectivity( MED_NODAL, entity ))
+        continue;
+      // buildSupportOnNode() from full entity support
+      const SUPPORT *allEntitySupport=aMesh->getSupportOnAll( entity );
+      SUPPORT *testSupport=allEntitySupport->buildSupportOnNode();
+      CPPUNIT_ASSERT(testSupport->isOnAllElements());
+      CPPUNIT_ASSERT_EQUAL(1,testSupport->getNumberOfTypes());
+      CPPUNIT_ASSERT_EQUAL(19,testSupport->getNumberOfElements(MED_ALL_ELEMENTS));
+
+      // buildSupportOnNode() from partial support
+      SUPPORT *partialSupport=new SUPPORT(*allEntitySupport);
+      partialSupport->setAll( false );
+      partialSupport->setNumberOfGeometricType( 1 );
+      partialSupport->setGeometricType( allEntitySupport->getTypes() );
+
+      // no element numbers set
+      CPPUNIT_ASSERT_THROW(partialSupport->buildSupportOnNode(), MEDEXCEPTION);
+
+      int index[] = 
+        {
+          1,2
+        };
+      int numbers[] = 
+        {
+          1
+        };
+      partialSupport->setNumberOfElements(numbers);
+      partialSupport->setNumber( index, numbers );
+
+      // mesh not set
+      partialSupport->setMesh(0);
+      CPPUNIT_ASSERT_THROW(partialSupport->buildSupportOnNode(), MEDEXCEPTION);
+      partialSupport->setMesh(aMesh);
+
+      testSupport->removeReference();
+      testSupport =( partialSupport->buildSupportOnNode() );
+      partialSupport->removeReference();
+      CPPUNIT_ASSERT(!testSupport->isOnAllElements());
+      CPPUNIT_ASSERT_EQUAL(1,testSupport->getNumberOfTypes());
+      int nbNodes = testSupport->getNumberOfElements(MED_ALL_ELEMENTS);
+      if ( entity == MED_NODE )
+        CPPUNIT_ASSERT_EQUAL(1, nbNodes);
+      else
+        CPPUNIT_ASSERT_EQUAL(aMesh->getCellsTypes(entity)[0].getNumberOfNodes(), nbNodes);
+      const int * nodes = testSupport->getNumber( MED_ALL_ELEMENTS );
+      switch ( entity )
+        {
+        case MED_CELL:
+          CPPUNIT_ASSERT_EQUAL(1,nodes[0]);
+          CPPUNIT_ASSERT_EQUAL(2,nodes[1]);
+          CPPUNIT_ASSERT_EQUAL(3,nodes[2]);
+          CPPUNIT_ASSERT_EQUAL(6,nodes[3]);
+          break;
+        case MED_FACE:
+          CPPUNIT_ASSERT_EQUAL(1,nodes[0]);
+          CPPUNIT_ASSERT_EQUAL(3,nodes[1]);
+          CPPUNIT_ASSERT_EQUAL(4,nodes[2]);
+          break;
+        case MED_NODE:
+          CPPUNIT_ASSERT_EQUAL(1,nodes[0]);
+          break;
+        default:;
+        }
+      testSupport->removeReference();
     }
-    testSupport->removeReference();
-  }
 
   ////////////
   // TEST 2 //
@@ -636,9 +697,15 @@ void MEDMEMTest::testSupport()
   nodes27.push_back(2);
   nodes27.push_back(7);
 
-  SUPPORT *aNodes137=new SUPPORT (aMesh, "Support On Nodes 1,3,7", MED_EN::MED_CELL);
-  SUPPORT *aNodes248=new SUPPORT (aMesh, "Support On Nodes 2,4,8", MED_EN::MED_CELL);
-  SUPPORT *aNodes27=new SUPPORT  (aMesh, "Support On Nodes 2,7"  , MED_EN::MED_CELL);
+  SUPPORT *aNodes137 = new SUPPORT;
+  SUPPORT *aNodes248 = new SUPPORT;
+  SUPPORT *aNodes27 = new SUPPORT;
+  aNodes137->setMesh( aMesh );
+  aNodes248->setMesh( aMesh );
+  aNodes27->setMesh( aMesh );
+  aNodes137->setName( "Support On Nodes 1,3,7" );
+  aNodes248->setName( "Support On Nodes 2,4,8" );
+  aNodes27->setName( "Support On Nodes 2,7" );
 
   aNodes137->fillFromNodeList(nodes137);
   aNodes248->fillFromNodeList(nodes248);
@@ -649,10 +716,11 @@ void MEDMEMTest::testSupport()
 
   list<int>::const_iterator iter137 = nodes137.begin();
   list<int>::const_iterator iter248 = nodes248.begin();
-  for (int i = 1; i <= 3; i++, iter137++, iter248++) {
-    CPPUNIT_ASSERT_EQUAL(i, aNodes137->getValIndFromGlobalNumber(*iter137));
-    CPPUNIT_ASSERT_EQUAL(i, aNodes248->getValIndFromGlobalNumber(*iter248));
-  }
+  for (int i = 1; i <= 3; i++, iter137++, iter248++) 
+    {
+      CPPUNIT_ASSERT_EQUAL(i, aNodes137->getValIndFromGlobalNumber(*iter137));
+      CPPUNIT_ASSERT_EQUAL(i, aNodes248->getValIndFromGlobalNumber(*iter248));
+    }
 
   ////////////
 
@@ -666,8 +734,14 @@ void MEDMEMTest::testSupport()
   faces135.push_back(3);
   faces135.push_back(5);
 
-  SUPPORT *aFaces123=new SUPPORT (aMesh, "Support On Faces 1,2,3", MED_EN::MED_FACE);
-  SUPPORT *aFaces135=new SUPPORT (aMesh, "Support On Faces 1,3,5", MED_EN::MED_FACE);
+  SUPPORT *aFaces123 = new SUPPORT;
+  aFaces123->setMesh( aMesh );
+  aFaces123->setName( "Support On Faces 1,2,3" );
+  aFaces123->setEntity( MED_EN::MED_FACE );
+  SUPPORT *aFaces135 = new SUPPORT;
+  aFaces135->setMesh( aMesh );
+  aFaces135->setName( "Support On Faces 1,3,5" );
+  aFaces135->setEntity( MED_EN::MED_FACE );
 
   aFaces123->fillFromElementList(faces123);
   aFaces135->fillFromElementList(faces135);
@@ -677,10 +751,11 @@ void MEDMEMTest::testSupport()
 
   list<int>::const_iterator iter123 = faces123.begin();
   list<int>::const_iterator iter135 = faces135.begin();
-  for (int i = 1; i <= 3; i++, iter123++, iter135++) {
-    CPPUNIT_ASSERT_EQUAL(i, aFaces123->getValIndFromGlobalNumber(*iter123));
-    CPPUNIT_ASSERT_EQUAL(i, aFaces135->getValIndFromGlobalNumber(*iter135));
-  }
+  for (int i = 1; i <= 3; i++, iter123++, iter135++) 
+    {
+      CPPUNIT_ASSERT_EQUAL(i, aFaces123->getValIndFromGlobalNumber(*iter123));
+      CPPUNIT_ASSERT_EQUAL(i, aFaces135->getValIndFromGlobalNumber(*iter135));
+    }
 
   // substract
   SUPPORT * aFaces2 = aFaces123->substract(*aFaces135); // => 2
@@ -747,7 +822,9 @@ void MEDMEMTest::testSupport()
   //aNodes_137->intersecting(&aNodes248); // => 2,4,8
   //CPPUNIT_ASSERT_EQUAL(3, aNodes_137->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
   //CPPUNIT_ASSERT_EQUAL(*aNodes_137, aNodes248);
-  aNodes137->intersecting(aNodes248); // => {}
+  aNodes137->intersecting(aNodes248); // => 
+  {
+  }
   CPPUNIT_ASSERT_EQUAL(0, aNodes137->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
   aNodes137->removeReference();
   // blending
@@ -801,23 +878,48 @@ void MEDMEMTest::testSupport()
   // TEST 3 //
   ////////////
 
-  SUPPORT *aPartialCells=new SUPPORT (aMesh, "Support On Cells 2,3,4", MED_EN::MED_CELL);
-  SUPPORT *aPartialNodes=new SUPPORT (aMesh, "Support On Nodes 2,3,4", MED_EN::MED_NODE);
+  SUPPORT *aPartialCells = new SUPPORT;
+  aPartialCells->setMesh( aMesh );
+  aPartialCells->setName( "Support On Cells 2,3,4" );
+  aPartialCells->setEntity( MED_EN::MED_CELL );
+
+  SUPPORT *aPartialNodes = new SUPPORT;
+  aPartialNodes->setMesh( aMesh );
+  aPartialNodes->setName( "Support On Nodes 2,3,4" );
+  aPartialNodes->setEntity( MED_EN::MED_NODE );
 
   // setpartial
-  MED_EN::medGeometryElement gtCells[1] = {MED_EN::MED_TETRA4};
-  int nbCells[1] = {3};
-  int cells[3] = {2,3,4};
+  MED_EN::medGeometryElement gtCells[1] = 
+    {
+      MED_EN::MED_TETRA4
+    };
+  int nbCells[1] = 
+    {
+      3
+    };
+  int cells[3] = 
+    {
+      2,3,4
+    };
   aPartialCells->setpartial("with description", 1, 3, gtCells, nbCells, cells);
   CPPUNIT_ASSERT_EQUAL(1, aPartialCells->getValIndFromGlobalNumber(2));
   CPPUNIT_ASSERT_EQUAL(2, aPartialCells->getValIndFromGlobalNumber(3));
   CPPUNIT_ASSERT_EQUAL(3, aPartialCells->getValIndFromGlobalNumber(4));
 
-  MED_EN::medGeometryElement gtNodes[1] = {MED_EN::MED_NONE};
+  MED_EN::medGeometryElement gtNodes[1] = 
+    {
+      MED_EN::MED_NONE
+    };
   aPartialNodes->setNumberOfGeometricType(1);
   aPartialNodes->setGeometricType(gtNodes);
-  int indexSN[2] = {1,4};
-  int valueSN[3] = {2,3,4};
+  int indexSN[2] = 
+    {
+      1,4
+    };
+  int valueSN[3] = 
+    {
+      2,3,4
+    };
   MEDSKYLINEARRAY * aNumberSN = new MEDSKYLINEARRAY(1, 3, indexSN, valueSN);
   aPartialNodes->setpartial(aNumberSN, /*shallowCopy*/false);
   delete aNumberSN;
@@ -828,7 +930,10 @@ void MEDMEMTest::testSupport()
   // changeElementsNbs
 
   // {1,2,3,4,5,6,7,8,9,10} -> {10,9,8,7,6,5,4,3,2,1}
-  int renumberingFromOldToNew[10] = {10,9,8,7,6,5,4,3,2,1};
+  int renumberingFromOldToNew[10] = 
+    {
+      10,9,8,7,6,5,4,3,2,1
+    };
 
   CPPUNIT_ASSERT_THROW(aPartialCells->changeElementsNbs
                        (MED_EN::MED_NODE, renumberingFromOldToNew, 10), MEDEXCEPTION);
@@ -858,7 +963,10 @@ void MEDMEMTest::testSupport()
   //#ifdef ENABLE_FAULTS
   // (BUG) Segmentation Fault during SUPPORT::getBoundaryElements()
   // ??? May be mesh is not complete ???
-  SUPPORT *aBoundaryFaces=new SUPPORT (aMesh, "meshing boundary faces", MED_EN::MED_FACE);
+  SUPPORT *aBoundaryFaces = new SUPPORT;
+  aBoundaryFaces->setMesh( aMesh );
+  aBoundaryFaces->setName( "meshing boundary faces" );
+  aBoundaryFaces->setEntity( MED_EN::MED_FACE );
   aBoundaryFaces->getBoundaryElements();
   //cout << "aBoundaryFaces:" << endl;
   //cout << aBoundaryFaces << endl;

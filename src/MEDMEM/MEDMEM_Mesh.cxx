@@ -24,10 +24,6 @@
  File Mesh.cxx
 */
 
-#include <math.h>
-#include <map>
-#include <sstream>
-
 #include "MEDMEM_DriversDef.hxx"
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_Mesh.hxx"
@@ -42,6 +38,10 @@
 #include "MEDMEM_DriverFactory.hxx"
 
 #include "PointLocator.hxx"
+
+#include <math.h>
+#include <map>
+#include <sstream>
 
 using namespace std;
 using namespace MEDMEM;
@@ -816,7 +816,7 @@ SUPPORT * MESH::getBoundaryElements(MED_EN::medEntityMesh Entity)
   Method return a reference on a support define on all the element of an entity.
 */
 
-SUPPORT * MESH::getSupportOnAll(medEntityMesh entity)
+const SUPPORT * MESH::getSupportOnAll(medEntityMesh entity) const
   throw(MEDEXCEPTION)
 {
   const char * LOC = "MESH::getSupportOnAll : " ;
@@ -829,15 +829,21 @@ SUPPORT * MESH::getSupportOnAll(medEntityMesh entity)
   // find support and return is if exists
   if(it != _entitySupport.end())
     return (*it).second;
-  else{
+  else
+    {
+      //build, store and return support
+      MESH* thisMesh = const_cast< MESH* >( this );
+      SUPPORT * aSupport = new SUPPORT;
+      string aSuppName = "SupportOnAll_"+entNames[entity];
+      aSupport->setName( aSuppName );
+      aSupport->setMesh( thisMesh );
+      aSupport->setEntity( entity );
+      aSupport->setAll( true );
+      aSupport->update();
 
-    //build, store and return support
-    string aSuppName = "SupportOnAll_"+entNames[entity];
-    SUPPORT * aSupport = new SUPPORT((MESH *)this,aSuppName,entity);
-
-    _entitySupport.insert(make_pair(entity,aSupport));
-    return aSupport;
-  }
+      thisMesh->_entitySupport.insert(make_pair(entity,aSupport));
+      return aSupport;
+    }
 }
 
 
@@ -852,22 +858,24 @@ void MESH::fillSupportOnNodeFromElementList(const list<int>& listOfElt, SUPPORT 
 
   int i;
   set<int> nodes;
-  if ( entity == MED_NODE ) {
-    supportToFill->fillFromNodeList(listOfElt);
-  }
-  else {
-    for(list<int>::const_iterator iter=listOfElt.begin();iter!=listOfElt.end();iter++)
+  if ( entity == MED_NODE )
     {
-      int lgth;
-      const int *conn=_connectivity->getConnectivityOfAnElementWithPoly(MED_NODAL,entity,*iter,lgth);
-      for(i=0;i<lgth;i++)
-        nodes.insert(conn[i]);
+      supportToFill->fillFromNodeList(listOfElt);
     }
-    list<int> nodesList;
-    for(set<int>::iterator iter2=nodes.begin();iter2!=nodes.end();iter2++)
-      nodesList.push_back(*iter2);
-    supportToFill->fillFromNodeList(nodesList);
-  }
+  else
+    {
+      for(list<int>::const_iterator iter=listOfElt.begin();iter!=listOfElt.end();iter++)
+        {
+          int lgth;
+          const int *conn=_connectivity->getConnectivityOfAnElementWithPoly(MED_NODAL,entity,*iter,lgth);
+          for(i=0;i<lgth;i++)
+            nodes.insert(conn[i]);
+        }
+      list<int> nodesList;
+      for(set<int>::iterator iter2=nodes.begin();iter2!=nodes.end();iter2++)
+        nodesList.push_back(*iter2);
+      supportToFill->fillFromNodeList(nodesList);
+    }
 }
 
 /*!
@@ -876,7 +884,10 @@ void MESH::fillSupportOnNodeFromElementList(const list<int>& listOfElt, SUPPORT 
 */
 SUPPORT *MESH::buildSupportOnNodeFromElementList(const list<int>& listOfElt,MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION)
 {
-  SUPPORT * mySupport = new SUPPORT((MESH *)this,"Boundary",entity);
+  SUPPORT * mySupport = new SUPPORT();
+  mySupport->setMesh((MESH *)this);
+  mySupport->setName("Boundary");
+  mySupport->setEntity( entity );
   fillSupportOnNodeFromElementList(listOfElt,mySupport);
   return mySupport;
 }
@@ -889,7 +900,10 @@ SUPPORT *MESH::buildSupportOnElementsFromElementList(const list<int>& listOfElt,
 {
   const char* LOC = "MESH::buildSupportOnElementsFromElementList : ";
   BEGIN_OF_MED(LOC);
-  SUPPORT *mySupport=new SUPPORT((MESH *)this,"Boundary",entity);
+  SUPPORT * mySupport = new SUPPORT();
+  mySupport->setMesh((MESH *)this);
+  mySupport->setName("Boundary");
+  mySupport->setEntity( entity );
   mySupport->fillFromElementList(listOfElt);
   END_OF_MED(LOC);
   return mySupport ;
@@ -2023,8 +2037,10 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Defined on 3D cells only"));
 
   // well, all rigth !
-  SUPPORT * mySupport = new SUPPORT(this,"Skin",MED_FACE);
-  mySupport->setAll(false);
+  SUPPORT * mySupport = new SUPPORT();
+  mySupport->setMesh((MESH *)this);
+  mySupport->setName("Skin");
+  mySupport->setEntity( MED_FACE );
 
   list<int> myElementsList;
   int i,j, size = 0;
@@ -2102,53 +2118,53 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
   int * mySkyLineArrayIndex ;
 
   int numberOfType = getNumberOfTypes(MED_FACE) ;
-  if (numberOfType == 1) { // wonderfull : it's easy !
-    numberOfGeometricType = 1 ;
-    geometricType = new medGeometryElement[1] ;
-    const medGeometryElement *  allType = getTypes(MED_FACE);
-    geometricType[0] = allType[0] ;
-    geometricTypeNumber = new int[1] ; // not use, but initialized to nothing
-    geometricTypeNumber[0] = 0 ;
-    numberOfEntities = new int[1] ;
-    numberOfEntities[0] = size ;
-    mySkyLineArrayIndex = new int[2] ;
-    mySkyLineArrayIndex[0]=1 ;
-    mySkyLineArrayIndex[1]=1+size ;
-  }
-  else {// hemmm
-    map<medGeometryElement,int> theType ;
-    for (myElementsListIt=myElementsList.begin();myElementsListIt!=myElementsList.end();myElementsListIt++) {
-      medGeometryElement myType = getElementType(MED_FACE,*myElementsListIt) ;
-      if (theType.find(myType) != theType.end() )
-        theType[myType]+=1 ;
-      else
-        theType[myType]=1 ;
+  if (numberOfType == 1) // wonderfull : it's easy !
+    {
+      numberOfGeometricType = 1 ;
+      geometricType = new medGeometryElement[1] ;
+      const medGeometryElement *  allType = getTypes(MED_FACE);
+      geometricType[0] = allType[0] ;
+      geometricTypeNumber = new int[1] ; // not use, but initialized to nothing
+      geometricTypeNumber[0] = 0 ;
+      numberOfEntities = new int[1] ;
+      numberOfEntities[0] = size ;
+      mySkyLineArrayIndex = new int[2] ;
+      mySkyLineArrayIndex[0]=1 ;
+      mySkyLineArrayIndex[1]=1+size ;
     }
-    numberOfGeometricType = theType.size() ;
-    geometricType = new medGeometryElement[numberOfGeometricType] ;
-    //const medGeometryElement *  allType = getTypes(MED_FACE); !! UNUSED VARIABLE !!
-    geometricTypeNumber = new int[numberOfGeometricType] ; // not use, but initialized to nothing
-    numberOfEntities = new int[numberOfGeometricType] ;
-    mySkyLineArrayIndex = new int[numberOfGeometricType+1] ;
-    int index = 0 ;
-    mySkyLineArrayIndex[0]=1 ;
-    map<medGeometryElement,int>::iterator theTypeIt ;
-    for (theTypeIt=theType.begin();theTypeIt!=theType.end();theTypeIt++) {
-      geometricType[index] = (*theTypeIt).first ;
-      geometricTypeNumber[index] = 0 ;
-      numberOfEntities[index] = (*theTypeIt).second ;
-      mySkyLineArrayIndex[index+1]=mySkyLineArrayIndex[index]+numberOfEntities[index] ;
-      index++ ;
+  else // hemmm
+    {
+      map<medGeometryElement,int> theType ;
+      for (myElementsListIt=myElementsList.begin();myElementsListIt!=myElementsList.end();myElementsListIt++)
+        {
+          medGeometryElement myType = getElementType(MED_FACE,*myElementsListIt) ;
+          if (theType.find(myType) != theType.end() )
+            theType[myType]+=1 ;
+          else
+            theType[myType]=1 ;
+        }
+      numberOfGeometricType = theType.size() ;
+      geometricType = new medGeometryElement[numberOfGeometricType] ;
+      geometricTypeNumber = new int[numberOfGeometricType] ; // not use, but initialized to nothing
+      numberOfEntities = new int[numberOfGeometricType] ;
+      mySkyLineArrayIndex = new int[numberOfGeometricType+1] ;
+      int index = 0 ;
+      mySkyLineArrayIndex[0]=1 ;
+      map<medGeometryElement,int>::iterator theTypeIt ;
+      for (theTypeIt=theType.begin();theTypeIt!=theType.end();theTypeIt++)
+        {
+          geometricType[index] = (*theTypeIt).first ;
+          geometricTypeNumber[index] = 0 ;
+          numberOfEntities[index] = (*theTypeIt).second ;
+          mySkyLineArrayIndex[index+1]=mySkyLineArrayIndex[index]+numberOfEntities[index] ;
+          index++ ;
+        }
     }
-  }
-  //  mySkyLineArray->setMEDSKYLINEARRAY(numberOfGeometricType,size,mySkyLineArrayIndex,myListArray) ;
   MEDSKYLINEARRAY * mySkyLineArray = new MEDSKYLINEARRAY(numberOfGeometricType,size,mySkyLineArrayIndex,myListArray) ;
 
   mySupport->setNumberOfGeometricType(numberOfGeometricType) ;
   mySupport->setGeometricType(geometricType) ;
-  //  mySupport->setGeometricTypeNumber(geometricTypeNumber) ;
   mySupport->setNumberOfElements(numberOfEntities) ;
-  //mySupport->setTotalNumberOfElements(size) ;
   mySupport->setNumber(mySkyLineArray) ;
 
   delete[] numberOfEntities;
@@ -2156,7 +2172,6 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
   delete[] geometricType;
   delete[] mySkyLineArrayIndex;
   delete[] myListArray;
-  //   delete mySkyLineArray;
 
   END_OF_MED(LOC);
   return mySupport ;

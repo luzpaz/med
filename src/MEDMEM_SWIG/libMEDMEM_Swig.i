@@ -564,8 +564,6 @@ class SUPPORT
 
   bool deepCompare(const SUPPORT &support) const;
 
-  SUPPORT(MESH* Mesh, std::string Name="", medEntityMesh Entity=MED_CELL);
-
   void setpartial(std::string Description, int NumberOfGeometricType,
 		  int TotalNumberOfElements, medGeometryElement *GeometricType,
 		  int *NumberOfElements, int *NumberValue);
@@ -1174,7 +1172,7 @@ public :
 
   medGeometryElement getElementTypeWithPoly(medEntityMesh Entity,int Number);
 
-  SUPPORT * getSupportOnAll(medEntityMesh Entity);
+  const SUPPORT * getSupportOnAll(medEntityMesh Entity);
 
   std::string getName() const;
   

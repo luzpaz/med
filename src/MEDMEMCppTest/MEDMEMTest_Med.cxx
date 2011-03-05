@@ -18,10 +18,10 @@
 //
 
 #include "MEDMEMTest.hxx"
-#include <cppunit/TestAssert.h>
 
 #include "MEDMEM_Med.hxx"
 
+#include <cppunit/TestAssert.h>
 #include <sstream>
 #include <cmath>
 
@@ -43,7 +43,8 @@ using namespace MED_EN;
 
 /*!
  *  Check methods (26), defined in MEDMEM_Med.hxx:
- *  class MED {
+ *  class MED 
+{
  *   (+) MED();
  *   (+) MED (driverTypes driverType, const string & fileName);
  *   (+) ~MED();
@@ -76,7 +77,8 @@ using namespace MED_EN;
  *   (+) SUPPORT *  getSupport (const string & meshName,
  *                                  MED_EN::medEntityMesh entity) const throw (MEDEXCEPTION);
  *   (-, as it is temporary and called from driver after Med object reading from file) void updateSupport ();
- *  }
+ *  
+}
  */
 void MEDMEMTest::testMed()
 {
@@ -110,92 +112,97 @@ void MEDMEMTest::testMed()
 
   //getNumberOfMeshes
   int nbMeshes, nbFields;
-  try{
-    nbMeshes = myMed->getNumberOfMeshes();
-  }
+  try
+    {
+      nbMeshes = myMed->getNumberOfMeshes();
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
   CPPUNIT_ASSERT(nbMeshes);
 
   //getMeshNames
   deque<string> mesh_names, field_names;
-  try{
-    mesh_names = myMed->getMeshNames();
-  }
+  try
+    {
+      mesh_names = myMed->getMeshNames();
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
   CPPUNIT_ASSERT(mesh_names.size() != 0);
 
   //getNumberOfFields
-  try{
-    nbFields = myMed->getNumberOfFields();
-  }
+  try
+    {
+      nbFields = myMed->getNumberOfFields();
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
   CPPUNIT_ASSERT(nbFields);
 
   //getFieldNames
-  try{
-    field_names = myMed->getFieldNames();
-  }
+  try
+    {
+      field_names = myMed->getFieldNames();
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
   CPPUNIT_ASSERT(field_names.size() != 0);
 
   string* field_names_1 = new string[nbFields];
   string* mesh_names_1 = new string[nbMeshes];
   //get field and mesh names
-  try{
-    myMed->getMeshNames(mesh_names_1);
-    myMed->getFieldNames(field_names_1);
-  }
+  try
+    {
+      myMed->getMeshNames(mesh_names_1);
+      myMed->getFieldNames(field_names_1);
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
 
   // Ensure what it's impossible to get mesh object by empty or non-existent name
   CPPUNIT_ASSERT_THROW(myMed->getMesh(""), MEDEXCEPTION);
 
   //compare mesh names, produced by two different methods
   for(int nb = 0; nb < nbMeshes; nb++ )
-  {
-    MESH* myMesh;
-    CPPUNIT_ASSERT(mesh_names_1[nb] == mesh_names[nb]);
-    CPPUNIT_ASSERT_NO_THROW(myMesh = myMed->getMesh(mesh_names[nb]));
-    //ensure mesh is not empty
-    CPPUNIT_ASSERT(myMesh->getSpaceDimension() != MED_INVALID);
-    CPPUNIT_ASSERT(myMesh->getNumberOfNodes() != MED_INVALID);
-    CPPUNIT_ASSERT(myMesh->getCoordinateptr() != NULL);
-  }
+    {
+      MESH* myMesh;
+      CPPUNIT_ASSERT(mesh_names_1[nb] == mesh_names[nb]);
+      CPPUNIT_ASSERT_NO_THROW(myMesh = myMed->getMesh(mesh_names[nb]));
+      //ensure mesh is not empty
+      CPPUNIT_ASSERT(myMesh->getSpaceDimension() != MED_INVALID);
+      CPPUNIT_ASSERT(myMesh->getNumberOfNodes() != MED_INVALID);
+      CPPUNIT_ASSERT(myMesh->getCoordinateptr() != NULL);
+    }
 
   // Ensure what it's impossible to get field object by empty or non-existent name
   CPPUNIT_ASSERT_THROW(myMed->getField("", 0, 0),MEDEXCEPTION);
@@ -204,83 +211,83 @@ void MEDMEMTest::testMed()
   // Compare field names produced by two different methods
   // Get field object with help of getField(...) and getField2(...)
   for(int nb = 0; nb < nbFields; nb++ )
-  {
-    CPPUNIT_ASSERT(field_names_1[nb] == field_names[nb]);
-    deque<DT_IT_> myFIter;
-    CPPUNIT_ASSERT_NO_THROW(myFIter = myMed->getFieldIteration(field_names[nb]));
-    CPPUNIT_ASSERT(myFIter.size());
-    for(int nbIter = 0; nbIter < myFIter.size(); nbIter++)
     {
-      FIELD_ *myField, *myField2;
-      CPPUNIT_ASSERT_NO_THROW(myField  = myMed->getField (field_names[nb], myFIter[nbIter].dt, myFIter[nbIter].it));
-      CPPUNIT_ASSERT_NO_THROW(myField2 = myMed->getField2(field_names[nb], myField->getTime()));
-      CPPUNIT_ASSERT(myField==myField2);
-      //compare two fields
-      CPPUNIT_ASSERT(myField->getNumberOfComponents() == myField2->getNumberOfComponents());
-      CPPUNIT_ASSERT(myField->getNumberOfValues() == myField2->getNumberOfValues());
-      CPPUNIT_ASSERT(myField->getSupport() == myField2->getSupport());
-      CPPUNIT_ASSERT(myField->getValueType() == myField2->getValueType());
-      CPPUNIT_ASSERT(myField->getDescription() == myField2->getDescription());
+      CPPUNIT_ASSERT(field_names_1[nb] == field_names[nb]);
+      deque<DT_IT_> myFIter;
+      CPPUNIT_ASSERT_NO_THROW(myFIter = myMed->getFieldIteration(field_names[nb]));
+      CPPUNIT_ASSERT(myFIter.size());
+      for(int nbIter = 0; nbIter < myFIter.size(); nbIter++)
+        {
+          FIELD_ *myField, *myField2;
+          CPPUNIT_ASSERT_NO_THROW(myField  = myMed->getField (field_names[nb], myFIter[nbIter].dt, myFIter[nbIter].it));
+          CPPUNIT_ASSERT_NO_THROW(myField2 = myMed->getField2(field_names[nb], myField->getTime()));
+          CPPUNIT_ASSERT(myField==myField2);
+          //compare two fields
+          CPPUNIT_ASSERT(myField->getNumberOfComponents() == myField2->getNumberOfComponents());
+          CPPUNIT_ASSERT(myField->getNumberOfValues() == myField2->getNumberOfValues());
+          CPPUNIT_ASSERT(myField->getSupport() == myField2->getSupport());
+          CPPUNIT_ASSERT(myField->getValueType() == myField2->getValueType());
+          CPPUNIT_ASSERT(myField->getDescription() == myField2->getDescription());
 
-      med_type_champ type = myField->getValueType();
-      switch (type)
-      {
-      case MED_INT32:
-        {
-          //#ifdef ENABLE_FORCED_FAILURES
-          // (BUG) ERROR in MEDMEM_Med.hxx line 153: FIELD_ retUp=getField(fieldName,dt,it);
-          //       But getField returns FIELD_*
-          //CPPUNIT_FAIL("Error in MED::getFieldT(const string & fieldName, const int dt,  const int it)");
-          // Fixed: * added
-          //#endif
-          // not compilable
-          //FIELD<int> *myFieldT;
-          //CPPUNIT_ASSERT_NO_THROW(myFieldT = myMed->getFieldT<int>(field_names[nb], myFIter[nbIter].dt, myFIter[nbIter].it))
-          // PROBLEM NOT REPRODUCED
+          med_type_champ type = myField->getValueType();
+          switch (type)
+            {
+            case MED_INT32:
+              {
+                //#ifdef ENABLE_FORCED_FAILURES
+                // (BUG) ERROR in MEDMEM_Med.hxx line 153: FIELD_ retUp=getField(fieldName,dt,it);
+                //       But getField returns FIELD_*
+                //CPPUNIT_FAIL("Error in MED::getFieldT(const string & fieldName, const int dt,  const int it)");
+                // Fixed: * added
+                //#endif
+                // not compilable
+                //FIELD<int> *myFieldT;
+                //CPPUNIT_ASSERT_NO_THROW(myFieldT = myMed->getFieldT<int>(field_names[nb], myFIter[nbIter].dt, myFIter[nbIter].it))
+                // PROBLEM NOT REPRODUCED
+              }
+              break;
+            case MED_REEL64:
+              {
+                // not compilable
+                //FIELD<double> *myFieldT;
+                //CPPUNIT_ASSERT_NO_THROW(myFieldT = myMed->getFieldT<double>(field_names[nb], myFIter[nbIter].dt, myFIter[nbIter].it))
+                // PROBLEM NOT REPRODUCED
+              }
+              break;
+            }
         }
-        break;
-      case MED_REEL64:
-        {
-          // not compilable
-          //FIELD<double> *myFieldT;
-          //CPPUNIT_ASSERT_NO_THROW(myFieldT = myMed->getFieldT<double>(field_names[nb], myFIter[nbIter].dt, myFIter[nbIter].it))
-          // PROBLEM NOT REPRODUCED
-        }
-        break;
-      }
     }
-  }
 
   // For each mesh get a map
   for(int nb = 0; nb < nbMeshes; nb++ )
-  {
-    map<MED_EN::medEntityMesh,SUPPORT *> myMapSupports;
-    CPPUNIT_ASSERT_NO_THROW(myMapSupports = myMed->getSupports(mesh_names[nb]));
-    map<MED_EN::medEntityMesh,SUPPORT *>::const_iterator myMapSupportsIter = myMapSupports.begin();
-    for( ; myMapSupportsIter != myMapSupports.end(); myMapSupportsIter++ )
     {
-      SUPPORT* mySupport;
-      CPPUNIT_ASSERT_NO_THROW(mySupport = myMed->getSupport(mesh_names[nb], (*myMapSupportsIter).first));
-      CPPUNIT_ASSERT_EQUAL(mySupport, (*myMapSupportsIter).second);
-      CPPUNIT_ASSERT(mySupport->deepCompare(*(*myMapSupportsIter).second));
+      map<MED_EN::medEntityMesh,SUPPORT *> myMapSupports;
+      CPPUNIT_ASSERT_NO_THROW(myMapSupports = myMed->getSupports(mesh_names[nb]));
+      map<MED_EN::medEntityMesh,SUPPORT *>::const_iterator myMapSupportsIter = myMapSupports.begin();
+      for( ; myMapSupportsIter != myMapSupports.end(); myMapSupportsIter++ )
+        {
+          SUPPORT* mySupport;
+          CPPUNIT_ASSERT_NO_THROW(mySupport = myMed->getSupport(mesh_names[nb], (*myMapSupportsIter).first));
+          CPPUNIT_ASSERT_EQUAL(mySupport, (*myMapSupportsIter).second);
+          CPPUNIT_ASSERT(mySupport->deepCompare(*(*myMapSupportsIter).second));
+        }
     }
-  }
 
   // add new driver
   int idMedV21;
 
   try
-  {
-    idMedV21 = myMed->addDriver(MED_DRIVER,filenameout21);
-  }
+    {
+      idMedV21 = myMed->addDriver(MED_DRIVER,filenameout21);
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
 
   // write to file
   CPPUNIT_ASSERT_NO_THROW(myMed->write(idMedV21));
@@ -328,17 +335,18 @@ void MEDMEMTest::testMed()
   // and add driver to med
   int idDriver;
   GENDRIVER *driver = DRIVERFACTORY::buildDriverForMed(MED_DRIVER,filename,myEmptyMed,RDONLY);
-  try{
-    idDriver = myEmptyMed->addDriver(*driver);
-  }
+  try
+    {
+      idDriver = myEmptyMed->addDriver(*driver);
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
   CPPUNIT_ASSERT(idDriver == 0);
 
   // trying to read file with non-existent index of driver
@@ -347,75 +355,79 @@ void MEDMEMTest::testMed()
 
   //getNumberOfMeshes
   int nbEmptyMeshes, nbEmptyFields;
-  try{
-    nbEmptyMeshes = myEmptyMed->getNumberOfMeshes();
-  }
+  try
+    {
+      nbEmptyMeshes = myEmptyMed->getNumberOfMeshes();
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
   CPPUNIT_ASSERT(nbEmptyMeshes == nbMeshes);
 
   //getMeshNames
   deque<string> empty_mesh_names, empty_field_names;
-  try{
-    empty_mesh_names = myEmptyMed->getMeshNames();
-  }
+  try
+    {
+      empty_mesh_names = myEmptyMed->getMeshNames();
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
   CPPUNIT_ASSERT(empty_mesh_names.size() != 0);
 
   //getNumberOfFields
-  try{
-    nbEmptyFields = myEmptyMed->getNumberOfFields();
-  }
+  try
+    {
+      nbEmptyFields = myEmptyMed->getNumberOfFields();
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
   CPPUNIT_ASSERT(nbFields == nbEmptyFields);
 
   //getFieldNames
-  try{
-    empty_field_names = myEmptyMed->getFieldNames();
-  }
+  try
+    {
+      empty_field_names = myEmptyMed->getFieldNames();
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
   CPPUNIT_ASSERT(empty_field_names.size() != 0);
 
   //compare mesh names, produced by two different methods
   for(int nb = 0; nb < nbMeshes; nb++ )
-  {
-    MESH* myMesh;
-    CPPUNIT_ASSERT(empty_mesh_names[nb] == mesh_names[nb]);
-    CPPUNIT_ASSERT_NO_THROW(myMesh = myEmptyMed->getMesh(empty_mesh_names[nb]));
-    //MESH* myMesh1 = myMed->getMesh(mesh_names[nb]);
-    CPPUNIT_ASSERT(!myMesh->deepCompare(*(myMed->getMesh(mesh_names[nb]))));
-    //ensure mesh is empty
-    CPPUNIT_ASSERT(myMesh->getSpaceDimension() == MED_INVALID);
-    CPPUNIT_ASSERT(myMesh->getNumberOfNodes() == MED_INVALID);
-    CPPUNIT_ASSERT(myMesh->getCoordinateptr() == NULL);
-  }
+    {
+      MESH* myMesh;
+      CPPUNIT_ASSERT(empty_mesh_names[nb] == mesh_names[nb]);
+      CPPUNIT_ASSERT_NO_THROW(myMesh = myEmptyMed->getMesh(empty_mesh_names[nb]));
+      //MESH* myMesh1 = myMed->getMesh(mesh_names[nb]);
+      CPPUNIT_ASSERT(!myMesh->deepCompare(*(myMed->getMesh(mesh_names[nb]))));
+      //ensure mesh is empty
+      CPPUNIT_ASSERT(myMesh->getSpaceDimension() == MED_INVALID);
+      CPPUNIT_ASSERT(myMesh->getNumberOfNodes() == MED_INVALID);
+      CPPUNIT_ASSERT(myMesh->getCoordinateptr() == NULL);
+    }
 
   // trying to add null mesh pointer
   CPPUNIT_ASSERT_THROW(myEmptyMed->addMesh(NULL), MEDEXCEPTION);
@@ -438,7 +450,9 @@ void MEDMEMTest::testMed()
   myEmptyField->setName("myField");
 
   // set support
-  SUPPORT* aSupport = new SUPPORT(myEmptyMed->getMesh("meshing"), "Support On Cells");
+  SUPPORT* aSupport = new SUPPORT();
+  aSupport->setMesh( myEmptyMed->getMesh("meshing"));
+  aSupport->setName( "Support On Cells" );
   myEmptyField->setSupport(aSupport);
 
   CPPUNIT_ASSERT_NO_THROW(myEmptyMed->addField(myEmptyField));

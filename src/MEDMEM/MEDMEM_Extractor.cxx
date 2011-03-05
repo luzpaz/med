@@ -62,24 +62,6 @@ namespace { // local tools
   }
   //================================================================================
   /*!
-   * \brief SUPPORT owning the mesh
-   */
-  struct TSupport : public SUPPORT
-  {
-    TSupport(MESH* mesh): SUPPORT(mesh) {}
-    ~TSupport() { }
-  };
-  //================================================================================
-  /*!
-   * \brief Field owning the support
-   */
-  struct TField: public FIELD<double>
-  {
-    TField( const SUPPORT * Support, int nbComp ): FIELD<double>( Support, nbComp ) {}
-    ~TField() { }
-  };
-  //================================================================================
-  /*!
    * \brief Accessor to some ids. Provides operator[] and more-next access methods
    */
   class TIter
@@ -510,11 +492,10 @@ FIELD<double>* Extractor::makeField( const map<int,set<int> >& new2oldCells,
                                      MESH*                     mesh ) const
 {
   // make new field
-  int nbComp               = _myInputField->getNumberOfComponents();
-  SUPPORT *sup=new SUPPORT( mesh );
+  int nbComp = _myInputField->getNumberOfComponents();
+  const SUPPORT *sup = mesh->getSupportOnAll( MED_CELL );
   FIELD<double> * outField = new FIELD<double>( sup, nbComp );
-  sup->removeReference();
-  double* outValues        = const_cast<double*>( outField->getValue() );
+  double*        outValues = const_cast<double*>( outField->getValue() );
 
   outField->setComponentsNames       ( _myInputField->getComponentsNames() );
   outField->setName                  ( STRING("Extracted from ")<< _myInputField->getName() );

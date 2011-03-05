@@ -22,18 +22,12 @@
 
 /*
   File Support.hxx
-  $Header$
 */
 
 #ifndef SUPPORT_HXX
 #define SUPPORT_HXX
 
-#include <MEDMEM.hxx>
-
-#include <list>
-#include <vector>
-#include <string>
-#include <list>
+#include "MEDMEM.hxx"
 
 #include "MEDMEM_Utilities.hxx"
 #include "MEDMEM_STRING.hxx"
@@ -42,6 +36,10 @@
 #include "MEDMEM_SkyLineArray.hxx"
 #include "MEDMEM_RCBase.hxx"
 
+#include <list>
+#include <vector>
+#include <string>
+#include <list>
 
 namespace MEDMEM {
 
@@ -132,13 +130,11 @@ protected:
   */
   int                      _totalNumberOfElements;
 
-  // the two following arrays are defined only if _isOnAllElts is false :
-
   /*!
     \if developper
     Array of size _index[_numberOfType]-1 wich contain number of
     entities of each geometric type. We use global numbering.\n
-    Defined only if _isOnAllElts is false.
+    Must be always defined.
     \endif
   */
   mutable MEDSKYLINEARRAY * _number;
@@ -148,6 +144,12 @@ protected:
     Array of size _index[_numberOfType]-1 wich contain number of
     entities of each geometric type. We use file numbering.\n
     Defined only if _isOnAllElts is false.
+    //
+    EAP: this member is to be removed. It is used once in
+    VISU_CorbaMedConvertor.cxx only. It was added in the frames of PAL13498.
+    The bug reason is that numbers in a profile are local within a geom type.
+    A right solution for that bug is to adjust _number using info provided by
+    _mesh->getGlobalNumberingIndex()
     \endif
   */
   mutable MEDSKYLINEARRAY * _number_fromfile;
@@ -164,9 +166,12 @@ protected:
   */
 
   vector< string > _profilNames;
+
+
 public:
   SUPPORT();
-  SUPPORT(MESH* Mesh, string Name="", MED_EN::medEntityMesh Entity=MED_EN::MED_CELL);
+  /*  issue 0021167: [CEA 448] Supports management on all elements
+      SUPPORT(MESH* Mesh, string Name="", MED_EN::medEntityMesh Entity=MED_EN::MED_CELL); */
   SUPPORT(const SUPPORT & m);
 public:
   friend MEDMEM_EXPORT ostream & operator<<(ostream &os,const SUPPORT &my);
@@ -237,7 +242,7 @@ public:
   void fillFromNodeList(const list<int>& listOfNode) throw (MEDEXCEPTION);
   void fillFromElementList(const list<int>& listOfElt) throw (MEDEXCEPTION);
   void clearDataOnNumbers();
-  MESH* makeMesh();
+  MESH* makeMesh() const;
  protected:
   virtual ~SUPPORT();
  protected:
@@ -309,8 +314,7 @@ inline MEDSKYLINEARRAY * SUPPORT::getnumberFromFile() const
 }
 
 /*!
-  If isOnAllElements is false, returns an array which contains
-  all number of given medGeometryElement.
+  Returns an array which contains all number of given medGeometryElement.
 
   Numbering is global, ie numbers are bounded by 1 and
   MESH::getNumberOfElement(entity,MED_ALL_ELEMENTS) and not by 1 and
@@ -324,8 +328,10 @@ inline const int * SUPPORT::getNumber(MED_EN::medGeometryElement GeometricType) 
   throw (MEDEXCEPTION)
 //---------------------------------------------------------------------
 {
+  /*  issue 0021167: [CEA 448] Supports management on all elements
   if (_isOnAllElts)
     throw MEDEXCEPTION("Support::getNumber : Not defined, support is on all entity !") ;
+  */
   if (!_number)
     throw MEDEXCEPTION("Support::getNumber : Not defined, support is empty !") ;
   if (GeometricType==MED_EN::MED_ALL_ELEMENTS)
@@ -352,8 +358,7 @@ inline const int * SUPPORT::getNumberFromFile(MED_EN::medGeometryElement Geometr
 }
 
 /*!
-  If isOnAllElements is false, returns index of element number.
-  Use it with getNumber(MED_ALL_ELEMENTS).
+  Returns index of element number.
 
   Note : See getConnectivityIndex for details.
 */
@@ -362,8 +367,10 @@ inline const int * SUPPORT::getNumberIndex() const
 //-------------------------------------------
   throw (MEDEXCEPTION)
 {
+  /*  issue 0021167: [CEA 448] Supports management on all elements
   if (_isOnAllElts)
     throw MEDEXCEPTION("Support::getNumberIndex : Not defined, support is on all entity !") ;
+  */
   return _number->getIndex() ;
 }
 /*! \if MEDMEM_ug
@@ -482,22 +489,15 @@ inline void SUPPORT::setNumberOfElements(const int *NumberOfElements)
     _totalNumberOfElements+=_numberOfElements[i];
 }
 
-/*! set the attribute _totalNumberOfElements to TotalNumberOfElements */
-//--------------------------------------------------------------------
-//inline void SUPPORT::setTotalNumberOfElements(int TotalNumberOfElements)
-//--------------------------------------------------------------------
-//{
-//  _totalNumberOfElements=TotalNumberOfElements;
-//}
-
 /*! set the attribute _number to Number */
 //---------------------------------------------------
 inline void SUPPORT::setNumber(MEDSKYLINEARRAY * Number)
 //---------------------------------------------------
 {
+  /*  issue 0021167: [CEA 448] Supports management on all elements
   if ( _isOnAllElts )
     throw MEDEXCEPTION("SUPPORT::setNumber(MEDSKYLINEARRAY * Number) Support is on all elements") ;
-
+  */
   if (_number != NULL) delete _number ;
   _number=Number;
 }
@@ -556,9 +556,6 @@ inline bool SUPPORT::isOnAllElements() const
 inline int SUPPORT::getNumberOfTypes() const
 //------------------------------------------
 {
-  //    if ((_isOnAllElts)&(_entity != MED_NODE))
-  //      return _mesh->getNumberOfTypes(_entity) ;
-  //    else
   return _numberOfGeometricType ;
 }
 
@@ -575,8 +572,7 @@ inline MED_EN::medEntityMesh SUPPORT::getEntity() const
 }
 
 /*!
-  If isOnAllElements is false, returns an array of %medGeometryElement
-  types used by the support.
+  Returns an array of %medGeometryElement types used by the support.
 */
 //---------------------------------------------------
 inline const MED_EN::medGeometryElement * SUPPORT::getTypes() const

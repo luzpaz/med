@@ -188,7 +188,7 @@ FIELD_::~FIELD_()
     _support->removeReference();
 }
 
-/*! 
+/*!
   \if developper
   PROVISOIRE : retourne des volumes, surfaces ou longueurs suivant les cas
   \endif
@@ -201,12 +201,10 @@ FIELD<double>* FIELD_::_getFieldSize(const SUPPORT *subSupport) const
   if ( !support )
     {
       if ( getSupport()->getEntity() == MED_NODE )
-        support = new SUPPORT(getSupport()->getMesh());
+        support = getSupport()->getMesh()->getSupportOnAll( MED_CELL );
       else
-        {
-          support = getSupport();
-          support->addReference();
-        }
+        support = getSupport();
+      support->addReference();
     }
   switch (getSupport()->getEntity())
     {
@@ -249,7 +247,7 @@ FIELD<double>* FIELD_::_getFieldSize(const SUPPORT *subSupport) const
         break;
       }
     }
-  if(!subSupport)
+  if(!subSupport && support)
     support->removeReference();
   return p_field_size;
 }

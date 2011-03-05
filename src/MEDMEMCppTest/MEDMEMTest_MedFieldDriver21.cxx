@@ -32,7 +32,8 @@
 
 /*!
  *  Check methods (17), defined in MEDMEM_MedFieldDriver21.hxx:
- *  template <class T> class MED_FIELD_DRIVER21 : public virtual MED_FIELD_DRIVER<T> {
+ *  template <class T> class MED_FIELD_DRIVER21 : public virtual MED_FIELD_DRIVER<T> 
+{
  *   (+) MED_FIELD_DRIVER21();
  *   (+) template <class INTERLACING_TAG> MED_FIELD_DRIVER21(const string & fileName,
  *          FIELD<T, INTERLACING_TAG> * ptrField, MED_EN::med_mode_acces accessMode);
@@ -40,9 +41,11 @@
  *   (+) virtual ~MED_FIELD_DRIVER21();
  *   (+) void open() throw (MEDEXCEPTION);
  *   (+) void close();
- *  }
+ *  
+}
  *  template <class T> class MED_FIELD_RDONLY_DRIVER21 : public virtual MED_FIELD_DRIVER21<T>,
- *                                                       public virtual IMED_FIELD_RDONLY_DRIVER<T> {
+ *                                                       public virtual IMED_FIELD_RDONLY_DRIVER<T> 
+{
  *   (+) MED_FIELD_RDONLY_DRIVER21();
  *   (+) template <class INTERLACING_TAG> MED_FIELD_RDONLY_DRIVER21
  *                 (const string & fileName, FIELD<T, INTERLACING_TAG> * ptrField);
@@ -50,9 +53,11 @@
  *   (+) virtual ~MED_FIELD_RDONLY_DRIVER21();
  *   (+) void write(void) const throw (MEDEXCEPTION);
  *   (+) void read (void) throw (MEDEXCEPTION);
- *  }
+ *  
+}
  *  template <class T> class MED_FIELD_WRONLY_DRIVER21 : public virtual MED_FIELD_DRIVER21<T>,
- *                                                       public virtual IMED_FIELD_WRONLY_DRIVER<T> {
+ *                                                       public virtual IMED_FIELD_WRONLY_DRIVER<T> 
+{
  *   (+) MED_FIELD_WRONLY_DRIVER21();
  *   (+) template <class INTERLACING_TAG> MED_FIELD_WRONLY_DRIVER21
  *              (const string & fileName, FIELD<T, INTERLACING_TAG> * ptrField);
@@ -60,9 +65,11 @@
  *   (+) virtual ~MED_FIELD_WRONLY_DRIVER21();
  *   (+) void write(void) const throw (MEDEXCEPTION);
  *   (+) void read (void) throw (MEDEXCEPTION);
- *  }
+ *  
+}
  *  template <class T> class MED_FIELD_RDWR_DRIVER21 : public MED_FIELD_RDONLY_DRIVER21<T>,
- *                           public MED_FIELD_WRONLY_DRIVER21<T>, public IMED_FIELD_RDWR_DRIVER<T> {
+ *                           public MED_FIELD_WRONLY_DRIVER21<T>, public IMED_FIELD_RDWR_DRIVER<T> 
+{
  *   (+) MED_FIELD_RDWR_DRIVER21();
  *   (+) template <class INTERLACING_TAG> MED_FIELD_RDWR_DRIVER21
  *              (const string & fileName, FIELD<T, INTERLACING_TAG> * ptrField);
@@ -70,7 +77,8 @@
  *   (+) ~MED_FIELD_RDWR_DRIVER21();
  *   (+) void write(void) const throw (MEDEXCEPTION);
  *   (+) void read (void) throw (MEDEXCEPTION);
- *  }
+ *  
+}
  */
 void MEDMEMTest::testMedFieldDriver21()
 {
@@ -155,22 +163,22 @@ void MEDMEMTest::testMedFieldDriver21()
 
   //Test open() method
   try
-  {
-    aMedRdFieldDriver21->open();
-  }
+    {
+      aMedRdFieldDriver21->open();
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
 
   //#ifdef ENABLE_FORCED_FAILURES
   //Trying open file secondary.
   //CPPUNIT_ASSERT_THROW(aMedRdFieldDriver21->open(), MEDEXCEPTION);
-        //  CPPUNIT_ASSERT_NO_THROW(aMedRdFieldDriver21->open());
+  //  CPPUNIT_ASSERT_NO_THROW(aMedRdFieldDriver21->open());
   // (BUG) No exception in this case
   //#endif
 
@@ -180,17 +188,17 @@ void MEDMEMTest::testMedFieldDriver21()
 
   //Test setFieldName() and getFieldName()
   try
-  {
-    aMedRdFieldDriver21->setFieldName(fileldnotexist);
-  }
+    {
+      aMedRdFieldDriver21->setFieldName(fileldnotexist);
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
   CPPUNIT_ASSERT_EQUAL(fileldnotexist, aMedRdFieldDriver21->getFieldName());
 
   //Trying read not existing field from file
@@ -199,34 +207,34 @@ void MEDMEMTest::testMedFieldDriver21()
   //Test read() method
   aMedRdFieldDriver21->setFieldName(fieldname);
   try
-  {
-    aMedRdFieldDriver21->read();
-  }
+    {
+      aMedRdFieldDriver21->read();
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
 
   //Test write() method for READ ONLY driver
   CPPUNIT_ASSERT_THROW(aMedRdFieldDriver21->write(), MEDEXCEPTION);
 
   //Test close() method
   try
-  {
-    aMedRdFieldDriver21->close();
-  }
+    {
+      aMedRdFieldDriver21->close();
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
 
   //Default constructor
   MED_FIELD_RDONLY_DRIVER21<int> aMedRdFieldDriver21Cpy_1;
@@ -274,8 +282,8 @@ void MEDMEMTest::testMedFieldDriver21()
   //  TEST3: Writing field in empty file without mesh  // -- no problem
   ///////////////////////////////////////////////////////
   //Creation Write Only MedFieldDriver21
-   MED_FIELD_WRONLY_DRIVER21<int> *aInvalidMedWrFieldDriver21_3 =
-     new MED_FIELD_WRONLY_DRIVER21<int>(emptyfile_wr, aField);
+  MED_FIELD_WRONLY_DRIVER21<int> *aInvalidMedWrFieldDriver21_3 =
+    new MED_FIELD_WRONLY_DRIVER21<int>(emptyfile_wr, aField);
 
   aInvalidMedWrFieldDriver21_3->open();
   //#ifdef ENABLE_FAULTS
@@ -290,7 +298,7 @@ void MEDMEMTest::testMedFieldDriver21()
   //Creation Write Only MedFieldDriver21
   MED_FIELD_WRONLY_DRIVER21<int> *aInvalidMedWrFieldDriver21_4 =
     new MED_FIELD_WRONLY_DRIVER21<int>(other_file_wr, aField);
-   aInvalidMedWrFieldDriver21_4->open();
+  aInvalidMedWrFieldDriver21_4->open();
   //#ifdef ENABLE_FAULTS
   CPPUNIT_ASSERT_NO_THROW(aInvalidMedWrFieldDriver21_4->write());
   aInvalidMedWrFieldDriver21_4->close();
@@ -317,17 +325,17 @@ void MEDMEMTest::testMedFieldDriver21()
 
   //Test open() method
   try
-  {
-    aMedWrFieldDriver21->open();
-  }
+    {
+      aMedWrFieldDriver21->open();
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
 
   //#ifdef ENABLE_FORCED_FAILURES
   //Trying open file secondary.
@@ -339,44 +347,46 @@ void MEDMEMTest::testMedFieldDriver21()
   //Test setFieldName() and getFieldName
   aField->setName(fieldname_cpy);
   try
-  {
-    aMedWrFieldDriver21->setFieldName(fieldname_cpy);
-  }
+    {
+      aMedWrFieldDriver21->setFieldName(fieldname_cpy);
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
   CPPUNIT_ASSERT_EQUAL(fieldname_cpy, aMedWrFieldDriver21->getFieldName());
 
   // there must be exception as mesh is not yet read
   // !!!!!!! mesh is not needed for writing !!!!!!!
   //CPPUNIT_ASSERT_THROW(aMedWrFieldDriver21->write(),MEDEXCEPTION);
 
-  try {
-    aMedWrFieldDriver21->write();
+  try
+    {
+      aMedWrFieldDriver21->write();
 
-    MESH* aMesh = new MESH;
-    aMesh->setName("maa1");
-    MED_MESH_RDONLY_DRIVER aMeshDriver (filename_rd, aMesh);
-    aMeshDriver.setMeshName("maa1");
-    aMeshDriver.open();
-    aMeshDriver.read();
-    aMeshDriver.close();
-    SUPPORT* sup = new SUPPORT(aMesh,"maa1",MED_EN::MED_NODE);// "fieldnodeint" is nodal field
-    aField->setSupport(sup);
-    sup->removeReference();
-    aMesh->removeReference();
-  }
-  catch(MEDEXCEPTION &e) {
-    CPPUNIT_FAIL(e.what());
-  }
-  catch( ... ) {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+      MESH* aMesh = new MESH;
+      aMesh->setName("maa1");
+      MED_MESH_RDONLY_DRIVER aMeshDriver (filename_rd, aMesh);
+      aMeshDriver.setMeshName("maa1");
+      aMeshDriver.open();
+      aMeshDriver.read();
+      aMeshDriver.close();
+      const SUPPORT* sup = aMesh->getSupportOnAll( MED_EN::MED_NODE );// "fieldnodeint" is nodal field
+      aField->setSupport(sup);
+      aMesh->removeReference();
+    }
+  catch(MEDEXCEPTION &e) 
+    {
+      CPPUNIT_FAIL(e.what());
+    }
+  catch( ... ) 
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
 
   //MESH* mesh(MED_DRIVER,);
   //aMedWrFieldDriver21->getSupport()->setMesh(mesh);//read(),MEDEXCEPTION);
@@ -384,17 +394,17 @@ void MEDMEMTest::testMedFieldDriver21()
   //#ifdef ENABLE_FAULTS
   //Test write() method
   try
-  {
-    aMedWrFieldDriver21->write();
-  }
+    {
+      aMedWrFieldDriver21->write();
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
   //=>Segmentation fault in this case
   //#endif
 
@@ -403,17 +413,17 @@ void MEDMEMTest::testMedFieldDriver21()
 
   //Test close() method
   try
-  {
-    aMedWrFieldDriver21->close();
-  }
+    {
+      aMedWrFieldDriver21->close();
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
 
   //Default constructor
   MED_FIELD_WRONLY_DRIVER21<int> aMedWrFieldDriver21Cpy_1;
@@ -472,8 +482,8 @@ void MEDMEMTest::testMedFieldDriver21()
   //  TEST4: Writing field in empty file without mesh  //
   ///////////////////////////////////////////////////////
   //Creation Invalid Read/Write MedFieldDriver21
-   MED_FIELD_RDWR_DRIVER21<int> *aInvalidMedRdWrFieldDriver21_4 =
-     new MED_FIELD_RDWR_DRIVER21<int>(emptyfile_rdwr, aField);
+  MED_FIELD_RDWR_DRIVER21<int> *aInvalidMedRdWrFieldDriver21_4 =
+    new MED_FIELD_RDWR_DRIVER21<int>(emptyfile_rdwr, aField);
 
   aInvalidMedRdWrFieldDriver21_4->open();
   //#ifdef ENABLE_FAULTS
@@ -481,22 +491,22 @@ void MEDMEMTest::testMedFieldDriver21()
   //=>Segmentation fault in this case
   //#endif
 
-        //VB : I don't quite understand the test, because, if the 
-        //file is already open, it is the open method that should fail. 
-        // as it is of little importance for the whole test base, 
-        //I remove it altogether
+  //VB : I don't quite understand the test, because, if the 
+  //file is already open, it is the open method that should fail. 
+  // as it is of little importance for the whole test base, 
+  //I remove it altogether
 
-//   //////////////////////////////////////////////
-//   //  TEST6: Writing field in the other file  //
-//   //////////////////////////////////////////////
-//   //Creation Invalid Read/Write MedFieldDriver21
-//   MED_FIELD_RDWR_DRIVER21<int> *aInvalidMedRdWrFieldDriver21_5 =
-//     new MED_FIELD_RDWR_DRIVER21<int>(other_file_wr, aField);
-//   aInvalidMedRdWrFieldDriver21_5->open();
-//   //#ifdef ENABLE_FAULTS
-//   CPPUNIT_ASSERT_THROW(aInvalidMedRdWrFieldDriver21_5->write(), MEDEXCEPTION);
-//   //=>Segmentation fault in this case
-//   //#endif
+  //   //////////////////////////////////////////////
+  //   //  TEST6: Writing field in the other file  //
+  //   //////////////////////////////////////////////
+  //   //Creation Invalid Read/Write MedFieldDriver21
+  //   MED_FIELD_RDWR_DRIVER21<int> *aInvalidMedRdWrFieldDriver21_5 =
+  //     new MED_FIELD_RDWR_DRIVER21<int>(other_file_wr, aField);
+  //   aInvalidMedRdWrFieldDriver21_5->open();
+  //   //#ifdef ENABLE_FAULTS
+  //   CPPUNIT_ASSERT_THROW(aInvalidMedRdWrFieldDriver21_5->write(), MEDEXCEPTION);
+  //   //=>Segmentation fault in this case
+  //   //#endif
 
   ////////////////////////
   //  TEST7: Main test  //
@@ -518,21 +528,21 @@ void MEDMEMTest::testMedFieldDriver21()
 
   //Test open() method
   try
-  {
-    aMedRdWrFieldDriver21->open();
-  }
+    {
+      aMedRdWrFieldDriver21->open();
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
 
   //#ifdef ENABLE_FORCED_FAILURES
   //Trying open file secondary.
-        //  CPPUNIT_ASSERT_THROW(aMedRdWrFieldDriver21->open(), MEDEXCEPTION);
+  //  CPPUNIT_ASSERT_THROW(aMedRdWrFieldDriver21->open(), MEDEXCEPTION);
   // (BUG) No exception in this case
   //#endif
 
@@ -541,38 +551,38 @@ void MEDMEMTest::testMedFieldDriver21()
 
   //Test setFieldName() and getFieldName
   try
-  {
-    aMedRdWrFieldDriver21->setFieldName(fileldnotexist);
-  }
+    {
+      aMedRdWrFieldDriver21->setFieldName(fileldnotexist);
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
   CPPUNIT_ASSERT_EQUAL(fileldnotexist, aMedRdWrFieldDriver21->getFieldName());
 
   //Trying read not existing field from file
-        // CPPUNIT_ASSERT_THROW(aMedRdWrFieldDriver21->read(), MEDEXCEPTION);
+  // CPPUNIT_ASSERT_THROW(aMedRdWrFieldDriver21->read(), MEDEXCEPTION);
 
   //Test read() method
-        
+
   aMedRdWrFieldDriver21->setFieldName(fieldnameDouble);
-  aMedRdWrFieldDriver21->open(); 
+  aMedRdWrFieldDriver21->open();
   try
-  {
-    aMedRdWrFieldDriver21->read();
-  }
+    {
+      aMedRdWrFieldDriver21->read();
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
 
   //Trying write field in the file with empty name
   aField_2->setName(emptyfilename);
@@ -584,33 +594,33 @@ void MEDMEMTest::testMedFieldDriver21()
   aMedRdWrFieldDriver21->setFieldName(fieldnameDouble_cpy);
   //#ifdef ENABLE_FAULTS
   try
-  {
-    aMedRdWrFieldDriver21->write();
-  }
+    {
+      aMedRdWrFieldDriver21->write();
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
   //=>Segmentation fault in this case
   //#endif
 
   //Test close() method
   try
-  {
-    aMedRdWrFieldDriver21->close();
-  }
+    {
+      aMedRdWrFieldDriver21->close();
+    }
   catch(MEDEXCEPTION &e)
-  {
-    CPPUNIT_FAIL(e.what());
-  }
+    {
+      CPPUNIT_FAIL(e.what());
+    }
   catch( ... )
-  {
-    CPPUNIT_FAIL("Unknown exception");
-  }
+    {
+      CPPUNIT_FAIL("Unknown exception");
+    }
 
   //Default constructor
   MED_FIELD_RDWR_DRIVER21<double> aMedRdWrFieldDriver21Cpy_1;
@@ -652,6 +662,6 @@ void MEDMEMTest::testMedFieldDriver21()
   delete aInvalidMedRdWrFieldDriver21_2;
   delete aInvalidMedRdWrFieldDriver21_3;
   delete aInvalidMedRdWrFieldDriver21_4;
-        //  delete aInvalidMedRdWrFieldDriver21_5;
+  //  delete aInvalidMedRdWrFieldDriver21_5;
   delete aMedRdWrFieldDriver21;
 }

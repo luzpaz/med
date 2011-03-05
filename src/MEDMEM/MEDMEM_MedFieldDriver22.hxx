@@ -906,10 +906,10 @@ reads the MESH object in order to retrieve the list of geometric types for a giv
 
 template <class T> void
 MED_FIELD_DRIVER22<T>::getMeshGeometricTypeFromMESH( MESH * meshPtr,
-                                          MED_EN::medEntityMesh  entity,
-                                          vector<MED_EN::medGeometryElement> & geoType,
-                                          vector<int> &nbOfElOfType,
-                                          vector<int> &nbOfElOfTypeC) const throw(MEDEXCEPTION)
+                                                     MED_EN::medEntityMesh  entity,
+                                                     vector<MED_EN::medGeometryElement> & geoType,
+                                                     vector<int> &nbOfElOfType,
+                                                     vector<int> &nbOfElOfTypeC) const throw(MEDEXCEPTION)
 {
   const char LOC[] = "MED_FIELD_DRIVER<T>::getMeshGeometricTypeFromMESH(...) : ";
   BEGIN_OF_MED(LOC);
@@ -920,9 +920,9 @@ MED_FIELD_DRIVER22<T>::getMeshGeometricTypeFromMESH( MESH * meshPtr,
   // Il est plus pratique de créer un support "onAll"
   // pour calculer les tableaux du nombre d'entités cumulées
 
-  SUPPORT *mySupportFromMesh=new SUPPORT(meshPtr, "Temporary Support From Associated Mesh", entity);
+  const SUPPORT *mySupportFromMesh=meshPtr->getSupportOnAll( entity );
   geoType = vector<MED_EN::medGeometryElement>(mySupportFromMesh->getTypes(),
-                              mySupportFromMesh->getTypes()+mySupportFromMesh->getNumberOfTypes());
+                                               mySupportFromMesh->getTypes()+mySupportFromMesh->getNumberOfTypes());
   nbOfElOfType.resize(mySupportFromMesh->getNumberOfTypes());
   nbOfElOfTypeC.resize(mySupportFromMesh->getNumberOfTypes()+1);
   nbOfElOfTypeC[0]=0;
@@ -931,7 +931,6 @@ MED_FIELD_DRIVER22<T>::getMeshGeometricTypeFromMESH( MESH * meshPtr,
     nbOfElOfType[j-1]=mySupportFromMesh->getNumberOfElements(geoType[j-1]);
     nbOfElOfTypeC[j]+=nbOfElOfTypeC[j-1]+nbOfElOfType[j-1];
   }
-  mySupportFromMesh->removeReference();
   END_OF_MED(LOC);
 }
 

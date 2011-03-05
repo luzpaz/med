@@ -24,14 +24,14 @@
  File Support.cxx
 */
 
-#include <set>
-#include <algorithm>
-#include <list>
-
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_DriversDef.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Meshing.hxx"
+
+#include <set>
+#include <algorithm>
+#include <list>
 
 using namespace std;
 using namespace MED_EN;
@@ -90,17 +90,17 @@ SUPPORT::SUPPORT(): _name(""),  _description("None"), _mesh((MESH*)NULL),
 \param Entity Entity type of the support (MED_CELL,MED_FACE,MED_EDGE, MED_NODE)
 */
 //--------------------------------------------------------------------------
-SUPPORT::SUPPORT(MESH* Mesh, string Name/*=""*/, medEntityMesh Entity/*=MED_CELL*/):
-  _name(Name), _description("None"), _mesh(Mesh), _entity(Entity),
-  _numberOfGeometricType(0), _isOnAllElts(true),
-  _totalNumberOfElements(0), _number((MEDSKYLINEARRAY*)NULL),_number_fromfile(0)
-  //--------------------------------------------------------------------------
-{
-  MESSAGE_MED("SUPPORT::SUPPORT(MESH*Mesh,string Name,medEntityMesh Entity)");
-  if(_mesh)
-    _mesh->addReference();
-  update() ;
-};
+// SUPPORT::SUPPORT(MESH* Mesh, string Name/*=""*/, medEntityMesh Entity/*=MED_CELL*/):
+//   _name(Name), _description("None"), _mesh(Mesh), _entity(Entity),
+//   _numberOfGeometricType(0), _isOnAllElts(true),
+//   _totalNumberOfElements(0), _number((MEDSKYLINEARRAY*)NULL),_number_fromfile(0)
+//   //--------------------------------------------------------------------------
+// {
+//   MESSAGE_MED("SUPPORT::SUPPORT(MESH*Mesh,string Name,medEntityMesh Entity)");
+//   if(_mesh)
+//     _mesh->addReference();
+//   update() ;
+// };
 
 /*!
   Copy constructor.
@@ -130,7 +130,7 @@ SUPPORT::SUPPORT(const SUPPORT & m):_number_fromfile(0)
 
   _totalNumberOfElements = m._totalNumberOfElements;
 
-  if (m._isOnAllElts == false && m._number ) // m may be not filled SUPPORTClient
+  if ( m._number ) // m may be not filled SUPPORTClient
     _number = new MEDSKYLINEARRAY(* m._number);
   else
     _number = (MEDSKYLINEARRAY *) NULL;
@@ -176,13 +176,9 @@ SUPPORT & SUPPORT::operator=(const SUPPORT & m)
     _numberOfElements.set(_numberOfGeometricType,m._numberOfElements);
   _totalNumberOfElements = m._totalNumberOfElements;
 
-  if (m._isOnAllElts == false) {
-    if (_number) delete _number;
-    if  ( m._number ) // m may be not filled SUPPORTClient
-      _number = new MEDSKYLINEARRAY(* m._number);
-    else
-      _number = (MEDSKYLINEARRAY *) NULL;
-  }
+  if (_number) delete _number;
+  if  ( m._number ) // m may be not filled SUPPORTClient
+    _number = new MEDSKYLINEARRAY(* m._number);
   else
     _number = (MEDSKYLINEARRAY *) NULL;
 
@@ -260,70 +256,87 @@ void SUPPORT::update()
   const char* LOC = "SUPPORT::update() : ";
   BEGIN_OF_MED(LOC);
 
-  if (_isOnAllElts)
-  {
-    if (_entity == MED_NODE)
+  if (_isOnAllElts && _mesh)
     {
-      // BEGIN Issue 0020804: [CEA 399] Memory corruption ... in MEDMEMCppTest
-      //_numberOfGeometricType = 1;
-      setNumberOfGeometricType(1);
-      // END Issue 0020804
-
-      // BEGIN Issue 0020633: [CEA] Pb with 3D field creation fron another
-      // Use setGeometricType() in order to get _profilNames updated
-      //_geometricType.set(1);
-      //_geometricType[0]=MED_POINT1;
-      const MED_EN::medGeometryElement type = MED_POINT1;
-      setGeometricType( & type );
-      // END Issue 0020633: [CEA] Pb with 3D field creation fron another
-      _numberOfElements.set(1);
-      _numberOfElements[0]=_mesh->getNumberOfNodes(); // Vérifier le pointeur !
-      _totalNumberOfElements=_numberOfElements[0];
-    }
-    else
-    { // we duplicate information from _mesh
-      // BEGIN Issue 0020804: [CEA 399] Memory corruption ... in MEDMEMCppTest
-      // VSR: commented next line as result of merge from V5_1_main
-      // since in V6_main there seems another solution
-      // setNumberOfGeometricType(_mesh->getNumberOfTypesWithPoly(_entity));
-      // END Issue 0020804
-      _numberOfGeometricType=_mesh->getNumberOfTypesWithPoly(_entity);
-      MED_EN::medGeometryElement *types=_mesh->getTypesWithPoly(_entity);
-      _geometricType.set(_numberOfGeometricType);
-      for (int i=0;i<_numberOfGeometricType;i++)
+      if (_entity == MED_NODE)
         {
-          _geometricType[i]=types[i];
-        }
-      delete [] types;
-      SCRUTE_MED(_numberOfGeometricType);
-      medGeometryElement *  allType = _mesh->getTypesWithPoly(_entity);
-      // BEGIN Issue 0020633: [CEA] Pb with 3D field creation fron another
-      // Use setGeometricType() in order to get _profilNames updated
-      //_geometricType.set(_numberOfGeometricType,allType );
-      setGeometricType( allType );
-      // END Issue 0020633: [CEA] Pb with 3D field creation fron another
-      _numberOfElements.set(_numberOfGeometricType);
-      _totalNumberOfElements=0;
-      for (int i=0;i<_numberOfGeometricType;i++)
-      {
-        _numberOfElements[i]=_mesh->getNumberOfElementsWithPoly(_entity,_geometricType[i]) ;
-        _totalNumberOfElements+=_numberOfElements[i];
-      }
-      delete [] allType;
-    }
+          // BEGIN Issue 0020804: [CEA 399] Memory corruption ... in MEDMEMCppTest
+          //_numberOfGeometricType = 1;
+          setNumberOfGeometricType(1);
+          // END Issue 0020804
 
-    SCRUTE_MED(_name);
-    SCRUTE_MED(_numberOfGeometricType);
-  }
+          // BEGIN Issue 0020633: [CEA] Pb with 3D field creation fron another
+          // Use setGeometricType() in order to get _profilNames updated
+          //_geometricType.set(1);
+          //_geometricType[0]=MED_POINT1;
+          const MED_EN::medGeometryElement type = MED_POINT1;
+          setGeometricType( & type );
+          // END Issue 0020633: [CEA] Pb with 3D field creation fron another
+          _numberOfElements.set(1);
+          _numberOfElements[0]=_mesh->getNumberOfNodes();
+          _totalNumberOfElements=_numberOfElements[0];
+        }
+      else
+        { // we duplicate information from _mesh
+          // BEGIN Issue 0020804: [CEA 399] Memory corruption ... in MEDMEMCppTest
+          // VSR: commented next line as result of merge from V5_1_main
+          // since in V6_main there seems another solution
+          // setNumberOfGeometricType(_mesh->getNumberOfTypesWithPoly(_entity));
+          // END Issue 0020804
+          _numberOfGeometricType=_mesh->getNumberOfTypesWithPoly(_entity);
+          MED_EN::medGeometryElement *types=_mesh->getTypesWithPoly(_entity);
+          _geometricType.set(_numberOfGeometricType);
+          for (int i=0;i<_numberOfGeometricType;i++)
+            {
+              _geometricType[i]=types[i];
+            }
+          delete [] types;
+          SCRUTE_MED(_numberOfGeometricType);
+          medGeometryElement *  allType = _mesh->getTypesWithPoly(_entity);
+          // BEGIN Issue 0020633: [CEA] Pb with 3D field creation fron another
+          // Use setGeometricType() in order to get _profilNames updated
+          //_geometricType.set(_numberOfGeometricType,allType );
+          setGeometricType( allType );
+          // END Issue 0020633: [CEA] Pb with 3D field creation fron another
+          _numberOfElements.set(_numberOfGeometricType);
+          _totalNumberOfElements=0;
+          for (int i=0;i<_numberOfGeometricType;i++)
+            {
+              _numberOfElements[i]=_mesh->getNumberOfElementsWithPoly(_entity,_geometricType[i]) ;
+              _totalNumberOfElements+=_numberOfElements[i];
+            }
+          delete [] allType;
+        }
+
+      // set _number (issue 0021167)
+      {
+        vector<int> nums( max( 0, _totalNumberOfElements ));
+        for ( unsigned i = 0; i < nums.size(); ++i )
+          nums[i] = i+1;
+        if ( _entity == MED_NODE || nums.empty())
+          {
+            const int index[2] =
+              {
+                1, 1 + nums.size()
+              };
+            setNumber( index, & nums[0] );
+          }
+        else
+          {
+            setNumber( _mesh->getGlobalNumberingIndex( _entity ), & nums[0] );
+          }
+      }
+    }
   END_OF_MED(LOC);
-};
+}
+
 /*!
   Get the field value index (in fortran mode) from the support global number.
   Becareful, it doesn't take care of the field number of components
 */
 //-------------------
 int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTION)
-  //-------------------
+//-------------------
 {
   const char * LOC="getValIndFromGlobalNumber(const int number) : ";
   //BEGIN_OF_MED(LOC);
@@ -494,11 +507,11 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
   for (int i=0;i<_numberOfGeometricType;i++) {
     if(GeometricType[i]/100 != elemDim)
       {
-	if(i==0)
-	  elemDim=GeometricType[i]/100;
-	else if ( CELLMODEL_Map::retrieveCellModel( GeometricType[i] ).getDimension() !=
-		  CELLMODEL_Map::retrieveCellModel( GeometricType[0] ).getDimension() )
-	  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"unhomogeneous geometric types (dimension) !"));
+        if(i==0)
+          elemDim=GeometricType[i]/100;
+        else if ( CELLMODEL_Map::retrieveCellModel( GeometricType[i] ).getDimension() !=
+                  CELLMODEL_Map::retrieveCellModel( GeometricType[0] ).getDimension() )
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"unhomogeneous geometric types (dimension) !"));
       }
     _geometricType[i] = GeometricType[i] ;
     _numberOfElements[i] = NumberOfElements[i] ;
@@ -631,8 +644,7 @@ vector<string> SUPPORT::getProfilNames() const throw (MEDEXCEPTION)
 
 /*!
   This method gets the boundary elements of the mesh. The support has to be
-  build using the constructor SUPPORT(MESH *,string, medEntityMesh) or
-  SUPPORT() followed by setMesh(MESH*) setName(string) and
+  build using SUPPORT() followed by setMesh(MESH*) setName(string) and
   setEntity(medEntityMesh) before using this method.
 */
 //-------------------
@@ -1213,19 +1225,25 @@ SUPPORT* SUPPORT::buildSupportOnNode() const throw (MEDEXCEPTION)
   if ( !getMesh() )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"This SUPPORT has no mesh"));
 
-  string name("Support On Node built from ");
-  name += getName();
-
-  SUPPORT* nodalSupport = new SUPPORT( getMesh(), name, MED_NODE );
-  if ( !isOnAllElements() )
+  SUPPORT* nodalSupport = 0;
+  if ( isOnAllElements() )
+    {
+      nodalSupport = const_cast<SUPPORT*>( getMesh()->getSupportOnAll( MED_NODE ));
+      nodalSupport->addReference();
+    }
+  else
     {
       if ( !_numberOfElements )
-        {
-          nodalSupport->removeReference();
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No element numbers in a partial support"));
-        }
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No element numbers in a partial support"));
+      string name("Support On Node built from ");
+      name += getName();
 
+      nodalSupport = new SUPPORT;
+      nodalSupport->setMesh( getMesh());
+      nodalSupport->setName( name );
+      nodalSupport->setEntity( MED_NODE );
       nodalSupport->setEntity( getEntity() );
+
       const int * nums = _number->getValue();
       list<int> elems( nums, nums + _totalNumberOfElements );
       getMesh()->fillSupportOnNodeFromElementList( elems, nodalSupport );
@@ -1266,7 +1284,6 @@ void MEDMEM::SUPPORT::fillFromNodeList(const list<int>& listOfNode) throw (MEDEX
   setNumberOfGeometricType(numberOfGeometricType);
   setGeometricType(geometricType);
   setNumberOfElements(numberOfElements);
-  //setTotalNumberOfElements(numberOfElements[0]);
   setNumber(mySkyLineArray);
 
   delete[] numberOfElements;
@@ -1351,9 +1368,9 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
 
 \brief creates a MESH that contains only the elements in the current support.
 
-The output mesh has no group, nor elements of connectivity lesser than that of the present support. The method does not handle polygon or polyhedral elements. Nodes are renumbered so that they are numberd from 1 to N in the new mesh. The order of the elements in the new mesh corresponds to that of the elements in the original support.
+The output mesh has no group, nor elements of connectivity lesser than that of the present support. Nodes are renumbered so that they are numberd from 1 to N in the new mesh. The order of the elements in the new mesh corresponds to that of the elements in the original support.
 */
-MESH* SUPPORT::makeMesh()
+MESH* SUPPORT::makeMesh() const
 {
   const char* LOC = "SUPPORT::makeMesh(): ";
   if ( !_mesh )
@@ -1440,7 +1457,7 @@ MESH* SUPPORT::makeMesh()
       new_index.reserve( nbelems + 1 );
       new_index.push_back(1);
 
-      const int * nums = _isOnAllElts ? 0 : getNumber( type );
+      const int * nums = getNumber( type );
 
       if ( type == MED_POLYHEDRA )
       {
@@ -1449,7 +1466,7 @@ MESH* SUPPORT::makeMesh()
 
         for (int i=0; i<nbelems;i++) // loop on polyhedrons
         {
-          int ielem = nums ? nums[i]-shift : i;
+          int ielem = nums[i]-shift;
           int elem_face = index[ ielem   ] - 1;
           int faces_end = index[ ielem+1 ] - 1;
           new_index.push_back( new_index.back() + faces_end - elem_face );
@@ -1475,7 +1492,7 @@ MESH* SUPPORT::makeMesh()
       {
         for (int i=0; i<nbelems;i++)
         {
-          int ielem = nums ? nums[i]-shift : i;
+          int ielem = nums[i]-shift;
           const int* elem_node = conn + index[ ielem   ] - 1;
           const int* nodes_end = conn + index[ ielem+1 ] - 1;
           for ( ; elem_node < nodes_end; ++elem_node )

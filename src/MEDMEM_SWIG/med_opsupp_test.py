@@ -303,7 +303,9 @@ else:
 
 print "Let's now do an example of union and intersection of two supports with a non empty intersection"
 print ""
-support1 = SUPPORT(mesh,"Partial_Support_1",MED_CELL)
+support1 = SUPPORT()
+support1.setMesh(mesh)
+support1.setName("Partial_Support_1")
 support1Description = "Partial Support 1"
 support1NbOfTypes = 3
 support1TotNbElm = 8
@@ -336,7 +338,9 @@ else:
         print "    * Number",number[0:nbOfElmtsOfType]
     print ""
 
-support2 = SUPPORT(mesh,"Partial_Support_2",MED_CELL)
+support2 = SUPPORT()
+support2.setMesh(mesh)
+support2.setName("Partial_Support_2")
 support2Description = "Partial Support 2"
 support2NbOfTypes = 3
 support2TotNbElm = 8

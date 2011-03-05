@@ -699,7 +699,7 @@ for i in range(nbOfFiles):
     print ""
 
     print "Building of the support on all Cells of the mesh."
-    supportCell = SUPPORT(mesh)
+    supportCell = mesh.getSupportOnAll( MED_CELL )
     print ""
     barycenter = mesh.getBarycenter(supportCell)
     print "Getting barycenter of all Cells of the mesh"
@@ -767,7 +767,7 @@ for i in range(nbOfFiles):
         print ""
 
         print "Building of the support on all Faces of the mesh."
-        supportFace = SUPPORT(mesh,"Support on all faces of the mesh",MED_FACE)
+        supportFace = mesh.getSupportOnAll(MED_FACE)
         nbFace = mesh.getNumberOfElements(MED_FACE,MED_ALL_ELEMENTS)
         print ""
         print "Getting normal of each face of this support",nbFace
@@ -844,7 +844,7 @@ for i in range(nbOfFiles):
         print ""
 
         print "Building of the support on all Edges of the mesh."
-        supportEdge = SUPPORT(mesh,"Support on all edges of the mesh",MED_EDGE)
+        supportEdge = mesh.getSupportOnAll(MED_EDGE)
         nbEdge = mesh.getNumberOfElements(MED_EDGE,MED_ALL_ELEMENTS)
         print ""
         print "Getting normal of each edge of this support",nbEdge
