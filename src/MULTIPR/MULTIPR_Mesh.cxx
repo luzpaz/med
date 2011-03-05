@@ -747,7 +747,7 @@ Mesh* Mesh::createFromFamily(const Family* pFamily, const char* pNewMeshName)
     if (strlen(pNewMeshName) > MED_TAILLE_NOM) 
     {
         char msg[256];
-        sprintf(msg, "pNewMeshName length (=%d) too long: max size allowed is %d", strlen(pNewMeshName), MED_TAILLE_NOM);
+        sprintf(msg, "pNewMeshName length (=%d) too long: max size allowed is %d", int(strlen(pNewMeshName)), MED_TAILLE_NOM);
         throw IllegalArgumentException(msg, __FILE__, __LINE__);
     }
     //---------------------------------------------------------------------
