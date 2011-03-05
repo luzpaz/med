@@ -270,11 +270,8 @@ public :
         inline void setConnectivityptr(CONNECTIVITY*);
   virtual SUPPORT *                    getBoundaryElements(MED_EN::medEntityMesh Entity)
                                                 throw (MEDEXCEPTION);
-  virtual SUPPORT *                    getSupportOnAll(MED_EN::medEntityMesh Entity)
+  virtual const SUPPORT *              getSupportOnAll(MED_EN::medEntityMesh Entity) const
                                                 throw (MEDEXCEPTION);
-  // problème avec le maillage dans le support :
-  //            le pointeur n'est pas const, mais sa valeur oui. A voir !!! PG
-
   SUPPORT *                            getSkin(const SUPPORT * Support3D)
                                                 throw (MEDEXCEPTION);
 
