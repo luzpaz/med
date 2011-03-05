@@ -2135,19 +2135,10 @@ void MESHCollection::castSupport(const MESHCollection& old_collection, vector<co
     element_array[idomain].sort();
     element_array[idomain].unique();
 
-    if ( element_array[idomain].empty() )
-    {
-      support->setNumberOfGeometricType(0);
-    }
+    if (entity != MED_EN::MED_NODE)
+      support->fillFromElementList(element_array[idomain]);
     else
-    {
-      if (entity != MED_EN::MED_NODE)
-        support->fillFromElementList(element_array[idomain]);
-      else
-      {
-        support->fillFromNodeList(element_array[idomain]);
-      }
-    }
+      support->fillFromNodeList(element_array[idomain]);
   }
 }
 
