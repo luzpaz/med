@@ -50,13 +50,15 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
                int ** MEDArrayCellFamily,
                int ** MEDArrayFaceFamily,
                int ** MEDArrayEdgeFamily
-               ): SUPPORT(Mesh,Name),
-                  _identifier(Identifier), 
-                  _numberOfAttribute(NumberOfAttribute), 
+               ): SUPPORT(),
+                  _identifier(Identifier),
+                  _numberOfAttribute(NumberOfAttribute),
                   _numberOfGroup(NumberOfGroup)
 {
   MESSAGE_MED("FAMILY(int Identifier, string Name, int NumberOfAttribute,int *AttributeIdentifier,int *AttributeValue,string AttributeDescription,int NumberOfGroup,string GroupName, int ** Number) : "<<Identifier);
 
+  setMesh( Mesh );
+  setName( Name );
   _isOnAllElts = false ;
   SCRUTE_MED(_numberOfAttribute);
   if (_numberOfAttribute > 0)
@@ -64,95 +66,86 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
       _attributeIdentifier.set(_numberOfAttribute,AttributeIdentifier);
       _attributeValue.set(_numberOfAttribute,AttributeValue);
 
-      //_attributeDescription.set(_numberOfAttribute);
       _attributeDescription.resize(_numberOfAttribute);
       for (int i=0;i<NumberOfAttribute;i++) {
         _attributeDescription[i].assign(AttributeDescription,i*MED_TAILLE_DESC,MED_TAILLE_DESC);
         _attributeDescription[i].erase(strlen(_attributeDescription[i].c_str()));
-        //SCRUTE_MED(_attributeDescription[i]);
       }
     }
   else
     {
       _attributeIdentifier.set(_numberOfAttribute);
       _attributeValue.set(_numberOfAttribute);
-      //_attributeDescription.set(_numberOfAttribute);
       _attributeDescription.resize(_numberOfAttribute);
     }
- 
-  //_groupName.set(_numberOfGroup);
+
   _groupName.resize(_numberOfGroup);
-  for (int i=0;i<NumberOfGroup;i++) {
-    _groupName[i].assign(GroupName,i*MED_TAILLE_LNOM,MED_TAILLE_LNOM);
-    _groupName[i].erase(strlen(_groupName[i].c_str()));
-    //SCRUTE_MED(_groupName[i]);
-  }
+  for (int i=0;i<NumberOfGroup;i++)
+    {
+      _groupName[i].assign(GroupName,i*MED_TAILLE_LNOM,MED_TAILLE_LNOM);
+      _groupName[i].erase(strlen(_groupName[i].c_str()));
+    }
 
   // well, we must set SUPPORT attribut
   _description = "FAMILY" ;
   // on which geometric type :
   bool Find = false ;
-  
+
 
   // ************************ NODES RELATED PART *************************************************
   // Scan every node family number <NodeFamilyNumber[i]> in order to create 
   // the list <tmp_NodesList> of node numbers <i+1> belonging to the family <_identifier>
   int NumberOfNodes         = _mesh->getNumberOfNodes();
   int NumberOfNodesInFamily = 0 ;
-  //int * NodeFamilyNumber    = _mesh->getMEDArrayNodeFamily() ;   // EF : TEMPORAIRE !!
-  int * tmp_NodesList       = new int[NumberOfNodes] ;           // Un peu brutal...., oui mais ce n'est qu'un tableau de travail !
+  int * tmp_NodesList       = new int[NumberOfNodes] ; // Un peu brutal...., oui mais ce n'est qu'un tableau de travail !
   for (int i=0; i<NumberOfNodes; i++)
-    if ( _identifier == MEDArrayNodeFamily[i] ) {
-      tmp_NodesList[NumberOfNodesInFamily]=i+1 ;
-      NumberOfNodesInFamily++;
-    }
+    if ( _identifier == MEDArrayNodeFamily[i] )
+      {
+        tmp_NodesList[NumberOfNodesInFamily]=i+1 ;
+        NumberOfNodesInFamily++;
+      }
 
   SCRUTE_MED(NumberOfNodesInFamily);
 
-  // If we found nodes set the family attributes adequatly
-  if (NumberOfNodesInFamily>0) {
+  // If we found nodes, set the family attributes adequatly
+  if (NumberOfNodesInFamily>0)
+    {
+      Find = true ;
     
-    Find = true ;
-    
-    _entity = MED_NODE ;
-//      _numberOfGeometricType = 1 ;
-//      _geometricType = new medGeometryElement[1] ;
-//      _geometricType[0]=MED_NONE ;
+      _entity = MED_NODE ;
     
     // family on all NODE
-    if (NumberOfNodesInFamily==NumberOfNodes) {
-      _isOnAllElts = true ;
-      update();
-    } else {
-      _numberOfGeometricType = 1 ;
+      if (NumberOfNodesInFamily==NumberOfNodes)
+        {
+          _isOnAllElts = true ;
+          update();
+        }
+      else
+        {
+          _numberOfGeometricType = 1 ;
 
-      _geometricType.set(1) ;
+          _geometricType.set(1) ;
 
-      _geometricType[0]=MED_NONE ;
-      _isOnAllElts= false ;
+          _geometricType[0]=MED_NONE ;
+          _isOnAllElts= false ;
 
-      _numberOfElements.set(1) ;
+          _numberOfElements.set(1) ;
 
-      _numberOfElements[0]=NumberOfNodesInFamily ;
-      _totalNumberOfElements=NumberOfNodesInFamily;
-      
-//        _number=new MEDSKYLINEARRAY(1,NumberOfNodesInFamily) ;
-//        int * NumberIndex = _number->getIndex();
-//        int * NumberValue = _number->getValue();
-      int * NumberIndex = new int[2];
-      int * NumberValue = new int[NumberOfNodesInFamily];
+          _numberOfElements[0]=NumberOfNodesInFamily ;
+          _totalNumberOfElements=NumberOfNodesInFamily;
 
-      NumberIndex[0]=1;                          //set the MEDSKYLINEARRAY Index table
-      NumberIndex[1]=1+NumberOfNodesInFamily;    //set the MEDSKYLINEARRAY Index table
-      for(int i=0; i<NumberOfNodesInFamily; i++) // OH LA LA... 
-        NumberValue[i]=tmp_NodesList[i] ;        // RESIZE de tmp_NodesList serait plus efficace !!!!!!!!
-      // PG : pas de problème, si ca marche. Il faudra déplacer le delete !
-      if(_number!=NULL) delete _number ;
-      _number=new MEDSKYLINEARRAY(1,NumberOfNodesInFamily,NumberIndex,NumberValue) ;
-      delete[] NumberIndex ;
-      delete[] NumberValue ;
+          int * NumberIndex = new int[2];
+          int * NumberValue = new int[NumberOfNodesInFamily];
+
+          NumberIndex[0]=1;                          //set the MEDSKYLINEARRAY Index table
+          NumberIndex[1]=1+NumberOfNodesInFamily;    //set the MEDSKYLINEARRAY Index table
+          for(int i=0; i<NumberOfNodesInFamily; i++) // OH LA LA... 
+            NumberValue[i]=tmp_NodesList[i] ;        // RESIZE de tmp_NodesList serait plus efficace !!!!!!!!
+          setNumber( new MEDSKYLINEARRAY(1,NumberOfNodesInFamily,NumberIndex,NumberValue));
+          delete[] NumberIndex ;
+          delete[] NumberValue ;
+        }
     }
-  }
   delete[] tmp_NodesList ;
   
 
@@ -162,31 +155,34 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
   // family contains different geometic types of only one entity type.
   // ?? Scan every cell family number <NodeFamilyNumber[i]> in order to create 
   // ?? the list <tmp_NodesList> of node numbers <i+1> belonging to the family <_identifier>
-  if (!Find) {
-    Find = build(MED_CELL,MEDArrayCellFamily) ;
-  }
-  // on face ?
-  if (!Find) {
-    if ((_mesh->existConnectivityWithPoly(MED_NODAL,MED_FACE)) |
-        (_mesh->existConnectivityWithPoly(MED_DESCENDING,MED_FACE))) {
-      Find = build(MED_FACE,MEDArrayFaceFamily) ;
+  if (!Find)
+    {
+      Find = build(MED_CELL,MEDArrayCellFamily) ;
     }
-  }
+  // on face ?
+  if (!Find)
+    {
+      if (_mesh->existConnectivityWithPoly(MED_NODAL,MED_FACE) ||
+          _mesh->existConnectivityWithPoly(MED_DESCENDING,MED_FACE))
+        Find = build(MED_FACE,MEDArrayFaceFamily) ;
+    }
 
   // on edge ?
-  if (!Find) {
-    if ((_mesh->existConnectivity(MED_NODAL,MED_EDGE))|(_mesh->existConnectivity(MED_DESCENDING,MED_EDGE))) {
-      Find = build(MED_EDGE,MEDArrayEdgeFamily) ;
+  if (!Find)
+    {
+      if (_mesh->existConnectivity(MED_NODAL,MED_EDGE) ||
+          _mesh->existConnectivity(MED_DESCENDING,MED_EDGE))
+        Find = build(MED_EDGE,MEDArrayEdgeFamily) ;
     }
-  }
   // That's all !
 
   // if not find : no entity in familly !!!
-  if (!Find) {
-    _numberOfGeometricType = 0 ;
-    _isOnAllElts = false ;
-    MESSAGE_MED ("FAMILY() : No entity found !") ;
-  }
+  if (!Find)
+    {
+      _numberOfGeometricType = 0 ;
+      _isOnAllElts = false ;
+      MESSAGE_MED ("FAMILY() : No entity found !") ;
+    }
 
   MESSAGE_MED("Well now ??? :::");
 
@@ -195,22 +191,20 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
   MESSAGE_MED("Mesh name : " << getMesh()->getName());
   MESSAGE_MED("Entity : "<< getEntity());
   MESSAGE_MED("Entity list :");
-  if (!(isOnAllElements())) {
-    MESSAGE_MED("NumberOfTypes : "<<getNumberOfTypes());
-    for (int j=0;j<getNumberOfTypes();j++) {
-      MESSAGE_MED("    * Type "<<getTypes()[j]<<" : there is(are) "<<
-                  getNumberOfElements(getTypes()[j])<<" element(s) : ");
-      SCRUTE_MED(getNumber(getTypes()[j]));
-      //      for (int k=0; k<numberOfElements;k++)
-        //      MESSAGE_MED("________________ " << number[k]);
+  if ( !isOnAllElements() )
+    {
+      MESSAGE_MED("NumberOfTypes : "<<getNumberOfTypes());
+      for (int j=0;j<getNumberOfTypes();j++)
+        {
+          MESSAGE_MED("    * Type "<<getTypes()[j]<<" : there is(are) "<<
+                      getNumberOfElements(getTypes()[j])<<" element(s) : ");
+          SCRUTE_MED(getNumber(getTypes()[j]));
+        }
     }
-  }
   else
-  {
-    MESSAGE_MED("Is on all entities !");
-  }
-
-
+    {
+      MESSAGE_MED("Is on all entities !");
+    }
 }
 
 FAMILY::FAMILY(const FAMILY & m):SUPPORT(m)
@@ -219,19 +213,18 @@ FAMILY::FAMILY(const FAMILY & m):SUPPORT(m)
   _identifier = m._identifier;
   _numberOfAttribute = m._numberOfAttribute;
 
-  if (_numberOfAttribute) {
-    _attributeIdentifier.set(_numberOfAttribute,m._attributeIdentifier);
-    _attributeValue.set(_numberOfAttribute,m._attributeValue);
-  }
+  if (_numberOfAttribute)
+    {
+      _attributeIdentifier.set(_numberOfAttribute,m._attributeIdentifier);
+      _attributeValue.set(_numberOfAttribute,m._attributeValue);
+    }
 
-  //_attributeDescription.set(_numberOfAttribute);
   _attributeDescription.resize(_numberOfAttribute);
   for (int i=0;i<m._numberOfAttribute;i++)
     _attributeDescription[i] = m._attributeDescription[i];
 
   _numberOfGroup = m._numberOfGroup;
 
-  //_groupName.set(_numberOfGroup) ;
   _groupName.resize(_numberOfGroup) ;
   for (int i=0;i<m._numberOfGroup;i++)
     _groupName[i]=m._groupName[i];
@@ -247,34 +240,32 @@ FAMILY::FAMILY(const SUPPORT & s):SUPPORT(s)
   _numberOfGroup = 0;
 }
 
-FAMILY::~FAMILY() 
+FAMILY::~FAMILY()
 {
-    MESSAGE_MED("~FAMILY()");
+  MESSAGE_MED("~FAMILY()");
 }
-  
+
 FAMILY & FAMILY::operator=(const FAMILY &fam) 
 {
-    MESSAGE_MED("FAMILY::operator=");
-    if ( this == &fam ) return *this;
+  MESSAGE_MED("FAMILY::operator=");
+  if ( this == &fam ) return *this;
 
-    //Etant donné que l'opérateur d'affectation de la classe SUPPORT effectuait
-    //une recopie profonde j'ai mis en cohérence l'opérateur d'affectation
-    // de la classe FAMILY
-    SUPPORT::operator=(fam);
- 
+  //Etant donné que l'opérateur d'affectation de la classe SUPPORT effectuait
+  //une recopie profonde j'ai mis en cohérence l'opérateur d'affectation
+  // de la classe FAMILY
+  SUPPORT::operator=(fam);
 
-    _identifier = fam._identifier;
-    _numberOfAttribute = fam._numberOfAttribute; 
-    _attributeIdentifier.set(_numberOfAttribute, fam._attributeIdentifier) ;
-    _attributeValue.set(_numberOfAttribute, fam._attributeValue) ;
-    //_attributeDescription.set(_numberOfAttribute, fam._attributeDescription) ;
-    _attributeDescription.clear();
-    _attributeDescription = fam._attributeDescription;
-    _numberOfGroup = fam._numberOfGroup;
-    //_groupName.set(_numberOfGroup, fam._groupName) ;
-    _groupName.clear();
-    _groupName = fam._groupName;
-    return *this;
+
+  _identifier = fam._identifier;
+  _numberOfAttribute = fam._numberOfAttribute; 
+  _attributeIdentifier.set(_numberOfAttribute, fam._attributeIdentifier) ;
+  _attributeValue.set(_numberOfAttribute, fam._attributeValue) ;
+  _attributeDescription.clear();
+  _attributeDescription = fam._attributeDescription;
+  _numberOfGroup = fam._numberOfGroup;
+  _groupName.clear();
+  _groupName = fam._groupName;
+  return *this;
 }
 
 ostream & MEDMEM::operator<<(ostream &os, FAMILY &myFamily)
@@ -320,101 +311,94 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
   // Get types information from <_mesh>
   int    numberOfTypes             = _mesh->getNumberOfTypesWithPoly(Entity) ;
   medGeometryElement * types       = _mesh->getTypesWithPoly(Entity) ;
-  
-  int *  numberOfElementsInFamily         = new int[numberOfTypes] ;
-  int    numberOfElementTypesInFamily     = 0 ;
-  
-  medGeometryElement * tmp_Types  = new medGeometryElement[numberOfTypes];
-  int ** tmp_ElementsLists                = new int*[numberOfTypes] ;
-  //  int *  GeometricTypeNumber           = new int[numberOfTypes] ;
-  const int *  GlobalNumberingIndex          = _mesh->getGlobalNumberingIndex(Entity);
-  
+
+  int *  numberOfElementsInFamily     = new int[numberOfTypes] ;
+  int    numberOfElementTypesInFamily = 0 ;
+
+  medGeometryElement * tmp_Types    = new medGeometryElement[numberOfTypes];
+  int ** tmp_ElementsLists          = new int*[numberOfTypes] ;
+  const int *  GlobalNumberingIndex = _mesh->getGlobalNumberingIndex(Entity);
+
 
   SCRUTE_MED(numberOfTypes);
 
   // we search for all elements in this family
-  for (int TypeNumber=0; TypeNumber < numberOfTypes; TypeNumber++) {
-    
-    int NumberOfElements             = _mesh->getNumberOfElementsWithPoly(Entity,types[TypeNumber]) ;
-    int NumberOfElementsInThisFamily = 0 ;
-    int * ElementsOfThisFamilyNumber = FamilyNumber[TypeNumber];
-    int * tmp_ElementsList           = new int[NumberOfElements];
-      
-    for (int i=0; i<NumberOfElements; i++)
-      {
-        //      SCRUTE_MED(ElementsOfThisFamilyNumber[i]);
-        if (_identifier == ElementsOfThisFamilyNumber[i]) {
-          tmp_ElementsList[NumberOfElementsInThisFamily]=i+GlobalNumberingIndex[TypeNumber] ;
-          NumberOfElementsInThisFamily++;
+  for (int TypeNumber=0; TypeNumber < numberOfTypes; TypeNumber++)
+    {
+      int NumberOfElements             = _mesh->getNumberOfElementsWithPoly(Entity,types[TypeNumber]) ;
+      int NumberOfElementsInThisFamily = 0 ;
+      int * ElementsOfThisFamilyNumber = FamilyNumber[TypeNumber];
+      int * tmp_ElementsList           = new int[NumberOfElements];
+
+      for (int i=0; i<NumberOfElements; i++)
+        {
+          if (_identifier == ElementsOfThisFamilyNumber[i])
+            {
+              tmp_ElementsList[NumberOfElementsInThisFamily]=i+GlobalNumberingIndex[TypeNumber] ;
+              NumberOfElementsInThisFamily++;
+            }
         }
-      }
-    
-    if (NumberOfElementsInThisFamily>0) {// we have found some elements
-      numberOfElementsInFamily[numberOfElementTypesInFamily]=NumberOfElementsInThisFamily;
 
-      //int * ElementsList = tmp_ElementsList.resize(NumberOfElementsInThisFamily);
-      int * ElementsList = new int[NumberOfElementsInThisFamily] ;
-      memcpy(ElementsList,tmp_ElementsList,sizeof(int)*NumberOfElementsInThisFamily); // RESIZE de tmp_NodesList serait plus efficace !!!!!!!!
-        
-      tmp_ElementsLists[numberOfElementTypesInFamily]=ElementsList ;
-      tmp_Types[numberOfElementTypesInFamily]=types[TypeNumber];
-      //      GeometricTypeNumber[numberOfElementTypesInFamily]=TypeNumber+1;
-      numberOfElementTypesInFamily++;
-      //      delete [] ElementsList;
+      if (NumberOfElementsInThisFamily>0) // we have found some elements
+        {
+          numberOfElementsInFamily[numberOfElementTypesInFamily]=NumberOfElementsInThisFamily;
+
+          int * ElementsList = new int[NumberOfElementsInThisFamily] ;
+          memcpy(ElementsList,tmp_ElementsList,sizeof(int)*NumberOfElementsInThisFamily); // RESIZE de tmp_NodesList serait plus efficace !!!!!!!!
+
+          tmp_ElementsLists[numberOfElementTypesInFamily]=ElementsList ;
+          tmp_Types[numberOfElementTypesInFamily]=types[TypeNumber];
+          numberOfElementTypesInFamily++;
+        }
+      delete[] tmp_ElementsList;
     }
-    delete[] tmp_ElementsList;
-  }
-  
+
   // we define all attribut in SUPPORT :
-  if (numberOfElementTypesInFamily>0) { // we have found elements
-    Find = true ;
-    _entity = Entity ;
-    _numberOfGeometricType = numberOfElementTypesInFamily ;
-    _geometricType.set(numberOfElementTypesInFamily) ;
+  if (numberOfElementTypesInFamily>0) // we have found elements
+    {
+      Find = true ;
+      _entity = Entity ;
+      _numberOfGeometricType = numberOfElementTypesInFamily ;
+      _geometricType.set(numberOfElementTypesInFamily) ;
 
-    _isOnAllElts = false ;
+      _isOnAllElts = false ;
 
-    _numberOfElements.set(numberOfElementTypesInFamily) ;
-    _totalNumberOfElements=0;
+      _numberOfElements.set(numberOfElementTypesInFamily) ;
+      _totalNumberOfElements=0;
 
-    //_numberOfGaussPoint = new int[numberOfElementTypesInFamily] ;
+      for (int i=0; i<numberOfElementTypesInFamily; i++)
+        {
+          _geometricType[i]=tmp_Types[i] ;
+          _numberOfElements[i]=numberOfElementsInFamily[i]; // plutot un resize !!
+          _totalNumberOfElements+=_numberOfElements[i];
+        }
 
-    //int * numberIndex = new int[numberOfElementTypesInFamily+1];
-    //numberIndex[0]=1;
-    for (int i=0; i<numberOfElementTypesInFamily; i++) {
-      _geometricType[i]=tmp_Types[i] ;
-      //numberIndex[i+1]=numberIndex[i]+numberOfElementsInFamily[i];
-      _numberOfElements[i]=numberOfElementsInFamily[i]; // plutot un resize !!
-      _totalNumberOfElements+=_numberOfElements[i];
-      //_numberOfGaussPoint[i]=1;
+      // family on all ELEMENT ?
+      if (_totalNumberOfElements == 
+          _mesh->getNumberOfElementsWithPoly(Entity,MED_ALL_ELEMENTS) && Entity==MED_EN::MED_CELL)
+        {
+          _isOnAllElts = true ;
+          // all others attributs are rights !
+          for (int i=0; i<_numberOfGeometricType; i++)
+            delete[] tmp_ElementsLists[i];
+        }
+      else
+        {
+          int *NumberValue = new int[_totalNumberOfElements];
+          int *NumberIndex = new int[_numberOfGeometricType+1];
+          NumberIndex[0]=1;
+          for (int i=0; i<_numberOfGeometricType; i++)
+            {
+              NumberIndex[i+1]=NumberIndex[i]+_numberOfElements[i];
+              for (int j=NumberIndex[i]; j<NumberIndex[i+1]; j++)
+                NumberValue[j-1]=tmp_ElementsLists[i][j-NumberIndex[i]];
+              delete[] tmp_ElementsLists[i];
+            }
+          setNumber( new MEDSKYLINEARRAY(_numberOfGeometricType,_totalNumberOfElements,NumberIndex,NumberValue));
+          delete[] NumberIndex ;
+          delete[] NumberValue ;
+        }
     }
-    //    delete[] numberOfElementsInFamily;
-    //    delete[] tmp_Types;
-    //    delete[] GeometricTypeNumber;
-      
-    // family on all ELEMENT ?
-    if (_totalNumberOfElements == 
-        _mesh->getNumberOfElementsWithPoly(Entity,MED_ALL_ELEMENTS) && Entity==MED_EN::MED_CELL) {
-      _isOnAllElts = true ;
-      // all others attributs are rights !
-      for (int i=0; i<_numberOfGeometricType; i++)
-        delete[] tmp_ElementsLists[i];
-    } else {
-      int *NumberValue = new int[_totalNumberOfElements];
-      int *NumberIndex = new int[_numberOfGeometricType+1];
-      NumberIndex[0]=1;
-      for (int i=0; i<_numberOfGeometricType; i++) {
-        NumberIndex[i+1]=NumberIndex[i]+_numberOfElements[i];
-        for (int j=NumberIndex[i]; j<NumberIndex[i+1]; j++)
-          NumberValue[j-1]=tmp_ElementsLists[i][j-NumberIndex[i]];
-        delete[] tmp_ElementsLists[i];
-      }
-      if(_number!=NULL) delete _number ;
-      _number = new MEDSKYLINEARRAY(_numberOfGeometricType,_totalNumberOfElements,NumberIndex,NumberValue);
-      delete[] NumberIndex ;
-      delete[] NumberValue ;
-    }
-  }
   delete[] tmp_Types;
   delete[] types;
   delete[] numberOfElementsInFamily;
