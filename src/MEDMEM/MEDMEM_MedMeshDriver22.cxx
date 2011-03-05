@@ -3101,9 +3101,12 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
       int FamilyIdentifier = (*myFamilies)[i]->getIdentifier();
       int TotalNumber = (*myFamilies)[i]->getNumberOfElements(MED_ALL_ELEMENTS);
       if ((*myFamilies)[i]->isOnAllElements())
+      {
         for (int j=0; j<TotalNumber; j++)
           MEDArrayNodeFamily[j]=FamilyIdentifier;
-      else {
+      }
+      else if ( TotalNumber > 0 )
+      {
         const int * Number = (*myFamilies)[i]->getNumber(MED_ALL_ELEMENTS);
         for (int j=0; j<TotalNumber; j++)
           MEDArrayNodeFamily[Number[j]-1]=FamilyIdentifier;
@@ -3171,7 +3174,8 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
         if ((*myFamilies)[i]->isOnAllElements())
           for (int ii=0; ii<TotalNumber; ii++)
             MEDArrayFamily[ii]=FamilyIdentifier;
-        else {
+        else if ( TotalNumber > 0 )
+        {
           const int * Number = (*myFamilies)[i]->getNumber(MED_ALL_ELEMENTS);
           for (int ii=0; ii<TotalNumber; ii++)
             MEDArrayFamily[Number[ii]-1]=FamilyIdentifier;
@@ -3267,7 +3271,7 @@ int MED_MESH_WRONLY_DRIVER22::writeFamilyNumbers() const {
         if ((*myFamilies)[i]->isOnAllElements())
           for (int ii=0; ii<numberOfFamilyElements; ii++)
             familyArray[ii]=familyNumber;
-        else {
+        else  if ( numberOfFamilyElements > 0 ) {
           const int * myFamilyElements = (*myFamilies)[i]->getNumber(MED_ALL_ELEMENTS);
           for (int ii=0;ii<numberOfFamilyElements;ii++)
             familyArray[myFamilyElements[ii]-1]=familyNumber;
