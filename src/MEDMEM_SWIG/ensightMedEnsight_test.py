@@ -107,7 +107,7 @@ def compatibilityPb():
 from dircache import listdir
 
 inFiles = [
-    "blow1_ascii.case"
+    "frame.case"
 #     ,"blow1_bin.case"
 #     ,"zmat2d_esca.case"
 #     ,"dyna.case"
@@ -158,9 +158,25 @@ for inFile in inFiles: # loop on all files in inDir
     ensFile = os.path.join( inDir, inFile )
     print "\nreading",ensFile
     incompatible = False
+    meshes = []
+    fields = []
     try:
-        medFromEns = MED(ENSIGHT_DRIVER, ensFile)
-        medFromEns.read();
+        medFromEns = ENSIGHT_MED_RDONLY_DRIVER(ensFile);
+        fields = medFromEns.read()
+        if not fields:
+            mesh = MESH(ENSIGHT_DRIVER,ensFile,"");
+            meshes.append( mesh )
+        else:
+            meshNames = []
+            for f in fields:
+                mesh = f.getSupport().getMesh()
+                if mesh and not mesh.getName() in meshNames:
+                    meshes.append( mesh )
+                    meshNames.append( mesh.getName() )
+                    pass
+                pass
+            pass
+        pass
     except:
         if not compatibilityPb():
             sys.exit(1)
@@ -168,23 +184,27 @@ for inFile in inFiles: # loop on all files in inDir
             continue
 
     # show MEDMEM contents
-    m2m_nom  = medFromEns.getMeshName(0)
-    mesh = medFromEns.getMesh(m2m_nom)
+    mesh = meshes[0]
     if dumpMesh:
         ShowMesh( mesh, 10, [10,10,10] )
         ShowGroups( mesh )
         pass
     if dumpField:
-        ShowFields( medFromEns, 10 )
+        ShowFields( fields, 10 )
 
     # write MEDMEM into MED
 
     medFile = os.path.join( outDir, basename + ".med" )
     deleteFile(medFile)
     print "write",medFile
-    wdrv = medFromEns.addDriver(MED_DRIVER,medFile)
-    medFromEns.write( wdrv )
-    
+    for m in meshes:
+        m.write( MED_DRIVER,medFile )
+        pass
+    for f in fields:
+        fTyped = f.castToTypedField()
+        fTyped.write(MED_DRIVER,medFile)
+        pass
+
     # write MEDMEM into EnSight
 
     for format,bin in formats:
@@ -210,11 +230,15 @@ for inFile in inFiles: # loop on all files in inDir
 
         setEnSightFormatForWriting( format, bin )
 
-        medEnsDriver = ENSIGHT_MED_WRONLY_DRIVER (ensFile, medFromEns)
         print "writting", ensFile
         incompatible = False
         try:
-            medEnsDriver.write()
+            if fields:
+                medEnsDriver = ENSIGHT_MED_WRONLY_DRIVER (ensFile, fields)
+                medEnsDriver.write()
+            else:
+                mesh2EnsDriver = ENSIGHT_MESH_WRONLY_DRIVER( ensFile, mesh )
+                mesh2EnsDriver.write()
         except:
             if not compatibilityPb():
                 sys.exit(1)
@@ -223,7 +247,10 @@ for inFile in inFiles: # loop on all files in inDir
             incompatible = True
             setIgnoreIncompatibility(1)
             try:
-                medEnsDriver.write()
+                if fields:
+                    medEnsDriver.write()
+                else:
+                    mesh2EnsDriver.write()
             except:
                 if not compatibilityPb():
                     sys.exit(1)

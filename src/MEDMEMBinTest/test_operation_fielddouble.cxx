@@ -21,6 +21,11 @@
 //
 // Programme de test des operations sur les champs
 //
+#include <string>
+#include <iostream>
+#include <iomanip>
+#include <cmath>
+
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Family.hxx"
@@ -32,14 +37,10 @@
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
 
-#include <string>
-#include <iostream>
-#include <iomanip>
-#include <cmath>
-
+double myfunction1(double x);
 double myfunction1(double x)
 {
-  return 0.25*(x-1.0);
+    return 0.25*(x-1.0);
 }
 
 
@@ -47,14 +48,13 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
+static void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
 {
   cout << "Field "<< myField->getName() << " : " <<myField->getDescription() <<  endl ;
   int NumberOfComponents = myField->getNumberOfComponents() ;
   cout << "- Nombre de composantes : "<< NumberOfComponents << endl ;
   cout << "- Nombre de valeurs     : "<< myField->getNumberOfValues() << endl ;
-  for (int i=1; i<NumberOfComponents+1; i++) 
-  {
+  for (int i=1; i<NumberOfComponents+1; i++) {
     cout << "  - composante "<<i<<" :"<<endl ;
     cout << "      - nom         : "<<myField->getComponentName(i)<< endl;
     cout << "      - description : "<<myField->getComponentDescription(i) << endl;
@@ -70,16 +70,15 @@ void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
   cout << "- Adresse support : " << mySupport << endl;
 }
 
-void affiche_fieldT(FIELD<double> * myField, const SUPPORT * mySupport)
+static void affiche_fieldT(FIELD<double> * myField, const SUPPORT * mySupport)
 {
   affiche_field_((FIELD_ *) myField, mySupport);
 
   cout << "- Valeurs :"<<endl;
-  int NumberOf = mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
+  int NumberOf = mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
   int NumberOfComponents = myField->getNumberOfComponents() ;
 
-  for (int i=1; i<NumberOf+1; i++) 
-  {
+  for (int i=1; i<NumberOf+1; i++) {
     const double * value = myField->getRow(i) ;
     for (int j=0; j<NumberOfComponents; j++)
       cout << value[j]<< " ";
@@ -89,22 +88,22 @@ void affiche_fieldT(FIELD<double> * myField, const SUPPORT * mySupport)
   cout << "Norme euclidienne : " << myField->norm2() << endl;
   cout << "Norme max         : " << myField->normMax() << endl;
   try
-  {
-    for (int i=1; i<=myField->getNumberOfComponents(); ++i)
-      cout << "Norme L2 - comp=" << i << " : " << myField->normL2(i) << endl;
-    cout << "Norme L2          : " << myField->normL2() << endl;
+    {
+      for (int i=1; i<=myField->getNumberOfComponents(); ++i)
+        cout << "Norme L2 - comp=" << i << " : " << myField->normL2(i) << endl;
+      cout << "Norme L2          : " << myField->normL2() << endl;
 
-    for (int i=1; i<=myField->getNumberOfComponents(); ++i)
-      cout << "Norme L1 - comp=" << i << " : " << myField->normL1(i) << endl;
-    cout << "Norme L1          : " << myField->normL1() << endl;
-  }
+      for (int i=1; i<=myField->getNumberOfComponents(); ++i)
+        cout << "Norme L1 - comp=" << i << " : " << myField->normL1(i) << endl;
+      cout << "Norme L1          : " << myField->normL1() << endl;
+    }
   catch (MEDEXCEPTION &ex)
-  {
-    cout << ex.what() << endl;
-  }
+    {
+      cout << ex.what() << endl;
+    }
 }
 
-void affiche_valeur_field(const FIELD<double>& f)
+static void affiche_valeur_field(const FIELD<double>& f)
 {
   const int tailleMax=12;
   const int taille=f.getNumberOfValues()*f.getNumberOfComponents();
@@ -113,16 +112,16 @@ void affiche_valeur_field(const FIELD<double>& f)
     for(int i=0;i<taille;i++)
       cout << setw(3) << value[i] << " ";
   else
-  {
-    for(int i=0; i<tailleMax/2; ++i)
-      cout << setw(3) << value[i] << " ";
-    cout << "    ...    ";
-    for(int i=taille-tailleMax/2 ; i<taille; ++i)
-      cout << setw(3) << value[i] << " ";
-  }
+    {
+      for(int i=0; i<tailleMax/2; ++i)
+        cout << setw(3) << value[i] << " ";
+      cout << "    ...    ";
+      for(int i=taille-tailleMax/2 ; i<taille; ++i)
+        cout << setw(3) << value[i] << " ";
+    }
 }
 
-void checkOperation(const FIELD<double>& resOp, const FIELD<double>& f1, const FIELD<double>& f2,
+static void checkOperation(const FIELD<double>& resOp, const FIELD<double>& f1, const FIELD<double>& f2,
                     char Op, const char* intitule, int verbose)
 {
   int res=0;
@@ -139,56 +138,57 @@ void checkOperation(const FIELD<double>& resOp, const FIELD<double>& f1, const F
     res=1;
 
   if(!res)
-  {
-    switch(Op)
     {
-    case '+':
-      for(int i=0; i!=size; ++i)
-        if(value[i]!=value1[i]+value2[i])
-          res+=1;
-      break;
-    case '-':
-      for(int i=0; i!=size; ++i)
-        if(value[i]!=value1[i]-value2[i])
-          res+=1;
-      break;
-    case 'n':
-      for(int i=0; i!=size; ++i)
-        if(value[i]!=-value1[i])
-          res+=1;
-      break;
-    case '*':
-      for(int i=0; i!=size; ++i)
-        if(value[i]!=value1[i]*value2[i])
-          res+=1;
-      break;
-    case '/':
-      for(int i=0; i!=size; ++i)
-        if(value2[i]!=0.0)
-          if(value[i]!=value1[i]/value2[i])
-            res+=1;
-      break;
-    case '=':
-      for(int i=0; i!=size; ++i)
-        if(value[i]!=value2[i])
-          res+=1;
-      break;
-    case 'a':
-      for(int i=0; i!=size; ++i)
-        if(value[i]!=value1[i]+value2[i]*value2[i])
-          res+=1;
-      break;
+      switch(Op)
+        {
+        case '+':
+          for(int i=0; i!=size; ++i)
+            if(value[i]!=value1[i]+value2[i])
+              res+=1;
+          break;
+        case '-':
+          for(int i=0; i!=size; ++i)
+            if(value[i]!=value1[i]-value2[i])
+              res+=1;
+          break;
+        case 'n':
+          for(int i=0; i!=size; ++i)
+            if(value[i]!=-value1[i])
+              res+=1;
+          break;
+        case '*':
+          for(int i=0; i!=size; ++i)
+            if(value[i]!=value1[i]*value2[i])
+              res+=1;
+          break;
+        case '/':
+          for(int i=0; i!=size; ++i)
+            if(value2[i]!=0.0)
+              if(value[i]!=value1[i]/value2[i])
+                res+=1;
+          break;
+        case '=':
+          for(int i=0; i!=size; ++i)
+            if(value[i]!=value2[i])
+              res+=1;
+          break;
+        case 'a':
+          for(int i=0; i!=size; ++i)
+            if(value[i]!=value1[i]+value2[i]*value2[i])
+              res+=1;
+          break;
+        }
+
     }
-  }
 
   if (verbose)
     cout << endl << intitule << "[";
   cout << res;
   if (verbose)
-  {
-    cout << "] : ";
-    affiche_valeur_field(resOp);
-  }
+    {
+      cout << "] : ";
+      affiche_valeur_field(resOp);
+    }
   else
     cout << endl;
 }
@@ -204,13 +204,13 @@ int main (int argc, char ** argv)
     verbose=1;
 
   if (argc != 4+verbose)
-  {
-    cerr << "Usage : " << argv[0]
-         << "[-v] filename meshname fieldname" << endl << endl
-         << "-> tests field's operations on the FIELD<double> fieldname" << endl
-         << "Use optional option -v to select verbose mode" << endl;
-    exit(-1);
-  }
+    {
+      cerr << "Usage : " << argv[0]
+           << "[-v] filename meshname fieldname" << endl << endl
+           << "-> tests field's operations on the FIELD<double> fieldname" << endl
+           << "Use optional option -v to select verbose mode" << endl;
+      exit(-1);
+    }
   string filename  = argv[verbose+1];
   string meshname  = argv[verbose+2];// Maintenant plus très utile
   string fieldname = argv[verbose+3];
@@ -222,8 +222,7 @@ int main (int argc, char ** argv)
   const SUPPORT * mySupport;
   FIELD<double> * myField1;
 
-  try
-  {
+  try {
 
     myField1  = new FIELD<double>(MED_DRIVER,filename,fieldname) ;
     mySupport = myField1->getSupport();
@@ -232,8 +231,7 @@ int main (int argc, char ** argv)
 
     FIELD<double> * myField2 = new FIELD<double>(* myField1);
     FIELD<double> *myFieldPlus = *myField1 + *myField2;
-    if(verbose)
-    {
+    if(verbose)  {
       // affichage des nprmes,des champs f1, f2, scalarProduct(f1,f2) et f1+f2
       FIELD<double>* myField1_vol=myField1->getSupport()->getMesh()->getVolume(myField1->getSupport());
       cout << "Norme L2 calculee en fournissant le volume : " << myField1->normL2(myField1_vol) << endl;
@@ -255,7 +253,6 @@ int main (int argc, char ** argv)
       cout <<  endl << string(60,'-') << endl ;
       affiche_fieldT(myFieldPlus, myFieldPlus->getSupport());
       cout <<  endl << string(60,'-') << endl << endl ;
-      myFieldPlus->removeReference();
     }
 
 
@@ -266,22 +263,22 @@ int main (int argc, char ** argv)
     myField1->setMEDComponentUnit(1,string("UniteBidon"));
     ntest++; res=1;
     try
-    {
-      FIELD<double> *myFieldPlus = *myField1 + *myField2;
-      if(verbose)
       {
-        cout << endl << string(60,'-') << endl;
-        cout<< "Test " << ntest << " : incompatibilitÃ© d'unitÃ© : " << endl << endl;
+        FIELD<double> *myFieldPlus = *myField1 + *myField2;
+        if(verbose)
+          {
+            cout << endl << string(60,'-') << endl;
+            cout<< "Test " << ntest << " : incompatibilitÃ© d'unitÃ© : " << endl << endl;
+          }
+        myFieldPlus->removeReference();
       }
-      myFieldPlus->removeReference();
-    }
     catch (MEDEXCEPTION & ex)
-    {
-      res=0;
-      if(verbose)
-        cout << ex.what() << endl;
-      myField1->setMEDComponentUnit(1,unite);
-    }
+      {
+        res=0;
+        if(verbose)
+          cout << ex.what() << endl;
+        myField1->setMEDComponentUnit(1,unite);
+      }
     cout << res << endl;
 
     // test 2 : numberOfComponents non compatibles
@@ -289,42 +286,43 @@ int main (int argc, char ** argv)
     myField1->setNumberOfComponents(13);
     ntest++; res=1;
     try
-    {
-      if(verbose)
       {
-        cout << endl << string(60,'-') << endl;
-        cout<< "Test " << ntest << " : incompatibilitÃ© nombre de composantes : " << endl << endl;
+        if(verbose)
+          {
+            cout << endl << string(60,'-') << endl;
+            cout<< "Test " << ntest << " : incompatibilitÃ© nombre de composantes : " << endl << endl;
+          }
+        FIELD<double> *myFieldPlus = *myField1 + *myField2;
+        myFieldPlus->removeReference();
       }
-      FIELD<double> *myFieldPlus = *myField1 + *myField2;
-      myFieldPlus->removeReference();
-    }
     catch (MEDEXCEPTION & ex)
-    {
-      res=0;
-      if(verbose)
-        cout << endl << ex.what() << endl << endl;
-      myField1->setNumberOfComponents(numberOfComponents);
-    }
+      {
+        res=0;
+        if(verbose)
+          cout << endl << ex.what() << endl << endl;
+        myField1->setNumberOfComponents(numberOfComponents);
+      }
     cout << res << endl;
 
     // test 3 : supports non compatibles
-    const SUPPORT *mySupport2=myMesh->getSupportOnAll(MED_NODE);
+    const SUPPORT *mySupport2=new SUPPORT(myMesh,"On_all_node",MED_NODE);
     myField1->setSupport(mySupport2);
+    mySupport2->removeReference();
     ntest++; res=1;
     try
-    {
-      if(verbose)
-        cout << endl << string(60,'-') << endl << "Test " << ntest << " : incompatibilitÃ© des supports"  << endl << endl;
-      FIELD<double> *myFieldPlus = *myField1 + *myField2;
-      myFieldPlus->removeReference();
-    }
+      {
+        if(verbose)
+          cout << endl << string(60,'-') << endl << "Test " << ntest << " : incompatibilitÃ© des supports"  << endl << endl;
+        FIELD<double> *myFieldPlus = *myField1 + *myField2;
+        myFieldPlus->removeReference();
+      }
     catch (MEDEXCEPTION & ex)
-    {
-      res=0;
-      if(verbose)
-        cout << ex.what() << endl << endl << endl;
-      myField1->setSupport(mySupport);
-    }
+      {
+        res=0;
+        if(verbose)
+          cout << ex.what() << endl << endl << endl;
+        myField1->setSupport(mySupport);
+      }
     cout << res << endl;
 
     // test 4 : champs de taille nulle
@@ -332,41 +330,41 @@ int main (int argc, char ** argv)
     myField2->setNumberOfComponents(0);
     ntest++; res=2;
     try
-    {
-      if(verbose)
-        cout<< endl << string(60,'-') << endl << "Test " << ntest << " : incompatibilitÃ© taille nulle" << endl << endl;
-      FIELD<double> *myFieldPlus = *myField1 + *myField2;
-      myFieldPlus->removeReference();
-    }
+      {
+        if(verbose)
+          cout<< endl << string(60,'-') << endl << "Test " << ntest << " : incompatibilitÃ© taille nulle" << endl << endl;
+        FIELD<double> *myFieldPlus = *myField1 + *myField2;
+        myFieldPlus->removeReference();
+      }
     catch (MEDEXCEPTION & ex)
-    {
-      --res;
-      if(verbose)
-        cout << ex.what() << endl << endl ;
-    }
+      {
+        --res;
+        if(verbose)
+          cout << ex.what() << endl << endl ;
+      }
     try
-    {
-      myField1->norm2();
-    }
+      {
+        myField1->norm2();
+      }
     catch (MEDEXCEPTION & ex)
-    {
-      --res;
-      if(verbose)
-        cout << ex.what() << endl << endl ;
-      myField1->setNumberOfComponents(numberOfComponents);
-      myField2->setNumberOfComponents(numberOfComponents);
-    }
+      {
+        --res;
+        if(verbose)
+          cout << ex.what() << endl << endl ;
+        myField1->setNumberOfComponents(numberOfComponents);
+        myField2->setNumberOfComponents(numberOfComponents);
+      }
     cout << res << endl;
 
     // Apres toutes ces exceptions, des opÃ©rations qui marchent!
 
     if(verbose)
-    {
-      cout<< endl << string(60,'-') << endl << "Test " << ++ntest << " : Operations arithmÃ©tiques" << endl;
-      cout << endl << " f1           : "; affiche_valeur_field(*myField1);
-      cout << endl << " f2           : "; affiche_valeur_field(*myField2);
-      cout  << endl << string(140,'-');
-    }
+      {
+        cout<< endl << string(60,'-') << endl << "Test " << ++ntest << " : Operations arithmÃ©tiques" << endl;
+        cout << endl << " f1           : "; affiche_valeur_field(*myField1);
+        cout << endl << " f2           : "; affiche_valeur_field(*myField2);
+        cout  << endl << string(140,'-');
+      }
 
     // Test du rÃ©sultats de certaines opÃ©rations et affichage si verbose
     checkOperation(*myFieldPlus, *myField1, *myField2, '+', " f1+f2    ", verbose);
@@ -388,7 +386,7 @@ int main (int argc, char ** argv)
     myFieldFois->removeReference();
     FIELD<double>* myFieldmul = FIELD<double>::mul(*myField1, *myField2);
     checkOperation( *myFieldmul, *myField1, *myField2, '*', "mul(f1,f2)", verbose);
-
+    
     FIELD<double> *myFieldDiv = *myField1 / *myField2;
     checkOperation(*myFieldDiv, *myField1, *myField2, '/', " f1/f2    ", verbose);
     myFieldDiv->removeReference();
@@ -417,13 +415,14 @@ int main (int argc, char ** argv)
     myFieldmul->removeReference();
 
 
+    myFieldPlus->removeReference();
     myField1->removeReference();
     myField2->removeReference();
-    //mySupport->removeReference(); ???
+    mySupport->removeReference();
     myMesh->removeReference();
+
   }
-  catch ( MEDEXCEPTION & ex) 
-  {
+  catch ( MEDEXCEPTION & ex) {
     cout << ex.what() << endl;
   }
 

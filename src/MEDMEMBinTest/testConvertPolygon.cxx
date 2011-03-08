@@ -60,6 +60,7 @@ int main()
 
   int id=mesh->addDriver(MEDMEM::MED_DRIVER,file.c_str(),"mesh");
   mesh->write(id);
+  mesh->removeReference();
 
   remove(file.c_str());
 

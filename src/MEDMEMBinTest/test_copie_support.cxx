@@ -19,6 +19,11 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+#include<string>
+
+#include <math.h>
+#include <stdlib.h>
+
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Family.hxx"
@@ -30,16 +35,11 @@
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
 
-#include<string>
-
-#include <math.h>
-#include <stdlib.h>
-
 using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-void affiche_support(const SUPPORT * mySupport) 
+static void affiche_support(const SUPPORT * mySupport) 
 {
   cout << "  - Name : "<<mySupport->getName().c_str()<<endl ;
   cout << "  - Description : "<<mySupport->getDescription().c_str()<<endl ;
@@ -62,47 +62,13 @@ void affiche_support(const SUPPORT * mySupport)
 }
 
 
-void affiche_famille(MESH *myMesh,medEntityMesh Entity) 
-{
-  int NumberOfFamilies = myMesh->getNumberOfFamilies(Entity) ;
-  cout << "NumberOfFamilies : "<<NumberOfFamilies<<endl;
-  for (int i=1; i<NumberOfFamilies+1;i++) {
-    const FAMILY* myFamily = myMesh->getFamily(Entity,i);
-    affiche_support(myFamily);
-    cout << "  - Identifier : "<<myFamily->getIdentifier()<<endl ;
-    int NumberOfAttributes = myFamily->getNumberOfAttributes() ;
-    cout << "  - Attributes ("<<NumberOfAttributes<<") :"<<endl;
-    for (int j=1;j<NumberOfAttributes+1;j++)
-      cout << "    * "<<myFamily->getAttributeIdentifier(j)<<" : "<<myFamily->getAttributeValue(j)<<", "<<myFamily->getAttributeDescription(j).c_str()<<endl ;
-    int NumberOfGroups = myFamily->getNumberOfGroups() ;
-    cout << "  - Groups ("<<NumberOfGroups<<") :"<<endl;
-    for (int j=1;j<NumberOfGroups+1;j++)
-      cout << "    * "<<myFamily->getGroupName(j).c_str()<<endl ;
-  }
-}
+int main (int argc, char ** argv) {
 
-void affiche_groupe(MESH *myMesh,medEntityMesh Entity) 
-{
-  int NumberOfGroups = myMesh->getNumberOfGroups(Entity) ;
-  cout << "NumberOfGroups : "<<NumberOfGroups<<endl;
-  for (int i=1; i<NumberOfGroups+1;i++) {
-    const GROUP* myGroup = myMesh->getGroup(Entity,i);
-    affiche_support(myGroup);
-    int NumberOfFamillies = myGroup->getNumberOfFamilies() ;
-    cout << "  - Families ("<<NumberOfFamillies<<") :"<<endl;
-    for (int j=1;j<NumberOfFamillies+1;j++)
-      cout << "    * "<<myGroup->getFamily(j)->getName().c_str()<<endl ;
+  if (argc <3) { // after 3, ignored !
+    cerr << "Usage : " << argv[0] 
+         << " filename meshname" << endl << endl;
+    exit(-1);
   }
-}
-
-int main (int argc, char ** argv)
-{
-  if (argc <3) // after 3, ignored !
-    {
-      cerr << "Usage : " << argv[0] 
-           << " filename meshname" << endl << endl;
-      exit(-1);
-    }
 
   string filename = argv[1] ;
   string meshname = argv[2] ;
@@ -116,19 +82,18 @@ int main (int argc, char ** argv)
   myMeshDriver.close() ;
 
   //Construction d'un support total
-  const SUPPORT * mySupportTotal = myMesh->getSupportOnAll(MED_CELL);
+  SUPPORT * mySupport = new SUPPORT(myMesh,"Support on CELLs",MED_CELL);
 
   cout << "Show Support on all :"<<endl ;
-  affiche_support(mySupportTotal);
-  SUPPORT * mySupport2 = new SUPPORT(* mySupportTotal);
+  affiche_support(mySupport);
+  SUPPORT * mySupport2 = new SUPPORT(* mySupport);
+  mySupport->removeReference();
   affiche_support(mySupport2);
   mySupport2->removeReference();
 
   //Construction d'un support partiel
-  SUPPORT* mySupport = new SUPPORT;
-  mySupport->setMesh(myMesh);
-  mySupport->setName("Support on CELLs");
-  mySupport->setEntity(MED_CELL);
+  mySupport = new SUPPORT(myMesh,"Support on CELLs",MED_CELL);
+  mySupport->setAll(false);
 
   int NumberOfGeometricType = 0;
   int TotalNumberOfElements = 0;
@@ -162,20 +127,6 @@ int main (int argc, char ** argv)
   mySupport->removeReference();
   affiche_support(mySupport2);
   mySupport2->removeReference();
-
-  /*
-  cout << "Show Family :"<<endl ;
-  affiche_famille(myMesh,MED_NODE);
-  affiche_famille(myMesh,MED_CELL);
-  affiche_famille(myMesh,MED_FACE);
-  affiche_famille(myMesh,MED_EDGE);
-
-  cout << "Show Group :"<<endl ;
-  affiche_groupe(myMesh,MED_NODE);
-  affiche_groupe(myMesh,MED_CELL);
-  affiche_groupe(myMesh,MED_FACE);
-  affiche_groupe(myMesh,MED_EDGE);
-  */
 
   myMesh->removeReference();
 

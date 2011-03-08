@@ -94,9 +94,9 @@ int main (int argc, char ** argv)
 
       //      cell part
 
-      const int NumberOfTypes = 2;
-      medGeometryElement Types[NumberOfTypes] = {MED_TRIA3,MED_QUAD4};
-      const int NumberOfElements[NumberOfTypes] = {1,4};
+      const int NumberOfTypes = 3;
+      medGeometryElement Types[NumberOfTypes] = {MEDMEM_TRIA3,MEDMEM_QUAD4,MEDMEM_POLYGON};
+      const int NumberOfElements[NumberOfTypes] = {1,4,1};
 
       myMeshing->setNumberOfTypes(NumberOfTypes,MED_CELL);
       myMeshing->setTypes(Types,MED_CELL);
@@ -107,7 +107,7 @@ int main (int argc, char ** argv)
           7,4,1
         };
 
-      myMeshing->setConnectivity(ConnectivityTria,MED_CELL,MED_TRIA3);
+      myMeshing->setConnectivity(MED_CELL,MED_TRIA3,ConnectivityTria);
 
       int ConnectivityQuad[4*4]=
         {
@@ -117,12 +117,7 @@ int main (int argc, char ** argv)
           8,9,6,5
         };
   
-      myMeshing->setConnectivity(ConnectivityQuad,MED_CELL,MED_QUAD4);
-
-      int MeshDimension = SpaceDimension ;
-      // because there are 2D cells in the mesh
-
-      myMeshing->setMeshDimension(MeshDimension) ;
+      myMeshing->setConnectivity(MED_CELL,MED_QUAD4,ConnectivityQuad);
 
       // then define eventuel polygonal cells
 
@@ -135,13 +130,9 @@ int main (int argc, char ** argv)
           1,6
         };
 
-      myMeshing->setPolygonsConnectivity(ConnectivityPolygonIndex,ConnectivityPolygon,1,MED_CELL);
+      myMeshing->setConnectivity(MED_CELL,MED_POLYGON,ConnectivityPolygon,ConnectivityPolygonIndex);
 
       // Ecriture fichier
-
-      medFileVersion version = getMedFileVersionForWriting();
-      if (version == V21)
-        setMedFileVersionForWriting(V22);
 
       int idMed22 = myMeshing->addDriver(MED_DRIVER,medfilename,myMeshing->getName());
       myMeshing->write(idMed22) ;

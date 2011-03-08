@@ -45,7 +45,7 @@ int main (int argc, char ** argv) {
 
 
  /* Caractéristiques du model n° 1 de localisation des points de gauss pour le champ n°1*/
-  MED_EN::medGeometryElement typeGeo = MED_TRIA6;
+  MED_EN::medGeometryElement typeGeo = MEDMEM_TRIA6;
 
   int       ngauss1_1 = 6;
   string    gauss1_1("Model n1");

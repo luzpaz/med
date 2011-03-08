@@ -47,21 +47,13 @@ def print_ord(i):
     else:
         return `i`+'th'
 
-md = MED()
-
-mdDriver = MED_MED_RDONLY_DRIVER(medFile,md)
-
-mdDriver.open()
-mdDriver.readFileStruct()
-mdDriver.close()
-
+md = MEDFILEBROWSER(medFile)
 nbMeshes = md.getNumberOfMeshes()
 
 print "The med file", medFile, "contains", nbMeshes, "mesh(es)"
 
 mesh_name = md.getMeshName(0)
-mesh = md.getMesh(mesh_name)
-mesh.read()
+mesh = MESH(MED_DRIVER,medFile,mesh_name)
 spaceDim = mesh.getSpaceDimension()
 meshDim = mesh.getMeshDimension()
 nbNodes = mesh.getNumberOfNodes()
@@ -303,13 +295,11 @@ else:
 
 print "Let's now do an example of union and intersection of two supports with a non empty intersection"
 print ""
-support1 = SUPPORT()
-support1.setMesh(mesh)
-support1.setName("Partial_Support_1")
+support1 = SUPPORT(mesh,"Partial_Support_1",MED_CELL)
 support1Description = "Partial Support 1"
 support1NbOfTypes = 3
 support1TotNbElm = 8
-support1GeoType = [MED_TETRA4,MED_HEXA8,MED_PYRA5]
+support1GeoType = [MEDMEM_TETRA4,MEDMEM_HEXA8,MEDMEM_PYRA5]
 support1NbOfElm = [4,2,2]
 support1NbValue = [1,2,3,4,15,16,13,14]
 
@@ -338,13 +328,11 @@ else:
         print "    * Number",number[0:nbOfElmtsOfType]
     print ""
 
-support2 = SUPPORT()
-support2.setMesh(mesh)
-support2.setName("Partial_Support_2")
+support2 = SUPPORT(mesh,"Partial_Support_2",MED_CELL)
 support2Description = "Partial Support 2"
 support2NbOfTypes = 3
 support2TotNbElm = 8
-support2GeoType = [MED_TETRA4,MED_HEXA8,MED_PYRA5]
+support2GeoType = [MEDMEM_TETRA4,MEDMEM_HEXA8,MEDMEM_PYRA5]
 support2NbOfElm = [6,1,1]
 support2NbValue = [3,4,9,10,11,12,16,14]
 

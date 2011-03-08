@@ -34,24 +34,18 @@ filePath=os.path.join(filePath, "share", "salome", "resources", "med")
 
 medFile = os.path.join(filePath, "cube_hexa8_quad4.med")
 
-md = MED()
-
-mdDriver = MED_MED_RDONLY_DRIVER(medFile,md)
-
 print ""
 print "Read file", medFile
 print ""
 
-mdDriver.open()
-mdDriver.readFileStruct()
-mdDriver.close()
+md = MEDFILEBROWSER(medFile)
 
 mesh_name = md.getMeshName(0)
-mesh = md.getMesh(mesh_name)
-mesh.read()
+mesh = MESH(MED_DRIVER,medFile,mesh_name)
 
 print "Building the support on all (8) Cells of the mesh."
-supportCell = mesh.getSupportOnAll(MED_CELL)
+supportCell = SUPPORT(mesh)
+supportCell.update()
 
 print "Getting skin of an all cell support"
 
@@ -62,7 +56,6 @@ if faceNumbers != [2, 3, 6, 8, 10, 11, 12, 13, 16, 17, 19, 20, 22, 23, 24, 27, 2
   raise  RuntimeError, "Wrong skin of an all cell support"
   
 print "Build the support on 1 Cell (#8) of the mesh."
-supportCell = SUPPORT( supportCell )
 supportCell.setAll( 0 )
 nbGeomTypes = 1
 nbTotalEntity = 1

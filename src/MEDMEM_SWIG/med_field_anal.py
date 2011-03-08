@@ -101,21 +101,13 @@ def print_ord(i):
     else:
         return `i`+'th'
 
-md = MED()
-
-mdDriver = MED_MED_RDONLY_DRIVER(medFile,md)
-
-mdDriver.open()
-mdDriver.readFileStruct()
-mdDriver.close()
-
+md = MEDFILEBROWSER(medFile)
 nbMeshes = md.getNumberOfMeshes()
 
 print "The med file", medFile, "contains", nbMeshes, "mesh(es)"
 
 mesh_name = md.getMeshName(0)
-mesh = md.getMesh(mesh_name)
-mesh.read()
+mesh = MESH(MED_DRIVER,medFile,mesh_name)
 spaceDim = mesh.getSpaceDimension()
 meshDim = mesh.getMeshDimension()
 nbNodes = mesh.getNumberOfNodes()
@@ -123,18 +115,14 @@ nbNodes = mesh.getNumberOfNodes()
 print ""
 print "The mesh",mesh_name,"is a",spaceDim,"D mesh on a",meshDim,"D geometry and has",nbNodes,"Nodes"
 
-print ""
-print "Updating supports in the Med Object"
-md.updateSupport()
+supportOnCell = mesh.getSupportOnAll(MED_CELL)
 
-supportOnCell = md.getSupport(mesh_name,MED_CELL)
-
-supportOnNode = md.getSupport(mesh_name,MED_NODE)
+supportOnNode = mesh.getSupportOnAll(MED_NODE)
 
 if (spaceDim == 3) :
-    supportOnConst = md.getSupport(mesh_name,MED_FACE)
+    supportOnConst = mesh.getSupportOnAll(MED_FACE)
 elif (spaceDim == 2) :
-    supportOnConst = md.getSupport(mesh_name,MED_EDGE)
+    supportOnConst = mesh.getSupportOnAll(MED_EDGE)
 
 ##print ""
 ##print supportOnCell
@@ -194,7 +182,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldDoubleScalOnCell.getSupport()
-nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldDoubleScalOnCell.getRow(k+1)
@@ -223,7 +211,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldDoubleVectOnCell.getSupport()
-nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldDoubleVectOnCell.getRow(k+1)
@@ -252,7 +240,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldIntScalOnCell.getSupport()
-nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldIntScalOnCell.getRow(k+1)
@@ -281,7 +269,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldIntVectOnCell.getSupport()
-nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldIntVectOnCell.getRow(k+1)
@@ -346,7 +334,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldDoubleScalOnNode.getSupport()
-nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldDoubleScalOnNode.getRow(k+1)
@@ -375,7 +363,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldDoubleVectOnNode.getSupport()
-nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldDoubleVectOnNode.getRow(k+1)
@@ -404,7 +392,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldIntScalOnNode.getSupport()
-nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldIntScalOnNode.getRow(k+1)
@@ -433,7 +421,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldIntVectOnNode.getSupport()
-nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldIntVectOnNode.getRow(k+1)
@@ -498,7 +486,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldDoubleScalOnConst.getSupport()
-nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldDoubleScalOnConst.getRow(k+1)
@@ -527,7 +515,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldDoubleVectOnConst.getSupport()
-nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldDoubleVectOnConst.getRow(k+1)
@@ -556,7 +544,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldIntScalOnConst.getSupport()
-nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldIntScalOnConst.getRow(k+1)
@@ -585,7 +573,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldIntVectOnConst.getSupport()
-nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldIntVectOnConst.getRow(k+1)

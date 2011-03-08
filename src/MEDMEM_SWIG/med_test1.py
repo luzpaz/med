@@ -50,13 +50,7 @@ def print_ord(i):
     else:
         return `i`+'th'
 
-md = MED()
-
-mdDriver = MED_MED_RDONLY_DRIVER(medFile,md)
-
-mdDriver.open()
-mdDriver.readFileStruct()
-mdDriver.close()
+md = MEDFILEBROWSER(medFile)
 
 nbMeshes = md.getNumberOfMeshes()
 
@@ -84,8 +78,7 @@ if (nbMeshes>0):
     print "Mesh(es) Analysis "
     for i in range(nbMeshes):
         mesh_name = md.getMeshName(i)
-        mesh = md.getMesh(mesh_name)
-        mesh.read()
+        mesh = MESH(MED_DRIVER,md.getFileName(),mesh_name)
         spaceDim = mesh.getSpaceDimension()
         meshDim = mesh.getMeshDimension()
         print "The",print_ord(i), "mesh, '",mesh_name,"', is a",spaceDim,"D mesh on a",meshDim,"D geometry"
@@ -124,7 +117,7 @@ if (nbMeshes>0):
                 type = types[k]
                 nbElemType = mesh.getNumberOfElements(MED_CELL,type)
                 print "For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
-                connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,type)
+                connectivity = mesh.getConnectivity(MED_NODAL,MED_CELL,type)
                 nbNodesPerCell = type%100
                 for j in range(nbElemType):
                     print "Element",(j+1)," ",connectivity[j*nbNodesPerCell:(j+1)*nbNodesPerCell]
@@ -145,7 +138,7 @@ if (nbMeshes>0):
                 type = types[k]
                 nbElemType = mesh.getNumberOfElements(constituent,type)
                 print "For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
-                connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,constituent,type)
+                connectivity = mesh.getConnectivity(MED_NODAL,constituent,type)
                 nbNodesPerCell = type%100
                 for j in range(nbElemType):
                     print "Element",(j+1)," ",connectivity[j*nbNodesPerCell:(j+1)*nbNodesPerCell]
@@ -162,9 +155,9 @@ if (nbMeshes>0):
 
         print ""
         print "Show the Descending Connectivity:"
-        mesh.calculateConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL)
-        nbElemts = mesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)
-        Connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS)
+        mesh.calculateConnectivity(MED_DESCENDING,MED_CELL)
+        nbElemts = mesh.getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS)
+        Connectivity = mesh.getConnectivity(MED_DESCENDING,MED_CELL,MEDMEM_ALL_ELEMENTS)
         ConnectivityIndex = mesh.getConnectivityIndex(MED_DESCENDING,MED_CELL)
         print ""
         for j in range(nbElemts):
@@ -221,7 +214,7 @@ if (nbMeshes>0):
                             print "    * Type",type
                             print "    * Number",number[0:nbOfElmtsOfType]
                         print ""
-                        numberFamily = family.getNumber(MED_ALL_ELEMENTS)
+                        numberFamily = family.getNumber(MEDMEM_ALL_ELEMENTS)
                         print "    * Getting an Integer Field on the family ",familyName
                         fieldFamilyIntg = FIELDINT(family,spaceDim)
                         fieldFamilyIntg.setIterationNumber(0)
@@ -262,7 +255,7 @@ if (nbMeshes>0):
                             print "          Description:",compDesc
                             print "          Unit:",compUnit
 
-                        nbOf = fieldFamilyIntg.getSupport().getNumberOfElements(MED_ALL_ELEMENTS)
+                        nbOf = fieldFamilyIntg.getSupport().getNumberOfElements(MEDMEM_ALL_ELEMENTS)
                         print "      Values:",nbOf
                         print "      Randomly set and get to check ..!"
                         for k in range(nbOf):
@@ -316,7 +309,7 @@ if (nbMeshes>0):
                             print "          Description:",compDesc
                             print "          Unit:",compUnit
 
-                        nbOf = fieldFamilyDble.getSupport().getNumberOfElements(MED_ALL_ELEMENTS)
+                        nbOf = fieldFamilyDble.getSupport().getNumberOfElements(MEDMEM_ALL_ELEMENTS)
                         print "      Values:",nbOf
                         print "      Randomly set and get to check ..!"
                         for k in range(nbOf):
@@ -374,7 +367,8 @@ if (nbMeshes>0):
                 print ""
 
         print "Building of the support on all Cells of the mesh."
-        supportCell = mesh.getSupportOnAll( MED_CELL )
+        supportCell = SUPPORT(mesh)
+        supportCell.update()
         print ""
         barycenter = mesh.getBarycenter(supportCell)
         print "Getting barycenter of all Cells of the mesh"
@@ -394,7 +388,7 @@ if (nbMeshes>0):
             print ""
             print "Building of the support on all Faces of the mesh."
             supportFace = SUPPORT(mesh,"Support on all faces of the mesh",MED_FACE)
-            nbFace = mesh.getNumberOfElements(MED_FACE,MED_ALL_ELEMENTS)
+            nbFace = mesh.getNumberOfElements(MED_FACE,MEDMEM_ALL_ELEMENTS)
             print ""
             print "Getting normal of each face of this support",nbFace
             nbTypeFace = mesh.getNumberOfTypes(MED_FACE)
@@ -421,8 +415,8 @@ if (nbMeshes>0):
             print "Area of the mesh:",areatot
             print ""            
             print "Building of the support on all Edges of the mesh."
-            supportEdge = mesh.getSupportOnAll(MED_EDGE)
-            nbEdge = mesh.getNumberOfElements(MED_EDGE,MED_ALL_ELEMENTS)
+            supportEdge = SUPPORT(mesh,"Support on all edges of the mesh",MED_EDGE)
+            nbEdge = mesh.getNumberOfElements(MED_EDGE,MEDMEM_ALL_ELEMENTS)
             print ""
             print "Getting normal of each edge of this support",nbEdge
             nbTypeEdge = mesh.getNumberOfTypes(MED_EDGE)
@@ -441,13 +435,13 @@ if (nbMeshes>0):
         print "Building support on Elements of the boundary"
         if spaceDim == 3 :
             suppBound = mesh.getBoundaryElements(MED_FACE)
-            nbElmBound = suppBound.getNumberOfElements(MED_ALL_ELEMENTS)
+            nbElmBound = suppBound.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
             print "Getting normal field on the boundary",nbElmBound
             normalBound = mesh.getNormal(suppBound)
             if suppBound.isOnAllElements():
                 numberSuppBound = range(1,nbElmBound+1)
             else:
-                numberSuppBound = suppBound.getNumber(MED_ALL_ELEMENTS)
+                numberSuppBound = suppBound.getNumber(MEDMEM_ALL_ELEMENTS)
             for j in range(nbElmBound):
                 valInd = numberSuppBound[j]
                 normalBoundJ = normalBound.getRow(valInd)
@@ -458,13 +452,13 @@ if (nbMeshes>0):
                 print "    * ",normalBoundJ[:spaceDim],"norm:",norm
         elif spaceDim == 2:
             suppBound = mesh.getBoundaryElements(MED_EDGE)
-            nbElmBound = suppBound.getNumberOfElements(MED_ALL_ELEMENTS)
+            nbElmBound = suppBound.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
             print "Getting normal field on the boundary",nbElmBound
             normalBound = mesh.getNormal(suppBound)
             if suppBound.isOnAllElements():
                 numberSuppBound = range(1,nbElmBound+1)
             else:
-                numberSuppBound = suppBound.getNumber(MED_ALL_ELEMENTS)
+                numberSuppBound = suppBound.getNumber(MEDMEM_ALL_ELEMENTS)
             for j in range(nbElmBound):
                 valInd = numberSuppBound[j]
                 normalBoundJ = normalBound.getRow(valInd)
@@ -474,23 +468,19 @@ if (nbMeshes>0):
                 print "    * ",normalBoundJ[:spaceDim],"norm:",norm
         print ""
 if (nbFields>0):
-    print "Updating supports in the Med Object"
-    md.updateSupport()
     print "Field(s) Analysis "
     for i in range(nbFields):
         field_name = md.getFieldName(i)
-        nbOfIt = md.getFieldNumberOfIteration(field_name)
+        dtits = md.getFieldIteration(field_name)
+        nbOfIt = len(dtits)
         print "The",print_ord(i),"field is",field_name,"with",nbOfIt,"iteration(s)"
-        for j in range(nbOfIt):
-            dtitfield = md.getFieldIteration(field_name,j)
+        for dtitfield in dtits:
             dt = dtitfield.getdt()
             it = dtitfield.getit()
-            field = md.getField(field_name,dt,it)
-            type = field.getValueType()
+            type = md.getFieldType(field_name)
             print "     * Iteration:",dt,"Order number:",it,"Type:",type
             if type == MED_INT32:
-                fieldint = createFieldIntFromField(field)
-                fieldint.read()
+                fieldint = FIELDINT(MED_DRIVER,md.getFileName(),field_name,dt,it,mesh)
                 name = fieldint.getName()
                 desc = fieldint.getDescription()
                 nbOfComp = fieldint.getNumberOfComponents()
@@ -513,14 +503,13 @@ if (nbFields>0):
                     print "          Unit:",compUnit
 
                 support = fieldint.getSupport()
-                nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+                nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
                     valueI = fieldint.getRow(k+1)
                     print "     *",valueI[:nbOfComp]
             elif type == MED_REEL64:
-                fielddouble = createFieldDoubleFromField(field)
-                fielddouble.read()
+                fielddouble = FIELDDOUBLE(MED_DRIVER,md.getFileName(),field_name,dt,it,mesh)
                 name = fielddouble.getName()
                 desc = fielddouble.getDescription()
                 nbOfComp = fielddouble.getNumberOfComponents()
@@ -543,7 +532,7 @@ if (nbFields>0):
                     print "          Unit:",compUnit
 
                 support = fielddouble.getSupport()
-                nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+                nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
                     valueI = fielddouble.getRow(k+1)

@@ -22,6 +22,11 @@
 /* Programme de test du constructeur de copies de la classe FIELD_ de MEDMEM
    jroy - 12/12/2002 */
 
+#include<string>
+
+#include <math.h>
+#include <stdlib.h>
+
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Family.hxx"
@@ -34,17 +39,12 @@
 #include "MEDMEM_FieldConvert.hxx"
 #include "MEDMEM_define.hxx"
 
-#include<string>
-
-#include <math.h>
-#include <stdlib.h>
-
 using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
 
-void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
+static void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
 {
   cout << "Field "<< myField->getName() << " : " <<myField->getDescription() <<  endl ;
   int NumberOfComponents = myField->getNumberOfComponents() ;
@@ -72,7 +72,7 @@ void affiche_fieldT(FIELD<double, INTERLACING_TAG> * myField,
   affiche_field_((FIELD_ *) myField, mySupport);
 
   cout << "- Valeurs :"<<endl;
-  int NumberOf = mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
+  int NumberOf = mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
   int NumberOfComponents = myField->getNumberOfComponents() ;
 
   if ( myField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE ) {
@@ -93,14 +93,14 @@ void affiche_fieldT(FIELD<double, INTERLACING_TAG> * myField,
   }
 }
 
-int main (int argc, char ** argv)
-{
-  if ((argc !=3) && (argc != 4))
-    {
-      cerr << "Usage : " << argv[0] 
-           << " filename meshname fieldname" << endl << endl;
-      exit(-1);
-    }
+int main (int argc, char ** argv) {
+  // int read; !! UNUSED VARIABLE !!
+
+  if ((argc !=3) && (argc != 4)) {
+    cerr << "Usage : " << argv[0] 
+         << " filename meshname fieldname" << endl << endl;
+    exit(-1);
+  }
 
   string filename = argv[1] ;
   string meshname = argv[2] ;
@@ -118,25 +118,21 @@ int main (int argc, char ** argv)
   string fieldname = argv[3];
 
   FIELD<double> * myField ;
-  const SUPPORT * mySupport = myMesh->getSupportOnAll(MED_CELL);
-  try
-    {
+  //  SUPPORT * mySupport = new SUPPORT(myMesh,"On_all_node",MED_NODE);
+  SUPPORT * mySupport = new SUPPORT(myMesh,"On_all_cell",MED_CELL);
+  try {
+    myField = new FIELD<double>(mySupport,MED_DRIVER,filename,fieldname) ;
+  } catch (...) {
+    mySupport->removeReference() ;
+    mySupport = new SUPPORT(myMesh,"On_all_node",MED_NODE);
+    try {
       myField = new FIELD<double>(mySupport,MED_DRIVER,filename,fieldname) ;
+    } catch (...) {
+      cout << "Field double " << fieldname << " not found !!!" << endl ;
+      exit (-1) ;
     }
-  catch (...)
-    {
-      mySupport = myMesh->getSupportOnAll(MED_NODE);
-      try
-        {
-          myField = new FIELD<double>(mySupport,MED_DRIVER,filename,fieldname) ;
-        }
-      catch (...)
-        {
-          cout << "Field double " << fieldname << " not found !!!" << endl ;
-          exit (-1) ;
-        }
-    }
-
+  }
+  
   affiche_fieldT(myField, mySupport);
   FIELD<double> * myField2 = new FIELD<double>(* myField); // Contructeur par recopie, sauf SUPPORT
   myField->removeReference(); // Ne détruit pas le Support 
@@ -154,6 +150,7 @@ int main (int argc, char ** argv)
   affiche_fieldT(myField5, myField5->getSupport());
   myField5->removeReference();
 
+  mySupport->removeReference();
   myMesh->removeReference();
 
   return 0;
