@@ -112,12 +112,17 @@ namespace MED
     TInt myDim; //!< Dimension of the mesh (0, 1, 2 or 3)
     TInt GetDim() const { return myDim;} //!< Gets dimension of the mesh
 
+    TInt mySpaceDim;
+    TInt GetSpaceDim() const { return mySpaceDim; }
+
     EMaillage myType; //!< Type of the mesh
     EMaillage GetType() const { return myType;} //!< Gets type of the mesh
 
     TString myDesc; //!< Description of the mesh
     virtual std::string GetDesc() const = 0; //!< Get description for the mesh
     virtual void SetDesc(const std::string& theValue) = 0; //!< Sets description for the mesh
+
+    
   };
   
 
@@ -202,6 +207,12 @@ namespace MED
     EBooleen myIsElemNum;
     //! Let know if the mesh elements are indexed
     EBooleen IsElemNum() const { return myIsElemNum;}
+    
+    //! Defines if the mesh elements family are indexed
+    EBooleen myIsFamNum;
+    //! Let know if the mesh elements family are indexed
+    EBooleen IsFamNum() const { return myIsFamNum;}
+    
 
     //! Contains sequence of the indexes for the mesh elements
     PElemNum myElemNum;
@@ -404,6 +415,7 @@ namespace MED
     virtual std::string GetUnitName(TInt theId) const = 0;
     //! Set unit for the component by its order number
     virtual void SetUnitName(TInt theId, const std::string& theValue) = 0;
+
   };
 
 

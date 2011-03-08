@@ -425,8 +425,8 @@ namespace MED
     typedef TTElemInfo<eVersion> TElemInfoBase;
 
     TTNodeInfo(const PMeshInfo& theMeshInfo, const PNodeInfo& theInfo):
-      TElemInfoBase(theMeshInfo, theInfo),
-      TNodeInfo(theInfo)
+      TNodeInfo(theInfo),
+      TElemInfoBase(theMeshInfo, theInfo)
     {
       myModeSwitch = theInfo->GetModeSwitch();
       
@@ -451,11 +451,11 @@ namespace MED
                ERepere theSystem, 
                EBooleen theIsElemNum,
                EBooleen theIsElemNames):
+      TModeSwitchInfo(theMode),
       TElemInfoBase(theMeshInfo,
                     theNbElem,
                     theIsElemNum,
-                    theIsElemNames),
-      TModeSwitchInfo(theMode)
+                    theIsElemNames)
     {
       mySystem = theSystem;
 
@@ -476,12 +476,12 @@ namespace MED
                const TIntVector& theFamilyNums,
                const TIntVector& theElemNums,
                const TStringVector& theElemNames):
+      TModeSwitchInfo(theMode),
       TElemInfoBase(theMeshInfo,
                     (TInt)theNodeCoords.size()/theMeshInfo->GetDim(),
                     theFamilyNums,
                     theElemNums,
-                    theElemNames),
-      TModeSwitchInfo(theMode)
+                    theElemNames)
     {
       mySystem = theSystem;
 
@@ -703,11 +703,11 @@ namespace MED
                EBooleen theIsElemNum,
                EBooleen theIsElemNames,
                EModeSwitch theMode):
+      TModeSwitchInfo(theMode),
       TElemInfoBase(theMeshInfo,
                     theNbElem,
                     theIsElemNum,
-                    theIsElemNames),
-      TModeSwitchInfo(theMode)
+                    theIsElemNames)
     {
       myEntity = theEntity;
       myGeom = theGeom;
@@ -726,12 +726,12 @@ namespace MED
                const TIntVector& theElemNums,
                const TStringVector& theElemNames,
                EModeSwitch theMode):
+      TModeSwitchInfo(theMode),
       TElemInfoBase(theMeshInfo,
                     (TInt)theConnectivities.size() / GetNbNodes(theGeom),
                     theFamilyNums,
                     theElemNums,
-                    theElemNames),
-      TModeSwitchInfo(theMode)
+                    theElemNames)
     {
       myEntity = theEntity;
       myGeom = theGeom;
@@ -848,8 +848,8 @@ namespace MED
 
     TTGaussInfo(const TGaussInfo::TInfo& theInfo,
                 EModeSwitch theMode):
-      TNameInfoBase(boost::get<1>(boost::get<0>(theInfo))),
-      TModeSwitchInfo(theMode)
+      TModeSwitchInfo(theMode),
+      TNameInfoBase(boost::get<1>(boost::get<0>(theInfo)))
     {
       const TGaussInfo::TKey& aKey = boost::get<0>(theInfo);
 

@@ -29,13 +29,13 @@ extern "C"{
 
 int main (int argc, char **argv)
 {
-  med_idt aFid = MEDouvrir(argv[1],MED_LECTURE);
+  med_idt aFid = MEDfileOpen(argv[1],MED_ACC_RDONLY);
   if(aFid < 0)
     exit(1);
 
   med_int aMajor, aMinor, aRelease;
-  med_err aRet = MEDversionLire(aFid,&aMajor,&aMinor,&aRelease);
-  MEDfermer(aFid);
+  med_err aRet = MEDfileNumVersionRd(aFid,&aMajor,&aMinor,&aRelease);
+  MEDfileClose(aFid);
   if(aRet < 0)
     exit(2);
 
