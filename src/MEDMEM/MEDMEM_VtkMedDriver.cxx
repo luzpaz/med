@@ -25,7 +25,6 @@
 #include <sstream>
 
 #include "MEDMEM_define.hxx"
-#include "MEDMEM_Med.hxx"
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Mesh.hxx"
@@ -35,37 +34,26 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-VTK_MED_DRIVER::VTK_MED_DRIVER(): GENDRIVER(VTK_DRIVER), 
-                                  _ptrMed((MED * const)MED_NULL)
+VTK_MED_DRIVER::VTK_MED_DRIVER(): GENDRIVER(VTK_DRIVER), _fields(0)
 {
-  //_vtkFile = new ofstream();
-  // What about _id in Gendriver ?
-  // _driverType ???
 }
 
 
-VTK_MED_DRIVER::VTK_MED_DRIVER(const string & fileName,  MED * const ptrMed):
-  GENDRIVER(fileName, MED_EN::RDWR, VTK_DRIVER), _ptrMed(ptrMed)
+VTK_MED_DRIVER::VTK_MED_DRIVER(const string & fileName,
+                               const vector< const FIELD_* >& fields):
+  GENDRIVER(fileName, MED_EN::RDWR, VTK_DRIVER), _fields( &fields )
 {
-  //_vtkFile = new ofstream();
 }
 
 VTK_MED_DRIVER::VTK_MED_DRIVER(const VTK_MED_DRIVER & driver):
-  GENDRIVER(driver), 
-  _ptrMed(driver._ptrMed)
+  GENDRIVER(driver), _fields(driver._fields)
 {
-  _ptrMed->addDriver(*this); // OU RECUPERER L'ID.
-  //_vtkFile = new ofstream(); 
-  // What about _id in Gendriver ?
-  // _driverType ???
 }
 
 VTK_MED_DRIVER::~VTK_MED_DRIVER()
 {
   const char* LOC = "VTK_MED_DRIVER::~VTK_MED_DRIVER()";
   BEGIN_OF_MED(LOC);
-
-  //delete _vtkFile ;
 
   END_OF_MED(LOC);
 }
@@ -75,10 +63,8 @@ GENDRIVER * VTK_MED_DRIVER::copy() const
   return new VTK_MED_DRIVER(*this) ;
 }
 
-//REM :  As t'on besoin du champ _status :  _vtkFile <-> _status  ?  Oui
-
-void VTK_MED_DRIVER::openConst() const {
-
+void VTK_MED_DRIVER::openConst() const
+{
   const char * LOC ="VTK_MED_DRIVER::open() : ";
   BEGIN_OF_MED(LOC);
 
@@ -119,74 +105,54 @@ void VTK_MED_DRIVER::write() const
   // VTK supports only one dataset per a file (in Simple Legacy Formats)
   // so we write the first mesh only
 
-  int NumberOfMeshes = _ptrMed->getNumberOfMeshes() ;
-  deque<string> MeshNames = _ptrMed->getMeshNames() ;
+  const int NumberOfMeshes = ( _fields && !_fields->empty() ) ? 1 : 0;
 
-  int NumberOfFields = _ptrMed->getNumberOfFields() ;
-  deque<string> FieldNames = _ptrMed->getFieldNames() ;
-
-  //  for ( currentMesh=MeshName.begin();currentMesh != MeshName.end(); currentMesh++) {
   for (int i=0; i<NumberOfMeshes; i++)
+  {
+    GMESH * myMesh = _fields->at(i)->getSupport()->getMesh();
+    writeMesh(myMesh) ;
+    for (unsigned j=0; j<_fields->size(); j++)
     {
-      MESH * myMesh = _ptrMed->getMesh(MeshNames[i]) ;
-      writeMesh(myMesh) ;
-      // get all field which values are on this mesh => revoir api de Med !!!
-      // first : field on node
-      // fields is on all node !
-      for (int j=0; j<NumberOfFields; j++) {
-        deque<DT_IT_> timeStep = _ptrMed->getFieldIteration(FieldNames[j]) ;
-        deque<DT_IT_>::const_iterator currentTimeStep ;
-        for ( currentTimeStep=timeStep.begin(); currentTimeStep!=timeStep.end(); currentTimeStep++) {
-          int dt = (*currentTimeStep).dt ;
-          int it = (*currentTimeStep).it ;
-          FIELD_ * myField = _ptrMed->getField(FieldNames[j],dt,it) ;
-          if( MeshNames[i] == myField->getSupport()->getMesh()->getName() ) { 
-            // rigth in all case : better compare pointeur ?
-            if (MED_NODE == myField->getSupport()->getEntity())
-              {
-                if (myField->getSupport()->isOnAllElements()) {
-                  ostringstream name ; 
-                  name << myField->getName() << "_" << dt << "_" << it ;
-                  writeField(myField,name.str()) ;
-                } else
-                  MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
-              }
+      const FIELD_ * myField = _fields->at(j);
+      if( myMesh == myField->getSupport()->getMesh() )
+      {
+        if (MED_NODE == myField->getSupport()->getEntity())
+        {
+          if (myField->getSupport()->isOnAllElements())
+          {
+            writeField(myField,STRING(myField->getName()) << "_" << myField->getIterationNumber() << "_" << myField->getOrderNumber() ) ;
+          }
+          else
+          {
+            MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
           }
         }
       }
+    }
 
-      // second : field on cell
-      for (int j=0; j<NumberOfFields; j++) {
-        deque<DT_IT_> timeStep = _ptrMed->getFieldIteration(FieldNames[j]) ;
-        deque<DT_IT_>::const_iterator currentTimeStep ;
-        for ( currentTimeStep=timeStep.begin(); currentTimeStep!=timeStep.end(); currentTimeStep++) {
-          int dt = (*currentTimeStep).dt;
-          int it = (*currentTimeStep).it;
-          FIELD_ * myField = _ptrMed->getField(FieldNames[j],dt,it) ;
-          if( MeshNames[i] == myField->getSupport()->getMesh()->getName() ) { 
-            // rigth in all case : better compare pointeur ?
-            if (MED_CELL == myField->getSupport()->getEntity())
-              {
-                if (myField->getSupport()->isOnAllElements()) {
-                  ostringstream name ; 
-                  name << myField->getName() << "_" << dt << "_" << it ;
-                  writeField(myField,name.str()) ;
-                }
-                else
-                  MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" which is not on all cells !");
-              }
+    // second : field on cell
+    for (unsigned j=0; j<_fields->size(); j++)
+    {
+      const FIELD_ * myField = _fields->at(j);
+      if( myMesh == myField->getSupport()->getMesh() )
+        if (MED_CELL == myField->getSupport()->getEntity())
+        {
+          if (myField->getSupport()->isOnAllElements())
+          {
+            writeField(myField,STRING(myField->getName()) << "_" << myField->getIterationNumber() << "_" << myField->getOrderNumber() );
+          }
+          else
+          {
+            MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" which is not on all cells !");
           }
         }
-      }
-      // VTK supports only one dataset per a file (in Simple Legacy Formats)
-      // so we write the first mesh only
-      break;
-    } // loop on meshes
+    }
+  } // loop on meshes
 
   END_OF_MED(LOC);
 }
 
-void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const
+void VTK_MED_DRIVER::writeMesh(const GMESH * myMesh) const
 {
   const char * LOC = "VTK_MED_DRIVER::writeMesh() : ";
   BEGIN_OF_MED(LOC);
@@ -197,7 +163,7 @@ void VTK_MED_DRIVER::writeMesh(MESH * myMesh) const
   END_OF_MED(LOC);
 }
 
-void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const
+void VTK_MED_DRIVER::writeField(const FIELD_ * myField,string name) const
 {
   const char* LOC = "VTK_MED_DRIVER::writeField() : ";
   BEGIN_OF_MED(LOC);
@@ -210,30 +176,30 @@ void VTK_MED_DRIVER::writeField(FIELD_ * myField,string name) const
 
       if ( myField->getInterlacingType() == MED_FULL_INTERLACE )
         driver = new VTK_FIELD_DRIVER<int>(_fileName,
-                                           static_cast< FIELD<int,FullInterlace>* >(myField));
+                                           static_cast< const FIELD<int,FullInterlace>* >(myField));
 
       else if ( myField->getInterlacingType() == MED_NO_INTERLACE_BY_TYPE )
         driver = new VTK_FIELD_DRIVER<int>(_fileName,
-                                           static_cast< FIELD<int,NoInterlaceByType>* >(myField));
+                                           static_cast< const FIELD<int,NoInterlaceByType>* >(myField));
 
       else
         driver = new VTK_FIELD_DRIVER<int>(_fileName,
-                                           static_cast< FIELD<int,NoInterlace>* >(myField));
+                                           static_cast< const FIELD<int,NoInterlace>* >(myField));
       break;
 
     case MED_REEL64 : 
 
       if ( myField->getInterlacingType() == MED_FULL_INTERLACE )
         driver = new VTK_FIELD_DRIVER<double>(_fileName,
-                                              static_cast< FIELD<double,FullInterlace>* >(myField));
+                                              static_cast< const FIELD<double,FullInterlace>* >(myField));
 
       else if ( myField->getInterlacingType() == MED_NO_INTERLACE_BY_TYPE )
         driver = new VTK_FIELD_DRIVER<double>(_fileName,
-                                              static_cast< FIELD<double,NoInterlaceByType>*>(myField));
+                                              static_cast< const FIELD<double,NoInterlaceByType>*>(myField));
 
       else
         driver = new VTK_FIELD_DRIVER<double>(_fileName,
-                                              static_cast< FIELD<double,NoInterlace>* >(myField));
+                                              static_cast< const FIELD<double,NoInterlace>* >(myField));
       break;
 
     default :

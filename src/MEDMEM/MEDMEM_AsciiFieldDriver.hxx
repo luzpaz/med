@@ -102,7 +102,7 @@ namespace MEDMEM {
 
   public:
     template <class INTERLACING_TAG>
-    ASCII_FIELD_DRIVER():GENDRIVER(ASCII_DRIVER),
+    ASCII_FIELD_DRIVER():GENDRIVER(),
                          _ptrField((FIELD<T>)MED_NULL),
                          _fileName("") {}
 
@@ -199,7 +199,7 @@ namespace MEDMEM {
           }
       else
         {
-          if(_spaceDimension!=strlen(priority))
+          if(_spaceDimension != (int)strlen(priority))
             throw MEDEXCEPTION("ASCII_FIELD_DRIVER : Coordinate priority invalid with spaceDim");
           for(i=_spaceDimension-1;i>=0;i--)
             {
@@ -216,14 +216,14 @@ namespace MEDMEM {
   template <class T>
   ASCII_FIELD_DRIVER<T>::ASCII_FIELD_DRIVER(const ASCII_FIELD_DRIVER<T>& other):
     GENDRIVER(ASCII_DRIVER),
+    _mesh(other._mesh),
+    _support(other._support),
     _ptrField(other._ptrField),
     _fileName(other._fileName),
-    _direc(other._direc),
-    _mesh(other._mesh),
-    _nbComponents(other._nbComponents),
     _code(other._code),
-    _spaceDimension(other._spaceDimension),
-    _support(other._support)
+    _direc(other._direc),
+    _nbComponents(other._nbComponents),
+    _spaceDimension(other._spaceDimension)
   {
   }
 
@@ -408,7 +408,7 @@ namespace MEDMEM
       } else {
 
         coord = _mesh->getCoordinates(MED_EN::MED_FULL_INTERLACE);
-        const int * nodesNumber=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
+        const int * nodesNumber=_support->getNumber(MED_EN::MEDMEM_ALL_ELEMENTS);
         for(i=0; i<SPACEDIMENSION; i++)
           xyz[i]=new double[numberOfValues];
             deallocateXyz=true;

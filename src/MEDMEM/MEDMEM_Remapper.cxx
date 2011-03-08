@@ -46,10 +46,10 @@ MEDMEM_REMAPPER::~MEDMEM_REMAPPER()
     _sourceMesh->removeReference();
   if(_targetMesh)
     _targetMesh->removeReference();
-//   if(_sourceSupport)
-//     _sourceSupport->removeReference();
-//   if(_targetSupport)
-//     _targetSupport->removeReference();
+  if(_sourceSupport)
+    _sourceSupport->removeReference();
+  if(_targetSupport)
+    _targetSupport->removeReference();
 }
 /*! This method computes the intersection matrix between 
  * source \a mesh_source and \a mesh_target. It is a preliminary step 
@@ -95,18 +95,18 @@ int MEDMEM_REMAPPER::prepare(const MEDMEM::MESH& mesh_source, const MEDMEM::MESH
     throw INTERP_KERNEL::Exception("MEDMEM_REMAPPER::prepare: Invalid method specified ! Must be in : \"P0P0\" \"P0P1\" \"P1P0\" or \"P1P1\"");
                 
 
-//   if(_sourceSupport)
-//     _sourceSupport->removeReference();
-//   if(_targetSupport)
-//     _targetSupport->removeReference();
-  if(   _sourceFieldType == "P0")
-    _sourceSupport = ((MEDMEM::MESH *)_sourceMesh)->getSupportOnAll(MED_EN::MED_CELL);
+  if(_sourceSupport)
+    _sourceSupport->removeReference();
+  if(_targetSupport)
+    _targetSupport->removeReference();
+  if(     _sourceFieldType == "P0")
+    _sourceSupport = new MEDMEM::SUPPORT((MEDMEM::MESH *)_sourceMesh,"on All support",MED_EN::MED_CELL);
   else
-    _sourceSupport = ((MEDMEM::MESH *)_sourceMesh)->getSupportOnAll(MED_EN::MED_NODE);
+    _sourceSupport = new MEDMEM::SUPPORT((MEDMEM::MESH *)_sourceMesh,"on All support",MED_EN::MED_NODE);
   if(   _targetFieldType == "P0")
-    _targetSupport = ((MEDMEM::MESH *)_targetMesh)->getSupportOnAll(MED_EN::MED_CELL);
+    _targetSupport = new MEDMEM::SUPPORT((MEDMEM::MESH *)_targetMesh,"on All support",MED_EN::MED_CELL);
   else
-    _targetSupport = ((MEDMEM::MESH *)_targetMesh)->getSupportOnAll(MED_EN::MED_NODE);
+    _targetSupport = new MEDMEM::SUPPORT((MEDMEM::MESH *)_targetMesh,"on All support",MED_EN::MED_NODE);
         
   if (tm_spacedim!=sm_spacedim || tm_meshdim!=sm_meshdim)
     throw MEDEXCEPTION("incompatible mesh and/or space dimensions in meshes");
@@ -316,7 +316,7 @@ int MEDMEM_REMAPPER::setOptionString(const std::string& key, std::string& value)
 */
 MEDMEM::FIELD<double>* MEDMEM_REMAPPER::getSupportVolumes(const MEDMEM::SUPPORT& support)
 {
-  const MEDMEM::MESH* mesh=support.getMesh();
+  const MEDMEM::GMESH* mesh=support.getMesh();
   int dim = mesh->getMeshDimension();
   switch (dim)
     {

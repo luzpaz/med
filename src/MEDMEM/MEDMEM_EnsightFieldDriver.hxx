@@ -136,7 +136,7 @@ public :
   /*!
     Constructor to append a field to the file
   */
-  ENSIGHT_FIELD_WRONLY_DRIVER(const string & fileName, FIELD_ * ptrField);
+  ENSIGHT_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD_ * ptrField);
 
   ENSIGHT_FIELD_WRONLY_DRIVER();
   ENSIGHT_FIELD_WRONLY_DRIVER(const ENSIGHT_FIELD_WRONLY_DRIVER & fieldDriver);

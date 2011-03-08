@@ -276,7 +276,7 @@ namespace {
   SUPPORT* makeShiftedSupport(const SUPPORT* support,
                               const set<int> undefIndices)
   {
-    int nbElements = support->getNumberOfElements(MED_ALL_ELEMENTS);
+    int nbElements = support->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
     int nbTypes    = support->getNumberOfTypes();
 
     int i, shitf = 1;
@@ -302,7 +302,7 @@ namespace {
     else {
       // shift existing number
       shitf = 1;
-      const int * oldNumber = support->getNumber( MED_ALL_ELEMENTS );
+      const int * oldNumber = support->getNumber( MEDMEM_ALL_ELEMENTS );
       std::copy( oldNumber, oldNumber + *undefIndices.begin()-1, number ); // copy [0:firstUndef]
       for ( undef = undefIndices.begin(); undef != undefIndices.end(); ) {
         i = *undef++;
@@ -354,10 +354,11 @@ namespace {
   {
     medEntityMesh entity = field->getSupport()->getEntity();
     SUPPORT* support = interSupport->medSupport( entity );
-    field->setSupport( support );
+    field->setSupport( new SUPPORT( *support ));
+    field->getSupport()->removeReference(); // support belongs to field only
 
     int j, nbComponents = field->getNumberOfComponents();
-    int      nbElements = field->getSupport()->getNumberOfElements(MED_ALL_ELEMENTS);
+    int      nbElements = field->getSupport()->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
 
     typedef typename MEDMEM_ArrayInterface<T,INTERLACE,NoGauss>::Array TArray;
 
@@ -552,7 +553,7 @@ ENSIGHT_FIELD_DRIVER::~ENSIGHT_FIELD_DRIVER()
 void ENSIGHT_FIELD_DRIVER::setFieldName(const string & fieldName) throw (MEDEXCEPTION)
 {
   const char* LOC = "ENSIGHT_FIELD_DRIVER::setFieldName(): ";
-  if ( fieldName.size() > MAX_FIELD_NAME_LENGTH )
+  if ( (int)fieldName.size() > MAX_FIELD_NAME_LENGTH )
     throw MEDEXCEPTION( compatibilityPb(LOC) << "too long name (> " <<
                         MAX_FIELD_NAME_LENGTH << "): " << fieldName);
 
@@ -677,29 +678,33 @@ void ENSIGHT_FIELD_RDONLY_DRIVER::read (void)
   const char * LOC = "ENSIGHT_FIELD_RDONLY_DRIVER::read() : " ;
   BEGIN_OF_MED(LOC);
 
-  openConst(false); // check if can read case file
-
   _CaseFileDriver caseFile( getCaseFileName(), this);
-  caseFile.read();
 
-  // find out index of variable to read
-  int variableIndex = caseFile.getVariableIndex( _fieldName );
-  if ( !variableIndex )
-    variableIndex = caseFile.getVariableIndex( _ptrField->getName() );
-  if ( !variableIndex ) {
-    if ( !_fieldName.empty() )
-      throw MEDEXCEPTION
-        (LOCALIZED(STRING(LOC) << "no field found by name |" << _fieldName << "|"));
-    else
-      throw MEDEXCEPTION
-        (LOCALIZED(STRING(LOC) << "no field found by name |" << _ptrField->getName() << "|"));
+  if ( getDataFileName().empty() ) // find out what to read
+  {
+    openConst(false); // check if can read case file
+
+    caseFile.read();
+
+    // find out index of variable to read
+    int variableIndex = caseFile.getVariableIndex( _fieldName );
+    if ( !variableIndex )
+      variableIndex = caseFile.getVariableIndex( _ptrField->getName() );
+    if ( !variableIndex ) {
+      if ( !_fieldName.empty() )
+        throw MEDEXCEPTION
+          (LOCALIZED(STRING(LOC) << "no field found by name |" << _fieldName << "|"));
+      else
+        throw MEDEXCEPTION
+          (LOCALIZED(STRING(LOC) << "no field found by name |" << _ptrField->getName() << "|"));
+    }
+
+    //  here data from Case File is passed:
+    // * field name
+    // * number of components
+    // * etc.
+    caseFile.setDataFileName( variableIndex, _fieldStep, this );
   }
-
-  //  here data from Case File is passed:
-  // * field name
-  // * number of components
-  // * etc.
-  caseFile.setDataFileName( variableIndex, _fieldStep, this );
 
   openConst(true); // check if can read data file
 
@@ -1138,8 +1143,8 @@ ENSIGHT_FIELD_WRONLY_DRIVER::ENSIGHT_FIELD_WRONLY_DRIVER()
 //=======================================================================
 
 ENSIGHT_FIELD_WRONLY_DRIVER::ENSIGHT_FIELD_WRONLY_DRIVER(const string & fileName,
-                                                         FIELD_ *       ptrField)
-  :ENSIGHT_FIELD_DRIVER(fileName,ptrField,MED_EN::WRONLY)
+                                                         const FIELD_ * ptrField)
+  :ENSIGHT_FIELD_DRIVER(fileName,(FIELD_*)ptrField,MED_EN::WRONLY)
 {
 }
 
@@ -1388,7 +1393,7 @@ void ENSIGHT_FIELD_WRONLY_DRIVER::write(void) const
 
   const FIELD_* field     = _ptrField;
   const SUPPORT * support = field->getSupport();
-  const MESH * mesh       = support->getMesh();
+  const GMESH * mesh      = support->getMesh();
 
   int dt              = field->getIterationNumber();
   int it              = field->getOrderNumber();
@@ -1396,7 +1401,7 @@ void ENSIGHT_FIELD_WRONLY_DRIVER::write(void) const
   med_type_champ type = field->getValueType() ;
 
   medEntityMesh entity = support->getEntity();
-  int totalNbValues    = support->getNumberOfElements(MED_ALL_ELEMENTS);
+  int totalNbValues    = support->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
   //const int* mainNbValsByType = support->getNumberOfElements();
 
   int nbValuesByType = 0;
@@ -1407,7 +1412,7 @@ void ENSIGHT_FIELD_WRONLY_DRIVER::write(void) const
     throw MED_EXCEPTION(STRING("Can't write field ") << field->getName() <<
                         ", which is not on all elements while mesh is not set to its support");
   if (!isOnAll)
-    isOnAll = ( mesh->getNumberOfElements(entity,MED_ALL_ELEMENTS) == componentShift );
+    isOnAll = ( mesh->getNumberOfElements(entity,MEDMEM_ALL_ELEMENTS) == componentShift );
   if (!isOnAll && entity == MED_NODE && !isGoldFormat() ) {
     throw MED_EXCEPTION(compatibilityPb("Can't write field ") << field->getName() <<
                         " which is not on all nodes of the mesh in EnSight6 format,"
@@ -1548,7 +1553,7 @@ void ENSIGHT_FIELD_WRONLY_DRIVER::write(void) const
             geoTypeValues.myValues  = getValuePointer( geoTypeValues.myNumbers[0], field );
           }
         }
-        else if ( partSup->getNumberOfElements(MED_ALL_ELEMENTS) != totalNbValues ) {
+        else if ( partSup->getNumberOfElements(MEDMEM_ALL_ELEMENTS) != totalNbValues ) {
           geoTypeValues.myNumbers = partSup->getNumber(medType);
           geoTypeValues.myValues  = getValuePointer( geoTypeValues.myNumbers[0], field );
         }
@@ -1646,7 +1651,7 @@ void ENSIGHT_FIELD_WRONLY_DRIVER::write(void) const
             geoTypeValues.myValues  = getValuePointer( geoTypeValues.myNumbers[0], field );
           }
         }
-        else if ( partSup->getNumberOfElements(MED_ALL_ELEMENTS) != totalNbValues ) {
+        else if ( partSup->getNumberOfElements(MEDMEM_ALL_ELEMENTS) != totalNbValues ) {
           geoTypeValues.myNumbers = partSup->getNumber(medType);
           geoTypeValues.myValues  = getValuePointer( geoTypeValues.myNumbers[0], field );
         }

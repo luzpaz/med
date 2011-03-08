@@ -62,8 +62,8 @@ template <class T> class VTK_FIELD_DRIVER : public GENDRIVER
 {
 protected:
   
-  FIELD<T> *                 _ptrField;
-  string                     _fieldName;
+  const FIELD<T> *           _ptrField;
+  std::string                _fieldName;
   int                        _fieldNum;
 
   mutable ofstream *         _vtkFile ;
@@ -75,8 +75,8 @@ public :
     Constructor.
   */
   VTK_FIELD_DRIVER():GENDRIVER(VTK_DRIVER),
-                     _ptrField((FIELD<T> *) 0), _fieldName(""), _fieldNum(MED_EN::MED_INVALID),
-                      _vtkFile(0), _binaryFile(0)
+                     _ptrField(0), _fieldName(""), _fieldNum(MED_EN::MED_INVALID),
+                     _vtkFile(0), _binaryFile(0)
   {
     const char * LOC = "VTK_FIELD_DRIVER::VTK_FIELD_DRIVER() ";
     BEGIN_OF_MED(LOC);
@@ -86,10 +86,10 @@ public :
     Constructor.
   */
   template <class INTERLACING_TAG>
-  VTK_FIELD_DRIVER(const string &              fileName,
-                   FIELD<T, INTERLACING_TAG> * ptrField):
+  VTK_FIELD_DRIVER(const std::string &              fileName,
+                   const FIELD<T, INTERLACING_TAG> * ptrField):
     GENDRIVER(fileName, MED_EN::WRONLY, VTK_DRIVER),
-    _ptrField((FIELD<T> *) ptrField), _fieldName(fileName),_fieldNum(MED_EN::MED_INVALID),
+    _ptrField((const FIELD<T> *) ptrField), _fieldName(fileName),_fieldNum(MED_EN::MED_INVALID),
     _vtkFile(0), _binaryFile(0)
   {
     const char* LOC = "VTK_FIELD_DRIVER::VTK_FIELD_DRIVER(const string & fileName, FIELD<T> * ptrField) ";
@@ -107,7 +107,6 @@ public :
     _fieldNum(fieldDriver._fieldNum),
     _vtkFile(0), _binaryFile(0)
   {
-    _ptrField->addDriver(*this);
   }
 
   /*!
@@ -308,7 +307,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
   // we get the Support and its associated Mesh
 
   const SUPPORT * supportField = _ptrField->getSupport();
-  MESH * meshField = supportField->getMesh();
+  GMESH * meshField = supportField->getMesh();
   if (! meshField )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": mesh was not read before writing")) ;
 
@@ -337,7 +336,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
   // we get the Support and its associated Mesh
 
   const SUPPORT * supportField = _ptrField->getSupport();
-  MESH * meshField = supportField->getMesh();
+  GMESH * meshField = supportField->getMesh();
   MED_EN::medEntityMesh entitySupport = supportField->getEntity();
 
   if (! meshField )
@@ -373,7 +372,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
   if (entitySupport == MED_EN::MED_NODE)
     dataStr << "POINT_DATA " << meshField->getNumberOfNodes() ;
   else if (entitySupport == MED_EN::MED_CELL)
-    dataStr << "CELL_DATA " << meshField->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+    dataStr << "CELL_DATA " << meshField->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
   else
     throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" which is not on all nodes or cells but it's on !" << entitySupport));
 
@@ -412,7 +411,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
     vtkFileStr << dataStr << endl;
   // END issue 0020610: [CEA 371] VTK field driver : save many fields
 
-  int NomberOfValue = supportField->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS) ;
+  int NomberOfValue = supportField->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS) ;
   int NomberOfComponents =  _ptrField->getNumberOfComponents() ;
 
   MED_EN::med_type_champ fieldType = _ptrField->getValueType() ;
@@ -488,7 +487,9 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
       // (at least paraview shows wrong values)
       if ( fieldType == MED_EN::MED_REEL64 )
         {
-          vector<float> floatValue( value, value + NomberOfValue * NomberOfComponents );
+          vector<float> floatValue(NomberOfValue * NomberOfComponents );
+          for ( unsigned i = 0; i < floatValue.size(); ++i )
+            floatValue[i]=float( value[i] );
           _binaryFile->write( &floatValue[0], NomberOfValue * NomberOfComponents );
         }
       else

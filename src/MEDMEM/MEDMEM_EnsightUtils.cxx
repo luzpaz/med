@@ -166,6 +166,14 @@ namespace MEDMEM_ENSIGHT
   void unregister(const _CaseFileDriver_User* driver)
   {
     theCaseUsers.erase( driver );
+    if ( theCaseUsers.empty() )
+    {
+      for ( map< string, _InterMed* >::iterator str_imed = theInterMedMap.begin();
+            str_imed != theInterMedMap.end();
+            str_imed++ )
+        delete str_imed->second;
+      theInterMedMap.clear();
+    }
   }
 
   //--------------------------------------------------------------------------------
@@ -234,102 +242,102 @@ namespace MEDMEM_ENSIGHT
     theEnSightType._medType = medType;
 
     switch ( medType ) {
-    case MED_NONE    :
-    case MED_POINT1  : {
+    case MEDMEM_NONE    :
+    case MEDMEM_POINT1  : {
       theEnSightType._name = "point";
       theEnSightType._medIndex.resize(1,0);
       break ;
     }
-    case MED_SEG2    : {
+    case MEDMEM_SEG2    : {
       theEnSightType._name = "bar2";
       int conn [2] = {0,1};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MED_SEG3    : {  
+    case MEDMEM_SEG3    : {  
       theEnSightType._name = "bar3";
       int conn [3] = {0,2,1};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MED_TRIA3   : {
+    case MEDMEM_TRIA3   : {
       theEnSightType._name = "tria3";
       int conn [3] = {0,2,1};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MED_QUAD4   : {
+    case MEDMEM_QUAD4   : {
       theEnSightType._name = "quad4";
       int conn [4] = {0,3,2,1};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MED_TRIA6   : {
+    case MEDMEM_TRIA6   : {
       theEnSightType._name = "tria6";
       int conn [6] = {0,2,1,5,4,3};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MED_QUAD8   : {
+    case MEDMEM_QUAD8   : {
       theEnSightType._name = "quad8";
       int conn [8] = {0,3,2,1,7,6,5,4};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MED_TETRA4  : {
+    case MEDMEM_TETRA4  : {
       theEnSightType._name = "tetra4";
       int conn [4] = {0,1,3,2};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MED_PYRA5   : {
+    case MEDMEM_PYRA5   : {
       theEnSightType._name = "pyramid5";
       int conn [5] = {0,3,2,1,4};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MED_PENTA6  : {
+    case MEDMEM_PENTA6  : {
       theEnSightType._name = "penta6";
       int conn [6] = {0,2,1,3,5,4};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MED_HEXA8   : {
+    case MEDMEM_HEXA8   : {
       theEnSightType._name = "hexa8";
       int conn [8] = {0,3,2,1,4,7,6,5};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MED_TETRA10 : {
+    case MEDMEM_TETRA10 : {
       theEnSightType._name = "tetra10";
       int conn [10] = {0,2,1,3,6,5,4,7,9,8};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MED_PYRA13  : {
+    case MEDMEM_PYRA13  : {
       theEnSightType._name = "pyramid13";
       int conn [13] = {0,3,2,1,4,8,7,6,5,9,12,11,10};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MED_PENTA15 : {
+    case MEDMEM_PENTA15 : {
       theEnSightType._name = "penta15";
       int conn [15] = {0,2,1,3,5,4,8,7,6,11,10,12,14,13};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MED_HEXA20  : {
+    case MEDMEM_HEXA20  : {
       theEnSightType._name = "hexa20";
       int conn [20] = {0,3,2,1,4,7,6,5,11,10,9,8,15,14,13,12,16,19,18,17};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MED_POLYGON : {
+    case MEDMEM_POLYGON : {
       theEnSightType._name = "nsided";
       theEnSightType._medIndex.clear();
       break ;
     }
-    case MED_POLYHEDRA : {
+    case MEDMEM_POLYHEDRA : {
       theEnSightType._name = "nfaced";
       theEnSightType._medIndex.clear();
       break ;
@@ -366,7 +374,7 @@ namespace MEDMEM_ENSIGHT
       if ( enSightType._name == typeName )
         return name2Type[ typeName ] = enSightType;
     }
-    return getEnSightType(MED_ALL_ELEMENTS);
+    return getEnSightType(MEDMEM_ALL_ELEMENTS);
   }
 
 // =============================================================== _CaseFileDriver
@@ -377,10 +385,12 @@ namespace MEDMEM_ENSIGHT
 
 _CaseFileDriver::_CaseFileDriver(const string &              fileName,
                                  const _CaseFileDriver_User* creator)
-  : _user( creator ), _fileName( fileName ), _directory(".")
+  : _fileName( fileName ), _directory("."), _user( creator )
 {
   // Find out if the driver is blocked
   _blocked = isToIgnore( creator );
+  if ( creator->getAccessMode() == MED_EN::RDONLY )
+    _blocked = false;
   if ( !_blocked ) {
     // set directory
     string::size_type sepPos = _fileName.rfind( FILE_SEPARATOR );
@@ -400,8 +410,11 @@ _CaseFileDriver::_CaseFileDriver(const string &              fileName,
 _CaseFileDriver::~_CaseFileDriver()
 {
   if ( !_blocked )
+  {
     // to write case file again by same DRIVER
     unregister( _user );
+    ((_CaseFileDriver_User*)_user)->_imed = 0;
+  }
 }
 
 #define READ_NEXT_LINE continue
@@ -641,7 +654,7 @@ void _CaseFileDriver::read() throw (MEDEXCEPTION)
         list<string>::iterator t = times.begin();
         for ( i = 0; i < nbTimes; ++i, ++t )
           timeSet->_times[i] = *t;
-        while ( nbTimes != timeSet->_times.size() ) {
+        while ( nbTimes != (int)timeSet->_times.size() ) {
           value = reader.getLine();
           ++lineNb;
           nbTimes += reader.split( value, times );
@@ -651,7 +664,7 @@ void _CaseFileDriver::read() throw (MEDEXCEPTION)
             timeSet->_times[i] = *t;
           }
         }
-        if ( nbTimes != timeSet->_times.size() ) {
+        if ( nbTimes != (int)timeSet->_times.size() ) {
           errorMsg << "incorrect number of times in time set " << timeSet->_number;
           RAISE_EXCEPTION;
         }
@@ -711,7 +724,7 @@ void _CaseFileDriver::read() throw (MEDEXCEPTION)
         while ( !file.eof() )
           numbers.push_back( file.getWord() );
         int nb = numbers.size();
-        if ( nb != timeSet->_times.size() ) {
+        if ( nb != (int)timeSet->_times.size() ) {
           errorMsg << "incorrect number of values in file " << value;
           RAISE_EXCEPTION;
         }
@@ -963,7 +976,7 @@ void _CaseFileDriver::setDataFileName(const int                   meshIndex,
   meshDriver->_singleFileMode  = ( !_fileSets.empty() );
   meshDriver->_imedMapKey      = STRING(_fileName)<<":"<<meshIndex;
 
-  MESH* ptrMesh = meshDriver->getMesh();
+  GMESH* ptrMesh = meshDriver->getMesh();
   ptrMesh->setName(STRING("EnSight mesh ") << meshIndex);
 }
 
@@ -1136,8 +1149,10 @@ int _CaseFileDriver::setDataFileName(const int                    varIndex,
 
   // support type
   SUPPORT* sup = const_cast<SUPPORT*>( field->getSupport());
-  if ( !sup )
+  if ( !sup ) {
     field->setSupport( sup = new SUPPORT );
+    sup->removeReference(); // sup belongs to field
+  }
   medEntityMesh entity = ( type_parts.back() == "node" ) ? MED_NODE : MED_CELL;
   sup->setEntity( entity );
 
@@ -1166,7 +1181,7 @@ int _CaseFileDriver::setDataFileName(const int                    varIndex,
       while ( !cvfile.eof() )
         fileData_parts.push_back( cvfile.getWord() );
     }
-    if ( fileData_parts.size() < stepIndex )
+    if ( (int)fileData_parts.size() < stepIndex )
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "can't find value for step " << stepIndex
                                    << " of " << var._type << " " << var._name));
     list<string>::iterator value = fileData_parts.begin();
@@ -1250,14 +1265,14 @@ int  _CaseFileDriver::fixWildCardName(const int      timeStep,
   _ASCIIFileReader::split( fileName, head, queue, '*' );
   int indexWidth = fileName.size() - head.size() - queue.size();
 
-  if ( indexWidth > 0 || !ts.empty() ) {
+  if ( indexWidth > 0 || !ts.empty() || timeStep > 1 ) {
     int tsId = ts.empty() ? 1 : _ATOI( ts );
     const _TimeSet& timeSet = _timeSets[ tsId ];
-    if ( timeStep > timeSet._times.size() )
+    if ( timeStep > (int)timeSet._times.size() )
       throw MEDEXCEPTION(LOCALIZED(badFile << "Cant'f find time for time step " <<
                                    timeStep << " in time set " << ts ));
     time = timeSet._times[ timeStep-1 ];
-    if ( timeStep-1 < timeSet._fileIndex.size()  )
+    if ( timeStep-1 < (int)timeSet._fileIndex.size()  )
       fileIndex = timeSet._fileIndex[ timeStep-1 ];
     if ( !indexInFile )
       indexInFile = 1;
@@ -1270,7 +1285,7 @@ int  _CaseFileDriver::fixWildCardName(const int      timeStep,
                                    timeStep << " in time set <" << ts <<
                                    "> and file set <" << fs << ">"));
     }
-    if ( indexWidth == fileIndex.size() ) {
+    if ( indexWidth ==  (int)fileIndex.size() ) {
       fileName = head + fileIndex + queue;
     }
     else {
@@ -1295,8 +1310,10 @@ void _CaseFileDriver::addMesh(const ENSIGHT_MESH_WRONLY_DRIVER* meshDriver)
 
   if ( _format == ENSIGHT_6 )
   {
-    const MESH* mesh = _meshDrivers.back()->getMesh();
-    if ( mesh->getNumberOfPolygons() > 0 || mesh->getNumberOfPolyhedron() > 0 )
+    const GMESH* mesh = _meshDrivers.back()->getMesh();
+    if ( mesh->getNumberOfElements(MED_CELL, MEDMEM_POLYGON) > 0 ||
+         mesh->getNumberOfElements(MED_FACE, MEDMEM_POLYGON) > 0 ||
+         mesh->getNumberOfElements(MED_CELL, MEDMEM_POLYHEDRA) > 0 )
       throw MEDEXCEPTION
         ( compatibilityPb(STRING("Can't write mesh <") << mesh->getName() <<
                           "> since Ensight6 format does not support poly elements,"
@@ -1337,7 +1354,7 @@ void _CaseFileDriver::addField(const ENSIGHT_FIELD_WRONLY_DRIVER * theFieldDrive
   case 6:
   case 9: break; // ok, supported
   case 2:
-    if ( MESH* mesh = field->getSupport()->getMesh() )
+    if ( GMESH* mesh = field->getSupport()->getMesh() )
       if ( mesh->getSpaceDimension() == 2 )
         break; // we add one component to both mesh and field
   default:
@@ -1438,7 +1455,7 @@ void _CaseFileDriver::write() throw (MEDEXCEPTION)
           }
         }
       }
-      int digitPos = (int) _model._fileName.find('*');
+      string::size_type digitPos = _model._fileName.find('*');
       bool isSeveralFiles = ( digitPos != _model._fileName.npos );
       int nbDigits = defaultNbDigits;
       if ( isSeveralFiles ) {
@@ -1570,11 +1587,11 @@ void _CaseFileDriver::write() throw (MEDEXCEPTION)
     }
     FDriverByDouble * sortedDrivers;
     FDriverByDouble::iterator tDrv;
-    if ( timeMap.size() == nbNewSteps )
+    if ( (int)timeMap.size() == nbNewSteps )
       sortedDrivers = & timeMap;
-    else if ( iterMap.size() == nbNewSteps )
+    else if ( (int)iterMap.size() == nbNewSteps )
       sortedDrivers = & iterMap;
-    else if ( orderMap.size() == nbNewSteps )
+    else if ( (int)orderMap.size() == nbNewSteps )
       sortedDrivers = & orderMap;
     else {
       timeMap.clear();
@@ -1727,8 +1744,8 @@ void _CaseFileDriver::write() throw (MEDEXCEPTION)
                << "number of steps:\t" << ts._times.size() << endl;
       if ( !ts._fileIndex.empty() ) {
         STRING numbers( "filename numbers:" );
-        for ( int i = 0; i < ts._fileIndex.size(); ++i ) {
-          if ( numbers.size() + ts._fileIndex[i].size() + 2 > MAX_LINE_LENGTH ) {
+        for ( unsigned i = 0; i < ts._fileIndex.size(); ++i ) {
+          if (int( numbers.size() + ts._fileIndex[i].size() + 2) > MAX_LINE_LENGTH ) {
             caseFile << numbers << endl;
             numbers = STRING();
           }
@@ -1737,8 +1754,8 @@ void _CaseFileDriver::write() throw (MEDEXCEPTION)
         caseFile << numbers << endl;
       }
       STRING times( "time values:" );
-      for ( int i = 0; i < ts._times.size(); ++i ) {
-        if ( times.size() + ts._times[i].size() + 2 > MAX_LINE_LENGTH ) {
+      for ( unsigned i = 0; i < ts._times.size(); ++i ) {
+        if (int( times.size() + ts._times[i].size() + 2 ) > MAX_LINE_LENGTH ) {
           caseFile << times << endl;
           times = STRING();
         }
@@ -1788,6 +1805,27 @@ _CaseFileDriver_User::_CaseFileDriver_User(const string & caseFileName,
 
 //================================================================================
 /*!
+ * \brief take data from other driver
+ */
+//================================================================================
+
+void _CaseFileDriver_User::merge( const GENDRIVER& driver)
+{
+  const _CaseFileDriver_User* other = dynamic_cast< const _CaseFileDriver_User* >( &driver );
+  if ( other ) {
+    _dataFileName    = other->_dataFileName   ;
+    _isGoldFormat    = other->_isGoldFormat   ;
+    _transientMode   = other->_transientMode  ;  
+    _singleFileMode  = other->_singleFileMode ; 
+    _indexInDataFile = other->_indexInDataFile;
+    _time            = other->_time           ;           
+    _imed            = other->_imed           ;            
+    _imedMapKey      = other->_imedMapKey     ;      
+  }
+}
+
+//================================================================================
+/*!
  * \brief analyse if data file is binary
  */
 //================================================================================
@@ -1829,13 +1867,13 @@ int _CaseFileDriver_User::getPartNumber(const SUPPORT* support) const
   bool isGroup = ( dynamic_cast<const GROUP*>( support ));
   bool isForField = ( dynamic_cast<const ENSIGHT_FIELD_DRIVER*>( this ));
   medEntityMesh entity = support->getEntity();
-  const MESH* mesh = support->getMesh();
+  const GMESH* mesh = support->getMesh();
 
   // for supports on all entities, reserve numbers corresponding to entity
   bool isOnAll = support->isOnAllElements();
   if (!isOnAll && mesh ) {
-    int nbMeshElem = mesh->getNumberOfElements(entity, MED_ALL_ELEMENTS);
-    int nbSuppElem = support->getNumberOfElements(MED_ALL_ELEMENTS);
+    int nbMeshElem = mesh->getNumberOfElements(entity, MEDMEM_ALL_ELEMENTS);
+    int nbSuppElem = support->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
     isOnAll = (  nbSuppElem == nbMeshElem );
   }
   if ( !isGroup ) {
@@ -1881,12 +1919,12 @@ int _CaseFileDriver_User::getPartNumber(const SUPPORT* support) const
 //================================================================================
 
 bool _CaseFileDriver_User::isToWriteEntity(const medEntityMesh entity,
-                                           const MESH*         mesh)
+                                           const GMESH*        mesh)
 {
   if ( entity == MED_NODE )
     return mesh->getNumberOfNodes() > 0;
 
-  if ( mesh->getNumberOfTypesWithPoly( entity ) < 1 )
+  if ( mesh->getNumberOfElements( entity, MEDMEM_ALL_ELEMENTS ) < 1 )
     return false;
   if ( entity == MED_CELL )
     return true;
@@ -1907,12 +1945,10 @@ bool _CaseFileDriver_User::isToWriteEntity(const medEntityMesh entity,
 
 void _CaseFileDriver_User::getSupportNodes(const SUPPORT* support, map<int, int> & nodeIds)
 {
-  MESH* mesh           = support->getMesh();
   medEntityMesh entity = support->getEntity();
 
-  const medModeSwitch conMode       = MED_FULL_INTERLACE;
   const medConnectivity conType     = MED_NODAL;
-  const medGeometryElement allGeoms = MED_ALL_ELEMENTS;
+  const medGeometryElement allGeoms = MEDMEM_ALL_ELEMENTS;
   const int * connectivity          = 0;
   const int * elemConnectivity      = 0;
   const int * index                 = 0;
@@ -1929,92 +1965,39 @@ void _CaseFileDriver_User::getSupportNodes(const SUPPORT* support, map<int, int>
       }
     }
     else {
-      int nbTypes = support->getNumberOfTypes();
-      const medGeometryElement* geoType = support->getTypes();
-      const medGeometryElement* geoTypeEnd = geoType + nbTypes;
-      int hasPolygons  = ( find( geoType, geoTypeEnd, MED_POLYGON   ) != geoTypeEnd );
-      int hasPolyhedra = ( find( geoType, geoTypeEnd, MED_POLYHEDRA ) != geoTypeEnd );
-      int hasStdTypes  = ( nbTypes - hasPolygons - hasPolyhedra > 0 );
+      const MESH* mesh = support->getMesh()->convertInMESH();
       int conLength = 0;
-      if ( hasStdTypes ) {
-        connectivity = mesh->getConnectivity      (conMode, conType, entity, allGeoms);
-        conLength    = mesh->getConnectivityLength(conMode, conType, entity, allGeoms);
-        while ( conLength-- ) nodeIds[ *connectivity++ ];
-      }
-      if ( hasPolygons ) {
-        connectivity = mesh->getPolygonsConnectivity      (conType, entity);
-        conLength    = mesh->getPolygonsConnectivityLength(conType, entity);
-        while ( conLength-- ) nodeIds[ *connectivity++ ];
-      }
-      if ( hasPolyhedra ) {
-        connectivity = mesh->getPolyhedronConnectivity      (conType);
-        conLength    = mesh->getPolyhedronConnectivityLength(conType);
-        while ( conLength-- ) nodeIds[ *connectivity++ ];
-      }
+      connectivity = mesh->getConnectivity      (conType, entity, allGeoms);
+      conLength    = mesh->getConnectivityLength(conType, entity, allGeoms);
+      while ( conLength-- ) nodeIds[ *connectivity++ ];
+      mesh->removeReference();
     }
     return;
   }
 
   if ( entity == MED_NODE )
   {
-    number           = support->getNumber(MED_ALL_ELEMENTS);
-    int numberOfCell = support->getNumberOfElements(MED_ALL_ELEMENTS);
+    number           = support->getNumber(MEDMEM_ALL_ELEMENTS);
+    int numberOfCell = support->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
     for (j=0; j < numberOfCell; j++)
       nodeIds.insert(nodeIds.end(), make_pair( number[j], j ));
     return;
   }
 
-  // loop on types
-  int nbTypes = support->getNumberOfTypes();
-  const medGeometryElement* geoType = support->getTypes();
-  for (int i=0; i<nbTypes; i++)
+  number           = support->getNumber(MEDMEM_ALL_ELEMENTS);
+  int numberOfCell = support->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  const MESH* mesh = support->getMesh()->convertInMESH();
+  index        = mesh->getConnectivityIndex( MED_NODAL, entity);
+  connectivity = mesh->getConnectivity( MED_NODAL, entity, MEDMEM_ALL_ELEMENTS);
+  for ( j = 0; j < numberOfCell; ++j )
   {
-    medGeometryElement medType = geoType[i];
-    number                     = support->getNumber(medType);
-    int numberOfCell           = support->getNumberOfElements(medType);
-
-    if ( medType < MED_POLYGON )  // STANDARD ELEMENTS
-    {
-      index        = mesh->getConnectivityIndex(MED_FULL_INTERLACE, entity);
-      connectivity = mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                           entity, MED_ALL_ELEMENTS);
-      for ( j = 0; j < numberOfCell; ++j ) {
-        int elem = number[j];
-        elemConnectivity   = connectivity + index[elem-1]-1;
-        const int* connEnd = connectivity + index[elem]-1;
-        while ( elemConnectivity < connEnd )
-          nodeIds[ *elemConnectivity++ ];
-      }
-    }
-    else if ( medType == MED_POLYGON ) // POLYGONs connectivity
-    {
-      connectivity   = mesh->getPolygonsConnectivity(MED_NODAL, entity);
-      index          = mesh->getPolygonsConnectivityIndex(MED_NODAL, entity);
-      int nbStdElems = mesh->getNumberOfElements(entity,MED_ALL_ELEMENTS);
-      for ( j = 0; j < numberOfCell; ++j ) {
-        int elem = number[ j ] - nbStdElems;
-        elemConnectivity   = connectivity + index[elem-1]-1;
-        const int* connEnd = connectivity + index[elem]-1;
-        while ( elemConnectivity < connEnd )
-          nodeIds[ *elemConnectivity++ ];
-      }
-    }
-    else // POLYHEDRA connectivity
-    {
-      connectivity       = mesh->getPolyhedronConnectivity(MED_NODAL);
-      index              = mesh->getPolyhedronIndex(MED_NODAL);
-      const int * fIndex = mesh->getPolyhedronFacesIndex();
-      int nbStdElems     = mesh->getNumberOfElements(entity,MED_ALL_ELEMENTS);
-      for ( j = 0; j < numberOfCell; ++j ) {
-        int elem = number[ j ] - nbStdElems;
-        int f1 = index[ elem-1 ] - 1, f2 = index[ elem ] - 1;
-        elemConnectivity   = connectivity + fIndex[ f1 ] - 1;
-        const int* connEnd = connectivity + fIndex[ f2 ] - 1;
-        while ( elemConnectivity < connEnd )
-          nodeIds[ *elemConnectivity++ ];
-      }
-    }
+    int elem = number[j];
+    elemConnectivity   = connectivity + index[elem-1]-1;
+    const int* connEnd = connectivity + index[elem]-1;
+    while ( elemConnectivity < connEnd )
+      nodeIds[ *elemConnectivity++ ];
   }
+  mesh->removeReference();
 }
 
 //================================================================================
@@ -2028,7 +2011,7 @@ void _CaseFileDriver_User::setInterData(_InterMed* imed )
 {
   theInterMedMap[ _imedMapKey ] = imed;
   if ( ENSIGHT_MESH_DRIVER* mDrv = dynamic_cast<ENSIGHT_MESH_DRIVER*>( this )) {
-    imed->_medMesh = mDrv->getMesh();
+    imed->_medMesh = dynamic_cast<MESH*>( mDrv->getMesh() );
     imed->_isOwnMedMesh = false;
   }
   else
@@ -2156,7 +2139,7 @@ _Support* _CaseFileDriver_User::getSupport(const _SupportDesc & descriptor,
           _groupe & groupe = _imed->groupes.back();
           groupe.mailles.resize( subPart->myNbNodes );
 
-          _maille ma( MED_POINT1, 1 );
+          _maille ma( MEDMEM_POINT1, 1 );
           ma.sommets.resize( 1 );
           map< int, _noeud >::iterator n = subPart->myFirstNode;
           for (int i = 0; i < subPart->myNbNodes; ++i, ++n ) {
@@ -2180,7 +2163,7 @@ _Support* _CaseFileDriver_User::getSupport(const _SupportDesc & descriptor,
     if ( dimensions.size() > 1 )
       throw MEDEXCEPTION
         (compatibilityPb(LOC) << "can't create a SUPPORT for the field from "
-         << _dataFileName << ", since it is on different mesh entities");
+         << _dataFileName << ", since it includes different mesh entities");
 
     ENSIGHT_MESH_RDONLY_DRIVER::makeGroup( grp, *_imed );
 
@@ -2195,7 +2178,12 @@ _Support* _CaseFileDriver_User::getSupport(const _SupportDesc & descriptor,
 
   // remove temporary mesh from med SUPPORT
   if ( _imed->_isOwnMedMesh )
+  {
+    if ( sup->medSupport( entity )->getMesh() == _imed->_medMesh )
+      _imed->_medMesh->addReference(); // don't want _medMesh to die.
     sup->medSupport( entity )->setMesh( 0 );
+    sup->medSupport( entity )->setMeshName( _imed->_medMesh->getName() );
+  }
 
   return sup;
 }
@@ -2266,7 +2254,29 @@ void _InterMed::addSubPart(const _SubPart& theSubPart)
     }
   }
 }
+//================================================================================
+/*!
+ * \brief delete intermediate med data
+ */
+//================================================================================
 
+_InterMed::~_InterMed()
+{
+  if ( _isOwnMedMesh )
+  {
+    // remove MEDMEM groups not belonging to _medMesh
+    for (unsigned int i=0; i < _intermediateMED::groupes.size(); ++i)
+    {
+      _groupe& grp = _intermediateMED::groupes[i];
+      if ( !grp.medGroup ) continue;
+      vector<GROUP*> groups = _medMesh->getGroups( grp.medGroup->getEntity() );
+      if ( find( groups.begin(), groups.end(), grp.medGroup ) == groups.end() )
+        grp.medGroup->removeReference();
+    }
+    if(_medMesh) _medMesh->removeReference();
+    _medMesh=0;
+  }
+}
 //================================================================================
 /*!
  * \brief For a node, find its index in the supporting GROUP 
@@ -2650,7 +2660,7 @@ int _ASCIIFileReader::split(const string& str,
     }
     //if ( !*ptr2) --ptr2;
     // skip spaces after the current part
-    while ( isspace(ptr2[-1])) --ptr2;
+    while ( ptr2 > ptr1 && isspace(ptr2[-1])) --ptr2;
     parts[ nbParts ] = string( ptr1, ptr2-ptr1 );
     ptr1 = nextBeg;
   }
@@ -2898,7 +2908,7 @@ _BinaryFileWriter::~_BinaryFileWriter()
 void _BinaryFileWriter::addString(const char* str) throw (MEDEXCEPTION)
 {
   size_t len = strlen( str );
-  if ( len > MAX_LINE_LENGTH )
+  if ((int) len > MAX_LINE_LENGTH )
     throw MEDEXCEPTION
       (LOCALIZED(STRING("_BinaryFileWriter::addString(), too long string (>80):\n") << str));
 

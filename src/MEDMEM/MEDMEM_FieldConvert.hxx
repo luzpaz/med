@@ -23,8 +23,7 @@
 #ifndef FIELD_CONVERT_HXX
 #define FIELD_CONVERT_HXX
 
-//#include "MEDMEM_FieldForward.hxx"
-#include "MEDMEM_Field.hxx" // issue 0021050: compilation with clang
+#include "MEDMEM_FieldForward.hxx"
 #include "MEDMEM_ArrayInterface.hxx"
 #include "MEDMEM_ArrayConvert.hxx"
 

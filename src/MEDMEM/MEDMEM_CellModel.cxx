@@ -22,6 +22,7 @@
 
 /*
  File MEDMEM_CellModel.cxx
+ $Header$
 */
 
 #include "MEDMEM_CellModel.hxx"
@@ -59,8 +60,8 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
   MESSAGE_MED("CELLMODEL : constructeur pour le type " << t);
   switch (t)
     {
-    case MED_POINT1  : {
-      _name="MED_POINT1";
+    case MEDMEM_POINT1  : {
+      _name="MEDMEM_POINT1";
       _type=t;
       _dimension=0;
       _numberOfVertexes=1;
@@ -68,8 +69,8 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       // nothing else : POINT are none constituent
       break;
     }
-    case MED_SEG2    : {
-      _name="MED_SEG2" ;
+    case MEDMEM_SEG2    : {
+      _name="MEDMEM_SEG2" ;
       _type=t;
       _dimension=1;
       _numberOfVertexes=2;
@@ -91,14 +92,14 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       _constituents[0][1][0] = 2 ;
 
       medGeometryElement * tmpConstituentsType1 = new medGeometryElement[2] ;
-      tmpConstituentsType1[0] = MED_POINT1 ;
-      tmpConstituentsType1[1] = MED_POINT1 ;
+      tmpConstituentsType1[0] = MEDMEM_POINT1 ;
+      tmpConstituentsType1[1] = MEDMEM_POINT1 ;
       _constituentsType = new medGeometryElement*[1] ;
       _constituentsType[0]=tmpConstituentsType1 ;
       break;
     }
-    case MED_SEG3    : {
-      _name="MED_SEG3" ;
+    case MEDMEM_SEG3    : {
+      _name="MEDMEM_SEG3" ;
       _type=t;
       _dimension=1;
       _numberOfVertexes=2;
@@ -123,15 +124,15 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       _constituents[0][2][0] = 3 ;
 
       medGeometryElement * tmpConstituentsType1 = new medGeometryElement[3] ;
-      tmpConstituentsType1[0] = MED_POINT1 ;
-      tmpConstituentsType1[1] = MED_POINT1 ;
-      tmpConstituentsType1[2] = MED_POINT1 ;
+      tmpConstituentsType1[0] = MEDMEM_POINT1 ;
+      tmpConstituentsType1[1] = MEDMEM_POINT1 ;
+      tmpConstituentsType1[2] = MEDMEM_POINT1 ;
       _constituentsType = new medGeometryElement*[1] ;
       _constituentsType[0]=tmpConstituentsType1 ;
       break;
     }
-    case MED_TRIA3   : {
-      _name="MED_TRIA3" ;
+    case MEDMEM_TRIA3   : {
+      _name="MEDMEM_TRIA3" ;
       _type=t;
       _dimension=2;
       _numberOfVertexes=3;
@@ -163,13 +164,13 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       _constituents[0]=tmpConstituents1 ;
 
       medGeometryElement * tmpConstituentsType1 = new medGeometryElement[3] ;
-      tmpConstituentsType1[0] = MED_SEG2 ;
-      tmpConstituentsType1[1] = MED_SEG2 ;
-      tmpConstituentsType1[2] = MED_SEG2 ;
+      tmpConstituentsType1[0] = MEDMEM_SEG2 ;
+      tmpConstituentsType1[1] = MEDMEM_SEG2 ;
+      tmpConstituentsType1[2] = MEDMEM_SEG2 ;
 //        medGeometryElement * tmpConstituentsType2 = new medGeometryElement[3] ;
-//        tmpConstituentsType2[0] = MED_POINT1 ;
-//        tmpConstituentsType2[1] = MED_POINT1 ;
-//        tmpConstituentsType2[2] = MED_POINT1 ;
+//        tmpConstituentsType2[0] = MEDMEM_POINT1 ;
+//        tmpConstituentsType2[1] = MEDMEM_POINT1 ;
+//        tmpConstituentsType2[2] = MEDMEM_POINT1 ;
 //        _constituentsType = new medGeometryElement*[2] ;
       _constituentsType = new medGeometryElement*[1] ;
       _constituentsType[0]=tmpConstituentsType1 ;
@@ -179,8 +180,8 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
 
       break;
     }
-    case MED_TRIA6   : {
-      _name="MED_TRIA6" ;
+    case MEDMEM_TRIA6   : {
+      _name="MEDMEM_TRIA6" ;
       _type=t;
       _dimension=2;
       _numberOfVertexes=3;
@@ -213,16 +214,16 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       _constituents = new int**[1] ;
       _constituents[0]=tmpConstituents1 ;
       medGeometryElement * tmpConstituentsType1 = new medGeometryElement[3] ;
-      tmpConstituentsType1[0] = MED_SEG3 ;
-      tmpConstituentsType1[1] = MED_SEG3 ;
-      tmpConstituentsType1[2] = MED_SEG3 ;
+      tmpConstituentsType1[0] = MEDMEM_SEG3 ;
+      tmpConstituentsType1[1] = MEDMEM_SEG3 ;
+      tmpConstituentsType1[2] = MEDMEM_SEG3 ;
 //        medGeometryElement * tmpConstituentsType2 = new medGeometryElement[6] ;
-//        tmpConstituentsType2[0] = MED_POINT1 ;
-//        tmpConstituentsType2[1] = MED_POINT1 ;
-//        tmpConstituentsType2[2] = MED_POINT1 ;
-//        tmpConstituentsType2[3] = MED_POINT1 ;
-//        tmpConstituentsType2[4] = MED_POINT1 ;
-//        tmpConstituentsType2[5] = MED_POINT1 ;
+//        tmpConstituentsType2[0] = MEDMEM_POINT1 ;
+//        tmpConstituentsType2[1] = MEDMEM_POINT1 ;
+//        tmpConstituentsType2[2] = MEDMEM_POINT1 ;
+//        tmpConstituentsType2[3] = MEDMEM_POINT1 ;
+//        tmpConstituentsType2[4] = MEDMEM_POINT1 ;
+//        tmpConstituentsType2[5] = MEDMEM_POINT1 ;
 //        _constituentsType = new medGeometryElement*[2] ;
       _constituentsType = new medGeometryElement*[1] ;
       _constituentsType[0]=tmpConstituentsType1 ;
@@ -232,8 +233,8 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
 
       break;
     }
-    case MED_QUAD4   : {
-      _name="MED_QUAD4" ;
+    case MEDMEM_QUAD4   : {
+      _name="MEDMEM_QUAD4" ;
       _type=t;
       _dimension=2;
       _numberOfVertexes=4;
@@ -268,15 +269,15 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       _constituents = new int**[1] ;
       _constituents[0]=tmpConstituents1 ;
       medGeometryElement * tmpConstituentsType1 = new medGeometryElement[4] ;
-      tmpConstituentsType1[0] = MED_SEG2 ;
-      tmpConstituentsType1[1] = MED_SEG2 ;
-      tmpConstituentsType1[2] = MED_SEG2 ;
-      tmpConstituentsType1[3] = MED_SEG2 ;
+      tmpConstituentsType1[0] = MEDMEM_SEG2 ;
+      tmpConstituentsType1[1] = MEDMEM_SEG2 ;
+      tmpConstituentsType1[2] = MEDMEM_SEG2 ;
+      tmpConstituentsType1[3] = MEDMEM_SEG2 ;
 //        medGeometryElement * tmpConstituentsType2 = new medGeometryElement[4] ;
-//        tmpConstituentsType2[0] = MED_POINT1 ;
-//        tmpConstituentsType2[1] = MED_POINT1 ;
-//        tmpConstituentsType2[2] = MED_POINT1 ;
-//        tmpConstituentsType2[3] = MED_POINT1 ;
+//        tmpConstituentsType2[0] = MEDMEM_POINT1 ;
+//        tmpConstituentsType2[1] = MEDMEM_POINT1 ;
+//        tmpConstituentsType2[2] = MEDMEM_POINT1 ;
+//        tmpConstituentsType2[3] = MEDMEM_POINT1 ;
 //        _constituentsType = new medGeometryElement*[2] ;
       _constituentsType = new medGeometryElement*[1] ;
       _constituentsType[0]=tmpConstituentsType1 ;
@@ -286,8 +287,8 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
 
       break;
     }
-    case MED_QUAD8   : {
-      _name="MED_QUAD8" ;
+    case MEDMEM_QUAD8   : {
+      _name="MEDMEM_QUAD8" ;
       _type=t;
       _dimension=2;
       _numberOfVertexes=4;
@@ -326,19 +327,19 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       _constituents = new int**[1] ;
       _constituents[0]=tmpConstituents1 ;
       medGeometryElement * tmpConstituentsType1 = new medGeometryElement[4] ;
-      tmpConstituentsType1[0] = MED_SEG3 ;
-      tmpConstituentsType1[1] = MED_SEG3 ;
-      tmpConstituentsType1[2] = MED_SEG3 ;
-      tmpConstituentsType1[3] = MED_SEG3 ;
+      tmpConstituentsType1[0] = MEDMEM_SEG3 ;
+      tmpConstituentsType1[1] = MEDMEM_SEG3 ;
+      tmpConstituentsType1[2] = MEDMEM_SEG3 ;
+      tmpConstituentsType1[3] = MEDMEM_SEG3 ;
 //        medGeometryElement * tmpConstituentsType2 = new medGeometryElement[8] ;
-//        tmpConstituentsType2[0] = MED_POINT1 ;
-//        tmpConstituentsType2[1] = MED_POINT1 ;
-//        tmpConstituentsType2[2] = MED_POINT1 ;
-//        tmpConstituentsType2[3] = MED_POINT1 ;
-//        tmpConstituentsType2[4] = MED_POINT1 ;
-//        tmpConstituentsType2[5] = MED_POINT1 ;
-//        tmpConstituentsType2[6] = MED_POINT1 ;
-//        tmpConstituentsType2[7] = MED_POINT1 ;
+//        tmpConstituentsType2[0] = MEDMEM_POINT1 ;
+//        tmpConstituentsType2[1] = MEDMEM_POINT1 ;
+//        tmpConstituentsType2[2] = MEDMEM_POINT1 ;
+//        tmpConstituentsType2[3] = MEDMEM_POINT1 ;
+//        tmpConstituentsType2[4] = MEDMEM_POINT1 ;
+//        tmpConstituentsType2[5] = MEDMEM_POINT1 ;
+//        tmpConstituentsType2[6] = MEDMEM_POINT1 ;
+//        tmpConstituentsType2[7] = MEDMEM_POINT1 ;
 //        _constituentsType = new medGeometryElement*[2] ;
       _constituentsType = new medGeometryElement*[1] ;
       _constituentsType[0]=tmpConstituentsType1 ;
@@ -348,8 +349,8 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
 
       break;
     }
-    case MED_TETRA4  : {
-      _name="MED_TETRA4" ;
+    case MEDMEM_TETRA4  : {
+      _name="MEDMEM_TETRA4" ;
       _type=t;
       _dimension=3;
       _numberOfVertexes=4;
@@ -422,24 +423,24 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       _constituents[0]=tmpConstituents1 ;
       _constituents[1]=tmpConstituents2 ;
       medGeometryElement * tmpConstituentsType1 = new medGeometryElement[4] ;
-      tmpConstituentsType1[0] = MED_TRIA3 ;
-      tmpConstituentsType1[1] = MED_TRIA3 ;
-      tmpConstituentsType1[2] = MED_TRIA3 ;
-      tmpConstituentsType1[3] = MED_TRIA3 ;
+      tmpConstituentsType1[0] = MEDMEM_TRIA3 ;
+      tmpConstituentsType1[1] = MEDMEM_TRIA3 ;
+      tmpConstituentsType1[2] = MEDMEM_TRIA3 ;
+      tmpConstituentsType1[3] = MEDMEM_TRIA3 ;
       medGeometryElement * tmpConstituentsType2 = new medGeometryElement[6] ;
-      tmpConstituentsType2[0] = MED_SEG2 ;
-      tmpConstituentsType2[1] = MED_SEG2 ;
-      tmpConstituentsType2[2] = MED_SEG2 ;
-      tmpConstituentsType2[3] = MED_SEG2 ;
-      tmpConstituentsType2[4] = MED_SEG2 ;
-      tmpConstituentsType2[5] = MED_SEG2 ;
+      tmpConstituentsType2[0] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[1] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[2] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[3] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[4] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[5] = MEDMEM_SEG2 ;
       _constituentsType = new medGeometryElement*[2] ;
       _constituentsType[0]=tmpConstituentsType1 ;
       _constituentsType[1]=tmpConstituentsType2 ;
       break;
     }
-    case MED_TETRA10 : {
-      _name="MED_TETRA10" ;
+    case MEDMEM_TETRA10 : {
+      _name="MEDMEM_TETRA10" ;
       _type=t;
       _dimension=3;
       _numberOfVertexes=4;
@@ -530,24 +531,24 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       _constituents[0]=tmpConstituents1 ;
       _constituents[1]=tmpConstituents2 ;
       medGeometryElement * tmpConstituentsType1 = new medGeometryElement[4] ;
-      tmpConstituentsType1[0] = MED_TRIA6 ;
-      tmpConstituentsType1[1] = MED_TRIA6 ;
-      tmpConstituentsType1[2] = MED_TRIA6 ;
-      tmpConstituentsType1[3] = MED_TRIA6 ;
+      tmpConstituentsType1[0] = MEDMEM_TRIA6 ;
+      tmpConstituentsType1[1] = MEDMEM_TRIA6 ;
+      tmpConstituentsType1[2] = MEDMEM_TRIA6 ;
+      tmpConstituentsType1[3] = MEDMEM_TRIA6 ;
       medGeometryElement * tmpConstituentsType2 = new medGeometryElement[6] ;
-      tmpConstituentsType2[0] = MED_SEG3 ;
-      tmpConstituentsType2[1] = MED_SEG3 ;
-      tmpConstituentsType2[2] = MED_SEG3 ;
-      tmpConstituentsType2[3] = MED_SEG3 ;
-      tmpConstituentsType2[4] = MED_SEG3 ;
-      tmpConstituentsType2[5] = MED_SEG3 ;
+      tmpConstituentsType2[0] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[1] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[2] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[3] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[4] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[5] = MEDMEM_SEG3 ;
       _constituentsType = new medGeometryElement*[2] ;
       _constituentsType[0]=tmpConstituentsType1 ;
       _constituentsType[1]=tmpConstituentsType2 ;
     break;
     }
-    case MED_HEXA8   : {
-      _name="MED_HEXA8" ;
+    case MEDMEM_HEXA8   : {
+      _name="MEDMEM_HEXA8" ;
       _type=t;
       _dimension=3;
       _numberOfVertexes=8;
@@ -668,32 +669,32 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       _constituents[0]=tmpConstituents1 ;
       _constituents[1]=tmpConstituents2 ;
       medGeometryElement * tmpConstituentsType1 = new medGeometryElement[6] ;
-      tmpConstituentsType1[0] = MED_QUAD4 ;
-      tmpConstituentsType1[1] = MED_QUAD4 ;
-      tmpConstituentsType1[2] = MED_QUAD4 ;
-      tmpConstituentsType1[3] = MED_QUAD4 ;
-      tmpConstituentsType1[4] = MED_QUAD4 ;
-      tmpConstituentsType1[5] = MED_QUAD4 ;
+      tmpConstituentsType1[0] = MEDMEM_QUAD4 ;
+      tmpConstituentsType1[1] = MEDMEM_QUAD4 ;
+      tmpConstituentsType1[2] = MEDMEM_QUAD4 ;
+      tmpConstituentsType1[3] = MEDMEM_QUAD4 ;
+      tmpConstituentsType1[4] = MEDMEM_QUAD4 ;
+      tmpConstituentsType1[5] = MEDMEM_QUAD4 ;
       medGeometryElement * tmpConstituentsType2 = new medGeometryElement[12] ;
-      tmpConstituentsType2[0] = MED_SEG2 ;
-      tmpConstituentsType2[1] = MED_SEG2 ;
-      tmpConstituentsType2[2] = MED_SEG2 ;
-      tmpConstituentsType2[3] = MED_SEG2 ;
-      tmpConstituentsType2[4] = MED_SEG2 ;
-      tmpConstituentsType2[5] = MED_SEG2 ;
-      tmpConstituentsType2[6] = MED_SEG2 ;
-      tmpConstituentsType2[7] = MED_SEG2 ;
-      tmpConstituentsType2[8] = MED_SEG2 ;
-      tmpConstituentsType2[9] = MED_SEG2 ;
-      tmpConstituentsType2[10] = MED_SEG2 ;
-      tmpConstituentsType2[11] = MED_SEG2 ;
+      tmpConstituentsType2[0] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[1] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[2] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[3] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[4] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[5] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[6] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[7] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[8] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[9] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[10] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[11] = MEDMEM_SEG2 ;
       _constituentsType = new medGeometryElement*[2] ;
       _constituentsType[0]=tmpConstituentsType1 ;
       _constituentsType[1]=tmpConstituentsType2 ;
       break;
     }
-    case MED_HEXA20  : {
-      _name="MED_HEXA20" ;
+    case MEDMEM_HEXA20  : {
+      _name="MEDMEM_HEXA20" ;
       _type=t;
       _dimension=3;
       _numberOfVertexes=8;
@@ -850,32 +851,32 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       _constituents[0]=tmpConstituents1 ;
       _constituents[1]=tmpConstituents2 ;
       medGeometryElement * tmpConstituentsType1 = new medGeometryElement[6] ;
-      tmpConstituentsType1[0] = MED_QUAD8 ;
-      tmpConstituentsType1[1] = MED_QUAD8 ;
-      tmpConstituentsType1[2] = MED_QUAD8 ;
-      tmpConstituentsType1[3] = MED_QUAD8 ;
-      tmpConstituentsType1[4] = MED_QUAD8 ;
-      tmpConstituentsType1[5] = MED_QUAD8 ;
+      tmpConstituentsType1[0] = MEDMEM_QUAD8 ;
+      tmpConstituentsType1[1] = MEDMEM_QUAD8 ;
+      tmpConstituentsType1[2] = MEDMEM_QUAD8 ;
+      tmpConstituentsType1[3] = MEDMEM_QUAD8 ;
+      tmpConstituentsType1[4] = MEDMEM_QUAD8 ;
+      tmpConstituentsType1[5] = MEDMEM_QUAD8 ;
       medGeometryElement * tmpConstituentsType2 = new medGeometryElement[12] ;
-      tmpConstituentsType2[0] = MED_SEG3 ;
-      tmpConstituentsType2[1] = MED_SEG3 ;
-      tmpConstituentsType2[2] = MED_SEG3 ;
-      tmpConstituentsType2[3] = MED_SEG3 ;
-      tmpConstituentsType2[4] = MED_SEG3 ;
-      tmpConstituentsType2[5] = MED_SEG3 ;
-      tmpConstituentsType2[6] = MED_SEG3 ;
-      tmpConstituentsType2[7] = MED_SEG3 ;
-      tmpConstituentsType2[8] = MED_SEG3 ;
-      tmpConstituentsType2[9] = MED_SEG3 ;
-      tmpConstituentsType2[10] = MED_SEG3 ;
-      tmpConstituentsType2[11] = MED_SEG3 ;
+      tmpConstituentsType2[0] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[1] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[2] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[3] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[4] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[5] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[6] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[7] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[8] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[9] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[10] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[11] = MEDMEM_SEG3 ;
       _constituentsType = new medGeometryElement*[2] ;
       _constituentsType[0]=tmpConstituentsType1 ;
       _constituentsType[1]=tmpConstituentsType2 ;
       break;
     }
-    case MED_PENTA6  : {
-      _name="MED_PENTA6" ;
+    case MEDMEM_PENTA6  : {
+      _name="MEDMEM_PENTA6" ;
       _type=t;
       _dimension=3;
       _numberOfVertexes=6;
@@ -973,28 +974,28 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       _constituents[0]=tmpConstituents1 ;
       _constituents[1]=tmpConstituents2 ;
       medGeometryElement * tmpConstituentsType1 = new medGeometryElement[5] ;
-      tmpConstituentsType1[0] = MED_TRIA3 ;
-      tmpConstituentsType1[1] = MED_TRIA3 ;
-      tmpConstituentsType1[2] = MED_QUAD4 ;
-      tmpConstituentsType1[3] = MED_QUAD4 ;
-      tmpConstituentsType1[4] = MED_QUAD4 ;
+      tmpConstituentsType1[0] = MEDMEM_TRIA3 ;
+      tmpConstituentsType1[1] = MEDMEM_TRIA3 ;
+      tmpConstituentsType1[2] = MEDMEM_QUAD4 ;
+      tmpConstituentsType1[3] = MEDMEM_QUAD4 ;
+      tmpConstituentsType1[4] = MEDMEM_QUAD4 ;
       medGeometryElement * tmpConstituentsType2 = new medGeometryElement[9] ;
-      tmpConstituentsType2[0] = MED_SEG2 ;
-      tmpConstituentsType2[1] = MED_SEG2 ;
-      tmpConstituentsType2[2] = MED_SEG2 ;
-      tmpConstituentsType2[3] = MED_SEG2 ;
-      tmpConstituentsType2[4] = MED_SEG2 ;
-      tmpConstituentsType2[5] = MED_SEG2 ;
-      tmpConstituentsType2[6] = MED_SEG2 ;
-      tmpConstituentsType2[7] = MED_SEG2 ;
-      tmpConstituentsType2[8] = MED_SEG2 ;
+      tmpConstituentsType2[0] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[1] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[2] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[3] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[4] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[5] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[6] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[7] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[8] = MEDMEM_SEG2 ;
       _constituentsType = new medGeometryElement*[2] ;
       _constituentsType[0]=tmpConstituentsType1 ;
       _constituentsType[1]=tmpConstituentsType2 ;
       break;
     }
-    case MED_PENTA15 : {
-      _name="MED_PENTA15" ;
+    case MEDMEM_PENTA15 : {
+      _name="MEDMEM_PENTA15" ;
       _type=t;
       _dimension=3;
       _numberOfVertexes=6;
@@ -1118,28 +1119,28 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       _constituents[0]=tmpConstituents1 ;
       _constituents[1]=tmpConstituents2 ;
       medGeometryElement * tmpConstituentsType1 = new medGeometryElement[5] ;
-      tmpConstituentsType1[0] = MED_TRIA6 ;
-      tmpConstituentsType1[1] = MED_TRIA6 ;
-      tmpConstituentsType1[2] = MED_QUAD8 ;
-      tmpConstituentsType1[3] = MED_QUAD8 ;
-      tmpConstituentsType1[4] = MED_QUAD8 ;
+      tmpConstituentsType1[0] = MEDMEM_TRIA6 ;
+      tmpConstituentsType1[1] = MEDMEM_TRIA6 ;
+      tmpConstituentsType1[2] = MEDMEM_QUAD8 ;
+      tmpConstituentsType1[3] = MEDMEM_QUAD8 ;
+      tmpConstituentsType1[4] = MEDMEM_QUAD8 ;
       medGeometryElement * tmpConstituentsType2 = new medGeometryElement[9] ;
-      tmpConstituentsType2[0] = MED_SEG3 ;
-      tmpConstituentsType2[1] = MED_SEG3 ;
-      tmpConstituentsType2[2] = MED_SEG3 ;
-      tmpConstituentsType2[3] = MED_SEG3 ;
-      tmpConstituentsType2[4] = MED_SEG3 ;
-      tmpConstituentsType2[5] = MED_SEG3 ;
-      tmpConstituentsType2[6] = MED_SEG3 ;
-      tmpConstituentsType2[7] = MED_SEG3 ;
-      tmpConstituentsType2[8] = MED_SEG3 ;
+      tmpConstituentsType2[0] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[1] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[2] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[3] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[4] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[5] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[6] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[7] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[8] = MEDMEM_SEG3 ;
       _constituentsType = new medGeometryElement*[2] ;
       _constituentsType[0]=tmpConstituentsType1 ;
       _constituentsType[1]=tmpConstituentsType2 ;
       break ;
     }
-    case MED_PYRA5   : {
-      _name="MED_PYRA5" ;
+    case MEDMEM_PYRA5   : {
+      _name="MEDMEM_PYRA5" ;
       _type=t;
       _dimension=3;
       _numberOfVertexes=5;
@@ -1229,27 +1230,27 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       _constituents[0]=tmpConstituents1 ;
       _constituents[1]=tmpConstituents2 ;
       medGeometryElement * tmpConstituentsType1 = new medGeometryElement[5] ;
-      tmpConstituentsType1[0] = MED_QUAD4 ;
-      tmpConstituentsType1[1] = MED_TRIA3 ;
-      tmpConstituentsType1[2] = MED_TRIA3 ;
-      tmpConstituentsType1[3] = MED_TRIA3 ;
-      tmpConstituentsType1[4] = MED_TRIA3 ;
+      tmpConstituentsType1[0] = MEDMEM_QUAD4 ;
+      tmpConstituentsType1[1] = MEDMEM_TRIA3 ;
+      tmpConstituentsType1[2] = MEDMEM_TRIA3 ;
+      tmpConstituentsType1[3] = MEDMEM_TRIA3 ;
+      tmpConstituentsType1[4] = MEDMEM_TRIA3 ;
       medGeometryElement * tmpConstituentsType2 = new medGeometryElement[8] ;
-      tmpConstituentsType2[0] = MED_SEG2 ;
-      tmpConstituentsType2[1] = MED_SEG2 ;
-      tmpConstituentsType2[2] = MED_SEG2 ;
-      tmpConstituentsType2[3] = MED_SEG2 ;
-      tmpConstituentsType2[4] = MED_SEG2 ;
-      tmpConstituentsType2[5] = MED_SEG2 ;
-      tmpConstituentsType2[6] = MED_SEG2 ;
-      tmpConstituentsType2[7] = MED_SEG2 ;
+      tmpConstituentsType2[0] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[1] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[2] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[3] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[4] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[5] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[6] = MEDMEM_SEG2 ;
+      tmpConstituentsType2[7] = MEDMEM_SEG2 ;
       _constituentsType = new medGeometryElement*[2] ;
       _constituentsType[0]=tmpConstituentsType1 ;
       _constituentsType[1]=tmpConstituentsType2 ;
       break;
     }
-    case MED_PYRA13  : {
-      _name="MED_PYRA13" ;
+    case MEDMEM_PYRA13  : {
+      _name="MEDMEM_PYRA13" ;
       _type=t;
       _dimension=3;
       _numberOfVertexes=5;
@@ -1363,37 +1364,53 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       _constituents[0]=tmpConstituents1 ;
       _constituents[1]=tmpConstituents2 ;
       medGeometryElement * tmpConstituentsType1 = new medGeometryElement[5] ;
-      tmpConstituentsType1[0] = MED_QUAD8 ;
-      tmpConstituentsType1[1] = MED_TRIA6 ;
-      tmpConstituentsType1[2] = MED_TRIA6 ;
-      tmpConstituentsType1[3] = MED_TRIA6 ;
-      tmpConstituentsType1[4] = MED_TRIA6 ;
+      tmpConstituentsType1[0] = MEDMEM_QUAD8 ;
+      tmpConstituentsType1[1] = MEDMEM_TRIA6 ;
+      tmpConstituentsType1[2] = MEDMEM_TRIA6 ;
+      tmpConstituentsType1[3] = MEDMEM_TRIA6 ;
+      tmpConstituentsType1[4] = MEDMEM_TRIA6 ;
       medGeometryElement * tmpConstituentsType2 = new medGeometryElement[8] ;
-      tmpConstituentsType2[0] = MED_SEG3 ;
-      tmpConstituentsType2[1] = MED_SEG3 ;
-      tmpConstituentsType2[2] = MED_SEG3 ;
-      tmpConstituentsType2[3] = MED_SEG3 ;
-      tmpConstituentsType2[4] = MED_SEG3 ;
-      tmpConstituentsType2[5] = MED_SEG3 ;
-      tmpConstituentsType2[6] = MED_SEG3 ;
-      tmpConstituentsType2[7] = MED_SEG3 ;
+      tmpConstituentsType2[0] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[1] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[2] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[3] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[4] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[5] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[6] = MEDMEM_SEG3 ;
+      tmpConstituentsType2[7] = MEDMEM_SEG3 ;
       _constituentsType = new medGeometryElement*[2] ;
       _constituentsType[0]=tmpConstituentsType1 ;
       _constituentsType[1]=tmpConstituentsType2 ;
       break;
     }
-    case MED_POLYGON  : {
-      _name="MED_POLYGON";
+    case MEDMEM_POLYGON:
+      _name="MEDMEM_POLYGON" ;
       _type=t;
       _dimension=2;
-      break;
-    }
-    case MED_POLYHEDRA  : {
-      _name="MED_POLYHEDRA";
+      _numberOfConstituentsDimension=1 ;
+      _numberOfConstituents=new int[_numberOfConstituentsDimension] ;
+      _numberOfConstituents[0]=0 ;
+      _numberOfNodeOfEachConstituent=new int*[_numberOfConstituentsDimension] ;
+      _numberOfNodeOfEachConstituent[0]=0;
+      _constituentsType = new medGeometryElement*[_numberOfConstituentsDimension] ;
+      _constituentsType[0]=0 ;
+      _constituents = new int**[_numberOfConstituentsDimension] ;
+      _constituents[0]=0;
+     break;
+    case MEDMEM_POLYHEDRA:
+      _name="MEDMEM_POLYHEDRA" ;
       _type=t;
       _dimension=3;
+      _numberOfConstituentsDimension=2 ;
+      _numberOfConstituents=new int[_numberOfConstituentsDimension] ;
+      _numberOfConstituents[0]=_numberOfConstituents[1]=0;
+      _numberOfNodeOfEachConstituent=new int*[_numberOfConstituentsDimension] ;
+      _numberOfNodeOfEachConstituent[0]=_numberOfNodeOfEachConstituent[1]=0;
+      _constituentsType = new medGeometryElement*[_numberOfConstituentsDimension] ;
+      _constituentsType[0]=_constituentsType[1]=0 ;
+      _constituents = new int**[_numberOfConstituentsDimension] ;
+      _constituents[0]=_constituents[1]=0;
       break;
-    }
 //      default : 
 //        _type=0;
 //        break;
@@ -1532,27 +1549,26 @@ void CELLMODEL::clean()
   for(int i=0; i<_numberOfConstituentsDimension; i++) {
     int numberOf = _numberOfConstituents[i] ;
     for(int j=0; j<numberOf; j++) {
-      if (NULL!=_constituents[i][j])
+      if (_constituents[i][j])
         delete[] _constituents[i][j] ;
     }
-    if (NULL!=_constituentsType)
+    if (_constituentsType)
       delete [] _constituentsType[i] ;
-    if (NULL!=_constituents[i])
+    if (_constituents[i])
       delete[] _constituents[i] ;
-    if (NULL!=_numberOfNodeOfEachConstituent[i])
+    if (_numberOfNodeOfEachConstituent[i])
       delete[] _numberOfNodeOfEachConstituent[i] ;
   }
-  delete [] _constituentsType; _constituentsType = NULL;
-  if (NULL != _numberOfConstituents) {
-    delete [] _numberOfConstituents;
-    _numberOfConstituents = NULL;
-  }
-  if (NULL != _constituents) {
-    delete [] _constituents;
-    _constituents = NULL;
-  }
-  if (NULL != _numberOfNodeOfEachConstituent) {
-    delete [] _numberOfNodeOfEachConstituent;
-    _numberOfNodeOfEachConstituent = NULL;
-  }
+  delete [] _constituentsType; 
+  if (_numberOfConstituents)
+    delete[]_numberOfConstituents ;
+  if (_constituents)
+    delete[] _constituents ;
+  if (_numberOfNodeOfEachConstituent)
+    delete[] _numberOfNodeOfEachConstituent ;
+
+  _constituentsType = 0;
+  _numberOfConstituents = 0;
+  _constituents = 0;
+  _numberOfNodeOfEachConstituent = 0;
 }

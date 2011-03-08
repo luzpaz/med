@@ -22,6 +22,7 @@
 
 /*
  File Group.cxx
+ $Header$
 */
 #include <list>
 
@@ -118,12 +119,12 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
     MESSAGE_MED(LOC << " Type : " << _geometricType[i] << " number of element(s) " << _numberOfElements[i]);
   }
   _isOnAllElts = false ;
-  //_totalNumberOfEntities = myFamily->getNumberOfElements(MED_ALL_ELEMENTS) ;
+  //_totalNumberOfEntities = myFamily->getNumberOfElements(MEDMEM_ALL_ELEMENTS) ;
 
 
   MEDSKYLINEARRAY * famNumber = myFamily->getnumber();
 
-  const int * famNumberValue = myFamily->getNumber(MED_ALL_ELEMENTS);
+  const int * famNumberValue = myFamily->getNumber(MEDMEM_ALL_ELEMENTS);
 
   const int * famNumberIndex = myFamily->getNumberIndex();
 
@@ -205,7 +206,7 @@ GROUP::GROUP(const GROUP & m):SUPPORT(m)
 //     _numberOfElements[i]=myFamily->getNumberOfElements(geometricType[i]);
 //   }
 //   _isOnAllElts = false ;
-//   _totalNumberOfEntities = myFamily->getNumberOfElements(MED_ALL_ELEMENTS) ;
+//   _totalNumberOfEntities = myFamily->getNumberOfElements(MEDMEM_ALL_ELEMENTS) ;
 //   _number = new MEDSKYLINEARRAY(*myFamily->getnumber()) ;
   
 //   _numberOfFamilies = families.size();

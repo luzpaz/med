@@ -22,6 +22,7 @@
 
 /*
   File MEDMEM_Meshing.hxx
+  $Header$
 */
 
 #ifndef MESHING_HXX
@@ -40,67 +41,36 @@ namespace MEDMEM {
 
 class MEDMEM_EXPORT MESHING: public MESH
 {
- protected:
-  ~MESHING();
  public :
   MESHING();
+  ~MESHING();
 
-  void setSpaceDimension   (const int SpaceDimension) ;
-  void setMeshDimension    (const int MeshDimension) ;
-  void setNumberOfNodes    (const int NumberOfNodes) ;
   void setCoordinates      (const int SpaceDimension,
                             const int NumberOfNodes,
                             const double * Coordinates,
                             const string System,
                             const MED_EN::medModeSwitch Mode) ;
-  void setCoordinatesSystem(const string& System)
-    throw (MEDEXCEPTION) ;
   void setCoordinatesNames (const string * names) ;
-  void setCoordinateName (const string name, const int i) ;
+  void setCoordinateName   (const string name, const int i) ;
   void setCoordinatesUnits (const string * units) ;
-  void setCoordinateUnit (const string unit, const int i) ;
+  void setCoordinateUnit   (const string unit, const int i) ;
 
   void setNumberOfTypes    (const int NumberOfTypes,
-                            const MED_EN::medEntityMesh Entity) 
-    throw (MEDEXCEPTION) ;
+                            const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION) ;
+
   void setTypes            (const MED_EN::medGeometryElement * Types,
-                            const MED_EN::medEntityMesh Entity)
-    throw (MEDEXCEPTION) ;
+                            const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION) ;
+
   void setNumberOfElements (const int * NumberOfElements,
-                            const MED_EN::medEntityMesh Entity)
-    throw (MEDEXCEPTION) ;
-  void setConnectivity     (const int * Connectivity,
-                            const MED_EN::medEntityMesh Entity,
-                            const MED_EN::medGeometryElement Type)
-    throw (MEDEXCEPTION) ;
-  
-  void setPolygonsConnectivity     (const int * ConnectivityIndex,
-                                    const int * ConnectivityValue,
-                                    int nbOfPolygons,
-                                    const MED_EN::medEntityMesh Entity)
-    throw (MEDEXCEPTION) ;
+                            const MED_EN::medEntityMesh Entity) throw (MEDEXCEPTION) ;
 
-  void setPolyhedraConnectivity     (const int * PolyhedronIndex,
-                                     const int * FacesIndex,
-                                     const int * Nodes,
-                                     int nbOfPolyhedra,
-                                     const MED_EN::medEntityMesh Entity=MED_EN::MED_CELL)
-    throw (MEDEXCEPTION) ;
+  void setConnectivity     (const MED_EN::medEntityMesh Entity,
+                            const MED_EN::medGeometryElement Type,
+                            const int * Connectivity,
+                            const int * PolyConnectivityIndex=0)    throw (MEDEXCEPTION) ;
 
-  void setConnectivities   (const int * ConnectivityIndex,
-                            const int * ConnectivityValue,
-                            const MED_EN::medConnectivity ConnectivityType,
-                            const MED_EN::medEntityMesh Entity)
-    throw (MEDEXCEPTION) ;
-
-//   void setGroup            (const string name,
-//                          const string description,
-//                          const int NumberOfElements,
-//                          const int * ElementsNumbers,
-//                          const medEntityMesh Entity) ;
-  void addGroup            (const GROUP & Group)
-    throw (MEDEXCEPTION) ;
+  void addGroup            (const GROUP & Group)                throw (MEDEXCEPTION) ;
 };
-};
+}
 
 #endif /* MESHING_HXX */

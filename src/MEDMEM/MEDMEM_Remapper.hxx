@@ -55,8 +55,8 @@ private :
   string _targetFieldType;
   const MEDMEM::MESH * _sourceMesh;
   const MEDMEM::MESH * _targetMesh;
-  const MEDMEM::SUPPORT * _sourceSupport;
-  const MEDMEM::SUPPORT * _targetSupport;
+  MEDMEM::SUPPORT * _sourceSupport;
+  MEDMEM::SUPPORT * _targetSupport;
 };
 
 

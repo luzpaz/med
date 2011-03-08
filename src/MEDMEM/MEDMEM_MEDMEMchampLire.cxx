@@ -73,7 +73,7 @@ namespace med_2_3 {
      *     - profil   (OUT) : nom du profil utilisé (MED_NOPFL si inutilisé)
      *     - pflmod   (IN)  : Indique comment lire les informations en mémoire { MED_COMPACT, MED_GLOBALE }.
      *     - type_ent (IN)  : entité concerné par le champ {MED_NOEUD,MED_ARETE,MED_FACE,MED_MAILLE}
-     *     - type_geo (IN)  : type géométrique de l'entité concerné {MED_POINT,MED_SEG2 ......}
+     *     - type_geo (IN)  : type géométrique de l'entité concerné {MED_POINT,MEDMEM_SEG2 ......}
      *     - numdt    (IN)  : n° du pas de temps (MED_NOPDT si aucun)
      *     - numo     (IN)  : n° d'ordre utilisé MED_NONOR si inutile
      * - Resultat : 0 en cas de succes, -1 sinon

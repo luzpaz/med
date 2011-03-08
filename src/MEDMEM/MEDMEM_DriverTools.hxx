@@ -76,7 +76,7 @@ struct MEDMEM_EXPORT _maille
   mutable int*               sortedNodeIDs; // for comparison and merge
   //mutable list<unsigned>   groupes; // the GROUPs maille belongs to, used to create families
 
-  _maille(MED_EN::medGeometryElement type=MED_EN::MED_NONE, size_t nelem=0)
+  _maille(MED_EN::medGeometryElement type=MED_EN::MEDMEM_NONE, size_t nelem=0)
     : geometricType(type),reverse(false),sortedNodeIDs(0),_ordre(0) { sommets.reserve(nelem); }
 
   _maille(const _maille& ma);
@@ -87,7 +87,7 @@ struct MEDMEM_EXPORT _maille
   { return geometricType/100; }
 
   int dimensionWithPoly() const // retourne la dimension de la maille
-  { return geometricType >= MED_EN::MED_POLYGON ? dimension()-2 : dimension(); }
+  { return geometricType >= MED_EN::MEDMEM_POLYGON ? dimension()-2 : dimension(); }
 
   const int* getSortedNodes() const; // creates if needed and return sortedNodeIDs
   bool operator < (const _maille& ma) const;
@@ -524,7 +524,7 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
       // store values
       const std::vector< T > & values = comp_values[ i_comp_tot++ ];
       bool oneValue = ( values.size() == 1 );
-      ASSERT_MED( oneValue || values.size() == nb_supp_elems * nb_gauss );
+      ASSERT_MED( oneValue || (int)values.size() == nb_supp_elems * nb_gauss );
       for ( int k = 0; k < nb_supp_elems; ++k )
       {
         const T& val = oneValue ? values[ 0 ] : values[ k * elem_step ];

@@ -22,6 +22,7 @@
 
 /*
  File Group.hxx
+ $Header$
 */
 
 #ifndef GROUP_HXX
@@ -45,7 +46,7 @@
 namespace MEDMEM {
   class FAMILY;
   class GROUP;
-  MEDMEM_EXPORT ostream & operator<<(ostream &os, GROUP &my) ;
+  MEDMEM_EXPORT std::ostream & operator<<(std::ostream &os, GROUP &my) ;
 
 class MEDMEM_EXPORT GROUP : virtual public SUPPORT
 {
@@ -62,7 +63,7 @@ protected :
     Note that Families are numbered from 1 to N.
     \endif
   */
-  vector<FAMILY*> _family ;
+  std::vector<FAMILY*> _family ;
  protected:
   /*! Destructor. */
   virtual ~GROUP();
@@ -71,7 +72,7 @@ public:
   /*! Constructor. */
   GROUP();
   /*! Constructor. */
-  GROUP(const string & name, const list<FAMILY*> & family) throw (MEDEXCEPTION) ;
+  GROUP(const std::string & name, const std::list<FAMILY*> & family) throw (MEDEXCEPTION) ;
   /*! Copy Constructor. */
   GROUP(const GROUP & m);
 
@@ -80,13 +81,13 @@ public:
   GROUP & operator=(const GROUP &group);
 
   /*! Operator << */
-  friend ostream & operator<<(ostream &os, GROUP &my) ;
+  friend std::ostream & operator<<(std::ostream &os, GROUP &my) ;
 
   inline void setNumberOfFamilies(int numberOfFamilies);
-  inline void setFamilies(vector<FAMILY*> Family);
+  inline void setFamilies(std::vector<FAMILY*> Family);
   
   inline int             getNumberOfFamilies() const ;
-  inline vector<FAMILY*> getFamilies() const ;
+  inline std::vector<FAMILY*> getFamilies() const ;
   inline FAMILY *        getFamily(int i) const ;
 
 };
@@ -104,7 +105,7 @@ inline void GROUP::setNumberOfFamilies(int numberOfFamilies)
 
 /*! set the attribut _family to Family              */
 //----------------------------------------------------
-inline void GROUP::setFamilies(vector<FAMILY*> Family) 
+inline void GROUP::setFamilies(std::vector<FAMILY*> Family) 
 //----------------------------------------------------
 { 
   _family = Family; 
@@ -120,7 +121,7 @@ inline int GROUP::getNumberOfFamilies() const
 
 /*! returns the vector of families in the group */
 //------------------------------------------------
-inline vector<FAMILY*> GROUP::getFamilies() const 
+inline std::vector<FAMILY*> GROUP::getFamilies() const 
 //------------------------------------------------
 { 
   return _family; 
