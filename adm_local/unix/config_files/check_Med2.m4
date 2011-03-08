@@ -36,6 +36,7 @@ AC_ARG_WITH(med2,
 
 AC_SUBST(MED2_INCLUDES)
 AC_SUBST(MED2_LIBS)
+AC_SUBST(MED2_LIBS_C_ONLY)
 AC_SUBST(MED2_MT_LIBS)
 AC_SUBST(MED_CPPFLAGS)
 
@@ -48,6 +49,7 @@ med2_ok=no
 
 LOCAL_INCLUDES="$HDF5_INCLUDES"
 LOCAL_LIBS="-lmed -lmedimport $HDF5_LIBS"
+LOCAL_LIBS_C_ONLY="-lmedC $HDF5_LIBS"
 
 if test -z $MED2HOME
 then
@@ -65,8 +67,10 @@ then
    if test "x$MED2HOME" = "x/usr"
    then
      LOCAL_LIBS="-lmed  $LOCAL_LIBS"
+     LOCAL_LIBS_C_ONLY="-lmedC $LOCAL_LIBS_C_ONLY"
    else
      LOCAL_LIBS="-L$MED2HOME/lib $LOCAL_LIBS"
+     LOCAL_LIBS_C_ONLY="-L$MED2HOME/lib $LOCAL_LIBS"
    fi
 fi
 
@@ -170,7 +174,7 @@ dnl check med2 library
 
   LIBS_old="$LIBS"
   LIBS="$LIBS $LOCAL_LIBS"
-  AC_CHECK_LIB(med,MEDouvrir,med2_ok=yes,med2_ok=no)
+  AC_CHECK_LIB(med,MEDfileOpen,med2_ok=yes,med2_ok=no)
 
   if  test "x$med2_ok" = "xyes"
   then
@@ -192,6 +196,7 @@ dnl      MED2_INCLUDES="-DPCLINUX $LOCAL_INCLUDES"
       ;;
 esac
   MED2_LIBS="$LOCAL_LIBS"
+  MED2_LIBS_C_ONLY="$LOCAL_LIBS_C_ONLY"
   MED2_MT_LIBS="$LOCAL_LIBS"
 fi
 
