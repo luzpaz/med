@@ -21,27 +21,8 @@
 
 using namespace MEDSPLITTER;
 
-Graph::Graph(MEDMEM::MEDSKYLINEARRAY* array, int* edgeweight):m_graph(array),m_partition(0),m_edgeweight(edgeweight),m_cellweight(0)
+Graph::Graph(const MEDMEM::MEDSKYLINEARRAY* array, int* edgeweight):m_graph(array),m_partition(0),m_edgeweight(edgeweight),m_cellweight(0)
 {
-}
-
-//================================================================================
-/*!
- * \brief Destructor
- */
-//================================================================================
-
-Graph::~Graph()
-{
-  if (m_partition)
-  {
-    delete m_partition;
-    m_partition=0;
-  }
-  if (m_graph)
-  {
-    delete m_graph;
-    m_graph=0;
-  }
+                
 }
 

@@ -16,59 +16,60 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef MESHCOLLECTIONMEDASCIIDRIVER_HXX_
 #define MESHCOLLECTIONMEDASCIIDRIVER_HXX_
 
 #include "MEDSPLITTER_MESHCollectionDriver.hxx"
 
-namespace MEDSPLITTER
-{
-  class MESHCollection;
-
+namespace MEDSPLITTER{
+        
+class MESHCollection;
+  
   class MESHCollectionMedAsciiDriver:public MESHCollectionDriver
-  {
-  public:
+{
+public:
+  
+  MESHCollectionMedAsciiDriver(MESHCollection*);
+  virtual ~MESHCollectionMedAsciiDriver(){}
 
-    MESHCollectionMedAsciiDriver(MESHCollection*);
-    virtual ~MESHCollectionMedAsciiDriver(){}
+  int read(char*);
 
-    int read(char*, ParaDomainSelector* sel=0);
+  void write(char*);
+  
+        void readFields(vector <MEDMEM::FIELD<int> *>& filenames, char* fieldname,
+                                                                        int itnumber, int ordernumber)
+        {
+                _readFields(filenames,fieldname,itnumber,ordernumber);
+        }
+        void readFields(vector <MEDMEM::FIELD<double> *>& filenames, char* fieldname,
+                                                                        int itnumber, int ordernumber)
+        {
+                _readFields(filenames,fieldname,itnumber,ordernumber);
+        }
+        
+        void writeFields(vector <MEDMEM::FIELD<int> *>& filenames, char* fieldname)
+        {
+                _writeFields( filenames, fieldname);
+        }
+        
+        void writeFields(vector <MEDMEM::FIELD<double> *>& filenames, char* fieldname)
+        {
+                _writeFields( filenames, fieldname);
+        }
 
-    void write(char*, ParaDomainSelector* sel=0);
+    
+private :
+        template <class T> void _readFields(vector <MEDMEM::FIELD<T> *>& filenames, char* fieldname,
+                                                                                                                                                        int itnumber, int ordernumber);
+  
+  template <class T>
+  void _writeFields(vector <MEDMEM::FIELD<T> *>& filenames, char* fieldname);
+  
 
-    void readFields(vector <MEDMEM::FIELD<int> *>& filenames, char* fieldname,
-                    int itnumber, int ordernumber)
-    {
-      _readFields(filenames,fieldname,itnumber,ordernumber);
-    }
-    void readFields(vector <MEDMEM::FIELD<double> *>& filenames, char* fieldname,
-                    int itnumber, int ordernumber)
-    {
-      _readFields(filenames,fieldname,itnumber,ordernumber);
-    }
-
-    void writeFields(vector <MEDMEM::FIELD<int> *>& filenames, char* fieldname)
-    {
-      _writeFields( filenames, fieldname);
-    }
-
-    void writeFields(vector <MEDMEM::FIELD<double> *>& filenames, char* fieldname)
-    {
-      _writeFields( filenames, fieldname);
-    }
-
-
-  private :
-    template <class T> void _readFields(vector <MEDMEM::FIELD<T> *>& filenames, char* fieldname,
-                                        int itnumber, int ordernumber);
-
-    template <class T>
-    void _writeFields(vector <MEDMEM::FIELD<T> *>& filenames, char* fieldname);
-
-
-
-    std::string _master_filename;
-  };
+  
+        std::string m_master_filename;
+};
 
 }
 
