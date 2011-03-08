@@ -248,57 +248,14 @@ for i in range(nbOfMeshes):
             type = types[k]
             nbElemType = meshLocalCopy.getNumberOfElements(MED_CELL,type)
             print "     For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
-            connectivity = meshLocalCopy.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,type)
-            nbNodesPerCell = type%100
-            for j in range(nbElemType):
-                print "       Element",(j+1)," ",connectivity[j*nbNodesPerCell:(j+1)*nbNodesPerCell]
-                pass
-            pass
-        pass
-
-    ##
-    ## TEST METHODS ABOUT POLY ELEMENTS ##
-    ##
-    nbTypesCellWithPoly = meshLocalCopy.getNumberOfTypesWithPoly(MED_CELL)
-    if (nbTypesCell == nbTypesCellWithPoly):
-        print ""
-        print "          No Poly Cells in the mesh"
-        print ""
-        pass
-    else:
-        print ""
-        print "          The Cell Nodal Connectivity of the Poly Cells:"
-        print ""
-        print "      The Mesh has",nbTypesCellWithPoly-nbTypesCell,"Type(s) of Poly Cell"
-        types = meshLocalCopy.getTypesWithPoly(MED_CELL)
-        for k in range(nbTypesCellWithPoly):
-            type = types[k]
-            if type == MED_POLYGON:
-                nbElemType = meshLocalCopy.getNumberOfPolygons()
-            elif type == MED_POLYHEDRA:
-                nbElemType = meshLocalCopy.getNumberOfPolyhedron()
-            else:
-                continue
-            print ""
-            print "     For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
-            if type == MED_POLYGON:
-                connectivity = meshLocalCopy.getPolygonsConnectivity(MED_NODAL,MED_CELL)
-                index = meshLocalCopy.getPolygonsConnectivityIndex(MED_NODAL,MED_CELL)
-                for j in range(nbElemType):
-                    print "       Polygon",(j+1)," ",connectivity[ index[j]-1 : index[j+1]-1 ]
-                    pass
+            connectivity = meshLocalCopy.getConnectivity(MED_NODAL,MED_CELL,MEDMEM_ALL_ELEMENTS)
+            index = meshLocalCopy.getConnectivityIndex(MED_NODAL,MED_CELL)
+            if type == MEDMEM_POLYHEDRA:
                 pass
             else:
-                connectivity = meshLocalCopy.getPolyhedronConnectivity(MED_NODAL)
-                fIndex = meshLocalCopy.getPolyhedronFacesIndex()
-                index = meshLocalCopy.getPolyhedronIndex(MED_NODAL)
+                nbNodesPerCell = type%100
                 for j in range(nbElemType):
-                    print     "       Polyhedra",(j+1)
-                    iF1, iF2 = index[ j ]-1, index[ j+1 ]-1
-                    for f in range( iF2 - iF1 ):
-                        iN1, iN2 = fIndex[ iF1+f ]-1, fIndex[ iF1+f+1 ]-1
-                        print "         Face",f+1," ",connectivity[ iN1 : iN2 ]
-                        pass
+                    print "       Element",(j+1)," ",connectivity[ index[j]-1 : index[j+1]-1 ]
                     pass
                 pass
             pass
@@ -353,7 +310,7 @@ for i in range(nbOfFields):
                 print "     Order Number",orderNb
                 print "     Time",time
                 support = fieldTyped.getSupport()
-                nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
+                nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
                     valueI = fieldTyped.getRow(k+1)

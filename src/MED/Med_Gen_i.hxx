@@ -18,12 +18,13 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 
 //  MED MED : implemetation of MED idl descriptions
 //  File   : Med_Gen_i.hxx
 //  Author : Paul RASCLE, EDF
 //  Module : MED
-
+//
 #ifndef _MED_GEN_I_HXX_
 #define _MED_GEN_I_HXX_
 
@@ -83,7 +84,7 @@ public:
   virtual ~Med_Gen_i();
 
   //
-  SALOME_MED::MESH_ptr readMeshInFile(const char* fileName,
+  SALOME_MED::GMESH_ptr readMeshInFile(const char* fileName,
                                       const char* studyName,
                                       const char* meshName)
     throw(SALOME::SALOME_Exception);

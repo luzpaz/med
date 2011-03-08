@@ -25,6 +25,7 @@ salomeinclude_HEADERS = \
 	MEDClient.hxx \
 	COORDINATEClient.hxx \
 	CONNECTIVITYClient.hxx \
+	GMESHClient.hxx \
 	MESHClient.hxx \
 	SUPPORTClient.hxx \
 	FAMILYClient.hxx \
@@ -57,6 +58,7 @@ lib_LTLIBRARIES = libMEDClientcmodule.la _libMEDClient.la
 dist_libMEDClientcmodule_la_SOURCES = \
 	COORDINATEClient.cxx \
 	CONNECTIVITYClient.cxx \
+	GMESHClient.cxx \
 	MESHClient.cxx \
 	SUPPORTClient.cxx \
 	FAMILYClient.cxx \
@@ -68,8 +70,7 @@ nodist__libMEDClient_la_SOURCES = libMEDClient_wrap.cxx
 libMEDClientcmodule_la_CPPFLAGS = $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) \
 	$(MED2_INCLUDES) $(HDF5_INCLUDES) $(PYTHON_INCLUDES) ${KERNEL_CXXFLAGS} \
 	-I$(srcdir)/../../MEDMEM_I -I$(srcdir)/../../MEDMEM -I$(top_builddir)/idl \
-	-I$(srcdir)/../../MEDWrapper/V2_1/Core -I$(srcdir)/../../MEDMEM_SWIG -I$(srcdir)/../../MED -I$(srcdir)/../../INTERP_KERNEL -I$(srcdir)/../../MED -I$(srcdir)/../../INTERP_KERNEL/Bases \
-	-I$(srcdir)/../../INTERP_KERNEL/GaussPoints
+	-I$(srcdir)/../../MEDMEM_SWIG -I$(srcdir)/../../MED -I$(srcdir)/../../INTERP_KERNEL -I$(srcdir)/../../MED -I$(srcdir)/../../INTERP_KERNEL/Bases
 libMEDClientcmodule_la_LDFLAGS  = ${KERNEL_LDFLAGS} -lOpUtil -lSalomeCommunication ../../MEDMEM/libmedmem.la \
                                   ../../MEDMEM_I/libMEDMEMImpl.la ../../INTERP_KERNEL/libinterpkernel.la ../../MED/libMEDEngine.la
 

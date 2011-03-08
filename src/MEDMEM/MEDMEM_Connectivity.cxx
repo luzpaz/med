@@ -251,6 +251,18 @@ void CONNECTIVITY::setConstituent(CONNECTIVITY * Constituent)
   }
 }
 
+const CONNECTIVITY *CONNECTIVITY::getConstituent(MED_EN::medEntityMesh Entity) const throw (MEDEXCEPTION)
+{
+  if(Entity==MED_FACE && _entityDimension==3)
+    return _constituent;
+  if(Entity==MED_EDGE && _entityDimension==2)
+    return _constituent;
+  if(Entity==MED_EDGE && _entityDimension==3)
+    return _constituent->getConstituent(MED_EDGE);
+  throw MEDEXCEPTION(LOCALIZED("CONNECTIVITY::getConstituent : Invalid request !"));
+}
+
+
 /*! Duplicated Types array in CONNECTIVITY object. */
 //--------------------------------------------------------------------//
 void CONNECTIVITY::setGeometricTypes(const medGeometryElement * Types,

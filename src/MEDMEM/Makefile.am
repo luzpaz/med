@@ -91,6 +91,7 @@ PointLocator.hxx \
 MEDNormalizedUnstructuredMesh.hxx \
 MEDNormalizedUnstructuredMesh.txx \
 MEDMEM_GMesh.hxx \
+MEDMEM_MeshFuse.hxx \
 MEDMEM_MedFileBrowser.hxx
 
 dist_libmedmem_la_SOURCES= \
@@ -131,6 +132,7 @@ MEDMEM_Extractor.cxx \
 PointLocator.cxx \
 MEDMEM_Remapper.cxx \
 MEDMEM_GMesh.cxx \
+MEDMEM_MeshFuse.cxx \
 MEDMEM_MedFileBrowser.cxx
 
 #libmedmem_la_LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 

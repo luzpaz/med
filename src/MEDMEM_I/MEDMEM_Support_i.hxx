@@ -73,7 +73,7 @@ public:
     // IDL Methods
     char *               getName()         throw (SALOME::SALOME_Exception);
     char *               getDescription()  throw (SALOME::SALOME_Exception);
-    SALOME_MED::MESH_ptr getMesh()         throw (SALOME::SALOME_Exception);
+    SALOME_MED::GMESH_ptr getMesh()         throw (SALOME::SALOME_Exception);
     CORBA::Boolean       isOnAllElements() throw (SALOME::SALOME_Exception);
     SALOME_MED::medEntityMesh getEntity()  throw (SALOME::SALOME_Exception);
     CORBA::Long          getNumberOfElements(SALOME_MED::medGeometryElement geomElement) 

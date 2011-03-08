@@ -18,14 +18,16 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 
 //=============================================================================
 // File      : MEDMEM_Field_i.cxx
 // Created   : mer fév 20 15:47:57 CET 2002
 // Author    : EDF
 // Project   : SALOME
+// $Header   : $
 //=============================================================================
-
+//
 #include "MEDMEM_Field_i.hxx"
 
 #include "SALOME_NamingService.hxx"
@@ -65,10 +67,10 @@ FIELD_i::~FIELD_i()
  */
 //=============================================================================
 FIELD_i::FIELD_i(::FIELD_ * const field, bool ownCppPtr):
+  _ownCppPtr(ownCppPtr),
   _fieldTptr(field),
   _corbaIndex(FIELD_i::fieldIndex++),
-  _FieldId(""),
-  _ownCppPtr(ownCppPtr)
+  _FieldId("")
 {
   FIELD_i::fieldMap[_corbaIndex]=_fieldTptr;
 
@@ -82,9 +84,9 @@ FIELD_i::FIELD_i(::FIELD_ * const field, bool ownCppPtr):
  * Constructor par recopie
  */
 //=============================================================================
-FIELD_i::FIELD_i( FIELD_i & f):_fieldTptr(f._fieldTptr),
+FIELD_i::FIELD_i( FIELD_i & f):_ownCppPtr(false), _fieldTptr(f._fieldTptr),
                                _corbaIndex(FIELD_i::fieldIndex++),
-                               _FieldId(""), _ownCppPtr(false)
+                               _FieldId("")
 {
         FIELD_i::fieldMap[_corbaIndex]=_fieldTptr;
 }
@@ -645,7 +647,7 @@ throw (SALOME::SALOME_Exception)
                                              SALOME::INTERNAL_ERROR);
         try
         {
-                _fieldTptr->write(i,driverFieldName);
+                _fieldTptr->write(i);
         }
         catch (MEDEXCEPTION &)
         {

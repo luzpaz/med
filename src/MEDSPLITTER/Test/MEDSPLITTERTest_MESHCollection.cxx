@@ -280,44 +280,46 @@ void MEDSPLITTERTest::testMESHCollection_square()
   MEDMEM::MESH mesh2(MEDMEM::MED_DRIVER, filename_wr_2, meshname2);
     
   // testing number of elements for each partition
-  int nbelem1=mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
-  int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+  int nbelem1=mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
+  int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
     
   CPPUNIT_ASSERT_EQUAL(nbelem1,2);
   CPPUNIT_ASSERT_EQUAL(nbelem2,2);
   
   
   //testing number of joints
-  med_2_3::med_idt fid1 = med_2_3::MEDouvrir(const_cast<char*> (filename_wr_1.c_str()),med_2_3::MED_LECTURE);
-  med_2_3::med_idt fid2 = med_2_3::MEDouvrir(const_cast<char*> (filename_wr_2.c_str()),med_2_3::MED_LECTURE);
-  int nj1= med_2_3::MEDnJoint(fid1, meshname1);
-  int nj2= med_2_3::MEDnJoint(fid2, meshname2);
+  med_2_3::med_idt fid1 = med_2_3::MEDfileOpen(filename_wr_1.c_str(),med_2_3::MED_ACC_RDONLY);
+  med_2_3::med_idt fid2 = med_2_3::MEDfileOpen(filename_wr_2.c_str(),med_2_3::MED_ACC_RDONLY);
+  int nj1= med_2_3::MEDnSubdomainJoint(fid1, meshname1);
+  int nj2= med_2_3::MEDnSubdomainJoint(fid2, meshname2);
   CPPUNIT_ASSERT_EQUAL(nj1,1);
   CPPUNIT_ASSERT_EQUAL(nj2,1);
        
   //testing distant domains
     
-  char desc1[MED_TAILLE_DESC+1];
-  char maa_dist1[MED_TAILLE_NOM+1], jn1[MED_TAILLE_NOM+1];
-  char desc2[MED_TAILLE_DESC+1], maa_dist2[MED_TAILLE_NOM+1], jn2[MED_TAILLE_NOM+1];
+  char desc1[MED_COMMENT_SIZE+1];
+  char maa_dist1[MED_NAME_SIZE+1], jn1[MED_NAME_SIZE+1];
+  char desc2[MED_COMMENT_SIZE+1], maa_dist2[MED_NAME_SIZE+1], jn2[MED_NAME_SIZE+1];
   int dom1, dom2;
-  med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
-  med_2_3::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
+  int nstep,nocstp;
+  med_2_3::MEDsubdomainJointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1, &nstep, &nocstp);
+  med_2_3::MEDsubdomainJointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2, &nstep, &nocstp);
   CPPUNIT_ASSERT(strcmp(jn1,"joint_2")==0);
   CPPUNIT_ASSERT(strcmp(jn2,"joint_1")==0);
   CPPUNIT_ASSERT_EQUAL(dom1,1);
   CPPUNIT_ASSERT_EQUAL(dom2,0);
   
   // testing node-node correspondency
-  med_2_3::med_entite_maillage typ_ent_loc=med_2_3::MED_NOEUD;
-  med_2_3::med_entite_maillage typ_ent_dist=med_2_3::MED_NOEUD;
-  med_2_3::med_geometrie_element typ_geo_loc= med_2_3::MED_POINT1;
-  med_2_3::med_geometrie_element typ_geo_dist= med_2_3::MED_POINT1;
+  med_2_3::med_entity_type typ_ent_loc=med_2_3::MED_NODE;
+  med_2_3::med_entity_type typ_ent_dist=med_2_3::MED_NODE;
+  med_2_3::med_geometry_type typ_geo_loc= MED_POINT1;
+  med_2_3::med_geometry_type typ_geo_dist= MED_POINT1;
 
-  int n1 = med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  int n1;
+  med_2_3::MEDsubdomainCorrespondenceSize(fid1,meshname1,jn1,MED_NO_DT, MED_NO_IT, typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist, &n1);
   med_2_3::med_int* tab = new med_2_3::med_int[2*n1];
    
-  med_2_3::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceRd(fid1,meshname1,jn1,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist, tab);
     
   med_2_3::med_int tabreference1[6] = {2,1,3,4,6,5};
   for (int i=0; i<2*n1; i++)
@@ -325,10 +327,11 @@ void MEDSPLITTERTest::testMESHCollection_square()
 
   delete[] tab;
 
-  int n2 =med_2_3::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  int n2;
+  med_2_3::MEDsubdomainCorrespondenceSize(fid2,meshname2,jn2,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist,&n2);
   tab = new med_2_3::med_int[2*n2];
 
-  med_2_3::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceRd(fid2,meshname2,jn2,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist,tab);
 
   med_2_3::med_int tabreference2[] = {1,2,4,3,5,6};
   for (int i=0; i<2*n1; i++)
@@ -337,7 +340,7 @@ void MEDSPLITTERTest::testMESHCollection_square()
 
   //testing nodes global numbering
   med_2_3::med_int* num = new med_2_3::med_int[6];
-  cout << "Reading global " << MEDglobalNumLire(fid1, meshname1, num, 6, typ_ent_loc, typ_geo_loc) << endl;
+  cout << "Reading global " << MEDmeshGlobalNumberRd(fid1, meshname1, MED_NO_DT, MED_NO_IT, typ_ent_loc, typ_geo_loc, num) << endl;
   
   med_2_3::med_int globnoderef1[] = {4,5,2,1,7,8};
 
@@ -347,33 +350,33 @@ void MEDSPLITTERTest::testMESHCollection_square()
 
   //testing nodes global numbering
   num = new med_2_3::med_int[6];
-  MEDglobalNumLire(fid2, meshname2, num, 6, typ_ent_loc, typ_geo_loc);
+  MEDmeshGlobalNumberRd(fid2, meshname2, MED_NO_DT, MED_NO_IT, typ_ent_loc, typ_geo_loc, num);
   med_2_3::med_int globnoderef2[] = {5,6,3,2,8,9};
   for (int i=0; i<6; i++)
     CPPUNIT_ASSERT_EQUAL(num[i],globnoderef2[i]);
   delete[] num;
 
   //testing cell-cell correspondency
-  typ_ent_loc=med_2_3::MED_MAILLE;
-  typ_ent_dist=med_2_3::MED_MAILLE;
-  typ_geo_loc= med_2_3::MED_QUAD4;
-  typ_geo_dist= med_2_3::MED_QUAD4;
+  typ_ent_loc=med_2_3::MED_CELL;
+  typ_ent_dist=med_2_3::MED_CELL;
+  typ_geo_loc= MED_QUAD4;
+  typ_geo_dist= MED_QUAD4;
   //joint1
-  n1=med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceSize(fid1,meshname1,jn1,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist,&n1);
   CPPUNIT_ASSERT_EQUAL(n1,2);
   tab = new med_2_3::med_int[2*n1];
-  med_2_3::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceRd(fid1,meshname1,jn1,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist,tab);
 
   med_2_3::med_int tabreferencecell1[4] = {1,1,2,2};
   for (int i=0; i<2*n1; i++)
     CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell1[i]);
 
-  n2=med_2_3::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceSize(fid2,meshname2,jn2,MED_NO_DT, MED_NO_IT, typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist, &n2);
   CPPUNIT_ASSERT_EQUAL(n2,2);
   delete[] tab;
   //joint2
   tab = new med_2_3::med_int[2*n2];
-  med_2_3::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceRd(fid2,meshname2,jn2,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist,tab);
 
   med_2_3::med_int tabreferencecell2[4] = {1,1,2,2};
   for (int i=0; i<n2; i++)
@@ -383,7 +386,7 @@ void MEDSPLITTERTest::testMESHCollection_square()
 
   //testing cells global numbering
   num = new med_2_3::med_int[2];
-  MEDglobalNumLire(fid1, meshname1, num, 2, typ_ent_loc, typ_geo_loc);
+  MEDmeshGlobalNumberRd(fid1, meshname1, MED_NO_DT, MED_NO_IT, typ_ent_loc, typ_geo_loc, num);
   med_2_3::med_int* globcellref = new med_2_3::med_int[2];
   globcellref[0]=1;
   globcellref[1]=3;
@@ -394,7 +397,7 @@ void MEDSPLITTERTest::testMESHCollection_square()
 
   //testing cells global numbering
   num = new med_2_3::med_int[2];
-  MEDglobalNumLire(fid2, meshname2, num, 2, typ_ent_loc, typ_geo_loc);
+  MEDmeshGlobalNumberRd(fid2, meshname2, MED_NO_DT, MED_NO_IT, typ_ent_loc, typ_geo_loc, num);
   globcellref[0]=2;
   globcellref[1]=4;
   for (int i=0; i<2; i++)
@@ -447,43 +450,45 @@ void MEDSPLITTERTest::testMESHCollection_square_with_faces()
   MEDMEM::MESH mesh2(MEDMEM::MED_DRIVER, filename_wr_2, meshname2);
 
   // testing number of elements for each partition
-  int nbelem1=mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
-  int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+  int nbelem1=mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
+  int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
 
   CPPUNIT_ASSERT_EQUAL(nbelem1,2);
   CPPUNIT_ASSERT_EQUAL(nbelem2,2);
   
   
   //testing number of joints
-  med_2_3::med_idt fid1 = med_2_3::MEDouvrir(const_cast<char*> (filename_wr_1.c_str()),med_2_3::MED_LECTURE);
-  med_2_3::med_idt fid2 = med_2_3::MEDouvrir(const_cast<char*> (filename_wr_2.c_str()),med_2_3::MED_LECTURE);
-  int nj1= med_2_3::MEDnJoint(fid1, meshname1);
-  int nj2= med_2_3::MEDnJoint(fid2, meshname2);
+  med_2_3::med_idt fid1 = med_2_3::MEDfileOpen(filename_wr_1.c_str(),med_2_3::MED_ACC_RDONLY);
+  med_2_3::med_idt fid2 = med_2_3::MEDfileOpen(filename_wr_2.c_str(),med_2_3::MED_ACC_RDONLY);
+  int nj1= med_2_3::MEDnSubdomainJoint(fid1, meshname1);
+  int nj2= med_2_3::MEDnSubdomainJoint(fid2, meshname2);
   CPPUNIT_ASSERT_EQUAL(nj1,1);
   CPPUNIT_ASSERT_EQUAL(nj2,1);
        
   //testing distant domains
     
-  char desc1[MED_TAILLE_DESC+1];
-  char maa_dist1[MED_TAILLE_NOM+1], jn1[MED_TAILLE_NOM+1];
-  char desc2[MED_TAILLE_DESC+1], maa_dist2[MED_TAILLE_NOM+1], jn2[MED_TAILLE_NOM+1];
+  char desc1[MED_COMMENT_SIZE+1];
+  char maa_dist1[MED_NAME_SIZE+1], jn1[MED_NAME_SIZE+1];
+  char desc2[MED_COMMENT_SIZE+1], maa_dist2[MED_NAME_SIZE+1], jn2[MED_NAME_SIZE+1];
   int dom1, dom2;
-  med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
-  med_2_3::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
+  int nstep,nocstp;
+  med_2_3::MEDsubdomainJointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1, &nstep, &nocstp);
+  med_2_3::MEDsubdomainJointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2, &nstep, &nocstp);
   CPPUNIT_ASSERT_EQUAL(dom1,1);
   CPPUNIT_ASSERT_EQUAL(dom2,0);
   
   // testing node-node correspondency
-  med_2_3::med_entite_maillage typ_ent_loc=med_2_3::MED_NOEUD;
-  med_2_3::med_entite_maillage typ_ent_dist=med_2_3::MED_NOEUD;
-  med_2_3::med_geometrie_element typ_geo_loc= med_2_3::MED_POINT1;
-  med_2_3::med_geometrie_element typ_geo_dist= med_2_3::MED_POINT1;
+  med_2_3::med_entity_type typ_ent_loc=med_2_3::MED_NODE;
+  med_2_3::med_entity_type typ_ent_dist=med_2_3::MED_NODE;
+  med_2_3::med_geometry_type typ_geo_loc= MED_POINT1;
+  med_2_3::med_geometry_type typ_geo_dist= MED_POINT1;
     
-  int n1 =med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  int n1;
+  med_2_3::MEDsubdomainCorrespondenceSize(fid1,meshname1,jn1, MED_NO_DT, MED_NO_IT, typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist, &n1);
   CPPUNIT_ASSERT_EQUAL(3,n1);
   med_2_3::med_int* tab = new med_2_3::med_int[2*n1];
    
-  med_2_3::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceRd(fid1,meshname1,jn1, MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist, tab);
     
   med_2_3::med_int tabreference1[6] = {2,1,3,4,6,5};
   for (int i=0; i<2*n1; i++)
@@ -491,10 +496,11 @@ void MEDSPLITTERTest::testMESHCollection_square_with_faces()
     
   delete[] tab;
 
-  int n2 = med_2_3::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  int n2;
+  med_2_3::MEDsubdomainCorrespondenceSize(fid2,meshname2,jn2, MED_NO_DT, MED_NO_IT, typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist,&n2);
   tab = new med_2_3::med_int[2*n2];
     
-  med_2_3::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceRd(fid2,meshname2,jn2,MED_NO_DT, MED_NO_IT, typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist,tab);
     
   med_2_3::med_int tabreference2[]={1,2,4,3,5,6};
   for (int i=0; i<2*n1; i++)
@@ -503,7 +509,7 @@ void MEDSPLITTERTest::testMESHCollection_square_with_faces()
 
   //testing nodes global numbering
   med_2_3::med_int* num = new med_2_3::med_int[6];
-  cout << "Reading global " << MEDglobalNumLire(fid1, meshname1, num, 6, typ_ent_loc, typ_geo_loc) << endl;
+  cout << "Reading global " << MEDmeshGlobalNumberRd(fid1, meshname1, MED_NO_DT, MED_NO_IT, typ_ent_loc, typ_geo_loc, num) << endl;
 
   med_2_3::med_int globnoderef1[]={4,5,2,1,7,8};
 
@@ -513,33 +519,33 @@ void MEDSPLITTERTest::testMESHCollection_square_with_faces()
 
   //testing nodes global numbering
   num = new med_2_3::med_int[6];
-  MEDglobalNumLire(fid2, meshname2, num, 6, typ_ent_loc, typ_geo_loc);
+  MEDmeshGlobalNumberRd(fid2, meshname2, MED_NO_DT, MED_NO_IT, typ_ent_loc, typ_geo_loc, num);
   med_2_3::med_int globnoderef2[]={5,6,3,2,8,9};
   for (int i=0; i<6; i++)
     CPPUNIT_ASSERT_EQUAL(num[i],globnoderef2[i]);
   delete[] num;
   
   //testing cell-cell correspondency
-  typ_ent_loc=med_2_3::MED_MAILLE;
-  typ_ent_dist=med_2_3::MED_MAILLE;
-  typ_geo_loc= med_2_3::MED_QUAD4;
-  typ_geo_dist= med_2_3::MED_QUAD4;
+  typ_ent_loc=med_2_3::MED_CELL;
+  typ_ent_dist=med_2_3::MED_CELL;
+  typ_geo_loc= MED_QUAD4;
+  typ_geo_dist= MED_QUAD4;
   //joint1
-  n1=med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceSize(fid1,meshname1,jn1,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist,&n1);
   CPPUNIT_ASSERT_EQUAL(n1,2);
   tab = new med_2_3::med_int[2*n1];
-  med_2_3::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceRd(fid1,meshname1,jn1,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist,tab);
     
   med_2_3::med_int tabreferencecell1[4]={1,1,2,2};
   for (int i=0; i<2*n1; i++)
     CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell1[i]);
             
-  n2=med_2_3::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceSize(fid2,meshname2,jn2,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist,&n2);
   CPPUNIT_ASSERT_EQUAL(n2,2);
   delete[] tab;
   //joint2
   tab = new med_2_3::med_int[2*n2];
-  med_2_3::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceRd(fid2,meshname2,jn2,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist,tab);
     
   med_2_3::med_int tabreferencecell2[4]={1,1,2,2};
   for (int i=0; i<n2; i++)
@@ -549,7 +555,7 @@ void MEDSPLITTERTest::testMESHCollection_square_with_faces()
         
   //testing cells global numbering
   num = new med_2_3::med_int[2];
-  MEDglobalNumLire(fid1, meshname1, num, 2, typ_ent_loc, typ_geo_loc);
+  MEDmeshGlobalNumberRd(fid1, meshname1, MED_NO_DT, MED_NO_IT, typ_ent_loc, typ_geo_loc,num);
   med_2_3::med_int* globcellref = new int[2];
   globcellref[0]=1;
   globcellref[1]=3;
@@ -560,7 +566,7 @@ void MEDSPLITTERTest::testMESHCollection_square_with_faces()
     
   //testing cells global numbering
   num = new med_2_3::med_int[2];
-  MEDglobalNumLire(fid2, meshname2, num, 2, typ_ent_loc, typ_geo_loc);
+  MEDmeshGlobalNumberRd(fid2, meshname2, MED_NO_DT, MED_NO_IT, typ_ent_loc, typ_geo_loc,num);
   globcellref[0]=2;
   globcellref[1]=4;
   for (int i=0; i<2; i++)
@@ -568,26 +574,26 @@ void MEDSPLITTERTest::testMESHCollection_square_with_faces()
   delete[] num;
   
   //testing face/face/correspondency
-  typ_ent_loc=med_2_3::MED_MAILLE;
-  typ_ent_dist=med_2_3::MED_MAILLE;
-  typ_geo_loc= med_2_3::MED_SEG2;
-  typ_geo_dist= med_2_3::MED_SEG2;
+  typ_ent_loc=med_2_3::MED_CELL;
+  typ_ent_dist=med_2_3::MED_CELL;
+  typ_geo_loc= MED_SEG2;
+  typ_geo_dist= MED_SEG2;
   //joint1
-  n1=med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceSize(fid1,meshname1,jn1,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist, &n1);
   CPPUNIT_ASSERT_EQUAL(n1,2);
   tab = new med_2_3::med_int[2*n1];
-  med_2_3::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceRd(fid1,meshname1,jn1,MED_NO_DT, MED_NO_IT, typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist,tab);
     
   med_2_3::med_int tabreferencecell3[4]={1,1,2,2};
   for (int i=0; i<2*n1; i++)
     CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell3[i]);
             
-  n2=med_2_3::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceSize(fid2,meshname2,jn2,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist, &n2);
   CPPUNIT_ASSERT_EQUAL(n2,2);
   delete[] tab;
   //joint2
   tab = new med_2_3::med_int[2*n2];
-  med_2_3::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceRd(fid2,meshname2,jn2,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist,tab);
     
   med_2_3::med_int tabreferencecell4[4]={1,1,2,2};
   for (int i=0; i<n2; i++)
@@ -634,7 +640,7 @@ void MEDSPLITTERTest::testMESHCollection_indivisible()
   
   
   char meshname[20]  = "MAILTRQU";
-  char family[MED_TAILLE_NOM]="QUAD";
+  char family[MED_NAME_SIZE]="QUAD";
   MESHCollection collection(filename_rd,meshname);
   collection.setIndivisibleGroup(family);
   Topology* topo;
@@ -658,10 +664,10 @@ void MEDSPLITTERTest::testMESHCollection_indivisible()
   MEDMEM::MESH mesh4(MEDMEM::MED_DRIVER, filename_wr_4, meshname4);
       
   // testing number of quads for each partition
-  int nbquad1=    mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_QUAD4);
-  int nbquad2=    mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_QUAD4);
-  int nbquad3=    mesh3.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_QUAD4);
-  int nbquad4=    mesh4.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_QUAD4);
+  int nbquad1=    mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_QUAD4);
+  int nbquad2=    mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_QUAD4);
+  int nbquad3=    mesh3.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_QUAD4);
+  int nbquad4=    mesh4.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_QUAD4);
   int nb_domain_with_quad=(nbquad1?1:0)+(nbquad2?1:0)+(nbquad3?1:0)+(nbquad4?1:0);
 
   CPPUNIT_ASSERT_EQUAL(nb_domain_with_quad,1);
@@ -755,54 +761,56 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
 
   // testing number of elements for each partition
 
-  int nbelem1=mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
-  int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+  int nbelem1=mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
+  int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
   CPPUNIT_ASSERT_EQUAL(nbelem1,2);
   CPPUNIT_ASSERT_EQUAL(nbelem2,2);
 
   //testing number of joints
-  med_2_3::med_idt fid1 = med_2_3::MEDouvrir(const_cast<char*>(filename_wr_1.c_str()),med_2_3::MED_LECTURE);
-  med_2_3::med_idt fid2 = med_2_3::MEDouvrir(const_cast<char*>(filename_wr_2.c_str()),med_2_3::MED_LECTURE);
+  med_2_3::med_idt fid1 = med_2_3::MEDfileOpen(filename_wr_1.c_str(),med_2_3::MED_ACC_RDONLY);
+  med_2_3::med_idt fid2 = med_2_3::MEDfileOpen(filename_wr_2.c_str(),med_2_3::MED_ACC_RDONLY);
 
-  int nj1= med_2_3::MEDnJoint(fid1, meshname1);
-  int nj2= med_2_3::MEDnJoint(fid2, meshname2);
+  int nj1= med_2_3::MEDnSubdomainJoint(fid1, meshname1);
+  int nj2= med_2_3::MEDnSubdomainJoint(fid2, meshname2);
   CPPUNIT_ASSERT_EQUAL(nj1,1);
   CPPUNIT_ASSERT_EQUAL(nj2,1);
 
   //testing distant domains
 
-  char desc1[MED_TAILLE_DESC+1];
-  char maa_dist1[MED_TAILLE_NOM+1], jn1[MED_TAILLE_NOM+1];
-  char desc2[MED_TAILLE_DESC];
-  char maa_dist2[MED_TAILLE_NOM+1], jn2[MED_TAILLE_NOM+1];
+  char desc1[MED_COMMENT_SIZE+1];
+  char maa_dist1[MED_NAME_SIZE+1], jn1[MED_NAME_SIZE+1];
+  char desc2[MED_COMMENT_SIZE+1];
+  char maa_dist2[MED_NAME_SIZE+1], jn2[MED_NAME_SIZE+1];
   //int dom1, dom2;
   med_2_3::med_int dom1, dom2;
-  med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
-  med_2_3::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
+  int nstep,nocstp;
+  med_2_3::MEDsubdomainJointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1, &nstep, &nocstp);
+  med_2_3::MEDsubdomainJointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2, &nstep, &nocstp);
   CPPUNIT_ASSERT_EQUAL(dom1,1);
   CPPUNIT_ASSERT_EQUAL(dom2,0);
 
   // testing node-node correspondency
-  med_2_3::med_entite_maillage typ_ent_loc=med_2_3::MED_NOEUD;
-  med_2_3::med_entite_maillage typ_ent_dist=med_2_3::MED_NOEUD;
-  med_2_3::med_geometrie_element typ_geo_loc= med_2_3::MED_POINT1;
-  med_2_3::med_geometrie_element typ_geo_dist= med_2_3::MED_POINT1;
+  med_2_3::med_entity_type typ_ent_loc=med_2_3::MED_NODE;
+  med_2_3::med_entity_type typ_ent_dist=med_2_3::MED_NODE;
+  med_2_3::med_geometry_type typ_geo_loc= MED_POINT1;
+  med_2_3::med_geometry_type typ_geo_dist= MED_POINT1;
 
-  int n1 = med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  int n1;
+  med_2_3::MEDsubdomainCorrespondenceSize(fid1,meshname1,jn1,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist,&n1);
   CPPUNIT_ASSERT_EQUAL(5,n1);
   med_2_3::med_int* tab = new med_2_3::med_int[2*n1];
 
-  med_2_3::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceRd(fid1,meshname1,jn1,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist,tab);
 
   med_2_3::med_int tabreference1[10] = {1,7,2,1,3,4,5,6,7,2};
   for (int i=0; i<2*n1; i++)
     CPPUNIT_ASSERT_EQUAL(tab[i],tabreference1[i]);
   delete[] tab;
-
-  int n2 = med_2_3::MEDjointnCorres(fid2,meshname2,jn2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  int n2;
+  med_2_3::MEDsubdomainCorrespondenceSize(fid2,meshname2,jn2,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist,&n2);
   tab = new med_2_3::med_int[2*n2];
 
-  med_2_3::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceRd(fid2,meshname2,jn2,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist,tab);
 
   med_2_3::med_int tabreference2[10] = {1,2,2,7,4,3,6,5,7,1};
   for (int i=0; i<2*n2; i++)
@@ -811,7 +819,7 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
 
   //testing nodes global numbering
   med_2_3::med_int* num = new med_2_3::med_int[7];
-  cout << "Reading global " << MEDglobalNumLire(fid1, meshname1, num, 7, typ_ent_loc, typ_geo_loc) << endl;
+  cout << "Reading global " << MEDmeshGlobalNumberRd(fid1, meshname1, MED_NO_DT, MED_NO_IT, typ_ent_loc, typ_geo_loc, num) << endl;
   med_2_3::med_int globnoderef1[7] = {4,5,2,1,8,9,6};
 
   for (int i=0; i<7; i++)
@@ -821,31 +829,31 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
 
   //testing nodes global numbering
   num = new med_2_3::med_int[7];
-  MEDglobalNumLire(fid2, meshname2, num, 7, typ_ent_loc, typ_geo_loc);
+  MEDmeshGlobalNumberRd(fid2, meshname2, MED_NO_DT, MED_NO_IT, typ_ent_loc, typ_geo_loc, num);
   med_2_3::med_int globnoderef2[7] = {5,6,3,2,7,8,4};
   for (int i=0; i<7; i++)
                 CPPUNIT_ASSERT_EQUAL(num[i],globnoderef2[i]);
   delete[] num;
 
   //testing cell-cell correspondency
-  typ_ent_loc=med_2_3::MED_MAILLE;
-  typ_ent_dist=med_2_3::MED_MAILLE;
-  typ_geo_loc= med_2_3::MED_QUAD4;
-  typ_geo_dist= med_2_3::MED_QUAD4;
+  typ_ent_loc=med_2_3::MED_CELL;
+  typ_ent_dist=med_2_3::MED_CELL;
+  typ_geo_loc= MED_QUAD4;
+  typ_geo_dist= MED_QUAD4;
   //joint1
-  n1 = med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceSize(fid1,meshname1,jn1,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist, &n1);
   tab = new med_2_3::med_int[2*n1];
-  med_2_3::MEDjointLire(fid1,meshname1,jn1,tab,n1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceRd(fid1,meshname1,jn1,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist,tab);
 
   med_2_3::med_int tabreferencecell1[8] = {1,1,1,2,2,1,2,2};
   for (int i=0; i<2*n1; i++)
                 CPPUNIT_ASSERT_EQUAL(tab[i],tabreferencecell1[i]);
 
-  n2 = med_2_3::MEDjointnCorres(fid1,meshname1,jn1,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceSize(fid1,meshname1,jn1,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist,&n2);
   delete[] tab;
   //joint2
   tab = new med_2_3::med_int[2*n2];
-  med_2_3::MEDjointLire(fid2,meshname2,jn2,tab,n2,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist);
+  med_2_3::MEDsubdomainCorrespondenceRd(fid2,meshname2,jn2,MED_NO_DT, MED_NO_IT,typ_ent_loc, typ_geo_loc,typ_ent_dist, typ_geo_dist, tab);
 
   med_2_3::med_int tabreferencecell2[8] = {1,1,1,2,2,1,2,2};
   for (int i=0; i<n2; i++)
@@ -854,7 +862,7 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
 
   //testing cells global numbering
   num = new med_2_3::med_int[2];
-  MEDglobalNumLire(fid1, meshname1, num, 2, typ_ent_loc, typ_geo_loc);
+  MEDmeshGlobalNumberRd(fid1, meshname1, MED_NO_DT, MED_NO_IT, typ_ent_loc, typ_geo_loc, num);
   med_2_3::med_int globcellref1[2] = {1,4};
   for (int i=0; i<2; i++)
     CPPUNIT_ASSERT_EQUAL(num[i],globcellref1[i]);
@@ -862,7 +870,7 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
 
   //testing cells global numbering
   num = new med_2_3::med_int[2];
-  MEDglobalNumLire(fid2, meshname2, num, 2, typ_ent_loc, typ_geo_loc);
+  MEDmeshGlobalNumberRd(fid2, meshname2, MED_NO_DT, MED_NO_IT, typ_ent_loc, typ_geo_loc, num);
   med_2_3::med_int globcellref2[2] = {2,3};
   for (int i=0; i<2; i++)
     CPPUNIT_ASSERT_EQUAL(num[i],globcellref2[i]);
@@ -941,9 +949,9 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
   new_collection_seq.write(filename_seq_wr);
   MEDMEM::MESH* mesh_after = new_collection_seq.getMesh(0);
   MEDMEM::MESH* mesh_before = collection.getMesh(0);
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS));
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS));
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_CELL, MEDMEM_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_CELL, MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_FACE, MEDMEM_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_FACE, MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_EDGE, MEDMEM_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_EDGE, MEDMEM_ALL_ELEMENTS));
   CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfNodes(), mesh_after->getNumberOfNodes());
   delete topo2;
   delete topo3;
@@ -1010,12 +1018,12 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polygon()
   new_collection_seq.write(filename_seq_wr);
   MEDMEM::MESH* mesh_after = new_collection_seq.getMesh(0);
   MEDMEM::MESH* mesh_before = collection.getMesh(0);
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS),
-                       mesh_after->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS));
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS),
-                       mesh_after->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS));
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS),
-                       mesh_after->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_CELL, MEDMEM_ALL_ELEMENTS),
+                       mesh_after->getNumberOfElements(MED_CELL, MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_FACE, MEDMEM_ALL_ELEMENTS),
+                       mesh_after->getNumberOfElements(MED_FACE, MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_EDGE, MEDMEM_ALL_ELEMENTS),
+                       mesh_after->getNumberOfElements(MED_EDGE, MEDMEM_ALL_ELEMENTS));
   CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfNodes(), mesh_after->getNumberOfNodes());
   delete topo2;
   delete topo3;
@@ -1076,9 +1084,9 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polyhedra()
   new_collection_seq.write(filename_seq_wr);
   MEDMEM::MESH* mesh_after = new_collection_seq.getMesh(0);
   MEDMEM::MESH* mesh_before = collection.getMesh(0);
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS));
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS));
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_CELL, MEDMEM_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_CELL, MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_FACE, MEDMEM_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_FACE, MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_EDGE, MEDMEM_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_EDGE, MEDMEM_ALL_ELEMENTS));
   CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfNodes(), mesh_after->getNumberOfNodes());
   delete topo2;
   delete topo3;
@@ -1125,41 +1133,42 @@ void MEDSPLITTERTest::testMESHCollection_families()
   MEDMEM::MESH mesh2(MEDMEM::MED_DRIVER, filename_wr_2, meshname2);
 
   // testing number of elements for each partition
-  int nbelem1=mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
-  int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+  int nbelem1=mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
+  int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
 
   CPPUNIT_ASSERT_EQUAL(nbelem1+nbelem2,2020);
 
 
 
   //testing number of joints
-  med_2_3::med_idt fid1 = med_2_3::MEDouvrir(const_cast<char*> (filename_wr_1.c_str()),med_2_3::MED_LECTURE);
-  med_2_3::med_idt fid2 = med_2_3::MEDouvrir(const_cast<char*> (filename_wr_2.c_str()),med_2_3::MED_LECTURE);
-  int nj1= med_2_3::MEDnJoint(fid1, meshname1);
-  int nj2= med_2_3::MEDnJoint(fid2, meshname2);
+  med_2_3::med_idt fid1 = med_2_3::MEDfileOpen(filename_wr_1.c_str(),med_2_3::MED_ACC_RDONLY);
+  med_2_3::med_idt fid2 = med_2_3::MEDfileOpen(filename_wr_2.c_str(),med_2_3::MED_ACC_RDONLY);
+  int nj1= med_2_3::MEDnSubdomainJoint(fid1, meshname1);
+  int nj2= med_2_3::MEDnSubdomainJoint(fid2, meshname2);
   CPPUNIT_ASSERT_EQUAL(nj1,1);
   CPPUNIT_ASSERT_EQUAL(nj2,1);
 
   //testing distant domains
 
-  char desc1[MED_TAILLE_DESC+1];
-  char maa_dist1[MED_TAILLE_NOM+1], jn1[MED_TAILLE_NOM+1];
-  char desc2[MED_TAILLE_DESC+1], maa_dist2[MED_TAILLE_NOM+1], jn2[MED_TAILLE_NOM+1];
+  char desc1[MED_COMMENT_SIZE+1];
+  char maa_dist1[MED_NAME_SIZE+1], jn1[MED_NAME_SIZE+1];
+  char desc2[MED_COMMENT_SIZE+1], maa_dist2[MED_NAME_SIZE+1], jn2[MED_NAME_SIZE+1];
   int dom1, dom2;
-  med_2_3::MEDjointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1);
-  med_2_3::MEDjointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2);
+  int nstep,nocstp;
+  med_2_3::MEDsubdomainJointInfo(fid1, meshname1, 1, jn1, desc1, &dom1, maa_dist1, &nstep, &nocstp);
+  med_2_3::MEDsubdomainJointInfo(fid2, meshname2, 1, jn2, desc2, &dom2, maa_dist2, &nstep, &nocstp);
   CPPUNIT_ASSERT_EQUAL(dom1,1);
   CPPUNIT_ASSERT_EQUAL(dom2,0);
 
 
-  int nbEdgesFamilies1= med_2_3::MEDnFam(fid1, meshname1);
-  int nbEdgesFamilies2= med_2_3::MEDnFam(fid2, meshname2);
+  int nbEdgesFamilies1= med_2_3::MEDnFamily(fid1, meshname1);
+  int nbEdgesFamilies2= med_2_3::MEDnFamily(fid2, meshname2);
 
   CPPUNIT_ASSERT_EQUAL(nbEdgesFamilies1,7); // six initial families + a joint
   CPPUNIT_ASSERT_EQUAL(nbEdgesFamilies2,7); // six initial families + a joint
 
   string fam_name = mesh1.getFamily(MED_EN::MED_EDGE,1)->getName();
-  char test_name[MED_TAILLE_NOM]="Sortie";
+  char test_name[MED_NAME_SIZE+1]="Sortie";
   CPPUNIT_ASSERT(strcmp(fam_name.c_str(),test_name)==0);
 
 }

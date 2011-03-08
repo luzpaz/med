@@ -198,6 +198,8 @@ public:
   void setConstituent (CONNECTIVITY * Constituent)
                                         throw (MEDEXCEPTION);
 
+  const CONNECTIVITY *getConstituent(MED_EN::medEntityMesh Entity) const throw (MEDEXCEPTION);
+
   void setGeometricTypes (const MED_EN::medGeometryElement * Types,
                           const MED_EN::medEntityMesh        Entity)
                                         throw (MEDEXCEPTION);

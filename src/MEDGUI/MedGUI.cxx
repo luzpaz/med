@@ -613,7 +613,7 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
     SCRUTE(k);
     std::string nomFam=Families[k]->getName();
     SCRUTE(nomFam);
-    SALOME_TYPES::ListOfLong_var tabnoeuds=Families[k]->getNumber(SALOME_MED::MED_NONE);
+    SALOME_TYPES::ListOfLong_var tabnoeuds=Families[k]->getNumber(SALOME_MED::MEDMEM_NONE);
     for (int l=0;l<(int)tabnoeuds->length();l++)
       SCRUTE(tabnoeuds[l]);
   }
@@ -643,7 +643,7 @@ bool MedGUI::DumpSubMesh( SALOME_MED::FAMILY_var Fam )
   if ( Fam->_is_nil() )
     return false;
 
-  SALOME_TYPES::ListOfLong_var tabnoeuds=Fam->getNumber(SALOME_MED::MED_NONE);
+  SALOME_TYPES::ListOfLong_var tabnoeuds=Fam->getNumber(SALOME_MED::MEDMEM_NONE);
   for (int l=0;l<(int)tabnoeuds->length();l++)
     SCRUTE(tabnoeuds[l]);
 

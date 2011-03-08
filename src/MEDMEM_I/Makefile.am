@@ -33,7 +33,8 @@ salomeinclude_HEADERS= \
   MEDMEM_Group_i.hxx \
   MEDMEM_Mesh_i.hxx \
   MEDMEM_Support_i.hxx \
-  MEDMEM_I.hxx
+  MEDMEM_I.hxx \
+  MEDMEM_GMesh_i.hxx
 
 dist_libMEDMEMImpl_la_SOURCES= \
 	MEDMEM_Med_i.cxx \
@@ -42,12 +43,11 @@ dist_libMEDMEMImpl_la_SOURCES= \
 	MEDMEM_Group_i.cxx \
 	MEDMEM_Mesh_i.cxx \
 	MEDMEM_Support_i.cxx \
-	MEDMEM_convert.cxx   
+	MEDMEM_convert.cxx \
+	MEDMEM_GMesh_i.cxx
 
 libMEDMEMImpl_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) ${KERNEL_CXXFLAGS} \
-	-I$(srcdir)/../MEDMEM -I$(top_builddir)/idl -I$(srcdir)/../MEDWrapper/V2_1/Core -I$(srcdir)/../INTERP_KERNEL/Bases \
-	-I$(srcdir)/../INTERP_KERNEL/GaussPoints \
-	-I$(srcdir)/../INTERP_KERNEL
+	-I$(srcdir)/../MEDMEM -I$(top_builddir)/idl -I$(srcdir)/../INTERP_KERNEL/Bases
 libMEDMEMImpl_la_LDFLAGS= \
 	../../idl/libSalomeIDLMED.la \
 	../MEDMEM/libmedmem.la \

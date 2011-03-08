@@ -281,7 +281,7 @@ int main (int argc, char **argv)
   printf("%d\n",ret);
 
   /*
-    ecriture des mailles MED_HEXA8 :
+    ecriture des mailles MEDMEM_HEXA8 :
     - connectivite
     - noms (optionnel) 
     - numeros (optionnel)
@@ -291,7 +291,7 @@ int main (int argc, char **argv)
   if (ret == 0) 
     ret = MEDelementsEcr(fid,maa,mdim,hexa8,MED_FULL_INTERLACE,
                          nomhexa8,MED_FAUX,numhexa8,MED_VRAI,nufahexa8,nhexa8,
-                         MED_MAILLE,MED_HEXA8,MED_NOD,WRONLY);
+                         MED_MAILLE,MEDMEM_HEXA8,MED_NOD,WRONLY);
   printf("%d \n",ret);
 
   /***************************************************************************/
@@ -352,7 +352,7 @@ int main (int argc, char **argv)
                             (unsigned char *)DbleVectCell,
                             MED_NO_INTERLACE, nhexa8,
                             MED_NOPG, MED_ALL, MED_NOPFL, WRONLY, MED_MAILLE,
-                            MED_HEXA8, MED_NOPDT,"        ", 0., MED_NONOR);
+                            MEDMEM_HEXA8, MED_NOPDT,"        ", 0., MED_NONOR);
         
           printf("MEDchampEcr DbleVectCell : %d \n",ret);
         }

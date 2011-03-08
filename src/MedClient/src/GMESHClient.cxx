@@ -20,13 +20,14 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include "MESHClient.hxx"
+#include "GMESHClient.hxx"
 #include "MEDMEM_convert.hxx"
 #include "UtilClient.hxx"
 #include "COORDINATEClient.hxx"
 #include "CONNECTIVITYClient.hxx"
 #include "FAMILYClient.hxx"
 #include "GROUPClient.hxx"
+#include "MESHClient.hxx"
 
 using namespace MEDMEM;
 using namespace MED_EN;
@@ -37,15 +38,13 @@ using namespace MED_EN;
  */
 //=============================================================================
 
-MESHClient::MESHClient(const SALOME_MED::MESH_ptr m) : 
-  IOR_Mesh(SALOME_MED::MESH::_duplicate(m)),
-  _complete(false),
-  _refCounter(1)
+GMESHClient::GMESHClient(const SALOME_MED::GMESH_ptr m) : 
+  GMESH(), //_refCounter(1),
+  IOR_Mesh(SALOME_MED::GMESH::_duplicate(m)),
+  _complete(false), _uMesh(0)
+
 {
   ASSERT(m);
-
-  _coordinate = new COORDINATEClient(m, MED_FULL_INTERLACE);
-  _connectivity = new CONNECTIVITYClient(m, MED_FULL_INTERLACE);
 
   blankCopy();
 }
@@ -55,7 +54,7 @@ MESHClient::MESHClient(const SALOME_MED::MESH_ptr m) :
  */
 //=============================================================================
 
-FAMILY * convertFamily(const SALOME_MED::FAMILY_ptr &F, MESH *M) 
+FAMILY * convertFamily(const SALOME_MED::FAMILY_ptr &F, GMESH *M) 
 {
   return new FAMILYClient(F, M);
 }
@@ -64,7 +63,7 @@ FAMILY * convertFamily(const SALOME_MED::FAMILY_ptr &F, MESH *M)
  * Transforme un IOR groupe en groupe Client
  */
 //=============================================================================
-GROUP * convertGroup(const SALOME_MED::GROUP_ptr &F, MESH *M) 
+GROUP * convertGroup(const SALOME_MED::GROUP_ptr &F, GMESH *M) 
 {
   return new GROUPClient(F, M);
 }
@@ -73,29 +72,12 @@ GROUP * convertGroup(const SALOME_MED::GROUP_ptr &F, MESH *M)
  * Remplit les informations générales 
  */
 //=============================================================================
-void MESHClient::blankCopy()
+void GMESHClient::blankCopy()
 {
   SALOME_MED::GMESH::meshInfos_var all = IOR_Mesh->getMeshGlobal();
 
-  //CORBA::String_var s;
-  //s= IOR_Mesh->getName(); _name = s;
-  //_spaceDimension = IOR_Mesh->getSpaceDimension();
-  //_meshDimension  = IOR_Mesh->getMeshDimension();
-  //_numberOfNodes  = IOR_Mesh->getNumberOfNodes();
-  
   _name           = all->name;
   _spaceDimension = all->spaceDimension;
-  _numberOfNodes  = all->numberOfNodes;
-
-  COORDINATEClient *_coord 
-    = dynamic_cast<COORDINATEClient*>(_coordinate);
-  ASSERT(_coord);
-  CONNECTIVITYClient *_connect 
-    = dynamic_cast<CONNECTIVITYClient*>(_connectivity);
-  ASSERT(_connect);
-
-  _coord->blankCopy();
-  _connect->blankCopy();
 
   convertCorbaArray<SALOME_MED::FAMILY_ptr>
     (_familyNode, 
@@ -144,7 +126,13 @@ void MESHClient::blankCopy()
      //IOR_Mesh->getGroups(MED_CELL),
      &all->groupCell,
      (void *) (convertGroup), this);
- 
+
+  if ( !IOR_Mesh->getIsAGrid() )
+  {
+    SALOME_MED::MESH_var umeshIOR = IOR_Mesh->convertInMESH();
+    _uMesh = new MESHClient( umeshIOR );
+  }
+
   _complete = false;
 }
 //=============================================================================
@@ -153,18 +141,8 @@ void MESHClient::blankCopy()
  */
 //=============================================================================
 
-void MESHClient::fillCopy()
+void GMESHClient::fillCopy()
 {
-  COORDINATEClient *_coord 
-    = dynamic_cast<COORDINATEClient *> (_coordinate);
-  ASSERT(_coord);
-  CONNECTIVITYClient *_connect 
-    = dynamic_cast<CONNECTIVITYClient *> (_connectivity);
-  ASSERT(_connect);
-
-  _coord->fillCopy();
-  _connect->fillCopy();
-
   int size = _familyNode.size();
 
   for (int i = 0; i < size; i++)
@@ -205,17 +183,20 @@ void MESHClient::fillCopy()
       _fam->fillCopy();
     }
 
+  if ( _uMesh )
+    _uMesh->fillCopy();
+
   _complete = true;
 }
 
 //=============================================================================
 /*!
- *  Test equality between 2 MESHClients.
+ *  Test equality between 2 GMESHClients.
  */
 //=============================================================================
-bool MESHClient::operator==(const MESH& other) const
+bool GMESHClient::operator==(const GMESH& other) const
 {
-  const MESHClient* otherClt=dynamic_cast<const MESHClient *>(&other);
+  const GMESHClient* otherClt=dynamic_cast<const GMESHClient *>(&other);
   if(otherClt)
     {
       if(this==otherClt)
@@ -233,7 +214,7 @@ bool MESHClient::operator==(const MESH& other) const
  */
 //=============================================================================
 
-MESHClient::~MESHClient()
+GMESHClient::~GMESHClient()
 {
   IOR_Mesh->UnRegister();
 }
@@ -244,32 +225,32 @@ MESHClient::~MESHClient()
  */
 //=============================================================================
 
-void MESHClient::addReference() const
-{
-  _refCounter++;
-}
+// void GMESHClient::addReference() const
+// {
+//   _refCounter++;
+// }
+
+// //=============================================================================
+// /*!
+//  * For refCounter
+//  */
+// //=============================================================================
+
+// void GMESHClient::removeReference() const
+// {
+//   if (--_refCounter <= 0)
+//     {
+//       delete this;
+//     }
+// }
 
 //=============================================================================
 /*!
- * For refCounter
+ * Write all the content of the GMESH using driver referenced by the integer handler index
  */
 //=============================================================================
 
-void MESHClient::removeReference() const
-{
-  if (--_refCounter <= 0)
-    {
-      delete this;
-    }
-}
-
-//=============================================================================
-/*!
- * Write all the content of the MESH using driver referenced by the integer handler index
- */
-//=============================================================================
-
-void MESHClient::write(int index/*=0*/)
+void GMESHClient::write(int index/*=0*/)
 {
   this->fillCopy();
   GMESH::write(index);
@@ -281,7 +262,7 @@ void MESHClient::write(int index/*=0*/)
  */
 //=============================================================================
 
-void MESHClient::write(const GENDRIVER & genDriver)
+void GMESHClient::write(const GENDRIVER & genDriver)
 {
   this->fillCopy();
   GMESH::write(genDriver);
@@ -293,7 +274,7 @@ void MESHClient::write(const GENDRIVER & genDriver)
  */
 //=============================================================================
 
-void MESHClient::write(driverTypes driverType, const std::string& filename)
+void GMESHClient::write(driverTypes driverType, const std::string& filename)
 {
   this->fillCopy();
   GMESH::write(driverType, filename);
@@ -305,9 +286,164 @@ void MESHClient::write(driverTypes driverType, const std::string& filename)
  */
 //================================================================================
 
-void MESHClient::printMySelf(ostream &os) const
+void GMESHClient::printMySelf(ostream &os) const
 {
-  MESHClient* that = (MESHClient*)this;
+  GMESHClient* that = (GMESHClient*)this;
   that->fillCopy();
-  MESH::printMySelf( os );  
+  if ( _uMesh )
+    _uMesh->printMySelf( os );
+  else
+    os << "GMESHClient " << (void*) this;
 }
+
+bool GMESHClient::isEmpty() const
+{
+  return _uMesh ? _uMesh->isEmpty() : (IOR_Mesh->getNumberOfNodes() < 1);
+}
+
+bool GMESHClient::deepCompare(const GMESH& other) const
+{
+  if ( getIsAGrid() != other.getIsAGrid() ||
+       getIsAGrid()) // no client nor server for GRID -> can't compare
+    return false;
+
+  return _uMesh ? _uMesh->deepCompare( other ) : false;
+}
+
+int GMESHClient::getMeshDimension() const
+{
+  return IOR_Mesh->getMeshDimension();
+}
+
+bool GMESHClient::getIsAGrid() const
+{
+  return IOR_Mesh->getIsAGrid();
+}
+
+std::string GMESHClient::getCoordinatesSystem() const
+{
+  CORBA::String_var s = IOR_Mesh->getCoordinatesSystem();
+  return s._retn();
+}
+
+const std::string* GMESHClient::getCoordinatesNames() const
+{
+  return _uMesh ? _uMesh->getCoordinatesNames() : (std::string*) 0;
+}
+
+const std::string* GMESHClient::getCoordinatesUnits() const
+{
+  return _uMesh ? _uMesh->getCoordinatesUnits() : (std::string*) 0;
+}
+
+int GMESHClient::getNumberOfNodes() const
+{
+  return IOR_Mesh->getNumberOfNodes();
+}
+
+int GMESHClient::getNumberOfTypes(MED_EN::medEntityMesh entity) const
+{
+  return IOR_Mesh->getNumberOfTypes(entity);
+}
+
+int GMESHClient::getNumberOfElements(MED_EN::medEntityMesh entity,
+                                     MED_EN::medGeometryElement type) const
+{
+  return IOR_Mesh->getNumberOfElements(entity,type);
+}
+
+const MED_EN::medGeometryElement* GMESHClient::getTypes(MED_EN::medEntityMesh entity) const
+{
+  return _uMesh ? _uMesh->getTypes(entity) : (MED_EN::medGeometryElement*) 0;
+}
+
+MED_EN::medGeometryElement GMESHClient::getElementType(MED_EN::medEntityMesh entity,
+                                                       int i) const
+{
+  return IOR_Mesh->getElementType(entity,i);
+}
+
+const MESH* GMESHClient::convertInMESH() const
+{
+  if ( !_uMesh )
+  {
+    SALOME_MED::MESH_var umeshIOR = IOR_Mesh->convertInMESH();
+    const_cast<GMESHClient*>(this)->_uMesh = new MESHClient( umeshIOR );
+  }
+  return _uMesh;
+}
+
+SUPPORT* GMESHClient::getBoundaryElements(MED_EN::medEntityMesh entity) throw (MEDEXCEPTION)
+{
+  SALOME_MED::SUPPORT_var s = IOR_Mesh->getBoundaryElements(entity);
+  return new SUPPORTClient( s );
+}
+
+SUPPORT* GMESHClient::getSkin(const SUPPORT* sup) throw (MEDEXCEPTION)
+{
+  return _uMesh ? _uMesh->getSkin( sup ) : (SUPPORT*)0;
+}
+
+SUPPORT* GMESHClient::buildSupportOnNodeFromElementList(const std::list<int>& elems,
+                                                        MED_EN::medEntityMesh entity) const
+   throw (MEDEXCEPTION)
+{
+  return _uMesh ? _uMesh->buildSupportOnNodeFromElementList(elems,entity ) : (SUPPORT*)0;
+}
+
+void GMESHClient::fillSupportOnNodeFromElementList(const std::list<int>& elems,
+                                                   SUPPORT* sup) const
+   throw (MEDEXCEPTION)
+{
+  if ( _uMesh ) _uMesh->fillSupportOnNodeFromElementList(elems,sup);
+}
+
+FIELD<double>* GMESHClient::getVolume(const SUPPORT* sup , bool isAbs) const
+  throw (MEDEXCEPTION)
+{
+  FIELD<double>* f = (FIELD<double>*) 0;
+  if ( _uMesh )
+    f = _uMesh->getVolume(sup,isAbs);
+  return f;
+}
+
+FIELD<double>* GMESHClient::getArea(const SUPPORT* sup) const throw (MEDEXCEPTION)
+{
+  FIELD<double>* f = (FIELD<double>*) 0;
+  if ( _uMesh )
+    f = _uMesh->getArea(sup);
+  return f;
+}
+
+FIELD<double>* GMESHClient::getLength(const SUPPORT* sup) const throw (MEDEXCEPTION)
+{
+  FIELD<double>* f = (FIELD<double>*) 0;
+  if ( _uMesh )
+    f = _uMesh->getLength(sup);
+  return f;
+}
+
+FIELD<double>* GMESHClient::getNormal(const SUPPORT* sup) const throw (MEDEXCEPTION)
+{
+  FIELD<double>* f = (FIELD<double>*) 0;
+  if ( _uMesh )
+    f = _uMesh->getNormal(sup);
+  return f;
+}
+
+FIELD<double>* GMESHClient::getBarycenter(const SUPPORT* sup) const throw (MEDEXCEPTION)
+{
+  FIELD<double>* f = (FIELD<double>*) 0;
+  if ( _uMesh )
+    f = _uMesh->getBarycenter(sup);
+  return f;
+}
+
+std::vector<std::vector<double> > GMESHClient::getBoundingBox() const
+{
+  std::vector<std::vector<double> > bb;
+  if ( _uMesh )
+    bb = _uMesh->getBoundingBox();
+  return bb;
+}
+
