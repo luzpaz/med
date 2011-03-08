@@ -21,7 +21,7 @@
 #include <cppunit/TestAssert.h>
 
 #include <MEDMEM_Field.hxx>
-#include <MEDMEM_MedFieldDriver22.hxx>
+#include <MEDMEM_MedFieldDriver.hxx>
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
 //#define ENABLE_FAULTS
@@ -40,28 +40,28 @@
  *   (+) void open() throw (MEDEXCEPTION);
  *   (+) void close();
  *  }
- *  template <class T> class MED_FIELD_RDONLY_DRIVER22 : public virtual MED_FIELD_DRIVER22<T>,
+ *  template <class T> class MED_FIELD_RDONLY_DRIVER : public virtual MED_FIELD_DRIVER22<T>,
  *                                                       public virtual IMED_FIELD_RDONLY_DRIVER<T> {
- *   (+) MED_FIELD_RDONLY_DRIVER22();
- *   (+) template <class INTERLACING_TAG> MED_FIELD_RDONLY_DRIVER22
+ *   (+) MED_FIELD_RDONLY_DRIVER();
+ *   (+) template <class INTERLACING_TAG> MED_FIELD_RDONLY_DRIVER
  *                 (const string & fileName, FIELD<T, INTERLACING_TAG> * ptrField);
- *   (+) MED_FIELD_RDONLY_DRIVER22(const MED_FIELD_RDONLY_DRIVER22 & fieldDriver);
- *   (+) virtual ~MED_FIELD_RDONLY_DRIVER22();
+ *   (+) MED_FIELD_RDONLY_DRIVER(const MED_FIELD_RDONLY_DRIVER & fieldDriver);
+ *   (+) virtual ~MED_FIELD_RDONLY_DRIVER();
  *   (+) void write(void) const throw (MEDEXCEPTION);
  *   (+) void read (void) throw (MEDEXCEPTION);
  *  }
- *  template <class T> class MED_FIELD_WRONLY_DRIVER22 : public virtual MED_FIELD_DRIVER22<T>,
+ *  template <class T> class MED_FIELD_WRONLY_DRIVER : public virtual MED_FIELD_DRIVER22<T>,
  *                                                       public virtual IMED_FIELD_WRONLY_DRIVER<T> {
- *   (+) MED_FIELD_WRONLY_DRIVER22();
- *   (+) template <class INTERLACING_TAG> MED_FIELD_WRONLY_DRIVER22
+ *   (+) MED_FIELD_WRONLY_DRIVER();
+ *   (+) template <class INTERLACING_TAG> MED_FIELD_WRONLY_DRIVER
  *              (const string & fileName, FIELD<T, INTERLACING_TAG> * ptrField);
- *   (+) MED_FIELD_WRONLY_DRIVER22(const MED_FIELD_WRONLY_DRIVER22 & fieldDriver);
- *   (+) virtual ~MED_FIELD_WRONLY_DRIVER22();
+ *   (+) MED_FIELD_WRONLY_DRIVER(const MED_FIELD_WRONLY_DRIVER & fieldDriver);
+ *   (+) virtual ~MED_FIELD_WRONLY_DRIVER();
  *   (+) void write(void) const throw (MEDEXCEPTION);
  *   (+) void read (void) throw (MEDEXCEPTION);
  *  }
- *  template <class T> class MED_FIELD_RDWR_DRIVER22 : public MED_FIELD_RDONLY_DRIVER22<T>,
- *                           public MED_FIELD_WRONLY_DRIVER22<T>, public IMED_FIELD_RDWR_DRIVER<T> {
+ *  template <class T> class MED_FIELD_RDWR_DRIVER22 : public MED_FIELD_RDONLY_DRIVER<T>,
+ *                           public MED_FIELD_WRONLY_DRIVER<T>, public IMED_FIELD_RDWR_DRIVER<T> {
  *   (+) MED_FIELD_RDWR_DRIVER22();
  *   (+) template <class INTERLACING_TAG> MED_FIELD_RDWR_DRIVER22
  *              (const string & fileName, FIELD<T, INTERLACING_TAG> * ptrField);
@@ -71,14 +71,14 @@
  *   (+) void read (void) throw (MEDEXCEPTION);
  *  }
  */
-void MEDMEMTest::testMedFieldDriver22()
+void MEDMEMTest::testMedFieldDriver()
 {
   FIELD<int> *aField                = new FIELD<int>();
   FIELD<int> *aField_1              = new FIELD<int>();
   FIELD<double> *aField_2           = new FIELD<double>();
-  string filename_rd                = getResourceFile("pointe_import22.med");
-  string filenameWithOutFileds      = getResourceFile("mesh_import22.med");
-  string filenameWithOutFileds_rdwr = makeTmpFile("mesh_import22.med", filenameWithOutFileds);
+  string filename_rd                = getResourceFile("pointe.med");
+  string filenameWithOutFileds      = getResourceFile("mesh.med");
+  string filenameWithOutFileds_rdwr = makeTmpFile("mesh.med", filenameWithOutFileds);
   string fileldnotexist             = "anyfield";
   string fieldname                  = "fieldnodeint";
   string fieldname_cpy              = fieldname + "_cpy";
@@ -88,8 +88,8 @@ void MEDMEMTest::testMedFieldDriver22()
   string filename_wr                = makeTmpFile("myWrField_pointe22.med", filename_rd);
   string fileNotExist_wr            = "/path_not_exist/file_not_exist.med";
   string emptyfile_wr               = makeTmpFile("myWrField_pointe_empty22.med");
-  string other_file                 = getResourceFile("cube_hexa8_import22.med");
-  string other_file_wr              = makeTmpFile("myWRcube_hexa8_import22.med", other_file);
+  string other_file                 = getResourceFile("cube_hexa8.med");
+  string other_file_wr              = makeTmpFile("myWRcube_hexa8.med", other_file);
 
   string filename_rdwr              = makeTmpFile("myRdWrField_pointe22.med", filename_rd);
   string emptyfile_rdwr             = makeTmpFile("myRdWrField_pointe_empty22.med");
@@ -112,8 +112,8 @@ void MEDMEMTest::testMedFieldDriver22()
   /////////////////////////////////////
 
   //Creation Invalid Read Only MedFieldDriver22 (file not exist)
-  MED_FIELD_RDONLY_DRIVER22<int> *aInvalidMedRdFieldDriver22_1 =
-    new MED_FIELD_RDONLY_DRIVER22<int>(fileNotExist_rd, aField);
+  MED_FIELD_RDONLY_DRIVER<int> *aInvalidMedRdFieldDriver22_1 =
+    new MED_FIELD_RDONLY_DRIVER<int>(fileNotExist_rd, aField);
   //Trying open not existing file
   CPPUNIT_ASSERT_THROW(aInvalidMedRdFieldDriver22_1->open(), MEDEXCEPTION);
 
@@ -122,16 +122,16 @@ void MEDMEMTest::testMedFieldDriver22()
   //////////////////////////////////////////////
 
   //Creation Invalid Read Only MedFieldDriver22 (empty file name)
-  MED_FIELD_RDONLY_DRIVER22<int> *aInvalidMedRdFieldDriver22_2 =
-    new MED_FIELD_RDONLY_DRIVER22<int>(emptyfilename, aField);
+  MED_FIELD_RDONLY_DRIVER<int> *aInvalidMedRdFieldDriver22_2 =
+    new MED_FIELD_RDONLY_DRIVER<int>(emptyfilename, aField);
   //Trying file with empty name
   CPPUNIT_ASSERT_THROW(aInvalidMedRdFieldDriver22_2->open(), MEDEXCEPTION);
 
   /////////////////////////////////////////////////////
   //  TEST3: Reading field from file without fields  //
   /////////////////////////////////////////////////////
-  MED_FIELD_RDONLY_DRIVER22<int> *aInvalidMedRdFieldDriver22_3 =
-    new MED_FIELD_RDONLY_DRIVER22<int>(filenameWithOutFileds, aField);
+  MED_FIELD_RDONLY_DRIVER<int> *aInvalidMedRdFieldDriver22_3 =
+    new MED_FIELD_RDONLY_DRIVER<int>(filenameWithOutFileds, aField);
   aInvalidMedRdFieldDriver22_3->open();
   aInvalidMedRdFieldDriver22_3->setFieldName(fieldname);
   //Trying read field from file
@@ -142,8 +142,8 @@ void MEDMEMTest::testMedFieldDriver22()
   //  TEST4: Main test  //
   ////////////////////////
   //Creation correct Read Only MedFieldDriver22
-  MED_FIELD_RDONLY_DRIVER22<int> *aMedRdFieldDriver22 =
-    new MED_FIELD_RDONLY_DRIVER22<int>(filename_rd, aField);
+  MED_FIELD_RDONLY_DRIVER<int> *aMedRdFieldDriver22 =
+    new MED_FIELD_RDONLY_DRIVER<int>(filename_rd, aField);
 
   //Check driver
   CPPUNIT_ASSERT(aMedRdFieldDriver22);
@@ -226,7 +226,7 @@ void MEDMEMTest::testMedFieldDriver22()
   }
 
   //Default constructor
-  MED_FIELD_RDONLY_DRIVER22<int> aMedRdFieldDriver22Cpy_1;
+  MED_FIELD_RDONLY_DRIVER<int> aMedRdFieldDriver22Cpy_1;
 
   //Test (void operator =) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
   aMedRdFieldDriver22Cpy_1 = *aMedRdFieldDriver22;
@@ -235,7 +235,7 @@ void MEDMEMTest::testMedFieldDriver22()
   CPPUNIT_ASSERT(aMedRdFieldDriver22Cpy_1 ==  *aMedRdFieldDriver22);
 
   //Test copy constructorg
-  MED_FIELD_RDONLY_DRIVER22<int> aMedRdFieldDriver22Cpy_2 (*aMedRdFieldDriver22);
+  MED_FIELD_RDONLY_DRIVER<int> aMedRdFieldDriver22Cpy_2 (*aMedRdFieldDriver22);
   CPPUNIT_ASSERT_EQUAL(aMedRdFieldDriver22Cpy_2, *aMedRdFieldDriver22);
 
   //Test (friend ostream & operator <<) defined GENDRIVER class in MEDMEM_GenDriver.hxx
@@ -253,8 +253,8 @@ void MEDMEMTest::testMedFieldDriver22()
   /////////////////////////////////////
 
   //Creation Invalid Write Only MedFieldDriver22 (file not exist)
-  MED_FIELD_WRONLY_DRIVER22<int> *aInvalidMedWrFieldDriver22_1 =
-    new MED_FIELD_WRONLY_DRIVER22<int>(fileNotExist_wr, aField_1);
+  MED_FIELD_WRONLY_DRIVER<int> *aInvalidMedWrFieldDriver22_1 =
+    new MED_FIELD_WRONLY_DRIVER<int>(fileNotExist_wr, aField_1);
   //Trying open not existing file
   CPPUNIT_ASSERT_THROW(aInvalidMedWrFieldDriver22_1->open(), MEDEXCEPTION);
 
@@ -262,8 +262,8 @@ void MEDMEMTest::testMedFieldDriver22()
   //  TEST2: Open file with empty file name  //
   /////////////////////////////////////////////
   //Creation Invalid Write Only MedFieldDriver22 (empty file name)
-  MED_FIELD_WRONLY_DRIVER22<int> *aInvalidMedWrFieldDriver22_2 =
-    new MED_FIELD_WRONLY_DRIVER22<int>(emptyfilename, aField_1);
+  MED_FIELD_WRONLY_DRIVER<int> *aInvalidMedWrFieldDriver22_2 =
+    new MED_FIELD_WRONLY_DRIVER<int>(emptyfilename, aField_1);
   //Trying open not existing file and file with empty name
   CPPUNIT_ASSERT_THROW(aInvalidMedWrFieldDriver22_2->open(), MEDEXCEPTION);
 
@@ -271,8 +271,8 @@ void MEDMEMTest::testMedFieldDriver22()
   //  TEST3: Writing field in empty file without mesh  //
   ///////////////////////////////////////////////////////
   //Creation Invalid Write Only MedFieldDriver22
-   MED_FIELD_WRONLY_DRIVER22<int> *aInvalidMedWrFieldDriver22_3 =
-     new MED_FIELD_WRONLY_DRIVER22<int>(emptyfile_wr, aField);
+   MED_FIELD_WRONLY_DRIVER<int> *aInvalidMedWrFieldDriver22_3 =
+     new MED_FIELD_WRONLY_DRIVER<int>(emptyfile_wr, aField);
 
   aInvalidMedWrFieldDriver22_3->open();
   //#ifdef ENABLE_FORCED_FAILURES
@@ -287,8 +287,8 @@ void MEDMEMTest::testMedFieldDriver22()
   //////////////////////////////////////////////
 
   //Creation Invalid Write Only MedFieldDriver22
-  MED_FIELD_WRONLY_DRIVER22<int> *aInvalidMedWrFieldDriver22_4 =
-    new MED_FIELD_WRONLY_DRIVER22<int>(other_file_wr, aField);
+  MED_FIELD_WRONLY_DRIVER<int> *aInvalidMedWrFieldDriver22_4 =
+    new MED_FIELD_WRONLY_DRIVER<int>(other_file_wr, aField);
   aInvalidMedWrFieldDriver22_4->open();
   //#ifdef ENABLE_FORCED_FAILURES
   //CPPUNIT_ASSERT_THROW(aInvalidMedWrFieldDriver22_4->write(), MEDEXCEPTION);
@@ -301,8 +301,8 @@ void MEDMEMTest::testMedFieldDriver22()
   ////////////////////////
 
   //Creation correct Write Only MedFieldDriver22
-  MED_FIELD_WRONLY_DRIVER22<int> *aMedWrFieldDriver22 =
-    new MED_FIELD_WRONLY_DRIVER22<int>(filename_wr, aField);
+  MED_FIELD_WRONLY_DRIVER<int> *aMedWrFieldDriver22 =
+    new MED_FIELD_WRONLY_DRIVER<int>(filename_wr, aField);
 
   //Check driver
   CPPUNIT_ASSERT(aMedWrFieldDriver22);
@@ -382,7 +382,7 @@ void MEDMEMTest::testMedFieldDriver22()
   }
 
   //Default constructor
-  MED_FIELD_WRONLY_DRIVER22<int> aMedWrFieldDriver22Cpy_1;
+  MED_FIELD_WRONLY_DRIVER<int> aMedWrFieldDriver22Cpy_1;
 
   //Test (void operator =) defined in GENDRIVER class
   aMedWrFieldDriver22Cpy_1 = *aMedWrFieldDriver22;
@@ -391,7 +391,7 @@ void MEDMEMTest::testMedFieldDriver22()
   CPPUNIT_ASSERT(aMedWrFieldDriver22Cpy_1.GENDRIVER::operator==(*aMedWrFieldDriver22));
 
   //Test copy constructor
-  MED_FIELD_WRONLY_DRIVER22<int> aMedWrFieldDriver22Cpy_2 (*aMedWrFieldDriver22);
+  MED_FIELD_WRONLY_DRIVER<int> aMedWrFieldDriver22Cpy_2 (*aMedWrFieldDriver22);
   CPPUNIT_ASSERT_EQUAL(aMedWrFieldDriver22Cpy_2, *aMedWrFieldDriver22);
 
   //Test (friend ostream & operator <<) defined GENDRIVER class in MEDMEM_GenDriver.hxx
@@ -409,8 +409,8 @@ void MEDMEMTest::testMedFieldDriver22()
   /////////////////////////////////////
 
   //Creation Invalid Read/Write MedFieldDriver22 (file not exist)
-  MED_FIELD_RDWR_DRIVER22<int> *aInvalidMedRdWrFieldDriver22_1 =
-    new MED_FIELD_RDWR_DRIVER22<int>(fileNotExist_wr, aField_1);
+  MED_FIELD_RDWR_DRIVER<int> *aInvalidMedRdWrFieldDriver22_1 =
+    new MED_FIELD_RDWR_DRIVER<int>(fileNotExist_wr, aField_1);
   //Trying open not existing file
   CPPUNIT_ASSERT_THROW(aInvalidMedRdWrFieldDriver22_1->open(), MEDEXCEPTION);
 
@@ -418,16 +418,16 @@ void MEDMEMTest::testMedFieldDriver22()
   //  TEST2: Open file with empty file name  //
   /////////////////////////////////////////////
   //Creation Invalid Read/Write MedFieldDriver22 (empty file name)
-  MED_FIELD_RDWR_DRIVER22<int> *aInvalidMedRdWrFieldDriver22_2 =
-    new MED_FIELD_RDWR_DRIVER22<int>(emptyfilename, aField_1);
+  MED_FIELD_RDWR_DRIVER<int> *aInvalidMedRdWrFieldDriver22_2 =
+    new MED_FIELD_RDWR_DRIVER<int>(emptyfilename, aField_1);
   //Trying open not existing file and file with empty name
   CPPUNIT_ASSERT_THROW(aInvalidMedRdWrFieldDriver22_2->open(), MEDEXCEPTION);
 
   /////////////////////////////////////////////////////
   //  TEST3: Reading field from file without fields  //
   /////////////////////////////////////////////////////
-  MED_FIELD_RDWR_DRIVER22<int> *aInvalidMedRdWrFieldDriver22_3 =
-    new MED_FIELD_RDWR_DRIVER22<int>(filenameWithOutFileds_rdwr, aField_1);
+  MED_FIELD_RDWR_DRIVER<int> *aInvalidMedRdWrFieldDriver22_3 =
+    new MED_FIELD_RDWR_DRIVER<int>(filenameWithOutFileds_rdwr, aField_1);
   aInvalidMedRdWrFieldDriver22_3->open();
   aInvalidMedRdWrFieldDriver22_3->setFieldName(fieldname);
   //Trying read field from file
@@ -439,8 +439,8 @@ void MEDMEMTest::testMedFieldDriver22()
   ///////////////////////////////////////////////////////
 
   //Creation Invalid Read/Write MedFieldDriver22
-   MED_FIELD_RDWR_DRIVER22<int> *aInvalidMedRdWrFieldDriver22_4 =
-     new MED_FIELD_RDWR_DRIVER22<int>(emptyfile_rdwr, aField);
+   MED_FIELD_RDWR_DRIVER<int> *aInvalidMedRdWrFieldDriver22_4 =
+     new MED_FIELD_RDWR_DRIVER<int>(emptyfile_rdwr, aField);
 
   aInvalidMedRdWrFieldDriver22_4->open();
   //#ifdef ENABLE_FORCED_FAILURES
@@ -453,8 +453,8 @@ void MEDMEMTest::testMedFieldDriver22()
   //////////////////////////////////////////////
 
   //Creation Invalid Read/Write MedFieldDriver22
-  MED_FIELD_RDWR_DRIVER22<int> *aInvalidMedRdWrFieldDriver22_5 =
-    new MED_FIELD_RDWR_DRIVER22<int>(other_file_wr, aField);
+  MED_FIELD_RDWR_DRIVER<int> *aInvalidMedRdWrFieldDriver22_5 =
+    new MED_FIELD_RDWR_DRIVER<int>(other_file_wr, aField);
   aInvalidMedRdWrFieldDriver22_5->open();
   //#ifdef ENABLE_FORCED_FAILURES
   //CPPUNIT_ASSERT_THROW(aInvalidMedRdWrFieldDriver22_5->write(), MEDEXCEPTION);
@@ -466,8 +466,8 @@ void MEDMEMTest::testMedFieldDriver22()
   ////////////////////////
 
   //Creation correct Read/Write MedFieldDriver22
-  MED_FIELD_RDWR_DRIVER22<double> *aMedRdWrFieldDriver22 =
-    new MED_FIELD_RDWR_DRIVER22<double>(filename_rdwr, aField_2);
+  MED_FIELD_RDWR_DRIVER<double> *aMedRdWrFieldDriver22 =
+    new MED_FIELD_RDWR_DRIVER<double>(filename_rdwr, aField_2);
 
   //Check driver
   CPPUNIT_ASSERT(aMedRdWrFieldDriver22);
@@ -569,7 +569,7 @@ void MEDMEMTest::testMedFieldDriver22()
   }
 
   //Default constructor
-  MED_FIELD_RDWR_DRIVER22<double> aMedRdWrFieldDriver22Cpy_1;
+  MED_FIELD_RDWR_DRIVER<double> aMedRdWrFieldDriver22Cpy_1;
 
   //Test (void operator =) defined in GENDRIVER class
   aMedRdWrFieldDriver22Cpy_1 = *aMedRdWrFieldDriver22;
@@ -578,7 +578,7 @@ void MEDMEMTest::testMedFieldDriver22()
   CPPUNIT_ASSERT(aMedRdWrFieldDriver22Cpy_1.GENDRIVER::operator==(*aMedRdWrFieldDriver22));
 
   //Test copy constructor
-  MED_FIELD_RDWR_DRIVER22<double> aMedRdWrFieldDriver22Cpy_2 (*aMedRdWrFieldDriver22);
+  MED_FIELD_RDWR_DRIVER<double> aMedRdWrFieldDriver22Cpy_2 (*aMedRdWrFieldDriver22);
   CPPUNIT_ASSERT_EQUAL(aMedRdWrFieldDriver22Cpy_2, *aMedRdWrFieldDriver22);
 
   //Test (friend ostream & operator <<) defined GENDRIVER class in MEDMEM_GenDriver.hxx

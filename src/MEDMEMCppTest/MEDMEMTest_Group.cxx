@@ -69,7 +69,7 @@ void MEDMEMTest::testGroup()
   CPPUNIT_ASSERT(NumberOfFamillies != 0);
 
   vector<FAMILY*> aFamilies = myGroup->getFamilies();
-  CPPUNIT_ASSERT(NumberOfFamillies == aFamilies.size());
+  CPPUNIT_ASSERT(NumberOfFamillies == (int)aFamilies.size());
   list<FAMILY*> aList;
 
   for (int j=1;j<=NumberOfFamillies;j++)
@@ -90,7 +90,6 @@ void MEDMEMTest::testGroup()
 
   GROUP* myGroup2 = new GROUP(*myGroup);
 
-  cout<<*myGroup2<<endl;
   ostringstream os;
   os << *myGroup2;
   CPPUNIT_ASSERT(os.str() != "");
@@ -131,7 +130,6 @@ void MEDMEMTest::testGroup()
   {
     try{
       GROUP *myGroup5=new GROUP("newFamily", aList);
-      cout<< *myGroup5 <<endl;
       myGroup5->removeReference();
     }
     catch (const std::exception &e)

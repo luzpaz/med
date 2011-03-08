@@ -45,19 +45,14 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_GibiMeshDriver.cxx \
 	MEDMEMTest_Grid.cxx \
 	MEDMEMTest_Group.cxx \
-	MEDMEMTest_Med.cxx \
-	MEDMEMTest_MedFieldDriver21.cxx \
-	MEDMEMTest_MedFieldDriver22.cxx \
-	MEDMEMTest_MedMedDriver21.cxx \
-	MEDMEMTest_MedMedDriver22.cxx \
-	MEDMEMTest_MedMeshDriver21.cxx \
-	MEDMEMTest_MedMeshDriver22.cxx \
+	MEDMEMTest_MedFileBrowser.cxx \
+	MEDMEMTest_MedFieldDriver.cxx \
+	MEDMEMTest_MedMeshDriver.cxx \
 	MEDMEMTest_MedVersion.cxx \
 	MEDMEMTest_MeshAndMeshing.cxx \
 	MEDMEMTest_ModulusArray.cxx \
 	MEDMEMTest_PartialDescendingConnectivity.cxx \
 	MEDMEMTest_PointerOf.cxx \
-	MEDMEMTest_PolyhedronArray.cxx \
 	MEDMEMTest_PorflowMeshDriver.cxx \
 	MEDMEMTest_Remapper.cxx \
 	MEDMEMTest_SkyLineArray.cxx \
@@ -69,12 +64,10 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_VtkMeshDriver.cxx \
 	MEDMEMTest_nArray.cxx \
 	MEDMEMTest_Utils.hxx \
-	MEDMEMTest_Utils.cxx \
-	MEDMEMTest_MeshFuse.cxx
+	MEDMEMTest_Utils.cxx
 
 libMEDMEMCppTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED2_INCLUDES) $(HDF5_INCLUDES) \
-	-I$(srcdir)/../MEDMEM -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases -I$(srcdir)/../INTERP_KERNEL/GaussPoints \
-	-I$(srcdir)/../MEDWrapper/V2_1/Core
+	-I$(srcdir)/../MEDMEM -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases
 libMEDMEMCppTest_la_LDFLAGS= $(MED2_LIBS) @CPPUNIT_LIBS@ \
 	../MEDMEM/libmedmem.la
 
@@ -84,16 +77,14 @@ if MED_ENABLE_KERNEL
 endif
 
 # Executables targets
-bin_PROGRAMS = TestMEDMEM \
+bin_PROGRAMS = \
+	TestMEDMEM \
 	MEDMEMTest_Array_fault \
 	MEDMEMTest_Connectivity_fault \
 	MEDMEMTest_Coordinate_fault \
 	MEDMEMTest_Family_fault \
 	MEDMEMTest_Field_fault \
 	MEDMEMTest_Grid_fault \
-	MEDMEMTest_MedFieldDriver21_fault \
-	MEDMEMTest_MedMedDriver21_fault \
-	MEDMEMTest_MedMedDriver22_fault \
 	MEDMEMTest_MeshAndMeshing_fault \
 	MEDMEMTest_Support_fault \
 	MEDMEMTest_VtkFieldDriver_fault \
@@ -106,16 +97,13 @@ dist_MEDMEMTest_Coordinate_fault_SOURCES= MEDMEMTest_Coordinate_fault.cxx
 dist_MEDMEMTest_Family_fault_SOURCES= MEDMEMTest_Family_fault.cxx
 dist_MEDMEMTest_Field_fault_SOURCES= MEDMEMTest_Field_fault.cxx
 dist_MEDMEMTest_Grid_fault_SOURCES= MEDMEMTest_Grid_fault.cxx
-dist_MEDMEMTest_MedFieldDriver21_fault_SOURCES= MEDMEMTest_MedFieldDriver21_fault.cxx
-dist_MEDMEMTest_MedMedDriver21_fault_SOURCES= MEDMEMTest_MedMedDriver21_fault.cxx
-dist_MEDMEMTest_MedMedDriver22_fault_SOURCES= MEDMEMTest_MedMedDriver22_fault.cxx
 dist_MEDMEMTest_MeshAndMeshing_fault_SOURCES= MEDMEMTest_MeshAndMeshing_fault.cxx
 dist_MEDMEMTest_Support_fault_SOURCES= MEDMEMTest_Support_fault.cxx
 dist_MEDMEMTest_VtkFieldDriver_fault_SOURCES= MEDMEMTest_VtkFieldDriver_fault.cxx
 dist_MEDMEMTest_VtkMeshDriver_fault_SOURCES= MEDMEMTest_VtkMeshDriver_fault.cxx
 
 LDADD= $(MED2_LIBS) $(libMEDMEMCppTest_la_LDFLAGS) -lm \
-	../MEDWrapper/V2_1/Core/libmed_V2_1.la ../MEDMEM/libmedmem.la \
+	 ../MEDMEM/libmedmem.la \
 	../INTERP_KERNEL/libinterpkernel.la libMEDMEMCppTest.la
 if MED_ENABLE_KERNEL
      LDADD+= -lSALOMEBasics
