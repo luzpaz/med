@@ -135,7 +135,6 @@ class MEDLoaderTest(unittest.TestCase):
         VAL2=-1111111111111.;
         name1="AField";
         name3="AMesh1";
-        name2="AMesh2";
         f1=MEDLoaderDataForTest.buildVecFieldOnCells_1();
         f1.getMesh().setName(name3);
         f1.setName(name1);
@@ -146,14 +145,11 @@ class MEDLoaderTest(unittest.TestCase):
         f1.setTime(10.14,18,19);
         f1.getArray().setIJ(0,0,VAL2);
         MEDLoader.MEDLoader.WriteFieldUsingAlreadyWrittenMesh(fileName,f1);
-        f1.getMesh().setName(name2);
+        f1.getMesh().setName(name3);
         f1.setTime(10.55,28,29);
         f1.getArray().setIJ(0,0,3*VAL1);
-        MEDLoader.MEDLoader.WriteField(fileName,f1,False);
+        MEDLoader.MEDLoader.WriteFieldUsingAlreadyWrittenMesh(fileName,f1);
         vec=MEDLoader.MEDLoader.GetMeshNamesOnField(fileName,name1);
-        self.assertEqual(2,len(vec));
-        self.assertTrue(vec[0]==name3);
-        self.assertTrue(vec[1]==name2);
         f1.setTime(10.66,38,39);
         f1.getArray().setIJ(0,0,3*VAL2);
         MEDLoader.MEDLoader.WriteFieldUsingAlreadyWrittenMesh(fileName,f1);
@@ -163,7 +159,7 @@ class MEDLoaderTest(unittest.TestCase):
         #ON NODES
         f1=MEDLoaderDataForTest.buildVecFieldOnNodes_1();
         f1.setName(name1);
-        f1.getMesh().setName(name2);
+        f1.getMesh().setName(name3);
         f1.setTime(110.,8,9);
         MEDLoader.MEDLoader.WriteFieldUsingAlreadyWrittenMesh(fileName,f1);
         f1.setTime(110.,108,109);
@@ -175,39 +171,35 @@ class MEDLoaderTest(unittest.TestCase):
         MEDLoader.MEDLoader.WriteFieldUsingAlreadyWrittenMesh(fileName,f1);
         #
         it1=MEDLoader.MEDLoader.GetCellFieldIterations(fileName,name3,name1);
-        self.assertEqual(2,len(it1));
+        self.assertEqual(5,len(it1));
         self.assertEqual(8,it1[0][0]); self.assertEqual(9,it1[0][1]);
         self.assertEqual(18,it1[1][0]); self.assertEqual(19,it1[1][1]);
-        it2=MEDLoader.MEDLoader.GetCellFieldIterations(fileName,name2,name1);
-        self.assertEqual(3,len(it2));
-        self.assertEqual(28,it2[0][0]); self.assertEqual(29,it2[0][1]);
-        self.assertEqual(38,it2[1][0]); self.assertEqual(39,it2[1][1]);
-        self.assertEqual(48,it2[2][0]); self.assertEqual(49,it2[2][1]);
-        it3=MEDLoader.MEDLoader.GetNodeFieldIterations(fileName,name2,name1);
+        self.assertEqual(28,it1[2][0]); self.assertEqual(29,it1[2][1]);
+        self.assertEqual(38,it1[3][0]); self.assertEqual(39,it1[3][1]);
+        self.assertEqual(48,it1[4][0]); self.assertEqual(49,it1[4][1]);
+        it3=MEDLoader.MEDLoader.GetNodeFieldIterations(fileName,name3,name1);
         self.assertEqual(3,len(it3));
         self.assertEqual(8,it3[0][0]); self.assertEqual(9,it3[0][1]);
         self.assertEqual(108,it3[1][0]); self.assertEqual(109,it3[1][1]);
         self.assertEqual(208,it3[2][0]); self.assertEqual(209,it3[2][1]);
-        it4=MEDLoader.MEDLoader.GetNodeFieldIterations(fileName,name3,name1);
-        self.assertTrue(len(it4)==0);
         #
         #
         f1=MEDLoader.MEDLoader.ReadFieldCell(fileName,name3,0,name1,8,9);
         self.assertAlmostEqual(VAL1,f1.getArray().getIJ(0,0),13);
         f1=MEDLoader.MEDLoader.ReadFieldCell(fileName,name3,0,name1,18,19);
         self.assertAlmostEqual(VAL2,f1.getArray().getIJ(0,0),13);
-        f1=MEDLoader.MEDLoader.ReadFieldCell(fileName,name2,0,name1,28,29);
+        f1=MEDLoader.MEDLoader.ReadFieldCell(fileName,name3,0,name1,28,29);
         self.assertAlmostEqual(3*VAL1,f1.getArray().getIJ(0,0),13);
-        f1=MEDLoader.MEDLoader.ReadFieldCell(fileName,name2,0,name1,38,39);
+        f1=MEDLoader.MEDLoader.ReadFieldCell(fileName,name3,0,name1,38,39);
         self.assertAlmostEqual(3*VAL2,f1.getArray().getIJ(0,0),13);
-        f1=MEDLoader.MEDLoader.ReadFieldCell(fileName,name2,0,name1,48,49);
+        f1=MEDLoader.MEDLoader.ReadFieldCell(fileName,name3,0,name1,48,49);
         self.assertAlmostEqual(4*VAL2,f1.getArray().getIJ(0,0),13);
         #
-        f1=MEDLoader.MEDLoader.ReadFieldNode(fileName,name2,0,name1,8,9);
+        f1=MEDLoader.MEDLoader.ReadFieldNode(fileName,name3,0,name1,8,9);
         self.assertAlmostEqual(71.,f1.getArray().getIJ(0,3),13);
-        f1=MEDLoader.MEDLoader.ReadFieldNode(fileName,name2,0,name1,108,109);
+        f1=MEDLoader.MEDLoader.ReadFieldNode(fileName,name3,0,name1,108,109);
         self.assertAlmostEqual(VAL1,f1.getArray().getIJ(0,3),13);
-        f1=MEDLoader.MEDLoader.ReadFieldNode(fileName,name2,0,name1,208,209);
+        f1=MEDLoader.MEDLoader.ReadFieldNode(fileName,name3,0,name1,208,209);
         self.assertAlmostEqual(VAL2,f1.getArray().getIJ(0,3),13);
         pass
 
@@ -492,7 +484,7 @@ class MEDLoaderTest(unittest.TestCase):
         array.setValues(arr2,12,2)
         array.setInfoOnComponent(0,"plkj [mm]");
         array.setInfoOnComponent(1,"pqqqss [mm]");
-        f2.setTime(3.17,2,7);
+        f2.setTime(3.14,2,7);
         f2.checkCoherency();
         #
         MEDLoader.MEDLoader.WriteField(fileName,f1,True);
