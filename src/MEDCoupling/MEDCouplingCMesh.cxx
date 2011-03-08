@@ -447,6 +447,42 @@ void MEDCouplingCMesh::setCoords(DataArrayDouble *coordsX, DataArrayDouble *coor
   declareAsNew();
 }
 
+/*!
+ * See MEDCouplingUMesh::checkTypeConsistencyAndContig for more information
+ */
+DataArrayInt *MEDCouplingCMesh::checkTypeConsistencyAndContig(const std::vector<int>& code, const std::vector<const DataArrayInt *>& idsPerType) const throw(INTERP_KERNEL::Exception)
+{
+  int sz=code.size();
+  if(sz!=0 && sz!=3)
+    throw INTERP_KERNEL::Exception("MEDCouplingCMesh::checkTypeConsistencyAndContig : code should be of size 2 exactly !");
+  if(code[0]==INTERP_KERNEL::NORM_ERROR)
+    {
+      int nbNodes=getNumberOfNodes();
+      if(code[2]==-1)
+        {
+          if(code[1]==nbNodes)
+            return 0;
+          else
+            throw INTERP_KERNEL::Exception("MEDCouplingCMesh::checkTypeConsistencyAndContig : number of nodes mismatch !");
+        }
+      else
+        idsPerType[code[2]]->deepCpy();
+    }
+  else
+    {
+      int nbCells=getNumberOfCellsWithType((INTERP_KERNEL::NormalizedCellType)code[0]);
+      if(code[2]==-1)
+        {
+          if(code[1]==nbCells)
+            return 0;
+          else
+            throw INTERP_KERNEL::Exception("MEDCouplingCMesh::checkTypeConsistencyAndContig : number of cells mismatch !");
+        }
+      else
+        idsPerType[code[2]]->deepCpy();
+    }
+}
+
 MEDCouplingUMesh *MEDCouplingCMesh::buildUnstructured() const throw(INTERP_KERNEL::Exception)
 {
   int spaceDim=getSpaceDimension();

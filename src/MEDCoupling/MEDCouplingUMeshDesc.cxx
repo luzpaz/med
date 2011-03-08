@@ -174,6 +174,11 @@ void MEDCouplingUMeshDesc::setConnectivity(DataArrayInt *descConn, DataArrayInt 
   computeTypes();
 }
 
+DataArrayInt *MEDCouplingUMeshDesc::checkTypeConsistencyAndContig(const std::vector<int>& code, const std::vector<const DataArrayInt *>& idsPerType) const throw(INTERP_KERNEL::Exception)
+{
+  throw INTERP_KERNEL::Exception("Not implemented yet !");
+}
+
 void MEDCouplingUMeshDesc::getTinySerializationInformation(std::vector<double>& tinyInfoD, std::vector<int>& tinyInfo, std::vector<std::string>& littleStrings) const
 {
   MEDCouplingPointSet::getTinySerializationInformation(tinyInfoD,tinyInfo,littleStrings);

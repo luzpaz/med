@@ -1763,17 +1763,6 @@ MEDCouplingUMesh *MEDCouplingUMesh::buildPartOfMySelfKeepCoords(const int *begin
 {
   checkFullyDefined();
   MEDCouplingUMesh *ret=MEDCouplingUMesh::New();
-  std::string name(getName());
-  int sz=strlen(PART_OF_NAME);
-  if((int)name.length()>=sz)
-    name=name.substr(0,sz);
-  if(name!=PART_OF_NAME)
-    {
-      std::ostringstream stream; stream << PART_OF_NAME << getName();
-      ret->setName(stream.str().c_str());
-    }
-  else
-    ret->setName(getName());
   ret->_mesh_dim=_mesh_dim;
   ret->setCoords(_coords);
   int nbOfElemsRet=end-begin;
@@ -1800,6 +1789,18 @@ MEDCouplingUMesh *MEDCouplingUMesh::buildPartOfMySelfKeepCoords(const int *begin
   ret->_types=types;
   connRetArr->decrRef();
   connIndexRetArr->decrRef();
+  ret->copyTinyInfoFrom(this);
+  std::string name(getName());
+  int sz=strlen(PART_OF_NAME);
+  if((int)name.length()>=sz)
+    name=name.substr(0,sz);
+  if(name!=PART_OF_NAME)
+    {
+      std::ostringstream stream; stream << PART_OF_NAME << getName();
+      ret->setName(stream.str().c_str());
+    }
+  else
+    ret->setName(getName());
   return ret;
 }
 
@@ -3241,6 +3242,88 @@ namespace ParaMEDMEMImpl
     const int *_conn;
     int _val;
   };
+
+  class ConnReader2
+  {
+  public:
+    ConnReader2(const int *c, int val):_conn(c),_val(val) { }
+    bool operator() (const int& pos) { return _conn[pos]==_val; }
+  private:
+    const int *_conn;
+    int _val;
+  };
+}
+
+/*!
+ * This method is used to check that this has contiguous cell type in same order than described in 'code'.
+ * Format of 'code' is the following. 'code' should be of size 3*n and non empty. If not an exception is thrown.
+ * foreach k in [0,n) on 3*k pos represent the geometric type and 3*k+1 number of elements of type 3*k.
+ * 3*k+2 refers if different from -1 the pos in 'idsPerType' to get the corresponding array.
+ * If 2 or more same geometric type is in 'code' and exception is thrown too.
+ *
+ * This method fistly checks
+ * If it exists k so that 3*k geometric type is not in geometric types of this an exception will be thrown.
+ * If it exists k so that 3*k geometric type exists but the number of consecutive cell types does not match,
+ * an exception is thrown too.
+ * 
+ * If all geometric types in 'code' are exactly those in 'this' null pointer is returned.
+ * If it exists a geometric type in 'this' \b not in 'code' \b no exception is thrown and a DataArrayInt instance is returned that the user as the responsability
+ * to deallocate.
+ */
+DataArrayInt *MEDCouplingUMesh::checkTypeConsistencyAndContig(const std::vector<int>& code, const std::vector<const DataArrayInt *>& idsPerType) const throw(INTERP_KERNEL::Exception)
+{
+  if(code.empty())
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::checkTypeConsistencyAndContig : code is empty, should not !");
+  int sz=code.size();
+  std::size_t n=sz/3;
+  if(sz%3!=0)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::checkTypeConsistencyAndContig : code size is NOT even !");
+  std::vector<INTERP_KERNEL::NormalizedCellType> types;
+  int nb=0;
+  for(std::size_t i=0;i<n;i++)
+    if(std::find(types.begin(),types.end(),(INTERP_KERNEL::NormalizedCellType)code[3*i])==types.end())
+      {
+        types.push_back((INTERP_KERNEL::NormalizedCellType)code[3*i]);
+        nb+=code[3*i+1];
+        if(_types.find((INTERP_KERNEL::NormalizedCellType)code[3*i])==_types.end())
+          throw INTERP_KERNEL::Exception("MEDCouplingUMesh::checkTypeConsistencyAndContig : expected geo types not in this !");
+      }
+  if(types.size()!=n)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::checkTypeConsistencyAndContig : code contains duplication of types in unstructured mesh !");
+  if(idsPerType.empty())
+    {
+      if(!checkConsecutiveCellTypesAndOrder(&types[0],&types[0]+types.size()))
+        throw INTERP_KERNEL::Exception("MEDCouplingUMesh::checkTypeConsistencyAndContig : non contiguous type !");
+      if(types.size()==_types.size())
+        return 0;
+    }
+  DataArrayInt *ret=DataArrayInt::New();
+  ret->alloc(nb,1);
+  int *retPtr=ret->getPointer();
+  const int *connI=_nodal_connec_index->getConstPointer();
+  const int *conn=_nodal_connec->getConstPointer();
+  int nbOfCells=getNumberOfCells();
+  const int *i=connI;
+  int kk=0;
+  for(std::vector<INTERP_KERNEL::NormalizedCellType>::const_iterator it=types.begin();it!=types.end();it++,kk++)
+    {
+      i=std::find_if(i,connI+nbOfCells,ParaMEDMEMImpl::ConnReader2(conn,(int)(*it)));
+      int offset=std::distance(connI,i);
+      if(code[3*kk+2]==-1)
+        {
+          const int *j=std::find_if(i+1,connI+nbOfCells,ParaMEDMEMImpl::ConnReader(conn,(int)(*it)));
+          int pos2=std::distance(i,j);
+          for(int k=0;k<pos2;k++)
+            *retPtr++=k+offset;
+          i=j;
+        }
+      else
+        {
+          retPtr=std::transform(idsPerType[code[3*kk+2]]->getConstPointer(),idsPerType[code[3*kk+2]]->getConstPointer()+idsPerType[code[3*kk+2]]->getNbOfElems(),
+                                retPtr,std::bind2nd(std::plus<int>(),offset));
+        }
+    }
+  return ret;
 }
 
 /*!
@@ -3451,7 +3534,7 @@ DataArrayInt *MEDCouplingUMesh::convertCellArrayPerGeoType(const DataArrayInt *d
  * cells whose ids is in 'idsPerGeoType' array.
  * This method conserves coords and name of mesh.
  */
-MEDCouplingUMesh *MEDCouplingUMesh::keepSpecifiedCells(INTERP_KERNEL::NormalizedCellType type, const std::vector<int>& idsPerGeoType) const
+MEDCouplingUMesh *MEDCouplingUMesh::keepSpecifiedCells(INTERP_KERNEL::NormalizedCellType type, const int *idsPerGeoTypeBg, const int *idsPerGeoTypeEnd) const
 {
   std::vector<int> idsTokeep;
   int nbOfCells=getNumberOfCells();
@@ -3461,7 +3544,7 @@ MEDCouplingUMesh *MEDCouplingUMesh::keepSpecifiedCells(INTERP_KERNEL::Normalized
       idsTokeep.push_back(i);
     else
       {
-        if(std::find(idsPerGeoType.begin(),idsPerGeoType.end(),j)!=idsPerGeoType.end())
+        if(std::find(idsPerGeoTypeBg,idsPerGeoTypeEnd,j)!=idsPerGeoTypeEnd)
           idsTokeep.push_back(i);
         j++;
       }
@@ -3472,8 +3555,7 @@ MEDCouplingUMesh *MEDCouplingUMesh::keepSpecifiedCells(INTERP_KERNEL::Normalized
       ret->decrRef();
       return 0;
     }
-  ret2->setName(getName());
-  ret2->setDescription(getDescription());
+  ret2->copyTinyInfoFrom(this);
   return ret2;
 }
 

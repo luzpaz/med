@@ -182,6 +182,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayDouble::fromCylToCart;
 %newobject ParaMEDMEM::DataArrayDouble::fromSpherToCart;
 %newobject ParaMEDMEM::MEDCouplingMesh::deepCpy;
+%newobject ParaMEDMEM::MEDCouplingMesh::checkTypeConsistencyAndContig;
 %newobject ParaMEDMEM::MEDCouplingMesh::getCoordinatesAndOwner;
 %newobject ParaMEDMEM::MEDCouplingMesh::getBarycenterAndOwner;
 %newobject ParaMEDMEM::MEDCouplingMesh::buildOrthogonalField;
@@ -300,6 +301,7 @@ namespace ParaMEDMEM
     virtual bool isEqual(const MEDCouplingMesh *other, double prec) const throw(INTERP_KERNEL::Exception);
     virtual bool isEqualWithoutConsideringStr(const MEDCouplingMesh *other, double prec) const throw(INTERP_KERNEL::Exception) = 0;
     virtual void copyTinyStringsFrom(const MEDCouplingMesh *other) throw(INTERP_KERNEL::Exception);
+    virtual void copyTinyInfoFrom(const MEDCouplingMesh *other) throw(INTERP_KERNEL::Exception);
     virtual void checkCoherency() const throw(INTERP_KERNEL::Exception) = 0;
     virtual int getNumberOfCells() const throw(INTERP_KERNEL::Exception) = 0;
     virtual int getNumberOfNodes() const throw(INTERP_KERNEL::Exception) = 0;
@@ -494,6 +496,15 @@ namespace ParaMEDMEM
           PyList_SetItem(res,0,obj0);
           PyList_SetItem(res,1,obj1);
           return res;
+        }
+
+        DataArrayInt *checkTypeConsistencyAndContig(PyObject *li, PyObject *li2) const throw(INTERP_KERNEL::Exception)
+        {
+          std::vector<int> code;
+          std::vector<const DataArrayInt *> idsPerType;
+          convertPyObjToVecDataArrayIntCst(li2,idsPerType);
+          convertPyToNewIntArr3(li,code);
+          return self->checkTypeConsistencyAndContig(code,idsPerType);
         }
 
          void translate(PyObject *vector) throw(INTERP_KERNEL::Exception)
@@ -885,9 +896,9 @@ namespace ParaMEDMEM
 
       PyObject *keepSpecifiedCells(INTERP_KERNEL::NormalizedCellType type, PyObject *ids) const throw(INTERP_KERNEL::Exception)
       {
-        std::vector<int> idsPerGeoType;
-        convertPyToNewIntArr3(ids,idsPerGeoType);
-        MEDCouplingUMesh *ret=self->keepSpecifiedCells(type,idsPerGeoType);
+        int size;
+        INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(ids,&size);
+        MEDCouplingUMesh *ret=self->keepSpecifiedCells(type,tmp,tmp+size);
         return SWIG_NewPointerObj(SWIG_as_voidptr(ret),SWIGTYPE_p_ParaMEDMEM__MEDCouplingUMesh, SWIG_POINTER_OWN | 0 );
       }
 
