@@ -62,6 +62,7 @@ namespace ParaMEDMEM
     void setName(const char *name);
     void setDescription(const char *descr);
     void write(const char *fName, bool writeFromScratch) const throw(INTERP_KERNEL::Exception);
+    void display() const throw(INTERP_KERNEL::Exception);
     std::string simpleRepr() const;
     MEDCalculatorDBFieldReal *operator()(const MEDCalculatorDBRangeSelection& t, const MEDCalculatorDBRangeSelection& p, const MEDCalculatorDBRangeSelection& c) throw(INTERP_KERNEL::Exception);
     const MEDCalculatorDBFieldReal& operator=(const MEDCalculatorDBFieldReal& other) throw(INTERP_KERNEL::Exception);

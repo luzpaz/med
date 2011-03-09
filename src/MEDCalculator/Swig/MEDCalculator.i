@@ -101,6 +101,7 @@ namespace ParaMEDMEM
     std::string getInfoOnComponent(int i) const throw(INTERP_KERNEL::Exception);
     void setInfoOnComponent(int i, const char *info) throw(INTERP_KERNEL::Exception);
     void write(const char *fName, bool writeFromScratch) const throw(INTERP_KERNEL::Exception);
+    void display() const throw(INTERP_KERNEL::Exception);
     void applyFunc(const char *func) throw(INTERP_KERNEL::Exception);
     MEDCalculatorDBField *operator^(const MEDCalculatorDBFieldReal& other) const throw(INTERP_KERNEL::Exception);
     MEDCalculatorDBField *dot(const MEDCalculatorDBFieldReal& other) const throw(INTERP_KERNEL::Exception);

@@ -26,6 +26,10 @@
 #include "MEDCouplingUMesh.hxx"
 #include "MEDCouplingMemArray.hxx"
 #include "MEDCouplingFieldDouble.hxx"
+#include "MEDCouplingFieldOverTime.hxx"
+
+#include "MEDCouplingFieldOverTimeServant.hxx"
+#include "SALOME_NamingService.hxx"
 
 #include <cmath>
 
@@ -126,6 +130,47 @@ void MEDCalculatorDBFieldReal::write(const char *fName, bool writeFromScratch) c
   MEDLoader::WriteUMesh(fName,mesh,writeFromScratch);
   for(std::vector<int>::const_iterator iter=ids.begin();iter!=ids.end();iter++)
     _time_steps[*iter]->write(fName,_name,_description);
+}
+
+void MEDCalculatorDBFieldReal::display() const throw(INTERP_KERNEL::Exception)
+{
+  fetchData();
+  std::vector<int> ids=_t.getIds(_time_steps.size());
+  std::vector< MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> > fs2(ids.size());
+  int ii=0;
+  for(std::vector<int>::const_iterator iter=ids.begin();iter!=ids.end();iter++)
+    fs2[ii++]=_time_steps[*iter]->getFieldWithoutQuestion(_c_labels.size(),_c);
+  std::vector<MEDCouplingFieldDouble *> fs(fs2.begin(),fs2.end());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldOverTime> fot=MEDCouplingFieldOverTime::New(fs);
+  //
+  int argc=0;
+  CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
+  CORBA::Object_var obj=orb->resolve_initial_references("RootPOA");
+  PortableServer::POA_var poa=PortableServer::POA::_narrow(obj);
+  PortableServer::POAManager_var mgr=poa->the_POAManager();
+  mgr->activate();
+  MEDCouplingFieldOverTimeServant *fots=new MEDCouplingFieldOverTimeServant(fot);
+  SALOME_MED::MEDCouplingFieldOverTimeCorbaInterface_var fotPtr=fots->_this();
+  //
+  SALOME_NamingService ns(orb);
+  ns.Change_Directory("/Containers");
+  std::vector<std::string> subdirs=ns.list_subdirs();
+  std::ostringstream path;
+  path << "/Containers/" << subdirs[0] << "/FactoryServer/PARAVIS_inst_1";
+  //
+  CORBA::Object_var paravis=ns.Resolve(path.str().c_str());
+  CORBA::Request_var req=paravis->_request("ExecuteScript");
+  CORBA::NVList_ptr args=req->arguments();
+  CORBA::Any ob;
+  std::ostringstream script;
+  char *ior=orb->object_to_string(fotPtr);
+  script << "src1 = ParaMEDCorbaPluginSource()\nsrc1.IORCorba = '" << ior << "'\nasc=GetAnimationScene()\nrw=GetRenderView()\ndr=Show()\ndr.Visibility = 1\n";
+  CORBA::string_free(ior);
+  ob <<= script.str().c_str();
+  args->add_value("script",ob,CORBA::ARG_IN);
+  req->set_return_type(CORBA::_tc_void);
+  req->invoke();
+  // clean-up
 }
 
 std::string MEDCalculatorDBFieldReal::simpleRepr() const

@@ -55,6 +55,8 @@ libmedcalculator_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS
 	-I$(srcdir)/../INTERP_KERNEL/Geometric2D \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../MEDCoupling \
-	-I$(srcdir)/../MEDLoader
+	-I$(srcdir)/../MEDLoader \
+	-I$(srcdir)/../MEDCouplingCorba \
+	$(CORBA_CXXFLAGS) $(CORBA_INCLUDES) -I$(top_builddir)/idl @KERNEL_CXXFLAGS@
 
-libmedcalculator_la_LDFLAGS= ../MEDLoader/libmedloader.la
+libmedcalculator_la_LDFLAGS= ../MEDLoader/libmedloader.la ../MEDCouplingCorba/libmedcouplingcorba.la $(KERNEL_LDFLAGS) -lSALOMELocalTrace -lSalomeNS -lOpUtil
