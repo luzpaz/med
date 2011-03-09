@@ -31,7 +31,7 @@ from libMEDMEM_Swig import *
 
 medFile = "pointe.med"
 medFile2 = "Field&MeshGeneratedPointe.med"
-fieldName = "fieldcelldouble"
+fieldName = "fieldcelldoublescalar"
 meshName = "maa1"
 
 try:
@@ -53,17 +53,17 @@ except :
 
 try:
     myMesh = MESH()
-
     myRdOnlyDriver = MED_MESH_RDONLY_DRIVER(medFile,myMesh)
     myRdOnlyDriver.setMeshName(meshName)
     myRdOnlyDriver.open()
     myRdOnlyDriver.read()
     myRdOnlyDriver.close()
 
-    myWrOnlyDriver = MED_MESH_WRONLY_DRIVER(medFile2,myMesh)
+    myWrOnlyDriver = MED_MESH_WRONLY_DRIVER(medFile,myMesh)
     myWrOnlyDriver.setMeshName(meshName)
     myWrOnlyDriver.open()
     myWrOnlyDriver.write()
+
     myWrOnlyDriver.close()
 
     print "Invoking mesh drivers OK"
@@ -71,15 +71,3 @@ except :
     print "there is a problem in invoking mesh drivers !!"
     print "Please consult the error standart output of the python execution !!"
 
-try:
-    myMed = MED()
-    myRdOnlyDriver = MED_MED_RDONLY_DRIVER(medFile,myMed)
-    myRdOnlyDriver.open() 
-    myRdOnlyDriver.readFileStruct()
-    myRdOnlyDriver.close()
-    myMed.updateSupport()
-
-    print "Invoking Med drivers OK"
-except :
-    print "There is a problem in invoking MED drivers !!"
-    print "Please consult the error standart output of the python execution !!"

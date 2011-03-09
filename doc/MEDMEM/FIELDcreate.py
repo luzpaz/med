@@ -34,7 +34,7 @@ meshName = "maa1"
 
 myMesh = MESH(MED_DRIVER,MedFile,meshName)
 
-mySupport = myMesh.getSupportOnAll(MED_CELL)
+mySupport = SUPPORT(myMesh,"Support on all CELLs",MED_CELL)
 
 numberOfComponents = 3
 myField = FIELDDOUBLE(mySupport,numberOfComponents)
@@ -66,7 +66,7 @@ myField.setOrderNumber(orderNumber)
 time = 3.435678
 myField.setTime(time)
 
-numberOfValue = mySupport.getNumberOfElements(MED_ALL_ELEMENTS)
+numberOfValue = mySupport.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
 
 for i in range(numberOfValue):
     ip1 = i+1

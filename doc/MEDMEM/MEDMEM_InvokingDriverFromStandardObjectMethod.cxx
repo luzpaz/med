@@ -25,7 +25,6 @@
 
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_Mesh.hxx"
-#include "MEDMEM_Med.hxx"
 
 using namespace MEDMEM ;
 using namespace MED_EN ;
@@ -34,7 +33,7 @@ main () {
   
   const char * fileName   = "pointe.med";
   const char * fileName2  = "fieldCellDoubleOfpointe.med";
-  const char * fieldName  = "fieldcelldouble";
+  const char * fieldName  = "fieldcelldoublescalar";
   const char * meshName   = "maa1";
     
   try {
@@ -55,16 +54,11 @@ main () {
     myMesh->read();
     myMesh->rmDriver();
 
-    MED  *  myMed  = new MED();
-    int myDriver4  = myMed->addDriver(MED_DRIVER, fileName);
-    myMed->readFileStruct();
-    myMed->rmDriver();
 
-    delete myField;
-    delete myMesh;
-    delete myMed;
+    myMesh->removeReference();
+    myField->removeReference();
 
   } catch (MEDEXCEPTION& ex){
-    MESSAGE(ex.what()) ;
+    MESSAGE_MED(ex.what()) ;
   }
 }

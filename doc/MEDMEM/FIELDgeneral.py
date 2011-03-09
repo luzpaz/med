@@ -35,7 +35,7 @@ fieldName = "fieldcelldoublescalar"
 
 myMesh = MESH(MED_DRIVER,MedFile,meshName)
 
-mySupport = myMesh.getSupportOnAll(MED_CELL)
+mySupport = SUPPORT(myMesh,"Support on CELLs",MED_CELL)
 
 myField = FIELDDOUBLE(mySupport,MED_DRIVER,MedFile,fieldName,-1,-1)
 
@@ -58,7 +58,7 @@ time = myField.getTime()
 print "Iteration ",iterationNumber,"  at time ",time,\
       " (and order number ",orderNumber,")"
 
-numberOfValue = mySupport.getNumberOfElements(MED_ALL_ELEMENTS)
+numberOfValue = mySupport.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
 value = myField.getValue()
 
 for i in range(numberOfValue):

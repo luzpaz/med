@@ -68,7 +68,7 @@ int main (int argc, char ** argv) {
     " (and order number " << OrderNumber << ")" << endl ;
 
   // How many Value :
-  int NumberOfValue = mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
+  int NumberOfValue = mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
   // Value
   const double * Value = myField.getValue();
   for(int i=0; i<NumberOfValue; i++) {
@@ -77,8 +77,8 @@ int main (int argc, char ** argv) {
     cout << endl ;
   }
 
-  delete mySupport;
-  delete myMesh;
+  mySupport->removeReference();
+  myMesh->removeReference();
 
   return 0 ;
 }
