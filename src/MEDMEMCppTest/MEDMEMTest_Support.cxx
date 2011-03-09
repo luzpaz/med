@@ -421,6 +421,20 @@ using namespace MEDMEM;
   CPPUNIT_ASSERT_THROW(aSupportOnFaces1->getNumberOfElements(MED_EN::MED_TRIA6), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aSupportOnFaces1->getNumberOfElements(MED_EN::MED_QUAD8), MEDEXCEPTION);
 
+  // check type of nodal support
+  // (021199: MEDMEM::SUPPORT : geometric type when support is on node)
+  {
+    const SUPPORT* s = aMesh->getSupportOnAll( MED_EN::MED_NODE );
+    CPPUNIT_ASSERT_EQUAL( MED_EN::MED_NONE, s->getTypes()[0] );
+
+    SUPPORT* s2 = new SUPPORT( *s );
+    CPPUNIT_ASSERT_EQUAL( MED_EN::MED_NONE, s2->getTypes()[0] );
+    const MED_EN::medGeometryElement point1 = MED_EN::MED_POINT1;
+    s2->setNumberOfGeometricType( 1 );
+    CPPUNIT_ASSERT_THROW( s2->setGeometricType( &point1 ), MEDEXCEPTION );
+    s2->removeReference();
+  }
+
   //checking makeMesh()
   MESH *meshFromSupport=aSupportOnFaces1->makeMesh();
   CPPUNIT_ASSERT_EQUAL(4,meshFromSupport->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_TRIA3));

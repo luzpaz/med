@@ -754,14 +754,7 @@ MED_FIELD_DRIVER22<T>::getMeshDimensionFromFile(med_2_3::med_idt id,
       if (numberOfElements <= 0)
         continue;
 
-      MED_EN::medGeometryElement geomType;
-
-      //MED_FILE uses MED_NONE as a geometricType to describe MED_NODE
-      //MEDMEM uses MED_POINT1
-      if ( *currentGeometry==MED_NONE)
-        geomType=MED_POINT1;
-      else
-        geomType=*currentGeometry;
+      MED_EN::medGeometryElement geomType = *currentGeometry;
       geometricType[numberOfGeometricType] = geomType;
 
       numberOfGeometricType++;
@@ -851,14 +844,7 @@ MED_FIELD_DRIVER22<T>::getMeshGeometricTypeFromFile(med_2_3::med_idt      id,
     numberOfElementsOfType[numberOfGeometricType] = numberOfElements;
     numberOfElementsOfTypeC[numberOfGeometricType+1] =
       numberOfElementsOfTypeC[numberOfGeometricType]+numberOfElements;
-    MED_EN::medGeometryElement geomType;
-
-    //MED_FILE uses MED_NONE as a geometricType to describe MED_NODE
-    //MEDMEM uses MED_POINT1
-    if ( *currentGeometry==MED_NONE)
-      geomType=MED_POINT1;
-    else
-      geomType=*currentGeometry;
+    MED_EN::medGeometryElement geomType = *currentGeometry;
     geometricType[numberOfGeometricType] = geomType;
 
     //Because MEDFILE and MEDMEM differ on the definition of MED_CELL
@@ -1503,11 +1489,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
   {
     for (int typeNo=0; typeNo < NumberOfTypes; typeNo++)
     {
-      //MED_FILE uses MED_NONE as a geometricType to describe MED_NODE
-      //MEDMEM uses MED_POINT1
       MED_EN::medGeometryElement geomType = types[typeNo];
-      if (geomType == MED_EN::MED_NONE)
-        geomType = MED_EN::MED_POINT1;
 
       // Trouve l'index du type géométrique dans la liste des types géométriques du maillage
       // correspondant au type géométrique du champ traité

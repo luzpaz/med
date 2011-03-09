@@ -269,7 +269,7 @@ void SUPPORT::update()
           // Use setGeometricType() in order to get _profilNames updated
           //_geometricType.set(1);
           //_geometricType[0]=MED_POINT1;
-          const MED_EN::medGeometryElement type = MED_POINT1;
+          const MED_EN::medGeometryElement type = MED_NONE;
           setGeometricType( & type );
           // END Issue 0020633: [CEA] Pb with 3D field creation fron another
           _numberOfElements.set(1);
@@ -1714,6 +1714,14 @@ void SUPPORT::setMeshName(const string & meshName)
 void SUPPORT::setEntity(MED_EN::medEntityMesh Entity)
 {
   _entity=Entity;
+  // 0021199: [CEA 458] MEDMEM::SUPPORT : geometric type when support is on node
+  // set geometric type -> MED_NONE
+  if ( _entity == MED_NODE )
+    {
+      _numberOfGeometricType = 1;
+      const MED_EN::medGeometryElement nodeType = MED_EN::MED_NONE;
+      setGeometricType( &nodeType );
+    }
 }
 
 /*! set the attribute _numberOfGeometricType to NumberOfGeometricType */
@@ -1734,8 +1742,13 @@ void SUPPORT::setGeometricType(const MED_EN::medGeometryElement *GeometricType)
 //---------------------------------------------------------------------
 {
   if (!_geometricType)
-    _geometricType.set(_numberOfGeometricType, GeometricType);
-
+    {
+      _geometricType.set(_numberOfGeometricType, GeometricType);
+      // 0021199: [CEA 458] MEDMEM::SUPPORT : geometric type when support is on node
+      // geometric type must be MED_NONE
+      if ( _entity == MED_NODE && _numberOfGeometricType == 1 && _geometricType[0] != MED_NONE )
+        throw MEDEXCEPTION("SUPPORT::setGeometricType(), valid type for MED_NODE is MED_NONE ");
+    }
   if (_profilNames.empty() || _profilNames[0].empty())
     {
       // giving a default value to profile names
