@@ -2650,7 +2650,7 @@ int _ASCIIFileReader::split(const string& str,
     }
     //if ( !*ptr2) --ptr2;
     // skip spaces after the current part
-    while ( isspace(ptr2[-1])) --ptr2;
+    while ( ptr2 > ptr1 && isspace(ptr2[-1])) --ptr2;
     parts[ nbParts ] = string( ptr1, ptr2-ptr1 );
     ptr1 = nextBeg;
   }
@@ -2711,7 +2711,7 @@ int _ASCIIFileReader::split(const string&       str,
       //if ( !*ptr2) --ptr2;
       const char* sepPtr = ptr2;
       // skip spaces after the current part
-      while ( isspace(ptr2[-1])) --ptr2;
+      while ( ptr2 > ptr1 && isspace(ptr2[-1])) --ptr2;
       parts.push_back( string( ptr1, ptr2-ptr1 ));
       ++nbParts;
       ptr1 = sepPtr + int( sepPtr < back );
