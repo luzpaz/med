@@ -24,8 +24,8 @@
 //  File   : MEDGUI.h
 //  Module : MED
 //
-#ifndef _MEDGUI_H_
-#define _MEDGUI_H_
+#ifndef __MEDGUI_HXX_
+#define __MEDGUI_HXX__
 
 #include <SalomeApp_Module.h>
 #include <SUIT_Desktop.h>
@@ -33,6 +33,8 @@
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(MED_Gen)
 #include CORBA_SERVER_HEADER(SALOMEDS_Attributes)
+
+class MEDGUIDataBaseDockWidget;
 
 class MedGUI: public SalomeApp_Module
 {
@@ -77,6 +79,8 @@ public slots:
   virtual bool                activateModule( SUIT_Study* );
 
 protected:
+  MEDGUIDataBaseDockWidget *_data_base;
+
 private slots:
   void onGUIEvent();
   void onWindowActivated( SUIT_ViewWindow* );

@@ -229,5 +229,7 @@ if MED_ENABLE_GUI
     Structure.png \
     explore_med_file.png \
     field_selection.png \
-    mesh_selection.png
+    mesh_selection.png \
+    med_mesh.png \
+    med_field.png
 endif

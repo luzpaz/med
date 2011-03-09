@@ -23,18 +23,51 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 # Libraries targets
 lib_LTLIBRARIES= libMED.la
-dist_libMED_la_SOURCES = MedGUI_Selection.h MedGUI.h MedGUI.cxx MedGUI_Selection.cxx
-MOC_FILES= MedGUI_moc.cxx
+
+UIC_FILES = ui_MEDGUIFileContentDial.h ui_MEDGUISelectComponents.h
+
+BUILT_SOURCES = $(UIC_FILES)
+
+EXTRA_DIST+= MEDGUIFileContent_Dial.ui MEDGUISelectComponents.ui
+
+dist_libMED_la_SOURCES = MEDGUIFileContentDial.h MEDGUISelection.hxx \
+	MEDGUI.h MEDGUI.cxx MEDGUIFileContentDial.cxx MEDGUISelection.cxx \
+	MEDGUISelectComponents.h MEDGUISelectComponents.cxx MEDGUIDataBaseDockWidget.hxx \
+	MEDGUIDataBaseDockWidget.cxx
+
+MOC_FILES= MEDGUI_moc.cxx MEDGUIFileContentDial_moc.cxx MEDGUISelectComponents_moc.cxx
+
+ui_%.h: %.ui
+	${QTDIR}/bin/uic $< -o $@
+
+.hxx_moc.cxx :
+	${QTDIR}/bin/moc -p . -o $@ $<
+
+%_moc.cxx: %.hxx
+	${QTDIR}/bin/moc $< -o $@
+
+.qrc_qrc.cxx :
+	${QTDIR}/bin/rcc -name $(*F)  $< -o $@
+
+clean-local-qt :
+	rm -f *_moc.cxx *_qrc.cxx ui_*.h
+
+clean-local: clean-local-qt
+
+# End Of Qt Part
+
 nodist_libMED_la_SOURCES= $(MOC_FILES)
 
 libMED_la_CPPFLAGS= $(QT_INCLUDES) $(VTK_INCLUDES) @CAS_CPPFLAGS@ $(PYTHON_INCLUDES) \
-	${KERNEL_CXXFLAGS} ${GUI_CXXFLAGS} ${BOOST_CPPFLAGS} \
+	${KERNEL_CXXFLAGS} ${GUI_CXXFLAGS} \
 	@CORBA_INCLUDES@ @CORBA_CXXFLAGS@ \
-	-I$(top_builddir)/idl
+	-I$(top_builddir)/idl -I$(srcdir)/../MEDCoupling -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases \
+	-I$(srcdir)/../MEDCoupling -I$(srcdir)/../MEDLoader -I$(srcdir)/../MEDCalculator
 
 libMED_la_LDFLAGS= \
 	$(QT_MT_LIBS) $(CAS_KERNEL) \
-	../../idl/libSalomeIDLMED.la \
+	../../idl/libSalomeIDLMED.la ../MEDCalculator/Swig/libmedcalculator.la \
+	../MEDCalculator/Swig/libmedcalculatorspython.la \
 	$(KERNEL_LDFLAGS) -lSalomeLifeCycleCORBA -lOpUtil -lSALOMELocalTrace \
 	$(GUI_LDFLAGS) -lSalomeApp -lCAM -lLightApp -lqtx -lsuit -lSalomeObject
 

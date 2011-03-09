@@ -18,14 +18,18 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 
 //  MED MEDGUI : MED component GUI implemetation
-//  File   : MedGUI.cxx
+//  File   : MEDGUI.cxx
 //  Module : MED
+//
+#include "MEDGUI.h"
 
-#include "MedGUI.h"
+#include "MEDGUIFileContentDial.h"
+#include "MEDGUIDataBaseDockWidget.hxx"
+#include "MEDGUISelection.hxx"
 
-// SALOME Includes
 #include "Utils_ORB_INIT.hxx"
 #include "Utils_SINGLETON.hxx"
 #include "utilities.h"
@@ -53,9 +57,8 @@
 #include <QIcon>
 #include <QInputDialog>
 #include <QLineEdit>
-
-
-#include <MedGUI_Selection.h>
+#include <QKeyEvent>
+#include <QDockWidget>
 
 static CORBA::ORB_var   _orb;
 
@@ -64,9 +67,7 @@ static CORBA::ORB_var   _orb;
  *
  */
 //=============================================================================
-MedGUI::MedGUI() :
-  SalomeApp_Module( "MED" ),
-  LightApp_Module( "MED" )
+MedGUI::MedGUI() : LightApp_Module( "MED" ),SalomeApp_Module( "MED" )
 {
 }
 
@@ -85,7 +86,7 @@ void MedGUI::createMedAction( const int id, const QString& po_id, const QString&
   if ( !pix.isNull() )
     icon = QIcon( pix );
 
-  createAction( id, 
+  createAction( id,
                 tr( (const char*)("TOP_" + po_id).toLatin1() ),
                 icon,
                 tr( (const char*)("MEN_" + po_id).toLatin1() ),
@@ -113,28 +114,30 @@ void MedGUI::initialize( CAM_Application* app )
 
   createMedAction( 931, "MESHSEL", "ICO_TB_MESHSEL" );
   createMedAction( 932, "FIELDSEL", "ICO_TB_FIELDSEL" );
-  createMedAction( 933, "EXPLORE", "ICO_TB_EXPLORE" );
   createMedAction( 934, "DUMPMESH" );
   createMedAction( 935, "DUMPSUBMESH" );
-//   createMedAction( 8031, "POPUPTEST" );
-//   createMedAction( 9002, "ERASE" );
-//   createMedAction( 9003, "DISPLAY" );
+  createMedAction( 936, "EXPLORE", "ICO_TB_EXPLORE");
+
   createMedAction( 4031, "MESHSEL", "ICO_TB_MESHSEL" );
   createMedAction( 4032, "FIELDSEL", "ICO_TB_FIELDSEL" );
-  createMedAction( 4033, "EXPLORE", "ICO_TB_EXPLORE" );
+  createMedAction( 4034, "EXPLORE", "ICO_TB_EXPLORE");
 
   int MedId = createMenu( tr( "MED" ), -1, 50, 10 );
   createMenu( separator(), MedId, 10 );
   createMenu( 931, MedId, 11 );
   createMenu( 932, MedId, 11 );
-  createMenu( 933, MedId, 11 );
   createMenu( 934, MedId, 11 );
   createMenu( 935, MedId, 11 );
+  createMenu( 936, MedId, 11 );
 
   int medTb = createTool( tr( "TB_MED" ) );
   createTool( 4031, medTb );
   createTool( 4032, medTb );
-  createTool( 4033, medTb );
+  createTool( 4034, medTb );
+
+  _data_base = new MEDGUIDataBaseDockWidget(application(),application()->desktop());
+  application()->desktop()->addDockWidget(Qt::LeftDockWidgetArea,_data_base);
+  _data_base->show();              
 }
 
 QString MedGUI::engineIOR() const
@@ -321,7 +324,7 @@ bool MedGUI::OnGUIEvent (int theCommandID)
 
         // load MED engine
         SALOME_MED::MED_Gen_ptr medgen = InitMedGen();
-        
+
         // Selection du Fichier
         QString anInitialPath = "";
         if ( SUIT_FileDlg::getLastVisitedPath().isEmpty() )
@@ -369,62 +372,6 @@ bool MedGUI::OnGUIEvent (int theCommandID)
           }
         break;
       }
-    case 4033:
-    case 933:
-      {
-        MESSAGE("command " << theCommandID << " activated");
-
-        QString myStudyName = myActiveStudy->studyName();
-//      int myStudyId = myActiveStudy->id();
-
-        // load MED engine
-        SALOME_MED::MED_Gen_ptr medgen = InitMedGen();
-
-        // Selection du Fichier
-        QString anInitialPath = "";
-        if ( SUIT_FileDlg::getLastVisitedPath().isEmpty() )
-          anInitialPath = QDir::currentPath();
-
-        file = SUIT_FileDlg::getFileName(application()->desktop(),
-                                        anInitialPath,
-                                        filtersList,
-                                        tr("MED_MEN_IMPORT"),
-                                        true);
-        if (!file.isEmpty() )
-          {
-            SCRUTE((const char*)file.toLatin1());
-            try
-              {
-//              medgen->readStructFile(file.latin1(),myStudyName);
-                medgen->readStructFileWithFieldType((const char*)file.toLatin1(),
-                                                    (const char*)myStudyName.toLatin1());
-
-                MESSAGE("Ouais on est la !!!!");
-
-                if (myActiveStudy->studyDS()->GetProperties()->IsLocked()) {
-
-                  MESSAGE("Ouais on est la 1 !!!!");
-
-                  SUIT_MessageBox::warning (application()->desktop(),
-                                            tr("WRN_WARNING"),
-                                            tr("WRN_STUDY_LOCKED") );
-                  //QObject::tr("BUT_OK")); by default
-                }
-              }
-            catch (const SALOME::SALOME_Exception & S_ex)
-              {
-                MESSAGE("Ouais on est la 2 !!!!");
-
-                SalomeApp_Tools::QtCatchCorbaException(S_ex);
-              }
-
-            MESSAGE("Ouais on est la 3 !!!!");
-
-            updateObjBrowser ();
-          }
-        break;
-      }
-
     case 934:
       {
         //Handle(SMESH_TypeFilter) aMeshFilter = new SMESH_TypeFilter( MESH );
@@ -522,6 +469,14 @@ bool MedGUI::OnGUIEvent (int theCommandID)
           }
         break;
       }
+      case 936 :
+      case 4034 :
+      	{
+          
+          MEDGUIFileContentDial* mfcd = new MEDGUIFileContentDial(_data_base);
+          mfcd->show();
+          break;
+      	}
     }
 
   app->updateActions(); //SRN: To update a Save button in the toolbar
@@ -563,6 +518,7 @@ bool MedGUI::OnKeyPress (QKeyEvent* pe,
                          SUIT_ViewWindow* wnd)
 {
   MESSAGE("MedGUI::OnKeyPress");
+
   return true;
 }
 
@@ -579,7 +535,6 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
       return false;
     }
 
-  //SALOME_MED::MESH_var MEDMesh = aMesh->GetMEDMesh();
   std::string name = MEDMesh->getName();
   SCRUTE(name);
 
@@ -595,7 +550,7 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
     if (dim2==3)
       {
         MESSAGE ( " Coordinates  X = " << coords[i] << " Y = " << coords[i+1] << " Z = " << coords[i+2] );
-        i = i + 3; // Only for triangles
+        i = i + 3;
       }
     else
       {
@@ -617,17 +572,6 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
     for (int l=0;l<(int)tabnoeuds->length();l++)
       SCRUTE(tabnoeuds[l]);
   }
-
-  //     int famIdent = 1;
-  //     SALOME_MED::FAMILY_ptr Family=MEDMesh->getFamily(SALOME_MED::MED_NODE,1) ;
-  //     MESSAGE("ici");
-  //     string nomFam=Family->getName();
-  //     SCRUTE(nomFam);
-  //     int identfam=Family->getIdentifier();
-  //     SCRUTE(identfam);
-  //     SALOME_TYPES::ListOfLong_var tabnoeuds=Family->getNumber(SALOME_MED::MED_NONE);
-  //     for (int l=0;l<tabnoeuds->length();l++)
-  //       SCRUTE(tabnoeuds[l]);
 
   return true;
 }
