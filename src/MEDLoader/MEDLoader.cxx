@@ -2103,7 +2103,7 @@ void MEDLoaderNS::writeUMeshesDirectly(const char *fileName, const std::vector<c
   MEDLoaderBase::safeStrCpy(mesh[0]->getDescription(),MED_COMMENT_SIZE,desc,MEDLoader::_TOO_LONG_STR);
   const int spaceDim=mesh[0]->getSpaceDimension();
   const int meshDim=mesh[0]->getMeshDimension();
-  DataArrayDouble *arr=mesh[0]->getCoords();
+  const DataArrayDouble *arr=mesh[0]->getCoords();
   INTERP_KERNEL::AutoPtr<char> comp=MEDLoaderBase::buildEmptyString(spaceDim*MED_SNAME_SIZE);
   INTERP_KERNEL::AutoPtr<char> unit=MEDLoaderBase::buildEmptyString(spaceDim*MED_SNAME_SIZE);
   for(int i=0;i<spaceDim;i++)
@@ -2621,7 +2621,7 @@ void MEDLoader::WriteUMeshesPartition(const char *fileName, const char *meshName
     }
   if(meshes.empty())
     throw INTERP_KERNEL::Exception("List of meshes must be not empty !");
-  DataArrayDouble *coords=meshes.front()->getCoords();
+  const DataArrayDouble *coords=meshes.front()->getCoords();
   for(std::vector<const ParaMEDMEM::MEDCouplingUMesh *>::const_iterator iter=meshes.begin();iter!=meshes.end();iter++)
     if(coords!=(*iter)->getCoords())
       throw INTERP_KERNEL::Exception("Meshes does not not share the same coordinates : try method MEDCouplingPointSet::tryToShareSameCoords !");
@@ -2671,7 +2671,7 @@ void MEDLoader::WriteUMeshesPartitionDep(const char *fileName, const char *meshN
     }
   if(meshes.empty())
     throw INTERP_KERNEL::Exception("List of meshes must be not empty !");
-  DataArrayDouble *coords=meshes.front()->getCoords();
+  const DataArrayDouble *coords=meshes.front()->getCoords();
   for(std::vector<const ParaMEDMEM::MEDCouplingUMesh *>::const_iterator iter=meshes.begin();iter!=meshes.end();iter++)
     if(coords!=(*iter)->getCoords())
       throw INTERP_KERNEL::Exception("Meshes does not not share the same coordinates : try method MEDCouplingPointSet::tryToShareSameCoords !");
@@ -2713,7 +2713,7 @@ void MEDLoader::WriteUMeshes(const char *fileName, const std::vector<const ParaM
   std::string meshName(meshes[0]->getName());
   if(meshName.empty())
     throw INTERP_KERNEL::Exception("Trying to write a unstructured mesh with no name ! MED file format needs a not empty mesh name : change name of first element of 2nd parameter !");
-  DataArrayDouble *coords=meshes.front()->getCoords();
+  const DataArrayDouble *coords=meshes.front()->getCoords();
   for(std::vector<const ParaMEDMEM::MEDCouplingUMesh *>::const_iterator iter=meshes.begin();iter!=meshes.end();iter++)
     if(coords!=(*iter)->getCoords())
       throw INTERP_KERNEL::Exception("Meshes does not not share the same coordinates : try method MEDCouplingPointSet::tryToShareSameCoords !");

@@ -980,7 +980,7 @@ DataArrayInt *MEDCouplingUMesh::mergeNodes2(double precision, bool& areNodesMerg
  */
 void MEDCouplingUMesh::tryToShareSameCoordsPermute(const MEDCouplingPointSet& other, double epsilon) throw(INTERP_KERNEL::Exception)
 {
-  DataArrayDouble *coords=other.getCoords();
+  const DataArrayDouble *coords=other.getCoords();
   if(!coords)
     throw INTERP_KERNEL::Exception("tryToShareSameCoordsPermute : No coords specified in other !");
   if(!_coords)
@@ -3742,7 +3742,7 @@ MEDCouplingUMesh *MEDCouplingUMesh::MergeUMeshesOnSameCoords(const std::vector<c
 {
   if(meshes.empty())
     throw INTERP_KERNEL::Exception("meshes input parameter is expected to be non empty.");
-  DataArrayDouble *coords=meshes.front()->getCoords();
+  const DataArrayDouble *coords=meshes.front()->getCoords();
   int meshDim=meshes.front()->getMeshDimension();
   std::vector<const MEDCouplingUMesh *>::const_iterator iter=meshes.begin();
   int meshLgth=0;

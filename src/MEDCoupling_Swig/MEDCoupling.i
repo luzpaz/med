@@ -246,7 +246,6 @@ using namespace INTERP_KERNEL;
 %rename(assign) *::operator=;
 %ignore ParaMEDMEM::MemArray::operator=;
 %ignore ParaMEDMEM::MemArray::operator[];
-%ignore ParaMEDMEM::MEDCouplingPointSet::getCoords();
 %ignore ParaMEDMEM::MEDCouplingGaussLocalization::pushTinySerializationIntInfo;
 %ignore ParaMEDMEM::MEDCouplingGaussLocalization::pushTinySerializationDblInfo;
 %ignore ParaMEDMEM::MEDCouplingGaussLocalization::fillWithValues;
@@ -541,7 +540,7 @@ namespace ParaMEDMEM
     {
     public:
       void updateTime() const;
-      void setCoords(DataArrayDouble *coords) throw(INTERP_KERNEL::Exception);
+      void setCoords(const DataArrayDouble *coords) throw(INTERP_KERNEL::Exception);
       DataArrayDouble *getCoordinatesAndOwner() const throw(INTERP_KERNEL::Exception);
       bool areCoordsEqual(const MEDCouplingPointSet& other, double prec) const throw(INTERP_KERNEL::Exception);
       void zipCoords() throw(INTERP_KERNEL::Exception);
@@ -588,7 +587,7 @@ namespace ParaMEDMEM
              return res;
            }
            
-           PyObject *getCoords() const throw(INTERP_KERNEL::Exception)
+           PyObject *getCoords() throw(INTERP_KERNEL::Exception)
            {
              DataArrayDouble *ret1=self->getCoords();
              ret1->incrRef();
@@ -832,14 +831,14 @@ namespace ParaMEDMEM
         INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(li,&sz);
         self->insertNextCell(type,size,tmp);
       }
-      DataArrayInt *getNodalConnectivity() const throw(INTERP_KERNEL::Exception)
+      DataArrayInt *getNodalConnectivity() throw(INTERP_KERNEL::Exception)
       {
         DataArrayInt *ret=self->getNodalConnectivity();
         if(ret)
           ret->incrRef();
         return ret;
       }
-      DataArrayInt *getNodalConnectivityIndex() const throw(INTERP_KERNEL::Exception)
+      DataArrayInt *getNodalConnectivityIndex() throw(INTERP_KERNEL::Exception)
       {
         DataArrayInt *ret=self->getNodalConnectivityIndex();
         if(ret)
@@ -1155,16 +1154,16 @@ namespace ParaMEDMEM
   {
   public:
     static MEDCouplingCMesh *New();
-    void setCoords(DataArrayDouble *coordsX,
-                   DataArrayDouble *coordsY=0,
-                   DataArrayDouble *coordsZ=0) throw(INTERP_KERNEL::Exception);
-    void setCoordsAt(int i, DataArrayDouble *arr) throw(INTERP_KERNEL::Exception);
+    void setCoords(const DataArrayDouble *coordsX,
+                   const DataArrayDouble *coordsY=0,
+                   const DataArrayDouble *coordsZ=0) throw(INTERP_KERNEL::Exception);
+    void setCoordsAt(int i, const DataArrayDouble *arr) throw(INTERP_KERNEL::Exception);
     %extend {
       std::string __str__() const
       {
         return self->simpleRepr();
       }
-      DataArrayDouble *getCoordsAt(int i) const throw(INTERP_KERNEL::Exception)
+      DataArrayDouble *getCoordsAt(int i) throw(INTERP_KERNEL::Exception)
       {
         DataArrayDouble *ret=self->getCoordsAt(i);
         if(ret)

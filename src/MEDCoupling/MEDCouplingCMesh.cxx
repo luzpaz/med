@@ -396,7 +396,7 @@ std::string MEDCouplingCMesh::advancedRepr() const
   return simpleRepr();
 }
 
-DataArrayDouble *MEDCouplingCMesh::getCoordsAt(int i) const throw(INTERP_KERNEL::Exception)
+const DataArrayDouble *MEDCouplingCMesh::getCoordsAt(int i) const throw(INTERP_KERNEL::Exception)
 {
   switch(i)
     {
@@ -411,7 +411,22 @@ DataArrayDouble *MEDCouplingCMesh::getCoordsAt(int i) const throw(INTERP_KERNEL:
     }
 }
 
-void MEDCouplingCMesh::setCoordsAt(int i, DataArrayDouble *arr) throw(INTERP_KERNEL::Exception)
+DataArrayDouble *MEDCouplingCMesh::getCoordsAt(int i) throw(INTERP_KERNEL::Exception)
+{
+  switch(i)
+    {
+    case 0:
+      return _x_array;
+    case 1:
+      return _y_array;
+    case 2:
+      return _z_array;
+    default:
+      throw INTERP_KERNEL::Exception("Invalid rank specified must be 0 or 1 or 2.");
+    }
+}
+
+void MEDCouplingCMesh::setCoordsAt(int i, const DataArrayDouble *arr) throw(INTERP_KERNEL::Exception)
 {
   DataArrayDouble **thisArr[3]={&_x_array,&_y_array,&_z_array};
   if(i<0 || i>2)
@@ -420,28 +435,28 @@ void MEDCouplingCMesh::setCoordsAt(int i, DataArrayDouble *arr) throw(INTERP_KER
     {
       if(*(thisArr[i]))
         (*(thisArr[i]))->decrRef();
-      (*(thisArr[i]))=arr;
+      (*(thisArr[i]))=const_cast<DataArrayDouble *>(arr);
       if(*(thisArr[i]))
         (*(thisArr[i]))->incrRef();
       declareAsNew();
     }
 }
 
-void MEDCouplingCMesh::setCoords(DataArrayDouble *coordsX, DataArrayDouble *coordsY, DataArrayDouble *coordsZ)
+void MEDCouplingCMesh::setCoords(const DataArrayDouble *coordsX, const DataArrayDouble *coordsY, const DataArrayDouble *coordsZ)
 {
   if(_x_array)
     _x_array->decrRef();
-  _x_array=coordsX;
+  _x_array=const_cast<DataArrayDouble *>(coordsX);
   if(_x_array)
     _x_array->incrRef();
   if(_y_array)
     _y_array->decrRef();
-  _y_array=coordsY;
+  _y_array=const_cast<DataArrayDouble *>(coordsY);
   if(_y_array)
     _y_array->incrRef();
   if(_z_array)
     _z_array->decrRef();
-  _z_array=coordsZ;
+  _z_array=const_cast<DataArrayDouble *>(coordsZ);
   if(_z_array)
     _z_array->incrRef();
   declareAsNew();
@@ -534,7 +549,7 @@ void MEDCouplingCMesh::getBoundingBox(double *bbox) const
   int j=0;
   for (int idim=0; idim<dim; idim++)
     {
-      DataArrayDouble *c=getCoordsAt(idim);
+      const DataArrayDouble *c=getCoordsAt(idim);
       if(c)
         {
           const double *coords=c->getConstPointer();
@@ -675,7 +690,7 @@ DataArrayDouble *MEDCouplingCMesh::getCoordinatesAndOwner() const
   double *pt=ret->getPointer();
   int tmp[3];
   getSplitNodeValues(tmp);
-  DataArrayDouble *tabs[3]={getCoordsAt(0),getCoordsAt(1),getCoordsAt(2)};
+  const DataArrayDouble *tabs[3]={getCoordsAt(0),getCoordsAt(1),getCoordsAt(2)};
   const double *tabsPtr[3];
   for(int j=0;j<spaceDim;j++)
     {
@@ -701,7 +716,7 @@ DataArrayDouble *MEDCouplingCMesh::getBarycenterAndOwner() const
   double *pt=ret->getPointer();
   int tmp[3];
   getSplitCellValues(tmp);
-  DataArrayDouble *tabs[3]={getCoordsAt(0),getCoordsAt(1),getCoordsAt(2)};
+  const DataArrayDouble *tabs[3]={getCoordsAt(0),getCoordsAt(1),getCoordsAt(2)};
   std::vector<double> tabsPtr[3];
   for(int j=0;j<spaceDim;j++)
     {

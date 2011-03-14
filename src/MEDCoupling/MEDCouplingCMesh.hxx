@@ -57,11 +57,12 @@ namespace ParaMEDMEM
     void getCoordinatesOfNode(int nodeId, std::vector<double>& coo) const;
     std::string simpleRepr() const;
     std::string advancedRepr() const;
-    DataArrayDouble *getCoordsAt(int i) const throw(INTERP_KERNEL::Exception);
-    void setCoordsAt(int i, DataArrayDouble *arr) throw(INTERP_KERNEL::Exception);
-    void setCoords(DataArrayDouble *coordsX,
-                   DataArrayDouble *coordsY=0,
-                   DataArrayDouble *coordsZ=0);
+    const DataArrayDouble *getCoordsAt(int i) const throw(INTERP_KERNEL::Exception);
+    DataArrayDouble *getCoordsAt(int i) throw(INTERP_KERNEL::Exception);
+    void setCoordsAt(int i, const DataArrayDouble *arr) throw(INTERP_KERNEL::Exception);
+    void setCoords(const DataArrayDouble *coordsX,
+                   const DataArrayDouble *coordsY=0,
+                   const DataArrayDouble *coordsZ=0);
     // tools
     DataArrayInt *checkTypeConsistencyAndContig(const std::vector<int>& code, const std::vector<const DataArrayInt *>& idsPerType) const throw(INTERP_KERNEL::Exception);
     MEDCouplingUMesh *buildUnstructured() const throw(INTERP_KERNEL::Exception);

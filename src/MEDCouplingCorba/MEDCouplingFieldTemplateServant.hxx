@@ -48,6 +48,7 @@ namespace ParaMEDMEM
   protected:
     void getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da, SALOME_TYPES::ListOfString_out sa);
     void getSerialisationData(SALOME_TYPES::ListOfLong_out la);
+    CORBA::Boolean ExportDataAs(const char *format, SALOME::GenericObj_out exporter);
   };
 }
 

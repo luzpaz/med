@@ -1280,7 +1280,7 @@ void MEDFileUMesh::setGroupsOnSetMesh(int meshDimRelToMax, const std::vector<con
 
 DataArrayDouble *MEDFileUMesh::checkMultiMesh(const std::vector<const MEDCouplingUMesh *>& ms) const throw(INTERP_KERNEL::Exception)
 {
-  DataArrayDouble *ret=ms[0]->getCoords();
+  const DataArrayDouble *ret=ms[0]->getCoords();
   int mdim=ms[0]->getMeshDimension();
   for(unsigned int i=1;i<ms.size();i++)
     {
@@ -1290,7 +1290,7 @@ DataArrayDouble *MEDFileUMesh::checkMultiMesh(const std::vector<const MEDCouplin
       if(ms[i]->getMeshDimension()!=mdim)
         throw INTERP_KERNEL::Exception("MEDFileUMesh::checkMultiMesh : meshes have not same mesh dimension !");
     }
-  return ret;
+  return const_cast<DataArrayDouble *>(ret);
 }
 
 void MEDFileUMesh::setFamilyFieldArr(int meshDimRelToMaxExt, DataArrayInt *famArr) throw(INTERP_KERNEL::Exception)
@@ -1631,7 +1631,7 @@ void MEDFileCMesh::write(const char *fileName, int mode) const throw(INTERP_KERN
   MEDmeshGridTypeWr(fid,maa,MED_CARTESIAN_GRID);
   for(int i=0;i<spaceDim;i++)
     {
-      DataArrayDouble *da=_cmesh->getCoordsAt(i);
+      const DataArrayDouble *da=_cmesh->getCoordsAt(i);
       MEDmeshGridIndexCoordinateWr(fid,maa,_iteration,_order,_time,i+1,da->getNumberOfTuples(),da->getConstPointer());
     }
   if((const DataArrayInt *)_fam_cells)

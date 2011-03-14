@@ -124,3 +124,17 @@ SALOME_MED::DataArrayDoubleCorbaInterface_ptr MEDCouplingMultiFieldsServant::get
   DataArrayDoubleServant *retServ=new DataArrayDoubleServant(das[id]);
   return retServ->_this();
 }
+
+CORBA::Boolean MEDCouplingMultiFieldsServant::ExportDataAs(const char *format, SALOME::GenericObj_out exporter)
+{
+  std::string frmCpp(format);
+  if(frmCpp=="MEDCorba")
+    {
+      SALOME_MED::MEDCouplingMultiFieldsCorbaInterface_ptr cPtr=_this();
+      Register();
+      exporter=cPtr;
+      return true;
+    }
+  exporter=SALOME::GenericObj::_nil();
+  return false;
+}
