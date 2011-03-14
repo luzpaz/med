@@ -308,12 +308,14 @@ void SUPPORT::update()
           delete [] allType;
         }
 
+      if (_totalNumberOfElements <= 0)
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"We have found no element for this support !"));
       // set _number (issue 0021167)
       {
-        vector<int> nums( max( 0, _totalNumberOfElements ));
+        vector<int> nums( _totalNumberOfElements );
         for ( unsigned i = 0; i < nums.size(); ++i )
           nums[i] = i+1;
-        if ( _entity == MED_NODE || nums.empty())
+        if ( _entity == MED_NODE )
           {
             const int index[2] =
               {
