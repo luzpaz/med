@@ -230,7 +230,7 @@ ostream & MEDMEM::operator<<(ostream &os, const SUPPORT &my)
   os << "NumberOfTypes : "<<numberoftypes<<endl;
   PointerOf<medGeometryElement> types = my._geometricType;
   for (int j=0;j<numberoftypes;j++) {
-    int numberOfElements = my._numberOfElements[j];
+    int numberOfElements = my._numberOfElements ? my._numberOfElements[j] : -1;
     os << "    On Type "<<geoNames[types[j]]
        <<" : there is(are) "<<numberOfElements<<" element(s) and " <<endl;
   }
