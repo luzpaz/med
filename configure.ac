@@ -341,7 +341,7 @@ if test "$with_interp_kernel_only" != "yes" ; then
         echo --------------------------------------------- 
         echo testing SCOTCH 
         echo ---------------------------------------------
-        echo scotch_ok=no 
+        scotch_ok=no 
         CHECK_SCOTCH 
         dnl scotch_ok is set to yes by CHECK_SCOTCH    
         
@@ -349,7 +349,7 @@ if test "$with_interp_kernel_only" != "yes" ; then
         echo --------------------------------------------- 
         echo testing LIBXML2
         echo ---------------------------------------------
-        echo libxml_ok=no 
+        libxml_ok=no 
         CHECK_LIBXML 
         dnl libxml_ok is set to yes by CHECK_LIBXML         
         
