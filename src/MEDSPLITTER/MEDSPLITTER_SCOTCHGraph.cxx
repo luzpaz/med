@@ -19,7 +19,7 @@
 #include <cstdio>
 extern "C" {
 #define restrict
-#include "bin/scotch.h"
+#include "scotch.h"
 }
 #include "MEDSPLITTER_Graph.hxx"
 #include "MEDSPLITTER_SCOTCHGraph.hxx"
