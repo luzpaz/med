@@ -1605,7 +1605,7 @@ int SUPPORT::getNumberOfElements(MED_EN::medGeometryElement GeometricType) const
     return _totalNumberOfElements;
   for (int i=0;i<_numberOfGeometricType;i++)
     if (_geometricType[i]==GeometricType)
-      return _numberOfElements[i];
+      return ( _totalNumberOfElements < 1 ) ? 0 : _numberOfElements[i];
   throw MEDEXCEPTION("Support::getNumberOfElements : Geometric type not found !") ;
 }
 
@@ -1722,6 +1722,7 @@ void SUPPORT::setEntity(MED_EN::medEntityMesh Entity)
     {
       _numberOfGeometricType = 1;
       const MED_EN::medGeometryElement nodeType = MED_EN::MED_NONE;
+      _geometricType.set(0);
       setGeometricType( &nodeType );
     }
 }
