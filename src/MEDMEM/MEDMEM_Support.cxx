@@ -1756,10 +1756,11 @@ void SUPPORT::setGeometricType(const MED_EN::medGeometryElement *GeometricType)
     {
       // giving a default value to profile names
       vector<string> prof_names( _numberOfGeometricType);
+      string name = healName( _name );
       for (int itype=0; itype < _numberOfGeometricType; itype++)
         {
           ostringstream typestr;
-          typestr<<_name<<"_type"<<_geometricType[itype];
+          typestr<<name<<"_type"<<_geometricType[itype];
           prof_names[itype]=typestr.str();
         }
       _profilNames=prof_names;
