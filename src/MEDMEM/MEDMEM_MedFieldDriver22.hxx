@@ -1166,8 +1166,10 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 //                                 << MED_EN::entNames[entityType] << "|."
 //                                 ));
 //     }
-    if ( entityType == MED_FIELD_DRIVER<T>::_ptrField->getSupport()->getEntity() )
-      mySupport->setName( MED_FIELD_DRIVER<T>::_ptrField->getSupport()->getName() );
+    // postpone name setting until profile analisys in order not to set "ON_ALL_entity"
+    // name to a partial support
+    //if ( entityType == MED_FIELD_DRIVER<T>::_ptrField->getSupport()->getEntity() )
+    //mySupport->setName( MED_FIELD_DRIVER<T>::_ptrField->getSupport()->getName() );
     mySupport->setMesh( MED_FIELD_DRIVER<T>::_ptrField->getSupport()->getMesh() );
     mySupport->setDescription(MED_FIELD_DRIVER<T>::_ptrField->getSupport()->getDescription());
   }
@@ -1651,9 +1653,11 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 
   MED_FIELD_DRIVER<T>::_ptrField->_isRead = true ;
 
-  bool isFound = false;
   MESH* aMesh = MED_FIELD_DRIVER<T>::_ptrField->_mesh;
-  if (!haveSupport && aMesh && anyProfil)
+  bool isFound = false, onlyMeshProvided = ( !haveSupport && aMesh );
+  if ( !aMesh )
+    aMesh = ptrMesh; // try to find FAMILY OR GROUP in ptrMesh but without being so stern
+  if ( aMesh && anyProfil)
   {
     int it = -1;
     for (int typeNo = 0; (typeNo < NumberOfTypes) && (it == -1); typeNo++) {
@@ -1700,11 +1704,11 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
         }
       }
     }
-    if (!isFound) {
+    if (!isFound ) {
       // - If no family or group was found and the
       //   profile name is xxx_PFL, throw an exception
       int pos = aPN.rfind(aSuff);
-      if (pos + aSuff.length() - 1 == aPN.length())
+      if (pos + aSuff.length() - 1 == aPN.length() && onlyMeshProvided )
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC)
                                      << ": Can't find appropriate support (GROUP or FAMILY)"
                                      << " in mesh " << meshName << " for field " << fieldName
@@ -1715,7 +1719,8 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
       // - Check that the found support has correct types
       //   and number of elements. If not, throw an exception
       const SUPPORT* aSupp = MED_FIELD_DRIVER<T>::_ptrField->_support;
-      if (aSupp->getNumberOfTypes() != NumberOfTypes)
+      isFound = ( aSupp->getNumberOfTypes() == NumberOfTypes );
+      if ( !isFound && onlyMeshProvided )
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << ": Invalid support (GROUP or FAMILY) found in mesh "
                                      << meshName << " for field " << fieldName << " by name of profile "
                                      << aPN << ": different number of types in found support |"
@@ -1724,33 +1729,42 @@ template <class T> void MED_FIELD_RDONLY_DRIVER22<T>::read(void)
 
       const MED_EN::medGeometryElement* aTypes = aSupp->getTypes();
       for (int it = 0; it < NumberOfTypes && isFound; it++)
-      {
-        MED_EN::medGeometryElement aType = aTypes[it];
-        if (aType != types[it])
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << ": Invalid support (GROUP or FAMILY) found in mesh "
-                                       << meshName << " for field " << fieldName << " by name of profile "
-                                       << aPN << ": geometric type in found support |" << aType
-                                       << "| differs from required type |" << types[it] << "|"));
+        {
+          MED_EN::medGeometryElement aType = aTypes[it];
+          if (aType != types[it])
+            throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << ": Invalid support (GROUP or FAMILY) found in mesh "
+                                         << meshName << " for field " << fieldName << " by name of profile "
+                                         << aPN << ": geometric type in found support |" << aType
+                                         << "| differs from required type |" << types[it] << "|"));
 
-        if (aSupp->getNumberOfElements(aType) != nbOfElOfType[it])
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << ": Invalid support (GROUP or FAMILY) found in mesh "
-                                       << meshName << " for field " << fieldName << " by name of profile "
-                                       << aPN << ": number of elements of type " << aType
-                                       << " in found support |" << aSupp->getNumberOfElements(aType)
-                                       << "| differs from required |" << nbOfElOfType[it] << "|"));
-      }
+          if (aSupp->getNumberOfElements(aType) != nbOfElOfType[it])
+            throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << ": Invalid support (GROUP or FAMILY) found in mesh "
+                                         << meshName << " for field " << fieldName << " by name of profile "
+                                         << aPN << ": number of elements of type " << aType
+                                         << " in found support |" << aSupp->getNumberOfElements(aType)
+                                         << "| differs from required |" << nbOfElOfType[it] << "|"));
+        }
     }
   }
 
-  if (!isFound) {
-    // No corresponding support (family or group)
-    // found in the mesh, use the newly created one
-    if(MED_FIELD_DRIVER<T>::_ptrField->_support)
-      MED_FIELD_DRIVER<T>::_ptrField->_support->removeReference();
-    MED_FIELD_DRIVER<T>::_ptrField->_support = mySupport; //Prévenir l'utilisateur ?
-  }
+  if (!isFound)
+    {
+      // No corresponding support (family or group)
+      // found in the mesh, use the newly created one
+      const MEDMEM::SUPPORT * & fieldSupport = MED_FIELD_DRIVER<T>::_ptrField->_support;
+      if ( fieldSupport )
+        {
+          if ( mySupport->getEntity() == fieldSupport->getEntity() &&
+               //not to set "ON_ALL_entity" name to a partial support
+               mySupport->isOnAllElements() == fieldSupport->isOnAllElements())
+            mySupport->setName( fieldSupport->getName() );
+          fieldSupport->removeReference();
+        }
+      fieldSupport = mySupport; //Prévenir l'utilisateur ?
+    }
   else
     mySupport->removeReference();
+
   END_OF_MED(LOC);
 }
 
