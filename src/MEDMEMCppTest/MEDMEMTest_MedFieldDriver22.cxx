@@ -588,6 +588,60 @@ void MEDMEMTest::testMedFieldDriver22()
   CPPUNIT_ASSERT(rwostr1.str() != "");
   CPPUNIT_ASSERT(rwostr1.str() == rwostr2.str());
 
+  ///////////////////////////////////////////////////////////////////////////////////
+  // Test for the issue 0021211. Check that a support of field on a partial support
+  // (group or family) is restored at reading
+  {
+    MESH* mesh = new MESH(MED_DRIVER, filenameWithOutFileds, "Mesh 1");
+    mesh->setName("UniqueMeshName");
+    //mesh->setMeshDimension(3); need to make mdump work on 2D mesh in 3D space
+
+    FAMILY* family = const_cast<FAMILY*>( mesh->getFamily( MED_EDGE, 1 ));
+    family->setName( healName( family->getName() ));
+
+    // mesh is 2D, make a field on the 1st FAMILY of segments
+    FIELD<double>* field = new FIELD<double>( family, /*NumberOfComponents=*/1);
+    field->setName( "FieldOnFamily");
+    field->setComponentsNames(&fileldnotexist);
+    field->setComponentsDescriptions(&fileldnotexist);
+    field->setMEDComponentsUnits(&fileldnotexist);
+    double* vals = const_cast<double*>( field->getValue() );
+    const int nbVals = family->getNumberOfElements( MED_ALL_ELEMENTS);
+    for ( int i = 0; i < nbVals; ++i ) vals[i] = i;
+
+    // store the mesh and the field in a file
+    int drv = mesh->addDriver( MED_DRIVER, filenameWithOutFileds_rdwr, mesh->getName() );
+    CPPUNIT_ASSERT_NO_THROW( mesh->write(drv) );
+    drv = field->addDriver( MED_DRIVER, filenameWithOutFileds_rdwr, field->getName() );
+    CPPUNIT_ASSERT_NO_THROW( field->write(drv) );
+
+    // Check 1) read the field back and check it's support
+    string familyName = family->getName();
+    const SUPPORT* supOnAll = mesh->getSupportOnAll( family->getEntity() );
+    FIELD<double>* field2 =
+      new FIELD<double>( supOnAll, MED_DRIVER, filenameWithOutFileds_rdwr, field->getName());
+    const SUPPORT* support2 = field2->getSupport();
+    CPPUNIT_ASSERT( support2 == family );
+    CPPUNIT_ASSERT_EQUAL( familyName, support2->getName() ); // name must not change
+
+    // Check 2) if a support with name corresponding to a profile is not found,
+    // the new SUPPORT must not have name "SupportOnAll_MED_entity"
+    ((FAMILY*)family)->setName("setName");
+    FIELD<double>* field3 =
+      new FIELD<double>( supOnAll, MED_DRIVER, filenameWithOutFileds_rdwr, field->getName());
+    const SUPPORT* support3 = field3->getSupport();
+    CPPUNIT_ASSERT( support3 != family );
+    CPPUNIT_ASSERT( support3->getName() != supOnAll->getName());
+
+    // delete
+    field->removeReference();
+    field2->removeReference();
+    field3->removeReference();
+    mesh->removeReference();
+  }
+  // End Test for the issue 0021211
+  ///////////////////////////////////////////////////////////////////////////////////
+
   //Delete all objects
   aField->removeReference();
   aField_1->removeReference();
