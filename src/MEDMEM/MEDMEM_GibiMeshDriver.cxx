@@ -506,6 +506,8 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
               strangeGroupType.insert( make_pair( objet, type_geom_castem ));
               continue;
             }
+            if ( medType == MED_POINT1 )
+              medType = MED_NONE; // issue 21199
             if ( nbElemsByGeomType.find( medType ) == nbElemsByGeomType.end())
               nbElemsByGeomType[ medType ] = 0;
             int & order = nbElemsByGeomType[ medType ];
@@ -3761,7 +3763,7 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
       {
         vector<string> prof_names( sup->getNumberOfTypes() );
         for (int itype=0; itype < prof_names.size(); itype++)
-          prof_names[itype]=STRING( sup->getName())<<"_type_"<<sup->getTypes()[itype];
+          prof_names[itype]=STRING( sup->getName())<<"_type"<<sup->getTypes()[itype];
         ((SUPPORT*) sup)->setProfilNames( prof_names );
       }
       _med->addField( *it );
