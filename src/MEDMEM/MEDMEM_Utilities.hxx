@@ -74,7 +74,7 @@ namespace MEDMEM
   inline std::string healName(const std::string& name )
   {
     size_t last = name.size()-1;
-    while ( last >= 0 && isspace( name[last] ))
+    while ( last >= 0 && ( isspace( name[last] ) || !name[last] ))
       last--;
     return name.substr( 0, last + 1 );
   }
