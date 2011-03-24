@@ -22,17 +22,16 @@
 
 /*
  File Support.cxx
- $Header$
 */
-
-#include <set>
-#include <algorithm>
-#include <list>
 
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_DriversDef.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Meshing.hxx"
+
+#include <set>
+#include <algorithm>
+#include <list>
 
 using namespace std;
 using namespace MED_EN;
@@ -69,7 +68,8 @@ SUPPORT::SUPPORT(): _name(""),  _description("None"), _mesh((MESH*)NULL),
                     _entity(MED_CELL), _numberOfGeometricType(0),
                     _isOnAllElts(false),
                     _totalNumberOfElements(0),
-                    _number((MEDSKYLINEARRAY*)NULL)
+                    _number((MEDSKYLINEARRAY*)NULL),
+                    _number_fromfile(0)
   //--------------------------------------------------------------------------
 {
   MESSAGE_MED("SUPPORT::SUPPORT()");
@@ -93,7 +93,7 @@ SUPPORT::SUPPORT(): _name(""),  _description("None"), _mesh((MESH*)NULL),
 SUPPORT::SUPPORT(MESH* Mesh, string Name/*=""*/, medEntityMesh Entity/*=MED_CELL*/):
   _name(Name), _description("None"), _mesh(Mesh), _entity(Entity),
   _numberOfGeometricType(0), _isOnAllElts(true),
-  _totalNumberOfElements(0), _number((MEDSKYLINEARRAY*)NULL)
+  _totalNumberOfElements(0), _number((MEDSKYLINEARRAY*)NULL),_number_fromfile(0)
   //--------------------------------------------------------------------------
 {
   MESSAGE_MED("SUPPORT::SUPPORT(MESH*Mesh,string Name,medEntityMesh Entity)");
@@ -104,7 +104,7 @@ SUPPORT::SUPPORT(MESH* Mesh, string Name/*=""*/, medEntityMesh Entity/*=MED_CELL
   Copy constructor.
 */
 //--------------------------------------------------------------------------
-SUPPORT::SUPPORT(const SUPPORT & m)
+SUPPORT::SUPPORT(const SUPPORT & m):_number_fromfile(0)
   //--------------------------------------------------------------------------
 {
   const char* LOC = "SUPPORT::SUPPORT(SUPPORT & m) : ";
@@ -220,7 +220,7 @@ ostream & MEDMEM::operator<<(ostream &os, const SUPPORT &my)
   os << "NumberOfTypes : "<<numberoftypes<<endl;
   PointerOf<medGeometryElement> types = my._geometricType;
   for (int j=0;j<numberoftypes;j++) {
-    int numberOfElements = my._numberOfElements[j];
+    int numberOfElements = my._numberOfElements ? my._numberOfElements[j] : -1;
     os << "    On Type "<<geoNames[types[j]]
        <<" : there is(are) "<<numberOfElements<<" element(s) and " <<endl;
   }
@@ -300,7 +300,7 @@ void SUPPORT::update()
 */
 //-------------------
 int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTION)
-  //-------------------
+//-------------------
 {
   const char * LOC="getValIndFromGlobalNumber(const int number) : ";
   //BEGIN_OF_MED(LOC);
@@ -470,11 +470,13 @@ void SUPPORT::setpartial(string Description, int NumberOfGeometricType,
   int elemDim = -1;
   for (int i=0;i<_numberOfGeometricType;i++) {
     if(GeometricType[i]/100 != elemDim)
-      if(i==0)
-        elemDim=GeometricType[i]/100;
-      else if ( CELLMODEL_Map::retrieveCellModel( GeometricType[i] ).getDimension() !=
-                CELLMODEL_Map::retrieveCellModel( GeometricType[0] ).getDimension() )
-        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"unhomogeneous geometric types (dimension) !"));
+      {
+        if(i==0)
+          elemDim=GeometricType[i]/100;
+        else if ( CELLMODEL_Map::retrieveCellModel( GeometricType[i] ).getDimension() !=
+                  CELLMODEL_Map::retrieveCellModel( GeometricType[0] ).getDimension() )
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"unhomogeneous geometric types (dimension) !"));
+      }
     _geometricType[i] = GeometricType[i] ;
     _numberOfElements[i] = NumberOfElements[i] ;
     index[i+1] = index[i]+NumberOfElements[i] ;
@@ -803,6 +805,11 @@ void MEDMEM::SUPPORT::clearDataOnNumbers()
     delete _number;
     _number=(MEDSKYLINEARRAY *) NULL;
   }
+  if(_number_fromfile)
+    {
+      delete _number_fromfile;
+      _number_fromfile=0;
+    }
 }
 
 /*!
@@ -963,6 +970,7 @@ bool MEDMEM::SUPPORT::belongsTo(const SUPPORT& other, bool deepCompare) const
 /*!
   Method used to sort array of id.
 */
+int compareId(const void *x, const void *y);
 int compareId(const void *x, const void *y)
 {
   const int *x1=(const int *)x;
@@ -1124,17 +1132,25 @@ SUPPORT *MEDMEM::SUPPORT::getBoundaryElements(medEntityMesh Entity) const throw 
   int spaceDimension=_mesh->getSpaceDimension();
   medEntityMesh baseEntity=Entity;
   if (spaceDimension == 3)
-    if (Entity!=MED_FACE)
-      if(Entity==MED_NODE)
-        baseEntity=MED_FACE;
-      else
-        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 3D mesh for entity "<<Entity<<" !"));
+    {
+      if (Entity!=MED_FACE)
+        {
+          if(Entity==MED_NODE)
+            baseEntity=MED_FACE;
+          else
+            throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 3D mesh for entity "<<Entity<<" !"));
+        }
+    }
   if (spaceDimension == 2)
-    if (Entity!=MED_EDGE)
-      if(Entity==MED_NODE)
-        baseEntity=MED_EDGE;
-      else
-        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 2D mesh for entity "<<Entity<<" !"));
+    {
+      if (Entity!=MED_EDGE)
+        {
+          if(Entity==MED_NODE)
+            baseEntity=MED_EDGE;
+          else
+            throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 2D mesh for entity "<<Entity<<" !"));
+        }
+    }
   if(_isOnAllElts)
     return _mesh->getBoundaryElements(Entity);
 
@@ -1224,7 +1240,6 @@ void MEDMEM::SUPPORT::fillFromNodeList(const list<int>& listOfNode) throw (MEDEX
   setNumberOfGeometricType(numberOfGeometricType);
   setGeometricType(geometricType);
   setNumberOfElements(numberOfElements);
-  //setTotalNumberOfElements(numberOfElements[0]);
   setNumber(mySkyLineArray);
 
   delete[] numberOfElements;
@@ -1309,7 +1324,7 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
 
 \brief creates a MESH that contains only the elements in the current support.
 
-The output mesh has no group, nor elements of connectivity lesser than that of the present support. The method does not handle polygon or polyhedral elements. Nodes are renumbered so that they are numberd from 1 to N in the new mesh. The order of the elements in the new mesh corresponds to that of the elements in the original support.
+The output mesh has no group, nor elements of connectivity lesser than that of the present support. Nodes are renumbered so that they are numberd from 1 to N in the new mesh. The order of the elements in the new mesh corresponds to that of the elements in the original support.
 */
 MESH* SUPPORT::makeMesh()
 {
@@ -1494,12 +1509,15 @@ MESH* SUPPORT::makeMesh()
 void SUPPORT::setMesh(MESH *Mesh) const
   //--------------------------------------
 {
-  if(_mesh)
-    _mesh->removeReference();
-  _mesh=Mesh;
-  _meshName = "";
-  if(_mesh)
-    _mesh->addReference();
+  if(_mesh!=Mesh)
+    {
+      if(_mesh)
+        _mesh->removeReference();
+      _mesh=Mesh;
+      _meshName = "";
+      if(_mesh)
+        _mesh->addReference();
+    }
 }
 
 /*! returns the mesh name  */
