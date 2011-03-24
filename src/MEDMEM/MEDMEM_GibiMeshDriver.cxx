@@ -45,7 +45,10 @@
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_DriverTools.hxx"
 
-class MEDMEM::FIELD_;
+namespace MEDMEM
+{
+class FIELD_;
+}
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -676,8 +679,8 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
                   int nm4 = getInt() ; next();
                   int nm5 = getInt() ; next();
                   int n45 = getInt() ; next();
-                  int nm6 = getInt() ; next();
-                  int nm7 = getInt() ; next();
+                  /*int nm6 =*/ getInt() ; next();
+                  /*int nm7 = */getInt() ; next();
                   next();
                   next();
                   int nm1 = n1 * n45;
@@ -2509,6 +2512,7 @@ void GIBI_MESH_RDONLY_DRIVER::updateSupports()
       string* attDescr = new string[1];
       attDescr[0] = "med_family";
       f->setAttributesDescriptions( attDescr );
+      delete [] attDescr;
       // limit a name length
       if ( f->getName().length() > 31 ) {
         ostringstream name;
@@ -3713,7 +3717,7 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
   if (_status!=MED_OPENED)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "file " << _fileName<<" is not opened." ));
 
-  _ptrMesh = new MESH();
+  _ptrMesh = new MESH;
 
   _intermediateMED medi;
   try {
@@ -3757,7 +3761,7 @@ void GIBI_MED_RDONLY_DRIVER::read ( void ) throw (MEDEXCEPTION)
       {
         vector<string> prof_names( sup->getNumberOfTypes() );
         for (int itype=0; itype < prof_names.size(); itype++)
-          prof_names[itype]=STRING( sup->getName())<<"_type_"<<sup->getTypes()[itype];
+          prof_names[itype]=STRING( sup->getName())<<"_type"<<sup->getTypes()[itype];
         ((SUPPORT*) sup)->setProfilNames( prof_names );
       }
       _med->addField( *it );
