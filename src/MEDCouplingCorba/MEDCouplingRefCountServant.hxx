@@ -38,6 +38,7 @@ namespace ParaMEDMEM
   protected:
     void Register();
     void UnRegister();
+    void Destroy(); // obsolete
     CORBA::Long getTimeLabel();
   protected:
     int _ref_counter;

@@ -72,3 +72,9 @@ void MEDCouplingRefCountServant::UnRegister()
       _remove_ref();
     }
 }
+
+void MEDCouplingRefCountServant::Destroy()
+{
+  std::cerr << "WARNING SALOME::GenericObj::Destroy() function is obsolete! Use UnRegister() instead." << std::endl;
+  UnRegister();
+}
