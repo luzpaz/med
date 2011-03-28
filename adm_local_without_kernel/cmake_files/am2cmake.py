@@ -205,31 +205,44 @@ class CMakeFile(object):
             "vtkImagingPythonD",
             ]
         kernel_list  = [
+            "CalciumC",
             "DF",
             "Launcher",
+            "LifeCycleCORBATest",
+            "NamingServiceTest",
             "OpUtil",
             "Registry",
             "ResourcesManager",
             "SALOMEBasics",
-            "SalomeBatch",
             "SalomeCatalog",
             "SalomeCommunication",
             "SalomeContainer",
+            "SalomeDatastream",
             "SalomeDSCContainer",
             "SalomeDSClient",
+            "SalomeDSCSupervBasic",
+            "SalomeDSCSuperv",
             "SalomeDSImpl",
+            "SALOMEDSImplTest",
             "SalomeDS",
+            "SALOMEDSTest",
             "SalomeGenericObj",
             "SalomeHDFPersist",
             "SalomeIDLKernel",
             "SalomeLauncher",
             "SalomeLifeCycleCORBA",
             "SALOMELocalTrace",
+            "SALOMELocalTraceTest",
             "SalomeLoggerServer",
+            "SalomeMPIContainer",
             "SalomeNotification",
             "SalomeNS",
             "SalomeResourcesManager",
+            "SalomeTestComponentEngine",
+            "SalomeTestMPIComponentEngine",
+            "SALOMETraceCollectorTest",
             "TOOLSDS",
+            "UtilsTest",
             "with_loggerTraceCollector",
             ]
         gui_list = [
@@ -243,6 +256,7 @@ class CMakeFile(object):
             "LogWindow",
             "ObjBrowser",
             "OCCViewer",
+            "OpenGLUtils",
             "Plot2d",
             "PyConsole",
             "PyInterp",
@@ -250,9 +264,14 @@ class CMakeFile(object):
             "qtx",
             "QxScene",
             "SalomeApp",
+            "SalomeAppTest",
             "SalomeIDLGUI",
             "SalomeObject",
             "SalomePrs",
+            "SalomePyQtGUILight",
+            "SalomePyQtGUI",
+            "SalomePyQt",
+            "SalomePy",
             "SalomeSession",
             "SalomeStyle",
             "SOCC",
@@ -263,9 +282,11 @@ class CMakeFile(object):
             "SUPERVGraph",
             "SVTK",
             "ToolsGUI",
+            "ViewerTools",
             "VTKViewer",
             ]
         geom_list = [
+            "AdvancedGUI",
             "BasicGUI",
             "BlocksGUI",
             "BooleanGUI",
@@ -295,6 +316,7 @@ class CMakeFile(object):
             "MeasureGUI",
             "NMTDS",
             "NMTTools",
+            "OCC2VTK",
             "OperationGUI",
             "PrimitiveGUI",
             "RepairGUI",
@@ -304,6 +326,7 @@ class CMakeFile(object):
             "STEPImport",
             "STLExport",
             "TransformationGUI",
+            "VTKExport",
             ]
         med_list = [
             "interpkernel",
@@ -332,6 +355,7 @@ class CMakeFile(object):
             "paramedmem",
             "ParaMEDMEMTest",
             "SalomeIDLMED",
+            "SalomeIDLMEDTests",
             ]
         smesh_list = [
             "GeomSelectionTools",
@@ -442,6 +466,10 @@ class CMakeFile(object):
             ENABLE_TESTING()
             """)
             # --
+            newlines.append("""
+            SET(MODULE %s)
+            """%(self.module.upper()))
+            # --
             if self.module == "kernel":
                 newlines.append("""
                 INCLUDE(${CMAKE_SOURCE_DIR}/salome_adm/cmake_files/FindPLATFORM.cmake)
@@ -455,6 +483,7 @@ class CMakeFile(object):
                 INCLUDE(${CMAKE_SOURCE_DIR}/salome_adm/cmake_files/FindCPPUNIT.cmake)
                 INCLUDE(${CMAKE_SOURCE_DIR}/salome_adm/cmake_files/FindDOXYGEN.cmake)
                 INCLUDE(${CMAKE_SOURCE_DIR}/salome_adm/cmake_files/FindMPI.cmake)
+                INCLUDE(${CMAKE_SOURCE_DIR}/salome_adm/cmake_files/FindLIBBATCH.cmake)
                 """)
                 pass
             else:
@@ -473,6 +502,7 @@ class CMakeFile(object):
                     INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindCPPUNIT.cmake)
                     INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindDOXYGEN.cmake)
                     INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindMPI.cmake)
+                    INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindLIBBATCH.cmake)
                     INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindKERNEL.cmake)
                     ELSE(KERNEL_ROOT_DIR)
                     INCLUDE(${CMAKE_SOURCE_DIR}/adm_local_without_kernel/cmake_files/FindPLATFORM.cmake)
@@ -493,6 +523,7 @@ class CMakeFile(object):
                     INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindCPPUNIT.cmake)
                     INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindDOXYGEN.cmake)
                     INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindMPI.cmake)
+                    INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindLIBBATCH.cmake)
                     INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindKERNEL.cmake)
                     """)
                     pass
@@ -615,8 +646,6 @@ class CMakeFile(object):
                 newlines.append("""
                 SET(WITH_LOCAL 1)
                 SET(WITH_BATCH 1)
-                set(VERSION 5.1.5)
-                set(XVERSION 0x050105)
                 SET(CALCIUM_IDL_INT_F77 long)
                 SET(CALCIUM_CORBA_INT_F77 CORBA::Long)
                 SET(LONG_OR_INT int)
@@ -632,8 +661,13 @@ class CMakeFile(object):
                 SET(ENABLE_PYCONSOLE ON)
                 SET(ENABLE_SUPERVGRAPHVIEWER ON)
                 SET(ENABLE_QXGRAPHVIEWER ON)
-                set(VERSION 5.1.5)
-                set(XVERSION 0x050105)
+                """)
+                pass
+            elif self.module == "jobmanager":
+                newlines.append("""
+                IF(GUI_ROOT_DIR)
+                SET(HAS_GUI ON)
+                ENDIF(GUI_ROOT_DIR)
                 """)
                 pass
             elif self.module == "geom":
@@ -726,6 +760,10 @@ class CMakeFile(object):
                 """)
                 pass
             # --
+            newlines.append("""
+            set(VERSION 6.3.0)
+            set(XVERSION 0x060300)
+            """)
             pass
         # --
         newlines.append("""
@@ -735,6 +773,9 @@ class CMakeFile(object):
         SET(AM_CPPFLAGS)
         SET(AM_CXXFLAGS)
         SET(LDADD)
+        SET(pythondir lib/python${PYTHON_VERSION}/site-packages)
+        SET(salomepythondir ${pythondir}/salome)
+        SET(salomepypkgdir ${salomepythondir}/salome)
         """)
         if self.module == "netgen":
             newlines.append(r'''
@@ -752,6 +793,20 @@ class CMakeFile(object):
                 SET(AM_CPPFLAGS ${AM_CPPFLAGS} -DHAVE_SALOME_CONFIG -I${KERNEL_ROOT_DIR}/include/salome -include SALOMEconfig.h)
                 SET(AM_CXXFLAGS ${AM_CXXFLAGS} -DHAVE_SALOME_CONFIG -I${KERNEL_ROOT_DIR}/include/salome -include SALOMEconfig.h)
                 ENDIF(KERNEL_ROOT_DIR)
+                ''')
+                pass
+            if self.module == "gui":
+                newlines.append(r'''
+                IF(KERNEL_ROOT_DIR)
+                SET(AM_CPPFLAGS ${AM_CPPFLAGS} -DWITH_SALOMEDS_OBSERVER)
+                SET(AM_CXXFLAGS ${AM_CXXFLAGS} -DWITH_SALOMEDS_OBSERVER)
+                ENDIF(KERNEL_ROOT_DIR)
+                ''')
+                pass
+            if self.module in ["smesh", "netgenplugin", "blsurfplugin", "ghs3dplugin"]:
+                newlines.append(r'''
+                SET(AM_CPPFLAGS ${AM_CPPFLAGS} -DWITH_SMESH_CANCEL_COMPUTE)
+                SET(AM_CXXFLAGS ${AM_CXXFLAGS} -DWITH_SMESH_CANCEL_COMPUTE)
                 ''')
                 pass
             if self.module == "hxx2salome":
@@ -958,10 +1013,57 @@ class CMakeFile(object):
         return
     
     def finalize(self, newlines):
-        
+      
         # --
         # Convert the .in files in build dir
         # --
+
+        import operator
+        mod = self.module
+        if mod in ['kernel', 'gui'] and self.root[-len('gui'):] == 'gui' or mod == 'med' and operator.contains(self.root, 'doxygen'):
+            newlines.append(r'''
+            SET(top_builddir
+                ${CMAKE_BINARY_DIR}
+            )
+            SET(top_srcdir 
+                ${CMAKE_SOURCE_DIR}
+            )
+            SET(srcdir 
+                ${CMAKE_CURRENT_SOURCE_DIR}
+            )
+            SET(builddir 
+                ${CMAKE_CURRENT_BINARY_DIR}
+            )
+            SET(datadir
+                ${CMAKE_INSTALL_PREFIX}/share
+            )
+            SET(docdir 
+                ${datadir}/doc/salome
+            )
+            ''')
+            self.files.append("static/header.html.in")
+        elif self.root[-len(mod):] == mod.upper() and operator.contains(self.root, 'doc') or mod in ['kernel', 'gui', 'geom', 'med', 'smesh', 'visu'] and self.root[-len('tui'):] == 'tui':
+            newlines.append(r'''
+            SET(top_builddir
+                ${CMAKE_BINARY_DIR}
+            )
+            SET(top_srcdir 
+                ${CMAKE_SOURCE_DIR}
+            )
+            SET(srcdir 
+                ${CMAKE_CURRENT_SOURCE_DIR}
+            )
+            SET(builddir 
+                ${CMAKE_CURRENT_BINARY_DIR}
+            )
+            SET(datadir
+                ${CMAKE_INSTALL_PREFIX}/share
+            )
+            SET(docdir 
+                ${datadir}/doc/salome
+            )
+            ''')
+            self.files.append("static/header.html.in")
         if self.module == "yacs":
             key = "salomegui"
             if self.root[-len(key):] == key:
@@ -970,6 +1072,8 @@ class CMakeFile(object):
             pass
         for f in self.files:
             if f[-3:] == ".in":
+                if self.module == 'yacs' and f == "Doxyfile.in":
+                    continue
                 if f == "sstream.in":
                     continue
                 if f in ["runContainer.in", "stopContainer.in"]:
@@ -995,7 +1099,104 @@ class CMakeFile(object):
                 ''')
                 pass
             pass
-        
+
+	# --
+	# add commands for generating of user's documentation
+	# --
+  
+        upmod = self.module.upper()
+        doc_gui_destination = "${CMAKE_INSTALL_PREFIX}/share/doc/salome/gui/%s"%(upmod)
+        doc_tui_destination = "${CMAKE_INSTALL_PREFIX}/share/doc/salome/tui/%s"%(upmod)
+        doc_destination = "${CMAKE_INSTALL_PREFIX}/share/doc/salome"
+        head_source = "${CMAKE_CURRENT_SOURCE_DIR}/images/head.png"
+        if mod == 'kernel':
+            copytree_src = "${CMAKE_SOURCE_DIR}/salome_adm/cmake_files"
+        else:
+            copytree_src = "$ENV{KERNEL_ROOT_DIR}/salome_adm/cmake_files"
+        str = "import re \nimport sys \noutfile = open(sys.argv[1], 'wb') \nfor line in open(sys.argv[2], 'rb').readlines():"
+        str += "\n    if re.match('class '+sys.argv[3]+'DC', line): \n        continue \n    line = re.sub(r'^\s+\#', '#', line) \n    line = re.sub(r'^\s+def', 'def', line) \n    line = re.sub(sys.argv[3]+'DC', sys.argv[3], line)"
+        str += "\n    outfile.write(line) \noutfile.close()"
+
+        if mod in ['kernel', 'gui'] and self.root[-len('gui'):] == 'gui' or mod == 'med' and operator.contains(self.root, 'doxygen'):
+            if mod == 'med':
+                doc_source = "${CMAKE_CURRENT_BINARY_DIR}/doc_ref_user/html"
+                input = "Doxyfile_med_user"
+            else:
+                doc_source = "${CMAKE_CURRENT_BINARY_DIR}/%s"%(upmod)
+                input = ""
+            newlines.append("""\t    ADD_CUSTOM_TARGET(usr_docs ${DOXYGEN_EXECUTABLE} %s
+            COMMAND ${PYTHON_EXECUTABLE} -c "import shutil, sys; sys.path.append(r'''%s'''); shutil.rmtree(r'''%s''', True); import copytree1; copytree1.copytree(r'''%s''', r'''%s'''); shutil.copy(r'''%s''', r'''%s''')"
+            VERBATIM 
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}             
+            )"""%(input, copytree_src, doc_gui_destination, doc_source, doc_gui_destination, head_source, doc_gui_destination))
+                
+        if mod in ['geom', 'smesh', 'visu'] and self.root[-len(mod):] == upmod and operator.contains(self.root, 'doc'):
+            ign = r"""'tempfile', '*usr_docs*', '*CMakeFiles*', '*.cmake', 'doxyfile*', '*.vcproj', 'static', 'Makefile*'"""
+            if mod in ['geom', 'smesh']:
+                if mod == 'geom':
+                    tmp = 'geompy'
+                    input = "COMMAND ${DOXYGEN_EXECUTABLE} doxyfile_tui \n\t\t"
+                else:
+                    tmp =  'smesh' 
+                    input = ''
+                newlines.append(r"""
+                FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/tempfile "%s")
+                ADD_CUSTOM_TARGET(usr_docs ${PYTHON_EXECUTABLE} tempfile ${CMAKE_BINARY_DIR}/src/%s_SWIG/%s.py ${CMAKE_SOURCE_DIR}/src/%s_SWIG/%sDC.py %s
+                %sCOMMAND ${DOXYGEN_EXECUTABLE} doxyfile_py
+                COMMAND ${DOXYGEN_EXECUTABLE} doxyfile
+                COMMAND ${PYTHON_EXECUTABLE} -c "import os; os.remove(r'''${CMAKE_BINARY_DIR}/src/%s_SWIG/%s.py''')"
+                COMMAND ${PYTHON_EXECUTABLE} -c "import shutil, sys; sys.path.append(r'''%s'''); shutil.rmtree(r'''%s''', True); import copytree1; copytree1.copytree(r'''${CMAKE_CURRENT_BINARY_DIR}''', r'''%s''', ignore=copytree1.ignore_patterns(%s)); shutil.copy(r'''%s''', r'''%s''')"
+                VERBATIM 
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}             
+                )"""%(str, upmod, tmp, upmod, tmp, tmp, input, upmod, tmp, copytree_src, doc_gui_destination, doc_gui_destination, ign, head_source, doc_gui_destination))
+            else:
+      	        newlines.append("""\t    ADD_CUSTOM_TARGET(usr_docs ${DOXYGEN_EXECUTABLE} doxyfile_idl
+                COMMAND ${DOXYGEN_EXECUTABLE} doxyfile
+                COMMAND ${PYTHON_EXECUTABLE} -c "import shutil, sys; sys.path.append(r'''%s'''); shutil.rmtree(r'''%s''',True); import copytree1; copytree1.copytree(r'''${CMAKE_CURRENT_BINARY_DIR}''',r'''%s''', ignore=copytree1.ignore_patterns(%s)); shutil.copy(r'''%s''',r'''%s''')"
+                VERBATIM 
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}             
+                )"""%(copytree_src, doc_gui_destination, doc_gui_destination, ign, head_source, doc_gui_destination))
+
+	# --
+	# add commands for generating of developer's documentation
+	# --
+  
+        upmod = self.module.upper()
+        if mod in ['kernel', 'gui', 'med', 'smesh', 'visu'] and self.root[-len('tui'):] == 'tui':
+            if mod == 'kernel':
+                tmp = """\tADD_CUSTOM_TARGET(dev_docs ${DOXYGEN_EXECUTABLE} -u
+            COMMAND ${DOXYGEN_EXECUTABLE}
+            COMMAND ${PYTHON_EXECUTABLE} -c "import os; os.remove(r'''${CMAKE_CURRENT_BINARY_DIR}/doxyfile.bak''')"  """
+                tmp1=""
+            else: 
+                tmp = """\tADD_CUSTOM_TARGET(dev_docs ${DOXYGEN_EXECUTABLE}"""
+                if mod == 'visu':
+                    tmp1= r"""\n           COMMAND ${PYTHON_EXECUTABLE} -c "from shutil import copy; copy(r'''${CMAKE_CURRENT_SOURCE_DIR}/images/visuscreen.png''', r'''%s''')" """%(doc_tui_destination)
+                elif mod == 'smesh':
+                    extra_srcdir = "${CMAKE_CURRENT_SOURCE_DIR}/extra"
+                    tmp1= """\n            COMMAND ${PYTHON_EXECUTABLE} -c "from shutil import copy; copy(r'''${CMAKE_CURRENT_SOURCE_DIR}/images/smeshscreen.png''', r'''%s'''); copy(r'''%s/AddNetgenInSalome2.pdf''', r'''%s'''); copy(r'''%s/PluginMeshers.html''', r'''%s''')" 
+            COMMAND ${PYTHON_EXECUTABLE} -c "from shutil import copy; copy(r'''%s/AddNetgenInSalome2.ps''', r'''%s'''); copy(r'''%s/AddNetgenInSalome2.sxw''', r'''%s''')" """%(doc_tui_destination, extra_srcdir,doc_destination, extra_srcdir,doc_destination, extra_srcdir,doc_destination,extra_srcdir,doc_destination)
+                else:
+                    tmp1=""
+            doc_source = "${CMAKE_CURRENT_BINARY_DIR}/%s"%(upmod)
+            newlines.append(tmp + """
+            COMMAND ${PYTHON_EXECUTABLE} -c "import shutil, sys; sys.path.append(r'''%s'''); shutil.rmtree(r'''%s''', True); import copytree1; copytree1.copytree(r'''%s''', r'''%s'''); shutil.copy(r'''%s''', r'''%s''')" """%(copytree_src, doc_tui_destination, doc_source, doc_tui_destination, head_source, doc_tui_destination) + tmp1 + """
+            VERBATIM 
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}             
+            )""")
+        if mod == 'geom' and self.root[-len('tui'):] == 'tui':
+            tmp = 'geompy'
+            doc_source = "${CMAKE_CURRENT_BINARY_DIR}/%s"%(upmod)
+            newlines.append(r"""
+            FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/tempfile "%s")
+            ADD_CUSTOM_TARGET(dev_docs ${PYTHON_EXECUTABLE} tempfile ${CMAKE_BINARY_DIR}/src/%s_SWIG/%s.py ${CMAKE_SOURCE_DIR}/src/%s_SWIG/%sDC.py %s
+            COMMAND ${DOXYGEN_EXECUTABLE} doxyfile
+            COMMAND ${PYTHON_EXECUTABLE} -c "import os; os.remove(r'''${CMAKE_BINARY_DIR}/src/%s_SWIG/%s.py''')"
+            COMMAND ${PYTHON_EXECUTABLE} -c "import shutil, sys; sys.path.append(r'''%s'''); shutil.rmtree(r'''%s''', True); import copytree1; copytree1.copytree(r'''%s''', r'''%s'''); shutil.copy(r'''%s''', r'''%s'''); shutil.copy(r'''${CMAKE_CURRENT_SOURCE_DIR}/images/geomscreen.png''', r'''%s''')"
+            VERBATIM 
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}             
+            )"""%(str, upmod, tmp, upmod, tmp, tmp, upmod, tmp, copytree_src, doc_tui_destination, doc_source, doc_tui_destination, head_source, doc_tui_destination, doc_tui_destination))
+
         # --
         # convert the SUBDIRS in cmake grammar
         # --
@@ -1082,7 +1283,10 @@ class CMakeFile(object):
                 pass
             newlines.append('''
             INSTALL(CODE "SET(IDL_FILE ${input})")
-            INSTALL(CODE "SET(DIR lib/python${PYTHON_VERSION}/site-packages/salome)")
+            INSTALL(CODE "SET(DIR ${salomepythondir})")
+            IF(WINDOWS)
+            INSTALL(CODE "SET(DIR bin/salome)")
+            ENDIF(WINDOWS)
             INSTALL(CODE "SET(CMAKE_CURRENT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})")
             INSTALL(CODE "SET(OMNIORB_IDL_PYTHON ${OMNIORB_IDL_PYTHON})")
             # --
@@ -1180,7 +1384,7 @@ class CMakeFile(object):
             newlines.append('''
             FOREACH(output ${MOC_FILES})
             ''')
-            if self.module == "yacs":
+            if self.module in ["jobmanager", "yacs"]:
                 newlines.append('''
                 STRING(REGEX REPLACE _moc.cxx .hxx input ${output})
                 ''')
@@ -1305,27 +1509,33 @@ class CMakeFile(object):
             resdir = self.hxxmodule
             pass
         d = {
-            "salomeadmux_DATA"            :  "salome_adm/unix",
-            "dist_salomeadmux_DATA"       :  "salome_adm/unix",
-            "dist_salome_cmake_DATA"      :  "salome_adm/cmake_files",
-            "dist_salomem4_DATA"          :  "salome_adm/unix/config_files",
-            "dist_salome4depr_DATA"       :  "salome_adm/unix/config_files/DEPRECATED",
-            "dist_admlocalm4_DATA"        :  "adm_local/unix/config_files",
-            "dist_admlocal_cmake_DATA"    :  "adm_local/cmake_files",
-            "salomeinclude_DATA"          :  "include/salome",
-            "salomeinclude_HEADERS"       :  "include/salome",
-            "dist_salomeres_DATA"         :  "share/salome/resources/%s"%(resdir),
-            "nodist_salomeres_DATA"       :  "share/salome/resources/%s"%(resdir),
-            "nodist_salomeres_SCRIPTS"    :  "share/salome/resources/%s"%(resdir),
-            "dist_salomescript_SCRIPTS"   :  "bin/salome",
-            "dist_salomescript_DATA"      :  "bin/salome",
-            "dist_salomescript_PYTHON"    :  "bin/salome",
-            "nodist_salomescript_DATA"    :  "bin/salome",
-            "salomepython_PYTHON"         :  "lib/python${PYTHON_VERSION}/site-packages/salome",
-            "nodist_salomepython_PYTHON"  :  "lib/python${PYTHON_VERSION}/site-packages/salome",
-            "dist_salomepython_DATA"      :  "lib/python${PYTHON_VERSION}/site-packages/salome",
-            "sharedpkgpython_PYTHON"      :  "lib/python${PYTHON_VERSION}/site-packages/salome/shared_modules",
+            "salomeadmux_DATA"                 :  "salome_adm/unix",
+            "dist_salomeadmux_DATA"            :  "salome_adm/unix",
+            "dist_salome_cmake_DATA"           :  "salome_adm/cmake_files",
+            "dist_salomem4_DATA"               :  "salome_adm/unix/config_files",
+            "dist_salome4depr_DATA"            :  "salome_adm/unix/config_files/DEPRECATED",
+            "dist_admlocalm4_DATA"             :  "adm_local/unix/config_files",
+            "dist_admlocal_cmake_DATA"         :  "adm_local/cmake_files",
+            "salomeinclude_DATA"               :  "include/salome",
+            "salomeinclude_HEADERS"            :  "include/salome",
+            "nodist_salomeinclude_HEADERS"     :  "include/salome",
+            "dist_salomeres_DATA"              :  "share/salome/resources/%s"%(resdir),
+            "nodist_salomeres_DATA"            :  "share/salome/resources/%s"%(resdir),
+            "nodist_salomeres_SCRIPTS"         :  "share/salome/resources/%s"%(resdir),
+            "dist_salomescript_SCRIPTS"        :  "bin/salome",
+            "dist_salomescript_DATA"           :  "bin/salome",
+            "dist_salomescript_PYTHON"         :  "bin/salome",
+            "nodist_salomescript_DATA"         :  "bin/salome",
+            "salomepython_PYTHON"              :  "${salomepythondir}",
+            "nodist_salomepython_PYTHON"       :  "${salomepythondir}",
+            "dist_salomepython_DATA"           :  "${salomepythondir}",
+            "sharedpkgpython_PYTHON"           :  "${salomepythondir}/shared_modules",
+            "salomepypkg_PYTHON"               :  "${salomepypkgdir}",
+            "mypkgpython_PYTHON"               :  "${mypkgpythondir}",
             }
+        if self.module == "jobmanager":
+            d["bin_SCRIPTS"] = "bin"
+            pass
         if self.module == "medfile":
             d = {
                 "include_HEADERS"        :  "include",
@@ -1406,7 +1616,13 @@ class CMakeFile(object):
         SET(lib)
         ENDIF(lib STREQUAL v)
         ENDFOREACH(v ${vars})
+        SET(test OFF)
+        IF(lib)
+        STRING(REGEX MATCH "^-lQt" test ${lib})
+        ENDIF(lib)
+        IF(NOT test)
         SET(libadd ${libadd} ${lib})
+        ENDIF(NOT test)
         ENDFOREACH(lib ${libs})
         TARGET_LINK_LIBRARIES(${name} ${libadd})
         ''')
@@ -1657,9 +1873,21 @@ class CMakeFile(object):
         FOREACH(f ${l})
         GET_FILENAME_COMPONENT(ext ${f} EXT)
         IF(ext STREQUAL .py)
+        SET(fff)
         ELSE(ext STREQUAL .py)
-        SET(build_srcs ${build_srcs} ${CMAKE_CURRENT_BINARY_DIR}/${f})
+        SET(fff ${CMAKE_CURRENT_BINARY_DIR}/${f})
         ENDIF(ext STREQUAL .py)
+        IF(fff)
+        IF(build_srcs)
+        LIST(FIND build_srcs ${fff} index)
+        IF(NOT index EQUAL -1)
+        SET(fff)
+        ENDIF(NOT index EQUAL -1)
+        ENDIF(build_srcs)
+        ENDIF(fff)
+        IF(fff)
+        SET(build_srcs ${build_srcs} ${fff})
+        ENDIF(fff)
         ENDFOREACH(f ${l})
         ''')
         # --
@@ -1761,18 +1989,18 @@ class CMakeFile(object):
             ''')
             newlines.append(r'''
             IF(WINDOWS)
-            INSTALL(TARGETS ${name} DESTINATION lib/python${PYTHON_VERSION}/site-packages/salome)
+            INSTALL(TARGETS ${name} DESTINATION ${salomepythondir})
             IF(CMAKE_BUILD_TYPE STREQUAL Release)
-            INSTALL(FILES ${CMAKE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION}/site-packages/salome/${name}.dll DESTINATION lib/python${PYTHON_VERSION}/site-packages/salome RENAME ${name}.pyd)
+            INSTALL(FILES ${CMAKE_INSTALL_PREFIX}/${salomepythondir}/${name}.dll DESTINATION ${salomepythondir} RENAME ${name}.pyd)
             ELSE(CMAKE_BUILD_TYPE STREQUAL Release)
-            INSTALL(FILES ${CMAKE_INSTALL_PREFIX}/lib/python${PYTHON_VERSION}/site-packages/salome/${name}.dll DESTINATION lib/python${PYTHON_VERSION}/site-packages/salome RENAME ${name}_d.pyd)
+            INSTALL(FILES ${CMAKE_INSTALL_PREFIX}/${salomepythondir}/${name}.dll DESTINATION ${salomepythondir} RENAME ${name}_d.pyd)
             ENDIF(CMAKE_BUILD_TYPE STREQUAL Release)
             ELSE(WINDOWS)
             GET_TARGET_PROPERTY(version ${name} VERSION)
             GET_TARGET_PROPERTY(soversion ${name} SOVERSION)
-            INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${name}.so.${version} DESTINATION lib/python${PYTHON_VERSION}/site-packages/salome RENAME ${name}.so.${version})
-            INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${name}.so.${version} DESTINATION lib/python${PYTHON_VERSION}/site-packages/salome RENAME ${name}.so.${soversion})
-            INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${name}.so.${version} DESTINATION lib/python${PYTHON_VERSION}/site-packages/salome RENAME ${name}.so)
+            INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${name}.so.${version} DESTINATION ${salomepythondir} RENAME ${name}.so.${version})
+            INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${name}.so.${version} DESTINATION ${salomepythondir} RENAME ${name}.so.${soversion})
+            INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib${name}.so.${version} DESTINATION ${salomepythondir} RENAME ${name}.so)
             ENDIF(WINDOWS)
             ''')
             newlines.append(r'''
@@ -1829,7 +2057,7 @@ class CMakeFile(object):
         # --
         self.setLibAdd(key, newlines)
         # --
-        if self.module in ["medfile", "netgen"]:
+        if self.module in ["jobmanager", "medfile", "netgen"]:
             newlines.append(r'''
             SET(DEST bin)
             ''')
@@ -1952,7 +2180,10 @@ class CMakeFile(object):
             ELSE(f STREQUAL SALOME_ContainerPy.py)
             IF(f STREQUAL am2cmake.py)
             ELSE(f STREQUAL am2cmake.py)
+            IF(f STREQUAL copytree1.py)
+            ELSE(f STREQUAL copytree1.py)
             INSTALL(SCRIPT ${CMAKE_SOURCE_DIR}/salome_adm/cmake_files/install_and_compile_python_file.cmake)
+            ENDIF(f STREQUAL copytree1.py)
             ENDIF(f STREQUAL am2cmake.py)
             ENDIF(f STREQUAL SALOME_ContainerPy.py)
             ''')
