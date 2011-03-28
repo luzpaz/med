@@ -65,7 +65,7 @@ _MEDattrNumEcrire(med_idt pere,med_type_champ type,char *nom,unsigned char *val,
          we don't know yet if it is an HDF bug or an ASTER one */
       /* The problem seems to be in convertion process between INT32LE->INT32BE ? */
       type_hdf = H5T_STD_I32BE;
-      if ((H5Tconvert(H5T_NATIVE_INT,H5T_STD_I32BE,1,(void *)val,NULL,NULL)) < 0) 
+      if ((H5Tconvert(H5T_NATIVE_INT,H5T_STD_I32BE,1,(void *)val,NULL,0)) < 0) 
           return -1;
 #else
       type_hdf = H5T_NATIVE_INT;
@@ -98,7 +98,7 @@ _MEDattrNumEcrire(med_idt pere,med_type_champ type,char *nom,unsigned char *val,
   /* This explicit convertion cancel the previous on which avoid a mysterious bug between HDF&ASTER when reading
      a file written under a PCLINUX system, we don't know yet if it is an HDF bug or an ASTER one */  
   if (type == MED_INT) 
-    if ((H5Tconvert(H5T_STD_I32BE,H5T_NATIVE_INT,1,(void *)val,NULL,NULL)) < 0) 
+    if ((H5Tconvert(H5T_STD_I32BE,H5T_NATIVE_INT,1,(void *)val,NULL,0)) < 0) 
       return -1;
 #endif
 
