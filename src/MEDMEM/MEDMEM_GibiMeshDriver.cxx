@@ -97,6 +97,24 @@ const medGeometryElement GIBI_MESH_DRIVER::geomGIBItoMED[nb_geometrie_gibi] =
       /*41*/ MED_NONE   ,/*42*/ MED_NONE   ,/*43*/ MED_NONE   ,/*44*/ MED_NONE   ,/*45*/ MED_NONE   ,
       /*46*/ MED_NONE   ,/*47*/ MED_NONE   };
 
+enum Readable_Piles
+  {
+    PILE_SOUS_MAILLAGE=1,
+    PILE_NODES_FIELD  =2,
+    PILE_TABLES       =10,
+    PILE_LREEL        =18,
+    PILE_LOGIQUES     =24,
+    PILE_FLOATS       =25,
+    PILE_INTEGERS     =26,
+    PILE_STRINGS      =27,
+    PILE_LMOTS        =29,
+    PILE_NOEUDS       =32,
+    PILE_COORDONNEES  =33,
+    PILE_MODL         =38,
+    PILE_FIELD        =39,
+    PILE_LAST_READABLE=39
+  };
+
 //=======================================================================
 //function : gibi2medGeom
 //purpose  :
@@ -228,22 +246,6 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
 
   // LECTURE DES DONNEES DS FICHIER GIBI
 
-  enum Readable_Piles {
-    PILE_SOUS_MAILLAGE=1,
-    PILE_NODES_FIELD  =2,
-    PILE_TABLES       =10,
-    PILE_LREEL        =18,
-    PILE_LOGIQUES     =24,
-    PILE_FLOATS       =25,
-    PILE_INTEGERS     =26,
-    PILE_STRINGS      =27,
-    PILE_LMOTS        =29,
-    PILE_NOEUDS       =32,
-    PILE_COORDONNEES  =33,
-    PILE_MODL         =38,
-    PILE_FIELD        =39,
-    PILE_LAST_READABLE=39
-  };
   Readable_Piles readable_Piles [] = {
     PILE_SOUS_MAILLAGE,
     PILE_NODES_FIELD,
@@ -1363,53 +1365,55 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
   if (listGIBItoMED_comp.size() > 0) {
     list<nameGIBItoMED>::iterator itGIBItoMED = listGIBItoMED_comp.begin();
     for (; itGIBItoMED != listGIBItoMED_comp.end(); itGIBItoMED++)
-    {
-      string medName  = mapStrings[itGIBItoMED->med_id];
-      string gibiName = mapStrings[itGIBItoMED->gibi_id];
+      {
+        string medName  = mapStrings[itGIBItoMED->med_id];
+        string gibiName = mapStrings[itGIBItoMED->gibi_id];
 
-      int posDot = medName.find(".");
-      string medNameField = medName.substr(0, posDot);
-      string medNameCompo = medName.substr(posDot + 1);
-
-      int nbFields = cell_fields.size();
-      for (int ifi = 0; ifi < nbFields; ifi++) {
-        if (cell_fields[ifi]->_name == medNameField) {
-          std::vector<_fieldBase::_sub_data>& aSubDs = cell_fields[ifi]->_sub;
-          int nbSub = aSubDs.size();
-          for (int isu = 0; isu < nbSub; isu++) {
-            for (int ico = 0; ico < aSubDs[isu].nbComponents(); ico++) {
-              if (aSubDs[isu].compName(ico) == gibiName) {
-                cell_fields[ifi]->_sub[isu].compName(ico) = medNameCompo;
+        bool name_found = false;
+        for ( int isNodal = 0; isNodal < 2 && !name_found; ++isNodal )
+          {
+            vector<_fieldBase*> & fields = isNodal ? node_fields : cell_fields;
+            for ( unsigned ifi = 0; ifi < fields.size() && !name_found; ifi++)
+              {
+                if (medName.find( fields[ifi]->_name + "." ) == 0 ) {
+                  std::vector<_fieldBase::_sub_data>& aSubDs = fields[ifi]->_sub;
+                  int nbSub = aSubDs.size();
+                  for (int isu = 0; isu < nbSub; isu++) {
+                    for (int ico = 0; ico < aSubDs[isu].nbComponents(); ico++) {
+                      if (aSubDs[isu].compName(ico) == gibiName) {
+                        string medNameCompo = medName.substr( fields[ifi]->_name.size() + 1 );
+                        fields[ifi]->_sub[isu].compName(ico) = medNameCompo;
+                      }
+                    }
+                  }
+                }
               }
-            }
           }
-        }
-      }
-    } // iterate on listGIBItoMED_comp
+      } // iterate on listGIBItoMED_comp
   }
 
   // check if all needed piles present
   if ( donePiles.find( PILE_SOUS_MAILLAGE ) != donePiles.end() )
-  {
-    if (donePiles.find( PILE_NOEUDS ) == donePiles.end() ) {
-      INFOS_MED( " Missing pile " << PILE_NOEUDS );
-      return false;
+    {
+      if (donePiles.find( PILE_NOEUDS ) == donePiles.end() ) {
+        INFOS_MED( " Missing pile " << PILE_NOEUDS );
+        return false;
+      }
+      if (donePiles.find( PILE_COORDONNEES ) == donePiles.end()) {
+        INFOS_MED( " Missing pile " << PILE_COORDONNEES );
+        return false;
+      }
     }
-    if (donePiles.find( PILE_COORDONNEES ) == donePiles.end()) {
-      INFOS_MED( " Missing pile " << PILE_COORDONNEES );
-      return false;
-    }
-  }
 
   END_OF_MED(LOC);
   return true;
 }
 
 GIBI_MESH_DRIVER::GIBI_MESH_DRIVER():
-       GENDRIVER(GIBI_DRIVER),
-       _ptrMesh(( MESH *) NULL),
-       // A VOIR _medIdt(MED_INVALID),
-       _meshName("")
+  GENDRIVER(GIBI_DRIVER),
+  _ptrMesh(( MESH *) NULL),
+  // A VOIR _medIdt(MED_INVALID),
+  _meshName("")
 {
   MESSAGE_MED("GIBI_MESH_DRIVER()");
 }
@@ -3182,7 +3186,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh(list<nameGIBItoMED>& listGIBI
 
     // IMP 0020434: mapping GIBI names to MED names
     nameGIBItoMED aMEDName;
-    aMEDName.gibi_pile = 1; // PILE_SOUS_MAILLAGE
+    aMEDName.gibi_pile = PILE_SOUS_MAILLAGE;
     aMEDName.gibi_id = data._id;
     aMEDName.med_name = data._cleanName;
     listGIBItoMED_mail.push_back(aMEDName);
@@ -3849,14 +3853,17 @@ static void writeDataSection (fstream&                    file,
 #ifdef CASTEM_FULL_INTERLACE
   const int gauss_step = field->getInterlacingType() == MED_EN::MED_FULL_INTERLACE ? nbComp : 1;
 #endif
+  const bool isNodal = ( field->getSupport()->getEntity() == MED_EN::MED_NODE );
 
   for ( int iComp = 1; iComp <= nbComp; ++iComp )
   {
-    file << setw(8) << nbGauss       // nb scalar values by element
-         << setw(8) << ( id2 - id1 ) // total nb of scalar values
-         << setw(8) << 0
-         << setw(8) << 0
-         << endl;
+    if ( !isNodal )
+      file << setw(8) << nbGauss       // nb scalar values by element
+           << setw(8) << ( id2 - id1 ) // total nb of scalar values
+           << setw(8) << 0
+           << setw(8) << 0
+           << endl;
+
     // * 8003   FORMAT(1P,3E22.14)
     if ( arrayNoGauss ) {
       for (int id = id1; id < id2; id++, fcount++ )
@@ -3898,10 +3905,11 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
   // get all fields on _ptrMesh and add their support to be written
   list<FIELD_*> fields;
   int iField, nbFields = _med->getNumberOfFields();
-  int nb_obj = 0;
-  list<int> nb_sub_list;
+  list<int> nb_sub_list, nb_comp_list;
   map<string,int> nameNbMap;
   map<string,int> namePrefixMap;
+  list< string > orderedNames;
+  int nb_nodal_flds = 0;
 
   list<pair<int,int> >           subIdSizeList; // pair( <submesh id>, <submesh size> );
   list<pair<int,int> >::iterator idsize;
@@ -3911,206 +3919,309 @@ void GIBI_MED_WRONLY_DRIVER::write( void ) const throw (MEDEXCEPTION)
   list<nameGIBItoMED> listGIBItoMED_cham;
   list<nameGIBItoMED> listGIBItoMED_comp;
 
-  string *names=new string[ nbFields ];
-  _med->getFieldNames( names );
+  vector< string > names( nbFields );
+  _med->getFieldNames( & names[0] );
   for ( iField = 0; iField < nbFields; ++iField )
-  {
-    int nb_sub = 0;
-    deque<DT_IT_> dtit = _med->getFieldIteration( names[ iField ]);
-    deque<DT_IT_>::iterator fIt = dtit.begin();
-    for ( ; fIt != dtit.end(); fIt++ )
     {
-      FIELD_ * f = _med->getField( names[ iField ], fIt->dt, fIt->it );
-      if ( f->getValueType() != MED_EN::MED_REEL64 )
-      {
-        MESSAGE_MED("GIBI_MED_WRONLY_DRIVER::write( FIELD< int > ) not implemented");
-        continue;
-      }
-      const SUPPORT * sup = f->getSupport();
-      if ( me->addSupport( sup ) ) {
-        fields.push_back( f );
-        nb_sub += getSubMeshIdAndSize( sup, subIdSizeList );
-      }
+      int nb_sub = 0, nb_comp = 0;
+      deque<DT_IT_> dtit = _med->getFieldIteration( names[ iField ]);
+      deque<DT_IT_>::iterator fIt = dtit.begin();
+      medEntityMesh entity = MED_INVALID;
+      for ( ; fIt != dtit.end(); fIt++ )
+        {
+          FIELD_ * f = _med->getField( names[ iField ], fIt->dt, fIt->it );
+          if ( f->getValueType() != MED_EN::MED_REEL64 )
+            {
+              MESSAGE_MED("GIBI_MED_WRONLY_DRIVER::write( FIELD< int > ) not implemented");
+              continue;
+            }
+          const SUPPORT * sup = f->getSupport();
+
+          if ( entity != MED_INVALID &&
+               entity != sup->getEntity() )
+            throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Timestamps of field |"<< names[ iField ]
+                                         << "| are on supports of different dimension"));
+          entity = sup->getEntity();
+
+          if ( me->addSupport( sup ) )
+            {
+              if ( entity == MED_NODE ) fields.push_front( f );
+              else                      fields.push_back( f );
+              nb_sub += getSubMeshIdAndSize( sup, subIdSizeList );
+              nb_comp += nb_sub * f->getNumberOfComponents();
+            }
+        }
+      if ( nb_sub )
+        {
+          if ( entity == MED_NODE )
+            {
+              nb_sub_list.push_front ( nb_sub );
+              orderedNames.push_front( names[ iField ]);
+              nb_comp_list.push_front( nb_comp );
+              nb_nodal_flds++;
+            }
+          else
+            {
+              nb_sub_list.push_back ( nb_sub );
+              orderedNames.push_back( names[ iField ]);
+              nb_comp_list.push_back( nb_comp );
+            }
+        }
     }
-    if ( nb_sub ) {
-      //addName( nameNbMap, names[ iField ], ++nb_obj, "F" );
-      addName(nameNbMap, namePrefixMap, names[ iField ], ++nb_obj);
+  list< string >::iterator nameIt = orderedNames.begin();
+  for ( iField = 0 ; nameIt != orderedNames.end(); ++nameIt, ++iField )
+    {
+      const bool isNodal = iField < nb_nodal_flds;
+      int nb_obj = isNodal ? (iField + 1) : (iField - nb_nodal_flds + 1);
+      addName(nameNbMap, namePrefixMap, *nameIt, nb_obj);
 
       // IMP 0020434: mapping GIBI names to MED names
       nameGIBItoMED aMEDName;
-      aMEDName.gibi_pile = 39; // PILE_FIELD
-      aMEDName.gibi_id = nb_obj;
-      aMEDName.med_name = names[ iField ];
+      aMEDName.gibi_pile = isNodal ? PILE_NODES_FIELD : PILE_FIELD;
+      aMEDName.gibi_id   = nb_obj;
+      aMEDName.med_name  = *nameIt;
       listGIBItoMED_cham.push_back(aMEDName);
-
-      nb_sub_list.push_back( nb_sub );
     }
-  }
 
-  // write mesh
+  // write the mesh
 
-  //try {
   me->writeSupportsAndMesh(listGIBItoMED_mail);
-//   }
-//   catch (MEDEXCEPTION &ex)
-//   {
-//     INFOS_MED( ex.what() );
-//     return;
-//   }
 
   // write fields
 
-  if ( !fields.empty() ) {
-
-    fstream & gibi = me->_gibi;
-
-    TFieldCounter fcount( gibi, 10 );
-
-    gibi << " ENREGISTREMENT DE TYPE   2" << endl;
-    gibi << " PILE NUMERO  39NBRE OBJETS NOMMES" << setw(8) << nameNbMap.size()
-      << "NBRE OBJETS" << setw(8) << nb_obj << endl;
-
-    me->writeNames( nameNbMap );
-
-    list<FIELD_*>::iterator itF = fields.begin();
-    list<int>::iterator itNbSub = nb_sub_list.begin();
-    int nb_sub = 0, cur_nb_sub = 0;
-    for ( iField = 0; itF != fields.end(); itF++, iField++ )
+  if ( !fields.empty() )
     {
-      if ( cur_nb_sub == nb_sub && itNbSub != nb_sub_list.end() ) {
-        // start the next field writting
-        nb_sub = *(itNbSub++);
-        string description = (*itF)->getDescription();
-        if ( description.size() > 72 )
-          description = description.substr(0,72);
-        gibi << setw(8) << nb_sub
-             << setw(8) << -1
-             << setw(8) << 6
-             << setw(8) << 72 /*description.size()*/ << endl; // PAL19100
-        if ( !description.empty() )
-          gibi << setw(72) << description << endl;
-        else
-          gibi << setw(72) << "Field" << endl;
-        gibi << setw(72) << " " << endl;
+      fstream & gibi = me->_gibi;
 
-        // Sub Components section
-        list<FIELD_*>::iterator itF2 = itF;
-        vector<int> vals( 9, 0 );
-        vals[8] = 2;
-        fcount.init(10);
-        cur_nb_sub = 0;
-        while ( itF2 != fields.end() && cur_nb_sub < nb_sub )
+      TFieldCounter fcount( gibi, 10 );
+
+      list<FIELD_*>::iterator itF = fields.begin();
+      list<int>::iterator itNbSub = nb_sub_list.begin(), itNbComp = nb_comp_list.begin();
+      int nb_sub = 0, cur_nb_sub = 0, total_nb_comp = 0;
+      medEntityMesh entity = MED_INVALID;
+
+      for ( iField = 0; itF != fields.end(); itF++, iField++ )
         {
-          FIELD_* f = *itF2++;
-          vals[2] = f->getNumberOfComponents();
+          FIELD_* f = *itF;
+
+          unsigned iComp, nbComp = unsigned( f->getNumberOfComponents() );
+
+          // IMP 0020434: mapping GIBI names to MED names
+          map<string, string> mapMedToGibi;
+          {
+            for (int ico = 0; ico < nbComp; ico++)
+              {
+                string compMedName = f->getComponentName(ico + 1);
+                compMedName = cleanName(compMedName);
+                mapMedToGibi[compMedName] = compMedName;
+              }
+            int compIndex = 1;
+            map<string, string>::iterator namesIt = mapMedToGibi.begin();
+            for (; namesIt != mapMedToGibi.end(); namesIt++)
+              {
+                string compMedName = (*namesIt).first;
+                string compGibiName = compMedName;
+                if (compGibiName.size() > 4) {
+                  // use new name in form "CXXX", where "XXX" is a number
+                  do
+                    {
+                      char strCGN [32];
+                      strCGN[0] = 'C';
+                      int pos = 1;
+                      if (compIndex < 100) strCGN[pos++] = '0';
+                      if (compIndex < 10 ) strCGN[pos++] = '0';
+                      sprintf(strCGN + pos, "%d", compIndex++);
+                      compGibiName = strCGN;
+                    }
+                  while (mapMedToGibi.count(compGibiName) > 0); // real component name could be CXXX
+
+                  mapMedToGibi[compMedName] = compGibiName;
+                }
+
+                compMedName = f->getName() + "." + compMedName;
+                nameGIBItoMED aMEDName;
+                aMEDName.med_name  = compMedName;
+                aMEDName.gibi_pile = PILE_STRINGS;
+                aMEDName.gibi_name = compGibiName;
+                listGIBItoMED_comp.push_back(aMEDName);
+              }
+          } // IMP 0020434
+
+          if ( cur_nb_sub == nb_sub && itNbSub != nb_sub_list.end() )
+            {
+              // Start writting another field
+
+              const medEntityMesh nextEntity = f->getSupport()->getEntity();
+              if ( nextEntity != entity )
+                {
+                  if ( entity == MED_INVALID || entity == MED_NODE )
+                    {
+                      int nb_obj = ( nextEntity == MED_NODE ) ? nb_nodal_flds : orderedNames.size() - nb_nodal_flds;
+                      gibi << " ENREGISTREMENT DE TYPE   2" << endl;
+                      gibi << " PILE NUMERO" << ( nextEntity == MED_NODE ? "   2" : "  39" );
+                      gibi << "NBRE OBJETS NOMMES" << setw(8) << nameNbMap.size();
+                      gibi << "NBRE OBJETS" << setw(8) << nb_obj << endl;
+
+                      me->writeNames( nameNbMap );
+                    }
+                  entity = f->getSupport()->getEntity();
+                }
+
+              total_nb_comp = *(itNbComp++);
+              nb_sub        = *(itNbSub++);
+
+              string description = (*itF)->getDescription();
+              if ( description.size() > 72 )
+                description = description.substr(0,72);
+
+              if ( entity == MED_NODE )
+                {
+                  gibi << setw(8) << nb_sub
+                       << setw(8) << total_nb_comp
+                       << setw(8) << -1         // IFOUR
+                       << setw(8) << 0 << endl; // nb attributes
+                }
+              else
+                {
+                  gibi << setw(8) << nb_sub
+                       << setw(8) << -1
+                       << setw(8) << 6
+                       << setw(8) << 72 /*description.size()*/ << endl; // PAL19100
+                  if ( !description.empty() )
+                    gibi << setw(72) << description << endl;
+                  else
+                    gibi << setw(72) << "Field" << endl;
+                  gibi << setw(72) << " " << endl;
+                }
+
+              // Sub Components section
+
+              list<FIELD_*>::iterator itF2 = itF;
+              int vals[9] =
+                {
+                  0, 0, 0, 0, 0, 0, 0, 0, 2
+                };
+              const int nbv = ( entity == MED_NODE ? 3 : 9 );
+              vector< string > comp_names;
+              fcount.init(10);
+              cur_nb_sub = 0;
+              while ( itF2 != fields.end() && cur_nb_sub < nb_sub )
+                {
+                  FIELD_* f = *itF2++;
+                  vals[2] = f->getNumberOfComponents();
+                  getSubMeshIdAndSize( f->getSupport(), subIdSizeList );
+                  for ( idsize = subIdSizeList.begin(); idsize != subIdSizeList.end(); idsize++)
+                    {
+                      ++cur_nb_sub;
+
+                      vals[0] = -idsize->first; // support id
+                      if ( entity == MED_NODE )
+                        vals[1] = idsize->second; // nb values
+                      for ( int i = 0; i < nbv; ++i, fcount++ )
+                        gibi << setw(8) << vals[ i ];
+
+                      for ( int i = 0; i < f->getNumberOfComponents(); ++i )
+                        comp_names.push_back( f->getComponentName( i+1 ));
+                    }
+                }
+              fcount.stop();
+              cur_nb_sub = 0;
+
+              if ( entity == MED_NODE )
+                {
+                  // component names
+                  fcount.init(8);
+                  gibi << left;
+                  {
+                    for ( iComp = 0; iComp < comp_names.size(); ++iComp, fcount++ )
+                      {
+                        string compMedName = cleanName(f->getComponentName(iComp + 1));
+                        string compName = mapMedToGibi[compMedName];
+                        gibi << " "  << setw(8) << compName;
+                      }
+                  }
+                  gibi << right;
+                  fcount.stop();
+
+                  // nb harmonics
+                  fcount.init(10);
+                  for ( int i = 0; i < total_nb_comp; ++i )
+                    gibi << setw(8) << 0;
+                  fcount.stop();
+
+                  gibi << endl; // TYPE
+                  gibi << setw(72) << description << endl;
+                  gibi << endl; // 0 attributes
+                }
+              else
+                {
+                  // dummy strings
+                  int i_sub;
+                  for ( fcount.init(4), i_sub = 0; i_sub < nb_sub; ++i_sub, fcount++ )
+                    gibi << "                  ";
+                  fcount.stop();
+
+                  for ( fcount.init(8), i_sub = 0; i_sub < nb_sub; ++i_sub, fcount++ )
+                    gibi << "         ";
+                  fcount.stop();
+                }
+            } // end writing common field data
+
+
+          // loop on sub-components
+          int id1 = 1;
           getSubMeshIdAndSize( f->getSupport(), subIdSizeList );
           for ( idsize = subIdSizeList.begin(); idsize != subIdSizeList.end(); idsize++ )
-          {
-            ++cur_nb_sub;
-            vals[0] = -idsize->first; // support id
-            for ( int i = 0; i < (int)vals.size(); ++i, fcount++ )
-              gibi << setw(8) << vals[ i ];
-          }
-        }
-        fcount.stop();
-        cur_nb_sub = 0;
-        // dummy strings
-        int i_sub;
-        for ( fcount.init(4), i_sub = 0; i_sub < nb_sub; ++i_sub, fcount++ )
-          gibi << "                  ";
-        fcount.stop();
-        for ( fcount.init(8), i_sub = 0; i_sub < nb_sub; ++i_sub, fcount++ )
-          gibi << "         ";
-        fcount.stop();
-      }
+            {
+              cur_nb_sub++;
+              if ( entity != MED_NODE )
+                {
+                  // component addresses
+                  fcount.init(10);
+                  for ( iComp = 0; iComp < nbComp; ++iComp, fcount++ )
+                    gibi << setw(8) << 777; // a good number
+                  fcount.stop();
+                  // component names
+                  gibi << left;
+                  fcount.init(8);
+                  for ( iComp = 0; iComp < nbComp; ++iComp, fcount++ )
+                    {
+                      string compMedName = cleanName(f->getComponentName(iComp + 1));
+                      string compName    = mapMedToGibi[compMedName];
+                      gibi << " "  << setw(8) << compName;
+                    }
+                  fcount.stop();
+                  // component types
+                  fcount.init(4);
+                  for ( iComp = 0; iComp < nbComp; ++iComp, fcount++ )
+                    gibi << " "  << setw(17) << "REAL*8";
+                  fcount.stop();
+                  gibi << right;
+                }
 
-      FIELD_* f = *itF;
-      int id1 = 1;
-      int iComp, nbComp = f->getNumberOfComponents();
+              // Data section
 
-      // IMP 0020434: mapping GIBI names to MED names
-      int compIndex = 1;
-      map<string, string> mapMedToGibi;
-      for (int ico = 0; ico < nbComp; ico++) {
-        string compMedName = f->getComponentName(ico + 1);
-        compMedName = cleanName(compMedName);
-        mapMedToGibi[compMedName] = compMedName;
-      }
-      map<string, string>::iterator namesIt = mapMedToGibi.begin();
-      for (; namesIt != mapMedToGibi.end(); namesIt++) {
-        string compMedName = (*namesIt).first;
-        string compGibiName = compMedName;
-        if (compGibiName.size() > 4) {
-          // use new name in form "CXXX", where "XXX" is a number
-          do {
-            char strCGN [32];
-            strCGN[0] = 'C';
-            int pos = 1;
-            if (compIndex < 100) strCGN[pos++] = '0';
-            if (compIndex < 10 ) strCGN[pos++] = '0';
-            sprintf(strCGN + pos, "%d", compIndex++);
-            compGibiName = strCGN;
-          } while (mapMedToGibi.count(compGibiName) > 0); // real component name could be CXXX
+              int id2 = id1 + idsize->second;
 
-          mapMedToGibi[compMedName] = compGibiName;
-        }
+              if ( f->getInterlacingType() == MED_NO_INTERLACE )
+                writeDataSection( gibi, static_cast<FIELD<double,NoInterlace  > * >(f),
+                                  id1, id2 );
+              else if ( f->getInterlacingType() == MED_FULL_INTERLACE )
+                writeDataSection( gibi, static_cast<FIELD<double,FullInterlace> * >(f),
+                                  id1, id2 );
+              else
+                writeDataSection( gibi, static_cast<FIELD<double,NoInterlaceByType> * >(f),
+                                  id1, id2 );
 
-        compMedName = names[iField] + "." + compMedName;
-        nameGIBItoMED aMEDName;
-        aMEDName.med_name = compMedName;
-        aMEDName.gibi_pile = 27; // PILE_STRINGS
-        aMEDName.gibi_name = compGibiName;
-        listGIBItoMED_comp.push_back(aMEDName);
-      } // IMP 0020434
-
-      // loop on sub-components
-      getSubMeshIdAndSize( f->getSupport(), subIdSizeList );
-      for ( idsize = subIdSizeList.begin(); idsize != subIdSizeList.end(); idsize++ )
-      {
-        cur_nb_sub++;
-        // component addresses
-        for ( fcount.init(10), iComp = 0; iComp < nbComp; ++iComp, fcount++ )
-          gibi << setw(8) << 777; // a good number
-        fcount.stop();
-        // component names
-        gibi << left;
-        for ( fcount.init(8), iComp = 0; iComp < nbComp; ++iComp, fcount++ ) {
-          string compMedName = cleanName(f->getComponentName(iComp + 1));
-          string compName = mapMedToGibi[compMedName];
-          //if ( compName.size() > 8 )
-          //  compName = compName.substr(0, 8);
-          gibi << " "  << setw(8) << compName;
-        }
-        fcount.stop();
-        // component types
-        for ( fcount.init(4), iComp = 0; iComp < nbComp; ++iComp, fcount++ )
-          gibi << " "  << setw(17) << "REAL*8";
-        fcount.stop();
-        gibi << right;
-
-        // Data section
-        int id2 = id1 + idsize->second;
-
-        // PAL11040
-        //if  (f->getGaussPresence() )
-        //throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "GibiDriver don't support Field with Gauss point"));
-
-        if ( f->getInterlacingType() == MED_NO_INTERLACE )
-          writeDataSection( gibi, static_cast<FIELD<double,NoInterlace  > * >(f), id1, id2 );
-        else if ( f->getInterlacingType() == MED_FULL_INTERLACE )
-          writeDataSection( gibi, static_cast<FIELD<double,FullInterlace> * >(f), id1, id2 );
-        else
-          writeDataSection( gibi, static_cast<FIELD<double,NoInterlaceByType> * >(f), id1, id2 );
-
-        id1 = id2;
-      }
-    } // loop on fields
-  }
+              id1 = id2;
+            }
+        } // loop on fields
+    }
 
   // IMP 0020434: mapping GIBI names to MED names
   me->writeMEDNames(listGIBItoMED_mail, listGIBItoMED_cham, listGIBItoMED_comp);
 
   me->writeLastRecord();
-  delete [] names;
+
   END_OF_MED(LOC);
 }
