@@ -123,9 +123,14 @@ void MESHING::setCoordinates(const int SpaceDimension,
   if (_connectivity)
     _connectivity->setNumberOfNodes(NumberOfNodes);
 
+  if ( !NumberOfNodes && !Coordinates )
+    return; // enable using this method for setting SpaceDimension only
+
   SCRUTE_MED(_coordinate);
   SCRUTE_MED(_connectivity);
 
+  if ( _coordinate )
+    delete _coordinate, _coordinate = 0;
   _coordinate = new COORDINATE(SpaceDimension,NumberOfNodes,Mode);
   _coordinate->setCoordinates(Mode,Coordinates);
   _coordinate->setCoordinatesSystem(System);
