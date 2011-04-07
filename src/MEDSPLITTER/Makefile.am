@@ -79,8 +79,7 @@ endif
 
 libmedsplitter_la_CPPFLAGS= $(MPI_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
 	$(BOOST_CPPFLAGS) $(LIBXML_INCLUDES) \
-	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core \
-	-I$(srcdir)/../INTERP_KERNEL \
+	-I$(srcdir)/../MEDMEM \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../INTERP_KERNEL/GaussPoints
 
@@ -101,12 +100,12 @@ if MED_ENABLE_SCOTCH
   libmedsplitter_la_LDFLAGS+= $(SCOTCH_LIBS)
 endif
 if MED_ENABLE_KERNEL
-  libmedsplitter_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
-  libmedsplitter_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
+  libmedsplitter_la_CPPFLAGS+= ${KERNEL_CXXFLAGS} $(BOOST_CPPFLAGS)
+  libmedsplitter_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace $(BOOST_LIBS)
 endif
 
 libmedsplitter_la_LDFLAGS+= $(MED2_LIBS) $(HDF5_LIBS) $(STDLIB) $(LIBXML_LIBS) $(MPI_LIBS) \
-	../MEDMEM/libmedmem.la ../MEDWrapper/V2_1/Core/libmed_V2_1.la ../INTERP_KERNEL/libinterpkernel.la
+	../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la
 
 # Executables targets
 bin_PROGRAMS= medsplitter
@@ -114,7 +113,7 @@ bin_PROGRAMS= medsplitter
 dist_medsplitter_SOURCES= medsplitter.cxx
 
 medsplitter_CPPFLAGS= $(libmedsplitter_la_CPPFLAGS)
-medsplitter_LDADD= $(libmedsplitter_la_LDFLAGS) -lm $(BOOST_LIBS) libmedsplitter.la
+medsplitter_LDADD= $(libmedsplitter_la_LDFLAGS) -lm libmedsplitter.la
 if MED_ENABLE_KERNEL
   medsplitter_LDADD+= -lSALOMEBasics
 endif

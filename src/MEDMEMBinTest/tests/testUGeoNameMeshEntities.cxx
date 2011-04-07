@@ -23,7 +23,7 @@
 #include "MEDMEM_DriversDef.hxx"
 
 using namespace std;
-void usage(char * name)
+static void usage(char * name)
 {
   cout << "    " << name << endl;
   cout << "    " << "displays all avalaible geometry elements" << endl;

@@ -98,12 +98,12 @@ void MEDMEMTest::testGaussLocalization()
   double cooGauss[10] = {7.,7., 6.,6., 5.,5., 4.,3., 2.,1.}; // x1,y1  x2,y2  x3,y3  x4,y4  x5,y5
   double wg[5] = {1., 2., 3., 4., 5.};
 
-  GAUSS_LOCALIZATION<> gl1 ("GL1", MED_EN::MED_TRIA3, /*nGauss*/5, cooRef, cooGauss, wg);
-  GAUSS_LOCALIZATION<> gl2 ("GL1", MED_EN::MED_TRIA3, /*nGauss*/5, cooRef, cooGauss, wg);
+  GAUSS_LOCALIZATION<> gl1 ("GL1", MED_EN::MEDMEM_TRIA3, /*nGauss*/5, cooRef, cooGauss, wg);
+  GAUSS_LOCALIZATION<> gl2 ("GL1", MED_EN::MEDMEM_TRIA3, /*nGauss*/5, cooRef, cooGauss, wg);
 
   // getXXX
   CPPUNIT_ASSERT(gl1.getName() == "GL1");
-  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_TRIA3, gl1.getType());
+  CPPUNIT_ASSERT_EQUAL(MED_EN::MEDMEM_TRIA3, gl1.getType());
   CPPUNIT_ASSERT_EQUAL(5, gl1.getNbGauss());
 
   GAUSS_LOCALIZATION<>::ArrayNoGauss cooRefBack   = gl1.getRefCoo();
@@ -150,9 +150,9 @@ void MEDMEMTest::testGaussLocalization()
   double cooGauss_ch[10] = {7.,8., 6.,6., 5.,5., 4.,3., 2.,1.};
   double wg_ch[5] = {1., 2., 8., 4., 5.};
 
-  GAUSS_LOCALIZATION<> gl3 ("GL1", MED_EN::MED_TRIA3, /*nGauss*/5, cooRef_ch, cooGauss, wg);
-  GAUSS_LOCALIZATION<> gl4 ("GL1", MED_EN::MED_TRIA3, /*nGauss*/5, cooRef, cooGauss_ch, wg);
-  GAUSS_LOCALIZATION<> gl5 ("GL1", MED_EN::MED_TRIA3, /*nGauss*/5, cooRef, cooGauss, wg_ch);
+  GAUSS_LOCALIZATION<> gl3 ("GL1", MED_EN::MEDMEM_TRIA3, /*nGauss*/5, cooRef_ch, cooGauss, wg);
+  GAUSS_LOCALIZATION<> gl4 ("GL1", MED_EN::MEDMEM_TRIA3, /*nGauss*/5, cooRef, cooGauss_ch, wg);
+  GAUSS_LOCALIZATION<> gl5 ("GL1", MED_EN::MEDMEM_TRIA3, /*nGauss*/5, cooRef, cooGauss, wg_ch);
 
   CPPUNIT_ASSERT(!(gl1 == gl3));
   CPPUNIT_ASSERT(!(gl1 == gl4));
@@ -163,9 +163,9 @@ void MEDMEMTest::testGaussLocalization()
   double cooGauss_4[8] = {7.,8., 6.,6., 5.,5., 4.,3.};
   double wg_4[4] = {1., 2., 8., 4.};
 
-  GAUSS_LOCALIZATION<> gl6 ("GL6", MED_EN::MED_TRIA3, /*nGauss*/5, cooRef, cooGauss, wg);
-  GAUSS_LOCALIZATION<> gl7 ("GL1", MED_EN::MED_QUAD4, /*nGauss*/5, cooRef_quad, cooGauss, wg);
-  GAUSS_LOCALIZATION<> gl8 ("GL1", MED_EN::MED_TRIA3, /*nGauss*/4, cooRef, cooGauss_4, wg_4);
+  GAUSS_LOCALIZATION<> gl6 ("GL6", MED_EN::MEDMEM_TRIA3, /*nGauss*/5, cooRef, cooGauss, wg);
+  GAUSS_LOCALIZATION<> gl7 ("GL1", MED_EN::MEDMEM_QUAD4, /*nGauss*/5, cooRef_quad, cooGauss, wg);
+  GAUSS_LOCALIZATION<> gl8 ("GL1", MED_EN::MEDMEM_TRIA3, /*nGauss*/4, cooRef, cooGauss_4, wg_4);
 
   CPPUNIT_ASSERT(!(gl1 == gl6));
   CPPUNIT_ASSERT(!(gl1 == gl7));
@@ -181,14 +181,14 @@ void MEDMEMTest::testGaussLocalization()
   CPPUNIT_ASSERT_EQUAL(ostr1.str(), ostr2.str());
 
   // Construction from ArrayNoGauss and vector<double>
-  GAUSS_LOCALIZATION<> gl9 ("GL1", MED_EN::MED_TRIA3, /*nGauss*/5, cooRefBack, cooGaussBack, wgBack);
+  GAUSS_LOCALIZATION<> gl9 ("GL1", MED_EN::MEDMEM_TRIA3, /*nGauss*/5, cooRefBack, cooGaussBack, wgBack);
   CPPUNIT_ASSERT(gl1 == gl9);
 
   // NoInterlace
   double cooRef_ni[6] = {1.,2.,3., 1.,4.,9.}; // xxx yyy
   double cooGauss_ni[10] = {7.,6.,5.,4.,2., 7.,6.,5.,3.,1.}; // x1,x2,x3,x4,x5  y1,y2,y3,y4,y5
 
-  GAUSS_LOCALIZATION<NoInterlace> gl10 ("GL10", MED_EN::MED_TRIA3, /*nGauss*/5, cooRef_ni, cooGauss_ni, wg);
+  GAUSS_LOCALIZATION<NoInterlace> gl10 ("GL10", MED_EN::MEDMEM_TRIA3, /*nGauss*/5, cooRef_ni, cooGauss_ni, wg);
 
   GAUSS_LOCALIZATION<NoInterlace>::ArrayNoGauss cooRefBack_ni   = gl10.getRefCoo();
   GAUSS_LOCALIZATION<NoInterlace>::ArrayNoGauss cooGaussBack_ni = gl10.getGsCoo();

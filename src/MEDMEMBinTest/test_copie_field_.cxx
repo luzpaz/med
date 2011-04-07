@@ -43,7 +43,7 @@ using namespace MEDMEM;
 using namespace MED_EN;
 
 
-void affiche_field(FIELD_ * myField, const SUPPORT * mySupport)
+static void affiche_field(FIELD_ * myField, const SUPPORT * mySupport)
 {
   cout << "Field "<< myField->getName() << " : " <<myField->getDescription() <<  endl ;
   int NumberOfComponents = myField->getNumberOfComponents() ;
@@ -63,9 +63,10 @@ void affiche_field(FIELD_ * myField, const SUPPORT * mySupport)
   cout << "- Type : " << myField->getValueType()<< endl;
   /*
     cout << "- Valeurs :"<<endl;
-    int NumberOf = mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
+    int NumberOf = mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
 
-    for (int i=1; i<NumberOf+1; i++) {
+    for (int i=1; i<NumberOf+1; i++) 
+    {
     double * value = myField->getValueI(MED_FULL_INTERLACE,i) ;
     for (int j=0; j<NumberOfComponents; j++)
     cout << value[j]<< " ";

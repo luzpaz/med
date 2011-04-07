@@ -72,22 +72,26 @@ namespace MED
 #endif
 
     // Next, try to open the file trough the MED API
-    char* aFileName = const_cast<char*>(theFileName.c_str());
-    med_idt aFid = MEDouvrir(aFileName,MED_LECTURE);
+    const char* aFileName = theFileName.c_str();
+    med_idt aFid = MEDfileOpen(aFileName,MED_ACC_RDONLY);
 
     MSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'; aFid = "<<aFid<<std::endl);
     if(aFid >= 0){
       med_int aMajor, aMinor, aRelease;
-      med_err aRet = MEDversionLire(aFid,&aMajor,&aMinor,&aRelease);
+      med_err aRet = MEDfileNumVersionRd(aFid,&aMajor,&aMinor,&aRelease);
       INITMSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'; aRet = "<<aRet<<std::endl);
       if(aRet >= 0){
-        if(aMajor >= 2 && aMinor >= 2)
-          aVersion = eV2_2;
-        else
+        if(aMajor == 2 && aMinor == 1)
           aVersion = eV2_1;
+        else
+          aVersion = eV2_2;
+      }
+      else {
+	// VSR: simulate med 2.3.6 behavior, med file version is assumed to 2.1
+	aVersion = eV2_1;
       }
     }
-    MEDfermer(aFid);
+    MEDfileClose(aFid);
 
     BEGMSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'; aVersion = "<<aVersion<<std::endl);
     return aVersion;
@@ -95,18 +99,21 @@ namespace MED
 
   bool getMEDVersion( const std::string& fname, int& major, int& minor, int& release )
   {
-    med_idt f = MEDouvrir( (char*)fname.c_str(), MED_LECTURE );
+    med_idt f = MEDfileOpen(fname.c_str(), MED_ACC_RDONLY );
     if( f<0 )
       return false;
 
     med_int aMajor, aMinor, aRelease;
-    med_err aRet = MEDversionLire( f, &aMajor, &aMinor, &aRelease );
+    med_err aRet = MEDfileNumVersionRd( f, &aMajor, &aMinor, &aRelease );
     major = aMajor;
     minor = aMinor;
     release = aRelease;
-    MEDfermer( f );
-    if( aRet<0 )
-      return false;
+    MEDfileClose( f );
+    if( aRet<0 ) {
+      // VSR: simulate med 2.3.6 behavior, med file version is assumed to 2.1
+      major = 2; minor = release = -1;
+      //return false;
+    }
     return true;
   }
 
@@ -143,6 +150,8 @@ namespace MED
     case eV2_1:
       aWrapper.reset(new MED::V2_1::TVWrapper(theFileName));
       break;
+    default:
+      aWrapper.reset(new MED::V2_2::TVWrapper(theFileName));
     }
     return aWrapper;
   }

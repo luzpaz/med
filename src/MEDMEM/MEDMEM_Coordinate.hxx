@@ -81,12 +81,9 @@ protected:
 
 public :
 
-  friend class IMED_MESH_RDONLY_DRIVER;
-  friend class MED_MESH_RDONLY_DRIVER21;
-  friend class IMED_MESH_WRONLY_DRIVER;
-  friend class MED_MESH_WRONLY_DRIVER21;
-  friend class MED_MESH_RDONLY_DRIVER22;
-  friend class MED_MESH_WRONLY_DRIVER22;
+
+  friend class MED_MESH_RDONLY_DRIVER;
+  friend class MED_MESH_WRONLY_DRIVER;
 
 
   COORDINATE();

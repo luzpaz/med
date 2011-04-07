@@ -81,11 +81,11 @@ def analyseField(field):
     fieldSupport = field.getSupport()
     fieldMeshName = fieldSupport.getMeshName()
     fieldSupportOnAll = fieldSupport.isOnAllElements()
-    fieldNbEntities = fieldSupport.getNumberOfElements(MED_ALL_ELEMENTS)
+    fieldNbEntities = fieldSupport.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
     fieldEntityType = fieldSupport.getEntity()
     fieldSupportNumber = range(1,fieldNbEntities+1)
     if (not fieldSupportOnAll):
-        fieldSupportNumber = fieldSupport.getNumber(MED_ALL_ELEMENTS)
+        fieldSupportNumber = fieldSupport.getNumber(MEDMEM_ALL_ELEMENTS)
         pass
     print " fieldSupportNumber ", fieldSupportNumber
     fieldInterlacingType = field.getInterlacingType()

@@ -48,13 +48,7 @@ def print_ord(i):
     else:
         return `i`+'th'
 
-md = MED()
-
-mdDriver = MED_MED_RDONLY_DRIVER(medFile,md)
-
-mdDriver.open()
-mdDriver.readFileStruct()
-mdDriver.close()
+md = MEDFILEBROWSER(medFile)
 
 nbMeshes = md.getNumberOfMeshes()
 
@@ -82,8 +76,7 @@ if (nbMeshes>0):
     print "Mesh(es) Analysis "
     for i in range(nbMeshes):
         mesh_name = md.getMeshName(i)
-        mesh = md.getMesh(mesh_name)
-        mesh.read()
+        mesh = MESH(MED_DRIVER,md.getFileName(),mesh_name)
         spaceDim = mesh.getSpaceDimension()
         for entity in [MED_NODE,MED_CELL,MED_FACE,MED_EDGE]:
             nbFam = mesh.getNumberOfFamilies(entity)
@@ -133,7 +126,7 @@ if (nbMeshes>0):
                             print "    * Type",type
                             print "    * Number",number[0:nbOfElmtsOfType]
                         print ""
-                        numberFamily = family.getNumber(MED_ALL_ELEMENTS)
+                        numberFamily = family.getNumber(MEDMEM_ALL_ELEMENTS)
                         print "    * Getting an Integer Field on the family ",familyName
                         fieldFamilyIntg = FIELDINT(family,spaceDim)
                         fieldFamilyIntg.setIterationNumber(0)
@@ -174,7 +167,7 @@ if (nbMeshes>0):
                             print "          Description:",compDesc
                             print "          Unit:",compUnit
 
-                        nbOf = fieldFamilyIntg.getSupport().getNumberOfElements(MED_ALL_ELEMENTS)
+                        nbOf = fieldFamilyIntg.getSupport().getNumberOfElements(MEDMEM_ALL_ELEMENTS)
                         print "      Values:",nbOf
                         print "      Randomly set (via setValue) and get (via getValue) to check with the same mode ..!"
                         value = []

@@ -29,7 +29,7 @@ fi
 
 infile=${srcdir}/../../resources/poly3D.med
 
-./test_MEDMEM_poly3D $infile poly3D
+./test_MEDMEM_poly3D $infile poly3D   >& /dev/null
 
 exit
 

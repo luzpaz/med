@@ -17,6 +17,9 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_RCBase.hxx"
+#ifdef _DEBUG_
+#include <iostream>
+#endif
 
 MEDMEM::RCBASE::RCBASE():_cnt(1)
 {
@@ -28,11 +31,11 @@ MEDMEM::RCBASE::~RCBASE()
 /*!
  * \brief To be called at destructor beginning to avoid recursive calls of destructor
  * in case of cyclic dependencies between reference counters like e.g. between
- * a MESH and a GROUP it contains
+ * the GMESH and the GROUPs it contains
  */
 void MEDMEM::RCBASE::clearRefCouner()
 {
-  _cnt = -1;
+  _cnt = -100;
 }
 
 void MEDMEM::RCBASE::addReference() const
@@ -46,4 +49,17 @@ bool MEDMEM::RCBASE::removeReference() const
   if(ret)
     delete this;
   return ret;
+}
+
+MEDMEM::AutoDeref::AutoDeref(const RCBASE* obj): _obj(obj)
+{
+}
+
+MEDMEM::AutoDeref::~AutoDeref()
+{
+  if ( _obj )
+  {
+    _obj->removeReference();
+    _obj = 0;
+  }
 }

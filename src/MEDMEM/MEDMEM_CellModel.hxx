@@ -64,7 +64,7 @@ private:
 
 
   //protected:
-                        /*! explicit name (as MED_POINT1)           */
+                        /*! explicit name (as MEDMEM_POINT1)           */
   string             _name;
                         /*! type of cell (cf define.h)              */
   MED_EN::medGeometryElement _type;
@@ -109,7 +109,7 @@ public :
                         /*! Operator << : print CELLMODEL to the given stream. */
   friend MEDMEM_EXPORT ostream & operator<<(ostream &os,const CELLMODEL &my);
 
-                        /*! returns _name attribute (ie: MED_PENTA15).\n
+                        /*! returns _name attribute (ie: MEDMEM_PENTA15).\n
                             see med.h (in med/include) */
   inline string                 getName()             const;
 
@@ -169,7 +169,7 @@ public :
 // ------------------------------------------
 
 inline CELLMODEL::CELLMODEL():
-    _type(MED_EN::MED_NONE),
+    _type(MED_EN::MEDMEM_NONE),
     _dimension(0),
     _numberOfNodes(0),
     _numberOfVertexes(0),
@@ -181,7 +181,7 @@ inline CELLMODEL::CELLMODEL():
 {
 }
 inline CELLMODEL::CELLMODEL(const CELLMODEL &m):
-    _type(MED_EN::MED_NONE),
+    _type(MED_EN::MEDMEM_NONE),
     _dimension(0),
     _numberOfNodes(0),
     _numberOfVertexes(0),
@@ -260,33 +260,11 @@ private:
   static CELLMODEL_Map *getInstance();
   static CELLMODEL_Map *_singleton;
   std::map<MED_EN::medGeometryElement,MEDMEM::CELLMODEL> _cell_models;
-        
-  CELLMODEL_Map(){
-    _cell_models.insert(make_pair(MED_EN::MED_NONE     ,CELLMODEL(MED_EN::MED_NONE     )));
-    _cell_models.insert(make_pair(MED_EN::MED_POINT1   ,CELLMODEL(MED_EN::MED_POINT1   )));
-    _cell_models.insert(make_pair(MED_EN::MED_SEG2     ,CELLMODEL(MED_EN::MED_SEG2     )));
-    _cell_models.insert(make_pair(MED_EN::MED_SEG3     ,CELLMODEL(MED_EN::MED_SEG3     )));
-    _cell_models.insert(make_pair(MED_EN::MED_TRIA3    ,CELLMODEL(MED_EN::MED_TRIA3    )));
-    _cell_models.insert(make_pair(MED_EN::MED_QUAD4    ,CELLMODEL(MED_EN::MED_QUAD4    )));
-    _cell_models.insert(make_pair(MED_EN::MED_TRIA6    ,CELLMODEL(MED_EN::MED_TRIA6    )));
-    _cell_models.insert(make_pair(MED_EN::MED_QUAD8    ,CELLMODEL(MED_EN::MED_QUAD8    )));
-    _cell_models.insert(make_pair(MED_EN::MED_TETRA4   ,CELLMODEL(MED_EN::MED_TETRA4   )));
-    _cell_models.insert(make_pair(MED_EN::MED_PYRA5    ,CELLMODEL(MED_EN::MED_PYRA5    )));
-    _cell_models.insert(make_pair(MED_EN::MED_PENTA6   ,CELLMODEL(MED_EN::MED_PENTA6   )));
-    _cell_models.insert(make_pair(MED_EN::MED_HEXA8    ,CELLMODEL(MED_EN::MED_HEXA8    )));
-    _cell_models.insert(make_pair(MED_EN::MED_TETRA10  ,CELLMODEL(MED_EN::MED_TETRA10  )));
-    _cell_models.insert(make_pair(MED_EN::MED_PYRA13   ,CELLMODEL(MED_EN::MED_PYRA13   )));
-    _cell_models.insert(make_pair(MED_EN::MED_PENTA15  ,CELLMODEL(MED_EN::MED_PENTA15  )));
-    _cell_models.insert(make_pair(MED_EN::MED_HEXA20   ,CELLMODEL(MED_EN::MED_HEXA20   )));
-    _cell_models.insert(make_pair(MED_EN::MED_POLYGON  ,CELLMODEL(MED_EN::MED_POLYGON  )));
-    _cell_models.insert(make_pair(MED_EN::MED_POLYHEDRA,CELLMODEL(MED_EN::MED_POLYHEDRA)));
-  };
-  ~CELLMODEL_Map(){ if(_singleton) delete _singleton;};
-        
-  const MEDMEM::CELLMODEL& getCellModel(MED_EN::medGeometryElement type)
-  {
-    return _cell_models[type];
-  };
+
+  CELLMODEL_Map() {}
+  ~CELLMODEL_Map(){ if(_singleton) delete _singleton;}
+
+  const MEDMEM::CELLMODEL& getCellModel(MED_EN::medGeometryElement type);
 
 };
 

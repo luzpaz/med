@@ -34,7 +34,7 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
+static void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
 {
   cout << "Field "<< myField->getName() << " : " <<myField->getDescription() <<  endl ;
   int NumberOfComponents = myField->getNumberOfComponents() ;
@@ -67,11 +67,11 @@ void affiche_fieldT(FIELD<double, INTERLACING_TAG> * myField,
   cout.setf(ios::fixed);
   cout << "- Valeurs :"<<endl;
   bool onAll   = mySupport->isOnAllElements();
-  int NumberOf = mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
-  cout << "mySupport->getNumberOfElements(MED_ALL_ELEMENTS)" << NumberOf << endl;
+  int NumberOf = mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  cout << "mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS)" << NumberOf << endl;
   int NumberOfComponents = myField->getNumberOfComponents() ;
   cout << "myField->getNumberOfComponents()" << NumberOfComponents << endl;
-  if (!onAll) number = mySupport->getNumber(MED_ALL_ELEMENTS);
+  if (!onAll) number = mySupport->getNumber(MEDMEM_ALL_ELEMENTS);
 
   if ( myField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE ) {
     for (int i=1; i<NumberOf+1; i++) {
@@ -213,8 +213,8 @@ int main (int argc, char ** argv) {
 //    //      (même sans profil) lu à posteriori.
 //    {
 //      med_2_3::med_err err=-1;
-//      med_2_3::med_idt id = med_2_3::MEDouvrir(const_cast<char *> ( ("Copy_nomesh_"+fileName).c_str()),
-//                                            med_2_3::MED_LECTURE_ECRITURE);
+//      med_2_3::med_idt id = med_2_3::MEDfileOpen(const_cast<char *> ( ("Copy_nomesh_"+fileName).c_str()),
+//                                            med_2_3::MED_ACC_RDWR);
 //      if (id <=0) cout << "Erreur dans MEDouvrir pour le fichier " << "Copy_nomesh_"+fileName <<endl;
 
 //      err=med_2_3::MEDlienEcr(id, const_cast<char *> ( ("Copy_withmesh_"+fileName).c_str()),

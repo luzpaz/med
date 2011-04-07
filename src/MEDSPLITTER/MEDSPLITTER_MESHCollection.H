@@ -181,7 +181,7 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
     //retrieves the group igroup on domain idomain
 
     const MEDMEM::SUPPORT* support = old_supports[idomain];
-    int nbelem = support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+    int nbelem = support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS);
     if (nbelem==0) continue;
     int* list_of_elems=0;
 
@@ -192,7 +192,7 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
         list_of_elems[i]=i+1;
     }
     else
-      list_of_elems = const_cast<int*> (support->getNumber(MED_EN::MED_ALL_ELEMENTS));
+      list_of_elems = const_cast<int*> (support->getNumber(MED_EN::MEDMEM_ALL_ELEMENTS));
 
     int* array=new int[nbelem];
     int* ip;
@@ -244,7 +244,7 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
       for (int i=0; i<size; i++)
       {
         MED_EN::medGeometryElement type =
-    old_collection._mesh[idomain]->getElementType(entity,initial_local[i]);
+          old_collection._mesh[idomain]->getElementType(entity,initial_local[i]);
         int nb_gauss_points=old_fields[idomain]->getNumberOfGaussPoints(type);
         for (int j=0; j<nb_components;j++)
           for (int k=0;k<nb_gauss_points; k++)
@@ -276,7 +276,7 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
     new_supports[i]->removeReference();
     //delete medarray[i];
   }
-  for (int i=0; i<old_fields.size(); i++)
+  for (unsigned i=0; i<old_fields.size(); i++)
   {
     cout << "old field deletion" <<endl;
     old_fields[i]->removeReference();

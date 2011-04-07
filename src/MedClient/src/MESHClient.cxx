@@ -38,10 +38,9 @@ using namespace MED_EN;
 //=============================================================================
 
 MESHClient::MESHClient(const SALOME_MED::MESH_ptr m) : 
-  MESH(), _refCounter(1),
   IOR_Mesh(SALOME_MED::MESH::_duplicate(m)),
-  _complete(false)
-
+  _complete(false),
+  _refCounter(1)
 {
   ASSERT(m);
 
@@ -76,7 +75,7 @@ GROUP * convertGroup(const SALOME_MED::GROUP_ptr &F, MESH *M)
 //=============================================================================
 void MESHClient::blankCopy()
 {
-  SALOME_MED::MESH::meshInfos_var all = IOR_Mesh->getMeshGlobal();
+  SALOME_MED::GMESH::meshInfos_var all = IOR_Mesh->getMeshGlobal();
 
   //CORBA::String_var s;
   //s= IOR_Mesh->getName(); _name = s;
@@ -86,7 +85,6 @@ void MESHClient::blankCopy()
   
   _name           = all->name;
   _spaceDimension = all->spaceDimension;
-  _meshDimension  = all->meshDimension;
   _numberOfNodes  = all->numberOfNodes;
 
   COORDINATEClient *_coord 
@@ -271,10 +269,34 @@ void MESHClient::removeReference() const
  */
 //=============================================================================
 
-void MESHClient::write(int index/*=0*/, const string & driverName/* = ""*/)
+void MESHClient::write(int index/*=0*/)
 {
   this->fillCopy();
-  MESH::write(index,driverName);
+  GMESH::write(index);
+}
+
+//=============================================================================
+/*!
+ * Write all the content of the GMESH using genDriver
+ */
+//=============================================================================
+
+void MESHClient::write(const GENDRIVER & genDriver)
+{
+  this->fillCopy();
+  GMESH::write(genDriver);
+}
+
+//=============================================================================
+/*!
+ * Write all the content of the GMESH
+ */
+//=============================================================================
+
+void MESHClient::write(driverTypes driverType, const std::string& filename)
+{
+  this->fillCopy();
+  GMESH::write(driverType, filename);
 }
 
 //================================================================================

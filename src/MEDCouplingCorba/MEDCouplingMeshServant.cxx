@@ -78,3 +78,17 @@ void MEDCouplingMeshServant::getSerialisationData(SALOME_TYPES::ListOfLong_out l
       array2->decrRef();
     }
 }
+
+CORBA::Boolean MEDCouplingMeshServant::ExportDataAs(const char *format, SALOME::GenericObj_out exporter)
+{
+  std::string frmCpp(format);
+  if(frmCpp=="MEDCorba")
+    {
+      SALOME_MED::MEDCouplingMeshCorbaInterface_ptr cPtr=_this();
+      Register();
+      exporter=cPtr;
+      return true;
+    }
+  exporter=SALOME::GenericObj::_nil();
+  return false;
+}

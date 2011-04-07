@@ -99,7 +99,7 @@ namespace MEDSPLITTER
     void getPolygonNodeConnectivity(const int* cell_list,int nb_cells,MED_EN::medEntityMesh entity,
                                     vector<int>& type_connectivity, vector<int>& connectivity_index) const;
     void getPolyhedraNodeConnectivity(const int* cell_list,int nb_cells,MED_EN::medEntityMesh entity,
-                                      vector<int>& type_connectivity, vector<int>& connectivity_index, vector<int>& face_connectivity_index) const;
+                                      vector<int>& type_connectivity, vector<int>& connectivity_index/*, vector<int>& face_connectivity_index*/) const;
 
     void getFaceConnectivity( const int*  cell_list,int nb_cells,MED_EN::medEntityMesh,MED_EN::medGeometryElement type, int* type_connectivity) const ;
 
@@ -168,7 +168,7 @@ namespace MEDSPLITTER
 
     static bool isDimensionOK(MED_EN::medGeometryElement type, int dim)
     {
-      return ((type/100 == dim) || (dim==2 && type == MED_EN::MED_POLYGON) || (dim==3 && type == MED_EN::MED_POLYHEDRA));
+      return ((type/100 == dim) || (dim==2 && type == MED_EN::MEDMEM_POLYGON) || (dim==3 && type == MED_EN::MEDMEM_POLYHEDRA));
     }
     void setSubdomainBoundaryCreates(bool flag) {  _subdomain_boundary_creates=flag;}
     bool getSubdomainBoundaryCreates(){return _subdomain_boundary_creates;}
@@ -240,12 +240,12 @@ namespace MEDSPLITTER
       so that they are written in joints*/
     bool                              _subdomain_boundary_creates;
 
-        /*! flag specifying that families must be preserved by the
-                splitting*/
+    /*! flag specifying that families must be preserved by the
+      splitting*/
     bool                              _family_splitting;
 
-        /*! flag specifying that groups must be created on all domains, 
-                even if they are empty*/
+    /*! flag specifying that groups must be created on all domains, 
+      even if they are empty*/
     bool                              _create_empty_groups;
   };
 

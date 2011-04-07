@@ -50,13 +50,14 @@ namespace MED
     //----------------------------------------------------------------------------
     virtual 
     PMeshInfo
-    CrMeshInfo(TInt theDim = 0,
+    CrMeshInfo(TInt theDim = 0, TInt theSpaceDim = 0,
                const std::string& theValue = "",
                EMaillage theType = eNON_STRUCTURE,
                const std::string& theDesc = "")
     {
       return PMeshInfo(new TTMeshInfo<eVersion>
                        (theDim,
+                        theSpaceDim,
                         theValue,
                         theType,
                         theDesc));

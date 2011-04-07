@@ -37,7 +37,7 @@
 template <class T>
 void MESHCollectionMedXMLDriver::_readFields(vector<MEDMEM::FIELD<T>* >& fields,char* fieldname, int itnumber, int ordernumber)
 {
-  for (int i=0; i<_collection->getMesh().size(); i++)
+  for (unsigned i=0; i<_collection->getMesh().size(); i++)
   {
     char filename[256];
     strcpy(filename,_filename[i].c_str());
@@ -88,7 +88,7 @@ void MESHCollectionMedXMLDriver::_writeFields(vector<MEDMEM::FIELD<T>* >& fields
   }
 
 
-  for (int i=0; i<_collection->getMesh().size(); i++)
+  for (unsigned i=0; i<_collection->getMesh().size(); i++)
   {
     char filename[256];
     strcpy(filename,_filename[i].c_str());

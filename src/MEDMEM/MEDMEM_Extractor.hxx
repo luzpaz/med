@@ -99,6 +99,7 @@ namespace MEDMEM
 
 
     const FIELD<double>* _myInputField; //!<  input field
+    const MESH*          _myInputMesh;  //!<  unstructured field support mesh
     std::vector<double>  _myNodeDistance; //!< distance of input nodes to cutting tool
   };
 }

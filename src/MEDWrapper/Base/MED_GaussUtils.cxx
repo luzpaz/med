@@ -189,9 +189,9 @@ namespace MED
   //---------------------------------------------------------------
 
   TShapeFun::TShapeFun(TInt theDim, TInt theNbRef):
+    myRefCoord(theNbRef*theDim),
     myDim(theDim),
-    myNbRef(theNbRef),
-    myRefCoord(theNbRef*theDim)
+    myNbRef(theNbRef)
   {}
 
   TCCoordSlice 

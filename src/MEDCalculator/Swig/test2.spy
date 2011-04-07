@@ -1,0 +1,25 @@
+e=MEDCalculatorBrowserLiteStruct("hfile1.med")
+f=e.getField(0)
+Power=MEDCalculatorDBFieldReal(f)
+Power[1:3,:,4:]^Power[5:7,:,4:]
+Power(1:3,:,2)+3
+Power(1:3,:,2)+3.6
+Power(1:3,:,2)+(3+5)
+(Power(1:3,:,2)+(3+5))
+Power(2:4,:,5)=(Power[1:3,:,2]+(3+5))
+3+Power(1:3,:,2)
+3.6+Power(1:3,:,2)
+(3.6+Power(1:3,:,2))*((4.2*7.8)+Power(5:7,:,2))
+Power2=Power(1:3,:,2:)+(3+5)
+3.6+Power2(0:2,:,2)
+Power=0
+Power3=Power2
+3.6/Power3(0:2,:,2)
+print 2+Power3(0:2,:,:)*4
+Power4=Power3.magnitude()
+print Power3.getValues()
+Power4.applyFunc("3*x")
+Power6=Power(0:2,:,1:4)
+Power7=Power(7:9,:,4:)
+Power5=4*Power7.dot(Power(0:2,:,1:4))+3
+del Power7

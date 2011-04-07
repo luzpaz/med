@@ -37,19 +37,66 @@
 extern "C"
 {
 #include <med.h>
+med_err MEDmeshEntityNameRd(const med_idt              fid,
+                            const char*  const         meshname,
+                            const med_int              numdt,
+                            const med_int              numit,
+                            const med_entity_type      entitype,
+                            const med_geometry_type    geotype,
+                            char* const                name);
+
+med_err MEDmeshEntityNumberRd(const med_idt               fid,
+                                const char*  const          meshname,
+                                const med_int               numdt,
+                                const med_int               numit,
+                                const med_entity_type       entitype,
+                                const med_geometry_type     geotype,
+                                med_int * const             number);
+  
+  med_err MEDmeshEntityFamilyNumberRd(const med_idt               fid,
+                                      const char*  const          meshname,
+                                      const med_int               numdt,
+                                      const med_int               numit,
+                                      const med_entity_type       entitype,
+                                      const med_geometry_type     geotype,
+                                      med_int * const             number);
+
+  med_err MEDfieldCr( const med_idt fid,
+                      const char * const fieldname,
+                      const med_field_type fieldtype,
+                      const med_int nbofcomponent,
+                      const char * const componentname,
+                      const char * const componentunit,
+                      const char * const dtunit,
+                      const char * const meshname);
+
+  med_err MEDfieldComputingStepInfo(const med_idt fid,
+                                    const char * const fieldname,
+                                    const int csit,
+                                    med_int * const numdt,
+                                    med_int * const numit,
+                                    med_float * const dt);
 
 #ifdef WNT
 MEDC_EXPORT
 #endif
 med_err
-MEDgaussInfo(med_idt fid, int indice, char * locname, med_geometrie_element * type_geo,
-             med_int * ngauss );
+MEDlocalizationInfo(const med_idt             fid,
+        const int                 localizationit,
+        char              * const localizationname,
+        med_geometry_type * const geotype,
+        med_int           * const spacedimension,
+        med_int           * const nbofipoint,
+        char *              const geointerpname,
+        char *              const sectionmeshname,
+        med_int           * const nsectionmeshcell,
+        med_geometry_type * const sectiongeotype);
 
 #ifdef WNT
 MEDC_EXPORT
 #endif
 med_int
-MEDnMaa(med_idt fid);
+MEDnMesh(med_idt fid);
 
 }
 
@@ -81,7 +128,7 @@ namespace MED
   TInt
   GetNOMLength<eV2_2>()
   {
-    return 32;
+    return 64;
   }
 
   template<>
@@ -102,7 +149,9 @@ namespace MED
   void
   GetVersionRelease<eV2_2>(TInt& majeur, TInt& mineur, TInt& release)
   {
-    MEDversionDonner(&majeur, &mineur, &release);
+    majeur=MED_MAJOR_NUM;
+    mineur=MED_MINOR_NUM;
+    release=MED_RELEASE_NUM;
   }
 
   template<>
@@ -124,8 +173,8 @@ namespace MED
       
     public:
       TFile(const std::string& theFileName): 
-        myFid(0), 
         myCount(0),
+        myFid(0), 
         myFileName(theFileName)
       {}
       
@@ -138,13 +187,13 @@ namespace MED
       Open(EModeAcces theMode, TErr* theErr = NULL)
       {
         if(myCount++ == 0){
-          char* aFileName = const_cast<char*>(myFileName.c_str());
-          myFid = MEDouvrir(aFileName,med_mode_acces(theMode));
+          const char* aFileName = myFileName.c_str();
+          myFid = MEDfileOpen(aFileName,med_access_mode(theMode));
         }
         if(theErr)
           *theErr = TErr(myFid);
         else if(myFid < 0)
-          EXCEPTION(std::runtime_error,"TFile - MEDouvrir('"<<myFileName<<"',"<<theMode<<")");
+          EXCEPTION(std::runtime_error,"TFile - MEDfileOpen('"<<myFileName<<"',"<<theMode<<")");
       }
 
       const TIdt& Id() const 
@@ -157,13 +206,13 @@ namespace MED
       void Close()
       { 
         if(--myCount == 0)
-          MEDfermer(myFid);
+          MEDfileClose(myFid);
       }
 
     protected:
-      std::string myFileName;
       TInt myCount;
       TIdt myFid;
+      std::string myFileName;
     };
 
 
@@ -202,7 +251,7 @@ namespace MED
       if(theErr && *theErr < 0)
         return -1;
       
-      return MEDnMaa(myFile->Id());
+      return MEDnMesh(myFile->Id());
     }
     
     
@@ -220,23 +269,32 @@ namespace MED
       
       TValueHolder<TString, char> aMeshName(theInfo.myName);
       TValueHolder<TInt, med_int> aDim(theInfo.myDim);
-      TValueHolder<EMaillage, med_maillage> aType(theInfo.myType);
-
-      TErr aRet = MEDmaaInfo(myFile->Id(),
-                             theMeshId,
-                             &aMeshName,
-                             &aDim,
-                             &aType,
-                             &theInfo.myDesc[0]);
-      // read space dimension of the mesh (issue 20232)
-      med_int spaceDim = MEDdimEspaceLire(myFile->Id(), &aMeshName);
-      if ( spaceDim > aDim )
-        aDim.myRepresentation = spaceDim;
-
-      if(theErr) 
-        *theErr = aRet;
-      else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"GetMeshInfo - MEDmaaInfo(...)");
+      TValueHolder<TInt, med_int> aSpaceDim(theInfo.mySpaceDim);
+      TValueHolder<EMaillage, med_mesh_type> aType(theInfo.myType);
+      char dtunit[MED_SNAME_SIZE+1];
+      med_sorting_type sorttype;
+      med_int nstep;
+      med_axis_type at;
+      int naxis=MEDmeshnAxis(myFile->Id(),theMeshId);
+      char *axisname=new char[naxis*MED_SNAME_SIZE+1];
+      char *axisunit=new char[naxis*MED_SNAME_SIZE+1];
+      TErr aRet = MEDmeshInfo(myFile->Id(),
+                              theMeshId,
+                              &aMeshName,
+                              &aSpaceDim,
+                              &aDim,
+                              &aType,
+                              &theInfo.myDesc[0],
+                              dtunit,
+                              &sorttype,
+                              &nstep,
+                              &at,
+                              axisname,
+                              axisunit);
+      delete [] axisname;
+      delete [] axisunit;
+      if(aRet < 0)
+        EXCEPTION(std::runtime_error,"GetMeshInfo - MEDmeshInfo(...)");
     }
     
     
@@ -256,25 +314,37 @@ namespace MED
       
       TValueHolder<TString, char> aMeshName(anInfo.myName);
       TValueHolder<TInt, med_int> aDim(anInfo.myDim);
-      TValueHolder<EMaillage, med_maillage> aType(anInfo.myType);
+      TValueHolder<TInt, med_int> aSpaceDim(anInfo.mySpaceDim);
+      TValueHolder<EMaillage, med_mesh_type> aType(anInfo.myType);
       TValueHolder<TString, char> aDesc(anInfo.myDesc);
 
-      TErr aRet = MEDmaaCr(myFile->Id(),
-                           &aMeshName,
-                           aDim,
-                           aType,
-                           &aDesc);
-      if(aRet == 0){
-        aRet = MEDunvCr(myFile->Id(),
-                        &aMeshName);
-      }
+      char *nam=new char[aSpaceDim*MED_SNAME_SIZE+1];
+      std::fill(nam,nam+aSpaceDim*MED_SNAME_SIZE+1,'\0');
+      char *unit=new char[aSpaceDim*MED_SNAME_SIZE+1];
+      std::fill(unit,unit+aSpaceDim*MED_SNAME_SIZE+1,'\0');
+      TErr aRet = MEDmeshCr(myFile->Id(),
+                            &aMeshName,
+                            aSpaceDim,
+                            aDim,
+                            aType,
+                            &aDesc,
+                            "",
+                            MED_SORT_DTIT,
+                            MED_CARTESIAN,
+                            nam,
+                            unit);
+      delete [] nam;
+      delete [] unit;
+      
+      //if(aRet == 0)
+      //  aRet = MEDunvCr(myFile->Id(),&aMeshName);
       
       INITMSG(MYDEBUG,"TVWrapper::SetMeshInfo - MED_MODE_ACCES = "<<theMode<<"; aRet = "<<aRet<<std::endl);
       
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"SetMeshInfo - MEDmaaCr(...)");
+        EXCEPTION(std::runtime_error,"SetMeshInfo - MEDmeshCr(...)");
     }
     
     
@@ -311,8 +381,7 @@ namespace MED
       
       MED::TMeshInfo& anInfo = const_cast<MED::TMeshInfo&>(theInfo);
       TValueHolder<TString, char> aName(anInfo.myName);
-      return MEDnFam(myFile->Id(),
-                     &aName);
+      return MEDnFamily(myFile->Id(),&aName);
     }
     
     
@@ -332,9 +401,7 @@ namespace MED
 
       TValueHolder<TString, char> aName(anInfo.myName);
 
-      return MEDnAttribut(myFile->Id(),
-                          &aName,
-                          theFamId);
+      return MEDnFamily23Attribute(myFile->Id(),&aName,theFamId);
     }
     
     
@@ -354,9 +421,7 @@ namespace MED
 
       TValueHolder<TString, char> aName(anInfo.myName);
 
-      return MEDnGroupe(myFile->Id(),
-                        &aName,
-                        theFamId);
+      return MEDnFamilyGroup(myFile->Id(),&aName,theFamId);
     }
     
     
@@ -383,23 +448,21 @@ namespace MED
       TValueHolder<TString, char> anAttrDesc(theInfo.myAttrDesc);
       TValueHolder<TInt, med_int> aNbGroup(theInfo.myNbGroup);
       TValueHolder<TString, char> aGroupNames(theInfo.myGroupNames);
-
-      TErr aRet = MEDfamInfo(myFile->Id(),
-                             &aMeshName,
-                             theFamId,
-                             &aFamilyName,
-                             &aFamilyId,
-                             &anAttrId,
-                             &anAttrVal,
-                             &anAttrDesc,
-                             &aNbAttr,
-                             &aGroupNames,
-                             &aNbGroup);
+      
+      TErr aRet = MEDfamily23Info(myFile->Id(),
+                                  &aMeshName,
+                                  theFamId,
+                                  &aFamilyName,
+                                  &anAttrId,
+                                  &anAttrVal,
+                                  &anAttrDesc,
+                                  &aFamilyId,
+                                  &aGroupNames);
       
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"GetFamilyInfo - MEDfamInfo(...) - "<<
+        EXCEPTION(std::runtime_error,"GetFamilyInfo - MEDfamily23Info(...) - "<<
                   " aMeshInfo.myName = '"<<&aMeshName<<
                   "'; theFamId = "<<theFamId<<
                   "; theInfo.myNbGroup = "<<aNbGroup()<<
@@ -432,23 +495,20 @@ namespace MED
       TValueHolder<TInt, med_int> aNbGroup(anInfo.myNbGroup);
       TValueHolder<TString, char> aGroupNames(anInfo.myGroupNames);
 
-      TErr aRet = MEDfamCr(myFile->Id(),
-                           &aMeshName,
-                           &aFamilyName,
-                           aFamilyId,
-                           &anAttrId,
-                           &anAttrVal,
-                           &anAttrDesc,
-                           aNbAttr,
-                           &aGroupNames,
-                           aNbGroup);
+      TErr aRet = MEDfamilyCr(myFile->Id(),
+                              &aMeshName, 
+                              &aFamilyName,
+                              aFamilyId,
+                              aNbGroup,
+                              &aGroupNames);
+      //&anAttrId,&anAttrVal,&anAttrDesc,aNbAttr,                   
       
       INITMSG(MYDEBUG,"TVWrapper::GetFamilyInfo - MED_MODE_ACCES = "<<theMode<<"; aRet = "<<aRet<<std::endl);
       
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"SetFamilyInfo - MEDfamCr(...)");
+        EXCEPTION(std::runtime_error,"SetFamilyInfo - MEDfamilyCr(...)");
     }
     
     
@@ -486,15 +546,16 @@ namespace MED
 
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
       TValueHolder<TString, char> anElemNames(theInfo.myElemNames);
-      TValueHolder<EEntiteMaillage, med_entite_maillage> anEntity(theEntity);
-      TValueHolder<EGeometrieElement, med_geometrie_element> aGeom(theGeom);
+      TValueHolder<EEntiteMaillage, med_entity_type> anEntity(theEntity);
+      TValueHolder<EGeometrieElement, med_geometry_type> aGeom(theGeom);
       
-      TErr aRet = MEDnomLire(myFile->Id(),
-                             &aMeshName,
-                             &anElemNames,
-                             theNb,
-                             anEntity,
-                             aGeom);
+      TErr aRet = MEDmeshEntityNameRd(myFile->Id(),
+                                      &aMeshName,
+                                      MED_NO_DT,
+                                      MED_NO_IT,
+                                      anEntity,
+                                      aGeom,
+                                      &anElemNames);
 
       theInfo.myIsElemNames = aRet != 0? eFAUX : eVRAI ;
 
@@ -520,15 +581,16 @@ namespace MED
       
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
       TValueHolder<TElemNum, med_int> anElemNum(theInfo.myElemNum);
-      TValueHolder<EEntiteMaillage, med_entite_maillage> anEntity(theEntity);
-      TValueHolder<EGeometrieElement, med_geometrie_element> aGeom(theGeom);
+      TValueHolder<EEntiteMaillage, med_entity_type> anEntity(theEntity);
+      TValueHolder<EGeometrieElement, med_geometry_type> aGeom(theGeom);
       
-      TErr aRet = MEDnumLire(myFile->Id(),
-                             &aMeshName,
-                             &anElemNum,
-                             theNb,
-                             anEntity,
-                             aGeom);
+      TErr aRet = MEDmeshEntityNumberRd(myFile->Id(),
+                                        &aMeshName,
+                                        MED_NO_DT,
+                                        MED_NO_IT,
+                                        anEntity,
+                                        aGeom,
+                                        &anElemNum);
 
       theInfo.myIsElemNum = aRet != 0? eFAUX : eVRAI;
 
@@ -554,20 +616,26 @@ namespace MED
 
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
       TValueHolder<TElemNum, med_int> aFamNum(theInfo.myFamNum);
-      TValueHolder<EEntiteMaillage, med_entite_maillage> anEntity(theEntity);
-      TValueHolder<EGeometrieElement, med_geometrie_element> aGeom(theGeom);
+      TValueHolder<EEntiteMaillage, med_entity_type> anEntity(theEntity);
+      TValueHolder<EGeometrieElement, med_geometry_type> aGeom(theGeom);
       
-      TErr aRet = MEDfamLire(myFile->Id(),
-                             &aMeshName,
-                             &aFamNum,
-                             theNb,
-                             anEntity,
-                             aGeom);
+      TErr aRet = MEDmeshEntityFamilyNumberRd(myFile->Id(),
+                                              &aMeshName,
+                                              MED_NO_DT,
+                                              MED_NO_IT,
+                                              anEntity,
+                                              aGeom,
+                                              &aFamNum);
 
       if(theErr) 
         *theErr = aRet;
-      else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"GetFamilies - MEDfamLire(...)");
+      else if(aRet < 0){ // TODO: Get correct error code
+        //EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDfamLire(...) of CELLS");
+        aRet = 0;
+        int aSize = (int)theInfo.myFamNum->size();
+        theInfo.myFamNum->clear();
+        theInfo.myFamNum->resize(aSize,0);
+      }
     }
 
 
@@ -604,19 +672,21 @@ namespace MED
       if(theInfo.myIsElemNames){
         TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
         TValueHolder<TString, char> anElemNames(anInfo.myElemNames);
-        TValueHolder<EEntiteMaillage, med_entite_maillage> anEntity(theEntity);
-        TValueHolder<EGeometrieElement, med_geometrie_element> aGeom(theGeom);
+        TValueHolder<EEntiteMaillage, med_entity_type> anEntity(theEntity);
+        TValueHolder<EGeometrieElement, med_geometry_type> aGeom(theGeom);
       
-        aRet  = MEDnomEcr(myFile->Id(),
-                          &aMeshName,
-                          &anElemNames,
-                          (TInt)anInfo.myElemNames->size(),
-                          anEntity,
-                          aGeom);
+        aRet  = MEDmeshEntityNameWr(myFile->Id(),
+                                    &aMeshName,
+                                    MED_NO_DT,
+                                    MED_NO_IT,
+                                    anEntity,
+                                    aGeom, 
+                                    (TInt)anInfo.myElemNames->size(),
+                                    &anElemNames);
         if(theErr) 
           *theErr = aRet;
         else if(aRet < 0)
-          EXCEPTION(std::runtime_error,"SetNames - MEDnomEcr(...)");
+          EXCEPTION(std::runtime_error,"SetNames - MEDmeshEntityNameWr(...)");
       }
     }
 
@@ -654,19 +724,21 @@ namespace MED
       if(theInfo.myIsElemNum){
         TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
         TValueHolder<TElemNum, med_int> anElemNum(anInfo.myElemNum);
-        TValueHolder<EEntiteMaillage, med_entite_maillage> anEntity(theEntity);
-        TValueHolder<EGeometrieElement, med_geometrie_element> aGeom(theGeom);
+        TValueHolder<EEntiteMaillage, med_entity_type> anEntity(theEntity);
+        TValueHolder<EGeometrieElement, med_geometry_type> aGeom(theGeom);
       
-        aRet  = MEDnumEcr(myFile->Id(),
-                          &aMeshName,
-                          &anElemNum,
-                          (TInt)anInfo.myElemNum->size(),
-                          anEntity,
-                          aGeom);
+        aRet  = MEDmeshEntityNumberWr(myFile->Id(),
+                                      &aMeshName,
+                                      MED_NO_DT,
+                                      MED_NO_IT,
+                                      anEntity,
+                                      aGeom,
+                                      (TInt)anInfo.myElemNum->size(),
+                                      &anElemNum);
         if(theErr) 
           *theErr = aRet;
         else if(aRet < 0)
-          EXCEPTION(std::runtime_error,"SetNumeration - MEDnumEcr(...)");
+          EXCEPTION(std::runtime_error,"SetNumeration - MEDmeshEntityNumberWr(...)");
       }
     }
 
@@ -700,20 +772,22 @@ namespace MED
 
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
       TValueHolder<TElemNum, med_int> aFamNum(anInfo.myFamNum);
-      TValueHolder<EEntiteMaillage, med_entite_maillage> anEntity(theEntity);
-      TValueHolder<EGeometrieElement, med_geometrie_element> aGeom(theGeom);
+      TValueHolder<EEntiteMaillage, med_entity_type> anEntity(theEntity);
+      TValueHolder<EGeometrieElement, med_geometry_type> aGeom(theGeom);
       
-      TErr aRet = MEDfamEcr(myFile->Id(),
-                            &aMeshName,
-                            &aFamNum,
-                            (TInt)anInfo.myFamNum->size(),
-                            anEntity,
-                            aGeom);
+      TErr aRet = MEDmeshEntityFamilyNumberWr(myFile->Id(),
+                                              &aMeshName,
+                                              MED_NO_DT,
+                                              MED_NO_IT,
+                                              anEntity,
+                                              aGeom,
+                                              (TInt)anInfo.myFamNum->size(),
+                                              &aFamNum);
       
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"SetFamilies - MEDfamEcr(...)");
+        EXCEPTION(std::runtime_error,"SetFamilies - MEDmeshEntityFamilyNumberWr(...)");
     }
     
     //----------------------------------------------------------------------------
@@ -731,14 +805,18 @@ namespace MED
       MED::TMeshInfo& aMeshInfo = const_cast<MED::TMeshInfo&>(theMeshInfo);
       
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-      TValueHolder<ETable, med_table> aTable(theTable);
-
-      return MEDnEntMaa(myFile->Id(),
-                        &aMeshName,
-                        aTable,
-                        MED_NOEUD,
-                        med_geometrie_element(0),
-                        med_connectivite(0));
+      //TValueHolder<ETable, med_table> aTable(theTable);
+      med_bool chgt,trsf;
+      return MEDmeshnEntity(myFile->Id(),
+                            &aMeshName,
+                            MED_NO_DT,
+                            MED_NO_IT,
+                            MED_NODE,
+                            MED_NO_GEOTYPE,
+                            MED_COORDINATE,
+                            MED_NO_CMODE,
+                            &chgt,
+                            &trsf);
     }
     
     
@@ -758,35 +836,57 @@ namespace MED
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
       TValueHolder<TInt, med_int> aDim(aMeshInfo.myDim);
       TValueHolder<TNodeCoord, med_float> aCoord(theInfo.myCoord);
-      TValueHolder<EModeSwitch, med_mode_switch> aModeSwitch(theInfo.myModeSwitch);
-      TValueHolder<ERepere, med_repere> aSystem(theInfo.mySystem);
+      TValueHolder<EModeSwitch, med_switch_mode> aModeSwitch(theInfo.myModeSwitch);
+      TValueHolder<ERepere, med_axis_type> aSystem(theInfo.mySystem);
       TValueHolder<TString, char> aCoordNames(theInfo.myCoordNames);
       TValueHolder<TString, char> aCoordUnits(theInfo.myCoordUnits);
       TValueHolder<TString, char> anElemNames(theInfo.myElemNames);
-      TValueHolder<EBooleen, med_booleen> anIsElemNames(theInfo.myIsElemNames);
+      //TValueHolder<EBooleen, med_bool> anIsElemNames(theInfo.myIsElemNames);
       TValueHolder<TElemNum, med_int> anElemNum(theInfo.myElemNum);
-      TValueHolder<EBooleen, med_booleen> anIsElemNum(theInfo.myIsElemNum);
+      //TValueHolder<EBooleen, med_bool> anIsElemNum(theInfo.myIsElemNum);
       TValueHolder<TElemNum, med_int> aFamNum(theInfo.myFamNum);
       TValueHolder<TInt, med_int> aNbElem(theInfo.myNbElem);
 
-      TErr aRet = MEDnoeudsLire(myFile->Id(),
-                                &aMeshName,
-                                aDim,
-                                &aCoord,
-                                aModeSwitch,
-                                &aSystem,
-                                &aCoordNames,
-                                &aCoordUnits,
-                                &anElemNames,
-                                &anIsElemNames,
-                                &anElemNum,
-                                &anIsElemNum,
-                                &aFamNum,
-                                aNbElem);
+      TErr aRet = MEDmeshNodeCoordinateRd(myFile->Id(),
+                                          &aMeshName,
+                                          MED_NO_DT,
+                                          MED_NO_IT,
+                                          aModeSwitch,
+                                          &aCoord);
+                                          
+      if (MEDmeshEntityFamilyNumberRd(myFile->Id(),
+                                  &aMeshName,
+                                  MED_NO_DT,
+                                  MED_NO_IT,
+                                  MED_NODE,
+                                  MED_NO_GEOTYPE ,
+                                  &aFamNum) < 0 )
+      { // TODO: Get correct error code
+        int mySize = (int)theInfo.myFamNum->size();
+        theInfo.myFamNum->clear();
+        theInfo.myFamNum->resize(mySize,0);
+      }
+                                  
+      if ( MEDmeshEntityNameRd(myFile->Id(),
+                          &aMeshName,
+                          MED_NO_DT,
+                          MED_NO_IT,
+                          MED_NODE,
+                          MED_NO_GEOTYPE ,
+                          &anElemNames) < 0) theInfo.myIsElemNames=eFAUX;
+      
+      if ( MEDmeshEntityNumberRd(myFile->Id(),
+                            &aMeshName,
+                            MED_NO_DT,
+                            MED_NO_IT,
+                            MED_NODE,
+                            MED_NO_GEOTYPE ,
+                            &anElemNum) < 0 ) theInfo.myIsElemNum=eFAUX;
+      
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"GetNodeInfo - MEDnoeudsLire(...)");
+        EXCEPTION(std::runtime_error,"GetNodeInfo - MEDmeshNodeCoordinateRd(...)");
     }
     
     
@@ -808,35 +908,56 @@ namespace MED
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
       TValueHolder<TInt, med_int> aDim(aMeshInfo.myDim);
       TValueHolder<TNodeCoord, med_float> aCoord(anInfo.myCoord);
-      TValueHolder<EModeSwitch, med_mode_switch> aModeSwitch(anInfo.myModeSwitch);
-      TValueHolder<ERepere, med_repere> aSystem(anInfo.mySystem);
+      TValueHolder<EModeSwitch, med_switch_mode> aModeSwitch(anInfo.myModeSwitch);
+      TValueHolder<ERepere, med_axis_type> aSystem(anInfo.mySystem);
       TValueHolder<TString, char> aCoordNames(anInfo.myCoordNames);
       TValueHolder<TString, char> aCoordUnits(anInfo.myCoordUnits);
       TValueHolder<TString, char> anElemNames(anInfo.myElemNames);
-      TValueHolder<EBooleen, med_booleen> anIsElemNames(anInfo.myIsElemNames);
+      TValueHolder<EBooleen, med_bool> anIsElemNames(anInfo.myIsElemNames);
       TValueHolder<TElemNum, med_int> anElemNum(anInfo.myElemNum);
-      TValueHolder<EBooleen, med_booleen> anIsElemNum(anInfo.myIsElemNum);
+      TValueHolder<EBooleen, med_bool> anIsElemNum(anInfo.myIsElemNum);
       TValueHolder<TElemNum, med_int> aFamNum(anInfo.myFamNum);
       TValueHolder<TInt, med_int> aNbElem(anInfo.myNbElem);
 
-      TErr aRet = MEDnoeudsEcr(myFile->Id(),
-                               &aMeshName,
-                               aDim,
-                               &aCoord,
-                               aModeSwitch,
-                               aSystem,
-                               &aCoordNames,
-                               &aCoordUnits,
-                               &anElemNames,
-                               anIsElemNames,
-                               &anElemNum,
-                               anIsElemNum,
-                               &aFamNum,
-                               aNbElem);
+      TErr aRet = MEDmeshNodeCoordinateWr(myFile->Id(),
+                                          &aMeshName,
+                                          MED_NO_DT,
+                                          MED_NO_IT,
+                                          MED_NO_DT,
+                                          aModeSwitch,
+                                          aNbElem,
+                                          &aCoord);
+                                          
+      MEDmeshEntityFamilyNumberWr(myFile->Id(),
+                                  &aMeshName,
+                                  MED_NO_DT,
+                                  MED_NO_IT,
+                                  MED_NODE,
+                                  MED_NO_GEOTYPE,
+                                  aNbElem,
+                                  &aFamNum);
+      if(anIsElemNames)
+        MEDmeshEntityNameWr(myFile->Id(),
+                            &aMeshName,
+                            MED_NO_DT,
+                            MED_NO_IT,
+                            MED_NODE,
+                            MED_NO_GEOTYPE,
+                            aNbElem,
+                            &anElemNames);
+      if(anIsElemNum)
+        MEDmeshEntityNumberWr(myFile->Id(),
+                              &aMeshName,
+                              MED_NO_DT,
+                              MED_NO_IT,
+                              MED_NODE,
+                              MED_NO_GEOTYPE,
+                              aNbElem,
+                              &anElemNum);
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"SetNodeInfo - MEDnoeudsEcr(...)");
+        EXCEPTION(std::runtime_error,"SetNodeInfo - MEDmeshNodeCoordinateWr(...)");
     }
     
     
@@ -874,22 +995,23 @@ namespace MED
       TValueHolder<TElemNum, med_int> anIndex(theInfo.myIndex);
       TInt aNbElem = (TInt)theInfo.myElemNum->size();
       TValueHolder<TElemNum, med_int> aConn(theInfo.myConn);
-      TValueHolder<EEntiteMaillage, med_entite_maillage> anEntity(theInfo.myEntity);
-      TValueHolder<EConnectivite, med_connectivite> aConnMode(theInfo.myConnMode);
+      TValueHolder<EEntiteMaillage, med_entity_type> anEntity(theInfo.myEntity);
+      TValueHolder<EConnectivite, med_connectivity_mode> aConnMode(theInfo.myConnMode);
 
       TErr aRet;
-      aRet = MEDpolygoneConnLire(myFile->Id(), 
-                                 &aMeshName,
-                                 &anIndex,
-                                 aNbElem+1,
-                                 &aConn,
-                                 anEntity,
-                                 aConnMode);
+      aRet = MEDmeshPolygonRd(myFile->Id(),
+                              &aMeshName,
+                              MED_NO_DT,
+                              MED_NO_IT,
+                              anEntity,
+                              aConnMode,
+                              &anIndex,
+                              &aConn);
 
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"GetPolygoneInfo - MEDpolygoneInfo(...)");
+        EXCEPTION(std::runtime_error,"GetPolygoneInfo - MEDmeshPolygonRd(...)");
 
       if(theInfo.myIsElemNames){
         GetNames(theInfo,aNbElem,theInfo.myEntity,ePOLYGONE,&aRet);
@@ -935,21 +1057,24 @@ namespace MED
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
       TValueHolder<TElemNum, med_int> anIndex(anInfo.myIndex);
       TValueHolder<TElemNum, med_int> aConn(anInfo.myConn);
-      TValueHolder<EEntiteMaillage, med_entite_maillage> anEntity(anInfo.myEntity);
-      TValueHolder<EConnectivite, med_connectivite> aConnMode(anInfo.myConnMode);
+      TValueHolder<EEntiteMaillage, med_entity_type> anEntity(anInfo.myEntity);
+      TValueHolder<EConnectivite, med_connectivity_mode> aConnMode(anInfo.myConnMode);
 
-      TErr aRet = MEDpolygoneConnEcr(myFile->Id(),
-                                     &aMeshName,
-                                     &anIndex,
-                                     anInfo.myNbElem + 1,
-                                     &aConn,
-                                     anEntity,
-                                     aConnMode);
+      TErr aRet = MEDmeshPolygonWr(myFile->Id(),
+                                   &aMeshName,
+                                   MED_NO_DT,
+                                   MED_NO_IT,
+                                   MED_UNDEF_DT,
+                                   anEntity,
+                                   aConnMode,
+                                   anInfo.myNbElem + 1,
+                                   &anIndex,
+                                   &aConn);
       
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"SetPolygoneInfo - MEDpolygoneConnEcr(...)");
+        EXCEPTION(std::runtime_error,"SetPolygoneInfo - MEDmeshPolygonWr(...)");
       
       SetNames(anInfo,theInfo.myEntity,ePOLYGONE,&aRet);
       if(theErr) 
@@ -994,18 +1119,21 @@ namespace MED
       
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
       med_int aTaille = 0;
+      med_bool chgt,trsf;
+      aTaille=MEDmeshnEntity(myFile->Id(),
+                             &aMeshName,
+                             MED_NO_DT,
+                             MED_NO_IT,
+                             med_entity_type(theEntity),
+                             MED_POLYGON,
+                             MED_CONNECTIVITY,
+                             med_connectivity_mode(theConnMode),
+                             &chgt,
+                             &trsf);
 
-      TErr aRet;
-      aRet = MEDpolygoneInfo(myFile->Id(), 
-                             &aMeshName, 
-                             med_entite_maillage(theEntity), 
-                             med_connectivite(theConnMode),
-                             &aTaille);
       
-      if(theErr) 
-        *theErr = aRet;
-      else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"GetPolygoneInfo - MEDpolygoneInfo(...)");
+      if(aTaille < 0)
+        EXCEPTION(std::runtime_error,"GetPolygoneInfo - MEDmeshnEntity(...)");
 
       return TInt(aTaille);
     }
@@ -1028,22 +1156,23 @@ namespace MED
       TValueHolder<TElemNum, med_int> anIndex(theInfo.myIndex);
       TValueHolder<TElemNum, med_int> aFaces(theInfo.myFaces);
       TValueHolder<TElemNum, med_int> aConn(theInfo.myConn);
-      TValueHolder<EConnectivite, med_connectivite> aConnMode(theInfo.myConnMode);
+      TValueHolder<EConnectivite, med_connectivity_mode> aConnMode(theInfo.myConnMode);
 
       TErr aRet;
-      aRet = MEDpolyedreConnLire(myFile->Id(), 
+      aRet = MEDmeshPolyhedronRd(myFile->Id(),
                                  &aMeshName,
+                                 MED_NO_DT,
+                                 MED_NO_IT,
+                                 MED_CELL,
+                                 aConnMode,
                                  &anIndex,
-                                 aNbElem + 1,
                                  &aFaces,
-                                 (TInt)theInfo.myFaces->size(),
-                                 &aConn,
-                                 aConnMode);
+                                 &aConn);
 
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"GetPolygoneInfo - MEDpolyedreConnLire(...)");
+        EXCEPTION(std::runtime_error,"GetPolygoneInfo - MEDmeshPolyhedronRd(...)");
 
       if(theInfo.myIsElemNames){
         GetNames(theInfo,aNbElem,theInfo.myEntity,ePOLYEDRE,&aRet);
@@ -1090,66 +1219,76 @@ namespace MED
       TValueHolder<TElemNum, med_int> anIndex(anInfo.myIndex);
       TValueHolder<TElemNum, med_int> aFaces(anInfo.myFaces);
       TValueHolder<TElemNum, med_int> aConn(anInfo.myConn);
-      TValueHolder<EConnectivite, med_connectivite> aConnMode(anInfo.myConnMode);
+      TValueHolder<EConnectivite, med_connectivity_mode> aConnMode(anInfo.myConnMode);
 
       TErr aRet;
-      aRet = MEDpolyedreConnEcr(myFile->Id(),
-                                &aMeshName,
-                                &anIndex,
-                                anInfo.myNbElem + 1,
-                                &aFaces,
-                                (TInt)anInfo.myFaces->size(),
-                                &aConn,
-                                aConnMode);
+      aRet = MEDmeshPolyhedronWr(myFile->Id(),
+                                 &aMeshName,
+                                 MED_NO_DT,
+                                 MED_NO_IT,
+                                 MED_UNDEF_DT,
+                                 MED_CELL,
+                                 aConnMode,
+                                 anInfo.myNbElem+1,
+                                 &anIndex,
+                                 (TInt)anInfo.myFaces->size(),
+                                 &aFaces,
+                                 &aConn);
       
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"SetPolyedreInfo - MEDpolyedreConnEcr(...)");
+        EXCEPTION(std::runtime_error,"SetPolyedreInfo - MEDmeshPolyhedronWr(...)");
       
-      TValueHolder<EEntiteMaillage, med_entite_maillage> anEntity(anInfo.myEntity);
+      TValueHolder<EEntiteMaillage, med_entity_type> anEntity(anInfo.myEntity);
 
       if(theInfo.myIsElemNames){
         TValueHolder<TString, char> anElemNames(anInfo.myElemNames);
-        aRet  = MEDnomEcr(myFile->Id(),
-                          &aMeshName,
-                          &anElemNames,
-                          (TInt)anInfo.myElemNames->size(),
-                          anEntity,
-                          MED_POLYEDRE);
+        aRet  = MEDmeshEntityNameWr(myFile->Id(),
+                                    &aMeshName,
+                                    MED_NO_DT,
+                                    MED_NO_IT,
+                                    anEntity,
+                                    MED_POLYHEDRON,
+                                    (TInt)anInfo.myElemNames->size(),
+                                    &anElemNames);
         if(theErr) 
           *theErr = aRet;
         else if(aRet < 0)
-          EXCEPTION(std::runtime_error,"SetPolyedreInfo - MEDnomEcr(...)");
+          EXCEPTION(std::runtime_error,"SetPolyedreInfo - MEDmeshEntityNameWr(...)");
       }
       
       if(theInfo.myIsElemNum){
         TValueHolder<TElemNum, med_int> anElemNum(anInfo.myElemNum);
-        aRet  = MEDnumEcr(myFile->Id(),
-                          &aMeshName,
-                          &anElemNum,
-                          (TInt)anInfo.myElemNum->size(),
-                          anEntity,
-                          MED_POLYEDRE);
+        aRet = MEDmeshEntityNumberWr(myFile->Id(),
+                                     &aMeshName,
+                                     MED_NO_DT,
+                                     MED_NO_IT,
+                                     anEntity,
+                                     MED_POLYHEDRON,
+                                     (TInt)anInfo.myElemNum->size(),
+                                     &anElemNum);
         if(theErr) 
           *theErr = aRet;
         else if(aRet < 0)
-          EXCEPTION(std::runtime_error,"SetPolyedreInfo - MEDnumEcr(...)");
+          EXCEPTION(std::runtime_error,"SetPolyedreInfo - MEDmeshEntityNumberWr(...)");
       }
       
       
       TValueHolder<TElemNum, med_int> aFamNum(anInfo.myFamNum);
-      aRet = MEDfamEcr(myFile->Id(),
-                       &aMeshName,
-                       &aFamNum,
-                       (TInt)anInfo.myFamNum->size(),
-                       anEntity,
-                       MED_POLYEDRE);
+      aRet = MEDmeshEntityFamilyNumberWr(myFile->Id(),
+                                         &aMeshName,
+                                         MED_NO_DT,
+                                         MED_NO_IT,
+                                         anEntity,
+                                         MED_POLYHEDRON,
+                                         (TInt)anInfo.myFamNum->size(),
+                                         &aFamNum);
       
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"SetPolyedreInfo - MEDfamEcr(...)");
+        EXCEPTION(std::runtime_error,"SetPolyedreInfo - MEDmeshEntityFamilyNumberWr(...)");
     }
 
     //----------------------------------------------------------------------------
@@ -1181,20 +1320,35 @@ namespace MED
       MED::TMeshInfo& aMeshInfo = const_cast<MED::TMeshInfo&>(theMeshInfo);
       
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-      TValueHolder<EConnectivite, med_connectivite> aConnMode(theConnMode);
+      TValueHolder<EConnectivite, med_connectivity_mode> aConnMode(theConnMode);
       TValueHolder<TInt, med_int> aNbFaces(theNbFaces);
       TValueHolder<TInt, med_int> aConnSize(theConnSize);
 
-      TErr aRet = MEDpolyedreInfo(myFile->Id(), 
-                                  &aMeshName, 
+      med_bool chgt,trsf;
+      theNbFaces = MEDmeshnEntity(myFile->Id(),
+                                  &aMeshName,
+                                  MED_NO_DT,
+                                  MED_NO_IT,
+                                  MED_CELL,
+                                  MED_POLYHEDRON,
+                                  MED_INDEX_NODE,
                                   aConnMode,
-                                  &aNbFaces,
-                                  &aConnSize);
+                                  &chgt,
+                                  &trsf);
+                                
+      theConnSize = MEDmeshnEntity(myFile->Id(),
+                                  &aMeshName,
+                                  MED_NO_DT,
+                                  MED_NO_IT,
+                                  MED_CELL,
+                                  MED_POLYHEDRON,
+                                  MED_CONNECTIVITY,
+                                  aConnMode,
+                                  &chgt,
+                                  &trsf);
 
-      if(theErr) 
-        *theErr = aRet;
-      else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"GetPolygoneInfo - MEDpolyedreInfo(...)");
+      if(theNbFaces < 0 || aConnSize<0)
+        EXCEPTION(std::runtime_error,"GetPolygoneInfo - MEDmeshnEntity(...)");
 
     }
     
@@ -1305,13 +1459,17 @@ namespace MED
       
       MED::TMeshInfo& aMeshInfo = const_cast<MED::TMeshInfo&>(theMeshInfo);
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-
-      return MEDnEntMaa(myFile->Id(),
-                        &aMeshName,
-                        MED_CONN,
-                        med_entite_maillage(theEntity),
-                        med_geometrie_element(theGeom),
-                        med_connectivite(theConnMode)); 
+      med_bool chgt,trsf;
+      return MEDmeshnEntity(myFile->Id(),
+                            &aMeshName,
+                            MED_NO_DT,
+                            MED_NO_IT,
+                            med_entity_type(theEntity),
+                            med_geometry_type(theGeom),
+                            MED_CONNECTIVITY,
+                            med_connectivity_mode(theConnMode),
+                            &chgt,
+                            &trsf);
     }
     
     
@@ -1327,40 +1485,50 @@ namespace MED
         return;
       
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
-      TInt aNbElem = (TInt)theInfo.myElemNum->size();
 
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
       TValueHolder<TInt, med_int> aDim(aMeshInfo.myDim);
       TValueHolder<TElemNum, med_int> aConn(theInfo.myConn);
-      TValueHolder<EModeSwitch, med_mode_switch> aModeSwitch(theInfo.myModeSwitch);
+      TValueHolder<EModeSwitch, med_switch_mode> aModeSwitch(theInfo.myModeSwitch);
       TValueHolder<TString, char> anElemNames(theInfo.myElemNames);
-      TValueHolder<EBooleen, med_booleen> anIsElemNames(theInfo.myIsElemNames);
+      TValueHolder<EBooleen, med_bool> anIsElemNames(theInfo.myIsElemNames);
       TValueHolder<TElemNum, med_int> anElemNum(theInfo.myElemNum);
-      TValueHolder<EBooleen, med_booleen> anIsElemNum(theInfo.myIsElemNum);
+      TValueHolder<EBooleen, med_bool> anIsElemNum(theInfo.myIsElemNum);
       TValueHolder<TElemNum, med_int> aFamNum(theInfo.myFamNum);
-      TValueHolder<EEntiteMaillage, med_entite_maillage> anEntity(theInfo.myEntity);
-      TValueHolder<EGeometrieElement, med_geometrie_element> aGeom(theInfo.myGeom);
-      TValueHolder<EConnectivite, med_connectivite> aConnMode(theInfo.myConnMode);
+      TValueHolder<EBooleen, med_bool> anIsFamNum(theInfo.myIsFamNum);
+      TValueHolder<EEntiteMaillage, med_entity_type> anEntity(theInfo.myEntity);
+      TValueHolder<EGeometrieElement, med_geometry_type> aGeom(theInfo.myGeom);
+      TValueHolder<EConnectivite, med_connectivity_mode> aConnMode(theInfo.myConnMode);
 
       TErr aRet;
-      aRet = MEDelementsLire(myFile->Id(),
-                             &aMeshName,
-                             aDim,
-                             &aConn,
-                             aModeSwitch,
-                             &anElemNames,
-                             &anIsElemNames,
-                             &anElemNum,
-                             &anIsElemNum,
-                             &aFamNum,
-                             aNbElem,
-                             anEntity,
-                             aGeom,
-                             aConnMode);
+      aRet = MEDmeshElementRd(myFile->Id(),
+                              &aMeshName,
+                              MED_NO_DT,
+                              MED_NO_IT,
+                              anEntity,
+                              aGeom,
+                              aConnMode,
+                              aModeSwitch,
+                              &aConn,
+                              &anIsElemNames,
+                              &anElemNames,
+                              &anIsElemNum,
+                              &anElemNum,
+                              &anIsFamNum,
+                              &aFamNum);
+
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"GetCellInfo - MEDelementsLire(...)");
+        EXCEPTION(std::runtime_error,"GetCellInfo - MEDmeshElementRd(...)");
+      
+      if (anIsFamNum == MED_FALSE)
+      {
+        int mySize = (int)theInfo.myFamNum->size();
+        theInfo.myFamNum->clear();
+        theInfo.myFamNum->resize(mySize,0);
+      }
+      
     }
     
     
@@ -1382,36 +1550,41 @@ namespace MED
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
       TValueHolder<TInt, med_int> aDim(aMeshInfo.myDim);
       TValueHolder<TElemNum, med_int> aConn(anInfo.myConn);
-      TValueHolder<EModeSwitch, med_mode_switch> aModeSwitch(anInfo.myModeSwitch);
+      TValueHolder<EModeSwitch, med_switch_mode> aModeSwitch(anInfo.myModeSwitch);
       TValueHolder<TString, char> anElemNames(anInfo.myElemNames);
-      TValueHolder<EBooleen, med_booleen> anIsElemNames(anInfo.myIsElemNames);
+      TValueHolder<EBooleen, med_bool> anIsElemNames(anInfo.myIsElemNames);
       TValueHolder<TElemNum, med_int> anElemNum(anInfo.myElemNum);
-      TValueHolder<EBooleen, med_booleen> anIsElemNum(anInfo.myIsElemNum);
+      TValueHolder<EBooleen, med_bool> anIsElemNum(anInfo.myIsElemNum);
       TValueHolder<TElemNum, med_int> aFamNum(anInfo.myFamNum);
-      TValueHolder<EEntiteMaillage, med_entite_maillage> anEntity(anInfo.myEntity);
-      TValueHolder<EGeometrieElement, med_geometrie_element> aGeom(anInfo.myGeom);
-      TValueHolder<EConnectivite, med_connectivite> aConnMode(anInfo.myConnMode);
+      TValueHolder<EBooleen, med_bool> anIsFamNum(anInfo.myIsFamNum);
+      TValueHolder<EEntiteMaillage, med_entity_type> anEntity(anInfo.myEntity);
+      TValueHolder<EGeometrieElement, med_geometry_type> aGeom(anInfo.myGeom);
+      TValueHolder<EConnectivite, med_connectivity_mode> aConnMode(anInfo.myConnMode);
 
       TErr aRet;
-      aRet = MEDelementsEcr(myFile->Id(),
-                            &aMeshName,
-                            aDim,
-                            &aConn,
-                            aModeSwitch,
-                            &anElemNames,
-                            anIsElemNames,
-                            &anElemNum,
-                            anIsElemNum,
-                            &aFamNum,
-                            anInfo.myNbElem,
-                            anEntity,
-                            aGeom,
-                            aConnMode);
+      aRet = MEDmeshElementWr(myFile->Id(),
+                              &aMeshName,
+                              MED_NO_DT,
+                              MED_NO_IT,
+                              MED_UNDEF_DT,
+                              anEntity,
+                              aGeom,
+                              aConnMode,
+                              aModeSwitch,
+                              anInfo.
+                              myNbElem,
+                              &aConn,
+                              anIsElemNames,
+                              &anElemNames,
+                              anIsElemNum,
+                              &anElemNum,
+                              anIsFamNum,
+                              &aFamNum);
       
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"SetCellInfo - MEDelementsLire(...)");
+        EXCEPTION(std::runtime_error,"SetCellInfo - MEDmeshElementWr(...)");
     }
     
 
@@ -1435,7 +1608,7 @@ namespace MED
       if(theErr && *theErr < 0)
         return -1;
       
-      return MEDnChamp(myFile->Id(),0);
+      return MEDnField(myFile->Id());
     }
     
     
@@ -1450,7 +1623,7 @@ namespace MED
       if(theErr && *theErr < 0)
         return -1;
       
-      return MEDnChamp(myFile->Id(),theFieldId);
+      return MEDfieldnComponent(myFile->Id(),theFieldId);
     }
     
     
@@ -1467,25 +1640,33 @@ namespace MED
         return;
       
       TString aFieldName(256); // Protect from memory problems with too long names
-      TValueHolder<ETypeChamp, med_type_champ> aType(theInfo.myType);
+      TValueHolder<ETypeChamp, med_field_type> aType(theInfo.myType);
       TValueHolder<TString, char> aCompNames(theInfo.myCompNames);
       TValueHolder<TString, char> anUnitNames(theInfo.myUnitNames);
-
+      MED::TMeshInfo& aMeshInfo = theInfo.myMeshInfo;
+      
       TErr aRet;
-      aRet = MEDchampInfo(myFile->Id(),
+      med_bool local;
+      char dtunit[MED_SNAME_SIZE+1];
+      med_int nbofstp;
+      theInfo.myNbComp = MEDfieldnComponent(myFile->Id(),theFieldId);
+      aRet = MEDfieldInfo(myFile->Id(),
                           theFieldId,
                           &aFieldName[0],
+                          &aMeshInfo.myName[0],
+                          &local,
                           &aType,
                           &aCompNames,
                           &anUnitNames,
-                          theInfo.myNbComp);
+                          dtunit,
+                          &nbofstp);
 
       theInfo.SetName(aFieldName);
 
       if(theErr)
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"GetFieldInfo - MEDchampInfo(...)");
+        EXCEPTION(std::runtime_error,"GetFieldInfo - MEDfieldInfo(...)");
     }
     
     
@@ -1504,21 +1685,25 @@ namespace MED
       MED::TFieldInfo& anInfo = const_cast<MED::TFieldInfo&>(theInfo);
       
       TValueHolder<TString, char> aFieldName(anInfo.myName);
-      TValueHolder<ETypeChamp, med_type_champ> aType(anInfo.myType);
+      TValueHolder<ETypeChamp, med_field_type> aType(anInfo.myType);
       TValueHolder<TString, char> aCompNames(anInfo.myCompNames);
       TValueHolder<TString, char> anUnitNames(anInfo.myUnitNames);
-
+      MED::TMeshInfo& aMeshInfo = anInfo.myMeshInfo;
       TErr aRet;
-      aRet = MEDchampCr(myFile->Id(),
+      char dtunit[MED_SNAME_SIZE+1];
+      std::fill(dtunit,dtunit+MED_SNAME_SIZE+1,'\0');
+      aRet = MEDfieldCr(myFile->Id(),
                         &aFieldName,
                         aType,
+                        anInfo.myNbComp,
                         &aCompNames,
                         &anUnitNames,
-                        anInfo.myNbComp);
+                        dtunit,
+                        &aMeshInfo.myName[0]);
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"SetFieldInfo - MEDchampEcr(...)");
+        EXCEPTION(std::runtime_error,"SetFieldInfo - MEDfieldCr(...)");
     }
     
     
@@ -1549,7 +1734,7 @@ namespace MED
       if(theErr && *theErr < 0)
         return -1;
       
-      return MEDnGauss(myFile->Id());
+      return MEDnLocalization(myFile->Id());
     }
 
 
@@ -1566,19 +1751,28 @@ namespace MED
       
       med_int aNbGaussPoints = med_int();
       TVector<char> aName(GetNOMLength<eV2_2>()+1);
-      med_geometrie_element aGeom = MED_NONE;
+      med_geometry_type aGeom = MED_NONE;
 
       TErr aRet;
-      aRet = MEDgaussInfo(myFile->Id(),
-                          theId,
-                          &aName[0],
-                          &aGeom,
-                          &aNbGaussPoints);
+      med_int dim;
+      char geointerpname[MED_NAME_SIZE+1]="";
+      char ipointstructmeshname[MED_NAME_SIZE+1]="";
+      med_int nsectionmeshcell;
+      med_geometry_type sectiongeotype;
+      aRet = MEDlocalizationInfo (myFile->Id(),
+                                  theId,
+                                  &aName[0],
+                                  &aGeom,
+                                  &dim,
+                                  &aNbGaussPoints,
+                                  geointerpname,
+                                  ipointstructmeshname,
+                                  &nsectionmeshcell,
+                                  &sectiongeotype);
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"GetGaussPreInfo - MEDgaussInfo(...)");
-      
+        EXCEPTION(std::runtime_error,"GetGaussPreInfo - MEDlocalizationInfo(...)");
       return TGaussInfo::TInfo(TGaussInfo::TKey(EGeometrieElement(aGeom),&aName[0]),
                                TInt(aNbGaussPoints));
     }
@@ -1599,21 +1793,21 @@ namespace MED
       TValueHolder<TNodeCoord, med_float> aRefCoord(theInfo.myRefCoord);
       TValueHolder<TNodeCoord, med_float> aGaussCoord(theInfo.myGaussCoord);
       TValueHolder<TWeight, med_float> aWeight(theInfo.myWeight);
-      TValueHolder<EModeSwitch, med_mode_switch> aModeSwitch(theInfo.myModeSwitch);
+      TValueHolder<EModeSwitch, med_switch_mode> aModeSwitch(theInfo.myModeSwitch);
       TValueHolder<TString, char> aGaussName(theInfo.myName);
 
       TErr aRet;
-      aRet = MEDgaussLire(myFile->Id(),
-                          &aRefCoord,
-                          &aGaussCoord,
-                          &aWeight,
-                          aModeSwitch,
-                          &aGaussName);
+      aRet = MEDlocalizationRd(myFile->Id(),
+                               &aGaussName,
+                               aModeSwitch,
+                               &aRefCoord,
+                               &aGaussCoord,
+                               &aWeight);
 
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"GetGaussInfo - MEDgaussLire(...)");
+        EXCEPTION(std::runtime_error,"GetGaussInfo - MEDlocalizationRd(...)");
     }
 
 
@@ -1627,7 +1821,7 @@ namespace MED
       if(theErr && *theErr < 0)
         return -1;
       
-      return MEDnProfil(myFile->Id());
+      return MEDnProfile(myFile->Id());
     }
 
     TProfileInfo::TInfo
@@ -1644,14 +1838,14 @@ namespace MED
       TVector<char> aName(GetNOMLength<eV2_2>()+1);
 
       TErr aRet;
-      aRet = MEDprofilInfo(myFile->Id(),
-                           theId,
-                           &aName[0],
-                           &aSize);
+      aRet = MEDprofileInfo(myFile->Id(),
+                            theId,
+                            &aName[0],
+                            &aSize);
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"GetProfilePreInfo - MEDprofilInfo(...)");
+        EXCEPTION(std::runtime_error,"GetProfilePreInfo - MEDprofileInfo(...)");
       
       return TProfileInfo::TInfo(&aName[0],aSize);
     }
@@ -1672,13 +1866,13 @@ namespace MED
       TValueHolder<TString, char>     aProfileName(anInfo.myName);
 
       TErr aRet;
-      aRet = MEDprofilLire(myFile->Id(),
-                           &anElemNum,
-                           &aProfileName);
+      aRet = MEDprofileRd(myFile->Id(),
+                          &aProfileName,
+                          &anElemNum);
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"GetProfileInfo - MEDprofilLire(...)");
+        EXCEPTION(std::runtime_error,"GetProfileInfo - MEDprofileRd(...)");
     }
 
     void
@@ -1697,14 +1891,14 @@ namespace MED
       TValueHolder<TString, char>     aProfileName(anInfo.myName);
 
       TErr aRet;
-      aRet = MEDprofilEcr(myFile->Id(),      // descripteur du fichier.
-                          &anElemNum,        // tableau de valeurs du profil.
+      aRet = MEDprofileWr(myFile->Id(),      // descripteur du fichier.
+                          &aProfileName,        // tableau de valeurs du profil.
                           theInfo.GetSize(), // taille du profil.
-                          &aProfileName);    // nom profil.
+                          &anElemNum);    // nom profil.
       if(theErr)
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"SetProfileInfo - MEDprofilEcr(...)");
+        EXCEPTION(std::runtime_error,"SetProfileInfo - MEDprofileWr(...)");
     }
 
     void
@@ -1763,15 +1957,31 @@ namespace MED
         
       TEntityInfo::const_iterator anIter = localEntityInfo.begin();
       for(; anIter != localEntityInfo.end(); anIter++){
-        med_entite_maillage anEntity = med_entite_maillage(anIter->first);
+        med_entity_type anEntity = med_entity_type(anIter->first);
         const TGeom2Size& aGeom2Size = anIter->second;
         TGeom2Size::const_iterator anGeomIter = aGeom2Size.begin();
         for(; anGeomIter != aGeom2Size.end(); anGeomIter++){
-          med_geometrie_element aGeom = med_geometrie_element(anGeomIter->first);
-          TInt aNbStamps = MEDnPasdetemps(anId,
-                                          &aFieldName,
-                                          anEntity,
-                                          aGeom);
+          med_geometry_type aGeom = med_geometry_type(anGeomIter->first);
+          char meshName[MED_NAME_SIZE+1];
+          med_bool islocal;
+          med_field_type ft;
+          char dtunit[MED_SNAME_SIZE+1];
+          med_int myNbComp = MEDfieldnComponentByName(anId,&aFieldName);
+          char *cname=new char[myNbComp*MED_SNAME_SIZE+1];
+          char *unitname=new char[myNbComp*MED_SNAME_SIZE+1];
+          TInt aNbStamps;
+          MEDfieldInfoByName(anId,
+                             &aFieldName,
+                             meshName,
+                             &islocal,
+                             &ft,
+                             cname,
+                             unitname,
+                             dtunit,
+                             &aNbStamps);
+          delete [] cname;
+          delete [] unitname;
+
           bool anIsSatisfied = aNbStamps > 0;
           if(anIsSatisfied){
             INITMSG(MYDEBUG,
@@ -1782,25 +1992,15 @@ namespace MED
               for(TInt iTimeStamp = 1; iTimeStamp <= iTimeStampEnd; iTimeStamp++){
                 TVector<char> aMeshName(GetNOMLength<eV2_2>()+1);
                 TVector<char> aDtUnit(GetPNOMLength<eV2_2>()+1);
-                med_int aNbGauss;
                 med_int aNumDt;
                 med_int aNumOrd;
                 med_float aDt;
-                med_booleen anIsLocal;
-                med_int aNbRef;
-                TErr aRet = MEDpasdetempsInfo(anId,
-                                              &aFieldName,
-                                              anEntity,
-                                              aGeom,
-                                              iTimeStamp, 
-                                              &aNbGauss,
-                                              &aNumDt,  
-                                              &aNumOrd,
-                                              &aDtUnit[0],
-                                              &aDt, 
-                                              &aMeshName[0],
-                                              &anIsLocal,
-                                              &aNbRef);
+                TErr aRet = MEDfieldComputingStepInfo(anId,
+                                                      &aFieldName,
+                                                      iTimeStamp,
+                                                      &aNumDt,  
+                                                      &aNumOrd,
+                                                      &aDt);
 
                 anIsSatisfied = (aRet == 0 && (!strcmp(&aMeshName[0],&aMeshInfo.myName[0])));
                 if(!anIsSatisfied){
@@ -1848,13 +2048,13 @@ namespace MED
       MED::TMeshInfo& aMeshInfo = *aFieldInfo.myMeshInfo;
       
       TValueHolder<TString, char> aFieldName(aFieldInfo.myName);
-      TValueHolder<EEntiteMaillage, med_entite_maillage> anEntity(theInfo.myEntity);
+      TValueHolder<EEntiteMaillage, med_entity_type> anEntity(theInfo.myEntity);
       TValueHolder<TInt, med_int> aNumDt(theInfo.myNumDt);
       TValueHolder<TInt, med_int> aNumOrd(theInfo.myNumOrd);
       TValueHolder<TString, char> anUnitDt(theInfo.myUnitDt);
       TValueHolder<TFloat, med_float> aDt(theInfo.myDt);
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-      TValueHolder<EBooleen, med_booleen> anIsLocal(aFieldInfo.myIsLocal);
+      TValueHolder<EBooleen, med_bool> anIsLocal(aFieldInfo.myIsLocal);
       TValueHolder<TInt, med_int> aNbRef(aFieldInfo.myNbRef);
 
       TGeom2NbGauss& aGeom2NbGauss = theInfo.myGeom2NbGauss;
@@ -1865,19 +2065,27 @@ namespace MED
         med_int aNbGauss = -1;
 
         TErr aRet;
-        aRet = MEDpasdetempsInfo(myFile->Id(),
-                                 &aFieldName,
-                                 anEntity,
-                                 med_geometrie_element(aGeom),
-                                 theTimeStampId,
-                                 &aNbGauss,
-                                 &aNumDt,
-                                 &aNumOrd,
-                                 &anUnitDt,
-                                 &aDt,
-                                 &aMeshName,
-                                 &anIsLocal,
-                                 &aNbRef);
+        aRet = MEDfieldComputingStepInfo(myFile->Id(),
+                                         &aFieldName,
+                                         theTimeStampId,
+                                         &aNumDt,  
+                                         &aNumOrd,
+                                         &aDt);
+        char profilename[MED_NAME_SIZE+1];
+        med_int profilsize;
+        char locname[MED_NAME_SIZE+1];
+        MEDfieldnValueWithProfile(myFile->Id(),
+                                  &aFieldName,
+                                  aNumDt,
+                                  aNumOrd,
+                                  anEntity,
+                                  med_geometry_type(aGeom),
+                                  1,
+                                  MED_COMPACT_STMODE,
+                                  profilename,
+                                  &profilsize,
+                                  locname,
+                                  &aNbGauss);
 
         static TInt MAX_NB_GAUSS_POINTS = 32;
         if(aNbGauss <= 0 || aNbGauss > MAX_NB_GAUSS_POINTS)
@@ -1888,7 +2096,7 @@ namespace MED
         if(theErr) 
           *theErr = aRet;
         else if(aRet < 0)
-          EXCEPTION(std::runtime_error,"GetTimeStampInfo - MEDpasdetempsInfo(...)");
+          EXCEPTION(std::runtime_error,"GetTimeStampInfo - MEDfieldnValueWithProfile(...)");
       }      
     }
     
@@ -1908,17 +2116,17 @@ namespace MED
       
       TIdt anId = myFile->Id();
       
-      TValueHolder<EModeSwitch, med_mode_switch> aModeSwitch(theTimeStampValue->myModeSwitch);
+      TValueHolder<EModeSwitch, med_switch_mode> aModeSwitch(theTimeStampValue->myModeSwitch);
       MED::TGeom2Profile& aGeom2Profile = theTimeStampValue->myGeom2Profile;
 
       MED::PTimeStampInfo aTimeStampInfo = theTimeStampValue->myTimeStampInfo;
-      TValueHolder<EEntiteMaillage, med_entite_maillage> anEntity(aTimeStampInfo->myEntity);
+      TValueHolder<EEntiteMaillage, med_entity_type> anEntity(aTimeStampInfo->myEntity);
       TValueHolder<TInt, med_int> aNumDt(aTimeStampInfo->myNumDt);
       TValueHolder<TInt, med_int> aNumOrd(aTimeStampInfo->myNumOrd);
 
       MED::PFieldInfo aFieldInfo = aTimeStampInfo->myFieldInfo;
       TValueHolder<TString, char> aFieldName(aFieldInfo->myName);
-      TValueHolder<EBooleen, med_booleen> anIsLocal(aFieldInfo->myIsLocal);
+      TValueHolder<EBooleen, med_bool> anIsLocal(aFieldInfo->myIsLocal);
 
       MED::PMeshInfo aMeshInfo = aFieldInfo->myMeshInfo;
       TValueHolder<TString, char> aMeshName(aMeshInfo->myName);
@@ -1926,7 +2134,7 @@ namespace MED
       TGeom2Gauss& aGeom2Gauss = aTimeStampInfo->myGeom2Gauss;
       TVector<char> aGaussName(GetNOMLength<eV2_2>()+1);
 
-      med_mode_profil aProfileMode = med_mode_profil(boost::get<0>(theMKey2Profile));
+      med_storage_mode aProfileMode = med_storage_mode(boost::get<0>(theMKey2Profile));
       MED::TKey2Profile aKey2Profile = boost::get<1>(theMKey2Profile);
       TVector<char> aProfileName(GetNOMLength<eV2_2>()+1);
 
@@ -1935,56 +2143,28 @@ namespace MED
       for(; anIter != aGeom2Size.end(); anIter++){
         EGeometrieElement aGeom = anIter->first;
         TInt aNbElem = anIter->second;
+        char profilename[MED_NAME_SIZE+1];
+        med_int profilesize,aNbGauss;
+        char locname[MED_NAME_SIZE+1];
+        TInt aNbVal = MEDfieldnValueWithProfile(anId,
+                                                &aFieldName,
+                                                aNumDt,
+                                                aNumOrd,
+                                                anEntity,
+                                                med_geometry_type(aGeom),
+                                                1,
+                                                aProfileMode,
+                                                profilename,
+                                                &profilesize,
+                                                locname,
+                                                &aNbGauss);
 
-        TInt aNbMeshRef = MEDnChampRef(anId,
-                                       &aFieldName,
-                                       anEntity,
-                                       med_geometrie_element(aGeom),
-                                       aNumDt,
-                                       aNumOrd);
-        if(aNbMeshRef < 1){
-          if(theErr){
-            *theErr = MED_FAUX;
-            return;
-          }
-          EXCEPTION(std::runtime_error,"GetTimeStampValue - MEDnChampRef(...) < 1");
-        }
-        
-        TErr aRet;
-        med_int aNbGauss = -1;
-        aRet = MEDchampRefInfo(anId,
-                               &aFieldName,
-                               anEntity,
-                               med_geometrie_element(aGeom),
-                               aNbMeshRef,
-                               aNumDt,
-                               aNumOrd, 
-                               &aMeshName,
-                               &anIsLocal,
-                               &aNbGauss);
-
-        if(aRet < 0){
-          if(theErr){
-            *theErr = MED_FAUX;
-            return;
-          }
-          EXCEPTION(std::runtime_error,"GetTimeStampValue - MEDchampRefInfo(...)");
-        }
- 
-        TInt aNbVal = MEDnVal(anId,
-                              &aFieldName,
-                              anEntity,
-                              med_geometrie_element(aGeom),
-                              aNumDt,
-                              aNumOrd,
-                              &aMeshName,
-                              aProfileMode);
         if(aNbVal <= 0){
           if(theErr){
             *theErr = -1;
             return;
           }
-          EXCEPTION(std::runtime_error,"GetTimeStampValue - MEDnVal(...) - aNbVal == "<<aNbVal<<" <= 0");
+          EXCEPTION(std::runtime_error,"GetTimeStampValue - MEDfieldnValueWithProfile(...) - aNbVal == "<<aNbVal<<" <= 0");
         }
         
         TInt aNbComp = aFieldInfo->myNbComp;
@@ -2003,25 +2183,23 @@ namespace MED
                 "; aNbComp = "<<aNbComp<<
                 std::endl);
         
-        aRet = MEDchampLire(anId,
-                            &aMeshName,
-                            &aFieldName,
-                            theTimeStampValue->GetValuePtr(aGeom),
-                            aModeSwitch,
-                            MED_ALL,
-                            &aGaussName[0],
-                            &aProfileName[0],
-                            aProfileMode,
-                            anEntity,
-                            med_geometrie_element(aGeom),
-                            aNumDt,
-                            aNumOrd);
+        TErr aRet = MEDfieldValueWithProfileRd(anId,
+                                               &aFieldName,
+                                               aNumDt,
+                                               aNumOrd,
+                                               anEntity,
+                                               med_geometry_type(aGeom),
+                                               aProfileMode,
+                                               &aProfileName[0],
+                                               aModeSwitch,
+                                               MED_ALL_CONSTITUENT,
+                                               theTimeStampValue->GetValuePtr(aGeom));
         if(aRet < 0){
           if(theErr){
-            *theErr = MED_FAUX;
+            *theErr = MED_FALSE;
             return;
           }
-          EXCEPTION(std::runtime_error,"GetTimeStampValue - MEDchampLire(...)");
+          EXCEPTION(std::runtime_error,"GetTimeStampValue - MEDfieldValueWithProfileRd(...)");
         }
 
         MED::PGaussInfo aGaussInfo;
@@ -2045,7 +2223,7 @@ namespace MED
 
         if(aGaussInfo && aNbGauss != aGaussInfo->GetNbGauss()){
           if(theErr){
-            *theErr = MED_FAUX;
+            *theErr = MED_FALSE;
             return;
           }
           EXCEPTION(std::runtime_error,"GetTimeStampValue - aNbGauss != aGaussInfo->GetNbGauss()");
@@ -2108,11 +2286,11 @@ namespace MED
       TErr aRet;
       TIdt anId = myFile->Id();
       
-      TValueHolder<EModeSwitch, med_mode_switch> aModeSwitch(theTimeStampValue->myModeSwitch);
+      TValueHolder<EModeSwitch, med_switch_mode> aModeSwitch(theTimeStampValue->myModeSwitch);
       MED::TGeom2Profile& aGeom2Profile = theTimeStampValue->myGeom2Profile;
 
       MED::PTimeStampInfo aTimeStampInfo = theTimeStampValue->myTimeStampInfo;
-      TValueHolder<EEntiteMaillage, med_entite_maillage> anEntity(aTimeStampInfo->myEntity);
+      TValueHolder<EEntiteMaillage, med_entity_type> anEntity(aTimeStampInfo->myEntity);
       TValueHolder<TInt, med_int> aNumDt(aTimeStampInfo->myNumDt);
       TValueHolder<TInt, med_int> aNumOrd(aTimeStampInfo->myNumOrd);
       TValueHolder<TString, char> anUnitDt(aTimeStampInfo->myUnitDt);
@@ -2138,38 +2316,36 @@ namespace MED
         }
 
         TVector<char> aProfileName(GetNOMLength<eV2_2>()+1);
-        med_mode_profil aProfileMode = med_mode_profil(eNO_PFLMOD);
+        med_storage_mode aProfileMode = med_storage_mode(eNO_PFLMOD);
         MED::TGeom2Profile::const_iterator aProfileIter = aGeom2Profile.find(aGeom);
         if(aProfileIter != aGeom2Profile.end()){
           MED::PProfileInfo aProfileInfo = aProfileIter->second;
-          aProfileMode = med_mode_profil(aProfileInfo->myMode);
+          aProfileMode = med_storage_mode(aProfileInfo->myMode);
           strcpy(&aProfileName[0],&aProfileInfo->myName[0]);
         }
 
         med_int aNbVal = theTimeStampValue->GetNbVal(aGeom);
 
-        aRet = MEDchampEcr(anId,
-                           &aMeshName,
-                           &aFieldName,
-                           theTimeStampValue->GetValuePtr(aGeom),
-                           aModeSwitch,
-                           aNbVal,
-                           &aGaussName[0],
-                           MED_ALL,
-                           &aProfileName[0],
-                           aProfileMode,
-                           anEntity,
-                           med_geometrie_element(aGeom),
-                           aNumDt,
-                           &anUnitDt,
-                           aDt,
-                           aNumOrd);    
+        aRet = MEDfieldValueWithProfileWr(anId,
+                                          &aFieldName,
+                                          aNumDt,
+                                          aNumOrd,
+                                          aDt,
+                                          anEntity,
+                                          med_geometry_type(aGeom),
+                                          aProfileMode,
+                                          &aProfileName[0],
+                                          &aGaussName[0],
+                                          aModeSwitch,
+                                          MED_ALL_CONSTITUENT,
+                                          aNbVal,
+                                          theTimeStampValue->GetValuePtr(aGeom));
         if(aRet < 0){
           if(theErr){
-            *theErr = MED_FAUX;
+            *theErr = MED_FALSE;
             break;
           }
-          EXCEPTION(std::runtime_error,"SetTimeStampValue - MEDchampEcr(...)");
+          EXCEPTION(std::runtime_error,"SetTimeStampValue - MEDfieldValueWithProfileWr(...)");
         }
         
       }
@@ -2223,58 +2399,60 @@ namespace MED
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
       TValueHolder<TInt, med_int> aDim(aMeshInfo.myDim);
 
-      TValueHolder<EGrilleType, med_type_grille> aGrilleType(anInfo.myGrilleType);
+      TValueHolder<EGrilleType, med_grid_type > aGrilleType(anInfo.myGrilleType);
 
       TErr aRet = 0;
-      aRet = MEDnatureGrilleEcr(myFile->Id(),
-                                &aMeshName,
-                                aGrilleType);
+      aRet = MEDmeshGridTypeRd(myFile->Id(),
+                               &aMeshName,
+                               &aGrilleType);
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"SetGrilleInfo - MEDnatureGrilleEcr(...)");
+        EXCEPTION(std::runtime_error,"SetGrilleInfo - MEDmeshGridTypeRd(...)");
       
       if(anInfo.myGrilleType == eGRILLE_STANDARD){
         TValueHolder<TNodeCoord, med_float> aCoord(anInfo.myCoord);
-        TValueHolder<EModeSwitch, med_mode_switch> aModeSwitch(anInfo.myModeSwitch);
+        TValueHolder<EModeSwitch, med_switch_mode> aModeSwitch(anInfo.myModeSwitch);
         TValueHolder<TString, char> aCoordNames(anInfo.myCoordNames);
         TValueHolder<TString, char> aCoordUnits(anInfo.myCoordUnits);
         med_int aNbNoeuds = med_int(anInfo.myCoord.size() / aMeshInfo.myDim);
-        med_repere aRepere = MED_CART;
+        //med_axis_type aRepere = MED_CARTESIAN;
 
-        aRet = MEDcoordEcr(myFile->Id(),
-                           &aMeshName,
-                           aDim,
-                           &aCoord,
-                           aModeSwitch,
-                           aNbNoeuds,
-                           aRepere,
-                           &aCoordNames,
-                           &aCoordUnits);
+        aRet = MEDmeshNodeCoordinateWr(myFile->Id(),
+                                       &aMeshName,
+                                       MED_NO_DT,
+                                       MED_NO_IT,
+                                       MED_UNDEF_DT,
+                                       aModeSwitch,
+                                       aNbNoeuds,
+                                       &aCoord);
 
         if(aRet < 0)
-          EXCEPTION(std::runtime_error,"SetGrilleInfo - MEDcoordEcr(...)");
+          EXCEPTION(std::runtime_error,"SetGrilleInfo - MEDmeshNodeCoordinateWr(...)");
 
         TValueHolder<TIntVector, med_int> aGrilleStructure(anInfo.myGrilleStructure);
-        aRet = MEDstructureCoordEcr(myFile->Id(),
+        aRet = MEDmeshGridStructWr(myFile->Id(),
                                     &aMeshName,
-                                    aDim,
-                                    &aGrilleStructure);
+                                   MED_NO_DT,
+                                   MED_NO_IT,
+                                   MED_UNDEF_DT,
+                                   &aGrilleStructure);
         if(aRet < 0)
-          EXCEPTION(std::runtime_error,"SetGrilleInfo - MEDstructureCoordEcr(...)");
+          EXCEPTION(std::runtime_error,"SetGrilleInfo - MEDmeshGridStructWr(...)");
         
       } else {
         for(med_int aAxis = 0; aAxis < aMeshInfo.myDim; aAxis++){
-          aRet = MEDindicesCoordEcr(myFile->Id(),
-                                    &aMeshName,
-                                    aDim,
-                                    &anInfo.GetIndexes(aAxis)[0],
-                                    anInfo.GetIndexes(aAxis).size(),
-                                    aAxis + 1,
-                                    &anInfo.GetCoordName(aAxis)[0],
-                                    &anInfo.GetCoordUnit(aAxis)[0]);
+          aRet = MEDmeshGridIndexCoordinateWr(myFile->Id(),
+                                              &aMeshName,
+                                              MED_NO_DT,
+                                              MED_NO_IT,
+                                              MED_UNDEF_DT,
+                                              aAxis+1,
+                                              anInfo.GetIndexes(aAxis).size(),
+                                              &anInfo.GetIndexes(aAxis)[0]);
+
           if(aRet < 0)
-            EXCEPTION(std::runtime_error,"SetGrilleInfo - MEDindicesCoordEcr(...)");
+            EXCEPTION(std::runtime_error,"SetGrilleInfo - MEDmeshGridIndexCoordinateWr(...)");
         }
         
       }
@@ -2306,42 +2484,44 @@ namespace MED
         GetGrilleStruct(aMeshInfo, theInfo.myGrilleStructure, theErr);
 
         TValueHolder<TNodeCoord, med_float> aCoord(theInfo.myCoord);
-        TValueHolder<EModeSwitch, med_mode_switch> aModeSwitch(theInfo.myModeSwitch);
+        TValueHolder<EModeSwitch, med_switch_mode> aModeSwitch(theInfo.myModeSwitch);
         TValueHolder<TString, char> aCoordNames(theInfo.myCoordNames);
         TValueHolder<TString, char> aCoordUnits(theInfo.myCoordUnits);
-        med_repere aRepere;
+        //med_axis_type aRepere;
 
-        aRet = MEDcoordLire(myFile->Id(),
-                            &aMeshName,
-                            aDim,
-                            &aCoord,
-                            aModeSwitch,
-                            MED_ALL, // all coordinates must be return
-                            NULL,
-                            0,
-                            &aRepere,
-                            &aCoordNames,
-                            &aCoordUnits);
+        aRet = MEDmeshNodeCoordinateRd(myFile->Id(),
+                                       &aMeshName,
+                                       MED_NO_DT,
+                                       MED_NO_IT,
+                                       aModeSwitch,
+                                       &aCoord);
 
         if(theErr) 
           *theErr = aRet;
         else if(aRet < 0)
-          EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDcoordLire(...)");
+          EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDmeshNodeCoordinateRd(...)");
 
-        TInt aNbNodes = theInfo.GetNbNodes();//GetNbFamilies(aMeshInfo);
+        //TInt aNbNodes = theInfo.GetNbNodes();//GetNbFamilies(aMeshInfo);
         TValueHolder<TElemNum, med_int> aFamNumNode(theInfo.myFamNumNode);
         
-        aRet = MEDfamLire(myFile->Id(),
-                          &aMeshName,
-                          &aFamNumNode,
-                          aNbNodes,
-                          med_entite_maillage(eNOEUD),
-                          med_geometrie_element(ePOINT1));
+        aRet = MEDmeshEntityFamilyNumberRd(myFile->Id(),
+                                           &aMeshName,
+                                           MED_NO_DT,
+                                           MED_NO_IT,
+                                           MED_NODE,
+                                           MED_NO_GEOTYPE,
+                                           &aFamNumNode);
 
         if(theErr) 
           *theErr = aRet;
         else if(aRet < 0)
-          EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDfamLire(...) of NODES");
+        { // TODO: Get correct error code
+          aRet = 0;
+//           EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDmeshEntityFamilyNumberRd(...) of NODES");
+          int mySize = (int)theInfo.myFamNumNode.size();
+          theInfo.myFamNumNode.clear();
+          theInfo.myFamNumNode.resize(mySize,0);
+        }
 
         //============================
       }
@@ -2373,17 +2553,9 @@ namespace MED
             EXCEPTION(std::runtime_error,"GetGrilleInfo - Erreur a la lecture de la taille de l'indice");
             
           TValueHolder<TFloatVector, med_float> anIndexes(theInfo.GetIndexes(anAxis-1));
-          char aCompNames[MED_TAILLE_PNOM+1];
-          char anUnitNames[MED_TAILLE_PNOM+1];
-            
-          aRet = MEDindicesCoordLire(myFile->Id(),
-                                     &aMeshName,
-                                     aDim,
-                                     &anIndexes,
-                                     aNbIndexes,
-                                     anAxis,
-                                     aCompNames,
-                                     anUnitNames);
+          char aCompNames[MED_SNAME_SIZE+1];
+          char anUnitNames[MED_SNAME_SIZE+1];
+          aRet=MEDmeshGridIndexCoordinateRd(myFile->Id(),&aMeshName,MED_NO_DT,MED_NO_IT,MED_NO_DT,&anIndexes);
 
           theInfo.SetCoordName(anAxis-1, aCompNames);
           theInfo.SetCoordUnit(anAxis-1, anUnitNames);
@@ -2403,12 +2575,9 @@ namespace MED
       theInfo.myFamNum.resize(aNbCells);
       TValueHolder<TElemNum, med_int> aFamNum(theInfo.myFamNum);
       
-      aRet = MEDfamLire(myFile->Id(),
-                        &aMeshName,
-                        &aFamNum,
-                        aNbCells,
-                        med_entite_maillage(aEntity),
-                        med_geometrie_element(aGeom));
+      aRet = MEDmeshEntityFamilyNumberRd(myFile->Id(),
+                                         &aMeshName,MED_NO_DT,MED_NO_IT,med_entity_type(aEntity),
+                                         med_geometry_type(aGeom),&aFamNum);
 
       if ( aMeshInfo.myDim == 3 )
       {
@@ -2419,19 +2588,19 @@ namespace MED
         theInfo.myFamSubNum.resize(aNbCells,0);
         TValueHolder<TElemNum, med_int> aFamNum(theInfo.myFamSubNum);
       
-        MEDfamLire(myFile->Id(),
-                   &aMeshName,
-                   &aFamNum,
-                   aNbCells,
-                   med_entite_maillage(aEntity),
-                   med_geometrie_element(aGeom));
+        MEDmeshEntityFamilyNumberRd(myFile->Id(),
+                                    &aMeshName,MED_NO_DT,MED_NO_IT,
+                                    med_entity_type(aEntity),
+                                    med_geometry_type(aGeom),&aFamNum);
       }
       if(theErr) 
         *theErr = aRet;
-      else if(aRet < 0){
+      else if(aRet < 0){ // TODO: Get correct error code
         //EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDfamLire(...) of CELLS");
         aRet = 0;
-        theInfo.myFamNum.resize(0);
+        int mySize = (int)theInfo.myFamNum.size();
+        theInfo.myFamNum.clear();
+        theInfo.myFamNum.resize(mySize,0);
       }
       
     }
@@ -2439,7 +2608,7 @@ namespace MED
     void
     TVWrapper
     ::GetGrilleType(const MED::TMeshInfo& theMeshInfo,
-                    EGrilleType& theGrilleType,
+                    EGrilleType& theGridType,
                     TErr* theErr)
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
@@ -2451,13 +2620,13 @@ namespace MED
       
       if(aMeshInfo.myType == eSTRUCTURE){
         TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-        TValueHolder<EGrilleType, med_type_grille> aGrilleType(theGrilleType);
+        TValueHolder<EGrilleType, med_grid_type> aGridType(theGridType);
+        TErr aRet = MEDmeshGridTypeRd(myFile->Id(),
+                                      &aMeshName,
+                                      &aGridType);
 
-        TErr aRet = MEDnatureGrilleLire(myFile->Id(),
-                                        &aMeshName,
-                                        &aGrilleType);
         if(aRet < 0)
-          EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDnatureGrilleLire(...)");
+          EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDmeshGridTypeRd(...)");
       }
     }    
     
@@ -2476,17 +2645,17 @@ namespace MED
       MED::TMeshInfo& aMeshInfo = const_cast<MED::TMeshInfo&>(theMeshInfo);
 
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-      TValueHolder<TInt, med_int> aDim(aMeshInfo.myDim);
-      TValueHolder<TIntVector, med_int> aGrilleStructure(theStruct);
+      TValueHolder<TIntVector, med_int> aGridStructure(theStruct);
         
-      aRet = MEDstructureCoordLire(myFile->Id(),
-                                   &aMeshName,
-                                   aDim,
-                                   &aGrilleStructure);
+      aRet = MEDmeshGridStructRd(myFile->Id(),
+                                 &aMeshName,
+                                 MED_NO_DT,
+                                 MED_NO_IT,
+                                 &aGridStructure);
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
-        EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDstructureCoordLire(...)");
+        EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDmeshGridStructRd(...)");
     }
 
   }  

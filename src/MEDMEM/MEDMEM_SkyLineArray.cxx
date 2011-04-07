@@ -39,8 +39,10 @@ MEDSKYLINEARRAY::MEDSKYLINEARRAY(const MEDSKYLINEARRAY &myArray):
 {
   const char* LOC = "MEDSKYLINEARRAY(const MEDSKYLINEARRAY &)";
   BEGIN_OF_MED(LOC);
-  memcpy(_index,myArray._index,sizeof(int)*(_count+1));
-  memcpy(_value,myArray._value,sizeof(int)*_length);
+  if ( myArray._index )
+    memcpy(_index,myArray._index,sizeof(int)*(_count+1));
+  if ( myArray._value )
+    memcpy(_value,myArray._value,sizeof(int)*_length);
   END_OF_MED(LOC);
 }
 

@@ -43,7 +43,7 @@ FAMILY::FAMILY():_identifier(0), _numberOfAttribute(0), _numberOfGroup(0)
     MESSAGE_MED("FAMILY::FAMILY()");
 }
 
-FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
+FAMILY::FAMILY(GMESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
                int *AttributeIdentifier, int *AttributeValue, string AttributeDescription,
                int NumberOfGroup, string GroupName,
                int * MEDArrayNodeFamily,
@@ -162,16 +162,14 @@ FAMILY::FAMILY(MESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
   // on face ?
   if (!Find)
     {
-      if (_mesh->existConnectivityWithPoly(MED_NODAL,MED_FACE) ||
-          _mesh->existConnectivityWithPoly(MED_DESCENDING,MED_FACE))
+      if ( _mesh->getNumberOfElements(MED_FACE, MEDMEM_ALL_ELEMENTS) > 0 )
         Find = build(MED_FACE,MEDArrayFaceFamily) ;
     }
 
   // on edge ?
   if (!Find)
     {
-      if (_mesh->existConnectivity(MED_NODAL,MED_EDGE) ||
-          _mesh->existConnectivity(MED_DESCENDING,MED_EDGE))
+      if ( _mesh->getNumberOfElements(MED_EDGE, MEDMEM_ALL_ELEMENTS) > 0 )
         Find = build(MED_EDGE,MEDArrayEdgeFamily) ;
     }
   // That's all !
@@ -309,49 +307,47 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
   MESSAGE_MED("FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)");
   bool Find = false ;
   // Get types information from <_mesh>
-  int    numberOfTypes             = _mesh->getNumberOfTypesWithPoly(Entity) ;
-  medGeometryElement * types       = _mesh->getTypesWithPoly(Entity) ;
-
+  int    numberOfTypes             = _mesh->getNumberOfTypes(Entity) ;
+  const medGeometryElement * types = _mesh->getTypes(Entity) ;
+  
   int *  numberOfElementsInFamily     = new int[numberOfTypes] ;
   int    numberOfElementTypesInFamily = 0 ;
 
   medGeometryElement * tmp_Types    = new medGeometryElement[numberOfTypes];
   int ** tmp_ElementsLists          = new int*[numberOfTypes] ;
-  const int *  GlobalNumberingIndex = _mesh->getGlobalNumberingIndex(Entity);
-
+  int elementNumber                 = 1;
+  
 
   SCRUTE_MED(numberOfTypes);
 
   // we search for all elements in this family
-  for (int TypeNumber=0; TypeNumber < numberOfTypes; TypeNumber++)
-    {
-      int NumberOfElements             = _mesh->getNumberOfElementsWithPoly(Entity,types[TypeNumber]) ;
-      int NumberOfElementsInThisFamily = 0 ;
-      int * ElementsOfThisFamilyNumber = FamilyNumber[TypeNumber];
-      int * tmp_ElementsList           = new int[NumberOfElements];
+  for (int TypeNumber=0; TypeNumber < numberOfTypes; TypeNumber++) {
+    
+    int NumberOfElements             = _mesh->getNumberOfElements(Entity,types[TypeNumber]) ;
+    int NumberOfElementsInThisFamily = 0 ;
+    int * ElementsOfThisFamilyNumber = FamilyNumber[TypeNumber];
+    int * tmp_ElementsList           = new int[NumberOfElements];
 
-      for (int i=0; i<NumberOfElements; i++)
-        {
-          if (_identifier == ElementsOfThisFamilyNumber[i])
-            {
-              tmp_ElementsList[NumberOfElementsInThisFamily]=i+GlobalNumberingIndex[TypeNumber] ;
-              NumberOfElementsInThisFamily++;
-            }
+    for (int i=0; i<NumberOfElements; i++, elementNumber++)
+      {
+        if (_identifier == ElementsOfThisFamilyNumber[i]) {
+          tmp_ElementsList[NumberOfElementsInThisFamily]=elementNumber;
+          NumberOfElementsInThisFamily++;
         }
+      }
+    
+    if (NumberOfElementsInThisFamily>0) {// we have found some elements
+      numberOfElementsInFamily[numberOfElementTypesInFamily]=NumberOfElementsInThisFamily;
 
-      if (NumberOfElementsInThisFamily>0) // we have found some elements
-        {
-          numberOfElementsInFamily[numberOfElementTypesInFamily]=NumberOfElementsInThisFamily;
-
-          int * ElementsList = new int[NumberOfElementsInThisFamily] ;
-          memcpy(ElementsList,tmp_ElementsList,sizeof(int)*NumberOfElementsInThisFamily); // RESIZE de tmp_NodesList serait plus efficace !!!!!!!!
-
-          tmp_ElementsLists[numberOfElementTypesInFamily]=ElementsList ;
-          tmp_Types[numberOfElementTypesInFamily]=types[TypeNumber];
-          numberOfElementTypesInFamily++;
-        }
-      delete[] tmp_ElementsList;
+      int * ElementsList = new int[NumberOfElementsInThisFamily] ;
+      memcpy(ElementsList,tmp_ElementsList,sizeof(int)*NumberOfElementsInThisFamily); // RESIZE de tmp_NodesList serait plus efficace !!!!!!!!
+        
+      tmp_ElementsLists[numberOfElementTypesInFamily]=ElementsList ;
+      tmp_Types[numberOfElementTypesInFamily]=types[TypeNumber];
+      numberOfElementTypesInFamily++;
     }
+    delete[] tmp_ElementsList;
+  }
 
   // we define all attribut in SUPPORT :
   if (numberOfElementTypesInFamily>0) // we have found elements
@@ -374,10 +370,11 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
         }
 
       // family on all ELEMENT ?
-      if (_totalNumberOfElements == 
-          _mesh->getNumberOfElementsWithPoly(Entity,MED_ALL_ELEMENTS) && Entity==MED_EN::MED_CELL)
+      if (Entity == MED_EN::MED_CELL &&
+          _totalNumberOfElements ==_mesh->getNumberOfElements(Entity,MEDMEM_ALL_ELEMENTS))
         {
           _isOnAllElts = true ;
+          update();
           // all others attributs are rights !
           for (int i=0; i<_numberOfGeometricType; i++)
             delete[] tmp_ElementsLists[i];
@@ -394,13 +391,13 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
                 NumberValue[j-1]=tmp_ElementsLists[i][j-NumberIndex[i]];
               delete[] tmp_ElementsLists[i];
             }
-          setNumber( new MEDSKYLINEARRAY(_numberOfGeometricType,_totalNumberOfElements,NumberIndex,NumberValue));
+          setNumber( new MEDSKYLINEARRAY(_numberOfGeometricType, _totalNumberOfElements,
+                                         NumberIndex, NumberValue));
           delete[] NumberIndex ;
           delete[] NumberValue ;
         }
     }
   delete[] tmp_Types;
-  delete[] types;
   delete[] numberOfElementsInFamily;
 
   delete[] tmp_ElementsLists;

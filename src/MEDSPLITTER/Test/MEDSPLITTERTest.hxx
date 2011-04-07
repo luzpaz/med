@@ -65,38 +65,6 @@ public:
         void testMESHCollection_families();
   void testParallelTopology_graph_constructor();
     
-  std::string getResourceFile( const std::string& );
-  std::string getTmpDirectory();
-  std::string makeTmpFile( const std::string&, const std::string& = "" );
-
   };
-
-// to automatically remove temporary files from disk
-class MEDSPLITTERTest_TmpFilesRemover
-{
-public:
-  MEDSPLITTERTest_TmpFilesRemover() {}
-  ~MEDSPLITTERTest_TmpFilesRemover();
-  bool Register(const std::string theTmpFile);
-
-private:
-  std::set<std::string> myTmpFiles;
-};
-
-/*!
- *  Tool to print array to stream.
- */
-template<class T>
-void MEDSPLITTERTest_DumpArray (std::ostream & stream, const T* array, const int length, const std::string text)
-{
-  stream << text << ": {";
-  if (length > 0) {
-    stream << array[0];
-    for (int i = 1; i < length; i++) {
-      stream << ", " << array[i];
-    }
-  }
-  stream << "}" << std::endl;
-};
 
 #endif

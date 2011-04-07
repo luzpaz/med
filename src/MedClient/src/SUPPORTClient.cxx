@@ -23,7 +23,7 @@
 #include "Utils_CorbaException.hxx"
 #include "UtilClient.hxx"
 #include "SUPPORTClient.hxx"
-#include "MESHClient.hxx"
+#include "GMESHClient.hxx"
 #include "ReceiverFactory.hxx"
 
 using namespace MEDMEM;
@@ -36,7 +36,7 @@ using namespace MED_EN;
 //=============================================================================
 
 SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
-                             MESH * M) : 
+                             GMESH * M) : 
   SUPPORT(), 
   IOR_Support(SALOME_MED::SUPPORT::_duplicate(S)),_refCounter(1)
 {
@@ -46,8 +46,8 @@ SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
     _mesh=M;
   else
     {
-      SALOME_MED::MESH_var ior_mesh=IOR_Support->getMesh();
-      _mesh=new MESHClient(ior_mesh);
+      SALOME_MED::GMESH_var ior_mesh=IOR_Support->getMesh();
+      _mesh=new GMESHClient(ior_mesh);
     }
   blankCopy();
 }
@@ -105,7 +105,7 @@ void SUPPORTClient::fillCopy()
     const int * index, * value;
     long n_index, n_value;
     
-    SALOME::SenderInt_var senderForValue=IOR_Support->getSenderForNumber(MED_ALL_ELEMENTS);
+    SALOME::SenderInt_var senderForValue=IOR_Support->getSenderForNumber(MEDMEM_ALL_ELEMENTS);
     value=(const int *)ReceiverFactory::getValue(senderForValue,n_value);
     SALOME::SenderInt_var senderForIndex=IOR_Support->getSenderForNumberIndex();
     index=(const int *)ReceiverFactory::getValue(senderForIndex,n_index);

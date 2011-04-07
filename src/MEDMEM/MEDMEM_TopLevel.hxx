@@ -36,12 +36,10 @@ namespace MEDMEM
 namespace MEDMEM
 {
   //read part
-  MEDMEM_EXPORT MED *readMedInFile(const std::string& fileName) throw(MEDEXCEPTION);
   MEDMEM_EXPORT MESH *readMeshInFile(const std::string& fileName, const std::string& meshName);
   template<class T>
   FIELD<T> *readFieldInFile(const std::string& fileName, const std::string& fieldName);
   //write part
-  MEDMEM_EXPORT void writeMedToFile(const MED *medObj, const std::string& fileName);
   MEDMEM_EXPORT void writeMeshToFile(const MESH *meshObj, const std::string& fileName);
   template<class T>
   void writeFieldToFile(const FIELD<T> *fieldObj, const std::string& fileName);

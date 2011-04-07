@@ -1,0 +1,6 @@
+def f(i):
+
+def f(i):
+    return i+3
+
+print f(56.)

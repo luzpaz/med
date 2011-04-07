@@ -316,7 +316,7 @@ int MEDMEM_REMAPPER::setOptionString(const std::string& key, std::string& value)
 */
 MEDMEM::FIELD<double>* MEDMEM_REMAPPER::getSupportVolumes(const MEDMEM::SUPPORT& support)
 {
-  const MEDMEM::MESH* mesh=support.getMesh();
+  const MEDMEM::GMESH* mesh=support.getMesh();
   int dim = mesh->getMeshDimension();
   switch (dim)
     {

@@ -698,11 +698,13 @@ AC_OUTPUT([ \
         src/MEDCouplingCorba/Test/Makefile \
 	src/MEDCouplingCorba_Swig/Makefile \
 	src/MEDCouplingCorba_Swig/Client/Makefile \
+	src/MEDCalculator/Makefile \
+	src/MEDCalculator/Swig/Makefile \
+	src/MEDCalculator/Test/Makefile \
         src/MEDSPLITTER/Makefile \
         src/MEDSPLITTER/Test/Makefile \
         src/MEDSPLITTER_Swig/Makefile \
         src/RENUMBER/Makefile \
-        src/MULTIPR/Makefile \
         src/ParaMEDCouplingCorba/Makefile \
         src/ParaMEDMEM/Makefile \
         src/ParaMEDMEMComponent/Makefile \

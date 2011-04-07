@@ -45,15 +45,13 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 #endif
 
 AM_CPPFLAGS += $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
-	-I$(srcdir)/../MEDWrapper/Base \
-	-I$(srcdir)/../MEDWrapper/V2_1/Core \
 	-I$(srcdir)/../INTERP_KERNEL \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../INTERP_KERNEL/GaussPoints \
 	-I$(srcdir)/../MEDMEM
 
-LDADD= $(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
-	../MEDWrapper/Base/libMEDWrapperBase.la $(STDLIB) ../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la
+LDADD= $(MED2_LIBS) $(HDF5_LIBS)  \
+	$(STDLIB) ../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la
 
 
 if MED_ENABLE_KERNEL
@@ -74,7 +72,7 @@ bin_PROGRAMS= \
 	test_copie_family test_copie_group test_copie_mesh test_affect_medarray \
 	test_MEDMEM_Meshing test_MEDMEM_MeshingPoly test_operation_fielddouble \
 	test_operation_fieldint test_gibi_driver test_porflow_driver \
-	test_grid test_MEDMEM_PolyhedronArray test_MEDMEM_PolyConnectivity \
+	test_grid \
 	test_MEDMEM_PolyDriverMedMeshRead test_MEDMEM_PolyDriverMedMeshWrite \
 	test_MEDMEM_poly3D test_MEDMEM_nArray test_MEDMEM_Meshing_poly test_profil_MedFieldDriver \
 	test_profil_gauss_MedFieldDriver test_GaussLocalization testAnalFile test_MEDMEM_MeshingFlica testConvertPolygon \
@@ -197,8 +195,6 @@ dist_test_operation_fieldint_SOURCES= test_operation_fieldint.cxx
 dist_test_gibi_driver_SOURCES= test_gibi_driver.cxx
 dist_test_porflow_driver_SOURCES= test_porflow_driver.cxx
 dist_test_grid_SOURCES= test_grid.cxx
-dist_test_MEDMEM_PolyhedronArray_SOURCES= test_MEDMEM_PolyhedronArray.cxx
-dist_test_MEDMEM_PolyConnectivity_SOURCES= test_MEDMEM_PolyConnectivity.cxx
 dist_test_MEDMEM_PolyDriverMedMeshRead_SOURCES= test_MEDMEM_PolyDriverMedMeshRead.cxx
 dist_test_MEDMEM_PolyDriverMedMeshWrite_SOURCES= test_MEDMEM_PolyDriverMedMeshWrite.cxx
 dist_test_MEDMEM_poly3D_SOURCES= test_MEDMEM_poly3D.cxx

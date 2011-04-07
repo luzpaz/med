@@ -22,7 +22,7 @@
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_Meshing.hxx"
-#include "MEDMEM_MedMeshDriver22.hxx"
+#include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_GibiMeshDriver.hxx"
 
 #include <cppunit/Message.h>
@@ -35,7 +35,7 @@
 using namespace std;
 using namespace MEDMEM;
 
-void addMedFacesGroup2( MESHING& meshing, int nFaces, const int *groupValue,
+static void addMedFacesGroup2( MESHING& meshing, int nFaces, const int *groupValue,
                         string groupName, const MED_EN::medGeometryElement *mytypes,  const int *index, const int *myNumberOfElements, int nbOfGeomTypes)
   {
     GROUP *faces=new GROUP;
@@ -122,15 +122,15 @@ void MEDMEMTest::testDesactivateFacesComputation()
       26, 22, 31, 35};
 
   int bottom[2]={1,7};
-  MED_EN::medGeometryElement bottomTypes[1]={MED_EN::MED_QUAD4};
+  MED_EN::medGeometryElement bottomTypes[1]={MED_EN::MEDMEM_QUAD4};
   int bottomIndex[2]={1,3};
   int bottomNbOfElts[1]={2};
   int top[4]={8,9,10,11};
-  MED_EN::medGeometryElement topTypes[1]={MED_EN::MED_QUAD4};
+  MED_EN::medGeometryElement topTypes[1]={MED_EN::MEDMEM_QUAD4};
   int topIndex[3]={1,5};
   int topNbOfElts[1]={4};
   int side[5]={ 3, 6, 10, 11, 13};
-  MED_EN::medGeometryElement sideTypes[1]={MED_EN::MED_QUAD4};
+  MED_EN::medGeometryElement sideTypes[1]={MED_EN::MEDMEM_QUAD4};
   int sideIndex[2]={1,6};
   int sideNbOfElts[1]={5};
   //
@@ -144,9 +144,7 @@ void MEDMEMTest::testDesactivateFacesComputation()
 
   MESHING* meshing = new MESHING;
   meshing->setName( "TESTMESH" );
-  meshing->setSpaceDimension(3);
   const int nNodes=36;
-  meshing->setNumberOfNodes(nNodes);
   meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
                           MED_EN::MED_NO_INTERLACE);
   string coordname[3] = { "x", "y", "z" };
@@ -154,22 +152,21 @@ void MEDMEMTest::testDesactivateFacesComputation()
   string coordunit[3] = { "m", "m", "m" };
   meshing->setCoordinatesUnits(coordunit);
   //Cell connectivity info for classical elts
-  const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MED_HEXA8};
+  const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MEDMEM_HEXA8};
   const int nbOfCellElts[1]={6};
   meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
   meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
   meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
-  meshing->setMeshDimension(3);
   //Face connectivity info for classical elts
-  const MED_EN::medGeometryElement classicalTypesFace[1]={MED_EN::MED_QUAD4};
+  const MED_EN::medGeometryElement classicalTypesFace[1]={MED_EN::MEDMEM_QUAD4};
   const int nbOfFaceElts[1]={14};
   meshing->setNumberOfTypes(1,MED_EN::MED_FACE);
   meshing->setTypes(classicalTypesFace,MED_EN::MED_FACE);
   meshing->setNumberOfElements(nbOfFaceElts,MED_EN::MED_FACE);
   //All cell conn
-  meshing->setConnectivity(connNodalCellClassical,MED_EN::MED_CELL,MED_EN::MED_HEXA8);
+  meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MEDMEM_HEXA8,connNodalCellClassical);
   //All face conn
-  meshing->setConnectivity(connNodalFaceClassical,MED_EN::MED_FACE,MED_EN::MED_QUAD4);
+  meshing->setConnectivity(MED_EN::MED_FACE,MED_EN::MEDMEM_QUAD4,connNodalFaceClassical);
   int nbOfTypes=meshing->getNumberOfTypes(MED_EN::MED_EDGE);
   addMedFacesGroup2( *meshing, 2,  bottom, "Bottom",bottomTypes,bottomIndex,bottomNbOfElts,1) ;
   addMedFacesGroup2( *meshing, 4,  top,    "TopFace",topTypes,topIndex,topNbOfElts,1) ;
@@ -180,7 +177,7 @@ void MEDMEMTest::testDesactivateFacesComputation()
   //
   MESH *mesh=new MESH;
   mesh->setName(meshing->getName());
-  MEDMEM::MED_MESH_RDONLY_DRIVER22 *driver=new MEDMEM::MED_MESH_RDONLY_DRIVER22(tmpfile,mesh);
+  MEDMEM::MED_MESH_RDONLY_DRIVER *driver=new MEDMEM::MED_MESH_RDONLY_DRIVER(tmpfile,mesh);
   driver->desactivateFacesComputation();
   id=mesh->addDriver(*driver);
   mesh->read(id);
@@ -190,7 +187,7 @@ void MEDMEMTest::testDesactivateFacesComputation()
   id=mesh->addDriver(*gibidriver);
   mesh->write(id);
 #ifdef WNT
-  CPPUNIT_ASSERT( GetFileAttributes(tmpGibiFile.c_str()) & FILE_ATTRIBUTE_NORMAL );
+  CPPUNIT_ASSERT( GetFileAttributes(tmpGibiFile.c_str()) != INVALID_FILE_ATTRIBUTES );
 #else
   CPPUNIT_ASSERT( access(tmpGibiFile.c_str(), F_OK) == 0 );
 #endif

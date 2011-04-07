@@ -65,10 +65,10 @@ FIELD_i::~FIELD_i()
  */
 //=============================================================================
 FIELD_i::FIELD_i(::FIELD_ * const field, bool ownCppPtr):
+  _ownCppPtr(ownCppPtr),
   _fieldTptr(field),
   _corbaIndex(FIELD_i::fieldIndex++),
-  _FieldId(""),
-  _ownCppPtr(ownCppPtr)
+  _FieldId("")
 {
   FIELD_i::fieldMap[_corbaIndex]=_fieldTptr;
 
@@ -82,9 +82,9 @@ FIELD_i::FIELD_i(::FIELD_ * const field, bool ownCppPtr):
  * Constructor par recopie
  */
 //=============================================================================
-FIELD_i::FIELD_i( FIELD_i & f):_fieldTptr(f._fieldTptr),
+FIELD_i::FIELD_i( FIELD_i & f):_ownCppPtr(false), _fieldTptr(f._fieldTptr),
                                _corbaIndex(FIELD_i::fieldIndex++),
-                               _FieldId(""), _ownCppPtr(false)
+                               _FieldId("")
 {
         FIELD_i::fieldMap[_corbaIndex]=_fieldTptr;
 }
@@ -645,7 +645,7 @@ throw (SALOME::SALOME_Exception)
                                              SALOME::INTERNAL_ERROR);
         try
         {
-                _fieldTptr->write(i,driverFieldName);
+                _fieldTptr->write(i);
         }
         catch (MEDEXCEPTION &)
         {

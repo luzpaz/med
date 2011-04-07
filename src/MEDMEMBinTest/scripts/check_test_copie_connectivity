@@ -29,7 +29,7 @@ fi
 
 infile=${srcdir}/../../resources/pointe.med
 
-./test_copie_connectivity $infile maa1
+./test_copie_connectivity $infile maa1   >& /dev/null
 
 exit
 

@@ -29,11 +29,11 @@ fi
 
 infile=${srcdir}/../../resources/pointe.med
 
-./test_copie_fieldT $infile maa1 fieldcelldoublescalar
+./test_copie_fieldT $infile maa1 fieldcelldoublescalar   >& /dev/null
 
 if test $? -ne 0; then exit -1;fi
 
-./test_copie_fieldT $infile maa1 fieldnodedouble
+./test_copie_fieldT $infile maa1 fieldnodedouble  >& /dev/null
 
 exit
 

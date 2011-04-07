@@ -31,7 +31,7 @@ infile=${srcdir}/../../resources/pointe.med
 
 outfile=${outdir}/pointe.case
 
-./med2ensight $infile $outfile
+./med2ensight $infile $outfile   >& /dev/null
 
 ok=$?
 

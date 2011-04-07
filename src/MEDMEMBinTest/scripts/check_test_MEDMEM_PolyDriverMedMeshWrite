@@ -27,13 +27,13 @@ else
  fi
 fi
 
-initfile=${srcdir}/../../resources/pointe_import22.med
+initfile=${srcdir}/../../resources/pointe.med
 infile=$outdir/test_MEDMEM_PolyDriverMedMeshWrite.med
 outfile=$outdir/test_MEDMEM_PolyDriverMedMeshWrite.med_copy
 
 cp $initfile $infile
 
-./test_MEDMEM_PolyDriverMedMeshWrite $infile maa1
+./test_MEDMEM_PolyDriverMedMeshWrite $infile maa1   >& /dev/null
 
 ok=$?
 

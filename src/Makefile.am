@@ -71,14 +71,6 @@ endif
 
 if MED_ENABLE_SPLITTER
     SPLITTER_SUBDIRS = MEDSPLITTER MEDSPLITTER_Swig
-
-if MED_ENABLE_METIS
-      MULTIPR_SUBDIRS = MULTIPR
-endif
-if MED_ENABLE_SCOTCH
-      MULTIPR_SUBDIRS = MULTIPR
-endif
-
 endif
 
 if MED_ENABLE_RENUMBER
@@ -86,10 +78,15 @@ if MED_ENABLE_RENUMBER
 endif
 
 if MED_ENABLE_KERNEL
-    KERNEL_SUBDIRS = $(MULTIPR_SUBDIRS) MEDCouplingCorba MEDCouplingCorba_Swig MEDMEM_I MED MedCorba_Swig MED_SWIG MedClient
+    KERNEL_SUBDIRS = MEDCouplingCorba MEDCouplingCorba_Swig MEDMEM_I MED MedCorba_Swig MED_SWIG MedClient
 
 if MPI_IS_OK
   KERNEL_SUBDIRS += ParaMEDCouplingCorba ParaMEDMEMComponent
+endif
+
+if MED_ENABLE_MED2
+
+  KERNEL_SUBDIRS += MEDCalculator
 endif
 
 endif
@@ -105,6 +102,6 @@ SUBDIRS = $(COMMON_SUBDIRS) $(PARAMEDMEM_SUBDIRS) $(BASE_SUBDIRS) $(INTERPTEST_S
 
 DIST_SUBDIRS= MEDWrapper INTERP_KERNEL MEDMEM MEDCoupling MEDCoupling_Swig MEDMEM_SWIG    \
               MEDMEMBinTest MEDMEMCppTest INTERP_KERNELTest ParaMEDMEM ParaMEDMEM_Swig MEDLoader        \
-	      MEDSPLITTER MEDSPLITTER_Swig RENUMBER MULTIPR MEDCouplingCorba MEDCouplingCorba_Swig      \
+	      MEDSPLITTER MEDSPLITTER_Swig RENUMBER MEDCouplingCorba MEDCouplingCorba_Swig      \
 	      MEDMEM_I MED MED_SWIG MedCorba_Swig ParaMEDLoader MedClient ParaMEDMEMComponent           \
-	      ParaMEDCouplingCorba MEDGUI ParaMEDMEMTest
+	      ParaMEDCouplingCorba MEDCalculator MEDGUI ParaMEDMEMTest

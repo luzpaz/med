@@ -30,7 +30,7 @@ module SALOME_MED
     long getTimeLabel();
   };
 
-  interface MEDCouplingRefCountCorbaInterface : SALOME::GenericObj, MEDCouplingTimeLabelCorbaInterface
+  interface MEDCouplingRefCountCorbaInterface : SALOME::ExportableObject, MEDCouplingTimeLabelCorbaInterface
   {
   };
 

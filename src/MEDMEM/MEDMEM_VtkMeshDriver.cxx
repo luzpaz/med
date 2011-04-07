@@ -50,8 +50,7 @@ VTK_MESH_DRIVER::VTK_MESH_DRIVER(): GENDRIVER(VTK_DRIVER),
   // _driverType ???
 }
 
-VTK_MESH_DRIVER::VTK_MESH_DRIVER(const string & fileName,
-                                 MESH * ptrMesh) :
+VTK_MESH_DRIVER::VTK_MESH_DRIVER(const string & fileName, const GMESH *  ptrMesh) :
   GENDRIVER(fileName, WRONLY, VTK_DRIVER),
   _ptrMesh(ptrMesh)
 {
@@ -188,8 +187,8 @@ void VTK_MESH_DRIVER::close() {
   closeConst() ;
 }
 
-void    VTK_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; };
-string  VTK_MESH_DRIVER::getMeshName() const { return _meshName; };
+void    VTK_MESH_DRIVER::setMeshName(const string & meshName) { _meshName = meshName; }
+string  VTK_MESH_DRIVER::getMeshName() const { return _meshName; }
 
 void VTK_MESH_DRIVER::read(void) throw (MEDEXCEPTION)
 {
@@ -210,6 +209,9 @@ void VTK_MESH_DRIVER::write(void) const
   const char * LOC = "void VTK_MESH_DRIVER::write(void) const : ";
   BEGIN_OF_MED(LOC);
 
+  if ( !_ptrMesh )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Mesh is NULL"));
+
   // Well we must open vtk file first, because there are
   // no other driver than MED for VTK that do it !
 
@@ -220,6 +222,7 @@ void VTK_MESH_DRIVER::write(void) const
 
   openConst();
 
+  const MESH* mesh = _ptrMesh->convertInMESH();
   char buf[256];
   const char* header = "# vtk DataFile Version 2.0\n";
   const char* title  = "maillage from MedMemory\n";
@@ -232,7 +235,7 @@ void VTK_MESH_DRIVER::write(void) const
       (*_vtkFile) << dataset ;
       // put points (all point are in 3D, so if we are in 1D or 2D, we complete by zero !
       (*_vtkFile) << "POINTS " << NumberOfNodes << " float" << endl ;
-      const double *coordinate = _ptrMesh->getCoordinates(MED_FULL_INTERLACE) ;
+      const double *coordinate = mesh->getCoordinates(MED_FULL_INTERLACE) ;
       string missingCoord = SpaceDimension==3 ? "" : SpaceDimension==2 ? "0" : "0 0";
       for (int i=0;i<NumberOfNodes;i++)
         {
@@ -253,7 +256,7 @@ void VTK_MESH_DRIVER::write(void) const
       //sprintf(buf,"POINTS %d double\n", NumberOfNodes);
       sprintf(buf,"POINTS %d float\n", NumberOfNodes);
       writeBinary( buf, strlen(buf) );
-      const double *coordinate = _ptrMesh->getCoordinates(MED_FULL_INTERLACE) ;
+      const double *coordinate = mesh->getCoordinates(MED_FULL_INTERLACE) ;
       //PointerOf<double> coordBuf( SpaceDimension==3 ? 0 : NumberOfNodes * 3 );
       //double * toCoord = coordBuf;
       PointerOf<float> coordBuf( NumberOfNodes * 3 );
@@ -309,11 +312,11 @@ void VTK_MESH_DRIVER::write(void) const
 
   // we put connectivity
   // how many cells and how many value in connectivity :
-  int cells_types_count        = _ptrMesh->getNumberOfTypes(MED_CELL) ;
-  int cells_sum                = _ptrMesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) ;
-  const CELLMODEL * cells_type = _ptrMesh->getCellsTypes(MED_CELL) ;
+  int cells_types_count        = mesh->getNumberOfTypes(MED_CELL) ;
+  int cells_sum                = mesh->getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS) ;
+  const CELLMODEL * cells_type = mesh->getCellsTypes(MED_CELL) ;
 
-  const int * connectivityIndex = _ptrMesh->getConnectivityIndex(MED_NODAL,MED_CELL) ;
+  const int * connectivityIndex = mesh->getConnectivityIndex(MED_NODAL,MED_CELL) ;
   int          connectivity_sum =  connectivityIndex[cells_sum]-1 ;
 
   sprintf(buf,"\nCELLS %d %d\n", cells_sum, connectivity_sum+cells_sum);
@@ -326,28 +329,28 @@ void VTK_MESH_DRIVER::write(void) const
     int *filter = (int*) NULL ; // index in vtk connectivity
     switch (cells_type[i].getType())
       {
-      case MED_POINT1  : {
+      case MEDMEM_POINT1  : {
         filter = new int[1] ;
         filter[0] = 0 ;
         break ;
       }
-      case MED_SEG2    : {
+      case MEDMEM_SEG2    : {
         filter = new int[2] ;
         filter[0] = 0 ;
         filter[1] = 1 ;
         break ;
       }
-      case MED_SEG3    : {  
+      case MEDMEM_SEG3    : {  
         break ;
       }
-      case MED_TRIA3   : {
+      case MEDMEM_TRIA3   : {
         filter = new int[3] ;
         filter[0] = 0 ;
         filter[1] = 1 ;
         filter[2] = 2 ;
         break ;
       }
-      case MED_QUAD4   : {
+      case MEDMEM_QUAD4   : {
         filter = new int[4] ;
         filter[0] = 0 ;
         filter[1] = 1 ;
@@ -355,13 +358,13 @@ void VTK_MESH_DRIVER::write(void) const
         filter[3] = 3 ;
         break ;
       }
-      case MED_TRIA6   : {
+      case MEDMEM_TRIA6   : {
         break ;
       }
-      case MED_QUAD8   : {
+      case MEDMEM_QUAD8   : {
         break ;
       }
-      case MED_TETRA4  : {
+      case MEDMEM_TETRA4  : {
         filter = new int[4] ;
         filter[0] = 0 ;
         filter[1] = 1 ;
@@ -369,7 +372,7 @@ void VTK_MESH_DRIVER::write(void) const
         filter[3] = 2 ;  // 4th element in med are 3rd in vtk (array begin at 0 !)
         break ;
       }
-      case MED_PYRA5   : {
+      case MEDMEM_PYRA5   : {
         filter = new int[5] ;
         filter[0] = 0 ;
         filter[1] = 3 ;  // 2nd element in med are 4th in vtk (array begin at 0 !)
@@ -378,7 +381,7 @@ void VTK_MESH_DRIVER::write(void) const
         filter[4] = 4 ;
         break ;
       }
-      case MED_PENTA6  : {
+      case MEDMEM_PENTA6  : {
         filter = new int[6] ;
         filter[0] = 0 ;
         filter[1] = 1 ;
@@ -388,7 +391,7 @@ void VTK_MESH_DRIVER::write(void) const
         filter[5] = 5 ;
         break ;
       }
-      case MED_HEXA8   : {
+      case MEDMEM_HEXA8   : {
         filter = new int[8] ;
         filter[0] = 0 ;
         filter[1] = 3 ;
@@ -400,16 +403,16 @@ void VTK_MESH_DRIVER::write(void) const
         filter[7] = 5 ;
         break ;
       }
-      case MED_TETRA10 : {
+      case MEDMEM_TETRA10 : {
         break ;
       }
-      case MED_PYRA13  : {
+      case MEDMEM_PYRA13  : {
         break ;
       }
-      case MED_PENTA15 : {
+      case MEDMEM_PENTA15 : {
         break ;
       }
-      case MED_HEXA20  : {
+      case MEDMEM_HEXA20  : {
         break ;
       }
       default : { 
@@ -419,8 +422,8 @@ void VTK_MESH_DRIVER::write(void) const
     if (filter==NULL) 
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": MED element type not supported yet : " << cells_type[i].getName() ) ) ;
     int nodes_cell = cells_type[i].getNumberOfNodes();
-    int numberOfCell = _ptrMesh->getNumberOfElements(MED_CELL,cells_type[i].getType()) ;
-    const int * connectivityArray = _ptrMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,cells_type[i].getType());
+    int numberOfCell = mesh->getNumberOfElements(MED_CELL,cells_type[i].getType()) ;
+    const int * connectivityArray = mesh->getConnectivity(MED_NODAL,MED_CELL,cells_type[i].getType());
     if ( _vtkFile )
       {
         for (int j=0;j<numberOfCell;j++)
@@ -456,26 +459,26 @@ void VTK_MESH_DRIVER::write(void) const
     int vtkType = 0 ;
     switch (cells_type[i].getType())
       {
-      case MED_POINT1  :vtkType = 1 ;break ;
-      case MED_SEG2    :vtkType = 3 ;break ;
-      case MED_SEG3    :vtkType = 0 ;break ;
-      case MED_TRIA3   :vtkType = 5 ;break ;
-      case MED_QUAD4   :vtkType = 9 ;break ;
-      case MED_TRIA6   :vtkType = 0 ;break ;
-      case MED_QUAD8   :vtkType = 0 ;break ;
-      case MED_TETRA4  :vtkType = 10 ;break ;
-      case MED_PYRA5   :vtkType = 14 ;break ;
-      case MED_PENTA6  :vtkType = 13 ;break ;
-      case MED_HEXA8   :vtkType = 12 ;break ;
-      case MED_TETRA10 :vtkType = 0 ;break ;
-      case MED_PYRA13  :vtkType = 0 ;break ;
-      case MED_PENTA15 :vtkType = 0 ;break ;
-      case MED_HEXA20  :vtkType = 0 ;break ;
+      case MEDMEM_POINT1  :vtkType = 1 ;break ;
+      case MEDMEM_SEG2    :vtkType = 3 ;break ;
+      case MEDMEM_SEG3    :vtkType = 0 ;break ;
+      case MEDMEM_TRIA3   :vtkType = 5 ;break ;
+      case MEDMEM_QUAD4   :vtkType = 9 ;break ;
+      case MEDMEM_TRIA6   :vtkType = 0 ;break ;
+      case MEDMEM_QUAD8   :vtkType = 0 ;break ;
+      case MEDMEM_TETRA4  :vtkType = 10 ;break ;
+      case MEDMEM_PYRA5   :vtkType = 14 ;break ;
+      case MEDMEM_PENTA6  :vtkType = 13 ;break ;
+      case MEDMEM_HEXA8   :vtkType = 12 ;break ;
+      case MEDMEM_TETRA10 :vtkType = 0 ;break ;
+      case MEDMEM_PYRA13  :vtkType = 0 ;break ;
+      case MEDMEM_PENTA15 :vtkType = 0 ;break ;
+      case MEDMEM_HEXA20  :vtkType = 0 ;break ;
       default          :vtkType = 0 ;break ;
       }
     if (vtkType == 0)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": MED element type not supported yet : " << cells_type[i].getType() ) ) ;
-    int numberOfCell = _ptrMesh->getNumberOfElements(MED_CELL,cells_type[i].getType()) ;
+    int numberOfCell = mesh->getNumberOfElements(MED_CELL,cells_type[i].getType()) ;
     if ( _vtkFile )
       {
         for (int j=0;j<numberOfCell;j++)
@@ -487,6 +490,7 @@ void VTK_MESH_DRIVER::write(void) const
         writeBinary( &type[0], type.size() );
       }
   }
+  mesh->removeReference();
 
   closeConst();
 

@@ -44,10 +44,9 @@ using namespace MEDMEM;
  * Default constructor
  */
 //=============================================================================
-GROUP_i::GROUP_i():_group((::GROUP*)NULL),
-                   SUPPORT_i()
+GROUP_i::GROUP_i():_group((::GROUP*)NULL)
 {
-};
+}
 //=============================================================================
 /*!
  * Destructor
@@ -55,25 +54,23 @@ GROUP_i::GROUP_i():_group((::GROUP*)NULL),
 //=============================================================================
 GROUP_i::~GROUP_i()
 {
-};
+}
 //=============================================================================
 /*!
  * Constructor
  */
 //=============================================================================
-GROUP_i::GROUP_i(const ::GROUP * const g):_group(g),
-                   SUPPORT_i(g)
+GROUP_i::GROUP_i(const ::GROUP * const g):SUPPORT_i(g),_group(g)
 {
-};
+}
 //=============================================================================
 /*!
  * Constructor par recopie
  */
 //=============================================================================
-GROUP_i::GROUP_i(const GROUP_i & g):_group(g._group),
-                   SUPPORT_i(g._group)
+GROUP_i::GROUP_i(const GROUP_i & g):SUPPORT_i(g._group),_group(g._group)
 {
-};
+}
 //=============================================================================
 /*!
  * CORBA: Number of Families existing in the group
@@ -95,7 +92,7 @@ throw (SALOME::SALOME_Exception)
                 MESSAGE("Unable to get number of families of the group");
                 THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
-};
+}
 //=============================================================================
 /*!
  * CORBA: Returns references for families within the group
@@ -127,7 +124,7 @@ throw (SALOME::SALOME_Exception)
                 THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
         return myseq._retn();
-};
+}
 //=============================================================================
 /*!
  * CORBA: Returns reference for family I within the group
@@ -151,4 +148,4 @@ throw (SALOME::SALOME_Exception)
                 MESSAGE("Unable to acces to the specified family");
                 THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
-};
+}

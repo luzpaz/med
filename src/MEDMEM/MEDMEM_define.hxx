@@ -31,6 +31,42 @@
 // UTILE AUX DEUX NAMESPACES
 #include <hdf5.h>
 
+namespace med_2_3 {
+  extern "C" { 
+    #include <med.h>
+        med_err MEDfieldComputingStepInfo(const med_idt fid,
+                                    const char * const fieldname,
+                                    const int csit,
+                                    med_int * const numdt,
+                                    med_int * const numit,
+                                    med_float * const dt);
+  
+  med_err MEDmeshEntityFamilyNumberRd(const med_idt               fid,
+                                      const char*  const          meshname,
+                                      const med_int               numdt,
+                                      const med_int               numit,
+                                      const med_entity_type       entitype,
+                                      const med_geometry_type     geotype,
+                                      med_int * const             number);
+
+  med_err MEDmeshEntityNumberRd(const med_idt               fid,
+                                const char*  const          meshname,
+                                const med_int               numdt,
+                                const med_int               numit,
+                                const med_entity_type       entitype,
+                                const med_geometry_type     geotype,
+                                med_int * const             number);
+
+  med_err MEDfieldCr( const med_idt fid,
+                      const char * const fieldname,
+                      const med_field_type fieldtype,
+                      const med_int nbofcomponent,
+                      const char * const componentname,
+                      const char * const componentunit,
+                      const char * const dtunit,
+                      const char * const meshname);
+  }
+}
 
 namespace MED_EN {
   extern "C" { // on est la
@@ -46,25 +82,25 @@ namespace MED_EN {
 
 
     typedef long medGeometryElement;
-    const medGeometryElement MED_NONE = 0;
-    const medGeometryElement MED_POINT1 = 1;
-    const medGeometryElement MED_SEG2 = 102;
-    const medGeometryElement MED_SEG3 = 103;
-    const medGeometryElement MED_TRIA3 = 203;
-    const medGeometryElement MED_QUAD4 = 204;
-    const medGeometryElement MED_TRIA6 = 206;
-    const medGeometryElement MED_QUAD8 = 208;
-    const medGeometryElement MED_TETRA4 = 304;
-    const medGeometryElement MED_PYRA5 = 305;
-    const medGeometryElement MED_PENTA6 = 306;
-    const medGeometryElement MED_HEXA8 = 308;
-    const medGeometryElement MED_TETRA10 = 310;
-    const medGeometryElement MED_PYRA13 = 313;
-    const medGeometryElement MED_PENTA15 = 315;
-    const medGeometryElement MED_HEXA20 = 320;
-    const medGeometryElement MED_POLYGON = 400;
-    const medGeometryElement MED_POLYHEDRA = 500;
-    const medGeometryElement MED_ALL_ELEMENTS = 999;
+    const medGeometryElement MEDMEM_NONE = 0;
+    const medGeometryElement MEDMEM_POINT1 = 1;
+    const medGeometryElement MEDMEM_SEG2 = 102;
+    const medGeometryElement MEDMEM_SEG3 = 103;
+    const medGeometryElement MEDMEM_TRIA3 = 203;
+    const medGeometryElement MEDMEM_QUAD4 = 204;
+    const medGeometryElement MEDMEM_TRIA6 = 206;
+    const medGeometryElement MEDMEM_QUAD8 = 208;
+    const medGeometryElement MEDMEM_TETRA4 = 304;
+    const medGeometryElement MEDMEM_PYRA5 = 305;
+    const medGeometryElement MEDMEM_PENTA6 = 306;
+    const medGeometryElement MEDMEM_HEXA8 = 308;
+    const medGeometryElement MEDMEM_TETRA10 = 310;
+    const medGeometryElement MEDMEM_PYRA13 = 313;
+    const medGeometryElement MEDMEM_PENTA15 = 315;
+    const medGeometryElement MEDMEM_HEXA20 = 320;
+    const medGeometryElement MEDMEM_POLYGON = 400;
+    const medGeometryElement MEDMEM_POLYHEDRA = 500;
+    const medGeometryElement MEDMEM_ALL_ELEMENTS = 999;
 
     typedef long medEntityMesh;
     const medEntityMesh MED_CELL = 0;

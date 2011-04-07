@@ -59,7 +59,7 @@ namespace med_2_3 {
      *                 et le  maillage par défaut avec son eventuel lien à un autre fichier.
      * - Parametres :
      *     - fid      (IN) : ID du fichier HDF courant
-     *     - type_geo (IN) : Le type géométrique de l'entité concerné {MED_POINT,MED_SEG2 ......}
+     *     - type_geo (IN) : Le type géométrique de l'entité concerné {MED_POINT,MEDMEM_SEG2 ......}
      *     - refcoo   (IN) : Les coordonnées des noeuds de l'élément de référence (tableau de taille(typegeo%100)*(typegeo/100) )
      *     - mode_coo (IN) : Choix du type d'entrelacement utilisé en mémoire pour refcoo et gscoo
      *                        { MED_FULL_INTERLACE(x1,y1,z1,x2,...)) , MED_NO_INTERLACE(x1,x2,y1,y2,z1,z2) }

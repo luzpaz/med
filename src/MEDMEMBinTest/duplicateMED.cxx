@@ -23,11 +23,14 @@
 #include<string>
 
 #include "MEDMEM_Exception.hxx"
-#include "MEDMEM_Med.hxx"
+#include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_Grid.hxx"
+#include "MEDMEM_Field.hxx"
+#include "MEDMEM_MedFileBrowser.hxx"
 
 using namespace std;
 using namespace MEDMEM;
-void usage(char * name)
+static void usage(char * name)
 {
   cout << "  " << name << " <input med file> <output med file> " <<endl ;
   cout << "    " << "(the two file name are mandatory)" << endl ;
@@ -41,16 +44,44 @@ int main (int argc, char ** argv) {
   string filenameOUT = argv[2] ;
   
   try {
+
+    MEDFILEBROWSER myMed(filenameIN) ;
+
+    std::vector< std::string > meshNames = myMed.getMeshNames ();
+    for ( unsigned i = 0; i < meshNames.size(); ++i )
+    {
+      GMESH* mesh = myMed.isStructuredMesh( meshNames[i] ) ? (GMESH*) new GRID : (GMESH*) new MESH;
+      int drv = mesh->addDriver(MED_DRIVER, filenameIN, meshNames[i] );
+      mesh->read(drv);
+      drv = mesh->addDriver(MED_DRIVER, filenameOUT, meshNames[i] );
+      mesh->write(drv);
+      mesh->removeReference();
+    }
     
-    MED myMed(MED_DRIVER,filenameIN) ; // do readFilestruct !
-
-    // we read all meshes and fields in filenameIN
-    myMed.read() ;
-
-    // we write all in file filenameOUT :
-    int id = myMed.addDriver(MED_DRIVER,filenameOUT) ;
-    myMed.write(id);
-
+    vector<string> FieldName = myMed.getFieldNames() ;
+    for (unsigned i=0; i<FieldName.size(); i++)
+    {
+      vector<DT_IT_> FieldIteration = myMed.getFieldIteration(FieldName[i]) ;
+      for (unsigned j=0; j<FieldIteration.size(); j++)
+      {
+        FIELD_ * myField = 0;
+        switch( myMed.getFieldType( FieldName[i] ))
+        {
+        case MED_REEL64: myField = new FIELD<double>; break;
+        case MED_INT32:  
+        case MED_INT64:  myField = new FIELD<int>; break;
+        default:
+          continue;
+        }
+        myField->setIterationNumber( FieldIteration[j].dt );
+        myField->setOrderNumber    ( FieldIteration[j].it );
+        int drv = myField->addDriver( MED_DRIVER, filenameIN, FieldName[i]);
+        myField->read( drv ) ;
+        drv = myField->addDriver( MED_DRIVER, filenameOUT, FieldName[i]);
+        myField->write( drv );
+        myField->removeReference();
+      }
+    }
   } catch (MEDEXCEPTION& ex) {
     MESSAGE_MED(ex.what()) ;
   }

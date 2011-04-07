@@ -36,7 +36,7 @@ cp $initfile $infile
 cp $xyzfile ${outdir}/cube.xyz
 cp $cncfile ${outdir}/cube.cnc
 
-./test_porflow_driver $infile
+./test_porflow_driver $infile   >& /dev/null
 
 ok=$?
 

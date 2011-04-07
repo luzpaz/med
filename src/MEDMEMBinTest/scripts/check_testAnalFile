@@ -30,9 +30,11 @@ fi
 initfile=${srcdir}/../../resources/TimeStamps.med
 infile=$outdir/testAnalFile.med
 
+# convert med file from non-suported version
+#medimport $initfile $infile 
 cp $initfile $infile
 
-./testAnalFile $infile
+./testAnalFile $infile  >& /dev/null
 
 ok=$?
 

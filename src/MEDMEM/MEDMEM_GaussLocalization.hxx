@@ -104,7 +104,7 @@ namespace MEDMEM {
 
   };
   template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG>::GAUSS_LOCALIZATION() throw (MEDEXCEPTION) :
-    _typeGeo(MED_EN::MED_NONE), _nGauss(-1),
+    _typeGeo(MED_EN::MEDMEM_NONE), _nGauss(-1),
     _interlacingType( SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType) 
   {}
 
@@ -130,7 +130,7 @@ namespace MEDMEM {
     if (_cooGauss.getArraySize() != _nGauss*(_typeGeo/100) )
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"cooGauss must be of size nGauss*(_typeGeo/100) "
                                      << _nGauss*(_typeGeo/100) ));
-    if (_wg.size() != _nGauss )
+    if ((int)_wg.size() != _nGauss )
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"wg must be of size nGauss "
                                      << _nGauss ));
 
@@ -162,7 +162,7 @@ namespace MEDMEM {
     if (_cooGauss.getArraySize() != _nGauss*(_typeGeo/100) )
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"cooGauss must be of size nGauss*(_typeGeo/100) "
                                      << _nGauss*(_typeGeo/100) ));
-    if (_wg.size() != _nGauss )
+    if ((int)_wg.size() != _nGauss )
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"wg must be of size nGauss "
                                      << _nGauss ));
   END_OF_MED(LOC);
@@ -206,7 +206,7 @@ namespace MEDMEM {
     os << "Ref.   Element Coords : " << endl << loc._cooRef << endl;
     os << "Gauss points Coords   : " << endl << loc._cooGauss << endl;
     os << "Gauss points weigth   : " << endl ;
-    for(int i=0; i<loc._wg.size();++i)
+    for(unsigned i=0; i<loc._wg.size();++i)
       os << "_wg[" << i << "] = " << loc._wg[i] << endl;
     return os;
   }

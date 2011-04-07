@@ -362,7 +362,7 @@ private:
  */
 // ==============================================================================
 
-class _CaseFileDriver_User: public GENDRIVER
+class MEDMEM_EXPORT _CaseFileDriver_User: public GENDRIVER
 {
 protected:
 
@@ -420,9 +420,11 @@ public:
   static bool isTimeStepEnd(const char* line)
   { return ( strncmp( line, TIME_STEP_END, TIME_STEP_END_LEN ) == 0 ); }
 
-  static bool isToWriteEntity(const medEntityMesh entity, const MESH* mesh);
+  static bool isToWriteEntity(const medEntityMesh entity, const GMESH* mesh);
 
   ~_CaseFileDriver_User();
+
+  void merge( const GENDRIVER& driver);
 
 private:
 
@@ -526,11 +528,11 @@ struct _Support
 
 struct _InterMed : public _intermediateMED
 {
-  MESH * _medMesh;
-  bool   _isOwnMedMesh; //!< whether to delete _medMesh
-  int    _nbUsers;      //!< to know when to delete _medMesh
+  MESH* _medMesh;
+  bool  _isOwnMedMesh; //!< whether to delete _medMesh
+  int   _nbUsers;      //!< to know when to delete _medMesh
 
-  bool   _needSubParts; //!< true if there are fields needing _SubPart data
+  bool  _needSubParts; //!< true if there are fields needing _SubPart data
 
   map< _SubPartDesc, _SubPart > _subPartDescribed;
 
@@ -538,7 +540,7 @@ struct _InterMed : public _intermediateMED
 
   void addSubPart(const _SubPart& subPart);
 
-  ~_InterMed() { if ( _isOwnMedMesh ) { if(_medMesh) _medMesh->removeReference(); _medMesh=0; }}
+  ~_InterMed();
 };
 
 // ==============================================================================
@@ -793,14 +795,14 @@ private:
   template <typename T> T* get(int nb, bool inverseBytes=false)
   {
     size_t bufSize = nb * sizeof( T );
-    if ( bufSize > _maxPos - _pos )
+    if ( int(bufSize) > _maxPos - _pos )
       throw _exception;
     T* buf = new T[ nb ];
 #ifdef WNT
 #else
     ssize_t nBytesRead = ::read (_file, buf, bufSize );
     _pos += nBytesRead;
-    if ( nBytesRead < bufSize ) {
+    if ( int(nBytesRead) < int(bufSize) ) {
       delete buf;
       throw _exception;
     }

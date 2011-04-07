@@ -50,7 +50,7 @@ namespace MEDSPLITTER
     JointExchangeData();
 
     // Store cell/cell pair of joint between domains (residing different procs by default)
-    void addCellCorrespondence(MEDMEM::MESH* mesh_here,
+    void addCellCorrespondence(const MEDMEM::MESH* mesh_here,
                                int domain_dist, int domain_here,
                                int glob_dist, int glob_here,
                                int loc_here, int loc_dist = -1 );
@@ -59,8 +59,8 @@ namespace MEDSPLITTER
     int nbCellPairs() const { return _glob_to_locs_here_and_dist.size(); }
 
     // Stores meshes and corresponding domain ids
-    void setMeshes( int domain_dist, MEDMEM::MESH* mesh_dist,
-                    int domain_here, MEDMEM::MESH* mesh_here); 
+    void setMeshes( int domain_dist, const MEDMEM::MESH* mesh_dist,
+                    int domain_here, const MEDMEM::MESH* mesh_here); 
 
     // Stores local and global connectivity of joint cells on this proc
     void setConnectivity( const int* glob_fused_nodes);
@@ -89,8 +89,8 @@ namespace MEDSPLITTER
 
     int _dist_domain, _loc_domain, _conn_here_size, _nb_cell_pairs, _first_glob_sub_id;
 
-    MEDMEM::MESH* _dist_mesh;
-    MEDMEM::MESH* _loc_mesh;
+    const MEDMEM::MESH* _dist_mesh;
+    const MEDMEM::MESH* _loc_mesh;
 
     std::vector<int> _global_conn_here, _global_conn_dist;
     std::vector<int> _local_conn_here,  _local_conn_dist;

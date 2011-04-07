@@ -18,7 +18,7 @@
 //
 
 #include "MEDSPLITTERTest.hxx"
-#include <cppunit/TestAssert.h>
+#include "MEDSPLITTERTest_Utils.hxx"
 
 #include "MEDMEM_ConnectZone.hxx" 
 #include "MEDMEM_DriversDef.hxx"
@@ -44,6 +44,7 @@
 #include "MEDMEM_Exception.hxx"
 
 #include <string>
+#include <cppunit/TestAssert.h>
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
 //#define ENABLE_FAULTS
@@ -107,10 +108,10 @@ void MEDSPLITTERTest::testParallelTopology_graph_constructor()
 #ifndef ENABLE_METIS
   CPPUNIT_FAIL("METIS is not available. Please, check your compilation.");
 #else
-  string filename_rd                = getResourceFile("carre_en_quad4_import22.med");
-  string filename_para_wr           = makeTmpFile("myWrField_seq_pointe22_");
-  string filename_para_med0         = makeTmpFile("myWrField_seq_pointe22_1.med");
-  string filename_para_med1         = makeTmpFile("myWrField_seq_pointe22_2.med");
+  string filename_rd        = MEDSPLITTERTest_Utils::getResourceFile("carre_en_quad4.med");
+  string filename_para_wr   = MEDSPLITTERTest_Utils::makeTmpFile("myWrField_seq_pointe22_");
+  string filename_para_med0 = MEDSPLITTERTest_Utils::makeTmpFile("myWrField_seq_pointe22_1.med");
+  string filename_para_med1 = MEDSPLITTERTest_Utils::makeTmpFile("myWrField_seq_pointe22_2.med");
   
   string meshname="carre_en_quad4";
   MESHCollection collection(filename_rd,meshname);

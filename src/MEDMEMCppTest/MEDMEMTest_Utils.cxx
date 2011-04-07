@@ -53,9 +53,8 @@ std::string getResourceFile( const std::string& filename )
     resourceFile += "/share/salome/resources/med/";
   }
   resourceFile += filename;
-  return resourceFile;
+  return fixSlashes( resourceFile );
 }
-
 
 //================================================================================
 /*!
@@ -77,12 +76,11 @@ std::string getTmpDirectory()
   std::string tmpd = "";
   for ( std::list<std::string>::iterator dir = dirs.begin(); dir != dirs.end() && tmpd == "" ; ++dir ) {
 #ifdef WNT
-    if ( GetFileAttributes(dir->data()) & FILE_ATTRIBUTE_DIRECTORY ) {
+    if ( GetFileAttributes(dir->data()) & FILE_ATTRIBUTE_DIRECTORY )
 #else
-    if ( access( dir->data(), W_OK ) == 0 ) {
+    if ( access( dir->data(), W_OK ) == 0 )
 #endif
       tmpd = dir->data();
-    }
   }
 
   if ( tmpd == "" )
@@ -101,12 +99,37 @@ std::string getTmpDirectory()
  * \return path to the temporary file
  */
 //================================================================================
+
 std::string makeTmpFile( const std::string& tmpfile, const std::string& srcfile )
 {
-  std::string tmpf = getTmpDirectory() + "/" + tmpfile;
+  std::string tmpf = fixSlashes( getTmpDirectory() + "/" + tmpfile );
   if ( srcfile != "" ) {
+#ifdef WNT
+    std::string cmd  = "copy " + fixSlashes( srcfile ) + " " + tmpf;
+#else
     std::string cmd  = "cp " + srcfile + " " + tmpf + " ; chmod +w " + tmpf;
+#endif
     system( cmd.c_str() );
   }
   return tmpf;
+}
+
+//================================================================================
+/*!
+ * \brief On WINDOWS, replaces all forward slashes by back slashes
+ * to avoid mixed slashes in one path
+ */
+//================================================================================
+
+std::string fixSlashes( const std::string& path)
+{
+#ifdef WNT
+  std::string fixedpath = path;
+  for ( int i=0; i < path.size(); ++i )
+    if (path[i] == '/')
+      fixedpath[i] = '\\';
+  return fixedpath;
+#else
+  return path;
+#endif
 }

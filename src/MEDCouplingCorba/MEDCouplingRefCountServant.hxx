@@ -40,6 +40,7 @@ namespace ParaMEDMEM
     void UnRegister();
     void Destroy(); // obsolete
     CORBA::Long getTimeLabel();
+    SALOME::StringSeq *GetExportableFormats();
   protected:
     int _ref_counter;
     const RefCountObject *_cpp_pointer;

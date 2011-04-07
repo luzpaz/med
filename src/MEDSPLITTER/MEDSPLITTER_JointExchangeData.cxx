@@ -48,8 +48,8 @@ JointExchangeData::JointExchangeData():
  */
 //================================================================================
 
-void JointExchangeData::setMeshes( int domain_dist, MEDMEM::MESH* mesh_dist,
-                                   int domain_here, MEDMEM::MESH* mesh_here)
+void JointExchangeData::setMeshes( int domain_dist, const MEDMEM::MESH* mesh_dist,
+                                   int domain_here, const MEDMEM::MESH* mesh_here)
 {
   _dist_domain = domain_dist;
   _loc_domain  = domain_here;
@@ -70,7 +70,7 @@ void JointExchangeData::setMeshes( int domain_dist, MEDMEM::MESH* mesh_dist,
  */
 //================================================================================
 
-void JointExchangeData::addCellCorrespondence(MEDMEM::MESH* mesh,
+void JointExchangeData::addCellCorrespondence(const MEDMEM::MESH* mesh,
                                               int domain_dist, int domain_here,
                                               int glob_dist,   int glob_here,
                                               int loc_here,    int loc_dist)
@@ -113,7 +113,7 @@ int JointExchangeData::serialize(vector<int> & out_data) const
   
   data_size =
     _glob_to_locs_here_and_dist.size() +
-    2 * max_nb_node_by_cell * _dist_mesh->getNumberOfElements( MED_CELL, MED_ALL_ELEMENTS );
+    2 * max_nb_node_by_cell * _dist_mesh->getNumberOfElements( MED_CELL, MEDMEM_ALL_ELEMENTS );
 
   return data_size;
 }
@@ -157,7 +157,7 @@ void JointExchangeData::deserialize(const std::vector<int> & in_data)
 
 MEDMEM::MEDSKYLINEARRAY* JointExchangeData::makeCellCorrespArray() const
 {
-  int nb_cells_here    = _loc_mesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
+  int nb_cells_here    = _loc_mesh->getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS);
   int cells_value_size = _glob_to_locs_here_and_dist.size();
   int* cell_index = new int [nb_cells_here+1];
   int* cell_value = new int [cells_value_size];
@@ -223,8 +223,8 @@ namespace
 MEDMEM::CONNECTZONE* JointExchangeData::makeConnectZone(TGeom2FacesByDomian& face_map)
 {
   MEDMEM::CONNECTZONE* cz= new MEDMEM::CONNECTZONE();
-  cz->setLocalMesh          (_loc_mesh);
-  cz->setDistantMesh        (_dist_mesh);
+  cz->setLocalMesh          (const_cast<MEDMEM::MESH*>(_loc_mesh));
+  cz->setDistantMesh        (const_cast<MEDMEM::MESH*>(_dist_mesh));
   cz->setLocalDomainNumber  (_loc_domain);
   cz->setDistantDomainNumber(_dist_domain);
   cz->setName               ("Connect zone defined by SPLITTER");
@@ -329,8 +329,7 @@ void JointExchangeData::setConnectivity(const int* glob_fused_nodes)
 {
   _global_conn_here.reserve( _conn_here_size );
   _local_conn_here.reserve ( _conn_here_size );
-  const int* conn  = _loc_mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                                MED_CELL, MED_ALL_ELEMENTS);
+  const int* conn  = _loc_mesh->getConnectivity(MED_NODAL, MED_CELL, MEDMEM_ALL_ELEMENTS);
   const int* index = _loc_mesh->getConnectivityIndex(MED_NODAL, MED_CELL);
 
   TGlob2LocsHD::iterator glob_locs_here_dist     = _glob_to_locs_here_and_dist.begin();

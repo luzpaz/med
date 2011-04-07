@@ -35,10 +35,10 @@
 template <class T>
 void MESHCollectionDriver::readFields(vector<MEDMEM::FIELD<T>* >& fields,char* fieldname, int itnumber, int ordernumber)
 {
-  for (int i=0; i<m_collection->getMesh().size(); i++)
+  for (int i=0; i<_collection->getMesh().size(); i++)
   {
     char filename[256];
-    strcpy(filename,m_filename[i].c_str());
+    strcpy(filename,_filename[i].c_str());
     cout << "maillage : " << filename << " champ : " << fieldname << endl;
     //    MEDMEM::FIELD<T>* field = new MEDMEM::FIELD<T>(MEDMEM::MED_DRIVER,filename,fieldname,itnumber,ordernumber);
     fields.push_back (new MEDMEM::FIELD<T>(MEDMEM::MED_DRIVER,filename,fieldname,itnumber,ordernumber));
@@ -54,7 +54,7 @@ void MESHCollectionDriver::readFields(vector<MEDMEM::FIELD<T>* >& fields,char* f
 template <class T>
 void MESHCollectionDriver::writeFields(vector<MEDMEM::FIELD<T>* >& fields,char* fieldname)
 {
-  xmlDocPtr master_doc=xmlParseFile(m_master_filename.c_str());
+  xmlDocPtr master_doc=xmlParseFile(_master_filename.c_str());
 
   if (!master_doc)    
     throw MEDEXCEPTION("MEDSPLITTER writeFields - Master File does not exist");
@@ -69,10 +69,10 @@ void MESHCollectionDriver::writeFields(vector<MEDMEM::FIELD<T>* >& fields,char* 
   xmlNewProp(field_node,BAD_CAST "name",BAD_CAST fieldname);
 
 
-  for (int i=0; i<m_collection->getMesh().size(); i++)
+  for (int i=0; i<_collection->getMesh().size(); i++)
   {
     char filename[256];
-    strcpy(filename,m_filename[i].c_str());
+    strcpy(filename,_filename[i].c_str());
     int driverid = fields[i]->addDriver(MEDMEM::MED_DRIVER, filename, fieldname);
     fields[i]->write(driverid);
     xmlNodePtr chunk_node= xmlNewChild(field_node,0,BAD_CAST "chunk",0);
@@ -82,7 +82,7 @@ void MESHCollectionDriver::writeFields(vector<MEDMEM::FIELD<T>* >& fields,char* 
     xmlNewProp(chunk_node,BAD_CAST "name", BAD_CAST fieldname);
 
   }
-  xmlSaveFormatFileEnc(m_master_filename.c_str(), master_doc, "UTF-8", 1);
+  xmlSaveFormatFileEnc(_master_filename.c_str(), master_doc, "UTF-8", 1);
   xmlFreeDoc(master_doc);
   //xmlCleanupParser();
 

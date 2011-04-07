@@ -51,6 +51,14 @@ CORBA::Long MEDCouplingRefCountServant::getTimeLabel()
   return -1;
 }
 
+SALOME::StringSeq *MEDCouplingRefCountServant::GetExportableFormats()
+{
+  SALOME::StringSeq *ret=new SALOME::StringSeq;
+  ret->length(1);
+  (*ret)[0]=CORBA::string_dup("MEDCorba");
+  return ret;
+}
+
 void MEDCouplingRefCountServant::Register()
 {
   if(_cpp_pointer)
@@ -78,3 +86,4 @@ void MEDCouplingRefCountServant::Destroy()
   std::cerr << "WARNING SALOME::GenericObj::Destroy() function is obsolete! Use UnRegister() instead." << std::endl;
   UnRegister();
 }
+    

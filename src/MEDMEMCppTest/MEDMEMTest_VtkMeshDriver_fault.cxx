@@ -20,7 +20,6 @@
 #include "MEDMEMTest.hxx"
 
 #include <MEDMEM_VtkMeshDriver.hxx>
-#include <MEDMEM_MedMeshDriver21.hxx>
 #include <MEDMEM_Mesh.hxx>
 
 using namespace std;

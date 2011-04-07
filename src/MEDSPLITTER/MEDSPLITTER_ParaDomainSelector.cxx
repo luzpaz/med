@@ -150,7 +150,7 @@ int ParaDomainSelector::gatherNbOf(MED_EN::medEntityMesh        entity,
   vector<int> nb_elems( nb_domains, 0 );
   for ( int i = 0; i < nb_domains; ++i )
     if ( domain_meshes[i] )
-      nb_elems[i] = domain_meshes[i]->getNumberOfElementsWithPoly(entity, MED_ALL_ELEMENTS);
+      nb_elems[i] = domain_meshes[i]->getNumberOfElements(entity, MEDMEM_ALL_ELEMENTS);
 
   // receive nb of elems from other procs
   vector<int> all_nb_elems( nb_domains );
@@ -435,11 +435,11 @@ void ParaDomainSelector::gatherEntityTypesInfo(vector<MEDMEM::MESH*>& domain_mes
     if ( isMyDomain(idomain)) continue;
 
     MEDMEM::MESHING* meshing = (MEDMEM::MESHING*) domain_meshes[idomain];
-    if ( meshing->getMeshDimension() < mesh_dim )
-    {
-      meshing->setMeshDimension( mesh_dim );
-      meshing->setSpaceDimension( space_dim );
-    }
+//     if ( meshing->getMeshDimension() < mesh_dim )
+//     {
+//       meshing->setMeshDimension( mesh_dim );
+//       meshing->setSpaceDimension( space_dim );
+//     }
 
     vector< medGeometryElement > types;
     vector< int >                nb_elems;

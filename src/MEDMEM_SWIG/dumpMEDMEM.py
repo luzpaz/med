@@ -33,25 +33,25 @@ theEntityName = { MED_CELL        :"CELL",
                   MED_NODE        :"NODE",
                   MED_ALL_ENTITIES:"ALL_ENTITIES" }
 
-theTypeName = {MED_NONE        :"NONE",
-               MED_POINT1      :"POINT1",
-               MED_SEG2        :"SEG2",
-               MED_SEG3        :"SEG3",
-               MED_TRIA3       :"TRIA3",
-               MED_QUAD4       :"QUAD4",
-               MED_TRIA6       :"TRIA6",
-               MED_QUAD8       :"QUAD8",
-               MED_TETRA4      :"TETRA4",
-               MED_PYRA5       :"PYRA5",
-               MED_PENTA6      :"PENTA6",
-               MED_HEXA8       :"HEXA8",
-               MED_TETRA10     :"TETRA10",
-               MED_PYRA13      :"PYRA13",
-               MED_PENTA15     :"PENTA15",
-               MED_HEXA20      :"HEXA20",
-               MED_POLYGON     :"POLYGON",
-               MED_POLYHEDRA   :"POLYHEDRA",
-               MED_ALL_ELEMENTS:"ALL_ELEMENTS"}
+theTypeName = {MEDMEM_NONE        :"NONE",
+               MEDMEM_POINT1      :"POINT1",
+               MEDMEM_SEG2        :"SEG2",
+               MEDMEM_SEG3        :"SEG3",
+               MEDMEM_TRIA3       :"TRIA3",
+               MEDMEM_QUAD4       :"QUAD4",
+               MEDMEM_TRIA6       :"TRIA6",
+               MEDMEM_QUAD8       :"QUAD8",
+               MEDMEM_TETRA4      :"TETRA4",
+               MEDMEM_PYRA5       :"PYRA5",
+               MEDMEM_PENTA6      :"PENTA6",
+               MEDMEM_HEXA8       :"HEXA8",
+               MEDMEM_TETRA10     :"TETRA10",
+               MEDMEM_PYRA13      :"PYRA13",
+               MEDMEM_PENTA15     :"PENTA15",
+               MEDMEM_HEXA20      :"HEXA20",
+               MEDMEM_POLYGON     :"POLYGON",
+               MEDMEM_POLYHEDRA   :"POLYHEDRA",
+               MEDMEM_ALL_ELEMENTS:"ALL_ELEMENTS"}
 
 medModeSwitch = { 0:"FULL_INTERLACE",
                   1:"NO_INTERLACE",
@@ -71,7 +71,7 @@ SHOW_ALL = -1
 
 # private
 def _showNodalConnectivity(mesh,entity,type,elems,tablevel,showOnly=SHOW_ALL):
-    if debugShowConn: print "ELEMENS:",elems
+    if debugShowConn: print "ELEMENTS:",elems
     tab1 = tab*tablevel
     tab2 = tab*(tablevel+1)
     typeName = theTypeName[type]
@@ -79,50 +79,20 @@ def _showNodalConnectivity(mesh,entity,type,elems,tablevel,showOnly=SHOW_ALL):
     if showOnly > 0:
         elems = elems[:showOnly]
     nbShow = len( elems )
-    if type == MED_POLYGON:
-        connectivity = mesh.getPolygonsConnectivity(MED_NODAL,entity)
-        index = mesh.getPolygonsConnectivityIndex(MED_NODAL,entity)
-        if debugShowConn: print "CONN:",connectivity,"\nIND:",index
-        d = mesh.getNumberOfElements(entity,MED_ALL_ELEMENTS)
-        for i in elems:
-            j = i - d
-            print tab1,typeName,i,":",connectivity[ index[j-1]-1 : index[j]-1 ]
-            pass
+    connectivity = mesh.getConnectivity(MED_NODAL,entity,MEDMEM_ALL_ELEMENTS)
+    index = mesh.getConnectivityIndex(MED_NODAL,entity)
+    if debugShowConn: print "CONN:",connectivity,"\nIND:",index
+    elemShift = 0
+    types = mesh.getTypes( entity )
+    for t in types:
+        if t != type:
+            elemShift += mesh.getNumberOfElements(entity,t)
+        else:
+            break
         pass
-    elif type == MED_POLYHEDRA:
-        connectivity = mesh.getPolyhedronConnectivity(MED_NODAL)
-        fIndex = mesh.getPolyhedronFacesIndex()
-        index = mesh.getPolyhedronIndex(MED_NODAL)
-        d = mesh.getNumberOfElements(entity,MED_ALL_ELEMENTS)
-        if debugShowConn: print "CONN:",connectivity,"\nIND:",index,"\nFIND:",fIndex
-        for i in elems:
-            j = i - d
-            print tab1,typeName, i
-            iF1, iF2 = index[ j-1 ]-1, index[ j ]-1
-            for f in range( iF2 - iF1 ):
-                iN1, iN2 = fIndex[ iF1+f ]-1, fIndex[ iF1+f+1 ]-1
-                print tab2,"Face",(f+1),":",connectivity[ iN1 : iN2 ]
-                pass
-            pass
-        pass
-    else:
-        elemShift = 0
-        types = mesh.getTypes( entity )
-        for t in types:
-            if t != type:
-                elemShift += mesh.getNumberOfElements(entity,t)
-            else:
-                break
-            pass
-        connectivity = mesh.getConnectivity(MED_FULL_INTERLACE, MED_NODAL, entity,MED_ALL_ELEMENTS)
-        index = mesh.getConnectivityIndex(MED_FULL_INTERLACE, entity)
-        if debugShowConn: print "CONN: %s\n INX: %s" % (connectivity,index)
-        nbNodesPerCell = type%100
-        for i in elems:
-            elem = i + elemShift
-            n = index[elem-1]-1
-            print tab1,typeName,i,":",connectivity[n:n+nbNodesPerCell]
-            pass
+    for i in elems:
+        elem = i + elemShift
+        print tab1,typeName,i,":",connectivity[index[elem-1]-1 : index[elem]-1]
         pass
     nbSkip = nbElem - nbShow
     if nbSkip > 0:
@@ -294,15 +264,15 @@ def ShowMesh(mesh, nodes2Show=0, entity2Show=[0,0,0]):
     for entity in [MED_CELL,MED_FACE,MED_EDGE]:
         i += 1
         entityName = theEntityName[ entity ]
-        nbTypes = mesh.getNumberOfTypesWithPoly( entity )
-        if nbTypes == 0 : continue
+        if mesh.getNumberOfElements(entity,MEDMEM_ALL_ELEMENTS) < 1: continue
+        nbTypes = mesh.getNumberOfTypes( entity )
         try:
-            types = mesh.getTypesWithPoly( entity )
+            types = mesh.getTypes( entity )
         except:
             continue
         print tab,"%s types:" % entityName
         for type in types:
-            nbElemType = mesh.getNumberOfElementsWithPoly(entity,type)
+            nbElemType = mesh.getNumberOfElements(entity,type)
             print tab*2,"%s: \t %d elements" % ( theTypeName[ type ], nbElemType )
             pass
         # nodal connectivity
@@ -311,12 +281,10 @@ def ShowMesh(mesh, nodes2Show=0, entity2Show=[0,0,0]):
         print tab,"%s nodal connectivity:" % entityName
         for type in types:
             typeName = theTypeName[ type ]
-            nbElemType = mesh.getNumberOfElementsWithPoly(entity,type)
+            nbElemType = mesh.getNumberOfElements(entity,type)
             if nbElemType == 0:
                 continue
             d = 1
-            if type==MED_POLYGON or type==MED_POLYHEDRA:
-                d += mesh.getNumberOfElements(entity,MED_ALL_ELEMENTS)
             number = range (d, nbElemType+d)
             _showNodalConnectivity(mesh,entity,type,number,2,entity2Show[ i ])
             pass
@@ -328,7 +296,7 @@ def ShowMesh(mesh, nodes2Show=0, entity2Show=[0,0,0]):
     for entity in [MED_NODE,MED_CELL,MED_FACE,MED_EDGE]:
         nbFam = mesh.getNumberOfFamilies(entity)
         nbGrp = mesh.getNumberOfGroups(entity)
-        nbElem= mesh.getNumberOfElements(entity, MED_ALL_ELEMENTS);
+        nbElem= mesh.getNumberOfElements(entity, MEDMEM_ALL_ELEMENTS);
         nbF += nbFam
         nbG += nbGrp
         if (entity == MED_NODE) :
@@ -353,123 +321,129 @@ def ShowMesh(mesh, nodes2Show=0, entity2Show=[0,0,0]):
             pass
         pass
     print "Total nbF", nbF,"nbG",nbG
+    return
 
 ## Dump all FIELD's in MED.
 ## Optionally dump <showValues> first values.
 ## Use showValues=SHOW_ALL to dump all values.
 
-def ShowFields( med, showValues=0 ):
-    nbFields = med.getNumberOfFields()
+def ShowFields( fields, showValues=0 ):
+    nbFields = len(fields)
     print "---------------------- Fields-------------------------"
     print "Nb fields", nbFields
-    for iField in range( med.getNumberOfFields() ):
-        fName = med.getFieldName( iField )
-        for it in range( med.getFieldNumberOfIteration( fName ) ):
-            dt_it_    = med.getFieldIteration( fName, it )
-            f         = med.getField( fName, dt_it_.dt, dt_it_.it )
-            sup       = f.getSupport()
-            name      = f.getName()
-            desc      = f.getDescription()
-            itnb      = f.getIterationNumber()
-            time      = f.getTime()
-            order     = f.getOrderNumber()
-            ftype     = f.getValueType()
-            mode      = f.getInterlacingType()
-            nbcomp    = f.getNumberOfComponents()
-            nbval     = f.getNumberOfValues()
-            nbelem    = sup.getNumberOfElements(MED_ALL_ELEMENTS)
-            nbOfTypes = sup.getNumberOfTypes()
-            types     = sup.getTypes()
-            isOnAll   = sup.isOnAllElements()
-            print '\nFIELD',iField
-            print tab*1,'-Name             : "%s"' % name
-            print tab*1,'-Description      : "%s"' % desc
-            print tab*1,'-IterationNumber  :  %s' % itnb
-            print tab*1,'-Time             :  %s' % time
-            print tab*1,'-OrderNumber      :  %s' % order
-            print tab*1,'-Nb Values        :  %s' % nbval
-            print tab*1,'-Nb Supp. Elements:  %s' % nbelem
-            print tab*1,'-Nb Componenets   :  %s' % nbcomp
-            print tab*1,'-ValueType        :  %s' % med_type_champ[ftype]
-            print tab*1,'-Interlace        :  %s' % medModeSwitch[mode]
-            print tab*1,'-Conponents'
-            for k in range(nbcomp):
-                kp1 = k+1
-                compName = f.getComponentName(kp1)
-                compDesc = f.getComponentDescription(kp1)
-                compUnit = f.getMEDComponentUnit(kp1)
-                print     tab*2,kp1,'*Name       : "%s"' % compName
-                try:
-                    print tab*2,'  *Description: "%s"' % compDesc
-                except:
-                    print 'INVALID'
-                try:
-                    print tab*2,'  *Unit       : "%s"' % compUnit
-                except:
-                    print 'INVALID'
+    for (iField, f ) in enumerate( fields ):
+        sup       = f.getSupport()
+        name      = f.getName()
+        desc      = f.getDescription()
+        itnb      = f.getIterationNumber()
+        time      = f.getTime()
+        order     = f.getOrderNumber()
+        ftype     = f.getValueType()
+        mode      = f.getInterlacingType()
+        nbcomp    = f.getNumberOfComponents()
+        nbval     = f.getNumberOfValues()
+        nbelem    = sup.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+        nbOfTypes = sup.getNumberOfTypes()
+        types     = sup.getTypes()
+        isOnAll   = sup.isOnAllElements()
+        print '\nFIELD',iField
+        print tab*1,'-Name             : "%s"' % name
+        print tab*1,'-Description      : "%s"' % desc
+        print tab*1,'-IterationNumber  :  %s' % itnb
+        print tab*1,'-Time             :  %s' % time
+        print tab*1,'-OrderNumber      :  %s' % order
+        print tab*1,'-Nb Values        :  %s' % nbval
+        print tab*1,'-Nb Supp. Elements:  %s' % nbelem
+        print tab*1,'-Nb Componenets   :  %s' % nbcomp
+        print tab*1,'-ValueType        :  %s' % med_type_champ[ftype]
+        print tab*1,'-Interlace        :  %s' % medModeSwitch[mode]
+        print tab*1,'-Conponents'
+        for k in range(nbcomp):
+            kp1 = k+1
+            compName = f.getComponentName(kp1)
+            compDesc = f.getComponentDescription(kp1)
+            compUnit = f.getMEDComponentUnit(kp1)
+            print     tab*2,kp1,'*Name       : "%s"' % compName
+            try:
+                print tab*2,'  *Description: "%s"' % compDesc
+            except:
+                print 'INVALID'
                 pass
-            print tab*1,'-SUPPORT          : "%s"' % sup.getName()
-            print tab*1,'-On all elements  :  %s' % bool(isOnAll)
-            print tab*1,'-Types            :  %s'  % types
+            try:
+                print tab*2,'  *Unit       : "%s"' % compUnit
+            except:
+                print 'INVALID'
+                pass
+            pass
+        print tab*1,'-MESH             : "%s"' % sup.getMeshName()
+        print tab*1,'-SUPPORT          : "%s"' % sup.getName()
+        print tab*1,'-On all elements  :  %s' % bool(isOnAll)
+        print tab*1,'-Types            :  %s'  % types
 
-            if ftype == MED_REEL64:
-                if mode == MED_FULL_INTERLACE:
-                    f = createFieldDoubleFromField(f)
-                else:
-                    f = createFieldDoubleNoInterlaceFromField( f )
-            elif ftype == MED_INT32:
-                if mode == MED_FULL_INTERLACE:
-                    f = createFieldIntFromField(f)
-                else:
-                    f = createFieldIntNoInterlaceFromField( f )
+        if ftype == MED_REEL64:
+            if mode == MED_FULL_INTERLACE:
+                f = createFieldDoubleFromField(f)
             else:
-                print tab*1,'<< Unknown field type >>:',ftype
-                continue
-            nbGauss = 1
-            hasGauss = False
-            if nbcomp == 0:
-                nbGauss = 0
-            else:
-                hasGauss = f.getGaussPresence()
-            if hasGauss:
-                nbGaussByType = f.getNumberOfGaussPoints()
-            for k in range(nbOfTypes):
-                type = types[k]
-                nbOfElmtsOfType = sup.getNumberOfElements(type)
-                if hasGauss: nbGauss = nbGaussByType[ k ]
-                if type == 0: type = MED_POINT1
-                print tab*2,k+1,theTypeName[type],':',nbOfElmtsOfType, 'elements,',\
-                      nbGauss,'gauss point(s)'
+                f = createFieldDoubleNoInterlaceFromField( f )
                 pass
-            nbOf = sup.getNumberOfElements(MED_ALL_ELEMENTS)
-            elements = []
-            if not isOnAll:
-                elements = sup.getNumber(MED_ALL_ELEMENTS)
-            if nbcomp == 0:
-                nbOf = 0
+            pass
+        elif ftype == MED_INT32:
+            if mode == MED_FULL_INTERLACE:
+                f = createFieldIntFromField(f)
+            else:
+                f = createFieldIntNoInterlaceFromField( f )
+                pass
+            pass
+        else:
+            print tab*1,'<< Unknown field type >>:',ftype
+            continue
+        nbGauss = 1
+        hasGauss = False
+        if nbcomp == 0:
+            nbGauss = 0
+        else:
+            hasGauss = f.getGaussPresence()
+            pass
+        if hasGauss:
+            nbGaussByType = f.getNumberOfGaussPoints()
+            pass
+        for k in range(nbOfTypes):
+            type = types[k]
+            nbOfElmtsOfType = sup.getNumberOfElements(type)
+            if hasGauss: nbGauss = nbGaussByType[ k ]
+            if type == 0: type = MEDMEM_POINT1
+            print tab*2,k+1,theTypeName[type],':',nbOfElmtsOfType, 'elements,',\
+                  nbGauss,'gauss point(s)'
+            pass
+        nbOf = sup.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+        elements = []
+        if not isOnAll:
+            elements = sup.getNumber(MEDMEM_ALL_ELEMENTS)
+            pass
+        if nbcomp == 0:
+            nbOf = 0
             print tab*1,'-Nb Values        :',nbOf
             #value = f.getValue(MED_FULL_INTERLACE)
             #print value[0: min( 100, len(value)-1 )]
 
-            toShow = min( nbOf, showValues )
-            if toShow < 0: toShow = nbOf
-            for I in range( toShow ):
-                if elements:
-                    i = elements[ I ]
-                else:
-                    i = I+1
-                if mode == MED_FULL_INTERLACE:
-                    valueI = f.getRow(i)
-                else:
-                    valueI = []
-                    for j in range( nbcomp ):
-                        for k in range( f.getNbGaussI( i ) ):
-                            valueI.append( f.getValueIJK(i,j+1,k+1) )
-                print '         ',i,' - ',valueI #[:nbcomp]
-                pass
-            if nbOf > toShow:
-                print '            ...skip',nbOf - toShow,'values'
-                pass
+        toShow = min( nbOf, showValues )
+        if toShow < 0: toShow = nbOf
+        for I in range( toShow ):
+            if elements:
+                i = elements[ I ]
+            else:
+                i = I+1
+            if mode == MED_FULL_INTERLACE:
+                valueI = f.getRow(i)
+            else:
+                valueI = []
+                for j in range( nbcomp ):
+                    for k in range( f.getNbGaussI( i ) ):
+                        valueI.append( f.getValueIJK(i,j+1,k+1) )
+            print '         ',i,' - ',valueI #[:nbcomp]
+            pass
+        if nbOf > toShow:
+            print '            ...skip',nbOf - toShow,'values'
             pass
         pass
     pass

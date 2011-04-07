@@ -21,10 +21,9 @@
 
 #include "MEDMEM_FieldConvert.hxx"
 #include "MEDMEM_Field.hxx"
-#include "MEDMEM_GaussLocalization.hxx"
+#include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_Grid.hxx"
 #include "MEDMEM_Group.hxx"
-#include "MEDMEM_MedMeshDriver22.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_Support.hxx"
@@ -175,8 +174,12 @@ using namespace MEDMEM;
  *
  *   (+)     inline void read(int index=0);
  *   (+)     inline void read(const GENDRIVER & genDriver);
- *   (+)     inline void write(int index=0, const string & driverName = "");
- *   (+)     inline void write(const GENDRIVER &);
+ *   (+)     inline void read(driverTypes driverType, const std::string& filename);
+ *   (+)     inline void write(int index=0);
+ *   (+)     inline void write(const GENDRIVER &,
+ *                             MED_EN::med_mode_acces medMode=MED_EN::RDWR);
+ *   (+)     inline void write(driverTypes driverType, const std::string& filename,
+ *                             MED_EN::med_mode_acces medMode=MED_EN::RDWR);
  *   (+)     inline void writeAppend(int index=0, const string & driverName = "");
  *   (+) inline void writeAppend(const GENDRIVER &);
  *
@@ -232,7 +235,7 @@ using namespace MEDMEM;
  *              test_copie_field_.cxx
  *              test_copie_fieldT.cxx
  */
- void compareField_(const FIELD_ * theField_1, const FIELD_ * theField_2, bool isFIELD, bool isValue)
+ static void compareField_(const FIELD_ * theField_1, const FIELD_ * theField_2, bool isFIELD, bool isValue)
 {
   // name, description, support
   CPPUNIT_ASSERT_EQUAL(theField_1->getName(), theField_2->getName());
@@ -283,9 +286,9 @@ using namespace MEDMEM;
     }
 }
 
-void checkField_(FIELD_ * theField_, const SUPPORT * theSupport,
-                 MED_EN::med_type_champ theValueType,
-                 MED_EN::medModeSwitch theInterlace)
+static void checkField_(FIELD_ * theField_, const SUPPORT * theSupport,
+                        MED_EN::med_type_champ theValueType,
+                        MED_EN::medModeSwitch theInterlace)
 {
   // name
   const string aFieldName = "a_name_of_a_field";
@@ -343,10 +346,6 @@ void checkField_(FIELD_ * theField_, const SUPPORT * theSupport,
   // restore components names
   theField_->setNumberOfComponents(aNbComps);
   theField_->setComponentsNames(aCompsNames);
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("FIELD_::_componentsNames bad management");
-  //#endif
 
   theField_->setComponentsDescriptions(aCompsDescs);
   theField_->setMEDComponentsUnits(aCompsUnits);
@@ -387,19 +386,12 @@ void checkField_(FIELD_ * theField_, const SUPPORT * theSupport,
   CPPUNIT_ASSERT_EQUAL(aCompsUnitsBack2[1], theField_->getMEDComponentUnit(2));
   CPPUNIT_ASSERT_EQUAL(aCompsUnitsBack2[1], aCompUnit2);
 
-  //#ifdef ENABLE_FAULTS
-  // (BUG) No index checking
-  // It's normal: performance reason
   CPPUNIT_ASSERT_THROW(theField_->setComponentName(0, "str"), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(theField_->setComponentName(aNbComps + 1, "str"), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(theField_->setComponentDescription(0, "str"), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(theField_->setComponentDescription(aNbComps + 1, "str"), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(theField_->setMEDComponentUnit(0, "str"), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(theField_->setMEDComponentUnit(aNbComps + 1, "str"), MEDEXCEPTION);
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("FIELD::setComponentXXX() does not check component index");
-  //#endif
 
   // iteration information
   int anIterNumber = 10; // set value to MED_NOPDT if undefined (default)
@@ -451,43 +443,20 @@ void checkField (FIELD<T, INTERLACING_TAG> * theField, const SUPPORT * theSuppor
   // nb. of components must be equal 1 (for Volume, Area, Length) or
   // space dimension (for Normal, Barycenter, )
   {
-    MESH* aMesh = theSupport->getMesh();
+    GMESH* aMesh = theSupport->getMesh();
     int spaceDim = 3;
     if (aMesh) spaceDim = aMesh->getSpaceDimension();
     theField->deallocValue();
     theField->allocValue(/*NumberOfComponents = */spaceDim + 1);
 
-    //  0020142: [CEA 315] Unused function in MEDMEM::FIELD
-    // getVolume() etc. does nothing
-    //
-    //     CPPUNIT_ASSERT_THROW(theField->getVolume(), MEDEXCEPTION);
-    //     CPPUNIT_ASSERT_THROW(theField->getArea(), MEDEXCEPTION);
-    //     CPPUNIT_ASSERT_THROW(theField->getLength(), MEDEXCEPTION);
-    //     if (aMesh)
-    {
-      //       CPPUNIT_ASSERT_THROW(theField->getNormal(), MEDEXCEPTION);
-      //       CPPUNIT_ASSERT_THROW(theField->getBarycenter(), MEDEXCEPTION);
-      //
-    }
-
     theField->deallocValue();
     theField->allocValue(/*NumberOfComponents = */1);
-    //  0020142: [CEA 315] Unused function in MEDMEM::FIELD
-    // getVolume() etc. does nothing
-    //     if (aValueType == MED_EN::MED_REEL64)
-    {
-      //       CPPUNIT_ASSERT_NO_THROW(theField->getVolume());
-      //       CPPUNIT_ASSERT_NO_THROW(theField->getArea());
-      //       CPPUNIT_ASSERT_NO_THROW(theField->getLength());
-      //
-    }
-    //     else
-    {
-      //       CPPUNIT_ASSERT_THROW(theField->getVolume(), MEDEXCEPTION);
-      //       CPPUNIT_ASSERT_THROW(theField->getArea(), MEDEXCEPTION);
-      //       CPPUNIT_ASSERT_THROW(theField->getLength(), MEDEXCEPTION);
-      //
-    }
+
+    if (aMesh) 
+      {
+        theField->deallocValue();
+        theField->allocValue(/*NumberOfComponents = */spaceDim);
+      }
 
     if (aMesh)
       {
@@ -513,39 +482,22 @@ void checkField (FIELD<T, INTERLACING_TAG> * theField, const SUPPORT * theSuppor
   // values
   theField->deallocValue();
   theField->allocValue(/*NumberOfComponents = */2);
-  int nbElemSupport = theSupport->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+  int nbElemSupport = theSupport->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS);
   CPPUNIT_ASSERT_EQUAL(nbElemSupport, theField->getNumberOfValues());
 
-  //#ifdef ENABLE_FAULTS
-  // (BUG) FIELD::deallocValue() does not nullify _value pointer,
-  // that is why there can be failures in other methods
-  // (even if simply call deallocValue() two times)
   theField->deallocValue();
   CPPUNIT_ASSERT_THROW(theField->getGaussPresence(), MEDEXCEPTION);
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("FIELD::deallocValue() does not nullify _value pointer");
-  //#endif
 
   // copy constructor
   FIELD<T, INTERLACING_TAG> *aField_copy1= new FIELD<T, INTERLACING_TAG>(*theField);
   compareField(theField, aField_copy1, /*isValue = */false);
-  //compareField(theField, &aField_copy1, /*isValue = */true);
   aField_copy1->removeReference();
 
   // operator=
-  //#ifdef ENABLE_FAULTS
-  // (BUG) This fails (Segmentation fault) if not set:
-  // _componentsNames or _componentsDescriptions, or _componentsUnits, or _MEDComponentsUnits
   FIELD<T, INTERLACING_TAG> *aField_copy2=new FIELD<T, INTERLACING_TAG>();
   *aField_copy2 = *theField;
   compareField(theField, aField_copy2, /*isValue = */false);
   aField_copy2->removeReference();
-  //compareField(theField, &aField_copy2, /*isValue = */true);
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("FIELD_::operator=() fails if _componentsUnits is not set");
-  //#endif
 }
 
 template<class T>
@@ -577,6 +529,7 @@ FIELD<T> * createFieldOnGroup(MESH* theMesh, const GROUP* theGroup,
   return aFieldOnGroup;
 }
 
+double plus13 (double val);
 double plus13 (double val)
 {
   return val + 13;
@@ -586,7 +539,7 @@ double plus13 (double val)
 // typedef void (*myFuncType)(const double * temp, T* output);
 // size of temp array = space dim = 3
 // size of output array = nb. comps = 2
-void proj2d (const double * temp, double* output)
+static void proj2d (const double * temp, double* output)
 {
   // dimetric projection with coefficients:
   // 1.0 along Oy and Oz, 0.5 along Ox
@@ -606,12 +559,12 @@ void proj2d (const double * temp, double* output)
   output[1] = temp[2] - dx;
 }
 
-void testDrivers()
+static void testDrivers()
 {
   string filename_rd                  = getResourceFile("pointe.med");
   string filename_wr                  = makeTmpFile("myMedFieldfile.med", filename_rd);
   string filename_support_wr          = makeTmpFile("myMedSupportFiledfile.med");
-  string filename22_rd                = getResourceFile("pointe_import22.med");
+  string filename22_rd                = getResourceFile("pointe.med");
   string filenamevtk_wr               = makeTmpFile("myMedFieldfile22.vtk");
 
   string fieldname_celldouble_rd      = "fieldcelldoublescalar";
@@ -649,27 +602,31 @@ void testDrivers()
   int IdDriver_rd = aField_1->addDriver(MED_DRIVER,filename_rd,fieldname_celldouble_rd);
   // TODO: throw if read for the second time
   // (BUG) Cannot open file, but file exist
-  CPPUNIT_ASSERT_THROW(aField_1->read(IdDriver_rd),MEDEXCEPTION);
+  // EAP: no more pb with opening the file for the second time with "weaker" mode,
+  // but why to re-read the field?
+  //CPPUNIT_ASSERT_THROW(aField_1->read(IdDriver_rd),MEDEXCEPTION);
+  CPPUNIT_ASSERT_NO_THROW(aField_1->read(IdDriver_rd));
 
   //Test read(GENDRIVER & genDriver) method
-  //Creation a Driver
-  MED_FIELD_RDONLY_DRIVER21<int> *aMedRdFieldDriver21_1 =
-    new MED_FIELD_RDONLY_DRIVER21<int>();
-  aMedRdFieldDriver21_1->setFileName(filename_rd);
-  //Creation a Field
   FIELD<int> *aField_2 = new FIELD<int>();
   aField_2->setName(fieldname_nodeint_rd);
-  aField_2->addDriver(*aMedRdFieldDriver21_1);
-  aField_2->read(*aMedRdFieldDriver21_1);
+  {
+    MED_FIELD_RDONLY_DRIVER<int> aMedRdFieldDriver;
+    aMedRdFieldDriver.setFileName(filename_rd);
+    aField_2->read( aMedRdFieldDriver );
+  }
+  //Test read(driverTypes driverType, const std::string & fileName);
+  FIELD<double> * aField_3 = new FIELD<double>();
+  aField_3->setName(fieldname_celldouble_rd);
+  aField_3->read( MED_DRIVER, filename_rd);
 
   ///////////////////
   //Test Write Part//
   ///////////////////
-  int IdDriver;
+  //int IdDriver;
   MESH *aMesh = new MESH(MED_DRIVER,filename_rd,meshname);
   const SUPPORT *aSupport = aMesh->getSupportOnAll(MED_CELL);
   FIELD<int> *aFieldSupport;
-  //#ifdef ENABLE_FORCED_FAILURES  
   CPPUNIT_ASSERT_THROW(aFieldSupport = 
                        new FIELD<int>(aSupport, MED_DRIVER,filename_rd,
                                       fieldname_nodeint_rd), MEDMEM::MEDEXCEPTION);
@@ -677,161 +634,78 @@ void testDrivers()
   CPPUNIT_ASSERT_NO_THROW(aFieldSupport = 
                           new FIELD<int>(aSupport, MED_DRIVER, filename_rd,
                                          fieldname_nodeint_rd));
-  //(BUG) Can not open file
-  MED_FIELD_WRONLY_DRIVER21<int> * aFieldWrDriver21 = 
-    new MED_FIELD_WRONLY_DRIVER21<int>(filename_support_wr,aFieldSupport);
-  aFieldWrDriver21->setFieldName(aFieldSupport->getName() + "_copy");
-  CPPUNIT_ASSERT_NO_THROW(IdDriver= aFieldSupport->addDriver(*aFieldWrDriver21));
-  CPPUNIT_ASSERT_NO_THROW(aFieldSupport->write(IdDriver));
   aFieldSupport->removeReference();
-  delete aFieldWrDriver21;
-  //#endif
-
-  //Create fileds
-  FIELD<double> * aField_3 = new FIELD<double>();
-  MED_FIELD_RDONLY_DRIVER21<double> *aMedRdFieldDriver21_2 =
-    new MED_FIELD_RDONLY_DRIVER21<double>(filename_rd, aField_3);
-  aMedRdFieldDriver21_2->open();
-  aMedRdFieldDriver21_2->setFieldName(fieldname_celldouble_rd);
-  aMedRdFieldDriver21_2->read();
-  aMedRdFieldDriver21_2->close();
 
   //Test write(int index) method
-  //Add drivers to FIELDs
-  int IdDriver1 = -1;
-  try
-    {
-      IdDriver1 = aField_3->addDriver(MED_DRIVER,filename_wr,fieldname_celldouble_wr);
-    }
-  catch(MEDEXCEPTION &e)
-    {
-      e.what();
-    }
-  catch( ... )
-    {
-      CPPUNIT_FAIL("Unknown exception");
-    }
+  // Add drivers to FIELDs
+  int IdDriver1 = aField_3->addDriver(MED_DRIVER,filename_wr,fieldname_celldouble_wr);
+
   //Trying call write(int index) method with incorrect index
-  //#ifdef ENABLE_FAULTS
-  CPPUNIT_ASSERT_THROW(aField_3->write(IdDriver1+1, fieldname_celldouble_wr),MEDEXCEPTION);
-  // => Segmentation fault
-  //#endif
+  CPPUNIT_ASSERT_THROW(aField_3->write(IdDriver1+1),MEDEXCEPTION);
 
   //Write field to file
-  //#ifdef ENABLE_FAULTS
-  try
-    {
-      aField_3->write(IdDriver1, fieldname_celldouble_wr);
-      // => Segmentation fault
-    }
-  catch(MEDEXCEPTION &e)
-    {
-      e.what();
-    }
-  catch( ... )
-    {
-      CPPUNIT_FAIL("Unknown exception");
-    }
-  //#endif
+  aField_3->write(IdDriver1);
 
   CPPUNIT_ASSERT_NO_THROW(aField_3->rmDriver(IdDriver1));
 
-  //Test write(const GENDRIVER &);
-  //Create a driver
-  MED_FIELD_WRONLY_DRIVER21<int> *aMedWrFieldDriver21 =
-    new MED_FIELD_WRONLY_DRIVER21<int>();
-  aMedWrFieldDriver21->setFileName(filename_wr);
-  aField_2->setName(fieldname_nodeint_wr1);
-  //Add driver to a field
-  aField_2->addDriver(*aMedWrFieldDriver21);
+  //Test write(const GENDRIVER &, MED_EN::med_mode_acces medMode=MED_EN::RDWR);
+  {
+    MED_FIELD_WRONLY_DRIVER<int> aMedWrFieldDriver;
+    aMedWrFieldDriver.setFileName(filename_wr);
 
-  try
-    {
-      aField_2->write(*aMedWrFieldDriver21);
-    }
-  catch(MEDEXCEPTION &e)
-    {
-      e.what();
-    }
-  catch( ... )
-    {
-      CPPUNIT_FAIL("Unknown exception");
-    }
+    aField_3->setName(fieldname_nodeint_wr);
+    aField_3->write(aMedWrFieldDriver);
+    FIELD<double> aField_3_RD;
+    aField_3_RD.setName(fieldname_nodeint_wr);
+    aField_3_RD.read(MED_DRIVER,filename_wr);
+  }
 
+  // Test write(driverTypes driverType, const std::string& filename
+  //            MED_EN::med_mode_acces medMode=MED_EN::RDWR)
+  aField_3->setName(fieldname_nodeint_wr1);
+  // wrong mode
+  CPPUNIT_ASSERT_THROW(aField_3->write(MED_DRIVER,filename_wr,MED_EN::RDONLY), MEDEXCEPTION);
+  aField_3->write(MED_DRIVER,filename_wr);
+  {
+    FIELD<double> aField_3_RD;
+    aField_3_RD.setName(fieldname_nodeint_wr1);
+    aField_3_RD.read(MED_DRIVER,filename_wr);
+  }
+  aField_3->setName("fieldname_nodeint_wr1");
+  aField_3->write(MED_DRIVER,filename_wr, MED_EN::WRONLY);// overwrite filename_wr
+  {
+    FIELD<double> aField_3_RD;
+    aField_3_RD.setName(fieldname_nodeint_wr1);
+    CPPUNIT_ASSERT_THROW(aField_3_RD.read(MED_DRIVER,filename_wr),MEDEXCEPTION);
+  }
   //Test writeAppend(int index) method
   //Create a vtk file
-  MESH * aMesh_1 = new MESH;
-  MED_MESH_RDONLY_DRIVER22 *aMedMeshRdDriver22 = new MED_MESH_RDONLY_DRIVER22(filename22_rd, aMesh_1);
-  aMedMeshRdDriver22->open();
-  aMedMeshRdDriver22->setMeshName(meshname);
-  aMedMeshRdDriver22->read();
-  aMedMeshRdDriver22->close();
-  VTK_MESH_DRIVER *aVtkDriver = new VTK_MESH_DRIVER(filenamevtk_wr, aMesh_1);
-  aVtkDriver->open();
-  aVtkDriver->write();
-  aVtkDriver->close();
-
+  MESH * aMesh_1 = new MESH(MED_DRIVER,filename22_rd, meshname);
+  aMesh_1->write(VTK_DRIVER, filenamevtk_wr);
   //Create a field
-  FIELD<int> * aField_4 = new FIELD<int>();
-  MED_FIELD_RDONLY_DRIVER22<int> *aMedRdFieldDriver22 =
-    new MED_FIELD_RDONLY_DRIVER22<int>(filename22_rd, aField_4);
-  aMedRdFieldDriver22->open();
-  aMedRdFieldDriver22->setFieldName(fieldname_nodeint_rd);
-  aMedRdFieldDriver22->read();
-  aMedRdFieldDriver22->close();
-
+  FIELD<int> * aField_4 =
+    new FIELD<int>(MED_DRIVER,filename22_rd,fieldname_nodeint_rd,-1,-1,aMesh_1);
   //Add Driver to a field
-  int IdDriver2;
-  try
-    {
-      IdDriver2 = aField_4->addDriver(VTK_DRIVER, filenamevtk_wr ,fieldname_nodeint_wr);
-    }
-  catch(MEDEXCEPTION &e)
-    {
-      e.what();
-    }
-  catch( ... )
-    {
-      CPPUNIT_FAIL("Unknown exception");
-    }
-  //#ifdef ENABLE_FAULTS
+  int IdDriver2 = aField_4->addDriver(VTK_DRIVER, filenamevtk_wr ,fieldname_nodeint_wr);
   //Trying call writeAppend() method with incorrect index
   CPPUNIT_ASSERT_THROW(aField_4->writeAppend(IdDriver2+1,fieldname_nodeint_wr),MEDEXCEPTION);
-  // => Segmentation fault
-  //#endif
 
-  //#ifdef ENABLE_FAULTS
-  // (BUG) => Segmentation fault
-  CPPUNIT_ASSERT_THROW(aField_4->writeAppend(IdDriver2, fieldname_nodeint_wr),MEDEXCEPTION);
-  //#endif
+  CPPUNIT_ASSERT_NO_THROW(aField_4->writeAppend(IdDriver2, fieldname_nodeint_wr));
 
   //Test writeAppend(const GENDRIVER &) method
   aField_4->setName(fieldname_nodeint_wr1);
-
-  //Add driver to a field
-  //#ifdef ENABLE_FAULTS
-  //Create a driver
-  VTK_FIELD_DRIVER<int> *aVtkFieldDriver = new VTK_FIELD_DRIVER<int>(filenamevtk_wr, aField_4);
-  CPPUNIT_ASSERT_NO_THROW(aField_4->addDriver(*aVtkFieldDriver));
-  //(BUG) => Segmentation fault after addDriver(const GENDRIVER &)
-  CPPUNIT_ASSERT_THROW(aField_4->writeAppend(*aVtkFieldDriver),MEDEXCEPTION);
-  delete aVtkFieldDriver;
-  //#endif
-
+  {
+    VTK_FIELD_DRIVER<int> aVtkFieldDriver(filenamevtk_wr, aField_4);
+    CPPUNIT_ASSERT_NO_THROW(aField_4->writeAppend(aVtkFieldDriver));
+  }
 
   //Delete objects
   aField_1->removeReference();
-  delete aMedRdFieldDriver21_1;
   aField_2->removeReference();
   aField_3->removeReference();
-  delete aMedRdFieldDriver21_2;
   aField_4->removeReference();
-  delete aMedMeshRdDriver22;
-  delete aMedWrFieldDriver21;
-  delete aVtkDriver;
   aMesh->removeReference();
   aMesh_1->removeReference();
-  delete aMedRdFieldDriver22;
 }
 
 void MEDMEMTest::testField()
@@ -854,41 +728,11 @@ void MEDMEMTest::testField()
   compareField_(aField_, aField_copy1, /*isFIELD = */false, /*isValue = */false);
   aField_copy1->removeReference();
   // operator=
-  //#ifdef ENABLE_FAULTS
-  // (BUG) This fails (Segmentation fault) if not set:
-  // _componentsNames or _componentsDescriptions, or _componentsUnits, or _MEDComponentsUnits
-  // (BUG) Code duplication with copyGlobalInfo(), called from copy constructor
   FIELD_ *aField_copy2=new FIELD_;
   *aField_copy2 = *aField_;
   compareField_(aField_, aField_copy2,/*isFIELD = */false, /*isValue = */false);
   aField_copy2->removeReference();
   aField_->removeReference();
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  //CPPUNIT_FAIL("FIELD_::operator=() fails if _componentsUnits is not set");
-  //#endif
-
-  // following test is commented since method
-  // setTotalNumberOfElements() is removed.
-  /*
-  // construction on a given support
-  {
-  anEmptySupport.setTotalNumberOfElements(11);
-  // CASE1:
-  FIELD_ aField_case1 (&anEmptySupport, 10);
-  // CASE2:
-  // Invalid API usage
-  //     FIELD_ aField_case2;
-  //     aField_case2.setSupport(&anEmptySupport);
-  //     aField_case2.setNumberOfComponents(10);
-
-  // #ifdef ENABLE_FORCED_FAILURES
-  //     CPPUNIT_ASSERT_EQUAL_MESSAGE("No correspondance between CASE1 and CASE2",
-  //                                  aField_case1.getNumberOfValues(),
-  //                                  aField_case2.getNumberOfValues());
-  // #endif
-  }
-  */
 
   ////////////////////////
   // TEST 2: FIELD<int> //
@@ -1105,50 +949,50 @@ void MEDMEMTest::testField()
   const int * nbElemsInEachType = aFieldOnGroup1->getNumberOfElements();
   const MED_EN::medGeometryElement * aGeomTypes = aFieldOnGroup1->getGeometricTypes();
 
-  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_TRIA3, aGeomTypes[0]);
-  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_QUAD4, aGeomTypes[1]);
+  CPPUNIT_ASSERT_EQUAL(MED_EN::MEDMEM_TRIA3, aGeomTypes[0]);
+  CPPUNIT_ASSERT_EQUAL(MED_EN::MEDMEM_QUAD4, aGeomTypes[1]);
 
   // GAUSS
 
   // now we have no gauss localization in aFieldOnGroup1
-  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_TRIA3));
-  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_QUAD4));
-  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_TRIA6), MEDEXCEPTION);
+  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MEDMEM_TRIA3));
+  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MEDMEM_QUAD4));
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MEDMEM_TRIA6), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(), MEDEXCEPTION);
 
-  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalization(MED_EN::MED_TRIA3), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MED_TRIA3), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalization(MED_EN::MEDMEM_TRIA3), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MEDMEM_TRIA3), MEDEXCEPTION);
 
   CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNbGaussI(anElems[0]));
 
   // set a gauss localization into aFieldOnGroup1
-  double cooRef[6] =
+  double cooRef[6] = 
     {
       1.,1., 2.,4., 3.,9.
     }; // xy xy xy
-  double cooGauss[10] =
+  double cooGauss[10] = 
     {
       7.,7., 6.,6., 5.,5., 4.,3., 2.,1.
     }; // x1,y1  x2,y2  x3,y3  x4,y4  x5,y5
-  double wg[5] =
+  double wg[5] = 
     {
       1., 2., 3., 4., 5.
     };
-  GAUSS_LOCALIZATION<> gl1 ("GL1", MED_EN::MED_TRIA3, /*nGauss*/5, cooRef, cooGauss, wg);
+  GAUSS_LOCALIZATION<> gl1 ("GL1", MED_EN::MEDMEM_TRIA3, /*nGauss*/5, cooRef, cooGauss, wg);
 
-  aFieldOnGroup1->setGaussLocalization(MED_EN::MED_TRIA3, gl1);
+  aFieldOnGroup1->setGaussLocalization(MED_EN::MEDMEM_TRIA3, gl1);
 
-  // now we have a gauss localization for MED_TRIA3 type
-  CPPUNIT_ASSERT_EQUAL(5, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_TRIA3));
-  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_QUAD4));
-  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_TRIA6), MEDEXCEPTION);
+  // now we have a gauss localization for MEDMEM_TRIA3 type
+  CPPUNIT_ASSERT_EQUAL(5, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MEDMEM_TRIA3));
+  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MEDMEM_QUAD4));
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MEDMEM_TRIA6), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(), MEDEXCEPTION);
 
-  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalization(MED_EN::MED_QUAD4), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MED_QUAD4), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalization(MED_EN::MEDMEM_QUAD4), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MEDMEM_QUAD4), MEDEXCEPTION);
 
-  GAUSS_LOCALIZATION<> gl1Back = aFieldOnGroup1->getGaussLocalization(MED_EN::MED_TRIA3);
-  const GAUSS_LOCALIZATION<> * gl1BackPtr = aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MED_TRIA3);
+  GAUSS_LOCALIZATION<> gl1Back = aFieldOnGroup1->getGaussLocalization(MED_EN::MEDMEM_TRIA3);
+  const GAUSS_LOCALIZATION<> * gl1BackPtr = aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MEDMEM_TRIA3);
 
   CPPUNIT_ASSERT(gl1 == gl1Back);
   CPPUNIT_ASSERT(gl1 == *gl1BackPtr);
@@ -1159,7 +1003,7 @@ void MEDMEMTest::testField()
   SUPPORT * aSubSupport1 = new SUPPORT();
   aSubSupport1->setMesh( aMesh );
   aSubSupport1->setName( "Sub-Support 1 of Group1" );
-  aSubSupport1->setEntity( MED_EN::MED_FACE);
+  aSubSupport1->setEntity( MED_EN::MED_FACE );
 
   int nbTypes1 = 1;
   int nbElemsInEachType1[1];
@@ -1217,8 +1061,8 @@ void MEDMEMTest::testField()
 
   // check normL2() on nodal field (issue 0020120)
   {
-    // read nodal field from pointe_import22.med
-    string filename  = getResourceFile("pointe_import22.med");
+    // read nodal field from pointe.med
+    string filename  = getResourceFile("pointe.med");
     string fieldname = "fieldnodedouble";
     string meshname  = "maa1";
     FIELD<double> *nodalField=new FIELD<double>( MED_DRIVER, filename, fieldname);
@@ -1243,8 +1087,7 @@ void MEDMEMTest::testField()
                                 /*TotalNumberOfElements=*/ *NumberOfElements,
                                 GeometricType,
                                 NumberOfElements,
-                                /*NumberValue=*/ mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,
-                                                                       MED_CELL,MED_ALL_ELEMENTS ));
+                                /*NumberValue=*/ mesh->getConnectivity(MED_NODAL,MED_CELL,MEDMEM_ALL_ELEMENTS ));
     FIELD<double, FullInterlace> * oneCellNodesField = nodalField->extract( oneCellNodesSup );
     oneCellNodesSup->removeReference();
     // compute normL2 by avarage nodal value on the cell
@@ -1252,7 +1095,7 @@ void MEDMEMTest::testField()
     const SUPPORT *allCellsSupport=mesh->getSupportOnAll( MED_CELL );
     FIELD<double>* volumeField = mesh->getVolume(allCellsSupport);
     // mdump output:
-    // - Mailles de type MED_TETRA4 : 
+    // - Mailles de type MEDMEM_TETRA4 : 
     //  [     1 ] :          1          2          3          6
     // - Valeurs :
     // | 1.000000 | 1.000000 | 1.000000 | 2.000000 | 2.000000 | 2.000000 | ...
@@ -1288,7 +1131,7 @@ void MEDMEMTest::testField()
     vector< vector<double> > xyz_array( dim, vector<double>( coord, coord + 3 ));
     vector<string> coord_name( dim, "coord_name");
     vector<string> coord_unit( dim, "m");
-    GRID *mesh=new GRID( xyz_array, coord_name, coord_unit );
+    MESH *mesh= const_cast<MESH*>( GRID( xyz_array, coord_name, coord_unit ).convertInMESH());
 
     // make supports on the grid
     const SUPPORT *supOnAll=mesh->getSupportOnAll(MED_CELL);
@@ -1441,11 +1284,7 @@ void MEDMEMTest::testField()
   aSubField1->setColumn(1, col);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(-7., aSubField1->getValueIJ(anElems1[0], 1), 0.000001);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(-3., aSubField1->getValueIJ(anElems1[0], 2), 0.000001);
-  //#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) in MEDMEM_Array::setColumn()
-  // WAIT FOR DECISION
   CPPUNIT_ASSERT_DOUBLES_EQUAL(-9., aSubField1->getValueIJ(anElems1[1], 1), 0.000001);
-  //#endif
   CPPUNIT_ASSERT_DOUBLES_EQUAL( 1., aSubField1->getValueIJ(anElems1[1], 2), 0.000001);
   // out of range
   CPPUNIT_ASSERT_THROW(aSubField1->setColumn(3, col), MEDEXCEPTION);
@@ -1464,17 +1303,10 @@ void MEDMEMTest::testField()
       new MEDMEM_ArrayInterface<double,FullInterlace,Gauss>::Array
       (/*dim*/2, /*nbelem*/2, /*nbtypegeo*/1, /*nbelgeoc*/nbelgeoc, /*nbgaussgeo*/nbgaussgeo);
 
-    //#ifdef ENABLE_FAULTS
     aNewArrayGauss->setIJ(1, 1, -4.);
     aNewArrayGauss->setIJ(1, 2, -2.);
     aNewArrayGauss->setIJ(2, 1, -5.);
     aNewArrayGauss->setIJ(2, 2, -1.);
-    //#endif
-    //#ifdef ENABLE_FORCED_FAILURES
-    // ? (BUG) in FullInterlaceGaussPolicy::getIndex(int i,int j)
-    // FullInterlaceGaussPolicy::getIndex(2,2) returns 4!!!
-    //CPPUNIT_FAIL("? Bug in FullInterlaceGaussPolicy::getIndex(int i,int j) ?");
-    //#endif
 
     aNewArrayGauss->setIJK(1, 1, 1, -4.);
     aNewArrayGauss->setIJK(1, 2, 1, -2.);
@@ -1485,19 +1317,10 @@ void MEDMEMTest::testField()
     // no need to delete aNewArrayGauss, because it will be deleted
     // in destructor or in deallocValue() method of aSubField1
 
-    //#ifdef ENABLE_FAULTS
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-4., aSubField1->getValueIJ(anElems1[0], 1), 0.000001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-2., aSubField1->getValueIJ(anElems1[0], 2), 0.000001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-5., aSubField1->getValueIJ(anElems1[1], 1), 0.000001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-1., aSubField1->getValueIJ(anElems1[1], 2), 0.000001);
-    //#endif
-    //#ifdef ENABLE_FORCED_FAILURES
-    // ? (BUG) in FullInterlaceGaussPolicy::getIndex(int i,int j)
-    // Must be   : return _G[i-1]-1 + (j-1);
-    // Instead of: return _G[i-1]-1 + (j-1)*_dim;
-    // TODO: THINK YOUR-SELF
-    //CPPUNIT_FAIL("? Bug in FullInterlaceGaussPolicy::getIndex(int i,int j) ?");
-    //#endif
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-4., aSubField1->getValueIJK(anElems1[0], 1, 1), 0.000001);
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-2., aSubField1->getValueIJK(anElems1[0], 2, 1), 0.000001);
@@ -2064,9 +1887,6 @@ void MEDMEMTest::testFieldConvert()
   aField_FIGG->removeReference();
   aField_NIGG->removeReference();
   aField_FIGG_conv->removeReference();
-
-  //#ifdef ENABLE_FAULTS
-  // (BUG) in FieldConvert(), concerning FIELD_::operator=
   {
     // create an empty integer field 2x10
     FIELD<int, FullInterlace> * aField = new FIELD<int, FullInterlace>();
@@ -2092,11 +1912,6 @@ void MEDMEMTest::testFieldConvert()
     CPPUNIT_ASSERT(aField_conv);
     aField_conv->removeReference();
   }
-  //#endif
-  //#ifdef ENABLE_FORCED_FAILURES
-  // STD::vector
-  //CPPUNIT_FAIL("FieldConvert() fails if _componentsUnits is not set, because it calls FIELD_::operator=");
-  //#endif
 }
 
 //================================================================================
@@ -2125,9 +1940,11 @@ void MEDMEMTest::testReadFieldOnNodesAndCells()
 
   const SUPPORT *supportOnCells=mesh->getSupportOnAll( MED_CELL );
   const SUPPORT *supportOnNodes=mesh->getSupportOnAll( MED_NODE );
+  supportOnCells->addReference();
+  supportOnNodes->addReference();
   mesh->removeReference();
-  int numberOfCells = supportOnCells->getNumberOfElements(MED_ALL_ELEMENTS);
-  int numberOfNodes = supportOnNodes->getNumberOfElements(MED_ALL_ELEMENTS);
+  int numberOfCells = supportOnCells->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  int numberOfNodes = supportOnNodes->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
 
   PointerOf<double> cellValues( numberOfCells ), nodeValues( numberOfNodes );
   for ( int i = 0; i < numberOfCells; ++i ) cellValues[i] = i;
@@ -2166,6 +1983,9 @@ void MEDMEMTest::testReadFieldOnNodesAndCells()
   CPPUNIT_ASSERT_EQUAL( MED_NODE, nodeField->getSupport()->getEntity());
   CPPUNIT_ASSERT_DOUBLES_EQUAL( -(numberOfNodes-1), nodeField->getValueIJ( numberOfNodes, 1 ),1e-20);
   nodeField->removeReference();
+
+  supportOnCells->removeReference();
+  supportOnNodes->removeReference();
 }
 
 
@@ -2262,20 +2082,20 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
 
   MED_EN::medGeometryElement cellTypes[ numberOfCellTypes ] =
     {
-      MED_EN::MED_SEG2,
-      MED_EN::MED_SEG3,
-      MED_EN::MED_TRIA3,
-      MED_EN::MED_TRIA6,
-      MED_EN::MED_QUAD4,
-      MED_EN::MED_QUAD8,
-      MED_EN::MED_TETRA4,
-      MED_EN::MED_TETRA10,
-      MED_EN::MED_PYRA5,
-      MED_EN::MED_PYRA13,
-      MED_EN::MED_PENTA6,
-      MED_EN::MED_PENTA15,
-      MED_EN::MED_HEXA8,
-      MED_EN::MED_HEXA20
+      MED_EN::MEDMEM_SEG2,
+      MED_EN::MEDMEM_SEG3,
+      MED_EN::MEDMEM_TRIA3,
+      MED_EN::MEDMEM_TRIA6,
+      MED_EN::MEDMEM_QUAD4,
+      MED_EN::MEDMEM_QUAD8,
+      MED_EN::MEDMEM_TETRA4,
+      MED_EN::MEDMEM_TETRA10,
+      MED_EN::MEDMEM_PYRA5,
+      MED_EN::MEDMEM_PYRA13,
+      MED_EN::MEDMEM_PENTA6,
+      MED_EN::MEDMEM_PENTA15,
+      MED_EN::MEDMEM_HEXA8,
+      MED_EN::MEDMEM_HEXA20
     };
 
   const int numberOfCells[numberOfCellTypes] =
@@ -2374,9 +2194,6 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
   MEDMEM::MESHING* mesh = new MEDMEM::MESHING;
   mesh->setCoordinates(spaceDimension, numberOfNodes, coordinates,
                        "CARTESIAN", MED_EN::MED_FULL_INTERLACE);
-
-  mesh->setCoordinates(spaceDimension, numberOfNodes, coordinates,
-                       "CARTESIAN", MED_EN::MED_FULL_INTERLACE);
   mesh->setCoordinatesNames(names);
   mesh->setCoordinatesUnits(units);
 
@@ -2385,20 +2202,20 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
   mesh->setTypes(cellTypes, MED_EN::MED_CELL);
   mesh->setNumberOfElements(numberOfCells, MED_EN::MED_CELL);
 
-  mesh->setConnectivity(seg2C , MED_EN::MED_CELL, MED_EN::MED_SEG2);
-  mesh->setConnectivity(seg3C , MED_EN::MED_CELL, MED_EN::MED_SEG3);
-  mesh->setConnectivity(tria3C , MED_EN::MED_CELL, MED_EN::MED_TRIA3);
-  mesh->setConnectivity(tria6C , MED_EN::MED_CELL, MED_EN::MED_TRIA6);
-  mesh->setConnectivity(quad4C , MED_EN::MED_CELL, MED_EN::MED_QUAD4);
-  mesh->setConnectivity(quad8C , MED_EN::MED_CELL, MED_EN::MED_QUAD8);
-  mesh->setConnectivity(tetra4C , MED_EN::MED_CELL, MED_EN::MED_TETRA4);
-  mesh->setConnectivity(tetra10C , MED_EN::MED_CELL, MED_EN::MED_TETRA10);
-  mesh->setConnectivity(pyra5C , MED_EN::MED_CELL, MED_EN::MED_PYRA5);
-  mesh->setConnectivity(pyra13C , MED_EN::MED_CELL, MED_EN::MED_PYRA13);
-  mesh->setConnectivity(penta6C , MED_EN::MED_CELL, MED_EN::MED_PENTA6);
-  mesh->setConnectivity(penta15C , MED_EN::MED_CELL, MED_EN::MED_PENTA15);
-  mesh->setConnectivity(hexa8C , MED_EN::MED_CELL, MED_EN::MED_HEXA8);
-  mesh->setConnectivity(hexa20C , MED_EN::MED_CELL, MED_EN::MED_HEXA20);
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_SEG2, seg2C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_SEG3, seg3C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_TRIA3, tria3C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_TRIA6, tria6C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_QUAD4, quad4C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_QUAD8, quad8C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_TETRA4, tetra4C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_TETRA10, tetra10C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_PYRA5, pyra5C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_PYRA13, pyra13C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_PENTA6, penta6C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_PENTA15, penta15C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_HEXA8, hexa8C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_HEXA20, hexa20C );
 
 
   //Support definition 
@@ -2437,7 +2254,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* aseg2L = new GAUSS_LOCALIZATION<>("Seg2 Gauss localization",
-                                                          MED_EN::MED_SEG2,
+                                                          MED_EN::MEDMEM_SEG2,
                                                           1,
                                                           seg2CooRef,
                                                           seg2CooGauss,
@@ -2455,7 +2272,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* aseg3L = new GAUSS_LOCALIZATION<>("Seg3 Gauss localization",
-                                                          MED_EN::MED_SEG3,
+                                                          MED_EN::MEDMEM_SEG3,
                                                           1,
                                                           seg3CooRef,
                                                           seg3CooGauss,
@@ -2473,7 +2290,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* atria3L = new GAUSS_LOCALIZATION<>("Tria3 Gauss localization",
-                                                           MED_EN::MED_TRIA3,
+                                                           MED_EN::MEDMEM_TRIA3,
                                                            2,
                                                            tria3CooRef,
                                                            tria3CooGauss,
@@ -2492,7 +2309,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* atria6L = new GAUSS_LOCALIZATION<>("Tria6 Gauss localization",
-                                                           MED_EN::MED_TRIA6,
+                                                           MED_EN::MEDMEM_TRIA6,
                                                            3,
                                                            tria6CooRef,
                                                            tria6CooGauss,
@@ -2510,7 +2327,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* aquad4L = new GAUSS_LOCALIZATION<>("Quad8 Gauss localization",
-                                                           MED_EN::MED_QUAD4,
+                                                           MED_EN::MEDMEM_QUAD4,
                                                            4,
                                                            quad4CooRef,
                                                            quad4CooGauss,
@@ -2535,7 +2352,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* aquad8L = new GAUSS_LOCALIZATION<>("Quad8 Gauss localization",
-                                                           MED_EN::MED_QUAD8,
+                                                           MED_EN::MEDMEM_QUAD8,
                                                            4,
                                                            quad8CooRef,
                                                            quad8CooGauss,
@@ -2557,7 +2374,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* atetra4L = new GAUSS_LOCALIZATION<>("Tetra4 Gauss localization",
-                                                            MED_EN::MED_TETRA4,
+                                                            MED_EN::MEDMEM_TETRA4,
                                                             1,
                                                             tetra4CooRef,
                                                             tetra4CooGauss,
@@ -2585,7 +2402,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* atetra10L = new GAUSS_LOCALIZATION<>("Tetra10 Gauss localization",
-                                                             MED_EN::MED_TETRA10,
+                                                             MED_EN::MEDMEM_TETRA10,
                                                              1,
                                                              tetra10CooRef,
                                                              tetra10CooGauss,
@@ -2607,7 +2424,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* apyra5L = new GAUSS_LOCALIZATION<>("Pyra5 Gauss localization",
-                                                           MED_EN::MED_PYRA5,
+                                                           MED_EN::MEDMEM_PYRA5,
                                                            1,
                                                            pyra5CooRef,
                                                            pyra5CooGauss,
@@ -2638,7 +2455,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* apyra13L = new GAUSS_LOCALIZATION<>("Pyra13 Gauss localization",
-                                                            MED_EN::MED_PYRA13,
+                                                            MED_EN::MEDMEM_PYRA13,
                                                             1,
                                                             pyra13CooRef,
                                                             pyra13CooGauss,
@@ -2661,7 +2478,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* apenta6L = new GAUSS_LOCALIZATION<>("Penta6 Gauss localization",
-                                                            MED_EN::MED_PENTA6,
+                                                            MED_EN::MEDMEM_PENTA6,
                                                             1,
                                                             penta6CooRef,
                                                             penta6CooGauss,
@@ -2694,7 +2511,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* apenta15L = new GAUSS_LOCALIZATION<>("Penta15 Gauss localization",
-                                                             MED_EN::MED_PENTA15,
+                                                             MED_EN::MEDMEM_PENTA15,
                                                              1,
                                                              penta15CooRef,
                                                              penta15CooGauss,
@@ -2720,7 +2537,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* ahexa8L = new GAUSS_LOCALIZATION<>("Hexa8 Gauss localization",
-                                                           MED_EN::MED_HEXA8,
+                                                           MED_EN::MEDMEM_HEXA8,
                                                            1,
                                                            hexa8CooRef,
                                                            hexa8CooGauss,
@@ -2758,7 +2575,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* ahexa20L = new GAUSS_LOCALIZATION<>("Hexa20 Gauss localization",
-                                                            MED_EN::MED_HEXA20,
+                                                            MED_EN::MEDMEM_HEXA20,
                                                             1,
                                                             hexa20CooRef,
                                                             hexa20CooGauss,
@@ -2766,20 +2583,20 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
 
 
 
-  aField->setGaussLocalization(MED_EN::MED_SEG2, aseg2L);
-  aField->setGaussLocalization(MED_EN::MED_SEG3, aseg3L);
-  aField->setGaussLocalization(MED_EN::MED_TRIA3, atria3L);
-  aField->setGaussLocalization(MED_EN::MED_TRIA6, atria6L);
-  aField->setGaussLocalization(MED_EN::MED_QUAD4, aquad4L);
-  aField->setGaussLocalization(MED_EN::MED_QUAD8, aquad8L);
-  aField->setGaussLocalization(MED_EN::MED_TETRA4, atetra4L);
-  aField->setGaussLocalization(MED_EN::MED_TETRA10, atetra10L);
-  aField->setGaussLocalization(MED_EN::MED_PYRA5, apyra5L);
-  aField->setGaussLocalization(MED_EN::MED_PYRA13, apyra13L);
-  aField->setGaussLocalization(MED_EN::MED_PENTA6, apenta6L);
-  aField->setGaussLocalization(MED_EN::MED_PENTA15, apenta15L);
-  aField->setGaussLocalization(MED_EN::MED_HEXA8, ahexa8L);
-  aField->setGaussLocalization(MED_EN::MED_HEXA20, ahexa20L);
+  aField->setGaussLocalization(MED_EN::MEDMEM_SEG2, aseg2L);
+  aField->setGaussLocalization(MED_EN::MEDMEM_SEG3, aseg3L);
+  aField->setGaussLocalization(MED_EN::MEDMEM_TRIA3, atria3L);
+  aField->setGaussLocalization(MED_EN::MEDMEM_TRIA6, atria6L);
+  aField->setGaussLocalization(MED_EN::MEDMEM_QUAD4, aquad4L);
+  aField->setGaussLocalization(MED_EN::MEDMEM_QUAD8, aquad8L);
+  aField->setGaussLocalization(MED_EN::MEDMEM_TETRA4, atetra4L);
+  aField->setGaussLocalization(MED_EN::MEDMEM_TETRA10, atetra10L);
+  aField->setGaussLocalization(MED_EN::MEDMEM_PYRA5, apyra5L);
+  aField->setGaussLocalization(MED_EN::MEDMEM_PYRA13, apyra13L);
+  aField->setGaussLocalization(MED_EN::MEDMEM_PENTA6, apenta6L);
+  aField->setGaussLocalization(MED_EN::MEDMEM_PENTA15, apenta15L);
+  aField->setGaussLocalization(MED_EN::MEDMEM_HEXA8, ahexa8L);
+  aField->setGaussLocalization(MED_EN::MEDMEM_HEXA20, ahexa20L);
 
   FIELD<double>* aGaussCoords = aField->getGaussPointsCoordinates();
 
@@ -2993,4 +2810,8 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
       CPPUNIT_ASSERT_DOUBLES_EQUAL(aGaussCoords->getValueIJK(ElemId,j,1),
                                    hexa20Coord[j-1], 0.0001);
     }
+
+  aGaussCoords->removeReference();
+  aField->removeReference();
+  mesh->removeReference();
 }

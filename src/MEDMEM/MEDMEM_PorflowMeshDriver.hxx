@@ -49,6 +49,7 @@
 
 
 namespace MEDMEM {
+class GMESH;
 class MESH;
 class FAMILY;
 class GROUP;
@@ -95,9 +96,9 @@ public :
   /*!
     Constructor.
   */
-  PORFLOW_MESH_DRIVER(const string & fileName,  
-                  MESH * ptrMesh, 
-                  MED_EN::med_mode_acces accessMode) ;
+  PORFLOW_MESH_DRIVER(const string &         fileName,  
+                      GMESH *                ptrMesh, 
+                      MED_EN::med_mode_acces accessMode) ;
   /*!
     Copy constructor.
   */
@@ -191,7 +192,7 @@ public :
   /*!
     Constructor.
   */
-  PORFLOW_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) ;
+  PORFLOW_MESH_WRONLY_DRIVER(const string & fileName, GMESH * ptrMesh) ;
   /*!
     Copy constructor.
   */

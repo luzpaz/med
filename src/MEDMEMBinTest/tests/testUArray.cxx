@@ -27,7 +27,7 @@
 using namespace std;
 using namespace MEDMEM;
 
-void imprime(string titre,const int * myValues,const int * myOthers, int lignes, int colonnes)
+static void imprime(string titre,const int * myValues,const int * myOthers, int lignes, int colonnes)
 {
   cout << "             " <<titre << endl<< endl;
   cout << "Full Interlace : " << endl;

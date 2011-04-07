@@ -64,7 +64,8 @@ MEDEXCEPTION::MEDEXCEPTION( void ): exception() , _text(0)
   INTERRUPTION_MED(1) ;
 }
 
-
+namespace
+{
 /*!
   \internal
   Function used to elaborate the text of the MEDEXCEPTION
@@ -101,6 +102,7 @@ char *makeText( const char *text, const char *fileName, const unsigned int lineN
    }
   ASSERT_MED(newText) ;
   return newText ;
+}
 }
 
 /*!
@@ -170,13 +172,13 @@ const char* MEDEXCEPTION::what( void ) const throw ()
 // -------------------- class MED_DRIVER_NOT_FOUND_EXCEPTION
 
 
-MED_DRIVER_NOT_FOUND_EXCEPTION::MED_DRIVER_NOT_FOUND_EXCEPTION(const MED_DRIVER_NOT_FOUND_EXCEPTION &ex ):MEDEXCEPTION ( ex ) {};
+MED_DRIVER_NOT_FOUND_EXCEPTION::MED_DRIVER_NOT_FOUND_EXCEPTION(const MED_DRIVER_NOT_FOUND_EXCEPTION &ex ):MEDEXCEPTION ( ex ) {}
 
 
 MED_DRIVER_NOT_FOUND_EXCEPTION::MED_DRIVER_NOT_FOUND_EXCEPTION
 (
  const char *text, const char *fileName/*=0*/, 
  const unsigned int lineNumber/*=0*/ 
- ) : MEDEXCEPTION(text, fileName, lineNumber) {};
+ ) : MEDEXCEPTION(text, fileName, lineNumber) {}
 
-MED_DRIVER_NOT_FOUND_EXCEPTION::~MED_DRIVER_NOT_FOUND_EXCEPTION() throw (){};
+MED_DRIVER_NOT_FOUND_EXCEPTION::~MED_DRIVER_NOT_FOUND_EXCEPTION() throw (){}

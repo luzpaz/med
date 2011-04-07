@@ -47,7 +47,7 @@
 
 */
 namespace MEDMEM {
-class MESH;
+class GMESH;
 class FAMILY;
 class GROUP;
 class CONNECTIVITY;
@@ -57,9 +57,9 @@ class MEDMEM_EXPORT VTK_MESH_DRIVER : public GENDRIVER
 {
 protected:
 
-  MESH *     _ptrMesh;
-  string     _meshName;
-  mutable ofstream *         _vtkFile ;     // The _vtkFile used to write Meshes to _filename
+  const GMESH * _ptrMesh;
+  std::string   _meshName;
+  mutable std::ofstream *    _vtkFile ;     // The _vtkFile used to write Meshes to _filename
   mutable _VTK_BinaryWriter* _binaryFile;
 
 public :
@@ -71,7 +71,7 @@ public :
   /*!
     Constructor.
   */
-  VTK_MESH_DRIVER(const string & fileName,  MESH * ptrMesh) ;
+  VTK_MESH_DRIVER(const std::string & fileName, const GMESH * ptrMesh) ;
   /*!
     Copy constructor.
   */

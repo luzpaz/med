@@ -43,11 +43,9 @@
 #include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Family.hxx"
-#include "MEDMEM_Med.hxx"
 #include "MEDMEM_Unit.hxx"
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_FieldConvert.hxx"
-#include "MEDMEM_MedMedDriver.hxx"
 #include "MEDMEM_Grid.hxx"
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_DriverFactory.hxx"
@@ -56,14 +54,22 @@
 #include "MEDMEM_EnsightMeshDriver.hxx"
 #include "MEDMEM_EnsightFieldDriver.hxx"
 #include "MEDMEM_ArrayInterface.hxx"
-#include "MEDMEM_SWIG_Templates.hxx"
+#include "MEDMEM_MedFileBrowser.hxx"
 #include "PointLocator.hxx"
+
+#include "MEDMEM_SWIG_Templates.hxx"
+#ifdef WITH_NUMPY
+  template< typename T >
+    PyObject * TYPEMAP_OUTPUT_PY_ARRAY(const T* value, int size)
+  {
+    npy_intp dim = (npy_intp) size;
+    return PyArray_SimpleNewFromData(1,&dim, Binding<T>::numpy_type(),(T*)value);
+  }
+#endif
 
   using namespace MEDMEM;
   using namespace MED_EN;
-	using namespace INTERP_KERNEL;
-  /*  typedef FIELD <double, FullInterlace> FIELDDOUBLEFULLINTERLACE;*/
-  /*  typedef FIELD <int, FullInterlace> FIELDINTFULLINTERLACE;*/
+  using namespace INTERP_KERNEL;
   typedef FIELD <double, FullInterlace> FIELDDOUBLE;
   typedef FIELD <int   , FullInterlace> FIELDINT;
   typedef FIELD <double, NoInterlace> FIELDDOUBLENOINTERLACE;
@@ -82,8 +88,6 @@
   <SWIG Object at _d0709808_p_FIELDDOUBLE> which has no attributes
 */
 
-/*typedef FIELD <double, FullInterlace> FIELDDOUBLEFULLINTERLACE;*/
-/*typedef FIELD <int, FullInterlace> FIELDINTFULLINTERLACE;*/
 typedef FIELD <double, FullInterlace> FIELDDOUBLE;
 typedef FIELD <int   , FullInterlace> FIELDINT;
 typedef FIELD <double, NoInterlace> FIELDDOUBLENOINTERLACE;
@@ -212,23 +216,6 @@ typedef FIELD <int   , NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
 %enddef
 
 /*
-  MACRO to transforme a C++ deque<string> object into a proper Python List
-*/
-
-%define TYPEMAP_OUTPUT_DEQUE_STRING(myDeque)
-{
-   PyObject *py_list = PyList_New(myDeque.size());
-   deque<string>::iterator iter4;
-   int i4=0;
-   for(iter4=myDeque.begin();iter4!=myDeque.end();iter4++,i4++)
-     {
-         PyList_SetItem(py_list, i4, PyString_FromString((*iter4).c_str()));
-     }
-   return py_list;
-}
-%enddef
-
-/*
   MACRO converting C array <arrayvar> of length <size> into a PyList
   by calling type_converter() for each array element.
   It reports error in <method> in failure case
@@ -237,7 +224,7 @@ typedef FIELD <int   , NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
 %define TYPEMAP_OUTPUT_ARRAY(arrayvar, size, type_converter, method)
 {
   PyObject *py_list = PyList_New(size);
-  for (int i=0; i < size; i++)
+  for (int i=0; i < int(size); i++)
     {
       int err = PyList_SetItem(py_list, i, type_converter( arrayvar[ i ]));
       if(err)
@@ -318,6 +305,16 @@ typedef FIELD <int   , NoInterlaceByType> FIELDINTNOINTERLACEBYTYPE;
 #if defined(SWIGPYTHON)
 %typemap(in) vector< FIELDDOUBLE* >, const vector< FIELDDOUBLE* >
 { TYPEMAP_INPUT_VECTOR_BY_VALUE( FIELDDOUBLE * ) }
+#endif
+
+#if defined(SWIGPYTHON)
+%typemap(in) vector< FIELD_* >, const vector< FIELD_* >
+{ TYPEMAP_INPUT_VECTOR_BY_VALUE( FIELD_ * ) }
+#endif
+
+#if defined(SWIGPYTHON)
+%typemap(in) vector< const FIELD_* >, const vector< const FIELD_* >
+{ TYPEMAP_INPUT_VECTOR_BY_VALUE( const FIELD_ * ) }
 #endif
 
 #if defined(SWIGPYTHON)
@@ -402,12 +399,12 @@ typedef enum {ASCENDING=7,DESCENDING=77} med_sort_direc;
 typedef enum {MED_CELL, MED_FACE, MED_EDGE, MED_NODE,
 	      MED_ALL_ENTITIES} medEntityMesh;
 
-typedef enum {MED_NONE=0, MED_POINT1=1, MED_SEG2=102, MED_SEG3=103,
-	      MED_TRIA3=203, MED_QUAD4=204, MED_TRIA6=206, MED_QUAD8=208,
-	      MED_TETRA4=304, MED_PYRA5=305, MED_PENTA6=306,
-	      MED_HEXA8=308, MED_TETRA10=310, MED_PYRA13=313,
-	      MED_PENTA15=315, MED_HEXA20=320, MED_POLYGON = 400, MED_POLYHEDRA = 500,
-	      MED_ALL_ELEMENTS=999} medGeometryElement;
+typedef enum {MEDMEM_NONE=0, MEDMEM_POINT1=1, MEDMEM_SEG2=102, MEDMEM_SEG3=103,
+	      MEDMEM_TRIA3=203, MEDMEM_QUAD4=204, MEDMEM_TRIA6=206, MEDMEM_QUAD8=208,
+	      MEDMEM_TETRA4=304, MEDMEM_PYRA5=305, MEDMEM_PENTA6=306,
+	      MEDMEM_HEXA8=308, MEDMEM_TETRA10=310, MEDMEM_PYRA13=313,
+	      MEDMEM_PENTA15=315, MEDMEM_HEXA20=320, MEDMEM_POLYGON = 400, MEDMEM_POLYHEDRA = 500,
+	      MEDMEM_ALL_ELEMENTS=999} medGeometryElement;
 
 typedef enum {MED_NODAL, MED_DESCENDING} medConnectivity ;
 
@@ -421,6 +418,7 @@ typedef struct { int dt; int it; } DT_IT_;
 typedef enum {V21 = 26, V22 = 75} medFileVersion;
 
 %feature("unref") SUPPORT "$this->removeReference();"
+%feature("unref") GMESH "$this->removeReference();"
 %feature("unref") MESH "$this->removeReference();"
 %feature("unref") FIELDDOUBLE "$this->removeReference();"
 %feature("unref") FIELDINT "$this->removeReference();"
@@ -428,22 +426,6 @@ typedef enum {V21 = 26, V22 = 75} medFileVersion;
 %feature("unref") FIELDINTNOINTERLACE "$this->removeReference();"
 %feature("unref") FIELDDOUBLENOINTERLACEBYTYPE "$this->removeReference();"
 %feature("unref") FIELDINTNOINTERLACEBYTYPE "$this->removeReference();"
-
-medFileVersion getMedFileVersionForWriting();
-
-void setMedFileVersionForWriting(medFileVersion version);
-
-%{
-  medFileVersion getMedFileVersionForWriting()
-    {
-      return (medFileVersion) DRIVERFACTORY::getMedFileVersionForWriting();
-    }
-
-  void setMedFileVersionForWriting(medFileVersion version)
-    {
-      DRIVERFACTORY::setMedFileVersionForWriting((medFileVersion) version);
-    }
-%}
 
 bool getVtkBinaryFormatForWriting();
 
@@ -472,7 +454,7 @@ void setVtkBinaryFormatForWriting(bool isBinary);
     }
 }
 
-%typecheck(SWIG_TYPECHECK_POINTER) vector< SUPPORT * >, const vector< SUPPORT * >
+%typecheck(SWIG_TYPECHECK_POINTER) vector< SUPPORT * >, const vector< SUPPORT * >, vector< const FIELD_* >
 {
   $1 = ($input != 0);
 }
@@ -555,8 +537,6 @@ class SUPPORT
   void setGeometricType(medGeometryElement *GeometricType);
 
   void setNumberOfElements(int *NumberOfElements);
-
-  //void setTotalNumberOfElements(int TotalNumberOfElements);
 
   void getBoundaryElements();
 
@@ -653,11 +633,11 @@ class FAMILY : public SUPPORT
 
   void setAttributesValues(int * AttributeValue);
 
-  void setAttributesDescriptions(string * AttributeDescription);
+  void setAttributesDescriptions(std::string * AttributeDescription);
 
   void setNumberOfGroups(int NumberOfGroups);
 
-  void setGroupsNames(string * GroupName);
+  void setGroupsNames(std::string * GroupName);
 
   int getIdentifier() const;
 
@@ -703,6 +683,26 @@ class FAMILY : public SUPPORT
   }
 };
 
+class GENDRIVER
+{
+  GENDRIVER();
+public:
+  void open();
+  void write();
+  void read ();
+  void close();
+
+  std::string getFileName () const;
+  void setFileName ( const std::string & fileName);
+
+  void setMeshName    ( const std::string & meshName);
+  std::string getMeshName();
+
+  void setFieldName   ( const std::string & fieldName);
+  std::string getFieldName() const;
+
+};
+
 class FIELD_
 {
 public:
@@ -711,6 +711,17 @@ public:
   ~FIELD_();
 
   void rmDriver(int index=0);
+
+  void read (driverTypes driverType, const std::string & fileName);
+  void read (const GENDRIVER &);
+  void read(int index=0);
+
+  void write(const GENDRIVER& driver, med_mode_acces medMode=RDWR);
+  void write(driverTypes driverType, const char* filename,
+             med_mode_acces medMode=RDWR);
+  void write(int index=0);
+
+  void writeAppend(int index=0, const std::string& driverName="");
 
   void setIterationNumber (int IterationNumber);
   int getIterationNumber() const;
@@ -765,6 +776,34 @@ public:
       {
 	return (SUPPORT *)self->getSupport();
       }
+  PyObject* castToTypedField()
+  {
+    if ( self->getValueType() == MED_REEL64 )
+      switch( self->getInterlacingType() ) {
+      case MED_FULL_INTERLACE:
+        return SWIG_NewPointerObj((void *)self, $descriptor(FIELDDOUBLE *), 0);
+      case MED_NO_INTERLACE:
+        return SWIG_NewPointerObj((void *)self, $descriptor(FIELDDOUBLENOINTERLACE *), 0);
+      case MED_NO_INTERLACE_BY_TYPE:
+        return SWIG_NewPointerObj((void *)self, $descriptor(FIELDDOUBLENOINTERLACEBYTYPE *), 0);
+      default:
+        PyErr_SetString(PyExc_RuntimeError,"Invalid interlacing type of a field");
+        return NULL;
+      }
+    else
+      switch( self->getInterlacingType() ) {
+      case MED_FULL_INTERLACE:
+        return SWIG_NewPointerObj((void *)self, $descriptor(FIELD<int, FullInterlace> *), 0);
+      case MED_NO_INTERLACE:
+        return SWIG_NewPointerObj((void *)self, $descriptor(FIELD<int, NoInterlace> *), 0);
+      case MED_NO_INTERLACE_BY_TYPE:
+        return SWIG_NewPointerObj((void *)self, $descriptor(FIELD<int, NoInterlaceByType> *), 0);
+      default:
+        PyErr_SetString(PyExc_RuntimeError,"Invalid interlacing type of a field");
+        return NULL;
+      }
+    return NULL;
+  }
   }
 };
 
@@ -788,11 +827,8 @@ public:
 	const std::string& fileName, const std::string& fieldName,
 	const int iterationNumber, const int orderNumber);
 
-  FIELD(driverTypes driverType,	const std::string& fileName,
-	const std::string& fieldName, const int iterationNumber,
-	const int orderNumber);
-
-  void read(int index=0);
+  FIELD(driverTypes driverType,	const char* fileName, const char* fieldName,
+        int iterationNumber, int orderNumber, GMESH* mesh=0);
 
   T1 getValueIJ(int i,int j) const;
 
@@ -842,10 +878,6 @@ public:
 
   double integral(const SUPPORT* subSupport=0);
 
-  void write(int index=0, const std::string& driverName="");
-
-  void writeAppend(int index=0, const std::string& driverName="");
-
   bool getGaussPresence();
 
   GAUSS_LOCALIZATION<INTERLACING_TAG> * getGaussLocalizationPtr(medGeometryElement geomElement);
@@ -878,7 +910,7 @@ public:
         }
         typedef MEDMEM_ArrayInterface<T1,INTERLACING_TAG,Gauss>::Array Array;
         Array* array = new Array(numberOfComponents,
-                                 support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS),
+                                 support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS),
                                  support->getNumberOfTypes(),
                                  &nbelgeoc[0],
                                  nbGaussByType-1);
@@ -1012,8 +1044,11 @@ public:
 
 	const T1 * value = self->getValue();
 
-        TYPEMAP_OUTPUT_ARRAY(value, size, Binding< T1 >::Traducer,
-			     FIELD::getValue);
+#ifdef WITH_NUMPY
+        return TYPEMAP_OUTPUT_PY_ARRAY( value, size );
+#else
+        TYPEMAP_OUTPUT_ARRAY(value, size, Binding< T1 >::Traducer,FIELD::getValue);
+#endif
       }
 
     // returns values for geom type in NoInterlaceByType mode
@@ -1023,12 +1058,14 @@ public:
 
 	const T1 * value = self->getValueByType(type);
 
-        TYPEMAP_OUTPUT_ARRAY(value, size, Binding< T1 >::Traducer,
-			     FIELD::getValueByType());
+#ifdef WITH_NUMPY
+        return TYPEMAP_OUTPUT_PY_ARRAY( value, size );
+#else
+        TYPEMAP_OUTPUT_ARRAY(value, size, Binding< T1 >::Traducer,FIELD::getValueByType());
+#endif
       }
 
     // this method replaces getValueI() in FullInterlace mode
-    /* %newobject getRow(int );*/
     PyObject * getRow(int index)
       {
 	int size = self->getNumberOfComponents() * self->getNbGaussI( index );
@@ -1040,33 +1077,15 @@ public:
       }
 
     // this method replaces getValueI() in NoInterlace mode
-    /*%newobject getColum(int );*/
     PyObject * getColumn(int index)
       {
-	int size = (self->getSupport())->getNumberOfElements(MED_ALL_ELEMENTS);
+	int size = (self->getSupport())->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
 
 	const T1 * value = self->getColumn(index);
 
         TYPEMAP_OUTPUT_ARRAY(value, size, Binding< T1 >::Traducer,
 			     FIELD::getColumn);
       }
-
-    /*
-    %newobject getValueI(int );
-    PyObject * getValueI(int index)
-      {
-	int size = self->getNumberOfComponents();
-
-	medModeSwitch  Mode = self->getInterlacingType();
-
-	if ( Mode == MED_NO_INTERLACE ) size = (self->getSupport())->getNumberOfElements(MED_ALL_ELEMENTS);
-
-	const T1 * value = self->getValueI(index);
-
-        TYPEMAP_OUTPUT_ARRAY(value, size, Binding< T1 >::Traducer,
-			     FIELD::getValueI);
-      }
-    */
 
     void allocValue2(int NumberOfComponents, int LengthValue)
       {
@@ -1082,11 +1101,9 @@ public:
   }
 };
 
-/*%template(FIELDDOUBLEFULLINTERLACE) FIELD<double, FullInterlace>;*/
 %template(FIELDDOUBLE) FIELD<double, FullInterlace>;
 %template(FIELDDOUBLENOINTERLACE) FIELD<double, NoInterlace>;
 %template(FIELDDOUBLENOINTERLACEBYTYPE) FIELD<double, NoInterlaceByType>;
-/*%template(FIELDINTFULLINTERLACE) FIELD<int, FullInterlace>;*/
 %template(FIELDINT) FIELD<int, FullInterlace>;
 %template(FIELDINTNOINTERLACE) FIELD<int, NoInterlace>;
 %template(FIELDINTNOINTERLACEBYTYPE) FIELD<int, NoInterlaceByType>;
@@ -1106,17 +1123,31 @@ public:
   FAMILY * getFamily(int i) const ;
 };
 
-class MESH
+class GMESH
 {
 public :
-  MESH();
-  MESH(MESH &m);
-
-  ~MESH();
+  int addDriver(driverTypes driverType,
+                const char * fileName="Default File Name.med",
+                const char * driverName="Default Mesh Name",
+                med_mode_acces access=RDWR);
 
   void rmDriver(int index=0);
 
   void read(int index=0);
+  void read(const GENDRIVER & genDriver);
+  void read(driverTypes        driverType,
+            const std::string& filename,
+            const std::string& meshname);
+
+  void write(int index=0);
+  void write(const GENDRIVER & driver,
+             med_mode_acces medMode=WRONLY);
+  void write(driverTypes        driverType,
+             const std::string& filename,
+             const std::string& meshname="",
+             med_mode_acces medMode=WRONLY);
+
+  void setName(char * name);
 
   int getSpaceDimension();
 
@@ -1124,23 +1155,13 @@ public :
 
   int getNumberOfNodes();
   
-  void convertToPoly();
-
   bool getIsAGrid();
 
-  const double getCoordinate(int Number, int Axis);
-
   int getNumberOfTypes(medEntityMesh Entity);
-
-  void calculateConnectivity(medModeSwitch Mode,medConnectivity ConnectivityType,medEntityMesh Entity);
 
   int  getNumberOfElements(medEntityMesh Entity,medGeometryElement Type);
 
   int getNumberOfFamilies(medEntityMesh Entity);
-
-  int getElementNumber(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type, int * connectivity);
-
-  CELLMODEL * getCellsTypes(medEntityMesh Entity);
 
   FAMILY* getFamily(medEntityMesh Entity,int i);
 
@@ -1151,32 +1172,20 @@ public :
 
   medGeometryElement getElementType(medEntityMesh Entity,int Number);
 
-  int getElementContainingPoint(const double *coord);
-
-  int getNumberOfTypesWithPoly(medEntityMesh Entity);
-
-  int getNumberOfPolygons(medEntityMesh Entity=MED_ALL_ENTITIES);
-
-  int getNumberOfPolyhedronFaces();
-
-  int getNumberOfPolyhedron();
-
-  int getNumberOfElementsWithPoly(medEntityMesh Entity,
-                                  medGeometryElement Type);
-
-  bool existPolygonsConnectivity(medConnectivity ConnectivityType,
-                                 medEntityMesh Entity);
-
-  bool existPolyhedronConnectivity(medConnectivity ConnectivityType,
-                                   medEntityMesh Entity);
-
-  medGeometryElement getElementTypeWithPoly(medEntityMesh Entity,int Number);
-
-  const SUPPORT * getSupportOnAll(medEntityMesh Entity);
+  SUPPORT * getSupportOnAll(medEntityMesh Entity);
 
   std::string getName() const;
   
+  std::string getCoordinatesSystem();
+
   %extend {
+
+    PyObject* convertInMESH()
+    {
+      const MESH* mesh = self->convertInMESH();
+      return SWIG_NewPointerObj((void *)mesh, $descriptor(MESH *), self->getIsAGrid() );
+    }
+
     %newobject getBoundaryElements(medEntityMesh );
     SUPPORT * getBoundaryElements(medEntityMesh Entity)
       {
@@ -1213,49 +1222,11 @@ public :
 	return (FIELD<int, FullInterlace> *)self->mergeFields<int>(others);
       }
 
-    CELLMODEL getCellType(medEntityMesh Entity,int i)
-      {
-	return self->getCellsTypes(Entity)[i];
-      }
-
-    MESH (driverTypes driverType, char * fileName, char * meshName)
-      {
-	return new MESH(driverType, string(fileName), string(meshName));
-      }
-
-    int addDriver(driverTypes driverType,
-		  const char * fileName="Default File Name.med",
-		  const char * driverName="Default Mesh Name",
-		  med_mode_acces access=RDWR)
-      {
-	return self->addDriver(driverType,string(fileName),
-			       string(driverName),access);
-      }
-
-    void write(int index=0, const char * driverName="")
-      {
-	self->write(index, string(driverName));
-      }
-
-    void setName(char * name)
-      {
-	self->setName(string(name));
-      }
-
-    %newobject getCoordinatesSystem();
-    const char * getCoordinatesSystem()
-      {
-	string tmp_str = self->getCoordinatesSystem();
-	char * tmp = new char[strlen(tmp_str.c_str())+1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
-
     %newobject __str__();
     const char* __str__()
       {
 	ostringstream mess;
-	mess << "Python Printing MESH : " << *self << endl;
+	mess << "Python Printing GMESH : " << *self << endl;
 	return strdup(mess.str().c_str());
       }
 
@@ -1293,125 +1264,12 @@ public :
 			     MESH::getCoordinatesUnits);
       }
 
-    PyObject * getCoordinates(medModeSwitch Mode)
-      {
-	const double * array = self->getCoordinates(Mode);
-	int size = (self->getSpaceDimension())*(self->getNumberOfNodes());
-        TYPEMAP_OUTPUT_ARRAY(array, size, PyFloat_FromDouble,
-			     MESH::getCoordinates);
-      }
-
     PyObject * getTypes(medEntityMesh Entity)
       {
 	const medGeometryElement * types = self->getTypes(Entity);
 	int size = self->getNumberOfTypes(Entity);
         TYPEMAP_OUTPUT_ARRAY(types, size, PyInt_FromLong, MESH::getTypes);
       }
-
-    PyObject * getConnectivity(medModeSwitch Mode,
-			       medConnectivity ConnectivityType,
-			       medEntityMesh Entity,
-			       medGeometryElement Type)
-      {
-	const int * connectivity = self->getConnectivity(Mode,ConnectivityType,
-						   Entity,Type);
-	int size = self->getConnectivityLength(Mode,ConnectivityType,Entity,Type);
-        TYPEMAP_OUTPUT_ARRAY(connectivity, size, PyInt_FromLong,
-			     MESH::getConnectivity );
-      }
-
-    PyObject * getConnectivityIndex(medConnectivity ConnectivityType,
-				    medEntityMesh Entity)
-      {
-	const int * connectivity_index =
-	  self->getConnectivityIndex(ConnectivityType,Entity);
-	int size = (self->getNumberOfElements(Entity,MED_ALL_ELEMENTS))+1;
-        TYPEMAP_OUTPUT_ARRAY(connectivity_index,size,PyInt_FromLong,
-			     MESH::getConnectivityIndex);
-      }
-
-    PyObject * getReverseConnectivity(medConnectivity ConnectivityType,
-				      medEntityMesh Entity=MED_CELL)
-      {
-	const int * reverseconnectivity =
-	  self->getReverseConnectivity(ConnectivityType,Entity);
-	int size = self->getReverseConnectivityLength(ConnectivityType,Entity);
-        TYPEMAP_OUTPUT_ARRAY(reverseconnectivity, size, PyInt_FromLong,
-			     MESH::getReverseConnectivity);
-      }
-
-    PyObject * getReverseConnectivityIndex(medConnectivity ConnectivityType,
-					   medEntityMesh Entity=MED_CELL)
-      {
-	const int * reverseconnectivity_index =
-	  self->getReverseConnectivityIndex(ConnectivityType,Entity);
-	int size=self->getReverseConnectivityIndexLength(ConnectivityType,Entity);
-        TYPEMAP_OUTPUT_ARRAY(reverseconnectivity_index,size, PyInt_FromLong,
-			     MESH::getReverseConnectivityIndex);
-      }
-
-    PyObject * getGlobalNumberingIndex(medEntityMesh Entity)
-      {
-	const int * numberingIndex = self->getGlobalNumberingIndex(Entity);
-	int nbOfTypes = self->getNumberOfTypes(Entity);
-	int size = nbOfTypes+1;
-        TYPEMAP_OUTPUT_ARRAY(numberingIndex, size, PyInt_FromLong,
-			     MESH::getGlobalNumberingIndex);
-      }
-
-    PyObject * getPolygonsConnectivity(medConnectivity ConnectivityType,
-                                       medEntityMesh   Entity)
-      {
-        const int * array = self->getPolygonsConnectivity(ConnectivityType,Entity);
-        int size = self->getPolygonsConnectivityLength(ConnectivityType, Entity);
-        TYPEMAP_OUTPUT_ARRAY(array, size, PyInt_FromLong,
-			     MESH::getPolygonsConnectivity);
-      }
-
-    PyObject * getPolygonsConnectivityIndex(medConnectivity ConnectivityType,
-                                            medEntityMesh   Entity)
-      {
-        const int * array = self->getPolygonsConnectivityIndex(ConnectivityType,Entity);
-        int size = self->getNumberOfPolygons(Entity) + 1;
-        TYPEMAP_OUTPUT_ARRAY(array, size, PyInt_FromLong,
-			     MESH::getPolygonsConnectivity);
-      }
-
-    PyObject * getPolyhedronConnectivity(medConnectivity ConnectivityType)
-      {
-        const int * array = self->getPolyhedronConnectivity(ConnectivityType);
-        int size = self->getPolyhedronConnectivityLength(ConnectivityType);
-        TYPEMAP_OUTPUT_ARRAY(array, size, PyInt_FromLong,
-			     MESH::getPolygonsConnectivity);
-      }
-
-    PyObject * getPolyhedronIndex(medConnectivity ConnectivityType)
-      {
-        const int * array = self->getPolyhedronIndex(ConnectivityType);
-        int size = self->getNumberOfPolyhedron() + 1;
-        TYPEMAP_OUTPUT_ARRAY(array, size, PyInt_FromLong,
-			     MESH::getPolyhedronIndex);
-      }
-
-    PyObject * getPolyhedronFacesIndex()
-      {
-        const int * array = self->getPolyhedronFacesIndex();
-        int size = self->getNumberOfPolyhedronFaces() + 1;
-        TYPEMAP_OUTPUT_ARRAY(array, size, PyInt_FromLong,
-			     MESH::getPolyhedronFacesIndex);
-      }
-
-    PyObject * getTypesWithPoly(medEntityMesh Entity)
-      {
-        //medGeometryElement * array = self->getTypesWithPoly(Entity);
-        PointerOf<medGeometryElement> array;
-        array.setShallowAndOwnership( self->getTypesWithPoly(Entity));
-        int size = self->getNumberOfTypesWithPoly(Entity);
-        TYPEMAP_OUTPUT_ARRAY(array, size, PyInt_FromLong,
-			     MESH::getTypesWithPoly);
-        //delete [] array; - it is not reached as return goes before
-      }
-      
 
     %newobject getVolume(const SUPPORT * , bool );
     FIELD<double, FullInterlace> * getVolume(const SUPPORT * Support, bool isAbs = true)
@@ -1443,6 +1301,116 @@ public :
 	return (FIELD<double, FullInterlace> *) self->getBarycenter(Support);
       }
   }
+private:
+  GMESH(); // prohibit SWIG to generate a default constructor
+
+};
+
+class MESH : public GMESH
+{
+public :
+  MESH();
+  MESH(MESH &m);
+  MESH (driverTypes driverType, const char* fileName, const char* meshName);
+
+  ~MESH();
+
+  void convertToPoly();
+
+  const double getCoordinate(int Number, int Axis);
+
+  void calculateConnectivity(medConnectivity ConnectivityType,medEntityMesh Entity);
+
+  int getElementNumber(medConnectivity ConnectivityType, medEntityMesh Entity, medGeometryElement Type, int * connectivity);
+
+  CELLMODEL * getCellsTypes(medEntityMesh Entity);
+
+  int getElementContainingPoint(const double *coord);
+
+  %extend {
+
+    CELLMODEL getCellType(medEntityMesh Entity,int i)
+      {
+	return self->getCellsTypes(Entity)[i];
+      }
+
+    %newobject __str__();
+    const char* __str__()
+      {
+	ostringstream mess;
+	mess << "Python Printing MESH : " << *self << endl;
+	return strdup(mess.str().c_str());
+      }
+
+    PyObject * getCoordinates(medModeSwitch Mode)
+      {
+	const double * array = self->getCoordinates(Mode);
+	int size = (self->getSpaceDimension())*(self->getNumberOfNodes());
+#ifdef WITH_NUMPY
+        return TYPEMAP_OUTPUT_PY_ARRAY( array, size );
+#else
+        TYPEMAP_OUTPUT_ARRAY(array, size, PyFloat_FromDouble,MESH::getCoordinates);
+#endif
+      }
+
+    PyObject * getConnectivity(medConnectivity ConnectivityType,
+			       medEntityMesh Entity,
+			       medGeometryElement Type)
+      {
+	const int * connectivity = self->getConnectivity(ConnectivityType, Entity,Type);
+	int size = self->getConnectivityLength(ConnectivityType,Entity,Type);
+#ifdef WITH_NUMPY
+        return TYPEMAP_OUTPUT_PY_ARRAY( connectivity, size );
+#else
+        TYPEMAP_OUTPUT_ARRAY(connectivity, size, PyInt_FromLong,MESH::getConnectivity );
+#endif
+      }
+
+    PyObject * getConnectivityIndex(medConnectivity ConnectivityType,
+				    medEntityMesh Entity)
+      {
+	const int * index = self->getConnectivityIndex(ConnectivityType,Entity);
+	int size = (self->getNumberOfElements(Entity,MEDMEM_ALL_ELEMENTS))+1;
+#ifdef WITH_NUMPY
+        return TYPEMAP_OUTPUT_PY_ARRAY( index, size );
+#else
+        TYPEMAP_OUTPUT_ARRAY(index,size,PyInt_FromLong,MESH::getConnectivityIndex);
+#endif
+      }
+
+    PyObject * getReverseConnectivity(medConnectivity ConnectivityType,
+				      medEntityMesh Entity=MED_CELL)
+      {
+	const int * conn = self->getReverseConnectivity(ConnectivityType,Entity);
+	int size = self->getReverseConnectivityLength(ConnectivityType,Entity);
+#ifdef WITH_NUMPY
+        return TYPEMAP_OUTPUT_PY_ARRAY( conn, size );
+#else
+        TYPEMAP_OUTPUT_ARRAY(conn, size, PyInt_FromLong,MESH::getReverseConnectivity);
+#endif
+      }
+
+    PyObject * getReverseConnectivityIndex(medConnectivity ConnectivityType,
+					   medEntityMesh Entity=MED_CELL)
+      {
+	const int * index = self->getReverseConnectivityIndex(ConnectivityType,Entity);
+	int size=self->getReverseConnectivityIndexLength(ConnectivityType,Entity);
+#ifdef WITH_NUMPY
+        return TYPEMAP_OUTPUT_PY_ARRAY( index, size );
+#else
+        TYPEMAP_OUTPUT_ARRAY(index,size, PyInt_FromLong,MESH::getReverseConnectivityIndex);
+#endif
+      }
+
+    PyObject * getGlobalNumberingIndex(medEntityMesh Entity)
+      {
+	const int * numberingIndex = self->getGlobalNumberingIndex(Entity);
+	int nbOfTypes = self->getNumberOfTypes(Entity);
+	int size = nbOfTypes+1;
+        TYPEMAP_OUTPUT_ARRAY(numberingIndex, size, PyInt_FromLong,
+			     MESH::getGlobalNumberingIndex);
+      }
+  }
 } ;
 
 class MESHING: public MESH
@@ -1451,11 +1419,15 @@ public :
   MESHING();
   ~MESHING();
 
-  void setSpaceDimension   (const int SpaceDimension) ;
-
-  void setMeshDimension    (const int MeshDimension) ;
-
-  void setNumberOfNodes    (const int NumberOfNodes) ;
+  void setCoordinates      (const int SpaceDimension,
+                            const int NumberOfNodes,
+                            const double * Coordinates,
+                            std::string System,
+                            const medModeSwitch Mode) ;
+  void setCoordinatesNames (const std::string * names) ;
+  void setCoordinateName   (const std::string name, const int i) ;
+  void setCoordinatesUnits (const std::string * units);
+  void setCoordinateUnit   (const std::string unit, const int i) ;
 
   void setNumberOfTypes    (const int NumberOfTypes,
 			    const medEntityMesh Entity) ;
@@ -1466,58 +1438,21 @@ public :
   void setNumberOfElements (const int * NumberOfElements,
 			    const medEntityMesh Entity) ;
 
-  void setConnectivity     (const int * Connectivity,
-			    const medEntityMesh Entity,
-			    const medGeometryElement Type) ;
-
-  void setConnectivities   (const int * ConnectivityIndex,
-			    const int * ConnectivityValue,
-			    const medConnectivity ConnectivityType,
-			    const medEntityMesh Entity) ;
+  void setConnectivity     (const medEntityMesh Entity,
+			    const medGeometryElement Type,
+                            const int * Connectivity,
+			    const int * ConnectivityIndex=0) ;
 
   void addGroup            (const GROUP & Group) ;
 
-  void setPolygonsConnectivity     (const int * ConnectivityIndex,
-				    const int * ConnectivityValue,
-				    int nbOfPolygons,
-				    const medEntityMesh Entity);
-
-  void setPolyhedraConnectivity     (const int * PolyhedronIndex,
-				     const int * FacesIndex,
-				     const int * Nodes,
-				     int nbOfPolyhedra,
-				     const medEntityMesh Entity);
-
-  %extend {
-    void setCoordinates(const int SpaceDimension, const int NumberOfNodes,
-			const double * Coordinates, const char * System,
-			const medModeSwitch Mode)
-      {
-	self->setCoordinates(SpaceDimension, NumberOfNodes, Coordinates,
-			     string(System), Mode);
-      }
-
-    void setCoordinatesSystem(const char * System)
-      {
-	self->setCoordinatesSystem(string(System));
-      }
-
-    void setCoordinateName (const char * name, const int i)
-      {
-	self->setCoordinateName(string(name), i);
-      }
-
-    void setCoordinateUnit (const char* unit, const int i)
-    {
-      self->setCoordinateUnit (string(unit), i) ;
-    }
-  }
 };
 
-class GRID : public MESH
+class GRID : public GMESH
 {
  public:
   GRID();
+
+  GRID(driverTypes driverType, const char * fileName, const char * meshName);
 
   GRID(const GRID &m);
 
@@ -1540,10 +1475,6 @@ class GRID : public MESH
   void setGridType(med_grid_type gridType);
 
   %extend {
-    GRID(driverTypes driverType, const char * fileName="", const char * meshName="")
-      {
-	return new GRID(driverType, string(fileName), string(meshName));
-      }
 
     PyObject * getEntityPosition(const medEntityMesh Entity, const int Number)
     {
@@ -1622,203 +1553,72 @@ public:
    }
 };
 
-class MED
+class MEDFILEBROWSER
 {
  public:
-  MED();
+  MEDFILEBROWSER();
+  MEDFILEBROWSER (const std::string & fileName);
+  void readFileStruct(const std::string & fileName);
 
-  ~MED();
+  std::string  getFileName();
 
-  void rmDriver (int index=0);
+  int getNumberOfMeshes ();
+  int getNumberOfFields ();
 
-  int getNumberOfMeshes ( void ) const;
+  bool isStructuredMesh(const std::string & meshName);
 
-  int getNumberOfFields ( void ) const;
-
-  void updateSupport () ;
-
-  void write (int index=0);
-
-  void read (int index=0);
-
-  void readFileStruct (int index=0);
-
-  void addField ( FIELD_  * const ptrField  );
-
-  void addMesh  ( MESH    * const ptrMesh   );
-
-  void updateNamesInMaps();
+  med_type_champ getFieldType (const std::string & fieldName);
+  std::string    getMeshName  (const std::string & fieldName);
 
   %extend {
-    MED(driverTypes driverType, char * fileName)
-      {
-	return new MED(driverType,string(fileName));
-      }
 
-    int addDriver(driverTypes driverType,
-		  const char * fileName="Default File Name.med",
-		  med_mode_acces access=RDWR)
-      {
-	return self->addDriver(driverType,string(fileName),access);
-      }
+    std::string getMeshName(int i)
+    {
+      return self->getMeshNames().at(i);
+    }
+
+    std::string getFieldName(int i)
+    {
+      return self->getFieldNames().at(i);
+    }
 
     PyObject *getMeshNames()
       {
-        deque<string> list_string = self->getMeshNames();
-	TYPEMAP_OUTPUT_DEQUE_STRING(list_string);
+	std::vector< std::string > names = self->getMeshNames();
+        std::string* array = &names[0];
+        TYPEMAP_OUTPUT_ARRAY(array, names.size(), PyString_FromStdString,
+                             MEDFILEBROWSER::getMeshNames);
       }
 
-    %newobject getMeshName(int );
-    const char * getMeshName(int i)
-      {
-	deque<string> list_string = self->getMeshNames();
-	char * tmp = new char[strlen(list_string[i].c_str())+1];
-	strcpy(tmp,list_string[i].c_str());
-	return tmp;
-      }
 
     PyObject *getFieldNames()
       {
-        deque<string> list_string = self->getFieldNames();
-        TYPEMAP_OUTPUT_DEQUE_STRING(list_string);
+	std::vector< std::string > names = self->getFieldNames();
+        std::string* array = &names[0];
+        TYPEMAP_OUTPUT_ARRAY(array, names.size(), PyString_FromStdString,
+                             MEDFILEBROWSER::getMeshNames);
       }
 
-    %newobject getFieldName(int );
-    const char * getFieldName(int i)
+    PyObject* getFieldIteration (char* fieldName)
       {
-	deque<string> list_string = self->getFieldNames();
-	char * tmp = new char[strlen(list_string[i].c_str())+1];
-	strcpy(tmp,list_string[i].c_str());
-	return tmp;
-      }
+        VEC_DT_IT_ vec_dtit = self->getFieldIteration (fieldName);
+        PyObject *py_list = PyList_New(vec_dtit.size());
+        for (unsigned i=0; i < vec_dtit.size(); i++)
+        {
+          DT_IT_* dtit = new DT_IT_(vec_dtit[i]);
+          PyObject * pyDTIT= SWIG_NewPointerObj((void *) dtit, $descriptor(DT_IT_*), 1);
+          int err = PyList_SetItem(py_list, i, pyDTIT);
+          if(err)
+          {
+            PyErr_SetString(PyExc_RuntimeError, "Error in getFieldIteration");
+            return NULL;
+          }
+        }
 
-    MESH * getMesh(char * meshName)
-      {
-	MESH * myMesh = self->getMesh(string(meshName));
-	return myMesh;
-      }
-
-    int getFieldNumberOfIteration(char * fieldName)
-      {
-	deque<DT_IT_> list_dtit =
-	  self->getFieldIteration(string(fieldName));
-	return list_dtit.size();
-      }
-
-    DT_IT_ getFieldIteration(char * fieldName, int i)
-      {
-	deque<DT_IT_> list_dtit =
-	  self->getFieldIteration(string(fieldName));
-	return list_dtit[i];
-      }
-
-    FIELD_ * getField(char * fieldName, int dt, int it)
-      {
-	return self->getField(string(fieldName),dt,it);
-      }
-
-    PyObject *getFieldT(char * fieldName, int dt, int it)
-      {
-        FIELD_ *ret=self->getField(string(fieldName),dt,it);
-	TYPEMAP_OUTPUT_FIELDT(ret);
-      }
-
-    FIELD_ * getField2(char * fieldName,double time, int it=0)
-      {
-	return self->getField2(string(fieldName),time,it);
-      }
-
-    SUPPORT * getSupport(char * meshName, medEntityMesh entity)
-      {
-	return self->getSupport(string(meshName),entity);
-      }
-  }
-};
-
-/*
-  API de MED_MED_[RDONLY,WRONLY,RDWR]_DRIVER
-*/
-
-class MED_MED_RDONLY_DRIVER
-{
- public :
-  void open();
-  void close();
-
-  void read           ( void ) ;
-  void readFileStruct ( void ) ;
-
-  virtual ~MED_MED_RDONLY_DRIVER();
-
-  %extend {
-    MED_MED_RDONLY_DRIVER(char * fileName,  MED * ptrMed)
-      {
-	return new MED_MED_RDONLY_DRIVER(string(fileName), ptrMed);
-      }
-
-    %newobject __str__();
-    const char* __str__()
-      {
-	ostringstream mess;
-	mess << "Python Printing MED_MED_RDONLY_DRIVER : " << *self << endl;
-	return strdup(mess.str().c_str());
-      }
-  }
-};
-
-class MED_MED_WRONLY_DRIVER
-{
- public :
-  void open();
-  void close();
-
-  void write          ( void ) const ;
-  void writeFrom      ( void ) const ;
-
-  virtual ~MED_MED_WRONLY_DRIVER();
-
-  %extend {
-    MED_MED_WRONLY_DRIVER(char * fileName,  MED * ptrMed)
-      {
-	return new MED_MED_WRONLY_DRIVER(string(fileName), ptrMed);
-      }
-
-    %newobject __str__();
-    const char* __str__()
-      {
-	ostringstream mess;
-	mess << "Python Printing MED_MED_WRONLY_DRIVER : " << *self << endl;
-	return strdup(mess.str().c_str());
-      }
-  }
-};
-
-class MED_MED_RDWR_DRIVER : public virtual MED_MED_RDONLY_DRIVER,
-			    public virtual MED_MED_WRONLY_DRIVER
-{
- public :
-  void open();
-  void close();
-
-  void write          ( void ) const ;
-  void writeFrom      ( void ) const ;
-  void read           ( void ) ;
-  void readFileStruct ( void ) ;
-
-  ~MED_MED_RDWR_DRIVER();
-
-  %extend {
-    MED_MED_RDWR_DRIVER(char * fileName,  MED * ptrMed)
-      {
-	return new MED_MED_RDWR_DRIVER(string(fileName), ptrMed);
-      }
-
-    %newobject __str__();
-    const char* __str__()
-      {
-	ostringstream mess;
-	mess << "Python Printing MED_MED_RDWR_DRIVER : " << *self << endl;
-	return strdup(mess.str().c_str());
+        PyObject * result = Py_BuildValue("O", py_list);
+        Py_DECREF(py_list);
+        return result;
+        
       }
   }
 };
@@ -1827,28 +1627,18 @@ class MED_MED_RDWR_DRIVER : public virtual MED_MED_RDONLY_DRIVER,
   API de GIBI_MESH_[RDONLY,WRONLY,RDWR]_DRIVER
 */
 
-class GIBI_MESH_RDONLY_DRIVER
+class GIBI_MESH_RDONLY_DRIVER : public GENDRIVER
 {
 public :
   GIBI_MESH_RDONLY_DRIVER() ;
 
   GIBI_MESH_RDONLY_DRIVER(const GIBI_MESH_RDONLY_DRIVER & driver) ;
 
+  GIBI_MESH_RDONLY_DRIVER(const char* fileName, MESH * ptrMesh);
+
   ~GIBI_MESH_RDONLY_DRIVER() ;
 
-  void open();
-
-  void write( void );
-
-  void read ( void );
-
-  void close();
-
   %extend {
-    GIBI_MESH_RDONLY_DRIVER(char * fileName, MESH * ptrMesh)
-      {
-	return new GIBI_MESH_RDONLY_DRIVER(string(fileName), ptrMesh) ;
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -1857,45 +1647,21 @@ public :
 	mess << "Python Printing GIBI_MESH_RDONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
       }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    %newobject getMeshName();
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
   }
 };
 
-class GIBI_MESH_WRONLY_DRIVER
+class GIBI_MESH_WRONLY_DRIVER : public GENDRIVER
 {
 public :
   GIBI_MESH_WRONLY_DRIVER() ;
 
   GIBI_MESH_WRONLY_DRIVER(const GIBI_MESH_WRONLY_DRIVER & driver) ;
 
+  GIBI_MESH_WRONLY_DRIVER(const char* fileName, GMESH * ptrMesh);
+
   ~GIBI_MESH_WRONLY_DRIVER() ;
 
-  void open();
-
-  void write( void );
-
-  void read ( void );
-
-  void close();
-
   %extend {
-    GIBI_MESH_WRONLY_DRIVER(char * fileName, MESH * ptrMesh)
-      {
-	return new GIBI_MESH_WRONLY_DRIVER(string(fileName), ptrMesh) ;
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -1903,20 +1669,6 @@ public :
 	ostringstream mess;
 	mess << "Python Printing GIBI_MESH_WRONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
-      }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    %newobject getMeshName();
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
       }
   }
 };
@@ -1929,21 +1681,11 @@ public :
 
   GIBI_MESH_RDWR_DRIVER(const GIBI_MESH_RDWR_DRIVER & driver) ;
 
+  GIBI_MESH_RDWR_DRIVER(const char* fileName, MESH * ptrMesh);
+
   ~GIBI_MESH_RDWR_DRIVER() ;
 
-  void open();
-
-  void write( void );
-
-  void read ( void );
-
-  void close();
-
   %extend {
-    GIBI_MESH_RDWR_DRIVER(char * fileName, MESH * ptrMesh)
-      {
-	return new GIBI_MESH_RDWR_DRIVER(string(fileName), ptrMesh) ;
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -1952,45 +1694,46 @@ public :
 	mess << "Python Printing GIBI_MESH_RDWR_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
       }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    %newobject getMeshName();
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
   }
 };
 
-class GIBI_MED_RDONLY_DRIVER
+class GIBI_MED_RDONLY_DRIVER : public GENDRIVER
 {
 public :
   GIBI_MED_RDONLY_DRIVER() ;
 
   GIBI_MED_RDONLY_DRIVER(const GIBI_MED_RDONLY_DRIVER & driver) ;
 
-  ~GIBI_MED_RDONLY_DRIVER() ;
-
-  void open();
-
-  void write( void );
-
-  void read ( void );
-
-  void close();
+  MESH* getMesh();
 
   %extend {
-    GIBI_MED_RDONLY_DRIVER(char * fileName, MED * ptrMed)
+    GIBI_MED_RDONLY_DRIVER(char * fileName)
       {
-	return new GIBI_MED_RDONLY_DRIVER(string(fileName), ptrMed) ;
+        std::vector< FIELD_* > fields;
+	return new GIBI_MED_RDONLY_DRIVER(string(fileName), fields) ;
       }
+
+    PyObject * read ( void )
+    {
+      std::vector< FIELD_* > fields;
+      GIBI_MED_RDONLY_DRIVER tmp( self->getFileName(), fields) ;
+      tmp.open();
+      tmp.read();
+      tmp.close();
+      *self = tmp;
+      tmp.getMesh();
+
+      PyObject* py_list = PyList_New(fields.size());
+
+      for (unsigned i=0;i<fields.size();i++)
+      {
+        PyObject * f = SWIG_NewPointerObj((void*)fields.at(i),$descriptor(FIELD_*),1);
+        PyList_SetItem(py_list,i,f);
+      }
+      PyObject * result = Py_BuildValue("O", py_list);
+      Py_DECREF(py_list);
+      return result;
+    }
 
     %newobject __str__();
     const char* __str__()
@@ -2003,29 +1746,18 @@ public :
   }
 };
 
-class GIBI_MED_WRONLY_DRIVER
+class GIBI_MED_WRONLY_DRIVER : public GENDRIVER
 {
 public :
   GIBI_MED_WRONLY_DRIVER() ;
 
   GIBI_MED_WRONLY_DRIVER(const GIBI_MED_WRONLY_DRIVER & driver) ;
 
-  ~GIBI_MED_WRONLY_DRIVER() ;
-
-  void open();
-
-  void write( void );
-
-  void read ( void );
-
-  void close();
+  GIBI_MED_WRONLY_DRIVER(const char*             fileName,
+                         vector< const FIELD_* > fields,
+                         GMESH *                 ptrMesh) ;
 
   %extend {
-    GIBI_MED_WRONLY_DRIVER(char * fileName, MED * ptrMed, MESH * ptrMesh)
-      {
-	return new GIBI_MED_WRONLY_DRIVER(string(fileName), ptrMed, ptrMesh) ;
-      }
-
     %newobject __str__();
     const char* __str__()
       {
@@ -2041,28 +1773,18 @@ public :
   API de PORFLOW_MESH_[RDONLY,WRONLY,RDWR]_DRIVER
 */
 
-class PORFLOW_MESH_RDONLY_DRIVER
+class PORFLOW_MESH_RDONLY_DRIVER : public GENDRIVER
 {
 public :
   PORFLOW_MESH_RDONLY_DRIVER() ;
 
   PORFLOW_MESH_RDONLY_DRIVER(const PORFLOW_MESH_RDONLY_DRIVER & driver) ;
 
+  PORFLOW_MESH_RDONLY_DRIVER(const char* fileName, MESH * ptrMesh);
+
   ~PORFLOW_MESH_RDONLY_DRIVER() ;
 
-  void open();
-
-  void write( void );
-
-  void read ( void );
-
-  void close();
-
   %extend {
-    PORFLOW_MESH_RDONLY_DRIVER(char * fileName, MESH * ptrMesh)
-      {
-	return new PORFLOW_MESH_RDONLY_DRIVER(string(fileName), ptrMesh) ;
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -2071,45 +1793,21 @@ public :
 	mess << "Python Printing PORFLOW_MESH_RDONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
       }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    %newobject getMeshName();
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
   }
 };
 
-class PORFLOW_MESH_WRONLY_DRIVER
+class PORFLOW_MESH_WRONLY_DRIVER : public GENDRIVER
 {
 public :
   PORFLOW_MESH_WRONLY_DRIVER() ;
 
   PORFLOW_MESH_WRONLY_DRIVER(const PORFLOW_MESH_WRONLY_DRIVER & driver) ;
 
+  PORFLOW_MESH_WRONLY_DRIVER(char * fileName, GMESH * ptrMesh);
+
   ~PORFLOW_MESH_WRONLY_DRIVER() ;
 
-  void open();
-
-  void write( void );
-
-  void read ( void );
-
-  void close();
-
   %extend {
-    PORFLOW_MESH_WRONLY_DRIVER(char * fileName, MESH * ptrMesh)
-      {
-	return new PORFLOW_MESH_WRONLY_DRIVER(string(fileName), ptrMesh) ;
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -2117,20 +1815,6 @@ public :
 	ostringstream mess;
 	mess << "Python Printing PORFLOW_MESH_WRONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
-      }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    %newobject getMeshName();
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
       }
   }
 };
@@ -2143,21 +1827,11 @@ public :
 
   PORFLOW_MESH_RDWR_DRIVER(const PORFLOW_MESH_RDWR_DRIVER & driver) ;
 
+  PORFLOW_MESH_RDWR_DRIVER(const char * fileName, MESH * ptrMesh);
+
   ~PORFLOW_MESH_RDWR_DRIVER() ;
 
-  void open();
-
-  void write( void );
-
-  void read ( void );
-
-  void close();
-
   %extend {
-    PORFLOW_MESH_RDWR_DRIVER(char * fileName, MESH * ptrMesh)
-      {
-	return new PORFLOW_MESH_RDWR_DRIVER(string(fileName), ptrMesh) ;
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -2166,20 +1840,6 @@ public :
 	mess << "Python Printing PORFLOW_MESH_RDWR_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
       }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    %newobject getMeshName();
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
   }
 };
 
@@ -2187,29 +1847,19 @@ public :
   API de MED_MESH_[RDONLY,WRONLY,RDWR]_DRIVER
 */
 
-class MED_MESH_RDONLY_DRIVER
+class MED_MESH_RDONLY_DRIVER : public GENDRIVER
 {
  public :
 
+  MED_MESH_RDONLY_DRIVER(const char * fileName,  GMESH * ptrMesh);
+
   ~MED_MESH_RDONLY_DRIVER();
-
-  void open();
-
-  void close();
-
-  void write( void ) ;
-
-  void read ( void ) ;
 
   void desactivateFacesComputation();
 
   void activateFacesComputation();
 
   %extend {
-    MED_MESH_RDONLY_DRIVER(char * fileName,  MESH * ptrMesh)
-      {
-	return new MED_MESH_RDONLY_DRIVER(string(fileName), ptrMesh);
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -2218,41 +1868,17 @@ class MED_MESH_RDONLY_DRIVER
 	mess << "Python Printing MED_MESH_RDONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
       }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    %newobject getMeshName();
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
   }
 };
 
-class MED_MESH_WRONLY_DRIVER
+class MED_MESH_WRONLY_DRIVER : public GENDRIVER
 {
  public :
   ~MED_MESH_WRONLY_DRIVER();
 
-  void write( void ) const ;
-
-  void read ( void ) ;
-
-  void open();
-
-  void close();
+  MED_MESH_WRONLY_DRIVER(const char * fileName,  GMESH * ptrMesh);
 
   %extend {
-    MED_MESH_WRONLY_DRIVER(char * fileName,  MESH * ptrMesh)
-      {
-	return new MED_MESH_WRONLY_DRIVER(string(fileName), ptrMesh);
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -2260,20 +1886,6 @@ class MED_MESH_WRONLY_DRIVER
 	ostringstream mess;
 	mess << "Python Printing MED_MESH_WRONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
-      }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    %newobject getMeshName();
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
       }
   }
 };
@@ -2285,19 +1897,9 @@ class MED_MESH_RDWR_DRIVER : public virtual MED_MESH_RDONLY_DRIVER,
 
   ~MED_MESH_RDWR_DRIVER();
 
-  void write(void) const ;
-
-  void read (void)       ;
-
-  void open();
-
-  void close();
+  MED_MESH_RDWR_DRIVER(const char * fileName,  GMESH * ptrMesh);
 
   %extend {
-    MED_MESH_RDWR_DRIVER(char * fileName,  MESH * ptrMesh)
-      {
-	return new MED_MESH_RDWR_DRIVER(string(fileName), ptrMesh);
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -2305,20 +1907,6 @@ class MED_MESH_RDWR_DRIVER : public virtual MED_MESH_RDONLY_DRIVER,
 	ostringstream mess;
 	mess << "Python Printing MED_MESH_RDWR_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
-      }
-
-    void setMeshName(char * meshName)
-      {
-	self->setMeshName(string(meshName));
-      }
-
-    %newobject getMeshName();
-    char * getMeshName()
-      {
-	string tmp_str = self->getMeshName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
       }
   }
 };
@@ -2328,25 +1916,15 @@ class MED_MESH_RDWR_DRIVER : public virtual MED_MESH_RDONLY_DRIVER,
 */
 
 template< class T1 >
-class MED_FIELD_RDONLY_DRIVER
+class MED_FIELD_RDONLY_DRIVER : public GENDRIVER
 {
 public:
 
+  MED_FIELD_RDONLY_DRIVER(const char * fileName, FIELD<T1, FullInterlace > * ptrField);
+
   ~MED_FIELD_RDONLY_DRIVER();
 
-  void open();
-
-  void close();
-
-  void write( void ) const ;
-
-  void read ( void ) ;
-
   %extend {
-    MED_FIELD_RDONLY_DRIVER(char * fileName, FIELD<T1, FullInterlace > * ptrField)
-      {
-	return new MED_FIELD_RDONLY_DRIVER< T1 >(string(fileName), ptrField);
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -2355,20 +1933,6 @@ public:
 	mess << "Python Printing MED_FIELD_RDONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
       }
-
-    void setFieldName(char * fieldName)
-      {
-	self->setFieldName(string(fieldName));
-      }
-
-    %newobject getFieldName();
-    char * getFieldName()
-      {
-	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
   }
 };
 %template ( MED_FIELDDOUBLE_RDONLY_DRIVER ) MED_FIELD_RDONLY_DRIVER< double >;
@@ -2376,46 +1940,21 @@ public:
 
 
 template < class T1 >
-class MED_FIELD_WRONLY_DRIVER
+class MED_FIELD_WRONLY_DRIVER : public GENDRIVER
 {
 public:
 
+  MED_FIELD_WRONLY_DRIVER(const char * fileName, FIELD<T1, FullInterlace> * ptrField);
+
   ~MED_FIELD_WRONLY_DRIVER();
 
-  void open();
-
-  void close();
-
-  void write( void ) const ;
-
-  void read ( void ) ;
-
   %extend {
-    MED_FIELD_WRONLY_DRIVER(char * fileName, FIELD<T1, FullInterlace> * ptrField)
-      {
-	return new MED_FIELD_WRONLY_DRIVER< T1 >(string(fileName), ptrField);
-      }
-
     %newobject __str__();
     const char* __str__()
       {
 	ostringstream mess;
 	mess << "Python Printing MED_FIELD_WRONLY_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
-      }
-
-    void setFieldName(char * fieldName)
-      {
-	self->setFieldName(string(fieldName));
-      }
-
-    %newobject getFieldName();
-    char * getFieldName()
-      {
-	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
       }
   }
 };
@@ -2428,21 +1967,11 @@ class MED_FIELD_RDWR_DRIVER : public virtual MED_FIELD_RDONLY_DRIVER< T1 >, publ
 {
 public:
 
+  MED_FIELD_RDWR_DRIVER(const char * fileName, FIELD<T1, FullInterlace> * ptrField);
+
   ~MED_FIELD_RDWR_DRIVER();
 
-  void open();
-
-  void close();
-
-  void write( void ) const ;
-
-  void read ( void ) ;
-
   %extend {
-    MED_FIELD_RDWR_DRIVER(char * fileName, FIELD<T1, FullInterlace> * ptrField)
-      {
-	return new MED_FIELD_RDWR_DRIVER< T1 >(string(fileName), ptrField);
-      }
 
     %newobject __str__();
     const char* __str__()
@@ -2451,20 +1980,6 @@ public:
 	mess << "Python Printing MED_FIELD_RDWR_DRIVER : " << *self << endl;
 	return strdup(mess.str().c_str());
       }
-
-    void setFieldName(char * fieldName)
-      {
-	self->setFieldName(string(fieldName));
-      }
-
-    %newobject getFieldName();
-    char * getFieldName()
-      {
-	string tmp_str = self->getFieldName();
-	char * tmp = new char[strlen(tmp_str.c_str()) + 1];
-	strcpy(tmp,tmp_str.c_str());
-	return tmp;
-      }
   }
 };
 %template ( MED_FIELDDOUBLE_RDWR_DRIVER ) MED_FIELD_RDWR_DRIVER< double >;
@@ -2472,23 +1987,11 @@ public:
 
 
 template< class T1 >
-class ASCII_FIELD_DRIVER {
+class ASCII_FIELD_DRIVER  : public GENDRIVER
+{
 public:
+  ASCII_FIELD_DRIVER(const char *fileName, FIELD<T1, FullInterlace> * ptrField, med_sort_direc direction, const char *priority);
   ~ASCII_FIELD_DRIVER();
-
-  void open();
-
-  void close();
-
-  void write( void ) const ;
-
-
-  %extend {
-    ASCII_FIELD_DRIVER(const char *fileName, FIELD<T1, FullInterlace> * ptrField, med_sort_direc direction, const char *priority)
-      {
-	return new ASCII_FIELD_DRIVER<T1>(string(fileName), ptrField, (MED_EN::med_sort_direc)direction, priority);
-      }
-  }
 };
 
 %template (ASCII_FIELDDOUBLE_DRIVER) ASCII_FIELD_DRIVER< double >;
@@ -2516,26 +2019,49 @@ void setIgnoreIncompatibility(bool toIgnore=true);
 // ---------------------------------------------------------------
 //!< EnSight reading driver reads all meshes and fields
 
-class ENSIGHT_MED_RDONLY_DRIVER
+class ENSIGHT_MED_RDONLY_DRIVER : public GENDRIVER
 {
 public:
-  ENSIGHT_MED_RDONLY_DRIVER(const std::string & fileName,  MED * ptrMed);
-  void read();
-  void readFileStruct();
+
+  %extend {
+    ENSIGHT_MED_RDONLY_DRIVER(const std::string & fileName)
+    {
+      vector< FIELD_* > fields;
+      return new ENSIGHT_MED_RDONLY_DRIVER(fileName,fields);
+    }
+
+    PyObject * read()
+    {
+      std::vector< FIELD_* > fields;
+      ENSIGHT_MED_RDONLY_DRIVER tmp( self->getFileName(), fields) ;
+      tmp.read();
+
+      PyObject* py_list = PyList_New(fields.size());
+
+      for (unsigned i=0;i<fields.size();i++)
+      {
+        PyObject * f = SWIG_NewPointerObj((void*)fields.at(i),$descriptor(FIELD_*),1);
+        PyList_SetItem(py_list,i,f);
+      }
+      PyObject * result = Py_BuildValue("O", py_list);
+      Py_DECREF(py_list);
+      return result;
+    }
+  }
 };
 // ---------------------------------------------------------------
 //!< EnSight writing driver
 
-class ENSIGHT_MED_WRONLY_DRIVER
+class ENSIGHT_MED_WRONLY_DRIVER : public GENDRIVER
 {
 public :
-  ENSIGHT_MED_WRONLY_DRIVER(const std::string & fileName, MED * ptrMed);
+  ENSIGHT_MED_WRONLY_DRIVER(const std::string & fileName, const vector< const FIELD_* > fields);
   void write();
 };
 // ---------------------------------------------------------------
 //!< EnSight mesh reading driver
 
-class ENSIGHT_MESH_RDONLY_DRIVER
+class ENSIGHT_MESH_RDONLY_DRIVER : public GENDRIVER
 {
 public :
   //!< to read mesh of index-th time step
@@ -2545,20 +2071,20 @@ public :
 // ---------------------------------------------------------------
 //!< Writing EnSight mesh driver.
 
-class ENSIGHT_MESH_WRONLY_DRIVER
+class ENSIGHT_MESH_WRONLY_DRIVER : public GENDRIVER
 {
 public :
-  ENSIGHT_MESH_WRONLY_DRIVER(const std::string & fileName, MESH * ptrMesh, bool append=false);
+  ENSIGHT_MESH_WRONLY_DRIVER(const std::string & fileName, GMESH * ptrMesh, bool append=false);
   void write();
 };
 // ---------------------------------------------------------------
 //!< EnSight field reading driver
 
-class ENSIGHT_FIELD_RDONLY_DRIVER
+class ENSIGHT_FIELD_RDONLY_DRIVER : public GENDRIVER
 {
 public :
   //!< Set the name of the FIELD in EnSight file
-  void setFieldName(const string & fieldName);
+  void setFieldName(const std::string & fieldName);
   //!<  read the field of a specified name and index-th time step.
   ENSIGHT_FIELD_RDONLY_DRIVER(const std::string & fileName, FIELD_ * ptrField, int step=1);
   void read();
@@ -2566,7 +2092,7 @@ public :
 // ---------------------------------------------------------------
 //!< Writing EnSight field driver.
 
-class ENSIGHT_FIELD_WRONLY_DRIVER
+class ENSIGHT_FIELD_WRONLY_DRIVER : public GENDRIVER
 {
 public :
   //!< Set the name of the FIELD in EnSight file

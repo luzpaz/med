@@ -39,60 +39,29 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-void affiche_support(const SUPPORT * mySupport) 
+static void affiche_support(const SUPPORT * mySupport) 
 {
   cout << "  - Name : "<<mySupport->getName().c_str()<<endl ;
   cout << "  - Description : "<<mySupport->getDescription().c_str()<<endl ;
   cout << "  - Entity : "<<mySupport->getEntity()<<endl ;
   cout << "  - Entities list : "<<endl ;
-  if (!(mySupport->isOnAllElements())) {
-    int NumberOfTypes = mySupport->getNumberOfTypes() ;
-    cout<<"  - NumberOfTypes : "<<NumberOfTypes<<endl;
-    const medGeometryElement * Types = mySupport->getTypes() ;
-    for (int j=0;j<NumberOfTypes;j++) {
-      cout<<"    * Type "<<Types[j]<<" : ";
-      int NumberOfElements = mySupport->getNumberOfElements(Types[j]) ;
-      const int * Number = mySupport->getNumber(Types[j]) ;
-      for (int k=0; k<NumberOfElements;k++)
-        cout << Number[k] << " ";
-      cout << endl ;
+  if (!(mySupport->isOnAllElements())) 
+    {
+      int NumberOfTypes = mySupport->getNumberOfTypes() ;
+      cout<<"  - NumberOfTypes : "<<NumberOfTypes<<endl;
+      const medGeometryElement * Types = mySupport->getTypes() ;
+      for (int j=0;j<NumberOfTypes;j++) 
+        {
+          cout<<"    * Type "<<Types[j]<<" : ";
+          int NumberOfElements = mySupport->getNumberOfElements(Types[j]) ;
+          const int * Number = mySupport->getNumber(Types[j]) ;
+          for (int k=0; k<NumberOfElements;k++)
+            cout << Number[k] << " ";
+          cout << endl ;
+        }
     }
-  } else
+  else
     cout << "    Is on all entities !"<< endl;
-}
-
-
-void affiche_famille(MESH *myMesh,medEntityMesh Entity) 
-{
-  int NumberOfFamilies = myMesh->getNumberOfFamilies(Entity) ;
-  cout << "NumberOfFamilies : "<<NumberOfFamilies<<endl;
-  for (int i=1; i<NumberOfFamilies+1;i++) {
-    const FAMILY* myFamily = myMesh->getFamily(Entity,i);
-    affiche_support(myFamily);
-    cout << "  - Identifier : "<<myFamily->getIdentifier()<<endl ;
-    int NumberOfAttributes = myFamily->getNumberOfAttributes() ;
-    cout << "  - Attributes ("<<NumberOfAttributes<<") :"<<endl;
-    for (int j=1;j<NumberOfAttributes+1;j++)
-      cout << "    * "<<myFamily->getAttributeIdentifier(j)<<" : "<<myFamily->getAttributeValue(j)<<", "<<myFamily->getAttributeDescription(j).c_str()<<endl ;
-    int NumberOfGroups = myFamily->getNumberOfGroups() ;
-    cout << "  - Groups ("<<NumberOfGroups<<") :"<<endl;
-    for (int j=1;j<NumberOfGroups+1;j++)
-      cout << "    * "<<myFamily->getGroupName(j).c_str()<<endl ;
-  }
-}
-
-void affiche_groupe(MESH *myMesh,medEntityMesh Entity) 
-{
-  int NumberOfGroups = myMesh->getNumberOfGroups(Entity) ;
-  cout << "NumberOfGroups : "<<NumberOfGroups<<endl;
-  for (int i=1; i<NumberOfGroups+1;i++) {
-    const GROUP* myGroup = myMesh->getGroup(Entity,i);
-    affiche_support(myGroup);
-    int NumberOfFamillies = myGroup->getNumberOfFamilies() ;
-    cout << "  - Families ("<<NumberOfFamillies<<") :"<<endl;
-    for (int j=1;j<NumberOfFamillies+1;j++)
-      cout << "    * "<<myGroup->getFamily(j)->getName().c_str()<<endl ;
-  }
 }
 
 int main (int argc, char ** argv)
@@ -138,7 +107,7 @@ int main (int argc, char ** argv)
   medGeometryElement * GeometricTypePartial = new medGeometryElement[myMesh->getNumberOfTypes(MED_CELL)];
   const medGeometryElement * GeometricType = myMesh->getTypes(MED_CELL);
   for (int i=0;i<myMesh->getNumberOfTypes(MED_CELL);i=i+2)
-    { 
+    {
       NumberOfGeometricType=NumberOfGeometricType+1;
       TotalNumberOfElements=TotalNumberOfElements+myMesh->getNumberOfElements(MED_CELL,GeometricType[i]);
       NumberOfElements[i/2]=myMesh->getNumberOfElements(MED_CELL,GeometricType[i]);
@@ -162,20 +131,6 @@ int main (int argc, char ** argv)
   mySupport->removeReference();
   affiche_support(mySupport2);
   mySupport2->removeReference();
-
-  /*
-  cout << "Show Family :"<<endl ;
-  affiche_famille(myMesh,MED_NODE);
-  affiche_famille(myMesh,MED_CELL);
-  affiche_famille(myMesh,MED_FACE);
-  affiche_famille(myMesh,MED_EDGE);
-
-  cout << "Show Group :"<<endl ;
-  affiche_groupe(myMesh,MED_NODE);
-  affiche_groupe(myMesh,MED_CELL);
-  affiche_groupe(myMesh,MED_FACE);
-  affiche_groupe(myMesh,MED_EDGE);
-  */
 
   myMesh->removeReference();
 

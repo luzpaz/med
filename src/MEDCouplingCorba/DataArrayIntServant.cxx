@@ -59,3 +59,16 @@ void DataArrayIntServant::getSerialisationData(SALOME_TYPES::ListOfLong_out da)
       da->length(0);
     }
 }
+
+SALOME::StringSeq *DataArrayIntServant::GetExportableFormats()
+{
+  SALOME::StringSeq *ret=new SALOME::StringSeq;
+  ret->length(0);
+  return ret;
+}
+
+CORBA::Boolean DataArrayIntServant::ExportDataAs(const char *format, SALOME::GenericObj_out exporter)
+{
+  exporter=SALOME::GenericObj::_nil();
+  return false;
+}

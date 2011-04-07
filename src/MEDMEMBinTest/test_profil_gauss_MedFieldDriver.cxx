@@ -36,10 +36,10 @@ using namespace MEDMEM;
 using namespace MED_EN;
 
 #define INTERLACING_MODE FullInterlace
-int fct2(int i,const int * number) { return i;};
-int fct1(int i,const int * number) { return number[i]; };
+static int fct2(int i,const int * number) { return i;}
+static int fct1(int i,const int * number) { return number[i]; }
 
-void affiche_field_(FIELD_ * myField)
+static void affiche_field_(FIELD_ * myField)
 {
   cout << "Field "<< myField->getName() << " : " <<myField->getDescription() <<  endl ;
   int NumberOfComponents = myField->getNumberOfComponents() ;
@@ -79,8 +79,8 @@ void affiche_fieldT(FIELD<double,INTERLACING_TAG> * myField)
   // Suivant le traitement, on peut faire sortir  si il y a des points de Gauss
   // ou des profils
 
-  cout << "myField->getValueLength        (MED_ALL_ELEMENTS) : " << valueLength << endl;
-  cout << "myField->getNumberOfElements   (MED_ALL_ELEMENTS) : " << numberOf   << endl;
+  cout << "myField->getValueLength        (MEDMEM_ALL_ELEMENTS) : " << valueLength << endl;
+  cout << "myField->getNumberOfElements   (MEDMEM_ALL_ELEMENTS) : " << numberOf   << endl;
   cout << "myField->getNumberOfComponents ()                 : " << numberOfComponents << endl;
   cout << "myField->getNumberOfGeometricType ()              : " << numberOfGeometricType << endl;
   for (int i=0; i < numberOfGeometricType; i++) {
@@ -119,14 +119,14 @@ void affiche_fieldT(FIELD<double, FullInterlace> * myField)
   int valueLength           = myField->getValueLength();
   const int * nbGaussPoints = myField->getNumberOfGaussPoints();
 
-  int numberOf              = mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
+  int numberOf              = mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
   int numberOfGeometricType = mySupport->getNumberOfTypes();
   const int * nbOfElements  = mySupport->getNumberOfElements();
   const MED_EN::medGeometryElement * typeList      = mySupport->getTypes();
   bool  onAll               = mySupport->isOnAllElements();
 
-  cout << "mySupport->getValueLength           (MED_ALL_ELEMENTS) : " << valueLength << endl;
-  cout << "mySupport->getNumberOfElements      (MED_ALL_ELEMENTS) : " << numberOf   << endl;
+  cout << "mySupport->getValueLength           (MEDMEM_ALL_ELEMENTS) : " << valueLength << endl;
+  cout << "mySupport->getNumberOfElements      (MEDMEM_ALL_ELEMENTS) : " << numberOf   << endl;
   cout << "mySupport->getNumberOfComponents    ()                 : " << numberOfComponents << endl;
   cout << "mySupport->getNumberOfGeometricType ()                 : " << numberOfGeometricType << endl;
   assert(numberOf == myField->getNumberOfValues() );
@@ -142,7 +142,7 @@ void affiche_fieldT(FIELD<double, FullInterlace> * myField)
   }
 
   // On récupère la liste complète
-  if (!onAll) number = mySupport->getNumber(MED_ALL_ELEMENTS);
+  if (!onAll) number = mySupport->getNumber(MEDMEM_ALL_ELEMENTS);
 
   int elNo = -1;
   cout << "- Valeurs :" << endl;
@@ -181,17 +181,17 @@ void affiche_fieldT(FIELD<double, NoInterlace> * myField)
   int valueLength           = myField->getValueLength();
   const int * nbGaussPoints = myField->getNumberOfGaussPoints();
 
-  int numberOf              = mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
+  int numberOf              = mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
   int numberOfGeometricType = mySupport->getNumberOfTypes();
   const int * nbOfElements  = mySupport->getNumberOfElements();
   const MED_EN::medGeometryElement * typeList      = mySupport->getTypes();
   bool  onAll               = mySupport->isOnAllElements();
 
-  cout << "mySupport->getValueLength           (MED_ALL_ELEMENTS) : " << valueLength << endl;
-  cout << "mySupport->getNumberOfElements      (MED_ALL_ELEMENTS) : " << numberOf   << endl;
+  cout << "mySupport->getValueLength           (MEDMEM_ALL_ELEMENTS) : " << valueLength << endl;
+  cout << "mySupport->getNumberOfElements      (MEDMEM_ALL_ELEMENTS) : " << numberOf   << endl;
   cout << "mySupport->getNumberOfComponents    ()                 : " << numberOfComponents << endl;
   cout << "mySupport->getNumberOfGeometricType ()                 : " << numberOfGeometricType << endl;
-  cout << "mySupport->getNumberOfElements(MED_ALL_ELEMENTS)       : " << numberOf << endl;
+  cout << "mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS)       : " << numberOf << endl;
   assert(numberOf == myField->getNumberOfValues() );
 
   // S'il existe des profils, je récupère la liste des numéros d'éléments
@@ -208,7 +208,7 @@ void affiche_fieldT(FIELD<double, NoInterlace> * myField)
   int (* fct)(int,const int *);
 
   if (!onAll) {
-    number = mySupport->getNumber(MED_ALL_ELEMENTS);
+    number = mySupport->getNumber(MEDMEM_ALL_ELEMENTS);
     fct=fct1;
   } else
     fct=fct2;
@@ -226,7 +226,7 @@ void affiche_fieldT(FIELD<double, NoInterlace> * myField)
 
 template <class T, class INTERLACING_TAG>
 void affiche_fieldT2(FIELD< T,  INTERLACING_TAG> * myField)
-{};
+{}
 
 
 // Spécialisation du traitement pour le mode FullInterlace
@@ -248,17 +248,17 @@ void affiche_fieldT2(FIELD<double, FullInterlace> * myField)
   int valueLength           = myField->getValueLength();
   const int * nbGaussPoints = myField->getNumberOfGaussPoints();
 
-  int numberOf              = mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
+  int numberOf              = mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
   int numberOfGeometricType = mySupport->getNumberOfTypes();
   const int * nbOfElements  = mySupport->getNumberOfElements();
   const MED_EN::medGeometryElement * typeList      = mySupport->getTypes();
   bool  onAll               = mySupport->isOnAllElements();
 
-  cout << "mySupport->getValueLength           (MED_ALL_ELEMENTS) : " << valueLength << endl;
-  cout << "mySupport->getNumberOfElements      (MED_ALL_ELEMENTS) : " << numberOf   << endl;
+  cout << "mySupport->getValueLength           (MEDMEM_ALL_ELEMENTS) : " << valueLength << endl;
+  cout << "mySupport->getNumberOfElements      (MEDMEM_ALL_ELEMENTS) : " << numberOf   << endl;
   cout << "mySupport->getNumberOfComponents    ()                 : " << numberOfComponents << endl;
   cout << "mySupport->getNumberOfGeometricType ()                 : " << numberOfGeometricType << endl;
-  cout << "mySupport->getNumberOfElements(MED_ALL_ELEMENTS)       : " << numberOf << endl;
+  cout << "mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS)       : " << numberOf << endl;
   assert(numberOf == myField->getNumberOfValues() );
 
   // S'il existe des profils, je récupère la liste des numéros d'éléments
@@ -274,7 +274,7 @@ void affiche_fieldT2(FIELD<double, FullInterlace> * myField)
   int (* fct)(int,const int *);
 
   if (!onAll) {
-    number = mySupport->getNumber(MED_ALL_ELEMENTS);
+    number = mySupport->getNumber(MEDMEM_ALL_ELEMENTS);
     fct=fct1;
   } else
     fct=fct2;
@@ -420,8 +420,8 @@ int main (int argc, char ** argv) {
 //    //      (même sans profil) lu à posteriori.
 //    {
 //      med_2_3::med_err err=-1;
-//      med_2_3::med_idt id = med_2_3::MEDouvrir(const_cast<char *> ( ("Copy_nomesh_"+fileName).c_str()),
-//                                            med_2_3::MED_LECTURE_ECRITURE);
+//      med_2_3::med_idt id = med_2_3::MEDfileOpen(const_cast<char *> ( ("Copy_nomesh_"+fileName).c_str()),
+//                                            med_2_3::MED_ACC_RDWR);
 //      if (id <=0) cout << "Erreur dans MEDouvrir pour le fichier " << "Copy_nomesh_"+fileName <<endl;
 
 //      err=med_2_3::MEDlienEcr(id, const_cast<char *> ( ("Copy_withmesh_"+fileName).c_str()),

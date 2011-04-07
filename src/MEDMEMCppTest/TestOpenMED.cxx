@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 {
   cout<<"test start"<<endl;
 
-  std::string filename = getResourceFile("pointe_import22.med");
+  std::string filename = getResourceFile("pointe.med");
 
   med_2_3::med_idt medIdt = med_2_3::MEDouvrir( (const_cast <char *> (filename.c_str())),
                                                  med_2_3::MED_LECTURE_ECRITURE);

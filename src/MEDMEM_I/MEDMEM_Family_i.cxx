@@ -38,8 +38,7 @@ using namespace MEDMEM;
  * Default constructor
  */
 //=============================================================================
-FAMILY_i::FAMILY_i(): _family((::FAMILY*)NULL),
-                                SUPPORT_i()
+FAMILY_i::FAMILY_i(): _family((::FAMILY*)NULL)
 {
 }
 //=============================================================================
@@ -47,8 +46,8 @@ FAMILY_i::FAMILY_i(): _family((::FAMILY*)NULL),
  * Copy Constructor 
  */
 //=============================================================================
-FAMILY_i::FAMILY_i(const FAMILY_i & f): _family(f._family),
-                                        SUPPORT_i(f._family)
+FAMILY_i::FAMILY_i(const FAMILY_i & f): SUPPORT_i(f._family),_family(f._family)
+                                        
 {
 }
 //=============================================================================
@@ -64,8 +63,7 @@ FAMILY_i::~FAMILY_i()
  * Constructor
  */
 //=============================================================================
-FAMILY_i::FAMILY_i(const ::FAMILY * const f): _family(f),
-                                              SUPPORT_i(f)
+FAMILY_i::FAMILY_i(const ::FAMILY * const f): SUPPORT_i(f),_family(f)
 {
 }
 //=============================================================================

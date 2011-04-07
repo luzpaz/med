@@ -63,8 +63,6 @@ namespace MEDMEM
 
     void updateNodeIds( CONNECTIVITY* connectivity );
 
-    void expandPolyConnectivity();
-
     struct TConnData
     {
       int _nb_elems;
