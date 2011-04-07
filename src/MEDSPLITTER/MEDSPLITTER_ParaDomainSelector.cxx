@@ -435,11 +435,11 @@ void ParaDomainSelector::gatherEntityTypesInfo(vector<MEDMEM::MESH*>& domain_mes
     if ( isMyDomain(idomain)) continue;
 
     MEDMEM::MESHING* meshing = (MEDMEM::MESHING*) domain_meshes[idomain];
-//     if ( meshing->getMeshDimension() < mesh_dim )
-//     {
-//       meshing->setMeshDimension( mesh_dim );
-//       meshing->setSpaceDimension( space_dim );
-//     }
+    if ( meshing->getMeshDimension() < mesh_dim )
+    {
+      //meshing->setSpaceDimension( space_dim );
+      meshing->setCoordinates( space_dim, /*NumberOfNodes=*/0, 0, "", 0);
+    }
 
     vector< medGeometryElement > types;
     vector< int >                nb_elems;
