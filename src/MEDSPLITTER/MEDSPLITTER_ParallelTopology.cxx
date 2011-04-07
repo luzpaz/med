@@ -645,6 +645,7 @@ void ParallelTopology::createFaceMapping(const MESHCollection& initial_collectio
 
   for (int iold=0; iold<nb_domain_old;iold++)
   {
+    if ( !initial_collection.getMesh(iold) ) continue;
     int nbtotalface = initial_collection.getMesh(iold)->getNumberOfElements(constituent_entity,MED_EN::MEDMEM_ALL_ELEMENTS);
     SCRUTE_MED(nbtotalface);
     const int* face_conn = 0;
