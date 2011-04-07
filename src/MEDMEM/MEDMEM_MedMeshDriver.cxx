@@ -730,8 +730,10 @@ int MED_MESH_RDONLY_DRIVER::getCONNECTIVITY()
                                        "any Connectivity"));
         }
 
-      if (Connectivity->_entityDimension != _ptrMesh->getMeshDimension())
-        MESSAGE_MED(LOC << "Small mesh dimension problem on the med file mounted in memory : diim stored " << _ptrMesh->getMeshDimension() << " dim computed using the connectivity " << Connectivity->_entityDimension);
+      // commented since _ptrMesh->getMeshDimension() is based on connectivity
+      // which is not yet set
+//       if (Connectivity->_entityDimension != _ptrMesh->getMeshDimension())
+//         MESSAGE_MED(LOC << "Small mesh dimension problem on the med file mounted in memory : diim stored " << _ptrMesh->getMeshDimension() << " dim computed using the connectivity " << Connectivity->_entityDimension);
 
       // At this point Connectivity->_typeConnectivity is either NODAL or DESCENDING
       // If both connectivities are found Connectivity->_typeConnectivity is NODAL
@@ -745,9 +747,7 @@ int MED_MESH_RDONLY_DRIVER::getCONNECTIVITY()
 
       if(Connectivity->_constituent==NULL) {
 
-      SCRUTE_MED(_ptrMesh->getMeshDimension());
-      SCRUTE_MED(Connectivity->_entityDimension);
-      if (_ptrMesh->getMeshDimension() == 3) {
+      if (Connectivity->_entityDimension == 3) {
         MESSAGE_MED(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DES FACES..." );
         CONNECTIVITY * ConnectivityFace = new CONNECTIVITY(MED_EN::MED_FACE);
         ConnectivityFace->_numberOfNodes    = _ptrMesh->getNumberOfNodes();
@@ -778,7 +778,7 @@ int MED_MESH_RDONLY_DRIVER::getCONNECTIVITY()
       }
 
       // read MED_EDGE connectivity
-      if (_ptrMesh->getMeshDimension() > 1) { // we are in 3 or 2D
+      if (Connectivity->_entityDimension > 1) { // we are in 3 or 2D
         MESSAGE_MED(LOC<<" ESSAI DE LECTURE DE LA CONNECTIVITE DES ARRETES...." );
         CONNECTIVITY * ConnectivityEdge = new CONNECTIVITY(MED_EDGE);
         ConnectivityEdge->_numberOfNodes    = _ptrMesh->getNumberOfNodes();
@@ -801,7 +801,7 @@ int MED_MESH_RDONLY_DRIVER::getCONNECTIVITY()
           delete ConnectivityEdge;
           MESSAGE_MED(LOC<<"No EDGE defined.");
         } else {
-          if (_ptrMesh->getMeshDimension() == 3)
+          if (Connectivity->_entityDimension == 3)
             if (Connectivity->_constituent != NULL)
               Connectivity->_constituent->_constituent=ConnectivityEdge;
             else
