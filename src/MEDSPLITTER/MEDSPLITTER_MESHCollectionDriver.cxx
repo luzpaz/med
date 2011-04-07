@@ -416,21 +416,21 @@ void MESHCollectionDriver::readSubdomain(vector<int*>& cellglobal,
 
   MESSAGE_MED("Reading face global numbering for mesh "<<idomain);
   MED_EN::medEntityMesh entity =
-    (_collection->getMeshDimension()==3)?MED_EN::MED_FACE:MED_EN::MED_EDGE;
+    (mesh->getMeshDimension()==3)?MED_EN::MED_FACE:MED_EN::MED_EDGE;
   int nbface=(_collection->getMesh())[idomain]->getNumberOfElements(entity,MED_EN::MEDMEM_ALL_ELEMENTS);
   if (nbface!=0)
   {
     int* array=new int[nbface];
     int offset=0;
-    int nbtypes = (_collection->getMesh())[idomain]->getNumberOfTypes(MED_EN::MED_FACE);
-    const MED_EN::medGeometryElement* types =(_collection->getMesh())[idomain]->getTypes(MED_EN::MED_FACE);
+    int nbtypes = mesh->getNumberOfTypes( entity );
+    const MED_EN::medGeometryElement* types =mesh->getTypes(entity);
 
     for (int itype=0; itype< nbtypes; itype++)
     {
-      MED_EN::medGeometryElement type=types[itype];
-      if (!_collection->isDimensionOK(type,(_collection->getMesh())[idomain]->getMeshDimension()-1)) continue;
+      MED_EN::medGeometryElement type = types[itype];
+      if (!_collection->isDimensionOK(type,mesh->getMeshDimension()-1)) continue;
 
-      int ntype = (_collection->getMesh())[idomain]->getNumberOfElements(MED_EN::MED_FACE,type);
+      int ntype = mesh->getNumberOfElements(entity,type);
       if (ntype==0) continue;
       med_2_3::MEDmeshGlobalNumberRd( fid, meshname,
                                       MED_NO_DT, MED_NO_IT,
@@ -587,7 +587,7 @@ void MESHCollectionDriver::writeSubdomain(int idomain, int nbdomains, char* dist
                                        ntype, array+offset );
         offset+=ntype;
       }
-    if (nface>0) delete[] array;
+    delete[] array;
   }
 
 
