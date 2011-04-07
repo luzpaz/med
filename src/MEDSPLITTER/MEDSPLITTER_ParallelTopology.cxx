@@ -246,7 +246,7 @@ ParallelTopology::ParallelTopology(const vector<MEDMEM::MESH*>& meshes,
           m_face_loc_to_glob[idomain][iface]=global_number;
         } 
       }
-    }     
+    }
     //using former face numbering
     else
     {
@@ -258,7 +258,7 @@ ParallelTopology::ParallelTopology(const vector<MEDMEM::MESH*>& meshes,
         //m_face_loc_to_glob[make_pair(idomain,iface+1)]=global_number;
         m_face_loc_to_glob[idomain][iface]=global_number;
       }
-    }     
+    }
   }
 
   m_nb_total_cells=index_global;
