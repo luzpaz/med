@@ -44,7 +44,7 @@ using namespace MED_EN;
 
 void ParaMEDSPLITTERTest::testMeshSendReceive()
 {
-  MEDMEM::STRING filename = MEDSPLITTERTest_Utils::getResourceFile("pointe_import22.med");
+  MEDMEM::STRING filename = MEDSPLITTERTest_Utils::getResourceFile("pointe.med");
   MEDMEM::MESH* meshSent = 0;
   MEDMEM::MESH* meshRecv = 0;
 
@@ -84,7 +84,7 @@ void ParaMEDSPLITTERTest::testMeshSendReceive()
     if ( ! meshSent->deepCompare( *meshRecv ) )
     {
 #ifdef _DEBUG_
-      MEDMEM::STRING outfilename("/tmp/pointe_import22");
+      MEDMEM::STRING outfilename("/tmp/pointe");
       outfilename << (void*) meshRecv << ".med";
       int drv = meshRecv->addDriver(MEDMEM::MED_DRIVER, outfilename, meshRecv->getName() );
       meshRecv->write( drv );
@@ -108,7 +108,7 @@ void ParaMEDSPLITTERTest::testMeshSendReceive()
 
 void ParaMEDSPLITTERTest::testMeshFuse()
 {
-  string filename  = MEDSPLITTERTest_Utils::getResourceFile("pointe_import22.med");
+  string filename  = MEDSPLITTERTest_Utils::getResourceFile("pointe.med");
   string meshname  = "maa1";
 
   // Splitting

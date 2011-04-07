@@ -39,16 +39,16 @@ using namespace MED_EN;
 
 //================================================================================
 /*!
- * \brief call test_medsplitter_para with 2 files: blade.med et pointe_import22.med
+ * \brief call test_medsplitter_para with 2 files: blade.med et pointe.med
  */
 //================================================================================
 
 void ParaMEDSPLITTERTest::functional_validation()
 {
   //test_medsplitter_para( "/dn25/salome/eap/salome/misc/tmp/meshing_REsplit1.med", "meshing_1");
-  test_medsplitter_para( MEDSPLITTERTest_Utils::getResourceFile("TimeStamps_import22.med"), "dom");
+  test_medsplitter_para( MEDSPLITTERTest_Utils::getResourceFile("TimeStamps.med"), "dom");
   test_medsplitter_para( MEDSPLITTERTest_Utils::getResourceFile("square1.med"), "Mesh_2");
-  test_medsplitter_para( MEDSPLITTERTest_Utils::getResourceFile("pointe_import22.med"), "maa1");
+  test_medsplitter_para( MEDSPLITTERTest_Utils::getResourceFile("pointe.med"), "maa1");
 }
 
 //================================================================================
