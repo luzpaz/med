@@ -39,7 +39,7 @@ extern "C"
 }
 
 #ifdef _DEBUG_
-static int MYDEBUG = 0;
+static int MYDEBUG = 1;
 #else
 static int MYDEBUG = 0;
 #endif
@@ -87,8 +87,8 @@ namespace MED
           aVersion = eV2_2;
       }
       else {
-	// VSR: simulate med 2.3.6 behavior, med file version is assumed to 2.1
-	aVersion = eV2_1;
+        // VSR: simulate med 2.3.6 behavior, med file version is assumed to 2.1
+        aVersion = eV2_1;
       }
     }
     MEDfileClose(aFid);
