@@ -478,10 +478,10 @@ void ParaMEDSPLITTERTest::testParaDomainSelector_exchangeJoint ()
   CPPUNIT_ASSERT_EQUAL( joint_edge_glob_id+0, faces[0]->getGlobal());
   CPPUNIT_ASSERT_EQUAL( joint_edge_glob_id+1, faces[1]->getGlobal());
   // edge connectivity
-  CPPUNIT_ASSERT_EQUAL( dom_sel.rank() ? 3 : 2, (*faces[0])[0]);
-  CPPUNIT_ASSERT_EQUAL( dom_sel.rank() ? 1 : 4, (*faces[0])[1]);
-  CPPUNIT_ASSERT_EQUAL( dom_sel.rank() ? 5 : 4, (*faces[1])[0]);
-  CPPUNIT_ASSERT_EQUAL( dom_sel.rank() ? 3 : 6, (*faces[1])[1]);
+  CPPUNIT_ASSERT_EQUAL( dom_sel.rank() ? 1 : 4, (*faces[0])[0]);
+  CPPUNIT_ASSERT_EQUAL( dom_sel.rank() ? 3 : 2, (*faces[0])[1]);
+  CPPUNIT_ASSERT_EQUAL( dom_sel.rank() ? 3 : 6, (*faces[1])[0]);
+  CPPUNIT_ASSERT_EQUAL( dom_sel.rank() ? 5 : 4, (*faces[1])[1]);
 
   grid->removeReference();
 }
