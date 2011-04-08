@@ -23,9 +23,9 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 # if without KERNEL, build only med 2.1 library
 if MED_ENABLE_KERNEL
-  SUBDIRS = Base V2_1 V2_2 Factory
+  SUBDIRS = Base V2_2 Factory
 else !MED_ENABLE_KERNEL
   SUBDIRS = Base V2_1
 endif
 
-DIST_SUBDIRS = Base V2_1 V2_2 Factory
+DIST_SUBDIRS = Base V2_2 Factory
