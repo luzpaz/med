@@ -66,7 +66,7 @@ int main (int argc, char ** argv) {
     vector<string> MeshName = myMed.getMeshNames() ;
     for (int i=0; i<NumberOfMeshes; i++) {
       GMESH* mesh = myMed.isStructuredMesh( MeshName[i] ) ? (GMESH*) new GRID : (GMESH*) new MESH;
-      mesh->addDriver(MED_DRIVER, filenameIN, MeshName[i] );
+      mesh->addDriver(MED_DRIVER, filenameIN, MeshName[i], MED_EN::RDONLY);
       mesh->read();
       cout << "-> Mesh "<<i+1<<", named "<<MeshName[i]<<" is read !" << endl;
       meshes.push_back( mesh );
@@ -94,7 +94,7 @@ int main (int argc, char ** argv) {
         }
         myField->setIterationNumber( FieldIteration[j].dt );
         myField->setOrderNumber( FieldIteration[j].it );
-        myField->addDriver( MED_DRIVER, filenameIN, FieldName[i]);
+        myField->addDriver( MED_DRIVER, filenameIN, FieldName[i], MED_EN::RDONLY);
         myField->read() ;
         cout << "    * Iteration "<<FieldIteration[j].dt<<" and  order number "<<FieldIteration[j].it<<" is read !" << endl;
         fields.push_back( myField );
