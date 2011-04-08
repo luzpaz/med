@@ -259,11 +259,10 @@ MED_FIELD_DRIVER<T>::createFieldSupportPart1(med_2_3::med_idt        id,
   numberOfElementsOfTypeC.resize(MED_N_CELL_GEO_FIXED_CON+1);
   numberOfGaussPoint.resize(MED_N_CELL_GEO_FIXED_CON+1);
 
-  //med_2_3::med_int nmaa=0, ngauss=0, numdt=-1, numo=-1, nbPdtIt=0, nbPdtIt1=0, nbPdtIt2=0;
-  med_2_3::med_int ngauss=0, nbPdtIt=0;
+  med_2_3::med_int numdt=-1, numo=-1, ngauss=0, nbPdtIt=0;
   char dtunit[MED_LNAME_SIZE+1];
   char maa[MED_NAME_SIZE+1];
-  //med_2_3::med_float   dt=-1.0;
+  med_2_3::med_float   dt=-1.0;
   med_2_3::med_bool local;
   med_2_3::med_err     ret=1;
   numberOfElementsOfTypeC[0] = 1;
@@ -362,91 +361,12 @@ MED_FIELD_DRIVER<T>::createFieldSupportPart1(med_2_3::med_idt        id,
         }
       }
 
-
-      /* Cherche le champ pour le <ndt>,<ot> demandé et détermine le nombre de points de Gauss*/
-//       ret = 0; alreadyFoundPdtIt = false; ngauss =0;
-//       for ( med_2_3::med_int j=1; j <= nbPdtIt; j++ ) {
-
-//         // Search how many <ngauss> (<fieldName>,<ndt>,<ot>) has   (NB)
-//         //ret += med_2_3::MEDpasdetempsInfo(id, const_cast <char*> ( fieldName.c_str() ),
-//         //                               (med_2_3::med_entite_maillage)   (*currentEntity).first,
-//         //                               (med_2_3::med_geometrie_element)  *currentGeometry,
-//         //                               j, &ngauss,  &numdt,  &numo, dtunit, &dt,
-//         //                                maa, &local, &nmaa);
-
-//         ret += med_2_3::MEDfieldComputingStepInfo(id,fieldName.c_str(),j,&numdt,&numo,&dt);
-//         nmaa=1;
-//         char pflnamep3[MED_NAME_SIZE+1];
-//         int profilesizep3;
-//         char locnamep3[MED_NAME_SIZE+1];
-//         numberOfElements =med_2_3::MEDfieldnValueWithProfile(id,fieldName.c_str(),numdt,numo,(med_2_3::med_entity_type)   (*currentEntity).first,
-//                                                              (med_2_3::med_geometry_type)  *currentGeometry,1,med_2_3::MED_COMPACT_PFLMODE,pflnamep3,&profilesizep3,locnamep3,&ngauss);
-                
-//         MED_FIELD_DRIVER<T>::_ptrField->setTime(dt); // PAL12664
-        
-//         if ( ndt == numdt && numo == od ) {
-//           alreadyFoundPdtIt = true;
-
-//           if ( nmaa > 1 ) {
-//             MESSAGE_MED(LOC<<" Field |" << fieldName << "| with (ndt,or) = ("
-//                     << ndt << "," << od << ") for (entityType,geometricType)=("
-//                     << MED_EN::entNames[entityCurrent] << ","
-//                     << MED_EN::geoNames[*currentGeometry] << ")"
-//                     << "is defined on multiple meshes, using dafault mesh  |" << maa << "|" );
-//           }
-
-//           if ( !local) {
-//             MESSAGE_MED(" Field |" << fieldName << "| with (ndt,or) = ("
-//                     << ndt << "," << od << ") for (entityType,geometricType)=("
-//                     << MED_EN::entNames[entityCurrent] << ","
-//                     << MED_EN::geoNames[*currentGeometry] << ")"
-//                     << "is using a mesh on a distant file (ignored)" );
-
-// //            throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Field |" << fieldName << "| with (ndt,or) = ("
-// //                                         << ndt << "," << od << ") for (entityType,geometricType)=("
-// //                                         << MED_EN::entNames[(*currentEntity).first] << ","
-// //                                         << MED_EN::geoNames[*currentGeometry] << ")"
-// //                                         << "is using a mesh on a different file which is not yet supported" ));
-//           }
-
-//                 //VB commented out to allow for fields on multiple meshes
-//          //  if ( ! meshName.empty() )
-// //          if ( meshName != maa ) {
-// //            throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Field |" << fieldName << "| with (ndt,or) = ("
-// //                                         << ndt << "," << od << ") for (entityType,geometricType)=("
-// //                                         << MED_EN::entNames[entityCurrent] << ","
-// //                                         << MED_EN::geoNames[*currentGeometry] << ")"
-// //                                         << "is defined on mesh |" << maa << "| not on mesh |" << meshName ));
-// //          }
-//           break;
-//         }
-
-//       }
-
-//       MESSAGE_MED(LOC << " a (dt,it) is found ?? " << alreadyFoundPdtIt);
-
-//       if ( !alreadyFoundPdtIt )
-//         throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Field |" << fieldName << "| with (ndt,or) = ("
-//                                      << ndt << "," << od << ") should be defined for (entityType,geometricType)=("
-//                                      << MED_EN::entNames[entityCurrent] << ","
-//                                      << MED_EN::geoNames[*currentGeometry] << ")" ));
-
       if (/* (ret != 0)  ||*/ (ngauss < 1 ) )
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Error in MEDfieldnValueWithProfile for  Field |" << fieldName 
                                      << "| with (ndt,or) = ("
                                      << ndt << "," << od << ") for (entityType,geometricType)=("
                                      << MED_EN::entNames[entityCurrent] << ","
                                      << MED_EN::geoNames[geometryCurrent] << ")" )); ;
-
-//       if ( meshName.empty() ) // PAL19635: error with TestMEDSPLITTER
-//         meshName = maa;
-
-//       if ( numberOfElements <=  0 )
-//         throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Error in MEDnVal for  Field |" << fieldName
-//                                      << "| with (ndt,or) = ("
-//                                      << ndt << "," << od << ") for (entityType,geometricType)=("
-//                                      << MED_EN::entNames[entityCurrent] << ","
-//                                      << MED_EN::geoNames[*currentGeometry] << ")" )); ;
 
       numberOfElementsOfType[numberOfGeometricType] = numberOfElements;
       numberOfElementsOfTypeC[numberOfGeometricType+1]=
@@ -468,25 +388,54 @@ MED_FIELD_DRIVER<T>::createFieldSupportPart1(med_2_3::med_idt        id,
   if ( numberOfGeometricType == 0 )
     return false;
 
-  if ( meshName.empty() ) // PAL19635: error with TestMEDSPLITTER
-    {
-      med_2_3::med_field_type typchap3;
-      int nbCompp3=med_2_3::MEDfieldnComponentByName(id,fieldName.c_str());
-      if ( nbCompp3 <= 0 )
-        return false;
-      char *compNamesp3=new char[nbCompp3*MED_SNAME_SIZE+1];
-      char *compUnitp3=new char[nbCompp3*MED_SNAME_SIZE+1];
-      ret = med_2_3::MEDfieldInfoByName(id,fieldName.c_str(),maa,&local,&typchap3,compNamesp3,compUnitp3,dtunit,&nbPdtIt);
-      delete [] compNamesp3;
-      delete [] compUnitp3;
-      if ( ret < 0 )
-        return false;
-      meshName = maa;
-      if ( meshName.empty() )
-        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't get mesh name for field |"  << fieldName
-                                     << "| using MEDfieldInfoByName()" ));
-    }
+  {
+    // Read mesh name and nb of timestamps in the field
+    med_2_3::med_field_type typchap3;
+    int nbCompp3=med_2_3::MEDfieldnComponentByName(id,fieldName.c_str());
+    if ( nbCompp3 <= 0 )
+      return false;
+    char *compNamesp3=new char[nbCompp3*MED_SNAME_SIZE+1];
+    char *compUnitp3=new char[nbCompp3*MED_SNAME_SIZE+1];
+    ret = med_2_3::MEDfieldInfoByName(id,fieldName.c_str(),maa,&local,&typchap3,compNamesp3,compUnitp3,dtunit,&nbPdtIt);
+    delete [] compNamesp3;
+    delete [] compUnitp3;
+    if ( ret < 0 )
+      return false;
 
+
+    //VB commented out to allow for fields on multiple meshes
+    //  if ( ! meshName.empty() )
+    //          if ( meshName != maa ) {
+    //            throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Field |" << fieldName << "| with (ndt,or) = ("
+    //                                         << ndt << "," << od << ") for (entityType,geometricType)=("
+    //                                         << MED_EN::entNames[entityCurrent] << ","
+    //                                         << MED_EN::geoNames[*currentGeometry] << ")"
+    //                                         << "is defined on mesh |" << maa << "| not on mesh |" << meshName ));
+    if ( meshName.empty() )
+      meshName = maa;
+    if ( meshName.empty() )
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't get mesh name for field |"  << fieldName
+                                   << "| using MEDfieldInfoByName()" ));
+    // Read the time
+    bool timeFound = false;
+    for ( med_2_3::med_int j=1; j <= nbPdtIt; j++ )
+      {
+        ret = med_2_3::MEDfieldComputingStepInfo(id,fieldName.c_str(),j,&numdt,&numo,&dt);
+        if ( ret == MED_INVALID )
+          throw MEDEXCEPTION(LOCALIZED( STRING(LOC) << ": can't read the "
+                                        << j << "-th timestamp info of field " << fieldName ));
+        if ( numdt == ndt && numo == od )
+          {
+            MED_FIELD_DRIVER<T>::_ptrField->setTime(dt);
+            timeFound = true;
+            break;
+          }
+      }
+    if ( !timeFound )
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Timestamp with (ndt,or) = ("
+                                   << ndt << "," << od << ") not found for field " << fieldName));
+  }
+   
   //retrieves the right medmem entity type from field_dim and mesh_dim
   int mesh_dim = MED_FIELD_DRIVER<T>::getMeshDimensionFromFile(id,meshName);
   //if (mesh_dim==2 && field_dim==2) // 0020644: [CEA 384] Problem with 1D no structured meshing
@@ -893,7 +842,8 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
           med_2_3::med_bool localp3;
           char dtunitp3[MED_LNAME_SIZE+1];
           med_2_3::med_int nstpp3;
-          err = med_2_3::MEDfieldInfo(id, i, tmpFieldName, meshnamep3, &localp3, &type, componentName,
+          err = med_2_3::MEDfieldInfo(id, i, tmpFieldName, meshnamep3,
+                                      &localp3, &type, componentName,
                                       unitName, dtunitp3,&nstpp3) ;
 
           MESSAGE_MED("Field "<<i<<" : #" << tmpFieldName <<"# et recherche #"<<fieldName.c_str()<<"#");
@@ -907,8 +857,6 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
           delete[] unitName ;
         }
     }
-
-  //delete[] tmpFieldName ;
 
   // Si aucun champ ne correspond les variables <componentName> et <unitName> ont été correctement
   // désallouées dans la boucle de recherche
