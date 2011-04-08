@@ -237,14 +237,15 @@ void MED_MESH_RDONLY_DRIVER::read(void)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << " no meshes at all in file " << _fileName));
 
   // check mesh nature, unstructured or not (PAL14113)
+  // and set space dimension
   {
     int naxis=med_2_3::MEDmeshnAxisByName(_medIdt,_meshName.c_str());
     if ( naxis < 0 )
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << " no mesh |" << _meshName
                                    << "| in file " << _fileName));
-    if ( naxis == 0 )
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Mesh |" << _meshName
-                                   << "| has invalid space dimension 0."));
+//     if ( naxis == 0 )
+//       throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Mesh |" << _meshName
+//                                    << "| has invalid space dimension 0."));
 
     med_2_3::med_int spaceDimension,meshDimension;
     med_2_3::med_mesh_type meshType;
@@ -253,6 +254,7 @@ void MED_MESH_RDONLY_DRIVER::read(void)
     med_2_3::med_sorting_type sttp3;
     int nstep;
     med_2_3::med_axis_type axtypp3;
+    naxis = std::max(3, naxis); // safe enough?
     char *t1pp3=new char[naxis*MED_SNAME_SIZE+1];
     char *t2pp3=new char[naxis*MED_SNAME_SIZE+1];
     med_2_3::MEDmeshInfoByName(_medIdt,_meshName.c_str(),&spaceDimension,&meshDimension,&meshType,commentp3,dtunittp3,&sttp3,&nstep,&axtypp3,t1pp3,t2pp3);
@@ -268,8 +270,16 @@ void MED_MESH_RDONLY_DRIVER::read(void)
           throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Mesh type mismatch. "
                                        "Class GRID must be used for a structured mesh"));
       }
-    _ptrMesh->_spaceDimension = naxis;
+    if ( meshDimension > spaceDimension )
+      spaceDimension = meshDimension;
+
+    if ( spaceDimension < 1 )
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "The space dimension |" << spaceDimension
+                                   << "| seems to be incorrect for the mesh : |" << _meshName << "|"));
+    _ptrMesh->_spaceDimension = spaceDimension;
+    
   }
+
   if (_ptrMesh->getIsAGrid())
   {
     getGRID();
@@ -556,44 +566,31 @@ int  MED_MESH_RDONLY_DRIVER::getCOORDINATE()
     med_2_3::med_sorting_type sortTypepp3;
     int nstepp3;
     med_2_3::med_axis_type axtypepp3;
-    
-    int numberOfMeshesInFile = med_2_3::MEDnMesh(_medIdt);
-
-    if (numberOfMeshesInFile == MED_INVALID)
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Problem in File where the mesh " << _meshName
-                                   << " is supposed to be stored"));
-    int naxis=med_2_3::MEDmeshnAxisByName(_medIdt,_meshName.c_str());
     //
-    string tmp_nom_coord (MED_SNAME_SIZE*naxis+1,'\0');
-    string tmp_unit_coord(MED_SNAME_SIZE*naxis+1,'\0');
+    string tmp_nom_coord (MED_SNAME_SIZE*_ptrMesh->_spaceDimension+1,'\0');
+    string tmp_unit_coord(MED_SNAME_SIZE*_ptrMesh->_spaceDimension+1,'\0');
     char * tmp_nom = (const_cast <char *> ( tmp_nom_coord.c_str())  );
     char * tmp_unit= (const_cast <char *> ( tmp_unit_coord.c_str()) );
     //
-    err=med_2_3::MEDmeshInfoByName(_medIdt,_meshName.c_str(),&SpaceDimensionRead,&MeshDimension,&meshTypepp3,meshDescription,dtunit,&sortTypepp3,&nstepp3,
-                          &axtypepp3,tmp_nom,tmp_unit);
+    err=med_2_3::MEDmeshInfoByName(_medIdt,_meshName.c_str(),
+                                   &SpaceDimensionRead,&MeshDimension,
+                                   &meshTypepp3,meshDescription,
+                                   dtunit,&sortTypepp3,&nstepp3,
+                                   &axtypepp3,tmp_nom,tmp_unit);
     int dtp3,itp3;
     med_2_3::med_float ttpp3;
     med_2_3::MEDmeshComputationStepInfo(_medIdt,_meshName.c_str(),1,&dtp3,&itp3,&ttpp3);
-
-    if ( MeshDimension == MED_INVALID )
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "The mesh dimension |" << MeshDimension
-                                   << "| seems to be incorrect for the mesh : |" << _meshName << "|"));
-
-    // Read or get the dimension of the space for the mesh <_meshName>
-    int SpaceDimension = MeshDimension;
-
-    if (SpaceDimensionRead  != MED_INVALID)
-      SpaceDimension = SpaceDimensionRead;
-
-    _ptrMesh->_spaceDimension = SpaceDimension;
 
     MESH* ptrMesh = dynamic_cast<MESH*>(_ptrMesh);
 
     // Read the number of nodes used in the mesh <_meshName>
     // to be able to create a COORDINATE object
     med_2_3::med_bool chgtpp3,trsfpp3;
-    int NumberOfNodes = med_2_3::MEDmeshnEntity(_medIdt,_meshName.c_str(),dtp3,itp3,med_2_3::MED_NODE,MED_NONE,med_2_3::MED_COORDINATE,med_2_3::MED_NO_CMODE,&chgtpp3,&trsfpp3);
-
+    int NumberOfNodes = med_2_3::MEDmeshnEntity(_medIdt,_meshName.c_str(),
+                                                dtp3,itp3,med_2_3::MED_NODE,MED_NONE,
+                                                med_2_3::MED_COORDINATE,
+                                                med_2_3::MED_NO_CMODE,
+                                                &chgtpp3,&trsfpp3);
     if ( NumberOfNodes <= MED_VALID )
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"The number of nodes |" << NumberOfNodes
                                    << "| seems to be incorrect for the mesh : |" << _meshName << "|" ));
@@ -602,7 +599,7 @@ int  MED_MESH_RDONLY_DRIVER::getCOORDINATE()
     // create a COORDINATE object
     if (ptrMesh->_coordinate)
       delete ptrMesh->_coordinate;
-    ptrMesh->_coordinate = new COORDINATE(SpaceDimension, NumberOfNodes, MED_EN::MED_FULL_INTERLACE);
+    ptrMesh->_coordinate = new COORDINATE(ptrMesh->_spaceDimension, NumberOfNodes, MED_EN::MED_FULL_INTERLACE);
 
     med_2_3::med_axis_type rep=axtypepp3; // ATTENTION ---> DOIT ETRE INTEGRE DS MESH EF: FAIT NON?
 
@@ -611,7 +608,7 @@ int  MED_MESH_RDONLY_DRIVER::getCOORDINATE()
     if (err != MED_VALID)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Can't read coordinates of the |" << NumberOfNodes
                                    << "| nodes for the mesh : |" << _meshName
-                                   << "| of space dimension |" << SpaceDimension
+                                   << "| of space dimension |" << ptrMesh->_spaceDimension
                                    << "| with units names |"   << tmp_nom
                                    << "| and units |"          << tmp_unit
                                    << " |"));
@@ -1498,7 +1495,7 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
       err = getCellsFamiliesNumber(MEDArrayFaceFamily,MED_FACE);
       MESSAGE_MED(LOC << "error returned from getCellsFamiliesNumber for Faces " << err);
     }
-    else if (_ptrMesh->getNumberOfElements( MED_EN::MED_EDGE, MED_EN::MEDMEM_ALL_ELEMENTS))
+    if (_ptrMesh->getNumberOfElements( MED_EN::MED_EDGE, MED_EN::MEDMEM_ALL_ELEMENTS))
     {
       // EDGE in 3D or 2D
       MEDArrayEdgeFamily = new int* [_ptrMesh->getNumberOfTypes(MED_EDGE)];
@@ -1998,7 +1995,7 @@ int MED_MESH_WRONLY_DRIVER::writeGRID() const
       med_2_3::med_sorting_type sttp3;
       int nstep;
       med_2_3::med_axis_type axtypp3;
-      int naxis=med_2_3::MEDmeshnAxisByName(_medIdt,_meshName.c_str());
+      int naxis=std::max( 3, med_2_3::MEDmeshnAxisByName(_medIdt,_meshName.c_str()));
       char *t1pp3=new char[naxis*MED_SNAME_SIZE+1];
       char *t2pp3=new char[naxis*MED_SNAME_SIZE+1];
       med_2_3::MEDmeshInfoByName(_medIdt,_meshName.c_str(),&spaceDimension,&meshDimension,&ttmp3,commentp3,dtunittp3,&sttp3,&nstep,&axtypp3,t1pp3,t2pp3);
