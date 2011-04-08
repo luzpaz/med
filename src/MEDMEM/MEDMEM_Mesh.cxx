@@ -237,7 +237,8 @@ MESH::MESH(driverTypes driverType, const string &  fileName/*=""*/, const string
   }
   catch ( MED_EXCEPTION& e )
   {
-    if ( _drivers[current] ) delete _drivers[current];
+    if ( _drivers[current] )
+      _drivers[current]->close(), delete _drivers[current];
     _drivers[current] = 0;
     throw e;
   }
