@@ -599,7 +599,7 @@ static void testDrivers()
                                                        fieldname_celldouble_rd));
 
   //Test read(int index) method
-  int IdDriver_rd = aField_1->addDriver(MED_DRIVER,filename_rd,fieldname_celldouble_rd);
+  int IdDriver_rd = aField_1->addDriver(MED_DRIVER,filename_rd,fieldname_celldouble_rd,MED_EN::RDONLY);
   // TODO: throw if read for the second time
   // (BUG) Cannot open file, but file exist
   // EAP: no more pb with opening the file for the second time with "weaker" mode,
