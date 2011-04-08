@@ -29,81 +29,13 @@
 #include "MED_Algorithm.hxx"
 #include "MED_Utilities.hxx"
 
-
-
-//#include <med.h>
-//using namespace med_2_2;
-
-extern "C"
-{
 #include <med.h>
-med_err MEDmeshEntityNameRd(const med_idt              fid,
-                            const char*  const         meshname,
-                            const med_int              numdt,
-                            const med_int              numit,
-                            const med_entity_type      entitype,
-                            const med_geometry_type    geotype,
-                            char* const                name);
-
-med_err MEDmeshEntityNumberRd(const med_idt               fid,
-                                const char*  const          meshname,
-                                const med_int               numdt,
-                                const med_int               numit,
-                                const med_entity_type       entitype,
-                                const med_geometry_type     geotype,
-                                med_int * const             number);
-  
-  med_err MEDmeshEntityFamilyNumberRd(const med_idt               fid,
-                                      const char*  const          meshname,
-                                      const med_int               numdt,
-                                      const med_int               numit,
-                                      const med_entity_type       entitype,
-                                      const med_geometry_type     geotype,
-                                      med_int * const             number);
-
-  med_err MEDfieldCr( const med_idt fid,
-                      const char * const fieldname,
-                      const med_field_type fieldtype,
-                      const med_int nbofcomponent,
-                      const char * const componentname,
-                      const char * const componentunit,
-                      const char * const dtunit,
-                      const char * const meshname);
-
-  med_err MEDfieldComputingStepInfo(const med_idt fid,
-                                    const char * const fieldname,
-                                    const int csit,
-                                    med_int * const numdt,
-                                    med_int * const numit,
-                                    med_float * const dt);
-
-#ifdef WNT
-MEDC_EXPORT
-#endif
-med_err
-MEDlocalizationInfo(const med_idt             fid,
-        const int                 localizationit,
-        char              * const localizationname,
-        med_geometry_type * const geotype,
-        med_int           * const spacedimension,
-        med_int           * const nbofipoint,
-        char *              const geointerpname,
-        char *              const sectionmeshname,
-        med_int           * const nsectionmeshcell,
-        med_geometry_type * const sectiongeotype);
-
-#ifdef WNT
-MEDC_EXPORT
-#endif
-med_int
-MEDnMesh(med_idt fid);
-
-}
+#include <med_err.h>
 
 #ifdef _DEBUG_
-static int MYDEBUG = 0;
+static int MYDEBUG = 1;
 #else
-// static int MYDEBUG = 0;
+static int MYDEBUG = 0;
 #endif
 
 
@@ -630,11 +562,15 @@ namespace MED
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0){ // TODO: Get correct error code
-        //EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDfamLire(...) of CELLS");
+//         EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDfamLire(...) of CELLS");
         aRet = 0;
-        int aSize = (int)theInfo.myFamNum->size();
-        theInfo.myFamNum->clear();
-        theInfo.myFamNum->resize(aSize,0);
+        
+        if (aRet == MED_ERR_DOESNTEXIST)
+        {
+          int aSize = (int)theInfo.myFamNum->size();
+          theInfo.myFamNum->clear();
+          theInfo.myFamNum->resize(aSize,0);
+        }
       }
     }
 
@@ -854,17 +790,22 @@ namespace MED
                                           aModeSwitch,
                                           &aCoord);
                                           
-      if (MEDmeshEntityFamilyNumberRd(myFile->Id(),
-                                  &aMeshName,
-                                  MED_NO_DT,
-                                  MED_NO_IT,
-                                  MED_NODE,
-                                  MED_NO_GEOTYPE ,
-                                  &aFamNum) < 0 )
-      { // TODO: Get correct error code
-        int mySize = (int)theInfo.myFamNum->size();
-        theInfo.myFamNum->clear();
-        theInfo.myFamNum->resize(mySize,0);
+      aRet = MEDmeshEntityFamilyNumberRd(myFile->Id(),
+                                         &aMeshName,
+                                         MED_NO_DT,
+                                         MED_NO_IT,
+                                         MED_NODE,
+                                         MED_NO_GEOTYPE ,
+                                         &aFamNum);
+                                  
+      if (aRet < 0 )
+      { 
+        if (aRet == MED_ERR_DOESNTEXIST)
+        {
+          int aSize = (int)theInfo.myFamNum->size();
+          theInfo.myFamNum->clear();
+          theInfo.myFamNum->resize(aSize,0);
+        }
       }
                                   
       if ( MEDmeshEntityNameRd(myFile->Id(),
@@ -1524,9 +1465,12 @@ namespace MED
       
       if (anIsFamNum == MED_FALSE)
       {
-        int mySize = (int)theInfo.myFamNum->size();
-        theInfo.myFamNum->clear();
-        theInfo.myFamNum->resize(mySize,0);
+        if (aRet == MED_ERR_DOESNTEXIST)
+        {
+          int aSize = (int)theInfo.myFamNum->size();
+          theInfo.myFamNum->clear();
+          theInfo.myFamNum->resize(aSize,0);
+        }
       }
       
     }
