@@ -28,7 +28,6 @@
 #include "MED_Factory.hxx"
 #include "MED_Utilities.hxx"
 #include "MED_V2_2_Wrapper.hxx"
-#include "MED_V2_1_Wrapper.hxx"
 
 #include <stdio.h>
 #include <sstream>
@@ -81,14 +80,11 @@ namespace MED
       med_err aRet = MEDfileNumVersionRd(aFid,&aMajor,&aMinor,&aRelease);
       INITMSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'; aRet = "<<aRet<<std::endl);
       if(aRet >= 0){
-        if(aMajor == 2 && aMinor == 1)
-          aVersion = eV2_1;
-        else
           aVersion = eV2_2;
       }
       else {
         // VSR: simulate med 2.3.6 behavior, med file version is assumed to 2.1
-        aVersion = eV2_1;
+        aVersion = eV2_2;
       }
     }
     MEDfileClose(aFid);
@@ -126,9 +122,6 @@ namespace MED
     case eV2_2:
       aWrapper.reset(new MED::V2_2::TVWrapper(theFileName));
       break;
-    case eV2_1:
-      aWrapper.reset(new MED::V2_1::TVWrapper(theFileName));
-      break;
     default:
       EXCEPTION(std::runtime_error,"MED::CrWrapper - theFileName = '"<<theFileName<<"'");
     }
@@ -146,9 +139,6 @@ namespace MED
     switch(theId){
     case eV2_2:
       aWrapper.reset(new MED::V2_2::TVWrapper(theFileName));
-      break;
-    case eV2_1:
-      aWrapper.reset(new MED::V2_1::TVWrapper(theFileName));
       break;
     default:
       aWrapper.reset(new MED::V2_2::TVWrapper(theFileName));
