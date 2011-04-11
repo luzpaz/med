@@ -23,7 +23,6 @@
 //  File   : 
 //  Author : 
 //  Module : 
-//  $Header$
 //
 #include "MED_V2_2_Wrapper.hxx"
 #include "MED_Algorithm.hxx"
@@ -33,9 +32,9 @@
 #include <med_err.h>
 
 #ifdef _DEBUG_
-static int MYDEBUG = 1;
-#else
 static int MYDEBUG = 0;
+#else
+// static int MYDEBUG = 0;
 #endif
 
 
@@ -390,7 +389,7 @@ namespace MED
                                   &anAttrDesc,
                                   &aFamilyId,
                                   &aGroupNames);
-      
+
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
@@ -562,15 +561,14 @@ namespace MED
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0){ // TODO: Get correct error code
-//         EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDfamLire(...) of CELLS");
+        //EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDfamLire(...) of CELLS");
         aRet = 0;
-        
         if (aRet == MED_ERR_DOESNTEXIST)
-        {
-          int aSize = (int)theInfo.myFamNum->size();
-          theInfo.myFamNum->clear();
-          theInfo.myFamNum->resize(aSize,0);
-        }
+          {
+            int aSize = (int)theInfo.myFamNum->size();
+            theInfo.myFamNum->clear();
+            theInfo.myFamNum->resize(aSize,0);
+          }
       }
     }
 
@@ -1276,7 +1274,7 @@ namespace MED
                                   aConnMode,
                                   &chgt,
                                   &trsf);
-                                
+
       theConnSize = MEDmeshnEntity(myFile->Id(),
                                   &aMeshName,
                                   MED_NO_DT,
@@ -1466,11 +1464,11 @@ namespace MED
       if (anIsFamNum == MED_FALSE)
       {
         if (aRet == MED_ERR_DOESNTEXIST)
-        {
-          int aSize = (int)theInfo.myFamNum->size();
-          theInfo.myFamNum->clear();
-          theInfo.myFamNum->resize(aSize,0);
-        }
+          {
+            int mySize = (int)theInfo.myFamNum->size();
+            theInfo.myFamNum->clear();
+            theInfo.myFamNum->resize(mySize,0);
+          }
       }
       
     }
@@ -1925,8 +1923,39 @@ namespace MED
                              &aNbStamps);
           delete [] cname;
           delete [] unitname;
-
-          bool anIsSatisfied = aNbStamps > 0;
+          med_int nval = 0;
+          med_int aNumDt;
+          med_int aNumOrd;
+          med_float aDt;
+          if (aNbStamps > 0)
+            {
+              TErr err = MEDfieldComputingStepInfo(anId,
+                                                   &aFieldName,
+                                                   1,
+                                                   &aNumDt,
+                                                   &aNumOrd,
+                                                   &aDt);
+              if ( !err )
+                {
+                  char profilename[MED_NAME_SIZE+1];
+                  char locname[MED_NAME_SIZE+1];
+                  med_int profilsize;
+                  med_int aNbGauss;
+                  nval = MEDfieldnValueWithProfile(anId,
+                                                   &aFieldName,
+                                                   aNumDt,
+                                                   aNumOrd,
+                                                   anEntity,
+                                                   med_geometry_type(aGeom),
+                                                   1,
+                                                   MED_COMPACT_STMODE,
+                                                   profilename,
+                                                   &profilsize,
+                                                   locname,
+                                                   &aNbGauss);
+                }
+            }
+          bool anIsSatisfied =(nval > 0);
           if(anIsSatisfied){
             INITMSG(MYDEBUG,
                     "GetNbTimeStamps aNbTimeStamps = "<<aNbStamps<<
@@ -1936,9 +1965,6 @@ namespace MED
               for(TInt iTimeStamp = 1; iTimeStamp <= iTimeStampEnd; iTimeStamp++){
                 TVector<char> aMeshName(GetNOMLength<eV2_2>()+1);
                 TVector<char> aDtUnit(GetPNOMLength<eV2_2>()+1);
-                med_int aNumDt;
-                med_int aNumOrd;
-                med_float aDt;
                 TErr aRet = MEDfieldComputingStepInfo(anId,
                                                       &aFieldName,
                                                       iTimeStamp,
@@ -2087,9 +2113,8 @@ namespace MED
       for(; anIter != aGeom2Size.end(); anIter++){
         EGeometrieElement aGeom = anIter->first;
         TInt aNbElem = anIter->second;
-        char profilename[MED_NAME_SIZE+1];
         med_int profilesize,aNbGauss;
-        char locname[MED_NAME_SIZE+1];
+
         TInt aNbVal = MEDfieldnValueWithProfile(anId,
                                                 &aFieldName,
                                                 aNumDt,
@@ -2098,9 +2123,9 @@ namespace MED
                                                 med_geometry_type(aGeom),
                                                 1,
                                                 aProfileMode,
-                                                profilename,
+                                                &aProfileName[0],
                                                 &profilesize,
-                                                locname,
+                                                &aGaussName[0],
                                                 &aNbGauss);
 
         if(aNbVal <= 0){
@@ -2112,7 +2137,7 @@ namespace MED
         }
         
         TInt aNbComp = aFieldInfo->myNbComp;
-        TInt aNbValue = aNbVal / aNbGauss;
+        TInt aNbValue = aNbVal;// / aNbGauss; rules in MED changed
         theTimeStampValue->AllocateValue(aGeom,
                                          aNbValue,
                                          aNbGauss,
@@ -2157,7 +2182,7 @@ namespace MED
         }
         
         MED::PProfileInfo aProfileInfo;
-        if(strcmp(&aProfileName[0],"") != 0){
+        if(strcmp(&aProfileName[0],MED_NO_PROFILE) != 0){
           MED::TKey2Profile::const_iterator anIter = aKey2Profile.find(&aProfileName[0]);
           if(anIter != aKey2Profile.end()){
             aProfileInfo = anIter->second;
@@ -2194,7 +2219,7 @@ namespace MED
                       "");
           }
         }else{
-          if(aNbElem != aNbValue){
+          if((aProfileMode == MED_GLOBAL_STMODE) && (aNbElem != aNbValue)){
             if(theErr){
               *theErr = -1;
               return;
