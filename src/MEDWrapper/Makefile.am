@@ -25,7 +25,7 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 if MED_ENABLE_KERNEL
   SUBDIRS = Base V2_2 Factory
 else !MED_ENABLE_KERNEL
-  SUBDIRS = Base V2_1
+  SUBDIRS = Base
 endif
 
 DIST_SUBDIRS = Base V2_2 Factory
