@@ -1727,7 +1727,7 @@ public :
 
       for (unsigned i=0;i<fields.size();i++)
       {
-        PyObject * f = SWIG_NewPointerObj((void*)fields.at(i),$descriptor(FIELD_*),1);
+        PyObject * f = SWIG_NewPointerObj((void*)fields.at(i),$descriptor(FIELDDOUBLE*),1);
         PyList_SetItem(py_list,i,f);
       }
       PyObject * result = Py_BuildValue("O", py_list);
