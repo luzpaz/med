@@ -1280,7 +1280,7 @@ namespace MED
                                   MED_INDEX_NODE,
                                   aConnMode,
                                   &chgt,
-                                  &trsf);
+                                  &trsf)-1;
 
       theConnSize = MEDmeshnEntity(myFile->Id(),
                                   &aMeshName,
@@ -1293,7 +1293,7 @@ namespace MED
                                   &chgt,
                                   &trsf);
 
-      if(theNbFaces < 0 || aConnSize<0)
+      if(theNbFaces < 0 || theConnSize<0)
         EXCEPTION(std::runtime_error,"GetPolygoneInfo - MEDmeshnEntity(...)");
 
     }
@@ -1406,16 +1406,29 @@ namespace MED
       MED::TMeshInfo& aMeshInfo = const_cast<MED::TMeshInfo&>(theMeshInfo);
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
       med_bool chgt,trsf;
-      return MEDmeshnEntity(myFile->Id(),
-                            &aMeshName,
-                            MED_NO_DT,
-                            MED_NO_IT,
-                            med_entity_type(theEntity),
-                            med_geometry_type(theGeom),
-                            MED_CONNECTIVITY,
-                            med_connectivity_mode(theConnMode),
-                            &chgt,
-                            &trsf);
+      if(theGeom!=MED::ePOLYGONE && theGeom!=MED::ePOLYEDRE)
+	{
+	  return MEDmeshnEntity(myFile->Id(),
+				&aMeshName,
+				MED_NO_DT,
+				MED_NO_IT,
+				med_entity_type(theEntity),
+				med_geometry_type(theGeom),
+				MED_CONNECTIVITY,
+				med_connectivity_mode(theConnMode),
+				&chgt,
+				&trsf);
+	}
+      else if(theGeom==MED::ePOLYGONE)
+	{
+	  return MEDmeshnEntity(myFile->Id(),&aMeshName,MED_NO_DT,MED_NO_IT,med_entity_type(theEntity),
+				MED_POLYGON,MED_INDEX_NODE,med_connectivity_mode(theConnMode),&chgt,&trsf)-1;
+	}
+      else
+	{
+	  return MEDmeshnEntity(myFile->Id(),&aMeshName,MED_NO_DT,MED_NO_IT,med_entity_type(theEntity),
+				MED_POLYHEDRON,MED_INDEX_FACE,med_connectivity_mode(theConnMode),&chgt,&trsf)-1;
+	}
     }
     
     
