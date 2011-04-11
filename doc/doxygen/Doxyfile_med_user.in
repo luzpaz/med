@@ -83,12 +83,14 @@ FILE_PATTERNS          = MEDMEM_Mesh.* \
                          MEDMEM_Field.* \
                          MEDMEM_Med.* \
                          InterpKernelDEC.* \
+			 OverlapDEC.* \
                          DEC.* \
                          MPIProcessorGroup.* \
                          StructuredCoincidentDEC.* \
                          ExplicitCoincidentDEC.* \
                          NonCoincidentDEC.* \
                          CommInterface.* \
+			 NormalizedUnstructuredMesh.* \
                          Interpolation2D.* \
                          Interpolation3D.* \
                          Interpolation3DSurf.* \
@@ -121,6 +123,7 @@ FILE_PATTERNS          = MEDMEM_Mesh.* \
 			 MEDCouplingMemArray.* \
 			 MEDCouplingRemapper.* \
 			 MEDLoader.* \
+			 MEDFileMesh.* \
                          *.dox
 RECURSIVE              = NO
 EXCLUDE                = CVS

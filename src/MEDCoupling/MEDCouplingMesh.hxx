@@ -40,6 +40,7 @@ namespace ParaMEDMEM
 
   class DataArrayInt;
   class DataArrayDouble;
+  class MEDCouplingUMesh;
   class MEDCouplingFieldDouble;
 
   class MEDCOUPLING_EXPORT MEDCouplingMesh : public RefCountObject, public TimeLabel
@@ -47,10 +48,17 @@ namespace ParaMEDMEM
   public:
     void setName(const char *name) { _name=name; }
     const char *getName() const { return _name.c_str(); }
+    void setDescription(const char *descr) { _description=descr; }
+    const char *getDescription() const { return _description.c_str(); }
+    double getTime(int& iteration, int& order) const { iteration=_iteration; order=_order; return _time; }
+    void setTime(double val, int iteration, int order) { _time=val; _iteration=iteration; _order=order; }
+    void setTimeUnit(const char *unit) { _time_unit=unit; }
+    const char *getTimeUnit() const { return _time_unit.c_str(); }
     virtual MEDCouplingMesh *deepCpy() const = 0;
     virtual MEDCouplingMeshType getType() const = 0;
     bool isStructured() const;
     virtual void copyTinyStringsFrom(const MEDCouplingMesh *other) throw(INTERP_KERNEL::Exception);
+    virtual void copyTinyInfoFrom(const MEDCouplingMesh *other) throw(INTERP_KERNEL::Exception);
     // comparison methods
     virtual bool isEqual(const MEDCouplingMesh *other, double prec) const;
     virtual bool isEqualWithoutConsideringStr(const MEDCouplingMesh *other, double prec) const = 0;
@@ -63,6 +71,8 @@ namespace ParaMEDMEM
                              DataArrayInt *&cellCor, DataArrayInt *&nodeCor) const throw(INTERP_KERNEL::Exception);
     //
     virtual void checkCoherency() const throw(INTERP_KERNEL::Exception) = 0;
+    virtual void checkCoherency1(double eps=1e-12) const throw(INTERP_KERNEL::Exception) = 0;
+    virtual void checkCoherency2(double eps=1e-12) const throw(INTERP_KERNEL::Exception) = 0;
     virtual int getNumberOfCells() const = 0;
     virtual int getNumberOfNodes() const = 0;
     virtual int getSpaceDimension() const = 0;
@@ -77,12 +87,17 @@ namespace ParaMEDMEM
     virtual std::string simpleRepr() const = 0;
     virtual std::string advancedRepr() const = 0;
     // tools
+    virtual DataArrayInt *checkTypeConsistencyAndContig(const std::vector<int>& code, const std::vector<const DataArrayInt *>& idsPerType) const throw(INTERP_KERNEL::Exception) = 0;
     virtual void getBoundingBox(double *bbox) const = 0;
     virtual MEDCouplingFieldDouble *getMeasureField(bool isAbs) const = 0;
     virtual MEDCouplingFieldDouble *getMeasureFieldOnNode(bool isAbs) const = 0;
     virtual int getCellContainingPoint(const double *pos, double eps) const = 0;
+    virtual void getCellsContainingPoint(const double *pos, double eps, std::vector<int>& elts) const;
+    virtual void getCellsContainingPoints(const double *pos, int nbOfPoints, double eps, std::vector<int>& elts, std::vector<int>& eltsIndex) const;
     virtual MEDCouplingFieldDouble *fillFromAnalytic(TypeOfField t, int nbOfComp, FunctionToEvaluate func) const;
     virtual MEDCouplingFieldDouble *fillFromAnalytic(TypeOfField t, int nbOfComp, const char *func) const;
+    virtual MEDCouplingFieldDouble *fillFromAnalytic2(TypeOfField t, int nbOfComp, const char *func) const;
+    virtual MEDCouplingFieldDouble *fillFromAnalytic3(TypeOfField t, int nbOfComp, const std::vector<std::string>& varsOrder, const char *func) const;
     virtual MEDCouplingFieldDouble *buildOrthogonalField() const = 0;
     virtual void rotate(const double *center, const double *vector, double angle) = 0;
     virtual void translate(const double *vector) = 0;
@@ -91,21 +106,27 @@ namespace ParaMEDMEM
     virtual MEDCouplingMesh *mergeMyselfWith(const MEDCouplingMesh *other) const = 0;
     virtual MEDCouplingMesh *buildPart(const int *start, const int *end) const = 0;
     virtual MEDCouplingMesh *buildPartAndReduceNodes(const int *start, const int *end, DataArrayInt*& arr) const = 0;
+    virtual MEDCouplingUMesh *buildUnstructured() const throw(INTERP_KERNEL::Exception) = 0;
     virtual DataArrayInt *simplexize(int policy) throw(INTERP_KERNEL::Exception) = 0;
     virtual bool areCompatibleForMerge(const MEDCouplingMesh *other) const;
-    static MEDCouplingMesh *mergeMeshes(const MEDCouplingMesh *mesh1, const MEDCouplingMesh *mesh2);
+    static MEDCouplingMesh *MergeMeshes(const MEDCouplingMesh *mesh1, const MEDCouplingMesh *mesh2);
     //serialisation-unserialization
-    virtual void getTinySerializationInformation(std::vector<int>& tinyInfo, std::vector<std::string>& littleStrings) const = 0;
+    virtual void getTinySerializationInformation(std::vector<double>& tinyInfoD, std::vector<int>& tinyInfo, std::vector<std::string>& littleStrings) const = 0;
     virtual void resizeForUnserialization(const std::vector<int>& tinyInfo, DataArrayInt *a1, DataArrayDouble *a2, std::vector<std::string>& littleStrings) const = 0;
     virtual void serialize(DataArrayInt *&a1, DataArrayDouble *&a2) const = 0;
-    virtual void unserialization(const std::vector<int>& tinyInfo, const DataArrayInt *a1, DataArrayDouble *a2,
+    virtual void unserialization(const std::vector<double>& tinyInfoD, const std::vector<int>& tinyInfo, const DataArrayInt *a1, DataArrayDouble *a2,
                                  const std::vector<std::string>& littleStrings) = 0;
   protected:
-    MEDCouplingMesh() { }
-    MEDCouplingMesh(const MEDCouplingMesh& other):_name(other._name) { }
+    MEDCouplingMesh();
+    MEDCouplingMesh(const MEDCouplingMesh& other);
     virtual ~MEDCouplingMesh() { }
   private:
     std::string _name;
+    std::string _description;
+    double _time;
+    int _iteration;
+    int _order;
+    std::string _time_unit;
   };
 }
 

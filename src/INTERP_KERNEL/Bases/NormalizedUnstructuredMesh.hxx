@@ -31,7 +31,7 @@ namespace INTERP_KERNEL
 
   typedef enum
     {
-      NORM_POINT0  =  0,
+      NORM_POINT1  =  0,
       NORM_SEG2    =  1,
       NORM_SEG3    =  2,
       NORM_TRI3    =  3,
@@ -45,6 +45,7 @@ namespace INTERP_KERNEL
       NORM_PENTA6  = 16,
       NORM_HEXA8   = 18,
       NORM_TETRA10 = 20,
+      NORM_HEXGP12 = 22,
       NORM_PYRA13  = 23,
       NORM_PENTA15 = 25,
       NORM_HEXA20  = 30,

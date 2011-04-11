@@ -29,6 +29,8 @@ bool MEDCouplingField::isEqual(const MEDCouplingField *other, double meshPrec, d
     return false;
   if(_desc!=other->_desc)
     return false;
+  if(_nature!=other->_nature)
+    return false;
   if(!_type->isEqual(other->_type,valsPrec))
     return false;
   if(_mesh==0 && other->_mesh==0)
@@ -43,6 +45,8 @@ bool MEDCouplingField::isEqual(const MEDCouplingField *other, double meshPrec, d
 bool MEDCouplingField::isEqualWithoutConsideringStr(const MEDCouplingField *other, double meshPrec, double valsPrec) const
 {
   if(!_type->isEqualWithoutConsideringStr(other->_type,valsPrec))
+    return false;
+  if(_nature!=other->_nature)
     return false;
   if(_mesh==0 && other->_mesh==0)
     return true;
@@ -62,6 +66,8 @@ bool MEDCouplingField::areCompatibleForMerge(const MEDCouplingField *other) cons
 {
   if(!_type->isEqual(other->_type,1.))
     return false;
+  if(_nature!=other->_nature)
+    return false;
   if(_mesh==other->_mesh)
     return true;
   return _mesh->areCompatibleForMerge(other->_mesh);
@@ -75,10 +81,12 @@ bool MEDCouplingField::areStrictlyCompatible(const MEDCouplingField *other) cons
 {
   if(!_type->isEqual(other->_type,1.e-12))
     return false;
+  if(_nature!=other->_nature)
+    return false;
   return _mesh==other->_mesh;
 }
 
-void MEDCouplingField::updateTime()
+void MEDCouplingField::updateTime() const
 {
   if(_mesh)
     updateTimeWith(*_mesh);
@@ -89,6 +97,24 @@ void MEDCouplingField::updateTime()
 TypeOfField MEDCouplingField::getTypeOfField() const
 {
   return _type->getEnum();
+}
+
+void MEDCouplingField::setNature(NatureOfField nat) throw(INTERP_KERNEL::Exception)
+{
+  _nature=nat;
+}
+
+/*!
+ * This method returns is case of success an instance of DataArrayDouble the user is in reponsability to deal with.
+ * If 'this->_mesh' is not set an exception will be thrown.
+ * For a field on node the array of coords will be returned. For a field on cell a ParaMEDMEM::DataArrayDouble instance
+ * containing the barycenter of cells will be returned. And for a field on gauss point the explicit position of gauss points.
+ */
+DataArrayDouble *MEDCouplingField::getLocalizationOfDiscr() const throw(INTERP_KERNEL::Exception)
+{
+  if(!_mesh)
+    throw INTERP_KERNEL::Exception("MEDCouplingField::getLocalizationOfDiscr : No mesh set !");
+  return _type->getLocalizationOfDiscValues(_mesh);
 }
 
 /*!
@@ -244,15 +270,15 @@ MEDCouplingField::~MEDCouplingField()
   delete _type;
 }
 
-MEDCouplingField::MEDCouplingField(MEDCouplingFieldDiscretization *type):_mesh(0),_type(type)
+MEDCouplingField::MEDCouplingField(MEDCouplingFieldDiscretization *type, NatureOfField nature):_nature(nature),_mesh(0),_type(type)
 {
 }
 
-MEDCouplingField::MEDCouplingField(TypeOfField type):_mesh(0),_type(MEDCouplingFieldDiscretization::New(type))
+MEDCouplingField::MEDCouplingField(TypeOfField type):_nature(NoNature),_mesh(0),_type(MEDCouplingFieldDiscretization::New(type))
 {
 }
 
-MEDCouplingField::MEDCouplingField(const MEDCouplingField& other):_name(other._name),_desc(other._desc),
+MEDCouplingField::MEDCouplingField(const MEDCouplingField& other):_name(other._name),_desc(other._desc),_nature(other._nature),
                                                                   _mesh(0),_type(other._type->clone())
 {
   if(other._mesh)
@@ -269,4 +295,16 @@ MEDCouplingField::MEDCouplingField(const MEDCouplingField& other):_name(other._n
 MEDCouplingMesh *MEDCouplingField::buildSubMeshData(const int *start, const int *end, DataArrayInt *&di) const
 {
   return _type->buildSubMeshData(_mesh,start,end,di);
+}
+
+/*!
+ * This method returns number of tuples expected regarding its discretization and its _mesh attribute.
+ * This method expected a not null _mesh instance. If null, an exception will be thrown.
+ */
+int MEDCouplingField::getNumberOfTuplesExpected() const throw(INTERP_KERNEL::Exception)
+{
+  if(_mesh)
+    return _type->getNumberOfTuples(_mesh);
+  else
+    throw INTERP_KERNEL::Exception("MEDCouplingField::getNumberOfTuplesExpected : Empty mesh !");
 }

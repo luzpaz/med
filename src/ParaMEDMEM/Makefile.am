@@ -33,13 +33,18 @@ ComponentTopology.hxx\
 ExplicitTopology.hxx\
 ParaFIELD.hxx\
 DEC.hxx\
+DisjointDEC.hxx\
+OverlapDEC.hxx\
 DECOptions.hxx\
 MxN_Mapping.hxx\
+OverlapMapping.hxx\
 StructuredCoincidentDEC.hxx\
 InterpolationMatrix.hxx\
+OverlapInterpolationMatrix.hxx\
 InterpKernelDEC.hxx\
 ExplicitCoincidentDEC.hxx\
 ElementLocator.hxx\
+OverlapElementLocator.hxx\
 ExplicitMapping.hxx\
 ICoCoField.hxx \
 ICoCoMEDField.hxx \
@@ -56,16 +61,21 @@ ParaMESH.cxx\
 ComponentTopology.cxx\
 MPIAccess.cxx \
 InterpolationMatrix.cxx\
+OverlapInterpolationMatrix.cxx\
 StructuredCoincidentDEC.cxx\
 ExplicitCoincidentDEC.cxx\
 InterpKernelDEC.cxx\
 ElementLocator.cxx\
+OverlapElementLocator.cxx\
 MPIAccessDEC.cxx \
 TimeInterpolator.cxx \
 LinearTimeInterpolator.cxx\
 DEC.cxx\
+DisjointDEC.cxx\
+OverlapDEC.cxx\
 ExplicitTopology.cxx\
 MxN_Mapping.cxx\
+OverlapMapping.cxx\
 ICoCoMEDField.cxx\
 ICoCoField.cxx\
 ICoCoTrioField.cxx\

@@ -32,14 +32,16 @@ namespace ParaMEDMEM
 {
   class MEDCouplingMesh;
 
-  class MEDCOUPLINGCORBA_EXPORT MEDCouplingMeshServant : public MEDCouplingRefCountServant , public virtual POA_SALOME_MED::MEDCouplingMeshCorbaInterface
+  class MEDCOUPLINGCORBA_EXPORT MEDCouplingMeshServant : public MEDCouplingRefCountServant,
+                                                         public virtual POA_SALOME_MED::MEDCouplingMeshCorbaInterface
   {
   protected:
     MEDCouplingMeshServant(const MEDCouplingMesh *cppPointerOfMesh);
     const MEDCouplingMesh *getPointer() const { return (const MEDCouplingMesh *)(_cpp_pointer); }
   protected:
-    void getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfString_out sa);
+    void getTinyInfo(SALOME_TYPES::ListOfDouble_out da, SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfString_out sa);
     void getSerialisationData(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da);
+    CORBA::Boolean ExportDataAs(const char *format, SALOME::GenericObj_out exporter);
   };
 }
 

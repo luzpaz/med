@@ -58,24 +58,28 @@ namespace ParaMEDMEM
     std::string simpleRepr() const;
     std::string advancedRepr() const;
     void checkCoherency() const throw (INTERP_KERNEL::Exception);
+    void checkCoherency1(double eps=1e-12) const throw(INTERP_KERNEL::Exception);
+    void checkCoherency2(double eps=1e-12) const throw(INTERP_KERNEL::Exception);
     void getBoundingBox(double *bbox) const;
-    void updateTime();
+    void updateTime() const;
     void renumberCells(const int *old2NewBg, bool check) throw(INTERP_KERNEL::Exception);
     MEDCouplingUMesh *getMesh2D() const { return _mesh2D; }
     MEDCouplingUMesh *getMesh1D() const { return _mesh1D; }
     DataArrayInt *getMesh3DIds() const { return _mesh3D_ids; }
     MEDCouplingUMesh *build3DUnstructuredMesh() const;
+    MEDCouplingUMesh *buildUnstructured() const throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *getMeasureField(bool) const;
     MEDCouplingFieldDouble *getMeasureFieldOnNode(bool) const;
     MEDCouplingFieldDouble *buildOrthogonalField() const;
     int getCellContainingPoint(const double *pos, double eps) const;
-    static int findCorrespCellByNodalConn(const std::vector<int>& nodalConnec,
+    static int FindCorrespCellByNodalConn(const std::vector<int>& nodalConnec,
                                           const int *revNodalPtr, const int *revNodalIndxPtr) throw(INTERP_KERNEL::Exception);
-    static void project1DMeshes(const MEDCouplingUMesh *m1, const MEDCouplingUMesh *m2, double eps,
+    static void Project1DMeshes(const MEDCouplingUMesh *m1, const MEDCouplingUMesh *m2, double eps,
                                 MEDCouplingUMesh *&m1r, MEDCouplingUMesh *&m2r, double *v) throw(INTERP_KERNEL::Exception);
     void rotate(const double *center, const double *vector, double angle);
     void translate(const double *vector);
     void scale(const double *point, double factor);
+    DataArrayInt *checkTypeConsistencyAndContig(const std::vector<int>& code, const std::vector<const DataArrayInt *>& idsPerType) const throw(INTERP_KERNEL::Exception);
     MEDCouplingMesh *buildPart(const int *start, const int *end) const;
     MEDCouplingMesh *buildPartAndReduceNodes(const int *start, const int *end, DataArrayInt*& arr) const;
     DataArrayInt *simplexize(int policy) throw(INTERP_KERNEL::Exception);
@@ -83,10 +87,10 @@ namespace ParaMEDMEM
     DataArrayDouble *getCoordinatesAndOwner() const;
     DataArrayDouble *getBarycenterAndOwner() const;
     //Serialization unserialisation
-    void getTinySerializationInformation(std::vector<int>& tinyInfo, std::vector<std::string>& littleStrings) const;
+    void getTinySerializationInformation(std::vector<double>& tinyInfoD, std::vector<int>& tinyInfo, std::vector<std::string>& littleStrings) const;
     void resizeForUnserialization(const std::vector<int>& tinyInfo, DataArrayInt *a1, DataArrayDouble *a2, std::vector<std::string>& littleStrings) const;
     void serialize(DataArrayInt *&a1, DataArrayDouble *&a2) const;
-    void unserialization(const std::vector<int>& tinyInfo, const DataArrayInt *a1, DataArrayDouble *a2,
+    void unserialization(const std::vector<double>& tinyInfoD, const std::vector<int>& tinyInfo, const DataArrayInt *a1, DataArrayDouble *a2,
                          const std::vector<std::string>& littleStrings);
   private:
     MEDCouplingExtrudedMesh(const MEDCouplingUMesh *mesh3D, MEDCouplingUMesh *mesh2D, int cell2DId) throw(INTERP_KERNEL::Exception);

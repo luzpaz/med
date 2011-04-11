@@ -236,7 +236,10 @@ The classes that make up the API of the library are :
  - \ref interpkerneldec for a \ref InterpKerRemapGlobal based on intersecting elems volume computation,
  - \ref noncoincidentdec for a non-conservative interpolation based on element localization,
  - \ref structuredcoincidentdec for remapping coincident meshes on a one-to-one basis. This class applies to structured topologies.
- - \ref explicitcoincidentdec for remapping coincident meshes on a one-to-one basis. This class applies to unstructured topologies,
+ - \ref explicitcoincidentdec for remapping coincident meshes on a
+ one-to-one basis. This class applies to unstructured topologies,
+ - \ref overlapdec based on intersecting elems volume
+ computation with source and target meshes are on same process id
 
 */
 

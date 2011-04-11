@@ -20,15 +20,16 @@
 #include "MEDCouplingRemapper.hxx"
 #include "MEDCouplingMemArray.hxx"
 #include "MEDCouplingFieldDouble.hxx"
+#include "MEDCouplingFieldTemplate.hxx"
 #include "MEDCouplingFieldDiscretization.hxx"
 #include "MEDCouplingExtrudedMesh.hxx"
 #include "MEDCouplingNormalizedUnstructuredMesh.txx"
 
 #include "Interpolation1D.txx"
-#include "Interpolation2DCurve.txx"
+#include "Interpolation2DCurve.hxx"
 #include "Interpolation2D.txx"
 #include "Interpolation3D.txx"
-#include "Interpolation3DSurf.txx"
+#include "Interpolation3DSurf.hxx"
 
 using namespace ParaMEDMEM;
 
@@ -44,7 +45,7 @@ MEDCouplingRemapper::~MEDCouplingRemapper()
 int MEDCouplingRemapper::prepare(const MEDCouplingMesh *srcMesh, const MEDCouplingMesh *targetMesh, const char *method) throw(INTERP_KERNEL::Exception)
 {
   releaseData(true);
-  _src_mesh=(MEDCouplingMesh *)srcMesh; _target_mesh=(MEDCouplingMesh *)targetMesh;
+  _src_mesh=const_cast<MEDCouplingMesh *>(srcMesh); _target_mesh=const_cast<MEDCouplingMesh *>(targetMesh);
   _src_mesh->incrRef(); _target_mesh->incrRef();
   int meshInterpType=((int)_src_mesh->getType()*16)+(int)_target_mesh->getType();
   switch(meshInterpType)
@@ -56,6 +57,13 @@ int MEDCouplingRemapper::prepare(const MEDCouplingMesh *srcMesh, const MEDCoupli
     default:
       throw INTERP_KERNEL::Exception("Not managed type of meshes !");
     }
+}
+
+int MEDCouplingRemapper::prepareEx(const MEDCouplingFieldTemplate *src, const MEDCouplingFieldTemplate *target) throw(INTERP_KERNEL::Exception)
+{
+  std::string meth(src->getDiscretization()->getStringRepr());
+  meth+=target->getDiscretization()->getStringRepr();
+  return prepare(src->getMesh(),target->getMesh(),meth.c_str());
 }
 
 void MEDCouplingRemapper::transfer(const MEDCouplingFieldDouble *srcField, MEDCouplingFieldDouble *targetField, double dftValue) throw(INTERP_KERNEL::Exception)
@@ -316,7 +324,7 @@ int MEDCouplingRemapper::prepareEE(const char *method) throw(INTERP_KERNEL::Exce
   int nbCols2D=interpolation2D.interpolateMeshes(source_mesh_wrapper,target_mesh_wrapper,matrix2D,method);
   MEDCouplingUMesh *s1D,*t1D;
   double v[3];
-  MEDCouplingExtrudedMesh::project1DMeshes(src_mesh->getMesh1D(),target_mesh->getMesh1D(),getPrecision(),s1D,t1D,v);
+  MEDCouplingExtrudedMesh::Project1DMeshes(src_mesh->getMesh1D(),target_mesh->getMesh1D(),getPrecision(),s1D,t1D,v);
   MEDCouplingNormalizedUnstructuredMesh<1,1> s1DWrapper(s1D);
   MEDCouplingNormalizedUnstructuredMesh<1,1> t1DWrapper(t1D);
   std::vector<std::map<int,double> > matrix1D;
@@ -335,7 +343,7 @@ int MEDCouplingRemapper::prepareEE(const char *method) throw(INTERP_KERNEL::Exce
   return 1;
 }
 
-void MEDCouplingRemapper::updateTime()
+void MEDCouplingRemapper::updateTime() const
 {
 }
 

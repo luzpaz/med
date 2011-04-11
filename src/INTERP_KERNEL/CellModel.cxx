@@ -27,11 +27,11 @@
 
 namespace INTERP_KERNEL
 {
-  const char *CellModel::CELL_TYPES_REPR[]={"NORM_POINT0", "NORM_SEG2", "NORM_SEG3", "NORM_TRI3", "NORM_QUAD4",// 0->4
+  const char *CellModel::CELL_TYPES_REPR[]={"NORM_POINT1", "NORM_SEG2", "NORM_SEG3", "NORM_TRI3", "NORM_QUAD4",// 0->4
                                             "NORM_POLYGON", "NORM_TRI6", "" , "NORM_QUAD8", "",//5->9
                                             "", "", "", "", "NORM_TETRA4",//10->14
                                             "NORM_PYRA5", "NORM_PENTA6", "", "NORM_HEXA8", "",//15->19
-                                            "NORM_TETRA10", "", "", "NORM_PYRA13", "",//20->24
+                                            "NORM_TETRA10", "", "NORM_HEXGP12", "NORM_PYRA13", "",//20->24
                                             "NORM_PENTA15", "", "", "", "",//25->29
                                             "NORM_HEXA20", "NORM_POLYHED", "", "", "",//30->34
                                             "", "", "", "", "",//35->39
@@ -78,7 +78,7 @@ namespace INTERP_KERNEL
 
   void CellModel::buildUniqueInstance()
   {
-    _map_of_unique_instance.insert(std::make_pair(NORM_POINT0,CellModel(NORM_POINT0)));
+    _map_of_unique_instance.insert(std::make_pair(NORM_POINT1,CellModel(NORM_POINT1)));
     _map_of_unique_instance.insert(std::make_pair(NORM_SEG2,CellModel(NORM_SEG2)));
     _map_of_unique_instance.insert(std::make_pair(NORM_SEG3,CellModel(NORM_SEG3)));
     _map_of_unique_instance.insert(std::make_pair(NORM_TRI3,CellModel(NORM_TRI3)));
@@ -90,6 +90,7 @@ namespace INTERP_KERNEL
     _map_of_unique_instance.insert(std::make_pair(NORM_PYRA5,CellModel(NORM_PYRA5)));
     _map_of_unique_instance.insert(std::make_pair(NORM_PENTA6,CellModel(NORM_PENTA6)));
     _map_of_unique_instance.insert(std::make_pair(NORM_TETRA10,CellModel(NORM_TETRA10)));
+    _map_of_unique_instance.insert(std::make_pair(NORM_HEXGP12,CellModel(NORM_HEXGP12)));
     _map_of_unique_instance.insert(std::make_pair(NORM_PYRA13,CellModel(NORM_PYRA13)));
     _map_of_unique_instance.insert(std::make_pair(NORM_PENTA15,CellModel(NORM_PENTA15)));
     _map_of_unique_instance.insert(std::make_pair(NORM_HEXA20,CellModel(NORM_HEXA20)));
@@ -106,9 +107,9 @@ namespace INTERP_KERNEL
     _quadratic_type=NORM_ERROR;
     switch(type)
       {
-      case NORM_POINT0:
+      case NORM_POINT1:
         {
-          _nb_of_pts=0; _nb_of_sons=0; _dim=0; _extruded_type=NORM_SEG2; _is_simplex=true;
+          _nb_of_pts=1; _nb_of_sons=0; _dim=0; _extruded_type=NORM_SEG2; _is_simplex=true;
         }
         break;
       case NORM_SEG2:
@@ -211,6 +212,21 @@ namespace INTERP_KERNEL
           _sons_con[1][0]=0; _sons_con[1][1]=3; _sons_con[1][2]=1; _sons_con[1][3]=7; _sons_con[1][4]=8; _sons_con[1][5]=4; _nb_of_sons_con[1]=6;
           _sons_con[2][0]=1; _sons_con[2][1]=3; _sons_con[2][2]=2; _sons_con[2][3]=8; _sons_con[2][4]=9; _sons_con[2][5]=5; _nb_of_sons_con[2]=6;
           _sons_con[3][0]=2; _sons_con[3][1]=3; _sons_con[3][2]=0; _sons_con[3][3]=9; _sons_con[3][4]=7; _sons_con[3][5]=6; _nb_of_sons_con[3]=6;  _quadratic=true;
+        }
+        break;
+      case NORM_HEXGP12:
+        {
+          _nb_of_pts=12; _nb_of_sons=8; _dim=3; _is_simplex=false;
+          _sons_type[0]=NORM_POLYGON; _sons_type[1]=NORM_POLYGON; _sons_type[2]=NORM_QUAD4; _sons_type[3]=NORM_QUAD4; _sons_type[4]=NORM_QUAD4; _sons_type[5]=NORM_QUAD4;
+          _sons_type[6]=NORM_QUAD4; _sons_type[7]=NORM_QUAD4;
+          _sons_con[0][0]=0; _sons_con[0][1]=1; _sons_con[0][2]=2; _sons_con[0][3]=3; _sons_con[0][4]=4; _sons_con[0][5]=5; _nb_of_sons_con[0]=6;
+          _sons_con[1][0]=6; _sons_con[1][1]=11; _sons_con[1][2]=10; _sons_con[1][3]=9; _sons_con[1][4]=8; _sons_con[1][5]=7; _nb_of_sons_con[1]=6;
+          _sons_con[2][0]=0; _sons_con[2][1]=6; _sons_con[2][2]=7; _sons_con[2][3]=1; _nb_of_sons_con[2]=4;
+          _sons_con[3][0]=1; _sons_con[3][1]=7; _sons_con[3][2]=8; _sons_con[3][3]=2; _nb_of_sons_con[3]=4;
+          _sons_con[4][0]=2; _sons_con[4][1]=8; _sons_con[4][2]=9; _sons_con[4][3]=3; _nb_of_sons_con[4]=4;
+          _sons_con[5][0]=3; _sons_con[5][1]=9; _sons_con[5][2]=10; _sons_con[5][3]=4; _nb_of_sons_con[5]=4;
+          _sons_con[6][0]=4; _sons_con[6][1]=10; _sons_con[6][2]=11; _sons_con[6][3]=5; _nb_of_sons_con[6]=4;
+          _sons_con[7][0]=5; _sons_con[7][1]=11; _sons_con[7][2]=6; _sons_con[7][3]=0; _nb_of_sons_con[7]=4;
         }
         break;
       case NORM_PYRA13:

@@ -34,11 +34,13 @@ namespace ParaMEDMEM
   class DataArrayInt;
   class DataArrayDouble;
   
-  class MEDCOUPLINGCORBA_EXPORT MEDCouplingPointSetServant : public MEDCouplingMeshServant, public virtual POA_SALOME_MED::MEDCouplingPointSetCorbaInterface
+  class MEDCOUPLINGCORBA_EXPORT MEDCouplingPointSetServant : public MEDCouplingMeshServant,
+                                                             public virtual POA_SALOME_MED::MEDCouplingPointSetCorbaInterface
   {
   protected:
     MEDCouplingPointSetServant(const MEDCouplingPointSet *cppPointerOfMesh);
     ~MEDCouplingPointSetServant();
+    SALOME_MED::DataArrayDoubleCorbaInterface_ptr getCoords();
   private:
     const MEDCouplingPointSet *getPointer() const { return (const MEDCouplingPointSet *)(_cpp_pointer); }
   };

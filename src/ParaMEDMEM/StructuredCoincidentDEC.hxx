@@ -20,7 +20,7 @@
 #ifndef __STRUCTUREDCOINCIDENTDEC_HXX__
 #define __STRUCTUREDCOINCIDENTDEC_HXX__
 
-#include "DEC.hxx"
+#include "DisjointDEC.hxx"
 #include "BlockTopology.hxx"
 
 
@@ -28,7 +28,7 @@ namespace ParaMEDMEM
 {
   class DEC;
   class BlockTopology;
-  class StructuredCoincidentDEC : public DEC
+  class StructuredCoincidentDEC : public DisjointDEC
   {
   public:
     StructuredCoincidentDEC();

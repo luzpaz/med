@@ -38,6 +38,7 @@ namespace INTERP_KERNEL
     //static Function *buildUnaryFuncFromString(char type) throw(INTERP_KERNEL::Exception);
     static Function *buildBinaryFuncFromString(const char *type) throw(INTERP_KERNEL::Exception);
     static Function *buildBinaryFuncFromString(char type) throw(INTERP_KERNEL::Exception);
+    static Function *buildTernaryFuncFromString(const char *type) throw(INTERP_KERNEL::Exception);
   };
 
   class INTERPKERNELEXPREVAL_EXPORT Function
@@ -177,6 +178,30 @@ namespace INTERP_KERNEL
     static const char REPR[];
   };
 
+  class INTERPKERNELEXPREVAL_EXPORT LogFunction : public UnaryFunction
+  {
+  public:
+    ~LogFunction();
+    void operate(std::vector<Value *>& stack) const throw(INTERP_KERNEL::Exception);
+    void operateX86(std::vector<std::string>& asmb) const throw(INTERP_KERNEL::Exception);
+    const char *getRepr() const;
+    bool isACall() const;
+  public:
+    static const char REPR[];
+  };
+
+  class INTERPKERNELEXPREVAL_EXPORT Log10Function : public UnaryFunction
+  {
+  public:
+    ~Log10Function();
+    void operate(std::vector<Value *>& stack) const throw(INTERP_KERNEL::Exception);
+    void operateX86(std::vector<std::string>& asmb) const throw(INTERP_KERNEL::Exception);
+    const char *getRepr() const;
+    bool isACall() const;
+  public:
+    static const char REPR[];
+  };
+
   class INTERPKERNELEXPREVAL_EXPORT BinaryFunction : public Function
   {
   public:
@@ -259,6 +284,48 @@ namespace INTERP_KERNEL
   {
   public:
     ~MinFunction();
+    void operate(std::vector<Value *>& stack) const throw(INTERP_KERNEL::Exception);
+    void operateX86(std::vector<std::string>& asmb) const throw(INTERP_KERNEL::Exception);
+    const char *getRepr() const;
+    bool isACall() const;
+  public:
+    static const char REPR[];
+  };
+
+  class INTERPKERNELEXPREVAL_EXPORT GreaterThanFunction : public BinaryFunction
+  {
+  public:
+    ~GreaterThanFunction();
+    void operate(std::vector<Value *>& stack) const throw(INTERP_KERNEL::Exception);
+    void operateX86(std::vector<std::string>& asmb) const throw(INTERP_KERNEL::Exception);
+    const char *getRepr() const;
+    bool isACall() const;
+  public:
+    static const char REPR[];
+  };
+
+  class INTERPKERNELEXPREVAL_EXPORT LowerThanFunction : public BinaryFunction
+  {
+  public:
+    ~LowerThanFunction();
+    void operate(std::vector<Value *>& stack) const throw(INTERP_KERNEL::Exception);
+    void operateX86(std::vector<std::string>& asmb) const throw(INTERP_KERNEL::Exception);
+    const char *getRepr() const;
+    bool isACall() const;
+  public:
+    static const char REPR[];
+  };
+
+  class INTERPKERNELEXPREVAL_EXPORT TernaryFunction : public Function
+  {
+  public:
+    int getNbInputParams() const;
+  };
+
+  class INTERPKERNELEXPREVAL_EXPORT IfFunction : public TernaryFunction
+  {
+  public:
+    ~IfFunction();
     void operate(std::vector<Value *>& stack) const throw(INTERP_KERNEL::Exception);
     void operateX86(std::vector<std::string>& asmb) const throw(INTERP_KERNEL::Exception);
     const char *getRepr() const;

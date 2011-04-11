@@ -24,9 +24,9 @@
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-SUBDIRS = Bases Geometric2D ExprEval .
+SUBDIRS = Bases Geometric2D ExprEval GaussPoints .
 
-DIST_SUBDIRS = Bases Geometric2D ExprEval
+DIST_SUBDIRS = Bases Geometric2D ExprEval GaussPoints
 
 lib_LTLIBRARIES = libinterpkernel.la
 
@@ -52,7 +52,6 @@ Interpolation2D.txx			\
 Interpolation3D.hxx			\
 Interpolation3D.txx			\
 Interpolation3DSurf.hxx			\
-Interpolation3DSurf.txx			\
 InterpolationOptions.hxx		\
 InterpolationPlanar.hxx			\
 InterpolationPlanar.txx			\
@@ -159,7 +158,6 @@ CurveIntersectorP1P1.txx                \
 Interpolation1D.hxx	                \
 Interpolation1D.txx	                \
 Interpolation2DCurve.hxx                \
-Interpolation2DCurve.txx                \
 InterpolationCurve.hxx	                \
 InterpolationCurve.txx			\
 DirectedBoundingBox.hxx
@@ -190,6 +188,10 @@ dist_libinterpkernel_la_SOURCES = \
 	UnitTetraIntersectionBary.cxx \
 	InterpolationOptions.cxx \
 	DirectedBoundingBox.cxx \
+	Interpolation2DCurve.cxx \
+	Interpolation3DSurf.cxx \
+	Interpolation3D.cxx \
+	MeshElement.cxx \
 	InterpKernelMeshQuality.cxx \
 	InterpKernelCellSimplify.cxx
 
@@ -198,7 +200,8 @@ libinterpkernel_la_CPPFLAGS=-I$(srcdir)/Geometric2D -I$(srcdir)/Bases
 libinterpkernel_la_LDFLAGS=
 
 # the geom2D library is included in the interpkernel one
-libinterpkernel_la_LIBADD= ./Geometric2D/libInterpGeometric2DAlg.la Bases/libinterpkernelbases.la ExprEval/libinterpkernelexpreval.la
+libinterpkernel_la_LIBADD= ./Geometric2D/libInterpGeometric2DAlg.la Bases/libinterpkernelbases.la ExprEval/libinterpkernelexpreval.la \
+	GaussPoints/libinterpkernelgauss.la
 
 AM_CPPFLAGS += $(libinterpkernel_la_CPPFLAGS)
 LDADD= $(libinterpkernel_la_LDFLAGS)

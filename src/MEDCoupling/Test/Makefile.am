@@ -26,11 +26,12 @@ TestMEDCoupling_CPPFLAGS=@CPPUNIT_INCLUDES@ @PTHREAD_CFLAGS@ -I$(srcdir)/.. -I$(
 TestMEDCoupling_LDFLAGS = @CPPUNIT_LIBS@ ../libmedcoupling.la ../../INTERP_KERNEL/libinterpkernel.la
 
 dist_TestMEDCoupling_SOURCES = TestMEDCoupling.cxx MEDCouplingBasicsTest.hxx MEDCouplingBasicsTest0.cxx MEDCouplingBasicsTest1.cxx \
-	MEDCouplingBasicsTest2.cxx MEDCouplingBasicsTestInterp.cxx MEDCouplingBasicsTestData1.hxx
+	MEDCouplingBasicsTest2.cxx MEDCouplingBasicsTest3.cxx MEDCouplingBasicsTestInterp.cxx MEDCouplingBasicsTestData1.hxx       \
+	MEDCouplingBasicsTest4.cxx
 
 TestMEDCouplingRemapper_CPPFLAGS=@CPPUNIT_INCLUDES@ @PTHREAD_CFLAGS@ -I$(srcdir)/.. -I$(srcdir)/../../INTERP_KERNEL/Bases -I$(srcdir)/../../INTERP_KERNELTest -I$(srcdir)/../../INTERP_KERNEL -I$(srcdir)/../../INTERP_KERNEL/Geometric2D
 
-TestMEDCouplingRemapper_LDFLAGS = @CPPUNIT_LIBS@ ../libmedcouplingremapper.la ../../INTERP_KERNEL/libinterpkernel.la
+TestMEDCouplingRemapper_LDFLAGS = @CPPUNIT_LIBS@ ../libmedcouplingremapper.la ../../INTERP_KERNEL/libinterpkernel.la ../libmedcoupling.la
 
 dist_TestMEDCouplingRemapper_SOURCES = TestMEDCouplingRemapper.cxx MEDCouplingRemapperTest.hxx MEDCouplingRemapperTest.cxx MEDCouplingBasicsTest0.cxx
 
@@ -40,4 +41,3 @@ check : tests
 
 CLEANFILES = \
         UnitTestsResult
-	

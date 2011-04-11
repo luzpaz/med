@@ -27,7 +27,10 @@
 
 namespace ParaMEDMEM
 {
+  class DataArrayDouble;
   class MEDCouplingUMesh;
+  class MEDCouplingFieldDouble;
+  class MEDCouplingMultiFields;
 
   class MEDCouplingBasicsTest : public CppUnit::TestFixture
   {
@@ -128,6 +131,7 @@ namespace ParaMEDMEM
     CPPUNIT_TEST( testFillFromAnalytic3 );
     CPPUNIT_TEST( testFieldDoubleOpEqual1 );
     CPPUNIT_TEST( testAreaBary3D2 );
+    //MEDCouplingBasicsTest3.cxx
     CPPUNIT_TEST( testGetMeasureFieldCMesh1 );
     CPPUNIT_TEST( testFieldDoubleZipCoords1 );
     CPPUNIT_TEST( testFieldDoubleZipConnectivity1 );
@@ -160,6 +164,62 @@ namespace ParaMEDMEM
     CPPUNIT_TEST( testExtrudedMesh7 );
     CPPUNIT_TEST( testSimplexize1 );
     CPPUNIT_TEST( testSimplexize2 );
+    CPPUNIT_TEST( testDAMeld1 );
+    CPPUNIT_TEST( testFieldMeld1 );
+    CPPUNIT_TEST( testMergeNodes2 );
+    CPPUNIT_TEST( testMergeField2 );
+    CPPUNIT_TEST( testDAIBuildComplement1 );
+    CPPUNIT_TEST( testDAIBuildUnion1 );
+    CPPUNIT_TEST( testDAIBuildIntersection1 );
+    CPPUNIT_TEST( testDAIDeltaShiftIndex1 );
+    CPPUNIT_TEST( testDaDoubleSelectByTupleIdSafe1 );
+    CPPUNIT_TEST( testAreCellsIncludedIn1 );
+    CPPUNIT_TEST( testDAIBuildSubstraction1 );
+    CPPUNIT_TEST( testBuildOrthogonalField2 );
+    CPPUNIT_TEST( testUMInsertNextCell1 );
+    CPPUNIT_TEST( testFieldOperatorDivDiffComp1 );
+    CPPUNIT_TEST( testDARearrange1 );
+    CPPUNIT_TEST( testGetDifferentValues1 );
+    CPPUNIT_TEST( testDAIBuildPermutationArr1 );
+    CPPUNIT_TEST( testAreCellsIncludedIn2 );
+    CPPUNIT_TEST( testUMeshGetPartBarycenterAndOwner1 );
+    CPPUNIT_TEST( testUMeshGetPartMeasureField1 );
+    CPPUNIT_TEST( testUMeshBuildPartOrthogonalField1 );
+    CPPUNIT_TEST( testUMeshGetTypesOfPart1 );
+    CPPUNIT_TEST( testUMeshKeepCellIdsByType1 );
+    CPPUNIT_TEST( testDAIAggregateMulti1 );
+    CPPUNIT_TEST( testMergeUMeshes2 );
+    CPPUNIT_TEST( testBuild0DMeshFromCoords1 );
+    //MEDCouplingBasicsTest4.cxx
+    CPPUNIT_TEST( testDescriptionInMeshTimeUnit1 );
+    CPPUNIT_TEST( testMultiFields1 );
+    CPPUNIT_TEST( testFieldOverTime1 );
+    CPPUNIT_TEST( testDAICheckAndPreparePermutation1 );
+    CPPUNIT_TEST( testDAIChangeSurjectiveFormat1 );
+    CPPUNIT_TEST( testUMeshGetCellIdsLyingOnNodes1 );
+    CPPUNIT_TEST( testUMeshFindCellsIdsOnBoundary1 );
+    CPPUNIT_TEST( testMeshSetTime1 );
+    CPPUNIT_TEST( testApplyFuncTwo1 );
+    CPPUNIT_TEST( testApplyFuncThree1 );
+    CPPUNIT_TEST( testFillFromAnalyticTwo1 );
+    CPPUNIT_TEST( testFillFromAnalyticThree1 );
+    CPPUNIT_TEST( testDAUnitVar1 );
+    CPPUNIT_TEST( testGaussCoordinates1 );
+    CPPUNIT_TEST( testP2Localization1 );
+    CPPUNIT_TEST( testP2Localization2 );
+    CPPUNIT_TEST( testGetValueOn2 );
+    CPPUNIT_TEST( testDAIGetIdsNotEqual1 );
+    CPPUNIT_TEST( testDAIComputeOffsets1 );
+    CPPUNIT_TEST( testUMeshHexagonPrism1 );
+    CPPUNIT_TEST( testDADCheckIsMonotonic );
+    CPPUNIT_TEST( testCheckCoherencyDeeper1 );
+    CPPUNIT_TEST( testUnPolyze2 );
+    CPPUNIT_TEST( testDACpyFrom1 );
+    CPPUNIT_TEST( testDAITransformWithIndArr1 );
+    CPPUNIT_TEST( testDAIBuildPermArrPerLevel1 );
+    CPPUNIT_TEST( testDAIOperations1 );
+    CPPUNIT_TEST( testEmulateMEDMEMBDC1 );
+    CPPUNIT_TEST( testGetLevArrPerCellTypes1 );
     //MEDCouplingBasicsTestInterp.cxx
     CPPUNIT_TEST( test2DInterpP0P0_1 );
     CPPUNIT_TEST( test2DInterpP0P0PL_1 );
@@ -316,6 +376,7 @@ namespace ParaMEDMEM
     void testFillFromAnalytic3();
     void testFieldDoubleOpEqual1();
     void testAreaBary3D2();
+    //MEDCouplingBasicsTest3.cxx
     void testGetMeasureFieldCMesh1();
     void testFieldDoubleZipCoords1();
     void testFieldDoubleZipConnectivity1();
@@ -348,6 +409,63 @@ namespace ParaMEDMEM
     void testExtrudedMesh7();
     void testSimplexize1();
     void testSimplexize2();
+    void testDAMeld1();
+    void testFieldMeld1();
+    void testMergeNodes2();
+    void testMergeField2();
+    void testDAIBuildComplement1();
+    void testDAIBuildUnion1();
+    void testDAIBuildIntersection1();
+    void testDAIDeltaShiftIndex1();
+    void testDaDoubleSelectByTupleIdSafe1();
+    void testAreCellsIncludedIn1();
+    void testDAIBuildSubstraction1();
+    void testBuildOrthogonalField2();
+    void testUMInsertNextCell1();
+    void testFieldOperatorDivDiffComp1();
+    void testDARearrange1();
+    void testGetDifferentValues1();
+    void testDAIBuildPermutationArr1();
+    void testAreCellsIncludedIn2();
+    void testUMeshGetPartBarycenterAndOwner1();
+    void testUMeshGetPartMeasureField1();
+    void testUMeshBuildPartOrthogonalField1();
+    void testUMeshGetTypesOfPart1();
+    void testUMeshKeepCellIdsByType1();
+    void testDAIAggregateMulti1();
+    void testMergeUMeshes2();
+    void testBuild0DMeshFromCoords1();
+    //MEDCouplingBasicsTest4.cxx
+    void testDescriptionInMeshTimeUnit1();
+    void testMultiFields1();
+    void testFieldOverTime1();
+    void testDAICheckAndPreparePermutation1();
+    void testDAIChangeSurjectiveFormat1();
+    void testUMeshGetCellIdsLyingOnNodes1();
+    void testUMeshFindCellsIdsOnBoundary1();
+    void testMeshSetTime1();
+    void testApplyFuncTwo1();
+    void testApplyFuncThree1();
+    void testFillFromAnalyticTwo1();
+    void testFillFromAnalyticThree1();
+    void testDAUnitVar1();
+    void testGaussCoordinates1();
+    void testQ1Localization1();
+    void testP2Localization1();
+    void testP2Localization2();
+    void testGetValueOn2();
+    void testDAIGetIdsNotEqual1();
+    void testDAIComputeOffsets1();
+    void testUMeshHexagonPrism1();
+    void testDADCheckIsMonotonic();
+    void testCheckCoherencyDeeper1();
+    void testUnPolyze2();
+    void testDACpyFrom1();
+    void testDAITransformWithIndArr1();
+    void testDAIBuildPermArrPerLevel1();
+    void testDAIOperations1();
+    void testEmulateMEDMEMBDC1();
+    void testGetLevArrPerCellTypes1();
     //MEDCouplingBasicsTestInterp.cxx
     void test2DInterpP0P0_1();
     void test2DInterpP0P0PL_1();
@@ -441,6 +559,14 @@ namespace ParaMEDMEM
     static MEDCouplingUMesh *build2DTargetMesh_3();
     static MEDCouplingUMesh *build3DTargetMesh_3();
     static MEDCouplingUMesh *build2DTargetMesh_4();
+    static MEDCouplingUMesh *build1DMultiTypes_1();
+    static MEDCouplingUMesh *build2DMultiTypes_1();
+    static MEDCouplingUMesh *build3DMultiTypes_1();
+    static MEDCouplingUMesh *buildHexa8Mesh_1();
+    static MEDCouplingUMesh *buildPointe_1(MEDCouplingUMesh *&m1);
+    static DataArrayDouble *buildCoordsForMultiTypes_1();
+    static MEDCouplingMultiFields *buildMultiFields_1();
+    static std::vector<MEDCouplingFieldDouble *> buildMultiFields_2();
     static double sumAll(const std::vector< std::map<int,double> >& matrix);
   };
 }

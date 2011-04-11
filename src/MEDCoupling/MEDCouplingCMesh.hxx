@@ -34,7 +34,7 @@ namespace ParaMEDMEM
     static MEDCouplingCMesh *New();
     MEDCouplingMesh *deepCpy() const;
     MEDCouplingCMesh *clone(bool recDeepCpy) const;
-    void updateTime();
+    void updateTime() const;
     MEDCouplingMeshType getType() const { return CARTESIAN; }
     void copyTinyStringsFrom(const MEDCouplingMesh *other) throw(INTERP_KERNEL::Exception);
     bool isEqual(const MEDCouplingMesh *other, double prec) const;
@@ -44,26 +44,30 @@ namespace ParaMEDMEM
     void checkDeepEquivalOnSameNodesWith(const MEDCouplingMesh *other, int cellCompPol, double prec,
                                          DataArrayInt *&cellCor) const throw(INTERP_KERNEL::Exception);
     void checkCoherency() const throw(INTERP_KERNEL::Exception);
+    void checkCoherency1(double eps=1e-12) const throw(INTERP_KERNEL::Exception);
+    void checkCoherency2(double eps=1e-12) const throw(INTERP_KERNEL::Exception);
     int getNumberOfCells() const;
     int getNumberOfNodes() const;
     int getSpaceDimension() const;
     int getMeshDimension() const;
     int getCellIdFromPos(int i, int j, int k) const;
     int getNodeIdFromPos(int i, int j, int k) const;
-    static void getPosFromId(int nodeId, int spaceDim, const int *split, int *res);
+    static void GetPosFromId(int nodeId, int spaceDim, const int *split, int *res);
     INTERP_KERNEL::NormalizedCellType getTypeOfCell(int cellId) const;
     int getNumberOfCellsWithType(INTERP_KERNEL::NormalizedCellType type) const;
     void getNodeIdsOfCell(int cellId, std::vector<int>& conn) const;
     void getCoordinatesOfNode(int nodeId, std::vector<double>& coo) const;
     std::string simpleRepr() const;
     std::string advancedRepr() const;
-    DataArrayDouble *getCoordsAt(int i) const throw(INTERP_KERNEL::Exception);
-    void setCoordsAt(int i, DataArrayDouble *arr) throw(INTERP_KERNEL::Exception);
-    void setCoords(DataArrayDouble *coordsX,
-                   DataArrayDouble *coordsY=0,
-                   DataArrayDouble *coordsZ=0);
+    const DataArrayDouble *getCoordsAt(int i) const throw(INTERP_KERNEL::Exception);
+    DataArrayDouble *getCoordsAt(int i) throw(INTERP_KERNEL::Exception);
+    void setCoordsAt(int i, const DataArrayDouble *arr) throw(INTERP_KERNEL::Exception);
+    void setCoords(const DataArrayDouble *coordsX,
+                   const DataArrayDouble *coordsY=0,
+                   const DataArrayDouble *coordsZ=0);
     // tools
-    MEDCouplingUMesh *buildUnstructured() const;
+    DataArrayInt *checkTypeConsistencyAndContig(const std::vector<int>& code, const std::vector<const DataArrayInt *>& idsPerType) const throw(INTERP_KERNEL::Exception);
+    MEDCouplingUMesh *buildUnstructured() const throw(INTERP_KERNEL::Exception);
     MEDCouplingMesh *buildPart(const int *start, const int *end) const;
     MEDCouplingMesh *buildPartAndReduceNodes(const int *start, const int *end, DataArrayInt*& arr) const;
     DataArrayInt *simplexize(int policy) throw(INTERP_KERNEL::Exception);
@@ -86,10 +90,10 @@ namespace ParaMEDMEM
     void getSplitCellValues(int *res) const;
     void getSplitNodeValues(int *res) const;
     //serialisation-unserialization
-    void getTinySerializationInformation(std::vector<int>& tinyInfo, std::vector<std::string>& littleStrings) const;
+    void getTinySerializationInformation(std::vector<double>& tinyInfoD, std::vector<int>& tinyInfo, std::vector<std::string>& littleStrings) const;
     void resizeForUnserialization(const std::vector<int>& tinyInfo, DataArrayInt *a1, DataArrayDouble *a2, std::vector<std::string>& littleStrings) const;
     void serialize(DataArrayInt *&a1, DataArrayDouble *&a2) const;
-    void unserialization(const std::vector<int>& tinyInfo, const DataArrayInt *a1, DataArrayDouble *a2,
+    void unserialization(const std::vector<double>& tinyInfoD, const std::vector<int>& tinyInfo, const DataArrayInt *a1, DataArrayDouble *a2,
                          const std::vector<std::string>& littleStrings);
   private:
     MEDCouplingCMesh();

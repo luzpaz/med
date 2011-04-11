@@ -34,10 +34,11 @@ MEDCouplingField.hxx MEDCouplingNormalizedUnstructuredMesh.hxx MEDCouplingMemArr
 MEDCouplingNormalizedUnstructuredMesh.txx  MEDCouplingMemArray.txx MEDCouplingRefCountObject.hxx  \
 MEDCouplingCMesh.hxx MEDCouplingTimeDiscretization.hxx                                            \
 MEDCouplingFieldDiscretization.hxx MEDCouplingPointSet.hxx MEDCouplingPointSet.txx                \
-MEDCouplingUMeshDesc.hxx MEDCouplingNatureOfField.hxx                                             \
+MEDCouplingUMeshDesc.hxx MEDCouplingNatureOfField.hxx MEDCouplingFieldTemplate.hxx                \
 MEDCouplingNormalizedCartesianMesh.hxx MEDCouplingNormalizedCartesianMesh.txx                     \
 MEDCouplingRemapper.hxx MEDCouplingExtrudedMesh.hxx MEDCouplingGaussLocalization.hxx              \
-MEDCouplingAutoRefCountObjectPtr.hxx
+MEDCouplingAutoRefCountObjectPtr.hxx MEDCouplingMultiFields.hxx MEDCouplingDefinitionTime.hxx     \
+MEDCouplingFieldOverTime.hxx
 
 # Libraries targets
 
@@ -46,16 +47,17 @@ dist_libmedcoupling_la_SOURCES = \
 	MEDCouplingUMesh.cxx  MEDCouplingMemArray.cxx  MEDCouplingTimeLabel.cxx             \
 	MEDCouplingCMesh.cxx MEDCouplingTimeDiscretization.cxx                              \
 	MEDCouplingFieldDiscretization.cxx MEDCouplingRefCountObject.cxx                    \
-	MEDCouplingPointSet.cxx MEDCouplingUMeshDesc.cxx                                    \
+	MEDCouplingPointSet.cxx MEDCouplingUMeshDesc.cxx  MEDCouplingFieldTemplate.cxx      \
 	MEDCouplingExtrudedMesh.cxx MEDCouplingMesh.cxx MEDCouplingGaussLocalization.cxx    \
-	MEDCouplingNatureOfField.cxx
+	MEDCouplingNatureOfField.cxx MEDCouplingMultiFields.cxx                             \
+	MEDCouplingDefinitionTime.cxx MEDCouplingFieldOverTime.cxx
 
 libmedcoupling_la_LDFLAGS= 
 
 libmedcoupling_la_CPPFLAGS=  @CXXTMPDPTHFLAGS@ \
 	-I$(srcdir) -I$(srcdir)/../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Geometric2D \
-	-I$(srcdir)/../INTERP_KERNEL/ExprEval
+	-I$(srcdir)/../INTERP_KERNEL/ExprEval -I$(srcdir)/../INTERP_KERNEL/GaussPoints
 
 # the geom2D library is included in the interpkernel one
 libmedcoupling_la_LIBADD= ../INTERP_KERNEL/libinterpkernel.la
@@ -93,4 +95,8 @@ EXTRA_DIST += \
 	MEDCouplingNatureOfField.hxx              \
 	MEDCouplingRemapper.hxx                   \
 	MEDCouplingExtrudedMesh.hxx               \
-	MEDCouplingGaussLocalization.hxx 
+	MEDCouplingGaussLocalization.hxx          \
+	MEDCouplingMultiFields.hxx                \
+	MEDCouplingFieldTemplate.hxx              \
+	MEDCouplingDefinitionTime.hxx             \
+	MEDCouplingFieldOverTime.hxx

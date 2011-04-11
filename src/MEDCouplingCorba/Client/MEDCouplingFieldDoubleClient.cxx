@@ -90,7 +90,7 @@ MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplin
   delete bigArr;
   //
   //notify server that the servant is no more used.
-  fieldPtr->Destroy();
+  fieldPtr->Register();
   //
   ret->finishUnserialization(tinyLV,tinyLD,tinyLS);
   //

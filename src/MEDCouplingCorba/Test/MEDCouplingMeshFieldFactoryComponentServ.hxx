@@ -58,6 +58,18 @@ namespace SALOME_TEST
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldGaussPtNE2DWT();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldVectorOnExtrudedWT();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldVectorOnCMeshWT();
+    SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr getFieldTemplateCellOn2D();
+    SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr getFieldTemplateNodeOn2D();
+    SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr getFieldTemplateGaussPtOn2D();
+    SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr getFieldTemplateGaussNEOn2D();
+    SALOME_MED::MEDCouplingMultiFieldsCorbaInterface_ptr getMultiFields1();
+    SALOME_MED::DataArrayDoubleCorbaInterface_ptr getArrayDouble1();
+    SALOME_MED::DataArrayDoubleCorbaInterface_ptr getArrayDouble2();
+    SALOME_MED::DataArrayDoubleCorbaInterface_ptr getArrayDouble3();
+    SALOME_MED::DataArrayIntCorbaInterface_ptr getArrayInt1();
+    SALOME_MED::DataArrayIntCorbaInterface_ptr getArrayInt2();
+    SALOME_MED::DataArrayIntCorbaInterface_ptr getArrayInt3();
+    SALOME_MED::MEDCouplingFieldOverTimeCorbaInterface_ptr getMultiFields2();
   private:
     CORBA::ORB_ptr _orb;
   };
