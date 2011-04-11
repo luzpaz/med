@@ -1469,14 +1469,11 @@ namespace MED
         EXCEPTION(std::runtime_error,"GetCellInfo - MEDmeshElementRd(...)");
       
       if (anIsFamNum == MED_FALSE)
-      {
-        if (aRet == MED_ERR_DOESNTEXIST)
-          {
-            int mySize = (int) theInfo.myFamNum->size();
-            theInfo.myFamNum->clear();
-            theInfo.myFamNum->resize(mySize, 0);
-          }
-      }
+        {
+          int mySize = (int) theInfo.myFamNum->size();
+          theInfo.myFamNum->clear();
+          theInfo.myFamNum->resize(mySize, 0);
+        }
       
     }
     
