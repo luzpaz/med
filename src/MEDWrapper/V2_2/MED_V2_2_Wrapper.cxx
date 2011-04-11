@@ -23,18 +23,22 @@
 //  File   : 
 //  Author : 
 //  Module : 
+//  $Header$
 //
 #include "MED_V2_2_Wrapper.hxx"
 #include "MED_Algorithm.hxx"
 #include "MED_Utilities.hxx"
 
+extern "C"
+{
 #include <med.h>
 #include <med_err.h>
+}
 
 #ifdef _DEBUG_
-static int MYDEBUG = 0;
+static int MYDEBUG = 1;
 #else
-// static int MYDEBUG = 0;
+static int MYDEBUG = 0;
 #endif
 
 
@@ -433,7 +437,7 @@ namespace MED
                               aNbGroup,
                               &aGroupNames);
       //&anAttrId,&anAttrVal,&anAttrDesc,aNbAttr,                   
-      
+
       INITMSG(MYDEBUG,"TVWrapper::GetFamilyInfo - MED_MODE_ACCES = "<<theMode<<"; aRet = "<<aRet<<std::endl);
       
       if(theErr) 
@@ -558,18 +562,20 @@ namespace MED
                                               aGeom,
                                               &aFamNum);
 
-      if(theErr) 
-        *theErr = aRet;
-      else if(aRet < 0){ // TODO: Get correct error code
-        //EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDfamLire(...) of CELLS");
-        aRet = 0;
-        if (aRet == MED_ERR_DOESNTEXIST)
+      if(aRet < 0)
+      {
+//        if (aRet == MED_ERR_DOESNTEXIST) // --- only valid with MED3.x files
           {
             int aSize = (int)theInfo.myFamNum->size();
             theInfo.myFamNum->clear();
             theInfo.myFamNum->resize(aSize,0);
+            aRet = 0;
           }
+//        else
+//          EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDmeshEntityFamilyNumberRd(...) of CELLS");
       }
+      if(theErr)
+        *theErr = aRet;
     }
 
 
@@ -787,23 +793,24 @@ namespace MED
                                           MED_NO_IT,
                                           aModeSwitch,
                                           &aCoord);
-                                          
-      aRet = MEDmeshEntityFamilyNumberRd(myFile->Id(),
-                                         &aMeshName,
-                                         MED_NO_DT,
-                                         MED_NO_IT,
-                                         MED_NODE,
-                                         MED_NO_GEOTYPE ,
-                                         &aFamNum);
-                                  
-      if (aRet < 0 )
-      { 
-        if (aRet == MED_ERR_DOESNTEXIST)
-        {
-          int aSize = (int)theInfo.myFamNum->size();
-          theInfo.myFamNum->clear();
-          theInfo.myFamNum->resize(aSize,0);
-        }
+
+      TErr aRet2 =MEDmeshEntityFamilyNumberRd(myFile->Id(),
+                                  &aMeshName,
+                                  MED_NO_DT,
+                                  MED_NO_IT,
+                                  MED_NODE,
+                                  MED_NO_GEOTYPE ,
+                                  &aFamNum);
+      if (aRet2  < 0)
+      {
+//        if (aRet2 == MED_ERR_DOESNTEXIST) // --- only valid with MED3.x files
+          {
+            int mySize = (int)theInfo.myFamNum->size();
+            theInfo.myFamNum->clear();
+            theInfo.myFamNum->resize(mySize,0);
+          }
+//        else
+//          EXCEPTION(std::runtime_error,"GetNodeInfo - MEDmeshEntityFamilyNumberRd(...)");
       }
                                   
       if ( MEDmeshEntityNameRd(myFile->Id(),
@@ -1465,9 +1472,9 @@ namespace MED
       {
         if (aRet == MED_ERR_DOESNTEXIST)
           {
-            int mySize = (int)theInfo.myFamNum->size();
+            int mySize = (int) theInfo.myFamNum->size();
             theInfo.myFamNum->clear();
-            theInfo.myFamNum->resize(mySize,0);
+            theInfo.myFamNum->resize(mySize, 0);
           }
       }
       
@@ -1502,27 +1509,47 @@ namespace MED
       TValueHolder<EEntiteMaillage, med_entity_type> anEntity(anInfo.myEntity);
       TValueHolder<EGeometrieElement, med_geometry_type> aGeom(anInfo.myGeom);
       TValueHolder<EConnectivite, med_connectivity_mode> aConnMode(anInfo.myConnMode);
+      TValueHolder<TInt, med_int> aNbElem(anInfo.myNbElem);
 
       TErr aRet;
-      aRet = MEDmeshElementWr(myFile->Id(),
+      aRet = MEDmeshElementConnectivityWr(myFile->Id(),
+                                          &aMeshName,
+                                          MED_NO_DT,
+                                          MED_NO_IT,
+                                          MED_UNDEF_DT,
+                                          anEntity,
+                                          aGeom,
+                                          aConnMode,
+                                          aModeSwitch,
+                                          aNbElem,
+                                          &aConn);
+
+      MEDmeshEntityFamilyNumberWr(myFile->Id(),
+                                  &aMeshName,
+                                  MED_NO_DT,
+                                  MED_NO_IT,
+                                  anEntity,
+                                  aGeom,
+                                  aNbElem,
+                                  &aFamNum);
+      if(anIsElemNames)
+        MEDmeshEntityNameWr(myFile->Id(),
+                            &aMeshName,
+                            MED_NO_DT,
+                            MED_NO_IT,
+                            anEntity,
+                            aGeom,
+                            aNbElem,
+                            &anElemNames);
+      if(anIsElemNum)
+        MEDmeshEntityNumberWr(myFile->Id(),
                               &aMeshName,
                               MED_NO_DT,
                               MED_NO_IT,
-                              MED_UNDEF_DT,
                               anEntity,
                               aGeom,
-                              aConnMode,
-                              aModeSwitch,
-                              anInfo.
-                              myNbElem,
-                              &aConn,
-                              anIsElemNames,
-                              &anElemNames,
-                              anIsElemNum,
-                              &anElemNum,
-                              anIsFamNum,
-                              &aFamNum);
-      
+                              aNbElem,
+                              &anElemNum);
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
@@ -1929,31 +1956,28 @@ namespace MED
           med_float aDt;
           if (aNbStamps > 0)
             {
-              TErr err = MEDfieldComputingStepInfo(anId,
-                                                   &aFieldName,
-                                                   1,
-                                                   &aNumDt,
-                                                   &aNumOrd,
-                                                   &aDt);
-              if ( !err )
-                {
-                  char profilename[MED_NAME_SIZE+1];
-                  char locname[MED_NAME_SIZE+1];
-                  med_int profilsize;
-                  med_int aNbGauss;
-                  nval = MEDfieldnValueWithProfile(anId,
-                                                   &aFieldName,
-                                                   aNumDt,
-                                                   aNumOrd,
-                                                   anEntity,
-                                                   med_geometry_type(aGeom),
-                                                   1,
-                                                   MED_COMPACT_STMODE,
-                                                   profilename,
-                                                   &profilsize,
-                                                   locname,
-                                                   &aNbGauss);
-                }
+              TErr aRet = MEDfieldComputingStepInfo(anId,
+                                                    &aFieldName,
+                                                    1,
+                                                    &aNumDt,
+                                                    &aNumOrd,
+                                                    &aDt);
+              char profilename[MED_NAME_SIZE+1];
+              char locname[MED_NAME_SIZE+1];
+              med_int profilsize;
+              med_int aNbGauss;
+              nval = MEDfieldnValueWithProfile(anId,
+                                               &aFieldName,
+                                               aNumDt,
+                                               aNumOrd,
+                                               anEntity,
+                                               med_geometry_type(aGeom),
+                                               1,
+                                               MED_COMPACT_STMODE,
+                                               profilename,
+                                               &profilsize,
+                                               locname,
+                                               &aNbGauss);
             }
           bool anIsSatisfied =(nval > 0);
           if(anIsSatisfied){
@@ -2113,6 +2137,7 @@ namespace MED
       for(; anIter != aGeom2Size.end(); anIter++){
         EGeometrieElement aGeom = anIter->first;
         TInt aNbElem = anIter->second;
+        char profilename[MED_NAME_SIZE+1];
         med_int profilesize,aNbGauss;
 
         TInt aNbVal = MEDfieldnValueWithProfile(anId,
@@ -2481,16 +2506,20 @@ namespace MED
                                            MED_NO_GEOTYPE,
                                            &aFamNumNode);
 
+        if(aRet < 0)
+        {
+//            if (aRet == MED_ERR_DOESNTEXIST) // --- only valid with MED3.x files
+              {
+                int mySize = (int)theInfo.myFamNumNode.size();
+                theInfo.myFamNumNode.clear();
+                theInfo.myFamNumNode.resize(mySize,0);
+                aRet = 0;
+              }
+//            else
+//              EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDmeshEntityFamilyNumberRd(...)");
+        }
         if(theErr) 
           *theErr = aRet;
-        else if(aRet < 0)
-        { // TODO: Get correct error code
-          aRet = 0;
-//           EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDmeshEntityFamilyNumberRd(...) of NODES");
-          int mySize = (int)theInfo.myFamNumNode.size();
-          theInfo.myFamNumNode.clear();
-          theInfo.myFamNumNode.resize(mySize,0);
-        }
 
         //============================
       }
@@ -2557,21 +2586,25 @@ namespace MED
         theInfo.myFamSubNum.resize(aNbCells,0);
         TValueHolder<TElemNum, med_int> aFamNum(theInfo.myFamSubNum);
       
-        MEDmeshEntityFamilyNumberRd(myFile->Id(),
+        aRet = MEDmeshEntityFamilyNumberRd(myFile->Id(),
                                     &aMeshName,MED_NO_DT,MED_NO_IT,
                                     med_entity_type(aEntity),
                                     med_geometry_type(aGeom),&aFamNum);
       }
+      if(aRet < 0)
+      {
+//          if (aRet == MED_ERR_DOESNTEXIST) // --- only valid with MED3.x files
+            {
+              int mySize = (int)theInfo.myFamNumNode.size();
+              theInfo.myFamNumNode.clear();
+              theInfo.myFamNumNode.resize(mySize,0);
+              aRet = 0;
+            }
+//          else
+//            EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDmeshEntityFamilyNumberRd(...)");
+      }
       if(theErr) 
         *theErr = aRet;
-      else if(aRet < 0){ // TODO: Get correct error code
-        //EXCEPTION(std::runtime_error,"GetGrilleInfo - MEDfamLire(...) of CELLS");
-        aRet = 0;
-        int mySize = (int)theInfo.myFamNum.size();
-        theInfo.myFamNum.clear();
-        theInfo.myFamNum.resize(mySize,0);
-      }
-      
     }
 
     void
