@@ -75,6 +75,11 @@ namespace MED
         return aVersion;
     }
 #endif
+    // check compatibility of hdf and med versions
+    med_bool hdfok, medok;
+    med_err aRet0= MEDfileCompatibility(theFileName.c_str(), &hdfok, &medok);
+    if ((!hdfok) || (!medok))
+      return aVersion;
 
     // Next, try to open the file trough the MED API
     const char* aFileName = theFileName.c_str();
@@ -87,10 +92,6 @@ namespace MED
       INITMSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'; aRet = "<<aRet<<std::endl);
       if(aRet >= 0){
           aVersion = eV2_2;
-      }
-      else {
-        // VSR: simulate med 2.3.6 behavior, med file version is assumed to 2.1
-        aVersion = eV2_2;
       }
     }
     MEDfileClose(aFid);
