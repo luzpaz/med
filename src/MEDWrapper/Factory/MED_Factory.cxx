@@ -35,6 +35,9 @@
 extern "C"
 {
 #include <med.h>
+#ifndef WIN32
+  #include <unistd.h>
+#endif
 }
 
 #ifdef _DEBUG_
@@ -50,9 +53,12 @@ namespace MED
                         bool theDoPreCheckInSeparateProcess)
   {
     INITMSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'"<<std::endl);
-    EVersion aVersion = eVUnknown;    
+    EVersion aVersion = eVUnknown;
 
 #ifndef WIN32
+    if (access(theFileName.c_str(),F_OK))
+      return aVersion;
+
     if(theDoPreCheckInSeparateProcess){
       // First check, is it possible to deal with the file
       std::ostringstream aStr;
