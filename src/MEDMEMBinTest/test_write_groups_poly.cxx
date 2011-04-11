@@ -121,8 +121,8 @@ int main()
   pmesh->setTypes( & types[0], MED_EN::MED_FACE );
   pmesh->setNumberOfElements( & nb_polyG, MED_FACE );
 
-  int polyHInd[nb_polyH+1] = {1, 40 ,83, 126, 169, 212, 255, 303 };
-  int polyHConn[302] = {
+  int polyHInd[nb_polyH+1] = {1, 44, 87, 130, 173, 216, 259, 302 };
+  int polyHConn[301] = {
     1,2,3,4,5,6,      -1, 43,44,45,46,47,48,-1, 1,2,44,43,  -1, 2,3,45,44,  -1,
     3,4,46,45,        -1, 4,5,47,46,        -1, 5,6,48,47,  -1, 6,1,43,48,       // #1
     7,8,9,10,3,2,     -1, 49,50,51,52,45,44,-1, 7,8,50,49,  -1, 8,9,51,50,  -1,
