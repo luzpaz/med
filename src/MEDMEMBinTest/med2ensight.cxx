@@ -83,7 +83,7 @@ int main (int argc, char ** argv) {
       cout << "    Number of iteration pair : "<< NumberOfIteration << endl;
       for (int j=0; j<NumberOfIteration; j++) {
         FIELD_ * myField = 0;
-        switch( myMed.getFieldType( FieldName[j] ))
+        switch( myMed.getFieldType( FieldName[i] ))
         {
         case MED_REEL64: myField = new FIELD<double>; break;
         case MED_INT32:  
