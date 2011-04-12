@@ -327,6 +327,7 @@ void GRID::printMySelf(std::ostream &os) const
 const MESH * GRID::convertInMESH() const
 {
   MESHING* mesh = new MESHING;
+  mesh->setName( getName() );
 
   int i, j, k;
 
