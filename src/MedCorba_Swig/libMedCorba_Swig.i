@@ -31,6 +31,7 @@
 #include "MEDMEM_FieldTemplate_i.hxx"
 #include "MEDMEM_Group_i.hxx"
 #include "MEDMEM_Med_i.hxx"
+#include "MEDMEM_GMesh_i.hxx"
 #include "MEDMEM_Mesh_i.hxx"
 #include "MEDMEM_Support_i.hxx"
 #include "Med_Gen_i.hxx"
@@ -56,10 +57,10 @@
 */
 
 #if defined(SWIGPYTHON)
-%typemap(out) SALOME_MED::MESH_ptr, SALOME_MED::FIELDDOUBLE_ptr,
-  SALOME_MED::FIELDINT_ptr, SALOME_MED::SUPPORT_ptr,
-  const SALOME_MED::MESH_ptr, const SALOME_MED::FIELDDOUBLE_ptr,
-  const SALOME_MED::FIELDINT_ptr, const SALOME_MED::SUPPORT_ptr
+%typemap(out) SALOME_MED::GMESH_ptr, SALOME_MED::MESH_ptr, SALOME_MED::FIELDDOUBLE_ptr,
+   SALOME_MED::FIELDINT_ptr, SALOME_MED::SUPPORT_ptr,
+   const SALOME_MED::GMESH_ptr, const SALOME_MED::MESH_ptr, const SALOME_MED::FIELDDOUBLE_ptr,
+   const SALOME_MED::FIELDINT_ptr, const SALOME_MED::SUPPORT_ptr
 {
   MESSAGE("typemap out sur Objet Corba version ptr");
 
@@ -111,10 +112,10 @@
 #endif
 
 #if defined(SWIGPYTHON)
-%typemap(out) SALOME_MED::MESH_var, SALOME_MED::FIELDDOUBLE_var,
-  SALOME_MED::FIELDINT_var, SALOME_MED::SUPPORT_var,
-  const SALOME_MED::MESH_var, const SALOME_MED::FIELDDOUBLE_var,
-  const SALOME_MED::FIELDINT_var, const SALOME_MED::SUPPORT_var
+%typemap(out) SALOME_MED::GMESH_var, SALOME_MED::MESH_var, SALOME_MED::FIELDDOUBLE_var,
+   SALOME_MED::FIELDINT_var, SALOME_MED::SUPPORT_var,
+   const SALOME_MED::GMESH_var, const SALOME_MED::MESH_var, const SALOME_MED::FIELDDOUBLE_var,
+   const SALOME_MED::FIELDINT_var, const SALOME_MED::SUPPORT_var
 {
   MESSAGE("typemap out sur Objet Corba version var");
 
@@ -146,11 +147,11 @@
 #endif
 
 #if defined(SWIGPYTHON)
-%typemap(typecheck) SALOME_MED::MESH_ptr, SALOME_MED::FIELDDOUBLE_ptr,
+%typemap(typecheck) SALOME_MED::GMESH_ptr, SALOME_MED::MESH_ptr, SALOME_MED::FIELDDOUBLE_ptr,
                     SALOME_MED::FIELDINT_ptr, SALOME_MED::SUPPORT_ptr,
                     const SALOME_MED::MESH_ptr, const SALOME_MED::FIELDDOUBLE_ptr,
                     const SALOME_MED::FIELDINT_ptr, const SALOME_MED::SUPPORT_ptr,
-                    SALOME_MED::MESH_var, SALOME_MED::FIELDDOUBLE_var,
+                    SALOME_MED::GMESH_var, SALOME_MED::MESH_var, SALOME_MED::FIELDDOUBLE_var,
                     SALOME_MED::FIELDINT_var, SALOME_MED::SUPPORT_var,
                     const SALOME_MED::MESH_var, const SALOME_MED::FIELDDOUBLE_var,
                     const SALOME_MED::FIELDINT_var, const SALOME_MED::SUPPORT_var
@@ -432,6 +433,47 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::SUPPORT_ptr t = SALOME_MED::SUPPORT::_narrow(O);
+
+  $1 = t;
+  SCRUTE($1);
+}
+#endif
+
+#if defined(SWIGPYTHON)
+%typemap(in) const SALOME_MED::GMESH_ptr, SALOME_MED::GMESH_ptr
+{
+
+  MESSAGE("typemap in sur Objet Corba MESH sans reference");
+
+  SCRUTE($input);
+
+  PyObject* pdict = PyDict_New();
+  PyDict_SetItemString(pdict, "__builtins__", PyEval_GetBuiltins());
+  PyRun_String("import CORBA", Py_single_input, pdict, pdict);
+ 
+  PyRun_String("o = CORBA.ORB_init([''], CORBA.ORB_ID);", Py_single_input,
+                   pdict, pdict);
+ 
+  PyObject* orb = PyDict_GetItemString(pdict, "o");
+
+  // Ask omniORBpy to transform MESH (python Corba) ptr to IOR string
+
+  PyObject* iorMesh
+    = PyObject_CallMethod(orb, (char*)"object_to_string", (char*)"O", $input);
+ 
+  if (iorMesh == Py_None)
+    return NULL;
+  char * s = PyString_AsString(PyObject_Str(iorMesh));
+ 
+  // Ask omniORB to convert IOR string to MESH (C++ Corba) ptr
+
+  int argc = 0;
+  char *xargv = (char*)"";
+  char **argv = &xargv;
+  CORBA::ORB_var ORB = CORBA::ORB_init(argc, argv);
+  CORBA::Object_var O =  ORB->string_to_object(s);
+  SCRUTE(O);
+  SALOME_MED::GMESH_ptr t = SALOME_MED::GMESH::_narrow(O);
 
   $1 = t;
   SCRUTE($1);
