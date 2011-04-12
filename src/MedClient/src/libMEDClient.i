@@ -23,6 +23,7 @@
 %module libMEDClient
 
 %{
+#include "GMESHClient.hxx"
 #include "MESHClient.hxx"
 #include "SUPPORTClient.hxx"
 #include "FIELDClient.hxx"
@@ -68,6 +69,21 @@
 
   $action
 }*/
+
+class GMESHClient : public GMESH {
+
+ public:
+  
+  GMESHClient(const SALOME_MED::GMESH_ptr m);
+
+  void blankCopy();
+  void fillCopy();
+  %extend {
+    ~GMESHClient(){
+      self->removeReference();
+    }
+  }
+};
 
 class MESHClient : public MESH {
 
