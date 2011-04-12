@@ -61,9 +61,12 @@ int GMESH_i::meshIndex = 0 ;
  * Default constructor
  */
 //=============================================================================
-GMESH_i::GMESH_i(): _mesh(constructConstMesh()),
-                    _corbaIndex(MESH_i::meshIndex++),
-                    _meshId("") 
+GMESH_i::GMESH_i():
+  SALOMEMultiComm(),
+  SALOME::GenericObj_i(),
+  _mesh(constructConstMesh()),
+  _corbaIndex(MESH_i::meshIndex++),
+  _meshId("") 
 {
   MESH_i::meshMap[_corbaIndex]=_mesh;
 }
@@ -82,9 +85,12 @@ GMESH_i::~GMESH_i()
  * Constructor
  */
 //=============================================================================
-GMESH_i::GMESH_i(::GMESH * const m ) :_mesh(m),
-                                     _corbaIndex(MESH_i::meshIndex++),
-                                     _meshId("") 
+GMESH_i::GMESH_i(::GMESH * const m ) :
+  SALOMEMultiComm(),
+  SALOME::GenericObj_i(),
+  _mesh(m),
+  _corbaIndex(MESH_i::meshIndex++),
+  _meshId("") 
 {
         GMESH_i::meshMap[_corbaIndex]=_mesh;
         SCRUTE(_mesh);
@@ -95,9 +101,12 @@ GMESH_i::GMESH_i(::GMESH * const m ) :_mesh(m),
  */
 //=============================================================================
 //MESH_i::MESH_i(const MESH_i & m) :_mesh(m._mesh),
-GMESH_i::GMESH_i( GMESH_i & m) :_mesh(m._mesh),
-                             _corbaIndex(MESH_i::meshIndex++),
-                             _meshId("") 
+GMESH_i::GMESH_i( GMESH_i & m) :
+  SALOMEMultiComm(),
+  SALOME::GenericObj_i(),
+  _mesh(m._mesh),
+  _corbaIndex(MESH_i::meshIndex++),
+  _meshId("") 
 {
         GMESH_i::meshMap[_corbaIndex]=_mesh;
 }
