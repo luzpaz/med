@@ -48,7 +48,7 @@ namespace // matters used by GAUSS_LOCALIZATION_::makeDefaultLocalization()
 
     TInt GetNbRef() const { return myNbRef; }
 
-    TCoordSlice GetCoord(TInt theRefId) { return &myRefCoord[0] + myNbRef * myDim; }
+    TCoordSlice GetCoord(TInt theRefId) { return &myRefCoord[0] + theRefId * myDim; }
   };
   //---------------------------------------------------------------
   /*!
