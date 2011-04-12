@@ -943,7 +943,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
                                  << fieldName
                                  << "| with (it,or) = ("
                                   << MED_FIELD_DRIVER<T>::_ptrField->_iterationNumber << ","
-                                 << MED_FIELD_DRIVER<T>::_ptrField->_orderNumber << "), on mesh "
+                                 << MED_FIELD_DRIVER<T>::_ptrField->_orderNumber << "), on mesh |"
                                  << meshName << "|" ));
   }
 
@@ -2104,8 +2104,8 @@ template <class T> void MED_FIELD_WRONLY_DRIVER<T>::write(void) const
                             )
                          );
 
-        //numberOfElForMED *= mySupport->getNumberOfGaussPoints(types[typeNo]); //Deplacer la méthode dans FIELD
-        numberOfElForMED *= ngauss;
+      //numberOfElForMED *= mySupport->getNumberOfGaussPoints(types[typeNo]); //Deplacer la méthode dans FIELD
+      //numberOfElForMED *= ngauss;
     }
 
     MESSAGE_MED("MED_FIELD_DRIVER<T>::_medIdt                       : "<<id);
@@ -2127,10 +2127,18 @@ template <class T> void MED_FIELD_WRONLY_DRIVER<T>::write(void) const
 
     // Rem 1 : le nombre d'éléments passé à MEDchampEcr ne doit pas tenir compte de la taille
     //         des profils : c'est la taille du champ sans profil.
-    err=med_2_3::MEDfieldValueWithProfileWr(id,fieldName.c_str(),MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber(),MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber(),MED_FIELD_DRIVER<T>::_ptrField->getTime(),
-                                            (med_2_3::med_entity_type)entityType,(med_2_3::med_geometry_type)types[typeNo],med_2_3::MED_COMPACT_PFLMODE,profilName.c_str(),locName.c_str(),modswt,MED_ALL_CONSTITUENT,numberOfElForMED,
+    err=med_2_3::MEDfieldValueWithProfileWr(id,fieldName.c_str(),
+                                            MED_FIELD_DRIVER<T>::_ptrField->getIterationNumber(),
+                                            MED_FIELD_DRIVER<T>::_ptrField->getOrderNumber(),
+                                            MED_FIELD_DRIVER<T>::_ptrField->getTime(),
+                                            (med_2_3::med_entity_type)entityType,
+                                            (med_2_3::med_geometry_type)types[typeNo],
+                                            med_2_3::MED_COMPACT_PFLMODE,
+                                            profilName.c_str(),
+                                            locName.c_str(),
+                                            modswt,MED_ALL_CONSTITUENT,
+                                            numberOfElForMED,
                                             (unsigned char*)value);
-
     if (err < MED_VALID ) {
       if ( !isFullInterlace )
         delete myField;
