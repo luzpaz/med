@@ -996,7 +996,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
   med_2_3::med_sorting_type sttp3;
   med_2_3::med_int nsteppp3;
   med_2_3::med_axis_type axxxppp3;
-  int naxis=med_2_3::MEDmeshnAxisByName(id,meshName.c_str());
+  int naxis=std::max(3,med_2_3::MEDmeshnAxisByName(id,meshName.c_str()));
   char *annp3=new char[naxis*MED_SNAME_SIZE+1];
   char *auup3=new char[naxis*MED_SNAME_SIZE+1];
   bool fileHasMesh=(med_2_3::MEDmeshInfoByName(id,meshName.c_str(),&spceDimp3,&mdimp3,&mtype,desccp3,dttunittp3,&sttp3,&nsteppp3,&axxxppp3,annp3,auup3)==0);
