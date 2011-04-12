@@ -28,6 +28,7 @@
 #include "FAMILYClient.hxx"
 #include "GROUPClient.hxx"
 #include "MESHClient.hxx"
+#include "Utils_CorbaException.hxx"
 
 using namespace MEDMEM;
 using namespace MED_EN;
@@ -185,6 +186,8 @@ void GMESHClient::fillCopy()
 
   if ( _uMesh )
     _uMesh->fillCopy();
+  else
+    THROW_SALOME_CORBA_EXCEPTION("GRID client does not exists",SALOME::INTERNAL_ERROR);
 
   _complete = true;
 }
@@ -250,10 +253,15 @@ GMESHClient::~GMESHClient()
  */
 //=============================================================================
 
-void GMESHClient::write(int index/*=0*/)
+void GMESHClient::write(int index/*=0*/) const
 {
-  this->fillCopy();
-  GMESH::write(index);
+  if ( index < 0 || index >= (int)_drivers.size() || !_drivers[index] )
+    throw MED_EXCEPTION ( LOCALIZED( STRING("GMESHClient::write(int index): ")
+                                     << "The index given is invalid, index must be between  0 and |"
+                                     << _drivers.size() ));
+
+  const_cast<GMESHClient*>(this)->fillCopy();
+  _uMesh->write( *_drivers[index], _drivers[index]->getAccessMode() );
 }
 
 //=============================================================================
@@ -262,10 +270,11 @@ void GMESHClient::write(int index/*=0*/)
  */
 //=============================================================================
 
-void GMESHClient::write(const GENDRIVER & genDriver)
+void GMESHClient::write(const GENDRIVER &      genDriver,
+                        MED_EN::med_mode_acces medMode) const
 {
-  this->fillCopy();
-  GMESH::write(genDriver);
+  const_cast<GMESHClient*>(this)->fillCopy();
+  _uMesh->write(genDriver,medMode);
 }
 
 //=============================================================================
@@ -274,10 +283,13 @@ void GMESHClient::write(const GENDRIVER & genDriver)
  */
 //=============================================================================
 
-void GMESHClient::write(driverTypes driverType, const std::string& filename)
+void GMESHClient::write(driverTypes        driverType,
+                        const std::string& filename,
+                        const std::string& meshname,
+                        MED_EN::med_mode_acces medMode) const
 {
-  this->fillCopy();
-  GMESH::write(driverType, filename);
+  const_cast<GMESHClient*>(this)->fillCopy();
+  _uMesh->write(driverType, filename,meshname,medMode);
 }
 
 //================================================================================

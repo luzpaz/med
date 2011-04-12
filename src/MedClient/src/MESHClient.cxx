@@ -269,9 +269,9 @@ void MESHClient::removeReference() const
  */
 //=============================================================================
 
-void MESHClient::write(int index/*=0*/)
+void MESHClient::write(int index/*=0*/) const
 {
-  this->fillCopy();
+  const_cast<MESHClient*>(this)->fillCopy();
   GMESH::write(index);
 }
 
@@ -281,9 +281,10 @@ void MESHClient::write(int index/*=0*/)
  */
 //=============================================================================
 
-void MESHClient::write(const GENDRIVER & genDriver)
+void MESHClient::write(const GENDRIVER &      genDriver,
+                       MED_EN::med_mode_acces medMode) const
 {
-  this->fillCopy();
+  const_cast<MESHClient*>(this)->fillCopy();
   GMESH::write(genDriver);
 }
 
@@ -293,9 +294,12 @@ void MESHClient::write(const GENDRIVER & genDriver)
  */
 //=============================================================================
 
-void MESHClient::write(driverTypes driverType, const std::string& filename)
+void MESHClient::write(driverTypes        driverType,
+                       const std::string& filename,
+                       const std::string& meshname,
+                       MED_EN::med_mode_acces medMode) const
 {
-  this->fillCopy();
+  const_cast<MESHClient*>(this)->fillCopy();
   GMESH::write(driverType, filename);
 }
 

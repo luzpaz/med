@@ -49,9 +49,13 @@ public :
   void fillCopy();
   virtual void addReference() const;
   virtual void removeReference() const;
-  virtual void write(int index=0);
-  virtual void write(const GENDRIVER & genDriver);
-  virtual void write(driverTypes driverType, const std::string& filename);
+  virtual void write(int index=0) const;
+  virtual void write(const GENDRIVER & genDriver,
+                     MED_EN::med_mode_acces medMode=MED_EN::WRONLY) const;
+  virtual void write(driverTypes        driverType,
+                     const std::string& filename,
+                     const std::string& meshname="",
+                     MED_EN::med_mode_acces medMode=MED_EN::WRONLY) const;
   virtual void printMySelf(ostream &os) const;
 
 private:
