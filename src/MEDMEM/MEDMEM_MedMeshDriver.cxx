@@ -1987,7 +1987,7 @@ int MED_MESH_WRONLY_DRIVER::writeGRID() const
 
   int spaceDimension=-1;
   int meshDimension=-1;
-  if(err!=0)
+  if(!err)
     {
       med_2_3::med_mesh_type ttmp3;
       char commentp3[MED_COMMENT_SIZE+1];
@@ -2015,62 +2015,81 @@ int MED_MESH_WRONLY_DRIVER::writeGRID() const
     tmp_unit.replace(i*MED_SNAME_SIZE,i*MED_SNAME_SIZE+lengthString,valueString,0,lengthString);
   }
 
-  if (err!=0)
+  if (err) // create a mesh in the file
     {
+      // Pourquoi le stocker sous forme de chaîne ?
+      const string & coordinateSystem = ptrGrid->_coordinate->_coordinateSystem;
+      if      (coordinateSystem  == "CARTESIAN")
+        rep = med_2_3::MED_CARTESIAN;
+      else if ( coordinateSystem == "CYLINDRICAL")
+        rep = med_2_3::MED_CYLINDRICAL;
+      else if ( coordinateSystem == "SPHERICAL" )
+        rep = med_2_3::MED_SPHERICAL;
+      else
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Grid |" << _meshName.c_str() <<
+                                     "| doesn't have a valid coordinate system : |"
+                                     << ptrGrid->_coordinate->_coordinateSystem
+                                     << "|" ));
+
       _ptrMesh->_description.resize(MED_COMMENT_SIZE+1,'\0');
       char dtunitp3[MED_LNAME_SIZE+1];
       std::fill(dtunitp3,dtunitp3+MED_LNAME_SIZE+1,'\0');
 
-      err = med_2_3::MEDmeshCr(_medIdt,_meshName.c_str(),_ptrMesh->getSpaceDimension(),_ptrMesh->getMeshDimension(),med_2_3::MED_STRUCTURED_MESH,
-                               _ptrMesh->_description.c_str(),dtunitp3,med_2_3::MED_SORT_DTIT,
-                               (med_2_3::med_axis_type)ptrGrid->getGridType(),const_cast <char *> (tmp_name.c_str()),const_cast <char *> (tmp_unit.c_str()));
-
-      meshDimension =  _ptrMesh->getMeshDimension();
+      err = med_2_3::MEDmeshCr(_medIdt,_meshName.c_str(),
+                               _ptrMesh->getSpaceDimension(),
+                               _ptrMesh->getMeshDimension(),
+                               med_2_3::MED_STRUCTURED_MESH,
+                               _ptrMesh->_description.c_str(),
+                               dtunitp3,med_2_3::MED_SORT_DTIT,
+                               rep,
+                               const_cast <char *> (tmp_name.c_str()),
+                               const_cast <char *> (tmp_unit.c_str()));
 
       if (err != MED_VALID)
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Unable to create Grid"));
       else
         MESSAGE_MED(LOC<<"Grid "<<_meshName<<" created in file "<<_fileName<<" !");
+
+      err = med_2_3::MEDmeshGridTypeWr(_medIdt,_meshName.c_str(),
+                                       (med_2_3::med_grid_type)ptrGrid->getGridType());
+      if (err != MED_VALID)
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Error in MEDmeshGridTypeWr()"));
+
+      meshDimension =  _ptrMesh->getMeshDimension();
     }
   else if ((spaceDimension != _ptrMesh->_spaceDimension)  &&
            (meshDimension != _ptrMesh->getMeshDimension()))
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Grid |" << _meshName.c_str() <<
-                                 "| already exists in file |" << _fileName <<
-                                 "| with space dimension |" << spaceDimension <<
-                                 "| and mesh dimension |" << meshDimension <<
-                                 "| but the space dimension and the mesh dimension of the mesh we want to write are respectively |"
-                                 << _ptrMesh->_spaceDimension <<"|" <<
-                                 _ptrMesh->getMeshDimension() <<"|" ));
+    {
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Grid |" << _meshName.c_str() <<
+                                   "| already exists in file |" << _fileName <<
+                                   "| with space dimension |" << spaceDimension <<
+                                   "| and mesh dimension |" << meshDimension <<
+                                   "| but the space dimension and the mesh dimension of "
+                                   "the mesh we want to write are respectively |"
+                                   << _ptrMesh->_spaceDimension <<"|" <<
+                                   _ptrMesh->getMeshDimension() <<"|" ));
+    }
 
   MED_EN::med_grid_type gridType = ptrGrid->getGridType();
 
   if (err != MED_VALID)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Unable to write the type of the Grid"));
 
-  // Pourquoi le stocker sous forme de chaîne ?
-  const string & coordinateSystem = ptrGrid->_coordinate->_coordinateSystem;
-  if      (coordinateSystem  == "CARTESIAN")
-    rep = med_2_3::MED_CARTESIAN;
-  else if ( coordinateSystem == "CYLINDRICAL")
-    rep = med_2_3::MED_CYLINDRICAL;
-  else if ( coordinateSystem == "SPHERICAL" )
-    rep = med_2_3::MED_SPHERICAL;
-  else
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Grid |" << _meshName.c_str() <<
-                                 "| doesn't have a valid coordinate system : |"
-                                 << ptrGrid->_coordinate->_coordinateSystem
-                                 << "|" ));
 
   med_2_3::med_int ArrayLen[] = { (med_2_3::med_int) ptrGrid->_iArrayLength,
-                     (med_2_3::med_int) ptrGrid->_jArrayLength,
-                     (med_2_3::med_int) ptrGrid->_kArrayLength  };
+                                  (med_2_3::med_int) ptrGrid->_jArrayLength,
+                                  (med_2_3::med_int) ptrGrid->_kArrayLength  };
 
   // Write node coordinates for MED_BODY_FITTED grid
   if (gridType == MED_EN::MED_BODY_FITTED)
     {
       // Write Coordinates and families
 
-      err = med_2_3::MEDmeshNodeCoordinateWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,MED_NO_DT,med_2_3::MED_FULL_INTERLACE,ptrGrid->getNumberOfNodes(),ptrGrid->_coordinate->_coordinate.get(MED_EN::MED_FULL_INTERLACE));
+      err = med_2_3::MEDmeshNodeCoordinateWr(_medIdt,_meshName.c_str(),
+                                             MED_NO_DT,MED_NO_IT,MED_NO_DT,
+                                             med_2_3::MED_FULL_INTERLACE,
+                                             ptrGrid->getNumberOfNodes(),
+                                             ptrGrid->_coordinate->_coordinate.get(MED_EN::MED_FULL_INTERLACE));
 
       if (err != MED_VALID)
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"Can't write coordinates of the grid |" << _meshName.c_str() << "| in file |" << _fileName
@@ -2085,7 +2104,9 @@ int MED_MESH_WRONLY_DRIVER::writeGRID() const
         structure[idim] = ArrayLen [idim];
 
 
-      err = med_2_3::MEDmeshGridStructWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,MED_NO_DT,structure);
+      err = med_2_3::MEDmeshGridStructWr(_medIdt,_meshName.c_str(),
+                                         MED_NO_DT,MED_NO_IT,MED_NO_DT,
+                                         structure);
 
       if (err != MED_VALID)
         throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<"error in writing the structure of the grid |" << _meshName.c_str()));
@@ -2108,8 +2129,11 @@ int MED_MESH_WRONLY_DRIVER::writeGRID() const
           string str_unit = string (tmp_unit,idim*MED_SNAME_SIZE,
                                     MED_SNAME_SIZE);
 
-          err = med_2_3::MEDmeshGridIndexCoordinateWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,MED_NO_DT,idim+1,ArrayLen[idim],Array[idim]);
-
+          err = med_2_3::MEDmeshGridIndexCoordinateWr(_medIdt,_meshName.c_str(),
+                                                      MED_NO_DT,MED_NO_IT,MED_NO_DT,
+                                                      idim+1,
+                                                      ArrayLen[idim],
+                                                      Array[idim]);
 
           if (err != MED_VALID)
             throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<
@@ -2761,8 +2785,8 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
 #endif
         if ( err != MED_VALID)
           throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Can't write family for the |"<< typeNumberOfElements
-                                       << "| faces of geometric type |" << geoNames[types[i]] <<"|in mesh |"
-                                       << _ptrMesh->_name.c_str() << "|" ));
+                                       << "| faces of geometric type |" << geoNames[types[i]]
+                                       << "| in mesh |" << _meshName << "|" ));
         offset+=typeNumberOfElements;
       }
       delete[] familyArray;
