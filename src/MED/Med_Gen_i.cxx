@@ -476,7 +476,7 @@ throw (SALOME::SALOME_Exception)
     }
     myField->setIterationNumber( iter );
     myField->setOrderNumber( ordre );
-    myField->addDriver( MED_DRIVER, fileName, fieldName);
+    myField->addDriver( MED_DRIVER, fileName, fieldName, MED_EN::RDONLY);
 
   }
 #if defined(_DEBUG_) || defined(_DEBUG)
@@ -494,7 +494,7 @@ throw (SALOME::SALOME_Exception)
   try {
     string MeshName = mymed.getMeshName( fieldName );
     myMesh = mymed.isStructuredMesh( MeshName ) ? (GMESH*) new GRID : (GMESH*) new MESH;
-    myMesh->addDriver(MED_DRIVER, fileName, MeshName );
+    myMesh->addDriver(MED_DRIVER, fileName, MeshName, MED_EN::RDONLY );
     myMesh->read();
     SCRUTE(myMesh->getName());
   }
