@@ -56,6 +56,7 @@
 #include "MEDMEM_ArrayInterface.hxx"
 #include "MEDMEM_MedFileBrowser.hxx"
 #include "PointLocator.hxx"
+#include "MEDMEM_VtkMedDriver.hxx"
 
 #include "MEDMEM_SWIG_Templates.hxx"
 #ifdef WITH_NUMPY
@@ -426,21 +427,6 @@ typedef enum {V21 = 26, V22 = 75} medFileVersion;
 %feature("unref") FIELDINTNOINTERLACE "$this->removeReference();"
 %feature("unref") FIELDDOUBLENOINTERLACEBYTYPE "$this->removeReference();"
 %feature("unref") FIELDINTNOINTERLACEBYTYPE "$this->removeReference();"
-
-bool getVtkBinaryFormatForWriting();
-
-void setVtkBinaryFormatForWriting(bool isBinary);
-
-%{
-  bool getVtkBinaryFormatForWriting()
-    {
-      return DRIVERFACTORY::getVtkBinaryFormatForWriting();
-    }
-  void setVtkBinaryFormatForWriting(bool isBinary)
-    {
-      DRIVERFACTORY::setVtkBinaryFormatForWriting(isBinary);
-    }
-%}
 
 %extend DT_IT_ {
   int getdt()
@@ -1767,6 +1753,32 @@ public :
       }
 
   }
+};
+
+/*!
+ * \brief set/get format of vtk file
+ */
+bool getVtkBinaryFormatForWriting();
+
+void setVtkBinaryFormatForWriting(bool isBinary);
+
+%{
+  bool getVtkBinaryFormatForWriting()
+    {
+      return DRIVERFACTORY::getVtkBinaryFormatForWriting();
+    }
+  void setVtkBinaryFormatForWriting(bool isBinary)
+    {
+      DRIVERFACTORY::setVtkBinaryFormatForWriting(isBinary);
+    }
+%}
+/*!
+ * \brief Driver to write fields to vtk file
+ */
+class VTK_MED_DRIVER : public GENDRIVER
+{
+public:
+  VTK_MED_DRIVER(const char* fileName, vector< const FIELD_* > fields);
 };
 
 /*
