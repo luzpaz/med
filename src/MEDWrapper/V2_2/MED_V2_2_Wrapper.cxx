@@ -1251,8 +1251,7 @@ namespace MED
 
     //----------------------------------------------------------------------------
     void
-    TVWrapper
-    ::GetPolyedreConnSize(const TMeshInfo& theMeshInfo,
+    TVWrapper    ::GetPolyedreConnSize(const TMeshInfo& theMeshInfo,
                           TInt& theNbFaces,
                           TInt& theConnSize,
                           EConnectivite theConnMode,
@@ -1267,8 +1266,8 @@ namespace MED
       
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
       TValueHolder<EConnectivite, med_connectivity_mode> aConnMode(theConnMode);
-      TValueHolder<TInt, med_int> aNbFaces(theNbFaces);
-      TValueHolder<TInt, med_int> aConnSize(theConnSize);
+      //TValueHolder<TInt, med_int> aNbFaces(theNbFaces);
+      //TValueHolder<TInt, med_int> aConnSize(theConnSize);
 
       med_bool chgt,trsf;
       theNbFaces = MEDmeshnEntity(myFile->Id(),
@@ -1280,7 +1279,7 @@ namespace MED
                                   MED_INDEX_NODE,
                                   aConnMode,
                                   &chgt,
-                                  &trsf)-1;
+                                  &trsf);
 
       theConnSize = MEDmeshnEntity(myFile->Id(),
                                   &aMeshName,
