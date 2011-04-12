@@ -2784,9 +2784,22 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
         err=med_2_3::MEDmeshEntityFamilyNumberWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,med_2_3::MED_CELL,(med_2_3::med_geometry_type) types[i],typeNumberOfElements,familyArray+offset);
 #endif
         if ( err != MED_VALID)
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Can't write family for the |"<< typeNumberOfElements
-                                       << "| faces of geometric type |" << geoNames[types[i]]
-                                       << "| in mesh |" << _meshName << "|" ));
+          {
+            if ( _ptrMesh->getIsAGrid() )
+              {
+                if ( numberOfFamilies > 0 )
+                  throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<
+                                               "Groups and families of FACEs in the structured "
+                                               "mesh are not supported by med file" ));
+              }
+            else
+              {
+                throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<
+                                             "Can't write family for the |"<< typeNumberOfElements
+                                             << "| faces of geometric type |" << geoNames[types[i]]
+                                             << "| in mesh |" << _meshName << "|" ));
+              }
+          }
         offset+=typeNumberOfElements;
       }
       delete[] familyArray;
@@ -2840,19 +2853,33 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
 #endif
 
       for (int i=0; i<numberOfTypes; i++)
-      {
-        int typeNumberOfElements = _ptrMesh->getNumberOfElements(entity, types[i]);
+        {
+          int typeNumberOfElements = _ptrMesh->getNumberOfElements(entity, types[i]);
 #if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
-        err=med_2_3::MEDmeshEntityFamilyNumberWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,med_2_3::MED_CELL,(med_2_3::med_geometry_type) types[i],typeNumberOfElements,&temp[0]+typeCount);
+          err=med_2_3::MEDmeshEntityFamilyNumberWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,med_2_3::MED_CELL,(med_2_3::med_geometry_type) types[i],typeNumberOfElements,&temp[0]+typeCount);
 #else
-        err=med_2_3::MEDmeshEntityFamilyNumberWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,med_2_3::MED_CELL,(med_2_3::med_geometry_type) types[i],typeNumberOfElements,familyArray+typeCount);
+          err=med_2_3::MEDmeshEntityFamilyNumberWr(_medIdt,_meshName.c_str(),MED_NO_DT,MED_NO_IT,med_2_3::MED_CELL,(med_2_3::med_geometry_type) types[i],typeNumberOfElements,familyArray+typeCount);
 #endif
-        if ( err != MED_VALID)
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Can't write family for the |"<< _ptrMesh->getNumberOfElements(entity, types[i])
-                                       << "| edges of geometric type |" << geoNames[types[i]] <<"|in mesh |"
-                                       << _ptrMesh->_name.c_str() << "|" ));
-        typeCount += typeNumberOfElements;
-      }
+          if ( err != MED_VALID)
+            {
+              if ( _ptrMesh->getIsAGrid() )
+                {
+                  if ( numberOfFamilies > 0 )
+                    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<
+                                                 "Groups and families of EDGEs in the structured "
+                                                 " mesh are not supported by med file" ));
+                }
+              else
+                {
+                  throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<  "Can't write family for the |"
+                                               << _ptrMesh->getNumberOfElements(entity, types[i])
+                                               << "| edges of geometric type |"
+                                               << geoNames[types[i]] <<"|in mesh |"
+                                               << _ptrMesh->_name.c_str() << "|" ));
+                }
+            }
+          typeCount += typeNumberOfElements;
+        }
       delete[] familyArray;
     }
   }
