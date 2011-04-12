@@ -140,6 +140,7 @@ TElemInfo
 ::SetFamNum(TInt theId, TInt theVal) 
 {
   (*myFamNum)[theId] = theVal;
+  myIsFamNum = eVRAI;
 }
 
 TInt

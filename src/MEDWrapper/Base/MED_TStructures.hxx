@@ -309,6 +309,7 @@ namespace MED
       
       myNbElem = theInfo->GetNbElem();
       myFamNum.reset(new TElemNum(myNbElem));
+      myIsFamNum = eFAUX; // is set to eVRAI in SetFamNum()
 
       myIsElemNum = theInfo->IsElemNum();
       if(theInfo->IsElemNum())
@@ -348,6 +349,7 @@ namespace MED
 
       myNbElem = theNbElem;
       myFamNum.reset(new TElemNum(theNbElem));
+      myIsFamNum = eFAUX; // is set to eVRAI in SetFamNum()
 
       myIsElemNum = theIsElemNum;
       if(theIsElemNum)
@@ -372,6 +374,7 @@ namespace MED
       
       myNbElem = theNbElem;
       myFamNum.reset(new TElemNum(theNbElem));
+      myIsFamNum = eFAUX; // is set to eVRAI in SetFamNum()
       
       myIsElemNum = theElemNums.size()? eVRAI: eFAUX;
       if(myIsElemNum)
