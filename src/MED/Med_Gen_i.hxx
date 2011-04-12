@@ -91,8 +91,8 @@ public:
   SALOME_MED::FIELD_ptr readFieldInFile(const char* fileName,
                                         const char* studyName,
                                         const char* fieldName,
-                                        CORBA::Long ordre,
-                                        CORBA::Long iter)
+                                        CORBA::Long iter,
+                                        CORBA::Long ordre)
     throw(SALOME::SALOME_Exception);
 
   SALOME_MED::MED_ptr   readStructFile(const char* fileName,

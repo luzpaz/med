@@ -378,8 +378,8 @@ throw (SALOME::SALOME_Exception)
 SALOME_MED::FIELD_ptr Med_Gen_i::readFieldInFile(const char* fileName,
                                                  const char* studyName,
                                                  const char* fieldName,
-                                                 CORBA::Long ordre,
-                                                 CORBA::Long iter)
+                                                 CORBA::Long iter,
+                                                 CORBA::Long ordre)
 throw (SALOME::SALOME_Exception)
 {
   beginService("Med_Gen_i::readFieldInFile");
