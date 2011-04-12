@@ -41,7 +41,7 @@ VTK_MED_DRIVER::VTK_MED_DRIVER(): GENDRIVER(VTK_DRIVER), _fields(0)
 
 VTK_MED_DRIVER::VTK_MED_DRIVER(const string & fileName,
                                const vector< const FIELD_* >& fields):
-  GENDRIVER(fileName, MED_EN::RDWR, VTK_DRIVER), _fields( &fields )
+  GENDRIVER(fileName, MED_EN::RDWR, VTK_DRIVER), _fields( fields )
 {
 }
 
@@ -105,15 +105,15 @@ void VTK_MED_DRIVER::write() const
   // VTK supports only one dataset per a file (in Simple Legacy Formats)
   // so we write the first mesh only
 
-  const int NumberOfMeshes = ( _fields && !_fields->empty() ) ? 1 : 0;
+  const int NumberOfMeshes = ( !_fields.empty() ) ? 1 : 0;
 
   for (int i=0; i<NumberOfMeshes; i++)
   {
-    GMESH * myMesh = _fields->at(i)->getSupport()->getMesh();
+    GMESH * myMesh = _fields.at(i)->getSupport()->getMesh();
     writeMesh(myMesh) ;
-    for (unsigned j=0; j<_fields->size(); j++)
+    for (unsigned j=0; j<_fields.size(); j++)
     {
-      const FIELD_ * myField = _fields->at(j);
+      const FIELD_ * myField = _fields.at(j);
       if( myMesh == myField->getSupport()->getMesh() )
       {
         if (MED_NODE == myField->getSupport()->getEntity())
@@ -131,9 +131,9 @@ void VTK_MED_DRIVER::write() const
     }
 
     // second : field on cell
-    for (unsigned j=0; j<_fields->size(); j++)
+    for (unsigned j=0; j<_fields.size(); j++)
     {
-      const FIELD_ * myField = _fields->at(j);
+      const FIELD_ * myField = _fields.at(j);
       if( myMesh == myField->getSupport()->getMesh() )
         if (MED_CELL == myField->getSupport()->getEntity())
         {

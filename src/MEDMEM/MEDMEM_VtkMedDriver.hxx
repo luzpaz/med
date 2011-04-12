@@ -48,7 +48,7 @@ class MEDMEM_EXPORT VTK_MED_DRIVER : public GENDRIVER
 {
 protected:
 
-  const std::vector< const FIELD_* > *_fields;
+  const std::vector< const FIELD_* > _fields;
   
 private:
   VTK_MED_DRIVER();
