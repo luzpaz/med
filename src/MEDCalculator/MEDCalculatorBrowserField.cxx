@@ -56,6 +56,8 @@ MEDCalculatorBrowserField::MEDCalculatorBrowserField(const char *fname, const ch
       _steps.push_back(MEDCalculatorBrowserStep((*iter).first.first,(*iter).first.second,(*iter).second,meshNames[0]));
     }
   std::vector<TypeOfField> types=MEDLoader::GetTypesOfField(fname,meshNames[0].c_str(),fieldName);
+  if(types.empty())
+    throw INTERP_KERNEL::Exception("MEDCalculatorBrowserField::MEDCalculatorBrowserField : the file is not loadable using MED File 3 API ! Problably presence of field on edges faces...");
   _type=types[0];//To improve
   MEDCouplingFieldDouble *tmpf=0;
   try
