@@ -508,7 +508,7 @@ MED_FIELD_DRIVER<T>::getMeshDimensionFromFile(med_2_3::med_idt id,
   int numberOfMeshes = med_2_3::MEDnMesh(id);
   for (int i = 1; i <= numberOfMeshes; ++i )
     {
-      int naxis=med_2_3::MEDmeshnAxis(id,i);
+      int naxis=std::max(3,med_2_3::MEDmeshnAxis(id,i));
       char *axisname=new char[naxis*MED_SNAME_SIZE+1];
       char *axisunit=new char[naxis*MED_SNAME_SIZE+1];
       med_2_3::MEDmeshInfo(id, i ,meshNameInFile, &spaceDimp3, &meshDim, &meshType, meshDescription,dtunit,&sorttypep3,&nstepp3,&atp3,axisname,axisunit);
@@ -516,7 +516,7 @@ MED_FIELD_DRIVER<T>::getMeshDimensionFromFile(med_2_3::med_idt id,
       delete [] axisunit;
       if ( meshName == meshNameInFile )
         {
-          if ( meshType == med_2_3::MED_UNSTRUCTURED_MESH )
+          if ( meshType == med_2_3::MED_STRUCTURED_MESH )
             return meshDim;
           break;
         }
