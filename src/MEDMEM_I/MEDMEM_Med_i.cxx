@@ -231,9 +231,28 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes /*driverTy
     }
   }
 
-  // FIELDS :
+  // SUPPORTS on All:
 
   map<string, set<string> > publishedSupportsByMesh;
+
+  map<string, ::MEDMEM::GMESH* >::const_iterator name2mesh = _medmem_meshes.begin();
+  for ( ; name2mesh != _medmem_meshes.end(); ++name2mesh )
+    {
+      ::MEDMEM::GMESH* mesh = name2mesh->second;
+      for ( medEntityMesh entity = 0; entity < MED_ALL_ENTITIES; ++entity )
+        {
+          if ( mesh->getNumberOfElements( entity, MEDMEM_ALL_ELEMENTS ) > 0 )
+            {
+              const ::MEDMEM::SUPPORT* sup = mesh->getSupportOnAll( entity );
+              SUPPORT_i * mySupportI = new SUPPORT_i( sup );
+              SALOME_MED::SUPPORT_ptr mySupportIOR = mySupportI->_this();
+              mySupportI->addInStudy(myStudy,mySupportIOR);
+              publishedSupportsByMesh[ mesh->getName() ].insert(sup->getName());
+            }
+        }
+    }
+
+  // FIELDS :
 
   vector<string> fieldsNames = _med.getFieldNames();
   for (int i=0; i<(int)fieldsNames.size(); i++) 
