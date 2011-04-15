@@ -65,11 +65,11 @@ def AnalyzeField(field):
         if fieldEntity == SALOME_MED.MED_NODE:
             nbValByComp = fieldMesh.getNumberOfNodes()
         else:
-            nbValByComp = fieldMesh.getNumberOfElements(fieldEntity,SALOME_MED.MED_ALL_ELEMENTS)
+            nbValByComp = fieldMesh.getNumberOfElements(fieldEntity,SALOME_MED.MEDMEM_ALL_ELEMENTS)
         print "and its dimension (number of values by component of the field) is ",nbValByComp
     else:
         print "The support of this field is partially on entities ",fieldEntity," of the mesh ",fieldMesh.getName()
-        nbValByComp = fieldSupport.getNumberOfElements(SALOME_MED.MED_ALL_ELEMENTS)
+        nbValByComp = fieldSupport.getNumberOfElements(SALOME_MED.MEDMEM_ALL_ELEMENTS)
         print "and its dimension (number of values by component of the field) is ",nbValByComp
 
     for i in range(nbComp):
@@ -221,7 +221,7 @@ for entity in [SALOME_MED.MED_NODE,SALOME_MED.MED_CELL,SALOME_MED.MED_FACE,SALOM
                     print "    * Type",type
                     print "    * Number",number[0:nbOfElmtsOfType]
                 print ""
-                lengthValue = familycorba.getNumberOfElements(SALOME_MED.MED_ALL_ELEMENTS)
+                lengthValue = familycorba.getNumberOfElements(SALOME_MED.MEDMEM_ALL_ELEMENTS)
                 nbOfComp = 1
 
                 print "\nGenerate a Local scalar double field"
