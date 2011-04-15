@@ -55,8 +55,8 @@ module SALOME_MED
       file <VAR>fileName</VAR> with the name <VAR>fieldName</VAR>.
      */
     SALOME_MED::FIELD readFieldInFile(in string fileName, in string studyName,
-				      in string fieldName, in long ordre,
-				      in long iter)
+				      in string fieldName, in long iter,
+				      in long ordre)
       raises (SALOME::SALOME_Exception);
 
     /*!
