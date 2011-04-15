@@ -17,13 +17,18 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+#  File   : 
+#  Author : 
+#  Module : 
+#  $Header$
+#
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 # if without KERNEL, build only med 2.1 library
 if MED_ENABLE_KERNEL
-  SUBDIRS = Base V2_1 V2_2 Factory
+  SUBDIRS = Core Wrapper
 else !MED_ENABLE_KERNEL
-  SUBDIRS = Base V2_1
+  SUBDIRS = Core
 endif
 
-DIST_SUBDIRS = Base V2_1 V2_2 Factory
+DIST_SUBDIRS = Core Wrapper

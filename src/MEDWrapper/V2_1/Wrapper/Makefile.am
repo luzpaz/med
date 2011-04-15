@@ -17,13 +17,27 @@
 #  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+#  File   : 
+#  Author : 
+#  Module : 
+#  $Header$
+#
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-# if without KERNEL, build only med 2.1 library
-if MED_ENABLE_KERNEL
-  SUBDIRS = Base V2_1 V2_2 Factory
-else !MED_ENABLE_KERNEL
-  SUBDIRS = Base V2_1
-endif
+lib_LTLIBRARIES= libMEDWrapper_V2_1.la
 
-DIST_SUBDIRS = Base V2_1 V2_2 Factory
+salomeinclude_HEADERS = \
+	MED_V2_1_Wrapper.hxx
+
+dist_libMEDWrapper_V2_1_la_SOURCES= \
+	MED_V2_1_Wrapper.cxx
+
+libMEDWrapper_V2_1_la_CPPFLAGS= -D@MACHINE@ $(BOOST_CPPFLAGS) $(HDF5_INCLUDES) \
+	-I$(srcdir)/../../Base -I$(srcdir)/../Core
+if MED_ENABLE_KERNEL
+  libMEDWrapper_V2_1_la_CPPFLAGS+= -I$(KERNEL_ROOT_DIR)/include/salome
+else
+  libMEDWrapper_V2_1_la_CPPFLAGS+= -I$(top_builddir)/adm_local_without_kernel/unix
+endif
+libMEDWrapper_V2_1_la_LDFLAGS= $(HDF5_LIBS)
+libMEDWrapper_V2_1_la_LIBADD= ../../Base/libMEDWrapperBase.la ../Core/libmed_V2_1.la

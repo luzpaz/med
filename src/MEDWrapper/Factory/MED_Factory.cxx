@@ -23,11 +23,11 @@
 //  File   : 
 //  Author : 
 //  Module : 
-//  $Header$
 //
 #include "MED_Factory.hxx"
 #include "MED_Utilities.hxx"
 #include "MED_V2_2_Wrapper.hxx"
+#include "MED_V2_1_Wrapper.hxx"
 
 #include <stdio.h>
 #include <sstream>
@@ -41,7 +41,7 @@ extern "C"
 }
 
 #ifdef _DEBUG_
-static int MYDEBUG = 1;
+static int MYDEBUG = 0;
 #else
 static int MYDEBUG = 0;
 #endif
@@ -53,12 +53,11 @@ namespace MED
                         bool theDoPreCheckInSeparateProcess)
   {
     INITMSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'"<<std::endl);
-    EVersion aVersion = eVUnknown;
+    EVersion aVersion = eVUnknown;    
 
 #ifndef WIN32
     if (access(theFileName.c_str(),F_OK))
       return aVersion;
-
     if(theDoPreCheckInSeparateProcess){
       // First check, is it possible to deal with the file
       std::ostringstream aStr;
@@ -66,10 +65,10 @@ namespace MED
       aStr<<"bash -c \""<<getenv("MED_ROOT_DIR")<<"/bin/salome/mprint_version \'"<<theFileName<<"\'\"";
       if(!MYDEBUG)
         aStr<<" 2>&1 > /dev/null";
-      
+
       std::string aCommand = aStr.str();
       int aStatus = system(aCommand.c_str());
-      
+
       BEGMSG(MYDEBUG,"aCommand = '"<<aCommand<<"'; aStatus = "<<aStatus<<std::endl);
       if(aStatus != 0)
         return aVersion;
@@ -91,7 +90,14 @@ namespace MED
       med_err aRet = MEDfileNumVersionRd(aFid,&aMajor,&aMinor,&aRelease);
       INITMSG(MYDEBUG,"GetVersionId - theFileName = '"<<theFileName<<"'; aRet = "<<aRet<<std::endl);
       if(aRet >= 0){
+        if(aMajor == 2 && aMinor == 1)
+          aVersion = eV2_1;
+        else
           aVersion = eV2_2;
+      }
+      else {
+        // VSR: simulate med 2.3.6 behavior, med file version is assumed to 2.1
+        aVersion = eV2_1;
       }
     }
     MEDfileClose(aFid);
@@ -129,6 +135,9 @@ namespace MED
     case eV2_2:
       aWrapper.reset(new MED::V2_2::TVWrapper(theFileName));
       break;
+    case eV2_1:
+      aWrapper.reset(new MED::V2_1::TVWrapper(theFileName));
+      break;
     default:
       EXCEPTION(std::runtime_error,"MED::CrWrapper - theFileName = '"<<theFileName<<"'");
     }
@@ -146,6 +155,9 @@ namespace MED
     switch(theId){
     case eV2_2:
       aWrapper.reset(new MED::V2_2::TVWrapper(theFileName));
+      break;
+    case eV2_1:
+      aWrapper.reset(new MED::V2_1::TVWrapper(theFileName));
       break;
     default:
       aWrapper.reset(new MED::V2_2::TVWrapper(theFileName));

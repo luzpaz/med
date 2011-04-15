@@ -20,7 +20,6 @@
 #  File   : 
 #  Author : 
 #  Module : 
-#  $Header$
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
@@ -40,18 +39,18 @@ if MED_ENABLE_KERNEL
 else
   libMEDWrapper_la_CPPFLAGS+= -I$(top_builddir)/adm_local_without_kernel/unix
 endif
-libMEDWrapper_la_CPPFLAGS+= -I$(srcdir)/../V2_2
-libMEDWrapper_la_LDFLAGS= ../V2_2/libMEDWrapper_V2_2.la
+libMEDWrapper_la_CPPFLAGS+= -I$(srcdir)/../V2_1/Wrapper -I$(srcdir)/../V2_2
+libMEDWrapper_la_LDFLAGS= ../V2_2/libMEDWrapper_V2_2.la ../V2_1/Wrapper/libMEDWrapper_V2_1.la
 
 # Executables targets
 bin_PROGRAMS = MED_Test mprint_version
 
 dist_MED_Test_SOURCES= MED_Test.cxx
 MED_Test_CPPFLAGS= $(libMEDWrapper_la_CPPFLAGS)
-MED_Test_LDADD= $(libMEDWrapper_la_LDFLAGS) ../Base/libMEDWrapperBase.la \
+MED_Test_LDADD= $(libMEDWrapper_la_LDFLAGS) ../Base/libMEDWrapperBase.la ../V2_1/Core/libmed_V2_1.la \
 	$(BOOST_LIB_THREAD) libMEDWrapper.la
 
 dist_mprint_version_SOURCES= mprint_version.cxx
 mprint_version_CPPFLAGS= $(libMEDWrapper_la_CPPFLAGS)
-mprint_version_LDADD= $(libMEDWrapper_la_LDFLAGS) ../Base/libMEDWrapperBase.la \
+mprint_version_LDADD= $(libMEDWrapper_la_LDFLAGS) ../Base/libMEDWrapperBase.la ../V2_1/Core/libmed_V2_1.la \
 	$(BOOST_LIB_THREAD) libMEDWrapper.la $(MED2_LIBS)
