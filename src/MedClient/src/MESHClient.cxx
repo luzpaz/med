@@ -39,8 +39,7 @@ using namespace MED_EN;
 
 MESHClient::MESHClient(const SALOME_MED::MESH_ptr m) : 
   IOR_Mesh(SALOME_MED::MESH::_duplicate(m)),
-  _complete(false),
-  _refCounter(1)
+  _complete(false)//,_refCounter(1)
 {
   ASSERT(m);
 
@@ -244,10 +243,10 @@ MESHClient::~MESHClient()
  */
 //=============================================================================
 
-void MESHClient::addReference() const
+/*void MESHClient::addReference() const
 {
   _refCounter++;
-}
+}*/
 
 //=============================================================================
 /*!
@@ -255,13 +254,13 @@ void MESHClient::addReference() const
  */
 //=============================================================================
 
-void MESHClient::removeReference() const
+/*void MESHClient::removeReference() const
 {
   if (--_refCounter <= 0)
     {
       delete this;
     }
-}
+}*/
 
 //=============================================================================
 /*!

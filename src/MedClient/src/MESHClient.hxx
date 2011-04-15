@@ -38,7 +38,7 @@ private :
 
   mutable bool _complete;
   
-  mutable int _refCounter;
+//  mutable int _refCounter;
 
 public :
 
@@ -47,8 +47,8 @@ public :
 
   void blankCopy();
   void fillCopy();
-  virtual void addReference() const;
-  virtual void removeReference() const;
+//  virtual void addReference() const;
+//  virtual void removeReference() const;
   virtual void write(int index=0) const;
   virtual void write(const GENDRIVER & genDriver,
                      MED_EN::med_mode_acces medMode=MED_EN::WRONLY) const;

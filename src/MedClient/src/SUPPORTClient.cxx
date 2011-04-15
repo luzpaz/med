@@ -38,7 +38,7 @@ using namespace MED_EN;
 SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
                              GMESH * M) : 
   SUPPORT(), 
-  IOR_Support(SALOME_MED::SUPPORT::_duplicate(S)),_refCounter(1)
+  IOR_Support(SALOME_MED::SUPPORT::_duplicate(S))//,_refCounter(1)
 {
   SCRUTE(S);
   SCRUTE(M);
@@ -187,20 +187,20 @@ int SUPPORTClient::getValIndFromGlobalNumber(const int number) const throw (MEDE
  * 
  */
 //=============================================================================
-void SUPPORTClient::addReference() const
+/*void SUPPORTClient::addReference() const
 {
   _refCounter++;
-}
+}*/
 
 //=============================================================================
 /*!
  * 
  */
 //=============================================================================
-void SUPPORTClient::removeReference() const
+/*void SUPPORTClient::removeReference() const
 {
   if (--_refCounter <= 0)
     {
       delete this;
     }
-}
+}*/

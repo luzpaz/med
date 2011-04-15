@@ -39,7 +39,7 @@ private :
 
   mutable bool _complete_support;
 
-  mutable int _refCounter;
+//  mutable int _refCounter;
 
 protected:
 
@@ -61,8 +61,8 @@ public :
     const throw (MEDEXCEPTION);
   int getValIndFromGlobalNumber(const int number) 
     const throw (MEDEXCEPTION);
-  void addReference() const;
-  void removeReference() const;
+//  void addReference() const;
+//  void removeReference() const;
 };
 }
 
