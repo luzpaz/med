@@ -76,8 +76,8 @@ namespace MED
 #endif
     // check compatibility of hdf and med versions
     med_bool hdfok, medok;
-    med_err aRet0= MEDfileCompatibility(theFileName.c_str(), &hdfok, &medok);
-    if ((!hdfok) || (!medok))
+    MEDfileCompatibility(theFileName.c_str(), &hdfok, &medok);
+    if ((!hdfok) /*|| (!medok)*/) // med-2.1 is KO since med-3.0.0
       return aVersion;
 
     // Next, try to open the file trough the MED API
