@@ -211,12 +211,18 @@ namespace MED
         return;
       
       TValueHolder<TString, char> aMeshName(theInfo.myName);
-      TValueHolder<TInt, med_int> aDim(theInfo.myDim);
+      TValueHolder<TInt, med_int> aDim(theInfo.mySpaceDim);
 
       TErr aRet = MEDmaaInfo(myFile->Id(),
                              theMeshId,
                              &aMeshName,
                              &aDim);
+
+      if ( theInfo.mySpaceDim < 1 )
+        theInfo.mySpaceDim = MEDdimLire( myFile->Id(), &aMeshName );
+
+      theInfo.myDim = theInfo.mySpaceDim;
+
       if(theErr) 
         *theErr = aRet;
       else if(aRet < 0)
