@@ -602,7 +602,7 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   }
   MESSAGE(" Find SObject MESH (represent mesh in support)");
 
-  string meshName = _support->getMesh()->getName() ;
+  string meshName = _support->getMeshName() ;
   string meshNameStudy = meshName;
 
   for (string::size_type pos=0; pos<meshNameStudy.size();++pos)
