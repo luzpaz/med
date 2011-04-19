@@ -162,7 +162,7 @@ TCCoordSlice
 TNodeInfo
 ::GetCoordSlice(TInt theId) const
 {
-  TInt aDim = myMeshInfo->GetDim();
+  TInt aDim = myMeshInfo->GetSpaceDim();
   if(GetModeSwitch() == eFULL_INTERLACE)
     return TCCoordSlice(*myCoord, std::slice(theId*aDim, aDim, 1));
   else
@@ -173,7 +173,7 @@ TCoordSlice
 TNodeInfo
 ::GetCoordSlice(TInt theId)
 {
-  TInt aDim = myMeshInfo->GetDim();
+  TInt aDim = myMeshInfo->GetSpaceDim();
   if(GetModeSwitch() == eFULL_INTERLACE)
     return TCoordSlice(*myCoord, std::slice(theId*aDim,aDim,1));
   else
