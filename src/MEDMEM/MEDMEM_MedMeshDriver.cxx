@@ -1741,7 +1741,10 @@ int  MED_MESH_RDONLY_DRIVER::getCellsFamiliesNumber(int **MEDArrayFamily,
       {
         err=med_2_3::MEDmeshEntityFamilyNumberRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_CELL,(med_2_3::med_geometry_type)types[i],tmp_MEDArrayFamily);
         if (err != MED_VALID )
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<entity<<" and geometric type "<<types[i]));
+          {
+            std::fill(tmp_MEDArrayFamily,tmp_MEDArrayFamily+NumberOfCell,0);
+            //throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<entity<<" and geometric type "<<types[i]));
+          }
       }
       if (err == MED_VALID) {
         int ii;
@@ -1758,7 +1761,11 @@ int  MED_MESH_RDONLY_DRIVER::getCellsFamiliesNumber(int **MEDArrayFamily,
         err=med_2_3::MEDmeshEntityFamilyNumberRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_CELL,(med_2_3::med_geometry_type)types[i],MEDArrayFamily[i]);
 
         if (err != MED_VALID)
-          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<entity<<" and geometric type "<<types[i]));
+          {
+            int NumberOfCell=_ptrMesh->getNumberOfElements(entity,types[i]);
+            std::fill(MEDArrayFamily[i],MEDArrayFamily[i]+NumberOfCell,0);
+            //throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<" Family not found for entity "<<entity<<" and geometric type "<<types[i]));
+          }
       }
 #endif
     }
