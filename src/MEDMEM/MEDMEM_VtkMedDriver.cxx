@@ -109,7 +109,7 @@ void VTK_MED_DRIVER::write() const
 
   for (int i=0; i<NumberOfMeshes; i++)
   {
-    GMESH * myMesh = _fields.at(i)->getSupport()->getMesh();
+    const GMESH * myMesh = _fields.at(i)->getSupport()->getMesh();
     writeMesh(myMesh) ;
     for (unsigned j=0; j<_fields.size(); j++)
     {
