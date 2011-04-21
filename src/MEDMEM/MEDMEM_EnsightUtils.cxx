@@ -1354,7 +1354,7 @@ void _CaseFileDriver::addField(const ENSIGHT_FIELD_WRONLY_DRIVER * theFieldDrive
   case 6:
   case 9: break; // ok, supported
   case 2:
-    if ( GMESH* mesh = field->getSupport()->getMesh() )
+    if ( const GMESH* mesh = field->getSupport()->getMesh() )
       if ( mesh->getSpaceDimension() == 2 )
         break; // we add one component to both mesh and field
   default:
