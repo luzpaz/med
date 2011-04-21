@@ -446,7 +446,7 @@ void checkField (FIELD<T, INTERLACING_TAG> * theField, const SUPPORT * theSuppor
   // nb. of components must be equal 1 (for Volume, Area, Length) or
   // space dimension (for Normal, Barycenter, )
   {
-    GMESH* aMesh = theSupport->getMesh();
+    const GMESH* aMesh = theSupport->getMesh();
     int spaceDim = 3;
     if (aMesh) spaceDim = aMesh->getSpaceDimension();
     theField->deallocValue();
