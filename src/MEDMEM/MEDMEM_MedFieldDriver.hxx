@@ -108,7 +108,7 @@ protected:
                                     std::vector<int> &         nbOfElOfTypeC
                                     ) const throw(MEDEXCEPTION);
 
-  void getMeshGeometricTypeFromMESH( GMESH * meshPtr,
+  void getMeshGeometricTypeFromMESH( const GMESH * meshPtr,
                                      MED_EN::medEntityMesh  entity,
                                      std::vector<MED_EN::medGeometryElement> & geoType,
                                      std::vector<int> &nbOfElOfType,

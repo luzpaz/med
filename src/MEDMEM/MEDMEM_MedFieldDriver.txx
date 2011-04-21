@@ -690,7 +690,7 @@ reads the MESH object in order to retrieve the list of geometric types for a giv
  */
 
 template <class T> void
-MED_FIELD_DRIVER<T>::getMeshGeometricTypeFromMESH( GMESH * meshPtr,
+MED_FIELD_DRIVER<T>::getMeshGeometricTypeFromMESH( const GMESH * meshPtr,
                                                    MED_EN::medEntityMesh  entity,
                                                    std::vector<MED_EN::medGeometryElement> & geoType,
                                                    std::vector<int> &nbOfElOfType,
@@ -897,7 +897,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
   }
 
   string meshName="";
-  GMESH * ptrMesh = 0;
+  const GMESH * ptrMesh = 0;
   bool   haveSupport = false;
   bool   haveMesh    = false;
   MED_EN::medEntityMesh preferEntity = MED_EN::MED_ALL_ENTITIES;
@@ -1468,7 +1468,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
 
   MED_FIELD_DRIVER<T>::_ptrField->_isRead = true ;
 
-  GMESH* aMesh = MED_FIELD_DRIVER<T>::_ptrField->_mesh;
+  const GMESH* aMesh = MED_FIELD_DRIVER<T>::_ptrField->_mesh;
   bool isFound = false, onlyMeshProvided = ( !haveSupport && aMesh );
   if ( !aMesh )
     aMesh = ptrMesh; // try to find FAMILY OR GROUP in ptrMesh but without being so stern
@@ -1874,7 +1874,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER<T>::write(void) const
     delete [] annp3;
     delete [] auup3;
   // end porting MED3
-    GMESH * meshPtr = mySupport->getMesh();
+    const GMESH * meshPtr = mySupport->getMesh();
 //     if(!meshPtr)
 //       throw MEDEXCEPTION( LOCALIZED (STRING(LOC)
 //                                      <<": Mesh in support is null"
