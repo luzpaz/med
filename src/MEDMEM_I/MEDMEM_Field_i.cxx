@@ -57,7 +57,9 @@ FIELD_i::FIELD_i():_fieldTptr(constructConstField()),_corbaIndex(FIELD_i::fieldI
 //=============================================================================
 FIELD_i::~FIELD_i()
 {
-  if (_ownCppPtr) delete _fieldTptr;
+  if ( _fieldTptr )
+    _fieldTptr->removeReference();
+  //if (_ownCppPtr) delete _fieldTptr;
 }
 //=============================================================================
 /*!
@@ -70,6 +72,7 @@ FIELD_i::FIELD_i(::FIELD_ * const field, bool ownCppPtr):
   _corbaIndex(FIELD_i::fieldIndex++),
   _FieldId("")
 {
+  if ( _fieldTptr ) _fieldTptr->addReference();
   FIELD_i::fieldMap[_corbaIndex]=_fieldTptr;
 
   MESSAGE("FIELD_i::FIELD_i  Checking of pointeurs !!!");
@@ -86,7 +89,8 @@ FIELD_i::FIELD_i( FIELD_i & f):_ownCppPtr(false), _fieldTptr(f._fieldTptr),
                                _corbaIndex(FIELD_i::fieldIndex++),
                                _FieldId("")
 {
-        FIELD_i::fieldMap[_corbaIndex]=_fieldTptr;
+  if ( _fieldTptr ) _fieldTptr->addReference();
+  FIELD_i::fieldMap[_corbaIndex]=_fieldTptr;
 }
 //=============================================================================
 /*!
