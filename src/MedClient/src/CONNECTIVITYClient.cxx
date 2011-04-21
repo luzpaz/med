@@ -234,10 +234,21 @@ const int * CONNECTIVITYClient::getConnectivity (medConnectivity ConnectivityTyp
   if (!_complete)
     (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
 
-  const int * c = CONNECTIVITY::getConnectivity
-    (ConnectivityType, Entity, Type);
+  const int * c = CONNECTIVITY::getConnectivity (ConnectivityType, Entity, Type);
 
   return c;
+}
+
+int CONNECTIVITYClient::getConnectivityLength(medConnectivity    ConnectivityType,
+                                              medEntityMesh      Entity,
+                                              medGeometryElement Type) const
+{
+  if (!_complete)
+    (const_cast<CONNECTIVITYClient *>(this))->fillCopy();
+
+  const int l = CONNECTIVITY::getConnectivityLength (ConnectivityType, Entity, Type);
+
+  return l;
 }
 
 //=============================================================================

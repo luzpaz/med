@@ -53,6 +53,9 @@ namespace MEDMEM {
     const int * getConnectivity      (medConnectivity ConnectivityType, 
                                       medEntityMesh Entity,
                                       medGeometryElement Type) const;
+    int         getConnectivityLength(MED_EN::medConnectivity    ConnectivityType,
+                                      MED_EN::medEntityMesh      Entity,
+                                      MED_EN::medGeometryElement Type) const;
     const int * getConnectivityIndex (medConnectivity ConnectivityType,
                                       medEntityMesh Entity) const;
 
