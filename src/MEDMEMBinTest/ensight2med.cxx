@@ -59,7 +59,7 @@ int main (int argc, char ** argv) {
     cout << " reading all into the Ensight file " << filenameIN << " and writing all into the Med file " << filenameOUT <<  endl ;
 
     vector< FIELD_* > fields;
-    vector< GMESH* > meshes;
+    vector< const GMESH* > meshes;
 
     // Read
 
@@ -69,7 +69,7 @@ int main (int argc, char ** argv) {
     medDriver.close();
     if ( !fields.empty() )
     {
-      set<GMESH*> uniqueMeshes;
+      set<const GMESH*> uniqueMeshes;
       for ( unsigned i = 0; i < fields.size(); ++i )
         uniqueMeshes.insert( fields[i]->getSupport()->getMesh() );
       meshes.assign( uniqueMeshes.begin(), uniqueMeshes.end() );
@@ -128,8 +128,8 @@ int main (int argc, char ** argv) {
       return -1;
     }
     // read-write the mesh
-    GMESH* mesh = fields[0]->getSupport()->getMesh();
-    mesh->read();
+    const GMESH* mesh = fields[0]->getSupport()->getMesh();
+    const_cast<GMESH*>( mesh )->read();
     mesh->write(MED_DRIVER, filenameOUT );
 
     // read-write fields
