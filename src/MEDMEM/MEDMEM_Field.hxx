@@ -4398,7 +4398,7 @@ void FIELD<T, INTERLACING_TAG>::fillFromAnalytic(myFuncType f) throw (MEDEXCEPTI
   if (_support == (SUPPORT *) NULL)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No Support defined."));
 
-  GMESH * mesh = _support->getMesh();
+  const GMESH * mesh = _support->getMesh();
   int spaceDim = mesh->getSpaceDimension();
   const double * coord;
 
