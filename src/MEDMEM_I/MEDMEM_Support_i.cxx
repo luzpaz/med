@@ -70,6 +70,7 @@ SUPPORT_i::SUPPORT_i() :_support((::SUPPORT *)NULL),_corbaIndex(SUPPORT_i::suppo
 SUPPORT_i::SUPPORT_i(const ::SUPPORT * const s) :_support(s),
                                                  _corbaIndex(SUPPORT_i::supportIndex++)
 {
+  if ( _support ) _support->addReference();
   SUPPORT_i::supportMap[_corbaIndex]=(::SUPPORT *)_support;
 }
 //=============================================================================
@@ -80,6 +81,7 @@ SUPPORT_i::SUPPORT_i(const ::SUPPORT * const s) :_support(s),
 SUPPORT_i::SUPPORT_i(const SUPPORT_i &s) :_support(s._support),
                                           _corbaIndex(SUPPORT_i::supportIndex++)
 {
+  if ( _support ) _support->addReference();
   SUPPORT_i::supportMap[_corbaIndex]=(::SUPPORT *)_support;
 }
 //=============================================================================
@@ -90,6 +92,8 @@ SUPPORT_i::SUPPORT_i(const SUPPORT_i &s) :_support(s._support),
 
 SUPPORT_i::~SUPPORT_i()
 {
+  if ( SUPPORT_i::supportMap[_corbaIndex] )
+    SUPPORT_i::supportMap[_corbaIndex]->removeReference();
 }
 //=============================================================================
 /*!
@@ -231,11 +235,11 @@ SALOME_MED::GMESH_ptr SUPPORT_i::getMesh()
     THROW_SALOME_CORBA_EXCEPTION("No associated Support", SALOME::INTERNAL_ERROR);
   try
   {
-    GMESH * mesh = _support->getMesh();
+    const GMESH * mesh = _support->getMesh();
 
     SCRUTE(mesh) ;
 
-    GMESH_i * m1 = new GMESH_i(mesh);
+    GMESH_i * m1 = new GMESH_i(const_cast<GMESH*>( mesh ));
     SALOME_MED::GMESH_ptr m2 = m1->_this();
     MESSAGE("SALOME_MED::GMESH_ptr SUPPORT_i::getMesh() checking des pointeurs CORBA");
 

@@ -77,8 +77,8 @@ GMESH_i::GMESH_i():
 //=============================================================================
 GMESH_i::~GMESH_i()
 {
-//   if ( _mesh )
-//     _mesh->removeReference();
+  if ( _mesh )
+    _mesh->removeReference();
 }
 //=============================================================================
 /*!
@@ -92,8 +92,8 @@ GMESH_i::GMESH_i(::GMESH * const m ) :
   _corbaIndex(MESH_i::meshIndex++),
   _meshId("") 
 {
-        GMESH_i::meshMap[_corbaIndex]=_mesh;
-        SCRUTE(_mesh);
+  if ( _mesh ) _mesh->addReference();
+  GMESH_i::meshMap[_corbaIndex]=_mesh;
 }
 //=============================================================================
 /*!
@@ -108,7 +108,8 @@ GMESH_i::GMESH_i( GMESH_i & m) :
   _corbaIndex(MESH_i::meshIndex++),
   _meshId("") 
 {
-        GMESH_i::meshMap[_corbaIndex]=_mesh;
+  if ( _mesh ) _mesh->addReference();
+  GMESH_i::meshMap[_corbaIndex]=_mesh;
 }
 //=============================================================================
 /*!
@@ -770,9 +771,9 @@ throw (SALOME::SALOME_Exception)
                                               SALOME::INTERNAL_ERROR);
         try
         {
-                SUPPORT * myNewSupport = _mesh->getSupportOnAll(convertIdlEntToMedEnt(entity));
-                SUPPORT_i * mySupportI = new SUPPORT_i(myNewSupport);
-                return mySupportI->_this();
+          const SUPPORT * myNewSupport = _mesh->getSupportOnAll(convertIdlEntToMedEnt(entity));
+          SUPPORT_i * mySupportI = new SUPPORT_i(myNewSupport);
+          return mySupportI->_this();
         }
         catch (MEDEXCEPTION &ex)
         {
@@ -1200,7 +1201,7 @@ CORBA::Boolean GMESH_i::areEquals(SALOME_MED::GMESH_ptr other)
   if(baseServ)
     {
      baseServ->_remove_ref();
-     MESH_i *otherServ=dynamic_cast<MESH_i *>(baseServ);
+     GMESH_i *otherServ=dynamic_cast<GMESH_i *>(baseServ);
      return *_mesh==*otherServ->_mesh;
     }
   return false;
