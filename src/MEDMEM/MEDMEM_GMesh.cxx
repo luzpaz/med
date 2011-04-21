@@ -802,7 +802,7 @@ const GROUP* GMESH::getGroup(const string& name) const  throw (MEDEXCEPTION)
 */
 //================================================================================
 
-SUPPORT * GMESH::getSupportOnAll(medEntityMesh entity) throw(MEDEXCEPTION)
+const SUPPORT * GMESH::getSupportOnAll(medEntityMesh entity) const throw(MEDEXCEPTION)
 {
   const char * LOC = "GMESH::getSupportOnAll : " ;
   BEGIN_OF_MED(LOC) ;

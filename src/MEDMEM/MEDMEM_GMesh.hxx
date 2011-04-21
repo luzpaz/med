@@ -169,7 +169,7 @@ class MEDMEM_EXPORT GMESH: public RCBASE
   virtual SUPPORT *                  getSkin(const SUPPORT * Support3D)
                                                 throw (MEDEXCEPTION) = 0;
 
-  virtual SUPPORT *                  getSupportOnAll(MED_EN::medEntityMesh Entity)
+  virtual const SUPPORT *            getSupportOnAll(MED_EN::medEntityMesh Entity) const
                                                 throw (MEDEXCEPTION);
 
   static SUPPORT *                   mergeSupports(const std::vector<SUPPORT *> Supports)
