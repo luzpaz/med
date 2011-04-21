@@ -35,6 +35,41 @@
 //   int  InterpolationOptions::_orientation =0;
 //   SplittingPolicy  InterpolationOptions::_splittingPolicy =GENERAL_48;
 
+/*!
+    \defgroup medmemremapper MEDMEM::MEDMEM_REMAPPER
+
+    \section overview Overview
+
+    \c MEDMEM_REMAPPER enables conservative remapping of fields 
+    between two sequential codes. 
+    The computation is possible for 3D meshes and 2D meshes or 3D surfaces. It enables fast sequential localization, based on a bounding box tree structure. It is based on cell-cell intersection or on a point in element search, depending on the field type. Fields can either lie on cells (P0) or nodes (P1).
+
+    A typical use of \c MEDMEM_REMAPPER encompasses two distinct phases :
+    - A setup phase during which the intersection volumes are computed and the interpolation matrix is stored. This corresponds to calling the \c MEDMEM_REMAPPER::prepare() method.
+    - A use phase during which the remappings are actually performed. This corresponds to the calls to transfer() and reverseTransfer() which actually performs the interpolation.
+
+    The following code excerpt illutrates a typical use of the \c MEDMEM_REMAPPER class.
+ 
+    \code
+    ...
+    std::string sourceFileName("source.med");
+    MEDMEM::MESH med_source_mesh(MED_DRIVER,sourceFileName,"Source_Mesh");
+    std::string targetFileName("target.med");
+    MEDMEM::MESH med_target_mesh(MED_DRIVER,targetFileName,"Target_Mesh");
+    FIELD<double> sourceField(MED_DRIVER,sourceFileName,"Density",0,0);
+    FIELD<double> targetField;
+    MEDMEM_Remapper mapper;
+    mapper.setOptionsDouble("Precision",1e-7);
+    mapper.setOptionsString("Intersection_type",Geometric2D);
+    mapper.prepare(med_source_mesh,med_target_mesh,"P0P1");
+    mapper.transfer(sourceField,targetField);
+    //use targetField
+    ...
+    \endcode
+
+    @{
+ */
+
 MEDMEM_REMAPPER::MEDMEM_REMAPPER():_matrix(0),_sourceMesh(0), _targetMesh(0), _sourceSupport(0), _targetSupport(0)
 {
 }
@@ -333,3 +368,7 @@ void MEDMEM_REMAPPER::printMatrixInfo()
 {
         std::cout << *_matrix << std::endl;
 }
+
+/*!
+@}
+*/
