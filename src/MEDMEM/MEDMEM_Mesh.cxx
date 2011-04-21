@@ -597,7 +597,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support, bool isAbs
 
   // Make sure that the MESH class is the same as the MESH class attribut
   // in the class Support
-  GMESH* myMesh = Support->getMesh();
+  const GMESH* myMesh = Support->getMesh();
   if (this != myMesh)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"no compatibility between *this and SUPPORT::_mesh !"));
 
@@ -840,7 +840,7 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
 
   // Make sure that the MESH class is the same as the MESH class attribut
   // in the class Support
-  GMESH* myMesh = Support->getMesh();
+  const GMESH* myMesh = Support->getMesh();
   if (this != myMesh)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"no compatibility between *this and SUPPORT::_mesh !"));
 
@@ -1006,7 +1006,7 @@ FIELD<double, FullInterlace>* MESH::getLength(const SUPPORT * Support) const thr
 
   // Make sure that the MESH class is the same as the MESH class attribut
   // in the class Support
-  GMESH* myMesh = Support->getMesh();
+  const GMESH* myMesh = Support->getMesh();
   if (this != myMesh)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"no compatibility between *this and SUPPORT::_mesh !"));
 
@@ -1116,7 +1116,7 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
 
   // Make sure that the MESH class is the same as the MESH class attribut
   // in the class Support
-  GMESH* myMesh = Support->getMesh();
+  const GMESH* myMesh = Support->getMesh();
   if (this != myMesh)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"no compatibility between *this and SUPPORT::_mesh : pointeur problem !"));
 
@@ -1303,7 +1303,7 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
 FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const throw (MEDEXCEPTION)
 {
   const char * LOC = "MESH::getBarycenter(SUPPORT*) : ";
-  GMESH* myMesh = Support->getMesh();
+  const GMESH* myMesh = Support->getMesh();
   if (this != myMesh)
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"no compatibility between *this and SUPPORT::_mesh !"));
 
