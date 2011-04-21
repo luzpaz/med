@@ -462,7 +462,7 @@ and five MEDMEM_POLYGON, the number of the first polygonal element is 11.
 */
 
 //-------------------
-void SUPPORT::setpartial(string                     Description,
+void SUPPORT::setpartial(const std::string&         Description,
                          int                        NumberOfGeometricType,
                          int                        TotalNumberOfElements,
                          const medGeometryElement * GeometricType,
@@ -577,7 +577,7 @@ void SUPPORT::setpartial_fromfile(MEDSKYLINEARRAY * number, bool shallowCopy) th
   END_OF_MED(LOC);
 }
 
-void SUPPORT::setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION){
+void SUPPORT::setProfilNames(const std::vector<std::string>& profilNames) throw (MEDEXCEPTION){
 
   const char * LOC = "SUPPORT::setProfilNames(vector<string> profilNames) : " ;
   BEGIN_OF_MED(LOC) ;
@@ -750,7 +750,7 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
   If A.intersecting(B) is called, on output, \f$ A \f$ contains \f$A \cap B\f$.
 */
 //-------------------
-void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
+void SUPPORT::intersecting(const SUPPORT * mySupport) throw (MEDEXCEPTION)
 {
   const char * LOC="SUPPORT::intersecting(SUPPORT *) : ";
   BEGIN_OF_MED(LOC);
@@ -1458,7 +1458,7 @@ MESH* SUPPORT::makeMesh() const
 
 /*! set the reference _mesh to Mesh */
 //--------------------------------------
-void SUPPORT::setMesh(GMESH *Mesh) const
+void SUPPORT::setMesh(const GMESH *Mesh) const
   //--------------------------------------
 {
   if(_mesh!=Mesh)
