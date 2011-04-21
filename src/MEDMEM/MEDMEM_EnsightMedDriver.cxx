@@ -216,9 +216,9 @@ void ENSIGHT_MED_RDONLY_DRIVER::read()
   {
     for ( unsigned i = 0; i < _fields->size(); ++i )
     {
-      GMESH* mesh = _fields->at(i)->getSupport()->getMesh();
+      const GMESH* mesh = _fields->at(i)->getSupport()->getMesh();
       if ( mesh->getNumberOfNodes() < 1 )
-        mesh->read( getId() );
+        const_cast<GMESH*>( mesh )->read( getId() );
       _fields->at(i)->read( getId() );
     }
   }
