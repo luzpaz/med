@@ -347,7 +347,7 @@ Extractor::Extractor(const FIELD<double>& inputField) throw (MEDEXCEPTION)
   if ( inputField.getGaussPresence() && inputField.getNumberOfGaussPoints()[0] > 1 )
     throw MEDEXCEPTION(STRING(LOC) << "InputField is not constant be element");
 
-  GMESH* mesh = inputField.getSupport()->getMesh();
+  const GMESH* mesh = inputField.getSupport()->getMesh();
   if ( !mesh )
       throw MEDEXCEPTION(STRING(LOC) << "InputField has support with NULL mesh");
 
