@@ -307,7 +307,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
   // we get the Support and its associated Mesh
 
   const SUPPORT * supportField = _ptrField->getSupport();
-  GMESH * meshField = supportField->getMesh();
+  const GMESH * meshField = supportField->getMesh();
   if (! meshField )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": mesh was not read before writing")) ;
 
@@ -336,7 +336,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
   // we get the Support and its associated Mesh
 
   const SUPPORT * supportField = _ptrField->getSupport();
-  GMESH * meshField = supportField->getMesh();
+  const GMESH * meshField = supportField->getMesh();
   MED_EN::medEntityMesh entitySupport = supportField->getEntity();
 
   if (! meshField )
