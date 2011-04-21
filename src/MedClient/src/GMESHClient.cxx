@@ -68,6 +68,7 @@ GROUP * convertGroup(const SALOME_MED::GROUP_ptr &F, GMESH *M)
 {
   return new GROUPClient(F, M);
 }
+
 //=============================================================================
 /*!
  * Remplit les informations générales 
@@ -128,7 +129,7 @@ void GMESHClient::blankCopy()
      &all->groupCell,
      (void *) (convertGroup), this);
 
-  if ( !IOR_Mesh->getIsAGrid() )
+  if ( !IOR_Mesh->getIsAGrid() && !dynamic_cast<MESHClient*>(this))
   {
     SALOME_MED::MESH_var umeshIOR = IOR_Mesh->convertInMESH();
     _uMesh = new MESHClient( umeshIOR );
@@ -219,33 +220,10 @@ bool GMESHClient::operator==(const GMESH& other) const
 
 GMESHClient::~GMESHClient()
 {
+  if ( _uMesh )
+    _uMesh->removeReference();
   IOR_Mesh->UnRegister();
 }
-
-//=============================================================================
-/*!
- * For refCounter
- */
-//=============================================================================
-
-// void GMESHClient::addReference() const
-// {
-//   _refCounter++;
-// }
-
-// //=============================================================================
-// /*!
-//  * For refCounter
-//  */
-// //=============================================================================
-
-// void GMESHClient::removeReference() const
-// {
-//   if (--_refCounter <= 0)
-//     {
-//       delete this;
-//     }
-// }
 
 //=============================================================================
 /*!
@@ -382,6 +360,7 @@ const MESH* GMESHClient::convertInMESH() const
     SALOME_MED::MESH_var umeshIOR = IOR_Mesh->convertInMESH();
     const_cast<GMESHClient*>(this)->_uMesh = new MESHClient( umeshIOR );
   }
+  _uMesh->addReference();
   return _uMesh;
 }
 
@@ -414,40 +393,60 @@ FIELD<double>* GMESHClient::getVolume(const SUPPORT* sup , bool isAbs) const
   throw (MEDEXCEPTION)
 {
   FIELD<double>* f = (FIELD<double>*) 0;
-  if ( _uMesh )
+  if ( _uMesh && sup )
+  {
+    sup->setMesh( _uMesh );
     f = _uMesh->getVolume(sup,isAbs);
+    sup->setMesh( this );
+  }
   return f;
 }
 
 FIELD<double>* GMESHClient::getArea(const SUPPORT* sup) const throw (MEDEXCEPTION)
 {
   FIELD<double>* f = (FIELD<double>*) 0;
-  if ( _uMesh )
+  if ( _uMesh && sup )
+  {
+    sup->setMesh( _uMesh );
     f = _uMesh->getArea(sup);
+    sup->setMesh( this );
+  }
   return f;
 }
 
 FIELD<double>* GMESHClient::getLength(const SUPPORT* sup) const throw (MEDEXCEPTION)
 {
   FIELD<double>* f = (FIELD<double>*) 0;
-  if ( _uMesh )
+  if ( _uMesh && sup )
+  {
+    sup->setMesh( _uMesh );
     f = _uMesh->getLength(sup);
+    sup->setMesh( this );
+  }
   return f;
 }
 
 FIELD<double>* GMESHClient::getNormal(const SUPPORT* sup) const throw (MEDEXCEPTION)
 {
   FIELD<double>* f = (FIELD<double>*) 0;
-  if ( _uMesh )
+  if ( _uMesh && sup )
+  {
+    sup->setMesh( _uMesh );
     f = _uMesh->getNormal(sup);
+    sup->setMesh( this );
+  }
   return f;
 }
 
 FIELD<double>* GMESHClient::getBarycenter(const SUPPORT* sup) const throw (MEDEXCEPTION)
 {
   FIELD<double>* f = (FIELD<double>*) 0;
-  if ( _uMesh )
+  if ( _uMesh && sup )
+  {
+    sup->setMesh( _uMesh );
     f = _uMesh->getBarycenter(sup);
+    sup->setMesh( this );
+  }
   return f;
 }
 

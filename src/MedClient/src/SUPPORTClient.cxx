@@ -37,13 +37,16 @@ using namespace MED_EN;
 
 SUPPORTClient::SUPPORTClient(const SALOME_MED::SUPPORT_ptr S,
                              GMESH * M) : 
-  SUPPORT(), 
+  SUPPORT(),
   IOR_Support(SALOME_MED::SUPPORT::_duplicate(S))//,_refCounter(1)
 {
   SCRUTE(S);
   SCRUTE(M);
   if(M)
-    _mesh=M;
+    {
+      _mesh=M;
+      _mesh->addReference();
+    }
   else
     {
       SALOME_MED::GMESH_var ior_mesh=IOR_Support->getMesh();
