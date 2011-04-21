@@ -50,12 +50,9 @@ static void test_extractLine( Extractor* extractor,
   // store extracted field
   if ( resField )
     {
-      GMESH* mesh = resField->getSupport()->getMesh();
-      mesh->setName( name );
-      int drv = mesh->addDriver( MED_DRIVER, result_file, name );
-      mesh->write( drv );
-      drv = resField->addDriver(MED_DRIVER, result_file, name );
-      resField->write( drv );
+      const GMESH* mesh = resField->getSupport()->getMesh();
+      mesh->write( MED_DRIVER, result_file, name );
+      resField->write(MED_DRIVER, result_file );
 
       CPPUNIT_ASSERT_EQUAL( nbSegments, resField->getSupport()->getNumberOfElements(MEDMEM_ALL_ELEMENTS));
       CPPUNIT_ASSERT_EQUAL( nbSegments+1, resField->getSupport()->getMesh()->getNumberOfNodes());
@@ -120,16 +117,14 @@ void MEDMEMTest::testExtractor()
   CPPUNIT_ASSERT_NO_THROW( resField = extractor->extractPlane(coords,normal ));
 
   // store extracted mesh
-  GMESH* mesh = resField->getSupport()->getMesh();
-  int drv = mesh->addDriver( MED_DRIVER, result_file, mesh->getName() );
-  mesh->write( drv );
+  const GMESH* mesh = resField->getSupport()->getMesh();
+  mesh->write( MED_DRIVER, result_file );
   CPPUNIT_ASSERT_EQUAL( 2, mesh->getNumberOfTypes(MED_CELL));
   CPPUNIT_ASSERT_EQUAL( 6, mesh->getNumberOfElements(MED_CELL, MEDMEM_TRIA3));
   CPPUNIT_ASSERT_EQUAL( 2, mesh->getNumberOfElements(MED_CELL, MEDMEM_QUAD4));
 
   // store extracted field
-  drv = resField->addDriver(MED_DRIVER, result_file, resField->getName());
-  resField->write( drv );
+  resField->write(MED_DRIVER, result_file);
 
   delete extractor; extractor=0;
   aMesh->removeReference(); aMesh=0;
@@ -212,8 +207,7 @@ void MEDMEMTest::testExtractor()
   // To remove tmp files from disk
   aRemover.Register(result_file);
 
-  drv = myMeshing->addDriver( MED_DRIVER, result_file, myMeshing->getName() );
-  CPPUNIT_ASSERT_NO_THROW( myMeshing->write(drv) );
+  CPPUNIT_ASSERT_NO_THROW( myMeshing->write( MED_DRIVER, result_file ));
 
   // Make input field
 
@@ -232,7 +226,7 @@ void MEDMEMTest::testExtractor()
   inField->setValue( &value[0] );
 
   // store input field
-  drv = inField->addDriver(MED_DRIVER, result_file, fieldname);
+  int drv = inField->addDriver(MED_DRIVER, result_file, fieldname);
   inField->write(drv);
 
   // Extraction
@@ -252,8 +246,7 @@ void MEDMEMTest::testExtractor()
 
   // store extracted mesh
   mesh = resField->getSupport()->getMesh();
-  drv = mesh->addDriver( MED_DRIVER, result_file, mesh->getName() );
-  mesh->write( drv );
+  mesh->write( MED_DRIVER, result_file );
   //   CPPUNIT_ASSERT_EQUAL( 2, mesh->getNumberOfTypes(MED_CELL));
   //   CPPUNIT_ASSERT_EQUAL( 6, mesh->getNumberOfElements(MED_CELL, MEDMEM_TRIA3));
   //   CPPUNIT_ASSERT_EQUAL( 2, mesh->getNumberOfElements(MED_CELL, MEDMEM_QUAD4));
