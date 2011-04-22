@@ -121,7 +121,6 @@ SCRIPT_TESTS = \
 	scripts/check_convertToPoly \
 	scripts/check_duplicateMED \
 	scripts/check_ensight2med \
-	scripts/check_med2_1_To_med2_2 \
 	scripts/check_med2ensight \
 	scripts/check_med2vtk \
 	scripts/check_readCoordinate \

@@ -1546,13 +1546,15 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
       for (int it = 0; it < NumberOfTypes && isFound; it++)
       {
         MED_EN::medGeometryElement aType = aTypes[it];
-        if (aType != types[it])
+        isFound = ( aType == types[it] );
+        if ( !isFound && onlyMeshProvided )
           throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << ": Invalid support (GROUP or FAMILY) found in mesh "
                                        << meshName << " for field " << fieldName << " by name of profile "
                                        << aPN << ": geometric type in found support |" << aType
                                        << "| differs from required type |" << types[it] << "|"));
 
-        if (aSupp->getNumberOfElements(aType) != nbOfElOfType[it])
+        isFound = ( isFound && aSupp->getNumberOfElements(aType) == nbOfElOfType[it] );
+        if ( !isFound && onlyMeshProvided )
           throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << ": Invalid support (GROUP or FAMILY) found in mesh "
                                        << meshName << " for field " << fieldName << " by name of profile "
                                        << aPN << ": number of elements of type " << aType
