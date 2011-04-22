@@ -41,7 +41,8 @@ MESHClient::MESHClient(const SALOME_MED::MESH_ptr m) :
   IOR_Mesh(SALOME_MED::MESH::_duplicate(m)),
   _complete(false)//,_refCounter(1)
 {
-  ASSERT(m);
+  if ( CORBA::is_nil( m ))
+    throw MEDEXCEPTION("MESHClient(const SALOME_MED::MESH_ptr mesh): NULL mesh!");
 
   _coordinate = new COORDINATEClient(m, MED_FULL_INTERLACE);
   _connectivity = new CONNECTIVITYClient(m, MED_FULL_INTERLACE);
