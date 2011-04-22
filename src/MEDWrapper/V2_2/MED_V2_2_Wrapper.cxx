@@ -35,12 +35,17 @@ extern "C"
 #include <med_err.h>
 }
 
+#include <string>
+#include <sstream>
+#include <cstdio>
+
 #ifdef _DEBUG_
 static int MYDEBUG = 0;
 #else
 static int MYDEBUG = 0;
 #endif
 
+#define SALOME_COLOR_ATTR "_SalomeColor_"
 
 
 namespace MED
@@ -379,20 +384,109 @@ namespace MED
       TValueHolder<TInt, med_int> aFamilyId(theInfo.myId);
       TValueHolder<TFamAttr, med_int> anAttrId(theInfo.myAttrId);
       TValueHolder<TFamAttr, med_int> anAttrVal(theInfo.myAttrVal);
-      TValueHolder<TInt, med_int> aNbAttr(theInfo.myNbAttr);
       TValueHolder<TString, char> anAttrDesc(theInfo.myAttrDesc);
-      TValueHolder<TInt, med_int> aNbGroup(theInfo.myNbGroup);
       TValueHolder<TString, char> aGroupNames(theInfo.myGroupNames);
-      
-      TErr aRet = MEDfamily23Info(myFile->Id(),
-                                  &aMeshName,
-                                  theFamId,
-                                  &aFamilyName,
-                                  &anAttrId,
-                                  &anAttrVal,
-                                  &anAttrDesc,
-                                  &aFamilyId,
-                                  &aGroupNames);
+
+      TErr aRet;
+
+      if (theInfo.myNbAttr == 0 && theInfo.myNbGroup > 0)
+      {
+        char* aTmpGroupNames = (char*)malloc(sizeof(char)*(theInfo.myNbGroup*MED_LNAME_SIZE+1));
+        med_int aNewAttrId;
+        med_int aNewAttrVal;
+        char aNewAttrDescr[MED_COMMENT_SIZE+1] = "";
+        
+        aRet = MEDfamily23Info(myFile->Id(),
+                                    &aMeshName,
+                                    theFamId,
+                                    &aFamilyName,
+                                    &aNewAttrId,
+                                    &aNewAttrVal,
+                                    aNewAttrDescr,
+                                    &aFamilyId,
+                                    aTmpGroupNames);
+                                    
+//         std::cout << "aTmpGroupNames: ";
+        char* p_strtmp;
+        
+        char aTmpGroupName[MED_LNAME_SIZE+1];
+        for (int i=0;i<theInfo.myNbGroup;i++)
+        {
+          p_strtmp = aTmpGroupNames + i*MED_LNAME_SIZE;
+          strncpy(aTmpGroupName,p_strtmp,MED_LNAME_SIZE);
+          aTmpGroupName[MED_LNAME_SIZE]='\0';
+//           std::cout << std::string(aTmpGroupName) << ", ";
+        }
+//         std::cout << std::endl;
+        char* pch = strstr (aTmpGroupName,SALOME_COLOR_ATTR);
+        if (pch != NULL)
+        {
+          // Attr id & Attr value
+          char tmpstr[14];
+          sscanf(aTmpGroupName,"%[ =_SalomeColor_]%d_%d_%s",tmpstr,&aNewAttrId,&aNewAttrVal);
+
+          // Resize the number of groups
+
+          theInfo.myNbGroup -= 1;
+          TValueHolder<TInt, med_int> aNbGroup(theInfo.myNbGroup);
+          theInfo.myGroupNames.resize(aNbGroup*MED_LNAME_SIZE+1);
+
+
+          for (int i=0 ; i < aNbGroup ; i++)
+          {
+            p_strtmp = aTmpGroupNames + i*MED_LNAME_SIZE;
+            strncpy(aTmpGroupName,p_strtmp,MED_LNAME_SIZE);
+            aTmpGroupName[MED_LNAME_SIZE]='\0';
+//             std::cout << "aTmpGroupName: ("<< std::string(aTmpGroupName) <<")"<< std::endl;
+            theInfo.SetGroupName(i,std::string(aTmpGroupName));
+//             std::cout << "theInfo.GetGroupName("<<i<<"): "<< theInfo.GetGroupName(i) << std::endl;
+//             std::cout << "Family " << &aFamilyName << " has 1 attribute : id = "<<aNewAttrId<<" val = "<<aNewAttrVal<<" group = " << std::string(aTmpGroupName) << ")" << std::endl;
+          }
+          
+          // ATTRIBUTES (COLOR)
+          theInfo.myNbAttr += 1;
+          TValueHolder<TInt, med_int> aNbAttr(theInfo.myNbAttr);
+          theInfo.myAttrId.resize(aNbAttr);
+          theInfo.myAttrVal.resize(aNbAttr);
+          theInfo.myAttrDesc.resize(aNbAttr*MED_LNAME_SIZE+1);
+          for (int ia=0;ia<theInfo.myNbAttr;ia++)
+          {
+            theInfo.SetAttrId(ia,aNewAttrId);
+            theInfo.SetAttrVal(ia,aNewAttrVal);
+            theInfo.SetAttrDesc(ia,std::string(aNewAttrDescr));
+          }
+
+//           std::cout << "theInfo.myNbGroup = "<< theInfo.myNbGroup << std::endl;
+//           std::cout << "aNbGroup = "<< aNbGroup << std::endl;
+          
+        }
+        else {
+          aRet = MEDfamily23Info(myFile->Id(),
+                                      &aMeshName,
+                                      theFamId,
+                                      &aFamilyName,
+                                      &anAttrId,
+                                      &anAttrVal,
+                                      &anAttrDesc,
+                                      &aFamilyId,
+                                      &aGroupNames);
+//           std::cout << "No attribute for family " << &aFamilyName << std::endl;
+        }
+        free(aTmpGroupNames);
+      }
+      else
+      {
+        aRet = MEDfamily23Info(myFile->Id(),
+                                    &aMeshName,
+                                    theFamId,
+                                    &aFamilyName,
+                                    &anAttrId,
+                                    &anAttrVal,
+                                    &anAttrDesc,
+                                    &aFamilyId,
+                                    &aGroupNames);
+//         std::cout << "No group for family " << &aFamilyName << std::endl;
+      }
 
       if(theErr) 
         *theErr = aRet;
@@ -400,8 +494,8 @@ namespace MED
         EXCEPTION(std::runtime_error,"GetFamilyInfo - MEDfamily23Info(...) - "<<
                   " aMeshInfo.myName = '"<<&aMeshName<<
                   "'; theFamId = "<<theFamId<<
-                  "; theInfo.myNbGroup = "<<aNbGroup()<<
-                  "; theInfo.myNbAttr = "<<aNbAttr());
+                  "; theInfo.myNbGroup = "<<theInfo.myNbGroup<<
+                  "; theInfo.myNbAttr = "<<theInfo.myNbAttr);
     }
     
     
@@ -430,15 +524,43 @@ namespace MED
       TValueHolder<TInt, med_int> aNbGroup(anInfo.myNbGroup);
       TValueHolder<TString, char> aGroupNames(anInfo.myGroupNames);
 
-      TErr aRet = MEDfamilyCr(myFile->Id(),
+      TErr aRet;
+      if ((strlen(&aGroupNames) == 0) || aNbAttr == 0)
+      {
+        aRet = MEDfamilyCr(myFile->Id(),
                               &aMeshName, 
                               &aFamilyName,
                               aFamilyId,
                               aNbGroup,
                               &aGroupNames);
-      //&anAttrId,&anAttrVal,&anAttrDesc,aNbAttr,                   
+      }
+      else
+      {
+        std::cout << std::endl;
+//         std::cout << "aGroupNames: " << &aGroupNames << std::endl;
+        med_int aNewNbGroup = aNbGroup + aNbAttr;
+        anInfo.myGroupNames.resize(aNewNbGroup*MED_LNAME_SIZE+1);
+        
+//         std::cout << "aNbAttr: " << aNbAttr << std::endl;
+        
+        std::ostringstream anColorGroupNames;
+        for (med_int i=0 ; i<aNbAttr ; i++)
+        {
+          anColorGroupNames << SALOME_COLOR_ATTR << "_" << (&anAttrId)[i]<< "_" << (&anAttrVal)[i] << "_";
+          anInfo.SetGroupName(aNbGroup+i,anColorGroupNames.str());
+        }
+        TValueHolder<TString, char> aGroupNamesBis(anInfo.myGroupNames);
 
-      INITMSG(MYDEBUG,"TVWrapper::GetFamilyInfo - MED_MODE_ACCES = "<<theMode<<"; aRet = "<<aRet<<std::endl);
+        aRet = MEDfamilyCr(myFile->Id(),
+                                &aMeshName, 
+                                &aFamilyName,
+                                aFamilyId,
+                                aNewNbGroup,
+                                &aGroupNamesBis);
+//                                 anColorGroupNames.str().c_str());
+      }
+
+      INITMSG(MYDEBUG,"TVWrapper::SetFamilyInfo - MED_MODE_ACCES = "<<theMode<<"; aRet = "<<aRet<<std::endl);
       
       if(theErr) 
         *theErr = aRet;
@@ -1965,12 +2087,12 @@ namespace MED
           med_float aDt;
           if (aNbStamps > 0)
             {
-              TErr aRet = MEDfieldComputingStepInfo(anId,
-                                                    &aFieldName,
-                                                    1,
-                                                    &aNumDt,
-                                                    &aNumOrd,
-                                                    &aDt);
+              MEDfieldComputingStepInfo(anId,
+                                        &aFieldName,
+                                        1,
+                                        &aNumDt,
+                                        &aNumOrd,
+                                        &aDt);
               char profilename[MED_NAME_SIZE+1];
               char locname[MED_NAME_SIZE+1];
               med_int profilsize;
@@ -2146,7 +2268,6 @@ namespace MED
       for(; anIter != aGeom2Size.end(); anIter++){
         EGeometrieElement aGeom = anIter->first;
         TInt aNbElem = anIter->second;
-        char profilename[MED_NAME_SIZE+1];
         med_int profilesize,aNbGauss;
 
         TInt aNbVal = MEDfieldnValueWithProfile(anId,
