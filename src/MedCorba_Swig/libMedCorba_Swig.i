@@ -193,6 +193,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::MESH_ptr t = SALOME_MED::MESH::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = &t;
   SCRUTE(*$1);
@@ -233,6 +234,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::FIELDDOUBLE_ptr t = SALOME_MED::FIELDDOUBLE::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = &t;
   SCRUTE(*$1);
@@ -273,6 +275,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::FIELDINT_ptr t = SALOME_MED::FIELDINT::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = &t;
   SCRUTE(*$1);
@@ -313,6 +316,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::FIELDDOUBLE_ptr t = SALOME_MED::FIELDDOUBLE::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = t;
   SCRUTE($1);
@@ -353,6 +357,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::FIELDINT_ptr t = SALOME_MED::FIELDINT::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = t;
   SCRUTE($1);
@@ -392,6 +397,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::SUPPORT_ptr t = SALOME_MED::SUPPORT::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = &t;
   SCRUTE(*$1);
@@ -433,6 +439,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::SUPPORT_ptr t = SALOME_MED::SUPPORT::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = t;
   SCRUTE($1);
@@ -474,6 +481,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::GMESH_ptr t = SALOME_MED::GMESH::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = t;
   SCRUTE($1);
@@ -515,6 +523,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::MESH_ptr t = SALOME_MED::MESH::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = t;
   SCRUTE($1);
@@ -557,6 +566,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::FIELDDOUBLE_ptr t = SALOME_MED::FIELDDOUBLE::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = t;
   SCRUTE($1);
@@ -599,6 +609,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::FIELDINT_ptr t = SALOME_MED::FIELDINT::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = t;
   SCRUTE($1);
