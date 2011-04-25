@@ -52,14 +52,23 @@
 //  Put mouse tracking on, so this class received mouse positions informations when mouse is above treewidget
 //  Add contextual menu to treewidget's items with the call to selectCompoPopup and selStepPopup
 //  Connect those actions to corresponding signals
-MEDGUIFileContentDial::MEDGUIFileContentDial(MEDGUIDataBaseDockWidget *db):QWidget(0),
-                                                                           ui(new Ui::MEDGUIFileContentDial),_db(db)
+MEDGUIFileContentDial::MEDGUIFileContentDial(MEDGUIDataBaseDockWidget* db, QWidget* parent):
+  QDialog(parent, 0), ui(new Ui::MEDGUIFileContentDial), _db(db)
 {
-  ui->setupUi(this);
+  setModal( false );
+  setSizeGripEnabled( true );
+  setAttribute( Qt::WA_DeleteOnClose );
+
+  QWidget* w = new QWidget( this );
+  QHBoxLayout* l = new QHBoxLayout( this );
+  l->setMargin( 0 );
+  l->addWidget( w );
+  ui->setupUi(w);
 
   connect(ui->importMedFileButton, SIGNAL(clicked()), this, SLOT(openFile()));
   connect(ui->addSelectionButton, SIGNAL(clicked()), this, SLOT(sendSelectionToDB()));
   connect(ui->unselectAllButton, SIGNAL(clicked()), this, SLOT(unselectAll()));
+  connect(ui->closeButton, SIGNAL(clicked()), this, SLOT(close()));
 
   ui->treeWidgetFields->setHeaderLabel("Available Field");
   ui->treeWidgetFields->setSelectionMode(QAbstractItemView::MultiSelection);

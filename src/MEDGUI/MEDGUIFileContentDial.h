@@ -29,7 +29,7 @@
 
 #include "MEDCalculatorBrowserLiteStruct.hxx"
 
-#include <QWidget>
+#include <QDialog>
 #include <QTreeWidgetItem>
 
 class MEDGUIDataBaseDockWidget;
@@ -39,11 +39,11 @@ namespace Ui
   class MEDGUIFileContentDial;
 }
 
-class MEDGUIFileContentDial : public QWidget
+class MEDGUIFileContentDial : public QDialog
 {
   Q_OBJECT
     public:
-  MEDGUIFileContentDial(MEDGUIDataBaseDockWidget *);
+  MEDGUIFileContentDial(MEDGUIDataBaseDockWidget*, QWidget* = 0);
   ~MEDGUIFileContentDial();
   
  protected:

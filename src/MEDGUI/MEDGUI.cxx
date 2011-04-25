@@ -473,7 +473,7 @@ bool MedGUI::OnGUIEvent (int theCommandID)
       case 4034 :
         {
           
-          MEDGUIFileContentDial* mfcd = new MEDGUIFileContentDial(_data_base);
+          MEDGUIFileContentDial* mfcd = new MEDGUIFileContentDial(_data_base, application()->desktop());
           mfcd->show();
           break;
         }
