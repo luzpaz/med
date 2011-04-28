@@ -867,7 +867,7 @@ namespace MED
       MED::TMeshInfo& aMeshInfo = const_cast<MED::TMeshInfo&>(theMeshInfo);
       
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-      //TValueHolder<ETable, med_table> aTable(theTable);
+      TValueHolder<ETable, med_data_type > aTable(theTable);
       med_bool chgt,trsf;
       return MEDmeshnEntity(myFile->Id(),
                             &aMeshName,
@@ -875,7 +875,7 @@ namespace MED
                             MED_NO_IT,
                             MED_NODE,
                             MED_NO_GEOTYPE,
-                            MED_COORDINATE,
+                            aTable,
                             MED_NO_CMODE,
                             &chgt,
                             &trsf);
@@ -2686,12 +2686,16 @@ namespace MED
             EXCEPTION(std::runtime_error,"GetGrilleInfo - Erreur a la lecture de la taille de l'indice");
             
           TValueHolder<TFloatVector, med_float> anIndexes(theInfo.GetIndexes(anAxis-1));
-          char aCompNames[MED_SNAME_SIZE+1];
-          char anUnitNames[MED_SNAME_SIZE+1];
-          aRet=MEDmeshGridIndexCoordinateRd(myFile->Id(),&aMeshName,MED_NO_DT,MED_NO_IT,MED_NO_DT,&anIndexes);
+          TValueHolder<ETable, med_data_type > aTable(aTable);
+          //char aCompNames[MED_SNAME_SIZE+1];
+          //char anUnitNames[MED_SNAME_SIZE+1];
+          aRet=MEDmeshGridIndexCoordinateRd(myFile->Id(),&aMeshName,
+                                            MED_NO_DT,MED_NO_IT,
+                                            anAxis,
+                                            &anIndexes);
 
-          theInfo.SetCoordName(anAxis-1, aCompNames);
-          theInfo.SetCoordUnit(anAxis-1, anUnitNames);
+          //theInfo.SetCoordName(anAxis-1, aCompNames);
+          //theInfo.SetCoordUnit(anAxis-1, anUnitNames);
           theInfo.SetGrilleStructure(anAxis-1, aNbIndexes);
 
           if(theErr) 
