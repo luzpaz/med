@@ -2171,6 +2171,24 @@ namespace MED
 
       TGeom2NbGauss& aGeom2NbGauss = theInfo.myGeom2NbGauss;
 
+      // just to get a time stamp unit (anUnitDt)
+      med_field_type aFieldType;
+      med_int aNbComp = MEDfieldnComponentByName(myFile->Id(), &aFieldName);
+      char *aCompName = new char[aNbComp*MED_SNAME_SIZE+1];
+      char *aCompUnit = new char[aNbComp*MED_SNAME_SIZE+1];
+      TInt aNbStamps;
+      MEDfieldInfoByName(myFile->Id(),
+                         &aFieldName,
+                         &aMeshName,
+                         &anIsLocal,
+                         &aFieldType,
+                         aCompName,
+                         aCompUnit,
+                         &anUnitDt,
+                         &aNbStamps);
+      delete [] aCompName;
+      delete [] aCompUnit;
+
       TGeom2Size::const_iterator anIter = aGeom2Size.begin();
       for(; anIter != aGeom2Size.end(); anIter++){
         const EGeometrieElement& aGeom = anIter->first;
