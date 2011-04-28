@@ -246,8 +246,15 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes /*driverTy
               const ::MEDMEM::SUPPORT* sup = mesh->getSupportOnAll( entity );
               SUPPORT_i * mySupportI = new SUPPORT_i( sup );
               SALOME_MED::SUPPORT_ptr mySupportIOR = mySupportI->_this();
-              mySupportI->addInStudy(myStudy,mySupportIOR);
-              publishedSupportsByMesh[ mesh->getName() ].insert(sup->getName());
+              try // mySupportI->addInStudy() may throw
+              {
+                mySupportI->addInStudy(myStudy,mySupportIOR);
+                publishedSupportsByMesh[ mesh->getName() ].insert(sup->getName());
+              }
+              catch (...)
+              {
+                mySupportIOR->UnRegister();
+              }
             }
         }
     }
