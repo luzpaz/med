@@ -1688,7 +1688,7 @@ int  MED_MESH_RDONLY_DRIVER::getNodesFamiliesNumber(int * MEDArrayNodeFamily)
   BEGIN_OF_MED(LOC);
 
   if (_status==MED_OPENED)
-    { 
+    {
 
       int dtp3,itp3;
       med_2_3::med_float ttpp3;
@@ -1700,16 +1700,19 @@ int  MED_MESH_RDONLY_DRIVER::getNodesFamiliesNumber(int * MEDArrayNodeFamily)
       err=med_2_3::MEDmeshEntityFamilyNumberRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_NODE,MED_NONE,tmp_MEDArrayNodeFamily);
       int i;
       for ( i = 0; i < _ptrMesh->getNumberOfNodes(); i++ )
-         MEDArrayNodeFamily[i] = tmp_MEDArrayNodeFamily[i];
+        MEDArrayNodeFamily[i] = tmp_MEDArrayNodeFamily[i];
       delete [] tmp_MEDArrayNodeFamily;
 #else
       err=med_2_3::MEDmeshEntityFamilyNumberRd(_medIdt,_ptrMesh->_name.c_str(),dtp3,itp3,med_2_3::MED_NODE,MED_NONE,MEDArrayNodeFamily);
 #endif
 
       if ( err != MED_VALID)
-        throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "There is no family for the |"<< _ptrMesh->getNumberOfNodes() << "| nodes in mesh |" << _ptrMesh->_name.c_str() << "|"));
+        {
+          std::fill(MEDArrayNodeFamily,MEDArrayNodeFamily+_ptrMesh->getNumberOfNodes(),0);
+          //throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "There is no family for the |"<< _ptrMesh->getNumberOfNodes() << "| nodes in mesh |" << _ptrMesh->_name.c_str() << "|"));
+        }
 
-  END_OF_MED(LOC);
+      END_OF_MED(LOC);
       return MED_VALID;
     }
 
