@@ -2062,7 +2062,7 @@ namespace MED
         TGeom2Size::const_iterator anGeomIter = aGeom2Size.begin();
         for(; anGeomIter != aGeom2Size.end(); anGeomIter++){
           med_geometry_type aGeom = med_geometry_type(anGeomIter->first);
-          char meshName[MED_NAME_SIZE+1];
+          char aMeshName[MED_NAME_SIZE+1];
           med_bool islocal;
           med_field_type ft;
           char dtunit[MED_SNAME_SIZE+1];
@@ -2072,7 +2072,7 @@ namespace MED
           TInt aNbStamps;
           MEDfieldInfoByName(anId,
                              &aFieldName,
-                             meshName,
+                             aMeshName,
                              &islocal,
                              &ft,
                              cname,
@@ -2116,24 +2116,11 @@ namespace MED
                     "GetNbTimeStamps aNbTimeStamps = "<<aNbStamps<<
                     "; aGeom = "<<aGeom<<"; anEntity = "<<anEntity<<"\n");
             if(anIsPerformAdditionalCheck){
-              TInt iTimeStampEnd = aNbStamps;
-              for(TInt iTimeStamp = 1; iTimeStamp <= iTimeStampEnd; iTimeStamp++){
-                TVector<char> aMeshName(GetNOMLength<eV2_2>()+1);
-                TVector<char> aDtUnit(GetPNOMLength<eV2_2>()+1);
-                TErr aRet = MEDfieldComputingStepInfo(anId,
-                                                      &aFieldName,
-                                                      iTimeStamp,
-                                                      &aNumDt,  
-                                                      &aNumOrd,
-                                                      &aDt);
-
-                anIsSatisfied = (aRet == 0 && (!strcmp(&aMeshName[0],&aMeshInfo.myName[0])));
-                if(!anIsSatisfied){
-                  INITMSG(MYDEBUG,
-                          "GetNbTimeStamps aMeshName = '"<<&aMeshName[0]<<"' != "<<
-                          "; aMeshInfo.myName = '"<<&aMeshInfo.myName[0]<<"'\n");
-                  break;
-                }
+              anIsSatisfied = !strcmp(&aMeshName[0],&aMeshInfo.myName[0]);
+              if(!anIsSatisfied){
+                INITMSG(MYDEBUG,
+                        "GetNbTimeStamps aMeshName = '"<<&aMeshName[0]<<"' != "<<
+                        "; aMeshInfo.myName = '"<<&aMeshInfo.myName[0]<<"'\n");
               }
             }
           }
