@@ -166,7 +166,7 @@ void CONNECTIVITYClient::fillCopy()
       ASSERT(nC == (T[iT]%100) * (Count[iT+1]-Count[iT]));
 
       int *index = 0;
-      if ( T[iT] == MED_EN::MEDMEM_POLYGON || T[iT] == MED_EN::MEDMEM_POLYHEDRA )
+      if ( T[iT] == MED_EN::MED_POLYGON || T[iT] == MED_EN::MED_POLYHEDRA )
       {
         SALOME::SenderInt_var senderForIndex=IOR_Mesh->getSenderForConnectivityIndex(MED_NODAL, Entity, T[iT]);
         index=ReceiverFactory::getValue(senderForIndex,nC);
@@ -201,7 +201,7 @@ int CONNECTIVITYClient::getNumberOf(medEntityMesh Entity,
     
     if (Entity == _entity) {
       
-      if (Type==MEDMEM_ALL_ELEMENTS)
+      if (Type==MED_ALL_ELEMENTS)
         n = _totalNumberOfElements_client;
       
       for (int i=0; i<_numberOfTypes; i++) {

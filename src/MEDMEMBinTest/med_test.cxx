@@ -189,8 +189,8 @@ int main (int argc, char ** argv) {
   const int * connectivity_index ;
   myMesh->calculateConnectivity(MED_DESCENDING,MED_CELL);
   try {
-    NumberOfElements = myMesh->getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS);
-    connectivity =  myMesh->getConnectivity(MED_DESCENDING,MED_CELL,MEDMEM_ALL_ELEMENTS);
+    NumberOfElements = myMesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
+    connectivity =  myMesh->getConnectivity(MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS);
     connectivity_index =  myMesh->getConnectivityIndex(MED_DESCENDING,MED_CELL);
   }
   catch (MEDEXCEPTION& m) {
@@ -226,7 +226,7 @@ int main (int argc, char ** argv) {
     INFOS_MED("ERROR : MeshDimension = 1 !");
     INFOS_MED("We could not see Reverse Descending Connectivity.") ;
   } else {
-    NumberOfConstituents = myMesh->getNumberOfElements (constituentEntity,MEDMEM_ALL_ELEMENTS);
+    NumberOfConstituents = myMesh->getNumberOfElements (constituentEntity,MED_ALL_ELEMENTS);
     for (int i=0; i<NumberOfConstituents; i++) {
       cout << constituent <<i+1<<" : " ;
       for (int j=ReverseDescendingConnectivityIndex[i];j<ReverseDescendingConnectivityIndex[i+1];j++)
@@ -235,7 +235,7 @@ int main (int argc, char ** argv) {
     }
   }
   cout << "Show "<<constituent<<" Connectivity (Nodal) :" << endl ;
-  const int * face_connectivity =  myMesh->getConnectivity(MED_NODAL,constituentEntity,MEDMEM_ALL_ELEMENTS);
+  const int * face_connectivity =  myMesh->getConnectivity(MED_NODAL,constituentEntity,MED_ALL_ELEMENTS);
   const int * face_connectivity_index =  myMesh->getConnectivityIndex(MED_NODAL,constituentEntity);
   for (int i=0; i<NumberOfConstituents; i++) {
     cout << constituent <<i+1<<" : " ;
@@ -305,7 +305,7 @@ int main (int argc, char ** argv) {
   cout << "Getting the barycenter of each element of this support !" << endl ;
 
   FIELD<double>* barycenter = myMesh->getBarycenter(support);
-  NumberOfElements = myMesh->getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS);
+  NumberOfElements = myMesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
 
   for (int i = 1; i<=NumberOfElements;i++)
     {
@@ -420,7 +420,7 @@ int main (int argc, char ** argv) {
   cout << "    - temps  : " << myField->getTime()<< endl  ;
 
   cout << "- Valeurs :"<<endl;
-  int NumberOf = mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  int NumberOf = mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
   MEDMEM_Array<double> * myvalue = myField->getArrayNoGauss();
   const double * value ;
   for (int i=1; i<NumberOf+1; i++)

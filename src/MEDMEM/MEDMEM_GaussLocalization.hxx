@@ -104,7 +104,7 @@ namespace MEDMEM {
 
   };
   template <class INTERLACING_TAG> GAUSS_LOCALIZATION<INTERLACING_TAG>::GAUSS_LOCALIZATION() throw (MEDEXCEPTION) :
-    _typeGeo(MED_EN::MEDMEM_NONE), _nGauss(-1),
+    _typeGeo(MED_EN::MED_NONE), _nGauss(-1),
     _interlacingType( SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType) 
   {}
 

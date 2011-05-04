@@ -168,7 +168,7 @@ namespace MEDSPLITTER
 
     static bool isDimensionOK(MED_EN::medGeometryElement type, int dim)
     {
-      return ((type/100 == dim) || (dim==2 && type == MED_EN::MEDMEM_POLYGON) || (dim==3 && type == MED_EN::MEDMEM_POLYHEDRA));
+      return ((type/100 == dim) || (dim==2 && type == MED_EN::MED_POLYGON) || (dim==3 && type == MED_EN::MED_POLYHEDRA));
     }
     void setSubdomainBoundaryCreates(bool flag) {  _subdomain_boundary_creates=flag;}
     bool getSubdomainBoundaryCreates(){return _subdomain_boundary_creates;}

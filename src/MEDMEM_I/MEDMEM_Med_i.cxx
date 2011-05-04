@@ -241,7 +241,7 @@ void MED_i::initWithFieldType(SALOMEDS::Study_ptr myStudy,driverTypes /*driverTy
       ::MEDMEM::GMESH* mesh = name2mesh->second;
       for ( medEntityMesh entity = 0; entity < MED_ALL_ENTITIES; ++entity )
         {
-          if ( mesh->getNumberOfElements( entity, MEDMEM_ALL_ELEMENTS ) > 0 )
+          if ( mesh->getNumberOfElements( entity, MED_ALL_ELEMENTS ) > 0 )
             {
               const ::MEDMEM::SUPPORT* sup = mesh->getSupportOnAll( entity );
               SUPPORT_i * mySupportI = new SUPPORT_i( sup );

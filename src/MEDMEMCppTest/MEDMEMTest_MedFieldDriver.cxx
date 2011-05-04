@@ -609,7 +609,7 @@ void MEDMEMTest::testMedFieldDriver()
     field->setComponentsDescriptions(&fileldnotexist);
     field->setMEDComponentsUnits(&fileldnotexist);
     double* vals = const_cast<double*>( field->getValue() );
-    const int nbVals = family->getNumberOfElements( MEDMEM_ALL_ELEMENTS );
+    const int nbVals = family->getNumberOfElements( MED_ALL_ELEMENTS );
     for ( int i = 0; i < nbVals; ++i ) vals[i] = i;
 
     // store the mesh and the field in a file

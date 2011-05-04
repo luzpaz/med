@@ -53,7 +53,7 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
   }
 
   // GeometricTypes
-  MED_EN::medGeometryElement aCellTypes[2] = {MED_EN::MEDMEM_PYRA5, MED_EN::MEDMEM_HEXA8};
+  MED_EN::medGeometryElement aCellTypes[2] = {MED_EN::MED_PYRA5, MED_EN::MED_HEXA8};
 
   // this variable is needed in check mode (!create)
   // because of bug with getGlobalNumberingIndex() method (see below)
@@ -72,15 +72,15 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
 
   if (create) {
     theC->setCount(countCells, MED_EN::MED_CELL);
-    theC->setNodal(nodesCells_PYRA5, MED_EN::MED_CELL, MED_EN::MEDMEM_PYRA5);
-    theC->setNodal(nodesCells_HEXA8, MED_EN::MED_CELL, MED_EN::MEDMEM_HEXA8);
+    theC->setNodal(nodesCells_PYRA5, MED_EN::MED_CELL, MED_EN::MED_PYRA5);
+    theC->setNodal(nodesCells_HEXA8, MED_EN::MED_CELL, MED_EN::MED_HEXA8);
 
     // Invalid cases
     CPPUNIT_ASSERT_THROW(theC->setCount(countCells, MED_EN::MED_NODE), MEDEXCEPTION);
     CPPUNIT_ASSERT_THROW(theC->setCount(countCells, MED_EN::MED_EDGE), MEDEXCEPTION);
     CPPUNIT_ASSERT_THROW(theC->setCount(countCells, MED_EN::MED_FACE), MEDEXCEPTION);
 
-    CPPUNIT_ASSERT_THROW(theC->setNodal(nodesCells_PYRA5, MED_EN::MED_FACE, MED_EN::MEDMEM_PYRA5), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(theC->setNodal(nodesCells_PYRA5, MED_EN::MED_FACE, MED_EN::MED_PYRA5), MEDEXCEPTION);
   }
 
   // 2 POLYHEDRA
@@ -95,7 +95,7 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
 
   if (create) {
     theC->setNodal(aPolyhedronNodalConnectivity,
-                   MED_EN::MED_CELL, MED_EN::MEDMEM_POLYHEDRA, aPolyhedronIndex);
+                   MED_EN::MED_CELL, MED_EN::MED_POLYHEDRA, aPolyhedronIndex);
   }
   else {
     // CELLS(3D): theC

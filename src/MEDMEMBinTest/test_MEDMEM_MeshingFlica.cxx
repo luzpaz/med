@@ -137,15 +137,15 @@ int cpolygonsValue[92]=
    27, 25, 34, 36};
 
 int bottom[4]={1,7,30,35};
-MED_EN::medGeometryElement bottomTypes[2]={MED_EN::MEDMEM_QUAD4, MED_EN::MEDMEM_POLYGON };
+MED_EN::medGeometryElement bottomTypes[2]={MED_EN::MED_QUAD4, MED_EN::MED_POLYGON };
 int bottomIndex[3]={1,3,5};
 int bottomNbOfElts[2]={2,2};
 int top[4]={21,26,46,50};
-MED_EN::medGeometryElement topTypes[2]={MED_EN::MEDMEM_QUAD4, MED_EN::MEDMEM_POLYGON };
+MED_EN::medGeometryElement topTypes[2]={MED_EN::MED_QUAD4, MED_EN::MED_POLYGON };
 int topIndex[3]={1,3,5};
 int topNbOfElts[2]={2,2};
 int side[24]={ 3, 6, 10, 11, 13, 16, 19, 20, 22, 25, 28, 29, 32, 33, 37, 38, 40, 41, 44, 45, 47, 48, 51, 52};
-MED_EN::medGeometryElement sideTypes[2]={MED_EN::MEDMEM_QUAD4, MED_EN::MEDMEM_POLYGON };
+MED_EN::medGeometryElement sideTypes[2]={MED_EN::MED_QUAD4, MED_EN::MED_POLYGON };
 int sideIndex[3]={1,13,25};
 int sideNbOfElts[2]={12,12};
 
@@ -178,23 +178,23 @@ int main()
   string coordunit[3] = { "m", "m", "m" };
   meshing->setCoordinatesUnits(coordunit);
   //Cell connectivity info for classical elts
-  const MED_EN::medGeometryElement classicalTypesCell[2]={MED_EN::MEDMEM_HEXA8,MED_EN::MEDMEM_POLYHEDRA};
+  const MED_EN::medGeometryElement classicalTypesCell[2]={MED_EN::MED_HEXA8,MED_EN::MED_POLYHEDRA};
   const int nbOfCellElts[2]={6,6};
   meshing->setNumberOfTypes(2,MED_EN::MED_CELL);
   meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
   meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
   //Face connectivity info for classical elts
-  const MED_EN::medGeometryElement classicalTypesFace[2]={MED_EN::MEDMEM_QUAD4,MED_EN::MEDMEM_POLYGON};
+  const MED_EN::medGeometryElement classicalTypesFace[2]={MED_EN::MED_QUAD4,MED_EN::MED_POLYGON};
   const int nbOfFaceElts[2]={29,23};
   meshing->setNumberOfTypes(2,MED_EN::MED_FACE);
   meshing->setTypes(classicalTypesFace,MED_EN::MED_FACE);
   meshing->setNumberOfElements(nbOfFaceElts,MED_EN::MED_FACE);
   //All cell conn
-  meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MEDMEM_HEXA8,connNodalCellClassical);
-  meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MEDMEM_POLYHEDRA,polyHedraConn,polyHedraInd);
+  meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_HEXA8,connNodalCellClassical);
+  meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_POLYHEDRA,polyHedraConn,polyHedraInd);
   //All face conn
-  meshing->setConnectivity(MED_EN::MED_FACE,MED_EN::MEDMEM_QUAD4,connNodalFaceClassical);
-  meshing->setConnectivity(MED_EN::MED_FACE,MED_EN::MEDMEM_POLYGON, cpolygonsValue,cpolygonsIndex);
+  meshing->setConnectivity(MED_EN::MED_FACE,MED_EN::MED_QUAD4,connNodalFaceClassical);
+  meshing->setConnectivity(MED_EN::MED_FACE,MED_EN::MED_POLYGON, cpolygonsValue,cpolygonsIndex);
   //Adding some groups on faces
   addMedFacesGroup( *meshing, 4,  bottom, "BottomFaces",bottomTypes,bottomIndex,bottomNbOfElts,2) ;
   addMedFacesGroup( *meshing, 4,  top,    "TopFaces",topTypes,topIndex,topNbOfElts,2) ;

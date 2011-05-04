@@ -372,7 +372,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
   if (entitySupport == MED_EN::MED_NODE)
     dataStr << "POINT_DATA " << meshField->getNumberOfNodes() ;
   else if (entitySupport == MED_EN::MED_CELL)
-    dataStr << "CELL_DATA " << meshField->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
+    dataStr << "CELL_DATA " << meshField->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
   else
     throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" which is not on all nodes or cells but it's on !" << entitySupport));
 
@@ -411,7 +411,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
     vtkFileStr << dataStr << endl;
   // END issue 0020610: [CEA 371] VTK field driver : save many fields
 
-  int NomberOfValue = supportField->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS) ;
+  int NomberOfValue = supportField->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS) ;
   int NomberOfComponents =  _ptrField->getNumberOfComponents() ;
 
   MED_EN::med_type_champ fieldType = _ptrField->getValueType() ;

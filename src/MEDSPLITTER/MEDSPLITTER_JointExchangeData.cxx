@@ -113,7 +113,7 @@ int JointExchangeData::serialize(vector<int> & out_data) const
   
   data_size =
     _glob_to_locs_here_and_dist.size() +
-    2 * max_nb_node_by_cell * _dist_mesh->getNumberOfElements( MED_CELL, MEDMEM_ALL_ELEMENTS );
+    2 * max_nb_node_by_cell * _dist_mesh->getNumberOfElements( MED_CELL, MED_ALL_ELEMENTS );
 
   return data_size;
 }
@@ -157,7 +157,7 @@ void JointExchangeData::deserialize(const std::vector<int> & in_data)
 
 MEDMEM::MEDSKYLINEARRAY* JointExchangeData::makeCellCorrespArray() const
 {
-  int nb_cells_here    = _loc_mesh->getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS);
+  int nb_cells_here    = _loc_mesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
   int cells_value_size = _glob_to_locs_here_and_dist.size();
   int* cell_index = new int [nb_cells_here+1];
   int* cell_value = new int [cells_value_size];
@@ -329,7 +329,7 @@ void JointExchangeData::setConnectivity(const int* glob_fused_nodes)
 {
   _global_conn_here.reserve( _conn_here_size );
   _local_conn_here.reserve ( _conn_here_size );
-  const int* conn  = _loc_mesh->getConnectivity(MED_NODAL, MED_CELL, MEDMEM_ALL_ELEMENTS);
+  const int* conn  = _loc_mesh->getConnectivity(MED_NODAL, MED_CELL, MED_ALL_ELEMENTS);
   const int* index = _loc_mesh->getConnectivityIndex(MED_NODAL, MED_CELL);
 
   TGlob2LocsHD::iterator glob_locs_here_dist     = _glob_to_locs_here_and_dist.begin();

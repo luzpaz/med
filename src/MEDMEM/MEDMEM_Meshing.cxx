@@ -62,7 +62,7 @@ being defined by the number of nodes).
 \defgroup MESHING_poly Polygons and Polyhedra creation
 
 These methods belong to the meshing class and are necessary for
-creating the connectivities of MED_POLYHEDRON and MEDMEM_POLYGON
+creating the connectivities of MED_POLYHEDRON and MED_POLYGON
 elements.
 
 */
@@ -209,8 +209,8 @@ void MESHING::setCoordinateUnit(const string unit, const int i)
   entity. If a connectivity already exist, it is deleted by the call.
 
   For exemple setNumberOfTypes(3,MED_CELL) creates a connectivity with 3 
-  medGeometryElement in MESH for MED_CELL entity (like MEDMEM_TETRA4, 
-  MEDMEM_PYRA5 and MED_HEXA6 for example).
+  medGeometryElement in MESH for MED_CELL entity (like MED_TETRA4, 
+  MED_PYRA5 and MED_HEXA6 for example).
 
   Returns an exception if it could not create the connectivity (as if we set 
   MED_FACE connectivity before MED_CELL).
@@ -264,7 +264,7 @@ void MESHING::setNumberOfTypes(const int NumberOfTypes,
   Sets the list of geometric types used by a given entity.
   medEntityMesh entity could be : MED_CELL, MED_FACE, MED_EDGE.
   This method is used to set the differents geometrics types 
-({MEDMEM_TETRA4,MEDMEM_PYRA5,MEDMEM_HEXA8} for example). Geometric types should be given in increasing order of number of nodes for entity type \a entity.
+({MED_TETRA4,MED_PYRA5,MED_HEXA8} for example). Geometric types should be given in increasing order of number of nodes for entity type \a entity.
 
   Remark : Don't use MED_NODE and MED_ALL_ENTITIES.
 
@@ -289,7 +289,7 @@ void MESHING::setTypes(const MED_EN::medGeometryElement * Types,
   Sets the number of elements for each geometric type of given entity.
 
   Example : setNumberOfElements(\{12,23\},MED_FACE);
-  If there are two types of face (MEDMEM_TRIA3 and MEDMEM_QUAD4), 
+  If there are two types of face (MED_TRIA3 and MED_QUAD4), 
   this sets 12 triangles and 23 quadrangles.
 */
 void MESHING::setNumberOfElements(const int * NumberOfElements,
@@ -316,8 +316,8 @@ void MESHING::setNumberOfElements(const int * NumberOfElements,
 /*!
   Sets the nodal connectivity for geometric type \a Type of  entity \a Entity.
   The nodal connectivity must be defined one element type at a time :
-  \a MEDMEM_ALL_ELEMENTS is not a valid \a Type argument.
-  To define connectivity of \a MEDMEM_POLYGON and \a MEDMEM_POLYHEDRA, \a PolyConnectivityIndex
+  \a MED_ALL_ELEMENTS is not a valid \a Type argument.
+  To define connectivity of \a MED_POLYGON and \a MED_POLYHEDRA, \a PolyConnectivityIndex
   is also necessary, which defines index of the first node of each element.
   Connectiviy of polyhedron must contain -1 as a separator of faces. For example,
   a tetrahedron with connectivity {1,2,3,4} can be represented as a polyhedron by the following arrays:<br>
@@ -330,13 +330,13 @@ Connectivity_index : {1,16}
 MESHING myMeshing ;
 myMeshing.setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,System,Mode);
 myMeshing.setNumberOfTypes(2,MED_CELL);
-myMeshing.setTypes({MEDMEM_TRIA3,MEDMEM_QUAD4},MED_CELL);
-myMeshing.setNumberOfElements({3,2},MED_CELL); // 3 MEDMEM_TRIA3 and 2 MEDMEM_QUAD4
-myMeshing.setConnectivity(MED_CELL,MEDMEM_TRIA3,{1,2,3,6,8,9,4,5,6});
-myMeshing.setConnectivity(MED_CELL,MEDMEM_QUAD4,{1,3,4,5,4,5,7,8});
+myMeshing.setTypes({MED_TRIA3,MED_QUAD4},MED_CELL);
+myMeshing.setNumberOfElements({3,2},MED_CELL); // 3 MED_TRIA3 and 2 MED_QUAD4
+myMeshing.setConnectivity(MED_CELL,MED_TRIA3,{1,2,3,6,8,9,4,5,6});
+myMeshing.setConnectivity(MED_CELL,MED_QUAD4,{1,3,4,5,4,5,7,8});
 \endverbatim
 
-  Example : setConnectivity(MED_FACE,MEDMEM_TRIA3,{1,2,3,1,4,2})
+  Example : setConnectivity(MED_FACE,MED_TRIA3,{1,2,3,1,4,2})
   Define 2 triangles face defined with nodes 1,2,3 and 1,4,2.
 */
 void MESHING::setConnectivity(const MED_EN::medEntityMesh Entity,

@@ -76,7 +76,7 @@ struct MEDMEM_EXPORT _maille
   mutable int*               sortedNodeIDs; // for comparison and merge
   //mutable list<unsigned>   groupes; // the GROUPs maille belongs to, used to create families
 
-  _maille(MED_EN::medGeometryElement type=MED_EN::MEDMEM_NONE, size_t nelem=0)
+  _maille(MED_EN::medGeometryElement type=MED_EN::MED_NONE, size_t nelem=0)
     : geometricType(type),reverse(false),sortedNodeIDs(0),_ordre(0) { sommets.reserve(nelem); }
 
   _maille(const _maille& ma);
@@ -87,7 +87,7 @@ struct MEDMEM_EXPORT _maille
   { return geometricType/100; }
 
   int dimensionWithPoly() const // retourne la dimension de la maille
-  { return geometricType >= MED_EN::MEDMEM_POLYGON ? dimension()-2 : dimension(); }
+  { return geometricType >= MED_EN::MED_POLYGON ? dimension()-2 : dimension(); }
 
   const int* getSortedNodes() const; // creates if needed and return sortedNodeIDs
   bool operator < (const _maille& ma) const;

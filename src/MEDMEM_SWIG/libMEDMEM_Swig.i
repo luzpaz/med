@@ -400,12 +400,12 @@ typedef enum {ASCENDING=7,DESCENDING=77} med_sort_direc;
 typedef enum {MED_CELL, MED_FACE, MED_EDGE, MED_NODE,
 	      MED_ALL_ENTITIES} medEntityMesh;
 
-typedef enum {MEDMEM_NONE=0, MEDMEM_POINT1=1, MEDMEM_SEG2=102, MEDMEM_SEG3=103,
-	      MEDMEM_TRIA3=203, MEDMEM_QUAD4=204, MEDMEM_TRIA6=206, MEDMEM_QUAD8=208,
-	      MEDMEM_TETRA4=304, MEDMEM_PYRA5=305, MEDMEM_PENTA6=306,
-	      MEDMEM_HEXA8=308, MEDMEM_TETRA10=310, MEDMEM_PYRA13=313,
-	      MEDMEM_PENTA15=315, MEDMEM_HEXA20=320, MEDMEM_POLYGON = 400, MEDMEM_POLYHEDRA = 500,
-	      MEDMEM_ALL_ELEMENTS=999} medGeometryElement;
+typedef enum {MED_NONE=0, MED_POINT1=1, MED_SEG2=102, MED_SEG3=103,
+	      MED_TRIA3=203, MED_QUAD4=204, MED_TRIA6=206, MED_QUAD8=208,
+	      MED_TETRA4=304, MED_PYRA5=305, MED_PENTA6=306,
+	      MED_HEXA8=308, MED_TETRA10=310, MED_PYRA13=313,
+	      MED_PENTA15=315, MED_HEXA20=320, MED_POLYGON = 400, MED_POLYHEDRA = 500,
+	      MED_ALL_ELEMENTS=999} medGeometryElement;
 
 typedef enum {MED_NODAL, MED_DESCENDING} medConnectivity ;
 
@@ -896,7 +896,7 @@ public:
         }
         typedef MEDMEM_ArrayInterface<T1,INTERLACING_TAG,Gauss>::Array Array;
         Array* array = new Array(numberOfComponents,
-                                 support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS),
+                                 support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS),
                                  support->getNumberOfTypes(),
                                  &nbelgeoc[0],
                                  nbGaussByType-1);
@@ -1065,7 +1065,7 @@ public:
     // this method replaces getValueI() in NoInterlace mode
     PyObject * getColumn(int index)
       {
-	int size = (self->getSupport())->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+	int size = (self->getSupport())->getNumberOfElements(MED_ALL_ELEMENTS);
 
 	const T1 * value = self->getColumn(index);
 
@@ -1356,7 +1356,7 @@ public :
 				    medEntityMesh Entity)
       {
 	const int * index = self->getConnectivityIndex(ConnectivityType,Entity);
-	int size = (self->getNumberOfElements(Entity,MEDMEM_ALL_ELEMENTS))+1;
+	int size = (self->getNumberOfElements(Entity,MED_ALL_ELEMENTS))+1;
 #ifdef WITH_NUMPY
         return TYPEMAP_OUTPUT_PY_ARRAY( index, size );
 #else

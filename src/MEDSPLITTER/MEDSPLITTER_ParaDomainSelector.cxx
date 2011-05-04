@@ -150,7 +150,7 @@ int ParaDomainSelector::gatherNbOf(MED_EN::medEntityMesh        entity,
   vector<int> nb_elems( nb_domains, 0 );
   for ( int i = 0; i < nb_domains; ++i )
     if ( domain_meshes[i] )
-      nb_elems[i] = domain_meshes[i]->getNumberOfElements(entity, MEDMEM_ALL_ELEMENTS);
+      nb_elems[i] = domain_meshes[i]->getNumberOfElements(entity, MED_ALL_ELEMENTS);
 
   // receive nb of elems from other procs
   vector<int> all_nb_elems( nb_domains );

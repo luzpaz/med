@@ -307,7 +307,7 @@ Python version may be found in
 /*! Gets the number of different geometric types for a given entity type.
 
     For example getNumberOfTypes(MED_CELL) would return 3 if the MESH
-    have some MEDMEM_TETRA4, MEDMEM_PYRA5 and MEDMEM_HEXA8 in it.
+    have some MED_TETRA4, MED_PYRA5 and MED_HEXA8 in it.
     If entity is not defined, returns 0.
     If there is no connectivity, returns an exception.
 
@@ -334,7 +334,7 @@ inline const MED_EN::medGeometryElement * MESH::getTypes(MED_EN::medEntityMesh e
 {
   if (entity == MED_EN::MED_NODE)
     throw MEDEXCEPTION(LOCALIZED("MESH::getTypes( medEntityMesh ) : No medGeometryElement with MED_NODE entity !"));
-  // return un tableau de taille 1 contenant MEDMEM_NONE, comme les supports pour etre coherent avec getNumberOfTypes ???? PG
+  // return un tableau de taille 1 contenant MED_NONE, comme les supports pour etre coherent avec getNumberOfTypes ???? PG
 
 //   checkGridFillConnectivity();
   if (_connectivity != NULL)
@@ -395,17 +395,17 @@ inline const int * MESH::getGlobalNumberingIndex(MED_EN::medEntityMesh entity) c
   Returns the number of elements of given geometric type of given entity. Returns 0 if query is not defined.
 
   Example :
-  - getNumberOfElements(MED_NODE,MEDMEM_NONE) : number of nodes
-  - getNumberOfElements(MED_NODE,MEDMEM_TRIA3) : returns 0 (not defined)
-  - getNumberOfElements(MED_FACE,MEDMEM_TRIA3) : returns number of triangle
+  - getNumberOfElements(MED_NODE,MED_NONE) : number of nodes
+  - getNumberOfElements(MED_NODE,MED_TRIA3) : returns 0 (not defined)
+  - getNumberOfElements(MED_FACE,MED_TRIA3) : returns number of triangle
   elements defined in face entity (0 if not defined)
-  - getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS) : returns total number
+  - getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) : returns total number
   of elements defined in cell entity
  */
 inline int MESH::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
 {
   if (entity==MED_EN::MED_NODE)
-    if ((Type==MED_EN::MEDMEM_NONE)|(Type==MED_EN::MEDMEM_ALL_ELEMENTS))
+    if ((Type==MED_EN::MED_NONE)|(Type==MED_EN::MED_ALL_ELEMENTS))
       return _numberOfNodes;
     else
       return 0;
@@ -500,7 +500,7 @@ inline int MESH::getConnectivityLength(MED_EN::medConnectivity ConnectivityType,
   int nbOfElm = getNumberOfElements(entity,Type);
   int size;
 
-  if (Type == MED_EN::MEDMEM_ALL_ELEMENTS)
+  if (Type == MED_EN::MED_ALL_ELEMENTS)
     {
       size = getConnectivityIndex(ConnectivityType,entity)[nbOfElm]-1;
     }
@@ -523,7 +523,7 @@ inline int MESH::getConnectivityLength(MED_EN::medConnectivity ConnectivityType,
 \a ConnectivityType specifies descending or nodal connectivity.
 
   To get connectivity for all geometric type, use \a Mode=MED_FULL_INTERLACE
-  and \a Type=MEDMEM_ALL_ELEMENTS.
+  and \a Type=MED_ALL_ELEMENTS.
   You must also get the corresponding index array.
  */
 inline const int * MESH::getConnectivity(MED_EN::medConnectivity ConnectivityType,MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
@@ -532,7 +532,7 @@ inline const int * MESH::getConnectivity(MED_EN::medConnectivity ConnectivityTyp
 }
 /*!
   Returns the required index array for a connectivity received in
-  MED_FULL_INTERLACE mode and MEDMEM_ALL_ELEMENTS type.
+  MED_FULL_INTERLACE mode and MED_ALL_ELEMENTS type.
 
   This array allows to find connectivity of each element.
 
@@ -572,10 +572,10 @@ inline int MESH::getReverseConnectivityLength(MED_EN::medConnectivity Connectivi
     {
       if (spaceDim == 2)
         nb = getNumberOfElements(MED_EN::MED_EDGE,
-                                        MED_EN::MEDMEM_ALL_ELEMENTS);
+                                        MED_EN::MED_ALL_ELEMENTS);
       else if (spaceDim == 3)
         nb = getNumberOfElements(MED_EN::MED_FACE,
-                                        MED_EN::MEDMEM_ALL_ELEMENTS);
+                                        MED_EN::MED_ALL_ELEMENTS);
     }
   return getReverseConnectivityIndex(ConnectivityType,Entity)[nb]-1;
 }
@@ -611,9 +611,9 @@ inline int MESH::getReverseConnectivityIndexLength(MED_EN::medConnectivity Conne
   else
     {
       if (spaceDim == 2)
-        return getNumberOfElements(MED_EN::MED_EDGE,MED_EN::MEDMEM_ALL_ELEMENTS)+1;
+        return getNumberOfElements(MED_EN::MED_EDGE,MED_EN::MED_ALL_ELEMENTS)+1;
       else if (spaceDim == 3)
-        return getNumberOfElements(MED_EN::MED_FACE,MED_EN::MEDMEM_ALL_ELEMENTS)+1;
+        return getNumberOfElements(MED_EN::MED_FACE,MED_EN::MED_ALL_ELEMENTS)+1;
       else
         throw MEDEXCEPTION("Invalid dimension");
     }

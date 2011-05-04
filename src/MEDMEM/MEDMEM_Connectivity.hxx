@@ -360,7 +360,7 @@ inline const MED_EN::medGeometryElement* CONNECTIVITY::getGeometricTypes(MED_EN:
 
       Exemple :\n
 
-      In case of a CONNECTIVITY containing 3*MEDMEM_TRIA3 et 2*MEDMEM_QUAD4 : \n
+      In case of a CONNECTIVITY containing 3*MED_TRIA3 et 2*MED_QUAD4 : \n
             int * count = getGlobalNumberingIndex(MED_CELL)\n
       count[0] is always set to 1\n
       count[1] is set to 1+3=4\n
@@ -527,9 +527,9 @@ int CONNECTIVITY::getEntityDimension() const
 MED_EN::medGeometryElement CONNECTIVITY::getPolyTypeRelativeTo() const
 {
   if(_entity==MED_EN::MED_CELL && _entityDimension==3)
-    return MED_EN::MEDMEM_POLYHEDRA;
+    return MED_EN::MED_POLYHEDRA;
   else if((_entity==MED_EN::MED_CELL && _entityDimension==2) || (_entity==MED_EN::MED_FACE && _entityDimension==2))
-    return MED_EN::MEDMEM_POLYGON;
+    return MED_EN::MED_POLYGON;
   else
     throw MEDEXCEPTION("getPolyTypeRelativeTo : ");
 }

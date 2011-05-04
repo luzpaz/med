@@ -313,7 +313,7 @@ void VTK_MESH_DRIVER::write(void) const
   // we put connectivity
   // how many cells and how many value in connectivity :
   int cells_types_count        = mesh->getNumberOfTypes(MED_CELL) ;
-  int cells_sum                = mesh->getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS) ;
+  int cells_sum                = mesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) ;
   const CELLMODEL * cells_type = mesh->getCellsTypes(MED_CELL) ;
 
   const int * connectivityIndex = mesh->getConnectivityIndex(MED_NODAL,MED_CELL) ;
@@ -329,28 +329,28 @@ void VTK_MESH_DRIVER::write(void) const
     int *filter = (int*) NULL ; // index in vtk connectivity
     switch (cells_type[i].getType())
       {
-      case MEDMEM_POINT1  : {
+      case MED_POINT1  : {
         filter = new int[1] ;
         filter[0] = 0 ;
         break ;
       }
-      case MEDMEM_SEG2    : {
+      case MED_SEG2    : {
         filter = new int[2] ;
         filter[0] = 0 ;
         filter[1] = 1 ;
         break ;
       }
-      case MEDMEM_SEG3    : {  
+      case MED_SEG3    : {  
         break ;
       }
-      case MEDMEM_TRIA3   : {
+      case MED_TRIA3   : {
         filter = new int[3] ;
         filter[0] = 0 ;
         filter[1] = 1 ;
         filter[2] = 2 ;
         break ;
       }
-      case MEDMEM_QUAD4   : {
+      case MED_QUAD4   : {
         filter = new int[4] ;
         filter[0] = 0 ;
         filter[1] = 1 ;
@@ -358,13 +358,13 @@ void VTK_MESH_DRIVER::write(void) const
         filter[3] = 3 ;
         break ;
       }
-      case MEDMEM_TRIA6   : {
+      case MED_TRIA6   : {
         break ;
       }
-      case MEDMEM_QUAD8   : {
+      case MED_QUAD8   : {
         break ;
       }
-      case MEDMEM_TETRA4  : {
+      case MED_TETRA4  : {
         filter = new int[4] ;
         filter[0] = 0 ;
         filter[1] = 1 ;
@@ -372,7 +372,7 @@ void VTK_MESH_DRIVER::write(void) const
         filter[3] = 2 ;  // 4th element in med are 3rd in vtk (array begin at 0 !)
         break ;
       }
-      case MEDMEM_PYRA5   : {
+      case MED_PYRA5   : {
         filter = new int[5] ;
         filter[0] = 0 ;
         filter[1] = 3 ;  // 2nd element in med are 4th in vtk (array begin at 0 !)
@@ -381,7 +381,7 @@ void VTK_MESH_DRIVER::write(void) const
         filter[4] = 4 ;
         break ;
       }
-      case MEDMEM_PENTA6  : {
+      case MED_PENTA6  : {
         filter = new int[6] ;
         filter[0] = 0 ;
         filter[1] = 1 ;
@@ -391,7 +391,7 @@ void VTK_MESH_DRIVER::write(void) const
         filter[5] = 5 ;
         break ;
       }
-      case MEDMEM_HEXA8   : {
+      case MED_HEXA8   : {
         filter = new int[8] ;
         filter[0] = 0 ;
         filter[1] = 3 ;
@@ -403,16 +403,16 @@ void VTK_MESH_DRIVER::write(void) const
         filter[7] = 5 ;
         break ;
       }
-      case MEDMEM_TETRA10 : {
+      case MED_TETRA10 : {
         break ;
       }
-      case MEDMEM_PYRA13  : {
+      case MED_PYRA13  : {
         break ;
       }
-      case MEDMEM_PENTA15 : {
+      case MED_PENTA15 : {
         break ;
       }
-      case MEDMEM_HEXA20  : {
+      case MED_HEXA20  : {
         break ;
       }
       default : { 
@@ -459,21 +459,21 @@ void VTK_MESH_DRIVER::write(void) const
     int vtkType = 0 ;
     switch (cells_type[i].getType())
       {
-      case MEDMEM_POINT1  :vtkType = 1 ;break ;
-      case MEDMEM_SEG2    :vtkType = 3 ;break ;
-      case MEDMEM_SEG3    :vtkType = 0 ;break ;
-      case MEDMEM_TRIA3   :vtkType = 5 ;break ;
-      case MEDMEM_QUAD4   :vtkType = 9 ;break ;
-      case MEDMEM_TRIA6   :vtkType = 0 ;break ;
-      case MEDMEM_QUAD8   :vtkType = 0 ;break ;
-      case MEDMEM_TETRA4  :vtkType = 10 ;break ;
-      case MEDMEM_PYRA5   :vtkType = 14 ;break ;
-      case MEDMEM_PENTA6  :vtkType = 13 ;break ;
-      case MEDMEM_HEXA8   :vtkType = 12 ;break ;
-      case MEDMEM_TETRA10 :vtkType = 0 ;break ;
-      case MEDMEM_PYRA13  :vtkType = 0 ;break ;
-      case MEDMEM_PENTA15 :vtkType = 0 ;break ;
-      case MEDMEM_HEXA20  :vtkType = 0 ;break ;
+      case MED_POINT1  :vtkType = 1 ;break ;
+      case MED_SEG2    :vtkType = 3 ;break ;
+      case MED_SEG3    :vtkType = 0 ;break ;
+      case MED_TRIA3   :vtkType = 5 ;break ;
+      case MED_QUAD4   :vtkType = 9 ;break ;
+      case MED_TRIA6   :vtkType = 0 ;break ;
+      case MED_QUAD8   :vtkType = 0 ;break ;
+      case MED_TETRA4  :vtkType = 10 ;break ;
+      case MED_PYRA5   :vtkType = 14 ;break ;
+      case MED_PENTA6  :vtkType = 13 ;break ;
+      case MED_HEXA8   :vtkType = 12 ;break ;
+      case MED_TETRA10 :vtkType = 0 ;break ;
+      case MED_PYRA13  :vtkType = 0 ;break ;
+      case MED_PENTA15 :vtkType = 0 ;break ;
+      case MED_HEXA20  :vtkType = 0 ;break ;
       default          :vtkType = 0 ;break ;
       }
     if (vtkType == 0)

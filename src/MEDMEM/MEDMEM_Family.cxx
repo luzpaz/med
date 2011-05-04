@@ -162,14 +162,14 @@ FAMILY::FAMILY(GMESH* Mesh, int Identifier, string Name, int NumberOfAttribute,
   // on face ?
   if (!Find)
     {
-      if ( _mesh->getNumberOfElements(MED_FACE, MEDMEM_ALL_ELEMENTS) > 0 )
+      if ( _mesh->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS) > 0 )
         Find = build(MED_FACE,MEDArrayFaceFamily) ;
     }
 
   // on edge ?
   if (!Find)
     {
-      if ( _mesh->getNumberOfElements(MED_EDGE, MEDMEM_ALL_ELEMENTS) > 0 )
+      if ( _mesh->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS) > 0 )
         Find = build(MED_EDGE,MEDArrayEdgeFamily) ;
     }
   // That's all !
@@ -371,7 +371,7 @@ bool FAMILY::build(medEntityMesh Entity,int **FamilyNumber /* from MED file */)
 
       // family on all ELEMENT ?
       if (Entity == MED_EN::MED_CELL &&
-          _totalNumberOfElements ==_mesh->getNumberOfElements(Entity,MEDMEM_ALL_ELEMENTS))
+          _totalNumberOfElements ==_mesh->getNumberOfElements(Entity,MED_ALL_ELEMENTS))
         {
           _isOnAllElts = true ;
           update();

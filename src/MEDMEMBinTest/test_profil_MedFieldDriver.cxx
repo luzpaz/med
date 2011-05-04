@@ -67,11 +67,11 @@ void affiche_fieldT(FIELD<double, INTERLACING_TAG> * myField,
   cout.setf(ios::fixed);
   cout << "- Valeurs :"<<endl;
   bool onAll   = mySupport->isOnAllElements();
-  int NumberOf = mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
-  cout << "mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS)" << NumberOf << endl;
+  int NumberOf = mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
+  cout << "mySupport->getNumberOfElements(MED_ALL_ELEMENTS)" << NumberOf << endl;
   int NumberOfComponents = myField->getNumberOfComponents() ;
   cout << "myField->getNumberOfComponents()" << NumberOfComponents << endl;
-  if (!onAll) number = mySupport->getNumber(MEDMEM_ALL_ELEMENTS);
+  if (!onAll) number = mySupport->getNumber(MED_ALL_ELEMENTS);
 
   if ( myField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE ) {
     for (int i=1; i<NumberOf+1; i++) {

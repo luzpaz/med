@@ -44,8 +44,8 @@ using namespace MEDMEM;
 // geometric types conversion from PORFLOW -> MED
 //const size_t PORFLOW_MESH_DRIVER::nb_geometrie_porflow;
 const medGeometryElement PORFLOW_MESH_DRIVER::geomPORFLOWtoMED[nb_geometrie_porflow] =
-  {   /*  1  */ MEDMEM_TRIA3   ,/*  2  */ MEDMEM_QUAD4  ,/*  3  */ MEDMEM_TETRA4  ,/*  4  */ MEDMEM_PYRA5  ,
-      /*  5  */ MEDMEM_PENTA6  ,/*  6  */ MEDMEM_HEXA8   };
+  {   /*  1  */ MED_TRIA3   ,/*  2  */ MED_QUAD4  ,/*  3  */ MED_TETRA4  ,/*  4  */ MED_PYRA5  ,
+      /*  5  */ MED_PENTA6  ,/*  6  */ MED_HEXA8   };
 // indirection table from PORFLOW order to MED one for nodes numerotation in all PORFLOW geometries
 //const size_t PORFLOW_MESH_DRIVER::nb_nodes_max;
 
@@ -231,16 +231,16 @@ inline static medGeometryElement get2DMedGeomType(int nbSommets)
     switch (nbSommets)
     {
         case 2:
-            return MEDMEM_SEG2;
+            return MED_SEG2;
             break;
         case 3:
-            return MEDMEM_TRIA3;
+            return MED_TRIA3;
             break;
         case 4:
-            return MEDMEM_QUAD4;
+            return MED_QUAD4;
             break;
     }
-    return MEDMEM_NONE;
+    return MED_NONE;
 }
 
 // helper function to read a porflow file name (enclosed in single or double quotes) in line

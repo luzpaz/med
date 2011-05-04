@@ -137,9 +137,9 @@ const med_2_3::med_geometry_type  MED_MESH_DRIVER::all_cell_type[MED_N_CELL_GEO_
     MED_PENTA15, MED_HEXA20,MED_HEXA27};
 
 const char * const MED_MESH_DRIVER::all_cell_type_tab [MED_N_CELL_GEO_FIXED_CON]=
-  { "MEDMEM_POINT1","MEDMEM_SEG2","MEDMEM_SEG3","MEDMEM_SEG4","MEDMEM_TRIA3","MEDMEM_QUAD4","MEDMEM_TRIA6","MEDMEM_TRIA7","MEDMEM_QUAD8","MEDMEM_QUAD9",
-    "MEDMEM_TETRA4","MEDMEM_PYRA5","MEDMEM_PENTA6","MEDMEM_HEXA8","MEDMEM_TETRA10","MEDMEM_OCTA12","MEDMEM_PYRA13",
-    "MEDMEM_PENTA15","MEDMEM_HEXA20","MEDMEM_HEXA27"};
+  { "MED_POINT1","MED_SEG2","MED_SEG3","MEDMEM_SEG4","MED_TRIA3","MED_QUAD4","MED_TRIA6","MEDMEM_TRIA7","MED_QUAD8","MEDMEM_QUAD9",
+    "MED_TETRA4","MED_PYRA5","MED_PENTA6","MED_HEXA8","MED_TETRA10","MEDMEM_OCTA12","MED_PYRA13",
+    "MED_PENTA15","MED_HEXA20","MEDMEM_HEXA27"};
 
 
 //---------------------------------- RDONLY PART -------------------------------------------------------------
@@ -935,8 +935,8 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
         // Retrieve connectivity size of poly elements
         med_2_3::med_int polygonConnSize, polyhedraFacesIndexSize, polyhedraConnSize;
         int polyhedraConnSizeWithFaceSeparators;
-        if ( tmp_cell_models.back().getType() == MED_EN::MEDMEM_POLYGON ||
-             (!faceTypes.empty() && faceTypes.back() == MED_EN::MEDMEM_POLYGON ))
+        if ( tmp_cell_models.back().getType() == MED_EN::MED_POLYGON ||
+             (!faceTypes.empty() && faceTypes.back() == MED_EN::MED_POLYGON ))
           {
             polygonConnSize = med_2_3::MEDmeshnEntity(_medIdt,_ptrMesh->_name.c_str(),
                                                       dtp3,itp3,
@@ -946,7 +946,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
                                                       med_2_3::MED_NODAL,
                                                       &chgtp3,&trfp3);
           }
-        if ( tmp_cell_models.back().getType() == MED_EN::MEDMEM_POLYHEDRA )
+        if ( tmp_cell_models.back().getType() == MED_EN::MED_POLYHEDRA )
           {
             polyhedraFacesIndexSize=MEDmeshnEntity(_medIdt,_ptrMesh->_name.c_str(),
                                                    dtp3,itp3,
@@ -998,9 +998,9 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
 
             switch (tmp_cell_models[i].getType() )
             {
-            case MED_EN::MEDMEM_POLYGON:
+            case MED_EN::MED_POLYGON:
               connSizeByType.push_back( polygonConnSize ); break;
-            case MED_EN::MEDMEM_POLYHEDRA:
+            case MED_EN::MED_POLYHEDRA:
               connSizeByType.push_back( polyhedraConnSizeWithFaceSeparators ); break;
             default:
               connSizeByType.push_back
@@ -1027,7 +1027,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
             med_2_3::med_err err2;
             switch ( Connectivity->_geometricTypes[i] )
             {
-            case MED_EN::MEDMEM_POLYGON:
+            case MED_EN::MED_POLYGON:
               {
                 PointerOf <med_2_3::med_int> PolygonsConnIndex( tmp_numberOfCells+1 );
                 err2=med_2_3::MEDmeshPolygonRd(_medIdt,_ptrMesh->_name.c_str(),
@@ -1047,7 +1047,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
                   polyindex[j]= delta + PolygonsConnIndex[ j ];
                 break;
               }
-            case MED_EN::MEDMEM_POLYHEDRA:
+            case MED_EN::MED_POLYHEDRA:
               {
                 PointerOf< med_2_3::med_int> FacesIndex( polyhedraFacesIndexSize );
                 PointerOf< med_2_3::med_int> PolyhedronIndex( tmp_numberOfCells+1 );
@@ -1184,7 +1184,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
             constituent->_type[i] = CELLMODEL_Map::retrieveCellModel( faceTypes[i] );
             constituent->_geometricTypes[i] = faceTypes[i];
 
-            if ( faceTypes[i] == MED_EN::MEDMEM_POLYGON )
+            if ( faceTypes[i] == MED_EN::MED_POLYGON )
               connSizeByType.push_back( polygonConnSize );
             else
               connSizeByType.push_back( tmpFaceCount[i] * constituent->_type[i].getNumberOfNodes());
@@ -1217,7 +1217,7 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
             else
               tmp_constituentArray.set( connSizeByType[i] );
 
-            if ( constituent->_geometricTypes[i] == MED_EN::MEDMEM_POLYGON )
+            if ( constituent->_geometricTypes[i] == MED_EN::MED_POLYGON )
             {
               PointerOf< med_2_3::med_int> PolygonsConnIndex( tmpFaceCount[i]+1 );
               int err2 = med_2_3::MEDmeshPolygonRd(_medIdt,_ptrMesh->_name.c_str(),
@@ -1483,7 +1483,7 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
     err = getCellsFamiliesNumber(MEDArrayCellFamily,MED_CELL);
     MESSAGE_MED(LOC << "error returned from getCellsFamiliesNumber for Cells " << err);
 
-    if (_ptrMesh->getNumberOfElements( MED_EN::MED_FACE, MED_EN::MEDMEM_ALL_ELEMENTS ))
+    if (_ptrMesh->getNumberOfElements( MED_EN::MED_FACE, MED_EN::MED_ALL_ELEMENTS ))
     {
       // FACE
       MEDArrayFaceFamily = new int* [_ptrMesh->getNumberOfTypes(MED_FACE)];
@@ -1495,7 +1495,7 @@ int  MED_MESH_RDONLY_DRIVER::getFAMILY()
       err = getCellsFamiliesNumber(MEDArrayFaceFamily,MED_FACE);
       MESSAGE_MED(LOC << "error returned from getCellsFamiliesNumber for Faces " << err);
     }
-    if (_ptrMesh->getNumberOfElements( MED_EN::MED_EDGE, MED_EN::MEDMEM_ALL_ELEMENTS))
+    if (_ptrMesh->getNumberOfElements( MED_EN::MED_EDGE, MED_EN::MED_ALL_ELEMENTS))
     {
       // EDGE in 3D or 2D
       MEDArrayEdgeFamily = new int* [_ptrMesh->getNumberOfTypes(MED_EDGE)];
@@ -2343,7 +2343,7 @@ int MED_MESH_WRONLY_DRIVER::writeConnectivities(medEntityMesh entity) const
 
           switch ( types[i] )
             {
-            case MED_EN::MEDMEM_POLYGON:
+            case MED_EN::MED_POLYGON:
               {
                 int nbStdCells = ptrMesh->getGlobalNumberingIndex(entity)[i]-1;
                 vector< med_2_3::med_int > connectivityArray( connectivity, connectivity + size );
@@ -2365,12 +2365,12 @@ int MED_MESH_WRONLY_DRIVER::writeConnectivities(medEntityMesh entity) const
                                                ));
                 break;
               }
-            case MED_EN::MEDMEM_POLYHEDRA:
+            case MED_EN::MED_POLYHEDRA:
               {
                 vector< med_2_3::med_int > PolyhedronIndex, PolyhedronFacesIndex, PolyhedronConnectivity;
                 PolyhedronIndex.push_back(1);
                 PolyhedronFacesIndex.push_back(1);
-                connectivity = ptrMesh->getConnectivity(MED_NODAL, entity, MEDMEM_ALL_ELEMENTS);
+                connectivity = ptrMesh->getConnectivity(MED_NODAL, entity, MED_ALL_ELEMENTS);
                 int nbStdCells = ptrMesh->getGlobalNumberingIndex(entity)[i]-1;
                 for ( int j = nbStdCells; j < nbStdCells+numberOfElements; ++j )
                   {
@@ -2487,8 +2487,8 @@ void MED_MESH_WRONLY_DRIVER::groupFamilyConverter(const vector <GROUP*>& myGroup
   std::multimap <int,int> elem2groups;
   for (int igroup=0; igroup< (int)myGroups.size(); igroup++)
   {
-    const int*Number = myGroups[igroup]->getNumber(MEDMEM_ALL_ELEMENTS);
-    for (int ielem = 0; ielem< myGroups[igroup]->getNumberOfElements(MEDMEM_ALL_ELEMENTS); ielem++)
+    const int*Number = myGroups[igroup]->getNumber(MED_ALL_ELEMENTS);
+    for (int ielem = 0; ielem< myGroups[igroup]->getNumberOfElements(MED_ALL_ELEMENTS); ielem++)
     {
       elem2groups.insert(make_pair(Number[ielem], igroup));
     }
@@ -2623,7 +2623,7 @@ void MED_MESH_WRONLY_DRIVER::groupFamilyConverter(const vector <GROUP*>& myGroup
   //adding empty families corresponding to empty groups
   for (size_t i=0; i<myGroups.size(); i++)
   {
-    if (myGroups[i]->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS)==0)
+    if (myGroups[i]->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)==0)
     {
       FAMILY* myFamily=new FAMILY(*(myGroups[i]));
       char family_name[MED_NAME_SIZE];
@@ -2674,8 +2674,8 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
     }
     for (int i=0; i<NumberOfNodesFamilies; i++) {
       int FamilyIdentifier = (*myFamilies)[i]->getIdentifier();
-      int TotalNumber = (*myFamilies)[i]->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
-      const int * Number = (*myFamilies)[i]->getNumber(MEDMEM_ALL_ELEMENTS);
+      int TotalNumber = (*myFamilies)[i]->getNumberOfElements(MED_ALL_ELEMENTS);
+      const int * Number = (*myFamilies)[i]->getNumber(MED_ALL_ELEMENTS);
       for (int j=0; j<TotalNumber; j++)
         MEDArrayNodeFamily[Number[j]-1]=FamilyIdentifier;
     }
@@ -2700,7 +2700,7 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
       const medGeometryElement  * types = _ptrMesh->getTypes(entity);
 
       // We build the array from the families list objects :
-      int NumberOfElements = _ptrMesh->getNumberOfElements(entity, MEDMEM_ALL_ELEMENTS);
+      int NumberOfElements = _ptrMesh->getNumberOfElements(entity, MED_ALL_ELEMENTS);
       int * MEDArrayFamily = new int[NumberOfElements];
       // family 0 by default
       for (int i=0; i<NumberOfElements; i++)
@@ -2714,8 +2714,8 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
       }
       for (int i=0; i<NumberOfFamilies; i++) {
         int FamilyIdentifier = (*myFamilies)[i]->getIdentifier();
-        int TotalNumber = (*myFamilies)[i]->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
-        const int * Number = (*myFamilies)[i]->getNumber(MEDMEM_ALL_ELEMENTS);
+        int TotalNumber = (*myFamilies)[i]->getNumberOfElements(MED_ALL_ELEMENTS);
+        const int * Number = (*myFamilies)[i]->getNumber(MED_ALL_ELEMENTS);
         for (int ii=0; ii<TotalNumber; ii++)
           MEDArrayFamily[Number[ii]-1]=FamilyIdentifier;
       }
@@ -2756,7 +2756,7 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
       const medGeometryElement  * types = _ptrMesh->getTypes(entity);
       SCRUTE_MED(numberOfTypes);
 
-      int numberOfElements = _ptrMesh->getNumberOfElements(entity, MEDMEM_ALL_ELEMENTS);
+      int numberOfElements = _ptrMesh->getNumberOfElements(entity, MED_ALL_ELEMENTS);
       int * familyArray = new int[numberOfElements];
       for (int i=0;i<numberOfElements;i++)
         familyArray[i]=0;
@@ -2772,8 +2772,8 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
       }
       for (int i=0;i<numberOfFamilies;i++) {
         int familyNumber = (*myFamilies)[i]->getIdentifier();
-        int numberOfFamilyElements = (*myFamilies)[i]->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
-        const int * myFamilyElements = (*myFamilies)[i]->getNumber(MEDMEM_ALL_ELEMENTS);
+        int numberOfFamilyElements = (*myFamilies)[i]->getNumberOfElements(MED_ALL_ELEMENTS);
+        const int * myFamilyElements = (*myFamilies)[i]->getNumber(MED_ALL_ELEMENTS);
         for (int ii=0;ii<numberOfFamilyElements;ii++)
           familyArray[myFamilyElements[ii]-1]=familyNumber;
       }
@@ -2828,7 +2828,7 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
       int numberOfTypes           = _ptrMesh->getNumberOfTypes (entity);
       const medGeometryElement  * types = _ptrMesh->getTypes         (entity);
 
-      int numberOfElements = _ptrMesh->getNumberOfElements(entity, MEDMEM_ALL_ELEMENTS);
+      int numberOfElements = _ptrMesh->getNumberOfElements(entity, MED_ALL_ELEMENTS);
       int * familyArray = new int[numberOfElements];
       for (int i=0;i<numberOfElements;i++)
         familyArray[i]=0;
@@ -2846,8 +2846,8 @@ int MED_MESH_WRONLY_DRIVER::writeFamilyNumbers() const {
 
       for (int i=0;i<numberOfFamilies;i++) {
         int familyNumber = (*myFamilies)[i]->getIdentifier();
-        int numberOfFamilyElements = (*myFamilies)[i]->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
-        const int * myFamilyElements = (*myFamilies)[i]->getNumber(MEDMEM_ALL_ELEMENTS);
+        int numberOfFamilyElements = (*myFamilies)[i]->getNumberOfElements(MED_ALL_ELEMENTS);
+        const int * myFamilyElements = (*myFamilies)[i]->getNumber(MED_ALL_ELEMENTS);
         for (int ii=0;ii<numberOfFamilyElements;ii++)
           familyArray[myFamilyElements[ii]-1]=familyNumber;
       }

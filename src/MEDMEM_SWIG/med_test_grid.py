@@ -227,12 +227,12 @@ if end-beg != 4:
 if ReverseConnectivity[beg] != 1:
   raise  RuntimeError, "Wrong reverse connectivity"
 
-edgfecon = mesh.getConnectivity(MED_NODAL,MED_EDGE,MEDMEM_ALL_ELEMENTS)
+edgfecon = mesh.getConnectivity(MED_NODAL,MED_EDGE,MED_ALL_ELEMENTS)
 print edgfecon
 print len(edgfecon)
 
 mesh.calculateConnectivity(MED_DESCENDING,MED_CELL)
-Connectivity = mesh.getConnectivity(MED_DESCENDING,MED_CELL,MEDMEM_ALL_ELEMENTS)
+Connectivity = mesh.getConnectivity(MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS)
 ConnectivityIndex = mesh.getConnectivityIndex(MED_DESCENDING,MED_CELL)
 n = 1
 beg = ConnectivityIndex[n-1]-1

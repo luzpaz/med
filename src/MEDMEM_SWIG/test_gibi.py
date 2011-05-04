@@ -108,8 +108,8 @@ for j in range(nbNodes):
 print ""
 print "Show the Descending Connectivity:"
 mesh.calculateConnectivity(MED_DESCENDING,MED_CELL)
-nbElemts = mesh.getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS)
-Connectivity = mesh.getConnectivity(MED_DESCENDING,MED_CELL,MEDMEM_ALL_ELEMENTS)
+nbElemts = mesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)
+Connectivity = mesh.getConnectivity(MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS)
 ConnectivityIndex = mesh.getConnectivityIndex(MED_DESCENDING,MED_CELL)
 print ""
 for j in range(nbElemts):
@@ -287,8 +287,8 @@ for j in range(nbNodes):
 print ""
 print "Show the Descending Connectivity:"
 mesh1.calculateConnectivity(MED_DESCENDING,MED_CELL)
-nbElemts = mesh1.getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS)
-Connectivity = mesh1.getConnectivity(MED_DESCENDING,MED_CELL,MEDMEM_ALL_ELEMENTS)
+nbElemts = mesh1.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)
+Connectivity = mesh1.getConnectivity(MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS)
 ConnectivityIndex = mesh1.getConnectivityIndex(MED_DESCENDING,MED_CELL)
 print ""
 for j in range(nbElemts):

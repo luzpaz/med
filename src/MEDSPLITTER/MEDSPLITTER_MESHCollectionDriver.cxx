@@ -376,7 +376,7 @@ void MESHCollectionDriver::readSubdomain(vector<int*>& cellglobal,
 
   // Reading global numbering
   //
-  int ncell=(_collection->getMesh())[idomain]->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
+  int ncell=(_collection->getMesh())[idomain]->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
   if (ncell>0)
   {
     int * array=new int[ncell];
@@ -417,7 +417,7 @@ void MESHCollectionDriver::readSubdomain(vector<int*>& cellglobal,
   MESSAGE_MED("Reading face global numbering for mesh "<<idomain);
   MED_EN::medEntityMesh entity =
     (mesh->getMeshDimension()==3)?MED_EN::MED_FACE:MED_EN::MED_EDGE;
-  int nbface=(_collection->getMesh())[idomain]->getNumberOfElements(entity,MED_EN::MEDMEM_ALL_ELEMENTS);
+  int nbface=(_collection->getMesh())[idomain]->getNumberOfElements(entity,MED_EN::MED_ALL_ELEMENTS);
   if (nbface!=0)
   {
     int* array=new int[nbface];
@@ -568,7 +568,7 @@ void MESHCollectionDriver::writeSubdomain(int idomain, int nbdomains, char* dist
 
     int nbfacetypes = 0;
     const MED_EN::medGeometryElement* facetypes = 0;
-    if ( _collection->getMesh()[idomain]->getNumberOfElements( constituent_entity, MEDMEM_ALL_ELEMENTS))
+    if ( _collection->getMesh()[idomain]->getNumberOfElements( constituent_entity, MED_ALL_ELEMENTS))
       {
         nbfacetypes = (_collection->getMesh())[idomain]->getNumberOfTypes(constituent_entity);
         if (nbfacetypes>0)

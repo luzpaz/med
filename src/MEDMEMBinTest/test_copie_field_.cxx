@@ -63,7 +63,7 @@ static void affiche_field(FIELD_ * myField, const SUPPORT * mySupport)
   cout << "- Type : " << myField->getValueType()<< endl;
   /*
     cout << "- Valeurs :"<<endl;
-    int NumberOf = mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+    int NumberOf = mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
 
     for (int i=1; i<NumberOf+1; i++) 
     {

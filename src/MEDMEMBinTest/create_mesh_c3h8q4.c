@@ -173,7 +173,7 @@ int main (int argc, char **argv)
   MEDmeshEntityFamilyNumberWr(fid,maa,MED_NO_DT,MED_NO_IT,MED_NODE,0,nnoe,nufano);
   printf("MEDnoeudsEcr : %d\n",ret);
 
-  /* ecriture des mailles MEDMEM_HEXA8 :
+  /* ecriture des mailles MED_HEXA8 :
      - connectivite
      - noms (optionnel) 
      - numeros (optionnel)
@@ -185,7 +185,7 @@ int main (int argc, char **argv)
   MEDmeshEntityFamilyNumberWr(fid,maa,MED_NO_DT,MED_NO_IT,MED_CELL,MED_HEXA8,nhexa8,nufahexa8);
   printf("MEDelementsEcr : %d \n",ret);
 
-  /* ecriture des mailles MEDMEM_QUAD4 :
+  /* ecriture des mailles MED_QUAD4 :
      - connectivite
      - noms (optionnel) 
      - numeros (optionnel)

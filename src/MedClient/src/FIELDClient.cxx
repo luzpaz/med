@@ -38,7 +38,7 @@ FIELDClient<T,INTERLACING_TAG>::FIELDClient(typename FIELDI_TRAITS<T,INTERLACING
   int nc = _fieldPtr->getNumberOfComponents();
   MEDMEM::FIELD<T,INTERLACING_TAG>::setNumberOfComponents(nc);
 
-  MEDMEM::FIELD<T,INTERLACING_TAG>::setNumberOfValues( MEDMEM::FIELD<T,INTERLACING_TAG>::_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS));
+  MEDMEM::FIELD<T,INTERLACING_TAG>::setNumberOfValues( MEDMEM::FIELD<T,INTERLACING_TAG>::_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 
   string * _s = new string[nc];
 

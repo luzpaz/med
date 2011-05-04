@@ -451,7 +451,7 @@ void MESHCollection::getNodeConnectivity(const int* cell_list,int nb_cells,MED_E
     int nb_elem = _mesh[i]->getNumberOfElements(entity,type);
     if (nb_elem>0)
     {
-      conn_ip[i]=_mesh[i]->getConnectivity(MED_EN::MED_NODAL,entity,MED_EN::MEDMEM_ALL_ELEMENTS);
+      conn_ip[i]=_mesh[i]->getConnectivity(MED_EN::MED_NODAL,entity,MED_EN::MED_ALL_ELEMENTS);
       conn_index_ip[i] = _mesh[i]->getConnectivityIndex(MED_EN::MED_NODAL,entity);
       //       global_index= _mesh[i]->getGlobalNumberingIndex(entity);
     }                                             
@@ -484,7 +484,7 @@ void MESHCollection::getNodeConnectivity(const int* cell_list,int nb_cells,MED_E
   delete[]ip;
 }
 
-/*!gets the connectivity for MEDMEM_POLYGON type
+/*!gets the connectivity for MED_POLYGON type
  *
  * \param cell_list list of elements (global cell numbers) for which the connectivity is required
  * \param nb_cells number of elements
@@ -521,10 +521,10 @@ void MESHCollection::getPolygonNodeConnectivity(const int* cell_list,int nb_cell
 
   for (int i=0; i<_topology->nbDomain();i++)
   {
-    int nb_elem = _mesh[i]->getNumberOfElements(entity,MED_EN::MEDMEM_POLYGON);
+    int nb_elem = _mesh[i]->getNumberOfElements(entity,MED_EN::MED_POLYGON);
     if (nb_elem>0)
     {
-      conn_ip[i]=_mesh[i]->getConnectivity(MED_EN::MED_NODAL,entity,MED_EN::MEDMEM_ALL_ELEMENTS);
+      conn_ip[i]=_mesh[i]->getConnectivity(MED_EN::MED_NODAL,entity,MED_EN::MED_ALL_ELEMENTS);
       conn_index_ip[i] = _mesh[i]->getConnectivityIndex(MED_EN::MED_NODAL,entity);
     }
     else
@@ -555,7 +555,7 @@ void MESHCollection::getPolygonNodeConnectivity(const int* cell_list,int nb_cell
 }
 
 
-/*!gets the connectivity for MEDMEM_POLYHEDRA type
+/*!gets the connectivity for MED_POLYHEDRA type
  *
  * \param cell_list list of elements (global cell numbers) for which the connectivity is required
  * \param nb_cells number of elements
@@ -591,11 +591,11 @@ void MESHCollection::getPolyhedraNodeConnectivity(const int* cell_list,int nb_ce
 
   for (int i=0; i<_topology->nbDomain();i++)
   {
-    nb_plain_elems[i] = _mesh[i]->getNumberOfElements(entity, MED_EN::MEDMEM_ALL_ELEMENTS);
-    int nb_elem = _mesh[i]->getNumberOfElements(entity,MED_EN::MEDMEM_POLYHEDRA);
+    nb_plain_elems[i] = _mesh[i]->getNumberOfElements(entity, MED_EN::MED_ALL_ELEMENTS);
+    int nb_elem = _mesh[i]->getNumberOfElements(entity,MED_EN::MED_POLYHEDRA);
     if (nb_elem>0)
     {
-      conn_ip[i]=_mesh[i]->getConnectivity(MED_EN::MED_NODAL,MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
+      conn_ip[i]=_mesh[i]->getConnectivity(MED_EN::MED_NODAL,MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
       conn_index_ip[i] = _mesh[i]->getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_CELL);
     }
     else
@@ -917,8 +917,8 @@ void MESHCollection::treatIndivisibleRegions(int* indivisible_tag)
         string groupname = group->getName();
         if (trim(groupname)==trim(_indivisible_regions[i]))
         {
-          int nbcells=group->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS);
-          const int* numbers=group->getNumber(MED_EN::MEDMEM_ALL_ELEMENTS);
+          int nbcells=group->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+          const int* numbers=group->getNumber(MED_EN::MED_ALL_ELEMENTS);
           int* global=new int[nbcells];
           _topology->convertCellToGlobal(idomain,numbers,nbcells,global);
           for (int icell=0; icell<nbcells; icell++)
@@ -948,7 +948,7 @@ void MESHCollection::fillGlobalConnectivity(TID2CONN & node2cell, TID2CONN & cel
     _topology->getCellList(idomain, cell_list);
 
     int nb_plain_cells = _mesh[idomain]->getNumberOfElements(MED_EN::MED_CELL,
-                                                             MED_EN::MEDMEM_ALL_ELEMENTS);
+                                                             MED_EN::MED_ALL_ELEMENTS);
     if (nb_plain_cells >0)
     {          
       const int* conn_index = _mesh[idomain]->getConnectivityIndex(MED_EN::MED_NODAL,
@@ -956,7 +956,7 @@ void MESHCollection::fillGlobalConnectivity(TID2CONN & node2cell, TID2CONN & cel
 
       const int* conn =   _mesh[idomain]->getConnectivity(MED_EN::MED_NODAL,
                                                           MED_EN::MED_CELL,
-                                                          MED_EN::MEDMEM_ALL_ELEMENTS);                                                                    
+                                                          MED_EN::MED_ALL_ELEMENTS);                                                                    
       int nbnodes = conn_index[nb_plain_cells]-1;
       int* global_nodes =new int [nbnodes];
       _topology->convertNodeToGlobal(idomain, conn, nbnodes, global_nodes);
@@ -1948,7 +1948,7 @@ void MESHCollection::castSupport(const MESHCollection& old_collection, vector<co
     if (old_support[idomain]==0) continue;
     name = support->getName();
     description=support->getDescription();
-    int nbelem = support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS);
+    int nbelem = support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
     if (nbelem==0 && !_create_empty_groups) continue;
 
     int* list_of_elems;
@@ -1959,7 +1959,7 @@ void MESHCollection::castSupport(const MESHCollection& old_collection, vector<co
         list_of_elems[i]=i+1;
     }
     else
-      list_of_elems = const_cast<int*> (support->getNumber(MED_EN::MEDMEM_ALL_ELEMENTS));
+      list_of_elems = const_cast<int*> (support->getNumber(MED_EN::MED_ALL_ELEMENTS));
 
     int* array=new int[nbelem];
     int* ip=0;
@@ -2196,17 +2196,17 @@ void MESHCollection::createNodalConnectivity(const MESHCollection& initial_colle
 
 
     if (!isDimensionOK(type,dimension)) continue;
-    if (type != MED_EN::MEDMEM_POLYGON && type != MED_EN::MEDMEM_POLYHEDRA)
+    if (type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
     { 
       int nbnode_per_type = (int)type%100;
       type_connectivity[type]=new int[type_numbers[type]*nbnode_per_type];
       initial_collection.getNodeConnectivity(type_cell_list[type],type_numbers[type],entity,type,type_connectivity[type]);
     }
-    else if (type == MED_EN::MEDMEM_POLYGON && dimension==2)
+    else if (type == MED_EN::MED_POLYGON && dimension==2)
     {
       initial_collection.getPolygonNodeConnectivity(type_cell_list[type],type_numbers[type],entity,polygon_conn,polygon_conn_index);
     }
-    else if (type == MED_EN::MEDMEM_POLYHEDRA && dimension==3)
+    else if (type == MED_EN::MED_POLYHEDRA && dimension==3)
     {
       initial_collection.getPolyhedraNodeConnectivity(type_cell_list[type],type_numbers[type],entity,polyhedron_conn,polyhedron_conn_index);
     }
@@ -2229,17 +2229,17 @@ void MESHCollection::createNodalConnectivity(const MESHCollection& initial_colle
 
     if (!isDimensionOK(type, dimension)) continue;
     if (type_numbers[type]==0) continue;
-    if (type != MED_EN::MEDMEM_POLYGON && type != MED_EN::MEDMEM_POLYHEDRA)
+    if (type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
     { 
       int nbnode_per_type = (int)type%100;
       _topology->convertToLocal2ndVersion(type_connectivity[type],type_numbers[type]*nbnode_per_type,idomain);
     }
-    else if (type == MED_EN::MEDMEM_POLYGON && dimension==2)
+    else if (type == MED_EN::MED_POLYGON && dimension==2)
     {
       int nbpoly = type_numbers[type]; 
       _topology->convertToLocal2ndVersion(&polygon_conn[0], polygon_conn_index[nbpoly]-1, idomain);  
     }
-    else if (type == MED_EN::MEDMEM_POLYHEDRA && dimension==3)
+    else if (type == MED_EN::MED_POLYHEDRA && dimension==3)
     {
       int nbpoly = type_numbers[type]; 
       _topology->convertToLocal2ndVersion(&polyhedron_conn[0], polyhedron_face_index[polyhedron_conn_index[nbpoly]-1]-1, idomain);  
@@ -2294,16 +2294,16 @@ void MESHCollection::createNodalConnectivity(const MESHCollection& initial_colle
     if (!isDimensionOK(type,dimension)) continue;
     if (type_numbers[type]==0) continue;
 
-    if (type != MED_EN::MEDMEM_POLYHEDRA && type != MED_EN::MEDMEM_POLYGON)
+    if (type != MED_EN::MED_POLYHEDRA && type != MED_EN::MED_POLYGON)
     {
       mesh_builder->setConnectivity(entity,type,type_connectivity[type]);
       delete[] type_connectivity[type];
     }
-    else if (type == MED_EN::MEDMEM_POLYGON && dimension ==2)
+    else if (type == MED_EN::MED_POLYGON && dimension ==2)
     {
       mesh_builder->setConnectivity(entity,type,&polygon_conn[0],&polygon_conn_index[0]);
     }
-    else if (type == MED_EN::MEDMEM_POLYHEDRA && dimension ==3)
+    else if (type == MED_EN::MED_POLYHEDRA && dimension ==3)
     {
       mesh_builder->setConnectivity(entity,type,&polyhedron_conn[0],&polyhedron_conn_index[0]);
     }
@@ -2332,7 +2332,7 @@ void MESHCollection::getFaces(int idomain,
 
   int nbtypes  = _mesh[idomain]->getNumberOfTypes(constituent_entity);
   const int* global_numbering= _mesh[idomain]->getGlobalNumberingIndex(constituent_entity);
-  int* conn = const_cast<int*> (_mesh[idomain]->getConnectivity(MED_EN::MED_NODAL,constituent_entity, MED_EN::MEDMEM_ALL_ELEMENTS));
+  int* conn = const_cast<int*> (_mesh[idomain]->getConnectivity(MED_EN::MED_NODAL,constituent_entity, MED_EN::MED_ALL_ELEMENTS));
   for (int itype=0; itype<nbtypes; itype++)
   {
     for (int iface=global_numbering[itype]; iface<global_numbering[itype+1]; iface++)
@@ -2366,12 +2366,12 @@ MEDSPLITTER_FaceModel* MESHCollection::getCommonFace(int ip1,int ilocal1,int ip2
   MEDMEM::CELLMODEL celltype1 (type1);
 
   const int* conn_index1 =  _mesh[ip1]->getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_CELL);
-  const int* conn1 = _mesh[ip1]->getConnectivity(MED_EN::MED_NODAL,MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
+  const int* conn1 = _mesh[ip1]->getConnectivity(MED_EN::MED_NODAL,MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
 
   // MED_EN::medGeometryElement type2 = _mesh[ip2]->getElementType(MED_EN::MED_CELL,ilocal2);
   //MEDMEM::CELLTYPE celltype2 (type2);
   const int* conn_index2 =  _mesh[ip2]->getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_CELL);
-  const int* conn2 = _mesh[ip2]->getConnectivity(MED_EN::MED_NODAL,MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
+  const int* conn2 = _mesh[ip2]->getConnectivity(MED_EN::MED_NODAL,MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
 
   vector<int> nodes1, nodes1_local;
   vector<int> nodes2;

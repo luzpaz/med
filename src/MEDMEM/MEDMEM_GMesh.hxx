@@ -234,7 +234,7 @@ FIELD<T> * GMESH::mergeFields(const std::vector< FIELD<T> * > & others, bool mes
   int retNumberOfComponents=(*iter)->getNumberOfComponents();
   FIELD<T, FullInterlace> *ret=new FIELD<T, FullInterlace>(retSup, retNumberOfComponents);
   T* valuesToSet=(T*)ret->getValue();
-  int nbOfEltsRetSup=retSup->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS);
+  int nbOfEltsRetSup=retSup->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
   T* tempValues=new T[retNumberOfComponents];
   if(retSup->isOnAllElements())
     {
@@ -252,7 +252,7 @@ FIELD<T> * GMESH::mergeFields(const std::vector< FIELD<T> * > & others, bool mes
     }
   else
     {
-      const int *eltsRetSup=retSup->getNumber(MED_EN::MEDMEM_ALL_ELEMENTS);
+      const int *eltsRetSup=retSup->getNumber(MED_EN::MED_ALL_ELEMENTS);
       for(i=0;i<nbOfEltsRetSup;i++)
         {
           bool found=false;

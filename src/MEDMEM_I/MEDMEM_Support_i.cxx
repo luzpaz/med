@@ -184,13 +184,13 @@ SALOME_MED::SUPPORT::supportInfos * SUPPORT_i::getSupportGlobal()
       int connLength = 0;
       switch ( types[i] )
       {
-      case MED_EN::MEDMEM_POLYGON: 
-      case MED_EN::MEDMEM_POLYHEDRA: 
+      case MED_EN::MED_POLYGON: 
+      case MED_EN::MED_POLYHEDRA: 
 {
         if (_support->isOnAllElements() ) 
 {
           connLength = mesh->getConnectivityLength(MED_EN::MED_NODAL,
-                                                   _support->getEntity(),MED_EN::MEDMEM_ALL_ELEMENTS);
+                                                   _support->getEntity(),MED_EN::MED_ALL_ELEMENTS);
         }
         else 
 {
@@ -361,7 +361,7 @@ CORBA::Long SUPPORT_i::getNumberOfElements(SALOME_MED::medGeometryElement geomEl
   throw (SALOME::SALOME_Exception)
 {
   SCRUTE(geomElement);
-  SCRUTE(SALOME_MED::MEDMEM_ALL_ELEMENTS);
+  SCRUTE(SALOME_MED::MED_ALL_ELEMENTS);
 
   if (_support==NULL)
     THROW_SALOME_CORBA_EXCEPTION("No associated Support", SALOME::INTERNAL_ERROR);
@@ -495,8 +495,8 @@ SALOME_TYPES::ListOfLong *  SUPPORT_i::getNumberIndex()
   SALOME_TYPES::ListOfLong_var myseq= new SALOME_TYPES::ListOfLong;
   try
   {
-    MESSAGE ("Nombre d'elements  mis de façon stupide a MEDMEM_ALL_ELEMENTS");
-    int nbelements=_support->getNumberOfElements(::MEDMEM_ALL_ELEMENTS);
+    MESSAGE ("Nombre d'elements  mis de façon stupide a MED_ALL_ELEMENTS");
+    int nbelements=_support->getNumberOfElements(::MED_ALL_ELEMENTS);
     myseq->length(nbelements);
     const int * numbers=_support->getNumberIndex();
     for (int i=0;i<nbelements;i++)
@@ -525,8 +525,8 @@ SALOME::SenderInt_ptr SUPPORT_i::getSenderForNumberIndex()
   SALOME::SenderInt_ptr ret;
   try
   {
-    MESSAGE ("Nombre d'elements  mis de façon stupide a MEDMEM_ALL_ELEMENTS");
-    int nbelements=_support->getNumberOfElements(::MEDMEM_ALL_ELEMENTS);
+    MESSAGE ("Nombre d'elements  mis de façon stupide a MED_ALL_ELEMENTS");
+    int nbelements=_support->getNumberOfElements(::MED_ALL_ELEMENTS);
     const int * numbers=_support->getNumberIndex();
     ret=SenderFactory::buildSender(*this,numbers,nbelements);
   }

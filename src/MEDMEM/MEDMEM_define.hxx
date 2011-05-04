@@ -80,27 +80,84 @@ namespace MED_EN {
 // #define MED_TAILLE_LNOM  80
 // #define MED_TAILLE_PNOM   8
 
+#ifdef MED_NONE
+#undef MED_NONE
+#endif
+#ifdef MED_POINT1
+#undef MED_POINT1
+#endif
+#ifdef MED_SEG2
+#undef MED_SEG2
+#endif
+#ifdef MED_SEG3
+#undef MED_SEG3
+#endif
+#ifdef MED_TRIA3
+#undef MED_TRIA3
+#endif
+#ifdef MED_QUAD4
+#undef MED_QUAD4
+#endif
+#ifdef MED_TRIA6
+#undef MED_TRIA6
+#endif
+#ifdef MED_QUAD8
+#undef MED_QUAD8
+#endif
+#ifdef MED_TETRA4
+#undef MED_TETRA4
+#endif
+#ifdef MED_PYRA5
+#undef MED_PYRA5
+#endif
+#ifdef MED_PENTA6
+#undef MED_PENTA6
+#endif
+#ifdef MED_HEXA8
+#undef MED_HEXA8
+#endif
+#ifdef MED_TETRA10
+#undef MED_TETRA10
+#endif
+#ifdef MED_PYRA13
+#undef MED_PYRA13
+#endif
+#ifdef MED_PENTA15
+#undef MED_PENTA15
+#endif
+#ifdef MED_HEXA20
+#undef MED_HEXA20
+#endif
+#ifdef MED_POLYGON
+#undef MED_POLYGON
+#endif
+#ifdef MED_POLYHEDRA
+#undef MED_POLYHEDRA
+#endif
+#ifdef MED_ALL_ELEMENTS
+#undef MED_ALL_ELEMENTS
+#endif
 
     typedef long medGeometryElement;
-    const medGeometryElement MEDMEM_NONE = 0;
-    const medGeometryElement MEDMEM_POINT1 = 1;
-    const medGeometryElement MEDMEM_SEG2 = 102;
-    const medGeometryElement MEDMEM_SEG3 = 103;
-    const medGeometryElement MEDMEM_TRIA3 = 203;
-    const medGeometryElement MEDMEM_QUAD4 = 204;
-    const medGeometryElement MEDMEM_TRIA6 = 206;
-    const medGeometryElement MEDMEM_QUAD8 = 208;
-    const medGeometryElement MEDMEM_TETRA4 = 304;
-    const medGeometryElement MEDMEM_PYRA5 = 305;
-    const medGeometryElement MEDMEM_PENTA6 = 306;
-    const medGeometryElement MEDMEM_HEXA8 = 308;
-    const medGeometryElement MEDMEM_TETRA10 = 310;
-    const medGeometryElement MEDMEM_PYRA13 = 313;
-    const medGeometryElement MEDMEM_PENTA15 = 315;
-    const medGeometryElement MEDMEM_HEXA20 = 320;
-    const medGeometryElement MEDMEM_POLYGON = 400;
-    const medGeometryElement MEDMEM_POLYHEDRA = 500;
-    const medGeometryElement MEDMEM_ALL_ELEMENTS = 999;
+    const medGeometryElement MED_NONE = 0;
+    const medGeometryElement MED_POINT1 = 1;
+    const medGeometryElement MED_SEG2 = 102;
+    const medGeometryElement MED_SEG3 = 103;
+    const medGeometryElement MED_TRIA3 = 203;
+    const medGeometryElement MED_QUAD4 = 204;
+    const medGeometryElement MED_TRIA6 = 206;
+    const medGeometryElement MED_QUAD8 = 208;
+    const medGeometryElement MED_TETRA4 = 304;
+    const medGeometryElement MED_PYRA5 = 305;
+    const medGeometryElement MED_PENTA6 = 306;
+    const medGeometryElement MED_HEXA8 = 308;
+    const medGeometryElement MED_TETRA10 = 310;
+    const medGeometryElement MED_PYRA13 = 313;
+    const medGeometryElement MED_PENTA15 = 315;
+    const medGeometryElement MED_HEXA20 = 320;
+    const medGeometryElement MED_POLYGON = 400;
+    const medGeometryElement MED_POLYHEDRA = 500;
+    const medGeometryElement MED_ALL_ELEMENTS = 999;
 
     typedef long medEntityMesh;
     const medEntityMesh MED_CELL = 0;

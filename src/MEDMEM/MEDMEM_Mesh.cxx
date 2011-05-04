@@ -521,7 +521,7 @@ SUPPORT * MESH::getBoundaryElements(MED_EN::medEntityMesh Entity) const throw (M
 
   const int * myConnectivityValue = getReverseConnectivity(MED_DESCENDING) ;
   const int * myConnectivityIndex = getReverseConnectivityIndex(MED_DESCENDING) ;
-  int numberOf = getNumberOfElements(entityToParse,MEDMEM_ALL_ELEMENTS) ;
+  int numberOf = getNumberOfElements(entityToParse,MED_ALL_ELEMENTS) ;
   list<int> myElementsList;
 
   for (int i=0 ; i<numberOf; i++)
@@ -611,7 +611,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support, bool isAbs
   // !!!! WARNING : use of nodal global numbering in the mesh !!!!
   const int* global_connectivity;
   nb_type = Support->getNumberOfTypes();
-  length_values = Support->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  length_values = Support->getNumberOfElements(MED_ALL_ELEMENTS);
   types = Support->getTypes();
   int index;
   FIELD<double, FullInterlace>* Volume =
@@ -640,7 +640,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support, bool isAbs
     medGeometryElement type = types[i] ;
     double xvolume;
     nb_entity_type = Support->getNumberOfElements(type);
-    if(type != MED_EN::MEDMEM_POLYHEDRA)
+    if(type != MED_EN::MED_POLYHEDRA)
     {
       if (onAll)
       {
@@ -649,7 +649,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support, bool isAbs
       else
       {
         const int * supp_number = Support->getNumber(type);
-        const int * connectivity = getConnectivity(MED_NODAL,support_entity,MEDMEM_ALL_ELEMENTS);
+        const int * connectivity = getConnectivity(MED_NODAL,support_entity,MED_ALL_ELEMENTS);
         const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
         int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
 
@@ -664,7 +664,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support, bool isAbs
 
     switch (type)
     {
-    case MEDMEM_TETRA4 : case MEDMEM_TETRA10 :
+    case MED_TETRA4 : case MED_TETRA10 :
       {
         for (int tetra=0;tetra<nb_entity_type;tetra++)
         {
@@ -681,7 +681,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support, bool isAbs
         }
         break;
       }
-    case MEDMEM_PYRA5 : case MEDMEM_PYRA13 :
+    case MED_PYRA5 : case MED_PYRA13 :
       {
         for (int pyra=0;pyra<nb_entity_type;pyra++)
         {
@@ -699,7 +699,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support, bool isAbs
         }
         break;
       }
-    case MEDMEM_PENTA6 : case MEDMEM_PENTA15 :
+    case MED_PENTA6 : case MED_PENTA15 :
       {
         for (int penta=0;penta<nb_entity_type;penta++)
         {
@@ -718,7 +718,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support, bool isAbs
         }
         break;
       }
-    case MEDMEM_HEXA8 : case MEDMEM_HEXA20 :
+    case MED_HEXA8 : case MED_HEXA20 :
       {
         for (int hexa=0;hexa<nb_entity_type;hexa++)
         {
@@ -740,7 +740,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support, bool isAbs
         }
         break;
       }
-    case MEDMEM_POLYHEDRA:
+    case MED_POLYHEDRA:
       {
         double bary[3];
         if(onAll)
@@ -780,7 +780,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support, bool isAbs
         }
         else
         {
-          const int * supp_number = Support->getNumber(MED_EN::MEDMEM_POLYHEDRA);
+          const int * supp_number = Support->getNumber(MED_EN::MED_POLYHEDRA);
           for (int polyhs=0;polyhs<nb_entity_type;polyhs++)
           {
             int lgthNodes,iPts,iFaces,iPtsInFace;
@@ -820,7 +820,7 @@ FIELD<double, FullInterlace>* MESH::getVolume(const SUPPORT *Support, bool isAbs
       break;
     }
 
-    if (!onAll && type!=MED_EN::MEDMEM_POLYHEDRA)
+    if (!onAll && type!=MED_EN::MED_POLYHEDRA)
       delete [] global_connectivity ;
   }
 
@@ -855,7 +855,7 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
   const int* global_connectivity;
 
   nb_type = Support->getNumberOfTypes();
-  length_values = Support->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  length_values = Support->getNumberOfElements(MED_ALL_ELEMENTS);
   types = Support->getTypes();
 
   int index;
@@ -888,7 +888,7 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
     medGeometryElement type = types[i] ;
     nb_entity_type = Support->getNumberOfElements(type);
     const int *global_connectivityIndex = 0;
-    if(type != MED_EN::MEDMEM_POLYGON && type != MED_EN::MEDMEM_POLYHEDRA)
+    if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
     {
       global_connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
       if (onAll)
@@ -898,7 +898,7 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
       else
       {
         const int * supp_number = Support->getNumber(type);
-        const int * connectivity = getConnectivity(MED_NODAL,support_entity,MEDMEM_ALL_ELEMENTS);
+        const int * connectivity = getConnectivity(MED_NODAL,support_entity,MED_ALL_ELEMENTS);
         int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
 
         for (int k_type = 0; k_type<nb_entity_type; k_type++) {
@@ -911,7 +911,7 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
     }
     switch (type)
     {
-    case MEDMEM_TRIA3 : case MEDMEM_TRIA6 :
+    case MED_TRIA3 : case MED_TRIA6 :
       {
         for (int tria=0;tria<nb_entity_type;tria++)
         {
@@ -928,7 +928,7 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
         }
         break;
       }
-    case MEDMEM_QUAD4 : case MEDMEM_QUAD8 :
+    case MED_QUAD4 : case MED_QUAD8 :
       {
         for (int quad=0;quad<nb_entity_type;quad++)
         {
@@ -947,12 +947,12 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
         }
         break;
       }
-    case MEDMEM_POLYGON :
+    case MED_POLYGON :
       {
         if(onAll)
         {
           int offsetWithClassicType=getGlobalNumberingIndex(support_entity)[i]-1;
-          const int * connectivity = _connectivity->getConnectivity(MED_NODAL,support_entity,MEDMEM_ALL_ELEMENTS);
+          const int * connectivity = _connectivity->getConnectivity(MED_NODAL,support_entity,MED_ALL_ELEMENTS);
           const int * connectivity_index = _connectivity->getConnectivityIndex(MED_EN::MED_NODAL,support_entity) + offsetWithClassicType;
           for (int polygs=0;polygs<nb_entity_type;polygs++)
           {
@@ -967,8 +967,8 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
         }
         else
         {
-          const int * supp_number = Support->getNumber(MED_EN::MEDMEM_POLYGON);
-          const int * connectivity = _connectivity->getConnectivity(MED_NODAL,support_entity,MEDMEM_ALL_ELEMENTS);
+          const int * supp_number = Support->getNumber(MED_EN::MED_POLYGON);
+          const int * connectivity = _connectivity->getConnectivity(MED_NODAL,support_entity,MED_ALL_ELEMENTS);
           const int * connectivity_index = _connectivity->getConnectivityIndex(MED_EN::MED_NODAL,support_entity);
           for (int polygs=0;polygs<nb_entity_type;polygs++)
           {
@@ -989,7 +989,7 @@ FIELD<double, FullInterlace>* MESH::getArea(const SUPPORT * Support) const throw
     }
 
     if (!onAll)
-      if(type != MED_EN::MEDMEM_POLYGON && type != MED_EN::MEDMEM_POLYHEDRA)
+      if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
         delete [] global_connectivity ;
   }
   return Area;
@@ -1021,7 +1021,7 @@ FIELD<double, FullInterlace>* MESH::getLength(const SUPPORT * Support) const thr
   const int* global_connectivity;
 
   nb_type = Support->getNumberOfTypes();
-  length_values = Support->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  length_values = Support->getNumberOfElements(MED_ALL_ELEMENTS);
   types = Support->getTypes();
 
   int index;
@@ -1049,7 +1049,7 @@ FIELD<double, FullInterlace>* MESH::getLength(const SUPPORT * Support) const thr
     {
       nb_entity_type = Support->getNumberOfElements(type);
       const int * supp_number = Support->getNumber(type);
-      const int * connectivity = getConnectivity(MED_NODAL,support_entity,MEDMEM_ALL_ELEMENTS);
+      const int * connectivity = getConnectivity(MED_NODAL,support_entity,MED_ALL_ELEMENTS);
       const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
       int* global_connectivity_tmp = new int[(type%100)*nb_entity_type];
 
@@ -1063,7 +1063,7 @@ FIELD<double, FullInterlace>* MESH::getLength(const SUPPORT * Support) const thr
 
     switch (type)
     {
-    case MEDMEM_SEG2 : case MEDMEM_SEG3 :
+    case MED_SEG2 : case MED_SEG3 :
       {
         for (int edge=0;edge<nb_entity_type;edge++)
         {
@@ -1134,7 +1134,7 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
   const int* global_connectivity;
 
   nb_type = Support->getNumberOfTypes();
-  length_values = Support->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  length_values = Support->getNumberOfElements(MED_ALL_ELEMENTS);
   types = Support->getTypes();
 
   int index;
@@ -1166,12 +1166,12 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
     // TRIA3 or TRIA6 or QUAD4 QUAD8 (2D) cells on a 3D mesh
     // or on SEG2 or SEG3 (1D) cells on a 2D mesh
 
-    if ( (((type==MEDMEM_TRIA3) || (type==MEDMEM_TRIA6) ||
-           (type==MEDMEM_QUAD4) || (type==MEDMEM_QUAD8) || (type==MEDMEM_POLYGON)) &&
-          (dim_space != 3)) || (((type==MEDMEM_SEG2) || (type==MEDMEM_SEG3)) &&
+    if ( (((type==MED_TRIA3) || (type==MED_TRIA6) ||
+           (type==MED_QUAD4) || (type==MED_QUAD8) || (type==MED_POLYGON)) &&
+          (dim_space != 3)) || (((type==MED_SEG2) || (type==MED_SEG3)) &&
                                 (dim_space != 2)) )
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"no compatibility between *this and SUPPORT::_mesh : dimension problem !"));
-    if(type != MED_EN::MEDMEM_POLYGON && type != MED_EN::MEDMEM_POLYHEDRA)
+    if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
     {
       if (onAll)
       {
@@ -1180,7 +1180,7 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
       else
       {
         const int * supp_number = Support->getNumber(type);
-        const int * connectivity = getConnectivity(MED_NODAL,support_entity,MEDMEM_ALL_ELEMENTS);
+        const int * connectivity = getConnectivity(MED_NODAL,support_entity,MED_ALL_ELEMENTS);
         const int * connectivityIndex = getConnectivityIndex(MED_NODAL,support_entity);
         int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
 
@@ -1196,7 +1196,7 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
 
     switch (type)
     {
-    case MEDMEM_TRIA3 : case MEDMEM_TRIA6 :
+    case MED_TRIA3 : case MED_TRIA6 :
       {
         for (int tria=0;tria<nb_entity_type;tria++)
         {
@@ -1209,7 +1209,7 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
         }
         break;
       }
-    case MEDMEM_QUAD4 : case MEDMEM_QUAD8 :
+    case MED_QUAD4 : case MED_QUAD8 :
       {
         for (int quad=0;quad<nb_entity_type;quad++)
         {
@@ -1223,7 +1223,7 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
         }
         break;
       }
-    case MEDMEM_SEG2 : case MEDMEM_SEG3 :
+    case MED_SEG2 : case MED_SEG3 :
       {
         double xnormal1, xnormal2;
         for (int edge=0;edge<nb_entity_type;edge++)
@@ -1249,12 +1249,12 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
         }
         break;
       }
-    case MEDMEM_POLYGON :
+    case MED_POLYGON :
       {
         if(onAll)
         {
           int offsetWithClassicType=getGlobalNumberingIndex(support_entity)[i]-1;
-          const int * connectivity = _connectivity->getConnectivity(MED_NODAL,support_entity,MEDMEM_ALL_ELEMENTS);
+          const int * connectivity = _connectivity->getConnectivity(MED_NODAL,support_entity,MED_ALL_ELEMENTS);
           const int * connectivity_index = _connectivity->getConnectivityIndex(MED_EN::MED_NODAL,support_entity) + offsetWithClassicType;
           for (int polygs=0;polygs<nb_entity_type;polygs++)
           {
@@ -1269,8 +1269,8 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
         }
         else
         {
-          const int * supp_number = Support->getNumber(MED_EN::MEDMEM_POLYGON);
-          const int * connectivity = _connectivity->getConnectivity(MED_NODAL,support_entity,MEDMEM_ALL_ELEMENTS);
+          const int * supp_number = Support->getNumber(MED_EN::MED_POLYGON);
+          const int * connectivity = _connectivity->getConnectivity(MED_NODAL,support_entity,MED_ALL_ELEMENTS);
           const int * connectivity_index = _connectivity->getConnectivityIndex(MED_EN::MED_NODAL,support_entity);
           for (int polygs=0;polygs<nb_entity_type;polygs++)
           {
@@ -1289,7 +1289,7 @@ FIELD<double, FullInterlace>* MESH::getNormal(const SUPPORT * Support) const thr
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad Support to get Normals on it !"));
       break;
     }
-    if (!onAll && type!=MED_EN::MEDMEM_POLYGON)
+    if (!onAll && type!=MED_EN::MED_POLYGON)
       delete [] global_connectivity ;
   }
   END_OF_MED(LOC);
@@ -1317,7 +1317,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
   const int* global_connectivity;
 
   nb_type = Support->getNumberOfTypes();
-  length_values = Support->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  length_values = Support->getNumberOfElements(MED_ALL_ELEMENTS);
   types = Support->getTypes();
 
   FIELD<double, FullInterlace>* Barycenter;
@@ -1341,7 +1341,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
   {
     medGeometryElement type = types[i] ;
     nb_entity_type = Support->getNumberOfElements(type);
-    if(type != MED_EN::MEDMEM_POLYGON && type != MED_EN::MEDMEM_POLYHEDRA )
+    if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA )
     {
       if (onAll)
       {
@@ -1350,7 +1350,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
       else
       {
         const int * supp_number = Support->getNumber(type);
-        const int * connectivity = getConnectivity(MED_NODAL,support_entity,MEDMEM_ALL_ELEMENTS);
+        const int * connectivity = getConnectivity(MED_NODAL,support_entity,MED_ALL_ELEMENTS);
         int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
 
         for (int k_type = 0; k_type<nb_entity_type; k_type++) {
@@ -1365,7 +1365,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
 
     switch (type)
     {
-    case MEDMEM_TETRA4 : case MEDMEM_TETRA10 :
+    case MED_TETRA4 : case MED_TETRA10 :
       {
         for (int tetra =0;tetra<nb_entity_type;tetra++)
         {
@@ -1385,7 +1385,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
         }
         break;
       }
-    case MEDMEM_PYRA5 : case MEDMEM_PYRA13 :
+    case MED_PYRA5 : case MED_PYRA13 :
       {
         for (int pyra=0;pyra<nb_entity_type;pyra++)
         {
@@ -1407,7 +1407,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
         }
         break;
       }
-    case MEDMEM_PENTA6 : case MEDMEM_PENTA15 :
+    case MED_PENTA6 : case MED_PENTA15 :
       {
         for (int penta=0;penta<nb_entity_type;penta++)
         {
@@ -1431,7 +1431,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
         }
         break;
       }
-    case MEDMEM_HEXA8 : case MEDMEM_HEXA20 :
+    case MED_HEXA8 : case MED_HEXA20 :
       {
         for (int hexa=0;hexa<nb_entity_type;hexa++)
         {
@@ -1459,7 +1459,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
         }
         break;
       }
-    case MEDMEM_TRIA3 : case MEDMEM_TRIA6 :
+    case MED_TRIA3 : case MED_TRIA6 :
       {
         for (int tria=0;tria<nb_entity_type;tria++)
         {
@@ -1479,7 +1479,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
         }
         break;
       }
-    case MEDMEM_QUAD4 : case MEDMEM_QUAD8 :
+    case MED_QUAD4 : case MED_QUAD8 :
       {
         for (int quad=0;quad<nb_entity_type;quad++)
         {
@@ -1501,7 +1501,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
         }
         break;
       }
-    case MEDMEM_SEG2 : case MEDMEM_SEG3 :
+    case MED_SEG2 : case MED_SEG3 :
       {
         for (int edge=0;edge<nb_entity_type;edge++)
         {
@@ -1519,12 +1519,12 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
         }
         break;
       }
-    case MEDMEM_POLYGON :
+    case MED_POLYGON :
       {
         if(onAll)
         {
           int offsetWithClassicType=getGlobalNumberingIndex(support_entity)[i]-1;
-          const int * connectivity = _connectivity->getConnectivity(MED_NODAL,support_entity,MEDMEM_ALL_ELEMENTS);
+          const int * connectivity = _connectivity->getConnectivity(MED_NODAL,support_entity,MED_ALL_ELEMENTS);
           const int * connectivity_index = _connectivity->getConnectivityIndex(MED_EN::MED_NODAL,support_entity) + offsetWithClassicType;
           for (int polygs=0;polygs<nb_entity_type;polygs++)
           {
@@ -1539,8 +1539,8 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
         }
         else
         {
-          const int * supp_number = Support->getNumber(MED_EN::MEDMEM_POLYGON);
-          const int * connectivity = _connectivity->getConnectivity(MED_NODAL,support_entity,MEDMEM_ALL_ELEMENTS);
+          const int * supp_number = Support->getNumber(MED_EN::MED_POLYGON);
+          const int * connectivity = _connectivity->getConnectivity(MED_NODAL,support_entity,MED_ALL_ELEMENTS);
           const int * connectivity_index = _connectivity->getConnectivityIndex(MED_EN::MED_NODAL,support_entity);
           for (int polygs=0;polygs<nb_entity_type;polygs++)
           {
@@ -1556,7 +1556,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
         }
         break;
       }
-    case MED_EN::MEDMEM_POLYHEDRA:
+    case MED_EN::MED_POLYHEDRA:
       {
         if(onAll)
         {
@@ -1576,7 +1576,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
         }
         else
         {
-          const int * supp_number = Support->getNumber(MED_EN::MEDMEM_POLYHEDRA);
+          const int * supp_number = Support->getNumber(MED_EN::MED_POLYHEDRA);
           for (int polyhs=0;polyhs<nb_entity_type;polyhs++)
           {
             int lgthNodes;
@@ -1598,7 +1598,7 @@ FIELD<double, FullInterlace>* MESH::getBarycenter(const SUPPORT * Support) const
     }
 
     if (!onAll)
-      if(type != MED_EN::MEDMEM_POLYGON && type != MED_EN::MEDMEM_POLYHEDRA)
+      if(type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
         delete [] global_connectivity;
   }
   return Barycenter;
@@ -1681,7 +1681,7 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
     const int* value = getReverseConnectivity(MED_DESCENDING);
     const int* index = getReverseConnectivityIndex(MED_DESCENDING);
 
-    int nbFaces = getNumberOfElements(MED_FACE,MEDMEM_ALL_ELEMENTS);
+    int nbFaces = getNumberOfElements(MED_FACE,MED_ALL_ELEMENTS);
     for (int i = 0; i < nbFaces; i++)
     {
       //a face is in skin if it is linked to one element or if one of the elements
@@ -1697,7 +1697,7 @@ SUPPORT * MESH::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
     map<int,int> FaceNbEncounterNb;
 
     int * myConnectivityValue = const_cast <int *>
-      (getConnectivity(MED_DESCENDING,MED_CELL, MEDMEM_ALL_ELEMENTS));
+      (getConnectivity(MED_DESCENDING,MED_CELL, MED_ALL_ELEMENTS));
     int * myConnectivityIndex = const_cast <int *> (getConnectivityIndex(MED_DESCENDING, MED_CELL));
     int * myCellNbs = const_cast <int *> (Support3D->getnumber()->getValue());
     int nbCells = Support3D->getnumber()->getLength();
@@ -1830,18 +1830,18 @@ void MESH::convertToPoly()
     // First step : Treating polygons connectivity
     ///////////////////////////////////////////
 
-    int oldnbface = getNumberOfElements(MED_EN::MED_FACE,MED_EN::MEDMEM_ALL_ELEMENTS);
+    int oldnbface = getNumberOfElements(MED_EN::MED_FACE,MED_EN::MED_ALL_ELEMENTS);
     int nbTypes = oldnbface > 0 ? 1 : 0;
     newpolygonconnectivity = new CONNECTIVITY(nbTypes, MED_EN::MED_FACE);
     if ( nbTypes > 0 )
     {
-      medGeometryElement type = MEDMEM_POLYGON;
+      medGeometryElement type = MED_POLYGON;
       newpolygonconnectivity->setGeometricTypes( &type, MED_FACE );
 
       const int count[] = { 1, oldnbface + 1 };
       newpolygonconnectivity->setCount( count, MED_FACE );
 
-      const int* oldconn = getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE, MED_EN::MEDMEM_ALL_ELEMENTS);
+      const int* oldconn = getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE, MED_EN::MED_ALL_ELEMENTS);
       const int* oldconnindex= getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_FACE);
       newpolygonconnectivity->setNodal( oldconn, MED_FACE, type, oldconnindex );
 
@@ -1858,15 +1858,15 @@ void MESH::convertToPoly()
 
     int nboldtypes=getNumberOfTypes(MED_EN::MED_CELL);
     const MED_EN::medGeometryElement* oldtypes = getTypes(MED_EN::MED_CELL);
-    const int* oldconn = getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL, MED_EN::MEDMEM_ALL_ELEMENTS);
+    const int* oldconn = getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
     const int* oldconnindex= getConnectivityIndex(MED_EN::MED_NODAL,MED_EN::MED_CELL);
-    int oldnbelem = getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
+    int oldnbelem = getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
 
     for (int itype=0; itype<nboldtypes; itype++)
     {
       MED_EN::medGeometryElement type = oldtypes[itype];
       int nb_elems=getNumberOfElements(MED_EN::MED_CELL,type);
-      if ( type == MEDMEM_POLYHEDRA )
+      if ( type == MED_POLYHEDRA )
       {
         const int* oldpolyindex = oldconnindex + getGlobalNumberingIndex( MED_CELL )[itype] - 1;
         int oldpolyconnsize = oldpolyindex[nb_elems] - oldpolyindex[0];
@@ -1903,7 +1903,7 @@ void MESH::convertToPoly()
     newpolyhedraconnectivity = new CONNECTIVITY(nbTypes, MED_EN::MED_CELL);
     if ( nbTypes > 0 )
     {
-      medGeometryElement type = MEDMEM_POLYHEDRA;
+      medGeometryElement type = MED_POLYHEDRA;
       newpolyhedraconnectivity->setGeometricTypes( &type, MED_CELL );
 
       const int count[] = { 1, oldnbelem + 1 };

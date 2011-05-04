@@ -116,7 +116,7 @@ void ParaMEDSPLITTERTest::testMeshFuse()
   MESHCollection collection(filename,meshname);
 
   vector<int> partition;
-  partition.reserve( collection.getMesh()[0]->getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS));
+  partition.reserve( collection.getMesh()[0]->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS));
   for ( int i = 0; i < partition.capacity()/2; ++i )
     partition.push_back( 0 );
   while ( partition.size() < partition.capacity() )
@@ -167,8 +167,8 @@ void ParaMEDSPLITTERTest::testMeshFuse()
     CPPUNIT_ASSERT( init_mesh.getNumberOfTypes(MED_CELL) == fusion.getNumberOfTypes(MED_CELL) );
     for ( int i = 0; i < init_mesh.getNumberOfTypes(MED_CELL); ++i )
       CPPUNIT_ASSERT( init_mesh.getTypes(MED_CELL)[i] == fusion.getTypes(MED_CELL)[i] );
-    CPPUNIT_ASSERT( init_mesh.getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS)
-                    == fusion.getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS) );
+    CPPUNIT_ASSERT( init_mesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)
+                    == fusion.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) );
 
 //     CPPUNIT_ASSERT( init_mesh.() == fusion.() );
 //     CPPUNIT_ASSERT( init_mesh.() == fusion.() );

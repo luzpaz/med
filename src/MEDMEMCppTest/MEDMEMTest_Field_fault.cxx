@@ -497,7 +497,7 @@ void checkField (FIELD<T, INTERLACING_TAG> * theField, const SUPPORT * theSuppor
   // values
   theField->deallocValue();
   theField->allocValue(/*NumberOfComponents = */2);
-  int nbElemSupport = theSupport->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS);
+  int nbElemSupport = theSupport->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
   CPPUNIT_ASSERT_EQUAL(nbElemSupport, theField->getNumberOfValues());
 
   //#ifdef ENABLE_FAULTS
@@ -1028,19 +1028,19 @@ static void MEDMEMTest_testField()
   const int * nbElemsInEachType = aFieldOnGroup1->getNumberOfElements();
   const MED_EN::medGeometryElement * aGeomTypes = aFieldOnGroup1->getGeometricTypes();
 
-  CPPUNIT_ASSERT_EQUAL(MED_EN::MEDMEM_TRIA3, aGeomTypes[0]);
-  CPPUNIT_ASSERT_EQUAL(MED_EN::MEDMEM_QUAD4, aGeomTypes[1]);
+  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_TRIA3, aGeomTypes[0]);
+  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_QUAD4, aGeomTypes[1]);
 
   // GAUSS
 
   // now we have no gauss localization in aFieldOnGroup1
-  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MEDMEM_TRIA3));
-  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MEDMEM_QUAD4));
-  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MEDMEM_TRIA6), MEDEXCEPTION);
+  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_TRIA3));
+  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_QUAD4));
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_TRIA6), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(), MEDEXCEPTION);
 
-  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalization(MED_EN::MEDMEM_TRIA3), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MEDMEM_TRIA3), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalization(MED_EN::MED_TRIA3), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MED_TRIA3), MEDEXCEPTION);
 
   CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNbGaussI(anElems[0]));
 
@@ -1057,21 +1057,21 @@ static void MEDMEMTest_testField()
     {
       1., 2., 3., 4., 5.
     };
-  GAUSS_LOCALIZATION<> gl1 ("GL1", MED_EN::MEDMEM_TRIA3, /*nGauss*/5, cooRef, cooGauss, wg);
+  GAUSS_LOCALIZATION<> gl1 ("GL1", MED_EN::MED_TRIA3, /*nGauss*/5, cooRef, cooGauss, wg);
 
-  aFieldOnGroup1->setGaussLocalization(MED_EN::MEDMEM_TRIA3, gl1);
+  aFieldOnGroup1->setGaussLocalization(MED_EN::MED_TRIA3, gl1);
 
-  // now we have a gauss localization for MEDMEM_TRIA3 type
-  CPPUNIT_ASSERT_EQUAL(5, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MEDMEM_TRIA3));
-  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MEDMEM_QUAD4));
-  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MEDMEM_TRIA6), MEDEXCEPTION);
+  // now we have a gauss localization for MED_TRIA3 type
+  CPPUNIT_ASSERT_EQUAL(5, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_TRIA3));
+  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_QUAD4));
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_TRIA6), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(), MEDEXCEPTION);
 
-  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalization(MED_EN::MEDMEM_QUAD4), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MEDMEM_QUAD4), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalization(MED_EN::MED_QUAD4), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MED_QUAD4), MEDEXCEPTION);
 
-  GAUSS_LOCALIZATION<> gl1Back = aFieldOnGroup1->getGaussLocalization(MED_EN::MEDMEM_TRIA3);
-  const GAUSS_LOCALIZATION<> * gl1BackPtr = aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MEDMEM_TRIA3);
+  GAUSS_LOCALIZATION<> gl1Back = aFieldOnGroup1->getGaussLocalization(MED_EN::MED_TRIA3);
+  const GAUSS_LOCALIZATION<> * gl1BackPtr = aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MED_TRIA3);
 
   CPPUNIT_ASSERT(gl1 == gl1Back);
   CPPUNIT_ASSERT(gl1 == *gl1BackPtr);

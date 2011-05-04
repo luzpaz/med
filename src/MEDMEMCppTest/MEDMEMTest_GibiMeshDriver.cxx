@@ -125,8 +125,8 @@ void MEDMEMTest::testGibiMeshDriver()
 
   //Test gibi2medGeom() and med2gibiGeom() methods
   size_t aSize = 17;
-  CPPUNIT_ASSERT_EQUAL(GIBI_MESH_DRIVER::gibi2medGeom(aSize), MEDMEM_PENTA15);
-  CPPUNIT_ASSERT_EQUAL(GIBI_MESH_DRIVER::med2gibiGeom(MEDMEM_PENTA15), 17);
+  CPPUNIT_ASSERT_EQUAL(GIBI_MESH_DRIVER::gibi2medGeom(aSize), MED_PENTA15);
+  CPPUNIT_ASSERT_EQUAL(GIBI_MESH_DRIVER::med2gibiGeom(MED_PENTA15), 17);
 
   //---------------------------Test GIBI MESH READ ONLY part--------------------------------//
   {

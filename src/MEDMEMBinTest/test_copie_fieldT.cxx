@@ -72,7 +72,7 @@ void affiche_fieldT(FIELD<double, INTERLACING_TAG> * myField,
   affiche_field_((FIELD_ *) myField, mySupport);
 
   cout << "- Valeurs :"<<endl;
-  int NumberOf = mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  int NumberOf = mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
   int NumberOfComponents = myField->getNumberOfComponents() ;
 
   if ( myField->getInterlacingType() == MED_EN::MED_FULL_INTERLACE ) {

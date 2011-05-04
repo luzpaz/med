@@ -156,8 +156,8 @@ if (nbMeshes>0):
         print ""
         print "Show the Descending Connectivity:"
         mesh.calculateConnectivity(MED_DESCENDING,MED_CELL)
-        nbElemts = mesh.getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS)
-        Connectivity = mesh.getConnectivity(MED_DESCENDING,MED_CELL,MEDMEM_ALL_ELEMENTS)
+        nbElemts = mesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)
+        Connectivity = mesh.getConnectivity(MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS)
         ConnectivityIndex = mesh.getConnectivityIndex(MED_DESCENDING,MED_CELL)
         print ""
         for j in range(nbElemts):
@@ -214,7 +214,7 @@ if (nbMeshes>0):
                             print "    * Type",type
                             print "    * Number",number[0:nbOfElmtsOfType]
                         print ""
-                        numberFamily = family.getNumber(MEDMEM_ALL_ELEMENTS)
+                        numberFamily = family.getNumber(MED_ALL_ELEMENTS)
                         print "    * Getting an Integer Field on the family ",familyName
                         fieldFamilyIntg = FIELDINT(family,spaceDim)
                         fieldFamilyIntg.setIterationNumber(0)
@@ -255,7 +255,7 @@ if (nbMeshes>0):
                             print "          Description:",compDesc
                             print "          Unit:",compUnit
 
-                        nbOf = fieldFamilyIntg.getSupport().getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+                        nbOf = fieldFamilyIntg.getSupport().getNumberOfElements(MED_ALL_ELEMENTS)
                         print "      Values:",nbOf
                         print "      Randomly set and get to check ..!"
                         for k in range(nbOf):
@@ -309,7 +309,7 @@ if (nbMeshes>0):
                             print "          Description:",compDesc
                             print "          Unit:",compUnit
 
-                        nbOf = fieldFamilyDble.getSupport().getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+                        nbOf = fieldFamilyDble.getSupport().getNumberOfElements(MED_ALL_ELEMENTS)
                         print "      Values:",nbOf
                         print "      Randomly set and get to check ..!"
                         for k in range(nbOf):
@@ -387,7 +387,7 @@ if (nbMeshes>0):
             print ""
             print "Building of the support on all Faces of the mesh."
             supportFace = SUPPORT(mesh,"Support on all faces of the mesh",MED_FACE)
-            nbFace = mesh.getNumberOfElements(MED_FACE,MEDMEM_ALL_ELEMENTS)
+            nbFace = mesh.getNumberOfElements(MED_FACE,MED_ALL_ELEMENTS)
             print ""
             print "Getting normal of each face of this support",nbFace
             nbTypeFace = mesh.getNumberOfTypes(MED_FACE)
@@ -415,7 +415,7 @@ if (nbMeshes>0):
             print ""            
             print "Building of the support on all Edges of the mesh."
             supportEdge = mesh.getSupportOnAll(MED_EDGE)
-            nbEdge = mesh.getNumberOfElements(MED_EDGE,MEDMEM_ALL_ELEMENTS)
+            nbEdge = mesh.getNumberOfElements(MED_EDGE,MED_ALL_ELEMENTS)
             print ""
             print "Getting normal of each edge of this support",nbEdge
             nbTypeEdge = mesh.getNumberOfTypes(MED_EDGE)
@@ -434,13 +434,13 @@ if (nbMeshes>0):
         print "Building support on Elements of the boundary"
         if spaceDim == 3 :
             suppBound = mesh.getBoundaryElements(MED_FACE)
-            nbElmBound = suppBound.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+            nbElmBound = suppBound.getNumberOfElements(MED_ALL_ELEMENTS)
             print "Getting normal field on the boundary",nbElmBound
             normalBound = mesh.getNormal(suppBound)
             if suppBound.isOnAllElements():
                 numberSuppBound = range(1,nbElmBound+1)
             else:
-                numberSuppBound = suppBound.getNumber(MEDMEM_ALL_ELEMENTS)
+                numberSuppBound = suppBound.getNumber(MED_ALL_ELEMENTS)
             for j in range(nbElmBound):
                 valInd = numberSuppBound[j]
                 normalBoundJ = normalBound.getRow(valInd)
@@ -451,13 +451,13 @@ if (nbMeshes>0):
                 print "    * ",normalBoundJ[:spaceDim],"norm:",norm
         elif spaceDim == 2:
             suppBound = mesh.getBoundaryElements(MED_EDGE)
-            nbElmBound = suppBound.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+            nbElmBound = suppBound.getNumberOfElements(MED_ALL_ELEMENTS)
             print "Getting normal field on the boundary",nbElmBound
             normalBound = mesh.getNormal(suppBound)
             if suppBound.isOnAllElements():
                 numberSuppBound = range(1,nbElmBound+1)
             else:
-                numberSuppBound = suppBound.getNumber(MEDMEM_ALL_ELEMENTS)
+                numberSuppBound = suppBound.getNumber(MED_ALL_ELEMENTS)
             for j in range(nbElmBound):
                 valInd = numberSuppBound[j]
                 normalBoundJ = normalBound.getRow(valInd)
@@ -502,7 +502,7 @@ if (nbFields>0):
                     print "          Unit:",compUnit
 
                 support = fieldint.getSupport()
-                nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+                nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
                     valueI = fieldint.getRow(k+1)
@@ -531,7 +531,7 @@ if (nbFields>0):
                     print "          Unit:",compUnit
 
                 support = fielddouble.getSupport()
-                nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+                nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
                     valueI = fielddouble.getRow(k+1)

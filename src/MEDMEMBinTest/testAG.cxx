@@ -40,7 +40,7 @@ void addMedFacesGroup( MESHING& meshing, int nFaces, int *groupValue,string grou
     faces.setMesh(&meshing) ;
     faces.setEntity(MED_EN::MED_FACE) ;
     faces.setNumberOfGeometricType(1) ;
-    mytypes[0]=MED_EN::MEDMEM_POLYGON;
+    mytypes[0]=MED_EN::MED_POLYGON;
     faces.setGeometricType(mytypes);
     myNumberOfElements[0]=nFaces;
     faces.setNumberOfElements(myNumberOfElements) ;
@@ -71,8 +71,8 @@ int main()
   string coordunit[3] = { "cm", "cm", "cm" } ;
   pmesh->setCoordinatesUnits(coordunit) ;
 
-  medGeometryElement mytypes3D[1]={MEDMEM_POLYHEDRA};
-  medGeometryElement mytypes2D[2]={MEDMEM_QUAD4,MEDMEM_POLYGON};
+  medGeometryElement mytypes3D[1]={MED_POLYHEDRA};
+  medGeometryElement mytypes2D[2]={MED_QUAD4,MED_POLYGON};
   pmesh->setNumberOfTypes(1, MED_EN::MED_CELL);
   pmesh->setNumberOfTypes(2,MED_EN::MED_FACE);
   pmesh->setTypes(mytypes3D,MED_EN::MED_CELL);
@@ -101,9 +101,9 @@ int main()
   pmesh->setNumberOfElements(nbOfElemsFace,MED_EN::MED_FACE);
   //
   //
-  pmesh->setConnectivity(MED_EN::MED_CELL, MED_EN::MEDMEM_POLYHEDRA, polyHFaceConn,polyHInd);
-  pmesh->setConnectivity(MED_EN::MED_FACE, MED_EN::MEDMEM_QUAD4,&conn2DClassical[0]);
-  pmesh->setConnectivity(MED_EN::MED_FACE, MED_EN::MEDMEM_POLYGON,&conn2DPolyInd[0],conn2DPolyIndTab);
+  pmesh->setConnectivity(MED_EN::MED_CELL, MED_EN::MED_POLYHEDRA, polyHFaceConn,polyHInd);
+  pmesh->setConnectivity(MED_EN::MED_FACE, MED_EN::MED_QUAD4,&conn2DClassical[0]);
+  pmesh->setConnectivity(MED_EN::MED_FACE, MED_EN::MED_POLYGON,&conn2DPolyInd[0],conn2DPolyIndTab);
   int bottom=7;
   addMedFacesGroup(*pmesh,1,&bottom,NomBottom);
   int id = pmesh->addDriver(MED_DRIVER, "coeur.med", pmesh->getName());
@@ -120,8 +120,8 @@ int main()
   delete drv;
   mesh.read(newDrv);
   cout << " *** " << mesh.getNumberOfTypes(MED_EN::MED_FACE) << endl;
-  cout << "Expected 8 - having " << mesh.getNumberOfElements(MED_FACE,MEDMEM_ALL_ELEMENTS) << endl;
-  cout << "Expected 6 - having " << mesh.getNumberOfElements(MED_FACE,MEDMEM_QUAD4) << endl;
-  cout << "Expected 1 - having " << mesh.getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS) << endl;
+  cout << "Expected 8 - having " << mesh.getNumberOfElements(MED_FACE,MED_ALL_ELEMENTS) << endl;
+  cout << "Expected 6 - having " << mesh.getNumberOfElements(MED_FACE,MED_QUAD4) << endl;
+  cout << "Expected 1 - having " << mesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) << endl;
   return 0;
 }

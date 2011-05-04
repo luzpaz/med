@@ -223,13 +223,13 @@ namespace { // local tools
       _tolerance      = getTolerance(&mesh);
       _dim            = mesh.getSpaceDimension();
       _coord          = mesh.getCoordinates(MED_FULL_INTERLACE);
-      _cellConn       = mesh.getConnectivity( MED_NODAL, MED_CELL, MEDMEM_ALL_ELEMENTS);
+      _cellConn       = mesh.getConnectivity( MED_NODAL, MED_CELL, MED_ALL_ELEMENTS);
       _cellConnIndex  = mesh.getConnectivityIndex(MED_NODAL, MED_CELL);
-      _cell2Face      = mesh.getConnectivity( MED_DESCENDING, MED_CELL, MEDMEM_ALL_ELEMENTS);
+      _cell2Face      = mesh.getConnectivity( MED_DESCENDING, MED_CELL, MED_ALL_ELEMENTS);
       _cell2FaceIndex = mesh.getConnectivityIndex( MED_DESCENDING, MED_CELL );
       _face2Cell      = mesh.getReverseConnectivity( MED_DESCENDING );
       _face2CellIndex = mesh.getReverseConnectivityIndex( MED_DESCENDING );
-      _faceConn       = mesh.getConnectivity( MED_NODAL, MED_FACE, MEDMEM_ALL_ELEMENTS);
+      _faceConn       = mesh.getConnectivity( MED_NODAL, MED_FACE, MED_ALL_ELEMENTS);
       _faceConnIndex  = mesh.getConnectivityIndex(MED_NODAL, MED_FACE);
       _node2Cell      = mesh.getReverseConnectivity( MED_NODAL );
       _node2CellIndex = mesh.getReverseConnectivityIndex( MED_NODAL );
@@ -341,7 +341,7 @@ Extractor::Extractor(const FIELD<double>& inputField) throw (MEDEXCEPTION)
   if ( entity == MED_NODE || entity == MED_EDGE )
     throw MEDEXCEPTION(STRING(LOC) << "InputField has invalid supporting entity");
 
-  if ( inputField.getSupport()->getNumberOfElements(MEDMEM_ALL_ELEMENTS) == 0 )
+  if ( inputField.getSupport()->getNumberOfElements(MED_ALL_ELEMENTS) == 0 )
     throw MEDEXCEPTION(STRING(LOC) << "InputField has support of zero size");
 
   if ( inputField.getGaussPresence() && inputField.getNumberOfGaussPoints()[0] > 1 )
@@ -354,8 +354,8 @@ Extractor::Extractor(const FIELD<double>& inputField) throw (MEDEXCEPTION)
   if ( mesh->getSpaceDimension() < 2 )
       throw MEDEXCEPTION(STRING(LOC) << "InputField with 1D support not acceptable");
 
-  if ( mesh->getNumberOfElements(MED_CELL, MEDMEM_POLYGON) > 0 ||
-       mesh->getNumberOfElements(MED_CELL, MEDMEM_POLYHEDRA) > 0 )
+  if ( mesh->getNumberOfElements(MED_CELL, MED_POLYGON) > 0 ||
+       mesh->getNumberOfElements(MED_CELL, MED_POLYHEDRA) > 0 )
       throw MEDEXCEPTION(STRING(LOC) << "InputField has supporting mesh with poly elements");
 
   if ( mesh->getMeshDimension() < 2 )
@@ -533,7 +533,7 @@ MESH* Extractor::divideEdges(const double*       coords,
   const MESH* inMesh                = _myInputMesh;//support->getMesh();
   const medGeometryElement* inTypes = support->getTypes();
 
-  const int* inConn      = inMesh->getConnectivity( MED_NODAL, entity, MEDMEM_ALL_ELEMENTS);
+  const int* inConn      = inMesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
   const int* inConnIndex = inMesh->getConnectivityIndex(MED_NODAL, entity);
   const int spaceDim     = inMesh->getSpaceDimension();
   const int meshDim      = inTypes[ support->getNumberOfTypes()-1 ] / 100;
@@ -541,13 +541,13 @@ MESH* Extractor::divideEdges(const double*       coords,
 
   // connectivity of new cells by nb of nodes per cell
   map< int, vector< int > > newConnByNbNodes;
-  int nbInputCells = support->getNumberOfElements( MEDMEM_ALL_ELEMENTS );
+  int nbInputCells = support->getNumberOfElements( MED_ALL_ELEMENTS );
   int minNbNodesPerCell = 2, maxNbNodesPerCell = 2;
   if ( meshDim == 3 ) {
     newConnByNbNodes[ 3 ].reserve( nbInputCells/2 );
     newConnByNbNodes[ 4 ].reserve( nbInputCells/2 );
     minNbNodesPerCell = 3;
-    maxNbNodesPerCell = int (MEDMEM_POLYGON); // polygones allowed
+    maxNbNodesPerCell = int (MED_POLYGON); // polygones allowed
   }
   else {
     newConnByNbNodes[ 2 ].reserve( nbInputCells/2 );
@@ -730,7 +730,7 @@ MESH* Extractor::divideEdges(const double*       coords,
     else
     {
       nbCellByType.push_back( nbNodesPerPolygon.size() );
-      types.push_back( MEDMEM_POLYGON );
+      types.push_back( MED_POLYGON );
     }
   }
   if ( types.empty() )
@@ -745,7 +745,7 @@ MESH* Extractor::divideEdges(const double*       coords,
   meshing->setTypes( &types[0], MED_CELL );
   meshing->setNumberOfElements( &nbCellByType[0], MED_CELL);
   for ( unsigned i = 0; i < types.size(); ++i )
-    if ( types[i] != MEDMEM_POLYGON )
+    if ( types[i] != MED_POLYGON )
     {
       meshing->setConnectivity( MED_CELL, types[i], & newConnByNbNodes[ types[i]%100 ].front());
     }
@@ -928,7 +928,7 @@ MESH* Extractor::transfixFaces( const double*       coords,
   TMeshData inMeshData( *inMesh );
   TLine line( direction, coords );
 
-  const int nbFaces = inMesh->getNumberOfElements( MED_FACE, MEDMEM_ALL_ELEMENTS );
+  const int nbFaces = inMesh->getNumberOfElements( MED_FACE, MED_ALL_ELEMENTS );
   const int dim = 3;
 
   // Intersect 1st domain
@@ -1021,9 +1021,9 @@ MESH* Extractor::transfixFaces( const double*       coords,
   meshing->setNumberOfTypes( 1, MED_CELL );
   meshing->setCoordinates( dim, nbNodes, &resCoords[0],
                            inMesh->getCoordinatesSystem(), MED_FULL_INTERLACE );
-  meshing->setTypes( &MEDMEM_SEG2, MED_CELL );
+  meshing->setTypes( &MED_SEG2, MED_CELL );
   meshing->setNumberOfElements( &nbSegments, MED_CELL);
-  meshing->setConnectivity( MED_CELL, MEDMEM_SEG2, & resConn[0]);
+  meshing->setConnectivity( MED_CELL, MED_SEG2, & resConn[0]);
 
   return meshing;
 }
@@ -1040,18 +1040,18 @@ public:
 
 MapGeoEdge::MapGeoEdge()
 {
-  std::vector<TEdge> *edges=(*this)[MEDMEM_TRIA3]=(*this)[MEDMEM_TRIA6]=new vector<TEdge>();
+  std::vector<TEdge> *edges=(*this)[MED_TRIA3]=(*this)[MED_TRIA6]=new vector<TEdge>();
   edges->reserve( 3 );
   edges->push_back( TEdge( 0, 1 ));
   edges->push_back( TEdge( 1, 2 ));
   edges->push_back( TEdge( 2, 0 ));
-  edges=(*this)[MEDMEM_QUAD4]=(*this)[MEDMEM_QUAD8]=new vector<TEdge>();
+  edges=(*this)[MED_QUAD4]=(*this)[MED_QUAD8]=new vector<TEdge>();
   edges->reserve( 4 );
   edges->push_back( TEdge( 0, 1 ));
   edges->push_back( TEdge( 1, 2 ));
   edges->push_back( TEdge( 2, 3 ));
   edges->push_back( TEdge( 3, 0 ));
-  edges=(*this)[MEDMEM_TETRA4]=(*this)[MEDMEM_TETRA10]=new vector<TEdge>();
+  edges=(*this)[MED_TETRA4]=(*this)[MED_TETRA10]=new vector<TEdge>();
   edges->reserve( 6 );
   edges->push_back( TEdge( 0, 1 ));
   edges->push_back( TEdge( 1, 2 ));
@@ -1059,7 +1059,7 @@ MapGeoEdge::MapGeoEdge()
   edges->push_back( TEdge( 0, 3 ));
   edges->push_back( TEdge( 1, 3 ));
   edges->push_back( TEdge( 2, 3 ));
-  edges=(*this)[MEDMEM_HEXA8]=(*this)[MEDMEM_HEXA20]=new vector<TEdge>();
+  edges=(*this)[MED_HEXA8]=(*this)[MED_HEXA20]=new vector<TEdge>();
   edges->reserve( 12 );
   edges->push_back( TEdge( 0, 1 ));
   edges->push_back( TEdge( 1, 2 ));
@@ -1073,7 +1073,7 @@ MapGeoEdge::MapGeoEdge()
   edges->push_back( TEdge( 1, 5 ));
   edges->push_back( TEdge( 2, 6 ));
   edges->push_back( TEdge( 3, 7 ));
-  edges=(*this)[MEDMEM_PYRA5]=(*this)[MEDMEM_PYRA13]=new vector<TEdge>();
+  edges=(*this)[MED_PYRA5]=(*this)[MED_PYRA13]=new vector<TEdge>();
   edges->reserve( 8 );
   edges->push_back( TEdge( 0, 1 ));
   edges->push_back( TEdge( 1, 2 ));
@@ -1083,7 +1083,7 @@ MapGeoEdge::MapGeoEdge()
   edges->push_back( TEdge( 1, 4 ));
   edges->push_back( TEdge( 2, 4 ));
   edges->push_back( TEdge( 3, 4 ));
-  edges=(*this)[MEDMEM_PENTA6]=(*this)[MEDMEM_PENTA15]=new vector<TEdge>();
+  edges=(*this)[MED_PENTA6]=(*this)[MED_PENTA15]=new vector<TEdge>();
   edges->reserve( 9 );
   edges->push_back( TEdge( 0, 1 ));
   edges->push_back( TEdge( 1, 2 ));
@@ -1094,23 +1094,23 @@ MapGeoEdge::MapGeoEdge()
   edges->push_back( TEdge( 0, 4 ));
   edges->push_back( TEdge( 1, 5 ));
   edges->push_back( TEdge( 2, 3 ));
-  (*this)[MEDMEM_NONE]         = 0;
-  (*this)[MEDMEM_POINT1]       = 0;
-  (*this)[MEDMEM_SEG2]         = 0;
-  (*this)[MEDMEM_SEG3]         = 0;
-  (*this)[MEDMEM_POLYGON]      = 0;
-  (*this)[MEDMEM_POLYHEDRA]    = 0;
-  (*this)[MEDMEM_ALL_ELEMENTS] = 0;
+  (*this)[MED_NONE]         = 0;
+  (*this)[MED_POINT1]       = 0;
+  (*this)[MED_SEG2]         = 0;
+  (*this)[MED_SEG3]         = 0;
+  (*this)[MED_POLYGON]      = 0;
+  (*this)[MED_POLYHEDRA]    = 0;
+  (*this)[MED_ALL_ELEMENTS] = 0;
 }
 
 MapGeoEdge::~MapGeoEdge()
 {
-  delete (*this)[MEDMEM_TRIA6];
-  delete (*this)[MEDMEM_QUAD8];
-  delete (*this)[MEDMEM_TETRA10];
-  delete (*this)[MEDMEM_HEXA20];
-  delete (*this)[MEDMEM_PYRA13];
-  delete (*this)[MEDMEM_PENTA15];
+  delete (*this)[MED_TRIA6];
+  delete (*this)[MED_QUAD8];
+  delete (*this)[MED_TETRA10];
+  delete (*this)[MED_HEXA20];
+  delete (*this)[MED_PYRA13];
+  delete (*this)[MED_PENTA15];
 }
 
 //================================================================================

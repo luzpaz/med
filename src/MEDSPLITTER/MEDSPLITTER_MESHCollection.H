@@ -181,7 +181,7 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
     //retrieves the group igroup on domain idomain
 
     const MEDMEM::SUPPORT* support = old_supports[idomain];
-    int nbelem = support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS);
+    int nbelem = support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
     if (nbelem==0) continue;
     int* list_of_elems=0;
 
@@ -192,7 +192,7 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
         list_of_elems[i]=i+1;
     }
     else
-      list_of_elems = const_cast<int*> (support->getNumber(MED_EN::MEDMEM_ALL_ELEMENTS));
+      list_of_elems = const_cast<int*> (support->getNumber(MED_EN::MED_ALL_ELEMENTS));
 
     int* array=new int[nbelem];
     int* ip;

@@ -248,9 +248,9 @@ for i in range(nbOfMeshes):
             type = types[k]
             nbElemType = meshLocalCopy.getNumberOfElements(MED_CELL,type)
             print "     For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
-            connectivity = meshLocalCopy.getConnectivity(MED_NODAL,MED_CELL,MEDMEM_ALL_ELEMENTS)
+            connectivity = meshLocalCopy.getConnectivity(MED_NODAL,MED_CELL,MED_ALL_ELEMENTS)
             index = meshLocalCopy.getConnectivityIndex(MED_NODAL,MED_CELL)
-            if type == MEDMEM_POLYHEDRA:
+            if type == MED_POLYHEDRA:
                 pass
             else:
                 nbNodesPerCell = type%100
@@ -310,7 +310,7 @@ for i in range(nbOfFields):
                 print "     Order Number",orderNb
                 print "     Time",time
                 support = fieldTyped.getSupport()
-                nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+                nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
                     valueI = fieldTyped.getRow(k+1)

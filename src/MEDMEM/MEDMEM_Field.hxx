@@ -185,7 +185,7 @@ double cooRef[6] ={0.0, 0.0, 1.0, 0.0, 0.0, 1.0};
 double cooGauss[6]={0.2, 0.2, 0.8, 0.1, 0.1, 0.8};
 double wg[3]={0.3334, 0.3334, 0.3334};
 GAUSS_LOCALIZATION model(locname, 
-                         MED_EN::MEDMEM_TRIA3,  
+                         MED_EN::MED_TRIA3,  
                          3,
                          cooRef,
                          cooGauss,
@@ -1103,7 +1103,7 @@ it will be 3 for a (vx,vy,vz) vector.
 
 \code
 FIELD<double> field (support, 3);
-int nbelem = support->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+int nbelem = support->getNumberOfElements(MED_ALL_ELEMENTS);
 for (int i=1; i<=nbelem; i++)
    for (j=1; j<=3;j++)
        field->setValueIJ(i,j,0.0);
@@ -1129,7 +1129,7 @@ FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
   try
     {
       // becarefull about the numbre of gauss point
-      _numberOfValues = Support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS);
+      _numberOfValues = Support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
     }
 #if defined(_DEBUG_) || defined(_DEBUG)
   catch (MEDEXCEPTION &ex)
@@ -2073,7 +2073,7 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildGradient() const th
   case MED_EDGE:
     {
       // read connectivity array to have the list of nodes contained by an element
-      C = getSupport()->getMesh()->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,typ,MEDMEM_ALL_ELEMENTS);
+      C = getSupport()->getMesh()->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,typ,MED_ALL_ELEMENTS);
       iC = getSupport()->getMesh()->getConnectivityIndex(MED_NODAL,typ);
       // calculate reverse connectivity to have the list of elements which contains node i
       revC = getSupport()->getMesh()->getReverseConnectivity(MED_NODAL,typ);
@@ -2081,7 +2081,7 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildGradient() const th
       // coordinates of each node
       coord = getSupport()->getMesh()->getCoordinates(MED_FULL_INTERLACE);
       // number of elements
-      NumberOf = getSupport()->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+      NumberOf = getSupport()->getNumberOfElements(MED_ALL_ELEMENTS);
       // barycenter field of elements
       FIELD<double, FullInterlace>* barycenter = getSupport()->getMesh()->getBarycenter(getSupport());
 
@@ -2132,7 +2132,7 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildGradient() const th
     break;
   case MED_NODE:
     // read connectivity array to have the list of nodes contained by an element
-    C = getSupport()->getMesh()->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MEDMEM_ALL_ELEMENTS);
+    C = getSupport()->getMesh()->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
     iC = getSupport()->getMesh()->getConnectivityIndex(MED_NODAL,MED_CELL);
     // calculate reverse connectivity to have the list of elements which contains node i
     revC=getSupport()->getMesh()->getReverseConnectivity(MED_NODAL,MED_CELL);
@@ -2141,7 +2141,7 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildGradient() const th
     coord = getSupport()->getMesh()->getCoordinates(MED_FULL_INTERLACE);
 
     // calculate gradient for each node
-    NumberOf = getSupport()->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+    NumberOf = getSupport()->getNumberOfElements(MED_ALL_ELEMENTS);
     for (int i=1; i<NumberOf+1; i++){
       // listNodes contains nodes neigbor of node i 
       set <int> listNodes;
@@ -2221,7 +2221,7 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildNorm2Field() const 
   Norm2Field->setTime(getTime());
 
   // calculate nom2 for each element
-  int NumberOf = getSupport()->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  int NumberOf = getSupport()->getNumberOfElements(MED_ALL_ELEMENTS);
   for (int i=1; i<NumberOf+1; i++){
     double norm2 = 0.;
     for(int j=1;j<=getNumberOfComponents();j++)
@@ -2382,8 +2382,8 @@ double FIELD<T, INTERLACING_TAG>::normL2(int component,
       // there is no need in optimizing iterations from supporting nodes-> back to cells,
       // so we iterate just on all cells
       const MESH * mesh = getSupport()->getMesh()->convertInMESH();
-      const int nbCells = mesh->getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS);
-      const int *C = mesh->getConnectivity(MED_NODAL,MED_CELL,MEDMEM_ALL_ELEMENTS);
+      const int nbCells = mesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
+      const int *C = mesh->getConnectivity(MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
       const int *iC = mesh->getConnectivityIndex(MED_NODAL,MED_CELL);
       for (int i = 0; i < nbCells; ++i, ++vol) {
         // calculate integral on current element as average summ of values on all it's nodes
@@ -2466,8 +2466,8 @@ double FIELD<T, INTERLACING_TAG>::normL2(const FIELD<double, FullInterlace> * p_
       // there is no need in optimizing iterations from supporting nodes-> back to cells,
       // so we iterate just on all cells
       const MESH * mesh = getSupport()->getMesh()->convertInMESH();
-      const int nbCells = mesh->getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS);
-      const int *C = mesh->getConnectivity(MED_NODAL,MED_CELL,MEDMEM_ALL_ELEMENTS);
+      const int nbCells = mesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
+      const int *C = mesh->getConnectivity(MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
       const int *iC = mesh->getConnectivityIndex(MED_NODAL,MED_CELL);
       int nbComp = getNumberOfComponents();
       for (int i = 0; i < nbCells; ++i, ++vol) {
@@ -2667,11 +2667,11 @@ double FIELD<T, INTERLACING_TAG>::integral(const SUPPORT *subSupport) const thro
     throw MEDEXCEPTION(STRING(LOC)<<"Integral of nodal field not yet supported");
 
   // analyze support
-  const int nbElems = subSupport->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS);
+  const int nbElems = subSupport->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
   const bool subOnAll = ( subSupport->isOnAllElements() );
   const bool  myOnAll = ( _support->isOnAllElements() );
-  const int* subNums = !subOnAll ? subSupport->getNumber(MED_EN::MEDMEM_ALL_ELEMENTS) : 0;
-  const int*   myNums = !myOnAll ? _support->getNumber(MED_EN::MEDMEM_ALL_ELEMENTS) : 0;
+  const int* subNums = !subOnAll ? subSupport->getNumber(MED_EN::MED_ALL_ELEMENTS) : 0;
+  const int*   myNums = !myOnAll ? _support->getNumber(MED_EN::MED_ALL_ELEMENTS) : 0;
   if ( !subOnAll && !subNums )
     throw MEDEXCEPTION(STRING(LOC)<<"Invalid support: no element numbers");
   if ( !myOnAll && !myNums )
@@ -2815,8 +2815,8 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::extract(const SUPPORT *sub
 
   T* valuesToSet=(T*)ret->getValue();
 
-  int nbOfEltsSub=subSupport->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS);
-  const int *eltsSub=subSupport->getNumber(MED_EN::MEDMEM_ALL_ELEMENTS);
+  int nbOfEltsSub=subSupport->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+  const int *eltsSub=subSupport->getNumber(MED_EN::MED_ALL_ELEMENTS);
   T* tempVals=new T[_numberOfComponents];
   for(int i=0;i<nbOfEltsSub;i++)
     {
@@ -2997,7 +2997,7 @@ void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents)
   delete _value;
   try {
     // becarefull about the number of gauss point
-    _numberOfValues = _support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS);
+    _numberOfValues = _support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
     MESSAGE_MED(PREFIX_MED <<" : "<<_numberOfValues <<" et "<< NumberOfComponents);
 
     //EF : A modifier lors de l'intégration de la classe de localisation des points de gauss
@@ -3439,7 +3439,7 @@ bool FIELD<T, INTERLACING_TAG>::getValueOnElement(int eltIdInSup,T* retValues)
     return false;
   if(_support->isOnAllElements())
     {
-      int nbOfEltsThis=_support->getMesh()->getNumberOfElements(_support->getEntity(),MED_EN::MEDMEM_ALL_ELEMENTS);
+      int nbOfEltsThis=_support->getMesh()->getNumberOfElements(_support->getEntity(),MED_EN::MED_ALL_ELEMENTS);
       if(eltIdInSup>nbOfEltsThis)
         return false;
       const T* valsThis=getValue();
@@ -3449,8 +3449,8 @@ bool FIELD<T, INTERLACING_TAG>::getValueOnElement(int eltIdInSup,T* retValues)
     }
   else
     {
-      int nbOfEltsThis=_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS);
-      const int *eltsThis=_support->getNumber(MED_EN::MEDMEM_ALL_ELEMENTS);
+      int nbOfEltsThis=_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+      const int *eltsThis=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
       int iThis;
       bool found=false;
       for(iThis=0;iThis<nbOfEltsThis && !found;)
@@ -3595,7 +3595,7 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACING_TAG>::getGaussPointsCoordinat
   locMap::const_iterator it;
 
   int nb_type                     = getSupport()->getNumberOfTypes();
-  int length_values               = getSupport()->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  int length_values               = getSupport()->getNumberOfElements(MED_ALL_ELEMENTS);
   const medGeometryElement* types = getSupport()->getTypes();
   medEntityMesh support_entity    = getSupport()->getEntity();
   bool isOnAll                    = getSupport()->isOnAllElements();
@@ -3614,7 +3614,7 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACING_TAG>::getGaussPointsCoordinat
   for ( int iType = 0 ; iType < nb_type ; iType++ ) {
 
     medGeometryElement elem_type = types[iType] ;
-    if(elem_type == MED_EN::MEDMEM_POLYGON && elem_type == MED_EN::MEDMEM_POLYHEDRA ) 
+    if(elem_type == MED_EN::MED_POLYGON && elem_type == MED_EN::MED_POLYHEDRA ) 
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad cell type : "<<MED_EN::geoNames[elem_type]<<" !!! "));
 
     it = _gaussModel.find(elem_type);
@@ -3643,8 +3643,8 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACING_TAG>::getGaussPointsCoordinat
       
     INTERP_KERNEL::NormalizedCellType normType;
     switch(elem_type) {
-    case MED_EN::MEDMEM_SEG2 : normType = INTERP_KERNEL::NORM_SEG2;break;
-    case MED_EN::MEDMEM_SEG3 : normType = INTERP_KERNEL::NORM_SEG3;break;
+    case MED_EN::MED_SEG2 : normType = INTERP_KERNEL::NORM_SEG2;break;
+    case MED_EN::MED_SEG3 : normType = INTERP_KERNEL::NORM_SEG3;break;
     default : normType = (INTERP_KERNEL::NormalizedCellType) ((((unsigned long)elem_type/100-2)*10) + ((unsigned long)elem_type%100));
       break;
     }
@@ -3706,8 +3706,8 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACING_TAG>::getGaussPointsCoordinat
     medGeometryElement type = types[i] ;
     INTERP_KERNEL::NormalizedCellType normType;
     switch(type) {
-    case MED_EN::MEDMEM_SEG2 : normType = INTERP_KERNEL::NORM_SEG2;break;
-    case MED_EN::MEDMEM_SEG3 : normType = INTERP_KERNEL::NORM_SEG3;break;
+    case MED_EN::MED_SEG2 : normType = INTERP_KERNEL::NORM_SEG2;break;
+    case MED_EN::MED_SEG3 : normType = INTERP_KERNEL::NORM_SEG3;break;
     default : normType = (INTERP_KERNEL::NormalizedCellType) ((((unsigned long)type/100-2)*10) + ((unsigned long)type%100));
       break;
     }
@@ -3723,7 +3723,7 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACING_TAG>::getGaussPointsCoordinat
     }
     else {
       const int * supp_number = getSupport()->getNumber(type);
-      const int * connectivity = mesh->getConnectivity(MED_NODAL,support_entity,MEDMEM_ALL_ELEMENTS);
+      const int * connectivity = mesh->getConnectivity(MED_NODAL,support_entity,MED_ALL_ELEMENTS);
       const int * connectivityIndex = mesh->getConnectivityIndex(MED_NODAL,support_entity);
       int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
       
@@ -3761,7 +3761,7 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACING_TAG>::getGaussPointsCoordinat
       delete [] Ni;
       index++;
     }
-    if (!isOnAll && type != MED_EN::MEDMEM_POLYHEDRA && type != MED_EN::MEDMEM_POLYGON) {
+    if (!isOnAll && type != MED_EN::MED_POLYHEDRA && type != MED_EN::MED_POLYGON) {
       delete [] global_connectivity ;
     }
   }
@@ -4419,7 +4419,7 @@ void FIELD<T, INTERLACING_TAG>::fillFromAnalytic(myFuncType f) throw (MEDEXCEPTI
       else
         {
           coord = unstructured->getCoordinates(MED_EN::MED_FULL_INTERLACE);
-          const int * nodesNumber=_support->getNumber(MED_EN::MEDMEM_ALL_ELEMENTS);
+          const int * nodesNumber=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
           for(i=0; i<spaceDim; i++)
             xyz[i]=new double[_numberOfValues];
           deallocateXyz=true;

@@ -287,12 +287,12 @@ MED_FIELD_DRIVER<T>::createFieldSupportPart1(med_2_3::med_idt        id,
       medmem_entity = entityCurrent;
 
       // That is a difference between Med File and Med Memory (NB)
-      if (geometryCurrent == MED_EN::MEDMEM_SEG2 || geometryCurrent == MED_EN::MEDMEM_SEG3)
+      if (geometryCurrent == MED_EN::MED_SEG2 || geometryCurrent == MED_EN::MED_SEG3)
         medmem_entity = MED_EN::MED_EDGE;
 
-      if (geometryCurrent == MED_EN::MEDMEM_TRIA3 || geometryCurrent == MED_EN::MEDMEM_QUAD4 ||
-          geometryCurrent == MED_EN::MEDMEM_TRIA6 || geometryCurrent == MED_EN::MEDMEM_QUAD8 || 
-          geometryCurrent == MED_EN::MEDMEM_POLYGON)
+      if (geometryCurrent == MED_EN::MED_TRIA3 || geometryCurrent == MED_EN::MED_QUAD4 ||
+          geometryCurrent == MED_EN::MED_TRIA6 || geometryCurrent == MED_EN::MED_QUAD8 || 
+          geometryCurrent == MED_EN::MED_POLYGON)
         medmem_entity = MED_EN::MED_FACE;
 
       // med3 porting
@@ -467,8 +467,8 @@ MED_FIELD_DRIVER<T>::getMEDMEMEntityFromMEDType(medGeometryElement type,
                                                 int mesh_dim) const
 {
   int elem_dim = type/100;
-  if (type==MEDMEM_POLYGON) elem_dim=2;
-  if (type==MEDMEM_POLYHEDRA) elem_dim=3;
+  if (type==MED_POLYGON) elem_dim=2;
+  if (type==MED_POLYHEDRA) elem_dim=3;
 
   if (elem_dim==3)
     return MED_CELL;
@@ -794,7 +794,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
 //      repose sur plusieurs maillages cf HOMARD-ASTER, ce qui n'est pas géré dans MEDMEM)
 //   -  vérifier le type d'entité (MED_NOEUD xor MED_MAILLE xor MED_FACE xor MED_ARETE ) sur lequel
 //      il faut lire le champ qui est également retouvé.
-//   - Si le support défini une liste d'entité ( différente de MEDMEM_ALL_ELEMENTS), celle-ci est ignorée
+//   - Si le support défini une liste d'entité ( différente de MED_ALL_ELEMENTS), celle-ci est ignorée
 //     à la lecture et écrasé par soit :
 //            - onall, après avoir vérifié que la liste des types géométriques utilisés par le champ
 //                     est égale à la liste des type géométriques définis dans le maillage associé
@@ -1300,7 +1300,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
 
   //MESSAGE_MED ("Index              : "<< index);
   assert(index == totalNumberOfElWg*numberOfComponents);
-  assert(MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues == mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS));
+  assert(MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues == mySupport->getNumberOfElements(MED_ALL_ELEMENTS));
 
   if (anyProfil)
   {
@@ -1399,10 +1399,10 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
   SCRUTE_MED(anyGauss);
   MEDMEM_Array_ * Values;
   if (anyGauss) {
-    SCRUTE_MED(mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS) );
+    SCRUTE_MED(mySupport->getNumberOfElements(MED_ALL_ELEMENTS) );
     SCRUTE_MED(NumberOfTypes);
     SCRUTE_MED(numberOfElementsOfTypeC[NumberOfTypes]-1);
-    assert(mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS) == (numberOfElementsOfTypeC[NumberOfTypes]-1) );
+    assert(mySupport->getNumberOfElements(MED_ALL_ELEMENTS) == (numberOfElementsOfTypeC[NumberOfTypes]-1) );
     // PAL16681. If NumberOfTypes == 1 then myValues is what should be
     // in a field value, inspite of InterlacingType
     if ( NumberOfTypes == 1 && modswt == med_2_3::MED_NO_INTERLACE )
@@ -1858,7 +1858,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER<T>::write(void) const
 
   if (!onAll) {
 
-    number = mySupport->getNumber(MEDMEM_ALL_ELEMENTS);
+    number = mySupport->getNumber(MED_ALL_ELEMENTS);
     numberIndex = mySupport->getNumberIndex();
     profilNameList=mySupport->getProfilNames();
     // porting MED3

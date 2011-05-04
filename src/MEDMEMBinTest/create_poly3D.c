@@ -193,7 +193,7 @@ int main (int argc, char **argv)
   MEDmeshEntityFamilyNumberWr(fid,maa,MED_NO_DT,MED_NO_IT,MED_NODE,0,nnoe,nufano);
   printf("MEDnoeudsEcr : %d\n",ret);
 
-  /* ecriture des faces MEDMEM_QUAD4 :
+  /* ecriture des faces MED_QUAD4 :
      - connectivite
      - noms (optionnel) 
      - numeros (optionnel)
@@ -205,7 +205,7 @@ int main (int argc, char **argv)
   MEDmeshEntityFamilyNumberWr(fid,maa,MED_NO_DT,MED_NO_IT,MED_CELL,MED_QUAD4,nquad4,nufaquad4);
   printf("MEDelementsEcr for quad : %d \n",ret);
 
-  /* ecriture des faces MEDMEM_TRIA3 :
+  /* ecriture des faces MED_TRIA3 :
      - connectivite
      - noms (optionnel) 
      - numeros (optionnel)

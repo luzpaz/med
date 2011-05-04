@@ -104,7 +104,7 @@ void MEDMEMTest::testGetVolumeAbs()
   //Cell connectivity info
   const MED_EN::medGeometryElement classicalTypesCell[2]=
     {
-      MED_EN::MEDMEM_PENTA6,MEDMEM_POLYHEDRA
+      MED_EN::MED_PENTA6,MED_POLYHEDRA
     };
   const int nbOfCellElts[2]=
     {
@@ -114,8 +114,8 @@ void MEDMEMTest::testGetVolumeAbs()
   meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
   meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
   //All cell conn
-  meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MEDMEM_PENTA6,connNodalCellClassical);
-  meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MEDMEM_POLYHEDRA, polyHedraConn,polyHedraInd);
+  meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_PENTA6,connNodalCellClassical);
+  meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_POLYHEDRA, polyHedraConn,polyHedraInd);
   //
   const SUPPORT *sup=meshing->getSupportOnAll(MED_CELL);
   FIELD<double> *volumes=meshing->getVolume(sup);

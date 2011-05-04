@@ -95,7 +95,7 @@ int main (int argc, char ** argv)
       //      cell part
 
       const int NumberOfTypes = 3;
-      medGeometryElement Types[NumberOfTypes] = {MEDMEM_TRIA3,MEDMEM_QUAD4,MEDMEM_POLYGON};
+      medGeometryElement Types[NumberOfTypes] = {MED_TRIA3,MED_QUAD4,MED_POLYGON};
       const int NumberOfElements[NumberOfTypes] = {1,4,1};
 
       myMeshing->setNumberOfTypes(NumberOfTypes,MED_CELL);

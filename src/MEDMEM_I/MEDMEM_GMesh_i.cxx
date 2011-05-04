@@ -405,7 +405,7 @@ throw (SALOME::SALOME_Exception)
 //=============================================================================
 /*!
  * CORBA: Returns number of elements of type medGeometryElement
- *        Not implemented for MEDMEM_ALL_ELEMENTS 
+ *        Not implemented for MED_ALL_ELEMENTS 
 *         implemented for MED_ALL_ENTITIES
  */
 //=============================================================================
@@ -422,8 +422,8 @@ throw (SALOME::SALOME_Exception)
         
         try
         {
-//           if ( geomElement == SALOME_MED::MEDMEM_POLYGON ||
-//                geomElement == SALOME_MED::MEDMEM_POLYHEDRA )
+//           if ( geomElement == SALOME_MED::MED_POLYGON ||
+//                geomElement == SALOME_MED::MED_POLYHEDRA )
 //             return _mesh->getNumberOfElementsWithPoly(convertIdlEntToMedEnt(entity),
 //                                                       convertIdlEltToMedElt(geomElement));
 //           else

@@ -259,33 +259,33 @@ def avs2med_one_file(file_in, file_out, mesh_name, field_name):
         elif avs_type == 'tri':
             entity = MED_CELL
             nb2medtype = {
-                3: MEDMEM_TRIA3,
+                3: MED_TRIA3,
                 }
         elif avs_type == 'quad':
             entity = MED_CELL
             nb2medtype = {
-                4: MEDMEM_QUAD4,
-                8: MEDMEM_QUAD8,
+                4: MED_QUAD4,
+                8: MED_QUAD8,
                 }
         elif avs_type == 'tet':
             entity = MED_CELL
             nb2medtype = {
-                4: MEDMEM_TETRA4,
+                4: MED_TETRA4,
                 }
         elif avs_type == 'hex':
             entity = MED_CELL
             nb2medtype = {
-                8: MEDMEM_HEXA8,
+                8: MED_HEXA8,
                 }
         elif avs_type == 'pyr':
             entity = MED_CELL
             nb2medtype = {
-                5: MEDMEM_PYRA5,
+                5: MED_PYRA5,
                 }
         elif avs_type == 'prism':
             entity = MED_CELL
             nb2medtype = {
-                6: MEDMEM_PENTA6,
+                6: MED_PENTA6,
                 }
         else:
             raise Exception("unknown avs_type : %s"%(avs_type))

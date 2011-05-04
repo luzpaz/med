@@ -54,7 +54,7 @@ static void test_extractLine( Extractor* extractor,
       mesh->write( MED_DRIVER, result_file, name );
       resField->write(MED_DRIVER, result_file );
 
-      CPPUNIT_ASSERT_EQUAL( nbSegments, resField->getSupport()->getNumberOfElements(MEDMEM_ALL_ELEMENTS));
+      CPPUNIT_ASSERT_EQUAL( nbSegments, resField->getSupport()->getNumberOfElements(MED_ALL_ELEMENTS));
       CPPUNIT_ASSERT_EQUAL( nbSegments+1, resField->getSupport()->getMesh()->getNumberOfNodes());
       resField->removeReference();
     }
@@ -120,8 +120,8 @@ void MEDMEMTest::testExtractor()
   const GMESH* mesh = resField->getSupport()->getMesh();
   mesh->write( MED_DRIVER, result_file );
   CPPUNIT_ASSERT_EQUAL( 2, mesh->getNumberOfTypes(MED_CELL));
-  CPPUNIT_ASSERT_EQUAL( 6, mesh->getNumberOfElements(MED_CELL, MEDMEM_TRIA3));
-  CPPUNIT_ASSERT_EQUAL( 2, mesh->getNumberOfElements(MED_CELL, MEDMEM_QUAD4));
+  CPPUNIT_ASSERT_EQUAL( 6, mesh->getNumberOfElements(MED_CELL, MED_TRIA3));
+  CPPUNIT_ASSERT_EQUAL( 2, mesh->getNumberOfElements(MED_CELL, MED_QUAD4));
 
   // store extracted field
   resField->write(MED_DRIVER, result_file);
@@ -170,7 +170,7 @@ void MEDMEMTest::testExtractor()
   const int NumberOfTypes = 1;
   medGeometryElement Types[NumberOfTypes] = 
     {
-      MEDMEM_TRIA3
+      MED_TRIA3
     };
   const int NumberOfElements[NumberOfTypes] = 
     {
@@ -197,7 +197,7 @@ void MEDMEMTest::testExtractor()
       8, 4, 7, 
       4, 3, 7 
     };
-  myMeshing->setConnectivity(MED_CELL,MEDMEM_TRIA3,ConnectivityTria);
+  myMeshing->setConnectivity(MED_CELL,MED_TRIA3,ConnectivityTria);
 
   // store input mesh
 
@@ -248,8 +248,8 @@ void MEDMEMTest::testExtractor()
   mesh = resField->getSupport()->getMesh();
   mesh->write( MED_DRIVER, result_file );
   //   CPPUNIT_ASSERT_EQUAL( 2, mesh->getNumberOfTypes(MED_CELL));
-  //   CPPUNIT_ASSERT_EQUAL( 6, mesh->getNumberOfElements(MED_CELL, MEDMEM_TRIA3));
-  //   CPPUNIT_ASSERT_EQUAL( 2, mesh->getNumberOfElements(MED_CELL, MEDMEM_QUAD4));
+  //   CPPUNIT_ASSERT_EQUAL( 6, mesh->getNumberOfElements(MED_CELL, MED_TRIA3));
+  //   CPPUNIT_ASSERT_EQUAL( 2, mesh->getNumberOfElements(MED_CELL, MED_QUAD4));
 
   // store extracted field
   drv = resField->addDriver(MED_DRIVER, result_file, resField->getName());
@@ -320,7 +320,7 @@ void MEDMEMTest::testExtractor()
     const int NumberOfTypes = 1;
     medGeometryElement Types[NumberOfTypes] = 
       {
-        MEDMEM_HEXA8
+        MED_HEXA8
       };
     const int NumberOfElements[NumberOfTypes] = 
       {
@@ -342,7 +342,7 @@ void MEDMEMTest::testExtractor()
         23, 13, 5, 18, 27, 22, 14, 26, 
         12, 25, 27, 21, 4, 19, 24, 11 
       };
-    myMeshing->setConnectivity(MED_CELL,MEDMEM_HEXA8,ConnectivityHex);
+    myMeshing->setConnectivity(MED_CELL,MED_HEXA8,ConnectivityHex);
   }
   // store input mesh
 
@@ -524,7 +524,7 @@ void MEDMEMTest::testExtractor()
   aSupport = aMesh->getSupportOnAll( MED_CELL );
 
   // make a field
-  int nbValues = aSupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  int nbValues = aSupport->getNumberOfElements(MED_ALL_ELEMENTS);
   inField->setSupport( aSupport );
   inField->allocValue( 1, nbValues );
   {
@@ -546,7 +546,7 @@ void MEDMEMTest::testExtractor()
     CPPUNIT_ASSERT_NO_THROW( resField = extractor->extractLine(coords,direct));
   }
   CPPUNIT_ASSERT( resField );
-  CPPUNIT_ASSERT_EQUAL( 31, resField->getSupport()->getNumberOfElements(MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL( 31, resField->getSupport()->getNumberOfElements(MED_ALL_ELEMENTS));
   CPPUNIT_ASSERT_EQUAL( 33, resField->getSupport()->getMesh()->getNumberOfNodes());
   delete extractor;
   resField->removeReference(); resField=0;

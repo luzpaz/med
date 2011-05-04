@@ -85,16 +85,16 @@ using namespace MEDMEM;
 //const size_t GIBI_MESH_DRIVER::nb_geometrie_gibi;
 
 const medGeometryElement GIBI_MESH_DRIVER::geomGIBItoMED[nb_geometrie_gibi] =
-  {   /*1 */ MEDMEM_POINT1 ,/*2 */ MEDMEM_SEG2   ,/*3 */ MEDMEM_SEG3   ,/*4 */ MEDMEM_TRIA3  ,/*5 */ MEDMEM_NONE   ,
-      /*6 */ MEDMEM_TRIA6  ,/*7 */ MEDMEM_NONE   ,/*8 */ MEDMEM_QUAD4  ,/*9 */ MEDMEM_NONE   ,/*10*/ MEDMEM_QUAD8  ,
-      /*11*/ MEDMEM_NONE   ,/*12*/ MEDMEM_NONE   ,/*13*/ MEDMEM_NONE   ,/*14*/ MEDMEM_HEXA8  ,/*15*/ MEDMEM_HEXA20 ,
-      /*16*/ MEDMEM_PENTA6 ,/*17*/ MEDMEM_PENTA15,/*18*/ MEDMEM_NONE   ,/*19*/ MEDMEM_NONE   ,/*20*/ MEDMEM_NONE   ,
-      /*21*/ MEDMEM_NONE   ,/*22*/ MEDMEM_NONE   ,/*23*/ MEDMEM_TETRA4 ,/*24*/ MEDMEM_TETRA10,/*25*/ MEDMEM_PYRA5  ,
-      /*26*/ MEDMEM_PYRA13 ,/*27*/ MEDMEM_NONE   ,/*28*/ MEDMEM_NONE   ,/*29*/ MEDMEM_NONE   ,/*30*/ MEDMEM_NONE   ,
-      /*31*/ MEDMEM_NONE   ,/*32*/ MEDMEM_NONE   ,/*33*/ MEDMEM_NONE   ,/*34*/ MEDMEM_NONE   ,/*35*/ MEDMEM_NONE   ,
-      /*36*/ MEDMEM_NONE   ,/*37*/ MEDMEM_NONE   ,/*38*/ MEDMEM_NONE   ,/*39*/ MEDMEM_NONE   ,/*40*/ MEDMEM_NONE   ,
-      /*41*/ MEDMEM_NONE   ,/*42*/ MEDMEM_NONE   ,/*43*/ MEDMEM_NONE   ,/*44*/ MEDMEM_NONE   ,/*45*/ MEDMEM_NONE   ,
-      /*46*/ MEDMEM_NONE   ,/*47*/ MEDMEM_NONE   };
+  {   /*1 */ MED_POINT1 ,/*2 */ MED_SEG2   ,/*3 */ MED_SEG3   ,/*4 */ MED_TRIA3  ,/*5 */ MED_NONE   ,
+      /*6 */ MED_TRIA6  ,/*7 */ MED_NONE   ,/*8 */ MED_QUAD4  ,/*9 */ MED_NONE   ,/*10*/ MED_QUAD8  ,
+      /*11*/ MED_NONE   ,/*12*/ MED_NONE   ,/*13*/ MED_NONE   ,/*14*/ MED_HEXA8  ,/*15*/ MED_HEXA20 ,
+      /*16*/ MED_PENTA6 ,/*17*/ MED_PENTA15,/*18*/ MED_NONE   ,/*19*/ MED_NONE   ,/*20*/ MED_NONE   ,
+      /*21*/ MED_NONE   ,/*22*/ MED_NONE   ,/*23*/ MED_TETRA4 ,/*24*/ MED_TETRA10,/*25*/ MED_PYRA5  ,
+      /*26*/ MED_PYRA13 ,/*27*/ MED_NONE   ,/*28*/ MED_NONE   ,/*29*/ MED_NONE   ,/*30*/ MED_NONE   ,
+      /*31*/ MED_NONE   ,/*32*/ MED_NONE   ,/*33*/ MED_NONE   ,/*34*/ MED_NONE   ,/*35*/ MED_NONE   ,
+      /*36*/ MED_NONE   ,/*37*/ MED_NONE   ,/*38*/ MED_NONE   ,/*39*/ MED_NONE   ,/*40*/ MED_NONE   ,
+      /*41*/ MED_NONE   ,/*42*/ MED_NONE   ,/*43*/ MED_NONE   ,/*44*/ MED_NONE   ,/*45*/ MED_NONE   ,
+      /*46*/ MED_NONE   ,/*47*/ MED_NONE   };
 
 enum Readable_Piles
   {
@@ -122,7 +122,7 @@ enum Readable_Piles
 medGeometryElement GIBI_MESH_DRIVER::gibi2medGeom( size_t gibiTypeNb )
 {
   if ( gibiTypeNb < 1 || gibiTypeNb > 47 )
-    return MEDMEM_NONE;
+    return MED_NONE;
 
   return geomGIBItoMED[ gibiTypeNb - 1 ];
 }
@@ -499,14 +499,14 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
             medGeometryElement medType = gibi2medGeom(type_geom_castem);
 
             initIntReading( nb_elements * nb_noeud );
-            if ( medType == MEDMEM_NONE ) { // look for group end
+            if ( medType == MED_NONE ) { // look for group end
               while ( more() )
                 next();
               strangeGroupType.insert( make_pair( objet, type_geom_castem ));
               continue;
             }
-            if ( medType == MEDMEM_POINT1 )
-              medType = MEDMEM_NONE; // issue 21199
+            if ( medType == MED_POINT1 )
+              medType = MED_NONE; // issue 21199
             if ( nbElemsByGeomType.find( medType ) == nbElemsByGeomType.end())
               nbElemsByGeomType[ medType ] = 0;
             int & order = nbElemsByGeomType[ medType ];
@@ -1996,45 +1996,45 @@ static void getReverseVector (const medGeometryElement type,
   swapVec.clear();
 
   switch ( type ) {
-  case MEDMEM_TETRA4:
+  case MED_TETRA4:
     swapVec.resize(1);
     swapVec[0] = make_pair( 1, 2 );
     break;
-  case MEDMEM_PYRA5:
+  case MED_PYRA5:
     swapVec.resize(1);
     swapVec[0] = make_pair( 1, 3 );
     break;
-  case MEDMEM_PENTA6:
+  case MED_PENTA6:
     swapVec.resize(2);
     swapVec[0] = make_pair( 1, 2 );
     swapVec[1] = make_pair( 4, 5 );
     break;
-  case MEDMEM_HEXA8:
+  case MED_HEXA8:
     swapVec.resize(2);
     swapVec[0] = make_pair( 1, 3 );
     swapVec[1] = make_pair( 5, 7 );
     break;
-  case MEDMEM_TETRA10:
+  case MED_TETRA10:
     swapVec.resize(3);
     swapVec[0] = make_pair( 1, 2 );
     swapVec[1] = make_pair( 4, 6 );
     swapVec[2] = make_pair( 8, 9 );
     break;
-  case MEDMEM_PYRA13:
+  case MED_PYRA13:
     swapVec.resize(4);
     swapVec[0] = make_pair( 1, 3 );
     swapVec[1] = make_pair( 5, 8 );
     swapVec[2] = make_pair( 6, 7 );
     swapVec[3] = make_pair( 10, 12 );
     break;
-  case MEDMEM_PENTA15:
+  case MED_PENTA15:
     swapVec.resize(4);
     swapVec[0] = make_pair( 1, 2 );
     swapVec[1] = make_pair( 4, 5 );
     swapVec[2] = make_pair( 6, 8 );
     swapVec[3] = make_pair( 9, 11 );
     break;
-  case MEDMEM_HEXA20:
+  case MED_HEXA20:
     swapVec.resize(7);
     swapVec[0] = make_pair( 1, 3 );
     swapVec[1] = make_pair( 5, 7 );
@@ -2044,16 +2044,16 @@ static void getReverseVector (const medGeometryElement type,
     swapVec[5] = make_pair( 13, 14 );
     swapVec[6] = make_pair( 17, 19 );
     break;
-//   case MEDMEM_SEG3: no need to reverse edges
+//   case MED_SEG3: no need to reverse edges
 //     swapVec.resize(1);
 //     swapVec[0] = make_pair( 1, 2 );
 //     break;
-  case MEDMEM_TRIA6:
+  case MED_TRIA6:
     swapVec.resize(2);
     swapVec[0] = make_pair( 1, 2 );
     swapVec[1] = make_pair( 3, 5 );
     break;
-  case MEDMEM_QUAD8:
+  case MED_QUAD8:
     swapVec.resize(3);
     swapVec[0] = make_pair( 1, 3 );
     swapVec[1] = make_pair( 4, 7 );
@@ -2098,14 +2098,14 @@ static const int * getGibi2MedConnectivity( const medGeometryElement type )
   static int tria6  [] = {0,2,4, 1,3,5};
   static int seg3   [] = {0,2,1};
   if ( conn.empty() ) {
-    conn.resize( MEDMEM_HEXA20 + 1, 0 );
-    conn[ MEDMEM_HEXA20 ] = hexa20;
-    conn[ MEDMEM_PENTA15] = penta15;
-    conn[ MEDMEM_PYRA13 ] = pyra13;
-    conn[ MEDMEM_TETRA10] = tetra10;
-    conn[ MEDMEM_SEG3   ] = seg3;
-    conn[ MEDMEM_TRIA6  ] = tria6;
-    conn[ MEDMEM_QUAD8  ] = quad8;
+    conn.resize( MED_HEXA20 + 1, 0 );
+    conn[ MED_HEXA20 ] = hexa20;
+    conn[ MED_PENTA15] = penta15;
+    conn[ MED_PYRA13 ] = pyra13;
+    conn[ MED_TETRA10] = tetra10;
+    conn[ MED_SEG3   ] = seg3;
+    conn[ MED_TRIA6  ] = tria6;
+    conn[ MED_QUAD8  ] = quad8;
   }
   return conn[ type ];
 }
@@ -2378,15 +2378,15 @@ static void orientElements( _intermediateMED& medi )
       elemIt = elems->begin(), elemEnd = elems->end();
       int nbBottomNodes = 0;
       switch ( elemIt->geometricType ) {
-      case MEDMEM_TETRA4:
-      case MEDMEM_TETRA10:
-      case MEDMEM_PENTA6:
-      case MEDMEM_PENTA15:
+      case MED_TETRA4:
+      case MED_TETRA10:
+      case MED_PENTA6:
+      case MED_PENTA15:
         nbBottomNodes = 3; break;
-      case MEDMEM_PYRA5:
-      case MEDMEM_PYRA13:
-      case MEDMEM_HEXA8:
-      case MEDMEM_HEXA20:
+      case MED_PYRA5:
+      case MED_PYRA13:
+      case MED_HEXA8:
+      case MED_HEXA20:
         nbBottomNodes = 4; break;
       default: continue;
       }
@@ -2525,16 +2525,16 @@ void GIBI_MESH_RDONLY_DRIVER::updateSupports()
         f->setName( name.str());
       }
       // check if family is on the whole mesh entity
-      if (_mesh->getNumberOfElements( entity, MEDMEM_ALL_ELEMENTS ) ==
-          f->getNumberOfElements( MEDMEM_ALL_ELEMENTS ))
+      if (_mesh->getNumberOfElements( entity, MED_ALL_ELEMENTS ) ==
+          f->getNumberOfElements( MED_ALL_ELEMENTS ))
         f->setAll( true );
     }
     // setAll() for groups
     nb = _mesh->getNumberOfGroups(entity);
     for ( i = 1; i <= nb; ++i ) {
       GROUP * g = const_cast<GROUP*>( _mesh->getGroup( entity, i ));
-      if (_mesh->getNumberOfElements( entity, MEDMEM_ALL_ELEMENTS ) ==
-          g->getNumberOfElements( MEDMEM_ALL_ELEMENTS ))
+      if (_mesh->getNumberOfElements( entity, MED_ALL_ELEMENTS ) ==
+          g->getNumberOfElements( MED_ALL_ELEMENTS ))
         g->setAll( true );
     }
   }
@@ -2779,9 +2779,9 @@ bool GIBI_MESH_WRONLY_DRIVER::addSupport( const SUPPORT * support )
       types = _mesh->getTypes( entity );
     for ( int iType = 0; iType < nbTypes; ++iType )
     {
-      if ( types && types[ iType ] > MEDMEM_HEXA20 )
+      if ( types && types[ iType ] > MED_HEXA20 )
         continue; // poly
-      medGeometryElement geomType = types ? types[ iType ] : MEDMEM_ALL_ELEMENTS;
+      medGeometryElement geomType = types ? types[ iType ] : MED_ALL_ELEMENTS;
       const int * ptrElemIDs = 0;
       int elemID1 = 0, nbElems = 0;
       if ( onAll ) {
@@ -2793,7 +2793,7 @@ bool GIBI_MESH_WRONLY_DRIVER::addSupport( const SUPPORT * support )
         ptrElemIDs = (*sIt)->getNumber( geomType );
       }
       if ( geomType == 0 || ( entity == MED_NODE ))
-        geomType = MEDMEM_POINT1;
+        geomType = MED_POINT1;
 
       data.addTypeData( geomType, nbElems, ptrElemIDs, elemID1 );
     }
@@ -2927,7 +2927,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeElements (medGeometryElement geomType,
     for ( int i = 0; i < td->_nbElems; i++ )
     {
       iElem = td->_ptrElemIDs ? td->_ptrElemIDs[ i ] : td->_elemID1 + i;
-      if ( geomType == MEDMEM_POINT1 )
+      if ( geomType == MED_POINT1 )
       {
         _gibi << setw(8) << iElem;
         fcount++;
@@ -3174,7 +3174,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh(list<nameGIBItoMED>& listGIBI
   // Collect object names
   // --------------------------------------------------------------------
 
-  vector<int> nbSuppElemsByType(MEDMEM_HEXA20+1,0);
+  vector<int> nbSuppElemsByType(MED_HEXA20+1,0);
   map<string,int> nameNbMap;
   map<string,int> namePrefixMap;
   map<const SUPPORT*,supportData>::iterator supIt = _supports.begin();
@@ -3304,7 +3304,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh(list<nameGIBItoMED>& listGIBI
     entity = supIt->first->getEntity();
     const int * nodalConnect = 0, * nodalConnectIndex = 0;
     if ( entity != MED_NODE ) {
-      nodalConnect = mesh->getConnectivity (MED_NODAL,entity,MEDMEM_ALL_ELEMENTS);
+      nodalConnect = mesh->getConnectivity (MED_NODAL,entity,MED_ALL_ELEMENTS);
       nodalConnectIndex = mesh->getConnectivityIndex (MED_NODAL,entity);
     }
     supportData::typeIterator tIt = data._types.begin();
@@ -3329,7 +3329,7 @@ void GIBI_MESH_WRONLY_DRIVER::writeSupportsAndMesh(list<nameGIBItoMED>& listGIBI
     const medGeometryElement* types = _mesh->getTypes( entity );
     const int * nbIndex = mesh->getGlobalNumberingIndex (entity);
     const int * nodalConnect = 0, * nodalConnectIndex = 0;
-    nodalConnect = mesh->getConnectivity (MED_NODAL,entity,MEDMEM_ALL_ELEMENTS);
+    nodalConnect = mesh->getConnectivity (MED_NODAL,entity,MED_ALL_ELEMENTS);
     nodalConnectIndex = mesh->getConnectivityIndex (MED_NODAL,entity);
 
     for ( int iType = 1; iType <= nbTypes; ++iType )

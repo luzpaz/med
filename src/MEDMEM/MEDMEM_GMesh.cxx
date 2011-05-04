@@ -1130,7 +1130,7 @@ struct _cell
   std::vector<int> groups;
   MED_EN::medGeometryElement geometricType;
   // to have geometricType good for nodal groups when MESH::getNumberOfTypes(MED_NODE)==0
-  _cell():geometricType(MEDMEM_POINT1) {}
+  _cell():geometricType(MED_POINT1) {}
 };
 
 //================================================================================
@@ -1183,7 +1183,7 @@ void GMESH::createFamilies()
       numberOfTypes = getNumberOfTypes(entity);
       geometricTypes = getTypes(entity);
     }
-    med_int numberOfCells=getNumberOfElements(entity, MEDMEM_ALL_ELEMENTS);  // total number of cells for that entity
+    med_int numberOfCells=getNumberOfElements(entity, MED_ALL_ELEMENTS);  // total number of cells for that entity
     SCRUTE_MED(numberOfTypes);
     SCRUTE_MED(numberOfCells);
     vector< _cell > tab_cell(numberOfCells);
@@ -1237,7 +1237,7 @@ void GMESH::createFamilies()
     for( fam=tab_families.begin(); fam!=tab_families.end(); ++fam)
     {
       vector<medGeometryElement> tab_types_geometriques;
-      medGeometryElement geometrictype=MEDMEM_NONE;
+      medGeometryElement geometrictype=MED_NONE;
       vector<int> tab_index_types_geometriques;
       vector<int> tab_nombres_elements;
       if ( fam->second.empty() )
@@ -1290,7 +1290,7 @@ void GMESH::createFamilies()
       newFam->setNumberOfElements(&tab_nombres_elements[0]);
       newFam->setNumber(&tab_index_types_geometriques[0],&fam->second[0]);
       newFam->setEntity(entity);
-      newFam->setAll( getNumberOfElements( entity, MEDMEM_ALL_ELEMENTS ) == fam->second.size() );
+      newFam->setAll( getNumberOfElements( entity, MED_ALL_ELEMENTS ) == fam->second.size() );
 
       int idFam = 0;
 

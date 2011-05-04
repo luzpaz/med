@@ -291,7 +291,7 @@ SALOME_TYPES::ListOfLong* MESH_i::getConnectivityIndex(SALOME_MED::medConnectivi
     {
       int nbelements = ((::MESH*)_mesh)->getNumberOfElements(
                                                              convertIdlEntToMedEnt(entity),
-                                                             MEDMEM_ALL_ELEMENTS) + 1;
+                                                             MED_ALL_ELEMENTS) + 1;
       myseq->length(nbelements);
       const int * numbers=((::MESH*)_mesh)->getConnectivityIndex(convertIdlConnToMedConn(mode),
                                                                  convertIdlEntToMedEnt(entity));
@@ -377,7 +377,7 @@ SALOME_TYPES::ListOfLong* MESH_i::getGlobalNumberingIndex( SALOME_MED::medEntity
 /*!
  * CORBA: get global element number in connectivity array
  * not implemented for MED_NODE and MED_ALL_ENTITIES,
- * MEDMEM_NONE and MEDMEM_ALL_ELEMENTS.
+ * MED_NONE and MED_ALL_ELEMENTS.
  */
 //=============================================================================
 CORBA::Long MESH_i::getElementNumber(SALOME_MED::medConnectivity mode,

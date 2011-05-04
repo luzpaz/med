@@ -114,7 +114,7 @@ int main (int argc, char ** argv)
   const int NumberOfTypes = 2;
   medGeometryElement Types[NumberOfTypes] = 
     {
-      MEDMEM_TETRA4, MEDMEM_POLYHEDRA
+      MED_TETRA4, MED_POLYHEDRA
     };
   const int NumberOfElements[NumberOfTypes] = 
     {
@@ -146,9 +146,9 @@ int main (int argc, char ** argv)
       17, 9, 18, 19
     };
 
-  myMeshing->setConnectivity(MED_CELL, MEDMEM_TETRA4, ConnectivityTetra);
+  myMeshing->setConnectivity(MED_CELL, MED_TETRA4, ConnectivityTetra);
 
-  myMeshing->setConnectivity(MED_CELL, MEDMEM_POLYHEDRA, REFnodalConnOfFaces, REFpolyIndex);
+  myMeshing->setConnectivity(MED_CELL, MED_POLYHEDRA, REFnodalConnOfFaces, REFpolyIndex);
 
 
   MESHING *myPolygonMeshing=new MESHING;
@@ -158,7 +158,7 @@ int main (int argc, char ** argv)
   SpaceDimension = 3;
   medGeometryElement PolygonTypes[NumberOfTypes] = 
     {
-      MEDMEM_TRIA3,MEDMEM_POLYGON
+      MED_TRIA3,MED_POLYGON
     };
   const int PolygonNumberOfElements[NumberOfTypes] = 
     {
@@ -181,8 +181,8 @@ int main (int argc, char ** argv)
       1, 7, 2, 3, 9, 4
     };
 
-  myPolygonMeshing->setConnectivity(MED_CELL, MEDMEM_TRIA3,   ConnectivityTri);
-  myPolygonMeshing->setConnectivity(MED_CELL, MEDMEM_POLYGON, REFpolygonFaces, REFpolygonIndex);
+  myPolygonMeshing->setConnectivity(MED_CELL, MED_TRIA3,   ConnectivityTri);
+  myPolygonMeshing->setConnectivity(MED_CELL, MED_POLYGON, REFpolygonFaces, REFpolygonIndex);
   FIELD<double> *areas = myPolygonMeshing->getArea(myPolygonMeshing->getSupportOnAll( MED_CELL ));
   myPolygonMeshing->removeReference();
   const double *vals2 = areas->getValue();

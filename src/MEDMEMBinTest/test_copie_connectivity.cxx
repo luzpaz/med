@@ -80,8 +80,8 @@ static void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myM
   const int * connectivity_index ;
   myMesh->calculateConnectivity(MED_DESCENDING,MED_CELL);
   try {
-    NumberOfElements = myMesh->getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS);
-    connectivity =  myMesh->getConnectivity(MED_DESCENDING,MED_CELL,MEDMEM_ALL_ELEMENTS);
+    NumberOfElements = myMesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
+    connectivity =  myMesh->getConnectivity(MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS);
     connectivity_index =  myMesh->getConnectivityIndex(MED_DESCENDING,MED_CELL);
   }
   catch (MEDEXCEPTION& m) {
@@ -117,7 +117,7 @@ static void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myM
     MESSAGE_MED("ERROR : MeshDimension = 1 !");
     MESSAGE_MED("We could not see Reverse Descending Connectivity.") ;
   } else {
-    NumberOfConstituents = myMesh->getNumberOfElements (constituentEntity,MEDMEM_ALL_ELEMENTS);
+    NumberOfConstituents = myMesh->getNumberOfElements (constituentEntity,MED_ALL_ELEMENTS);
     for (int i=0; i<NumberOfConstituents; i++) {
       cout << constituent <<i+1<<" : " ;
       for (int j=ReverseDescendingConnectivityIndex[i];j<ReverseDescendingConnectivityIndex[i+1];j++)
@@ -126,7 +126,7 @@ static void affiche_connectivity(const CONNECTIVITY * myConnectivity, MESH * myM
     }
   }
   cout << "Show "<<constituent<<" Connectivity (Nodal) :" << endl ;
-  const int * face_connectivity =  myMesh->getConnectivity(MED_NODAL,constituentEntity,MEDMEM_ALL_ELEMENTS);
+  const int * face_connectivity =  myMesh->getConnectivity(MED_NODAL,constituentEntity,MED_ALL_ELEMENTS);
   const int * face_connectivity_index =  myMesh->getConnectivityIndex(MED_NODAL,constituentEntity);
   for (int i=0; i<NumberOfConstituents; i++) {
     cout << constituent <<i+1<<" : " ;

@@ -62,11 +62,11 @@ def AnalyzeField(field):
         if fieldEntity == SALOME_MED.MED_NODE:
             nbValByComp = fieldMesh.getNumberOfNodes()
         else:
-            nbValByComp = fieldMesh.getNumberOfElements(fieldEntity,SALOME_MED.MEDMEM_ALL_ELEMENTS)
+            nbValByComp = fieldMesh.getNumberOfElements(fieldEntity,SALOME_MED.MED_ALL_ELEMENTS)
         print "and its dimension (number of values by component of the field) is ",nbValByComp
     else:
         print "The support of this field is partially on entities ",fieldEntity," of the mesh ",fieldMesh.getName()
-        nbValByComp = fieldSupport.getNumberOfElements(SALOME_MED.MEDMEM_ALL_ELEMENTS)
+        nbValByComp = fieldSupport.getNumberOfElements(SALOME_MED.MED_ALL_ELEMENTS)
         print "and its dimension (number of values by component of the field) is ",nbValByComp
 
     for i in range(nbComp):

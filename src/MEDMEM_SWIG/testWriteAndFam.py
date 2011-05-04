@@ -87,7 +87,7 @@ for i in range(nbOfFiles):
                     print "  -this famyly named ",familyName," is on all entities"
                     pass
                 else:
-                    familyNumber = family.getNumber(MEDMEM_ALL_ELEMENTS)
+                    familyNumber = family.getNumber(MED_ALL_ELEMENTS)
                     print "  -this famyly named ",familyName," has ",len(familyNumber)," entities"
                     pass
                 pass
@@ -147,7 +147,7 @@ for i in range(nbOfFiles):
                     print "  -this famyly named ",familyName," is on all entities"
                     pass
                 else:
-                    familyNumber = family.getNumber(MEDMEM_ALL_ELEMENTS)
+                    familyNumber = family.getNumber(MED_ALL_ELEMENTS)
                     print "  -this famyly named ",familyName," has ",len(familyNumber)," entities"
                     pass
                 pass

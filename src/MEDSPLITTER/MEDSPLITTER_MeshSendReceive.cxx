@@ -572,11 +572,11 @@ namespace { // local utils
     for ( ; t < types.size(); ++t )
     {
       types[t] = medGeometryElement( int_data[ SLC_GEOM_TYPES ][t] );
-      if ( types[t] == MEDMEM_POLYGON )
+      if ( types[t] == MED_POLYGON )
       {
         nbElementsByType[t] = int_data[ SLC_POLYGON_INDEX ]._size - 1;
       }
-      else if ( types[t] == MEDMEM_POLYHEDRA )
+      else if ( types[t] == MED_POLYHEDRA )
       {
         nbElementsByType[t] = int_data[ SLC_POLYHED_INDEX ]._size - 1;
       }
@@ -595,11 +595,11 @@ namespace { // local utils
     const int * index = 0;
     for ( t = 0, conn_slice = SLC_FIRST_STD_CONN; t < types.size(); ++t )
     {
-      if ( types[t] == MEDMEM_POLYGON )
+      if ( types[t] == MED_POLYGON )
       {
         index = int_data[ SLC_POLYGON_INDEX ]._pointer;
       }
-      else if ( types[t] == MEDMEM_POLYHEDRA )
+      else if ( types[t] == MED_POLYHEDRA )
       {
         index = int_data[ SLC_POLYHED_INDEX ]._pointer;
       }
@@ -782,7 +782,7 @@ namespace { // local utils
     // polygon connectivity index
 
     medEntityMesh polygon_entity = mesh->getMeshDimension()==2 ? MED_CELL : MED_FACE;
-    if ( int nb_polygon = mesh->getNumberOfElements( polygon_entity, MEDMEM_POLYGON ))
+    if ( int nb_polygon = mesh->getNumberOfElements( polygon_entity, MED_POLYGON ))
     {
       const int nbTypes = mesh->getNumberOfTypes( polygon_entity );
       const int * index = mesh->getConnectivityIndex( conn, polygon_entity );
@@ -791,7 +791,7 @@ namespace { // local utils
     }
     // polyherdra connectivity index
 
-    if ( int nb_polyhedra = mesh->getNumberOfElements( MED_CELL, MEDMEM_POLYHEDRA ))
+    if ( int nb_polyhedra = mesh->getNumberOfElements( MED_CELL, MED_POLYHEDRA ))
     {
       const int nbTypes = mesh->getNumberOfTypes( MED_CELL );
       const int * index = mesh->getConnectivityIndex( conn, MED_CELL );
@@ -820,7 +820,7 @@ namespace { // local utils
         int nb_types = is_nodal ? 1 : families[f]->getNumberOfTypes();
         for ( int t = 0; t < nb_types; ++t )
         {
-          medGeometryElement type = is_nodal ? MEDMEM_ALL_ELEMENTS : families[f]->getTypes()[t];
+          medGeometryElement type = is_nodal ? MED_ALL_ELEMENTS : families[f]->getTypes()[t];
           int_data[ i_slice++ ].setPtr( families[f]->getNumberOfElements( type ),
                                         families[f]->getNumber( type ));
         }

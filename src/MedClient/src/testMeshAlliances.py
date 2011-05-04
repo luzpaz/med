@@ -129,15 +129,15 @@ for i in range(nbOfFiles):
       types = meshLocalCopy.getTypesWithPoly(MED_CELL)
       for k in range(nbTypesCellWithPoly):
           type = types[k]
-          if type == MEDMEM_POLYGON:
+          if type == MED_POLYGON:
               nbElemType = meshLocalCopy.getNumberOfPolygons()
-          elif type == MEDMEM_POLYHEDRA:
+          elif type == MED_POLYHEDRA:
               nbElemType = meshLocalCopy.getNumberOfPolyhedron()
           else:
               continue
           print ""
           print "     For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
-          if type == MEDMEM_POLYGON:
+          if type == MED_POLYGON:
               connectivity = meshLocalCopy.getPolygonsConnectivity(MED_NODAL,MED_CELL)
               index = meshLocalCopy.getPolygonsConnectivityIndex(MED_NODAL,MED_CELL)
               for j in range(nbElemType):

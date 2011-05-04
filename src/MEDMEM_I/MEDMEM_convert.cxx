@@ -39,25 +39,25 @@ throw (SALOME::SALOME_Exception)
 {
   switch (element)
     {
-    case MEDMEM_NONE    :  return SALOME_MED::MEDMEM_NONE;
-    case MEDMEM_POINT1  :  return SALOME_MED::MEDMEM_POINT1;
-    case MEDMEM_SEG2    :  return SALOME_MED::MEDMEM_SEG2;
-    case MEDMEM_SEG3    :  return SALOME_MED::MEDMEM_SEG3;
-    case MEDMEM_TRIA3   :  return SALOME_MED::MEDMEM_TRIA3;
-    case MEDMEM_QUAD4   :  return SALOME_MED::MEDMEM_QUAD4;
-    case MEDMEM_TRIA6   :  return SALOME_MED::MEDMEM_TRIA6;
-    case MEDMEM_QUAD8   :  return SALOME_MED::MEDMEM_QUAD8;
-    case MEDMEM_TETRA4  :  return SALOME_MED::MEDMEM_TETRA4;
-    case MEDMEM_PYRA5   :  return SALOME_MED::MEDMEM_PYRA5;
-    case MEDMEM_PENTA6  :  return SALOME_MED::MEDMEM_PENTA6;
-    case MEDMEM_HEXA8   :  return SALOME_MED::MEDMEM_HEXA8;
-    case MEDMEM_TETRA10 :  return SALOME_MED::MEDMEM_TETRA10;
-    case MEDMEM_PYRA13  :  return SALOME_MED::MEDMEM_PYRA13;
-    case MEDMEM_PENTA15 :  return SALOME_MED::MEDMEM_PENTA15;
-    case MEDMEM_HEXA20  :  return SALOME_MED::MEDMEM_HEXA20;
-    case MEDMEM_POLYGON      :  return SALOME_MED::MEDMEM_POLYGON;
-    case MEDMEM_POLYHEDRA    :  return SALOME_MED::MEDMEM_POLYHEDRA;
-    case MEDMEM_ALL_ELEMENTS :  return SALOME_MED::MEDMEM_ALL_ELEMENTS;
+    case MED_NONE    :  return SALOME_MED::MED_NONE;
+    case MED_POINT1  :  return SALOME_MED::MED_POINT1;
+    case MED_SEG2    :  return SALOME_MED::MED_SEG2;
+    case MED_SEG3    :  return SALOME_MED::MED_SEG3;
+    case MED_TRIA3   :  return SALOME_MED::MED_TRIA3;
+    case MED_QUAD4   :  return SALOME_MED::MED_QUAD4;
+    case MED_TRIA6   :  return SALOME_MED::MED_TRIA6;
+    case MED_QUAD8   :  return SALOME_MED::MED_QUAD8;
+    case MED_TETRA4  :  return SALOME_MED::MED_TETRA4;
+    case MED_PYRA5   :  return SALOME_MED::MED_PYRA5;
+    case MED_PENTA6  :  return SALOME_MED::MED_PENTA6;
+    case MED_HEXA8   :  return SALOME_MED::MED_HEXA8;
+    case MED_TETRA10 :  return SALOME_MED::MED_TETRA10;
+    case MED_PYRA13  :  return SALOME_MED::MED_PYRA13;
+    case MED_PENTA15 :  return SALOME_MED::MED_PENTA15;
+    case MED_HEXA20  :  return SALOME_MED::MED_HEXA20;
+    case MED_POLYGON      :  return SALOME_MED::MED_POLYGON;
+    case MED_POLYHEDRA    :  return SALOME_MED::MED_POLYHEDRA;
+    case MED_ALL_ELEMENTS :  return SALOME_MED::MED_ALL_ELEMENTS;
     default :
         { MESSAGE("Unknown Geometry Element");
           THROW_SALOME_CORBA_EXCEPTION("Unknown Geometry Element",
@@ -74,25 +74,25 @@ throw (SALOME::SALOME_Exception)
 
   switch (element)
     {
-    case SALOME_MED::MEDMEM_NONE     :  return MEDMEM_NONE;
-    case SALOME_MED::MEDMEM_POINT1   :  return MEDMEM_POINT1;
-    case SALOME_MED::MEDMEM_SEG2     :  return MEDMEM_SEG2;
-    case SALOME_MED::MEDMEM_SEG3     :  return MEDMEM_SEG3;
-    case SALOME_MED::MEDMEM_TRIA3    :  return MEDMEM_TRIA3;
-    case SALOME_MED::MEDMEM_QUAD4    :  return MEDMEM_QUAD4;
-    case SALOME_MED::MEDMEM_TRIA6    :  return MEDMEM_TRIA6;
-    case SALOME_MED::MEDMEM_QUAD8    :  return MEDMEM_QUAD8;
-    case SALOME_MED::MEDMEM_TETRA4   :  return MEDMEM_TETRA4;
-    case SALOME_MED::MEDMEM_PYRA5    :  return MEDMEM_PYRA5;
-    case SALOME_MED::MEDMEM_PENTA6   :  return MEDMEM_PENTA6;
-    case SALOME_MED::MEDMEM_HEXA8    :  return MEDMEM_HEXA8;
-    case SALOME_MED::MEDMEM_TETRA10  :  return MEDMEM_TETRA10;
-    case SALOME_MED::MEDMEM_PYRA13   :  return MEDMEM_PYRA13;
-    case SALOME_MED::MEDMEM_PENTA15  :  return MEDMEM_PENTA15;
-    case SALOME_MED::MEDMEM_HEXA20   :  return MEDMEM_HEXA20;
-    case SALOME_MED::MEDMEM_POLYGON      :  return MEDMEM_POLYGON;
-    case SALOME_MED::MEDMEM_POLYHEDRA    :  return MEDMEM_POLYHEDRA;
-    case SALOME_MED::MEDMEM_ALL_ELEMENTS :  return MEDMEM_ALL_ELEMENTS;
+    case SALOME_MED::MED_NONE     :  return MED_NONE;
+    case SALOME_MED::MED_POINT1   :  return MED_POINT1;
+    case SALOME_MED::MED_SEG2     :  return MED_SEG2;
+    case SALOME_MED::MED_SEG3     :  return MED_SEG3;
+    case SALOME_MED::MED_TRIA3    :  return MED_TRIA3;
+    case SALOME_MED::MED_QUAD4    :  return MED_QUAD4;
+    case SALOME_MED::MED_TRIA6    :  return MED_TRIA6;
+    case SALOME_MED::MED_QUAD8    :  return MED_QUAD8;
+    case SALOME_MED::MED_TETRA4   :  return MED_TETRA4;
+    case SALOME_MED::MED_PYRA5    :  return MED_PYRA5;
+    case SALOME_MED::MED_PENTA6   :  return MED_PENTA6;
+    case SALOME_MED::MED_HEXA8    :  return MED_HEXA8;
+    case SALOME_MED::MED_TETRA10  :  return MED_TETRA10;
+    case SALOME_MED::MED_PYRA13   :  return MED_PYRA13;
+    case SALOME_MED::MED_PENTA15  :  return MED_PENTA15;
+    case SALOME_MED::MED_HEXA20   :  return MED_HEXA20;
+    case SALOME_MED::MED_POLYGON      :  return MED_POLYGON;
+    case SALOME_MED::MED_POLYHEDRA    :  return MED_POLYHEDRA;
+    case SALOME_MED::MED_ALL_ELEMENTS :  return MED_ALL_ELEMENTS;
     default :
         { MESSAGE("unknown Geometry Element");
           THROW_SALOME_CORBA_EXCEPTION("Unknown Geometry Element",
@@ -239,11 +239,11 @@ throw (SALOME::SALOME_Exception)
        {
          switch (geomElement)
            {
-           case SALOME_MED::MEDMEM_TRIA3    : coherent=true;
-           case SALOME_MED::MEDMEM_QUAD4    : coherent=true;
-           case SALOME_MED::MEDMEM_TRIA6    : coherent=true;
-           case SALOME_MED::MEDMEM_QUAD8    : coherent=true;
-           case SALOME_MED::MEDMEM_POLYGON  : coherent=true;
+           case SALOME_MED::MED_TRIA3    : coherent=true;
+           case SALOME_MED::MED_QUAD4    : coherent=true;
+           case SALOME_MED::MED_TRIA6    : coherent=true;
+           case SALOME_MED::MED_QUAD8    : coherent=true;
+           case SALOME_MED::MED_POLYGON  : coherent=true;
            }
          break;
        }
@@ -251,23 +251,23 @@ throw (SALOME::SALOME_Exception)
        {
          switch (geomElement)
            {
-           case SALOME_MED::MEDMEM_POINT1   : coherent=true;
-           case SALOME_MED::MEDMEM_SEG2     : coherent=true;
-           case SALOME_MED::MEDMEM_SEG3     : coherent=true;
-           case SALOME_MED::MEDMEM_TRIA3    : coherent=true;
-           case SALOME_MED::MEDMEM_TRIA6    : coherent=true;
-           case SALOME_MED::MEDMEM_QUAD4    : coherent=true;
-           case SALOME_MED::MEDMEM_QUAD8    : coherent=true;
-           case SALOME_MED::MEDMEM_TETRA4   : coherent=true;
-           case SALOME_MED::MEDMEM_TETRA10  : coherent=true;
-           case SALOME_MED::MEDMEM_HEXA8    : coherent=true;
-           case SALOME_MED::MEDMEM_HEXA20   : coherent=true;
-           case SALOME_MED::MEDMEM_PENTA6   : coherent=true;
-           case SALOME_MED::MEDMEM_PENTA15  : coherent=true;
-           case SALOME_MED::MEDMEM_PYRA5    : coherent=true;
-           case SALOME_MED::MEDMEM_PYRA13   : coherent=true;
-           case SALOME_MED::MEDMEM_POLYGON  : coherent=true;
-           case SALOME_MED::MEDMEM_POLYHEDRA: coherent=true;
+           case SALOME_MED::MED_POINT1   : coherent=true;
+           case SALOME_MED::MED_SEG2     : coherent=true;
+           case SALOME_MED::MED_SEG3     : coherent=true;
+           case SALOME_MED::MED_TRIA3    : coherent=true;
+           case SALOME_MED::MED_TRIA6    : coherent=true;
+           case SALOME_MED::MED_QUAD4    : coherent=true;
+           case SALOME_MED::MED_QUAD8    : coherent=true;
+           case SALOME_MED::MED_TETRA4   : coherent=true;
+           case SALOME_MED::MED_TETRA10  : coherent=true;
+           case SALOME_MED::MED_HEXA8    : coherent=true;
+           case SALOME_MED::MED_HEXA20   : coherent=true;
+           case SALOME_MED::MED_PENTA6   : coherent=true;
+           case SALOME_MED::MED_PENTA15  : coherent=true;
+           case SALOME_MED::MED_PYRA5    : coherent=true;
+           case SALOME_MED::MED_PYRA13   : coherent=true;
+           case SALOME_MED::MED_POLYGON  : coherent=true;
+           case SALOME_MED::MED_POLYHEDRA: coherent=true;
            }
          break;
        }
@@ -275,8 +275,8 @@ throw (SALOME::SALOME_Exception)
        {
          switch (geomElement)
            {
-           case SALOME_MED::MEDMEM_SEG2     : coherent=true;
-           case SALOME_MED::MEDMEM_SEG3     : coherent=true;
+           case SALOME_MED::MED_SEG2     : coherent=true;
+           case SALOME_MED::MED_SEG3     : coherent=true;
            }
          break;
        }         
@@ -284,7 +284,7 @@ throw (SALOME::SALOME_Exception)
        {
          switch (geomElement)
            {
-           case SALOME_MED::MEDMEM_POINT1   : coherent=true;
+           case SALOME_MED::MED_POINT1   : coherent=true;
            }
          break;
        }
@@ -292,7 +292,7 @@ throw (SALOME::SALOME_Exception)
        {
          switch (geomElement)
            {
-           case SALOME_MED::MEDMEM_NONE     : coherent=true;
+           case SALOME_MED::MED_NONE     : coherent=true;
            }
          break;
        }
@@ -306,7 +306,7 @@ throw (SALOME::SALOME_Exception)
 
      switch (geomElement)
      {
-           case SALOME_MED::MEDMEM_ALL_ELEMENTS     : coherent=true;
+           case SALOME_MED::MED_ALL_ELEMENTS     : coherent=true;
      }
     return coherent;
 }

@@ -81,7 +81,7 @@ static void affiche_fieldT(FIELD<int> * myField, const SUPPORT * mySupport)
   affiche_field_((FIELD_ *) myField, mySupport);
 
   cout << "- Valeurs :"<<endl;
-  int NumberOf = mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  int NumberOf = mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
   int NumberOfComponents = myField->getNumberOfComponents() ;
 
   for (int i=1; i<NumberOf+1; i++) 

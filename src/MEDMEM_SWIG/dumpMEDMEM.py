@@ -33,25 +33,25 @@ theEntityName = { MED_CELL        :"CELL",
                   MED_NODE        :"NODE",
                   MED_ALL_ENTITIES:"ALL_ENTITIES" }
 
-theTypeName = {MEDMEM_NONE        :"NONE",
-               MEDMEM_POINT1      :"POINT1",
-               MEDMEM_SEG2        :"SEG2",
-               MEDMEM_SEG3        :"SEG3",
-               MEDMEM_TRIA3       :"TRIA3",
-               MEDMEM_QUAD4       :"QUAD4",
-               MEDMEM_TRIA6       :"TRIA6",
-               MEDMEM_QUAD8       :"QUAD8",
-               MEDMEM_TETRA4      :"TETRA4",
-               MEDMEM_PYRA5       :"PYRA5",
-               MEDMEM_PENTA6      :"PENTA6",
-               MEDMEM_HEXA8       :"HEXA8",
-               MEDMEM_TETRA10     :"TETRA10",
-               MEDMEM_PYRA13      :"PYRA13",
-               MEDMEM_PENTA15     :"PENTA15",
-               MEDMEM_HEXA20      :"HEXA20",
-               MEDMEM_POLYGON     :"POLYGON",
-               MEDMEM_POLYHEDRA   :"POLYHEDRA",
-               MEDMEM_ALL_ELEMENTS:"ALL_ELEMENTS"}
+theTypeName = {MED_NONE        :"NONE",
+               MED_POINT1      :"POINT1",
+               MED_SEG2        :"SEG2",
+               MED_SEG3        :"SEG3",
+               MED_TRIA3       :"TRIA3",
+               MED_QUAD4       :"QUAD4",
+               MED_TRIA6       :"TRIA6",
+               MED_QUAD8       :"QUAD8",
+               MED_TETRA4      :"TETRA4",
+               MED_PYRA5       :"PYRA5",
+               MED_PENTA6      :"PENTA6",
+               MED_HEXA8       :"HEXA8",
+               MED_TETRA10     :"TETRA10",
+               MED_PYRA13      :"PYRA13",
+               MED_PENTA15     :"PENTA15",
+               MED_HEXA20      :"HEXA20",
+               MED_POLYGON     :"POLYGON",
+               MED_POLYHEDRA   :"POLYHEDRA",
+               MED_ALL_ELEMENTS:"ALL_ELEMENTS"}
 
 medModeSwitch = { 0:"FULL_INTERLACE",
                   1:"NO_INTERLACE",
@@ -79,7 +79,7 @@ def _showNodalConnectivity(mesh,entity,type,elems,tablevel,showOnly=SHOW_ALL):
     if showOnly > 0:
         elems = elems[:showOnly]
     nbShow = len( elems )
-    connectivity = mesh.getConnectivity(MED_NODAL,entity,MEDMEM_ALL_ELEMENTS)
+    connectivity = mesh.getConnectivity(MED_NODAL,entity,MED_ALL_ELEMENTS)
     index = mesh.getConnectivityIndex(MED_NODAL,entity)
     if debugShowConn: print "CONN:",connectivity,"\nIND:",index
     elemShift = 0
@@ -264,7 +264,7 @@ def ShowMesh(mesh, nodes2Show=0, entity2Show=[0,0,0]):
     for entity in [MED_CELL,MED_FACE,MED_EDGE]:
         i += 1
         entityName = theEntityName[ entity ]
-        if mesh.getNumberOfElements(entity,MEDMEM_ALL_ELEMENTS) < 1: continue
+        if mesh.getNumberOfElements(entity,MED_ALL_ELEMENTS) < 1: continue
         nbTypes = mesh.getNumberOfTypes( entity )
         try:
             types = mesh.getTypes( entity )
@@ -296,7 +296,7 @@ def ShowMesh(mesh, nodes2Show=0, entity2Show=[0,0,0]):
     for entity in [MED_NODE,MED_CELL,MED_FACE,MED_EDGE]:
         nbFam = mesh.getNumberOfFamilies(entity)
         nbGrp = mesh.getNumberOfGroups(entity)
-        nbElem= mesh.getNumberOfElements(entity, MEDMEM_ALL_ELEMENTS);
+        nbElem= mesh.getNumberOfElements(entity, MED_ALL_ELEMENTS);
         nbF += nbFam
         nbG += nbGrp
         if (entity == MED_NODE) :
@@ -342,7 +342,7 @@ def ShowFields( fields, showValues=0 ):
         mode      = f.getInterlacingType()
         nbcomp    = f.getNumberOfComponents()
         nbval     = f.getNumberOfValues()
-        nbelem    = sup.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+        nbelem    = sup.getNumberOfElements(MED_ALL_ELEMENTS)
         nbOfTypes = sup.getNumberOfTypes()
         types     = sup.getTypes()
         isOnAll   = sup.isOnAllElements()
@@ -411,14 +411,14 @@ def ShowFields( fields, showValues=0 ):
             type = types[k]
             nbOfElmtsOfType = sup.getNumberOfElements(type)
             if hasGauss: nbGauss = nbGaussByType[ k ]
-            if type == 0: type = MEDMEM_POINT1
+            if type == 0: type = MED_POINT1
             print tab*2,k+1,theTypeName[type],':',nbOfElmtsOfType, 'elements,',\
                   nbGauss,'gauss point(s)'
             pass
-        nbOf = sup.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+        nbOf = sup.getNumberOfElements(MED_ALL_ELEMENTS)
         elements = []
         if not isOnAll:
-            elements = sup.getNumber(MEDMEM_ALL_ELEMENTS)
+            elements = sup.getNumber(MED_ALL_ELEMENTS)
             pass
         if nbcomp == 0:
             nbOf = 0

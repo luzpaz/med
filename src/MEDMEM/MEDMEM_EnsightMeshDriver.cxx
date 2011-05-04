@@ -579,7 +579,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldBinary(_BinaryFileWriter& ensightG
 #endif
         ensightGeomFile.addInt( nodeIds );
       }
-      else if ( medType == MEDMEM_POLYGON ) // POLYGONs connectivity
+      else if ( medType == MED_POLYGON ) // POLYGONs connectivity
       {
         int nbStdCells = mesh->getGlobalNumberingIndex(entity)[i]-1;
         connectivity   = mesh->getConnectivity( MED_NODAL, entity, medType);
@@ -639,7 +639,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldBinary(_BinaryFileWriter& ensightG
 #endif
       if ( nbCellNodes > 1 ) // STANDARD ELEMENTS connectivity
       {
-        connectivity = mesh->getConnectivity( MED_NODAL, entity, MEDMEM_ALL_ELEMENTS);
+        connectivity = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
         index = mesh->getConnectivityIndex(MED_NODAL, entity);
 
         nodeIds.reserve( numberOfCell * nbCellNodes);
@@ -661,9 +661,9 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldBinary(_BinaryFileWriter& ensightG
           nodeIds[ j-1 ] = j;
         ensightGeomFile.addInt( nodeIds );
       }
-      else if ( medType == MEDMEM_POLYGON ) // POLYGONs connectivity
+      else if ( medType == MED_POLYGON ) // POLYGONs connectivity
       {
-        connectivity = mesh->getConnectivity( MED_NODAL, entity, MEDMEM_ALL_ELEMENTS);
+        connectivity = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
         index = mesh->getConnectivityIndex(MED_NODAL, entity);
 
         // number of nodes in each element
@@ -685,7 +685,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldBinary(_BinaryFileWriter& ensightG
       }
       else // POLYHEDRA connectivity
       {
-        connectivity = mesh->getConnectivity( MED_NODAL, entity, MEDMEM_ALL_ELEMENTS);
+        connectivity = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
         index = mesh->getConnectivityIndex(MED_NODAL, entity);
         vector<int> nbFacesInPolyhedron, nbNodesInFace, faceConn;
         for ( int j = 0; j < numberOfCell; ++j )
@@ -849,10 +849,10 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldASCII(ofstream&      ensightGeomFi
         for ( j = 1; j <= numberOfCell; j++)
           ensightGeomFile << setw(iw) << j << endl;
       }
-      else if ( medType == MEDMEM_POLYGON ) // POLYGONs connectivity
+      else if ( medType == MED_POLYGON ) // POLYGONs connectivity
       {
         int nbStdCells = mesh->getGlobalNumberingIndex(entity)[i]-1;
-        connectivity   = mesh->getConnectivity( MED_NODAL, entity, MEDMEM_ALL_ELEMENTS);
+        connectivity   = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
         index          = mesh->getConnectivityIndex(MED_NODAL, entity) + nbStdCells;
         // number of nodes in each element
         const int* ind = index;
@@ -908,7 +908,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldASCII(ofstream&      ensightGeomFi
 #endif
       if ( nbCellNodes > 1 ) // STANDARD ELEMENTS connectivity
       {
-        connectivity = mesh->getConnectivity( MED_NODAL, entity, MEDMEM_ALL_ELEMENTS);
+        connectivity = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
         index = mesh->getConnectivityIndex(MED_NODAL, entity);
 
         for (j=0; j<numberOfCell; j++) {
@@ -928,9 +928,9 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePartGoldASCII(ofstream&      ensightGeomFi
           ensightGeomFile << setw(iw) << node << endl ;
         }
       }
-      else if ( medType == MEDMEM_POLYGON ) // POLYGONs connectivity
+      else if ( medType == MED_POLYGON ) // POLYGONs connectivity
       {
-        connectivity   = mesh->getConnectivity( MED_NODAL, entity, MEDMEM_ALL_ELEMENTS);
+        connectivity   = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
         index          = mesh->getConnectivityIndex(MED_NODAL, entity);
         // number of nodes in each element
         for (j = 0 ; j < numberOfCell; j++) {
@@ -1011,7 +1011,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePart6Binary(_BinaryFileWriter& ensightGeom
   int j = 1;
   const int * connectivity = 0;
   if ( entity != MED_NODE )
-    connectivity = mesh->getConnectivity( MED_NODAL, entity, MEDMEM_ALL_ELEMENTS);
+    connectivity = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
   const int * elemConnectivity = connectivity;
 
   // CONNECTIVITY                                                       Ensight 6 binary
@@ -1117,7 +1117,7 @@ void ENSIGHT_MESH_WRONLY_DRIVER::writePart6ASCII(ofstream&      ensightGeomFile,
   int j = 1;
   const int * connectivity = 0;
   if ( entity != MED_NODE )
-    connectivity = mesh->getConnectivity( MED_NODAL,entity, MEDMEM_ALL_ELEMENTS);
+    connectivity = mesh->getConnectivity( MED_NODAL,entity, MED_ALL_ELEMENTS);
   const int * elemConnectivity = connectivity;
 
   // CONNECTIVITY                                                        Ensight 6 ASCII
@@ -1329,7 +1329,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read() throw (MEDEXCEPTION)
     mesh->_name = theDefaultMeshName;
   }
   mesh->_spaceDimension = SPACE_DIM;
-  mesh->_numberOfNodes  = imed->points.size() - imed->nbMerged( MEDMEM_POINT1 );
+  mesh->_numberOfNodes  = imed->points.size() - imed->nbMerged( MED_POINT1 );
   mesh->_coordinate     = imed->getCoordinate();
 
   //Construction des groupes
@@ -1366,8 +1366,8 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read() throw (MEDEXCEPTION)
       nb = mesh->getNumberOfGroups(entity);
       for ( i = 1; i <= nb; ++i ) {
         GROUP * g = const_cast<GROUP*>( mesh->getGroup( entity, i ));
-        if (mesh->getNumberOfElements( entity, MEDMEM_ALL_ELEMENTS ) ==
-            g->getNumberOfElements( MEDMEM_ALL_ELEMENTS ))
+        if (mesh->getNumberOfElements( entity, MED_ALL_ELEMENTS ) ==
+            g->getNumberOfElements( MED_ALL_ELEMENTS ))
         {
           g->setAll( true );
           g->update();
@@ -1466,7 +1466,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldASCII(_InterMed & imed)
     TStrTool::split( line, word, restLine );
 
     const TEnSightElemType & partType = getEnSightType( word );
-    if ( partType._medType != MEDMEM_ALL_ELEMENTS )
+    if ( partType._medType != MED_ALL_ELEMENTS )
     {
       //  Unstructured element type encounters
       // --------------------------------------
@@ -1727,7 +1727,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldASCII(_InterMed & imed)
       grid._spaceDimension = SPACE_DIM;
       if ( J < 2 ) { grid._spaceDimension--; grid._jArrayLength = 0; }
       if ( K < 2 ) { grid._spaceDimension--; grid._kArrayLength = 0; }
-      int nbElems = grid.getNumberOfElements(MED_CELL, MEDMEM_ALL_ELEMENTS);
+      int nbElems = grid.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);
 
       if ( curvilinear ) // read coordinates for all nodes
       {
@@ -1804,7 +1804,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldASCII(_InterMed & imed)
       }
 
       // store connectivity 
-      const int * conn = unstruct->getConnectivity( MED_NODAL, MED_CELL, MEDMEM_ALL_ELEMENTS );
+      const int * conn = unstruct->getConnectivity( MED_NODAL, MED_CELL, MED_ALL_ELEMENTS );
       medGeometryElement elemType = grid.getElementType( MED_CELL, 1 );
       int  nbElemNodes = elemType % 100;
 
@@ -1947,7 +1947,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldBinary(_InterMed & imed)
     TStrTool::split( line.myValues, word, restLine );
 
     const TEnSightElemType & partType = getEnSightType( word );
-    if ( partType._medType != MEDMEM_ALL_ELEMENTS )
+    if ( partType._medType != MED_ALL_ELEMENTS )
     {
       //  Unstructured element type encounters
       // --------------------------------------
@@ -2199,7 +2199,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldBinary(_InterMed & imed)
       grid._spaceDimension = SPACE_DIM;
       if ( J < 2 ) { grid._spaceDimension--; grid._jArrayLength = 0; }
       if ( K < 2 ) { grid._spaceDimension--; grid._kArrayLength = 0; }
-      int nbElems = grid.getNumberOfElements(MED_CELL, MEDMEM_ALL_ELEMENTS);
+      int nbElems = grid.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);
 
       if ( curvilinear ) // read coordinates for all nodes
       {
@@ -2293,7 +2293,7 @@ void ENSIGHT_MESH_RDONLY_DRIVER::readGoldBinary(_InterMed & imed)
       }
 
       // store connectivity 
-      const int * conn = unstruct->getConnectivity( MED_NODAL, MED_CELL, MEDMEM_ALL_ELEMENTS );
+      const int * conn = unstruct->getConnectivity( MED_NODAL, MED_CELL, MED_ALL_ELEMENTS );
       medGeometryElement elemType = grid.getElementType( MED_CELL, 1 );
       int  nbElemNodes = elemType % 100;
 
@@ -2513,10 +2513,10 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read6ASCII(_InterMed & imed)
       if ( K < 2 ) { grid._spaceDimension--; grid._kArrayLength = 0; }
 
       const MESH* unstruct = grid.convertInMESH();
-      const int * conn = unstruct->getConnectivity( MED_NODAL, MED_CELL, MEDMEM_ALL_ELEMENTS );
+      const int * conn = unstruct->getConnectivity( MED_NODAL, MED_CELL, MED_ALL_ELEMENTS );
       medGeometryElement elemType = grid.getElementType( MED_CELL, 1 );
       int  nbElemNodes = elemType % 100;
-      int      nbElems = grid.getNumberOfElements(MED_CELL, MEDMEM_ALL_ELEMENTS);
+      int      nbElems = grid.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);
 
       partGroupe->mailles.resize( nbElems );
       _maille ma( elemType, nbElemNodes );
@@ -2795,10 +2795,10 @@ void ENSIGHT_MESH_RDONLY_DRIVER::read6Binary(_InterMed & imed)
       if ( K < 2 ) { grid._spaceDimension--; grid._kArrayLength = 0; }
 
       const MESH* unstruct = grid.convertInMESH();
-      const int * conn = unstruct->getConnectivity( MED_NODAL, MED_CELL, MEDMEM_ALL_ELEMENTS );
+      const int * conn = unstruct->getConnectivity( MED_NODAL, MED_CELL, MED_ALL_ELEMENTS );
       medGeometryElement elemType = grid.getElementType( MED_CELL, 1 );
       int  nbElemNodes = elemType % 100;
-      int      nbElems = grid.getNumberOfElements(MED_CELL, MEDMEM_ALL_ELEMENTS);
+      int      nbElems = grid.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);
 
       partGroupe->mailles.resize( nbElems );
       _maille ma( elemType, nbElemNodes );
@@ -2928,7 +2928,7 @@ int ENSIGHT_MESH_RDONLY_DRIVER::countParts(const string& geomFileName,
       TStrTool::split( line, word, restLine );
 
       const TEnSightElemType & partType = getEnSightType( word );
-      if ( partType._medType != MEDMEM_ALL_ELEMENTS )
+      if ( partType._medType != MED_ALL_ELEMENTS )
       {
         //  Unstructured element type encounters
         // --------------------------------------
@@ -3131,7 +3131,7 @@ int ENSIGHT_MESH_RDONLY_DRIVER::countPartsBinary(_BinaryFileReader& geoFile,
     TStrTool::split( line.myValues, word, restLine );
 
     const TEnSightElemType & partType = getEnSightType( word );
-    if ( partType._medType != MEDMEM_ALL_ELEMENTS )
+    if ( partType._medType != MED_ALL_ELEMENTS )
     {
       //  Unstructured element type encounters
       // --------------------------------------

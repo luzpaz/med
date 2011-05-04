@@ -385,7 +385,7 @@ const MESH * GRID::convertInMESH() const
   {
     mesh->setNumberOfTypes( getNumberOfTypes(MED_CELL), MED_CELL );
     mesh->setTypes( getTypes( MED_CELL), MED_CELL );
-    int nbCells = getNumberOfElements( MED_CELL, MEDMEM_ALL_ELEMENTS );
+    int nbCells = getNumberOfElements( MED_CELL, MED_ALL_ELEMENTS );
     mesh->setNumberOfElements( &nbCells, MED_CELL );
 
     vector<int> conn;
@@ -439,7 +439,7 @@ const MESH * GRID::convertInMESH() const
   {
     mesh->setNumberOfTypes( getNumberOfTypes(subEntity), subEntity );
     mesh->setTypes( getTypes( subEntity), subEntity );
-    int nbCells = getNumberOfElements( subEntity, MEDMEM_ALL_ELEMENTS );
+    int nbCells = getNumberOfElements( subEntity, MED_ALL_ELEMENTS );
     mesh->setNumberOfElements( &nbCells, subEntity );
 
     vector<int> conn;
@@ -522,7 +522,7 @@ const MESH * GRID::convertInMESH() const
 
 const medGeometryElement * GRID::getTypes(MED_EN::medEntityMesh entity) const
 {
-  static const medGeometryElement _gridGeometry[4]={MEDMEM_HEXA8,MEDMEM_QUAD4,MEDMEM_SEG2,MEDMEM_POINT1};
+  static const medGeometryElement _gridGeometry[4]={MED_HEXA8,MED_QUAD4,MED_SEG2,MED_POINT1};
   int i=0;
   if(entity==MED_CELL)
   {
@@ -924,13 +924,13 @@ int GRID::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGeometryE
   int numberOfElements=0;
 
   // Cas où le nombre d'éléments n'est pas nul
-  if (entity==MED_EN::MED_FACE && (Type==MED_EN::MEDMEM_QUAD4 || Type==MED_EN::MEDMEM_ALL_ELEMENTS) && getMeshDimension()>2)
+  if (entity==MED_EN::MED_FACE && (Type==MED_EN::MED_QUAD4 || Type==MED_EN::MED_ALL_ELEMENTS) && getMeshDimension()>2)
     numberOfElements=
       (_iArrayLength-1)*(_jArrayLength-1)*(_kArrayLength  )+
       (_iArrayLength-1)*(_jArrayLength  )*(_kArrayLength-1)+
       (_iArrayLength  )*(_jArrayLength-1)*(_kArrayLength-1);
 
-  else if (entity==MED_EN::MED_EDGE && (Type==MED_EN::MEDMEM_SEG2 || Type==MED_EN::MEDMEM_ALL_ELEMENTS))
+  else if (entity==MED_EN::MED_EDGE && (Type==MED_EN::MED_SEG2 || Type==MED_EN::MED_ALL_ELEMENTS))
     if ( _spaceDimension==2)
       numberOfElements=_iArrayLength*(_jArrayLength-1) + (_iArrayLength-1)*_jArrayLength;
     else if ( _spaceDimension==1)
@@ -940,16 +940,16 @@ int GRID::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGeometryE
         (_iArrayLength*(_jArrayLength-1) + (_iArrayLength-1)*_jArrayLength) * _kArrayLength +
         _iArrayLength*_jArrayLength*(_kArrayLength-1);
 
-  else if (entity==MED_EN::MED_NODE && (Type==MED_EN::MEDMEM_NONE || Type==MED_EN::MEDMEM_ALL_ELEMENTS) && _spaceDimension>0)
+  else if (entity==MED_EN::MED_NODE && (Type==MED_EN::MED_NONE || Type==MED_EN::MED_ALL_ELEMENTS) && _spaceDimension>0)
     numberOfElements=getNumberOfNodes();
 
-  else if (entity==MED_EN::MED_CELL && _spaceDimension==3 && (Type==MED_EN::MEDMEM_HEXA8 || Type==MED_EN::MEDMEM_ALL_ELEMENTS) )
+  else if (entity==MED_EN::MED_CELL && _spaceDimension==3 && (Type==MED_EN::MED_HEXA8 || Type==MED_EN::MED_ALL_ELEMENTS) )
     numberOfElements=(_iArrayLength-1)*(_jArrayLength-1)*(_kArrayLength-1);
 
-  else if (entity==MED_EN::MED_CELL && _spaceDimension==2 && (Type==MED_EN::MEDMEM_QUAD4 || Type==MED_EN::MEDMEM_ALL_ELEMENTS))
+  else if (entity==MED_EN::MED_CELL && _spaceDimension==2 && (Type==MED_EN::MED_QUAD4 || Type==MED_EN::MED_ALL_ELEMENTS))
     numberOfElements=(_iArrayLength-1)*(_jArrayLength-1);
 
-  else if (entity==MED_EN::MED_CELL && _spaceDimension==1 && (Type==MED_EN::MEDMEM_SEG2 || Type==MED_EN::MEDMEM_ALL_ELEMENTS) )
+  else if (entity==MED_EN::MED_CELL && _spaceDimension==1 && (Type==MED_EN::MED_SEG2 || Type==MED_EN::MED_ALL_ELEMENTS) )
     numberOfElements=_iArrayLength-1;
 
   MESSAGE_MED("GRID::getNumberOfElements - entity=" << entity << " Type=" << Type);
@@ -1093,7 +1093,7 @@ SUPPORT * GRID::getBoundaryElements(MED_EN::medEntityMesh Entity) const throw (M
           throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 2D mesh for entity "<<Entity<<" !"));
       }
   list<int> bnd_elems1, bnd_elems2;
-  int numberOf = getNumberOfElements(entityToParse,MEDMEM_ALL_ELEMENTS) ;
+  int numberOf = getNumberOfElements(entityToParse,MED_ALL_ELEMENTS) ;
 
   if ( _coordinate->getNumberOfNodes() > 0 ) // BODY FITTED
     {

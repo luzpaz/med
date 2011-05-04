@@ -105,7 +105,7 @@ void ParaMEDSPLITTERTest::test_medsplitter_para( const string& med_file, const s
   {
     int total_nb_faces = 0;
     for ( int idomain=0; idomain < collection_3w.getMesh().size(); ++idomain )
-      total_nb_faces += collection_3w.getMesh()[idomain]->getNumberOfElements(collection_3w.getSubEntity(), MEDMEM_ALL_ELEMENTS );
+      total_nb_faces += collection_3w.getMesh()[idomain]->getNumberOfElements(collection_3w.getSubEntity(), MED_ALL_ELEMENTS );
 
     for ( int idomain=0; idomain < collection_3w.getMesh().size(); ++idomain )
     {

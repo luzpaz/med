@@ -357,7 +357,7 @@ void MEDMEMTest::testFamily()
     CPPUNIT_ASSERT(strcmp("Nodes 1", aNodesF1->getName().c_str()) == 0);
     CPPUNIT_ASSERT(MED_EN::MED_NODE == aNodesF1->getEntity());
     CPPUNIT_ASSERT(!aNodesF1->isOnAllElements());
-    CPPUNIT_ASSERT_EQUAL(7, aNodesF1->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_EQUAL(7, aNodesF1->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 
     CPPUNIT_ASSERT_EQUAL(2, aNodesF1->getNumberOfAttributes());
     CPPUNIT_ASSERT_EQUAL(1, aNodesF1->getAttributeIdentifier(1));
@@ -385,8 +385,8 @@ void MEDMEMTest::testFamily()
     CPPUNIT_ASSERT(MED_EN::MED_FACE == aFacesF7->getEntity());
 
     CPPUNIT_ASSERT_EQUAL(8, aTestMesh->getNumberOfElements(MED_EN::MED_FACE,
-                                                           MED_EN::MEDMEM_ALL_ELEMENTS));
-    CPPUNIT_ASSERT_EQUAL(8, aFacesF7->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS));
+                                                           MED_EN::MED_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_EQUAL(8, aFacesF7->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 
     CPPUNIT_ASSERT(!aFacesF7->isOnAllElements());
 

@@ -330,7 +330,7 @@ int main (int argc, char **argv)
   printf("%d\n",ret);
 
   /*
-    ecriture des mailles MEDMEM_TETRA4 :
+    ecriture des mailles MED_TETRA4 :
     - connectivite
     - noms (optionnel) 
     - numeros (optionnel)
@@ -340,7 +340,7 @@ int main (int argc, char **argv)
   if (ret == 0) 
     ret = MEDelementsEcr(fid,maa,mdim,tetra4,MED_FULL_INTERLACE,
                          nomtetra4,MED_FAUX,numtetra4,MED_VRAI,nufatetra4,
-                         ntetra4,MED_MAILLE,MEDMEM_TETRA4,MED_NOD,WRONLY);
+                         ntetra4,MED_MAILLE,MED_TETRA4,MED_NOD,WRONLY);
   printf("%d \n",ret);
 
   /***************************************************************************/
@@ -405,7 +405,7 @@ int main (int argc, char **argv)
                             (unsigned char *) DbleVectCell,
                             MED_NO_INTERLACE, dimTot,
                             MED_NOPG, MED_ALL, MED_NOPFL, WRONLY, MED_MAILLE,
-                            MEDMEM_TETRA4, MED_NOPDT,"        ", 0., MED_NONOR);
+                            MED_TETRA4, MED_NOPDT,"        ", 0., MED_NONOR);
         
           printf("MEDchampEcr DbleVectCell : %d \n",ret);
         }

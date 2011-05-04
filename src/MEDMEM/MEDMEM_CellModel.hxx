@@ -64,7 +64,7 @@ private:
 
 
   //protected:
-                        /*! explicit name (as MEDMEM_POINT1)           */
+                        /*! explicit name (as MED_POINT1)           */
   string             _name;
                         /*! type of cell (cf define.h)              */
   MED_EN::medGeometryElement _type;
@@ -109,7 +109,7 @@ public :
                         /*! Operator << : print CELLMODEL to the given stream. */
   friend MEDMEM_EXPORT ostream & operator<<(ostream &os,const CELLMODEL &my);
 
-                        /*! returns _name attribute (ie: MEDMEM_PENTA15).\n
+                        /*! returns _name attribute (ie: MED_PENTA15).\n
                             see med.h (in med/include) */
   inline string                 getName()             const;
 
@@ -169,7 +169,7 @@ public :
 // ------------------------------------------
 
 inline CELLMODEL::CELLMODEL():
-    _type(MED_EN::MEDMEM_NONE),
+    _type(MED_EN::MED_NONE),
     _dimension(0),
     _numberOfNodes(0),
     _numberOfVertexes(0),
@@ -181,7 +181,7 @@ inline CELLMODEL::CELLMODEL():
 {
 }
 inline CELLMODEL::CELLMODEL(const CELLMODEL &m):
-    _type(MED_EN::MEDMEM_NONE),
+    _type(MED_EN::MED_NONE),
     _dimension(0),
     _numberOfNodes(0),
     _numberOfVertexes(0),

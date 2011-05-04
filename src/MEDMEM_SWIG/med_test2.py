@@ -57,11 +57,11 @@ def AnalyzeField(field):
         if fieldEntity == MED_NODE:
             nbValByComp = fieldMesh.getNumberOfNodes()
         else:
-            nbValByComp = fieldMesh.getNumberOfElements(fieldEntity,MEDMEM_ALL_ELEMENTS)
+            nbValByComp = fieldMesh.getNumberOfElements(fieldEntity,MED_ALL_ELEMENTS)
         print "and its dimension (number of values by component of the field) is ",nbValByComp
     else:
         print "The support of this field is partially on entities ",fieldEntity," of the mesh ",fieldMesh.getName()
-        nbValByComp = fieldSupport.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+        nbValByComp = fieldSupport.getNumberOfElements(MED_ALL_ELEMENTS)
         print "and its dimension (number of values by component of the field) is ",nbValByComp
 
     for i in range(nbComp):
@@ -180,8 +180,8 @@ if (nbMeshes>0):
         print ""
         print "Show the Descending Connectivity:"
         mesh.calculateConnectivity(MED_DESCENDING,MED_CELL)
-        nbElemts = mesh.getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS)
-        Connectivity = mesh.getConnectivity(MED_DESCENDING,MED_CELL,MEDMEM_ALL_ELEMENTS)
+        nbElemts = mesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)
+        Connectivity = mesh.getConnectivity(MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS)
         ConnectivityIndex = mesh.getConnectivityIndex(MED_DESCENDING,MED_CELL)
         print ""
         for j in range(nbElemts):
@@ -238,7 +238,7 @@ if (nbMeshes>0):
                             print "    * Type",type
                             print "    * Number",number[0:nbOfElmtsOfType]
                         print ""
-                        numberFamily = family.getNumber(MEDMEM_ALL_ELEMENTS)
+                        numberFamily = family.getNumber(MED_ALL_ELEMENTS)
                         print "    * Getting an Integer Field on the family ",familyName
                         fieldFamilyIntg = FIELDINT(family,spaceDim)
                         fieldFamilyIntg.setIterationNumber(0)
@@ -279,7 +279,7 @@ if (nbMeshes>0):
                             print "          Description:",compDesc
                             print "          Unit:",compUnit
 
-                        nbOf = fieldFamilyIntg.getSupport().getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+                        nbOf = fieldFamilyIntg.getSupport().getNumberOfElements(MED_ALL_ELEMENTS)
                         print "      Values:",nbOf
                         print "      Randomly set and get to check ..!"
                         for k in range(nbOf):
@@ -333,7 +333,7 @@ if (nbMeshes>0):
                             print "          Description:",compDesc
                             print "          Unit:",compUnit
 
-                        nbOf = fieldFamilyDble.getSupport().getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+                        nbOf = fieldFamilyDble.getSupport().getNumberOfElements(MED_ALL_ELEMENTS)
                         print "      Values:",nbOf
                         print "      Randomly set and get to check ..!"
                         for k in range(nbOf):
@@ -350,8 +350,8 @@ if (nbMeshes>0):
                         print ""
                         print "Getting barycenter on this family"
                         barycenterfamily = mesh.getBarycenter(family)
-                        if (not familyBool): numberFamily = family.getNumber(MEDMEM_ALL_ELEMENTS)
-                        nbVal = barycenterfamily.getSupport().getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+                        if (not familyBool): numberFamily = family.getNumber(MED_ALL_ELEMENTS)
+                        nbVal = barycenterfamily.getSupport().getNumberOfElements(MED_ALL_ELEMENTS)
                         nbComp = barycenterfamily.getNumberOfComponents()
                         for j in range(nbVal):
                             valInd = j+1
@@ -413,7 +413,7 @@ if (nbMeshes>0):
             print "Building of the support on all Faces of the mesh."
             supportFace = SUPPORT(mesh,"Support on all faces of the mesh",MED_FACE)
             supportFace.update()
-            nbFace = mesh.getNumberOfElements(MED_FACE,MEDMEM_ALL_ELEMENTS)
+            nbFace = mesh.getNumberOfElements(MED_FACE,MED_ALL_ELEMENTS)
             print ""
             print "Getting normal of each face of this support",nbFace
             nbTypeFace = mesh.getNumberOfTypes(MED_FACE)
@@ -461,7 +461,7 @@ if (nbMeshes>0):
             print ""
             print "Getting the support on all Edges of the mesh."
             supportEdge = mesh.getSupportOnAll(MED_EDGE)
-            nbEdge = mesh.getNumberOfElements(MED_EDGE,MEDMEM_ALL_ELEMENTS)
+            nbEdge = mesh.getNumberOfElements(MED_EDGE,MED_ALL_ELEMENTS)
             print ""
             print "Getting normal of each edge of this support",nbEdge
             nbTypeEdge = mesh.getNumberOfTypes(MED_EDGE)

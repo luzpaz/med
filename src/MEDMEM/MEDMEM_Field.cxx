@@ -53,7 +53,7 @@ FIELD_::FIELD_(const SUPPORT * Support, const int NumberOfComponents):
 {
   MESSAGE_MED("FIELD_(const SUPPORT * Support, const int NumberOfComponents)");
 
-  _numberOfValues = Support->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  _numberOfValues = Support->getNumberOfElements(MED_ALL_ELEMENTS);
   _componentsTypes.resize(NumberOfComponents);
   _componentsNames.resize(NumberOfComponents);
   _componentsDescriptions.resize(NumberOfComponents);
@@ -257,7 +257,7 @@ void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume,
       throw MEDEXCEPTION(diagnosis.c_str());
     }
 
-  if( getSupport()->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS) != getNumberOfValues() ) {
+  if( getSupport()->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS) != getNumberOfValues() ) {
     diagnosis="Cannot compute Lnorm of "+getName()+
       " : the suppors size not corresponded to number of elements!";
     throw MEDEXCEPTION(diagnosis.c_str());
@@ -274,7 +274,7 @@ void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume,
       if ( getSupport()->getEntity() == MED_NODE )
         {
           if (support_volume->getNumberOfValues()!=
-              getSupport()->getMesh()->getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS))
+              getSupport()->getMesh()->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS))
             {
               diagnosis="Cannot compute Lnorm of nodal field "+getName()+
                 " : the volume furnished has wrong number of values";

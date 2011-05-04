@@ -126,7 +126,7 @@ if (nbMeshes>0):
                             print "    * Type",type
                             print "    * Number",number[0:nbOfElmtsOfType]
                         print ""
-                        numberFamily = family.getNumber(MEDMEM_ALL_ELEMENTS)
+                        numberFamily = family.getNumber(MED_ALL_ELEMENTS)
                         print "    * Getting an Integer Field on the family ",familyName
                         fieldFamilyIntg = FIELDINT(family,spaceDim)
                         fieldFamilyIntg.setIterationNumber(0)
@@ -167,7 +167,7 @@ if (nbMeshes>0):
                             print "          Description:",compDesc
                             print "          Unit:",compUnit
 
-                        nbOf = fieldFamilyIntg.getSupport().getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+                        nbOf = fieldFamilyIntg.getSupport().getNumberOfElements(MED_ALL_ELEMENTS)
                         print "      Values:",nbOf
                         print "      Randomly set (via setValue) and get (via getValue) to check with the same mode ..!"
                         value = []

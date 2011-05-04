@@ -120,7 +120,7 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
 
   MEDSKYLINEARRAY * famNumber = myFamily->getnumber();
 
-  const int * famNumberValue = myFamily->getNumber(MEDMEM_ALL_ELEMENTS);
+  const int * famNumberValue = myFamily->getNumber(MED_ALL_ELEMENTS);
 
   const int * famNumberIndex = myFamily->getNumberIndex();
 

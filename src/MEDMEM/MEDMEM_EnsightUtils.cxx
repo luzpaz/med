@@ -242,102 +242,102 @@ namespace MEDMEM_ENSIGHT
     theEnSightType._medType = medType;
 
     switch ( medType ) {
-    case MEDMEM_NONE    :
-    case MEDMEM_POINT1  : {
+    case MED_NONE    :
+    case MED_POINT1  : {
       theEnSightType._name = "point";
       theEnSightType._medIndex.resize(1,0);
       break ;
     }
-    case MEDMEM_SEG2    : {
+    case MED_SEG2    : {
       theEnSightType._name = "bar2";
       int conn [2] = {0,1};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MEDMEM_SEG3    : {  
+    case MED_SEG3    : {  
       theEnSightType._name = "bar3";
       int conn [3] = {0,2,1};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MEDMEM_TRIA3   : {
+    case MED_TRIA3   : {
       theEnSightType._name = "tria3";
       int conn [3] = {0,2,1};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MEDMEM_QUAD4   : {
+    case MED_QUAD4   : {
       theEnSightType._name = "quad4";
       int conn [4] = {0,3,2,1};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MEDMEM_TRIA6   : {
+    case MED_TRIA6   : {
       theEnSightType._name = "tria6";
       int conn [6] = {0,2,1,5,4,3};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MEDMEM_QUAD8   : {
+    case MED_QUAD8   : {
       theEnSightType._name = "quad8";
       int conn [8] = {0,3,2,1,7,6,5,4};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MEDMEM_TETRA4  : {
+    case MED_TETRA4  : {
       theEnSightType._name = "tetra4";
       int conn [4] = {0,1,3,2};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MEDMEM_PYRA5   : {
+    case MED_PYRA5   : {
       theEnSightType._name = "pyramid5";
       int conn [5] = {0,3,2,1,4};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MEDMEM_PENTA6  : {
+    case MED_PENTA6  : {
       theEnSightType._name = "penta6";
       int conn [6] = {0,2,1,3,5,4};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MEDMEM_HEXA8   : {
+    case MED_HEXA8   : {
       theEnSightType._name = "hexa8";
       int conn [8] = {0,3,2,1,4,7,6,5};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MEDMEM_TETRA10 : {
+    case MED_TETRA10 : {
       theEnSightType._name = "tetra10";
       int conn [10] = {0,2,1,3,6,5,4,7,9,8};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MEDMEM_PYRA13  : {
+    case MED_PYRA13  : {
       theEnSightType._name = "pyramid13";
       int conn [13] = {0,3,2,1,4,8,7,6,5,9,12,11,10};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MEDMEM_PENTA15 : {
+    case MED_PENTA15 : {
       theEnSightType._name = "penta15";
       int conn [15] = {0,2,1,3,5,4,8,7,6,11,10,12,14,13};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MEDMEM_HEXA20  : {
+    case MED_HEXA20  : {
       theEnSightType._name = "hexa20";
       int conn [20] = {0,3,2,1,4,7,6,5,11,10,9,8,15,14,13,12,16,19,18,17};
       theEnSightType._medIndex.assign( conn, conn+nbNodes );
       break ;
     }
-    case MEDMEM_POLYGON : {
+    case MED_POLYGON : {
       theEnSightType._name = "nsided";
       theEnSightType._medIndex.clear();
       break ;
     }
-    case MEDMEM_POLYHEDRA : {
+    case MED_POLYHEDRA : {
       theEnSightType._name = "nfaced";
       theEnSightType._medIndex.clear();
       break ;
@@ -374,7 +374,7 @@ namespace MEDMEM_ENSIGHT
       if ( enSightType._name == typeName )
         return name2Type[ typeName ] = enSightType;
     }
-    return getEnSightType(MEDMEM_ALL_ELEMENTS);
+    return getEnSightType(MED_ALL_ELEMENTS);
   }
 
 // =============================================================== _CaseFileDriver
@@ -1311,9 +1311,9 @@ void _CaseFileDriver::addMesh(const ENSIGHT_MESH_WRONLY_DRIVER* meshDriver)
   if ( _format == ENSIGHT_6 )
   {
     const GMESH* mesh = _meshDrivers.back()->getMesh();
-    if ( mesh->getNumberOfElements(MED_CELL, MEDMEM_POLYGON) > 0 ||
-         mesh->getNumberOfElements(MED_FACE, MEDMEM_POLYGON) > 0 ||
-         mesh->getNumberOfElements(MED_CELL, MEDMEM_POLYHEDRA) > 0 )
+    if ( mesh->getNumberOfElements(MED_CELL, MED_POLYGON) > 0 ||
+         mesh->getNumberOfElements(MED_FACE, MED_POLYGON) > 0 ||
+         mesh->getNumberOfElements(MED_CELL, MED_POLYHEDRA) > 0 )
       throw MEDEXCEPTION
         ( compatibilityPb(STRING("Can't write mesh <") << mesh->getName() <<
                           "> since Ensight6 format does not support poly elements,"
@@ -1872,8 +1872,8 @@ int _CaseFileDriver_User::getPartNumber(const SUPPORT* support) const
   // for supports on all entities, reserve numbers corresponding to entity
   bool isOnAll = support->isOnAllElements();
   if (!isOnAll && mesh ) {
-    int nbMeshElem = mesh->getNumberOfElements(entity, MEDMEM_ALL_ELEMENTS);
-    int nbSuppElem = support->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+    int nbMeshElem = mesh->getNumberOfElements(entity, MED_ALL_ELEMENTS);
+    int nbSuppElem = support->getNumberOfElements(MED_ALL_ELEMENTS);
     isOnAll = (  nbSuppElem == nbMeshElem );
   }
   if ( !isGroup ) {
@@ -1924,7 +1924,7 @@ bool _CaseFileDriver_User::isToWriteEntity(const medEntityMesh entity,
   if ( entity == MED_NODE )
     return mesh->getNumberOfNodes() > 0;
 
-  if ( mesh->getNumberOfElements( entity, MEDMEM_ALL_ELEMENTS ) < 1 )
+  if ( mesh->getNumberOfElements( entity, MED_ALL_ELEMENTS ) < 1 )
     return false;
   if ( entity == MED_CELL )
     return true;
@@ -1948,7 +1948,7 @@ void _CaseFileDriver_User::getSupportNodes(const SUPPORT* support, map<int, int>
   medEntityMesh entity = support->getEntity();
 
   const medConnectivity conType     = MED_NODAL;
-  const medGeometryElement allGeoms = MEDMEM_ALL_ELEMENTS;
+  const medGeometryElement allGeoms = MED_ALL_ELEMENTS;
   const int * connectivity          = 0;
   const int * elemConnectivity      = 0;
   const int * index                 = 0;
@@ -1977,18 +1977,18 @@ void _CaseFileDriver_User::getSupportNodes(const SUPPORT* support, map<int, int>
 
   if ( entity == MED_NODE )
   {
-    number           = support->getNumber(MEDMEM_ALL_ELEMENTS);
-    int numberOfCell = support->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+    number           = support->getNumber(MED_ALL_ELEMENTS);
+    int numberOfCell = support->getNumberOfElements(MED_ALL_ELEMENTS);
     for (j=0; j < numberOfCell; j++)
       nodeIds.insert(nodeIds.end(), make_pair( number[j], j ));
     return;
   }
 
-  number           = support->getNumber(MEDMEM_ALL_ELEMENTS);
-  int numberOfCell = support->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  number           = support->getNumber(MED_ALL_ELEMENTS);
+  int numberOfCell = support->getNumberOfElements(MED_ALL_ELEMENTS);
   const MESH* mesh = support->getMesh()->convertInMESH();
   index        = mesh->getConnectivityIndex( MED_NODAL, entity);
-  connectivity = mesh->getConnectivity( MED_NODAL, entity, MEDMEM_ALL_ELEMENTS);
+  connectivity = mesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
   for ( j = 0; j < numberOfCell; ++j )
   {
     int elem = number[j];
@@ -2139,7 +2139,7 @@ _Support* _CaseFileDriver_User::getSupport(const _SupportDesc & descriptor,
           _groupe & groupe = _imed->groupes.back();
           groupe.mailles.resize( subPart->myNbNodes );
 
-          _maille ma( MEDMEM_POINT1, 1 );
+          _maille ma( MED_POINT1, 1 );
           ma.sommets.resize( 1 );
           map< int, _noeud >::iterator n = subPart->myFirstNode;
           for (int i = 0; i < subPart->myNbNodes; ++i, ++n ) {
