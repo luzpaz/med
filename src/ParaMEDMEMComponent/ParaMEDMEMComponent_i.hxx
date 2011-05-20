@@ -18,7 +18,7 @@
 //
 
 #ifndef __PARAMEDMEMCOMPOCOMPONENT_I__
-#define __PARAMEMDEMCOMPOCOMPONENT_I__
+#define __PARAMEDMEMCOMPOCOMPONENT_I__
 
 #include "SALOMEconfig.h"
 #include CORBA_SERVER_HEADER(ParaMEDMEMComponent)
