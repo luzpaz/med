@@ -115,7 +115,7 @@
   if (PyList_Check($input)) { 
     int size = PyList_Size($input);
     int i = 0; 
-    $1 = (medGeometryElement *) malloc(size*sizeof(int));
+    $1 = (medGeometryElement *) malloc(size*sizeof(medGeometryElement));
     for (i = 0; i < size; i++) {
       PyObject *o = PyList_GetItem($input,i);
       if (PyInt_Check(o))
