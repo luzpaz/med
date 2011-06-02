@@ -136,6 +136,7 @@ namespace MED
     {
       myDim = theInfo->GetDim();
       myType = theInfo->GetType();
+      myMeshDim = theInfo->myMeshDim;
       
       myDesc.resize(GetDESCLength<eVersion>()+1);
       SetDesc(theInfo->GetDesc());
@@ -149,6 +150,7 @@ namespace MED
     {
       myDim = theDim;
       myType = theType;
+      myMeshDim = myDim;
       
       myDesc.resize(GetDESCLength<eVersion>()+1);
       SetDesc(theDesc);

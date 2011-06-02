@@ -247,16 +247,21 @@ namespace MED
       
       MED::TMeshInfo& anInfo = const_cast<MED::TMeshInfo&>(theInfo);
       
-      TValueHolder<TString, char> aMeshName(anInfo.myName);
-      TValueHolder<TInt, med_int> aDim(anInfo.myDim);
+      TValueHolder<TString, char> aMeshName(anInfo.myName); // mesh dim
+      TValueHolder<TInt, med_int> aDim(anInfo.myDim); // space dim
+      TValueHolder<TInt, med_int> aMeshDim(anInfo.myMeshDim);
       TValueHolder<EMaillage, med_maillage> aType(anInfo.myType);
       TValueHolder<TString, char> aDesc(anInfo.myDesc);
 
       TErr aRet = MEDmaaCr(myFile->Id(),
                            &aMeshName,
-                           aDim,
+                           aMeshDim,
                            aType,
                            &aDesc);
+      if( aRet == 0 && anInfo.myDim != anInfo.myMeshDim )
+        aRet = MEDdimEspaceCr( myFile->Id(),
+                               &aMeshName,
+                               aDim);
       if(aRet == 0){
         aRet = MEDunvCr(myFile->Id(),
                         &aMeshName);
