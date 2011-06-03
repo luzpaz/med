@@ -33,6 +33,7 @@ from libSALOME_Swig import *
 sg = SALOMEGUI_Swig()
 
 from libMedCorba_Swig import *
+from libMEDClient import *
 
 from random import *
 
@@ -224,6 +225,9 @@ for entity in [SALOME_MED.MED_NODE,SALOME_MED.MED_CELL,SALOME_MED.MED_FACE,SALOM
                 lengthValue = familycorba.getNumberOfElements(SALOME_MED.MED_ALL_ELEMENTS)
                 nbOfComp = 1
 
+                supportOutLocal = SUPPORTClient( familycorba )
+                supportOutCorba = createCorbaSupport( supportOutLocal )
+
                 print "\nGenerate a Local scalar double field"
                 fieldScalDblLoc = createLocalFieldDouble(nbOfComp,lengthValue)
                 value = [ random() for k in range(lengthValue*nbOfComp) ]
@@ -233,7 +237,8 @@ for entity in [SALOME_MED.MED_NODE,SALOME_MED.MED_CELL,SALOME_MED.MED_FACE,SALOM
                 print "     Get ",valueIverif
 
                 print "\nGenerate a Corba scalar double field"
-                fieldScalDblCorba = createCorbaFieldDouble(familycorba,fieldScalDblLoc)
+                fieldScalDblLoc.setSupport( supportOutLocal )
+                fieldScalDblCorba = createCorbaFieldDouble(supportOutCorba,fieldScalDblLoc)
                 AnalyzeField(fieldScalDblCorba)
 
                 print "Generate a Local scalar integer field"
@@ -245,7 +250,8 @@ for entity in [SALOME_MED.MED_NODE,SALOME_MED.MED_CELL,SALOME_MED.MED_FACE,SALOM
                 print "     Get ",valueIverif
 
                 print "\nGenerate a Corba scalar integer field"
-                fieldScalIntCorba = createCorbaFieldInt(familycorba,fieldScalIntLoc)
+                fieldScalIntLoc.setSupport( supportOutLocal )
+                fieldScalIntCorba = createCorbaFieldInt(supportOutCorba,fieldScalIntLoc)
                 AnalyzeField(fieldScalIntCorba)
 
                 nbOfComp = spaceDim
@@ -258,7 +264,8 @@ for entity in [SALOME_MED.MED_NODE,SALOME_MED.MED_CELL,SALOME_MED.MED_FACE,SALOM
                 print "     Get ",valueIverif
 
                 print "\nGenerate a Corba vector double field"
-                fieldVectDblCorba = createCorbaFieldDouble(familycorba,fieldVectDblLoc)
+                fieldVectDblLoc.setSupport( supportOutLocal )
+                fieldVectDblCorba = createCorbaFieldDouble(supportOutCorba,fieldVectDblLoc)
                 AnalyzeField(fieldVectDblCorba)
 
                 print "\nGenerate a Local vector integer field"
@@ -270,7 +277,8 @@ for entity in [SALOME_MED.MED_NODE,SALOME_MED.MED_CELL,SALOME_MED.MED_FACE,SALOM
                 print "     Get ",valueIverif
 
                 print "\nGenerate a Corba vector integer field"
-                fieldVectIntCorba = createCorbaFieldInt(familycorba,fieldVectIntLoc)
+                fieldVectIntLoc.setSupport( supportOutLocal )
+                fieldVectIntCorba = createCorbaFieldInt(supportOutCorba,fieldVectIntLoc)
                 AnalyzeField(fieldVectIntCorba)
                 print ""
 print "Fin du script Python ...."

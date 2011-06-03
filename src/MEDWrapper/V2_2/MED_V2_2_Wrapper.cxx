@@ -1926,6 +1926,7 @@ namespace MED
       TValueHolder<TString, char> aFieldName(anInfo.myName);
       MED::TMeshInfo& aMeshInfo = anInfo.myMeshInfo;
 
+      // workaround for IPAL13676
       MED::TEntityInfo localEntityInfo = theEntityInfo;
       TEntityInfo::iterator anLocalIter = localEntityInfo.find(eMAILLE);
       if(anLocalIter != localEntityInfo.end()){
@@ -1974,6 +1975,13 @@ namespace MED
               char locname[MED_NAME_SIZE+1];
               med_int profilsize;
               med_int aNbGauss;
+
+              // protection from crash (division by zero)
+              // inside MEDfieldnValueWithProfile function
+              // caused by the workaround for IPAL13676 (see above)
+              if( anEntity == MED_NODE_ELEMENT && aGeom % 100 == 0 )
+                continue;
+
               nval = MEDfieldnValueWithProfile(anId,
                                                &aFieldName,
                                                aNumDt,
@@ -2486,7 +2494,7 @@ namespace MED
       EGrilleType aGrilleType = theInfo.myGrilleType;
 
       TErr aRet = 0;
-      if(aMaillageType == eSTRUCTURE && aGrilleType == eGRILLE_STANDARD){
+      if(aMaillageType == eSTRUCTURE && aGrilleType == eGRILLE_STANDARD) {
         GetGrilleStruct(aMeshInfo, theInfo.myGrilleStructure, theErr);
 
         TValueHolder<TNodeCoord, med_float> aCoord(theInfo.myCoord);
@@ -2563,7 +2571,7 @@ namespace MED
             EXCEPTION(std::runtime_error,"GetGrilleInfo - Erreur a la lecture de la taille de l'indice");
             
           TValueHolder<TFloatVector, med_float> anIndexes(theInfo.GetIndexes(anAxis-1));
-          TValueHolder<ETable, med_data_type > aTable(aTable);
+          //TValueHolder<ETable, med_data_type > table(aTable);
           //char aCompNames[MED_SNAME_SIZE+1];
           //char anUnitNames[MED_SNAME_SIZE+1];
           aRet=MEDmeshGridIndexCoordinateRd(myFile->Id(),&aMeshName,
