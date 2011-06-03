@@ -137,7 +137,6 @@ void MedGUI::initialize( CAM_Application* app )
 
   _data_base = new MEDGUIDataBaseDockWidget(application(),application()->desktop());
   application()->desktop()->addDockWidget(Qt::LeftDockWidgetArea,_data_base);
-  _data_base->show();              
 }
 
 QString MedGUI::engineIOR() const
@@ -196,6 +195,9 @@ bool MedGUI::deactivateModule( SUIT_Study* study )
   setMenuShown( false );
   setToolShown( false );
 
+  _data_base->setVisible( false );
+  _data_base->toggleViewAction()->setVisible( false );
+
   disconnect( application()->desktop(), SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
              this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );
 
@@ -215,6 +217,9 @@ bool MedGUI::activateModule( SUIT_Study* study )
 
   setMenuShown( true );
   setToolShown( true );
+
+  _data_base->setVisible( true );
+  _data_base->toggleViewAction()->setVisible( true );
 
   connect( application()->desktop(), SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
           this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );
