@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 /*
@@ -85,7 +85,7 @@ protected:
     Reference to the mesh on which the support is defined.
     \endif
   */
-  mutable GMESH *                   _mesh;
+  mutable const GMESH *            _mesh;
 
   /*!
     \if developper
@@ -176,9 +176,9 @@ public:
   bool deepCompare(const SUPPORT &support) const;
   void update();
 
-  inline void setName(string Name);
-  inline void setDescription(string Description);
-  void        setMesh(GMESH *Mesh) const;
+  inline void setName(const std::string& Name);
+  inline void setDescription(const std::string& Description);
+  void        setMesh(const GMESH *Mesh) const;
   void        setMeshName(const string & meshName);
   inline void setAll(bool All);
   void        setEntity(MED_EN::medEntityMesh Entity);
@@ -188,10 +188,10 @@ public:
   void        setNumber(MEDSKYLINEARRAY * Number);
   void        setNumber(const int * index, const int* value, bool shallowCopy=false);
 
-  inline std::string getName() const;
-  inline std::string getDescription() const;
-  virtual inline GMESH * getMesh() const;
-  std::string getMeshName() const;
+  inline const std::string&    getName() const;
+  inline const std::string&    getDescription() const;
+  virtual inline const GMESH * getMesh() const;
+  std::string                  getMeshName() const;
   inline MED_EN::medEntityMesh getEntity() const;
 
   inline bool   isOnAllElements() const;
@@ -210,7 +210,7 @@ public:
 
   // Les numéros d'entités dans les profils doivent être croissant
   // pour respecter la norme MED
-  void setpartial(string Description, int NumberOfGeometricType,
+  void setpartial(const std::string& Description, int NumberOfGeometricType,
                   int TotalNumberOfEntity, const MED_EN::medGeometryElement *GeometricType,
                   const int *NumberOfEntity, const int *NumberValue);
 
@@ -221,13 +221,13 @@ public:
   
   // Si les noms de profils ne sont pas positionnés, les profils ne seront
   // pas écrits par MEDFICHIER.
-  void   setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION);
+  void   setProfilNames(const std::vector<std::string>& profilNames) throw (MEDEXCEPTION);
   //string getProfilName(const MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
-  vector<string> getProfilNames() const throw (MEDEXCEPTION);
+  std::vector<std::string> getProfilNames() const throw (MEDEXCEPTION);
 
   void getBoundaryElements() throw (MEDEXCEPTION);
   void changeElementsNbs(MED_EN::medEntityMesh entity, const int *renumberingFromOldToNew);
-  void intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION) ;
+  void intersecting(const SUPPORT * mySupport) throw (MEDEXCEPTION) ;
   bool belongsTo(const SUPPORT& other, bool deepCompare=false) const;
   SUPPORT *getComplement() const;
   SUPPORT *substract(const SUPPORT& other) const throw (MEDEXCEPTION) ;
@@ -250,7 +250,7 @@ public:
 
 /*! set the attribute _name to Name */
 //--------------------------------------
-inline void SUPPORT::setName(std::string Name)
+inline void SUPPORT::setName(const std::string& Name)
 //--------------------------------------
 {
   _name=Name;
@@ -258,7 +258,7 @@ inline void SUPPORT::setName(std::string Name)
 
 /*! set the attribute _description to Description */
 //--------------------------------------------------
-inline void SUPPORT::setDescription(std::string Description)
+inline void SUPPORT::setDescription(const std::string& Description)
 //--------------------------------------------------
 {
   _description=Description;
@@ -288,7 +288,7 @@ inline void SUPPORT::setAll(bool All)
 
 /*! returns the name of the support. */
 //------------------------------------
-inline std::string SUPPORT::getName() const
+inline const std::string& SUPPORT::getName() const
 //------------------------------------
 {
   return _name;
@@ -296,7 +296,7 @@ inline std::string SUPPORT::getName() const
 
 /*! returns the description of the support. */
 //--------------------------------------------
-inline std::string SUPPORT::getDescription() const
+inline const std::string& SUPPORT::getDescription() const
 //--------------------------------------------
 {
   return _description;
@@ -304,7 +304,7 @@ inline std::string SUPPORT::getDescription() const
 
 /*! returns a reference to the mesh */
 //------------------------------------
-inline GMESH * SUPPORT::getMesh() const
+inline const GMESH * SUPPORT::getMesh() const
 //------------------------------------
 {
   return _mesh;

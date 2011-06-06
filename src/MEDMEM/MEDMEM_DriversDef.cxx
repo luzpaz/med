@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEM_DriversDef.hxx"
@@ -31,25 +31,25 @@ namespace MED_EN {
 GEO_NAME::GEO_NAME() : map<int,string>()
 {
   map<int,string> &table  = (map<int,string>&)*this ;
-  table[(int)0 ] = "MEDMEM_NONE" ;
-  table[(int)MEDMEM_POINT1 ] = "MEDMEM_POINT1" ;
-  table[(int)MEDMEM_SEG2   ] = "MEDMEM_SEG2"   ;
-  table[(int)MEDMEM_SEG3   ] = "MEDMEM_SEG3"   ;
-  table[(int)MEDMEM_TRIA3  ] = "MEDMEM_TRIA3"  ;
-  table[(int)MEDMEM_TRIA6  ] = "MEDMEM_TRIA6"  ;
-  table[(int)MEDMEM_QUAD4  ] = "MEDMEM_QUAD4"  ;
-  table[(int)MEDMEM_QUAD8  ] = "MEDMEM_QUAD8"  ;
-  table[(int)MEDMEM_TETRA4 ] = "MEDMEM_TETRA4" ;
-  table[(int)MEDMEM_TETRA10] = "MEDMEM_TETRA10";
-  table[(int)MEDMEM_HEXA8  ] = "MEDMEM_HEXA8"  ;
-  table[(int)MEDMEM_HEXA20 ] = "MEDMEM_HEXA20" ;
-  table[(int)MEDMEM_PENTA6 ] = "MEDMEM_PENTA6" ;
-  table[(int)MEDMEM_PENTA15] = "MEDMEM_PENTA15";
-  table[(int)MEDMEM_PYRA5  ] = "MEDMEM_PYRA5"  ;
-  table[(int)MEDMEM_PYRA13 ] = "MEDMEM_PYRA13" ;
-  table[(int)MEDMEM_POLYGON] = "MEDMEM_POLYGON";
-  table[(int)MEDMEM_POLYHEDRA] = "MEDMEM_POLYHEDRA";
-  assert( table.find( (int)MEDMEM_POLYHEDRA ) != table.end() ) ;
+  table[(int)0 ] = "MED_NONE" ;
+  table[(int)MED_POINT1 ] = "MED_POINT1" ;
+  table[(int)MED_SEG2   ] = "MED_SEG2"   ;
+  table[(int)MED_SEG3   ] = "MED_SEG3"   ;
+  table[(int)MED_TRIA3  ] = "MED_TRIA3"  ;
+  table[(int)MED_TRIA6  ] = "MED_TRIA6"  ;
+  table[(int)MED_QUAD4  ] = "MED_QUAD4"  ;
+  table[(int)MED_QUAD8  ] = "MED_QUAD8"  ;
+  table[(int)MED_TETRA4 ] = "MED_TETRA4" ;
+  table[(int)MED_TETRA10] = "MED_TETRA10";
+  table[(int)MED_HEXA8  ] = "MED_HEXA8"  ;
+  table[(int)MED_HEXA20 ] = "MED_HEXA20" ;
+  table[(int)MED_PENTA6 ] = "MED_PENTA6" ;
+  table[(int)MED_PENTA15] = "MED_PENTA15";
+  table[(int)MED_PYRA5  ] = "MED_PYRA5"  ;
+  table[(int)MED_PYRA13 ] = "MED_PYRA13" ;
+  table[(int)MED_POLYGON] = "MED_POLYGON";
+  table[(int)MED_POLYHEDRA] = "MED_POLYHEDRA";
+  assert( table.find( (int)MED_POLYHEDRA ) != table.end() ) ;
 }
  
 GEO_NAME::~GEO_NAME()
@@ -101,23 +101,23 @@ MESH_ENTITIES::MESH_ENTITIES () : map<int, const list<MED_EN::medGeometryElement
   // Initialize the value associated with the ROUGE_ key ( use the private operator = )
   {
     const MED_EN::medGeometryElement T[] =  {
-      MEDMEM_POINT1,
-      MEDMEM_SEG2,
-      MEDMEM_SEG3,
-      MEDMEM_TRIA3,
-      MEDMEM_QUAD4,
-      MEDMEM_TRIA6,
-      MEDMEM_QUAD8,
-      MEDMEM_TETRA4,
-      MEDMEM_PYRA5,
-      MEDMEM_PENTA6,
-      MEDMEM_HEXA8,
-      MEDMEM_TETRA10,
-      MEDMEM_PYRA13,
-      MEDMEM_PENTA15,
-      MEDMEM_HEXA20,
-      MEDMEM_POLYGON,
-      MEDMEM_POLYHEDRA};
+      MED_POINT1,
+      MED_SEG2,
+      MED_SEG3,
+      MED_TRIA3,
+      MED_QUAD4,
+      MED_TRIA6,
+      MED_QUAD8,
+      MED_TETRA4,
+      MED_PYRA5,
+      MED_PENTA6,
+      MED_HEXA8,
+      MED_TETRA10,
+      MED_PYRA13,
+      MED_PENTA15,
+      MED_HEXA20,
+      MED_POLYGON,
+      MED_POLYHEDRA};
 
     list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
     (*this)[MED_CELL] = geomList;
@@ -125,11 +125,11 @@ MESH_ENTITIES::MESH_ENTITIES () : map<int, const list<MED_EN::medGeometryElement
   
   {
     const MED_EN::medGeometryElement T[] =  {
-      MEDMEM_TRIA3,
-      MEDMEM_QUAD4,
-      MEDMEM_TRIA6,
-      MEDMEM_QUAD8,
-      MEDMEM_POLYGON};
+      MED_TRIA3,
+      MED_QUAD4,
+      MED_TRIA6,
+      MED_QUAD8,
+      MED_POLYGON};
 
     list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
     (*this)[MED_FACE] = geomList; 
@@ -137,15 +137,15 @@ MESH_ENTITIES::MESH_ENTITIES () : map<int, const list<MED_EN::medGeometryElement
   
   {
     const MED_EN::medGeometryElement T[] =  {
-      MEDMEM_SEG2,
-      MEDMEM_SEG3 };
+      MED_SEG2,
+      MED_SEG3 };
 
     list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
     (*this)[MED_EDGE] = geomList; 
   }
   
   {
-    //    const med_geometrie_element T[] =  { MEDMEM_NONE };
+    //    const med_geometrie_element T[] =  { MED_NONE };
     const MED_EN::medGeometryElement T[] =  { (MED_EN::medGeometryElement)0 };
     list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
     (*this)[MED_NODE] = geomList; 

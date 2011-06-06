@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEM_Meshing.hxx"
@@ -114,7 +114,7 @@ int main (int argc, char ** argv)
   const int NumberOfTypes = 2;
   medGeometryElement Types[NumberOfTypes] = 
     {
-      MEDMEM_TETRA4, MEDMEM_POLYHEDRA
+      MED_TETRA4, MED_POLYHEDRA
     };
   const int NumberOfElements[NumberOfTypes] = 
     {
@@ -146,9 +146,9 @@ int main (int argc, char ** argv)
       17, 9, 18, 19
     };
 
-  myMeshing->setConnectivity(MED_CELL, MEDMEM_TETRA4, ConnectivityTetra);
+  myMeshing->setConnectivity(MED_CELL, MED_TETRA4, ConnectivityTetra);
 
-  myMeshing->setConnectivity(MED_CELL, MEDMEM_POLYHEDRA, REFnodalConnOfFaces, REFpolyIndex);
+  myMeshing->setConnectivity(MED_CELL, MED_POLYHEDRA, REFnodalConnOfFaces, REFpolyIndex);
 
 
   MESHING *myPolygonMeshing=new MESHING;
@@ -158,7 +158,7 @@ int main (int argc, char ** argv)
   SpaceDimension = 3;
   medGeometryElement PolygonTypes[NumberOfTypes] = 
     {
-      MEDMEM_TRIA3,MEDMEM_POLYGON
+      MED_TRIA3,MED_POLYGON
     };
   const int PolygonNumberOfElements[NumberOfTypes] = 
     {
@@ -181,8 +181,8 @@ int main (int argc, char ** argv)
       1, 7, 2, 3, 9, 4
     };
 
-  myPolygonMeshing->setConnectivity(MED_CELL, MEDMEM_TRIA3,   ConnectivityTri);
-  myPolygonMeshing->setConnectivity(MED_CELL, MEDMEM_POLYGON, REFpolygonFaces, REFpolygonIndex);
+  myPolygonMeshing->setConnectivity(MED_CELL, MED_TRIA3,   ConnectivityTri);
+  myPolygonMeshing->setConnectivity(MED_CELL, MED_POLYGON, REFpolygonFaces, REFpolygonIndex);
   FIELD<double> *areas = myPolygonMeshing->getArea(myPolygonMeshing->getSupportOnAll( MED_CELL ));
   myPolygonMeshing->removeReference();
   const double *vals2 = areas->getValue();

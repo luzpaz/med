@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_Group.hxx"
@@ -36,7 +36,7 @@ static void addMedFacesGroup (MESHING& meshing, int nFaces, int *groupValue, str
   faces->setMesh(&meshing);
   faces->setEntity(MED_EN::MED_FACE);
   faces->setNumberOfGeometricType(1);
-  mytypes[0] = MED_EN::MEDMEM_POLYGON;
+  mytypes[0] = MED_EN::MED_POLYGON;
   faces->setGeometricType(mytypes);
   myNumberOfElements[0] = nFaces;
   faces->setNumberOfElements(myNumberOfElements);
@@ -111,7 +111,7 @@ int main()
   string coordunit[3] = { "cm", "cm", "cm" };
   pmesh->setCoordinatesUnits(coordunit);
 
-  const medGeometryElement types[] = { MED_EN::MEDMEM_POLYGON, MED_EN::MEDMEM_POLYHEDRA };
+  const medGeometryElement types[] = { MED_EN::MED_POLYGON, MED_EN::MED_POLYHEDRA };
   
   pmesh->setNumberOfTypes(1, MED_EN::MED_CELL);
   pmesh->setTypes( & types[1], MED_EN::MED_CELL );
@@ -138,7 +138,7 @@ int main()
     21,28,39,40,33,22,-1, 63,70,81,82,75,64,-1, 21,28,70,63,-1, 28,39,81,70,-1,
     39,40,82,81,      -1, 40,33,75,82,      -1, 33,22,64,75,-1, 22,21,63,64};    // #7
 
-  pmesh->setConnectivity(MED_EN::MED_CELL, MED_EN::MEDMEM_POLYHEDRA, polyHConn, polyHInd);
+  pmesh->setConnectivity(MED_EN::MED_CELL, MED_EN::MED_POLYHEDRA, polyHConn, polyHInd);
 
   int cpolygonsindex[nb_polyG+1] = {1, 7, 13, 19, 25, 31, 37, 43, 49, 55, 61, 67, 73, 79, 85};
   int connec[] = {
@@ -157,7 +157,7 @@ int main()
     57, 64, 75, 76, 77, 58,
     63, 70, 81, 82, 75, 64};
 
-  pmesh->setConnectivity(MED_EN::MED_FACE, MED_EN::MEDMEM_POLYGON,connec, cpolygonsindex);
+  pmesh->setConnectivity(MED_EN::MED_FACE, MED_EN::MED_POLYGON,connec, cpolygonsindex);
 
   int bottom[] = {1, 2, 3, 4, 5, 6, 7};
   addMedFacesGroup(*pmesh, nb_hexagone, bottom, "BottomFaces");

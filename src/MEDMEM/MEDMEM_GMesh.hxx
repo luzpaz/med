@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File      : MEDMEM_GMesh.hxx
 // Created   : Fri Jul 23 10:17:08 2010
@@ -169,7 +169,7 @@ class MEDMEM_EXPORT GMESH: public RCBASE
   virtual SUPPORT *                  getSkin(const SUPPORT * Support3D)
                                                 throw (MEDEXCEPTION) = 0;
 
-  virtual SUPPORT *                  getSupportOnAll(MED_EN::medEntityMesh Entity)
+  virtual const SUPPORT *            getSupportOnAll(MED_EN::medEntityMesh Entity) const
                                                 throw (MEDEXCEPTION);
 
   static SUPPORT *                   mergeSupports(const std::vector<SUPPORT *> Supports)
@@ -234,7 +234,7 @@ FIELD<T> * GMESH::mergeFields(const std::vector< FIELD<T> * > & others, bool mes
   int retNumberOfComponents=(*iter)->getNumberOfComponents();
   FIELD<T, FullInterlace> *ret=new FIELD<T, FullInterlace>(retSup, retNumberOfComponents);
   T* valuesToSet=(T*)ret->getValue();
-  int nbOfEltsRetSup=retSup->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS);
+  int nbOfEltsRetSup=retSup->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
   T* tempValues=new T[retNumberOfComponents];
   if(retSup->isOnAllElements())
     {
@@ -252,7 +252,7 @@ FIELD<T> * GMESH::mergeFields(const std::vector< FIELD<T> * > & others, bool mes
     }
   else
     {
-      const int *eltsRetSup=retSup->getNumber(MED_EN::MEDMEM_ALL_ELEMENTS);
+      const int *eltsRetSup=retSup->getNumber(MED_EN::MED_ALL_ELEMENTS);
       for(i=0;i<nbOfEltsRetSup;i++)
         {
           bool found=false;

@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEMTest.hxx"
@@ -464,7 +464,7 @@ MEDMEM::MESH * MEDMEMTest_createTestMesh ()
   // cells connectivities
   const int NumberOfCellTypes = 3;
   MED_EN::medGeometryElement CellTypes[NumberOfCellTypes] =
-    {MED_EN::MEDMEM_TETRA4, MED_EN::MEDMEM_PYRA5, MED_EN::MEDMEM_HEXA8};
+    {MED_EN::MED_TETRA4, MED_EN::MED_PYRA5, MED_EN::MED_HEXA8};
   const int NumberOfCells[NumberOfCellTypes] = {12, 2, 2};
 
   int ConnectivityTetra[12 * 4] = {
@@ -494,7 +494,7 @@ MEDMEM::MESH * MEDMEMTest_createTestMesh ()
 
   // faces connectivities
   const int NumberOfFaceTypes = 2;
-  MED_EN::medGeometryElement FaceTypes[NumberOfFaceTypes] = {MED_EN::MEDMEM_TRIA3, MED_EN::MEDMEM_QUAD4};
+  MED_EN::medGeometryElement FaceTypes[NumberOfFaceTypes] = {MED_EN::MED_TRIA3, MED_EN::MED_QUAD4};
   const int NumberOfFaces[NumberOfFaceTypes] = {4, 4};
 
   int ConnectivityTria[4 * 3] = {
@@ -527,16 +527,16 @@ MEDMEM::MESH * MEDMEMTest_createTestMesh ()
   myMeshing->setTypes(CellTypes, MED_EN::MED_CELL);
   myMeshing->setNumberOfElements(NumberOfCells, MED_EN::MED_CELL);
 
-  myMeshing->setConnectivity(MED_EN::MED_CELL, MED_EN::MEDMEM_TETRA4, ConnectivityTetra );
-  myMeshing->setConnectivity(MED_EN::MED_CELL, MED_EN::MEDMEM_PYRA5 , ConnectivityPyra  );
-  myMeshing->setConnectivity(MED_EN::MED_CELL, MED_EN::MEDMEM_HEXA8 , ConnectivityHexa  );
+  myMeshing->setConnectivity(MED_EN::MED_CELL, MED_EN::MED_TETRA4, ConnectivityTetra );
+  myMeshing->setConnectivity(MED_EN::MED_CELL, MED_EN::MED_PYRA5 , ConnectivityPyra  );
+  myMeshing->setConnectivity(MED_EN::MED_CELL, MED_EN::MED_HEXA8 , ConnectivityHexa  );
 
   myMeshing->setNumberOfTypes(NumberOfFaceTypes, MED_EN::MED_FACE);
   myMeshing->setTypes(FaceTypes, MED_EN::MED_FACE);
   myMeshing->setNumberOfElements(NumberOfFaces, MED_EN::MED_FACE);
 
-  myMeshing->setConnectivity(MED_EN::MED_FACE, MED_EN::MEDMEM_TRIA3,ConnectivityTria);
-  myMeshing->setConnectivity(MED_EN::MED_FACE, MED_EN::MEDMEM_QUAD4,ConnectivityQua);
+  myMeshing->setConnectivity(MED_EN::MED_FACE, MED_EN::MED_TRIA3,ConnectivityTria);
+  myMeshing->setConnectivity(MED_EN::MED_FACE, MED_EN::MED_QUAD4,ConnectivityQua);
 
   // edges connectivities
   // not yet implemented : if set, results are unpredictable.
@@ -548,7 +548,7 @@ MEDMEM::MESH * MEDMEMTest_createTestMesh ()
     myGroup->setMesh(myMeshing);
     myGroup->setEntity(MED_EN::MED_NODE);
     myGroup->setNumberOfGeometricType(1);
-    MED_EN::medGeometryElement myTypes[1] = {MED_EN::MEDMEM_NONE};
+    MED_EN::medGeometryElement myTypes[1] = {MED_EN::MED_NONE};
     myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[1] = {4};
     myGroup->setNumberOfElements(myNumberOfElements);
@@ -564,7 +564,7 @@ MEDMEM::MESH * MEDMEMTest_createTestMesh ()
     myGroup->setMesh(myMeshing);
     myGroup->setEntity(MED_EN::MED_NODE);
     myGroup->setNumberOfGeometricType(1);
-    MED_EN::medGeometryElement myTypes[1] = {MED_EN::MEDMEM_NONE};
+    MED_EN::medGeometryElement myTypes[1] = {MED_EN::MED_NONE};
     myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[1] = {3};
     myGroup->setNumberOfElements(myNumberOfElements);
@@ -582,7 +582,7 @@ MEDMEM::MESH * MEDMEMTest_createTestMesh ()
     myGroup->setMesh(myMeshing);
     myGroup->setEntity(MED_EN::MED_CELL);
     myGroup->setNumberOfGeometricType(3);
-    MED_EN::medGeometryElement myTypes[3] = {MED_EN::MEDMEM_TETRA4,MED_EN::MEDMEM_PYRA5,MED_EN::MEDMEM_HEXA8};
+    MED_EN::medGeometryElement myTypes[3] = {MED_EN::MED_TETRA4,MED_EN::MED_PYRA5,MED_EN::MED_HEXA8};
     myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[3] = {4,1,2};
     myGroup->setNumberOfElements(myNumberOfElements);
@@ -598,7 +598,7 @@ MEDMEM::MESH * MEDMEMTest_createTestMesh ()
     myGroup->setMesh(myMeshing);
     myGroup->setEntity(MED_EN::MED_CELL);
     myGroup->setNumberOfGeometricType(2);
-    MED_EN::medGeometryElement myTypes[] = {MED_EN::MEDMEM_TETRA4,MED_EN::MEDMEM_PYRA5};
+    MED_EN::medGeometryElement myTypes[] = {MED_EN::MED_TETRA4,MED_EN::MED_PYRA5};
     myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[] = {4,1};
     myGroup->setNumberOfElements(myNumberOfElements);
@@ -616,7 +616,7 @@ MEDMEM::MESH * MEDMEMTest_createTestMesh ()
     myGroup->setMesh(myMeshing);
     myGroup->setEntity(MED_EN::MED_FACE);
     myGroup->setNumberOfGeometricType(2);
-    MED_EN::medGeometryElement myTypes[2] = {MED_EN::MEDMEM_TRIA3,MED_EN::MEDMEM_QUAD4};
+    MED_EN::medGeometryElement myTypes[2] = {MED_EN::MED_TRIA3,MED_EN::MED_QUAD4};
     myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[2] = {2,3};
     myGroup->setNumberOfElements(myNumberOfElements);
@@ -632,7 +632,7 @@ MEDMEM::MESH * MEDMEMTest_createTestMesh ()
     myGroup->setMesh(myMeshing);
     myGroup->setEntity(MED_EN::MED_FACE);
     myGroup->setNumberOfGeometricType(1);
-    MED_EN::medGeometryElement myTypes[1] = {MED_EN::MEDMEM_TRIA3};
+    MED_EN::medGeometryElement myTypes[1] = {MED_EN::MED_TRIA3};
     myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[1] = {2};
     myGroup->setNumberOfElements(myNumberOfElements);

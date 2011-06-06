@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEMTest.hxx"
@@ -357,7 +357,7 @@ void MEDMEMTest::testFamily()
     CPPUNIT_ASSERT(strcmp("Nodes 1", aNodesF1->getName().c_str()) == 0);
     CPPUNIT_ASSERT(MED_EN::MED_NODE == aNodesF1->getEntity());
     CPPUNIT_ASSERT(!aNodesF1->isOnAllElements());
-    CPPUNIT_ASSERT_EQUAL(7, aNodesF1->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_EQUAL(7, aNodesF1->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 
     CPPUNIT_ASSERT_EQUAL(2, aNodesF1->getNumberOfAttributes());
     CPPUNIT_ASSERT_EQUAL(1, aNodesF1->getAttributeIdentifier(1));
@@ -385,8 +385,8 @@ void MEDMEMTest::testFamily()
     CPPUNIT_ASSERT(MED_EN::MED_FACE == aFacesF7->getEntity());
 
     CPPUNIT_ASSERT_EQUAL(8, aTestMesh->getNumberOfElements(MED_EN::MED_FACE,
-                                                           MED_EN::MEDMEM_ALL_ELEMENTS));
-    CPPUNIT_ASSERT_EQUAL(8, aFacesF7->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS));
+                                                           MED_EN::MED_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_EQUAL(8, aFacesF7->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 
     CPPUNIT_ASSERT(!aFacesF7->isOnAllElements());
 

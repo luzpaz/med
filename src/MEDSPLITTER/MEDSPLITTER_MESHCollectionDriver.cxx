@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include <vector>
 #include <string>
@@ -376,7 +376,7 @@ void MESHCollectionDriver::readSubdomain(vector<int*>& cellglobal,
 
   // Reading global numbering
   //
-  int ncell=(_collection->getMesh())[idomain]->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
+  int ncell=(_collection->getMesh())[idomain]->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
   if (ncell>0)
   {
     int * array=new int[ncell];
@@ -417,7 +417,7 @@ void MESHCollectionDriver::readSubdomain(vector<int*>& cellglobal,
   MESSAGE_MED("Reading face global numbering for mesh "<<idomain);
   MED_EN::medEntityMesh entity =
     (mesh->getMeshDimension()==3)?MED_EN::MED_FACE:MED_EN::MED_EDGE;
-  int nbface=(_collection->getMesh())[idomain]->getNumberOfElements(entity,MED_EN::MEDMEM_ALL_ELEMENTS);
+  int nbface=(_collection->getMesh())[idomain]->getNumberOfElements(entity,MED_EN::MED_ALL_ELEMENTS);
   if (nbface!=0)
   {
     int* array=new int[nbface];
@@ -568,7 +568,7 @@ void MESHCollectionDriver::writeSubdomain(int idomain, int nbdomains, char* dist
 
     int nbfacetypes = 0;
     const MED_EN::medGeometryElement* facetypes = 0;
-    if ( _collection->getMesh()[idomain]->getNumberOfElements( constituent_entity, MEDMEM_ALL_ELEMENTS))
+    if ( _collection->getMesh()[idomain]->getNumberOfElements( constituent_entity, MED_ALL_ELEMENTS))
       {
         nbfacetypes = (_collection->getMesh())[idomain]->getNumberOfTypes(constituent_entity);
         if (nbfacetypes>0)

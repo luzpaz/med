@@ -1,24 +1,24 @@
 #  -*- coding: iso-8859-1 -*-
-#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
 ############################################################################
@@ -182,7 +182,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldDoubleScalOnCell.getSupport()
-nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldDoubleScalOnCell.getRow(k+1)
@@ -211,7 +211,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldDoubleVectOnCell.getSupport()
-nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldDoubleVectOnCell.getRow(k+1)
@@ -240,7 +240,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldIntScalOnCell.getSupport()
-nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldIntScalOnCell.getRow(k+1)
@@ -269,7 +269,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldIntVectOnCell.getSupport()
-nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldIntVectOnCell.getRow(k+1)
@@ -334,7 +334,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldDoubleScalOnNode.getSupport()
-nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldDoubleScalOnNode.getRow(k+1)
@@ -363,7 +363,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldDoubleVectOnNode.getSupport()
-nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldDoubleVectOnNode.getRow(k+1)
@@ -392,7 +392,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldIntScalOnNode.getSupport()
-nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldIntScalOnNode.getRow(k+1)
@@ -421,7 +421,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldIntVectOnNode.getSupport()
-nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldIntVectOnNode.getRow(k+1)
@@ -486,7 +486,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldDoubleScalOnConst.getSupport()
-nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldDoubleScalOnConst.getRow(k+1)
@@ -515,7 +515,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldDoubleVectOnConst.getSupport()
-nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldDoubleVectOnConst.getRow(k+1)
@@ -544,7 +544,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldIntScalOnConst.getSupport()
-nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldIntScalOnConst.getRow(k+1)
@@ -573,7 +573,7 @@ for k in range(nbOfComp):
     print "          Unit:",compUnit
 
 support = fieldIntVectOnConst.getSupport()
-nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
 print "     Values:",nbOf
 for k in range(nbOf):
     valueI = fieldIntVectOnConst.getRow(k+1)

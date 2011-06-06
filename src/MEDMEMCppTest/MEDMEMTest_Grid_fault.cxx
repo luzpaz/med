@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEMTest.hxx"
@@ -163,7 +163,7 @@ static void MEDMEMTest_testGrid()
     //        const MED_EN::medGeometryElement * GRID::getTypes(MED_EN::medEntityMesh entity) const
 //    CPPUNIT_FAIL("Problem with GRID::getTypes() method implementation.");
 //#endif
-    CPPUNIT_ASSERT(types[0] == MEDMEM_QUAD4);
+    CPPUNIT_ASSERT(types[0] == MED_QUAD4);
 
     int nbElem = 0;
     CPPUNIT_ASSERT_NO_THROW(nbElem = myGrid->getNumberOfElements(MED_CELL,types[0]));
@@ -180,7 +180,7 @@ static void MEDMEMTest_testGrid()
       CPPUNIT_ASSERT(NodeNumber == nbNode);
     }
 
-    int nbCells = myGrid->getNumberOfElements(MED_CELL, MEDMEM_ALL_ELEMENTS);
+    int nbCells = myGrid->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);
     CPPUNIT_ASSERT(nbCells);
 
     int ijkCell[3];
@@ -191,7 +191,7 @@ static void MEDMEMTest_testGrid()
       CPPUNIT_ASSERT(CellNumber == nbCell);
     }
 
-    int nbEdges = myGrid->getNumberOfElements(MED_EDGE, MEDMEM_ALL_ELEMENTS);
+    int nbEdges = myGrid->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS);
     CPPUNIT_ASSERT(nbEdges);
 
     int ijkAxisEdge[4];
@@ -204,7 +204,7 @@ static void MEDMEMTest_testGrid()
       CPPUNIT_ASSERT(EdgeNumber == nbEdge);
     }
 
-    int nbFaces = myGrid->getNumberOfElements(MED_FACE, MEDMEM_ALL_ELEMENTS);
+    int nbFaces = myGrid->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS);
     CPPUNIT_ASSERT(nbFaces == 0);
 
 //#ifdef ENABLE_FORCED_FAILURES
@@ -279,7 +279,7 @@ static void MEDMEMTest_testGrid()
     const int* ConnectivityDes;
     const int* connectivity_index_des;
     CPPUNIT_ASSERT_NO_THROW(ConnectivityDes = mesh->getConnectivity( MED_DESCENDING,
-                                                                    MED_CELL, MEDMEM_ALL_ELEMENTS));
+                                                                    MED_CELL, MED_ALL_ELEMENTS));
     CPPUNIT_ASSERT_NO_THROW(connectivity_index_des =
                             mesh->getConnectivityIndex(MED_DESCENDING, MED_CELL));
     out<<"Descending connectivity"<<endl;
@@ -336,7 +336,7 @@ static void MEDMEMTest_testGrid()
 
     const medGeometryElement* types1;
     CPPUNIT_ASSERT_NO_THROW( types1 = myGrid1->getTypes(MED_CELL) );
-    CPPUNIT_ASSERT( types1[0] == MEDMEM_QUAD4);
+    CPPUNIT_ASSERT( types1[0] == MED_QUAD4);
 
     int nbElem;
     CPPUNIT_ASSERT_NO_THROW(nbElem = myGrid1->getNumberOfElements(MED_CELL, types1[0]));
@@ -470,9 +470,9 @@ static void MEDMEMTest_testGrid()
     CPPUNIT_ASSERT(conn);
     bool hasFaces = myGrid2->getArrayLength(3), hasEdges = myGrid2->getArrayLength(2);
     medGeometryElement aCellGeometry;
-    if (hasFaces)      aCellGeometry = MEDMEM_HEXA8;
-    else if (hasEdges) aCellGeometry = MEDMEM_QUAD4;
-    else               aCellGeometry = MEDMEM_SEG2;
+    if (hasFaces)      aCellGeometry = MED_HEXA8;
+    else if (hasEdges) aCellGeometry = MED_QUAD4;
+    else               aCellGeometry = MED_SEG2;
     CPPUNIT_ASSERT(conn->getElementType(MED_CELL, 1) == aCellGeometry);
     CPPUNIT_ASSERT(conn->existConnectivity(MED_NODAL,      MED_CELL));
     CPPUNIT_ASSERT(conn->existConnectivity(MED_DESCENDING, MED_CELL));
@@ -493,7 +493,7 @@ static void MEDMEMTest_testGrid()
     CPPUNIT_ASSERT(aCellCount[1] - 1 == nbCells);
 
     if (hasFaces){
-      CPPUNIT_ASSERT(conn->getElementType(MED_FACE, 1) == MEDMEM_QUAD4);
+      CPPUNIT_ASSERT(conn->getElementType(MED_FACE, 1) == MED_QUAD4);
       nbFaces  = iLen * jLenMin1 * kLenMin1;
       nbFaces += jLen * kLenMin1 * iLenMin1;
       nbFaces += kLen * iLenMin1 * jLenMin1;
@@ -505,7 +505,7 @@ static void MEDMEMTest_testGrid()
       CPPUNIT_ASSERT(cellmodelF);
     }
     if (hasEdges){
-      CPPUNIT_ASSERT(conn->getElementType(MED_EDGE, 1) == MEDMEM_SEG2);
+      CPPUNIT_ASSERT(conn->getElementType(MED_EDGE, 1) == MED_SEG2);
       if (kLen) { // 3d grid
         nbEdges  = iLenMin1 * jLen * kLen;
         nbEdges += jLenMin1 * kLen * iLen;

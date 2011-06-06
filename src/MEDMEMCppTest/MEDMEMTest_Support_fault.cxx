@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEMTest.hxx"
@@ -262,7 +262,7 @@ static void MEDMEMTest_testSupport()
 
   MED_EN::medGeometryElement aSCTypes[2] = 
     {
-      MED_EN::MEDMEM_PYRA5, MED_EN::MEDMEM_PENTA15
+      MED_EN::MED_PYRA5, MED_EN::MED_PENTA15
     };
   aSupportOnCells1->setNumberOfGeometricType(2);
   aSupportOnCells1->setGeometricType(aSCTypes);
@@ -278,15 +278,15 @@ static void MEDMEMTest_testSupport()
   aSupportOnCells1->setNumberOfElements(nbEltsSC);
 
   const int * nbEltsSCBack = aSupportOnCells1->getNumberOfElements();
-  CPPUNIT_ASSERT_EQUAL(2, aSupportOnCells1->getNumberOfElements(MED_EN::MEDMEM_PYRA5));
+  CPPUNIT_ASSERT_EQUAL(2, aSupportOnCells1->getNumberOfElements(MED_EN::MED_PYRA5));
   CPPUNIT_ASSERT_EQUAL(2, nbEltsSCBack[0]);
-  CPPUNIT_ASSERT_EQUAL(1, aSupportOnCells1->getNumberOfElements(MED_EN::MEDMEM_PENTA15));
+  CPPUNIT_ASSERT_EQUAL(1, aSupportOnCells1->getNumberOfElements(MED_EN::MED_PENTA15));
   CPPUNIT_ASSERT_EQUAL(1, nbEltsSCBack[1]);
-  CPPUNIT_ASSERT_EQUAL(3, aSupportOnCells1->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(3, aSupportOnCells1->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 
   // old types
-  CPPUNIT_ASSERT_THROW(aSupportOnCells1->getNumberOfElements(MED_EN::MEDMEM_TETRA4), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aSupportOnCells1->getNumberOfElements(MED_EN::MEDMEM_HEXA8), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aSupportOnCells1->getNumberOfElements(MED_EN::MED_TETRA4), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aSupportOnCells1->getNumberOfElements(MED_EN::MED_HEXA8), MEDEXCEPTION);
 
   //_number= new MEDSKYLINEARRAY(_numberOfGeometricType,_totalNumberOfElements,index,value,shallowCopy);
   int indexSC[3] = 
@@ -337,11 +337,11 @@ static void MEDMEMTest_testSupport()
   CPPUNIT_ASSERT_EQUAL(3, aNumberIndexSC[1]);
   CPPUNIT_ASSERT_EQUAL(4, aNumberIndexSC[2]);
 
-  const int * aNbPYRA5 = aSupportOnCells2->getNumber(MED_EN::MEDMEM_PYRA5);
-  const int * aNbPENTA15 = aSupportOnCells2->getNumber(MED_EN::MEDMEM_PENTA15);
-  CPPUNIT_ASSERT_THROW(aSupportOnCells2->getNumber(MED_EN::MEDMEM_TETRA4), MEDEXCEPTION);
+  const int * aNbPYRA5 = aSupportOnCells2->getNumber(MED_EN::MED_PYRA5);
+  const int * aNbPENTA15 = aSupportOnCells2->getNumber(MED_EN::MED_PENTA15);
+  CPPUNIT_ASSERT_THROW(aSupportOnCells2->getNumber(MED_EN::MED_TETRA4), MEDEXCEPTION);
 
-  const int * aNbC = aSupportOnCells2->getNumber(MED_EN::MEDMEM_ALL_ELEMENTS);
+  const int * aNbC = aSupportOnCells2->getNumber(MED_EN::MED_ALL_ELEMENTS);
 
   CPPUNIT_ASSERT_EQUAL(21, aNbPYRA5[0]);
   CPPUNIT_ASSERT_EQUAL(22, aNbPYRA5[1]);
@@ -376,8 +376,8 @@ static void MEDMEMTest_testSupport()
   //    information about all faces of aMesh
   CPPUNIT_ASSERT_EQUAL(2, aSupportOnFaces1->getNumberOfTypes());
   const MED_EN::medGeometryElement* aSF1Types = aSupportOnFaces1->getTypes();
-  CPPUNIT_ASSERT_EQUAL(MED_EN::MEDMEM_TRIA3, aSF1Types[0]);
-  CPPUNIT_ASSERT_EQUAL(MED_EN::MEDMEM_QUAD4, aSF1Types[1]);
+  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_TRIA3, aSF1Types[0]);
+  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_QUAD4, aSF1Types[1]);
   //#ifdef ENABLE_FORCED_FAILURES
   // (BUG) Comment to method SUPPORT::getTypes() says:
   // "If isOnAllElements is false, returns an array of %medGeometryElement types used by the support."
@@ -391,23 +391,23 @@ static void MEDMEMTest_testSupport()
   // must be redirected to mesh, but what if mesh is not set (mesh name used instead)?.
   //#endif
   const int * nbEltsSF1 = aSupportOnFaces1->getNumberOfElements();
-  CPPUNIT_ASSERT_EQUAL(4, aSupportOnFaces1->getNumberOfElements(MED_EN::MEDMEM_TRIA3));
+  CPPUNIT_ASSERT_EQUAL(4, aSupportOnFaces1->getNumberOfElements(MED_EN::MED_TRIA3));
   CPPUNIT_ASSERT_EQUAL(4, nbEltsSF1[0]);
-  CPPUNIT_ASSERT_EQUAL(4, aSupportOnFaces1->getNumberOfElements(MED_EN::MEDMEM_QUAD4));
+  CPPUNIT_ASSERT_EQUAL(4, aSupportOnFaces1->getNumberOfElements(MED_EN::MED_QUAD4));
   CPPUNIT_ASSERT_EQUAL(4, nbEltsSF1[1]);
-  CPPUNIT_ASSERT_EQUAL(8, aSupportOnFaces1->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS));
-  CPPUNIT_ASSERT_THROW(aSupportOnFaces1->getNumberOfElements(MED_EN::MEDMEM_TRIA6), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aSupportOnFaces1->getNumberOfElements(MED_EN::MEDMEM_QUAD8), MEDEXCEPTION);
+  CPPUNIT_ASSERT_EQUAL(8, aSupportOnFaces1->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_THROW(aSupportOnFaces1->getNumberOfElements(MED_EN::MED_TRIA6), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aSupportOnFaces1->getNumberOfElements(MED_EN::MED_QUAD8), MEDEXCEPTION);
 
   // check number
   CPPUNIT_ASSERT_THROW(aSupportOnFaces1->getNumberIndex(), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aSupportOnFaces1->getNumber(MED_EN::MEDMEM_TRIA3), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aSupportOnFaces1->getNumber(MED_EN::MEDMEM_QUAD4), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aSupportOnFaces1->getNumber(MED_EN::MEDMEM_ALL_ELEMENTS), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aSupportOnFaces1->getNumber(MED_EN::MED_TRIA3), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aSupportOnFaces1->getNumber(MED_EN::MED_QUAD4), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aSupportOnFaces1->getNumber(MED_EN::MED_ALL_ELEMENTS), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aSupportOnFaces1->getnumber(), MEDEXCEPTION);
 
   // getValIndFromGlobalNumber
-  CPPUNIT_ASSERT_EQUAL(8, aMesh->getNumberOfElements(MED_EN::MED_FACE, MED_EN::MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(8, aMesh->getNumberOfElements(MED_EN::MED_FACE, MED_EN::MED_ALL_ELEMENTS));
   for (int i = 1; i <= 8; i++) 
     {
       CPPUNIT_ASSERT_EQUAL(i, aSupportOnFaces1->getValIndFromGlobalNumber(i));
@@ -430,12 +430,12 @@ static void MEDMEMTest_testSupport()
   /*
   // setTotalNumberOfElements
   aSupportOnFaces1->setTotalNumberOfElements(1000);
-  CPPUNIT_ASSERT_EQUAL(1000, aSupportOnFaces1->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(1000, aSupportOnFaces1->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
   */
 
   // clearDataOnNumbers
   aSupportOnCells1->clearDataOnNumbers();
-  CPPUNIT_ASSERT_EQUAL(0, aSupportOnCells1->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(0, aSupportOnCells1->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
   CPPUNIT_ASSERT_EQUAL(0, aSupportOnCells1->getNumberOfTypes());
   CPPUNIT_ASSERT_THROW(aSupportOnCells1->getnumber(), MEDEXCEPTION);
 
@@ -521,7 +521,7 @@ static void MEDMEMTest_testSupport()
   SUPPORT * aFaces2 = aFaces123->substract(*aFaces135); // => 2
   CPPUNIT_ASSERT_EQUAL(MED_EN::MED_FACE, aFaces2->getEntity());
   CPPUNIT_ASSERT_EQUAL(1, aFaces2->getValIndFromGlobalNumber(2));
-  CPPUNIT_ASSERT_EQUAL(1, aFaces2->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(1, aFaces2->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 
   CPPUNIT_ASSERT_THROW(aFaces123->substract(*aNodes137), MEDEXCEPTION);
 
@@ -548,7 +548,7 @@ static void MEDMEMTest_testSupport()
   // getComplement
   SUPPORT * aFaces_135 = aFaces135->getComplement(); // => 2,4,6,7,8
   CPPUNIT_ASSERT_EQUAL(MED_EN::MED_FACE, aFaces_135->getEntity());
-  CPPUNIT_ASSERT_EQUAL(5, aFaces_135->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(5, aFaces_135->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 
   //#ifdef ENABLE_FORCED_FAILURES
   // (BUG) Memory problem in SUPPORT::sub()
@@ -570,28 +570,28 @@ static void MEDMEMTest_testSupport()
   //       which does not work if entity = MED_NODE
   SUPPORT * aNodes_137 = aNodes137->getComplement(); // => 2,4,5,6,8,9,10-19
   CPPUNIT_ASSERT_EQUAL(MED_EN::MED_NODE, aNodes_137->getEntity());
-  CPPUNIT_ASSERT_EQUAL(16, aNodes_137->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(16, aNodes_137->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
   //#endif
 
   // intersecting
   aFaces_135->intersecting(aFaces123); // => 2
-  CPPUNIT_ASSERT_EQUAL(1, aFaces_135->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(1, aFaces_135->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
   CPPUNIT_ASSERT_EQUAL(1, aFaces_135->getValIndFromGlobalNumber(2));
 
   //aNodes_137->intersecting(&aNodes248); // => 2,4,8
-  //CPPUNIT_ASSERT_EQUAL(3, aNodes_137->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS));
+  //CPPUNIT_ASSERT_EQUAL(3, aNodes_137->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
   //CPPUNIT_ASSERT_EQUAL(*aNodes_137, aNodes248);
   aNodes137->intersecting(aNodes248); // => 
   {
   }
-  CPPUNIT_ASSERT_EQUAL(0, aNodes137->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(0, aNodes137->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 
   // blending
   aFaces_135->blending(aFaces135); // => 1,2,3,5
-  CPPUNIT_ASSERT_EQUAL(4, aFaces_135->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(4, aFaces_135->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 
   aNodes248->blending(aNodes27); // => 2,4,7,8
-  CPPUNIT_ASSERT_EQUAL(4, aNodes248->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(4, aNodes248->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 
   // operator=
   SUPPORT *aCopy1=new SUPPORT;
@@ -647,7 +647,7 @@ static void MEDMEMTest_testSupport()
   // setpartial
   MED_EN::medGeometryElement gtCells[1] = 
     {
-      MED_EN::MEDMEM_TETRA4
+      MED_EN::MED_TETRA4
     };
   int nbCells[1] = 
     {
@@ -664,7 +664,7 @@ static void MEDMEMTest_testSupport()
 
   MED_EN::medGeometryElement gtNodes[1] = 
     {
-      MED_EN::MEDMEM_NONE
+      MED_EN::MED_NONE
     };
   aPartialNodes->setNumberOfGeometricType(1);
   aPartialNodes->setGeometricType(gtNodes);

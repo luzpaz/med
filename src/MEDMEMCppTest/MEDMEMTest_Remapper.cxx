@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEMTest.hxx"
@@ -44,13 +44,13 @@ void MEDMEMTest::test_RemapperP0P0()
   const MEDMEM::SUPPORT *source_support=source_mesh->getSupportOnAll( MED_EN::MED_CELL );
   MEDMEM::FIELD<double> *source_field=new MEDMEM::FIELD<double>(source_support,nbcomp);
   double* sourcevalue=const_cast<double*>(source_field->getValue());
-  for (int i=0; i<source_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS)*nbcomp; i++)
+  for (int i=0; i<source_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     sourcevalue[i]=1.0;
 
   const MEDMEM::SUPPORT *target_support=target_mesh->getSupportOnAll( MED_EN::MED_CELL );
   MEDMEM::FIELD<double> *target_field=new MEDMEM::FIELD<double>(target_support,nbcomp);
   double* targetvalue=const_cast<double*>(target_field->getValue());
-  for (int i=0; i<target_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS)*nbcomp; i++)
+  for (int i=0; i<target_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     targetvalue[i]=0.0;
 
 
@@ -78,7 +78,7 @@ void MEDMEMTest::test_RemapperP0P0()
   //MN: Transfer test
   double max = -2;
   double min =  2;
-  for(int i = 0; i<target_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<target_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( targetvalue[i] >max) max = targetvalue[i];
       if( targetvalue[i] <min) min = targetvalue[i];
@@ -92,7 +92,7 @@ void MEDMEMTest::test_RemapperP0P0()
 
   max = -2;
   min =  2;
-  for(int i = 0; i<source_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<source_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( sourcevalue[i] >max) max = sourcevalue[i];
       if( sourcevalue[i] <min) min = sourcevalue[i];
@@ -108,7 +108,7 @@ void MEDMEMTest::test_RemapperP0P0()
   targetvalue=const_cast<double*>((*newTargetField).getValue());
   max = -2;
   min =  2;
-  for(int i = 0; i<source_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<source_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( sourcevalue[i] >max) max = sourcevalue[i];
       if( sourcevalue[i] <min) min = sourcevalue[i];
@@ -116,7 +116,7 @@ void MEDMEMTest::test_RemapperP0P0()
 
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,max,1e-10);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(1,min,1e-10);    
-  for(int i = 0; i<target_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<target_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( targetvalue[i] >max) max = targetvalue[i];
       if( targetvalue[i] <min) min = targetvalue[i];
@@ -147,13 +147,13 @@ void  MEDMEMTest::test_RemapperP1P1()
   const MEDMEM::SUPPORT *source_support=source_mesh->getSupportOnAll( MED_EN::MED_NODE );
   MEDMEM::FIELD<double> *source_field=new MEDMEM::FIELD<double>(source_support,nbcomp);
   double* sourcevalue=const_cast<double*>(source_field->getValue());
-  for (int i=0; i<source_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS)*nbcomp; i++)
+  for (int i=0; i<source_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     sourcevalue[i]=1.0;
 
   const MEDMEM::SUPPORT *target_support=target_mesh->getSupportOnAll( MED_EN::MED_NODE );
   MEDMEM::FIELD<double> *target_field=new MEDMEM::FIELD<double>(target_support,nbcomp);
   double* targetvalue=const_cast<double*>(target_field->getValue());
-  for (int i=0; i<target_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS)*nbcomp; i++)
+  for (int i=0; i<target_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     targetvalue[i]=-0.0001;
 
 
@@ -163,7 +163,7 @@ void  MEDMEMTest::test_RemapperP1P1()
 
   double max = -2;
   double min =  2;
-  for(int i = 0; i<target_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<target_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( targetvalue[i] >max) max = targetvalue[i];
       if( targetvalue[i] <min) min = targetvalue[i];
@@ -176,7 +176,7 @@ void  MEDMEMTest::test_RemapperP1P1()
 
   max = -2;
   min =  2;
-  for(int i = 0; i<source_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<source_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( sourcevalue[i] >max) max = sourcevalue[i];
       if( sourcevalue[i] <min) min = sourcevalue[i];
@@ -202,13 +202,13 @@ void  MEDMEMTest::test_RemapperP1P0()
   const MEDMEM::SUPPORT *source_support=source_mesh->getSupportOnAll( MED_EN::MED_NODE );
   MEDMEM::FIELD<double> *source_field=new MEDMEM::FIELD<double>(source_support,nbcomp);
   double* sourcevalue=const_cast<double*>(source_field->getValue());
-  for (int i=0; i<source_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS)*nbcomp; i++)
+  for (int i=0; i<source_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     sourcevalue[i]=1.0;
 
   const MEDMEM::SUPPORT *target_support=target_mesh->getSupportOnAll( MED_EN::MED_CELL );
   MEDMEM::FIELD<double> *target_field=new MEDMEM::FIELD<double>(target_support,nbcomp);
   double* targetvalue=const_cast<double*>(target_field->getValue());
-  for (int i=0; i<target_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS)*nbcomp; i++)
+  for (int i=0; i<target_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     targetvalue[i]=0.0;
 
 
@@ -220,7 +220,7 @@ void  MEDMEMTest::test_RemapperP1P0()
 
   double max = -2;
   double min =  2;
-  for(int i = 0; i<target_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<target_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( targetvalue[i] >max) max = targetvalue[i];
       if( targetvalue[i] <min) min = targetvalue[i];
@@ -232,7 +232,7 @@ void  MEDMEMTest::test_RemapperP1P0()
   remapper.reverseTransfer(*source_field,*target_field);
   max = -2;
   min =  2;
-  for(int i = 0; i<source_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<source_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( sourcevalue[i] >max) max = sourcevalue[i];
       if( sourcevalue[i] <min) min = sourcevalue[i];
@@ -256,13 +256,13 @@ void  MEDMEMTest::test_RemapperP0P1()
   const MEDMEM::SUPPORT *source_support=source_mesh->getSupportOnAll( MED_EN::MED_CELL );
   MEDMEM::FIELD<double> *source_field=new MEDMEM::FIELD<double>(source_support,nbcomp);
   double* sourcevalue=const_cast<double*>(source_field->getValue());
-  for (int i=0; i<source_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS)*nbcomp; i++)
+  for (int i=0; i<source_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     sourcevalue[i]=1.0;
 
   const MEDMEM::SUPPORT *target_support=target_mesh->getSupportOnAll( MED_EN::MED_NODE );
   MEDMEM::FIELD<double> *target_field=new MEDMEM::FIELD<double>(target_support,nbcomp);
   double* targetvalue=const_cast<double*>(target_field->getValue());
-  for (int i=0; i<target_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS)*nbcomp; i++)
+  for (int i=0; i<target_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     targetvalue[i]=0.0;
 
 
@@ -272,7 +272,7 @@ void  MEDMEMTest::test_RemapperP0P1()
 
   double max = -2;
   double min =  2;
-  for(int i = 0; i<target_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<target_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( targetvalue[i] >max) max = targetvalue[i];
       if( targetvalue[i] <min) min = targetvalue[i];
@@ -285,7 +285,7 @@ void  MEDMEMTest::test_RemapperP0P1()
 
   max = -2;
   min =  2;
-  for(int i = 0; i<source_support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS)*nbcomp; i++)
+  for(int i = 0; i<source_support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS)*nbcomp; i++)
     {
       if( sourcevalue[i] >max) max = sourcevalue[i];
       if( sourcevalue[i] <min) min = sourcevalue[i];
@@ -337,13 +337,13 @@ namespace
       };
     meshing->setCoordinatesUnits(coordunit);
     //Cell connectivity info for classical elts
-    const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MEDMEM_TETRA4};
+    const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MED_TETRA4};
     const int nbOfCellElts[1]={53};
     meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
     meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
     meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
     //All cell conn
-    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MEDMEM_TETRA4,conn);
+    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_TETRA4,conn);
     return meshing;
   }
 
@@ -372,13 +372,13 @@ namespace
       };
     meshing->setCoordinatesUnits(coordunit);
     //Cell connectivity info for classical elts
-    const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MEDMEM_TETRA4};
+    const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MED_TETRA4};
     const int nbOfCellElts[1]={5};
     meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
     meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
     meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
     //All cell conn
-    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MEDMEM_TETRA4,conn);
+    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_TETRA4,conn);
     return meshing;
   }
 
@@ -405,13 +405,13 @@ namespace
       };
     meshing->setCoordinatesUnits(coordunit);
     //Cell connectivity info for classical elts
-    const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MEDMEM_SEG2};
+    const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MED_SEG2};
     const int nbOfCellElts[1]={8};
     meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
     meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
     meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
     //All cell conn
-    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MEDMEM_SEG2,conn);
+    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_SEG2,conn);
     return meshing;
   }
 
@@ -438,20 +438,20 @@ namespace
       };
     meshing->setCoordinatesUnits(coordunit);
     //Cell connectivity info for classical elts
-    const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MEDMEM_TETRA4};
+    const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MED_TETRA4};
     const int nbOfCellElts[1]={12};
     meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
     meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
     meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
     //
-    const MED_EN::medGeometryElement classicalTypesFace[1]={MED_EN::MEDMEM_TRIA3};
+    const MED_EN::medGeometryElement classicalTypesFace[1]={MED_EN::MED_TRIA3};
     const int nbOfFaceElts[1]={1};
     meshing->setNumberOfTypes(1,MED_EN::MED_FACE);
     meshing->setTypes(classicalTypesFace,MED_EN::MED_FACE);
     meshing->setNumberOfElements(nbOfFaceElts,MED_EN::MED_FACE);
     //All cell conn
-    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MEDMEM_TETRA4,conn);
-    meshing->setConnectivity(MED_EN::MED_FACE,MED_EN::MEDMEM_TRIA3,conn);
+    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_TETRA4,conn);
+    meshing->setConnectivity(MED_EN::MED_FACE,MED_EN::MED_TRIA3,conn);
     return meshing;
   }
 
@@ -480,20 +480,20 @@ namespace
       };
     meshing->setCoordinatesUnits(coordunit);
     //Cell connectivity info for classical elts
-    const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MEDMEM_HEXA8};
+    const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MED_HEXA8};
     const int nbOfCellElts[1]={8};
     meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
     meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
     meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
     //
-    const MED_EN::medGeometryElement classicalTypesFace[1]={MED_EN::MEDMEM_QUAD4};
+    const MED_EN::medGeometryElement classicalTypesFace[1]={MED_EN::MED_QUAD4};
     const int nbOfFaceElts[1]={1};
     meshing->setNumberOfTypes(1,MED_EN::MED_FACE);
     meshing->setTypes(classicalTypesFace,MED_EN::MED_FACE);
     meshing->setNumberOfElements(nbOfFaceElts,MED_EN::MED_FACE);
     //All cell conn
-    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MEDMEM_HEXA8,conn);
-    meshing->setConnectivity(MED_EN::MED_FACE,MED_EN::MEDMEM_QUAD4,conn);
+    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_HEXA8,conn);
+    meshing->setConnectivity(MED_EN::MED_FACE,MED_EN::MED_QUAD4,conn);
     return meshing;
   }
 
@@ -517,14 +517,14 @@ namespace
       };
     meshing->setCoordinatesUnits(coordunit);
     //Cell connectivity info for classical elts
-    const MED_EN::medGeometryElement typesCell[2]={MED_EN::MEDMEM_TETRA4,MED_EN::MEDMEM_POLYHEDRA};
+    const MED_EN::medGeometryElement typesCell[2]={MED_EN::MED_TETRA4,MED_EN::MED_POLYHEDRA};
     const int nbOfCellElts[2]={10,2};
     meshing->setNumberOfTypes(2,MED_EN::MED_CELL);
     meshing->setTypes(typesCell,MED_EN::MED_CELL);
     meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
     //All cell conn
-    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MEDMEM_TETRA4,conn);
-    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MEDMEM_POLYHEDRA,connPoly2,connPoly1);
+    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_TETRA4,conn);
+    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_POLYHEDRA,connPoly2,connPoly1);
     return meshing;
   }
 
@@ -549,14 +549,14 @@ namespace
       };
     meshing->setCoordinatesUnits(coordunit);
     //Cell connectivity info for classical elts
-    const MED_EN::medGeometryElement typesCell[2]={MED_EN::MEDMEM_HEXA8,MED_EN::MEDMEM_POLYHEDRA};
+    const MED_EN::medGeometryElement typesCell[2]={MED_EN::MED_HEXA8,MED_EN::MED_POLYHEDRA};
     const int nbOfCellElts[2]={7,1};
     meshing->setNumberOfTypes(2,MED_EN::MED_CELL);
     meshing->setTypes(typesCell,MED_EN::MED_CELL);
     meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
     //All cell conn
-    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MEDMEM_HEXA8,conn);
-    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MEDMEM_POLYHEDRA,connPoly3,connPoly1);
+    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_HEXA8,conn);
+    meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_POLYHEDRA,connPoly3,connPoly1);
     return meshing;
   }
 } // noname namespace

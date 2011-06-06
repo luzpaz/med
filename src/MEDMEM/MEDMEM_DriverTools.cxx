@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEM_DriverTools.hxx"
@@ -407,7 +407,7 @@ void _intermediateMED::numerotationMaillage()
 
   set<_maille>::const_iterator i, iEnd;
 
-  // numerotation mailles of type MEDMEM_POINT1 by node number
+  // numerotation mailles of type MED_POINT1 by node number
   bool hasPointMailles = false;
   if ( const set<_maille> * points = _maillageByDimIterator( *this, 0 ).nextType() ) {
     hasPointMailles = true;
@@ -514,7 +514,7 @@ COORDINATE * _intermediateMED::getCoordinate(const string & coordinateSystem)
 {
     const medModeSwitch mode=MED_FULL_INTERLACE;
     int spaceDimension=points.begin()->second.coord.size();
-    int numberOfNodes=points.size() - nbMerged( MEDMEM_POINT1 );
+    int numberOfNodes=points.size() - nbMerged( MED_POINT1 );
 
     // creation du tableau des coordonnees en mode MED_FULL_INTERLACE
     double * coord = new double[spaceDimension*numberOfNodes];
@@ -544,7 +544,7 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
   const char * LOC = "_intermediateMED::getConnectivity() : ";
   BEGIN_OF_MED(LOC);
 
-  int numberOfNodes=points.size() - nbMerged( MEDMEM_POINT1 ); // number of nodes in the mesh
+  int numberOfNodes=points.size() - nbMerged( MED_POINT1 ); // number of nodes in the mesh
   medEntityMesh entity;
   CONNECTIVITY *Connectivity = NULL, *Constituent = NULL;
 
@@ -629,7 +629,7 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
 
       switch ( types[k] )
       {
-      case MEDMEM_POLYGON:
+      case MED_POLYGON:
         {
           // put polygones in order of increasing number
           vector<const _maille*> orderedPoly( nbMailles );
@@ -653,7 +653,7 @@ CONNECTIVITY * _intermediateMED::getConnectivity()
           break;
         }
 
-      case MEDMEM_POLYHEDRA:
+      case MED_POLYHEDRA:
         {
           if ( typeMailles.size() != polyherdalNbFaceNodes.size() )
             throw MEDEXCEPTION (LOCALIZED(STRING(LOC) << "Missing info on polyhedron faces"));
@@ -871,7 +871,7 @@ void _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     // total nb of elements in mesh of groupe_entity
     int totalNbElements = 0;
     if ( groupe_entity == MED_NODE )
-      totalNbElements = points.size() - nbMerged( MEDMEM_POINT1 );
+      totalNbElements = points.size() - nbMerged( MED_POINT1 );
     else {
       int entityDim = hasMixedCells ? -1 : group_min_dim;
       _maillageByDimIterator allMailles( *this, entityDim, true );
@@ -881,7 +881,7 @@ void _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
     }
     const bool isOnAll = ((int) mailleSet.size() == totalNbElements );
 
-    // if !isOnAll, build a map _maille::ordre() -> index in GROUP.getNumber(MEDMEM_ALL_ELEMENTS).
+    // if !isOnAll, build a map _maille::ordre() -> index in GROUP.getNumber(MED_ALL_ELEMENTS).
     // It is used while fields building.
     if ( !isOnAll || isSelfIntersect || isFieldSupport ) {
       TMailleSet::iterator maIt = mailleSet.begin();
@@ -1140,7 +1140,7 @@ void _intermediateMED::getFields(std::list< FIELD_* >& theFields)
         throw MEDEXCEPTION
           (LOCALIZED(STRING(LOC) <<"_intermediateMED::getFields(), NULL field support: "
                      << " group index: " << fb->_group_id));
-      int nb_elems = sup->getNumberOfElements( MEDMEM_ALL_ELEMENTS );
+      int nb_elems = sup->getNumberOfElements( MED_ALL_ELEMENTS );
       if ( nb_elems != f->getNumberOfValues() )
         throw MEDEXCEPTION
           (LOCALIZED(STRING("_intermediateMED::getFields(), field support size (")
@@ -1362,8 +1362,8 @@ void _intermediateMED::mergeNodesAndElements(double tolerance)
   //numerotationMaillage();
   treatGroupes();
 
-  nbRemovedByType[ MEDMEM_NONE   ] = nbRemovedNodes;
-  nbRemovedByType[ MEDMEM_POINT1 ] = nbRemovedNodes;
+  nbRemovedByType[ MED_NONE   ] = nbRemovedNodes;
+  nbRemovedByType[ MED_POINT1 ] = nbRemovedNodes;
 
   bool hasPointMailles = false;
   _maillageByDimIterator entityMailles( *this, 0 );

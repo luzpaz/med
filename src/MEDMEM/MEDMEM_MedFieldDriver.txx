@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File      : MEDMEM_MedFieldDriver22.txx
 // Created   : Thu Jul 22 12:52:43 2010
@@ -287,12 +287,12 @@ MED_FIELD_DRIVER<T>::createFieldSupportPart1(med_2_3::med_idt        id,
       medmem_entity = entityCurrent;
 
       // That is a difference between Med File and Med Memory (NB)
-      if (geometryCurrent == MED_EN::MEDMEM_SEG2 || geometryCurrent == MED_EN::MEDMEM_SEG3)
+      if (geometryCurrent == MED_EN::MED_SEG2 || geometryCurrent == MED_EN::MED_SEG3)
         medmem_entity = MED_EN::MED_EDGE;
 
-      if (geometryCurrent == MED_EN::MEDMEM_TRIA3 || geometryCurrent == MED_EN::MEDMEM_QUAD4 ||
-          geometryCurrent == MED_EN::MEDMEM_TRIA6 || geometryCurrent == MED_EN::MEDMEM_QUAD8 || 
-          geometryCurrent == MED_EN::MEDMEM_POLYGON)
+      if (geometryCurrent == MED_EN::MED_TRIA3 || geometryCurrent == MED_EN::MED_QUAD4 ||
+          geometryCurrent == MED_EN::MED_TRIA6 || geometryCurrent == MED_EN::MED_QUAD8 || 
+          geometryCurrent == MED_EN::MED_POLYGON)
         medmem_entity = MED_EN::MED_FACE;
 
       // med3 porting
@@ -467,8 +467,8 @@ MED_FIELD_DRIVER<T>::getMEDMEMEntityFromMEDType(medGeometryElement type,
                                                 int mesh_dim) const
 {
   int elem_dim = type/100;
-  if (type==MEDMEM_POLYGON) elem_dim=2;
-  if (type==MEDMEM_POLYHEDRA) elem_dim=3;
+  if (type==MED_POLYGON) elem_dim=2;
+  if (type==MED_POLYHEDRA) elem_dim=3;
 
   if (elem_dim==3)
     return MED_CELL;
@@ -690,7 +690,7 @@ reads the MESH object in order to retrieve the list of geometric types for a giv
  */
 
 template <class T> void
-MED_FIELD_DRIVER<T>::getMeshGeometricTypeFromMESH( GMESH * meshPtr,
+MED_FIELD_DRIVER<T>::getMeshGeometricTypeFromMESH( const GMESH * meshPtr,
                                                    MED_EN::medEntityMesh  entity,
                                                    std::vector<MED_EN::medGeometryElement> & geoType,
                                                    std::vector<int> &nbOfElOfType,
@@ -794,7 +794,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
 //      repose sur plusieurs maillages cf HOMARD-ASTER, ce qui n'est pas géré dans MEDMEM)
 //   -  vérifier le type d'entité (MED_NOEUD xor MED_MAILLE xor MED_FACE xor MED_ARETE ) sur lequel
 //      il faut lire le champ qui est également retouvé.
-//   - Si le support défini une liste d'entité ( différente de MEDMEM_ALL_ELEMENTS), celle-ci est ignorée
+//   - Si le support défini une liste d'entité ( différente de MED_ALL_ELEMENTS), celle-ci est ignorée
 //     à la lecture et écrasé par soit :
 //            - onall, après avoir vérifié que la liste des types géométriques utilisés par le champ
 //                     est égale à la liste des type géométriques définis dans le maillage associé
@@ -897,7 +897,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
   }
 
   string meshName="";
-  GMESH * ptrMesh = 0;
+  const GMESH * ptrMesh = 0;
   bool   haveSupport = false;
   bool   haveMesh    = false;
   MED_EN::medEntityMesh preferEntity = MED_EN::MED_ALL_ENTITIES;
@@ -1300,7 +1300,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
 
   //MESSAGE_MED ("Index              : "<< index);
   assert(index == totalNumberOfElWg*numberOfComponents);
-  assert(MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues == mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS));
+  assert(MED_FIELD_DRIVER<T>::_ptrField->_numberOfValues == mySupport->getNumberOfElements(MED_ALL_ELEMENTS));
 
   if (anyProfil)
   {
@@ -1399,10 +1399,10 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
   SCRUTE_MED(anyGauss);
   MEDMEM_Array_ * Values;
   if (anyGauss) {
-    SCRUTE_MED(mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS) );
+    SCRUTE_MED(mySupport->getNumberOfElements(MED_ALL_ELEMENTS) );
     SCRUTE_MED(NumberOfTypes);
     SCRUTE_MED(numberOfElementsOfTypeC[NumberOfTypes]-1);
-    assert(mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS) == (numberOfElementsOfTypeC[NumberOfTypes]-1) );
+    assert(mySupport->getNumberOfElements(MED_ALL_ELEMENTS) == (numberOfElementsOfTypeC[NumberOfTypes]-1) );
     // PAL16681. If NumberOfTypes == 1 then myValues is what should be
     // in a field value, inspite of InterlacingType
     if ( NumberOfTypes == 1 && modswt == med_2_3::MED_NO_INTERLACE )
@@ -1468,7 +1468,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
 
   MED_FIELD_DRIVER<T>::_ptrField->_isRead = true ;
 
-  GMESH* aMesh = MED_FIELD_DRIVER<T>::_ptrField->_mesh;
+  const GMESH* aMesh = MED_FIELD_DRIVER<T>::_ptrField->_mesh;
   bool isFound = false, onlyMeshProvided = ( !haveSupport && aMesh );
   if ( !aMesh )
     aMesh = ptrMesh; // try to find FAMILY OR GROUP in ptrMesh but without being so stern
@@ -1546,13 +1546,15 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
       for (int it = 0; it < NumberOfTypes && isFound; it++)
       {
         MED_EN::medGeometryElement aType = aTypes[it];
-        if (aType != types[it])
+        isFound = ( aType == types[it] );
+        if ( !isFound && onlyMeshProvided )
           throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << ": Invalid support (GROUP or FAMILY) found in mesh "
                                        << meshName << " for field " << fieldName << " by name of profile "
                                        << aPN << ": geometric type in found support |" << aType
                                        << "| differs from required type |" << types[it] << "|"));
 
-        if (aSupp->getNumberOfElements(aType) != nbOfElOfType[it])
+        isFound = ( isFound && aSupp->getNumberOfElements(aType) == nbOfElOfType[it] );
+        if ( !isFound && onlyMeshProvided )
           throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << ": Invalid support (GROUP or FAMILY) found in mesh "
                                        << meshName << " for field " << fieldName << " by name of profile "
                                        << aPN << ": number of elements of type " << aType
@@ -1856,7 +1858,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER<T>::write(void) const
 
   if (!onAll) {
 
-    number = mySupport->getNumber(MEDMEM_ALL_ELEMENTS);
+    number = mySupport->getNumber(MED_ALL_ELEMENTS);
     numberIndex = mySupport->getNumberIndex();
     profilNameList=mySupport->getProfilNames();
     // porting MED3
@@ -1874,7 +1876,7 @@ template <class T> void MED_FIELD_WRONLY_DRIVER<T>::write(void) const
     delete [] annp3;
     delete [] auup3;
   // end porting MED3
-    GMESH * meshPtr = mySupport->getMesh();
+    const GMESH * meshPtr = mySupport->getMesh();
 //     if(!meshPtr)
 //       throw MEDEXCEPTION( LOCALIZED (STRING(LOC)
 //                                      <<": Mesh in support is null"

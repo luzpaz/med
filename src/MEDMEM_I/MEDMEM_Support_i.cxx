@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 //=============================================================================
@@ -70,6 +70,7 @@ SUPPORT_i::SUPPORT_i() :_support((::SUPPORT *)NULL),_corbaIndex(SUPPORT_i::suppo
 SUPPORT_i::SUPPORT_i(const ::SUPPORT * const s) :_support(s),
                                                  _corbaIndex(SUPPORT_i::supportIndex++)
 {
+  if ( _support ) _support->addReference();
   SUPPORT_i::supportMap[_corbaIndex]=(::SUPPORT *)_support;
 }
 //=============================================================================
@@ -80,6 +81,7 @@ SUPPORT_i::SUPPORT_i(const ::SUPPORT * const s) :_support(s),
 SUPPORT_i::SUPPORT_i(const SUPPORT_i &s) :_support(s._support),
                                           _corbaIndex(SUPPORT_i::supportIndex++)
 {
+  if ( _support ) _support->addReference();
   SUPPORT_i::supportMap[_corbaIndex]=(::SUPPORT *)_support;
 }
 //=============================================================================
@@ -90,6 +92,8 @@ SUPPORT_i::SUPPORT_i(const SUPPORT_i &s) :_support(s._support),
 
 SUPPORT_i::~SUPPORT_i()
 {
+  if ( SUPPORT_i::supportMap[_corbaIndex] )
+    SUPPORT_i::supportMap[_corbaIndex]->removeReference();
 }
 //=============================================================================
 /*!
@@ -180,13 +184,13 @@ SALOME_MED::SUPPORT::supportInfos * SUPPORT_i::getSupportGlobal()
       int connLength = 0;
       switch ( types[i] )
       {
-      case MED_EN::MEDMEM_POLYGON: 
-      case MED_EN::MEDMEM_POLYHEDRA: 
+      case MED_EN::MED_POLYGON: 
+      case MED_EN::MED_POLYHEDRA: 
 {
         if (_support->isOnAllElements() ) 
 {
           connLength = mesh->getConnectivityLength(MED_EN::MED_NODAL,
-                                                   _support->getEntity(),MED_EN::MEDMEM_ALL_ELEMENTS);
+                                                   _support->getEntity(),MED_EN::MED_ALL_ELEMENTS);
         }
         else 
 {
@@ -231,11 +235,11 @@ SALOME_MED::GMESH_ptr SUPPORT_i::getMesh()
     THROW_SALOME_CORBA_EXCEPTION("No associated Support", SALOME::INTERNAL_ERROR);
   try
   {
-    GMESH * mesh = _support->getMesh();
+    const GMESH * mesh = _support->getMesh();
 
     SCRUTE(mesh) ;
 
-    GMESH_i * m1 = new GMESH_i(mesh);
+    GMESH_i * m1 = new GMESH_i(const_cast<GMESH*>( mesh ));
     SALOME_MED::GMESH_ptr m2 = m1->_this();
     MESSAGE("SALOME_MED::GMESH_ptr SUPPORT_i::getMesh() checking des pointeurs CORBA");
 
@@ -357,7 +361,7 @@ CORBA::Long SUPPORT_i::getNumberOfElements(SALOME_MED::medGeometryElement geomEl
   throw (SALOME::SALOME_Exception)
 {
   SCRUTE(geomElement);
-  SCRUTE(SALOME_MED::MEDMEM_ALL_ELEMENTS);
+  SCRUTE(SALOME_MED::MED_ALL_ELEMENTS);
 
   if (_support==NULL)
     THROW_SALOME_CORBA_EXCEPTION("No associated Support", SALOME::INTERNAL_ERROR);
@@ -491,8 +495,8 @@ SALOME_TYPES::ListOfLong *  SUPPORT_i::getNumberIndex()
   SALOME_TYPES::ListOfLong_var myseq= new SALOME_TYPES::ListOfLong;
   try
   {
-    MESSAGE ("Nombre d'elements  mis de façon stupide a MEDMEM_ALL_ELEMENTS");
-    int nbelements=_support->getNumberOfElements(::MEDMEM_ALL_ELEMENTS);
+    MESSAGE ("Nombre d'elements  mis de façon stupide a MED_ALL_ELEMENTS");
+    int nbelements=_support->getNumberOfElements(::MED_ALL_ELEMENTS);
     myseq->length(nbelements);
     const int * numbers=_support->getNumberIndex();
     for (int i=0;i<nbelements;i++)
@@ -521,8 +525,8 @@ SALOME::SenderInt_ptr SUPPORT_i::getSenderForNumberIndex()
   SALOME::SenderInt_ptr ret;
   try
   {
-    MESSAGE ("Nombre d'elements  mis de façon stupide a MEDMEM_ALL_ELEMENTS");
-    int nbelements=_support->getNumberOfElements(::MEDMEM_ALL_ELEMENTS);
+    MESSAGE ("Nombre d'elements  mis de façon stupide a MED_ALL_ELEMENTS");
+    int nbelements=_support->getNumberOfElements(::MED_ALL_ELEMENTS);
     const int * numbers=_support->getNumberIndex();
     ret=SenderFactory::buildSender(*this,numbers,nbelements);
   }
@@ -602,7 +606,7 @@ void SUPPORT_i::addInStudy (SALOMEDS::Study_ptr myStudy, SALOME_MED::SUPPORT_ptr
   }
   MESSAGE(" Find SObject MESH (represent mesh in support)");
 
-  string meshName = _support->getMesh()->getName() ;
+  string meshName = _support->getMeshName() ;
   string meshNameStudy = meshName;
 
   for (string::size_type pos=0; pos<meshNameStudy.size();++pos)

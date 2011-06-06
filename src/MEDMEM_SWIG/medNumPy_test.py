@@ -1,24 +1,24 @@
 #  -*- coding: iso-8859-1 -*-
-#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
 # Check that numpy arrays can be used to define coordinates, connectivities and field values
@@ -76,7 +76,7 @@ class medNumPyTest(unittest.TestCase):
         numberOfTypes = 1
         entity = MED_CELL
 
-        types = [MEDMEM_TETRA4]
+        types = [MED_TETRA4]
         numberOfElements = [12]
 
         myMeshing.setNumberOfTypes(numberOfTypes,entity)
@@ -97,7 +97,7 @@ class medNumPyTest(unittest.TestCase):
                               2,10,6,9]
 
         myMeshing.setConnectivity(entity,types[0], array( connectivityTetra ))
-        conn = myMeshing.getConnectivity(MED_NODAL,entity,MEDMEM_ALL_ELEMENTS)
+        conn = myMeshing.getConnectivity(MED_NODAL,entity,MED_ALL_ELEMENTS)
         self.assertTrue( isinstance( conn, ndarray ))
 
         myGroup = GROUP()
@@ -129,7 +129,7 @@ class medNumPyTest(unittest.TestCase):
         # we build now 2 fields
 
         supportOnNodes = SUPPORT(myMeshing,"On_All_Nodes",MED_NODE)
-        numberOfNodes = supportOnNodes.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+        numberOfNodes = supportOnNodes.getNumberOfElements(MED_ALL_ELEMENTS)
 
         fieldDoubleScalarOnNodes = FIELDDOUBLE(supportOnNodes,1)
         fieldDoubleScalarOnNodes.setName("fieldScalarDoubleNode")
@@ -154,7 +154,7 @@ class medNumPyTest(unittest.TestCase):
 
 
         supportOnCells = SUPPORT(myMeshing,"On_All_Cells",MED_CELL)
-        numberOfCells = supportOnCells.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+        numberOfCells = supportOnCells.getNumberOfElements(MED_ALL_ELEMENTS)
 
         fieldIntScalarOnCells = FIELDINT(supportOnCells,1)
         fieldIntScalarOnCells.setName("fieldScalarIntCell")

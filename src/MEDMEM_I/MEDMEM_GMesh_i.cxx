@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 //=============================================================================
@@ -77,8 +77,8 @@ GMESH_i::GMESH_i():
 //=============================================================================
 GMESH_i::~GMESH_i()
 {
-//   if ( _mesh )
-//     _mesh->removeReference();
+  if ( _mesh )
+    _mesh->removeReference();
 }
 //=============================================================================
 /*!
@@ -92,8 +92,8 @@ GMESH_i::GMESH_i(::GMESH * const m ) :
   _corbaIndex(MESH_i::meshIndex++),
   _meshId("") 
 {
-        GMESH_i::meshMap[_corbaIndex]=_mesh;
-        SCRUTE(_mesh);
+  if ( _mesh ) _mesh->addReference();
+  GMESH_i::meshMap[_corbaIndex]=_mesh;
 }
 //=============================================================================
 /*!
@@ -108,7 +108,8 @@ GMESH_i::GMESH_i( GMESH_i & m) :
   _corbaIndex(MESH_i::meshIndex++),
   _meshId("") 
 {
-        GMESH_i::meshMap[_corbaIndex]=_mesh;
+  if ( _mesh ) _mesh->addReference();
+  GMESH_i::meshMap[_corbaIndex]=_mesh;
 }
 //=============================================================================
 /*!
@@ -404,7 +405,7 @@ throw (SALOME::SALOME_Exception)
 //=============================================================================
 /*!
  * CORBA: Returns number of elements of type medGeometryElement
- *        Not implemented for MEDMEM_ALL_ELEMENTS 
+ *        Not implemented for MED_ALL_ELEMENTS 
 *         implemented for MED_ALL_ENTITIES
  */
 //=============================================================================
@@ -421,8 +422,8 @@ throw (SALOME::SALOME_Exception)
         
         try
         {
-//           if ( geomElement == SALOME_MED::MEDMEM_POLYGON ||
-//                geomElement == SALOME_MED::MEDMEM_POLYHEDRA )
+//           if ( geomElement == SALOME_MED::MED_POLYGON ||
+//                geomElement == SALOME_MED::MED_POLYHEDRA )
 //             return _mesh->getNumberOfElementsWithPoly(convertIdlEntToMedEnt(entity),
 //                                                       convertIdlEltToMedElt(geomElement));
 //           else
@@ -770,9 +771,9 @@ throw (SALOME::SALOME_Exception)
                                               SALOME::INTERNAL_ERROR);
         try
         {
-                SUPPORT * myNewSupport = _mesh->getSupportOnAll(convertIdlEntToMedEnt(entity));
-                SUPPORT_i * mySupportI = new SUPPORT_i(myNewSupport);
-                return mySupportI->_this();
+          const SUPPORT * myNewSupport = _mesh->getSupportOnAll(convertIdlEntToMedEnt(entity));
+          SUPPORT_i * mySupportI = new SUPPORT_i(myNewSupport);
+          return mySupportI->_this();
         }
         catch (MEDEXCEPTION &ex)
         {
@@ -1200,7 +1201,7 @@ CORBA::Boolean GMESH_i::areEquals(SALOME_MED::GMESH_ptr other)
   if(baseServ)
     {
      baseServ->_remove_ref();
-     MESH_i *otherServ=dynamic_cast<MESH_i *>(baseServ);
+     GMESH_i *otherServ=dynamic_cast<GMESH_i *>(baseServ);
      return *_mesh==*otherServ->_mesh;
     }
   return false;

@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 //  MED MEDGUI : MED component GUI implemetation
@@ -137,7 +137,6 @@ void MedGUI::initialize( CAM_Application* app )
 
   _data_base = new MEDGUIDataBaseDockWidget(application(),application()->desktop());
   application()->desktop()->addDockWidget(Qt::LeftDockWidgetArea,_data_base);
-  _data_base->show();              
 }
 
 QString MedGUI::engineIOR() const
@@ -196,6 +195,9 @@ bool MedGUI::deactivateModule( SUIT_Study* study )
   setMenuShown( false );
   setToolShown( false );
 
+  _data_base->setVisible( false );
+  _data_base->toggleViewAction()->setVisible( false );
+
   disconnect( application()->desktop(), SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
              this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );
 
@@ -215,6 +217,9 @@ bool MedGUI::activateModule( SUIT_Study* study )
 
   setMenuShown( true );
   setToolShown( true );
+
+  _data_base->setVisible( true );
+  _data_base->toggleViewAction()->setVisible( true );
 
   connect( application()->desktop(), SIGNAL( windowActivated( SUIT_ViewWindow* ) ),
           this, SLOT( onWindowActivated( SUIT_ViewWindow* ) ) );
@@ -473,7 +478,7 @@ bool MedGUI::OnGUIEvent (int theCommandID)
       case 4034 :
         {
           
-          MEDGUIFileContentDial* mfcd = new MEDGUIFileContentDial(_data_base);
+          MEDGUIFileContentDial* mfcd = new MEDGUIFileContentDial(_data_base, application()->desktop());
           mfcd->show();
           break;
         }
@@ -568,7 +573,7 @@ bool MedGUI::DumpMesh( SALOME_MED::MESH_var MEDMesh)
     SCRUTE(k);
     std::string nomFam=Families[k]->getName();
     SCRUTE(nomFam);
-    SALOME_TYPES::ListOfLong_var tabnoeuds=Families[k]->getNumber(SALOME_MED::MEDMEM_NONE);
+    SALOME_TYPES::ListOfLong_var tabnoeuds=Families[k]->getNumber(SALOME_MED::MED_NONE);
     for (int l=0;l<(int)tabnoeuds->length();l++)
       SCRUTE(tabnoeuds[l]);
   }
@@ -587,7 +592,7 @@ bool MedGUI::DumpSubMesh( SALOME_MED::FAMILY_var Fam )
   if ( Fam->_is_nil() )
     return false;
 
-  SALOME_TYPES::ListOfLong_var tabnoeuds=Fam->getNumber(SALOME_MED::MEDMEM_NONE);
+  SALOME_TYPES::ListOfLong_var tabnoeuds=Fam->getNumber(SALOME_MED::MED_NONE);
   for (int l=0;l<(int)tabnoeuds->length();l++)
     SCRUTE(tabnoeuds[l]);
 

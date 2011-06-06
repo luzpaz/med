@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 //#define protected public
@@ -118,7 +118,7 @@ int main (int argc, char ** argv)
   const int NumberOfTypes = 3 ;
   medGeometryElement Types[NumberOfTypes] = 
     {
-      MEDMEM_TETRA4,MEDMEM_PYRA5,MEDMEM_HEXA8
+      MED_TETRA4,MED_PYRA5,MED_HEXA8
     } ;
   const int NumberOfElements[NumberOfTypes] = 
     {
@@ -169,7 +169,7 @@ int main (int argc, char ** argv)
   const int NumberOfFacesTypes = 2 ;
   medGeometryElement FacesTypes[NumberOfFacesTypes] =
     {
-      MEDMEM_TRIA3,MEDMEM_QUAD4
+      MED_TRIA3,MED_QUAD4
     } ;
   const int NumberOfFacesElements[NumberOfFacesTypes] =
     {
@@ -188,7 +188,7 @@ int main (int argc, char ** argv)
       1,6,5,
       1,3,6
     };
-  myMeshing->setConnectivity(MED_FACE,MEDMEM_TRIA3,ConnectivityTria);
+  myMeshing->setConnectivity(MED_FACE,MED_TRIA3,ConnectivityTria);
 
   int ConnectivityQua[4*4]=
     {
@@ -198,7 +198,7 @@ int main (int argc, char ** argv)
       12,8,9,13
     };
 
-  myMeshing->setConnectivity(MED_FACE,MEDMEM_QUAD4,ConnectivityQua);
+  myMeshing->setConnectivity(MED_FACE,MED_QUAD4,ConnectivityQua);
 
   // edge part
 
@@ -216,7 +216,7 @@ int main (int argc, char ** argv)
     partialGroupOnNodes->setNumberOfGeometricType(1);
     medGeometryElement myTypes[1] = 
       {
-        MEDMEM_NONE
+        MED_NONE
       };
     partialGroupOnNodes->setGeometricType(myTypes);
     const int myNumberOfElements[1] = 
@@ -242,7 +242,7 @@ int main (int argc, char ** argv)
     partialGroupOnNodes2->setNumberOfGeometricType(1);
     medGeometryElement myTypes[1] = 
       {
-        MEDMEM_NONE
+        MED_NONE
       };
     partialGroupOnNodes2->setGeometricType(myTypes);
     const int myNumberOfElements[1] = 
@@ -273,7 +273,7 @@ int main (int argc, char ** argv)
     partialGroupOnCells->setNumberOfGeometricType(3);
     medGeometryElement myTypes[3] = 
       {
-        MEDMEM_TETRA4,MEDMEM_PYRA5,MEDMEM_HEXA8
+        MED_TETRA4,MED_PYRA5,MED_HEXA8
       };
     partialGroupOnCells->setGeometricType(myTypes);
     const int myNumberOfElements[3] = 
@@ -304,7 +304,7 @@ int main (int argc, char ** argv)
     partialGroupOnCells2->setNumberOfGeometricType(2);
     medGeometryElement myTypes[] = 
       {
-        MEDMEM_TETRA4,MEDMEM_PYRA5
+        MED_TETRA4,MED_PYRA5
       };
     partialGroupOnCells2->setGeometricType(myTypes);
     const int myNumberOfElements[] = 
@@ -335,7 +335,7 @@ int main (int argc, char ** argv)
     partialGroupOnFaces->setNumberOfGeometricType(2);
     medGeometryElement myTypes[2] = 
       {
-        MEDMEM_TRIA3,MEDMEM_QUAD4
+        MED_TRIA3,MED_QUAD4
       };
     partialGroupOnFaces->setGeometricType(myTypes);
     const int myNumberOfElements[2] = 
@@ -364,7 +364,7 @@ int main (int argc, char ** argv)
     partialGroupOnFaces2->setEntity(MED_FACE);
     medGeometryElement myTypes[1] = 
       {
-        MEDMEM_TRIA3
+        MED_TRIA3
       };
     int myNumberOfElements[1] = 
       {
@@ -392,11 +392,11 @@ int main (int argc, char ** argv)
   //                         1 scalar (vector)
 
   const SUPPORT * supportOnNodes = myMeshing->getSupportOnAll(MED_NODE);
-  int numberOfNodes = supportOnNodes->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  int numberOfNodes = supportOnNodes->getNumberOfElements(MED_ALL_ELEMENTS);
 
   const SUPPORT * supportOnCells = myMeshing->getSupportOnAll(MED_CELL);
   myMeshing->removeReference();
-  int numberOfCells = supportOnCells->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  int numberOfCells = supportOnCells->getNumberOfElements(MED_ALL_ELEMENTS);
 
   FIELD<double> * fieldDoubleScalarOnNodes = new FIELD<double>(supportOnNodes,1);
   fieldDoubleScalarOnNodes->setName("fieldScalarDoubleNode");
@@ -592,27 +592,27 @@ int main (int argc, char ** argv)
     fieldIntVectorOnCells->setValueIJ(i+1,3,valueInt3);
   }
 
-  for (int i=0; i<partialGroupOnNodes->getNumberOfElements(MEDMEM_ALL_ELEMENTS); i++)
+  for (int i=0; i<partialGroupOnNodes->getNumberOfElements(MED_ALL_ELEMENTS); i++)
   {
-    const int* number=partialGroupOnNodes->getNumber(MEDMEM_ALL_ELEMENTS);
+    const int* number=partialGroupOnNodes->getNumber(MED_ALL_ELEMENTS);
     fieldDoubleScalarOnPartialNodes->setValueIJ(number[i],1,i+1);
   }
 
-  for (int i=0; i<partialGroupOnCells->getNumberOfElements(MEDMEM_ALL_ELEMENTS); i++)
+  for (int i=0; i<partialGroupOnCells->getNumberOfElements(MED_ALL_ELEMENTS); i++)
   {
-    const int* number=partialGroupOnCells->getNumber(MEDMEM_ALL_ELEMENTS);
+    const int* number=partialGroupOnCells->getNumber(MED_ALL_ELEMENTS);
     fieldDoubleScalarOnPartialCells->setValueIJ(number[i],1,i+1);
   }
 
-  for (int i=0; i<partialGroupOnFaces->getNumberOfElements(MEDMEM_ALL_ELEMENTS); i++)
+  for (int i=0; i<partialGroupOnFaces->getNumberOfElements(MED_ALL_ELEMENTS); i++)
   {
-    const int* number=partialGroupOnFaces->getNumber(MEDMEM_ALL_ELEMENTS);
+    const int* number=partialGroupOnFaces->getNumber(MED_ALL_ELEMENTS);
     fieldDoubleScalarOnPartialFaces->setValueIJ(number[i],1,i+1);
   }
 
-  for (int i=0; i<partialGroupOnFaces2->getNumberOfElements(MEDMEM_ALL_ELEMENTS); i++)
+  for (int i=0; i<partialGroupOnFaces2->getNumberOfElements(MED_ALL_ELEMENTS); i++)
   {
-    const int* number=partialGroupOnFaces2->getNumber(MEDMEM_ALL_ELEMENTS);
+    const int* number=partialGroupOnFaces2->getNumber(MED_ALL_ELEMENTS);
     fieldDoubleVectorOnPartialFaces->setValueIJ(number[i],1,i+1);
     fieldDoubleVectorOnPartialFaces->setValueIJ(number[i],2,-i-1);
   }

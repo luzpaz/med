@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "GMESHClient.hxx"
@@ -68,6 +68,7 @@ GROUP * convertGroup(const SALOME_MED::GROUP_ptr &F, GMESH *M)
 {
   return new GROUPClient(F, M);
 }
+
 //=============================================================================
 /*!
  * Remplit les informations générales 
@@ -128,7 +129,7 @@ void GMESHClient::blankCopy()
      &all->groupCell,
      (void *) (convertGroup), this);
 
-  if ( !IOR_Mesh->getIsAGrid() )
+  if ( !IOR_Mesh->getIsAGrid() && !dynamic_cast<MESHClient*>(this))
   {
     SALOME_MED::MESH_var umeshIOR = IOR_Mesh->convertInMESH();
     _uMesh = new MESHClient( umeshIOR );
@@ -219,33 +220,10 @@ bool GMESHClient::operator==(const GMESH& other) const
 
 GMESHClient::~GMESHClient()
 {
+  if ( _uMesh )
+    _uMesh->removeReference();
   IOR_Mesh->UnRegister();
 }
-
-//=============================================================================
-/*!
- * For refCounter
- */
-//=============================================================================
-
-// void GMESHClient::addReference() const
-// {
-//   _refCounter++;
-// }
-
-// //=============================================================================
-// /*!
-//  * For refCounter
-//  */
-// //=============================================================================
-
-// void GMESHClient::removeReference() const
-// {
-//   if (--_refCounter <= 0)
-//     {
-//       delete this;
-//     }
-// }
 
 //=============================================================================
 /*!
@@ -382,6 +360,7 @@ const MESH* GMESHClient::convertInMESH() const
     SALOME_MED::MESH_var umeshIOR = IOR_Mesh->convertInMESH();
     const_cast<GMESHClient*>(this)->_uMesh = new MESHClient( umeshIOR );
   }
+  _uMesh->addReference();
   return _uMesh;
 }
 
@@ -414,40 +393,60 @@ FIELD<double>* GMESHClient::getVolume(const SUPPORT* sup , bool isAbs) const
   throw (MEDEXCEPTION)
 {
   FIELD<double>* f = (FIELD<double>*) 0;
-  if ( _uMesh )
+  if ( _uMesh && sup )
+  {
+    sup->setMesh( _uMesh );
     f = _uMesh->getVolume(sup,isAbs);
+    sup->setMesh( this );
+  }
   return f;
 }
 
 FIELD<double>* GMESHClient::getArea(const SUPPORT* sup) const throw (MEDEXCEPTION)
 {
   FIELD<double>* f = (FIELD<double>*) 0;
-  if ( _uMesh )
+  if ( _uMesh && sup )
+  {
+    sup->setMesh( _uMesh );
     f = _uMesh->getArea(sup);
+    sup->setMesh( this );
+  }
   return f;
 }
 
 FIELD<double>* GMESHClient::getLength(const SUPPORT* sup) const throw (MEDEXCEPTION)
 {
   FIELD<double>* f = (FIELD<double>*) 0;
-  if ( _uMesh )
+  if ( _uMesh && sup )
+  {
+    sup->setMesh( _uMesh );
     f = _uMesh->getLength(sup);
+    sup->setMesh( this );
+  }
   return f;
 }
 
 FIELD<double>* GMESHClient::getNormal(const SUPPORT* sup) const throw (MEDEXCEPTION)
 {
   FIELD<double>* f = (FIELD<double>*) 0;
-  if ( _uMesh )
+  if ( _uMesh && sup )
+  {
+    sup->setMesh( _uMesh );
     f = _uMesh->getNormal(sup);
+    sup->setMesh( this );
+  }
   return f;
 }
 
 FIELD<double>* GMESHClient::getBarycenter(const SUPPORT* sup) const throw (MEDEXCEPTION)
 {
   FIELD<double>* f = (FIELD<double>*) 0;
-  if ( _uMesh )
+  if ( _uMesh && sup )
+  {
+    sup->setMesh( _uMesh );
     f = _uMesh->getBarycenter(sup);
+    sup->setMesh( this );
+  }
   return f;
 }
 

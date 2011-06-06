@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEMTest.hxx"
@@ -121,7 +121,7 @@ static void checkConnectivity(CONNECTIVITY * myConnectivity,
   int entityDim = myConnectivity->getEntityDimension();
   CPPUNIT_ASSERT_EQUAL(MeshDimension, entityDim);
 
-  int nodesNb = myConnectivity->getNumberOf(MED_EN::MED_NODE, MED_EN::MEDMEM_NONE);
+  int nodesNb = myConnectivity->getNumberOf(MED_EN::MED_NODE, MED_EN::MED_NONE);
   CPPUNIT_ASSERT_EQUAL(NumberOfNodes, nodesNb); //?
 
   // MED_EN::MED_CELL
@@ -140,9 +140,9 @@ static void checkConnectivity(CONNECTIVITY * myConnectivity,
   const int * connectivity_index;
   myConnectivity->calculateConnectivity(MED_EN::MED_DESCENDING, Entity);
   try {
-    NumberOfElements = myConnectivity->getNumberOf(Entity, MED_EN::MEDMEM_ALL_ELEMENTS);
+    NumberOfElements = myConnectivity->getNumberOf(Entity, MED_EN::MED_ALL_ELEMENTS);
     connectivity = myConnectivity->getConnectivity(MED_EN::MED_DESCENDING, Entity,
-                                                   MED_EN::MEDMEM_ALL_ELEMENTS);
+                                                   MED_EN::MED_ALL_ELEMENTS);
     connectivity_index = myConnectivity->getConnectivityIndex(MED_EN::MED_DESCENDING, Entity);
   }
   catch (MEDEXCEPTION m) {
@@ -173,8 +173,8 @@ static void checkConnectivity(CONNECTIVITY * myConnectivity,
   myConnectivity->getReverseConnectivity(MED_EN::MED_DESCENDING, Entity);
   myConnectivity->getReverseConnectivityIndex(MED_EN::MED_DESCENDING, Entity);
 
-  NumberOfConstituents = myConnectivity->getNumberOf(constituentEntity, MED_EN::MEDMEM_ALL_ELEMENTS);
-  myConnectivity->getConnectivity(MED_EN::MED_NODAL, constituentEntity, MED_EN::MEDMEM_ALL_ELEMENTS);
+  NumberOfConstituents = myConnectivity->getNumberOf(constituentEntity, MED_EN::MED_ALL_ELEMENTS);
+  myConnectivity->getConnectivity(MED_EN::MED_NODAL, constituentEntity, MED_EN::MED_ALL_ELEMENTS);
   myConnectivity->getConnectivityIndex(MED_EN::MED_NODAL, constituentEntity);
 }
 
@@ -271,11 +271,11 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
   }
   else {
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, nbNodes, theC->getNumberOf
-                                 (MED_EN::MED_NODE, MED_EN::MEDMEM_NONE));
+                                 (MED_EN::MED_NODE, MED_EN::MED_NONE));
   }
 
   // GeometricTypes
-  MED_EN::medGeometryElement aCellTypes[3] = {MED_EN::MEDMEM_PYRA5, MED_EN::MEDMEM_HEXA8,MED_EN::MEDMEM_POLYHEDRA};
+  MED_EN::medGeometryElement aCellTypes[3] = {MED_EN::MED_PYRA5, MED_EN::MED_HEXA8,MED_EN::MED_POLYHEDRA};
 
   // this variable is needed in check mode (!create)
   // because of bug with getGlobalNumberingIndex() method (see below)
@@ -298,28 +298,28 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, aCellTypes[1], aCellModels[1].getType());
 
     string * aCellTypesNames = theC->getCellTypeNames(MED_EN::MED_CELL);
-    CPPUNIT_ASSERT_MESSAGE(msg, aCellTypesNames[0] == "MEDMEM_PYRA5");
-    CPPUNIT_ASSERT_MESSAGE(msg, aCellTypesNames[1] == "MEDMEM_HEXA8");
+    CPPUNIT_ASSERT_MESSAGE(msg, aCellTypesNames[0] == "MED_PYRA5");
+    CPPUNIT_ASSERT_MESSAGE(msg, aCellTypesNames[1] == "MED_HEXA8");
     delete [] aCellTypesNames;
 
     // FACES: theC->_constituent
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 3, theC->getNumberOfTypes(MED_EN::MED_FACE));
     const MED_EN::medGeometryElement * aFaceTypesBack = theC->getGeometricTypes(MED_EN::MED_FACE);
-    triaFirst = (aFaceTypesBack[0] == MED_EN::MEDMEM_TRIA3 && aFaceTypesBack[1] == MED_EN::MEDMEM_QUAD4);
-    CPPUNIT_ASSERT_MESSAGE(msg, triaFirst || (aFaceTypesBack[1] == MED_EN::MEDMEM_TRIA3 &&
-                                              aFaceTypesBack[0] == MED_EN::MEDMEM_QUAD4));
+    triaFirst = (aFaceTypesBack[0] == MED_EN::MED_TRIA3 && aFaceTypesBack[1] == MED_EN::MED_QUAD4);
+    CPPUNIT_ASSERT_MESSAGE(msg, triaFirst || (aFaceTypesBack[1] == MED_EN::MED_TRIA3 &&
+                                              aFaceTypesBack[0] == MED_EN::MED_QUAD4));
 
     const CELLMODEL * aFaceModels = theC->getCellsTypes(MED_EN::MED_FACE);
-    bool case1 = (aFaceModels[0].getType() == MED_EN::MEDMEM_TRIA3 &&
-                  aFaceModels[1].getType() == MED_EN::MEDMEM_QUAD4);
-    bool case2 = (aFaceModels[1].getType() == MED_EN::MEDMEM_TRIA3 &&
-                  aFaceModels[0].getType() == MED_EN::MEDMEM_QUAD4);
+    bool case1 = (aFaceModels[0].getType() == MED_EN::MED_TRIA3 &&
+                  aFaceModels[1].getType() == MED_EN::MED_QUAD4);
+    bool case2 = (aFaceModels[1].getType() == MED_EN::MED_TRIA3 &&
+                  aFaceModels[0].getType() == MED_EN::MED_QUAD4);
     CPPUNIT_ASSERT_MESSAGE(msg, case1 || case2);
 
     string * aFaceTypesNames = theC->getCellTypeNames(MED_EN::MED_FACE);
     CPPUNIT_ASSERT_MESSAGE(msg,
-                           (aFaceTypesNames[0] == "MEDMEM_TRIA3" && aFaceTypesNames[1] == "MEDMEM_QUAD4") ||
-                           (aFaceTypesNames[1] == "MEDMEM_TRIA3" && aFaceTypesNames[0] == "MEDMEM_QUAD4"));
+                           (aFaceTypesNames[0] == "MED_TRIA3" && aFaceTypesNames[1] == "MED_QUAD4") ||
+                           (aFaceTypesNames[1] == "MED_TRIA3" && aFaceTypesNames[0] == "MED_QUAD4"));
     delete [] aFaceTypesNames;
     // EDGES: theC->_constituent->_constituent
     //CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 1, theC->getNumberOfTypes(MED_EN::MED_EDGE));
@@ -386,26 +386,26 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
 
   if (create) {
     theC->setCount(countCells, MED_EN::MED_CELL);
-    theC->setNodal(nodesCells_PYRA5, MED_EN::MED_CELL, MED_EN::MEDMEM_PYRA5);
-    theC->setNodal(nodesCells_HEXA8, MED_EN::MED_CELL, MED_EN::MEDMEM_HEXA8);
-    theC->setNodal(aPolyhedronNodalConnectivity, MED_CELL, MEDMEM_POLYHEDRA, aPolyhedronIndex);
+    theC->setNodal(nodesCells_PYRA5, MED_EN::MED_CELL, MED_EN::MED_PYRA5);
+    theC->setNodal(nodesCells_HEXA8, MED_EN::MED_CELL, MED_EN::MED_HEXA8);
+    theC->setNodal(aPolyhedronNodalConnectivity, MED_CELL, MED_POLYHEDRA, aPolyhedronIndex);
 
     // Invalid cases
     CPPUNIT_ASSERT_THROW(theC->setCount(countCells, MED_EN::MED_NODE), MEDEXCEPTION);
     CPPUNIT_ASSERT_THROW(theC->setCount(countCells, MED_EN::MED_EDGE), MEDEXCEPTION);
     CPPUNIT_ASSERT_THROW(theC->setCount(countCells, MED_EN::MED_FACE), MEDEXCEPTION);
 
-    CPPUNIT_ASSERT_THROW(theC->setNodal(nodesCells_PYRA5, MED_EN::MED_FACE, MED_EN::MEDMEM_PYRA5), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(theC->setNodal(nodesCells_PYRA5, MED_EN::MED_FACE, MED_EN::MED_PYRA5), MEDEXCEPTION);
   }
   else {
     // CELLS(3D): theC
     CPPUNIT_ASSERT_MESSAGE(msg, theC->existConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL));
     CPPUNIT_ASSERT_MESSAGE(msg, theC->existConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_CELL));
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 2, theC->getNumberOf(MED_EN::MED_CELL, MED_EN::MEDMEM_PYRA5));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 1, theC->getNumberOf(MED_EN::MED_CELL, MED_EN::MEDMEM_HEXA8));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 2, theC->getNumberOf(MED_EN::MED_CELL, MED_EN::MEDMEM_POLYHEDRA));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 5, theC->getNumberOf(MED_EN::MED_CELL, MED_EN::MEDMEM_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 2, theC->getNumberOf(MED_EN::MED_CELL, MED_EN::MED_PYRA5));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 1, theC->getNumberOf(MED_EN::MED_CELL, MED_EN::MED_HEXA8));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 2, theC->getNumberOf(MED_EN::MED_CELL, MED_EN::MED_POLYHEDRA));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 5, theC->getNumberOf(MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS));
 
     // sorted by geometric type (order is given by the typedef enum medGeometryElement)
     const int * countCellsBack = theC->getGlobalNumberingIndex(MED_EN::MED_CELL);
@@ -416,15 +416,15 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
 
     // nodal connectivity length
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 18+64, theC->getConnectivityLength(MED_EN::MED_NODAL, MED_EN::MED_CELL,
-                                                                      MED_EN::MEDMEM_ALL_ELEMENTS));
+                                                                      MED_EN::MED_ALL_ELEMENTS));
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 10, theC->getConnectivityLength(MED_EN::MED_NODAL, MED_EN::MED_CELL,
-                                                                      MED_EN::MEDMEM_PYRA5));
+                                                                      MED_EN::MED_PYRA5));
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg,  8, theC->getConnectivityLength(MED_EN::MED_NODAL, MED_EN::MED_CELL,
-                                                                      MED_EN::MEDMEM_HEXA8));
+                                                                      MED_EN::MED_HEXA8));
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg,  64, theC->getConnectivityLength(MED_EN::MED_NODAL, MED_EN::MED_CELL,
-                                                                       MED_EN::MEDMEM_POLYHEDRA));
+                                                                       MED_EN::MED_POLYHEDRA));
 
     // nodal connectivity index
     const int * connAllIndex = theC->getConnectivityIndex(MED_EN::MED_NODAL, MED_EN::MED_CELL);
@@ -437,13 +437,13 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
 
     // nodal connectivity
     const int * connAll = theC->getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL,
-                                                MED_EN::MEDMEM_ALL_ELEMENTS);
+                                                MED_EN::MED_ALL_ELEMENTS);
     const int * connPYRA5 = theC->getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL,
-                                                  MED_EN::MEDMEM_PYRA5);
+                                                  MED_EN::MED_PYRA5);
     const int * connHEXA8 = theC->getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL,
-                                                  MED_EN::MEDMEM_HEXA8);
+                                                  MED_EN::MED_HEXA8);
     const int * connPOLYH = theC->getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_CELL,
-                                                  MED_EN::MEDMEM_POLYHEDRA);
+                                                  MED_EN::MED_POLYHEDRA);
     for (int i = 0; i < 10; i++) {
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, nodesCells_PYRA5[i], connPYRA5[i]);
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, nodesCells_PYRA5[i], connAll[i]);
@@ -460,16 +460,16 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
     // descending connectivity length
     // 10 faces in 2 pyra
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 10, theC->getConnectivityLength
-                                 (MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MEDMEM_PYRA5));
+                                 (MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_PYRA5));
     // 6 faces in 1 hexa
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg,  6, theC->getConnectivityLength
-                                 (MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MEDMEM_HEXA8));
+                                 (MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_HEXA8));
     // 14 faces in 2 polyhedrons
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg,  14, theC->getConnectivityLength
-                                 (MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MEDMEM_POLYHEDRA));
+                                 (MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_POLYHEDRA));
     // 10 + 6 + 14 faces
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 30, theC->getConnectivityLength
-                                 (MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MEDMEM_ALL_ELEMENTS));
+                                 (MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS));
 
     // descending connectivity index
     const int * descAllIndex = theC->getConnectivityIndex(MED_EN::MED_DESCENDING, MED_EN::MED_CELL);
@@ -484,13 +484,13 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
     // descending connectivity
     {
       const int * descAll = theC->getConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_CELL,
-                                                  MED_EN::MEDMEM_ALL_ELEMENTS);
+                                                  MED_EN::MED_ALL_ELEMENTS);
       const int * descPYRA5 = theC->getConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_CELL,
-                                                    MED_EN::MEDMEM_PYRA5);
+                                                    MED_EN::MED_PYRA5);
       const int * descHEXA8 = theC->getConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_CELL,
-                                                    MED_EN::MEDMEM_HEXA8);
+                                                    MED_EN::MED_HEXA8);
       const int * descPOLYH = theC->getConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_CELL,
-                                                    MED_EN::MEDMEM_POLYHEDRA);
+                                                    MED_EN::MED_POLYHEDRA);
       for (int i = 0; i < 10; i++) {
         CPPUNIT_ASSERT_MESSAGE(msg, 0 < labs(descPYRA5[i]) && labs(descPYRA5[i]) < 16);
         CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, descAll[i], descPYRA5[i]);
@@ -509,10 +509,10 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
     CPPUNIT_ASSERT_MESSAGE(msg, theC->existConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE));
     //CPPUNIT_ASSERT_MESSAGE(msg, theC->existConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_FACE));
 
-    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg,  8, theC->getNumberOf(MED_EN::MED_FACE, MED_EN::MEDMEM_TRIA3));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg,  6, theC->getNumberOf(MED_EN::MED_FACE, MED_EN::MEDMEM_QUAD4));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg,  13, theC->getNumberOf(MED_EN::MED_FACE, MED_EN::MEDMEM_POLYGON));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 27, theC->getNumberOf(MED_EN::MED_FACE, MED_EN::MEDMEM_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg,  8, theC->getNumberOf(MED_EN::MED_FACE, MED_EN::MED_TRIA3));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg,  6, theC->getNumberOf(MED_EN::MED_FACE, MED_EN::MED_QUAD4));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg,  13, theC->getNumberOf(MED_EN::MED_FACE, MED_EN::MED_POLYGON));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 27, theC->getNumberOf(MED_EN::MED_FACE, MED_EN::MED_ALL_ELEMENTS));
 
     // sorted by geometric type
     const int * countFacesBack = theC->getGlobalNumberingIndex(MED_EN::MED_FACE);
@@ -526,14 +526,14 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
 
     // nodal connectivity length // 8*3 + 6*4 + 46
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 48+46, theC->getConnectivityLength(MED_EN::MED_NODAL, MED_EN::MED_FACE,
-                                                                                  MED_EN::MEDMEM_ALL_ELEMENTS));
+                                                                                  MED_EN::MED_ALL_ELEMENTS));
 
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 24, theC->getConnectivityLength(MED_EN::MED_NODAL, MED_EN::MED_FACE,
-                                                                      MED_EN::MEDMEM_TRIA3));
+                                                                      MED_EN::MED_TRIA3));
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 24, theC->getConnectivityLength(MED_EN::MED_NODAL, MED_EN::MED_FACE,
-                                                                      MED_EN::MEDMEM_QUAD4));
+                                                                      MED_EN::MED_QUAD4));
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 46, theC->getConnectivityLength(MED_EN::MED_NODAL, MED_EN::MED_FACE,
-                                                                               MED_EN::MEDMEM_POLYGON));
+                                                                               MED_EN::MED_POLYGON));
 
     // nodal connectivity index
     const int * connFaceAllIndex = theC->getConnectivityIndex(MED_EN::MED_NODAL, MED_EN::MED_FACE);
@@ -556,11 +556,11 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
 
     // nodal connectivity
     const int * connFaceAll = theC->getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE,
-                                                    MED_EN::MEDMEM_ALL_ELEMENTS);
+                                                    MED_EN::MED_ALL_ELEMENTS);
     const int * connTRIA3 = theC->getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE,
-                                                  MED_EN::MEDMEM_TRIA3);
+                                                  MED_EN::MED_TRIA3);
     const int * connQUAD4 = theC->getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE,
-                                                  MED_EN::MEDMEM_QUAD4);
+                                                  MED_EN::MED_QUAD4);
     for (int i = 0; i < 24; i++) {
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, connFaceAll[   i], connTRIA3[i]);
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, connFaceAll[24+i], connQUAD4[i]);
@@ -573,15 +573,15 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
     CPPUNIT_ASSERT_MESSAGE(msg, !theC->existConnectivity(MED_EN::MED_NODAL, MED_EN::MED_NODE));
     CPPUNIT_ASSERT_MESSAGE(msg, !theC->existConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_EDGE));
     CPPUNIT_ASSERT_MESSAGE(msg, !theC->existConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_NODE));
-    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 0, theC->getNumberOf(MED_EN::MED_CELL, MED_EN::MEDMEM_TETRA4));
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 0, theC->getNumberOf(MED_EN::MED_CELL, MED_EN::MED_TETRA4));
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 0, theC->getNumberOf(MED_EN::MED_CELL,
-                                                                   MED_EN::MEDMEM_TETRA4));
+                                                                   MED_EN::MED_TETRA4));
     CPPUNIT_ASSERT_THROW(theC->getConnectivityLength(MED_EN::MED_NODAL, MED_EN::MED_CELL,
-                                                     MED_EN::MEDMEM_TRIA3), MEDEXCEPTION);
+                                                     MED_EN::MED_TRIA3), MEDEXCEPTION);
     CPPUNIT_ASSERT_THROW(theC->getConnectivityLength(MED_EN::MED_DESCENDING, MED_EN::MED_CELL,
-                                                     MED_EN::MEDMEM_NONE), MEDEXCEPTION);
+                                                     MED_EN::MED_NONE), MEDEXCEPTION);
     CPPUNIT_ASSERT_THROW(theC->getConnectivityLength(MED_EN::MED_NODAL, MED_EN::MED_CELL,
-                                                     MED_EN::MEDMEM_POLYGON), MEDEXCEPTION);
+                                                     MED_EN::MED_POLYGON), MEDEXCEPTION);
   }
 
 
@@ -594,24 +594,24 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
 
       {
         const MED_EN::medGeometryElement * aCellTypesBack = theC->getGeometricTypes(MED_EN::MED_CELL);
-        CPPUNIT_ASSERT_MESSAGE(msg, ((aCellTypesBack[0] == MED_EN::MEDMEM_PYRA5 &&
-                                      aCellTypesBack[1] == MED_EN::MEDMEM_HEXA8) ||
-                                     (aCellTypesBack[0] == MED_EN::MEDMEM_HEXA8 &&
-                                      aCellTypesBack[1] == MED_EN::MEDMEM_PYRA5)));
-        CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, MED_EN::MEDMEM_POLYHEDRA, aCellTypesBack[2]);
+        CPPUNIT_ASSERT_MESSAGE(msg, ((aCellTypesBack[0] == MED_EN::MED_PYRA5 &&
+                                      aCellTypesBack[1] == MED_EN::MED_HEXA8) ||
+                                     (aCellTypesBack[0] == MED_EN::MED_HEXA8 &&
+                                      aCellTypesBack[1] == MED_EN::MED_PYRA5)));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, MED_EN::MED_POLYHEDRA, aCellTypesBack[2]);
       }
 
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 2, theC->getNumberOf(MED_EN::MED_CELL,
-                                                             MED_EN::MEDMEM_POLYHEDRA));
+                                                             MED_EN::MED_POLYHEDRA));
       //checking that 0 is returned if polygons are asked as cells instead of faces
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 0, theC->getNumberOf(MED_EN::MED_CELL,
-                                                             MED_EN::MEDMEM_POLYGON));
+                                                             MED_EN::MED_POLYGON));
 
 
       int nbCellAll = 5; // 2 (PYRA5) + 1 (HEXA8) + 2 (POLYHEDRA)
 
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, nbCellAll, theC->getNumberOf
-                                   (MED_EN::MED_CELL, MED_EN::MEDMEM_ALL_ELEMENTS));
+                                   (MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS));
 
 
       // first PYRA5 {1,2,3,4,5}
@@ -651,16 +651,16 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
           }
         }
         else {
-          CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, MED_EN::MEDMEM_POLYHEDRA, aCurElemType);
+          CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, MED_EN::MED_POLYHEDRA, aCurElemType);
           for (int j = 0; j < len; j++) {
             CPPUNIT_ASSERT_MESSAGE(msg, 14 < labs(ci[j]) && labs(ci[j]) <= 27); // nb.polygons = 13
           }
         }
 
         switch (aCurElemType) {
-        case MED_EN::MEDMEM_PYRA5:     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 5, len); break;
-        case MED_EN::MEDMEM_HEXA8:     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 6, len); break;
-        case MED_EN::MEDMEM_POLYHEDRA: CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 7, len); break;
+        case MED_EN::MED_PYRA5:     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 5, len); break;
+        case MED_EN::MED_HEXA8:     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 6, len); break;
+        case MED_EN::MED_POLYHEDRA: CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 7, len); break;
         default:
           CPPUNIT_FAIL(msg); // wrong element type
         }
@@ -669,7 +669,7 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
       // Polyhedron-specific methods
       {
         CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 2, theC->getNumberOf(MED_EN::MED_CELL,
-                                                               MED_EN::MEDMEM_POLYHEDRA));
+                                                               MED_EN::MED_POLYHEDRA));
 
         // getNodesOfPolyhedron
         int lenPolyh1nodes, lenPolyh2nodes; // nb of unique nodes
@@ -763,7 +763,7 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
         CPPUNIT_ASSERT_EQUAL_MESSAGE(msg,  polyhDesceIndex[nbClassicCells+1]+7, polyhDesceIndex[nbClassicCells+2]); // +7 faces
 
         // Polyhedron Descending Connectivity: array of size (NumberOfPolyhedronFaces)
-        const int* polyhDesceConn = theC->getConnectivity(MED_EN::MED_DESCENDING,MED_EN::MED_CELL,MED_EN::MEDMEM_POLYHEDRA);
+        const int* polyhDesceConn = theC->getConnectivity(MED_EN::MED_DESCENDING,MED_EN::MED_CELL,MED_EN::MED_POLYHEDRA);
         // 15,16,17,18,19,20,21, -15,22,23,24,25,26,27
         for (int i = 0; i < 14; i++) {
           // nb. poly faces = 13, because one face is common for two polyhedra
@@ -775,9 +775,9 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
       // Polygon-specific methods
       {
         // Invalid cases: no polygons for MED_CELL in theC
-        CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 0, theC->getNumberOf(MED_EN::MED_CELL,MED_EN::MEDMEM_POLYGON));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 0, theC->getNumberOf(MED_EN::MED_CELL,MED_EN::MED_POLYGON));
         CPPUNIT_ASSERT_THROW(theC->getConnectivity(MED_EN::MED_DESCENDING,
-                                                   MED_EN::MED_CELL,MED_EN::MEDMEM_POLYGON), MEDEXCEPTION);
+                                                   MED_EN::MED_CELL,MED_EN::MED_POLYGON), MEDEXCEPTION);
       }
     } // CELLS: theC
 
@@ -786,22 +786,22 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 3, theC->getNumberOfTypes(MED_EN::MED_FACE));
 
       const MED_EN::medGeometryElement * aFaceTypesBack = theC->getGeometricTypes(MED_EN::MED_FACE);
-      CPPUNIT_ASSERT_MESSAGE(msg, ((aFaceTypesBack[0] == MED_EN::MEDMEM_TRIA3 &&
-                                    aFaceTypesBack[1] == MED_EN::MEDMEM_QUAD4) ||
-                                   (aFaceTypesBack[0] == MED_EN::MEDMEM_QUAD4 &&
-                                    aFaceTypesBack[1] == MED_EN::MEDMEM_TRIA3)));
-      CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, MED_EN::MEDMEM_POLYGON, aFaceTypesBack[2]);
+      CPPUNIT_ASSERT_MESSAGE(msg, ((aFaceTypesBack[0] == MED_EN::MED_TRIA3 &&
+                                    aFaceTypesBack[1] == MED_EN::MED_QUAD4) ||
+                                   (aFaceTypesBack[0] == MED_EN::MED_QUAD4 &&
+                                    aFaceTypesBack[1] == MED_EN::MED_TRIA3)));
+      CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, MED_EN::MED_POLYGON, aFaceTypesBack[2]);
 
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg,  0, theC->getNumberOf
-                                   (MED_EN::MED_FACE, MED_EN::MEDMEM_POLYHEDRA));
+                                   (MED_EN::MED_FACE, MED_EN::MED_POLYHEDRA));
 
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 13, theC->getNumberOf
-                                   (MED_EN::MED_FACE, MED_EN::MEDMEM_POLYGON));
+                                   (MED_EN::MED_FACE, MED_EN::MED_POLYGON));
 
       int nbFaAll = 27; // 6 (QUAD4) + 8 (TRIA3) + 13 (POLYGON)
 
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, nbFaAll, theC->getNumberOf
-                                   (MED_EN::MED_FACE, MED_EN::MEDMEM_ALL_ELEMENTS));
+                                   (MED_EN::MED_FACE, MED_EN::MED_ALL_ELEMENTS));
 
 
       bool isHexagon = false;
@@ -825,9 +825,9 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
         }
 
         switch (aCurElemType) {
-        case MED_EN::MEDMEM_TRIA3:   CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 3, len); break;
-        case MED_EN::MEDMEM_QUAD4:   CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 4, len); break;
-        case MED_EN::MEDMEM_POLYGON: CPPUNIT_ASSERT_MESSAGE(msg, len == 3 || len == 4 || len == 6); break;
+        case MED_EN::MED_TRIA3:   CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 3, len); break;
+        case MED_EN::MED_QUAD4:   CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 4, len); break;
+        case MED_EN::MED_POLYGON: CPPUNIT_ASSERT_MESSAGE(msg, len == 3 || len == 4 || len == 6); break;
         default:
           CPPUNIT_FAIL(msg); // wrong element type
         }
@@ -836,12 +836,12 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
 
       // Polygon-specific methods
       {
-        CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 13, theC->getNumberOf(MED_EN::MED_FACE,MED_EN::MEDMEM_POLYGON));
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 13, theC->getNumberOf(MED_EN::MED_FACE,MED_EN::MED_POLYGON));
 
         const int * pgIndx = theC->getConnectivityIndex(MED_EN::MED_NODAL, MED_EN::MED_FACE) + 8+6;
         CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 46, pgIndx[13]-pgIndx[0]);
 
-        const int * pgConn = theC->getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE, MED_EN::MEDMEM_ALL_ELEMENTS);
+        const int * pgConn = theC->getConnectivity(MED_EN::MED_NODAL, MED_EN::MED_FACE, MED_EN::MED_ALL_ELEMENTS);
 
         // face #  1: 11 15 19 20 17 13
         // face #  2: 11 13 14
@@ -883,49 +883,49 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
 
   }
   else {
-    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, MED_EN::MEDMEM_POLYHEDRA, theC->getPolyTypeRelativeTo());
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, MED_EN::MED_POLYHEDRA, theC->getPolyTypeRelativeTo());
 
     // The following methods are not recursive, i.e. they return types
     // of this connectivity, but do not return types of _constituent.
     // And these methods DO work with poly-types.
 
     // getType
-    const CELLMODEL & aPYRA5_type = theC->getType(MED_EN::MEDMEM_PYRA5);
-    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, MED_EN::MEDMEM_PYRA5, aPYRA5_type.getType());
+    const CELLMODEL & aPYRA5_type = theC->getType(MED_EN::MED_PYRA5);
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, MED_EN::MED_PYRA5, aPYRA5_type.getType());
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 5, aPYRA5_type.getNumberOfVertexes());
 
-    const CELLMODEL & aHEXA8_type = theC->getType(MED_EN::MEDMEM_HEXA8);
+    const CELLMODEL & aHEXA8_type = theC->getType(MED_EN::MED_HEXA8);
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 8, aHEXA8_type.getNumberOfNodes());
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 3, aHEXA8_type.getDimension());
     // nb. of sub-faces (nb. of constituents with dimension = 3 - 1)
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 6, aHEXA8_type.getNumberOfConstituents(1));
 
-    const CELLMODEL & aPOLYH_type = theC->getType(MED_EN::MEDMEM_POLYHEDRA);
+    const CELLMODEL & aPOLYH_type = theC->getType(MED_EN::MED_POLYHEDRA);
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 0, aPOLYH_type.getNumberOfNodes());
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 3, aPOLYH_type.getDimension());
 
-    CPPUNIT_ASSERT_THROW(theC->getType(MED_EN::MEDMEM_TRIA3), MEDEXCEPTION);
-    CPPUNIT_ASSERT_THROW(theC->getType(MED_EN::MEDMEM_POLYGON), MEDEXCEPTION);
-    CPPUNIT_ASSERT_THROW(theC->getType(MED_EN::MEDMEM_NONE), MEDEXCEPTION);
-    CPPUNIT_ASSERT_THROW(theC->getType(MED_EN::MEDMEM_ALL_ELEMENTS), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(theC->getType(MED_EN::MED_TRIA3), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(theC->getType(MED_EN::MED_POLYGON), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(theC->getType(MED_EN::MED_NONE), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(theC->getType(MED_EN::MED_ALL_ELEMENTS), MEDEXCEPTION);
 
     // getNumberOfNodesInType
-    int nbNodesInPYRA5 = theC->getNumberOfNodesInType(MED_EN::MEDMEM_PYRA5);
+    int nbNodesInPYRA5 = theC->getNumberOfNodesInType(MED_EN::MED_PYRA5);
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 5, nbNodesInPYRA5);
 
-    CPPUNIT_ASSERT_THROW(theC->getNumberOfNodesInType(MED_EN::MEDMEM_TRIA3), MEDEXCEPTION);
-    CPPUNIT_ASSERT_THROW(theC->getNumberOfNodesInType(MED_EN::MEDMEM_POLYGON), MEDEXCEPTION);
-    CPPUNIT_ASSERT_THROW(theC->getNumberOfNodesInType(MED_EN::MEDMEM_NONE), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(theC->getNumberOfNodesInType(MED_EN::MED_TRIA3), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(theC->getNumberOfNodesInType(MED_EN::MED_POLYGON), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(theC->getNumberOfNodesInType(MED_EN::MED_NONE), MEDEXCEPTION);
 
     // getNumberOfSubCellInType
-    int nbFacesInHEXA8 = theC->getNumberOfSubCellInType(MED_EN::MEDMEM_HEXA8);
+    int nbFacesInHEXA8 = theC->getNumberOfSubCellInType(MED_EN::MED_HEXA8);
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 6, nbFacesInHEXA8);
 
-    int nbFacesInPOLYH = theC->getNumberOfSubCellInType(MED_EN::MEDMEM_POLYHEDRA);
+    int nbFacesInPOLYH = theC->getNumberOfSubCellInType(MED_EN::MED_POLYHEDRA);
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 0, nbFacesInPOLYH);
 
-    CPPUNIT_ASSERT_THROW(theC->getNumberOfSubCellInType(MED_EN::MEDMEM_QUAD4), MEDEXCEPTION);
-    CPPUNIT_ASSERT_THROW(theC->getNumberOfSubCellInType(MED_EN::MEDMEM_ALL_ELEMENTS), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(theC->getNumberOfSubCellInType(MED_EN::MED_QUAD4), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(theC->getNumberOfSubCellInType(MED_EN::MED_ALL_ELEMENTS), MEDEXCEPTION);
 
     // getValueIndex
     const int* nodalIndex = theC->getValueIndex(MED_EN::MED_NODAL);
@@ -942,9 +942,9 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
     CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, 17, desceIndex[3]); // +6 faces of HEXA8
 
     // getValue
-    const int* nodalValue = theC->getValue(MED_EN::MED_NODAL, MED_EN::MEDMEM_ALL_ELEMENTS);
-    const int* nodalPYRA5 = theC->getValue(MED_EN::MED_NODAL, MED_EN::MEDMEM_PYRA5);
-    const int* nodalHEXA8 = theC->getValue(MED_EN::MED_NODAL, MED_EN::MEDMEM_HEXA8);
+    const int* nodalValue = theC->getValue(MED_EN::MED_NODAL, MED_EN::MED_ALL_ELEMENTS);
+    const int* nodalPYRA5 = theC->getValue(MED_EN::MED_NODAL, MED_EN::MED_PYRA5);
+    const int* nodalHEXA8 = theC->getValue(MED_EN::MED_NODAL, MED_EN::MED_HEXA8);
 
     for (int i = 0; i < 10; i++) {
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, nodesCells_PYRA5[i], nodalPYRA5[i]);
@@ -955,9 +955,9 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
       CPPUNIT_ASSERT_EQUAL_MESSAGE(msg, nodesCells_HEXA8[i], nodalValue[10 + i]);
     }
 
-    const int* desceValue = theC->getValue(MED_EN::MED_DESCENDING, MED_EN::MEDMEM_ALL_ELEMENTS);
-    const int* descePYRA5 = theC->getValue(MED_EN::MED_DESCENDING, MED_EN::MEDMEM_PYRA5);
-    const int* desceHEXA8 = theC->getValue(MED_EN::MED_DESCENDING, MED_EN::MEDMEM_HEXA8);
+    const int* desceValue = theC->getValue(MED_EN::MED_DESCENDING, MED_EN::MED_ALL_ELEMENTS);
+    const int* descePYRA5 = theC->getValue(MED_EN::MED_DESCENDING, MED_EN::MED_PYRA5);
+    const int* desceHEXA8 = theC->getValue(MED_EN::MED_DESCENDING, MED_EN::MED_HEXA8);
 
     for (int i = 0; i < 10; i++) {
       CPPUNIT_ASSERT_MESSAGE(msg, 0 < labs(descePYRA5[i]) && labs(descePYRA5[i]) < 16);
@@ -969,9 +969,9 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
       CPPUNIT_ASSERT_MESSAGE(msg, 0 < labs(desceValue[10 + i]) && labs(desceValue[10 + i]) < 16);
     }
 
-    CPPUNIT_ASSERT_THROW(theC->getValue(MED_EN::MED_NODAL, MED_EN::MEDMEM_QUAD4), MEDEXCEPTION);
-    CPPUNIT_ASSERT_THROW(theC->getValue(MED_EN::MED_NODAL, MED_EN::MEDMEM_POLYGON), MEDEXCEPTION);
-    CPPUNIT_ASSERT_THROW(theC->getValue(MED_EN::MED_DESCENDING, MED_EN::MEDMEM_NONE), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(theC->getValue(MED_EN::MED_NODAL, MED_EN::MED_QUAD4), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(theC->getValue(MED_EN::MED_NODAL, MED_EN::MED_POLYGON), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(theC->getValue(MED_EN::MED_DESCENDING, MED_EN::MED_NONE), MEDEXCEPTION);
   }
 }
 
@@ -983,7 +983,7 @@ void MEDMEMTest::testConnectivity()
   CONNECTIVITY myNodalConnectivity(1); // one type
   myNodalConnectivity.setEntityDimension(3);
 
-  MED_EN::medGeometryElement types[] = { MED_EN::MEDMEM_POLYHEDRA };
+  MED_EN::medGeometryElement types[] = { MED_EN::MED_POLYHEDRA };
 
   //POLYHEDRON
   const int NumberOfPolyhedron = 2;
@@ -1016,28 +1016,28 @@ void MEDMEMTest::testConnectivity()
   myNodalConnectivity.setGeometricTypes( &types[0], MED_EN::MED_CELL );
   myNodalConnectivity.setCount( count, MED_EN::MED_CELL );
   myNodalConnectivity.setNodal( PolyhedronNodalConnectivity, MED_EN::MED_CELL,
-                                MED_EN::MEDMEM_POLYHEDRA, PolyhedronIndex);
+                                MED_EN::MED_POLYHEDRA, PolyhedronIndex);
 
   myNodalConnectivity.setNumberOfNodes(777);
   CPPUNIT_ASSERT_EQUAL(777, myNodalConnectivity.getNumberOf
-                       (MED_EN::MED_NODE, MED_EN::MEDMEM_NONE));
+                       (MED_EN::MED_NODE, MED_EN::MED_NONE));
 //   // Throws because _constituent is not calculated
 //   CPPUNIT_ASSERT_THROW(myNodalConnectivity.getNumberOf
-//                        (MED_EN::MED_FACE, MED_EN::MEDMEM_NONE), MEDEXCEPTION);
+//                        (MED_EN::MED_FACE, MED_EN::MED_NONE), MEDEXCEPTION);
 
 //   // Returns zero, because EntityDimension is not set
 //   CPPUNIT_ASSERT_EQUAL(0, myNodalConnectivity.getNumberOf
-//                        (MED_EN::MED_CELL, MED_EN::MEDMEM_POLYGON));
+//                        (MED_EN::MED_CELL, MED_EN::MED_POLYGON));
 //   CPPUNIT_ASSERT_EQUAL(0, myNodalConnectivity.getNumberOf
-//                        (MED_EN::MED_CELL, MED_EN::MEDMEM_POLYHEDRA));
+//                        (MED_EN::MED_CELL, MED_EN::MED_POLYHEDRA));
 
-  // Throws because entity must differ from MEDMEM_NONE and MEDMEM_ALL_ELEMENTS
-  CPPUNIT_ASSERT_THROW(myNodalConnectivity.getNumberOfNodesInType(MED_EN::MEDMEM_NONE), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(myNodalConnectivity.getNumberOfNodesInType(MED_EN::MEDMEM_ALL_ELEMENTS), MEDEXCEPTION);
+  // Throws because entity must differ from MED_NONE and MED_ALL_ELEMENTS
+  CPPUNIT_ASSERT_THROW(myNodalConnectivity.getNumberOfNodesInType(MED_EN::MED_NONE), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(myNodalConnectivity.getNumberOfNodesInType(MED_EN::MED_ALL_ELEMENTS), MEDEXCEPTION);
 
   // Throws because types are not defined
-  CPPUNIT_ASSERT_THROW(myNodalConnectivity.getNumberOfNodesInType(MED_EN::MEDMEM_ALL_ELEMENTS), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(myNodalConnectivity.getNumberOfNodesInType(MED_EN::MEDMEM_POLYGON), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(myNodalConnectivity.getNumberOfNodesInType(MED_EN::MED_ALL_ELEMENTS), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(myNodalConnectivity.getNumberOfNodesInType(MED_EN::MED_POLYGON), MEDEXCEPTION);
 
   // does not throw any more exception because 
   // it is now possible to work on meshes with only polyhedric elements
@@ -1057,7 +1057,7 @@ void MEDMEMTest::testConnectivity()
   // it contains cells of different dimension (2D and 3D)
   // We set here EntityDimension for good work of below methods
 
-  CPPUNIT_ASSERT_EQUAL(MED_EN::MEDMEM_POLYHEDRA, myNodalConnectivity.getPolyTypeRelativeTo());
+  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_POLYHEDRA, myNodalConnectivity.getPolyTypeRelativeTo());
 
   // Poly types
   CPPUNIT_ASSERT_EQUAL(1, myNodalConnectivity.getNumberOfTypes(MED_EN::MED_CELL));
@@ -1066,12 +1066,12 @@ void MEDMEMTest::testConnectivity()
 
   // getNumberOf
   CPPUNIT_ASSERT_EQUAL(NumberOfPolyhedron, myNodalConnectivity.getNumberOf
-                       (MED_EN::MED_CELL, MED_EN::MEDMEM_POLYHEDRA));
+                       (MED_EN::MED_CELL, MED_EN::MED_POLYHEDRA));
   CPPUNIT_ASSERT_EQUAL(0, myNodalConnectivity.getNumberOf
-                       (MED_EN::MED_CELL, MED_EN::MEDMEM_POLYGON));
+                       (MED_EN::MED_CELL, MED_EN::MED_POLYGON));
   //Minus 1 because 2,3,8,9 is a given twice in connectivity
   CPPUNIT_ASSERT_EQUAL(NumberOfFaces-1, myNodalConnectivity.getNumberOf (MED_EN::MED_FACE,
-                                                                         MED_EN::MEDMEM_POLYGON));
+                                                                         MED_EN::MED_POLYGON));
 
   // getConnectivityOfAnElement
   {
@@ -1202,9 +1202,9 @@ void MEDMEMTest::testConnectivity()
   CPPUNIT_ASSERT_EQUAL(2, aFaces1->getEntityDimension());
 
   // getPolyTypeRelativeTo
-  CPPUNIT_ASSERT_EQUAL(MED_EN::MEDMEM_POLYHEDRA, aCells1->getPolyTypeRelativeTo());
-  CPPUNIT_ASSERT_EQUAL(MED_EN::MEDMEM_POLYGON  , aCells2.getPolyTypeRelativeTo());
-  CPPUNIT_ASSERT_EQUAL(MED_EN::MEDMEM_POLYGON  , aFaces1->getPolyTypeRelativeTo());
+  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_POLYHEDRA, aCells1->getPolyTypeRelativeTo());
+  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_POLYGON  , aCells2.getPolyTypeRelativeTo());
+  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_POLYGON  , aFaces1->getPolyTypeRelativeTo());
   // because there is no poly types for edges (2D entities)
   CPPUNIT_ASSERT_THROW(anEdges1->getPolyTypeRelativeTo(), MEDEXCEPTION);
 
@@ -1222,12 +1222,12 @@ void MEDMEMTest::testConnectivity()
   CPPUNIT_ASSERT_EQUAL(2, aCells2.getNumberOfTypes(MED_EN::MED_EDGE));
 
   // setGeometricTypes
-  MED_EN::medGeometryElement aCellTypes2D[3] = {MED_EN::MEDMEM_TRIA3, MED_EN::MEDMEM_QUAD4, MED_EN::MEDMEM_TRIA6};
-  MED_EN::medGeometryElement aCellTypes3D[2] = {MED_EN::MEDMEM_PYRA5, MED_EN::MEDMEM_HEXA8};
-  MED_EN::medGeometryElement anEdgeTypes1[1] = {MED_EN::MEDMEM_SEG2};
-  MED_EN::medGeometryElement anEdgeTypes2[2] = {MED_EN::MEDMEM_SEG2, MED_EN::MEDMEM_SEG3};
+  MED_EN::medGeometryElement aCellTypes2D[3] = {MED_EN::MED_TRIA3, MED_EN::MED_QUAD4, MED_EN::MED_TRIA6};
+  MED_EN::medGeometryElement aCellTypes3D[2] = {MED_EN::MED_PYRA5, MED_EN::MED_HEXA8};
+  MED_EN::medGeometryElement anEdgeTypes1[1] = {MED_EN::MED_SEG2};
+  MED_EN::medGeometryElement anEdgeTypes2[2] = {MED_EN::MED_SEG2, MED_EN::MED_SEG3};
   MED_EN::medGeometryElement aFaceTypes2[2] =
-    {MED_EN::MEDMEM_TRIA3, MED_EN::MEDMEM_QUAD4};
+    {MED_EN::MED_TRIA3, MED_EN::MED_QUAD4};
 
   aCells1->setGeometricTypes(aCellTypes3D, MED_EN::MED_CELL);
   aCells1->setGeometricTypes(aFaceTypes2, MED_EN::MED_FACE);
@@ -1261,24 +1261,24 @@ void MEDMEMTest::testConnectivity()
   int nodesCell2D_QUAD4[4] = {7,8,14,13};
   int nodesCell2D_TRIA6[24] = {1,2,3,7,10,6, 3,4,5,9,11,8, 11,15,20,19,18,14, 18,17,16,12,10,13};
 
-  aCells2.setNodal(nodesCell2D_TRIA3, MED_EN::MED_CELL, MED_EN::MEDMEM_TRIA3);
-  aCells2.setNodal(nodesCell2D_QUAD4, MED_EN::MED_CELL, MED_EN::MEDMEM_QUAD4);
-  aCells2.setNodal(nodesCell2D_TRIA6, MED_EN::MED_CELL, MED_EN::MEDMEM_TRIA6);
+  aCells2.setNodal(nodesCell2D_TRIA3, MED_EN::MED_CELL, MED_EN::MED_TRIA3);
+  aCells2.setNodal(nodesCell2D_QUAD4, MED_EN::MED_CELL, MED_EN::MED_QUAD4);
+  aCells2.setNodal(nodesCell2D_TRIA6, MED_EN::MED_CELL, MED_EN::MED_TRIA6);
 
   int nodesEdges2_SEG2[24] = {3,8, 8,11, 11,14, 14,18, 18,13, 13,10, 10,7,
                               7,3, 7,8, 8,14, 14,13, 13,7};
   int nodesEdges2_SEG3[24] = {1,2,3, 3,4,5, 5,9,11, 11,15,20,
                               20,19,18, 18,17,16, 16,12,10, 10,6,1};
 
-  aCells2.setNodal(nodesEdges2_SEG2, MED_EN::MED_EDGE, MED_EN::MEDMEM_SEG2);
-  aCells2.setNodal(nodesEdges2_SEG3, MED_EN::MED_EDGE, MED_EN::MEDMEM_SEG3);
+  aCells2.setNodal(nodesEdges2_SEG2, MED_EN::MED_EDGE, MED_EN::MED_SEG2);
+  aCells2.setNodal(nodesEdges2_SEG3, MED_EN::MED_EDGE, MED_EN::MED_SEG3);
 
   // aCells1
   int nodesCell3D_PYRA5[10] = {5,4,3,2,1, 6,7,8,9,10};
   int nodesCell3D_HEXA8[8] = {2,3,4,5, 6,7,8,9};
 
-  aCells1->setNodal(nodesCell3D_PYRA5, MED_EN::MED_CELL, MED_EN::MEDMEM_PYRA5);
-  aCells1->setNodal(nodesCell3D_HEXA8, MED_EN::MED_CELL, MED_EN::MEDMEM_HEXA8);
+  aCells1->setNodal(nodesCell3D_PYRA5, MED_EN::MED_CELL, MED_EN::MED_PYRA5);
+  aCells1->setNodal(nodesCell3D_HEXA8, MED_EN::MED_CELL, MED_EN::MED_HEXA8);
 
   int nodesFaces1_TRIA3[24] = {1,2,3, 1,3,4, 1,4,5, 1,5,2,
                                10,6,7, 10,7,8,  10,8,9, 10,9,6};
@@ -1286,16 +1286,16 @@ void MEDMEMTest::testConnectivity()
   // int nodesFaces1_TRIA6[6] = {11,12,13,14,15,16};
   // int nodesFaces1_QUAD8[8] = {15,14,13,17,18,19,20,21};
 
-  aCells1->setNodal(nodesFaces1_TRIA3, MED_EN::MED_FACE, MED_EN::MEDMEM_TRIA3);
-  aCells1->setNodal(nodesFaces1_QUAD4, MED_EN::MED_FACE, MED_EN::MEDMEM_QUAD4);
-  //aCells1->setNodal(nodesFaces1_TRIA6, MED_EN::MED_FACE, MED_EN::MEDMEM_TRIA6);
-  //aCells1->setNodal(nodesFaces1_QUAD8, MED_EN::MED_FACE, MED_EN::MEDMEM_QUAD8);
+  aCells1->setNodal(nodesFaces1_TRIA3, MED_EN::MED_FACE, MED_EN::MED_TRIA3);
+  aCells1->setNodal(nodesFaces1_QUAD4, MED_EN::MED_FACE, MED_EN::MED_QUAD4);
+  //aCells1->setNodal(nodesFaces1_TRIA6, MED_EN::MED_FACE, MED_EN::MED_TRIA6);
+  //aCells1->setNodal(nodesFaces1_QUAD8, MED_EN::MED_FACE, MED_EN::MED_QUAD8);
 
   int nodesEdges1_SEG2[40] = {1,2, 1,3, 1,4, 1,5, 10,6, 10,7, 10,8, 10,9,
                               2,3, 3,4, 4,5, 5,2,  6,7,  7,8,  8,9,  9,6,
                               2,6, 3,7, 4,8, 5,9};
 
-  aCells1->setNodal(nodesEdges1_SEG2, MED_EN::MED_EDGE, MED_EN::MEDMEM_SEG2);
+  aCells1->setNodal(nodesEdges1_SEG2, MED_EN::MED_EDGE, MED_EN::MED_SEG2);
 
   // setNumberOfNodes
   aCells2.setNumberOfNodes(20);
@@ -1365,12 +1365,12 @@ void MEDMEMTest::testConnectivity()
     //aFamilyOnFaces->setAll(true);
 
     int nbTypesFam1 = 2;
-    MED_EN::medGeometryElement aSCTypes[4] = {MED_EN::MEDMEM_TRIA3, MED_EN::MEDMEM_QUAD4};
+    MED_EN::medGeometryElement aSCTypes[4] = {MED_EN::MED_TRIA3, MED_EN::MED_QUAD4};
     int nbEltsSC[4] = {8,6};
     int indexSC[5] = {1,9,15}; // length = nb.types + 1
     int valueSC[16] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14}; // length = total nb. of elements
     //int nbTypesFam1 = 1;
-    //MED_EN::medGeometryElement aSCTypes[1] = {MED_EN::MEDMEM_TRIA3};
+    //MED_EN::medGeometryElement aSCTypes[1] = {MED_EN::MED_TRIA3};
     //int nbEltsSC[1] = {8};
     //int indexSC[2] = {1,9}; // length = nb.types + 1
     //int valueSC[8] = {1,3,5,7,9,11,13,15}; // length = total nb. of elements
@@ -1402,7 +1402,7 @@ void MEDMEMTest::testConnectivity()
   createOrCheck(c2, "Check copy constructor", /*create*/false);
 
   // invertConnectivityForAFace
-  int nbFacesC2 = c2->getNumberOf(MED_EN::MED_FACE, MED_EN::MEDMEM_ALL_ELEMENTS);
+  int nbFacesC2 = c2->getNumberOf(MED_EN::MED_FACE, MED_EN::MED_ALL_ELEMENTS);
   for (int faceId = 1; faceId <= nbFacesC2; faceId++) {
 
     // this face nodal connectivity before inversion:
@@ -1411,9 +1411,9 @@ void MEDMEMTest::testConnectivity()
                                                          MED_EN::MED_FACE, faceId, oldLen);
 
     // descending connectivity before inversion:
-    int before_NumberOfElements = c2->getNumberOf(MED_EN::MED_CELL, MED_EN::MEDMEM_ALL_ELEMENTS);
+    int before_NumberOfElements = c2->getNumberOf(MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
     const int * before_connectivity_shared =
-      c2->getConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MEDMEM_ALL_ELEMENTS);
+      c2->getConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
     const int * before_connectivity_index =
       c2->getConnectivityIndex(MED_EN::MED_DESCENDING, MED_EN::MED_CELL);
 
@@ -1480,9 +1480,9 @@ void MEDMEMTest::testConnectivity()
     }
 
     // descending connectivity after inversion:
-    int after_NumberOfElements = c2->getNumberOf(MED_EN::MED_CELL, MED_EN::MEDMEM_ALL_ELEMENTS);
+    int after_NumberOfElements = c2->getNumberOf(MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
     const int * after_connectivity =
-      c2->getConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MEDMEM_ALL_ELEMENTS);
+      c2->getConnectivity(MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
     const int * after_connectivity_index =
       c2->getConnectivityIndex(MED_EN::MED_DESCENDING, MED_EN::MED_CELL);
 

@@ -1,25 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
-// This program test the implementation of the class MED_MESH_RDONLY_DRIVER for Polygons and Polyhedron. //
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Mesh.hxx"
@@ -122,7 +120,7 @@ int main (int argc, char ** argv)
   //Test 1 : test if connectivity of poly3D mesh is OK
   if(myMesh->getMeshDimension()==3 && myMesh->getSpaceDimension()==3)
     nbOfPtsForTest++;
-  if(myMesh->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_TETRA4)==1 && myMesh->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_POLYHEDRA)==2)
+  if(myMesh->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_TETRA4)==1 && myMesh->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_POLYHEDRA)==2)
     nbOfPtsForTest++;
   const int REFnodalConnForTetra[4]=
     {
@@ -135,7 +133,7 @@ int main (int argc, char ** argv)
       nbOfPtsForTest++;
   //6
   const int *globIndex=connIndForTetraToTest + 1; // skip 1 tetra
-  const int *nodalConnOfFaces=myMesh->getConnectivity(MED_NODAL,MED_CELL,MEDMEM_POLYHEDRA);
+  const int *nodalConnOfFaces=myMesh->getConnectivity(MED_NODAL,MED_CELL,MED_POLYHEDRA);
   if(globIndex[1]-globIndex[0]==46 && globIndex[2]-globIndex[1]==45)// resp 46 nodes and 45 nodes are in polyh 1 and 2.
     nbOfPtsForTest++;
   //7
@@ -181,9 +179,9 @@ int main (int argc, char ** argv)
   FAMILY *fam3=*(iter);
   const int *nbs;
   // family 1
-  if(fam1->getNumberOfTypes()==1 && fam1->getTypes()[0]==MEDMEM_POLYGON && fam1->getNumberOfElements(MEDMEM_ALL_ELEMENTS)==3)
+  if(fam1->getNumberOfTypes()==1 && fam1->getTypes()[0]==MED_POLYGON && fam1->getNumberOfElements(MED_ALL_ELEMENTS)==3)
     nbOfPtsForTest++;
-  nbs=fam1->getNumber(MEDMEM_ALL_ELEMENTS);
+  nbs=fam1->getNumber(MED_ALL_ELEMENTS);
   const int REFTabForPolyg[16]=
     {
       1, 2, 3, 4, 5, 6, 10, 9, 8, 12, 11, 13, 14, 15, 3, 2
@@ -203,9 +201,9 @@ int main (int argc, char ** argv)
   if(test1.areAllEltsConsumed())
     nbOfPtsForTest++;
   // family 2
-  if(fam2->getNumberOfElements(MEDMEM_ALL_ELEMENTS)==8)
+  if(fam2->getNumberOfElements(MED_ALL_ELEMENTS)==8)
     nbOfPtsForTest++;
-  nbs=fam2->getNumber(MEDMEM_ALL_ELEMENTS);
+  nbs=fam2->getNumber(MED_ALL_ELEMENTS);
   const int REFTabForQuad[32]=
     {
       1, 7, 8, 2, 2, 8, 9, 3, 4, 3, 9, 10, 5, 4, 10, 11, 6, 5, 11, 12, 1, 6, 12, 7, 14, 13, 16, 17, 8, 9, 17, 16
@@ -221,9 +219,9 @@ int main (int argc, char ** argv)
   if(test2.areAllEltsConsumed())
     nbOfPtsForTest++;
   // family 3
-  if(fam3->getNumberOfElements(MEDMEM_ALL_ELEMENTS)==6)
+  if(fam3->getNumberOfElements(MED_ALL_ELEMENTS)==6)
     nbOfPtsForTest++;
-  nbs=fam3->getNumber(MEDMEM_ALL_ELEMENTS);
+  nbs=fam3->getNumber(MED_ALL_ELEMENTS);
   const int REFTabForTria[18]=
     {
       7, 12, 8, 15, 14, 17, 15, 17, 18, 15, 18, 9, 3, 15, 9, 18, 17, 9
@@ -333,7 +331,7 @@ int main (int argc, char ** argv)
   // TEST 4 -- CHECK FOR Reverse descending using getBoundaryElements.
   nbOfPtsForTest=0;
   SUPPORT *bound=myMesh->getBoundaryElements(MED_NODE);
-  if(bound->getNumberOfElements(MEDMEM_ALL_ELEMENTS)==19)
+  if(bound->getNumberOfElements(MED_ALL_ELEMENTS)==19)
     nbOfPtsForTest++;
   if(bound->isOnAllElements())
     nbOfPtsForTest++;

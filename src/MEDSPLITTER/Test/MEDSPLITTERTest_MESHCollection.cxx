@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDSPLITTERTest.hxx"
@@ -279,8 +279,8 @@ void MEDSPLITTERTest::testMESHCollection_square()
   MEDMEM::MESH mesh2(MEDMEM::MED_DRIVER, filename_wr_2, meshname2);
     
   // testing number of elements for each partition
-  int nbelem1=mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
-  int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
+  int nbelem1=mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+  int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
     
   CPPUNIT_ASSERT_EQUAL(nbelem1,2);
   CPPUNIT_ASSERT_EQUAL(nbelem2,2);
@@ -449,8 +449,8 @@ void MEDSPLITTERTest::testMESHCollection_square_with_faces()
   MEDMEM::MESH mesh2(MEDMEM::MED_DRIVER, filename_wr_2, meshname2);
 
   // testing number of elements for each partition
-  int nbelem1=mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
-  int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
+  int nbelem1=mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+  int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
 
   CPPUNIT_ASSERT_EQUAL(nbelem1,2);
   CPPUNIT_ASSERT_EQUAL(nbelem2,2);
@@ -663,10 +663,10 @@ void MEDSPLITTERTest::testMESHCollection_indivisible()
   MEDMEM::MESH mesh4(MEDMEM::MED_DRIVER, filename_wr_4, meshname4);
       
   // testing number of quads for each partition
-  int nbquad1=    mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_QUAD4);
-  int nbquad2=    mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_QUAD4);
-  int nbquad3=    mesh3.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_QUAD4);
-  int nbquad4=    mesh4.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_QUAD4);
+  int nbquad1=    mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_QUAD4);
+  int nbquad2=    mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_QUAD4);
+  int nbquad3=    mesh3.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_QUAD4);
+  int nbquad4=    mesh4.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_QUAD4);
   int nb_domain_with_quad=(nbquad1?1:0)+(nbquad2?1:0)+(nbquad3?1:0)+(nbquad4?1:0);
 
   CPPUNIT_ASSERT_EQUAL(nb_domain_with_quad,1);
@@ -760,8 +760,8 @@ void MEDSPLITTERTest::testMESHCollection_user_partition()
 
   // testing number of elements for each partition
 
-  int nbelem1=mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
-  int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
+  int nbelem1=mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+  int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
   CPPUNIT_ASSERT_EQUAL(nbelem1,2);
   CPPUNIT_ASSERT_EQUAL(nbelem2,2);
 
@@ -948,9 +948,9 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
   new_collection_seq.write(filename_seq_wr);
   MEDMEM::MESH* mesh_after = new_collection_seq.getMesh(0);
   MEDMEM::MESH* mesh_before = collection.getMesh(0);
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_CELL, MEDMEM_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_CELL, MEDMEM_ALL_ELEMENTS));
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_FACE, MEDMEM_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_FACE, MEDMEM_ALL_ELEMENTS));
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_EDGE, MEDMEM_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_EDGE, MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS));
   CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfNodes(), mesh_after->getNumberOfNodes());
   delete topo2;
   delete topo3;
@@ -1017,12 +1017,12 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polygon()
   new_collection_seq.write(filename_seq_wr);
   MEDMEM::MESH* mesh_after = new_collection_seq.getMesh(0);
   MEDMEM::MESH* mesh_before = collection.getMesh(0);
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_CELL, MEDMEM_ALL_ELEMENTS),
-                       mesh_after->getNumberOfElements(MED_CELL, MEDMEM_ALL_ELEMENTS));
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_FACE, MEDMEM_ALL_ELEMENTS),
-                       mesh_after->getNumberOfElements(MED_FACE, MEDMEM_ALL_ELEMENTS));
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_EDGE, MEDMEM_ALL_ELEMENTS),
-                       mesh_after->getNumberOfElements(MED_EDGE, MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS),
+                       mesh_after->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS),
+                       mesh_after->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS),
+                       mesh_after->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS));
   CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfNodes(), mesh_after->getNumberOfNodes());
   delete topo2;
   delete topo3;
@@ -1082,9 +1082,9 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polyhedra()
   new_collection_seq.write(filename_seq_wr);
   MEDMEM::MESH* mesh_after = new_collection_seq.getMesh(0);
   MEDMEM::MESH* mesh_before = collection.getMesh(0);
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_CELL, MEDMEM_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_CELL, MEDMEM_ALL_ELEMENTS));
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_FACE, MEDMEM_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_FACE, MEDMEM_ALL_ELEMENTS));
-  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_EDGE, MEDMEM_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_EDGE, MEDMEM_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_FACE, MED_ALL_ELEMENTS));
+  CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS), mesh_after->getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS));
   CPPUNIT_ASSERT_EQUAL(mesh_before->getNumberOfNodes(), mesh_after->getNumberOfNodes());
   delete topo2;
   delete topo3;
@@ -1131,8 +1131,8 @@ void MEDSPLITTERTest::testMESHCollection_families()
   MEDMEM::MESH mesh2(MEDMEM::MED_DRIVER, filename_wr_2, meshname2);
 
   // testing number of elements for each partition
-  int nbelem1=mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
-  int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
+  int nbelem1=mesh1.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+  int nbelem2=mesh2.getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
 
   CPPUNIT_ASSERT_EQUAL(nbelem1+nbelem2,2020);
 

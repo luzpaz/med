@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef __MEDNORMALIZEDUNSTRUCTUREDMESH_TXX__
 #define __MEDNORMALIZEDUNSTRUCTUREDMESH_TXX__
@@ -56,9 +56,9 @@ template<int SPACEDIM,int MESHDIM>
 INTERP_KERNEL::NormalizedCellType MEDNormalizedUnstructuredMesh<SPACEDIM,MESHDIM>::getTypeOfElement(int eltId) const
 {
   MED_EN::medGeometryElement type=_meshInMedMode->getElementType(MED_EN::MED_CELL,eltId);
-  if(type==MED_EN::MEDMEM_POLYGON)
+  if(type==MED_EN::MED_POLYGON)
     return INTERP_KERNEL::NORM_POLYGON;
-  if(type==MED_EN::MEDMEM_POLYHEDRA)
+  if(type==MED_EN::MED_POLYHEDRA)
     return INTERP_KERNEL::NORM_POLYHED;
   return (INTERP_KERNEL::NormalizedCellType)(((unsigned long)type/100-2)*10+((unsigned long)type%100));
 }
@@ -66,7 +66,7 @@ INTERP_KERNEL::NormalizedCellType MEDNormalizedUnstructuredMesh<SPACEDIM,MESHDIM
 template<int SPACEDIM,int MESHDIM>
 unsigned char MEDNormalizedUnstructuredMesh<SPACEDIM,MESHDIM>::getNumberOfNodesOfElement(int eltId) const
 {
-  if(_meshInMedMode->getElementType(MED_EN::MED_CELL,eltId)!=MED_EN::MEDMEM_POLYHEDRA)
+  if(_meshInMedMode->getElementType(MED_EN::MED_CELL,eltId)!=MED_EN::MED_POLYHEDRA)
     return (unsigned char) (_conn_index_for_interp[eltId]-_conn_index_for_interp[eltId-1]);
   else
     {
@@ -78,7 +78,7 @@ unsigned char MEDNormalizedUnstructuredMesh<SPACEDIM,MESHDIM>::getNumberOfNodesO
 template<int SPACEDIM,int MESHDIM>
 unsigned long MEDNormalizedUnstructuredMesh<SPACEDIM,MESHDIM>::getNumberOfElements() const
 {
-  return _meshInMedMode->getNumberOfElements(MED_EN::MED_CELL, MED_EN::MEDMEM_ALL_ELEMENTS);
+  return _meshInMedMode->getNumberOfElements(MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
 }
 
 template<int SPACEDIM,int MESHDIM>
@@ -122,7 +122,7 @@ template<int SPACEDIM,int MESHDIM>
 void MEDNormalizedUnstructuredMesh<SPACEDIM,MESHDIM>::prepare()
 {
   releaseTempArrays();
-  _conn_for_interp=(int *)_meshInMedMode->getConnectivity(MED_EN::MED_NODAL,MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
+  _conn_for_interp=(int *)_meshInMedMode->getConnectivity(MED_EN::MED_NODAL,MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
   _own_conn_for_interp=false;
   _conn_index_for_interp=(int *)_meshInMedMode->getConnectivityIndex(MED_EN::MED_NODAL, MED_EN::MED_CELL);
   _own_conn_index_for_interp=false;

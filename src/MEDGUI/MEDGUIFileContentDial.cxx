@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 //  MED MEDGUI : MED component GUI implemetation
@@ -52,14 +52,23 @@
 //  Put mouse tracking on, so this class received mouse positions informations when mouse is above treewidget
 //  Add contextual menu to treewidget's items with the call to selectCompoPopup and selStepPopup
 //  Connect those actions to corresponding signals
-MEDGUIFileContentDial::MEDGUIFileContentDial(MEDGUIDataBaseDockWidget *db):QWidget(0),
-                                                                           ui(new Ui::MEDGUIFileContentDial),_db(db)
+MEDGUIFileContentDial::MEDGUIFileContentDial(MEDGUIDataBaseDockWidget* db, QWidget* parent):
+  QDialog(parent, 0), ui(new Ui::MEDGUIFileContentDial), _db(db)
 {
-  ui->setupUi(this);
+  setModal( false );
+  setSizeGripEnabled( true );
+  setAttribute( Qt::WA_DeleteOnClose );
+
+  QWidget* w = new QWidget( this );
+  QHBoxLayout* l = new QHBoxLayout( this );
+  l->setMargin( 0 );
+  l->addWidget( w );
+  ui->setupUi(w);
 
   connect(ui->importMedFileButton, SIGNAL(clicked()), this, SLOT(openFile()));
   connect(ui->addSelectionButton, SIGNAL(clicked()), this, SLOT(sendSelectionToDB()));
   connect(ui->unselectAllButton, SIGNAL(clicked()), this, SLOT(unselectAll()));
+  connect(ui->closeButton, SIGNAL(clicked()), this, SLOT(close()));
 
   ui->treeWidgetFields->setHeaderLabel("Available Field");
   ui->treeWidgetFields->setSelectionMode(QAbstractItemView::MultiSelection);

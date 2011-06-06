@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEM_Mesh.hxx"
@@ -40,7 +40,7 @@ void addMedFacesGroup( MESHING& meshing, int nFaces, int *groupValue,string grou
     faces.setMesh(&meshing) ;
     faces.setEntity(MED_EN::MED_FACE) ;
     faces.setNumberOfGeometricType(1) ;
-    mytypes[0]=MED_EN::MEDMEM_POLYGON;
+    mytypes[0]=MED_EN::MED_POLYGON;
     faces.setGeometricType(mytypes);
     myNumberOfElements[0]=nFaces;
     faces.setNumberOfElements(myNumberOfElements) ;
@@ -71,8 +71,8 @@ int main()
   string coordunit[3] = { "cm", "cm", "cm" } ;
   pmesh->setCoordinatesUnits(coordunit) ;
 
-  medGeometryElement mytypes3D[1]={MEDMEM_POLYHEDRA};
-  medGeometryElement mytypes2D[2]={MEDMEM_QUAD4,MEDMEM_POLYGON};
+  medGeometryElement mytypes3D[1]={MED_POLYHEDRA};
+  medGeometryElement mytypes2D[2]={MED_QUAD4,MED_POLYGON};
   pmesh->setNumberOfTypes(1, MED_EN::MED_CELL);
   pmesh->setNumberOfTypes(2,MED_EN::MED_FACE);
   pmesh->setTypes(mytypes3D,MED_EN::MED_CELL);
@@ -101,9 +101,9 @@ int main()
   pmesh->setNumberOfElements(nbOfElemsFace,MED_EN::MED_FACE);
   //
   //
-  pmesh->setConnectivity(MED_EN::MED_CELL, MED_EN::MEDMEM_POLYHEDRA, polyHFaceConn,polyHInd);
-  pmesh->setConnectivity(MED_EN::MED_FACE, MED_EN::MEDMEM_QUAD4,&conn2DClassical[0]);
-  pmesh->setConnectivity(MED_EN::MED_FACE, MED_EN::MEDMEM_POLYGON,&conn2DPolyInd[0],conn2DPolyIndTab);
+  pmesh->setConnectivity(MED_EN::MED_CELL, MED_EN::MED_POLYHEDRA, polyHFaceConn,polyHInd);
+  pmesh->setConnectivity(MED_EN::MED_FACE, MED_EN::MED_QUAD4,&conn2DClassical[0]);
+  pmesh->setConnectivity(MED_EN::MED_FACE, MED_EN::MED_POLYGON,&conn2DPolyInd[0],conn2DPolyIndTab);
   int bottom=7;
   addMedFacesGroup(*pmesh,1,&bottom,NomBottom);
   int id = pmesh->addDriver(MED_DRIVER, "coeur.med", pmesh->getName());
@@ -120,8 +120,8 @@ int main()
   delete drv;
   mesh.read(newDrv);
   cout << " *** " << mesh.getNumberOfTypes(MED_EN::MED_FACE) << endl;
-  cout << "Expected 8 - having " << mesh.getNumberOfElements(MED_FACE,MEDMEM_ALL_ELEMENTS) << endl;
-  cout << "Expected 6 - having " << mesh.getNumberOfElements(MED_FACE,MEDMEM_QUAD4) << endl;
-  cout << "Expected 1 - having " << mesh.getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS) << endl;
+  cout << "Expected 8 - having " << mesh.getNumberOfElements(MED_FACE,MED_ALL_ELEMENTS) << endl;
+  cout << "Expected 6 - having " << mesh.getNumberOfElements(MED_FACE,MED_QUAD4) << endl;
+  cout << "Expected 1 - having " << mesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS) << endl;
   return 0;
 }

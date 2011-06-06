@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File      : MEDMEM_MeshFuse.cxx
 // Created   : Tue Jul  7 18:27:00 2009
@@ -29,7 +29,7 @@ using namespace MEDMEM;
 using namespace MED_EN;
 using namespace std;
 
-#define _NODE_TYPE_ MEDMEM_NONE
+#define _NODE_TYPE_ MED_NONE
 
 MeshFuse::MeshFuse():MESHING()
 {
@@ -346,7 +346,7 @@ void MeshFuse::expandConnectivity(int final_nb_nodes)
 void MeshFuse::updateNodeIds( CONNECTIVITY* connectivity )
 {
   const medConnectivity   nodal = MED_NODAL;
-  const medGeometryElement type = MEDMEM_ALL_ELEMENTS;
+  const medGeometryElement type = MED_ALL_ELEMENTS;
 
   const vector<int>& new_node_ids = _new_elem_ids_of_type[ _NODE_TYPE_ ];
 
@@ -405,7 +405,7 @@ int MeshFuse::appendConnectivity( MeshFuse::TConnData& data,
   index += shift;
   conn_len = index[ nb_elem ] - index[ 0 ];
 
-  bool need_index = ( type == MEDMEM_POLYGON || type == MEDMEM_POLYHEDRA );
+  bool need_index = ( type == MED_POLYGON || type == MED_POLYHEDRA );
   if ( !need_index )
     data._index.resize( 1, 0 ); // for safe access to pointer even if no real index exists
 
@@ -433,7 +433,7 @@ int MeshFuse::appendConnectivity( MeshFuse::TConnData& data,
 
     vector<int> other_conn( conn_len );
     const vector<int>& new_node_ids = _new_elem_ids_of_type[ _NODE_TYPE_ ];
-    if ( type == MEDMEM_POLYHEDRA )
+    if ( type == MED_POLYHEDRA )
       {
         for ( int n = 0; n < conn_len; ++n )
           if ( conn[ n ] > 0 )
@@ -783,7 +783,7 @@ void MeshFuse::uniteSupportElements(const SUPPORT*     add_support,
                                     medGeometryElement type,
                                     vector<int> &      elements)
 {
-  int sup_type = ( type/100 == 0 ? MEDMEM_ALL_ELEMENTS : type );
+  int sup_type = ( type/100 == 0 ? MED_ALL_ELEMENTS : type );
 
   const medEntityMesh entity = (add_support ? add_support : old_support )->getEntity();
 
@@ -916,8 +916,8 @@ void MeshFuse::findEqualOldElements(medEntityMesh      entity,
                                     vector< int > &    old_ids)
 {
   // poly element can coincide with any type of the same entity
-  const bool isPoly = ( type == MEDMEM_POLYGON || type == MEDMEM_POLYHEDRA );
-  const medGeometryElement checkType = isPoly ? MEDMEM_ALL_ELEMENTS : type;
+  const bool isPoly = ( type == MED_POLYGON || type == MED_POLYHEDRA );
+  const medGeometryElement checkType = isPoly ? MED_ALL_ELEMENTS : type;
 
   if ( !_mesh->getNumberOfElements(entity, type) ||
        ! this->getNumberOfElements(entity, checkType) )
@@ -927,7 +927,7 @@ void MeshFuse::findEqualOldElements(medEntityMesh      entity,
   if ( isPoly )
     {
       old_nb_elems_start = 0;
-      old_nb_elems_end   = this->getNumberOfElements( entity, MEDMEM_ALL_ELEMENTS );
+      old_nb_elems_end   = this->getNumberOfElements( entity, MED_ALL_ELEMENTS );
     }
   else
     {
@@ -1051,9 +1051,9 @@ void MeshFuse::append( medEntityMesh      entity,
     }
     add_nums += nb_add;
   }
-  if ( result.size() != getNumberOfElements( entity, MEDMEM_ALL_ELEMENTS ))
+  if ( result.size() != getNumberOfElements( entity, MED_ALL_ELEMENTS ))
     throw MED_EXCEPTION(MEDMEM::STRING(LOC) << "invalid nb of numbers of entity " << entity
-                        << ": expect " << getNumberOfElements( entity, MEDMEM_ALL_ELEMENTS)
+                        << ": expect " << getNumberOfElements( entity, MED_ALL_ELEMENTS)
                         << " but get " << result.size());
 
   numbers.swap(result);

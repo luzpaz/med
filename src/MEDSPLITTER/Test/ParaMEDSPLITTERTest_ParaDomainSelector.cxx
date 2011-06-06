@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File      : ParaMEDSPLITTERTest_ParaDomainSelector.cxx
 // Created   : Tue Jul 21 16:25:50 2009
@@ -152,12 +152,12 @@ void ParaMEDSPLITTERTest::testParaDomainSelector_gatherNbOf ()
     swap( meshes[0], meshes[1] );
 
   // test gatherNbOf( MED_CELL )
-  int nb_cells, init_nb_cells = mesh_full.getNumberOfElements( MED_CELL, MEDMEM_ALL_ELEMENTS );
+  int nb_cells, init_nb_cells = mesh_full.getNumberOfElements( MED_CELL, MED_ALL_ELEMENTS );
   CPPUNIT_ASSERT_NO_THROW( nb_cells = dom_sel.gatherNbOf( MED_CELL, meshes ));
   CPPUNIT_ASSERT_EQUAL( 2 * init_nb_cells, nb_cells );
 
   // test gatherNbOf( MED_EDGE )
-  int nb_edges, init_nb_edges = mesh_full.getNumberOfElements( MED_EDGE, MEDMEM_ALL_ELEMENTS );
+  int nb_edges, init_nb_edges = mesh_full.getNumberOfElements( MED_EDGE, MED_ALL_ELEMENTS );
   CPPUNIT_ASSERT_NO_THROW( nb_edges = dom_sel.gatherNbOf( MED_EDGE, meshes ));
   CPPUNIT_ASSERT_EQUAL( 2 * init_nb_edges, nb_edges );
 
@@ -227,8 +227,8 @@ void ParaMEDSPLITTERTest::testParaDomainSelector_gatherEntityTypesInfo ()
   for ( int i = 0; i < nb_got_cell_types; ++i )
   {
     CPPUNIT_ASSERT_EQUAL( init_cell_types[i], got_cell_types[i] );
-    CPPUNIT_ASSERT_EQUAL( mesh_full.getNumberOfElements(MED_CELL, MEDMEM_ALL_ELEMENTS ),
-                          mesh_empty.getNumberOfElements(MED_CELL, MEDMEM_ALL_ELEMENTS ));
+    CPPUNIT_ASSERT_EQUAL( mesh_full.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS ),
+                          mesh_empty.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS ));
     CPPUNIT_ASSERT_EQUAL( init_cell_nb_index[ i+1 ], got_cell_nb_index[ i+1 ]);
   }
 
@@ -257,8 +257,8 @@ void ParaMEDSPLITTERTest::testParaDomainSelector_gatherEntityTypesInfo ()
   for ( int i = 0; i < nb_got_edge_types; ++i )
   {
     CPPUNIT_ASSERT_EQUAL( init_edge_types[i], got_edge_types[i] );
-    CPPUNIT_ASSERT_EQUAL( mesh_full.getNumberOfElements(MED_EDGE, MEDMEM_ALL_ELEMENTS ),
-                          mesh_empty.getNumberOfElements(MED_EDGE, MEDMEM_ALL_ELEMENTS ));
+    CPPUNIT_ASSERT_EQUAL( mesh_full.getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS ),
+                          mesh_empty.getNumberOfElements(MED_EDGE, MED_ALL_ELEMENTS ));
     CPPUNIT_ASSERT_EQUAL( init_edge_nb_index[ i+1 ], got_edge_nb_index[ i+1 ]);
   }
 }
@@ -470,11 +470,11 @@ void ParaMEDSPLITTERTest::testParaDomainSelector_exchangeJoint ()
 
   CPPUNIT_ASSERT_EQUAL( 1, int( face_map[ dom_sel.rank() ].size() ));
   CPPUNIT_ASSERT_EQUAL( 0, int( face_map[ 1 - dom_sel.rank() ].size() ));
-  CPPUNIT_ASSERT_EQUAL( MEDMEM_SEG2, face_map[ dom_sel.rank() ].begin()->first );
+  CPPUNIT_ASSERT_EQUAL( MED_SEG2, face_map[ dom_sel.rank() ].begin()->first );
 
   vector< MEDSPLITTER_FaceModel* >& faces = face_map[ dom_sel.rank() ][ MED_SEG2 ];
   CPPUNIT_ASSERT_EQUAL( 2, int( faces.size() ));
-  CPPUNIT_ASSERT_EQUAL( MEDMEM_SEG2, faces[0]->getType());
+  CPPUNIT_ASSERT_EQUAL( MED_SEG2, faces[0]->getType());
   CPPUNIT_ASSERT_EQUAL( joint_edge_glob_id+0, faces[0]->getGlobal());
   CPPUNIT_ASSERT_EQUAL( joint_edge_glob_id+1, faces[1]->getGlobal());
   // edge connectivity

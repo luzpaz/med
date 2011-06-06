@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 // File      : MEDMEM_GaussLocalization.cxx
@@ -734,9 +734,9 @@ namespace // matters used by GAUSS_LOCALIZATION_::makeDefaultLocalization()
 
     switch ( geom ) {
 
-    case MEDMEM_SEG2:
-    case MEDMEM_SEG3:
-      if (geom == MEDMEM_SEG2) setRefCoords( TSeg2a() );
+    case MED_SEG2:
+    case MED_SEG3:
+      if (geom == MED_SEG2) setRefCoords( TSeg2a() );
       else               setRefCoords( TSeg3a() );
       switch ( nbGauss ) {
       case 1: {
@@ -768,10 +768,10 @@ namespace // matters used by GAUSS_LOCALIZATION_::makeDefaultLocalization()
       }
       break;
 
-    case MEDMEM_TRIA3:
-    case MEDMEM_TRIA6:
+    case MED_TRIA3:
+    case MED_TRIA6:
       if ( variant == 1 ) {
-        if (geom == MEDMEM_TRIA3) setRefCoords( TTria3b() );
+        if (geom == MED_TRIA3) setRefCoords( TTria3b() );
         else                setRefCoords( TTria6b() );
         switch ( nbGauss ) {
         case 1: { // FPG1
@@ -839,7 +839,7 @@ namespace // matters used by GAUSS_LOCALIZATION_::makeDefaultLocalization()
         }
       }
       else if ( variant == 2 ) {
-        if (geom == MEDMEM_TRIA3) setRefCoords( TTria3a() );
+        if (geom == MED_TRIA3) setRefCoords( TTria3a() );
         else                setRefCoords( TTria6a() );
         switch ( nbGauss ) {
         case 1: {
@@ -866,7 +866,7 @@ namespace // matters used by GAUSS_LOCALIZATION_::makeDefaultLocalization()
         }
       }
       else if ( variant == 3 ) {
-        if (geom == MEDMEM_TRIA3) setRefCoords( TTria3b() );
+        if (geom == MED_TRIA3) setRefCoords( TTria3b() );
         else                setRefCoords( TTria6b() );
         switch ( nbGauss ) {
         case 4: {
@@ -882,10 +882,10 @@ namespace // matters used by GAUSS_LOCALIZATION_::makeDefaultLocalization()
       }
       break;
 
-    case MEDMEM_QUAD4:
-    case MEDMEM_QUAD8:
+    case MED_QUAD4:
+    case MED_QUAD8:
       if ( variant == 1 ) {
-        if (geom == MEDMEM_QUAD4) setRefCoords( TQuad4b() );
+        if (geom == MED_QUAD4) setRefCoords( TQuad4b() );
         else                setRefCoords( TQuad8b() );
         switch ( nbGauss ) {
         case 1: { // FPG1
@@ -916,7 +916,7 @@ namespace // matters used by GAUSS_LOCALIZATION_::makeDefaultLocalization()
         }
       }
       else if ( variant == 2 ) {
-        if (geom == MEDMEM_QUAD4) setRefCoords( TQuad4a() );
+        if (geom == MED_QUAD4) setRefCoords( TQuad4a() );
         else                setRefCoords( TQuad8a() );
         switch ( nbGauss ) {
         case 4: {
@@ -944,7 +944,7 @@ namespace // matters used by GAUSS_LOCALIZATION_::makeDefaultLocalization()
         }
       }
       else if ( variant == 3 ) {
-        if (geom == MEDMEM_QUAD4) setRefCoords( TQuad4b() );
+        if (geom == MED_QUAD4) setRefCoords( TQuad4b() );
         else                setRefCoords( TQuad8b() );
         switch ( nbGauss ) {
         case 4: {
@@ -974,9 +974,9 @@ namespace // matters used by GAUSS_LOCALIZATION_::makeDefaultLocalization()
       }
       break;
 
-    case MEDMEM_TETRA4:
-    case MEDMEM_TETRA10:
-      if (geom == MEDMEM_TETRA4) setRefCoords( TTetra4a() );
+    case MED_TETRA4:
+    case MED_TETRA10:
+      if (geom == MED_TETRA4) setRefCoords( TTetra4a() );
       else                 setRefCoords( TTetra10a() );
       switch ( nbGauss ) {
       case 4: { // FPG4
@@ -1022,9 +1022,9 @@ namespace // matters used by GAUSS_LOCALIZATION_::makeDefaultLocalization()
       }
       break;
 
-    case MEDMEM_PYRA5:
-    case MEDMEM_PYRA13:
-      if (geom == MEDMEM_PYRA5) setRefCoords( TPyra5a() );
+    case MED_PYRA5:
+    case MED_PYRA13:
+      if (geom == MED_PYRA5) setRefCoords( TPyra5a() );
       else                setRefCoords( TPyra13a() );
       switch ( nbGauss ) {
       case 5: { // FPG5
@@ -1100,9 +1100,9 @@ namespace // matters used by GAUSS_LOCALIZATION_::makeDefaultLocalization()
         EXCEPTION( logic_error,"Invalid nb of gauss points for PYRA: "<<nbGauss);
       }
       break;
-    case MEDMEM_PENTA6:
-    case MEDMEM_PENTA15:
-      if (geom == MEDMEM_PENTA6) setRefCoords( TPenta6a() );
+    case MED_PENTA6:
+    case MED_PENTA15:
+      if (geom == MED_PENTA6) setRefCoords( TPenta6a() );
       else                 setRefCoords( TPenta15a() );
       switch ( nbGauss ) {
       case 6: { // FPG6
@@ -1159,9 +1159,9 @@ namespace // matters used by GAUSS_LOCALIZATION_::makeDefaultLocalization()
       }
       break;
 
-    case MEDMEM_HEXA8:
-    case MEDMEM_HEXA20:
-      if (geom == MEDMEM_HEXA8) setRefCoords( THexa8a() );
+    case MED_HEXA8:
+    case MED_HEXA20:
+      if (geom == MED_HEXA8) setRefCoords( THexa8a() );
       else                setRefCoords( THexa20a() );
       switch ( nbGauss ) {
       case 8: { // FPG8

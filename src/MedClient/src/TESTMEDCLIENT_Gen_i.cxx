@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #define private public
@@ -86,7 +86,7 @@ void TESTMEDCLIENT_Gen_i::go(SALOME_MED::MED_ptr objMed)
   int nbOfElt=mesh.getNumberOfTypes(MED_FACE);
   cout << "____" <<  nbOfElt << endl;
   SUPPORT* sup1=new SUPPORT(&mesh,"MonSup",MED_FACE);
-  nbOfElt=sup1->getNumberOfElements(MEDMEM_QUAD4);
+  nbOfElt=sup1->getNumberOfElements(MED_QUAD4);
   FIELD<double>* fd=mesh.getArea(sup1);
   delete sup1;
   int nbOfVal=fd->getNumberOfValues();
@@ -109,7 +109,7 @@ void TESTMEDCLIENT_Gen_i::go(SALOME_MED::MED_ptr objMed)
     }
   const vector<GROUP*>  groups=mesh.getGroups(MED_FACE);
   cout << "Nb Of FACES groups :" << groups.size() << endl;
-  const int * tabConec=mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_FACE,MEDMEM_QUAD4);
+  const int * tabConec=mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_FACE,MED_QUAD4);
   for(int p=0;p<nbOfElt;p++){
     for(int p1=0;p1<4;p1++)
       {
@@ -132,7 +132,7 @@ void TESTMEDCLIENT_Gen_i::go(SALOME_MED::MED_ptr objMed)
   FIELDClient<double,SALOME_MED::FIELDDOUBLE_ptr> myFieldDouble(myFieldD);
   delete strArray;
   const SUPPORT *supField=myFieldDouble.getSupport();
-  int nbOfValField=supField->getNumberOfElements(MEDMEM_NONE);
+  int nbOfValField=supField->getNumberOfElements(MED_NONE);
 
   const double * values = myFieldDouble.getValue(MED_FULL_INTERLACE);
   for(int r2=0;r2<myFieldDouble.getNumberOfComponents()*nbOfValField;r2++)
@@ -171,7 +171,7 @@ void TESTMEDCLIENT_Gen_i::go2(SALOME_MED::MED_ptr objMed)
   FIELDClient<double,SALOME_MED::FIELDDOUBLE_ptr> *myFieldDouble=new FIELDClient<double,SALOME_MED::FIELDDOUBLE_ptr>(myFieldD);
   cout << "Mem3bis : " << spy.getCurrentMemoryUsage() << endl;
   const SUPPORT *supField=myFieldDouble->getSupport();
-  int nbOfValField=supField->getNumberOfElements(MEDMEM_TETRA4);
+  int nbOfValField=supField->getNumberOfElements(MED_TETRA4);
   
   cout << "Mem4 : " << spy.getCurrentMemoryUsage() << endl;
   const double * values = myFieldDouble->getValue(MED_FULL_INTERLACE);

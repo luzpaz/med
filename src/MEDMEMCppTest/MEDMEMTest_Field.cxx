@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEMTest.hxx"
@@ -443,7 +443,7 @@ void checkField (FIELD<T, INTERLACING_TAG> * theField, const SUPPORT * theSuppor
   // nb. of components must be equal 1 (for Volume, Area, Length) or
   // space dimension (for Normal, Barycenter, )
   {
-    GMESH* aMesh = theSupport->getMesh();
+    const GMESH* aMesh = theSupport->getMesh();
     int spaceDim = 3;
     if (aMesh) spaceDim = aMesh->getSpaceDimension();
     theField->deallocValue();
@@ -482,7 +482,7 @@ void checkField (FIELD<T, INTERLACING_TAG> * theField, const SUPPORT * theSuppor
   // values
   theField->deallocValue();
   theField->allocValue(/*NumberOfComponents = */2);
-  int nbElemSupport = theSupport->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS);
+  int nbElemSupport = theSupport->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
   CPPUNIT_ASSERT_EQUAL(nbElemSupport, theField->getNumberOfValues());
 
   theField->deallocValue();
@@ -949,19 +949,19 @@ void MEDMEMTest::testField()
   const int * nbElemsInEachType = aFieldOnGroup1->getNumberOfElements();
   const MED_EN::medGeometryElement * aGeomTypes = aFieldOnGroup1->getGeometricTypes();
 
-  CPPUNIT_ASSERT_EQUAL(MED_EN::MEDMEM_TRIA3, aGeomTypes[0]);
-  CPPUNIT_ASSERT_EQUAL(MED_EN::MEDMEM_QUAD4, aGeomTypes[1]);
+  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_TRIA3, aGeomTypes[0]);
+  CPPUNIT_ASSERT_EQUAL(MED_EN::MED_QUAD4, aGeomTypes[1]);
 
   // GAUSS
 
   // now we have no gauss localization in aFieldOnGroup1
-  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MEDMEM_TRIA3));
-  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MEDMEM_QUAD4));
-  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MEDMEM_TRIA6), MEDEXCEPTION);
+  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_TRIA3));
+  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_QUAD4));
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_TRIA6), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(), MEDEXCEPTION);
 
-  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalization(MED_EN::MEDMEM_TRIA3), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MEDMEM_TRIA3), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalization(MED_EN::MED_TRIA3), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MED_TRIA3), MEDEXCEPTION);
 
   CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNbGaussI(anElems[0]));
 
@@ -978,21 +978,21 @@ void MEDMEMTest::testField()
     {
       1., 2., 3., 4., 5.
     };
-  GAUSS_LOCALIZATION<> gl1 ("GL1", MED_EN::MEDMEM_TRIA3, /*nGauss*/5, cooRef, cooGauss, wg);
+  GAUSS_LOCALIZATION<> gl1 ("GL1", MED_EN::MED_TRIA3, /*nGauss*/5, cooRef, cooGauss, wg);
 
-  aFieldOnGroup1->setGaussLocalization(MED_EN::MEDMEM_TRIA3, gl1);
+  aFieldOnGroup1->setGaussLocalization(MED_EN::MED_TRIA3, gl1);
 
-  // now we have a gauss localization for MEDMEM_TRIA3 type
-  CPPUNIT_ASSERT_EQUAL(5, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MEDMEM_TRIA3));
-  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MEDMEM_QUAD4));
-  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MEDMEM_TRIA6), MEDEXCEPTION);
+  // now we have a gauss localization for MED_TRIA3 type
+  CPPUNIT_ASSERT_EQUAL(5, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_TRIA3));
+  CPPUNIT_ASSERT_EQUAL(1, aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_QUAD4));
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(MED_EN::MED_TRIA6), MEDEXCEPTION);
   CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getNumberOfGaussPoints(), MEDEXCEPTION);
 
-  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalization(MED_EN::MEDMEM_QUAD4), MEDEXCEPTION);
-  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MEDMEM_QUAD4), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalization(MED_EN::MED_QUAD4), MEDEXCEPTION);
+  CPPUNIT_ASSERT_THROW(aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MED_QUAD4), MEDEXCEPTION);
 
-  GAUSS_LOCALIZATION<> gl1Back = aFieldOnGroup1->getGaussLocalization(MED_EN::MEDMEM_TRIA3);
-  const GAUSS_LOCALIZATION<> * gl1BackPtr = aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MEDMEM_TRIA3);
+  GAUSS_LOCALIZATION<> gl1Back = aFieldOnGroup1->getGaussLocalization(MED_EN::MED_TRIA3);
+  const GAUSS_LOCALIZATION<> * gl1BackPtr = aFieldOnGroup1->getGaussLocalizationPtr(MED_EN::MED_TRIA3);
 
   CPPUNIT_ASSERT(gl1 == gl1Back);
   CPPUNIT_ASSERT(gl1 == *gl1BackPtr);
@@ -1087,7 +1087,7 @@ void MEDMEMTest::testField()
                                 /*TotalNumberOfElements=*/ *NumberOfElements,
                                 GeometricType,
                                 NumberOfElements,
-                                /*NumberValue=*/ mesh->getConnectivity(MED_NODAL,MED_CELL,MEDMEM_ALL_ELEMENTS ));
+                                /*NumberValue=*/ mesh->getConnectivity(MED_NODAL,MED_CELL,MED_ALL_ELEMENTS ));
     FIELD<double, FullInterlace> * oneCellNodesField = nodalField->extract( oneCellNodesSup );
     oneCellNodesSup->removeReference();
     // compute normL2 by avarage nodal value on the cell
@@ -1095,7 +1095,7 @@ void MEDMEMTest::testField()
     const SUPPORT *allCellsSupport=mesh->getSupportOnAll( MED_CELL );
     FIELD<double>* volumeField = mesh->getVolume(allCellsSupport);
     // mdump output:
-    // - Mailles de type MEDMEM_TETRA4 : 
+    // - Mailles de type MED_TETRA4 : 
     //  [     1 ] :          1          2          3          6
     // - Valeurs :
     // | 1.000000 | 1.000000 | 1.000000 | 2.000000 | 2.000000 | 2.000000 | ...
@@ -1943,8 +1943,8 @@ void MEDMEMTest::testReadFieldOnNodesAndCells()
   supportOnCells->addReference();
   supportOnNodes->addReference();
   mesh->removeReference();
-  int numberOfCells = supportOnCells->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
-  int numberOfNodes = supportOnNodes->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  int numberOfCells = supportOnCells->getNumberOfElements(MED_ALL_ELEMENTS);
+  int numberOfNodes = supportOnNodes->getNumberOfElements(MED_ALL_ELEMENTS);
 
   PointerOf<double> cellValues( numberOfCells ), nodeValues( numberOfNodes );
   for ( int i = 0; i < numberOfCells; ++i ) cellValues[i] = i;
@@ -2082,20 +2082,20 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
 
   MED_EN::medGeometryElement cellTypes[ numberOfCellTypes ] =
     {
-      MED_EN::MEDMEM_SEG2,
-      MED_EN::MEDMEM_SEG3,
-      MED_EN::MEDMEM_TRIA3,
-      MED_EN::MEDMEM_TRIA6,
-      MED_EN::MEDMEM_QUAD4,
-      MED_EN::MEDMEM_QUAD8,
-      MED_EN::MEDMEM_TETRA4,
-      MED_EN::MEDMEM_TETRA10,
-      MED_EN::MEDMEM_PYRA5,
-      MED_EN::MEDMEM_PYRA13,
-      MED_EN::MEDMEM_PENTA6,
-      MED_EN::MEDMEM_PENTA15,
-      MED_EN::MEDMEM_HEXA8,
-      MED_EN::MEDMEM_HEXA20
+      MED_EN::MED_SEG2,
+      MED_EN::MED_SEG3,
+      MED_EN::MED_TRIA3,
+      MED_EN::MED_TRIA6,
+      MED_EN::MED_QUAD4,
+      MED_EN::MED_QUAD8,
+      MED_EN::MED_TETRA4,
+      MED_EN::MED_TETRA10,
+      MED_EN::MED_PYRA5,
+      MED_EN::MED_PYRA13,
+      MED_EN::MED_PENTA6,
+      MED_EN::MED_PENTA15,
+      MED_EN::MED_HEXA8,
+      MED_EN::MED_HEXA20
     };
 
   const int numberOfCells[numberOfCellTypes] =
@@ -2202,20 +2202,20 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
   mesh->setTypes(cellTypes, MED_EN::MED_CELL);
   mesh->setNumberOfElements(numberOfCells, MED_EN::MED_CELL);
 
-  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_SEG2, seg2C );
-  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_SEG3, seg3C );
-  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_TRIA3, tria3C );
-  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_TRIA6, tria6C );
-  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_QUAD4, quad4C );
-  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_QUAD8, quad8C );
-  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_TETRA4, tetra4C );
-  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_TETRA10, tetra10C );
-  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_PYRA5, pyra5C );
-  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_PYRA13, pyra13C );
-  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_PENTA6, penta6C );
-  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_PENTA15, penta15C );
-  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_HEXA8, hexa8C );
-  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MEDMEM_HEXA20, hexa20C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MED_SEG2, seg2C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MED_SEG3, seg3C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MED_TRIA3, tria3C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MED_TRIA6, tria6C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MED_QUAD4, quad4C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MED_QUAD8, quad8C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MED_TETRA4, tetra4C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MED_TETRA10, tetra10C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MED_PYRA5, pyra5C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MED_PYRA13, pyra13C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MED_PENTA6, penta6C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MED_PENTA15, penta15C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MED_HEXA8, hexa8C );
+  mesh->setConnectivity( MED_EN::MED_CELL, MED_EN::MED_HEXA20, hexa20C );
 
 
   //Support definition 
@@ -2254,7 +2254,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* aseg2L = new GAUSS_LOCALIZATION<>("Seg2 Gauss localization",
-                                                          MED_EN::MEDMEM_SEG2,
+                                                          MED_EN::MED_SEG2,
                                                           1,
                                                           seg2CooRef,
                                                           seg2CooGauss,
@@ -2272,7 +2272,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* aseg3L = new GAUSS_LOCALIZATION<>("Seg3 Gauss localization",
-                                                          MED_EN::MEDMEM_SEG3,
+                                                          MED_EN::MED_SEG3,
                                                           1,
                                                           seg3CooRef,
                                                           seg3CooGauss,
@@ -2290,7 +2290,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* atria3L = new GAUSS_LOCALIZATION<>("Tria3 Gauss localization",
-                                                           MED_EN::MEDMEM_TRIA3,
+                                                           MED_EN::MED_TRIA3,
                                                            2,
                                                            tria3CooRef,
                                                            tria3CooGauss,
@@ -2309,7 +2309,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* atria6L = new GAUSS_LOCALIZATION<>("Tria6 Gauss localization",
-                                                           MED_EN::MEDMEM_TRIA6,
+                                                           MED_EN::MED_TRIA6,
                                                            3,
                                                            tria6CooRef,
                                                            tria6CooGauss,
@@ -2327,7 +2327,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* aquad4L = new GAUSS_LOCALIZATION<>("Quad8 Gauss localization",
-                                                           MED_EN::MEDMEM_QUAD4,
+                                                           MED_EN::MED_QUAD4,
                                                            4,
                                                            quad4CooRef,
                                                            quad4CooGauss,
@@ -2352,7 +2352,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* aquad8L = new GAUSS_LOCALIZATION<>("Quad8 Gauss localization",
-                                                           MED_EN::MEDMEM_QUAD8,
+                                                           MED_EN::MED_QUAD8,
                                                            4,
                                                            quad8CooRef,
                                                            quad8CooGauss,
@@ -2374,7 +2374,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* atetra4L = new GAUSS_LOCALIZATION<>("Tetra4 Gauss localization",
-                                                            MED_EN::MEDMEM_TETRA4,
+                                                            MED_EN::MED_TETRA4,
                                                             1,
                                                             tetra4CooRef,
                                                             tetra4CooGauss,
@@ -2402,7 +2402,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* atetra10L = new GAUSS_LOCALIZATION<>("Tetra10 Gauss localization",
-                                                             MED_EN::MEDMEM_TETRA10,
+                                                             MED_EN::MED_TETRA10,
                                                              1,
                                                              tetra10CooRef,
                                                              tetra10CooGauss,
@@ -2424,7 +2424,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* apyra5L = new GAUSS_LOCALIZATION<>("Pyra5 Gauss localization",
-                                                           MED_EN::MEDMEM_PYRA5,
+                                                           MED_EN::MED_PYRA5,
                                                            1,
                                                            pyra5CooRef,
                                                            pyra5CooGauss,
@@ -2455,7 +2455,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* apyra13L = new GAUSS_LOCALIZATION<>("Pyra13 Gauss localization",
-                                                            MED_EN::MEDMEM_PYRA13,
+                                                            MED_EN::MED_PYRA13,
                                                             1,
                                                             pyra13CooRef,
                                                             pyra13CooGauss,
@@ -2478,7 +2478,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* apenta6L = new GAUSS_LOCALIZATION<>("Penta6 Gauss localization",
-                                                            MED_EN::MEDMEM_PENTA6,
+                                                            MED_EN::MED_PENTA6,
                                                             1,
                                                             penta6CooRef,
                                                             penta6CooGauss,
@@ -2511,7 +2511,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* apenta15L = new GAUSS_LOCALIZATION<>("Penta15 Gauss localization",
-                                                             MED_EN::MEDMEM_PENTA15,
+                                                             MED_EN::MED_PENTA15,
                                                              1,
                                                              penta15CooRef,
                                                              penta15CooGauss,
@@ -2537,7 +2537,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* ahexa8L = new GAUSS_LOCALIZATION<>("Hexa8 Gauss localization",
-                                                           MED_EN::MEDMEM_HEXA8,
+                                                           MED_EN::MED_HEXA8,
                                                            1,
                                                            hexa8CooRef,
                                                            hexa8CooGauss,
@@ -2575,7 +2575,7 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
     };
 
   GAUSS_LOCALIZATION<>* ahexa20L = new GAUSS_LOCALIZATION<>("Hexa20 Gauss localization",
-                                                            MED_EN::MEDMEM_HEXA20,
+                                                            MED_EN::MED_HEXA20,
                                                             1,
                                                             hexa20CooRef,
                                                             hexa20CooGauss,
@@ -2583,20 +2583,20 @@ void MEDMEMTest::testGetGaussPointsCoordinates()
 
 
 
-  aField->setGaussLocalization(MED_EN::MEDMEM_SEG2, aseg2L);
-  aField->setGaussLocalization(MED_EN::MEDMEM_SEG3, aseg3L);
-  aField->setGaussLocalization(MED_EN::MEDMEM_TRIA3, atria3L);
-  aField->setGaussLocalization(MED_EN::MEDMEM_TRIA6, atria6L);
-  aField->setGaussLocalization(MED_EN::MEDMEM_QUAD4, aquad4L);
-  aField->setGaussLocalization(MED_EN::MEDMEM_QUAD8, aquad8L);
-  aField->setGaussLocalization(MED_EN::MEDMEM_TETRA4, atetra4L);
-  aField->setGaussLocalization(MED_EN::MEDMEM_TETRA10, atetra10L);
-  aField->setGaussLocalization(MED_EN::MEDMEM_PYRA5, apyra5L);
-  aField->setGaussLocalization(MED_EN::MEDMEM_PYRA13, apyra13L);
-  aField->setGaussLocalization(MED_EN::MEDMEM_PENTA6, apenta6L);
-  aField->setGaussLocalization(MED_EN::MEDMEM_PENTA15, apenta15L);
-  aField->setGaussLocalization(MED_EN::MEDMEM_HEXA8, ahexa8L);
-  aField->setGaussLocalization(MED_EN::MEDMEM_HEXA20, ahexa20L);
+  aField->setGaussLocalization(MED_EN::MED_SEG2, aseg2L);
+  aField->setGaussLocalization(MED_EN::MED_SEG3, aseg3L);
+  aField->setGaussLocalization(MED_EN::MED_TRIA3, atria3L);
+  aField->setGaussLocalization(MED_EN::MED_TRIA6, atria6L);
+  aField->setGaussLocalization(MED_EN::MED_QUAD4, aquad4L);
+  aField->setGaussLocalization(MED_EN::MED_QUAD8, aquad8L);
+  aField->setGaussLocalization(MED_EN::MED_TETRA4, atetra4L);
+  aField->setGaussLocalization(MED_EN::MED_TETRA10, atetra10L);
+  aField->setGaussLocalization(MED_EN::MED_PYRA5, apyra5L);
+  aField->setGaussLocalization(MED_EN::MED_PYRA13, apyra13L);
+  aField->setGaussLocalization(MED_EN::MED_PENTA6, apenta6L);
+  aField->setGaussLocalization(MED_EN::MED_PENTA15, apenta15L);
+  aField->setGaussLocalization(MED_EN::MED_HEXA8, ahexa8L);
+  aField->setGaussLocalization(MED_EN::MED_HEXA20, ahexa20L);
 
   FIELD<double>* aGaussCoords = aField->getGaussPointsCoordinates();
 

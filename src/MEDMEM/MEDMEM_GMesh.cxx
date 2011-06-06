@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File      : MEDMEM_GMesh.cxx
 // Created   : Fri Jul 23 12:32:18 2010
@@ -802,7 +802,7 @@ const GROUP* GMESH::getGroup(const string& name) const  throw (MEDEXCEPTION)
 */
 //================================================================================
 
-SUPPORT * GMESH::getSupportOnAll(medEntityMesh entity) throw(MEDEXCEPTION)
+const SUPPORT * GMESH::getSupportOnAll(medEntityMesh entity) const throw(MEDEXCEPTION)
 {
   const char * LOC = "GMESH::getSupportOnAll : " ;
   BEGIN_OF_MED(LOC) ;
@@ -1130,7 +1130,7 @@ struct _cell
   std::vector<int> groups;
   MED_EN::medGeometryElement geometricType;
   // to have geometricType good for nodal groups when MESH::getNumberOfTypes(MED_NODE)==0
-  _cell():geometricType(MEDMEM_POINT1) {}
+  _cell():geometricType(MED_POINT1) {}
 };
 
 //================================================================================
@@ -1183,7 +1183,7 @@ void GMESH::createFamilies()
       numberOfTypes = getNumberOfTypes(entity);
       geometricTypes = getTypes(entity);
     }
-    med_int numberOfCells=getNumberOfElements(entity, MEDMEM_ALL_ELEMENTS);  // total number of cells for that entity
+    med_int numberOfCells=getNumberOfElements(entity, MED_ALL_ELEMENTS);  // total number of cells for that entity
     SCRUTE_MED(numberOfTypes);
     SCRUTE_MED(numberOfCells);
     vector< _cell > tab_cell(numberOfCells);
@@ -1237,7 +1237,7 @@ void GMESH::createFamilies()
     for( fam=tab_families.begin(); fam!=tab_families.end(); ++fam)
     {
       vector<medGeometryElement> tab_types_geometriques;
-      medGeometryElement geometrictype=MEDMEM_NONE;
+      medGeometryElement geometrictype=MED_NONE;
       vector<int> tab_index_types_geometriques;
       vector<int> tab_nombres_elements;
       if ( fam->second.empty() )
@@ -1290,7 +1290,7 @@ void GMESH::createFamilies()
       newFam->setNumberOfElements(&tab_nombres_elements[0]);
       newFam->setNumber(&tab_index_types_geometriques[0],&fam->second[0]);
       newFam->setEntity(entity);
-      newFam->setAll( getNumberOfElements( entity, MEDMEM_ALL_ELEMENTS ) == fam->second.size() );
+      newFam->setAll( getNumberOfElements( entity, MED_ALL_ELEMENTS ) == fam->second.size() );
 
       int idFam = 0;
 

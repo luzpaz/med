@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File      : ParaMEDSPLITTERTest_medsplitter_para.cxx
 // Created   : Fri Jul 31 12:35:44 2009
@@ -105,7 +105,7 @@ void ParaMEDSPLITTERTest::test_medsplitter_para( const string& med_file, const s
   {
     int total_nb_faces = 0;
     for ( int idomain=0; idomain < collection_3w.getMesh().size(); ++idomain )
-      total_nb_faces += collection_3w.getMesh()[idomain]->getNumberOfElements(collection_3w.getSubEntity(), MEDMEM_ALL_ELEMENTS );
+      total_nb_faces += collection_3w.getMesh()[idomain]->getNumberOfElements(collection_3w.getSubEntity(), MED_ALL_ELEMENTS );
 
     for ( int idomain=0; idomain < collection_3w.getMesh().size(); ++idomain )
     {

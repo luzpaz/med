@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEM_Field.hxx"
@@ -53,7 +53,7 @@ FIELD_::FIELD_(const SUPPORT * Support, const int NumberOfComponents):
 {
   MESSAGE_MED("FIELD_(const SUPPORT * Support, const int NumberOfComponents)");
 
-  _numberOfValues = Support->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  _numberOfValues = Support->getNumberOfElements(MED_ALL_ELEMENTS);
   _componentsTypes.resize(NumberOfComponents);
   _componentsNames.resize(NumberOfComponents);
   _componentsDescriptions.resize(NumberOfComponents);
@@ -257,7 +257,7 @@ void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume,
       throw MEDEXCEPTION(diagnosis.c_str());
     }
 
-  if( getSupport()->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS) != getNumberOfValues() ) {
+  if( getSupport()->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS) != getNumberOfValues() ) {
     diagnosis="Cannot compute Lnorm of "+getName()+
       " : the suppors size not corresponded to number of elements!";
     throw MEDEXCEPTION(diagnosis.c_str());
@@ -274,7 +274,7 @@ void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume,
       if ( getSupport()->getEntity() == MED_NODE )
         {
           if (support_volume->getNumberOfValues()!=
-              getSupport()->getMesh()->getNumberOfElements(MED_CELL,MEDMEM_ALL_ELEMENTS))
+              getSupport()->getMesh()->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS))
             {
               diagnosis="Cannot compute Lnorm of nodal field "+getName()+
                 " : the volume furnished has wrong number of values";

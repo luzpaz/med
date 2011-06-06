@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef __MEDSPLITTER_MESHCOLLECTION_H__
 #define __MEDSPLITTER_MESHCOLLECTION_H__
@@ -181,7 +181,7 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
     //retrieves the group igroup on domain idomain
 
     const MEDMEM::SUPPORT* support = old_supports[idomain];
-    int nbelem = support->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS);
+    int nbelem = support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
     if (nbelem==0) continue;
     int* list_of_elems=0;
 
@@ -192,7 +192,7 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
         list_of_elems[i]=i+1;
     }
     else
-      list_of_elems = const_cast<int*> (support->getNumber(MED_EN::MEDMEM_ALL_ELEMENTS));
+      list_of_elems = const_cast<int*> (support->getNumber(MED_EN::MED_ALL_ELEMENTS));
 
     int* array=new int[nbelem];
     int* ip;

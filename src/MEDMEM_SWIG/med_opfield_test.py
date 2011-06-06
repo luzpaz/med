@@ -1,24 +1,24 @@
 #  -*- coding: iso-8859-1 -*-
-#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
 ############################################################################
@@ -130,7 +130,7 @@ if (nbFields>0):
 			print "          Norme L2(vol) : ", fieldint.normL2(kp1,fieldint_vol)
 
                 support = fieldint.getSupport()
-                nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+                nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
                     valueI = fieldint.getRow(k+1)
@@ -162,7 +162,7 @@ if (nbFields>0):
                     print "          Unit:",compUnit
 
                 support = fieldintadd.getSupport()
-                nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+                nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
                     valueI = fieldintadd.getRow(k+1)
@@ -193,7 +193,7 @@ if (nbFields>0):
                     print "          Unit:",compUnit
 
                 support = fieldintsub.getSupport()
-                nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+                nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
                     valueI = fieldintsub.getRow(k+1)
@@ -224,7 +224,7 @@ if (nbFields>0):
                     print "          Unit:",compUnit
 
                 support = fieldintmul.getSupport()
-                nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+                nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
                     valueI = fieldintmul.getRow(k+1)
@@ -256,7 +256,7 @@ if (nbFields>0):
                         print "          Unit:",compUnit
 
                     support = fieldintdiv.getSupport()
-                    nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+                    nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                     print "     Values:",nbOf
                     for k in range(nbOf):
                         valueI = fieldintdiv.getRow(k+1)
@@ -304,7 +304,7 @@ if (nbFields>0):
 			print "          Norme L2(vol) : ", fielddouble.normL2(kp1, fielddouble_vol)
 
                 support = fielddouble.getSupport()
-                nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+                nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
                     valueI = fielddouble.getRow(k+1)
@@ -336,7 +336,7 @@ if (nbFields>0):
                     print "          Unit:",compUnit
 
                 support = fielddoubleadd.getSupport()
-                nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+                nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
                     valueI = fielddoubleadd.getRow(k+1)
@@ -367,7 +367,7 @@ if (nbFields>0):
                     print "          Unit:",compUnit
 
                 support = fielddoublesub.getSupport()
-                nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+                nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
                     valueI = fielddoublesub.getRow(k+1)
@@ -398,7 +398,7 @@ if (nbFields>0):
                     print "          Unit:",compUnit
 
                 support = fielddoublemul.getSupport()
-                nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+                nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                 print "     Values:",nbOf
                 for k in range(nbOf):
                     valueI = fielddoublemul.getRow(k+1)
@@ -430,7 +430,7 @@ if (nbFields>0):
                         print "          Unit:",compUnit
 
                     support = fielddoublediv.getSupport()
-                    nbOf = support.getNumberOfElements(MEDMEM_ALL_ELEMENTS)
+                    nbOf = support.getNumberOfElements(MED_ALL_ELEMENTS)
                     print "     Values:",nbOf
                     for k in range(nbOf):
                         valueI = fielddoublediv.getRow(k+1)

@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 //=============================================================================
@@ -291,7 +291,7 @@ SALOME_TYPES::ListOfLong* MESH_i::getConnectivityIndex(SALOME_MED::medConnectivi
     {
       int nbelements = ((::MESH*)_mesh)->getNumberOfElements(
                                                              convertIdlEntToMedEnt(entity),
-                                                             MEDMEM_ALL_ELEMENTS) + 1;
+                                                             MED_ALL_ELEMENTS) + 1;
       myseq->length(nbelements);
       const int * numbers=((::MESH*)_mesh)->getConnectivityIndex(convertIdlConnToMedConn(mode),
                                                                  convertIdlEntToMedEnt(entity));
@@ -377,7 +377,7 @@ SALOME_TYPES::ListOfLong* MESH_i::getGlobalNumberingIndex( SALOME_MED::medEntity
 /*!
  * CORBA: get global element number in connectivity array
  * not implemented for MED_NODE and MED_ALL_ENTITIES,
- * MEDMEM_NONE and MEDMEM_ALL_ELEMENTS.
+ * MED_NONE and MED_ALL_ELEMENTS.
  */
 //=============================================================================
 CORBA::Long MESH_i::getElementNumber(SALOME_MED::medConnectivity mode,

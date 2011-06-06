@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEMTest.hxx"
@@ -53,7 +53,7 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
   }
 
   // GeometricTypes
-  MED_EN::medGeometryElement aCellTypes[2] = {MED_EN::MEDMEM_PYRA5, MED_EN::MEDMEM_HEXA8};
+  MED_EN::medGeometryElement aCellTypes[2] = {MED_EN::MED_PYRA5, MED_EN::MED_HEXA8};
 
   // this variable is needed in check mode (!create)
   // because of bug with getGlobalNumberingIndex() method (see below)
@@ -72,15 +72,15 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
 
   if (create) {
     theC->setCount(countCells, MED_EN::MED_CELL);
-    theC->setNodal(nodesCells_PYRA5, MED_EN::MED_CELL, MED_EN::MEDMEM_PYRA5);
-    theC->setNodal(nodesCells_HEXA8, MED_EN::MED_CELL, MED_EN::MEDMEM_HEXA8);
+    theC->setNodal(nodesCells_PYRA5, MED_EN::MED_CELL, MED_EN::MED_PYRA5);
+    theC->setNodal(nodesCells_HEXA8, MED_EN::MED_CELL, MED_EN::MED_HEXA8);
 
     // Invalid cases
     CPPUNIT_ASSERT_THROW(theC->setCount(countCells, MED_EN::MED_NODE), MEDEXCEPTION);
     CPPUNIT_ASSERT_THROW(theC->setCount(countCells, MED_EN::MED_EDGE), MEDEXCEPTION);
     CPPUNIT_ASSERT_THROW(theC->setCount(countCells, MED_EN::MED_FACE), MEDEXCEPTION);
 
-    CPPUNIT_ASSERT_THROW(theC->setNodal(nodesCells_PYRA5, MED_EN::MED_FACE, MED_EN::MEDMEM_PYRA5), MEDEXCEPTION);
+    CPPUNIT_ASSERT_THROW(theC->setNodal(nodesCells_PYRA5, MED_EN::MED_FACE, MED_EN::MED_PYRA5), MEDEXCEPTION);
   }
 
   // 2 POLYHEDRA
@@ -95,7 +95,7 @@ static void createOrCheck (CONNECTIVITY * theC, string msg, bool create = false)
 
   if (create) {
     theC->setNodal(aPolyhedronNodalConnectivity,
-                   MED_EN::MED_CELL, MED_EN::MEDMEM_POLYHEDRA, aPolyhedronIndex);
+                   MED_EN::MED_CELL, MED_EN::MED_POLYHEDRA, aPolyhedronIndex);
   }
   else {
     // CELLS(3D): theC

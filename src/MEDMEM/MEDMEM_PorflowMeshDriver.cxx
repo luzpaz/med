@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEM_PorflowMeshDriver.hxx"
@@ -44,8 +44,8 @@ using namespace MEDMEM;
 // geometric types conversion from PORFLOW -> MED
 //const size_t PORFLOW_MESH_DRIVER::nb_geometrie_porflow;
 const medGeometryElement PORFLOW_MESH_DRIVER::geomPORFLOWtoMED[nb_geometrie_porflow] =
-  {   /*  1  */ MEDMEM_TRIA3   ,/*  2  */ MEDMEM_QUAD4  ,/*  3  */ MEDMEM_TETRA4  ,/*  4  */ MEDMEM_PYRA5  ,
-      /*  5  */ MEDMEM_PENTA6  ,/*  6  */ MEDMEM_HEXA8   };
+  {   /*  1  */ MED_TRIA3   ,/*  2  */ MED_QUAD4  ,/*  3  */ MED_TETRA4  ,/*  4  */ MED_PYRA5  ,
+      /*  5  */ MED_PENTA6  ,/*  6  */ MED_HEXA8   };
 // indirection table from PORFLOW order to MED one for nodes numerotation in all PORFLOW geometries
 //const size_t PORFLOW_MESH_DRIVER::nb_nodes_max;
 
@@ -231,16 +231,16 @@ inline static medGeometryElement get2DMedGeomType(int nbSommets)
     switch (nbSommets)
     {
         case 2:
-            return MEDMEM_SEG2;
+            return MED_SEG2;
             break;
         case 3:
-            return MEDMEM_TRIA3;
+            return MED_TRIA3;
             break;
         case 4:
-            return MEDMEM_QUAD4;
+            return MED_QUAD4;
             break;
     }
-    return MEDMEM_NONE;
+    return MED_NONE;
 }
 
 // helper function to read a porflow file name (enclosed in single or double quotes) in line

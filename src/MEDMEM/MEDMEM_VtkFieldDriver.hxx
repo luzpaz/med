@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #ifndef VTK_FIELD_DRIVER_HXX
@@ -307,7 +307,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::write(void) const
   // we get the Support and its associated Mesh
 
   const SUPPORT * supportField = _ptrField->getSupport();
-  GMESH * meshField = supportField->getMesh();
+  const GMESH * meshField = supportField->getMesh();
   if (! meshField )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<": mesh was not read before writing")) ;
 
@@ -336,7 +336,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
   // we get the Support and its associated Mesh
 
   const SUPPORT * supportField = _ptrField->getSupport();
-  GMESH * meshField = supportField->getMesh();
+  const GMESH * meshField = supportField->getMesh();
   MED_EN::medEntityMesh entitySupport = supportField->getEntity();
 
   if (! meshField )
@@ -372,7 +372,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
   if (entitySupport == MED_EN::MED_NODE)
     dataStr << "POINT_DATA " << meshField->getNumberOfNodes() ;
   else if (entitySupport == MED_EN::MED_CELL)
-    dataStr << "CELL_DATA " << meshField->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
+    dataStr << "CELL_DATA " << meshField->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
   else
     throw MED_EXCEPTION(LOCALIZED(STRING(LOC) << "Could not write field "<<_ptrField->getName()<<" which is not on all nodes or cells but it's on !" << entitySupport));
 
@@ -411,7 +411,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
     vtkFileStr << dataStr << endl;
   // END issue 0020610: [CEA 371] VTK field driver : save many fields
 
-  int NomberOfValue = supportField->getNumberOfElements(MED_EN::MEDMEM_ALL_ELEMENTS) ;
+  int NomberOfValue = supportField->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS) ;
   int NomberOfComponents =  _ptrField->getNumberOfComponents() ;
 
   MED_EN::med_type_champ fieldType = _ptrField->getValueType() ;

@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEMTest.hxx"
@@ -122,15 +122,15 @@ void MEDMEMTest::testDesactivateFacesComputation()
       26, 22, 31, 35};
 
   int bottom[2]={1,7};
-  MED_EN::medGeometryElement bottomTypes[1]={MED_EN::MEDMEM_QUAD4};
+  MED_EN::medGeometryElement bottomTypes[1]={MED_EN::MED_QUAD4};
   int bottomIndex[2]={1,3};
   int bottomNbOfElts[1]={2};
   int top[4]={8,9,10,11};
-  MED_EN::medGeometryElement topTypes[1]={MED_EN::MEDMEM_QUAD4};
+  MED_EN::medGeometryElement topTypes[1]={MED_EN::MED_QUAD4};
   int topIndex[3]={1,5};
   int topNbOfElts[1]={4};
   int side[5]={ 3, 6, 10, 11, 13};
-  MED_EN::medGeometryElement sideTypes[1]={MED_EN::MEDMEM_QUAD4};
+  MED_EN::medGeometryElement sideTypes[1]={MED_EN::MED_QUAD4};
   int sideIndex[2]={1,6};
   int sideNbOfElts[1]={5};
   //
@@ -152,21 +152,21 @@ void MEDMEMTest::testDesactivateFacesComputation()
   string coordunit[3] = { "m", "m", "m" };
   meshing->setCoordinatesUnits(coordunit);
   //Cell connectivity info for classical elts
-  const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MEDMEM_HEXA8};
+  const MED_EN::medGeometryElement classicalTypesCell[1]={MED_EN::MED_HEXA8};
   const int nbOfCellElts[1]={6};
   meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
   meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
   meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
   //Face connectivity info for classical elts
-  const MED_EN::medGeometryElement classicalTypesFace[1]={MED_EN::MEDMEM_QUAD4};
+  const MED_EN::medGeometryElement classicalTypesFace[1]={MED_EN::MED_QUAD4};
   const int nbOfFaceElts[1]={14};
   meshing->setNumberOfTypes(1,MED_EN::MED_FACE);
   meshing->setTypes(classicalTypesFace,MED_EN::MED_FACE);
   meshing->setNumberOfElements(nbOfFaceElts,MED_EN::MED_FACE);
   //All cell conn
-  meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MEDMEM_HEXA8,connNodalCellClassical);
+  meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_HEXA8,connNodalCellClassical);
   //All face conn
-  meshing->setConnectivity(MED_EN::MED_FACE,MED_EN::MEDMEM_QUAD4,connNodalFaceClassical);
+  meshing->setConnectivity(MED_EN::MED_FACE,MED_EN::MED_QUAD4,connNodalFaceClassical);
   int nbOfTypes=meshing->getNumberOfTypes(MED_EN::MED_EDGE);
   addMedFacesGroup2( *meshing, 2,  bottom, "Bottom",bottomTypes,bottomIndex,bottomNbOfElts,1) ;
   addMedFacesGroup2( *meshing, 4,  top,    "TopFace",topTypes,topIndex,topNbOfElts,1) ;

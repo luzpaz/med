@@ -1,24 +1,24 @@
 #  -*- coding: iso-8859-1 -*-
-#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
 #  MED MedCorba_Swig : binding of MED CORBA objects woth Python
@@ -33,6 +33,7 @@ from libSALOME_Swig import *
 sg = SALOMEGUI_Swig()
 
 from libMedCorba_Swig import *
+from libMEDClient import *
 
 from random import *
 
@@ -65,11 +66,11 @@ def AnalyzeField(field):
         if fieldEntity == SALOME_MED.MED_NODE:
             nbValByComp = fieldMesh.getNumberOfNodes()
         else:
-            nbValByComp = fieldMesh.getNumberOfElements(fieldEntity,SALOME_MED.MEDMEM_ALL_ELEMENTS)
+            nbValByComp = fieldMesh.getNumberOfElements(fieldEntity,SALOME_MED.MED_ALL_ELEMENTS)
         print "and its dimension (number of values by component of the field) is ",nbValByComp
     else:
         print "The support of this field is partially on entities ",fieldEntity," of the mesh ",fieldMesh.getName()
-        nbValByComp = fieldSupport.getNumberOfElements(SALOME_MED.MEDMEM_ALL_ELEMENTS)
+        nbValByComp = fieldSupport.getNumberOfElements(SALOME_MED.MED_ALL_ELEMENTS)
         print "and its dimension (number of values by component of the field) is ",nbValByComp
 
     for i in range(nbComp):
@@ -221,8 +222,11 @@ for entity in [SALOME_MED.MED_NODE,SALOME_MED.MED_CELL,SALOME_MED.MED_FACE,SALOM
                     print "    * Type",type
                     print "    * Number",number[0:nbOfElmtsOfType]
                 print ""
-                lengthValue = familycorba.getNumberOfElements(SALOME_MED.MEDMEM_ALL_ELEMENTS)
+                lengthValue = familycorba.getNumberOfElements(SALOME_MED.MED_ALL_ELEMENTS)
                 nbOfComp = 1
+
+                supportOutLocal = SUPPORTClient( familycorba )
+                supportOutCorba = createCorbaSupport( supportOutLocal )
 
                 print "\nGenerate a Local scalar double field"
                 fieldScalDblLoc = createLocalFieldDouble(nbOfComp,lengthValue)
@@ -233,7 +237,8 @@ for entity in [SALOME_MED.MED_NODE,SALOME_MED.MED_CELL,SALOME_MED.MED_FACE,SALOM
                 print "     Get ",valueIverif
 
                 print "\nGenerate a Corba scalar double field"
-                fieldScalDblCorba = createCorbaFieldDouble(familycorba,fieldScalDblLoc)
+                fieldScalDblLoc.setSupport( supportOutLocal )
+                fieldScalDblCorba = createCorbaFieldDouble(supportOutCorba,fieldScalDblLoc)
                 AnalyzeField(fieldScalDblCorba)
 
                 print "Generate a Local scalar integer field"
@@ -245,7 +250,8 @@ for entity in [SALOME_MED.MED_NODE,SALOME_MED.MED_CELL,SALOME_MED.MED_FACE,SALOM
                 print "     Get ",valueIverif
 
                 print "\nGenerate a Corba scalar integer field"
-                fieldScalIntCorba = createCorbaFieldInt(familycorba,fieldScalIntLoc)
+                fieldScalIntLoc.setSupport( supportOutLocal )
+                fieldScalIntCorba = createCorbaFieldInt(supportOutCorba,fieldScalIntLoc)
                 AnalyzeField(fieldScalIntCorba)
 
                 nbOfComp = spaceDim
@@ -258,7 +264,8 @@ for entity in [SALOME_MED.MED_NODE,SALOME_MED.MED_CELL,SALOME_MED.MED_FACE,SALOM
                 print "     Get ",valueIverif
 
                 print "\nGenerate a Corba vector double field"
-                fieldVectDblCorba = createCorbaFieldDouble(familycorba,fieldVectDblLoc)
+                fieldVectDblLoc.setSupport( supportOutLocal )
+                fieldVectDblCorba = createCorbaFieldDouble(supportOutCorba,fieldVectDblLoc)
                 AnalyzeField(fieldVectDblCorba)
 
                 print "\nGenerate a Local vector integer field"
@@ -270,7 +277,8 @@ for entity in [SALOME_MED.MED_NODE,SALOME_MED.MED_CELL,SALOME_MED.MED_FACE,SALOM
                 print "     Get ",valueIverif
 
                 print "\nGenerate a Corba vector integer field"
-                fieldVectIntCorba = createCorbaFieldInt(familycorba,fieldVectIntLoc)
+                fieldVectIntLoc.setSupport( supportOutLocal )
+                fieldVectIntCorba = createCorbaFieldInt(supportOutCorba,fieldVectIntLoc)
                 AnalyzeField(fieldVectIntCorba)
                 print ""
 print "Fin du script Python ...."

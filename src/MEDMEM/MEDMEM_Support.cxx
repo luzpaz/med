@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 /*
@@ -225,7 +225,7 @@ ostream & MEDMEM::operator<<(ostream &os, const SUPPORT &my)
   else {
     os << "Is not on all entities. "<< endl;
     if ( my._number )  // m may be not filled SUPPORTClient
-      os << *my.getNumber(MEDMEM_ALL_ELEMENTS);
+      os << *my.getNumber(MED_ALL_ELEMENTS);
   }
   int numberoftypes = my._numberOfGeometricType ;
   os << "NumberOfTypes : "<<numberoftypes<<endl;
@@ -270,7 +270,7 @@ void SUPPORT::update()
           // Use setGeometricType() in order to get _profilNames updated
           //_geometricType.set(1);
           //_geometricType[0]=MED_POINT1;
-          const MED_EN::medGeometryElement type = MEDMEM_NONE;
+          const MED_EN::medGeometryElement type = MED_NONE;
           setGeometricType( & type );
           // END Issue 0020633: [CEA] Pb with 3D field creation fron another
           _numberOfElements.set(1);
@@ -326,7 +326,7 @@ int SUPPORT::getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTI
 
   if (_isOnAllElts) return number;
 
-  int nbOfEltsThis    = getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  int nbOfEltsThis    = getNumberOfElements(MED_ALL_ELEMENTS);
 
   const int *eltsThis = _number->getValue();
 
@@ -389,10 +389,10 @@ void SUPPORT::blending(const SUPPORT * mySupport) throw (MEDEXCEPTION)
   }
   if(mySupport->_totalNumberOfElements==0)
     return;
-  const int *ids=getNumber(MEDMEM_ALL_ELEMENTS);
-  set<int> idsSet(ids,ids+getNumberOfElements(MEDMEM_ALL_ELEMENTS));
-  const int *idsMySupport=mySupport->getNumber(MEDMEM_ALL_ELEMENTS);
-  int mySupportSize=mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  const int *ids=getNumber(MED_ALL_ELEMENTS);
+  set<int> idsSet(ids,ids+getNumberOfElements(MED_ALL_ELEMENTS));
+  const int *idsMySupport=mySupport->getNumber(MED_ALL_ELEMENTS);
+  int mySupportSize=mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
   set<int>::iterator iter;
   for(int i=0;i<mySupportSize;i++)
     idsSet.insert(idsMySupport[i]);
@@ -446,7 +446,7 @@ right_group->setName("right group");
 string description = "partial support";
 int number_of_types=2;
 int number_of_elements=2;
-medGeometryElement geom_types[2]={MEDMEM_QUAD4, MEDMEM_TRIA6};
+medGeometryElement geom_types[2]={MED_QUAD4, MED_TRIA6};
 int number_of_elem_per_type[2]={1,1};
 int number_value[2]={3,4};
 
@@ -456,13 +456,13 @@ number_of_elements, geom_types,
 number_of_elem_per_type, number_value);
 \endverbatim
 
-When MEDMEM_POLYGON or MEDMEM_POLYHEDRA elements are included in the support,
-their global number should be given. For instance, on a mesh having ten MEDMEM_TRIA3 
-and five MEDMEM_POLYGON, the number of the first polygonal element is 11. 
+When MED_POLYGON or MED_POLYHEDRA elements are included in the support,
+their global number should be given. For instance, on a mesh having ten MED_TRIA3 
+and five MED_POLYGON, the number of the first polygonal element is 11. 
 */
 
 //-------------------
-void SUPPORT::setpartial(string                     Description,
+void SUPPORT::setpartial(const std::string&         Description,
                          int                        NumberOfGeometricType,
                          int                        TotalNumberOfElements,
                          const medGeometryElement * GeometricType,
@@ -577,7 +577,7 @@ void SUPPORT::setpartial_fromfile(MEDSKYLINEARRAY * number, bool shallowCopy) th
   END_OF_MED(LOC);
 }
 
-void SUPPORT::setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION){
+void SUPPORT::setProfilNames(const std::vector<std::string>& profilNames) throw (MEDEXCEPTION){
 
   const char * LOC = "SUPPORT::setProfilNames(vector<string> profilNames) : " ;
   BEGIN_OF_MED(LOC) ;
@@ -651,7 +651,7 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
     (mesh->getConnectivityptr())->calculateFullDescendingConnectivity(MED_CELL);
   const int * myConnectivityValue = mesh->getReverseConnectivity(MED_DESCENDING) ;
   const int * myConnectivityIndex = mesh->getReverseConnectivityIndex(MED_DESCENDING) ;
-  int numberOf = mesh->getNumberOfElements(_entity,MEDMEM_ALL_ELEMENTS) ;
+  int numberOf = mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS) ;
   list<int> myElementsList ;
   int size = 0 ;
   SCRUTE_MED(numberOf) ;
@@ -750,7 +750,7 @@ void SUPPORT::getBoundaryElements() throw (MEDEXCEPTION)
   If A.intersecting(B) is called, on output, \f$ A \f$ contains \f$A \cap B\f$.
 */
 //-------------------
-void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
+void SUPPORT::intersecting(const SUPPORT * mySupport) throw (MEDEXCEPTION)
 {
   const char * LOC="SUPPORT::intersecting(SUPPORT *) : ";
   BEGIN_OF_MED(LOC);
@@ -767,10 +767,10 @@ void SUPPORT::intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION)
   }
   if(_totalNumberOfElements==0)
     return;
-  const int *ids=getNumber(MEDMEM_ALL_ELEMENTS);
-  set<int> idsSet(ids,ids+getNumberOfElements(MEDMEM_ALL_ELEMENTS));
-  const int *idsMySupport=mySupport->getNumber(MEDMEM_ALL_ELEMENTS);
-  int mySupportSize=mySupport->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  const int *ids=getNumber(MED_ALL_ELEMENTS);
+  set<int> idsSet(ids,ids+getNumberOfElements(MED_ALL_ELEMENTS));
+  const int *idsMySupport=mySupport->getNumber(MED_ALL_ELEMENTS);
+  int mySupportSize=mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
   set<int> idsSetMySupport(idsMySupport,idsMySupport+mySupportSize);
   set<int>::iterator iter;
   list<int> idsList;
@@ -1068,8 +1068,8 @@ list<int> *MEDMEM::SUPPORT::sub(const int *ids,int lgthIds,const int *idsToSuppr
 SUPPORT *MEDMEM::SUPPORT::getComplement() const
 {
   SUPPORT *ret;
-  const int nbOfElt=_mesh->getNumberOfElements(_entity,MEDMEM_ALL_ELEMENTS);
-  int nbOfEltInSupp=getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  const int nbOfElt=_mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS);
+  int nbOfEltInSupp=getNumberOfElements(MED_ALL_ELEMENTS);
   if(_isOnAllElts || nbOfElt==nbOfEltInSupp)
   {
     ret=new SUPPORT;
@@ -1111,9 +1111,9 @@ SUPPORT *MEDMEM::SUPPORT::substract(const SUPPORT& other) const throw (MEDEXCEPT
   }
   if(_isOnAllElts)
     return other.getComplement();
-  int nbOfEltInThis=getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  int nbOfEltInThis=getNumberOfElements(MED_ALL_ELEMENTS);
   const int *nbsThis=_number->getValue();
-  int nbOfEltInOther=other.getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  int nbOfEltInOther=other.getNumberOfElements(MED_ALL_ELEMENTS);
   const int *nbsOther=other._number->getValue();
   list<int> *ids=sub(nbsThis,nbOfEltInThis,nbsOther,nbOfEltInOther);
   if(_entity==MED_NODE)
@@ -1161,7 +1161,7 @@ SUPPORT *MEDMEM::SUPPORT::getBoundaryElements(medEntityMesh Entity) const throw 
   const MESH* mesh = _mesh->convertInMESH();
   const int * myConnectivityValue=mesh->getReverseConnectivity(MED_DESCENDING);
   const int * myConnectivityIndex=mesh->getReverseConnectivityIndex(MED_DESCENDING);
-  int numberOf=mesh->getNumberOfElements(baseEntity,MEDMEM_ALL_ELEMENTS);
+  int numberOf=mesh->getNumberOfElements(baseEntity,MED_ALL_ELEMENTS);
   const int *ids=_number->getValue();
   set<int> idsSet(ids,ids+_totalNumberOfElements);
   list<int> myElementsList;
@@ -1231,7 +1231,7 @@ void MEDMEM::SUPPORT::fillFromNodeList(const list<int>& listOfNode) throw (MEDEX
   setEntity(MED_NODE);
   clearDataOnNumbers();
   int size=listOfNode.size();
-  int totalNbInMesh=_mesh->getNumberOfElements(_entity,MEDMEM_ALL_ELEMENTS);
+  int totalNbInMesh=_mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS);
   if(totalNbInMesh==size)
   {
     _isOnAllElts=true;
@@ -1242,7 +1242,7 @@ void MEDMEM::SUPPORT::fillFromNodeList(const list<int>& listOfNode) throw (MEDEX
     _isOnAllElts=false;
   int numberOfGeometricType=1;
   medGeometryElement* geometricType=new medGeometryElement[1];
-  geometricType[0]=MEDMEM_NONE;
+  geometricType[0]=MED_NONE;
   int *numberOfElements=new int[1];
   numberOfElements[0]=size;
   int *mySkyLineArrayIndex=new int[2];
@@ -1270,7 +1270,7 @@ void MEDMEM::SUPPORT::fillFromElementList(const list<int>& listOfElt) throw (MED
 {
   clearDataOnNumbers();
   int size=listOfElt.size();
-  int totalNbInMesh=_mesh->getNumberOfElements(_entity,MEDMEM_ALL_ELEMENTS);
+  int totalNbInMesh=_mesh->getNumberOfElements(_entity,MED_ALL_ELEMENTS);
   if(totalNbInMesh==size)
   {
     _isOnAllElts=true;
@@ -1372,7 +1372,7 @@ MESH* SUPPORT::makeMesh() const
   const int *                    num_index = mesh->getGlobalNumberingIndex( _entity );
 
   map<int,int> oldnodes; // map old to new nodes
-  if ( types[nb_types-1] == MEDMEM_POLYHEDRA )
+  if ( types[nb_types-1] == MED_POLYHEDRA )
     oldnodes.insert( make_pair( -1, -1 )); // for face separators
   int newid=1;
   for (int itype=0; itype < _numberOfGeometricType;itype++)
@@ -1382,7 +1382,7 @@ MESH* SUPPORT::makeMesh() const
 
     // get connectivity info
     int shift = 1; // to pass from elem number to array index
-    const int* conn = mesh->getConnectivity(MED_NODAL,_entity,MEDMEM_ALL_ELEMENTS);
+    const int* conn = mesh->getConnectivity(MED_NODAL,_entity,MED_ALL_ELEMENTS);
     const int* index = mesh->getConnectivityIndex(MED_NODAL,_entity);
     int t = 0;
     while ( type != all_mesh_types[t] ) ++t;
@@ -1458,7 +1458,7 @@ MESH* SUPPORT::makeMesh() const
 
 /*! set the reference _mesh to Mesh */
 //--------------------------------------
-void SUPPORT::setMesh(GMESH *Mesh) const
+void SUPPORT::setMesh(const GMESH *Mesh) const
   //--------------------------------------
 {
   if(_mesh!=Mesh)
@@ -1495,10 +1495,10 @@ string SUPPORT::getMeshName() const
   If isOnAllElements is false, it returns the number of elements in the
   support otherwise it returns number of elements in the mesh.
 
-  Example : number of MEDMEM_TRIA3 or MEDMEM_ALL_ELEMENTS elements
+  Example : number of MED_TRIA3 or MED_ALL_ELEMENTS elements
   in support.
 
-  Note : If SUPPORT is defined on MED_NODE, use MEDMEM_ALL_ELEMENTS as
+  Note : If SUPPORT is defined on MED_NODE, use MED_ALL_ELEMENTS as
          medGeometryElement GeometricType and it will return the number
          of nodes in the support (or in the mesh).
 */
@@ -1507,7 +1507,7 @@ int SUPPORT::getNumberOfElements(MED_EN::medGeometryElement GeometricType) const
   throw (MEDEXCEPTION)
 //-----------------------------------------------------------------------------
 {
-  if (GeometricType==MED_EN::MEDMEM_ALL_ELEMENTS)
+  if (GeometricType==MED_EN::MED_ALL_ELEMENTS)
     return _totalNumberOfElements;
   for (int i=0;i<_numberOfGeometricType;i++)
     if (_geometricType[i]==GeometricType)
@@ -1568,10 +1568,10 @@ MEDSKYLINEARRAY * SUPPORT::getnumberFromFile() const
   Returns an array which contains all number of given medGeometryElement.
 
   Numbering is global, ie numbers are bounded by 1 and
-  GMESH::getNumberOfElement(entity,MEDMEM_ALL_ELEMENTS) and not by 1 and
+  GMESH::getNumberOfElement(entity,MED_ALL_ELEMENTS) and not by 1 and
   GMESH::getNumberOfElement(entity,geomElement).
 
-  Note : If SUPPORT is defined on MED_NODE, use MEDMEM_NONE
+  Note : If SUPPORT is defined on MED_NODE, use MED_NONE
   medGeometryElement type.
 */
 //---------------------------------------------------------------------
@@ -1593,7 +1593,7 @@ const int * SUPPORT::getNumber(MED_EN::medGeometryElement GeometricType) const
     else
       return NULL;
   }
-  if (GeometricType==MED_EN::MEDMEM_ALL_ELEMENTS)
+  if (GeometricType==MED_EN::MED_ALL_ELEMENTS)
     return _number->getValue() ;
   for (int i=0;i<_numberOfGeometricType;i++)
     if (_geometricType[i]==GeometricType)
@@ -1608,7 +1608,7 @@ const int * SUPPORT::getNumberFromFile(MED_EN::medGeometryElement GeometricType)
 {
 //   if (_isOnAllElts)
 //     throw MEDEXCEPTION("Support::getNumberFromFile : Not defined, support is on all entity !") ;
-  if (GeometricType==MED_EN::MEDMEM_ALL_ELEMENTS)
+  if (GeometricType==MED_EN::MED_ALL_ELEMENTS)
     return _number_fromfile->getValue() ;
   for (int i=0;i<_numberOfGeometricType;i++)
     if (_geometricType[i]==GeometricType)
@@ -1637,7 +1637,7 @@ void SUPPORT::setEntity(MED_EN::medEntityMesh Entity)
   if ( _entity == MED_NODE )
     {
       _numberOfGeometricType = 1;
-      const MED_EN::medGeometryElement nodeType = MED_EN::MEDMEM_NONE;
+      const MED_EN::medGeometryElement nodeType = MED_EN::MED_NONE;
       _geometricType.set(0);
       setGeometricType( &nodeType );
     }

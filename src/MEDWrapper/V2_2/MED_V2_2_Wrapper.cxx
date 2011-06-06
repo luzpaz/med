@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 //  File   : 
@@ -37,8 +37,8 @@ extern "C"
 
 #ifdef _DEBUG_
 static int MYDEBUG = 0;
-#else
-static int MYDEBUG = 0;
+// #else
+// static int MYDEBUG = 0;
 #endif
 
 
@@ -435,10 +435,9 @@ namespace MED
                               &aFamilyName,
                               aFamilyId,
                               aNbGroup,
-                              &aGroupNames);
-      //&anAttrId,&anAttrVal,&anAttrDesc,aNbAttr,                   
+                              &aGroupNames);                 
 
-      INITMSG(MYDEBUG,"TVWrapper::GetFamilyInfo - MED_MODE_ACCES = "<<theMode<<"; aRet = "<<aRet<<std::endl);
+      INITMSG(MYDEBUG,"TVWrapper::SetFamilyInfo - MED_MODE_ACCES = "<<theMode<<"; aRet = "<<aRet<<std::endl);
       
       if(theErr) 
         *theErr = aRet;
@@ -745,7 +744,7 @@ namespace MED
       MED::TMeshInfo& aMeshInfo = const_cast<MED::TMeshInfo&>(theMeshInfo);
       
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-      //TValueHolder<ETable, med_table> aTable(theTable);
+      TValueHolder<ETable, med_data_type > aTable(theTable);
       med_bool chgt,trsf;
       return MEDmeshnEntity(myFile->Id(),
                             &aMeshName,
@@ -753,7 +752,7 @@ namespace MED
                             MED_NO_IT,
                             MED_NODE,
                             MED_NO_GEOTYPE,
-                            MED_COORDINATE,
+                            aTable,
                             MED_NO_CMODE,
                             &chgt,
                             &trsf);
@@ -1406,28 +1405,28 @@ namespace MED
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
       med_bool chgt,trsf;
       if(theGeom!=MED::ePOLYGONE && theGeom!=MED::ePOLYEDRE)
-	{
-	  return MEDmeshnEntity(myFile->Id(),
-				&aMeshName,
-				MED_NO_DT,
-				MED_NO_IT,
-				med_entity_type(theEntity),
-				med_geometry_type(theGeom),
-				MED_CONNECTIVITY,
-				med_connectivity_mode(theConnMode),
-				&chgt,
-				&trsf);
-	}
+        {
+          return MEDmeshnEntity(myFile->Id(),
+                                &aMeshName,
+                                MED_NO_DT,
+                                MED_NO_IT,
+                                med_entity_type(theEntity),
+                                med_geometry_type(theGeom),
+                                MED_CONNECTIVITY,
+                                med_connectivity_mode(theConnMode),
+                                &chgt,
+                                &trsf);
+        }
       else if(theGeom==MED::ePOLYGONE)
-	{
-	  return MEDmeshnEntity(myFile->Id(),&aMeshName,MED_NO_DT,MED_NO_IT,med_entity_type(theEntity),
-				MED_POLYGON,MED_INDEX_NODE,med_connectivity_mode(theConnMode),&chgt,&trsf)-1;
-	}
+        {
+          return MEDmeshnEntity(myFile->Id(),&aMeshName,MED_NO_DT,MED_NO_IT,med_entity_type(theEntity),
+                                MED_POLYGON,MED_INDEX_NODE,med_connectivity_mode(theConnMode),&chgt,&trsf)-1;
+        }
       else
-	{
-	  return MEDmeshnEntity(myFile->Id(),&aMeshName,MED_NO_DT,MED_NO_IT,med_entity_type(theEntity),
-				MED_POLYHEDRON,MED_INDEX_FACE,med_connectivity_mode(theConnMode),&chgt,&trsf)-1;
-	}
+        {
+          return MEDmeshnEntity(myFile->Id(),&aMeshName,MED_NO_DT,MED_NO_IT,med_entity_type(theEntity),
+                                MED_POLYHEDRON,MED_INDEX_FACE,med_connectivity_mode(theConnMode),&chgt,&trsf)-1;
+        }
     }
     
     
@@ -1927,6 +1926,7 @@ namespace MED
       TValueHolder<TString, char> aFieldName(anInfo.myName);
       MED::TMeshInfo& aMeshInfo = anInfo.myMeshInfo;
 
+      // workaround for IPAL13676
       MED::TEntityInfo localEntityInfo = theEntityInfo;
       TEntityInfo::iterator anLocalIter = localEntityInfo.find(eMAILLE);
       if(anLocalIter != localEntityInfo.end()){
@@ -1940,7 +1940,7 @@ namespace MED
         TGeom2Size::const_iterator anGeomIter = aGeom2Size.begin();
         for(; anGeomIter != aGeom2Size.end(); anGeomIter++){
           med_geometry_type aGeom = med_geometry_type(anGeomIter->first);
-          char meshName[MED_NAME_SIZE+1];
+          char aMeshName[MED_NAME_SIZE+1];
           med_bool islocal;
           med_field_type ft;
           char dtunit[MED_SNAME_SIZE+1];
@@ -1950,7 +1950,7 @@ namespace MED
           TInt aNbStamps;
           MEDfieldInfoByName(anId,
                              &aFieldName,
-                             meshName,
+                             aMeshName,
                              &islocal,
                              &ft,
                              cname,
@@ -1965,16 +1965,23 @@ namespace MED
           med_float aDt;
           if (aNbStamps > 0)
             {
-              TErr aRet = MEDfieldComputingStepInfo(anId,
-                                                    &aFieldName,
-                                                    1,
-                                                    &aNumDt,
-                                                    &aNumOrd,
-                                                    &aDt);
+              MEDfieldComputingStepInfo(anId,
+                                        &aFieldName,
+                                        1,
+                                        &aNumDt,
+                                        &aNumOrd,
+                                        &aDt);
               char profilename[MED_NAME_SIZE+1];
               char locname[MED_NAME_SIZE+1];
               med_int profilsize;
               med_int aNbGauss;
+
+              // protection from crash (division by zero)
+              // inside MEDfieldnValueWithProfile function
+              // caused by the workaround for IPAL13676 (see above)
+              if( anEntity == MED_NODE_ELEMENT && aGeom % 100 == 0 )
+                continue;
+
               nval = MEDfieldnValueWithProfile(anId,
                                                &aFieldName,
                                                aNumDt,
@@ -1994,24 +2001,11 @@ namespace MED
                     "GetNbTimeStamps aNbTimeStamps = "<<aNbStamps<<
                     "; aGeom = "<<aGeom<<"; anEntity = "<<anEntity<<"\n");
             if(anIsPerformAdditionalCheck){
-              TInt iTimeStampEnd = aNbStamps;
-              for(TInt iTimeStamp = 1; iTimeStamp <= iTimeStampEnd; iTimeStamp++){
-                TVector<char> aMeshName(GetNOMLength<eV2_2>()+1);
-                TVector<char> aDtUnit(GetPNOMLength<eV2_2>()+1);
-                TErr aRet = MEDfieldComputingStepInfo(anId,
-                                                      &aFieldName,
-                                                      iTimeStamp,
-                                                      &aNumDt,  
-                                                      &aNumOrd,
-                                                      &aDt);
-
-                anIsSatisfied = (aRet == 0 && (!strcmp(&aMeshName[0],&aMeshInfo.myName[0])));
-                if(!anIsSatisfied){
-                  INITMSG(MYDEBUG,
-                          "GetNbTimeStamps aMeshName = '"<<&aMeshName[0]<<"' != "<<
-                          "; aMeshInfo.myName = '"<<&aMeshInfo.myName[0]<<"'\n");
-                  break;
-                }
+              anIsSatisfied = !strcmp(&aMeshName[0],&aMeshInfo.myName[0]);
+              if(!anIsSatisfied){
+                INITMSG(MYDEBUG,
+                        "GetNbTimeStamps aMeshName = '"<<&aMeshName[0]<<"' != "<<
+                        "; aMeshInfo.myName = '"<<&aMeshInfo.myName[0]<<"'\n");
               }
             }
           }
@@ -2061,6 +2055,24 @@ namespace MED
       TValueHolder<TInt, med_int> aNbRef(aFieldInfo.myNbRef);
 
       TGeom2NbGauss& aGeom2NbGauss = theInfo.myGeom2NbGauss;
+
+      // just to get a time stamp unit (anUnitDt)
+      med_field_type aFieldType;
+      med_int aNbComp = MEDfieldnComponentByName(myFile->Id(), &aFieldName);
+      char *aCompName = new char[aNbComp*MED_SNAME_SIZE+1];
+      char *aCompUnit = new char[aNbComp*MED_SNAME_SIZE+1];
+      TInt aNbStamps;
+      MEDfieldInfoByName(myFile->Id(),
+                         &aFieldName,
+                         &aMeshName,
+                         &anIsLocal,
+                         &aFieldType,
+                         aCompName,
+                         aCompUnit,
+                         &anUnitDt,
+                         &aNbStamps);
+      delete [] aCompName;
+      delete [] aCompUnit;
 
       TGeom2Size::const_iterator anIter = aGeom2Size.begin();
       for(; anIter != aGeom2Size.end(); anIter++){
@@ -2146,7 +2158,6 @@ namespace MED
       for(; anIter != aGeom2Size.end(); anIter++){
         EGeometrieElement aGeom = anIter->first;
         TInt aNbElem = anIter->second;
-        char profilename[MED_NAME_SIZE+1];
         med_int profilesize,aNbGauss;
 
         TInt aNbVal = MEDfieldnValueWithProfile(anId,
@@ -2483,7 +2494,7 @@ namespace MED
       EGrilleType aGrilleType = theInfo.myGrilleType;
 
       TErr aRet = 0;
-      if(aMaillageType == eSTRUCTURE && aGrilleType == eGRILLE_STANDARD){
+      if(aMaillageType == eSTRUCTURE && aGrilleType == eGRILLE_STANDARD) {
         GetGrilleStruct(aMeshInfo, theInfo.myGrilleStructure, theErr);
 
         TValueHolder<TNodeCoord, med_float> aCoord(theInfo.myCoord);
@@ -2560,12 +2571,16 @@ namespace MED
             EXCEPTION(std::runtime_error,"GetGrilleInfo - Erreur a la lecture de la taille de l'indice");
             
           TValueHolder<TFloatVector, med_float> anIndexes(theInfo.GetIndexes(anAxis-1));
-          char aCompNames[MED_SNAME_SIZE+1];
-          char anUnitNames[MED_SNAME_SIZE+1];
-          aRet=MEDmeshGridIndexCoordinateRd(myFile->Id(),&aMeshName,MED_NO_DT,MED_NO_IT,MED_NO_DT,&anIndexes);
+          //TValueHolder<ETable, med_data_type > table(aTable);
+          //char aCompNames[MED_SNAME_SIZE+1];
+          //char anUnitNames[MED_SNAME_SIZE+1];
+          aRet=MEDmeshGridIndexCoordinateRd(myFile->Id(),&aMeshName,
+                                            MED_NO_DT,MED_NO_IT,
+                                            anAxis,
+                                            &anIndexes);
 
-          theInfo.SetCoordName(anAxis-1, aCompNames);
-          theInfo.SetCoordUnit(anAxis-1, anUnitNames);
+          //theInfo.SetCoordName(anAxis-1, aCompNames);
+          //theInfo.SetCoordUnit(anAxis-1, anUnitNames);
           theInfo.SetGrilleStructure(anAxis-1, aNbIndexes);
 
           if(theErr) 

@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEMTest.hxx"
@@ -125,8 +125,8 @@ void MEDMEMTest::testGibiMeshDriver()
 
   //Test gibi2medGeom() and med2gibiGeom() methods
   size_t aSize = 17;
-  CPPUNIT_ASSERT_EQUAL(GIBI_MESH_DRIVER::gibi2medGeom(aSize), MEDMEM_PENTA15);
-  CPPUNIT_ASSERT_EQUAL(GIBI_MESH_DRIVER::med2gibiGeom(MEDMEM_PENTA15), 17);
+  CPPUNIT_ASSERT_EQUAL(GIBI_MESH_DRIVER::gibi2medGeom(aSize), MED_PENTA15);
+  CPPUNIT_ASSERT_EQUAL(GIBI_MESH_DRIVER::med2gibiGeom(MED_PENTA15), 17);
 
   //---------------------------Test GIBI MESH READ ONLY part--------------------------------//
   {

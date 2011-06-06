@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include <set>
 #include <map>
@@ -78,7 +78,7 @@ ParallelTopology::ParallelTopology(const vector<MEDMEM::MESH*>& meshes,
     constituent_entity = (m_mesh_dimension == 3 ? MED_EN::MED_FACE : MED_EN::MED_EDGE );
 
     //creating cell maps
-    m_nb_cells[idomain]=meshes[idomain]->getNumberOfElements(MED_EN::MED_CELL, MED_EN::MEDMEM_ALL_ELEMENTS);
+    m_nb_cells[idomain]=meshes[idomain]->getNumberOfElements(MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
     //              cout << "Nb cells (domain "<<idomain<<") = "<<m_nb_cells[idomain];
     m_loc_to_glob[idomain].resize(m_nb_cells[idomain]);
 
@@ -125,8 +125,8 @@ ParallelTopology::ParallelTopology(const vector<MEDMEM::MESH*>& meshes,
       m_nb_total_nodes=meshes[idomain]->getNumberOfNodes();   
       m_nb_nodes[0]=m_nb_total_nodes; 
 
-      //                      meshes[idomain]->getConnectivity( MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MEDMEM_ALL_ELEMENTS); 
-      int nbfaces=meshes[idomain]->getNumberOfElements(constituent_entity,MED_EN::MEDMEM_ALL_ELEMENTS);
+      //                      meshes[idomain]->getConnectivity( MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS); 
+      int nbfaces=meshes[idomain]->getNumberOfElements(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
       m_face_loc_to_glob[idomain].resize(nbfaces);
       for (int i=0; i<nbfaces; i++)
       {
@@ -202,8 +202,8 @@ ParallelTopology::ParallelTopology(const vector<MEDMEM::MESH*>& meshes,
 
     //creating  dimension d-1 component mappings
 
-    //              meshes[idomain]->getConnectivity( MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MEDMEM_ALL_ELEMENTS); 
-    m_nb_faces[idomain]=meshes[idomain]->getNumberOfElements(constituent_entity,MED_EN::MEDMEM_ALL_ELEMENTS);
+    //              meshes[idomain]->getConnectivity( MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS); 
+    m_nb_faces[idomain]=meshes[idomain]->getNumberOfElements(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
     MESSAGE_MED ("Nb faces domain " << idomain<<m_nb_faces[idomain]);
     m_face_loc_to_glob[idomain].resize(m_nb_faces[idomain]);
     local2distant.clear();
@@ -506,10 +506,10 @@ void ParallelTopology::createNodeMapping(map<MED_EN::medGeometryElement,int*>& t
     int nodes_per_type= type%100;
 
     if (!((type/100==m_mesh_dimension)
-          ||(type==MED_EN::MEDMEM_POLYGON && m_mesh_dimension==2)
-          ||(type==MED_EN::MEDMEM_POLYHEDRA && m_mesh_dimension==3))) continue;
+          ||(type==MED_EN::MED_POLYGON && m_mesh_dimension==2)
+          ||(type==MED_EN::MED_POLYHEDRA && m_mesh_dimension==3))) continue;
 
-    if (type != MED_EN::MEDMEM_POLYGON && type != MED_EN::MEDMEM_POLYHEDRA)
+    if (type != MED_EN::MED_POLYGON && type != MED_EN::MED_POLYHEDRA)
     {
       for (int icell=0; icell<present_type_numbers[type]; icell++)
       {
@@ -529,7 +529,7 @@ void ParallelTopology::createNodeMapping(map<MED_EN::medGeometryElement,int*>& t
 
       }
     }
-    else if (type== MED_EN::MEDMEM_POLYGON)
+    else if (type== MED_EN::MED_POLYGON)
     {
       for ( unsigned i = 0; i < polygon_conn.size(); ++i )
       {
@@ -543,7 +543,7 @@ void ParallelTopology::createNodeMapping(map<MED_EN::medGeometryElement,int*>& t
         }
       }
     }
-    else if (type==MED_EN::MEDMEM_POLYHEDRA)
+    else if (type==MED_EN::MED_POLYHEDRA)
     {
       for ( unsigned i = 0; i < polyhedron_conn.size(); ++i )
       {
@@ -646,14 +646,14 @@ void ParallelTopology::createFaceMapping(const MESHCollection& initial_collectio
   for (int iold=0; iold<nb_domain_old;iold++)
   {
     if ( !initial_collection.getMesh(iold) ) continue;
-    int nbtotalface = initial_collection.getMesh(iold)->getNumberOfElements(constituent_entity,MED_EN::MEDMEM_ALL_ELEMENTS);
+    int nbtotalface = initial_collection.getMesh(iold)->getNumberOfElements(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
     SCRUTE_MED(nbtotalface);
     const int* face_conn = 0;
     const int* face_offset = 0;
     if (nbtotalface >0)
     {
       face_conn = initial_collection.getMesh(iold)->getConnectivity(
-                                                                    MED_EN::MED_NODAL,constituent_entity,MED_EN::MEDMEM_ALL_ELEMENTS);
+                                                                    MED_EN::MED_NODAL,constituent_entity,MED_EN::MED_ALL_ELEMENTS);
       face_offset = initial_collection.getMesh(iold)->getConnectivityIndex(MED_EN::MED_NODAL,constituent_entity);
     }
     for (int iface=0;iface<nbtotalface; iface++)
@@ -764,7 +764,7 @@ void ParallelTopology::createFaceMapping2ndversion(const MESHCollection& initial
     int nbcell=old_topology->getCellNumber(iold);
 
     const int* face_conn = initial_collection.getMesh(iold)->
-      getConnectivity(MED_EN::MED_DESCENDING,MED_EN::MED_CELL,MED_EN::MEDMEM_ALL_ELEMENTS);
+      getConnectivity(MED_EN::MED_DESCENDING,MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
     const int* face_offset = initial_collection.getMesh(iold)->
       getConnectivityIndex(MED_EN::MED_DESCENDING,MED_EN::MED_CELL);
     MESSAGE_MED("end of connectivity calculation");
@@ -1124,7 +1124,7 @@ void ParallelTopology::recreateMappingAfterFusion(const vector<MEDMEM::MESH*>& m
     //creating cell maps
 
     m_nb_cells[idomain]=meshes[idomain]->getNumberOfElements(MED_EN::MED_CELL,
-                                                             MED_EN::MEDMEM_ALL_ELEMENTS);
+                                                             MED_EN::MED_ALL_ELEMENTS);
     if ( m_cell_loc_to_glob_fuse[idomain].size() != m_nb_cells[idomain] )
       throw MED_EXCEPTION(MEDMEM::STRING(LOC)<<" invalid nb of fused cells");
 
@@ -1156,7 +1156,7 @@ void ParallelTopology::recreateMappingAfterFusion(const vector<MEDMEM::MESH*>& m
     MED_EN::medEntityMesh constituent_entity =
       (m_mesh_dimension == 3 ? MED_EN::MED_FACE : MED_EN::MED_EDGE );
     m_nb_faces[idomain] = meshes[idomain]->getNumberOfElements(constituent_entity,
-                                                               MED_EN::MEDMEM_ALL_ELEMENTS);
+                                                               MED_EN::MED_ALL_ELEMENTS);
     if ( m_face_loc_to_glob_fuse[idomain].size() != m_nb_faces[idomain] )
       throw MED_EXCEPTION(MEDMEM::STRING(LOC)<<" invalid nb of fused faces of domain "<< idomain
                           << ": expect " << m_nb_faces[idomain]

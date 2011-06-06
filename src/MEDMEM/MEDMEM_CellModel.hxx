@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 /*
@@ -64,7 +64,7 @@ private:
 
 
   //protected:
-                        /*! explicit name (as MEDMEM_POINT1)           */
+                        /*! explicit name (as MED_POINT1)           */
   string             _name;
                         /*! type of cell (cf define.h)              */
   MED_EN::medGeometryElement _type;
@@ -109,7 +109,7 @@ public :
                         /*! Operator << : print CELLMODEL to the given stream. */
   friend MEDMEM_EXPORT ostream & operator<<(ostream &os,const CELLMODEL &my);
 
-                        /*! returns _name attribute (ie: MEDMEM_PENTA15).\n
+                        /*! returns _name attribute (ie: MED_PENTA15).\n
                             see med.h (in med/include) */
   inline string                 getName()             const;
 
@@ -169,7 +169,7 @@ public :
 // ------------------------------------------
 
 inline CELLMODEL::CELLMODEL():
-    _type(MED_EN::MEDMEM_NONE),
+    _type(MED_EN::MED_NONE),
     _dimension(0),
     _numberOfNodes(0),
     _numberOfVertexes(0),
@@ -181,7 +181,7 @@ inline CELLMODEL::CELLMODEL():
 {
 }
 inline CELLMODEL::CELLMODEL(const CELLMODEL &m):
-    _type(MED_EN::MEDMEM_NONE),
+    _type(MED_EN::MED_NONE),
     _dimension(0),
     _numberOfNodes(0),
     _numberOfVertexes(0),

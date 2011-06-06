@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include <fstream>
@@ -276,7 +276,7 @@ namespace {
   SUPPORT* makeShiftedSupport(const SUPPORT* support,
                               const set<int> undefIndices)
   {
-    int nbElements = support->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+    int nbElements = support->getNumberOfElements(MED_ALL_ELEMENTS);
     int nbTypes    = support->getNumberOfTypes();
 
     int i, shitf = 1;
@@ -302,7 +302,7 @@ namespace {
     else {
       // shift existing number
       shitf = 1;
-      const int * oldNumber = support->getNumber( MEDMEM_ALL_ELEMENTS );
+      const int * oldNumber = support->getNumber( MED_ALL_ELEMENTS );
       std::copy( oldNumber, oldNumber + *undefIndices.begin()-1, number ); // copy [0:firstUndef]
       for ( undef = undefIndices.begin(); undef != undefIndices.end(); ) {
         i = *undef++;
@@ -358,7 +358,7 @@ namespace {
     field->getSupport()->removeReference(); // support belongs to field only
 
     int j, nbComponents = field->getNumberOfComponents();
-    int      nbElements = field->getSupport()->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+    int      nbElements = field->getSupport()->getNumberOfElements(MED_ALL_ELEMENTS);
 
     typedef typename MEDMEM_ArrayInterface<T,INTERLACE,NoGauss>::Array TArray;
 
@@ -1401,7 +1401,7 @@ void ENSIGHT_FIELD_WRONLY_DRIVER::write(void) const
   med_type_champ type = field->getValueType() ;
 
   medEntityMesh entity = support->getEntity();
-  int totalNbValues    = support->getNumberOfElements(MEDMEM_ALL_ELEMENTS);
+  int totalNbValues    = support->getNumberOfElements(MED_ALL_ELEMENTS);
   //const int* mainNbValsByType = support->getNumberOfElements();
 
   int nbValuesByType = 0;
@@ -1412,7 +1412,7 @@ void ENSIGHT_FIELD_WRONLY_DRIVER::write(void) const
     throw MED_EXCEPTION(STRING("Can't write field ") << field->getName() <<
                         ", which is not on all elements while mesh is not set to its support");
   if (!isOnAll)
-    isOnAll = ( mesh->getNumberOfElements(entity,MEDMEM_ALL_ELEMENTS) == componentShift );
+    isOnAll = ( mesh->getNumberOfElements(entity,MED_ALL_ELEMENTS) == componentShift );
   if (!isOnAll && entity == MED_NODE && !isGoldFormat() ) {
     throw MED_EXCEPTION(compatibilityPb("Can't write field ") << field->getName() <<
                         " which is not on all nodes of the mesh in EnSight6 format,"
@@ -1553,7 +1553,7 @@ void ENSIGHT_FIELD_WRONLY_DRIVER::write(void) const
             geoTypeValues.myValues  = getValuePointer( geoTypeValues.myNumbers[0], field );
           }
         }
-        else if ( partSup->getNumberOfElements(MEDMEM_ALL_ELEMENTS) != totalNbValues ) {
+        else if ( partSup->getNumberOfElements(MED_ALL_ELEMENTS) != totalNbValues ) {
           geoTypeValues.myNumbers = partSup->getNumber(medType);
           geoTypeValues.myValues  = getValuePointer( geoTypeValues.myNumbers[0], field );
         }
@@ -1651,7 +1651,7 @@ void ENSIGHT_FIELD_WRONLY_DRIVER::write(void) const
             geoTypeValues.myValues  = getValuePointer( geoTypeValues.myNumbers[0], field );
           }
         }
-        else if ( partSup->getNumberOfElements(MEDMEM_ALL_ELEMENTS) != totalNbValues ) {
+        else if ( partSup->getNumberOfElements(MED_ALL_ELEMENTS) != totalNbValues ) {
           geoTypeValues.myNumbers = partSup->getNumber(medType);
           geoTypeValues.myValues  = getValuePointer( geoTypeValues.myNumbers[0], field );
         }
