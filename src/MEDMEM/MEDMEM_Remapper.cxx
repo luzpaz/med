@@ -22,7 +22,7 @@
 #include "Interpolation.hxx"
 #include "Interpolation2D.txx"
 #include "Interpolation3D.txx"
-#include "Interpolation3DSurf.txx"
+#include "Interpolation3DSurf.hxx"
 
 
   
