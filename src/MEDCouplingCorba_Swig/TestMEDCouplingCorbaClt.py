@@ -33,7 +33,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testContentOfFetched1DMesh(self):
         meshPtr=self._objC.get1DMesh();
         _mesh_from_distant=MEDCouplingUMeshClient.New(meshPtr);
-        meshPtr.UnRegister();
+        meshPtr.Destroy();
         self.assertTrue(_mesh_from_distant.getSpaceDimension()==3);
         self.assertTrue(_mesh_from_distant.getMeshDimension()==1);
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
@@ -44,7 +44,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaFetching2D(self):
         meshPtr=self._objC.get2DMesh();
         _mesh_from_distant=MEDCouplingUMeshClient.New(meshPtr);
-        meshPtr.UnRegister();
+        meshPtr.Destroy();
         self.assertTrue(_mesh_from_distant.getSpaceDimension()==2);
         self.assertTrue(_mesh_from_distant.getMeshDimension()==2);
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
@@ -59,7 +59,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
         for i in xrange(1000):
             meshPtr=self._objC.get2DMesh();
             _mesh_from_distant=MEDCouplingUMeshClient.New(meshPtr);
-            meshPtr.UnRegister();
+            meshPtr.Destroy();
             test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
             meshRef=test.build2DMesh();
             self.assertTrue(_mesh_from_distant.isEqual(meshRef,1e-12));
@@ -69,7 +69,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaFetching3D(self):
         meshPtr=self._objC.get3DMesh();
         _mesh_from_distant=MEDCouplingUMeshClient.New(meshPtr);
-        meshPtr.UnRegister();
+        meshPtr.Destroy();
         self.assertTrue(3==_mesh_from_distant.getSpaceDimension());
         self.assertTrue(3==_mesh_from_distant.getMeshDimension());
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
@@ -83,7 +83,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaFetching3DSurf(self):
         meshPtr=self._objC.get3DSurfMesh();
         _mesh_from_distant=MEDCouplingUMeshClient.New(meshPtr);
-        meshPtr.UnRegister();
+        meshPtr.Destroy();
         self.assertTrue(3==_mesh_from_distant.getSpaceDimension());
         self.assertTrue(2==_mesh_from_distant.getMeshDimension());
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
@@ -97,7 +97,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaFetching0D(self):
         meshPtr=self._objC.get0DMesh();
         _mesh_from_distant=MEDCouplingUMeshClient.New(meshPtr);
-        meshPtr.UnRegister();
+        meshPtr.Destroy();
         self.assertTrue(3==_mesh_from_distant.getSpaceDimension());
         self.assertTrue(0==_mesh_from_distant.getMeshDimension());
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
@@ -108,7 +108,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaFetchingM1D(self):
         meshPtr=self._objC.getM1DMesh();
         _mesh_from_distant=MEDCouplingUMeshClient.New(meshPtr);
-        meshPtr.UnRegister();
+        meshPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         meshRef=test.buildM1DMesh();
         self.assertTrue(-1==_mesh_from_distant.getMeshDimension());
@@ -118,7 +118,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaFetchingExtruded(self):
         meshPtr=self._objC.getExtrudedMesh();
         _mesh_from_distant=MEDCouplingExtrudedMeshClient.New(meshPtr);
-        meshPtr.UnRegister();
+        meshPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         meshRef=test.buildExtrudedMesh();
         self.assertTrue(_mesh_from_distant.isEqual(meshRef,1e-12))
@@ -127,7 +127,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaFetchingCMesh(self):
         meshPtr=self._objC.getCMesh();
         _mesh_from_distant=MEDCouplingCMeshClient.New(meshPtr);
-        meshPtr.UnRegister();
+        meshPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         meshRef=test.buildCMesh();
         self.assertTrue(_mesh_from_distant.isEqual(meshRef,1e-12))
@@ -136,7 +136,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaField2DNTFetching(self):
         fieldPtr=self._objC.getFieldScalarOn2DNT();
         fieldCpp=MEDCouplingFieldDoubleClient.New(fieldPtr);
-        fieldPtr.UnRegister();
+        fieldPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildFieldScalarOn2DNT();
         self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
@@ -146,7 +146,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
         fieldPtr=self._objC.getFieldScalarOn2DNT();
         fieldCpp1=MEDCouplingFieldDoubleClient.New(fieldPtr);
         fieldCpp2=MEDCouplingFieldDoubleClient.New(fieldPtr);
-        fieldPtr.UnRegister();
+        fieldPtr.Destroy();
         self.assertTrue(fieldCpp1.isEqual(fieldCpp2,1.e-12,1.e-15))
         pass
 
@@ -169,13 +169,13 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
         for i in xrange(8-1):
             self.assertTrue(li[i].isEqual(li[i+1],1.e-12,1.e-15));
             pass
-        fieldPtr.UnRegister()
+        fieldPtr.Destroy()
         pass
     
     def testCorbaFieldNode2DNTFetching(self):
         fieldPtr=self._objC.getFieldNodeScalarOn2DNT();
         fieldCpp=MEDCouplingFieldDoubleClient.New(fieldPtr);
-        fieldPtr.UnRegister();
+        fieldPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildFieldNodeScalarOn2DNT();
         self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
@@ -184,7 +184,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaField3DNTFetching(self):
         fieldPtr=self._objC.getFieldScalarOn3DNT();
         fieldCpp=MEDCouplingFieldDoubleClient.New(fieldPtr);
-        fieldPtr.UnRegister();
+        fieldPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildFieldScalarOn3DNT();
         self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
@@ -193,7 +193,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaField3DSurfWTFetching(self):
         fieldPtr=self._objC.getFieldScalarOn3DSurfWT();
         fieldCpp=MEDCouplingFieldDoubleClient.New(fieldPtr);
-        fieldPtr.UnRegister();
+        fieldPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildFieldScalarOn3DSurfWT();
         self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
@@ -202,7 +202,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaField3DSurfCOTIFetching(self):
         fieldPtr=self._objC.getFieldScalarOn3DSurfCOTI();
         fieldCpp=MEDCouplingFieldDoubleClient.New(fieldPtr);
-        fieldPtr.UnRegister();
+        fieldPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildFieldScalarOn3DSurfCOTI();
         self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
@@ -211,7 +211,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaField2DLTFetching(self):
         fieldPtr=self._objC.getFieldScalarOn2DLT();
         fieldCpp=MEDCouplingFieldDoubleClient.New(fieldPtr);
-        fieldPtr.UnRegister();
+        fieldPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildFieldScalarOn2DLT();
         self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
@@ -220,7 +220,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaFieldGaussPt2DWTFetching(self):
         fieldPtr=self._objC.getFieldGaussPt2DWT();
         fieldCpp=MEDCouplingFieldDoubleClient.New(fieldPtr);
-        fieldPtr.UnRegister();
+        fieldPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildFieldGaussPt2DWT();
         self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
@@ -229,7 +229,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaFieldGaussPtNE2DWTFetching(self):
         fieldPtr=self._objC.getFieldGaussPtNE2DWT();
         fieldCpp=MEDCouplingFieldDoubleClient.New(fieldPtr);
-        fieldPtr.UnRegister();
+        fieldPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildFieldGaussPtNE2DWT();
         self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
@@ -238,7 +238,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaFieldVectorOnExtrudedWT(self):
         fieldPtr=self._objC.getFieldVectorOnExtrudedWT();
         fieldCpp=MEDCouplingFieldDoubleClient.New(fieldPtr);
-        fieldPtr.UnRegister();
+        fieldPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildFieldVectorOnExtrudedWT();
         self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
@@ -247,7 +247,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaFieldVectorOnCMeshWT(self):
         fieldPtr=self._objC.getFieldVectorOnCMeshWT();
         fieldCpp=MEDCouplingFieldDoubleClient.New(fieldPtr);
-        fieldPtr.UnRegister();
+        fieldPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildFieldVectorOnCMeshWT();
         self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
@@ -256,7 +256,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaFieldTemplateCellOn2D(self):
         fieldPtr=self._objC.getFieldTemplateCellOn2D();
         fieldCpp=MEDCouplingFieldTemplateClient.New(fieldPtr);
-        fieldPtr.UnRegister();
+        fieldPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildFieldTemplateCellOn2D();
         self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
@@ -265,7 +265,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaFieldTemplateNodeOn2D(self):
         fieldPtr=self._objC.getFieldTemplateNodeOn2D();
         fieldCpp=MEDCouplingFieldTemplateClient.New(fieldPtr);
-        fieldPtr.UnRegister();
+        fieldPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildFieldTemplateNodeOn2D();
         self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
@@ -274,7 +274,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaFieldTemplateGaussPtOn2D(self):
         fieldPtr=self._objC.getFieldTemplateGaussPtOn2D();
         fieldCpp=MEDCouplingFieldTemplateClient.New(fieldPtr);
-        fieldPtr.UnRegister();
+        fieldPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildFieldTemplateGaussPtOn2D();
         self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
@@ -283,7 +283,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaFieldTemplateGaussNEOn2D(self):
         fieldPtr=self._objC.getFieldTemplateGaussNEOn2D();
         fieldCpp=MEDCouplingFieldTemplateClient.New(fieldPtr);
-        fieldPtr.UnRegister();
+        fieldPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildFieldTemplateGaussNEOn2D();
         self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
@@ -292,7 +292,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaMultiFields1(self):
         fieldPtr=self._objC.getMultiFields1()
         fieldCpp=MEDCouplingMultiFieldsClient.New(fieldPtr);
-        fieldPtr.UnRegister()
+        fieldPtr.Destroy()
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildMultiFields1();
         self.assertTrue(fieldCpp.isEqual(refField,1.e-12,1.e-15));
@@ -301,7 +301,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaArrayDouble1(self):
         fieldPtr=self._objC.getArrayDouble1()
         fieldCpp=DataArrayDoubleClient.New(fieldPtr)
-        fieldPtr.UnRegister()
+        fieldPtr.Destroy()
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildArrayDouble1();
         self.assertTrue(fieldCpp.isEqual(refField,1e-12))
@@ -310,7 +310,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaArrayDouble2(self):
         fieldPtr=self._objC.getArrayDouble2()
         fieldCpp=DataArrayDoubleClient.New(fieldPtr)
-        fieldPtr.UnRegister()
+        fieldPtr.Destroy()
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildArrayDouble2();
         self.assertTrue(fieldCpp.isEqual(refField,1e-12))
@@ -319,7 +319,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaArrayDouble3(self):
         fieldPtr=self._objC.getArrayDouble3()
         fieldCpp=DataArrayDoubleClient.New(fieldPtr)
-        fieldPtr.UnRegister()
+        fieldPtr.Destroy()
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildArrayDouble3();
         self.assertTrue(fieldCpp.isEqual(refField,1e-12))
@@ -328,7 +328,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaArrayInt1(self):
         fieldPtr=self._objC.getArrayInt1()
         fieldCpp=DataArrayIntClient.New(fieldPtr)
-        fieldPtr.UnRegister()
+        fieldPtr.Destroy()
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildArrayInt1();
         self.assertTrue(fieldCpp.isEqual(refField))
@@ -337,7 +337,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaArrayInt2(self):
         fieldPtr=self._objC.getArrayInt2()
         fieldCpp=DataArrayIntClient.New(fieldPtr)
-        fieldPtr.UnRegister()
+        fieldPtr.Destroy()
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildArrayInt2();
         self.assertTrue(fieldCpp.isEqual(refField))
@@ -346,7 +346,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaArrayInt3(self):
         fieldPtr=self._objC.getArrayInt3()
         fieldCpp=DataArrayIntClient.New(fieldPtr)
-        fieldPtr.UnRegister()
+        fieldPtr.Destroy()
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildArrayInt3();
         self.assertTrue(fieldCpp.isEqual(refField))
@@ -355,9 +355,9 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaFetchingCoords1(self):
         meshPtr=self._objC.get3DSurfMesh();
         cooPtr=meshPtr.getCoords();
-        meshPtr.UnRegister();
+        meshPtr.Destroy();
         cooCpp=DataArrayDoubleClient.New(cooPtr);
-        cooPtr.UnRegister();
+        cooPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         meshRef=test.build3DSurfMesh();
         #
@@ -367,7 +367,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testCorbaMultiFields2(self):
         fotPtr=self._objC.getMultiFields2();
         fotc=MEDCouplingFieldOverTimeClient.New(fotPtr);
-        fotPtr.UnRegister();
+        fotPtr.Destroy();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         refField=test.buildMultiFields2()
         #

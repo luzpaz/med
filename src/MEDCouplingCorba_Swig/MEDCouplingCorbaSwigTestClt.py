@@ -34,7 +34,7 @@ for i in range(50):
     fCpy=MEDCouplingFieldDoubleClient.New(fCorbaIOR)
     print fCpy.isEqual(f,1e-12,1e-12)
     pass
-fCorbaIOR.UnRegister()
+fCorbaIOR.Destroy()
 
 f=file(MEDCouplingCorbaSwigTest.FileIOR2,"r")
 ior=f.read()
@@ -44,5 +44,5 @@ for i in range(50):
     mCpy=MEDCouplingUMeshClient.New(mCorbaIOR)
     print mCpy.isEqual(m,1e-12)
     pass
-mCorbaIOR.UnRegister()
+mCorbaIOR.Destroy()
 
