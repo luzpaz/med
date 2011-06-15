@@ -20,7 +20,7 @@
 import MEDCouplingCorbaSwigTest
 import MEDCouplingCorbaServantTest_idl
 
-from libMEDCouplingCorba_Swig import *
+from MEDCouplingCorba import *
 
 class MEDCouplingMeshFieldFactoryComponentPy(MEDCouplingCorbaServantTest_idl._0_SALOME_TEST__POA.MEDCouplingMeshFieldFactory):
     def __init__(self,orb):
@@ -107,4 +107,52 @@ class MEDCouplingMeshFieldFactoryComponentPy(MEDCouplingCorbaServantTest_idl._0_
     def getFieldVectorOnCMeshWT(self):
         field=self._test.buildFieldVectorOnCMeshWT()
         return MEDCouplingFieldDoubleServant._this(field)
+
+    def getFieldTemplateCellOn2D(self):
+        field=self._test.buildFieldTemplateCellOn2D()
+        return MEDCouplingFieldTemplateServant._this(field)
+    
+    def getFieldTemplateNodeOn2D(self):
+        field=self._test.buildFieldTemplateNodeOn2D()
+        return MEDCouplingFieldTemplateServant._this(field)
+    
+    def getFieldTemplateGaussPtOn2D(self):
+        field=self._test.buildFieldTemplateGaussPtOn2D()
+        return MEDCouplingFieldTemplateServant._this(field)
+    
+    def getFieldTemplateGaussNEOn2D(self):
+        field=self._test.buildFieldTemplateGaussNEOn2D()
+        return MEDCouplingFieldTemplateServant._this(field)
+
+    def getMultiFields1(self):
+        fields=self._test.buildMultiFields1()
+        return MEDCouplingMultiFieldsServant._this(fields)
+
+    def getArrayDouble1(self):
+        fields=self._test.buildArrayDouble1()
+        return DataArrayDoubleServant._this(fields)
+
+    def getArrayDouble2(self):
+        fields=self._test.buildArrayDouble2()
+        return DataArrayDoubleServant._this(fields)
+
+    def getArrayDouble3(self):
+        fields=self._test.buildArrayDouble3()
+        return DataArrayDoubleServant._this(fields)
+
+    def getArrayInt1(self):
+        fields=self._test.buildArrayInt1()
+        return DataArrayIntServant._this(fields)
+
+    def getArrayInt2(self):
+        fields=self._test.buildArrayInt2()
+        return DataArrayIntServant._this(fields)
+
+    def getArrayInt3(self):
+        fields=self._test.buildArrayInt3()
+        return DataArrayIntServant._this(fields)
+
+    def getMultiFields2(self):
+        fot=self._test.buildMultiFields2()
+        return MEDCouplingFieldOverTimeServant._this(fot)
     pass
