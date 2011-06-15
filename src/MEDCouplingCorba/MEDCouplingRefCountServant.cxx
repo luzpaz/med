@@ -20,12 +20,15 @@
 #include "MEDCouplingRefCountServant.hxx"
 #include "InterpKernelException.hxx"
 #include "MEDCouplingRefCountObject.hxx"
+#include "MEDCouplingTimeLabel.hxx"
 
 #include <iostream>
 
 using namespace ParaMEDMEM;
 
-MEDCouplingRefCountServant::MEDCouplingRefCountServant(const RefCountObject *pointer):_ref_counter(1),_cpp_pointer(pointer)
+MEDCouplingRefCountServant::MEDCouplingRefCountServant(const RefCountObject *pointer, const TimeLabel *pointer2):_ref_counter(1),
+                                                                                                                 _cpp_pointer(pointer),
+                                                                                                                 _tl_pointer(pointer2)
 {
   if(_cpp_pointer)
     _cpp_pointer->incrRef();
@@ -35,6 +38,17 @@ MEDCouplingRefCountServant::MEDCouplingRefCountServant(const RefCountObject *poi
 
 MEDCouplingRefCountServant::~MEDCouplingRefCountServant()
 {
+}
+
+
+CORBA::Long MEDCouplingRefCountServant::getTimeLabel()
+{
+  if(_tl_pointer)
+    {
+      _tl_pointer->updateTime();
+      return _tl_pointer->getTimeOfThis();
+    }
+  return -1;
 }
 
 void MEDCouplingRefCountServant::Register()

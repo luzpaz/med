@@ -17,30 +17,37 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef __MEDCOUPLINGMESHSERVANT_HXX__
-#define __MEDCOUPLINGMESHSERVANT_HXX__
+#ifndef __MEDCOUPLINGFIELDTEMPLATESERVANT_HXX__
+#define __MEDCOUPLINGFIELDTEMPLATESERVANT_HXX__
 
 #include "SALOMEconfig.h"
 #ifdef WNT
 #define NOMINMAX
 #endif
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
-#include "MEDCouplingRefCountServant.hxx"
 #include "MEDCouplingCorba.hxx"
+#include "MEDCouplingFieldServant.hxx"
+#include "MEDCouplingMeshServant.hxx"
+
+#include <vector>
 
 namespace ParaMEDMEM
 {
-  class MEDCouplingMesh;
+  class RefCountObject;
+  class MEDCouplingFieldTemplate;
+  class DataArrayInt;
+  class DataArrayDouble;
 
-  class MEDCOUPLINGCORBA_EXPORT MEDCouplingMeshServant : public MEDCouplingRefCountServant,
-                                                         public virtual POA_SALOME_MED::MEDCouplingMeshCorbaInterface
+  class MEDCOUPLINGCORBA_EXPORT MEDCouplingFieldTemplateServant : public MEDCouplingFieldServant , public virtual POA_SALOME_MED::MEDCouplingFieldTemplateCorbaInterface
   {
+  public:
+    typedef MEDCouplingFieldTemplate CppType;
+    MEDCouplingFieldTemplateServant(const MEDCouplingFieldTemplate *cppPointerOfMesh);
   protected:
-    MEDCouplingMeshServant(const MEDCouplingMesh *cppPointerOfMesh);
-    const MEDCouplingMesh *getPointer() const { return (const MEDCouplingMesh *)(_cpp_pointer); }
+    const MEDCouplingFieldTemplate *getPointer() const { return (const MEDCouplingFieldTemplate *)(_cpp_pointer); }
   protected:
-    void getTinyInfo(SALOME_TYPES::ListOfDouble_out da, SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfString_out sa);
-    void getSerialisationData(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da);
+    void getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da, SALOME_TYPES::ListOfString_out sa);
+    void getSerialisationData(SALOME_TYPES::ListOfLong_out la);
     CORBA::Boolean ExportDataAs(const char *format, SALOME::GenericObj_out exporter);
   };
 }

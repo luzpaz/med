@@ -17,15 +17,16 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include "MEDCouplingFieldDoubleClient.hxx"
+#include "MEDCouplingFieldTemplateClient.hxx"
 #include "MEDCouplingMeshClient.hxx"
+#include "MEDCouplingMemArray.hxx"
 #include "MEDCouplingMesh.hxx"
 
 #include <vector>
 
 using namespace ParaMEDMEM;
 
-MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr fieldPtr)
+MEDCouplingFieldTemplate *MEDCouplingFieldTemplateClient::New(SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr fieldPtr)
 {
   fieldPtr->Register();
   //
@@ -53,8 +54,7 @@ MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplin
   delete tinyS;
   //
   TypeOfField type=(TypeOfField) tinyLV[0];
-  TypeOfTimeDiscretization td=(TypeOfTimeDiscretization) tinyLV[1];
-  MEDCouplingFieldDouble *ret=MEDCouplingFieldDouble::New(type,td);
+  MEDCouplingFieldTemplate *ret=MEDCouplingFieldTemplate::New(type);
   //2nd CORBA call to retrieves the mesh.
   SALOME_MED::MEDCouplingMeshCorbaInterface_ptr meshPtr=fieldPtr->getMesh();
   MEDCouplingMesh *mesh=MEDCouplingMeshClient::New(meshPtr);
@@ -63,12 +63,10 @@ MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplin
   ret->setMesh(mesh);
   mesh->decrRef();
   DataArrayInt *array0;
-  std::vector<DataArrayDouble *> arrays;
-  ret->resizeForUnserialization(tinyLV,array0,arrays);
+  ret->resizeForUnserialization(tinyLV,array0);
   SALOME_TYPES::ListOfLong *bigArr0;
-  SALOME_TYPES::ListOfDouble2 *bigArr;
   //3rd CORBA invokation to get big content
-  fieldPtr->getSerialisationData(bigArr0,bigArr);
+  fieldPtr->getSerialisationData(bigArr0);
   if(bigArr0->length()!=0)
     {
       int *pt=array0->getPointer();
@@ -77,20 +75,9 @@ MEDCouplingFieldDouble *MEDCouplingFieldDoubleClient::New(SALOME_MED::MEDCouplin
         pt[i]=(*bigArr0)[i];
     }
   delete bigArr0;
-  tinyLgth=arrays.size();
-  for(int i=0;i<tinyLgth;i++)
-    {
-      SALOME_TYPES::ListOfDouble& oneArr=(*bigArr)[i];
-      DataArrayDouble *curArrToFill=arrays[i];
-      double *pt=curArrToFill->getPointer();
-      int lgth=curArrToFill->getNbOfElems();
-      for(int j=0;j<lgth;j++)
-        pt[j]=oneArr[j];
-    }
-  delete bigArr;
   //
   //notify server that the servant is no more used.
-  fieldPtr->Register();
+  fieldPtr->Destroy();
   //
   ret->finishUnserialization(tinyLV,tinyLD,tinyLS);
   //

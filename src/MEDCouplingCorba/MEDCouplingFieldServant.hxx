@@ -26,17 +26,21 @@
 #endif
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
 #include "MEDCouplingCorba.hxx"
-#include "MEDCouplingMeshServant.hxx"
+#include "MEDCouplingRefCountServant.hxx"
 
 namespace ParaMEDMEM
 {
+  class MEDCouplingMesh;
   class MEDCouplingField;
 
-  class MEDCOUPLINGCORBA_EXPORT MEDCouplingFieldServant : public MEDCouplingRefCountServant , public virtual POA_SALOME_MED::MEDCouplingFieldCorbaInterface
+  class MEDCOUPLINGCORBA_EXPORT MEDCouplingFieldServant : public MEDCouplingRefCountServant,
+                                                          public virtual POA_SALOME_MED::MEDCouplingFieldCorbaInterface
   {
   protected:
     MEDCouplingFieldServant(const MEDCouplingField *cppPointerOfMesh);
     const MEDCouplingField *getPointer() const { return (const MEDCouplingField *)(_cpp_pointer); }
+  public:
+    static SALOME_MED::MEDCouplingMeshCorbaInterface_ptr BuildCorbaRefFromCppPointer(const MEDCouplingMesh *mesh);
   protected:
     SALOME_MED::MEDCouplingMeshCorbaInterface_ptr getMesh();
   };

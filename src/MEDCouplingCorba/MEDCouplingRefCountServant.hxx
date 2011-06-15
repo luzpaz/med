@@ -27,19 +27,22 @@
 
 namespace ParaMEDMEM
 {
+  class TimeLabel;
   class RefCountObject;
 
-  class MEDCOUPLINGCORBA_EXPORT MEDCouplingRefCountServant : public virtual POA_SALOME::GenericObj
+  class MEDCOUPLINGCORBA_EXPORT MEDCouplingRefCountServant : public virtual POA_SALOME_MED::MEDCouplingRefCountCorbaInterface
   {
   protected:
-    MEDCouplingRefCountServant(const RefCountObject *pointer);
+    MEDCouplingRefCountServant(const RefCountObject *pointer, const TimeLabel *pointer2);
     ~MEDCouplingRefCountServant();
   protected:
     void Register();
     void Destroy();
+    CORBA::Long getTimeLabel();
   protected:
     int _ref_counter;
     const RefCountObject *_cpp_pointer;
+    const TimeLabel *_tl_pointer;
   };
 }
 

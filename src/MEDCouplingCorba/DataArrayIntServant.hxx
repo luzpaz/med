@@ -17,27 +17,32 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef __MEDCOUPLINGCMESHSERVANT_HXX__
-#define __MEDCOUPLINGCMESHSERVANT_HXX__
+#ifndef __DATAARRAYINTSERVANT_HXX__
+#define __DATAARRAYINTSERVANT_HXX__
 
 #include "SALOMEconfig.h"
-
+#ifdef WNT
+#define NOMINMAX
+#endif
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
-#include "MEDCouplingMeshServant.hxx"
 #include "MEDCouplingCorba.hxx"
+#include "MEDCouplingRefCountServant.hxx"
 
 namespace ParaMEDMEM
 {
-  class MEDCouplingCMesh;
+  class RefCountObject;
+  class DataArrayInt;
 
-  class MEDCOUPLINGCORBA_EXPORT MEDCouplingCMeshServant : MEDCouplingMeshServant, public virtual POA_SALOME_MED::MEDCouplingCMeshCorbaInterface
+  class MEDCOUPLINGCORBA_EXPORT DataArrayIntServant : public MEDCouplingRefCountServant , public virtual POA_SALOME_MED::DataArrayIntCorbaInterface
   {
   public:
-    typedef MEDCouplingCMesh CppType;
-    MEDCouplingCMeshServant(const MEDCouplingCMesh *cppPointerOfMesh);
-    ~MEDCouplingCMeshServant();
-  private:
-    const MEDCouplingCMesh *getPointer() const { return (const MEDCouplingCMesh *)(_cpp_pointer); }
+    typedef DataArrayInt CppType;
+    DataArrayIntServant(const DataArrayInt *cppPointer);
+  protected:
+    const DataArrayInt *getPointer() const { return (const DataArrayInt *)(_cpp_pointer); }
+  public:
+    void getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfString_out sa);
+    void getSerialisationData(SALOME_TYPES::ListOfLong_out da);
   };
 }
 

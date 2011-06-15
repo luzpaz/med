@@ -18,6 +18,7 @@
 //
 
 #include "MEDCouplingFieldServant.hxx"
+#include "MEDCouplingMeshServant.hxx"
 #include "MEDCouplingUMeshServant.hxx"
 #include "MEDCouplingCMeshServant.hxx"
 #include "MEDCouplingExtrudedMeshServant.hxx"
@@ -28,24 +29,25 @@
 
 using namespace ParaMEDMEM;
 
-MEDCouplingFieldServant::MEDCouplingFieldServant(const MEDCouplingField *cppPointerOfMesh):MEDCouplingRefCountServant(cppPointerOfMesh)
+MEDCouplingFieldServant::MEDCouplingFieldServant(const MEDCouplingField *cppPointerOfMesh):MEDCouplingRefCountServant(cppPointerOfMesh,cppPointerOfMesh)
 {
 }
 
-SALOME_MED::MEDCouplingMeshCorbaInterface_ptr MEDCouplingFieldServant::getMesh()
+SALOME_MED::MEDCouplingMeshCorbaInterface_ptr MEDCouplingFieldServant::BuildCorbaRefFromCppPointer(const MEDCouplingMesh *mesh)
 {
-  const MEDCouplingMesh *mesh=getPointer()->getMesh();
   const MEDCouplingUMesh *uMesh=dynamic_cast<const MEDCouplingUMesh *>(mesh);
   if(uMesh)
     {
       MEDCouplingUMeshServant *retServ=new MEDCouplingUMeshServant(uMesh);
-      return retServ->_this();
+      SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr ret=retServ->_this();//let this line even if it seems fool
+      return ret;
     }
   const MEDCouplingCMesh *cMesh=dynamic_cast<const MEDCouplingCMesh *>(mesh);
   if(cMesh)
     {
       MEDCouplingCMeshServant *retServ=new MEDCouplingCMeshServant(cMesh);
-      return retServ->_this();
+      SALOME_MED::MEDCouplingCMeshCorbaInterface_ptr ret=retServ->_this();//let this line even if it seems fool
+      return ret;
     }
   const MEDCouplingExtrudedMesh *eMesh=dynamic_cast<const MEDCouplingExtrudedMesh *>(mesh);
   if(eMesh)
@@ -54,4 +56,10 @@ SALOME_MED::MEDCouplingMeshCorbaInterface_ptr MEDCouplingFieldServant::getMesh()
       return retServ->_this();
     }
   throw INTERP_KERNEL::Exception("Not dealt mesh type !");
+}
+
+SALOME_MED::MEDCouplingMeshCorbaInterface_ptr MEDCouplingFieldServant::getMesh()
+{
+  const MEDCouplingMesh *mesh=getPointer()->getMesh();
+  return BuildCorbaRefFromCppPointer(mesh);
 }

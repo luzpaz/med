@@ -63,6 +63,19 @@ namespace SALOME_TEST
     CPPUNIT_TEST( checkCorbaFieldGaussPtNE2DWTFetching );
     CPPUNIT_TEST( checkCorbaFieldVectorOnExtrudedWT );
     CPPUNIT_TEST( checkCorbaFieldVectorOnCMeshWT );
+    CPPUNIT_TEST( checkCorbaFieldTemplateCellOn2D );
+    CPPUNIT_TEST( checkCorbaFieldTemplateNodeOn2D );
+    CPPUNIT_TEST( checkCorbaFieldTemplateGaussPtOn2D );
+    CPPUNIT_TEST( checkCorbaFieldTemplateGaussNEOn2D );
+    CPPUNIT_TEST( checkCorbaMultiFields1 );
+    CPPUNIT_TEST( checkCorbaArrayDouble1 );
+    CPPUNIT_TEST( checkCorbaArrayDouble2 );
+    CPPUNIT_TEST( checkCorbaArrayDouble3 );
+    CPPUNIT_TEST( checkCorbaArrayInt1 );
+    CPPUNIT_TEST( checkCorbaArrayInt2 );
+    CPPUNIT_TEST( checkCorbaArrayInt3 );
+    CPPUNIT_TEST( checkCorbaFetchingCoords1 );
+    CPPUNIT_TEST( checkCorbaMultiFields2 );
     CPPUNIT_TEST( shutdownServer );
     CPPUNIT_TEST_SUITE_END();
   public:
@@ -91,6 +104,19 @@ namespace SALOME_TEST
     void checkCorbaFieldGaussPtNE2DWTFetching();
     void checkCorbaFieldVectorOnExtrudedWT();
     void checkCorbaFieldVectorOnCMeshWT();
+    void checkCorbaFieldTemplateCellOn2D();
+    void checkCorbaFieldTemplateNodeOn2D();
+    void checkCorbaFieldTemplateGaussPtOn2D();
+    void checkCorbaFieldTemplateGaussNEOn2D();
+    void checkCorbaMultiFields1();
+    void checkCorbaArrayDouble1();
+    void checkCorbaArrayDouble2();
+    void checkCorbaArrayDouble3();
+    void checkCorbaArrayInt1();
+    void checkCorbaArrayInt2();
+    void checkCorbaArrayInt3();
+    void checkCorbaFetchingCoords1();
+    void checkCorbaMultiFields2();
     void shutdownServer();
   private:
     static void *checkCorbaField2DNTMultiFetchingMTStatic(void *stack);

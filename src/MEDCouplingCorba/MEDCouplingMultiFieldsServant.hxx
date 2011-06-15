@@ -17,8 +17,8 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef __MEDCOUPLINGFIELDDOUBLESERVANT_HXX__
-#define __MEDCOUPLINGFIELDDOUBLESERVANT_HXX__
+#ifndef __MEDCOUPLINGMULTIFIELDSSERVANT_HXX__
+#define __MEDCOUPLINGMULTIFIELDSSERVANT_HXX__
 
 #include "SALOMEconfig.h"
 #ifdef WNT
@@ -34,20 +34,27 @@
 namespace ParaMEDMEM
 {
   class RefCountObject;
-  class MEDCouplingFieldDouble;
-  class DataArrayInt;
-  class DataArrayDouble;
+  class MEDCouplingMultiFields;
 
-  class MEDCOUPLINGCORBA_EXPORT MEDCouplingFieldDoubleServant : public MEDCouplingFieldServant, public virtual POA_SALOME_MED::MEDCouplingFieldDoubleCorbaInterface
+  class MEDCOUPLINGCORBA_EXPORT MEDCouplingMultiFieldsServant : public MEDCouplingRefCountServant,
+                                                                public virtual POA_SALOME_MED::MEDCouplingMultiFieldsCorbaInterface
   {
   public:
-    typedef MEDCouplingFieldDouble CppType;
-    MEDCouplingFieldDoubleServant(const MEDCouplingFieldDouble *cppPointerOfMesh);
+    typedef MEDCouplingMultiFields CppType;
+    MEDCouplingMultiFieldsServant(const MEDCouplingMultiFields *cppPointer);
   protected:
-    const MEDCouplingFieldDouble *getPointer() const { return (const MEDCouplingFieldDouble *)(_cpp_pointer); }
+    const MEDCouplingMultiFields *getPointer() const { return (const MEDCouplingMultiFields *)(_cpp_pointer); }
   protected:
-    void getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da, SALOME_TYPES::ListOfString_out sa);
-    void getSerialisationData(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble2_out da2);
+    CORBA::Long getMainTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da, CORBA::Long& nbOfArrays, CORBA::Long& nbOfFields);
+    // for field templates
+    void getTinyInfo(CORBA::Long id, SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da, SALOME_TYPES::ListOfString_out sa);
+    void getSerialisationData(CORBA::Long id, SALOME_TYPES::ListOfLong_out la);
+    // for arrays
+    SALOME_MED::DataArrayDoubleCorbaInterface_ptr getArray(CORBA::Long id);
+    // for meshes
+    SALOME_MED::MEDCouplingMeshesCorbaInterface *getMeshes();
+    SALOME_MED::MEDCouplingMeshCorbaInterface_ptr getMeshWithId(CORBA::Long id);
+    //
     CORBA::Boolean ExportDataAs(const char *format, SALOME::GenericObj_out exporter);
   };
 }

@@ -17,16 +17,18 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include "MEDCouplingFieldDoubleServant.hxx"
-#include "MEDCouplingFieldDouble.hxx"
+#include "MEDCouplingFieldTemplateServant.hxx"
+#include "MEDCouplingFieldTemplate.hxx"
+
+#include "MEDCouplingMemArray.hxx"
 
 using namespace ParaMEDMEM;
 
-MEDCouplingFieldDoubleServant::MEDCouplingFieldDoubleServant(const MEDCouplingFieldDouble *cppPointerOfMesh):MEDCouplingFieldServant(cppPointerOfMesh)
+MEDCouplingFieldTemplateServant::MEDCouplingFieldTemplateServant(const MEDCouplingFieldTemplate *cppPointerOfMesh):MEDCouplingFieldServant(cppPointerOfMesh)
 {
 }
 
-void MEDCouplingFieldDoubleServant::getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da, SALOME_TYPES::ListOfString_out sa)
+void MEDCouplingFieldTemplateServant::getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da, SALOME_TYPES::ListOfString_out sa)
 {
   la=new SALOME_TYPES::ListOfLong;
   std::vector<int> tinyInfo;
@@ -50,11 +52,10 @@ void MEDCouplingFieldDoubleServant::getTinyInfo(SALOME_TYPES::ListOfLong_out la,
     (*sa)[i]=CORBA::string_dup(tinyInfo3[i].c_str());
 }
 
-void MEDCouplingFieldDoubleServant::getSerialisationData(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble2_out da2)
+void MEDCouplingFieldTemplateServant::getSerialisationData(SALOME_TYPES::ListOfLong_out la)
 {
-  std::vector<DataArrayDouble *> arrays;
   DataArrayInt *dataInt;
-  getPointer()->serialize(dataInt,arrays);
+  getPointer()->serialize(dataInt);
   //
   la=new SALOME_TYPES::ListOfLong;
   if(dataInt)
@@ -67,32 +68,15 @@ void MEDCouplingFieldDoubleServant::getSerialisationData(SALOME_TYPES::ListOfLon
     }
   else
     la->length(0);
-  //
-  da2=new SALOME_TYPES::ListOfDouble2;
-  int lgth=arrays.size();
-  da2->length(lgth);
-  for(int i=0;i<lgth;i++)
-    {
-      SALOME_TYPES::ListOfDouble& locCorbaArr=(*da2)[i];
-      DataArrayDouble *locArr=arrays[i];
-      int lgth2=locArr->getNbOfElems();
-      locCorbaArr.length(lgth2);
-      const double *pt=locArr->getConstPointer();
-      for(int j=0;j<lgth2;j++)
-        locCorbaArr[j]=pt[j];
-    }
 }
 
-CORBA::Boolean MEDCouplingFieldDoubleServant::ExportDataAs(const char *format, SALOME::GenericObj_out exporter)
+CORBA::Boolean MEDCouplingFieldTemplateServant::ExportDataAs(const char *format, SALOME::GenericObj_out exporter)
 {
   std::string frmCpp(format);
   if(frmCpp=="MEDCorba")
     {
-      SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr cPtr=_this();
-      Register();
-      exporter=cPtr;
+      exporter=getMesh();
       return true;
     }
-  exporter=SALOME::GenericObj::_nil();
   return false;
 }

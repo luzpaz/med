@@ -17,27 +17,30 @@
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef __MEDCOUPLINGCMESHSERVANT_HXX__
-#define __MEDCOUPLINGCMESHSERVANT_HXX__
+#ifndef __MEDCOUPLINGFIELDOVERTIMESERVANT_HXX__
+#define __MEDCOUPLINGFIELDOVERTIMESERVANT_HXX__
 
 #include "SALOMEconfig.h"
-
+#ifdef WNT
+#define NOMINMAX
+#endif
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
-#include "MEDCouplingMeshServant.hxx"
 #include "MEDCouplingCorba.hxx"
+#include "MEDCouplingMultiFieldsServant.hxx"
+#include "MEDCouplingFieldOverTime.hxx"
 
 namespace ParaMEDMEM
 {
-  class MEDCouplingCMesh;
-
-  class MEDCOUPLINGCORBA_EXPORT MEDCouplingCMeshServant : MEDCouplingMeshServant, public virtual POA_SALOME_MED::MEDCouplingCMeshCorbaInterface
+  class MEDCOUPLINGCORBA_EXPORT MEDCouplingFieldOverTimeServant : public MEDCouplingMultiFieldsServant,
+                                                                  public virtual POA_SALOME_MED::MEDCouplingFieldOverTimeCorbaInterface
   {
   public:
-    typedef MEDCouplingCMesh CppType;
-    MEDCouplingCMeshServant(const MEDCouplingCMesh *cppPointerOfMesh);
-    ~MEDCouplingCMeshServant();
-  private:
-    const MEDCouplingCMesh *getPointer() const { return (const MEDCouplingCMesh *)(_cpp_pointer); }
+    typedef MEDCouplingFieldOverTime CppType;
+    MEDCouplingFieldOverTimeServant(const MEDCouplingFieldOverTime *cppPointer);
+  protected:
+    const MEDCouplingFieldOverTime *getPointer() const { return (const MEDCouplingFieldOverTime *)(_cpp_pointer); }
+  protected:
+    void getTinyInfoAboutTimeDefinition(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da);
   };
 }
 

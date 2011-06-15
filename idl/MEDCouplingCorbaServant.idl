@@ -25,16 +25,37 @@
 
 module SALOME_MED
 {
+  interface MEDCouplingTimeLabelCorbaInterface
+  {
+    long getTimeLabel();
+  };
 
-  interface MEDCouplingMeshCorbaInterface : SALOME::GenericObj
+  interface MEDCouplingRefCountCorbaInterface : SALOME::GenericObj, MEDCouplingTimeLabelCorbaInterface
+  {
+  };
+
+  interface DataArrayDoubleCorbaInterface : MEDCouplingRefCountCorbaInterface
+  {
+    void getTinyInfo(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfString sa);
+    void getSerialisationData(out SALOME_TYPES::ListOfDouble da);
+  };
+
+  interface DataArrayIntCorbaInterface : MEDCouplingRefCountCorbaInterface
+  {
+    void getTinyInfo(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfString sa);
+    void getSerialisationData(out SALOME_TYPES::ListOfLong la);
+  };
+
+  interface MEDCouplingMeshCorbaInterface : MEDCouplingRefCountCorbaInterface
   {
     //!CORBA inplementation of MEDCouplingPointSet::getTinySerializationInformation
-    void getTinyInfo(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfString sa);
+    void getTinyInfo(out SALOME_TYPES::ListOfDouble da, out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfString sa);
     void getSerialisationData(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfDouble da);
   };
 
   interface MEDCouplingPointSetCorbaInterface : MEDCouplingMeshCorbaInterface
   {
+    DataArrayDoubleCorbaInterface getCoords();
   };
 
   interface MEDCouplingUMeshCorbaInterface : MEDCouplingPointSetCorbaInterface
@@ -49,9 +70,16 @@ module SALOME_MED
   {
   };
 
-  interface MEDCouplingFieldCorbaInterface : SALOME::GenericObj
+  interface MEDCouplingFieldCorbaInterface : MEDCouplingRefCountCorbaInterface
   {
     MEDCouplingMeshCorbaInterface getMesh();
+  };
+  
+  interface MEDCouplingFieldTemplateCorbaInterface : MEDCouplingFieldCorbaInterface
+  {
+    //!returns the 3 tiny arrays to prepare the new instance locally.
+    void getTinyInfo(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfDouble da, out SALOME_TYPES::ListOfString sa);
+    void getSerialisationData(out SALOME_TYPES::ListOfLong la);
   };
 
   interface MEDCouplingFieldDoubleCorbaInterface : MEDCouplingFieldCorbaInterface
@@ -59,6 +87,26 @@ module SALOME_MED
     //!returns the 3 tiny arrays to prepare the new instance locally.
     void getTinyInfo(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfDouble da, out SALOME_TYPES::ListOfString sa);
     void getSerialisationData(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfDouble2 da2);
+  };
+
+  typedef sequence<MEDCouplingMeshCorbaInterface> MEDCouplingMeshesCorbaInterface;
+
+  interface MEDCouplingMultiFieldsCorbaInterface : MEDCouplingRefCountCorbaInterface
+  {
+    long getMainTinyInfo(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfDouble da, out long nbOfArrays, out long nbOfFields);
+    //!for field templates
+    void getTinyInfo(in long id, out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfDouble da, out SALOME_TYPES::ListOfString sa);
+    void getSerialisationData(in long id, out SALOME_TYPES::ListOfLong la);
+    //!for arrays
+    DataArrayDoubleCorbaInterface getArray(in long id);
+    //! for meshes
+    MEDCouplingMeshesCorbaInterface getMeshes();
+    MEDCouplingMeshCorbaInterface getMeshWithId(in long id);
+  };
+
+  interface MEDCouplingFieldOverTimeCorbaInterface : MEDCouplingMultiFieldsCorbaInterface
+  {
+    void getTinyInfoAboutTimeDefinition(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfDouble da);
   };
 };
 
