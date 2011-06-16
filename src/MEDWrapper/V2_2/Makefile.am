@@ -32,7 +32,7 @@ salomeinclude_HEADERS = \
 dist_libMEDWrapper_V2_2_la_SOURCES = \
 	MED_V2_2_Wrapper.cxx
 
-libMEDWrapper_V2_2_la_CPPFLAGS= $(BOOST_CPPFLAGS) $(MED2_INCLUDES) -I$(srcdir)/../Base
+libMEDWrapper_V2_2_la_CPPFLAGS= $(BOOST_CPPFLAGS) $(MED2_INCLUDES) $(HDF5_INCLUDES) -I$(srcdir)/../Base
 if MED_ENABLE_KERNEL
   libMEDWrapper_V2_2_la_CPPFLAGS+= -I$(KERNEL_ROOT_DIR)/include/salome
 else
