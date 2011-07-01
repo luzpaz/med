@@ -1004,6 +1004,16 @@ void _intermediateMED::getGroups(vector<GROUP *> & _groupCell,
 
     vect_group->push_back(new_group);
 
+    // Issue 0021311. Use case: a gibi group has references (recorded in pile 1)
+    // and several names (pile 27) refer (pile 10) to this group.
+    // We create a copy of this group per each named reference
+    for ( unsigned iRef = 0 ; iRef < grp.refNames.size(); ++iRef )
+      if ( !grp.refNames[ iRef ].empty() )
+      {
+        vect_group->push_back( new GROUP( *new_group ));
+        vect_group->back()->setName( grp.refNames[ iRef ] );
+      }
+
     delete [] tab_types_geometriques;
     delete [] tab_index_types_geometriques;
     delete [] tab_numeros_elements;

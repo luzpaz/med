@@ -464,6 +464,11 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
           medi->groupes.push_back(_groupe());
           _groupe & groupe = medi->groupes.back();
 
+          // Issue 0021311. Allocate places for names of referring groups
+          // that will be possibly filled after reading long names from
+          // PILE_TABLES and PILE_STRINGS
+          groupe.refNames.resize( nb_reference );
+
           // si le groupe se compose de sous-maillages (ie groupe composite)
           if (type_geom_castem==0 && nb_sous_maillage>0)
           {
@@ -1176,26 +1181,15 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
 
         for (int itable = 1; itable <= nb_objets; itable++) {
           // read tables "MED_MAIL", "MED_CHAM" and "MED_COMP", that keeps correspondence
-          // between GIBI names (8 symbols) and MED names (possibly longer)
-          getNextLine( ligne );
-          int nb_table_vals;
-#ifdef HAS_XDR
-          if(_is_xdr)
-            {
-              initIntReading(1);
-              nb_table_vals = getInt();
-              next();
-            }
-          else
-#endif
-            nb_table_vals = atoi( ligne );
+          // between GIBI names (8 symbols if any) and MED names (possibly longer)
+          initIntReading(1);
+          int nb_table_vals = getInt(); next();
           if (nb_table_vals < 0) {
             INFOS_MED("Erreur de lecture dans enregistrement de pile " <<
                       PILE_TABLES << DUMP_LINE_NB );
             return false;
           }
 
-          //int name_i_val_pile;
           int name_i_med_pile;
           initIntReading(nb_table_vals);
           for (int i = 0; i < nb_table_vals/4; i++)
@@ -1205,10 +1199,6 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
                 itable == table_med_comp_id)
             {
               nameGIBItoMED name_i;
-              //name_i.key_pile = getInt(); next();
-              //name_i.key_id   = getInt(); next();
-              //name_i_val_pile = getInt(); next();
-              //name_i.val_id   = getInt(); next();
               name_i_med_pile  = getInt(); next();
               name_i.med_id    = getInt(); next();
               name_i.gibi_pile = getInt(); next();
@@ -1342,11 +1332,20 @@ bool GIBI_MESH_RDONLY_DRIVER::readFile (_intermediateMED* medi, bool readFields 
   // IMP 0020434: mapping GIBI names to MED names
   // set med names to objects (mesh, fields, support, group or other)
   if (listGIBItoMED_mail.size() > 0) {
+    set<int> treatedGroups;
     list<nameGIBItoMED>::iterator itGIBItoMED = listGIBItoMED_mail.begin();
     for (; itGIBItoMED != listGIBItoMED_mail.end(); itGIBItoMED++) {
-      _groupe & grp = medi->groupes[itGIBItoMED->gibi_id - 1];
       if ( medi->groupes.size() < itGIBItoMED->gibi_id ) continue;
-      grp.nom = mapStrings[itGIBItoMED->med_id];
+      _groupe & grp = medi->groupes[itGIBItoMED->gibi_id - 1];
+      // if there are several names for grp then the 1st name is the name
+      // of grp and the rest ones are names of groups referring grp (issue 0021311)
+      const bool isRefName = !treatedGroups.insert( itGIBItoMED->gibi_id ).second;
+      if ( !isRefName )
+        grp.nom = mapStrings[ itGIBItoMED->med_id ];
+      else
+        for ( unsigned i = 0; i < grp.refNames.size(); ++i )
+          if ( grp.refNames[i].empty() )
+            grp.refNames[i] = mapStrings[ itGIBItoMED->med_id ];
     } // iterate on listGIBItoMED_mail
   }
   if (listGIBItoMED_cham.size() > 0) {

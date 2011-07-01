@@ -132,6 +132,13 @@ struct MEDMEM_EXPORT _groupe
   std::map<unsigned,int> relocMap; // map _maille::ordre() -> index in GROUP, built by getGroups()
   GROUP*                 medGroup;
 
+  std::vector<std::string> refNames; /* names of groups referring this one;
+                                        refNames is resized according to nb of references
+                                        while reading a group (pile 1) and it is filled with
+                                        names while reading long names (pile 27); each named
+                                        reference is converted into a copy of the medGroup
+                                        (issue 0021311)
+                                      */
   const _maille& maille(int index) { return *mailles[index]; }
   bool empty() const { return mailles.empty() && groupes.empty(); }
 #ifdef WNT
