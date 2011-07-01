@@ -1340,7 +1340,7 @@ int  MED_MESH_RDONLY_DRIVER21::getFAMILY()
 
     // Creation of the families
     int NumberOfFamilies = MEDnFam(_medIdt,const_cast <char *> (_meshName.c_str()),0,med_2_1::MED_FAMILLE) ;
-    if ( NumberOfFamilies < 1 ) // at least family 0 must exist 
+    if ( NumberOfFamilies < 1 && !_ptrMesh->getIsAGrid() ) // at least family 0 must exist 
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"There is no FAMILY, FAMILY 0 must exists" ));
 
     SCRUTE_MED(NumberOfFamilies);
