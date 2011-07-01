@@ -2568,12 +2568,18 @@ void MESH::createFamilies()
     for (unsigned g=0; g!=myGroups.size(); ++g)
     {
       // scan cells that belongs to the group
-      const int* groupCells=myGroups[g]->getnumber()->getValue();
-      int nbCells=myGroups[g]->getnumber()->getLength();
-      for(int c=0; c!=nbCells; ++c)
-        tab_cell[groupCells[c]-1].groups.push_back(g);
+      if ( myGroups[g]->isOnAllElements() )
+      {
+        for(int c=0; c!=numberOfCells; ++c)
+          tab_cell[c].groups.push_back(g);
+      }
+      else if (int nbCells=myGroups[g]->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS))
+      {
+        const int* groupCells=myGroups[g]->getnumber()->getValue();
+        for(int c=0; c!=nbCells; ++c)
+          tab_cell[groupCells[c]-1].groups.push_back(g);
+      }
     }
-
 
     // 3 - Scan the cells vector, genarate family name, and create a map associating the family names
     //     whith the vector of contained cells
