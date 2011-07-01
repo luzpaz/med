@@ -34,7 +34,7 @@ namespace MEDMEM {
   MEDMEM_EXPORT MED_EN::medFileVersion getMedFileVersion(const string & fileName)
     throw (MEDEXCEPTION);
 
-  med_2_3::med_access_mode getMedAccessMode(MED_EN::med_mode_acces mode);
+  MEDMEM_EXPORT med_2_3::med_access_mode getMedAccessMode(MED_EN::med_mode_acces mode);
 }
 
 #endif /* MED_VERSION_HXX */
