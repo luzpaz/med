@@ -989,7 +989,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
     this->getMeshGeometricTypeFromMESH(ptrMesh,entityType,MESHgeoType,
                                        MESHnbOfElOfType,MESHnbOfElOfTypeC);
   // porting MED3
-  med_2_3::med_int spceDimp3,mdimp3;
+  med_2_3::med_int spceDimp3=-1,mdimp3;
   med_2_3::med_mesh_type mtype;
   char desccp3[MED_COMMENT_SIZE+1];
   char dttunittp3[MED_LNAME_SIZE+1];
@@ -999,7 +999,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
   int naxis=std::max(3,med_2_3::MEDmeshnAxisByName(id,meshName.c_str()));
   char *annp3=new char[naxis*MED_SNAME_SIZE+1];
   char *auup3=new char[naxis*MED_SNAME_SIZE+1];
-  bool fileHasMesh=(med_2_3::MEDmeshInfoByName(id,meshName.c_str(),&spceDimp3,&mdimp3,&mtype,desccp3,dttunittp3,&sttp3,&nsteppp3,&axxxppp3,annp3,auup3)==0);
+  bool fileHasMesh=(med_2_3::MEDmeshInfoByName(id,meshName.c_str(),&spceDimp3,&mdimp3,&mtype,desccp3,dttunittp3,&sttp3,&nsteppp3,&axxxppp3,annp3,auup3)==0 && spceDimp3 > 0);
   delete [] annp3;
   delete [] auup3;
   // end porting MED3
@@ -1305,57 +1305,57 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
   if (anyProfil)
   {
     for (int typeNo=0; typeNo < NumberOfTypes; typeNo++)
-    {
-      MED_EN::medGeometryElement geomType = types[typeNo];
-
-      // Trouve l'index du type géométrique dans la liste des types géométriques du maillage
-      // correspondant au type géométrique du champ traité
-      vector<MED_EN::medGeometryElement>::iterator meshTypeNoIt =
-        find(meshGeoType.begin(),meshGeoType.end(),geomType); //Gérer l'exception
-      if (meshTypeNoIt ==  meshGeoType.end())
-        throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<": Can't find "<< MED_EN::geoNames[geomType]
-                                     << " on entity " << MED_EN::entNames[entityType]
-                                     << " in geometric type list of mesh " << meshName));
-      int meshTypeNo = meshTypeNoIt - meshGeoType.begin();
-
-      if (! profilList[typeNo].empty() )
       {
-//      for (int j =0 ; j< meshGeoType.size();++j)
-//        cout << "--MeshTypeNo : "<<meshTypeNo<<"-> meshNbOfElOfTypeC["<<j<<"]="<<meshNbOfElOfTypeC[j]<<endl;
-//      cout << "--typeNo--" << typeNo << endl;
-//      cout << "meshNbOfElOfTypeC["<<meshTypeNo<<"]=" << meshNbOfElOfTypeC[meshTypeNo] <<endl;
+        MED_EN::medGeometryElement geomType = types[typeNo];
 
-        // Transformer les numéros locaux d'entités medfichier en numéro global medmémoire
-        for (unsigned i = 0; i < profilList[typeNo].size(); i++) {
-          // Les numéros des entités commencent à 1 dans MEDfichier comme dans MEDmémoire
-          // meshNbOfElOfTypeC[0]=0 ...meshNbOfEltOfTypeC[meshTypeNo]=
-          // meshNbOfElOfTypeC[meshTypeNo-1]+nbrOfElem of meshTypeNo type
-          // rem1 : Si le meshTypeNo trouvé est 0 (premier type géométrique du maillage
-          // il ne faut pas décaler les numéros du profils qui commencent à 1 dans MEDFICHIER
-          // rem2 : meshNbOfElOfTypeC[NumberOfTypes] ne devrait jamais être utilisé
-          profilList[typeNo][i]+=meshNbOfElOfTypeC[meshTypeNo];
+        // Trouve l'index du type géométrique dans la liste des types géométriques du maillage
+        // correspondant au type géométrique du champ traité
+        vector<MED_EN::medGeometryElement>::iterator meshTypeNoIt =
+          find(meshGeoType.begin(),meshGeoType.end(),geomType); //Gérer l'exception
+        if (meshTypeNoIt ==  meshGeoType.end())
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC) <<": Can't find "<< MED_EN::geoNames[geomType]
+                                       << " on entity " << MED_EN::entNames[entityType]
+                                       << " in geometric type list of mesh " << meshName));
+        int meshTypeNo = meshTypeNoIt - meshGeoType.begin();
+
+        if (! profilList[typeNo].empty() )
+          {
+            //      for (int j =0 ; j< meshGeoType.size();++j)
+            //        cout << "--MeshTypeNo : "<<meshTypeNo<<"-> meshNbOfElOfTypeC["<<j<<"]="<<meshNbOfElOfTypeC[j]<<endl;
+            //      cout << "--typeNo--" << typeNo << endl;
+            //      cout << "meshNbOfElOfTypeC["<<meshTypeNo<<"]=" << meshNbOfElOfTypeC[meshTypeNo] <<endl;
+
+            // Transformer les numéros locaux d'entités medfichier en numéro global medmémoire
+            for (unsigned i = 0; i < profilList[typeNo].size(); i++) {
+              // Les numéros des entités commencent à 1 dans MEDfichier comme dans MEDmémoire
+              // meshNbOfElOfTypeC[0]=0 ...meshNbOfEltOfTypeC[meshTypeNo]=
+              // meshNbOfElOfTypeC[meshTypeNo-1]+nbrOfElem of meshTypeNo type
+              // rem1 : Si le meshTypeNo trouvé est 0 (premier type géométrique du maillage
+              // il ne faut pas décaler les numéros du profils qui commencent à 1 dans MEDFICHIER
+              // rem2 : meshNbOfElOfTypeC[NumberOfTypes] ne devrait jamais être utilisé
+              profilList[typeNo][i]+=meshNbOfElOfTypeC[meshTypeNo];
+            }
+          } else {
+          // Créer le profil <MED_ALL> pour ce type géométrique
+          // uniquement pour renseigner le tableau skyline avec des accesseurs directs
+          // par type géométriques
+          // REM : Une conséquence est qu'à la réecriture le fichier contiendra des
+          // profils sur certains types géométriques alors qu'à la lecture il n'y en avait pas !
+          // Solution : Stocker les noms des profils et les utiliser pour savoir si il y avait ou non
+          //            un profil
+          int pflSize = meshNbOfElOfType[meshTypeNo];
+          // profil    = new int[pflSize];
+
+          profilList[typeNo].resize(pflSize);
+          profilSize[typeNo] = pflSize;
+
+          for (int j = 1; j <= pflSize; j++) {
+            profilList[typeNo][j-1] = meshNbOfElOfTypeC[meshTypeNo] + j ; // index MEDMEM commence à 1
+          }
+          profilNameList[typeNo] = MED_NO_PROFILE; //Information a utiliser pour la sauvegarde : PLUTOT MED_ALL
         }
-      } else {
-        // Créer le profil <MED_ALL> pour ce type géométrique
-        // uniquement pour renseigner le tableau skyline avec des accesseurs directs
-        // par type géométriques
-        // REM : Une conséquence est qu'à la réecriture le fichier contiendra des
-        // profils sur certains types géométriques alors qu'à la lecture il n'y en avait pas !
-        // Solution : Stocker les noms des profils et les utiliser pour savoir si il y avait ou non
-        //            un profil
-        int pflSize = meshNbOfElOfType[meshTypeNo];
-        // profil    = new int[pflSize];
-
-        profilList[typeNo].resize(pflSize);
-        profilSize[typeNo] = pflSize;
-
-        for (int j = 1; j <= pflSize; j++) {
-          profilList[typeNo][j-1] = meshNbOfElOfTypeC[meshTypeNo] + j ; // index MEDMEM commence à 1
-        }
-        profilNameList[typeNo] = MED_NO_PROFILE; //Information a utiliser pour la sauvegarde : PLUTOT MED_ALL
+        profilSizeC += profilList[typeNo].size();
       }
-      profilSizeC += profilList[typeNo].size();
-    }
 
     MEDSKYLINEARRAY * skyLine = new MEDSKYLINEARRAY(profilList.size(), profilSizeC );
     vector<int> index(NumberOfTypes+1,0);
@@ -1363,7 +1363,7 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
     for( int typeNo=0; typeNo < NumberOfTypes; typeNo++ )
       index[typeNo+1]=index[typeNo]+profilSize[typeNo];
     skyLine->setIndex(&index[0]);
-    for (int i=1; i <= (int)profilList.size() ; i++) {
+    for (unsigned i=1; i <= profilList.size() ; i++) {
       vector<int> aTmp(profilList[i-1].size()); // IPAL13481
       for (unsigned j=0; j < profilList[i-1].size(); j++)
         aTmp[j] = (int) profilList[i-1][j];
