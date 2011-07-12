@@ -25,6 +25,7 @@
 #include "Interpolation2D.txx"
 #include "Interpolation3DSurf.hxx"
 #include "Interpolation3D.txx"
+#include "Interpolation3D2D.txx"
 #include "InterpolationCC.txx"
 #include "InterpolationCU.txx"
 #include "Interpolation2DCurve.hxx"
@@ -2265,3 +2266,69 @@ void MEDCouplingBasicsTest::test2DCurveInterpP1P1_1()
   sourceMesh->decrRef();
   targetMesh->decrRef();
 }
+
+#if 1//dp
+#if 0
+void MEDCouplingBasicsTest::test3D2DInterpP0P0_1()
+{
+  MEDCouplingUMesh *sourceMesh=build3D2DSourceMesh_1();
+  MEDCouplingUMesh *targetMesh=build3D2DTargetMesh_1();
+
+  MEDCouplingNormalizedUnstructuredMesh<3,3> sourceWrapper(sourceMesh);
+  MEDCouplingNormalizedUnstructuredMesh<3,3> targetWrapper(targetMesh);
+  INTERP_KERNEL::Interpolation3D2D myInterpolator;
+  myInterpolator.setPrecision(1e-12);
+  std::vector<std::map<int,double> > res;
+  INTERP_KERNEL::SplittingPolicy sp[] = { INTERP_KERNEL::PLANAR_FACE_5, INTERP_KERNEL::PLANAR_FACE_6, INTERP_KERNEL::GENERAL_24, INTERP_KERNEL::GENERAL_48 };
+  for ( int i = 0; i < 4; ++i )
+  {
+    myInterpolator.setSplittingPolicy( sp[i] );
+    res.clear();
+    myInterpolator.interpolateMeshes(sourceWrapper,targetWrapper,res,"P0P0");
+    CPPUNIT_ASSERT_EQUAL(1,(int)res.size());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.125,res[0][0],1e-12);
+    //CPPUNIT_ASSERT_DOUBLES_EQUAL(8.e6,sumAll(res),1e-7);
+  }
+  //clean up
+  sourceMesh->decrRef();
+  targetMesh->decrRef();
+}
+#else
+void MEDCouplingBasicsTest::test3D2DInterpP0P0_1()
+{
+  MEDCouplingUMesh *sourceMesh=build3D2DSourceMesh_1();
+  MEDCouplingUMesh *targetMesh=build3D2DTargetMesh_1();
+
+  MEDCouplingNormalizedUnstructuredMesh<3,3> sourceWrapper(sourceMesh);
+  MEDCouplingNormalizedUnstructuredMesh<3,3> targetWrapper(targetMesh);
+  INTERP_KERNEL::Interpolation3D2D myInterpolator;
+  myInterpolator.setPrecision(1e-12);
+  std::vector<std::map<int,double> > res;
+  INTERP_KERNEL::SplittingPolicy sp[] = { INTERP_KERNEL::GENERAL_48 };
+  //INTERP_KERNEL::SplittingPolicy sp[] = { INTERP_KERNEL::PLANAR_FACE_5, INTERP_KERNEL::PLANAR_FACE_6, INTERP_KERNEL::GENERAL_24, INTERP_KERNEL::GENERAL_48 };
+  for ( int i = 0; i < 1; ++i )
+  {
+    myInterpolator.setSplittingPolicy( sp[i] );
+    res.clear();
+    myInterpolator.interpolateMeshes(sourceWrapper,targetWrapper,res,"P0P0");
+
+    CPPUNIT_ASSERT_EQUAL(1,(int)res.size());
+
+    //CPPUNIT_ASSERT_DOUBLES_EQUAL(0.         ,res[0][0],1e-12);
+    //CPPUNIT_ASSERT_DOUBLES_EQUAL(0.         ,res[0][1],1e-12);
+    //CPPUNIT_ASSERT_DOUBLES_EQUAL(40.        ,res[0][2],1e-12);
+    //CPPUNIT_ASSERT_DOUBLES_EQUAL(8.         ,res[0][3],1e-12);
+
+    //CPPUNIT_ASSERT_DOUBLES_EQUAL(8.*sqrt(3.),res[1][0],1e-12);
+    //CPPUNIT_ASSERT_DOUBLES_EQUAL(0.         ,res[1][1],1e-12);
+    //CPPUNIT_ASSERT_DOUBLES_EQUAL(40.        ,res[1][2],1e-12);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(80.        ,res[0][0],1e-12);
+
+    //CPPUNIT_ASSERT_DOUBLES_EQUAL(8.e6,sumAll(res),1e-7);
+  }
+  //clean up
+  sourceMesh->decrRef();
+  targetMesh->decrRef();
+}
+#endif
+#endif

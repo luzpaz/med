@@ -173,6 +173,7 @@ namespace INTERP_KERNEL
     ~SplitterTetra();
 
     double intersectSourceCell(typename MyMeshType::MyConnType srcCell, double* baryCentre=0);
+    double intersectSourceFace(typename MyMeshType::MyConnType srcCell);
 
     double intersectTetra(const double** tetraCorners);
 
@@ -188,8 +189,10 @@ namespace INTERP_KERNEL
     // member functions
     inline void createAffineTransform(const double** corners);
     inline void checkIsOutside(const double* pt, bool* isOutside) const;
+    inline void checkIsOutsideSurface(const double* pt, bool* isOutside, const double errTol = DEFAULT_ABS_TOL) const; //dp à supprimer
     inline void calculateNode(typename MyMeshType::MyConnType globalNodeNum);
     inline void calculateVolume(TransformedTriangle& tri, const TriangleFaceKey& key);
+    inline void calculateSurface(TransformedTriangle& tri, const TriangleFaceKey& key);
         
 
     /// disallow copying
@@ -256,6 +259,21 @@ namespace INTERP_KERNEL
     isOutside[7] = isOutside[7] && (1.0 - pt[0] - pt[1] - pt[2] >= 1.0);
   }
   
+  //dp à supprimer
+  template<class MyMeshType>
+  inline void SplitterTetra<MyMeshType>::checkIsOutsideSurface(const double* pt, bool* isOutside, const double errTol) const
+  {
+    isOutside[0] = isOutside[0] && (pt[0] < -errTol);
+    isOutside[1] = isOutside[1] && (pt[0] > (1.0 + errTol));
+    isOutside[2] = isOutside[2] && (pt[1] < -errTol);
+    isOutside[3] = isOutside[3] && (pt[1] > (1.0 + errTol));
+    isOutside[4] = isOutside[4] && (pt[2] < -errTol);
+    isOutside[5] = isOutside[5] && (pt[2] > (1.0 + errTol));
+    isOutside[6] = isOutside[6] && (1.0 - pt[0] - pt[1] - pt[2] < -errTol);
+    isOutside[7] = isOutside[7] && (1.0 - pt[0] - pt[1] - pt[2] > (1.0 + errTol));
+  }
+
+
   /**
    * Calculates the transformed node with a given global node number.
    * Gets the coordinates for the node in _src_mesh with the given global number and applies TetraAffineTransform
@@ -287,6 +305,22 @@ namespace INTERP_KERNEL
   {
     const double vol = tri.calculateIntersectionVolume();
     _volumes.insert(std::make_pair(key, vol));
+  }
+
+  // TODO DP : adapter les commentaires
+  // TODO DP : _volume ?
+  /**
+   * Calculates the volume contribution from the given TransformedTriangle and stores it with the given key in .
+   * Calls TransformedTriangle::calculateIntersectionVolume to perform the calculation.
+   *
+   * @param tri    triangle for which to calculate the volume contribution
+   * @param key    key associated with the face
+   */
+  template<class MyMeshType>
+  inline void SplitterTetra<MyMeshType>::calculateSurface(TransformedTriangle& tri, const TriangleFaceKey& key)
+  {
+    const double surf = tri.calculateIntersectionSurface(_t);
+    _volumes.insert(std::make_pair(key, surf));
   }
 
   template<class MyMeshTypeT, class MyMeshTypeS=MyMeshTypeT>

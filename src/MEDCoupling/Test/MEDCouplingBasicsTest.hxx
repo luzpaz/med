@@ -36,6 +36,7 @@ namespace ParaMEDMEM
   {
     CPPUNIT_TEST_SUITE(MEDCouplingBasicsTest);
     //MEDCouplingBasicsTest1.cxx
+#if 0//dp
     CPPUNIT_TEST( testArray );
     CPPUNIT_TEST( testArray2 );
     CPPUNIT_TEST( testArray3 );
@@ -252,8 +253,10 @@ namespace ParaMEDMEM
     CPPUNIT_TEST( testInterpolationCU1D );
     CPPUNIT_TEST( testInterpolationCU2D );
     CPPUNIT_TEST( testInterpolationCU3D );
+#endif
 
     CPPUNIT_TEST( test3DInterpP0P0_1 );
+#if 0 //dp
     CPPUNIT_TEST( test3DInterpP0P0PL_1 );
     CPPUNIT_TEST( test3DInterpP0P0PL_2 );
     CPPUNIT_TEST( test3DInterpP0P0PL_3 );
@@ -274,13 +277,18 @@ namespace ParaMEDMEM
     CPPUNIT_TEST( test3DSurfInterpP1P0Bary_1 );
     CPPUNIT_TEST( test3DInterpP1P0Bary_1 );
     CPPUNIT_TEST( test3DTo1DInterpP0P0PL_1 );
+#endif
 
+    CPPUNIT_TEST( test3D2DInterpP0P0_1 );
+
+#if 0//dp
     CPPUNIT_TEST( test1DInterp_1 );
     CPPUNIT_TEST( test2DCurveInterpP0P0_1 );
     CPPUNIT_TEST( test2DCurveInterpP0P0_2 );
     CPPUNIT_TEST( test2DCurveInterpP0P1_1 );
     CPPUNIT_TEST( test2DCurveInterpP1P0_1 );
     CPPUNIT_TEST( test2DCurveInterpP1P1_1 );
+#endif
     CPPUNIT_TEST_SUITE_END();
   public:
     //MEDCouplingBasicsTest1.cxx
@@ -531,6 +539,10 @@ namespace ParaMEDMEM
     void test2DCurveInterpP1P0_1();
     void test2DCurveInterpP1P1_1();
 
+#if 1//dp
+    void test3D2DInterpP0P0_1();
+#endif
+
   public:
     static MEDCouplingUMesh *build3DSourceMesh_2();
     static MEDCouplingUMesh *build3DTargetMesh_2();
@@ -570,6 +582,12 @@ namespace ParaMEDMEM
     static MEDCouplingUMesh *build3DMultiTypes_1();
     static MEDCouplingUMesh *buildHexa8Mesh_1();
     static MEDCouplingUMesh *buildPointe_1(MEDCouplingUMesh *&m1);
+
+#if 1//dp
+     static MEDCouplingUMesh *build3D2DSourceMesh_1();
+     static MEDCouplingUMesh *build3D2DTargetMesh_1();
+#endif
+
     static DataArrayDouble *buildCoordsForMultiTypes_1();
     static MEDCouplingMultiFields *buildMultiFields_1();
     static std::vector<MEDCouplingFieldDouble *> buildMultiFields_2();
