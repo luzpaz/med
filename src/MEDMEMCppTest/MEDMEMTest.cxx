@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEMTest.hxx"
@@ -57,12 +57,12 @@ void MEDMEMTest::tearDown()
 {
 }
 
+/*
 // #1: MEDMEM_Array.hxx                \
 // #2: MEDMEM_ArrayConvert.hxx          }  MEDMEMTest_Array.cxx
 // #3: MEDMEM_ArrayInterface.hxx (-)   /
 // #4: MEDMEM_AsciiFieldDriver.hxx      }  MEDMEMTest_AsciiFieldDriver.cxx
 // #5: MEDMEM_CellModel.hxx             }  MEDMEMTest.cxx (-)
-// #6: MEDMEM_Compatibility21_22.hxx    }  nothing to test
 // #7: MEDMEM_Connectivity.hxx          }  MEDMEMTest_Connectivity.cxx
 // #8: MEDMEM_Coordinate.hxx            }  MEDMEMTest_Coordinate.cxx
 // #9: MEDMEM_DriverFactory.hxx         }  MEDMEMTest_DriverFactory.cxx
@@ -83,26 +83,17 @@ void MEDMEMTest::tearDown()
 // #24: MEDMEM_Init.cxx                 }  MEDMEMTest.cxx
 // #25: MEDMEM_InterlacingPolicy.hxx    }  MEDMEMTest.cxx (-)
 // #26: MEDMEM_InterlacingTraits.hxx    }  MEDMEMTest.cxx (-)
-// #27: MEDMEM_MedFieldDriver21.hxx     }  MEDMEMTest_MedFieldDriver21.cxx
-// #28: MEDMEM_MedFieldDriver22.hxx     }  MEDMEMTest_MedFieldDriver22.cxx
-// #29: MEDMEM_MedFieldDriver.hxx       }  MEDMEMTest.cxx (-)
-// #30: MEDMEM_Med.hxx                  }  MEDMEMTest_Med.cxx
-// #31: MEDMEM_MedMedDriver21.hxx       }  MEDMEMTest_MedMedDriver21.cxx
-// #32: MEDMEM_MedMedDriver22.hxx       }  MEDMEMTest_MedMedDriver22.cxx
-// #33: MEDMEM_MedMedDriver.hxx         }  MEDMEMTest.cxx (-)
+// #28: MEDMEM_MedFieldDriver.hxx       }  MEDMEMTest_MedFieldDriver.cxx
 // #34: MEDMEM_MEDMEMchampLire.hxx      }  MEDMEMTest.cxx (-)
 // #35: MEDMEM_MEDMEMgaussEcr.hxx       }  MEDMEMTest.cxx (-)
 // #36: MEDMEM_MEDMEMprofilEcr.hxx      }  MEDMEMTest.cxx (-)
-// #37: MEDMEM_MedMeshDriver21.hxx      }  MEDMEMTest_MedMeshDriver21.cxx
-// #38: MEDMEM_MedMeshDriver22.hxx      }  MEDMEMTest_MedMeshDriver22.cxx
-// #39: MEDMEM_MedMeshDriver.hxx        }  MEDMEMTest.cxx (-)
+// #37: MEDMEM_MedMeshDriver.hxx        }  MEDMEMTest_MedMeshDriver.cxx
 // #40: MEDMEM_MedVersion.hxx           }  MEDMEMTest_MedVersion.cxx
 // #41: MEDMEM_Mesh.hxx                 \
 // #42: MEDMEM_Meshing.hxx              /  MEDMEMTest_MeshAndMeshing.cxx
 // #43: MEDMEM_ModulusArray.hxx         }  MEDMEMTest_ModulusArray.cxx
 // #44: MEDMEM_nArray.hxx               }  MEDMEMTest_nArray.cxx
 // #45: MEDMEM_PointerOf.hxx            }  MEDMEMTest_PointerOf.cxx
-// #46: MEDMEM_PolyhedronArray.hxx      }  MEDMEMTest_PolyhedronArray.cxx
 // #47: MEDMEM_PorflowMeshDriver.hxx    }  MEDMEMTest_PorflowMeshDriver.cxx
 // #48: MEDMEM_RCBase.hxx               }  MEDMEMTest.cxx (-)
 // #49: MEDMEM_SetInterlacingType.hxx   }  MEDMEMTest.cxx (-)
@@ -117,31 +108,7 @@ void MEDMEMTest::tearDown()
 // #58: MEDMEM_VtkMedDriver.hxx         }  MEDMEMTest_VtkMedDriver.cxx
 // #59: MEDMEM_VtkMeshDriver.hxx        }  MEDMEMTest_VtkMeshDriver.cxx
 // #60: MEDMEM_medimport_src.hxx        }  MEDMEMTest.cxx (-)
-
-
-/*!
- *  Check methods (not in spec), defined in MEDMEM_CellModel.hxx:
- */
-//void MEDMEMTest::testCellModel()
-//{
-//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-//}
-
-/*!
- *  Check methods (not in spec), defined in MEDMEM_DriversDef.hxx:
- */
-//void MEDMEMTest::testDriversDef()
-//{
-//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-//}
-
-/*!
- *  Check methods (not in spec), defined in MEDMEM_DriverTools.hxx:
- */
-//void MEDMEMTest::testDriverTools()
-//{
-//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-//}
+*/
 
 /*!
  *  Check methods (4), defined in MEDMEM_IndexCheckingPolicy.hxx:
@@ -229,14 +196,6 @@ void MEDMEMTest::testInit()
  *  Check methods (not in spec), defined in MEDMEM_MedFieldDriver.hxx:
  */
 //void MEDMEMTest::testMedFieldDriver()
-//{
-//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-//}
-
-/*!
- *  Check methods (not in spec), defined in MEDMEM_MedMedDriver.hxx:
- */
-//void MEDMEMTest::testMedMedDriver()
 //{
 //  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
 //}
@@ -473,7 +432,6 @@ MEDMEM::MESH * MEDMEMTest_createTestMesh ()
 {
   // MESH DATA
   int SpaceDimension = 3;
-  int meshDimension = SpaceDimension; // because there 3D cells in the mesh
 
   // coordinates
   int NumberOfNodes = 19;
@@ -569,19 +527,16 @@ MEDMEM::MESH * MEDMEMTest_createTestMesh ()
   myMeshing->setTypes(CellTypes, MED_EN::MED_CELL);
   myMeshing->setNumberOfElements(NumberOfCells, MED_EN::MED_CELL);
 
-  myMeshing->setConnectivity(ConnectivityTetra, MED_EN::MED_CELL, MED_EN::MED_TETRA4);
-  myMeshing->setConnectivity(ConnectivityPyra, MED_EN::MED_CELL, MED_EN::MED_PYRA5);
-  myMeshing->setConnectivity(ConnectivityHexa, MED_EN::MED_CELL, MED_EN::MED_HEXA8);
+  myMeshing->setConnectivity(MED_EN::MED_CELL, MED_EN::MED_TETRA4, ConnectivityTetra );
+  myMeshing->setConnectivity(MED_EN::MED_CELL, MED_EN::MED_PYRA5 , ConnectivityPyra  );
+  myMeshing->setConnectivity(MED_EN::MED_CELL, MED_EN::MED_HEXA8 , ConnectivityHexa  );
 
   myMeshing->setNumberOfTypes(NumberOfFaceTypes, MED_EN::MED_FACE);
   myMeshing->setTypes(FaceTypes, MED_EN::MED_FACE);
   myMeshing->setNumberOfElements(NumberOfFaces, MED_EN::MED_FACE);
 
-  myMeshing->setConnectivity(ConnectivityTria, MED_EN::MED_FACE, MED_EN::MED_TRIA3);
-  myMeshing->setConnectivity(ConnectivityQua, MED_EN::MED_FACE, MED_EN::MED_QUAD4);
-
-  // mesh dimension
-  myMeshing->setMeshDimension(meshDimension);
+  myMeshing->setConnectivity(MED_EN::MED_FACE, MED_EN::MED_TRIA3,ConnectivityTria);
+  myMeshing->setConnectivity(MED_EN::MED_FACE, MED_EN::MED_QUAD4,ConnectivityQua);
 
   // edges connectivities
   // not yet implemented : if set, results are unpredictable.
@@ -700,7 +655,8 @@ MEDMEMTest_TmpFilesRemover::~MEDMEMTest_TmpFilesRemover()
   set<string>::iterator it = myTmpFiles.begin();
   for (; it != myTmpFiles.end(); it++) {
 #ifdef WNT
-    if (GetFileAttributes((*it).data()) & FILE_ATTRIBUTE_NORMAL)
+    //if (GetFileAttributes((*it).data()) & FILE_ATTRIBUTE_NORMAL)
+    if (GetFileAttributes((*it).data()) != INVALID_FILE_ATTRIBUTES)
 #else
     if (access((*it).data(), F_OK) == 0)
 #endif

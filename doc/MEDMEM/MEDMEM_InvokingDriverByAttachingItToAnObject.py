@@ -1,24 +1,24 @@
 #  -*- coding: iso-8859-1 -*-
-#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
 ######################################################################
@@ -31,7 +31,7 @@ from libMEDMEM_Swig import *
 
 medFile = "pointe.med"
 medFile2 = "Field&MeshGeneratedPointe.med"
-fieldName = "fieldcelldouble"
+fieldName = "fieldcelldoublescalar"
 meshName = "maa1"
 
 try:
@@ -53,17 +53,17 @@ except :
 
 try:
     myMesh = MESH()
+
     myRdOnlyDriver = MED_MESH_RDONLY_DRIVER(medFile,myMesh)
     myRdOnlyDriver.setMeshName(meshName)
     myRdOnlyDriver.open()
     myRdOnlyDriver.read()
     myRdOnlyDriver.close()
 
-    myWrOnlyDriver = MED_MESH_WRONLY_DRIVER(medFile,myMesh)
+    myWrOnlyDriver = MED_MESH_WRONLY_DRIVER(medFile2,myMesh)
     myWrOnlyDriver.setMeshName(meshName)
     myWrOnlyDriver.open()
     myWrOnlyDriver.write()
-
     myWrOnlyDriver.close()
 
     print "Invoking mesh drivers OK"
@@ -71,15 +71,3 @@ except :
     print "there is a problem in invoking mesh drivers !!"
     print "Please consult the error standart output of the python execution !!"
 
-try:
-    myMed = MED()
-    myRdOnlyDriver = MED_MED_RDONLY_DRIVER(medFile,myMed)
-    myRdOnlyDriver.open() 
-    myRdOnlyDriver.readFileStruct()
-    myRdOnlyDriver.close()
-    myMed.updateSupport()
-
-    print "Invoking Med drivers OK"
-except :
-    print "There is a problem in invoking MED drivers !!"
-    print "Please consult the error standart output of the python execution !!"

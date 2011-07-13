@@ -1,20 +1,20 @@
-#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
 # -* Makefile *- 
@@ -58,7 +58,7 @@ SUBDIRS += $(IDLDIR) src doc resources bin
 
 DIST_SUBDIRS = adm_local adm_local_without_kernel idl src doc resources bin
 
-DISTCLEANFILES = a.out aclocal.m4 configure local-install.sh hack_libtool
+DISTCLEANFILES = a.out aclocal.m4 configure local-install.sh hack_libtool adm_local/unix/config_files/config.guess adm_local/unix/config_files/config.sub adm_local/unix/config_files/depcomp adm_local/unix/config_files/install-sh adm_local/unix/config_files/libtool.m4 adm_local/unix/config_files/ltmain.sh adm_local/unix/config_files/ltoptions.m4 adm_local/unix/config_files/ltsugar.m4 adm_local/unix/config_files/ltversion.m4 adm_local/unix/config_files/lt~obsolete.m4 adm_local/unix/config_files/missing adm_local/unix/config_files/py-compile
 
 salomeinclude_DATA = MED_version.h
 
@@ -69,3 +69,8 @@ dist-hook:
 
 dev_docs:
 	(cd doc && $(MAKE) $(AM_MAKEFLAGS) dev_docs)
+
+docs: usr_docs
+
+usr_docs:
+	(cd doc && $(MAKE) $(AM_MAKEFLAGS) usr_docs)

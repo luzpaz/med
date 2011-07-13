@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include <stdlib.h>
 #include<string>
@@ -36,10 +36,10 @@ using namespace MEDMEM;
 using namespace MED_EN;
 
 #define INTERLACING_MODE FullInterlace
-int fct2(int i,const int * number) { return i;};
-int fct1(int i,const int * number) { return number[i]; };
+static int fct2(int i,const int * number) { return i;}
+static int fct1(int i,const int * number) { return number[i]; }
 
-void affiche_field_(FIELD_ * myField)
+static void affiche_field_(FIELD_ * myField)
 {
   cout << "Field "<< myField->getName() << " : " <<myField->getDescription() <<  endl ;
   int NumberOfComponents = myField->getNumberOfComponents() ;
@@ -226,7 +226,7 @@ void affiche_fieldT(FIELD<double, NoInterlace> * myField)
 
 template <class T, class INTERLACING_TAG>
 void affiche_fieldT2(FIELD< T,  INTERLACING_TAG> * myField)
-{};
+{}
 
 
 // Spécialisation du traitement pour le mode FullInterlace
@@ -420,8 +420,8 @@ int main (int argc, char ** argv) {
 //    //      (même sans profil) lu à posteriori.
 //    {
 //      med_2_3::med_err err=-1;
-//      med_2_3::med_idt id = med_2_3::MEDouvrir(const_cast<char *> ( ("Copy_nomesh_"+fileName).c_str()),
-//                                            med_2_3::MED_LECTURE_ECRITURE);
+//      med_2_3::med_idt id = med_2_3::MEDfileOpen(const_cast<char *> ( ("Copy_nomesh_"+fileName).c_str()),
+//                                            med_2_3::MED_ACC_RDWR);
 //      if (id <=0) cout << "Erreur dans MEDouvrir pour le fichier " << "Copy_nomesh_"+fileName <<endl;
 
 //      err=med_2_3::MEDlienEcr(id, const_cast<char *> ( ("Copy_withmesh_"+fileName).c_str()),

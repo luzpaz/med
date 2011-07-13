@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include<string>
 
@@ -39,64 +39,54 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-void affiche_support(const SUPPORT * mySupport) 
+static void affiche_support(const SUPPORT * mySupport) 
 {
   cout << "  - Name : "<<mySupport->getName().c_str()<<endl ;
   cout << "  - Description : "<<mySupport->getDescription().c_str()<<endl ;
   cout << "  - Entity : "<<mySupport->getEntity()<<endl ;
   cout << "  - Entities list : "<<endl ;
-  if (!(mySupport->isOnAllElements())) {
-    int NumberOfTypes = mySupport->getNumberOfTypes() ;
-    cout<<"  - NumberOfTypes : "<<NumberOfTypes<<endl;
-    const medGeometryElement * Types = mySupport->getTypes() ;
-    for (int j=0;j<NumberOfTypes;j++) {
-      cout<<"    * Type "<<Types[j]<<" : ";
-      int NumberOfElements = mySupport->getNumberOfElements(Types[j]) ;
-      const int * Number = mySupport->getNumber(Types[j]) ;
-      for (int k=0; k<NumberOfElements;k++)
-        cout << Number[k] << " ";
-      cout << endl ;
+  if (!(mySupport->isOnAllElements())) 
+    {
+      int NumberOfTypes = mySupport->getNumberOfTypes() ;
+      cout<<"  - NumberOfTypes : "<<NumberOfTypes<<endl;
+      const medGeometryElement * Types = mySupport->getTypes() ;
+      for (int j=0;j<NumberOfTypes;j++) 
+        {
+          cout<<"    * Type "<<Types[j]<<" : ";
+          int NumberOfElements = mySupport->getNumberOfElements(Types[j]) ;
+          const int * Number = mySupport->getNumber(Types[j]) ;
+          for (int k=0; k<NumberOfElements;k++)
+            cout << Number[k] << " ";
+          cout << endl ;
+        }
     }
-  } else
+  else
     cout << "    Is on all entities !"<< endl;
 }
 
 
-void affiche_famille(const FAMILY * myFamily)
+static void affiche_famille(const FAMILY * myFamily)
 {
-    affiche_support(myFamily);
-    cout << "  - Identifier : "<<myFamily->getIdentifier()<<endl ;
-    int NumberOfAttributes = myFamily->getNumberOfAttributes() ;
-    cout << "  - Attributes ("<<NumberOfAttributes<<") :"<<endl;
-    for (int j=1;j<NumberOfAttributes+1;j++)
-      cout << "    * "<<myFamily->getAttributeIdentifier(j)<<" : "<<myFamily->getAttributeValue(j)<<", "<<myFamily->getAttributeDescription(j).c_str()<<endl ;
-    int NumberOfGroups = myFamily->getNumberOfGroups() ;
-    cout << "  - Groups ("<<NumberOfGroups<<") :"<<endl;
-    for (int j=1;j<NumberOfGroups+1;j++)
-      cout << "    * "<<myFamily->getGroupName(j).c_str()<<endl ;
+  affiche_support(myFamily);
+  cout << "  - Identifier : "<<myFamily->getIdentifier()<<endl ;
+  int NumberOfAttributes = myFamily->getNumberOfAttributes() ;
+  cout << "  - Attributes ("<<NumberOfAttributes<<") :"<<endl;
+  for (int j=1;j<NumberOfAttributes+1;j++)
+    cout << "    * "<<myFamily->getAttributeIdentifier(j)<<" : "<<myFamily->getAttributeValue(j)<<", "<<myFamily->getAttributeDescription(j).c_str()<<endl ;
+  int NumberOfGroups = myFamily->getNumberOfGroups() ;
+  cout << "  - Groups ("<<NumberOfGroups<<") :"<<endl;
+  for (int j=1;j<NumberOfGroups+1;j++)
+    cout << "    * "<<myFamily->getGroupName(j).c_str()<<endl ;
 }
 
-void affiche_groupe(MESH *myMesh,medEntityMesh Entity) 
+int main (int argc, char ** argv) 
 {
-  int NumberOfGroups = myMesh->getNumberOfGroups(Entity) ;
-  cout << "NumberOfGroups : "<<NumberOfGroups<<endl;
-  for (int i=1; i<NumberOfGroups+1;i++) {
-    const GROUP* myGroup = myMesh->getGroup(Entity,i);
-    affiche_support(myGroup);
-    int NumberOfFamillies = myGroup->getNumberOfFamilies() ;
-    cout << "  - Families ("<<NumberOfFamillies<<") :"<<endl;
-    for (int j=1;j<NumberOfFamillies+1;j++)
-      cout << "    * "<<myGroup->getFamily(j)->getName().c_str()<<endl ;
-  }
-}
-
-int main (int argc, char ** argv) {
-
-  if (argc <3) { // after 3, ignored !
-    cerr << "Usage : " << argv[0] 
-         << " filename meshname" << endl << endl;
-    exit(-1);
-  }
+  if (argc <3) 
+    { // after 3, ignored !
+      cerr << "Usage : " << argv[0] 
+           << " filename meshname" << endl << endl;
+      exit(-1);
+    }
 
   string filename = argv[1] ;
   string meshname = argv[2] ;
@@ -109,25 +99,12 @@ int main (int argc, char ** argv) {
   myMeshDriver.read() ;
   myMeshDriver.close() ;
 
+  if ( myMesh->getNumberOfFamilies(MED_NODE) < 1 )
+    {
+      cerr << "No nodal families in the file" << endl;
+      return 1;
+    }
   const FAMILY * myFamily = myMesh->getFamily(MED_NODE,1);
-  //On renseigne les attributs spécifiques à FAMILY (p/r à SUPPORT) et non renseignés lors de la lecture du maillage
-//    int  NumberOfAttribute = 3;
-//    int *AttributeIdentifier = new int[NumberOfAttribute];
-//    int *AttributeValue = new int[NumberOfAttribute];
-//    string *AttributeDescription = new string[NumberOfAttribute];
-//    char *tmp;
-//    for (int i=0;i<NumberOfAttribute;i++)
-//      {
-//        AttributeIdentifier[i]=i+1;
-//        AttributeValue[i]=(i+1)*10;
-//        sprintf(tmp,"Attribut N° %d",i+1);
-//        AttributeDescription[i]=tmp;
-//      }
-
-//    myFamily->setNumberOfAttributes(NumberOfAttribute);
-//    myFamily->setAttributesIdentifiers (AttributeIdentifier);
-//    myFamily->setAttributesValues (AttributeValue);
-//    myFamily->setAttributesDescriptions (AttributeDescription);
 
   cout << "Show Family :"<<endl ;
   affiche_famille(myFamily);
@@ -142,14 +119,6 @@ int main (int argc, char ** argv) {
   myFamily3->removeReference();
 
   cout << "That's all"<<endl ;
-
-  /*
-  cout << "Show Group :"<<endl ;
-  affiche_groupe(myMesh,MED_NODE);
-  affiche_groupe(myMesh,MED_CELL);
-  affiche_groupe(myMesh,MED_FACE);
-  affiche_groupe(myMesh,MED_EDGE);
-  */
 
   myMesh->removeReference();
 

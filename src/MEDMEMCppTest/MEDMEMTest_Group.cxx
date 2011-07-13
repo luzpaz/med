@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEMTest.hxx"
@@ -69,7 +69,7 @@ void MEDMEMTest::testGroup()
   CPPUNIT_ASSERT(NumberOfFamillies != 0);
 
   vector<FAMILY*> aFamilies = myGroup->getFamilies();
-  CPPUNIT_ASSERT(NumberOfFamillies == aFamilies.size());
+  CPPUNIT_ASSERT(NumberOfFamillies == (int)aFamilies.size());
   list<FAMILY*> aList;
 
   for (int j=1;j<=NumberOfFamillies;j++)
@@ -90,7 +90,6 @@ void MEDMEMTest::testGroup()
 
   GROUP* myGroup2 = new GROUP(*myGroup);
 
-  cout<<*myGroup2<<endl;
   ostringstream os;
   os << *myGroup2;
   CPPUNIT_ASSERT(os.str() != "");
@@ -131,7 +130,6 @@ void MEDMEMTest::testGroup()
   {
     try{
       GROUP *myGroup5=new GROUP("newFamily", aList);
-      cout<< *myGroup5 <<endl;
       myGroup5->removeReference();
     }
     catch (const std::exception &e)

@@ -1,27 +1,27 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
 #include <MEDMEM_VtkMeshDriver.hxx>
-#include <MEDMEM_MedMeshDriver22.hxx>
+#include <MEDMEM_MedMeshDriver.hxx>
 #include <MEDMEM_Mesh.hxx>
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
@@ -54,7 +54,7 @@ void MEDMEMTest::testVtkMeshDriver()
 {
   MESH * aMesh = new MESH;
 
-  string filename_rd               = getResourceFile("pointe_import22.med");
+  string filename_rd               = getResourceFile("pointe.med");
   string emptyfilename             = "";
   string meshname_rd               = "maa1";
   string meshname                  = "MyMesh";
@@ -91,7 +91,7 @@ void MEDMEMTest::testVtkMeshDriver()
   CPPUNIT_ASSERT(aVtkDriver);
 
   //Create a Mesh
-  MED_MESH_RDONLY_DRIVER22 *aMedMeshRdDriver22 = new MED_MESH_RDONLY_DRIVER22(filename_rd, aMesh);
+  MED_MESH_RDONLY_DRIVER *aMedMeshRdDriver22 = new MED_MESH_RDONLY_DRIVER(filename_rd, aMesh);
   aMedMeshRdDriver22->open();
   aMedMeshRdDriver22->setMeshName(meshname_rd);
 

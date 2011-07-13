@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #ifndef GAUSS_LOCALIZATION_HXX
@@ -130,7 +130,7 @@ namespace MEDMEM {
     if (_cooGauss.getArraySize() != _nGauss*(_typeGeo/100) )
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"cooGauss must be of size nGauss*(_typeGeo/100) "
                                      << _nGauss*(_typeGeo/100) ));
-    if (_wg.size() != _nGauss )
+    if ((int)_wg.size() != _nGauss )
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"wg must be of size nGauss "
                                      << _nGauss ));
 
@@ -162,7 +162,7 @@ namespace MEDMEM {
     if (_cooGauss.getArraySize() != _nGauss*(_typeGeo/100) )
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"cooGauss must be of size nGauss*(_typeGeo/100) "
                                      << _nGauss*(_typeGeo/100) ));
-    if (_wg.size() != _nGauss )
+    if ((int)_wg.size() != _nGauss )
       throw MEDEXCEPTION( LOCALIZED( STRING(LOC) <<"wg must be of size nGauss "
                                      << _nGauss ));
   END_OF_MED(LOC);
@@ -206,7 +206,7 @@ namespace MEDMEM {
     os << "Ref.   Element Coords : " << endl << loc._cooRef << endl;
     os << "Gauss points Coords   : " << endl << loc._cooGauss << endl;
     os << "Gauss points weigth   : " << endl ;
-    for(int i=0; i<loc._wg.size();++i)
+    for(unsigned i=0; i<loc._wg.size();++i)
       os << "_wg[" << i << "] = " << loc._wg[i] << endl;
     return os;
   }

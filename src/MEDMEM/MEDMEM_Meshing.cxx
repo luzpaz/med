@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 /*
@@ -87,35 +87,8 @@ MESHING::~MESHING()
 }
 
 /*!  
-\addtogroup MESHING_general
- @{  */
-
-/*! Sets the dimension of the space. */
-void MESHING::setSpaceDimension(int SpaceDimension)
-{
-  _spaceDimension = SpaceDimension ;
-}
-
-/*! Sets the dimension of the mesh. */
-void MESHING::setMeshDimension(const int MeshDimension)
-{
-   _meshDimension = MeshDimension ;
-   if (_connectivity)
-     _connectivity->setEntityDimension(MeshDimension);
-}
-/*!  @}  */
-
-/*!  
 \addtogroup MESHING_nodes
  @{  */
-
-/*! Sets the number of nodes used in the mesh. */
-void MESHING::setNumberOfNodes(const int NumberOfNodes)
-{
-  _numberOfNodes = NumberOfNodes ;
-  if (_connectivity)
-    _connectivity->setNumberOfNodes(NumberOfNodes);
-}
 
 /*! 
   Sets the whole coordinates array in a given system and interlacing mode.
@@ -140,35 +113,29 @@ myMeshing.setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,System,Mode);
 
 */
 void MESHING::setCoordinates(const int SpaceDimension,
-                                                                                                                 const int NumberOfNodes,
-                                                                                                                 const double * Coordinates,
-                                                                                                                 const string System,
-                                                                                                                 const MED_EN::medModeSwitch Mode)
+                             const int NumberOfNodes,
+                             const double * Coordinates,
+                             const string System,
+                             const MED_EN::medModeSwitch Mode)
 {
-  setSpaceDimension(SpaceDimension);
-  setNumberOfNodes(NumberOfNodes);
+  _spaceDimension = SpaceDimension;
+  _numberOfNodes  = NumberOfNodes;
+  if (_connectivity)
+    _connectivity->setNumberOfNodes(NumberOfNodes);
+
+  if ( !NumberOfNodes && !Coordinates )
+    return; // enable using this method for setting SpaceDimension only
 
   SCRUTE_MED(_coordinate);
   SCRUTE_MED(_connectivity);
-  //if (NULL != _coordinate) delete _coordinate;
 
-  _coordinate = new COORDINATE(SpaceDimension,
-                               NumberOfNodes,
-                               Mode);
+  if ( _coordinate )
+    delete _coordinate, _coordinate = 0;
+  _coordinate = new COORDINATE(SpaceDimension,NumberOfNodes,Mode);
   _coordinate->setCoordinates(Mode,Coordinates);
   _coordinate->setCoordinatesSystem(System);
 }
 /*!  @}  */
-
-
-/*! Sets the system in which coordinates are given (MED_CART,MED_CYL,MED_SPHER). */
-void MESHING::setCoordinatesSystem(const string& System)
-  throw (MEDEXCEPTION)
-{
-  if (NULL == _coordinate)
-    throw MEDEXCEPTION(LOCALIZED("MESHING::setCoordinatesSystem : no coordinates defined"));
-  _coordinate->setCoordinatesSystem(System);
-}
 
 /*! 
  \addtogroup MESHING_general
@@ -260,10 +227,9 @@ void MESHING::setNumberOfTypes(const int NumberOfTypes,
 
   if (MED_CELL == Entity) {
     SCRUTE_MED(_connectivity);
-    //     if (_connectivity != (CONNECTIVITY *) NULL)
-    //       delete _connectivity ;
+    if (_connectivity )
+      delete _connectivity ;
     _connectivity = new CONNECTIVITY(NumberOfTypes,Entity) ;
-
     _connectivity->setNumberOfNodes( _numberOfNodes );
 
   } else {
@@ -289,7 +255,6 @@ void MESHING::setNumberOfTypes(const int NumberOfTypes,
       }
     // all right, we could create connectivity !
     CONNECTIVITY * myConnectivity = new CONNECTIVITY(NumberOfTypes,Entity) ;
-    myConnectivity->setEntityDimension(_connectivity->getEntityDimension()-1);
     myConnectivity->setNumberOfNodes(_connectivity->getNumberOfNodes());
     _connectivity->setConstituent(myConnectivity);
   }
@@ -317,10 +282,7 @@ void MESHING::setTypes(const MED_EN::medGeometryElement * Types,
   if (_connectivity == NULL)
     throw MEDEXCEPTION(LOCALIZED("MESHING::setTypes : No connectivity defined !"));
 
-  if ( entity == MED_EN::MED_CELL && getNumberOfTypes( entity ) > 0 )
-    setMeshDimension( Types[0] / 100 );
-
-   _connectivity->setGeometricTypes(Types,entity) ;
+  _connectivity->setGeometricTypes(Types,entity);
 }
 
 /*!
@@ -355,26 +317,32 @@ void MESHING::setNumberOfElements(const int * NumberOfElements,
   Sets the nodal connectivity for geometric type \a Type of  entity \a Entity.
   The nodal connectivity must be defined one element type at a time :
   \a MED_ALL_ELEMENTS is not a valid \a Type argument.
+  To define connectivity of \a MED_POLYGON and \a MED_POLYHEDRA, \a PolyConnectivityIndex
+  is also necessary, which defines index of the first node of each element.
+  Connectiviy of polyhedron must contain -1 as a separator of faces. For example,
+  a tetrahedron with connectivity {1,2,3,4} can be represented as a polyhedron by the following arrays:<br>
+Connectivity : {1,2,3,-1,2,3,4,-1,3,4,1,-1,4,1,2}<br>
+Connectivity_index : {1,16}
 
   Example :
 
 \verbatim
 MESHING myMeshing ;
 myMeshing.setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,System,Mode);
-
 myMeshing.setNumberOfTypes(2,MED_CELL);
 myMeshing.setTypes({MED_TRIA3,MED_QUAD4},MED_CELL);
 myMeshing.setNumberOfElements({3,2},MED_CELL); // 3 MED_TRIA3 and 2 MED_QUAD4
-myMeshing.setConnectivity({1,2,3,6,8,9,4,5,6},MED_CELL,MED_TRIA3);
-myMeshing.setConnectivity({1,3,4,5,4,5,7,8},MED_CELL,MED_QUAD4);
+myMeshing.setConnectivity(MED_CELL,MED_TRIA3,{1,2,3,6,8,9,4,5,6});
+myMeshing.setConnectivity(MED_CELL,MED_QUAD4,{1,3,4,5,4,5,7,8});
 \endverbatim
 
-  Example : setConnectivity({1,2,3,1,4,2},MED_FACE,MED_TRIA3)
+  Example : setConnectivity(MED_FACE,MED_TRIA3,{1,2,3,1,4,2})
   Define 2 triangles face defined with nodes 1,2,3 and 1,4,2.
 */
-void MESHING::setConnectivity(const int * Connectivity,
-                              const MED_EN::medEntityMesh Entity,
-                              const MED_EN::medGeometryElement Type)
+void MESHING::setConnectivity(const MED_EN::medEntityMesh Entity,
+                              const MED_EN::medGeometryElement Type,
+                              const int * Connectivity,
+                              const int * PolyConnectivityIndex)
   throw (MEDEXCEPTION)
 {
   const char * LOC = "MESHING::setConnectivity : " ;
@@ -386,120 +354,10 @@ void MESHING::setConnectivity(const int * Connectivity,
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No connectivity defined !"));
 
   _connectivity->setNumberOfNodes(_numberOfNodes);
-  _connectivity->setNodal(Connectivity,Entity,Type) ;
+  _connectivity->setNodal(Connectivity,Entity,Type,PolyConnectivityIndex) ;
 }
+
 /*!  @}  */
-
-/*!  
-\addtogroup MESHING_poly
- @{
-  */
-
-/*! Method setting the connectivity for MED_POLYGON
-elements
-\param ConnectivityIndex polygon connectivity index
-\param Connectivity polygon connectivity
-\param nbOfPolygons number of polygons defined
-\param Entity entity of the polygon
-
-The \a Entity parameter specifies whether the polygon is the highest order
- element (MED_CELL) or it is a 2D element in a 3D mesh (MED_FACE).
-
-This method is fully compatible with the MESHING::setConnectivity method.
-The following code excerpt creates two polygons with 5 and 4 nodes respectively.
-\verbatim
-MESHING myMeshing ;
-myMeshing.setCoordinates(SpaceDimension,NumberOfNodes,Coordinates,System,Mode);
-
-int conn_index[3]={1,6,10};
-int conn[9]={1,2,3,4,5,5,4,6,7};
-int nb_poly=2;
-meshing.setPolygonsConnectivity(conn_index, conn, nb_poly, MED_CELL)
-\endverbatim
-
-*/
-
-void MESHING::setPolygonsConnectivity(const int * ConnectivityIndex,
-                                      const int * Connectivity,
-                                      int nbOfPolygons,
-                                      const MED_EN::medEntityMesh Entity)
-  throw (MEDEXCEPTION)
-{
-  if (_connectivity == (CONNECTIVITY*)NULL)
-    throw MEDEXCEPTION("No connectivity defined !");
-  
-  setMeshDimension( Entity == MED_EN::MED_CELL ? 2 : 3 );
-
-  _connectivity->setPolygonsConnectivity(MED_NODAL, Entity, Connectivity, ConnectivityIndex,ConnectivityIndex[nbOfPolygons]-1,nbOfPolygons) ;
-}
-
-
-/*! Method setting the connectivity for MED_POLYHEDRON
-elements
-\param PolyhedronIndex polyhedra connectivity index
-\param FacesIndex polyhedra face connectivity index
-\param Nodes polyhedra connectivity
-\param nbOfPolyhedra number of polyhedra defined
-\param Entity deprecated parameter 
-*/
-void MESHING::setPolyhedraConnectivity     (const int * PolyhedronIndex,
-                                            const int * FacesIndex,
-                                            const int * Nodes,
-                                            int nbOfPolyhedra,
-                                            const MED_EN::medEntityMesh Entity)
-  throw (MEDEXCEPTION)
-{
-  if (_connectivity == (CONNECTIVITY*)NULL)
-    throw MEDEXCEPTION("No connectivity defined !");
-  if(_connectivity->getPolyTypeRelativeTo()==MED_EN::MED_POLYHEDRA)
-    {
-      int nbOfFacesOfAllPolyhedra=PolyhedronIndex[nbOfPolyhedra]-1;
-      _connectivity->setPolyhedronConnectivity(MED_NODAL, Nodes, PolyhedronIndex, FacesIndex[nbOfFacesOfAllPolyhedra]-1 , nbOfPolyhedra, FacesIndex, nbOfFacesOfAllPolyhedra) ;
-    }
-  else
-    throw MEDEXCEPTION("Invalid connectivity for polyhedra !!!");
-}
-/*!  @}  */
-
-/*!
-  NOT YET IMPLEMENTED !! WARNING
-*/
-void MESHING::setConnectivities (const int * ConnectivityIndex,
-                                 const int * ConnectivityValue,
-                                 const MED_EN::medConnectivity ConnectivityType,
-                                 const MED_EN::medEntityMesh Entity)
-  throw (MEDEXCEPTION)
-{
-  const char * LOC = "MESHING::setConnectivities : " ;
-  SCRUTE_MED(Entity);
-  SCRUTE_MED(ConnectivityType);
-  SCRUTE_MED(ConnectivityValue);
-  SCRUTE_MED(ConnectivityIndex);
-
-  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not Yet Implemented :: Warning !"));
-}
-
-/*!
-*/
-
-// void MESHING::setGroup(const string name,
-//                     const string description,
-//                     const int NumberOfElements,
-//                     const int * ElementsNumbers,
-//                     const medEntityMesh Entity)
-// {
-//   GROUP * myGroup = new GROUP() ;
-//   myGroup->setMesh(*this) ;
-//   myGroup->setName(name) ;
-//   myGroup->setDescription(description) ;
-//   myGroup->setEntity(Entity) ;
-//   // medEntityMesh and medGeometryElement ???
-//   myGroup->setNumberOfGeometricType(NumberOfType) ;
-//   myGroup->setGeometricType(Type) ;
-//   myGroup->setNumberOfGaussPoint(NumberOfGaussPoint) ;
-//   myGroup->setNumberOfElements(NumberOfElements) ;
-//   myGroup->setNumber(Number) ;
-// }
 
 /*!  
 \addtogroup MESHING_group
@@ -544,5 +402,5 @@ void MESHING::addGroup(const GROUP & Group)
   }
 }
 
-};
+}
 /*!  @}  */

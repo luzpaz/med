@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDLoaderBase.hxx"
@@ -58,16 +58,16 @@ std::string MEDLoaderBase::buildUnionUnit(const char *name, int nameLgth, const 
   std::string unitCpp(buildStringFromFortran(unit,unitLgth));
   if(unitCpp[0]=='\0')
     return ret;
-  ret+=" (";
+  ret+=" [";
   ret+=unitCpp;
-  ret+=")";
+  ret+="]";
   return ret;
 }
 
 void MEDLoaderBase::splitIntoNameAndUnit(const std::string& s, std::string& name, std::string& unit)
 {
-  std::string::size_type f1=s.find_first_of('(');
-  std::string::size_type f2=s.find_last_of(')');
+  std::string::size_type f1=s.find_first_of('[');
+  std::string::size_type f2=s.find_last_of(']');
   if(f1!=std::string::npos && f2!=std::string::npos)
     {
       if(f1<f2)
@@ -115,6 +115,32 @@ void MEDLoaderBase::safeStrCpy(const char *src, int maxLgth, char *dest, int beh
         }
     }
   strcpy(dest,src);
+}
+
+/*!
+ * This method is equivalent to MEDLoaderBase::safeStrCpy except that here no '\0' car is put.
+ * This method should be used for multi string in one string.
+ */
+void MEDLoaderBase::safeStrCpy2(const char *src, int maxLgth, char *dest, int behaviour) throw(INTERP_KERNEL::Exception)
+{
+  if((int)strlen(src)>maxLgth)
+    {
+      if(behaviour==0 || behaviour>1)
+        {
+          std::ostringstream oss; oss << "A string : \"" << src << "\" has been detected to be too long for MED File ( > " << maxLgth << ") !";
+          throw INTERP_KERNEL::Exception(oss.str().c_str());
+        }
+      else if(behaviour==1)
+        {
+          std::string s=zipString(src,maxLgth);
+          std::cerr << "A string : \"" << src << "\" has been detected to be too long for MED File ( > " << maxLgth << ") : ";
+          std::cerr << "zipping to : " << s << "\n";
+          strcpy(dest,s.c_str());
+          return ;
+        }
+    }
+  int n=strlen(src);
+  strncpy(dest,src,n);
 }
 
 std::string MEDLoaderBase::buildStringFromFortran(const char *expr, int lgth)

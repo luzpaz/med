@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #ifndef __PARAMEDMEM_MEDCOUPLINGPOINTSET_HXX__
@@ -34,7 +34,15 @@ namespace ParaMEDMEM
 {
   class DataArrayInt;
   class DataArrayDouble;
-
+  
+  /*!
+   * This class is abstract and not instanciable.
+   * ParaMEDMEM::MEDCouplingUMesh class inherits from this class.
+   * This class aggregates an array '_coords' containing nodes coordinates.
+   * So all operations on coordinates are managed by this class.
+   * This is the case for example for following methods :
+   * rotation, translation, scaling, getNodeIdsNearPoint, boundingbox...
+   */
   class MEDCOUPLING_EXPORT MEDCouplingPointSet : public MEDCouplingMesh
   {
   protected:
@@ -42,11 +50,12 @@ namespace ParaMEDMEM
     MEDCouplingPointSet(const MEDCouplingPointSet& other, bool deepCpy);
     ~MEDCouplingPointSet();
   public:
-    void updateTime();
+    void updateTime() const;
     int getNumberOfNodes() const;
     int getSpaceDimension() const;
-    void setCoords(DataArrayDouble *coords);
-    DataArrayDouble *getCoords() const { return _coords; }
+    void setCoords(const DataArrayDouble *coords);
+    const DataArrayDouble *getCoords() const { return _coords; }
+    DataArrayDouble *getCoords() { return _coords; }
     DataArrayDouble *getCoordinatesAndOwner() const;
     void copyTinyStringsFrom(const MEDCouplingMesh *other) throw(INTERP_KERNEL::Exception);
     bool isEqual(const MEDCouplingMesh *other, double prec) const;
@@ -87,13 +96,13 @@ namespace ParaMEDMEM
     virtual void renumberNodes2(const int *newNodeNumbers, int newNbOfNodes);
     virtual bool isEmptyMesh(const std::vector<int>& tinyInfo) const = 0;
     //! size of returned tinyInfo must be always the same.
-    void getTinySerializationInformation(std::vector<int>& tinyInfo, std::vector<std::string>& littleStrings) const;
+    void getTinySerializationInformation(std::vector<double>& tinyInfoD, std::vector<int>& tinyInfo, std::vector<std::string>& littleStrings) const;
     void resizeForUnserialization(const std::vector<int>& tinyInfo, DataArrayInt *a1, DataArrayDouble *a2, std::vector<std::string>& littleStrings) const;
     void serialize(DataArrayInt *&a1, DataArrayDouble *&a2) const;
-    void unserialization(const std::vector<int>& tinyInfo, const DataArrayInt *a1, DataArrayDouble *a2,
+    void unserialization(const std::vector<double>& tinyInfoD, const std::vector<int>& tinyInfo, const DataArrayInt *a1, DataArrayDouble *a2,
                          const std::vector<std::string>& littleStrings);
-    virtual void giveElemsInBoundingBox(const double *bbox, double eps, std::vector<int>& elems) = 0;
-    virtual void giveElemsInBoundingBox(const INTERP_KERNEL::DirectedBoundingBox& bbox, double eps, std::vector<int>& elems) = 0;
+    virtual void getCellsInBoundingBox(const double *bbox, double eps, std::vector<int>& elems) = 0;
+    virtual void getCellsInBoundingBox(const INTERP_KERNEL::DirectedBoundingBox& bbox, double eps, std::vector<int>& elems) = 0;
     virtual DataArrayInt *zipCoordsTraducer() = 0;
   protected:
     virtual void checkFullyDefined() const throw(INTERP_KERNEL::Exception) = 0;

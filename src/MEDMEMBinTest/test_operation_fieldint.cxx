@@ -1,31 +1,24 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// Programme de test des operations sur les champs
-//
-#include <string>
-#include <iostream>
-#include <iomanip>
-#include <cmath>
-
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Family.hxx"
@@ -37,32 +30,40 @@
 #include "MEDMEM_Field.hxx"
 #include "MEDMEM_define.hxx"
 
+#include <string>
+#include <iostream>
+#include <iomanip>
+#include <cmath>
+
 using namespace MEDMEM;
 using namespace MED_EN;
 
+int myfunction1(int x);
 int myfunction1(int x)
 {
-    return 2*x;
+  return 2*x;
 }
 
+int myfunction2(int x);
 int myfunction2(int x)
 {
-    return x/2;
+  return x/2;
 }
 
 using namespace std;
-void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
+static void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
 {
   cout << "Field "<< myField->getName() << " : " <<myField->getDescription() <<  endl ;
   int NumberOfComponents = myField->getNumberOfComponents() ;
   cout << "- Nombre de composantes : "<< NumberOfComponents << endl ;
   cout << "- Nombre de valeurs     : "<< myField->getNumberOfValues() << endl ;
-  for (int i=1; i<NumberOfComponents+1; i++) {
-    cout << "  - composante "<<i<<" :"<<endl ;
-    cout << "      - nom         : "<<myField->getComponentName(i)<< endl;
-    cout << "      - description : "<<myField->getComponentDescription(i) << endl;
-    cout << "      - units       : "<<myField->getMEDComponentUnit(i) << endl;
-  }
+  for (int i=1; i<NumberOfComponents+1; i++) 
+    {
+      cout << "  - composante "<<i<<" :"<<endl ;
+      cout << "      - nom         : "<<myField->getComponentName(i)<< endl;
+      cout << "      - description : "<<myField->getComponentDescription(i) << endl;
+      cout << "      - units       : "<<myField->getMEDComponentUnit(i) << endl;
+    }
   cout << "- iteration :" << endl ;
   cout << "    - numero : " << myField->getIterationNumber()<< endl  ;
   cout << "    - ordre  : " << myField->getOrderNumber()<< endl  ;
@@ -73,7 +74,7 @@ void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
   cout << "- Adresse support : " << mySupport << endl;
 }
 
-void affiche_fieldT(FIELD<int> * myField, const SUPPORT * mySupport)
+static void affiche_fieldT(FIELD<int> * myField, const SUPPORT * mySupport)
 {
   affiche_field_((FIELD_ *) myField, mySupport);
 
@@ -81,73 +82,73 @@ void affiche_fieldT(FIELD<int> * myField, const SUPPORT * mySupport)
   int NumberOf = mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
   int NumberOfComponents = myField->getNumberOfComponents() ;
 
-  for (int i=1; i<NumberOf+1; i++) {
-    const int * value = myField->getRow(i) ;
-    for (int j=0; j<NumberOfComponents; j++)
-      cout << value[j]<< " ";
-    cout<<endl;
-  }
+  for (int i=1; i<NumberOf+1; i++) 
+    {
+      const int * value = myField->getRow(i) ;
+      for (int j=0; j<NumberOfComponents; j++)
+        cout << value[j]<< " ";
+      cout<<endl;
+    }
   std::cout << std::endl;
   std::cout << "Norme euclidienne : " << myField->norm2() << endl;
   std::cout << "Norme max         : " << myField->normMax() << endl;
   try
-  {
+    {
       for (int i=1; i<=myField->getNumberOfComponents(); ++i)
-            std::cout << "Norme L2 - comp=" << i << " : " << myField->normL2(i) << endl;
+        std::cout << "Norme L2 - comp=" << i << " : " << myField->normL2(i) << endl;
       std::cout << "Norme L2          : " << myField->normL2() << endl;
 
       for (int i=1; i<=myField->getNumberOfComponents(); ++i)
-            std::cout << "Norme L1 - comp=" << i << " : " << myField->normL1(i) << endl;
+        std::cout << "Norme L1 - comp=" << i << " : " << myField->normL1(i) << endl;
       std::cout << "Norme L1          : " << myField->normL1() << endl;
-  }
+    }
   catch (MEDEXCEPTION &ex)
-  {
+    {
       std::cout << ex.what() << std::endl;
-  }
+    }
 }
 
-void affiche_valeur_field(const char * intitule, const int taille, const FIELD<int>& f)
+static void affiche_valeur_field(const char * intitule, const int taille, const FIELD<int>& f)
 {
-    const int * value=f.getValue();
-    std::cout << endl << intitule;
-    for(int i=0;i<taille;i++)
-        std::cout << setw(3) << value[i] << " ";
+  const int * value=f.getValue();
+  std::cout << endl << intitule;
+  for(int i=0;i<taille;i++)
+    std::cout << setw(3) << value[i] << " ";
 }
 
 int main (int argc, char ** argv)
 {
-    if (argc != 4) 
+  if (argc != 4)
     {
-        cerr << "Usage : " << argv[0] 
-        << " filename meshname fieldname" << endl << endl;
-        exit(-1);
+      cerr << "Usage : " << argv[0] 
+           << " filename meshname fieldname" << endl << endl;
+      exit(-1);
     }
-    string filename = argv[1] ;
-    string meshname = argv[2] ;
-    string fieldname = argv[3];
+  string filename = argv[1] ;
+  string meshname = argv[2] ;
+  string fieldname = argv[3];
 
-    MESH * myMesh = new MESH(MED_DRIVER,filename,meshname);
-    SUPPORT * mySupport;
-    FIELD<int> * myField1;
-    try
+  MESH * myMesh = new MESH(MED_DRIVER,filename,meshname);
+  const SUPPORT * mySupport;
+  FIELD<int> * myField1;
+  try
     {
-        /* read MESH, SUPPORT and FIELD */
-      mySupport = new SUPPORT(myMesh,"Support on all Cells",MED_CELL);
+      /* read MESH, SUPPORT and FIELD */
+      mySupport = myMesh->getSupportOnAll(MED_CELL);
       myField1 = new FIELD<int>(mySupport,MED_DRIVER,filename,fieldname) ;
     }
-    catch (MEDEXCEPTION &ex)
+  catch (MEDEXCEPTION &ex)
     {
-        mySupport->removeReference();
-        mySupport = new SUPPORT(myMesh,"On_all_node",MED_NODE);
-        try 
+      mySupport = myMesh->getSupportOnAll(MED_NODE);
+      try
         {
           myField1 = new FIELD<int>(mySupport,MED_DRIVER,filename,fieldname) ;
-            myField1->setValueIJ(10,1,-9); // pour tester les normes max avec une valeur negative
+          myField1->setValueIJ(10,1,-9); // pour tester les normes max avec une valeur negative
         }
-        catch (...) 
+      catch (...)
         {
-            cout << "Field int " << fieldname << " not found !!!" << endl ;
-            exit (-1) ;
+          cout << "Field int " << fieldname << " not found !!!" << endl ;
+          exit (-1) ;
         }
     }
 
@@ -196,7 +197,7 @@ int main (int argc, char ** argv)
     }
 
     // supports non compatibles
-    const SUPPORT *mySupport2=new SUPPORT(myMesh,"On_all_node",MED_NODE);
+    const SUPPORT *mySupport2=myMesh->getSupportOnAll(MED_NODE);
     myField1->setSupport(mySupport2);
     try
     {
@@ -240,14 +241,10 @@ int main (int argc, char ** argv)
 
     FIELD<int> *myFieldPlus = *myField1 + *myField2;
     FIELD<int> *myFieldMoins = *myField1 - *myField2;
-    myFieldMoins->removeReference();
     FIELD<int> *myFieldNeg = -(*myField1);
     FIELD<int> *myFieldFois = *myField1 * *myField2;
-    myFieldFois->removeReference();
     FIELD<int> *myFieldDiv = *myField1 / *myField2;
-    myFieldDiv->removeReference();
     FIELD<int> *myFieldAsso = (*myField1)+*((*myField2)*(*myField2));
-    myFieldAsso->removeReference();
     FIELD<int>* myFieldadd = FIELD<int>::add(*myField1, *myField2);
     FIELD<int>* myFieldsub = FIELD<int>::sub(*myField1, *myField2);
     FIELD<int>* myFieldmul = FIELD<int>::mul(*myField1, *myField2);
@@ -279,6 +276,13 @@ int main (int argc, char ** argv)
     affiche_valeur_field(" div    :", size, *myFielddiv);
     affiche_valeur_field("f1+f2*f1:", size, *myFieldAsso);
     affiche_valeur_field("  - f1  :", size, *myFieldNeg);
+
+    myFieldPlus->removeReference();
+    myFieldMoins->removeReference();
+    myFieldFois->removeReference();
+    myFieldDiv->removeReference();
+    myFieldAsso->removeReference();
+    myFieldNeg->removeReference();
 
     // Test applyLin
     std::cout << endl;

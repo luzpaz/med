@@ -1,140 +1,139 @@
-dnl  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+dnl Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 dnl
-dnl  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-dnl  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+dnl Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+dnl CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 dnl
-dnl  This library is free software; you can redistribute it and/or
-dnl  modify it under the terms of the GNU Lesser General Public
-dnl  License as published by the Free Software Foundation; either
-dnl  version 2.1 of the License.
+dnl This library is free software; you can redistribute it and/or
+dnl modify it under the terms of the GNU Lesser General Public
+dnl License as published by the Free Software Foundation; either
+dnl version 2.1 of the License.
 dnl
-dnl  This library is distributed in the hope that it will be useful,
-dnl  but WITHOUT ANY WARRANTY; without even the implied warranty of
-dnl  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-dnl  Lesser General Public License for more details.
+dnl This library is distributed in the hope that it will be useful,
+dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+dnl Lesser General Public License for more details.
 dnl
-dnl  You should have received a copy of the GNU Lesser General Public
-dnl  License along with this library; if not, write to the Free Software
-dnl  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+dnl You should have received a copy of the GNU Lesser General Public
+dnl License along with this library; if not, write to the Free Software
+dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 dnl
-dnl  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+dnl See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 dnl
 
 AC_DEFUN([CHECK_SCOTCH],[
 
-AC_CHECKING(for SCOTCH Library)
+AC_CHECKING(for scotch)
 
 AC_LANG_SAVE
 AC_LANG_C
 
-SCOTCH_CPPFLAGS=""
-SCOTCH_LIBSUFFIX=""
-SCOTCH_LIBS=""
+dnl
+dnl default values
+dnl
+SCOTCH_CPPFLAGS="SCOTCH_CPPFLAGS_NOT_DEFINED"
+SCOTCH_LIBS="SCOTCH_LIBS_NOT_FOUND"
+SCOTCH_LIBSUFFIX="-not-defined"
+
 ENABLE_SCOTCH="no"
 
-AC_CHECKING(for SCOTCH location)
+AC_CHECKING(for scotch location)
+
 AC_ARG_WITH(scotch,
             [  --with-scotch=DIR      root directory path to SCOTCH library installation ],
             [SCOTCHDIR="$withval"
-             AC_MSG_RESULT("select $withval as path to SCOTCH library")])
+             AC_MSG_RESULT([Select $withval as path to SCOTCH library])])
 
-AC_MSG_RESULT(\$SCOTCHDIR = ${SCOTCHDIR})
+if test "x${SCOTCHDIR}" = "x" ; then
+  AC_MSG_WARN(SCOTCHDIR is not specified)
+  AC_MSG_NOTICE(Trying native scotch...)
+  SCOTCHDIR=/usr
+fi
 
 CPPFLAGS_old="${CPPFLAGS}"
 LIBS_old=$LIBS
-
-if test "x${SCOTCHDIR}" != "x" ; then
-  SCOTCH_CPPFLAGS="-DENABLE_SCOTCH -I${SCOTCHDIR}"
-  SCOTCH_LIBS="-L${SCOTCHDIR}/bin -lscotch -lscotcherr"
-fi
 
 scotch_ok=no
 scotch_headers_ok=no
 scotch_binaries_ok=no
 
+dnl
 dnl SCOTCH headers
+dnl
 AC_CHECKING(for SCOTCH headers)
-CPPFLAGS="${CPPFLAGS_old} ${SCOTCH_CPPFLAGS} -std=c99"
 
-scotch_include_dir_ok=yes
-if test "x${SCOTCHDIR}" != "x" ; then
-  AC_CHECK_FILE(${SCOTCHDIR}/bin/scotch.h,
-                scotch_include_dir_ok=yes,
-                scotch_include_dir_ok=no)
-fi
+for d in ${SCOTCHDIR}/include ${SCOTCHDIR}/include/scotch ${SCOTCHDIR}/bin ${SCOTCHDIR} ; do
+  dnl
+  dnl check scotch.h file availability
+  dnl
+  AC_CHECK_FILE([${d}/scotch.h],
+                [scotch_include_dir_ok=yes],
+                [scotch_include_dir_ok=no])
 
-if test "x${scotch_include_dir_ok}" = "xyes" ; then
-  AC_TRY_COMPILE([#include <stdio.h>
-		  #include <bin/scotch.h>],
-                 [SCOTCH_Graph* graph;
-		  SCOTCH_graphInit(graph)],
-                 scotch_headers_ok=yes,
-                 scotch_headers_ok=no)
-fi
+  if test "x${scotch_include_dir_ok}" = "xyes" ; then
+    LOCAL_INCLUDES="-DENABLE_SCOTCH -I${d} ${MPI_INCLUDES}"
+    CPPFLAGS="${CPPFLAGS_old} ${LOCAL_INCLUDES} -std=c99"
+    AC_TRY_COMPILE([
+      #include <stdio.h>
+      #include <scotch.h>
+      ],
+      [SCOTCH_Graph* graph; SCOTCH_graphInit(graph)],
+      [scotch_headers_ok=yes],
+      [scotch_headers_ok=no])
+    if test "x${scotch_headers_ok}" = "xyes" ; then
+      break;
+    fi
+  fi
+done
 
-if test "x${scotch_headers_ok}" = "xno" ; then
-  SCOTCH_CPPFLAGS="SCOTCH_CPPFLAGS_NOT_DEFINED"
-else
-  AC_MSG_RESULT(\$SCOTCH_CPPFLAGS = ${SCOTCH_CPPFLAGS})
-fi
+dnl
+dnl result for headers
+dnl
 AC_MSG_RESULT(for scotch headers: $scotch_headers_ok)
 
+dnl
+dnl SCOTCH libraries
+dnl
 if test "x${scotch_headers_ok}" = "xyes" ; then
-  dnl SCOTCH binaries
-  AC_CHECKING(for SCOTCH binaries)
-  scotch_lib_dir_ok=yes
-  if test "x${SCOTCHDIR}" != "x" ; then
-    AC_CHECK_FILE(${SCOTCHDIR}/bin/libscotch.a,
-                  scotch_lib_dir_ok=yes,
-                  scotch_lib_dir_ok=no)
-    if test "x${scotch_lib_dir_ok}" = "xno" ; then
-      SCOTCH_LIBSUFFIX=""
-      AC_CHECK_FILE(${SCOTCHDIR}/bin/libscotch.a,
-                    scotch_lib_dir_ok=yes,
-                    scotch_lib_dir_ok=no)
+  AC_CHECKING(for scotch libraries)
+
+  for d in ${SCOTCHDIR}/lib ${SCOTCHDIR}/lib64 ${SCOTCHDIR}/lib/scotch ${SCOTCHDIR}/lib64/scotch ${SCOTCHDIR}/bin ${SCOTCHDIR} ; do
+    LOCAL_LIBS="-L${d} -lscotch -lscotcherr"
+    LIBS="${LIBS_old} ${LOCAL_LIBS}"
+    AC_TRY_LINK([
+      #include <stdio.h>
+      #include <scotch.h>
+      ],
+      [SCOTCH_Graph* graph; SCOTCH_graphInit(graph)],
+      [scotch_binaries_ok=yes],
+      [scotch_binaries_ok=no])
+    if test "x${scotch_binaries_ok}" = "xyes" ; then
+      break;
     fi
-  fi
-  if test "x${scotch_lib_dir_ok}" = "xyes" ; then
-    LIBS="${LIBS_old} ${SCOTCH_LIBS}"
-    AC_TRY_LINK([#include <stdio.h>
-		#include <bin/scotch.h>],
-                  [SCOTCH_Graph* graph;
-		  SCOTCH_graphInit(graph)],
-                scotch_binaries_ok=yes,
-                scotch_binaries_ok=no)
-    if test "x${scotch_binaries_ok}" = "xno" ; then
-      SCOTCH_LIBSUFFIX=""
-      LIBS="${LIBS_old} ${SCOTCH_LIBS} "
-      AC_TRY_LINK([#include <stdio.h>
-		   #include <bin/scotch.h>],
-                  [SCOTCH_Graph* graph;
-		  SCOTCH_graphInit(graph)],
-                  scotch_binaries_ok=yes,
-                  scotch_binaries_ok=no)
-    fi
-  fi
+  done
 fi
 
-if test "x${scotch_binaries_ok}" = "xno" ; then
-  SCOTCH_LIBS="SCOTCH_LIBS_NOT_FOUND"
-  SCOTCH_LIBSUFFIX="-not-defined"
-else
+dnl
+dnl result for libraries
+dnl
+AC_MSG_RESULT(for scotch libraries: $scotch_binaries_ok)
+
+dnl
+dnl summary
+dnl
+if test "x${scotch_binaries_ok}" = "xyes" ; then
+  SCOTCH_CPPFLAGS=${LOCAL_INCLUDES}
+  SCOTCH_LIBS=${LOCAL_LIBS}
+  SCOTCH_LIBSUFFIX=""
+  ENABLE_SCOTCH="yes"
+  scotch_ok=yes
+  AC_MSG_RESULT(\$SCOTCH_CPPFLAGS  = ${SCOTCH_CPPFLAGS})
+  AC_MSG_RESULT(\$SCOTCH_LIBS      = ${SCOTCH_LIBS})
   AC_MSG_RESULT(\$SCOTCH_LIBSUFFIX = ${SCOTCH_LIBSUFFIX})
-  AC_MSG_RESULT(\$SCOTCH_LIBS = ${SCOTCH_LIBS})
 fi
-AC_MSG_RESULT(for scotch binaries: $scotch_binaries_ok)
+AC_MSG_RESULT(for scotch: $scotch_ok)
 
 CPPFLAGS="${CPPFLAGS_old}"
 LIBS="${LIBS_old}"
-
-if test "x${scotch_headers_ok}" = "xyes" ; then
-  if test "x${scotch_binaries_ok}" = "xyes" ; then
-    scotch_ok=yes
-    ENABLE_SCOTCH="yes"
-  fi
-fi
-
-AC_MSG_RESULT(for scotch: $scotch_ok)
 
 AC_SUBST(SCOTCH_CPPFLAGS)
 AC_SUBST(SCOTCH_LIBSUFFIX)

@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #ifndef DEFINE_HXX
@@ -29,10 +29,44 @@
 #include <assert.h>
 
 // UTILE AUX DEUX NAMESPACES
-extern "C"{
 #include <hdf5.h>
-}
 
+namespace med_2_3 {
+  extern "C" { 
+    #include <med.h>
+        med_err MEDfieldComputingStepInfo(const med_idt fid,
+                                    const char * const fieldname,
+                                    const int csit,
+                                    med_int * const numdt,
+                                    med_int * const numit,
+                                    med_float * const dt);
+  
+  med_err MEDmeshEntityFamilyNumberRd(const med_idt               fid,
+                                      const char*  const          meshname,
+                                      const med_int               numdt,
+                                      const med_int               numit,
+                                      const med_entity_type       entitype,
+                                      const med_geometry_type     geotype,
+                                      med_int * const             number);
+
+  med_err MEDmeshEntityNumberRd(const med_idt               fid,
+                                const char*  const          meshname,
+                                const med_int               numdt,
+                                const med_int               numit,
+                                const med_entity_type       entitype,
+                                const med_geometry_type     geotype,
+                                med_int * const             number);
+
+  med_err MEDfieldCr( const med_idt fid,
+                      const char * const fieldname,
+                      const med_field_type fieldtype,
+                      const med_int nbofcomponent,
+                      const char * const componentname,
+                      const char * const componentunit,
+                      const char * const dtunit,
+                      const char * const meshname);
+  }
+}
 
 namespace MED_EN {
   extern "C" { // on est la
@@ -46,6 +80,63 @@ namespace MED_EN {
 // #define MED_TAILLE_LNOM  80
 // #define MED_TAILLE_PNOM   8
 
+#ifdef MED_NONE
+#undef MED_NONE
+#endif
+#ifdef MED_POINT1
+#undef MED_POINT1
+#endif
+#ifdef MED_SEG2
+#undef MED_SEG2
+#endif
+#ifdef MED_SEG3
+#undef MED_SEG3
+#endif
+#ifdef MED_TRIA3
+#undef MED_TRIA3
+#endif
+#ifdef MED_QUAD4
+#undef MED_QUAD4
+#endif
+#ifdef MED_TRIA6
+#undef MED_TRIA6
+#endif
+#ifdef MED_QUAD8
+#undef MED_QUAD8
+#endif
+#ifdef MED_TETRA4
+#undef MED_TETRA4
+#endif
+#ifdef MED_PYRA5
+#undef MED_PYRA5
+#endif
+#ifdef MED_PENTA6
+#undef MED_PENTA6
+#endif
+#ifdef MED_HEXA8
+#undef MED_HEXA8
+#endif
+#ifdef MED_TETRA10
+#undef MED_TETRA10
+#endif
+#ifdef MED_PYRA13
+#undef MED_PYRA13
+#endif
+#ifdef MED_PENTA15
+#undef MED_PENTA15
+#endif
+#ifdef MED_HEXA20
+#undef MED_HEXA20
+#endif
+#ifdef MED_POLYGON
+#undef MED_POLYGON
+#endif
+#ifdef MED_POLYHEDRA
+#undef MED_POLYHEDRA
+#endif
+#ifdef MED_ALL_ELEMENTS
+#undef MED_ALL_ELEMENTS
+#endif
 
     typedef long medGeometryElement;
     const medGeometryElement MED_NONE = 0;

@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "TestInterpKernelUtils.hxx"
 
@@ -23,8 +23,10 @@
 
 #include "MeshTestToolkit.hxx"
 #include "MEDMEM_Mesh.hxx"
+#include "MEDMEM_Field.hxx"
+#include "MEDMEM_Support.hxx"
 
-#include "Interpolation3DSurf.txx"
+#include "Interpolation3DSurf.hxx"
 #include "Interpolation2D.txx"
 #include "Interpolation3D.txx"
 
@@ -34,10 +36,6 @@
 #include <cmath>
 #include <algorithm>
 
-//#include "VectorUtils.hxx"
-
-#include "MEDMEM_Field.hxx"
-#include "MEDMEM_Support.hxx"
 
 // levels : 
 // 1 - titles and volume results
@@ -57,7 +55,6 @@ using namespace INTERP_KERNEL;
 
 namespace INTERP_TEST
 {
-
   /**
    * Calculates the sum of a row of an intersection matrix
    *
@@ -110,7 +107,7 @@ namespace INTERP_TEST
   template <int SPACEDIM, int MESHDIM>
   void MeshTestToolkit<SPACEDIM,MESHDIM>::getVolumes(MEDMEM::MESH& mesh, double* tab) const
   {
-    SUPPORT *sup=new SUPPORT(&mesh,"dummy",MED_CELL);
+    const SUPPORT *sup=mesh.getSupportOnAll( MED_CELL );
     FIELD<double>* f;
     switch (MESHDIM)
       {
@@ -123,7 +120,6 @@ namespace INTERP_TEST
       }
     const double *tabS = f->getValue();
     std::copy(tabS,tabS+mesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS),tab);
-    sup->removeReference();
     f->removeReference();
   }
 
@@ -137,7 +133,6 @@ namespace INTERP_TEST
   template <int SPACEDIM, int MESHDIM>
   double MeshTestToolkit<SPACEDIM,MESHDIM>::sumVolume(const IntersectionMatrix& m) const
   {
-    
     std::vector<double> volumes;
     for(IntersectionMatrix::const_iterator iter = m.begin() ; iter != m.end() ; ++iter)
       {
@@ -146,12 +141,12 @@ namespace INTERP_TEST
             volumes.push_back(fabs(iter2->second));
           }
       }
-    
+
     // sum in ascending order to avoid rounding errors
-    
+
     sort(volumes.begin(), volumes.end());
     const double vol = accumulate(volumes.begin(), volumes.end(), 0.0);
-    
+
     return vol;
   }
 
@@ -242,7 +237,7 @@ namespace INTERP_TEST
       }
     return compatitable;
   }
-      
+
   /**
    * Tests if two intersection matrices are each others' transposes.
    *
@@ -253,7 +248,6 @@ namespace INTERP_TEST
   template <int SPACEDIM, int MESHDIM>
   bool MeshTestToolkit<SPACEDIM,MESHDIM>::testTranspose(const IntersectionMatrix& m1, const IntersectionMatrix& m2) const
   {
-
     int i = 0;
     bool isSymmetric = true;
 
@@ -343,9 +337,7 @@ namespace INTERP_TEST
       {
         for(map<int, double>::const_iterator iter2 = iter->begin() ; iter2 != iter->end() ; ++iter2)
           {
-    
             std::cout << "V(" << i << ", " << iter2->first << ") = " << iter2->second << endl;
-    
           }
         ++i;
       }
@@ -369,7 +361,7 @@ namespace INTERP_TEST
 
     LOG(5, "Loading " << mesh1 << " from " << mesh1path);
     MESH sMesh(MED_DRIVER, INTERP_TEST::getResourceFile(mesh1path), mesh1);
-  
+
     LOG(5, "Loading " << mesh2 << " from " << mesh2path);
     MESH tMesh(MED_DRIVER, INTERP_TEST::getResourceFile(mesh2path), mesh2);
 
@@ -407,7 +399,6 @@ namespace INTERP_TEST
       }
 
     LOG(1, "Intersection calculation done. " << std::endl );
-  
   }
 
   /**
@@ -460,14 +451,13 @@ namespace INTERP_TEST
       }
     else
       {
-      
         IntersectionMatrix matrix2;
         calcIntersectionMatrix(mesh2path, mesh2, mesh1path, mesh1, matrix2);    
 
 #if LOG_LEVEL >= 2
         dumpIntersectionMatrix(matrix2);
 #endif
-      
+
         const double vol2 = sumVolume(matrix2);
 
         LOG(1, "vol1 =  " << vol1 << ", vol2 = " << vol2 << ", correctVol = " << correctVol );
@@ -477,7 +467,6 @@ namespace INTERP_TEST
         CPPUNIT_ASSERT_DOUBLES_EQUAL(correctVol, vol2, prec * std::max(vol2, correctVol));
         CPPUNIT_ASSERT_DOUBLES_EQUAL(vol1, vol2, prec * std::max(vol1, vol2));
       }
-
   }
 
   /**
@@ -502,6 +491,4 @@ namespace INTERP_TEST
 
     intersectMeshes(path1.c_str(), mesh1, path2.c_str(), mesh2, correctVol, prec, doubleTest);
   }
-
-
 }

@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File      : MEDMEM_MeshFuse.cxx
 // Created   : Tue Jul  7 18:27:00 2009
@@ -28,6 +28,8 @@
 using namespace MEDMEM;
 using namespace MED_EN;
 using namespace std;
+
+#define _NODE_TYPE_ MED_NONE
 
 MeshFuse::MeshFuse():MESHING()
 {
@@ -82,7 +84,6 @@ void MeshFuse::concatenate( const MESH* mesh, const vector<int>& node_glob_numbe
     static_cast<MESH&>(*this) = *mesh;
 
     _node_glob_numbers = node_glob_numbers;
-    _isAGrid = false;
     return;
   }
   // check feasibility
@@ -113,8 +114,6 @@ void MeshFuse::concatenate( const MESH* mesh, const vector<int>& node_glob_numbe
 
   expandConnectivity(final_nb_nodes);
 
-  expandPolyConnectivity();
-
   expandSupports();
 
   // clear unnecessary data
@@ -131,8 +130,8 @@ void MeshFuse::concatenate( const MESH* mesh, const vector<int>& node_glob_numbe
 int MeshFuse::makeNewNodeIds(const vector<int>& add_glob_numbers)
 {
   // remember merged added nodes and make an array of new ids of added nodes
-  vector<int>&       merged = _merged_of_type      [ MED_POINT1 ];
-  vector<int>& new_node_ids = _new_elem_ids_of_type[ MED_POINT1 ];
+  vector<int>&       merged = _merged_of_type      [ _NODE_TYPE_ ];
+  vector<int>& new_node_ids = _new_elem_ids_of_type[ _NODE_TYPE_ ];
   new_node_ids.resize( add_glob_numbers.size() );
 
   // extand global node numbers
@@ -161,9 +160,9 @@ int MeshFuse::makeNewNodeIds(const vector<int>& add_glob_numbers)
       merged.push_back( i );
     }
   }
-  _nb_index[ INIT_OLD ][ MED_NODE ][ MED_POINT1 ] = getNumberOfNodes();
-  _nb_index[ INIT_ADD ][ MED_NODE ][ MED_POINT1 ] = add_glob_numbers.size();
-  _nb_index[ RSLT_ADD ][ MED_NODE ][ MED_POINT1 ] = add_glob_numbers.size() - merged.size();
+  _nb_index[ INIT_OLD ][ MED_NODE ][ _NODE_TYPE_ ] = getNumberOfNodes();
+  _nb_index[ INIT_ADD ][ MED_NODE ][ _NODE_TYPE_ ] = add_glob_numbers.size();
+  _nb_index[ RSLT_ADD ][ MED_NODE ][ _NODE_TYPE_ ] = add_glob_numbers.size() - merged.size();
 
   return next_loc_id - 1;
 }
@@ -189,7 +188,7 @@ void MeshFuse::expandCoordinates(int final_nb_nodes)
   // set new coords
   coord += nb_old_coord;
   const double* add_coord =_mesh->getCoordinates( MED_FULL_INTERLACE );
-  if ( _merged_of_type[ MED_POINT1 ].empty())
+  if ( _merged_of_type[ _NODE_TYPE_ ].empty())
   {
     // no coincident nodes in the two meshes, just add coords
     memcpy( coord, add_coord, _mesh->getNumberOfNodes() * dim * sizeof( double ));
@@ -198,7 +197,7 @@ void MeshFuse::expandCoordinates(int final_nb_nodes)
   {
     // copy coord of only unique nodes
     int first_added_node = getNumberOfNodes() + 1;
-    const vector<int>& new_node_ids = _new_elem_ids_of_type[ MED_POINT1 ];
+    const vector<int>& new_node_ids = _new_elem_ids_of_type[ _NODE_TYPE_ ];
     for ( int n = 0; n < new_node_ids.size(); ++n )
     {
       if ( new_node_ids[n] < first_added_node ) continue; // coincident node
@@ -208,7 +207,7 @@ void MeshFuse::expandCoordinates(int final_nb_nodes)
   }
   _coordinate->setCoordinates( &medarray, /*shallowCopy=*/true );
 
-  setNumberOfNodes( final_nb_nodes );
+  _numberOfNodes = final_nb_nodes;
 }
 
 //================================================================================
@@ -222,7 +221,19 @@ void MeshFuse::expandCoordinates(int final_nb_nodes)
 void MeshFuse::expandConnectivity(int final_nb_nodes)
 {
   const medConnectivity nodal   = MED_NODAL;
-  const medModeSwitch interlace = MED_FULL_INTERLACE;
+
+  // fill in _nb_index[ INIT_OLD ]
+  for ( medEntityMesh entity = MED_CELL; entity < MED_ALL_ENTITIES; ++entity )
+  {
+    if ( existConnectivity( nodal, entity ))
+    {
+      const int *               index = this->getGlobalNumberingIndex(entity);
+      const medGeometryElement* types = this->getTypes(entity);
+      int                    nb_types = this->getNumberOfTypes(entity);
+      for ( int t = 0; t < nb_types; ++t )
+        _nb_index[ INIT_OLD ][ entity ][ types[t] ] = index[t+1]-index[0];
+    }
+  }
 
   CONNECTIVITY *prev_connectivity = 0, *cell_connectivity = 0;
 
@@ -277,9 +288,11 @@ void MeshFuse::expandConnectivity(int final_nb_nodes)
     set<medGeometryElement>::iterator type = types.begin();
     for ( int t = 0; type != types.end(); ++type, ++t )
     {
-      int max_conn_len = 
-        this->getConnectivityLength( interlace, nodal, entity, *type) +
-       _mesh->getConnectivityLength( interlace, nodal, entity, *type);
+      int max_conn_len = 0;
+      if ( this->getNumberOfElements( entity, *type ))
+        max_conn_len += this->getConnectivityLength( nodal, entity, *type);
+      if ( _mesh->getNumberOfElements( entity, *type ))
+        max_conn_len += _mesh->getConnectivityLength( nodal, entity, *type);
       conn_of_type[t]._connectivity.reserve( max_conn_len );
 
       int nb_old = appendConnectivity( conn_of_type[t], this, entity, *type );
@@ -299,7 +312,9 @@ void MeshFuse::expandConnectivity(int final_nb_nodes)
     connectivity->setGeometricTypes( &type_vec[0], entity );
     connectivity->setCount         ( &count   [0], entity );
     for ( int t = 0; t < types.size(); ++t )
-      connectivity->setNodal( &conn_of_type[t]._connectivity[0], entity, type_vec[t] );
+      connectivity->setNodal( &conn_of_type[t]._connectivity[0],
+                              entity, type_vec[t],
+                              &conn_of_type[t]._index[0] );
 
     // store connectivity of an entity
     if ( !prev_connectivity )
@@ -333,7 +348,7 @@ void MeshFuse::updateNodeIds( CONNECTIVITY* connectivity )
   const medConnectivity   nodal = MED_NODAL;
   const medGeometryElement type = MED_ALL_ELEMENTS;
 
-  const vector<int>& new_node_ids = _new_elem_ids_of_type[ MED_POINT1 ];
+  const vector<int>& new_node_ids = _new_elem_ids_of_type[ _NODE_TYPE_ ];
 
   medEntityMesh entity = connectivity->getEntity();
 
@@ -348,18 +363,6 @@ void MeshFuse::updateNodeIds( CONNECTIVITY* connectivity )
         ( make_pair( connectivity->getConnectivity(nodal,entity,type),
                      connectivity->getConnectivityLength(nodal,entity,type)));
 
-    if ( connectivity->existPolygonsConnectivity(nodal,entity))
-      conn_len_list.push_back
-        ( make_pair( connectivity->getPolygonsConnectivity(nodal,entity),
-                     connectivity->getPolygonsConnectivityIndex(nodal,entity)
-                     [ connectivity->getNumberOfPolygons(entity) ]-1));
-
-    if ( connectivity->existPolyhedronConnectivity(nodal,entity))
-      conn_len_list.push_back
-        ( make_pair( connectivity->getPolyhedronConnectivity(nodal),
-                     connectivity->getPolyhedronFacesIndex()
-                     [ connectivity->getNumberOfPolyhedronFaces() ]-1));
-
     // Convert them
 
     list< pair< const int*, int > >::iterator conn_len = conn_len_list.begin();
@@ -370,107 +373,6 @@ void MeshFuse::updateNodeIds( CONNECTIVITY* connectivity )
       for ( ; conn < conn_end; ++conn )
         *conn = new_node_ids[ *conn-1 ];
     }
-  }
-}
-
-//================================================================================
-/*!
- * \brief Unite poly connectivities
- */
-//================================================================================
-
-void MeshFuse::expandPolyConnectivity()
-{
-  const medConnectivity nodal = MED_NODAL;
-
-  // polygones
-
-  medEntityMesh entity =_mesh->getMeshDimension()==2 ? MED_CELL : MED_FACE;
-  bool add_poly = _mesh->existPolygonsConnectivity(nodal,entity);
-  bool old_poly = this ->existPolygonsConnectivity(nodal,entity);
-  if ( add_poly || old_poly )
-  {
-    TConnData conn_data;
-    // reserve place for new connectivity
-    int max_conn_len = 
-      old_poly ?  this->getPolygonsConnectivityLength( nodal, entity ) : 0 +
-      add_poly ? _mesh->getPolygonsConnectivityLength( nodal, entity ) : 0;
-    conn_data._connectivity.reserve( max_conn_len );
-    conn_data._index.reserve( this->getNumberOfPolygons( entity ) +
-                             _mesh->getNumberOfPolygons( entity ));
-
-    // unite connectivities and store
-    int nb_old = appendConnectivity( conn_data, this, entity, MED_POLYGON );
-    int nb_add = appendConnectivity( conn_data,_mesh, entity, MED_POLYGON );
-    setPolygonsConnectivity( &conn_data._connectivity[0],
-                             &conn_data._index[0],
-                             conn_data._nb_elems,
-                             entity );
-
-    // update numbering indices of polygones
-    int sum_old = nb_old +
-      _nb_index[INIT_OLD][ entity ].empty() ? 0 :_nb_index[ INIT_OLD ][ entity ].rbegin()->second;
-    int sum_add = nb_add +
-      _nb_index[RSLT_ADD][ entity ].empty() ? 0 :_nb_index[ RSLT_ADD ][ entity ].rbegin()->second;
-    int init_sum_add = _mesh->getNumberOfPolygons( entity ) +
-      _nb_index[INIT_ADD][ entity ].empty() ? 0 :_nb_index[ INIT_ADD ][ entity ].rbegin()->second;
-
-    _nb_index[ INIT_OLD ][ entity ][ MED_POLYGON ] = sum_old;
-    _nb_index[ RSLT_ADD ][ entity ][ MED_POLYGON ] = sum_add;
-    _nb_index[ INIT_ADD ][ entity ][ MED_POLYGON ] = init_sum_add;
-  }
-
-  // polyhedrons
-
-  int nb_add_poly =_mesh->getNumberOfPolyhedron();
-  int nb_old_poly = this->getNumberOfPolyhedron();
-  if ( nb_add_poly + nb_old_poly )
-  {
-    // reserve place for new connectivity
-    entity = MED_CELL;
-    TConnData conn_data;
-    int max_conn_len =
-      nb_old_poly ? this ->getPolyhedronConnectivityLength(nodal) : 0 +
-      nb_old_poly ? _mesh->getPolyhedronConnectivityLength(nodal) : 0;
-    conn_data._connectivity.reserve( max_conn_len );
-    conn_data._index.reserve( this->getNumberOfPolyhedronFaces() +
-                             _mesh->getNumberOfPolyhedronFaces());
-
-    // unite connectivities
-    appendConnectivity( conn_data, this, entity, MED_POLYHEDRA );
-    appendConnectivity( conn_data,_mesh, entity, MED_POLYHEDRA );
-
-    // unite polyhedrons indices
-    vector< int > index;
-    index.reserve( nb_add_poly + nb_old_poly + 1 );
-    if ( nb_old_poly )
-      index.insert( index.end(), getPolyhedronIndex( nodal ),
-                    getPolyhedronIndex( nodal ) + nb_old_poly );
-    else
-      index.push_back(1);
-    if ( nb_add_poly )
-    {
-      const int* add_index =_mesh->getPolyhedronIndex( nodal );
-      for ( int p = 0; p < nb_add_poly; ++p )
-        index.push_back( index.back() + add_index[p+1] - add_index[p] );
-    }
-    // store
-    setPolyhedraConnectivity( & index[0],
-                              & conn_data._index[0],
-                              & conn_data._connectivity[0],
-                              nb_add_poly + nb_old_poly );
-
-    // we currently suppose that cells can't be double
-    int sum_old = _mesh->getNumberOfPolyhedron() +
-      _nb_index[INIT_OLD][ entity ].empty() ? 0 :_nb_index[INIT_OLD][ entity ].rbegin()->second;
-    int sum_add = getNumberOfPolyhedron() +
-      _nb_index[RSLT_ADD][ entity ].empty() ? 0 :_nb_index[RSLT_ADD][ entity ].rbegin()->second;
-    int init_sum_add = _mesh->getNumberOfPolyhedron() +
-      _nb_index[INIT_ADD][ entity ].empty() ? 0 :_nb_index[INIT_ADD][ entity ].rbegin()->second;
-
-    _nb_index[ INIT_OLD ][ entity ][ MED_POLYHEDRA ] = sum_old;
-    _nb_index[ RSLT_ADD ][ entity ][ MED_POLYHEDRA ] = sum_add;
-    _nb_index[ INIT_ADD ][ entity ][ MED_POLYHEDRA ] = init_sum_add;
   }
 }
 
@@ -494,33 +396,18 @@ int MeshFuse::appendConnectivity( MeshFuse::TConnData& data,
 
   const int* conn, *index = 0;
   int nb_elem, conn_len;
-  bool need_index = true;
 
-  switch ( type ) {
-  case MED_POLYGON:
-    nb_elem = mesh->getNumberOfPolygons           ( entity );
-    if ( !nb_elem ) return 0;
-    conn     = mesh->getPolygonsConnectivity      ( MED_NODAL, entity );
-    index    = mesh->getPolygonsConnectivityIndex ( MED_NODAL, entity );
-    conn_len = mesh->getPolygonsConnectivityLength( MED_NODAL, entity );
-    break;
-  case MED_POLYHEDRA:
-    nb_elem  = mesh->getNumberOfPolyhedronFaces();
-    if ( !nb_elem ) return 0;
-    conn     = mesh->getPolyhedronConnectivity      ( MED_NODAL );
-    index    = mesh->getPolyhedronFacesIndex        ();
-    conn_len = mesh->getPolyhedronConnectivityLength( MED_NODAL );
-    break;
-  default:
-    nb_elem = mesh->getNumberOfElements ( entity, type );
-    if ( !nb_elem ) return 0;
-    conn    = mesh->getConnectivity     ( MED_FULL_INTERLACE, MED_NODAL, entity, type );
-    index   = mesh->getConnectivityIndex( MED_NODAL, entity );
-    int shift = getElemNbShift( entity, type, (mesh == this ? INIT_OLD : INIT_ADD), /*prev=*/true);
-    index += shift;
-    conn_len = index[ nb_elem ] - index[ 0 ];
-    need_index = false;
-  }
+  nb_elem = mesh->getNumberOfElements ( entity, type );
+  if ( !nb_elem ) return 0;
+  conn    = mesh->getConnectivity     ( MED_NODAL, entity, type );
+  index   = mesh->getConnectivityIndex( MED_NODAL, entity );
+  int shift = getElemNbShift( entity, type, (mesh == this ? INIT_OLD : INIT_ADD), /*prev=*/true);
+  index += shift;
+  conn_len = index[ nb_elem ] - index[ 0 ];
+
+  bool need_index = ( type == MED_POLYGON || type == MED_POLYHEDRA );
+  if ( !need_index )
+    data._index.resize( 1, 0 ); // for safe access to pointer even if no real index exists
 
   // Append
 
@@ -545,11 +432,19 @@ int MeshFuse::appendConnectivity( MeshFuse::TConnData& data,
     // convert connectivity of other mesh
 
     vector<int> other_conn( conn_len );
-    const vector<int>& new_node_ids = _new_elem_ids_of_type[ MED_POINT1 ];
-    for ( int n = 0; n < conn_len; ++n )
-      other_conn[ n ] = new_node_ids[ conn[ n ]-1 ];
-
-    if ( entity == MED_CELL || _merged_of_type[ MED_POINT1 ].empty() )
+    const vector<int>& new_node_ids = _new_elem_ids_of_type[ _NODE_TYPE_ ];
+    if ( type == MED_POLYHEDRA )
+      {
+        for ( int n = 0; n < conn_len; ++n )
+          if ( conn[ n ] > 0 )
+            other_conn[ n ] = new_node_ids[ conn[ n ]-1 ];
+      }
+    else
+      {
+        for ( int n = 0; n < conn_len; ++n )
+          other_conn[ n ] = new_node_ids[ conn[ n ]-1 ];
+      }
+    if ( entity == MED_CELL || _merged_of_type[ _NODE_TYPE_ ].empty() )
     {
       // store converted connectivity in data
       data._connectivity.insert( data._connectivity.end(), other_conn.begin(), other_conn.end());
@@ -574,7 +469,7 @@ int MeshFuse::appendConnectivity( MeshFuse::TConnData& data,
 
       // find added elements possibly(!) coincident with old ones
       vector<int>& merged = _merged_of_type[ type ]; // to fill in
-      int first_added_node = _nb_index[ INIT_OLD ][ MED_NODE ][ MED_POINT1 ] + 1;
+      int first_added_node = _nb_index[ INIT_OLD ][ MED_NODE ][ _NODE_TYPE_ ] + 1;
       for ( int i = 0; i < nb_elem; ++i )
       {
         // count coincident nodes
@@ -588,12 +483,14 @@ int MeshFuse::appendConnectivity( MeshFuse::TConnData& data,
       // find old elements equal to merged, if no equal exist there is zero in array
       vector<int>& equalo = _equalo_of_type[ type ];
       findEqualOldElements( entity, type, equalo );
+      if ( equalo.size() < merged.size() )
+        equalo.resize( merged.size(), 0 );
 
       // fill connectivity
       int rm_i = 0, nb_rm = 0;
       for ( int i = 0; i < nb_elem; ++i )
       {
-        bool is_merged = ( rm_i < merged.size() && i == merged[rm_i] && equalo[rm_i]);
+        bool is_merged = ( rm_i < merged.size() && i == merged[rm_i] && equalo[rm_i] );
         if ( is_merged )
         {
           data._nb_elems--;
@@ -685,7 +582,7 @@ TSUPPORT* MeshFuse::makeSupport(const TSUPPORT* add_support,
 
   set<medGeometryElement> add_types, old_types, all_types;
   if ( res_support->getEntity() == MED_NODE )
-    add_types.insert( MED_POINT1 );
+    add_types.insert( _NODE_TYPE_ );
   else
     add_types.insert( add_support->getTypes(),
                       add_support->getTypes() + add_support->getNumberOfTypes() );
@@ -693,7 +590,7 @@ TSUPPORT* MeshFuse::makeSupport(const TSUPPORT* add_support,
   if ( same_name_support )
   {
     if ( same_name_support->getEntity() == MED_NODE )
-      old_types.insert( MED_POINT1 );
+      old_types.insert( _NODE_TYPE_ );
     else
       old_types.insert(same_name_support->getTypes(),
                        same_name_support->getTypes()+same_name_support->getNumberOfTypes() );
@@ -851,7 +748,7 @@ int MeshFuse::getElemNbShift( const medEntityMesh& entity,
                               medGeometryElement   type,
                               int which, bool prev ) const
 {
-  if ( type == MED_NONE ) type = MED_POINT1;
+  //if ( type == MED_NONE ) type = MED_POINT1;
 
   const TNbOfGeom & shift_of_type = _nb_index[ which ][ int(entity) ];
 
@@ -860,11 +757,13 @@ int MeshFuse::getElemNbShift( const medEntityMesh& entity,
     return shift_of_type.empty() ? 0 : shift_of_type.rbegin()->second;
 
   // get shift of exactly the type or of the previos type
-  if ( prev && type_shift->first == type || type_shift->first > type )
+  if ( ( prev && type_shift->first == type ) || type_shift->first > type )
+  {
     if ( type_shift == shift_of_type.begin() )
       return 0;
     else
       type_shift--;
+  }
 
   return type_shift->second;
 }
@@ -884,9 +783,7 @@ void MeshFuse::uniteSupportElements(const SUPPORT*     add_support,
                                     medGeometryElement type,
                                     vector<int> &      elements)
 {
-  // internal data for nodes implies type==MED_POINT1, but support may have MED_NONE,
-  // so use MED_ALL_ELEMENTS for calls of support methods
-  int sup_type = ( type == MED_POINT1 ? MED_ALL_ELEMENTS : type );
+  int sup_type = ( type/100 == 0 ? MED_ALL_ELEMENTS : type );
 
   const medEntityMesh entity = (add_support ? add_support : old_support )->getEntity();
 
@@ -976,8 +873,8 @@ void MeshFuse::makeNewElemIds(medEntityMesh      entity,
 
   // find ids for merged added elements
   vector< int >& old_ids = _equalo_of_type[ type ];
-  if ( old_ids.empty() && !merged_i.empty() )
-    findEqualOldElements( entity, type, old_ids );
+//   if ( old_ids.empty() && !merged_i.empty() )
+//     findEqualOldElements( entity, type, old_ids );
   vector< int >::iterator old_id = old_ids.begin();
 
   // nb of added elements
@@ -990,6 +887,7 @@ void MeshFuse::makeNewElemIds(medEntityMesh      entity,
   int elem_id = old_shift + add_shift + 1;
 
   // all new ids
+  // (this works implying that numbers in SUPPORT are in inceasing order!)
   for (int i_elem = 0; i_elem < add_nb_elems; )
   {
     int i_until = ( rm_i == merged_i.end() ? add_nb_elems : *rm_i++ );
@@ -998,10 +896,12 @@ void MeshFuse::makeNewElemIds(medEntityMesh      entity,
       new_ids[ i_elem++ ] = elem_id++;
     // insert id of old element equal to merged one, if any
     if ( i_elem < add_nb_elems )
+    {
       if ( *old_id )
         new_ids[ i_elem++ ] = *old_id++;
       else
         new_ids[ i_elem++ ] = elem_id++, old_id++; // no equal old elem exist
+    }
   }
 }
 
@@ -1015,38 +915,38 @@ void MeshFuse::findEqualOldElements(medEntityMesh      entity,
                                     medGeometryElement type,
                                     vector< int > &    old_ids)
 {
-  //const char* LOC = "MeshFuse::findEqualOldElements(): ";
-  const int *old_conn, *old_index, *add_conn, *add_index;
-  if ( type == MED_POLYGON )
-  {
-    if ( !_mesh->getNumberOfPolygons() || !this->getNumberOfPolygons() )
-      return;
-    add_conn  = _mesh->getPolygonsConnectivity(MED_NODAL, entity );
-    old_conn  =  this->getPolygonsConnectivity(MED_NODAL, entity );
-    add_index = _mesh->getPolygonsConnectivityIndex(MED_NODAL, entity );
-    old_index =  this->getPolygonsConnectivityIndex(MED_NODAL, entity );
-  }
-  else // case of POLYHEDRON is omitted yet
-  {
-    if ( !_mesh->getNumberOfElements(entity, type) || !this->getNumberOfElements(entity, type) )
-      return;
-    add_conn  = _mesh->getConnectivity( MED_NODAL, MED_FULL_INTERLACE, entity, type );
-    old_conn  =  this->getConnectivity( MED_NODAL, MED_FULL_INTERLACE, entity, type );
-    add_index = _mesh->getConnectivityIndex( MED_NODAL, entity );
-    old_index =  this->getConnectivityIndex( MED_NODAL, entity );
-  }
+  // poly element can coincide with any type of the same entity
+  const bool isPoly = ( type == MED_POLYGON || type == MED_POLYHEDRA );
+  const medGeometryElement checkType = isPoly ? MED_ALL_ELEMENTS : type;
 
-  const vector<int>& new_node_ids = _new_elem_ids_of_type[ MED_POINT1 ];
+  if ( !_mesh->getNumberOfElements(entity, type) ||
+       ! this->getNumberOfElements(entity, checkType) )
+    return;
+
+  int old_nb_elems_end, old_nb_elems_start;
+  if ( isPoly )
+    {
+      old_nb_elems_start = 0;
+      old_nb_elems_end   = this->getNumberOfElements( entity, MED_ALL_ELEMENTS );
+    }
+  else
+    {
+      // if this method is called when connectivity of the entity is not yet concatenated:
+      old_nb_elems_start = getElemNbShift( entity, type, INIT_OLD, /*prev=*/true);
+      old_nb_elems_end   = getElemNbShift( entity, type, INIT_OLD, /*prev=*/false);
+      // if this method is called after expandConnectivity() and this mesh contains all elements
+      //   int old_nb_elems = 
+    }
+  const int *old_conn, *old_index, *add_conn, *add_index;
+  add_conn  = _mesh->getConnectivity( MED_NODAL, entity, type );
+  old_conn  =  this->getConnectivity( MED_NODAL, entity, checkType );
+  add_index = _mesh->getConnectivityIndex( MED_NODAL, entity );
+  old_index =  this->getConnectivityIndex( MED_NODAL, entity );
+
+  const vector<int>& new_node_ids = _new_elem_ids_of_type[ _NODE_TYPE_ ];
 
   const vector<int>& merged_i = _merged_of_type[ type ];
   vector<int>::const_iterator rm_i = merged_i.begin();
-
-  // this method is called after expandConnectivity() and this mesh already contains all elements
-  //int add_nb_elems = _mesh->getNumberOfElements( entity, type );
-  //int old_nb_elems =  this->getNumberOfElements( entity, type ) - add_nb_elems + merged_i.size();
-  int old_nb_elems = 
-    getElemNbShift( entity, type, INIT_OLD, /*prev=*/false) -
-    getElemNbShift( entity, type, INIT_OLD, /*prev=*/true);
 
   old_ids.reserve( merged_i.size() );
 
@@ -1063,7 +963,7 @@ void MeshFuse::findEqualOldElements(medEntityMesh      entity,
     const int* old_node = old_conn;
     int        new_node = *add_elem_nodes.begin();
     int  found_old_elem = 0;
-    for ( int i = 0; i < old_nb_elems && !found_old_elem; ++i )
+    for ( int i = old_nb_elems_start; i < old_nb_elems_end && !found_old_elem; ++i )
     {
       int nb_old_elem_nodes = old_index[ i+1 ] - old_index[ i ];
       for ( int j = 0; j < nb_old_elem_nodes; ++j, ++old_node )
@@ -1100,9 +1000,9 @@ void MeshFuse::append( medEntityMesh      entity,
 {
   const char* LOC="MeshFuse::append(): ";
 
-  int nb_types = getNumberOfTypesWithPoly( entity );
+  int nb_types = getNumberOfTypes( entity );
   if ( numbers.empty() || add_numbers.empty() ||
-       nb_types < 2 && _merged_of_type[ getElementType( entity, 1 )].empty() )
+       ( nb_types < 2 && _merged_of_type[ getElementType( entity, 1 )].empty() ))
   {
     numbers.insert( numbers.end(), add_numbers.begin(), add_numbers.end() );
     return;
@@ -1114,7 +1014,7 @@ void MeshFuse::append( medEntityMesh      entity,
   const int* add_nums = & add_numbers[0];
 
   MEDMEM::PointerOf<medGeometryElement> types;
-  types.setShallowAndOwnership( getTypesWithPoly(entity));
+  types.setShallowAndOwnership( getTypes(entity));
 
   for ( int t = 0; t < nb_types; ++t )
   {
@@ -1151,9 +1051,9 @@ void MeshFuse::append( medEntityMesh      entity,
     }
     add_nums += nb_add;
   }
-  if ( result.size() != getNumberOfElementsWithPoly( entity, MED_ALL_ELEMENTS ))
+  if ( result.size() != getNumberOfElements( entity, MED_ALL_ELEMENTS ))
     throw MED_EXCEPTION(MEDMEM::STRING(LOC) << "invalid nb of numbers of entity " << entity
-                        << ": expect " << getNumberOfElementsWithPoly( entity, MED_ALL_ELEMENTS)
+                        << ": expect " << getNumberOfElements( entity, MED_ALL_ELEMENTS)
                         << " but get " << result.size());
 
   numbers.swap(result);

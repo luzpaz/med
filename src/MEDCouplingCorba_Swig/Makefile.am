@@ -1,20 +1,20 @@
-#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+# Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
@@ -23,9 +23,9 @@ SUBDIRS = Client
 
 lib_LTLIBRARIES = _MEDCouplingCorba.la
 
-salomeinclude_HEADERS = MEDCouplingCorba.i
+salomeinclude_HEADERS = MEDCouplingCorba.i MEDCouplingCorbaTypemaps.i
 
-SWIG_DEF = MEDCouplingCorba.i
+SWIG_DEF = MEDCouplingCorba.i MEDCouplingCorbaTypemaps.i
 
 SWIG_FLAGS = @SWIG_FLAGS@ -I$(srcdir) -I$(srcdir)/../MEDCouplingCorba -I$(srcdir)/../MEDCoupling -I$(srcdir)/../MEDCoupling_Swig -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases
 
@@ -52,3 +52,6 @@ _MEDCouplingCorba_la_LDFLAGS  = -module $(PYTHON_LIBS) \
 CLEANFILES = MEDCouplingCorba_wrap.cxx MEDCouplingCorba.py
 
 dist_salomescript_DATA= MEDCouplingCorba.py
+
+EXTRA_DIST += MEDCouplingCorbaSwigTest.py MEDCouplingCorbaSwigTestClt.py MEDCouplingCorbaSwigTestServ.py \
+              TestMEDCouplingCorbaClt.py TestMEDCouplingCorbaServ.py>>>>>>> 1.1.2.2.4.3.4.2

@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #ifndef ASCII_FIELD_DRIVER_HXX
@@ -102,7 +102,7 @@ namespace MEDMEM {
 
   public:
     template <class INTERLACING_TAG>
-    ASCII_FIELD_DRIVER():GENDRIVER(),
+    ASCII_FIELD_DRIVER():GENDRIVER(ASCII_DRIVER),
                          _ptrField((FIELD<T>)MED_NULL),
                          _fileName("") {}
 
@@ -199,7 +199,7 @@ namespace MEDMEM {
           }
       else
         {
-          if(_spaceDimension!=strlen(priority))
+          if(_spaceDimension != (int)strlen(priority))
             throw MEDEXCEPTION("ASCII_FIELD_DRIVER : Coordinate priority invalid with spaceDim");
           for(i=_spaceDimension-1;i>=0;i--)
             {
@@ -216,14 +216,14 @@ namespace MEDMEM {
   template <class T>
   ASCII_FIELD_DRIVER<T>::ASCII_FIELD_DRIVER(const ASCII_FIELD_DRIVER<T>& other):
     GENDRIVER(ASCII_DRIVER),
+    _mesh(other._mesh),
+    _support(other._support),
     _ptrField(other._ptrField),
     _fileName(other._fileName),
-    _direc(other._direc),
-    _mesh(other._mesh),
-    _nbComponents(other._nbComponents),
     _code(other._code),
-    _spaceDimension(other._spaceDimension),
-    _support(other._support)
+    _direc(other._direc),
+    _nbComponents(other._nbComponents),
+    _spaceDimension(other._spaceDimension)
   {
   }
 

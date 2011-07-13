@@ -1,23 +1,23 @@
-dnl  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+dnl Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 dnl
-dnl  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-dnl  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+dnl Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+dnl CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 dnl
-dnl  This library is free software; you can redistribute it and/or
-dnl  modify it under the terms of the GNU Lesser General Public
-dnl  License as published by the Free Software Foundation; either
-dnl  version 2.1 of the License.
+dnl This library is free software; you can redistribute it and/or
+dnl modify it under the terms of the GNU Lesser General Public
+dnl License as published by the Free Software Foundation; either
+dnl version 2.1 of the License.
 dnl
-dnl  This library is distributed in the hope that it will be useful,
-dnl  but WITHOUT ANY WARRANTY; without even the implied warranty of
-dnl  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-dnl  Lesser General Public License for more details.
+dnl This library is distributed in the hope that it will be useful,
+dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+dnl Lesser General Public License for more details.
 dnl
-dnl  You should have received a copy of the GNU Lesser General Public
-dnl  License along with this library; if not, write to the Free Software
-dnl  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+dnl You should have received a copy of the GNU Lesser General Public
+dnl License along with this library; if not, write to the Free Software
+dnl Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 dnl
-dnl  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+dnl See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 dnl
 
 AC_DEFUN([CHECK_MED2],[
@@ -36,6 +36,7 @@ AC_ARG_WITH(med2,
 
 AC_SUBST(MED2_INCLUDES)
 AC_SUBST(MED2_LIBS)
+AC_SUBST(MED2_LIBS_C_ONLY)
 AC_SUBST(MED2_MT_LIBS)
 AC_SUBST(MED_CPPFLAGS)
 
@@ -47,7 +48,8 @@ MED_CPPFLAGS="$DEFINED_F77INT64"
 med2_ok=no
 
 LOCAL_INCLUDES="$HDF5_INCLUDES"
-LOCAL_LIBS="-lmed -lmedimportcxx $HDF5_LIBS"
+LOCAL_LIBS="-lmed -lmedimport $HDF5_LIBS"
+LOCAL_LIBS_C_ONLY="-lmedC $HDF5_LIBS"
 
 if test -z $MED2HOME
 then
@@ -65,8 +67,10 @@ then
    if test "x$MED2HOME" = "x/usr"
    then
      LOCAL_LIBS="-lmed  $LOCAL_LIBS"
+     LOCAL_LIBS_C_ONLY="-lmedC $LOCAL_LIBS_C_ONLY"
    else
      LOCAL_LIBS="-L$MED2HOME/lib $LOCAL_LIBS"
+     LOCAL_LIBS_C_ONLY="-L$MED2HOME/lib $LOCAL_LIBS"
    fi
 fi
 
@@ -170,11 +174,11 @@ dnl check med2 library
 
   LIBS_old="$LIBS"
   LIBS="$LIBS $LOCAL_LIBS"
-  AC_CHECK_LIB(med,MEDouvrir,med2_ok=yes,med2_ok=no)
+  AC_CHECK_LIB(med,MEDfileOpen,med2_ok=yes,med2_ok=no)
 
   if  test "x$med2_ok" = "xyes"
   then
-   AC_CHECK_LIB(medimportcxx,HAVE_MEDimport,med2_ok=yes,med2_ok=no)
+   AC_CHECK_LIB(medimport,HAVE_MEDimport,med2_ok=yes,med2_ok=no)
   fi
   LIBS="$LIBS_old"
  
@@ -192,6 +196,7 @@ dnl      MED2_INCLUDES="-DPCLINUX $LOCAL_INCLUDES"
       ;;
 esac
   MED2_LIBS="$LOCAL_LIBS"
+  MED2_LIBS_C_ONLY="$LOCAL_LIBS_C_ONLY"
   MED2_MT_LIBS="$LOCAL_LIBS"
 fi
 

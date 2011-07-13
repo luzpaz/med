@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #ifndef MEDMEM_ARRAY_HXX
@@ -221,18 +221,18 @@ public  :
   }
 
   inline const ElementType * getRow(int i) const {
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
     // Empêche l'utilisation de getRow en mode MED_NO_INTERLACE
     // Ne devrait pas dépendre de la politique check
-    checkEquality("MEDMEM_Array (Interlace test)",
-                  MED_EN::MED_NO_INTERLACE,
-                  InterlacingPolicy::_interlacing );
+    CHECKING_POLICY::checkEquality("MEDMEM_Array (Interlace test)",
+                                   MED_EN::MED_NO_INTERLACE,
+                                   InterlacingPolicy::_interlacing );
     return &(_array[ InterlacingPolicy::getIndex(i,1) ]);
 
   }
 
   void setRow(int i,const ElementType * const value) {
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
     // setRow fonctionne
     // dans les deux modes d'entrelacement.
 
@@ -247,14 +247,14 @@ public  :
   }
 
   inline const ElementType * getColumn(int j) const {
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
-    checkEquality("MEDMEM_Array (Interlace test)",
-                  MED_EN::MED_FULL_INTERLACE, InterlacingPolicy::_interlacing );
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
+    CHECKING_POLICY::checkEquality("MEDMEM_Array (Interlace test)",
+                                   MED_EN::MED_FULL_INTERLACE, InterlacingPolicy::_interlacing );
     return &(_array[ InterlacingPolicy::getIndex(1,j) ]);
   }
 
   void setColumn(int j, const ElementType * const value) {
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
     // setColumn fonctionne
     // dans les deux modes d'entrelacement.
 
@@ -270,15 +270,15 @@ public  :
 
 
   inline const ElementType & getIJ(int i, int j) const  {
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
     return _array[ InterlacingPolicy::getIndex(i,j) ];
   }
 
   inline const ElementType & getIJK(int i, int j, int k ) const {
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGauss(i),k);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGauss(i),k);
 
     return _array[ InterlacingPolicy::getIndex(i,j,k) ];
   };
@@ -286,9 +286,9 @@ public  :
   inline const ElementType & getIJByType(int i, int j, int t) const  {
     if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE_BY_TYPE )
       throw MEDEXCEPTION(LOCALIZED(STRING("Wrong interlacing type ") << getInterlacingType()));
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGeoType(),t);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGeoType(),t);
     if ( InterlacingPolicy::getGaussPresence() )
       return _array[ ((NoInterlaceByTypeGaussPolicy*)this)->getIndexByType(i,j,t) ];
     else
@@ -298,13 +298,13 @@ public  :
   inline const ElementType & getIJKByType(int i, int j, int k, int t) const {
     if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE_BY_TYPE )
       throw MEDEXCEPTION(LOCALIZED(STRING("Wrong interlacing type ") << getInterlacingType()));
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGeoType(),t);
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGeoType(),t);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
 
     if ( InterlacingPolicy::getGaussPresence() ) {
         // not compilable on Debian40
-//       checkInInclusiveRange("MEDMEM_Array",
+//       CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",
 //                             1,((NoInterlaceByTypeGaussPolicy*)this)->getNbGaussByType(t),k);
       int kmax = ((NoInterlaceByTypeGaussPolicy*)this)->getNbGaussByType(t);
       if ( k < 1 || k > kmax )
@@ -313,14 +313,14 @@ public  :
       return _array[ ((NoInterlaceByTypeGaussPolicy*)this)->getIndexByType(i,j,k,t) ];
     }
     else {
-      checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGauss(i),k);
+      CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGauss(i),k);
       return _array[ ((NoInterlaceByTypeNoGaussPolicy*)this)->getIndexByType(i,j,k,t) ];
     }
   };
 
   inline void setIJ(int i, int j, const ElementType & value) {   //autre signature avec
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
 
     _array[ InterlacingPolicy::getIndex(i,j) ] = value;                      // retour ElementType & ?
   };
@@ -328,9 +328,9 @@ public  :
   inline void setIJByType(int i, int j, int t, const ElementType & value) {   //autre signature avec
     if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE_BY_TYPE )
       throw MEDEXCEPTION(LOCALIZED(STRING("Wrong interlacing type ") << getInterlacingType()));
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGeoType(),t);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGeoType(),t);
 
     if ( InterlacingPolicy::getGaussPresence() )
       _array[ ((NoInterlaceByTypeGaussPolicy*)this)->getIndexByType(i,j,t) ] = value;
@@ -339,9 +339,9 @@ public  :
   };
 
   inline void setIJK(int i, int j, int k, const ElementType & value) {   //autre signature avec
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGauss(i),k);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGauss(i),k);
 
     _array[ InterlacingPolicy::getIndex(i,j,k) ] = value;                      // retour ElementType & ?
   };
@@ -349,13 +349,13 @@ public  :
   inline void setIJKByType(int i, int j, int k, int t, const ElementType & value) {   //autre signature avec
     if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE_BY_TYPE )
       throw MEDEXCEPTION(LOCALIZED(STRING("Wrong interlacing type ") << getInterlacingType()));
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
-    checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGeoType(),t);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_nbelem,i);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::_dim,j);
+    CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGeoType(),t);
 
     if ( InterlacingPolicy::getGaussPresence() ) {
         // not compilable on Debian40
-//       checkInInclusiveRange("MEDMEM_Array",
+//       CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",
 //                             1,((NoInterlaceByTypeGaussPolicy*)this)->getNbGaussByType(t),k);
       int kmax = ((NoInterlaceByTypeGaussPolicy*)this)->getNbGaussByType(t);
       if ( k < 1 || k > kmax )
@@ -364,7 +364,7 @@ public  :
       _array[ ((NoInterlaceByTypeGaussPolicy*)this)->getIndexByType(i,j,k,t) ] = value;
     }
     else {
-      checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGauss(i),k);
+      CHECKING_POLICY::checkInInclusiveRange("MEDMEM_Array",1,InterlacingPolicy::getNbGauss(i),k);
       _array[ ((NoInterlaceByTypeNoGaussPolicy*)this)->getIndexByType(i,j,k,t) ] = value;
     }
   };

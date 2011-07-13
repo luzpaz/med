@@ -1,20 +1,20 @@
-#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
@@ -86,10 +86,15 @@ if MED_ENABLE_RENUMBER
 endif
 
 if MED_ENABLE_KERNEL
-    KERNEL_SUBDIRS = $(MULTIPR_SUBDIRS) MEDCouplingCorba MEDCouplingCorba_Swig MEDMEM_I MED MedCorba_Swig MED_SWIG MedClient
+    KERNEL_SUBDIRS = MEDCouplingCorba MEDCouplingCorba_Swig MEDMEM_I MED MedCorba_Swig MED_SWIG MedClient
 
 if MPI_IS_OK
   KERNEL_SUBDIRS += ParaMEDCouplingCorba ParaMEDMEMComponent
+endif
+
+if MED_ENABLE_MED2
+
+  KERNEL_SUBDIRS += MEDCalculator
 endif
 
 endif
@@ -105,6 +110,6 @@ SUBDIRS = $(COMMON_SUBDIRS) $(PARAMEDMEM_SUBDIRS) $(BASE_SUBDIRS) $(INTERPTEST_S
 
 DIST_SUBDIRS= MEDWrapper INTERP_KERNEL MEDMEM MEDCoupling MEDCoupling_Swig MEDMEM_SWIG    \
               MEDMEMBinTest MEDMEMCppTest INTERP_KERNELTest ParaMEDMEM ParaMEDMEM_Swig MEDLoader        \
-	      MEDSPLITTER MEDSPLITTER_Swig RENUMBER MULTIPR MEDCouplingCorba MEDCouplingCorba_Swig      \
+	      MEDSPLITTER MEDSPLITTER_Swig RENUMBER MEDCouplingCorba MEDCouplingCorba_Swig      \
 	      MEDMEM_I MED MED_SWIG MedCorba_Swig ParaMEDLoader MedClient ParaMEDMEMComponent           \
-	      ParaMEDCouplingCorba MEDGUI ParaMEDMEMTest MEDPartitioner
+	      ParaMEDCouplingCorba MEDCalculator MEDGUI ParaMEDMEMTest

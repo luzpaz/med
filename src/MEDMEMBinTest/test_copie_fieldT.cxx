@@ -1,31 +1,26 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 /* Programme de test du constructeur de copies de la classe FIELD_ de MEDMEM
    jroy - 12/12/2002 */
-
-#include<string>
-
-#include <math.h>
-#include <stdlib.h>
 
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_Mesh.hxx"
@@ -39,12 +34,17 @@
 #include "MEDMEM_FieldConvert.hxx"
 #include "MEDMEM_define.hxx"
 
+#include<string>
+
+#include <math.h>
+#include <stdlib.h>
+
 using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
 
-void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
+static void affiche_field_(FIELD_ * myField, const SUPPORT * mySupport)
 {
   cout << "Field "<< myField->getName() << " : " <<myField->getDescription() <<  endl ;
   int NumberOfComponents = myField->getNumberOfComponents() ;
@@ -93,14 +93,14 @@ void affiche_fieldT(FIELD<double, INTERLACING_TAG> * myField,
   }
 }
 
-int main (int argc, char ** argv) {
-  // int read; !! UNUSED VARIABLE !!
-
-  if ((argc !=3) && (argc != 4)) {
-    cerr << "Usage : " << argv[0] 
-         << " filename meshname fieldname" << endl << endl;
-    exit(-1);
-  }
+int main (int argc, char ** argv)
+{
+  if ((argc !=3) && (argc != 4))
+    {
+      cerr << "Usage : " << argv[0] 
+           << " filename meshname fieldname" << endl << endl;
+      exit(-1);
+    }
 
   string filename = argv[1] ;
   string meshname = argv[2] ;
@@ -118,21 +118,25 @@ int main (int argc, char ** argv) {
   string fieldname = argv[3];
 
   FIELD<double> * myField ;
-  //  SUPPORT * mySupport = new SUPPORT(myMesh,"On_all_node",MED_NODE);
-  SUPPORT * mySupport = new SUPPORT(myMesh,"On_all_cell",MED_CELL);
-  try {
-    myField = new FIELD<double>(mySupport,MED_DRIVER,filename,fieldname) ;
-  } catch (...) {
-    mySupport->removeReference() ;
-    mySupport = new SUPPORT(myMesh,"On_all_node",MED_NODE);
-    try {
+  const SUPPORT * mySupport = myMesh->getSupportOnAll(MED_CELL);
+  try
+    {
       myField = new FIELD<double>(mySupport,MED_DRIVER,filename,fieldname) ;
-    } catch (...) {
-      cout << "Field double " << fieldname << " not found !!!" << endl ;
-      exit (-1) ;
     }
-  }
-  
+  catch (...)
+    {
+      mySupport = myMesh->getSupportOnAll(MED_NODE);
+      try
+        {
+          myField = new FIELD<double>(mySupport,MED_DRIVER,filename,fieldname) ;
+        }
+      catch (...)
+        {
+          cout << "Field double " << fieldname << " not found !!!" << endl ;
+          exit (-1) ;
+        }
+    }
+
   affiche_fieldT(myField, mySupport);
   FIELD<double> * myField2 = new FIELD<double>(* myField); // Contructeur par recopie, sauf SUPPORT
   myField->removeReference(); // Ne détruit pas le Support 
@@ -150,7 +154,6 @@ int main (int argc, char ** argv) {
   affiche_fieldT(myField5, myField5->getSupport());
   myField5->removeReference();
 
-  mySupport->removeReference();
   myMesh->removeReference();
 
   return 0;

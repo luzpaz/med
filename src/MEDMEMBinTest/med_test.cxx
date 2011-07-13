@@ -1,29 +1,24 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-
-#include<string>
-
-#include <math.h>
-#include <stdlib.h>
 
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_Mesh.hxx"
@@ -36,17 +31,22 @@
 #include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_define.hxx"
 
+#include<string>
+
+#include <math.h>
+#include <stdlib.h>
+
 using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-double dmax(double x, double y) { return (x>y)?x:y;}
+static double dmax(double x, double y) { return (x>y)?x:y;}
 
-double dmin(double x, double y) { return (x>y)?y:x;}
+static double dmin(double x, double y) { return (x>y)?y:x;}
 
-double infty = 1.e20;
+static double infty = 1.e20;
 
-void affiche_support(const SUPPORT * mySupport) 
+static void affiche_support(const SUPPORT * mySupport) 
 {
   cout << "  - Name : "<<mySupport->getName().c_str()<<endl ;
   cout << "  - Description : "<<mySupport->getDescription().c_str()<<endl ;
@@ -69,7 +69,7 @@ void affiche_support(const SUPPORT * mySupport)
 }
 
 
-void affiche_famille(MESH *myMesh,medEntityMesh Entity) 
+static void affiche_famille(MESH *myMesh,medEntityMesh Entity) 
 {
   int NumberOfFamilies = myMesh->getNumberOfFamilies(Entity) ;
   cout << "NumberOfFamilies : "<<NumberOfFamilies<<endl;
@@ -88,7 +88,7 @@ void affiche_famille(MESH *myMesh,medEntityMesh Entity)
   }
 }
 
-void affiche_groupe(MESH *myMesh,medEntityMesh Entity) 
+static void affiche_groupe(MESH *myMesh,medEntityMesh Entity) 
 {
   int NumberOfGroups = myMesh->getNumberOfGroups(Entity) ;
   cout << "NumberOfGroups : "<<NumberOfGroups<<endl;
@@ -113,19 +113,8 @@ int main (int argc, char ** argv) {
   string filename = argv[1] ;
   string meshname = argv[2] ;
 
-  //  MESH * myMesh= new MESH(MED_DRIVER,filename,meshname) ;
-  MESH * myMesh= new MESH ;
-  myMesh->setName(meshname);
-  MED_MESH_RDONLY_DRIVER myMeshDriver(filename,myMesh) ;
-  myMeshDriver.setMeshName(meshname);
-  myMeshDriver.open() ;
-  myMeshDriver.read() ;
-  myMeshDriver.close() ;
-
-  //    int drv = myMesh->addDriver(MED_DRIVER,"sortie.med",meshname);
-  //    myMesh->write(drv); 
-
-
+  MESH * myMesh= new MESH(MED_DRIVER,filename,meshname) ;
+  
   int SpaceDimension = myMesh->getSpaceDimension() ;
   int MeshDimension  = myMesh->getMeshDimension() ;
   int NumberOfNodes  = myMesh->getNumberOfNodes() ;
@@ -162,7 +151,7 @@ int main (int argc, char ** argv) {
   for (int i=0; i<NumberOfTypes; i++) {
     cout << "For type " << Types[i] << " : " << endl ;
     int NumberOfElements = myMesh->getNumberOfElements(MED_CELL,Types[i]);
-    const int * connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,Types[i]);
+    const int * connectivity =  myMesh->getConnectivity(MED_NODAL,MED_CELL,Types[i]);
     int NomberOfNodesPerCell = Types[i]%100 ;
     for (int j=0;j<NumberOfElements;j++){
       cout << "Element "<< j+1 <<" : " ;
@@ -198,10 +187,10 @@ int main (int argc, char ** argv) {
   int NumberOfElements ;
   const int * connectivity ;
   const int * connectivity_index ;
-  myMesh->calculateConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL);
+  myMesh->calculateConnectivity(MED_DESCENDING,MED_CELL);
   try {
     NumberOfElements = myMesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
-    connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS);
+    connectivity =  myMesh->getConnectivity(MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS);
     connectivity_index =  myMesh->getConnectivityIndex(MED_DESCENDING,MED_CELL);
   }
   catch (MEDEXCEPTION& m) {
@@ -246,7 +235,7 @@ int main (int argc, char ** argv) {
     }
   }
   cout << "Show "<<constituent<<" Connectivity (Nodal) :" << endl ;
-  const int * face_connectivity =  myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,constituentEntity,MED_ALL_ELEMENTS);
+  const int * face_connectivity =  myMesh->getConnectivity(MED_NODAL,constituentEntity,MED_ALL_ELEMENTS);
   const int * face_connectivity_index =  myMesh->getConnectivityIndex(MED_NODAL,constituentEntity);
   for (int i=0; i<NumberOfConstituents; i++) {
     cout << constituent <<i+1<<" : " ;
@@ -257,41 +246,35 @@ int main (int argc, char ** argv) {
 
   /* test of normal, area, volume, barycenter */
 
-  SUPPORT * support1 = (SUPPORT*) NULL;
-  
-  //FIELD<double>* normal = new FIELD<double>::FIELD();
-  //FIELD<double>* length = new FIELD<double>::FIELD();
-  //normal = NULL;
-  //length = NULL;
-  string support_name = "Support on all " ;
-  support_name+=constituent;
-  support1 = new SUPPORT(myMesh,support_name,constituentEntity);
+  const SUPPORT* support1 = myMesh->getSupportOnAll(constituentEntity);
   cout << "Building of the Support on all cells dimensionned (Meshdim-1) of the mesh :"<< endl ;
   cout << "Face in 3D or Edge in 2D" << endl;
-  
+
   cout << "Getting the normal of each face of this support !" << endl ;
-  
+
   FIELD<double>* normal = myMesh->getNormal(support1);
-  
+
   double normal_square, norm ;
   double maxnorm=-infty;
   double minnorm=infty;
   double tmp_value ;
-  for (int i = 1; i<=NumberOfConstituents;i++) {
-    normal_square = 0. ;
-    cout << "Normal " << i << " " ; 
-    for (int j=1; j<=SpaceDimension; j++) {
-      tmp_value = normal->getValueIJ(i,j) ;
-      normal_square += tmp_value*tmp_value ;
-      cout << tmp_value << " " ;
+  for (int i = 1; i<=NumberOfConstituents;i++)
+    {
+      normal_square = 0. ;
+      cout << "Normal " << i << " " ; 
+      for (int j=1; j<=SpaceDimension; j++)
+        {
+          tmp_value = normal->getValueIJ(i,j) ;
+          normal_square += tmp_value*tmp_value ;
+          cout << tmp_value << " " ;
+        }
+      norm = sqrt(normal_square);
+      maxnorm = dmax(maxnorm,norm);
+      minnorm = dmin(minnorm,norm);
+      cout << ", Norm = " << norm << endl;
     }
-    norm = sqrt(normal_square);
-    maxnorm = dmax(maxnorm,norm);
-    minnorm = dmin(minnorm,norm);
-    cout << ", Norm = " << norm << endl;
-  }
   cout << "Max Norm " << maxnorm << " Min Norm " << minnorm << endl;
-  
+
   if(normal)
     normal->removeReference() ;
 
@@ -315,15 +298,11 @@ int main (int argc, char ** argv) {
       if(length)
         length->removeReference();
     }
-  if(support1)
-    support1->removeReference();
 
   cout << "Building of the Support on all space-dimensionned cells of the mesh :"<< endl ;
-  SUPPORT * support = new SUPPORT(myMesh);
+  const SUPPORT * support = myMesh->getSupportOnAll( MED_CELL );
 
   cout << "Getting the barycenter of each element of this support !" << endl ;
-
-  //FIELD<double>* barycenter = new FIELD<double>::FIELD();
 
   FIELD<double>* barycenter = myMesh->getBarycenter(support);
   NumberOfElements = myMesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
@@ -338,11 +317,6 @@ int main (int argc, char ** argv) {
     }
   if(barycenter)
     barycenter->removeReference();
-
-  //FIELD<double>* volume = new FIELD<double>::FIELD();
-  //FIELD<double>* area = new FIELD<double>::FIELD();
-  //volume = NULL;
-  //area = NULL;
 
   if (SpaceDimension == 3)
     {
@@ -373,8 +347,6 @@ int main (int argc, char ** argv) {
 
       FIELD<double>* area = myMesh->getArea(support);
 
-      //    cout << "nb of comp "<< area->getNumberOfComponents() << " length " << area->getSupport()->getNumberOfElements(MED_ALL_ELEMENTS) << endl;
-
       double maxarea,minarea,areatot;
       maxarea = -infty;
       minarea = infty;
@@ -392,13 +364,6 @@ int main (int argc, char ** argv) {
       if(area)
         area->removeReference();
     }
-  if(support)
-    support->removeReference();
-
-  //if (barycenter != NULL) delete barycenter;
-  //if (volume != NULL ) delete volume;
-  //if (area != NULL ) delete area;
-
 
   if (argc < 4) return 0;
 
@@ -409,8 +374,7 @@ int main (int argc, char ** argv) {
 
   string fieldname = argv[3];
 
-  //  SUPPORT * mySupport = new SUPPORT(myMesh,"On_all_node",MED_NODE);
-  SUPPORT * mySupport = new SUPPORT(myMesh,"On_all_cell",MED_CELL);
+  const SUPPORT * mySupport = myMesh->getSupportOnAll(MED_CELL);
   FIELD<double> * myField= new FIELD<double>() ;
 
   myField->setName(fieldname);
@@ -419,31 +383,37 @@ int main (int argc, char ** argv) {
   myFieldDriver.setFieldName(fieldname);
   myFieldDriver.open() ;
 
-  try {
-    myFieldDriver.read() ;
-  } catch (...) {
-    mySupport->removeReference();
-    mySupport = new SUPPORT(myMesh,"On_all_node",MED_NODE);
-    myField->setSupport(mySupport);
-    try {
+  try
+    {
       myFieldDriver.read() ;
-    } catch (...) {
-      cout << "Field " << fieldname << " not found !!!" << endl ;
-      exit (-1) ;
     }
-  }
-  
+  catch (...)
+    {
+      mySupport = myMesh->getSupportOnAll(MED_NODE);
+      myField->setSupport(mySupport);
+      try
+        {
+          myFieldDriver.read() ;
+        }
+      catch (...)
+        {
+          cout << "Field " << fieldname << " not found !!!" << endl ;
+          exit (-1) ;
+        }
+    }
+
   myFieldDriver.close() ;
 
   cout << "Field "<< myField->getName() << " : " <<myField->getDescription() <<  endl ;
   int NumberOfComponents = myField->getNumberOfComponents() ;
   cout << "- Nombre de composantes : "<< NumberOfComponents << endl ;
-  for (int i=1; i<NumberOfComponents+1; i++) {
-    cout << "  - composante "<<i<<" :"<<endl ;
-    cout << "      - nom         : "<<myField->getComponentName(i)<< endl;
-    cout << "      - description : "<<myField->getComponentDescription(i) << endl;
-    cout << "      - units       : "<<myField->getMEDComponentUnit(i) << endl;
-  }
+  for (int i=1; i<NumberOfComponents+1; i++)
+    {
+      cout << "  - composante "<<i<<" :"<<endl ;
+      cout << "      - nom         : "<<myField->getComponentName(i)<< endl;
+      cout << "      - description : "<<myField->getComponentDescription(i) << endl;
+      cout << "      - units       : "<<myField->getMEDComponentUnit(i) << endl;
+    }
   cout << "- iteration :" << endl ;
   cout << "    - numero : " << myField->getIterationNumber()<< endl  ;
   cout << "    - ordre  : " << myField->getOrderNumber()<< endl  ;
@@ -451,25 +421,18 @@ int main (int argc, char ** argv) {
 
   cout << "- Valeurs :"<<endl;
   int NumberOf = mySupport->getNumberOfElements(MED_ALL_ELEMENTS);
-  //    for (int i=1; i<NumberOfComponents+1; i++) {
-  //      double * value = myField->getValueI(MED_NO_INTERLACE,i) ;
-  //      for (int j=0; j<NumberOf; j++)
-  //        cout << value[j]<< " ";
-  //      cout<<endl;
-  //    }
   MEDMEM_Array<double> * myvalue = myField->getArrayNoGauss();
   const double * value ;
-  for (int i=1; i<NumberOf+1; i++) {
-    value = myvalue->getRow(i) ;
-    for (int j=0; j<NumberOfComponents; j++)
-      cout << value[j]<< " ";
-    cout<<endl;
-  }
+  for (int i=1; i<NumberOf+1; i++)
+    {
+      value = myvalue->getRow(i) ;
+      for (int j=0; j<NumberOfComponents; j++)
+        cout << value[j]<< " ";
+      cout<<endl;
+    }
   cout<<endl;
-  
-  myField->removeReference();
-  mySupport->removeReference();
 
+  myField->removeReference();
   myMesh->removeReference();
 
   return 0;

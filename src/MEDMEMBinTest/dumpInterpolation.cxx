@@ -1,52 +1,51 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 // File      : dumpInterpolation.cxx
 // Created   : Mon Jan 11 16:46:10 2010
 // Author    : Edward AGAPOV (eap)
 //
-#include <MEDMEM_Med.hxx>
+#include <MEDMEM_MedFileBrowser.hxx>
 #include <MEDMEM_Remapper.hxx>
 
 using namespace MEDMEM;
 using namespace std;
 
 
-string getMeshName(const char* file, int mesh_index)
+static string getMeshName(const char* file, int mesh_index)
 {
-  MED med(MED_DRIVER, file);
+  MEDFILEBROWSER med(file);
   if ( mesh_index >= med.getNumberOfMeshes() )
     {
       cout << "Invalid index of mesh, it must be less than " << med.getNumberOfMeshes() << endl;
       return "Invalid mesh index";
     }
-  vector<string> mesh_names(med.getNumberOfMeshes());
-  med.getMeshNames( &mesh_names[0] );
+  vector<string> mesh_names = med.getMeshNames();
   return mesh_names[mesh_index];
 }
 
 //================================================================================
 /*!
- * \brief Perform interpolation of two meshes and dumps result (for format of output,
+ * \brief Perform interpolation of two meshes and dumps result. For format of output,
  * see comment to operator<<() in InterpKernelMatrix.hxx
  */
 //================================================================================

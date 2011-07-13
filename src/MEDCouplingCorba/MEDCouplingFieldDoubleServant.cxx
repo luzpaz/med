@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDCouplingFieldDoubleServant.hxx"
@@ -81,4 +81,18 @@ void MEDCouplingFieldDoubleServant::getSerialisationData(SALOME_TYPES::ListOfLon
       for(int j=0;j<lgth2;j++)
         locCorbaArr[j]=pt[j];
     }
+}
+
+CORBA::Boolean MEDCouplingFieldDoubleServant::ExportDataAs(const char *format, SALOME::GenericObj_out exporter)
+{
+  std::string frmCpp(format);
+  if(frmCpp=="MEDCorba")
+    {
+      SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr cPtr=_this();
+      Register();
+      exporter=cPtr;
+      return true;
+    }
+  exporter=SALOME::GenericObj::_nil();
+  return false;
 }

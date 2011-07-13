@@ -1,21 +1,21 @@
 #  -*- coding: iso-8859-1 -*-
-#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+# Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
 from MEDLoader import *
@@ -36,7 +36,7 @@ class MEDLoaderDataForTest:
         mesh.finishInsertingCells();
         myCoords=DataArrayDouble.New();
         myCoords.setValues(coords,6,1);
-        myCoords.setInfoOnComponent(0,"tototototototot (m*m*m*m*m*m*m*m)");
+        myCoords.setInfoOnComponent(0,"tototototototot [m*m*m*m*m*m*m*m]");
         mesh.setCoords(myCoords);
         return mesh;
 
@@ -74,8 +74,8 @@ class MEDLoaderDataForTest:
         targetMesh.finishInsertingCells();
         myCoords=DataArrayDouble.New();
         myCoords.setValues(targetCoords,12,2);
-        myCoords.setInfoOnComponent(0,"tototototototot (m)");
-        myCoords.setInfoOnComponent(1,"energie (kW)");
+        myCoords.setInfoOnComponent(0,"tototototototot [m]");
+        myCoords.setInfoOnComponent(1,"energie [kW]");
         targetMesh.setCoords(myCoords)
         return targetMesh;
 
@@ -89,14 +89,44 @@ class MEDLoaderDataForTest:
         targetMesh.setName("2DMesh_2");
         targetMesh.insertNextCell(NORM_TRI3,3,targetConn[0:3])
         targetMesh.insertNextCell(NORM_TRI3,3,targetConn[3:6])
-        targetMesh.insertNextCell(NORM_TRI6,6,targetConn[6:12])
         targetMesh.insertNextCell(NORM_QUAD4,4,targetConn[12:16])
         targetMesh.insertNextCell(NORM_QUAD4,4,targetConn[16:20])
+        targetMesh.insertNextCell(NORM_TRI6,6,targetConn[6:12])
         targetMesh.finishInsertingCells();
         myCoords=DataArrayDouble.New();
         myCoords.setValues(targetCoords,12,2);
-        myCoords.setInfoOnComponent(0,"toto (m)");
-        myCoords.setInfoOnComponent(1,"energie (kW)");
+        myCoords.setInfoOnComponent(0,"toto [m]");
+        myCoords.setInfoOnComponent(1,"energie [kW]");
+        targetMesh.setCoords(myCoords);
+        return targetMesh;
+
+    #this mesh has several cells duplicated ! it is not beautiful but efficient to test file WR.
+    def build2DMesh_3(cls):
+        targetCoords=[-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7,
+                      -0.05,0.95, 0.2,1.2, 0.45,0.95]
+        targetConn=[1,4,2, 4,5,2, 6,10,8,9,11,7, 0,3,4,1, 6,7,4,3, 7,8,5,4]
+        targetMesh=MEDCouplingUMesh.New();
+        targetMesh.setMeshDimension(2);
+        targetMesh.allocateCells(13);
+        targetMesh.setName("2DMesh_3");
+        targetMesh.insertNextCell(NORM_TRI3,3,targetConn[0:3])
+        targetMesh.insertNextCell(NORM_TRI3,3,targetConn[3:6])
+        targetMesh.insertNextCell(NORM_TRI3,3,targetConn[0:3])
+        targetMesh.insertNextCell(NORM_TRI3,3,targetConn[3:6])
+        targetMesh.insertNextCell(NORM_TRI3,3,targetConn[0:3])
+        targetMesh.insertNextCell(NORM_TRI3,3,targetConn[3:6])
+        targetMesh.insertNextCell(NORM_QUAD4,4,targetConn[12:16])
+        targetMesh.insertNextCell(NORM_QUAD4,4,targetConn[16:20])
+        targetMesh.insertNextCell(NORM_QUAD4,4,targetConn[12:16])
+        targetMesh.insertNextCell(NORM_QUAD4,4,targetConn[16:20])
+        targetMesh.insertNextCell(NORM_TRI6,6,targetConn[6:12])
+        targetMesh.insertNextCell(NORM_TRI6,6,targetConn[6:12])
+        targetMesh.insertNextCell(NORM_TRI6,6,targetConn[6:12])
+        targetMesh.finishInsertingCells();
+        myCoords=DataArrayDouble.New();
+        myCoords.setValues(targetCoords,12,2);
+        myCoords.setInfoOnComponent(0,"toto [m]");
+        myCoords.setInfoOnComponent(1,"energie [kW]");
         targetMesh.setCoords(myCoords);
         return targetMesh;
 
@@ -156,9 +186,9 @@ class MEDLoaderDataForTest:
         ret.finishInsertingCells();
         myCoords=DataArrayDouble.New();
         myCoords.setValues(coords,60,3);
-        myCoords.setInfoOnComponent(0,"titi (m)");
-        myCoords.setInfoOnComponent(1,"density power (MW/m^3)");
-        myCoords.setInfoOnComponent(2,"t (kW)");
+        myCoords.setInfoOnComponent(0,"titi [m]");
+        myCoords.setInfoOnComponent(1,"density power [MW/m^3]");
+        myCoords.setInfoOnComponent(2,"t [kW]");
         ret.setCoords(myCoords);
         return ret;
     
@@ -172,21 +202,21 @@ class MEDLoaderDataForTest:
         targetMesh.setName("3DSurfMesh_1");
         targetMesh.insertNextCell(NORM_TRI3,3,targetConn[0:3])
         targetMesh.insertNextCell(NORM_TRI3,3,targetConn[3:6])
-        targetMesh.insertNextCell(NORM_TRI6,6,targetConn[6:12])
         targetMesh.insertNextCell(NORM_QUAD4,4,targetConn[12:16])
         targetMesh.insertNextCell(NORM_QUAD4,4,targetConn[16:20])
+        targetMesh.insertNextCell(NORM_TRI6,6,targetConn[6:12])
         targetMesh.insertNextCell(NORM_POLYGON,4,targetConn[20:24])
         targetMesh.finishInsertingCells();
         myCoords=DataArrayDouble.New();
         myCoords.setValues(targetCoords,12,3);
-        myCoords.setInfoOnComponent(0,"toto (m)");
-        myCoords.setInfoOnComponent(2,"ff (km)");#component 1 is not set for test
+        myCoords.setInfoOnComponent(0,"toto [m]");
+        myCoords.setInfoOnComponent(2,"ff [km]");#component 1 is not set for test
         targetMesh.setCoords(myCoords);
         return targetMesh;
     
     def build3DMesh_2(cls):
         m3dsurfBase=MEDLoaderDataForTest.build3DSurfMesh_1();
-        numbers=[0,1,3,4,5]
+        numbers=[0,1,2,3,5]
         m3dsurf=m3dsurfBase.buildPartOfMySelf(numbers,False);
         m1dBase=MEDLoaderDataForTest.build1DMesh_1();
         numbers2=[0,1,2,3]
@@ -198,6 +228,91 @@ class MEDLoaderDataForTest:
         ret=m3dsurf.buildExtrudedMesh(m1d,0);
         return ret;
 
+    def buildMultiLevelMesh_1(cls):
+        coo=[10.,0.,10.,1.25,10.,2.5,10.,3.75,10.,5.,8.75,0.,8.75,1.25,8.75,2.5,8.75,3.75,8.75,5.,7.5,0.,7.5,1.25,7.5,2.5,7.5,3.75,7.5,5.,6.25,0.,6.25,1.25,6.25,2.5,6.25,3.75,6.25,5.,5.,0.,5.,1.25,5.,2.5,5.,3.75,5.,5.,3.75,0.,3.75,1.25,3.75,2.5,3.75,3.75,3.75,5.,2.5,0.,2.5,1.25,2.5,2.5,2.5,3.75,2.5,5.,1.25,0.,1.25,1.25,1.25,2.5,1.25,3.75,1.25,5.,0.,1.25,0.,2.5,0.,3.75,0.,5.,0.,0.,0.,5.,10.,5.,0.,10.,10.,10.,5.,5.,5.,5.,5.,10.,5.,10.,0.625,5.,1.25,5.,1.875,5.,2.5,5.,3.125,5.,3.75,5.,4.375,5.,5.,6.25,5.,7.5,5.,8.75,4.375,10.,3.75,10.,3.125,10.,2.5,10.,1.875,10.,1.25,10.,0.625,10.,0.,8.75,0.,7.5,0.,6.25,4.375,6.25,4.375,7.5,4.375,8.75,3.75,6.25,3.75,7.5,3.75,8.75,3.125,6.25,3.125,7.5,3.125,8.75,2.5,6.25,2.5,7.5,2.5,8.75,1.875,6.25,1.875,7.5,1.875,8.75,1.25,6.25,1.25,7.5,1.25,8.75,0.625,6.25,0.625,7.5,0.625,8.75,5.625,5.,6.25,5.,6.875,5.,7.5,5.,8.125,5.,8.75,5.,9.375,5.,10.,6.25,10.,7.5,10.,8.75,9.375,10.,8.75,10.,8.125,10.,7.5,10.,6.875,10.,6.25,10.,5.625,10.,5.,8.75,5.,7.5,5.,6.25,9.375,6.25,9.375,7.5,9.375,8.75,8.75,6.25,8.75,7.5,8.75,8.75,8.125,6.25,8.125,7.5,8.125,8.75,7.5,6.25,7.5,7.5,7.5,8.75,6.875,6.25,6.875,7.5,6.875,8.75,6.25,6.25,6.25,7.5,6.25,8.75,5.625,6.25,5.625,7.5,5.625,8.75]
+        coo2=DataArrayDouble.New()
+        coo2.setValues(coo,135,2)
+        coo2=coo2.changeNbOfComponents(3,0.)
+        coo2.setInfoOnComponent(0,"X [INCONNUE]")
+        coo2.setInfoOnComponent(1,"Y [INCONNUE]")
+        coo2.setInfoOnComponent(2,"Z [INCONNUE]")
+        c2tri=[0,1,6,0,6,5,1,2,6,2,7,6,2,3,8,2,8,7,3,4,8,4,9,8,5,6,11,5,11,10,6,7,11,7,12,11,7,8,13,7,13,12,8,9,13,9,14,13,10,11,16,10,16,15,11,12,16,12,17,16,12,13,18,12,18,17,13,14,18,14,19,18,15,16,21,15,21,20,16,17,21,17,22,21,17,18,23,17,23,22,18,19,23,19,24,23,20,21,26,20,26,25,21,22,26,22,27,26,22,23,28,22,28,27,23,24,28,24,29,28,25,26,31,25,31,30,26,27,31,27,32,31,27,28,33,27,33,32,28,29,33,29,34,33,30,31,36,30,36,35,31,32,36,32,37,36,32,33,38,32,38,37,33,34,38,34,39,38,35,36,40,35,40,44,36,37,40,37,41,40,37,38,42,37,42,41,38,39,42,39,43,42]
+        c2quad4=[46,101,114,100,101,102,115,114,102,103,116,115,103,48,104,116,100,114,117,99,114,115,118,117,115,116,119,118,116,104,105,119,99,117,120,98,117,118,121,120,118,119,122,121,119,105,106,122,98,120,123,97,120,121,124,123,121,122,125,124,122,106,107,125,97,123,126,96,123,124,127,126,124,125,128,127,125,107,108,128,96,126,129,95,126,127,130,129,127,128,131,130,128,108,109,131,95,129,132,94,129,130,133,132,130,131,134,133,131,109,110,134,94,132,113,50,132,133,112,113,133,134,111,112,134,110,51,111,49,60,73,59,60,61,74,73,61,62,75,74,62,52,63,75,59,73,76,58,73,74,77,76,74,75,78,77,75,63,64,78,58,76,79,57,76,77,80,79,77,78,81,80,78,64,65,81,57,79,82,56,79,80,83,82,80,81,84,83,81,65,66,84,56,82,85,55,82,83,86,85,83,84,87,86,84,66,67,87,55,85,88,54,85,86,89,88,86,87,90,89,87,67,68,90,54,88,91,53,88,89,92,91,89,90,93,92,90,68,69,93,53,91,72,45,91,92,71,72,92,93,70,71,93,69,47,70]
+        m2=MEDCouplingUMesh.New("ma",2)
+        m2.setCoords(coo2)
+        m2.allocateCells(128)
+        nbTri=len(c2tri)/3
+        for i in xrange(nbTri):
+            m2.insertNextCell(NORM_TRI3,3,c2tri[3*i:3*i+3])
+            pass
+        nbQua=len(c2quad4)/4
+        for i in xrange(nbQua):
+            m2.insertNextCell(NORM_QUAD4,4,c2quad4[4*i:4*i+4])
+            pass
+        m2.finishInsertingCells()
+        m2.setDescription("CREE PAR CODE_ASTER")
+        m1=MEDCouplingUMesh.New("ma",1)
+        m1.setCoords(coo2)
+        c1seg=[0,1,1,2,2,3,3,4,4,9,9,14,14,19,19,24,24,29,29,34,34,39,39,43,43,42,42,41,41,40,40,44,44,35,35,30,30,25,25,20,20,15,15,10,10,5,5,0,43,39,39,34,34,29,29,24,24,19,19,14,14,9,9,4,45,53,53,54,54,55,55,56,56,57,57,58,58,59,59,49,49,60,60,61,61,62,62,52,52,63,63,64,64,65,65,66,66,67,67,68,68,69,69,47,47,70,70,71,71,72,72,45,50,94,94,95,95,96,96,97,97,98,98,99,99,100,100,46,46,101,101,102,102,103,103,48,48,104,104,105,105,106,106,107,107,108,108,109,109,110,110,51,51,111,111,112,112,113,113,50]
+        m1.allocateCells(80)
+        for i in xrange(80):
+            m1.insertNextCell(NORM_SEG2,2,c1seg[2*i:2*i+2])
+            pass
+        m1.finishInsertingCells()
+        m1.setDescription("CREE PAR CODE_ASTER")
+        m0=MEDCouplingUMesh.New("ma",0)
+        m0.setCoords(coo2)
+        c0pt=[44,0,47,48]
+        m0.allocateCells(4)
+        for i in xrange(4):
+            m0.insertNextCell(NORM_POINT1,1,[c0pt[i]])
+            pass
+        m0.finishInsertingCells()
+        f2=DataArrayInt.New()
+        f2.alloc(128,1)
+        f2[:64]=-1
+        f2[64:96]=-2
+        f2[96:]=-3
+        f1=DataArrayInt.New()
+        f1.alloc(80,1)
+        f1[:4]=-8
+        f1[4:12]=-9
+        f1[12:16]=-10
+        f1[16:24]=-11
+        f1[24:28]=-12
+        f1[28:32]=-13
+        f1[32:40]=-14
+        f1[40:44]=-15
+        f1[44:52]=-16
+        f1[52:56]=-17
+        f1[56:64]=-18
+        f1[64:68]=-19
+        f1[68:76]=-20
+        f1[76:]=-21
+        f0=DataArrayInt.New()
+        f0.setValues([-4,-5,-6,-7],4,1)
+        p=DataArrayInt.New()
+        p.alloc(135,1)
+        p.fillWithZero()
+        p1=DataArrayInt.New()
+        p1.alloc(13,1)
+        p1.iota(1)
+        p[[0,4,24,43,44,45,46,47,48,49,50,51,52]]=p1
+        n2=DataArrayInt.New()
+        n2.alloc(128,1)
+        n2.iota(1)
+        n1=DataArrayInt.New()
+        n1.alloc(80,1)
+        n1.iota(133)
+        n0=DataArrayInt.New()
+        n0.alloc(4,1)
+        n0.iota(129)
+        fns=['A1A2____________________________', 'A1______________________________', 'A2A4____________________________', 'A2______________________________', 'A3A1____________________________', 'A3C5____________________________', 'A3______________________________', 'A4A3____________________________', 'A4______________________________', 'B1C1____________________________', 'B1______________________________', 'B2B4____________________________', 'B2______________________________', 'B3B1____________________________', 'B3______________________________', 'B4C3____________________________', 'B4______________________________', 'C1C4____________________________', 'C1______________________________', 'C2B2____________________________', 'C2______________________________', 'C3C2____________________________', 'C3______________________________', 'C4B3____________________________', 'C4______________________________', 'C5A4____________________________', 'C5______PMMA____________________', 'FAMILLE_ZERO', 'MESH____APPS____AP1_____________', 'MESH____APPS____AP2_____________', 'MESH____APPS____AP3_____________', 'MESH____APPS____AP4_____________', 'MESH____DALQ1___DALLE___________', 'MESH____DALQ2___DALLE___________', 'MESH____DALT3___DALLE___________']
+        fids=[-11, 5, -8, 1, -10, -12, 4, -9, 2, -14, 6, -19, 7, -17, 8, -20, 9, -15, 10, -18, 11, -21, 12, -16, 13, -13, 3, 0, -4, -5, -6, -7, -3, -2, -1]
+        grpns=['A1', 'A1A2', 'A2', 'A2A4', 'A3', 'A3A1', 'A3C5', 'A4', 'A4A3', 'AP1', 'AP2', 'AP3', 'AP4', 'APPS', 'B1', 'B1C1', 'B2', 'B2B4', 'B3', 'B3B1', 'B4', 'B4C3', 'C1', 'C1C4', 'C2', 'C2B2', 'C3', 'C3C2', 'C4', 'C4B3', 'C5', 'C5A4', 'DALLE', 'DALQ1', 'DALQ2', 'DALT3', 'MESH', 'PMMA']
+        famIdsPerGrp=[[5],[-11],[1],[-8],[4],[-10],[-12],[2],[-9],[-4],[-5],[-6],[-7],[-4,-5,-6,-7],[6],[-14],[7],[-19],[8],[-17],[9],[-20],[10],[-15],[11],[-18],[12],[-21],[13],[-16],[3],[-13],[-3,-2,-1],[-3],[-2],[-1],[-4,-5,-6,-7,-3,-2,-1],[3]]
+        return m2,m1,m0,f2,f1,f0,p,n2,n1,n0,fns,fids,grpns,famIdsPerGrp
+
     def buildVecFieldOnCells_1(cls):
         mesh=MEDLoaderDataForTest.build3DSurfMesh_1();
         nbOfCells=mesh.getNumberOfCells();
@@ -207,9 +322,9 @@ class MEDLoaderDataForTest:
         array=DataArrayDouble.New();
         arr1=[0.,10.,20.,1.,11.,21.,2.,12.,22.,3.,13.,23.,4.,14.,24.,5.,15.,25.]
         array.setValues(arr1,nbOfCells,3);
-        array.setInfoOnComponent(0,"power (MW/m^3)");
-        array.setInfoOnComponent(1,"density (g/cm^3)");
-        array.setInfoOnComponent(2,"temperature (K)");
+        array.setInfoOnComponent(0,"power [MW/m^3]");
+        array.setInfoOnComponent(1,"density [g/cm^3]");
+        array.setInfoOnComponent(2,"temperature [K]");
         f1.setArray(array);
         tmp=array.getPointer();
         f1.setTime(2.,0,1);
@@ -227,9 +342,9 @@ class MEDLoaderDataForTest:
         arr1=[70.,80.,90.,71.,81.,91.,72.,82.,92.,73.,83.,93.,74.,84.,94.,75.,85.,95.,
         1000.,10010.,10020.,1001.,10011.,10021.,1002.,10012.,10022.,1003.,10013.,10023.,1004.,10014.,10024.,1005.,10015.,10025.]
         array.setValues(arr1,nbOfNodes,3);
-        array.setInfoOnComponent(0,"power (MW/m^3)");
-        array.setInfoOnComponent(1,"density (g/cm^3)");
-        array.setInfoOnComponent(2,"temperature (K)");
+        array.setInfoOnComponent(0,"power [MW/m^3]");
+        array.setInfoOnComponent(1,"density [g/cm^3]");
+        array.setInfoOnComponent(2,"temperature [K]");
         f1.setTime(2.12,2,3);
         f1.checkCoherency();
         return f1;
@@ -254,13 +369,15 @@ class MEDLoaderDataForTest:
         refCoo2=[-1.0,1.0, -1.0,-1.0, 1.0,-1.0, -1.0,0.0, 0.0,-1.0, 0.0,0.0 ]
         _refCoo2=refCoo2;
         _gsCoo1=_gsCoo1[0:6];
+        _gsCoo2=_gsCoo1
         _wg1=_wg1[0:3];
-        f.setGaussLocalizationOnType(NORM_TRI6,_refCoo2,_gsCoo1,_wg1);
+        _wg2=_wg1
         refCoo3=[ 0.,0., 1.,0., 1.,1., 0.,1. ]
         _refCoo3=refCoo3;
         _gsCoo1=_gsCoo1[0:4];
         _wg1=_wg1[0:2];
         f.setGaussLocalizationOnType(NORM_QUAD4,_refCoo3,_gsCoo1,_wg1);
+        f.setGaussLocalizationOnType(NORM_TRI6,_refCoo2,_gsCoo2,_wg2);
         array=DataArrayDouble.New();
         array.alloc(19,2);
         ptr=array.getPointer();
@@ -269,7 +386,106 @@ class MEDLoaderDataForTest:
             pass
         f.setArray(array);
         f.setName("MyFirstFieldOnGaussPoint");
-        array.setInfoOnComponent(0,"power (MW/m^3)");
+        array.setInfoOnComponent(0,"power [MW/m^3]");
+        array.setInfoOnComponent(1,"density");
+        f.checkCoherency();
+        return f;
+
+    def buildVecFieldOnGauss_2(cls):
+        _a=0.446948490915965;
+        _b=0.091576213509771;
+        _p1=0.11169079483905;
+        _p2=0.0549758718227661;
+        refCoo1=[ 0.,0., 1.,0., 0.,1. ]
+        gsCoo1=[ 2*_b-1, 1-4*_b, 2*_b-1, 2.07*_b-1, 1-4*_b,
+                 2*_b-1, 1-4*_a, 2*_a-1, 2*_a-1, 1-4*_a, 2*_a-1, 2*_a-1 ];
+        wg1=[ 4*_p2, 4*_p2, 4*_p2, 4*_p1, 4*_p1, 4*_p1 ]
+        _refCoo1=refCoo1;
+        _gsCoo1=gsCoo1;
+        _wg1=wg1;
+        m=MEDLoaderDataForTest.build2DMesh_3();
+        f=MEDCouplingFieldDouble.New(ON_GAUSS_PT,ONE_TIME);
+        f.setTime(3.14,1,5);
+        f.setMesh(m);
+        di=DataArrayInt.New(); di.setValues([0,2,3],3,1)
+        f.setGaussLocalizationOnCells(di,_refCoo1,_gsCoo1,_wg1)
+        _wg1[-1]*=2
+        f.setGaussLocalizationOnCells([1,5],_refCoo1,_gsCoo1,_wg1);
+        _wg1[-1]*=2
+        f.setGaussLocalizationOnCells([4],_refCoo1,_gsCoo1,_wg1);
+        refCoo2=[-1.0,1.0, -1.0,-1.0, 1.0,-1.0, -1.0,0.0, 0.0,-1.0, 0.0,0.0 ]
+        _refCoo2=refCoo2;
+        _gsCoo1=_gsCoo1[0:6];
+        _gsCoo2=_gsCoo1
+        _wg1=_wg1[0:3];
+        _wg2=_wg1
+        refCoo3=[ 0.,0., 1.,0., 1.,1., 0.,1. ]
+        _refCoo3=refCoo3;
+        _gsCoo1=_gsCoo1[0:4];
+        _wg1=_wg1[0:2];
+        f.setGaussLocalizationOnCells([6,7,8],_refCoo3,_gsCoo1,_wg1);
+        _wg1[-1]*=2
+        f.setGaussLocalizationOnCells([9],_refCoo3,_gsCoo1,_wg1);
+        f.setGaussLocalizationOnType(NORM_TRI6,_refCoo2,_gsCoo2,_wg2);
+        array=DataArrayDouble.New();
+        array.alloc(53,2);
+        ptr=array.getPointer();
+        for i in xrange(53*2):
+            array.setIJ(0,i,float(i+7));
+            pass
+        f.setArray(array);
+        f.setName("MyFirstFieldOnGaussPoint");
+        array.setInfoOnComponent(0,"power [MW/m^3]");
+        array.setInfoOnComponent(1,"density");
+        f.checkCoherency();
+        return f;
+
+    # idem buildVecFieldOnGauss_2 except that different discretizations are sorted inside one type
+    def buildVecFieldOnGauss_2_Simpler(cls):
+        _a=0.446948490915965;
+        _b=0.091576213509771;
+        _p1=0.11169079483905;
+        _p2=0.0549758718227661;
+        refCoo1=[ 0.,0., 1.,0., 0.,1. ]
+        gsCoo1=[ 2*_b-1, 1-4*_b, 2*_b-1, 2.07*_b-1, 1-4*_b,
+                 2*_b-1, 1-4*_a, 2*_a-1, 2*_a-1, 1-4*_a, 2*_a-1, 2*_a-1 ];
+        wg1=[ 4*_p2, 4*_p2, 4*_p2, 4*_p1, 4*_p1, 4*_p1 ]
+        _refCoo1=refCoo1;
+        _gsCoo1=gsCoo1;
+        _wg1=wg1;
+        m=MEDLoaderDataForTest.build2DMesh_3();
+        f=MEDCouplingFieldDouble.New(ON_GAUSS_PT,ONE_TIME);
+        f.setTime(3.14,1,5);
+        f.setMesh(m);
+        di=DataArrayInt.New(); di.setValues([0,1,2],3,1)
+        f.setGaussLocalizationOnCells(di,_refCoo1,_gsCoo1,_wg1)
+        _wg1[-1]*=2
+        f.setGaussLocalizationOnCells([3,4],_refCoo1,_gsCoo1,_wg1);
+        _wg1[-1]*=2
+        f.setGaussLocalizationOnCells([5],_refCoo1,_gsCoo1,_wg1);
+        refCoo2=[-1.0,1.0, -1.0,-1.0, 1.0,-1.0, -1.0,0.0, 0.0,-1.0, 0.0,0.0 ]
+        _refCoo2=refCoo2;
+        _gsCoo1=_gsCoo1[0:6];
+        _gsCoo2=_gsCoo1
+        _wg1=_wg1[0:3];
+        _wg2=_wg1
+        refCoo3=[ 0.,0., 1.,0., 1.,1., 0.,1. ]
+        _refCoo3=refCoo3;
+        _gsCoo1=_gsCoo1[0:4];
+        _wg1=_wg1[0:2];
+        f.setGaussLocalizationOnCells([6,7,8],_refCoo3,_gsCoo1,_wg1);
+        _wg1[-1]*=2
+        f.setGaussLocalizationOnCells([9],_refCoo3,_gsCoo1,_wg1);
+        f.setGaussLocalizationOnType(NORM_TRI6,_refCoo2,_gsCoo2,_wg2);
+        array=DataArrayDouble.New();
+        array.alloc(53,2);
+        ptr=array.getPointer();
+        for i in xrange(53*2):
+            array.setIJ(0,i,float(i+7));
+            pass
+        f.setArray(array);
+        f.setName("MyFirstFieldOnGaussPoint");
+        array.setInfoOnComponent(0,"power [MW/m^3]");
         array.setInfoOnComponent(1,"density");
         f.checkCoherency();
         return f;
@@ -284,7 +500,7 @@ class MEDLoaderDataForTest:
         for i in xrange(2*20):
             array.setIJ(0,i,float(i+8));
         f.setArray(array);
-        array.setInfoOnComponent(0,"power (W)");
+        array.setInfoOnComponent(0,"power [W]");
         array.setInfoOnComponent(1,"temperature");
         f.setName("MyFieldOnGaussNE");
         f.checkCoherency();
@@ -294,11 +510,15 @@ class MEDLoaderDataForTest:
     build2DCurveMesh_1=classmethod(build2DCurveMesh_1)
     build2DMesh_1=classmethod(build2DMesh_1)
     build2DMesh_2=classmethod(build2DMesh_2)
+    build2DMesh_3=classmethod(build2DMesh_3)
     build3DMesh_1=classmethod(build3DMesh_1)
     build3DSurfMesh_1=classmethod(build3DSurfMesh_1)
     build3DMesh_2=classmethod(build3DMesh_2)
+    buildMultiLevelMesh_1=classmethod(buildMultiLevelMesh_1)
     buildVecFieldOnCells_1=classmethod(buildVecFieldOnCells_1)
     buildVecFieldOnNodes_1=classmethod(buildVecFieldOnNodes_1)
     buildVecFieldOnGauss_1=classmethod(buildVecFieldOnGauss_1)
+    buildVecFieldOnGauss_2=classmethod(buildVecFieldOnGauss_2)
+    buildVecFieldOnGauss_2_Simpler=classmethod(buildVecFieldOnGauss_2_Simpler)
     buildVecFieldOnGaussNE_1=classmethod(buildVecFieldOnGaussNE_1)
     pass

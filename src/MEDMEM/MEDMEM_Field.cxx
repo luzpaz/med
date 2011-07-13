@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEM_Field.hxx"
@@ -35,11 +35,6 @@ FIELD_::FIELD_():
   _isMinMax(false),
   _name(""), _description(""), _support((SUPPORT *)NULL),
   _numberOfComponents(0), _numberOfValues(0),
-  //_componentsTypes((int *)NULL),
-  //_componentsNames((string *)NULL), 
-  //_componentsDescriptions((string *)NULL),
-  //_componentsUnits((UNIT*)NULL),
-  //_MEDComponentsUnits((string *)NULL),
   _iterationNumber(-1),_time(0.0),_orderNumber(-1),
   _valueType(MED_EN::MED_UNDEFINED_TYPE),
   _interlacingType(MED_EN::MED_UNDEFINED_INTERLACE)
@@ -59,11 +54,6 @@ FIELD_::FIELD_(const SUPPORT * Support, const int NumberOfComponents):
   MESSAGE_MED("FIELD_(const SUPPORT * Support, const int NumberOfComponents)");
 
   _numberOfValues = Support->getNumberOfElements(MED_ALL_ELEMENTS);
-  //_componentsTypes = new int[NumberOfComponents] ;
-  //_componentsNames = new string[NumberOfComponents];
-  //_componentsDescriptions = new string[NumberOfComponents];
-  //_componentsUnits = new UNIT[NumberOfComponents];
-  //_MEDComponentsUnits = new string[NumberOfComponents];
   _componentsTypes.resize(NumberOfComponents);
   _componentsNames.resize(NumberOfComponents);
   _componentsDescriptions.resize(NumberOfComponents);
@@ -95,12 +85,6 @@ FIELD_& FIELD_::operator=(const FIELD_ &m) {
   _numberOfComponents = m._numberOfComponents;
   _numberOfValues     = m._numberOfValues;
 
-  //if (m._componentsTypes != NULL) {
-  //  _componentsTypes = new int[m._numberOfComponents] ;
-  //  memcpy(_componentsTypes,m._componentsTypes,sizeof(int)*m._numberOfComponents);
-  //} else 
-  //  _componentsTypes = (int *) NULL;
-
   _componentsTypes.resize(_numberOfComponents);
   for (int i=0; i<m._numberOfComponents; i++)
     {_componentsTypes[i]=m._componentsTypes[i];}
@@ -110,17 +94,13 @@ FIELD_& FIELD_::operator=(const FIELD_ &m) {
   _componentsUnits.resize(_numberOfComponents);
   _MEDComponentsUnits.resize(_numberOfComponents);
 
-  //_componentsNames = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     {_componentsNames[i]=m._componentsNames[i];}
-  //_componentsDescriptions = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     {_componentsDescriptions[i]=m._componentsDescriptions[i];}
-  //_componentsUnits = new UNIT[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     {_componentsUnits[i] = m._componentsUnits[i];}
   // L'operateur '=' est defini dans la classe UNIT
-  //_MEDComponentsUnits = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     {_MEDComponentsUnits[i] = m._MEDComponentsUnits[i];}
 
@@ -157,25 +137,6 @@ FIELD_::FIELD_(const FIELD_ &m)
 FIELD_::~FIELD_()
 {
   MESSAGE_MED("~FIELD_()");
-  //if ( _componentsTypes !=NULL)
-  //  delete[] _componentsTypes ;
-  //if ( _componentsNames !=NULL)
-  //  delete[] _componentsNames ;
-  //if ( _componentsDescriptions !=NULL)
-  //  delete[] _componentsDescriptions ;
-  //if ( _componentsUnits !=NULL)
-  //  delete[] _componentsUnits ;
-  //if ( _MEDComponentsUnits !=NULL)
-  //  delete[] _MEDComponentsUnits ;
-  // delete driver
-//   vector<GENDRIVER *>::const_iterator it ;
-//   SCRUTE_MED(_drivers.size());
-//   int i=0;
-//   for (it=_drivers.begin();it!=_drivers.end();it++) {
-//     i++;
-//     SCRUTE_MED(i);
-//     delete (*it) ;
-
 
   MESSAGE_MED("In this object FIELD_ there is(are) " << _drivers.size() << " driver(s)");
 
@@ -184,11 +145,13 @@ FIELD_::~FIELD_()
       SCRUTE_MED(_drivers[index]);
       if ( _drivers[index] != NULL) delete _drivers[index];
     }
+  _drivers.clear();
   if(_support)
     _support->removeReference();
+  _support=0;
 }
 
-/*! 
+/*!
   \if developper
   PROVISOIRE : retourne des volumes, surfaces ou longueurs suivant les cas
   \endif
@@ -201,55 +164,54 @@ FIELD<double>* FIELD_::_getFieldSize(const SUPPORT *subSupport) const
   if ( !support )
     {
       if ( getSupport()->getEntity() == MED_NODE )
-        support = new SUPPORT(getSupport()->getMesh());
+        support = getSupport()->getMesh()->getSupportOnAll( MED_CELL );
       else
-        {
-          support = getSupport();
-          support->addReference();
-        }
+        support = getSupport();
+      support->addReference();
     }
+  const GMESH* mesh = getSupport()->getMesh();
   switch (getSupport()->getEntity())
     {
     case MED_CELL :
-      switch (getSupport()->getMesh()->getMeshDimension() ) 
+      switch (mesh->getMeshDimension() ) 
         {
         case 1:
-          p_field_size=getSupport()->getMesh()->getLength( support );
+          p_field_size=mesh->getLength( support );
           break;
         case 2:
-          p_field_size=getSupport()->getMesh()->getArea( support );
+          p_field_size=mesh->getArea( support );
           break;
         case 3:
-          p_field_size=getSupport()->getMesh()->getVolume( support );
+          p_field_size=mesh->getVolume( support );
           break;
         }
       break;
 
     case MED_FACE :
-      p_field_size=getSupport()->getMesh()->getArea( support );
+      p_field_size=mesh->getArea( support );
       break;
 
     case MED_EDGE :
-      p_field_size=getSupport()->getMesh()->getLength( support );
+      p_field_size=mesh->getLength( support );
       break;
     case MED_NODE : // issue 0020120: [CEA 206] normL2 on NODE field
       {
-        switch (getSupport()->getMesh()->getMeshDimension() ) 
+        switch (mesh->getMeshDimension() ) 
           {
           case 1:
-            p_field_size=getSupport()->getMesh()->getLength( support );
+            p_field_size=mesh->getLength( support );
             break;
           case 2:
-            p_field_size=getSupport()->getMesh()->getArea( support );
+            p_field_size=mesh->getArea( support );
             break;
           case 3:
-            p_field_size=getSupport()->getMesh()->getVolume( support );
+            p_field_size=mesh->getVolume( support );
             break;
           }
         break;
       }
     }
-  if(!subSupport)
+  if(!subSupport && support)
     support->removeReference();
   return p_field_size;
 }
@@ -279,7 +241,8 @@ void FIELD_::_checkNormCompatibility(const FIELD<double>* support_volume,
             " : it's support has no mesh reference";
           throw MEDEXCEPTION(diagnosis.c_str());
         }
-      if ( !getSupport()->getMesh()->existConnectivity(MED_NODAL,MED_CELL) )
+      if ( !getSupport()->getMesh()->getIsAGrid() &&
+           !( (const MESH*)getSupport()->getMesh() )->existConnectivity(MED_NODAL,MED_CELL) )
         {
           diagnosis="Cannot compute Lnorm of nodal field"+getName()+
             " : it's supporting mesh has no nodal connectivity data";
@@ -475,12 +438,17 @@ int      FIELD_::addDriver     (GENDRIVER & driver)
 }
 
 void     FIELD_::openAppend    ( void )                               {}
-void     FIELD_::write         (const GENDRIVER &)                    {}
+void     FIELD_::write         (const GENDRIVER &,
+                                MED_EN::med_mode_acces)               {}
+void     FIELD_::write         (driverTypes driverType,
+                                const std::string & fileName,
+                                MED_EN::med_mode_acces medMode)       {}
 void     FIELD_::writeAppend   (const GENDRIVER &)                    {}
-void     FIELD_::read          (const GENDRIVER &)                    {}
-void     FIELD_::write         (int , const string & ) {}
+void     FIELD_::write         (int ) {}
 void     FIELD_::writeAppend   (int , const string & ) {}
-void     FIELD_::read          (int )                                  {}
+void     FIELD_::read          (int )                                 {}
+void     FIELD_::read          (const GENDRIVER &)                    {}
+void     FIELD_::read          (driverTypes driverType, const std::string & fileName){}
 void     FIELD_::copyGlobalInfo(const FIELD_& m)
 {  
 
@@ -493,32 +461,15 @@ void     FIELD_::copyGlobalInfo(const FIELD_& m)
   for (int i=0; i<m._numberOfComponents; i++)
     {_componentsTypes[i]=m._componentsTypes[i];}
 
-  //if (m._componentsTypes != NULL)
-  //  {
-  //    _componentsTypes = new int[m._numberOfComponents] ;
-  //    memcpy(_componentsTypes,m._componentsTypes,sizeof(int)*m._numberOfComponents);
-  //  }
-  //else
-  //  _componentsTypes = (int *) NULL;
-
-  //_componentsNames = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     _componentsNames[i]=m._componentsNames[i];
-  //_componentsDescriptions = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     _componentsDescriptions[i]=m._componentsDescriptions[i];
 
-  //if (m._componentsUnits != NULL)
-  //  {
-  //    _componentsUnits = new UNIT[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     _componentsUnits[i] = m._componentsUnits[i];
-  //  }
-  //else
-  //  _componentsUnits=(UNIT*)NULL;
   
   // L'operateur '=' est defini dans la classe UNIT
-  //_MEDComponentsUnits = new string[m._numberOfComponents];
   for (int i=0; i<m._numberOfComponents; i++)
     {_MEDComponentsUnits[i] = m._MEDComponentsUnits[i];}
 

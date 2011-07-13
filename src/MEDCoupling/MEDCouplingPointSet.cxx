@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDCouplingPointSet.hxx"
@@ -65,7 +65,7 @@ int MEDCouplingPointSet::getSpaceDimension() const
     throw INTERP_KERNEL::Exception("Unable to get space dimension because no coordinates specified !");
 }
 
-void MEDCouplingPointSet::updateTime()
+void MEDCouplingPointSet::updateTime() const
 {
   if(_coords)
     {
@@ -73,13 +73,13 @@ void MEDCouplingPointSet::updateTime()
     }
 }
 
-void MEDCouplingPointSet::setCoords(DataArrayDouble *coords)
+void MEDCouplingPointSet::setCoords(const DataArrayDouble *coords)
 {
   if( coords != _coords )
     {
       if (_coords)
         _coords->decrRef();
-      _coords=coords;
+      _coords=const_cast<DataArrayDouble *>(coords);
       if(_coords)
         _coords->incrRef();
       declareAsNew();
@@ -174,7 +174,7 @@ DataArrayInt *MEDCouplingPointSet::buildPermArrayForMergeNode(int limitNodeId, d
 /*!
  * This methods searches for each node n1 nodes in _coords that are less far than 'prec' from n1. if any these nodes are stored in params
  * comm and commIndex.
- * @param limitNodeId is the limit node id. All nodes which id is strictly lower than 'limitNodeId' will not be merged.
+ * @param limitNodeId is the limit node id. All nodes which id is strictly lower than 'limitNodeId' will not be merged each other.
  * @param comm out parameter (not inout)
  * @param commIndex out parameter (not inout)
  */
@@ -226,7 +226,7 @@ std::vector<int> MEDCouplingPointSet::getNodeIdsNearPoint(const double *pos, dou
 
 /*!
  * Given a point given by its position 'pos' this method finds the set of node ids that are a a distance lower than eps.
- * Position 'pos' is expected to be of size getSpaceDimension(). If not the behabiour is not warranted.
+ * Position 'pos' is expected to be of size getSpaceDimension()*nbOfNodes. If not the behabiour is not warranted.
  * This method throws an exception if no coordiantes are set.
  */
 void MEDCouplingPointSet::getNodeIdsNearPoints(const double *pos, int nbOfNodes, double eps, std::vector<int>& c, std::vector<int>& cI) const throw(INTERP_KERNEL::Exception)
@@ -308,7 +308,7 @@ DataArrayInt *MEDCouplingPointSet::buildNewNumberingFromCommonNodesFormat(const 
  * This method renumber 'this' using 'newNodeNumbers' array of size this->getNumberOfNodes.
  * newNbOfNodes specifies the *std::max_element(newNodeNumbers,newNodeNumbers+this->getNumberOfNodes())
  * This value is asked because often known by the caller of this method.
- * @param newNodeNumbers array specifying the new numbering.
+ * @param newNodeNumbers array specifying the new numbering in old2New convention..
  * @param newNbOfNodes the new number of nodes.
  */
 void MEDCouplingPointSet::renumberNodes(const int *newNodeNumbers, int newNbOfNodes)
@@ -597,28 +597,41 @@ MEDCouplingPointSet *MEDCouplingPointSet::BuildInstanceFromMeshType(MEDCouplingM
 /*!
  * First step of serialization process. Used by ParaMEDMEM and MEDCouplingCorba to transfert data between process.
  */
-void MEDCouplingPointSet::getTinySerializationInformation(std::vector<int>& tinyInfo, std::vector<std::string>& littleStrings) const
+void MEDCouplingPointSet::getTinySerializationInformation(std::vector<double>& tinyInfoD, std::vector<int>& tinyInfo, std::vector<std::string>& littleStrings) const
 {
+  int it,order;
+  double time=getTime(it,order);
   if(_coords)
     {
       int spaceDim=getSpaceDimension();
-      littleStrings.resize(spaceDim+1);
+      littleStrings.resize(spaceDim+4);
       littleStrings[0]=getName();
+      littleStrings[1]=getDescription();
+      littleStrings[2]=_coords->getName();
+      littleStrings[3]=getTimeUnit();
       for(int i=0;i<spaceDim;i++)
-        littleStrings[i+1]=getCoords()->getInfoOnComponent(i);
+        littleStrings[i+4]=getCoords()->getInfoOnComponent(i);
       tinyInfo.clear();
       tinyInfo.push_back(getType());
       tinyInfo.push_back(spaceDim);
       tinyInfo.push_back(getNumberOfNodes());
+      tinyInfo.push_back(it);
+      tinyInfo.push_back(order);
+      tinyInfoD.push_back(time);
     }
   else
     {
-      littleStrings.resize(1);
+      littleStrings.resize(3);
       littleStrings[0]=getName();
+      littleStrings[1]=getDescription();
+      littleStrings[2]=getTimeUnit();
       tinyInfo.clear();
       tinyInfo.push_back(getType());
       tinyInfo.push_back(-1);
       tinyInfo.push_back(-1);
+      tinyInfo.push_back(it);
+      tinyInfo.push_back(order);
+      tinyInfoD.push_back(time);
     }
 }
 
@@ -629,7 +642,7 @@ void MEDCouplingPointSet::serialize(DataArrayInt *&a1, DataArrayDouble *&a2) con
 {
   if(_coords)
     {
-      a2=getCoords();
+      a2=const_cast<DataArrayDouble *>(getCoords());
       a2->incrRef();
     }
   else
@@ -645,11 +658,11 @@ void MEDCouplingPointSet::resizeForUnserialization(const std::vector<int>& tinyI
   if(tinyInfo[2]>=0 && tinyInfo[1]>=1)
     {
       a2->alloc(tinyInfo[2],tinyInfo[1]);
-      littleStrings.resize(tinyInfo[1]+1);
+      littleStrings.resize(tinyInfo[1]+4);
     }
   else
     {
-      littleStrings.resize(1);
+      littleStrings.resize(3);
     }
 }
 
@@ -657,17 +670,26 @@ void MEDCouplingPointSet::resizeForUnserialization(const std::vector<int>& tinyI
  * Second and final unserialization process.
  * @param tinyInfo must be equal to the result given by getTinySerializationInformation method.
  */
-void MEDCouplingPointSet::unserialization(const std::vector<int>& tinyInfo, const DataArrayInt *a1, DataArrayDouble *a2, const std::vector<std::string>& littleStrings)
+void MEDCouplingPointSet::unserialization(const std::vector<double>& tinyInfoD, const std::vector<int>& tinyInfo, const DataArrayInt *a1, DataArrayDouble *a2, const std::vector<std::string>& littleStrings)
 {
   if(tinyInfo[2]>=0 && tinyInfo[1]>=1)
     {
       setCoords(a2);
       setName(littleStrings[0].c_str());
+      setDescription(littleStrings[1].c_str());
+      a2->setName(littleStrings[2].c_str());
+      setTimeUnit(littleStrings[3].c_str());
       for(int i=0;i<tinyInfo[1];i++)
-        getCoords()->setInfoOnComponent(i,littleStrings[i+1].c_str());
+        getCoords()->setInfoOnComponent(i,littleStrings[i+4].c_str());
+      setTime(tinyInfoD[0],tinyInfo[3],tinyInfo[4]);
     }
   else
-    setName(littleStrings[0].c_str());
+    {
+      setName(littleStrings[0].c_str());
+      setDescription(littleStrings[1].c_str());
+      setTimeUnit(littleStrings[2].c_str());
+      setTime(tinyInfoD[0],tinyInfo[3],tinyInfo[4]);
+    }
 }
 
 /*!
@@ -787,7 +809,7 @@ void MEDCouplingPointSet::Rotate3DAlg(const double *center, const double *vect, 
  */
 MEDCouplingMesh *MEDCouplingPointSet::buildPart(const int *start, const int *end) const
 {
-  return buildPartOfMySelf(start,end,false);
+  return buildPartOfMySelf(start,end,true);
 }
 
 /*!
@@ -796,6 +818,7 @@ MEDCouplingMesh *MEDCouplingPointSet::buildPart(const int *start, const int *end
  * behind returned mesh. This cause an overhead but it is lesser in memory.
  * This method returns an array too. This array allows to the caller to know the mapping between nodeids in 'this' and nodeids in 
  * returned mesh. This is quite usefull for MEDCouplingFieldDouble on nodes for example...
+ * 'arr' is in old2New format of size ret->getNumberOfCells like MEDCouplingUMesh::zipCoordsTraducer is.
  * The returned mesh has to be managed by the caller.
  */
 MEDCouplingMesh *MEDCouplingPointSet::buildPartAndReduceNodes(const int *start, const int *end, DataArrayInt*& arr) const

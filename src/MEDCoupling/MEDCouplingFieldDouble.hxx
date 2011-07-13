@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #ifndef __PARAMEDMEM_MEDCOUPLINGFIELDDOUBLE_HXX__
@@ -23,15 +23,19 @@
 #include "MEDCoupling.hxx"
 #include "MEDCouplingField.hxx"
 #include "MEDCouplingTimeDiscretization.hxx"
-#include "MEDCouplingNatureOfField.hxx"
 #include "MEDCouplingMemArray.hxx"
 
 namespace ParaMEDMEM
 {
+  class MEDCouplingFieldTemplate;
+
   class MEDCOUPLING_EXPORT MEDCouplingFieldDouble : public MEDCouplingField
   {
   public:
     static MEDCouplingFieldDouble *New(TypeOfField type, TypeOfTimeDiscretization td=NO_TIME);
+    static MEDCouplingFieldDouble *New(const MEDCouplingFieldTemplate *ft, TypeOfTimeDiscretization td=NO_TIME);
+    void setTimeUnit(const char *unit);
+    const char *getTimeUnit() const;
     void copyTinyStringsFrom(const MEDCouplingFieldDouble *other) throw(INTERP_KERNEL::Exception);
     void copyTinyAttrFrom(const MEDCouplingFieldDouble *other) throw(INTERP_KERNEL::Exception);
     std::string simpleRepr() const;
@@ -46,7 +50,7 @@ namespace ParaMEDMEM
     void renumberCells(const int *old2NewBg, bool check) throw(INTERP_KERNEL::Exception);
     void renumberCellsWithoutMesh(const int *old2NewBg, bool check) throw(INTERP_KERNEL::Exception);
     void renumberNodes(const int *old2NewBg) throw(INTERP_KERNEL::Exception);
-    void renumberNodesWithoutMesh(const int *old2NewBg) throw(INTERP_KERNEL::Exception);
+    void renumberNodesWithoutMesh(const int *old2NewBg, double eps=1e-15) throw(INTERP_KERNEL::Exception);
     DataArrayInt *getIdsInRange(double vmin, double vmax) const throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *buildSubPart(const DataArrayInt *part) const throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *buildSubPart(const int *partBg, const int *partEnd) const throw(INTERP_KERNEL::Exception);
@@ -56,7 +60,6 @@ namespace ParaMEDMEM
     MEDCouplingFieldDouble *buildNewTimeReprFromThis(TypeOfTimeDiscretization td, bool deepCpy) const;
     TypeOfTimeDiscretization getTimeDiscretization() const;
     void checkCoherency() const throw(INTERP_KERNEL::Exception);
-    NatureOfField getNature() const { return _nature; }
     void setNature(NatureOfField nat) throw(INTERP_KERNEL::Exception);
     void setTimeTolerance(double val) { _time_discr->setTimeTolerance(val); }
     double getTimeTolerance() const { return _time_discr->getTimeTolerance(); }
@@ -76,8 +79,12 @@ namespace ParaMEDMEM
     double getIJK(int cellId, int nodeIdInCell, int compoId) const;
     void setArray(DataArrayDouble *array);
     void setEndArray(DataArrayDouble *array);
-    DataArrayDouble *getArray() const { return _time_discr->getArray(); }
-    DataArrayDouble *getEndArray() const { return _time_discr->getEndArray(); }
+    void setArrays(const std::vector<DataArrayDouble *>& arrs) throw(INTERP_KERNEL::Exception);
+    const DataArrayDouble *getArray() const { return _time_discr->getArray(); }
+    DataArrayDouble *getArray() { return _time_discr->getArray(); }
+    const DataArrayDouble *getEndArray() const { return _time_discr->getEndArray(); }
+    DataArrayDouble *getEndArray() { return _time_discr->getEndArray(); }
+    std::vector<DataArrayDouble *> getArrays() const { std::vector<DataArrayDouble *> ret; _time_discr->getArrays(ret); return ret; }
     double accumulate(int compId) const;
     void accumulate(double *res) const;
     double getMaxValue() const throw(INTERP_KERNEL::Exception);
@@ -95,21 +102,26 @@ namespace ParaMEDMEM
     void getValueOnPos(int i, int j, int k, double *res) const throw(INTERP_KERNEL::Exception);
     void getValueOn(const double *spaceLoc, double *res) const throw(INTERP_KERNEL::Exception);
     void getValueOn(const double *spaceLoc, double time, double *res) const throw(INTERP_KERNEL::Exception);
+    DataArrayDouble *getValueOnMulti(const double *spaceLoc, int nbOfPoints) const throw(INTERP_KERNEL::Exception);
     //! \b temporary
     void applyLin(double a, double b, int compoId);
     MEDCouplingFieldDouble &operator=(double value) throw(INTERP_KERNEL::Exception);
     void fillFromAnalytic(int nbOfComp, FunctionToEvaluate func) throw(INTERP_KERNEL::Exception);
     void fillFromAnalytic(int nbOfComp, const char *func) throw(INTERP_KERNEL::Exception);
+    void fillFromAnalytic2(int nbOfComp, const char *func) throw(INTERP_KERNEL::Exception);
+    void fillFromAnalytic3(int nbOfComp, const std::vector<std::string>& varsOrder, const char *func) throw(INTERP_KERNEL::Exception);
     void applyFunc(int nbOfComp, FunctionToEvaluate func);
     void applyFunc(int nbOfComp, double val);
-    void applyFunc(int nbOfComp, const char *func);
-    void applyFunc(const char *func);
+    void applyFunc(int nbOfComp, const char *func) throw(INTERP_KERNEL::Exception);
+    void applyFunc2(int nbOfComp, const char *func) throw(INTERP_KERNEL::Exception);
+    void applyFunc3(int nbOfComp, const std::vector<std::string>& varsOrder, const char *func) throw(INTERP_KERNEL::Exception);
+    void applyFunc(const char *func) throw(INTERP_KERNEL::Exception);
     void applyFuncFast32(const char *func) throw(INTERP_KERNEL::Exception);
     void applyFuncFast64(const char *func) throw(INTERP_KERNEL::Exception);
     int getNumberOfComponents() const throw(INTERP_KERNEL::Exception);
     int getNumberOfTuples() const throw(INTERP_KERNEL::Exception);
     int getNumberOfValues() const throw(INTERP_KERNEL::Exception);
-    void updateTime();
+    void updateTime() const;
     //
     void getTinySerializationIntInformation(std::vector<int>& tinyInfo) const;
     void getTinySerializationDbleInformation(std::vector<double>& tinyInfo) const;
@@ -120,10 +132,10 @@ namespace ParaMEDMEM
     //
     void changeUnderlyingMesh(const MEDCouplingMesh *other, int levOfCheck, double prec) throw(INTERP_KERNEL::Exception);
     void substractInPlaceDM(const MEDCouplingFieldDouble *f, int levOfCheck, double prec) throw(INTERP_KERNEL::Exception);
-    bool mergeNodes(double eps) throw(INTERP_KERNEL::Exception);
-    bool mergeNodes2(double eps) throw(INTERP_KERNEL::Exception);
-    bool zipCoords() throw(INTERP_KERNEL::Exception);
-    bool zipConnectivity(int compType) throw(INTERP_KERNEL::Exception);
+    bool mergeNodes(double eps, double epsOnVals=1e-15) throw(INTERP_KERNEL::Exception);
+    bool mergeNodes2(double eps, double epsOnVals=1e-15) throw(INTERP_KERNEL::Exception);
+    bool zipCoords(double epsOnVals=1e-15) throw(INTERP_KERNEL::Exception);
+    bool zipConnectivity(int compType, double epsOnVals=1e-15) throw(INTERP_KERNEL::Exception);
     bool simplexize(int policy) throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *doublyContractedProduct() const throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *determinant() const throw(INTERP_KERNEL::Exception);
@@ -161,13 +173,16 @@ namespace ParaMEDMEM
     MEDCouplingFieldDouble *operator/(const MEDCouplingFieldDouble& other) const throw(INTERP_KERNEL::Exception) { return DivideFields(this,&other); }
     const MEDCouplingFieldDouble &operator/=(const MEDCouplingFieldDouble& other) throw(INTERP_KERNEL::Exception);
     static MEDCouplingFieldDouble *DivideFields(const MEDCouplingFieldDouble *f1, const MEDCouplingFieldDouble *f2) throw(INTERP_KERNEL::Exception);
+  public:
+    const MEDCouplingTimeDiscretization *getTimeDiscretizationUnderGround() const { return _time_discr; }
+    MEDCouplingTimeDiscretization *getTimeDiscretizationUnderGround() { return _time_discr; }
   private:
     MEDCouplingFieldDouble(TypeOfField type, TypeOfTimeDiscretization td);
+    MEDCouplingFieldDouble(const MEDCouplingFieldTemplate *ft, TypeOfTimeDiscretization td);
     MEDCouplingFieldDouble(const MEDCouplingFieldDouble& other, bool deepCpy);
     MEDCouplingFieldDouble(NatureOfField n, MEDCouplingTimeDiscretization *td, MEDCouplingFieldDiscretization *type);
     ~MEDCouplingFieldDouble();
   private:
-    NatureOfField _nature;
     MEDCouplingTimeDiscretization *_time_discr;
   };
 }

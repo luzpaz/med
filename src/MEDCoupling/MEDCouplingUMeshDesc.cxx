@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDCouplingUMeshDesc.hxx"
@@ -25,7 +25,7 @@
 
 using namespace ParaMEDMEM;
 
-MEDCouplingUMeshDesc::MEDCouplingUMeshDesc():_mesh_dim(-1),_desc_connec(0),_desc_connec_index(0),
+MEDCouplingUMeshDesc::MEDCouplingUMeshDesc():_mesh_dim(-2),_desc_connec(0),_desc_connec_index(0),
                                              _nodal_connec_face(0),_nodal_connec_face_index(0)
 {
 }
@@ -67,13 +67,23 @@ void MEDCouplingUMeshDesc::checkCoherency() const throw(INTERP_KERNEL::Exception
 {
   for(std::set<INTERP_KERNEL::NormalizedCellType>::const_iterator iter=_types.begin();iter!=_types.end();iter++)
     {
-      if(INTERP_KERNEL::CellModel::getCellModel(*iter).getDimension()!=_mesh_dim)
+      if((int)INTERP_KERNEL::CellModel::GetCellModel(*iter).getDimension()!=_mesh_dim)
         {
           std::ostringstream message;
           message << "MeshDesc invalid because dimension is " << _mesh_dim << " and there is presence of cell(s) with type " << (*iter);
           throw INTERP_KERNEL::Exception(message.str().c_str());
         }
     }
+}
+
+void MEDCouplingUMeshDesc::checkCoherency1(double eps) const throw(INTERP_KERNEL::Exception)
+{
+  checkCoherency();
+}
+
+void MEDCouplingUMeshDesc::checkCoherency2(double eps) const throw(INTERP_KERNEL::Exception)
+{
+  checkCoherency1(eps);
 }
 
 void MEDCouplingUMeshDesc::checkDeepEquivalWith(const MEDCouplingMesh *other, int cellCompPol, double prec,
@@ -127,6 +137,11 @@ INTERP_KERNEL::NormalizedCellType MEDCouplingUMeshDesc::getTypeOfCell(int cellId
   return (INTERP_KERNEL::NormalizedCellType)desc_connec[desc_connec_index[cellId]+1];
 }
 
+std::set<INTERP_KERNEL::NormalizedCellType> MEDCouplingUMeshDesc::getAllGeoTypes() const
+{
+  return _types;
+}
+
 int MEDCouplingUMeshDesc::getNumberOfCellsWithType(INTERP_KERNEL::NormalizedCellType type) const
 {
   const int *desc_connec=_desc_connec->getConstPointer();
@@ -174,9 +189,19 @@ void MEDCouplingUMeshDesc::setConnectivity(DataArrayInt *descConn, DataArrayInt 
   computeTypes();
 }
 
-void MEDCouplingUMeshDesc::getTinySerializationInformation(std::vector<int>& tinyInfo, std::vector<std::string>& littleStrings) const
+DataArrayInt *MEDCouplingUMeshDesc::checkTypeConsistencyAndContig(const std::vector<int>& code, const std::vector<const DataArrayInt *>& idsPerType) const throw(INTERP_KERNEL::Exception)
 {
-  MEDCouplingPointSet::getTinySerializationInformation(tinyInfo,littleStrings);
+  throw INTERP_KERNEL::Exception("Not implemented yet !");
+}
+
+void MEDCouplingUMeshDesc::splitProfilePerType(const DataArrayInt *profile, std::vector<int>& code, std::vector<DataArrayInt *>& idsInPflPerType, std::vector<DataArrayInt *>& idsPerType) const throw(INTERP_KERNEL::Exception)
+{
+  throw INTERP_KERNEL::Exception("Not implemented yet !");
+}
+
+void MEDCouplingUMeshDesc::getTinySerializationInformation(std::vector<double>& tinyInfoD, std::vector<int>& tinyInfo, std::vector<std::string>& littleStrings) const
+{
+  MEDCouplingPointSet::getTinySerializationInformation(tinyInfoD,tinyInfo,littleStrings);
   tinyInfo.push_back(getMeshDimension());
   tinyInfo.push_back(getNumberOfNodes());
   tinyInfo.push_back(getNumberOfCells());
@@ -190,7 +215,7 @@ bool MEDCouplingUMeshDesc::isEmptyMesh(const std::vector<int>& tinyInfo) const
   return tinyInfo[5]<=0;
 }
 
-void MEDCouplingUMeshDesc::resizeForUnserialization(const std::vector<int>& tinyInfo, DataArrayInt *a1, DataArrayDouble *a2, std::vector<std::string>& littleStrings)
+void MEDCouplingUMeshDesc::resizeForUnserialization(const std::vector<int>& tinyInfo, DataArrayInt *a1, DataArrayDouble *a2, std::vector<std::string>& littleStrings) const
 {
   std::vector<int> tinyInfoTmp(tinyInfo.begin()+1,tinyInfo.end());
   MEDCouplingPointSet::resizeForUnserialization(tinyInfoTmp,a1,a2,littleStrings);
@@ -214,10 +239,10 @@ void MEDCouplingUMeshDesc::serialize(DataArrayInt *&a1, DataArrayDouble *&a2) co
   std::copy(faceConnIndex,faceConnIndex+getNumberOfFaces()+1,ptA1);
 }
 
-void MEDCouplingUMeshDesc::unserialization(const std::vector<int>& tinyInfo, DataArrayInt *a1, DataArrayDouble *a2, const std::vector<std::string>& littleStrings)
+void MEDCouplingUMeshDesc::unserialization(const std::vector<double>& tinyInfoD, const std::vector<int>& tinyInfo, const DataArrayInt *a1, DataArrayDouble *a2, const std::vector<std::string>& littleStrings)
 {
   std::vector<int> tinyInfoTmp(tinyInfo.begin()+1,tinyInfo.end());
-  MEDCouplingPointSet::unserialization(tinyInfoTmp,a1,a2,littleStrings);
+  MEDCouplingPointSet::unserialization(tinyInfoD,tinyInfoTmp,a1,a2,littleStrings);
   //
   const int *recvBuffer=a1->getConstPointer();
   DataArrayInt *descConn=DataArrayInt::New();
@@ -241,7 +266,7 @@ void MEDCouplingUMeshDesc::unserialization(const std::vector<int>& tinyInfo, Dat
   setMeshDimension(tinyInfo[2]);
 }
 
-void MEDCouplingUMeshDesc::giveElemsInBoundingBox(const double *bbox, double eps, std::vector<int>& elems)
+void MEDCouplingUMeshDesc::getCellsInBoundingBox(const double *bbox, double eps, std::vector<int>& elems)
 {
   int dim=getSpaceDimension();
   double* elem_bb=new double[2*dim];
@@ -286,7 +311,7 @@ void MEDCouplingUMeshDesc::giveElemsInBoundingBox(const double *bbox, double eps
   delete [] elem_bb;
 }
 
-void MEDCouplingUMeshDesc::giveElemsInBoundingBox(const INTERP_KERNEL::DirectedBoundingBox &bbox, double eps, std::vector<int>& elems)
+void MEDCouplingUMeshDesc::getCellsInBoundingBox(const INTERP_KERNEL::DirectedBoundingBox &bbox, double eps, std::vector<int>& elems)
 {
   int dim=getSpaceDimension();
   double* elem_bb=new double[2*dim];
@@ -459,6 +484,5 @@ DataArrayDouble *MEDCouplingUMeshDesc::getBarycenterAndOwner() const
 
 int MEDCouplingUMeshDesc::getCellContainingPoint(const double *pos, double eps) const
 {
-  //not implemented yet.
-  return -1;
+  throw INTERP_KERNEL::Exception("MEDCouplingUMeshDesc::getCellContainingPoint : not implemented yet !");
 }

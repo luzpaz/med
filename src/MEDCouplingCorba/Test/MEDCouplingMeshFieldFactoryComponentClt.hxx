@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #ifndef __MEDCOUPLINGCORBAFIELDFACTORYCOMPONENTCLT_HXX__
@@ -63,6 +63,19 @@ namespace SALOME_TEST
     CPPUNIT_TEST( checkCorbaFieldGaussPtNE2DWTFetching );
     CPPUNIT_TEST( checkCorbaFieldVectorOnExtrudedWT );
     CPPUNIT_TEST( checkCorbaFieldVectorOnCMeshWT );
+    CPPUNIT_TEST( checkCorbaFieldTemplateCellOn2D );
+    CPPUNIT_TEST( checkCorbaFieldTemplateNodeOn2D );
+    CPPUNIT_TEST( checkCorbaFieldTemplateGaussPtOn2D );
+    CPPUNIT_TEST( checkCorbaFieldTemplateGaussNEOn2D );
+    CPPUNIT_TEST( checkCorbaMultiFields1 );
+    CPPUNIT_TEST( checkCorbaArrayDouble1 );
+    CPPUNIT_TEST( checkCorbaArrayDouble2 );
+    CPPUNIT_TEST( checkCorbaArrayDouble3 );
+    CPPUNIT_TEST( checkCorbaArrayInt1 );
+    CPPUNIT_TEST( checkCorbaArrayInt2 );
+    CPPUNIT_TEST( checkCorbaArrayInt3 );
+    CPPUNIT_TEST( checkCorbaFetchingCoords1 );
+    CPPUNIT_TEST( checkCorbaMultiFields2 );
     CPPUNIT_TEST( shutdownServer );
     CPPUNIT_TEST_SUITE_END();
   public:
@@ -91,6 +104,19 @@ namespace SALOME_TEST
     void checkCorbaFieldGaussPtNE2DWTFetching();
     void checkCorbaFieldVectorOnExtrudedWT();
     void checkCorbaFieldVectorOnCMeshWT();
+    void checkCorbaFieldTemplateCellOn2D();
+    void checkCorbaFieldTemplateNodeOn2D();
+    void checkCorbaFieldTemplateGaussPtOn2D();
+    void checkCorbaFieldTemplateGaussNEOn2D();
+    void checkCorbaMultiFields1();
+    void checkCorbaArrayDouble1();
+    void checkCorbaArrayDouble2();
+    void checkCorbaArrayDouble3();
+    void checkCorbaArrayInt1();
+    void checkCorbaArrayInt2();
+    void checkCorbaArrayInt3();
+    void checkCorbaFetchingCoords1();
+    void checkCorbaMultiFields2();
     void shutdownServer();
   private:
     static void *checkCorbaField2DNTMultiFetchingMTStatic(void *stack);

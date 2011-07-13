@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 /*----------------------------------------------------------------------------
@@ -37,6 +37,7 @@
 
 #include <med.h>
 #include <string.h>
+#include <stdlib.h>
 
 /******************************************************************************
  *    - creation d'un fichier MED
@@ -58,9 +59,9 @@ int main (int argc, char **argv)
   /* la dimension du maillage */
   med_int mdim = 2;
   /* nom du maillage de longueur maxi MED_TAILLE_NOM */
-  char maa[MED_TAILLE_NOM+1] = "maa1";
+  char maa[MED_NAME_SIZE+1] = "maa1";
   /* description du maillage de longueur maxi MED_TAIIL_DESC */
-  char maadesc[MED_TAILLE_DESC+1] = "Example de maillage structure 2D";
+  char maadesc[MED_COMMENT_SIZE+1] = "Example de maillage structure 2D";
   /* le nombre de noeuds */
   med_int nnoe = 4;
   /* table des coordonnees  
@@ -69,25 +70,26 @@ int main (int argc, char **argv)
   med_int nbr[2] = {2, 2};
   /* tables des noms et des unites des coordonnees 
      profil : (dimension*MED_TAILLE_PNOM+1) */
-  char nomcoo[2*MED_TAILLE_PNOM+1] = "x               y               ";
-  char unicoo[2*MED_TAILLE_PNOM+1] = "cm              cm              ";
+  char nomcoo[2*MED_SNAME_SIZE+1] = "x               y               ";
+  char unicoo[2*MED_SNAME_SIZE+1] = "cm              cm              ";
 
-  char nomcooi[MED_TAILLE_PNOM+1] = "x               ";
-  char unicooi[MED_TAILLE_PNOM+1] = "cm              ";
+  char nomcooi[MED_SNAME_SIZE+1] = "x               ";
+  char unicooi[MED_SNAME_SIZE+1] = "cm              ";
   /* tables des noms, numeros, numeros de familles des noeuds
      autant d'elements que de noeuds - les noms ont pout longueur
-     MED_TAILLE_PNOM */
-  char nomnoe[4*MED_TAILLE_PNOM+1] = "nom1            nom2            nom3            nom4            ";
-  med_int numnoe[4] = {1,2,3,4};
+     MED_SNAME_SIZE */
+//   char nomnoe[4*MED_SNAME_SIZE+1] = "nom1            nom2            nom3            nom4            ";
+//  med_int numnoe[4] = {1,2,3,4};
   med_int nufano[4] = {0,1,2,2};
-  char nomfam[MED_TAILLE_NOM+1];
+  char nomfam[MED_NAME_SIZE+1];
   med_int numfam;
-  char attdes[MED_TAILLE_DESC+1];
+  //char attdesMED_TAILLE_DESC+1];
   med_int natt;
   med_int attide;
   med_int attval;
   med_int ngro;
-  char gro[MED_TAILLE_LNOM+1];
+  char gro[MED_LNAME_SIZE+1];
+  char dtunitp3[MED_LNAME_SIZE+1]="";
   int i, ip1;
   int nfame = 1; 
   int nfamn = 2;
@@ -104,11 +106,11 @@ int main (int argc, char **argv)
   med_int quad4[4] = {
     1, 2, 4, 3
   };
-  char nomquad4[MED_TAILLE_PNOM*1+1] = "quad1           ";
-  med_int numquad4[1] = {1};
+ // char nomquad4[MED_SNAME_SIZE*1+1] = "quad1           ";
+ // med_int numquad4[1] = {1};
   med_int nufaquad4[1] = {-1};
 
-  fid = MEDouvrir("test19.med",MED_LECTURE_ECRITURE);
+  fid = MEDfileOpen("test19.med",MED_ACC_RDWR);
   if (fid < 0)
     ret = -1;
   else
@@ -117,7 +119,8 @@ int main (int argc, char **argv)
 
   /* creation du maillage maa de dimension 2 */
   if (ret == 0)
-    ret = MEDmaaCr(fid,maa,mdim,MED_NON_STRUCTURE,maadesc);
+    ret = MEDmeshCr(fid,maa,mdim,mdim,MED_UNSTRUCTURED_MESH,maadesc,dtunitp3,
+                    MED_SORT_DTIT,MED_CARTESIAN,nomcoo,unicoo);
   printf("MEDmaaCr : %d\n",ret);
 
   /* ecriture des noeuds d'un maillage MED : 
@@ -127,9 +130,8 @@ int main (int argc, char **argv)
      - des numeros (optionnel dans un fichier MED) 
      - des numeros de familles des noeuds */          
   if (ret == 0)
-    ret = MEDnoeudsEcr(fid,maa,mdim,coo,MED_FULL_INTERLACE,MED_CART,
-                       nomcoo,unicoo,nomnoe,MED_VRAI,numnoe,MED_VRAI,
-                       nufano,nnoe);
+    ret = MEDmeshNodeCoordinateWr(fid,maa,MED_NO_DT,MED_NO_IT,MED_NO_DT,MED_FULL_INTERLACE,nnoe,coo);
+  MEDmeshEntityFamilyNumberWr(fid,maa,MED_NO_DT,MED_NO_IT,MED_NODE,0,nnoe,nufano);
   printf("MEDnoeudsEcr : %d\n",ret);
 
   /* ecriture des mailles MED_QUAD4 :
@@ -138,9 +140,10 @@ int main (int argc, char **argv)
      - numeros (optionnel)
      - numeros des familles */
   if (ret == 0) 
-    ret = MEDelementsEcr(fid,maa,mdim,quad4,MED_FULL_INTERLACE,
-                         nomquad4,MED_FAUX,numquad4,MED_VRAI,nufaquad4,nquad4,
-                         MED_MAILLE,MED_QUAD4,MED_NOD);
+    ret = MEDmeshElementConnectivityWr(fid,maa,MED_NO_DT,MED_NO_IT,MED_NO_DT,
+                                       MED_CELL,MED_QUAD4,MED_NODAL,MED_FULL_INTERLACE,
+                                       nquad4,quad4);
+  MEDmeshEntityFamilyNumberWr(fid,maa,MED_NO_DT,MED_NO_IT,MED_CELL,MED_QUAD4,nquad4,nufaquad4);
   printf("MEDelementsEcr : %d\n",ret);
 
   /* ecriture des familles */
@@ -158,8 +161,7 @@ int main (int argc, char **argv)
     {
       strcpy(nomfam,"FAMILLE_0");
       numfam = 0;
-      ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,0,
-                     gro,0);
+      ret = MEDfamilyCr(fid,maa,nomfam,numfam,0,gro);
     }
   printf("MEDfamCr : %d \n",ret);
 
@@ -178,13 +180,12 @@ int main (int argc, char **argv)
               attide = 1;
               attval = numfam*100;
               natt = 1;
-              strcpy(attdes,"description attribut");
+              //strcpy(attdes,"description attribut");
               strcpy(gro,"groupe1");
               ngro = 1;
               printf("%s - %d - %d - %d - %d \n",nomfam,numfam,attide,attval,
                      ngro);
-              ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,
-                             natt,gro,ngro);
+              ret = MEDfamilyCr(fid,maa,nomfam,numfam,ngro,gro);
               printf("MEDfamCr (elements) : %d\n",ret);
             }
         }
@@ -203,13 +204,12 @@ int main (int argc, char **argv)
               attide = 1;
               attval = numfam*100;
               natt = 1;
-              strcpy(attdes,"description attribut");
+              //strcpy(attdes,"description attribut");
               strcpy(gro,"groupe1");
               ngro = 1;
               printf("%s - %d - %d - %d - %d \n",nomfam,numfam,attide,attval,
                      ngro);
-              ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,
-                             natt,gro,ngro);
+              ret = MEDfamilyCr(fid,maa,nomfam,numfam,ngro,gro);
               printf("MEDfamCr (nodes) : %d\n",ret);
             }
         }
@@ -223,7 +223,7 @@ int main (int argc, char **argv)
   /* Ecriture d'un deuxieme maillage structure : grille standard
     ************************************************************* */
 
-  fid = MEDouvrir("test19.med", MED_LECTURE_ECRITURE);
+  fid = MEDfileOpen("test19.med", MED_ACC_RDWR);
   if (fid < 0)
     ret = -1;
   else
@@ -234,11 +234,12 @@ int main (int argc, char **argv)
   strcpy(maadesc, "Example de maillage structure grille standard 2D");
   /* creation du maillage grille standard maa de dimension 2 */
   if (ret == 0)
-    ret = MEDmaaCr(fid, maa, mdim, MED_STRUCTURE, maadesc);
+    ret = MEDmeshCr(fid,maa,mdim,mdim,MED_STRUCTURED_MESH,maadesc,dtunitp3,
+                    MED_SORT_DTIT,MED_CARTESIAN,nomcoo,unicoo);
   printf("MEDmaaCr : %d\n",ret);
 
   if (ret == 0)
-    ret = MEDnatureGrilleEcr(fid, maa, MED_GRILLE_STANDARD);
+    ret = MEDmeshGridTypeWr(fid, maa, MED_CARTESIAN_GRID);
   printf("MEDnatureGrilleEcr : %d\n",ret);
 
   /* ecriture des noeuds d'un maillage MED : 
@@ -252,12 +253,11 @@ int main (int argc, char **argv)
 /*   printf("MEDstructureCoordEcr : %d\n",ret); */
 
   if (ret == 0)
-    ret = MEDcoordEcr(fid,maa,mdim,coo,MED_FULL_INTERLACE,nnoe,MED_CART,
-                      nomcoo,unicoo);
+    ret = MEDmeshNodeCoordinateWr(fid,maa,MED_NO_DT,MED_NO_IT,MED_NO_DT,MED_FULL_INTERLACE,nnoe,coo);
   printf("MEDcoordEcr : %d\n",ret);
 
   if (ret == 0)
-    ret = MEDstructureCoordEcr(fid,maa,mdim,nbr);
+    ret = MEDmeshGridStructWr(fid,maa,MED_NO_DT,MED_NO_IT,MED_NO_DT,nbr);
   printf("MEDstructureCoordEcr : %d\n",ret);
 
   /* Ecriture des familles de la grille standard */
@@ -268,7 +268,7 @@ int main (int argc, char **argv)
     famNodeStd[ 0]=1; famNodeStd[ 1]=1;
     famNodeStd[ 2]=2; famNodeStd[ 3]=2;
 
-    ret = MEDfamEcr(fid, maa, famNodeStd, 4, MED_NOEUD, 0);
+    ret = MEDfamEcr(fid, maa, MED_NO_DT,MED_NO_IT,MED_NODE, 0, 4, famNodeStd);
   };
   printf("MEDfamEcr for Nodes : %d\n",ret);
 
@@ -277,7 +277,7 @@ int main (int argc, char **argv)
   if (ret == 0) {
     famElmtStd[ 0]=0;
 
-    ret = MEDfamEcr(fid, maa, famElmtStd, 1, MED_MAILLE, MED_QUAD4);
+    ret = MEDfamEcr(fid, maa, MED_NO_DT,MED_NO_IT,MED_CELL, MED_QUAD4, 1, famElmtStd);
   };
   printf("MEDfamEcr for Elements : %d\n",ret);
 
@@ -286,7 +286,7 @@ int main (int argc, char **argv)
   if (ret == 0) {
     for (i=0; i<4; i++) famFaceStd[i]=0;
 
-    ret = MEDfamEcr(fid, maa, famFaceStd, 4, MED_ARETE, MED_SEG2);
+    ret = MEDfamEcr(fid, maa, MED_NO_DT,MED_NO_IT,MED_CELL, MED_SEG2, 4, famFaceStd);
   };
   printf("MEDfamEcr for Elements : %d\n",ret);
 
@@ -295,8 +295,7 @@ int main (int argc, char **argv)
     {
       strcpy(nomfam,"FAMILLE_0");
       numfam = 0;
-      ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,0,
-                     gro,0);
+      ret = MEDfamilyCr(fid,maa,nomfam,numfam,0,gro);
     }
   printf("MEDfamCr : %d\n",ret);
 
@@ -313,13 +312,12 @@ int main (int argc, char **argv)
               attide = 1;
               attval = numfam*100;
               natt = 1;
-              strcpy(attdes,"description attribut");
+              //strcpy(attdes,"description attribut");
               strcpy(gro,"groupe1");
               ngro = 1;
               printf("%s - %d - %d - %d - %d \n",nomfam,numfam,attide,attval,
                      ngro);
-              ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,
-                             natt,gro,ngro);
+              ret = MEDfamilyCr(fid,maa,nomfam,numfam,ngro,gro);
               printf("MEDfamCr (nodes) : %d\n",ret);
             }
         }
@@ -332,7 +330,7 @@ int main (int argc, char **argv)
   /* Ecriture d'un troisieme maillage structure : grille cartesienne
     *************************************************************** */
 
-  fid = MEDouvrir("test19.med", MED_LECTURE_ECRITURE);
+  fid = MEDfileOpen("test19.med", MED_ACC_RDWR);
   if (fid < 0)
     ret = -1;
   else
@@ -343,11 +341,12 @@ int main (int argc, char **argv)
   strcpy(maadesc, "Example de maillage structure grille cartesienne 2D");
   /* creation d'une grille cartesienne maa de dimension 2 */
   if (ret == 0)
-    ret = MEDmaaCr(fid, maa, mdim, MED_STRUCTURE, maadesc);
+    ret = MEDmeshCr(fid,maa,mdim,mdim,MED_STRUCTURED_MESH,maadesc,dtunitp3,
+                    MED_SORT_DTIT,MED_CARTESIAN,nomcoo,unicoo);
   printf("MEDmaaCr : %d\n",ret);
 
   if (ret == 0)
-    ret = MEDnatureGrilleEcr(fid, maa, MED_GRILLE_CARTESIENNE);
+    ret = MEDmeshGridTypeWr(fid, maa, MED_CARTESIAN_GRID);
   printf("MEDnatureGrilleEcr : %d\n",ret);
 
   /* Ecriture des indices de la grille cartesienne :
@@ -375,7 +374,7 @@ int main (int argc, char **argv)
     famNodeCart[ 8]=2; famNodeCart[ 9]=9; famNodeCart[10]=0; famNodeCart[11]=2;
     famNodeCart[12]=5; famNodeCart[13]=5; famNodeCart[14]=6; famNodeCart[15]=7;
 
-    ret = MEDfamEcr(fid, maa, famNodeCart, 16, MED_NOEUD, 0);
+    ret = MEDfamEcr(fid, maa, famNodeCart, 16, MED_NODE, 0);
   };
   printf("MEDfamEcr for Nodes : %d\n",ret);
 
@@ -384,7 +383,7 @@ int main (int argc, char **argv)
   if (ret == 0) {
     for(i=0; i<9; i++) famElmtCart[i]=0;
 
-    ret = MEDfamEcr(fid, maa, famElmtCart, 9, MED_MAILLE, MED_QUAD4);
+    ret = MEDfamEcr(fid, maa, MED_NO_DT,MED_NO_IT,MED_CELL, MED_QUAD4, 9, famElmtCart);
   };
   printf("MEDfamEcr for Elements : %d\n",ret);
 
@@ -393,7 +392,7 @@ int main (int argc, char **argv)
   if (ret == 0) {
     for(i=0; i<24; i++) famFaceCart[i]=0;
 
-    ret = MEDfamEcr(fid, maa, famFaceCart, 24, MED_ARETE, MED_SEG2);
+    ret = MEDfamEcr(fid, maa, MED_NO_DT,MED_NO_IT, MED_CELL, MED_SEG2, 24, famFaceCart);
   };
   printf("MEDfamEcr for Elements : %d\n",ret);
 
@@ -402,8 +401,7 @@ int main (int argc, char **argv)
     {
       strcpy(nomfam,"FAMILLE_0");
       numfam = 0;
-      ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,0,
-                     gro,0);
+      ret = MEDfamilyCr(fid,maa,nomfam,numfam,0,gro);
     }
   printf("MEDfamCr : %d \n",ret);
 
@@ -420,13 +418,12 @@ int main (int argc, char **argv)
               attide = 1;
               attval = numfam*100;
               natt = 1;
-              strcpy(attdes,"description attribut");
+              //strcpy(attdes,"description attribut");
               strcpy(gro,"groupe1");
               ngro = 1;
               printf("%s - %d - %d - %d - %d \n",nomfam,numfam,attide,attval,
                      ngro);
-              ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,
-                             natt,gro,ngro);
+              ret = MEDfamilyCr(fid,maa,nomfam,numfam,ngro,gro);
               printf("MEDfamCr (nodes) : %d\n",ret);
             }
         }

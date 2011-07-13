@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #ifndef __MEDCOUPLINGCORBAFIELDFACTORYCOMPONENT_HXX__
@@ -26,8 +26,13 @@ namespace ParaMEDMEM
 {
   class MEDCouplingUMesh;
   class MEDCouplingFieldDouble;
+  class MEDCouplingFieldTemplate;
   class MEDCouplingExtrudedMesh;
   class MEDCouplingCMesh;
+  class DataArrayDouble;
+  class DataArrayInt;
+  class MEDCouplingMultiFields;
+  class MEDCouplingFieldOverTime;
 }
 
 namespace SALOME_TEST
@@ -53,6 +58,18 @@ namespace SALOME_TEST
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldGaussPtNE2DWT();
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldVectorOnExtrudedWT();
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldVectorOnCMeshWT();
+    static ParaMEDMEM::MEDCouplingFieldTemplate *buildFieldTemplateCellOn2D();
+    static ParaMEDMEM::MEDCouplingFieldTemplate *buildFieldTemplateNodeOn2D();
+    static ParaMEDMEM::MEDCouplingFieldTemplate *buildFieldTemplateGaussPtOn2D();
+    static ParaMEDMEM::MEDCouplingFieldTemplate *buildFieldTemplateGaussNEOn2D();
+    static ParaMEDMEM::MEDCouplingMultiFields *buildMultiFields1();
+    static ParaMEDMEM::DataArrayDouble *buildArrayDouble1();
+    static ParaMEDMEM::DataArrayDouble *buildArrayDouble2();
+    static ParaMEDMEM::DataArrayDouble *buildArrayDouble3();
+    static ParaMEDMEM::DataArrayInt *buildArrayInt1();
+    static ParaMEDMEM::DataArrayInt *buildArrayInt2();
+    static ParaMEDMEM::DataArrayInt *buildArrayInt3();
+    static ParaMEDMEM::MEDCouplingFieldOverTime *buildMultiFields2();
     static std::string buildFileNameForIOR();
   };
 }

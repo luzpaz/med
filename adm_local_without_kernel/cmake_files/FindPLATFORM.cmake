@@ -1,20 +1,20 @@
-#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
 MARK_AS_ADVANCED(ISSUE)
@@ -40,11 +40,34 @@ IF(NOT CMAKE_BUILD_TYPE)
   SET(CMAKE_BUILD_TYPE $ENV{CMAKE_BUILD_TYPE})
 ENDIF(NOT CMAKE_BUILD_TYPE)
 
+IF(WINDOWS)
+ELSE(WINDOWS)
+  SET(ADD_WERROR ON)
+  SET(NAMES ACCEPT_SALOME_WARNINGS ACCEPT_${MODULE}_WARNINGS I_AM_A_TROLL_I_DO_NOT_FIX_${MODULE}_WARNINGS)
+  FOREACH(name ${NAMES})
+    SET(VAL $ENV{${name}})
+    IF(X${VAL} STREQUAL X0)
+      SET(ADD_WERROR ON)
+    ENDIF(X${VAL} STREQUAL X0)
+    IF(X${VAL} STREQUAL X1)
+      SET(ADD_WERROR OFF)
+    ENDIF(X${VAL} STREQUAL X1)
+  ENDFOREACH(name ${NAMES})
+  IF(ADD_WERROR)
+    SET(CMAKE_C_FLAGS "-Werror")
+    SET(CMAKE_CXX_FLAGS "-Werror")
+  ENDIF(ADD_WERROR)
+ENDIF(WINDOWS)
+
 IF(CMAKE_BUILD_TYPE)
   IF(WINDOWS)
     MARK_AS_ADVANCED(CLEAR CMAKE_CONFIGURATION_TYPES)
     SET(CMAKE_CONFIGURATION_TYPES ${CMAKE_BUILD_TYPE} CACHE STRING "compilation types" FORCE)
   ELSE(WINDOWS)
+    IF(CMAKE_BUILD_TYPE STREQUAL Debug)
+      SET(CMAKE_C_FLAGS_DEBUG "-g")
+      SET(CMAKE_CXX_FLAGS_DEBUG "-g")
+    ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
     IF(CMAKE_BUILD_TYPE STREQUAL Release)
       SET(CMAKE_C_FLAGS_RELEASE "-O1 -DNDEBUG")
       SET(CMAKE_CXX_FLAGS_RELEASE "-O1 -DNDEBUG")
@@ -66,7 +89,11 @@ IF(WINDOWS)
   SET(PLATFORM_LIBADD ${PLATFORM_LIBADD} Ws2_32.lib)
   SET(PLATFORM_LIBADD ${PLATFORM_LIBADD} Userenv.lib) # At least for GEOM suit
 ELSE(WINDOWS)
-  SET(PLATFORM_CPPFLAGS ${PLATFORM_CPPFLAGS} -Wall)
+  # SET(PLATFORM_CPPFLAGS ${PLATFORM_CPPFLAGS} -Wparentheses)
+  # SET(PLATFORM_CPPFLAGS ${PLATFORM_CPPFLAGS} -Wreturn-type)
+  # SET(PLATFORM_CPPFLAGS ${PLATFORM_CPPFLAGS} -Wmissing-declarations)
+  # SET(PLATFORM_CPPFLAGS ${PLATFORM_CPPFLAGS} -Wunused)
+  # SET(PLATFORM_CPPFLAGS ${PLATFORM_CPPFLAGS} -Wall)
   SET(PLATFORM_LIBADD ${PLATFORM_LIBADD} -ldl)
 ENDIF(WINDOWS)
 

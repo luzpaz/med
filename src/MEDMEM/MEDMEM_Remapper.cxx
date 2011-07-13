@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEM_Remapper.hxx"
@@ -22,7 +22,7 @@
 #include "Interpolation.hxx"
 #include "Interpolation2D.txx"
 #include "Interpolation3D.txx"
-#include "Interpolation3DSurf.txx"
+#include "Interpolation3DSurf.hxx"
 
 
   
@@ -35,6 +35,41 @@
 //   int  InterpolationOptions::_orientation =0;
 //   SplittingPolicy  InterpolationOptions::_splittingPolicy =GENERAL_48;
 
+/*!
+    \defgroup medmemremapper MEDMEM::MEDMEM_REMAPPER
+
+    \section overview Overview
+
+    \c MEDMEM_REMAPPER enables conservative remapping of fields 
+    between two sequential codes. 
+    The computation is possible for 3D meshes and 2D meshes or 3D surfaces. It enables fast sequential localization, based on a bounding box tree structure. It is based on cell-cell intersection or on a point in element search, depending on the field type. Fields can either lie on cells (P0) or nodes (P1).
+
+    A typical use of \c MEDMEM_REMAPPER encompasses two distinct phases :
+    - A setup phase during which the intersection volumes are computed and the interpolation matrix is stored. This corresponds to calling the \c MEDMEM_REMAPPER::prepare() method.
+    - A use phase during which the remappings are actually performed. This corresponds to the calls to transfer() and reverseTransfer() which actually performs the interpolation.
+
+    The following code excerpt illutrates a typical use of the \c MEDMEM_REMAPPER class.
+ 
+    \code
+    ...
+    std::string sourceFileName("source.med");
+    MEDMEM::MESH med_source_mesh(MED_DRIVER,sourceFileName,"Source_Mesh");
+    std::string targetFileName("target.med");
+    MEDMEM::MESH med_target_mesh(MED_DRIVER,targetFileName,"Target_Mesh");
+    FIELD<double> sourceField(MED_DRIVER,sourceFileName,"Density",0,0);
+    FIELD<double> targetField;
+    MEDMEM_Remapper mapper;
+    mapper.setOptionsDouble("Precision",1e-7);
+    mapper.setOptionsString("Intersection_type",Geometric2D);
+    mapper.prepare(med_source_mesh,med_target_mesh,"P0P1");
+    mapper.transfer(sourceField,targetField);
+    //use targetField
+    ...
+    \endcode
+
+    @{
+ */
+
 MEDMEM_REMAPPER::MEDMEM_REMAPPER():_matrix(0),_sourceMesh(0), _targetMesh(0), _sourceSupport(0), _targetSupport(0)
 {
 }
@@ -46,10 +81,10 @@ MEDMEM_REMAPPER::~MEDMEM_REMAPPER()
     _sourceMesh->removeReference();
   if(_targetMesh)
     _targetMesh->removeReference();
-  if(_sourceSupport)
-    _sourceSupport->removeReference();
-  if(_targetSupport)
-    _targetSupport->removeReference();
+//   if(_sourceSupport)
+//     _sourceSupport->removeReference();
+//   if(_targetSupport)
+//     _targetSupport->removeReference();
 }
 /*! This method computes the intersection matrix between 
  * source \a mesh_source and \a mesh_target. It is a preliminary step 
@@ -95,18 +130,18 @@ int MEDMEM_REMAPPER::prepare(const MEDMEM::MESH& mesh_source, const MEDMEM::MESH
     throw INTERP_KERNEL::Exception("MEDMEM_REMAPPER::prepare: Invalid method specified ! Must be in : \"P0P0\" \"P0P1\" \"P1P0\" or \"P1P1\"");
                 
 
-  if(_sourceSupport)
-    _sourceSupport->removeReference();
-  if(_targetSupport)
-    _targetSupport->removeReference();
-  if(     _sourceFieldType == "P0")
-    _sourceSupport = new MEDMEM::SUPPORT((MEDMEM::MESH *)_sourceMesh,"on All support",MED_EN::MED_CELL);
+//   if(_sourceSupport)
+//     _sourceSupport->removeReference();
+//   if(_targetSupport)
+//     _targetSupport->removeReference();
+  if(   _sourceFieldType == "P0")
+    _sourceSupport = ((MEDMEM::MESH *)_sourceMesh)->getSupportOnAll(MED_EN::MED_CELL);
   else
-    _sourceSupport = new MEDMEM::SUPPORT((MEDMEM::MESH *)_sourceMesh,"on All support",MED_EN::MED_NODE);
+    _sourceSupport = ((MEDMEM::MESH *)_sourceMesh)->getSupportOnAll(MED_EN::MED_NODE);
   if(   _targetFieldType == "P0")
-    _targetSupport = new MEDMEM::SUPPORT((MEDMEM::MESH *)_targetMesh,"on All support",MED_EN::MED_CELL);
+    _targetSupport = ((MEDMEM::MESH *)_targetMesh)->getSupportOnAll(MED_EN::MED_CELL);
   else
-    _targetSupport = new MEDMEM::SUPPORT((MEDMEM::MESH *)_targetMesh,"on All support",MED_EN::MED_NODE);
+    _targetSupport = ((MEDMEM::MESH *)_targetMesh)->getSupportOnAll(MED_EN::MED_NODE);
         
   if (tm_spacedim!=sm_spacedim || tm_meshdim!=sm_meshdim)
     throw MEDEXCEPTION("incompatible mesh and/or space dimensions in meshes");
@@ -316,7 +351,7 @@ int MEDMEM_REMAPPER::setOptionString(const std::string& key, std::string& value)
 */
 MEDMEM::FIELD<double>* MEDMEM_REMAPPER::getSupportVolumes(const MEDMEM::SUPPORT& support)
 {
-  const MEDMEM::MESH* mesh=support.getMesh();
+  const MEDMEM::GMESH* mesh=support.getMesh();
   int dim = mesh->getMeshDimension();
   switch (dim)
     {
@@ -333,3 +368,7 @@ void MEDMEM_REMAPPER::printMatrixInfo()
 {
         std::cout << *_matrix << std::endl;
 }
+
+/*!
+@}
+*/

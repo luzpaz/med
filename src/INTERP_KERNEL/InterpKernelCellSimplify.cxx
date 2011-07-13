@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "InterpKernelCellSimplify.hxx"
@@ -39,7 +39,7 @@ using namespace INTERP_KERNEL;
 INTERP_KERNEL::NormalizedCellType CellSimplify::simplifyDegeneratedCell(INTERP_KERNEL::NormalizedCellType type, const int *conn, int lgth,
                                                                         int *retConn, int& retLgth) throw(INTERP_KERNEL::Exception)
 {
-  const INTERP_KERNEL::CellModel& cm=INTERP_KERNEL::CellModel::getCellModel(type);
+  const INTERP_KERNEL::CellModel& cm=INTERP_KERNEL::CellModel::GetCellModel(type);
   std::set<int> c(conn,conn+lgth);
   c.erase(-1);
   bool isObviousNonDegeneratedCell=((int)c.size()==lgth);
@@ -104,7 +104,7 @@ INTERP_KERNEL::NormalizedCellType CellSimplify::tryToUnPoly2D(const int *conn, i
 int *CellSimplify::getFullPolyh3DCell(INTERP_KERNEL::NormalizedCellType type, const int *conn, int lgth,
                                       int& retNbOfFaces, int& retLgth)
 {
-  const INTERP_KERNEL::CellModel& cm=INTERP_KERNEL::CellModel::getCellModel(type);
+  const INTERP_KERNEL::CellModel& cm=INTERP_KERNEL::CellModel::GetCellModel(type);
   unsigned nbOfFaces=cm.getNumberOfSons2(conn,lgth);
   int *tmp=new int[nbOfFaces*(lgth+1)];
   int *work=tmp;
@@ -153,6 +153,8 @@ INTERP_KERNEL::NormalizedCellType CellSimplify::tryToUnPoly3D(const int *conn, i
     {
     case 806:
       return tryToUnPolyHex8(conn,nbOfFaces,lgth,retConn,retLgth);
+    case 1208:
+      return tryToUnPolyHexp12(conn,nbOfFaces,lgth,retConn,retLgth);
     case 605:
       return tryToUnPolyPenta6(conn,nbOfFaces,lgth,retConn,retLgth);
     case 505:
@@ -299,6 +301,47 @@ INTERP_KERNEL::NormalizedCellType CellSimplify::tryToUnPolyHex8(const int *conn,
               std::copy(tmp2,tmp2+4,retConn+4);
               retLgth=8;
               return INTERP_KERNEL::NORM_HEXA8;
+            }
+        }
+    }
+  retLgth=lgth;
+  std::copy(conn,conn+lgth,retConn);
+  return INTERP_KERNEL::NORM_POLYHED;
+}
+
+INTERP_KERNEL::NormalizedCellType CellSimplify::tryToUnPolyHexp12(const int *conn, int nbOfFaces, int lgth, int *retConn, int& retLgth)
+{
+  int nbOfHexagon=std::count(conn+lgth,conn+lgth+nbOfFaces,(int)INTERP_KERNEL::NORM_POLYGON);
+  int nbOfQuad=std::count(conn+lgth,conn+lgth+nbOfFaces,(int)INTERP_KERNEL::NORM_QUAD4);
+  if(nbOfQuad==6 && nbOfHexagon==2)
+    {
+      const int *hexag0=std::find(conn+lgth,conn+lgth+nbOfFaces,(int)INTERP_KERNEL::NORM_POLYGON);
+      int hexg0Id=std::distance(conn+lgth,hexag0);
+      const int *hexag1=std::find(hexag0+1,conn+lgth+nbOfFaces,(int)INTERP_KERNEL::NORM_POLYGON);
+      int hexg1Id=std::distance(conn+lgth,hexag1);
+      const int *connHexag0=conn+5*hexg0Id;
+      int lgthH0=std::distance(connHexag0,std::find(connHexag0,conn+lgth,-1));
+      if(lgthH0==6)
+        {
+          const int *connHexag1=conn+5*hexg0Id+7+(hexg1Id-hexg0Id-1)*5;
+          int lgthH1=std::distance(connHexag1,std::find(connHexag1,conn+lgth,-1));
+          if(lgthH1==6)
+            {
+              std::vector<int> tmp;
+              std::set<int> conn1(connHexag0,connHexag0+6);
+              std::set<int> conn2(connHexag1,connHexag1+6);
+              std::set_intersection(conn1.begin(),conn1.end(),conn2.begin(),conn2.end(),std::back_insert_iterator< std::vector<int> >(tmp));
+              if(tmp.empty())
+                {
+                  int tmp2[6];
+                  if(tryToArrangeOppositeFace(conn,lgth,6,connHexag0,connHexag1,8,tmp2))
+                    {
+                      std::copy(connHexag0,connHexag0+6,retConn);
+                      std::copy(tmp2,tmp2+6,retConn+6);
+                      retLgth=12;
+                      return INTERP_KERNEL::NORM_HEXGP12;
+                    }
+                }
             }
         }
     }

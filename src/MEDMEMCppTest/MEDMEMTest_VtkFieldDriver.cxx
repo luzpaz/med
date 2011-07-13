@@ -1,27 +1,26 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
 #include <MEDMEM_VtkFieldDriver.hxx>
-#include <MEDMEM_Med.hxx>
 #include <MEDMEM_Field.hxx>
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
@@ -62,7 +61,7 @@ void MEDMEMTest::testVtkFieldDriver()
   FIELD<int> *aField                = new FIELD<int>();
   FIELD<double> *aField_1           = new FIELD<double>();
 
-  string filename_rd                = getResourceFile("pointe_import22.med");
+  string filename_rd                = getResourceFile("pointe.med");
   string emptyfilename              = "";
   string fileNotExistsName          = "/path_not_exists/file_not_exists.vtk";
   string filename_wr                = makeTmpFile( "myField_pointe.vtk" );
@@ -101,7 +100,7 @@ void MEDMEMTest::testVtkFieldDriver()
   //  TEST2: Main test  //
   ////////////////////////
   //Read Fields from file
-  MED_FIELD_RDONLY_DRIVER22<int> *aMedRdFieldDriver22_int = new MED_FIELD_RDONLY_DRIVER22<int>(filename_rd, aField);
+  MED_FIELD_RDONLY_DRIVER<int> *aMedRdFieldDriver22_int = new MED_FIELD_RDONLY_DRIVER<int>(filename_rd, aField);
   aMedRdFieldDriver22_int->open();
   aMedRdFieldDriver22_int->setFieldName(fieldname_rd_int);
   aMedRdFieldDriver22_int->read();
@@ -109,7 +108,7 @@ void MEDMEMTest::testVtkFieldDriver()
   MESH *mesh=new MESH(MED_DRIVER,filename_rd,"maa1");
   aField->getSupport()->setMesh(mesh);
 
-  MED_FIELD_RDONLY_DRIVER22<double> *aMedRdFieldDriver22_double = new MED_FIELD_RDONLY_DRIVER22<double>(filename_rd, aField_1);
+  MED_FIELD_RDONLY_DRIVER<double> *aMedRdFieldDriver22_double = new MED_FIELD_RDONLY_DRIVER<double>(filename_rd, aField_1);
   aMedRdFieldDriver22_double->open();
   aMedRdFieldDriver22_double->setFieldName(fieldname_rd_double);
   aMedRdFieldDriver22_double->read();

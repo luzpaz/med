@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEM_DriversDef.hxx"
@@ -119,7 +119,7 @@ MESH_ENTITIES::MESH_ENTITIES () : map<int, const list<MED_EN::medGeometryElement
       MED_POLYGON,
       MED_POLYHEDRA};
 
-    static const list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
+    list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
     (*this)[MED_CELL] = geomList;
   }
   
@@ -131,7 +131,7 @@ MESH_ENTITIES::MESH_ENTITIES () : map<int, const list<MED_EN::medGeometryElement
       MED_QUAD8,
       MED_POLYGON};
 
-    static const list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
+    list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
     (*this)[MED_FACE] = geomList; 
   }
   
@@ -140,14 +140,14 @@ MESH_ENTITIES::MESH_ENTITIES () : map<int, const list<MED_EN::medGeometryElement
       MED_SEG2,
       MED_SEG3 };
 
-    static const list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
+    list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
     (*this)[MED_EDGE] = geomList; 
   }
   
   {
     //    const med_geometrie_element T[] =  { MED_NONE };
     const MED_EN::medGeometryElement T[] =  { (MED_EN::medGeometryElement)0 };
-    static const list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
+    list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
     (*this)[MED_NODE] = geomList; 
   }
   

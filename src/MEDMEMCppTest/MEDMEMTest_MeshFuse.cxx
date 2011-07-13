@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File      : MEDMEMTest_MeshFuse.cxx
 // Created   : Mon Jul 13 10:35:22 2009
@@ -33,6 +33,7 @@
 
 #include <vector>
 #include <string>
+#include <algorithm>
 
 using namespace MEDMEM;
 using namespace MED_EN;
@@ -40,7 +41,7 @@ using namespace std;
 
 namespace
 {
-  const char* bnd_elem_name = "Boundary elements";
+  const char* bnd_elem_name = "Bnd elems";
 
   /*!
    * \brief Class allowing to add groups to GRID
@@ -61,6 +62,7 @@ namespace
       case MED_NODE: _groupNode.push_back( g ); break;
       default :throw MEDEXCEPTION(LOCALIZED("Bad Entity !"));
       }
+      removeReference();
     }
   };
 }
@@ -89,74 +91,33 @@ GRID* makeGrid(double step, double x0, double y0, int nb_x,  int nb_y, int nb_z 
   }
   _GRID* grid = new _GRID( xyz_array, coord_name, unit );
 
-//   if (dim==3)
-//   {
-//     grid->addDriver( MED_DRIVER, STRING("/dn25/salome/eap/salome/misc/tmp/grid3D_")
-//                      << int(grid) <<".med", "grid");
-//     grid->writeUnstructured();
-//   }
-  // make group of boundary elems
 
-  vector<int> bnd_elems;
-  medEntityMesh bnd_entity;
-  if ( dim == 3 )
-  {
-    bnd_entity = MED_FACE;
-    for ( int x = 0; x < nb_x; ++x )
-      for ( int y = 0; y < nb_y; ++y )
-      {
-        bnd_elems.push_back( grid->getFaceNumber( 3, x, y, 0    ));
-        bnd_elems.push_back( grid->getFaceNumber( 3, x, y, nb_z ));
-      }
-    for ( int x = 0; x < nb_x; ++x )
-      for ( int z = 0; z < nb_z; ++z )
-      {
-        bnd_elems.push_back( grid->getFaceNumber( 2, x, 0,    z ));
-        bnd_elems.push_back( grid->getFaceNumber( 2, x, nb_y, z ));
-      }
-    for ( int y = 0; y < nb_y; ++y )
-      for ( int z = 0; z < nb_z; ++z )
-      {
-        bnd_elems.push_back( grid->getFaceNumber( 1, 0,    y, z ));
-        bnd_elems.push_back( grid->getFaceNumber( 1, nb_x, y, z ));
-      }
-  }
-  else
-  {
-    bnd_entity = MED_EDGE;
-    for ( int x = 0; x < nb_x; ++x )
-    {
-      bnd_elems.push_back( grid->getEdgeNumber( 1, x, 0 ));
-      bnd_elems.push_back( grid->getEdgeNumber( 1, x, nb_y ));
-    }
-    for ( int y = 0; y < nb_y; ++y )
-    {
-      bnd_elems.push_back( grid->getEdgeNumber( 2, y, 0 ));
-      bnd_elems.push_back( grid->getEdgeNumber( 2, y, nb_x ));
-    }
-  }
-  medGeometryElement types[] = { dim == 2 ? MED_SEG2 : MED_QUAD4 };
-  int nb_elems[] = { bnd_elems.size() };
+  // make group of boundary elements
+  SUPPORT* boundary = grid->getBoundaryElements( dim == 3 ? MED_FACE : MED_EDGE );
+
   GROUP* bnd_group = new GROUP;
   bnd_group->setMesh( grid );
-  bnd_group->setEntity( bnd_entity );
+  bnd_group->setEntity( boundary->getEntity() );
   bnd_group->setName(bnd_elem_name);
-  bnd_group->setpartial("Bnd",/*NumberOfGeometricType=*/1,
-                         bnd_elems.size(), types,
-                         nb_elems, & bnd_elems[0] );
+  bnd_group->setpartial("Bnd",
+                        boundary->getNumberOfTypes(),
+                        boundary->getNumberOfElements(MED_ALL_ELEMENTS),
+                        boundary->getTypes(),
+                        boundary->getNumberOfElements(),
+                        boundary->getNumber(MED_ALL_ELEMENTS));
   grid->addGroup( bnd_group );
-
+ 
   // make group on all bnd_entity's
   GROUP* all_bnd = new GROUP;
   all_bnd->setMesh( grid );
-  all_bnd->setEntity( bnd_entity );
-  all_bnd->setName(STRING("all bnd #")<<long(all_bnd));
+  all_bnd->setEntity( boundary->getEntity() );
+  all_bnd->setName(STRING("all bnd #")<<x0<<y0<<nb_x<<nb_x<<nb_z<<z0);
   all_bnd->setAll( true );
   all_bnd->update();
   grid->addGroup( all_bnd );
 
-  // compute families
-  grid->createFamilies();
+  boundary->removeReference();
+  
 
   return grid;
 }
@@ -180,9 +141,15 @@ void MEDMEMTest::testMeshFuse()
   const int nb_x = 1, nb_y = 2, nb_z = 3;
 
   // make grids
-  double step = 10;
-  GRID* grid_left  = makeGrid(step, 0,0,       nb_x,nb_y);
-  GRID* grid_right = makeGrid(step, step,-step,nb_x,nb_y);
+  const double step = 10;
+  const GRID* grid_left  = makeGrid(step, 0,0,       nb_x,nb_y);
+  const GRID* grid_right = makeGrid(step, step,-step,nb_x,nb_y);
+  const MESH* mesh_left  = grid_left->convertInMESH();
+  const MESH* mesh_right = grid_right->convertInMESH();
+
+  // compute families
+  const_cast<MESH*>( mesh_left )->createFamilies();
+  const_cast<MESH*>( mesh_right )->createFamilies();
 
   // global node numbers
   vector<int> glob_nb_left ( gnl, ((int*)gnl) + 6 );
@@ -191,12 +158,8 @@ void MEDMEMTest::testMeshFuse()
   // fuse two 2D grids
   {
     MeshFuse fusion;
-    fusion.concatenate(grid_left, glob_nb_left);
-    fusion.concatenate(grid_right, glob_nb_right);
-
-    //   DRIVERFACTORY::setMedFileVersionForWriting( V21 );
-    //   fusion.addDriver( MED_DRIVER, "/tmp/fusion.med", "fusion");
-    //   fusion.write();
+    fusion.concatenate(mesh_left,  glob_nb_left);
+    fusion.concatenate(mesh_right, glob_nb_right);
 
     const medEntityMesh sub_entity = MED_EDGE;
 
@@ -227,21 +190,31 @@ void MEDMEMTest::testMeshFuse()
 
     // check families
     set<string> oldFamNames;
-    vector<FAMILY*> fams = grid_left->getFamilies(sub_entity);
+    vector<FAMILY*> fams = mesh_left->getFamilies(sub_entity);
     for (int i = 0; i< fams.size(); ++i ) oldFamNames.insert( fams[i]->getName());
-    fams = grid_right->getFamilies(sub_entity);
+    fams = mesh_right->getFamilies(sub_entity);
     for (int i = 0; i< fams.size(); ++i ) oldFamNames.insert( fams[i]->getName());
     CPPUNIT_ASSERT_EQUAL( int(oldFamNames.size()), fusion.getNumberOfFamilies( sub_entity ));
   }
   grid_left->removeReference();
   grid_right->removeReference();
+  mesh_left->removeReference();
+  mesh_right->removeReference();
 
 
   // Fuse two 3D grids
 
-  grid_left  = makeGrid(step, 0,0,       nb_x,nb_y, nb_z,0.);
-  grid_right = makeGrid(step, step,-step,nb_x,nb_y, nb_z,step);
+  // both grids are 1x2x3 cells,
+  // the 2nd one is shifted by 1 cell along X, by -1 cell along Y and by 1 cell along Z
+  // so they shares 2 faces
+  grid_left  = makeGrid(step, 0,   0,    nb_x,nb_y,nb_z, 0.);
+  grid_right = makeGrid(step, step,-step,nb_x,nb_y,nb_z, step);
+  mesh_left  = grid_left->convertInMESH();
+  mesh_right = grid_right->convertInMESH();
 
+  // compute families
+  const_cast<MESH*>( mesh_left )->createFamilies();
+  const_cast<MESH*>( mesh_right )->createFamilies();
   {
     // global node numbers
     int nb_nodes = grid_left->getNumberOfNodes();
@@ -258,12 +231,8 @@ void MEDMEMTest::testMeshFuse()
           glob_nb_left[ grid_left->getNodeNumber(1,y-1,z+1)-1 ];
 
     MeshFuse fusion;
-    fusion.concatenate(grid_left,  glob_nb_left);
-    fusion.concatenate(grid_right, glob_nb_right);
-
-    //   DRIVERFACTORY::setMedFileVersionForWriting( V21 );
-    //   fusion.addDriver( MED_DRIVER, "/tmp/fusion.med", "fusion");
-    //   fusion.write();
+    fusion.concatenate(mesh_left,  glob_nb_left);
+    fusion.concatenate(mesh_right, glob_nb_right);
 
     const medEntityMesh sub_entity = MED_FACE;
 
@@ -299,19 +268,19 @@ void MEDMEMTest::testMeshFuse()
     CPPUNIT_ASSERT_EQUAL( expect_nb_bnd, bnd_faces->getNumberOfElements(MED_ALL_ELEMENTS));
 
     // check families
-    CPPUNIT_ASSERT_EQUAL( 3, fusion.getNumberOfFamilies( sub_entity ));
+    CPPUNIT_ASSERT_EQUAL( 4, fusion.getNumberOfFamilies( sub_entity ));
   }
 
 
 
   // Fuse one 3D grid and another converted to polygons
 
-  grid_right->convertToPoly();
+  const_cast<MESH*>(mesh_right)->convertToPoly();
   CPPUNIT_ASSERT_EQUAL( 0, grid_right->getNumberOfElements(MED_CELL, MED_QUAD4));
   {
     MeshFuse fusion;
-    fusion.concatenate(grid_left,  glob_nb_left);
-    fusion.concatenate(grid_right, glob_nb_right);
+    fusion.concatenate(mesh_left,  glob_nb_left);
+    fusion.concatenate(mesh_right, glob_nb_right);
 
     const medEntityMesh sub_entity = MED_FACE;
 
@@ -322,7 +291,7 @@ void MEDMEMTest::testMeshFuse()
 
     const int expect_nb_cells = 2 * grid_left->getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS);
     CPPUNIT_ASSERT_EQUAL( expect_nb_cells,
-                          fusion.getNumberOfElementsWithPoly(MED_CELL, MED_ALL_ELEMENTS));
+                          fusion.getNumberOfElements(MED_CELL, MED_ALL_ELEMENTS));
 
     const int grid_nb_faces =
       nb_x * nb_y * (nb_z+1)+
@@ -335,7 +304,7 @@ void MEDMEMTest::testMeshFuse()
     const int expect_nb_faces =
       2 * grid_left->getNumberOfElements(sub_entity, MED_ALL_ELEMENTS) - nb_common_faces;
     CPPUNIT_ASSERT_EQUAL( expect_nb_faces,
-                          fusion.getNumberOfElementsWithPoly(sub_entity, MED_ALL_ELEMENTS));
+                          fusion.getNumberOfElements(sub_entity, MED_ALL_ELEMENTS));
 
     // check groups
     const GROUP* bnd_faces = 0;
@@ -349,10 +318,12 @@ void MEDMEMTest::testMeshFuse()
     CPPUNIT_ASSERT_EQUAL( expect_nb_bnd, bnd_faces->getNumberOfElements(MED_ALL_ELEMENTS));
 
     // check families
-    CPPUNIT_ASSERT_EQUAL( 3, fusion.getNumberOfFamilies( sub_entity ));
+    CPPUNIT_ASSERT_EQUAL( 4, fusion.getNumberOfFamilies( sub_entity ));
   }
 
   grid_left->removeReference();
   grid_right->removeReference();
+  mesh_left->removeReference();
+  mesh_right->removeReference();
 
 }

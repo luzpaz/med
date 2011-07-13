@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 //  MED MED : implemetation of MED idl descriptions
@@ -34,8 +34,6 @@
 
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Field.hxx"
-#include "MEDMEM_Med.hxx"
-#include "MEDMEM_MedMedDriver.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_MedFieldDriver.hxx"
 #include "MEDMEM_define.hxx"
@@ -213,7 +211,7 @@ namespace {
 
     // First save fields and their meshes and then not saved meshes
 
-    set< CORBA::Long > savedMeshIDs;
+    set< ::MEDMEM::GMESH* > savedMeshes;
     {
       SALOMEDS::ChildIterator_var anIter = study->NewChildIterator(theComponent);
       anIter->InitEx(1);
@@ -228,15 +226,15 @@ namespace {
           // save mesh
           SALOME_MED::SUPPORT_var sup = myField->getSupport();
           if ( !sup->_is_nil() ) {
-            SALOME_MED::MESH_var mesh = sup->getMesh();
+            SALOME_MED::GMESH_var mesh = sup->getMesh();
             if ( !mesh->_is_nil() ) {
               CORBA::Long corbaID = mesh->getCorbaIndex();
-              if ( savedMeshIDs.find( corbaID ) == savedMeshIDs.end() ) {
+              ::MEDMEM::GMESH* gmesh = GMESH_i::meshMap[ int(corbaID) ];
+              if ( savedMeshes.insert( gmesh ).second ) {
                 long driverId = mesh->addDriver(SALOME_MED::MED_DRIVER,
                                                 aFile.c_str(),
                                                 mesh->getName());
                 mesh->write(driverId,"");
-                savedMeshIDs.insert( corbaID );
               }
             }
           }
@@ -252,12 +250,12 @@ namespace {
         SALOME_MED::MESH_var myMesh = SALOME_MED::MESH::_narrow( aSO->GetObject() );
         if (! CORBA::is_nil(myMesh)) {
           CORBA::Long corbaID = myMesh->getCorbaIndex();
-          if ( savedMeshIDs.find( corbaID ) == savedMeshIDs.end() ) {
+          ::MEDMEM::GMESH* gmesh = GMESH_i::meshMap[ int(corbaID) ];
+          if ( savedMeshes.insert( gmesh ).second ) {
             long driverId = myMesh->addDriver(SALOME_MED::MED_DRIVER,
                                               aFile.c_str(),
                                               myMesh->getName());
             myMesh->write(driverId,"");
-            savedMeshIDs.insert( corbaID );
           }
         }
       }
@@ -690,7 +688,7 @@ char* Med_Gen_Driver_i::LocalPersistentIDToIOR (SALOMEDS::SObject_ptr theSObject
           }
         }
         else {
-          SALOME_MED::MESH_var mesh;
+          SALOME_MED::GMESH_var mesh;
           try {
             mesh = med->getMeshByName( meshName.c_str() );
             if ( mesh->_is_nil() ) {
@@ -708,14 +706,14 @@ char* Med_Gen_Driver_i::LocalPersistentIDToIOR (SALOMEDS::SObject_ptr theSObject
             try {
               if ( type == "FAMILY" ) {
                 SALOME_MED::Family_array_var families = mesh->getFamilies( medEntity );
-                for ( int i = 0; CORBA::is_nil(object) && i <= families->length(); ++i )
+                for ( int i = 0; CORBA::is_nil(object) && i <= (int)families->length(); ++i )
                   if ( families[ i ]->getName() == name ||
                        families[ i ]->getName() == healedName )
                     object = SALOME_MED::FAMILY::_duplicate( families[ i ]);
               }
               else {
                 SALOME_MED::Group_array_var groups = mesh->getGroups( medEntity );
-                for ( int i = 0; CORBA::is_nil(object) && i <= groups->length(); ++i )
+                for ( int i = 0; CORBA::is_nil(object) && i <= (int)groups->length(); ++i )
                   if ( groups[ i ]->getName() == name ||
                        groups[ i ]->getName() == healedName )
                     object = SALOME_MED::GROUP::_duplicate( groups[ i ]);

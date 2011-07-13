@@ -1,29 +1,37 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDCouplingMeshFieldFactoryComponentServ.hxx"
 #include "MEDCouplingMeshFieldFactoryComponent.hxx"
 #include "MEDCouplingFieldDoubleServant.hxx"
+#include "MEDCouplingFieldTemplateServant.hxx"
+#include "MEDCouplingMultiFieldsServant.hxx"
+#include "MEDCouplingFieldOverTimeServant.hxx"
 #include "MEDCouplingExtrudedMeshServant.hxx"
 #include "MEDCouplingCMeshServant.hxx"
 #include "MEDCouplingUMeshServant.hxx"
+#include "DataArrayDoubleServant.hxx"
+#include "DataArrayIntServant.hxx"
 #include "MEDCouplingFieldDouble.hxx"
+#include "MEDCouplingFieldTemplate.hxx"
+#include "MEDCouplingMultiFields.hxx"
+#include "MEDCouplingFieldOverTime.hxx"
 #include "MEDCouplingExtrudedMesh.hxx"
 #include "MEDCouplingUMesh.hxx"
 #include "MEDCouplingCMesh.hxx"
@@ -208,5 +216,106 @@ namespace SALOME_TEST
     field->decrRef();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr ret=m->_this();
     return ret;
+  }
+  
+  SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldTemplateCellOn2D()
+  {
+    ParaMEDMEM::MEDCouplingFieldTemplate *field=MEDCouplingCorbaServBasicsTest::buildFieldTemplateCellOn2D();
+    ParaMEDMEM::MEDCouplingFieldTemplateServant *m=new ParaMEDMEM::MEDCouplingFieldTemplateServant(field);
+    field->decrRef();
+    SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr ret=m->_this();
+    return ret;
+  }
+  
+  SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldTemplateNodeOn2D()
+  {
+    ParaMEDMEM::MEDCouplingFieldTemplate *field=MEDCouplingCorbaServBasicsTest::buildFieldTemplateNodeOn2D();
+    ParaMEDMEM::MEDCouplingFieldTemplateServant *m=new ParaMEDMEM::MEDCouplingFieldTemplateServant(field);
+    field->decrRef();
+    SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr ret=m->_this();
+    return ret;
+  }
+  
+  SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldTemplateGaussPtOn2D()
+  {
+    ParaMEDMEM::MEDCouplingFieldTemplate *field=MEDCouplingCorbaServBasicsTest::buildFieldTemplateGaussPtOn2D();
+    ParaMEDMEM::MEDCouplingFieldTemplateServant *m=new ParaMEDMEM::MEDCouplingFieldTemplateServant(field);
+    field->decrRef();
+    SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr ret=m->_this();
+    return ret;
+  }
+
+  SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getFieldTemplateGaussNEOn2D()
+  {
+    ParaMEDMEM::MEDCouplingFieldTemplate *field=MEDCouplingCorbaServBasicsTest::buildFieldTemplateGaussNEOn2D();
+    ParaMEDMEM::MEDCouplingFieldTemplateServant *m=new ParaMEDMEM::MEDCouplingFieldTemplateServant(field);
+    field->decrRef();
+    SALOME_MED::MEDCouplingFieldTemplateCorbaInterface_ptr ret=m->_this();
+    return ret;
+  }
+
+  SALOME_MED::MEDCouplingMultiFieldsCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getMultiFields1()
+  {
+    ParaMEDMEM::MEDCouplingMultiFields *fields=MEDCouplingCorbaServBasicsTest::buildMultiFields1();
+    ParaMEDMEM::MEDCouplingMultiFieldsServant *s=new ParaMEDMEM::MEDCouplingMultiFieldsServant(fields);
+    fields->decrRef();
+    SALOME_MED::MEDCouplingMultiFieldsCorbaInterface_ptr ret=s->_this();
+    return ret;
+  }
+
+  SALOME_MED::DataArrayDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getArrayDouble1()
+  {
+    ParaMEDMEM::DataArrayDouble *retCpp=MEDCouplingCorbaServBasicsTest::buildArrayDouble1();
+    ParaMEDMEM::DataArrayDoubleServant *retServ=new ParaMEDMEM::DataArrayDoubleServant(retCpp);
+    retCpp->decrRef();
+    return retServ->_this();
+  }
+
+  SALOME_MED::DataArrayDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getArrayDouble2()
+  {
+    ParaMEDMEM::DataArrayDouble *retCpp=MEDCouplingCorbaServBasicsTest::buildArrayDouble2();
+    ParaMEDMEM::DataArrayDoubleServant *retServ=new ParaMEDMEM::DataArrayDoubleServant(retCpp);
+    retCpp->decrRef();
+    return retServ->_this();
+  }
+
+  SALOME_MED::DataArrayDoubleCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getArrayDouble3()
+  {
+    ParaMEDMEM::DataArrayDouble *retCpp=MEDCouplingCorbaServBasicsTest::buildArrayDouble3();
+    ParaMEDMEM::DataArrayDoubleServant *retServ=new ParaMEDMEM::DataArrayDoubleServant(retCpp);
+    retCpp->decrRef();
+    return retServ->_this();
+  }
+
+  SALOME_MED::DataArrayIntCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getArrayInt1()
+  {
+    ParaMEDMEM::DataArrayInt *retCpp=MEDCouplingCorbaServBasicsTest::buildArrayInt1();
+    ParaMEDMEM::DataArrayIntServant *retServ=new ParaMEDMEM::DataArrayIntServant(retCpp);
+    retCpp->decrRef();
+    return retServ->_this();
+  }
+
+  SALOME_MED::DataArrayIntCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getArrayInt2()
+  {
+    ParaMEDMEM::DataArrayInt *retCpp=MEDCouplingCorbaServBasicsTest::buildArrayInt2();
+    ParaMEDMEM::DataArrayIntServant *retServ=new ParaMEDMEM::DataArrayIntServant(retCpp);
+    retCpp->decrRef();
+    return retServ->_this();
+  }
+
+  SALOME_MED::DataArrayIntCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getArrayInt3()
+  {
+    ParaMEDMEM::DataArrayInt *retCpp=MEDCouplingCorbaServBasicsTest::buildArrayInt3();
+    ParaMEDMEM::DataArrayIntServant *retServ=new ParaMEDMEM::DataArrayIntServant(retCpp);
+    retCpp->decrRef();
+    return retServ->_this();
+  }
+
+  SALOME_MED::MEDCouplingFieldOverTimeCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getMultiFields2()
+  {
+    ParaMEDMEM::MEDCouplingFieldOverTime *fot=MEDCouplingCorbaServBasicsTest::buildMultiFields2();
+    ParaMEDMEM::MEDCouplingFieldOverTimeServant *retServ=new ParaMEDMEM::MEDCouplingFieldOverTimeServant(fot);
+    fot->decrRef();
+    return retServ->_this();
   }
 }

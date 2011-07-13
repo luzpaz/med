@@ -1,28 +1,27 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 // File: MED.idl
 // Project: SALOME
-// $Header$
 //
 /*!
 This file contains the main IDL definitions of the %MED component in %SALOME application.
@@ -46,8 +45,8 @@ This file contains the main IDL definitions of the %MED component in %SALOME app
 #include "SALOMEDS.idl"
 #include "SALOME_Comm.idl"
 
-module SALOME_MED {
-
+module SALOME_MED
+{
 /*! \ingroup MED
 This package contains a set of interfaces used for %SALOME %MED component.
 */
@@ -56,6 +55,7 @@ This package contains a set of interfaces used for %SALOME %MED component.
   interface FIELD;
   interface FAMILY;
   interface GROUP;
+  interface GMESH;
   interface MESH;
   interface SUPPORT;
 
@@ -141,10 +141,11 @@ This enumeration contains a set of elements defining the type of connectivity.
   typedef sequence<GROUP> Group_array;
 
   // ----------------------
-  // mesh interface
+  // base mesh interface
   // ----------------------
 
-  interface MESH : SALOME::MultiCommClass, SALOME::GenericObj {
+  interface GMESH : SALOME::MultiCommClass, SALOME::GenericObj 
+  {
     // Index range begins from 1
 
     // General Informations
@@ -176,16 +177,6 @@ This enumeration contains a set of elements defining the type of connectivity.
     boolean getIsAGrid() raises (SALOME::SALOME_Exception);
 
     /*!
-	Pour Alliances
-    */
-    boolean existConnectivity (in medConnectivity mode,
-			       in medEntityMesh entity)
-			       raises (SALOME::SALOME_Exception);
-
-    // Coordinates
-    //------------
-
-    /*!
       Returns coordinate system :
       - "CARTESIAN"
       - "CYLINDRICAL"
@@ -197,25 +188,6 @@ This enumeration contains a set of elements defining the type of connectivity.
       Returns the number of nodes defined in the mesh.
     */
     long getNumberOfNodes() raises (SALOME::SALOME_Exception);
-
-    /*!
-      Returns an array of coordinates stored in any type
-    */
-    SALOME_TYPES::ListOfDouble getCoordinates(in medModeSwitch typeSwitch)
-      raises (SALOME::SALOME_Exception);
-
-    /*!
-      Returns an array (Sender) of coordinates stored in any type.\n
-      It could be used in a Client code using the MED Client classes.
-     */
-    SALOME::SenderDouble getSenderForCoordinates(in medModeSwitch typeSwitch)
-      raises (SALOME::SALOME_Exception);
-    /*!
-     Returns coordinate  n° Number on axis n° Axis
-    */
-    double getCoordinate(in long Number, in long Axis)
-      raises (SALOME::SALOME_Exception);
-
 
     /*!
       Returns an array containing the names of coordinates.
@@ -258,13 +230,11 @@ This enumeration contains a set of elements defining the type of connectivity.
     */
     SUPPORT getSkin(in SUPPORT mySupport3D ) raises (SALOME::SALOME_Exception);
 
-    SALOME_TYPES::ListOfLong getGlobalNumberingIndex(in medEntityMesh entity) ;
-
     struct coordinateInfos
     {
-    	string 			coordSystem;
-    	SALOME_TYPES::ListOfString   coordNames;
-    	SALOME_TYPES::ListOfString   coordUnits;
+    	string 			 coordSystem;
+    	SALOME_TYPES::ListOfString coordNames;
+    	SALOME_TYPES::ListOfString coordUnits;
     };
     coordinateInfos getCoordGlobal()	raises (SALOME::SALOME_Exception);
 
@@ -304,128 +274,9 @@ This enumeration contains a set of elements defining the type of connectivity.
 			     in medGeometryElement geomElement)
       raises (SALOME::SALOME_Exception);
 
-    /*!
-      Give, in full or no interlace mode (for nodal connectivity),
-      descending or nodal connectivity.
-
-      You must give a %medEntityMesh (ie:MED_EDGE) and a
-      %medGeometryElement (ie:MED_SEG3).
-    */
-    SALOME_TYPES::ListOfLong getConnectivity(in medModeSwitch typeSwitch,
-					in medConnectivity mode,
-					in medEntityMesh entity,
-					in medGeometryElement geomElement)
-      raises (SALOME::SALOME_Exception);
-
-    /*!
-      Idem getConnectivity but return a Sender.\n
-      It could be used in a Client code using the MED Client classes.
-     */
-    SALOME::SenderInt getSenderForConnectivity(in medModeSwitch typeSwitch,
-					in medConnectivity mode,
-					in medEntityMesh entity,
-					in medGeometryElement geomElement)
-      raises (SALOME::SALOME_Exception);
-
-    /*!
-      Idem getConnectivity but return a Sender.\n
-      It could be used in a Client code using the MED Client classes.
-     */
-    SALOME::SenderInt getSenderForPolygonsConnectivity(in medConnectivity mode,
-                                                       in medEntityMesh entity)
-      raises (SALOME::SALOME_Exception);
-
-    /*!
-      Idem getConnectivityIndex but return a Sender.\n
-      It could be used in a Client code using the MED Client classes.
-     */
-    SALOME::SenderInt getSenderForPolygonsConnectivityIndex(in medConnectivity mode,
-                                                            in medEntityMesh entity)
-      raises (SALOME::SALOME_Exception);
-
-    /*!
-      Idem getConnectivity but return a Sender.\n
-      It could be used in a Client code using the MED Client classes.
-     */
-    SALOME::SenderInt getSenderForPolyhedronConnectivity(in medConnectivity mode)
-      raises (SALOME::SALOME_Exception);
-
-    /*!
-      Idem getConnectivityIndex but return a Sender.\n
-      It could be used in a Client code using the MED Client classes.
-     */
-    SALOME::SenderInt getSenderForPolyhedronIndex(in medConnectivity mode)
-      raises (SALOME::SALOME_Exception);
-
-    /*!
-      Idem getConnectivityIndex but return a Sender.\n
-      It could be used in a Client code using the MED Client classes.
-     */
-    SALOME::SenderInt getSenderForPolyhedronFacesIndex()
-      raises (SALOME::SALOME_Exception);
-
-    /*!
-      Give morse index array to use with
-      getConnectivity(MED_FULL_INTERLACE,mode,entity,MED_ALL_ELEMENTS).
-
-      Each value give start index for corresponding entity in
-      connectivity array.
-
-      Example : i-th element, j-th node of it :
-      - In C mode : Connectivity[ConnectivityIndex[i]-1+j-1]
-      - In fortran mode : Connectivity[ConnectivityIndex[i]+j]
-    */
-    SALOME_TYPES::ListOfLong getConnectivityIndex(in medConnectivity mode,
-					     in medEntityMesh entity)
-      raises (SALOME::SALOME_Exception);
-
-    /*!
-      Gets a global number of the element which have the same connectivity as the
-      connectivity argument.
-    */
-    long getElementNumber(in medConnectivity mode,
-			  in medEntityMesh entity,
-			  in medGeometryElement type,
-			  in SALOME_TYPES::ListOfLong connectivity)
-      raises (SALOME::SALOME_Exception);
-
     medGeometryElement   getElementType (in  medEntityMesh entity,
 				       in long number)
       raises (SALOME::SALOME_Exception);
-
-    /*!
-      Returns a reverse connectivity to MED_CELL.
-
-      If mode=MED_NODAL, the array contains, for each node, all cells
-      arround it.
-
-      If mode=MED_DESCENDING, the array contains, for each face (or edge),
-      the 2 cells of each side. First is cell which face normal is outgoing.
-    */
-    SALOME_TYPES::ListOfLong getReverseConnectivity(in medConnectivity mode)
-      raises (SALOME::SALOME_Exception);
-
-    /*!
-      Give index array to use with getReverseConnectivity(MED_NODAL).
-
-      This method is not used with MED_DESCENDING mode,
-      because we have allways two cells.
-
-      See getConnectivityIndex for details.
-    */
-    SALOME_TYPES::ListOfLong getReverseConnectivityIndex(in medConnectivity mode)
-      raises (SALOME::SALOME_Exception);
-
-    struct connectivityInfos
-    {
-    	long                     numberOfNodes;
-        medGeometryElement_array meshTypes;
-    	SALOME_TYPES::ListOfLong   numberOfElements;
-    	SALOME_TYPES::ListOfLong   nodalConnectivityLength;
-        long                     entityDimension;
-    };
-    connectivityInfos getConnectGlobal(in medEntityMesh entity)
-    raises (SALOME::SALOME_Exception);
 
     // Families and Groups
     // -------------------
@@ -530,7 +381,7 @@ This enumeration contains a set of elements defining the type of connectivity.
     /*!
       Adds the Mesh in the StudyManager.
     */
-    void addInStudy(in SALOMEDS::Study myStudy, in MESH myIor )
+    void addInStudy(in SALOMEDS::Study myStudy, in GMESH myIor )
       raises (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
 
     // 		                Add a MED/VTK/... driver
@@ -566,7 +417,145 @@ Internal Corba method.
     	   Group_array  groupCell;
     };
     meshInfos getMeshGlobal()		raises (SALOME::SALOME_Exception);
-    boolean areEquals(in MESH other);
+    boolean areEquals(in GMESH other);
+
+    MESH convertInMESH();
+  };
+
+  // ----------------------
+  // mesh interface
+  // ----------------------
+
+  interface MESH : GMESH {
+
+    /*!
+	Pour Alliances
+    */
+    boolean existConnectivity (in medConnectivity mode,
+			       in medEntityMesh entity)
+			       raises (SALOME::SALOME_Exception);
+
+    // Coordinates
+    //------------
+
+    /*!
+      Returns an array of coordinates stored in any type
+    */
+    SALOME_TYPES::ListOfDouble getCoordinates(in medModeSwitch typeSwitch)
+      raises (SALOME::SALOME_Exception);
+
+    /*!
+      Returns an array (Sender) of coordinates stored in any type.\n
+      It could be used in a Client code using the MED Client classes.
+     */
+    SALOME::SenderDouble getSenderForCoordinates(in medModeSwitch typeSwitch)
+      raises (SALOME::SALOME_Exception);
+    /*!
+     Returns coordinate  n° Number on axis n° Axis
+    */
+    double getCoordinate(in long Number, in long Axis)
+      raises (SALOME::SALOME_Exception);
+
+    /*!
+      Returns the %SUPPORT containing the boundary elements
+      of the mesh.
+    */
+
+    SALOME_TYPES::ListOfLong getGlobalNumberingIndex(in medEntityMesh entity) ;
+
+
+    // Connectivity
+    // ------------
+
+    /*!
+      Give, in full or no interlace mode (for nodal connectivity),
+      descending or nodal connectivity.
+
+      You must give a %medEntityMesh (ie:MED_EDGE) and a
+      %medGeometryElement (ie:MED_SEG3).
+    */
+    SALOME_TYPES::ListOfLong getConnectivity(in medConnectivity mode,
+                                           in medEntityMesh entity,
+                                           in medGeometryElement geomElement)
+      raises (SALOME::SALOME_Exception);
+
+    /*!
+      Idem getConnectivity but return a Sender.\n
+      It could be used in a Client code using the MED Client classes.
+     */
+    SALOME::SenderInt getSenderForConnectivity(in medConnectivity mode,
+                                               in medEntityMesh entity,
+                                               in medGeometryElement geomElement)
+      raises (SALOME::SALOME_Exception);
+
+    /*!
+      Give morse index array to use with
+      getConnectivity(mode,entity,MED_ALL_ELEMENTS).
+
+      Each value give start index for corresponding entity in
+      connectivity array.
+
+      Example : i-th element, j-th node of it :
+      - In C mode : Connectivity[ConnectivityIndex[i]-1+j-1]
+      - In fortran mode : Connectivity[ConnectivityIndex[i]+j]
+    */
+    SALOME_TYPES::ListOfLong getConnectivityIndex(in medConnectivity mode,
+                                                in medEntityMesh entity)
+      raises (SALOME::SALOME_Exception);
+
+    /*!
+      Idem getConnectivityIndex but return a Sender.\n
+      It could be used in a Client code using the MED Client classes.
+     */
+    SALOME::SenderInt getSenderForConnectivityIndex(in medConnectivity mode,
+                                                    in medEntityMesh entity,
+                                                    in medGeometryElement geomElement)
+      raises (SALOME::SALOME_Exception);
+
+    /*!
+      Gets a global number of the element which have the same connectivity as the
+      connectivity argument.
+    */
+    long getElementNumber(in medConnectivity mode,
+			  in medEntityMesh entity,
+			  in medGeometryElement type,
+			  in SALOME_TYPES::ListOfLong connectivity)
+      raises (SALOME::SALOME_Exception);
+
+    /*!
+      Returns a reverse connectivity to MED_CELL.
+
+      If mode=MED_NODAL, the array contains, for each node, all cells
+      arround it.
+
+      If mode=MED_DESCENDING, the array contains, for each face (or edge),
+      the 2 cells of each side. First is cell which face normal is outgoing.
+    */
+    SALOME_TYPES::ListOfLong getReverseConnectivity(in medConnectivity mode)
+      raises (SALOME::SALOME_Exception);
+
+    /*!
+      Give index array to use with getReverseConnectivity(MED_NODAL).
+
+      This method is not used with MED_DESCENDING mode,
+      because we have allways two cells.
+
+      See getConnectivityIndex for details.
+    */
+    SALOME_TYPES::ListOfLong getReverseConnectivityIndex(in medConnectivity mode)
+      raises (SALOME::SALOME_Exception);
+
+    struct connectivityInfos
+    {
+    	long                     numberOfNodes;
+        medGeometryElement_array meshTypes;
+    	SALOME_TYPES::ListOfLong   numberOfElements;
+    	SALOME_TYPES::ListOfLong   nodalConnectivityLength;
+        long                     entityDimension;
+    };
+    connectivityInfos getConnectGlobal(in medEntityMesh entity)
+    raises (SALOME::SALOME_Exception);
+
   };
 
 
@@ -589,7 +578,7 @@ Internal Corba method.
     /*!
       Returns a reference to the mesh.
     */
-    MESH getMesh() raises (SALOME::SALOME_Exception);
+    GMESH getMesh() raises (SALOME::SALOME_Exception);
 
     /*!
       Returns the type of %medEntityMesh used by the support.
@@ -1039,12 +1028,12 @@ Internal Corba method.
     /*!
       giving a mesh name, it returns the corresponding %MESH pointer.
      */
-    MESH                   getMeshByName     ( in string  meshName)  raises (SALOME::SALOME_Exception);
+    GMESH                   getMeshByName     ( in string  meshName)  raises (SALOME::SALOME_Exception);
     /*!
       giving a %FIELD pointer, it returns the corresponding %MESH pointer of the mesh
       on which the field lies.
      */
-    MESH                   getMesh           ( in FIELD  fieldPtr)   raises (SALOME::SALOME_Exception);
+    GMESH                   getMesh           ( in FIELD  fieldPtr)   raises (SALOME::SALOME_Exception);
     /*!
       giving a field name, it returns the number of iteration in the corresponding %FIELD object.
      */
@@ -1086,7 +1075,7 @@ Internal Corba method.
     void writeFrom     (in long i)  raises (SALOME::SALOME_Exception);
     void write         (in long i)  raises (SALOME::SALOME_Exception);
 
-    void addMesh  (in MESH   ptrMesh   ) raises (SALOME::SALOME_Exception);
+    void addMesh  (in GMESH  ptrMesh   ) raises (SALOME::SALOME_Exception);
     void addField (in FIELD  ptrField  ) raises (SALOME::SALOME_Exception);
 
     void addInStudy (in SALOMEDS::Study myStudy, in MED medPtr) raises (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);

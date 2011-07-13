@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_DriverFactory.hxx"
@@ -94,9 +94,9 @@ int main (int argc, char ** argv)
 
       //      cell part
 
-      const int NumberOfTypes = 2;
-      medGeometryElement Types[NumberOfTypes] = {MED_TRIA3,MED_QUAD4};
-      const int NumberOfElements[NumberOfTypes] = {1,4};
+      const int NumberOfTypes = 3;
+      medGeometryElement Types[NumberOfTypes] = {MED_TRIA3,MED_QUAD4,MED_POLYGON};
+      const int NumberOfElements[NumberOfTypes] = {1,4,1};
 
       myMeshing->setNumberOfTypes(NumberOfTypes,MED_CELL);
       myMeshing->setTypes(Types,MED_CELL);
@@ -107,7 +107,7 @@ int main (int argc, char ** argv)
           7,4,1
         };
 
-      myMeshing->setConnectivity(ConnectivityTria,MED_CELL,MED_TRIA3);
+      myMeshing->setConnectivity(MED_CELL,MED_TRIA3,ConnectivityTria);
 
       int ConnectivityQuad[4*4]=
         {
@@ -117,12 +117,7 @@ int main (int argc, char ** argv)
           8,9,6,5
         };
   
-      myMeshing->setConnectivity(ConnectivityQuad,MED_CELL,MED_QUAD4);
-
-      int MeshDimension = SpaceDimension ;
-      // because there are 2D cells in the mesh
-
-      myMeshing->setMeshDimension(MeshDimension) ;
+      myMeshing->setConnectivity(MED_CELL,MED_QUAD4,ConnectivityQuad);
 
       // then define eventuel polygonal cells
 
@@ -135,13 +130,9 @@ int main (int argc, char ** argv)
           1,6
         };
 
-      myMeshing->setPolygonsConnectivity(ConnectivityPolygonIndex,ConnectivityPolygon,1,MED_CELL);
+      myMeshing->setConnectivity(MED_CELL,MED_POLYGON,ConnectivityPolygon,ConnectivityPolygonIndex);
 
       // Ecriture fichier
-
-      medFileVersion version = getMedFileVersionForWriting();
-      if (version == V21)
-        setMedFileVersionForWriting(V22);
 
       int idMed22 = myMeshing->addDriver(MED_DRIVER,medfilename,myMeshing->getName());
       myMeshing->write(idMed22) ;

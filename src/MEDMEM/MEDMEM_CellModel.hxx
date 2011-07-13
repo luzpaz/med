@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 /*
@@ -260,33 +260,11 @@ private:
   static CELLMODEL_Map *getInstance();
   static CELLMODEL_Map *_singleton;
   std::map<MED_EN::medGeometryElement,MEDMEM::CELLMODEL> _cell_models;
-        
-  CELLMODEL_Map(){
-    _cell_models.insert(make_pair(MED_EN::MED_NONE     ,CELLMODEL(MED_EN::MED_NONE     )));
-    _cell_models.insert(make_pair(MED_EN::MED_POINT1   ,CELLMODEL(MED_EN::MED_POINT1   )));
-    _cell_models.insert(make_pair(MED_EN::MED_SEG2     ,CELLMODEL(MED_EN::MED_SEG2     )));
-    _cell_models.insert(make_pair(MED_EN::MED_SEG3     ,CELLMODEL(MED_EN::MED_SEG3     )));
-    _cell_models.insert(make_pair(MED_EN::MED_TRIA3    ,CELLMODEL(MED_EN::MED_TRIA3    )));
-    _cell_models.insert(make_pair(MED_EN::MED_QUAD4    ,CELLMODEL(MED_EN::MED_QUAD4    )));
-    _cell_models.insert(make_pair(MED_EN::MED_TRIA6    ,CELLMODEL(MED_EN::MED_TRIA6    )));
-    _cell_models.insert(make_pair(MED_EN::MED_QUAD8    ,CELLMODEL(MED_EN::MED_QUAD8    )));
-    _cell_models.insert(make_pair(MED_EN::MED_TETRA4   ,CELLMODEL(MED_EN::MED_TETRA4   )));
-    _cell_models.insert(make_pair(MED_EN::MED_PYRA5    ,CELLMODEL(MED_EN::MED_PYRA5    )));
-    _cell_models.insert(make_pair(MED_EN::MED_PENTA6   ,CELLMODEL(MED_EN::MED_PENTA6   )));
-    _cell_models.insert(make_pair(MED_EN::MED_HEXA8    ,CELLMODEL(MED_EN::MED_HEXA8    )));
-    _cell_models.insert(make_pair(MED_EN::MED_TETRA10  ,CELLMODEL(MED_EN::MED_TETRA10  )));
-    _cell_models.insert(make_pair(MED_EN::MED_PYRA13   ,CELLMODEL(MED_EN::MED_PYRA13   )));
-    _cell_models.insert(make_pair(MED_EN::MED_PENTA15  ,CELLMODEL(MED_EN::MED_PENTA15  )));
-    _cell_models.insert(make_pair(MED_EN::MED_HEXA20   ,CELLMODEL(MED_EN::MED_HEXA20   )));
-    _cell_models.insert(make_pair(MED_EN::MED_POLYGON  ,CELLMODEL(MED_EN::MED_POLYGON  )));
-    _cell_models.insert(make_pair(MED_EN::MED_POLYHEDRA,CELLMODEL(MED_EN::MED_POLYHEDRA)));
-  };
-  ~CELLMODEL_Map(){ if(_singleton) delete _singleton;};
-        
-  const MEDMEM::CELLMODEL& getCellModel(MED_EN::medGeometryElement type)
-  {
-    return _cell_models[type];
-  };
+
+  CELLMODEL_Map() {}
+  ~CELLMODEL_Map(){ if(_singleton) delete _singleton;}
+
+  const MEDMEM::CELLMODEL& getCellModel(MED_EN::medGeometryElement type);
 
 };
 

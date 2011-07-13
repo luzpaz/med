@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDLoaderTest.hxx"
@@ -99,6 +99,9 @@ void MEDLoaderTest::testFieldRW1()
   MEDLoader::WriteField("file7.med",f1,true);
   f2=MEDLoader::ReadFieldNode("file7.med",f1->getMesh()->getName(),0,f1->getName(),2,3);
   CPPUNIT_ASSERT(f1->isEqual(f2,1e-12,1e-12));
+  // testing kind message on error of field type.
+  CPPUNIT_ASSERT_THROW(MEDLoader::ReadFieldCell("file7.med",f1->getMesh()->getName(),0,f1->getName(),2,3),INTERP_KERNEL::Exception);
+  //
   f1->decrRef();
   f2->decrRef();
 }
@@ -178,7 +181,6 @@ void MEDLoaderTest::testFieldRW3()
   static const double VAL2=-1111111111111.;
   const char name1[]="AField";
   const char name3[]="AMesh1";
-  const char name2[]="AMesh2";
   MEDCouplingFieldDouble *f1=buildVecFieldOnCells_1();
   ((MEDCouplingMesh *)f1->getMesh())->setName(name3);
   f1->setName(name1);
@@ -189,14 +191,9 @@ void MEDLoaderTest::testFieldRW3()
   f1->setTime(10.14,18,19);
   tmp[0]=VAL2;
   MEDLoader::WriteFieldUsingAlreadyWrittenMesh(fileName,f1);
-  ((MEDCouplingMesh *)f1->getMesh())->setName(name2);
   f1->setTime(10.55,28,29);
   tmp[0]=3*VAL1;
-  MEDLoader::WriteField(fileName,f1,false);
-  std::vector<std::string> vec=MEDLoader::GetMeshNamesOnField(fileName,name1);
-  CPPUNIT_ASSERT_EQUAL(2,(int)vec.size());
-  CPPUNIT_ASSERT(vec[0]==name3);
-  CPPUNIT_ASSERT(vec[1]==name2);
+  MEDLoader::WriteFieldUsingAlreadyWrittenMesh(fileName,f1);
   f1->setTime(10.66,38,39);
   tmp[0]=3*VAL2;
   MEDLoader::WriteFieldUsingAlreadyWrittenMesh(fileName,f1);
@@ -207,7 +204,7 @@ void MEDLoaderTest::testFieldRW3()
   f1->decrRef();
   f1=buildVecFieldOnNodes_1();
   f1->setName(name1);
-  ((MEDCouplingMesh *)f1->getMesh())->setName(name2);
+   ((MEDCouplingMesh *)f1->getMesh())->setName(name3);
   f1->setTime(110.,8,9);
   MEDLoader::WriteFieldUsingAlreadyWrittenMesh(fileName,f1);
   f1->setTime(110.,108,109);
@@ -219,21 +216,17 @@ void MEDLoaderTest::testFieldRW3()
   MEDLoader::WriteFieldUsingAlreadyWrittenMesh(fileName,f1);
   //
   std::vector< std::pair<int,int> > it1=MEDLoader::GetCellFieldIterations(fileName,name3,name1);
-  CPPUNIT_ASSERT_EQUAL(2,(int)it1.size());
+  CPPUNIT_ASSERT_EQUAL(5,(int)it1.size());
   CPPUNIT_ASSERT_EQUAL(8,it1[0].first); CPPUNIT_ASSERT_EQUAL(9,it1[0].second);
   CPPUNIT_ASSERT_EQUAL(18,it1[1].first); CPPUNIT_ASSERT_EQUAL(19,it1[1].second);
-  std::vector< std::pair<int,int> > it2=MEDLoader::GetCellFieldIterations(fileName,name2,name1);
-  CPPUNIT_ASSERT_EQUAL(3,(int)it2.size());
-  CPPUNIT_ASSERT_EQUAL(28,it2[0].first); CPPUNIT_ASSERT_EQUAL(29,it2[0].second);
-  CPPUNIT_ASSERT_EQUAL(38,it2[1].first); CPPUNIT_ASSERT_EQUAL(39,it2[1].second);
-  CPPUNIT_ASSERT_EQUAL(48,it2[2].first); CPPUNIT_ASSERT_EQUAL(49,it2[2].second);
-  std::vector< std::pair<int,int> > it3=MEDLoader::GetNodeFieldIterations(fileName,name2,name1);
+  CPPUNIT_ASSERT_EQUAL(28,it1[2].first); CPPUNIT_ASSERT_EQUAL(29,it1[2].second);
+  CPPUNIT_ASSERT_EQUAL(38,it1[3].first); CPPUNIT_ASSERT_EQUAL(39,it1[3].second);
+  CPPUNIT_ASSERT_EQUAL(48,it1[4].first); CPPUNIT_ASSERT_EQUAL(49,it1[4].second);
+  std::vector< std::pair<int,int> > it3=MEDLoader::GetNodeFieldIterations(fileName,name3,name1);
   CPPUNIT_ASSERT_EQUAL(3,(int)it3.size());
   CPPUNIT_ASSERT_EQUAL(8,it3[0].first); CPPUNIT_ASSERT_EQUAL(9,it3[0].second);
   CPPUNIT_ASSERT_EQUAL(108,it3[1].first); CPPUNIT_ASSERT_EQUAL(109,it3[1].second);
   CPPUNIT_ASSERT_EQUAL(208,it3[2].first); CPPUNIT_ASSERT_EQUAL(209,it3[2].second);
-  std::vector< std::pair<int,int> > it4=MEDLoader::GetNodeFieldIterations(fileName,name3,name1);
-  CPPUNIT_ASSERT(it4.empty());
   //
   f1->decrRef();
   //
@@ -243,23 +236,23 @@ void MEDLoaderTest::testFieldRW3()
   f1=MEDLoader::ReadFieldCell(fileName,name3,0,name1,18,19);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(VAL2,f1->getArray()->getConstPointer()[0],1e-13);
   f1->decrRef();
-  f1=MEDLoader::ReadFieldCell(fileName,name2,0,name1,28,29);
+  f1=MEDLoader::ReadFieldCell(fileName,name3,0,name1,28,29);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(3*VAL1,f1->getArray()->getConstPointer()[0],1e-13);
   f1->decrRef();
-  f1=MEDLoader::ReadFieldCell(fileName,name2,0,name1,38,39);
+  f1=MEDLoader::ReadFieldCell(fileName,name3,0,name1,38,39);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(3*VAL2,f1->getArray()->getConstPointer()[0],1e-13);
   f1->decrRef();
-  f1=MEDLoader::ReadFieldCell(fileName,name2,0,name1,48,49);
+  f1=MEDLoader::ReadFieldCell(fileName,name3,0,name1,48,49);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(4*VAL2,f1->getArray()->getConstPointer()[0],1e-13);
   f1->decrRef();
   //
-  f1=MEDLoader::ReadFieldNode(fileName,name2,0,name1,8,9);
+  f1=MEDLoader::ReadFieldNode(fileName,name3,0,name1,8,9);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(71.,f1->getArray()->getConstPointer()[3],1e-13);
   f1->decrRef();
-  f1=MEDLoader::ReadFieldNode(fileName,name2,0,name1,108,109);
+  f1=MEDLoader::ReadFieldNode(fileName,name3,0,name1,108,109);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(VAL1,f1->getArray()->getConstPointer()[3],1e-13);
   f1->decrRef();
-  f1=MEDLoader::ReadFieldNode(fileName,name2,0,name1,208,209);
+  f1=MEDLoader::ReadFieldNode(fileName,name3,0,name1,208,209);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(VAL2,f1->getArray()->getConstPointer()[3],1e-13);
   f1->decrRef();
 }
@@ -379,6 +372,9 @@ void MEDLoaderTest::testFieldProfilRW1()
   MEDLoader::WriteField(fileName,f1,false);//<- false important for the test
   //
   MEDCouplingFieldDouble *f2=MEDLoader::ReadFieldCell(fileName,f1->getMesh()->getName(),0,f1->getName(),2,7);
+  std::vector<ParaMEDMEM::TypeOfField> types=MEDLoader::GetTypesOfField(fileName,f1->getMesh()->getName(),f1->getName());
+  CPPUNIT_ASSERT_EQUAL(1,(int)types.size());
+  CPPUNIT_ASSERT(types[0]==ON_CELLS);
   f2->checkCoherency();
   CPPUNIT_ASSERT(f1->isEqual(f2,1e-12,1e-12));
   //
@@ -388,6 +384,9 @@ void MEDLoaderTest::testFieldProfilRW1()
   mesh2->decrRef();
 }
 
+/*!
+ * Test MED file profiles.
+ */
 void MEDLoaderTest::testFieldNodeProfilRW1()
 {
   const char fileName[]="file19.med";
@@ -403,8 +402,8 @@ void MEDLoaderTest::testFieldNodeProfilRW1()
   array->alloc(nbOfNodes,2);
   std::copy(arr1,arr1+24,array->getPointer());
   f1->setArray(array);
-  array->setInfoOnComponent(0,"tyty (mm)");
-  array->setInfoOnComponent(1,"uiop (MW)");
+  array->setInfoOnComponent(0,"tyty [mm]");
+  array->setInfoOnComponent(1,"uiop [MW]");
   array->decrRef();
   f1->setTime(3.14,2,7);
   f1->checkCoherency();
@@ -448,8 +447,8 @@ void MEDLoaderTest::testFieldNodeProfilRW2()
   DataArrayDouble *array=DataArrayDouble::New();
   array->alloc(12,2);
   f1->setArray(array);
-  array->setInfoOnComponent(0,"plkj (mm)");
-  array->setInfoOnComponent(1,"pqqqss (mm)");
+  array->setInfoOnComponent(0,"plkj [mm]");
+  array->setInfoOnComponent(1,"pqqqss [mm]");
   array->decrRef();
   double *tmp=array->getPointer();
   std::copy(arr2,arr2+24,tmp);
@@ -538,6 +537,9 @@ void MEDLoaderTest::testFieldShuffleRW1()
   f1->decrRef();
 }
 
+/*!
+ * Shuffle de cells but no profile. Like pointe.med
+ */
 void MEDLoaderTest::testMultiFieldShuffleRW1()
 {
   const char fileName[]="file17.med";
@@ -618,8 +620,8 @@ void MEDLoaderTest::testWriteUMeshesRW1()
   f1->setMesh(m2d);
   DataArrayDouble *array=DataArrayDouble::New();
   array->alloc(m2d->getNumberOfCells(),2);
-  array->setInfoOnComponent(0,"plkj (mm)");
-  array->setInfoOnComponent(1,"pqqqss (mm)");
+  array->setInfoOnComponent(0,"plkj [mm]");
+  array->setInfoOnComponent(1,"pqqqss [mm]");
   f1->setArray(array);
   array->decrRef();
   double *tmp=array->getPointer();
@@ -649,8 +651,8 @@ void MEDLoaderTest::testMixCellAndNodesFieldRW1()
   DataArrayDouble *array=DataArrayDouble::New();
   array->alloc(6,2);
   f1->setArray(array);
-  array->setInfoOnComponent(0,"plkj (mm)");
-  array->setInfoOnComponent(1,"pqqqss (mm)");
+  array->setInfoOnComponent(0,"plkj [mm]");
+  array->setInfoOnComponent(1,"pqqqss [mm]");
   array->decrRef();
   double *tmp=array->getPointer();
   const double arr1[12]={71.,171.,10.,110.,20.,120.,30.,130.,40.,140.,50.,150.};
@@ -664,8 +666,8 @@ void MEDLoaderTest::testMixCellAndNodesFieldRW1()
   array=DataArrayDouble::New();
   array->alloc(12,2);
   f2->setArray(array);
-  array->setInfoOnComponent(0,"plkj (mm)");
-  array->setInfoOnComponent(1,"pqqqss (mm)");
+  array->setInfoOnComponent(0,"plkj [mm]");
+  array->setInfoOnComponent(1,"pqqqss [mm]");
   array->decrRef();
   tmp=array->getPointer();
   const double arr2[24]={
@@ -673,11 +675,11 @@ void MEDLoaderTest::testMixCellAndNodesFieldRW1()
     1060.,1160.,1070.,1170.,1080.,1180.,1090.,1190.,1091.,1191.,1092.,1192.
   };
   std::copy(arr2,arr2+24,tmp);
-  f2->setTime(3.17,2,7);
+  f2->setTime(3.14,2,7);
   f2->checkCoherency();
   //
   MEDLoader::WriteField(fileName,f1,true);
-  std::vector<ParaMEDMEM::TypeOfField> ts=MEDLoader::GetTypesOfField(fileName,f1->getName(),f1->getMesh()->getName());
+  std::vector<ParaMEDMEM::TypeOfField> ts=MEDLoader::GetTypesOfField(fileName,f1->getMesh()->getName(),f1->getName());
   CPPUNIT_ASSERT_EQUAL(1,(int)ts.size());
   CPPUNIT_ASSERT_EQUAL(ON_CELLS,ts[0]);
   std::vector<std::string> fs=MEDLoader::GetAllFieldNamesOnMesh(fileName,f1->getMesh()->getName());
@@ -688,7 +690,7 @@ void MEDLoaderTest::testMixCellAndNodesFieldRW1()
   CPPUNIT_ASSERT_EQUAL(1,(int)fs.size());
   CPPUNIT_ASSERT(fs[0]=="FieldMix");
   //
-  ts=MEDLoader::GetTypesOfField(fileName,f1->getName(),f1->getMesh()->getName());
+  ts=MEDLoader::GetTypesOfField(fileName,f1->getMesh()->getName(),f1->getName());
   CPPUNIT_ASSERT_EQUAL(2,(int)ts.size());
   CPPUNIT_ASSERT_EQUAL(ON_NODES,ts[0]);
   CPPUNIT_ASSERT_EQUAL(ON_CELLS,ts[1]);
@@ -755,7 +757,7 @@ MEDCouplingUMesh *MEDLoaderTest::build1DMesh_1()
   mesh->finishInsertingCells();
   DataArrayDouble *myCoords=DataArrayDouble::New();
   myCoords->alloc(6,1);
-  myCoords->setInfoOnComponent(0,"tototototototot (m*m*m*m*m*m*m*m)");
+  myCoords->setInfoOnComponent(0,"tototototototot [m*m*m*m*m*m*m*m]");
   std::copy(coords,coords+6,myCoords->getPointer());
   mesh->setCoords(myCoords);
   myCoords->decrRef();
@@ -800,8 +802,8 @@ MEDCouplingUMesh *MEDLoaderTest::build2DMesh_1()
   targetMesh->finishInsertingCells();
   DataArrayDouble *myCoords=DataArrayDouble::New();
   myCoords->alloc(12,2);
-  myCoords->setInfoOnComponent(0,"tototototototot (m)");
-  myCoords->setInfoOnComponent(1,"energie (kW)");
+  myCoords->setInfoOnComponent(0,"tototototototot [m]");
+  myCoords->setInfoOnComponent(1,"energie [kW]");
   std::copy(targetCoords,targetCoords+24,myCoords->getPointer());
   targetMesh->setCoords(myCoords);
   myCoords->decrRef();
@@ -821,14 +823,14 @@ MEDCouplingUMesh *MEDLoaderTest::build2DMesh_2()
   targetMesh->setName("2DMesh_2");
   targetMesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3,targetConn);
   targetMesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3,targetConn+3);
-  targetMesh->insertNextCell(INTERP_KERNEL::NORM_TRI6,6,targetConn+6);
   targetMesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,targetConn+12);
   targetMesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,targetConn+16);
+  targetMesh->insertNextCell(INTERP_KERNEL::NORM_TRI6,6,targetConn+6);
   targetMesh->finishInsertingCells();
   DataArrayDouble *myCoords=DataArrayDouble::New();
   myCoords->alloc(12,2);
-  myCoords->setInfoOnComponent(0,"toto (m)");
-  myCoords->setInfoOnComponent(1,"energie (kW)");
+  myCoords->setInfoOnComponent(0,"toto [m]");
+  myCoords->setInfoOnComponent(1,"energie [kW]");
   std::copy(targetCoords,targetCoords+24,myCoords->getPointer());
   targetMesh->setCoords(myCoords);
   myCoords->decrRef();
@@ -848,15 +850,15 @@ MEDCouplingUMesh *MEDLoaderTest::build3DSurfMesh_1()
   targetMesh->setName("3DSurfMesh_1");
   targetMesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3,targetConn);
   targetMesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3,targetConn+3);
-  targetMesh->insertNextCell(INTERP_KERNEL::NORM_TRI6,6,targetConn+6);
   targetMesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,targetConn+12);
   targetMesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,targetConn+16);
+  targetMesh->insertNextCell(INTERP_KERNEL::NORM_TRI6,6,targetConn+6);
   targetMesh->insertNextCell(INTERP_KERNEL::NORM_POLYGON,4,targetConn+20);
   targetMesh->finishInsertingCells();
   DataArrayDouble *myCoords=DataArrayDouble::New();
   myCoords->alloc(12,3);
-  myCoords->setInfoOnComponent(0,"toto (m)");
-  myCoords->setInfoOnComponent(2,"ff (km)");//component 1 is not set for test
+  myCoords->setInfoOnComponent(0,"toto [m]");
+  myCoords->setInfoOnComponent(2,"ff [km]");//component 1 is not set for test
   std::copy(targetCoords,targetCoords+36,myCoords->getPointer());
   targetMesh->setCoords(myCoords);
   myCoords->decrRef();
@@ -923,9 +925,9 @@ MEDCouplingUMesh *MEDLoaderTest::build3DMesh_1()
   ret->finishInsertingCells();
   DataArrayDouble *myCoords=DataArrayDouble::New();
   myCoords->alloc(60,3);
-  myCoords->setInfoOnComponent(0,"titi (m)");
-  myCoords->setInfoOnComponent(1,"density power (MW/m^3)");
-  myCoords->setInfoOnComponent(2,"t (kW)");
+  myCoords->setInfoOnComponent(0,"titi [m]");
+  myCoords->setInfoOnComponent(1,"density power [MW/m^3]");
+  myCoords->setInfoOnComponent(2,"t [kW]");
   std::copy(coords,coords+180,myCoords->getPointer());
   ret->setCoords(myCoords);
   myCoords->decrRef();
@@ -935,7 +937,7 @@ MEDCouplingUMesh *MEDLoaderTest::build3DMesh_1()
 MEDCouplingUMesh *MEDLoaderTest::build3DMesh_2()
 {
   MEDCouplingUMesh *m3dsurfBase=build3DSurfMesh_1();
-  int numbers[5]={0,1,3,4,5};
+  int numbers[5]={0,1,2,3,5};
   MEDCouplingUMesh *m3dsurf=(MEDCouplingUMesh *)m3dsurfBase->buildPartOfMySelf(numbers,numbers+5,false);
   m3dsurfBase->decrRef();
   MEDCouplingUMesh *m1dBase=build1DMesh_1();
@@ -961,9 +963,9 @@ MEDCouplingFieldDouble *MEDLoaderTest::buildVecFieldOnCells_1()
   f1->setMesh(mesh);
   DataArrayDouble *array=DataArrayDouble::New();
   array->alloc(nbOfCells,3);
-  array->setInfoOnComponent(0,"power (MW/m^3)");
-  array->setInfoOnComponent(1,"density (g/cm^3)");
-  array->setInfoOnComponent(2,"temperature (K)");
+  array->setInfoOnComponent(0,"power [MW/m^3]");
+  array->setInfoOnComponent(1,"density [g/cm^3]");
+  array->setInfoOnComponent(2,"temperature [K]");
   f1->setArray(array);
   array->decrRef();
   double *tmp=array->getPointer();
@@ -985,9 +987,9 @@ MEDCouplingFieldDouble *MEDLoaderTest::buildVecFieldOnNodes_1()
   DataArrayDouble *array=DataArrayDouble::New();
   array->alloc(nbOfNodes,3);
   f1->setArray(array);
-  array->setInfoOnComponent(0,"power (MW/m^3)");
-  array->setInfoOnComponent(1,"density (g/cm^3)");
-  array->setInfoOnComponent(2,"temperature (K)");
+  array->setInfoOnComponent(0,"power [MW/m^3]");
+  array->setInfoOnComponent(1,"density [g/cm^3]");
+  array->setInfoOnComponent(2,"temperature [K]");
   array->decrRef();
   double *tmp=array->getPointer();
   const double arr1[36]={
@@ -1021,12 +1023,14 @@ MEDCouplingFieldDouble *MEDLoaderTest::buildVecFieldOnGauss_1()
   f->setGaussLocalizationOnType(INTERP_KERNEL::NORM_TRI3,_refCoo1,_gsCoo1,_wg1);
   const double refCoo2[12]={-1.0,1.0, -1.0,-1.0, 1.0,-1.0, -1.0,0.0, 0.0,-1.0, 0.0,0.0 };
   std::vector<double> _refCoo2(refCoo2,refCoo2+12);
-  _gsCoo1.resize(6); _wg1.resize(3);
-  f->setGaussLocalizationOnType(INTERP_KERNEL::NORM_TRI6,_refCoo2,_gsCoo1,_wg1);
+  std::vector<double> _gsCoo2(_gsCoo1);
+  std::vector<double> _wg2(_wg1);
+  _gsCoo2.resize(6); _wg2.resize(3);
   const double refCoo3[8]={ 0.,0., 1.,0., 1.,1., 0.,1. };
   std::vector<double> _refCoo3(refCoo3,refCoo3+8);
   _gsCoo1.resize(4); _wg1.resize(2);
   f->setGaussLocalizationOnType(INTERP_KERNEL::NORM_QUAD4,_refCoo3,_gsCoo1,_wg1);
+  f->setGaussLocalizationOnType(INTERP_KERNEL::NORM_TRI6,_refCoo2,_gsCoo2,_wg2);
   DataArrayDouble *array=DataArrayDouble::New();
   array->alloc(19,2);
   double *ptr=array->getPointer();
@@ -1034,7 +1038,7 @@ MEDCouplingFieldDouble *MEDLoaderTest::buildVecFieldOnGauss_1()
     ptr[i]=(double)(i+7);
   f->setArray(array);
   f->setName("MyFirstFieldOnGaussPoint");
-  array->setInfoOnComponent(0,"power (MW/m^3)");
+  array->setInfoOnComponent(0,"power [MW/m^3]");
   array->setInfoOnComponent(1,"density");
   array->decrRef();
   f->checkCoherency();
@@ -1054,7 +1058,7 @@ MEDCouplingFieldDouble *MEDLoaderTest::buildVecFieldOnGaussNE_1()
   for(int i=0;i<20*2;i++)
     ptr[i]=(double)(i+8);
   f->setArray(array);
-  array->setInfoOnComponent(0,"power (W)");
+  array->setInfoOnComponent(0,"power [W]");
   array->setInfoOnComponent(1,"temperature");
   f->setName("MyFieldOnGaussNE");
   array->decrRef();

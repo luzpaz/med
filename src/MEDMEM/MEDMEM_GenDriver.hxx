@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #ifndef GENDRIVER_HXX
@@ -53,13 +53,13 @@ namespace MEDMEM {
 
 protected :
 
-  int            _id;         // MED_INVALID : if the driver hasn't been created by a MedMedDriver
-                              // the MedMedDriver index of the driver vector in the MED object where it has been created
+    int            _id; // position in a vector of drivers in GMESH or FIELD_
+
   /*File related part*/
   string         _fileName;   // The name of the file currently in use.
   MED_EN::med_mode_acces _accessMode; // The file access mode set by the adequate construtor.
   int            _status;     // The file status {MED_INVALID, MED_OPENED, MED_CLOSED } 
-  driverTypes    _driverType; //  A FAIRE LE POSITIONNER DS TOUTES LES SS CLASSES !!
+  driverTypes    _driverType;
 
 
 public:
@@ -124,11 +124,11 @@ public:
   virtual GENDRIVER * copy ( void ) const = 0 ;
 
   // Take missing data from other driver.
-  // Is for object->read( genDriver ) if object was not passed to genDriver
+  // Intended for object->read( genDriver ) if object was not passed to genDriver
   // (i.e. genDriver has been created through constructor without parameters),
   // then object asks driverFactory to create a driver initialized by object
   // and fills the new driver up using merge( genDriver ).
-  // Needed for drivers possessing own data
+  // Needed for drivers possessing specific data
   virtual void merge ( const GENDRIVER &genDriver );
 
   // MED  related part
@@ -146,6 +146,7 @@ public:
   string getFileName () const;
   virtual void setFileName ( const string & fileName);
   virtual MED_EN::med_mode_acces getAccessMode() const;
+  virtual void setAccessMode(MED_EN::med_mode_acces mode);
   driverTypes getDriverType() const { return _driverType; }
 };
 }

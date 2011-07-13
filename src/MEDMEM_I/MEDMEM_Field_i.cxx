@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 //=============================================================================
@@ -25,9 +25,8 @@
 // Created   : mer fév 20 15:47:57 CET 2002
 // Author    : EDF
 // Project   : SALOME
-// $Header   : $
 //=============================================================================
-//
+
 #include "MEDMEM_Field_i.hxx"
 
 #include "SALOME_NamingService.hxx"
@@ -59,7 +58,9 @@ FIELD_i::FIELD_i():_fieldTptr(constructConstField()),_corbaIndex(FIELD_i::fieldI
 //=============================================================================
 FIELD_i::~FIELD_i()
 {
-  if (_ownCppPtr) delete _fieldTptr;
+  if ( _fieldTptr )
+    _fieldTptr->removeReference();
+  //if (_ownCppPtr) delete _fieldTptr;
 }
 //=============================================================================
 /*!
@@ -67,11 +68,12 @@ FIELD_i::~FIELD_i()
  */
 //=============================================================================
 FIELD_i::FIELD_i(::FIELD_ * const field, bool ownCppPtr):
+  _ownCppPtr(ownCppPtr),
   _fieldTptr(field),
   _corbaIndex(FIELD_i::fieldIndex++),
-  _FieldId(""),
-  _ownCppPtr(ownCppPtr)
+  _FieldId("")
 {
+  if ( _fieldTptr ) _fieldTptr->addReference();
   FIELD_i::fieldMap[_corbaIndex]=_fieldTptr;
 
   MESSAGE("FIELD_i::FIELD_i  Checking of pointeurs !!!");
@@ -84,11 +86,12 @@ FIELD_i::FIELD_i(::FIELD_ * const field, bool ownCppPtr):
  * Constructor par recopie
  */
 //=============================================================================
-FIELD_i::FIELD_i( FIELD_i & f):_fieldTptr(f._fieldTptr),
+FIELD_i::FIELD_i( FIELD_i & f):_ownCppPtr(false), _fieldTptr(f._fieldTptr),
                                _corbaIndex(FIELD_i::fieldIndex++),
-                               _FieldId(""), _ownCppPtr(false)
+                               _FieldId("")
 {
-        FIELD_i::fieldMap[_corbaIndex]=_fieldTptr;
+  if ( _fieldTptr ) _fieldTptr->addReference();
+  FIELD_i::fieldMap[_corbaIndex]=_fieldTptr;
 }
 //=============================================================================
 /*!
@@ -647,7 +650,7 @@ throw (SALOME::SALOME_Exception)
                                              SALOME::INTERNAL_ERROR);
         try
         {
-                _fieldTptr->write(i,driverFieldName);
+                _fieldTptr->write(i);
         }
         catch (MEDEXCEPTION &)
         {
@@ -767,7 +770,7 @@ SALOMEDS::SComponent_ptr FIELD_i::PublishMedComponent(SALOMEDS::Study_ptr theStu
   SALOMEDS::AttributeName_var aName = SALOMEDS::AttributeName::_narrow(anAttr);
   aName->SetValue( aComp->componentusername() );
   
-  Engines::Component_var aMedComponent = lcc->FindOrLoad_Component("FactoryServer", "MED");
+  Engines::EngineComponent_var aMedComponent = lcc->FindOrLoad_Component("FactoryServer", "MED");
   SALOME_MED::MED_Gen_var aMedEngine = SALOME_MED::MED_Gen::_narrow( aMedComponent );
   aBuilder->DefineComponentInstance(medfather, aMedEngine);
   

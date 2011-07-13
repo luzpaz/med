@@ -1,24 +1,24 @@
 #  -*- coding: iso-8859-1 -*-
-#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
 ###################################################################################
@@ -50,13 +50,7 @@ def print_ord(i):
     else:
         return `i`+'th'
 
-md = MED()
-
-mdDriver = MED_MED_RDONLY_DRIVER(medFile,md)
-
-mdDriver.open()
-mdDriver.readFileStruct()
-mdDriver.close()
+md = MEDFILEBROWSER(medFile)
 
 nbMeshes = md.getNumberOfMeshes()
 
@@ -84,8 +78,7 @@ if (nbMeshes>0):
     print "Mesh(es) Analysis "
     for i in range(nbMeshes):
         mesh_name = md.getMeshName(i)
-        mesh = md.getMesh(mesh_name)
-        mesh.read()
+        mesh = MESH(MED_DRIVER,md.getFileName(),mesh_name)
         spaceDim = mesh.getSpaceDimension()
         meshDim = mesh.getMeshDimension()
         print "The",print_ord(i), "mesh, '",mesh_name,"', is a",spaceDim,"D mesh on a",meshDim,"D geometry"
@@ -124,7 +117,7 @@ if (nbMeshes>0):
                 type = types[k]
                 nbElemType = mesh.getNumberOfElements(MED_CELL,type)
                 print "For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
-                connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,type)
+                connectivity = mesh.getConnectivity(MED_NODAL,MED_CELL,type)
                 nbNodesPerCell = type%100
                 for j in range(nbElemType):
                     print "Element",(j+1)," ",connectivity[j*nbNodesPerCell:(j+1)*nbNodesPerCell]
@@ -145,7 +138,7 @@ if (nbMeshes>0):
                 type = types[k]
                 nbElemType = mesh.getNumberOfElements(constituent,type)
                 print "For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
-                connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,constituent,type)
+                connectivity = mesh.getConnectivity(MED_NODAL,constituent,type)
                 nbNodesPerCell = type%100
                 for j in range(nbElemType):
                     print "Element",(j+1)," ",connectivity[j*nbNodesPerCell:(j+1)*nbNodesPerCell]
@@ -162,9 +155,9 @@ if (nbMeshes>0):
 
         print ""
         print "Show the Descending Connectivity:"
-        mesh.calculateConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL)
+        mesh.calculateConnectivity(MED_DESCENDING,MED_CELL)
         nbElemts = mesh.getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS)
-        Connectivity = mesh.getConnectivity(MED_FULL_INTERLACE,MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS)
+        Connectivity = mesh.getConnectivity(MED_DESCENDING,MED_CELL,MED_ALL_ELEMENTS)
         ConnectivityIndex = mesh.getConnectivityIndex(MED_DESCENDING,MED_CELL)
         print ""
         for j in range(nbElemts):
@@ -374,8 +367,7 @@ if (nbMeshes>0):
                 print ""
 
         print "Building of the support on all Cells of the mesh."
-        supportCell = SUPPORT(mesh)
-        supportCell.update()
+        supportCell = mesh.getSupportOnAll( MED_CELL )
         print ""
         barycenter = mesh.getBarycenter(supportCell)
         print "Getting barycenter of all Cells of the mesh"
@@ -422,7 +414,7 @@ if (nbMeshes>0):
             print "Area of the mesh:",areatot
             print ""            
             print "Building of the support on all Edges of the mesh."
-            supportEdge = SUPPORT(mesh,"Support on all edges of the mesh",MED_EDGE)
+            supportEdge = mesh.getSupportOnAll(MED_EDGE)
             nbEdge = mesh.getNumberOfElements(MED_EDGE,MED_ALL_ELEMENTS)
             print ""
             print "Getting normal of each edge of this support",nbEdge
@@ -475,23 +467,19 @@ if (nbMeshes>0):
                 print "    * ",normalBoundJ[:spaceDim],"norm:",norm
         print ""
 if (nbFields>0):
-    print "Updating supports in the Med Object"
-    md.updateSupport()
     print "Field(s) Analysis "
     for i in range(nbFields):
         field_name = md.getFieldName(i)
-        nbOfIt = md.getFieldNumberOfIteration(field_name)
+        dtits = md.getFieldIteration(field_name)
+        nbOfIt = len(dtits)
         print "The",print_ord(i),"field is",field_name,"with",nbOfIt,"iteration(s)"
-        for j in range(nbOfIt):
-            dtitfield = md.getFieldIteration(field_name,j)
+        for dtitfield in dtits:
             dt = dtitfield.getdt()
             it = dtitfield.getit()
-            field = md.getField(field_name,dt,it)
-            type = field.getValueType()
+            type = md.getFieldType(field_name)
             print "     * Iteration:",dt,"Order number:",it,"Type:",type
             if type == MED_INT32:
-                fieldint = createFieldIntFromField(field)
-                fieldint.read()
+                fieldint = FIELDINT(MED_DRIVER,md.getFileName(),field_name,dt,it,mesh)
                 name = fieldint.getName()
                 desc = fieldint.getDescription()
                 nbOfComp = fieldint.getNumberOfComponents()
@@ -520,8 +508,7 @@ if (nbFields>0):
                     valueI = fieldint.getRow(k+1)
                     print "     *",valueI[:nbOfComp]
             elif type == MED_REEL64:
-                fielddouble = createFieldDoubleFromField(field)
-                fielddouble.read()
+                fielddouble = FIELDDOUBLE(MED_DRIVER,md.getFileName(),field_name,dt,it,mesh)
                 name = fielddouble.getName()
                 desc = fielddouble.getDescription()
                 nbOfComp = fielddouble.getNumberOfComponents()

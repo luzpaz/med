@@ -1,20 +1,20 @@
-#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
 # Author : Marc Tajchman (CEA)
@@ -23,7 +23,7 @@
 # Modified by : Marc Tajchman (CEA)
 # Modified by : Mikhail PONIKAROV (OCN)
 #
-AC_INIT([Salome2 Project MED module], [6.2.0], [webmaster.salome@opencascade.com], [SalomeMED])
+AC_INIT([Salome2 Project MED module], [6.3.1], [webmaster.salome@opencascade.com], [SalomeMED])
 AC_CONFIG_AUX_DIR(adm_local/unix/config_files)
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
@@ -224,6 +224,14 @@ ENABLE_PTHREADS
 
 echo
 echo ---------------------------------------------
+echo testing MPI
+echo ---------------------------------------------
+echo
+
+CHECK_MPI
+
+echo
+echo ---------------------------------------------
 echo testing HDF5
 echo ---------------------------------------------
 echo
@@ -245,15 +253,6 @@ echo --------------------------------------------------
 echo
 
 CHECK_CPPUNIT
-
-echo
-echo ---------------------------------------------
-echo testing MPI
-echo ---------------------------------------------
-echo
-
-CHECK_MPI
-#CHECK_MPICH
 
 echo
 echo ---------------------------------------------
@@ -342,7 +341,7 @@ if test "$with_interp_kernel_only" != "yes" ; then
         echo --------------------------------------------- 
         echo testing SCOTCH 
         echo ---------------------------------------------
-        echo scotch_ok=no 
+        scotch_ok=no 
         CHECK_SCOTCH 
         dnl scotch_ok is set to yes by CHECK_SCOTCH    
         
@@ -350,7 +349,7 @@ if test "$with_interp_kernel_only" != "yes" ; then
         echo --------------------------------------------- 
         echo testing LIBXML2
         echo ---------------------------------------------
-        echo libxml_ok=no 
+        libxml_ok=no 
         CHECK_LIBXML 
         dnl libxml_ok is set to yes by CHECK_LIBXML         
         
@@ -699,12 +698,14 @@ AC_OUTPUT([ \
         src/MEDCouplingCorba/Test/Makefile \
 	src/MEDCouplingCorba_Swig/Makefile \
 	src/MEDCouplingCorba_Swig/Client/Makefile \
+	src/MEDCalculator/Makefile \
+	src/MEDCalculator/Swig/Makefile \
+	src/MEDCalculator/Test/Makefile \
         src/MEDSPLITTER/Makefile \
         src/MEDSPLITTER/Test/Makefile \
         src/MEDSPLITTER_Swig/Makefile \
         src/MEDPartitioner/Makefile \
         src/RENUMBER/Makefile \
-        src/MULTIPR/Makefile \
         src/ParaMEDCouplingCorba/Makefile \
         src/ParaMEDMEM/Makefile \
         src/ParaMEDMEMComponent/Makefile \

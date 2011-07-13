@@ -1,20 +1,20 @@
-#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+# Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
 #  SALOMELocalTrace : log on local machine
@@ -26,15 +26,27 @@ lib_LTLIBRARIES = libMEDSPLITTERTest.la
 dist_libMEDSPLITTERTest_la_SOURCES= \
 	MEDSPLITTERTest.cxx \
 	MEDSPLITTERTest_MESHCollection.cxx \
-	MEDSPLITTERTest_ParallelTopology.cxx
+	MEDSPLITTERTest_ParallelTopology.cxx \
+	MEDSPLITTERTest_Utils.cxx
 
-salomeinclude_HEADERS = MEDSPLITTERTest.hxx
+if MED_ENABLE_PARMETIS
+  dist_libMEDSPLITTERTest_la_SOURCES+= \
+	ParaMEDSPLITTERTest_MeshSendReceive.cxx \
+	ParaMEDSPLITTERTest_ParaDomainSelector.cxx \
+	ParaMEDSPLITTERTest_medsplitter_para.cxx \
+	ParaMEDSPLITTERTest.hxx
+endif
+
+salomeinclude_HEADERS = \
+	MEDSPLITTERTest.hxx \
+	MEDSPLITTERTest_Utils.hxx
 
 libMEDSPLITTERTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED2_INCLUDES) \
 	$(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ $(BOOST_CPPFLAGS) $(LIBXML_CXXFLAGS) \
 	-I$(srcdir)/.. -I$(srcdir)/../../MEDWrapper/V2_1/Core -I$(srcdir)/../../MEDMEM \
 	-I$(srcdir)/../../MEDMEMCppTest -I$(srcdir)/../../INTERP_KERNEL/Bases \
-	-I$(srcdir)/../../INTERP_KERNEL/GaussPoints
+	-I$(srcdir)/../../INTERP_KERNEL/GaussPoints \
+	-I$(srcdir)/../../INTERP_KERNEL
 libMEDSPLITTERTest_la_LDFLAGS= $(MED2_LIBS) @CPPUNIT_LIBS@
 
 if MED_ENABLE_KERNEL
@@ -42,6 +54,10 @@ if MED_ENABLE_KERNEL
     libMEDSPLITTERTest_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
 endif
 
+if MED_ENABLE_PARMETIS
+  libMEDSPLITTERTest_la_CPPFLAGS+= $(PARMETIS_CPPFLAGS)
+  libMEDSPLITTERTest_la_LDFLAGS+= $(PARMETIS_LIBS)
+endif
 if MED_ENABLE_METIS
   libMEDSPLITTERTest_la_CPPFLAGS+= $(METIS_CPPFLAGS)
   libMEDSPLITTERTest_la_LDFLAGS+= $(METIS_LIBS)
@@ -68,6 +84,17 @@ endif
 dist_salomescript_DATA = testMEDSPLITTER.py
 
 UNIT_TEST_PROG = TestMEDSPLITTER
+
+# parallel exe
+
+if MED_ENABLE_PARMETIS
+  bin_PROGRAMS+= TestParaMEDSPLITTER
+  TestParaMEDSPLITTER_SOURCES= TestParaMEDSPLITTER.cxx
+  TestParaMEDSPLITTER_CPPFLAGS = $(TestMEDSPLITTER_CPPFLAGS)
+  TestParaMEDSPLITTER_LDADD = $(TestMEDSPLITTER_LDADD) $(HDF5_LIBS)
+  dist_salomescript_DATA += testParaMEDSPLITTER.py
+  TESTS = TestParaMEDSPLITTER
+endif
 
 check: tests
 

@@ -1,26 +1,25 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
-#include "MEDMEM_Compatibility21_22.hxx"
 #include "MEDMEM_AsciiFieldDriver.hxx"
 #include "MEDMEM_STRING.hxx"
 
@@ -139,9 +138,6 @@ void MEDMEMTest::testAsciiFieldDriver()
     CPPUNIT_ASSERT_EQUAL(aa[2], bb[0]);
   }
 
-  printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-  printf("1\n");
-  printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
   // template<int N> bool compare(const double* a, const double* b)
   {
     {
@@ -235,11 +231,8 @@ void MEDMEMTest::testAsciiFieldDriver()
     CPPUNIT_ASSERT_THROW(ASCII_FIELD_DRIVER<double> aDriver4
                          ("anyfile4", aField1, MED_EN::ASCENDING, "XY"), MEDEXCEPTION);
     // invalid
-//#ifdef ENABLE_FORCED_FAILURES
-    // (BUG) This assert fails because 'A'(and 'B', and 'C') < 'X'
     CPPUNIT_ASSERT_THROW(ASCII_FIELD_DRIVER<double> aDriver5
                          ("anyfile5", aField1, MED_EN::ASCENDING, "ABC"), MEDEXCEPTION);
-//#endif
   }
   else if (spaceDimension == 2) {
     // good
@@ -252,11 +245,8 @@ void MEDMEMTest::testAsciiFieldDriver()
     CPPUNIT_ASSERT_THROW(ASCII_FIELD_DRIVER<double> aDriver4
                          ("anyfile4", aField1, MED_EN::ASCENDING, "X"), MEDEXCEPTION);
     // invalid
-//#ifdef ENABLE_FORCED_FAILURES
-    // (BUG) Invalid string is accepted for priority
     CPPUNIT_ASSERT_THROW(ASCII_FIELD_DRIVER<double> aDriver5
                          ("anyfile5", aField1, MED_EN::ASCENDING, "AB"), MEDEXCEPTION);
-//#endif
   }
   else {
     CPPUNIT_FAIL("Cannot test ASCII_FIELD_DRIVER because file pointe.med"

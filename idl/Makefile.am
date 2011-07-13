@@ -1,20 +1,20 @@
-#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
 # This Makefile is responsible of generating the client and server
@@ -24,9 +24,9 @@
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-BASEIDL_FILES = MED.idl MED_Gen.idl Compo1Py.idl MEDCouplingCorbaServant.idl MEDCouplingCorbaServantTest.idl
+BASEIDL_FILES = MED.idl MED_Gen.idl Compo1Py.idl MEDCouplingCorbaServant.idl MEDCouplingCorbaServantTest.idl ParaMEDCouplingCorbaServant.idl
 
-MPIIDL_FILES = ParaMEDCouplingCorbaServant.idl ParaMEDMEMComponent.idl
+MPIIDL_FILES = ParaMEDMEMComponent.idl
 
 IDL_FILES = $(BASEIDL_FILES)
 if MPI_IS_OK
@@ -40,9 +40,9 @@ dist_salomeidl_DATA = $(IDL_FILES)
 lib_LTLIBRARIES = libSalomeIDLMED.la libSalomeIDLMEDTests.la
 
 # Sources built from idl files
-BASEIDL_SOURCES = MEDSK.cc MED_GenSK.cc MEDCouplingCorbaServantSK.cc Compo1PySK.cc 
+BASEIDL_SOURCES = MEDSK.cc MED_GenSK.cc MEDCouplingCorbaServantSK.cc Compo1PySK.cc ParaMEDCouplingCorbaServantSK.cc
 
-MPIIDL_SOURCES = ParaMEDCouplingCorbaServantSK.cc ParaMEDMEMComponentSK.cc
+MPIIDL_SOURCES = ParaMEDMEMComponentSK.cc
 
 IDL_SOURCES = $(BASEIDL_SOURCES)
 if MPI_IS_OK
@@ -52,9 +52,9 @@ endif
 nodist_libSalomeIDLMED_la_SOURCES = $(IDL_SOURCES)
 
 # header files must be exported: other modules have to use this library
-nodist_salomeinclude_HEADERS = MED.hh MED_Gen.hh MEDCouplingCorbaServant.hh Compo1Py.hh MEDCouplingCorbaServantTest.hh
+nodist_salomeinclude_HEADERS = MED.hh MED_Gen.hh MEDCouplingCorbaServant.hh Compo1Py.hh MEDCouplingCorbaServantTest.hh ParaMEDCouplingCorbaServant.hh
 if MPI_IS_OK
-  nodist_salomeinclude_HEADERS += ParaMEDCouplingCorbaServant.hh ParaMEDMEMComponent.hh
+  nodist_salomeinclude_HEADERS += ParaMEDMEMComponent.hh
 endif
 
 libSalomeIDLMED_la_CPPFLAGS =			\

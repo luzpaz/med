@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #ifndef GIBI_MESH_DRIVER_HXX
@@ -59,13 +59,13 @@
 */
 
 namespace MEDMEM {
-class MED;
+class GMESH;
 class MESH;
-  //class FIELD_;
 class FAMILY;
 class GROUP;
 class SUPPORT;
 class CONNECTIVITY;
+class FIELD_;
 struct _intermediateMED;
 
 // IMP 0020434: mapping GIBI names to MED names
@@ -84,10 +84,8 @@ class MEDMEM_EXPORT GIBI_MESH_DRIVER : public GENDRIVER
 {
 protected:
 
-  MESH *          _ptrMesh;
-  // A VOIR FILE DESCRIPTEUR ? MED_FR::med_idt _medIdt;
-  string          _meshName;
-  /////
+  GMESH *         _mesh;
+  std::string    _meshName;
 
   // This enumeration is used to substitude static const
   // memers data causing link errors on VC7 compiler.
@@ -109,9 +107,9 @@ public :
   /*!
     Constructor.
   */
-  GIBI_MESH_DRIVER(const string & fileName,
-                  MESH * ptrMesh,
-                  MED_EN::med_mode_acces accessMode) ;
+  GIBI_MESH_DRIVER(const string &         fileName,
+                   GMESH *                ptrMesh,
+                   MED_EN::med_mode_acces accessMode) ;
   /*!
     Copy constructor.
   */
@@ -239,7 +237,7 @@ private:
       _xdr_kind_null,
       _xdr_kind_char,
       _xdr_kind_int,
-      _xdr_kind_double,
+      _xdr_kind_double
     };
 #endif
 };
@@ -263,7 +261,7 @@ public :
   /*!
     Constructor.
   */
-  GIBI_MESH_WRONLY_DRIVER(const string & fileName, MESH * ptrMesh) ;
+  GIBI_MESH_WRONLY_DRIVER(const string & fileName, GMESH * ptrMesh) ;
   /*!
     Copy constructor.
   */
@@ -297,8 +295,8 @@ public :
   /*!
     return submesh id and size for a support. Call it after writeSupportsAndMesh()
   */
-  int getSubMeshIdAndSize(const SUPPORT *        support,
-                          list<pair<int,int> > & idsAndSizes ) const;
+  int getSubMeshIdAndSize(const SUPPORT *                  support,
+                          std::list<std::pair<int,int> > & idsAndSizes ) const;
   /*!
     Write MESH and _supports.
   */
@@ -308,21 +306,21 @@ public :
    * All MED names are written in STRINGS PILE, and the correspondence
    * between GIBI and MED names is written as TABLE "noms_med"
   */
-  void writeMEDNames(const list<nameGIBItoMED>& listGIBItoMED_mail,
-                     const list<nameGIBItoMED>& listGIBItoMED_cham,
-                     const list<nameGIBItoMED>& listGIBItoMED_comp);
+  void writeMEDNames(const std::list<nameGIBItoMED>& listGIBItoMED_mail,
+                     const std::list<nameGIBItoMED>& listGIBItoMED_cham,
+                     const std::list<nameGIBItoMED>& listGIBItoMED_comp);
   /*!
     Write the record closing file
   */
   void writeLastRecord();
 
   //static void addName( map<string,int>& nameMap, string& name, int index, string prefix );
-  static void addName( map<string,int>& nameMap,
-                       map<string,int>& namePrefixesMap,
-                       string&          name,
-                       int              index);
+  static void addName( std::map<std::string,int>& nameMap,
+                       std::map<std::string,int>& namePrefixesMap,
+                       const std::string&         name,
+                       int                        index);
 
-  void writeNames( map<string,int>& nameMap );
+  void writeNames( std::map<std::string,int>& nameMap );
 
  private:
 
@@ -379,7 +377,7 @@ public :
   /*!
     Constructor.
   */
-  GIBI_MESH_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) ;
+  GIBI_MESH_RDWR_DRIVER(const std::string & fileName, MESH * ptrMesh) ;
   /*!
     Copy constructor.
   */
@@ -409,7 +407,7 @@ public :
 
 class MEDMEM_EXPORT GIBI_MED_RDONLY_DRIVER : public GIBI_MESH_RDONLY_DRIVER {
 
-  MED * _med;
+  std::vector<FIELD_*> * _fields;
 
 public:
 
@@ -420,7 +418,7 @@ public:
   /*!
     Constructor.
   */
-  GIBI_MED_RDONLY_DRIVER(const string & fileName, MED * ptrMed) ;
+  GIBI_MED_RDONLY_DRIVER(const std::string & fileName, std::vector<FIELD_*>& ptrFields) ;
   /*!
     Copy constructor.
   */
@@ -432,9 +430,11 @@ public:
   virtual ~GIBI_MED_RDONLY_DRIVER() ;
 
   /*!
-    Read MESH in the specified file.
+    Read MESH and FIELDs in the specified file.
   */
   void read ( void ) throw (MEDEXCEPTION);
+
+  MESH* getMesh() const;
 
 private:
 
@@ -452,7 +452,7 @@ private:
 
 class MEDMEM_EXPORT GIBI_MED_WRONLY_DRIVER : public GIBI_MESH_WRONLY_DRIVER {
 
-  MED * _med;
+  std::vector<const FIELD_*> _fields;
 
 public :
 
@@ -463,7 +463,9 @@ public :
   /*!
     Constructor. To write a mesh and all fields on it
   */
-  GIBI_MED_WRONLY_DRIVER(const string & fileName, MED * ptrMed, MESH * ptrMesh) ;
+  GIBI_MED_WRONLY_DRIVER(const std::string &               fileName,
+                         const std::vector<const FIELD_*>& fields,
+                         GMESH *                           ptrMesh);
   /*!
     Copy constructor.
   */
@@ -486,50 +488,6 @@ private:
   GENDRIVER * copy ( void ) const ;
 };
 
-
-/*!
-
-  Driver GIBI for MESH : Read write.
-  - Use read method from GIBI_MED_RDONLY_DRIVER
-  - Use write method from GIBI_MED_WRONLY_DRIVER
-
-*/
-
-// class GIBI_MED_RDWR_DRIVER : public GIBI_MED_RDONLY_DRIVER, public GIBI_MED_WRONLY_DRIVER {
-
-// public :
-
-//   /*!
-//     Constructor.
-//   */
-//   GIBI_MED_RDWR_DRIVER() ;
-//   /*!
-//     Constructor.
-//   */
-//   GIBI_MED_RDWR_DRIVER(const string & fileName, MESH * ptrMesh) ;
-//   /*!
-//     Copy constructor.
-//   */
-//   GIBI_MED_RDWR_DRIVER(const GIBI_MED_RDWR_DRIVER & driver) ;
-
-//   /*!
-//     Destructor.
-//   */
-//   ~GIBI_MED_RDWR_DRIVER() ;
-
-//   /*!
-//     Write MESH in the specified file.
-//   */
-//   void write(void) const throw (MEDEXCEPTION);
-//   /*!
-//     Read MESH in the specified file.
-//   */
-//   void read (void) throw (MEDEXCEPTION);
-
-// private:
-//   GENDRIVER * copy(void) const ;
-
-// };
 }
 
 

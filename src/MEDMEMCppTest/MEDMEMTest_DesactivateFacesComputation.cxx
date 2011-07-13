@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDMEMTest.hxx"
@@ -22,7 +22,7 @@
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_Meshing.hxx"
-#include "MEDMEM_MedMeshDriver22.hxx"
+#include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_GibiMeshDriver.hxx"
 
 #include <cppunit/Message.h>
@@ -35,7 +35,7 @@
 using namespace std;
 using namespace MEDMEM;
 
-void addMedFacesGroup2( MESHING& meshing, int nFaces, const int *groupValue,
+static void addMedFacesGroup2( MESHING& meshing, int nFaces, const int *groupValue,
                         string groupName, const MED_EN::medGeometryElement *mytypes,  const int *index, const int *myNumberOfElements, int nbOfGeomTypes)
   {
     GROUP *faces=new GROUP;
@@ -144,9 +144,7 @@ void MEDMEMTest::testDesactivateFacesComputation()
 
   MESHING* meshing = new MESHING;
   meshing->setName( "TESTMESH" );
-  meshing->setSpaceDimension(3);
   const int nNodes=36;
-  meshing->setNumberOfNodes(nNodes);
   meshing->setCoordinates(3, nNodes, coords, "CARTESIAN",
                           MED_EN::MED_NO_INTERLACE);
   string coordname[3] = { "x", "y", "z" };
@@ -159,7 +157,6 @@ void MEDMEMTest::testDesactivateFacesComputation()
   meshing->setNumberOfTypes(1,MED_EN::MED_CELL);
   meshing->setTypes(classicalTypesCell,MED_EN::MED_CELL);
   meshing->setNumberOfElements(nbOfCellElts,MED_EN::MED_CELL);
-  meshing->setMeshDimension(3);
   //Face connectivity info for classical elts
   const MED_EN::medGeometryElement classicalTypesFace[1]={MED_EN::MED_QUAD4};
   const int nbOfFaceElts[1]={14};
@@ -167,9 +164,9 @@ void MEDMEMTest::testDesactivateFacesComputation()
   meshing->setTypes(classicalTypesFace,MED_EN::MED_FACE);
   meshing->setNumberOfElements(nbOfFaceElts,MED_EN::MED_FACE);
   //All cell conn
-  meshing->setConnectivity(connNodalCellClassical,MED_EN::MED_CELL,MED_EN::MED_HEXA8);
+  meshing->setConnectivity(MED_EN::MED_CELL,MED_EN::MED_HEXA8,connNodalCellClassical);
   //All face conn
-  meshing->setConnectivity(connNodalFaceClassical,MED_EN::MED_FACE,MED_EN::MED_QUAD4);
+  meshing->setConnectivity(MED_EN::MED_FACE,MED_EN::MED_QUAD4,connNodalFaceClassical);
   int nbOfTypes=meshing->getNumberOfTypes(MED_EN::MED_EDGE);
   addMedFacesGroup2( *meshing, 2,  bottom, "Bottom",bottomTypes,bottomIndex,bottomNbOfElts,1) ;
   addMedFacesGroup2( *meshing, 4,  top,    "TopFace",topTypes,topIndex,topNbOfElts,1) ;
@@ -180,7 +177,7 @@ void MEDMEMTest::testDesactivateFacesComputation()
   //
   MESH *mesh=new MESH;
   mesh->setName(meshing->getName());
-  MEDMEM::MED_MESH_RDONLY_DRIVER22 *driver=new MEDMEM::MED_MESH_RDONLY_DRIVER22(tmpfile,mesh);
+  MEDMEM::MED_MESH_RDONLY_DRIVER *driver=new MEDMEM::MED_MESH_RDONLY_DRIVER(tmpfile,mesh);
   driver->desactivateFacesComputation();
   id=mesh->addDriver(*driver);
   mesh->read(id);
@@ -190,7 +187,7 @@ void MEDMEMTest::testDesactivateFacesComputation()
   id=mesh->addDriver(*gibidriver);
   mesh->write(id);
 #ifdef WNT
-  CPPUNIT_ASSERT( GetFileAttributes(tmpGibiFile.c_str()) & FILE_ATTRIBUTE_NORMAL );
+  CPPUNIT_ASSERT( GetFileAttributes(tmpGibiFile.c_str()) != INVALID_FILE_ATTRIBUTES );
 #else
   CPPUNIT_ASSERT( access(tmpGibiFile.c_str(), F_OK) == 0 );
 #endif

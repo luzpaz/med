@@ -1,24 +1,24 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MEDSPLITTERTest.hxx"
-#include <cppunit/TestAssert.h>
+#include "MEDSPLITTERTest_Utils.hxx"
 
 #include "MEDMEM_ConnectZone.hxx" 
 #include "MEDMEM_DriversDef.hxx"
@@ -44,6 +44,7 @@
 #include "MEDMEM_Exception.hxx"
 
 #include <string>
+#include <cppunit/TestAssert.h>
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
 //#define ENABLE_FAULTS
@@ -107,10 +108,10 @@ void MEDSPLITTERTest::testParallelTopology_graph_constructor()
 #ifndef ENABLE_METIS
   CPPUNIT_FAIL("METIS is not available. Please, check your compilation.");
 #else
-  string filename_rd                = getResourceFile("carre_en_quad4_import22.med");
-  string filename_para_wr           = makeTmpFile("myWrField_seq_pointe22_");
-  string filename_para_med0         = makeTmpFile("myWrField_seq_pointe22_1.med");
-  string filename_para_med1         = makeTmpFile("myWrField_seq_pointe22_2.med");
+  string filename_rd        = MEDSPLITTERTest_Utils::getResourceFile("carre_en_quad4.med");
+  string filename_para_wr   = MEDSPLITTERTest_Utils::makeTmpFile("myWrField_seq_pointe22_");
+  string filename_para_med0 = MEDSPLITTERTest_Utils::makeTmpFile("myWrField_seq_pointe22_1.med");
+  string filename_para_med1 = MEDSPLITTERTest_Utils::makeTmpFile("myWrField_seq_pointe22_2.med");
   
   string meshname="carre_en_quad4";
   MESHCollection collection(filename_rd,meshname);

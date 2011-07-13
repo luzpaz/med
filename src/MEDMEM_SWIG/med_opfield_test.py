@@ -1,24 +1,24 @@
 #  -*- coding: iso-8859-1 -*-
-#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
 ############################################################################
@@ -49,16 +49,8 @@ def print_ord(i):
     else:
         return `i`+'th'
 
-md = MED()
-
-mdDriver = MED_MED_RDONLY_DRIVER(medFile,md)
-
-mdDriver.open()
-mdDriver.readFileStruct()
-mdDriver.close()
-
+md = MEDFILEBROWSER(medFile)
 nbMeshes = md.getNumberOfMeshes()
-
 nbFields = md.getNumberOfFields()
 
 print "The med file", medFile, "contains", nbMeshes, "mesh(es) and", nbFields, "field(s)"
@@ -80,35 +72,29 @@ if (nbFields>0):
 print ""
 
 mesh_name = md.getMeshName(0)
-mesh = md.getMesh(mesh_name)
-mesh.read()
+mesh = MESH(MED_DRIVER,md.getFileName(),mesh_name)
 spaceDim = mesh.getSpaceDimension()
 meshDim = mesh.getMeshDimension()
 nbNodes = mesh.getNumberOfNodes()
 print "The mesh",mesh_name,"is a",spaceDim,"D mesh on a",meshDim,"D geometry and has",nbNodes,"Nodes"
 
 if (nbFields>0):
-    print "Updating supports in the Med Object"
-    md.updateSupport()
     print ""
     print "Field(s) Analysis "
     for i in range(nbFields):
         print ""
         field_name = md.getFieldName(i)
-        nbOfIt = md.getFieldNumberOfIteration(field_name)
+        dtits = md.getFieldIteration(field_name)
+        nbOfIt = len(dtits)
         print "The",print_ord(i),"field is",field_name,"with",nbOfIt,"iteration(s)"
-        for j in range(nbOfIt):
+        for dtitfield in dtits:
             print ""
-            dtitfield = md.getFieldIteration(field_name,j)
             dt = dtitfield.getdt()
             it = dtitfield.getit()
-            field = md.getField(field_name,dt,it)
-            type = field.getValueType()
+            type = md.getFieldType(field_name)
             print "     * Iteration:",dt,"Order number:",it,"Type:",type
             if type == MED_INT32:
-                fieldint = createFieldIntFromField(field)
-                fieldint.read()
-                fieldint.getSupport().update()
+                fieldint = FIELDINT(MED_DRIVER,md.getFileName(),field_name,dt,it,mesh)
                 name = fieldint.getName()
                 desc = fieldint.getDescription()
                 nbOfComp = fieldint.getNumberOfComponents()
@@ -279,9 +265,7 @@ if (nbFields>0):
                 except:
                     print "fieldintdiv = fieldint / fieldint2 catch/except error"
             elif type == MED_REEL64:
-                fielddouble = createFieldDoubleFromField(field)
-                fielddouble.read()
-                fielddouble.getSupport().update()
+                fielddouble = FIELDDOUBLE(MED_DRIVER,md.getFileName(),field_name,dt,it,mesh)
                 name = fielddouble.getName()
                 desc = fielddouble.getDescription()
                 nbOfComp = fielddouble.getNumberOfComponents()
@@ -450,7 +434,7 @@ if (nbFields>0):
                     print "     Values:",nbOf
                     for k in range(nbOf):
                         valueI = fielddoublediv.getRow(k+1)
-                    print "     *",valueI[:nbOfComp]
+                        print "     *",valueI[:nbOfComp]
                 except:
                     print "fielddoublediv = fielddouble / fielddouble2 catch/except error"
             else:
