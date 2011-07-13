@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #ifndef __MEDSPLITTER_MESHCOLLECTION_HXX__
 #define __MEDSPLITTER_MESHCOLLECTION_HXX__
@@ -99,7 +99,7 @@ namespace MEDSPLITTER
     void getPolygonNodeConnectivity(const int* cell_list,int nb_cells,MED_EN::medEntityMesh entity,
                                     vector<int>& type_connectivity, vector<int>& connectivity_index) const;
     void getPolyhedraNodeConnectivity(const int* cell_list,int nb_cells,MED_EN::medEntityMesh entity,
-                                      vector<int>& type_connectivity, vector<int>& connectivity_index, vector<int>& face_connectivity_index) const;
+                                      vector<int>& type_connectivity, vector<int>& connectivity_index/*, vector<int>& face_connectivity_index*/) const;
 
     void getFaceConnectivity( const int*  cell_list,int nb_cells,MED_EN::medEntityMesh,MED_EN::medGeometryElement type, int* type_connectivity) const ;
 
@@ -240,12 +240,12 @@ namespace MEDSPLITTER
       so that they are written in joints*/
     bool                              _subdomain_boundary_creates;
 
-        /*! flag specifying that families must be preserved by the
-                splitting*/
+    /*! flag specifying that families must be preserved by the
+      splitting*/
     bool                              _family_splitting;
 
-        /*! flag specifying that groups must be created on all domains, 
-                even if they are empty*/
+    /*! flag specifying that groups must be created on all domains, 
+      even if they are empty*/
     bool                              _create_empty_groups;
   };
 

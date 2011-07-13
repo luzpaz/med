@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 %module libMedCorba_Swig
@@ -31,6 +31,7 @@
 #include "MEDMEM_FieldTemplate_i.hxx"
 #include "MEDMEM_Group_i.hxx"
 #include "MEDMEM_Med_i.hxx"
+#include "MEDMEM_GMesh_i.hxx"
 #include "MEDMEM_Mesh_i.hxx"
 #include "MEDMEM_Support_i.hxx"
 #include "Med_Gen_i.hxx"
@@ -56,10 +57,10 @@
 */
 
 #if defined(SWIGPYTHON)
-%typemap(out) SALOME_MED::MESH_ptr, SALOME_MED::FIELDDOUBLE_ptr,
-  SALOME_MED::FIELDINT_ptr, SALOME_MED::SUPPORT_ptr,
-  const SALOME_MED::MESH_ptr, const SALOME_MED::FIELDDOUBLE_ptr,
-  const SALOME_MED::FIELDINT_ptr, const SALOME_MED::SUPPORT_ptr
+%typemap(out) SALOME_MED::GMESH_ptr, SALOME_MED::MESH_ptr, SALOME_MED::FIELDDOUBLE_ptr,
+   SALOME_MED::FIELDINT_ptr, SALOME_MED::SUPPORT_ptr,
+   const SALOME_MED::GMESH_ptr, const SALOME_MED::MESH_ptr, const SALOME_MED::FIELDDOUBLE_ptr,
+   const SALOME_MED::FIELDINT_ptr, const SALOME_MED::SUPPORT_ptr
 {
   MESSAGE("typemap out sur Objet Corba version ptr");
 
@@ -111,10 +112,10 @@
 #endif
 
 #if defined(SWIGPYTHON)
-%typemap(out) SALOME_MED::MESH_var, SALOME_MED::FIELDDOUBLE_var,
-  SALOME_MED::FIELDINT_var, SALOME_MED::SUPPORT_var,
-  const SALOME_MED::MESH_var, const SALOME_MED::FIELDDOUBLE_var,
-  const SALOME_MED::FIELDINT_var, const SALOME_MED::SUPPORT_var
+%typemap(out) SALOME_MED::GMESH_var, SALOME_MED::MESH_var, SALOME_MED::FIELDDOUBLE_var,
+   SALOME_MED::FIELDINT_var, SALOME_MED::SUPPORT_var,
+   const SALOME_MED::GMESH_var, const SALOME_MED::MESH_var, const SALOME_MED::FIELDDOUBLE_var,
+   const SALOME_MED::FIELDINT_var, const SALOME_MED::SUPPORT_var
 {
   MESSAGE("typemap out sur Objet Corba version var");
 
@@ -146,11 +147,11 @@
 #endif
 
 #if defined(SWIGPYTHON)
-%typemap(typecheck) SALOME_MED::MESH_ptr, SALOME_MED::FIELDDOUBLE_ptr,
+%typemap(typecheck) SALOME_MED::GMESH_ptr, SALOME_MED::MESH_ptr, SALOME_MED::FIELDDOUBLE_ptr,
                     SALOME_MED::FIELDINT_ptr, SALOME_MED::SUPPORT_ptr,
                     const SALOME_MED::MESH_ptr, const SALOME_MED::FIELDDOUBLE_ptr,
                     const SALOME_MED::FIELDINT_ptr, const SALOME_MED::SUPPORT_ptr,
-                    SALOME_MED::MESH_var, SALOME_MED::FIELDDOUBLE_var,
+                    SALOME_MED::GMESH_var, SALOME_MED::MESH_var, SALOME_MED::FIELDDOUBLE_var,
                     SALOME_MED::FIELDINT_var, SALOME_MED::SUPPORT_var,
                     const SALOME_MED::MESH_var, const SALOME_MED::FIELDDOUBLE_var,
                     const SALOME_MED::FIELDINT_var, const SALOME_MED::SUPPORT_var
@@ -192,6 +193,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::MESH_ptr t = SALOME_MED::MESH::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = &t;
   SCRUTE(*$1);
@@ -232,6 +234,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::FIELDDOUBLE_ptr t = SALOME_MED::FIELDDOUBLE::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = &t;
   SCRUTE(*$1);
@@ -272,6 +275,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::FIELDINT_ptr t = SALOME_MED::FIELDINT::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = &t;
   SCRUTE(*$1);
@@ -312,6 +316,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::FIELDDOUBLE_ptr t = SALOME_MED::FIELDDOUBLE::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = t;
   SCRUTE($1);
@@ -352,6 +357,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::FIELDINT_ptr t = SALOME_MED::FIELDINT::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = t;
   SCRUTE($1);
@@ -391,6 +397,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::SUPPORT_ptr t = SALOME_MED::SUPPORT::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = &t;
   SCRUTE(*$1);
@@ -432,6 +439,49 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::SUPPORT_ptr t = SALOME_MED::SUPPORT::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
+
+  $1 = t;
+  SCRUTE($1);
+}
+#endif
+
+#if defined(SWIGPYTHON)
+%typemap(in) const SALOME_MED::GMESH_ptr, SALOME_MED::GMESH_ptr
+{
+
+  MESSAGE("typemap in sur Objet Corba MESH sans reference");
+
+  SCRUTE($input);
+
+  PyObject* pdict = PyDict_New();
+  PyDict_SetItemString(pdict, "__builtins__", PyEval_GetBuiltins());
+  PyRun_String("import CORBA", Py_single_input, pdict, pdict);
+ 
+  PyRun_String("o = CORBA.ORB_init([''], CORBA.ORB_ID);", Py_single_input,
+                   pdict, pdict);
+ 
+  PyObject* orb = PyDict_GetItemString(pdict, "o");
+
+  // Ask omniORBpy to transform MESH (python Corba) ptr to IOR string
+
+  PyObject* iorMesh
+    = PyObject_CallMethod(orb, (char*)"object_to_string", (char*)"O", $input);
+ 
+  if (iorMesh == Py_None)
+    return NULL;
+  char * s = PyString_AsString(PyObject_Str(iorMesh));
+ 
+  // Ask omniORB to convert IOR string to MESH (C++ Corba) ptr
+
+  int argc = 0;
+  char *xargv = (char*)"";
+  char **argv = &xargv;
+  CORBA::ORB_var ORB = CORBA::ORB_init(argc, argv);
+  CORBA::Object_var O =  ORB->string_to_object(s);
+  SCRUTE(O);
+  SALOME_MED::GMESH_ptr t = SALOME_MED::GMESH::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = t;
   SCRUTE($1);
@@ -473,6 +523,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::MESH_ptr t = SALOME_MED::MESH::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = t;
   SCRUTE($1);
@@ -515,6 +566,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::FIELDDOUBLE_ptr t = SALOME_MED::FIELDDOUBLE::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = t;
   SCRUTE($1);
@@ -557,6 +609,7 @@
   CORBA::Object_var O =  ORB->string_to_object(s);
   SCRUTE(O);
   SALOME_MED::FIELDINT_ptr t = SALOME_MED::FIELDINT::_narrow(O);
+  SCRUTE(CORBA::is_nil(t));
 
   $1 = t;
   SCRUTE($1);

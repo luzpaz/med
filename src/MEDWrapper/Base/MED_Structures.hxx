@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 //  File   : 
@@ -112,12 +112,17 @@ namespace MED
     TInt myDim; //!< Dimension of the mesh (0, 1, 2 or 3)
     TInt GetDim() const { return myDim;} //!< Gets dimension of the mesh
 
+    TInt mySpaceDim;
+    TInt GetSpaceDim() const { return mySpaceDim; }
+
     EMaillage myType; //!< Type of the mesh
     EMaillage GetType() const { return myType;} //!< Gets type of the mesh
 
     TString myDesc; //!< Description of the mesh
     virtual std::string GetDesc() const = 0; //!< Get description for the mesh
     virtual void SetDesc(const std::string& theValue) = 0; //!< Sets description for the mesh
+
+    
   };
   
 
@@ -202,6 +207,12 @@ namespace MED
     EBooleen myIsElemNum;
     //! Let know if the mesh elements are indexed
     EBooleen IsElemNum() const { return myIsElemNum;}
+    
+    //! Defines if the mesh elements family are indexed
+    EBooleen myIsFamNum;
+    //! Let know if the mesh elements family are indexed
+    EBooleen IsFamNum() const { return myIsFamNum;}
+    
 
     //! Contains sequence of the indexes for the mesh elements
     PElemNum myElemNum;
@@ -404,6 +415,7 @@ namespace MED
     virtual std::string GetUnitName(TInt theId) const = 0;
     //! Set unit for the component by its order number
     virtual void SetUnitName(TInt theId, const std::string& theValue) = 0;
+
   };
 
 

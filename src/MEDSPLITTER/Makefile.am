@@ -1,22 +1,20 @@
-#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+# Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-#
-#  MED MEDMEM : MED files in memory
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
@@ -79,7 +77,7 @@ endif
 
 libmedsplitter_la_CPPFLAGS= $(MPI_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
 	$(BOOST_CPPFLAGS) $(LIBXML_INCLUDES) \
-	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core \
+	-I$(srcdir)/../MEDMEM \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../INTERP_KERNEL/GaussPoints
 
@@ -100,12 +98,12 @@ if MED_ENABLE_SCOTCH
   libmedsplitter_la_LDFLAGS+= $(SCOTCH_LIBS)
 endif
 if MED_ENABLE_KERNEL
-  libmedsplitter_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
-  libmedsplitter_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
+  libmedsplitter_la_CPPFLAGS+= ${KERNEL_CXXFLAGS} $(BOOST_CPPFLAGS)
+  libmedsplitter_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace $(BOOST_LIBS)
 endif
 
 libmedsplitter_la_LDFLAGS+= $(MED2_LIBS) $(HDF5_LIBS) $(STDLIB) $(LIBXML_LIBS) $(MPI_LIBS) \
-	../MEDMEM/libmedmem.la ../MEDWrapper/V2_1/Core/libmed_V2_1.la ../INTERP_KERNEL/libinterpkernel.la
+	../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la
 
 # Executables targets
 bin_PROGRAMS= medsplitter
@@ -113,7 +111,7 @@ bin_PROGRAMS= medsplitter
 dist_medsplitter_SOURCES= medsplitter.cxx
 
 medsplitter_CPPFLAGS= $(libmedsplitter_la_CPPFLAGS)
-medsplitter_LDADD= $(libmedsplitter_la_LDFLAGS) -lm $(BOOST_LIBS) libmedsplitter.la
+medsplitter_LDADD= $(libmedsplitter_la_LDFLAGS) -lm libmedsplitter.la
 if MED_ENABLE_KERNEL
   medsplitter_LDADD+= -lSALOMEBasics
 endif

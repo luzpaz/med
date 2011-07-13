@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File      : MEDSPLITTER_MeshSendReceive.cxx
 // Created   : Tue Jun 30 20:39:33 2009
@@ -279,10 +279,7 @@ namespace { // local utils
       SLC_FAMILY_GEN_DATA,
       SLC_FAMILY_GROUP_IDS,
       SLC_POLYGON_INDEX,
-      SLC_POLYGON_CONN,
-      SLC_POLYHED_FACE_INDEX,
       SLC_POLYHED_INDEX,
-      SLC_POLYHED_CONN,
       SLC_FIRST_STD_CONN, // index of the first of non-fixed int slices:
       // - connectivities of std types and
       // - elements of families
@@ -320,7 +317,7 @@ namespace { // local utils
 
   //================================================================================
   /*!
-   * \brief Enrich MEDMEM::MESHING with addFamily()
+   * \brief Enrich MEDMEM::MESHING with addFamily() etc
    */
   //================================================================================
 
@@ -367,6 +364,39 @@ namespace { // local utils
       for ( int i = 0; i < groups.size(); ++i )
         groups[i]->setNumberOfFamilies(0), groups[i]->setFamilies(families);
     }
+
+    //================================================================================
+    /*!
+     * \brief Sets type of coordinate system
+     */
+    //================================================================================
+
+    void setCoordinatesSystem(const std::string& system)
+    {
+      _coordinate->setCoordinatesSystem(system);
+    }
+
+    //================================================================================
+    /*!
+     * \brief Sets space dimension
+     */
+    //================================================================================
+
+    void setSpaceDimension( int dim )
+    {
+      _spaceDimension = dim;
+    }
+
+    //================================================================================
+    /*!
+     * \brief Sets the number of nodes in the mesh
+     */
+    //================================================================================
+
+    void setNumberOfNodes(const int NumberOfNodes)
+    {
+      _numberOfNodes = NumberOfNodes ;
+    }
   };
 
   //================================================================================
@@ -380,7 +410,7 @@ namespace { // local utils
     if ( char_data.size() < SLC_FIRST_COORD_NAME + 2 * mesh->getSpaceDimension() )
       throw MED_EXCEPTION(LOCALIZED("Internal error in MeshSendReceive::recv()"));
 
-    MEDMEM::MESHING* meshing = (MEDMEM::MESHING*) mesh;
+    TMESHING* meshing = (TMESHING*) mesh;
 
     meshing->setName             ( fromCharSlice( char_data[ SLC_MESH_NAME ]));
     meshing->setDescription      ( fromCharSlice( char_data[ SLC_MESH_DESC ]));
@@ -472,10 +502,10 @@ namespace { // local utils
         for ( int t = 0; t < nb_geom_types; ++t )
         {
           if ( families[f]->getEntity() != MED_NODE )
-            geom_types[t] = mesh->getElementTypeWithPoly( families[f]->getEntity(),
-                                                          int_data[ fam_elem_slice + t ][0] );
+            geom_types[t] = mesh->getElementType( families[f]->getEntity(),
+                                                  int_data[ fam_elem_slice + t ][0] );
           else
-            geom_types[t] = MED_POINT1;
+            geom_types[t] = MED_NONE;
           nb_elements[t] = int_data[ fam_elem_slice ]._size;
           index[t+1] = index[t] + nb_elements[t];
         }
@@ -525,11 +555,11 @@ namespace { // local utils
     TMESHING* mesh = new TMESHING();
     // general info
     mesh->setSpaceDimension( int_data[ SLC_GENERAL_INFO ][ I_SPACEDIM ]);
-    mesh->setMeshDimension ( int_data[ SLC_GENERAL_INFO ][ I_MESHDIM ]);
     mesh->setNumberOfNodes ( int_data[ SLC_GENERAL_INFO ][ I_NB_NODES ]);
+    int meshDimension = int_data[ SLC_GENERAL_INFO ][ I_MESHDIM ];
 
     // nb of types
-    medEntityMesh face_entity = mesh->getMeshDimension()==3 ? MED_FACE : MED_EDGE;
+    medEntityMesh face_entity = meshDimension==3 ? MED_FACE : MED_EDGE;
     int nb_cell_types = int_data[ SLC_GENERAL_INFO ][ I_NB_CELL_TYPES ];
     int nb_face_types = int_data[ SLC_GENERAL_INFO ][ I_NB_FACE_TYPES ];
     mesh->setNumberOfTypes ( nb_cell_types, MED_CELL );
@@ -542,8 +572,19 @@ namespace { // local utils
     for ( ; t < types.size(); ++t )
     {
       types[t] = medGeometryElement( int_data[ SLC_GEOM_TYPES ][t] );
-      int nn = types[t] % 100;
-      nbElementsByType[t] = int_data[ conn_slice++ ]._size / nn;
+      if ( types[t] == MED_POLYGON )
+      {
+        nbElementsByType[t] = int_data[ SLC_POLYGON_INDEX ]._size - 1;
+      }
+      else if ( types[t] == MED_POLYHEDRA )
+      {
+        nbElementsByType[t] = int_data[ SLC_POLYHED_INDEX ]._size - 1;
+      }
+      else
+      {
+        int nn = types[t] % 100;
+        nbElementsByType[t] = int_data[ conn_slice++ ]._size / nn;
+      }
     }
     mesh->setTypes( &types[0], MED_CELL );
     mesh->setTypes( &types[0] + nb_cell_types, face_entity );
@@ -551,26 +592,24 @@ namespace { // local utils
     mesh->setNumberOfElements( &nbElementsByType[0] + nb_cell_types, face_entity );
 
     // connectivity
+    const int * index = 0;
     for ( t = 0, conn_slice = SLC_FIRST_STD_CONN; t < types.size(); ++t )
     {
-      mesh->setConnectivity( int_data[ conn_slice++ ]._pointer,
-                             t < nb_cell_types ? MED_CELL : face_entity,
-                             types[ t ]);
+      if ( types[t] == MED_POLYGON )
+      {
+        index = int_data[ SLC_POLYGON_INDEX ]._pointer;
+      }
+      else if ( types[t] == MED_POLYHEDRA )
+      {
+        index = int_data[ SLC_POLYHED_INDEX ]._pointer;
+      }
+
+      mesh->setConnectivity( t < nb_cell_types ? MED_CELL : face_entity,
+                             types[ t ],
+                             int_data[ conn_slice++ ]._pointer,
+                             index);
     }
-    if ( int_data[ SLC_POLYGON_CONN ]._size > 0 )
-    {
-      mesh->setPolygonsConnectivity( int_data[ SLC_POLYGON_INDEX ]._pointer,
-                                     int_data[ SLC_POLYGON_CONN  ]._pointer,
-                                     int_data[ SLC_POLYGON_INDEX ]._size - 1, // nbOfPolygons
-                                     mesh->getMeshDimension()==2 ? MED_CELL : MED_FACE);
-    }
-    if ( int_data[ SLC_POLYHED_CONN ]._size > 0 )
-    {
-      mesh->setPolyhedraConnectivity( int_data[ SLC_POLYHED_INDEX       ]._pointer,
-                                      int_data[ SLC_POLYHED_FACE_INDEX  ]._pointer,
-                                      int_data[ SLC_POLYHED_CONN        ]._pointer,
-                                      int_data[ SLC_POLYHED_INDEX ]._size - 1); // nbOfPolyhedra
-    }
+
     // make families and groups
 
     makeGroupsAndFamilies( mesh, int_data, SLC_FIRST_STD_CONN + types.size() );
@@ -716,7 +755,7 @@ namespace { // local utils
     int_data[ SLC_FAMILY_GROUP_IDS ].copy( family_group_ids.size(), &family_group_ids[0] );
     family_gen_data.clear(); family_group_ids.clear();
 
-    // std geom types and their connectvity
+    // geom types and their connectvity
 
     int_data[ SLC_GEOM_TYPES ].resize( general_info[I_NB_CELL_TYPES] +
                                        general_info[I_NB_FACE_TYPES] );
@@ -726,47 +765,38 @@ namespace { // local utils
     const medGeometryElement * cell_types = mesh->getTypes(MED_CELL);
     for ( int t = 0; t < general_info[I_NB_CELL_TYPES]; ++t )
     {
-      int nn = cell_types[t] % 100;
       *type_ptr++ = cell_types[t];
-      int_data[ i_slice++ ].setPtr( mesh->getNumberOfElements( MED_CELL, cell_types[t]) * nn,
-                                    mesh->getConnectivity( MED_FULL_INTERLACE, conn,
-                                                           MED_CELL, cell_types[t]));
+      int_data[ i_slice++ ].setPtr( mesh->getConnectivityLength( conn, MED_CELL, cell_types[t]),
+                                    mesh->getConnectivity      ( conn, MED_CELL, cell_types[t]));
     }
     if ( have_faces )
     {
       const medGeometryElement * face_types = mesh->getTypes( face_entity );
       for ( int t = 0; t < general_info[I_NB_FACE_TYPES]; ++t )
       {
-        int nn = face_types[t] % 100;
         *type_ptr++ = face_types[t];
-        int_data[ i_slice++ ].setPtr( mesh->getNumberOfElements( face_entity, face_types[t]) * nn,
-                                      mesh->getConnectivity( MED_FULL_INTERLACE, conn,
-                                                             face_entity, face_types[t]));
+        int_data[ i_slice++ ].setPtr(mesh->getConnectivityLength( conn, face_entity, face_types[t]),
+                                     mesh->getConnectivity( conn, face_entity, face_types[t]));
       }
     }
-    // polygon connectivity
+    // polygon connectivity index
 
     medEntityMesh polygon_entity = mesh->getMeshDimension()==2 ? MED_CELL : MED_FACE;
-    if ( mesh->existPolygonsConnectivity( conn, polygon_entity ))
+    if ( int nb_polygon = mesh->getNumberOfElements( polygon_entity, MED_POLYGON ))
     {
-      if ( int nb_polygon = mesh->getNumberOfPolygons( polygon_entity ))
-      {
-        int_data[SLC_POLYGON_CONN].setPtr( mesh->getPolygonsConnectivityLength( conn, polygon_entity ),
-                                           mesh->getPolygonsConnectivity( conn, polygon_entity ));
-        int_data[SLC_POLYGON_INDEX].setPtr( nb_polygon + 1,
-                                            mesh->getPolygonsConnectivityIndex( conn, polygon_entity ));
-      }
+      const int nbTypes = mesh->getNumberOfTypes( polygon_entity );
+      const int * index = mesh->getConnectivityIndex( conn, polygon_entity );
+      index += mesh->getGlobalNumberingIndex( polygon_entity )[ nbTypes-1 ] - 1;
+      int_data[SLC_POLYGON_INDEX].setPtr( nb_polygon + 1, index );
     }
-    // polyherdra connectivity
+    // polyherdra connectivity index
 
-    if ( int nb_polyhedra = mesh->getNumberOfPolyhedron())
+    if ( int nb_polyhedra = mesh->getNumberOfElements( MED_CELL, MED_POLYHEDRA ))
     {
-      int_data[SLC_POLYHED_CONN].setPtr( mesh->getPolyhedronConnectivityLength( conn ),
-                                         mesh->getPolyhedronConnectivity( conn ));
-      int_data[SLC_POLYHED_INDEX].setPtr( nb_polyhedra + 1,
-                                          mesh->getPolyhedronIndex( conn ));
-      int_data[SLC_POLYHED_FACE_INDEX].setPtr( mesh->getNumberOfPolyhedronFaces() + 1,
-                                               mesh->getPolyhedronFacesIndex());
+      const int nbTypes = mesh->getNumberOfTypes( MED_CELL );
+      const int * index = mesh->getConnectivityIndex( conn, MED_CELL );
+      index += mesh->getGlobalNumberingIndex( MED_CELL )[ nbTypes-1 ] - 1;
+      int_data[SLC_POLYHED_INDEX].setPtr( nb_polyhedra + 1, index );
     }
     // coordinates
 

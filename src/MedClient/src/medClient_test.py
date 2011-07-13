@@ -1,24 +1,24 @@
 #  -*- coding: iso-8859-1 -*-
-#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
 ####################################################################################################
@@ -248,57 +248,14 @@ for i in range(nbOfMeshes):
             type = types[k]
             nbElemType = meshLocalCopy.getNumberOfElements(MED_CELL,type)
             print "     For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
-            connectivity = meshLocalCopy.getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,type)
-            nbNodesPerCell = type%100
-            for j in range(nbElemType):
-                print "       Element",(j+1)," ",connectivity[j*nbNodesPerCell:(j+1)*nbNodesPerCell]
-                pass
-            pass
-        pass
-
-    ##
-    ## TEST METHODS ABOUT POLY ELEMENTS ##
-    ##
-    nbTypesCellWithPoly = meshLocalCopy.getNumberOfTypesWithPoly(MED_CELL)
-    if (nbTypesCell == nbTypesCellWithPoly):
-        print ""
-        print "          No Poly Cells in the mesh"
-        print ""
-        pass
-    else:
-        print ""
-        print "          The Cell Nodal Connectivity of the Poly Cells:"
-        print ""
-        print "      The Mesh has",nbTypesCellWithPoly-nbTypesCell,"Type(s) of Poly Cell"
-        types = meshLocalCopy.getTypesWithPoly(MED_CELL)
-        for k in range(nbTypesCellWithPoly):
-            type = types[k]
-            if type == MED_POLYGON:
-                nbElemType = meshLocalCopy.getNumberOfPolygons()
-            elif type == MED_POLYHEDRA:
-                nbElemType = meshLocalCopy.getNumberOfPolyhedron()
-            else:
-                continue
-            print ""
-            print "     For the type:",type,"there is(are)",nbElemType,"elemnt(s)"
-            if type == MED_POLYGON:
-                connectivity = meshLocalCopy.getPolygonsConnectivity(MED_NODAL,MED_CELL)
-                index = meshLocalCopy.getPolygonsConnectivityIndex(MED_NODAL,MED_CELL)
-                for j in range(nbElemType):
-                    print "       Polygon",(j+1)," ",connectivity[ index[j]-1 : index[j+1]-1 ]
-                    pass
+            connectivity = meshLocalCopy.getConnectivity(MED_NODAL,MED_CELL,MED_ALL_ELEMENTS)
+            index = meshLocalCopy.getConnectivityIndex(MED_NODAL,MED_CELL)
+            if type == MED_POLYHEDRA:
                 pass
             else:
-                connectivity = meshLocalCopy.getPolyhedronConnectivity(MED_NODAL)
-                fIndex = meshLocalCopy.getPolyhedronFacesIndex()
-                index = meshLocalCopy.getPolyhedronIndex(MED_NODAL)
+                nbNodesPerCell = type%100
                 for j in range(nbElemType):
-                    print     "       Polyhedra",(j+1)
-                    iF1, iF2 = index[ j ]-1, index[ j+1 ]-1
-                    for f in range( iF2 - iF1 ):
-                        iN1, iN2 = fIndex[ iF1+f ]-1, fIndex[ iF1+f+1 ]-1
-                        print "         Face",f+1," ",connectivity[ iN1 : iN2 ]
-                        pass
+                    print "       Element",(j+1)," ",connectivity[ index[j]-1 : index[j+1]-1 ]
                     pass
                 pass
             pass

@@ -1,24 +1,24 @@
 #  -*- coding: iso-8859-1 -*-
-#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
 #  MED MedCorba_Swig : binding of MED CORBA objects woth Python
@@ -30,6 +30,7 @@ import batchmode_salome
 import SALOME_MED
 
 from libMedCorba_Swig import *
+from libMEDClient import *
 
 from random import *
 
@@ -191,7 +192,7 @@ print ""
 
 med_comp = batchmode_salome.lcc.FindOrLoadComponent("FactoryServer", "MED")
 
-med_comp.readStructFile(medFile,studyCurrent)
+med_comp.readStructFileWithFieldType(medFile,studyCurrent)
 
 med_obj = getMedObjectFromStudy(fileName)
 
@@ -262,57 +263,61 @@ for entity in [SALOME_MED.MED_NODE,SALOME_MED.MED_CELL,SALOME_MED.MED_FACE,SALOM
                 print ""
                 lengthValue = familycorba.getNumberOfElements(SALOME_MED.MED_ALL_ELEMENTS)
                 nbOfComp = 1
-                print "Generate a Local scalar double field"
+
+                supportOutLocal = SUPPORTClient( familycorba )
+                supportOutCorba = createCorbaSupport( supportOutLocal )
+
+                print "\nGenerate a Local scalar double field"
                 fieldScalDblLoc = createLocalFieldDouble(nbOfComp,lengthValue)
-                for k in range(lengthValue):
-                    valueI = []
-                    for kcomp in range(nbOfComp):
-                        valueI.append(random())
-                    fieldScalDblLoc.setValueI(MED_FULL_INTERLACE,k+1,valueI)
-                    valueIverif = fieldScalDblLoc.getValueI(MED_FULL_INTERLACE,k+1)
-                    print "     Set/Get Entry *",(k+1)," ",valueI[:nbOfComp],"  /  ",valueIverif[:nbOfComp]
-                print "Generate a Corba scalar double field"
-                fieldScalDblCorba = createCorbaFieldDouble(familycorba,fieldScalDblLoc)
+                value = [ random() for k in range(lengthValue*nbOfComp) ]
+                fieldScalDblLoc.setValue( value ) ## the only way as field support not defined
+                valueIverif = fieldScalDblLoc.getValue()
+                print "     Set ",value
+                print "     Get ",valueIverif
+
+                print "\nGenerate a Corba scalar double field"
+                fieldScalDblLoc.setSupport( supportOutLocal )
+                fieldScalDblCorba = createCorbaFieldDouble(supportOutCorba,fieldScalDblLoc)
                 AnalyzeField(fieldScalDblCorba)
-                print ""
+
                 print "Generate a Local scalar integer field"
                 fieldScalIntLoc = createLocalFieldInt(nbOfComp,lengthValue)
-                for k in range(lengthValue):
-                    valueI = []
-                    for kcomp in range(nbOfComp):
-                        valueI.append(randint(0,100))
-                    fieldScalIntLoc.setValueI(MED_FULL_INTERLACE,k+1,valueI)
-                    valueIverif = fieldScalIntLoc.getValueI(MED_FULL_INTERLACE,k+1)
-                    print "     Set/Get Entry *",(k+1)," ",valueI[:nbOfComp],"  /  ",valueIverif[:nbOfComp]
-                print "Generate a Corba scalar integer field"
-                fieldScalIntCorba = createCorbaFieldInt(familycorba,fieldScalIntLoc)
+                value = [ randint(0,100) for k in range(lengthValue*nbOfComp) ]
+                fieldScalIntLoc.setValue( value ) ## the only way as field support not defined
+                valueIverif = fieldScalIntLoc.getValue()
+                print "     Set ",value
+                print "     Get ",valueIverif
+
+                print "\nGenerate a Corba scalar integer field"
+                fieldScalIntLoc.setSupport( supportOutLocal )
+                fieldScalIntCorba = createCorbaFieldInt(supportOutCorba,fieldScalIntLoc)
                 AnalyzeField(fieldScalIntCorba)
-                print ""
+
                 nbOfComp = spaceDim
-                print "Generate a Local vector double field"
+                print "\nGenerate a Local vector double field"
                 fieldVectDblLoc = createLocalFieldDouble(nbOfComp,lengthValue)
-                for k in range(lengthValue):
-                    valueI = []
-                    for kcomp in range(nbOfComp):
-                        valueI.append(random())
-                    fieldVectDblLoc.setValueI(MED_FULL_INTERLACE,k+1,valueI)
-                    valueIverif = fieldVectDblLoc.getValueI(MED_FULL_INTERLACE,k+1)
-                    print "     Set/Get Entry *",(k+1)," ",valueI[:nbOfComp],"  /  ",valueIverif[:nbOfComp]
-                print "Generate a Corba vector double field"
-                fieldVectDblCorba = createCorbaFieldDouble(familycorba,fieldVectDblLoc)
+                value = [ random() for k in range(lengthValue*nbOfComp) ]
+                fieldVectDblLoc.setValue(value)
+                valueIverif = fieldVectDblLoc.getValue()
+                print "     Set ",value
+                print "     Get ",valueIverif
+
+                print "\nGenerate a Corba vector double field"
+                fieldVectDblLoc.setSupport( supportOutLocal )
+                fieldVectDblCorba = createCorbaFieldDouble(supportOutCorba,fieldVectDblLoc)
                 AnalyzeField(fieldVectDblCorba)
-                print ""
-                print "Generate a Local vector integer field"
+
+                print "\nGenerate a Local vector integer field"
                 fieldVectIntLoc = createLocalFieldInt(nbOfComp,lengthValue)
-                for k in range(lengthValue):
-                    valueI = []
-                    for kcomp in range(nbOfComp):
-                        valueI.append(randint(0,100))
-                    fieldVectIntLoc.setValueI(MED_FULL_INTERLACE,k+1,valueI)
-                    valueIverif = fieldVectIntLoc.getValueI(MED_FULL_INTERLACE,k+1)
-                    print "     Set/Get Entry *",(k+1)," ",valueI[:nbOfComp],"  /  ",valueIverif[:nbOfComp]
-                print "Generate a Corba vector integer field"
-                fieldVectIntCorba = createCorbaFieldInt(familycorba,fieldVectIntLoc)
+                value = [ randint(0,100) for k in range(lengthValue*nbOfComp) ]
+                fieldVectIntLoc.setValue(value)
+                valueIverif = fieldVectIntLoc.getValue()
+                print "     Set ",value
+                print "     Get ",valueIverif
+
+                print "\nGenerate a Corba vector integer field"
+                fieldVectIntLoc.setSupport( supportOutLocal )
+                fieldVectIntCorba = createCorbaFieldInt(supportOutCorba,fieldVectIntLoc)
                 AnalyzeField(fieldVectIntCorba)
                 print ""
 print "Fin du script Python ...."

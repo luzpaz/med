@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 #include "MESHClient.hxx"
@@ -38,12 +38,11 @@ using namespace MED_EN;
 //=============================================================================
 
 MESHClient::MESHClient(const SALOME_MED::MESH_ptr m) : 
-  MESH(), _refCounter(1),
   IOR_Mesh(SALOME_MED::MESH::_duplicate(m)),
-  _complete(false)
-
+  _complete(false)//,_refCounter(1)
 {
-  ASSERT(m);
+  if ( CORBA::is_nil( m ))
+    throw MEDEXCEPTION("MESHClient(const SALOME_MED::MESH_ptr mesh): NULL mesh!");
 
   _coordinate = new COORDINATEClient(m, MED_FULL_INTERLACE);
   _connectivity = new CONNECTIVITYClient(m, MED_FULL_INTERLACE);
@@ -76,7 +75,7 @@ GROUP * convertGroup(const SALOME_MED::GROUP_ptr &F, MESH *M)
 //=============================================================================
 void MESHClient::blankCopy()
 {
-  SALOME_MED::MESH::meshInfos_var all = IOR_Mesh->getMeshGlobal();
+  SALOME_MED::GMESH::meshInfos_var all = IOR_Mesh->getMeshGlobal();
 
   //CORBA::String_var s;
   //s= IOR_Mesh->getName(); _name = s;
@@ -86,7 +85,6 @@ void MESHClient::blankCopy()
   
   _name           = all->name;
   _spaceDimension = all->spaceDimension;
-  _meshDimension  = all->meshDimension;
   _numberOfNodes  = all->numberOfNodes;
 
   COORDINATEClient *_coord 
@@ -237,7 +235,7 @@ bool MESHClient::operator==(const MESH& other) const
 
 MESHClient::~MESHClient()
 {
-  IOR_Mesh->Destroy();
+  IOR_Mesh->UnRegister();
 }
 
 //=============================================================================
@@ -246,10 +244,10 @@ MESHClient::~MESHClient()
  */
 //=============================================================================
 
-void MESHClient::addReference() const
+/*void MESHClient::addReference() const
 {
   _refCounter++;
-}
+}*/
 
 //=============================================================================
 /*!
@@ -257,13 +255,13 @@ void MESHClient::addReference() const
  */
 //=============================================================================
 
-void MESHClient::removeReference() const
+/*void MESHClient::removeReference() const
 {
   if (--_refCounter <= 0)
     {
       delete this;
     }
-}
+}*/
 
 //=============================================================================
 /*!
@@ -271,10 +269,38 @@ void MESHClient::removeReference() const
  */
 //=============================================================================
 
-void MESHClient::write(int index/*=0*/, const string & driverName/* = ""*/)
+void MESHClient::write(int index/*=0*/) const
 {
-  this->fillCopy();
-  MESH::write(index,driverName);
+  const_cast<MESHClient*>(this)->fillCopy();
+  GMESH::write(index);
+}
+
+//=============================================================================
+/*!
+ * Write all the content of the GMESH using genDriver
+ */
+//=============================================================================
+
+void MESHClient::write(const GENDRIVER &      genDriver,
+                       MED_EN::med_mode_acces medMode) const
+{
+  const_cast<MESHClient*>(this)->fillCopy();
+  GMESH::write(genDriver);
+}
+
+//=============================================================================
+/*!
+ * Write all the content of the GMESH
+ */
+//=============================================================================
+
+void MESHClient::write(driverTypes        driverType,
+                       const std::string& filename,
+                       const std::string& meshname,
+                       MED_EN::med_mode_acces medMode) const
+{
+  const_cast<MESHClient*>(this)->fillCopy();
+  GMESH::write(driverType, filename);
 }
 
 //================================================================================

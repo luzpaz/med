@@ -1,20 +1,20 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 // File      : MEDSPLITTER_JointExchangeData.cxx
 // Created   : Thu Jul 23 13:01:35 2009
@@ -48,8 +48,8 @@ JointExchangeData::JointExchangeData():
  */
 //================================================================================
 
-void JointExchangeData::setMeshes( int domain_dist, MEDMEM::MESH* mesh_dist,
-                                   int domain_here, MEDMEM::MESH* mesh_here)
+void JointExchangeData::setMeshes( int domain_dist, const MEDMEM::MESH* mesh_dist,
+                                   int domain_here, const MEDMEM::MESH* mesh_here)
 {
   _dist_domain = domain_dist;
   _loc_domain  = domain_here;
@@ -70,7 +70,7 @@ void JointExchangeData::setMeshes( int domain_dist, MEDMEM::MESH* mesh_dist,
  */
 //================================================================================
 
-void JointExchangeData::addCellCorrespondence(MEDMEM::MESH* mesh,
+void JointExchangeData::addCellCorrespondence(const MEDMEM::MESH* mesh,
                                               int domain_dist, int domain_here,
                                               int glob_dist,   int glob_here,
                                               int loc_here,    int loc_dist)
@@ -223,8 +223,8 @@ namespace
 MEDMEM::CONNECTZONE* JointExchangeData::makeConnectZone(TGeom2FacesByDomian& face_map)
 {
   MEDMEM::CONNECTZONE* cz= new MEDMEM::CONNECTZONE();
-  cz->setLocalMesh          (_loc_mesh);
-  cz->setDistantMesh        (_dist_mesh);
+  cz->setLocalMesh          (const_cast<MEDMEM::MESH*>(_loc_mesh));
+  cz->setDistantMesh        (const_cast<MEDMEM::MESH*>(_dist_mesh));
   cz->setLocalDomainNumber  (_loc_domain);
   cz->setDistantDomainNumber(_dist_domain);
   cz->setName               ("Connect zone defined by SPLITTER");
@@ -329,8 +329,7 @@ void JointExchangeData::setConnectivity(const int* glob_fused_nodes)
 {
   _global_conn_here.reserve( _conn_here_size );
   _local_conn_here.reserve ( _conn_here_size );
-  const int* conn  = _loc_mesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                                MED_CELL, MED_ALL_ELEMENTS);
+  const int* conn  = _loc_mesh->getConnectivity(MED_NODAL, MED_CELL, MED_ALL_ELEMENTS);
   const int* index = _loc_mesh->getConnectivityIndex(MED_NODAL, MED_CELL);
 
   TGlob2LocsHD::iterator glob_locs_here_dist     = _glob_to_locs_here_and_dist.begin();

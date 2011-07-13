@@ -20,9 +20,7 @@
 #define MED_H
 
 
-extern "C"{
 #include <hdf5.h>
-}
 
 namespace med_2_1{
   

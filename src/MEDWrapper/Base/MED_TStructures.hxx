@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
 //  File   : 
@@ -140,19 +140,21 @@ namespace MED
       TNameInfoBase(theInfo->GetName())
     {
       myDim = theInfo->GetDim();
+      mySpaceDim = theInfo->GetSpaceDim();
       myType = theInfo->GetType();
       
       myDesc.resize(GetDESCLength<eVersion>()+1);
       SetDesc(theInfo->GetDesc());
     }
 
-    TTMeshInfo(TInt theDim,
+    TTMeshInfo(TInt theDim, TInt theSpaceDim,
                const std::string& theValue,
                EMaillage theType,
                const std::string& theDesc):
       TNameInfoBase(theValue)
     {
       myDim = theDim;
+      mySpaceDim = theSpaceDim;
       myType = theType;
       
       myDesc.resize(GetDESCLength<eVersion>()+1);
@@ -307,6 +309,7 @@ namespace MED
       
       myNbElem = theInfo->GetNbElem();
       myFamNum.reset(new TElemNum(myNbElem));
+      myIsFamNum = eFAUX; // is set to eVRAI in SetFamNum()
 
       myIsElemNum = theInfo->IsElemNum();
       if(theInfo->IsElemNum())
@@ -346,6 +349,7 @@ namespace MED
 
       myNbElem = theNbElem;
       myFamNum.reset(new TElemNum(theNbElem));
+      myIsFamNum = eFAUX; // is set to eVRAI in SetFamNum()
 
       myIsElemNum = theIsElemNum;
       if(theIsElemNum)
@@ -370,6 +374,7 @@ namespace MED
       
       myNbElem = theNbElem;
       myFamNum.reset(new TElemNum(theNbElem));
+      myIsFamNum = eFAUX; // is set to eVRAI in SetFamNum()
       
       myIsElemNum = theElemNums.size()? eVRAI: eFAUX;
       if(myIsElemNum)
@@ -425,8 +430,8 @@ namespace MED
     typedef TTElemInfo<eVersion> TElemInfoBase;
 
     TTNodeInfo(const PMeshInfo& theMeshInfo, const PNodeInfo& theInfo):
-      TElemInfoBase(theMeshInfo, theInfo),
-      TNodeInfo(theInfo)
+      TNodeInfo(theInfo),
+      TElemInfoBase(theMeshInfo, theInfo)
     {
       myModeSwitch = theInfo->GetModeSwitch();
       
@@ -434,14 +439,14 @@ namespace MED
       
       myCoord.reset(new TNodeCoord(*theInfo->myCoord));
       
-      TInt aDim = theMeshInfo->GetDim();
+      TInt aSpaceDim = theMeshInfo->GetSpaceDim();
 
-      myCoordNames.resize(aDim*GetPNOMLength<eVersion>()+1);
-      for(TInt anId = 0; anId < aDim; anId++)
+      myCoordNames.resize(aSpaceDim*GetPNOMLength<eVersion>()+1);
+      for(TInt anId = 0; anId < aSpaceDim; anId++)
         SetCoordName(anId,theInfo->GetCoordName(anId));
       
-      myCoordUnits.resize(aDim*GetPNOMLength<eVersion>()+1);
-      for(TInt anId = 0; anId < aDim; anId++)
+      myCoordUnits.resize(aSpaceDim*GetPNOMLength<eVersion>()+1);
+      for(TInt anId = 0; anId < aSpaceDim; anId++)
         SetCoordUnit(anId,theInfo->GetCoordUnit(anId));
     }
 
@@ -451,19 +456,19 @@ namespace MED
                ERepere theSystem, 
                EBooleen theIsElemNum,
                EBooleen theIsElemNames):
+      TModeSwitchInfo(theMode),
       TElemInfoBase(theMeshInfo,
                     theNbElem,
                     theIsElemNum,
-                    theIsElemNames),
-      TModeSwitchInfo(theMode)
+                    theIsElemNames)
     {
       mySystem = theSystem;
 
-      myCoord.reset(new TNodeCoord(theNbElem * theMeshInfo->myDim));
+      myCoord.reset(new TNodeCoord(theNbElem * theMeshInfo->mySpaceDim));
 
-      myCoordUnits.resize(theMeshInfo->myDim*GetPNOMLength<eVersion>()+1);
+      myCoordUnits.resize(theMeshInfo->mySpaceDim*GetPNOMLength<eVersion>()+1);
 
-      myCoordNames.resize(theMeshInfo->myDim*GetPNOMLength<eVersion>()+1);
+      myCoordNames.resize(theMeshInfo->mySpaceDim*GetPNOMLength<eVersion>()+1);
     }
 
     
@@ -476,27 +481,27 @@ namespace MED
                const TIntVector& theFamilyNums,
                const TIntVector& theElemNums,
                const TStringVector& theElemNames):
+      TModeSwitchInfo(theMode),
       TElemInfoBase(theMeshInfo,
                     (TInt)theNodeCoords.size()/theMeshInfo->GetDim(),
                     theFamilyNums,
                     theElemNums,
-                    theElemNames),
-      TModeSwitchInfo(theMode)
+                    theElemNames)
     {
       mySystem = theSystem;
 
       myCoord.reset(new TNodeCoord(theNodeCoords));
       
-      TInt aDim = theMeshInfo->GetDim();
+      TInt aSpaceDim = theMeshInfo->GetSpaceDim();
 
-      myCoordNames.resize(aDim*GetPNOMLength<eVersion>()+1);
+      myCoordNames.resize(aSpaceDim*GetPNOMLength<eVersion>()+1);
       if(!theCoordNames.empty())
-        for(TInt anId = 0; anId < aDim; anId++)
+        for(TInt anId = 0; anId < aSpaceDim; anId++)
           SetCoordName(anId,theCoordNames[anId]);
       
-      myCoordUnits.resize(aDim*GetPNOMLength<eVersion>() + 1);
+      myCoordUnits.resize(aSpaceDim*GetPNOMLength<eVersion>() + 1);
       if(!theCoordUnits.empty())
-        for(TInt anId = 0; anId < aDim; anId++)
+        for(TInt anId = 0; anId < aSpaceDim; anId++)
           SetCoordUnit(anId, theCoordUnits[anId]);
     }
 
@@ -703,11 +708,11 @@ namespace MED
                EBooleen theIsElemNum,
                EBooleen theIsElemNames,
                EModeSwitch theMode):
+      TModeSwitchInfo(theMode),
       TElemInfoBase(theMeshInfo,
                     theNbElem,
                     theIsElemNum,
-                    theIsElemNames),
-      TModeSwitchInfo(theMode)
+                    theIsElemNames)
     {
       myEntity = theEntity;
       myGeom = theGeom;
@@ -726,12 +731,12 @@ namespace MED
                const TIntVector& theElemNums,
                const TStringVector& theElemNames,
                EModeSwitch theMode):
+      TModeSwitchInfo(theMode),
       TElemInfoBase(theMeshInfo,
                     (TInt)theConnectivities.size() / GetNbNodes(theGeom),
                     theFamilyNums,
                     theElemNums,
-                    theElemNames),
-      TModeSwitchInfo(theMode)
+                    theElemNames)
     {
       myEntity = theEntity;
       myGeom = theGeom;
@@ -848,8 +853,8 @@ namespace MED
 
     TTGaussInfo(const TGaussInfo::TInfo& theInfo,
                 EModeSwitch theMode):
-      TNameInfoBase(boost::get<1>(boost::get<0>(theInfo))),
-      TModeSwitchInfo(theMode)
+      TModeSwitchInfo(theMode),
+      TNameInfoBase(boost::get<1>(boost::get<0>(theInfo)))
     {
       const TGaussInfo::TKey& aKey = boost::get<0>(theInfo);
 
@@ -1074,16 +1079,16 @@ namespace MED
                  const TInt nnoeuds)
     {
       myMeshInfo        = theMeshInfo;
-      TInt aDim = theMeshInfo->GetDim();
+      TInt aSpaceDim = theMeshInfo->GetSpaceDim();
       if(type == eGRILLE_STANDARD){
-        myCoord.resize(aDim*nnoeuds);
-        myCoordNames.resize(aDim*GetPNOMLength<eVersion>()+1);
-        myCoordUnits.resize(aDim*GetPNOMLength<eVersion>()+1);
+        myCoord.resize(aSpaceDim*nnoeuds);
+        myCoordNames.resize(aSpaceDim*GetPNOMLength<eVersion>()+1);
+        myCoordUnits.resize(aSpaceDim*GetPNOMLength<eVersion>()+1);
       } else { //if(type == eGRILLE_CARTESIENNE){
-        myCoordNames.resize(aDim*GetPNOMLength<eVersion>()+aDim);
-        myCoordUnits.resize(aDim*GetPNOMLength<eVersion>()+aDim);
+        myCoordNames.resize(aSpaceDim*GetPNOMLength<eVersion>()+aSpaceDim);
+        myCoordUnits.resize(aSpaceDim*GetPNOMLength<eVersion>()+aSpaceDim);
       }
-      myGrilleStructure.resize(aDim);
+      myGrilleStructure.resize(aSpaceDim);
       myFamNumNode.resize(nnoeuds);
     }
 
@@ -1091,15 +1096,15 @@ namespace MED
                  const EGrilleType& type)
     {
       myMeshInfo        = theMeshInfo;
-      TInt aDim = theMeshInfo->GetDim();
+      TInt aSpaceDim = theMeshInfo->GetSpaceDim();
       if(type == eGRILLE_STANDARD){
-        myCoordNames.resize(aDim*GetPNOMLength<eVersion>()+1);
-        myCoordUnits.resize(aDim*GetPNOMLength<eVersion>()+1);
+        myCoordNames.resize(aSpaceDim*GetPNOMLength<eVersion>()+1);
+        myCoordUnits.resize(aSpaceDim*GetPNOMLength<eVersion>()+1);
       } else {// if(type == eGRILLE_CARTESIENNE){
-        myCoordNames.resize(aDim*GetPNOMLength<eVersion>()+aDim);
-        myCoordUnits.resize(aDim*GetPNOMLength<eVersion>()+aDim);
+        myCoordNames.resize(aSpaceDim*GetPNOMLength<eVersion>()+aSpaceDim);
+        myCoordUnits.resize(aSpaceDim*GetPNOMLength<eVersion>()+aSpaceDim);
       }
-      myGrilleStructure.resize(aDim);
+      myGrilleStructure.resize(aSpaceDim);
     }
 
     TTGrilleInfo(const PMeshInfo& theMeshInfo,
@@ -1108,20 +1113,20 @@ namespace MED
     {
       myMeshInfo        = theMeshInfo;
 
-      TInt aDim = theMeshInfo->GetDim();
+      TInt aSpaceDim = theMeshInfo->GetSpaceDim();
       if(type == eGRILLE_STANDARD){
-        myCoordNames.resize(aDim*GetPNOMLength<eVersion>()+1);
-        myCoordUnits.resize(aDim*GetPNOMLength<eVersion>()+1);
+        myCoordNames.resize(aSpaceDim*GetPNOMLength<eVersion>()+1);
+        myCoordUnits.resize(aSpaceDim*GetPNOMLength<eVersion>()+1);
       } else {// if(type == eGRILLE_CARTESIENNE){
-        myCoordNames.resize(aDim*GetPNOMLength<eVersion>()+aDim);
-        myCoordUnits.resize(aDim*GetPNOMLength<eVersion>()+aDim);
+        myCoordNames.resize(aSpaceDim*GetPNOMLength<eVersion>()+aSpaceDim);
+        myCoordUnits.resize(aSpaceDim*GetPNOMLength<eVersion>()+aSpaceDim);
       }
 
       if(type != eGRILLE_STANDARD)
         for(unsigned int aAxe=0;aAxe<nbNodeVec.size();aAxe++){
           myIndixes[aAxe].resize(nbNodeVec[aAxe]);
         }
-      myGrilleStructure.resize(aDim);
+      myGrilleStructure.resize(aSpaceDim);
     }
 
     virtual

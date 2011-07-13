@@ -1,20 +1,20 @@
-#  Copyright (C) 2007-2010  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
 #  MED MedClient : tool to transfer MED CORBA from server producer of MED object to a client using those MED object
@@ -25,6 +25,7 @@ salomeinclude_HEADERS = \
 	MEDClient.hxx \
 	COORDINATEClient.hxx \
 	CONNECTIVITYClient.hxx \
+	GMESHClient.hxx \
 	MESHClient.hxx \
 	SUPPORTClient.hxx \
 	FAMILYClient.hxx \
@@ -57,6 +58,7 @@ lib_LTLIBRARIES = libMEDClientcmodule.la _libMEDClient.la
 dist_libMEDClientcmodule_la_SOURCES = \
 	COORDINATEClient.cxx \
 	CONNECTIVITYClient.cxx \
+	GMESHClient.cxx \
 	MESHClient.cxx \
 	SUPPORTClient.cxx \
 	FAMILYClient.cxx \
@@ -68,10 +70,17 @@ nodist__libMEDClient_la_SOURCES = libMEDClient_wrap.cxx
 libMEDClientcmodule_la_CPPFLAGS = $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) \
 	$(MED2_INCLUDES) $(HDF5_INCLUDES) $(PYTHON_INCLUDES) ${KERNEL_CXXFLAGS} \
 	-I$(srcdir)/../../MEDMEM_I -I$(srcdir)/../../MEDMEM -I$(top_builddir)/idl \
-	-I$(srcdir)/../../MEDWrapper/V2_1/Core -I$(srcdir)/../../MEDMEM_SWIG -I$(srcdir)/../../MED -I$(srcdir)/../../INTERP_KERNEL -I$(srcdir)/../../MED -I$(srcdir)/../../INTERP_KERNEL/Bases \
+	-I$(srcdir)/../../MEDMEM_SWIG \
+	-I$(srcdir)/../../MED \
+	-I$(srcdir)/../../INTERP_KERNEL \
+	-I$(srcdir)/../../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../../INTERP_KERNEL/GaussPoints
-libMEDClientcmodule_la_LDFLAGS  = ${KERNEL_LDFLAGS} -lOpUtil -lSalomeCommunication ../../MEDMEM/libmedmem.la \
-                                  ../../MEDMEM_I/libMEDMEMImpl.la ../../INTERP_KERNEL/libinterpkernel.la ../../MED/libMEDEngine.la
+
+libMEDClientcmodule_la_LDFLAGS  = ${KERNEL_LDFLAGS} -lOpUtil -lSalomeCommunication \
+	../../MEDMEM/libmedmem.la \
+	../../MEDMEM_I/libMEDMEMImpl.la \
+	../../INTERP_KERNEL/libinterpkernel.la \
+	../../MED/libMEDEngine.la
 
 _libMEDClient_la_CPPFLAGS = $(libMEDClientcmodule_la_CPPFLAGS)
 _libMEDClient_la_LDFLAGS  = $(PYTHON_LIBS) -module $(libMEDClientcmodule_la_LDFLAGS)

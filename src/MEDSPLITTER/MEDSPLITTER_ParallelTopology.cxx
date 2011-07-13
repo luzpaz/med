@@ -1,29 +1,26 @@
-//  Copyright (C) 2007-2010  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include <set>
 #include <map>
 #include <vector>
-#ifndef WNT
-# include <ext/hash_map>
-#else
-# include <hash_map>
-#endif
+
+#include "InterpKernelHashMap.hxx"
 
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_ConnectZone.hxx"
@@ -39,11 +36,7 @@
 #include "MEDSPLITTER_Graph.hxx"
 #include "MEDSPLITTER_ParallelTopology.hxx"
 
-#ifndef WNT
-using namespace __gnu_cxx;
-#else
-using namespace std;
-#endif
+using namespace INTERP_KERNEL;
 
 using namespace MEDSPLITTER;
 
@@ -85,8 +78,8 @@ ParallelTopology::ParallelTopology(const vector<MEDMEM::MESH*>& meshes,
     constituent_entity = (m_mesh_dimension == 3 ? MED_EN::MED_FACE : MED_EN::MED_EDGE );
 
     //creating cell maps
-    m_nb_cells[idomain]=meshes[idomain]->getNumberOfElementsWithPoly(MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
-    //    cout << "Nb cells (domain "<<idomain<<") = "<<m_nb_cells[idomain];
+    m_nb_cells[idomain]=meshes[idomain]->getNumberOfElements(MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS);
+    //              cout << "Nb cells (domain "<<idomain<<") = "<<m_nb_cells[idomain];
     m_loc_to_glob[idomain].resize(m_nb_cells[idomain]);
 
     if (cellglobal[idomain]==0 || parallel_mode)
@@ -132,8 +125,8 @@ ParallelTopology::ParallelTopology(const vector<MEDMEM::MESH*>& meshes,
       m_nb_total_nodes=meshes[idomain]->getNumberOfNodes();   
       m_nb_nodes[0]=m_nb_total_nodes; 
 
-      //      meshes[idomain]->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS); 
-      int nbfaces=meshes[idomain]->getNumberOfElementsWithPoly(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
+      //                      meshes[idomain]->getConnectivity( MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS); 
+      int nbfaces=meshes[idomain]->getNumberOfElements(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
       m_face_loc_to_glob[idomain].resize(nbfaces);
       for (int i=0; i<nbfaces; i++)
       {
@@ -151,9 +144,9 @@ ParallelTopology::ParallelTopology(const vector<MEDMEM::MESH*>& meshes,
 
     //creating node maps
     m_nb_nodes[idomain]=meshes[idomain]->getNumberOfNodes();
-    hash_map <int,pair<int,int> > local2distant;
+    INTERP_KERNEL::HashMap <int,pair<int,int> > local2distant;
     m_node_loc_to_glob[idomain].resize(m_nb_nodes[idomain]);
-    for (int icz=0; icz<cz.size(); icz++)
+    for (unsigned icz=0; icz<cz.size(); icz++)
     {
       if (cz[icz]->getLocalDomainNumber() == idomain && 
           cz[icz]->getLocalDomainNumber()>cz[icz]->getDistantDomainNumber())
@@ -209,12 +202,12 @@ ParallelTopology::ParallelTopology(const vector<MEDMEM::MESH*>& meshes,
 
     //creating  dimension d-1 component mappings
 
-    //    meshes[idomain]->getConnectivity(MED_EN::MED_FULL_INTERLACE, MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS); 
-    m_nb_faces[idomain]=meshes[idomain]->getNumberOfElementsWithPoly(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
+    //              meshes[idomain]->getConnectivity( MED_EN::MED_DESCENDING, MED_EN::MED_CELL, MED_EN::MED_ALL_ELEMENTS); 
+    m_nb_faces[idomain]=meshes[idomain]->getNumberOfElements(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
     MESSAGE_MED ("Nb faces domain " << idomain<<m_nb_faces[idomain]);
     m_face_loc_to_glob[idomain].resize(m_nb_faces[idomain]);
     local2distant.clear();
-    for (int icz=0; icz<cz.size(); icz++)
+    for (unsigned icz=0; icz<cz.size(); icz++)
     {
       if (cz[icz]->getLocalDomainNumber() == idomain && 
           cz[icz]->getLocalDomainNumber()>cz[icz]->getDistantDomainNumber())
@@ -253,20 +246,19 @@ ParallelTopology::ParallelTopology(const vector<MEDMEM::MESH*>& meshes,
           m_face_loc_to_glob[idomain][iface]=global_number;
         } 
       }
-    }     
+    }
     //using former face numbering
     else
     {
       for (int iface=0; iface<m_nb_faces[idomain]; iface++)
       {
         int global_number=faceglobal[idomain][iface];
-        //cout << "dom: "<< idomain << " read glob face " << global_number << endl;
         //SCRUTE_MED(global_number);
         m_face_glob_to_loc.insert(make_pair(global_number,make_pair(idomain,iface+1)));
         //m_face_loc_to_glob[make_pair(idomain,iface+1)]=global_number;
         m_face_loc_to_glob[idomain][iface]=global_number;
       }
-    }     
+    }
   }
 
   m_nb_total_cells=index_global;
@@ -282,8 +274,8 @@ ParallelTopology::ParallelTopology(const vector<MEDMEM::MESH*>& meshes,
 //!constructing ParallelTopology from an old topology and a graph
 ParallelTopology::ParallelTopology(boost::shared_ptr<Graph> graph, int nb_domain, int mesh_dimension):
   m_nb_domain(nb_domain),
-  m_nb_cells(graph->nbVertices()),
   m_mesh_dimension(mesh_dimension),
+  m_nb_cells(graph->nbVertices()),
   m_graph(graph)
 {
   m_nb_cells.resize(m_nb_domain);
@@ -327,7 +319,7 @@ ParallelTopology::~ParallelTopology()
 
 /*!Converts a list of global node numbers
  * to a distributed array with local cell numbers.
- * 
+ *
  * If a node in the list is represented on several domains,
  * only the first value is returned
  * */
@@ -345,10 +337,10 @@ void ParallelTopology::convertGlobalNodeList(const int* node_list, int nbnode, i
 
 /*!Converts a list of global node numbers on domain ip
  * to a distributed array with local cell numbers.
- * 
+ *
  * If a node in the list is represented on several domains,
  * only the value with domain ip is returned
- * 
+ *
  * */
 void ParallelTopology::convertGlobalNodeList(const int* node_list, int nbnode, int* local, int ip)
 {
@@ -357,7 +349,7 @@ void ParallelTopology::convertGlobalNodeList(const int* node_list, int nbnode, i
 
   for (int i=0; i< nbnode; i++)
   {
-    typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+    typedef INTERP_KERNEL::HashMultiMap<int,pair<int,int> >::iterator mmiter;
     pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(node_list[i]);
     for (mmiter it=range.first; it !=range.second; it++)
     { 
@@ -370,7 +362,7 @@ void ParallelTopology::convertGlobalNodeList(const int* node_list, int nbnode, i
 
 /*!Converts a list of global node numbers
  * to a distributed array with local cell numbers.
- * 
+ *
  * If a node in the list is represented on several domains,
  * all the values are put in the array
  * */
@@ -393,7 +385,7 @@ void ParallelTopology::convertGlobalNodeListWithTwins(const int* node_list, int 
   full_array=new int[size];
   for (int i=0; i< nbnode; i++)
   {
-    typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+    typedef INTERP_KERNEL::HashMultiMap<int,pair<int,int> >::iterator mmiter;
     pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(node_list[i]);
     for (mmiter it=range.first; it !=range.second; it++)
     { 
@@ -408,7 +400,7 @@ void ParallelTopology::convertGlobalNodeListWithTwins(const int* node_list, int 
 
 /*!Converts a list of global face numbers
  * to a distributed array with local face numbers.
- * 
+ *
  * If a face in the list is represented on several domains,
  * all the values are put in the array
  * */
@@ -427,7 +419,7 @@ void ParallelTopology::convertGlobalFaceListWithTwins(const int* face_list, int 
   full_array=new int[size];
   for (int i=0; i< nbface; i++)
   {
-    typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+    typedef INTERP_KERNEL::HashMultiMap<int,pair<int,int> >::iterator mmiter;
     pair<mmiter,mmiter> range=m_face_glob_to_loc.equal_range(face_list[i]);
     for (mmiter it=range.first; it !=range.second; it++)
     { 
@@ -446,7 +438,7 @@ void ParallelTopology::convertGlobalCellList(const int* cell_list, int nbcell, i
 {
   for (int i=0; i< nbcell; i++)
   {
-    hash_map<int, pair<int,int> >::const_iterator iter = m_glob_to_loc.find(cell_list[i]);
+    INTERP_KERNEL::HashMap<int, pair<int,int> >::const_iterator iter = m_glob_to_loc.find(cell_list[i]);
     ip[i]=(iter->second).first;
     local[i]=(iter->second).second;
   }
@@ -459,7 +451,7 @@ void ParallelTopology::convertGlobalFaceList(const int* face_list, int nbface, i
 {
   for (int i=0; i< nbface; i++)
   {
-    hash_map<int, pair<int,int> >::const_iterator iter = m_face_glob_to_loc.find(face_list[i]);
+    INTERP_KERNEL::HashMap<int, pair<int,int> >::const_iterator iter = m_face_glob_to_loc.find(face_list[i]);
     if (iter == m_face_glob_to_loc.end())
     {
       throw MED_EXCEPTION("convertGlobalFaceList - Face  not found");
@@ -472,16 +464,16 @@ void ParallelTopology::convertGlobalFaceList(const int* face_list, int nbface, i
 
 /*!Converts a list of global node numbers on domain ip
  * to a distributed array with local cell numbers.
- * 
+ *
  * If a node in the list is represented on several domains,
  * only the value with domain ip is returned
- * 
+ *
  * */
 void ParallelTopology::convertGlobalFaceList(const int* face_list, int nbface, int* local, int ip)
 {
   for (int i=0; i< nbface; i++)
   {
-    typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+    typedef INTERP_KERNEL::HashMultiMap<int,pair<int,int> >::iterator mmiter;
     pair<mmiter,mmiter> range=m_face_glob_to_loc.equal_range(face_list[i]);
     for (mmiter it=range.first; it !=range.second; it++)
     { 
@@ -539,47 +531,30 @@ void ParallelTopology::createNodeMapping(map<MED_EN::medGeometryElement,int*>& t
     }
     else if (type== MED_EN::MED_POLYGON)
     {
-      for (int icell=0; icell<polygon_conn_index.size()-1; icell++)
+      for ( unsigned i = 0; i < polygon_conn.size(); ++i )
       {
-        for (int inode=polygon_conn_index[icell]; inode<polygon_conn_index[icell+1]; inode++)
+        int global=polygon_conn[i];
+        if(local_numbers.find(global)==local_numbers.end())
         {
-          int global=polygon_conn[inode-1];
-          if(local_numbers.find(global)==local_numbers.end())
-          {
-            local_index++;
-            local_numbers.insert(global);
-            //m_node_loc_to_glob.insert(make_pair(make_pair(idomain,local_index),global));
-            m_node_loc_to_glob[idomain].push_back(global);
-            m_node_glob_to_loc.insert(make_pair(global,make_pair(idomain,local_index)));
-            //          cout << "node : global ="<<global<<" local =("<<idomain<<","<<local_index<<")"<<endl;         
-          }
+          local_index++;
+          local_numbers.insert(global);
+          m_node_loc_to_glob[idomain].push_back(global);
+          m_node_glob_to_loc.insert(make_pair(global,make_pair(idomain,local_index)));
         }
-
       }
     }
     else if (type==MED_EN::MED_POLYHEDRA)
     {
-      for (int icell=0; icell<polyhedron_conn_index.size()-1; icell++)
+      for ( unsigned i = 0; i < polyhedron_conn.size(); ++i )
       {
-        for (int iface = polyhedron_conn_index[icell];
-             iface < polyhedron_conn_index[icell+1];
-             iface++)
-          for (int inode=polyhedron_face_index[iface-1];
-               inode<polyhedron_face_index[iface]; inode++)
-          {
-            int global=polyhedron_conn[inode-1];
-            if(local_numbers.find(global)==local_numbers.end())
-            {
-              local_index++;
-              local_numbers.insert(global);
-              //m_node_loc_to_glob.insert(make_pair(make_pair(idomain,local_index),global));
-              m_node_loc_to_glob[idomain].push_back(global);
-              m_node_glob_to_loc.insert(make_pair(global,make_pair(idomain,local_index)));
-              //          cout << "node : global ="<<global<<" local =("<<idomain<<","<<local_index<<")"<<endl;         
-            }
-          }
-
-
+        int global=polyhedron_conn[i];
+        if(local_numbers.find(global)==local_numbers.end())
+        {
+          local_index++;
+          local_numbers.insert(global);
+          m_node_loc_to_glob[idomain].push_back(global);
+          m_node_glob_to_loc.insert(make_pair(global,make_pair(idomain,local_index)));
+        }
       }
     }
 
@@ -608,30 +583,17 @@ bool ParallelTopology::hasCellWithNodes( const MESHCollection& new_collection,
 
   // loop on all types of cells
   const MEDMEM::MESH* mesh = new_collection.getMesh( domain );
-  int nbTypes = mesh->getNumberOfTypesWithPoly( entity );
-  MED_EN::medGeometryElement * types = mesh->getTypesWithPoly( entity );
+  int nbTypes = mesh->getNumberOfTypes( entity );
+  const MED_EN::medGeometryElement * types = mesh->getTypes( entity );
   for ( int t = 0; t < nbTypes; ++t )
   {
     // get connectivity
-    if ( !mesh->existConnectivityWithPoly( connType, entity ))
+    if ( !mesh->existConnectivity( connType, entity ))
       continue;
-    int nbCell = mesh->getNumberOfElementsWithPoly( entity, types[t] );
+    int nbCell = mesh->getNumberOfElements( entity, types[t] );
     const int *conn, *index;
-    switch ( types[t] )
-    {
-    case MED_EN::MED_POLYGON:
-      conn  = mesh->getPolygonsConnectivity( connType, entity );
-      index = mesh->getPolygonsConnectivityIndex( connType, entity );
-      break;
-    case MED_EN::MED_POLYHEDRA:
-      conn  = mesh->getPolyhedronConnectivity( connType );
-      index = mesh->getPolyhedronFacesIndex();
-      nbCell = mesh->getNumberOfPolyhedronFaces();
-      break;
-    default:
-      conn  = mesh->getConnectivity(MED_EN::MED_FULL_INTERLACE,connType, entity, types[t]);
-      index = mesh->getConnectivityIndex(connType, entity);
-    }
+    conn  = mesh->getConnectivity(connType, entity, types[t]);
+    index = mesh->getConnectivityIndex(connType, entity);
     // find a cell containing the first of given nodes,
     // then check if the found cell contains all the given nodes
     const int firstNode = *nodes.begin();
@@ -640,7 +602,7 @@ bool ParallelTopology::hasCellWithNodes( const MESHCollection& new_collection,
       for ( int j = index[i]-1; j < index[i+1]-1; ++j )
         if ( conn[j] == firstNode )
         {
-          int nbSame = 0;
+          unsigned nbSame = 0;
           for ( j = index[i]-1; j < index[i+1]-1; ++j )
             nbSame += nodes.count( conn[j] );
           if ( nbSame == nodes.size() )
@@ -649,7 +611,6 @@ bool ParallelTopology::hasCellWithNodes( const MESHCollection& new_collection,
         }
     }
   }
-  delete [] types;
   return false;
 }
 
@@ -685,33 +646,15 @@ void ParallelTopology::createFaceMapping(const MESHCollection& initial_collectio
   for (int iold=0; iold<nb_domain_old;iold++)
   {
     if ( !initial_collection.getMesh(iold) ) continue;
-    int nbplainface = initial_collection.getMesh(iold)->getNumberOfElements(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
-    int nbtotalface = initial_collection.getMesh(iold)->getNumberOfElementsWithPoly(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
-    SCRUTE_MED(nbplainface);
-    SCRUTE_MED(nbtotalface);  
-    const int* face_conn;
-    const int* face_offset;
-    const int* poly_conn;
-    const int* poly_index;
+    int nbtotalface = initial_collection.getMesh(iold)->getNumberOfElements(constituent_entity,MED_EN::MED_ALL_ELEMENTS);
+    SCRUTE_MED(nbtotalface);
+    const int* face_conn = 0;
+    const int* face_offset = 0;
     if (nbtotalface >0)
     {
-      if (nbplainface >0)
-      {
-        face_conn = initial_collection.getMesh(iold)->getConnectivity(MED_EN::MED_FULL_INTERLACE,
-                                                                      MED_EN::MED_NODAL,constituent_entity,MED_EN::MED_ALL_ELEMENTS);
-        face_offset = initial_collection.getMesh(iold)->getConnectivityIndex(MED_EN::MED_NODAL,constituent_entity);
-      }
-      if (nbtotalface > nbplainface)
-      {
-        poly_conn = initial_collection.getMesh(iold)->getPolygonsConnectivity(MED_EN::MED_NODAL,constituent_entity);
-        poly_index = initial_collection.getMesh(iold)->getPolygonsConnectivityIndex(MED_EN::MED_NODAL,constituent_entity);
-      }
-
-    }
-    else 
-    {
-      face_conn=0;
-      face_offset=0;
+      face_conn = initial_collection.getMesh(iold)->getConnectivity(
+                                                                    MED_EN::MED_NODAL,constituent_entity,MED_EN::MED_ALL_ELEMENTS);
+      face_offset = initial_collection.getMesh(iold)->getConnectivityIndex(MED_EN::MED_NODAL,constituent_entity);
     }
     for (int iface=0;iface<nbtotalface; iface++)
     {
@@ -721,7 +664,6 @@ void ParallelTopology::createFaceMapping(const MESHCollection& initial_collectio
       for (int i=0; i<m_nb_domain; i++) domain_counts[i]=0;
       set <int> nodes;
       int nbnodes;
-      if (iface<nbplainface)
       {
         nbnodes=face_offset[iface+1]-face_offset[iface];
         for (int inode= face_offset[iface];inode < face_offset[iface+1]; inode++)
@@ -731,7 +673,7 @@ void ParallelTopology::createFaceMapping(const MESHCollection& initial_collectio
           int global = old_topology->convertNodeToGlobal(iold,node);
           //        cout << "global node "<<global<<"ip "<<iold<< "noeud"<<node<<endl;
           nodes.insert(global);
-          typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+          typedef INTERP_KERNEL::HashMultiMap<int,pair<int,int> >::iterator mmiter;
           pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(global);
 
           int ip;
@@ -742,28 +684,7 @@ void ParallelTopology::createFaceMapping(const MESHCollection& initial_collectio
           }
         }
       }
-      else 
-      {
-        nbnodes =poly_index[iface-nbplainface+1]- poly_index[iface-nbplainface];
-        for (int inode= poly_index[iface-nbplainface];inode < poly_index[iface-nbplainface+1]; inode++)
-        {
-          int node=poly_conn[inode-1];
-          //   SCRUTE_MED(node);
-          int global = old_topology->convertNodeToGlobal(iold,node);
-          //        cout << "global node "<<global<<"ip "<<iold<< "noeud"<<node<<endl;
-          // SCRUTE_MED(global);
-          nodes.insert(global);
-          typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
-          pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(global);
 
-          int ip;
-          for (mmiter it=range.first; it !=range.second; it++)
-          { 
-            ip=(it->second).first;
-            domain_counts[ip]++;
-          }
-        }
-      }
       set<int>::const_iterator iter_node = nodes.begin();
       int numbers[3];
       numbers[2]=0; // for segments
@@ -843,8 +764,7 @@ void ParallelTopology::createFaceMapping2ndversion(const MESHCollection& initial
     int nbcell=old_topology->getCellNumber(iold);
 
     const int* face_conn = initial_collection.getMesh(iold)->
-      getConnectivity(MED_EN::MED_FULL_INTERLACE,
-                      MED_EN::MED_DESCENDING,MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
+      getConnectivity(MED_EN::MED_DESCENDING,MED_EN::MED_CELL,MED_EN::MED_ALL_ELEMENTS);
     const int* face_offset = initial_collection.getMesh(iold)->
       getConnectivityIndex(MED_EN::MED_DESCENDING,MED_EN::MED_CELL);
     MESSAGE_MED("end of connectivity calculation");
@@ -915,7 +835,7 @@ void ParallelTopology::convertToLocal(map<MED_EN::medGeometryElement,int*>& type
     {
       //      cout <<" inode :"<<inode<< " global = "<<type_connectivity[type][inode];
       int global = type_connectivity[type][inode];
-      typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+      typedef INTERP_KERNEL::HashMultiMap<int,pair<int,int> >::iterator mmiter;
       pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(global);
       for (mmiter it=range.first; it !=range.second; it++)
       {
@@ -937,7 +857,7 @@ void ParallelTopology::convertToLocal2ndVersion(int* nodes, int nbnodes, int ido
   {
     //      cout <<" inode :"<<inode<< " global = "<<type_connectivity[type][inode];
     int global = nodes[inode];
-    typedef hash_multimap<int,pair<int,int> >::iterator mmiter;
+    typedef INTERP_KERNEL::HashMultiMap<int,pair<int,int> >::iterator mmiter;
     pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(global);
     for (mmiter it=range.first; it !=range.second; it++)
     {
@@ -962,7 +882,7 @@ void ParallelTopology::computeNodeNodeCorrespondencies(int idomain, vector<MEDME
   {
     //int global = (m_node_loc_to_glob.find(make_pair(idomain,inode+1)))->second;
     int global = m_node_loc_to_glob[idomain][inode];
-    typedef hash_multimap<int,pair<int,int> >::const_iterator mm;
+    typedef INTERP_KERNEL::HashMultiMap<int,pair<int,int> >::const_iterator mm;
     pair<mm,mm> range = m_node_glob_to_loc.equal_range(global);
     for (mm it=range.first; it !=range.second; it++)
     {
@@ -986,7 +906,7 @@ void ParallelTopology::computeNodeNodeCorrespondencies(int idomain, vector<MEDME
   {
     //int global = (m_node_loc_to_glob.find(make_pair(idomain,inode+1)))->second;
     int global = m_node_loc_to_glob[idomain][inode];
-    typedef hash_multimap<int,pair<int,int> >::const_iterator mm;
+    typedef INTERP_KERNEL::HashMultiMap<int,pair<int,int> >::const_iterator mm;
     pair<mm,mm> range = m_node_glob_to_loc.equal_range(global);
     for (mm it=range.first; it !=range.second; it++)
     {
@@ -1034,7 +954,7 @@ void ParallelTopology::computeCellCellCorrespondencies(int idomain, vector<MEDME
     values[i]=0;
   }
 
-  vector <hash_multimap<int,int> > cell_corresp;
+  vector <INTERP_KERNEL::HashMultiMap<int,int> > cell_corresp;
   //TODO : remplacer int* par une map <int,int>
   //  vector<int*  > number_of_connections(m_nb_domain);
   //  vector<map<int,int> > number_of_connections;
@@ -1103,14 +1023,14 @@ void ParallelTopology::computeCellCellCorrespondencies(int idomain, vector<MEDME
 
     int value_i=0;
 
-    //      hash_multimap<int,int>::iterator iter=cell_corresp[inew].begin();
+    //                      INTERP_KERNEL::HashMultiMap<int,int>::iterator iter=cell_corresp[inew].begin();
 
     for (int i=0; i<m_nb_cells[idomain]; i++)
     {
       //          for (int j=new_index[i];j<new_index[i+1];j++,value_i++,iter++)
       //            new_value[value_i]=iter->second;
 
-      typedef hash_multimap<int,int>::iterator mmiter;
+      typedef INTERP_KERNEL::HashMultiMap<int,int>::iterator mmiter;
       pair<mmiter,mmiter> range=cell_corresp[inew].equal_range(i+1);
       for (mmiter it=range.first; it!=range.second; it++)
       {
@@ -1165,7 +1085,7 @@ void ParallelTopology::recreateFaceMapping(const TGeom2FacesByDomian& face_map)
     TGeom2Faces::const_iterator iter = face_map[idomain].begin();
     for (; iter != face_map[idomain].end(); iter++)
     {
-      for (int i=0; i< (iter->second).size(); i++)
+      for (unsigned i=0; i< (iter->second).size(); i++)
       {
         MEDSPLITTER_FaceModel* face = (iter->second)[i];
         //cout << "global :"<<face->getGlobal()<<" - "<<ilocal<<endl;
@@ -1203,8 +1123,8 @@ void ParallelTopology::recreateMappingAfterFusion(const vector<MEDMEM::MESH*>& m
 
     //creating cell maps
 
-    m_nb_cells[idomain]=meshes[idomain]->getNumberOfElementsWithPoly(MED_EN::MED_CELL,
-                                                                     MED_EN::MED_ALL_ELEMENTS);
+    m_nb_cells[idomain]=meshes[idomain]->getNumberOfElements(MED_EN::MED_CELL,
+                                                             MED_EN::MED_ALL_ELEMENTS);
     if ( m_cell_loc_to_glob_fuse[idomain].size() != m_nb_cells[idomain] )
       throw MED_EXCEPTION(MEDMEM::STRING(LOC)<<" invalid nb of fused cells");
 
@@ -1235,8 +1155,8 @@ void ParallelTopology::recreateMappingAfterFusion(const vector<MEDMEM::MESH*>& m
 
     MED_EN::medEntityMesh constituent_entity =
       (m_mesh_dimension == 3 ? MED_EN::MED_FACE : MED_EN::MED_EDGE );
-    m_nb_faces[idomain] = meshes[idomain]->getNumberOfElementsWithPoly(constituent_entity,
-                                                                       MED_EN::MED_ALL_ELEMENTS);
+    m_nb_faces[idomain] = meshes[idomain]->getNumberOfElements(constituent_entity,
+                                                               MED_EN::MED_ALL_ELEMENTS);
     if ( m_face_loc_to_glob_fuse[idomain].size() != m_nb_faces[idomain] )
       throw MED_EXCEPTION(MEDMEM::STRING(LOC)<<" invalid nb of fused faces of domain "<< idomain
                           << ": expect " << m_nb_faces[idomain]
