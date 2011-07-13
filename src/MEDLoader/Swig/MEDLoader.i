@@ -63,11 +63,11 @@ using namespace ParaMEDMEM;
 %newobject ParaMEDMEM::MEDFileUMesh::getNodeGroupsArr;
 %newobject ParaMEDMEM::MEDFileUMesh::getNodeFamilyArr;
 %newobject ParaMEDMEM::MEDFileUMesh::getNodeFamiliesArr;
-%newobject ParaMEDMEM::MEDFileUMesh::getMeshAtRank;
-%newobject ParaMEDMEM::MEDFileUMesh::getRank0Mesh;
-%newobject ParaMEDMEM::MEDFileUMesh::getRankM1Mesh;
-%newobject ParaMEDMEM::MEDFileUMesh::getRankM2Mesh;
-%newobject ParaMEDMEM::MEDFileUMesh::getRankM3Mesh;
+%newobject ParaMEDMEM::MEDFileUMesh::getMeshAtLevel;
+%newobject ParaMEDMEM::MEDFileUMesh::getLevel0Mesh;
+%newobject ParaMEDMEM::MEDFileUMesh::getLevelM1Mesh;
+%newobject ParaMEDMEM::MEDFileUMesh::getLevelM2Mesh;
+%newobject ParaMEDMEM::MEDFileUMesh::getLevelM3Mesh;
 
 class MEDLoader
 {
@@ -158,19 +158,18 @@ public:
        }
        static void WriteUMeshesPartition(const char *fileName, const char *meshName, PyObject *li, bool writeFromScratch) throw(INTERP_KERNEL::Exception)
        {
-         std::vector<ParaMEDMEM::MEDCouplingUMesh *> v=convertFieldDoubleVecFromPy(li);
+         std::vector<const ParaMEDMEM::MEDCouplingUMesh *> v=convertUMeshVecFromPy(li);
          MEDLoader::WriteUMeshesPartition(fileName,meshName,v,writeFromScratch);
        }
        static void WriteUMeshesPartitionDep(const char *fileName, const char *meshName, PyObject *li, bool writeFromScratch) throw(INTERP_KERNEL::Exception)
        {
-         std::vector<ParaMEDMEM::MEDCouplingUMesh *> v=convertFieldDoubleVecFromPy(li);
+         std::vector<const ParaMEDMEM::MEDCouplingUMesh *> v=convertUMeshVecFromPy(li);
          MEDLoader::WriteUMeshesPartitionDep(fileName,meshName,v,writeFromScratch);
        }
        static void WriteUMeshes(const char *fileName, PyObject *li, bool writeFromScratch) throw(INTERP_KERNEL::Exception)
        {
-         std::vector<ParaMEDMEM::MEDCouplingUMesh *> v=convertFieldDoubleVecFromPy(li);
-         std::vector<const ParaMEDMEM::MEDCouplingUMesh *> v2(v.begin(),v.end());
-         MEDLoader::WriteUMeshes(fileName,v2,writeFromScratch);
+         std::vector<const ParaMEDMEM::MEDCouplingUMesh *> v=convertUMeshVecFromPy(li);
+         MEDLoader::WriteUMeshes(fileName,v,writeFromScratch);
        }
        static PyObject *GetTypesOfField(const char *fileName, const char *fieldName, const char *meshName) throw(INTERP_KERNEL::Exception)
        {
@@ -210,3 +209,12 @@ public:
 
 %include "MEDFileMesh.hxx"
 
+%extend ParaMEDMEM::MEDFileUMesh
+{
+  void setGroupsAtLevel(int meshDimRelToMaxExt, PyObject *li, bool renum=true) throw(INTERP_KERNEL::Exception)
+  {
+    std::vector<const DataArrayInt *> grps;
+    convertPyObjToVecDataArrayIntCst(li,grps);
+    self->setGroupsAtLevel(meshDimRelToMaxExt,grps,renum);
+  }
+}

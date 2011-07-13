@@ -49,6 +49,7 @@ AM_CPPFLAGS += $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
 	-I$(srcdir)/../MEDWrapper/V2_1/Core \
 	-I$(srcdir)/../INTERP_KERNEL \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \
+	-I$(srcdir)/../INTERP_KERNEL/GaussPoints \
 	-I$(srcdir)/../INTERPOLATION \
 	-I$(srcdir)/../MEDMEM
 

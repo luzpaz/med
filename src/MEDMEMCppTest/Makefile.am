@@ -73,7 +73,8 @@ dist_libMEDMEMCppTest_la_SOURCES= \
 	MEDMEMTest_MeshFuse.cxx
 
 libMEDMEMCppTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED2_INCLUDES) $(HDF5_INCLUDES) \
-	-I$(srcdir)/../MEDMEM -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases -I$(srcdir)/../MEDWrapper/V2_1/Core
+	-I$(srcdir)/../MEDMEM -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases -I$(srcdir)/../INTERP_KERNEL/GaussPoints \
+	-I$(srcdir)/../MEDWrapper/V2_1/Core
 libMEDMEMCppTest_la_LDFLAGS= $(MED2_LIBS) @CPPUNIT_LIBS@ \
 	../MEDMEM/libmedmem.la
 

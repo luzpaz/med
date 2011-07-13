@@ -65,7 +65,7 @@ public:
   bool isMyDomain(int domainIndex) const;
 
   // Return processor id where the domain with domainIndex resides
-  int getProccessorID(int domainIndex) const;
+  int getProcessorID(int domainIndex) const;
 
 
   //!< Set nb of required domains. (Used to sort joints via jointId())
@@ -126,6 +126,17 @@ const std::vector<ParaMEDMEM::MEDCouplingUMesh*>& domain_meshes);
 
   // Evaluate current memory usage and return the maximal one in KB
   int evaluateMemory() const;
+
+  void sendMesh(const ParaMEDMEM::MEDCouplingUMesh& mesh, int target) const;
+    
+  void recvMesh(ParaMEDMEM::MEDCouplingUMesh*& mesh, int source) const;
+    
+  void sendDoubleVec(const std::vector<double>& vec, int target) const;
+    
+  void recvDoubleVec(std::vector<double>& vec, int source) const;
+    
+  void sendIntVec(const std::vector<int>& vec, int target) const;
+  void recvIntVec(std::vector<int>& vec, int source) const;
 
 private:
 

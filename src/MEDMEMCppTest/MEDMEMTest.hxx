@@ -116,6 +116,7 @@ class MEDMEMCPPTEST_EXPORT MEDMEMTest : public CppUnit::TestFixture
   CPPUNIT_TEST( test_RemapperP1P1 );
   CPPUNIT_TEST( test_RemapperP1P0 );
   CPPUNIT_TEST( test_RemapperP0P1 );
+  CPPUNIT_TEST( testGetGaussPointsCoordinates );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -199,6 +200,7 @@ public:
   void test_remapper6();
   void test_remapper7();
   void test_remapper3DTo1D();
+  void testGetGaussPointsCoordinates();
 
   //private:
   void absField(MEDMEM::FIELD<double>&);

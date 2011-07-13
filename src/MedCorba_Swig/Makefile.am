@@ -53,7 +53,7 @@ libMedCorba_Swig_wrap.cxx: $(SWIG_DEF) $(SWIG_DEP)
 _libMedCorba_Swig_la_CPPFLAGS = $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) \
 	$(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) ${KERNEL_CXXFLAGS} \
 	-I$(srcdir)/../MEDMEM_I -I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDMEM_SWIG -I$(srcdir)/../MED -I$(srcdir)/../MEDWrapper/V2_1/Core \
-	-I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases -I$(top_builddir)/idl
+	-I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases -I$(srcdir)/../INTERP_KERNEL/GaussPoints -I$(top_builddir)/idl
 _libMedCorba_Swig_la_LDFLAGS  = -module $(PYTHON_LIBS) $(MED2_LIBS) $(HDF5_LIBS)  ${KERNEL_LDFLAGS} -lSALOMELocalTrace \
 	../MEDMEM_I/libMEDMEMImpl.la ../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la ../MED/libMEDEngine.la
 ###  ../MEDMEM_SWIG/_libMEDMEM_Swig.la

@@ -113,7 +113,7 @@ bool ParaDomainSelector::isOnDifferentHosts() const
 bool ParaDomainSelector::isMyDomain(int domainIndex) const
 {
   evaluateMemory();
-  return (_rank == getProccessorID( domainIndex ));
+  return (_rank == getProcessorID( domainIndex ));
 }
 
 //================================================================================
@@ -124,7 +124,7 @@ bool ParaDomainSelector::isMyDomain(int domainIndex) const
  */
 //================================================================================
 
-int ParaDomainSelector::getProccessorID(int domainIndex) const
+int ParaDomainSelector::getProcessorID(int domainIndex) const
 {
   evaluateMemory();
   return ( domainIndex % _world_size );
@@ -169,7 +169,7 @@ int ParaDomainSelector::gatherNbOf(
   ordered_nbs.push_back(0);
   for ( int iproc = 0; iproc < nbProcs(); ++iproc )
     for ( int idomain = 0; idomain < nb_domains; ++idomain )
-      if ( getProccessorID( idomain ) == iproc )
+      if ( getProcessorID( idomain ) == iproc )
       {
         domain_order[ idomain ] = ordered_nbs.size() - 1;
         ordered_nbs.push_back( ordered_nbs.back() + all_nb_elems[idomain] );
@@ -177,43 +177,22 @@ int ParaDomainSelector::gatherNbOf(
   elem_shift_by_domain.resize( nb_domains+1, 0 );
   for ( int idomain = 0; idomain < nb_domains; ++idomain )
     elem_shift_by_domain[ idomain ] = ordered_nbs[ domain_order[ idomain ]];
-
+  
   elem_shift_by_domain.back() = ordered_nbs.back(); // to know total nb of elements
-
-  //  if ( entity == MED_CELL )
-  {
-    // fill _nb_vert_of_procs
-    _nb_vert_of_procs.resize( _world_size+1, 0 );
-    for ( int i = 0; i < nb_domains; ++i )
+  
+  // fill _nb_vert_of_procs
+  _nb_vert_of_procs.resize( _world_size+1, 0 );
+  for ( int i = 0; i < nb_domains; ++i )
     {
-      int rank = getProccessorID( i );
+      int rank = getProcessorID( i );
       _nb_vert_of_procs[ rank+1 ] += all_nb_elems[ i ];
     }
-    _nb_vert_of_procs[0] = 1; // base = 1
-    for ( int i = 1; i < _nb_vert_of_procs.size(); ++i )
-      _nb_vert_of_procs[ i ] += _nb_vert_of_procs[ i-1 ]; // to CSR format
-  }
-//   else
-//   {
-//     // to compute global ids of faces in joints
-//     //_total_nb_faces = total_nb;
-//   }
-
-//   if ( !_rank) {
-//     MEDMEM::STRING out("_nb_vert_of_procs :");
-//     for ( int i = 0; i < _nb_vert_of_procs.size(); ++i )
-//       out << _nb_vert_of_procs[i] << " ";
-//     std::cout << out << std::endl;
-//   }
-//   if ( !_rank) {
-//     MEDMEM::STRING out("elem_shift_by_domain :");
-//     for ( int i = 0; i < elem_shift_by_domain.size(); ++i )
-//       out << elem_shift_by_domain[i] << " ";
-//     std::cout << out << std::endl;
-//   }
-
+  _nb_vert_of_procs[0] = 0; // base = 0
+  for ( int i = 1; i < _nb_vert_of_procs.size(); ++i )
+    _nb_vert_of_procs[ i ] += _nb_vert_of_procs[ i-1 ]; // to CSR format
+  
   evaluateMemory();
-
+  
   return total_nb;
 }
 
@@ -367,10 +346,10 @@ auto_ptr<Graph> ParaDomainSelector::gatherGraph(const Graph* graph) const
   // Make graph
   // -----------
 
-  MEDMEM::MEDSKYLINEARRAY* array =
-    new MEDMEM::MEDSKYLINEARRAY( index_size-1, value_size, graph_index, graph_value, true );
+//   MEDPARTITIONER::MEDSKYLINEARRAY* array =
+//     new MEDPARTITIONER::MEDSKYLINEARRAY( index_size-1, value_size, graph_index, graph_value, true );
 
-  glob_graph = new UserGraph( array, partition, index_size-1 );
+//   glob_graph = new UserGraph( array, partition, index_size-1 );
 
   evaluateMemory();
 
@@ -535,7 +514,7 @@ void ParaDomainSelector::gatherNbCellPairs()
 // {
 //   vector<int> send_data, recv_data( joint->serialize( send_data ));
 
-//   int dest = getProccessorID( joint->distantDomain() );
+//   int dest = getProcessorID( joint->distantDomain() );
 //   int tag  = 1001 + jointId( joint->localDomain(), joint->distantDomain() );
   
 // #ifdef HAVE_MPI2
@@ -583,7 +562,7 @@ int* ParaDomainSelector::exchangeSubentityIds( int loc_domain, int dist_domain,
                                                const vector<int>& loc_ids_here ) const
 {
   int* loc_ids_dist = new int[ loc_ids_here.size()];
-  int dest = getProccessorID( dist_domain );
+  int dest = getProcessorID( dist_domain );
   int tag  = 2002 + jointId( loc_domain, dist_domain );
 #ifdef HAVE_MPI2
   MPI_Status status;
@@ -621,7 +600,7 @@ int ParaDomainSelector::jointId( int local_domain, int distant_domain ) const
 
 // int ParaDomainSelector::getDomianOrder(int idomain, int nb_domains) const
 // {
-//   return nb_domains / nbProcs() * getProccessorID( idomain ) + idomain / nbProcs();
+//   return nb_domains / nbProcs() * getProcessorID( idomain ) + idomain / nbProcs();
 // }
 
 //================================================================================
@@ -665,3 +644,154 @@ int ParaDomainSelector::evaluateMemory() const
   }
   return _max_memory - _init_memory;
 }
+
+
+void ParaDomainSelector::sendMesh(const ParaMEDMEM::MEDCouplingUMesh& mesh, int target) const
+{
+
+
+    // First stage : sending sizes
+    // ------------------------------
+    vector<int> tinyInfoLocal;
+    vector<string> tinyInfoLocalS;
+    //Getting tiny info of local mesh to allow the distant proc to initialize and allocate
+    //the transmitted mesh.
+    mesh.getTinySerializationInformation(tinyInfoLocal,tinyInfoLocalS);
+    tinyInfoLocal.push_back(mesh.getNumberOfCells());
+ #ifdef        HAVE_MPI2
+    int tinySize=tinyInfoLocal.size();
+    MPI_Send(&tinySize, 1, MPI_INT, target, 1113, MPI_COMM_WORLD);
+    MPI_Send(&tinyInfoLocal[0], tinyInfoLocal.size(), MPI_INT, target, 1112,
+                            MPI_COMM_WORLD);
+#endif
+    ParaMEDMEM::DataArrayInt *v1Local=0;
+    ParaMEDMEM::DataArrayDouble *v2Local=0;
+    //serialization of local mesh to send data to distant proc.
+    mesh.serialize(v1Local,v2Local);
+    int nbLocalElems;
+    int* ptLocal=0;
+    if(v1Local)
+      {
+        nbLocalElems=v1Local->getNbOfElems();
+        ptLocal=v1Local->getPointer();
+      }
+ #ifdef        HAVE_MPI2
+    MPI_Send(ptLocal, nbLocalElems, MPI_INT,
+                            target, 1111, MPI_COMM_WORLD);
+    #endif
+    double *ptLocal2=0;
+    if(v2Local)
+      {
+        nbLocalElems=v2Local->getNbOfElems();
+        ptLocal2=v2Local->getPointer();
+      }
+#ifdef HAVE_MPI2
+    MPI_Send(ptLocal2, nbLocalElems, MPI_DOUBLE,
+                            target, 1110, MPI_COMM_WORLD);
+#endif
+     if(v1Local)
+      v1Local->decrRef();
+    if(v2Local)
+      v2Local->decrRef();
+    
+}
+void ParaDomainSelector::recvMesh(ParaMEDMEM::MEDCouplingUMesh*& mesh, int source)const
+{
+
+    // First stage : exchanging sizes
+    // ------------------------------
+    vector<int> tinyInfoDistant;
+    vector<string> tinyInfoLocalS;
+    //Getting tiny info of local mesh to allow the distant proc to initialize and allocate
+    //the transmitted mesh.
+#ifdef HAVE_MPI2
+    MPI_Status status; 
+    int tinyVecSize;
+    MPI_Recv(&tinyVecSize, 1, MPI_INT,source,1113,MPI_COMM_WORLD, &status);
+    tinyInfoDistant.resize(tinyVecSize);
+#endif
+    std::fill(tinyInfoDistant.begin(),tinyInfoDistant.end(),0);
+
+#ifdef HAVE_MPI2
+    MPI_Recv(&tinyInfoDistant[0], tinyVecSize, MPI_INT,source,1112,MPI_COMM_WORLD, &status);
+#endif
+    ParaMEDMEM::DataArrayInt *v1Distant=ParaMEDMEM::DataArrayInt::New();
+    ParaMEDMEM::DataArrayDouble *v2Distant=ParaMEDMEM::DataArrayDouble::New();
+    //Building the right instance of copy of distant mesh.
+    ParaMEDMEM::MEDCouplingPointSet *distant_mesh_tmp=ParaMEDMEM::MEDCouplingPointSet::BuildInstanceFromMeshType((ParaMEDMEM::MEDCouplingMeshType)tinyInfoDistant[0]);
+    std::vector<std::string> unusedTinyDistantSts;
+    mesh=dynamic_cast<ParaMEDMEM::MEDCouplingUMesh*> (distant_mesh_tmp);
+ 
+    mesh->resizeForUnserialization(tinyInfoDistant,v1Distant,v2Distant,unusedTinyDistantSts);
+    int nbDistElem=0;
+    int *ptDist=0;
+    if(v1Distant)
+      {
+        nbDistElem=v1Distant->getNbOfElems();
+        ptDist=v1Distant->getPointer();
+      }
+#ifdef HAVE_MPI2
+    MPI_Recv(ptDist, nbDistElem, MPI_INT,
+                            source,1111,
+                            MPI_COMM_WORLD, &status);
+#endif
+    int nbLocalElems=0;
+    double *ptDist2=0;
+    nbDistElem=0;
+    if(v2Distant)
+      {
+        nbDistElem=v2Distant->getNbOfElems();
+        ptDist2=v2Distant->getPointer();
+      }
+#ifdef HAVE_MPI2
+    MPI_Recv(ptDist2, nbDistElem, MPI_DOUBLE,source, 1110, MPI_COMM_WORLD, &status);
+#endif
+    //
+    //mesh=dynamic_cast<ParaMEDMEM::MEDCouplingUMesh*> (distant_mesh_tmp);
+    //finish unserialization
+    mesh->unserialization(tinyInfoDistant,v1Distant,v2Distant,unusedTinyDistantSts);
+    std::cout<<"mesh size on recv"<<mesh->getNumberOfCells()<<std::endl;
+    //
+    if(v1Distant)
+      v1Distant->decrRef();
+    if(v2Distant)
+      v2Distant->decrRef();
+  
+}
+void ParaDomainSelector::sendDoubleVec(const std::vector<double>& vec, int target)const
+{
+  int size=vec.size();
+#ifdef HAVE_MPI2
+  MPI_Send(&size,1,MPI_INT,target,1211, MPI_COMM_WORLD);
+  MPI_Send(const_cast<double*>(&vec[0]), size,MPI_DOUBLE, target, 1212, MPI_COMM_WORLD);
+#endif
+}
+void ParaDomainSelector::recvDoubleVec(std::vector<double>& vec, int source)const
+{
+  int size;
+#ifdef HAVE_MPI2
+  MPI_Status status;  
+  MPI_Recv(&size,1,MPI_INT,source,1211, MPI_COMM_WORLD, &status);
+  vec.resize(size);
+  MPI_Recv(&vec[0],size,MPI_DOUBLE,source, 1212, MPI_COMM_WORLD,&status);
+#endif
+}
+void ParaDomainSelector::sendIntVec(const std::vector<int>& vec, int target)const
+{
+  int size=vec.size();
+#ifdef HAVE_MPI2
+  MPI_Send(&size,1,MPI_INT,target,1211, MPI_COMM_WORLD);
+  MPI_Send(const_cast<int*>(&vec[0]), size,MPI_INT, target, 1212, MPI_COMM_WORLD);
+#endif
+}
+void ParaDomainSelector::recvIntVec(std::vector<int>& vec, int source)const
+{
+  int size;
+#ifdef HAVE_MPI2
+  MPI_Status status;  
+  MPI_Recv(&size,1,MPI_INT,source,1211, MPI_COMM_WORLD, &status);
+  vec.resize(size);
+  MPI_Recv(&vec[0],size,MPI_INT,source, 1212, MPI_COMM_WORLD,&status);
+#endif
+}
+

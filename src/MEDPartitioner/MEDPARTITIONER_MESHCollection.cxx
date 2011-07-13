@@ -23,7 +23,7 @@
 #include "MEDCouplingNormalizedUnstructuredMesh.hxx"
 #include "MEDCouplingMemArray.hxx"
 #include "PointLocator3DIntersectorP0P0.hxx"
-
+#include "BBTree.txx"
 #include "MEDPARTITIONER_utils.hxx" 
 
 #include "MEDPARTITIONER_Graph.hxx"
@@ -39,7 +39,7 @@
 #include "MEDPARTITIONER_MESHCollectionDriver.hxx"
 #include "MEDPARTITIONER_MESHCollectionMedXMLDriver.hxx"
 #include "MEDPARTITIONER_MESHCollectionMedAsciiDriver.hxx"
-
+#include "MEDPARTITIONER_JointFinder.hxx"
 #include "MEDPARTITIONER_UserGraph.hxx"
 
 
@@ -52,6 +52,7 @@
 
 #include <vector>
 #include <string>
+#include <limits>
 
 #ifndef WNT
 # include <ext/hash_map>
@@ -111,66 +112,10 @@ MESHCollection::MESHCollection(MESHCollection& initialCollection, Topology* topo
     _create_empty_groups(create_empty_groups)
 {
   
-  _mesh.resize(_topology->nbDomain());
-  
-  //splitting the initial domains into smaller bits
-  
-  std::vector<std::vector<ParaMEDMEM::MEDCouplingUMesh*> > splitMeshes;
-  splitMeshes.resize(topology->nbDomain());
-  for (int inew=0; inew<topology->nbDomain();inew++)
-    splitMeshes[inew].resize(initialCollection.getTopology()->nbDomain());
-  
   std::vector<std::vector<std::vector<int> > > new2oldIds(initialCollection.getTopology()->nbDomain());
+   castCellMeshes(initialCollection, new2oldIds);
 
-  for (int iold=0; iold<initialCollection.getTopology()->nbDomain();iold++)
-    {
-      if (!isParallelMode() || initialCollection._domain_selector->isMyDomain(iold))
-        {
-          int size=(initialCollection._mesh)[iold]->getNumberOfCells();
-          std::vector<int> globalids(size);
-          initialCollection.getTopology()->getCellList(iold, &globalids[0]);
-          std::vector<int> ilocalnew(size);
-          std::vector<int> ipnew(size);
-          topology->convertGlobalCellList(&globalids[0],size,&ilocalnew[0],&ipnew[0]);
-          new2oldIds[iold].resize(topology->nbDomain());
-          for (int i=0; i<ilocalnew.size();i++)
-            {
-              new2oldIds[iold][ipnew[i]].push_back(i);
-            }
-          for (int inew=0;inew<topology->nbDomain();inew++)
-            {
-              //               cout <<"inew:"<<inew<<" iold:"<<iold<<endl;
-              //               for (int i=0; i<new2oldIds[iold][inew].size();i++)
-              //                 cout<<new2oldIds[iold][inew][i]<<" ";
-              //               cout<<endl;
-              splitMeshes[inew][iold]=(ParaMEDMEM::MEDCouplingUMesh*)(initialCollection.getMesh())[iold]->buildPartOfMySelf(&new2oldIds[iold][inew][0],&new2oldIds[iold][inew][0]+new2oldIds[iold][inew].size(),true);
-              //              cout <<"small domain "<<iold<<" "<<inew<<" has "<<splitMeshes[inew][iold]->getNumberOfCells()<<" cells"<<endl;
-            }
-        }
-    }
 
-  if (isParallelMode())
-    {
-      //send/receive stuff
-    }
-  
-  //fusing the split meshes
-  for (int inew=0; inew<topology->nbDomain()  ;inew++)
-    {
-      std::vector<const ParaMEDMEM::MEDCouplingUMesh*> meshes(splitMeshes[inew].size());
-      for (int i=0; i< splitMeshes[inew].size();i++)
-        meshes[i]=splitMeshes[inew][i];
-      
-      if (!isParallelMode()||_domain_selector->isMyDomain(inew))
-        {
-          _mesh[inew]=ParaMEDMEM::MEDCouplingUMesh::MergeUMeshes(meshes);
-          _mesh[inew]->zipCoords();
-         
-          //          std::cout<<"creating mesh #"<<inew+1<<" with "<<_mesh[inew]->getNumberOfCells()<<" cells and "<<_mesh[inew]->getNumberOfNodes()<<" nodes"<<std::endl;
-        }
-      for (int i=0; i< splitMeshes[inew].size();i++)
-        splitMeshes[inew][i]->decrRef();
-    }  
   //casting cell families on new meshes
   _cellFamilyIds.resize(topology->nbDomain());
   castIntField(initialCollection.getMesh(), this->getMesh(),initialCollection.getCellFamilyIds(),_cellFamilyIds, new2oldIds);
@@ -182,22 +127,30 @@ MESHCollection::MESHCollection(MESHCollection& initialCollection, Topology* topo
   // treating faces
   /////////////////
 
-  std::multimap<pair<int,int>, pair<int,int> > nodeMapping;
+  NodeMapping nodeMapping;
   createNodeMapping(initialCollection, nodeMapping);
   std::vector<std::vector<std::vector<int> > > new2oldFaceIds;
   castMeshes(initialCollection.getFaceMesh(), this->getFaceMesh(),initialCollection, nodeMapping, new2oldFaceIds);
 
+
+
+  ////////////////////
+  //treating families
+  ////////////////////
 
   _faceFamilyIds.resize(topology->nbDomain());
 
   //allocating family ids arrays
   for (int inew=0; inew<topology->nbDomain();inew++)
     {
+      if(isParallelMode() && !_domain_selector->isMyDomain(inew)) continue;
       _cellFamilyIds[inew]=ParaMEDMEM::DataArrayInt::New();
       int* ptrCellIds=new int[_mesh[inew]->getNumberOfCells()];
+      for (int i=0; i< _mesh[inew]->getNumberOfCells();i++) ptrCellIds[i]=0;
       _cellFamilyIds[inew]->useArray(ptrCellIds,true, ParaMEDMEM::CPP_DEALLOC,_mesh[inew]->getNumberOfCells(),1);
       _faceFamilyIds[inew]=ParaMEDMEM::DataArrayInt::New();
       int* ptrFaceIds=new int[_faceMesh[inew]->getNumberOfCells()];
+      for (int i=0; i< _faceMesh[inew]->getNumberOfCells();i++) ptrFaceIds[i]=0;
       _faceFamilyIds[inew]->useArray(ptrFaceIds,true, ParaMEDMEM::CPP_DEALLOC,_faceMesh[inew]->getNumberOfCells(),1); 
     }
 
@@ -213,35 +166,158 @@ MESHCollection::MESHCollection(MESHCollection& initialCollection, Topology* topo
 }
 
 /*!
+Creates the meshes using the topology underlying he mesh collection and the mesh data coming from the ancient collection
+\param initialCollection collection from which the data is extracted to create the new meshes
+ */
+
+void MESHCollection::castCellMeshes(MESHCollection& initialCollection, std::vector<std::vector<std::vector<int> > >& new2oldIds)
+{
+  if (_topology==0) throw INTERP_KERNEL::Exception("Topology has not been defined on call to castCellMeshes");
+  _mesh.resize(_topology->nbDomain());
+  
+  //splitting the initial domains into smaller bits
+  
+  std::vector<std::vector<ParaMEDMEM::MEDCouplingUMesh*> > splitMeshes;
+  splitMeshes.resize(_topology->nbDomain());
+  for (int inew=0; inew<_topology->nbDomain();inew++)
+    {
+      splitMeshes[inew].resize(initialCollection.getTopology()->nbDomain());
+      std::fill(&(splitMeshes[inew][0]),&(splitMeshes[inew][0])+splitMeshes[inew].size(),(ParaMEDMEM::MEDCouplingUMesh*)0);
+    }
+  
+  for (int iold=0; iold<initialCollection.getTopology()->nbDomain();iold++)
+    {
+      if (!isParallelMode() || initialCollection._domain_selector->isMyDomain(iold))
+        {
+          int size=(initialCollection._mesh)[iold]->getNumberOfCells();
+          std::vector<int> globalids(size);
+          initialCollection.getTopology()->getCellList(iold, &globalids[0]);
+          std::vector<int> ilocalnew(size);
+          std::vector<int> ipnew(size);
+          _topology->convertGlobalCellList(&globalids[0],size,&ilocalnew[0],&ipnew[0]);
+          new2oldIds[iold].resize(_topology->nbDomain());
+          for (int i=0; i<ilocalnew.size();i++)
+            {
+              new2oldIds[iold][ipnew[i]].push_back(i);
+            }
+          for (int inew=0;inew<_topology->nbDomain();inew++)
+            {
+              splitMeshes[inew][iold]=(ParaMEDMEM::MEDCouplingUMesh*)(initialCollection.getMesh())[iold]->buildPartOfMySelf(&new2oldIds[iold][inew][0],&new2oldIds[iold][inew][0]+new2oldIds[iold][inew].size(),true);
+            }
+        }
+    }
+
+  if (isParallelMode())
+    {
+      for (int iold=0; iold<initialCollection.getTopology()->nbDomain();iold++)
+        for(int inew=0;inew<_topology->nbDomain();inew++)
+          {
+            if (initialCollection._domain_selector->isMyDomain(iold) && _domain_selector->isMyDomain(inew)) continue;
+            if(initialCollection._domain_selector->isMyDomain(iold))
+              {
+              _domain_selector->sendMesh(*(splitMeshes[inew][iold]),_domain_selector->getProcessorID(inew));
+              std::cout<<"send iold"<<iold<<" inew "<<inew<<" "<<splitMeshes[inew][iold]->getNumberOfCells()<<std::endl;
+              
+              }
+            if (_domain_selector->isMyDomain(inew))
+              {
+                _domain_selector->recvMesh(splitMeshes[inew][iold],_domain_selector->getProcessorID(iold));
+                std::cout<<"recv iold"<<iold<<" inew "<<inew<<std::endl;
+              }
+          }
+    }
+  
+  //fusing the split meshes
+  for (int inew=0; inew<_topology->nbDomain()  ;inew++)
+    {
+      std::vector<const ParaMEDMEM::MEDCouplingUMesh*> meshes;
+     
+      for (int i=0; i< splitMeshes[inew].size();i++)
+        if (splitMeshes[inew][i]!=0) meshes.push_back(splitMeshes[inew][i]);
+       std::cout<< "nb of meshes"<<meshes.size()<<std::endl;
+
+      if (!isParallelMode()||_domain_selector->isMyDomain(inew))
+        {
+          _mesh[inew]=ParaMEDMEM::MEDCouplingUMesh::MergeUMeshes(meshes);
+          _mesh[inew]->zipCoords();
+        }
+      for (int i=0; i< splitMeshes[inew].size();i++)
+        if (splitMeshes[inew][i]!=0) splitMeshes[inew][i]->decrRef();
+    }  
+  
+}
+
+/*!
   \param initialCollection source mesh collection 
   \param nodeMapping structure containing the correspondency between nodes in the initial collection and the node(s) in the new collection
 */
-void MESHCollection::createNodeMapping( MESHCollection& initialCollection, std::multimap<pair<int,int>,pair<int,int> >& nodeMapping)
+void MESHCollection::createNodeMapping( MESHCollection& initialCollection, NodeMapping& nodeMapping)
 {
+
+  //  NodeMapping reverseNodeMapping;
   for (int iold=0; iold<initialCollection.getTopology()->nbDomain();iold++)
     {
-      std::map<pair<double,pair<double, double> >, int > nodeClassifier;
-      for (int inode=0; inode<initialCollection.getMesh(iold)->getNumberOfNodes(); inode++)
+
+      double* bbox;
+      BBTree<3>* tree; 
+      if (!isParallelMode() || (_domain_selector->isMyDomain(iold)))
         {
+          //      std::map<pair<double,pair<double, double> >, int > nodeClassifier;
+          int nvertices=getMesh(iold)->getNumberOfNodes();
+          bbox=new double[nvertices*6];
           ParaMEDMEM::DataArrayDouble* coords = initialCollection.getMesh(iold)->getCoords();
-          double* coordsPtr=coords->getPointer()+initialCollection.getMesh(iold)->getMeshDimension()*inode;
-          pair<double, pair<double,double> > tripleDouble =std::make_pair(coordsPtr[0],std::make_pair(coordsPtr[1],coordsPtr[2]));
-          nodeClassifier.insert(make_pair(tripleDouble,inode));
-          
+          double* coordsPtr=coords->getPointer();
+          for (int i=0; i<nvertices*3;i++)
+            {
+              bbox[i*2]=coordsPtr[i]-1e-9;
+              bbox[i*2+1]=coordsPtr[i]+1e-9;
+            }
+          tree=new BBTree<3>(bbox,0,0,nvertices,1e-12);
         }
+              
       for (int inew=0; inew<_topology->nbDomain(); inew++)
         {
-          for (int inode=0; inode<_mesh[inew]->getNumberOfNodes();inode++)
+          //sending meshes for parallel computation
+          if (isParallelMode() && _domain_selector->isMyDomain(inew) && !_domain_selector->isMyDomain(iold))
             {
-              ParaMEDMEM::DataArrayDouble* coords = getMesh(inew)->getCoords();
-              double* coordsPtr=coords->getPointer()+inode*getMesh(inew)->getMeshDimension();
-              std::map<pair<double,pair<double, double> >, int >::iterator iter=
-                nodeClassifier.find(make_pair(coordsPtr[0],make_pair(coordsPtr[1],coordsPtr[2])));
-              nodeMapping.insert(make_pair(make_pair(iold,iter->second),make_pair(inew,inode)));
-              //              cout <<"("<<iold<<","<<iter->second<<")-->("<<inew<<","<<inode<<")"<<endl;
+              std::cout<<"sendTo"<<_domain_selector->getProcessorID(iold)<<std::endl;
+              _domain_selector->sendMesh(*(getMesh(inew)), _domain_selector->getProcessorID(iold));
+              
+            }
+          else if (isParallelMode() && !_domain_selector->isMyDomain(inew)&& _domain_selector->isMyDomain(iold))
+            {
+              ParaMEDMEM::MEDCouplingUMesh* mesh;
+              std::cout<<"recvFrom" << _domain_selector->getProcessorID(inew) <<std::endl;
+              _domain_selector->recvMesh(mesh, _domain_selector->getProcessorID(inew));
+              ParaMEDMEM::DataArrayDouble* coords = mesh->getCoords();
+              for (int inode=0; inode<mesh->getNumberOfNodes();inode++)
+                {
+                  double* coordsPtr=coords->getPointer()+inode*3;
+                  std::vector<int> elems;
+                  tree->getElementsAroundPoint(coordsPtr,elems);
+                  if (elems.size()==0) continue;         
+                  nodeMapping.insert(make_pair(make_pair(iold,elems[0]),make_pair(inew,inode)));
+                }
+            }
+          else if (!isParallelMode() || (_domain_selector->isMyDomain(inew) && _domain_selector->isMyDomain(iold)))
+            {
+              ParaMEDMEM::DataArrayDouble* coords = getMesh(inew)->getCoords();           
+            
+              for (int inode=0; inode<_mesh[inew]->getNumberOfNodes();inode++)
+                {
+                  
+                  double* coordsPtr=coords->getPointer()+inode*3;
+                  std::vector<int> elems;
+                  tree->getElementsAroundPoint(coordsPtr,elems);
+                  if (elems.size()==0) {continue;}              
+                  nodeMapping.insert(make_pair(make_pair(iold,elems[0]),make_pair(inew,inode)));
+                  cout << "inode :" <<inode<<" ("<<iold<<","<<elems[0]<<")-->("<<inew<<","<<inode<<")"<<endl;
+                }
             }
         }
     } 
+  std::cout<<"NodeMapping size"<<nodeMapping.size()<<std::endl;
+
 }
 
 /*!
@@ -249,7 +325,7 @@ void MESHCollection::createNodeMapping( MESHCollection& initialCollection, std::
   faces at the interface are duplicated
 */
 
-void MESHCollection::castMeshes(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastFrom,std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastTo, MESHCollection& initialCollection,const multimap<pair<int,int>,pair<int,int> >& nodeMapping, std::vector<std::vector<std::vector<int> > >& new2oldIds)
+void MESHCollection::castMeshes(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastFrom,std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastTo, MESHCollection& initialCollection,const NodeMapping& nodeMapping, std::vector<std::vector<std::vector<int> > >& new2oldIds)
 {
 
   //splitMeshes structure will contain the partition of 
@@ -267,11 +343,13 @@ void MESHCollection::castMeshes(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& mesh
 
 
   new2oldIds.resize(meshesCastFrom.size());
+
   //loop over the old domains to analyse the faces and decide 
   //on which new domain they belong
 
   for (int iold=0; iold<meshesCastFrom.size();iold++)
     {
+      if (isParallelMode() && !_domain_selector->isMyDomain(iold)) continue;
       new2oldIds[iold].resize(newSize);
       for (int ielem=0;ielem<meshesCastFrom[iold]->getNumberOfCells();ielem++)
         {
@@ -284,7 +362,9 @@ void MESHCollection::castMeshes(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& mesh
           for (int inode=0;inode<nodes.size();inode++)
             {
               typedef multimap<pair<int,int>,pair<int,int> >::const_iterator MI;
-              pair <MI,MI> myRange = nodeMapping.equal_range(make_pair(iold,nodes[inode]));
+              int mynode=nodes[inode];
+              if (mynode <0 || mynode > 1000000000) exit(1);
+              pair <MI,MI> myRange = nodeMapping.equal_range(make_pair(iold,mynode));
               //                cout << iold <<" " <<nodes[inode]<<endl;
               for (MI iter=myRange.first; iter!=myRange.second; iter++)
                 {
@@ -308,34 +388,37 @@ void MESHCollection::castMeshes(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& mesh
       //creating the splitMeshes from the face ids
       for (int inew=0;inew<_topology->nbDomain();inew++)
         {
-          cout<<"nb faces "<<new2oldIds[iold][inew].size()<<endl;
+          cout<<"nb faces - iold "<<iold<<" inew "<<inew<<" : "<<new2oldIds[iold][inew].size()<<endl;
           splitMeshes[inew][iold]=(ParaMEDMEM::MEDCouplingUMesh*)(meshesCastFrom[iold]->buildPartOfMySelf(&new2oldIds[iold][inew][0],&new2oldIds[iold][inew][0]+new2oldIds[iold][inew].size(),true));
         }
     }
       
   // send/receive stuff
+  if (isParallelMode())
+  for (int iold=0; iold<meshesCastFrom.size();iold++)
+    for (int inew=0; inew<newSize; inew++)
+      {
+        if (_domain_selector->isMyDomain(iold) && !_domain_selector->isMyDomain(inew))
+          _domain_selector->sendMesh(*(splitMeshes[inew][iold]), _domain_selector->getProcessorID(inew));
+        if (!_domain_selector->isMyDomain(iold) && _domain_selector->isMyDomain(inew))
+           _domain_selector->recvMesh(splitMeshes[inew][iold], _domain_selector->getProcessorID(iold));
+      }
 
 
   //recollecting the bits of splitMeshes to fuse them into one
   meshesCastTo.resize(newSize);
   for (int inew=0; inew < newSize;inew++)
     {
-      vector<const ParaMEDMEM::MEDCouplingUMesh*> myMeshes(meshesCastFrom.size());
+      vector<const ParaMEDMEM::MEDCouplingUMesh*> myMeshes;
       for (int iold=0; iold < meshesCastFrom.size();iold++)
         {
-          myMeshes[iold]=splitMeshes[inew][iold];
-          cout<<"number of nodes"<<splitMeshes[inew][iold]->getNumberOfNodes()<<endl;
-          cout<<"number of cells"<<splitMeshes[inew][iold]->getNumberOfCells()<<endl;
-          cout<<"dimension "<<splitMeshes[inew][iold]->getMeshDimension()<<endl;
-          
+          if (splitMeshes[inew][iold] !=0)
+            myMeshes.push_back(splitMeshes[inew][iold]);          
         }
       meshesCastTo[inew]=ParaMEDMEM::MEDCouplingUMesh::MergeUMeshes(myMeshes);
-      meshesCastTo[inew]->checkCoherency();
       meshesCastTo[inew]->zipCoords();
-      meshesCastTo[inew]->checkCoherency();
       for (int iold=0; iold < meshesCastFrom.size();iold++)
-        splitMeshes[inew][iold]->decrRef();
-      cout<<"creating face mesh #"<<inew<<" with "<<meshesCastTo[inew]->getNumberOfCells()<<" cells and "<<meshesCastTo[inew]->getNumberOfNodes()<<" nodes"<<endl;
+        if (splitMeshes[inew][iold]!=0) splitMeshes[inew][iold]->decrRef();
     }
 }
 
@@ -346,6 +429,7 @@ void MESHCollection::castIntField(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& me
       vector<const ParaMEDMEM::DataArrayInt*> splitIds;
       for (int iold=0; iold < meshesCastFrom.size();iold++)
         {
+          if (isParallelMode() && !_domain_selector->isMyDomain(iold)) continue;
           int* ptr=&(new2oldMapping[iold][inew][0]);
           splitIds.push_back(arrayFrom[iold]->selectByTupleId(ptr,ptr+new2oldMapping[iold][inew].size()));
         }
@@ -561,7 +645,7 @@ vector<ParaMEDMEM::MEDCouplingUMesh*>& MESHCollection::getFaceMesh()
 {
   return _faceMesh;
 }
-ParaMEDMEM::MEDCouplingUMesh* MESHCollection::getMesh(int idomain)
+ParaMEDMEM::MEDCouplingUMesh* MESHCollection::getMesh(int idomain) const
 {
   return _mesh[idomain];
 }
@@ -604,9 +688,25 @@ void MESHCollection::buildCellGraph(MEDPARTITIONER::MEDSKYLINEARRAY* & array,int
   multimap< int, int > node2cell;
   multimap< int, int > cell2cell;
 
-  //looking for reverse nodal connectivity i global numbering
-  for (int idomain=0; idomain<_topology->nbDomain();idomain++)
+  vector<vector<multimap<int,int> > > commonDistantNodes;
+  int nbdomain=_topology->nbDomain();
+  if (isParallelMode())
     {
+      _joint_finder=new JointFinder(*this);
+      _joint_finder->findCommonDistantNodes();
+      commonDistantNodes=_joint_finder->getDistantNodeCell();
+    }
+
+  //looking for reverse nodal connectivity i global numbering
+  for (int idomain=0; idomain<nbdomain;idomain++)
+    {
+      if (isParallelMode() && !_domain_selector->isMyDomain(idomain)) continue;
+      int offset=0, procOffset=0;
+      if (isParallelMode())
+        {
+          offset=_domain_selector->getDomainShift(idomain);
+          procOffset=_domain_selector->getProcShift()+1;
+        }
       ParaMEDMEM::DataArrayInt* index=ParaMEDMEM::DataArrayInt::New();
       ParaMEDMEM::DataArrayInt* revConn=ParaMEDMEM::DataArrayInt::New();
       _mesh[idomain]->getReverseNodalConnectivity(revConn,index);
@@ -617,7 +717,7 @@ void MESHCollection::buildCellGraph(MEDPARTITIONER::MEDSKYLINEARRAY* & array,int
                                      index_ptr[_mesh[idomain]->getNumberOfNodes()],
                                      globalRevConn->getPointer());
 
-      int min=10000000,max=-1;
+      int min=std::numeric_limits<int>::max(),max=-1;
       for (int i=0; i< index_ptr[_mesh[idomain]->getNumberOfNodes()];i++)
         {
           if (revConn->getPointer()[i]<min) min=revConn->getPointer()[i];
@@ -626,17 +726,38 @@ void MESHCollection::buildCellGraph(MEDPARTITIONER::MEDSKYLINEARRAY* & array,int
       cout <<"min:"<<min<<" max:"<<max<<endl;
       int* globalNodeIds=new int[_mesh[idomain]->getNumberOfNodes()];
       _topology->getNodeList(idomain,globalNodeIds);
-     
+      
       int* globalRevConnPtr=globalRevConn->getPointer();
       for (int i=0; i<_mesh[idomain]->getNumberOfNodes();i++)
         {
           for (int icell=index_ptr[i]; icell<index_ptr[i+1];icell++)
-            node2cell.insert(make_pair(globalNodeIds[i],globalRevConnPtr[icell]));
+            node2cell.insert(make_pair(globalNodeIds[i],globalRevConnPtr[icell]+procOffset));
         }
+      if (isParallelMode())
+        {
+          for (int mydomain=0; mydomain<_topology->nbDomain();mydomain++)
+            {
+              if (_domain_selector->isMyDomain(mydomain)) continue;
+              //            for (int idomain=0; idomain<_topology->nbDomain();idomain++)
+              // {
+              //          if (_domain_selector->isMyDomain(idomain)) continue;
+                  multimap<int,int>::iterator iter;
+                  for (iter=commonDistantNodes[idomain][mydomain].begin();iter!=commonDistantNodes[idomain][mydomain].end();iter++)
+                    {
+                      int ilocnode=iter->first;
+                      int icell=iter->second;
+                      
+                      node2cell.insert(make_pair(globalNodeIds[ilocnode],icell+offset));     
+                      //  cout<<"pair "<<globalNodeIds[ilocnode]<<" "<<icell+offset<<" "<<offset<<endl;
+                    }
+                  // }
+            }
+        }
+
       globalRevConn->decrRef();
       revConn->decrRef();
       index->decrRef();
-      delete[]globalNodeIds;
+      delete[] globalNodeIds;
     }
 
   //creating graph arcs (cell to cell relations)
@@ -646,6 +767,21 @@ void MESHCollection::buildCellGraph(MEDPARTITIONER::MEDSKYLINEARRAY* & array,int
   // means 6 arcs (0,1), (0,2), (0,3), (1,2), (1,3), (2,3)
   // in present version arcs are not doubled but reflexive (1,1) arcs are present for each cell
  
+  int mincell,maxcell;
+  if (isParallelMode())
+    {
+      mincell=_domain_selector->getProcShift()+1;
+      maxcell=mincell;
+      for (int i=0; i<nbdomain;i++)
+        if (_domain_selector->isMyDomain(i)) maxcell+=_mesh[i]->getNumberOfCells();
+    
+    }
+  else
+    {
+      mincell=0;
+      maxcell=_topology->nbCells();
+    }
+         cout<<"mincell"<<mincell<<" maxcell "<<maxcell<<endl;
   for (int inode=0; inode<_topology->nbNodes();inode++)
     {
       typedef multimap<int,int>::const_iterator MI;
@@ -654,7 +790,7 @@ void MESHCollection::buildCellGraph(MEDPARTITIONER::MEDSKYLINEARRAY* & array,int
         {
           for (MI cell2 = myRange.first; cell2!=myRange.second; cell2++)
             {
-              if (cell1->second!=cell2->second) cell2cell.insert(make_pair(cell1->second,cell2->second));
+              if (cell1->second!=cell2->second&&cell1->second>=mincell&&cell1->second<maxcell) cell2cell.insert(make_pair(cell1->second,cell2->second));
             }
         }
     }
@@ -682,203 +818,101 @@ void MESHCollection::buildCellGraph(MEDPARTITIONER::MEDSKYLINEARRAY* & array,int
     }
 
   array=new MEDPARTITIONER::MEDSKYLINEARRAY(index,value);
-  cout<<"taille du graphe créé "<<array->getNumberOf()<<endl;
-  //   int cell_number=1;
-  //   int node_number=1;
-  //   for (int i=0; i<_topology->nbDomain(); i++)
-  //     {
-  //       cell_number+=_topology->getCellNumber(i);
-  //       node_number+=_topology->getNodeNumber(i);
-  //     }
-  //   //list of cells for a given node
-  //   //vector< vector<int> > node2cell(node_number);
-  //   map< int, vector<int> > node2cell;
-
-  //   //list of nodes for a given cell
-  //   //vector< vector <int> > cell2node(cell_number);
-  //   map< int, vector <int> > cell2node;
-
-  //   //  map<MED_EN::medGeometryElement,int*> type_cell_list;
-
-  //   //tagging for the indivisible regions
-  //   int* indivisible_tag=0;
-  //   bool has_indivisible_regions=false;
-  // //   if (!_indivisible_regions.empty())
-  // //     {
-  // //       has_indivisible_regions=true;
-  // //       indivisible_tag=new int[_topology->nbCells()];
-  // //       treatIndivisibleRegions(indivisible_tag);
-  // //     }
-
-  //   fillGlobalConnectivity(node2cell, cell2node );
-
-  //   cout << "beginning of skyline creation"<<endl;
-  //   //creating the MEDMEMSKYLINEARRAY containing the graph
-
-  //   int* size = new int[_topology->nbCells()];
-  //   int** temp=new int*[_topology->nbCells()];
-  //   int** temp_edgeweight=0;
-  // //   if (has_indivisible_regions)
-  // //     temp_edgeweight=new int*[_topology->nbCells()];
-
-  //   int cell_glob_shift = 0;
-
-  //   // Get connection to cells on other procs
-  //   multimap< int, int > loc2dist; // global cell ids on this proc -> other proc cells
-  //   if ( isParallelMode() )
-  //     {
-  //       cell_glob_shift = _domain_selector->getProcShift();
-
-  //       set<int> loc_domains; // domains on this proc
-  //       for ( int idom = 0; idom < _mesh.size(); ++idom )
-  //         if ( _mesh[ idom ] )
-  //           loc_domains.insert( idom );
-
-  //       for ( int idom = 0; idom < _mesh.size(); ++idom )
-  //         {
-  //           if ( !_mesh[idom] ) continue;
-  //           vector<int> loc2glob_corr; // pairs of corresponding cells (loc_loc & glob_dist)
-  //           retrieveDriver()->readLoc2GlobCellConnect(idom, loc_domains, _domain_selector, loc2glob_corr);
-  //           //MEDMEM::STRING out;
-  //           for ( int i = 0; i < loc2glob_corr.size(); i += 2 )
-  //             {
-  //               int glob_here  = _topology->convertCellToGlobal(idom,loc2glob_corr[i]); 
-  //               int glob_there = loc2glob_corr[i+1]; 
-  //               loc2dist.insert ( make_pair( glob_here, glob_there));
-  //               //out << glob_here << "-" << glob_there << " ";
-  //             }
-  //           //cout << "\nRank " << _domain_selector->rank() << ": BndCZ: " << out << endl;
-  //         }
-  //     }
-
-  //   //going across all cells
-
-  //   map<int,int> cells_neighbours;
-  //   for (int i=0; i< _topology->nbCells(); i++)
-  //     {
-
-
-  //       vector<int> cells(50);
-
-  //       //     /*// cout << "size cell2node "<<cell2node[i+1].size()<<endl;
-  //       //      for (vector<int>::const_iterator iternode=cell2node[i+1].begin();
-  //       //            iternode!=cell2node[i+1].end();
-  //       //            iternode++)
-  //       //        {
-  //       //          int nodeid=*iternode;
-  //       //       //   cout << "size node2cell "<<node2cell[nodeid].size()<<endl;
-  //       //          for (vector<int>::const_iterator iter=node2cell[nodeid].begin();
-  //       //             iter != node2cell[nodeid].end();
-  //       //             iter++)
-  //       //              cells_neighbours[*iter]++;
-  //       //        }*/
-
-  //       for (int inode=0; inode< cell2node[i+1].size(); inode++)
-  //         {
-  //           int nodeid=cell2node[i+1][inode];
-  //           //   cout << "size node2cell "<<node2cell[nodeid].size()<<endl;
-  //           for (int icell=0; icell<node2cell[nodeid].size();icell++)
-  //             cells_neighbours[node2cell[nodeid][icell]]++;
-  //         }
-  //       size[i]=0;
-  //       int dimension = getMeshDimension();
-  //       cells.clear();
-
-  //       for (map<int,int>::const_iterator iter=cells_neighbours.begin(); iter != cells_neighbours.end(); iter++)  
-  //         {
-  //           if (iter->second >= dimension && iter->first != i+1) 
-  //             {
-  //               cells.push_back(iter->first + cell_glob_shift);
-  //               //       cells[isize++]=iter->first;
-  //             }
-  //         }
-  //       // add neighbour cells from distant domains
-  //       multimap< int, int >::iterator loc_dist = loc2dist.find( i+1 );
-  //       for (; loc_dist!=loc2dist.end() && loc_dist->first==( i+1 ); ++loc_dist )
-  //         cells.push_back( loc_dist->second );
-
-  //       size[i]=cells.size();
-  //       //   size[i]=isize;
-
-  //       //cout << cells.size()<<endl;
-  //       //cout << cells_neighbours.size()<<endl;
-
-  //       temp[i]=new int[size[i]];
-  // //       if (has_indivisible_regions)
-  // //         temp_edgeweight[i]=new int[size[i]];
-  //       //    
-  //       int itemp=0;
-
-  //       // memcpy(temp[i],cells,isize*sizeof(int));
-
-  //       for (vector<int>::const_iterator iter=cells.begin(); iter!=cells.end();iter++)
-  //         //for(int j=0; j<isize; j++)
-  //         {
-  //           temp[i][itemp]=*iter;
-  //           //temp[i][itemp]=cells[j];
-  //  //          if (has_indivisible_regions)
-  // //             {
-  // //               int tag1 = indivisible_tag[(i+1)-1];
-  // //               //int tag2 = indivisible_tag[iter->first-1];
-  // //               int tag2 = indivisible_tag[*iter-1];
-  // //               if (tag1==tag2 && tag1!=0)
-  // //                 temp_edgeweight[i][itemp]=_topology->nbCells()*100000;
-  // //               else
-  // //                 temp_edgeweight[i][itemp]=1;
-  // //             } 
-  //           itemp++;
-  //         }
-  //       cells_neighbours.clear();
-  //     }
-  //   cout <<"end of graph definition"<<endl;
-  //   int* index=new int[_topology->nbCells()+1];
-  //   index[0]=1;
-  //   for (int i=0; i<_topology->nbCells(); i++)
-  //     index[i+1]=index[i]+size[i];
-
-  //   node2cell.clear();
-  //   cell2node.clear();
-  //   // if (indivisible_tag!=0) delete [] indivisible_tag;
-
-  //   //SKYLINEARRAY structure holding the cell graph
-  //   array= new MEDMEM::MEDSKYLINEARRAY(_topology->nbCells(),index[_topology->nbCells()]-index[0]);
-  //   array->setIndex(index);
-
-  //   for (int i=0; i<_topology->nbCells(); i++)
-  //     {
-  //       array->setI(i+1,temp[i]);
-  //       delete[]temp[i];
-  //     }
-
-  //   {// DEBUG
-  //     //     MEDMEM::STRING out;
-  //     //     const int* index= array->getIndex();
-  //     //     const int* value =array->getValue();
-  //     //     out << "\nRank " << (_domain_selector?_domain_selector->rank():0) << ": Index: ";
-  //     //     for ( int i = 0; i <= array->getNumberOf(); ++i )
-  //     //       out << index[i] << " ";
-  //     //     out << "\nRank " << (_domain_selector?_domain_selector->rank():0) << ": Value: ";
-  //     //     for ( int i = 0; i < array->getLength(); ++i )
-  //     //       out << value[i] << " ";
-  //     //     cout << out << endl;
-  //   }
-  // //   if (has_indivisible_regions)
-  // //     {
-  // //       edgeweights=new int[array->getLength()];
-  // //       for (int i=0; i<_topology->nbCells(); i++)
-  // //         {
-  // //           for (int j=index[i]; j<index[i+1];j++)
-  // //             edgeweights[j-1]=temp_edgeweight[i][j-index[i]];
-  // //           delete[] temp_edgeweight[i];  
-  // //         }
-  // //       delete[]temp_edgeweight;
-  // //     }
-  //   delete[] index;
-  //   delete[] temp;
-  //   delete[] size;
 
   cout<< "end of graph creation"<<endl;
 }
+
+// /*! Method contributing to the distant cell graph
+//  */
+// void MESHCollection::findCommonDistantNodes(vector<vector<multimap<int,int> > >& commonDistantNodes)
+// {
+//   int nbdomain=_topology->nbDomain();
+//   commonDistantNodes.resize(nbdomain);
+//   for (int i=0; i<nbdomain;i++) commonDistantNodes[i].resize(nbdomain);
+//   int nbproc=_domain_selector->nbProcs();
+//   vector<BBTree<3>* > bbtree(nbdomain); 
+//   vector<ParaMEDMEM::DataArrayInt*> rev(nbdomain);
+//   vector<ParaMEDMEM::DataArrayInt*>revIndx(nbdomain);
+//   int meshDim;
+//   int spaceDim;
+
+//   for (int mydomain=0;mydomain<nbdomain;mydomain++)
+//     {
+//       if(! _domain_selector->isMyDomain(mydomain)) continue;
+//       meshDim=_mesh[mydomain]->getMeshDimension();
+//       spaceDim= _mesh[mydomain]->getSpaceDimension();
+//       rev[mydomain] = ParaMEDMEM::DataArrayInt::New();
+//       revIndx[mydomain] = ParaMEDMEM::DataArrayInt::New();
+//       _mesh[mydomain]->getReverseNodalConnectivity(rev[mydomain],revIndx[mydomain]);
+//         double* bbx=new double[2*spaceDim*_mesh[mydomain]->getNumberOfNodes()];
+//       for (int i=0; i<_mesh[mydomain]->getNumberOfNodes()*spaceDim;i++)
+//         {
+//           const double* coords=_mesh[mydomain]->getCoords()->getConstPointer();
+//           bbx[2*i]=(coords[i])-1e-12;
+//           bbx[2*i+1]=bbx[2*i]+2e-12;
+//         }
+//       bbtree[mydomain]=new BBTree<3> (bbx,0,0,_mesh[mydomain]->getNumberOfNodes(),-1e-12);
+//     }
+//   for (int isource=0;isource<nbdomain;isource++)
+//     for (int itarget=0;itarget<nbdomain;itarget++)
+//       {
+
+//         if (_domain_selector->isMyDomain(isource)&&_domain_selector->isMyDomain(itarget)) continue;
+//         if (_domain_selector->isMyDomain(isource))
+//           {
+//             //preparing data for treatment on target proc
+//             int targetProc = _domain_selector->getProccessorID(itarget);
+            
+//             std::vector<double> vec(spaceDim*_mesh[isource]->getNumberOfNodes());
+//             std::copy(_mesh[isource]->getCoords()->getConstPointer(),_mesh[isource]->getCoords()->getConstPointer()+_mesh[isource]->getNumberOfNodes()*spaceDim,&vec[0]);
+//             _domain_selector->sendDoubleVec (vec,targetProc);
+            
+//             //retrieving target data for storage in commonDistantNodes array
+//             vector<int> localCorrespondency;
+//             _domain_selector->recvIntVec(localCorrespondency, targetProc);
+//             cout<<"size "<<localCorrespondency.size()<<endl;
+//              for (int i=0; i<localCorrespondency.size()/2;i++)
+//               commonDistantNodes[isource][itarget].insert(make_pair(localCorrespondency[2*i],localCorrespondency[2*i+1]));      
+            
+//           }
+//         if (_domain_selector->isMyDomain(itarget))    
+//           {
+//             //receiving data from source proc
+//             int sourceProc = isource%nbproc;
+//             std::vector<double> recvVec;
+//             _domain_selector->recvDoubleVec(recvVec,sourceProc);
+//             std::map<int,int> commonNodes; // (local nodes, distant nodes) list
+//             for (int inode=0; inode<(recvVec.size()/meshDim);inode++)
+//               {
+//                 double* bbox=new double[2*spaceDim];
+//                 for (int i=0; i<spaceDim;i++)
+//                   {
+//                     bbox[2*i]=recvVec[inode*spaceDim+i]-1e-12;
+//                     bbox[2*i+1]=bbox[2*i]+2e-12;
+//                   }
+//                 vector<int> inodes;
+//                 bbtree[itarget]->getIntersectingElems(bbox,inodes);
+//                 delete[] bbox;
+           
+//                 if (inodes.size()>0) commonNodes.insert(make_pair(inodes[0],inode));
+//               }
+//             std::vector<int> nodeCellCorrespondency;
+//             for (map<int,int>::iterator iter=commonNodes.begin();iter!=commonNodes.end();iter++)
+//               {
+//                 const int*revIndxPtr=revIndx[itarget]->getConstPointer();
+//                 const int*revPtr=rev[itarget]->getConstPointer();
+//                 for (int icell=revIndxPtr[iter->first];icell<revIndxPtr[iter->first+1];icell++)
+//                   {
+//                     nodeCellCorrespondency.push_back(iter->second);
+//                     nodeCellCorrespondency.push_back(revPtr[icell]);
+//                   }
+//           }
+//         _domain_selector->sendIntVec(nodeCellCorrespondency, sourceProc);
+//       }
+  
+// }
+//     }
+      
 
 /*! Creates the partition corresponding to the cell graph and the partition number
  * 
@@ -1776,16 +1810,13 @@ Topology* MESHCollection::createPartition(const int* partition)
 //   }
 // }
 
-// void MESHCollection::castField(const MESHCollection& old_collection, const string& fieldname, int itnumber, int ordernumber)
+// void MESHCollection::castFieldDouble(const MESHCollection& old_collection, const string& fieldname, int itnumber, int ordernumber)
 // {
 //   int type=old_collection.getDriver()->getFieldType(fieldname);
 //   char field_char[80];
 //   strcpy(field_char,fieldname.c_str());
-
-//   if (type ==0)
-//     castFields<int>(old_collection, field_char, itnumber, ordernumber);
-//   else
-//     castFields<double>(old_collection, field_char, itnumber, ordernumber);
+//   std::vector<ParaMEDMEM::TypeOfField> fieldTypes =MEDLoader::GetTypesOfField(fileName, fieldName,meshName);
+  
 // }
 
 // void MESHCollection::castAllFields(const MESHCollection& initial_collection)
@@ -1794,18 +1825,18 @@ Topology* MESHCollection::createPartition(const int* partition)
 //   vector <int> iternumber;
 //   vector <int> ordernumber;
 //   vector <int> types;
-//   initial_collection.getDriver()->readFileStruct(field_names,iternumber,ordernumber,types);
+
+//   string filename=initial_collection.getDriver()->getFilename();
+//   field_names=MEDLoader::GetAllFieldNames(filename.c_str());
+
+// readFileStruct(field_names,iternumber,ordernumber,types);
 
 //   for (int i=0; i<field_names.size(); i++)
 //   {
 //     char field_char[80];
 //     strcpy(field_char,field_names[i].c_str());
 
-//     // choosing whether the field is of int or double type
-//     if (types[i] ==0)
-//       castFields<int>(initial_collection, field_char, iternumber[i], ordernumber[i]);
-//     else
-//       castFields<double>(initial_collection, field_char, iternumber[i], ordernumber[i]);
+//     castFieldDouble(initial_collection, field_char, iternumber[i], ordernumber[i]);
 //   }
 // }
 
@@ -2211,6 +2242,7 @@ void MESHCollection::setDomainNames(const std::string& name)
     {
       ostringstream oss;
       oss<<name<<"_"<<i;
+      if (!isParallelMode() || _domain_selector->isMyDomain(i))
       _mesh[i]->setName(oss.str().c_str());
     }
 }

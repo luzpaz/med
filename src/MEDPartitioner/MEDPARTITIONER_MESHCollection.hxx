@@ -26,7 +26,7 @@
 //#include "boost/shared_ptr.hpp"
 #include <vector>
 #include <map>
-
+#include <string>
 namespace ParaMEDMEM
 {
   class MEDCouplingUMesh;
@@ -42,9 +42,11 @@ namespace MEDPARTITIONER
   class ParaDomainSelector;
   class MEDSKYLINEARRAY;
   class CONNECTZONE;
-
+  class JointFinder;
   typedef enum{MedAscii, MedXML, Undefined} DriverType;
 
+  typedef std::multimap<std::pair<int,int>, std::pair<int,int> > NodeMapping ;
+  typedef std::vector<std::pair<int,int> >  NodeList;
   
   class MEDPARTITIONER_EXPORT MESHCollection
   {
@@ -126,7 +128,7 @@ namespace MEDPARTITIONER
      std::vector<ParaMEDMEM::MEDCouplingUMesh*>& getFaceMesh() ;
      std::vector<std::vector<ParaMEDMEM::MEDCouplingUMesh*> >&getGroupMeshes();
  
-     ParaMEDMEM::MEDCouplingUMesh* getMesh(int idomain);
+     ParaMEDMEM::MEDCouplingUMesh* getMesh(int idomain) const;
      ParaMEDMEM::MEDCouplingUMesh* getFaceMesh(int idomain);
      std::vector<ParaMEDMEM::MEDCouplingUMesh*>& getGroupMeshes(int idomain);
 
@@ -141,7 +143,7 @@ namespace MEDPARTITIONER
 
     //getting a pointer to topology
     Topology* getTopology() const ;
-   
+    ParaDomainSelector* getParaDomainSelector() const{return _domain_selector;}
   //settig a new topology
     void setTopology(Topology* topology);
 
@@ -158,6 +160,7 @@ namespace MEDPARTITIONER
     //creates the node mapping between an old collection and the present one
     void createNodeMapping( MESHCollection& initialCollection, std::multimap<std::pair<int,int>,std::pair<int,int> >& nodeMapping);
 
+    void castCellMeshes(MESHCollection& initialCollection, std::vector<std::vector<std::vector<int> > >& new2oldIds);
     //creates faces on the new collection
     void castFaceMeshes( MESHCollection& initialCollection,const std::multimap<std::pair<int,int>,std::pair<int,int> >& nodeMapping);
 
@@ -212,6 +215,7 @@ namespace MEDPARTITIONER
     
     void castIntField(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastFrom,std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastTo,  std::vector<ParaMEDMEM::DataArrayInt*>& arrayFrom,  std::vector<ParaMEDMEM::DataArrayInt*>& arrayTo, std::vector<std::vector< std::vector<int> > > & old2newMapping);
 
+    void findCommonDistantNodes(std::vector<std::vector<std::multimap<int,int> > >& commonDistantNodes);
   //     template <class T>
     //     void castFields(const MESHCollection& old_collection, const string& fieldname, int itnumber, int ordernumber);
     
@@ -278,6 +282,8 @@ namespace MEDPARTITIONER
         /*! flag specifying that groups must be created on all domains, 
                 even if they are empty*/
     bool                              _create_empty_groups;
+
+    JointFinder* _joint_finder;
   };
 
 }//of namespace

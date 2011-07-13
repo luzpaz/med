@@ -70,6 +70,16 @@ static PyObject *convertIntArrToPyList2(const std::vector<int>& v) throw(INTERP_
 #endif
 }
 
+static PyObject *convertIntArrToPyList3(const std::set<int>& v) throw(INTERP_KERNEL::Exception)
+{
+  int size=v.size();
+  PyObject *ret=PyList_New(size);
+  std::set<int>::const_iterator it=v.begin();
+  for(int i=0;i<size;i++,it++)
+    PyList_SetItem(ret,i,PyInt_FromLong(*it));
+  return ret;
+}
+
 static PyObject *convertIntArrToPyListOfTuple(const int *vals, int nbOfComp, int nbOfTuples) throw(INTERP_KERNEL::Exception)
 {
   PyObject *ret=PyList_New(nbOfTuples);
@@ -220,6 +230,63 @@ static void convertPyToNewIntArr3(PyObject *pyLi, std::vector<int>& arr) throw(I
     }
 }
 
+static void fillArrayWithPyListInt(PyObject *pyLi, int *arrToFill, int sizeOfArray, int dftVal) throw(INTERP_KERNEL::Exception)
+{
+  if(PyList_Check(pyLi))
+    {
+      int size=PyList_Size(pyLi);
+      for(int i=0;i<size;i++)
+        {
+          PyObject *o=PyList_GetItem(pyLi,i);
+          if(PyInt_Check(o))
+            {
+              int val=(int)PyInt_AS_LONG(o);
+              if(i<sizeOfArray)
+                arrToFill[i]=val;
+            }
+          else
+            {
+              const char msg[]="list must contain integers only";
+              PyErr_SetString(PyExc_TypeError,msg);
+              throw INTERP_KERNEL::Exception(msg);
+            }
+        }
+      for(int i=size;i<sizeOfArray;i++)
+        arrToFill[i]=dftVal;
+      return;
+      
+    }
+  else if(PyTuple_Check(pyLi))
+    {
+      int size=PyTuple_Size(pyLi);
+      for(int i=0;i<size;i++)
+        {
+          PyObject *o=PyTuple_GetItem(pyLi,i);
+          if(PyInt_Check(o))
+            {
+              int val=(int)PyInt_AS_LONG(o);
+              if(i<sizeOfArray)
+                arrToFill[i]=val;
+            }
+          else
+            {
+              const char msg[]="tuple must contain integers only";
+              PyErr_SetString(PyExc_TypeError,msg);
+              throw INTERP_KERNEL::Exception(msg);
+            }
+        }
+      for(int i=size;i<sizeOfArray;i++)
+        arrToFill[i]=dftVal;
+      return;
+    }
+  else
+    {
+      const char msg[]="fillArrayWithPyListInt : not a list";
+      PyErr_SetString(PyExc_TypeError,msg);
+      throw INTERP_KERNEL::Exception(msg);
+    }
+}
+
 static PyObject *convertDblArrToPyList(const double *ptr, int size) throw(INTERP_KERNEL::Exception)
 {
   PyObject *ret=PyList_New(size);
@@ -310,36 +377,75 @@ static double *convertPyToNewDblArr2(PyObject *pyLi, int *size) throw(INTERP_KER
     }
   else
     {
-      const char msg[]="convertPyToNewIntArr : not a list";
+      const char msg[]="convertPyToNewDblArr2 : not a list";
       PyErr_SetString(PyExc_TypeError,msg);
       throw INTERP_KERNEL::Exception(msg);
     }
 }
 
-void convertPyObjToVecUMeshes(PyObject *ms, std::vector<ParaMEDMEM::MEDCouplingUMesh *>& v) throw(INTERP_KERNEL::Exception)
+static void fillArrayWithPyListDbl(PyObject *pyLi, double *arrToFill, int sizeOfArray, double dftVal) throw(INTERP_KERNEL::Exception)
 {
-  if(PyList_Check(ms))
+  if(PyList_Check(pyLi))
     {
-      int size=PyList_Size(ms);
-      v.resize(size);
+      int size=PyList_Size(pyLi);
       for(int i=0;i<size;i++)
         {
-          PyObject *obj=PyList_GetItem(ms,i);
-          void *argp;
-          int status=SWIG_ConvertPtr(obj,&argp,SWIGTYPE_p_ParaMEDMEM__MEDCouplingUMesh,0|0);
-          if(!SWIG_IsOK(status))
+          PyObject *o=PyList_GetItem(pyLi,i);
+          if(PyFloat_Check(o))
             {
-              const char msg[]="list must contain only MEDCouplingUMesh";
+              double val=PyFloat_AS_DOUBLE(o);
+              if(i<sizeOfArray)
+                arrToFill[i]=val;
+            }
+          else if(PyInt_Check(o))
+            {
+              long val0=PyInt_AS_LONG(o);
+              double val=val0;
+              if(i<sizeOfArray)
+                arrToFill[i]=val;
+            }
+          else
+            {
+              const char msg[]="fillArrayWithPyListDbl : list must contain floats/integers only";
               PyErr_SetString(PyExc_TypeError,msg);
               throw INTERP_KERNEL::Exception(msg);
             }
-          ParaMEDMEM::MEDCouplingUMesh *arg=reinterpret_cast< ParaMEDMEM::MEDCouplingUMesh * >(argp);
-          v[i]=arg;
         }
+      for(int i=size;i<sizeOfArray;i++)
+        arrToFill[i]=dftVal;
+      return;
+    }
+  else if(PyTuple_Check(pyLi))
+    {
+      int size=PyTuple_Size(pyLi);
+      for(int i=0;i<size;i++)
+        {
+          PyObject *o=PyTuple_GetItem(pyLi,i);
+          if(PyFloat_Check(o))
+            {
+              double val=PyFloat_AS_DOUBLE(o);
+              arrToFill[i]=val;
+            }
+          else if(PyInt_Check(o))
+            {
+              long val0=PyInt_AS_LONG(o);
+              double val=val0;
+              arrToFill[i]=val;
+            }
+          else
+            {
+              const char msg[]="fillArrayWithPyListDbl : tuple must contain floats/integers only";
+              PyErr_SetString(PyExc_TypeError,msg);
+              throw INTERP_KERNEL::Exception(msg);
+            }
+        }
+      for(int i=size;i<sizeOfArray;i++)
+        arrToFill[i]=dftVal;
+      return ;
     }
   else
     {
-      const char msg[]="convertPyObjToVecUMeshes : not a list";
+      const char msg[]="convertPyToNewIntArr : not a list";
       PyErr_SetString(PyExc_TypeError,msg);
       throw INTERP_KERNEL::Exception(msg);
     }
@@ -427,35 +533,6 @@ void convertPyObjToVecFieldDblCst(PyObject *ms, std::vector<const ParaMEDMEM::ME
   else
     {
       const char msg[]="convertPyObjToVecFieldDblCst : not a list";
-      PyErr_SetString(PyExc_TypeError,msg);
-      throw INTERP_KERNEL::Exception(msg);
-    }
-}
-
-void convertPyObjToVecDataArrayInt(PyObject *ms, std::vector<ParaMEDMEM::DataArrayInt *>& v) throw(INTERP_KERNEL::Exception)
-{
-  if(PyList_Check(ms))
-    {
-      int size=PyList_Size(ms);
-      v.resize(size);
-      for(int i=0;i<size;i++)
-        {
-          PyObject *obj=PyList_GetItem(ms,i);
-          void *argp;
-          int status=SWIG_ConvertPtr(obj,&argp,SWIGTYPE_p_ParaMEDMEM__DataArrayInt,0|0);
-          if(!SWIG_IsOK(status))
-            {
-              const char msg[]="list must contain only DataArrayInt";
-              PyErr_SetString(PyExc_TypeError,msg);
-              throw INTERP_KERNEL::Exception(msg);
-            }
-          ParaMEDMEM::DataArrayInt *arg=reinterpret_cast< ParaMEDMEM::DataArrayInt * >(argp);
-          v[i]=arg;
-        }
-    }
-  else
-    {
-      const char msg[]="convertPyObjToVecDataArrayInt : not a list";
       PyErr_SetString(PyExc_TypeError,msg);
       throw INTERP_KERNEL::Exception(msg);
     }

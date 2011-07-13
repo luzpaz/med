@@ -69,6 +69,7 @@ void METISGraph::partGraph(int                 ndomain,
   int edgecut;
   int* partition = new int[n];
 
+  cout << "ParMETIS : n="<<n<<endl;
   if (nparts >1)
   {
     if ( parallelizer )
@@ -77,7 +78,7 @@ void METISGraph::partGraph(int                 ndomain,
       // distribution of vertices of the graph among the processors
       int * vtxdist = parallelizer ? parallelizer->getNbVertOfProcs() : 0;
       MPI_Comm comm = MPI_COMM_WORLD;
-
+      cout<<"vtxdist[1]"<<" "<<vtxdist[2]<<endl;
       ParMETIS_PartKway( vtxdist, xadj, adjncy, vwgt, adjwgt, &wgtflag,
                          &base, &nparts, options, &edgecut, partition, &comm );
 #else
