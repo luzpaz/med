@@ -54,7 +54,7 @@ echo Build  root directory : $ROOT_BUILDDIR
 echo
 
 dnl remember MED_WITH_KERNEL set by build configure
-MED_WITH_KERNEL=yes
+MED_WITH_KERNEL=no
 old_with_kernel=${MED_WITH_KERNEL}
 
 dnl
@@ -686,6 +686,7 @@ AC_OUTPUT([ \
         src/INTERP_KERNEL/Bases/Makefile \
         src/INTERP_KERNEL/Geometric2D/Makefile \
 	src/INTERP_KERNEL/ExprEval/Makefile \
+	src/INTERP_KERNEL/GaussPoints/Makefile \
         src/INTERP_KERNELTest/Makefile \
         src/MEDCoupling/Makefile \
         src/MEDCoupling/Test/Makefile \
@@ -701,6 +702,7 @@ AC_OUTPUT([ \
         src/MEDSPLITTER/Makefile \
         src/MEDSPLITTER/Test/Makefile \
         src/MEDSPLITTER_Swig/Makefile \
+        src/MEDPartitioner/Makefile \
         src/RENUMBER/Makefile \
         src/MULTIPR/Makefile \
         src/ParaMEDCouplingCorba/Makefile \
