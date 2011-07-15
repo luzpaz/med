@@ -30,9 +30,7 @@
 
 #include "MEDMEM_STRING.hxx"
 
-#ifdef HAVE_MPI2
 #include <mpi.h>
-#endif
 
 #include <fstream>
 

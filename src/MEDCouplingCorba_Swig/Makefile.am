@@ -52,3 +52,6 @@ _MEDCouplingCorba_la_LDFLAGS  = -module $(PYTHON_LIBS) \
 CLEANFILES = MEDCouplingCorba_wrap.cxx MEDCouplingCorba.py
 
 dist_salomescript_DATA= MEDCouplingCorba.py
+
+EXTRA_DIST += MEDCouplingCorbaSwigTest.py MEDCouplingCorbaSwigTestClt.py MEDCouplingCorbaSwigTestServ.py \
+              TestMEDCouplingCorbaClt.py TestMEDCouplingCorbaServ.py
