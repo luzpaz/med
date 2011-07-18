@@ -25,7 +25,7 @@
 #include "MEDPARTITIONER_ParaDomainSelector.hxx"
 
 #include "MEDPARTITIONER_UserGraph.hxx"
-#include "MEDPARTITIONER_JointExchangeData.hxx"
+//#include "MEDPARTITIONER_JointExchangeData.hxx"
 
 //#include <MEDMEM_Meshing.hxx>
 #include <MEDMEM_DriversDef.hxx>
@@ -654,9 +654,10 @@ void ParaDomainSelector::sendMesh(const ParaMEDMEM::MEDCouplingUMesh& mesh, int 
     // ------------------------------
     vector<int> tinyInfoLocal;
     vector<string> tinyInfoLocalS;
+    vector<double> tinyInfoLocalD;
     //Getting tiny info of local mesh to allow the distant proc to initialize and allocate
     //the transmitted mesh.
-    mesh.getTinySerializationInformation(tinyInfoLocal,tinyInfoLocalS);
+    mesh.getTinySerializationInformation(tinyInfoLocalD,tinyInfoLocal,tinyInfoLocalS);
     tinyInfoLocal.push_back(mesh.getNumberOfCells());
  #ifdef        HAVE_MPI2
     int tinySize=tinyInfoLocal.size();
@@ -702,6 +703,7 @@ void ParaDomainSelector::recvMesh(ParaMEDMEM::MEDCouplingUMesh*& mesh, int sourc
     // ------------------------------
     vector<int> tinyInfoDistant;
     vector<string> tinyInfoLocalS;
+    vector<double> tinyInfoDistantD(1);
     //Getting tiny info of local mesh to allow the distant proc to initialize and allocate
     //the transmitted mesh.
 #ifdef HAVE_MPI2
@@ -749,7 +751,7 @@ void ParaDomainSelector::recvMesh(ParaMEDMEM::MEDCouplingUMesh*& mesh, int sourc
     //
     //mesh=dynamic_cast<ParaMEDMEM::MEDCouplingUMesh*> (distant_mesh_tmp);
     //finish unserialization
-    mesh->unserialization(tinyInfoDistant,v1Distant,v2Distant,unusedTinyDistantSts);
+    mesh->unserialization(tinyInfoDistantD,tinyInfoDistant,v1Distant,v2Distant,unusedTinyDistantSts);
     std::cout<<"mesh size on recv"<<mesh->getNumberOfCells()<<std::endl;
     //
     if(v1Distant)

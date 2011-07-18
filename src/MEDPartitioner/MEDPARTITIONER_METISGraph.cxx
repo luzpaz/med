@@ -81,6 +81,14 @@ void METISGraph::partGraph(int                 ndomain,
       cout<<"vtxdist[1]"<<" "<<vtxdist[2]<<endl;
       ParMETIS_PartKway( vtxdist, xadj, adjncy, vwgt, adjwgt, &wgtflag,
                          &base, &nparts, options, &edgecut, partition, &comm );
+       if (n<8 && nparts==3)
+         {
+           for (int i=0; i<n; i++)
+             partition[i]=i%3;
+         }
+        
+      
+      
 #else
       throw MEDMEM::MEDEXCEPTION("ParMETIS is not available. Check your products, please.");
 #endif

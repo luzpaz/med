@@ -32,9 +32,9 @@ namespace MEDPARTITIONER
     MESHCollectionMedAsciiDriver(MESHCollection*);
     virtual ~MESHCollectionMedAsciiDriver(){}
 
-    int read(char*, ParaDomainSelector* sel=0);
+    int read(const char*, ParaDomainSelector* sel=0);
 
-    void write(char*, ParaDomainSelector* sel=0);
+    void write(const char*, ParaDomainSelector* sel=0);
 
 //     void readFields(vector <MEDMEM::FIELD<int> *>& filenames, char* fieldname,
 //                     int itnumber, int ordernumber)

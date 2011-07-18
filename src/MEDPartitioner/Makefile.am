@@ -31,14 +31,12 @@ lib_LTLIBRARIES= libmedsplitter.la
 salomeinclude_HEADERS= \
 MEDPARTITIONER_Topology.hxx \
 MEDPARTITIONER_MESHCollection.hxx \
-MEDPARTITIONER_MESHCollectionDriver.H \
 MEDPARTITIONER_MESHCollectionMedXMLDriver.H \
 MEDPARTITIONER_MESHCollectionMedAsciiDriver.H \
 MEDPARTITIONER_MESHCollectionDriver.hxx \
 MEDPARTITIONER_MESHCollectionMedXMLDriver.hxx \
 MEDPARTITIONER_MESHCollectionMedAsciiDriver.hxx \
 MEDPARTITIONER_ParallelTopology.hxx \
-MEDPARTITIONER_FaceModel.hxx \
 MEDPARTITIONER_JointFinder.hxx \
 MEDPARTITIONER_Graph.hxx\
 MEDPARTITIONER_UserGraph.hxx\
@@ -65,7 +63,6 @@ MEDPARTITIONER_ParallelTopology.cxx \
 MEDPARTITIONER_Graph.cxx\
 MEDPARTITIONER_UserGraph.cxx\
 MEDPARTITIONER_ParaDomainSelector.cxx \
-MEDPARTITIONER_JointExchangeData.cxx \
 MEDPARTITIONER_JointFinder.cxx \
 MEDPARTITIONER_SkyLineArray.cxx \
 MEDPARTITIONER_ConnectZone.cxx

@@ -54,7 +54,7 @@ void MESHCollectionMedXMLDriver::_readFields(vector<MEDMEM::FIELD<T>* >& fields,
  * \param fieldname name of the field
  * */
 template <class T>
-void MESHCollectionMedXMLDriver::_writeFields(vector<MEDMEM::FIELD<T>* >& fields,char* fieldname)
+void MESHCollectionMedXMLDriver::_writeFields(vector<MEDMEM::FIELD<T>* >& fields,const char* fieldname)
 {
   xmlDocPtr master_doc=xmlParseFile(_master_filename.c_str());
 

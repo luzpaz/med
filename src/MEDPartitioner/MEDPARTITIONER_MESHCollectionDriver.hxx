@@ -33,10 +33,10 @@ namespace MEDPARTITIONER
     MESHCollectionDriver(MESHCollection*);
     virtual ~MESHCollectionDriver(){}
 
-    virtual int read(char*, ParaDomainSelector* sel=0)=0;
-    int readSeq(char*,char*);
+    virtual int read(const char*, ParaDomainSelector* sel=0)=0;
+    int readSeq(const char*,const char*);
 
-    virtual void write(char*, ParaDomainSelector* sel=0)=0;
+    virtual void write(const char*, ParaDomainSelector* sel=0)=0;
 //     virtual void readFields (vector <MEDMEM::FIELD<int> *>& filenames, char* fieldname,
 //                              int itnumber, int ordernumber) =0;
 //     virtual void readFields (vector <MEDMEM::FIELD<double> *>& filenames, char* fieldname,
@@ -59,7 +59,7 @@ namespace MEDPARTITIONER
     void readSubdomain(vector<int*>& cellglobal,
                        vector<int*>& faceglobal,
                        vector<int*>& nodeglobal, int idomain);
-    void writeSubdomain(int idomain,int nbdomain, char*filename,
+    void writeSubdomain(int idomain,int nbdomain, const char*filename,
                         ParaDomainSelector* domain_selector);
 
 //     void writeElementJoint(medEntityMesh entity ,

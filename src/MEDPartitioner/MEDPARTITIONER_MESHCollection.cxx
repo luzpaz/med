@@ -116,6 +116,7 @@ MESHCollection::MESHCollection(MESHCollection& initialCollection, Topology* topo
    castCellMeshes(initialCollection, new2oldIds);
 
 
+
   //casting cell families on new meshes
   _cellFamilyIds.resize(topology->nbDomain());
   castIntField(initialCollection.getMesh(), this->getMesh(),initialCollection.getCellFamilyIds(),_cellFamilyIds, new2oldIds);
@@ -145,13 +146,16 @@ MESHCollection::MESHCollection(MESHCollection& initialCollection, Topology* topo
     {
       if(isParallelMode() && !_domain_selector->isMyDomain(inew)) continue;
       _cellFamilyIds[inew]=ParaMEDMEM::DataArrayInt::New();
-      int* ptrCellIds=new int[_mesh[inew]->getNumberOfCells()];
-      for (int i=0; i< _mesh[inew]->getNumberOfCells();i++) ptrCellIds[i]=0;
-      _cellFamilyIds[inew]->useArray(ptrCellIds,true, ParaMEDMEM::CPP_DEALLOC,_mesh[inew]->getNumberOfCells(),1);
+      int nbCells=_mesh[inew]->getNumberOfCells();
+      int* ptrCellIds=new int[nbCells];
+      for (int i=0; i< nbCells;i++) ptrCellIds[i]=0;
+      _cellFamilyIds[inew]->useArray(ptrCellIds,true, ParaMEDMEM::CPP_DEALLOC,nbCells,1);
+
+      int nbFaces=_faceMesh[inew]->getNumberOfCells();
       _faceFamilyIds[inew]=ParaMEDMEM::DataArrayInt::New();
-      int* ptrFaceIds=new int[_faceMesh[inew]->getNumberOfCells()];
-      for (int i=0; i< _faceMesh[inew]->getNumberOfCells();i++) ptrFaceIds[i]=0;
-      _faceFamilyIds[inew]->useArray(ptrFaceIds,true, ParaMEDMEM::CPP_DEALLOC,_faceMesh[inew]->getNumberOfCells(),1); 
+      int* ptrFaceIds=new int[nbFaces];
+      for (int i=0; i<nbFaces;i++) ptrFaceIds[i]=0;
+      _faceFamilyIds[inew]->useArray(ptrFaceIds,true, ParaMEDMEM::CPP_DEALLOC,nbFaces,1); 
     }
 
   castIntField(initialCollection.getFaceMesh(), this->getFaceMesh(),initialCollection.getFaceFamilyIds(),_faceFamilyIds,new2oldFaceIds);
@@ -240,6 +244,8 @@ void MESHCollection::castCellMeshes(MESHCollection& initialCollection, std::vect
         {
           _mesh[inew]=ParaMEDMEM::MEDCouplingUMesh::MergeUMeshes(meshes);
           _mesh[inew]->zipCoords();
+          cout <<"new mesh "<<inew<<" "<<_mesh[inew]->getNumberOfCells()<<" cells"<<
+            _mesh[inew]->getNumberOfNodes()<<" nodes"<<endl;
         }
       for (int i=0; i< splitMeshes[inew].size();i++)
         if (splitMeshes[inew][i]!=0) splitMeshes[inew][i]->decrRef();
@@ -263,16 +269,20 @@ void MESHCollection::createNodeMapping( MESHCollection& initialCollection, NodeM
       if (!isParallelMode() || (_domain_selector->isMyDomain(iold)))
         {
           //      std::map<pair<double,pair<double, double> >, int > nodeClassifier;
-          int nvertices=getMesh(iold)->getNumberOfNodes();
+          int nvertices=initialCollection.getMesh(iold)->getNumberOfNodes();
+          cout <<"nvertices "<<nvertices<<endl;
           bbox=new double[nvertices*6];
           ParaMEDMEM::DataArrayDouble* coords = initialCollection.getMesh(iold)->getCoords();
           double* coordsPtr=coords->getPointer();
+          for (int i=0; i<nvertices;i++)
+              cout<<"coords old "<<coordsPtr[3*i]<<" "<<coordsPtr[3*i+1]<<" "<<coordsPtr[3*i+2]<<endl;
+              
           for (int i=0; i<nvertices*3;i++)
             {
-              bbox[i*2]=coordsPtr[i]-1e-9;
-              bbox[i*2+1]=coordsPtr[i]+1e-9;
+              bbox[i*2]=coordsPtr[i]-1e-6;
+              bbox[i*2+1]=coordsPtr[i]+1e-6;
             }
-          tree=new BBTree<3>(bbox,0,0,nvertices,1e-12);
+          tree=new BBTree<3>(bbox,0,0,nvertices,1e-9);
         }
               
       for (int inew=0; inew<_topology->nbDomain(); inew++)
@@ -307,9 +317,11 @@ void MESHCollection::createNodeMapping( MESHCollection& initialCollection, NodeM
                 {
                   
                   double* coordsPtr=coords->getPointer()+inode*3;
+                  cout<<"coords new "<<coordsPtr[0]<<" "<<coordsPtr[1]<<" "<<coordsPtr[2]<<endl;
+     
                   std::vector<int> elems;
                   tree->getElementsAroundPoint(coordsPtr,elems);
-                  if (elems.size()==0) {continue;}              
+                  if (elems.size()==0) {cout<<"warning " <<inode<< endl;continue;}              
                   nodeMapping.insert(make_pair(make_pair(iold,elems[0]),make_pair(inew,inode)));
                   cout << "inode :" <<inode<<" ("<<iold<<","<<elems[0]<<")-->("<<inew<<","<<inode<<")"<<endl;
                 }
@@ -350,6 +362,8 @@ void MESHCollection::castMeshes(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& mesh
   for (int iold=0; iold<meshesCastFrom.size();iold++)
     {
       if (isParallelMode() && !_domain_selector->isMyDomain(iold)) continue;
+      cout <<"-----------MESH OLD "<<iold<<"-----------"<<endl;
+      cout <<meshesCastFrom[iold]->advancedRepr();
       new2oldIds[iold].resize(newSize);
       for (int ielem=0;ielem<meshesCastFrom[iold]->getNumberOfCells();ielem++)
         {
@@ -358,7 +372,7 @@ void MESHCollection::castMeshes(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& mesh
           
           map <int,int> faces;
           //      cout<<"----------------"<<endl;
-          //analysis of one face
+          //analysis of element ielem
           for (int inode=0;inode<nodes.size();inode++)
             {
               typedef multimap<pair<int,int>,pair<int,int> >::const_iterator MI;
@@ -368,10 +382,11 @@ void MESHCollection::castMeshes(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& mesh
               //                cout << iold <<" " <<nodes[inode]<<endl;
               for (MI iter=myRange.first; iter!=myRange.second; iter++)
                 {
-                  if (faces.find(iter->second.first)==faces.end())
-                    faces[iter->second.first]=1;
+                  int inew=iter->second.first;
+                  if (faces.find(inew)==faces.end())
+                    faces[inew]=1;
                   else
-                    faces[iter->second.first]++;
+                    faces[inew]++;
                   //                    cout<<"idomain" << iter->second.first<<" facemapping "<<faces[iter->second.first]<<endl;
                 }
             }
@@ -390,6 +405,7 @@ void MESHCollection::castMeshes(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& mesh
         {
           cout<<"nb faces - iold "<<iold<<" inew "<<inew<<" : "<<new2oldIds[iold][inew].size()<<endl;
           splitMeshes[inew][iold]=(ParaMEDMEM::MEDCouplingUMesh*)(meshesCastFrom[iold]->buildPartOfMySelf(&new2oldIds[iold][inew][0],&new2oldIds[iold][inew][0]+new2oldIds[iold][inew].size(),true));
+          cout << "split face Meshes "<<inew<<" "<<iold<<splitMeshes[inew][iold]->advancedRepr();
         }
     }
       
@@ -424,16 +440,48 @@ void MESHCollection::castMeshes(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& mesh
 
 void MESHCollection::castIntField(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastFrom,std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastTo,  std::vector<ParaMEDMEM::DataArrayInt*>& arrayFrom,  std::vector<ParaMEDMEM::DataArrayInt*>& arrayTo, std::vector< std::vector< std::vector<int> > >& new2oldMapping)
 {
-  for (int inew=0; inew < meshesCastTo.size();inew++)
+  vector<vector<const ParaMEDMEM::DataArrayInt*> > splitIds;
+  splitIds.resize(meshesCastTo.size());
+ 
+  // send / recv operations
+  for (int inew=0; inew < meshesCastTo.size();inew++)    
+    for (int iold=0; iold < meshesCastFrom.size();iold++)
+      {
+        vector<int> recvIntVec;
+        //sending arrays for distant domains
+        if (isParallelMode() && _domain_selector->isMyDomain(iold) && !_domain_selector->isMyDomain(inew))
+          {
+            int* ptr=&(new2oldMapping[iold][inew][0]);
+            int size=new2oldMapping[iold][inew].size();
+            ParaMEDMEM::DataArrayInt* sendSplitIds=arrayFrom[iold]->selectByTupleId(ptr,ptr+size);
+            vector<int>sendIds(size);
+            std::copy(sendSplitIds->getPointer(),sendSplitIds->getPointer()+size,&sendIds[0]);
+            _domain_selector->sendIntVec(sendIds, _domain_selector->getProcessorID(inew));
+          }
+        //receiving arrays from distant domains
+        if (isParallelMode()&&!_domain_selector->isMyDomain(iold) && _domain_selector->isMyDomain(inew))
+          {
+            vector<int> recvIds;
+            ParaMEDMEM::DataArrayInt* recvSplitIds=ParaMEDMEM::DataArrayInt::New();
+            _domain_selector->recvIntVec(recvIds, _domain_selector->getProcessorID(iold));
+            int* intSplitIds=new int[recvIds.size()];
+            std::copy(&recvIds[0],&recvIds[0]+recvIds.size(),intSplitIds);
+            recvSplitIds->useArray(intSplitIds, true, ParaMEDMEM::CPP_DEALLOC, recvIds.size(),1);
+            splitIds[inew].push_back(recvSplitIds);
+          }
+      }
+
+  //local contributions and aggregation
+  for (int inew=0; inew < meshesCastTo.size();inew++)    
     {
-      vector<const ParaMEDMEM::DataArrayInt*> splitIds;
       for (int iold=0; iold < meshesCastFrom.size();iold++)
-        {
-          if (isParallelMode() && !_domain_selector->isMyDomain(iold)) continue;
-          int* ptr=&(new2oldMapping[iold][inew][0]);
-          splitIds.push_back(arrayFrom[iold]->selectByTupleId(ptr,ptr+new2oldMapping[iold][inew].size()));
-        }
-      arrayTo[inew]=ParaMEDMEM::DataArrayInt::Aggregate(splitIds);
+          if (isParallelMode() && _domain_selector->isMyDomain(iold) && _domain_selector->isMyDomain(inew))
+            {
+              int* ptr=&(new2oldMapping[iold][inew][0]);
+              splitIds[inew].push_back(arrayFrom[iold]->selectByTupleId(ptr,ptr+new2oldMapping[iold][inew].size()));
+            }     
+      if (!isParallelMode()||_domain_selector->isMyDomain(inew))
+        arrayTo[inew]=ParaMEDMEM::DataArrayInt::Aggregate(splitIds[inew]);
     }
 }
 
@@ -453,12 +501,12 @@ MESHCollection::MESHCollection(const string& filename)
     _family_splitting(false),
     _create_empty_groups(false)
 {
-  char filenamechar[256];
-  strcpy(filenamechar,filename.c_str());
+  // char filenamechar[256];
+  // strcpy(filenamechar,filename.c_str());
   try
     {
       _driver=new MESHCollectionMedXMLDriver(this);
-      _driver->read (filenamechar);
+      _driver->read (filename.c_str());
       _driver_type = MedXML;
 
     }
@@ -467,7 +515,7 @@ MESHCollection::MESHCollection(const string& filename)
     try
       {
         _driver=new MESHCollectionMedAsciiDriver(this);
-        _driver->read (filenamechar);
+        _driver->read (filename.c_str());
         _driver_type=MedAscii;
       }
     catch(MEDMEM::MEDEXCEPTION&)
@@ -545,13 +593,13 @@ MESHCollection::MESHCollection(const string& filename, const string& meshname)
     _family_splitting(false),
     _create_empty_groups(false)
 {
-  char filenamechar[256];
-  char meshnamechar[256];
-  strcpy(filenamechar,filename.c_str());
-  strcpy(meshnamechar,meshname.c_str());
+  //char filenamechar[256];
+  //char meshnamechar[256];
+  //  strcpy(filenamechar,filename.c_str());
+  //strcpy(meshnamechar,meshname.c_str());
   try // avoid memory leak in case of inexistent filename
     {
-      retrieveDriver()->readSeq (filenamechar,meshnamechar);
+      retrieveDriver()->readSeq (filename.c_str(),meshname.c_str());
     }
   catch ( MED_EXCEPTION& e )
     {
@@ -596,9 +644,9 @@ void MESHCollection::write(const string& filename)
   if (_driver!=0)delete _driver;
   _driver=0;
 
-  char filenamechar[256];
-  strcpy(filenamechar,filename.c_str());
-  retrieveDriver()->write (filenamechar, _domain_selector);
+  //char filenamechar[256];
+  //  strcpy(filenamechar,filename.c_str());
+  retrieveDriver()->write (filename.c_str(), _domain_selector);
 }
 
 /*! creates or gets the link to the collection driver

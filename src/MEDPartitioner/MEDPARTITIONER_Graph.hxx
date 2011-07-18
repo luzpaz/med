@@ -22,7 +22,7 @@
 
 #include "MEDPARTITIONER.hxx"
 #include "MEDPARTITIONER_SkyLineArray.hxx"
-
+#include <string>
 namespace MEDPARTITIONER {
         
 class ParaDomainSelector;
