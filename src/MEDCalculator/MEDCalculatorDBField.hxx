@@ -20,6 +20,7 @@
 #ifndef __MEDCALCULATORDBFIELD_HXX__
 #define __MEDCALCULATORDBFIELD_HXX__
 
+#include "MedCalculatorDefines.hxx"
 #include "MEDCalculatorDBSliceField.hxx"
 #include "MEDCalculatorDBRangeSelection.hxx"
 
@@ -38,7 +39,7 @@ namespace ParaMEDMEM
   class MEDCalculatorDBFieldCst;
 
 
-  class MEDCalculatorDBField : public RefCountObject
+  class MEDCALCULATOR_EXPORT MEDCalculatorDBField : public RefCountObject
   {
   public:
     static MEDCalculatorDBFieldReal *New(const MEDCalculatorBrowserField& ls);
@@ -54,7 +55,7 @@ namespace ParaMEDMEM
     virtual bool isEqual(const MEDCalculatorDBField& other, double precM, double precF) const = 0;
   };
 
-  class MEDCalculatorDBFieldReal : public MEDCalculatorDBField
+  class MEDCALCULATOR_EXPORT MEDCalculatorDBFieldReal : public MEDCalculatorDBField
   {
   public:
     MEDCalculatorDBFieldReal(const MEDCalculatorBrowserField& ls);
@@ -116,7 +117,7 @@ namespace ParaMEDMEM
     std::vector< MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBSliceField> > _time_steps;
   };
 
-  class MEDCalculatorDBFieldCst : public MEDCalculatorDBField
+  class MEDCALCULATOR_EXPORT MEDCalculatorDBFieldCst : public MEDCalculatorDBField
   {
   public:
     MEDCalculatorDBFieldCst(double val);

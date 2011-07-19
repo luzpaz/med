@@ -19,6 +19,8 @@
 #ifndef __MEDCALCULATORBROWSERMESH_HXX__
 #define __MEDCALCULATORBROWSERMESH_HXX__
 
+#include "MedCalculatorDefines.hxx"
+
 #include <string>
 
 //  This class corresponds to a MED mesh of a file
@@ -26,7 +28,7 @@
 //  It's used only for selecting mesh, out of all fields.
 namespace ParaMEDMEM
 {
-  class MEDCalculatorBrowserMesh
+  class MEDCALCULATOR_EXPORT MEDCalculatorBrowserMesh
   {
   public :
     MEDCalculatorBrowserMesh();

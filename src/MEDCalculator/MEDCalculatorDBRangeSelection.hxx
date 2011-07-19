@@ -20,13 +20,14 @@
 #ifndef __MEDCALCULATORDBRANGESELECTION_HXX__
 #define __MEDCALCULATORDBRANGESELECTION_HXX__
 
+#include "MedCalculatorDefines.hxx"
 #include "InterpKernelException.hxx"
 
 #include <vector>
 
 namespace ParaMEDMEM
 {
-  class MEDCalculatorDBRangeSelection
+  class MEDCALCULATOR_EXPORT MEDCalculatorDBRangeSelection
   {
   public:
     MEDCalculatorDBRangeSelection(const char *v) throw(INTERP_KERNEL::Exception);

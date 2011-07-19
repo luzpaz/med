@@ -34,7 +34,7 @@ namespace MEDMEM
   /*!
    * \brief Mesh able to concatenate other meshes
    */
-  class MeshFuse : public MESHING
+  class MEDMEM_EXPORT MeshFuse : public MESHING
   {
   public:
     MeshFuse();

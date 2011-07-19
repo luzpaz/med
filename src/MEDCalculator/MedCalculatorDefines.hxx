@@ -17,22 +17,18 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef __INTERPOLATION2DCURVE_HXX__
-#define __INTERPOLATION2DCURVE_HXX__
+#ifndef __MEDCALCULATORDEFINES_HXX__
+#define __MEDCALCULATORDEFINES_HXX__
 
-#include "InterpolationCurve.hxx"
-#include "InterpolationOptions.hxx"
-
-namespace INTERP_KERNEL
-{
-  class INTERPKERNEL_EXPORT Interpolation2DCurve : public InterpolationCurve<Interpolation2DCurve>
-  {
-  public:
-    Interpolation2DCurve();
-    Interpolation2DCurve(const InterpolationOptions& io);
-    // geometric precision, intersection tolerance, coice of the median line,
-    void setOptions(double precision, double tolerance, double medianLine);
-  };
-}
+//export symbols
+#ifdef WIN32
+# if defined MEDCALCULATOR_EXPORTS || defined medcalculator_EXPORTS
+#  define MEDCALCULATOR_EXPORT __declspec(dllexport)
+# else
+#  define MEDCALCULATOR_EXPORT __declspec(dllimport)
+# endif
+#else
+# define MEDCALCULATOR_EXPORT
+#endif 
 
 #endif

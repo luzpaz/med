@@ -32,10 +32,10 @@ namespace ParaMEDMEM
 {
   class MEDCouplingDefinitionTime;
 
-  class MEDCouplingFieldOverTimeClient : public MEDCouplingFieldOverTime
+  class MEDCOUPLINGCLIENT_EXPORT MEDCouplingFieldOverTimeClient : public MEDCouplingFieldOverTime
   {
   public:
-    MEDCOUPLINGCLIENT_EXPORT static MEDCouplingFieldOverTimeClient *New(SALOME_MED::MEDCouplingFieldOverTimeCorbaInterface_ptr field);
+    static MEDCouplingFieldOverTimeClient *New(SALOME_MED::MEDCouplingFieldOverTimeCorbaInterface_ptr field);
     std::vector<double> getTimeSteps() const;
   private:
     void fetchDefTimeIfNeeded() const;

@@ -39,7 +39,8 @@ MEDCalculatorBrowserStep.hxx                 \
 MEDCalculatorBrowserLiteStruct.hxx           \
 MEDCalculatorDBRangeSelection.hxx            \
 MEDCalculatorDBSliceField.hxx                \
-MEDCalculatorDBField.hxx
+MEDCalculatorDBField.hxx                     \
+MedCalculatorDefines.hxx
 
 dist_libmedcalculator_la_SOURCES= \
 MEDCalculatorBrowserMesh.cxx                 \

@@ -508,7 +508,11 @@ MED_FIELD_DRIVER<T>::getMeshDimensionFromFile(med_2_3::med_idt id,
   int numberOfMeshes = med_2_3::MEDnMesh(id);
   for (int i = 1; i <= numberOfMeshes; ++i )
     {
+#ifdef WIN32
+      int naxis=max(3,med_2_3::MEDmeshnAxis(id,i));
+#else
       int naxis=std::max(3,med_2_3::MEDmeshnAxis(id,i));
+#endif
       char *axisname=new char[naxis*MED_SNAME_SIZE+1];
       char *axisunit=new char[naxis*MED_SNAME_SIZE+1];
       med_2_3::MEDmeshInfo(id, i ,meshNameInFile, &spaceDimp3, &meshDim, &meshType, meshDescription,dtunit,&sorttypep3,&nstepp3,&atp3,axisname,axisunit);
@@ -996,7 +1000,11 @@ template <class T> void MED_FIELD_RDONLY_DRIVER<T>::read(void)
   med_2_3::med_sorting_type sttp3;
   med_2_3::med_int nsteppp3;
   med_2_3::med_axis_type axxxppp3;
+#ifdef WIN32
+  int naxis=max(3,med_2_3::MEDmeshnAxisByName(id,meshName.c_str()));
+#else
   int naxis=std::max(3,med_2_3::MEDmeshnAxisByName(id,meshName.c_str()));
+#endif
   char *annp3=new char[naxis*MED_SNAME_SIZE+1];
   char *auup3=new char[naxis*MED_SNAME_SIZE+1];
   bool fileHasMesh=(med_2_3::MEDmeshInfoByName(id,meshName.c_str(),&spceDimp3,&mdimp3,&mtype,desccp3,dttunittp3,&sttp3,&nsteppp3,&axxxppp3,annp3,auup3)==0 && spceDimp3 > 0);

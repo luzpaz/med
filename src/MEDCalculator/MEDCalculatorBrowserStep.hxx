@@ -20,6 +20,8 @@
 #ifndef __MEDCALCULATORBROWSERSTEP_HXX__
 #define __MEDCALCULATORBROWSERSTEP_HXX__
 
+#include "MedCalculatorDefines.hxx"
+
 #include <string>
 
 //  This class corresponds to a time step (dt,it) of a field
@@ -27,7 +29,7 @@
 //  It also contains methods for selecting or unselecting this time step and it hold the name of the supporting mesh.
 namespace ParaMEDMEM
 {
-  class MEDCalculatorBrowserStep
+  class MEDCALCULATOR_EXPORT MEDCalculatorBrowserStep
   {
   public :
     MEDCalculatorBrowserStep(int ts=0, int order=0, double tv=0.0, std::string m="") : _time_step(ts), _order(order), _time_value(tv), _selection(false), _mesh(m) { }

@@ -20,6 +20,7 @@
 #ifndef __MEDCALCULATORDBSLICEFIELD_HXX__
 #define __MEDCALCULATORDBSLICEFIELD_HXX__
 
+#include "MedCalculatorDefines.hxx"
 #include "MEDCouplingRefCountObject.hxx"
 
 #include "InterpKernelException.hxx"
@@ -33,7 +34,7 @@ namespace ParaMEDMEM
   class DataArrayInt;
   class MEDCalculatorDBRangeSelection;
   
-  class MEDCalculatorDBSliceField : public RefCountObject
+  class MEDCALCULATOR_EXPORT MEDCalculatorDBSliceField : public RefCountObject
   {
   public:
     MEDCalculatorDBSliceField(int iter, int order);

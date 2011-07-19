@@ -22,6 +22,8 @@
 
 #include "Python.h"
 
+#include "MedCalculatorSPythonDefines.hxx"
+
 #include <string>
 #include <vector>
 
@@ -40,7 +42,7 @@ namespace ParaMEDMEM
 
   class SPythonParser;
 
-  class SPythonPredParser
+  class MEDCALCULATORSPYTHON_EXPORT SPythonPredParser
   {
   public:
     SPythonPredParser();
@@ -60,7 +62,7 @@ namespace ParaMEDMEM
   /*!
    * This class works on strings previously stripped.
    */
-  class SPythonParser
+  class MEDCALCULATORSPYTHON_EXPORT SPythonParser
   {
   public:
     SPythonParser();
@@ -92,7 +94,7 @@ namespace ParaMEDMEM
    * The main aim of this class is to deal with operator = between spython parts and aggregate it.
    * HL means HL because parse method dispatch the core operation on SPythonParse class.
    */
-  class SPythonParserHL
+  class MEDCALCULATORSPYTHON_EXPORT SPythonParserHL
   {
   public:
     SPythonParserHL(PyObject *glob, PyObject *loc);

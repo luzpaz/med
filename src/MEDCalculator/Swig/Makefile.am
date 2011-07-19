@@ -26,7 +26,7 @@ bin_PROGRAMS = spython
 lib_LTLIBRARIES = libmedcalculatorspython.la _MEDCalculator.la 
 
 salomeinclude_HEADERS =  \
-	MEDCalculator.i MEDCalculatorTypemaps.i SPythonInterpreter.hxx SPythonParser.hxx
+	MEDCalculator.i MEDCalculatorTypemaps.i SPythonInterpreter.hxx SPythonParser.hxx MedCalculatorSPythonDefines.hxx
 
 SWIG_DEF = MEDCalculator.i MEDCalculatorTypemaps.i
 

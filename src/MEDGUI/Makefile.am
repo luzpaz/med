@@ -22,7 +22,7 @@
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 # Libraries targets
-lib_LTLIBRARIES= libMED.la
+lib_LTLIBRARIES= libMEDGUI.la
 
 UIC_FILES = ui_MEDGUIFileContentDial.h ui_MEDGUISelectComponents.h
 
@@ -30,7 +30,7 @@ BUILT_SOURCES = $(UIC_FILES)
 
 EXTRA_DIST+= MEDGUIFileContentDial.ui MEDGUISelectComponents.ui
 
-dist_libMED_la_SOURCES = MEDGUIFileContentDial.h MEDGUISelection.hxx \
+dist_libMEDGUI_la_SOURCES = MEDGUIFileContentDial.h MEDGUISelection.hxx \
 	MEDGUI.h MEDGUI.cxx MEDGUIFileContentDial.cxx MEDGUISelection.cxx \
 	MEDGUISelectComponents.h MEDGUISelectComponents.cxx MEDGUIDataBaseDockWidget.hxx \
 	MEDGUIDataBaseDockWidget.cxx
@@ -56,15 +56,15 @@ clean-local: clean-local-qt
 
 # End Of Qt Part
 
-nodist_libMED_la_SOURCES= $(MOC_FILES)
+nodist_libMEDGUI_la_SOURCES= $(MOC_FILES)
 
-libMED_la_CPPFLAGS= $(QT_INCLUDES) $(VTK_INCLUDES) @CAS_CPPFLAGS@ $(PYTHON_INCLUDES) $(BOOST_CPPFLAGS) \
+libMEDGUI_la_CPPFLAGS= $(QT_INCLUDES) $(VTK_INCLUDES) @CAS_CPPFLAGS@ $(PYTHON_INCLUDES) $(BOOST_CPPFLAGS) \
 	${KERNEL_CXXFLAGS} ${GUI_CXXFLAGS} \
 	@CORBA_INCLUDES@ @CORBA_CXXFLAGS@ \
 	-I$(top_builddir)/idl -I$(srcdir)/../MEDCoupling -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../MEDCoupling -I$(srcdir)/../MEDLoader -I$(srcdir)/../MEDCalculator
 
-libMED_la_LDFLAGS= \
+libMEDGUI_la_LDFLAGS= \
 	$(QT_MT_LIBS) $(CAS_KERNEL) $(BOOST_LIBS) \
 	../../idl/libSalomeIDLMED.la ../MEDCalculator/libmedcalculator.la \
 	$(KERNEL_LDFLAGS) -lSalomeLifeCycleCORBA -lOpUtil -lSALOMELocalTrace \

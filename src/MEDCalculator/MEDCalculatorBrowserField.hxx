@@ -20,6 +20,7 @@
 #ifndef __MEDCALCULATORBROWSERFIELD_HXX__
 #define __MEDCALCULATORBROWSERFIELD_HXX__
 
+#include "MedCalculatorDefines.hxx"
 #include "MEDCalculatorBrowserStep.hxx"
 
 #include "InterpKernelException.hxx"
@@ -34,7 +35,7 @@
 namespace ParaMEDMEM
 {
   class MEDCalculatorBrowserStep;//  top prevent cross include
-  class MEDCalculatorBrowserField
+  class MEDCALCULATOR_EXPORT MEDCalculatorBrowserField
   {
   public :
     MEDCalculatorBrowserField(const char* nm);

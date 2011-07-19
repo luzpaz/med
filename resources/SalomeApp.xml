@@ -27,6 +27,7 @@
     <parameter name="name" value="Med"/>
     <parameter name="icon" value="ModuleMed.png"/>
     <parameter name="documentation" value="med_help"/>
+    <parameter name="library"       value="MEDGUI"/>
   </section>
   <section name="med_help" >
     <parameter name="sub_menu"          value="%1 module"/>

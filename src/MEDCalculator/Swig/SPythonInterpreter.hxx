@@ -22,13 +22,15 @@
 
 #include <Python.h>
 
+#include "MedCalculatorSPythonDefines.hxx"
+
 #include <string>
 #include <vector>
 #include <set>
 
 namespace ParaMEDMEM
 {
-  class SPythonInterpreter
+  class MEDCALCULATORSPYTHON_EXPORT SPythonInterpreter
   {
   public:
     SPythonInterpreter(PyObject *globals, PyObject *locals);

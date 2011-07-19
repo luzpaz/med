@@ -20,6 +20,7 @@
 #ifndef __MEDCALCULATORBROWSERLITESTRUCT_HXX__
 #define __MEDCALCULATORBROWSERLITESTRUCT_HXX__
 
+#include "MedCalculatorDefines.hxx"
 #include "MEDCalculatorBrowserMesh.hxx"
 #include "MEDCalculatorBrowserField.hxx"
 
@@ -31,7 +32,7 @@
 //  It also has methods for selecting/unselecting meshes, field and components from fields
 namespace ParaMEDMEM
 {
-  class MEDCalculatorBrowserLiteStruct
+  class MEDCALCULATOR_EXPORT MEDCalculatorBrowserLiteStruct
   {
   public :
     MEDCalculatorBrowserLiteStruct();
