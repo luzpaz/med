@@ -21,7 +21,7 @@
 
 using namespace MEDPARTITIONER;
 
-Graph::Graph(MEDPARTITIONER::MEDSKYLINEARRAY* array, int* edgeweight):m_graph(array),m_partition(0),m_edgeweight(edgeweight),m_cellweight(0)
+Graph::Graph(MEDPARTITIONER::MEDSKYLINEARRAY* array, int* edgeweight):_graph(array),_partition(0),_edgeweight(edgeweight),_cellweight(0)
 {
 }
 
@@ -33,15 +33,15 @@ Graph::Graph(MEDPARTITIONER::MEDSKYLINEARRAY* array, int* edgeweight):m_graph(ar
 
 Graph::~Graph()
 {
-  if (m_partition)
+  if (_partition)
   {
-    delete m_partition;
-    m_partition=0;
+    delete _partition;
+    _partition=0;
   }
-  if (m_graph)
+  if (_graph)
   {
-    delete m_graph;
-    m_graph=0;
+    delete _graph;
+    _graph=0;
   }
 }
 

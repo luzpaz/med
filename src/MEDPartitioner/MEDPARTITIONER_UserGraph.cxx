@@ -39,7 +39,7 @@ UserGraph::UserGraph(MEDPARTITIONER::MEDSKYLINEARRAY* array, const int* partitio
     value[i]=partition[i];
   }
 
-  m_partition = new MEDPARTITIONER::MEDSKYLINEARRAY(index,value);
+  _partition = new MEDPARTITIONER::MEDSKYLINEARRAY(index,value);
 
 }
 

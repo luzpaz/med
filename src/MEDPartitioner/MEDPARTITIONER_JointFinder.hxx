@@ -16,21 +16,28 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef MEDPARTITIONER_SCOTCHGRAPH_HXX_
-#define MEDPARTITIONER_SCOTCHGRAPH_HXX_
+#ifndef __MEDPARTITIONER_JOINTFINDER_HXX__
+#define  __MEDPARTITIONER_JOINTFINDER_HXX__
 
-#include "MEDPARTITIONER.hxx"
-#include <string>
-
+#include <vector> 
+#include <map>
 namespace MEDPARTITIONER {
-  class MEDSKYLINEARRAY;
-  class MEDPARTITIONER_EXPORT SCOTCHGraph:public Graph
-  {
-  public:
-    SCOTCHGraph();
-    SCOTCHGraph(MEDPARTITIONER::MEDSKYLINEARRAY*, int* edgeweight=0);
-    virtual ~SCOTCHGraph();
-    void partGraph(int ndomain, const std::string& options_string="", ParaDomainSelector* sel=0);
-  };
-}
-#endif /*SCOTCHGRAPH_HXX_*/
+  class MESHCollection;
+  class ParaDomainSelector;
+  class Topology;
+class JointFinder
+{
+public:
+  JointFinder(const MESHCollection& mc);
+  void findCommonDistantNodes();
+  std::vector<std::vector<std::multimap<int,int> > >& getDistantNodeCell();
+  std::vector<std::vector<std::vector<std::pair<int,int> > > >& getNodeNode();
+private:
+  const MESHCollection& _mesh_collection;
+  const ParaDomainSelector* _domain_selector;
+  const Topology* _topology;
+  std::vector<std::vector<std::multimap<int,int> > > _distant_node_cell;
+  std::vector<std::vector<std::vector<std::pair<int,int> > > > _node_node;
+};
+};
+#endif

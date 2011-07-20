@@ -38,29 +38,29 @@ class MEDPARTITIONER_EXPORT Graph
 
     virtual ~Graph();
 
-    void setEdgesWeights(int* edgeweight){m_edgeweight=edgeweight;}
-    void setVerticesWeights(int* cellweight){m_cellweight=cellweight;}
+    void setEdgesWeights(int* edgeweight){_edgeweight=edgeweight;}
+    void setVerticesWeights(int* cellweight){_cellweight=cellweight;}
 
     //computes partitioning of the graph
     virtual void partGraph(int ndomain, const std::string&, ParaDomainSelector* sel=0)=0;
 
     //! returns the partitioning
-    const int* getPart() const {return m_partition->getValue();}
+    const int* getPart() const {return _partition->getValue();}
 
     //! returns the number of graph vertices (which can correspond to the cells in the mesh!)
-    int nbVertices() const {return m_graph->getNumberOf();}
+    int nbVertices() const {return _graph->getNumberOf();}
 
-    const MEDPARTITIONER::MEDSKYLINEARRAY* getGraph() const {return m_graph;}
+    const MEDPARTITIONER::MEDSKYLINEARRAY* getGraph() const {return _graph;}
 
   protected:
 
-    MEDPARTITIONER::MEDSKYLINEARRAY* m_graph;
+    MEDPARTITIONER::MEDSKYLINEARRAY* _graph;
 
-    MEDPARTITIONER::MEDSKYLINEARRAY* m_partition;
+    MEDPARTITIONER::MEDSKYLINEARRAY* _partition;
 
-    int* m_edgeweight;  
+    int* _edgeweight;  
 
-    int* m_cellweight;
+    int* _cellweight;
   };
 
 }

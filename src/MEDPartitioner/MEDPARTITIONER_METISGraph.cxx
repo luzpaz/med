@@ -46,15 +46,15 @@ void METISGraph::partGraph(int                 ndomain,
                            ParaDomainSelector* parallelizer)
 {
   // number of graph vertices
-  int n = m_graph->getNumberOf();
+  int n = _graph->getNumberOf();
 
   //graph
-  int * xadj=const_cast<int*>(m_graph->getIndex());
-  int * adjncy = const_cast<int*>(m_graph->getValue());
+  int * xadj=const_cast<int*>(_graph->getIndex());
+  int * adjncy = const_cast<int*>(_graph->getValue());
   //constraints
-  int * vwgt=m_cellweight;
-  int * adjwgt=m_edgeweight;
-  int wgtflag=(m_edgeweight!=0)?1:0+(m_cellweight!=0)?2:0;
+  int * vwgt=_cellweight;
+  int * adjwgt=_edgeweight;
+  int wgtflag=(_edgeweight!=0)?1:0+(_cellweight!=0)?2:0;
 
   //base 0 or 1
   int base=0;
@@ -124,6 +124,6 @@ void METISGraph::partGraph(int                 ndomain,
   // the fifth argument true specifies that only the pointers are passed 
   //to the object
   
-  m_partition = new MEDPARTITIONER::MEDSKYLINEARRAY(index,value);
+  _partition = new MEDPARTITIONER::MEDSKYLINEARRAY(index,value);
 }
 

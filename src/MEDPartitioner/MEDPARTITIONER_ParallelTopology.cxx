@@ -40,7 +40,7 @@ using namespace std;
 using namespace MEDPARTITIONER;
 
 //empty constructor
-ParallelTopology::ParallelTopology():m_nb_domain(0),m_mesh_dimension(0)
+ParallelTopology::ParallelTopology():_nb_domain(0),_mesh_dimension(0)
 {}
 
 //!constructing topology according to mesh collection
@@ -48,48 +48,48 @@ ParallelTopology::ParallelTopology(const vector<ParaMEDMEM::MEDCouplingUMesh*>& 
                                    const vector<MEDPARTITIONER::CONNECTZONE*>& cz,
                                    vector<int*>& cellglobal,
                                    vector<int*>& nodeglobal,
-                                   vector<int*>& faceglobal):m_nb_domain(meshes.size())/*,m_mesh_dimension(meshes[0]->getMeshDimension())*/
+                                   vector<int*>& faceglobal):_nb_domain(meshes.size())/*,_mesh_dimension(meshes[0]->getMeshDimension())*/
 {
 
   int index_global=0;
   int index_node_global=0;
   int index_face_global=0;
 
-  m_nb_cells.resize(m_nb_domain);
-  m_nb_nodes.resize(m_nb_domain);
-  //  m_nb_faces.resize(m_nb_domain);
+  _nb_cells.resize(_nb_domain);
+  _nb_nodes.resize(_nb_domain);
+  //  _nb_faces.resize(_nb_domain);
 
-  m_loc_to_glob.resize(m_nb_domain);
-  m_node_loc_to_glob.resize(m_nb_domain);
-  //  m_face_loc_to_glob.resize(m_nb_domain);
+  _loc_to_glob.resize(_nb_domain);
+  _node_loc_to_glob.resize(_nb_domain);
+  //  _face_loc_to_glob.resize(_nb_domain);
 
   //MED_EN::medEntityMesh constituent_entity;
 
   bool parallel_mode = false;
-  for (int idomain=0; !parallel_mode && idomain<m_nb_domain; idomain++)
+  for (int idomain=0; !parallel_mode && idomain<_nb_domain; idomain++)
     parallel_mode = (!meshes[idomain]);
 
-  for (int idomain=0; idomain<m_nb_domain; idomain++)
+  for (int idomain=0; idomain<_nb_domain; idomain++)
   {
     if ( !meshes[idomain] )
       continue;
-    m_mesh_dimension = meshes[idomain]->getMeshDimension();
-    //constituent_entity = (m_mesh_dimension == 3 ? MED_EN::MED_FACE : MED_EN::MED_EDGE );
+    _mesh_dimension = meshes[idomain]->getMeshDimension();
+    //constituent_entity = (_mesh_dimension == 3 ? MED_EN::MED_FACE : MED_EN::MED_EDGE );
 
     //creating cell maps
-    m_nb_cells[idomain]=meshes[idomain]->getNumberOfCells();
-    //    cout << "Nb cells (domain "<<idomain<<") = "<<m_nb_cells[idomain];
-    m_loc_to_glob[idomain].resize(m_nb_cells[idomain]);
+    _nb_cells[idomain]=meshes[idomain]->getNumberOfCells();
+    //    cout << "Nb cells (domain "<<idomain<<") = "<<_nb_cells[idomain];
+    _loc_to_glob[idomain].resize(_nb_cells[idomain]);
 
     if (cellglobal[idomain]==0 || parallel_mode)
     {
       MESSAGE_MED("Creating global numbering"); 
       //creating global numbering from scratch
-      for (int i=0; i<m_nb_cells[idomain]; i++)
+      for (int i=0; i<_nb_cells[idomain]; i++)
       {
        
-        m_glob_to_loc.insert(make_pair(index_global,make_pair(idomain,i+1)));
-        m_loc_to_glob[idomain][i]=index_global;
+        _glob_to_loc.insert(make_pair(index_global,make_pair(idomain,i+1)));
+        _loc_to_glob[idomain][i]=index_global;
         //        cout<<"glob:"<<index_global<<" --> ("<<idomain<<","<<i+1<<")"<<endl;
         index_global++;
       }
@@ -98,40 +98,40 @@ ParallelTopology::ParallelTopology(const vector<ParaMEDMEM::MEDCouplingUMesh*>& 
     else
     {
       MESSAGE_MED("Using former global numbering");
-      for (int i=0; i<m_nb_cells[idomain]; i++)
+      for (int i=0; i<_nb_cells[idomain]; i++)
       {
         int global=cellglobal[idomain][i];
-        m_glob_to_loc.insert(make_pair(global,make_pair(idomain,i)));
-        //m_loc_to_glob[make_pair(idomain,i+1)]=global;
-        m_loc_to_glob[idomain][i]=global;
+        _glob_to_loc.insert(make_pair(global,make_pair(idomain,i)));
+        //_loc_to_glob[make_pair(idomain,i+1)]=global;
+        _loc_to_glob[idomain][i]=global;
         index_global++;
         //        cout<<"glob:"<<global<<" --> ("<<idomain<<","<<i+1<<")"<<endl;
       }
     }
 
     //cas sequentiel
-    if (m_nb_domain==1)
+    if (_nb_domain==1)
     {
-      m_nb_total_cells=index_global;
-      m_nb_cells[0]=index_global;
-      m_node_loc_to_glob[idomain].resize(meshes[idomain]->getNumberOfNodes());
+      _nb_total_cells=index_global;
+      _nb_cells[0]=index_global;
+      _node_loc_to_glob[idomain].resize(meshes[idomain]->getNumberOfNodes());
       for (int i=0; i<meshes[idomain]->getNumberOfNodes(); i++)
       {
-        m_node_glob_to_loc.insert(make_pair(i,make_pair(0,i)));
-        m_node_loc_to_glob[0][i]=i;
+        _node_glob_to_loc.insert(make_pair(i,make_pair(0,i)));
+        _node_loc_to_glob[0][i]=i;
       }
-      m_nb_total_nodes=meshes[idomain]->getNumberOfNodes();   
-      m_nb_nodes[0]=m_nb_total_nodes; 
+      _nb_total_nodes=meshes[idomain]->getNumberOfNodes();   
+      _nb_nodes[0]=_nb_total_nodes; 
 
-      MESSAGE_MED ("nb total cells "<< m_nb_total_cells);
-      MESSAGE_MED("nb total nodes "<< m_nb_total_nodes);  
+      MESSAGE_MED ("nb total cells "<< _nb_total_cells);
+      MESSAGE_MED("nb total nodes "<< _nb_total_nodes);  
       return;
     }
 
     //creating node maps
-    m_nb_nodes[idomain]=meshes[idomain]->getNumberOfNodes();
+    _nb_nodes[idomain]=meshes[idomain]->getNumberOfNodes();
     INTERP_KERNEL::HashMap <int,pair<int,int> > local2distant;
-    m_node_loc_to_glob[idomain].resize(m_nb_nodes[idomain]);
+    _node_loc_to_glob[idomain].resize(_nb_nodes[idomain]);
     for (int icz=0; icz<cz.size(); icz++)
     {
       if (cz[icz]->getLocalDomainNumber() == idomain && 
@@ -151,84 +151,84 @@ ParallelTopology::ParallelTopology(const vector<ParaMEDMEM::MEDCouplingUMesh*>& 
     // setting mappings for all nodes
     if (nodeglobal[idomain]==0)
     {
-      for (int inode=0; inode<m_nb_nodes[idomain]; inode++)
+      for (int inode=0; inode<_nb_nodes[idomain]; inode++)
       {
         if (local2distant.find(inode)==local2distant.end())
         {
           index_node_global++;
-          m_node_glob_to_loc.insert(make_pair(index_node_global,make_pair(idomain,inode)));
-          //m_node_loc_to_glob[make_pair(idomain,inode+1)]=index_node_global;
-          m_node_loc_to_glob[idomain][inode]=index_node_global;
+          _node_glob_to_loc.insert(make_pair(index_node_global,make_pair(idomain,inode)));
+          //_node_loc_to_glob[make_pair(idomain,inode+1)]=index_node_global;
+          _node_loc_to_glob[idomain][inode]=index_node_global;
         }   
         else
         {
           int ip = (local2distant.find(inode)->second).first;
           int distant = (local2distant.find(inode)->second).second;
-          int global_number=m_loc_to_glob[ip][distant];
-          m_node_glob_to_loc.insert(make_pair(global_number,make_pair(idomain,inode)));
-          m_node_loc_to_glob[idomain][inode]=global_number;
+          int global_number=_loc_to_glob[ip][distant];
+          _node_glob_to_loc.insert(make_pair(global_number,make_pair(idomain,inode)));
+          _node_loc_to_glob[idomain][inode]=global_number;
         } 
       }
     }
     //using former node numbering
     else
     {
-      for (int inode=0; inode<m_nb_nodes[idomain]; inode++)
+      for (int inode=0; inode<_nb_nodes[idomain]; inode++)
       {
         int global_number=nodeglobal[idomain][inode];
-        m_node_glob_to_loc.insert(make_pair(global_number,make_pair(idomain,inode)));
-        m_node_loc_to_glob[idomain][inode]=global_number;
+        _node_glob_to_loc.insert(make_pair(global_number,make_pair(idomain,inode)));
+        _node_loc_to_glob[idomain][inode]=global_number;
       }
     }
   }
 
-  m_nb_total_cells=index_global;
-  m_nb_total_nodes=index_node_global;   
-  m_nb_total_faces=index_face_global;
-  SCRUTE_MED(m_nb_total_cells);
-  SCRUTE_MED(m_nb_total_faces);
-  SCRUTE_MED(m_nb_total_nodes);
+  _nb_total_cells=index_global;
+  _nb_total_nodes=index_node_global;   
+  _nb_total_faces=index_face_global;
+  SCRUTE_MED(_nb_total_cells);
+  SCRUTE_MED(_nb_total_faces);
+  SCRUTE_MED(_nb_total_nodes);
 
 }
 
 
 //!constructing ParallelTopology from an old topology and a graph
 ParallelTopology::ParallelTopology(Graph* graph, int nb_domain, int mesh_dimension):
-  m_nb_domain(nb_domain),
-  m_nb_cells(graph->nbVertices()),
-  m_mesh_dimension(mesh_dimension)
+  _nb_domain(nb_domain),
+  _nb_cells(graph->nbVertices()),
+  _mesh_dimension(mesh_dimension)
 {
-  m_nb_cells.resize(m_nb_domain);
-  m_nb_nodes.resize(m_nb_domain);
-  m_nb_faces.resize(m_nb_domain);
+  _nb_cells.resize(_nb_domain);
+  _nb_nodes.resize(_nb_domain);
+  _nb_faces.resize(_nb_domain);
 
-  m_loc_to_glob.resize(m_nb_domain);
-  m_node_loc_to_glob.resize(m_nb_domain);
-  m_face_loc_to_glob.resize(m_nb_domain);
+  _loc_to_glob.resize(_nb_domain);
+  _node_loc_to_glob.resize(_nb_domain);
+  _face_loc_to_glob.resize(_nb_domain);
 
   // used in parallel mode only
-  m_cell_loc_to_glob_fuse.resize(m_nb_domain);
-  m_face_loc_to_glob_fuse.resize(m_nb_domain);
+  _cell_loc_to_glob_fuse.resize(_nb_domain);
+  _face_loc_to_glob_fuse.resize(_nb_domain);
 
-  for (int i=0; i<m_nb_domain; i++)
-    m_nb_cells[i]=0;  
+  for (int i=0; i<_nb_domain; i++)
+    _nb_cells[i]=0;  
 
   const int* part = graph-> getPart();
-  m_nb_total_cells= graph->nbVertices();
+  _nb_total_cells= graph->nbVertices();
   
-  for (int icell=0; icell<m_nb_total_cells; icell++)
+  for (int icell=0; icell<_nb_total_cells; icell++)
   {
     int idomain = part[icell];
-    m_nb_cells[idomain]++;
-    //m_loc_to_glob[make_pair(idomain,m_nb_cells[idomain])]=icell+1;
-    m_loc_to_glob[idomain].push_back(icell);
-    m_glob_to_loc.insert(make_pair(icell,make_pair(idomain,m_nb_cells[idomain])));
+    _nb_cells[idomain]++;
+    //_loc_to_glob[make_pair(idomain,_nb_cells[idomain])]=icell+1;
+    _loc_to_glob[idomain].push_back(icell);
+    _glob_to_loc.insert(make_pair(icell,make_pair(idomain,_nb_cells[idomain])));
 
   }
-  for (int idomain=0; idomain<m_nb_domain; idomain++)
-    MESSAGE_MED("Nombre de cellules dans le domaine "<< idomain <<" : "<<m_nb_cells[idomain]); 
+  for (int idomain=0; idomain<_nb_domain; idomain++)
+    MESSAGE_MED("Nombre de cellules dans le domaine "<< idomain <<" : "<<_nb_cells[idomain]); 
 
-  SCRUTE_MED(m_nb_total_cells);
+  SCRUTE_MED(_nb_total_cells);
 
 }
 
@@ -244,11 +244,11 @@ ParallelTopology::~ParallelTopology()
  * */
 void ParallelTopology::convertGlobalNodeList(const int* node_list, int nbnode, int* local, int* ip)
 {
-  if (m_node_glob_to_loc.empty()) 
+  if (_node_glob_to_loc.empty()) 
     throw MEDMEM::MEDEXCEPTION("convertGlobalNodeList - Node mapping has not yet been built");
   for (int i=0; i< nbnode; i++)
   {
-    pair<int,int> local_node = m_node_glob_to_loc.find(node_list[i])->second;
+    pair<int,int> local_node = _node_glob_to_loc.find(node_list[i])->second;
     ip[i]=local_node.first;
     local[i]=local_node.second;
   }
@@ -263,13 +263,13 @@ void ParallelTopology::convertGlobalNodeList(const int* node_list, int nbnode, i
  * */
 void ParallelTopology::convertGlobalNodeList(const int* node_list, int nbnode, int* local, int ip)
 {
-  if (m_node_glob_to_loc.empty()) 
+  if (_node_glob_to_loc.empty()) 
     throw MEDMEM::MEDEXCEPTION("convertGlobalNodeList - Node mapping has not yet been built");
 
   for (int i=0; i< nbnode; i++)
   {
     typedef INTERP_KERNEL::HashMultiMap<int,pair<int,int> >::iterator mmiter;
-    pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(node_list[i]);
+    pair<mmiter,mmiter> range=_node_glob_to_loc.equal_range(node_list[i]);
     for (mmiter it=range.first; it !=range.second; it++)
     { 
       int ipfound=(it->second).first;
@@ -287,13 +287,13 @@ void ParallelTopology::convertGlobalNodeList(const int* node_list, int nbnode, i
  * */
 void ParallelTopology::convertGlobalNodeListWithTwins(const int* node_list, int nbnode, int*& local, int*& ip,int*& full_array, int& size)
 {
-  if (m_node_glob_to_loc.empty()) 
+  if (_node_glob_to_loc.empty()) 
     throw MEDMEM::MEDEXCEPTION("convertGlobalNodeList - Node mapping has not yet been built");
 
   size=0;
   for (int i=0; i< nbnode; i++)
   {
-    int count= m_node_glob_to_loc.count(node_list[i]);
+    int count= _node_glob_to_loc.count(node_list[i]);
     //      if (count > 1) 
     //        cout << "noeud " << node_list[i]<< " doublon d'ordre " << count<<endl;
     size+=count;
@@ -305,7 +305,7 @@ void ParallelTopology::convertGlobalNodeListWithTwins(const int* node_list, int 
   for (int i=0; i< nbnode; i++)
   {
     typedef INTERP_KERNEL::HashMultiMap<int,pair<int,int> >::iterator mmiter;
-    pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(node_list[i]);
+    pair<mmiter,mmiter> range=_node_glob_to_loc.equal_range(node_list[i]);
     for (mmiter it=range.first; it !=range.second; it++)
     { 
       ip[index]=(it->second).first;
@@ -328,9 +328,9 @@ void ParallelTopology::convertGlobalFaceListWithTwins(const int* face_list, int 
   size=0;
   for (int i=0; i< nbface; i++)
   {
-    //int count = m_face_glob_to_loc.count(face_list[i]);
+    //int count = _face_glob_to_loc.count(face_list[i]);
     //if (count >1) MESSAGE_MED("face en doublon "<<face_list[i]);
-    size+= m_face_glob_to_loc.count(face_list[i]);
+    size+= _face_glob_to_loc.count(face_list[i]);
   }
   int index=0;
   ip=new int[size];
@@ -339,7 +339,7 @@ void ParallelTopology::convertGlobalFaceListWithTwins(const int* face_list, int 
   for (int i=0; i< nbface; i++)
   {
     typedef INTERP_KERNEL::HashMultiMap<int,pair<int,int> >::iterator mmiter;
-    pair<mmiter,mmiter> range=m_face_glob_to_loc.equal_range(face_list[i]);
+    pair<mmiter,mmiter> range=_face_glob_to_loc.equal_range(face_list[i]);
     for (mmiter it=range.first; it !=range.second; it++)
     { 
       ip[index]=(it->second).first;
@@ -357,7 +357,7 @@ void ParallelTopology::convertGlobalCellList(const int* cell_list, int nbcell, i
 {
   for (int i=0; i< nbcell; i++)
   {
-    INTERP_KERNEL::HashMap<int, pair<int,int> >::const_iterator iter = m_glob_to_loc.find(cell_list[i]);
+    INTERP_KERNEL::HashMap<int, pair<int,int> >::const_iterator iter = _glob_to_loc.find(cell_list[i]);
     ip[i]=(iter->second).first;
     local[i]=(iter->second).second;
   }
@@ -370,8 +370,8 @@ void ParallelTopology::convertGlobalFaceList(const int* face_list, int nbface, i
 {
   for (int i=0; i< nbface; i++)
   {
-    INTERP_KERNEL::HashMap<int, pair<int,int> >::const_iterator iter = m_face_glob_to_loc.find(face_list[i]);
-    if (iter == m_face_glob_to_loc.end())
+    INTERP_KERNEL::HashMap<int, pair<int,int> >::const_iterator iter = _face_glob_to_loc.find(face_list[i]);
+    if (iter == _face_glob_to_loc.end())
     {
       throw MED_EXCEPTION("convertGlobalFaceList - Face  not found");
     }
@@ -393,7 +393,7 @@ void ParallelTopology::convertGlobalFaceList(const int* face_list, int nbface, i
   for (int i=0; i< nbface; i++)
   {
     typedef INTERP_KERNEL::HashMultiMap<int,pair<int,int> >::iterator mmiter;
-    pair<mmiter,mmiter> range=m_face_glob_to_loc.equal_range(face_list[i]);
+    pair<mmiter,mmiter> range=_face_glob_to_loc.equal_range(face_list[i]);
     for (mmiter it=range.first; it !=range.second; it++)
     { 
       int ipfound=(it->second).first;
@@ -416,7 +416,7 @@ void ParallelTopology::convertToLocal2ndVersion(int* nodes, int nbnodes, int ido
     //      cout <<" inode :"<<inode<< " global = "<<type_connectivity[type][inode];
     int global = nodes[inode];
     typedef INTERP_KERNEL::HashMultiMap<int,pair<int,int> >::iterator mmiter;
-    pair<mmiter,mmiter> range=m_node_glob_to_loc.equal_range(global);
+    pair<mmiter,mmiter> range=_node_glob_to_loc.equal_range(global);
     for (mmiter it=range.first; it !=range.second; it++)
     {
       if ((it->second).first==idomain)
@@ -435,8 +435,8 @@ void ParallelTopology::convertToLocal2ndVersion(int* nodes, int nbnodes, int ido
 int ParallelTopology::getMaxGlobalFace() const
 {
   int max = 0;
-  TGlob2LocsMap::const_iterator g_l_l = m_face_glob_to_loc.begin();
-  for ( ; g_l_l != m_face_glob_to_loc.end(); ++g_l_l )
+  TGlob2LocsMap::const_iterator g_l_l = _face_glob_to_loc.begin();
+  for ( ; g_l_l != _face_glob_to_loc.end(); ++g_l_l )
     if ( g_l_l->first > max )
       max = g_l_l->first;
   return max;

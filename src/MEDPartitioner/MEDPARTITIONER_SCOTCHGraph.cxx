@@ -41,11 +41,11 @@ SCOTCHGraph::~SCOTCHGraph()
 void SCOTCHGraph::partGraph(int ndomain, const std::string& options_string, ParaDomainSelector* sel)
 {
   // number of graph vertices
-  int n = m_graph->getNumberOf();
+  int n = _graph->getNumberOf();
 
   //graph
-  int * xadj=const_cast<int*>(m_graph->getIndex());
-  int * adjncy = const_cast<int*>(m_graph->getValue());
+  int * xadj=const_cast<int*>(_graph->getIndex());
+  int * adjncy = const_cast<int*>(_graph->getValue());
 
   //ndomain
   int nparts = ndomain;
@@ -63,11 +63,11 @@ void SCOTCHGraph::partGraph(int ndomain, const std::string& options_string, Para
                     n, // nb of graph nodes
                     xadj,
                     0,
-                    m_cellweight, //graph vertices loads
+                    _cellweight, //graph vertices loads
                     0,
                     xadj[n], // number of edges
                     adjncy,
-                    m_edgeweight);
+                    _edgeweight);
 
   SCOTCH_Strat scotch_strategy;           
   SCOTCH_stratInit(&scotch_strategy);
@@ -100,6 +100,6 @@ void SCOTCHGraph::partGraph(int ndomain, const std::string& options_string, Para
   // the fifth argument true specifies that only the pointers are passed 
   //to the object
   
-  m_partition = new MEDPARTITIONER::MEDSKYLINEARRAY(index,value);
+  _partition = new MEDPARTITIONER::MEDSKYLINEARRAY(index,value);
 
 }
