@@ -28,9 +28,7 @@
 
 #include "MEDPARTITIONER_Graph.hxx"
 
-#include "MEDPARTITIONER_Topology.hxx"
 #include "MEDPARTITIONER_ParallelTopology.hxx"
-#include "MEDPARTITIONER_SequentialTopology.hxx"
 #include "MEDPARTITIONER_ParaDomainSelector.hxx"
 
 #include "MEDPARTITIONER_MESHCollection.hxx"

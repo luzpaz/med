@@ -31,24 +31,13 @@
 
 #include <sys/time.h>
 //Debug macros
-#include "MEDMEM_Utilities.hxx"
 #include "MEDMEM_Exception.hxx"
-//MEDMEM includes
-// #include "MEDMEM_DriversDef.hxx"
-// #include "MEDMEM_Mesh.hxx"
-// #include "MEDMEM_Med.hxx"
-// #include "MEDMEM_Field.hxx"
-// #include "MEDMEM_Meshing.hxx"
-// #include "MEDMEM_CellModel.hxx"
-// #include "MEDMEM_SkyLineArray.hxx"
-// #include "MEDMEM_ConnectZone.hxx"
+
 #include "MEDCouplingUMesh.hxx"
 #include "MEDLoader.hxx"
 
 //MEDPARTITIONER includes
-#include "MEDPARTITIONER_Topology.hxx"
 #include "MEDPARTITIONER_ParallelTopology.hxx"
-#include "MEDPARTITIONER_SequentialTopology.hxx"
 #include "MEDPARTITIONER_MESHCollectionDriver.hxx"
 #include "MEDPARTITIONER_MESHCollection.hxx"
 #include "MEDPARTITIONER_MESHCollectionMedAsciiDriver.hxx"
@@ -74,9 +63,6 @@ MESHCollectionMedAsciiDriver::MESHCollectionMedAsciiDriver(MESHCollection* colle
 int MESHCollectionMedAsciiDriver::read(const char* filename, ParaDomainSelector* domainSelector)
 {
 
-  const char* LOC = "MEDPARTITIONER::MESHCollectionDriver::read()";
-  BEGIN_OF_MED(LOC);
-
   //ditributed meshes
   vector<int*> cellglobal;
   vector<int*> nodeglobal;
@@ -86,11 +72,10 @@ int MESHCollectionMedAsciiDriver::read(const char* filename, ParaDomainSelector*
 
   // reading ascii master file
   try{
-    MESSAGE_MED("Start reading");
     ifstream asciiinput(filename);
 
     if (!asciiinput)     
-      throw MEDMEM::MEDEXCEPTION("MEDPARTITIONER read - Master File does not exist");
+      throw INTERP_KERNEL::Exception("MEDPARTITIONER read - Master File does not exist");
 
     char charbuffer[512];
     asciiinput.getline(charbuffer,512);
@@ -112,7 +97,7 @@ int MESHCollectionMedAsciiDriver::read(const char* filename, ParaDomainSelector*
     faceglobal.resize(nbdomain);
 
     if (nbdomain == 0)
-      throw MEDMEM::MEDEXCEPTION("Empty ASCII master file");
+      throw INTERP_KERNEL::Exception("Empty ASCII master file");
     for (int i=0; i<nbdomain;i++)
     {
 
@@ -140,7 +125,6 @@ int MESHCollectionMedAsciiDriver::read(const char* filename, ParaDomainSelector*
         readSubdomain(cellglobal,faceglobal,nodeglobal, i);
 
     }//loop on domains
-    MESSAGE_MED("end of read");
   }//of try
   catch(...)
   {
@@ -160,7 +144,6 @@ int MESHCollectionMedAsciiDriver::read(const char* filename, ParaDomainSelector*
     if (faceglobal[i]!=0) delete[] faceglobal[i];
   }
 
-  END_OF_MED(LOC);
   return 0;
 }
 
@@ -173,8 +156,6 @@ int MESHCollectionMedAsciiDriver::read(const char* filename, ParaDomainSelector*
 void MESHCollectionMedAsciiDriver::write(const char* filename, ParaDomainSelector* domainSelector)
 {
 
-  const char* LOC = "MEDPARTITIONER::MESHCollectionDriver::write()";
-  BEGIN_OF_MED(LOC);
 
   int nbdomains= _collection->getMesh().size();
   _filename.resize(nbdomains);
@@ -190,8 +171,6 @@ void MESHCollectionMedAsciiDriver::write(const char* filename, ParaDomainSelecto
     distfilename=suffix.str();
 
     _filename[idomain]=distfilename;
-
-    MESSAGE_MED("File name "<<distfilename);
 
     if ( !domainSelector || domainSelector->isMyDomain( idomain ) )
     {
@@ -217,7 +196,5 @@ void MESHCollectionMedAsciiDriver::write(const char* filename, ParaDomainSelecto
            << (_collection->getMesh())[idomain]->getName() << " localhost "
            << _filename[idomain] << " "<<endl;
   }
-
-  END_OF_MED(LOC);
 
 }

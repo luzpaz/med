@@ -29,7 +29,6 @@ endif
 lib_LTLIBRARIES= libmedsplitter.la
 
 salomeinclude_HEADERS= \
-MEDPARTITIONER_Topology.hxx \
 MEDPARTITIONER_MESHCollection.hxx \
 MEDPARTITIONER_MESHCollectionMedXMLDriver.H \
 MEDPARTITIONER_MESHCollectionMedAsciiDriver.H \
@@ -40,7 +39,6 @@ MEDPARTITIONER_ParallelTopology.hxx \
 MEDPARTITIONER_JointFinder.hxx \
 MEDPARTITIONER_Graph.hxx\
 MEDPARTITIONER_UserGraph.hxx\
-MEDPARTITIONER_SequentialTopology.hxx \
 MEDPARTITIONER_utils.hxx \
 MEDPARTITIONER.hxx \
 MEDPARTITIONER_ParaDomainSelector.hxx \

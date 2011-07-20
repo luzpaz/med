@@ -38,10 +38,7 @@ extern "C" {
 #include "med.h"
 }
 //MEDPARTITIONER includes
-//#include "MEDPARTITIONER_ConnectZone.hxx"
-#include "MEDPARTITIONER_Topology.hxx"
 #include "MEDPARTITIONER_ParallelTopology.hxx"
-#include "MEDPARTITIONER_SequentialTopology.hxx"
 #include "MEDPARTITIONER_MESHCollectionDriver.hxx"
 #include "MEDPARTITIONER_MESHCollection.hxx"
 #include "MEDPARTITIONER_ParaDomainSelector.hxx"
