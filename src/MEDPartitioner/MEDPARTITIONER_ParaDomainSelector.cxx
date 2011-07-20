@@ -21,16 +21,11 @@
 // Author    : Edward AGAPOV (eap)
 
 #include "MEDCouplingUMesh.hxx"
-#include "MEDMEM_Exception.hxx"
+
 #include "MEDPARTITIONER_ParaDomainSelector.hxx"
 
 #include "MEDPARTITIONER_UserGraph.hxx"
-//#include "MEDPARTITIONER_JointExchangeData.hxx"
 
-//#include <MEDMEM_Meshing.hxx>
-#include <MEDMEM_DriversDef.hxx>
-
-#include <iostream>
 #include <numeric>
 
 #ifdef HAVE_MPI2
@@ -141,7 +136,6 @@ int ParaDomainSelector::getProcessorID(int domainIndex) const
 //================================================================================
 
 int ParaDomainSelector::gatherNbOf(
-                                   //MED_EN::medEntityMesh        entity,
                                    const vector<ParaMEDMEM::MEDCouplingUMesh*>& domain_meshes)
 {
   evaluateMemory();
@@ -207,7 +201,7 @@ int ParaDomainSelector::gatherNbOf(
  */
 //================================================================================
 
-#define gatherNbOf_NOT_CALLED(meth) throw MED_EXCEPTION \
+#define gatherNbOf_NOT_CALLED(meth) throw INTERP_KERNEL::Exception  \
 ("ParaDomainSelector::" #meth "(): gatherNbOf( MED_CELL ) must be called before")
 
 int* ParaDomainSelector::getNbVertOfProcs() const
@@ -360,87 +354,6 @@ auto_ptr<Graph> ParaDomainSelector::gatherGraph(const Graph* graph) const
   return auto_ptr<Graph>( glob_graph );
 }
 
-//================================================================================
-/*!
- * \brief Sets global numbering for the entity.
- *
- * This method must be once called for MED_CELL before exchangeJoint() calls
- */
-//================================================================================
-
-// void ParaDomainSelector::gatherEntityTypesInfo(vector<ParaMEDMEM::MEDCouplingUMesh*>& domain_meshes,
-//                                                MED_EN::medEntityMesh  entity)
-// {
-//   const list<medGeometryElement> & all_types = meshEntities[ entity ];
-
-//   evaluateMemory();
-
-//   // Put nb of elements of the entity of all domains in one vector
-//   // and by the way find out mesh dimension
-
-//   vector<int> nb_of_type( domain_meshes.size() * all_types.size(), 0 );
-//   int mesh_dim = -1, space_dim = -1;
-
-//   for ( int idomain = 0; idomain < domain_meshes.size(); ++idomain )
-//   {
-//     if ( !isMyDomain(idomain)) continue;
-
-//     int* domain_nbs = & nb_of_type[ idomain * all_types.size()];
-
-//     list<medGeometryElement>::const_iterator type = all_types.begin();
-//     for ( int t = 0; type != all_types.end(); ++t,++type )
-//       domain_nbs[t] = domain_meshes[idomain]->getNumberOfCells();
-
-//     int i_mesh_dim = domain_meshes[idomain]->getMeshDimension();
-//     int i_space_dim = domain_meshes[idomain]->getSpaceDimension();
-//     if ( mesh_dim < i_mesh_dim && i_mesh_dim <= 3 )
-//       mesh_dim = i_mesh_dim;
-//     if ( space_dim < i_space_dim && i_space_dim <= 3 )
-//       space_dim = i_space_dim;
-//   }
-
-//   // Receive nbs from other procs
-
-//   vector< int > nb_recv( nb_of_type.size() );
-// #ifdef HAVE_MPI2
-//   MPI_Allreduce((void*)&nb_of_type[0], (void*)&nb_recv[0], nb_of_type.size(),
-//                 MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-// #endif
-
-//   // Set info to meshes of distant domains
-
-//   for ( int idomain = 0; idomain < domain_meshes.size(); ++idomain )
-//   {
-//     if ( isMyDomain(idomain)) continue;
-
-//     MEDMEM::MESHING* meshing = (MEDMEM::MESHING*) domain_meshes[idomain];
-//     if ( meshing->getMeshDimension() < mesh_dim )
-//     {
-//       meshing->setMeshDimension( mesh_dim );
-//       meshing->setSpaceDimension( space_dim );
-//     }
-
-//     vector< medGeometryElement > types;
-//     vector< int >                nb_elems;
-
-//     int* domain_nbs = & nb_recv[ idomain * all_types.size()];
-
-//     list<medGeometryElement>::const_iterator type = all_types.begin();
-//     for ( int t = 0; type != all_types.end(); ++t,++type )
-//     {
-//       if ( domain_nbs[t]==0 ) continue;
-//       types.push_back( *type );
-//       nb_elems.push_back( domain_nbs[t] );
-//     }
-//     meshing->setNumberOfTypes( types.size(), entity );
-//     if ( !types.empty() )
-//     {
-//       meshing->setTypes           ( & types[0], entity );
-//       meshing->setNumberOfElements( & nb_elems[0], entity );
-//     }
-//   }
-//   evaluateMemory();
-// }
 
 //================================================================================
 /*!
@@ -501,31 +414,8 @@ void ParaDomainSelector::gatherNbCellPairs()
   // namely that each joint is treated on one proc only
   for ( int j = 0; j < _nb_cell_pairs_by_joint.size(); ++j )
     if ( _nb_cell_pairs_by_joint[j] != send_buf[j] && send_buf[j]>0 )
-      throw MED_EXCEPTION("invalid nb of cell pairs");
+      throw INTERP_KERNEL::Exception("invalid nb of cell pairs");
 }
-
-//================================================================================
-/*!
- * \brief Send-receive joint data
- */
-//================================================================================
-
-// void ParaDomainSelector::exchangeJoint( JointExchangeData* joint ) const
-// {
-//   vector<int> send_data, recv_data( joint->serialize( send_data ));
-
-//   int dest = getProcessorID( joint->distantDomain() );
-//   int tag  = 1001 + jointId( joint->localDomain(), joint->distantDomain() );
-  
-// #ifdef HAVE_MPI2
-//   MPI_Status status;
-//   MPI_Sendrecv((void*)&send_data[0], send_data.size(), MPI_INT, dest, tag,
-//                (void*)&recv_data[0], recv_data.size(), MPI_INT, dest, tag,
-//                MPI_COMM_WORLD, &status);  
-// #endif
-
-//   joint->deserialize( recv_data );
-// }
 
 //================================================================================
 /*!
@@ -543,7 +433,7 @@ int ParaDomainSelector::getFisrtGlobalIdOfSubentity( int loc_domain, int dist_do
   int id = total_nb_faces + 1;
 
   if ( _nb_cell_pairs_by_joint.empty() )
-    throw MED_EXCEPTION("MEDPARTITIONER::ParaDomainSelector::getFisrtGlobalIdOfSubentity(), "
+    throw INTERP_KERNEL::Exception("MEDPARTITIONER::ParaDomainSelector::getFisrtGlobalIdOfSubentity(), "
                         "gatherNbCellPairs() must be called before");
   int joint_id = jointId( loc_domain, dist_domain );
   for ( int j = 0; j < joint_id; ++j )
@@ -585,23 +475,13 @@ int ParaDomainSelector::jointId( int local_domain, int distant_domain ) const
 {
   evaluateMemory();
   if (_nb_result_domains < 0)
-    throw MED_EXCEPTION("ParaDomainSelector::jointId(): setNbDomains() must be called before()");
+    throw INTERP_KERNEL::Exception("ParaDomainSelector::jointId(): setNbDomains() must be called before()");
 
   if ( local_domain < distant_domain )
     swap( local_domain, distant_domain );
   return local_domain * _nb_result_domains + distant_domain;
 }
 
-//================================================================================
-/*!
- * \brief Return domain order so that first go domains on proc 0 and so n
- */
-//================================================================================
-
-// int ParaDomainSelector::getDomianOrder(int idomain, int nb_domains) const
-// {
-//   return nb_domains / nbProcs() * getProcessorID( idomain ) + idomain / nbProcs();
-// }
 
 //================================================================================
 /*!
@@ -645,6 +525,11 @@ int ParaDomainSelector::evaluateMemory() const
   return _max_memory - _init_memory;
 }
 
+/*!
+Sends content of \a mesh to processor \a target. To be used with \a recvMesh method.
+\param mesh mesh to be sent
+\param target processor id of the target
+*/
 
 void ParaDomainSelector::sendMesh(const ParaMEDMEM::MEDCouplingUMesh& mesh, int target) const
 {
@@ -696,6 +581,13 @@ void ParaDomainSelector::sendMesh(const ParaMEDMEM::MEDCouplingUMesh& mesh, int 
       v2Local->decrRef();
     
 }
+
+/*! Receives messages from proc \a source to fill mesh \a mesh.
+To be used with \a sendMesh method.
+
+\param mesh  pointer to mesh that is filled
+\param source processor id of the incoming messages
+ */
 void ParaDomainSelector::recvMesh(ParaMEDMEM::MEDCouplingUMesh*& mesh, int source)const
 {
 
@@ -749,17 +641,20 @@ void ParaDomainSelector::recvMesh(ParaMEDMEM::MEDCouplingUMesh*& mesh, int sourc
     MPI_Recv(ptDist2, nbDistElem, MPI_DOUBLE,source, 1110, MPI_COMM_WORLD, &status);
 #endif
     //
-    //mesh=dynamic_cast<ParaMEDMEM::MEDCouplingUMesh*> (distant_mesh_tmp);
     //finish unserialization
     mesh->unserialization(tinyInfoDistantD,tinyInfoDistant,v1Distant,v2Distant,unusedTinyDistantSts);
-    std::cout<<"mesh size on recv"<<mesh->getNumberOfCells()<<std::endl;
-    //
+    
     if(v1Distant)
       v1Distant->decrRef();
     if(v2Distant)
       v2Distant->decrRef();
   
 }
+/*!
+Sends content of \a vec to processor \a target. To be used with \a recvDoubleVec method.
+\param vec vector to be sent
+\param target processor id of the target
+*/
 void ParaDomainSelector::sendDoubleVec(const std::vector<double>& vec, int target)const
 {
   int size=vec.size();
@@ -768,6 +663,12 @@ void ParaDomainSelector::sendDoubleVec(const std::vector<double>& vec, int targe
   MPI_Send(const_cast<double*>(&vec[0]), size,MPI_DOUBLE, target, 1212, MPI_COMM_WORLD);
 #endif
 }
+/*! Receives messages from proc \a source to fill vector<int> vec.
+To be used with \a sendDoubleVec method.
+
+\param vec vector that is filled
+\param source processor id of the incoming messages
+ */
 void ParaDomainSelector::recvDoubleVec(std::vector<double>& vec, int source)const
 {
   int size;
@@ -778,6 +679,11 @@ void ParaDomainSelector::recvDoubleVec(std::vector<double>& vec, int source)cons
   MPI_Recv(&vec[0],size,MPI_DOUBLE,source, 1212, MPI_COMM_WORLD,&status);
 #endif
 }
+/*!
+Sends content of \a vec to processor \a target. To be used with \a recvIntVec method.
+\param vec vector to be sent
+\param target processor id of the target
+*/
 void ParaDomainSelector::sendIntVec(const std::vector<int>& vec, int target)const
 {
   int size=vec.size();
@@ -786,6 +692,12 @@ void ParaDomainSelector::sendIntVec(const std::vector<int>& vec, int target)cons
   MPI_Send(const_cast<int*>(&vec[0]), size,MPI_INT, target, 1212, MPI_COMM_WORLD);
 #endif
 }
+/*! Receives messages from proc \a source to fill vector<int> vec.
+To be used with \a sendIntVec method.
+
+\param vec vector that is filled
+\param source processor id of the incoming messages
+ */
 void ParaDomainSelector::recvIntVec(std::vector<int>& vec, int source)const
 {
   int size;

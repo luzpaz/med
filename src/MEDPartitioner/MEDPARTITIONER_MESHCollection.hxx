@@ -167,64 +167,17 @@ namespace MEDPARTITIONER
     //creates faces on the new collection
     void castMeshes(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshCastFrom,std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshCastTo,   MESHCollection& initialCollection,const std::multimap<std::pair<int,int>,std::pair<int,int> >& nodeMapping, std::vector<std::vector<std::vector<int> > >& old2newIds);
     
-
-    //!transfers families from an old MESHCollection to new mesh
-   //    void castFamilies(const MESHCollection& old_collection);
-
-    //void castSupport(const MESHCollection& old_collection, std::vector<const MEDMEM::SUPPORT*>& old_support, std::vector<MEDMEM::SUPPORT*>& new_support);
-
-//     //!casts all the fields to the new mesh collection
-//     void castAllFields(const MESHCollection& old_collection);
-
-//     //!casts one specific field to the new mesh collection
-//     void castField(const MESHCollection& old_collection, const string& fieldname, int itnumber, int ordernumber);
-
-//     //choosing a group to be indivisible
-//     void setIndivisibleGroup(const string& a);
-
-//     //!constructing connect zones
-//     // void buildConnectZones(int idomain);
-//     void buildConnectZones();
-//     void buildConnectZonesBetweenProcs(std::vector <std::map <MED_EN::medGeometryElement, std::vector<MEDPARTITIONER_FaceModel*> > > &, map< pair<int,int>, MEDPARTITIONER::MEDSKYLINEARRAY*> & local_cell_cell_correspondency);
-
-//     void addJointGroup(const std::vector<int>&, int idomain, int idistant);
-
-//     static bool isDimensionOK(MED_EN::medGeometryElement type, int dim)
-//     {
-//       return ((type/100 == dim) || (dim==2 && type == MED_EN::MED_POLYGON) || (dim==3 && type == MED_EN::MED_POLYHEDRA));
-//     }
-//     void setSubdomainBoundaryCreates(bool flag) {  _subdomain_boundary_creates=flag;}
-//     bool getSubdomainBoundaryCreates(){return _subdomain_boundary_creates;}
-
-//     void setFamilySplitting(bool flag){_family_splitting=flag;}
-//     bool getFamilySplitting(){return _family_splitting;}
-
-//     void setCreateEmptyGroups(bool flag){_create_empty_groups=flag;}
-//     bool getCreateEmptyGroups(){return _create_empty_groups;}
-
-
   private:
 
- //    //!creates connectivities for a domain and an entity (face or cell)
-//     void createNodalConnectivity(const MESHCollection & initial_collection, int idomain, MED_EN::medEntityMesh entity);
-
-
-//     //!projects a field from an old collection to the present one
-//     //!field is identified by (name, dt, it)
-
     
-    void castIntField(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastFrom,std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastTo,  std::vector<ParaMEDMEM::DataArrayInt*>& arrayFrom,  std::vector<ParaMEDMEM::DataArrayInt*>& arrayTo, std::vector<std::vector< std::vector<int> > > & old2newMapping);
+    void castIntField(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastFrom,std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastTo,  std::vector<ParaMEDMEM::DataArrayInt*>& arrayFrom,  std::vector<ParaMEDMEM::DataArrayInt*>& arrayTo);
 
     void findCommonDistantNodes(std::vector<std::vector<std::multimap<int,int> > >& commonDistantNodes);
-  //     template <class T>
-    //     void castFields(const MESHCollection& old_collection, const string& fieldname, int itnumber, int ordernumber);
-    
-    //     void getFaces(int idomain, std::map<MED_EN::medGeometryElement, std::vector<MEDPARTITIONER_FaceModel*> >&);
 
-//     MEDPARTITIONER_FaceModel* getCommonFace(int ip1,int ilocal1,int ip2,int ilocal2,int face_index);
-
-//     template<class TID2CONN>
-//     void fillGlobalConnectivity(TID2CONN & node2cell, TID2CONN & cell2node );
+void remapIntField(const ParaMEDMEM::MEDCouplingUMesh& sourceMesh,
+                              const ParaMEDMEM::MEDCouplingUMesh& targetMesh,
+                              const int* fromArray,
+                               int* toArray);
 
     //!link to mesh_collection topology
     Topology*                         _topology;

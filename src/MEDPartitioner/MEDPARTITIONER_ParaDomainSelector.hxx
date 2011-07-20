@@ -92,15 +92,10 @@ const std::vector<ParaMEDMEM::MEDCouplingUMesh*>& domain_meshes);
   // Return nb of cells in domains with lower index
   int getDomainShift(int domainIndex) const;
 
-//   // Return nb of sub-entities in domains with lower index
-//   int getDomainSubentityShift(int domainIndex) const;
 
   // Gather graphs from all processors into one
   std::auto_ptr<Graph> gatherGraph(const Graph* graph) const;
 
-  // Set types and number of elements of the entity to all meshes
-//   void gatherEntityTypesInfo(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& domain_meshes,
-//                              MED_EN::medEntityMesh       entity);
 
   // Set nb of cell/cell pairs in a joint between domains
   void setNbCellPairs( int nb_cell_pairs, int dist_domain, int loc_domain );

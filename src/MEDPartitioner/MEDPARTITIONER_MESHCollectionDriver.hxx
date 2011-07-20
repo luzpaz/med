@@ -20,6 +20,7 @@
 #define MEDPARTITIONER_MESHCOLLECTIONDRIVER_HXX_
 
 #include "MEDPARTITIONER.hxx"
+#include <string>
 
 namespace MEDPARTITIONER
 {
@@ -59,8 +60,7 @@ namespace MEDPARTITIONER
     void readSubdomain(vector<int*>& cellglobal,
                        vector<int*>& faceglobal,
                        vector<int*>& nodeglobal, int idomain);
-    void writeSubdomain(int idomain,int nbdomain, const char*filename,
-                        ParaDomainSelector* domain_selector);
+    void writeMedFile(int idomain, const std::string& distfilename);
 
 //     void writeElementJoint(medEntityMesh entity ,
 //                            int icz, 

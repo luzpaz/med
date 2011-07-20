@@ -145,16 +145,11 @@ void MESHCollectionDriver::readSubdomain(vector<int*>& cellglobal,
                                          vector<int*>& faceglobal,
                                          vector<int*>& nodeglobal, int idomain)
 {
-//   const char* LOC = "MEDPARTITIONER::MESHCollectionDriver::readSubdomain()";
-//   BEGIN_OF_MED(LOC);
-//  char file[256];
-  //char meshname[MED_TAILLE_NOM+1];
   string meshname=_meshname[idomain];
   string file=_filename[idomain];
-  //strcpy(meshname,_meshname[idomain].c_str());
-  //strcpy(file,_filename[idomain].c_str());
+
   cout << "Reading "<<_meshname[idomain]<<" in "<<_filename[idomain]<<endl;
-  //(_collection->getMesh())[idomain]=new MEDMEM::MESH(MEDMEM::MED_DRIVER,file, meshname);
+
   ParaMEDMEM::MEDFileUMesh* mfm=ParaMEDMEM::MEDFileUMesh::New(file.c_str(),meshname.c_str());
  (_collection->getMesh())[idomain]=mfm->getLevel0Mesh(false);
   (_collection->getFaceMesh())[idomain]=mfm->getLevelM1Mesh(false);
@@ -172,146 +167,28 @@ void MESHCollectionDriver::readSubdomain(vector<int*>& cellglobal,
   _collection->getGroupInfo()=mfm->getGroupInfo();
 
   cout <<"End of Read"<<endl;
-  //reading MEDPARTITIONER::CONNECTZONEs NODE/NODE and CELL/CELL
-  // med_idt fid = MEDouvrir(file,MED_LECTURE);
-  // med_int njoint = MEDnJoint(fid, meshname);
-  // for (int ijoint=0; ijoint<njoint; ijoint++)
-  // {
-  //   int distant;
-  //   char joint_description[MED_TAILLE_DESC+1];
-  //   char name[MED_TAILLE_NOM+1];
-  //   char name_distant[MED_TAILLE_NOM+1];
 
-  //   int ncorr = MEDjointInfo(fid,meshname, ijoint+1, name, 
-  //                                     joint_description,
-  //                                     &distant, name_distant);
-
-  //   for (int ic=0; ic<ncorr; ic++)
-  //   {
-  //     med_entite_maillage cor_typent_local;
-  //     med_geometrie_element cor_typgeo_local;
-  //     med_entite_maillage cor_typent_dist;
-  //     med_geometrie_element cor_typgeo_dist;
-
-
-  //     int ncouples;
-  //     ncouples = MEDjointTypeCorres(fid, meshname, name, ic+1,
-  //                                            &cor_typent_local,  &cor_typgeo_local,
-  //                                            &cor_typent_dist, &cor_typgeo_dist
-  //                                            );
-  //     int* node_corresp=new int[ncouples];
-  //     if (cor_typent_local == MED_NOEUD && cor_typent_dist == MED_NOEUD)
-  //     {
-
-  //       MEDjointLire(fid, meshname, name,
-  //                             node_corresp,ncouples,
-  //                             cor_typent_local,  cor_typgeo_local,
-  //                             cor_typent_dist, cor_typgeo_dist
-  //                             );
-  //     }
-  //     //constructing the connect zone and adding it to the connect zone list
-  //     MEDPARTITIONER::CONNECTZONE* cz = new MEDPARTITIONER::CONNECTZONE();
-  //     cz->setName(string(name));
-  //     cz->setDescription(joint_description);
-  //     cz->setLocalDomainNumber(idomain);
-  //     cz->setDistantDomainNumber(distant);
-  //     cz->setLocalMesh((_collection->getMesh())[idomain]);
-  //     cz->setDistantMesh((_collection->getMesh())[distant]);
-  //     cz->setNodeCorresp(node_corresp,ncouples);
-  //     (_collection->getCZ()).push_back(cz);
-
-  //   }//loop on correspom_topology->nbDomain())ndances
-  // }//loop on joints 
-
-  // // Reading global numbering
-  // // à faire dans MEDLoader 
-
-  // //  MEDCouplingFieldDouble globalcell=MEDLoader::GetGlobalNumbering(file,meshname,0);
-
-
-  //  MEDfermer(fid);
-
-   //  END_OF_MED(LOC);
+  mfm->decrRef();
 }
 
-void MESHCollectionDriver::writeSubdomain(int idomain, int nbdomains, const char* distfilename,
-                                          ParaDomainSelector* domain_selector)
+
+void MESHCollectionDriver::writeMedFile(int idomain, const string& distfilename)
 {
-  //build connect zones
-  //      if (nbdomains>1)
-  //  _collection->buildConnectZones(idomain);
-
-  //  MESSAGE_MED(" Number of connect zones "<<(_collection->getCZ()).size());
-
-  //writing connect zones in joints
-
- //  med_idt fid = MEDouvrir(distfilename,MED_LECTURE_ECRITURE);  
-
-//   int index_joint=0;
-
-
-//   for (int icz=0; icz<(_collection->getCZ()).size(); icz++)
-//   {
-//     if ((_collection->getCZ())[icz]->getLocalDomainNumber()==idomain)
-//     {
-//       med_err error;
-//       int idistant=(_collection->getCZ())[icz]->getDistantDomainNumber();
-//       char joint_name[MED_TAILLE_NOM+1];
-//       sprintf(joint_name,"joint_%i",idistant+1);
-//       char desc[MED_TAILLE_DESC+1];
-//       sprintf(desc,"connect_zone_%d",icz+1);
-
-//       char distant_name[MED_TAILLE_NOM+1];
-//       //sprintf(distant_name,"domain_%i",(_collection->getCZ())[icz]->getDistantDomainNumber());
-
-//       //        sprintf(distant_name,(_collection->getMesh())[idistant]->getName().c_str());
-//       sprintf(distant_name,"domain_%i",idistant);
-//       char mesh_name[MED_TAILLE_NOM+1];
-
-//       strcpy (mesh_name, (_collection->getMesh())[idomain]->getName());
-//       //      SCRUTE_MED((_collection->getMesh())[idomain]->getName());
-//       error = MEDjointCr(fid,mesh_name, joint_name, desc, 
-//                                   idistant, distant_name);
-//       if (error==-1) cout << "erreur creation de joint "<<endl;
-
-//       /////////////////////////////////////////
-//       //writing node/node correspondency
-//       /////////////////////////////////////////
-//       int nbnodes=(_collection->getCZ())[icz]->getNodeNumber();
-//       int* node_corresp=const_cast<int*>((_collection->getCZ())[icz]->getNodeCorrespValue());
-
-//       /* Nodes are reordered so that the ordering on the local and the distant domain
-//          correspond. The chosen order is the natural ordering on the domain
-//          with lowest proc id*/
-//       // if (_collection->getSubdomainBoundaryCreates())
-// //         if (idomain<idistant)
-// //           jointSort(node_corresp, nbnodes, true);
-// //         else
-// //           jointSort(node_corresp, nbnodes, false);
-
-//       error=
-//         MEDjointEcr(fid, mesh_name, joint_name, node_corresp, nbnodes,
-//                              MED_NOEUD, MED_POINT1,MED_NOEUD, MED_POINT1);
-//       if (error==-1) cout << "erreur creation de joint "<<endl;
-
-//       //writing cell/cell joint      
-// //      writeElementJoint(MED_EN::MED_CELL, icz, idomain, idistant, mesh_name,joint_name,fid);
-//       //writing face/face joint
-// //       if (_collection->getSubdomainBoundaryCreates())
-// //       {
-// //         MED_EN::medEntityMesh constituent_entity =
-// //           (_collection->getMeshDimension()==3)?MED_EN::MED_FACE:MED_EN::MED_EDGE;
-// //         writeElementJoint(constituent_entity, icz, idomain, idistant, mesh_name,joint_name,fid);                 
-// //       }                   
-//       index_joint++;
-//     }
-//   }
+  vector<const ParaMEDMEM::MEDCouplingUMesh*> meshes;
+  ParaMEDMEM::MEDCouplingUMesh* cellMesh=_collection->getMesh(idomain);
+  ParaMEDMEM::MEDCouplingUMesh*faceMesh =_collection->getFaceMesh(idomain);
   
-//   char meshchar[MED_TAILLE_NOM+1];
-//   strcpy(meshchar,(_collection->getMesh())[idomain]->getName());
-  
-
-//   MEDfermer(fid);
-  std::cout<<"End of writing"<<std::endl;
-
+  meshes.push_back(cellMesh);
+  // faceMesh->zipCoords();
+  faceMesh->checkCoherency();
+  faceMesh->tryToShareSameCoordsPermute(*cellMesh,1e-10);
+  meshes.push_back(faceMesh);
+  MEDLoader::WriteUMeshes(distfilename.c_str(), meshes,true);       
+  ParaMEDMEM::MEDFileUMesh* mfm=ParaMEDMEM::MEDFileUMesh::New(distfilename.c_str(),_collection->getMesh(idomain)->getName());
+  mfm->setFamilyFieldArr(-1,(_collection->getFaceFamilyIds())[idomain]);
+  mfm->setFamilyInfo(_collection->getFamilyInfo());
+  mfm->setGroupInfo(_collection->getGroupInfo());
+  mfm->write(distfilename.c_str(),0);
+  mfm->decrRef();
+  //  writeSubdomain(idomain, nbdomains, distfilename.c_str(), domainSelector);
 }
