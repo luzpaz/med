@@ -28,12 +28,12 @@
 namespace po=boost::program_options;
 #endif
 
+#include <iostream>
 #include <string>
 #include <fstream>
+#include <cstring>
+#include <cstdlib>
 
-#include "MEDMEM_define.hxx"
-#include "MEDMEM_Mesh.hxx"
-#include "MEDMEM_Family.hxx"
 #include "MEDPARTITIONER_Graph.hxx"
 #include "MEDPARTITIONER_MESHCollection.hxx"
 #include "MEDPARTITIONER_Topology.hxx"

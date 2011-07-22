@@ -16,8 +16,8 @@
 //
 //  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef PARALLELTOPOLOGY_HXX_
-#define PARALLELTOPOLOGY_HXX_
+#ifndef __PARALLELTOPOLOGY_HXX__
+#define __PARALLELTOPOLOGY_HXX__
 
 #include <set>
 #include <vector>

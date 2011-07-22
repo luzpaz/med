@@ -26,7 +26,7 @@ if CPPUNIT_IS_OK
  SUBDIRS=. 
 endif
 
-lib_LTLIBRARIES= libmedsplitter.la
+lib_LTLIBRARIES= libmedpartitioner.la
 
 salomeinclude_HEADERS= \
 MEDPARTITIONER_MESHCollection.hxx \
@@ -52,7 +52,7 @@ if MED_ENABLE_SCOTCH
     salomeinclude_HEADERS+= MEDPARTITIONER_SCOTCHGraph.hxx
 endif
 
-dist_libmedsplitter_la_SOURCES= \
+dist_libmedpartitioner_la_SOURCES= \
 MEDPARTITIONER_MESHCollection.cxx \
 MEDPARTITIONER_MESHCollectionDriver.cxx \
 MEDPARTITIONER_MESHCollectionMedXMLDriver.cxx \
@@ -66,58 +66,58 @@ MEDPARTITIONER_SkyLineArray.cxx \
 MEDPARTITIONER_ConnectZone.cxx
 
 if MED_ENABLE_METIS
-    dist_libmedsplitter_la_SOURCES+= MEDPARTITIONER_METISGraph.cxx
+    dist_libmedpartitioner_la_SOURCES+= MEDPARTITIONER_METISGraph.cxx
 endif
 if MED_ENABLE_SCOTCH
-    dist_libmedsplitter_la_SOURCES+= MEDPARTITIONER_SCOTCHGraph.cxx
+    dist_libmedpartitioner_la_SOURCES+= MEDPARTITIONER_SCOTCHGraph.cxx
 endif
 
-libmedsplitter_la_CPPFLAGS= $(MPI_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
+libmedpartitioner_la_CPPFLAGS= $(MPI_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
 	$(BOOST_CPPFLAGS) $(LIBXML_INCLUDES) \
 	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core \
 	-I$(srcdir)/../INTERP_KERNEL/Bases -I$(srcdir)/../MEDCoupling \
   -I$(srcdir)/../MEDLoader -I$(srcdir)/../INTERP_KERNEL
 
-libmedsplitter_la_LDFLAGS= 
-#libmedsplitter_la_LDFLAGS= $(MED2_LIBS) $(HDF5_LIBS) $(STDLIB) $(LIBXML_LIBS) \
+libmedpartitioner_la_LDFLAGS= 
+#libmedpartitioner_la_LDFLAGS= $(MED2_LIBS) $(HDF5_LIBS) $(STDLIB) $(LIBXML_LIBS) \
 #	../MEDMEM/libmedmem.la ../MEDWrapper/V2_1/Core/libmed_V2_1.la
 
 if MED_ENABLE_PARMETIS
-  libmedsplitter_la_CPPFLAGS+= $(PARMETIS_CPPFLAGS)
-  libmedsplitter_la_LDFLAGS+= $(PARMETIS_LIBS)
+  libmedpartitioner_la_CPPFLAGS+= $(PARMETIS_CPPFLAGS)
+  libmedpartitioner_la_LDFLAGS+= $(PARMETIS_LIBS)
 endif
 if MED_ENABLE_METIS
-  libmedsplitter_la_CPPFLAGS+= $(METIS_CPPFLAGS)
-  libmedsplitter_la_LDFLAGS+= $(METIS_LIBS)
+  libmedpartitioner_la_CPPFLAGS+= $(METIS_CPPFLAGS)
+  libmedpartitioner_la_LDFLAGS+= $(METIS_LIBS)
 endif
 if MED_ENABLE_SCOTCH
-  libmedsplitter_la_CPPFLAGS+= $(SCOTCH_CPPFLAGS)
-  libmedsplitter_la_LDFLAGS+= $(SCOTCH_LIBS)
+  libmedpartitioner_la_CPPFLAGS+= $(SCOTCH_CPPFLAGS)
+  libmedpartitioner_la_LDFLAGS+= $(SCOTCH_LIBS)
 endif
 if MED_ENABLE_KERNEL
-  libmedsplitter_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
-  libmedsplitter_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
+  libmedpartitioner_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
+  libmedpartitioner_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
 endif
 
-libmedsplitter_la_LDFLAGS+= $(MED2_LIBS) $(HDF5_LIBS) $(STDLIB) $(LIBXML_LIBS) $(MPI_LIBS) \
+libmedpartitioner_la_LDFLAGS+= $(MED2_LIBS) $(HDF5_LIBS) $(STDLIB) $(LIBXML_LIBS) $(MPI_LIBS) \
 	../MEDMEM/libmedmem.la  ../INTERP_KERNEL/libinterpkernel.la ../MEDCoupling/libmedcoupling.la ../MEDLoader/libmedloader.la 
 
 # Executables targets
-bin_PROGRAMS= medsplitter
+bin_PROGRAMS= medpartitioner
 
-dist_medsplitter_SOURCES= medsplitter.cxx
+dist_medpartitioner_SOURCES= medpartitioner.cxx
 
-medsplitter_CPPFLAGS= $(libmedsplitter_la_CPPFLAGS)
-medsplitter_LDADD= $(libmedsplitter_la_LDFLAGS) -lm $(BOOST_LIBS) libmedsplitter.la
+medpartitioner_CPPFLAGS= $(libmedpartitioner_la_CPPFLAGS)
+medpartitioner_LDADD= $(libmedpartitioner_la_LDFLAGS) -lm $(BOOST_LIBS) libmedpartitioner.la
 if MED_ENABLE_KERNEL
-  medsplitter_LDADD+= -lSALOMEBasics
+  medpartitioner_LDADD+= -lSALOMEBasics
 endif
 
 if MPI_IS_OK
-  bin_PROGRAMS+=medsplitter_para
-  dist_medsplitter_para_SOURCES= medsplitter_para.cxx
-  medsplitter_para_CPPFLAGS= $(medsplitter_CPPFLAGS)
-  medsplitter_para_LDADD= $(medsplitter_LDADD)
+  bin_PROGRAMS+=medpartitioner_para
+  dist_medpartitioner_para_SOURCES= medpartitioner_para.cxx
+  medpartitioner_para_CPPFLAGS= $(medpartitioner_CPPFLAGS)
+  medpartitioner_para_LDADD= $(medpartitioner_LDADD)
 endif
 
 OBSOLETE_FILES = \
