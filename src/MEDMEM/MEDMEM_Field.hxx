@@ -34,7 +34,7 @@
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Support.hxx"
-#include "MEDMEM_Unit.hxx" 
+#include "MEDMEM_Unit.hxx"
 #include "MEDMEM_nArray.hxx"
 #include "MEDMEM_GenDriver.hxx"
 #include "MEDMEM_RCBase.hxx"
@@ -2549,7 +2549,7 @@ double FIELD<T, INTERLACING_TAG>::normL1(int component,
 
     const FIELD<double,FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-      p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃÃŠmentation dans mesh]
+      p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'impl��Šmentation dans mesh]
     else
       p_field_size->addReference();
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
@@ -2598,7 +2598,7 @@ double FIELD<T, INTERLACING_TAG>::normL1(const FIELD<double, FullInterlace> * p_
   _checkNormCompatibility(p_field_volume); // may throw exception
   const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
   if(!p_field_volume) // if the user don't supply the volume
-    p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃ©mentation dans mesh]
+    p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'impl�©mentation dans mesh]
   else
     p_field_size->addReference();
   // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
@@ -3756,207 +3756,6 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACING_TAG>::getGaussPointsCoordinat
           gpCoord->setValueIJK(index,dimId,(k+1),gCoord[resultIndex]);
           resultIndex++;
         }
-      }
-      delete [] gCoord;
-      delete [] Ni;
-      index++;
-    }
-    if (!isOnAll && type != MED_EN::MED_POLYHEDRA && type != MED_EN::MED_POLYGON) {
-      delete [] global_connectivity ;
-    }
-  }
-  END_OF_MED(LOC);
-  return gpCoord;
-}
-
-/*!
-  \if developper
-  Return the coordinates of the gauss points
-  The returned field have SPACEDIM components 
-  \endif
-*/
-template <class T, class INTERLACING_TAG>
-FIELD<double, FullInterlace>* FIELD<T, INTERLACING_TAG>::getGaussPointsCoordinates() const throw (MEDEXCEPTION) {
-                           
-  const char * LOC = "FIELD::getGaussPointsCoordinates() : ";
-  BEGIN_OF_MED(LOC);
-
-  if (!getSupport())
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
-
-  MESH* mesh = getSupport()->getMesh();
-  int spaceDim = mesh->getSpaceDimension();
-
-  //Init calculator of the gauss point coordinates
-  INTERP_KERNEL::GaussCoords calculator;
-  locMap::const_iterator it;
-
-  int nb_type;
-  const medGeometryElement* types;
-  int nb_entity_type, length_values;
-
-  const int* global_connectivity;
-  nb_type = getSupport()->getNumberOfTypes();
-  length_values = getSupport()->getNumberOfElements(MED_ALL_ELEMENTS);
-  types = getSupport()->getTypes();
-  medEntityMesh support_entity = getSupport()->getEntity();
-  const double * coord = mesh->getCoordinates(MED_FULL_INTERLACE);
-  bool isOnAll = getSupport()->isOnAllElements();
-  const GAUSS_LOCALIZATION<INTERLACING_TAG>* gaussLock = NULL;
-
-  typedef typename MEDMEM_ArrayInterface<double,INTERLACING_TAG,NoGauss>::Array ArrayCoord;
-  typedef typename MEDMEM_ArrayInterface<double,INTERLACING_TAG,Gauss>::Array TArrayGauss;
-
-  vector<int>  nbelgeoc, nbgaussgeo;
-  
-  nbelgeoc.resize(nb_type+1, 0);
-  nbgaussgeo.resize(nb_type+1, 0);
-
-  for ( int iType = 0 ; iType < nb_type ; iType++ ) {
-    
-    medGeometryElement elem_type = types[iType] ;
-    if(elem_type == MED_EN::MED_POLYGON && elem_type == MED_EN::MED_POLYHEDRA ) 
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad cell type :"<<MED_EN::geoNames[elem_type]<<" !!! "));
-    
-    it = _gaussModel.find(elem_type);
-    
-    if(it == _gaussModel.end())
-      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Gauss localization not defined for "<<MED_EN::geoNames[elem_type]<<" type!!! "));
-    gaussLock = static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ((*it).second);
-
-    ArrayCoord coord = gaussLock->getGsCoo();
-    double* gaussCoord = new double[coord.getNbElem()*coord.getDim()];
-    int idx = 0;
-    for( int i = 1 ; i <= coord.getNbElem() ; i++ ) {
-      for( int j = 1 ; j <= coord.getDim() ; j++ ) {
-	gaussCoord[idx++] = coord.getIJ(i,j);
-      }
-    }
-
-    idx = 0;
-    ArrayCoord ref = gaussLock->getRefCoo();
-    double* refCoord = new double[ref.getNbElem()*ref.getDim()];
-    for( int i = 1 ; i <= ref.getNbElem() ; i++ ) {
-      for( int j = 1 ; j <= ref.getDim() ; j++ ) {
-	refCoord[idx++] = ref.getIJ(i,j);
-      }
-    }
-      
-    INTERP_KERNEL::NormalizedCellType normType;
-    switch(elem_type) {
-    case MED_EN::MED_SEG2 : normType = INTERP_KERNEL::NORM_SEG2;break;
-    case MED_EN::MED_SEG3 : normType = INTERP_KERNEL::NORM_SEG3;break;
-    default : normType = (INTERP_KERNEL::NormalizedCellType) ((((unsigned long)elem_type/100-2)*10) + ((unsigned long)elem_type%100));
-      break;
-    }
-      
-    calculator.addGaussInfo(normType,
-			    elem_type/100,
-			    gaussCoord,
-			    gaussLock->getNbGauss(),
-			    refCoord,
-			    elem_type%100
-			    );
-    //Preapre Info for the gauss array
-    nbelgeoc  [ iType+1 ] = nbelgeoc[ iType ] + getSupport()->getNumberOfElements(elem_type);
-    nbgaussgeo [ iType+1 ] = gaussLock->getNbGauss();
-    
-    delete [] gaussCoord;
-    delete [] refCoord;
-  }
-
-  FIELD<double, FullInterlace>* gpCoord =
-    new FIELD<double, FullInterlace>(getSupport(),spaceDim);
-  gpCoord->setName("Gauss Points Coordinates");
-  gpCoord->setDescription("Gauss Points Coordinates");
-  
-  for(int dimId = 1 ; dimId <= spaceDim; dimId++) {
-    switch(dimId) {
-    case 1:
-      gpCoord->setComponentName(dimId,"X");
-      gpCoord->setComponentDescription(dimId,"X coordinate of the gauss point");
-      break;
-    case 2:
-      gpCoord->setComponentName(dimId,"Y");
-      gpCoord->setComponentDescription(dimId,"Y coordinate of the gauss point");
-      break;
-    case 3:
-      gpCoord->setComponentName(dimId,"Z");
-      gpCoord->setComponentDescription(dimId,"Z coordinate of the gauss point");
-      break;
-    }
-    
-    gpCoord->setMEDComponentUnit(dimId, mesh->getCoordinatesUnits()[dimId-1]);    
-  }
-  
-  gpCoord->setIterationNumber(getIterationNumber());
-  gpCoord->setOrderNumber(getOrderNumber());
-  gpCoord->setTime(getTime());
-
-  TArrayGauss *arrayGauss = new TArrayGauss(spaceDim, length_values,
-					    nb_type, & nbelgeoc[0], & nbgaussgeo[0]);
-  gpCoord->setArray(arrayGauss);
-
-
-  
-    
-  //Calculation of the coordinates  
-  int index = 1;
-  for ( int i = 0 ; i < nb_type ; i++ ) {
-    
-    medGeometryElement type = types[i] ;
-    INTERP_KERNEL::NormalizedCellType normType;
-    switch(type) {
-    case MED_EN::MED_SEG2 : normType = INTERP_KERNEL::NORM_SEG2;break;
-    case MED_EN::MED_SEG3 : normType = INTERP_KERNEL::NORM_SEG3;break;
-    default : normType = (INTERP_KERNEL::NormalizedCellType) ((((unsigned long)type/100-2)*10) + ((unsigned long)type%100));
-      break;
-    }
-    
-    it = _gaussModel.find(type);
-    
-    gaussLock = static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ((*it).second);
-    nb_entity_type = getSupport()->getNumberOfElements(type);
-    
-    
-    if (isOnAll) {
-      global_connectivity = mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,type);
-    }
-    else {
-      const int * supp_number = getSupport()->getNumber(type);
-      const int * connectivity = mesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,support_entity,MED_ALL_ELEMENTS);
-      const int * connectivityIndex = mesh->getConnectivityIndex(MED_NODAL,support_entity);
-      int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
-      
-      for (int k_type = 0; k_type<nb_entity_type; k_type++) {
-	for (int j_ent = 0; j_ent<(type%100); j_ent++) {
-	  global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[connectivityIndex[supp_number[k_type]-1]+j_ent-1];
-	}
-      }
-      global_connectivity = global_connectivity_tmp;
-    }
-
-    int nbNodes = (type%100);
-    double* gCoord = NULL;
-    int* Ni = NULL; 
-    
-    for ( int elem = 0; elem < nb_entity_type; elem++ ) {
-      int elem_index = nbNodes*elem;
-      Ni = new int[nbNodes];
-      for( int idx = 0 ; idx < nbNodes; idx++ ) {
-	Ni[idx] = global_connectivity[ elem_index+idx ] - 1;
-      }
-      
-      gCoord = calculator.CalculateCoords(normType,
-					  coord,
-					  spaceDim,
-					  Ni);
-      int resultIndex = 0;
-      for( int k = 0; k < gaussLock->getNbGauss(); k++ ) {
-	for( int dimId = 1; dimId <= spaceDim; dimId++ ) {
-	  gpCoord->setValueIJK(index,dimId,(k+1),gCoord[resultIndex]);
-	  resultIndex++;
-	}
       }
       delete [] gCoord;
       delete [] Ni;
