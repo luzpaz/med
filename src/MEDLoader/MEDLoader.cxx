@@ -29,8 +29,6 @@
 
 #include "InterpKernelAutoPtr.hxx"
 
-#include "InterpKernelAutoPtr.hxx"
-
 extern "C"
 {
 #include "med.h"

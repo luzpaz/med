@@ -262,39 +262,6 @@ bool MEDCouplingFieldDouble::areCompatibleForMeld(const MEDCouplingFieldDouble *
 }
 
 /*!
- * Method with same principle than MEDCouplingFieldDouble::areStrictlyCompatible method except that
- * number of components between 'this' and 'other' can be different here (for operator/).
- */
-bool MEDCouplingFieldDouble::areCompatibleForDiv(const MEDCouplingField *other) const
-{
-  if(!MEDCouplingField::areStrictlyCompatible(other))
-    return false;
-  const MEDCouplingFieldDouble *otherC=dynamic_cast<const MEDCouplingFieldDouble *>(other);
-  if(!otherC)
-    return false;
-  if(_nature!=otherC->_nature)
-    return false;
-  if(!_time_discr->areStrictlyCompatibleForDiv(otherC->_time_discr))
-    return false;
-  return true;
-}
-
-/*!
- * This method is invocated before any attempt of melding. This method is very close to areStrictlyCompatible,
- * except that 'this' and other can have different number of components.
- */
-bool MEDCouplingFieldDouble::areCompatibleForMeld(const MEDCouplingFieldDouble *other) const
-{
-  if(!MEDCouplingField::areStrictlyCompatible(other))
-    return false;
-  if(_nature!=other->_nature)
-    return false;
-  if(!_time_discr->areCompatibleForMeld(other->_time_discr))
-    return false;
-  return true;
-}
-
-/*!
  * This method performs a clone of mesh and a renumbering of underlying cells of it. The number of cells remains the same.
  * The values of field are impacted in consequence to have the same geometrical field.
  */
@@ -1201,29 +1168,6 @@ bool MEDCouplingFieldDouble::mergeNodes2(double eps, double epsOnVals) throw(INT
   for(std::vector<DataArrayDouble *>::const_iterator iter=arrays.begin();iter!=arrays.end();iter++)
     if(*iter)
       _type->renumberValuesOnNodes(epsOnVals,arr->getConstPointer(),*iter);
-  setMesh(meshC2);
-  return true;
-}
-
-/*!
- * Merge nodes with (barycenter computation) of underlying mesh. In case of some node will be merged the underlying mesh instance will change.
- */
-bool MEDCouplingFieldDouble::mergeNodes2(double eps) throw(INTERP_KERNEL::Exception)
-{
-  const MEDCouplingPointSet *meshC=dynamic_cast<const MEDCouplingPointSet *>(_mesh);
-  if(!meshC)
-    throw INTERP_KERNEL::Exception("Invalid support mesh to apply mergeNodes on it : must be a MEDCouplingPointSet one !");
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingPointSet> meshC2((MEDCouplingPointSet *)meshC->deepCpy());
-  bool ret;
-  int ret2;
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> arr=meshC2->mergeNodes2(eps,ret,ret2);
-  if(!ret)//no nodes have been merged.
-    return ret;
-  std::vector<DataArrayDouble *> arrays;
-  _time_discr->getArrays(arrays);
-  for(std::vector<DataArrayDouble *>::const_iterator iter=arrays.begin();iter!=arrays.end();iter++)
-    if(*iter)
-      _type->renumberValuesOnNodes(arr->getConstPointer(),*iter);
   setMesh(meshC2);
   return true;
 }

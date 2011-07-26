@@ -225,9 +225,14 @@ std::vector<int> MEDCouplingPointSet::getNodeIdsNearPoint(const double *pos, dou
 }
 
 /*!
- * Given a point given by its position 'pos' this method finds the set of node ids that are a a distance lower than eps.
- * Position 'pos' is expected to be of size getSpaceDimension()*nbOfNodes. If not the behabiour is not warranted.
+ * Given a set of points given by their position 'pos' this method finds the set of node ids that are a a distance lower than eps.
+ * Position 'pos' is expected to be of size getSpaceDimension()*nbOfNodes. If not the behaviour is not warranted.
  * This method throws an exception if no coordiantes are set.
+ *
+ *  Information is returned via a (value, index) integer array giving the number 
+ * of nodes in (this) point set found for each node in pos : (c,cI)
+ * cI has size nbOfNodes+1
+ * c has size cI[nbOfNodes]
  */
 void MEDCouplingPointSet::getNodeIdsNearPoints(const double *pos, int nbOfNodes, double eps, std::vector<int>& c, std::vector<int>& cI) const throw(INTERP_KERNEL::Exception)
 {

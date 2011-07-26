@@ -31,7 +31,6 @@
 #include "MEDCouplingAutoRefCountObjectPtr.hxx"
 #include "InterpKernelAutoPtr.hxx"
 
-
 #include <sstream>
 #include <numeric>
 #include <cstring>
@@ -117,15 +116,6 @@ void MEDCouplingUMesh::checkCoherency() const throw(INTERP_KERNEL::Exception)
         throw INTERP_KERNEL::Exception("Nodal connectivity index array is expected to be with number of components set to one !");
       if(_nodal_connec_index->getInfoOnComponent(0)!="")
         throw INTERP_KERNEL::Exception("Nodal connectivity index array is expected to have no info on its single component !");
-      int curNbOfCell=getNumberOfCells();
-      const int *curCI=_nodal_connec_index->getConstPointer();
-      for (int i=0; i<curNbOfCell; i++)
-        if(curCI[i+1]<curCI[i])
-          {
-            std::ostringstream oss;
-            oss<<"pb in connectivity index --> cell "<<i<<" conn_index[i]=" <<curCI[i]<<" conn_index[i+1]="<<curCI[i+1];
-            throw INTERP_KERNEL::Exception(oss.str().c_str());
-          }
     }
 }
 
