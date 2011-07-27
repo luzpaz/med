@@ -2304,25 +2304,31 @@ void MEDCouplingBasicsTest::test3D2DInterpP0P0_1()
   INTERP_KERNEL::Interpolation3D2D myInterpolator;
   myInterpolator.setPrecision(1e-12);
   std::vector<std::map<int,double> > res;
-  INTERP_KERNEL::SplittingPolicy sp[] = { INTERP_KERNEL::GENERAL_48 };
-  //INTERP_KERNEL::SplittingPolicy sp[] = { INTERP_KERNEL::PLANAR_FACE_5, INTERP_KERNEL::PLANAR_FACE_6, INTERP_KERNEL::GENERAL_24, INTERP_KERNEL::GENERAL_48 };
+  //INTERP_KERNEL::SplittingPolicy sp[] = { INTERP_KERNEL::GENERAL_48 };
+  INTERP_KERNEL::SplittingPolicy sp[] = { INTERP_KERNEL::PLANAR_FACE_5, INTERP_KERNEL::PLANAR_FACE_6, INTERP_KERNEL::GENERAL_24, INTERP_KERNEL::GENERAL_48 };
   for ( int i = 0; i < 1; ++i )
   {
     myInterpolator.setSplittingPolicy( sp[i] );
     res.clear();
     myInterpolator.interpolateMeshes(sourceWrapper,targetWrapper,res,"P0P0");
 
-    CPPUNIT_ASSERT_EQUAL(1,(int)res.size());
+    CPPUNIT_ASSERT_EQUAL(2,(int)res.size());
 
-    //CPPUNIT_ASSERT_DOUBLES_EQUAL(0.         ,res[0][0],1e-12);
-    //CPPUNIT_ASSERT_DOUBLES_EQUAL(0.         ,res[0][1],1e-12);
-    //CPPUNIT_ASSERT_DOUBLES_EQUAL(40.        ,res[0][2],1e-12);
-    //CPPUNIT_ASSERT_DOUBLES_EQUAL(8.         ,res[0][3],1e-12);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.         ,res[0][0],1e-12);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.         ,res[0][1],1e-12);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(40.        ,res[0][2],1e-12);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(8.         ,res[0][3],1e-12);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(2.5        ,res[0][4],1e-12);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.         ,res[0][5],1e-12);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(32.        ,res[0][6],1e-12);
 
-    //CPPUNIT_ASSERT_DOUBLES_EQUAL(8.*sqrt(3.),res[1][0],1e-12);
-    //CPPUNIT_ASSERT_DOUBLES_EQUAL(0.         ,res[1][1],1e-12);
-    //CPPUNIT_ASSERT_DOUBLES_EQUAL(40.        ,res[1][2],1e-12);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(80.        ,res[0][0],1e-12);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(8.*sqrt(3.),res[1][0],1e-12);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.         ,res[1][1],1e-12);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(40.        ,res[1][2],1e-12);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(80.        ,res[1][3],1e-12);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.         ,res[1][4],1e-12);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(80.        ,res[1][5],1e-12);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(80.        ,res[1][6],1e-12);
 
     //CPPUNIT_ASSERT_DOUBLES_EQUAL(8.e6,sumAll(res),1e-7);
   }

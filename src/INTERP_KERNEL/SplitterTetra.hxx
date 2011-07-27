@@ -67,6 +67,23 @@ namespace INTERP_KERNEL
       return _nodes[0] == key._nodes[0] && _nodes[1] == key._nodes[1] && _nodes[2] == key._nodes[2];
     }
 
+    //dp TODO DP : à commenter
+    bool operator<(const TriangleFaceKey& key) const
+    {
+      for (int i = 0; i < 3; ++i)
+        {
+          if (_nodes[i] < key._nodes[i])
+            {
+              return true;
+            }
+          else if (_nodes[i] > key._nodes[i])
+            {
+              return false;
+            }
+        }
+      return false;
+    }
+
     /**
      * Returns a hash value for the object, based on its three nodes.
      * This value is not unique for each face.
@@ -173,7 +190,11 @@ namespace INTERP_KERNEL
     ~SplitterTetra();
 
     double intersectSourceCell(typename MyMeshType::MyConnType srcCell, double* baryCentre=0);
-    double intersectSourceFace(typename MyMeshType::MyConnType srcCell);
+    double intersectSourceFace(const NormalizedCellType polyType,
+                               const int polyNodesNbr,
+                               const int *const polyNodes,
+                               const double *const *const polyCoords,
+                               std::set<TriangleFaceKey>& listOfTetraFacesTreated);
 
     double intersectTetra(const double** tetraCorners);
 
@@ -189,11 +210,17 @@ namespace INTERP_KERNEL
     // member functions
     inline void createAffineTransform(const double** corners);
     inline void checkIsOutside(const double* pt, bool* isOutside) const;
-    inline void checkIsOutsideSurface(const double* pt, bool* isOutside, const double errTol = DEFAULT_ABS_TOL) const; //dp à supprimer
+    inline void checkIsStrictlyOutside(const double* pt, bool* isStrictlyOutside, const double errTol = DEFAULT_ABS_TOL) const; //dp à supprimer
     inline void calculateNode(typename MyMeshType::MyConnType globalNodeNum);
     inline void calculateVolume(TransformedTriangle& tri, const TriangleFaceKey& key);
     inline void calculateSurface(TransformedTriangle& tri, const TriangleFaceKey& key);
-        
+
+    inline bool isFacesCoplanar(const double *const plane_normal, const double plane_constant,
+                                const double *const *const coordsFace);
+    inline double calculateIntersectionSurfaceOfCoplanarTriangles(const double *const normal,
+                                                                  const double *const P_1, const double *const P_2, const double *const P_3,
+                                                                  const double *const P_4, const double *const P_5, const double *const P_6,
+                                                                  double dim_caracteristic, double precision);
 
     /// disallow copying
     SplitterTetra(const SplitterTetra& t);
@@ -259,20 +286,21 @@ namespace INTERP_KERNEL
     isOutside[7] = isOutside[7] && (1.0 - pt[0] - pt[1] - pt[2] >= 1.0);
   }
   
+#if 1//dp
   //dp à supprimer
   template<class MyMeshType>
-  inline void SplitterTetra<MyMeshType>::checkIsOutsideSurface(const double* pt, bool* isOutside, const double errTol) const
+  inline void SplitterTetra<MyMeshType>::checkIsStrictlyOutside(const double* pt, bool* isStrictlyOutside, const double errTol) const
   {
-    isOutside[0] = isOutside[0] && (pt[0] < -errTol);
-    isOutside[1] = isOutside[1] && (pt[0] > (1.0 + errTol));
-    isOutside[2] = isOutside[2] && (pt[1] < -errTol);
-    isOutside[3] = isOutside[3] && (pt[1] > (1.0 + errTol));
-    isOutside[4] = isOutside[4] && (pt[2] < -errTol);
-    isOutside[5] = isOutside[5] && (pt[2] > (1.0 + errTol));
-    isOutside[6] = isOutside[6] && (1.0 - pt[0] - pt[1] - pt[2] < -errTol);
-    isOutside[7] = isOutside[7] && (1.0 - pt[0] - pt[1] - pt[2] > (1.0 + errTol));
+    isStrictlyOutside[0] = isStrictlyOutside[0] && (pt[0] < -errTol);
+    isStrictlyOutside[1] = isStrictlyOutside[1] && (pt[0] > (1.0 + errTol));
+    isStrictlyOutside[2] = isStrictlyOutside[2] && (pt[1] < -errTol);
+    isStrictlyOutside[3] = isStrictlyOutside[3] && (pt[1] > (1.0 + errTol));
+    isStrictlyOutside[4] = isStrictlyOutside[4] && (pt[2] < -errTol);
+    isStrictlyOutside[5] = isStrictlyOutside[5] && (pt[2] > (1.0 + errTol));
+    isStrictlyOutside[6] = isStrictlyOutside[6] && (1.0 - pt[0] - pt[1] - pt[2] < -errTol);
+    isStrictlyOutside[7] = isStrictlyOutside[7] && (1.0 - pt[0] - pt[1] - pt[2] > (1.0 + errTol));
   }
-
+#endif
 
   /**
    * Calculates the transformed node with a given global node number.

@@ -1179,22 +1179,28 @@ double MEDCouplingBasicsTest::sumAll(const std::vector< std::map<int,double> >& 
 #if 1
 MEDCouplingUMesh *MEDCouplingBasicsTest::build3D2DSourceMesh_1()
 {
-  double sourceCoords[42]={-12., 6., 10., -12.,10.,  6., -16.,10., 10.,
-                           -20., 0.,  0., -12., 0.,  0., -12., 0., -4., -20.,0.,-4.,
-                           -20., 0., 10., -12., 0., 10., -20.,10., 10.,
-                           -25., 5., -5.,   5., 5., -5.,   5., 5., 25., -25.,5.,25.};
-  int sourceConn[14]={0,1,2, 3,4,5,6, 7,8,9, 10,11,12,13};
+  double sourceCoords[63]={-12., 6., 10., -12.,10.,  6., -16.,10. , 10.,
+                           -20., 0.,  0., -12., 0.,  0., -12., 0. , -4., -20.,0.,-4.,
+                           -20., 0., 10., -12., 0., 10., -20.,10. , 10.,
+                           -25., 5., -5.,   5., 5., -5.,   5., 5. , 25., -25.,5.,25.,
+                           -20., 0., 16., -18., 0., 16., -20., 2.5, 16.,
+                           -25., 0., -5.,   5., 0., -5.,   5., 0. , 25., -25.,0.,25.
+  };
+  int sourceConn[25]={0,1,2, 3,4,5,6, 7,8,9, 10,11,12,13, 14,15,16, 3,4,8,7, 17,18,19,20};
   MEDCouplingUMesh *sourceMesh=MEDCouplingUMesh::New();
   sourceMesh->setMeshDimension(2);
-  sourceMesh->allocateCells(1);
-  //sourceMesh->insertNextCell(INTERP_KERNEL::NORM_TRI3 ,3,sourceConn);
-  //sourceMesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,sourceConn+3);
-  //sourceMesh->insertNextCell(INTERP_KERNEL::NORM_TRI3 ,3,sourceConn+7);
+  sourceMesh->allocateCells(7);
+  sourceMesh->insertNextCell(INTERP_KERNEL::NORM_TRI3 ,3,sourceConn);
+  sourceMesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,sourceConn+3);
+  sourceMesh->insertNextCell(INTERP_KERNEL::NORM_TRI3 ,3,sourceConn+7);
   sourceMesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,sourceConn+10);
+  sourceMesh->insertNextCell(INTERP_KERNEL::NORM_TRI3 ,3,sourceConn+14);
+  sourceMesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,sourceConn+17);
+  sourceMesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,sourceConn+21);
   sourceMesh->finishInsertingCells();
   DataArrayDouble *myCoords=DataArrayDouble::New();
-  myCoords->alloc(14,3);
-  std::copy(sourceCoords,sourceCoords+42,myCoords->getPointer());
+  myCoords->alloc(21,3);
+  std::copy(sourceCoords,sourceCoords+63,myCoords->getPointer());
   sourceMesh->setCoords(myCoords);
   myCoords->decrRef();
   return sourceMesh;
@@ -1206,8 +1212,8 @@ MEDCouplingUMesh *MEDCouplingBasicsTest::build3D2DTargetMesh_1()
   int sourceConn[12]={4,5,7,8, 0,3,2,1,4,7,6,5};
   MEDCouplingUMesh *sourceMesh=MEDCouplingUMesh::New();
   sourceMesh->setMeshDimension(3);
-  sourceMesh->allocateCells(1);
-  //sourceMesh->insertNextCell(INTERP_KERNEL::NORM_TETRA4,4,sourceConn);
+  sourceMesh->allocateCells(2);
+  sourceMesh->insertNextCell(INTERP_KERNEL::NORM_TETRA4,4,sourceConn);
   sourceMesh->insertNextCell(INTERP_KERNEL::NORM_HEXA8,8,sourceConn + 4);
   sourceMesh->finishInsertingCells();
   DataArrayDouble *myCoords=DataArrayDouble::New();

@@ -238,7 +238,9 @@ namespace ParaMEDMEM
     CPPUNIT_TEST( test2DInterpP1P0PL_2 );
     CPPUNIT_TEST( test2DInterpP1P1_1 );
     CPPUNIT_TEST( test2DInterpP1P1PL_1 );
+#endif
     CPPUNIT_TEST( test3DSurfInterpP0P0_1 );
+#if 0
     CPPUNIT_TEST( test3DSurfInterpP0P0PL_1 );
     CPPUNIT_TEST( test3DSurfInterpP0P1_1 );
     CPPUNIT_TEST( test3DSurfInterpP0P1PL_1 );
