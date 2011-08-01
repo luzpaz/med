@@ -109,8 +109,10 @@ namespace MED
   //! Define a base class which represents MED Mesh entity
   struct MEDWRAPPER_EXPORT TMeshInfo: virtual TNameInfo
   {
-    TInt myDim; //!< Dimension of the mesh (0, 1, 2 or 3)
-    TInt GetDim() const { return myDim;} //!< Gets dimension of the mesh
+    TInt myDim; //!< Space dimension (0, 1, 2 or 3)
+    TInt GetDim() const { return myDim;} //!< Gets Space dimension
+
+    TInt myMeshDim; //!< dimension of mesh elements
 
     EMaillage myType; //!< Type of the mesh
     EMaillage GetType() const { return myType;} //!< Gets type of the mesh
