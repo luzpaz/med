@@ -1771,63 +1771,66 @@ static void orientElements( _intermediateMED& medi )
         nbBottomNodes = 4; break;
       default: continue;
       }
-      // find a normal to the bottom face
-      const _noeud* n[4] = {
-        &elemIt->sommets[0]->second, // 3 bottom nodes
-        &elemIt->sommets[1]->second,
-        &elemIt->sommets[2]->second,
-        &elemIt->sommets[nbBottomNodes]->second };// a top node
-      double vec01 [3] = { // vector n[0]-n[1]
-        n[1]->coord[0] - n[0]->coord[0],
-        n[1]->coord[1] - n[0]->coord[1],
-        n[1]->coord[2] - n[0]->coord[2], };
-      double vec02 [3] = { // vector n[0]-n[2]
-        n[2]->coord[0] - n[0]->coord[0],
-        n[2]->coord[1] - n[0]->coord[1],
-        n[2]->coord[2] - n[0]->coord[2] };
-      double normal [3] = { // vec01 ^ vec02
-        vec01[1] * vec02[2] - vec01[2] * vec02[1],
-        vec01[2] * vec02[0] - vec01[0] * vec02[2],
-        vec01[0] * vec02[1] - vec01[1] * vec02[0] };
-      // check if the 102 angle is convex
-      if ( nbBottomNodes > 3 ) {
-        const _noeud* n3 = &elemIt->sommets[nbBottomNodes-1]->second;// last bottom node
-        double vec03 [3] = { // vector n[0]-n3
-          n3->coord[0] - n[0]->coord[0],
-          n3->coord[1] - n[0]->coord[1],
-          n3->coord[2] - n[0]->coord[2], };
-        if ( fabs( normal[0]+normal[1]+normal[2] ) <= DBL_MIN ) { // vec01 || vec02
-          normal[0] = vec01[1] * vec03[2] - vec01[2] * vec03[1]; // vec01 ^ vec03
-          normal[1] = vec01[2] * vec03[0] - vec01[0] * vec03[2];
-          normal[2] = vec01[0] * vec03[1] - vec01[1] * vec03[0];
-        }
-        else {
-          double vec [3] = { // normal ^ vec01
-            normal[1] * vec01[2] - normal[2] * vec01[1],
-            normal[2] * vec01[0] - normal[0] * vec01[2],
-            normal[0] * vec01[1] - normal[1] * vec01[0] };
-          double dot2 = vec[0]*vec03[0] + vec[1]*vec03[1] + vec[2]*vec03[2]; // vec*vec03
-          if ( dot2 < 0 ) { // concave -> reverse normal
-            normal[0] *= -1;
-            normal[1] *= -1;
-            normal[2] *= -1;
+      getReverseVector( elemIt->geometricType, swapVec );
+
+      for ( ; elemIt != elemEnd; elemIt++ )
+      {
+        // find a normal to the bottom face
+        const _noeud* n[4] = {
+          &elemIt->sommets[0]->second, // 3 bottom nodes
+          &elemIt->sommets[1]->second,
+          &elemIt->sommets[2]->second,
+          &elemIt->sommets[nbBottomNodes]->second };// a top node
+        double vec01 [3] = { // vector n[0]-n[1]
+          n[1]->coord[0] - n[0]->coord[0],
+          n[1]->coord[1] - n[0]->coord[1],
+          n[1]->coord[2] - n[0]->coord[2], };
+        double vec02 [3] = { // vector n[0]-n[2]
+          n[2]->coord[0] - n[0]->coord[0],
+          n[2]->coord[1] - n[0]->coord[1],
+          n[2]->coord[2] - n[0]->coord[2] };
+        double normal [3] = { // vec01 ^ vec02
+          vec01[1] * vec02[2] - vec01[2] * vec02[1],
+          vec01[2] * vec02[0] - vec01[0] * vec02[2],
+          vec01[0] * vec02[1] - vec01[1] * vec02[0] };
+        // check if the 102 angle is convex
+        if ( nbBottomNodes > 3 ) {
+          const _noeud* n3 = &elemIt->sommets[nbBottomNodes-1]->second;// last bottom node
+          double vec03 [3] = { // vector n[0]-n3
+            n3->coord[0] - n[0]->coord[0],
+            n3->coord[1] - n[0]->coord[1],
+            n3->coord[2] - n[0]->coord[2], };
+          if ( fabs( normal[0]+normal[1]+normal[2] ) <= DBL_MIN ) { // vec01 || vec02
+            normal[0] = vec01[1] * vec03[2] - vec01[2] * vec03[1]; // vec01 ^ vec03
+            normal[1] = vec01[2] * vec03[0] - vec01[0] * vec03[2];
+            normal[2] = vec01[0] * vec03[1] - vec01[1] * vec03[0];
+          }
+          else {
+            double vec [3] = { // normal ^ vec01
+              normal[1] * vec01[2] - normal[2] * vec01[1],
+              normal[2] * vec01[0] - normal[0] * vec01[2],
+              normal[0] * vec01[1] - normal[1] * vec01[0] };
+            double dot2 = vec[0]*vec03[0] + vec[1]*vec03[1] + vec[2]*vec03[2]; // vec*vec03
+            if ( dot2 < 0 ) { // concave -> reverse normal
+              normal[0] *= -1;
+              normal[1] *= -1;
+              normal[2] *= -1;
+            }
           }
         }
-      }
-      // direction from top to bottom
-      vector<double> tbDir(3);
-      tbDir[0] = n[0]->coord[0] - n[3]->coord[0];
-      tbDir[1] = n[0]->coord[1] - n[3]->coord[1];
-      tbDir[2] = n[0]->coord[2] - n[3]->coord[2];
-      // compare 2 directions: normal and top-bottom
-      double dot = normal[0]*tbDir[0] + normal[1]*tbDir[1] + normal[2]*tbDir[2];
-      if ( dot < 0. ) // need reverse
-      {
-        getReverseVector( elemIt->geometricType, swapVec );
-        for ( ; elemIt != elemEnd; elemIt++ )
+        // direction from top to bottom
+        double tbDir[3];
+        tbDir[0] = n[0]->coord[0] - n[3]->coord[0];
+        tbDir[1] = n[0]->coord[1] - n[3]->coord[1];
+        tbDir[2] = n[0]->coord[2] - n[3]->coord[2];
+        // compare 2 directions: normal and top-bottom
+        double dot = normal[0]*tbDir[0] + normal[1]*tbDir[1] + normal[2]*tbDir[2];
+        if ( dot < 0. ) // need reverse
+        {
           reverse( *elemIt, swapVec );
-      }
-    } // loop on volumes of one geometry
+        }
+      } // loop on volumes of one geometry
+    } // loop on 3D geometry types
 
   } // space dimension == 3
 }
