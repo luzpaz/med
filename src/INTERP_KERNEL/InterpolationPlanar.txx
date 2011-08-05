@@ -86,8 +86,7 @@ namespace INTERP_KERNEL
     InterpolationOptions::setIntersectionType(intersectionType);
     InterpolationOptions::setOrientation(orientation);
   }
-  
-  
+
   /** \brief Main function to interpolate triangular or quadrangular meshes.
       \details  The algorithm proceeds in two steps: first a filtering process reduces the number of pairs of elements for which the
       * calculation must be carried out by eliminating pairs that do not intersect based on their bounding boxes. Then, the 
@@ -123,32 +122,15 @@ namespace INTERP_KERNEL
     /***********************************************************/
 
     long nbMailleS=myMeshS.getNumberOfElements();
-    long nbMailleT=myMeshT.getNumberOfElements();
     
     /**************************************************/
     /* Search the characteristic size of the meshes   */
     /**************************************************/
     
-    double BoxS[2*SPACEDIM]; myMeshS.getBoundingBox(BoxS);
-    double BoxT[2*SPACEDIM]; myMeshT.getBoundingBox(BoxT);
-    double diagonalS,dimCaracteristicS=std::numeric_limits<double>::max();
-    if(nbMailleS!=0)
+    int printLevel = InterpolationOptions::getPrintLevel();
+    _dim_caracteristic = CalculateCharacteristicSizeOfMeshes(myMeshS, myMeshT, printLevel);
+    if (printLevel>=1)
       {
-        diagonalS=getDistanceBtw2Pts<SPACEDIM>(BoxS+SPACEDIM,BoxS);
-        dimCaracteristicS=diagonalS/nbMailleS;
-      }
-    double diagonalT,dimCaracteristicT=std::numeric_limits<double>::max();
-    if(nbMailleT!=0)
-      {
-        diagonalT=getDistanceBtw2Pts<SPACEDIM>(BoxT+SPACEDIM,BoxT);
-        dimCaracteristicT=diagonalT/nbMailleT;
-      }
-    
-    _dim_caracteristic=std::min(dimCaracteristicS, dimCaracteristicT);
-    if (InterpolationOptions::getPrintLevel()>=1)
-      {
-        std::cout << "  - Characteristic size of the source mesh : " << dimCaracteristicS << std::endl;
-        std::cout << "  - Characteristic size of the target mesh: " << dimCaracteristicT << std::endl;
         std::cout << "InterpolationPlanar::computation of the intersections" << std::endl;
       }
     

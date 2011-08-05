@@ -1174,10 +1174,7 @@ double MEDCouplingBasicsTest::sumAll(const std::vector< std::map<int,double> >& 
   return ret;
 }
 
-#if 1//dp
-
-#if 1
-MEDCouplingUMesh *MEDCouplingBasicsTest::build3D2DSourceMesh_1()
+MEDCouplingUMesh *MEDCouplingBasicsTest::build3D2DSourceMesh()
 {
   double sourceCoords[63]={-12., 6., 10., -12.,10.,  6., -16.,10. , 10.,
                            -20., 0.,  0., -12., 0.,  0., -12., 0. , -4., -20.,0.,-4.,
@@ -1206,58 +1203,249 @@ MEDCouplingUMesh *MEDCouplingBasicsTest::build3D2DSourceMesh_1()
   return sourceMesh;
 }
 
-MEDCouplingUMesh *MEDCouplingBasicsTest::build3D2DTargetMesh_1()
+MEDCouplingUMesh *MEDCouplingBasicsTest::build3D2DTargetMesh()
 {
-  double sourceCoords[27]={-20.,0.,0., -20.,10.,0., -12.,10.,0., -12.,0.,0., -20.,0.,10., -20.,10.,10., -12.,10.,10., -12.,0.,10., -20.,0.,18.};
-  int sourceConn[12]={4,5,7,8, 0,3,2,1,4,7,6,5};
-  MEDCouplingUMesh *sourceMesh=MEDCouplingUMesh::New();
-  sourceMesh->setMeshDimension(3);
-  sourceMesh->allocateCells(2);
-  sourceMesh->insertNextCell(INTERP_KERNEL::NORM_TETRA4,4,sourceConn);
-  sourceMesh->insertNextCell(INTERP_KERNEL::NORM_HEXA8,8,sourceConn + 4);
-  sourceMesh->finishInsertingCells();
+  double targetCoords[45]={-20., 0., 0., -20.,10., 0., -12.,10., 0.,
+                           -12., 0., 0., -20., 0.,10., -20.,10.,10.,
+                           -12.,10.,10., -12., 0.,10., -20., 0.,18.,
+                           -20.,-5.,10., -20.,-5.,-4., -12.,-5.,-4.,
+                           -12.,-5.,10., -20., 0.,-4., -12., 0.,-4.
+  };
+  int targetConn[20]={4,5,7,8, 0,3,2,1,4,7,6,5, 4,13,14,7,9,10,11,12};
+  MEDCouplingUMesh *targetMesh=MEDCouplingUMesh::New();
+  targetMesh->setMeshDimension(3);
+  targetMesh->allocateCells(3);
+  targetMesh->insertNextCell(INTERP_KERNEL::NORM_TETRA4,4,targetConn);
+  targetMesh->insertNextCell(INTERP_KERNEL::NORM_HEXA8,8,targetConn + 4);
+  targetMesh->insertNextCell(INTERP_KERNEL::NORM_HEXA8,8,targetConn + 12);
+  targetMesh->finishInsertingCells();
   DataArrayDouble *myCoords=DataArrayDouble::New();
-  myCoords->alloc(9,3);
-  std::copy(sourceCoords,sourceCoords+27,myCoords->getPointer());
+  myCoords->alloc(15,3);
+  std::copy(targetCoords,targetCoords+45,myCoords->getPointer());
+  targetMesh->setCoords(myCoords);
+  myCoords->decrRef();
+  return targetMesh;
+}
+
+MEDCouplingUMesh* MEDCouplingBasicsTest::build3D2DQuadSourceMesh(const double shiftX,
+                                                                 const double inclinationX)
+{
+  MEDCouplingUMesh *sourceMesh=MEDCouplingUMesh::New();
+  sourceMesh->setMeshDimension(2);
+
+  const int nbY = 4;
+  const int nbZ = 5;
+  const int nbYP1 = nbY + 1;
+  const int nbZP1 = nbZ + 1;
+  sourceMesh->allocateCells(nbY * nbZ);
+
+  int sourceConn[4];
+  for (int iY = 0; iY < nbY; ++iY)
+    {
+      for (int iZ = 0; iZ < nbZ; ++iZ)
+        {
+          sourceConn[0] = iZ     +  iY      * nbZP1;
+          sourceConn[1] = iZ + 1 +  iY      * nbZP1;
+          sourceConn[2] = iZ + 1 + (iY + 1) * nbZP1;
+          sourceConn[3] = iZ     + (iY + 1) * nbZP1;
+          sourceMesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,sourceConn);
+        }
+    }
+  sourceMesh->finishInsertingCells();
+
+  std::vector<double> sourceCoords;
+  for (int iY = 0; iY < nbYP1; ++iY)
+    {
+      for (int iZ = 0; iZ < nbZP1; ++iZ)
+        {
+            sourceCoords.push_back(iY * inclinationX + shiftX);
+            sourceCoords.push_back(iY * 4.);
+            sourceCoords.push_back(iZ * 3.);
+        }
+
+    }
+  DataArrayDouble *myCoords=DataArrayDouble::New();
+  myCoords->alloc(nbYP1 * nbZP1,3);
+  std::copy(sourceCoords.begin(),sourceCoords.end(),myCoords->getPointer());
   sourceMesh->setCoords(myCoords);
   myCoords->decrRef();
+
   return sourceMesh;
 }
 
-#else // détruire dessous
-
-MEDCouplingUMesh *MEDCouplingBasicsTest::build3D2DTargetMesh_1()
+MEDCouplingUMesh* MEDCouplingBasicsTest::build3D2DTriSourceMesh(const double shiftX,
+                                                                const double inclinationX)
 {
-   double targetCoords[12]={0.,0.,0, 1.,0.,0., 0.,1.,0., 0.,0.,1.};
-   int targetConn[4]={0,1,2,3};
+  MEDCouplingUMesh *sourceMesh=MEDCouplingUMesh::New();
+  sourceMesh->setMeshDimension(2);
+
+  const int nbY = 4;
+  const int nbZ = 5;
+  const int nbYP1 = nbY + 1;
+  const int nbZP1 = nbZ + 1;
+  sourceMesh->allocateCells(nbY * nbZ * 2);
+
+  int sourceConn[3];
+  for (int iY = 0; iY < nbY; ++iY)
+    {
+      for (int iZ = 0; iZ < nbZ; ++iZ)
+        {
+        sourceConn[0] = iZ     +  iY      * nbZP1;
+        sourceConn[1] = iZ + 1 +  iY      * nbZP1;
+        sourceConn[2] = iZ + 1 + (iY + 1) * nbZP1;
+        sourceMesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3,sourceConn);
+        sourceConn[0] = iZ     +  iY      * nbZP1;
+        sourceConn[1] = iZ     + (iY + 1) * nbZP1;
+        sourceConn[2] = iZ + 1 + (iY + 1) * nbZP1;
+        sourceMesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3,sourceConn);
+        }
+    }
+  sourceMesh->finishInsertingCells();
+
+  std::vector<double> sourceCoords;
+  for (int iY = 0; iY < nbYP1; ++iY)
+    {
+      for (int iZ = 0; iZ < nbZP1; ++iZ)
+        {
+            sourceCoords.push_back(iY * inclinationX + shiftX);
+            sourceCoords.push_back(iY * 4.);
+            sourceCoords.push_back(iZ * 3.);
+        }
+
+    }
+  DataArrayDouble *myCoords=DataArrayDouble::New();
+  myCoords->alloc(nbYP1 * nbZP1,3);
+  std::copy(sourceCoords.begin(),sourceCoords.end(),myCoords->getPointer());
+  sourceMesh->setCoords(myCoords);
+  myCoords->decrRef();
+
+  return sourceMesh;
+}
+
+MEDCouplingUMesh* MEDCouplingBasicsTest::build3D2DHexaTargetMesh(const double inclinationX)
+{
   MEDCouplingUMesh *targetMesh=MEDCouplingUMesh::New();
   targetMesh->setMeshDimension(3);
-  targetMesh->allocateCells(1);
-  targetMesh->insertNextCell(INTERP_KERNEL::NORM_TETRA4,4,targetConn);
+
+  const int nbX = 5;
+  const int nbY = 4;
+  const int nbZ = 5;
+  const int nbXP1 = nbX + 1;
+  const int nbYP1 = nbY + 1;
+  const int nbZP1 = nbZ + 1;
+  targetMesh->allocateCells(nbX * nbY * nbZ);
+
+  int targetConn[8];
+  for (int iX = 0; iX < nbX; ++iX)
+    {
+      for (int iY = 0; iY < nbY; ++iY)
+        {
+          for (int iZ = 0; iZ < nbZ; ++iZ)
+            {
+              targetConn[0] = iZ     + ( iY      +  iX      * nbYP1) * nbZP1;
+              targetConn[1] = iZ + 1 + ( iY      +  iX      * nbYP1) * nbZP1;
+              targetConn[2] = iZ + 1 + ((iY + 1) +  iX      * nbYP1) * nbZP1;
+              targetConn[3] = iZ     + ((iY + 1) +  iX      * nbYP1) * nbZP1;
+              targetConn[4] = iZ     + ( iY      + (iX + 1) * nbYP1) * nbZP1;
+              targetConn[5] = iZ + 1 + ( iY      + (iX + 1) * nbYP1) * nbZP1;
+              targetConn[6] = iZ + 1 + ((iY + 1) + (iX + 1) * nbYP1) * nbZP1;
+              targetConn[7] = iZ     + ((iY + 1) + (iX + 1) * nbYP1) * nbZP1;
+              targetMesh->insertNextCell(INTERP_KERNEL::NORM_HEXA8,8,targetConn);
+            }
+        }
+    }
   targetMesh->finishInsertingCells();
+
+  std::vector<double> targetCoords;
+  for (int iX = 0; iX < nbXP1; ++iX)
+    {
+      for (int iY = 0; iY < nbYP1; ++iY)
+        {
+          for (int iZ = 0; iZ < nbZP1; ++iZ)
+            {
+                targetCoords.push_back(iX * 3. + iY * inclinationX);
+                targetCoords.push_back(iY * 4.);
+                targetCoords.push_back(iZ * 3.);
+            }
+        }
+    }
   DataArrayDouble *myCoords=DataArrayDouble::New();
-  myCoords->alloc(4,3);
-  std::copy(targetCoords,targetCoords+12,myCoords->getPointer());
+  myCoords->alloc(nbXP1 * nbYP1 * nbZP1, 3);
+  std::copy(targetCoords.begin(),targetCoords.end(),myCoords->getPointer());
   targetMesh->setCoords(myCoords);
   myCoords->decrRef();
+
   return targetMesh;
 }
 
-MEDCouplingUMesh *MEDCouplingBasicsTest::build3D2DSourceMesh_1()
+MEDCouplingUMesh* MEDCouplingBasicsTest::build3D2DTetraTargetMesh(const double inclinationX)
 {
-   double targetCoords[9]={0.5,0.,0., 0.5,0.5,0., 0.5,0.,0.5};
-   int targetConn[3]={0,1,2};
   MEDCouplingUMesh *targetMesh=MEDCouplingUMesh::New();
-  targetMesh->setMeshDimension(2);
-  targetMesh->allocateCells(1);
-  targetMesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3,targetConn);
+  targetMesh->setMeshDimension(3);
+
+  const int nbX = 5;
+  const int nbY = 4;
+  const int nbZ = 5;
+  const int nbXP1 = nbX + 1;
+  const int nbYP1 = nbY + 1;
+  const int nbZP1 = nbZ + 1;
+  targetMesh->allocateCells(nbX * nbY * nbZ * 5);
+
+  int targetConn[4];
+  for (int iX = 0; iX < nbX; ++iX)
+    {
+      for (int iY = 0; iY < nbY; ++iY)
+        {
+          for (int iZ = 0; iZ < nbZ; ++iZ)
+            {
+              targetConn[0] = iZ     + ( iY      +  iX      * nbYP1) * nbZP1;
+              targetConn[1] = iZ + 1 + ( iY      +  iX      * nbYP1) * nbZP1;
+              targetConn[2] = iZ + 1 + ( iY      + (iX + 1) * nbYP1) * nbZP1;
+              targetConn[3] = iZ + 1 + ((iY + 1) +  iX      * nbYP1) * nbZP1;
+              targetMesh->insertNextCell(INTERP_KERNEL::NORM_TETRA4,4,targetConn);
+              targetConn[0] = iZ     + ( iY      +  iX      * nbYP1) * nbZP1;
+              targetConn[1] = iZ     + ( iY      + (iX + 1) * nbYP1) * nbZP1;
+              targetConn[2] = iZ + 1 + ( iY      + (iX + 1) * nbYP1) * nbZP1;
+              targetConn[3] = iZ     + ((iY + 1) + (iX + 1) * nbYP1) * nbZP1;
+              targetMesh->insertNextCell(INTERP_KERNEL::NORM_TETRA4,4,targetConn);
+              targetConn[0] = iZ     + ( iY      +  iX      * nbYP1) * nbZP1;
+              targetConn[1] = iZ     + ((iY + 1) +  iX      * nbYP1) * nbZP1;
+              targetConn[2] = iZ     + ((iY + 1) + (iX + 1) * nbYP1) * nbZP1;
+              targetConn[3] = iZ + 1 + ((iY + 1) +  iX      * nbYP1) * nbZP1;
+              targetMesh->insertNextCell(INTERP_KERNEL::NORM_TETRA4,4,targetConn);
+              targetConn[0] = iZ + 1 + ( iY      + (iX + 1) * nbYP1) * nbZP1;
+              targetConn[1] = iZ + 1 + ((iY + 1) + (iX + 1) * nbYP1) * nbZP1;
+              targetConn[2] = iZ     + ((iY + 1) + (iX + 1) * nbYP1) * nbZP1;
+              targetConn[3] = iZ + 1 + ((iY + 1) +  iX      * nbYP1) * nbZP1;
+              targetMesh->insertNextCell(INTERP_KERNEL::NORM_TETRA4,4,targetConn);
+              targetConn[0] = iZ     + ( iY      +  iX      * nbYP1) * nbZP1;
+              targetConn[1] = iZ + 1 + ((iY + 1) +  iX      * nbYP1) * nbZP1;
+              targetConn[2] = iZ + 1 + ( iY      + (iX + 1) * nbYP1) * nbZP1;
+              targetConn[3] = iZ     + ((iY + 1) + (iX + 1) * nbYP1) * nbZP1;
+              targetMesh->insertNextCell(INTERP_KERNEL::NORM_TETRA4,4,targetConn);
+            }
+        }
+    }
   targetMesh->finishInsertingCells();
+
+  std::vector<double> targetCoords;
+  for (int iX = 0; iX < nbXP1; ++iX)
+    {
+      for (int iY = 0; iY < nbYP1; ++iY)
+        {
+          for (int iZ = 0; iZ < nbZP1; ++iZ)
+            {
+                targetCoords.push_back(iX * 3. + iY * inclinationX);
+                targetCoords.push_back(iY * 4.);
+                targetCoords.push_back(iZ * 3.);
+            }
+        }
+    }
   DataArrayDouble *myCoords=DataArrayDouble::New();
-  myCoords->alloc(3,3);
-  std::copy(targetCoords,targetCoords+9,myCoords->getPointer());
+  myCoords->alloc(nbXP1 * nbYP1 * nbZP1, 3);
+  std::copy(targetCoords.begin(),targetCoords.end(),myCoords->getPointer());
   targetMesh->setCoords(myCoords);
   myCoords->decrRef();
+
   return targetMesh;
 }
-#endif
-#endif

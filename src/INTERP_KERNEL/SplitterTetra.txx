@@ -259,7 +259,6 @@ namespace INTERP_KERNEL
                 faceNodes=new int[faceModel.getNumberOfNodes()];      
                 cellModelCell.fillSonCellNodalConnectivity(ii,cellNodes,faceNodes);
               }
-
             // intersect a son with the unit tetra
             switch(faceType)
               {
@@ -375,9 +374,10 @@ namespace INTERP_KERNEL
     return std::fabs(1.0 / _t->determinant() * totalVolume) ;
   }
 
-#if 1//dp TODO DP : à commenter
+  //dp TODO DP : à commenter
   template<class MyMeshType>
   double SplitterTetra<MyMeshType>::calculateIntersectionSurfaceOfCoplanarTriangles(const double *const plane_normal,
+                                                                                    const double plane_constant,
                                                                                     const double *const P_1, const double *const P_2, const double *const P_3,
                                                                                     const double *const P_4, const double *const P_5, const double *const P_6,
                                                                                     double dim_caracteristic, double precision)
@@ -479,57 +479,51 @@ namespace INTERP_KERNEL
                          inter2,
                          dim_caracteristic, precision);
     ConnType nb_inter=((ConnType)inter2.size())/2;
-    if(nb_inter >3) inter2=reconstruct_polygon(inter2);
     double surface = 0.;
-    double normal[3];
-    for(ConnType i = 1; i<nb_inter-1; i++)
-      {
-        INTERP_KERNEL::crossprod<2>(&inter2[0],&inter2[2*i],&inter2[2*(i+1)],normal);
-        surface +=0.5*fabs(normal[0]);
-      }
-    return surface;
-#if 0//dp
-    int nb_inter = inter2.size();
+    if(nb_inter >3) inter2=reconstruct_polygon(inter2);
     if (nb_inter > 0)
       {
-        inter3.resize(3 * nb_inter / 2);
+        std::vector<double> inter3;
+        inter3.resize(3 * nb_inter);
         // Map 2D intersections back to the 3D triangle space.
         if (maxNormal == 0)
           {
-            double invNX = ((double) 1.) / normal[0];
+            double invNX = ((double) 1.) / plane_normal[0];
             for (i = 0; i < nb_inter; i++)
               {
                 inter3[3 * i + 1] = inter2[2 * i];
                 inter3[3 * i + 2] = inter2[2 * i + 1];
-                inter3[3 * i] = invNX * (constant - normal[1] * inter3[3 * i + 1] - normal[2] * inter3[3 * i + 2]);
+                inter3[3 * i] = invNX * (plane_constant - plane_normal[1] * inter3[3 * i + 1] - plane_normal[2] * inter3[3 * i + 2]);
               }
           }
         else if (maxNormal == 1)
           {
-            double invNY = ((double) 1.) / normal[1];
+            double invNY = ((double) 1.) / plane_normal[1];
             for (i = 0; i < nb_inter; i++)
               {
                 inter3[3 * i] = inter2[2 * i];
                 inter3[3 * i + 2] = inter2[2 * i + 1];
-                inter3[3 * i + 1] = invNY * (constant - normal[0] * inter3[3 * i] - normal[2] * inter3[3 * i + 2]);
+                inter3[3 * i + 1] = invNY * (plane_constant - plane_normal[0] * inter3[3 * i] - plane_normal[2] * inter3[3 * i + 2]);
               }
           }
         else
           {
-            double invNZ = ((double) 1.) / normal[2];
+            double invNZ = ((double) 1.) / plane_normal[2];
             for (i = 0; i < nb_inter; i++)
               {
                 inter3[3 * i] = inter2[2 * i];
                 inter3[3 * i + 1] = inter2[2 * i + 1];
-                inter3[3 * i + 2] = invNZ * (constant - normal[0] * inter3[3 * i] - normal[1] * inter3[3 * i + 1]);
+                inter3[3 * i + 2] = invNZ * (plane_constant - plane_normal[0] * inter3[3 * i] - plane_normal[1] * inter3[3 * i + 1]);
               }
           }
+        surface = polygon_area<3>(inter3);
       }
-#endif
+    return surface;
   }
 
   template<class MyMeshType>
-  bool SplitterTetra<MyMeshType>::isFacesCoplanar(const double *const plane_normal, const double plane_constant,
+  bool SplitterTetra<MyMeshType>::isFacesCoplanar(const double *const plane_normal,
+                                                  const double plane_constant,
                                                   const double *const *const coordsFace)
   {
       // Compute the signed distances of triangle vertices to the plane. Use an epsilon-thick plane test.
@@ -548,9 +542,6 @@ namespace INTERP_KERNEL
       else
         return false;
   }
-
-#endif
-
 
   // TODO DP : adapter les commentaires suivants. _volume => _surface ?
   /**
@@ -571,65 +562,15 @@ namespace INTERP_KERNEL
                                                         const int polyNodesNbr,
                                                         const int *const polyNodes,
                                                         const double *const *const polyCoords,
-                                                        std::set<TriangleFaceKey>& listOfTetraFacesTreated)
+                                                        const double dimCaracteristic,
+                                                        const double precision,
+                                                        std::multiset<TriangleFaceKey>& listOfTetraFacesTreated,
+                                                        std::set<TriangleFaceKey>& listOfTetraFacesColinear)
   {
     typedef typename MyMeshType::MyConnType ConnType;
 
-    double totalVolume = 0.0;
+    double totalSurface = 0.0;
 
-
-#if 0
-    // Is src element coplanar with one of the tetra faces ?
-
-    double srcNormal[3];
-#if 0//dp
-    const double* points[3];
-    for(int i = 0 ; i < 3 ; ++i)
-      {
-        points[i] = _src_mesh.getCoordinatesPtr()+MyMeshType::MY_SPACEDIM*cellNodes[i];
-      }
-    calculateNormalForTria(points[0],points[1],points[2], srcNormal);
-#else
-    calculateNormalForPolyg((const double **)coordsPoly, nbOfNodes4Type, srcNormal);
-#endif
-
-    double faceNormal[3];
-    double crossNormals[3];
-    const int tetraFacesNodesConn[4][3] = {{0,1,2},{0,2,3},{0,3,1},{1,2,3}};
-    for (int iTetraFace = 0; iTetraFace < 4; ++iTetraFace)
-      {
-        const int *const tetraFaceNodesConn = tetraFacesNodesConn[iTetraFace];
-        const double *const coordsTriNode1 = _coords + tetraFaceNodesConn[0] * MyMeshType::MY_SPACEDIM;
-        const double *const coordsTriNode2 = _coords + tetraFaceNodesConn[1] * MyMeshType::MY_SPACEDIM;
-        const double *const coordsTriNode3 = _coords + tetraFaceNodesConn[2] * MyMeshType::MY_SPACEDIM;
-        calculateNormalForTria(coordsTriNode1, coordsTriNode2, coordsTriNode3, faceNormal);
-        cross(srcNormal, faceNormal, crossNormals);
-        if (epsilonEqual(norm(crossNormals), 0.))
-          {
-            // Les faces sont sur des plans parallèles
-            double area[3];
-            int nbTria = nbOfNodes4Type - 2; // split polygon into nbTria triangles
-            for (int iTri = 0; iTri < nbTria; ++iTri)
-              {
-                std::vector<double> inter;
-                INTERP_KERNEL::intersec_de_triangle(coordsPoly[0], coordsPoly[1 + iTri], coordsPoly[2 + iTri],
-                                                    coordsTriNode1, coordsTriNode2, coordsTriNode3,
-                                                    inter,
-                                                    1., //dp inter, PlanarIntersector<MyMeshType,MyMatrix>::_dim_caracteristic,
-                                                    DEFAULT_ABS_TOL); //dp PlanarIntersector<MyMeshType,MyMatrix>::_precision);
-                ConnType nb_inter=((ConnType)inter.size())/2;
-                if(nb_inter >3) inter=reconstruct_polygon(inter);
-                for(ConnType i = 1; i<nb_inter-1; i++)
-                  {
-                    INTERP_KERNEL::crossprod<2>(&inter[0],&inter[2*i],&inter[2*(i+1)],area);
-                    totalVolume +=0.5*fabs(area[0]);
-                  }
-              }
-          }
-      }
-#endif
-
-    //{ could be done on outside?
     // check if we have planar tetra element
     if(_t->determinant() == 0.0)
       {
@@ -645,24 +586,15 @@ namespace INTERP_KERNEL
     bool isTargetOutside = false;
 
     // calculate the coordinates of the nodes
-#if 0//dp
-    int *polyNodes=new int[polyNodesNbr];
-#endif
     for(int i = 0;i<(int)polyNodesNbr;++i)
       {
-#if 0//dp
-        // we could store mapping local -> global numbers too, but not sure it is worth it
-        const int globalNodeNum = getGlobalNumberOfNode(i, OTT<ConnType,numPol>::indFC(element), _src_mesh);
-        polyNodes[i]=globalNodeNum;
-#else
         const int globalNodeNum = polyNodes[i];
-#endif
         if(_nodes.find(globalNodeNum) == _nodes.end())
           {
             //for(HashMap< int , double* >::iterator iter3=_nodes.begin();iter3!=_nodes.end();iter3++)
             //  std::cout << (*iter3).first << " ";
             //std::cout << std::endl << "*** " << globalNodeNum << std::endl;
-            calculateNode(globalNodeNum);
+            calculateNode2(globalNodeNum, polyCoords[i]);
           }
 
         checkIsStrictlyOutside(_nodes[globalNodeNum], isStrictlyOutside);
@@ -704,7 +636,6 @@ namespace INTERP_KERNEL
                                                       _conn[tetraFaceNodesConn[2]]);
                 if (listOfTetraFacesTreated.find(key) == listOfTetraFacesTreated.end())
                   {
-                    listOfTetraFacesTreated.insert(key);
                     const double * const coordsTetraTriNode1 = _coords + tetraFaceNodesConn[0] * MyMeshType::MY_SPACEDIM;
                     const double * const coordsTetraTriNode2 = _coords + tetraFaceNodesConn[1] * MyMeshType::MY_SPACEDIM;
                     const double * const coordsTetraTriNode3 = _coords + tetraFaceNodesConn[2] * MyMeshType::MY_SPACEDIM;
@@ -731,18 +662,25 @@ namespace INTERP_KERNEL
                         int nbrPolyTri = polyNodesNbr - 2; // split polygon into nbrPolyTri triangles
                         for (int iTri = 0; iTri < nbrPolyTri; ++iTri)
                           {
-                            totalVolume += calculateIntersectionSurfaceOfCoplanarTriangles(plane_normal,
-                                                                                           polyCoords[0],
-                                                                                           polyCoords[1 + iTri],
-                                                                                           polyCoords[2 + iTri],
-                                                                                           coordsTetraTriNode1,
-                                                                                           coordsTetraTriNode2,
-                                                                                           coordsTetraTriNode3,
-                                                                                           1., //dp PlanarIntersector<MyMeshType,MyMatrix>::_dim_caracteristic,
-                                                                                           DEFAULT_ABS_TOL); //dp PlanarIntersector<MyMeshType,MyMatrix>::_precision);
+                            double volume = calculateIntersectionSurfaceOfCoplanarTriangles(plane_normal,
+                                                                                            plane_constant,
+                                                                                            polyCoords[0],
+                                                                                            polyCoords[1 + iTri],
+                                                                                            polyCoords[2 + iTri],
+                                                                                            coordsTetraTriNode1,
+                                                                                            coordsTetraTriNode2,
+                                                                                            coordsTetraTriNode3,
+                                                                                            dimCaracteristic,
+                                                                                            precision);
+                            if (!epsilonEqual(volume, 0.))
+                              {
+                                totalSurface += volume;
+                                listOfTetraFacesColinear.insert(key);
+                              }
                           }
                       }
                   }
+                listOfTetraFacesTreated.insert(key);
               }
           }
         else
@@ -760,17 +698,17 @@ namespace INTERP_KERNEL
                       {
                         TransformedTriangle tri(_nodes[polyNodes[0]], _nodes[polyNodes[1]], _nodes[polyNodes[2]]);
                         calculateSurface(tri, key);
-                        totalVolume += _volumes[key];
+                        totalSurface += _volumes[key];
                       }
                     else
                       {
                         // count negative as face has reversed orientation
-                        totalVolume -= _volumes[key];
+                        totalSurface -= _volumes[key];
                       }
                   }
                   break;
 
-                case NORM_QUAD4: //dp pas d'intérêt vis-à-vis du case suivant (à regrouper les deux cases)
+                case NORM_QUAD4:
 
                   // simple triangulation of faces along a diagonal :
                   //
@@ -793,12 +731,12 @@ namespace INTERP_KERNEL
                       {
                         TransformedTriangle tri(_nodes[polyNodes[0]], _nodes[polyNodes[1]], _nodes[polyNodes[2]]);
                         calculateSurface(tri, key1);
-                        totalVolume += _volumes[key1];
+                        totalSurface += _volumes[key1];
                       }
                     else
                       {
                         // count negative as face has reversed orientation
-                        totalVolume -= _volumes[key1];
+                        totalSurface -= _volumes[key1];
                       }
 
                     // local nodes 1, 3, 4
@@ -807,12 +745,12 @@ namespace INTERP_KERNEL
                       {
                         TransformedTriangle tri(_nodes[polyNodes[0]], _nodes[polyNodes[2]], _nodes[polyNodes[3]]);
                         calculateSurface(tri, key2);
-                        totalVolume += _volumes[key2];
+                        totalSurface += _volumes[key2];
                       }
                     else
                       {
                         // count negative as face has reversed orientation
-                        totalVolume -= _volumes[key2];
+                        totalSurface -= _volumes[key2];
                       }
                   }
                   break;
@@ -828,11 +766,11 @@ namespace INTERP_KERNEL
                             TransformedTriangle tri(_nodes[polyNodes[0]], _nodes[polyNodes[1 + iTri]],
                                 _nodes[polyNodes[2 + iTri]]);
                             calculateSurface(tri, key);
-                            totalVolume += _volumes[key];
+                            totalSurface += _volumes[key];
                           }
                         else
                           {
-                            totalVolume -= _volumes[key];
+                            totalSurface -= _volumes[key];
                           }
                       }
                   }
@@ -850,14 +788,14 @@ namespace INTERP_KERNEL
 
     // reset if it is very small to keep the matrix sparse
     // is this a good idea?
-    if(epsilonEqual(totalVolume, 0.0, SPARSE_TRUNCATION_LIMIT))
+    if(epsilonEqual(totalSurface, 0.0, SPARSE_TRUNCATION_LIMIT))
       {
-        totalVolume = 0.0;
+        totalSurface = 0.0;
       }
     
-    LOG(2, "Volume = " << totalVolume << ", det= " << _t->determinant());
+    LOG(2, "Volume = " << totalSurface << ", det= " << _t->determinant());
 
-    return totalVolume;
+    return totalSurface;
   }
 
   /**
@@ -1084,7 +1022,12 @@ namespace INTERP_KERNEL
         int conn[4];
         for(int j = 0; j < 4; ++j)
           {
+#if 0
             nodes[j] = getCoordsOfSubNode2(subZone[ SPLIT_NODES_5[4*i+j] ],conn[j]);
+#else
+            conn[j] = subZone[ SPLIT_NODES_5[4*i+j] ];
+            nodes[j] = getCoordsOfSubNode(conn[j]);
+#endif
           }
         SplitterTetra<MyMeshTypeS>* t = new SplitterTetra<MyMeshTypeS>(_src_mesh, nodes,conn);
         tetra.push_back(t);
@@ -1130,12 +1073,8 @@ namespace INTERP_KERNEL
         int conn[4];
         for(int j = 0; j < 4; ++j)
           {
-#if 1//dp
             conn[j] = subZone[SPLIT_NODES_6[4*i+j]];
             nodes[j] = getCoordsOfSubNode(conn[j]);
-#else
-            nodes[j] = getCoordsOfSubNode2(subZone[SPLIT_NODES_6[4*i+j]], conn[j]);
-#endif
           }
         SplitterTetra<MyMeshTypeS>* t = new SplitterTetra<MyMeshTypeS>(_src_mesh, nodes,conn);
         tetra.push_back(t);
@@ -1193,18 +1132,22 @@ namespace INTERP_KERNEL
     const double* nodes[4];
     int conn[4];
     // get the cell center
-    nodes[0] = getCoordsOfSubNode2(14,conn[0]);
-    
+    conn[0] = 14;
+    nodes[0] = getCoordsOfSubNode(conn[0]);
+
     for(int faceCenterNode = 8; faceCenterNode < 14; ++faceCenterNode)
       {
         // get the face center
-        nodes[1] = getCoordsOfSubNode2(faceCenterNode,conn[1]);
+        conn[1] = faceCenterNode;
+        nodes[1] = getCoordsOfSubNode(conn[1]);
         for(int j = 0; j < 4; ++j)
           {
             const int row = 4*(faceCenterNode - 8) + j;
-            nodes[2] = getCoordsOfSubNode2(TETRA_EDGES[2*row],conn[2]);
-            nodes[3] = getCoordsOfSubNode2(TETRA_EDGES[2*row + 1],conn[3]);
-           
+            conn[2] = TETRA_EDGES[2*row];
+            conn[3] = TETRA_EDGES[2*row + 1];
+            nodes[2] = getCoordsOfSubNode(conn[2]);
+            nodes[3] = getCoordsOfSubNode(conn[3]);
+
             SplitterTetra<MyMeshTypeS>* t = new SplitterTetra<MyMeshTypeS>(_src_mesh, nodes, conn);
             tetra.push_back(t);
           }

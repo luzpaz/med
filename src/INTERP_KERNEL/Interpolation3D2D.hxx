@@ -20,6 +20,9 @@
 #ifndef __INTERPOLATION3D2D_HXX__
 #define __INTERPOLATION3D2D_HXX__
 
+#include <set>
+#include <map>
+
 #include "Interpolation.hxx"
 #include "NormalizedUnstructuredMesh.hxx"
 #include "InterpolationOptions.hxx"
@@ -29,12 +32,22 @@ namespace INTERP_KERNEL
   class Interpolation3D2D : public Interpolation<Interpolation3D2D>
   {
   public:
+    typedef typename std::map<int,std::set<int> > DuplicateFacesType;
+
     Interpolation3D2D();
     Interpolation3D2D(const InterpolationOptions& io);
-    template<class MyMeshType, class MatrixType>
-    int interpolateMeshes(const MyMeshType& srcMesh, const MyMeshType& targetMesh, MatrixType& result, const char *method);
+    template<class MyMeshType, class MyMatrixType>
+    int interpolateMeshes(const MyMeshType& srcMesh,
+                          const MyMeshType& targetMesh,
+                          MyMatrixType& matrix,
+                          const char *method);
+    DuplicateFacesType retrieveDuplicateFaces() const
+    {
+      return _duplicate_faces;
+    }
   private:
     SplittingPolicy _splitting_policy;
+    DuplicateFacesType _duplicate_faces;
   };
 }
 

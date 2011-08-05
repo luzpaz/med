@@ -80,8 +80,6 @@ namespace INTERP_KERNEL
     return ss.str();
   }
 
-
-  //dp : à supprimer
   /**
    * Subtracts two a double[3] - vectors and store the result in res
    *

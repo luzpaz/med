@@ -43,6 +43,7 @@ namespace INTERP_KERNEL
     // Main function to interpolate triangular and quadratic meshes
     template<class MyMeshType, class MatrixType>
     int interpolateMeshes(const MyMeshType& meshS, const MyMeshType& meshT, MatrixType& result, const char *method);
+
   public:
     bool doRotate() const { return asLeafInterpPlanar().doRotate(); }
     double medianPlane() const { return asLeafInterpPlanar().medianPlane(); }

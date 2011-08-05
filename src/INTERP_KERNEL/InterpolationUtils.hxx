@@ -22,9 +22,6 @@
 
 #include "INTERPKERNELDefines.hxx"
 #include "InterpKernelException.hxx"
-#if 1//dp
-#include "VectorUtils.hxx"
-#endif
 
 #include "NormalizedUnstructuredMesh.hxx"
 

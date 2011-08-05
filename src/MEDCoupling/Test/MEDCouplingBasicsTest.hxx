@@ -36,7 +36,6 @@ namespace ParaMEDMEM
   {
     CPPUNIT_TEST_SUITE(MEDCouplingBasicsTest);
     //MEDCouplingBasicsTest1.cxx
-#if 0//dp
     CPPUNIT_TEST( testArray );
     CPPUNIT_TEST( testArray2 );
     CPPUNIT_TEST( testArray3 );
@@ -238,9 +237,7 @@ namespace ParaMEDMEM
     CPPUNIT_TEST( test2DInterpP1P0PL_2 );
     CPPUNIT_TEST( test2DInterpP1P1_1 );
     CPPUNIT_TEST( test2DInterpP1P1PL_1 );
-#endif
     CPPUNIT_TEST( test3DSurfInterpP0P0_1 );
-#if 0
     CPPUNIT_TEST( test3DSurfInterpP0P0PL_1 );
     CPPUNIT_TEST( test3DSurfInterpP0P1_1 );
     CPPUNIT_TEST( test3DSurfInterpP0P1PL_1 );
@@ -255,10 +252,8 @@ namespace ParaMEDMEM
     CPPUNIT_TEST( testInterpolationCU1D );
     CPPUNIT_TEST( testInterpolationCU2D );
     CPPUNIT_TEST( testInterpolationCU3D );
-#endif
 
     CPPUNIT_TEST( test3DInterpP0P0_1 );
-#if 0 //dp
     CPPUNIT_TEST( test3DInterpP0P0PL_1 );
     CPPUNIT_TEST( test3DInterpP0P0PL_2 );
     CPPUNIT_TEST( test3DInterpP0P0PL_3 );
@@ -279,18 +274,39 @@ namespace ParaMEDMEM
     CPPUNIT_TEST( test3DSurfInterpP1P0Bary_1 );
     CPPUNIT_TEST( test3DInterpP1P0Bary_1 );
     CPPUNIT_TEST( test3DTo1DInterpP0P0PL_1 );
-#endif
 
-    CPPUNIT_TEST( test3D2DInterpP0P0_1 );
+    CPPUNIT_TEST( test3D2DBasicInterpP0P0 );
+    CPPUNIT_TEST( test3D2QuadHexaInterpP0P0_1 );
+    CPPUNIT_TEST( test3D2QuadHexaInterpP0P0_2 );
+    CPPUNIT_TEST( test3D2QuadHexaInterpP0P0_3 );
+    CPPUNIT_TEST( test3D2QuadHexaInterpP0P0_4 );
+    CPPUNIT_TEST( test3D2QuadHexaInterpP0P0_5 );
+    CPPUNIT_TEST( test3D2QuadHexaInterpP0P0_6 );
+    CPPUNIT_TEST( test3D2TriHexaInterpP0P0_1 );
+    CPPUNIT_TEST( test3D2TriHexaInterpP0P0_2 );
+    CPPUNIT_TEST( test3D2TriHexaInterpP0P0_3 );
+    CPPUNIT_TEST( test3D2TriHexaInterpP0P0_4 );
+    CPPUNIT_TEST( test3D2TriHexaInterpP0P0_5 );
+    CPPUNIT_TEST( test3D2TriHexaInterpP0P0_6 );
+    CPPUNIT_TEST( test3D2QuadTetraInterpP0P0_1 );
+    CPPUNIT_TEST( test3D2QuadTetraInterpP0P0_2 );
+    CPPUNIT_TEST( test3D2QuadTetraInterpP0P0_3 );
+    CPPUNIT_TEST( test3D2QuadTetraInterpP0P0_4 );
+    CPPUNIT_TEST( test3D2QuadTetraInterpP0P0_5 );
+    CPPUNIT_TEST( test3D2QuadTetraInterpP0P0_6 );
+    CPPUNIT_TEST( test3D2TriTetraInterpP0P0_1 );
+    CPPUNIT_TEST( test3D2TriTetraInterpP0P0_2 );
+    CPPUNIT_TEST( test3D2TriTetraInterpP0P0_3 );
+    CPPUNIT_TEST( test3D2TriTetraInterpP0P0_4 );
+    CPPUNIT_TEST( test3D2TriTetraInterpP0P0_5 );
+    CPPUNIT_TEST( test3D2TriTetraInterpP0P0_6 );
 
-#if 0//dp
     CPPUNIT_TEST( test1DInterp_1 );
     CPPUNIT_TEST( test2DCurveInterpP0P0_1 );
     CPPUNIT_TEST( test2DCurveInterpP0P0_2 );
     CPPUNIT_TEST( test2DCurveInterpP0P1_1 );
     CPPUNIT_TEST( test2DCurveInterpP1P0_1 );
     CPPUNIT_TEST( test2DCurveInterpP1P1_1 );
-#endif
     CPPUNIT_TEST_SUITE_END();
   public:
     //MEDCouplingBasicsTest1.cxx
@@ -541,9 +557,31 @@ namespace ParaMEDMEM
     void test2DCurveInterpP1P0_1();
     void test2DCurveInterpP1P1_1();
 
-#if 1//dp
-    void test3D2DInterpP0P0_1();
-#endif
+    void test3D2DBasicInterpP0P0();
+    void test3D2QuadHexaInterpP0P0_1();
+    void test3D2QuadHexaInterpP0P0_2();
+    void test3D2QuadHexaInterpP0P0_3();
+    void test3D2QuadHexaInterpP0P0_4();
+    void test3D2QuadHexaInterpP0P0_5();
+    void test3D2QuadHexaInterpP0P0_6();
+    void test3D2TriHexaInterpP0P0_1();
+    void test3D2TriHexaInterpP0P0_2();
+    void test3D2TriHexaInterpP0P0_3();
+    void test3D2TriHexaInterpP0P0_4();
+    void test3D2TriHexaInterpP0P0_5();
+    void test3D2TriHexaInterpP0P0_6();
+    void test3D2QuadTetraInterpP0P0_1();
+    void test3D2QuadTetraInterpP0P0_2();
+    void test3D2QuadTetraInterpP0P0_3();
+    void test3D2QuadTetraInterpP0P0_4();
+    void test3D2QuadTetraInterpP0P0_5();
+    void test3D2QuadTetraInterpP0P0_6();
+    void test3D2TriTetraInterpP0P0_1();
+    void test3D2TriTetraInterpP0P0_2();
+    void test3D2TriTetraInterpP0P0_3();
+    void test3D2TriTetraInterpP0P0_4();
+    void test3D2TriTetraInterpP0P0_5();
+    void test3D2TriTetraInterpP0P0_6();
 
   public:
     static MEDCouplingUMesh *build3DSourceMesh_2();
@@ -585,15 +623,28 @@ namespace ParaMEDMEM
     static MEDCouplingUMesh *buildHexa8Mesh_1();
     static MEDCouplingUMesh *buildPointe_1(MEDCouplingUMesh *&m1);
 
-#if 1//dp
-     static MEDCouplingUMesh *build3D2DSourceMesh_1();
-     static MEDCouplingUMesh *build3D2DTargetMesh_1();
-#endif
+    static MEDCouplingUMesh *build3D2DSourceMesh();
+    static MEDCouplingUMesh *build3D2DTargetMesh();
+    static MEDCouplingUMesh* build3D2DQuadSourceMesh(const double shiftX = 0.,
+                                                     const double inclinationX = 0.);
+    static MEDCouplingUMesh* build3D2DTriSourceMesh(const double shiftX = 0.,
+                                                    const double inclinationX = 0.);
+    static MEDCouplingUMesh* build3D2DTetraTargetMesh(const double inclinaisonX = 0.);
+    static MEDCouplingUMesh* build3D2DHexaTargetMesh(const double inclinaisonX = 0.);
 
     static DataArrayDouble *buildCoordsForMultiTypes_1();
     static MEDCouplingMultiFields *buildMultiFields_1();
     static std::vector<MEDCouplingFieldDouble *> buildMultiFields_2();
     static double sumAll(const std::vector< std::map<int,double> >& matrix);
+
+  private:
+    static int countNonZero(const std::vector< std::map<int,double> >& matrix);
+
+    static void test3D2DMeshesIntersection(MEDCouplingUMesh *sourceMesh,
+                                           MEDCouplingUMesh *targetMesh,
+                                           const double correctSurf,
+                                           const int correctDuplicateFacesNbr,
+                                           const int correctTotalIntersectFacesNbr = -1);
   };
 }
 

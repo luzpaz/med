@@ -33,22 +33,31 @@ namespace INTERP_KERNEL
    * the source elements.
    *
    */
-  template<class MyMeshType, class MyMatrix>
-  class Polyhedron3D2DIntersectorP0P0 : public Intersector3DP0P0<MyMeshType,MyMatrix>
-  { 
+  template<class MyMeshType, class MyMatrixType>
+  class Polyhedron3D2DIntersectorP0P0 : public Intersector3DP0P0<MyMeshType,MyMatrixType>
+  {
+    typedef typename std::map<int,std::set<int> > DuplicateFacesType;
+
   public:
     static const int SPACEDIM=MyMeshType::MY_SPACEDIM;
     static const int MESHDIM=MyMeshType::MY_MESHDIM;
     typedef typename MyMeshType::MyConnType ConnType;
     static const NumberingPolicy numPol=MyMeshType::My_numPol;
+
   public:
 
-    Polyhedron3D2DIntersectorP0P0(const MyMeshType& targetMesh, const MyMeshType& srcMesh,
+    Polyhedron3D2DIntersectorP0P0(const MyMeshType& targetMesh,
+                                  const MyMeshType& srcMesh,
+                                  const double dimCaracteristic,
+                                  const double precision,
+                                  DuplicateFacesType& intersectFaces,
                                   SplittingPolicy policy = PLANAR_FACE_5);
 
     ~Polyhedron3D2DIntersectorP0P0();
 
-    void intersectCells(ConnType targetCell, const std::vector<ConnType>& srcCells, MyMatrix& res);
+    void intersectCells(ConnType targetCell,
+                        const std::vector<ConnType>& srcCells,
+                        MyMatrixType& matrix);
 
   private:
     void releaseArrays();
@@ -58,6 +67,11 @@ namespace INTERP_KERNEL
     std::vector< SplitterTetra<MyMeshType>* > _tetra;
     
     SplitterTetra2<MyMeshType> _split;
+
+    double _dim_caracteristic;
+    double _precision;
+
+    DuplicateFacesType& _intersect_faces;
 
   };
 }

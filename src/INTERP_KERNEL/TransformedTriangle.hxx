@@ -46,9 +46,7 @@ namespace INTERP_TEST
 
 namespace INTERP_KERNEL
 {
-#if 1//dp
   class TetraAffineTransform;
-#endif
 
   /** \class TransformedTriangle
    * \brief Class representing one of the faces of the triangulated source polyhedron after having been transformed

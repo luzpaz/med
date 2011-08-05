@@ -33,19 +33,8 @@
 #include "PolyhedronIntersectorP1P1.txx"
 #include "PointLocator3DIntersectorP1P1.txx"
 #include "Log.hxx"
-/// If defined, use recursion to traverse the binary search tree, else use the BBTree class
-//#define USE_RECURSIVE_BBOX_FILTER
-
-#ifdef USE_RECURSIVE_BBOX_FILTER
-#include "MeshRegion.txx"
-#include "RegionNode.hxx"
-#include <stack>
-
-#else // use BBTree class
 
 #include "BBTree.txx"
-
-#endif
 
 namespace INTERP_KERNEL
 {
@@ -67,11 +56,14 @@ namespace INTERP_KERNEL
 
    * @param srcMesh     3-dimensional source mesh
    * @param targetMesh  3-dimesional target mesh, containing only tetraedra
-   * @param result      matrix in which the result is stored 
+   * @param matrix      matrix in which the result is stored
    *
    */
-  template<class MyMeshType, class MatrixType>
-  int Interpolation3D2D::interpolateMeshes(const MyMeshType& srcMesh, const MyMeshType& targetMesh, MatrixType& result, const char *method)
+  template<class MyMeshType, class MyMatrixType>
+  int Interpolation3D2D::interpolateMeshes(const MyMeshType& srcMesh,
+                                           const MyMeshType& targetMesh,
+                                           MyMatrixType& matrix,
+                                           const char *method)
   {
     typedef typename MyMeshType::MyConnType ConnType;
     // create MeshElement objects corresponding to each element of the two meshes
@@ -84,6 +76,7 @@ namespace INTERP_KERNEL
     std::vector<MeshElement<ConnType>*> targetElems(numTargetElems);
 
     std::map<MeshElement<ConnType>*, int> indices;
+    DuplicateFacesType intersectFaces;
 
     for(unsigned long i = 0 ; i < numSrcElems ; ++i)
       srcElems[i] = new MeshElement<ConnType>(i, srcMesh);       
@@ -91,15 +84,20 @@ namespace INTERP_KERNEL
     for(unsigned long i = 0 ; i < numTargetElems ; ++i)
       targetElems[i] = new MeshElement<ConnType>(i, targetMesh);
 
-    Intersector3D<MyMeshType,MatrixType>* intersector=0;
+    Intersector3D<MyMeshType,MyMatrixType>* intersector=0;
     std::string methC = InterpolationOptions::filterInterpolationMethod(method);
+    const double dimCaracteristic = CalculateCharacteristicSizeOfMeshes(srcMesh, targetMesh, InterpolationOptions::getPrintLevel());
     if(methC=="P0P0")
       {
         switch(InterpolationOptions::getIntersectionType())
           {
           case Triangulation:
-             intersector=new Polyhedron3D2DIntersectorP0P0<MyMeshType,MatrixType>(targetMesh, srcMesh,
-                                                                                  getSplittingPolicy());
+             intersector=new Polyhedron3D2DIntersectorP0P0<MyMeshType,MyMatrixType>(targetMesh,
+                                                                                    srcMesh,
+                                                                                    dimCaracteristic,
+                                                                                    getPrecision(),
+                                                                                    intersectFaces,
+                                                                                    getSplittingPolicy());
             break;
           default:
             throw INTERP_KERNEL::Exception("Invalid 3D intersection type for P0P0 interp specified : must be Triangulation.");
@@ -108,9 +106,7 @@ namespace INTERP_KERNEL
     else
       throw Exception("Invalid method choosed must be in \"P0P0\".");
     // create empty maps for all source elements
-    result.resize(intersector->getNumberOfRowsOfResMatrix());
-
-    // TODO DP : #ifdef USE_RECURSIVE_BBOX_FILTER : voir Interpolation3D2D.txx
+    matrix.resize(intersector->getNumberOfRowsOfResMatrix());
 
     // create BBTree structure
     // - get bounding boxes
@@ -131,11 +127,7 @@ namespace INTERP_KERNEL
         srcElemIdx[i] = srcElems[i]->getIndex();
       }
 
-#if 0//dp
-    BBTree<3,ConnType> tree(bboxes, srcElemIdx, 0, numSrcElems);
-#else
     BBTree<3,ConnType> tree(bboxes, srcElemIdx, 0, numSrcElems, 0.);
-#endif
 
     // for each target element, get source elements with which to calculate intersection
     // - calculate intersection by calling intersectCells
@@ -158,11 +150,21 @@ namespace INTERP_KERNEL
         tree.getIntersectingElems(targetBox, intersectElems);
 
         if ( !intersectElems.empty() )
-          intersector->intersectCells(targetIdx,intersectElems,result);
+            intersector->intersectCells(targetIdx, intersectElems, matrix);
+
       }
 
     delete [] bboxes;
     delete [] srcElemIdx;
+
+    DuplicateFacesType::iterator iter;
+    for (iter = intersectFaces.begin(); iter != intersectFaces.end(); ++iter)
+      {
+        if (iter->second.size() > 1)
+          {
+            _duplicate_faces.insert(std::make_pair(iter->first, iter->second));
+          }
+      }
 
     // free allocated memory
     int ret=intersector->getNumberOfColsOfResMatrix();

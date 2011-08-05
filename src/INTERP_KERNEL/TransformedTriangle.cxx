@@ -19,9 +19,8 @@
 
 #include "TransformedTriangle.hxx"
 #include "VectorUtils.hxx"
-#if 1//dp
 #include "TetraAffineTransform.hxx"
-#endif
+//dp #include "InterpolationUtils.hxx"
 #include <iostream>
 #include <fstream>
 #include <cassert>
@@ -589,7 +588,7 @@ namespace INTERP_KERNEL
       for(int i = 0 ; i < nbPoints ; ++i)
         {
           const double *const ptCurr = _polygonA[i];  // pt "i"
-          const double *const ptNext = _polygonA[(i + 1) % nbPoints]; // pt "i+1" (pt m == pt 0)
+          const double *const ptNext = _polygonA[(i + 1) % nbPoints]; // pt "i+1" (pt nbPoints == pt 0)
 
           cross(ptCurr, ptNext, pdt);
           add(pdt, sum);
@@ -797,6 +796,10 @@ namespace INTERP_KERNEL
         };
 
       double sign = uv_xy[0] * uv_xy[3] - uv_xy[1] * uv_xy[2];
+      if(epsilonEqual(sign, 0.))
+        {
+          sign = 0.;
+        }
       return (sign < 0.) ? -1 : (sign > 0.) ? 1 : 0;
     }
 
