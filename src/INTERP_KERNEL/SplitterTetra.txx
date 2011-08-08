@@ -1060,12 +1060,8 @@ namespace INTERP_KERNEL
         int conn[4];
         for(int j = 0; j < 4; ++j)
           {
-#if 0
-            nodes[j] = getCoordsOfSubNode2(subZone[ SPLIT_NODES_5[4*i+j] ],conn[j]);
-#else
             conn[j] = subZone[ SPLIT_NODES_5[4*i+j] ];
             nodes[j] = getCoordsOfSubNode(conn[j]);
-#endif
           }
         SplitterTetra<MyMeshTypeS>* t = new SplitterTetra<MyMeshTypeS>(_src_mesh, nodes,conn);
         tetra.push_back(t);
