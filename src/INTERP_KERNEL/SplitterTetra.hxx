@@ -226,9 +226,9 @@ namespace INTERP_KERNEL
     inline void calculateVolume(TransformedTriangle& tri, const TriangleFaceKey& key);
     inline void calculateSurface(TransformedTriangle& tri, const TriangleFaceKey& key);
 
-    static inline bool isFacesCoplanar(const double *const planeNormal, const double planeConstant,
+    static inline bool IsFacesCoplanar(const double *const planeNormal, const double planeConstant,
                                 const double *const *const coordsFace, const double precision);
-    static inline double calculateIntersectionSurfaceOfCoplanarTriangles(const double *const planeNormal,
+    static inline double CalculateIntersectionSurfaceOfCoplanarTriangles(const double *const planeNormal,
                                                                          const double planeConstant,
                                                                          const double *const p1, const double *const p2, const double *const p3,
                                                                          const double *const p4, const double *const p5, const double *const p6,

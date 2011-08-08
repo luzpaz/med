@@ -389,7 +389,7 @@ namespace INTERP_KERNEL
    * @param precision precision for double float data used for comparison
    */
   template<class MyMeshType>
-  double SplitterTetra<MyMeshType>::calculateIntersectionSurfaceOfCoplanarTriangles(const double *const planeNormal,
+  double SplitterTetra<MyMeshType>::CalculateIntersectionSurfaceOfCoplanarTriangles(const double *const planeNormal,
                                                                                     const double planeConstant,
                                                                                     const double *const p1, const double *const p2, const double *const p3,
                                                                                     const double *const p4, const double *const p5, const double *const p6,
@@ -550,7 +550,7 @@ namespace INTERP_KERNEL
    * @param precision precision for double float data used for comparison
    */
   template<class MyMeshType>
-  bool SplitterTetra<MyMeshType>::isFacesCoplanar(const double *const planeNormal,
+  bool SplitterTetra<MyMeshType>::IsFacesCoplanar(const double *const planeNormal,
                                                   const double planeConstant,
                                                   const double *const *const coordsFace,
                                                   const double precision)
@@ -695,12 +695,12 @@ namespace INTERP_KERNEL
                           }
                       }
                     double planeConstant = dot(planeNormal, coordsTetraTriNode1);
-                    if (isFacesCoplanar(planeNormal, planeConstant, polyCoords, precision))
+                    if (IsFacesCoplanar(planeNormal, planeConstant, polyCoords, precision))
                       {
                         int nbrPolyTri = polyNodesNbr - 2; // split polygon into nbrPolyTri triangles
                         for (int iTri = 0; iTri < nbrPolyTri; ++iTri)
                           {
-                            double volume = calculateIntersectionSurfaceOfCoplanarTriangles(planeNormal,
+                            double volume = CalculateIntersectionSurfaceOfCoplanarTriangles(planeNormal,
                                                                                             planeConstant,
                                                                                             polyCoords[0],
                                                                                             polyCoords[1 + iTri],
