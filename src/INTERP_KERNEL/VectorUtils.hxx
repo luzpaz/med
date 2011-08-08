@@ -81,20 +81,6 @@ namespace INTERP_KERNEL
   }
 
   /**
-   * Subtracts two a double[3] - vectors and store the result in res
-   *
-   * @param v1    vector v1
-   * @param v2    vector v2
-   * @param res   vector in which to store the result v1 - v2.
-   */
-  inline void subtract(const double* v1, const double* v2, double* res)
-  {
-    res[0] = v1[0] - v2[0];
-    res[1] = v1[1] - v2[1];
-    res[2] = v1[2] - v2[2];
-  }
-
-  /**
    * Adds a double[3] - vector to another one.
    *
    * @param v     vector v

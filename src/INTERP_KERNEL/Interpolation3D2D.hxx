@@ -32,7 +32,7 @@ namespace INTERP_KERNEL
   class Interpolation3D2D : public Interpolation<Interpolation3D2D>
   {
   public:
-    typedef typename std::map<int,std::set<int> > DuplicateFacesType;
+    typedef std::map<int,std::set<int> > DuplicateFacesType;
 
     Interpolation3D2D();
     Interpolation3D2D(const InterpolationOptions& io);

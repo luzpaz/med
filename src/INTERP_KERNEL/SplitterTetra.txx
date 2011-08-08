@@ -374,33 +374,46 @@ namespace INTERP_KERNEL
     return std::fabs(1.0 / _t->determinant() * totalVolume) ;
   }
 
-  //dp TODO DP : à commenter
+  /**
+   * Calculates the intersection surface of two coplanar triangles.
+   *
+   * @param palneNormal normal of the plane for the first triangle
+   * @param planeConstant constant of the equation of the plane for the first triangle
+   * @param p1 coordinates of the first  node of the first  triangle
+   * @param p2 coordinates of the second node of the first  triangle
+   * @param p3 coordinates of the third  node of the first  triangle
+   * @param p4 coordinates of the first  node of the second triangle
+   * @param p5 coordinates of the second node of the second triangle
+   * @param p6 coordinates of the third  node of the second triangle
+   * @param dimCaracteristic characteristic size of the meshes containing the triangles
+   * @param precision precision for double float data used for comparison
+   */
   template<class MyMeshType>
-  double SplitterTetra<MyMeshType>::calculateIntersectionSurfaceOfCoplanarTriangles(const double *const plane_normal,
-                                                                                    const double plane_constant,
-                                                                                    const double *const P_1, const double *const P_2, const double *const P_3,
-                                                                                    const double *const P_4, const double *const P_5, const double *const P_6,
-                                                                                    double dim_caracteristic, double precision)
+  double SplitterTetra<MyMeshType>::calculateIntersectionSurfaceOfCoplanarTriangles(const double *const planeNormal,
+                                                                                    const double planeConstant,
+                                                                                    const double *const p1, const double *const p2, const double *const p3,
+                                                                                    const double *const p4, const double *const p5, const double *const p6,
+                                                                                    const double dimCaracteristic, const double precision)
   {
     typedef typename MyMeshType::MyConnType ConnType;
     typedef double Vect2[2];
     typedef double Vect3[3];
     typedef double Triangle2[3][2];
 
-    const double *const tri0[3] = {P_1, P_2, P_3};
-    const double *const tri1[3] = {P_4, P_5, P_6};
+    const double *const tri0[3] = {p1, p2, p3};
+    const double *const tri1[3] = {p4, p5, p6};
 
     // Plane of the first triangle defined by the normal of the triangle and the constant
     // Project triangles onto coordinate plane most aligned with plane normal
     int maxNormal = 0;
-    double fmax = std::abs(plane_normal[0]);
-    double absMax = std::abs(plane_normal[1]);
+    double fmax = std::abs(planeNormal[0]);
+    double absMax = std::abs(planeNormal[1]);
     if (absMax > fmax)
       {
         maxNormal = 1;
         fmax = absMax;
       }
-    absMax = std::abs(plane_normal[2]);
+    absMax = std::abs(planeNormal[2]);
     if (absMax > fmax)
       {
         maxNormal = 2;
@@ -447,9 +460,12 @@ namespace INTERP_KERNEL
     Vect2 save;
     Vect2 edge0;
     Vect2 edge1;
-    subtract(projTri0[1], projTri0[0], edge0);
-    subtract(projTri0[2], projTri0[0], edge1);
-    if ((edge0[0] * edge1[1] - edge0[1] - edge1[0]) < (double) 0.)
+    for (int i = 0; i < 2; ++i)
+      {
+        edge0[i] = projTri0[1][i] - projTri0[0][i];
+        edge1[i] = projTri0[2][i] - projTri0[0][i];
+      }
+    if ((edge0[0] * edge1[1] - edge0[1] * edge1[0]) < (double) 0.)
       {
         // Triangle is clockwise, reorder it.
         for (int i = 0; i < 2; ++i)
@@ -460,9 +476,12 @@ namespace INTERP_KERNEL
           }
       }
 
-    subtract(projTri1[1], projTri1[0], edge0);
-    subtract(projTri1[2], projTri1[0], edge1);
-    if ((edge0[0] * edge1[1] - edge0[1] - edge1[0]) < (double) 0.)
+    for (int i = 0; i < 2; ++i)
+      {
+        edge0[i] = projTri1[1][i] - projTri1[0][i];
+        edge1[i] = projTri1[2][i] - projTri1[0][i];
+      }
+    if ((edge0[0] * edge1[1] - edge0[1] * edge1[0]) < (double) 0.)
       {
         // Triangle is clockwise, reorder it.
       for (int i = 0; i < 2; ++i)
@@ -477,7 +496,7 @@ namespace INTERP_KERNEL
     intersec_de_triangle(projTri0[0], projTri0[1], projTri0[2],
                          projTri1[0], projTri1[1], projTri1[2],
                          inter2,
-                         dim_caracteristic, precision);
+                         dimCaracteristic, precision);
     ConnType nb_inter=((ConnType)inter2.size())/2;
     double surface = 0.;
     if(nb_inter >3) inter2=reconstruct_polygon(inter2);
@@ -488,32 +507,32 @@ namespace INTERP_KERNEL
         // Map 2D intersections back to the 3D triangle space.
         if (maxNormal == 0)
           {
-            double invNX = ((double) 1.) / plane_normal[0];
+            double invNX = ((double) 1.) / planeNormal[0];
             for (i = 0; i < nb_inter; i++)
               {
                 inter3[3 * i + 1] = inter2[2 * i];
                 inter3[3 * i + 2] = inter2[2 * i + 1];
-                inter3[3 * i] = invNX * (plane_constant - plane_normal[1] * inter3[3 * i + 1] - plane_normal[2] * inter3[3 * i + 2]);
+                inter3[3 * i] = invNX * (planeConstant - planeNormal[1] * inter3[3 * i + 1] - planeNormal[2] * inter3[3 * i + 2]);
               }
           }
         else if (maxNormal == 1)
           {
-            double invNY = ((double) 1.) / plane_normal[1];
+            double invNY = ((double) 1.) / planeNormal[1];
             for (i = 0; i < nb_inter; i++)
               {
                 inter3[3 * i] = inter2[2 * i];
                 inter3[3 * i + 2] = inter2[2 * i + 1];
-                inter3[3 * i + 1] = invNY * (plane_constant - plane_normal[0] * inter3[3 * i] - plane_normal[2] * inter3[3 * i + 2]);
+                inter3[3 * i + 1] = invNY * (planeConstant - planeNormal[0] * inter3[3 * i] - planeNormal[2] * inter3[3 * i + 2]);
               }
           }
         else
           {
-            double invNZ = ((double) 1.) / plane_normal[2];
+            double invNZ = ((double) 1.) / planeNormal[2];
             for (i = 0; i < nb_inter; i++)
               {
                 inter3[3 * i] = inter2[2 * i];
                 inter3[3 * i + 1] = inter2[2 * i + 1];
-                inter3[3 * i + 2] = invNZ * (plane_constant - plane_normal[0] * inter3[3 * i] - plane_normal[1] * inter3[3 * i + 1]);
+                inter3[3 * i + 2] = invNZ * (planeConstant - planeNormal[0] * inter3[3 * i] - planeNormal[1] * inter3[3 * i + 1]);
               }
           }
         surface = polygon_area<3>(inter3);
@@ -521,41 +540,60 @@ namespace INTERP_KERNEL
     return surface;
   }
 
+  /**
+   * Determine if a face is coplanar with a triangle.
+   * The first face is characterized by the equation of her plane
+   *
+   * @param palneNormal normal of the plane for the first triangle
+   * @param planeConstant constant of the equation of the plane for the first triangle
+   * @param coordsFace coordinates of the triangle face
+   * @param precision precision for double float data used for comparison
+   */
   template<class MyMeshType>
-  bool SplitterTetra<MyMeshType>::isFacesCoplanar(const double *const plane_normal,
-                                                  const double plane_constant,
-                                                  const double *const *const coordsFace)
+  bool SplitterTetra<MyMeshType>::isFacesCoplanar(const double *const planeNormal,
+                                                  const double planeConstant,
+                                                  const double *const *const coordsFace,
+                                                  const double precision)
   {
       // Compute the signed distances of triangle vertices to the plane. Use an epsilon-thick plane test.
       // For faces not left
-      int zero = 0;
+      int counter = 0;
       for (int i = 0; i < 3; ++i)
         {
-          const double distance = dot(plane_normal, coordsFace[i]) - plane_constant;
-          if (epsilonEqual(distance, 0.))
+          const double distance = dot(planeNormal, coordsFace[i]) - planeConstant;
+          if (epsilonEqual(distance, precision))
             {
-              zero++;
+              counter++;
             }
         }
-      if (zero == 3)
+      if (counter == 3)
         return true;
       else
         return false;
   }
 
-  // TODO DP : adapter les commentaires suivants. _volume => _surface ?
   /**
-   * Calculates the volume of intersection of an element in the source mesh and the target element.
+   * Calculates the surface of intersection of a polygon face in the source mesh and a cell of the target mesh.
    * It first calculates the transformation that takes the target tetrahedron into the unit tetrahedron. After that, the
    * faces of the source element are triangulated and the calculated transformation is applied
-   * to each triangle. The algorithm of Grandy, implemented in INTERP_KERNEL::TransformedTriangle is used
-   * to calculate the contribution to the volume from each triangle. The volume returned is the sum of these contributions
-   * divided by the determinant of the transformation.
+   * to each triangle.
+   * The algorithm is based on the algorithm of Grandy used in intersectSourceCell to compute
+   * the volume of intersection of two cell elements.
+   * The case with a source face colinear to one of the face of tetrahedrons is taking into account:
+   * the contribution of the face must not be counted two times.
    *
-   * The class will cache the intermediary calculations of transformed nodes of source cells and volumes associated
+   * The class will cache the intermediary calculations of transformed nodes of source faces and surfaces associated
    * with triangulated faces to avoid having to recalculate these.
    *
-   * @param element      global number of the source element in C mode.
+   * @param polyType type of the polygon source face
+   * @param polyNodesNbr number of the nodes of the polygon source face
+   * @param polyNodes numbers of the nodes of the polygon source face
+   * @param polyCoords coordinates of the nodes of the polygon source face
+   * @param polyCoords coordinates of the nodes of the polygon source face
+   * @param dimCaracteristic characteristic size of the meshes containing the triangles
+   * @param precision precision for double float data used for comparison
+   * @param listOfTetraFacesTreated list of tetra faces treated
+   * @param listOfTetraFacesColinear list of tetra faces colinear with the polygon source faces
    */
   template<class MyMeshType>
   double SplitterTetra<MyMeshType>::intersectSourceFace(const NormalizedCellType polyType,
@@ -597,7 +635,7 @@ namespace INTERP_KERNEL
             calculateNode2(globalNodeNum, polyCoords[i]);
           }
 
-        checkIsStrictlyOutside(_nodes[globalNodeNum], isStrictlyOutside);
+        checkIsStrictlyOutside(_nodes[globalNodeNum], isStrictlyOutside, precision);
         checkIsOutside(_nodes[globalNodeNum], isOutside);
       }
 
@@ -627,7 +665,7 @@ namespace INTERP_KERNEL
                 { 0, 2, 3 },
                 { 0, 3, 1 },
                 { 1, 2, 3 } };
-            double plane_normal[3];
+            double planeNormal[3];
             for (int iTetraFace = 0; iTetraFace < 4; ++iTetraFace)
               {
                 const int * const tetraFaceNodesConn = tetraFacesNodesConn[iTetraFace];
@@ -639,13 +677,13 @@ namespace INTERP_KERNEL
                     const double * const coordsTetraTriNode1 = _coords + tetraFaceNodesConn[0] * MyMeshType::MY_SPACEDIM;
                     const double * const coordsTetraTriNode2 = _coords + tetraFaceNodesConn[1] * MyMeshType::MY_SPACEDIM;
                     const double * const coordsTetraTriNode3 = _coords + tetraFaceNodesConn[2] * MyMeshType::MY_SPACEDIM;
-                    calculateNormalForTria(coordsTetraTriNode1, coordsTetraTriNode2, coordsTetraTriNode3, plane_normal);
-                    const double normOfTetraTriNormal = norm(plane_normal);
+                    calculateNormalForTria(coordsTetraTriNode1, coordsTetraTriNode2, coordsTetraTriNode3, planeNormal);
+                    const double normOfTetraTriNormal = norm(planeNormal);
                     if (epsilonEqual(normOfTetraTriNormal, 0.))
                       {
                         for (int i = 0; i < 3; ++i)
                           {
-                            plane_normal[i] = 0.;
+                            planeNormal[i] = 0.;
                           }
                       }
                     else
@@ -653,17 +691,17 @@ namespace INTERP_KERNEL
                         const double invNormOfTetraTriNormal = 1. / normOfTetraTriNormal;
                         for (int i = 0; i < 3; ++i)
                           {
-                            plane_normal[i] *= invNormOfTetraTriNormal;
+                            planeNormal[i] *= invNormOfTetraTriNormal;
                           }
                       }
-                    double plane_constant = dot(plane_normal, coordsTetraTriNode1);
-                    if (isFacesCoplanar(plane_normal, plane_constant, polyCoords))
+                    double planeConstant = dot(planeNormal, coordsTetraTriNode1);
+                    if (isFacesCoplanar(planeNormal, planeConstant, polyCoords, precision))
                       {
                         int nbrPolyTri = polyNodesNbr - 2; // split polygon into nbrPolyTri triangles
                         for (int iTri = 0; iTri < nbrPolyTri; ++iTri)
                           {
-                            double volume = calculateIntersectionSurfaceOfCoplanarTriangles(plane_normal,
-                                                                                            plane_constant,
+                            double volume = calculateIntersectionSurfaceOfCoplanarTriangles(planeNormal,
+                                                                                            planeConstant,
                                                                                             polyCoords[0],
                                                                                             polyCoords[1 + iTri],
                                                                                             polyCoords[2 + iTri],

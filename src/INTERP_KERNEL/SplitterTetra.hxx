@@ -24,13 +24,13 @@
 #include "TetraAffineTransform.hxx"
 #include "InterpolationOptions.hxx"
 #include "InterpKernelHashMap.hxx"
+#include "VectorUtils.hxx"
 
 #include <assert.h>
 #include <vector>
 #include <functional>
 #include <map>
 #include <set>
-//dp#include <algorithm>
 
 namespace INTERP_KERNEL
 {
@@ -69,7 +69,12 @@ namespace INTERP_KERNEL
       return _nodes[0] == key._nodes[0] && _nodes[1] == key._nodes[1] && _nodes[2] == key._nodes[2];
     }
 
-    //dp TODO DP : à commenter
+    /**
+     * Less than operator.
+     *
+     * @param   key  TriangleFaceKey with which to compare
+     * @return  true if this object has the three nodes less than the nodes of the key object, false if not
+     */
     bool operator<(const TriangleFaceKey& key) const
     {
       for (int i = 0; i < 3; ++i)
@@ -221,13 +226,13 @@ namespace INTERP_KERNEL
     inline void calculateVolume(TransformedTriangle& tri, const TriangleFaceKey& key);
     inline void calculateSurface(TransformedTriangle& tri, const TriangleFaceKey& key);
 
-    inline bool isFacesCoplanar(const double *const plane_normal, const double plane_constant,
-                                const double *const *const coordsFace);
-    inline double calculateIntersectionSurfaceOfCoplanarTriangles(const double *const normal,
-                                                                  const double plane_constant,
-                                                                  const double *const P_1, const double *const P_2, const double *const P_3,
-                                                                  const double *const P_4, const double *const P_5, const double *const P_6,
-                                                                  double dim_caracteristic, double precision);
+    static inline bool isFacesCoplanar(const double *const planeNormal, const double planeConstant,
+                                const double *const *const coordsFace, const double precision);
+    static inline double calculateIntersectionSurfaceOfCoplanarTriangles(const double *const planeNormal,
+                                                                         const double planeConstant,
+                                                                         const double *const p1, const double *const p2, const double *const p3,
+                                                                         const double *const p4, const double *const p5, const double *const p6,
+                                                                         const double dimCaracteristic, const double precision);
 
     /// disallow copying
     SplitterTetra(const SplitterTetra& t);
@@ -325,7 +330,17 @@ namespace INTERP_KERNEL
     _nodes[globalNodeNum] = transformedNode;
   }
 
-  //dp TODO DP : supprimer la précédente et commentariser
+
+  /**
+   * Calculates the transformed node with a given global node number.
+   * Applies TetraAffineTransform * _t to it.
+   * Stores the result in the cache _nodes. The non-existence of the node in _nodes should be verified before * calling.
+   * The only difference with the previous method calculateNode is that the coordinates of the node are passed in arguments
+   * and are not recalculated in order to optimize the method.
+   *
+   * @param globalNodeNum  global node number of the node in the mesh _src_mesh
+   *
+   */
   template<class MyMeshType>
   inline void SplitterTetra<MyMeshType>::calculateNode2(typename MyMeshType::MyConnType globalNodeNum, const double* node)
   {
@@ -349,13 +364,11 @@ namespace INTERP_KERNEL
     _volumes.insert(std::make_pair(key, vol));
   }
 
-  // TODO DP : adapter les commentaires
-  // TODO DP : _volume ?
   /**
-   * Calculates the volume contribution from the given TransformedTriangle and stores it with the given key in .
-   * Calls TransformedTriangle::calculateIntersectionVolume to perform the calculation.
+   * Calculates the surface contribution from the given TransformedTriangle and stores it with the given key in.
+   * Calls TransformedTriangle::calculateIntersectionSurface to perform the calculation.
    *
-   * @param tri    triangle for which to calculate the volume contribution
+   * @param tri    triangle for which to calculate the surface contribution
    * @param key    key associated with the face
    */
   template<class MyMeshType>

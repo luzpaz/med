@@ -1200,6 +1200,11 @@ MEDCouplingUMesh *MEDCouplingBasicsTest::build3D2DSourceMesh()
   std::copy(sourceCoords,sourceCoords+63,myCoords->getPointer());
   sourceMesh->setCoords(myCoords);
   myCoords->decrRef();
+
+  //dp sourceMesh->checkCoherency();
+  //dp MEDLoader::WriteUMesh("test3D2DBasicInterpP0P0.med",sourceMesh,true);
+  //dp sourceMesh->decrRef();
+
   return sourceMesh;
 }
 

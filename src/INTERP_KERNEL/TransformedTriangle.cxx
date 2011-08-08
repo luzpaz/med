@@ -20,7 +20,6 @@
 #include "TransformedTriangle.hxx"
 #include "VectorUtils.hxx"
 #include "TetraAffineTransform.hxx"
-//dp #include "InterpolationUtils.hxx"
 #include <iostream>
 #include <fstream>
 #include <cassert>
@@ -578,7 +577,12 @@ namespace INTERP_KERNEL
 
       }
 
-    //TODO DP : commentaires
+
+    /**
+     * Returns the surface of polygon A.
+     *
+     * @return the surface of polygon A.
+     */
     double TransformedTriangle::calculateSurfacePolygon()
     {
       const int nbPoints = _polygonA.size();
