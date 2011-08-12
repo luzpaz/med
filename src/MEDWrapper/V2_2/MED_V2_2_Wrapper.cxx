@@ -1625,18 +1625,25 @@ namespace MED
       TErr aRet;
       med_bool local;
       char dtunit[MED_SNAME_SIZE+1];
+	  char local_mesh_name[MED_NAME_SIZE+1]="";
       med_int nbofstp;
       theInfo.myNbComp = MEDfieldnComponent(myFile->Id(),theFieldId);
       aRet = MEDfieldInfo(myFile->Id(),
                           theFieldId,
                           &aFieldName[0],
-                          &aMeshInfo.myName[0],
+                          local_mesh_name,
                           &local,
                           &aType,
                           &aCompNames,
                           &anUnitNames,
                           dtunit,
                           &nbofstp);
+
+	  if(strcmp(&aMeshInfo.myName[0],local_mesh_name) != 0 ) {
+		  if(theErr)
+			*theErr = -1;
+		  return;
+	  }
 
       theInfo.SetName(aFieldName);
 
