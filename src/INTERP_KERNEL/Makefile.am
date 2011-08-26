@@ -51,6 +51,8 @@ Interpolation2D.hxx			\
 Interpolation2D.txx			\
 Interpolation3D.hxx			\
 Interpolation3D.txx			\
+Interpolation2D1D.hxx           \
+Interpolation2D1D.txx           \
 Interpolation3D2D.hxx			\
 Interpolation3D2D.txx			\
 Interpolation3DSurf.hxx			\
@@ -91,6 +93,8 @@ MeshUtils.hxx				\
 PointLocatorAlgos.txx                   \
 PlanarIntersector.hxx			\
 PlanarIntersector.txx			\
+Planar2D1DIntersectorP0P0.hxx       \
+Planar2D1DIntersectorP0P0.txx       \
 PlanarIntersectorP0P0.hxx		\
 PlanarIntersectorP0P0.txx		\
 PlanarIntersectorP0P1.hxx		\
