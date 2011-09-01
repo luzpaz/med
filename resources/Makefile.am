@@ -206,7 +206,8 @@ dist_salomeres_DATA = \
     blow5_ascii_cd_thickness \
     blow5_ascii_pd_displacement \
     blow5_ascii_pd_thickness \
-    test_2D.sauve
+    test_2D.sauve \
+    allPillesTest.sauv
 
 if !MED_ENABLE_MICROMED
   dist_salomeres_DATA += \
