@@ -33,10 +33,10 @@ int main (int argc, char ** argv)
     {
       cerr << "Usage : " << argv[0] 
            << " fileNameIn" << endl ;
-      cerr << "Where - fileNameIn is .med V2.1 file supplied by the user including all the directory path" << endl;
-      cerr << "fileNameOut is .med V2.3.2 file produced by this command in the directory $HOME/TMP_Med2_3Files/" << endl;
-      cerr << "This command is supposed to be the same as the med File V2.2 medimport utility" << endl << endl;
-      cerr << "It will produce a med V2.3.2 file fileNameOut which will be in the directory $HOME/TMP_Med2_3Files/" << endl;
+      cerr << "Where - fileNameIn is .med file of out-of-date version supplied by the user including all the directory path" << endl;
+      cerr << "fileNameOut is .med file of up-to-date version produced by this command in the directory $HOME/TMP_Med2_3Files/" << endl;
+      cerr << "This command is supposed to be the same as the med File V3.0 medimport utility" << endl << endl;
+      cerr << "It will produce a med V3.x file fileNameOut which will be in the directory $HOME/TMP_Med2_3Files/" << endl;
       cerr << "with the same root name as fileNameIn: " << endl;
       cerr << "If fileNameIn is /aPath/file.med so fileNameOut will be $HOME/TMP_Med2_3Files/file.med" << endl;
       exit(-1);
