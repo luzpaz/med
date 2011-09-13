@@ -30,6 +30,8 @@
 #include "MEDGUIDataBaseDockWidget.hxx"
 #include "MEDGUISelection.hxx"
 
+#include <MED_version.h>
+
 #include "Utils_ORB_INIT.hxx"
 #include "Utils_SINGLETON.hxx"
 #include "utilities.h"
@@ -637,5 +639,9 @@ void MedGUI::setOrb()
 extern "C" {
   Standard_EXPORT CAM_Module* createModule() {
     return new MedGUI();
+  }
+  
+  Standard_EXPORT char* getModuleVersion() {
+      return MED_VERSION_STR;
   }
 }

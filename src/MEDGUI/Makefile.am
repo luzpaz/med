@@ -61,7 +61,7 @@ nodist_libMEDGUI_la_SOURCES= $(MOC_FILES)
 libMEDGUI_la_CPPFLAGS= $(QT_INCLUDES) $(VTK_INCLUDES) @CAS_CPPFLAGS@ $(PYTHON_INCLUDES) $(BOOST_CPPFLAGS) \
 	${KERNEL_CXXFLAGS} ${GUI_CXXFLAGS} \
 	@CORBA_INCLUDES@ @CORBA_CXXFLAGS@ \
-	-I$(top_builddir)/idl -I$(srcdir)/../MEDCoupling -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases \
+	-I$(top_builddir) -I$(top_builddir)/idl -I$(srcdir)/../MEDCoupling -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../MEDCoupling -I$(srcdir)/../MEDLoader -I$(srcdir)/../MEDCalculator
 
 libMEDGUI_la_LDFLAGS= \
