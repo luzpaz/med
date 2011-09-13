@@ -663,6 +663,7 @@ AC_OUTPUT([ \
         adm_local_without_kernel/unix/Makefile \
         adm_local_without_kernel/Makefile \
         resources/Makefile
+	resources/SalomeApp.xml \
         resources/MEDCatalog.xml \
         bin/Makefile \
         bin/VERSION \

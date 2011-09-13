@@ -211,7 +211,7 @@ dist_salomeres_DATA = \
 
 if !MED_ENABLE_MICROMED
   dist_salomeres_DATA += \
-    SalomeApp.xml
+     $(top_builddir)/resources/SalomeApp.xml
 
   nodist_salomeres_SCRIPTS = MEDCatalog.xml
 endif
