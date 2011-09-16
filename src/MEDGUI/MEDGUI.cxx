@@ -642,6 +642,6 @@ extern "C" {
   }
   
   Standard_EXPORT char* getModuleVersion() {
-      return MED_VERSION_STR;
+      return (char*)MED_VERSION_STR;
   }
 }

@@ -28,15 +28,15 @@
     <parameter name="icon" value="ModuleMed.png"/>
     <parameter name="documentation" value="med_help"/>
     <parameter name="library"       value="MEDGUI"/>
-    <parameter name="MED_VERSION"       value="@VERSION@"/>
+    <parameter name="version"       value="@VERSION@"/>
   </section>
   <section name="med_help" >
     <parameter name="sub_menu"          value="%1 module"/>
-    <parameter name="User's Guide"      value="${MED_ROOT_DIR}/share/doc/salome/gui/MED/index.html"/>
-    <parameter name="Developer's Guide" value="${MED_ROOT_DIR}/share/doc/salome/tui/MED/index.html"/>
+    <parameter name="User's Guide"      value="%MED_ROOT_DIR%/share/doc/salome/gui/MED/index.html"/>
+    <parameter name="Developer's Guide" value="%MED_ROOT_DIR%/share/doc/salome/tui/MED/index.html"/>
   </section>
   <section name="resources">
     <!-- Module resources -->
-    <parameter name="MED"  value="${MED_ROOT_DIR}/share/salome/resources/med"/>
+    <parameter name="MED"  value="%MED_ROOT_DIR%/share/salome/resources/med"/>
   </section>
 </document>
