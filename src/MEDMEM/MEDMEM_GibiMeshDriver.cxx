@@ -2142,15 +2142,16 @@ static void orientElements( _intermediateMED& medi )
   vector< pair<int,int> > swapVec;
 
   bool isQuadratic = false;
-  _maillageByDimIterator maIt(medi);
-  while ( !isQuadratic && maIt.nextType() )
-    isQuadratic = getGibi2MedConnectivity( maIt.type() );
 
   if ( medi.points.begin()->second.coord.size() == 2 ) { // space dimension
 
     // fix connectivity of quadratic edges
-    if ( isQuadratic ) {
-      if ( const set<_maille > * edges = _maillageByDimIterator( medi, 1 ).nextType() ) {
+    _maillageByDimIterator edgesIt( medi, /*dim=*/1);
+    while ( const set<_maille > * edges = edgesIt.nextType() )
+    {
+      isQuadratic = getGibi2MedConnectivity( edgesIt.type() );
+      if (isQuadratic )
+      {
         elemIt = edges->begin(), elemEnd = edges->end();
         for ( ; elemIt != elemEnd; ++elemIt )
           fixConnectivity( *elemIt );
@@ -2160,9 +2161,10 @@ static void orientElements( _intermediateMED& medi )
     // Orient 2D faces clockwise
     // --------------------------
 
-    _maillageByDimIterator faceMailIt( medi, 2 );
+    _maillageByDimIterator faceMailIt( medi, /*dim=*/2 );
     while ( const set<_maille > * faces = faceMailIt.nextType() )
     {
+      isQuadratic = getGibi2MedConnectivity( faceMailIt.type() );
       elemIt = faces->begin(), elemEnd = faces->end();
       for ( ; elemIt != elemEnd; elemIt++ )
       {
@@ -2347,6 +2349,7 @@ static void orientElements( _intermediateMED& medi )
       _maillageByDimIterator mailIt( medi, dim );
       while ( const set<_maille > * elems = mailIt.nextType() )
       {
+        isQuadratic = getGibi2MedConnectivity( mailIt.type() );
         elemIt = elems->begin(), elemEnd = elems->end();
         for ( ; elemIt != elemEnd; elemIt++ )
         {
