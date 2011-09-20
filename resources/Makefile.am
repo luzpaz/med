@@ -210,10 +210,7 @@ dist_salomeres_DATA = \
     allPillesTest.sauv
 
 if !MED_ENABLE_MICROMED
-  dist_salomeres_DATA += \
-     $(top_builddir)/resources/SalomeApp.xml
-
-  nodist_salomeres_SCRIPTS = MEDCatalog.xml
+  nodist_salomeres_SCRIPTS = MEDCatalog.xml SalomeApp.xml
 endif
 
 if MED_ENABLE_GUI
