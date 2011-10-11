@@ -38,6 +38,8 @@ void * th_setinterpolationoptions(void *st);
 void * th_initializecoupling(void *st);
 void * th_terminatecoupling(void *st);
 void * th_getdata(void *st);
+void * th_initializecouplingdist (void *st);
+void * th_terminatecouplingdist (void *st);
 
 typedef struct
 {
@@ -55,8 +57,10 @@ typedef struct
   const char * splitting_policy;
   bool P1P0_bary_method;
   std::string coupling;
+  std::string ior;
   Engines::IORTab* tior;
   SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr;
+  SALOME_MED::ParaMEDMEMComponent_ptr compo;
 } thread_st;
 
 namespace ParaMEDMEM
@@ -89,7 +93,7 @@ namespace ParaMEDMEM
                                  CORBA::Boolean measure_abs,
                                  const char * splitting_policy,
                                  CORBA::Boolean P1P0_bary_method ) throw(SALOME::SALOME_Exception);
-    void initializeCoupling(const char * coupling) throw(SALOME::SALOME_Exception);
+    void initializeCoupling(const char * coupling, const char * ior) throw(SALOME::SALOME_Exception);
     void terminateCoupling(const char * coupling) throw(SALOME::SALOME_Exception);
     void _getOutputField(const char * coupling, MEDCouplingFieldDouble* field);
     
@@ -99,9 +103,10 @@ namespace ParaMEDMEM
   private:
     CommInterface* _interface;
     std::map<std::string,InterpKernelDEC*> _dec;
-    std::map<std::string,MPIProcessorGroup*> _source, _target;
+    std::map<std::string,MPIProcessorGroup*> _first, _second;
     std::map<std::string,ProcessorGroup*> _commgroup;
     std::map<std::string,INTERP_KERNEL::InterpolationOptions*> _dec_options;
+    std::map<std::string,std::string> _connectto;  //IOR of distant objects
   };
 }
 #endif

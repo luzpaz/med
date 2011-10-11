@@ -29,6 +29,9 @@ typedef struct
   string msg;
 } except_st;
 
+pthread_mutex_t m1 = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t m2 = PTHREAD_MUTEX_INITIALIZER;
+
 ParaMEDMEMComponent_i::ParaMEDMEMComponent_i()
 {
   _interface = new CommInterface;
@@ -49,16 +52,19 @@ ParaMEDMEMComponent_i::~ParaMEDMEMComponent_i()
 {
   MESSAGE("* [" << _numproc << "] ParaMEDMEMComponent destructor");
   delete _interface;
+  pthread_mutex_destroy (&m1);
+  pthread_mutex_destroy (&m2);
 }
 
-void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALOME::SALOME_Exception)
+void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling, const char * ior) throw(SALOME::SALOME_Exception)
 {
   int gsize, grank;
   except_st *est;
   void *ret_th;
   pthread_t *th;
   ostringstream msg;
-
+  
+  pthread_mutex_lock(&m1);
   if(_numproc == 0)
     {
       th = new pthread_t[_nbproc];
@@ -68,6 +74,7 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
           st->ip = ip;
           st->tior = _tior;
           st->coupling = coupling;
+          st->ior = ior;
           pthread_create(&(th[ip]),NULL,th_initializecoupling,(void*)st);
         }
     }
@@ -95,21 +102,21 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
     MESSAGE("[" << grank << "] new communicator of " << gsize << " processes");
 
     // Creation of processors group for ParaMEDMEM
-    // source is always the lower processor numbers
-    // target is always the upper processor numbers
+    // first is always the lower processor numbers
+    // second is always the upper processor numbers
     if(_numproc==grank)
       {
-        _source[coupling] = new MPIProcessorGroup(*_interface,0,_nbproc-1,_gcom[coupling]);
-        _target[coupling] = new MPIProcessorGroup(*_interface,_nbproc,gsize-1,_gcom[coupling]);
-        _commgroup[coupling] = _source[coupling];
+        _first[coupling] = new MPIProcessorGroup(*_interface,0,_nbproc-1,_gcom[coupling]);
+        _second[coupling] = new MPIProcessorGroup(*_interface,_nbproc,gsize-1,_gcom[coupling]);
+        _commgroup[coupling] = _first[coupling];
       }
     else
       {
-        _source[coupling] = new MPIProcessorGroup(*_interface,0,gsize-_nbproc-1,_gcom[coupling]);
-        _target[coupling] = new MPIProcessorGroup(*_interface,gsize-_nbproc,gsize-1,_gcom[coupling]);
-        _commgroup[coupling] = _target[coupling];
+        _first[coupling] = new MPIProcessorGroup(*_interface,0,gsize-_nbproc-1,_gcom[coupling]);
+        _second[coupling] = new MPIProcessorGroup(*_interface,gsize-_nbproc,gsize-1,_gcom[coupling]);
+        _commgroup[coupling] = _second[coupling];
       }
-    
+    _connectto [coupling] = ior;
     _dec[coupling] = NULL;
     _dec_options[coupling] = NULL;
     
@@ -120,6 +127,7 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling) throw(SALO
       THROW_SALOME_CORBA_EXCEPTION(ex.what(),SALOME::INTERNAL_ERROR);
     }
 
+  pthread_mutex_unlock(&m1);
   if(_numproc == 0)
     {
       for(int ip=1;ip<_nbproc;ip++)
@@ -144,6 +152,7 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOM
   pthread_t *th;
   ostringstream msg;
 
+  pthread_mutex_lock(&m2);
   if(_numproc == 0)
     {
       th = new pthread_t[_nbproc];
@@ -176,10 +185,10 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOM
 #endif
 
     /* Processors groups and DEC destruction */
-    delete _source[coupling];
-    _source.erase(coupling);
-    delete _target[coupling];
-    _target.erase(coupling);
+    delete _first[coupling];
+    _first.erase(coupling);
+    delete _second[coupling];
+    _second.erase(coupling);
     delete _dec[coupling];
     _dec.erase(coupling);
     _commgroup.erase(coupling);
@@ -188,13 +197,14 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOM
         delete _dec_options[coupling];
         _dec_options.erase(coupling);
       }
+    _connectto.erase(coupling);
   }
   catch(const std::exception &ex)
     {
       MESSAGE(ex.what());
       THROW_SALOME_CORBA_EXCEPTION(ex.what(),SALOME::INTERNAL_ERROR);
     }
-
+  pthread_mutex_unlock(&m2);
   if(_numproc == 0)
     {
       for(int ip=1;ip<_nbproc;ip++)
@@ -330,9 +340,9 @@ void ParaMEDMEMComponent_i::_setInputField(const char * coupling, SALOME_MED::MP
       // Creating the intersection Data Exchange Channel
       // Processors which received the field are always the second argument of InterpKernelDEC object
       if(_numproc==grank)
-        _dec[coupling] = new InterpKernelDEC(*_target[coupling], *_source[coupling]);
+        _dec[coupling] = new InterpKernelDEC(*_second[coupling], *_first[coupling]);
       else
-        _dec[coupling] = new InterpKernelDEC(*_source[coupling], *_target[coupling]);
+        _dec[coupling] = new InterpKernelDEC(*_first[coupling], *_second[coupling]);
 
       if(_dec_options[coupling])
         _dec[coupling]->copyOptions(*(_dec_options[coupling]));
@@ -385,9 +395,9 @@ void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, MEDCouplingFi
       // Creating the intersection Data Exchange Channel
       // Processors which sent the field are always the first argument of InterpKernelDEC object
       if(_numproc==grank)
-        _dec[coupling] = new InterpKernelDEC(*_source[coupling], *_target[coupling]);
+        _dec[coupling] = new InterpKernelDEC(*_first[coupling], *_second[coupling]);
       else
-        _dec[coupling] = new InterpKernelDEC(*_target[coupling], *_source[coupling]);
+        _dec[coupling] = new InterpKernelDEC(*_second[coupling], *_first[coupling]);
   
       if(_dec_options[coupling])
         _dec[coupling]->copyOptions(*(_dec_options[coupling]));
@@ -454,7 +464,7 @@ void *th_initializecoupling(void *s)
   try
     {
       SALOME_MED::ParaMEDMEMComponent_var compo=SALOME_MED::ParaMEDMEMComponent::_narrow((*(st->tior))[st->ip]);
-      compo->initializeCoupling(st->coupling.c_str());
+      compo->initializeCoupling(st->coupling.c_str(),st->ior.c_str());
     }
   catch(const SALOME::SALOME_Exception &ex)
     {
@@ -524,3 +534,54 @@ void *th_getdata(void *s)
   return((void*)est);
 }
 
+void *th_initializecouplingdist(void *s)
+{
+  ostringstream msg;
+  thread_st *st = (thread_st*)s;
+  except_st *est = new except_st;
+  est->exception = false;
+
+  try
+    {
+      st->compo->initializeCoupling(st->coupling.c_str(), st->ior.c_str());
+    }
+  catch(const SALOME::SALOME_Exception &ex)
+    {
+      est->exception = true;
+      est->msg = ex.details.text;
+    }
+  catch(const CORBA::Exception &ex)
+    {
+      est->exception = true;
+      msg << "CORBA::Exception: " << ex;
+      est->msg = msg.str();
+    }
+  delete st;
+  return((void*)est);
+}
+
+void *th_terminatecouplingdist(void *s)
+{
+  ostringstream msg;
+  thread_st *st = (thread_st*)s;
+  except_st *est = new except_st;
+  est->exception = false;
+
+  try
+    {
+      st->compo->terminateCoupling(st->coupling.c_str());
+    }
+  catch(const SALOME::SALOME_Exception &ex)
+    {
+      est->exception = true;
+      est->msg = ex.details.text;
+    }
+  catch(const CORBA::Exception &ex)
+    {
+      est->exception = true;
+      msg << "CORBA::Exception: " << ex;
+      est->msg = msg.str();
+    }
+  delete st;
+  return((void*)est);
+}

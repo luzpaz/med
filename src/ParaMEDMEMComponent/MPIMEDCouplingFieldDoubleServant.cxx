@@ -110,3 +110,12 @@ void *th_getdatabympi(void *s)
   return((void*)est);
 }
 
+const char *MPIMEDCouplingFieldDoubleServant::getRef() const
+{
+  return _ref.c_str();
+}
+
+void MPIMEDCouplingFieldDoubleServant::setRef(const char *ref)
+{
+  _ref = ref;
+}

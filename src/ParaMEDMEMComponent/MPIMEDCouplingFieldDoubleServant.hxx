@@ -25,6 +25,8 @@
 #include "ParaMEDMEMComponent_i.hxx"
 #include "ParaMEDCouplingFieldDoubleServant.hxx"
 
+#include <string>
+
 void * th_getdatabympi(void *st);
 
 namespace ParaMEDMEM
@@ -35,9 +37,13 @@ namespace ParaMEDMEM
   public:
     MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,MEDCouplingFieldDouble* field);
     void getDataByMPI(const char* coupling) throw(SALOME::SALOME_Exception);
+    const char* getRef() const;
+    void setRef(const char *ref);
   private:
     ParaMEDMEMComponent_i *_pcompo;
     MEDCouplingFieldDouble* _field;
+    ///IOR string of the object in which the vector is created
+    std::string _ref;
   };
 }
 #endif
