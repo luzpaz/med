@@ -47,7 +47,7 @@ dist_libmedcouplingclient_la_SOURCES=       \
 	DataArrayIntClient.cxx
 
 libmedcouplingclient_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) -I$(top_builddir)/idl ${KERNEL_CXXFLAGS} \
-	-I$(srcdir)/../../MEDCoupling -I$(srcdir)/../../INTERP_KERNEL/Bases
+	-I$(srcdir)/../../MEDCoupling -I$(srcdir)/../../INTERP_KERNEL/Bases -I$(srcdir)/../../INTERP_KERNEL
 libmedcouplingclient_la_LDFLAGS= \
 	../../../idl/libSalomeIDLMED.la \
 	../../MEDCoupling/libmedcoupling.la
