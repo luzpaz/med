@@ -106,7 +106,7 @@ namespace ParaMEDMEM
     
     CommInterface* _interface;
     std::map<std::string,InterpKernelDEC*> _dec;
-    std::map<std::string,MPIProcessorGroup*> _first, _second;
+    std::map<std::string,MPIProcessorGroup*> _source, _target;
     std::map<std::string,ProcessorGroup*> _commgroup;
     std::map<std::string,INTERP_KERNEL::InterpolationOptions*> _dec_options;
     std::map<std::string,std::string> _connectto;  //IOR of distant objects

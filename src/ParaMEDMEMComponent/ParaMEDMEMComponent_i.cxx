@@ -106,15 +106,15 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling, const char
     // second is always the upper processor numbers
     if(_numproc==grank)
       {
-        _first[coupling] = new MPIProcessorGroup(*_interface,0,_nbproc-1,_gcom[coupling]);
-        _second[coupling] = new MPIProcessorGroup(*_interface,_nbproc,gsize-1,_gcom[coupling]);
-        _commgroup[coupling] = _first[coupling];
+        _source[coupling] = new MPIProcessorGroup(*_interface,0,_nbproc-1,_gcom[coupling]);
+        _target[coupling] = new MPIProcessorGroup(*_interface,_nbproc,gsize-1,_gcom[coupling]);
+        _commgroup[coupling] = _source[coupling];
       }
     else
       {
-        _first[coupling] = new MPIProcessorGroup(*_interface,0,gsize-_nbproc-1,_gcom[coupling]);
-        _second[coupling] = new MPIProcessorGroup(*_interface,gsize-_nbproc,gsize-1,_gcom[coupling]);
-        _commgroup[coupling] = _second[coupling];
+        _source[coupling] = new MPIProcessorGroup(*_interface,0,gsize-_nbproc-1,_gcom[coupling]);
+        _target[coupling] = new MPIProcessorGroup(*_interface,gsize-_nbproc,gsize-1,_gcom[coupling]);
+        _commgroup[coupling] = _target[coupling];
       }
     _connectto [coupling] = ior;
     _dec[coupling] = NULL;
@@ -185,10 +185,10 @@ void ParaMEDMEMComponent_i::terminateCoupling(const char * coupling) throw(SALOM
 #endif
 
     /* Processors groups and DEC destruction */
-    delete _first[coupling];
-    _first.erase(coupling);
-    delete _second[coupling];
-    _second.erase(coupling);
+    delete _source[coupling];
+    _source.erase(coupling);
+    delete _target[coupling];
+    _target.erase(coupling);
     delete _dec[coupling];
     _dec.erase(coupling);
     _commgroup.erase(coupling);
@@ -353,9 +353,9 @@ void ParaMEDMEMComponent_i::_setInputField(SALOME_MED::MPIMEDCouplingFieldDouble
       // Creating the intersection Data Exchange Channel
       // Processors which received the field are always the second argument of InterpKernelDEC object
       if(_numproc==grank)
-        _dec[coupling] = new InterpKernelDEC(*_second[coupling], *_first[coupling]);
+        _dec[coupling] = new InterpKernelDEC(*_target[coupling], *_source[coupling]);
       else
-        _dec[coupling] = new InterpKernelDEC(*_first[coupling], *_second[coupling]);
+        _dec[coupling] = new InterpKernelDEC(*_source[coupling], *_target[coupling]);
 
       if(_dec_options[coupling])
         _dec[coupling]->copyOptions(*(_dec_options[coupling]));
@@ -408,9 +408,9 @@ void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, MEDCouplingFi
       // Creating the intersection Data Exchange Channel
       // Processors which sent the field are always the first argument of InterpKernelDEC object
       if(_numproc==grank)
-        _dec[coupling] = new InterpKernelDEC(*_first[coupling], *_second[coupling]);
+        _dec[coupling] = new InterpKernelDEC(*_source[coupling], *_target[coupling]);
       else
-        _dec[coupling] = new InterpKernelDEC(*_second[coupling], *_first[coupling]);
+        _dec[coupling] = new InterpKernelDEC(*_target[coupling], *_source[coupling]);
   
       if(_dec_options[coupling])
         _dec[coupling]->copyOptions(*(_dec_options[coupling]));
