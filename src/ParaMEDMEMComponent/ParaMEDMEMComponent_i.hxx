@@ -93,14 +93,17 @@ namespace ParaMEDMEM
                                  CORBA::Boolean measure_abs,
                                  const char * splitting_policy,
                                  CORBA::Boolean P1P0_bary_method ) throw(SALOME::SALOME_Exception);
-    void initializeCoupling(const char * coupling, const char * ior) throw(SALOME::SALOME_Exception);
-    void terminateCoupling(const char * coupling) throw(SALOME::SALOME_Exception);
-    void _getOutputField(const char * coupling, MEDCouplingFieldDouble* field);
+    virtual void _getOutputField(const char * coupling, MEDCouplingFieldDouble* field);
+    virtual void initializeCoupling(const char * coupling, const char * ior) throw(SALOME::SALOME_Exception);
+    virtual void terminateCoupling(const char * coupling) throw(SALOME::SALOME_Exception);
     
   protected:
-    void _setInputField(const char * coupling, SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr, MEDCouplingFieldDouble* field);
-    
+    void _setInputField(SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr, MEDCouplingFieldDouble* field);
+    void _initializeCoupling(SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr);
+
   private:
+    std::map<std::string,std::string>::const_iterator mapSearchByValue(std::map<std::string,std::string> & search_map, std::string search_val);
+    
     CommInterface* _interface;
     std::map<std::string,InterpKernelDEC*> _dec;
     std::map<std::string,MPIProcessorGroup*> _first, _second;

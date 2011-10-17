@@ -35,10 +35,9 @@ namespace ParaMEDMEM
                                            public ParaMEDCouplingFieldDoubleServant
   {
   public:
-    MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,MEDCouplingFieldDouble* field);
+    MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,PortableServer::POA_ptr poa,ParaMEDMEMComponent_i *pcompo,MEDCouplingFieldDouble* field);
     void getDataByMPI(const char* coupling) throw(SALOME::SALOME_Exception);
-    const char* getRef() const;
-    void setRef(const char *ref);
+    char* getRef();
   private:
     ParaMEDMEMComponent_i *_pcompo;
     MEDCouplingFieldDouble* _field;

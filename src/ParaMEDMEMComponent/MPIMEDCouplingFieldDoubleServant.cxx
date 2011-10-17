@@ -28,10 +28,15 @@ typedef struct
   string msg;
 } except_st;
 
-MPIMEDCouplingFieldDoubleServant::MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,ParaMEDMEMComponent_i *pcompo,MEDCouplingFieldDouble* field):ParaMEDCouplingFieldDoubleServant(orb,field)
+MPIMEDCouplingFieldDoubleServant::MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,PortableServer::POA_ptr poa,ParaMEDMEMComponent_i *pcompo,MEDCouplingFieldDouble* field):ParaMEDCouplingFieldDoubleServant(orb,field)
 {
   _pcompo = pcompo;
   _field = field;
+
+  CORBA::Object_var my_ref = poa->servant_to_reference (pcompo);
+  SALOME_MED::ParaMEDMEMComponent_var compo = SALOME_MED::ParaMEDMEMComponent::_narrow(my_ref);
+  _ref = orb->object_to_string(compo);
+
   Engines::MPIObject_var pobj = POA_SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface::_this();
   BCastIOR(orb,pobj,false);
 }
@@ -110,12 +115,8 @@ void *th_getdatabympi(void *s)
   return((void*)est);
 }
 
-const char *MPIMEDCouplingFieldDoubleServant::getRef() const
+char *MPIMEDCouplingFieldDoubleServant::getRef()
 {
-  return _ref.c_str();
+  return CORBA::string_dup(_ref.c_str());
 }
 
-void MPIMEDCouplingFieldDoubleServant::setRef(const char *ref)
-{
-  _ref = ref;
-}

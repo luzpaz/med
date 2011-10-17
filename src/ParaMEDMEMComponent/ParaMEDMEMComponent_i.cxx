@@ -306,13 +306,26 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
     }
 }
 
-void ParaMEDMEMComponent_i::_setInputField(const char * coupling, SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr, MEDCouplingFieldDouble *field)
+void ParaMEDMEMComponent_i::_setInputField(SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr, MEDCouplingFieldDouble *field)
 {
   int grank;
   except_st *est;
   void *ret_th;
   pthread_t th;
   ostringstream msg;
+
+  char *ch = fieldptr->getRef();
+  char coupling[1000];
+  
+  std::map<std::string,std::string>::const_iterator it = mapSearchByValue(_connectto, ch);
+  if (it == _connectto.end()){ //no coupling
+    strcpy (coupling, "/");
+  }
+  else {
+    strcpy (coupling,(*it).first.c_str());
+  }
+
+  MPI_Barrier(MPI_COMM_WORLD);
 
   if(_numproc == 0)
     {
@@ -414,6 +427,65 @@ void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, MEDCouplingFi
 
   //Sending data
   _dec[coupling]->sendData();
+}
+
+std::map<std::string,std::string>::const_iterator ParaMEDMEMComponent_i::mapSearchByValue(std::map<std::string,std::string> & search_map, std::string search_val)
+{
+  std::map<std::string,std::string>::const_iterator iRet = search_map.end();
+  for (std::map<std::string,std::string>::const_iterator iTer = search_map.begin(); iTer != search_map.end(); iTer ++)
+    {
+      if( iTer->second.find(search_val) != std::string::npos )
+        {
+          iRet = iTer;
+          break;
+        }
+    }
+  return iRet;
+}
+
+void ParaMEDMEMComponent_i::_initializeCoupling(SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr)
+{
+  pthread_t *th2;
+  //this string specifies the coupling
+  char cpl[1000];
+  //getting IOR string of the remote object
+  char *ch = fieldptr->getRef();
+  if(_numproc == 0){
+    //getting IOR string of the local object
+    CORBA::Object_var my_ref = _poa->servant_to_reference (_thisObj);
+    char* str_ref = _orb->object_to_string(my_ref);
+    //the component does not communicate with itself, a connection is required
+    if (strcmp(ch,str_ref) != 0){
+      th2 = new pthread_t[1];
+      //finding the IOR of the remote object in the map
+      std::map<std::string,std::string>::const_iterator it = mapSearchByValue(_connectto, ch);
+      //if it is not found : connecting two objects : this is the first (and the only) connection between these objects
+      if (it == _connectto.end()){
+        //generating the coupling string : concatenation of two IOR strings
+        strcpy (cpl,str_ref);
+        strcat (cpl,ch);
+
+        //initializing the coupling on the remote object in a thread
+        thread_st *st2 = new thread_st;
+        CORBA::Object_var obj = _orb->string_to_object (ch);
+        SALOME_MED::ParaMEDMEMComponent_var compo = SALOME_MED::ParaMEDMEMComponent::_narrow(obj);
+      
+        CORBA::Object_var my_ref = _poa->servant_to_reference (_thisObj);
+        char* str_ref = _orb->object_to_string(my_ref);
+	
+        st2->compo = compo._retn();
+        st2->coupling = cpl;
+        st2->ior = str_ref;
+	
+        pthread_create(&(th2[0]),NULL,th_initializecouplingdist,(void*)st2);
+	  
+        //initializing the coupling on the local object
+        initializeCoupling (cpl, ch);
+        pthread_join (th2[0], NULL); 
+        delete[] th2;
+      }
+    }
+  }
 }
 
 void *th_setinterpolationoptions(void *s)
