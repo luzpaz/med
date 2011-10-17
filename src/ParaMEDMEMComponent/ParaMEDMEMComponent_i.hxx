@@ -93,13 +93,13 @@ namespace ParaMEDMEM
                                  CORBA::Boolean measure_abs,
                                  const char * splitting_policy,
                                  CORBA::Boolean P1P0_bary_method ) throw(SALOME::SALOME_Exception);
-    virtual void _getOutputField(const char * coupling, MEDCouplingFieldDouble* field);
     virtual void initializeCoupling(const char * coupling, const char * ior) throw(SALOME::SALOME_Exception);
     virtual void terminateCoupling(const char * coupling) throw(SALOME::SALOME_Exception);
+    virtual void _getOutputField(const char * coupling, MEDCouplingFieldDouble* field);
     
   protected:
-    void _setInputField(SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr, MEDCouplingFieldDouble* field);
     void _initializeCoupling(SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr);
+    void _setInputField(SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr, MEDCouplingFieldDouble* field);
 
   private:
     std::map<std::string,std::string>::const_iterator mapSearchByValue(std::map<std::string,std::string> & search_map, std::string search_val);

@@ -102,8 +102,8 @@ void ParaMEDMEMComponent_i::initializeCoupling(const char * coupling, const char
     MESSAGE("[" << grank << "] new communicator of " << gsize << " processes");
 
     // Creation of processors group for ParaMEDMEM
-    // first is always the lower processor numbers
-    // second is always the upper processor numbers
+    // source is always the lower processor numbers
+    // target is always the upper processor numbers
     if(_numproc==grank)
       {
         _source[coupling] = new MPIProcessorGroup(*_interface,0,_nbproc-1,_gcom[coupling]);
@@ -313,19 +313,13 @@ void ParaMEDMEMComponent_i::_setInputField(SALOME_MED::MPIMEDCouplingFieldDouble
   void *ret_th;
   pthread_t th;
   ostringstream msg;
-
-  char *ch = fieldptr->getRef();
-  char coupling[1000];
+  string coupling;
   
-  std::map<std::string,std::string>::const_iterator it = mapSearchByValue(_connectto, ch);
-  if (it == _connectto.end()){ //no coupling
-    strcpy (coupling, "/");
-  }
-  else {
-    strcpy (coupling,(*it).first.c_str());
-  }
-
-  MPI_Barrier(MPI_COMM_WORLD);
+  std::map<std::string,std::string>::const_iterator it = mapSearchByValue(_connectto, fieldptr->getRef());
+  if(it != _connectto.end())
+    coupling = (*it).first.c_str();
+  else
+    throw SALOME_Exception("Reference of remote component doesn't find in connectto map !");
 
   if(_numproc == 0)
     {
@@ -335,13 +329,12 @@ void ParaMEDMEMComponent_i::_setInputField(SALOME_MED::MPIMEDCouplingFieldDouble
       pthread_create(&th,NULL,th_getdata,(void*)st);
     }
 
-  string service = coupling;
-  if( service.size() == 0 )
+  if( coupling.size() == 0 )
     throw SALOME_Exception("You have to give a service name !");
 
-  if( _gcom.find(service) == _gcom.end() )
+  if( _gcom.find(coupling) == _gcom.end() )
     {
-      msg << "service " << service << " doesn't exist !";
+      msg << "service " << coupling << " doesn't exist !";
       throw SALOME_Exception(msg.str().c_str());
     }
 
@@ -445,44 +438,45 @@ std::map<std::string,std::string>::const_iterator ParaMEDMEMComponent_i::mapSear
 
 void ParaMEDMEMComponent_i::_initializeCoupling(SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr)
 {
-  pthread_t *th2;
+  except_st *est;
+  void *ret_th;
+  pthread_t *th;
   //this string specifies the coupling
-  char cpl[1000];
+  string coupling;
   //getting IOR string of the remote object
-  char *ch = fieldptr->getRef();
+  string rcompo = fieldptr->getRef();
   if(_numproc == 0){
     //getting IOR string of the local object
     CORBA::Object_var my_ref = _poa->servant_to_reference (_thisObj);
-    char* str_ref = _orb->object_to_string(my_ref);
+    string lcompo = _orb->object_to_string(my_ref);
     //the component does not communicate with itself, a connection is required
-    if (strcmp(ch,str_ref) != 0){
-      th2 = new pthread_t[1];
+    if( rcompo.find(lcompo) == std::string::npos ){
+      th = new pthread_t[1];
       //finding the IOR of the remote object in the map
-      std::map<std::string,std::string>::const_iterator it = mapSearchByValue(_connectto, ch);
+      std::map<std::string,std::string>::const_iterator it = mapSearchByValue(_connectto, rcompo);
       //if it is not found : connecting two objects : this is the first (and the only) connection between these objects
       if (it == _connectto.end()){
         //generating the coupling string : concatenation of two IOR strings
-        strcpy (cpl,str_ref);
-        strcat (cpl,ch);
+        coupling = lcompo + rcompo;
 
         //initializing the coupling on the remote object in a thread
-        thread_st *st2 = new thread_st;
-        CORBA::Object_var obj = _orb->string_to_object (ch);
+        thread_st *st = new thread_st;
+        CORBA::Object_var obj = _orb->string_to_object (rcompo.c_str());
         SALOME_MED::ParaMEDMEMComponent_var compo = SALOME_MED::ParaMEDMEMComponent::_narrow(obj);
-      
-        CORBA::Object_var my_ref = _poa->servant_to_reference (_thisObj);
-        char* str_ref = _orb->object_to_string(my_ref);
+        st->compo = compo._retn();
+        st->coupling = coupling;
+        st->ior = lcompo;
 	
-        st2->compo = compo._retn();
-        st2->coupling = cpl;
-        st2->ior = str_ref;
-	
-        pthread_create(&(th2[0]),NULL,th_initializecouplingdist,(void*)st2);
+        pthread_create(&(th[0]),NULL,th_initializecouplingdist,(void*)st);
 	  
         //initializing the coupling on the local object
-        initializeCoupling (cpl, ch);
-        pthread_join (th2[0], NULL); 
-        delete[] th2;
+        initializeCoupling (coupling.c_str(), rcompo.c_str());
+        pthread_join (th[0], &ret_th); 
+        est = (except_st*)ret_th;
+        if(est->exception)
+          THROW_SALOME_CORBA_EXCEPTION(est->msg.c_str(),SALOME::INTERNAL_ERROR);
+        delete est;
+        delete[] th;
       }
     }
   }
