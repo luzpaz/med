@@ -100,6 +100,7 @@ namespace ParaMEDMEM
   protected:
     void _initializeCoupling(SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr);
     void _setInputField(SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr, MEDCouplingFieldDouble* field);
+    bool amICoupledWithThisComponent(const char * cref);
 
   private:
     std::map<std::string,std::string>::const_iterator mapSearchByValue(std::map<std::string,std::string> & search_map, std::string search_val);

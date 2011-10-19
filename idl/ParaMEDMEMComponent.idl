@@ -36,6 +36,8 @@ module SALOME_MED
   {
     void getDataByMPI(in string coupling) raises (SALOME::SALOME_Exception);
     string getRef();
+    // only for coupling one component with itself
+    long getImplementation();
   };
 
   interface ParaMEDMEMComponent:Engines::EngineComponent,Engines::MPIObject

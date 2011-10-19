@@ -38,6 +38,8 @@ namespace ParaMEDMEM
     MPIMEDCouplingFieldDoubleServant(CORBA::ORB_ptr orb,PortableServer::POA_ptr poa,ParaMEDMEMComponent_i *pcompo,MEDCouplingFieldDouble* field);
     void getDataByMPI(const char* coupling) throw(SALOME::SALOME_Exception);
     char* getRef();
+    // only for coupling one component with itself
+    CORBA::Long getImplementation() {return (CORBA::Long)_field;}
   private:
     ParaMEDMEMComponent_i *_pcompo;
     MEDCouplingFieldDouble* _field;

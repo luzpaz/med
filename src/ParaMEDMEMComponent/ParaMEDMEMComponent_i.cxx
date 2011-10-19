@@ -422,20 +422,6 @@ void ParaMEDMEMComponent_i::_getOutputField(const char * coupling, MEDCouplingFi
   _dec[coupling]->sendData();
 }
 
-std::map<std::string,std::string>::const_iterator ParaMEDMEMComponent_i::mapSearchByValue(std::map<std::string,std::string> & search_map, std::string search_val)
-{
-  std::map<std::string,std::string>::const_iterator iRet = search_map.end();
-  for (std::map<std::string,std::string>::const_iterator iTer = search_map.begin(); iTer != search_map.end(); iTer ++)
-    {
-      if( iTer->second.find(search_val) != std::string::npos )
-        {
-          iRet = iTer;
-          break;
-        }
-    }
-  return iRet;
-}
-
 void ParaMEDMEMComponent_i::_initializeCoupling(SALOME_MED::MPIMEDCouplingFieldDoubleCorbaInterface_ptr fieldptr)
 {
   except_st *est;
@@ -480,6 +466,29 @@ void ParaMEDMEMComponent_i::_initializeCoupling(SALOME_MED::MPIMEDCouplingFieldD
       }
     }
   }
+}
+
+std::map<std::string,std::string>::const_iterator ParaMEDMEMComponent_i::mapSearchByValue(std::map<std::string,std::string> & search_map, std::string search_val)
+{
+  std::map<std::string,std::string>::const_iterator iRet = search_map.end();
+  for (std::map<std::string,std::string>::const_iterator iTer = search_map.begin(); iTer != search_map.end(); iTer ++)
+    {
+      if( iTer->second.find(search_val) != std::string::npos )
+        {
+          iRet = iTer;
+          break;
+        }
+    }
+  return iRet;
+}
+
+bool ParaMEDMEMComponent_i::amICoupledWithThisComponent(const char* cref)
+{
+  std::map<std::string,std::string>::const_iterator it = mapSearchByValue(_connectto, cref);
+  if(it != _connectto.end())
+    return true;
+  else
+    return false;
 }
 
 void *th_setinterpolationoptions(void *s)
