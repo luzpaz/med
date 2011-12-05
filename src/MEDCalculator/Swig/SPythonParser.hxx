@@ -20,6 +20,15 @@
 #ifndef __SPYTHONPARSER_HXX__
 #define __SPYTHONPARSER_HXX__
 
+// rnv: avoid compilation warning on Linux : "_POSIX_C_SOURCE" and "_XOPEN_SOURCE" are redefined
+#ifdef _POSIX_C_SOURCE
+#undef _POSIX_C_SOURCE
+#endif 
+
+#ifdef _XOPEN_SOURCE
+#undef _XOPEN_SOURCE
+#endif 
+
 #include "Python.h"
 
 #include "MedCalculatorSPythonDefines.hxx"
