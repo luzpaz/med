@@ -39,7 +39,7 @@ namespace ParaMEDMEM
     void getDataByMPI(const char* coupling) throw(SALOME::SALOME_Exception);
     char* getRef();
     // only for coupling one component with itself
-    CORBA::Long getImplementation() {return NULL;}
+    CORBA::Long getImplementation() {return (CORBA::LongLong)_field;}
   private:
     ParaMEDMEMComponent_i *_pcompo;
     MEDCouplingFieldDouble* _field;
