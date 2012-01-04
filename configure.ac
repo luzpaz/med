@@ -683,10 +683,6 @@ AC_OUTPUT([ \
         src/MEDMEMBinTest/Makefile \
         src/MEDMEMCppTest/Makefile \
         src/INTERP_KERNEL/Makefile \
-        src/INTERP_KERNEL/Bases/Makefile \
-        src/INTERP_KERNEL/Geometric2D/Makefile \
-	src/INTERP_KERNEL/ExprEval/Makefile \
-	src/INTERP_KERNEL/GaussPoints/Makefile \
         src/INTERP_KERNELTest/Makefile \
         src/MEDCoupling/Makefile \
         src/MEDCoupling/Test/Makefile \
