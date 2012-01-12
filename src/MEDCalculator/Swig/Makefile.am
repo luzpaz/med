@@ -52,7 +52,8 @@ _MEDCalculator_la_LDFLAGS  = -module $(MED2_LIBS) $(HDF5_LIBS) $(PYTHON_LIBS) \
 
 dist_libmedcalculatorspython_la_SOURCES = SPythonInterpreter.cxx SPythonParser.cxx
 
-libmedcalculatorspython_la_CPPFLAGS = $(PYTHON_INCLUDES) -I$(srcdir)/../../INTERP_KERNEL/Bases
+libmedcalculatorspython_la_CPPFLAGS = $(PYTHON_INCLUDES) -I$(srcdir)/../../INTERP_KERNEL/Bases \
+				      -I$(srcdir)/../../INTERP_KERNEL	 
 
 libmedcalculatorspython_la_LDFLAGS = $(PYTHON_LIBS) ../../INTERP_KERNEL/libinterpkernel.la
 
