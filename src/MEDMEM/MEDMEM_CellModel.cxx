@@ -1524,7 +1524,7 @@ void CELLMODEL::clean()
       if (_constituents[i][j])
         delete[] _constituents[i][j] ;
     }
-    if (_constituentsType)
+    if (_constituentsType[i])
       delete [] _constituentsType[i] ;
     if (_constituents[i])
       delete[] _constituents[i] ;
