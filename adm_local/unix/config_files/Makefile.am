@@ -24,6 +24,7 @@ dist_admlocalm4_DATA =          \
     check_GUI.m4                \
     check_Med.m4                \
     check_Med2.m4               \
+    check_med3.m4               \
     check_bft.m4                \
     check_fvm.m4                \
     check_metis.m4              \

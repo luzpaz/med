@@ -32,7 +32,7 @@ salomeinclude_HEADERS= \
 dist_libMEDWrapper_la_SOURCES= \
 	MED_Factory.cxx
 
-libMEDWrapper_la_CPPFLAGS= $(BOOST_CPPFLAGS) $(MED2_INCLUDES) \
+libMEDWrapper_la_CPPFLAGS= $(BOOST_CPPFLAGS) $(MED3_INCLUDES) \
 	-I$(srcdir)/../Base
 if MED_ENABLE_KERNEL
   libMEDWrapper_la_CPPFLAGS+= -I$(KERNEL_ROOT_DIR)/include/salome
@@ -53,4 +53,4 @@ MED_Test_LDADD= $(libMEDWrapper_la_LDFLAGS) ../Base/libMEDWrapperBase.la ../V2_1
 dist_mprint_version_SOURCES= mprint_version.cxx
 mprint_version_CPPFLAGS= $(libMEDWrapper_la_CPPFLAGS)
 mprint_version_LDADD= $(libMEDWrapper_la_LDFLAGS) ../Base/libMEDWrapperBase.la ../V2_1/Core/libmed_V2_1.la \
-	$(BOOST_LIB_THREAD) libMEDWrapper.la $(MED2_LIBS)
+	$(BOOST_LIB_THREAD) libMEDWrapper.la $(MED3_LIBS)

@@ -42,12 +42,12 @@ MEDCalculator_wrap.cxx: $(SWIG_DEF)
 	$(SWIG) $(SWIG_FLAGS) -o $@  $<
 
 _MEDCalculator_la_CPPFLAGS = $(PYTHON_INCLUDES) \
-	$(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
+	$(MED3_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
 	-I$(srcdir)/../../INTERP_KERNEL \
 	-I$(srcdir)/.. -I$(srcdir)/../../MEDCoupling_Swig -I$(srcdir)/../../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../../MEDCoupling -I$(srcdir)/../../MEDLoader -I$(srcdir)/../../MEDLoader/Swig
 
-_MEDCalculator_la_LDFLAGS  = -module $(MED2_LIBS) $(HDF5_LIBS) $(PYTHON_LIBS) \
+_MEDCalculator_la_LDFLAGS  = -module $(MED3_LIBS) $(HDF5_LIBS) $(PYTHON_LIBS) \
 	../libmedcalculator.la
 
 dist_libmedcalculatorspython_la_SOURCES = SPythonInterpreter.cxx SPythonParser.cxx

@@ -68,7 +68,7 @@ dist__libMEDClient_la_SOURCES = libMEDClient.i
 nodist__libMEDClient_la_SOURCES = libMEDClient_wrap.cxx
 
 libMEDClientcmodule_la_CPPFLAGS = $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) \
-	$(MED2_INCLUDES) $(HDF5_INCLUDES) $(PYTHON_INCLUDES) ${KERNEL_CXXFLAGS} \
+	$(MED3_INCLUDES) $(HDF5_INCLUDES) $(PYTHON_INCLUDES) ${KERNEL_CXXFLAGS} \
 	-I$(srcdir)/../../MEDMEM_I -I$(srcdir)/../../MEDMEM -I$(top_builddir)/idl \
 	-I$(srcdir)/../../MEDMEM_SWIG \
 	-I$(srcdir)/../../MED \

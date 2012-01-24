@@ -240,11 +240,11 @@ CHECK_HDF5
 
 echo
 echo ---------------------------------------------
-echo testing MED2
+echo testing MED3
 echo ---------------------------------------------
 echo
 
-CHECK_MED2
+CHECK_MED3
 
 echo
 echo ---------------------------------------------------
@@ -507,7 +507,7 @@ AM_CONDITIONAL(MED_ENABLE_PARMETIS, [test "$ENABLE_PARMETIS" = yes])
 AM_CONDITIONAL(MED_ENABLE_SCOTCH,   [test "$ENABLE_SCOTCH" = yes])
 AM_CONDITIONAL(MED_WITHMPI,         [test "$WITHMPI" = yes])
 AM_CONDITIONAL(MED_ENABLE_FVM,      [test "$ENABLE_FVM" = yes])
-AM_CONDITIONAL(MED_ENABLE_MED2,     [test "$med2_ok" = yes])
+AM_CONDITIONAL(MED_ENABLE_MED3,     [test "$med3_ok" = yes])
 AM_CONDITIONAL(MED_ENABLE_RENUMBER, [test "$ENABLE_RENUMBER" = yes])
 AM_CONDITIONAL(BOOST_IS_OK,         [test "$boost_ok" = yes])
 ###
@@ -543,7 +543,7 @@ if test "x$ENABLE_RENUMBER" = "xyes" ; then
 fi
 if test "$MED_WITH_KERNEL" = "yes" ; then 
     # --with-kernel=yes
-    obligatory_vars="$obligatory_vars python_ok boost_ok swig_ok hdf5_ok med2_ok omniORB_ok $splitter_vars $renumber_vars"
+    obligatory_vars="$obligatory_vars python_ok boost_ok swig_ok hdf5_ok med3_ok omniORB_ok $splitter_vars $renumber_vars"
     optional_vars="$optional_vars graphviz_ok Kernel_ok"
     if test "${gui_ok}" = "yes"; then
         # GUI is enabled
@@ -555,10 +555,10 @@ else
     # --with-kernel=no
     if test "$with_interp_kernel_only" == "yes" ; then
         # --with-interp-kernel-only=yes mode
-        optional_vars="$optional_vars hdf5_ok med2_ok"
+        optional_vars="$optional_vars hdf5_ok med3_ok"
     else
         # --with-interp-kernel-only=no mode
-        obligatory_vars="$obligatory_vars python_ok boost_ok swig_ok hdf5_ok med2_ok omniORB_ok $splitter_vars $renumber_vars"
+        obligatory_vars="$obligatory_vars python_ok boost_ok swig_ok hdf5_ok med3_ok omniORB_ok $splitter_vars $renumber_vars"
     fi
 fi
 

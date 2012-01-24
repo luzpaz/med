@@ -20,7 +20,7 @@
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 ###
-# MEDLoader and Test sub-folders are available only if MED2 is detected ok
+# MEDLoader and Test sub-folders are available only if MED3 is detected ok
 ### 
 
 lib_LTLIBRARIES= libparamedcouplingcorba.la

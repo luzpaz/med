@@ -52,13 +52,13 @@ libMEDMEM_Swig_wrap.cxx: $(SWIG_DEF)
 	$(SWIG) $(SWIG_FLAGS) -o $@  $<
 
 _libMEDMEM_Swig_la_CPPFLAGS = \
-	$(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) $(XDR_CPPFLAGS) @CXXTMPDPTHFLAGS@ \
+	$(PYTHON_INCLUDES) $(MED3_INCLUDES) $(HDF5_INCLUDES) $(XDR_CPPFLAGS) @CXXTMPDPTHFLAGS@ \
 	-I$(srcdir)/../MEDMEM \
 	-I$(srcdir)/../INTERP_KERNEL \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../INTERP_KERNEL/GaussPoints
 
-_libMEDMEM_Swig_la_LDFLAGS  = -module $(MED2_LIBS) $(HDF5_LIBS) $(PYTHON_LIBS) $(XDR_LIBS) \
+_libMEDMEM_Swig_la_LDFLAGS  = -module $(MED3_LIBS) $(HDF5_LIBS) $(PYTHON_LIBS) $(XDR_LIBS) \
 	../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la
 
 CLEANFILES = libMEDMEM_Swig_wrap.cxx libMEDMEM_Swig.py

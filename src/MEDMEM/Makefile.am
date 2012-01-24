@@ -137,8 +137,8 @@ MEDMEM_MeshFuse.cxx \
 MEDMEM_MedFileBrowser.cxx
 
 #libmedmem_la_LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
-# libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@
-libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) $(XDR_CPPFLAGS) \
+# libmedmem_la_CPPFLAGS= $(MED3_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@
+libmedmem_la_CPPFLAGS= $(MED3_INCLUDES) $(HDF5_INCLUDES) $(XDR_CPPFLAGS) \
 	-I$(srcdir)/../INTERP_KERNEL \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../INTERP_KERNEL/Geometric2D \
@@ -146,7 +146,7 @@ libmedmem_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) $(XDR_CPPFLAGS) \
 libmedmem_la_CXXFLAGS= @CXXTMPDPTHFLAGS@
 
 # change motivated by the bug KERNEL4778.
-libmedmem_la_LDFLAGS=$(MED2_LIBS) $(HDF5_LIBS) $(XDR_LIBS) \
+libmedmem_la_LDFLAGS=$(MED3_LIBS) $(HDF5_LIBS) $(XDR_LIBS) \
 	$(STDLIB) ../INTERP_KERNEL/libinterpkernel.la
 
 AM_CPPFLAGS+= $(libmedmem_la_CPPFLAGS)

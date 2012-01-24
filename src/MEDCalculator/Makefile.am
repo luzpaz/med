@@ -51,7 +51,7 @@ MEDCalculatorDBRangeSelection.cxx            \
 MEDCalculatorDBSliceField.cxx                \
 MEDCalculatorDBField.cxx
 
-libmedcalculator_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
+libmedcalculator_la_CPPFLAGS= $(MED3_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
 	-I$(srcdir)/../INTERP_KERNEL \
 	-I$(srcdir)/../INTERP_KERNEL/Geometric2D \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \

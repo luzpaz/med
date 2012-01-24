@@ -32,25 +32,25 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 
 #libmedmem_la_LDFLAGS= -L$(top_builddir)/lib@LIB_LOCATION_SUFFIX@/salome 
-#libMEDMEMBinTest_la_CPPFLAGS= $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
+#libMEDMEMBinTest_la_CPPFLAGS= $(MED3_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
 #	-I$(srcdir)/../MEDWrapper/Base \
 #	-I$(srcdir)/../MEDWrapper/V2_1/Core -I$(srcdir)/../INTERPOLATION
 
 # change motivated by the bug KERNEL4778.
-#libMEDMEMBinTest_la_LDFLAGS=$(MED2_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
+#libMEDMEMBinTest_la_LDFLAGS=$(MED3_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
 #	../MEDWrapper/Base/libMEDWrapperBase.la $(STDLIB)
 #if MED_ENABLE_KERNEL
 #    libMEDMEMBinTest_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
 #    libMEDMEMBinTest_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace 
 #endif
 
-AM_CPPFLAGS += $(MED2_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
+AM_CPPFLAGS += $(MED3_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
 	-I$(srcdir)/../INTERP_KERNEL \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../INTERP_KERNEL/GaussPoints \
 	-I$(srcdir)/../MEDMEM
 
-LDADD= $(MED2_LIBS) $(HDF5_LIBS)  \
+LDADD= $(MED3_LIBS) $(HDF5_LIBS)  \
 	$(STDLIB) ../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la
 
 
