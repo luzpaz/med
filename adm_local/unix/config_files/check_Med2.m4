@@ -27,6 +27,7 @@ AC_REQUIRE([CHECK_HDF5])dnl
 AC_REQUIRE([MED_CHECK_SIZEOF_MEDINT])
 
 AC_CHECKING(for MED2)
+AC_MSG_WARN([[ ----- CHECK_MED2 procedure is obsolete. Use CHECK_MED3 instead! -----]])
 
 AC_ARG_WITH(med2,
     [  --with-med2=DIR                 root directory path to med2 installation ],
