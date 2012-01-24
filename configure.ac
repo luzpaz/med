@@ -533,18 +533,19 @@ optional_vars="mpi_ok fvm_ok cppunit_ok"
 gui_vars=""
 
 if test "x$ENABLE_SPLITTER" = "xyes" ; then
-  splitter_vars="metis_ok parmetis_ok scotch_ok libxml_ok"
+  splitter_obligatory_vars="libxml_ok"
+  splitter_optional_vars="metis_ok parmetis_ok scotch_ok"
 fi
 
 if test "x$ENABLE_RENUMBER" = "xyes" ; then
-  if test "x$splitter_vars" = "x" ; then
-    renumber_vars="metis_ok"
+  if test "x$splitter_optional_vars" = "x" ; then
+    renumber_optional_vars="metis_ok"
   fi
 fi
 if test "$MED_WITH_KERNEL" = "yes" ; then 
     # --with-kernel=yes
-    obligatory_vars="$obligatory_vars python_ok boost_ok swig_ok hdf5_ok med3_ok omniORB_ok $splitter_vars $renumber_vars"
-    optional_vars="$optional_vars graphviz_ok Kernel_ok"
+    obligatory_vars="$obligatory_vars python_ok boost_ok swig_ok hdf5_ok med3_ok omniORB_ok $splitter_obligatory_vars"
+    optional_vars="$optional_vars $splitter_optional_vars $renumber_optional_vars graphviz_ok Kernel_ok"
     if test "${gui_ok}" = "yes"; then
         # GUI is enabled
         gui_vars="lex_yacc_ok OpenGL_ok qt_ok vtk_ok sip_ok pyqt_ok qwt_ok occ_ok gui_ok"
@@ -555,10 +556,10 @@ else
     # --with-kernel=no
     if test "$with_interp_kernel_only" == "yes" ; then
         # --with-interp-kernel-only=yes mode
-        optional_vars="$optional_vars hdf5_ok med3_ok"
+        optional_vars="$optional_vars $splitter_optional_vars $renumber_optional_vars hdf5_ok med3_ok"
     else
         # --with-interp-kernel-only=no mode
-        obligatory_vars="$obligatory_vars python_ok boost_ok swig_ok hdf5_ok med3_ok omniORB_ok $splitter_vars $renumber_vars"
+        obligatory_vars="$obligatory_vars python_ok boost_ok swig_ok hdf5_ok med3_ok omniORB_ok $splitter_obligatory_vars"
     fi
 fi
 
@@ -566,14 +567,21 @@ fi
 # obligatory products
 ###
 
+echo "--- Obligatory products:"
+
+missing_obligatory=no
 for var in $obligatory_vars
 do
    eval toto=\$$var
-   if test x$toto != "x"; then
+   if test x$toto == "x"; then toto="no" ; fi
+   if test x$toto == "xno"; then missing_obligatory=yes ; fi
      printf "   %10s : " `echo \$var | sed -e "s,_ok,,"`
      eval echo \$$var
-   fi
+   #fi
 done
+if test x$missing_obligatory == "xyes"; then 
+AC_MSG_ERROR([one or more obligatory product is missing])
+fi
 
 ###
 # GUI products (if enabled)
@@ -581,7 +589,7 @@ done
 
 if test "$gui_vars" != "" ; then
 
-    echo "---GUI:"
+    echo "--- GUI products (optional):"
 
     for var in $gui_vars
     do
@@ -597,7 +605,7 @@ fi
 # optional products
 ###
 
-echo "---Optional:"
+echo "--- Other optional products:"
 
 for var in $optional_vars
 do
