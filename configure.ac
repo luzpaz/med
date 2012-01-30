@@ -524,6 +524,8 @@ if test "$with_interp_kernel_only" = "yes"; then
     echo "Configure (Micro MED)"
 elif test "$MED_WITH_KERNEL" = "no"; then 
     echo "Configure (without Kernel)"
+elif test "${SalomeGUI_need}" == "no"; then
+    echo "Configure (without GUI)"
 else
     echo Configure
 fi
@@ -559,7 +561,7 @@ else
         optional_vars="$optional_vars $splitter_optional_vars $renumber_optional_vars hdf5_ok med3_ok"
     else
         # --with-interp-kernel-only=no mode
-        obligatory_vars="$obligatory_vars python_ok boost_ok swig_ok hdf5_ok med3_ok omniORB_ok $splitter_obligatory_vars"
+        obligatory_vars="$obligatory_vars python_ok boost_ok swig_ok hdf5_ok med3_ok $splitter_obligatory_vars"
     fi
 fi
 
@@ -594,10 +596,9 @@ if test "$gui_vars" != "" ; then
     for var in $gui_vars
     do
         eval toto=\$$var
-        if test x$toto != "x"; then
+        if test x$toto == "x"; then toto="no"; fi
         printf "   %10s : " `echo \$var | sed -e "s,_ok,,"`
-        eval echo \$$var
-    fi
+        eval echo \$toto
     done
 fi
 
@@ -605,7 +606,7 @@ fi
 # optional products
 ###
 
-echo "--- Other optional products:"
+echo "--- Other (optional) products:"
 
 for var in $optional_vars
 do
