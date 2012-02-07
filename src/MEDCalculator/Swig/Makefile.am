@@ -47,7 +47,7 @@ _MEDCalculator_la_CPPFLAGS = $(PYTHON_INCLUDES) \
 	-I$(srcdir)/.. -I$(srcdir)/../../MEDCoupling_Swig -I$(srcdir)/../../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../../MEDCoupling -I$(srcdir)/../../MEDLoader -I$(srcdir)/../../MEDLoader/Swig
 
-_MEDCalculator_la_LDFLAGS  = -module $(MED3_LIBS) $(HDF5_LIBS) $(PYTHON_LIBS) \
+_MEDCalculator_la_LDFLAGS  = -module $(MED3_LIBS_C_ONLY) $(HDF5_LIBS) $(PYTHON_LIBS) \
 	../libmedcalculator.la
 
 dist_libmedcalculatorspython_la_SOURCES = SPythonInterpreter.cxx SPythonParser.cxx
