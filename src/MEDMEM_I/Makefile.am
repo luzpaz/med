@@ -58,5 +58,5 @@ libMEDMEMImpl_la_LDFLAGS= \
 	../../idl/libSalomeIDLMED.la \
 	../MEDMEM/libmedmem.la \
 	${KERNEL_LDFLAGS} -lSalomeLifeCycleCORBA -lSALOMELocalTrace -lSalomeCommunication -lSalomeGenericObj -lSalomeNS -lOpUtil \
-	$(MED3_LIBS) \
+	$(MED3_LIBS_C_ONLY) \
 	$(HDF5_LIBS)

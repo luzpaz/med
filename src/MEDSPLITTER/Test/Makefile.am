@@ -47,7 +47,7 @@ libMEDSPLITTERTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED3_INCLUDES) \
 	-I$(srcdir)/../../MEDMEMCppTest -I$(srcdir)/../../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../../INTERP_KERNEL/GaussPoints \
 	-I$(srcdir)/../../INTERP_KERNEL
-libMEDSPLITTERTest_la_LDFLAGS= $(MED3_LIBS) @CPPUNIT_LIBS@
+libMEDSPLITTERTest_la_LDFLAGS= $(MED3_LIBS_C_ONLY) @CPPUNIT_LIBS@
 
 if MED_ENABLE_KERNEL
     libMEDSPLITTERTest_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
@@ -73,7 +73,7 @@ bin_PROGRAMS= TestMEDSPLITTER
 TestMEDSPLITTER_SOURCES= TestMEDSPLITTER.cxx
 
 TestMEDSPLITTER_CPPFLAGS= $(libMEDSPLITTERTest_la_CPPFLAGS) 
-TestMEDSPLITTER_LDADD= $(MED3_LIBS) $(libMEDSPLITTERTest_la_LDFLAGS) -lm \
+TestMEDSPLITTER_LDADD= $(MED3_LIBS_C_ONLY) $(libMEDSPLITTERTest_la_LDFLAGS) -lm \
 	libMEDSPLITTERTest.la ../../MEDWrapper/V2_1/Core/libmed_V2_1.la \
 	../../MEDMEM/libmedmem.la ../../INTERP_KERNEL/libinterpkernel.la \
 	../libmedsplitter.la 

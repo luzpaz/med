@@ -58,7 +58,7 @@ _libMEDMEM_Swig_la_CPPFLAGS = \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../INTERP_KERNEL/GaussPoints
 
-_libMEDMEM_Swig_la_LDFLAGS  = -module $(MED3_LIBS) $(HDF5_LIBS) $(PYTHON_LIBS) $(XDR_LIBS) \
+_libMEDMEM_Swig_la_LDFLAGS  = -module $(MED3_LIBS_C_ONLY) $(HDF5_LIBS) $(PYTHON_LIBS) $(XDR_LIBS) \
 	../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la
 
 CLEANFILES = libMEDMEM_Swig_wrap.cxx libMEDMEM_Swig.py

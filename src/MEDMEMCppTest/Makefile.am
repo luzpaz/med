@@ -72,7 +72,7 @@ libMEDMEMCppTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED3_INCLUDES) $(HDF5_INCLUDE
 	-I$(srcdir)/../INTERP_KERNEL \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../INTERP_KERNEL/GaussPoints
-libMEDMEMCppTest_la_LDFLAGS= $(MED3_LIBS) @CPPUNIT_LIBS@ \
+libMEDMEMCppTest_la_LDFLAGS= $(MED3_LIBS_C_ONLY) @CPPUNIT_LIBS@ \
 	../MEDMEM/libmedmem.la
 
 if MED_ENABLE_KERNEL
@@ -105,7 +105,7 @@ dist_MEDMEMTest_Support_fault_SOURCES= MEDMEMTest_Support_fault.cxx
 dist_MEDMEMTest_VtkFieldDriver_fault_SOURCES= MEDMEMTest_VtkFieldDriver_fault.cxx
 dist_MEDMEMTest_VtkMeshDriver_fault_SOURCES= MEDMEMTest_VtkMeshDriver_fault.cxx
 
-LDADD= $(MED3_LIBS) $(libMEDMEMCppTest_la_LDFLAGS) -lm \
+LDADD= $(MED3_LIBS_C_ONLY) $(libMEDMEMCppTest_la_LDFLAGS) -lm \
 	 ../MEDMEM/libmedmem.la \
 	../INTERP_KERNEL/libinterpkernel.la libMEDMEMCppTest.la
 if MED_ENABLE_KERNEL

@@ -64,7 +64,6 @@ MEDMEM_Support.hxx \
 MEDMEM_Unit.hxx \
 MEDMEM_Grid.hxx \
 MEDMEM_RCBase.hxx \
-MEDMEM_medimport_src.hxx \
 MEDMEM_MedVersion.hxx \
 MEDMEM_TopLevel.hxx \
 MEDMEM_Utilities.hxx \
@@ -120,7 +119,6 @@ MEDMEM_VtkMedDriver.cxx \
 MEDMEM_VtkMeshDriver.cxx \
 MEDMEM_Grid.cxx \
 MEDMEM_MedVersion.cxx \
-MEDMEM_medimport_src.cxx \
 MEDMEM_TopLevel.cxx \
 MEDMEM_ConnectZone.cxx \
 MEDMEM_EnsightMedDriver.cxx \
@@ -146,7 +144,7 @@ libmedmem_la_CPPFLAGS= $(MED3_INCLUDES) $(HDF5_INCLUDES) $(XDR_CPPFLAGS) \
 libmedmem_la_CXXFLAGS= @CXXTMPDPTHFLAGS@
 
 # change motivated by the bug KERNEL4778.
-libmedmem_la_LDFLAGS=$(MED3_LIBS) $(HDF5_LIBS) $(XDR_LIBS) \
+libmedmem_la_LDFLAGS=$(MED3_LIBS_C_ONLY) $(HDF5_LIBS) $(XDR_LIBS) \
 	$(STDLIB) ../INTERP_KERNEL/libinterpkernel.la
 
 AM_CPPFLAGS+= $(libmedmem_la_CPPFLAGS)

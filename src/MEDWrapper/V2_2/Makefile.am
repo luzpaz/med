@@ -38,5 +38,5 @@ if MED_ENABLE_KERNEL
 else
   libMEDWrapper_V2_2_la_CPPFLAGS+= -I$(top_builddir)/adm_local_without_kernel/unix
 endif
-libMEDWrapper_V2_2_la_LDFLAGS= $(MED3_LIBS) $(HDF5_LIBS)
+libMEDWrapper_V2_2_la_LDFLAGS= $(MED3_LIBS_C_ONLY) $(HDF5_LIBS)
 libMEDWrapper_V2_2_la_LIBADD= ../Base/libMEDWrapperBase.la

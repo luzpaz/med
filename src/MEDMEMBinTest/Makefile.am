@@ -37,7 +37,7 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 #	-I$(srcdir)/../MEDWrapper/V2_1/Core -I$(srcdir)/../INTERPOLATION
 
 # change motivated by the bug KERNEL4778.
-#libMEDMEMBinTest_la_LDFLAGS=$(MED3_LIBS) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
+#libMEDMEMBinTest_la_LDFLAGS=$(MED3_LIBS_C_ONLY) $(HDF5_LIBS) ../MEDWrapper/V2_1/Core/libmed_V2_1.la \
 #	../MEDWrapper/Base/libMEDWrapperBase.la $(STDLIB)
 #if MED_ENABLE_KERNEL
 #    libMEDMEMBinTest_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}
@@ -50,7 +50,7 @@ AM_CPPFLAGS += $(MED3_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
 	-I$(srcdir)/../INTERP_KERNEL/GaussPoints \
 	-I$(srcdir)/../MEDMEM
 
-LDADD= $(MED3_LIBS) $(HDF5_LIBS)  \
+LDADD= $(MED3_LIBS_C_ONLY) $(HDF5_LIBS)  \
 	$(STDLIB) ../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la
 
 
@@ -62,7 +62,7 @@ endif
 
 bin_PROGRAMS= \
 	ensight2med med2ensight convertToPoly dumpInterpolation \
-	med2_1_To_med2_2 med2vtk duplicateMED medmembin_test duplicateMEDMESH test_write_groups_poly\
+	med2vtk duplicateMED medmembin_test duplicateMEDMESH test_write_groups_poly\
 	test_MEDMEM_ModulusArray test_MEDMEM_Array test_MEDMEM_SkyLineArray \
 	test_MEDMEM_CellModel testUPointerOf testUCoordinate testUUnit \
 	testUGeoNameMeshEntities testUMedException testUModulusArray \
@@ -91,7 +91,6 @@ XFAIL_TESTS = \
 	duplicateMED \
 	duplicateMEDMESH \
 	ensight2med \
-	med2_1_To_med2_2 \
 	med2ensight \
 	med2vtk \
 	medmembin_test \
@@ -156,7 +155,6 @@ dist_dumpInterpolation_SOURCES= dumpInterpolation.cxx
 dist_convertToPoly_SOURCES= convertToPoly.cxx
 dist_ensight2med_SOURCES= ensight2med.cxx
 dist_med2ensight_SOURCES= med2ensight.cxx
-dist_med2_1_To_med2_2_SOURCES= med2_1_To_med2_2.cxx
 dist_med2vtk_SOURCES= med2vtk.cxx
 dist_duplicateMED_SOURCES= duplicateMED.cxx
 dist_medmembin_test_SOURCES= med_test.cxx

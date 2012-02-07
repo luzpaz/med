@@ -43,7 +43,7 @@ _libMEDSPLITTER_Swig_la_CPPFLAGS = $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) $(PYTHON_
 	-I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDWrapper/V2_1/Core -I$(srcdir)/../INTERP_KERNEL \
 	-I$(srcdir)/../MEDSPLITTER -I$(srcdir)/../INTERP_KERNEL/Bases
 
-_libMEDSPLITTER_Swig_la_LDFLAGS  = -module $(MED3_LIBS) $(HDF5_LIBS) $(PYTHON_LIBS) $(BOOST_LIBS) \
+_libMEDSPLITTER_Swig_la_LDFLAGS  = -module $(MED3_LIBS_C_ONLY) $(HDF5_LIBS) $(PYTHON_LIBS) $(BOOST_LIBS) \
 	../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la \
 	../MEDSPLITTER/libmedsplitter.la
 
