@@ -379,9 +379,7 @@ namespace MED
       TValueHolder<TInt, med_int> aFamilyId(theInfo.myId);
       TValueHolder<TFamAttr, med_int> anAttrId(theInfo.myAttrId);
       TValueHolder<TFamAttr, med_int> anAttrVal(theInfo.myAttrVal);
-      TValueHolder<TInt, med_int> aNbAttr(theInfo.myNbAttr);
       TValueHolder<TString, char> anAttrDesc(theInfo.myAttrDesc);
-      TValueHolder<TInt, med_int> aNbGroup(theInfo.myNbGroup);
       TValueHolder<TString, char> aGroupNames(theInfo.myGroupNames);
       
       TErr aRet = MEDfamily23Info(myFile->Id(),
@@ -400,8 +398,8 @@ namespace MED
         EXCEPTION(std::runtime_error,"GetFamilyInfo - MEDfamily23Info(...) - "<<
                   " aMeshInfo.myName = '"<<&aMeshName<<
                   "'; theFamId = "<<theFamId<<
-                  "; theInfo.myNbGroup = "<<aNbGroup()<<
-                  "; theInfo.myNbAttr = "<<aNbAttr());
+                  "; theInfo.myNbGroup = "<<theInfo.myNbGroup<<
+                  "; theInfo.myNbAttr = "<<theInfo.myNbAttr);
     }
     
     
@@ -1625,7 +1623,7 @@ namespace MED
       TErr aRet;
       med_bool local;
       char dtunit[MED_SNAME_SIZE+1];
-	  char local_mesh_name[MED_NAME_SIZE+1]="";
+          char local_mesh_name[MED_NAME_SIZE+1]="";
       med_int nbofstp;
       theInfo.myNbComp = MEDfieldnComponent(myFile->Id(),theFieldId);
       aRet = MEDfieldInfo(myFile->Id(),
@@ -1639,11 +1637,11 @@ namespace MED
                           dtunit,
                           &nbofstp);
 
-	  if(strcmp(&aMeshInfo.myName[0],local_mesh_name) != 0 ) {
-		  if(theErr)
-			*theErr = -1;
-		  return;
-	  }
+          if(strcmp(&aMeshInfo.myName[0],local_mesh_name) != 0 ) {
+                  if(theErr)
+                        *theErr = -1;
+                  return;
+          }
 
       theInfo.SetName(aFieldName);
 
