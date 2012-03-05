@@ -271,11 +271,11 @@ int main(int argc, char** argv)
 
   // Creating the graph and partitioning it   
 #ifdef ENABLE_METIS
-#ifndef ENABLE_SCOTCH
   library = "metis";
-#endif
 #else
+#ifdef ENABLE_SCOTCH
   library = "scotch";
+#endif
 #endif
   cout << "\tsplit-method = " << library << endl; // tmp
 
