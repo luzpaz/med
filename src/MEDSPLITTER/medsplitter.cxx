@@ -269,12 +269,14 @@ int main(int argc, char** argv)
 
   cout << "MEDSPLITTER - computing partition "<<endl;
 
-  // Creating the graph and partitioning it   
+  // Creating the graph and partitioning it
 #ifdef ENABLE_METIS
-  library = "metis";
+  if ( library.empty() )
+    library = "metis";
 #else
 #ifdef ENABLE_SCOTCH
-  library = "scotch";
+  if ( library.empty() )
+    library = "scotch";
 #endif
 #endif
   cout << "\tsplit-method = " << library << endl; // tmp
