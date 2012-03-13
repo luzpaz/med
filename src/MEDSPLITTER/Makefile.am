@@ -75,7 +75,7 @@ if MED_ENABLE_SCOTCH
     dist_libmedsplitter_la_SOURCES+= MEDSPLITTER_SCOTCHGraph.cxx
 endif
 
-libmedsplitter_la_CPPFLAGS= $(MPI_INCLUDES) $(MED3_INCLUDES) $(HDF5_INCLUDES) @CXXTMPDPTHFLAGS@ \
+libmedsplitter_la_CPPFLAGS= $(MPI_INCLUDES) $(MED3_INCLUDES) $(HDF5_INCLUDES) \
 	$(BOOST_CPPFLAGS) $(LIBXML_INCLUDES) \
 	-I$(srcdir)/../MEDMEM \
 	-I$(srcdir)/../INTERP_KERNEL \
@@ -99,9 +99,11 @@ if MED_ENABLE_SCOTCH
   libmedsplitter_la_LDFLAGS+= $(SCOTCH_LIBS)
 endif
 if MED_ENABLE_KERNEL
-  libmedsplitter_la_CPPFLAGS+= ${KERNEL_CXXFLAGS} $(BOOST_CPPFLAGS)
+  libmedsplitter_la_CPPFLAGS+= $(BOOST_CPPFLAGS)
   libmedsplitter_la_LDFLAGS+= ${KERNEL_LDFLAGS} -lSALOMELocalTrace $(BOOST_LIBS)
 endif
+
+libmedsplitter_la_CXXFLAGS = @CXXTMPDPTHFLAGS@
 
 libmedsplitter_la_LDFLAGS+= $(MED3_LIBS_C_ONLY) $(HDF5_LIBS) $(STDLIB) $(LIBXML_LIBS) $(MPI_LIBS) \
 	../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la
@@ -112,6 +114,7 @@ bin_PROGRAMS= medsplitter
 dist_medsplitter_SOURCES= medsplitter.cxx
 
 medsplitter_CPPFLAGS= $(libmedsplitter_la_CPPFLAGS)
+
 medsplitter_LDADD= $(libmedsplitter_la_LDFLAGS) -lm libmedsplitter.la
 if MED_ENABLE_KERNEL
   medsplitter_LDADD+= -lSALOMEBasics
@@ -122,7 +125,10 @@ if MPI_IS_OK
   dist_medsplitter_para_SOURCES= medsplitter_para.cxx
   medsplitter_para_CPPFLAGS= $(medsplitter_CPPFLAGS)
   medsplitter_para_LDADD= $(medsplitter_LDADD)
+  medsplitter_para_CXXFLAGS=@CXXTMPDPTHFLAGS@
 endif
+
+medsplitter_CXXFLAGS = @CXXTMPDPTHFLAGS@
 
 OBSOLETE_FILES = \
 	MEDSPLITTER_SequentialTopology.cxx \
