@@ -320,15 +320,7 @@ if test "$with_interp_kernel_only" != "yes" ; then
     AC_ENABLE_SPLITTER(yes)
     
     if test "x$ENABLE_SPLITTER" = "xyes"; then
-        
-        echo  
-        echo --------------------------------------------- 
-        echo testing METIS 
-        echo ---------------------------------------------
-        echo 
-        metis_ok=no 
-        CHECK_METIS dnl metis_ok is set to yes by CHECK_METIS
-        
+
         echo  
         echo --------------------------------------------- 
         echo testing ParMETIS 
@@ -336,6 +328,14 @@ if test "$with_interp_kernel_only" != "yes" ; then
         echo 
         parmetis_ok=no 
         CHECK_PARMETIS dnl parmetis_ok is set to yes by CHECK_PARMETIS
+
+        echo  
+        echo --------------------------------------------- 
+        echo testing METIS 
+        echo ---------------------------------------------
+        echo 
+        metis_ok=no 
+        CHECK_METIS dnl metis_ok is set to yes by CHECK_METIS
         
         echo  
         echo --------------------------------------------- 
@@ -502,8 +502,8 @@ AM_CONDITIONAL(MED_ENABLE_GUI,      [test "${gui_ok}" = "yes"])
 AM_CONDITIONAL(MED_ENABLE_SSTREAM,  [test "$HAVE_SSTREAM" = yes])
 AM_CONDITIONAL(MED_SWIG_1_3_21,     [test "$SWIG_VERSION" = 1.3.21])
 AM_CONDITIONAL(MED_ENABLE_SPLITTER, [test "$ENABLE_SPLITTER" = yes])
-AM_CONDITIONAL(MED_ENABLE_METIS,    [test "$ENABLE_METIS" = yes])
 AM_CONDITIONAL(MED_ENABLE_PARMETIS, [test "$ENABLE_PARMETIS" = yes])
+AM_CONDITIONAL(MED_ENABLE_METIS,    [test "$ENABLE_METIS" = yes])
 AM_CONDITIONAL(MED_ENABLE_SCOTCH,   [test "$ENABLE_SCOTCH" = yes])
 AM_CONDITIONAL(MED_WITHMPI,         [test "$WITHMPI" = yes])
 AM_CONDITIONAL(MED_ENABLE_FVM,      [test "$ENABLE_FVM" = yes])
@@ -710,6 +710,8 @@ AC_OUTPUT([ \
         src/MEDSPLITTER/Makefile \
         src/MEDSPLITTER/Test/Makefile \
         src/MEDSPLITTER_Swig/Makefile \
+	src/MEDPartitioner/Makefile \
+        src/MEDPartitioner/Test/Makefile \
         src/RENUMBER/Makefile \
         src/ParaMEDCouplingCorba/Makefile \
         src/ParaMEDMEM/Makefile \
