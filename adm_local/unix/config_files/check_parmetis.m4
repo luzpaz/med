@@ -37,17 +37,17 @@ ENABLE_PARMETIS="no"
 AC_CHECKING(for ParMETIS location)
 AC_ARG_WITH(parmetis,
             [  --with-parmetis=DIR      root directory path to ParMETIS library installation ],
-            [METISDIR="$withval"
+            [PARMETISDIR="$withval"
              AC_MSG_RESULT("select $withval as path to ParMETIS library")])
 
-AC_MSG_RESULT(\$METISDIR = ${METISDIR})
+AC_MSG_RESULT(\$PARMETISDIR = ${PARMETISDIR})
 
 CPPFLAGS_old="${CPPFLAGS}"
 LIBS_old=$LIBS
 
-if test "x${METISDIR}" != "x" ; then
-  PARMETIS_CPPFLAGS="-DENABLE_PARMETIS -I${METISDIR} ${MPI_INCLUDES}"
-  PARMETIS_LIBS="-L${METISDIR} -lparmetis -lmetis ${MPI_LIBS}"
+if test "x${PARMETISDIR}" != "x" ; then
+  PARMETIS_CPPFLAGS="-DMED_ENABLE_PARMETIS -I${PARMETISDIR}/include ${MPI_INCLUDES}"
+  PARMETIS_LIBS="-L${PARMETISDIR}/lib -lparmetis -lmetis ${MPI_LIBS}"
 fi
 
 parmetis_ok=no
@@ -59,17 +59,10 @@ AC_CHECKING(for ParMETIS headers)
 CPPFLAGS="${CPPFLAGS_old} ${PARMETIS_CPPFLAGS}"
 
 parmetis_include_dir_ok=yes
-if test "x${METISDIR}" != "x" ; then
-  AC_CHECK_FILE(${METISDIR}/parmetis.h,
-                parmetis_include_dir_ok=yes,
-                parmetis_include_dir_ok=no)
-fi
-
-if test "x${parmetis_include_dir_ok}" = "xyes" ; then
-  AC_TRY_COMPILE([#include <parmetis.h>],
-                 [ParMETIS_V3_PartGeom(0,0,0,0,0)],
-                 parmetis_headers_ok=yes,
-                 parmetis_headers_ok=no)
+if test "x${PARMETISDIR}" != "x" ; then
+  AC_CHECK_FILE(${PARMETISDIR}/include/parmetis.h,
+                parmetis_headers_ok=yes,
+                parmetis_headers_ok=no)
 fi
 
 if test "x${parmetis_headers_ok}" = "xyes" ; then
@@ -80,18 +73,9 @@ AC_MSG_RESULT(for ParMETIS headers: $parmetis_headers_ok)
 if test "x${parmetis_headers_ok}" = "xyes" ; then
   dnl ParMETIS binaries
   AC_CHECKING(for ParMETIS binaries)
-  parmetis_lib_dir_ok=yes
-  AC_CHECK_FILE(${METISDIR}/libparmetis.a,
-                parmetis_lib_dir_ok=yes,
-                parmetis_lib_dir_ok=no)
-
-  if test "x${parmetis_lib_dir_ok}" = "xyes" ; then
-    LIBS="${LIBS_old} ${PARMETIS_LIBS}"
-    AC_TRY_LINK([#include <parmetis.h>],
-                [ParMETIS_V3_PartGeom(0,0,0,0,0)],
+  AC_CHECK_FILE(${PARMETISDIR}/lib/libparmetis.a,
                 parmetis_binaries_ok=yes,
                 parmetis_binaries_ok=no)
-  fi
 fi
 
 if test "x${parmetis_binaries_ok}" = "xyes" ; then
@@ -108,10 +92,10 @@ if test "x${parmetis_headers_ok}" = "xyes" ; then
     ENABLE_PARMETIS="yes"
     # ParMETIS includes METIS, so we redefine METIS cppflags and libs
     # And metis.h #include parmetis.h + mpi.h
-    metis_ok=yes
-    ENABLE_METIS="yes"
-    METIS_CPPFLAGS="-DENABLE_METIS -I${METISDIR}/METISLib ${PARMETIS_CPPFLAGS}"
-    METIS_LIBS="-L${METISDIR} -lmetis ${MPI_LIBS}"
+    #metis_ok=yes
+    #ENABLE_METIS="yes"
+    #METIS_CPPFLAGS="-DENABLE_METIS -I${METISDIR}/METISLib ${PARMETIS_CPPFLAGS}"
+    #METIS_LIBS="-L${METISDIR} -lmetis ${MPI_LIBS}"
   fi
 fi
 

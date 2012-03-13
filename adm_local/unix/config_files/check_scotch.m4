@@ -70,7 +70,7 @@ for d in ${SCOTCHDIR}/include ${SCOTCHDIR}/include/scotch ${SCOTCHDIR}/bin ${SCO
                 [scotch_include_dir_ok=no])
 
   if test "x${scotch_include_dir_ok}" = "xyes" ; then
-    LOCAL_INCLUDES="-DENABLE_SCOTCH -I${d} ${MPI_INCLUDES}"
+    LOCAL_INCLUDES="-DMED_ENABLE_SCOTCH -I${d} ${MPI_INCLUDES}"
     CPPFLAGS="${CPPFLAGS_old} ${LOCAL_INCLUDES} -std=c99"
     AC_TRY_COMPILE([
       #include <stdio.h>
