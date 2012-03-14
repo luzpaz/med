@@ -184,7 +184,7 @@ void MEDSPLITTERTest::testMESHCollection_read_para()
   Topology* topo=0;
   CPPUNIT_ASSERT_THROW(topo=collection.createPartition(0,Graph::METIS),MEDEXCEPTION);
   if (topo!=0) delete topo;
-#ifdef ENABLE_METIS
+#ifdef MED_ENABLE_METIS
   CPPUNIT_ASSERT_NO_THROW(topo=collection.createPartition(2,Graph::METIS));
 #else
   CPPUNIT_ASSERT_THROW(topo=collection.createPartition(2,Graph::METIS), MEDEXCEPTION);
@@ -263,7 +263,7 @@ void MEDSPLITTERTest::testMESHCollection_square()
     
   MESHCollection collection(filename_rd,meshname);
   MEDSPLITTER::Topology* topo;
-#ifdef ENABLE_METIS
+#ifdef MED_ENABLE_METIS
   CPPUNIT_ASSERT_NO_THROW(topo = collection.createPartition(2,Graph::METIS));
 #else
   CPPUNIT_ASSERT_THROW(topo = collection.createPartition(2,Graph::METIS), MEDEXCEPTION);
@@ -643,7 +643,7 @@ void MEDSPLITTERTest::testMESHCollection_indivisible()
   MESHCollection collection(filename_rd,meshname);
   collection.setIndivisibleGroup(family);
   Topology* topo;
-#ifdef ENABLE_SCOTCH
+#ifdef MED_ENABLE_SCOTCH
   CPPUNIT_ASSERT_NO_THROW(topo = collection.createPartition(4,Graph::SCOTCH));
 #else
   CPPUNIT_ASSERT_THROW(topo = collection.createPartition(4,Graph::SCOTCH), MEDEXCEPTION);
@@ -917,7 +917,7 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
   string meshname="maa1";
   MESHCollection collection(filename_rd,meshname);
   Topology* topo2;
-#ifdef ENABLE_METIS
+#ifdef MED_ENABLE_METIS
   CPPUNIT_ASSERT_NO_THROW(topo2 = collection.createPartition(2,Graph::METIS));
 #else
   CPPUNIT_ASSERT_THROW(topo2 = collection.createPartition(2,Graph::METIS), MEDEXCEPTION);
@@ -930,7 +930,7 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence()
   MESHCollection new_collection2(filename_para_wr);
   CPPUNIT_ASSERT_EQUAL(collection.getName(),new_collection2.getName());
   Topology* topo3;
-#ifdef ENABLE_SCOTCH
+#ifdef MED_ENABLE_SCOTCH
   CPPUNIT_ASSERT_NO_THROW(topo3 = new_collection2.createPartition(3,Graph::SCOTCH));
 #else
   CPPUNIT_ASSERT_THROW(topo3 = new_collection2.createPartition(3,Graph::SCOTCH), MEDEXCEPTION);
@@ -1006,7 +1006,7 @@ void MEDSPLITTERTest::testMESHCollection_complete_sequence_with_polygon()
 
   MESHCollection new_collection4(filename_para2_wr);
   Topology* topo1;
-#ifdef ENABLE_METIS
+#ifdef MED_ENABLE_METIS
   CPPUNIT_ASSERT_NO_THROW(topo1 = new_collection4.createPartition(1,Graph::METIS));
 #else
   CPPUNIT_ASSERT_THROW(topo1 = new_collection4.createPartition(1,Graph::METIS), MEDEXCEPTION);

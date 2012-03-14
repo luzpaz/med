@@ -36,7 +36,7 @@
 #include "MEDSPLITTER_MESHCollection.hxx"
 #include "MEDSPLITTER_MESHCollectionDriver.hxx"
 
-#ifdef ENABLE_METIS
+#ifdef MED_ENABLE_METIS
 #include "MEDSPLITTER_METISGraph.hxx"
 #endif
 //#include "MEDSPLITTER_SCOTCHGraph.hxx"
@@ -105,7 +105,7 @@ using namespace MEDMEM;
  
 void MEDSPLITTERTest::testParallelTopology_graph_constructor()
 {
-#ifndef ENABLE_METIS
+#ifndef MED_ENABLE_METIS
   CPPUNIT_FAIL("METIS is not available. Please, check your compilation.");
 #else
   string filename_rd        = MEDSPLITTERTest_Utils::getResourceFile("carre_en_quad4.med");
@@ -232,5 +232,5 @@ void MEDSPLITTERTest::testParallelTopology_graph_constructor()
   delete[] local_nodes;
   delete[] ip_nodes;
   delete[] full_array;
-#endif // ENABLE_METIS
+#endif // MED_ENABLE_METIS
 }

@@ -45,8 +45,8 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-#ifndef ENABLE_METIS
-#ifndef ENABLE_SCOTCH
+#ifndef MED_ENABLE_METIS
+#ifndef MED_ENABLE_SCOTCH
   cout << "Sorry, no one split method is available. Please, compile with METIS or SCOTCH."<<endl;
   return 1;
 #endif
@@ -79,8 +79,8 @@ int main(int argc, char** argv)
     ("input-file",po::value<string>(),"name of the input MED file")
     ("output-file",po::value<string>(),"name of the resulting file")
     ("meshname",po::value<string>(),"name of the input mesh")
-#ifdef ENABLE_METIS
-#ifdef ENABLE_SCOTCH
+#ifdef MED_ENABLE_METIS
+#ifdef MED_ENABLE_SCOTCH
     ("split-method",po::value<string>(&library)->default_value("metis"),"name of the splitting library (metis,scotch)")
 #endif
 #endif
@@ -155,8 +155,8 @@ int main(int argc, char** argv)
                "\t--output-file=<string> : name of the resulting file\n"
                "\t--meshname=<string>    : name of the input mesh (not used with --distributed option)\n"
                "\t--ndomains=<number>    : number of subdomains in the output file, default is 1\n"
-#ifdef ENABLE_METIS
-#ifdef ENABLE_SCOTCH
+#ifdef MED_ENABLE_METIS
+#ifdef MED_ENABLE_SCOTCH
                "\t--split-method=<string>: name of the splitting library (metis/scotch), default is metis\n"
 #endif
 #endif
@@ -270,11 +270,11 @@ int main(int argc, char** argv)
   cout << "MEDSPLITTER - computing partition "<<endl;
 
   // Creating the graph and partitioning it
-#ifdef ENABLE_METIS
+#ifdef MED_ENABLE_METIS
   if ( library.empty() )
     library = "metis";
 #else
-#ifdef ENABLE_SCOTCH
+#ifdef MED_ENABLE_SCOTCH
   if ( library.empty() )
     library = "scotch";
 #endif
