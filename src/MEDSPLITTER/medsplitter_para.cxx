@@ -45,7 +45,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-#ifndef ENABLE_PARMETIS
+#ifndef MED_ENABLE_PARMETIS
 #ifndef ENABLE_PTSCOTCH
   cout << "Sorry, no one split method is available. Please, compile with ParMETIS or PT-SCOTCH."<<endl;
   return 1;
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
     ("input-file",po::value<string>(),"name of the input MED file")
     ("output-file",po::value<string>(),"name of the resulting file")
     //("meshname",po::value<string>(),"name of the input mesh")
-#ifdef ENABLE_PARMETIS
+#ifdef MED_ENABLE_PARMETIS
 #ifdef ENABLE_PTSCOTCH
     ("split-method",po::value<string>(&library)->default_value("metis"),"name of the splitting library (metis,scotch)")
 #endif
@@ -160,7 +160,7 @@ int main(int argc, char** argv)
                "\t--output-file=<string>  : name of the resulting file\n"
                //"\t--meshname=<string>    : name of the input mesh (not used with --distributed option)\n"
                "\t--ndomains=<number>     : number of subdomains in the output file, default is 1\n"
-#ifdef ENABLE_PARMETIS
+#ifdef MED_ENABLE_PARMETIS
 #ifdef ENABLE_PTSCOTCH
                "\t--split-method=<string> : name of the splitting library (metis/scotch), default is metis\n"
 #endif
@@ -278,7 +278,7 @@ int main(int argc, char** argv)
 
   // Creating the graph and partitioning it   
   cout << "MEDSPLITTER - computing partition "<<endl;
-#ifdef ENABLE_PARMETIS
+#ifdef MED_ENABLE_PARMETIS
 #ifndef ENABLE_PTSCOTCH
   library = "metis";
 #endif

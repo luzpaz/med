@@ -17,7 +17,7 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifdef ENABLE_PARMETIS
+#ifdef MED_ENABLE_PARMETIS
 #include <parmetis.h>
 #endif
 extern "C" {
@@ -73,7 +73,7 @@ void METISGraph::partGraph(int                 ndomain,
   {
     if ( parallelizer )
     {
-#ifdef ENABLE_PARMETIS
+#ifdef MED_ENABLE_PARMETIS
       // distribution of vertices of the graph among the processors
       int * vtxdist = parallelizer ? parallelizer->getNbVertOfProcs() : 0;
       MPI_Comm comm = MPI_COMM_WORLD;
