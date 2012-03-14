@@ -45,12 +45,12 @@ PARAMEDMEM_SUBDIRS =
 
 if MPI_IS_OK
   PARAMEDMEM_SUBDIRS += ParaMEDMEM
-  if MED_ENABLE_MED3
+if MED_ENABLE_MED3
     PARAMEDMEM_SUBDIRS += ParaMEDLoader
-    if CPPUNIT_IS_OK
+if CPPUNIT_IS_OK
       PARAMEDMEM_SUBDIRS += ParaMEDMEMTest
-    endif
-  endif
+endif
+endif
 endif
 
 ###
