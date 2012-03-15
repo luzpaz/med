@@ -68,8 +68,14 @@ MEDSPLITTER_ParaDomainSelector.cxx \
 MEDSPLITTER_MeshSendReceive.cxx \
 MEDSPLITTER_JointExchangeData.cxx
 
+if MPI_IS_OK
+if MED_ENABLE_PARMETIS
+    dist_libmedsplitter_la_SOURCES+= MEDSPLITTER_METISGraph.cxx
+endif
+else !MPI_IS_OK
 if MED_ENABLE_METIS
     dist_libmedsplitter_la_SOURCES+= MEDSPLITTER_METISGraph.cxx
+endif
 endif
 if MED_ENABLE_SCOTCH
     dist_libmedsplitter_la_SOURCES+= MEDSPLITTER_SCOTCHGraph.cxx
@@ -86,13 +92,16 @@ libmedsplitter_la_LDFLAGS=
 #libmedsplitter_la_LDFLAGS= $(MED3_LIBS_C_ONLY) $(HDF5_LIBS) $(STDLIB) $(LIBXML_LIBS) \
 #	../MEDMEM/libmedmem.la ../MEDWrapper/V2_1/Core/libmed_V2_1.la
 
+if MPI_IS_OK
 if MED_ENABLE_PARMETIS
   libmedsplitter_la_CPPFLAGS+= $(PARMETIS_CPPFLAGS)
   libmedsplitter_la_LDFLAGS+= $(PARMETIS_LIBS)
 endif
+else !MPI_IS_OK
 if MED_ENABLE_METIS
   libmedsplitter_la_CPPFLAGS+= $(METIS_CPPFLAGS)
   libmedsplitter_la_LDFLAGS+= $(METIS_LIBS)
+endif
 endif
 if MED_ENABLE_SCOTCH
   libmedsplitter_la_CPPFLAGS+= $(SCOTCH_CPPFLAGS)

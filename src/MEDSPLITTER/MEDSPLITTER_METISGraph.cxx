@@ -20,9 +20,12 @@
 #ifdef MED_ENABLE_PARMETIS
 #include <parmetis.h>
 #endif
+#ifdef MED_ENABLE_METIS
 extern "C" {
 #include <metis.h>
 }
+#endif
+
 #include "MEDSPLITTER_METISGraph.hxx"
 #include "MEDSPLITTER_ParaDomainSelector.hxx"
 
@@ -86,12 +89,16 @@ void METISGraph::partGraph(int                 ndomain,
     }
     else
     {
+#ifdef MED_ENABLE_METIS
       if (options_string != "k")
         METIS_PartGraphRecursive(&n, xadj, adjncy, vwgt, adjwgt, &wgtflag,
                                  &base, &nparts, options, &edgecut, partition);
       else
         METIS_PartGraphKway(&n, xadj, adjncy, vwgt, adjwgt, &wgtflag,
                             &base, &nparts, options, &edgecut, partition);
+#else
+      throw MED_EXCEPTION("METIS is not available. Check your products, please.");
+#endif
     }
   }
   else
