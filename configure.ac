@@ -710,8 +710,6 @@ AC_OUTPUT([ \
         src/MEDSPLITTER/Makefile \
         src/MEDSPLITTER/Test/Makefile \
         src/MEDSPLITTER_Swig/Makefile \
-	src/MEDPartitioner/Makefile \
-        src/MEDPartitioner/Test/Makefile \
         src/RENUMBER/Makefile \
         src/ParaMEDCouplingCorba/Makefile \
         src/ParaMEDMEM/Makefile \
