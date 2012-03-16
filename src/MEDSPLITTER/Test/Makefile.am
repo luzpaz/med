@@ -68,8 +68,28 @@ if MED_ENABLE_SCOTCH
 endif
 libMEDSPLITTERTest_la_CXXFLAGS = @CXXTMPDPTHFLAGS@
 
+dist_salomescript_DATA = testMEDSPLITTER.py
+
+UNIT_TEST_PROG = TestMEDSPLITTER
+
+# parallel exe
+if MPI_IS_OK
+if MED_ENABLE_PARMETIS
+  bin_PROGRAMS = TestParaMEDSPLITTER
+  TestParaMEDSPLITTER_SOURCES= TestParaMEDSPLITTER.cxx
+  TestParaMEDSPLITTER_CPPFLAGS = $(TestMEDSPLITTER_CPPFLAGS) $(MPI_INCLUDES)
+  TestParaMEDSPLITTER_CXXFLAGS = @CXXTMPDPTHFLAGS@
+  TestParaMEDSPLITTER_LDADD = $(MED3_LIBS_C_ONLY) $(libMEDSPLITTERTest_la_LDFLAGS) -lm \
+	libMEDSPLITTERTest.la ../../MEDWrapper/V2_1/Core/libmed_V2_1.la \
+	../../MEDMEM/libmedmem.la ../../INTERP_KERNEL/libinterpkernel.la \
+	../libmedsplitter.la $(HDF5_LIBS) $(MPI_LIBS) @CPPUNIT_LIBS@
+  dist_salomescript_DATA += testParaMEDSPLITTER.py
+  TESTS = TestParaMEDSPLITTER
+endif
+else !MPI_IS_OK
+if MED_ENABLE_METIS
 # Executables targets
-bin_PROGRAMS= TestMEDSPLITTER
+bin_PROGRAMS = TestMEDSPLITTER
 
 TestMEDSPLITTER_SOURCES= TestMEDSPLITTER.cxx
 
@@ -78,25 +98,12 @@ TestMEDSPLITTER_CXXFLAGS = @CXXTMPDPTHFLAGS@
 TestMEDSPLITTER_LDADD= $(MED3_LIBS_C_ONLY) $(libMEDSPLITTERTest_la_LDFLAGS) -lm \
 	libMEDSPLITTERTest.la ../../MEDWrapper/V2_1/Core/libmed_V2_1.la \
 	../../MEDMEM/libmedmem.la ../../INTERP_KERNEL/libinterpkernel.la \
-	../libmedsplitter.la 
+	../libmedsplitter.la
+ TESTS = TestMEDSPLITTER
 if MED_ENABLE_KERNEL
      TestMEDSPLITTER_LDADD+= -lSALOMEBasics
 endif
-
-dist_salomescript_DATA = testMEDSPLITTER.py
-
-UNIT_TEST_PROG = TestMEDSPLITTER
-
-# parallel exe
-
-if MED_ENABLE_PARMETIS
-  bin_PROGRAMS+= TestParaMEDSPLITTER
-  TestParaMEDSPLITTER_SOURCES= TestParaMEDSPLITTER.cxx
-  TestParaMEDSPLITTER_CPPFLAGS = $(TestMEDSPLITTER_CPPFLAGS) $(MPI_INCLUDES)
-  TestParaMEDSPLITTER_CXXFLAGS = @CXXTMPDPTHFLAGS@
-  TestParaMEDSPLITTER_LDADD = $(TestMEDSPLITTER_LDADD) $(HDF5_LIBS)
-  dist_salomescript_DATA += testParaMEDSPLITTER.py
-  TESTS = TestParaMEDSPLITTER
+endif
 endif
 
 check: tests

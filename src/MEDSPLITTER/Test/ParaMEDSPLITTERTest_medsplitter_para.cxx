@@ -85,7 +85,7 @@ void ParaMEDSPLITTERTest::test_medsplitter_para( const string& med_file, const s
   if ( dom_sel.rank() == 0 )
   {
     MESHCollection collection_1(med_file,meshname);
-    auto_ptr<Topology> new_topo_2( collection_1.createPartition( 2, Graph::METIS ));
+    auto_ptr<Topology> new_topo_2( collection_1.createPartition( 2, Graph::SCOTCH ));
 
     MESHCollection collection_2w( collection_1, new_topo_2.get());
     collection_2w.setDriverType(MEDSPLITTER::MedAscii);

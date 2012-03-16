@@ -47,7 +47,7 @@
 
 #include "MEDSPLITTER_UserGraph.hxx"
 
-#ifdef MED_ENABLE_METIS
+#if defined(MED_ENABLE_METIS) || defined(MED_ENABLE_PARMETIS)
 #include "MEDSPLITTER_METISGraph.hxx"
 #endif
 #ifdef MED_ENABLE_SCOTCH
@@ -1174,7 +1174,7 @@ Topology* MESHCollection::createPartition(int nbdomain,
   switch (split)
   {
   case Graph::METIS:
-#ifdef MED_ENABLE_METIS
+#if defined(MED_ENABLE_METIS) || defined(MED_ENABLE_PARMETIS)
     _cell_graph=boost::shared_ptr<Graph>(new METISGraph(array,edgeweights));
 #else
     throw MEDEXCEPTION("METIS Graph is not available. Check your products, please.");
