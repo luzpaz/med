@@ -20,6 +20,8 @@
 #ifndef _MEDSPLITTERTEST_HXX_
 #define _MEDSPLITTERTEST_HXX_
 
+#include "MEDSPLITTERTest_defs.hxx"
+
 #include <cppunit/extensions/HelperMacros.h>
 
 #include <set>
@@ -30,7 +32,7 @@ namespace MEDSPLITTER {
   class MESH;
 };
 
-class MEDSPLITTERTest : public CppUnit::TestFixture
+class MEDSPLITTERTEST_EXPORT MEDSPLITTERTest : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE( MEDSPLITTERTest );
   CPPUNIT_TEST( testMESHCollection_constructor );

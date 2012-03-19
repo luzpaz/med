@@ -29,7 +29,12 @@
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
 
+#ifndef WIN32
 #include <sys/time.h>
+#else
+#include <time.h>
+#include <windows.h>
+#endif
 //Debug macros
 #include "MEDMEM_Utilities.hxx"
 
@@ -253,14 +258,22 @@ void MESHCollectionMedXMLDriver::write(char* filename, ParaDomainSelector* domai
   xmlNewProp(node, BAD_CAST "ver", BAD_CAST "1");
 
   //Description tag
-
+  char date[1024];
+#ifndef WIN32
   time_t present;
   time( &present);
   struct tm *time_asc = localtime(&present);
-  char date[1024];
   sprintf(date,"%02d%02d%02d",time_asc->tm_year
           ,time_asc->tm_mon+1
           ,time_asc->tm_mday);
+#else
+  SYSTEMTIME    st;
+  GetLocalTime ( &st );
+  sprintf(date,"%02d%02d%02d",
+          st.wYear
+          ,st.wMonth
+          ,st.wDay);
+#endif
 
   node = xmlNewChild(root_node,0, BAD_CAST "description",0);
 

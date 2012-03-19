@@ -28,8 +28,12 @@
 #include <libxml/parser.h>
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
-
+#ifndef WIN32
 #include <sys/time.h>
+#else
+#include <time.h>
+#include <windows.h>
+#endif
 //Debug macros
 #include "MEDMEM_Utilities.hxx"
 

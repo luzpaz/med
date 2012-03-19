@@ -23,6 +23,7 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 lib_LTLIBRARIES = libMEDSPLITTERTest.la
 
+
 dist_libMEDSPLITTERTest_la_SOURCES= \
 	MEDSPLITTERTest.cxx \
 	MEDSPLITTERTest_MESHCollection.cxx \
@@ -39,7 +40,8 @@ endif
 
 salomeinclude_HEADERS = \
 	MEDSPLITTERTest.hxx \
-	MEDSPLITTERTest_Utils.hxx
+	MEDSPLITTERTest_Utils.hxx \
+	MEDSPLITTERTest_defs.hxx
 
 libMEDSPLITTERTest_la_CPPFLAGS= $(MPI_INCLUDES) @CPPUNIT_INCLUDES@ $(MED3_INCLUDES) \
 	$(HDF5_INCLUDES) $(BOOST_CPPFLAGS) $(LIBXML_CXXFLAGS) \
@@ -47,7 +49,7 @@ libMEDSPLITTERTest_la_CPPFLAGS= $(MPI_INCLUDES) @CPPUNIT_INCLUDES@ $(MED3_INCLUD
 	-I$(srcdir)/../../MEDMEMCppTest -I$(srcdir)/../../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../../INTERP_KERNEL/GaussPoints \
 	-I$(srcdir)/../../INTERP_KERNEL
-libMEDSPLITTERTest_la_LDFLAGS= $(MED3_LIBS_C_ONLY) @CPPUNIT_LIBS@
+libMEDSPLITTERTest_la_LDFLAGS= $(MED3_LIBS_C_ONLY) @CPPUNIT_LIBS@ ../libmedsplitter.la
 
 if MED_ENABLE_KERNEL
     libMEDSPLITTERTest_la_CPPFLAGS+= ${KERNEL_CXXFLAGS}

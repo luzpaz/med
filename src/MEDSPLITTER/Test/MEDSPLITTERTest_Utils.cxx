@@ -28,6 +28,10 @@
 #include <list>
 #include <cstdlib>
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 using namespace std;
 
 namespace MEDSPLITTERTest_Utils
@@ -48,7 +52,12 @@ string getResourceFile( const string& filename )
     resourceFile += "/share/salome/resources/med/";
   }
   resourceFile += filename;
+#ifndef WIN32
   if (access(resourceFile.data(), F_OK) != 0)
+#else
+  if (  GetFileAttributes (  resourceFile.c_str()  ) == 0xFFFFFFFF  )
+    if (  GetLastError () == ERROR_FILE_NOT_FOUND  )
+#endif
     CPPUNIT_FAIL(MEDMEM::STRING("Resource file ")<< filename << " not found");
   
   return resourceFile;
@@ -69,10 +78,11 @@ string getTmpDirectory()
   if ( getenv("TMP") ) dirs.push_back( getenv("TMP" ));
   if ( getenv("TMPDIR") ) dirs.push_back( getenv("TMPDIR" ));
   dirs.push_back( "/tmp" );
-
+#ifndef WIN32
   for ( list<string>::iterator dir = dirs.begin(); dir != dirs.end(); ++dir )
     if ( access( dir->data(), W_OK ) == 0 )
       return *dir;
+#endif
 
   CPPUNIT_FAIL("Can't find writable temporary directory. Set TMP environment variable correctly");
   return "";
@@ -112,8 +122,13 @@ MEDSPLITTERTest_TmpFilesRemover::~MEDSPLITTERTest_TmpFilesRemover()
 {
   set< string>::iterator it = myTmpFiles.begin();
   for (; it != myTmpFiles.end(); it++) {
+#ifndef WIN32
     if (access((*it).data(), F_OK) == 0)
+#else 
+
+#endif
       remove((*it).data());
+
   }
   myTmpFiles.clear();
 }

@@ -17,22 +17,18 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  File   : MEDSPLITTER.hxx
-//  Author : Alexander A. BORODIN
-//  Module : MED
-//  Exporting/Importing defines for Windows Platform
-//
-#ifndef MEDSPLITTER_HXX_
-#define MEDSPLITTER_HXX_
+#ifndef _MEDSPLITTERTEST_DEFS_HXX_
+#define _MEDSPLITTERTEST_DEFS_HXX_
+
 
 #ifdef WIN32
-# if defined MEDSPLITTER_EXPORTS || defined medsplitter_EXPORTS
-#  define MEDSPLITTER_EXPORT __declspec( dllexport )
+# if defined MEDSPLITTERTEST_EXPORTS || defined MEDSPLITTERTest_EXPORTS
+#  define MEDSPLITTERTEST_EXPORT __declspec( dllexport )
 # else
-#  define MEDSPLITTER_EXPORT __declspec( dllimport )
+#  define MEDSPLITTERTEST_EXPORT __declspec( dllimport )
 # endif
 #else
-# define MEDSPLITTER_EXPORT
+# define MEDSPLITTERTEST_EXPORT
 #endif
 
-#endif //MEDSPLITTER_HXX_
+#endif //_MEDSPLITTERTEST_DEFS_HXX_
