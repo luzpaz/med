@@ -102,6 +102,6 @@ SUBDIRS = $(COMMON_SUBDIRS) $(PARAMEDMEM_SUBDIRS) $(BASE_SUBDIRS) $(INTERPTEST_S
 
 DIST_SUBDIRS= MEDWrapper INTERP_KERNEL MEDMEM MEDCoupling MEDCoupling_Swig MEDMEM_SWIG    \
               MEDMEMBinTest MEDMEMCppTest INTERP_KERNELTest ParaMEDMEM ParaMEDMEM_Swig MEDLoader        \
-	      MEDSPLITTER MEDSPLITTER_Swig MEDPartitioner RENUMBER MEDCouplingCorba MEDCouplingCorba_Swig      \
+	      MEDSPLITTER MEDSPLITTER_Swig RENUMBER MEDCouplingCorba MEDCouplingCorba_Swig      \
 	      MEDMEM_I MED MED_SWIG MedCorba_Swig ParaMEDLoader MedClient ParaMEDMEMComponent           \
 	      ParaMEDCouplingCorba MEDCalculator MEDGUI ParaMEDMEMTest
