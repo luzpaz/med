@@ -672,7 +672,7 @@ AC_OUTPUT([ \
         adm_local_without_kernel/unix/Makefile \
         adm_local_without_kernel/Makefile \
         resources/Makefile
-	resources/SalomeApp.xml \
+        resources/SalomeApp.xml \
         resources/MEDCatalog.xml \
         bin/Makefile \
         bin/VERSION \
@@ -695,21 +695,23 @@ AC_OUTPUT([ \
         src/INTERP_KERNELTest/Makefile \
         src/MEDCoupling/Makefile \
         src/MEDCoupling/Test/Makefile \
-	src/MEDLoader/Makefile \
- 	src/MEDLoader/Swig/Makefile \
-	src/MEDLoader/Test/Makefile \
+        src/MEDLoader/Makefile \
+        src/MEDLoader/Swig/Makefile \
+        src/MEDLoader/Test/Makefile \
         src/MEDCoupling_Swig/Makefile \
         src/MEDCouplingCorba/Makefile \
         src/MEDCouplingCorba/Client/Makefile \
         src/MEDCouplingCorba/Test/Makefile \
-	src/MEDCouplingCorba_Swig/Makefile \
-	src/MEDCouplingCorba_Swig/Client/Makefile \
-	src/MEDCalculator/Makefile \
-	src/MEDCalculator/Swig/Makefile \
-	src/MEDCalculator/Test/Makefile \
+        src/MEDCouplingCorba_Swig/Makefile \
+        src/MEDCouplingCorba_Swig/Client/Makefile \
+        src/MEDCalculator/Makefile \
+        src/MEDCalculator/Swig/Makefile \
+        src/MEDCalculator/Test/Makefile \
         src/MEDSPLITTER/Makefile \
         src/MEDSPLITTER/Test/Makefile \
         src/MEDSPLITTER_Swig/Makefile \
+        src/MEDPartitioner/Makefile \
+        src/MEDPartitioner/Test/Makefile \
         src/RENUMBER/Makefile \
         src/ParaMEDCouplingCorba/Makefile \
         src/ParaMEDMEM/Makefile \
@@ -748,8 +750,8 @@ AC_OUTPUT([ \
         doc/salome/Makefile \
         doc/salome/tui/Makefile \
         doc/salome/tui/doxyfile \
-	doc/salome/tui/static/header.html \
+        doc/salome/tui/static/header.html \
         doc/doxygen/Makefile \
         doc/doxygen/Doxyfile_med_user \
-	doc/doxygen/static/header.html \
+        doc/doxygen/static/header.html \
 ])
