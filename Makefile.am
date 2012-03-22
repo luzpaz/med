@@ -24,6 +24,8 @@
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
+EXTRA_DIST += CMakeLists.txt
+
 if MED_ENABLE_KERNEL
 if MED_ENABLE_GUI
   ACLOCAL_AMFLAGS = -I adm_local/unix/config_files			\

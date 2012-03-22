@@ -19,6 +19,8 @@
 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
+EXTRA_DIST += CMakeLists.txt
+
 ###
 # MEDLoader and Test sub-folders are available only if MED3 is detected ok
 ### 
