@@ -33,5 +33,6 @@
 
 #define MED_VERSION_STR "@VERSION@"
 #define MED_VERSION     @XVERSION@
+#define MED_DEVELOPMENT @VERSION_DEV@
 
 #endif // __MED_VERSION_H__
