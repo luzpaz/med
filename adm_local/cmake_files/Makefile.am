@@ -24,4 +24,9 @@ admlocal_cmakedir = $(admlocaldir)/cmake_files
 dist_admlocal_cmake_DATA = \
 FindMEDFILE.cmake \
 FindMED.cmake \
-FindXDR.cmake
+FindXDR.cmake \
+FindMETIS.cmake \
+FindPARMETIS.cmake \
+FindRENUMBER.cmake \
+FindSCOTCH.cmake \
+FindSPLITTER.cmake
