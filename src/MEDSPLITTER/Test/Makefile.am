@@ -113,5 +113,5 @@ bin_PROGRAMS = $(PARA_BIN_TEST_PROGS) $(BIN_TEST_PROGRS)
 
 check: tests
 
-CLEANFILES =            \
-        UnitTestsResult
+clean-local:
+	rm -f UnitTestsResult*

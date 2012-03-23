@@ -87,13 +87,20 @@ mostlyclean-local:
 tests: unittest
 
 unittest: $(UNIT_TEST_PROG)
-	@if test "x$(UNIT_TEST_PROG)" != "x"; then   \
+	@if test "x$(UNIT_TEST_PROG)" != "x"; then \
 	    for exe in $(UNIT_TEST_PROG) ; do \
-	        env top_srcdir=@top_srcdir@ ./$$exe;             \
-	        if [[ `awk '{ print $$1 }' UnitTestsResult` != "OK" ]]; then \
-	    	    cat UnitTestsResult;                 \
-	    	    exit 10;                             \
-	        fi;                                      \
+	        env top_srcdir=@top_srcdir@ ./$$exe; \
+	        err=0; \
+	        for f in `find -name "UnitTestsResult*"` XXX ; do \
+	            if [[ $$f == XXX ]] ; then continue ; fi ; \
+                    if [[ `awk '{ print $$1 }' $$f` != "OK" ]]; then \
+	                cat $$f; \
+	                err=1; \
+	            fi; \
+	        done; \
+	        if [[ $$err == 1 ]] ; then \
+	            exit 10; \
+	        fi; \
 	    done; \
 	fi;
 
