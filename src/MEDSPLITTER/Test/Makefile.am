@@ -84,7 +84,7 @@ if MED_ENABLE_PARMETIS
 	../../MEDMEM/libmedmem.la ../../INTERP_KERNEL/libinterpkernel.la \
 	../libmedsplitter.la $(HDF5_LIBS) $(MPI_LIBS) @CPPUNIT_LIBS@
   dist_salomescript_DATA += testParaMEDSPLITTER.py
-  TESTS = TestParaMEDSPLITTER
+#  TESTS = TestParaMEDSPLITTER
   UNIT_TEST_PROG = TestParaMEDSPLITTER
 endif
 else !MPI_IS_OK
@@ -101,7 +101,7 @@ TestMEDSPLITTER_LDADD= $(MED3_LIBS_C_ONLY) $(libMEDSPLITTERTest_la_LDFLAGS) -lm 
 	libMEDSPLITTERTest.la ../../MEDWrapper/V2_1/Core/libmed_V2_1.la \
 	../../MEDMEM/libmedmem.la ../../INTERP_KERNEL/libinterpkernel.la \
 	../libmedsplitter.la
- TESTS = TestMEDSPLITTER
+# TESTS = TestMEDSPLITTER
  UNIT_TEST_PROG = TestMEDSPLITTER
 if MED_ENABLE_KERNEL
      TestMEDSPLITTER_LDADD+= -lSALOMEBasics
