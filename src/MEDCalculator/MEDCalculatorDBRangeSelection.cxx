@@ -129,8 +129,7 @@ void MEDCalculatorDBRangeSelection::setValue(const char *v) throw(INTERP_KERNEL:
             std::istringstream iss(s1);
             iss.exceptions(std::istream::failbit | std::istream::badbit);
             iss >> _start;
-            int pos=iss.tellg();
-            if(pos!=(int)s1.length())
+            if(!iss.eof())
               throw INTERP_KERNEL::Exception("Invalid 1st part of ':' !");
           }
         //
@@ -141,8 +140,7 @@ void MEDCalculatorDBRangeSelection::setValue(const char *v) throw(INTERP_KERNEL:
             std::istringstream iss(s2);
             iss.exceptions(std::istream::failbit | std::istream::badbit);
             iss >> _end;
-            int pos=iss.tellg();
-            if(pos!=(int)s2.length())
+            if(!iss.eof())
               throw INTERP_KERNEL::Exception("Invalid 2nd part of ':' !");
           }
         if(_end>0)
