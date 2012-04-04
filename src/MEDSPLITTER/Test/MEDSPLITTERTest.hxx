@@ -40,11 +40,15 @@ class MEDSPLITTERTEST_EXPORT MEDSPLITTERTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testMESHCollection_read_para);
   CPPUNIT_TEST( testMESHCollection_square);
   CPPUNIT_TEST( testMESHCollection_square_with_faces);
+#ifdef MED_ENABLE_SCOTCH
   CPPUNIT_TEST( testMESHCollection_indivisible);
+#endif
   CPPUNIT_TEST( testMESHCollection_user_partition);
   CPPUNIT_TEST( testParallelTopology_graph_constructor);
+#ifdef MED_ENABLE_SCOTCH
   CPPUNIT_TEST( testMESHCollection_complete_sequence);
   CPPUNIT_TEST( testMESHCollection_complete_sequence_with_polygon);
+#endif
         CPPUNIT_TEST( testMESHCollection_families);
 //  CPPUNIT_TEST( testMESHCollection_complete_sequence_with_polyhedra);
   CPPUNIT_TEST_SUITE_END();
