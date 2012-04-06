@@ -67,6 +67,8 @@ namespace ParaMEDMEM
           PyObject *orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
           // Ask omniORBpy to transform SUPPORT (python Corba) ptr to IOR string
           PyObject *iorField=PyObject_CallMethod(orbPython,(char*)"object_to_string",(char*)"O",fieldPtr);
+          if(!iorField)
+            throw INTERP_KERNEL::Exception("Error : the input parameter of MEDCouplingFieldDoubleClient.New appears to differ from CORBA reference ! Expecting a FieldDouble CORBA reference !");
           char *ior=PyString_AsString(iorField);
           int argc=0;
           CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
@@ -97,6 +99,8 @@ namespace ParaMEDMEM
           PyObject *orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
           // Ask omniORBpy to transform SUPPORT (python Corba) ptr to IOR string
           PyObject *iorField=PyObject_CallMethod(orbPython,(char*)"object_to_string",(char*)"O",fieldPtr);
+          if(!iorField)
+            throw INTERP_KERNEL::Exception("Error : the input parameter of MEDCouplingFieldTemplateClient.New appears to differ from CORBA reference ! Expecting a FieldTemplate CORBA reference !");
           char *ior=PyString_AsString(iorField);
           int argc=0;
           CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
@@ -127,6 +131,8 @@ namespace ParaMEDMEM
           PyObject *orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
           // Ask omniORBpy to transform SUPPORT (python Corba) ptr to IOR string
           PyObject *iorField=PyObject_CallMethod(orbPython,(char*)"object_to_string",(char*)"O",fieldPtr);
+          if(!iorField)
+            throw INTERP_KERNEL::Exception("Error : the input parameter of MEDCouplingFieldTemplateClient.New appears to differ from CORBA reference ! Expecting a MultiFields CORBA reference !");
           char *ior=PyString_AsString(iorField);
           int argc=0;
           CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
@@ -158,6 +164,8 @@ namespace ParaMEDMEM
           PyObject *orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
           // Ask omniORBpy to transform SUPPORT (python Corba) ptr to IOR string
           PyObject *iorField=PyObject_CallMethod(orbPython,(char*)"object_to_string",(char*)"O",fieldPtr);
+          if(!iorField)
+            throw INTERP_KERNEL::Exception("Error : the input parameter of MEDCouplingFieldOverTimeClient.New appears to differ from CORBA reference ! Expecting a FieldOverTime CORBA reference !");
           char *ior=PyString_AsString(iorField);
           int argc=0;
           CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
@@ -188,6 +196,8 @@ namespace ParaMEDMEM
           PyObject *orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
           // Ask omniORBpy to transform SUPPORT (python Corba) ptr to IOR string
           PyObject *iorMesh=PyObject_CallMethod(orbPython,(char*)"object_to_string",(char*)"O",meshPtr);
+          if(!iorMesh)
+            throw INTERP_KERNEL::Exception("Error : the input parameter of MEDCouplingUMeshClient.New appears to differ from CORBA reference ! Expecting a UMeshCorbaInterface CORBA reference !");
           char *ior=PyString_AsString(iorMesh);
           int argc=0;
           CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
@@ -218,6 +228,8 @@ namespace ParaMEDMEM
           PyObject *orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
           // Ask omniORBpy to transform SUPPORT (python Corba) ptr to IOR string
           PyObject *iorMesh=PyObject_CallMethod(orbPython,(char*)"object_to_string",(char*)"O",meshPtr);
+          if(!iorMesh)
+            throw INTERP_KERNEL::Exception("Error : the input parameter of MEDCouplingExtrudedMeshClient.New appears to differ from CORBA reference ! Expecting an ExtrudedMeshCorbaInterface CORBA reference !");
           char *ior=PyString_AsString(iorMesh);
           int argc=0;
           CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
@@ -248,6 +260,8 @@ namespace ParaMEDMEM
           PyObject *orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
           // Ask omniORBpy to transform SUPPORT (python Corba) ptr to IOR string
           PyObject *iorMesh=PyObject_CallMethod(orbPython,(char*)"object_to_string",(char*)"O",meshPtr);
+          if(!iorMesh)
+            throw INTERP_KERNEL::Exception("Error : the input parameter of MEDCouplingCMeshClient.New appears to differ from CORBA reference ! Expecting a CMeshCorbaInterface CORBA reference !");
           char *ior=PyString_AsString(iorMesh);
           int argc=0;
           CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
@@ -278,6 +292,8 @@ namespace ParaMEDMEM
           PyObject *orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
           // Ask omniORBpy to transform SUPPORT (python Corba) ptr to IOR string
           PyObject *iorMesh=PyObject_CallMethod(orbPython,(char*)"object_to_string",(char*)"O",meshPtr);
+          if(!iorMesh)
+            throw INTERP_KERNEL::Exception("Error : the input parameter of DataArrayDoubleClient.New appears to differ from CORBA reference ! Expecting a DataArrayDoubleCorbaInterface CORBA reference !");
           char *ior=PyString_AsString(iorMesh);
           int argc=0;
           CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
@@ -308,6 +324,8 @@ namespace ParaMEDMEM
           PyObject *orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
           // Ask omniORBpy to transform SUPPORT (python Corba) ptr to IOR string
           PyObject *iorMesh=PyObject_CallMethod(orbPython,(char*)"object_to_string",(char*)"O",meshPtr);
+          if(!iorMesh)
+            throw INTERP_KERNEL::Exception("Error : the input parameter of DataArrayIntClient.New appears to differ from CORBA reference ! Expecting a DataArrayIntCorbaInterface CORBA reference !");
           char *ior=PyString_AsString(iorMesh);
           int argc=0;
           CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
