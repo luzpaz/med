@@ -243,9 +243,9 @@ void MED_MESH_RDONLY_DRIVER::read(void)
     if ( naxis < 0 )
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << " no mesh |" << _meshName
                                    << "| in file " << _fileName));
-//     if ( naxis == 0 )
-//       throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Mesh |" << _meshName
-//                                    << "| has invalid space dimension 0."));
+    if ( naxis == 0 )
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Mesh |" << _meshName
+                                   << "| has invalid space dimension 0."));
 
     med_2_3::med_int spaceDimension,meshDimension;
     med_2_3::med_mesh_type meshType;
