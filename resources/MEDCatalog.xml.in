@@ -45,6 +45,7 @@
   <objref name="SALOME_MED/DataArrayIntCorbaInterface" id="IDL:SALOME_MED/DataArrayIntCorbaInterface:1.0"/>
   <objref name="SALOME_MED/DataArrayDoubleCorbaInterface" id="IDL:SALOME_MED/DataArrayDoubleCorbaInterface:1.0"/>
   <objref name="SALOME_MED/MEDCouplingFieldDoubleCorbaInterface" id="IDL:SALOME_MED/MEDCouplingFieldDoubleCorbaInterface:1.0"/>
+  <objref name="SALOME_MED/MEDCouplingFieldTemplateCorbaInterface" id="IDL:SALOME_MED/MEDCouplingFieldTemplateCorbaInterface:1.0"/>
   <objref name="SALOME_MED/MEDCouplingMeshCorbaInterface" id="IDL:SALOME_MED/MEDCouplingMeshCorbaInterface:1.0"/>
   <objref name="SALOME_MED/MEDCouplingUMeshCorbaInterface" id="IDL:SALOME_MED/MEDCouplingUMeshCorbaInterface:1.0">
       <base>SALOME_MED/MEDCouplingMeshCorbaInterface</base>
@@ -62,7 +63,11 @@
       <base>SALOME_MED/MEDCouplingUMeshCorbaInterface</base>
   </objref>
   <objref name="SALOME_MED/MPIMEDCouplingFieldDoubleCorbaInterface" id="IDL:SALOME_MED/MPIMEDCouplingFieldDoubleCorbaInterface:1.0">
-    <base>SALOME_MED/ParaMEDCouplingFieldDoubleCorbaInterface</base>
+      <base>SALOME_MED/ParaMEDCouplingFieldDoubleCorbaInterface</base>
+  </objref>
+  <objref name="SALOME_MED/MEDCouplingMultiFieldsCorbaInterface" id="IDL:SALOME_MED/MEDCouplingMultiFieldsCorbaInterface:1.0"/>
+  <objref name="SALOME_MED/MEDCouplingFieldOverTimeCorbaInterface" id="IDL:SALOME_MED/MEDCouplingFieldOverTimeCorbaInterface:1.0">
+      <base>SALOME_MED/MEDCouplingMultiFieldsCorbaInterface</base>
   </objref>
 </type-list>
 
