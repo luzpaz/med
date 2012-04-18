@@ -89,7 +89,7 @@ tests: unittest
 unittest: $(UNIT_TEST_PROG)
 	@if test "x$(UNIT_TEST_PROG)" != "x"; then \
 	    for exe in $(UNIT_TEST_PROG) ; do \
-	        env top_srcdir=@top_srcdir@ ./$$exe; \
+	        env top_srcdir=@top_srcdir@ top_builddir=@top_builddir@ ./$$exe; \
 	        err=0; \
 	        for f in `find -name "UnitTestsResult*"` XXX ; do \
 	            if [[ $$f == XXX ]] ; then continue ; fi ; \
