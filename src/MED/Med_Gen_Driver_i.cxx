@@ -148,9 +148,9 @@ namespace {
     if (isMultiFile) {
       // file constantly holding data
       path = theURL;
-      SALOMEDS::Study_var study = theComponent->GetStudy();
-      file = SALOMEDS_Tool::GetNameFromPath( study->URL() );
-      file += string( "_" ) + string( compName ) + ".med";
+      // SALOMEDS::Study_var study = theComponent->GetStudy();
+      // file = SALOMEDS_Tool::GetNameFromPath( study->URL() );
+      file = string( "_" ) + string( compName ) + ".med";
     }
     else {
       // temporary file
