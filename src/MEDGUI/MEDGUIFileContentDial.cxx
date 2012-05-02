@@ -146,7 +146,7 @@ void MEDGUIFileContentDial::openFile()
       ParaMEDMEM::MEDCalculatorBrowserField field = ls.getField(i);
       for (unsigned int j = 0; j < field.getStepsSize(); j += 1)
       {
-        std::stringstream input;
+        std::ostringstream input;
         input<<field.getSteps()[j].getTimeStep()<<" ( "<<field.getSteps()[j].getTimeValue()<<" )";
         new QTreeWidgetItem(fieldname,QStringList(QString(tr(input.str().c_str()))));
       }
