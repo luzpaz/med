@@ -218,6 +218,13 @@ namespace MED
                          TFun& theFun) const;
   };
   //---------------------------------------------------------------
+  struct TQuad9a: TShapeFun {
+    TQuad9a();
+    virtual void InitFun(const TCCoordSliceArr& theRef,
+                         const TCCoordSliceArr& theGauss,
+                         TFun& theFun) const;
+  };
+  //---------------------------------------------------------------
   struct TQuad4b: TShapeFun {
     TQuad4b();
     virtual void InitFun(const TCCoordSliceArr& theRef,
@@ -227,6 +234,13 @@ namespace MED
   //---------------------------------------------------------------
   struct TQuad8b: TShapeFun {
     TQuad8b();
+    virtual void InitFun(const TCCoordSliceArr& theRef,
+                         const TCCoordSliceArr& theGauss,
+                         TFun& theFun) const;
+  };
+  //---------------------------------------------------------------
+  struct TQuad9b: TShapeFun {
+    TQuad9b();
     virtual void InitFun(const TCCoordSliceArr& theRef,
                          const TCCoordSliceArr& theGauss,
                          TFun& theFun) const;
