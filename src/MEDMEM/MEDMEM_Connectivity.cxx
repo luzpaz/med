@@ -2379,6 +2379,11 @@ ostream & MEDMEM::operator<<(ostream &os, CONNECTIVITY &co)
         }
         os << endl;
       }
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
+      delete [] polyhedronconnectivity;
+      delete [] polyhedronfacesindex;
+      delete [] polyhedronindex;
+#endif
     }
 
   }
@@ -2443,13 +2448,13 @@ ostream & MEDMEM::operator<<(ostream &os, CONNECTIVITY &co)
 */
 int *CONNECTIVITY::getNodesOfPolyhedron(int polyhedronId, int& lgthOfTab) const
 {
+  int offsetWithClassicType=getNumberOf(_entity,MED_ALL_ELEMENTS);
+  if (polyhedronId<offsetWithClassicType || polyhedronId> getNumberOfElementsWithPoly (MED_CELL, MED_ALL_ELEMENTS))
+    throw MEDEXCEPTION("Polyhedron ID does not match a polyhedron in the element range");
   const int *nodes=getPolyhedronConnectivity(MED_EN::MED_NODAL);
   const int *faces=getPolyhedronFacesIndex();
   const int *glob=getPolyhedronIndex(MED_EN::MED_NODAL);
-  int offsetWithClassicType=getNumberOf(_entity,MED_ALL_ELEMENTS);
   set<int> retInSet;
-  if (polyhedronId<offsetWithClassicType || polyhedronId> getNumberOfElementsWithPoly (MED_CELL, MED_ALL_ELEMENTS))
-    throw MEDEXCEPTION("Polyhedron ID does not match a polyhedron in the element range");
   int startFace=glob[polyhedronId-offsetWithClassicType-1]-1;
   int endFace=glob[polyhedronId-offsetWithClassicType]-1;
   int i;
@@ -2464,6 +2469,11 @@ int *CONNECTIVITY::getNodesOfPolyhedron(int polyhedronId, int& lgthOfTab) const
   i=0;
   for(iter=retInSet.begin();iter!=retInSet.end();iter++)
     ret[i++]=*iter;
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
+  delete [] nodes;
+  delete [] faces;
+  delete [] glob;
+#endif
   return ret;
 }
 
@@ -2474,24 +2484,45 @@ int *CONNECTIVITY::getNodesOfPolyhedron(int polyhedronId, int& lgthOfTab) const
 */
 int **CONNECTIVITY::getNodesPerFaceOfPolyhedron(int polyhedronId, int& nbOfFaces, int* & nbOfNodesPerFaces) const
 {
-  int i;
-  const int *nodes=getPolyhedronConnectivity(MED_EN::MED_NODAL);
-  const int *faces=getPolyhedronFacesIndex();
-  const int *glob=getPolyhedronIndex(MED_EN::MED_NODAL);
   int offsetWithClassicType=getNumberOf(_entity,MED_ALL_ELEMENTS);
   if (polyhedronId<offsetWithClassicType || polyhedronId> getNumberOfElementsWithPoly (MED_CELL, MED_ALL_ELEMENTS))
     throw MEDEXCEPTION("Polyhedron ID does not match a polyhedron in the element range");
 
+  int i;
+  const int *nodes=getPolyhedronConnectivity(MED_EN::MED_NODAL);
+  const int *faces=getPolyhedronFacesIndex();
+  const int *glob=getPolyhedronIndex(MED_EN::MED_NODAL);
   int startFace=glob[polyhedronId-offsetWithClassicType-1]-1;
   nbOfFaces=glob[polyhedronId-offsetWithClassicType]-startFace-1;
   nbOfNodesPerFaces=new int[nbOfFaces];
   int **ret=new int* [nbOfFaces];
   for(i=0;i<nbOfFaces;i++)
-  {
-    int startNode=faces[startFace+i]-1;
-    nbOfNodesPerFaces[i]=faces[startFace+i+1]-startNode-1;
-    ret[i]=(int *)(nodes)+startNode;
-  }
+    {
+      int startNode=faces[startFace+i]-1;
+      nbOfNodesPerFaces[i]=faces[startFace+i+1]-startNode-1;
+      ret[i]=(int *)(nodes)+startNode;
+    }
+#if defined(IRIX64) || defined(OSF1) || defined(VPP5000) || defined(PCLINUX64)
+  // nodes should be deleted and thus ret will become invalid,
+  // to avoid this we copy nodes to the tail of nbOfNodesPerFaces array
+  int nbElemNodes = 0;
+  for(i=0;i<nbOfFaces;i++)
+    nbElemNodes += nbOfNodesPerFaces[i];
+  int* nbOfNodesPerFacesPlusNodes=new int[nbOfFaces + nbElemNodes];
+  memcpy(nbOfNodesPerFacesPlusNodes,nbOfNodesPerFaces,nbOfFaces*sizeof(int));
+  nbOfNodesPerFacesPlusNodes += nbOfFaces;
+  for(i=0;i<nbOfFaces;i++)
+    {
+      memcpy(nbOfNodesPerFacesPlusNodes,ret[i],nbOfNodesPerFaces[i]*sizeof(int));
+      ret[i] = nbOfNodesPerFacesPlusNodes;
+      nbOfNodesPerFacesPlusNodes += nbOfNodesPerFaces[i];
+    }
+  delete [] nbOfNodesPerFaces;
+  nbOfNodesPerFaces = nbOfNodesPerFacesPlusNodes - ( nbOfFaces + nbElemNodes );
+  delete [] nodes;
+  delete [] faces;
+  delete [] glob;
+#endif
   return ret;
 }
 
