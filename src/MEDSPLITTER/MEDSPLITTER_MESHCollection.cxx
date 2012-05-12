@@ -2023,13 +2023,17 @@ void MESHCollection::castSupport(const MESHCollection& old_collection, vector<co
     support->setDescription(description);
     support->setEntity(entity);
 
-    element_array[idomain].sort();
-    element_array[idomain].unique();
+    if ( !element_array[idomain].empty() ) /* if() was added for issue 0021576
+                                              to prevent creation of faces */
+      {
+        element_array[idomain].sort();
+        element_array[idomain].unique();
 
-    if (entity != MED_EN::MED_NODE)
-      support->fillFromElementList(element_array[idomain]);
-    else
-      support->fillFromNodeList(element_array[idomain]);
+        if (entity != MED_EN::MED_NODE)
+          support->fillFromElementList(element_array[idomain]);
+        else
+          support->fillFromNodeList(element_array[idomain]);
+      }
   }
 }
 
