@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -657,6 +657,57 @@ namespace MED
 
 
   //---------------------------------------------------------------
+  TQuad9a::TQuad9a():
+    TShapeFun(2,9)
+  {
+    TInt aNbRef = GetNbRef();
+    for(TInt aRefId = 0; aRefId < aNbRef; aRefId++){
+      TCoordSlice aCoord = GetCoord(aRefId);
+      switch(aRefId){
+      case  0: aCoord[0] = -1.0;  aCoord[1] =  1.0; break;
+      case  1: aCoord[0] = -1.0;  aCoord[1] = -1.0; break;
+      case  2: aCoord[0] =  1.0;  aCoord[1] = -1.0; break;
+      case  3: aCoord[0] =  1.0;  aCoord[1] =  1.0; break;
+
+      case  4: aCoord[0] = -1.0;  aCoord[1] =  0.0; break;
+      case  5: aCoord[0] =  0.0;  aCoord[1] = -1.0; break;
+      case  6: aCoord[0] =  1.0;  aCoord[1] =  0.0; break;
+      case  7: aCoord[0] =  0.0;  aCoord[1] =  1.0; break;
+
+      case  8: aCoord[0] =  0.0;  aCoord[1] =  0.0; break;
+      }
+    }
+  }
+
+  void
+  TQuad9a::InitFun(const TCCoordSliceArr& theRef,
+                   const TCCoordSliceArr& theGauss,
+                   TFun& theFun) const
+  {
+    GetFun(theRef,theGauss,theFun);
+
+    TInt aNbGauss = theGauss.size();
+    for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
+      const TCCoordSlice& aCoord = theGauss[aGaussId];
+      TFloatVecSlice aSlice = theFun.GetFunSlice(aGaussId);
+
+      aSlice[0] = 0.25*aCoord[0]*aCoord[1]*(aCoord[0] + 1.0)*(aCoord[1] - 1.0);
+      aSlice[1] = 0.25*aCoord[0]*aCoord[1]*(aCoord[0] + 1.0)*(aCoord[1] + 1.0);
+      aSlice[2] = 0.25*aCoord[0]*aCoord[1]*(aCoord[0] - 1.0)*(aCoord[1] + 1.0);
+      aSlice[3] = 0.25*aCoord[0]*aCoord[1]*(aCoord[0] - 1.0)*(aCoord[1] - 1.0);
+
+      aSlice[4] = 0.5*aCoord[0]*(aCoord[0] + 1.0)*(1.0 - aCoord[1]*aCoord[1]);
+      aSlice[5] = 0.5*(1.0 - aCoord[0]*aCoord[0])*aCoord[1]*(aCoord[1] + 1.0);
+      aSlice[6] = 0.5*aCoord[0]*(aCoord[0] - 1.0)*(1.0 - aCoord[1]*aCoord[1]);
+      aSlice[7] = 0.5*(1.0 - aCoord[0]*aCoord[0])*aCoord[1]*(aCoord[1] - 1.0);
+
+      aSlice[8] = (1.0 - aCoord[0]*aCoord[0])*(1.0 - aCoord[1]*aCoord[1]);
+    }
+  }
+
+
+
+  //---------------------------------------------------------------
   TQuad4b::TQuad4b():
     TShapeFun(2,4)
   {
@@ -740,6 +791,57 @@ namespace MED
       //aSlice[5] = 0.5*(1.0 + aCoord[0])*(1.0 - aCoord[1])*(1.0 - aCoord[1]);
       //aSlice[6] = 0.5*(1.0 - aCoord[0])*(1.0 - aCoord[0])*(1.0 + aCoord[1]);
       //aSlice[7] = 0.5*(1.0 - aCoord[0])*(1.0 - aCoord[1])*(1.0 - aCoord[1]);
+    }
+  }
+
+
+
+  //---------------------------------------------------------------
+  TQuad9b::TQuad9b():
+    TShapeFun(2,9)
+  {
+    TInt aNbRef = GetNbRef();
+    for(TInt aRefId = 0; aRefId < aNbRef; aRefId++){
+      TCoordSlice aCoord = GetCoord(aRefId);
+      switch(aRefId){
+      case  0: aCoord[0] = -1.0;  aCoord[1] = -1.0; break;
+      case  1: aCoord[0] =  1.0;  aCoord[1] = -1.0; break;
+      case  2: aCoord[0] =  1.0;  aCoord[1] =  1.0; break;
+      case  3: aCoord[0] = -1.0;  aCoord[1] =  1.0; break;
+
+      case  4: aCoord[0] =  0.0;  aCoord[1] = -1.0; break;
+      case  5: aCoord[0] =  1.0;  aCoord[1] =  0.0; break;
+      case  6: aCoord[0] =  0.0;  aCoord[1] =  1.0; break;
+      case  7: aCoord[0] = -1.0;  aCoord[1] =  0.0; break;
+
+      case  8: aCoord[0] =  0.0;  aCoord[1] =  0.0; break;
+      }
+    }
+  }
+
+  void
+  TQuad9b::InitFun(const TCCoordSliceArr& theRef,
+                   const TCCoordSliceArr& theGauss,
+                   TFun& theFun) const
+  {
+    GetFun(theRef,theGauss,theFun);
+
+    TInt aNbGauss = theGauss.size();
+    for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
+      const TCCoordSlice& aCoord = theGauss[aGaussId];
+      TFloatVecSlice aSlice = theFun.GetFunSlice(aGaussId);
+
+      aSlice[0] = 0.25*aCoord[0]*aCoord[1]*(aCoord[0] - 1.0)*(aCoord[1] - 1.0);
+      aSlice[1] = 0.25*aCoord[0]*aCoord[1]*(aCoord[0] + 1.0)*(aCoord[1] - 1.0);
+      aSlice[2] = 0.25*aCoord[0]*aCoord[1]*(aCoord[0] + 1.0)*(aCoord[1] + 1.0);
+      aSlice[3] = 0.25*aCoord[0]*aCoord[1]*(aCoord[0] - 1.0)*(aCoord[1] + 1.0);
+
+      aSlice[4] = 0.5*(1.0 - aCoord[0]*aCoord[0])*aCoord[1]*(aCoord[1] - 1.0);
+      aSlice[5] = 0.5*aCoord[0]*(aCoord[0] + 1.0)*(1.0 - aCoord[1]*aCoord[1]);
+      aSlice[6] = 0.5*(1.0 - aCoord[0]*aCoord[0])*aCoord[1]*(aCoord[1] + 1.0);
+      aSlice[7] = 0.5*aCoord[0]*(aCoord[0] - 1.0)*(1.0 - aCoord[1]*aCoord[1]);
+
+      aSlice[8] = (1.0 - aCoord[0]*aCoord[0])*(1.0 - aCoord[1]*aCoord[1]);
     }
   }
 
@@ -1767,6 +1869,17 @@ namespace MED
           return true;
 
         if(TQuad8b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
+
+        break;
+      }
+      case eQUAD9: {
+        INITMSG(MYDEBUG,"eQUAD9"<<std::endl);
+
+        if(TQuad9a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
+
+        if(TQuad9b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
           return true;
 
         break;

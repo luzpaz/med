@@ -1,4 +1,4 @@
-dnl Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
+dnl Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 dnl
 dnl Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 dnl CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -35,6 +35,7 @@ AC_ARG_WITH(hdf5,
 AC_SUBST(HDF5_INCLUDES)
 AC_SUBST(HDF5_LIBS)
 AC_SUBST(HDF5_MT_LIBS)
+AC_SUBST(HDF5HOME)
 
 HDF5_INCLUDES=""
 HDF5_LIBS=""
@@ -50,6 +51,8 @@ if test -z $HDF5HOME
 then
    AC_MSG_WARN(undefined HDF5HOME variable which specify hdf5 installation directory)
    AC_MSG_NOTICE(Trying native Hdf5...)
+   dnl For Parallel HDF5 test
+   HDF5HOME="/usr" 
 else
    LOCAL_INCLUDES="-I$HDF5HOME/include"
    if test "x$HDF5HOME" = "x/usr"
@@ -59,14 +62,32 @@ else
    else
       AC_MSG_NOTICE(Trying Hdf5 from $HDF5HOME ...)
       LOCAL_LIBS="-L$HDF5HOME/lib"
-      LOCAL_RLIBS="-R$HDF5HOME/lib"
+      LOCAL_RLIBS="-Wl,-R$HDF5HOME/lib"
    fi
+fi
+
+if  test "x$hdf5_ok" = "xno"
+then
+  if  test -e "$HDF5HOME/include/hdf5.h" 
+  then
+    AC_MSG_CHECKING(if hdf5 is parallel and thus needs mpi)
+    hdf5_parallel=`grep "#define H5_HAVE_PARALLEL" $HDF5HOME/include/H5pubconf.h | awk '{i=3 ; print $i}'`
+    if test "x$hdf5_parallel" = "x1"
+    then
+      LOCAL_INCLUDES="-DOMPI_SKIP_MPICXX $MPI_INCLUDES $LOCAL_INCLUDES"
+      AC_MSG_RESULT(yes)
+    else
+      AC_MSG_RESULT(no,hdf5 seems serial)
+    fi
+  else
+    AC_MSG_WARN(File $HDF5HOME/include/hdf5.h not present)
+  fi
 fi
 
 dnl hdf5 headers
 
 CPPFLAGS_old="$CPPFLAGS"
-CPPFLAGS="$CPPFLAGS $LOCAL_INCLUDES"
+CPPFLAGS="$CPPFLAGS $MPI_INCLUDES $LOCAL_INCLUDES"
 AC_CHECK_HEADER(hdf5.h,hdf5_ok=yes ,hdf5_ok=no)
 CPPFLAGS="$CPPFLAGS_old"
 
@@ -77,7 +98,7 @@ then
 dnl hdf5 library
 
   LIBS_old="$LIBS"
-  LIBS="$LIBS $LOCAL_LIBS"
+  LIBS="$LIBS $MPI_LIBS $LOCAL_LIBS"
   AC_CHECK_LIB(hdf5,H5open,hdf5_ok=yes,hdf5_ok=no)
   LIBS="$LIBS_old"
 
@@ -85,9 +106,9 @@ fi
 
 if  test "x$hdf5_ok" = "xyes"
 then
-  HDF5_INCLUDES="$LOCAL_INCLUDES"
-  HDF5_LIBS="$LOCAL_LIBS -lhdf5 $LOCAL_RLIBS"
-  HDF5_MT_LIBS="$LOCAL_LIBS -lhdf5 $LOCAL_RLIBS"
+  HDF5_INCLUDES="$MPI_INCLUDES $LOCAL_INCLUDES"
+  HDF5_LIBS="$MPI_LIBS $LOCAL_LIBS -lhdf5 $LOCAL_RLIBS"
+  HDF5_MT_LIBS="$MPI_LIBS $LOCAL_LIBS -lhdf5 $LOCAL_RLIBS"
 fi
 
 if  test "x$hdf5_ok" = "xyes"

@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -146,7 +146,7 @@ void MEDGUIFileContentDial::openFile()
       ParaMEDMEM::MEDCalculatorBrowserField field = ls.getField(i);
       for (unsigned int j = 0; j < field.getStepsSize(); j += 1)
       {
-        std::stringstream input;
+        std::ostringstream input;
         input<<field.getSteps()[j].getTimeStep()<<" ( "<<field.getSteps()[j].getTimeValue()<<" )";
         new QTreeWidgetItem(fieldname,QStringList(QString(tr(input.str().c_str()))));
       }

@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2011  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -1165,8 +1165,9 @@ void MEDSPLITTERTest::testMESHCollection_families()
   CPPUNIT_ASSERT_EQUAL(nbEdgesFamilies1,7); // six initial families + a joint
   CPPUNIT_ASSERT_EQUAL(nbEdgesFamilies2,7); // six initial families + a joint
 
-  string fam_name = mesh1.getFamily(MED_EN::MED_EDGE,1)->getName();
-  char test_name[MED_NAME_SIZE+1]="Sortie";
-  CPPUNIT_ASSERT(strcmp(fam_name.c_str(),test_name)==0);
+  // EAP 16 Apr 2012: order of families is actually unpredictable
+  // string fam_name = mesh1.getFamily(MED_EN::MED_EDGE,1)->getName();
+  // char test_name[MED_NAME_SIZE+1]="Sortie";
+  // CPPUNIT_ASSERT(strcmp(fam_name.c_str(),test_name)==0);
 
 }

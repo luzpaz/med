@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
 // Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
 // CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -243,9 +243,9 @@ void MED_MESH_RDONLY_DRIVER::read(void)
     if ( naxis < 0 )
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << " no mesh |" << _meshName
                                    << "| in file " << _fileName));
-//     if ( naxis == 0 )
-//       throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Mesh |" << _meshName
-//                                    << "| has invalid space dimension 0."));
+    if ( naxis == 0 )
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Mesh |" << _meshName
+                                   << "| has invalid space dimension 0."));
 
     med_2_3::med_int spaceDimension,meshDimension;
     med_2_3::med_mesh_type meshType;

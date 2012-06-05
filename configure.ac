@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2011  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -23,7 +23,7 @@
 # Modified by : Marc Tajchman (CEA)
 # Modified by : Mikhail PONIKAROV (OCN)
 #
-AC_INIT([Salome2 Project MED module], [6.4.0], [webmaster.salome@opencascade.com], [SalomeMED])
+AC_INIT([Salome2 Project MED module], [6.5.0], [webmaster.salome@opencascade.com], [SalomeMED])
 AC_CONFIG_AUX_DIR(adm_local/unix/config_files)
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
@@ -552,7 +552,7 @@ if test "$MED_WITH_KERNEL" = "yes" ; then
     optional_vars="$optional_vars $splitter_optional_vars $renumber_optional_vars graphviz_ok Kernel_ok"
     if test "${gui_ok}" = "yes"; then
         # GUI is enabled
-        gui_vars="lex_yacc_ok OpenGL_ok qt_ok vtk_ok sip_ok pyqt_ok qwt_ok occ_ok gui_ok"
+        gui_vars="lex_yacc_ok OpenGL_ok qt_ok vtk_ok occ_ok gui_ok"
     elif test "${SalomeGUI_need}" != "no"; then
         gui_vars="gui_ok"
     fi
