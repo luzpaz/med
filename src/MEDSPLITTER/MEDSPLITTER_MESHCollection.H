@@ -195,10 +195,10 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
       list_of_elems = const_cast<int*> (support->getNumber(MED_EN::MED_ALL_ELEMENTS));
 
     int* array=new int[nbelem];
-    int* ip;
-    int* local;
+    int* ip=0;
+    int* local=0;
     int* initial_local=0;
-    int* full_array;
+    int* full_array=0;
 
     int size=0;
     MED_EN::medEntityMesh entity = support->getEntity();
