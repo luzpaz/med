@@ -26,6 +26,8 @@
 #include <io.h>
 #define access _access
 #define W_OK 02
+#else
+#include <unistd.h>
 #endif
 
 double coords[108]=

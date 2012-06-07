@@ -35,7 +35,9 @@
 #include <cmath>
 
 #ifdef WNT
-#define isnan _isnan
+# define isnan _isnan
+#else
+# include <unistd.h>
 #endif
 
 namespace MEDMEM {
