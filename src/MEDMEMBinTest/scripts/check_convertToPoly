@@ -31,7 +31,7 @@ infile=${srcdir}/../../resources/BoxTetra2.med
 
 outfile=$outdir/convertToPoly_BoxTetra2.med
 
-./convertToPoly $infile $outfile BoxTetra2   >& /dev/null
+./convertToPoly $infile $outfile BoxTetra2   > /dev/null 2>&1
 
 ok=$?
 

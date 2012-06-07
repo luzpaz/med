@@ -29,11 +29,11 @@ fi
 
 infile=${srcdir}/../../resources/pointe.med
 
-./test_copie_field_ $infile maa1 fieldcelldoublevector   >& /dev/null
+./test_copie_field_ $infile maa1 fieldcelldoublevector   > /dev/null 2>&1
 
 if test $? -ne 0; then exit -1;fi
 
-./test_copie_field_ $infile maa1 fieldnodeint  >& /dev/null
+./test_copie_field_ $infile maa1 fieldnodeint  > /dev/null 2>&1
 
 exit
 

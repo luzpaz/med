@@ -29,7 +29,7 @@ fi
 
 infile=${srcdir}/../../resources/pointe.med
 
-./test_operation_fielddouble $infile maa1 fieldcelldoublescalar   >& /dev/null
+./test_operation_fielddouble $infile maa1 fieldcelldoublescalar   > /dev/null 2>&1
 
 exit
 

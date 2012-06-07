@@ -29,7 +29,7 @@ fi
 
 infile=${srcdir}/../../resources/pointe.med
 
-./test_MEDMEM_PolyDriverMedMeshRead $infile maa1   >& /dev/null
+./test_MEDMEM_PolyDriverMedMeshRead $infile maa1   > /dev/null 2>&1
 
 exit
 

@@ -34,7 +34,7 @@ infile=$outdir/testAnalFile.med
 #medimport $initfile $infile 
 cp $initfile $infile
 
-./testAnalFile $infile  >& /dev/null
+./testAnalFile $infile  > /dev/null 2>&1
 
 ok=$?
 

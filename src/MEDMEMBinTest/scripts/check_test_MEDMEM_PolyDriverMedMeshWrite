@@ -33,7 +33,7 @@ outfile=$outdir/test_MEDMEM_PolyDriverMedMeshWrite.med_copy
 
 cp $initfile $infile
 
-./test_MEDMEM_PolyDriverMedMeshWrite $infile maa1   >& /dev/null
+./test_MEDMEM_PolyDriverMedMeshWrite $infile maa1   > /dev/null 2>&1
 
 ok=$?
 

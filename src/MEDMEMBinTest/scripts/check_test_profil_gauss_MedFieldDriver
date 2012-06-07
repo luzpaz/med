@@ -34,7 +34,7 @@ curdir=`pwd`
 cp $initfile $outdir/$infile
 cd $outdir
 
-$curdir/test_profil_gauss_MedFieldDriver $infile RESUZEROSIEF_ELGA_DEPL__________ 1 1   >& /dev/null
+$curdir/test_profil_gauss_MedFieldDriver $infile RESUZEROSIEF_ELGA_DEPL__________ 1 1   > /dev/null 2>&1
 
 ok=$?
 

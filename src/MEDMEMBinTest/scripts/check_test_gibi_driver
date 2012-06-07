@@ -32,7 +32,7 @@ infile=${outdir}/test_gibi_driver.sauve
 
 cp $initfile $infile
 
-./test_gibi_driver $infile   >& /dev/null
+./test_gibi_driver $infile   > /dev/null 2>&1
 
 ok=$?
 

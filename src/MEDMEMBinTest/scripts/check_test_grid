@@ -18,7 +18,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-./test_grid 3 5   >& /dev/null
+./test_grid 3 5   > /dev/null 2>&1
 
 exit
 
