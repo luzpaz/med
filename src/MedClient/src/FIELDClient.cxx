@@ -32,7 +32,7 @@ FIELDClient<T,INTERLACING_TAG>::FIELDClient(typename FIELDI_TRAITS<T,INTERLACING
   else
     MEDMEM::FIELD<T,INTERLACING_TAG>::setSupport(S);
   
-  setName(_fieldPtr->getName());
+  this->setName(_fieldPtr->getName());
 
   MEDMEM::FIELD<T,INTERLACING_TAG>::setDescription(_fieldPtr->getDescription());
   int nc = _fieldPtr->getNumberOfComponents();
@@ -59,9 +59,9 @@ FIELDClient<T,INTERLACING_TAG>::FIELDClient(typename FIELDI_TRAITS<T,INTERLACING
   MEDMEM::FIELD<T,INTERLACING_TAG>::setMEDComponentsUnits(_s);
 
   delete [] _s;
-  setIterationNumber(_fieldPtr->getIterationNumber());
-  setTime(_fieldPtr->getTime());
-  setOrderNumber(_fieldPtr->getOrderNumber());
+  this->setIterationNumber(_fieldPtr->getIterationNumber());
+  this->setTime(_fieldPtr->getTime());
+  this->setOrderNumber(_fieldPtr->getOrderNumber());
   fillCopy();
 }
 
