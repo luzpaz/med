@@ -34,7 +34,7 @@
 using namespace ParaMEDMEM;
 %}
 
-%include "MEDCoupling.i"
+%include "MEDCouplingCommon.i"
 
 namespace ParaMEDMEM
 {
@@ -146,3 +146,47 @@ namespace ParaMEDMEM
        }
   };
 }
+
+%pythoncode %{
+def ParaMEDMEMDataArrayDoubleIadd(self,*args):
+    import _MEDCouplingCorba
+    return _MEDCouplingCorba.DataArrayDouble____iadd___(self, self, *args)
+def ParaMEDMEMDataArrayDoubleIsub(self,*args):
+    import _MEDCouplingCorba
+    return _MEDCouplingCorba.DataArrayDouble____isub___(self, self, *args)
+def ParaMEDMEMDataArrayDoubleImul(self,*args):
+    import _MEDCouplingCorba
+    return _MEDCouplingCorba.DataArrayDouble____imul___(self, self, *args)
+def ParaMEDMEMDataArrayDoubleIdiv(self,*args):
+    import _MEDCouplingCorba
+    return _MEDCouplingCorba.DataArrayDouble____idiv___(self, self, *args)
+def ParaMEDMEMMEDCouplingFieldDoubleIadd(self,*args):
+    import _MEDCouplingCorba
+    return _MEDCouplingCorba.MEDCouplingFieldDouble____iadd___(self, self, *args)
+def ParaMEDMEMMEDCouplingFieldDoubleIsub(self,*args):
+    import _MEDCouplingCorba
+    return _MEDCouplingCorba.MEDCouplingFieldDouble____isub___(self, self, *args)
+def ParaMEDMEMMEDCouplingFieldDoubleImul(self,*args):
+    import _MEDCouplingCorba
+    return _MEDCouplingCorba.MEDCouplingFieldDouble____imul___(self, self, *args)
+def ParaMEDMEMMEDCouplingFieldDoubleIdiv(self,*args):
+    import _MEDCouplingCorba
+    return _MEDCouplingCorba.MEDCouplingFieldDouble____idiv___(self, self, *args)
+def ParaMEDMEMDataArrayIntIadd(self,*args):
+    import _MEDCouplingCorba
+    return _MEDCouplingCorba.DataArrayInt____iadd___(self, self, *args)
+def ParaMEDMEMDataArrayIntIsub(self,*args):
+    import _MEDCouplingCorba
+    return _MEDCouplingCorba.DataArrayInt____isub___(self, self, *args)
+def ParaMEDMEMDataArrayIntImul(self,*args):
+    import _MEDCouplingCorba
+    return _MEDCouplingCorba.DataArrayInt____imul___(self, self, *args)
+def ParaMEDMEMDataArrayIntIdiv(self,*args):
+    import _MEDCouplingCorba
+    return _MEDCouplingCorba.DataArrayInt____idiv___(self, self, *args)
+def ParaMEDMEMDataArrayIntImod(self,*args):
+    import _MEDCouplingCorba
+    return _MEDCouplingCorba.DataArrayInt____imod___(self, self, *args)
+%}
+
+%include "MEDCouplingFinalize.i"
