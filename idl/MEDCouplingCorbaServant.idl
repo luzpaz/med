@@ -34,13 +34,19 @@ module SALOME_MED
   {
   };
 
-  interface DataArrayDoubleCorbaInterface : MEDCouplingRefCountCorbaInterface
+  interface DataArrayCorbaInterface : MEDCouplingRefCountCorbaInterface
+  {
+    string getName();
+    SALOME_TYPES::ListOfString getInfoOnComponents();
+  };
+
+  interface DataArrayDoubleCorbaInterface : DataArrayCorbaInterface
   {
     void getTinyInfo(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfString sa);
     void getSerialisationData(out SALOME_TYPES::ListOfDouble da);
   };
 
-  interface DataArrayIntCorbaInterface : MEDCouplingRefCountCorbaInterface
+  interface DataArrayIntCorbaInterface : DataArrayCorbaInterface
   {
     void getTinyInfo(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfString sa);
     void getSerialisationData(out SALOME_TYPES::ListOfLong la);
@@ -48,6 +54,7 @@ module SALOME_MED
 
   interface MEDCouplingMeshCorbaInterface : MEDCouplingRefCountCorbaInterface
   {
+    string getName();
     //!CORBA inplementation of MEDCouplingPointSet::getTinySerializationInformation
     void getTinyInfo(out SALOME_TYPES::ListOfDouble da, out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfString sa);
     void getSerialisationData(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfDouble da);
@@ -84,6 +91,8 @@ module SALOME_MED
 
   interface MEDCouplingFieldDoubleCorbaInterface : MEDCouplingFieldCorbaInterface
   {
+    string getName();
+    SALOME_TYPES::ListOfString getInfoOnComponents();
     //!returns the 3 tiny arrays to prepare the new instance locally.
     void getTinyInfo(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfDouble da, out SALOME_TYPES::ListOfString sa);
     void getSerialisationData(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfDouble2 da2);
@@ -93,6 +102,8 @@ module SALOME_MED
 
   interface MEDCouplingMultiFieldsCorbaInterface : MEDCouplingRefCountCorbaInterface
   {
+    string getName();
+    SALOME_TYPES::ListOfString getInfoOnComponents();
     long getMainTinyInfo(out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfDouble da, out long nbOfArrays, out long nbOfFields);
     //!for field templates
     void getTinyInfo(in long id, out SALOME_TYPES::ListOfLong la, out SALOME_TYPES::ListOfDouble da, out SALOME_TYPES::ListOfString sa);

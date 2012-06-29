@@ -22,7 +22,7 @@
 
 using namespace ParaMEDMEM;
 
-DataArrayIntServant::DataArrayIntServant(const DataArrayInt *cppPointer):MEDCouplingRefCountServant(cppPointer,cppPointer)
+DataArrayIntServant::DataArrayIntServant(const DataArrayInt *cppPointer):DataArrayServant(cppPointer)
 {
 }
 

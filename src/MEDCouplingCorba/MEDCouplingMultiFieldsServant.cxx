@@ -21,6 +21,7 @@
 #include "DataArrayDoubleServant.hxx"
 #include "MEDCouplingFieldServant.hxx"
 #include "MEDCouplingMultiFields.hxx"
+#include "MEDCouplingFieldDouble.hxx"
 #include "MEDCouplingFieldTemplate.hxx"
 #include "MEDCouplingMemArray.hxx"
 
@@ -47,6 +48,33 @@ SALOME_MED::MEDCouplingMeshCorbaInterface_ptr MEDCouplingMultiFieldsServant::get
   std::vector<int> tmp;
   std::vector<MEDCouplingMesh *> cppMeshes=getPointer()->getDifferentMeshes(tmp);
   return MEDCouplingFieldServant::BuildCorbaRefFromCppPointer(cppMeshes[id]);
+}
+
+char *MEDCouplingMultiFieldsServant::getName()
+{
+  return CORBA::string_dup(getPointer()->getName().c_str());
+}
+
+SALOME_TYPES::ListOfString *MEDCouplingMultiFieldsServant::getInfoOnComponents()
+{
+  std::vector<const MEDCouplingFieldDouble *> fs=getPointer()->getFields();
+  for(std::vector<const MEDCouplingFieldDouble *>::const_iterator it=fs.begin();it!=fs.end();it++)
+    {
+      if(*it)
+        {
+          const DataArrayDouble *arr=(*it)->getArray();
+          if(arr)
+            {
+              SALOME_TYPES::ListOfString *ret=new SALOME_TYPES::ListOfString;
+              const std::vector<std::string> &comps=arr->getInfoOnComponents();
+              ret->length(comps.size());
+              for(std::size_t i=0;i<comps.size();i++)
+                (*ret)[i]=CORBA::string_dup(comps[i].c_str());
+              return ret;
+            }
+        }
+    }
+  throw INTERP_KERNEL::Exception("MEDCouplingMultiFieldsServant::getInfoOnComponents : impossible to find a not null DataArrayDouble !");
 }
 
 CORBA::Long MEDCouplingMultiFieldsServant::getMainTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da, CORBA::Long& nbOfArrays, CORBA::Long& nbOfFields)

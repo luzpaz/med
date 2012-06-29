@@ -26,6 +26,27 @@ MEDCouplingFieldDoubleServant::MEDCouplingFieldDoubleServant(const MEDCouplingFi
 {
 }
 
+char *MEDCouplingFieldDoubleServant::getName()
+{
+  return CORBA::string_dup(getPointer()->getName());
+}
+
+SALOME_TYPES::ListOfString *MEDCouplingFieldDoubleServant::getInfoOnComponents()
+{
+  const DataArrayDouble *arr=getPointer()->getArray();
+  SALOME_TYPES::ListOfString *ret=new SALOME_TYPES::ListOfString;
+  if(arr)
+    {
+      const std::vector<std::string> &comps=arr->getInfoOnComponents();
+      ret->length(comps.size());
+      for(std::size_t i=0;i<comps.size();i++)
+        (*ret)[i]=CORBA::string_dup(comps[i].c_str());
+      return ret;
+    }
+  else
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDoubleServant::getInfoOnComponents : no array specified !");
+}
+
 void MEDCouplingFieldDoubleServant::getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da, SALOME_TYPES::ListOfString_out sa)
 {
   la=new SALOME_TYPES::ListOfLong;

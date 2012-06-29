@@ -52,9 +52,9 @@ namespace SALOME_TEST
     myCoords->decrRef();
     mesh->changeSpaceDimension(3);
     myCoords=mesh->getCoords();
-    myCoords->setInfoOnComponent(0,"X1D(m)");
-    myCoords->setInfoOnComponent(1,"Y1D (dm)");
-    myCoords->setInfoOnComponent(2,"Z1D (pm)");
+    myCoords->setInfoOnComponent(0,"X1D [m]");
+    myCoords->setInfoOnComponent(1,"Y1D [dm]");
+    myCoords->setInfoOnComponent(2,"Z1D [pm]");
     double center[3]={0.,0.,0.};
     double vector[3]={0,1,0};
     mesh->rotate(center,vector,-M_PI/2.);
@@ -127,9 +127,9 @@ namespace SALOME_TEST
     myCoords->alloc(9,3);
     std::copy(targetCoords,targetCoords+27,myCoords->getPointer());
     targetMesh->setCoords(myCoords);
-    myCoords->setInfoOnComponent(0,"X (m)");
-    myCoords->setInfoOnComponent(1,"X (dm)");
-    myCoords->setInfoOnComponent(2,"X (m)");
+    myCoords->setInfoOnComponent(0,"X [m]");
+    myCoords->setInfoOnComponent(1,"X [dm]");
+    myCoords->setInfoOnComponent(2,"X [m]");
     myCoords->decrRef();
     return targetMesh;
   }
@@ -156,9 +156,9 @@ namespace SALOME_TEST
     myCoords->alloc(9,3);
     std::copy(targetCoords,targetCoords+27,myCoords->getPointer());
     targetMesh->setCoords(myCoords);
-    myCoords->setInfoOnComponent(0,"X (m)");
-    myCoords->setInfoOnComponent(1,"YY (Pm)");
-    myCoords->setInfoOnComponent(2,"ZZZ (m)");
+    myCoords->setInfoOnComponent(0,"X [m]");
+    myCoords->setInfoOnComponent(1,"YY [Pm]");
+    myCoords->setInfoOnComponent(2,"ZZZ [m]");
     myCoords->decrRef();
     //
     targetMesh->checkCoherency();
@@ -282,6 +282,7 @@ namespace SALOME_TEST
     fieldOnCells->setMesh(mesh);
     ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
     array->alloc(mesh->getNumberOfCells(),3);
+    array->setInfoOnComponent(0,"aaa"); array->setInfoOnComponent(1,"bbbb"); array->setInfoOnComponent(2,"ccccc");
     fieldOnCells->setArray(array);
     double *tmp=array->getPointer();
     array->decrRef();
@@ -367,8 +368,8 @@ namespace SALOME_TEST
     f->setGaussLocalizationOnType(INTERP_KERNEL::NORM_QUAD4,_refCoo2,_gsCoo1,_wg1);
     ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
     array->alloc(18,2);
-    array->setInfoOnComponent(0,"Power(MW)");
-    array->setInfoOnComponent(1,"Density (kg/m^3)");
+    array->setInfoOnComponent(0,"Power [MW]");
+    array->setInfoOnComponent(1,"Density [kg/m^3]");
     double *ptr=array->getPointer();
     for(int i=0;i<18*2;i++)
       ptr[i]=(double)(i+1);
@@ -392,8 +393,8 @@ namespace SALOME_TEST
     f->setDescription("MyDescriptionNE");
     ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
     array->alloc(18,2);
-    array->setInfoOnComponent(0,"Power(MW)");
-    array->setInfoOnComponent(1,"Density (kg/m^3)");
+    array->setInfoOnComponent(0,"Power [MW]");
+    array->setInfoOnComponent(1,"Density [kg/m^3]");
     double *ptr=array->getPointer();
     for(int i=0;i<18*2;i++)
       ptr[i]=(double)(i+7);
@@ -418,8 +419,8 @@ namespace SALOME_TEST
     ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
     int nbOfCells=ext->getNumberOfCells();
     array->alloc(nbOfCells,2);
-    array->setInfoOnComponent(0,"Power(MW)");
-    array->setInfoOnComponent(1,"Density (kg/m^3)");
+    array->setInfoOnComponent(0,"Power [MW]");
+    array->setInfoOnComponent(1,"Density [kg/m^3]");
     double *ptr=array->getPointer();
     for(int i=0;i<nbOfCells*2;i++)
       ptr[i]=(double)(i/2+7)+(double)((i%2)*1000);
@@ -445,8 +446,8 @@ namespace SALOME_TEST
     ParaMEDMEM::DataArrayDouble *array=ParaMEDMEM::DataArrayDouble::New();
     int nbOfCells=m->getNumberOfCells();
     array->alloc(nbOfCells,2);
-    array->setInfoOnComponent(0,"Power(GW)");
-    array->setInfoOnComponent(1,"Density (kg/m^3)");
+    array->setInfoOnComponent(0,"Power [GW]");
+    array->setInfoOnComponent(1,"Density [kg/m^3]");
     double *ptr=array->getPointer();
     for(int i=0;i<nbOfCells*2;i++)
       ptr[i]=(double)(i/2+7)+(double)((i%2)*1000);

@@ -17,8 +17,8 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef __DATAARRAYDOUBLESERVANT_HXX__
-#define __DATAARRAYDOUBLESERVANT_HXX__
+#ifndef __DATAARRAYSERVANT_HXX__
+#define __DATAARRAYSERVANT_HXX__
 
 #include "SALOMEconfig.h"
 #ifdef WNT
@@ -26,25 +26,21 @@
 #endif
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
 #include "MEDCouplingCorba.hxx"
-#include "DataArrayServant.hxx"
+#include "MEDCouplingRefCountServant.hxx"
 
 namespace ParaMEDMEM
 {
-  class DataArrayDouble;
+  class DataArray;
 
-  class MEDCOUPLINGCORBA_EXPORT DataArrayDoubleServant : public DataArrayServant,
-                                                         public virtual POA_SALOME_MED::DataArrayDoubleCorbaInterface
+  class MEDCOUPLINGCORBA_EXPORT DataArrayServant : public MEDCouplingRefCountServant , public virtual POA_SALOME_MED::DataArrayCorbaInterface
   {
   public:
-    typedef DataArrayDouble CppType;
-    DataArrayDoubleServant(const DataArrayDouble *cppPointer);
+    typedef DataArray CppType;
+    DataArrayServant(const DataArray *cppPointer);
+    char *getName();
+    SALOME_TYPES::ListOfString *getInfoOnComponents();
   protected:
-    const DataArrayDouble *getPointer() const { return (const DataArrayDouble *)(_cpp_pointer); }
-    SALOME::StringSeq *GetExportableFormats();
-    CORBA::Boolean ExportDataAs(const char *format, SALOME::GenericObj_out exporter);
-  public:
-    void getTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfString_out sa);
-    void getSerialisationData(SALOME_TYPES::ListOfDouble_out da);
+    const DataArray *getPointer() const { return (const DataArray *)(_cpp_pointer); }
   };
 }
 

@@ -32,6 +32,7 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
 
     def testContentOfFetched1DMesh(self):
         meshPtr=self._objC.get1DMesh();
+        self.assertEqual("1DMeshForCorba",meshPtr.getName());
         _mesh_from_distant=MEDCouplingUMeshClient.New(meshPtr);
         meshPtr.UnRegister();
         self.assertTrue(_mesh_from_distant.getSpaceDimension()==3);
@@ -192,6 +193,8 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     
     def testCorbaField3DSurfWTFetching(self):
         fieldPtr=self._objC.getFieldScalarOn3DSurfWT();
+        self.assertEqual("toto25",fieldPtr.getName());
+        self.assertEqual(["aaa","bbbb","ccccc"],fieldPtr.getInfoOnComponents());
         fieldCpp=MEDCouplingFieldDoubleClient.New(fieldPtr);
         fieldPtr.UnRegister();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
@@ -300,6 +303,8 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
 
     def testCorbaArrayDouble1(self):
         fieldPtr=self._objC.getArrayDouble1()
+        self.assertEqual("toto",fieldPtr.getName());
+        self.assertEqual(["sss","ppp","ttt"],fieldPtr.getInfoOnComponents());
         fieldCpp=DataArrayDoubleClient.New(fieldPtr)
         fieldPtr.UnRegister()
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()

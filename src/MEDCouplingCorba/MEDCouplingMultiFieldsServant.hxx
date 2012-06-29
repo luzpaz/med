@@ -45,6 +45,8 @@ namespace ParaMEDMEM
   protected:
     const MEDCouplingMultiFields *getPointer() const { return (const MEDCouplingMultiFields *)(_cpp_pointer); }
   protected:
+    char *getName();
+    SALOME_TYPES::ListOfString *getInfoOnComponents();
     CORBA::Long getMainTinyInfo(SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da, CORBA::Long& nbOfArrays, CORBA::Long& nbOfFields);
     // for field templates
     void getTinyInfo(CORBA::Long id, SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da, SALOME_TYPES::ListOfString_out sa);

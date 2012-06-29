@@ -65,6 +65,10 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkContentOfFetched1DMesh
 {
   SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr meshPtr=_objC->get1DMesh();
   _mesh_from_distant=ParaMEDMEM::MEDCouplingUMeshClient::New(meshPtr);
+  char *meshName=meshPtr->getName();
+  std::string meshNameCpp(meshName);
+  CPPUNIT_ASSERT(meshNameCpp=="1DMeshForCorba");
+  CORBA::string_free(meshName);
   meshPtr->UnRegister();
   CORBA::release(meshPtr);
   CPPUNIT_ASSERT_EQUAL(3,_mesh_from_distant->getSpaceDimension());
@@ -283,6 +287,18 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaField3DNTFetching
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaField3DSurfWTFetching()
 {
   SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr fieldPtr=_objC->getFieldScalarOn3DSurfWT();
+  //
+  char *fieldName=fieldPtr->getName();
+  std::string fieldNameCpp(fieldName);
+  CPPUNIT_ASSERT(fieldNameCpp=="toto25");
+  CORBA::string_free(fieldName);
+  SALOME_TYPES::ListOfString *comps=fieldPtr->getInfoOnComponents();
+  CPPUNIT_ASSERT_EQUAL(3,(int)comps->length());
+  CPPUNIT_ASSERT(std::string((*comps)[0])=="aaa");
+  CPPUNIT_ASSERT(std::string((*comps)[1])=="bbbb");
+  CPPUNIT_ASSERT(std::string((*comps)[2])=="ccccc");
+  delete comps;
+  //
   ParaMEDMEM::MEDCouplingFieldDouble *fieldCpp=ParaMEDMEM::MEDCouplingFieldDoubleClient::New(fieldPtr);
   fieldPtr->UnRegister();
   CORBA::release(fieldPtr);
@@ -461,6 +477,18 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaMultiFields1()
 void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaArrayDouble1()
 {
   SALOME_MED::DataArrayDoubleCorbaInterface_ptr fieldPtr=_objC->getArrayDouble1();
+  //
+  char *fieldName=fieldPtr->getName();
+  std::string fieldNameCpp(fieldName);
+  CPPUNIT_ASSERT(fieldNameCpp=="toto");
+  CORBA::string_free(fieldName);
+  SALOME_TYPES::ListOfString *comps=fieldPtr->getInfoOnComponents();
+  CPPUNIT_ASSERT_EQUAL(3,(int)comps->length());
+  CPPUNIT_ASSERT(std::string((*comps)[0])=="sss");
+  CPPUNIT_ASSERT(std::string((*comps)[1])=="ppp");
+  CPPUNIT_ASSERT(std::string((*comps)[2])=="ttt");
+  delete comps;
+  //
   ParaMEDMEM::DataArrayDouble *fieldCpp=ParaMEDMEM::DataArrayDoubleClient::New(fieldPtr);
   fieldPtr->UnRegister();
   CORBA::release(fieldPtr);

@@ -39,9 +39,9 @@ class MEDCouplingCorbaServBasicsTest:
         mesh.setCoords(myCoords);
         mesh.changeSpaceDimension(3);
         myCoords=mesh.getCoords();
-        myCoords.setInfoOnComponent(0,"X1D(m)");
-        myCoords.setInfoOnComponent(1,"Y1D (dm)");
-        myCoords.setInfoOnComponent(2,"Z1D (pm)");
+        myCoords.setInfoOnComponent(0,"X1D [m]");
+        myCoords.setInfoOnComponent(1,"Y1D [dm]");
+        myCoords.setInfoOnComponent(2,"Z1D [pm]");
         center=[0.,0.,0.]
         vector=[0.,1.,0.]
         mesh.rotate(center,vector,-math.pi/2.);
@@ -104,9 +104,9 @@ class MEDCouplingCorbaServBasicsTest:
         myCoords=DataArrayDouble.New();
         myCoords.setValues(targetCoords,9,3);
         targetMesh.setCoords(myCoords);
-        myCoords.setInfoOnComponent(0,"X (m)");
-        myCoords.setInfoOnComponent(1,"X (dm)");
-        myCoords.setInfoOnComponent(2,"X (m)");
+        myCoords.setInfoOnComponent(0,"X [m]");
+        myCoords.setInfoOnComponent(1,"X [dm]");
+        myCoords.setInfoOnComponent(2,"X [m]");
         return targetMesh;
 
     def build0DMesh(self):
@@ -129,9 +129,9 @@ class MEDCouplingCorbaServBasicsTest:
         myCoords=DataArrayDouble.New();
         myCoords.setValues(targetCoords,9,3);
         targetMesh.setCoords(myCoords);
-        myCoords.setInfoOnComponent(0,"X (m)");
-        myCoords.setInfoOnComponent(1,"YY (Pm)");
-        myCoords.setInfoOnComponent(2,"ZZZ (m)");
+        myCoords.setInfoOnComponent(0,"X [m]");
+        myCoords.setInfoOnComponent(1,"YY [Pm]");
+        myCoords.setInfoOnComponent(2,"ZZZ [m]");
         targetMesh.checkCoherency();
         return targetMesh;
 
@@ -225,6 +225,7 @@ class MEDCouplingCorbaServBasicsTest:
         array=DataArrayDouble.New();
         tmp=mesh.getNumberOfCells()*3*[7.]
         array.setValues(tmp,mesh.getNumberOfCells(),3);
+        array.setInfoOnComponents(["aaa","bbbb","ccccc"])
         fieldOnCells.setArray(array);
         fieldOnCells.setTime(6.7,1,4);
         fieldOnCells.checkCoherency();
@@ -294,8 +295,8 @@ class MEDCouplingCorbaServBasicsTest:
             ptr[i]=float(i+1);
             pass
         array.setValues(ptr,18,2);
-        array.setInfoOnComponent(0,"Power(MW)");
-        array.setInfoOnComponent(1,"Density (kg/m^3)");
+        array.setInfoOnComponent(0,"Power [MW]");
+        array.setInfoOnComponent(1,"Density [kg/m^3]");
         f.setArray(array);
         f.setName("MyFirstFieldOnGaussPoint");
         f.setTimeUnit("ms");
@@ -316,8 +317,8 @@ class MEDCouplingCorbaServBasicsTest:
         for i in xrange(18*2):
             ptr[i]=float(i+7)
         array.setValues(ptr,18,2);
-        array.setInfoOnComponent(0,"Power(MW)");
-        array.setInfoOnComponent(1,"Density (kg/m^3)");
+        array.setInfoOnComponent(0,"Power [MW]");
+        array.setInfoOnComponent(1,"Density [kg/m^3]");
         f.setArray(array);
         #
         f.checkCoherency();
@@ -338,8 +339,8 @@ class MEDCouplingCorbaServBasicsTest:
             ptr[i]=float(i/2+7)+float((i%2)*1000);
             pass
         array.setValues(ptr,nbOfCells,2);
-        array.setInfoOnComponent(0,"Power(MW)");
-        array.setInfoOnComponent(1,"Density (kg/m^3)");
+        array.setInfoOnComponent(0,"Power [MW]");
+        array.setInfoOnComponent(1,"Density [kg/m^3]");
         f.setArray(array);
         #
         f.checkCoherency();
@@ -360,8 +361,8 @@ class MEDCouplingCorbaServBasicsTest:
             ptr[i]=float(i/2+7)+float((i%2)*1000);
             pass
         array.setValues(ptr,nbOfCells,2);
-        array.setInfoOnComponent(0,"Power(GW)");
-        array.setInfoOnComponent(1,"Density (kg/m^3)");
+        array.setInfoOnComponent(0,"Power [GW]");
+        array.setInfoOnComponent(1,"Density [kg/m^3]");
         f.setArray(array);
         #
         f.checkCoherency();

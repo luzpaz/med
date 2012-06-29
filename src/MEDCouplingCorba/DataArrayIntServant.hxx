@@ -26,14 +26,13 @@
 #endif
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
 #include "MEDCouplingCorba.hxx"
-#include "MEDCouplingRefCountServant.hxx"
+#include "DataArrayServant.hxx"
 
 namespace ParaMEDMEM
 {
-  class RefCountObject;
   class DataArrayInt;
 
-  class MEDCOUPLINGCORBA_EXPORT DataArrayIntServant : public MEDCouplingRefCountServant , public virtual POA_SALOME_MED::DataArrayIntCorbaInterface
+  class MEDCOUPLINGCORBA_EXPORT DataArrayIntServant : public DataArrayServant , public virtual POA_SALOME_MED::DataArrayIntCorbaInterface
   {
   public:
     typedef DataArrayInt CppType;
