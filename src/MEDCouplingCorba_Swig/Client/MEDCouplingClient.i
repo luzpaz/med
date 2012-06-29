@@ -35,7 +35,7 @@
 using namespace ParaMEDMEM;
 %}
 
-%include "MEDCoupling.i"
+%include "MEDCouplingCommon.i"
 
 %newobject ParaMEDMEM::MEDCouplingFieldDoubleClient::New;
 %newobject ParaMEDMEM::MEDCouplingFieldTemplateClient::New;
@@ -341,3 +341,47 @@ namespace ParaMEDMEM
       }
   };
 }
+
+%pythoncode %{
+def ParaMEDMEMDataArrayDoubleIadd(self,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.DataArrayDouble____iadd___(self, self, *args)
+def ParaMEDMEMDataArrayDoubleIsub(self,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.DataArrayDouble____isub___(self, self, *args)
+def ParaMEDMEMDataArrayDoubleImul(self,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.DataArrayDouble____imul___(self, self, *args)
+def ParaMEDMEMDataArrayDoubleIdiv(self,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.DataArrayDouble____idiv___(self, self, *args)
+def ParaMEDMEMMEDCouplingFieldDoubleIadd(self,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.MEDCouplingFieldDouble____iadd___(self, self, *args)
+def ParaMEDMEMMEDCouplingFieldDoubleIsub(self,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.MEDCouplingFieldDouble____isub___(self, self, *args)
+def ParaMEDMEMMEDCouplingFieldDoubleImul(self,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.MEDCouplingFieldDouble____imul___(self, self, *args)
+def ParaMEDMEMMEDCouplingFieldDoubleIdiv(self,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.MEDCouplingFieldDouble____idiv___(self, self, *args)
+def ParaMEDMEMDataArrayIntIadd(self,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.DataArrayInt____iadd___(self, self, *args)
+def ParaMEDMEMDataArrayIntIsub(self,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.DataArrayInt____isub___(self, self, *args)
+def ParaMEDMEMDataArrayIntImul(self,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.DataArrayInt____imul___(self, self, *args)
+def ParaMEDMEMDataArrayIntIdiv(self,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.DataArrayInt____idiv___(self, self, *args)
+def ParaMEDMEMDataArrayIntImod(self,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.DataArrayInt____imod___(self, self, *args)
+%}
+
+%include "MEDCouplingFinalize.i"
