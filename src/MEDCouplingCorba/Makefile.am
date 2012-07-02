@@ -41,9 +41,10 @@ salomeinclude_HEADERS=                        \
 	MEDCouplingFieldDoubleServant.hxx     \
 	MEDCouplingFieldTemplateServant.hxx   \
 	MEDCouplingMultiFieldsServant.hxx     \
-	MEDCouplingFieldOverTimeServant.hxx  \
+	MEDCouplingFieldOverTimeServant.hxx   \
 	DataArrayDoubleServant.hxx            \
-	DataArrayIntServant.hxx
+	DataArrayIntServant.hxx               \
+	DataArrayServant.hxx
 
 dist_libmedcouplingcorba_la_SOURCES=         \
 	MEDCouplingRefCountServant.cxx       \
@@ -58,7 +59,8 @@ dist_libmedcouplingcorba_la_SOURCES=         \
 	MEDCouplingMultiFieldsServant.cxx    \
 	MEDCouplingFieldOverTimeServant.cxx  \
 	DataArrayDoubleServant.cxx           \
-	DataArrayIntServant.cxx
+	DataArrayIntServant.cxx              \
+	DataArrayServant.cxx
 
 libmedcouplingcorba_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) -I$(top_builddir)/idl ${KERNEL_CXXFLAGS} \
 	-I$(srcdir)/../MEDCoupling -I$(srcdir)/../INTERP_KERNEL/Bases -I$(srcdir)/../INTERP_KERNEL
