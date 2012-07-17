@@ -827,6 +827,8 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
   const char * LOC = "MED_MESH_RDONLY_DRIVER::getNodalConnectivity : ";
   BEGIN_OF_MED(LOC);
   med_2_3::med_bool chgtp3,trfp3;
+  med_2_3::med_err err;
+
   if (_status==MED_OPENED)
     {
       int dtp3,itp3;
@@ -1024,21 +1026,20 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
             int tmp_numberOfCells = Connectivity->_count[i+1]-Connectivity->_count[i];
             PointerOf< med_2_3::med_int > tmp_ConnectivityArray( connSizeByType[i] );
 
-            med_2_3::med_err err2;
             switch ( Connectivity->_geometricTypes[i] )
             {
             case MED_EN::MED_POLYGON:
               {
                 PointerOf <med_2_3::med_int> PolygonsConnIndex( tmp_numberOfCells+1 );
-                err2=med_2_3::MEDmeshPolygonRd(_medIdt,_ptrMesh->_name.c_str(),
+                err = med_2_3::MEDmeshPolygonRd(_medIdt,_ptrMesh->_name.c_str(),
                                                dtp3,itp3,
                                                med_2_3::MED_CELL,
                                                med_2_3::MED_NODAL,
                                                PolygonsConnIndex,
                                                tmp_ConnectivityArray);
-                if (err2 != MED_VALID)
+                if (err != MED_VALID)
                 {
-                  MESSAGE_MED(LOC<<": MEDpolygoneConnLire returns "<<err2);
+                  MESSAGE_MED(LOC<<": MEDpolygoneConnLire returns "<<err);
                   return MED_ERROR;
                 }
                 int* polyindex = (int*)NodalIndex + Connectivity->_count[i] - 1;
@@ -1051,16 +1052,16 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
               {
                 PointerOf< med_2_3::med_int> FacesIndex( polyhedraFacesIndexSize );
                 PointerOf< med_2_3::med_int> PolyhedronIndex( tmp_numberOfCells+1 );
-                err2=med_2_3::MEDmeshPolyhedronRd(_medIdt,_ptrMesh->_name.c_str(),
+                err = med_2_3::MEDmeshPolyhedronRd(_medIdt,_ptrMesh->_name.c_str(),
                                                   dtp3,itp3,
                                                   med_2_3::MED_CELL,
                                                   med_2_3::MED_NODAL,
                                                   PolyhedronIndex,
                                                   FacesIndex,
                                                   tmp_ConnectivityArray);
-                if (err2 != MED_VALID)
+                if (err != MED_VALID)
                 {
-                  MESSAGE_MED(LOC<<": MEDpolyedreConnLire returns "<<err2);
+                  MESSAGE_MED(LOC<<": MEDpolyedreConnLire returns "<<err);
                   return MED_ERROR;
                 }
                 // insert face separators
@@ -1082,32 +1083,17 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
                 //break;
               }
             default:
-              med_2_3::med_bool withname=med_2_3::MED_FALSE,withnumber=med_2_3::MED_FALSE,withfam=med_2_3::MED_FALSE;
-              int curNbOfElemp3=med_2_3::MEDmeshnEntity(_medIdt,_ptrMesh->_name.c_str(),
-                                                        dtp3,itp3,
-                                                        med_2_3::MED_CELL,
-                                                        med_2_3::med_geometry_type(Connectivity->_geometricTypes[i]),
-                                                        med_2_3::MED_CONNECTIVITY,
-                                                        med_2_3::MED_NODAL,
-                                                        &chgtp3,&trfp3);
-              char *nomsp3=new char[MED_SNAME_SIZE*curNbOfElemp3+1];
-              int *globArrp3=new int[curNbOfElemp3];
-              int *famp3=new int[curNbOfElemp3];
-              err2=med_2_3::MEDmeshElementRd(_medIdt,_ptrMesh->_name.c_str(),
-                                             dtp3,itp3,
-                                             med_2_3::MED_CELL,
-                                             med_2_3::med_geometry_type(Connectivity->_geometricTypes[i]),
-                                             med_2_3::MED_NODAL,
-                                             med_2_3::MED_FULL_INTERLACE,
-                                             tmp_ConnectivityArray,
-                                             &withname,nomsp3,&withnumber,
-                                             globArrp3,&withfam,famp3);
-              delete [] nomsp3;
-              delete [] globArrp3;
-              delete [] famp3;
-              if ( err2 != MED_VALID)
+              err = med_2_3::MEDmeshElementConnectivityRd(_medIdt,_ptrMesh->_name.c_str(),
+                                              dtp3,itp3,
+                                              med_2_3::MED_CELL,
+                                              med_2_3::med_geometry_type(Connectivity->_geometricTypes[i]),
+                                              med_2_3::MED_NODAL,
+                                              med_2_3::MED_FULL_INTERLACE,
+                                              tmp_ConnectivityArray
+                                              );
+              if ( err != MED_VALID)
               {
-                MESSAGE_MED(LOC<<": MEDconnLire returns "<<err2);
+                MESSAGE_MED(LOC<<": MEDconnLire returns "<<err);
                 return MED_ERROR;
               }
               int NumberOfNodeByCell = Connectivity->_type[i].getNumberOfNodes();
@@ -1199,9 +1185,9 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
           // Fill the MEDSKYLINEARRAY by reading the MED file.
           for ( i=0; i<constituent->_numberOfTypes; i++)
           {
-              int NumberOfNodeByFace = constituent->_type[i].getNumberOfNodes();
+            int NumberOfNodeByFace = constituent->_type[i].getNumberOfNodes();
 
-              // Il faut ajouter 1 pour le zero a la lecture !!!
+            // Il faut ajouter 1 pour le zero a la lecture !!!
             // ATTENTION UNIQUEMENT POUR MED < 2.2.x
             PointerOf< med_2_3::med_int> tmp_constituentArray;
 
@@ -1220,16 +1206,16 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
             if ( constituent->_geometricTypes[i] == MED_EN::MED_POLYGON )
             {
               PointerOf< med_2_3::med_int> PolygonsConnIndex( tmpFaceCount[i]+1 );
-              int err2 = med_2_3::MEDmeshPolygonRd(_medIdt,_ptrMesh->_name.c_str(),
+              err = med_2_3::MEDmeshPolygonRd(_medIdt,_ptrMesh->_name.c_str(),
                                                    dtp3,itp3,
                                                    med_2_3::MED_CELL,
                                                    med_2_3::MED_NODAL,
                                                    PolygonsConnIndex,
                                                    tmp_constituentArray);
 
-              if (err2 != MED_VALID)
+              if (err != MED_VALID)
               {
-                MESSAGE_MED(LOC<<": MEDpolygoneConnLire returns "<<err2);
+                MESSAGE_MED(LOC<<": MEDpolygoneConnLire returns "<<err);
                 delete constituent;
                 return MED_ERROR;
               }
@@ -1242,30 +1228,14 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
             {
               med_2_3::med_geometry_type med_type =
                 (med_2_3::med_geometry_type) constituent->_type[i].getType();
-
-              
-              med_2_3::med_bool withname=med_2_3::MED_FALSE,withnumber=med_2_3::MED_FALSE,withfam=med_2_3::MED_FALSE;
-              int curNbOfElemp3=med_2_3::MEDmeshnEntity(_medIdt,_ptrMesh->_name.c_str(),
-                                                        dtp3,itp3,
-                                                        med_2_3::MED_CELL,med_type,
-                                                        med_2_3::MED_CONNECTIVITY,
-                                                        med_2_3::MED_NODAL,
-                                                        &chgtp3,&trfp3);
-              char *nomsp3=new char[MED_SNAME_SIZE*curNbOfElemp3+1];
-              int *globArrp3=new int[curNbOfElemp3];
-              int *famp3=new int[curNbOfElemp3];
-              int err=med_2_3::MEDmeshElementRd(_medIdt,_ptrMesh->_name.c_str(),
-                                                dtp3,itp3,
-                                                med_2_3::MED_CELL,med_type,
-                                                med_2_3::MED_NODAL,
-                                                med_2_3::MED_FULL_INTERLACE,
-                                                tmp_constituentArray,
-                                                &withname,nomsp3,&withnumber,
-                                                globArrp3,&withfam,famp3);
-              delete [] nomsp3;
-              delete [] globArrp3;
-              delete [] famp3;
-              
+              err = med_2_3::MEDmeshElementConnectivityRd(_medIdt,_ptrMesh->_name.c_str(),
+                                              dtp3,itp3,
+                                              med_2_3::MED_CELL,
+                                              med_type,
+                                              med_2_3::MED_NODAL,
+                                              med_2_3::MED_FULL_INTERLACE,
+                                              tmp_constituentArray
+                                              );
               if ( err != MED_VALID)
               {
                 MESSAGE_MED(LOC<<": MEDconnLire returns "<<err);
@@ -1349,31 +1319,14 @@ int MED_MESH_RDONLY_DRIVER::getNodalConnectivity(CONNECTIVITY * Connectivity)
               MESSAGE_MED(LOC<<": WE ARE USING MED2.2 so there is no +1 for calculating the size of  tmp_constituentArray !");
             }
 
-
-            med_2_3::med_bool withname=med_2_3::MED_FALSE,withnumber=med_2_3::MED_FALSE,withfam=med_2_3::MED_FALSE;
-            int curNbOfElemp3=med_2_3::MEDmeshnEntity(_medIdt,_ptrMesh->_name.c_str(),
-                                                      dtp3,itp3,
-                                                      med_2_3::MED_CELL,
-                                                      med_type,
-                                                      med_2_3::MED_CONNECTIVITY,
-                                                      med_2_3::MED_NODAL,
-                                                      &chgtp3,&trfp3);
-            char *nomsp3  =new char[MED_SNAME_SIZE*curNbOfElemp3+1];
-            int *globArrp3=new int[curNbOfElemp3];
-            int *famp3    =new int[curNbOfElemp3];
-            int err=med_2_3::MEDmeshElementRd(_medIdt,_ptrMesh->_name.c_str(),
+            err = med_2_3::MEDmeshElementConnectivityRd(_medIdt,_ptrMesh->_name.c_str(),
                                               dtp3,itp3,
                                               med_2_3::MED_CELL,
                                               med_type,
                                               med_2_3::MED_NODAL,
                                               med_2_3::MED_FULL_INTERLACE,
-                                              tmp_constituentArray,
-                                              &withname,nomsp3,&withnumber,
-                                              globArrp3,&withfam,famp3);
-            delete [] nomsp3;
-            delete [] globArrp3;
-            delete [] famp3;
-
+                                              tmp_constituentArray
+                                              );
             if ( err != MED_VALID)
             {
               MESSAGE_MED(LOC<<": MEDconnLire returns "<<err);
