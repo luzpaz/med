@@ -20,11 +20,6 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  File   : 
-//  Author : 
-//  Module : 
-//  $Header$
-//
 #ifndef MED_Common_HeaderFile
 #define MED_Common_HeaderFile
 
@@ -76,9 +71,11 @@ namespace MED{
                 eQUAD4=204, eTRIA6=206,eQUAD8=208, eQUAD9=209,eTETRA4=304,
                 ePYRA5=305, ePENTA6=306, eHEXA8=308, eOCTA12=312, eTETRA10=310, 
                 ePYRA13=313, ePENTA15=315, eHEXA20=320, eHEXA27=327,
-                ePOLYGONE=400, ePOLYEDRE=500, eNONE=0} EGeometrieElement;
+                ePOLYGONE=400, ePOLYEDRE=500, eNONE=0, 
+                eBALL=1101 /*no such a type in med.h, it's just a trick*/,
+                eAllGeoType=-1 } EGeometrieElement;
 
-  typedef enum {eMAILLE, eFACE, eARETE, eNOEUD, eNOEUD_ELEMENT} EEntiteMaillage; 
+  typedef enum {eMAILLE, eFACE, eARETE, eNOEUD, eNOEUD_ELEMENT, eSTRUCT_ELEMENT} EEntiteMaillage; 
 
   typedef enum {eNO_PFLMOD, eGLOBAL, eCOMPACT}  EModeProfil; 
 
@@ -159,6 +156,9 @@ namespace MED{
 
   struct TCellInfo;
   typedef SharedPtr<TCellInfo> PCellInfo;
+
+  struct TBallInfo;
+  typedef SharedPtr<TBallInfo> PBallInfo;
 
   struct TFieldInfo;
   typedef SharedPtr<TFieldInfo> PFieldInfo;
