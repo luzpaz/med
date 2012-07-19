@@ -762,6 +762,63 @@ namespace MED
 
   };
 
+  //---------------------------------------------------------------
+  template<EVersion eVersion>
+  struct TTBallInfo: 
+    virtual TBallInfo,
+    virtual TTCellInfo<eVersion>
+  {
+    typedef TTCellInfo<eVersion> TCellInfoBase;
+
+    TTBallInfo(const PMeshInfo& theMeshInfo, const PBallInfo& theInfo):
+      TCellInfoBase::TElemInfoBase(theMeshInfo, theInfo),
+      TCellInfoBase(theMeshInfo,theInfo)
+    {
+      myDiameters = theInfo->myDiameters;
+    }
+
+    TTBallInfo(const PMeshInfo& theMeshInfo,
+               TInt             theNbElem,
+               EBooleen         theIsElemNum ):
+      TCellInfoBase::TElemInfoBase(theMeshInfo,
+                                   theNbElem,
+                                   theIsElemNum,
+                                   /*theIsElemNames=*/eFAUX),
+      TCellInfoBase(theMeshInfo,
+                    eSTRUCT_ELEMENT,
+                    eBALL,
+                    theNbElem,
+                    /*EConnectivite=*/eNOD,
+                    theIsElemNum,
+                    /*theIsElemNames=*/eFAUX,
+                    eFULL_INTERLACE)
+    {
+      myDiameters.resize( theNbElem );
+    }
+
+    TTBallInfo(const PMeshInfo&  theMeshInfo, 
+               const TIntVector& theNodes,
+               TFloatVector&     theDiameters,
+               const TIntVector& theFamilyNums,
+               const TIntVector& theElemNums):
+      TCellInfoBase::TElemInfoBase(theMeshInfo,
+                                   (TInt)std::max(theNodes.size(),theDiameters.size() ),
+                                   theFamilyNums,
+                                   theElemNums,
+                                   TStringVector()),
+      TCellInfoBase(theMeshInfo,
+                    eSTRUCT_ELEMENT,
+                    eBALL,
+                    theNodes,
+                    /*EConnectivite=*/eNOD,
+                    theFamilyNums,
+                    theElemNums,
+                    TStringVector(),
+                    eFULL_INTERLACE)
+    {
+      myDiameters.swap( theDiameters );
+    }
+  };
 
   //---------------------------------------------------------------
   template<EVersion eVersion>
