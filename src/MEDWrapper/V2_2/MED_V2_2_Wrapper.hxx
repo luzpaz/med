@@ -342,7 +342,22 @@ namespace MED
                   EModeAcces theMode,
                   TErr* theErr = NULL);
       
+      //----------------------------------------------------------------------------
+      //! Read geom type of MED_BALL structural element
+      EGeometrieElement GetBallGeom(const TMeshInfo& theMeshInfo);
       
+      //! Read number of balls in the Mesh
+      virtual TInt GetNbBalls(const TMeshInfo& theMeshInfo);
+
+      //! Read a MEDWrapped representation of MED_BALL from the MED file
+      virtual void GetBallInfo(TBallInfo& theInfo, TErr* theErr = NULL);
+
+      //! Write a MEDWrapped representation of MED_BALL to the MED file
+      virtual void  SetBallInfo(const TBallInfo& theInfo, TErr* theErr);
+
+      //! Write a MEDWrapped representation of MED_BALL to the MED file
+      void  SetBallInfo(const TBallInfo& theInfo, EModeAcces theMode, TErr* theErr);
+
       //----------------------------------------------------------------------------
       virtual
       TInt

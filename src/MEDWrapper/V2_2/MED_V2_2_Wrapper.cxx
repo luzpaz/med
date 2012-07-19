@@ -20,11 +20,6 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  File   : 
-//  Author : 
-//  Module : 
-//  $Header$
-//
 #include "MED_V2_2_Wrapper.hxx"
 #include "MED_Algorithm.hxx"
 #include "MED_Utilities.hxx"
@@ -463,23 +458,26 @@ namespace MED
     //----------------------------------------------------------------------------
     void
     TVWrapper
-    ::GetNames(TElemInfo& theInfo,
-               TInt theNb,
-               EEntiteMaillage theEntity, 
+    ::GetNames(TElemInfo&        theInfo,
+               TInt              theNb,
+               EEntiteMaillage   theEntity, 
                EGeometrieElement theGeom,
-               TErr* theErr)
+               TErr*             theErr)
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
       if(theErr && *theErr < 0)
         return;
       
+      if ( theGeom == eBALL )
+        theGeom = GetBallGeom( theInfo.myMeshInfo );
+
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
 
-      TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-      TValueHolder<TString, char> anElemNames(theInfo.myElemNames);
-      TValueHolder<EEntiteMaillage, med_entity_type> anEntity(theEntity);
-      TValueHolder<EGeometrieElement, med_geometry_type> aGeom(theGeom);
+      TValueHolder<TString, char>                        aMeshName  (aMeshInfo.myName);
+      TValueHolder<TString, char>                        anElemNames(theInfo.myElemNames);
+      TValueHolder<EEntiteMaillage, med_entity_type>     anEntity   (theEntity);
+      TValueHolder<EGeometrieElement, med_geometry_type> aGeom      (theGeom);
       
       TErr aRet = MEDmeshEntityNameRd(myFile->Id(),
                                       &aMeshName,
@@ -498,23 +496,26 @@ namespace MED
     //----------------------------------------------------------------------------
     void
     TVWrapper
-    ::GetNumeration(TElemInfo& theInfo,
-                    TInt theNb,
-                    EEntiteMaillage theEntity, 
+    ::GetNumeration(TElemInfo&        theInfo,
+                    TInt              theNb,
+                    EEntiteMaillage   theEntity, 
                     EGeometrieElement theGeom,
-                    TErr* theErr)
+                    TErr*             theErr)
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
       if(theErr && *theErr < 0)
         return;
       
+      if ( theGeom == eBALL )
+        theGeom = GetBallGeom( theInfo.myMeshInfo );
+
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
       
-      TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-      TValueHolder<TElemNum, med_int> anElemNum(theInfo.myElemNum);
-      TValueHolder<EEntiteMaillage, med_entity_type> anEntity(theEntity);
-      TValueHolder<EGeometrieElement, med_geometry_type> aGeom(theGeom);
+      TValueHolder<TString, char>                        aMeshName(aMeshInfo.myName);
+      TValueHolder<TElemNum, med_int>                    anElemNum(theInfo.myElemNum);
+      TValueHolder<EEntiteMaillage, med_entity_type>     anEntity (theEntity);
+      TValueHolder<EGeometrieElement, med_geometry_type> aGeom    (theGeom);
       
       TErr aRet = MEDmeshEntityNumberRd(myFile->Id(),
                                         &aMeshName,
@@ -533,23 +534,26 @@ namespace MED
     //----------------------------------------------------------------------------
     void
     TVWrapper
-    ::GetFamilies(TElemInfo& theInfo,
-                  TInt theNb,
-                  EEntiteMaillage theEntity, 
+    ::GetFamilies(TElemInfo&        theInfo,
+                  TInt              theNb,
+                  EEntiteMaillage   theEntity, 
                   EGeometrieElement theGeom,
-                  TErr* theErr)
+                  TErr*             theErr)
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
       
       if(theErr && *theErr < 0)
         return;
+
+      if ( theGeom == eBALL )
+        theGeom = GetBallGeom( theInfo.myMeshInfo );
       
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
 
-      TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-      TValueHolder<TElemNum, med_int> aFamNum(theInfo.myFamNum);
-      TValueHolder<EEntiteMaillage, med_entity_type> anEntity(theEntity);
-      TValueHolder<EGeometrieElement, med_geometry_type> aGeom(theGeom);
+      TValueHolder<TString, char>                        aMeshName(aMeshInfo.myName);
+      TValueHolder<TElemNum, med_int>                    aFamNum  (theInfo.myFamNum);
+      TValueHolder<EEntiteMaillage, med_entity_type>     anEntity (theEntity);
+      TValueHolder<EGeometrieElement, med_geometry_type> aGeom    (theGeom);
       
       TErr aRet = MEDmeshEntityFamilyNumberRd(myFile->Id(),
                                               &aMeshName,
@@ -591,26 +595,30 @@ namespace MED
     //----------------------------------------------------------------------------
     void
     TVWrapper
-    ::SetNames(const TElemInfo& theInfo,
-               EModeAcces theMode,
-               EEntiteMaillage theEntity, 
+    ::SetNames(const TElemInfo&  theInfo,
+               EModeAcces        theMode,
+               EEntiteMaillage   theEntity, 
                EGeometrieElement theGeom,
-               TErr* theErr)
+               TErr*             theErr)
     {
       TFileWrapper aFileWrapper(myFile,theMode,theErr);
       
       if(theErr && *theErr < 0)
         return;
 
+      if ( theGeom == eBALL )
+        theGeom = GetBallGeom( theInfo.myMeshInfo );
+
       MED::TElemInfo& anInfo = const_cast<MED::TElemInfo&>(theInfo);
       MED::TMeshInfo& aMeshInfo = *anInfo.myMeshInfo;
 
       TErr aRet = 0;
-      if(theInfo.myIsElemNames){
-        TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-        TValueHolder<TString, char> anElemNames(anInfo.myElemNames);
-        TValueHolder<EEntiteMaillage, med_entity_type> anEntity(theEntity);
-        TValueHolder<EGeometrieElement, med_geometry_type> aGeom(theGeom);
+      if(theInfo.myIsElemNames)
+      {
+        TValueHolder<TString, char>                        aMeshName  (aMeshInfo.myName);
+        TValueHolder<TString, char>                        anElemNames(anInfo.myElemNames);
+        TValueHolder<EEntiteMaillage, med_entity_type>     anEntity   (theEntity);
+        TValueHolder<EGeometrieElement, med_geometry_type> aGeom      (theGeom);
       
         aRet  = MEDmeshEntityNameWr(myFile->Id(),
                                     &aMeshName,
@@ -643,26 +651,30 @@ namespace MED
     //----------------------------------------------------------------------------
     void 
     TVWrapper
-    ::SetNumeration(const TElemInfo& theInfo,
-                    EModeAcces theMode,
-                    EEntiteMaillage theEntity, 
+    ::SetNumeration(const TElemInfo&  theInfo,
+                    EModeAcces        theMode,
+                    EEntiteMaillage   theEntity, 
                     EGeometrieElement theGeom,
-                    TErr* theErr)
+                    TErr*             theErr)
     {
       TFileWrapper aFileWrapper(myFile,theMode,theErr);
       
       if(theErr && *theErr < 0)
         return;
 
+      if ( theGeom == eBALL )
+        theGeom = GetBallGeom( theInfo.myMeshInfo );
+
       MED::TElemInfo& anInfo = const_cast<MED::TElemInfo&>(theInfo);
       MED::TMeshInfo& aMeshInfo = *anInfo.myMeshInfo;
 
       TErr aRet = 0;
-      if(theInfo.myIsElemNum){
-        TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-        TValueHolder<TElemNum, med_int> anElemNum(anInfo.myElemNum);
-        TValueHolder<EEntiteMaillage, med_entity_type> anEntity(theEntity);
-        TValueHolder<EGeometrieElement, med_geometry_type> aGeom(theGeom);
+      if(theInfo.myIsElemNum)
+      {
+        TValueHolder<TString, char>                        aMeshName(aMeshInfo.myName);
+        TValueHolder<TElemNum, med_int>                    anElemNum(anInfo.myElemNum);
+        TValueHolder<EEntiteMaillage, med_entity_type>     anEntity (theEntity);
+        TValueHolder<EGeometrieElement, med_geometry_type> aGeom    (theGeom);
       
         aRet  = MEDmeshEntityNumberWr(myFile->Id(),
                                       &aMeshName,
@@ -682,10 +694,10 @@ namespace MED
     //----------------------------------------------------------------------------
     void
     TVWrapper
-    ::SetFamilies(const TElemInfo& theInfo,
-                  EEntiteMaillage theEntity, 
+    ::SetFamilies(const TElemInfo&  theInfo,
+                  EEntiteMaillage   theEntity, 
                   EGeometrieElement theGeom,
-                  TErr* theErr)
+                  TErr*             theErr)
     { 
       SetFamilies(theInfo,eLECTURE_ECRITURE,theEntity,theGeom,theErr);
     }
@@ -693,24 +705,27 @@ namespace MED
     //----------------------------------------------------------------------------
     void 
     TVWrapper
-    ::SetFamilies(const TElemInfo& theInfo,
-                  EModeAcces theMode,
-                  EEntiteMaillage theEntity, 
+    ::SetFamilies(const TElemInfo&  theInfo,
+                  EModeAcces        theMode,
+                  EEntiteMaillage   theEntity, 
                   EGeometrieElement theGeom,
-                  TErr* theErr)
+                  TErr*             theErr)
     {
       TFileWrapper aFileWrapper(myFile,theMode,theErr);
       
       if(theErr && *theErr < 0)
         return;
 
+      if ( theGeom == eBALL )
+        theGeom = GetBallGeom( theInfo.myMeshInfo );
+
       MED::TElemInfo& anInfo = const_cast<MED::TElemInfo&>(theInfo);
       MED::TMeshInfo& aMeshInfo = *anInfo.myMeshInfo;
 
-      TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-      TValueHolder<TElemNum, med_int> aFamNum(anInfo.myFamNum);
-      TValueHolder<EEntiteMaillage, med_entity_type> anEntity(theEntity);
-      TValueHolder<EGeometrieElement, med_geometry_type> aGeom(theGeom);
+      TValueHolder<TString, char>                        aMeshName(aMeshInfo.myName);
+      TValueHolder<TElemNum, med_int>                    aFamNum  (anInfo.myFamNum);
+      TValueHolder<EEntiteMaillage, med_entity_type>     anEntity (theEntity);
+      TValueHolder<EGeometrieElement, med_geometry_type> aGeom    (theGeom);
       
       TErr aRet = MEDmeshEntityFamilyNumberWr(myFile->Id(),
                                               &aMeshName,
@@ -848,19 +863,18 @@ namespace MED
       MED::TNodeInfo& anInfo = const_cast<MED::TNodeInfo&>(theInfo);
       MED::TMeshInfo& aMeshInfo = *anInfo.myMeshInfo;
       
-      TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-      TValueHolder<TInt, med_int> aDim(aMeshInfo.myDim);
-      TValueHolder<TNodeCoord, med_float> aCoord(anInfo.myCoord);
-      TValueHolder<EModeSwitch, med_switch_mode> aModeSwitch(anInfo.myModeSwitch);
-      TValueHolder<ERepere, med_axis_type> aSystem(anInfo.mySystem);
-      TValueHolder<TString, char> aCoordNames(anInfo.myCoordNames);
-      TValueHolder<TString, char> aCoordUnits(anInfo.myCoordUnits);
-      TValueHolder<TString, char> anElemNames(anInfo.myElemNames);
-      TValueHolder<EBooleen, med_bool> anIsElemNames(anInfo.myIsElemNames);
-      TValueHolder<TElemNum, med_int> anElemNum(anInfo.myElemNum);
-      TValueHolder<EBooleen, med_bool> anIsElemNum(anInfo.myIsElemNum);
-      TValueHolder<TElemNum, med_int> aFamNum(anInfo.myFamNum);
-      TValueHolder<TInt, med_int> aNbElem(anInfo.myNbElem);
+      TValueHolder<TString, char>                aMeshName    (aMeshInfo.myName);
+      TValueHolder<TNodeCoord, med_float>        aCoord       (anInfo.myCoord);
+      TValueHolder<EModeSwitch, med_switch_mode> aModeSwitch  (anInfo.myModeSwitch);
+      TValueHolder<ERepere, med_axis_type>       aSystem      (anInfo.mySystem);
+      TValueHolder<TString, char>                aCoordNames  (anInfo.myCoordNames);
+      TValueHolder<TString, char>                aCoordUnits  (anInfo.myCoordUnits);
+      TValueHolder<TString, char>                anElemNames  (anInfo.myElemNames);
+      TValueHolder<EBooleen, med_bool>           anIsElemNames(anInfo.myIsElemNames);
+      TValueHolder<TElemNum, med_int>            anElemNum    (anInfo.myElemNum);
+      TValueHolder<EBooleen, med_bool>           anIsElemNum  (anInfo.myIsElemNum);
+      TValueHolder<TElemNum, med_int>            aFamNum      (anInfo.myFamNum);
+      TValueHolder<TInt, med_int>                aNbElem      (anInfo.myNbElem);
 
       TErr aRet = MEDmeshNodeCoordinateWr(myFile->Id(),
                                           &aMeshName,
@@ -1323,8 +1337,29 @@ namespace MED
             for(; anIter2 != anIterEnd2; anIter2++){
               const EGeometrieElement& aGeom = *anIter2;
               aNbElem = GetNbCells(theMeshInfo,anEntity,aGeom,theConnMode,theErr);
-              if(aNbElem > 0)
-                anInfo[anEntity][aGeom] = aNbElem;
+              if(aNbElem > 0) {
+                if ( anEntity == eSTRUCT_ELEMENT ) {
+                  const TInt nbStructTypes = aNbElem;
+                  for ( TInt structType = 0; structType < nbStructTypes; ++structType ) {
+                    // check type name to keep only "MED_BALL" structured element
+                    TValueHolder<TString, char> aMeshName((TString&) theMeshInfo.myName );
+                    char                        geotypename[ MED_NAME_SIZE + 1] = "";
+                    med_geometry_type           geotype;
+                    MEDmeshEntityInfo( myFile->Id(), &aMeshName, MED_NO_DT, MED_NO_IT,
+                                       med_entity_type(anEntity), structType+1,
+                                       geotypename, &geotype);
+                    if ( strcmp( geotypename, MED_BALL_NAME ) == 0 ) {
+                      aNbElem = GetNbCells( theMeshInfo, anEntity, EGeometrieElement(geotype),
+                                            theConnMode, theErr);
+                      if ( aNbElem > 0 )
+                        anInfo[anEntity][EGeometrieElement(geotype)] = aNbElem;
+                    }
+                  }
+                }
+                else {
+                  anInfo[anEntity][aGeom] = aNbElem;
+                }
+              }
             }
           }
         }
@@ -1395,39 +1430,44 @@ namespace MED
                  TErr* theErr)
     {
       TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
-      
+
       if(theErr && *theErr < 0)
         return -1;
-      
+
       MED::TMeshInfo& aMeshInfo = const_cast<MED::TMeshInfo&>(theMeshInfo);
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
       med_bool chgt,trsf;
-      if(theGeom!=MED::ePOLYGONE && theGeom!=MED::ePOLYEDRE)
-        {
-          return MEDmeshnEntity(myFile->Id(),
-                                &aMeshName,
-                                MED_NO_DT,
-                                MED_NO_IT,
-                                med_entity_type(theEntity),
-                                med_geometry_type(theGeom),
-                                MED_CONNECTIVITY,
-                                med_connectivity_mode(theConnMode),
-                                &chgt,
-                                &trsf);
-        }
+      if(theGeom!=MED::ePOLYGONE && theGeom!=MED::ePOLYEDRE && theGeom != MED::eBALL)
+      {
+        return MEDmeshnEntity(myFile->Id(),
+                              &aMeshName,
+                              MED_NO_DT,
+                              MED_NO_IT,
+                              med_entity_type(theEntity),
+                              med_geometry_type(theGeom),
+                              MED_CONNECTIVITY,
+                              med_connectivity_mode(theConnMode),
+                              &chgt,
+                              &trsf);
+      }
       else if(theGeom==MED::ePOLYGONE)
-        {
-          return MEDmeshnEntity(myFile->Id(),&aMeshName,MED_NO_DT,MED_NO_IT,med_entity_type(theEntity),
-                                MED_POLYGON,MED_INDEX_NODE,med_connectivity_mode(theConnMode),&chgt,&trsf)-1;
-        }
-      else
-        {
-          return MEDmeshnEntity(myFile->Id(),&aMeshName,MED_NO_DT,MED_NO_IT,med_entity_type(theEntity),
-                                MED_POLYHEDRON,MED_INDEX_FACE,med_connectivity_mode(theConnMode),&chgt,&trsf)-1;
-        }
+      {
+        return MEDmeshnEntity(myFile->Id(),&aMeshName,MED_NO_DT,MED_NO_IT,med_entity_type(theEntity),
+                              MED_POLYGON,MED_INDEX_NODE,med_connectivity_mode(theConnMode),&chgt,&trsf)-1;
+      }
+      else if ( theGeom==MED::ePOLYEDRE )
+      {
+        return MEDmeshnEntity(myFile->Id(),&aMeshName,MED_NO_DT,MED_NO_IT,med_entity_type(theEntity),
+                              MED_POLYHEDRON,MED_INDEX_FACE,med_connectivity_mode(theConnMode),&chgt,&trsf)-1;
+      }
+      else if ( theGeom==MED::eBALL )
+      {
+        return GetNbBalls( theMeshInfo );
+      }
+      return 0;
     }
-    
-    
+
+
     //----------------------------------------------------------------------------
     void
     TVWrapper
@@ -1441,19 +1481,18 @@ namespace MED
       
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
 
-      TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-      TValueHolder<TInt, med_int> aDim(aMeshInfo.myDim);
-      TValueHolder<TElemNum, med_int> aConn(theInfo.myConn);
-      TValueHolder<EModeSwitch, med_switch_mode> aModeSwitch(theInfo.myModeSwitch);
-      TValueHolder<TString, char> anElemNames(theInfo.myElemNames);
-      TValueHolder<EBooleen, med_bool> anIsElemNames(theInfo.myIsElemNames);
-      TValueHolder<TElemNum, med_int> anElemNum(theInfo.myElemNum);
-      TValueHolder<EBooleen, med_bool> anIsElemNum(theInfo.myIsElemNum);
-      TValueHolder<TElemNum, med_int> aFamNum(theInfo.myFamNum);
-      TValueHolder<EBooleen, med_bool> anIsFamNum(theInfo.myIsFamNum);
-      TValueHolder<EEntiteMaillage, med_entity_type> anEntity(theInfo.myEntity);
-      TValueHolder<EGeometrieElement, med_geometry_type> aGeom(theInfo.myGeom);
-      TValueHolder<EConnectivite, med_connectivity_mode> aConnMode(theInfo.myConnMode);
+      TValueHolder<TString, char>                        aMeshName    (aMeshInfo.myName);
+      TValueHolder<TElemNum, med_int>                    aConn        (theInfo.myConn);
+      TValueHolder<EModeSwitch, med_switch_mode>         aModeSwitch  (theInfo.myModeSwitch);
+      TValueHolder<TString, char>                        anElemNames  (theInfo.myElemNames);
+      TValueHolder<EBooleen, med_bool>                   anIsElemNames(theInfo.myIsElemNames);
+      TValueHolder<TElemNum, med_int>                    anElemNum    (theInfo.myElemNum);
+      TValueHolder<EBooleen, med_bool>                   anIsElemNum  (theInfo.myIsElemNum);
+      TValueHolder<TElemNum, med_int>                    aFamNum      (theInfo.myFamNum);
+      TValueHolder<EBooleen, med_bool>                   anIsFamNum   (theInfo.myIsFamNum);
+      TValueHolder<EEntiteMaillage, med_entity_type>     anEntity     (theInfo.myEntity);
+      TValueHolder<EGeometrieElement, med_geometry_type> aGeom        (theInfo.myGeom);
+      TValueHolder<EConnectivite, med_connectivity_mode> aConnMode    (theInfo.myConnMode);
 
       TErr aRet;
       aRet = MEDmeshElementRd(myFile->Id(),
@@ -1499,23 +1538,22 @@ namespace MED
       if(theErr && *theErr < 0)
         return;
 
-      MED::TCellInfo& anInfo = const_cast<MED::TCellInfo&>(theInfo);
+      MED::TCellInfo& anInfo    = const_cast<MED::TCellInfo&>(theInfo);
       MED::TMeshInfo& aMeshInfo = *anInfo.myMeshInfo;
 
-      TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-      TValueHolder<TInt, med_int> aDim(aMeshInfo.myDim);
-      TValueHolder<TElemNum, med_int> aConn(anInfo.myConn);
-      TValueHolder<EModeSwitch, med_switch_mode> aModeSwitch(anInfo.myModeSwitch);
-      TValueHolder<TString, char> anElemNames(anInfo.myElemNames);
-      TValueHolder<EBooleen, med_bool> anIsElemNames(anInfo.myIsElemNames);
-      TValueHolder<TElemNum, med_int> anElemNum(anInfo.myElemNum);
-      TValueHolder<EBooleen, med_bool> anIsElemNum(anInfo.myIsElemNum);
-      TValueHolder<TElemNum, med_int> aFamNum(anInfo.myFamNum);
-      TValueHolder<EBooleen, med_bool> anIsFamNum(anInfo.myIsFamNum);
-      TValueHolder<EEntiteMaillage, med_entity_type> anEntity(anInfo.myEntity);
-      TValueHolder<EGeometrieElement, med_geometry_type> aGeom(anInfo.myGeom);
-      TValueHolder<EConnectivite, med_connectivity_mode> aConnMode(anInfo.myConnMode);
-      TValueHolder<TInt, med_int> aNbElem(anInfo.myNbElem);
+      TValueHolder<TString, char>                        aMeshName    (aMeshInfo.myName);
+      TValueHolder<TElemNum, med_int>                    aConn        (anInfo.myConn);
+      TValueHolder<EModeSwitch, med_switch_mode>         aModeSwitch  (anInfo.myModeSwitch);
+      TValueHolder<TString, char>                        anElemNames  (anInfo.myElemNames);
+      TValueHolder<EBooleen, med_bool>                   anIsElemNames(anInfo.myIsElemNames);
+      TValueHolder<TElemNum, med_int>                    anElemNum    (anInfo.myElemNum);
+      TValueHolder<EBooleen, med_bool>                   anIsElemNum  (anInfo.myIsElemNum);
+      TValueHolder<TElemNum, med_int>                    aFamNum      (anInfo.myFamNum);
+      TValueHolder<EBooleen, med_bool>                   anIsFamNum   (anInfo.myIsFamNum);
+      TValueHolder<EEntiteMaillage, med_entity_type>     anEntity     (anInfo.myEntity);
+      TValueHolder<EGeometrieElement, med_geometry_type> aGeom        (anInfo.myGeom);
+      TValueHolder<EConnectivite, med_connectivity_mode> aConnMode    (anInfo.myConnMode);
+      TValueHolder<TInt, med_int>                        aNbElem      (anInfo.myNbElem);
 
       TErr aRet;
       aRet = MEDmeshElementConnectivityWr(myFile->Id(),
@@ -1571,7 +1609,156 @@ namespace MED
     {
       SetCellInfo(theInfo,eLECTURE_ECRITURE,theErr);
     }
-    
+
+    //----------------------------------------------------------------------------
+    //! Read geom type of MED_BALL structural element
+    EGeometrieElement TVWrapper::GetBallGeom(const TMeshInfo& theMeshInfo)
+    {
+      TFileWrapper aFileWrapper(myFile,eLECTURE);
+
+      // read med_geometry_type of "MED_BALL" element
+      char geotypename[ MED_NAME_SIZE + 1] = MED_BALL_NAME;
+      return EGeometrieElement( MEDstructElementGeotype( myFile->Id(), geotypename ) );
+    }
+
+    //----------------------------------------------------------------------------
+    //! Read number of balls in the Mesh
+    TInt TVWrapper::GetNbBalls(const TMeshInfo& theMeshInfo)
+    {
+      TFileWrapper aFileWrapper(myFile,eLECTURE);
+
+      EGeometrieElement ballType = GetBallGeom( theMeshInfo );
+      if ( ballType < 0 )
+        return 0;
+
+      return GetNbCells( theMeshInfo, eSTRUCT_ELEMENT, ballType, eNOD );
+    }
+
+    //----------------------------------------------------------------------------
+    //! Read a MEDWrapped representation of MED_BALL from the MED file
+    void TVWrapper::GetBallInfo(TBallInfo& theInfo, TErr* theErr)
+    {
+      TFileWrapper aFileWrapper(myFile,eLECTURE,theErr);
+
+      // check geometry of MED_BALL
+      if ( theInfo.myGeom == eBALL )
+      {
+        theInfo.myGeom = GetBallGeom( *theInfo.myMeshInfo );
+        if ( theInfo.myGeom < 0 ) {
+          if ( !theErr )
+            EXCEPTION(std::runtime_error,"GetBallInfo - no balls in the mesh");
+          *theErr = theInfo.myGeom;
+          return;
+        }
+      }
+
+      // read nodes ids
+      GetCellInfo( theInfo );
+
+      // read diameters
+      TValueHolder<TString, char>                        aMeshName (theInfo.myMeshInfo->myName);
+      TValueHolder<EGeometrieElement, med_geometry_type> aGeom     (theInfo.myGeom);
+      TValueHolder<TFloatVector, void>                   aDiam     (theInfo.myDiameters);
+      char varattname[ MED_NAME_SIZE + 1] = MED_BALL_DIAMETER;
+
+      TErr aRet = MEDmeshStructElementVarAttRd( myFile->Id(), &aMeshName,
+                                                MED_NO_DT, MED_NO_IT,
+                                                aGeom,
+                                                varattname,
+                                                &aDiam);
+      if ( theErr )
+        *theErr = aRet;
+      else if ( aRet < 0 )
+        EXCEPTION(std::runtime_error,"GetBallInfo - pb at reading diameters");
+    }
+
+
+    //----------------------------------------------------------------------------
+    //! Write a MEDWrapped representation of MED_BALL to the MED file
+    void  TVWrapper::SetBallInfo(const TBallInfo& theInfo, EModeAcces theMode, TErr* theErr)
+    {
+      TFileWrapper aFileWrapper(myFile,theMode,theErr);
+
+      TErr ret;
+      char ballsupportname[MED_NAME_SIZE+1]="BALL_SUPPORT_MESH";
+      EGeometrieElement ballGeom = GetBallGeom( *theInfo.myMeshInfo );
+      if ( ballGeom < 0 )
+      {
+        // no ball model in the file, create support mesh for it
+        char dummyname [MED_NAME_SIZE*3+1]="";
+        if (( ret = MEDsupportMeshCr( myFile->Id(),
+                                      ballsupportname,
+                                      theInfo.myMeshInfo->GetSpaceDim(),
+                                      theInfo.myMeshInfo->GetDim(),
+                                      "Support mesh for a ball model",
+                                      MED_CARTESIAN,
+                                      /*axisname=*/dummyname, /*unitname=*/dummyname)) < 0) {
+          if ( !theErr )
+            EXCEPTION(std::runtime_error,"SetBallInfo - MEDsupportMeshCr");
+          *theErr = ret;
+          return;
+        }
+        // write coordinates of 1 node
+        med_float coord[3] = {0,0,0};
+        if ((ret = MEDmeshNodeCoordinateWr(myFile->Id(),
+                                           ballsupportname, MED_NO_DT, MED_NO_IT, 0.0,
+                                           MED_FULL_INTERLACE, /*nnode=*/1, coord)) < 0) {
+          if ( !theErr )
+            EXCEPTION(std::runtime_error,"SetBallInfo - MEDmeshNodeCoordinateWr");
+          *theErr = ret;
+          return;
+        }
+        // ball model creation
+        char geotypename[ MED_NAME_SIZE + 1] = MED_BALL_NAME;
+        if (( ballGeom = (EGeometrieElement) MEDstructElementCr(myFile->Id(),
+                                                                geotypename,
+                                                                theInfo.myMeshInfo->GetSpaceDim(),
+                                                                ballsupportname,
+                                                                MED_NODE,MED_NONE)) < 0 ) {
+          if ( !theErr )
+            EXCEPTION(std::runtime_error,"SetBallInfo - MEDstructElementCr");
+          *theErr = ret;
+          return;
+        }
+        // create diameter attribute
+        if (( ret = MEDstructElementVarAttCr(myFile->Id(),
+                                             geotypename, MED_BALL_DIAMETER,
+                                             MED_ATT_FLOAT64, /*ncomp=*/1)) < 0) {
+          if ( !theErr )
+            EXCEPTION(std::runtime_error,"SetBallInfo - MEDstructElementVarAttCr");
+          *theErr = ret;
+          return;
+        }
+      } // ballGeom < 0
+
+      TBallInfo& aBallInfo = ((TBallInfo&) theInfo );
+      aBallInfo.myGeom = ballGeom;
+
+      // write node ids
+      SetCellInfo(theInfo,theMode,theErr);
+      if ( theErr && theErr < 0 )
+        return;
+
+      // write diameter
+      TValueHolder<TString, char>                        aMeshName (aBallInfo.myMeshInfo->myName);
+      TValueHolder<EGeometrieElement, med_geometry_type> aGeom     (aBallInfo.myGeom);
+      TValueHolder<TFloatVector, void>                   aDiam     (aBallInfo.myDiameters);
+      ret = MEDmeshStructElementVarAttWr(myFile->Id(), &aMeshName,
+                                         MED_NO_DT, MED_NO_IT,
+                                         aGeom, MED_BALL_DIAMETER,
+                                         theInfo.myNbElem, &aDiam);
+      if ( theErr )
+        *theErr = ret;
+      else if ( ret < 0 )
+        EXCEPTION(std::runtime_error,"SetBallInfo - MEDmeshStructElementVarAttWr");
+    }
+
+    //----------------------------------------------------------------------------
+    //! Write a MEDWrapped representation of MED_BALL to the MED file
+    void  TVWrapper::SetBallInfo(const TBallInfo& theInfo, TErr* theErr)
+    {
+      SetBallInfo( theInfo, eLECTURE_ECRITURE, theErr );
+    }
 
     //-----------------------------------------------------------------
     TInt
@@ -2416,7 +2603,6 @@ namespace MED
 
       MED::TMeshInfo& aMeshInfo = *anInfo.myMeshInfo;
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-      TValueHolder<TInt, med_int> aDim(aMeshInfo.myDim);
 
       TValueHolder<EGrilleType, med_grid_type > aGrilleType(anInfo.myGrilleType);
 
@@ -2492,7 +2678,6 @@ namespace MED
       
       MED::TMeshInfo& aMeshInfo = *theInfo.myMeshInfo;
       TValueHolder<TString, char> aMeshName(aMeshInfo.myName);
-      TValueHolder<TInt, med_int> aDim(aMeshInfo.myDim);
       EMaillage aMaillageType = aMeshInfo.myType;
       
       GetGrilleType(aMeshInfo, theInfo.myGrilleType, theErr);
