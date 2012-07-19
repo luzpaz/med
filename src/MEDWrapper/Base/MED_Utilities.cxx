@@ -100,7 +100,10 @@ bool InitEntity2GeomSet()
   aGeomMAILLESet.insert(eHEXA20);
   aGeomMAILLESet.insert(eHEXA27);
   aGeomMAILLESet.insert(ePOLYEDRE);
-  
+
+  /* This combination allows reading nb of models of structure elements */
+  Entity2GeomSet[eSTRUCT_ELEMENT].insert(eAllGeoType); 
+
   return true;
 }
 
