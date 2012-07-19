@@ -20,11 +20,6 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  File   : 
-//  Author : 
-//  Module : 
-//  $Header$
-//
 #ifndef MED_Wrapper_HeaderFile
 #define MED_Wrapper_HeaderFile
 
@@ -313,7 +308,7 @@ namespace MED
     
     //----------------------------------------------------------------------------
     //! Read a MEDWrapper MED Polygones representation from defined MED file
-    /*! This feature is support only for version of 2.2 and higher */
+    /*! This feature is supported only for version of 2.2 and higher */
     virtual
     void
     GetPolygoneInfo(TPolygoneInfo& theInfo,
@@ -321,7 +316,7 @@ namespace MED
     {}
 
     //! Write a MEDWrapper MED Polygones representation from defined MED file
-    /*! This feature is support only for version of 2.2 and higher */
+    /*! This feature is supported only for version of 2.2 and higher */
     virtual
     void
     SetPolygoneInfo(const TPolygoneInfo& theInfo,
@@ -329,7 +324,7 @@ namespace MED
     {}
 
     //! Read number of MED Polygones in defined MED Mesh
-    /*! This feature is support only for version of 2.2 and higher */
+    /*! This feature is supported only for version of 2.2 and higher */
     virtual
     TInt
     GetNbPolygones(const TMeshInfo& theMeshInfo,
@@ -342,7 +337,7 @@ namespace MED
     }
 
     //! Read connectivity infroamtion for the MED Polygones in defined MED Mesh
-    /*! This feature is support only for version of 2.2 and higher */
+    /*! This feature is supported only for version of 2.2 and higher */
     virtual
     TInt
     GetPolygoneConnSize(const TMeshInfo& theMeshInfo,
@@ -355,7 +350,7 @@ namespace MED
     }
     
     //! Creates a MEDWrapper MED Polygones representation
-    /*! This feature is support only for version of 2.2 and higher */
+    /*! This feature is supported only for version of 2.2 and higher */
     virtual 
     PPolygoneInfo
     CrPolygoneInfo(const PMeshInfo& theMeshInfo, 
@@ -371,7 +366,7 @@ namespace MED
     }
     
     //! Creates a MEDWrapper MED Polygones representation
-    /*! This feature is support only for version of 2.2 and higher */
+    /*! This feature is supported only for version of 2.2 and higher */
     virtual
     PPolygoneInfo 
     CrPolygoneInfo(const PMeshInfo& theMeshInfo, 
@@ -565,6 +560,70 @@ namespace MED
                  EConnectivite theConnMode = eNOD,
                  TErr* theErr = NULL);
 
+    //----------------------------------------------------------------------------
+    //! Read number of balls in the Mesh
+    /*! This feature is supported since version 3.0 */
+    virtual
+    TInt
+    GetNbBalls(const TMeshInfo& theMeshInfo)
+    {
+      return 0;
+    }
+
+    //! Read a MEDWrapped representation of MED_BALL from the MED file
+    /*! This feature is supported since version 3.0 */
+    virtual
+    void
+    GetBallInfo(TBallInfo& theInfo,
+                TErr* theErr = NULL) 
+    {}
+
+    //! Write a MEDWrapped representation of MED_BALL to the MED file
+    /*! This feature is supported since version 3.0 */
+    virtual
+    void
+    SetBallInfo(const TBallInfo& theInfo,
+                TErr* theErr = NULL) 
+    {}
+
+    //! Creates a MEDWrapper MED Balls representation
+    /*! This feature is supported since version 3.0 */
+    virtual 
+    PBallInfo
+    CrBallInfo(const PMeshInfo& theMeshInfo, 
+               TInt             theNbBalls,
+               EBooleen         theIsElemNum = eVRAI)
+    {
+      return PBallInfo();
+    }
+
+    //! Creates a MEDWrapper MED Balls representation
+    /*! This feature is supported since version 3.0 */
+    virtual
+    PBallInfo 
+    CrBallInfo(const PMeshInfo&  theMeshInfo, 
+               const TIntVector& theNodes,
+               TFloatVector&     theDiameters,
+               const TIntVector& theFamilyNums = TIntVector(),
+               const TIntVector& theElemNums = TIntVector())
+    {
+      return PBallInfo();
+    }
+
+    //! A copy-constructor for the MEDWrapped MED Balls representation
+    virtual
+    PBallInfo
+    CrBallInfo(const PMeshInfo& theMeshInfo,
+               const PBallInfo& theInfo)
+    {
+      return PBallInfo();
+    }
+    
+    //! Read a MEDWrapped MED Balls representation from defined MED file
+    /*! This feature is supported since version 3.0 */
+    virtual
+    PBallInfo
+    GetPBallInfo(const PMeshInfo& theMeshInfo);
 
     //----------------------------------------------------------------------------
     //! Read number of MED FIELDS in defined MED Mesh

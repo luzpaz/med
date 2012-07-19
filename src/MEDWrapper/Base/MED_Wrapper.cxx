@@ -380,7 +380,20 @@ namespace MED
     return anInfo;
   }
 
+  //----------------------------------------------------------------------------
+  //! Read a MEDWrapped representation of MED Balls from the MED file
+  PBallInfo
+  TWrapper
+  ::GetPBallInfo(const PMeshInfo& theMeshInfo)
+  {
+    TInt nbBalls = GetNbBalls(theMeshInfo);
+    if ( nbBalls < 1 ) return PBallInfo();
 
+    PBallInfo anInfo = CrBallInfo( theMeshInfo, nbBalls );
+    GetBallInfo(anInfo);
+
+    return anInfo;
+  }
   //----------------------------------------------------------------------------
   PFieldInfo
   TWrapper
