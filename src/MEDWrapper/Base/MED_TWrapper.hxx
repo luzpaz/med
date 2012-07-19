@@ -377,6 +377,32 @@ namespace MED
                         theInfo));
     }
     
+    //----------------------------------------------------------------------------
+    //! Creates a MEDWrapper MED Balls representation
+    virtual PBallInfo CrBallInfo(const PMeshInfo& theMeshInfo, 
+                                 TInt             theNbBalls,
+                                 EBooleen         theIsElemNum = eVRAI)
+    {
+      return PBallInfo( new TTBallInfo<eVersion>( theMeshInfo, theNbBalls, theIsElemNum ));
+    }
+
+    //! Creates a MEDWrapper MED Balls representation
+    virtual PBallInfo CrBallInfo(const PMeshInfo&  theMeshInfo, 
+                                 const TIntVector& theNodes,
+                                 TFloatVector&     theDiameters,
+                                 const TIntVector& theFamilyNums = TIntVector(),
+                                 const TIntVector& theElemNums = TIntVector())
+    {
+      return PBallInfo( new TTBallInfo<eVersion>( theMeshInfo, theNodes, theDiameters,
+                                                  theFamilyNums, theElemNums));
+    }
+
+    //! A copy-constructor for the MEDWrapper MED Balls representation
+    virtual PBallInfo CrBallInfo(const PMeshInfo& theMeshInfo,
+                                 const PBallInfo& theInfo)
+    {
+      return PBallInfo( new TTBallInfo<eVersion>( theMeshInfo, theInfo ));
+    }
 
     //----------------------------------------------------------------------------
     virtual
