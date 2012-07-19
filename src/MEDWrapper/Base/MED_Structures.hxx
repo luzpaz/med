@@ -20,11 +20,6 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-//  File   : 
-//  Author : 
-//  Module : 
-//  $Header$
-//
 #ifndef MED_Structures_HeaderFile
 #define MED_Structures_HeaderFile
 
@@ -301,7 +296,7 @@ namespace MED
 
     virtual TInt GetConnDim() const = 0; //!< Gives step in the connectivity sequence
 
-    PElemNum myConn; //!< Defines sequence which describe connectivity for ech of mesh cell
+    PElemNum myConn; //!< Defines sequence which describe connectivity for each of mesh cell
 
     //! Gives connectivities for mesh cell by its number (const version)
     TCConnSlice GetConnSlice(TInt theElemId) const;
@@ -339,6 +334,19 @@ namespace MED
     TCConnSlice GetConnSlice(TInt theElemId) const;
     //! Gives connectivities for polygon by its number
     TConnSlice GetConnSlice(TInt theElemId);
+  };
+
+  //---------------------------------------------------------------
+  //! Define a class representing MED_BALL structure element.
+  //
+  //  This could be a generic class for any structure element
+  //  holding any number of contant and variable attributes
+  //  but it's too hard to implement
+  //
+  struct MEDWRAPPER_EXPORT TBallInfo: 
+    virtual TCellInfo
+  {
+    TFloatVector myDiameters;
   };
 
   //---------------------------------------------------------------
@@ -966,7 +974,7 @@ namespace MED
   typedef std::map<TInt,TFloatVector> TIndexes;
   typedef std::map<TInt,TString> TNames;
   
-  //! Define a base class which represents MED Grille 
+  //! Define a base class which represents MED Grille (structured mesh)
   struct MEDWRAPPER_EXPORT TGrilleInfo:
     virtual TModeSwitchInfo
   {
