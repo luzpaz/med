@@ -207,7 +207,8 @@ dist_salomeres_DATA = \
     blow5_ascii_pd_displacement \
     blow5_ascii_pd_thickness \
     test_2D.sauve \
-    allPillesTest.sauv
+    allPillesTest.sauv \
+    BDC-714.sauv
 
 if !MED_ENABLE_MICROMED
   nodist_salomeres_SCRIPTS = MEDCatalog.xml SalomeApp.xml
