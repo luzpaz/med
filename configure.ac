@@ -683,9 +683,6 @@ AC_OUTPUT([ \
         src/MEDWrapper/Makefile \
         src/MEDWrapper/Base/Makefile \
         src/MEDWrapper/Factory/Makefile \
-        src/MEDWrapper/V2_1/Makefile \
-        src/MEDWrapper/V2_1/Core/Makefile \
-        src/MEDWrapper/V2_1/Wrapper/Makefile \
         src/MEDWrapper/V2_2/Makefile \
         src/MEDMEM/Doxyfile_med_devel \
         src/MEDMEM/Doxyfile_med_user \
