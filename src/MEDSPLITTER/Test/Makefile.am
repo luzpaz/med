@@ -15,10 +15,9 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-#
 
 #  SALOMELocalTrace : log on local machine
-#
+
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 lib_LTLIBRARIES = libMEDSPLITTERTest.la
@@ -45,7 +44,7 @@ salomeinclude_HEADERS = \
 
 libMEDSPLITTERTest_la_CPPFLAGS= $(MPI_INCLUDES) @CPPUNIT_INCLUDES@ $(MED3_INCLUDES) \
 	$(HDF5_INCLUDES) $(BOOST_CPPFLAGS) $(LIBXML_CXXFLAGS) \
-	-I$(srcdir)/.. -I$(srcdir)/../../MEDWrapper/V2_1/Core -I$(srcdir)/../../MEDMEM \
+	-I$(srcdir)/.. -I$(srcdir)/../../MEDMEM \
 	-I$(srcdir)/../../MEDMEMCppTest -I$(srcdir)/../../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../../INTERP_KERNEL/GaussPoints \
 	-I$(srcdir)/../../INTERP_KERNEL
@@ -80,7 +79,7 @@ if MED_ENABLE_PARMETIS
   TestParaMEDSPLITTER_CPPFLAGS = $(TestMEDSPLITTER_CPPFLAGS) $(MPI_INCLUDES)
   TestParaMEDSPLITTER_CXXFLAGS = @CXXTMPDPTHFLAGS@
   TestParaMEDSPLITTER_LDADD = $(MED3_LIBS_C_ONLY) $(libMEDSPLITTERTest_la_LDFLAGS) -lm \
-	libMEDSPLITTERTest.la ../../MEDWrapper/V2_1/Core/libmed_V2_1.la \
+	libMEDSPLITTERTest.la \
 	../../MEDMEM/libmedmem.la ../../INTERP_KERNEL/libinterpkernel.la \
 	../libmedsplitter.la $(HDF5_LIBS) $(MPI_LIBS) @CPPUNIT_LIBS@
   dist_salomescript_DATA += testParaMEDSPLITTER.py
@@ -98,7 +97,7 @@ TestMEDSPLITTER_SOURCES= TestMEDSPLITTER.cxx
 TestMEDSPLITTER_CPPFLAGS= $(libMEDSPLITTERTest_la_CPPFLAGS)
 TestMEDSPLITTER_CXXFLAGS = @CXXTMPDPTHFLAGS@
 TestMEDSPLITTER_LDADD= $(MED3_LIBS_C_ONLY) $(libMEDSPLITTERTest_la_LDFLAGS) -lm \
-	libMEDSPLITTERTest.la ../../MEDWrapper/V2_1/Core/libmed_V2_1.la \
+	libMEDSPLITTERTest.la \
 	../../MEDMEM/libmedmem.la ../../INTERP_KERNEL/libinterpkernel.la \
 	../libmedsplitter.la
 # TESTS = TestMEDSPLITTER

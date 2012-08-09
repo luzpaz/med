@@ -18,16 +18,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
 
-//  File   : 
-//  Author : 
-//  Module : 
-//
 #include "MED_Factory.hxx"
 #include "MED_Utilities.hxx"
 #include "MED_V2_2_Wrapper.hxx"
-#include "MED_V2_1_Wrapper.hxx"
 
 #include <stdio.h>
 #include <sstream>
@@ -136,7 +130,8 @@ namespace MED
       aWrapper.reset(new MED::V2_2::TVWrapper(theFileName));
       break;
     case eV2_1:
-      aWrapper.reset(new MED::V2_1::TVWrapper(theFileName));
+      EXCEPTION(std::runtime_error,"Cannot open file '"<<theFileName<<"'. Med version 2.1 is not supported any more.");
+      //aWrapper.reset(new MED::V2_1::TVWrapper(theFileName));
       break;
     default:
       EXCEPTION(std::runtime_error,"MED::CrWrapper - theFileName = '"<<theFileName<<"'");
@@ -157,7 +152,8 @@ namespace MED
       aWrapper.reset(new MED::V2_2::TVWrapper(theFileName));
       break;
     case eV2_1:
-      aWrapper.reset(new MED::V2_1::TVWrapper(theFileName));
+      EXCEPTION(std::runtime_error,"Cannot open file '"<<theFileName<<"'. Med version 2.1 is not supported any more.");
+      //aWrapper.reset(new MED::V2_1::TVWrapper(theFileName));
       break;
     default:
       aWrapper.reset(new MED::V2_2::TVWrapper(theFileName));

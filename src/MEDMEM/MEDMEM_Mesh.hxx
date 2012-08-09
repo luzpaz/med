@@ -18,7 +18,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
 
 #ifndef MESH_HXX
 #define MESH_HXX
@@ -92,9 +91,6 @@ protected :
   friend class MED_MESH_RDONLY_DRIVER;
   friend class MED_MESH_WRONLY_DRIVER;
 
-  friend class MED_MED_RDONLY_DRIVER21;
-  friend class MED_MED_WRONLY_DRIVER21;
-  friend class MED_MED_RDWR_DRIVER21;
   friend class MED_MED_RDONLY_DRIVER22;
   friend class MED_MED_WRONLY_DRIVER22;
   friend class MED_MED_RDWR_DRIVER22;
