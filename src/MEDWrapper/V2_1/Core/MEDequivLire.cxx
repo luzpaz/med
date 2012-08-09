@@ -28,7 +28,7 @@ namespace med_2_1{
 
 med_err 
 MEDequivLire(med_idt fid, char *maa, char *eq, med_int *corr, med_int n,
-	     med_entite_maillage typ_ent,med_geometrie_element typ_geo)
+             med_entite_maillage typ_ent,med_geometrie_element typ_geo)
 {
   med_idt eqid, datagroup;
   med_err ret;
@@ -65,7 +65,7 @@ MEDequivLire(med_idt fid, char *maa, char *eq, med_int *corr, med_int n,
   if ((typ_ent != MED_NOEUD))
     {
       if ((ret = _MEDnomGeometrie(tmp,typ_geo)) < 0)
-	return -1;
+        return -1;
       strcat(nomdatagroup,".");
       strcat(nomdatagroup,tmp);
     }
@@ -73,15 +73,15 @@ MEDequivLire(med_idt fid, char *maa, char *eq, med_int *corr, med_int n,
     return -1;
 #if defined(HAVE_F77INT64)
   if ((ret =  _MEDdatasetNumLire(datagroup,MED_NOM_COR,MED_INT64,
-				 MED_NO_INTERLACE,1,MED_ALL,
-				 MED_NOPF,0,MED_NOPG,
-				 (unsigned char *) corr)) < 0)
+                                 MED_NO_INTERLACE,1,MED_ALL,
+                                 MED_NOPF,0,MED_NOPG,
+                                 (unsigned char *) corr)) < 0)
     return -1;
 #else
   if ((ret =  _MEDdatasetNumLire(datagroup,MED_NOM_COR,MED_INT32,
-				 MED_NO_INTERLACE,1,MED_ALL,
-				 MED_NOPF,0,MED_NOPG,
-				 (unsigned char *) corr)) < 0)
+                                 MED_NO_INTERLACE,1,MED_ALL,
+                                 MED_NOPF,0,MED_NOPG,
+                                 (unsigned char *) corr)) < 0)
     return -1;
 #endif
 

@@ -285,36 +285,36 @@ int main (int argc, char **argv)
   med_connectivite typ_con;
   med_geometrie_element typgeo;
   med_geometrie_element typmai[MED_NBR_GEOMETRIE_MAILLE] = {MED_POINT1,MED_SEG2, 
-						   MED_SEG3,MED_TRIA3,
-						   MED_TRIA6,MED_QUAD4,
-						   MED_QUAD8,MED_TETRA4,
-						   MED_TETRA10,MED_HEXA8,
-						   MED_HEXA20,MED_PENTA6,
-						   MED_PENTA15,MED_PYRA5,
-						   MED_PYRA13};
+                                                   MED_SEG3,MED_TRIA3,
+                                                   MED_TRIA6,MED_QUAD4,
+                                                   MED_QUAD8,MED_TETRA4,
+                                                   MED_TETRA10,MED_HEXA8,
+                                                   MED_HEXA20,MED_PENTA6,
+                                                   MED_PENTA15,MED_PYRA5,
+                                                   MED_PYRA13};
   med_int desmai[MED_NBR_GEOMETRIE_MAILLE] = {0,2,3,3,3,4,4,4,4,6,6,5,5,5,5};
   med_int nmailles[MED_NBR_GEOMETRIE_MAILLE];
   char nommai[MED_NBR_GEOMETRIE_MAILLE] [MED_TAILLE_NOM+1] = {"MED_POINT1",
-							  "MED_SEG2", 
-							  "MED_SEG3",
-							  "MED_TRIA3",
-							  "MED_TRIA6",
-							  "MED_QUAD4",
-							  "MED_QUAD8",
-							  "MED_TETRA4",
-							  "MED_TETRA10",
-							  "MED_HEXA8",
-							  "MED_HEXA20",
-							  "MED_PENTA6",
-							  "MED_PENTA15",
-							  "MED_PYRA5",
-							  "MED_PYRA13"};
+                                                          "MED_SEG2", 
+                                                          "MED_SEG3",
+                                                          "MED_TRIA3",
+                                                          "MED_TRIA6",
+                                                          "MED_QUAD4",
+                                                          "MED_QUAD8",
+                                                          "MED_TETRA4",
+                                                          "MED_TETRA10",
+                                                          "MED_HEXA8",
+                                                          "MED_HEXA20",
+                                                          "MED_PENTA6",
+                                                          "MED_PENTA15",
+                                                          "MED_PYRA5",
+                                                          "MED_PYRA13"};
   med_geometrie_element typfac[MED_NBR_GEOMETRIE_FACE] = {MED_TRIA3,MED_TRIA6,
-						 MED_QUAD4,MED_QUAD8};
+                                                 MED_QUAD4,MED_QUAD8};
   med_int desfac[MED_NBR_GEOMETRIE_FACE] = {3,3,4,4};
   med_int nfaces[MED_NBR_GEOMETRIE_FACE];
   char nomfac[MED_NBR_GEOMETRIE_FACE][MED_TAILLE_NOM+1] = {"MED_TRIA3","MED_TRIA6",
-						       "MED_QUAD4","MED_QUAD8"};
+                                                       "MED_QUAD4","MED_QUAD8"};
   med_geometrie_element typare[MED_NBR_GEOMETRIE_ARETE] = {MED_SEG2,MED_SEG3};
   med_int desare[MED_NBR_GEOMETRIE_ARETE] = {2,3};
   med_int naretes[MED_NBR_GEOMETRIE_ARETE];
@@ -391,10 +391,10 @@ int main (int argc, char **argv)
       fichier_en_tete = (char *) malloc(sizeof(char)*(long_fichier_en_tete+1));
       ret = MEDfichEntete(fid,MED_FICH_DES,fichier_en_tete);
       if (ret < 0)
-	{
-	  fprintf(stderr,">> ERREUR : lecture de l'en-tete du fichier \n");
-	  exit(EXIT_FAILURE);
-	}      
+        {
+          fprintf(stderr,">> ERREUR : lecture de l'en-tete du fichier \n");
+          exit(EXIT_FAILURE);
+        }      
       fprintf(stdout,"- En-tete du fichier : %s \n",fichier_en_tete);
       free(fichier_en_tete);
     }
@@ -424,44 +424,44 @@ int main (int argc, char **argv)
       fprintf(stdout,"  2. Mode non entrelacé : taper 2 \n");
       reponse = 0;
       do
-	{
-	  fprintf(stdout,"  Reponse : ");
-	  scanf("%d",&reponse);
-	}
+        {
+          fprintf(stdout,"  Reponse : ");
+          scanf("%d",&reponse);
+        }
       while (reponse != 1 && reponse != 2);
       if (reponse == 1)
-	mode_coo = MED_FULL_INTERLACE;
+        mode_coo = MED_FULL_INTERLACE;
       else
-	mode_coo = MED_NO_INTERLACE;
+        mode_coo = MED_NO_INTERLACE;
       
       fprintf(stdout,"- Connectivité des éléments ? \n");
       fprintf(stdout,"  1. Nodale : taper 1 \n"); 
       fprintf(stdout,"  2. Descendante : taper 2 \n");
       reponse = 0;
       do
-	{
-	  fprintf(stdout,"  Reponse : ");
-	  scanf("%d",&reponse);
-	}
+        {
+          fprintf(stdout,"  Reponse : ");
+          scanf("%d",&reponse);
+        }
       while (reponse != 1 && reponse != 2);
       if (reponse == 1)
-	typ_con = MED_NOD;
+        typ_con = MED_NOD;
       else
-	typ_con = MED_DESC;
+        typ_con = MED_DESC;
     }
   else
       {
-	if (! strcmp(argv[3],"NODALE"))
-	  typ_con = MED_NOD;
-	if (! strcmp(argv[3],"DESCENDANTE"))	
-	  typ_con = MED_DESC;
-	
-	if (!strcmp(argv[4],"NO_INTERLACE"))
-	  mode_coo = MED_NO_INTERLACE;
-	if (!strcmp(argv[4],"FULL_INTERLACE"))
-	  mode_coo = MED_FULL_INTERLACE;
+        if (! strcmp(argv[3],"NODALE"))
+          typ_con = MED_NOD;
+        if (! strcmp(argv[3],"DESCENDANTE"))    
+          typ_con = MED_DESC;
+        
+        if (!strcmp(argv[4],"NO_INTERLACE"))
+          mode_coo = MED_NO_INTERLACE;
+        if (!strcmp(argv[4],"FULL_INTERLACE"))
+          mode_coo = MED_FULL_INTERLACE;
         if (! strcmp(argv[4],"LECTURE_EN_TETE_SEULEMENT"))
-	  lecture_en_tete_seulement = 1;
+          lecture_en_tete_seulement = 1;
 
       }
 
@@ -481,21 +481,21 @@ int main (int argc, char **argv)
       fprintf(stdout,"- Il y a %d maillages dans ce fichier \n",nmaa);
       fprintf(stdout,"  Lequel voulez-vous lire (1|2|3|...|n) ?\n");
       do
-	{
-	  fprintf(stdout,"  Reponse : ");
-	  scanf("%d",&numero);
-	}
+        {
+          fprintf(stdout,"  Reponse : ");
+          scanf("%d",&numero);
+        }
       while (numero > nmaa || numero <= 0);
     }
   else
     {
       numero = atoi(argv[2]);
       if (numero > nmaa || numero  <= 0)
-	{
-	  fprintf(stderr,">> ERREUR : il y a %d maillages dans ce fichier  \n",
-		  nmaa);
-	  exit(EXIT_FAILURE);
-	}
+        {
+          fprintf(stderr,">> ERREUR : il y a %d maillages dans ce fichier  \n",
+                  nmaa);
+          exit(EXIT_FAILURE);
+        }
     }
 
 /*****************************************************************************
@@ -568,36 +568,36 @@ int main (int argc, char **argv)
   for (i=0;i<MED_NBR_GEOMETRIE_MAILLE;i++)
     {
       nmailles[i] = MEDnEntMaa(fid,nommaa,MED_CONN,MED_MAILLE,typmai[i],
-			       typ_con);
+                               typ_con);
       if (nmailles[i] < 0)
-	{
-	  fprintf(stderr,">> ERREUR : lecture du nombre de mailles \n");
-	  exit(EXIT_FAILURE);
-	}
+        {
+          fprintf(stderr,">> ERREUR : lecture du nombre de mailles \n");
+          exit(EXIT_FAILURE);
+        }
       fprintf (stdout,"- Nombre de mailles de type %s : %d \n",nommai[i],nmailles[i]);
     }
 
   for (i=0;i<MED_NBR_GEOMETRIE_FACE;i++)
     {
       nfaces[i] = MEDnEntMaa(fid,nommaa,MED_CONN,MED_FACE,typfac[i],
-			     typ_con);
+                             typ_con);
       if (nfaces[i] < 0)
-	{
-	  fprintf(stderr,">> ERREUR : lecture du nombre de faces \n");
-	  exit(EXIT_FAILURE);
-	}
+        {
+          fprintf(stderr,">> ERREUR : lecture du nombre de faces \n");
+          exit(EXIT_FAILURE);
+        }
       fprintf (stdout,"- Nombre de faces de type %s : %d \n",nomfac[i],nfaces[i]);
     }    
 
   for (i=0;i<MED_NBR_GEOMETRIE_ARETE;i++)
     {
       naretes[i] = MEDnEntMaa(fid,nommaa,MED_CONN,MED_ARETE,typare[i],
-			      typ_con); 
+                              typ_con); 
       if (naretes[i] < 0)
-	{
-	  fprintf(stderr,">> ERREUR : lecture du nombre d'aretes \n");
-	  exit(EXIT_FAILURE);
-	}
+        {
+          fprintf(stderr,">> ERREUR : lecture du nombre d'aretes \n");
+          exit(EXIT_FAILURE);
+        }
       fprintf (stdout,"- Nombre d'aretes de type %s : %d \n",nomare[i],naretes[i]);
     }
 
@@ -607,7 +607,7 @@ int main (int argc, char **argv)
     {
       fprintf(stderr,">> ERREUR : lecture du nombre de familles \n");
       exit(EXIT_FAILURE);
-    }	
+    }   
   fprintf(stdout,"- Nombre de familles : %d \n",nfam);
 
   /* combien d'equivalences dans le fichier */
@@ -616,7 +616,7 @@ int main (int argc, char **argv)
     {
       fprintf(stderr,">> ERREUR : lecture du nombre d'equivalences \n");
       exit(EXIT_FAILURE);
-    }	
+    }   
     fprintf(stdout,"- Nombre d'equivalences : %d \n",nequ);
 
   /* combien de champs dans le fichier */
@@ -625,7 +625,7 @@ int main (int argc, char **argv)
     {
       fprintf(stderr,">> ERREUR : lecture du nombre de champs \n");
       exit(EXIT_FAILURE);
-    }	
+    }   
   fprintf(stdout,"- Nombre de champs : %d \n",ncha);
 
   /* Doit-on s'arreter ? */
@@ -633,15 +633,15 @@ int main (int argc, char **argv)
     {
       ret = MEDfermer(fid);
       if (ret == 0)
-	{
-	  fprintf(stdout,"\n >>>>>> FIN DU DUMP DU FICHIER %s >>>>>>\n",argv[1]);
-	  return 0;
-	}
+        {
+          fprintf(stdout,"\n >>>>>> FIN DU DUMP DU FICHIER %s >>>>>>\n",argv[1]);
+          return 0;
+        }
       else
-	{
-	  fprintf(stderr,">> ERREUR : fermeture du fichier %s  \n",argv[1]);
-	  exit(EXIT_FAILURE);
-	}
+        {
+          fprintf(stderr,">> ERREUR : fermeture du fichier %s  \n",argv[1]);
+          exit(EXIT_FAILURE);
+        }
     }
 
   /****************************************************************************
@@ -669,8 +669,8 @@ int main (int argc, char **argv)
      - numeros (optionnel dans un fichier MED) 
      - numeros des familles */
   ret = MEDnoeudsLire(fid,nommaa,mdim,coo,mode_coo,&rep,
-		      nomcoo,unicoo,nomnoe,&inonoe,numnoe,&inunoe,
-		      nufano,nnoe);
+                      nomcoo,unicoo,nomnoe,&inonoe,numnoe,&inunoe,
+                      nufano,nnoe);
   if (ret < 0)
     strcpy(message,">> ERREUR : lecture des noeuds \n");
 
@@ -680,40 +680,40 @@ int main (int argc, char **argv)
       fprintf(stdout,"- Type de repere des coordonnees : %d \n",rep);
       fprintf(stdout,"- Nom des coordonnees : \n");
       for (i=0;i<mdim;i++)
-	{
-	  strncpy(str,nomcoo+i*MED_TAILLE_PNOM,MED_TAILLE_PNOM);
+        {
+          strncpy(str,nomcoo+i*MED_TAILLE_PNOM,MED_TAILLE_PNOM);
           str[MED_TAILLE_PNOM] = '\0';
           fprintf(stdout," %s ",str);
-	}
+        }
       fprintf(stdout,"\n- Unites des coordonnees : \n");
       for (i=0;i<mdim;i++)
-	{
-	  strncpy(str,unicoo+i*MED_TAILLE_PNOM,MED_TAILLE_PNOM);
+        {
+          strncpy(str,unicoo+i*MED_TAILLE_PNOM,MED_TAILLE_PNOM);
           str[MED_TAILLE_PNOM] = '\0';
           fprintf(stdout," %s ",str);
-	}     
+        }     
       fprintf(stdout,"\n- Coordonnees des noeuds : \n");
       for (i=0;i<nnoe*mdim;i++)
-	fprintf(stdout," %f ",*(coo+i));
+        fprintf(stdout," %f ",*(coo+i));
       if (inonoe)
-	{
-	  fprintf(stdout,"\n- Noms des noeuds : \n");
-	  for (i=0;i<nnoe;i++)
-	    {
-	      strncpy(str,nomnoe+i*MED_TAILLE_PNOM,MED_TAILLE_PNOM);
+        {
+          fprintf(stdout,"\n- Noms des noeuds : \n");
+          for (i=0;i<nnoe;i++)
+            {
+              strncpy(str,nomnoe+i*MED_TAILLE_PNOM,MED_TAILLE_PNOM);
               str[MED_TAILLE_PNOM] = '\0';
-	      fprintf(stdout," %s ",str);
-	    }
-	}
+              fprintf(stdout," %s ",str);
+            }
+        }
       if (inunoe)
-	{
-	  fprintf(stdout,"\n- Numeros des noeuds : \n");
-	  for (i=0;i<nnoe;i++)
-	      fprintf(stdout," %d ",*(numnoe+i));
-	}
+        {
+          fprintf(stdout,"\n- Numeros des noeuds : \n");
+          for (i=0;i<nnoe;i++)
+              fprintf(stdout," %d ",*(numnoe+i));
+        }
       fprintf(stdout,"\n- Numeros des familles des noeuds : \n");
       for (i=0;i<nnoe;i++)
-	fprintf(stdout," %d ",*(nufano+i));
+        fprintf(stdout," %d ",*(nufano+i));
       fprintf(stdout,"\n");
     }
 
@@ -733,250 +733,250 @@ int main (int argc, char **argv)
   if (ret == 0)
     for (i=0;i<MED_NBR_GEOMETRIE_MAILLE;i++)
       {
-	if (nmailles[i] > 0 && ret == 0)
-	  {
-	    /* dimension de la maille */
-	    edim = typmai[i] / 100;
-	    nsup = 0;
-	    if (mdim  == 2 || mdim == 3)
-	      if (edim == 1)
-		nsup = 1;
-	    if (mdim == 3)
-	      if (edim == 2)
-		nsup = 1;
-	    switch(typ_con)
-	      {
-	      case MED_NOD :
-		taille = nsup+typmai[i]%100;
-		break;
-		
-	      case MED_DESC :
-		taille = nsup+desmai[i];
-		break;
-		
-	      default :
-		ret = -1;
-	      }
-	    
-	    /* allocation memoire */
-	    connectivite = (med_int*)malloc(sizeof(med_int)*
-					    taille*nmailles[i]);
-	    nomele = (char*)malloc(sizeof(char)*MED_TAILLE_PNOM*
-				   nmailles[i]+1);
-	    numele = (med_int*)malloc(sizeof(med_int)*
-				      nmailles[i]);
-	    nufael = (med_int*)malloc(sizeof(med_int)*
-				      nmailles[i]);
-	    
-	    /* lecture des données */
-	    ret = MEDelementsLire(fid,nommaa,mdim,connectivite,mode_coo,
-				  nomele,&inoele,numele,&inuele,nufael,
-				  nmailles[i],MED_MAILLE,typmai[i],
-				  typ_con);
-	    if (ret < 0)
-	      strcpy(message,">> ERREUR : lecture des mailles \n");
-	    
-	    /* affichage des resultats */
-	    if (ret == 0)
-	      {
-		fprintf(stdout,"\n\n- Mailles de type %s : ", nommai[i]);
-		fprintf(stdout,"\n  - Connectivité : \n");
-		for (j=0;j<nmailles[i]*taille;j++)
-		  fprintf(stdout," %d ",*(connectivite+j));
-		if (inoele)
-		  {
-		    fprintf(stdout,"\n  - Noms : \n");
-		    for (j=0;j<nmailles[i];j++)
-		      {
-			fprintf(stdout," %d ",*(connectivite+j));
-			strncpy(str,nomele+j*MED_TAILLE_PNOM,MED_TAILLE_PNOM);
-			str[MED_TAILLE_PNOM] = '\0';
-			fprintf(stdout," %s ",str);
-		      }
-		  }
-		if (inuele)
-		  {
-		    fprintf(stdout,"\n  - Numeros :\n");
-		    for (j=0;j<nmailles[i];j++)
-		      fprintf(stdout," %d ",*(numele+j));
-		  }
-		fprintf(stdout,"\n  - Numéros de familles : \n");
-		for (j=0;j<nmailles[i];j++)
-		  fprintf(stdout," %d ",*(nufael+j));
-	      }
-		
-	    /* liberation memoire */
-	    free(connectivite);
-	    free(nomele);
-	    free(numele);
-	    free(nufael);
-	  }
+        if (nmailles[i] > 0 && ret == 0)
+          {
+            /* dimension de la maille */
+            edim = typmai[i] / 100;
+            nsup = 0;
+            if (mdim  == 2 || mdim == 3)
+              if (edim == 1)
+                nsup = 1;
+            if (mdim == 3)
+              if (edim == 2)
+                nsup = 1;
+            switch(typ_con)
+              {
+              case MED_NOD :
+                taille = nsup+typmai[i]%100;
+                break;
+                
+              case MED_DESC :
+                taille = nsup+desmai[i];
+                break;
+                
+              default :
+                ret = -1;
+              }
+            
+            /* allocation memoire */
+            connectivite = (med_int*)malloc(sizeof(med_int)*
+                                            taille*nmailles[i]);
+            nomele = (char*)malloc(sizeof(char)*MED_TAILLE_PNOM*
+                                   nmailles[i]+1);
+            numele = (med_int*)malloc(sizeof(med_int)*
+                                      nmailles[i]);
+            nufael = (med_int*)malloc(sizeof(med_int)*
+                                      nmailles[i]);
+            
+            /* lecture des données */
+            ret = MEDelementsLire(fid,nommaa,mdim,connectivite,mode_coo,
+                                  nomele,&inoele,numele,&inuele,nufael,
+                                  nmailles[i],MED_MAILLE,typmai[i],
+                                  typ_con);
+            if (ret < 0)
+              strcpy(message,">> ERREUR : lecture des mailles \n");
+            
+            /* affichage des resultats */
+            if (ret == 0)
+              {
+                fprintf(stdout,"\n\n- Mailles de type %s : ", nommai[i]);
+                fprintf(stdout,"\n  - Connectivité : \n");
+                for (j=0;j<nmailles[i]*taille;j++)
+                  fprintf(stdout," %d ",*(connectivite+j));
+                if (inoele)
+                  {
+                    fprintf(stdout,"\n  - Noms : \n");
+                    for (j=0;j<nmailles[i];j++)
+                      {
+                        fprintf(stdout," %d ",*(connectivite+j));
+                        strncpy(str,nomele+j*MED_TAILLE_PNOM,MED_TAILLE_PNOM);
+                        str[MED_TAILLE_PNOM] = '\0';
+                        fprintf(stdout," %s ",str);
+                      }
+                  }
+                if (inuele)
+                  {
+                    fprintf(stdout,"\n  - Numeros :\n");
+                    for (j=0;j<nmailles[i];j++)
+                      fprintf(stdout," %d ",*(numele+j));
+                  }
+                fprintf(stdout,"\n  - Numéros de familles : \n");
+                for (j=0;j<nmailles[i];j++)
+                  fprintf(stdout," %d ",*(nufael+j));
+              }
+                
+            /* liberation memoire */
+            free(connectivite);
+            free(nomele);
+            free(numele);
+            free(nufael);
+          }
       }
 
   if (ret == 0)
     for (i=0;i<MED_NBR_GEOMETRIE_FACE;i++)
       {
-	if (nfaces[i] > 0 && ret == 0)
-	  {
-	    /* dimension de la face */
-	    edim = typfac[i] / 100;
-	    nsup = 0;
-	    if (mdim  == 2 || mdim == 3)
-	      if (edim == 1)
-		nsup = 1;
-	    if (mdim == 3)
-	      if (edim == 2)
-		nsup = 1;
-	    switch(typ_con)
-	      {
-	      case MED_NOD :
-		taille = nsup+typfac[i]%100;
-		break;
-		
-	      case MED_DESC :
-		taille = nsup+desfac[i];
-		break;
-		
-	      default :
-		ret = -1;
-	      }
-	    
-	    /* allocation memoire */
-	    connectivite = (med_int*)malloc(sizeof(med_int)*
-					    taille*nfaces[i]);
-	    nomele = (char*)malloc(sizeof(char)*MED_TAILLE_PNOM*
-				   nfaces[i]+1);
-	    numele = (med_int*)malloc(sizeof(med_int)*
-				      nfaces[i]);
-	    nufael = (med_int*)malloc(sizeof(med_int)*
-				      nfaces[i]);
-	    
-	    /* lecture des données */
-	    ret = MEDelementsLire(fid,nommaa,mdim,connectivite,mode_coo,
-				  nomele,&inoele,numele,&inuele,nufael,
-				  nfaces[i],MED_FACE,typfac[i],
-				  typ_con);
-	    if (ret < 0)
-	      strcpy(message,">> ERREUR : lecture des faces \n");
-	    
-	    /* affichage des resultats */
-	    if (ret == 0)
-	      {
-		fprintf(stdout,"\n- Faces de type %s : ", nomfac[i]);
-		fprintf(stdout,"\n  - Connectivité : \n");
-		for (j=0;j<nfaces[i]*taille;j++)
-		  fprintf(stdout," %d ",*(connectivite+j));
-		if (inoele)
-		  {
-		    fprintf(stdout,"\n  - Noms : \n");
-		    for (j=0;j<nfaces[i];j++)
-		      {
-			fprintf(stdout," %d ",*(connectivite+j));
-			strncpy(str,nomele+j*MED_TAILLE_PNOM,MED_TAILLE_PNOM);
-			str[MED_TAILLE_PNOM] = '\0';
-			fprintf(stdout," %s ",str);
-		      }
-		  }
-		if (inuele)
-		  {
-		    fprintf(stdout,"\n  - Numeros :\n");
-		    for (j=0;j<nfaces[i];j++)
-		      fprintf(stdout," %d ",*(numele+j));
-		  }
-		fprintf(stdout,"\n  - Numéros de familles : \n");
-		for (j=0;j<nfaces[i];j++)
-		  fprintf(stdout," %d ",*(nufael+j));
-	      }
-		
-	    /* liberation memoire */
-	    free(connectivite);
-	    free(nomele);
-	    free(numele);
-	    free(nufael);
-	  }
+        if (nfaces[i] > 0 && ret == 0)
+          {
+            /* dimension de la face */
+            edim = typfac[i] / 100;
+            nsup = 0;
+            if (mdim  == 2 || mdim == 3)
+              if (edim == 1)
+                nsup = 1;
+            if (mdim == 3)
+              if (edim == 2)
+                nsup = 1;
+            switch(typ_con)
+              {
+              case MED_NOD :
+                taille = nsup+typfac[i]%100;
+                break;
+                
+              case MED_DESC :
+                taille = nsup+desfac[i];
+                break;
+                
+              default :
+                ret = -1;
+              }
+            
+            /* allocation memoire */
+            connectivite = (med_int*)malloc(sizeof(med_int)*
+                                            taille*nfaces[i]);
+            nomele = (char*)malloc(sizeof(char)*MED_TAILLE_PNOM*
+                                   nfaces[i]+1);
+            numele = (med_int*)malloc(sizeof(med_int)*
+                                      nfaces[i]);
+            nufael = (med_int*)malloc(sizeof(med_int)*
+                                      nfaces[i]);
+            
+            /* lecture des données */
+            ret = MEDelementsLire(fid,nommaa,mdim,connectivite,mode_coo,
+                                  nomele,&inoele,numele,&inuele,nufael,
+                                  nfaces[i],MED_FACE,typfac[i],
+                                  typ_con);
+            if (ret < 0)
+              strcpy(message,">> ERREUR : lecture des faces \n");
+            
+            /* affichage des resultats */
+            if (ret == 0)
+              {
+                fprintf(stdout,"\n- Faces de type %s : ", nomfac[i]);
+                fprintf(stdout,"\n  - Connectivité : \n");
+                for (j=0;j<nfaces[i]*taille;j++)
+                  fprintf(stdout," %d ",*(connectivite+j));
+                if (inoele)
+                  {
+                    fprintf(stdout,"\n  - Noms : \n");
+                    for (j=0;j<nfaces[i];j++)
+                      {
+                        fprintf(stdout," %d ",*(connectivite+j));
+                        strncpy(str,nomele+j*MED_TAILLE_PNOM,MED_TAILLE_PNOM);
+                        str[MED_TAILLE_PNOM] = '\0';
+                        fprintf(stdout," %s ",str);
+                      }
+                  }
+                if (inuele)
+                  {
+                    fprintf(stdout,"\n  - Numeros :\n");
+                    for (j=0;j<nfaces[i];j++)
+                      fprintf(stdout," %d ",*(numele+j));
+                  }
+                fprintf(stdout,"\n  - Numéros de familles : \n");
+                for (j=0;j<nfaces[i];j++)
+                  fprintf(stdout," %d ",*(nufael+j));
+              }
+                
+            /* liberation memoire */
+            free(connectivite);
+            free(nomele);
+            free(numele);
+            free(nufael);
+          }
     }    
 
   if (ret == 0)
     for (i=0;i<MED_NBR_GEOMETRIE_ARETE;i++)
       {
-	if (naretes[i] > 0 && ret == 0)
-	  {
-	    /* dimension de l'arete  */
-	    edim = typare[i] / 100;
-	    nsup = 0;
-	    if (mdim  == 2 || mdim == 3)
-	      if (edim == 1)
-		nsup = 1;
-	    if (mdim == 3)
-	      if (edim == 2)
-		nsup = 1;
-	    switch(typ_con)
-	      {
-	      case MED_NOD :
-		taille = nsup+typare[i]%100;
-		break;
-		
-	      case MED_DESC :
-		taille = nsup+desare[i];
-		break;
-		
-	      default :
-		ret = -1;
-	      }
-	    
-	    /* allocation memoire */
-	    connectivite = (med_int*)malloc(sizeof(med_int)*
-					    taille*naretes[i]);
-	    nomele = (char*)malloc(sizeof(char)*MED_TAILLE_PNOM*
-				   naretes[i]+1);
-	    numele = (med_int*)malloc(sizeof(med_int)*
-				      naretes[i]);
-	    nufael = (med_int*)malloc(sizeof(med_int)*
-				      naretes[i]);
-	    
-	    /* lecture des données */
-	    ret = MEDelementsLire(fid,nommaa,mdim,connectivite,mode_coo,
-				  nomele,&inoele,numele,&inuele,nufael,
-				  naretes[i],MED_ARETE,typare[i],
-				  typ_con);
-	    if (ret < 0)
-	      strcpy(message,">> ERREUR : lecture des aretes \n");
-	    
-	    /* affichage des resultats */
-	    if (ret == 0)
-	      {
-		fprintf(stdout,"\n- Aretes de type %s : ", nomare[i]);
-		fprintf(stdout,"\n  - Connectivité : \n");
-		for (j=0;j<naretes[i]*taille;j++)
-		  fprintf(stdout," %d ",*(connectivite+j));
-		if (inoele)
-		  {
-		    fprintf(stdout,"\n  - Noms : \n");
-		    for (j=0;j<naretes[i];j++)
-		      {
-			fprintf(stdout," %d ",*(connectivite+j));
-			strncpy(str,nomele+j*MED_TAILLE_PNOM,MED_TAILLE_PNOM);
-			str[MED_TAILLE_PNOM] = '\0';
-			fprintf(stdout," %s ",str);
-		      }
-		  }
-		if (inuele)
-		  {
-		    fprintf(stdout,"\n  - Numeros :\n");
-		    for (j=0;j<naretes[i];j++)
-		      fprintf(stdout," %d ",*(numele+j));
-		  }
-		fprintf(stdout,"\n  - Numéros de familles : \n");
-		for (j=0;j<naretes[i];j++)
-		  fprintf(stdout," %d ",*(nufael+j));
-	      }
-		
-	    /* liberation memoire */
-	    free(connectivite);
-	    free(nomele);
-	    free(numele);
-	    free(nufael);
-	  }
+        if (naretes[i] > 0 && ret == 0)
+          {
+            /* dimension de l'arete  */
+            edim = typare[i] / 100;
+            nsup = 0;
+            if (mdim  == 2 || mdim == 3)
+              if (edim == 1)
+                nsup = 1;
+            if (mdim == 3)
+              if (edim == 2)
+                nsup = 1;
+            switch(typ_con)
+              {
+              case MED_NOD :
+                taille = nsup+typare[i]%100;
+                break;
+                
+              case MED_DESC :
+                taille = nsup+desare[i];
+                break;
+                
+              default :
+                ret = -1;
+              }
+            
+            /* allocation memoire */
+            connectivite = (med_int*)malloc(sizeof(med_int)*
+                                            taille*naretes[i]);
+            nomele = (char*)malloc(sizeof(char)*MED_TAILLE_PNOM*
+                                   naretes[i]+1);
+            numele = (med_int*)malloc(sizeof(med_int)*
+                                      naretes[i]);
+            nufael = (med_int*)malloc(sizeof(med_int)*
+                                      naretes[i]);
+            
+            /* lecture des données */
+            ret = MEDelementsLire(fid,nommaa,mdim,connectivite,mode_coo,
+                                  nomele,&inoele,numele,&inuele,nufael,
+                                  naretes[i],MED_ARETE,typare[i],
+                                  typ_con);
+            if (ret < 0)
+              strcpy(message,">> ERREUR : lecture des aretes \n");
+            
+            /* affichage des resultats */
+            if (ret == 0)
+              {
+                fprintf(stdout,"\n- Aretes de type %s : ", nomare[i]);
+                fprintf(stdout,"\n  - Connectivité : \n");
+                for (j=0;j<naretes[i]*taille;j++)
+                  fprintf(stdout," %d ",*(connectivite+j));
+                if (inoele)
+                  {
+                    fprintf(stdout,"\n  - Noms : \n");
+                    for (j=0;j<naretes[i];j++)
+                      {
+                        fprintf(stdout," %d ",*(connectivite+j));
+                        strncpy(str,nomele+j*MED_TAILLE_PNOM,MED_TAILLE_PNOM);
+                        str[MED_TAILLE_PNOM] = '\0';
+                        fprintf(stdout," %s ",str);
+                      }
+                  }
+                if (inuele)
+                  {
+                    fprintf(stdout,"\n  - Numeros :\n");
+                    for (j=0;j<naretes[i];j++)
+                      fprintf(stdout," %d ",*(numele+j));
+                  }
+                fprintf(stdout,"\n  - Numéros de familles : \n");
+                for (j=0;j<naretes[i];j++)
+                  fprintf(stdout," %d ",*(nufael+j));
+              }
+                
+            /* liberation memoire */
+            free(connectivite);
+            free(nomele);
+            free(numele);
+            free(nufael);
+          }
       }
   
   /****************************************************************************
@@ -988,61 +988,61 @@ int main (int argc, char **argv)
   if (ret == 0)
     for (i=0;i<nfam;i++)
       {
-	
-	/* nombre de groupes */
-	ngro = MEDnFam(fid,nommaa,i+1,MED_GROUPE);
-	if (ngro < 0)  
-	  {
-	    ret = -1;
-	    strcpy(message,
-		   ">> ERREUR : lecture du nombre de groupes d'une famille \n");
-	  }
-	
-	/* nombre d'attributs */
-	if (ret == 0)
-	  {
-	    natt = MEDnFam(fid,nommaa,i+1,MED_ATTR);
-	    if (natt < 0)
-	      {
-		ret = -1;
-		strcpy(message,
-		   ">> ERREUR : lecture du nombre d'attributs d'une famille\n");
-	      }
-	  }
+        
+        /* nombre de groupes */
+        ngro = MEDnFam(fid,nommaa,i+1,MED_GROUPE);
+        if (ngro < 0)  
+          {
+            ret = -1;
+            strcpy(message,
+                   ">> ERREUR : lecture du nombre de groupes d'une famille \n");
+          }
+        
+        /* nombre d'attributs */
+        if (ret == 0)
+          {
+            natt = MEDnFam(fid,nommaa,i+1,MED_ATTR);
+            if (natt < 0)
+              {
+                ret = -1;
+                strcpy(message,
+                   ">> ERREUR : lecture du nombre d'attributs d'une famille\n");
+              }
+          }
 
-	if (ret == 0)
-	  fprintf(stdout,"- Famille %d a %d attributs et %d groupes \n",i+1,natt,ngro); 
+        if (ret == 0)
+          fprintf(stdout,"- Famille %d a %d attributs et %d groupes \n",i+1,natt,ngro); 
 
-	/* nom,numero,attributs,groupes */
-	if (ret == 0)
-	  {
-	    attide = (med_int*) malloc(sizeof(med_int)*natt);
-	    attval = (med_int*) malloc(sizeof(med_int)*natt);	    
-	    attdes = (char *) malloc(MED_TAILLE_DESC*natt+1);
-	    gro = (char*) malloc(MED_TAILLE_LNOM*ngro+1);
-	    ret = MEDfamInfo(fid,nommaa,i+1,nomfam,&numfam,attide,attval,
-			     attdes,&natt,gro,&ngro);
-	    fprintf(stdout,"  - Famille de nom %s et de numero %d : \n",nomfam,numfam);
-	    fprintf(stdout,"  - Attributs : \n");
-	    for (j=0;j<natt;j++)
-	      {
-		strncpy(str1,attdes+j*MED_TAILLE_DESC,MED_TAILLE_DESC);
-		str1[MED_TAILLE_DESC] = '\0';
-		fprintf(stdout,"   ide = %d - val = %d - des = %s\n",*(attide+j),
-		       *(attval+j),str1);
-	      }
+        /* nom,numero,attributs,groupes */
+        if (ret == 0)
+          {
+            attide = (med_int*) malloc(sizeof(med_int)*natt);
+            attval = (med_int*) malloc(sizeof(med_int)*natt);       
+            attdes = (char *) malloc(MED_TAILLE_DESC*natt+1);
+            gro = (char*) malloc(MED_TAILLE_LNOM*ngro+1);
+            ret = MEDfamInfo(fid,nommaa,i+1,nomfam,&numfam,attide,attval,
+                             attdes,&natt,gro,&ngro);
+            fprintf(stdout,"  - Famille de nom %s et de numero %d : \n",nomfam,numfam);
+            fprintf(stdout,"  - Attributs : \n");
+            for (j=0;j<natt;j++)
+              {
+                strncpy(str1,attdes+j*MED_TAILLE_DESC,MED_TAILLE_DESC);
+                str1[MED_TAILLE_DESC] = '\0';
+                fprintf(stdout,"   ide = %d - val = %d - des = %s\n",*(attide+j),
+                       *(attval+j),str1);
+              }
             free(attide);
-	    free(attval);
+            free(attval);
             free(attdes);
             fprintf(stdout,"  - Groupes :\n");
-	    for (j=0;j<ngro;j++)
-	      {
-		strncpy(str2,gro+j*MED_TAILLE_LNOM,MED_TAILLE_LNOM);
-		str2[MED_TAILLE_LNOM] = '\0';
-		fprintf(stdout,"   gro = %s\n",str2);
-	      }
+            for (j=0;j<ngro;j++)
+              {
+                strncpy(str2,gro+j*MED_TAILLE_LNOM,MED_TAILLE_LNOM);
+                str2[MED_TAILLE_LNOM] = '\0';
+                fprintf(stdout,"   gro = %s\n",str2);
+              }
             free(gro);
-	  }
+          }
       }
 
   /****************************************************************************
@@ -1056,123 +1056,123 @@ int main (int argc, char **argv)
   if (ret == 0)
     for (i = 0;i<nequ;i++)
       {
-	fprintf(stdout,"- Equivalence numero : %d ",i+1);
+        fprintf(stdout,"- Equivalence numero : %d ",i+1);
 
-	/* lecture des infos sur l'equivalence */
-	ret = MEDequivInfo(fid,nommaa,i+1,equ,des);
+        /* lecture des infos sur l'equivalence */
+        ret = MEDequivInfo(fid,nommaa,i+1,equ,des);
         if (ret == 0)
-	  {
-	    fprintf(stdout,"\n  - Nom de l'equivalence: %s \n",equ);
+          {
+            fprintf(stdout,"\n  - Nom de l'equivalence: %s \n",equ);
             fprintf(stdout,"\n  - Description de l'equivalence : %s \n",des);
-	  }
-	else
-	  strcpy(message,">> ERREUR : lecture informations sur equivalence\n");
+          }
+        else
+          strcpy(message,">> ERREUR : lecture informations sur equivalence\n");
 
-	/* lecture des correspondances sur les differents types d'entites */
-	if (ret == 0)
-	  {
-	    /* les noeuds */
-	    if ((ncor = MEDnCorres(fid,nommaa,equ,MED_NOEUD,(med_geometrie_element)0)) < 0)
-	      {
-		ret = -1;
-		strcpy(message,">> ERREUR : lecture nombre de correspondances\n");
-	      }
-	    else
-	      fprintf(stdout,"\n  - Il y a %d correspondances sur les noeuds \n",ncor);
-	    if (ncor > 0)
-	      {
-		cor = (med_int*) malloc(sizeof(med_int)*ncor*2);
+        /* lecture des correspondances sur les differents types d'entites */
+        if (ret == 0)
+          {
+            /* les noeuds */
+            if ((ncor = MEDnCorres(fid,nommaa,equ,MED_NOEUD,(med_geometrie_element)0)) < 0)
+              {
+                ret = -1;
+                strcpy(message,">> ERREUR : lecture nombre de correspondances\n");
+              }
+            else
+              fprintf(stdout,"\n  - Il y a %d correspondances sur les noeuds \n",ncor);
+            if (ncor > 0)
+              {
+                cor = (med_int*) malloc(sizeof(med_int)*ncor*2);
                 ret = MEDequivLire(fid,nommaa,equ,cor,ncor,MED_NOEUD,(med_geometrie_element)0);
-		if (ret == 0)
-		  for (j=0;j<ncor;j++)
-		    fprintf(stdout,"\n  - Correspondance %d : %d et %d \n",j+1,*(cor+2*j),
-			   *(cor+2*j+1));
-		else
-		   strcpy(message,">> ERREUR : lecture des correspondances\n");
+                if (ret == 0)
+                  for (j=0;j<ncor;j++)
+                    fprintf(stdout,"\n  - Correspondance %d : %d et %d \n",j+1,*(cor+2*j),
+                           *(cor+2*j+1));
+                else
+                   strcpy(message,">> ERREUR : lecture des correspondances\n");
                 free(cor);
-	      }
-	    
-	    /* sur les mailles : on ne prend pas en compte les mailles 3D */
-	    if (ret ==0)
-	      for (j=0;j<NBR_MAILLE_EQU;j++)
-		{
-		  if ((ncor = MEDnCorres(fid,nommaa,equ,MED_MAILLE,typmai[j])) < 0)
-		    {
-		      ret = -1;
-		       strcpy(message,
-			      ">> ERREUR : lecture informations sur nombre de correspondances \n");
-		    }
-		  else
-		    fprintf(stdout,"\n  - Il y a %d correspondances sur les mailles %s \n",ncor,
-			   nommai[j]);
-		  if (ncor > 0)
-		    {
-		      cor = (med_int*) malloc(sizeof(med_int)*ncor*2);
-		      ret = MEDequivLire(fid,nommaa,equ,cor,ncor,MED_MAILLE,
-					 typmai[j]);
-		      if (ret == 0)
-			for (k=0;k<ncor;k++)
-			  fprintf(stdout,"\n  - Correspondance %d : %d et %d \n",k+1,*(cor+2*k),
-				 *(cor+2*k+1));
-		      else
-			 strcpy(message,">> ERREUR : correspondances\n");
-		      free(cor);
-		    }
-		}
+              }
+            
+            /* sur les mailles : on ne prend pas en compte les mailles 3D */
+            if (ret ==0)
+              for (j=0;j<NBR_MAILLE_EQU;j++)
+                {
+                  if ((ncor = MEDnCorres(fid,nommaa,equ,MED_MAILLE,typmai[j])) < 0)
+                    {
+                      ret = -1;
+                       strcpy(message,
+                              ">> ERREUR : lecture informations sur nombre de correspondances \n");
+                    }
+                  else
+                    fprintf(stdout,"\n  - Il y a %d correspondances sur les mailles %s \n",ncor,
+                           nommai[j]);
+                  if (ncor > 0)
+                    {
+                      cor = (med_int*) malloc(sizeof(med_int)*ncor*2);
+                      ret = MEDequivLire(fid,nommaa,equ,cor,ncor,MED_MAILLE,
+                                         typmai[j]);
+                      if (ret == 0)
+                        for (k=0;k<ncor;k++)
+                          fprintf(stdout,"\n  - Correspondance %d : %d et %d \n",k+1,*(cor+2*k),
+                                 *(cor+2*k+1));
+                      else
+                         strcpy(message,">> ERREUR : correspondances\n");
+                      free(cor);
+                    }
+                }
 
-	    /* sur les faces */
-	    if (ret == 0)
-	      for (j=0;j<MED_NBR_GEOMETRIE_FACE;j++)
-		{
-		  if ((ncor = MEDnCorres(fid,nommaa,equ,MED_FACE,typfac[j])) < 0)
-		    {
-		      ret = -1;
-		      strcpy(message,">> ERREUR : informations sur correspondances \n");
-		    }
-		  else
-		    fprintf(stdout,"\n  - Il y a %d correspondances sur les faces %s\n",ncor,
-			   nomfac[j]);
-		  if (ncor > 0)
-		    {
-		      cor = (med_int*) malloc(sizeof(med_int)*ncor*2);
-		      ret = MEDequivLire(fid,nommaa,equ,cor,ncor,MED_FACE,
-					 typfac[j]);
-		      if (ret < 0)
-			strcpy(message,"ERREUR : lecture des equivalences \n");
-		      else
-			for (k=0;k<ncor;k++)
-			  fprintf(stdout,"\n  - Correspondance %d : %d et %d \n",k+1,*(cor+2*k),
-				 *(cor+2*k+1));
-		      free(cor);
-		    }
-		}
-	    
-	    /*  sur les aretes */
-	    for (j=0;j<MED_NBR_GEOMETRIE_ARETE;j++)
-	      {
-		if ((ncor = MEDnCorres(fid,nommaa,equ,MED_ARETE,typare[j])) < 0)
-		  {
-		    ret = -1;
-		    strcpy(message,">> ERREUR : nombre de correspondances \n");
-		  }
-		else
-		  fprintf(stdout,"\n  - Il y a %d correspondances sur les aretes %s \n",
-			 ncor,nomare[j]);
-		if (ncor > 0)
-		  {
-		    cor = (med_int*) malloc(sizeof(med_int)*ncor*2);
-		    ret = MEDequivLire(fid,nommaa,equ,cor,ncor,MED_ARETE,
-				       typare[j]);
-		    if (ret < 0)
-		      strcpy(message,">> ERREUR : equivalences \n");
-		    else
-		      for (k=0;k<ncor;k++)
-			fprintf(stdout,"\n  Correspondance %d : %d et %d \n",k+1,*(cor+2*k),
-			       *(cor+2*k+1));
-		    free(cor);
-		  }
-	      }
-	  }			    
+            /* sur les faces */
+            if (ret == 0)
+              for (j=0;j<MED_NBR_GEOMETRIE_FACE;j++)
+                {
+                  if ((ncor = MEDnCorres(fid,nommaa,equ,MED_FACE,typfac[j])) < 0)
+                    {
+                      ret = -1;
+                      strcpy(message,">> ERREUR : informations sur correspondances \n");
+                    }
+                  else
+                    fprintf(stdout,"\n  - Il y a %d correspondances sur les faces %s\n",ncor,
+                           nomfac[j]);
+                  if (ncor > 0)
+                    {
+                      cor = (med_int*) malloc(sizeof(med_int)*ncor*2);
+                      ret = MEDequivLire(fid,nommaa,equ,cor,ncor,MED_FACE,
+                                         typfac[j]);
+                      if (ret < 0)
+                        strcpy(message,"ERREUR : lecture des equivalences \n");
+                      else
+                        for (k=0;k<ncor;k++)
+                          fprintf(stdout,"\n  - Correspondance %d : %d et %d \n",k+1,*(cor+2*k),
+                                 *(cor+2*k+1));
+                      free(cor);
+                    }
+                }
+            
+            /*  sur les aretes */
+            for (j=0;j<MED_NBR_GEOMETRIE_ARETE;j++)
+              {
+                if ((ncor = MEDnCorres(fid,nommaa,equ,MED_ARETE,typare[j])) < 0)
+                  {
+                    ret = -1;
+                    strcpy(message,">> ERREUR : nombre de correspondances \n");
+                  }
+                else
+                  fprintf(stdout,"\n  - Il y a %d correspondances sur les aretes %s \n",
+                         ncor,nomare[j]);
+                if (ncor > 0)
+                  {
+                    cor = (med_int*) malloc(sizeof(med_int)*ncor*2);
+                    ret = MEDequivLire(fid,nommaa,equ,cor,ncor,MED_ARETE,
+                                       typare[j]);
+                    if (ret < 0)
+                      strcpy(message,">> ERREUR : equivalences \n");
+                    else
+                      for (k=0;k<ncor;k++)
+                        fprintf(stdout,"\n  Correspondance %d : %d et %d \n",k+1,*(cor+2*k),
+                               *(cor+2*k+1));
+                    free(cor);
+                  }
+              }
+          }                         
       }
 
   /****************************************************************************
@@ -1185,427 +1185,427 @@ int main (int argc, char **argv)
   if (ret == 0)
     for (i=0;i<ncha;i++)
       {
-	fprintf(stdout,"- Champ numero : %d \n",i+1);
-	
-	/* combien de composantes */
-	if ((ncomp = MEDnChamp(fid,i+1)) < 0)
-	  {
-	    ret = -1;
-	    strcpy(message,">> ERREUR : nombre de composants d'un champ\n");
-	  }
-	
-	/* allocation memoire de comp et unit*/
+        fprintf(stdout,"- Champ numero : %d \n",i+1);
+        
+        /* combien de composantes */
+        if ((ncomp = MEDnChamp(fid,i+1)) < 0)
+          {
+            ret = -1;
+            strcpy(message,">> ERREUR : nombre de composants d'un champ\n");
+          }
+        
+        /* allocation memoire de comp et unit*/
         if (ret == 0)
-	  {
-	    comp = (char*) malloc(ncomp*MED_TAILLE_PNOM+1);
-	    unit = (char*) malloc(ncomp*MED_TAILLE_PNOM+1);
-	  }
+          {
+            comp = (char*) malloc(ncomp*MED_TAILLE_PNOM+1);
+            unit = (char*) malloc(ncomp*MED_TAILLE_PNOM+1);
+          }
 
-	/* infos sur les champs */
-	if (ret == 0)
-	  ret = MEDchampInfo(fid,i+1,nomcha,&typcha,comp,unit,ncomp);
-	if (ret < 0)
-	  strcpy(message,">> ERREUR : information sur les champs \n");
+        /* infos sur les champs */
+        if (ret == 0)
+          ret = MEDchampInfo(fid,i+1,nomcha,&typcha,comp,unit,ncomp);
+        if (ret < 0)
+          strcpy(message,">> ERREUR : information sur les champs \n");
 
-	if (ret == 0) {
-	  fprintf(stdout,"  - Nom du champ : %s de type %d\n",nomcha,typcha);
-	  fprintf(stdout,"  - Nom des composantes : %s\n",comp);
-	  fprintf(stdout,"  - Unites des composantes : %s \n",unit);
-	  free(comp);
-	  free(unit);	
-	}
-	     
-	      
-	if (ret == 0)  /* Valeurs sur les noeuds */
-	  {
-	    /* Combien de pas de temps ? */
-	    npdt = MEDnPasdetemps(fid,nomcha,MED_NOEUD,(med_geometrie_element)0);
-	    if (npdt < 0)
-	      ret = -1;
-	    if (ret == -1)
-	      strcpy(message,">> ERREUR : la lecture du nombe de pas de temps");
-	    else
-	      fprintf(stdout,"\n  - Il y a %d pas de temps sur les noeuds \n",npdt);
+        if (ret == 0) {
+          fprintf(stdout,"  - Nom du champ : %s de type %d\n",nomcha,typcha);
+          fprintf(stdout,"  - Nom des composantes : %s\n",comp);
+          fprintf(stdout,"  - Unites des composantes : %s \n",unit);
+          free(comp);
+          free(unit);   
+        }
+             
+              
+        if (ret == 0)  /* Valeurs sur les noeuds */
+          {
+            /* Combien de pas de temps ? */
+            npdt = MEDnPasdetemps(fid,nomcha,MED_NOEUD,(med_geometrie_element)0);
+            if (npdt < 0)
+              ret = -1;
+            if (ret == -1)
+              strcpy(message,">> ERREUR : la lecture du nombe de pas de temps");
+            else
+              fprintf(stdout,"\n  - Il y a %d pas de temps sur les noeuds \n",npdt);
 
-	    /* Lecture des valeurs pour tous les pas de temps */
-	    if (ret == 0)
-	      for (j=0;j<npdt;j++)
-		{
-		  /* Informations sur les pas de temps */
-		  if (ret == 0)
-		    ret = MEDpasdetempsInfo(fid,nomcha,MED_NOEUD,(med_geometrie_element)0,
-					    j+1, maillage_champ, &ngauss, &numdt,  dtunit, &dt, &numo);
+            /* Lecture des valeurs pour tous les pas de temps */
+            if (ret == 0)
+              for (j=0;j<npdt;j++)
+                {
+                  /* Informations sur les pas de temps */
+                  if (ret == 0)
+                    ret = MEDpasdetempsInfo(fid,nomcha,MED_NOEUD,(med_geometrie_element)0,
+                                            j+1, maillage_champ, &ngauss, &numdt,  dtunit, &dt, &numo);
 
-		  if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
-		    fprintf(stdout,"\n  -> \tPas de Temps n° %4i (%f), N°d'ordre %4i, avec %i pts de gauss\n",
-			    numdt,dt,numo,ngauss);
-		  else
-		    strcpy(message,">> ERREUR : information sur les pas de temps \n");
-		  
-		  /* Combien de valeurs a lire ? */
-		  if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
-		    {
-		      if ((nval = MEDnVal(fid,nomcha,MED_NOEUD,(med_geometrie_element)0,numdt,numo)) < 0)
-			{
-			  ret = -1;
-			  strcpy(message,">> ERREUR : nombre de valeurs d'un champ\n");
-			}
-		      else
-			fprintf(stdout,"\n  - Il y a %d valeurs sur les noeuds \n",nval);
-		    }
+                  if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
+                    fprintf(stdout,"\n  -> \tPas de Temps n° %4i (%f), N°d'ordre %4i, avec %i pts de gauss\n",
+                            numdt,dt,numo,ngauss);
+                  else
+                    strcpy(message,">> ERREUR : information sur les pas de temps \n");
+                  
+                  /* Combien de valeurs a lire ? */
+                  if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
+                    {
+                      if ((nval = MEDnVal(fid,nomcha,MED_NOEUD,(med_geometrie_element)0,numdt,numo)) < 0)
+                        {
+                          ret = -1;
+                          strcpy(message,">> ERREUR : nombre de valeurs d'un champ\n");
+                        }
+                      else
+                        fprintf(stdout,"\n  - Il y a %d valeurs sur les noeuds \n",nval);
+                    }
 
-		  if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
-		    {
-		      if (typcha == MED_REEL64)
-			{
-			  valr = (med_float*) malloc(sizeof(med_float)*ncomp*nval);
-			  ret = MEDchampLire(fid,nommaa,nomcha,(unsigned char*)valr,mode_coo,MED_ALL,
-					     pflnom,MED_NOEUD,(med_geometrie_element)0,numdt,numo);
-					     
-			  if (ret < 0)
-			    strcpy(message,">> ERREUR : lecture des champs \n");
-			  else
-			    for (k=0;k<nval*ncomp;k++)
-			      fprintf(stdout," %f ",*(valr+k));
-			  free(valr);
-			}
-		      else
-			{
-			  vale = (med_int*) malloc(sizeof(med_int)*ncomp*nval);
-			  ret = MEDchampLire(fid,nommaa,nomcha,(unsigned char*)vale,mode_coo,MED_ALL,
-					     pflnom,MED_NOEUD,(med_geometrie_element)0,numdt,numo);
-			  if (ret < 0)
-			    strcpy(message,">> ERREUR : lecture des champs \n");
-			  else
-			    for (k=0;k<nval*ncomp;k++)
-			      fprintf(stdout," %d ",*(vale+k));
-			  free(vale);
-			}
+                  if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
+                    {
+                      if (typcha == MED_REEL64)
+                        {
+                          valr = (med_float*) malloc(sizeof(med_float)*ncomp*nval);
+                          ret = MEDchampLire(fid,nommaa,nomcha,(unsigned char*)valr,mode_coo,MED_ALL,
+                                             pflnom,MED_NOEUD,(med_geometrie_element)0,numdt,numo);
+                                             
+                          if (ret < 0)
+                            strcpy(message,">> ERREUR : lecture des champs \n");
+                          else
+                            for (k=0;k<nval*ncomp;k++)
+                              fprintf(stdout," %f ",*(valr+k));
+                          free(valr);
+                        }
+                      else
+                        {
+                          vale = (med_int*) malloc(sizeof(med_int)*ncomp*nval);
+                          ret = MEDchampLire(fid,nommaa,nomcha,(unsigned char*)vale,mode_coo,MED_ALL,
+                                             pflnom,MED_NOEUD,(med_geometrie_element)0,numdt,numo);
+                          if (ret < 0)
+                            strcpy(message,">> ERREUR : lecture des champs \n");
+                          else
+                            for (k=0;k<nval*ncomp;k++)
+                              fprintf(stdout," %d ",*(vale+k));
+                          free(vale);
+                        }
 
-		      /* Lecture d'un profil eventuel */
-		      if (strcmp(pflnom,MED_NOPFL) == 0 )
-			fprintf(stdout,"\n \t- Pas de profil\n");
-		      else 
-			{
-			  if ( (pflsize = MEDnValProfil(fid,pflnom)) <0)
-			    {
-			      ret = -1;
-			      strcpy(message,">> ERREUR : lecture de la taille du profil \n");
-			    }
-			  else 
-			    {
-			      fprintf(stdout,"\n \t- Profil : %s de taille %i\n",pflnom,pflsize);
-			      pflval = (med_int*) malloc(sizeof(med_int)*pflsize);
-			      
-			      if ( (ret = MEDprofilLire(fid,pflval,pflnom)) <0)
-				strcpy(message,">> ERREUR : lecture du profil \n");
-			      else
-				for (l=0;l<pflsize;l++)
-				  fprintf(stdout,"\t%i\n",*(pflval+l));
-			      
-			      free(pflval);
-			    }
-			}
-		    }		  		  
-		}
-	  }
+                      /* Lecture d'un profil eventuel */
+                      if (strcmp(pflnom,MED_NOPFL) == 0 )
+                        fprintf(stdout,"\n \t- Pas de profil\n");
+                      else 
+                        {
+                          if ( (pflsize = MEDnValProfil(fid,pflnom)) <0)
+                            {
+                              ret = -1;
+                              strcpy(message,">> ERREUR : lecture de la taille du profil \n");
+                            }
+                          else 
+                            {
+                              fprintf(stdout,"\n \t- Profil : %s de taille %i\n",pflnom,pflsize);
+                              pflval = (med_int*) malloc(sizeof(med_int)*pflsize);
+                              
+                              if ( (ret = MEDprofilLire(fid,pflval,pflnom)) <0)
+                                strcpy(message,">> ERREUR : lecture du profil \n");
+                              else
+                                for (l=0;l<pflsize;l++)
+                                  fprintf(stdout,"\t%i\n",*(pflval+l));
+                              
+                              free(pflval);
+                            }
+                        }
+                    }                             
+                }
+          }
 
 
-	if (ret == 0)  /* Valeurs sur les mailles */
-	  {
-	    for (k=0;k<MED_NBR_GEOMETRIE_MAILLE;k++)
-	      {
-		typgeo = typmai[k];
+        if (ret == 0)  /* Valeurs sur les mailles */
+          {
+            for (k=0;k<MED_NBR_GEOMETRIE_MAILLE;k++)
+              {
+                typgeo = typmai[k];
 
-		/* Combien de pas de temps ? */
-		npdt = MEDnPasdetemps(fid,nomcha,MED_MAILLE,typgeo);
-		if (npdt < 0)
-		  ret = -1;
-		if (ret == -1)
-		  strcpy(message,">> ERREUR : la lecture du nombe de pas de temps");
-		else
-		  fprintf(stdout,"\n  - Il y a %d pas de temps sur les mailles de type %d \n",npdt,typgeo);
+                /* Combien de pas de temps ? */
+                npdt = MEDnPasdetemps(fid,nomcha,MED_MAILLE,typgeo);
+                if (npdt < 0)
+                  ret = -1;
+                if (ret == -1)
+                  strcpy(message,">> ERREUR : la lecture du nombe de pas de temps");
+                else
+                  fprintf(stdout,"\n  - Il y a %d pas de temps sur les mailles de type %d \n",npdt,typgeo);
 
-		/* Lecture des valeurs pour tous les pas de temps */
-		if (ret == 0)
-		  for (j=0;j<npdt;j++)
-		    {
-		      /* Informations sur les pas de temps */
-		      if (ret == 0)
-			ret = MEDpasdetempsInfo(fid,nomcha,MED_MAILLE,typgeo,
-						j+1, maillage_champ, &ngauss, &numdt,  dtunit, &dt, &numo);
+                /* Lecture des valeurs pour tous les pas de temps */
+                if (ret == 0)
+                  for (j=0;j<npdt;j++)
+                    {
+                      /* Informations sur les pas de temps */
+                      if (ret == 0)
+                        ret = MEDpasdetempsInfo(fid,nomcha,MED_MAILLE,typgeo,
+                                                j+1, maillage_champ, &ngauss, &numdt,  dtunit, &dt, &numo);
 
-		      if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
-			fprintf(stdout,"\n  -> \tPas de Temps n° %4i (%f), N°d'ordre %4i, avec %i pts de gauss\n",
-				numdt,dt,numo,ngauss);
-		      else
-			strcpy(message,">> ERREUR : information sur les pas de temps \n");
+                      if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
+                        fprintf(stdout,"\n  -> \tPas de Temps n° %4i (%f), N°d'ordre %4i, avec %i pts de gauss\n",
+                                numdt,dt,numo,ngauss);
+                      else
+                        strcpy(message,">> ERREUR : information sur les pas de temps \n");
 
-		      /* Combien de valeurs a lire ? */
-		      if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
-			{
-			  if ((nval = MEDnVal(fid,nomcha,MED_MAILLE,typgeo,numdt,numo)) < 0)
-			    {
-			      ret = -1;
-			      strcpy(message,">> ERREUR : nombre de valeurs d'un champ\n");
-			    }
-			  else
-			    fprintf(stdout,"\n  - Il y a %d valeurs sur les noeuds \n",nval);
-			}
+                      /* Combien de valeurs a lire ? */
+                      if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
+                        {
+                          if ((nval = MEDnVal(fid,nomcha,MED_MAILLE,typgeo,numdt,numo)) < 0)
+                            {
+                              ret = -1;
+                              strcpy(message,">> ERREUR : nombre de valeurs d'un champ\n");
+                            }
+                          else
+                            fprintf(stdout,"\n  - Il y a %d valeurs sur les noeuds \n",nval);
+                        }
 
-		      if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
-			{
-			  if (typcha == MED_REEL64)
-			    {
-			      valr = (med_float*) malloc(sizeof(med_float)*ncomp*nval);
-			      ret = MEDchampLire(fid,nommaa,nomcha,(unsigned char*)valr,mode_coo,MED_ALL,
-						 pflnom,MED_MAILLE,typgeo,numdt,numo);
-			      if (ret < 0)
-				strcpy(message,">> ERREUR : lecture des champs \n");
-			      else
-				for (kp=0;kp<nval*ncomp;kp++)
-				  fprintf(stdout," %f ",*(valr+kp));
-			      free(valr);
-			    }
-			  else
-			    {
-			      vale = (med_int*) malloc(sizeof(med_int)*ncomp*nval);
-			      ret = MEDchampLire(fid,nommaa,nomcha,(unsigned char*)vale,mode_coo,MED_ALL,
-						 pflnom,MED_MAILLE,typgeo,numdt,numo);
-			      if (ret < 0)
-				strcpy(message,">> ERREUR : lecture des champs \n");
-			      else
-				for (kp=0;kp<nval*ncomp;kp++)
-				  fprintf(stdout," %d ",*(vale+kp));
-			      free(vale);
-			    }
-			  
-			  /* Lecture d'un profil eventuel */
-			  if (strcmp(pflnom,MED_NOPFL) == 0 )
-			    fprintf(stdout,"\n \t- Pas de profil\n");
-			  else 
-			    {
-			      if ( (pflsize = MEDnValProfil(fid,pflnom)) <0)
-				{
-				  ret = -1;
-				  strcpy(message,">> ERREUR : lecture de la taille du profil \n");
-				}
-			      else 
-				{
-				  fprintf(stdout,"\n \t- Profil : %s de taille %i\n",pflnom,pflsize);
-				  pflval = (med_int*) malloc(sizeof(med_int)*pflsize);
-				  
-				  if ( (ret = MEDprofilLire(fid,pflval,pflnom)) <0)
-				    strcpy(message,">> ERREUR : lecture du profil \n");
-				  else
-				    for (l=0;l<pflsize;l++)
-				      fprintf(stdout,"\t%i\n",*(pflval+l));
-				  
-				  free(pflval);
-				}
-			    }
-			}		  		  
-		    }
-	      }
-	  }    
+                      if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
+                        {
+                          if (typcha == MED_REEL64)
+                            {
+                              valr = (med_float*) malloc(sizeof(med_float)*ncomp*nval);
+                              ret = MEDchampLire(fid,nommaa,nomcha,(unsigned char*)valr,mode_coo,MED_ALL,
+                                                 pflnom,MED_MAILLE,typgeo,numdt,numo);
+                              if (ret < 0)
+                                strcpy(message,">> ERREUR : lecture des champs \n");
+                              else
+                                for (kp=0;kp<nval*ncomp;kp++)
+                                  fprintf(stdout," %f ",*(valr+kp));
+                              free(valr);
+                            }
+                          else
+                            {
+                              vale = (med_int*) malloc(sizeof(med_int)*ncomp*nval);
+                              ret = MEDchampLire(fid,nommaa,nomcha,(unsigned char*)vale,mode_coo,MED_ALL,
+                                                 pflnom,MED_MAILLE,typgeo,numdt,numo);
+                              if (ret < 0)
+                                strcpy(message,">> ERREUR : lecture des champs \n");
+                              else
+                                for (kp=0;kp<nval*ncomp;kp++)
+                                  fprintf(stdout," %d ",*(vale+kp));
+                              free(vale);
+                            }
+                          
+                          /* Lecture d'un profil eventuel */
+                          if (strcmp(pflnom,MED_NOPFL) == 0 )
+                            fprintf(stdout,"\n \t- Pas de profil\n");
+                          else 
+                            {
+                              if ( (pflsize = MEDnValProfil(fid,pflnom)) <0)
+                                {
+                                  ret = -1;
+                                  strcpy(message,">> ERREUR : lecture de la taille du profil \n");
+                                }
+                              else 
+                                {
+                                  fprintf(stdout,"\n \t- Profil : %s de taille %i\n",pflnom,pflsize);
+                                  pflval = (med_int*) malloc(sizeof(med_int)*pflsize);
+                                  
+                                  if ( (ret = MEDprofilLire(fid,pflval,pflnom)) <0)
+                                    strcpy(message,">> ERREUR : lecture du profil \n");
+                                  else
+                                    for (l=0;l<pflsize;l++)
+                                      fprintf(stdout,"\t%i\n",*(pflval+l));
+                                  
+                                  free(pflval);
+                                }
+                            }
+                        }                                 
+                    }
+              }
+          }    
       
 
-	if (ret == 0)  /* Valeurs sur les faces */
-	  {
-	    for (k=0;k<MED_NBR_GEOMETRIE_FACE;k++)
-	      {
-		typgeo = typfac[k];
+        if (ret == 0)  /* Valeurs sur les faces */
+          {
+            for (k=0;k<MED_NBR_GEOMETRIE_FACE;k++)
+              {
+                typgeo = typfac[k];
 
-		/* Combien de pas de temps ? */
-		npdt = MEDnPasdetemps(fid,nomcha,MED_FACE,typgeo);
-		if (npdt < 0)
-		  ret = -1;
-		if (ret == -1)
-		  strcpy(message,">> ERREUR : la lecture du nombe de pas de temps");
-		else
-		  fprintf(stdout,"\n  - Il y a %d pas de temps sur les faces de type %d \n",npdt,typgeo);
+                /* Combien de pas de temps ? */
+                npdt = MEDnPasdetemps(fid,nomcha,MED_FACE,typgeo);
+                if (npdt < 0)
+                  ret = -1;
+                if (ret == -1)
+                  strcpy(message,">> ERREUR : la lecture du nombe de pas de temps");
+                else
+                  fprintf(stdout,"\n  - Il y a %d pas de temps sur les faces de type %d \n",npdt,typgeo);
 
-		/* Lecture des valeurs pour tous les pas de temps */
-		if (ret == 0)
-		  for (j=0;j<npdt;j++)
-		    {
-		      /* Informations sur les pas de temps */
-		      if (ret == 0)
-			ret = MEDpasdetempsInfo(fid,nomcha,MED_FACE,typgeo,
-						j+1, maillage_champ, &ngauss, &numdt,  dtunit, &dt, &numo);
+                /* Lecture des valeurs pour tous les pas de temps */
+                if (ret == 0)
+                  for (j=0;j<npdt;j++)
+                    {
+                      /* Informations sur les pas de temps */
+                      if (ret == 0)
+                        ret = MEDpasdetempsInfo(fid,nomcha,MED_FACE,typgeo,
+                                                j+1, maillage_champ, &ngauss, &numdt,  dtunit, &dt, &numo);
 
-		      if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
-			fprintf(stdout,"\n  -> \tPas de Temps n° %4i (%f), N°d'ordre %4i, avec %i pts de gauss\n",
-				numdt,dt,numo,ngauss);
-		      else
-			strcpy(message,">> ERREUR : information sur les pas de temps \n");
+                      if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
+                        fprintf(stdout,"\n  -> \tPas de Temps n° %4i (%f), N°d'ordre %4i, avec %i pts de gauss\n",
+                                numdt,dt,numo,ngauss);
+                      else
+                        strcpy(message,">> ERREUR : information sur les pas de temps \n");
 
-		      /* Combien de valeurs a lire ? */
-		      if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
-			{
-			  if ((nval = MEDnVal(fid,nomcha,MED_FACE,typgeo,numdt,numo)) < 0)
-			    {
-			      ret = -1;
-			      strcpy(message,">> ERREUR : nombre de valeurs d'un champ\n");
-			    }
-			  else
-			    fprintf(stdout,"\n  - Il y a %d valeurs sur les noeuds \n",nval);
-			}
+                      /* Combien de valeurs a lire ? */
+                      if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
+                        {
+                          if ((nval = MEDnVal(fid,nomcha,MED_FACE,typgeo,numdt,numo)) < 0)
+                            {
+                              ret = -1;
+                              strcpy(message,">> ERREUR : nombre de valeurs d'un champ\n");
+                            }
+                          else
+                            fprintf(stdout,"\n  - Il y a %d valeurs sur les noeuds \n",nval);
+                        }
 
-		      if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
-			{
-			  if (typcha == MED_REEL64)
-			    {
-			      valr = (med_float*) malloc(sizeof(med_float)*ncomp*nval);
-			      ret = MEDchampLire(fid,nommaa,nomcha,(unsigned char*)valr,mode_coo,MED_ALL,
-						 pflnom,MED_FACE,typgeo,numdt,numo);
-			      if (ret < 0)
-				strcpy(message,">> ERREUR : lecture des champs \n");
-			      else
-				for (kp=0;kp<nval*ncomp;kp++)
-				  fprintf(stdout," %f ",*(valr+kp));
-			      free(valr);
-			    }
-			  else
-			    {
-			      vale = (med_int*) malloc(sizeof(med_int)*ncomp*nval);
-			      ret = MEDchampLire(fid,nommaa,nomcha,(unsigned char*)vale,mode_coo,MED_ALL,
-						 pflnom,MED_FACE,typgeo,numdt,numo);
-			      if (ret < 0)
-				strcpy(message,">> ERREUR : lecture des champs \n");
-			      else
-				for (kp=0;kp<nval*ncomp;kp++)
-				  fprintf(stdout," %d ",*(vale+kp));
-			      free(vale);
-			    }
-			  
-			  /* Lecture d'un profil eventuel */
-			  if (strcmp(pflnom,MED_NOPFL) == 0 )
-			    fprintf(stdout,"\n \t- Pas de profil\n");
-			  else 
-			    {
-			      if ( (pflsize = MEDnValProfil(fid,pflnom)) <0)
-				{
-				  ret = -1;
-				  strcpy(message,">> ERREUR : lecture de la taille du profil \n");
-				}
-			      else 
-				{
-				  fprintf(stdout,"\n \t- Profil : %s de taille %i\n",pflnom,pflsize);
-				  pflval = (med_int*) malloc(sizeof(med_int)*pflsize);
-				  
-				  if ( (ret = MEDprofilLire(fid,pflval,pflnom)) <0)
-				    strcpy(message,">> ERREUR : lecture du profil \n");
-				  else
-				    for (l=0;l<pflsize;l++)
-				      fprintf(stdout,"\t%i\n",*(pflval+l));
-				  
-				  free(pflval);
-				}
-			    }
-			}		  		  
-		    }
-	      }
-	  }    
+                      if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
+                        {
+                          if (typcha == MED_REEL64)
+                            {
+                              valr = (med_float*) malloc(sizeof(med_float)*ncomp*nval);
+                              ret = MEDchampLire(fid,nommaa,nomcha,(unsigned char*)valr,mode_coo,MED_ALL,
+                                                 pflnom,MED_FACE,typgeo,numdt,numo);
+                              if (ret < 0)
+                                strcpy(message,">> ERREUR : lecture des champs \n");
+                              else
+                                for (kp=0;kp<nval*ncomp;kp++)
+                                  fprintf(stdout," %f ",*(valr+kp));
+                              free(valr);
+                            }
+                          else
+                            {
+                              vale = (med_int*) malloc(sizeof(med_int)*ncomp*nval);
+                              ret = MEDchampLire(fid,nommaa,nomcha,(unsigned char*)vale,mode_coo,MED_ALL,
+                                                 pflnom,MED_FACE,typgeo,numdt,numo);
+                              if (ret < 0)
+                                strcpy(message,">> ERREUR : lecture des champs \n");
+                              else
+                                for (kp=0;kp<nval*ncomp;kp++)
+                                  fprintf(stdout," %d ",*(vale+kp));
+                              free(vale);
+                            }
+                          
+                          /* Lecture d'un profil eventuel */
+                          if (strcmp(pflnom,MED_NOPFL) == 0 )
+                            fprintf(stdout,"\n \t- Pas de profil\n");
+                          else 
+                            {
+                              if ( (pflsize = MEDnValProfil(fid,pflnom)) <0)
+                                {
+                                  ret = -1;
+                                  strcpy(message,">> ERREUR : lecture de la taille du profil \n");
+                                }
+                              else 
+                                {
+                                  fprintf(stdout,"\n \t- Profil : %s de taille %i\n",pflnom,pflsize);
+                                  pflval = (med_int*) malloc(sizeof(med_int)*pflsize);
+                                  
+                                  if ( (ret = MEDprofilLire(fid,pflval,pflnom)) <0)
+                                    strcpy(message,">> ERREUR : lecture du profil \n");
+                                  else
+                                    for (l=0;l<pflsize;l++)
+                                      fprintf(stdout,"\t%i\n",*(pflval+l));
+                                  
+                                  free(pflval);
+                                }
+                            }
+                        }                                 
+                    }
+              }
+          }    
 
 
-	if (ret == 0)  /* Valeurs sur les aretes */
-	  {
-	    for (k=0;k<MED_NBR_GEOMETRIE_ARETE;k++)
-	      {
-		typgeo = typare[k];
+        if (ret == 0)  /* Valeurs sur les aretes */
+          {
+            for (k=0;k<MED_NBR_GEOMETRIE_ARETE;k++)
+              {
+                typgeo = typare[k];
 
-		/* Combien de pas de temps ? */
-		npdt = MEDnPasdetemps(fid,nomcha,MED_ARETE,typgeo);
-		if (npdt < 0)
-		  ret = -1;
-		if (ret == -1)
-		  strcpy(message,">> ERREUR : la lecture du nombe de pas de temps");
-		else
-		  fprintf(stdout,"\n  - Il y a %d pas de temps sur les aretes de type %d \n",npdt,typgeo);
+                /* Combien de pas de temps ? */
+                npdt = MEDnPasdetemps(fid,nomcha,MED_ARETE,typgeo);
+                if (npdt < 0)
+                  ret = -1;
+                if (ret == -1)
+                  strcpy(message,">> ERREUR : la lecture du nombe de pas de temps");
+                else
+                  fprintf(stdout,"\n  - Il y a %d pas de temps sur les aretes de type %d \n",npdt,typgeo);
 
-		/* Lecture des valeurs pour tous les pas de temps */
-		if (ret == 0)
-		  for (j=0;j<npdt;j++)
-		    {
-		      /* Informations sur les pas de temps */
-		      if (ret == 0)
-			ret = MEDpasdetempsInfo(fid,nomcha,MED_ARETE,typgeo,
-						j+1, maillage_champ, &ngauss, &numdt,  dtunit, &dt, &numo);
+                /* Lecture des valeurs pour tous les pas de temps */
+                if (ret == 0)
+                  for (j=0;j<npdt;j++)
+                    {
+                      /* Informations sur les pas de temps */
+                      if (ret == 0)
+                        ret = MEDpasdetempsInfo(fid,nomcha,MED_ARETE,typgeo,
+                                                j+1, maillage_champ, &ngauss, &numdt,  dtunit, &dt, &numo);
 
-		      if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
-			fprintf(stdout,"\n  -> \tPas de Temps n° %4i (%f), N°d'ordre %4i, avec %i pts de gauss\n",
-				numdt,dt,numo,ngauss);
-		      else
-			strcpy(message,">> ERREUR : information sur les pas de temps \n");
+                      if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
+                        fprintf(stdout,"\n  -> \tPas de Temps n° %4i (%f), N°d'ordre %4i, avec %i pts de gauss\n",
+                                numdt,dt,numo,ngauss);
+                      else
+                        strcpy(message,">> ERREUR : information sur les pas de temps \n");
 
-		      /* Combien de valeurs a lire ? */
-		      if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
-			{
-			  if ((nval = MEDnVal(fid,nomcha,MED_ARETE,typgeo,numdt,numo)) < 0)
-			    {
-			      ret = -1;
-			      strcpy(message,">> ERREUR : nombre de valeurs d'un champ\n");
-			    }
-			  else
-			    fprintf(stdout,"\n  - Il y a %d valeurs sur les noeuds \n",nval);
-			}
+                      /* Combien de valeurs a lire ? */
+                      if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
+                        {
+                          if ((nval = MEDnVal(fid,nomcha,MED_ARETE,typgeo,numdt,numo)) < 0)
+                            {
+                              ret = -1;
+                              strcpy(message,">> ERREUR : nombre de valeurs d'un champ\n");
+                            }
+                          else
+                            fprintf(stdout,"\n  - Il y a %d valeurs sur les noeuds \n",nval);
+                        }
 
-		      if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
-			{
-			  if (typcha == MED_REEL64)
-			    {
-			      valr = (med_float*) malloc(sizeof(med_float)*ncomp*nval);
-			      ret = MEDchampLire(fid,nommaa,nomcha,(unsigned char*)valr,mode_coo,MED_ALL,
-						 pflnom,MED_ARETE,typgeo,numdt,numo);
-			      if (ret < 0)
-				strcpy(message,">> ERREUR : lecture des champs \n");
-			      else
-				for (kp=0;kp<nval*ncomp;kp++)
-				  fprintf(stdout," %f ",*(valr+kp));
-			      free(valr);
-			    }
-			  else
-			    {
-			      vale = (med_int*) malloc(sizeof(med_int)*ncomp*nval);
-			      ret = MEDchampLire(fid,nommaa,nomcha,(unsigned char*)vale,mode_coo,MED_ALL,
-						 pflnom,MED_ARETE,typgeo,numdt,numo);
-			      if (ret < 0)
-				strcpy(message,">> ERREUR : lecture des champs \n");
-			      else
-				for (kp=0;kp<nval*ncomp;kp++)
-				  fprintf(stdout," %d ",*(vale+kp));
-			      free(vale);
-			    }
-			  
-			  /* Lecture d'un profil eventuel */
-			  if (strcmp(pflnom,MED_NOPFL) == 0 )
-			    fprintf(stdout,"\n \t- Pas de profil\n");
-			  else 
-			    {
-			      if ( (pflsize = MEDnValProfil(fid,pflnom)) <0)
-				{
-				  ret = -1;
-				  strcpy(message,">> ERREUR : lecture de la taille du profil \n");
-				}
-			      else 
-				{
-				  fprintf(stdout,"\n \t- Profil : %s de taille %i\n",pflnom,pflsize);
-				  pflval = (med_int*) malloc(sizeof(med_int)*pflsize);
-				  
-				  if ( (ret = MEDprofilLire(fid,pflval,pflnom)) <0)
-				    strcpy(message,">> ERREUR : lecture du profil \n");
-				  else
-				    for (l=0;l<pflsize;l++)
-				      fprintf(stdout,"\t%i\n",*(pflval+l));
-				  
-				  free(pflval);
-				}
-			    }
-			}		  		  
-		    }
-	      }
-	  }    
+                      if (ret == 0 && (! strcmp(maillage_champ,nommaa)))
+                        {
+                          if (typcha == MED_REEL64)
+                            {
+                              valr = (med_float*) malloc(sizeof(med_float)*ncomp*nval);
+                              ret = MEDchampLire(fid,nommaa,nomcha,(unsigned char*)valr,mode_coo,MED_ALL,
+                                                 pflnom,MED_ARETE,typgeo,numdt,numo);
+                              if (ret < 0)
+                                strcpy(message,">> ERREUR : lecture des champs \n");
+                              else
+                                for (kp=0;kp<nval*ncomp;kp++)
+                                  fprintf(stdout," %f ",*(valr+kp));
+                              free(valr);
+                            }
+                          else
+                            {
+                              vale = (med_int*) malloc(sizeof(med_int)*ncomp*nval);
+                              ret = MEDchampLire(fid,nommaa,nomcha,(unsigned char*)vale,mode_coo,MED_ALL,
+                                                 pflnom,MED_ARETE,typgeo,numdt,numo);
+                              if (ret < 0)
+                                strcpy(message,">> ERREUR : lecture des champs \n");
+                              else
+                                for (kp=0;kp<nval*ncomp;kp++)
+                                  fprintf(stdout," %d ",*(vale+kp));
+                              free(vale);
+                            }
+                          
+                          /* Lecture d'un profil eventuel */
+                          if (strcmp(pflnom,MED_NOPFL) == 0 )
+                            fprintf(stdout,"\n \t- Pas de profil\n");
+                          else 
+                            {
+                              if ( (pflsize = MEDnValProfil(fid,pflnom)) <0)
+                                {
+                                  ret = -1;
+                                  strcpy(message,">> ERREUR : lecture de la taille du profil \n");
+                                }
+                              else 
+                                {
+                                  fprintf(stdout,"\n \t- Profil : %s de taille %i\n",pflnom,pflsize);
+                                  pflval = (med_int*) malloc(sizeof(med_int)*pflsize);
+                                  
+                                  if ( (ret = MEDprofilLire(fid,pflval,pflnom)) <0)
+                                    strcpy(message,">> ERREUR : lecture du profil \n");
+                                  else
+                                    for (l=0;l<pflsize;l++)
+                                      fprintf(stdout,"\t%i\n",*(pflval+l));
+                                  
+                                  free(pflval);
+                                }
+                            }
+                        }                                 
+                    }
+              }
+          }    
 
       }
 

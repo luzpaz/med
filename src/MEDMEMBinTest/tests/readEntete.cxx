@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 //  File   : readEntete.cxx
 //  Module : MED
 //
@@ -33,7 +31,7 @@ using namespace std;
 using namespace MEDMEM;
 using namespace MED_EN;
 
-void usage(char * name)
+static void usage(char * name)
 {
   cout << "    " << name <<" <file name>"<< " <mesh name> " << " <interlace mode>" << endl;
   cout << "    " << "displays all Nodes Coordinates in mdump mode" << endl;
@@ -56,12 +54,12 @@ int main (int argc, char ** argv) {
   if (argc==4)
   {
         string comp=argv[3];
-  	if ( comp == "MED_NO_INTERLACE" ) Mode = MED_NO_INTERLACE;
-	else if ( comp != "MED_FULL_INTERLACE") usage(argv[0]);
+        if ( comp == "MED_NO_INTERLACE" ) Mode = MED_NO_INTERLACE;
+        else if ( comp != "MED_FULL_INTERLACE") usage(argv[0]);
   }
 
 
-  MESH * myMesh= new MESH() ;
+  MESH * myMesh= new MESH;
   myMesh->setName(meshName);
   MED_MESH_RDONLY_DRIVER myMeshDriver(fileName,myMesh);
   try
@@ -119,14 +117,14 @@ int main (int argc, char ** argv) {
       list<medGeometryElement>::const_iterator currentGeometry;
 
       for (currentGeometry  = currentEntity.begin();
-	   currentGeometry != currentEntity.end(); 
-	   currentGeometry++) 
-	{
-	  cout << "- Nombre de mailles de type "; 
-	  cout << geoNames[(*currentGeometry)] << " : ";
-	  cout << myMesh->getNumberOfElements(MED_CELL,(MED_EN::medGeometryElement)(*currentGeometry));
-	  cout << " " << endl;
-	}
+           currentGeometry != currentEntity.end(); 
+           currentGeometry++) 
+        {
+          cout << "- Nombre de mailles de type "; 
+          cout << geoNames[(*currentGeometry)] << " : ";
+          cout << myMesh->getNumberOfElements(MED_CELL,(MED_EN::medGeometryElement)(*currentGeometry));
+          cout << " " << endl;
+        }
     }
 
   NumberOfTypes = myMesh->getNumberOfTypes(MED_FACE);
@@ -145,14 +143,14 @@ int main (int argc, char ** argv) {
       list<medGeometryElement>::const_iterator currentGeometry;
 
       for (currentGeometry  = currentEntity2.begin();
-	   currentGeometry != currentEntity2.end(); 
-	   currentGeometry++) 
-	{
-	  cout << "- Nombre de faces de type "; 
-	  cout << geoNames[(*currentGeometry)] << " : ";
-	  cout << myMesh->getNumberOfElements(MED_FACE,(*currentGeometry));
-	  cout << " " << endl;
-	}
+           currentGeometry != currentEntity2.end(); 
+           currentGeometry++) 
+        {
+          cout << "- Nombre de faces de type "; 
+          cout << geoNames[(*currentGeometry)] << " : ";
+          cout << myMesh->getNumberOfElements(MED_FACE,(*currentGeometry));
+          cout << " " << endl;
+        }
     }
 
   NumberOfTypes = myMesh->getNumberOfTypes(MED_EDGE);
@@ -171,15 +169,15 @@ int main (int argc, char ** argv) {
       list<medGeometryElement>::const_iterator currentGeometry;
 
       for (currentGeometry  = currentEntity3.begin();
-	   currentGeometry != currentEntity3.end(); 
-	   currentGeometry++) 
-	{
-	  cout << "- Nombre d'aretes de type "; 
-	  cout << geoNames[(*currentGeometry)] << " : ";
-	  cout << myMesh->getNumberOfElements(MED_EDGE,(*currentGeometry));
-	  cout << " " << endl;
-	}
+           currentGeometry != currentEntity3.end(); 
+           currentGeometry++) 
+        {
+          cout << "- Nombre d'aretes de type "; 
+          cout << geoNames[(*currentGeometry)] << " : ";
+          cout << myMesh->getNumberOfElements(MED_EDGE,(*currentGeometry));
+          cout << " " << endl;
+        }
     }
 
-  delete myMesh;
+  myMesh->removeReference();
 }

@@ -7,7 +7,7 @@ namespace med_2_1{
 
 med_err 
 MEDgridLire(med_idt fid, char *maa, med_int mdim, med_float *coo, med_int dim, med_mode_switch mode_coo,
-	    med_repere *repere, char *nomcoo, char *unicoo )
+            med_repere *repere, char *nomcoo, char *unicoo )
 {
     med_idt   maaid, noeid, ds;
     char      chemin[MED_TAILLE_MAA+MED_TAILLE_NOM+1];

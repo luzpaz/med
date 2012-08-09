@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
@@ -27,7 +25,6 @@
 #include "MEDMEM_MedMeshDriver.hxx"
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Support.hxx"
-#include "MEDMEM_Compatibility21_22.hxx"
 
 #include <sstream>
 #include <cmath>
@@ -89,7 +86,7 @@ using namespace MEDMEM;
  *
  *  Use code of MEDMEM/test_copie_family.cxx
  */
-void check_support(const SUPPORT * theSupport,
+static void check_support(const SUPPORT * theSupport,
                    string theName, string theDescr, MED_EN::medEntityMesh theEntity, int theNbTypes)
 {
   string aName  = theSupport->getName();
@@ -101,24 +98,9 @@ void check_support(const SUPPORT * theSupport,
   CPPUNIT_ASSERT_EQUAL(theDescr, aDescr);
   CPPUNIT_ASSERT_EQUAL(theEntity, anEntity);
   CPPUNIT_ASSERT_EQUAL(theNbTypes, aNbGeomTypes);
-
-  cout << "  - Entities list : " << endl;
-  if (!(theSupport->isOnAllElements())) {
-    cout << "  - NumberOfTypes : " << aNbGeomTypes << endl;
-    const MED_EN::medGeometryElement * Types = theSupport->getTypes();
-    for (int j = 0; j < aNbGeomTypes; j++) {
-      cout << "    * Type " << Types[j] << " : ";
-      int NumberOfElements = theSupport->getNumberOfElements(Types[j]);
-      const int * Number = theSupport->getNumber(Types[j]);
-      for (int k = 0; k < NumberOfElements; k++)
-	cout << Number[k] << " ";
-      cout << endl;
-    }
-  } else
-    cout << "    Is on all entities !" << endl;
 }
 
-void check_famille(const FAMILY * theFamily,
+static void check_famille(const FAMILY * theFamily,
                    string theName, string theDescr, MED_EN::medEntityMesh theEntity, int theNbTypes,
                    int theID, int theNbAttributes, int theNbGroups)
 {
@@ -132,19 +114,6 @@ void check_famille(const FAMILY * theFamily,
     CPPUNIT_ASSERT_EQUAL(theID, id);
     CPPUNIT_ASSERT_EQUAL(theNbAttributes, nbAttributes);
     CPPUNIT_ASSERT_EQUAL(theNbGroups, nbGroups);
-
-    // attributes
-    cout << "  - Attributes (" << nbAttributes << ") :" << endl;
-    for (int j = 1; j < nbAttributes + 1; j++)
-      cout << "    * "
-           << theFamily->getAttributeIdentifier(j) << " : "
-           << theFamily->getAttributeValue(j) << ", "
-           << theFamily->getAttributeDescription(j).c_str() << endl;
-
-    // groups
-    cout << "  - Groups (" << nbGroups << ") :" << endl;
-    for (int j = 1; j < nbGroups + 1; j++)
-      cout << "    * " << theFamily->getGroupName(j).c_str() << endl;
 }
 
 void MEDMEMTest::testFamily()
@@ -152,11 +121,10 @@ void MEDMEMTest::testFamily()
   ///////////////////////////////////
   // TEST 1: test_copie_family.cxx //
   ///////////////////////////////////
-  string datadir  = getenv("MED_ROOT_DIR");
-  string filename = datadir + "/share/salome/resources/med/pointe.med";
+  string filename = getResourceFile("pointe.med");
   string meshname = "maa1";
 
-  MESH * aMesh = new MESH();
+  MESH * aMesh = new MESH;
   aMesh->setName(meshname);
   MED_MESH_RDONLY_DRIVER aMeshDriver (filename, aMesh);
   aMeshDriver.setMeshName(meshname);
@@ -182,7 +150,6 @@ void MEDMEMTest::testFamily()
   ostr1 << *aFamily1;
   CPPUNIT_ASSERT(ostr1.str() != "");
 
-  cout << "Show Family1 :" << endl;
   check_famille(aFamily1,
                 aName, aDescr, anEntity, aNbGeomTypes,
                 id, nbAttributes, nbGroups);
@@ -198,26 +165,23 @@ void MEDMEMTest::testFamily()
   // Compare supports
   CPPUNIT_ASSERT(aFamily2->deepCompare(*aFamily1));
 
-  cout << "Show Family2 :" << endl;
   check_famille(aFamily2,
                 aName, aDescr, anEntity, aNbGeomTypes,
                 id, nbAttributes, nbGroups);
 
   // One more copy
   FAMILY * aFamily3 = new FAMILY (* aFamily2);
-  delete aFamily2;
+  aFamily2->removeReference();
 
   // Dump
   ostringstream ostr3;
   ostr3 << *aFamily3;
   CPPUNIT_ASSERT(ostr1.str() == ostr3.str());
 
-  cout << "Show Family3 :" << endl;
   check_famille(aFamily3,
                 aName, aDescr, anEntity, aNbGeomTypes,
                 id, nbAttributes, nbGroups);
 
-  cout << "That's all" << endl;
 
   ////////////
   // TEST 2 //
@@ -285,8 +249,6 @@ void MEDMEMTest::testFamily()
     // next string is commented since this pointer is shared
     // by Family3 and in future during deleting of Family3
     // we recieve error
-    //delete [] newAttributeIdentifier;
-    //delete [] newAttributeValue;
     delete [] newAttributeDescription;
 
     // groups
@@ -308,67 +270,27 @@ void MEDMEMTest::testFamily()
   // TEST 3: check default constructor and operator= //
   /////////////////////////////////////////////////////
   {
-    FAMILY aFamily4;
-    //#ifdef ENABLE_FAULTS
-    aFamily4 = (const FAMILY &)*aFamily3;
-    //#endif
-    //#ifdef ENABLE_FORCED_FAILURES
-    // (BUG) Wrong implementation or usage of PointerOf<string>.
-    //       Do not use memcpy() with array of std::string!
-    //TODO::
-//     CPPUNIT_FAIL("Impossible to use FAMILY::operator= because of"
-//                  " wrong implementation or usage of PointerOf<string>");
-  /*{
-    int nb = 3;
-    string * str = new string[nb];
-
-    char tmp_str [32];
-    for (int i = 0; i < nb; i++) {
-      sprintf(tmp_str, "My String N° %d", i+1);
-      str[i] = tmp;
-    }
-
-    // bad
-    string* _pointer;
-    _pointer = new string[3];
-    // This is wrong, because class string is not simple type
-    // and can have pointers to some data, deallocated in it's destructor,
-    // which (data) will not be copied by this operation.
-    memcpy(_pointer, str, 3*sizeof(string));
-    delete [] _pointer;
-
-    // good
-    //PointerOf<int> p1 (1);
-    //PointerOf<int> p2 (20);
-    //p2 = newAttributeValue;
-    //p1.set(3, p2);
-
-    // bad
-    //PointerOf<string> p1 (1);
-    //PointerOf<string> p2 (20);
-    //p2 = str;
-    //p1.set(3, p2);
-
-    delete [] str;
-  }
-  */
-    //#endif
+    FAMILY *aFamily4=new FAMILY;
+    *aFamily4 = (const FAMILY &)*aFamily3;
+    aFamily4->removeReference();
   }
 
   ///////////////////////////////////////////////////
   // TEST 4: check construction from given support //
   ///////////////////////////////////////////////////
   {
-    SUPPORT s1 (*aFamily3);
-    FAMILY  f1 (s1);
-    CPPUNIT_ASSERT_EQUAL(0, f1.getIdentifier());
-    CPPUNIT_ASSERT_EQUAL(0, f1.getNumberOfAttributes());
-    CPPUNIT_ASSERT_EQUAL(0, f1.getNumberOfGroups());
-    CPPUNIT_ASSERT(s1.deepCompare(f1));
+    SUPPORT *s1=new SUPPORT(*aFamily3);
+    FAMILY  *f1=new FAMILY(*s1);
+    CPPUNIT_ASSERT_EQUAL(0, f1->getIdentifier());
+    CPPUNIT_ASSERT_EQUAL(0, f1->getNumberOfAttributes());
+    CPPUNIT_ASSERT_EQUAL(0, f1->getNumberOfGroups());
+    CPPUNIT_ASSERT(s1->deepCompare(*f1));
+    s1->removeReference();
+    f1->removeReference();
   }
 
-  delete aFamily3;
-  delete aMesh;
+  aFamily3->removeReference();
+  aMesh->removeReference();
 
   /////////////////////////////////////////////////////////////////
   // TEST 5: check constructor, designed to use with med driver. //
@@ -405,91 +327,83 @@ void MEDMEMTest::testFamily()
 
     string attrDescr1 ("Attribute 1 description");
     string attrDescr2 ("Attribute 2 description");
-    string attrDescrEmpty (MED_TAILLE_DESC - 23, ' ');
+    string attrDescrEmpty (MED_COMMENT_SIZE - 23, ' ');
     attrDescr1 += attrDescrEmpty;
     attrDescr2 += attrDescrEmpty;
-    CPPUNIT_ASSERT(MED_TAILLE_DESC == attrDescr1.length());
-    CPPUNIT_ASSERT(MED_TAILLE_DESC == attrDescr2.length());
+    CPPUNIT_ASSERT(MED_COMMENT_SIZE == attrDescr1.length());
+    CPPUNIT_ASSERT(MED_COMMENT_SIZE == attrDescr2.length());
     string attrDescr = attrDescr1 + attrDescr2;
 
     string groupName1 ("Group_1");
     string groupName2 ("Group_2");
     string groupName3 ("Group_3");
-    string groupNameEmpty (MED_TAILLE_LNOM - 7, ' ');
+    string groupNameEmpty (MED_LNAME_SIZE - 7, ' ');
     groupName1 += groupNameEmpty;
     groupName2 += groupNameEmpty;
     groupName3 += groupNameEmpty;
-    CPPUNIT_ASSERT(MED_TAILLE_LNOM == groupName1.length());
-    CPPUNIT_ASSERT(MED_TAILLE_LNOM == groupName2.length());
-    CPPUNIT_ASSERT(MED_TAILLE_LNOM == groupName3.length());
+    CPPUNIT_ASSERT(MED_LNAME_SIZE == groupName1.length());
+    CPPUNIT_ASSERT(MED_LNAME_SIZE == groupName2.length());
+    CPPUNIT_ASSERT(MED_LNAME_SIZE == groupName3.length());
     string groupNames = groupName1 + groupName2 + groupName3;
 
     // nodes family 1
-    FAMILY aNodesF1 (aTestMesh, /*Identifier*/1, "Nodes 1", 
-                     /*NumberOfAttribute*/2, attrId, attrVa, attrDescr,
-                     /*NumberOfGroup*/3, groupNames,
-                     aNodeFamily, aCellFamily, aFaceFamily, anEdgeFamily);
+    FAMILY *aNodesF1=new FAMILY(aTestMesh, /*Identifier*/1, "Nodes 1", 
+                                /*NumberOfAttribute*/2, attrId, attrVa, attrDescr,
+                                /*NumberOfGroup*/3, groupNames,
+                                aNodeFamily, aCellFamily, aFaceFamily, anEdgeFamily);
 
-    //cout << "Show aNodesF1 :" << endl;
-    //cout << aNodesF1 << endl;
 
-    CPPUNIT_ASSERT_EQUAL(1, aNodesF1.getIdentifier());
-    CPPUNIT_ASSERT(strcmp("Nodes 1", aNodesF1.getName().c_str()) == 0);
-    CPPUNIT_ASSERT(MED_EN::MED_NODE == aNodesF1.getEntity());
-    CPPUNIT_ASSERT(!aNodesF1.isOnAllElements());
-    CPPUNIT_ASSERT_EQUAL(7, aNodesF1.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_EQUAL(1, aNodesF1->getIdentifier());
+    CPPUNIT_ASSERT(strcmp("Nodes 1", aNodesF1->getName().c_str()) == 0);
+    CPPUNIT_ASSERT(MED_EN::MED_NODE == aNodesF1->getEntity());
+    CPPUNIT_ASSERT(!aNodesF1->isOnAllElements());
+    CPPUNIT_ASSERT_EQUAL(7, aNodesF1->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 
-    CPPUNIT_ASSERT_EQUAL(2, aNodesF1.getNumberOfAttributes());
-    CPPUNIT_ASSERT_EQUAL(1, aNodesF1.getAttributeIdentifier(1));
-    CPPUNIT_ASSERT_EQUAL(2, aNodesF1.getAttributeIdentifier(2));
-    CPPUNIT_ASSERT_EQUAL(7, aNodesF1.getAttributeValue(1));
-    CPPUNIT_ASSERT_EQUAL(8, aNodesF1.getAttributeValue(2));
-    CPPUNIT_ASSERT_EQUAL(attrDescr1, aNodesF1.getAttributeDescription(1));
-    CPPUNIT_ASSERT_EQUAL(attrDescr2, aNodesF1.getAttributeDescription(2));
+    CPPUNIT_ASSERT_EQUAL(2, aNodesF1->getNumberOfAttributes());
+    CPPUNIT_ASSERT_EQUAL(1, aNodesF1->getAttributeIdentifier(1));
+    CPPUNIT_ASSERT_EQUAL(2, aNodesF1->getAttributeIdentifier(2));
+    CPPUNIT_ASSERT_EQUAL(7, aNodesF1->getAttributeValue(1));
+    CPPUNIT_ASSERT_EQUAL(8, aNodesF1->getAttributeValue(2));
+    CPPUNIT_ASSERT_EQUAL(attrDescr1, aNodesF1->getAttributeDescription(1));
+    CPPUNIT_ASSERT_EQUAL(attrDescr2, aNodesF1->getAttributeDescription(2));
 
-    CPPUNIT_ASSERT_EQUAL(3, aNodesF1.getNumberOfGroups());
-    CPPUNIT_ASSERT_EQUAL(groupName1, aNodesF1.getGroupName(1));
-    CPPUNIT_ASSERT_EQUAL(groupName2, aNodesF1.getGroupName(2));
-    CPPUNIT_ASSERT_EQUAL(groupName3, aNodesF1.getGroupName(3));
+    CPPUNIT_ASSERT_EQUAL(3, aNodesF1->getNumberOfGroups());
+    CPPUNIT_ASSERT_EQUAL(groupName1, aNodesF1->getGroupName(1));
+    CPPUNIT_ASSERT_EQUAL(groupName2, aNodesF1->getGroupName(2));
+    CPPUNIT_ASSERT_EQUAL(groupName3, aNodesF1->getGroupName(3));
+    aNodesF1->removeReference();
 
     // faces family 7
-    FAMILY aFacesF7 (aTestMesh, /*Identifier*/7, "Faces All", 
-                     /*NumberOfAttribute*/2, attrId, attrVa, attrDescr,
-                     /*NumberOfGroup*/3, groupNames,
-                     aNodeFamily, aCellFamily, aFaceFamily, anEdgeFamily);
+    FAMILY *aFacesF7=new FAMILY(aTestMesh, /*Identifier*/7, "Faces All", 
+                                /*NumberOfAttribute*/2, attrId, attrVa, attrDescr,
+                                /*NumberOfGroup*/3, groupNames,
+                                aNodeFamily, aCellFamily, aFaceFamily, anEdgeFamily);
 
-    cout << "Show aFacesF7 :" << endl;
-    cout << aFacesF7 << endl;
 
-    CPPUNIT_ASSERT_EQUAL(7, aFacesF7.getIdentifier());
-    CPPUNIT_ASSERT(strcmp("Faces All", aFacesF7.getName().c_str()) == 0);
-    CPPUNIT_ASSERT(MED_EN::MED_FACE == aFacesF7.getEntity());
+    CPPUNIT_ASSERT_EQUAL(7, aFacesF7->getIdentifier());
+    CPPUNIT_ASSERT(strcmp("Faces All", aFacesF7->getName().c_str()) == 0);
+    CPPUNIT_ASSERT(MED_EN::MED_FACE == aFacesF7->getEntity());
 
-    CPPUNIT_ASSERT_EQUAL(8, aTestMesh->getNumberOfElementsWithPoly(MED_EN::MED_FACE,
-                                                                   MED_EN::MED_ALL_ELEMENTS));
-    CPPUNIT_ASSERT_EQUAL(8, aFacesF7.getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_EQUAL(8, aTestMesh->getNumberOfElements(MED_EN::MED_FACE,
+                                                           MED_EN::MED_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_EQUAL(8, aFacesF7->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS));
 
-//#ifdef ENABLE_FORCED_FAILURES
-    // ? (BUG) ? Why _isOnAllElts is set to true only for nodes and cells. What about faces?
-    //      _isOnAllElts = true ;
-    // See MEDMEM_Family.cxx lines 118-119 and 386-387.
-    CPPUNIT_ASSERT(aFacesF7.isOnAllElements());
-//#endif
+    CPPUNIT_ASSERT(!aFacesF7->isOnAllElements());
 
-    CPPUNIT_ASSERT_EQUAL(2, aFacesF7.getNumberOfAttributes());
-    CPPUNIT_ASSERT_EQUAL(1, aFacesF7.getAttributeIdentifier(1));
-    CPPUNIT_ASSERT_EQUAL(2, aFacesF7.getAttributeIdentifier(2));
-    CPPUNIT_ASSERT_EQUAL(7, aFacesF7.getAttributeValue(1));
-    CPPUNIT_ASSERT_EQUAL(8, aFacesF7.getAttributeValue(2));
-    CPPUNIT_ASSERT_EQUAL(attrDescr1, aFacesF7.getAttributeDescription(1));
-    CPPUNIT_ASSERT_EQUAL(attrDescr2, aFacesF7.getAttributeDescription(2));
+    CPPUNIT_ASSERT_EQUAL(2, aFacesF7->getNumberOfAttributes());
+    CPPUNIT_ASSERT_EQUAL(1, aFacesF7->getAttributeIdentifier(1));
+    CPPUNIT_ASSERT_EQUAL(2, aFacesF7->getAttributeIdentifier(2));
+    CPPUNIT_ASSERT_EQUAL(7, aFacesF7->getAttributeValue(1));
+    CPPUNIT_ASSERT_EQUAL(8, aFacesF7->getAttributeValue(2));
+    CPPUNIT_ASSERT_EQUAL(attrDescr1, aFacesF7->getAttributeDescription(1));
+    CPPUNIT_ASSERT_EQUAL(attrDescr2, aFacesF7->getAttributeDescription(2));
 
-    CPPUNIT_ASSERT_EQUAL(3, aFacesF7.getNumberOfGroups());
-    CPPUNIT_ASSERT_EQUAL(groupName1, aFacesF7.getGroupName(1));
-    CPPUNIT_ASSERT_EQUAL(groupName2, aFacesF7.getGroupName(2));
-    CPPUNIT_ASSERT_EQUAL(groupName3, aFacesF7.getGroupName(3));
-
-    delete aTestMesh;
+    CPPUNIT_ASSERT_EQUAL(3, aFacesF7->getNumberOfGroups());
+    CPPUNIT_ASSERT_EQUAL(groupName1, aFacesF7->getGroupName(1));
+    CPPUNIT_ASSERT_EQUAL(groupName2, aFacesF7->getGroupName(2));
+    CPPUNIT_ASSERT_EQUAL(groupName3, aFacesF7->getGroupName(3));
+    aFacesF7->removeReference();
+    aTestMesh->removeReference();
 
     // Method build() is not tested directly, but it is called from constructor, tested here
   }

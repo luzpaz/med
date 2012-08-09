@@ -35,7 +35,7 @@ namespace med_2_1{
 
 med_err 
 _MEDattrNumEcrire(med_idt pere,med_type_champ type,char *nom,unsigned char *val, 
-		  med_mode_acces mode)
+                  med_mode_acces mode)
 {
   med_idt aid,attr;
   med_err ret;
@@ -45,9 +45,9 @@ _MEDattrNumEcrire(med_idt pere,med_type_champ type,char *nom,unsigned char *val,
     {
     case MED_REEL64 :
       /* 1) IA32 is LE but due to an (?HDF convertion BUG?) when using H5T_NATIVE_DOUBLE/MED_REEL64? under PCLINUX
-	 the file read under SGI is incorrect
-	 2) Compaq OSF/1 is LE, since we force SGI64,SUN4SOL2,HP to write double in LE even if they are BE, mips OSF/1 must be BE
-	 REM  : Be careful of compatibility between MED files when changing this (med2.2)    
+         the file read under SGI is incorrect
+         2) Compaq OSF/1 is LE, since we force SGI64,SUN4SOL2,HP to write double in LE even if they are BE, mips OSF/1 must be BE
+         REM  : Be careful of compatibility between MED files when changing this (med2.2)    
                 */
 #if defined(PCLINUX) || defined(PPRO_NT) || defined(PCLINUX64) || defined(PCLINUX64_32) || defined(OSF1)
       type_hdf = H5T_IEEE_F64BE;
@@ -61,12 +61,12 @@ _MEDattrNumEcrire(med_idt pere,med_type_champ type,char *nom,unsigned char *val,
       type_hdf = H5T_NATIVE_LONG;
 #elif defined(PCLINUX) || defined(PCLINUX64_32)
       /* This explicit convertion avoid a core dump between in HDF&ASTER when reading on SGI
-	 a file written under a PCLINUX system (in founction H5Tconvert),
-	 we don't know yet if it is an HDF bug or an ASTER one */
+         a file written under a PCLINUX system (in founction H5Tconvert),
+         we don't know yet if it is an HDF bug or an ASTER one */
       /* The problem seems to be in convertion process between INT32LE->INT32BE ? */
       type_hdf = H5T_STD_I32BE;
-      if ((H5Tconvert(H5T_NATIVE_INT,H5T_STD_I32BE,1,(void *)val,NULL,NULL)) < 0) 
-	  return -1;
+      if ((H5Tconvert(H5T_NATIVE_INT,H5T_STD_I32BE,1,(void *)val,NULL,0)) < 0) 
+          return -1;
 #else
       type_hdf = H5T_NATIVE_INT;
 #endif
@@ -98,7 +98,7 @@ _MEDattrNumEcrire(med_idt pere,med_type_champ type,char *nom,unsigned char *val,
   /* This explicit convertion cancel the previous on which avoid a mysterious bug between HDF&ASTER when reading
      a file written under a PCLINUX system, we don't know yet if it is an HDF bug or an ASTER one */  
   if (type == MED_INT) 
-    if ((H5Tconvert(H5T_STD_I32BE,H5T_NATIVE_INT,1,(void *)val,NULL,NULL)) < 0) 
+    if ((H5Tconvert(H5T_STD_I32BE,H5T_NATIVE_INT,1,(void *)val,NULL,0)) < 0) 
       return -1;
 #endif
 

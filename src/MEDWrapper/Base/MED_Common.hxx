@@ -1,29 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  File   : 
-//  Author : 
-//  Module : 
-//  $Header$
-//
+
 #ifndef MED_Common_HeaderFile
 #define MED_Common_HeaderFile
 
@@ -33,10 +29,7 @@
 #include <set>
 #include <map>
 
-extern "C"
-{
 #include <hdf5.h>
-}  
 
 #include <boost/tuple/tuple.hpp>
 
@@ -45,6 +38,10 @@ extern "C"
 #include "MED_Vector.hxx"
 #include "MED_SharedPtr.hxx"
 #include "MED_SliceArray.hxx"
+
+#ifdef WNT
+#pragma warning(disable:4099)
+#endif
 
 namespace MED{
 
@@ -71,12 +68,14 @@ namespace MED{
   typedef enum {eNOD, eDESC} EConnectivite ; 
 
   typedef enum {ePOINT1=1, eSEG2=102, eSEG3=103, eTRIA3=203,
-		eQUAD4=204, eTRIA6=206,eQUAD8=208, eTETRA4=304,
-		ePYRA5=305, ePENTA6=306, eHEXA8=308, eTETRA10=310, 
-		ePYRA13=313, ePENTA15=315, eHEXA20=320, 
-		ePOLYGONE=400, ePOLYEDRE=500, eNONE=0} EGeometrieElement;
+                eQUAD4=204, eTRIA6=206,eQUAD8=208, eQUAD9=209,eTETRA4=304,
+                ePYRA5=305, ePENTA6=306, eHEXA8=308, eOCTA12=312, eTETRA10=310, 
+                ePYRA13=313, ePENTA15=315, eHEXA20=320, eHEXA27=327,
+                ePOLYGONE=400, ePOLYEDRE=500, eNONE=0, 
+                eBALL=1101 /*no such a type in med.h, it's just a trick*/,
+                eAllGeoType=-1 } EGeometrieElement;
 
-  typedef enum {eMAILLE, eFACE, eARETE, eNOEUD, eNOEUD_ELEMENT} EEntiteMaillage; 
+  typedef enum {eMAILLE, eFACE, eARETE, eNOEUD, eNOEUD_ELEMENT, eSTRUCT_ELEMENT} EEntiteMaillage; 
 
   typedef enum {eNO_PFLMOD, eGLOBAL, eCOMPACT}  EModeProfil; 
 
@@ -127,8 +126,8 @@ namespace MED{
   MEDWRAPPER_EXPORT
   TInt
   GetNbConn(EGeometrieElement typmai,
-	    EEntiteMaillage typent,
-	    TInt mdim);
+            EEntiteMaillage typent,
+            TInt mdim);
   
   MEDWRAPPER_EXPORT
   TInt 
@@ -157,6 +156,9 @@ namespace MED{
 
   struct TCellInfo;
   typedef SharedPtr<TCellInfo> PCellInfo;
+
+  struct TBallInfo;
+  typedef SharedPtr<TBallInfo> PBallInfo;
 
   struct TFieldInfo;
   typedef SharedPtr<TFieldInfo> PFieldInfo;

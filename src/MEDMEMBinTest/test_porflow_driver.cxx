@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_PorflowMeshDriver.hxx"
 #include "MEDMEM_Mesh.hxx"
@@ -31,10 +31,10 @@ int main (int argc, char ** argv)
     /* process the arguments */
     if (argc != 2) 
     {
-	cerr << "Usage : " << argv[0] 
-	<< " Porflowfilename" << endl << endl
-	<< "-> lit le fichier Porflowfilename ,cr√©e 2 fichiers : MED et VTK" << endl;
-	exit(-1);
+        cerr << "Usage : " << argv[0] 
+        << " Porflowfilename" << endl << endl
+        << "-> lit le fichier Porflowfilename ,cr√©e 2 fichiers : MED et VTK" << endl;
+        exit(-1);
     }
 
     string porflowfilename  = argv[1];
@@ -50,7 +50,7 @@ int main (int argc, char ** argv)
     cout << meshName << endl;
 
     // lecture du fichier porflow
-    MESH * myMesh= new MESH() ; 
+    MESH * myMesh= new MESH; 
     PORFLOW_MESH_RDONLY_DRIVER myPorflowMeshDriver(porflowfilename, myMesh) ;
     myPorflowMeshDriver.open() ;
     myPorflowMeshDriver.read() ;
@@ -95,15 +95,15 @@ int main (int argc, char ** argv)
     for(int i=0; i<NumberOfNodes ; i++) {
       cout << "Nodes " << i+1 << " : " ;
       for (int j=0; j<SpaceDimension ; j++)
-	cout << Coordinates[i*SpaceDimension+j] << " " ;
+        cout << Coordinates[i*SpaceDimension+j] << " " ;
       cout << endl ;
     }
 
     cout << "The END" << endl;
-    delete myMesh;
+    myMesh->removeReference();
 
     // remontÈe du fichier med en mÈmoire
     myMesh= new MESH(MED_DRIVER,medfile,meshName);
-    delete myMesh;
+    myMesh->removeReference();
 
 }

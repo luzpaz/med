@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef MEDMEM_INTERLACING_HXX
 #define MEDMEM_INTERLACING_HXX
 
@@ -37,9 +38,9 @@ protected:
   ~InterlacingPolicy() {} //pour éviter qu'un utilisateur cast la class array en politique
 public :
   InterlacingPolicy(void) : _dim(0), _nbelem(0),
-			    _arraySize(0),
-			    _interlacing(MED_EN::MED_UNDEFINED_INTERLACE),
-			    _gaussPresence(false) {}
+                            _arraySize(0),
+                            _interlacing(MED_EN::MED_UNDEFINED_INTERLACE),
+                            _gaussPresence(false) {}
 
   InterlacingPolicy(int nbelem, int dim, int arraySize=0, int interlacing=MED_EN::MED_UNDEFINED_INTERLACE) :
     _dim(dim),
@@ -50,11 +51,11 @@ public :
 
   // Constructeur par recopie
   InterlacingPolicy(const InterlacingPolicy & intpol,
-		    bool shallowcopy = true) :_dim(intpol._dim),
-					      _nbelem(intpol._nbelem),
-					      _arraySize(intpol._arraySize),
-					      _interlacing(intpol._interlacing),
-					      _gaussPresence(intpol._gaussPresence) {}
+                    bool shallowcopy = true) :_dim(intpol._dim),
+                                              _nbelem(intpol._nbelem),
+                                              _arraySize(intpol._arraySize),
+                                              _interlacing(intpol._interlacing),
+                                              _gaussPresence(intpol._gaussPresence) {}
 
   InterlacingPolicy & operator=(const InterlacingPolicy & intpol) {
     if ( this == &intpol ) return *this;
@@ -96,7 +97,7 @@ public :
     InterlacingPolicy(nbelem, dim, dim*nbelem,MED_EN::MED_FULL_INTERLACE) {}
 
   FullInterlaceNoGaussPolicy(const FullInterlaceNoGaussPolicy & policy,
-				bool shallowcopie=true)
+                                bool shallowcopie=true)
     : InterlacingPolicy(policy) {};
  
   inline int getIndex(int i,int j) const {
@@ -123,7 +124,7 @@ public :
     InterlacingPolicy(nbelem, dim, dim*nbelem,MED_EN::MED_NO_INTERLACE) {}
 
   NoInterlaceNoGaussPolicy(const NoInterlaceNoGaussPolicy & policy,
-			      bool shallowcopie=true)
+                              bool shallowcopie=true)
     : InterlacingPolicy(policy) {}
 
   inline int getIndex(int i,int j) const {
@@ -175,7 +176,7 @@ public :
       int nbelcurtype = nbelgeoc[ntyp]-nbelgeoc[ntyp-1];
       for (int i=0; i < nbelcurtype; i++ ) {
         _T[ elemno ] = ntyp;
-	elemno++;
+        elemno++;
       };
       _G[ ntyp ] = cumul;
       cumul += nbelcurtype*_dim;
@@ -275,7 +276,7 @@ public :
     InterlacingPolicy::_gaussPresence=true;
   }
   FullInterlaceGaussPolicy(int nbelem, int dim, int nbtypegeo,
-		  const int * const nbelgeoc, const int * const nbgaussgeo)
+                  const int * const nbelgeoc, const int * const nbgaussgeo)
     : InterlacingPolicy(nbelem, dim, -1, MED_EN::MED_FULL_INTERLACE),_nbtypegeo(nbtypegeo) {
 
     InterlacingPolicy::_gaussPresence=true;
@@ -292,9 +293,9 @@ public :
     // Construction of _G
     for (int ntyp=1; ntyp <= nbtypegeo; ntyp++ ) {
       for (int  i=0; i < (nbelgeoc[ntyp]-nbelgeoc[ntyp-1]) ; i++ ) {
-	_G[ elemno ] = cumul + i*nbgaussgeo[ntyp]*dim + 1;
-	elemno++;
-	_S[ elemno ] = nbgaussgeo[ntyp];
+        _G[ elemno ] = cumul + i*nbgaussgeo[ntyp]*dim + 1;
+        elemno++;
+        _S[ elemno ] = nbgaussgeo[ntyp];
       };
       cumul += (nbelgeoc[ntyp]-nbelgeoc[ntyp-1]) * nbgaussgeo[ntyp] * dim;
 #ifdef ARRAY_DEBUG
@@ -312,7 +313,7 @@ public :
   }
 
   FullInterlaceGaussPolicy(const FullInterlaceGaussPolicy & policy,
-			      bool shallowcopie=true)
+                              bool shallowcopie=true)
     : InterlacingPolicy(policy),_nbtypegeo(policy._nbtypegeo) {
 
     //Seuls les tableaux de grande taille sont recopiés superficiellement
@@ -388,7 +389,7 @@ public :
   }
 
   NoInterlaceGaussPolicy(int nbelem, int dim, int nbtypegeo,
-			 const int * const nbelgeoc, const int * const nbgaussgeo)
+                         const int * const nbelgeoc, const int * const nbgaussgeo)
     : InterlacingPolicy(nbelem, dim, -1, MED_EN::MED_NO_INTERLACE),_nbtypegeo(nbtypegeo) {
 
     InterlacingPolicy::_gaussPresence=true;
@@ -404,9 +405,9 @@ public :
     _cumul = 0;
     for (int ntyp=1; ntyp <= nbtypegeo; ntyp++ ) {
       for (int  i=0; i < (nbelgeoc[ntyp]-nbelgeoc[ntyp-1]) ; i++ ) {
-	_G[ elemno ] = _cumul + i*nbgaussgeo[ntyp] + 1;
-	elemno++;
-	_S[ elemno ] = nbgaussgeo[ntyp];
+        _G[ elemno ] = _cumul + i*nbgaussgeo[ntyp] + 1;
+        elemno++;
+        _S[ elemno ] = nbgaussgeo[ntyp];
       };
       _cumul += (nbelgeoc[ntyp]-nbelgeoc[ntyp-1]) * nbgaussgeo[ntyp];
 #ifdef ARRAY_DEBUG
@@ -425,7 +426,7 @@ public :
 
 
   NoInterlaceGaussPolicy(const NoInterlaceGaussPolicy & policy,
-			    bool shallowcopie=true)
+                            bool shallowcopie=true)
     : InterlacingPolicy(policy),_nbtypegeo(policy._nbtypegeo),_cumul(policy._cumul)
   {
     //Seuls les tableaux de grande taille sont recopiés superficiellement
@@ -496,7 +497,7 @@ public :
   }
 
   NoInterlaceByTypeGaussPolicy(int nbelem, int dim, int nbtypegeo,
-			       const int * const nbelgeoc, const int * const nbgaussgeo)
+                               const int * const nbelgeoc, const int * const nbgaussgeo)
     : InterlacingPolicy(nbelem, dim, -1, MED_EN::MED_NO_INTERLACE_BY_TYPE),_nbtypegeo(nbtypegeo) {
 
     InterlacingPolicy::_gaussPresence=true;
@@ -512,7 +513,7 @@ public :
       int nbelcurtype = nbelgeoc[ntyp]-nbelgeoc[ntyp-1];
       for (int i=0; i < nbelcurtype; i++ ) {
         _T[ elemno ] = ntyp;
-	elemno++;
+        elemno++;
       };
       _G[ ntyp ] = cumul;
       cumul += nbelcurtype * _dim * nbgaussgeo[ntyp];
@@ -531,7 +532,7 @@ public :
 
 
   NoInterlaceByTypeGaussPolicy(const NoInterlaceByTypeGaussPolicy & policy,
-			       bool shallowcopie=true)
+                               bool shallowcopie=true)
     : InterlacingPolicy(policy),_nbtypegeo(policy._nbtypegeo)
   {
     //Seuls les tableaux de grande taille sont recopiés superficiellement

@@ -1,24 +1,22 @@
-#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-#
+
 # This Makefile is responsible of generating the client and server
 # implementation of IDL interfaces for both C++ and python usage.
 # The building process of the C++ files is in charge of each source
@@ -26,50 +24,103 @@
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-BASEIDL_FILES= MED.idl MED_Gen.idl Compo1Py.idl
+EXTRA_DIST += CMakeLists.txt
+
+BASEIDL_FILES = MED.idl MED_Gen.idl Compo1Py.idl MEDCouplingCorbaServant.idl MEDCouplingCorbaServantTest.idl ParaMEDCouplingCorbaServant.idl
+
+MPIIDL_FILES = ParaMEDMEMComponent.idl
+
+IDL_FILES = $(BASEIDL_FILES)
+if MPI_IS_OK
+IDL_FILES += $(MPIIDL_FILES)
+endif
+
+IDL_FILES_PY=$(IDL_FILES:%.idl=%_idl.py)
 
 # This variable defines the files to be installed
-dist_salomeidl_DATA = $(BASEIDL_FILES)
+dist_salomeidl_DATA = $(IDL_FILES)
 
 # GUI idl common library
-lib_LTLIBRARIES = libSalomeIDLMED.la
+lib_LTLIBRARIES = libSalomeIDLMED.la libSalomeIDLMEDTests.la
 
 # Sources built from idl files
-nodist_libSalomeIDLMED_la_SOURCES = MEDSK.cc MED_GenSK.cc Compo1PySK.cc
+BASEIDL_SOURCES = MEDSK.cc MED_GenSK.cc MEDCouplingCorbaServantSK.cc Compo1PySK.cc ParaMEDCouplingCorbaServantSK.cc
+
+MPIIDL_SOURCES = ParaMEDMEMComponentSK.cc
+
+IDL_SOURCES = $(BASEIDL_SOURCES)
+if MPI_IS_OK
+  IDL_SOURCES += $(MPIIDL_SOURCES)
+endif
+
+nodist_libSalomeIDLMED_la_SOURCES = $(IDL_SOURCES)
 
 # header files must be exported: other modules have to use this library
-nodist_salomeinclude_HEADERS = $(BASEIDL_FILES:%.idl=%.hh)
+nodist_salomeinclude_HEADERS = MED.hh MED_Gen.hh MEDCouplingCorbaServant.hh Compo1Py.hh MEDCouplingCorbaServantTest.hh ParaMEDCouplingCorbaServant.hh
+if MPI_IS_OK
+  nodist_salomeinclude_HEADERS += ParaMEDMEMComponent.hh
+endif
 
 libSalomeIDLMED_la_CPPFLAGS =			\
-	-I$(top_builddir)/salome_adm/unix	\
 	-I$(top_builddir)/idl			\
 	@CORBA_CXXFLAGS@ @CORBA_INCLUDES@ @KERNEL_CXXFLAGS@
 libSalomeIDLMED_la_LDFLAGS = -no-undefined -version-info=0:0:0
 libSalomeIDLMED_la_LIBADD  = @CORBA_LIBS@ $(KERNEL_LDFLAGS) -lSalomeIDLKernel
 
+nodist_libSalomeIDLMEDTests_la_SOURCES = MEDCouplingCorbaServantTestSK.cc
+libSalomeIDLMEDTests_la_CPPFLAGS = $(libSalomeIDLMED_la_CPPFLAGS)
+libSalomeIDLMEDTests_la_LIBADD = libSalomeIDLMED.la
+
 # These variables defines the building process of CORBA files
 OMNIORB_IDL         = @OMNIORB_IDL@
 OMNIORB_IDLCXXFLAGS = @OMNIORB_IDLCXXFLAGS@
 OMNIORB_IDLPYFLAGS  = @OMNIORB_IDLPYFLAGS@ -I$(top_builddir)/idl/salome -I$(KERNEL_ROOT_DIR)/idl/salome 
-IDLCXXFLAGS = -bcxx @IDLCXXFLAGS@ -I$(top_builddir)/idl/salome -I$(KERNEL_ROOT_DIR)/idl/salome -I$(top_builddir)/salome_adm/unix
+IDLCXXFLAGS = -bcxx @IDLCXXFLAGS@ -I$(top_builddir)/idl/salome -I$(KERNEL_ROOT_DIR)/idl/salome
 IDLPYFLAGS  = @IDLPYFLAGS@ -I$(KERNEL_ROOT_DIR)/idl/salome
 
-# potential problem on parallel make on the following - multiple outputs
-SUFFIXES = .idl .hh SK.cc
-.idlSK.cc:
+MEDSK.cc : MED.idl
 	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
-.idl.hh:
-	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
+MED.hh : MEDSK.cc
 
-install-exec-local: $(BASEIDL_FILES:%=$(top_srcdir)/idl/%)
+MED_GenSK.cc : MED_Gen.idl
+	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
+MED_Gen.hh : MED_GenSK.cc
+
+ParaMEDMEMComponentSK.cc : ParaMEDMEMComponent.idl
+	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
+ParaMEDMEMComponent.hh : ParaMEDMEMComponentSK.cc
+
+MEDCouplingCorbaServantSK.cc : MEDCouplingCorbaServant.idl
+	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
+MEDCouplingCorbaServant.hh : MEDCouplingCorbaServantSK.cc
+
+ParaMEDCouplingCorbaServantSK.cc : ParaMEDCouplingCorbaServant.idl
+	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
+ParaMEDCouplingCorbaServant.hh : ParaMEDCouplingCorbaServantSK.cc
+
+Compo1PySK.cc : Compo1Py.idl
+	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
+Compo1Py.hh : Compo1PySK.cc
+
+MEDCouplingCorbaServantTestSK.cc : MEDCouplingCorbaServantTest.idl
+	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
+MEDCouplingCorbaServantTest.hh : MEDCouplingCorbaServantTestSK.cc
+
+install-exec-local: $(IDL_FILES:%=$(top_srcdir)/idl/%)
 	$(INSTALL) -d  $(DESTDIR)$(salomepythondir)
 	ls $^ | while read file; do \
 	  $(OMNIORB_IDL) $(IDLPYFLAGS) -C$(DESTDIR)$(salomepythondir) $$file ; \
 	done
 
-# uninstall-local removes too much, but it works in distcheck
+# we want to remove only staff generated for IDL files and nothing more
 uninstall-local:
-	rm -rf $(DESTDIR)$(salomepythondir)/*
+	@for modulen in SALOME_MED SALOME_TEST Compo1Py_ORB ; do \
+	  test -d $(DESTDIR)$(salomepythondir)/$${modulen} && echo "Removing $(DESTDIR)$(salomepythondir)/$${modulen}" && rm -rf $(DESTDIR)$(salomepythondir)/$${modulen} ; \
+	  test -d $(DESTDIR)$(salomepythondir)/$${modulen}__POA && echo "Removing $(DESTDIR)$(salomepythondir)/$${modulen}__POA" && rm -rf $(DESTDIR)$(salomepythondir)/$${modulen}__POA ; \
+	done ; \
+	for filen in $(IDL_FILES_PY) ; do \
+	  echo "Removing $(DESTDIR)$(salomepythondir)/$${filen}" && rm -f $(DESTDIR)$(salomepythondir)/$${filen}* ; \
+	done
 
 mostlyclean-local: clean-idls
 

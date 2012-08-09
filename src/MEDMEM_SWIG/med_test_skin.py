@@ -1,24 +1,26 @@
-#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+#  -*- coding: iso-8859-1 -*-
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+
 #% Test function MESH::getSkin() on mesh from file cube_hexa8_quad4.med
 #% The med file can be obtained by running create_mesh_c3h8q4 executable
 #
@@ -32,25 +34,17 @@ filePath=os.path.join(filePath, "share", "salome", "resources", "med")
 
 medFile = os.path.join(filePath, "cube_hexa8_quad4.med")
 
-md = MED()
-
-mdDriver = MED_MED_RDONLY_DRIVER(medFile,md)
-
 print ""
 print "Read file", medFile
 print ""
 
-mdDriver.open()
-mdDriver.readFileStruct()
-mdDriver.close()
+md = MEDFILEBROWSER(medFile)
 
 mesh_name = md.getMeshName(0)
-mesh = md.getMesh(mesh_name)
-mesh.read()
+mesh = MESH(MED_DRIVER,medFile,mesh_name)
 
 print "Building the support on all (8) Cells of the mesh."
-supportCell = SUPPORT(mesh)
-supportCell.update()
+supportCell = mesh.getSupportOnAll(MED_CELL)
 
 print "Getting skin of an all cell support"
 
@@ -61,6 +55,7 @@ if faceNumbers != [2, 3, 6, 8, 10, 11, 12, 13, 16, 17, 19, 20, 22, 23, 24, 27, 2
   raise  RuntimeError, "Wrong skin of an all cell support"
   
 print "Build the support on 1 Cell (#8) of the mesh."
+supportCell = SUPPORT( supportCell )
 supportCell.setAll( 0 )
 nbGeomTypes = 1
 nbTotalEntity = 1

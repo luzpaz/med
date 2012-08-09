@@ -1,27 +1,27 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 /*
  File MEDMEM_CellModel.cxx
- $Header$
 */
 
 #include "MEDMEM_CellModel.hxx"
@@ -31,6 +31,15 @@ using namespace MEDMEM;
 using namespace MED_EN;
 
 CELLMODEL_Map *CELLMODEL_Map::_singleton=0;
+
+const MEDMEM::CELLMODEL& CELLMODEL_Map::getCellModel(MED_EN::medGeometryElement type)
+{
+  map<MED_EN::medGeometryElement,MEDMEM::CELLMODEL>::iterator type2model = _cell_models.find(type);
+  if ( type2model == _cell_models.end() )
+    type2model = _cell_models.insert( make_pair( type, CELLMODEL( type ))).first;
+
+  return type2model->second;
+}
 
 const MEDMEM::CELLMODEL& CELLMODEL_Map::retrieveCellModel(MED_EN::medGeometryElement type)
 {
@@ -53,7 +62,6 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
   _numberOfConstituents=(int*)NULL ;
   _numberOfNodeOfEachConstituent=(int**)NULL ;
   _constituents=(int***)NULL ; 
-  //_numberOfonstituentsType=(int*)NULL ;
   _constituentsType=(medGeometryElement**)NULL ;
   
   MESSAGE_MED("CELLMODEL : constructeur pour le type " << t);
@@ -166,14 +174,8 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       tmpConstituentsType1[0] = MED_SEG2 ;
       tmpConstituentsType1[1] = MED_SEG2 ;
       tmpConstituentsType1[2] = MED_SEG2 ;
-//        medGeometryElement * tmpConstituentsType2 = new medGeometryElement[3] ;
-//        tmpConstituentsType2[0] = MED_POINT1 ;
-//        tmpConstituentsType2[1] = MED_POINT1 ;
-//        tmpConstituentsType2[2] = MED_POINT1 ;
-//        _constituentsType = new medGeometryElement*[2] ;
       _constituentsType = new medGeometryElement*[1] ;
       _constituentsType[0]=tmpConstituentsType1 ;
-//        _constituentsType[1]=tmpConstituentsType2 ;
       // Well, point are defined, but could not be acces because we have 
       // only 1 numberOfConstituentsDimension !
 
@@ -216,17 +218,8 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       tmpConstituentsType1[0] = MED_SEG3 ;
       tmpConstituentsType1[1] = MED_SEG3 ;
       tmpConstituentsType1[2] = MED_SEG3 ;
-//        medGeometryElement * tmpConstituentsType2 = new medGeometryElement[6] ;
-//        tmpConstituentsType2[0] = MED_POINT1 ;
-//        tmpConstituentsType2[1] = MED_POINT1 ;
-//        tmpConstituentsType2[2] = MED_POINT1 ;
-//        tmpConstituentsType2[3] = MED_POINT1 ;
-//        tmpConstituentsType2[4] = MED_POINT1 ;
-//        tmpConstituentsType2[5] = MED_POINT1 ;
-//        _constituentsType = new medGeometryElement*[2] ;
       _constituentsType = new medGeometryElement*[1] ;
       _constituentsType[0]=tmpConstituentsType1 ;
-//        _constituentsType[1]=tmpConstituentsType2 ;
       // Well, point are defined, but could not be acces because we have 
       // only 1 numberOfConstituentsDimension !
 
@@ -272,15 +265,8 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       tmpConstituentsType1[1] = MED_SEG2 ;
       tmpConstituentsType1[2] = MED_SEG2 ;
       tmpConstituentsType1[3] = MED_SEG2 ;
-//        medGeometryElement * tmpConstituentsType2 = new medGeometryElement[4] ;
-//        tmpConstituentsType2[0] = MED_POINT1 ;
-//        tmpConstituentsType2[1] = MED_POINT1 ;
-//        tmpConstituentsType2[2] = MED_POINT1 ;
-//        tmpConstituentsType2[3] = MED_POINT1 ;
-//        _constituentsType = new medGeometryElement*[2] ;
       _constituentsType = new medGeometryElement*[1] ;
       _constituentsType[0]=tmpConstituentsType1 ;
-//        _constituentsType[1]=tmpConstituentsType2 ;
       // Well, point are defined, but could not be acces because we have 
       // only 1 numberOfConstituentsDimension !
 
@@ -330,19 +316,8 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       tmpConstituentsType1[1] = MED_SEG3 ;
       tmpConstituentsType1[2] = MED_SEG3 ;
       tmpConstituentsType1[3] = MED_SEG3 ;
-//        medGeometryElement * tmpConstituentsType2 = new medGeometryElement[8] ;
-//        tmpConstituentsType2[0] = MED_POINT1 ;
-//        tmpConstituentsType2[1] = MED_POINT1 ;
-//        tmpConstituentsType2[2] = MED_POINT1 ;
-//        tmpConstituentsType2[3] = MED_POINT1 ;
-//        tmpConstituentsType2[4] = MED_POINT1 ;
-//        tmpConstituentsType2[5] = MED_POINT1 ;
-//        tmpConstituentsType2[6] = MED_POINT1 ;
-//        tmpConstituentsType2[7] = MED_POINT1 ;
-//        _constituentsType = new medGeometryElement*[2] ;
       _constituentsType = new medGeometryElement*[1] ;
       _constituentsType[0]=tmpConstituentsType1 ;
-//        _constituentsType[1]=tmpConstituentsType2 ;
       // Well, point are defined, but could not be acces because we have 
       // only 1 numberOfConstituentsDimension !
 
@@ -1382,6 +1357,34 @@ CELLMODEL::CELLMODEL(medGeometryElement t)
       _constituentsType[1]=tmpConstituentsType2 ;
       break;
     }
+    case MED_POLYGON:
+      _name="MED_POLYGON" ;
+      _type=t;
+      _dimension=2;
+      _numberOfConstituentsDimension=1 ;
+      _numberOfConstituents=new int[_numberOfConstituentsDimension] ;
+      _numberOfConstituents[0]=0 ;
+      _numberOfNodeOfEachConstituent=new int*[_numberOfConstituentsDimension] ;
+      _numberOfNodeOfEachConstituent[0]=0;
+      _constituentsType = new medGeometryElement*[_numberOfConstituentsDimension] ;
+      _constituentsType[0]=0 ;
+      _constituents = new int**[_numberOfConstituentsDimension] ;
+      _constituents[0]=0;
+     break;
+    case MED_POLYHEDRA:
+      _name="MED_POLYHEDRA" ;
+      _type=t;
+      _dimension=3;
+      _numberOfConstituentsDimension=2 ;
+      _numberOfConstituents=new int[_numberOfConstituentsDimension] ;
+      _numberOfConstituents[0]=_numberOfConstituents[1]=0;
+      _numberOfNodeOfEachConstituent=new int*[_numberOfConstituentsDimension] ;
+      _numberOfNodeOfEachConstituent[0]=_numberOfNodeOfEachConstituent[1]=0;
+      _constituentsType = new medGeometryElement*[_numberOfConstituentsDimension] ;
+      _constituentsType[0]=_constituentsType[1]=0 ;
+      _constituents = new int**[_numberOfConstituentsDimension] ;
+      _constituents[0]=_constituents[1]=0;
+      break;
 //      default : 
 //        _type=0;
 //        break;
@@ -1406,18 +1409,16 @@ ostream & MEDMEM::operator<<(ostream &os,const CELLMODEL &my)
       os << "    - number of Constituents for this Dimension : " << my._numberOfConstituents[i] << endl ;
 
       for(int j=0;j<my._numberOfConstituents[i];j++)
-	{
-	  os << "    - number of node for this constituent : " << my._numberOfNodeOfEachConstituent[i][j] << endl ;
-	  os << "      - constituents " << j+1 << " of type "<< my._constituentsType[i][j] <<" : " ;
-	  for(int k=0;k<my._numberOfNodeOfEachConstituent[i][j];k++)
-	    os << my._constituents[i][j][k] << " " ;
-	  os << endl ;
-	}
+        {
+          os << "    - number of node for this constituent : " << my._numberOfNodeOfEachConstituent[i][j] << endl ;
+          os << "      - constituents " << j+1 << " of type "<< my._constituentsType[i][j] <<" : " ;
+          for(int k=0;k<my._numberOfNodeOfEachConstituent[i][j];k++)
+            os << my._constituents[i][j][k] << " " ;
+          os << endl ;
+        }
     }
   return os;
 }
-/*
-*/
 
 // Return number of constituents type (which dimension is _dimension-1).
 int CELLMODEL::getNumberOfConstituentsType() const
@@ -1456,9 +1457,9 @@ map<medGeometryElement,int>  CELLMODEL::getNumberOfConstituentsForeachType() con
 //     for(itvec=constituentsType.begin();itvec!=constituentsType.end();itvec++) {
 //       itmap = numberOfConstituentsForeachType.find(*itvec);
 //       if (itmap==numberOfConstituentsForeachType.end()) // new element
-// 	numberOfConstituentsForeachType[*itvec]=1 ;
+//      numberOfConstituentsForeachType[*itvec]=1 ;
 //       else
-// 	numberOfConstituentsForeachType[*itvec]++ ;
+//      numberOfConstituentsForeachType[*itvec]++ ;
 //     }
 //   }
   return numberOfConstituentsForeachType ;
@@ -1488,6 +1489,12 @@ void CELLMODEL::init(const CELLMODEL &m)
     _numberOfNodeOfEachConstituent[i] = newArray ;
   }
   _constituents = new int**[_numberOfConstituentsDimension] ;
+  if(_constituentsType)
+    {
+      for(int i=0; i<_numberOfConstituentsDimension; i++)
+        delete [] _constituentsType[i];
+      delete [] _constituentsType;
+    }
   _constituentsType = new medGeometryElement*[_numberOfConstituentsDimension] ;
   for(int i=0; i<_numberOfConstituentsDimension; i++) {
     int numberOf = _numberOfConstituents[i] ;
@@ -1500,7 +1507,7 @@ void CELLMODEL::init(const CELLMODEL &m)
       int * newArray = new int[numberOf2] ;
       int * oldArray = m._constituents[i][j] ;
       for(int k=0; k<numberOf2; k++)
-	newArray[k] = oldArray[k] ;
+        newArray[k] = oldArray[k] ;
       tmpArray[j] = newArray ;
       newArrayType[j] = oldArrayType[j] ;
     }
@@ -1514,22 +1521,26 @@ void CELLMODEL::clean()
   for(int i=0; i<_numberOfConstituentsDimension; i++) {
     int numberOf = _numberOfConstituents[i] ;
     for(int j=0; j<numberOf; j++) {
-      if (NULL!=_constituents[i][j])
-	delete[] _constituents[i][j] ;
+      if (_constituents[i][j])
+        delete[] _constituents[i][j] ;
     }
-    if (NULL!=_constituentsType[i])
-      delete[] _constituentsType[i] ;
-    if (NULL!=_constituents[i])
+    if (_constituentsType[i])
+      delete [] _constituentsType[i] ;
+    if (_constituents[i])
       delete[] _constituents[i] ;
-    if (NULL!=_numberOfNodeOfEachConstituent[i])
+    if (_numberOfNodeOfEachConstituent[i])
       delete[] _numberOfNodeOfEachConstituent[i] ;
   }
-  if (NULL!=_numberOfConstituents)
+  delete [] _constituentsType; 
+  if (_numberOfConstituents)
     delete[]_numberOfConstituents ;
-  if (NULL!=_constituentsType)
-    delete[] _constituentsType ;
-  if (NULL!=_constituents)
+  if (_constituents)
     delete[] _constituents ;
-  if (NULL!=_numberOfNodeOfEachConstituent)
+  if (_numberOfNodeOfEachConstituent)
     delete[] _numberOfNodeOfEachConstituent ;
+
+  _constituentsType = 0;
+  _numberOfConstituents = 0;
+  _constituents = 0;
+  _numberOfNodeOfEachConstituent = 0;
 }

@@ -1,28 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
-#include "MEDMEM_Compatibility21_22.hxx"
 #include "MEDMEM_AsciiFieldDriver.hxx"
 #include "MEDMEM_STRING.hxx"
 
@@ -80,16 +77,12 @@ using namespace MEDMEM;
 void MEDMEMTest::testAsciiFieldDriver()
 {
   // read a mesh from a MED file
-  string datadir   = getenv("MED_ROOT_DIR");
-  string tmp_dir   = getenv("TMP") ? getenv("TMP") : "/tmp";
-  string filename  = datadir + "/share/salome/resources/med/pointe.med";
+  string filename  = getResourceFile("pointe.med");
   string meshname  = "maa1";
   string fieldname = "fieldcelldoublescalar";
 
-  if (tmp_dir == "")
-    tmp_dir = "/tmp";
-  string anyfile1  = tmp_dir + "/anyfile1";
-  string SDFfilename = tmp_dir + "/myfile";
+  string anyfile1    = makeTmpFile( "anyfile1" );
+  string SDFfilename = makeTmpFile( "myfile" );
   ofstream aFile(SDFfilename.c_str());
 
   // To remove tmp files from disk
@@ -145,9 +138,6 @@ void MEDMEMTest::testAsciiFieldDriver()
     CPPUNIT_ASSERT_EQUAL(aa[2], bb[0]);
   }
 
-  printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
-  printf("1\n");
-  printf("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
   // template<int N> bool compare(const double* a, const double* b)
   {
     {
@@ -189,7 +179,7 @@ void MEDMEMTest::testAsciiFieldDriver()
   // Test ASCII_FIELD_DRIVER
   FIELD<double> * aField1 = new FIELD<double> (MED_DRIVER, filename, fieldname);
   const SUPPORT * aSupport = aField1->getSupport();
-  MESH * aMesh = new MESH (MED_DRIVER, filename, aSupport->getMeshName());
+  MESH * aMesh = new MESH(MED_DRIVER, filename, aSupport->getMeshName());
   aSupport->setMesh(aMesh);
 
   // create an ASCII driver for a field
@@ -241,11 +231,8 @@ void MEDMEMTest::testAsciiFieldDriver()
     CPPUNIT_ASSERT_THROW(ASCII_FIELD_DRIVER<double> aDriver4
                          ("anyfile4", aField1, MED_EN::ASCENDING, "XY"), MEDEXCEPTION);
     // invalid
-//#ifdef ENABLE_FORCED_FAILURES
-    // (BUG) This assert fails because 'A'(and 'B', and 'C') < 'X'
     CPPUNIT_ASSERT_THROW(ASCII_FIELD_DRIVER<double> aDriver5
                          ("anyfile5", aField1, MED_EN::ASCENDING, "ABC"), MEDEXCEPTION);
-//#endif
   }
   else if (spaceDimension == 2) {
     // good
@@ -258,11 +245,8 @@ void MEDMEMTest::testAsciiFieldDriver()
     CPPUNIT_ASSERT_THROW(ASCII_FIELD_DRIVER<double> aDriver4
                          ("anyfile4", aField1, MED_EN::ASCENDING, "X"), MEDEXCEPTION);
     // invalid
-//#ifdef ENABLE_FORCED_FAILURES
-    // (BUG) Invalid string is accepted for priority
     CPPUNIT_ASSERT_THROW(ASCII_FIELD_DRIVER<double> aDriver5
                          ("anyfile5", aField1, MED_EN::ASCENDING, "AB"), MEDEXCEPTION);
-//#endif
   }
   else {
     CPPUNIT_FAIL("Cannot test ASCII_FIELD_DRIVER because file pointe.med"
@@ -274,9 +258,10 @@ void MEDMEMTest::testAsciiFieldDriver()
 
   //Test copy() function
   ASCII_FIELD_DRIVER<double> *aDriver1_Cpy2 = (ASCII_FIELD_DRIVER<double>*)aDriver1->copy();
-
+  CPPUNIT_ASSERT(aDriver1_Cpy2);
+  delete aDriver1_Cpy2;
   // free memory
   delete aDriver1;
-  delete aField1;
-  delete aMesh;
+  aField1->removeReference();
+  aMesh->removeReference();
 }

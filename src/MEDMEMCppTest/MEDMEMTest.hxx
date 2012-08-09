@@ -1,28 +1,30 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #ifndef _MEDMEMTEST_HXX_
 #define _MEDMEMTEST_HXX_
 
+#include "MEDMEMCppTestExport.hxx"
+#include "MEDMEMTest_Utils.hxx"
+
 #include <cppunit/extensions/HelperMacros.h>
+#include "MEDMEM_Field.hxx"
 
 #include <set>
 #include <string>
@@ -31,15 +33,15 @@
 
 namespace MEDMEM {
   class MESH;
-};
+}
 
-class MEDMEMTest : public CppUnit::TestFixture
+class MEDMEMCPPTEST_EXPORT MEDMEMTest : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE( MEDMEMTest );
   //0
   CPPUNIT_TEST( testArray );
   CPPUNIT_TEST( testArrayConvert );
-    //CPPUNIT_TEST( testArrayInterface /* not in spec */ );
+  //CPPUNIT_TEST( testArrayInterface /* not in spec */ );
   CPPUNIT_TEST( testAsciiFieldDriver );
   //CPPUNIT_TEST( testCellModel /* not in spec */ );
   CPPUNIT_TEST( testConnectivity );
@@ -62,27 +64,23 @@ class MEDMEMTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testInit /* cxx */ );
   //CPPUNIT_TEST( testInterlacingPolicy /* not in spec */ );
   //CPPUNIT_TEST( testInterlacingTraits /* not in spec */ );
-  CPPUNIT_TEST( testMedFieldDriver21 );
-  CPPUNIT_TEST( testMedFieldDriver22 );
+  CPPUNIT_TEST( testMedFieldDriver );
+  CPPUNIT_TEST( testReadFieldOnNodesAndCells );
   //CPPUNIT_TEST( testMedFieldDriver /* not in spec */ );
-    CPPUNIT_TEST( testMed );
+  CPPUNIT_TEST( testMedFileBrowser );
   //30
-  CPPUNIT_TEST( testMedMedDriver21 );
-  CPPUNIT_TEST( testMedMedDriver22 );
-  //CPPUNIT_TEST( testMedMedDriver /* not in spec */ );
   //CPPUNIT_TEST( testMEDMEMchampLire /* not in spec */ );
   //CPPUNIT_TEST( testMEDMEMgaussEcr /* not in spec */ );
   //CPPUNIT_TEST( testMEDMEMprofilEcr /* not in spec */ );
-   CPPUNIT_TEST( testMedMeshDriver21 );
-  CPPUNIT_TEST( testMedMeshDriver22 );
+  CPPUNIT_TEST( testMedMeshDriver );
   //CPPUNIT_TEST( testMedMeshDriver /* not in spec */ );
   CPPUNIT_TEST( testMedVersion );
   //40
   CPPUNIT_TEST( testMeshAndMeshing );
   CPPUNIT_TEST( testModulusArray );
   CPPUNIT_TEST( testnArray );
+  CPPUNIT_TEST( testPartialDescendingConnectivity );
   CPPUNIT_TEST( testPointerOf );
-  CPPUNIT_TEST( testPolyhedronArray );
   CPPUNIT_TEST( testPorflowMeshDriver );
   //CPPUNIT_TEST( testRCBase /* not in spec */ );
   //CPPUNIT_TEST( testSetInterlacingType /* not in spec */ );
@@ -92,7 +90,7 @@ class MEDMEMTest : public CppUnit::TestFixture
   CPPUNIT_TEST( testSupport );
   //CPPUNIT_TEST( testTags /* not in spec */ );
   //CPPUNIT_TEST( testTopLevel );
-	//  CPPUNIT_TEST( testTypeMeshDriver );
+  //  CPPUNIT_TEST( testTypeMeshDriver );
   CPPUNIT_TEST( testUnit );
   CPPUNIT_TEST( testVtkFieldDriver );
   CPPUNIT_TEST( testVtkMedDriver );
@@ -100,10 +98,22 @@ class MEDMEMTest : public CppUnit::TestFixture
   //CPPUNIT_TEST( testmedimport_src /* not in spec */ );
   //60
   CPPUNIT_TEST( testExtractor );
+  CPPUNIT_TEST( testMeshFuse );
+  CPPUNIT_TEST( testDesactivateFacesComputation ); // issue 0020411
+  CPPUNIT_TEST( testGetVolumeAbs );
+  CPPUNIT_TEST( test_remapper4 );
+  CPPUNIT_TEST( test_remapper5 );
+  CPPUNIT_TEST( test_remapper6 );
+  CPPUNIT_TEST( test_remapper7 );
+  CPPUNIT_TEST( test_remapper3DTo1D );
+  CPPUNIT_TEST( test_RemapperP0P0 );
+  CPPUNIT_TEST( test_RemapperP1P1 );
+  CPPUNIT_TEST( test_RemapperP1P0 );
+  CPPUNIT_TEST( test_RemapperP0P1 );
+  CPPUNIT_TEST( testGetGaussPointsCoordinates );
   CPPUNIT_TEST_SUITE_END();
 
 public:
-
   void setUp();
   void tearDown();
 
@@ -132,27 +142,23 @@ public:
   void testInit() /* cxx */;
   //void testInterlacingPolicy() /* not in spec */;
   //void testInterlacingTraits() /* not in spec */;
-  void testMedFieldDriver21();
-  void testMedFieldDriver22();
+  void testMedFieldDriver();
+  void testReadFieldOnNodesAndCells();
   //void testMedFieldDriver /* not in spec */();
-  void testMed();
+  void testMedFileBrowser();
   //30
-  void testMedMedDriver21();
-  void testMedMedDriver22();
-  //void testMedMedDriver() /* not in spec */;
   //void testMEDMEMchampLire() /* not in spec */;
   //void testMEDMEMgaussEcr() /* not in spec */;
   //void testMEDMEMprofilEcr() /* not in spec */;
-  void testMedMeshDriver21();
-  void testMedMeshDriver22();
+  void testMedMeshDriver();
   //void testMedMeshDriver() /* not in spec */;
   void testMedVersion();
   //40
   void testMeshAndMeshing();
   void testModulusArray();
   void testnArray();
+  void testPartialDescendingConnectivity();
   void testPointerOf();
-  void testPolyhedronArray();
   void testPorflowMeshDriver();
   //void testRCBase() /* not in spec */;
   //void testSetInterlacingType /*  IMED_MESH_RDWR_DRIVER(driver), not in spec */();
@@ -170,13 +176,31 @@ public:
   //void testmedimport_src() /* not in spec */;
   //60
   void testExtractor();
+  void testMeshFuse();
+  void testDesactivateFacesComputation(); // issue 0020411
+  void testGetVolumeAbs();
+  void test_RemapperP0P0();
+  void test_RemapperP1P1();
+  void test_RemapperP1P0();
+  void test_RemapperP0P1();
+  void test_remapper4();
+  void test_remapper5();
+  void test_remapper6();
+  void test_remapper7();
+  void test_remapper3DTo1D();
+  void testGetGaussPointsCoordinates();
+
+  //private:
+  void absField(MEDMEM::FIELD<double>&);
+ private:
+  double sumAll(const std::vector< std::map<int,double> >& matrix);
 };
 
 // to create a mesh with certain filling
-MEDMEM::MESH * MEDMEMTest_createTestMesh();
+MEDMEMCPPTEST_EXPORT MEDMEM::MESH * MEDMEMTest_createTestMesh();
 
 // to automatically remove temporary files from disk
-class MEDMEMTest_TmpFilesRemover
+class MEDMEMCPPTEST_EXPORT MEDMEMTest_TmpFilesRemover
 {
 public:
   MEDMEMTest_TmpFilesRemover() {}
@@ -201,6 +225,6 @@ void MEDMEMTest_DumpArray (std::ostream & stream, const T* array, const int leng
     }
   }
   stream << "}" << std::endl;
-};
+}
 
 #endif

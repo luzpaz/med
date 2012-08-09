@@ -1,36 +1,35 @@
 #!/usr/bin/env python
-# Copyright (C) 2005  OPEN CASCADE, CEA, EDF R&D, LEG
-#           PRINCIPIA R&D, EADS CCR, Lip6, BV, CEDRAT
+#  -*- coding: iso-8859-1 -*-
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
+#
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
-# License as published by the Free Software Foundation; either 
+# License as published by the Free Software Foundation; either
 # version 2.1 of the License.
-# 
-# This library is distributed in the hope that it will be useful 
-# but WITHOUT ANY WARRANTY; without even the implied warranty of 
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-# Lesser General Public License for more details.
-# 
-# You should have received a copy of the GNU Lesser General Public  
-# License along with this library; if not, write to the Free Software 
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-# 
-# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-# 
-############################################################################
 #
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#
+
+############################################################################
 # This script tests conversion of EnSight to MEDMEM by performing following
 # operations on all available EnSight files:
 # - read EnSight file into MEDMEM and breifly dump it's content;
 # - store MEDMEM to med file;
 # - write EnSight file in different formats: Gold and EnSight6, ASCII and binary;
 # - checks generated EnSight files using ens_checker utility (if available).
-#
 # EnSight samples are in EXAMPLES salome CVS repository, in directory SAMPLES_SRC/EnSight.
 # DATA_DIR should contain path to SAMPLES_SRC
-#
 ############################################################################
-
+#
 from medmem import *
 from dumpMEDMEM import *
 from re import search
@@ -48,7 +47,7 @@ formats = [
 dataDir = os.getenv("DATA_DIR")
 tmpDir  = os.getenv("TMP")
 if not tmpDir:
-    tmpDir = os.getenv("TMPDIR")
+    tmpDir = os.getenv("TMPDIR", "/tmp")
 
 # EnSight samples are in EXAMPLES CVS repository, in directory SAMPLES_SRC/EnSight.
 # DATA_DIR should contain path to SAMPLES_SRC
@@ -108,7 +107,7 @@ def compatibilityPb():
 from dircache import listdir
 
 inFiles = [
-    "blow1_ascii.case"
+    "frame.case"
 #     ,"blow1_bin.case"
 #     ,"zmat2d_esca.case"
 #     ,"dyna.case"
@@ -159,9 +158,25 @@ for inFile in inFiles: # loop on all files in inDir
     ensFile = os.path.join( inDir, inFile )
     print "\nreading",ensFile
     incompatible = False
+    meshes = []
+    fields = []
     try:
-        medFromEns = MED(ENSIGHT_DRIVER, ensFile)
-        medFromEns.read();
+        medFromEns = ENSIGHT_MED_RDONLY_DRIVER(ensFile);
+        fields = medFromEns.read()
+        if not fields:
+            mesh = MESH(ENSIGHT_DRIVER,ensFile,"");
+            meshes.append( mesh )
+        else:
+            meshNames = []
+            for f in fields:
+                mesh = f.getSupport().getMesh()
+                if mesh and not mesh.getName() in meshNames:
+                    meshes.append( mesh )
+                    meshNames.append( mesh.getName() )
+                    pass
+                pass
+            pass
+        pass
     except:
         if not compatibilityPb():
             sys.exit(1)
@@ -169,23 +184,27 @@ for inFile in inFiles: # loop on all files in inDir
             continue
 
     # show MEDMEM contents
-    m2m_nom  = medFromEns.getMeshName(0)
-    mesh = medFromEns.getMesh(m2m_nom)
+    mesh = meshes[0]
     if dumpMesh:
         ShowMesh( mesh, 10, [10,10,10] )
         ShowGroups( mesh )
         pass
     if dumpField:
-        ShowFields( medFromEns, 10 )
+        ShowFields( fields, 10 )
 
     # write MEDMEM into MED
 
     medFile = os.path.join( outDir, basename + ".med" )
     deleteFile(medFile)
     print "write",medFile
-    wdrv = medFromEns.addDriver(MED_DRIVER,medFile)
-    medFromEns.write( wdrv )
-    
+    for m in meshes:
+        m.write( MED_DRIVER,medFile )
+        pass
+    for f in fields:
+        fTyped = f.castToTypedField()
+        fTyped.write(MED_DRIVER,medFile)
+        pass
+
     # write MEDMEM into EnSight
 
     for format,bin in formats:
@@ -211,11 +230,15 @@ for inFile in inFiles: # loop on all files in inDir
 
         setEnSightFormatForWriting( format, bin )
 
-        medEnsDriver = ENSIGHT_MED_WRONLY_DRIVER (ensFile, medFromEns)
         print "writting", ensFile
         incompatible = False
         try:
-            medEnsDriver.write()
+            if fields:
+                medEnsDriver = ENSIGHT_MED_WRONLY_DRIVER (ensFile, fields)
+                medEnsDriver.write()
+            else:
+                mesh2EnsDriver = ENSIGHT_MESH_WRONLY_DRIVER( ensFile, mesh )
+                mesh2EnsDriver.write()
         except:
             if not compatibilityPb():
                 sys.exit(1)
@@ -224,7 +247,10 @@ for inFile in inFiles: # loop on all files in inDir
             incompatible = True
             setIgnoreIncompatibility(1)
             try:
-                medEnsDriver.write()
+                if fields:
+                    medEnsDriver.write()
+                else:
+                    mesh2EnsDriver.write()
             except:
                 if not compatibilityPb():
                     sys.exit(1)

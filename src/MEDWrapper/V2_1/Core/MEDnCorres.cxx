@@ -26,7 +26,7 @@ namespace med_2_1{
 
 med_int 
 MEDnCorres(med_idt fid,char *maa,char *eq,med_entite_maillage typ_ent,
-	   med_geometrie_element typ_geo)
+           med_geometrie_element typ_geo)
 {
   med_idt eqid, datagroup;
   med_err ret;
@@ -60,7 +60,7 @@ MEDnCorres(med_idt fid,char *maa,char *eq,med_entite_maillage typ_ent,
   if ((typ_ent != MED_NOEUD))
     {
       if ((ret = _MEDnomGeometrie(tmp,typ_geo)) < 0)
-	return -1;
+        return -1;
       strcat(nomdatagroup,".");
       strcat(nomdatagroup,tmp);
     }

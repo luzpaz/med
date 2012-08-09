@@ -1,25 +1,26 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File      : MEDMEM_Extractor.cxx
 // Created   : Thu Dec 18 11:10:11 2008
 // Author    : Edward AGAPOV (eap)
-
+//
 #include "MEDMEM_Extractor.hxx"
 
 #include <MEDMEM_Field.hxx>
@@ -59,24 +60,6 @@ namespace { // local tools
   {
     return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2];
   }
-  //================================================================================
-  /*!
-   * \brief SUPPORT owning the mesh
-   */
-  struct TSupport : public SUPPORT
-  {
-    TSupport(MESH* mesh): SUPPORT(mesh) {}
-    ~TSupport() { delete getMesh(); setMeshDirectly((MESH*)0); }
-  };
-  //================================================================================
-  /*!
-   * \brief Field owning the support
-   */
-  struct TField: public FIELD<double>
-  {
-    TField( const SUPPORT * Support, int nbComp ): FIELD<double>( Support, nbComp ) {}
-    ~TField() { if ( _support ) delete _support; _support = (SUPPORT*)0; }
-  };
   //================================================================================
   /*!
    * \brief Accessor to some ids. Provides operator[] and more-next access methods
@@ -240,16 +223,13 @@ namespace { // local tools
       _tolerance      = getTolerance(&mesh);
       _dim            = mesh.getSpaceDimension();
       _coord          = mesh.getCoordinates(MED_FULL_INTERLACE);
-      _cellConn       = mesh.getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                            MED_CELL, MED_ALL_ELEMENTS);
+      _cellConn       = mesh.getConnectivity( MED_NODAL, MED_CELL, MED_ALL_ELEMENTS);
       _cellConnIndex  = mesh.getConnectivityIndex(MED_NODAL, MED_CELL);
-      _cell2Face      = mesh.getConnectivity(MED_FULL_INTERLACE, MED_DESCENDING,
-                                            MED_CELL, MED_ALL_ELEMENTS);
+      _cell2Face      = mesh.getConnectivity( MED_DESCENDING, MED_CELL, MED_ALL_ELEMENTS);
       _cell2FaceIndex = mesh.getConnectivityIndex( MED_DESCENDING, MED_CELL );
       _face2Cell      = mesh.getReverseConnectivity( MED_DESCENDING );
       _face2CellIndex = mesh.getReverseConnectivityIndex( MED_DESCENDING );
-      _faceConn       = mesh.getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                            MED_FACE, MED_ALL_ELEMENTS);
+      _faceConn       = mesh.getConnectivity( MED_NODAL, MED_FACE, MED_ALL_ELEMENTS);
       _faceConnIndex  = mesh.getConnectivityIndex(MED_NODAL, MED_FACE);
       _node2Cell      = mesh.getReverseConnectivity( MED_NODAL );
       _node2CellIndex = mesh.getReverseConnectivityIndex( MED_NODAL );
@@ -367,19 +347,28 @@ Extractor::Extractor(const FIELD<double>& inputField) throw (MEDEXCEPTION)
   if ( inputField.getGaussPresence() && inputField.getNumberOfGaussPoints()[0] > 1 )
     throw MEDEXCEPTION(STRING(LOC) << "InputField is not constant be element");
 
-  MESH* mesh = inputField.getSupport()->getMesh();
+  const GMESH* mesh = inputField.getSupport()->getMesh();
   if ( !mesh )
-    throw MEDEXCEPTION(STRING(LOC) << "InputField has support with NULL mesh");
+      throw MEDEXCEPTION(STRING(LOC) << "InputField has support with NULL mesh");
 
   if ( mesh->getSpaceDimension() < 2 )
-    throw MEDEXCEPTION(STRING(LOC) << "InputField with 1D support not acceptable");
+      throw MEDEXCEPTION(STRING(LOC) << "InputField with 1D support not acceptable");
 
-  if ( mesh->getNumberOfPolygons() > 0 ||
-       mesh->getNumberOfPolyhedron() > 0 )
-    throw MEDEXCEPTION(STRING(LOC) << "InputField has supporting mesh with poly elements");
+  if ( mesh->getNumberOfElements(MED_CELL, MED_POLYGON) > 0 ||
+       mesh->getNumberOfElements(MED_CELL, MED_POLYHEDRA) > 0 )
+      throw MEDEXCEPTION(STRING(LOC) << "InputField has supporting mesh with poly elements");
 
-  if ( mesh->getConnectivityptr()->getEntityDimension() < 2 )
-    throw MEDEXCEPTION(STRING(LOC) << "Invalid entity dimension of connectivity");
+  if ( mesh->getMeshDimension() < 2 )
+      throw MEDEXCEPTION(STRING(LOC) << "Invalid entity dimension of connectivity");
+
+  _myInputField->addReference();
+  _myInputMesh = mesh->convertInMESH();
+}
+
+Extractor::~Extractor()
+{
+  _myInputField->removeReference();
+  _myInputMesh->removeReference();
 }
 
 //================================================================================
@@ -417,7 +406,8 @@ FIELD<double>* Extractor::extractPlane(const double* coords, const double* norma
   MESH* mesh = divideEdges( coords, norm, new2oldCells );
   if ( !mesh ) return 0;
 
-  return makeField( new2oldCells, mesh );
+  FIELD<double>* ret=makeField( new2oldCells, mesh );
+  return ret;
 }
 
 //================================================================================
@@ -472,7 +462,8 @@ FIELD<double>* Extractor::extractLine(const double* coords, const double* direct
 
   if ( !mesh ) return 0;
     
-  return makeField( new2oldCells, mesh );
+  FIELD<double>*ret=makeField( new2oldCells, mesh );
+  return ret;
 }
 
 //================================================================================
@@ -487,9 +478,9 @@ FIELD<double>* Extractor::makeField( const map<int,set<int> >& new2oldCells,
                                      MESH*                     mesh ) const
 {
   // make new field
-  int nbComp               = _myInputField->getNumberOfComponents();
-  FIELD<double> * outField = new TField( new TSupport( mesh ), nbComp );
-  double* outValues        = const_cast<double*>( outField->getValue() );
+  int nbComp = _myInputField->getNumberOfComponents();
+  const SUPPORT *sup = mesh->getSupportOnAll( MED_CELL );
+  FIELD<double> * outField = new FIELD<double>( sup, nbComp );
 
   outField->setComponentsNames       ( _myInputField->getComponentsNames() );
   outField->setName                  ( STRING("Extracted from ")<< _myInputField->getName() );
@@ -497,8 +488,12 @@ FIELD<double>* Extractor::makeField( const map<int,set<int> >& new2oldCells,
   outField->setComponentsDescriptions( _myInputField->getComponentsDescriptions() );
   outField->setMEDComponentsUnits    ( _myInputField->getMEDComponentsUnits() );
 
+  sup->removeReference(); // to delete mesh as soon as outField dies
 
   // put values to the new field
+
+  double* outValues = const_cast<double*>( outField->getValue() );
+
   map<int,set<int> >::const_iterator new_olds, noEnd = new2oldCells.end();
   for ( new_olds = new2oldCells.begin(); new_olds != noEnd; ++new_olds )
   {
@@ -535,11 +530,10 @@ MESH* Extractor::divideEdges(const double*       coords,
 
   const SUPPORT* support            = _myInputField->getSupport();
   medEntityMesh entity              = support->getEntity();
-  MESH* inMesh                      = support->getMesh();
+  const MESH* inMesh                = _myInputMesh;//support->getMesh();
   const medGeometryElement* inTypes = support->getTypes();
 
-  const int* inConn      = inMesh->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                                   entity, MED_ALL_ELEMENTS);
+  const int* inConn      = inMesh->getConnectivity( MED_NODAL, entity, MED_ALL_ELEMENTS);
   const int* inConnIndex = inMesh->getConnectivityIndex(MED_NODAL, entity);
   const int spaceDim     = inMesh->getSpaceDimension();
   const int meshDim      = inTypes[ support->getNumberOfTypes()-1 ] / 100;
@@ -634,7 +628,7 @@ MESH* Extractor::divideEdges(const double*       coords,
         // Associate new and old cells
         int newCell = new2oldCells.size() + 1;
         // detect equal new cells on boundaries of old cells
-        if ( newNodes.empty() && oldNodes.size() == nbEdgesOnPlane + int(meshDim==2)) {
+        if ( newNodes.empty() && (int)oldNodes.size() == nbEdgesOnPlane + int(meshDim==2)) {
           pair < map< set<int>, int>::iterator, bool > it_unique =
             oldNodes2newCell.insert( make_pair( oldNodes, newCell ));
           if ( !it_unique.second ) { // equal new faces
@@ -712,14 +706,14 @@ MESH* Extractor::divideEdges(const double*       coords,
   // --------------------
   // Sort nodes of cells
   // --------------------
-
-  sortNodes( newConnByNbNodes, &resCoords[0], coords, normal, nbNodesPerPolygon );
+  if ( nbNodes > 0 )
+    sortNodes( newConnByNbNodes, &resCoords[0], coords, normal, nbNodesPerPolygon );
 
   // ----------
   // Make mesh
   // ----------
 
-  // count classical types
+  // count types
   vector< medGeometryElement > types;
   vector< int > nbCellByType;
   map< int, vector< int > >::iterator nbNoConn, ncEnd =newConnByNbNodes.end();
@@ -727,12 +721,19 @@ MESH* Extractor::divideEdges(const double*       coords,
   {
     int nbNodesPerCell = nbNoConn->first;
     int connSize = nbNoConn->second.size();
-    if ( nbNodesPerCell >= 2 && nbNodesPerCell <= 4 && connSize > 0 ) {
+    if ( connSize == 0 ) continue;
+    if ( nbNodesPerCell >= 2 && nbNodesPerCell <= 4 )
+    {
       nbCellByType.push_back( connSize / nbNodesPerCell );
       types.push_back( medGeometryElement( (meshDim-1)*100 + nbNodesPerCell ));
     }
+    else
+    {
+      nbCellByType.push_back( nbNodesPerPolygon.size() );
+      types.push_back( MED_POLYGON );
+    }
   }
-  if ( types.empty() && newConnByNbNodes[_POLYGON].empty() )
+  if ( types.empty() )
     return 0;
 
   MESHING* meshing = new MESHING();
@@ -743,26 +744,25 @@ MESH* Extractor::divideEdges(const double*       coords,
                            inMesh->getCoordinatesSystem(), MED_FULL_INTERLACE );
   meshing->setTypes( &types[0], MED_CELL );
   meshing->setNumberOfElements( &nbCellByType[0], MED_CELL);
-  for ( int i = 0; i < types.size(); ++i )
-    meshing->setConnectivity( & newConnByNbNodes[ types[i]%100 ].front(), MED_CELL, types[i]);
-  meshing->setMeshDimension( spaceDim /*meshDim-1*/ );
+  for ( unsigned i = 0; i < types.size(); ++i )
+    if ( types[i] != MED_POLYGON )
+    {
+      meshing->setConnectivity( MED_CELL, types[i], & newConnByNbNodes[ types[i]%100 ].front());
+    }
+    else
+    {
+      // make index
+      vector<int> index;
+      index.reserve( nbNodesPerPolygon.size()+1 );
+      index.push_back( 1 );
+      list<int>::iterator nbNodes = nbNodesPerPolygon.begin(), nnEnd = nbNodesPerPolygon.end();
+      for ( ; nbNodes != nnEnd; ++nbNodes )
+        index.push_back( index.back() + *nbNodes );
+    
+      meshing->setConnectivity( MED_CELL, types[i], & newConnByNbNodes[ _POLYGON ].front(),
+                                & index[0]);
+    }
 
-  // polygons
-  if ( !newConnByNbNodes[_POLYGON].empty() )
-  {
-    // make index
-    vector<int> index;
-    index.reserve( newConnByNbNodes[_POLYGON].size() / 5 );
-    index.push_back( 1 );
-    list<int>::iterator nbNodes = nbNodesPerPolygon.begin(), nnEnd = nbNodesPerPolygon.end();
-    for ( ; nbNodes != nnEnd; ++nbNodes )
-      index.push_back( index.back() + *nbNodes );
-
-    meshing->setPolygonsConnectivity( & index[0],
-                                      & newConnByNbNodes[_POLYGON][0],
-                                      index.size()-1,
-                                      MED_CELL );
-  }
   return meshing;
 }
 
@@ -775,7 +775,7 @@ MESH* Extractor::divideEdges(const double*       coords,
 void Extractor::computeDistanceOfNodes(const double* point,
                                        const double* normal)
 {
-  const MESH* mesh     = _myInputField->getSupport()->getMesh();
+  const MESH* mesh     = _myInputMesh;
   const double * coord = mesh->getCoordinates(MED_FULL_INTERLACE);
   const int spaceDim   = mesh->getSpaceDimension();
 
@@ -820,7 +820,7 @@ void Extractor::sortNodes( map< int, vector< int > >& connByNbNodes,
       // select ordinate to check
       int ind = (fabs(normal[0]) < fabs(normal[1])) ? 1 : 0;
       // sorting
-      for ( int i = 0; i < conn.size(); i += 2) {
+      for ( unsigned i = 0; i < conn.size(); i += 2) {
         const double* p1 = nodeCoords + spaceDim*(conn[i]-1);
         const double* p2 = nodeCoords + spaceDim*(conn[i+1]-1);
         if ( p1[ind] > p2[ind] )
@@ -834,7 +834,7 @@ void Extractor::sortNodes( map< int, vector< int > >& connByNbNodes,
         if ( conn[0] == conn[2] || conn[0] == conn[3] )
           std::swap( conn[0], conn[1] );
         int i;
-        for ( i = 2; i < conn.size()-2; i += 2) {
+        for ( i = 2; i < (int)conn.size()-2; i += 2) {
           if ( conn[i-1] == conn[i+1] )
             std::swap( conn[i], conn[i+1] );
           else if ( conn[i] == conn[i+2] || conn[i] == conn[i+3] )
@@ -924,7 +924,7 @@ MESH* Extractor::transfixFaces( const double*       coords,
                                 const double*       direction,
                                 map<int,set<int> >& new2oldCells)
 {
-  MESH* inMesh = _myInputField->getSupport()->getMesh();
+  const MESH* inMesh = _myInputMesh;
   TMeshData inMeshData( *inMesh );
   TLine line( direction, coords );
 
@@ -969,7 +969,7 @@ MESH* Extractor::transfixFaces( const double*       coords,
         while ( nodes.more() && !isOut ) {
           double coord = inMeshData.getNodeCoord( nodes.next() )[ line._maxDir ];
           bool isIn = false;
-          for ( int i = 0; i < ranges.size() && !isIn; ++i ) {
+          for ( unsigned i = 0; i < ranges.size() && !isIn; ++i ) {
             const pair< double, double > & minMax = ranges[i];
             isIn = ( minMax.first < coord && coord < minMax.second );
           }
@@ -997,7 +997,7 @@ MESH* Extractor::transfixFaces( const double*       coords,
   double* coord = & resCoords[0];
   const size_t cooSize = size_t( sizeof(double)*dim );
 
-  for ( int i = 0; i < chains.size(); ++i ) {
+  for ( unsigned i = 0; i < chains.size(); ++i ) {
     TIntersection* section = chains[i];
     while ( section ) {
       memcpy( coord, section->_point, cooSize );
@@ -1019,19 +1019,99 @@ MESH* Extractor::transfixFaces( const double*       coords,
 
   meshing->setName(STRING("Cut of ") << inMesh->getName());
   meshing->setNumberOfTypes( 1, MED_CELL );
-  //meshing->setMeshDimension( dim );
   meshing->setCoordinates( dim, nbNodes, &resCoords[0],
                            inMesh->getCoordinatesSystem(), MED_FULL_INTERLACE );
   meshing->setTypes( &MED_SEG2, MED_CELL );
   meshing->setNumberOfElements( &nbSegments, MED_CELL);
-  meshing->setConnectivity( & resConn[0], MED_CELL, MED_SEG2);
-  meshing->setMeshDimension( dim );
+  meshing->setConnectivity( MED_CELL, MED_SEG2, & resConn[0]);
 
   return meshing;
 }
 
 } // namespace MEDMEM
 
+
+class MapGeoEdge : public map< medGeometryElement, vector<TEdge>* >
+{
+public:
+  MapGeoEdge();
+  ~MapGeoEdge();
+};
+
+MapGeoEdge::MapGeoEdge()
+{
+  std::vector<TEdge> *edges=(*this)[MED_TRIA3]=(*this)[MED_TRIA6]=new vector<TEdge>();
+  edges->reserve( 3 );
+  edges->push_back( TEdge( 0, 1 ));
+  edges->push_back( TEdge( 1, 2 ));
+  edges->push_back( TEdge( 2, 0 ));
+  edges=(*this)[MED_QUAD4]=(*this)[MED_QUAD8]=new vector<TEdge>();
+  edges->reserve( 4 );
+  edges->push_back( TEdge( 0, 1 ));
+  edges->push_back( TEdge( 1, 2 ));
+  edges->push_back( TEdge( 2, 3 ));
+  edges->push_back( TEdge( 3, 0 ));
+  edges=(*this)[MED_TETRA4]=(*this)[MED_TETRA10]=new vector<TEdge>();
+  edges->reserve( 6 );
+  edges->push_back( TEdge( 0, 1 ));
+  edges->push_back( TEdge( 1, 2 ));
+  edges->push_back( TEdge( 2, 0 ));
+  edges->push_back( TEdge( 0, 3 ));
+  edges->push_back( TEdge( 1, 3 ));
+  edges->push_back( TEdge( 2, 3 ));
+  edges=(*this)[MED_HEXA8]=(*this)[MED_HEXA20]=new vector<TEdge>();
+  edges->reserve( 12 );
+  edges->push_back( TEdge( 0, 1 ));
+  edges->push_back( TEdge( 1, 2 ));
+  edges->push_back( TEdge( 2, 3 ));
+  edges->push_back( TEdge( 3, 0 ));
+  edges->push_back( TEdge( 4, 5 ));
+  edges->push_back( TEdge( 5, 6 ));
+  edges->push_back( TEdge( 6, 7 ));
+  edges->push_back( TEdge( 7, 4 ));
+  edges->push_back( TEdge( 0, 4 ));
+  edges->push_back( TEdge( 1, 5 ));
+  edges->push_back( TEdge( 2, 6 ));
+  edges->push_back( TEdge( 3, 7 ));
+  edges=(*this)[MED_PYRA5]=(*this)[MED_PYRA13]=new vector<TEdge>();
+  edges->reserve( 8 );
+  edges->push_back( TEdge( 0, 1 ));
+  edges->push_back( TEdge( 1, 2 ));
+  edges->push_back( TEdge( 2, 3 ));
+  edges->push_back( TEdge( 3, 0 ));
+  edges->push_back( TEdge( 0, 4 ));
+  edges->push_back( TEdge( 1, 4 ));
+  edges->push_back( TEdge( 2, 4 ));
+  edges->push_back( TEdge( 3, 4 ));
+  edges=(*this)[MED_PENTA6]=(*this)[MED_PENTA15]=new vector<TEdge>();
+  edges->reserve( 9 );
+  edges->push_back( TEdge( 0, 1 ));
+  edges->push_back( TEdge( 1, 2 ));
+  edges->push_back( TEdge( 2, 0 ));
+  edges->push_back( TEdge( 3, 4 ));
+  edges->push_back( TEdge( 4, 5 ));
+  edges->push_back( TEdge( 5, 3 ));
+  edges->push_back( TEdge( 0, 4 ));
+  edges->push_back( TEdge( 1, 5 ));
+  edges->push_back( TEdge( 2, 3 ));
+  (*this)[MED_NONE]         = 0;
+  (*this)[MED_POINT1]       = 0;
+  (*this)[MED_SEG2]         = 0;
+  (*this)[MED_SEG3]         = 0;
+  (*this)[MED_POLYGON]      = 0;
+  (*this)[MED_POLYHEDRA]    = 0;
+  (*this)[MED_ALL_ELEMENTS] = 0;
+}
+
+MapGeoEdge::~MapGeoEdge()
+{
+  delete (*this)[MED_TRIA6];
+  delete (*this)[MED_QUAD8];
+  delete (*this)[MED_TETRA10];
+  delete (*this)[MED_HEXA20];
+  delete (*this)[MED_PYRA13];
+  delete (*this)[MED_PENTA15];
+}
 
 //================================================================================
 /*!
@@ -1041,70 +1121,7 @@ MESH* Extractor::transfixFaces( const double*       coords,
 
 TEdgeIterator::TEdgeIterator(const medGeometryElement type)
 {
-  static map< medGeometryElement, vector<TEdge>* > _edgesByType;
-  if ( _edgesByType.empty() ) {
-    _edges = _edgesByType[ MED_TRIA3 ] = _edgesByType[ MED_TRIA6 ] = new vector<TEdge>();
-    _edges->reserve( 3 );
-    _edges->push_back( TEdge( 0, 1 ));
-    _edges->push_back( TEdge( 1, 2 ));
-    _edges->push_back( TEdge( 2, 0 ));
-    _edges = _edgesByType[ MED_QUAD4 ] = _edgesByType[ MED_QUAD8 ] = new vector<TEdge>();
-    _edges->reserve( 4 );
-    _edges->push_back( TEdge( 0, 1 ));
-    _edges->push_back( TEdge( 1, 2 ));
-    _edges->push_back( TEdge( 2, 3 ));
-    _edges->push_back( TEdge( 3, 0 ));
-    _edges = _edgesByType[ MED_TETRA4 ] = _edgesByType[ MED_TETRA10 ] = new vector<TEdge>();
-    _edges->reserve( 6 );
-    _edges->push_back( TEdge( 0, 1 ));
-    _edges->push_back( TEdge( 1, 2 ));
-    _edges->push_back( TEdge( 2, 0 ));
-    _edges->push_back( TEdge( 0, 3 ));
-    _edges->push_back( TEdge( 1, 3 ));
-    _edges->push_back( TEdge( 2, 3 ));
-    _edges = _edgesByType[ MED_HEXA8 ] = _edgesByType[ MED_HEXA20 ] = new vector<TEdge>();
-    _edges->reserve( 12 );
-    _edges->push_back( TEdge( 0, 1 ));
-    _edges->push_back( TEdge( 1, 2 ));
-    _edges->push_back( TEdge( 2, 3 ));
-    _edges->push_back( TEdge( 3, 0 ));
-    _edges->push_back( TEdge( 4, 5 ));
-    _edges->push_back( TEdge( 5, 6 ));
-    _edges->push_back( TEdge( 6, 7 ));
-    _edges->push_back( TEdge( 7, 4 ));
-    _edges->push_back( TEdge( 0, 4 ));
-    _edges->push_back( TEdge( 1, 5 ));
-    _edges->push_back( TEdge( 2, 6 ));
-    _edges->push_back( TEdge( 3, 7 ));
-    _edges = _edgesByType[ MED_PYRA5 ] = _edgesByType[ MED_PYRA13 ] = new vector<TEdge>();
-    _edges->reserve( 8 );
-    _edges->push_back( TEdge( 0, 1 ));
-    _edges->push_back( TEdge( 1, 2 ));
-    _edges->push_back( TEdge( 2, 3 ));
-    _edges->push_back( TEdge( 3, 0 ));
-    _edges->push_back( TEdge( 0, 4 ));
-    _edges->push_back( TEdge( 1, 4 ));
-    _edges->push_back( TEdge( 2, 4 ));
-    _edges->push_back( TEdge( 3, 4 ));
-    _edges = _edgesByType[ MED_PENTA6 ] = _edgesByType[ MED_PENTA15 ] = new vector<TEdge>();
-    _edges->reserve( 9 );
-    _edges->push_back( TEdge( 0, 1 ));
-    _edges->push_back( TEdge( 1, 2 ));
-    _edges->push_back( TEdge( 2, 0 ));
-    _edges->push_back( TEdge( 3, 4 ));
-    _edges->push_back( TEdge( 4, 5 ));
-    _edges->push_back( TEdge( 5, 3 ));
-    _edges->push_back( TEdge( 0, 4 ));
-    _edges->push_back( TEdge( 1, 5 ));
-    _edges->push_back( TEdge( 2, 3 ));
-    _edgesByType[ MED_NONE ]         = 0;
-    _edgesByType[ MED_POINT1 ]       = 0;
-    _edgesByType[ MED_SEG2 ]         = 0;
-    _edgesByType[ MED_SEG3 ]         = 0;
-    _edgesByType[ MED_POLYGON ]      = 0;
-    _edgesByType[ MED_POLYHEDRA ]    = 0;
-    _edgesByType[ MED_ALL_ELEMENTS ] = 0;
-  }
+  static MapGeoEdge _edgesByType;
   _edges = _edgesByType[type];
 }
 

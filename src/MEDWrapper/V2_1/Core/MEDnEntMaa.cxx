@@ -26,7 +26,7 @@ namespace med_2_1{
 
 med_int
 MEDnEntMaa(med_idt fid, char *maa, med_table quoi, med_entite_maillage type_ent, 
-	   med_geometrie_element type_geo, med_connectivite type_conn)
+           med_geometrie_element type_geo, med_connectivite type_conn)
 {
   med_idt root, maaid, entid,geoid, dataset=0;
   med_err ret;
@@ -68,7 +68,7 @@ MEDnEntMaa(med_idt fid, char *maa, med_table quoi, med_entite_maillage type_ent,
   if ((type_ent==MED_MAILLE)||(type_ent==MED_FACE)||(type_ent==MED_ARETE))
     {
       if ((ret = _MEDnomGeometrie(nom_geo,type_geo)) < 0)
-	return -1;
+        return -1;
       geoid = _MEDdatagroupOuvrir(entid,nom_geo);
     }
   else

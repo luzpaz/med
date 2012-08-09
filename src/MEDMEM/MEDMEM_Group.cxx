@@ -1,32 +1,33 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 /*
  File Group.cxx
- $Header$
 */
 #include <list>
 
 #include "MEDMEM_Group.hxx"
 #include "MEDMEM_Family.hxx"
+#include "MEDMEM_Mesh.hxx"
 
 using namespace std;
 using namespace MEDMEM;
@@ -48,13 +49,13 @@ GROUP & GROUP::operator=(const GROUP &group)
   if ( &group == this ) return *this;
   SUPPORT::operator=(group);
   _numberOfFamilies = group._numberOfFamilies ;
-  _family      	    = group._family ;
+  _family           = group._family ;
   return *this;
 }
 
 ostream & MEDMEM::operator<<(ostream &os, GROUP &myGroup)
 {
-  os << (SUPPORT) myGroup;
+  os << (SUPPORT&) myGroup;
 
   int numberoffamilies = myGroup.getNumberOfFamilies();
   os << "  - Families ("<<numberoffamilies<<") :"<<endl;
@@ -79,6 +80,8 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   // first FAMILY to set all !
   FAMILY * myFamily = families.front() ;
   _mesh =  myFamily->getMesh() ;
+  if(_mesh)
+    _mesh->addReference();
   _entity = myFamily->getEntity() ;
   bool isOnAllElts = myFamily->isOnAllElements() ;
 
@@ -104,18 +107,15 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   _numberOfElements.set(_numberOfGeometricType) ;
 
   const medGeometryElement * geometricType = myFamily->getTypes() ;
-  //int * geometricTypeNumber = myFamily->getGeometricTypeNumber() ;
 
   SCRUTE_MED(_numberOfGeometricType);
 
   for (int i=0 ; i<_numberOfGeometricType; i++) {
     _geometricType[i]= geometricType[i] ;
-    // _geometricTypeNumber[i] = geometricTypeNumber[i] ;
     _numberOfElements[i]=myFamily->getNumberOfElements(geometricType[i]);
     MESSAGE_MED(LOC << " Type : " << _geometricType[i] << " number of element(s) " << _numberOfElements[i]);
   }
   _isOnAllElts = false ;
-  //_totalNumberOfEntities = myFamily->getNumberOfElements(MED_ALL_ELEMENTS) ;
 
 
   MEDSKYLINEARRAY * famNumber = myFamily->getnumber();
@@ -133,23 +133,13 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
   SCRUTE_MED(famNumberValue);
   SCRUTE_MED(famNumberIndex);
 
-//   _number = new MEDSKYLINEARRAY(*famNumber) ;
   _number = new MEDSKYLINEARRAY(famNumberCount,famNumberLength,
-				famNumberIndex,famNumberValue) ;
-
-  SCRUTE_MED(_number);
+                                famNumberIndex,famNumberValue) ;
 
   _numberOfFamilies = families.size();
 
-  SCRUTE_MED(numberOfFamilies);
-
-  //SCRUTE_MED(_numberOfFamilies);
-
   _family.resize(_numberOfFamilies) ;
   list<FAMILY*>::const_iterator li ;
-
-  // MESSAGE_MED(LOC<<"Printing of the object GROUP built right before the blending"<< (SUPPORT) *this);
-
 
   int it = 0 ;
   for (li=families.begin();li!=families.end();li++) {
@@ -157,8 +147,6 @@ GROUP::GROUP(const string & name, const list<FAMILY*> & families) throw (MEDEXCE
     _family[it] = (*li) ;
     it++ ;
   }
-
-  //MESSAGE_MED(LOC<<"Printing of the object GROUP built "<< (GROUP)*this);
 
   END_OF_MED(LOC);
 }
@@ -168,56 +156,4 @@ GROUP::GROUP(const GROUP & m):SUPPORT(m)
   _numberOfFamilies = m._numberOfFamilies;
   _family = m._family; //Copie profonde dans FAMILY Rmq from EF
 }
-
-// void GROUP::init(const list<FAMILY*> & families)
-// {
-  
-//   BEGIN_OF_MED(LOC);
-  
-//   FAMILY * myFamily = families.front() ;
-//   _mesh =  myFamily->getMesh() ;
-
-//   _isOnAllElts = myFamily->isOnAllElements() ;
-
-//   SCRUTE_MED(_mesh);
-
-//   SCRUTE_MED(_isOnAllElts);
-
-//   _entity = myFamily->getEntity() ;
-
-//   SCRUTE_MED(_mesh->getNumberOfTypes(_entity));
-
-//   _numberOfGeometricType = myFamily->getNumberOfTypes() ;
-//   _geometricType = new medGeometryElement[_numberOfGeometricType];
-//   //_geometricTypeNumber = new int[_numberOfGeometricType] ;
-//   _numberOfGaussPoints = new int[_numberOfGeometricType] ;
-//   _numberOfElements = new int[_numberOfGeometricType] ;
-//   medGeometryElement * geometricType = myFamily->getTypes() ;
-//   //int * geometricTypeNumber = myFamily->getGeometricTypeNumber() ;
-//   int * numberOfGaussPoints = myFamily->getNumberOfGaussPoints() ;
-//   for (int i=0 ; i<_numberOfGeometricType; i++) {
-//     _geometricType[i]= geometricType[i] ;
-//     // _geometricTypeNumber[i] = geometricTypeNumber[i] ;
-//     _numberOfGaussPoints[i] = numberOfGaussPoints[i] ;
-//     _numberOfElements[i]=myFamily->getNumberOfElements(geometricType[i]);
-//   }
-//   _isOnAllElts = false ;
-//   _totalNumberOfEntities = myFamily->getNumberOfElements(MED_ALL_ELEMENTS) ;
-//   _number = new MEDSKYLINEARRAY(*myFamily->getnumber()) ;
-  
-//   _numberOfFamilies = families.size();
-//   _family.resize(_numberOfFamilies) ;
-//   list<FAMILY*>::const_iterator liIni = families.begin() ;
-//   _family[0]=(*liIni);
-//   liIni++;
-//   list<FAMILY*>::const_iterator li ;
-//   int it = 1 ;
-//   for (li=liIni;li!=families.end();li++) {
-//     blending(*li);
-//     _family[it] = (*li) ;
-//     it++ ;
-//   }
-  
-//   END_OF_MED();
-// };
 

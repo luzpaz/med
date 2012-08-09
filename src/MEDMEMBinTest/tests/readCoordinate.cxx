@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 //  File   : readCoordinate.cxx
 //  Module : MED
 //
@@ -33,7 +31,7 @@ using namespace MEDMEM;
 
 #define MED_TAILLE_PNOM  16
 
-void usage(char * name)
+static void usage(char * name)
 {
   cout << "    " << name <<" <file name>"<< " <mesh name> " << " <interlace mode>" << endl;
   cout << "    " << "displays all Nodes Coordinates in mdump mode" << endl;
@@ -56,12 +54,12 @@ int main (int argc, char ** argv) {
   if (argc==4)
   {
         string comp=argv[3];
-  	if ( comp == "MED_NO_INTERLACE" ) Mode = MED_EN::MED_NO_INTERLACE;
-	else if ( comp != "MED_FULL_INTERLACE") usage(argv[0]);
+        if ( comp == "MED_NO_INTERLACE" ) Mode = MED_EN::MED_NO_INTERLACE;
+        else if ( comp != "MED_FULL_INTERLACE") usage(argv[0]);
   }
 
 
-  MESH * myMesh= new MESH() ;
+  MESH * myMesh= new MESH;
   myMesh->setName(meshName);
   MED_MESH_RDONLY_DRIVER myMeshDriver(fileName,myMesh);
   try
@@ -88,7 +86,6 @@ int main (int argc, char ** argv) {
   MESSAGE_MED("Read done");
   
   int SpaceDimension = myMesh->getSpaceDimension() ;
-  int MeshDimension  = myMesh->getMeshDimension() ;
   int NumberOfNodes  = myMesh->getNumberOfNodes() ;
 
   cout << "(************************)"<<endl;
@@ -104,9 +101,9 @@ int main (int argc, char ** argv) {
   const string * CoordinatesNames = myMesh->getCoordinatesNames() ;
   for (int i=0; i < SpaceDimension ; i++) 
   {
-	string bonnelongueur=chainevide;
-	bonnelongueur.replace(1,CoordinatesNames[i].size(),CoordinatesNames[i]);
-  	cout << bonnelongueur;
+        string bonnelongueur=chainevide;
+        bonnelongueur.replace(1,CoordinatesNames[i].size(),CoordinatesNames[i]);
+        cout << bonnelongueur;
   }
   cout <<endl;
 
@@ -114,9 +111,9 @@ int main (int argc, char ** argv) {
   const string * CoordinatesUnits = myMesh->getCoordinatesUnits() ;
   for ( int i=0; i < SpaceDimension ; i++) 
   {
-	string bonnelongueur=chainevide;
-	bonnelongueur.replace(1,CoordinatesUnits[i].size(),CoordinatesUnits[i]);
-  	cout << bonnelongueur;
+        string bonnelongueur=chainevide;
+        bonnelongueur.replace(1,CoordinatesUnits[i].size(),CoordinatesUnits[i]);
+        cout << bonnelongueur;
   }
   cout <<endl;
 
@@ -124,10 +121,10 @@ int main (int argc, char ** argv) {
   cout << "- Coordonnees des noeuds : " << endl;
   for (int i=0; i < SpaceDimension*NumberOfNodes; i++)
   {
-	fprintf(stdout," %f ",Coordinates[i]);
+        fprintf(stdout," %f ",Coordinates[i]);
   }
   cout <<endl;
 
-  delete myMesh;
+  myMesh->removeReference();
 
 }

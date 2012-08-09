@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #include "MEDMEMTest.hxx"
 #include <cppunit/Message.h>
 #include <cppunit/TestAssert.h>
@@ -91,17 +89,17 @@ void MEDMEMTest::testnArray()
   ////////////////////////////////////////
   const double * myArray1Ptr = 0;
   const double array1Ref[]  = { 11 , 12 , 21 , 22 , 31 , 32 , 41 , 42 , 51 , 52 ,
-			       61 , 62 , 71 , 72 , 81 , 82 , 91 , 92 , 101 , 102 ,
-			       111 , 112 , 121 , 122 , 131 , 132 , 141 , 142 ,
-			       151 , 152 , 161 , 162 , 171 , 172 , 181 , 182 ,
-			       191 , 192 , 201 , 202 };
+                               61 , 62 , 71 , 72 , 81 , 82 , 91 , 92 , 101 , 102 ,
+                               111 , 112 , 121 , 122 , 131 , 132 , 141 , 142 ,
+                               151 , 152 , 161 , 162 , 171 , 172 , 181 , 182 ,
+                               191 , 192 , 201 , 202 };
 
   const double array2Ref[] = { 11 , 21 , 31 , 41 , 51 , 61 , 71 , 81 , 91 , 101
-			       , 111 , 121 , 131 , 141 , 151 , 161 , 171 , 181
-			       , 191 , 201 ,
-			       12 , 22 , 32 , 42 , 52 , 62 , 72 , 82 , 92 , 102
-			       , 112 , 122 , 132 , 142 , 152 , 162 , 172 , 182
-			       , 192 , 202 };
+                               , 111 , 121 , 131 , 141 , 151 , 161 , 171 , 181
+                               , 191 , 201 ,
+                               12 , 22 , 32 , 42 , 52 , 62 , 72 , 82 , 92 , 102
+                               , 112 , 122 , 132 , 142 , 152 , 162 , 172 , 182
+                               , 192 , 202 };
 
   //test MEDMEM_Array(int dim, int nbelem)
   MEDMEM_Array<double>  myArray1(mdim,nbelem1);
@@ -134,7 +132,7 @@ void MEDMEMTest::testnArray()
       CPPUNIT_ASSERT( myArray1Ptr[i] == array1Ref[i] );
 
     //test setPtr
-    double myPtr[] = {-1, -2, -3, -4, -5, -6, -7, -8, -9, 0};
+    double myPtr[10] = {-1, -2, -3, -4, -5, -6, -7, -8, -9, 0};
     CPPUNIT_ASSERT_NO_THROW(myArray1valsh.setPtr(myPtr));
     //size the array stays the same, only first 10 element are being overwritten
     myArray1Ptr = myArray1valsh.getPtr();
@@ -212,7 +210,7 @@ void MEDMEMTest::testnArray()
       CPPUNIT_ASSERT(  myArray1Ptr[elemno]     ==  array2Ref[elemno] );
       elemno++;
     }
-
+  delete myArray1cin;
   /////////////////////////////////////
   // TEST 2   NoInterlace et NoGauss //
   /////////////////////////////////////
@@ -223,7 +221,7 @@ void MEDMEMTest::testnArray()
 
     for (int i =1; i <= nbelem1; i++) {
       for (int j =1; j <= mdim; j++) {
-	//test setIJ(int i, int j, const ElementType & value)
+        //test setIJ(int i, int j, const ElementType & value)
         CPPUNIT_ASSERT_NO_THROW(myArray2.setIJ(i,j,i*10+j));
       }
     }
@@ -272,6 +270,7 @@ void MEDMEMTest::testnArray()
         elemno++;
       }
     }
+    delete myArray2cin;
   }
 
   ///////////////////////////////////////
@@ -284,24 +283,24 @@ void MEDMEMTest::testnArray()
 
   const double * myArray3Ptr = 0;
   const double array3Ref[] = {1.11 , 1.12 , 1.21 , 1.22 ,
-			      2.11 , 2.12 , 2.21 , 2.22 ,
-			      13.11 , 13.12 , 13.21 , 13.22 , 13.31 , 13.32 ,
-			      14.11 , 14.12 , 14.21 , 14.22 , 14.31 , 14.32 ,
-			      15.11 , 15.12 , 15.21 , 15.22 , 15.31 , 15.32 };
+                              2.11 , 2.12 , 2.21 , 2.22 ,
+                              13.11 , 13.12 , 13.21 , 13.22 , 13.31 , 13.32 ,
+                              14.11 , 14.12 , 14.21 , 14.22 , 14.31 , 14.32 ,
+                              15.11 , 15.12 , 15.21 , 15.22 , 15.31 , 15.32 };
 
   const double array4Ref[] = { 1.11 , 1.21 , 2.11 , 2.21,
-			       13.11 , 13.21 , 13.31 , 14.11 , 14.21 , 14.31 ,
-			       15.11 , 15.21 , 15.31 ,
-			       1.12 , 1.22 , 2.12 , 2.22 ,
-			       13.12 , 13.22 , 13.32 , 14.12 , 14.22 , 14.32 ,
-			       15.12 , 15.22 , 15.32 };
+                               13.11 , 13.21 , 13.31 , 14.11 , 14.21 , 14.31 ,
+                               15.11 , 15.21 , 15.31 ,
+                               1.12 , 1.22 , 2.12 , 2.22 ,
+                               13.12 , 13.22 , 13.32 , 14.12 , 14.22 , 14.32 ,
+                               15.12 , 15.22 , 15.32 };
 
   const int array5Ref[] =    { 1 , 1 , 2 , 2,
-			       13 , 13 , 13 , 14 , 14 , 14 ,
-			       15 , 15 , 15 ,
-			       1 , 1 , 2 , 2 ,
-			       13 , 13 , 13 , 14 , 14 , 14 ,
-			       15 , 15 , 15 };
+                               13 , 13 , 13 , 14 , 14 , 14 ,
+                               15 , 15 , 15 ,
+                               1 , 1 , 2 , 2 ,
+                               13 , 13 , 13 , 14 , 14 , 14 ,
+                               15 , 15 , 15 };
 
   //test MEDMEM_Array(int dim, int nbelem, int nbtypegeo, const int * const  nbelgeoc, const int * const nbgaussgeo)
   MEDMEM_Array<double,FullInterlaceGaussPolicy> myArray3(mdim,nbelem2,nbtypegeo,nbelgeoc,nbgaussgeo);
@@ -310,19 +309,19 @@ void MEDMEMTest::testnArray()
    for (int ntyp=1; ntyp <= nbtypegeo; ntyp++ ) {
     for (int  i=0; i < (nbelgeoc[ntyp]-nbelgeoc[ntyp-1]) ; i++ ) {
       for (int k=1; k <= nbgaussgeo[ntyp]; k++)
-	for (int j=1; j <= mdim; j++) {
-	  try{
-	    //test setIJK(int i, int j, int k, const ElementType & value)
-	    myArray3.setIJK(elemno,j,k,elemno+(ntyp-1)*10+0.1*k+0.01*j);
-	  }
-	  catch (MEDMEM::MEDEXCEPTION &m) {
-	    CPPUNIT_FAIL(m.what());
-	  }
-	  catch (...)
-	  {
-	    CPPUNIT_FAIL("Unknown exception");
-	  }
-	}
+        for (int j=1; j <= mdim; j++) {
+          try{
+            //test setIJK(int i, int j, int k, const ElementType & value)
+            myArray3.setIJK(elemno,j,k,elemno+(ntyp-1)*10+0.1*k+0.01*j);
+          }
+          catch (MEDMEM::MEDEXCEPTION &m) {
+            CPPUNIT_FAIL(m.what());
+          }
+          catch (...)
+          {
+            CPPUNIT_FAIL("Unknown exception");
+          }
+        }
       elemno++;
     }
   }
@@ -338,9 +337,9 @@ void MEDMEMTest::testnArray()
   for (int  i=1; i < nbelgeoc[nbtypegeo] ; i++ )
     for (int k=1; k <= myArray3bis.getNbGauss(i); k++)
       for (int j=1; j <= mdim; j++) {
-	  CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray3bis.getIJK(i,j,k), array3Ref[elemno], EPS );
-	  CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray3Ptr[elemno], array3Ref[elemno], EPS );
-	elemno++;
+          CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray3bis.getIJK(i,j,k), array3Ref[elemno], EPS );
+          CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray3Ptr[elemno], array3Ref[elemno], EPS );
+        elemno++;
       }
 
   //test MEDMEM_Array()
@@ -353,13 +352,13 @@ void MEDMEMTest::testnArray()
   for (int  i=1; i < nbelgeoc[nbtypegeo] ; i++ )
     for (int k=1; k <= myArray3ter.getNbGauss(i); k++)
       for (int j=1; j <= mdim; j++) {
-	 CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray3ter.getIJK(i,j,k), array3Ref[elemno], EPS );
-	 CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray3Ptr[elemno], array3Ref[elemno], EPS );
-	elemno++;
+         CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray3ter.getIJK(i,j,k), array3Ref[elemno], EPS );
+         CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray3Ptr[elemno], array3Ref[elemno], EPS );
+        elemno++;
       }
 
   MEDMEM_Array<double,FullInterlaceGaussPolicy> myArray3qua(mdim,nbelem2,
-							    nbtypegeo,nbelgeoc,nbgaussgeo);
+                                                            nbtypegeo,nbelgeoc,nbgaussgeo);
   myArray3Ptr = myArray3qua.getPtr();
 
   int cumul = 0;
@@ -377,10 +376,7 @@ void MEDMEMTest::testnArray()
     }
   };
 
-  int nnn = myArray3qua.getArraySize();
   for (int i =0; i < myArray3qua.getArraySize(); i++) {
-    double aa = myArray3Ptr[i];
-    double bb = array3Ref[i];
     CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray3Ptr[i], array3Ref[i], EPS );
   }
 
@@ -390,11 +386,11 @@ void MEDMEMTest::testnArray()
   for (int j=1; j <= mdim; j++)
     for (int  i=1; i < nbelgeoc[nbtypegeo] ; i++ )
       for (int k=1; k <= myArray3cin->getNbGauss(i); k++) {
-	CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray3cin->getIJK(i,j,k), array4Ref[elemno], EPS );
-	CPPUNIT_ASSERT_DOUBLES_EQUAL(myArray3Ptr[elemno], array4Ref[elemno], EPS );
-	elemno++;
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray3cin->getIJK(i,j,k), array4Ref[elemno], EPS );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(myArray3Ptr[elemno], array4Ref[elemno], EPS );
+        elemno++;
       }
-
+  delete myArray3cin;
   ////////////////////////////////////
   // TEST 4   NoInterlace et Gauss  //
   ////////////////////////////////////
@@ -406,19 +402,19 @@ void MEDMEMTest::testnArray()
    for (int ntyp=1; ntyp <= nbtypegeo; ntyp++ ) {
     for (int  i=0; i < (nbelgeoc[ntyp]-nbelgeoc[ntyp-1]) ; i++ ) {
       for (int k=1; k <= nbgaussgeo[ntyp]; k++)
-	for (int j=1; j <= mdim; j++) {
-	  try{
-	    //test setIJK(int i, int j, int k, const ElementType & value)
-	    myArray4.setIJK(elemno,j,k,elemno+(ntyp-1)*10+0.1*k+0.01*j);
-	  }
-	  catch (MEDMEM::MEDEXCEPTION &m) {
-	    CPPUNIT_FAIL(m.what());
-	  }
-	  catch (...)
-	  {
-	    CPPUNIT_FAIL("Unknown exception");
-	  }
-	}
+        for (int j=1; j <= mdim; j++) {
+          try{
+            //test setIJK(int i, int j, int k, const ElementType & value)
+            myArray4.setIJK(elemno,j,k,elemno+(ntyp-1)*10+0.1*k+0.01*j);
+          }
+          catch (MEDMEM::MEDEXCEPTION &m) {
+            CPPUNIT_FAIL(m.what());
+          }
+          catch (...)
+          {
+            CPPUNIT_FAIL("Unknown exception");
+          }
+        }
       elemno++;
     }
   }
@@ -437,9 +433,9 @@ void MEDMEMTest::testnArray()
   for (int j=1; j <= mdim; j++)
     for (int  i=1; i < nbelgeoc[nbtypegeo] ; i++ )
       for (int k=1; k <= myArray4bis.getNbGauss(i); k++) {
-	CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray4bis.getIJK(i,j,k), array4Ref[elemno], EPS );
-	CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray4Ptr[elemno], array4Ref[elemno], EPS );
-	elemno++;
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray4bis.getIJK(i,j,k), array4Ref[elemno], EPS );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray4Ptr[elemno], array4Ref[elemno], EPS );
+        elemno++;
       }
 
   //test MEDMEM_Array()
@@ -452,9 +448,9 @@ void MEDMEMTest::testnArray()
   for (int j=1; j <= mdim; j++)
     for (int  i=1; i < nbelgeoc[nbtypegeo] ; i++ )
       for (int k=1; k <= myArray4ter.getNbGauss(i); k++) {
-	CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray4ter.getIJK(i,j,k), array4Ref[elemno], EPS );
-	CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray4Ptr[elemno], array4Ref[elemno], EPS );
-	elemno++;
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray4ter.getIJK(i,j,k), array4Ref[elemno], EPS );
+        CPPUNIT_ASSERT_DOUBLES_EQUAL( myArray4Ptr[elemno], array4Ref[elemno], EPS );
+        elemno++;
       }
 
   {
@@ -516,9 +512,9 @@ void MEDMEMTest::testnArray()
   for (int j=1; j <= mdim; j++)
     for (int  i=1; i < nbelgeoc[nbtypegeo] ; i++ )
       for (int k=1; k <= myArray5bis.getNbGauss(i); k++) {
-	CPPUNIT_ASSERT_EQUAL( myArray5bis.getIJK(i,j,k), array5Ref[elemno] );
-	CPPUNIT_ASSERT_EQUAL( myArray5Ptr[elemno], array5Ref[elemno] );
-	elemno++;
+        CPPUNIT_ASSERT_EQUAL( myArray5bis.getIJK(i,j,k), array5Ref[elemno] );
+        CPPUNIT_ASSERT_EQUAL( myArray5Ptr[elemno], array5Ref[elemno] );
+        elemno++;
       }
 
   //MEDMEM_Array()

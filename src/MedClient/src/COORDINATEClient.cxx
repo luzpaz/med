@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "COORDINATEClient.hxx"
 #include <string>
 #include "UtilClient.hxx"
@@ -36,17 +37,12 @@ using namespace MED_EN;
 //=============================================================================
 
 COORDINATEClient::COORDINATEClient(const SALOME_MED::MESH_ptr m,
-				   medModeSwitch Mode) :
+                                   medModeSwitch Mode) :
   COORDINATE(m->getSpaceDimension(), 1, Mode),
   _complete(false),
   IOR_Mesh(SALOME_MED::MESH::_duplicate(m))
 {
-  const char* LOC = "COORDINATEClient::COORDINATEClient(...)";
-  BEGIN_OF(LOC);
-
   blankCopy();
-
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -55,12 +51,9 @@ COORDINATEClient::COORDINATEClient(const SALOME_MED::MESH_ptr m,
 //=============================================================================
 void COORDINATEClient::blankCopy()
 {
-  const char* LOC = "void COORDINATEClient::blankCopy()";
-  BEGIN_OF(LOC);
-
   std::string *tA;
   long nA;
-  SALOME_MED::MESH::coordinateInfos_var all;
+  SALOME_MED::GMESH::coordinateInfos_var all;
   try
   {
         all = IOR_Mesh->getCoordGlobal();
@@ -87,8 +80,6 @@ void COORDINATEClient::blankCopy()
   setCoordinatesSystem( all->coordSystem.in());
 
   _complete = false;
-
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -98,9 +89,6 @@ void COORDINATEClient::blankCopy()
 
 void COORDINATEClient::fillCopy()
 {
-  const char* LOC = "void COORDINATEClient::fillCopy()";
-  BEGIN_OF(LOC);
-
   //PN ?? Est-ce qu on peut pas mettre une variable dans COORDINATEClient
   // qu on remplirait dans blankCopy ??
   long nN = IOR_Mesh->getNumberOfNodes();
@@ -116,8 +104,6 @@ void COORDINATEClient::fillCopy()
   setCoordinates(&mC,true);
 
   _complete = true;
-
-  END_OF(LOC);
 }
 
 //=============================================================================
@@ -128,13 +114,8 @@ void COORDINATEClient::fillCopy()
 
 const double *  COORDINATEClient::getCoordinates(medModeSwitch Mode)
 {
-  const char* LOC = "void COORDINATEClient::getCoordinates()";
-  BEGIN_OF(LOC);
-
   if (!_complete) fillCopy();
   const double * c = COORDINATE::getCoordinates(Mode);
-
-  END_OF(LOC);
 
   return c;
 }
@@ -146,13 +127,8 @@ const double *  COORDINATEClient::getCoordinates(medModeSwitch Mode)
 
 double COORDINATEClient::getCoordinate(int Number,int Axis)
 {
-  const char* LOC = "void COORDINATEClient::getCoordinate()";
-  BEGIN_OF(LOC);
-
   if (!_complete) fillCopy();
   double d = COORDINATE::getCoordinate(Number, Axis);
-
-  END_OF(LOC);
 
   return d;
 }
@@ -163,13 +139,8 @@ double COORDINATEClient::getCoordinate(int Number,int Axis)
 //=============================================================================
 const double *  COORDINATEClient::getCoordinateAxis(int Axis)
 {
-  const char* LOC = "void COORDINATEClient::getCoordinateAxis()";
-  BEGIN_OF(LOC);
-
   if (!_complete) fillCopy();
   const double *c = COORDINATE::getCoordinateAxis(Axis);
-
-  END_OF(LOC);
 
   return c;
 }
@@ -180,13 +151,9 @@ const double *  COORDINATEClient::getCoordinateAxis(int Axis)
 //=============================================================================
 const int*      COORDINATEClient::getNodesNumbers() const
 {
-  const char* LOC = "void COORDINATEClient::getNodesNumbers()";
-  BEGIN_OF(LOC);
-
   if (!_complete) (const_cast < COORDINATEClient * >(this))->fillCopy();
 
   MESSAGE("NON IMPLEMENTE DANS L'API CORBA");
-  END_OF(LOC);
 
   return NULL;
 }

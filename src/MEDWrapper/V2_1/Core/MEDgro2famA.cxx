@@ -73,9 +73,9 @@ namespace med_2_1{
 
 med_err 
 MEDgro2famA (med_int nnoe,med_int nele,med_int *numnoe,med_int *numele,
-	     med_int ngn,med_int nge,med_int nindn, 
-	     med_int ninde,int *indgronoe,int *indgroele,med_int *tabgronoe, 
-	     med_int *tabgroele,med_int *nfamg,med_int *nindf)
+             med_int ngn,med_int nge,med_int nindn, 
+             med_int ninde,int *indgronoe,int *indgroele,med_int *tabgronoe, 
+             med_int *tabgroele,med_int *nfamg,med_int *nindf)
 {
   int i,j,k;
   int *famnoe,*famele,*tmp;
@@ -97,180 +97,180 @@ MEDgro2famA (med_int nnoe,med_int nele,med_int *numnoe,med_int *numele,
   if ((ngn > 0) || (nge > 0))
     {
       /* pour chaque noeud :
-	 1 - on dresse la liste des groupes de noeuds auquel il appartient
-	 2 - en la comparant avec les listes pre-existantes, on
+         1 - on dresse la liste des groupes de noeuds auquel il appartient
+         2 - en la comparant avec les listes pre-existantes, on
          estime s'il est necessaire de creer une nouvelle famille de noeuds.
-	 Si oui => on incremente le compteur local nfamn (nombre de familles
+         Si oui => on incremente le compteur local nfamn (nombre de familles
                    de noeuds)
                    on incremente le parametre nindf du nombre de groupes
                    que devra compter cette famille de noeuds
-	 Si non => on ne fait rien */
+         Si non => on ne fait rien */
       for (i=0;i<nnoe;i++)
-	{
-	  if ((tmp = (int*) malloc(sizeof(int)*ngn)) == NULL)
-	    return -1;
-	  num = *(numnoe+i);
-	  for (j=0;j<ngn;j++)
-	    {
-	      flag = 0;
-	      /* on regarde si le noeud appartient au groupe */
-	      for (k=0;k<*(indgronoe+j+1)-*(indgronoe+j);k++)
-		if (num == *(tabgronoe+*(indgronoe+j)+k))
-		  flag = 1;
-	      /* on met le flag a jour dans tmp */
-	      *(tmp+j) = flag;
-	    }
-	  /* on note la creation de la famille 0 */
-	  if (fam01 == 0)
-	    {
-	      flag = 1;
-	      for (j=0;j<ngn;j++)
-		if (*(tmp+j) == 1)
-		  flag = 0;
-	      if (flag == 1)
-		fam01 = 1;
-	    }
-	  /* faut-il creer une nouvelle famille ? */
-	  if (famnoe == NULL)
-	    {
-	      exist = 0;
-	      if ((famnoe = (int *) malloc (sizeof(int)*ngn)) == NULL)
-		return -1;
-	      for (j=0;j<ngn;j++)
-		{
-		  *(famnoe+j) = *(tmp+j);
-		  if (*(famnoe+j) == 1)
-		    *nindf = *nindf + 1;
-		}
-	      nfamn = 1;
-	    }
-	  else
-	    {
-	      for (j=0;j<nfamn;j++)
-		{
-		  p = famnoe + ngn*j;
-		  for (k=0;k<ngn;k++)
-		    {
-		      if (*(p+k) != *(tmp+k))
-			{
-			  exist = 0;
-			  break;
-			}
-		      else
-			exist = 1;
-		    }
-		  if (exist == 1)
-		    break;
-		}
-	      if (exist == 0)
-		{
-		  nfamn = nfamn + 1;
-		  p = famnoe;
-		  if ((famnoe = (int*) malloc(sizeof(int)*ngn*nfamn)) == NULL)
-		    return -1;
-		  for (j=0;j<nfamn-1;j++)
-		    for (k=0;k<ngn;k++)
-		      *(famnoe+j*ngn+k) = *(p+j*ngn+k);
-		  free(p);
-		  p = famnoe+(nfamn-1)*ngn;
-		  for (j=0;j<ngn;j++)
-		    {
-		      *(p+j) = *(tmp+j);
-		      if (*(p+j) == 1)
-			*nindf = *nindf + 1;
-		    }
-		}
-	    }
-	  free(tmp);
-	}
+        {
+          if ((tmp = (int*) malloc(sizeof(int)*ngn)) == NULL)
+            return -1;
+          num = *(numnoe+i);
+          for (j=0;j<ngn;j++)
+            {
+              flag = 0;
+              /* on regarde si le noeud appartient au groupe */
+              for (k=0;k<*(indgronoe+j+1)-*(indgronoe+j);k++)
+                if (num == *(tabgronoe+*(indgronoe+j)+k))
+                  flag = 1;
+              /* on met le flag a jour dans tmp */
+              *(tmp+j) = flag;
+            }
+          /* on note la creation de la famille 0 */
+          if (fam01 == 0)
+            {
+              flag = 1;
+              for (j=0;j<ngn;j++)
+                if (*(tmp+j) == 1)
+                  flag = 0;
+              if (flag == 1)
+                fam01 = 1;
+            }
+          /* faut-il creer une nouvelle famille ? */
+          if (famnoe == NULL)
+            {
+              exist = 0;
+              if ((famnoe = (int *) malloc (sizeof(int)*ngn)) == NULL)
+                return -1;
+              for (j=0;j<ngn;j++)
+                {
+                  *(famnoe+j) = *(tmp+j);
+                  if (*(famnoe+j) == 1)
+                    *nindf = *nindf + 1;
+                }
+              nfamn = 1;
+            }
+          else
+            {
+              for (j=0;j<nfamn;j++)
+                {
+                  p = famnoe + ngn*j;
+                  for (k=0;k<ngn;k++)
+                    {
+                      if (*(p+k) != *(tmp+k))
+                        {
+                          exist = 0;
+                          break;
+                        }
+                      else
+                        exist = 1;
+                    }
+                  if (exist == 1)
+                    break;
+                }
+              if (exist == 0)
+                {
+                  nfamn = nfamn + 1;
+                  p = famnoe;
+                  if ((famnoe = (int*) malloc(sizeof(int)*ngn*nfamn)) == NULL)
+                    return -1;
+                  for (j=0;j<nfamn-1;j++)
+                    for (k=0;k<ngn;k++)
+                      *(famnoe+j*ngn+k) = *(p+j*ngn+k);
+                  free(p);
+                  p = famnoe+(nfamn-1)*ngn;
+                  for (j=0;j<ngn;j++)
+                    {
+                      *(p+j) = *(tmp+j);
+                      if (*(p+j) == 1)
+                        *nindf = *nindf + 1;
+                    }
+                }
+            }
+          free(tmp);
+        }
       
       /* pour chaque element : idem que pour les noeuds */
       for (i=0;i<nele;i++)
-	{
-	  if ((tmp = (int*) malloc(sizeof(int)*nge)) == NULL)
-	    return -1;
-	  num = *(numele+i);
-	  for (j=0;j<nge;j++)
-	    {
-	      flag = 0;
-	      /* on regarde si l'element appartient au groupe */
-	      for (k=0;k<*(indgroele+j+1)-*(indgroele+j);k++)
-		if (num == *(tabgroele+*(indgroele+j)+k))
-		  flag = 1;
-	      /* on met le flag a jour dans tmp */
-	      *(tmp+j) = flag;
-	    }
-	  /* on note la creation de la famille 0 */
-	  if (fam02 == 0)
-	    {
-	      flag = 1;
-	      for (j=0;j<nge;j++)
-		if (*(tmp+j) == 1)
-		  flag = 0;
-	      if (flag == 1)
-		fam02 = 1;
-	    }
-	  /* faut-il creer une nouvelle famille ? */
-	  if (famele == NULL)
-	    {
-	      exist = 0;
-	      if ((famele = (int *) malloc (sizeof(int)*nge)) == NULL)
-		return -1;
-	      for (j=0;j<nge;j++)
-		{
-		  *(famele+j) = *(tmp+j);
-		  if (*(famele+j) == 1)
-		    *nindf = *nindf + 1;
-		}
-	      nfame = 1;
-	    }
-	  else
-	    {
-	      for (j=0;j<nfame;j++)
-		{
-		  p = famele + nge*j;
-		  for (k=0;k<nge;k++)
-		    {
-		      if (*(p+k) != *(tmp+k))
-			{
-			  exist = 0;
-			  break;
-			}
-		      else
-			exist = 1;
-		    }
-		  if (exist == 1)
-		    break;
-		}
-	      if (exist == 0)
-		{
-		  nfame = nfame + 1;
-		  p = famele;
-		  if ((famele = (int*) malloc(sizeof(int)*nge*nfame)) == NULL)
-		    return -1;
-		  for (j=0;j<nfame-1;j++)
-		    for (k=0;k<nge;k++)
-		      *(famele+j*nge+k) = *(p+j*nge+k);
-		  free(p);
-		  p = famele+(nfame-1)*nge;
-		  for (j=0;j<nge;j++)
-		    {
-		      *(p+j) = *(tmp+j);
-		      if (*(p+j) == 1)
-			*nindf = *nindf + 1;
-		    }
-		}
-	    }
-	  free(tmp);
-	}
+        {
+          if ((tmp = (int*) malloc(sizeof(int)*nge)) == NULL)
+            return -1;
+          num = *(numele+i);
+          for (j=0;j<nge;j++)
+            {
+              flag = 0;
+              /* on regarde si l'element appartient au groupe */
+              for (k=0;k<*(indgroele+j+1)-*(indgroele+j);k++)
+                if (num == *(tabgroele+*(indgroele+j)+k))
+                  flag = 1;
+              /* on met le flag a jour dans tmp */
+              *(tmp+j) = flag;
+            }
+          /* on note la creation de la famille 0 */
+          if (fam02 == 0)
+            {
+              flag = 1;
+              for (j=0;j<nge;j++)
+                if (*(tmp+j) == 1)
+                  flag = 0;
+              if (flag == 1)
+                fam02 = 1;
+            }
+          /* faut-il creer une nouvelle famille ? */
+          if (famele == NULL)
+            {
+              exist = 0;
+              if ((famele = (int *) malloc (sizeof(int)*nge)) == NULL)
+                return -1;
+              for (j=0;j<nge;j++)
+                {
+                  *(famele+j) = *(tmp+j);
+                  if (*(famele+j) == 1)
+                    *nindf = *nindf + 1;
+                }
+              nfame = 1;
+            }
+          else
+            {
+              for (j=0;j<nfame;j++)
+                {
+                  p = famele + nge*j;
+                  for (k=0;k<nge;k++)
+                    {
+                      if (*(p+k) != *(tmp+k))
+                        {
+                          exist = 0;
+                          break;
+                        }
+                      else
+                        exist = 1;
+                    }
+                  if (exist == 1)
+                    break;
+                }
+              if (exist == 0)
+                {
+                  nfame = nfame + 1;
+                  p = famele;
+                  if ((famele = (int*) malloc(sizeof(int)*nge*nfame)) == NULL)
+                    return -1;
+                  for (j=0;j<nfame-1;j++)
+                    for (k=0;k<nge;k++)
+                      *(famele+j*nge+k) = *(p+j*nge+k);
+                  free(p);
+                  p = famele+(nfame-1)*nge;
+                  for (j=0;j<nge;j++)
+                    {
+                      *(p+j) = *(tmp+j);
+                      if (*(p+j) == 1)
+                        *nindf = *nindf + 1;
+                    }
+                }
+            }
+          free(tmp);
+        }
       
       /* la famille 0 existe pour les noeuds et les elements, on 
-	 ne la compte qu'une fois */
+         ne la compte qu'une fois */
       if (fam01 && fam02)
-	nfamn = nfamn - 1;
+        nfamn = nfamn - 1;
       
       /* le nombre de familles a creer est egal au nombre de familles
-	 de noeuds + nombre de familles d'elements */
+         de noeuds + nombre de familles d'elements */
       *nfamg = nfamn + nfame;
       
       

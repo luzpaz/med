@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
@@ -417,7 +415,7 @@ void MEDMEMTest::testArray()
   //#ifdef ENABLE_FAULTS
   //???skl CPPUNIT_ASSERT_DOUBLES_EQUAL(c7n3 * 2.0, shc.getIJ(3, 7), delta);
   //#endif
-	
+        
   //CPPUNIT_ASSERT_DOUBLES_EQUAL(c7n3 * 2.0, cpy.getIJ(3, 7), delta);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(c7n3, cpy.getIJ(3, 7), delta);
 
@@ -558,7 +556,7 @@ void MEDMEMTest::testArrayConvert()
       elemno++;
     }
   }
-
+  delete myArray1cin;
   // TEST n°2 : NoInterlaceNoGaussPolicy -> FullInterlaceNoGaussPolicy
 
   MEDMEM_Array<double, NoInterlaceNoGaussPolicy> myArray2 (mdim, nbelem1);
@@ -581,7 +579,7 @@ void MEDMEMTest::testArrayConvert()
       elemno++;
     }
   }
-
+  delete myArray2cin;
   // TEST n°3 : FullInterlaceGaussPolicy -> NoInterlaceGaussPolicy
 
   const int nbelem2 = 5;
@@ -619,7 +617,7 @@ void MEDMEMTest::testArrayConvert()
   }
   myArray3Ptr = myArray3.getPtr();
   for (int i = 0; i < myArray3.getArraySize(); i++)
-    CPPUNIT_ASSERT( abs(myArray3Ptr[i] - array3Ref[i]) < 10^-7);
+    CPPUNIT_ASSERT( abs(myArray3Ptr[i] - array3Ref[i]) < 1e-7);
 
   MEDMEM_Array<double, NoInterlaceGaussPolicy> * myArray3cin = ArrayConvert(myArray3);
   myArray3Ptr = myArray3cin->getPtr();
@@ -627,11 +625,11 @@ void MEDMEMTest::testArrayConvert()
   for (int j = 1; j <= mdim; j++)
     for (int i = 1; i < nbelgeoc[nbtypegeo]; i++)
       for (int k = 1; k <= myArray3cin->getNbGauss(i); k++) {
-        CPPUNIT_ASSERT( abs(myArray3cin->getIJK(i,j,k) - array4Ref[elemno]) < 10^-7);
-        CPPUNIT_ASSERT( abs(myArray3Ptr[elemno] - array4Ref[elemno]) < 10^-7);
+        CPPUNIT_ASSERT( abs(myArray3cin->getIJK(i,j,k) - array4Ref[elemno]) < 1e-7);
+        CPPUNIT_ASSERT( abs(myArray3Ptr[elemno] - array4Ref[elemno]) < 1e-7);
         elemno++;
       }
-
+  delete myArray3cin;
   // TEST n°4 : NoInterlaceGaussPolicy -> FullInterlaceGaussPolicy
 
   const double * myArray4Ptr = 0;
@@ -653,7 +651,7 @@ void MEDMEMTest::testArrayConvert()
   myArray4Ptr = myArray4.getPtr();
 
   for (int i = 0; i < myArray4.getArraySize(); i++)
-    CPPUNIT_ASSERT( abs(myArray4Ptr[i] - array4Ref[i]) < 10^-7);
+    CPPUNIT_ASSERT( abs(myArray4Ptr[i] - array4Ref[i]) < 1e-7);
 
   MEDMEM_Array<double, FullInterlaceGaussPolicy> * myArray4cin = ArrayConvert(myArray4);
   myArray4Ptr = myArray4cin->getPtr();
@@ -661,13 +659,13 @@ void MEDMEMTest::testArrayConvert()
   for (int i = 1; i < nbelgeoc[nbtypegeo]; i++)
     for (int k = 1; k <= myArray4cin->getNbGauss(i); k++)
       for (int j = 1; j <= mdim; j++) {
-        CPPUNIT_ASSERT( abs(myArray4cin->getIJK(i,j,k) - array3Ref[elemno]) < 10^-7);
-        CPPUNIT_ASSERT( abs(myArray4cin->getIJK(i,j,k) - myArray3.getIJK(i,j,k)) < 10^-7);
-        CPPUNIT_ASSERT( abs(myArray4Ptr[elemno] - array3Ref[elemno]) < 10^-7);
+        CPPUNIT_ASSERT( abs(myArray4cin->getIJK(i,j,k) - array3Ref[elemno]) < 1e-7);
+        CPPUNIT_ASSERT( abs(myArray4cin->getIJK(i,j,k) - myArray3.getIJK(i,j,k)) < 1e-7);
+        CPPUNIT_ASSERT( abs(myArray4Ptr[elemno] - array3Ref[elemno]) < 1e-7);
         elemno++;
       }
+  delete myArray4cin;
 }
-
 /*!
  *  Check methods (not in spec), defined in MEDMEM_ArrayInterface.hxx:
  */

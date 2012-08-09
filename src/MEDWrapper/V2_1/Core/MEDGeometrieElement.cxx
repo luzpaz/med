@@ -26,32 +26,32 @@ _MEDGeometrieElement(med_geometrie_element typ_geo[],med_entite_maillage typ_ent
 {
   int i;
   med_geometrie_element typ_mai[MED_NBR_GEOMETRIE_MAILLE] = {MED_POINT1,MED_SEG2, 
-							 MED_SEG3,MED_TRIA3,
-							 MED_TRIA6,MED_QUAD4,
-							 MED_QUAD8,MED_TETRA4,
-							 MED_TETRA10,MED_HEXA8,
-							 MED_HEXA20,MED_PENTA6,
-							 MED_PENTA15,MED_PYRA5,
-							 MED_PYRA13};
+                                                         MED_SEG3,MED_TRIA3,
+                                                         MED_TRIA6,MED_QUAD4,
+                                                         MED_QUAD8,MED_TETRA4,
+                                                         MED_TETRA10,MED_HEXA8,
+                                                         MED_HEXA20,MED_PENTA6,
+                                                         MED_PENTA15,MED_PYRA5,
+                                                         MED_PYRA13};
   med_geometrie_element typ_fac[MED_NBR_GEOMETRIE_FACE] = {MED_TRIA3,MED_TRIA6,
-						       MED_QUAD4,MED_QUAD8};
+                                                       MED_QUAD4,MED_QUAD8};
   med_geometrie_element typ_are[MED_NBR_GEOMETRIE_ARETE] = {MED_SEG2,MED_SEG3};  
 
   switch(typ_ent)
     {
     case MED_MAILLE :
       for (i=0;i<MED_NBR_GEOMETRIE_MAILLE;i++)
-	typ_geo[i] = typ_mai[i];
+        typ_geo[i] = typ_mai[i];
       break;
 
     case MED_FACE :
       for (i=0;i<MED_NBR_GEOMETRIE_FACE;i++)
-	typ_geo[i] = typ_fac[i];
+        typ_geo[i] = typ_fac[i];
       break;
       
     case MED_ARETE :
       for (i=0;i<MED_NBR_GEOMETRIE_ARETE;i++)
-	typ_geo[i] = typ_are[i];
+        typ_geo[i] = typ_are[i];
       break;
 
     default :

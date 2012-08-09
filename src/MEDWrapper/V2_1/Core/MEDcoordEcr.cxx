@@ -26,8 +26,8 @@ namespace med_2_1{
 
 med_err 
 MEDcoordEcr(med_idt fid, char *maa, med_int mdim, med_float *coo, 
-	    med_mode_switch mode_coo,med_int n,
-	    med_mode_acces mode, med_repere type_rep, char *nom, char *unit)
+            med_mode_switch mode_coo,med_int n,
+            med_mode_acces mode, med_repere type_rep, char *nom, char *unit)
 {
   med_idt maaid, noeid, dataset;
   med_err ret;
@@ -61,7 +61,7 @@ MEDcoordEcr(med_idt fid, char *maa, med_int mdim, med_float *coo,
    */
   dimd[0] = n*mdim;
   if ((ret = _MEDdatasetNumEcrire(noeid,MED_NOM_COO,MED_REEL64,mode_coo,mdim,MED_ALL,MED_NOPF,0,MED_NOPG,dimd,
-				  (unsigned char*) coo,mode)) < 0)
+                                  (unsigned char*) coo,mode)) < 0)
     return -1;
   
   /*

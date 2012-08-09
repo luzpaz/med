@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  File   : 
 //  Author : 
 //  Module : 
@@ -31,8 +32,8 @@
 static int MYDEBUG = 0;
 static int MYVALUEDEBUG = 0;
 #else
-static int MYDEBUG = 0;
-static int MYVALUEDEBUG = 0;
+// static int MYDEBUG = 0;
+// static int MYVALUEDEBUG = 0;
 #endif
 
 //#define _DEBUG_REF_COORDS_
@@ -53,9 +54,9 @@ namespace MED
   void
   TGaussCoord
   ::Init(TInt theNbElem,
-	 TInt theNbGauss,
-	 TInt theDim,
-	 EModeSwitch theMode)
+         TInt theNbGauss,
+         TInt theDim,
+         EModeSwitch theMode)
   {
     myModeSwitch = theMode;
 
@@ -106,15 +107,15 @@ namespace MED
     if(GetModeSwitch() == eFULL_INTERLACE){
       TInt anId = theElemId*myGaussStep;
       for(TInt anGaussId = 0; anGaussId < myNbGauss; anGaussId++){
-	aCoordSliceArr[anGaussId] =
-	  TCCoordSlice(myGaussCoord,std::slice(anId,myDim,1));
-	anId += myDim;
+        aCoordSliceArr[anGaussId] =
+          TCCoordSlice(myGaussCoord,std::slice(anId,myDim,1));
+        anId += myDim;
       }
     }
     else{
       for(TInt anGaussId = 0; anGaussId < myNbGauss; anGaussId++){
-	aCoordSliceArr[anGaussId] =
-	  TCCoordSlice(myGaussCoord,std::slice(theElemId,myDim,myGaussStep));
+        aCoordSliceArr[anGaussId] =
+          TCCoordSlice(myGaussCoord,std::slice(theElemId,myDim,myGaussStep));
       }
     }
     return aCoordSliceArr;
@@ -129,15 +130,15 @@ namespace MED
     if(GetModeSwitch() == eFULL_INTERLACE){
       TInt anId = theElemId*myGaussStep;
       for(TInt anGaussId = 0; anGaussId < myNbGauss; anGaussId++){
-	aCoordSliceArr[anGaussId] =
-	  TCoordSlice(myGaussCoord,std::slice(anId,myDim,1));
-	anId += myDim;
+        aCoordSliceArr[anGaussId] =
+          TCoordSlice(myGaussCoord,std::slice(anId,myDim,1));
+        anId += myDim;
       }
     }
     else{
       for(TInt anGaussId = 0; anGaussId < myNbGauss; anGaussId++){
-	aCoordSliceArr[anGaussId] =
-	  TCoordSlice(myGaussCoord,std::slice(theElemId,myDim,myGaussStep));
+        aCoordSliceArr[anGaussId] =
+          TCoordSlice(myGaussCoord,std::slice(theElemId,myDim,myGaussStep));
       }
     }
     return aCoordSliceArr;
@@ -188,9 +189,9 @@ namespace MED
   //---------------------------------------------------------------
 
   TShapeFun::TShapeFun(TInt theDim, TInt theNbRef):
+    myRefCoord(theNbRef*theDim),
     myDim(theDim),
-    myNbRef(theNbRef),
-    myRefCoord(theNbRef*theDim)
+    myNbRef(theNbRef)
   {}
 
   TCCoordSlice 
@@ -238,6 +239,7 @@ namespace MED
           }
         }
         if(!anIsEqual){
+#ifdef _DEBUG_
           TCCoordSlice aCoord = GetCoord(aRefId);
           INITMSG(MYDEBUG,aRefId + 1<<": aCoord = {");
           TInt aDim = aCoord.size();
@@ -248,6 +250,7 @@ namespace MED
           for(TInt anId = 0; anId < aDim; anId++)
             ADDMSG(MYDEBUG,"\t"<<aCoord2[anId]);
           ADDMSG(MYDEBUG,"}\n");
+#endif
 #ifndef _DEBUG_
           BEGMSG(MYDEBUG,"anIsSatisfy = "<<anIsSatisfy<<"\n");
           return anIsSatisfy;
@@ -654,6 +657,57 @@ namespace MED
 
 
   //---------------------------------------------------------------
+  TQuad9a::TQuad9a():
+    TShapeFun(2,9)
+  {
+    TInt aNbRef = GetNbRef();
+    for(TInt aRefId = 0; aRefId < aNbRef; aRefId++){
+      TCoordSlice aCoord = GetCoord(aRefId);
+      switch(aRefId){
+      case  0: aCoord[0] = -1.0;  aCoord[1] =  1.0; break;
+      case  1: aCoord[0] = -1.0;  aCoord[1] = -1.0; break;
+      case  2: aCoord[0] =  1.0;  aCoord[1] = -1.0; break;
+      case  3: aCoord[0] =  1.0;  aCoord[1] =  1.0; break;
+
+      case  4: aCoord[0] = -1.0;  aCoord[1] =  0.0; break;
+      case  5: aCoord[0] =  0.0;  aCoord[1] = -1.0; break;
+      case  6: aCoord[0] =  1.0;  aCoord[1] =  0.0; break;
+      case  7: aCoord[0] =  0.0;  aCoord[1] =  1.0; break;
+
+      case  8: aCoord[0] =  0.0;  aCoord[1] =  0.0; break;
+      }
+    }
+  }
+
+  void
+  TQuad9a::InitFun(const TCCoordSliceArr& theRef,
+                   const TCCoordSliceArr& theGauss,
+                   TFun& theFun) const
+  {
+    GetFun(theRef,theGauss,theFun);
+
+    TInt aNbGauss = theGauss.size();
+    for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
+      const TCCoordSlice& aCoord = theGauss[aGaussId];
+      TFloatVecSlice aSlice = theFun.GetFunSlice(aGaussId);
+
+      aSlice[0] = 0.25*aCoord[0]*aCoord[1]*(aCoord[0] + 1.0)*(aCoord[1] - 1.0);
+      aSlice[1] = 0.25*aCoord[0]*aCoord[1]*(aCoord[0] + 1.0)*(aCoord[1] + 1.0);
+      aSlice[2] = 0.25*aCoord[0]*aCoord[1]*(aCoord[0] - 1.0)*(aCoord[1] + 1.0);
+      aSlice[3] = 0.25*aCoord[0]*aCoord[1]*(aCoord[0] - 1.0)*(aCoord[1] - 1.0);
+
+      aSlice[4] = 0.5*aCoord[0]*(aCoord[0] + 1.0)*(1.0 - aCoord[1]*aCoord[1]);
+      aSlice[5] = 0.5*(1.0 - aCoord[0]*aCoord[0])*aCoord[1]*(aCoord[1] + 1.0);
+      aSlice[6] = 0.5*aCoord[0]*(aCoord[0] - 1.0)*(1.0 - aCoord[1]*aCoord[1]);
+      aSlice[7] = 0.5*(1.0 - aCoord[0]*aCoord[0])*aCoord[1]*(aCoord[1] - 1.0);
+
+      aSlice[8] = (1.0 - aCoord[0]*aCoord[0])*(1.0 - aCoord[1]*aCoord[1]);
+    }
+  }
+
+
+
+  //---------------------------------------------------------------
   TQuad4b::TQuad4b():
     TShapeFun(2,4)
   {
@@ -737,6 +791,57 @@ namespace MED
       //aSlice[5] = 0.5*(1.0 + aCoord[0])*(1.0 - aCoord[1])*(1.0 - aCoord[1]);
       //aSlice[6] = 0.5*(1.0 - aCoord[0])*(1.0 - aCoord[0])*(1.0 + aCoord[1]);
       //aSlice[7] = 0.5*(1.0 - aCoord[0])*(1.0 - aCoord[1])*(1.0 - aCoord[1]);
+    }
+  }
+
+
+
+  //---------------------------------------------------------------
+  TQuad9b::TQuad9b():
+    TShapeFun(2,9)
+  {
+    TInt aNbRef = GetNbRef();
+    for(TInt aRefId = 0; aRefId < aNbRef; aRefId++){
+      TCoordSlice aCoord = GetCoord(aRefId);
+      switch(aRefId){
+      case  0: aCoord[0] = -1.0;  aCoord[1] = -1.0; break;
+      case  1: aCoord[0] =  1.0;  aCoord[1] = -1.0; break;
+      case  2: aCoord[0] =  1.0;  aCoord[1] =  1.0; break;
+      case  3: aCoord[0] = -1.0;  aCoord[1] =  1.0; break;
+
+      case  4: aCoord[0] =  0.0;  aCoord[1] = -1.0; break;
+      case  5: aCoord[0] =  1.0;  aCoord[1] =  0.0; break;
+      case  6: aCoord[0] =  0.0;  aCoord[1] =  1.0; break;
+      case  7: aCoord[0] = -1.0;  aCoord[1] =  0.0; break;
+
+      case  8: aCoord[0] =  0.0;  aCoord[1] =  0.0; break;
+      }
+    }
+  }
+
+  void
+  TQuad9b::InitFun(const TCCoordSliceArr& theRef,
+                   const TCCoordSliceArr& theGauss,
+                   TFun& theFun) const
+  {
+    GetFun(theRef,theGauss,theFun);
+
+    TInt aNbGauss = theGauss.size();
+    for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
+      const TCCoordSlice& aCoord = theGauss[aGaussId];
+      TFloatVecSlice aSlice = theFun.GetFunSlice(aGaussId);
+
+      aSlice[0] = 0.25*aCoord[0]*aCoord[1]*(aCoord[0] - 1.0)*(aCoord[1] - 1.0);
+      aSlice[1] = 0.25*aCoord[0]*aCoord[1]*(aCoord[0] + 1.0)*(aCoord[1] - 1.0);
+      aSlice[2] = 0.25*aCoord[0]*aCoord[1]*(aCoord[0] + 1.0)*(aCoord[1] + 1.0);
+      aSlice[3] = 0.25*aCoord[0]*aCoord[1]*(aCoord[0] - 1.0)*(aCoord[1] + 1.0);
+
+      aSlice[4] = 0.5*(1.0 - aCoord[0]*aCoord[0])*aCoord[1]*(aCoord[1] - 1.0);
+      aSlice[5] = 0.5*aCoord[0]*(aCoord[0] + 1.0)*(1.0 - aCoord[1]*aCoord[1]);
+      aSlice[6] = 0.5*(1.0 - aCoord[0]*aCoord[0])*aCoord[1]*(aCoord[1] + 1.0);
+      aSlice[7] = 0.5*aCoord[0]*(aCoord[0] - 1.0)*(1.0 - aCoord[1]*aCoord[1]);
+
+      aSlice[8] = (1.0 - aCoord[0]*aCoord[0])*(1.0 - aCoord[1]*aCoord[1]);
     }
   }
 
@@ -1686,11 +1791,11 @@ namespace MED
   //---------------------------------------------------------------
   bool
   GetGaussCoord3D(const TGaussInfo& theGaussInfo, 
-		  const TCellInfo& theCellInfo,
-		  const TNodeInfo& theNodeInfo,
-		  TGaussCoord& theGaussCoord,
-		  const TElemNum& theElemNum,
-		  EModeSwitch theMode)
+                  const TCellInfo& theCellInfo,
+                  const TNodeInfo& theNodeInfo,
+                  TGaussCoord& theGaussCoord,
+                  const TElemNum& theElemNum,
+                  EModeSwitch theMode)
   {
     INITMSG(MYDEBUG,"GetGaussCoord3D\n");
 
@@ -1700,165 +1805,176 @@ namespace MED
       TInt aNbRef = theGaussInfo.GetNbRef();
       TCCoordSliceArr aRefSlice(aNbRef);
       for(TInt anId = 0; anId < aNbRef; anId++)
-	aRefSlice[anId] = theGaussInfo.GetRefCoordSlice(anId);
+        aRefSlice[anId] = theGaussInfo.GetRefCoordSlice(anId);
 
       TInt aNbGauss = theGaussInfo.GetNbGauss();
       TCCoordSliceArr aGaussSlice(aNbGauss);
       for(TInt anId = 0; anId < aNbGauss; anId++)
-	aGaussSlice[anId] = theGaussInfo.GetGaussCoordSlice(anId);
+        aGaussSlice[anId] = theGaussInfo.GetGaussCoordSlice(anId);
 
       switch(aGeom){
       case eSEG2: {
-	INITMSG(MYDEBUG,"eSEG2"<<std::endl);
+        INITMSG(MYDEBUG,"eSEG2"<<std::endl);
 
-	if(TSeg2a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TSeg2a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	break;
+        break;
       }
       case eSEG3: {
-	INITMSG(MYDEBUG,"eSEG3"<<std::endl);
+        INITMSG(MYDEBUG,"eSEG3"<<std::endl);
 
-	if(TSeg3a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TSeg3a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	break;
+        break;
       }
       case eTRIA3: {
-	INITMSG(MYDEBUG,"eTRIA3"<<std::endl);
+        INITMSG(MYDEBUG,"eTRIA3"<<std::endl);
 
-	if(TTria3a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TTria3a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	if(TTria3b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TTria3b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	break;
+        break;
       }
       case eTRIA6: {
-	INITMSG(MYDEBUG,"eTRIA6"<<std::endl);
+        INITMSG(MYDEBUG,"eTRIA6"<<std::endl);
 
-	if(TTria6a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TTria6a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	if(TTria6b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TTria6b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	break;
+        break;
       }
       case eQUAD4: {
-	INITMSG(MYDEBUG,"eQUAD4"<<std::endl);
+        INITMSG(MYDEBUG,"eQUAD4"<<std::endl);
 
-	if(TQuad4a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TQuad4a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	if(TQuad4b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TQuad4b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	break;
+        break;
       }
       case eQUAD8: {
-	INITMSG(MYDEBUG,"eQUAD8"<<std::endl);
+        INITMSG(MYDEBUG,"eQUAD8"<<std::endl);
 
-	if(TQuad8a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TQuad8a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	if(TQuad8b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TQuad8b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	break;
+        break;
+      }
+      case eQUAD9: {
+        INITMSG(MYDEBUG,"eQUAD9"<<std::endl);
+
+        if(TQuad9a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
+
+        if(TQuad9b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
+
+        break;
       }
       case eTETRA4: {
-	INITMSG(MYDEBUG,"eTETRA4"<<std::endl);
+        INITMSG(MYDEBUG,"eTETRA4"<<std::endl);
 
-	if(TTetra4a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TTetra4a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	if(TTetra4b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TTetra4b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	break;
+        break;
       }
       case ePYRA5: {
-	INITMSG(MYDEBUG,"ePYRA5"<<std::endl);
+        INITMSG(MYDEBUG,"ePYRA5"<<std::endl);
 
-	if(TPyra5a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TPyra5a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	if(TPyra5b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TPyra5b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	break;
+        break;
       }
       case ePENTA6: {
-	INITMSG(MYDEBUG,"ePENTA6"<<std::endl);
+        INITMSG(MYDEBUG,"ePENTA6"<<std::endl);
 
-	if(TPenta6a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TPenta6a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	if(TPenta6b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TPenta6b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	break;
+        break;
       }
       case eHEXA8: {
-	INITMSG(MYDEBUG,"eHEXA8"<<std::endl);
+        INITMSG(MYDEBUG,"eHEXA8"<<std::endl);
 
-	if(THexa8a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(THexa8a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	if(THexa8b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(THexa8b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	break;
+        break;
       }
       case eTETRA10: {
-	INITMSG(MYDEBUG,"eTETRA10"<<std::endl);
+        INITMSG(MYDEBUG,"eTETRA10"<<std::endl);
 
-	if(TTetra10a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TTetra10a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	if(TTetra10b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TTetra10b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	break;
+        break;
       }
       case ePYRA13: {
-	INITMSG(MYDEBUG,"ePYRA13"<<std::endl);
+        INITMSG(MYDEBUG,"ePYRA13"<<std::endl);
 
-	if(TPyra13a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TPyra13a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	if(TPyra13b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TPyra13b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	break;
+        break;
       }
       case ePENTA15: {
-	INITMSG(MYDEBUG,"ePENTA15"<<std::endl);
+        INITMSG(MYDEBUG,"ePENTA15"<<std::endl);
 
-	if(TPenta15a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TPenta15a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	if(TPenta15b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(TPenta15b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	break;
+        break;
       }
       case eHEXA20: {
-	INITMSG(MYDEBUG,"eHEXA20"<<std::endl);
+        INITMSG(MYDEBUG,"eHEXA20"<<std::endl);
 
-	if(THexa20a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(THexa20a().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	if(THexa20b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
-	  return true;
+        if(THexa20b().Eval(theCellInfo,theNodeInfo,theElemNum,aRefSlice,aGaussSlice,theGaussCoord,theMode))
+          return true;
 
-	break;
+        break;
       }
       default: 
-	INITMSG(MYDEBUG,"eNONE"<<std::endl);
-	return false;
+        INITMSG(MYDEBUG,"eNONE"<<std::endl);
+        return false;
       }
     }
 
@@ -1868,10 +1984,10 @@ namespace MED
   //---------------------------------------------------------------
   bool
   GetBaryCenter(const TCellInfo& theCellInfo,
-		const TNodeInfo& theNodeInfo,
-		TGaussCoord& theGaussCoord,
-		const TElemNum& theElemNum,
-		EModeSwitch theMode)
+                const TNodeInfo& theNodeInfo,
+                TGaussCoord& theGaussCoord,
+                const TElemNum& theElemNum,
+                EModeSwitch theMode)
   {
     INITMSG(MYDEBUG,"GetBaryCenter\n");
     const PMeshInfo& aMeshInfo = theCellInfo.GetMeshInfo();
@@ -1890,11 +2006,11 @@ namespace MED
     TInt aConnDim = theCellInfo.GetConnDim();
 
     INITMSGA(MYDEBUG,0,
-	     "- aDim = "<<aDim<<
-	     "; aNbGauss = "<<aNbGauss<<
-	     "; aNbElem = "<<aNbElem<<
-	     "; aNbNodes = "<<theNodeInfo.GetNbElem()<<
-	     std::endl);
+             "- aDim = "<<aDim<<
+             "; aNbGauss = "<<aNbGauss<<
+             "; aNbElem = "<<aNbElem<<
+             "; aNbNodes = "<<theNodeInfo.GetNbElem()<<
+             std::endl);
 
     for(TInt anElemId = 0; anElemId < aNbElem; anElemId++){
       TInt aCellId = anIsSubMesh? theElemNum[anElemId]-1: anElemId;
@@ -1902,20 +2018,20 @@ namespace MED
       TCoordSliceArr aCoordSliceArr = theGaussCoord.GetCoordSliceArr(anElemId);
 
       for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
-	TCoordSlice& aGaussCoordSlice = aCoordSliceArr[aGaussId];
+        TCoordSlice& aGaussCoordSlice = aCoordSliceArr[aGaussId];
 
-	for(TInt aConnId = 0; aConnId < aConnDim; aConnId++){
-	  TInt aNodeId = aConnSlice[aConnId] - 1;      
-	  TCCoordSlice aNodeCoordSlice = theNodeInfo.GetCoordSlice(aNodeId);
+        for(TInt aConnId = 0; aConnId < aConnDim; aConnId++){
+          TInt aNodeId = aConnSlice[aConnId] - 1;      
+          TCCoordSlice aNodeCoordSlice = theNodeInfo.GetCoordSlice(aNodeId);
 
-	  for(TInt aDimId = 0; aDimId < aDim; aDimId++){
-	    aGaussCoordSlice[aDimId] += aNodeCoordSlice[aDimId];
-	  }
-	}
+          for(TInt aDimId = 0; aDimId < aDim; aDimId++){
+            aGaussCoordSlice[aDimId] += aNodeCoordSlice[aDimId];
+          }
+        }
 
-	for(TInt aDimId = 0; aDimId < aDim; aDimId++){
-	  aGaussCoordSlice[aDimId] /= aConnDim;
-	}
+        for(TInt aDimId = 0; aDimId < aDim; aDimId++){
+          aGaussCoordSlice[aDimId] /= aConnDim;
+        }
       }
     }
 
@@ -1924,12 +2040,12 @@ namespace MED
       TCoordSliceArr aCoordSliceArr = theGaussCoord.GetCoordSliceArr(anElemId);
       INITMSG(MYVALUEDEBUG,"");
       for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
-	TCoordSlice& aCoordSlice = aCoordSliceArr[aGaussId];
-	ADDMSG(MYVALUEDEBUG,"{");
-	for(TInt aDimId = 0; aDimId < aDim; aDimId++){
-	  ADDMSG(MYVALUEDEBUG,aCoordSlice[aDimId]<<" ");
-	}
-	ADDMSG(MYVALUEDEBUG,"} ");
+        TCoordSlice& aCoordSlice = aCoordSliceArr[aGaussId];
+        ADDMSG(MYVALUEDEBUG,"{");
+        for(TInt aDimId = 0; aDimId < aDim; aDimId++){
+          ADDMSG(MYVALUEDEBUG,aCoordSlice[aDimId]<<" ");
+        }
+        ADDMSG(MYVALUEDEBUG,"} ");
       }
       ADDMSG(MYVALUEDEBUG,std::endl);
     }
@@ -1942,10 +2058,10 @@ namespace MED
   //---------------------------------------------------------------
   bool
   GetBaryCenter(const TPolygoneInfo& thePolygoneInfo,
-		const TNodeInfo& theNodeInfo,
-		TGaussCoord& theGaussCoord,
-		const TElemNum& theElemNum,
-		EModeSwitch theMode)
+                const TNodeInfo& theNodeInfo,
+                TGaussCoord& theGaussCoord,
+                const TElemNum& theElemNum,
+                EModeSwitch theMode)
   {
     INITMSG(MYDEBUG,"GetBaryCenter\n");
     const PMeshInfo& aMeshInfo = thePolygoneInfo.GetMeshInfo();
@@ -1962,11 +2078,11 @@ namespace MED
     theGaussCoord.Init(aNbElem,aNbGauss,aDim,theMode);
 
     INITMSGA(MYDEBUG,0,
-	     "- aDim = "<<aDim<<
-	     "; aNbGauss = "<<aNbGauss<<
-	     "; aNbElem = "<<aNbElem<<
-	     "; aNbNodes = "<<theNodeInfo.GetNbElem()<<
-	     std::endl);
+             "- aDim = "<<aDim<<
+             "; aNbGauss = "<<aNbGauss<<
+             "; aNbElem = "<<aNbElem<<
+             "; aNbNodes = "<<theNodeInfo.GetNbElem()<<
+             std::endl);
 
     for(TInt anElemId = 0; anElemId < aNbElem; anElemId++){
       TInt aCellId = anIsSubMesh? theElemNum[anElemId]-1: anElemId;
@@ -1977,20 +2093,20 @@ namespace MED
       TInt aNbNodes = thePolygoneInfo.GetNbConn(aCellId);
 
       for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
-	TCoordSlice& aGaussCoordSlice = aCoordSliceArr[aGaussId];
+        TCoordSlice& aGaussCoordSlice = aCoordSliceArr[aGaussId];
 
-	for(TInt aConnId = 0; aConnId < aNbConn; aConnId++){
-	  TInt aNodeId = aConnSlice[aConnId] - 1;      
-	  TCCoordSlice aNodeCoordSlice = theNodeInfo.GetCoordSlice(aNodeId);
+        for(TInt aConnId = 0; aConnId < aNbConn; aConnId++){
+          TInt aNodeId = aConnSlice[aConnId] - 1;      
+          TCCoordSlice aNodeCoordSlice = theNodeInfo.GetCoordSlice(aNodeId);
 
-	  for(TInt aDimId = 0; aDimId < aDim; aDimId++){
-	    aGaussCoordSlice[aDimId] += aNodeCoordSlice[aDimId];
-	  }
-	}
+          for(TInt aDimId = 0; aDimId < aDim; aDimId++){
+            aGaussCoordSlice[aDimId] += aNodeCoordSlice[aDimId];
+          }
+        }
 
-	for(TInt aDimId = 0; aDimId < aDim; aDimId++){
-	  aGaussCoordSlice[aDimId] /= aNbNodes;
-	}
+        for(TInt aDimId = 0; aDimId < aDim; aDimId++){
+          aGaussCoordSlice[aDimId] /= aNbNodes;
+        }
       }
     }
 
@@ -2001,10 +2117,10 @@ namespace MED
   //---------------------------------------------------------------
   bool
   GetBaryCenter(const TPolyedreInfo& thePolyedreInfo,
-		const TNodeInfo& theNodeInfo,
-		TGaussCoord& theGaussCoord,
-		const TElemNum& theElemNum,
-		EModeSwitch theMode)
+                const TNodeInfo& theNodeInfo,
+                TGaussCoord& theGaussCoord,
+                const TElemNum& theElemNum,
+                EModeSwitch theMode)
   {
     INITMSG(MYDEBUG,"GetBaryCenter\n");
     const PMeshInfo& aMeshInfo = thePolyedreInfo.GetMeshInfo();
@@ -2021,11 +2137,11 @@ namespace MED
     theGaussCoord.Init(aNbElem,aNbGauss,aDim,theMode);
 
     INITMSGA(MYDEBUG,0,
-	     "- aDim = "<<aDim<<
-	     "; aNbGauss = "<<aNbGauss<<
-	     "; aNbElem = "<<aNbElem<<
-	     "; aNbNodes = "<<theNodeInfo.GetNbElem()<<
-	     std::endl);
+             "- aDim = "<<aDim<<
+             "; aNbGauss = "<<aNbGauss<<
+             "; aNbElem = "<<aNbElem<<
+             "; aNbNodes = "<<theNodeInfo.GetNbElem()<<
+             std::endl);
 
     for(TInt anElemId = 0; anElemId < aNbElem; anElemId++){
       TInt aCellId = anIsSubMesh? theElemNum[anElemId]-1: anElemId;
@@ -2037,23 +2153,23 @@ namespace MED
       TInt aNbNodes = thePolyedreInfo.GetNbNodes(aCellId);
 
       for(TInt aGaussId = 0; aGaussId < aNbGauss; aGaussId++){
-	TCoordSlice& aGaussCoordSlice = aCoordSliceArr[aGaussId];
+        TCoordSlice& aGaussCoordSlice = aCoordSliceArr[aGaussId];
 
-	for(TInt aFaceId = 0; aFaceId < aNbFaces; aFaceId++){
-	  TCConnSlice aConnSlice = aConnSliceArr[aFaceId];
-	  TInt aNbConn = aConnSlice.size();
-	  for(TInt aConnId = 0; aConnId < aNbConn; aConnId++){
-	    TInt aNodeId = aConnSlice[aConnId] - 1;      
-	    TCCoordSlice aNodeCoordSlice = theNodeInfo.GetCoordSlice(aNodeId);
+        for(TInt aFaceId = 0; aFaceId < aNbFaces; aFaceId++){
+          TCConnSlice aConnSlice = aConnSliceArr[aFaceId];
+          TInt aNbConn = aConnSlice.size();
+          for(TInt aConnId = 0; aConnId < aNbConn; aConnId++){
+            TInt aNodeId = aConnSlice[aConnId] - 1;      
+            TCCoordSlice aNodeCoordSlice = theNodeInfo.GetCoordSlice(aNodeId);
 
-	    for(TInt aDimId = 0; aDimId < aDim; aDimId++){
-	      aGaussCoordSlice[aDimId] += aNodeCoordSlice[aDimId];
-	    }
-	  }
-	}
-	for(TInt aDimId = 0; aDimId < aDim; aDimId++){
-	  aGaussCoordSlice[aDimId] /= aNbNodes;
-	}
+            for(TInt aDimId = 0; aDimId < aDim; aDimId++){
+              aGaussCoordSlice[aDimId] += aNodeCoordSlice[aDimId];
+            }
+          }
+        }
+        for(TInt aDimId = 0; aDimId < aDim; aDimId++){
+          aGaussCoordSlice[aDimId] /= aNbNodes;
+        }
       }
     }
 

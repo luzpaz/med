@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 /*
  File Field.hxx
 */
@@ -28,26 +29,29 @@
 
 #include "MEDMEM.hxx"
 
-#include <vector>
-#include <map>
-#include <algorithm>
-#include <math.h>
-#include <cmath>
-#include <float.h>
-
 #include "MEDMEM_Utilities.hxx"
+#include "MEDMEM_MedVersion.hxx"
 #include "MEDMEM_Exception.hxx"
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Support.hxx"
 #include "MEDMEM_Unit.hxx"
 #include "MEDMEM_nArray.hxx"
 #include "MEDMEM_GenDriver.hxx"
+#include "MEDMEM_RCBase.hxx"
 #include "MEDMEM_ArrayInterface.hxx"
 #include "MEDMEM_SetInterlacingType.hxx"
 #include "MEDMEM_FieldForward.hxx"
 #include "MEDMEM_GaussLocalization.hxx"
+#include "InterpKernelGaussCoords.hxx"
+#include "PointLocator.hxx"
 
-
+#include <vector>
+#include <map>
+#include <algorithm>
+#include <memory>
+#include <math.h>
+#include <cmath>
+#include <float.h>
 
 namespace MEDMEM {
 
@@ -74,7 +78,7 @@ namespace MEDMEM {
   template < > struct SET_VALUE_TYPE<int> {
     static const MED_EN::med_type_champ _valueType = MED_EN::MED_INT32; };
 
-	/*!\defgroup FIELD_io Reading and writing files
+        /*!\defgroup FIELD_io Reading and writing files
 
 Fields can be read or written to/from MED files.
 
@@ -82,27 +86,14 @@ Fields can be read or written to/from MED files.
 
  For reading a field a typical use consists in :
 - reading the mesh associated on which the field lies
-- retrieve the support on which the field will be defined
 - read the field, specifying its time step and order number
 
 As an example :
 \verbatim
 //reading mesh from file
 MESH mesh(MED_DRIVER, "file.med", "my_Mesh");
-//retrieving group in the mesh structure
-GROUP* group= mesh->getGroup("myGroup");
 //reading the field from the file
-FIELD<double> field(group,MED_DRIVER,"file.med","my_Field",1,1);
-\endverbatim
-
-If the field is defined on all elements, one could have :
-\verbatim
-//reading mesh from file
-MESH mesh(MED_DRIVER, "file.med", "my_Mesh");
-//creating a support on all faces
-SUPPORT support (mesh,"mySupport",MED_FACE);
-//reading the field from the file
-FIELD<double> field(&support,MED_DRIVER,"file.med","my_FieldOnFaces",1,1);
+FIELD<double> field(group,MED_DRIVER,"file.med","my_Field",1,1,&mesh);
 \endverbatim
 
 It is also possible to read a field without specifying its support. In this case, the field constructor 
@@ -116,14 +107,12 @@ See also \ref FIELD_constructors
 
 \par Writing fields
 
-When it comes to write fields, it is necessary to use addDriver and then write.
+When it comes to write fields, it is enough to call write() method.
 A typical use will be :
 
 \verbatim
-mesh.addDriver(MED_DRIVER, "myResultFile.med", "myMesh");
-mesh.write();
-field.addDriver(MED_DRIVER, "myResultFile.med, "myField");
-field.write();
+mesh.write(MED_DRIVER, "myResultFile.med");
+field.write(MED_DRIVER, "myResultFile.med");
 \endverbatim
 
 \defgroup FIELD_constructors
@@ -196,15 +185,15 @@ double cooRef[6] ={0.0, 0.0, 1.0, 0.0, 0.0, 1.0};
 double cooGauss[6]={0.2, 0.2, 0.8, 0.1, 0.1, 0.8};
 double wg[3]={0.3334, 0.3334, 0.3334};
 GAUSS_LOCALIZATION model(locname, 
-			 MED_EN::MED_TRIA3,  
-			 3,
-			 cooRef,
-			 cooGauss,
-			 wg);
+                         MED_EN::MED_TRIA3,  
+                         3,
+                         cooRef,
+                         cooGauss,
+                         wg);
 \endcode
 
 */
-	
+        
 
 /*!
 
@@ -214,7 +203,7 @@ GAUSS_LOCALIZATION model(locname,
   - Location of the values (a SUPPORT class)
 
 */
-class MEDMEM_EXPORT FIELD_    // GENERIC POINTER TO a template <class T, class INTERLACING_TAG> class FIELD
+  class MEDMEM_EXPORT FIELD_ : public RCBASE    // GENERIC POINTER TO a template <class T, class INTERLACING_TAG> class FIELD
 {
 protected:
 
@@ -270,7 +259,6 @@ protected:
     Not implemented yet! All type are scalar !
     \endif
   */
-  //int *           _componentsTypes ;
   vector<int>     _componentsTypes ;
   /*!
     \if developper
@@ -278,7 +266,6 @@ protected:
     storing components names if any.
     \endif
   */
-  //string * 	  _componentsNames;
   vector<string>  _componentsNames;
   /*!
     \if developper
@@ -286,7 +273,6 @@ protected:
     storing components descriptions if any.
     \endif
   */
-  //string *        _componentsDescriptions;
   vector<string>  _componentsDescriptions;
   /*!
     \if developper
@@ -294,7 +280,6 @@ protected:
     storing components units if any.
     \endif
   */
-  //UNIT *          _componentsUnits;
   vector<UNIT>    _componentsUnits;
   /*!
     \if developper
@@ -302,7 +287,6 @@ protected:
     storing components units if any.
     \endif
   */
-  //string *        _MEDComponentsUnits;
   vector<string>  _MEDComponentsUnits;
   /*!
     \if developper
@@ -315,13 +299,13 @@ protected:
     Time of the field.
     \endif
   */
-  double   	  _time;
+  double          _time;
   /*!
     \if developper
     Order number of the field.
     \endif
   */
-  int      	  _orderNumber ;
+  int             _orderNumber ;
   /*!
     \if developper
     At the initialization step of the field using the constructors; this attribute,
@@ -342,19 +326,10 @@ protected:
   vector<GENDRIVER *> _drivers; // Storage of the drivers currently in use
   static void _checkFieldCompatibility(const FIELD_& m, const FIELD_& n, bool checkUnit=true) throw (MEDEXCEPTION);
   static void _deepCheckFieldCompatibility(const FIELD_& m, const FIELD_& n, bool checkUnit=true) throw (MEDEXCEPTION);
-  void _checkNormCompatibility(const FIELD<double>* p_field_volume=NULL) const  throw (MEDEXCEPTION);
-  FIELD<double>* _getFieldSize() const;
-
-public:
-
-  friend class MED_MED_RDONLY_DRIVER21;
-  friend class MED_MED_WRONLY_DRIVER21;
-  friend class MED_MED_RDWR_DRIVER21;
-  friend class MED_MED_RDONLY_DRIVER22;
-  friend class MED_MED_WRONLY_DRIVER22;
-  friend class MED_MED_RDWR_DRIVER22;
-  friend class VTK_MED_DRIVER;
-
+  void _checkNormCompatibility(const FIELD<double>* p_field_volume=NULL,
+                               const bool           nodalAllowed = false) const  throw (MEDEXCEPTION);
+  FIELD<double>* _getFieldSize(const SUPPORT *subSupport=NULL) const;
+ public:
   /*!
     Constructor.
   */
@@ -375,6 +350,16 @@ public:
   */
   virtual ~FIELD_();
 
+public:
+
+  friend class MED_MED_RDONLY_DRIVER21;
+  friend class MED_MED_WRONLY_DRIVER21;
+  friend class MED_MED_RDWR_DRIVER21;
+  friend class MED_MED_RDONLY_DRIVER22;
+  friend class MED_MED_WRONLY_DRIVER22;
+  friend class MED_MED_RDWR_DRIVER22;
+  friend class VTK_MED_DRIVER;
+
  FIELD_& operator=(const FIELD_ &m);
 
   virtual  void     rmDriver(int index=0);
@@ -394,18 +379,22 @@ public:
 
   virtual   int     addDriver(driverTypes driverType,
                               const string & fileName="Default File Name.med",
-			      const string & driverFieldName="Default Field Nam",
-			      MED_EN::med_mode_acces access=MED_EN::RDWR) ;
+                              const string & driverFieldName="Default Field Nam",
+                              MED_EN::med_mode_acces access=MED_EN::RDWR) ;
 
   virtual  int      addDriver( GENDRIVER & driver);
+  virtual  void     read (driverTypes driverType, const std::string & fileName);
   virtual  void     read (const GENDRIVER &);
   virtual  void     read(int index=0);
   virtual  void     openAppend( void );
-  virtual  void     write(const GENDRIVER &);
+  virtual  void     write(const GENDRIVER &, MED_EN::med_mode_acces medMode=MED_EN::RDWR);
+  virtual  void     write(driverTypes driverType,
+                          const std::string & fileName,
+                          MED_EN::med_mode_acces medMode=MED_EN::RDWR);
 
   /*! Triggers the writing of the field with respect to the driver handle
     \a index given by \a addDriver(...) method. */
-  virtual  void     write(int index=0, const string & driverName="");
+  virtual  void     write(int index=0);
   /*!\if MEDMEM_ug @} \endif */
 
   virtual  void     writeAppend(const GENDRIVER &);
@@ -417,13 +406,10 @@ public:
   inline string   getDescription() const;
   inline const SUPPORT * getSupport() const;
   inline void     setSupport(const SUPPORT * support);
-  /*inline*/ void     setNumberOfComponents(const int NumberOfComponents);
+  inline void     setNumberOfComponents(const int NumberOfComponents);
   inline int      getNumberOfComponents() const;
   inline void     setNumberOfValues(const int NumberOfValues);
   inline int      getNumberOfValues() const;
-  //    inline void     setComponentType(int *ComponentType);
-  //    inline int *    getComponentType() const;
-  //    inline int      getComponentTypeI(int i) const;
   inline void     setComponentsNames(const string * ComponentsNames);
   inline void     setComponentName(int i, const string ComponentName);
   inline const string * getComponentsNames() const;
@@ -455,10 +441,6 @@ public:
 protected:
   void copyGlobalInfo(const FIELD_& m);
 };
-
-// ---------------------------------
-// Implemented Methods : constructor
-// ---------------------------------
 
 // -----------------
 // Methodes Inline
@@ -533,19 +515,6 @@ inline int FIELD_::getNumberOfValues() const
   return _numberOfValues ;
 }
 
-//  inline void FIELD_::setComponentType(int *ComponentType)
-//  {
-//    _componentsTypes=ComponentType ;
-//  }
-//  inline int * FIELD_::getComponentType() const
-//  {
-//    return _componentsTypes ;
-//  }
-//  inline int FIELD_::getComponentTypeI(int i) const
-//  {
-//    return _componentsTypes[i-1] ;
-//  }
-
 /*!
   Sets FIELD components names.
 
@@ -554,8 +523,6 @@ inline int FIELD_::getNumberOfValues() const
 */
 inline void FIELD_::setComponentsNames(const string * ComponentsNames)
 {
-  //if (NULL == _componentsNames)
-  //  _componentsNames = new string[_numberOfComponents] ;
   _componentsNames.resize(_numberOfComponents);
   for (int i=0; i<_numberOfComponents; i++)
     _componentsNames[i]=ComponentsNames[i] ;
@@ -606,8 +573,6 @@ inline string FIELD_::getComponentName(int i) const
 */
 inline void FIELD_::setComponentsDescriptions(const string * ComponentsDescriptions)
 {
-  //if (NULL == _componentsDescriptions)
-  //  _componentsDescriptions = new string[_numberOfComponents] ;
   _componentsDescriptions.resize(_numberOfComponents);
   for (int i=0; i<_numberOfComponents; i++)
     _componentsDescriptions[i]=ComponentsDescriptions[i] ;
@@ -661,8 +626,6 @@ inline string FIELD_::getComponentDescription(int i) const
 */
 inline void FIELD_::setComponentsUnits(const UNIT * ComponentsUnits)
 {
-  //if (NULL == _componentsUnits)
-  //  _componentsUnits = new UNIT[_numberOfComponents] ;
   _componentsUnits.resize(_numberOfComponents);
   for (int i=0; i<_numberOfComponents; i++)
     _componentsUnits[i]=ComponentsUnits[i] ;
@@ -700,8 +663,6 @@ inline const UNIT * FIELD_::getComponentUnit(int i) const
 */
 inline void FIELD_::setMEDComponentsUnits(const string * MEDComponentsUnits)
 {
-  //if (NULL == _MEDComponentsUnits)
-  //  _MEDComponentsUnits = new string[_numberOfComponents] ;
   _MEDComponentsUnits.resize(_numberOfComponents);
   for (int i=0; i<_numberOfComponents; i++)
     _MEDComponentsUnits[i]=MEDComponentsUnits[i] ;
@@ -802,11 +763,14 @@ inline  const SUPPORT * FIELD_::getSupport() const
 inline void FIELD_::setSupport(const SUPPORT * support)
 {
   //A.G. Addings for RC
-  if(_support)
-    _support->removeReference();
-  _support = support ;
-  if(_support)
-    _support->addReference();
+  if(_support!=support)
+    {
+      if(_support)
+        _support->removeReference();
+      _support = support ;
+      if(_support)
+        _support->addReference();
+    }
 }
 /*!
   Gets the FIELD med value type (MED_INT32 or MED_REEL64).
@@ -858,16 +822,14 @@ inline MED_EN::med_type_champ FIELD_::getValueType () const
 
 namespace MEDMEM {
 
-  template<class T2> class MED_FIELD_RDONLY_DRIVER21;
-  template<class T2> class MED_FIELD_WRONLY_DRIVER21;
-  template<class T2> class MED_FIELD_RDONLY_DRIVER22;
-  template<class T2> class MED_FIELD_WRONLY_DRIVER22;
+  template<class T2> class MED_FIELD_RDONLY_DRIVER;
+  template<class T2> class MED_FIELD_WRONLY_DRIVER;
   template<class T2> class VTK_FIELD_DRIVER;
 
 
   template <class T,
-	    class INTERLACING_TAG
-	    > class FIELD : public FIELD_
+            class INTERLACING_TAG
+            > class FIELD : public FIELD_
 {
 protected:
 
@@ -887,7 +849,7 @@ protected:
 
   // MESH, to be used for field reading from a file (if desired to link
   // to existing support instead of new support creation for the field)
-  MESH* _mesh;
+  GMESH* _mesh;
 
   // extrema values
   T _vmin;
@@ -905,8 +867,6 @@ private:
   void _sub_in_place(const FIELD& m,const FIELD& n);
   void _mul_in_place(const FIELD& m,const FIELD& n);
   void _div_in_place(const FIELD& m,const FIELD& n) throw (MEDEXCEPTION);
-  //setValueType() ;
-
 public:
   FIELD();
   FIELD(const FIELD &m);
@@ -914,21 +874,22 @@ public:
   FIELD(driverTypes driverType,
         const string & fileName, const string & fieldDriverName,
         const int iterationNumber=-1, const int orderNumber=-1,
-        MESH* mesh = 0)
+        GMESH* mesh = 0)
     throw (MEDEXCEPTION);
   FIELD(const SUPPORT * Support, driverTypes driverType,
-	const string & fileName="", const string & fieldName="",
-	const int iterationNumber = -1, const int orderNumber = -1)
+        const string & fileName="", const string & fieldName="",
+        const int iterationNumber = -1, const int orderNumber = -1)
     throw (MEDEXCEPTION);
   ~FIELD();
 
+public:
   FIELD & operator=(const FIELD &m);
-	FIELD & operator=(T value);
-  const FIELD operator+(const FIELD& m) const;
-  const FIELD operator-(const FIELD& m) const;
-  const FIELD operator*(const FIELD& m) const;
-  const FIELD operator/(const FIELD& m) const;
-  const FIELD operator-() const;
+        FIELD & operator=(T value);
+  FIELD *operator+(const FIELD& m) const;
+  FIELD *operator-(const FIELD& m) const;
+  FIELD *operator*(const FIELD& m) const;
+  FIELD *operator/(const FIELD& m) const;
+  FIELD *operator-() const;
   FIELD& operator+=(const FIELD& m);
   FIELD& operator-=(const FIELD& m);
   FIELD& operator*=(const FIELD& m);
@@ -963,21 +924,19 @@ public:
   double normL2(const FIELD<double,FullInterlace> * p_field_volume=NULL) const;
   double normL1(int component, const FIELD<double,FullInterlace> * p_field_volume=NULL) const;
   double normL1(const FIELD<double,FullInterlace> * p_field_volume=NULL) const;
+  double integral(const SUPPORT *subSupport=NULL) const throw (MEDEXCEPTION);
   FIELD* extract(const SUPPORT *subSupport) const throw (MEDEXCEPTION);
 
-  friend class MED_FIELD_RDONLY_DRIVER21<T>;
-  friend class MED_FIELD_WRONLY_DRIVER21<T>;
-  friend class MED_FIELD_RDONLY_DRIVER22<T>;
-  friend class MED_FIELD_WRONLY_DRIVER22<T>;
+  friend class MED_FIELD_RDONLY_DRIVER<T>;
+  friend class MED_FIELD_WRONLY_DRIVER<T>;
   friend class VTK_FIELD_DRIVER<T>;
-  //friend class MED_FIELD_RDWR_DRIVER  <T>;
 
   void init ();
   void rmDriver(int index=0);
   int  addDriver(driverTypes driverType,
-		 const string & fileName="Default File Name.med",
-		 const string & driverFieldName="Default Field Name",
-		 MED_EN::med_mode_acces access=MED_EN::RDWR) ;
+                 const string & fileName="Default File Name.med",
+                 const string & driverFieldName="Default Field Name",
+                 MED_EN::med_mode_acces access=MED_EN::RDWR) ;
 
   int  addDriver(GENDRIVER & driver);
 
@@ -988,8 +947,12 @@ public:
 
   inline void read(int index=0);
   inline void read(const GENDRIVER & genDriver);
-  inline void write(int index=0, const string & driverName = "");
-  inline void write(const GENDRIVER &);
+  inline void read(driverTypes driverType, const std::string& filename);
+  inline void write(int index=0);
+  inline void write(const GENDRIVER &, MED_EN::med_mode_acces medMode=MED_EN::RDWR);
+  inline void write(driverTypes        driverType,
+                    const std::string& filename,
+                    MED_EN::med_mode_acces medMode=MED_EN::RDWR);
 
   inline void writeAppend(int index=0, const string & driverName = "");
   inline void writeAppend(const GENDRIVER &);
@@ -1035,13 +998,15 @@ definition (i.e., fields having one value per element).
   inline T            getValueIJKByType(int i,int j,int k,int t) const throw (MEDEXCEPTION);
 
   /*!
-		The following example describes the creation of a FIELD.
-		
-		\example FIELDcreate.cxx
+                The following example describes the creation of a FIELD.
+                
+                \example FIELDcreate.cxx
 
  \if MEDMEM_ug @} \endif */
 
   bool                getValueOnElement(int eltIdInSup,T* retValues) const throw (MEDEXCEPTION);
+  void                getValueOnPoint(const double* coords, double* output) const throw (MEDEXCEPTION);
+  void                getValueOnPoints(int nb_points, const double* coords, double* output) const throw (MEDEXCEPTION);
 
   const int   getNumberOfGeometricTypes() const throw (MEDEXCEPTION);
   const GAUSS_LOCALIZATION<INTERLACING_TAG> & getGaussLocalization(MED_EN::medGeometryElement geomElement) const throw (MEDEXCEPTION);
@@ -1057,6 +1022,8 @@ definition (i.e., fields having one value per element).
   bool        isOnAllElements()           const throw (MEDEXCEPTION);
  
   inline void setArray(MEDMEM_Array_ *value) throw (MEDEXCEPTION);
+
+  FIELD<double, FullInterlace>* getGaussPointsCoordinates() const throw (MEDEXCEPTION);
 
   /*! \if MEDMEM_ug
  \addtogroup FIELD_value
@@ -1081,54 +1048,6 @@ the components.
   inline void setValueIJK(int i, int j, int k, T value) throw (MEDEXCEPTION);
   inline void setValueIJByType(int i, int j, int t, T value) throw (MEDEXCEPTION);
   inline void setValueIJKByType(int i, int j, int k, int t, T value) throw (MEDEXCEPTION);
-
-  /*!
-    This fonction feeds the FIELD<double> private attributs _value with the
-    volume of each cells belonging to the argument Support. The field has to be
-    initialised via the constructor FIELD<double>(const SUPPORT * , const int )
-    with Support as SUPPORT argument, 1 has the number of components, and Support
-    has be a SUPPORT on 3D cells. This initialisation could be done by the empty
-    constructor followed by a setSupport and setNumberOfComponents call.
-   */
-  //void getVolume() const throw (MEDEXCEPTION) ;
-  /*!
-    This fonction feeds the FIELD<double> private attributs _value with the
-    area of each cells (or faces) belonging to the attribut _support. The field
-    has to be initialised via the constructor FIELD<double>(const SUPPORT * ,
-    const int ) with 1 has the number of components, and _support has be a
-    SUPPORT on 2D cells or 3D faces. This initialisation could be done by the
-    empty constructor followed by a setSupport and setNumberOfComponents call.
-   */
-  //void getArea() const throw (MEDEXCEPTION) ;
-  /*!
-    This fonction feeds the FIELD<double> private attributs _value with the
-    length of each segments belonging to the attribut _support. The field has
-    to be initialised via the constructor FIELD<double>(const SUPPORT * ,
-    const int ) with 1 has the number of components, and _support has be a
-    SUPPORT on 3D edges or 2D faces. This initialisation could be done by the
-    empty constructor followed by a setSupport and setNumberOfComponents call.
-   */
-  //void getLength() const throw (MEDEXCEPTION) ;
-  /*!
-    This fonction feeds the FIELD<double> private attributs _value with the
-    normal vector of each faces belonging to the attribut _support. The field
-    has to be initialised via the constructor FIELD<double>(const SUPPORT * ,
-    const int ) with the space dimension has the number of components, and
-    _support has be a SUPPORT on 3D or 2D faces. This initialisation could be done
-    by the empty constructor followed by a setSupport and setNumberOfComponents
-    call.
-   */
-  //void getNormal() const throw (MEDEXCEPTION) ;
-  /*!
-    This fonction feeds the FIELD<double> private attributs _value with the
-    barycenter of each faces or cells or edges belonging to the attribut _support.
-    The field has to be initialised via the constructor
-    FIELD<double>(const SUPPORT * ,const int ) with the space dimension has the
-    number of components, and _support has be a SUPPORT on 3D cells or 2D faces.
-    This initialisation could be done by the empty constructor followed by a
-    setSupport and setNumberOfComponents call.
-   */
-  //void getBarycenter() const throw (MEDEXCEPTION) ;
 
   typedef void (*myFuncType)(const double *,T*);
   void fillFromAnalytic(myFuncType f) throw (MEDEXCEPTION);
@@ -1164,12 +1083,14 @@ FIELD<T, INTERLACING_TAG>::FIELD():FIELD_()
   FIELD_::_interlacingType=SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType;
 
   _value = ( ArrayNoGauss * ) NULL;
+
+  _mesh  = ( MESH* ) NULL;
 }
 
-	/*!
+        /*!
 \addtogroup FIELD_constructors FIELD<T> constructors
 @{
-	*/
+        */
 
 /*!
   Constructor that allocates the value array with the dimensions provided by
@@ -1199,34 +1120,51 @@ FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
 
   //INITIALISATION DE _valueType DS LE CONSTRUCTEUR DE FIELD_
   ASSERT_MED(FIELD_::_valueType == MED_EN::MED_UNDEFINED_TYPE)
-  FIELD_::_valueType=SET_VALUE_TYPE<T>::_valueType;
+    FIELD_::_valueType=SET_VALUE_TYPE<T>::_valueType;
 
   //INITIALISATION DE _interlacingType DS LE CONSTRUCTEUR DE FIELD_
   ASSERT_MED(FIELD_::_interlacingType == MED_EN::MED_UNDEFINED_INTERLACE)
-  FIELD_::_interlacingType=SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType;
+    FIELD_::_interlacingType=SET_INTERLACING_TYPE<INTERLACING_TAG>::_interlacingType;
 
-  try {
-    // becarefull about the numbre of gauss point
-    _numberOfValues = Support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
-  }
+  try
+    {
+      // becarefull about the numbre of gauss point
+      _numberOfValues = Support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+    }
 #if defined(_DEBUG_) || defined(_DEBUG)
-  catch (MEDEXCEPTION &ex) {
+  catch (MEDEXCEPTION &ex)
 #else
-  catch (MEDEXCEPTION ) {
+  catch (MEDEXCEPTION )
 #endif
-    MESSAGE_MED("No value defined ! ("<<ex.what()<<")");
-  }
+    {
+      MESSAGE_MED("No value defined ! ("<<ex.what()<<")");
+    }
   MESSAGE_MED("FIELD : constructeur : "<< _numberOfValues <<" et "<< NumberOfComponents);
-  if (0<_numberOfValues) {
-    _value = new ArrayNoGauss (_numberOfComponents,_numberOfValues);
-    _isRead = true ;
-  }
+  if ( _numberOfValues > 0 )
+    {
+      if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE )
+        {
+          const int * nbelgeo = Support->getNumberOfElements();
+          vector<int> nbelgeoc( Support->getNumberOfTypes() + 1 );
+          nbelgeoc[0] = 0;
+          for ( int t = 1; t < (int)nbelgeoc.size(); ++t )
+            nbelgeoc[t] = nbelgeoc[t-1] + nbelgeo[t-1];
+          _value = new ArrayNoByType (_numberOfComponents,_numberOfValues,
+                                      Support->getNumberOfTypes(), &nbelgeoc[0]);
+        }
+      else
+        {
+          _value = new ArrayNoGauss (_numberOfComponents,_numberOfValues);
+        }
+      _isRead = true ;
+    }
+  _mesh  = ( MESH* ) NULL;
 
   END_OF_MED(LOC);
 }
-	/*!
+        /*!
 @}
-	*/
+        */
 /*!
   \if developper
   \endif
@@ -1239,7 +1177,7 @@ template <class T, class INTERLACING_TAG> void FIELD<T, INTERLACING_TAG>::init (
   Copy constructor.
 */
 template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::FIELD(const FIELD & m):
-  FIELD_((FIELD_) m)
+  FIELD_(m)
 {
   MESSAGE_MED("Constructeur FIELD de recopie");
 
@@ -1247,9 +1185,9 @@ template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::FIELD(const
   if (m._value != NULL)
     {
       if ( m.getGaussPresence() )
-	_value = new ArrayGauss( *(static_cast< ArrayGauss * > (m._value) ) ,false);
+        _value = new ArrayGauss( *(static_cast< ArrayGauss * > (m._value) ) ,false);
       else
-	_value = new ArrayNoGauss( *(static_cast< ArrayNoGauss * > (m._value)) ,false);
+        _value = new ArrayNoGauss( *(static_cast< ArrayNoGauss * > (m._value)) ,false);
     }
   else
     _value = (ArrayNoGauss *) NULL;
@@ -1257,12 +1195,15 @@ template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::FIELD(const
   for ( it = m._gaussModel.begin();it != m._gaussModel.end(); it++ )
     _gaussModel[static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ((*it).second)->getType()]=
       new GAUSS_LOCALIZATION<INTERLACING_TAG>(
-					      *static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ( (*it).second )
-					      );
+                                              *static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ( (*it).second )
+                                              );
 
   _valueType       = m._valueType;
   _interlacingType = m._interlacingType;
   //drivers = m._drivers;
+  _mesh            = m._mesh;
+  if(_mesh)
+    _mesh->addReference();
 }
 
 /*!
@@ -1286,26 +1227,33 @@ FIELD<T, INTERLACING_TAG> & FIELD<T, INTERLACING_TAG>::operator=(const FIELD &m)
   for ( it = m._gaussModel.begin();it != m._gaussModel.end(); it++ )
     _gaussModel[static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ((*it).second)->getType()]=
       new GAUSS_LOCALIZATION<INTERLACING_TAG>(
-					      *static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ( (*it).second )
-					      );
+                                              *static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ( (*it).second )
+                                              );
 
   _valueType       = m._valueType;
   _interlacingType = m._interlacingType;
-
+  if(_mesh!=m._mesh)
+    {
+      if(_mesh)
+        _mesh->removeReference();
+      _mesh = m._mesh;
+      if(_mesh)
+        _mesh->addReference();
+    }
   return *this;
 }
 
 /*!
-	Initializes all the field values to \a value 
+        Initializes all the field values to \a value 
 */
 template <class T, class INTERLACING_TAG>
 FIELD<T, INTERLACING_TAG> & FIELD<T, INTERLACING_TAG>::operator=(T value)
 {
   MESSAGE_MED("Appel de FIELD<T>::operator= T") ;
-	int size=getNumberOfComponents()*getNumberOfValues();
-	T* ptr= const_cast<T*>( getValue());
-	for (int i=0; i< size; i++)
-		{*ptr++=value;}
+        int size=getNumberOfComponents()*getNumberOfValues();
+        T* ptr= const_cast<T*>( getValue());
+        for (int i=0; i< size; i++)
+                {*ptr++=value;}
 
   return *this;
 }
@@ -1335,17 +1283,16 @@ FIELD<T, INTERLACING_TAG> & FIELD<T, INTERLACING_TAG>::operator=(T value)
      3 temporary fields.
 */
 template <class T, class INTERLACING_TAG>
-const FIELD<T, INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::operator+(const FIELD & m) const
+FIELD<T, INTERLACING_TAG> *FIELD<T, INTERLACING_TAG>::operator+(const FIELD & m) const
 {
   const char* LOC = "FIELD<T>::operator+(const FIELD & m)";
   BEGIN_OF_MED(LOC);
     FIELD_::_checkFieldCompatibility(*this, m); // may throw exception
 
     // Creation of the result - memory is allocated by FIELD constructor
-    FIELD<T, INTERLACING_TAG> result(this->getSupport(),this->getNumberOfComponents());
-    //result._operation(*this,m,mode,"+"); // perform Atribute's initialization & addition
-    result._operationInitialize(*this,m,"+"); // perform Atribute's initialization
-    result._add_in_place(*this,m); // perform addition
+    FIELD<T, INTERLACING_TAG> *result=new FIELD<T, INTERLACING_TAG>(this->getSupport(),this->getNumberOfComponents());
+    result->_operationInitialize(*this,m,"+"); // perform Atribute's initialization
+    result->_add_in_place(*this,m); // perform addition
 
   END_OF_MED(LOC);
     return result;
@@ -1369,7 +1316,7 @@ FIELD<T, INTERLACING_TAG>& FIELD<T, INTERLACING_TAG>::operator+=(const FIELD & m
     const int size=getNumberOfValues()*getNumberOfComponents(); // size of array
     const T* endV=value+size; // pointer to the end of value
     for(;value!=endV; value1++,value++)
-	*value += *value1;
+        *value += *value1;
   END_OF_MED(LOC);
     return *this;
 }
@@ -1389,7 +1336,7 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::add(const FIELD& m, const 
 
     // Creation of a new field
     FIELD<T, INTERLACING_TAG>* result = new FIELD<T, INTERLACING_TAG>(m.getSupport(),
-								      m.getNumberOfComponents());
+                                                                      m.getNumberOfComponents());
     result->_operationInitialize(m,n,"+"); // perform Atribute's initialization
     result->_add_in_place(m,n); // perform addition
 
@@ -1408,7 +1355,7 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::addDeep(const FIELD& m, co
 
     // Creation of a new field
     FIELD<T, INTERLACING_TAG>* result = new FIELD<T, INTERLACING_TAG>(m.getSupport(),
-								      m.getNumberOfComponents());
+                                                                      m.getNumberOfComponents());
     result->_operationInitialize(m,n,"+"); // perform Atribute's initialization
     result->_add_in_place(m,n); // perform addition
 
@@ -1437,49 +1384,48 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::addDeep(const FIELD& m, co
      3 temporary fields.
 */
 template <class T, class INTERLACING_TAG>
-const FIELD<T, INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::operator-(const FIELD & m) const
+FIELD<T, INTERLACING_TAG> *FIELD<T, INTERLACING_TAG>::operator-(const FIELD & m) const
 {
   const char* LOC = "FIELD<T>::operator-(const FIELD & m)";
   BEGIN_OF_MED(LOC);
     FIELD_::_checkFieldCompatibility(*this, m); // may throw exception
 
     // Creation of the result - memory is allocated by FIELD constructor
-    FIELD<T, INTERLACING_TAG> result(this->getSupport(),this->getNumberOfComponents());
-    //result._operation(*this,m,mode,"-"); // perform Atribute's initialization & substraction
-    result._operationInitialize(*this,m,"-"); // perform Atribute's initialization
-    result._sub_in_place(*this,m); // perform substracion
+    FIELD<T, INTERLACING_TAG> *result=new FIELD<T, INTERLACING_TAG>(this->getSupport(),this->getNumberOfComponents());
+    result->_operationInitialize(*this,m,"-"); // perform Atribute's initialization
+    result->_sub_in_place(*this,m); // perform substracion
 
   END_OF_MED(LOC);
     return result;
 }
 
 template <class T, class INTERLACING_TAG>
-const FIELD<T, INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::operator-() const
+FIELD<T, INTERLACING_TAG> *FIELD<T, INTERLACING_TAG>::operator-() const
 {
   const char* LOC = "FIELD<T>::operator-()";
   BEGIN_OF_MED(LOC);
 
     // Creation of the result - memory is allocated by FIELD constructor
-    FIELD<T, INTERLACING_TAG> result(this->getSupport(),this->getNumberOfComponents());
+  FIELD<T, INTERLACING_TAG> *result=new FIELD<T, INTERLACING_TAG>(this->getSupport(),this->getNumberOfComponents());
     // Atribute's initialization
-    result.setName("- "+getName());
-    result.setComponentsNames(getComponentsNames());
+    result->setName("- "+getName());
+    result->setComponentsNames(getComponentsNames());
     // not yet implemented    setComponentType(getComponentType());
-    result.setComponentsDescriptions(getComponentsDescriptions());
-    result.setMEDComponentsUnits(getMEDComponentsUnits());
-    result.setComponentsUnits(getComponentsUnits());
-    result.setIterationNumber(getIterationNumber());
-    result.setTime(getTime());
-    result.setOrderNumber(getOrderNumber());
+    result->setComponentsDescriptions(getComponentsDescriptions());
+    result->setMEDComponentsUnits(getMEDComponentsUnits());
+    result->setComponentsUnits(getComponentsUnits());
+    result->setIterationNumber(getIterationNumber());
+    result->setTime(getTime());
+    result->setOrderNumber(getOrderNumber());
 
     const T* value1=getValue();
     // get a non const pointer to the inside array of values and perform operation
-    T * value=const_cast<T *> (result.getValue());
+    T * value=const_cast<T *> (result->getValue());
     const int size=getNumberOfValues()*getNumberOfComponents(); // size of array
     const T* endV=value+size; // pointer to the end of value
 
     for(;value!=endV; value1++,value++)
-	*value = -(*value1);
+        *value = -(*value1);
   END_OF_MED(LOC);
     return result;
 }
@@ -1503,7 +1449,7 @@ FIELD<T, INTERLACING_TAG>& FIELD<T, INTERLACING_TAG>::operator-=(const FIELD & m
     const T* endV=value+size; // pointer to the end of value
 
     for(;value!=endV; value1++,value++)
-	*value -= *value1;
+        *value -= *value1;
 
   END_OF_MED(LOC);
     return *this;
@@ -1518,16 +1464,16 @@ template <class T, class INTERLACIN_TAG> void FIELD<T, INTERLACIN_TAG>::applyLin
 {
     // get a non const pointer to the inside array of values and perform operation in place
     T * value=const_cast<T *> (getValue());
-	 
+         
     const int size=getNumberOfValues()*getNumberOfComponents(); // size of array
 
     if (size>0) // for a negative size, there is nothing to do
     {
-			value+=icomp-1;
-			const T* lastvalue=value+size; // pointer to the end of value
+                        value+=icomp-1;
+                        const T* lastvalue=value+size; // pointer to the end of value
  
-			for(;value!=lastvalue; value+=getNumberOfComponents()) // apply linear transformation
-				*value = a*(*value)+b;
+                        for(;value!=lastvalue; value+=getNumberOfComponents()) // apply linear transformation
+                                *value = a*(*value)+b;
     }
 }
 
@@ -1545,7 +1491,7 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::sub(const FIELD& m, const 
 
     // Creation of a new field
     FIELD<T, INTERLACING_TAG>* result = new FIELD<T, INTERLACING_TAG>(m.getSupport(),
-								      m.getNumberOfComponents());
+                                                                      m.getNumberOfComponents());
     result->_operationInitialize(m,n,"-"); // perform Atribute's initialization
     result->_sub_in_place(m,n); // perform substraction
 
@@ -1564,7 +1510,7 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::subDeep(const FIELD& m, co
 
     // Creation of a new field
     FIELD<T, INTERLACING_TAG>* result = new FIELD<T, INTERLACING_TAG>(m.getSupport(),
-								      m.getNumberOfComponents());
+                                                                      m.getNumberOfComponents());
     result->_operationInitialize(m,n,"-"); // perform Atribute's initialization
     result->_sub_in_place(m,n); // perform substraction
 
@@ -1593,17 +1539,16 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::subDeep(const FIELD& m, co
      3 temporary fields.
 */
 template <class T, class INTERLACING_TAG>
-const FIELD<T, INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::operator*(const FIELD & m) const
+FIELD<T, INTERLACING_TAG> *FIELD<T, INTERLACING_TAG>::operator*(const FIELD & m) const
 {
   const char* LOC = "FIELD<T>::operator*(const FIELD & m)";
   BEGIN_OF_MED(LOC);
     FIELD_::_checkFieldCompatibility(*this, m, false); // may throw exception
 
     // Creation of the result - memory is allocated by FIELD constructor
-    FIELD<T, INTERLACING_TAG> result(this->getSupport(),this->getNumberOfComponents());
-    //result._operation(*this,m,mode,"*"); // perform Atribute's initialization & multiplication
-    result._operationInitialize(*this,m,"*"); // perform Atribute's initialization
-    result._mul_in_place(*this,m); // perform multiplication
+    FIELD<T, INTERLACING_TAG> *result=new FIELD<T, INTERLACING_TAG>(this->getSupport(),this->getNumberOfComponents());
+    result->_operationInitialize(*this,m,"*"); // perform Atribute's initialization
+    result->_mul_in_place(*this,m); // perform multiplication
 
   END_OF_MED(LOC);
     return result;
@@ -1628,7 +1573,7 @@ FIELD<T, INTERLACING_TAG>& FIELD<T, INTERLACING_TAG>::operator*=(const FIELD & m
     const T* endV=value+size; // pointer to the end of value
 
     for(;value!=endV; value1++,value++)
-	*value *= *value1;
+        *value *= *value1;
 
   END_OF_MED(LOC);
     return *this;
@@ -1649,7 +1594,7 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::mul(const FIELD& m, const 
 
     // Creation of a new field
     FIELD<T, INTERLACING_TAG>* result = new FIELD<T, INTERLACING_TAG>(m.getSupport(),
-								      m.getNumberOfComponents());
+                                                                      m.getNumberOfComponents());
     result->_operationInitialize(m,n,"*"); // perform Atribute's initialization
     result->_mul_in_place(m,n); // perform multiplication
 
@@ -1668,7 +1613,7 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::mulDeep(const FIELD& m, co
 
     // Creation of a new field
     FIELD<T, INTERLACING_TAG>* result = new FIELD<T,INTERLACING_TAG>(m.getSupport(),
-								     m.getNumberOfComponents());
+                                                                     m.getNumberOfComponents());
     result->_operationInitialize(m,n,"*"); // perform Atribute's initialization
     result->_mul_in_place(m,n); // perform multiplication
 
@@ -1697,17 +1642,24 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::mulDeep(const FIELD& m, co
      3 temporary fields.
 */
 template <class T, class INTERLACING_TAG>
-const FIELD<T, INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::operator/(const FIELD & m) const
+FIELD<T, INTERLACING_TAG> *FIELD<T, INTERLACING_TAG>::operator/(const FIELD & m) const
 {
   const char* LOC = "FIELD<T>::operator/(const FIELD & m)";
   BEGIN_OF_MED(LOC);
     FIELD_::_checkFieldCompatibility(*this, m, false); // may throw exception
 
     // Creation of the result - memory is allocated by FIELD constructor
-    FIELD<T, INTERLACING_TAG> result(this->getSupport(),this->getNumberOfComponents());
-    //result._operation(*this,m,mode,"/"); // perform Atribute's initialization & division
-    result._operationInitialize(*this,m,"/"); // perform Atribute's initialization
-    result._div_in_place(*this,m); // perform division
+    FIELD<T, INTERLACING_TAG> *result=new FIELD<T, INTERLACING_TAG>(this->getSupport(),this->getNumberOfComponents());
+    try
+      {
+        result->_operationInitialize(*this,m,"/"); // perform Atribute's initialization
+        result->_div_in_place(*this,m); // perform division
+      }
+    catch(MEDEXCEPTION& e)
+      {
+        result->removeReference();
+        throw e;
+      }
 
   END_OF_MED(LOC);
     return result;
@@ -1733,7 +1685,7 @@ FIELD<T, INTERLACING_TAG>& FIELD<T, INTERLACING_TAG>::operator/=(const FIELD & m
     const T* endV=value+size; // pointer to the end of value
 
     for(;value!=endV; value1++,value++)
-	*value /= *value1;
+        *value /= *value1;
 
   END_OF_MED(LOC);
     return *this;
@@ -1754,10 +1706,17 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::div(const FIELD& m, const 
 
     // Creation of a new field
     FIELD<T, INTERLACING_TAG>* result = new FIELD<T, INTERLACING_TAG>(m.getSupport(),
-								      m.getNumberOfComponents());
-    result->_operationInitialize(m,n,"/"); // perform Atribute's initialization
-    result->_div_in_place(m,n); // perform division
-
+                                                                      m.getNumberOfComponents());
+    try
+      {
+        result->_operationInitialize(m,n,"/"); // perform Atribute's initialization
+        result->_div_in_place(m,n); // perform division
+      }
+    catch(MEDEXCEPTION& e)
+      {
+        result->removeReference();
+        throw e;
+      }
   END_OF_MED(LOC);
     return result;
 }
@@ -1773,10 +1732,17 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::divDeep(const FIELD& m, co
 
   // Creation of a new field
   FIELD<T, INTERLACING_TAG>* result = new FIELD<T, INTERLACING_TAG>(m.getSupport(),
-								    m.getNumberOfComponents());
-  result->_operationInitialize(m,n,"/"); // perform Atribute's initialization
-  result->_div_in_place(m,n); // perform division
-
+                                                                    m.getNumberOfComponents());
+  try
+    {
+      result->_operationInitialize(m,n,"/"); // perform Atribute's initialization
+      result->_div_in_place(m,n); // perform division
+    }
+  catch(MEDEXCEPTION& e)
+      {
+        result->removeReference();
+        throw e;
+      }
   END_OF_MED(LOC);
   return result;
 }
@@ -1802,17 +1768,13 @@ void FIELD<T, INTERLACING_TAG>::_operationInitialize(const FIELD& m,const FIELD&
     // Other data members (_support, _numberOfValues) are initialized in the field's constr.
     setName(m.getName()+" "+Op+" "+n.getName());
     setComponentsNames(m.getComponentsNames());
-    // not yet implemented    setComponentType(m.getComponentType());
     setComponentsDescriptions(m.getComponentsDescriptions());
     setMEDComponentsUnits(m.getMEDComponentsUnits());
 
     // The following data member may differ from field m to n.
     // The initialization is done based on the first field.
 
-    //if(m.getComponentsUnits() != NULL)
     setComponentsUnits(m.getComponentsUnits());
-    //else
-    //  _componentsUnits = (UNIT *) NULL;
 
     setIterationNumber(m.getIterationNumber());
     setTime(m.getTime());
@@ -1841,7 +1803,7 @@ void FIELD<T, INTERLACING_TAG>::_add_in_place(const FIELD& m,const FIELD& n)
     SCRUTE_MED(size);
     const T* endV1=value1+size;
     for(;value1!=endV1; value1++,value2++,value++)
-	*value=(*value1)+(*value2);
+        *value=(*value1)+(*value2);
 }
 
 /*!
@@ -1865,7 +1827,7 @@ void FIELD<T, INTERLACING_TAG>::_sub_in_place(const FIELD& m,const FIELD& n)
     SCRUTE_MED(size);
     const T* endV1=value1+size;
     for(;value1!=endV1; value1++,value2++,value++)
-	*value=(*value1)-(*value2);
+        *value=(*value1)-(*value2);
 }
 
 /*!
@@ -1889,7 +1851,7 @@ void FIELD<T, INTERLACING_TAG>::_mul_in_place(const FIELD& m,const FIELD& n)
     SCRUTE_MED(size);
     const T* endV1=value1+size;
     for(;value1!=endV1; value1++,value2++,value++)
-	*value=(*value1)*(*value2);
+        *value=(*value1)*(*value2);
 }
 
 /*!
@@ -1914,11 +1876,11 @@ void FIELD<T, INTERLACING_TAG>::_div_in_place(const FIELD& m,const FIELD& n) thr
     const T* endV1=value1+size;
     for(;value1!=endV1; value1++,value2++,value++){
       if ( *value2 == 0 ) { // FAIRE PLUTOT UN TRY CATCH Rmq from EF
-	  string diagnosis;
-	  diagnosis="FIELD<T,INTERLACING_TAG>::_div_in_place(...) : Divide by zero !";
-	  throw MEDEXCEPTION(diagnosis.c_str());
-	}
-	*value=(*value1)/(*value2);
+          string diagnosis;
+          diagnosis="FIELD<T,INTERLACING_TAG>::_div_in_place(...) : Divide by zero !";
+          throw MEDEXCEPTION(diagnosis.c_str());
+        }
+        *value=(*value1)/(*value2);
     }
 }
 
@@ -1935,10 +1897,10 @@ template <class T, class INTERLACIN_TAG> double FIELD<T, INTERLACIN_TAG>::normMa
     const int size=getNumberOfValues()*getNumberOfComponents();
     if (size <= 0) // Size of array has to be strictly positive
     {
-	string diagnosis;
-	diagnosis="FIELD<T,INTERLACIN_TAG>::normMax() : cannot compute the norm of "+getName()+
-	    " : it size is non positive!";
-	throw MEDEXCEPTION(diagnosis.c_str());
+        string diagnosis;
+        diagnosis="FIELD<T,INTERLACIN_TAG>::normMax() : cannot compute the norm of "+getName()+
+            " : it size is non positive!";
+        throw MEDEXCEPTION(diagnosis.c_str());
     }
     const T* lastvalue=value+size; // get pointer just after last value
     const T* pMax=value; // pointer to the max value
@@ -1947,16 +1909,16 @@ template <class T, class INTERLACIN_TAG> double FIELD<T, INTERLACIN_TAG>::normMa
     // get pointers to the max & min value of array
     while ( ++value != lastvalue )
     {
-	if ( *pMin > *value )
-	    pMin=value;
-	if ( *pMax < *value )
-	    pMax=value;
+        if ( *pMin > *value )
+            pMin=value;
+        if ( *pMax < *value )
+            pMax=value;
     }
 
     T Max= *pMax>(T) 0 ? *pMax : -*pMax; // Max=abs(*pMax)
     T Min= *pMin>(T) 0 ? *pMin : -*pMin; // Min=abs(*pMin)
 
-    return Max>Min ? static_cast<double>(Max) : static_cast<double>(Min);
+    return Max>Min ? double(Max) : double(Min);
 }
 
 /*!  Return Euclidian norm for all elements of the array.
@@ -1967,18 +1929,18 @@ template <class T, class INTERLACIN_TAG> double FIELD<T, INTERLACIN_TAG>::norm2(
     const int size=getNumberOfValues()*getNumberOfComponents(); // get size of array
     if (size <= 0) // Size of array has to be strictly positive
     {
-	string diagnosis;
-	diagnosis="FIELD<T,INTERLACIN_TAG>::norm2() : cannot compute the norm of "+getName()+
-	    " : it size is non positive!";
-	throw MEDEXCEPTION(diagnosis.c_str());
+        string diagnosis;
+        diagnosis="FIELD<T,INTERLACIN_TAG>::norm2() : cannot compute the norm of "+getName()+
+            " : it size is non positive!";
+        throw MEDEXCEPTION(diagnosis.c_str());
     }
     const T* lastvalue=value+size; // point just after last value
 
     T result((T)0); // init
     for( ; value!=lastvalue ; ++value)
-	result += (*value) * (*value);
+        result += (*value) * (*value);
 
-    return std::sqrt(static_cast<double> (result));
+    return std::sqrt(double(result));
 }
 
 
@@ -2006,9 +1968,9 @@ template <class T, class INTERLACIN_TAG> double FIELD<T, INTERLACIN_TAG>::norm2(
       
     for( ; value!=lastvalue ; ++value){
       if ( vmin > *value )
-	vmin=*value;
+        vmin=*value;
       if ( vmax < *value )
-	vmax=*value;
+        vmax=*value;
     }
     _isMinMax=true;
     _vmin=vmin;
@@ -2036,7 +1998,6 @@ template <class T, class INTERLACIN_TAG> double FIELD<T, INTERLACIN_TAG>::norm2(
       " : it size is non positive!";
     throw MEDEXCEPTION(diagnosis.c_str());
   }
-  //    return static_cast<ArrayGauss *>(_value)->getIJ(valIndex,j) ;
 
   vector<int> Histogram(nbint) ;
   T vmin,vmax;
@@ -2187,33 +2148,33 @@ FIELD<double, FullInterlace>* FIELD<T, INTERLACIN_TAG>::buildGradient() const th
       set <int>::iterator nodeIt ;
       listNodes.clear();
       for(int j=indC[i-1];j<indC[i];j++){
-	// c element contains node i
-	int c=revC[j-1];
-	// we put the nodes of c element in set
-	for(int k=iC[c-1];k<iC[c];k++)
-	  if(C[k-1] != i)
-	    listNodes.insert(C[k-1]);
+        // c element contains node i
+        int c=revC[j-1];
+        // we put the nodes of c element in set
+        for(int k=iC[c-1];k<iC[c];k++)
+          if(C[k-1] != i)
+            listNodes.insert(C[k-1]);
       }
       // coordinates of node i in space of dimension spaceDim
       for(int j=0;j<spaceDim;j++)
-	x[j] = coord[(i-1)*spaceDim+j];
+        x[j] = coord[(i-1)*spaceDim+j];
       
       for(int j=0;j<spaceDim;j++){
-	// value of field
-	double val = getValueIJ(i,1);
-	double grad = 0.;
-	// calculate gradient for each neighbor node
-	for(nodeIt=listNodes.begin();nodeIt!=listNodes.end();nodeIt++){
-	  int node = *nodeIt;
-	  double d2 = 0.;
-	  for(int l=0;l<spaceDim;l++){
-	    double xx = coord[(node-1)*spaceDim+l];
-	    d2 += (x[l]-xx) * (x[l]-xx);
-	  }
-	  grad += (coord[(node-1)*spaceDim+j]-x[j])*(getValueIJ(node,1)-val)/sqrt(d2);
-	}
-	if(listNodes.size() != 0) grad /= listNodes.size();
-	Gradient->setValueIJ(i,j+1,grad);
+        // value of field
+        double val = getValueIJ(i,1);
+        double grad = 0.;
+        // calculate gradient for each neighbor node
+        for(nodeIt=listNodes.begin();nodeIt!=listNodes.end();nodeIt++){
+          int node = *nodeIt;
+          double d2 = 0.;
+          for(int l=0;l<spaceDim;l++){
+            double xx = coord[(node-1)*spaceDim+l];
+            d2 += (x[l]-xx) * (x[l]-xx);
+          }
+          grad += (coord[(node-1)*spaceDim+j]-x[j])*(getValueIJ(node,1)-val)/sqrt(d2);
+        }
+        if(listNodes.size() != 0) grad /= listNodes.size();
+        Gradient->setValueIJ(i,j+1,grad);
       }
     }
     break;
@@ -2291,9 +2252,9 @@ void FIELD<T, INTERLACIN_TAG>::applyFunc()
 
     if (size>0) // for a negative size, there is nothing to do
     {
-	const T* lastvalue=value+size; // pointer to the end of value
-	for(;value!=lastvalue; ++value) // apply linear transformation
-	    *value = T_function(*value);
+        const T* lastvalue=value+size; // pointer to the end of value
+        for(;value!=lastvalue; ++value) // apply linear transformation
+            *value = T_function(*value);
     }
 }
 
@@ -2326,9 +2287,9 @@ template <class T, class INTERLACIN_TAG> void FIELD<T, INTERLACIN_TAG>::applyLin
 
     if (size>0) // for a negative size, there is nothing to do
     {
-	const T* lastvalue=value+size; // pointer to the end of value
-	for(;value!=lastvalue; ++value) // apply linear transformation
-	    *value = a*(*value)+b;
+        const T* lastvalue=value+size; // pointer to the end of value
+        for(;value!=lastvalue; ++value) // apply linear transformation
+            *value = a*(*value)+b;
     }
 }
 
@@ -2380,10 +2341,10 @@ FIELD<T, INTERLACING_TAG>::scalarProduct(const FIELD & m, const FIELD & n, bool 
     const T* lastvalue=value+numberOfElements; // pointing just after last value of result
     for ( ; value!=lastvalue ; ++value ) // loop on all elements
     {
-	*value=(T)0; // initialize value
-	const T* endofRow=value1+NumberOfComponents; // pointing just after end of row
-	for ( ; value1 != endofRow; ++value1, ++value2) // computation of dot product
-	    *value += (*value1) * (*value2);
+        *value=(T)0; // initialize value
+        const T* endofRow=value1+NumberOfComponents; // pointing just after end of row
+        for ( ; value1 != endofRow; ++value1, ++value2) // computation of dot product
+            *value += (*value1) * (*value2);
     }
     return result;
 }
@@ -2391,19 +2352,21 @@ FIELD<T, INTERLACING_TAG>::scalarProduct(const FIELD & m, const FIELD & n, bool 
 /*!  Return L2 Norm  of the field's component.
  *   Cannot be applied to a field with a support on nodes.
  *   If the optional p_field_volume argument is furnished, the volume is not re-calculated.
+ *   For the nodal field, p_field_volume must be for all cells even if the field is partial.
  */
 template <class T, class INTERLACING_TAG>
 double FIELD<T, INTERLACING_TAG>::normL2(int component,
-					 const FIELD<double, FullInterlace> * p_field_volume) const
+                                         const FIELD<double, FullInterlace> * p_field_volume) const
 {
-    _checkNormCompatibility(p_field_volume); // may throw exception
+    _checkNormCompatibility(p_field_volume, /*nodalAllowed=*/true); // may throw exception
     if ( component<1 || component>getNumberOfComponents() )
-	throw MEDEXCEPTION(STRING("FIELD<T>::normL2() : The component argument should be between 1 and the number of components"));
+        throw MEDEXCEPTION(STRING("FIELD<T>::normL2() : The component argument should be between 1 and the number of components"));
 
     const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implémentation dans mesh]
-
+      p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implémentation dans mesh]
+    else
+      p_field_size->addReference();
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
     const double* vol=p_field_size->getValue();
     // Il n'est vraiment pas optimal de mixer des champs dans des modes d'entrelacement
@@ -2413,91 +2376,82 @@ double FIELD<T, INTERLACING_TAG>::normL2(int component,
     double integrale=0.0;
     double totVol=0.0;
 
-    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE ) {
-      const T* value = getValue();
-      value = value + (component-1) * getNumberOfValues();
-      const T* lastvalue = value + getNumberOfValues(); // pointing just after the end of column
-      for (; value!=lastvalue ; ++value ,++vol) {
-	integrale += static_cast<double>((*value) * (*value)) * (*vol);
-	totVol+=*vol;
+    if ( getSupport()->getEntity() == MED_NODE ) // issue 20120: [CEA 206] normL2 on NODE field
+    {
+      //Most frequently the FIELD is on the whole mesh and
+      // there is no need in optimizing iterations from supporting nodes-> back to cells,
+      // so we iterate just on all cells
+      const MESH * mesh = getSupport()->getMesh()->convertInMESH();
+      const int nbCells = mesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
+      const int *C = mesh->getConnectivity(MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
+      const int *iC = mesh->getConnectivityIndex(MED_NODAL,MED_CELL);
+      for (int i = 0; i < nbCells; ++i, ++vol) {
+        // calculate integral on current element as average summ of values on all it's nodes
+        double curCellValue = 0;
+        try { // we expect exception with partial fields for nodes w/o values
+          for (int ij = iC[i]; ij < iC[i+1]; ij++) {
+            int node = C[ij-1];
+            curCellValue += getValueIJ( node, component );
+          }
+        }
+        catch ( MEDEXCEPTION ) {
+          continue;
+        }
+        int nbNodes = iC[i+1]-iC[i];
+        curCellValue /= nbNodes;
+        integrale += (curCellValue * curCellValue) * std::abs(*vol);
+        totVol+=std::abs(*vol);
+      }
+      mesh->removeReference();
+    }
+    else
+    {
+      if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE ) {
+        const T* value = getValue();
+        value = value + (component-1) * getNumberOfValues();
+        const T* lastvalue = value + getNumberOfValues(); // pointing just after the end of column
+        for (; value!=lastvalue ; ++value ,++vol) {
+          integrale += double((*value) * (*value)) * std::abs(*vol);
+          totVol+=std::abs(*vol);
+        }
+      }
+      else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+        ArrayNoByType* anArray = dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() );
+        for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
+          integrale += anArray->getIJ(i,component) * anArray->getIJ(i,component) * std::abs(*vol);
+          totVol+=std::abs(*vol);
+        }
+      }
+      else { // FULL_INTERLACE
+        ArrayFull* anArray = dynamic_cast< ArrayFull * > ( getArrayNoGauss() );
+        for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
+          integrale += anArray->getIJ(i,component) * anArray->getIJ(i,component) * std::abs(*vol);
+          totVol+=std::abs(*vol);
+        }
       }
     }
-    else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
-      ArrayNoByType* anArray = dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() );
-      //for (int i=1; i <= anArray->getNbElem() ; i++ ) {
-      //  for (int j=1; j<= anArray->getDim(); j++, ++vol ) {
-      //    integrale += static_cast<double>( anArray->getIJ(i,j) * anArray->getIJ(i,j) * (*vol) );
-      //    totVol+=*vol;
-      //  }
-      //}
-      for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
-        integrale += static_cast<double>( anArray->getIJ(i,component) * anArray->getIJ(i,component) * (*vol) );
-        totVol+=*vol;
-      }
-      //delete anArray;
-    }
-    else { // FULL_INTERLACE
-      ArrayFull* anArray = dynamic_cast< ArrayFull * > ( getArrayNoGauss() );
-      //for (int i=1; i <= anArray->getNbElem() ; i++ ) {
-      //  for (int j=1; j<= anArray->getDim(); j++, ++vol ) {
-      //for (int j=1; j<= anArray->getDim(); j++ ) {
-      //  for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
-      //    integrale += static_cast<double>( anArray->getIJ(i,j) * anArray->getIJ(i,j) * (*vol) );
-      //    totVol+=*vol;
-      //  }
-      //}
-      for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
-        integrale += static_cast<double>( anArray->getIJ(i,component) * anArray->getIJ(i,component) * (*vol) );
-        totVol+=*vol;
-      }
-      //delete anArray;
-    }
 
-    //const T * value     = NULL;
-    //ArrayNo * myArray   = NULL;
-    //if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
-    //  value = getValue();
-    //else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
-    //  myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
-    //  value   = myArray->getPtr();
-    //}
-    //else {
-    //  myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
-    //  value   = myArray->getPtr();
-    //}
-    
-    //value = value + (component-1) * getNumberOfValues();
-    //const T* lastvalue=value+getNumberOfValues(); // pointing just after the end of column
+    if(p_field_size)
+      p_field_size->removeReference(); // delete temporary volume field
 
-    //double integrale=0.0;
-    //double totVol=0.0;
-    //for (; value!=lastvalue ; ++value ,++vol)
-    //{
-    //integrale += static_cast<double>((*value) * (*value)) * (*vol);
-    //totVol+=*vol;
-    //}
-
-    if(!p_field_volume) // if the user didn't supply the volume
-	delete p_field_size; // delete temporary volume field
-    //if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
     if( totVol <= 0)
-	throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
-
+        throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
     return integrale/totVol;
 }
 
 /*!  Return L2 Norm  of the field.
- *   Cannot be applied to a field with a support on nodes.
  *   If the optional p_field_volume argument is furnished, the volume is not re-calculated.
+ *   For the nodal field, p_field_volume must be for all cells even if the field is partial.
  */
 template <class T, class INTERLACING_TAG>
 double FIELD<T, INTERLACING_TAG>::normL2(const FIELD<double, FullInterlace> * p_field_volume) const
 {
-    _checkNormCompatibility(p_field_volume); // may throw exception
+    _checkNormCompatibility(p_field_volume, /*nodalAllowed=*/true); // may throw exception
     const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃ©mentation dans mesh]
-
+      p_field_size=_getFieldSize(); // we calculate the volume
+    else
+      p_field_size->addReference();
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
     const double* vol=p_field_size->getValue();
     const double* lastvol=vol+getNumberOfValues(); // pointing just after the end of vol
@@ -2505,88 +2459,99 @@ double FIELD<T, INTERLACING_TAG>::normL2(const FIELD<double, FullInterlace> * p_
 
     double integrale=0.0;
     double totVol=0.0;
-    const double* p_vol=vol;
-    for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
-	totVol+=*p_vol;
 
-    if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE ) {
-      const T* value = getValue();
-      for (int i=1; i<=getNumberOfComponents(); ++i) { // compute integral on all components
-	for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol) {
-          integrale += static_cast<double>((*value) * (*value)) * (*p_vol);
+    if ( getSupport()->getEntity() == MED_NODE ) // issue 20120: [CEA 206] normL2 on NODE field
+    {
+      //Most frequently the FIELD is on the whole mesh and
+      // there is no need in optimizing iterations from supporting nodes-> back to cells,
+      // so we iterate just on all cells
+      const MESH * mesh = getSupport()->getMesh()->convertInMESH();
+      const int nbCells = mesh->getNumberOfElements(MED_CELL,MED_ALL_ELEMENTS);
+      const int *C = mesh->getConnectivity(MED_NODAL,MED_CELL,MED_ALL_ELEMENTS);
+      const int *iC = mesh->getConnectivityIndex(MED_NODAL,MED_CELL);
+      int nbComp = getNumberOfComponents();
+      for (int i = 0; i < nbCells; ++i, ++vol) {
+        // calculate integral on current element as average summ of values on all it's nodes
+        int nbNodes = iC[i+1]-iC[i];
+        vector< double > curCellValue( nbComp, 0 );
+        try { // we expect exception with partial fields for nodes w/o values
+          for (int ij = iC[i]; ij < iC[i+1]; ij++) {
+            int node = C[ij-1];
+            for ( int j = 0; j < nbComp; ++j )
+              curCellValue[ j ] += getValueIJ( node, j+1 ) / nbNodes;
+          }
+        }
+        catch ( MEDEXCEPTION ) {
+          continue;
+        }
+
+        for ( int j = 0; j < nbComp; ++j ) {
+          integrale += (curCellValue[j] * curCellValue[j]) * std::abs(*vol);
+        }
+        totVol+=std::abs(*vol);
+      }
+      mesh->removeReference();
+      if ( nbCells > 0 && totVol == 0.)
+        throw MEDEXCEPTION("can't compute sobolev norm : "
+                           "none of elements has values on all it's nodes");
+    }
+    else
+    {
+      const double* p_vol=vol;
+      for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
+        totVol+=std::abs(*p_vol);
+
+      if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE ) {
+        const T* value = getValue();
+        for (int i=1; i<=getNumberOfComponents(); ++i) { // compute integral on all components
+          for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol) {
+            integrale += (*value) * (*value) * std::abs(*p_vol);
+          }
+        }
+      }
+      else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
+        ArrayNoByType* anArray = dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() );
+        for (int j=1; j<=anArray->getDim(); j++) {
+          int i = 1;
+          for (p_vol=vol; i<=anArray->getNbElem() || p_vol!=lastvol; i++, ++p_vol ) {
+            integrale += anArray->getIJ(i,j) * anArray->getIJ(i,j) * std::abs(*p_vol);
+          }
+        }
+      }
+      else { // FULL_INTERLACE
+        ArrayFull* anArray = dynamic_cast< ArrayFull * > ( getArrayNoGauss() );
+        for (int j=1; j<=anArray->getDim(); j++) {
+          int i = 1;
+          for (p_vol=vol; i<=anArray->getNbElem() || p_vol!=lastvol; i++, ++p_vol ) {
+            integrale += anArray->getIJ(i,j) * anArray->getIJ(i,j) * std::abs(*p_vol);
+          }
         }
       }
     }
-    else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
-      ArrayNoByType* anArray = dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() );
-      for (int j=1; j<=anArray->getDim(); j++) {
-        int i = 1;
-        for (p_vol=vol; i<=anArray->getNbElem() || p_vol!=lastvol; i++, ++p_vol ) {
-          integrale += static_cast<double>( anArray->getIJ(i,j) * anArray->getIJ(i,j) * (*p_vol) );
-        }
-      }
-      //delete anArray;
-    }
-    else { // FULL_INTERLACE
-      ArrayFull* anArray = dynamic_cast< ArrayFull * > ( getArrayNoGauss() );
-      for (int j=1; j<=anArray->getDim(); j++) {
-        int i = 1;
-        for (p_vol=vol; i<=anArray->getNbElem() || p_vol!=lastvol; i++, ++p_vol ) {
-          integrale += static_cast<double>( anArray->getIJ(i,j) * anArray->getIJ(i,j) * (*p_vol) );
-        }
-      }
-      //delete anArray;
-    }
+    if(p_field_size)
+        p_field_size->removeReference(); // delete temporary volume field
 
-
-    //const T * value     = NULL;
-    //ArrayNo * myArray   = NULL;
-    //if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
-    //  value = getValue();
-    //else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ){
-    //  myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
-    //  value   = myArray->getPtr();
-    //}
-    //else {
-    //  myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
-    //  value   = myArray->getPtr();
-    //}
-
-    //double totVol=0.0;
-    //const double* p_vol=vol;
-    //for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
-    //totVol+=*p_vol;
-
-    //double integrale=0.0;
-    //for (int i=1; i<=getNumberOfComponents(); ++i) // compute integral on all components
-    //for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol)
-    //    integrale += static_cast<double>((*value) * (*value)) * (*p_vol);
-
-    if(!p_field_volume) // if the user didn't supply the volume
-	delete p_field_size; // delete temporary volume field
-    //if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
     if( totVol <= 0)
-	throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
-
+      throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
     return integrale/totVol;
 }
 
 /*!  Return L1 Norm  of the field's component.
- *   Cannot be applied to a field with a support on nodes.
  *   If the optional p_field_volume argument is furnished, the volume is not re-calculated.
  */
 template <class T, class INTERLACING_TAG>
 double FIELD<T, INTERLACING_TAG>::normL1(int component,
-					 const FIELD<double, FullInterlace > * p_field_volume) const
+                                         const FIELD<double, FullInterlace > * p_field_volume) const
 {
     _checkNormCompatibility(p_field_volume); // may throw exception
     if ( component<1 || component>getNumberOfComponents() )
-	throw MEDEXCEPTION(STRING("FIELD<T,INTERLACING_TAG>::normL2() : The component argument should be between 1 and the number of components"));
+        throw MEDEXCEPTION(STRING("FIELD<T,INTERLACING_TAG>::normL1() : The component argument should be between 1 and the number of components"));
 
     const FIELD<double,FullInterlace> * p_field_size=p_field_volume;
     if(!p_field_volume) // if the user don't supply the volume
-	p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'implÃ©mentation dans mesh]
-
+      p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'impl��Šmentation dans mesh]
+    else
+      p_field_size->addReference();
     // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
     const double* vol = p_field_size->getValue();
 
@@ -2597,68 +2562,29 @@ double FIELD<T, INTERLACING_TAG>::normL1(int component,
       const T* value = getValue();
       const T* lastvalue = value + getNumberOfValues(); // pointing just after the end of column
       for (; value!=lastvalue ; ++value ,++vol) {
-	integrale += std::fabs( static_cast<double>(*value) ) * (*vol);
-	totVol+=*vol;
+        integrale += std::abs( *value * *vol );
+        totVol+=std::abs(*vol);
       }
     }
     else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
       ArrayNoByType* anArray = dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() );
-      //for (int i=1; i <= anArray->getNbElem() ; i++ ) {
-      //  for (int j=1; j<= anArray->getDim(); j++, ++vol ) {
-      //    integrale += std::abs(static_cast<double>( anArray->getIJ(i,j)) ) * (*vol);
-      //    totVol+=*vol;
-      //  }
-      //}
       for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
-        integrale += std::abs(static_cast<double>( anArray->getIJ(i,component)) ) * (*vol);
-        totVol+=*vol;
+        integrale += std::abs( anArray->getIJ(i,component) * (*vol));
+        totVol+=std::abs(*vol);
       }
-      //delete anArray;
     }
     else { // FULL_INTERLACE
       ArrayFull* anArray = dynamic_cast< ArrayFull * > ( getArrayNoGauss() );
-      //for (int i=1; i <= anArray->getNbElem() ; i++ ) {
-      //  for (int j=1; j<= anArray->getDim(); j++, ++vol ) {
-      //    integrale += std::abs(static_cast<double>( anArray->getIJ(i,j)) ) * (*vol);
-      //    totVol+=*vol;
-      //  }
-      //}
       for (int i=1; i <= anArray->getNbElem() ; i++, ++vol ) {
-        integrale += std::abs(static_cast<double>( anArray->getIJ(i,component)) ) * (*vol);
-        totVol+=*vol;
+        integrale += std::abs( anArray->getIJ(i,component) * *vol);
+        totVol+=std::abs(*vol);
       }
-      //delete anArray;
     }
     
-    //const T * value     = NULL;
-    //ArrayNo * myArray   = NULL;
-    //if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
-    //  value = getColumn(component);
-    //else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
-    //  myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
-    //  value   = myArray->getColumn(component);
-    //}
-    //else {
-    //  myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
-    //  value   = myArray->getColumn(component);
-    //}
-
-    //const T* lastvalue=value+getNumberOfValues(); // pointing just after the end of column
-
-    //double integrale=0.0;
-    //double totVol=0.0;
-    //for (; value!=lastvalue ; ++value ,++vol)
-    //{
-    //integrale += std::abs( static_cast<double>(*value) ) * (*vol);
-    //totVol+=*vol;
-    //}
-
-    if(!p_field_volume) // if the user didn't supply the volume
-	delete p_field_size; // delete temporary volume field
-    //if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
+    if(p_field_size)
+      p_field_size->removeReference(); // delete temporary volume field
     if( totVol <= 0)
-	throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
-
+        throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
     return integrale/totVol;
 }
 
@@ -2673,7 +2599,8 @@ double FIELD<T, INTERLACING_TAG>::normL1(const FIELD<double, FullInterlace> * p_
   const FIELD<double, FullInterlace> * p_field_size=p_field_volume;
   if(!p_field_volume) // if the user don't supply the volume
     p_field_size=_getFieldSize(); // we calculate the volume [PROVISOIRE, en attendant l'impl�©mentation dans mesh]
-  
+  else
+    p_field_size->addReference();
   // get pointer to the element's volumes. MED_FULL_INTERLACE is the default mode for p_field_size
   const double* vol = p_field_size->getValue();
   const double* lastvol = vol+getNumberOfValues(); // pointing just after the end of vol
@@ -2682,13 +2609,13 @@ double FIELD<T, INTERLACING_TAG>::normL1(const FIELD<double, FullInterlace> * p_
   double totVol=0.0;
   const double* p_vol=vol;
   for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
-    totVol+=*p_vol;
+    totVol+=std::abs(*p_vol);
 
   if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE ) {
     const T* value = getValue();
     for (int i=1; i<=getNumberOfComponents(); ++i) { // compute integral on all components
       for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol) {
-        integrale += std::abs( static_cast<double>(*value) ) * (*p_vol);
+        integrale += std::abs( *value * *p_vol );
       }
     }
   }
@@ -2697,53 +2624,176 @@ double FIELD<T, INTERLACING_TAG>::normL1(const FIELD<double, FullInterlace> * p_
     for (int j=1; j<=anArray->getDim(); j++) {
       int i = 1;
       for (p_vol=vol; i<=anArray->getNbElem() || p_vol!=lastvol; i++, ++p_vol ) {
-        integrale += std::abs(static_cast<double>(anArray->getIJ(i,j))) * (*p_vol);
+        integrale += std::abs( anArray->getIJ(i,j) * *p_vol );
       }
     }
-    //delete anArray;
   }
   else { // FULL_INTERLACE
     ArrayFull* anArray = dynamic_cast< ArrayFull * > ( getArrayNoGauss() );
     for (int j=1; j<=anArray->getDim(); j++) {
       int i = 1;
       for (p_vol=vol; i<=anArray->getNbElem() || p_vol!=lastvol; i++, ++p_vol ) {
-        integrale += std::abs(static_cast<double>(anArray->getIJ(i,j))) * (*p_vol);
+        integrale += std::abs( anArray->getIJ(i,j) * *p_vol );
       }
     }
-    //delete anArray;
   }
-  
-  
-  //const T * value     = NULL;
-  //ArrayNo * myArray   = NULL;
-  //if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
-  //  value = getValue();
-  //else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE ) {
-  //  myArray = ArrayConvert2No( *( dynamic_cast< ArrayNoByType * > ( getArrayNoGauss() ) ));
-  //  value   = myArray->getPtr();
-  //}
-  //else {
-  //  myArray = ArrayConvert( *( dynamic_cast< ArrayFull * > ( getArrayNoGauss() ) ));
-  //  value   = myArray->getPtr();
-  //}
-  
-  //double totVol=0.0;
-  //const double* p_vol=vol;
-  //for (p_vol=vol; p_vol!=lastvol ; ++p_vol) // calculate total volume
-  //  totVol+=*p_vol;
-  
-  //double integrale=0.0;
-  //for (int i=1; i<=getNumberOfComponents(); ++i) // compute integral on all components
-  //  for (p_vol=vol; p_vol!=lastvol ; ++value ,++p_vol)
-  //    integrale += std::abs( static_cast<double>(*value) ) * (*p_vol);
-  
-  if(!p_field_volume) // if the user didn't supply the volume
-    delete p_field_size; // delete temporary volume field
-  //if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE ) delete myArray;
+  if(p_field_size)
+    p_field_size->removeReference();
   if( totVol <= 0)
     throw MEDEXCEPTION(STRING("cannot compute sobolev norm : volume is not positive!"));
-  
   return integrale/totVol;
+}
+
+/*!
+ * \brief Return integral of the field.
+ *  \param subSupport - optional part of a field to consider.
+ *  \retval double - value of integral
+ */
+template <class T, class INTERLACING_TAG>
+double FIELD<T, INTERLACING_TAG>::integral(const SUPPORT *subSupport) const throw (MEDEXCEPTION)
+{
+  const char* LOC = "FIELD<>::integral(subSupport): ";
+
+  double integrale = 0;
+
+  if (!subSupport ) subSupport = _support;
+
+  // check feasibility
+  if ( getGaussPresence() )
+    throw MEDEXCEPTION(STRING(LOC)<<"Gauss numbers greater than one are not yet implemented!");
+  if ( subSupport->getEntity() != _support->getEntity())
+    throw MEDEXCEPTION(STRING(LOC)<<"Different support entity of this field and subSupport");
+  if ( subSupport->getEntity() == MED_EN::MED_NODE )
+    throw MEDEXCEPTION(STRING(LOC)<<"Integral of nodal field not yet supported");
+
+  // analyze support
+  const int nbElems = subSupport->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
+  const bool subOnAll = ( subSupport->isOnAllElements() );
+  const bool  myOnAll = ( _support->isOnAllElements() );
+  const int* subNums = !subOnAll ? subSupport->getNumber(MED_EN::MED_ALL_ELEMENTS) : 0;
+  const int*   myNums = !myOnAll ? _support->getNumber(MED_EN::MED_ALL_ELEMENTS) : 0;
+  if ( !subOnAll && !subNums )
+    throw MEDEXCEPTION(STRING(LOC)<<"Invalid support: no element numbers");
+  if ( !myOnAll && !myNums )
+    throw MEDEXCEPTION(STRING(LOC)<<"Invalid field support: no element numbers");
+  if ( subOnAll && !myOnAll )
+    return integral(NULL);
+
+  // get size of elements
+  const FIELD<double, FullInterlace> * cellSize=_getFieldSize(subSupport);
+  const double* size = cellSize->getValue();
+  const double* lastSize = size + nbElems; // pointing just after the end of size
+
+  const T* value = getValue();
+
+  // calculate integrale
+  if ( (subOnAll && _support->isOnAllElements()) || subSupport == _support )
+    {
+      const double* p_vol;
+      if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
+        {
+          for (int j=1; j<=getNumberOfComponents(); ++j)
+            for ( p_vol=size; p_vol != lastSize; ++value ,++p_vol)
+              integrale += std::abs( *value * *p_vol );
+        }
+      else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE )
+        {
+          typename ArrayNoByType::InterlacingPolicy* indexer =
+            dynamic_cast< typename ArrayNoByType::InterlacingPolicy * > ( getArrayNoGauss() );
+          for (int i, j=1; j<=getNumberOfComponents(); j++)
+            for (i = 1, p_vol=size; p_vol!=lastSize; i++, ++p_vol )
+              integrale += std::abs( value[indexer->getIndex(i,j)] * *p_vol );
+        }
+      else  // FULL_INTERLACE
+        {
+          for ( p_vol=size; p_vol != lastSize; ++p_vol)
+            for (int j=0; j<getNumberOfComponents(); ++j, ++value)
+              integrale += std::abs( *value * *p_vol );
+        }
+    }
+  else
+    {
+      // find index for each element of subSupport
+      PointerOf<int> index;
+      if ( _support->isOnAllElements() )
+        {
+          index.set( subNums );
+        }
+      else // find common of two partial supports
+        {
+          // hope that numbers are in increasing order
+          index.set( nbElems );
+          for (int ii = 0; ii < nbElems; ii++)
+            index[ii] = 0;
+          bool allNumsFound = true;
+          int i = 0, iSub = 0;
+          for ( ; iSub < nbElems; ++iSub )
+            {
+              while ( i < getNumberOfValues() && subNums[iSub] > myNums[i] )
+                ++i;
+              if (i == getNumberOfValues() /*subNums[iSub] > myNums[i]*/) // no more myNums
+                {
+                  index[iSub] = 0; // no such number in myNums
+                  break;
+                }
+              else if ( subNums[iSub] == myNums[i] ) // elem number found
+                index[iSub] = ++i; // -- index counts from 1
+              else // subNums[iSub] < myNums[i]
+                allNumsFound = (index[iSub] = 0); // no such number in myNums
+            }
+          if ( iSub != nbElems || !allNumsFound )
+            {
+              // check if numbers are in increasing order
+              bool increasingOrder = true;
+              for ( iSub = 1; iSub < nbElems && increasingOrder; ++iSub )
+                increasingOrder = ( subNums[iSub-1] < subNums[iSub] );
+              for ( i = 1; i < getNumberOfValues() && increasingOrder; ++i )
+                increasingOrder = ( myNums[i-1] < myNums[i] );
+
+              if ( !increasingOrder )
+                for ( iSub = 0; iSub < nbElems; ++iSub )
+                  try
+                    {
+                      index[iSub] = _support->getValIndFromGlobalNumber( subNums[iSub] );
+                    }
+                  catch (MEDEXCEPTION)
+                    {
+                      index[iSub] = 0;
+                    }
+            }
+        }
+
+      // calculation
+      if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE )
+        {
+          for (int j=0; j<getNumberOfComponents(); ++j)
+            {
+              value = getValue() + j * getNumberOfValues();
+              for ( int i = 0; i < nbElems; ++i )
+                if ( index[i] )
+                  integrale += std::abs( value[ index[i]-1 ] * size[i] );
+            }
+        }
+      else if ( getInterlacingType() == MED_EN::MED_NO_INTERLACE_BY_TYPE )
+        {
+          typename ArrayNoByType::InterlacingPolicy* indexer =
+            dynamic_cast< typename ArrayNoByType::InterlacingPolicy * > ( getArrayNoGauss() );
+          for (int j=1; j<=getNumberOfComponents(); j++)
+            for ( int i = 0; i < nbElems; ++i )
+              if ( index[i] )
+                integrale += std::abs( value[indexer->getIndex(index[i],j)] * size[i] );
+        }
+      else  // FULL_INTERLACE
+        {
+          const int dim = getNumberOfComponents();
+          for ( int i = 0; i < nbElems; ++i )
+            if ( index[i] )
+              for (int j=0; j<dim; ++j)
+                integrale += std::abs( value[ dim*(index[i]-1) + j] * size[i] );
+        }
+    }
+  cellSize->removeReference();
+  return integrale;
 }
 
 /*! Return a new field (to deallocate with delete) lying on subSupport that is included by
@@ -2758,10 +2808,10 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::extract(const SUPPORT *sub
     return new FIELD<T, INTERLACING_TAG>(*this);
 
   FIELD<T, INTERLACING_TAG> *ret = new FIELD<T, INTERLACING_TAG>(subSupport,
-								 _numberOfComponents);
+                                                                 _numberOfComponents);
 
   if(!ret->_value)
-    throw MEDEXCEPTION("FIELD<T>::extract : unvalid support detected !");
+    throw MEDEXCEPTION("FIELD<T>::extract : invalid support detected !");
 
   T* valuesToSet=(T*)ret->getValue();
 
@@ -2771,9 +2821,9 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::extract(const SUPPORT *sub
   for(int i=0;i<nbOfEltsSub;i++)
     {
       if(!getValueOnElement(eltsSub[i],tempVals))
-	throw MEDEXCEPTION("Problem in belongsTo function !!!");
+        throw MEDEXCEPTION("Problem in belongsTo function !!!");
       for(int j=0;j<_numberOfComponents;j++)
-	valuesToSet[i*_numberOfComponents+j]=tempVals[j];
+        valuesToSet[i*_numberOfComponents+j]=tempVals[j];
     }
   delete [] tempVals;
 
@@ -2785,8 +2835,8 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::extract(const SUPPORT *sub
 */
 
 /*!
-	\addtogroup FIELD_io
-	@{
+        \addtogroup FIELD_io
+        @{
 */
 /*!
   Constructor with parameters; the object is set via a file and its associated
@@ -2798,11 +2848,11 @@ FIELD<T, INTERLACING_TAG>* FIELD<T, INTERLACING_TAG>::extract(const SUPPORT *sub
 */
 template <class T, class INTERLACING_TAG>
 FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
-				 driverTypes driverType,
-				 const string & fileName/*=""*/,
-				 const string & fieldDriverName/*=""*/,
-				 const int iterationNumber,
-				 const int orderNumber) throw (MEDEXCEPTION)
+                                 driverTypes driverType,
+                                 const string & fileName/*=""*/,
+                                 const string & fieldDriverName/*=""*/,
+                                 const int iterationNumber,
+                                 const int orderNumber) throw (MEDEXCEPTION)
 {
   const char* LOC = "template <class T> FIELD<T>::FIELD(const SUPPORT * Support, driverTypes driverType, const string & fileName=\"\", const string & fieldName=\"\", const int iterationNumber=-1, const int orderNumber=-1) : ";
   BEGIN_OF_MED(LOC);
@@ -2810,6 +2860,8 @@ FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
   int current;
 
   init();
+
+  _mesh  = ( MESH* ) NULL;
 
   //INITIALISATION DE _valueType DS LE CONSTRUCTEUR DE FIELD_
   ASSERT_MED(FIELD_::_valueType == MED_EN::MED_UNDEFINED_TYPE)
@@ -2855,12 +2907,12 @@ FIELD<T, INTERLACING_TAG>::FIELD(const SUPPORT * Support,
   was created by MEDMEM, and so name of profile contains name of corresponding support.
 */
 template <class T, class INTERLACING_TAG>
-FIELD<T,INTERLACING_TAG>::FIELD(driverTypes driverType,
-				const string & fileName,
-				const string & fieldDriverName,
-				const int iterationNumber,
-				const int orderNumber,
-                                MESH* mesh)
+FIELD<T,INTERLACING_TAG>::FIELD(driverTypes    driverType,
+                                const string & fileName,
+                                const string & fieldDriverName,
+                                const int      iterationNumber,
+                                const int      orderNumber,
+                                GMESH*         mesh)
   throw (MEDEXCEPTION) :FIELD_()
 {
   int current;
@@ -2870,6 +2922,8 @@ FIELD<T,INTERLACING_TAG>::FIELD(driverTypes driverType,
   init();
 
   _mesh = mesh;
+  if(_mesh)
+    _mesh->addReference();
 
   //INITIALISATION DE _valueType DS LE CONSTRUCTEUR DE FIELD_
   ASSERT_MED(FIELD_::_valueType == MED_EN::MED_UNDEFINED_TYPE)
@@ -2911,11 +2965,14 @@ template <class T, class INTERLACING_TAG> FIELD<T, INTERLACING_TAG>::~FIELD()
   const char* LOC = " Destructeur FIELD<T, INTERLACING_TAG>::~FIELD()";
   BEGIN_OF_MED(LOC);
   SCRUTE_MED(this);
-  if (_value) delete _value;
+  if (_value) delete _value; _value=0;
   locMap::const_iterator it;
   for ( it = _gaussModel.begin();it != _gaussModel.end(); it++ )
     delete (*it).second;
-
+  _gaussModel.clear();
+  if(_mesh)
+    _mesh->removeReference();
+  _mesh=0;
   END_OF_MED(LOC);
 }
 
@@ -2929,25 +2986,15 @@ void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents)
   BEGIN_OF_MED(LOC);
 
   _numberOfComponents = NumberOfComponents ;
-  //if (_componentsTypes == NULL)
-  //  _componentsTypes = new int[NumberOfComponents] ;
   _componentsTypes.resize(NumberOfComponents);
-  //if (_componentsNames == NULL)
-  //  _componentsNames = new string[NumberOfComponents];
   _componentsNames.resize(NumberOfComponents);
-  //if (_componentsDescriptions == NULL)
-  //  _componentsDescriptions = new string[NumberOfComponents];
   _componentsDescriptions.resize(NumberOfComponents);
-  //if (_componentsUnits == NULL)
-  //  _componentsUnits = new UNIT[NumberOfComponents];
   _componentsUnits.resize(NumberOfComponents);
-  //if (_MEDComponentsUnits == NULL)
-  //  _MEDComponentsUnits = new string[NumberOfComponents];
   _MEDComponentsUnits.resize(NumberOfComponents);
   for (int i=0;i<NumberOfComponents;i++) {
     _componentsTypes[i] = 0 ;
   }
-
+  delete _value;
   try {
     // becarefull about the number of gauss point
     _numberOfValues = _support->getNumberOfElements(MED_EN::MED_ALL_ELEMENTS);
@@ -2977,22 +3024,12 @@ void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents)
 */
 template <class T, class INTERLACING_TAG>
 void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents,
-					   const int LengthValue)
+                                           const int LengthValue)
 {
   const char* LOC = "void FIELD<T>::allocValue(const int NumberOfComponents,const int LengthValue)";
   BEGIN_OF_MED(LOC);
 
   _numberOfComponents = NumberOfComponents ;
-  //if (_componentsTypes == NULL)
-  //  _componentsTypes = new int[NumberOfComponents] ;
-  //if (_componentsNames == NULL)
-  //  _componentsNames = new string[NumberOfComponents];
-  //if (_componentsDescriptions == NULL)
-  //  _componentsDescriptions = new string[NumberOfComponents];
-  //if (_componentsUnits == NULL)
-  //  _componentsUnits = new UNIT[NumberOfComponents];
-  //if (_MEDComponentsUnits == NULL)
-  //  _MEDComponentsUnits = new string[NumberOfComponents];
   _componentsTypes.resize(NumberOfComponents);
   _componentsNames.resize(NumberOfComponents);
   _componentsDescriptions.resize(NumberOfComponents);
@@ -3004,7 +3041,7 @@ void FIELD<T, INTERLACING_TAG>::allocValue(const int NumberOfComponents,
 
   MESSAGE_MED("FIELD : constructeur : "<<LengthValue <<" et "<< NumberOfComponents);
   _numberOfValues = LengthValue ;
-
+  delete _value;
   //EF : A modifier lors de l'intégration de la classe de localisation des points de gauss
   _value = new ArrayNoGauss(_numberOfComponents,_numberOfValues);
 
@@ -3056,9 +3093,9 @@ void FIELD<T, INTERLACING_TAG>::deallocValue()
 
 template <class T, class INTERLACING_TAG>
 int FIELD<T, INTERLACING_TAG>::addDriver(driverTypes driverType,
-					 const string & fileName/*="Default File Name.med"*/,
-					 const string & driverName/*="Default Field Name"*/,
-					 MED_EN::med_mode_acces access)
+                                         const string & fileName/*="Default File Name.med"*/,
+                                         const string & driverName/*="Default Field Name"*/,
+                                         MED_EN::med_mode_acces access)
 {
   //jfa tmp (as last argument has no default value):const char * LOC = "FIELD<T>::addDriver(driverTypes driverType, const string & fileName=\"Default File Name.med\",const string & driverName=\"Default Field Name\",MED_EN::med_mode_acces access) : ";
 
@@ -3081,6 +3118,95 @@ int FIELD<T, INTERLACING_TAG>::addDriver(driverTypes driverType,
 
   return current;
 }
+
+/*!
+  Read FIELD in the file specified in the driver given by its index.
+*/
+template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::read(int index/*=0*/)
+{
+  const char * LOC = "FIELD<T, INTERLACING_TAG>::read(int index=0) : ";
+  BEGIN_OF_MED(LOC);
+
+  if ( index>=0 && index<(int)_drivers.size() && _drivers[index] ) {
+    _drivers[index]->open();
+    try
+    {
+      _drivers[index]->read();
+    }
+    catch ( const MEDEXCEPTION& ex )
+    {
+      _drivers[index]->close();
+      throw ex;
+    }
+    _drivers[index]->close();
+  }
+  else
+    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
+                                     << "The index given is invalid, index must be between  0 and |"
+                                     << _drivers.size()
+                                     )
+                          );
+  END_OF_MED(LOC);
+}
+
+/*!
+  Read FIELD with the driver. Additional information (name etc.) to select a field
+  must be set to the field.
+*/
+template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::read(const GENDRIVER & driver )
+{
+  const char* LOC = " FIELD<T, INTERLACING_TAG>::read(const GENDRIVER &) : ";
+  BEGIN_OF_MED(LOC);
+
+  // For the case where driver does not know about me since it has been created through
+  // constructor witout parameters: create newDriver knowing me and get missing data
+  // from driver using merge()
+  std::auto_ptr<GENDRIVER> newDriver( DRIVERFACTORY::buildDriverForField(driver.getDriverType(),
+                                                                         driver.getFileName(),
+                                                                         this, RDONLY));
+  newDriver->merge( driver );
+
+  newDriver->open();
+  try
+  {
+    newDriver->read();
+  }
+  catch ( const MEDEXCEPTION& ex )
+  {
+    newDriver->close();
+    throw ex;
+  }
+  newDriver->close();
+
+  END_OF_MED(LOC);
+}
+
+/*!
+  Read FIELD with driver of the given type. Additional information (name etc.) to select a field
+  must be set to the field.
+*/
+template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::read(driverTypes driverType, const std::string& filename)
+{
+  const char* LOC = " FIELD<T, INTERLACING_TAG>::read(driverTypes driverType, const std::string& filename) : ";
+  BEGIN_OF_MED(LOC);
+
+  std::auto_ptr<GENDRIVER> newDriver( DRIVERFACTORY::buildDriverForField(driverType, filename,
+                                                                         this, RDONLY));
+  newDriver->open();
+  try
+  {
+    newDriver->read();
+  }
+  catch ( const MEDEXCEPTION& ex )
+  {
+    newDriver->close();
+    throw ex;
+  }
+  newDriver->close();
+
+  END_OF_MED(LOC);
+}
+
 /*! \if MEDMEM_ug @} \endif */
 
 /*!
@@ -3095,10 +3221,6 @@ inline int FIELD<T, INTERLACING_TAG>::addDriver (GENDRIVER & driver )
   const char* LOC = "FIELD<T, INTERLACING_TAG>::addDriver(GENDRIVER &) : ";
   BEGIN_OF_MED(LOC);
 
-  // duplicate driver to delete it with destructor !
-  //GENDRIVER * newDriver = driver.copy() ;
-
-  // for FIELD->read( genDriver ) if FIELD was not passed to genDriver
   GENDRIVER * newDriver = 
     DRIVERFACTORY::buildDriverForField(driver.getDriverType(),
                                        driver.getFileName(), this,
@@ -3124,9 +3246,7 @@ void FIELD<T, INTERLACING_TAG>::rmDriver (int index/*=0*/)
   const char * LOC = "FIELD<T, INTERLACING_TAG>::rmDriver (int index=0): ";
   BEGIN_OF_MED(LOC);
 
-  if ( index>=0 && index<_drivers.size() && _drivers[index] ) {
-    //_drivers.erase(&_drivers[index]);
-    // why not ????
+  if ( index>=0 && index<(int)_drivers.size() && _drivers[index] ) {
     MESSAGE_MED ("detruire");
   }
   else
@@ -3136,28 +3256,6 @@ void FIELD<T, INTERLACING_TAG>::rmDriver (int index/*=0*/)
                                      )
                           );
 
-  END_OF_MED(LOC);
-}
-
-/*!
-  Read FIELD in the file specified in the driver given by its index.
-*/
-template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::read(int index/*=0*/)
-{
-  const char * LOC = "FIELD<T, INTERLACING_TAG>::read(int index=0) : ";
-  BEGIN_OF_MED(LOC);
-
-  if ( index>=0 && index<_drivers.size() && _drivers[index] ) {
-    _drivers[index]->open();
-    _drivers[index]->read();
-    _drivers[index]->close();
-  }
-  else
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC)
-                                     << "The index given is invalid, index must be between  0 and |"
-                                     << _drivers.size()
-                                     )
-                          );
   END_OF_MED(LOC);
 }
 
@@ -3178,15 +3276,22 @@ int driver_handle = mesh.addDriver(MED_DRIVER, "output.med", "Mesh");
 mesh.write(driver_handle);
 \endverbatim
 */
-template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::write(int index/*=0*/, const string & driverName /*= ""*/)
+template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::write(int index/*=0*/)
 {
   const char * LOC = "FIELD<T,INTERLACING_TAG>::write(int index=0, const string & driverName = \"\") : ";
   BEGIN_OF_MED(LOC);
 
-  if( index>=0 && index<_drivers.size() && _drivers[index] ) {
+  if( index>=0 && index<(int)_drivers.size() && _drivers[index] ) {
     _drivers[index]->open();
-    if (driverName != "") _drivers[index]->setFieldName(driverName);
-    _drivers[index]->write();
+    try
+    {
+      _drivers[index]->write();
+    }
+    catch ( const MEDEXCEPTION& ex )
+    {
+      _drivers[index]->close();
+      throw ex;
+    }
     _drivers[index]->close();
   }
   else
@@ -3197,6 +3302,67 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
                           );
   END_OF_MED(LOC);
 }
+/*!
+  Write FIELD with the given driver.
+*/
+template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::write(const GENDRIVER & driver, MED_EN::med_mode_acces medMode/*=MED_EN::RDWR*/)
+{
+  const char* LOC = " FIELD<T, INTERLACING_TAG>::write(const GENDRIVER &) : ";
+  BEGIN_OF_MED(LOC);
+
+  // For the case where driver does not know about me since it has been created through
+  // constructor witout parameters: create newDriver knowing me and get missing data
+  // from driver using merge()
+  std::auto_ptr<GENDRIVER> newDriver( DRIVERFACTORY::buildDriverForField(driver.getDriverType(),
+                                                                         driver.getFileName(),
+                                                                         this, WRONLY));
+  newDriver->merge( driver );
+  if ( newDriver->getDriverType() == MED_DRIVER )
+    newDriver->setAccessMode( MED_EN::med_mode_acces( getMedAccessMode( medMode ) ));
+
+  newDriver->open();
+  try
+  {
+    newDriver->write();
+  }
+  catch ( const MEDEXCEPTION& ex )
+  {
+    newDriver->close();
+    throw ex;
+  }
+  newDriver->close();
+
+  END_OF_MED(LOC);
+}
+
+/*!
+  Write FIELD with driver of the given type.
+*/
+template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::write(driverTypes driverType, const std::string& filename, MED_EN::med_mode_acces medMode/*=MED_EN::RDWR*/)
+{
+  const char* LOC = " FIELD<T, INTERLACING_TAG>::write(driverTypes driverType, const std::string& filename) : ";
+  BEGIN_OF_MED(LOC);
+
+  std::auto_ptr<GENDRIVER> newDriver( DRIVERFACTORY::buildDriverForField(driverType, filename,
+                                                                         this, WRONLY));
+  if ( newDriver->getDriverType() == MED_DRIVER )
+    newDriver->setAccessMode( MED_EN::med_mode_acces( getMedAccessMode( medMode ) ));
+
+  newDriver->open();
+  try
+  {
+    newDriver->write();
+  }
+  catch ( const MEDEXCEPTION& ex )
+  {
+    newDriver->close();
+    throw ex;
+  }
+  newDriver->close();
+
+  END_OF_MED(LOC);
+}
+
 /*! \if MEDMEM_ug @} \endif */
 /*!
   Write FIELD in the file specified in the driver given by its index. Use this
@@ -3207,10 +3373,18 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
   const char * LOC = "FIELD<T,INTERLACING_TAG>::write(int index=0, const string & driverName = \"\") : ";
   BEGIN_OF_MED(LOC);
 
-  if( index>=0 && index<_drivers.size() && _drivers[index] ) {
+  if( index>=0 && index<(int)_drivers.size() && _drivers[index] ) {
     _drivers[index]->openAppend();
     if (driverName != "") _drivers[index]->setFieldName(driverName);
-    _drivers[index]->writeAppend();
+    try
+    {
+      _drivers[index]->writeAppend();
+    }
+    catch ( const MEDEXCEPTION& ex )
+    {
+      _drivers[index]->close();
+      throw ex;
+    }
     _drivers[index]->close();
   }
   else
@@ -3220,28 +3394,6 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
                                      )
                           );
   END_OF_MED(LOC);
-}
-
-/*!
-  \internal
-  Write FIELD with the driver which is equal to the given driver.
-
-  Use by MED object.
-*/
-template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::write(const GENDRIVER & genDriver)
-{
-  const char* LOC = " FIELD<T, INTERLACING_TAG>::write(const GENDRIVER &) : ";
-  BEGIN_OF_MED(LOC);
-
-  for (unsigned int index=0; index < _drivers.size(); index++ )
-    if ( *_drivers[index] == genDriver ) {
-      _drivers[index]->open();
-      _drivers[index]->write();
-      _drivers[index]->close();
-    }
-
-  END_OF_MED(LOC);
-
 }
 
 /*!
@@ -3258,29 +3410,15 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
   for (unsigned int index=0; index < _drivers.size(); index++ )
     if ( *_drivers[index] == genDriver ) {
       _drivers[index]->openAppend();
-      _drivers[index]->writeAppend();
-      _drivers[index]->close();
-    }
-
-  END_OF_MED(LOC);
-
-}
-
-/*!
-  \internal
-  Read FIELD with the driver which is equal to the given driver.
-
-  Use by MED object.
-*/
-template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>::read(const GENDRIVER & genDriver)
-{
-  const char* LOC = " FIELD<T, INTERLACING_TAG>::read(const GENDRIVER &) : ";
-  BEGIN_OF_MED(LOC);
-
-  for (unsigned int index=0; index < _drivers.size(); index++ )
-    if ( *_drivers[index] == genDriver ) {
-      _drivers[index]->open();
-      _drivers[index]->read();
+      try
+      {
+        _drivers[index]->writeAppend();
+      }
+      catch ( const MEDEXCEPTION& ex )
+      {
+        _drivers[index]->close();
+        throw ex;
+      }
       _drivers[index]->close();
     }
 
@@ -3291,7 +3429,7 @@ template <class T, class INTERLACING_TAG> inline void FIELD<T, INTERLACING_TAG>:
 /*!
   Fills in already allocated retValues array the values related to eltIdInSup.
   If the element does not exist in this->_support false is returned, true otherwise.
- */
+*/
 template <class T, class INTERLACING_TAG>
 bool FIELD<T, INTERLACING_TAG>::getValueOnElement(int eltIdInSup,T* retValues)
   const throw (MEDEXCEPTION)
@@ -3303,10 +3441,10 @@ bool FIELD<T, INTERLACING_TAG>::getValueOnElement(int eltIdInSup,T* retValues)
     {
       int nbOfEltsThis=_support->getMesh()->getNumberOfElements(_support->getEntity(),MED_EN::MED_ALL_ELEMENTS);
       if(eltIdInSup>nbOfEltsThis)
-	return false;
+        return false;
       const T* valsThis=getValue();
       for(int j=0;j<_numberOfComponents;j++)
-	retValues[j]=valsThis[(eltIdInSup-1)*_numberOfComponents+j];
+        retValues[j]=valsThis[(eltIdInSup-1)*_numberOfComponents+j];
       return true;
     }
   else
@@ -3316,17 +3454,319 @@ bool FIELD<T, INTERLACING_TAG>::getValueOnElement(int eltIdInSup,T* retValues)
       int iThis;
       bool found=false;
       for(iThis=0;iThis<nbOfEltsThis && !found;)
-	if(eltsThis[iThis]==eltIdInSup)
-	  found=true;
-	else
-	  iThis++;
+        if(eltsThis[iThis]==eltIdInSup)
+          found=true;
+        else
+          iThis++;
       if(!found)
-	return false;
+        return false;
       const T* valsThis=getValue();
       for(int j=0;j<_numberOfComponents;j++)
-	retValues[j]=valsThis[iThis*_numberOfComponents+j];
+        retValues[j]=valsThis[iThis*_numberOfComponents+j];
       return true;
     }
+}
+
+  /*!
+   * \brief Retrieve value in a given point
+   *  \param coords - point coordinates
+   *  \param output - output buffer
+   */
+  template <class T, class INTERLACING_TAG>
+  void FIELD<T, INTERLACING_TAG>::getValueOnPoint(const double* coords, double* output) const throw (MEDEXCEPTION)
+  {
+    getValueOnPoints(1, coords, output);
+  }
+
+  /*!
+   * \brief Retrieve values in given points
+   *  \param nb_points - number of points
+   *  \param coords - point coordinates
+   *  \param output - output buffer
+   */
+  template <class T, class INTERLACING_TAG>
+  void FIELD<T, INTERLACING_TAG>::getValueOnPoints(int nb_points, const double* coords, double* output) const throw (MEDEXCEPTION)
+  {
+    const char* LOC = " FIELD<T, INTERLACING_TAG>::getValueOnPoints(int nb_points, const double* coords, double* output) : ";
+    // check operation feasibility
+    if ( !getSupport() ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"NULL Support"));
+    if ( !getSupport()->getMesh() ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"NULL Mesh"));
+    if ( !_value ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"NULL _value"));
+    if ( getGaussPresence() ) throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not implemeneted for Gauss points"));
+
+    MED_EN::medEntityMesh entity = getSupport()->getEntity();
+    if ( entity != MED_EN::MED_CELL &&
+         entity != MED_EN::MED_NODE )
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support must be on CELLs or NODEs"));
+
+    // initialize output value
+    for ( int j = 0; j < nb_points*getNumberOfComponents(); ++j )
+      output[j] = 0.0;
+
+    const MEDMEM::MESH* mesh = getSupport()->getMesh()->convertInMESH();
+    MEDMEM::AutoDeref derefMesh( mesh );
+
+    const double* point = coords;
+    double* value = output;
+
+    if ( entity == MED_EN::MED_CELL )
+      {
+        MEDMEM::PointLocator pLocator (*mesh);
+        for ( int i = 0; i < nb_points; ++i)
+          {
+            // find the cell enclosing the point
+            std::list<int> cellIds = pLocator.locate( point );
+            int nbCells = cellIds.size();
+            if ( nbCells < 1 )
+              throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Point is out of mesh"));
+
+            // retrieve value
+            std::list<int>::iterator iCell = cellIds.begin();
+            for ( ; iCell != cellIds.end(); ++iCell )
+              for ( int j = 1; j <= getNumberOfComponents(); ++j )
+                value[j-1] += getValueIJ( *iCell, j ) / nbCells;
+
+            // next point
+            point += mesh->getSpaceDimension();
+            value += getNumberOfComponents();
+          }
+      }
+    else // MED_EN::MED_NODE
+      {
+        const double * allCoords = mesh->getCoordinates( MED_EN::MED_FULL_INTERLACE );
+
+        MEDMEM::PointLocatorInSimplex pLocator (*mesh);
+        for ( int i = 0; i < nb_points; ++i)
+          {
+            // find nodes of the simplex enclosing the point
+            std::list<int> nodeIds = pLocator.locate( point );
+            int nbNodes = nodeIds.size();
+            if ( nbNodes < 1 )
+              throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Point is out of mesh"));
+            if ( nbNodes != mesh->getMeshDimension() + 1 )
+              throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Invalid nb of points of simplex: "<<nbNodes));
+
+            // get coordinates of simplex nodes
+            std::vector<const double*> nodeCoords( nbNodes );
+            std::list<int>::iterator iNode = nodeIds.begin();
+            int n = 0;
+            for ( ; n < nbNodes; ++iNode, ++n )
+              nodeCoords[n] = allCoords + (*iNode-1) * mesh->getSpaceDimension();
+
+            // compute wegths of simplex nodes
+            double nodeWgt[4];
+            pLocator.getNodeWightsInSimplex( nodeCoords, coords, nodeWgt );
+
+            // retrieve value
+            for ( n = 0, iNode = nodeIds.begin(); iNode != nodeIds.end(); ++iNode, ++n )
+              for ( int j = 1; j <= getNumberOfComponents(); ++j )
+                value[j-1] += getValueIJ( *iNode, j ) * nodeWgt[ n ];
+
+            // next point
+            point += mesh->getSpaceDimension();
+            value += getNumberOfComponents();
+          }
+      }
+  }
+
+
+/*!
+  Return the coordinates of the gauss points
+  The returned field has SPACEDIM components 
+*/
+template <class T, class INTERLACING_TAG>
+FIELD<double, FullInterlace>* FIELD<T, INTERLACING_TAG>::getGaussPointsCoordinates() const
+  throw (MEDEXCEPTION)
+{
+  const char * LOC = "FIELD::getGaussPointsCoordinates() : ";
+  BEGIN_OF_MED(LOC);
+
+  if (!getSupport())
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
+
+  const MEDMEM::MESH* mesh = getSupport()->getMesh()->convertInMESH();
+  MEDMEM::AutoDeref derefMesh( mesh );
+
+  const double * coord = mesh->getCoordinates(MED_FULL_INTERLACE);
+  int spaceDim         = mesh->getSpaceDimension();
+
+  //Init calculator of the gauss point coordinates
+  INTERP_KERNEL::GaussCoords calculator;
+  locMap::const_iterator it;
+
+  int nb_type                     = getSupport()->getNumberOfTypes();
+  int length_values               = getSupport()->getNumberOfElements(MED_ALL_ELEMENTS);
+  const medGeometryElement* types = getSupport()->getTypes();
+  medEntityMesh support_entity    = getSupport()->getEntity();
+  bool isOnAll                    = getSupport()->isOnAllElements();
+
+  const int* global_connectivity  = 0;
+  const GAUSS_LOCALIZATION<INTERLACING_TAG>* gaussLock = NULL;
+
+  typedef typename MEDMEM_ArrayInterface<double,INTERLACING_TAG,NoGauss>::Array ArrayCoord;
+  typedef typename MEDMEM_ArrayInterface<double,INTERLACING_TAG,Gauss>::Array TArrayGauss;
+
+  vector<int>  nbelgeoc, nbgaussgeo;
+
+  nbelgeoc.resize(nb_type+1, 0);
+  nbgaussgeo.resize(nb_type+1, 0);
+
+  for ( int iType = 0 ; iType < nb_type ; iType++ ) {
+
+    medGeometryElement elem_type = types[iType] ;
+    if(elem_type == MED_EN::MED_POLYGON && elem_type == MED_EN::MED_POLYHEDRA ) 
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Bad cell type : "<<MED_EN::geoNames[elem_type]<<" !!! "));
+
+    it = _gaussModel.find(elem_type);
+
+    if(it == _gaussModel.end())
+      throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Gauss localization not defined for "<<MED_EN::geoNames[elem_type]<<" type!!! "));
+    gaussLock = static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ((*it).second);
+
+    ArrayCoord coord = gaussLock->getGsCoo();
+    double* gaussCoord = new double[coord.getNbElem()*coord.getDim()];
+    int idx = 0;
+    for( int i = 1 ; i <= coord.getNbElem() ; i++ ) {
+      for( int j = 1 ; j <= coord.getDim() ; j++ ) {
+        gaussCoord[idx++] = coord.getIJ(i,j);
+      }
+    }
+
+    idx = 0;
+    ArrayCoord ref = gaussLock->getRefCoo();
+    double* refCoord = new double[ref.getNbElem()*ref.getDim()];
+    for( int i = 1 ; i <= ref.getNbElem() ; i++ ) {
+      for( int j = 1 ; j <= ref.getDim() ; j++ ) {
+        refCoord[idx++] = ref.getIJ(i,j);
+      }
+    }
+      
+    INTERP_KERNEL::NormalizedCellType normType;
+    switch(elem_type) {
+    case MED_EN::MED_SEG2 : normType = INTERP_KERNEL::NORM_SEG2;break;
+    case MED_EN::MED_SEG3 : normType = INTERP_KERNEL::NORM_SEG3;break;
+    default : normType = (INTERP_KERNEL::NormalizedCellType) ((((unsigned long)elem_type/100-2)*10) + ((unsigned long)elem_type%100));
+      break;
+    }
+      
+    calculator.addGaussInfo(normType,
+                            elem_type/100,
+                            gaussCoord,
+                            gaussLock->getNbGauss(),
+                            refCoord,
+                            elem_type%100
+                            );
+    // Preapre Info for the gauss array
+    nbelgeoc   [ iType+1 ] = nbelgeoc[ iType ] + getSupport()->getNumberOfElements(elem_type);
+    nbgaussgeo [ iType+1 ] = gaussLock->getNbGauss();
+    
+    delete [] gaussCoord;
+    delete [] refCoord;
+  }
+
+  FIELD<double, FullInterlace>* gpCoord =
+    new FIELD<double, FullInterlace>(getSupport(),spaceDim);
+  gpCoord->setName("Gauss Points Coordinates");
+  gpCoord->setDescription("Gauss Points Coordinates");
+  
+  for(int dimId = 1 ; dimId <= spaceDim; dimId++) {
+    switch(dimId) {
+    case 1:
+      gpCoord->setComponentName(dimId,"X");
+      gpCoord->setComponentDescription(dimId,"X coordinate of the gauss point");
+      break;
+    case 2:
+      gpCoord->setComponentName(dimId,"Y");
+      gpCoord->setComponentDescription(dimId,"Y coordinate of the gauss point");
+      break;
+    case 3:
+      gpCoord->setComponentName(dimId,"Z");
+      gpCoord->setComponentDescription(dimId,"Z coordinate of the gauss point");
+      break;
+    }
+    
+    gpCoord->setMEDComponentUnit(dimId, mesh->getCoordinatesUnits()[dimId-1]);    
+  }
+  
+  gpCoord->setIterationNumber(getIterationNumber());
+  gpCoord->setOrderNumber(getOrderNumber());
+  gpCoord->setTime(getTime());
+
+  TArrayGauss *arrayGauss = new TArrayGauss(spaceDim, length_values,
+                                            nb_type, & nbelgeoc[0], & nbgaussgeo[0]);
+  gpCoord->setArray(arrayGauss);
+
+
+  
+    
+  //Calculation of the coordinates  
+  int index = 1;
+  for ( int i = 0 ; i < nb_type ; i++ ) {
+    
+    medGeometryElement type = types[i] ;
+    INTERP_KERNEL::NormalizedCellType normType;
+    switch(type) {
+    case MED_EN::MED_SEG2 : normType = INTERP_KERNEL::NORM_SEG2;break;
+    case MED_EN::MED_SEG3 : normType = INTERP_KERNEL::NORM_SEG3;break;
+    default : normType = (INTERP_KERNEL::NormalizedCellType) ((((unsigned long)type/100-2)*10) + ((unsigned long)type%100));
+      break;
+    }
+    
+    it = _gaussModel.find(type);
+    
+    gaussLock = static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> * > ((*it).second);
+    int nb_entity_type = getSupport()->getNumberOfElements(type);
+    
+    
+    if (isOnAll) {
+      global_connectivity = mesh->getConnectivity(MED_NODAL,support_entity,type);
+    }
+    else {
+      const int * supp_number = getSupport()->getNumber(type);
+      const int * connectivity = mesh->getConnectivity(MED_NODAL,support_entity,MED_ALL_ELEMENTS);
+      const int * connectivityIndex = mesh->getConnectivityIndex(MED_NODAL,support_entity);
+      int * global_connectivity_tmp = new int[(type%100)*nb_entity_type];
+      
+      for (int k_type = 0; k_type<nb_entity_type; k_type++) {
+        for (int j_ent = 0; j_ent<(type%100); j_ent++) {
+          global_connectivity_tmp[k_type*(type%100)+j_ent] = connectivity[connectivityIndex[supp_number[k_type]-1]+j_ent-1];
+        }
+      }
+      global_connectivity = global_connectivity_tmp;
+    }
+
+    int nbNodes = (type%100);
+    double* gCoord = NULL;
+    int* Ni = NULL; 
+    
+    for ( int elem = 0; elem < nb_entity_type; elem++ ) {
+      int elem_index = nbNodes*elem;
+      Ni = new int[nbNodes];
+      for( int idx = 0 ; idx < nbNodes; idx++ ) {
+        Ni[idx] = global_connectivity[ elem_index+idx ] - 1;
+      }
+      
+      gCoord = calculator.calculateCoords(normType,
+                                          coord,
+                                          spaceDim,
+                                          Ni);
+      int resultIndex = 0;
+      for( int k = 0; k < gaussLock->getNbGauss(); k++ ) {
+        for( int dimId = 1; dimId <= spaceDim; dimId++ ) {
+          gpCoord->setValueIJK(index,dimId,(k+1),gCoord[resultIndex]);
+          resultIndex++;
+        }
+      }
+      delete [] gCoord;
+      delete [] Ni;
+      index++;
+    }
+    if (!isOnAll && type != MED_EN::MED_POLYHEDRA && type != MED_EN::MED_POLYGON) {
+      delete [] global_connectivity ;
+    }
+  }
+  END_OF_MED(LOC);
+  return gpCoord;
 }
 
 /*!
@@ -3366,7 +3806,7 @@ FIELD<T, INTERLACING_TAG>::getArrayGauss() const throw (MEDEXCEPTION)
     return static_cast<ArrayGauss *> (_value);
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<
-				 "The field has no Gauss Point"));
+                                 "The field has no Gauss Point"));
 
   END_OF_MED(LOC);
 
@@ -3383,7 +3823,7 @@ FIELD<T, INTERLACING_TAG>::getArrayNoGauss() const throw (MEDEXCEPTION)
     return static_cast < ArrayNoGauss * > (_value);
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<
-				 "The field has Gauss Point"));
+                                 "The field has Gauss Point"));
 
   END_OF_MED(LOC);
 }
@@ -3392,15 +3832,10 @@ FIELD<T, INTERLACING_TAG>::getArrayNoGauss() const throw (MEDEXCEPTION)
 template <class T,class INTERLACING_TAG> inline bool
 FIELD<T, INTERLACING_TAG>::getGaussPresence() const throw (MEDEXCEPTION)
 {
-  const char * LOC = "FIELD<T, INTERLACING_TAG>::getGaussPresence() const :";
-  //BEGIN_OF_MED(LOC);
-
   if (_value != NULL)
     return _value->getGaussPresence();
   else
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't call getGaussPresence on a null _value"));
-
-  //END_OF_MED();
+    throw MEDEXCEPTION("FIELD<T, INTERLACING_TAG>::getGaussPresence() const : Can't call getGaussPresence on a null _value");
 }
 
 /*!
@@ -3467,21 +3902,18 @@ template <class T,class INTERLACING_TAG> inline
 const T*
 FIELD<T,INTERLACING_TAG>::getRow(int i) const throw (MEDEXCEPTION)
 {
-  const char * LOC = "FIELD<T,INTERLACING_TAG>::getRow(int i) : ";
-  //BEGIN_OF_MED(LOC);
+  const char* LOC; LOC = "FIELD<T,INTERLACING_TAG>::getRow(int i) : ";
 
   int valIndex=-1;
   if (_support)
     valIndex = _support->getValIndFromGlobalNumber(i);
   else
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not define |" ));
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
 
-  //cout << endl << "getRow Valindex : " << valIndex << endl;
   if ( getGaussPresence() )
     return static_cast<ArrayGauss *>(_value)->getRow(valIndex) ;
   else
     return static_cast<ArrayNoGauss *>(_value)->getRow(valIndex) ;
-  //END_OF_MED();
 }
 
 /*!
@@ -3491,7 +3923,6 @@ FIELD<T,INTERLACING_TAG>::getRow(int i) const throw (MEDEXCEPTION)
 template <class T,class INTERLACING_TAG> inline const T*
 FIELD<T,INTERLACING_TAG>::getColumn(int j) const throw (MEDEXCEPTION)
 {
-  //BEGIN_OF_MED(LOC);
   if ( getGaussPresence() )
     return static_cast<ArrayGauss *>(_value)->getColumn(j) ;
   else
@@ -3509,7 +3940,6 @@ definition (i.e., fields having one value per element).
 template <class T,class INTERLACING_TAG> inline T FIELD<T,INTERLACING_TAG>::getValueIJ(int i,int j) const throw (MEDEXCEPTION)
 {
   const char * LOC = "getValueIJ(..)";
-  //BEGIN_OF_MED(LOC);
   int valIndex=-1;
   if (_support)
     valIndex = _support->getValIndFromGlobalNumber(i);
@@ -3532,7 +3962,6 @@ template <class T,class INTERLACING_TAG> inline T FIELD<T,INTERLACING_TAG>::getV
 template <class T,class INTERLACING_TAG> inline T FIELD<T,INTERLACING_TAG>::getValueIJK(int i,int j,int k) const throw (MEDEXCEPTION)
 {
   const char * LOC = "getValueIJK(..)";
-  //BEGIN_OF_MED(LOC);
   int valIndex=-1;
   if (_support)
     valIndex = _support->getValIndFromGlobalNumber(i);
@@ -3553,7 +3982,6 @@ template <class T, class INTERLACIN_TAG>
 inline int FIELD<T, INTERLACIN_TAG>::getValueByTypeLength(int t) const throw (MEDEXCEPTION)
 {
   const char * LOC ="getValueByTypeLength() : ";
-  //BEGIN_OF_MED(LOC);
   if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE_BY_TYPE )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"not MED_NO_INTERLACE_BY_TYPE field" ));
 
@@ -3577,10 +4005,8 @@ inline int FIELD<T, INTERLACIN_TAG>::getValueByTypeLength(int t) const throw (ME
 template <class T, class INTERLACIN_TAG>
 inline const T* FIELD<T, INTERLACIN_TAG>::getValueByType(int t) const throw (MEDEXCEPTION)
 {
-  const char * LOC ="getValueByType() : ";
-  //BEGIN_OF_MED(LOC);
   if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE_BY_TYPE )
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"not MED_NO_INTERLACE_BY_TYPE field" ));
+    throw MEDEXCEPTION(LOCALIZED("getValueByType() : not MED_NO_INTERLACE_BY_TYPE field" ));
 
   if ( getGaussPresence() ) {
     ArrayNoByTypeGauss* array = static_cast<ArrayNoByTypeGauss *>(_value);
@@ -3598,7 +4024,6 @@ inline const T* FIELD<T, INTERLACIN_TAG>::getValueByType(int t) const throw (MED
 template <class T,class INTERLACING_TAG> inline T FIELD<T,INTERLACING_TAG>::getValueIJByType(int i,int j, int t) const throw (MEDEXCEPTION)
 {
   const char * LOC = "getValueIJByType(..)";
-  //BEGIN_OF_MED(LOC);
   if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE_BY_TYPE )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"not MED_NO_INTERLACE_BY_TYPE field" ));
     
@@ -3614,7 +4039,6 @@ template <class T,class INTERLACING_TAG> inline T FIELD<T,INTERLACING_TAG>::getV
 template <class T,class INTERLACING_TAG> inline T FIELD<T,INTERLACING_TAG>::getValueIJKByType(int i,int j,int k,int t) const throw (MEDEXCEPTION)
 {
   const char * LOC = "getValueIJKByType(..)";
-  //BEGIN_OF_MED(LOC);
   if ( getInterlacingType() != MED_EN::MED_NO_INTERLACE_BY_TYPE )
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"not MED_NO_INTERLACE_BY_TYPE field" ));
 
@@ -3650,8 +4074,8 @@ FIELD<T,INTERLACING_TAG>::getGaussLocalization(MED_EN::medGeometryElement geomEl
 
   locMap::const_iterator it;
   if ( ( it = _gaussModel.find(geomElement)) != _gaussModel.end() ) {
-	locPtr = (*it).second;
-	return  *static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> *>(locPtr);
+        locPtr = (*it).second;
+        return  *static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> *>(locPtr);
   }
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't find any GaussLocalization on this geometric type" ));
@@ -3666,8 +4090,8 @@ FIELD<T,INTERLACING_TAG>::getGaussLocalizationPtr(MED_EN::medGeometryElement geo
 
   locMap::const_iterator it;
   if ( ( it = _gaussModel.find(geomElement)) != _gaussModel.end() ) {
-	locPtr = (*it).second;
-	return  static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> *>(locPtr);
+        locPtr = (*it).second;
+        return  static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> *>(locPtr);
   }
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't find any GaussLocalization on this geometric type" ));
@@ -3684,7 +4108,7 @@ FIELD<T,INTERLACING_TAG>::getGaussLocalizationRoot(MED_EN::medGeometryElement ge
 
   locMap::const_iterator it;
   if ( ( it = _gaussModel.find(geomElement)) != _gaussModel.end() ) {
-	return (*it).second;
+        return (*it).second;
   }
   else
     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Can't find any GaussLocalization on this geometric type: "<< geomElement ));
@@ -3737,15 +4161,15 @@ template <class T,class INTERLACING_TAG> const int FIELD<T,INTERLACING_TAG>::get
 
   locMap::const_iterator it;
   if ( ( it = _gaussModel.find(geomElement)) != _gaussModel.end() ) {
-	locPtr = (*it).second;
-	return  static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> *>(locPtr)->getNbGauss();
+        locPtr = (*it).second;
+        return  static_cast<const GAUSS_LOCALIZATION<INTERLACING_TAG> *>(locPtr)->getNbGauss();
   }
   else
     if (_support)
       try {
-	if ( _support->getNumberOfElements(geomElement) ) return 1;
+        if ( _support->getNumberOfElements(geomElement) ) return 1;
       } catch ( MEDEXCEPTION & ex) {
-	throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<< "GeometricType not found !" )) ;
+        throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<< "GeometricType not found !" )) ;
       }
     else
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support not defined" ));
@@ -3784,7 +4208,6 @@ template <class T,class INTERLACING_TAG> const int * FIELD<T,INTERLACING_TAG>::g
 template <class T,class INTERLACING_TAG> const int FIELD<T,INTERLACING_TAG>::getNbGaussI(int i) const throw (MEDEXCEPTION)
 {
   const char * LOC = "getNbGaussI(..)";
-//   BEGIN_OF_MED(LOC);
 
   int valIndex=-1;
   if (_support)
@@ -3799,7 +4222,6 @@ template <class T,class INTERLACING_TAG> const int FIELD<T,INTERLACING_TAG>::get
      return static_cast<ArrayNoGauss *>(_value)->getNbGauss(valIndex) ;
  else
    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"_value not defined" ));
-//   END_OF_MED();
 }
 /*!
 @}
@@ -3964,111 +4386,6 @@ template <class T,class INTERLACING_TAG> inline void FIELD<T,INTERLACING_TAG>::s
 */
 
 /*!
-  Fill values array with volume values.
-*/
-// template <class T, class INTERLACING_TAG>
-// void FIELD<T, INTERLACING_TAG>::getVolume() const throw (MEDEXCEPTION)
-// {
-//   const char * LOC = "FIELD<double>::getVolume() const : ";
-//   BEGIN_OF_MED(LOC);
-
-//   // The field has to be initilised by a non empty support and a
-//   // number of components = 1 and its value type has to be set to MED_REEL64
-//   // (ie a FIELD<double>)
-
-//   if ((_support == (SUPPORT *) NULL) || (_numberOfComponents != 1) || (_valueType != MED_EN::MED_REEL64))
-//       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to 1 and a value type set to MED_REEL64"));
-
-//   END_OF_MED(LOC);
-// }
-
-// /*!
-//   Fill values array with area values.
-// */
-// template <class T, class INTERLACING_TAG>
-// void FIELD<T, INTERLACING_TAG>::getArea() const throw (MEDEXCEPTION)
-// {
-//   const char * LOC = "FIELD<double>::getArea() const : ";
-//   BEGIN_OF_MED(LOC);
-
-//   // The field has to be initilised by a non empty support and a
-//   // number of components = 1 and its value type has to be set to MED_REEL64
-//   // (ie a FIELD<double>)
-
-//   if ((_support == (SUPPORT *) NULL) || (_numberOfComponents != 1) || (_valueType != MED_EN::MED_REEL64))
-//       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to 1 and a value type set to MED_REEL64"));
-
-//   END_OF_MED(LOC);
-// }
-
-// /*!
-//   Fill values array with length values.
-// */
-// template <class T, class INTERLACING_TAG>
-// void FIELD<T, INTERLACING_TAG>::getLength() const throw (MEDEXCEPTION)
-// {
-//   const char * LOC = "FIELD<double>::getLength() const : ";
-//   BEGIN_OF_MED(LOC);
-
-//   // The field has to be initilised by a non empty support and a
-//   // number of components = 1 and its value type has to be set to MED_REEL64
-//   // (ie a FIELD<double>)
-
-//   if ((_support == (SUPPORT *) NULL) || (_numberOfComponents != 1) || (_valueType != MED_EN::MED_REEL64))
-//       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to 1 and a value type set to MED_REEL64"));
-
-//   END_OF_MED(LOC);
-// }
-
-// /*!
-//   Fill values array with normal values.
-// */
-// template <class T, class INTERLACING_TAG>
-// void FIELD<T, INTERLACING_TAG>::getNormal() const throw (MEDEXCEPTION)
-// {
-//   const char * LOC = "FIELD<double>::getNormal() const : ";
-//   BEGIN_OF_MED(LOC);
-
-//   // The field has to be initilised by a non empty support and a
-//   // number of components = 1 and its value type has to be set to MED_REEL64
-//   // (ie a FIELD<double>)
-
-//   if (_support == (SUPPORT *) NULL)
-//       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to the space dimension and a value type set to MED_REEL64"));
-
-//   int dim_space = _support->getMesh()->getSpaceDimension();
-
-//   if ((_numberOfComponents != dim_space) || (_valueType != MED_EN::MED_REEL64))
-//       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to the space dimension and a value type set to MED_REEL64"));
-
-//   END_OF_MED(LOC);
-// }
-
-// /*!
-//   Fill values array with barycenter values.
-// */
-// template <class T, class INTERLACING_TAG>
-// void FIELD<T, INTERLACING_TAG>::getBarycenter() const throw (MEDEXCEPTION)
-// {
-//   const char * LOC = "FIELD<double>::getBarycenter() const : ";
-//   BEGIN_OF_MED(LOC);
-
-//   // The field has to be initilised by a non empty support and a number of
-//   //components = space dimension and its value type has to be set to MED_REEL64
-//   // (ie a FIELD<double>)
-
-//   if (_support == (SUPPORT *) NULL)
-//       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to the space dimension and a value type set to MED_REEL64"));
-
-//   int dim_space = _support->getMesh()->getSpaceDimension();
-
-//   if ((_numberOfComponents != dim_space) || (_valueType != MED_EN::MED_REEL64))
-//       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"The field has to be initialised with a non empty support, a number of components set to the space dimension and a value type set to MED_REEL64"));
-
-//   END_OF_MED(LOC);
-// }
-
-/*!
   Fill array by using T_Analytic.
   WARNING : "this" must have allocated its array by setting this->_support and this->_numberOfComponents properly.
   Typically you should use it on a field built with constructor FIELD<T>::FIELD<T>(SUPPORT *,int nbOfComponents)
@@ -4081,7 +4398,7 @@ void FIELD<T, INTERLACING_TAG>::fillFromAnalytic(myFuncType f) throw (MEDEXCEPTI
   if (_support == (SUPPORT *) NULL)
       throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No Support defined."));
 
-  MESH * mesh = _support->getMesh();
+  const GMESH * mesh = _support->getMesh();
   int spaceDim = mesh->getSpaceDimension();
   const double * coord;
 
@@ -4092,32 +4409,32 @@ void FIELD<T, INTERLACING_TAG>::fillFromAnalytic(myFuncType f) throw (MEDEXCEPTI
   bool deallocateXyz=false;
   if(_support->getEntity()==MED_EN::MED_NODE)
     {
+      const MESH * unstructured = _support->getMesh()->convertInMESH();
       if (_support->isOnAllElements())
-	{
-	  coord=mesh->getCoordinates(MED_EN::MED_NO_INTERLACE);
-	  for(i=0; i<spaceDim; i++)
-	    xyz[i]=(double *)coord+i*_numberOfValues;
-	}
+        {
+          coord=unstructured->getCoordinates(MED_EN::MED_NO_INTERLACE);
+          for(i=0; i<spaceDim; i++)
+            xyz[i]=(double *)coord+i*_numberOfValues;
+        }
       else
-	{
-	  coord = mesh->getCoordinates(MED_EN::MED_FULL_INTERLACE);
-	  const int * nodesNumber=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
-	  for(i=0; i<spaceDim; i++)
-	    xyz[i]=new double[_numberOfValues];
-	  deallocateXyz=true;
-	  for(i=0;i<_numberOfValues;i++)
-	    {
-	      for(j=0;j<spaceDim;j++)
-		xyz[j][i]=coord[(nodesNumber[i]-1)*spaceDim+j];
-	    }
-	}
+        {
+          coord = unstructured->getCoordinates(MED_EN::MED_FULL_INTERLACE);
+          const int * nodesNumber=_support->getNumber(MED_EN::MED_ALL_ELEMENTS);
+          for(i=0; i<spaceDim; i++)
+            xyz[i]=new double[_numberOfValues];
+          deallocateXyz=true;
+          for(i=0;i<_numberOfValues;i++)
+            {
+              for(j=0;j<spaceDim;j++)
+                xyz[j][i]=coord[(nodesNumber[i]-1)*spaceDim+j];
+            }
+        }
+      unstructured->removeReference();
     }
   else
     {
       barycenterField = mesh->getBarycenter(_support);
       bary = barycenterField->getValue();
-      //for(i=0; i<spaceDim; i++)
-      //  xyz[i]=(double *)(bary+i*_numberOfValues);
       for(i=0; i<spaceDim; i++)
         xyz[i]=new double[_numberOfValues];
       deallocateXyz=true;

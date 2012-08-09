@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef DRIVERTOOLS_HXX
 #define DRIVERTOOLS_HXX
 
@@ -131,6 +132,13 @@ struct MEDMEM_EXPORT _groupe
   std::map<unsigned,int> relocMap; // map _maille::ordre() -> index in GROUP, built by getGroups()
   GROUP*                 medGroup;
 
+  std::vector<std::string> refNames; /* names of groups referring this one;
+                                        refNames is resized according to nb of references
+                                        while reading a group (pile 1) and it is filled with
+                                        names while reading long names (pile 27); each named
+                                        reference is converted into a copy of the medGroup
+                                        (issue 0021311)
+                                      */
   const _maille& maille(int index) { return *mailles[index]; }
   bool empty() const { return mailles.empty() && groupes.empty(); }
 #ifdef WNT
@@ -258,7 +266,7 @@ private:
 /*!
  * \if developper
  * Intermediate structure used by drivers to store data read from the other format file.
- * The structure provides functions that transform the stored data to the MED format : 
+ * The structure provides functions that transform the stored data to the MED format :
  * getCoordinate(), getConnectivity(), getGroups().
  * The elements inserted in maillage and points are automaticaly ordered.
  * Renumbering are performed by getConnectivity & getGroups before writing the MED structures.
@@ -285,10 +293,10 @@ struct MEDMEM_EXPORT _intermediateMED
   void mergeNodesAndElements(double tolerance); // optionally merge nodes and elements
   CONNECTIVITY * getConnectivity(); // creates MED connectivity from the intermediate structure
   COORDINATE * getCoordinate(const string & coordinateSystem="CARTESIAN"); // makes MED coordinate
-//   void getFamilies(std::vector<FAMILY *> & _famCell, std::vector<FAMILY *> & _famFace, 
+//   void getFamilies(std::vector<FAMILY *> & _famCell, std::vector<FAMILY *> & _famFace,
 //                    std::vector<FAMILY *> & _famEdge, std::vector<FAMILY *> & _famNode,
 //                    MESH * _ptrMesh);
-  void getGroups(std::vector<GROUP *> & _groupCell, std::vector<GROUP *> & _groupFace, 
+  void getGroups(std::vector<GROUP *> & _groupCell, std::vector<GROUP *> & _groupFace,
                  std::vector<GROUP *> & _groupEdge, std::vector<GROUP *> & _groupNode,
                  MESH * _ptrMesh);
   //GROUP * getGroup( int i );
@@ -370,7 +378,7 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
 
   int i_comp_tot = 0, nb_fields = 0;
   std::set<int> supp_id_set; // to create a new field when support repeats if hasCommonSupport()
-  std::vector< _sub_data >::const_iterator sub_data, sub_end = _sub.end(); 
+  std::vector< _sub_data >::const_iterator sub_data, sub_end = _sub.end();
 
   _groupe*  grp = 0;
   GROUP* medGrp = 0;
@@ -432,7 +440,8 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
     if ( !validSub ) {
       if ( hasCommonSupport() ) {
         if ( !res.empty() ) {
-          delete f;
+          if(f)
+            f->removeReference();
           res.clear();
         }
         return res;
@@ -460,7 +469,13 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
       vector<string> str( sub_data->nbComponents() );
       f->setComponentsDescriptions( &str[0] );
       f->setMEDComponentsUnits( &str[0] );
-
+      if ( !hasCommonSupport() && nb_fields > 1 )
+      {
+        f->setName( MEDMEM::STRING(_name) << "_Sub_" << nb_fields );
+        INFOS_MED("Warning: field |" <<_name<<"| is incompatible with MED format (has "
+                  "sub-fields of different nature), so we map its sub-field #"<< nb_fields <<
+                  " into a separate field |"<<f->getName() << "|");
+      }
       res.push_back( make_pair( f , hasCommonSupport() ? _group_id : sub_data->_supp_id ));
       MESSAGE_MED(" MAKE " << nb_fields << "-th field <" << _name << "> on group_id " << _group_id );
 
@@ -492,7 +507,7 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
     }
 
     // Set values
-    
+
     // get nb elements in a group
     _groupe & sub_grp = groupes[ sub_data->_supp_id ];
     int nb_supp_elems = sub_grp.mailles.size();
@@ -516,7 +531,7 @@ std::list<std::pair< FIELD_*, int> > _field< T >::getField(std::vector<_groupe> 
       // store values
       const std::vector< T > & values = comp_values[ i_comp_tot++ ];
       bool oneValue = ( values.size() == 1 );
-      ASSERT_MED( oneValue || values.size() == nb_supp_elems * nb_gauss );
+      ASSERT_MED( oneValue || (int)values.size() == nb_supp_elems * nb_gauss );
       for ( int k = 0; k < nb_supp_elems; ++k )
       {
         const T& val = oneValue ? values[ 0 ] : values[ k * elem_step ];

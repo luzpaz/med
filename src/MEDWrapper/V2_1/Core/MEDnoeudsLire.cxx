@@ -23,16 +23,16 @@ namespace med_2_1{
 
 med_err
 MEDnoeudsLire(med_idt fid,char *maa,med_int mdim, med_float *coord,
-	      med_mode_switch mode_coo,
-	      med_repere *repere,char *nomcoo, char *unicoo,char *nom,
-	      med_booleen *inom,med_int *num,med_booleen *inum,med_int *fam,
-	      med_int nnoeuds)
+              med_mode_switch mode_coo,
+              med_repere *repere,char *nomcoo, char *unicoo,char *nom,
+              med_booleen *inom,med_int *num,med_booleen *inum,med_int *fam,
+              med_int nnoeuds)
 {
   med_err ret;
 
   /* lecture des coordonnees */
   if ((ret = MEDcoordLire(fid,maa,mdim,coord,mode_coo,MED_ALL,0,MED_NOPF,repere,nomcoo,
-			  unicoo)) < 0)
+                          unicoo)) < 0)
     return -1;
 
   /* lecture des noms (facultatifs) */

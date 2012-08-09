@@ -23,8 +23,8 @@ namespace med_2_1{
 
 med_err
 MEDfamMaaLire(med_idt fid,char *maa,med_int *numfam,med_int *attide,
-	      med_int *attval,char *attdes,int *indatt,char *gro,int *indgro,
-	      med_int nfamilles)
+              med_int *attval,char *attdes,int *indatt,char *gro,int *indgro,
+              med_int nfamilles)
 {
   med_err ret;
   med_int natt,ngro;
@@ -36,10 +36,10 @@ MEDfamMaaLire(med_idt fid,char *maa,med_int *numfam,med_int *attide,
   for (i=0;i<nfamilles;i++)
     {
       if ((ret = MEDfamInfo(fid,maa,i+1,nom,numfam+i,attide+*(indatt+i),
-			    attval+*(indatt+i),
-			    attdes+*(indatt+i)*MED_TAILLE_DESC,
-			    &natt,gro+*(indgro+i),&ngro)) < 0)
-	return -1;
+                            attval+*(indatt+i),
+                            attdes+*(indatt+i)*MED_TAILLE_DESC,
+                            &natt,gro+*(indgro+i),&ngro)) < 0)
+        return -1;
       *(indatt+i+1) = *(indatt+i)+natt;
       *(indgro+i+1) = *(indgro+i)+ngro*MED_TAILLE_LNOM;
     }

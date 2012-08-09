@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "FAMILYClient.hxx"
 #include "MESHClient.hxx"
 #include "UtilClient.hxx"
@@ -29,20 +30,15 @@ using namespace MEDMEM;
  */
 //=============================================================================
 FAMILYClient::FAMILYClient(const SALOME_MED::FAMILY_ptr S,
-			     MESH * M) 
+                           GMESH * M) 
   : SUPPORTClient(S, M), 
     FAMILY(), 
     IOR_Family(SALOME_MED::FAMILY::_duplicate(S))
 {
-  const char* LOC = "FAMILYClient::FAMILYClient(SALOME_MED::FAMILY_ptr m)";
-  BEGIN_OF(LOC);
-
   SCRUTE(S);
   SCRUTE(M);
 
   blankCopy(false);
-
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -51,9 +47,6 @@ FAMILYClient::FAMILYClient(const SALOME_MED::FAMILY_ptr S,
 //=============================================================================
 void FAMILYClient::blankCopy(bool blankSupport)
 {
-  const char* LOC = "FAMILYClient::blankCopy()";
-  BEGIN_OF(LOC);
-
   if (blankSupport)
     SUPPORTClient::blankCopy();
 
@@ -66,7 +59,7 @@ void FAMILYClient::blankCopy(bool blankSupport)
   nAttr = IOR_Family->getNumberOfAttributes();
   setNumberOfAttributes(nAttr);
 
-  SALOME_MED::long_array* attrId= IOR_Family->getAttributesIdentifiers();
+  SALOME_TYPES::ListOfLong* attrId= IOR_Family->getAttributesIdentifiers();
   convertCorbaArray(i, n, attrId);
   delete attrId;
   ASSERT(n == nAttr);
@@ -79,7 +72,7 @@ void FAMILYClient::blankCopy(bool blankSupport)
   ASSERT(n == _numberOfAttribute);
   setAttributesValues(i);
 
-  SALOME_MED::string_array * attrDesc=IOR_Family->getAttributesDescriptions();
+  SALOME_TYPES::ListOfString * attrDesc=IOR_Family->getAttributesDescriptions();
   convertCorbaArray(s, n, attrDesc);
   delete attrDesc;
   ASSERT(n == _numberOfAttribute);
@@ -96,8 +89,6 @@ void FAMILYClient::blankCopy(bool blankSupport)
   setGroupsNames(s,true);
 
   _complete = false;
-
-  END_OF(LOC);
 }
 
 //=============================================================================
@@ -107,9 +98,6 @@ void FAMILYClient::blankCopy(bool blankSupport)
 //=============================================================================
 void FAMILYClient::fillCopy(bool fillSupport)
 {
-  const char* LOC = "FAMILYClient::fillCopy()";
-  BEGIN_OF(LOC);
-
   if (!_complete) {
 
     if (fillSupport)
@@ -119,8 +107,6 @@ void FAMILYClient::fillCopy(bool fillSupport)
 
     _complete = true;
   }
-
-  END_OF(LOC);
 }
 
 //=============================================================================
@@ -131,7 +117,4 @@ void FAMILYClient::fillCopy(bool fillSupport)
 
 FAMILYClient::~FAMILYClient()
 {
-  const char* LOC = "FAMILYClient::~FAMILYClient()";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
 }

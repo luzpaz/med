@@ -1,30 +1,33 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  File   : MED_Structure.cxx
 //  Author : Eugeny NIKOLAEV
 //  Module : MED
 //
 #include "MED_Structures.hxx"
 #include "MED_Utilities.hxx"
+
+#include <cstring>
 
 using namespace MED;
 
@@ -38,8 +41,8 @@ namespace MED
 
   std::string 
   GetString(TInt theId, 
-	    TInt theStep, 
-	    const TString& theString)
+            TInt theStep, 
+            const TString& theString)
   {
     const char* aPos = &theString[theId*theStep];
     TInt aSize = std::min(TInt(strlen(aPos)),theStep);
@@ -48,9 +51,9 @@ namespace MED
 
   void 
   SetString(TInt theId, 
-	    TInt theStep, 
-	    TString& theString, 
-	    const std::string& theValue)
+            TInt theStep, 
+            TString& theString, 
+            const std::string& theValue)
   {
     TInt aSize = std::min(TInt(theValue.size()+1),theStep);
     char* aPos = &theString[theId*theStep];
@@ -59,9 +62,9 @@ namespace MED
 
   void 
   SetString(TInt theId, 
-	    TInt theStep, 
-	    TString& theString, 
-	    const TString& theValue)
+            TInt theStep, 
+            TString& theString, 
+            const TString& theValue)
   {
     TInt aSize = std::min(TInt(theValue.size()+1),theStep);
     char* aPos = &theString[theId*theStep];
@@ -137,6 +140,7 @@ TElemInfo
 ::SetFamNum(TInt theId, TInt theVal) 
 {
   (*myFamNum)[theId] = theVal;
+  myIsFamNum = eVRAI;
 }
 
 TInt
@@ -158,7 +162,7 @@ TCCoordSlice
 TNodeInfo
 ::GetCoordSlice(TInt theId) const
 {
-  TInt aDim = myMeshInfo->GetDim();
+  TInt aDim = myMeshInfo->GetSpaceDim();
   if(GetModeSwitch() == eFULL_INTERLACE)
     return TCCoordSlice(*myCoord, std::slice(theId*aDim, aDim, 1));
   else
@@ -169,7 +173,7 @@ TCoordSlice
 TNodeInfo
 ::GetCoordSlice(TInt theId)
 {
-  TInt aDim = myMeshInfo->GetDim();
+  TInt aDim = myMeshInfo->GetSpaceDim();
   if(GetModeSwitch() == eFULL_INTERLACE)
     return TCoordSlice(*myCoord, std::slice(theId*aDim,aDim,1));
   else
@@ -289,9 +293,9 @@ TMeshValueBase
 void
 TMeshValueBase
 ::Allocate(TInt theNbElem,
-	   TInt theNbGauss,
-	   TInt theNbComp,
-	   EModeSwitch theMode)
+           TInt theNbGauss,
+           TInt theNbComp,
+           EModeSwitch theMode)
 {
   myModeSwitch = theMode;
   
@@ -508,19 +512,12 @@ TGrilleInfo
 {
   TInt nbNodes=0;
   TInt aDim = myMeshInfo->GetDim();
-  if(myGrilleType == eGRILLE_STANDARD)
-    for(int i=0;i<aDim;i++)
-      if(nbNodes == 0)
-	nbNodes = this->GetGrilleStructure()[i];
-      else
-	nbNodes = nbNodes*this->GetGrilleStructure()[i];
-  else
-    for(int i=0;i<aDim;i++)
-      if(nbNodes == 0)
-	nbNodes = GetNbIndexes(i);
-      else
-	nbNodes = nbNodes*GetNbIndexes(i);
-  
+  for(int i=0;i<aDim;i++)
+    if(nbNodes == 0)
+      nbNodes = this->GetGrilleStructure()[i];
+    else
+      nbNodes = nbNodes*this->GetGrilleStructure()[i];
+ 
   return nbNodes;
 }
 
@@ -530,19 +527,34 @@ TGrilleInfo
 {
   TInt nbCells=0;
   TInt aDim = myMeshInfo->GetDim();
-  if(this->GetGrilleType() == eGRILLE_STANDARD)
-    for(int i=0;i<aDim;i++)
-      if(nbCells == 0)
-	nbCells = this->GetGrilleStructure()[i]-1;
-      else
-	nbCells = nbCells*(this->GetGrilleStructure()[i]-1);
-  else
-    for(int i=0;i<aDim;i++)
-      if(nbCells == 0)
-	nbCells = GetNbIndexes(i)-1;
-      else
-	nbCells = nbCells*(GetNbIndexes(i)-1);
+  for(int i=0;i<aDim;i++)
+    if(nbCells == 0)
+      nbCells = this->GetGrilleStructure()[i]-1;
+    else
+      nbCells = nbCells*(this->GetGrilleStructure()[i]-1);
   return nbCells;
+}
+
+TInt
+TGrilleInfo
+::GetNbSubCells()
+{
+  TInt nb=0;
+  TInt aDim = myMeshInfo->GetDim();
+  switch (aDim) {
+  case 3:
+    nb =
+      (myGrilleStructure[0]  ) * (myGrilleStructure[1]-1) * (myGrilleStructure[2]-1) +
+      (myGrilleStructure[0]-1) * (myGrilleStructure[1]  ) * (myGrilleStructure[2]-1) +
+      (myGrilleStructure[0]-1) * (myGrilleStructure[1]-1) * (myGrilleStructure[2]  );
+    break;
+  case 2:
+    nb =
+      (myGrilleStructure[0]  ) * (myGrilleStructure[1]-1) +
+      (myGrilleStructure[0]-1) * (myGrilleStructure[1]  );
+    break;
+  }
+  return nb;
 }
 
 EGeometrieElement
@@ -562,11 +574,39 @@ TGrilleInfo
   }
 }
 
+EGeometrieElement
+TGrilleInfo
+::GetSubGeom()
+{
+  TInt aDim = myMeshInfo->GetDim();
+  switch(aDim){
+  case 2:
+    return eSEG2;
+  case 3:
+    return eQUAD4;
+  }
+  return eNONE;
+}
+
 EEntiteMaillage
 TGrilleInfo
 ::GetEntity()
 {
   return eMAILLE;
+}
+
+EEntiteMaillage
+TGrilleInfo
+::GetSubEntity()
+{
+  TInt aDim = myMeshInfo->GetDim();
+  switch(aDim){
+  case 2:
+    return eARETE;
+  case 3:
+    return eFACE;
+  }
+  return EEntiteMaillage(-1);
 }
 
 const
@@ -647,11 +687,11 @@ TGrilleInfo
       i = theId % nbIndxX;
       j = theId / nbIndxX;
       if(myGrilleType == eGRILLE_CARTESIENNE){
-	aCoord[0] = aVecX[i];
-	aCoord[1] = aVecY[j];
+        aCoord[0] = aVecX[i];
+        aCoord[1] = aVecY[j];
       } else { // eGRILLE_POLAIRE (cylindrical)
-	aCoord[0] = aVecX[i] * cos(aVecY[j]);
-	aCoord[1] = aVecX[i] * sin(aVecY[j]);
+        aCoord[0] = aVecX[i] * cos(aVecY[j]);
+        aCoord[1] = aVecX[i] * sin(aVecY[j]);
       }
       break;
     }
@@ -667,90 +707,120 @@ TGrilleInfo
       k = theId / (nbIndxX*nbIndxY);
 
       if(myGrilleType == eGRILLE_CARTESIENNE){
-	aCoord[0] = aVecX[i];
-	aCoord[1] = aVecY[j];
-	aCoord[2] = aVecZ[k];
+        aCoord[0] = aVecX[i];
+        aCoord[1] = aVecY[j];
+        aCoord[2] = aVecZ[k];
       } else { // eGRILLE_POLAIRE (cylindrical)
-	aCoord[0] = aVecX[i] * cos(aVecY[j]);
-	aCoord[1] = aVecX[i] * sin(aVecY[j]);
-	aCoord[2] = aVecZ[k];
+        aCoord[0] = aVecX[i] * cos(aVecY[j]);
+        aCoord[1] = aVecX[i] * sin(aVecY[j]);
+        aCoord[2] = aVecZ[k];
       }
       
       break;
     }
     }
   }
-    
+
   return aCoord;
 }
 
 TIntVector
 TGrilleInfo
-::GetConn(TInt theId)
+::GetConn(TInt theId, const bool isSub)
 {
   TIntVector anIndexes;
-  TInt aDim       = myMeshInfo->GetDim();
-  TInt aArrSize   = 2;
-  for(int i=1;i<aDim;i++) aArrSize = aArrSize*2;
-  
+  TInt aDim = myMeshInfo->GetDim();
+
   TInt idx;
-  TInt iMin, iMax, jMin, jMax, kMin, kMax;
+  TInt iMin, jMin, kMin, iMax, jMax, kMax;
   TInt loc[3];
 
   loc[0] = loc[1] = loc[2] = 0;
   iMin = iMax = jMin = jMax = kMin = kMax = 0;
- 
-  TInt nbX,nbY;
-  if (myGrilleType == eGRILLE_STANDARD)
-    {
-      nbX = this->GetGrilleStructure()[0];
-      nbY = this->GetGrilleStructure()[1];
-    }
-  else
-    {
-      nbX = this->GetNbIndexes(0);
-      nbY = this->GetNbIndexes(1);
-    }
 
-  TInt d01 = nbX*nbY;
-  
-  switch(aDim){
-  case 3:{
-    iMin = theId % (nbX - 1);
-    iMax = iMin + 1;
-    jMin = (theId / (nbX - 1)) % (nbY - 1);
-    jMax = jMin + 1;
-    kMin = theId / ((nbX - 1) * (nbY - 1));
-    kMax = kMin + 1;
-    break;
-  }
-  case 2:{
-    iMin = theId % (nbX-1);
-    iMax = iMin + 1;
-    jMin = theId / (nbX-1);
-    jMax = jMin + 1;
-    break;
-  }
-  case 1:{
-    iMin = theId;
-    iMax = theId + 1;
-    break;
-  }
-  }
-  
-  
-  for (loc[2]=kMin; loc[2]<=kMax; loc[2]++)
+  switch(aDim) {
+  case 3:
     {
-      for (loc[1]=jMin; loc[1]<=jMax; loc[1]++)
-	{
-	  for (loc[0]=iMin; loc[0]<=iMax; loc[0]++)
-	    {
-	      idx = loc[0] + loc[1]*nbX + loc[2]*d01;
-	      anIndexes.push_back(idx);
-	    }
-	}
+      TInt nbX = this->GetGrilleStructure()[0];
+      TInt nbY = this->GetGrilleStructure()[1];
+      TInt nbZ = this->GetGrilleStructure()[2];
+      TInt d01 = nbX*nbY, dX = 1, dY = 1, dZ = 1;
+      if ( isSub )
+      {
+        if ( theId < nbX * (nbY-1) * (nbZ-1))
+        { // face is normal to X axis
+          dX = 0;
+        }
+        else if ( theId < nbX * (nbY-1) * (nbZ-1) + (nbX-1) * nbY * (nbZ-1))
+        {  // face is normal to Y axis
+          theId -= nbX * (nbY-1) * (nbZ-1);
+          dY = 0;
+        }
+        else
+        {
+          theId -= nbX * (nbY-1) * (nbZ-1) + (nbX-1) * nbY * (nbZ-1);
+          dZ = 0;
+        }
+      }
+      //else
+      {
+        iMin = theId % (nbX - dX);
+        jMin = (theId / (nbX - dX)) % (nbY - dY);
+        kMin = theId / ((nbX - dX) * (nbY - dY));
+        iMax = iMin+dX;
+        jMax = jMin+dY;
+        kMax = kMin+dZ;
+      }
+      for (loc[2]=kMin; loc[2]<=kMax; loc[2]++)
+        for (loc[1]=jMin; loc[1]<=jMax; loc[1]++)
+          for (loc[0]=iMin; loc[0]<=iMax; loc[0]++)
+          {
+            idx = loc[0] + loc[1]*nbX + loc[2]*d01;
+            anIndexes.push_back(idx);
+          }
+      break;
     }
-  
+  case 2:
+    {
+      TInt nbX = this->GetGrilleStructure()[0];
+      TInt nbY = this->GetGrilleStructure()[1];
+      TInt dX = 1, dY = 1;
+      if ( isSub )
+      {
+        if ( theId < nbX * (nbY-1))
+        { // edge is normal to X axis
+          dX = 0;
+        }
+        else
+        {
+          theId -= nbX * (nbY-1);
+          dY = 0;
+        }
+      }
+      iMin = theId % (nbX-dX);
+      jMin = theId / (nbX-dX);
+      iMax = iMin+dX;
+      jMax = jMin+dY;
+      for (loc[1]=jMin; loc[1]<=jMax; loc[1]++)
+        for (loc[0]=iMin; loc[0]<=iMax; loc[0]++)
+        {
+          idx = loc[0] + loc[1]*nbX;
+          anIndexes.push_back(idx);
+        }
+      break;
+    }
+  case 1:
+    {
+      iMin = theId;
+      for (loc[0]=iMin; loc[0]<=iMin+1; loc[0]++)
+      {
+        idx = loc[0];
+        anIndexes.push_back(idx);
+      }
+      break;
+    }
+  }
+
   return anIndexes;
 }
 
@@ -780,4 +850,18 @@ TGrilleInfo
 ::SetFamNum(TInt theId,TInt theVal) 
 {
   myFamNum[theId] = theVal;
+}
+
+TInt
+TGrilleInfo
+::GetFamSubNum(TInt theId) const 
+{
+  return myFamSubNum[theId];
+}
+
+void
+TGrilleInfo
+::SetFamSubNum(TInt theId,TInt theVal) 
+{
+  myFamSubNum[theId] = theVal;
 }

@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  File   : 
 //  Author : 
 //  Module : 
@@ -61,9 +62,9 @@ namespace MED
     {
       long int anId = -1;
       if(theId < mySlice.size()){
-	anId = mySlice.start() + theId*mySlice.stride();
-	if(anId < mySourceSize)
-	  return;
+        anId = mySlice.start() + theId*mySlice.stride();
+        if(anId < (long int)mySourceSize)
+          return;
       }
       throw std::out_of_range("TCSlice::check_id");
     }
@@ -96,8 +97,8 @@ namespace MED
 
     //! Construct the class from bare pointer
     TCSlice(const value_type* theValuePtr,
-	    size_t theSourceSize,
-	    const std::slice& theSlice): 
+            size_t theSourceSize,
+            const std::slice& theSlice): 
       myCValuePtr(theValuePtr),
       mySourceSize(theSourceSize),
       mySlice(theSlice)
@@ -105,7 +106,7 @@ namespace MED
     
     //! Construct the class from corresponding container
     TCSlice(const TVector<value_type>& theContainer,
-	    const std::slice& theSlice): 
+            const std::slice& theSlice): 
       myCValuePtr(&theContainer[0]),
       mySourceSize(theContainer.size()),
       mySlice(theSlice)
@@ -151,15 +152,15 @@ namespace MED
 
     //! Construct the class from bare pointer
     TSlice(value_type* theValuePtr,
-	   size_t theSourceSize,
-	   const std::slice& theSlice): 
+           size_t theSourceSize,
+           const std::slice& theSlice): 
       TSupperClass(theValuePtr, theSourceSize, theSlice),
       myValuePtr(theValuePtr)
     {}
     
     //! Construct the class from corresponding container
     TSlice(TVector<value_type>& theContainer,
-	   const std::slice& theSlice): 
+           const std::slice& theSlice): 
       TSupperClass(theContainer, theSlice),
       myValuePtr(&theContainer[0])
     {}

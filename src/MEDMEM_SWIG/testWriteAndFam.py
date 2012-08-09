@@ -1,24 +1,26 @@
-#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+#  -*- coding: iso-8859-1 -*-
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+
 ###################################################################################
 # This Python script is testing the writing in Med format V2.1 V2.2
 # You can check if the analysis of the families is OK.
@@ -34,7 +36,7 @@ filePath=os.environ["MED_ROOT_DIR"]
 filePath=os.path.join(filePath, "share", "salome", "resources", "med")
 
 medFiles = []
-medFiles.append("geomMesh21.med")
+#medFiles.append("geomMesh21.med")
 medFiles.append("geomMesh22.med")
 nbOfFiles = len(medFiles)
 
@@ -92,25 +94,6 @@ for i in range(nbOfFiles):
             pass
         pass
     
-    medFileVersion = getMedFileVersionForWriting()
-
-    if (medFileVersion == V22):
-        setMedFileVersionForWriting(V21)
-        pass
-
-    print ""
-    print "  adding a Med file V2.1 format driver to the mesh with the file ",medFileOut21
-    idMedV21 = mesh.addDriver(MED_DRIVER,medFileOut21,mesh.getName())
-
-    print ""
-    print "  writing the mesh in Med file V2.1 format"
-    mesh.write(idMedV21)
-
-    medFileVersion = getMedFileVersionForWriting()
-    if (medFileVersion == V21):
-        setMedFileVersionForWriting(V22)
-        pass
-
     print ""
     print "  adding a Med file V2.2 format driver to the mesh with the file ",medFileOut22
     idMedV22 = mesh.addDriver(MED_DRIVER,medFileOut22,mesh.getName())
@@ -126,10 +109,8 @@ medFiles2 = []
 for i in range(nbOfFiles):
     medFile = medFiles[i]
     rootFile = string.split(medFile,".")[0]
-    medFileOut21 = rootFile + "Out21.med"
     medFileOut22 = rootFile + "Out22.med"
 
-    medFiles2.append(medFileOut21)
     medFiles2.append(medFileOut22)
     pass
 

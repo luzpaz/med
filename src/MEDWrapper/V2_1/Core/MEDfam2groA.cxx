@@ -78,9 +78,9 @@ namespace med_2_1{
 
 med_err 
 MEDfam2groA (med_int nfam,med_int *numfam,med_int *numfamnoe, 
-	     med_int nnoeuds,med_int *numfamele,med_int nelements, 
-	     char *grofam,int *indfamgro, 
-	     med_int *ngn,med_int *nge,med_int *nindn,med_int *ninde)
+             med_int nnoeuds,med_int *numfamele,med_int nelements, 
+             char *grofam,int *indfamgro, 
+             med_int *ngn,med_int *nge,med_int *nindn,med_int *ninde)
 {
   int i,j,k;
   char groupe[MED_TAILLE_LNOM];
@@ -105,97 +105,97 @@ MEDfam2groA (med_int nfam,med_int *numfam,med_int *numfamnoe,
   for (i=1;i<=nfam;i++)
     if ((*(indfamgro+i)-*(indfamgro+i-1))/MED_TAILLE_LNOM > 0) 
       {
-	/* on releve le numero de la famille courante */
+        /* on releve le numero de la famille courante */
         numc = *(numfam+i-1);
-	nnoe = 0;
-	nele = 0;
+        nnoe = 0;
+        nele = 0;
         /* si c'est une famille de noeuds, on compte le nombre de
            noeuds qui y sont rattaches */
         if (numc > 0)
-	  for (j=0;j<nnoeuds;j++)
-	    if (*(numfamnoe+j) == numc)
-	      nnoe++;
+          for (j=0;j<nnoeuds;j++)
+            if (*(numfamnoe+j) == numc)
+              nnoe++;
         /* si c'est une famille d'elements, on compte le nombre d'elements
            qui y sont rattaches */
-	if (numc < 0)
-	  for (j=0;j<nelements;j++)
-	    if (*(numfamele+j) == numc)
-	      nele++; 	  
+        if (numc < 0)
+          for (j=0;j<nelements;j++)
+            if (*(numfamele+j) == numc)
+              nele++;     
         /* on parcourt la liste des groupes de la famille et pour chaque
            groupe :
-	   1 - on met a jour les compteurs nindn et ninde ;
+           1 - on met a jour les compteurs nindn et ninde ;
            2 - on verifie s'il s'agit d'un groupe deja repertorie.
                Si c'est le cas on ne fait rien, sinon on met a jour les
                compteurs ngn ou nge */
         for (j=0;j<(*(indfamgro+i)-*(indfamgro+i-1))/MED_TAILLE_LNOM;j++)
-	  {
-	    strncpy(groupe,grofam+*(indfamgro+i-1)+j*MED_TAILLE_LNOM,
-		    MED_TAILLE_LNOM);
-	    if (numc > 0)
-	      {
+          {
+            strncpy(groupe,grofam+*(indfamgro+i-1)+j*MED_TAILLE_LNOM,
+                    MED_TAILLE_LNOM);
+            if (numc > 0)
+              {
                 *nindn = *nindn+nnoe;
-		if (*ngn == 0)
-		  {
-		    *ngn = 1;
-		    if ((nomgronoe=(char*)malloc(sizeof(char)*MED_TAILLE_LNOM))
-			 == NULL)
-		      return -1;
-		    strncpy(nomgronoe,groupe,MED_TAILLE_LNOM);
-		  }
-		else
-		  { 
+                if (*ngn == 0)
+                  {
+                    *ngn = 1;
+                    if ((nomgronoe=(char*)malloc(sizeof(char)*MED_TAILLE_LNOM))
+                         == NULL)
+                      return -1;
+                    strncpy(nomgronoe,groupe,MED_TAILLE_LNOM);
+                  }
+                else
+                  { 
                     flag = 0;
-		    for (k=0;k<(*ngn);k++)
-		      if (strncmp(groupe,nomgronoe+k*MED_TAILLE_LNOM,
-				  MED_TAILLE_LNOM) == 0)
-			flag = 1;
-		    if (flag == 0)
-		      { 
-			*ngn = *ngn + 1;
-			if ((tmp=(char*)malloc(sizeof(char)*
-					       MED_TAILLE_LNOM**ngn)) == NULL)
-			  return -1;
-			strncpy(tmp,nomgronoe,MED_TAILLE_LNOM*(*ngn-1));
-			strncpy(tmp+MED_TAILLE_LNOM*(*ngn-1),groupe, 
-				MED_TAILLE_LNOM);
-			free(nomgronoe); 
-			nomgronoe = tmp;
-		      }
-		  } 
-	      } 
-	    if (numc < 0)
-	      {
+                    for (k=0;k<(*ngn);k++)
+                      if (strncmp(groupe,nomgronoe+k*MED_TAILLE_LNOM,
+                                  MED_TAILLE_LNOM) == 0)
+                        flag = 1;
+                    if (flag == 0)
+                      { 
+                        *ngn = *ngn + 1;
+                        if ((tmp=(char*)malloc(sizeof(char)*
+                                               MED_TAILLE_LNOM**ngn)) == NULL)
+                          return -1;
+                        strncpy(tmp,nomgronoe,MED_TAILLE_LNOM*(*ngn-1));
+                        strncpy(tmp+MED_TAILLE_LNOM*(*ngn-1),groupe, 
+                                MED_TAILLE_LNOM);
+                        free(nomgronoe); 
+                        nomgronoe = tmp;
+                      }
+                  } 
+              } 
+            if (numc < 0)
+              {
                 *ninde = *ninde+nele;
-		if (*nge == 0)
-		  {
-		    *nge = 1;
-		    if ((nomgroele=(char *)malloc(sizeof(char)*
-						  MED_TAILLE_LNOM)) == NULL)
-		      return -1;
-		    strncpy(nomgroele,groupe,MED_TAILLE_LNOM);
-		  }
-		else
-		  { 
-		    flag = 0;
-		    for (k=0;k<(*nge);k++)
-		      if (strncmp(groupe,nomgroele+k*MED_TAILLE_LNOM, 
-				  MED_TAILLE_LNOM) == 0)
-			flag = 1;
-		    if (flag == 0)
-		      {
-			*nge = *nge + 1;
-			if ((tmp = (char*) malloc(sizeof(char)*MED_TAILLE_LNOM*
-						  *nge)) == NULL)
-			  return -1;
-			strncpy(tmp,nomgroele,MED_TAILLE_LNOM*(*nge-1));
-			strncpy(tmp+MED_TAILLE_LNOM*(*nge-1), groupe, 
-				MED_TAILLE_LNOM);
-			free(nomgroele);
-			nomgroele = tmp;
-		      }
-		  }
-	      } 
-	  } 
+                if (*nge == 0)
+                  {
+                    *nge = 1;
+                    if ((nomgroele=(char *)malloc(sizeof(char)*
+                                                  MED_TAILLE_LNOM)) == NULL)
+                      return -1;
+                    strncpy(nomgroele,groupe,MED_TAILLE_LNOM);
+                  }
+                else
+                  { 
+                    flag = 0;
+                    for (k=0;k<(*nge);k++)
+                      if (strncmp(groupe,nomgroele+k*MED_TAILLE_LNOM, 
+                                  MED_TAILLE_LNOM) == 0)
+                        flag = 1;
+                    if (flag == 0)
+                      {
+                        *nge = *nge + 1;
+                        if ((tmp = (char*) malloc(sizeof(char)*MED_TAILLE_LNOM*
+                                                  *nge)) == NULL)
+                          return -1;
+                        strncpy(tmp,nomgroele,MED_TAILLE_LNOM*(*nge-1));
+                        strncpy(tmp+MED_TAILLE_LNOM*(*nge-1), groupe, 
+                                MED_TAILLE_LNOM);
+                        free(nomgroele);
+                        nomgroele = tmp;
+                      }
+                  }
+              } 
+          } 
       }
 
   /* nettoyage memoire */

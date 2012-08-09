@@ -44,7 +44,7 @@ int main (int argc, char **argv)
   med_idt fid;
   char des[MED_TAILLE_DESC+1]="Ceci est un courte description du mon fichier test1.med";
 
-  fid = MEDouvrir("test1.med",MED_REMP);
+  fid = MEDouvrir((char*)"test1.med",MED_REMP);
   if (fid < 0)
     ret = -1;
   printf("%d\n",ret);
@@ -56,7 +56,7 @@ int main (int argc, char **argv)
   ret = MEDfermer(fid);
   printf("%d\n",ret);
 
-  fid = MEDouvrir("test1.med",MED_LECT);
+  fid = MEDouvrir((char*)"test1.med",MED_LECT);
   if (fid < 0)
     ret = -1;
   printf("%d\n",ret);

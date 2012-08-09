@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='us-ascii' ?>
 <!--
-  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+  Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 
   Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
   CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
@@ -30,6 +30,51 @@
 
 <path-prefix-list>
 </path-prefix-list>
+
+<type-list>
+  <objref name="SALOME_MED/MED" />
+  <objref name="SALOME_MED/MESH" />
+  <objref name="SALOME_MED/SUPPORT" />
+  <objref name="SALOME_MED/FIELD" />
+  <objref name="SALOME_MED/FIELDDOUBLE" >
+    <base>SALOME_MED/FIELD</base>
+  </objref>
+  <objref name="SALOME_MED/FIELDINT" >
+    <base>SALOME_MED/FIELD</base>
+  </objref>
+  <objref name="SALOME_MED/DataArrayCorbaInterface" id="IDL:SALOME_MED/DataArrayCorbaInterface:1.0"/>
+  <objref name="SALOME_MED/MEDCouplingFieldDoubleCorbaInterface" id="IDL:SALOME_MED/MEDCouplingFieldDoubleCorbaInterface:1.0"/>
+  <objref name="SALOME_MED/MEDCouplingFieldTemplateCorbaInterface" id="IDL:SALOME_MED/MEDCouplingFieldTemplateCorbaInterface:1.0"/>
+  <objref name="SALOME_MED/MEDCouplingMeshCorbaInterface" id="IDL:SALOME_MED/MEDCouplingMeshCorbaInterface:1.0"/>
+  <objref name="SALOME_MED/DataArrayIntCorbaInterface" id="IDL:SALOME_MED/DataArrayIntCorbaInterface:1.0">
+      <base>SALOME_MED/DataArrayCorbaInterface</base>
+  </objref>
+  <objref name="SALOME_MED/DataArrayDoubleCorbaInterface" id="IDL:SALOME_MED/DataArrayDoubleCorbaInterface:1.0">
+      <base>SALOME_MED/DataArrayCorbaInterface</base>
+  </objref>
+  <objref name="SALOME_MED/MEDCouplingUMeshCorbaInterface" id="IDL:SALOME_MED/MEDCouplingUMeshCorbaInterface:1.0">
+      <base>SALOME_MED/MEDCouplingMeshCorbaInterface</base>
+  </objref>
+  <objref name="SALOME_MED/MEDCouplingExtrudedMeshCorbaInterface" id="IDL:SALOME_MED/MEDCouplingExtrudedMeshCorbaInterface:1.0">
+      <base>SALOME_MED/MEDCouplingMeshCorbaInterface</base>
+  </objref>
+  <objref name="SALOME_MED/MEDCouplingCMeshCorbaInterface" id="IDL:SALOME_MED/MEDCouplingCMeshCorbaInterface:1.0">
+      <base>SALOME_MED/MEDCouplingMeshCorbaInterface</base>
+  </objref>
+  <objref name="SALOME_MED/ParaMEDCouplingFieldDoubleCorbaInterface" id="IDL:SALOME_MED/ParaMEDCouplingFieldDoubleCorbaInterface:1.0">
+      <base>SALOME_MED/MEDCouplingFieldDoubleCorbaInterface</base>
+  </objref>
+  <objref name="SALOME_MED/ParaMEDCouplingUMeshCorbaInterface" id="IDL:SALOME_MED/ParaMEDCouplingUMeshCorbaInterface:1.0">
+      <base>SALOME_MED/MEDCouplingUMeshCorbaInterface</base>
+  </objref>
+  <objref name="SALOME_MED/MPIMEDCouplingFieldDoubleCorbaInterface" id="IDL:SALOME_MED/MPIMEDCouplingFieldDoubleCorbaInterface:1.0">
+      <base>SALOME_MED/ParaMEDCouplingFieldDoubleCorbaInterface</base>
+  </objref>
+  <objref name="SALOME_MED/MEDCouplingMultiFieldsCorbaInterface" id="IDL:SALOME_MED/MEDCouplingMultiFieldsCorbaInterface:1.0"/>
+  <objref name="SALOME_MED/MEDCouplingFieldOverTimeCorbaInterface" id="IDL:SALOME_MED/MEDCouplingFieldOverTimeCorbaInterface:1.0">
+      <base>SALOME_MED/MEDCouplingMultiFieldsCorbaInterface</base>
+  </objref>
+</type-list>
 
 <!-- Component list -->
 <component-list>
@@ -78,7 +123,7 @@
 				<outParameter-list>
 				    <outParameter>
 					<outParameter-name>return</outParameter-name>
-					<outParameter-type>MESH</outParameter-type>
+					<outParameter-type>SALOME_MED/MESH</outParameter-type>
 					<outParameter-comment>unknown</outParameter-comment>
 				    </outParameter>
 				</outParameter-list>
@@ -120,7 +165,7 @@
 				<outParameter-list>
 				    <outParameter>
 					<outParameter-name>return</outParameter-name>
-					<outParameter-type>FIELD</outParameter-type>
+					<outParameter-type>SALOME_MED/FIELD</outParameter-type>
 					<outParameter-comment>unknown</outParameter-comment>
 				    </outParameter>
 				</outParameter-list>
@@ -147,7 +192,7 @@
 				<outParameter-list>
 				    <outParameter>
 					<outParameter-name>return</outParameter-name>
-					<outParameter-type>MED</outParameter-type>
+					<outParameter-type>SALOME_MED/MED</outParameter-type>
 					<outParameter-comment>unknown</outParameter-comment>
 				    </outParameter>
 				</outParameter-list>

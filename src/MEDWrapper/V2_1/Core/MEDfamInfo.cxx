@@ -26,9 +26,9 @@ namespace med_2_1{
 
 med_err 
 MEDfamInfo(med_idt fid,char *maa,int indice, char *famille, 
-	   med_int *numero,
-	   med_int *attr_ident, med_int *attr_val, char *attr_desc,
-	   med_int *n_attr, char *groupe ,med_int *n_groupe)
+           med_int *numero,
+           med_int *attr_ident, med_int *attr_val, char *attr_desc,
+           med_int *n_attr, char *groupe ,med_int *n_groupe)
 {
   med_idt famid,datagroup;
   med_err ret;
@@ -72,19 +72,19 @@ MEDfamInfo(med_idt fid,char *maa,int indice, char *famille,
        * L'attribut "NBR"
        */
       if ((ret = _MEDattrEntierLire(datagroup,MED_NOM_NBR,n_groupe)) < 0)
-	return -1;
+        return -1;
       
       /* 
        * Data Set des noms des groupes "NOM"
        */
       if ((ret = _MEDdatasetStringLire(datagroup,MED_NOM_NOM,groupe)) < 0)
-	return -1;
+        return -1;
 
       /* 
        * On ferme le Data Group
        */
       if ((ret = _MEDdatagroupFermer(datagroup)) < 0)
-	return -1;
+        return -1;
     }
   else
     *n_groupe = 0;
@@ -98,23 +98,23 @@ MEDfamInfo(med_idt fid,char *maa,int indice, char *famille,
        * L'attribut "NBR"
        */
       if ((ret = _MEDattrEntierLire(datagroup,MED_NOM_NBR,n_attr)) < 0)
-	return -1;
+        return -1;
       
       /*
        * Le Data Set "IDE"
        */
 #if defined(HAVE_F77INT64)
       if ((ret = _MEDdatasetNumLire(datagroup,MED_NOM_IDE,MED_INT64,
-				    MED_NO_INTERLACE,1,MED_ALL,
-				    MED_NOPF,0,MED_NOPG,
-				    (unsigned char*) attr_ident)) < 0)
-	return -1;     
+                                    MED_NO_INTERLACE,1,MED_ALL,
+                                    MED_NOPF,0,MED_NOPG,
+                                    (unsigned char*) attr_ident)) < 0)
+        return -1;     
 #else
       if ((ret = _MEDdatasetNumLire(datagroup,MED_NOM_IDE,MED_INT32,
-				    MED_NO_INTERLACE,1,MED_ALL,
-				    MED_NOPF,0,MED_NOPG,
-				    (unsigned char*) attr_ident)) < 0)
-	return -1;     
+                                    MED_NO_INTERLACE,1,MED_ALL,
+                                    MED_NOPF,0,MED_NOPG,
+                                    (unsigned char*) attr_ident)) < 0)
+        return -1;     
 #endif
 
       /*
@@ -122,16 +122,16 @@ MEDfamInfo(med_idt fid,char *maa,int indice, char *famille,
        */
 #if defined(HAVE_F77INT64)
       if ((ret = _MEDdatasetNumLire(datagroup,MED_NOM_VAL,MED_INT64,
-				    MED_NO_INTERLACE,1,MED_ALL,
-				    MED_NOPF,0,MED_NOPG,
-				    (unsigned char *) attr_val)) < 0)
-	return -1;
+                                    MED_NO_INTERLACE,1,MED_ALL,
+                                    MED_NOPF,0,MED_NOPG,
+                                    (unsigned char *) attr_val)) < 0)
+        return -1;
 #else
       if ((ret = _MEDdatasetNumLire(datagroup,MED_NOM_VAL,MED_INT32,
-				    MED_NO_INTERLACE,1,MED_ALL,
-				    MED_NOPF,0,MED_NOPG,
-				    (unsigned char *) attr_val)) < 0)
-	return -1;
+                                    MED_NO_INTERLACE,1,MED_ALL,
+                                    MED_NOPF,0,MED_NOPG,
+                                    (unsigned char *) attr_val)) < 0)
+        return -1;
 #endif
 
       /*
@@ -143,7 +143,7 @@ MEDfamInfo(med_idt fid,char *maa,int indice, char *famille,
        * On ferme le Data Group
        */
       if ((ret = _MEDdatagroupFermer(datagroup)) < 0)
-	return -1;
+        return -1;
     }
   else
     *n_attr = 0;

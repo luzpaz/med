@@ -1,27 +1,27 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 /*
  File Group.hxx
- $Header$
 */
 
 #ifndef GROUP_HXX
@@ -45,7 +45,7 @@
 namespace MEDMEM {
   class FAMILY;
   class GROUP;
-  ostream & operator<<(ostream &os, GROUP &my) ;
+  MEDMEM_EXPORT std::ostream & operator<<(std::ostream &os, GROUP &my) ;
 
 class MEDMEM_EXPORT GROUP : virtual public SUPPORT
 {
@@ -62,31 +62,32 @@ protected :
     Note that Families are numbered from 1 to N.
     \endif
   */
-  vector<FAMILY*> _family ;
+  std::vector<FAMILY*> _family ;
+ protected:
+  /*! Destructor. */
+  virtual ~GROUP();
   
 public:
   /*! Constructor. */
   GROUP();
   /*! Constructor. */
-  GROUP(const string & name, const list<FAMILY*> & family) throw (MEDEXCEPTION) ;
+  GROUP(const std::string & name, const std::list<FAMILY*> & family) throw (MEDEXCEPTION) ;
   /*! Copy Constructor. */
   GROUP(const GROUP & m);
-  /*! Destructor. */
-  virtual ~GROUP();
 
   /*! Copy operator. */
   // PN ATTention il n y a pas de copie du vecteur Family ????
   GROUP & operator=(const GROUP &group);
 
   /*! Operator << */
-  friend ostream & operator<<(ostream &os, GROUP &my) ;
+  friend std::ostream & operator<<(std::ostream &os, GROUP &my) ;
 
   inline void setNumberOfFamilies(int numberOfFamilies);
-  inline void setFamilies(vector<FAMILY*> Family);
+  inline void setFamilies(std::vector<FAMILY*> Family);
   
-  inline int 	         getNumberOfFamilies() const ;
-  inline vector<FAMILY*> getFamilies() const ;
-  inline FAMILY * 	 getFamily(int i) const ;
+  inline int             getNumberOfFamilies() const ;
+  inline std::vector<FAMILY*> getFamilies() const ;
+  inline FAMILY *        getFamily(int i) const ;
 
 };
 
@@ -103,7 +104,7 @@ inline void GROUP::setNumberOfFamilies(int numberOfFamilies)
 
 /*! set the attribut _family to Family              */
 //----------------------------------------------------
-inline void GROUP::setFamilies(vector<FAMILY*> Family) 
+inline void GROUP::setFamilies(std::vector<FAMILY*> Family) 
 //----------------------------------------------------
 { 
   _family = Family; 
@@ -119,7 +120,7 @@ inline int GROUP::getNumberOfFamilies() const
 
 /*! returns the vector of families in the group */
 //------------------------------------------------
-inline vector<FAMILY*> GROUP::getFamilies() const 
+inline std::vector<FAMILY*> GROUP::getFamilies() const 
 //------------------------------------------------
 { 
   return _family; 

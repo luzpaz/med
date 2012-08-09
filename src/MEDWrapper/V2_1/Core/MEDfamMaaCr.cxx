@@ -26,9 +26,9 @@ namespace med_2_1{
 
 med_err
 MEDfamMaaCr(med_idt fid,char *maa,
-	    med_int *numfam,med_int *attide,
-	    med_int *attval,char *attdes,int *indatt,char *gro,int *indgro,
-	    med_int nfamilles)
+            med_int *numfam,med_int *attide,
+            med_int *attval,char *attdes,int *indatt,char *gro,int *indgro,
+            med_int nfamilles)
 {
   med_err ret;
   med_int i;
@@ -43,27 +43,27 @@ MEDfamMaaCr(med_idt fid,char *maa,
     {
       numf = *(numfam+i);
       if (numf == 0)
-	strcpy(nomfam,"FAMILLE_0");
+        strcpy(nomfam,"FAMILLE_0");
       if (numf > 0)
-	{
-	  strcpy(nomfam,"FAMILLE_NOEUD_");
-	  sprintf(nomfam,"%s%d",nomfam,numf);
+        {
+          strcpy(nomfam,"FAMILLE_NOEUD_");
+          sprintf(nomfam,"%s%d",nomfam,numf);
           nomfam[MED_TAILLE_NOM] = '\0';
-	}
+        }
       if (numf < 0)
-	{
-	  strcpy(nomfam,"FAMILLE_ELEMENT_");
-	  sprintf(nomfam,"%s%d",nomfam,-numf);
-	  nomfam[MED_TAILLE_NOM] = '\0';
-	}	
+        {
+          strcpy(nomfam,"FAMILLE_ELEMENT_");
+          sprintf(nomfam,"%s%d",nomfam,-numf);
+          nomfam[MED_TAILLE_NOM] = '\0';
+        }       
       natt = *(indatt+i+1) - *(indatt+i);
       ngro = (*(indgro+i+1) - *(indgro+i))/MED_TAILLE_LNOM;
       if ((ret = MEDfamCr(fid,maa,nomfam,numf,
-			  attide+*(indatt+i),
-			  attval+*(indatt+i),
-			  attdes+*(indatt+i)*MED_TAILLE_DESC,natt,
-			  gro+*(indgro+i),ngro)) < 0)
-	return -1;
+                          attide+*(indatt+i),
+                          attval+*(indatt+i),
+                          attdes+*(indatt+i)*MED_TAILLE_DESC,natt,
+                          gro+*(indgro+i),ngro)) < 0)
+        return -1;
     }
     
   return 0;

@@ -1,32 +1,32 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //=============================================================================
 // File      : MEDMEM_Field_i.cxx
 // Created   : mer fév 20 15:47:57 CET 2002
 // Author    : EDF
 // Project   : SALOME
-// $Header   : $
 //=============================================================================
-//
+
 #include "MEDMEM_Field_i.hxx"
 
 #include "SALOME_NamingService.hxx"
@@ -50,9 +50,6 @@ int  FIELD_i::fieldIndex = 0;
 //FIELD_i::FIELD_i():_fieldTptr(FIELD_i::constructConstField())
 FIELD_i::FIELD_i():_fieldTptr(constructConstField()),_corbaIndex(FIELD_i::fieldIndex++)
 {
-  const char* LOC = "Default Constructor Field_i";
-  BEGIN_OF(LOC);
-  END_OF(LOC);
 }
 //=============================================================================
 /*!
@@ -61,7 +58,9 @@ FIELD_i::FIELD_i():_fieldTptr(constructConstField()),_corbaIndex(FIELD_i::fieldI
 //=============================================================================
 FIELD_i::~FIELD_i()
 {
-  if (_ownCppPtr) delete _fieldTptr;
+  if ( _fieldTptr )
+    _fieldTptr->removeReference();
+  //if (_ownCppPtr) delete _fieldTptr;
 }
 //=============================================================================
 /*!
@@ -69,20 +68,17 @@ FIELD_i::~FIELD_i()
  */
 //=============================================================================
 FIELD_i::FIELD_i(::FIELD_ * const field, bool ownCppPtr):
+  _ownCppPtr(ownCppPtr),
   _fieldTptr(field),
   _corbaIndex(FIELD_i::fieldIndex++),
-  _FieldId(""),
-  _ownCppPtr(ownCppPtr)
+  _FieldId("")
 {
-  const char* LOC = "Constructor FIELD_i(SALOME_MED::SUPPORT_ptr support,::FIELD<T> * const field)";
-  BEGIN_OF(LOC);
+  if ( _fieldTptr ) _fieldTptr->addReference();
   FIELD_i::fieldMap[_corbaIndex]=_fieldTptr;
 
   MESSAGE("FIELD_i::FIELD_i  Checking of pointeurs !!!");
 
   SCRUTE(_fieldTptr);
-
-  END_OF(LOC);
 }
 
 //=============================================================================
@@ -90,14 +86,12 @@ FIELD_i::FIELD_i(::FIELD_ * const field, bool ownCppPtr):
  * Constructor par recopie
  */
 //=============================================================================
-FIELD_i::FIELD_i( FIELD_i & f):_fieldTptr(f._fieldTptr),
-			       _corbaIndex(FIELD_i::fieldIndex++),
-			       _FieldId(""), _ownCppPtr(false)
+FIELD_i::FIELD_i( FIELD_i & f):_ownCppPtr(false), _fieldTptr(f._fieldTptr),
+                               _corbaIndex(FIELD_i::fieldIndex++),
+                               _FieldId("")
 {
-  const char* LOC = "Constructor Field_i";
-  BEGIN_OF(LOC);
-        FIELD_i::fieldMap[_corbaIndex]=_fieldTptr;
-  END_OF(LOC);
+  if ( _fieldTptr ) _fieldTptr->addReference();
+  FIELD_i::fieldMap[_corbaIndex]=_fieldTptr;
 }
 //=============================================================================
 /*!
@@ -127,8 +121,8 @@ throw (SALOME::SALOME_Exception)
         }
         catch (MEDEXCEPTION &ex)
         {
-		MESSAGE("Exception en accedant au nom");
-	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                MESSAGE("Exception en accedant au nom");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 
@@ -164,8 +158,8 @@ throw (SALOME::SALOME_Exception)
         }
         catch (MEDEXCEPTION &ex)
         {
-		MESSAGE("Exception en accedant a la description");
-	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                MESSAGE("Exception en accedant a la description");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -176,20 +170,15 @@ throw (SALOME::SALOME_Exception)
 SALOME_MED::SUPPORT_ptr FIELD_i::getSupport()
   throw (SALOME::SALOME_Exception)
 {
-  const char* LOC = "SALOME_MED::SUPPORT_ptr FIELD_i::getSupport()";
-  BEGIN_OF(LOC);
-
   if (_fieldTptr==NULL)
     THROW_SALOME_CORBA_EXCEPTION("No associated Field",
-				 SALOME::INTERNAL_ERROR);
+                                 SALOME::INTERNAL_ERROR);
   
   SUPPORT_i* servant = new SUPPORT_i(_fieldTptr->getSupport());
 
   SALOME_MED::SUPPORT_ptr support=servant->_this();
 
   SCRUTE(_fieldTptr);
-
-  END_OF(LOC);
 
   return support ;
 }
@@ -210,8 +199,8 @@ throw (SALOME::SALOME_Exception)
         }
         catch (MEDEXCEPTION &ex)
         {
-		MESSAGE("Exception en accedant au support");
-	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                MESSAGE("Exception en accedant au support");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -231,8 +220,8 @@ throw (SALOME::SALOME_Exception)
         }
         catch (MEDEXCEPTION &ex)
         {
-		MESSAGE("Exception en accedant au nom d un component");
-	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                MESSAGE("Exception en accedant au nom d un component");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -252,8 +241,8 @@ throw (SALOME::SALOME_Exception)
         }
         catch (MEDEXCEPTION &ex)
         {
-		MESSAGE("Exception en accedant au nom d un component");
-	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                MESSAGE("Exception en accedant au nom d un component");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -273,8 +262,8 @@ throw (SALOME::SALOME_Exception)
         }
         catch (MEDEXCEPTION &ex)
         {
-		MESSAGE("Exception en accedant a la description d un component");
-	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                MESSAGE("Exception en accedant a la description d un component");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -294,8 +283,8 @@ throw (SALOME::SALOME_Exception)
         }
         catch (MEDEXCEPTION &ex)
         {
-		MESSAGE("Exception en accedant au champ");
-	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                MESSAGE("Exception en accedant au champ");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -309,8 +298,8 @@ throw (SALOME::SALOME_Exception)
         if (_fieldTptr==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
                                              SALOME::INTERNAL_ERROR);
-	return _corbaIndex;
-	
+        return _corbaIndex;
+        
 }
 //=============================================================================
 /*!
@@ -329,8 +318,8 @@ throw (SALOME::SALOME_Exception)
         }
         catch (MEDEXCEPTION &ex)
         {
-		MESSAGE("Exception en accedant au champ");
-	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                MESSAGE("Exception en accedant au champ");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -349,8 +338,8 @@ CORBA::Boolean FIELD_i::getGaussPresence()
         }
         catch (MEDEXCEPTION &ex)
         {
-		MESSAGE("Exception en accedant au champ");
-	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                MESSAGE("Exception en accedant au champ");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -370,8 +359,8 @@ throw (SALOME::SALOME_Exception)
         }
         catch (MEDEXCEPTION &ex)
         {
-		MESSAGE("Exception en accedant au champ");
-	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                MESSAGE("Exception en accedant au champ");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -379,87 +368,87 @@ throw (SALOME::SALOME_Exception)
  * CORBA: Accessor for Fields's Components names
  */
 //=============================================================================
-SALOME_MED::string_array * FIELD_i::getComponentsNames()
+SALOME_TYPES::ListOfString * FIELD_i::getComponentsNames()
 throw (SALOME::SALOME_Exception)    
 {
         if (_fieldTptr==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
                                              SALOME::INTERNAL_ERROR);
-	SALOME_MED::string_array_var myseq = new SALOME_MED::string_array;
+        SALOME_TYPES::ListOfString_var myseq = new SALOME_TYPES::ListOfString;
         try
         {
-		int nbcom = _fieldTptr->getNumberOfComponents();
-		myseq->length(nbcom);
-		const string * namecom=_fieldTptr->getComponentsNames();
-		for (int i=0;i<nbcom;i++)
+                int nbcom = _fieldTptr->getNumberOfComponents();
+                myseq->length(nbcom);
+                const string * namecom=_fieldTptr->getComponentsNames();
+                for (int i=0;i<nbcom;i++)
                 {
                         myseq[i]=CORBA::string_dup(namecom[i].c_str());
                 }
         }
         catch (MEDEXCEPTION &ex)
         {
-		MESSAGE("Exception en accedant au champ");
-	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                MESSAGE("Exception en accedant au champ");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
-	return myseq._retn();
+        return myseq._retn();
 }
 //=============================================================================
 /*!
  * CORBA: Accessor for Fields's Components units
  */
 //=============================================================================
-SALOME_MED::string_array * FIELD_i::getComponentsUnits()
+SALOME_TYPES::ListOfString * FIELD_i::getComponentsUnits()
 throw (SALOME::SALOME_Exception)
 {
         if (_fieldTptr==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
                                              SALOME::INTERNAL_ERROR);
-	SALOME_MED::string_array_var myseq = new SALOME_MED::string_array;
+        SALOME_TYPES::ListOfString_var myseq = new SALOME_TYPES::ListOfString;
         try
         {
-		int nbcom = _fieldTptr->getNumberOfComponents();
-		myseq->length(nbcom);
-		const string * unitcom=_fieldTptr->getMEDComponentsUnits();
-		for (int i=0;i<nbcom;i++)
+                int nbcom = _fieldTptr->getNumberOfComponents();
+                myseq->length(nbcom);
+                const string * unitcom=_fieldTptr->getMEDComponentsUnits();
+                for (int i=0;i<nbcom;i++)
                 {
                         myseq[i]=CORBA::string_dup(unitcom[i].c_str());
                 }
         }
         catch (MEDEXCEPTION &ex)
         {
-		MESSAGE("Exception en accedant au champ");
-	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                MESSAGE("Exception en accedant au champ");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
-	return myseq._retn();
+        return myseq._retn();
 }
 //=============================================================================
 /*!
  * CORBA: Accessor for Fields's Components descriptions
  */
 //=============================================================================
-SALOME_MED::string_array * FIELD_i::getComponentsDescriptions()
+SALOME_TYPES::ListOfString * FIELD_i::getComponentsDescriptions()
 throw (SALOME::SALOME_Exception)    
 {
         if (_fieldTptr==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
                                              SALOME::INTERNAL_ERROR);
-	SALOME_MED::string_array_var myseq = new SALOME_MED::string_array;
+        SALOME_TYPES::ListOfString_var myseq = new SALOME_TYPES::ListOfString;
         try
         {
-		int nbcom = _fieldTptr->getNumberOfComponents();
-		myseq->length(nbcom);
-		const string * namecom=_fieldTptr->getComponentsDescriptions();
-		for (int i=0;i<nbcom;i++)
+                int nbcom = _fieldTptr->getNumberOfComponents();
+                myseq->length(nbcom);
+                const string * namecom=_fieldTptr->getComponentsDescriptions();
+                for (int i=0;i<nbcom;i++)
                 {
                         myseq[i]=CORBA::string_dup(namecom[i].c_str());
                 }
         }
         catch (MEDEXCEPTION &ex)
         {
-		MESSAGE("Exception en accedant au champ");
-	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                MESSAGE("Exception en accedant au champ");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
-	return myseq._retn();
+        return myseq._retn();
 }
 
 //=============================================================================
@@ -499,11 +488,8 @@ void FIELD_i::addInStudyToComponent (SALOMEDS::SComponent_ptr myComponent,
                                      SALOME_MED::FIELD_ptr    myIor)
   throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection)
 {
-  const char* LOC = " FIELD_i::addInStudy";
-  BEGIN_OF(LOC);
-
         if (CORBA::is_nil(myComponent) || CORBA::is_nil(myIor))
-	  THROW_SALOME_CORBA_EXCEPTION("Null parameter", SALOME::BAD_PARAM);
+          THROW_SALOME_CORBA_EXCEPTION("Null parameter", SALOME::BAD_PARAM);
 
         if (_fieldTptr == NULL)
           THROW_SALOME_CORBA_EXCEPTION("No associated Field", SALOME::INTERNAL_ERROR);
@@ -520,8 +506,8 @@ void FIELD_i::addInStudyToComponent (SALOMEDS::SComponent_ptr myComponent,
         SALOMEDS::AttributeName_var    aName;
         SALOMEDS::AttributeIOR_var     aIOR;
 
- 	// Create SObject labelled 'MEDFIELD' if it doesn't already exist
-	SALOMEDS::Study::ListOfSObject_var aMEDFIELDs =
+        // Create SObject labelled 'MEDFIELD' if it doesn't already exist
+        SALOMEDS::Study::ListOfSObject_var aMEDFIELDs =
           myStudy->FindObjectByName("MEDFIELD", myComponent->ComponentDataType());
         int aLength = aMEDFIELDs->length();
         SALOMEDS::SObject_var medfieldfather;
@@ -529,58 +515,58 @@ void FIELD_i::addInStudyToComponent (SALOMEDS::SComponent_ptr myComponent,
           medfieldfather = aMEDFIELDs[0];
         }
         else {
-	  MESSAGE("Add Object 'MEDFIELD'");
-	  medfieldfather = aBuilder->NewObject(myComponent);
-	  anAttr = aBuilder->FindOrCreateAttribute(medfieldfather, "AttributeName");
-	  aName = SALOMEDS::AttributeName::_narrow(anAttr);
-	  aName->SetValue("MEDFIELD");
+          MESSAGE("Add Object 'MEDFIELD'");
+          medfieldfather = aBuilder->NewObject(myComponent);
+          anAttr = aBuilder->FindOrCreateAttribute(medfieldfather, "AttributeName");
+          aName = SALOMEDS::AttributeName::_narrow(anAttr);
+          aName->SetValue("MEDFIELD");
         }
 
- 	// Create SObject labelled 'FIELDNAME' if it doesn't already exit
-	string fieldName = _fieldTptr->getName();
+        // Create SObject labelled 'FIELDNAME' if it doesn't already exit
+        string fieldName = _fieldTptr->getName();
         SALOMEDS::SObject_var medfieldnamefather = FindChildByName(medfieldfather, fieldName);
-  	if ( CORBA::is_nil(medfieldnamefather) ) 
-	{
-	  MESSAGE("Add Object "<<fieldName);
-	  medfieldnamefather = aBuilder->NewObject(medfieldfather);
-	  anAttr = aBuilder->FindOrCreateAttribute(medfieldnamefather, "AttributeName");
-	  aName = SALOMEDS::AttributeName::_narrow(anAttr);
-	  aName->SetValue(fieldName.c_str());
-  	}
+        if ( CORBA::is_nil(medfieldnamefather) ) 
+        {
+          MESSAGE("Add Object "<<fieldName);
+          medfieldnamefather = aBuilder->NewObject(medfieldfather);
+          anAttr = aBuilder->FindOrCreateAttribute(medfieldnamefather, "AttributeName");
+          aName = SALOMEDS::AttributeName::_narrow(anAttr);
+          aName->SetValue(fieldName.c_str());
+        }
 
         string fieldEntryPath = "/";
         //fieldEntryPath += "Med/";
         string componentName = myComponent->GetName();
         fieldEntryPath += componentName + "/MEDFIELD/" + fieldName + "/";
 
-	int iterationNumber = _fieldTptr->getIterationNumber();
-	SCRUTE(iterationNumber);
+        int iterationNumber = _fieldTptr->getIterationNumber();
+        SCRUTE(iterationNumber);
 
-	int orderNumber = _fieldTptr->getOrderNumber();
-	SCRUTE(orderNumber);
+        int orderNumber = _fieldTptr->getOrderNumber();
+        SCRUTE(orderNumber);
 
-	ostringstream iterationName;
-	iterationName<<"(" << iterationNumber << "," << orderNumber << ")";
-	string supportName = (_fieldTptr->getSupport())->getName();
-	string meshName = ((_fieldTptr->getSupport())->getMesh())->getName();
+        ostringstream iterationName;
+        iterationName<<"(" << iterationNumber << "," << orderNumber << ")";
+        string supportName = (_fieldTptr->getSupport())->getName();
+        string meshName = ((_fieldTptr->getSupport())->getMesh())->getName();
 
-	SCRUTE(meshName);
-	for (string::size_type pos=0; pos<meshName.size(); ++pos) {
+        SCRUTE(meshName);
+        for (string::size_type pos=0; pos<meshName.size(); ++pos) {
           if (isspace(meshName[pos])) meshName[pos] = '_';
         }
 
-	char * fieldEntryName;
-	int lenName = strlen(iterationName.str().c_str()) + 4 +
-	  strlen(supportName.c_str()) + 4 + strlen(meshName.c_str()) + 1;
+        char * fieldEntryName;
+        int lenName = strlen(iterationName.str().c_str()) + 4 +
+          strlen(supportName.c_str()) + 4 + strlen(meshName.c_str()) + 1;
 
-	fieldEntryName = new char[lenName];
-	fieldEntryName = strcpy(fieldEntryName,iterationName.str().c_str());
-	fieldEntryName = strcat(fieldEntryName,"_ON_");
-	fieldEntryName = strcat(fieldEntryName,supportName.c_str());
-	fieldEntryName = strcat(fieldEntryName,"_OF_");
-	fieldEntryName = strcat(fieldEntryName,meshName.c_str());
+        fieldEntryName = new char[lenName];
+        fieldEntryName = strcpy(fieldEntryName,iterationName.str().c_str());
+        fieldEntryName = strcat(fieldEntryName,"_ON_");
+        fieldEntryName = strcat(fieldEntryName,supportName.c_str());
+        fieldEntryName = strcat(fieldEntryName,"_OF_");
+        fieldEntryName = strcat(fieldEntryName,meshName.c_str());
 
-	SCRUTE(fieldEntryName);
+        SCRUTE(fieldEntryName);
         fieldEntryPath += fieldEntryName;
 
         // Create object labelled according to Field's Name
@@ -606,7 +592,7 @@ void FIELD_i::addInStudyToComponent (SALOMEDS::SComponent_ptr myComponent,
         ORB_INIT &init = *SINGLETON_<ORB_INIT>::Instance() ;
         ASSERT(SINGLETON_<ORB_INIT>::IsAlreadyExisting()) ;
         CORBA::ORB_var &orb = init(0,0);
-	string iorStr = orb->object_to_string(myIor);
+        string iorStr = orb->object_to_string(myIor);
         anAttr = aBuilder->FindOrCreateAttribute(fieldSO, "AttributeIOR");
         aIOR = SALOMEDS::AttributeIOR::_narrow(anAttr);
         aIOR->SetValue(iorStr.c_str());
@@ -640,13 +626,13 @@ void FIELD_i::addInStudyToComponent (SALOMEDS::SComponent_ptr myComponent,
 
         aBuilder->CommitCommand();
 
-	delete [] fieldEntryName;
+        delete [] fieldEntryName;
 
-	// register the Corba pointer: increase the referrence count
-   	MESSAGE("Registering of the Corba Field pointer");
-	Register();
+        // register the Corba pointer: increase the referrence count
+        MESSAGE("Registering of the Corba Field pointer");
+        Register();
 
-	MESSAGE("FIELD_i::addInStudy");
+        MESSAGE("FIELD_i::addInStudy");
 
         //END_OF();
 }
@@ -662,13 +648,13 @@ throw (SALOME::SALOME_Exception)
         if (_fieldTptr==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
                                              SALOME::INTERNAL_ERROR);
-	try
-	{
-		_fieldTptr->write(i,driverFieldName);
+        try
+        {
+                _fieldTptr->write(i);
         }
         catch (MEDEXCEPTION &)
         {
-		MESSAGE("Exception en accedant au champ");
+                MESSAGE("Exception en accedant au champ");
                 THROW_SALOME_CORBA_EXCEPTION("Unable to acces Field C++ Object"\
                                                 ,SALOME::INTERNAL_ERROR);
         }
@@ -684,14 +670,14 @@ throw (SALOME::SALOME_Exception)
         if (_fieldTptr==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
                                              SALOME::INTERNAL_ERROR);
-	try
-	{
-		_fieldTptr->read(i);
+        try
+        {
+                _fieldTptr->read(i);
         }
         catch (MEDEXCEPTION &ex)
         {
-		MESSAGE("Exception en accedant au champ");
-	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                MESSAGE("Exception en accedant au champ");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -705,14 +691,14 @@ throw (SALOME::SALOME_Exception)
         if (_fieldTptr==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
                                              SALOME::INTERNAL_ERROR);
-	try
-	{
-		_fieldTptr->rmDriver(i);
+        try
+        {
+                _fieldTptr->rmDriver(i);
         }
         catch (MEDEXCEPTION &ex)
         {
-		MESSAGE("Exception en accedant au champ");
-	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                MESSAGE("Exception en accedant au champ");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 //=============================================================================
@@ -721,23 +707,23 @@ throw (SALOME::SALOME_Exception)
  */
 //=============================================================================
 CORBA::Long FIELD_i::addDriver (SALOME_MED::medDriverTypes driverType, 
-			const char* fileName, const char* fieldName) throw (SALOME::SALOME_Exception)
+                        const char* fileName, const char* fieldName) throw (SALOME::SALOME_Exception)
 {
         if (_fieldTptr==NULL)
                 THROW_SALOME_CORBA_EXCEPTION("No associated Field", \
                                              SALOME::INTERNAL_ERROR);
-	try
-	{
-		int drivernum=_fieldTptr->addDriver(
-					convertIdlDriverToMedDriver(driverType),
-				        fileName,
-				        fieldName);
-		return drivernum;
+        try
+        {
+                int drivernum=_fieldTptr->addDriver(
+                                        convertIdlDriverToMedDriver(driverType),
+                                        fileName,
+                                        fieldName);
+                return drivernum;
         }
         catch (MEDEXCEPTION &ex)
         {
-		MESSAGE("Exception en accedant au champ");
-	        THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
+                MESSAGE("Exception en accedant au champ");
+                THROW_SALOME_CORBA_EXCEPTION(ex.what(), SALOME::INTERNAL_ERROR);
         }
 }
 
@@ -784,7 +770,7 @@ SALOMEDS::SComponent_ptr FIELD_i::PublishMedComponent(SALOMEDS::Study_ptr theStu
   SALOMEDS::AttributeName_var aName = SALOMEDS::AttributeName::_narrow(anAttr);
   aName->SetValue( aComp->componentusername() );
   
-  Engines::Component_var aMedComponent = lcc->FindOrLoad_Component("FactoryServer", "MED");
+  Engines::EngineComponent_var aMedComponent = lcc->FindOrLoad_Component("FactoryServer", "MED");
   SALOME_MED::MED_Gen_var aMedEngine = SALOME_MED::MED_Gen::_narrow( aMedComponent );
   aBuilder->DefineComponentInstance(medfather, aMedEngine);
   

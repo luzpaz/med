@@ -1,23 +1,23 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-#ifndef MEDSPLITTER_MESHCOLLECTION_H_
-#define MEDSPLITTER_MESHCOLLECTION_H_
+#ifndef __MEDSPLITTER_MESHCOLLECTION_H__
+#define __MEDSPLITTER_MESHCOLLECTION_H__
 
 /*! Projects an integer or double field onto a new mesh
  * 
@@ -30,15 +30,15 @@
 
 template <class T>
 void MESHCollection::castFields (const MESHCollection& old_collection,
-				 const string& fieldname, int itnumber, int ordernumber)
+                                 const string& fieldname, int itnumber, int ordernumber)
 {
   char fieldchar[80];
   strcpy(fieldchar,fieldname.c_str());
 
-  int nb_old_domains=old_collection.m_topology->nbDomain();
-  int nb_new_domains=m_topology->nbDomain();
+  int nb_old_domains=old_collection._topology->nbDomain();
+  int nb_new_domains=_topology->nbDomain();
 
-  vector <list<int> > element_array  (m_topology->nbDomain());
+  vector <list<int> > element_array  (_topology->nbDomain());
 
   vector <MEDMEM::FIELD<T> *> old_fields ;
 
@@ -129,25 +129,25 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
       MED_EN::MESH_ENTITIES::const_iterator currentEntity;
       std::list<MED_EN::medGeometryElement>::const_iterator iter;
       currentEntity  = MED_EN::meshEntities.find(MED_EN::MED_CELL);
-      for (iter = (*currentEntity).second.begin();iter != (*currentEntity).second.end(); iter++)	
+      for (iter = (*currentEntity).second.begin();iter != (*currentEntity).second.end(); iter++)        
       {
-	// getGaussLocalization throws an exception 
-	// if the GaussLocalization is not available
-	try
-	{
-	  MEDMEM::GAUSS_LOCALIZATION<FullInterlace> 
-	    gaussloc(old_fields[0]->getGaussLocalization(*iter));
-	  new_fields[inew]->setGaussLocalization(*iter,gaussloc);
+        // getGaussLocalization throws an exception 
+        // if the GaussLocalization is not available
+        try
+        {
+          MEDMEM::GAUSS_LOCALIZATION<FullInterlace> 
+            gaussloc(old_fields[0]->getGaussLocalization(*iter));
+          new_fields[inew]->setGaussLocalization(*iter,gaussloc);
 
-	  nbtypegeo++;
-	  gauss_pts_number.push_back(gaussloc.getNbGauss());
+          nbtypegeo++;
+          gauss_pts_number.push_back(gaussloc.getNbGauss());
 
-	  nb_elem.push_back(new_supports[inew]->getNumberOfElements(*iter));
-	}
-	catch(...)
-	{
-	  continue;
-	}
+          nb_elem.push_back(new_supports[inew]->getNumberOfElements(*iter));
+        }
+        catch(...)
+        {
+          continue;
+        }
       }
 
       // les tableaux nbelgeoc commencent a 1
@@ -158,25 +158,25 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
       nbgaussgeo[0]=-1;
       for (int i=1; i<=nbtypegeo;i++)
       {
-	size+=nb_elem[i-1];
-	nbelgeoc [i]=nb_elem[i-1]+nbelgeoc[i-1];
-	nbgaussgeo[i]=gauss_pts_number[i-1];	
+        size+=nb_elem[i-1];
+        nbelgeoc [i]=nb_elem[i-1]+nbelgeoc[i-1];
+        nbgaussgeo[i]=gauss_pts_number[i-1];    
       }
 
       //a MEDMEM_Array structure is created to contain 
       //the data on the Gauss points
 
       medarray[inew]=new MEDMEM::MEDMEM_Array<T,FullInterlaceGaussPolicy>
-	(new_fields[inew]->getNumberOfComponents(), size, nbtypegeo,
-	 static_cast<const int* const>(nbelgeoc),
-	 static_cast<const int* const> (nbgaussgeo));
+        (new_fields[inew]->getNumberOfComponents(), size, nbtypegeo,
+         static_cast<const int* const>(nbelgeoc),
+         static_cast<const int* const> (nbgaussgeo));
       new_fields[inew]->setArray(medarray[inew]);
-      // 			delete[] nbelgeoc;
-      // 			delete[] nbgaussgeo;
+      //                        delete[] nbelgeoc;
+      //                        delete[] nbgaussgeo;
     }
   }
 
-  for (int idomain=0; idomain < old_collection.m_topology->nbDomain(); idomain++)
+  for (int idomain=0; idomain < old_collection._topology->nbDomain(); idomain++)
   {
     //retrieves the group igroup on domain idomain
 
@@ -189,16 +189,16 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
     {
       list_of_elems = new int[nbelem];
       for (int i=0; i<nbelem;i++)
-	list_of_elems[i]=i+1;
+        list_of_elems[i]=i+1;
     }
     else
       list_of_elems = const_cast<int*> (support->getNumber(MED_EN::MED_ALL_ELEMENTS));
 
     int* array=new int[nbelem];
-    int* ip;
-    int* local;
+    int* ip=0;
+    int* local=0;
     int* initial_local=0;
-    int* full_array;
+    int* full_array=0;
 
     int size=0;
     MED_EN::medEntityMesh entity = support->getEntity();
@@ -209,19 +209,19 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
       local=new int[nbelem];
       initial_local=list_of_elems;
       old_collection.getTopology()->convertCellToGlobal(idomain,list_of_elems,nbelem,array);
-      m_topology->convertGlobalCellList(array,nbelem,local,ip);
+      _topology->convertGlobalCellList(array,nbelem,local,ip);
       size=nbelem;
       break;
     case MED_EN::MED_FACE :
       old_collection.getTopology()->convertFaceToGlobal(idomain,list_of_elems,nbelem,array);
-      m_topology->convertGlobalFaceListWithTwins(array,nbelem,local,ip,full_array,size);
+      _topology->convertGlobalFaceListWithTwins(array,nbelem,local,ip,full_array,size);
       initial_local=new int[size];
       old_collection.getTopology()->convertGlobalFaceList(full_array,size,initial_local,idomain);
       delete[] full_array;
       break;
     case MED_EN::MED_NODE :
       old_collection.getTopology()->convertNodeToGlobal(idomain,list_of_elems,nbelem,array);
-      m_topology->convertGlobalNodeListWithTwins(array,nbelem,local,ip,full_array,size);
+      _topology->convertGlobalNodeListWithTwins(array,nbelem,local,ip,full_array,size);
       initial_local=new int[size];
       old_collection.getTopology()->convertGlobalNodeList(full_array,size,initial_local,idomain);
       delete[] full_array;
@@ -231,29 +231,29 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
     if (!has_gauss_pts) {
       for (int i=0; i<size; i++)
       {
-	for (int j=0; j<nb_components;j++)
-	{
-	  T value = old_fields[idomain]->getValueIJ(initial_local[i],j+1);
+        for (int j=0; j<nb_components;j++)
+        {
+          T value = old_fields[idomain]->getValueIJ(initial_local[i],j+1);
 
-	  new_fields[ip[i]]->setValueIJ(local[i],j+1, value);
-	}
+          new_fields[ip[i]]->setValueIJ(local[i],j+1, value);
+        }
       }
     }
     else
     {
       for (int i=0; i<size; i++)
       {
-	MED_EN::medGeometryElement type =
-	  old_collection.m_mesh[idomain]->getElementType(entity,initial_local[i]);
-	int nb_gauss_points=old_fields[idomain]->getNumberOfGaussPoints(type);
-	for (int j=0; j<nb_components;j++)
-	  for (int k=0;k<nb_gauss_points; k++)
-	  {
-	    T value = old_fields[idomain]->getValueIJK(initial_local[i],j+1,k+1);
-	    medarray[ip[i]]->setIJK(local[i],j+1,k+1, value);
-	  }	
+        MED_EN::medGeometryElement type =
+          old_collection._mesh[idomain]->getElementType(entity,initial_local[i]);
+        int nb_gauss_points=old_fields[idomain]->getNumberOfGaussPoints(type);
+        for (int j=0; j<nb_components;j++)
+          for (int k=0;k<nb_gauss_points; k++)
+          {
+            T value = old_fields[idomain]->getValueIJK(initial_local[i],j+1,k+1);
+            medarray[ip[i]]->setIJK(local[i],j+1,k+1, value);
+          }     
       }
-    }	
+    }   
     delete[]array;
     delete[]ip;
     delete[]local;
@@ -272,15 +272,15 @@ void MESHCollection::castFields (const MESHCollection& old_collection,
   //  retrieveDriver()->writeFieldsInt(new_fields,fieldchar);
   for (int i=0; i<nb_new_domains; i++)
   {
-    delete new_fields[i];
-    delete new_supports[i];
+    new_fields[i]->removeReference();
+    new_supports[i]->removeReference();
     //delete medarray[i];
   }
-  for (int i=0; i<old_fields.size(); i++)
+  for (unsigned i=0; i<old_fields.size(); i++)
   {
     cout << "old field deletion" <<endl;
-    delete old_fields[i];
-    delete old_supports[i];
+    old_fields[i]->removeReference();
+    //old_supports[i]->removeReference();//as we did not addReference() neither created it
   }
 }
 

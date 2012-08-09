@@ -1,27 +1,27 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 /*
  File MedException.cxx
- $Header$
 */
 
 #include "MEDMEM_Utilities.hxx"
@@ -44,13 +44,13 @@ extern "C"
 char* duplicate( const char *const str ) ;
 char* duplicate( const char *const str )
 {
-	ASSERT_MED(str!=NULL) ;
-	const size_t length = strlen( str ) ;
-	ASSERT_MED(length>0) ;
-	char *new_str = new char[ 1+length ] ;
-	ASSERT_MED(new_str) ;
-	strcpy( new_str , str ) ;
-	return new_str ;
+        ASSERT_MED(str!=NULL) ;
+        const size_t length = strlen( str ) ;
+        ASSERT_MED(length>0) ;
+        char *new_str = new char[ 1+length ] ;
+        ASSERT_MED(new_str) ;
+        strcpy( new_str , str ) ;
+        return new_str ;
 }
 
 /*!
@@ -64,7 +64,8 @@ MEDEXCEPTION::MEDEXCEPTION( void ): exception() , _text(0)
   INTERRUPTION_MED(1) ;
 }
 
-
+namespace
+{
 /*!
   \internal
   Function used to elaborate the text of the MEDEXCEPTION
@@ -87,7 +88,7 @@ char *makeText( const char *text, const char *fileName, const unsigned int lineN
 
       ASSERT_MED(lineNumber>=1) ;
       const size_t l3 = 1+int(log10(float(lineNumber))) ;
-	
+        
       const size_t l4 =  l0+l1+l2+l3+10+1 ;
       newText = new char [ l4 ] ;
       sprintf( newText , "%s in %s [%u] : %s" , prefix, fileName, lineNumber, text ) ;
@@ -102,6 +103,7 @@ char *makeText( const char *text, const char *fileName, const unsigned int lineN
   ASSERT_MED(newText) ;
   return newText ;
 }
+}
 
 /*!
     Constructor : \n
@@ -111,7 +113,7 @@ char *makeText( const char *text, const char *fileName, const unsigned int lineN
 */
 // ------------------------------------------------------------------------------------------------ //
 MEDEXCEPTION::MEDEXCEPTION( const char *text, const char *fileName, const unsigned int lineNumber ) : 
-	      exception(), _text( makeText( text , fileName , lineNumber ) )
+              exception(), _text( makeText( text , fileName , lineNumber ) )
 // ------------------------------------------------------------------------------------------------ //
 {
   MESSAGE_MED(_text);
@@ -170,13 +172,13 @@ const char* MEDEXCEPTION::what( void ) const throw ()
 // -------------------- class MED_DRIVER_NOT_FOUND_EXCEPTION
 
 
-MED_DRIVER_NOT_FOUND_EXCEPTION::MED_DRIVER_NOT_FOUND_EXCEPTION(const MED_DRIVER_NOT_FOUND_EXCEPTION &ex ):MEDEXCEPTION ( ex ) {};
+MED_DRIVER_NOT_FOUND_EXCEPTION::MED_DRIVER_NOT_FOUND_EXCEPTION(const MED_DRIVER_NOT_FOUND_EXCEPTION &ex ):MEDEXCEPTION ( ex ) {}
 
 
 MED_DRIVER_NOT_FOUND_EXCEPTION::MED_DRIVER_NOT_FOUND_EXCEPTION
 (
  const char *text, const char *fileName/*=0*/, 
  const unsigned int lineNumber/*=0*/ 
- ) : MEDEXCEPTION(text, fileName, lineNumber) {};
+ ) : MEDEXCEPTION(text, fileName, lineNumber) {}
 
-MED_DRIVER_NOT_FOUND_EXCEPTION::~MED_DRIVER_NOT_FOUND_EXCEPTION() throw (){};
+MED_DRIVER_NOT_FOUND_EXCEPTION::~MED_DRIVER_NOT_FOUND_EXCEPTION() throw (){}

@@ -1,27 +1,27 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 /*
  File Coordinate.hxx
- $Header$
 */
 
 #ifndef COORDINATE_HXX
@@ -51,42 +51,39 @@ class MEDMEM_EXPORT COORDINATE
 {
 
 protected:
-				    /*! contains "CARTESIAN",
-					"CYLINDRICAL" or "SPHERICAL"*/
+                                    /*! contains "CARTESIAN",
+                                        "CYLINDRICAL" or "SPHERICAL"*/
   string                       _coordinateSystem;
 
 
-				     /*! _coordinate is a MEDARRAY<double> object : \n
-					 - spaceDimension \n
-					 - numberOfNodes \n
-					 - default storage mode \n
-					 - Up to 4 "PointerOf" to an array of size spaceDimension*NumberOfNodes\n
+                                     /*! _coordinate is a MEDARRAY<double> object : \n
+                                         - spaceDimension \n
+                                         - numberOfNodes \n
+                                         - default storage mode \n
+                                         - Up to 4 "PointerOf" to an array of size spaceDimension*NumberOfNodes\n
 
-					 Storing the object (not a pointer to this object) is more convenient for memory
-					 management.
-					 */
+                                         Storing the object (not a pointer to this object) is more convenient for memory
+                                         management.
+                                         */
   mutable MEDARRAY<double>            _coordinate;
 
-				     /*! PointerOf to an array of size spaceDimension storing axes names*/
+                                     /*! PointerOf to an array of size spaceDimension storing axes names*/
   //PointerOf<string>          _coordinateName;
   vector<string>          _coordinateName;
 
-				     /*! PointerOf to an array of size spaceDimension storing units */
+                                     /*! PointerOf to an array of size spaceDimension storing units */
   //PointerOf<string>          _coordinateUnit;
   vector<string>          _coordinateUnit;
 
-				     /*! PointerOf to an array of size NumberOfNodes : optional nodes numbers */
+                                     /*! PointerOf to an array of size NumberOfNodes : optional nodes numbers */
   PointerOf<int>             _nodeNumber;
 
 
 public :
 
-  friend class IMED_MESH_RDONLY_DRIVER;
-  friend class MED_MESH_RDONLY_DRIVER21;
-  friend class IMED_MESH_WRONLY_DRIVER;
-  friend class MED_MESH_WRONLY_DRIVER21;
-  friend class MED_MESH_RDONLY_DRIVER22;
-  friend class MED_MESH_WRONLY_DRIVER22;
+
+  friend class MED_MESH_RDONLY_DRIVER;
+  friend class MED_MESH_WRONLY_DRIVER;
 
 
   COORDINATE();

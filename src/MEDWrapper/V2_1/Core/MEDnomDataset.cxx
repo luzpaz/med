@@ -45,18 +45,18 @@ _MEDnomDataset(char *nom_dataset,med_table quoi,med_connectivite type_conn)
 
     case MED_CONN :
       switch(type_conn)
-	{
-	case MED_NOD :
-	  strcpy(nom_dataset,MED_NOM_NOD);
-	  break;
+        {
+        case MED_NOD :
+          strcpy(nom_dataset,MED_NOM_NOD);
+          break;
 
-	case MED_DESC :
-	  strcpy(nom_dataset,MED_NOM_DES);
-	  break;
+        case MED_DESC :
+          strcpy(nom_dataset,MED_NOM_DES);
+          break;
 
-	default :
-	  return -1;
-	}
+        default :
+          return -1;
+        }
       break;
 
     case MED_NOM :

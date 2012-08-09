@@ -25,7 +25,7 @@ namespace med_2_1{
 
 med_int 
 MEDnVal(med_idt fid, char *champ, med_entite_maillage type_ent, 
-	med_geometrie_element type_geo,med_int numdt, med_int numo)
+        med_geometrie_element type_geo,med_int numdt, med_int numo)
 {
   med_int n;
   med_idt datagroup;
@@ -52,7 +52,7 @@ MEDnVal(med_idt fid, char *champ, med_entite_maillage type_ent,
   if ((type_ent != MED_NOEUD))
     {
       if ((ret = _MEDnomGeometrie(tmp1,type_geo)) < 0)
-	return -1;
+        return -1;
       strcat(nomdatagroup1,".");
       strcat(nomdatagroup1,tmp1);
     }

@@ -1,29 +1,26 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
 #include <MEDMEM_VtkFieldDriver.hxx>
-#include <MEDMEM_Med.hxx>
 #include <MEDMEM_Field.hxx>
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
@@ -61,18 +58,13 @@ using namespace MED_EN;
  */
 void MEDMEMTest::testVtkFieldDriver()
 {
-  FIELD<int> *aField                = new FIELD<int> ();
-  FIELD<double> *aField_1           = new FIELD<double> ();
+  FIELD<int> *aField                = new FIELD<int>();
+  FIELD<double> *aField_1           = new FIELD<double>();
 
-  string data_dir                   = getenv("MED_ROOT_DIR");
-  string tmp_dir                    = getenv("TMP") ? getenv("TMP") : "/tmp";
-  if (tmp_dir == "")
-    tmp_dir = "/tmp";
-
-  string filename_rd                = data_dir + "/share/salome/resources/med/pointe_import22.med";
+  string filename_rd                = getResourceFile("pointe.med");
   string emptyfilename              = "";
   string fileNotExistsName          = "/path_not_exists/file_not_exists.vtk";
-  string filename_wr                = tmp_dir  + "/myField_pointe.vtk";
+  string filename_wr                = makeTmpFile( "myField_pointe.vtk" );
 
   string fieldname_rd_int           = "fieldnodeint";
   string fieldname_wr_int           = "myintfield";
@@ -108,20 +100,21 @@ void MEDMEMTest::testVtkFieldDriver()
   //  TEST2: Main test  //
   ////////////////////////
   //Read Fields from file
-  MED_FIELD_RDONLY_DRIVER22<int> *aMedRdFieldDriver22_int = new MED_FIELD_RDONLY_DRIVER22<int>(filename_rd, aField);
+  MED_FIELD_RDONLY_DRIVER<int> *aMedRdFieldDriver22_int = new MED_FIELD_RDONLY_DRIVER<int>(filename_rd, aField);
   aMedRdFieldDriver22_int->open();
   aMedRdFieldDriver22_int->setFieldName(fieldname_rd_int);
   aMedRdFieldDriver22_int->read();
   aMedRdFieldDriver22_int->close();
-  MESH mesh(MED_DRIVER,filename_rd,"maa1");
-  aField->getSupport()->setMesh(&mesh);
+  MESH *mesh=new MESH(MED_DRIVER,filename_rd,"maa1");
+  aField->getSupport()->setMesh(mesh);
 
-  MED_FIELD_RDONLY_DRIVER22<double> *aMedRdFieldDriver22_double = new MED_FIELD_RDONLY_DRIVER22<double>(filename_rd, aField_1);
+  MED_FIELD_RDONLY_DRIVER<double> *aMedRdFieldDriver22_double = new MED_FIELD_RDONLY_DRIVER<double>(filename_rd, aField_1);
   aMedRdFieldDriver22_double->open();
   aMedRdFieldDriver22_double->setFieldName(fieldname_rd_double);
   aMedRdFieldDriver22_double->read();
   aMedRdFieldDriver22_double->close();
-  aField_1->getSupport()->setMesh(&mesh);
+  aField_1->getSupport()->setMesh(mesh);
+  mesh->removeReference();
   //Check fields
   CPPUNIT_ASSERT(aField);
 
@@ -160,7 +153,6 @@ void MEDMEMTest::testVtkFieldDriver()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  //#ifdef ENABLE_FAULTS
   //Test write() method
   try
   {
@@ -174,8 +166,6 @@ void MEDMEMTest::testVtkFieldDriver()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-    // => Segmentation fault
-  //#endif
 
   //Test read() method for Vtk Field Driver
   CPPUNIT_ASSERT_THROW(aVtkFieldDriver_int->read(),MEDEXCEPTION);
@@ -235,7 +225,6 @@ void MEDMEMTest::testVtkFieldDriver()
 
   aVtkFieldDriver_double->setFieldName(fieldname_wr_double);
 
-  //#ifdef ENABLE_FAULTS
   //Test writeAppend() method
   try
   {
@@ -249,8 +238,6 @@ void MEDMEMTest::testVtkFieldDriver()
   {
     CPPUNIT_FAIL("Unknown exception");
   }
-  // => Segmentation fault
-  //#endif
 
   try
   {
@@ -265,16 +252,124 @@ void MEDMEMTest::testVtkFieldDriver()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  //#ifdef ENABLE_FORCED_FAILURES
-  //VTK_FIELD_DRIVER<int> aVtkFieldDriver_intCpy_1;
-  //VTK_FIELD_DRIVER<int>.template VTK_FIELD_DRIVER<FullInterlace> aVtkFieldDriver_intCpy_1;
-  //CPPUNIT_FAIL("Compilation error: no matching function for call to 'MEDMEM::VTK_FIELD_DRIVER<int>::VTK_FIELD_DRIVER()");
-  //#endif
+  /////////////////////////
+  //  TEST BINARY FORMAT //
+  /////////////////////////
 
-  //#ifdef ENABLE_FAULTS
+  DRIVERFACTORY::setVtkBinaryFormatForWriting( true );
+
+  //BINARY: Test open() method
+  try
+  {
+    aVtkFieldDriver_int->open();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+  //BINARY: Test write() method
+  try
+  {
+    aVtkFieldDriver_int->write();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+  //BINARY: Test read() method for Vtk Field Driver
+  CPPUNIT_ASSERT_THROW(aVtkFieldDriver_int->read(),MEDEXCEPTION);
+
+  //BINARY: Test close() method
+  try
+  {
+    aVtkFieldDriver_int->close();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+  //BINARY: Test openAppend() method
+  try
+  {
+    aVtkFieldDriver_int->close();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+
+  /////////////////////////////////////////////////////////
+  //  BINARY: Test openAppend() and writeAppend() methods  //
+  /////////////////////////////////////////////////////////
+
+  try
+  {
+    aVtkFieldDriver_double->openAppend();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+  aVtkFieldDriver_double->setFieldName(fieldname_wr_double);
+
+  //BINARY: Test writeAppend() method
+  try
+  {
+    aVtkFieldDriver_double->writeAppend();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+  try
+  {
+    aVtkFieldDriver_double->close();
+  }
+  catch(MEDEXCEPTION &e)
+  {
+    CPPUNIT_FAIL(e.what());
+  }
+  catch( ... )
+  {
+    CPPUNIT_FAIL("Unknown exception");
+  }
+
+  DRIVERFACTORY::setVtkBinaryFormatForWriting( false );
+
+  VTK_FIELD_DRIVER<int> aVtkFieldDriver_intCpy_1;
+
   //Test copy constructor
   VTK_FIELD_DRIVER<int> aVtkFieldDriver_intCpy_2 (*aVtkFieldDriver_int);
-  // => Segmentation fault after call Copy Constructor
 
   CPPUNIT_ASSERT_EQUAL(aVtkFieldDriver_intCpy_2, *aVtkFieldDriver_int);
   //Test (bool operator ==) defined in GENDRIVER class in MEDMEM_GenDriver.hxx
@@ -287,15 +382,11 @@ void MEDMEMTest::testVtkFieldDriver()
 
   CPPUNIT_ASSERT(ostr1.str() != "");
   CPPUNIT_ASSERT(ostr1.str() == ostr2.str());
-  //#endif
 
   //Delete all objects
-  delete aField;
-  delete aField_1;
-  //#ifdef ENABLE_FORCED_FAILURES
-  // (BUG) Exception in the destructor after trying close not existing file.
+  aField->removeReference();
+  aField_1->removeReference();
   delete aInvalidVtkFieldDriver_1;
-  //#endif
   delete aInvalidVtkFieldDriver_2;
   delete aMedRdFieldDriver22_int;
   delete aMedRdFieldDriver22_double;

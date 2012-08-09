@@ -1,25 +1,23 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
-// This program test the implementation of the class MED_MESH_RDONLY_DRIVER for Polygons and Polyhedron. //
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Mesh.hxx"
@@ -39,7 +37,8 @@ using namespace MED_EN;
 #define DIM_OF_FIELD 3
 
 
-class SupportTester {
+class SupportTester 
+{
 private:
   const int *_tabOfNodes;
   vector<int> _eltsActiveYet;
@@ -78,13 +77,13 @@ bool SupportTester::isIncludedAndNotAlreadyConsumed(const int *tabOfNodesOfTheEl
   for(vector<int>::iterator iter=_eltsActiveYet.begin();iter!=_eltsActiveYet.end();iter++)
     if(areEquivalent(_tabOfNodes+(*iter),tabOfNodesOfTheElementToTest,*iter2))
       {
-	_eltsActiveYet.erase(iter);
-	_lgthOfEltsActiveYet.erase(iter2);
-	return true;
+        _eltsActiveYet.erase(iter);
+        _lgthOfEltsActiveYet.erase(iter2);
+        return true;
       }
     else
       {
-	iter2++;
+        iter2++;
       }
   return false;
 }
@@ -121,49 +120,50 @@ int main (int argc, char ** argv)
   //Test 1 : test if connectivity of poly3D mesh is OK
   if(myMesh->getMeshDimension()==3 && myMesh->getSpaceDimension()==3)
     nbOfPtsForTest++;
-  if(myMesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,MED_EN::MED_TETRA4)==1 && myMesh->getNumberOfElementsWithPoly(MED_EN::MED_CELL,MED_EN::MED_POLYHEDRA)==2)
+  if(myMesh->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_TETRA4)==1 && myMesh->getNumberOfElements(MED_EN::MED_CELL,MED_EN::MED_POLYHEDRA)==2)
     nbOfPtsForTest++;
-  const int REFnodalConnForTetra[4]={17, 9, 18, 19};
-  const int *connForTetraToTest=myMesh->getConnectivity(MED_FULL_INTERLACE,MED_NODAL,MED_CELL,MED_TETRA4);
+  const int REFnodalConnForTetra[4]=
+    {
+      17, 9, 18, 19
+    };
+  const int *connForTetraToTest=myMesh->getConnectivity(MED_NODAL,MED_CELL,MED_TETRA4);
   const int *connIndForTetraToTest=myMesh->getConnectivityIndex(MED_NODAL,MED_CELL);
   for(i=connIndForTetraToTest[0]-1;i<connIndForTetraToTest[1]-1;i++)
     if(connForTetraToTest[i]==REFnodalConnForTetra[i])
       nbOfPtsForTest++;
   //6
-  const int *globIndex=myMesh->getPolyhedronIndex(MED_NODAL);
-  const int *nodalConnOfFaces=myMesh->getPolyhedronConnectivity(MED_NODAL);
-  const int *facesIndex=myMesh->getPolyhedronFacesIndex();
-  if(globIndex[1]-globIndex[0]==9 && globIndex[2]-globIndex[1]==10)// resp 9 faces and 10 faces are in polyh 1 and 2.
+  const int *globIndex=connIndForTetraToTest + 1; // skip 1 tetra
+  const int *nodalConnOfFaces=myMesh->getConnectivity(MED_NODAL,MED_CELL,MED_POLYHEDRA);
+  if(globIndex[1]-globIndex[0]==46 && globIndex[2]-globIndex[1]==45)// resp 46 nodes and 45 nodes are in polyh 1 and 2.
     nbOfPtsForTest++;
   //7
-  const int REFfacesIndex[20]={1, 7, 11, 15, 19, 23, 27, 31, 34, 39, 44, 48, 52, 55, 58, 61, 64, 68, 72, 75};
-  const int REFnodalConnOfFaces[74]={1, 2, 3, 4, 5, 6, // Polyhedron 1
-				     1, 7, 8, 2, 
-				     2, 8, 9, 3, 
-				     4, 3, 9, 10, 
-				     5, 4, 10, 11, 
-				     6, 5, 11, 12, 
-				     1, 6, 12, 7, 
-				     7, 12, 8, 10, 
-				     9, 8, 12, 11,
+  const int REFnodalConnOfFaces[91]=
+    {
+      1, 2, 3, 4, 5, 6, -1,// Polyhedron 1
+      1, 7, 8, 2,       -1,
+      2, 8, 9, 3,       -1,
+      4, 3, 9, 10,      -1,
+      5, 4, 10, 11,     -1,
+      6, 5, 11, 12,     -1,
+      1, 6, 12, 7,      -1,
+      7, 12, 8,         -1,
+      10, 9, 8, 12, 11,     
 
-				     13, 14, 15, 3, 2, // Polyhedron 2
-				     13, 2, 8, 16, 
-				     14, 13, 16, 17, 
-				     15, 14, 17, 15, 
-				     17, 18, 15, 
-				     18, 9, 3, 
-				     15, 9, 2, 
-				     3, 9, 8, 
-				     8, 9, 17, 16, 
-				     9, 18, 17 };
-  for(i=0;i<20;i++)
-    if(REFfacesIndex[i]==facesIndex[i])
-      nbOfPtsForTest++;
+      13, 14, 15, 3, 2, -1,// Polyhedron 2
+      13, 2, 8, 16,     -1,
+      14, 13, 16, 17,   -1,
+      15, 14, 17,       -1,
+      15, 17, 18,       -1,
+      15, 18, 9,        -1,
+      3, 15, 9,         -1,
+      2, 3, 9, 8,       -1,
+      8, 9, 17, 16,     -1,
+      9, 18, 17 
+    };
   for(i=0;i<74;i++)
     if(REFnodalConnOfFaces[i]==nodalConnOfFaces[i])
       nbOfPtsForTest++;
-  if(nbOfPtsForTest!=101)
+  if(nbOfPtsForTest!=7+74)
     {
       cout << "TEST1 K0 ! : Invalid Globaldata in memory..." << endl;
       return 1;
@@ -182,15 +182,21 @@ int main (int argc, char ** argv)
   if(fam1->getNumberOfTypes()==1 && fam1->getTypes()[0]==MED_POLYGON && fam1->getNumberOfElements(MED_ALL_ELEMENTS)==3)
     nbOfPtsForTest++;
   nbs=fam1->getNumber(MED_ALL_ELEMENTS);
-  const int REFTabForPolyg[16]={1, 2, 3, 4, 5, 6, 10, 9, 8, 12, 11, 13, 14, 15, 3, 2};
-  const int REFTabForPolygLgth[3]={6,5,5};
+  const int REFTabForPolyg[16]=
+    {
+      1, 2, 3, 4, 5, 6, 10, 9, 8, 12, 11, 13, 14, 15, 3, 2
+    };
+  const int REFTabForPolygLgth[3]=
+    {
+      6,5,5
+    };
   SupportTester test1(REFTabForPolyg,3,REFTabForPolygLgth);
   for(i=0;i<3;i++)
     {
       int lgth;
-      const int *conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElementWithPoly(MED_NODAL,MED_FACE,nbs[i],lgth);
+      const int *conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElement(MED_NODAL,MED_FACE,nbs[i],lgth);
       if(test1.isIncludedAndNotAlreadyConsumed(conn))
-	nbOfPtsForTest++;
+        nbOfPtsForTest++;
     }
   if(test1.areAllEltsConsumed())
     nbOfPtsForTest++;
@@ -198,14 +204,17 @@ int main (int argc, char ** argv)
   if(fam2->getNumberOfElements(MED_ALL_ELEMENTS)==8)
     nbOfPtsForTest++;
   nbs=fam2->getNumber(MED_ALL_ELEMENTS);
-  const int REFTabForQuad[32]={1, 7, 8, 2, 2, 8, 9, 3, 4, 3, 9, 10, 5, 4, 10, 11, 6, 5, 11, 12, 1, 6, 12, 7, 14, 13, 16, 17, 8, 9, 17, 16};
+  const int REFTabForQuad[32]=
+    {
+      1, 7, 8, 2, 2, 8, 9, 3, 4, 3, 9, 10, 5, 4, 10, 11, 6, 5, 11, 12, 1, 6, 12, 7, 14, 13, 16, 17, 8, 9, 17, 16
+    };
   SupportTester test2(REFTabForQuad,8,4);
   for(i=0;i<8;i++)
     {
       int lgth;
-      const int *conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElementWithPoly(MED_NODAL,MED_FACE,nbs[i],lgth);
+      const int *conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElement(MED_NODAL,MED_FACE,nbs[i],lgth);
       if(test2.isIncludedAndNotAlreadyConsumed(conn))
-	nbOfPtsForTest++;
+        nbOfPtsForTest++;
     }
   if(test2.areAllEltsConsumed())
     nbOfPtsForTest++;
@@ -213,14 +222,17 @@ int main (int argc, char ** argv)
   if(fam3->getNumberOfElements(MED_ALL_ELEMENTS)==6)
     nbOfPtsForTest++;
   nbs=fam3->getNumber(MED_ALL_ELEMENTS);
-  const int REFTabForTria[18]={7, 12, 8, 15, 14, 17, 15, 17, 18, 15, 18, 9, 3, 15, 9, 18, 17, 9};
+  const int REFTabForTria[18]=
+    {
+      7, 12, 8, 15, 14, 17, 15, 17, 18, 15, 18, 9, 3, 15, 9, 18, 17, 9
+    };
   SupportTester test3(REFTabForTria,6,3);
   for(i=0;i<6;i++)
     {
       int lgth;
-      const int *conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElementWithPoly(MED_NODAL,MED_FACE,nbs[i],lgth);
+      const int *conn=((CONNECTIVITY *)myMesh->getConnectivityptr())->getConnectivityOfAnElement(MED_NODAL,MED_FACE,nbs[i],lgth);
       if(test3.isIncludedAndNotAlreadyConsumed(conn))
-	nbOfPtsForTest++;
+        nbOfPtsForTest++;
     }
   if(test3.areAllEltsConsumed())
     nbOfPtsForTest++;
@@ -229,67 +241,91 @@ int main (int argc, char ** argv)
       cout << "TEST2 K0 ! : Invalid data in memory for families !!!" << endl;
       return 1;
     }
-  // TEST 3 : volumes, aeras, barycenter
+  // TEST 3 : volumes, areas, barycenter
   nbOfPtsForTest=0;
-  SUPPORT *supOnCell=new SUPPORT(myMesh);
-  FIELD<double>* vol1=myMesh->getVolume(supOnCell);
+  const SUPPORT *supOnCell=myMesh->getSupportOnAll(MED_CELL);
+  FIELD<double>* vol1=myMesh->getVolume(supOnCell, false);
   int lgth=vol1->getValueLength();
   const double *vals=vol1->getValue();
   if(lgth==3)
     nbOfPtsForTest++;
-  const double REFVolOfPolyHedron[3]={2.333333333333333,11.66666666666666,13.83224131414673};
+  const double REFVolOfPolyHedron[3]=
+    {
+      2.333333333333333,-11.66666666666666,-13.83224131414673
+    };
   for(i=0;i<3;i++)
     if(fabs(REFVolOfPolyHedron[i]-vals[i])<1e-12)
       nbOfPtsForTest++;
-  delete vol1;
+  vol1->removeReference();
+  vol1=myMesh->getVolume(supOnCell, true);
+  lgth=vol1->getValueLength();
+  vals=vol1->getValue();
+  if(lgth==3)
+    nbOfPtsForTest++;
+  for(i=0;i<3;i++)
+    if(fabs(fabs(REFVolOfPolyHedron[i])-vals[i])<1e-12)
+      nbOfPtsForTest++;
+  vol1->removeReference();
   FIELD<double>* bary=myMesh->getBarycenter(supOnCell);
   lgth=bary->getValueLength();
   vals=bary->getValue();
   if(lgth==9)
     nbOfPtsForTest++;
-  const double REFBaryOfPolyHedron[9]= {5.5, 1, -1, 2, 1.5, 1.0833333333333333, 5.1, 1.6, 0.9};
+  const double REFBaryOfPolyHedron[9]= 
+    {
+      5.5, 1, -1, 2, 1.5, 1.0833333333333333, 5.1, 1.6, 0.9
+    };
   for(i=0;i<9;i++)
     if(fabs(REFBaryOfPolyHedron[i]-vals[i])<1e-12)
       nbOfPtsForTest++;
-  delete bary;
-  delete supOnCell;
+  bary->removeReference();
   //area
   vol1=myMesh->getArea(fam1);
   lgth=vol1->getValueLength();
   vals=vol1->getValue();
   if(lgth==3)
     nbOfPtsForTest++;
-  const double REFAreaForPolyg[3]={6,5,6.5};
+  const double REFAreaForPolyg[3]=
+    {
+      6,5,6.5
+    };
   for(i=0;i<3;i++)
     if(fabs(REFAreaForPolyg[i]-vals[i])<1e-12)
       nbOfPtsForTest++;
+  vol1->removeReference();
 
   vol1=myMesh->getArea(fam2);
   lgth=vol1->getValueLength();
   vals=vol1->getValue();
   if(lgth==8)
     nbOfPtsForTest++;
-  const double REFAreaForQuad[8]={2.1213203435596424, 2.8284271247461903, 4.4721359549995796, 4.4721359549995796, 
-				  2.8284271247461903, 2.1213203435596428, 3.6798724963767362, 4};
+  const double REFAreaForQuad[8]=
+    {
+      2.1213203435596424, 2.8284271247461903, 4.4721359549995796, 4.4721359549995796, 
+      2.8284271247461903, 2.1213203435596428, 3.6798724963767362, 4
+    };
   for(i=0;i<8;i++)
     if(fabs(REFAreaForQuad[i]-vals[i])<1e-12)
       nbOfPtsForTest++;
-  delete vol1;
+  vol1->removeReference();
 
   vol1=myMesh->getArea(fam3);
   lgth=vol1->getValueLength();
   vals=vol1->getValue();
   if(lgth==6)
     nbOfPtsForTest++;
-  const double REFAreaForTri[6]={2.9580398915498081, 1.4142135623730951, 2.2360679774997898, 
-				 3.3541019662496847, 3.3541019662496847, 2.2360679774997898};
+  const double REFAreaForTri[6]=
+    {
+      2.9580398915498081, 1.4142135623730951, 2.2360679774997898, 
+      3.3541019662496847, 3.3541019662496847, 2.2360679774997898
+    };
   for(i=0;i<6;i++)
     if(fabs(REFAreaForTri[i]-vals[i])<1e-12)
       nbOfPtsForTest++;
-  delete vol1;
-  if(nbOfPtsForTest!=34)
+  vol1->removeReference();
+  if(nbOfPtsForTest!=38)
     {
-      cout << "TEST3 K0 ! : Error in caluclation of basic properties !!!" << endl;
+      cout << "TEST3 K0 ! : Error in calculation of basic properties !!!" << endl;
       return 1;
     }
   // TEST 4 -- CHECK FOR Reverse descending using getBoundaryElements.
@@ -298,15 +334,15 @@ int main (int argc, char ** argv)
   if(bound->getNumberOfElements(MED_ALL_ELEMENTS)==19)
     nbOfPtsForTest++;
   if(bound->isOnAllElements())
-      nbOfPtsForTest++;
+    nbOfPtsForTest++;
   if(nbOfPtsForTest!=2)
     {
       cout << "TEST4 K0 ! : Error in getBoundaryElements probably due to Reverse descending !!!" << endl;
       return 1;
     }
-  delete bound;
+  bound->removeReference();
   ///////////
   cout << "ALL TESTS OK !!!" << endl;
-  delete myMesh;
+  myMesh->removeReference();
   return 0;
 }

@@ -1,24 +1,22 @@
-#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-#
+
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 #
@@ -28,16 +26,6 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 #
 
 dist_salomeres_DATA = \
-    MED.config \
-    MED_en.xml \
-    SalomeApp.xml \
-    ModuleMed.png \
-    Data.png \
-    Infos.png \
-    Structure.png \
-    explore_med_file.png \
-    field_selection.png \
-    mesh_selection.png \
     boitenew.cnc \
     boitenew.inp \
     boitenew.xyz \
@@ -53,15 +41,11 @@ dist_salomeres_DATA = \
     titi.cnc \
     titi.inp \
     titi.xyz \
-    carre_en_quad4_import22.med \
     carre_en_quad4.med \
-    carre_en_quad4_seg2_import22.med \
     carre_en_quad4_seg2.med \
     cas_defaut_domaine_fluide.med \
     ChampsDarcy.med \
-    cube_hexa8_import22.med \
     cube_hexa8.med \
-    cube_hexa8_quad4_import22.med \
     cube_hexa8_quad4.med \
     darcy_1.1_res.med \
     darcy_1.3_resCASTEM.med \
@@ -72,8 +56,6 @@ dist_salomeres_DATA = \
     darcy2_Castem_qua_VF.med \
     Darcy3_3D_H_10x10x10_2.med \
     Darcy3_3D_H_10x10x10.sauve \
-    Deff_fdt_5.8_castem_efmh_diff_conc_dom.med \
-    Deff_fdt_5.8_castem_vf_diff_conc_dom.med \
     dx200_dy1_avec_2couches.sauve \
     elle_2D_QT_10x10.sauve \
     elle_2D_QT_2x2.sauve \
@@ -86,7 +68,7 @@ dist_salomeres_DATA = \
     elle_3D_HPr_4x4x4_2.med \
     elle_3D_HPr_4x4x4.sauve \
     extendedtransport53_triangles.med \
-    geomMesh21.med \
+    geomMesh_nomorereadable21.med \
     geomMesh22.med \
     H_CastCast_EFMH_I129_COUPLEX1.med \
     H_CastCast_VF_I129_COUPLEX1.med \
@@ -118,7 +100,6 @@ dist_salomeres_DATA = \
     maillage_chemvalIV_cas1_100elts.sauve \
     maillage_chemvalIV_cas1_40elts.med \
     maillage_chemvalIV_cas1_40elts.sauve \
-    maillage_UniSegFam_import22.med \
     maillage_UniSegFam.med \
     mail_test1-1-qua.sauve \
     mail_test1-1-tri.sauve \
@@ -126,9 +107,8 @@ dist_salomeres_DATA = \
     mail_test1-2-tri.sauve \
     mail-test1-4-1.sauve \
     mail-test1-4-2.sauve \
-    mesh_import22.med \
+    mesh_nomorereadable21.med \
     mesh.med \
-    Mistrat_import22.med \
     Mistrat.med \
     Old_ChampsDarcy.med \
     Old_darcy_1.1_res.med \
@@ -138,8 +118,6 @@ dist_salomeres_DATA = \
     Old_darcy2_Castem_EFMH.med \
     Old_darcy2_Castem_qua_EFMH.med \
     Old_darcy2_Castem_qua_VF.med \
-    Old_Deff_fdt_5.8_castem_efmh_diff_conc_dom.med \
-    Old_Deff_fdt_5.8_castem_vf_diff_conc_dom.med \
     Old_H_CastCast_EFMH_I129_COUPLEX1.med \
     Old_H_CastCast_VF_I129_COUPLEX1.med \
     Old_H_CastCast_VF_Se79_COUPLEX1.med \
@@ -152,7 +130,7 @@ dist_salomeres_DATA = \
     Old_H_Traces_I129_COUPLEX1.med \
     Old_H_Traces_Se79_COUPLEX1.med \
     Old_maillage_chemvalIV_cas1_40elts.med \
-    pointe_import22.med \
+    pointe_nomorereadable21.med \
     pointe.med \
     poly3D.med \
     polyedres.med \
@@ -161,7 +139,6 @@ dist_salomeres_DATA = \
     test19.med \
     test_2D.med \
     trio_2D.med \
-    TimeStamps_import22.med \
     TimeStamps.med \
     zzzz121b.med \
     zzzz121b_without_tr6.med \
@@ -172,7 +149,10 @@ dist_salomeres_DATA = \
     CornerTetra.med \
     SimpleIncludedTetra.med \
     SimpleIncludingTetra.med \
-    trio_2D.med \
+    Test2D.med \
+    Test2Dpoly.med \
+    Test3D.med \
+    Test3Dpoly.med \
     UnitTetraDegenT.med \
     DegenEdgeXY.med \
     DegenFaceXYZ.med \
@@ -215,14 +195,34 @@ dist_salomeres_DATA = \
     square2_split \
     square2_split1.med \
     square2_split2.med \
+    testStructCart3D.med \
+    Mesh3D_10_2d1.med \
+    Mesh3D_10_2d2.med \
+    Mesh3D_11.med \
     Pol1.fig Pol2.fig Pol3.fig  Pol4.fig \
     blow5_ascii.case \
     blow5_ascii.geo \
     blow5_ascii_cd_displacement \
     blow5_ascii_cd_thickness \
     blow5_ascii_pd_displacement \
-    blow5_ascii_pd_thickness
+    blow5_ascii_pd_thickness \
+    test_2D.sauve \
+    allPillesTest.sauv \
+    BDC-714.sauv
 
+if !MED_ENABLE_MICROMED
+  nodist_salomeres_SCRIPTS = MEDCatalog.xml SalomeApp.xml
+endif
 
-# VSR: little trick to avoid putting if MEDCatalog.xml to the distribution archive
-nodist_salomeres_SCRIPTS = MEDCatalog.xml
+if MED_ENABLE_GUI
+  dist_salomeres_DATA += \
+    ModuleMed.png \
+    Data.png \
+    Infos.png \
+    Structure.png \
+    explore_med_file.png \
+    field_selection.png \
+    med_mesh.png \
+    med_field.png \
+    mesh_selection.png
+endif

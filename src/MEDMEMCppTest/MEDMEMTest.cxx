@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
@@ -29,9 +27,15 @@
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_STRING.hxx"
+#include "MEDMEM_Remapper.hxx"
 
 #include <sstream>
 #include <cmath>
+#include <stdexcept>
+
+#ifdef WNT
+#include <windows.h>
+#endif
 
 using namespace std;
 
@@ -53,12 +57,12 @@ void MEDMEMTest::tearDown()
 {
 }
 
+/*
 // #1: MEDMEM_Array.hxx                \
 // #2: MEDMEM_ArrayConvert.hxx          }  MEDMEMTest_Array.cxx
 // #3: MEDMEM_ArrayInterface.hxx (-)   /
 // #4: MEDMEM_AsciiFieldDriver.hxx      }  MEDMEMTest_AsciiFieldDriver.cxx
 // #5: MEDMEM_CellModel.hxx             }  MEDMEMTest.cxx (-)
-// #6: MEDMEM_Compatibility21_22.hxx    }  nothing to test
 // #7: MEDMEM_Connectivity.hxx          }  MEDMEMTest_Connectivity.cxx
 // #8: MEDMEM_Coordinate.hxx            }  MEDMEMTest_Coordinate.cxx
 // #9: MEDMEM_DriverFactory.hxx         }  MEDMEMTest_DriverFactory.cxx
@@ -79,26 +83,17 @@ void MEDMEMTest::tearDown()
 // #24: MEDMEM_Init.cxx                 }  MEDMEMTest.cxx
 // #25: MEDMEM_InterlacingPolicy.hxx    }  MEDMEMTest.cxx (-)
 // #26: MEDMEM_InterlacingTraits.hxx    }  MEDMEMTest.cxx (-)
-// #27: MEDMEM_MedFieldDriver21.hxx     }  MEDMEMTest_MedFieldDriver21.cxx
-// #28: MEDMEM_MedFieldDriver22.hxx     }  MEDMEMTest_MedFieldDriver22.cxx
-// #29: MEDMEM_MedFieldDriver.hxx       }  MEDMEMTest.cxx (-)
-// #30: MEDMEM_Med.hxx                  }  MEDMEMTest_Med.cxx
-// #31: MEDMEM_MedMedDriver21.hxx       }  MEDMEMTest_MedMedDriver21.cxx
-// #32: MEDMEM_MedMedDriver22.hxx       }  MEDMEMTest_MedMedDriver22.cxx
-// #33: MEDMEM_MedMedDriver.hxx         }  MEDMEMTest.cxx (-)
+// #28: MEDMEM_MedFieldDriver.hxx       }  MEDMEMTest_MedFieldDriver.cxx
 // #34: MEDMEM_MEDMEMchampLire.hxx      }  MEDMEMTest.cxx (-)
 // #35: MEDMEM_MEDMEMgaussEcr.hxx       }  MEDMEMTest.cxx (-)
 // #36: MEDMEM_MEDMEMprofilEcr.hxx      }  MEDMEMTest.cxx (-)
-// #37: MEDMEM_MedMeshDriver21.hxx      }  MEDMEMTest_MedMeshDriver21.cxx
-// #38: MEDMEM_MedMeshDriver22.hxx      }  MEDMEMTest_MedMeshDriver22.cxx
-// #39: MEDMEM_MedMeshDriver.hxx        }  MEDMEMTest.cxx (-)
+// #37: MEDMEM_MedMeshDriver.hxx        }  MEDMEMTest_MedMeshDriver.cxx
 // #40: MEDMEM_MedVersion.hxx           }  MEDMEMTest_MedVersion.cxx
 // #41: MEDMEM_Mesh.hxx                 \
 // #42: MEDMEM_Meshing.hxx              /  MEDMEMTest_MeshAndMeshing.cxx
 // #43: MEDMEM_ModulusArray.hxx         }  MEDMEMTest_ModulusArray.cxx
 // #44: MEDMEM_nArray.hxx               }  MEDMEMTest_nArray.cxx
 // #45: MEDMEM_PointerOf.hxx            }  MEDMEMTest_PointerOf.cxx
-// #46: MEDMEM_PolyhedronArray.hxx      }  MEDMEMTest_PolyhedronArray.cxx
 // #47: MEDMEM_PorflowMeshDriver.hxx    }  MEDMEMTest_PorflowMeshDriver.cxx
 // #48: MEDMEM_RCBase.hxx               }  MEDMEMTest.cxx (-)
 // #49: MEDMEM_SetInterlacingType.hxx   }  MEDMEMTest.cxx (-)
@@ -113,31 +108,7 @@ void MEDMEMTest::tearDown()
 // #58: MEDMEM_VtkMedDriver.hxx         }  MEDMEMTest_VtkMedDriver.cxx
 // #59: MEDMEM_VtkMeshDriver.hxx        }  MEDMEMTest_VtkMeshDriver.cxx
 // #60: MEDMEM_medimport_src.hxx        }  MEDMEMTest.cxx (-)
-
-
-/*!
- *  Check methods (not in spec), defined in MEDMEM_CellModel.hxx:
- */
-//void MEDMEMTest::testCellModel()
-//{
-//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-//}
-
-/*!
- *  Check methods (not in spec), defined in MEDMEM_DriversDef.hxx:
- */
-//void MEDMEMTest::testDriversDef()
-//{
-//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-//}
-
-/*!
- *  Check methods (not in spec), defined in MEDMEM_DriverTools.hxx:
- */
-//void MEDMEMTest::testDriverTools()
-//{
-//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-//}
+*/
 
 /*!
  *  Check methods (4), defined in MEDMEM_IndexCheckingPolicy.hxx:
@@ -225,14 +196,6 @@ void MEDMEMTest::testInit()
  *  Check methods (not in spec), defined in MEDMEM_MedFieldDriver.hxx:
  */
 //void MEDMEMTest::testMedFieldDriver()
-//{
-//  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
-//}
-
-/*!
- *  Check methods (not in spec), defined in MEDMEM_MedMedDriver.hxx:
- */
-//void MEDMEMTest::testMedMedDriver()
 //{
 //  CPPUNIT_FAIL("Case Not Implemented (not in spec)");
 //}
@@ -341,8 +304,8 @@ void MEDMEMTest::testSTRING()
     MEDMEM::STRING medstr (*aMesh1);
     CPPUNIT_ASSERT(strcmp(medstr, ostr.str().c_str()) == 0);
   }
-
-  delete aMesh1;
+  if(aMesh1)
+    aMesh1->removeReference();
 }
 
 /*!
@@ -469,7 +432,6 @@ MEDMEM::MESH * MEDMEMTest_createTestMesh ()
 {
   // MESH DATA
   int SpaceDimension = 3;
-  int meshDimension = SpaceDimension; // because there 3D cells in the mesh
 
   // coordinates
   int NumberOfNodes = 19;
@@ -565,117 +527,120 @@ MEDMEM::MESH * MEDMEMTest_createTestMesh ()
   myMeshing->setTypes(CellTypes, MED_EN::MED_CELL);
   myMeshing->setNumberOfElements(NumberOfCells, MED_EN::MED_CELL);
 
-  myMeshing->setConnectivity(ConnectivityTetra, MED_EN::MED_CELL, MED_EN::MED_TETRA4);
-  myMeshing->setConnectivity(ConnectivityPyra, MED_EN::MED_CELL, MED_EN::MED_PYRA5);
-  myMeshing->setConnectivity(ConnectivityHexa, MED_EN::MED_CELL, MED_EN::MED_HEXA8);
+  myMeshing->setConnectivity(MED_EN::MED_CELL, MED_EN::MED_TETRA4, ConnectivityTetra );
+  myMeshing->setConnectivity(MED_EN::MED_CELL, MED_EN::MED_PYRA5 , ConnectivityPyra  );
+  myMeshing->setConnectivity(MED_EN::MED_CELL, MED_EN::MED_HEXA8 , ConnectivityHexa  );
 
   myMeshing->setNumberOfTypes(NumberOfFaceTypes, MED_EN::MED_FACE);
   myMeshing->setTypes(FaceTypes, MED_EN::MED_FACE);
   myMeshing->setNumberOfElements(NumberOfFaces, MED_EN::MED_FACE);
 
-  myMeshing->setConnectivity(ConnectivityTria, MED_EN::MED_FACE, MED_EN::MED_TRIA3);
-  myMeshing->setConnectivity(ConnectivityQua, MED_EN::MED_FACE, MED_EN::MED_QUAD4);
-
-  // mesh dimension
-  myMeshing->setMeshDimension(meshDimension);
+  myMeshing->setConnectivity(MED_EN::MED_FACE, MED_EN::MED_TRIA3,ConnectivityTria);
+  myMeshing->setConnectivity(MED_EN::MED_FACE, MED_EN::MED_QUAD4,ConnectivityQua);
 
   // edges connectivities
   // not yet implemented : if set, results are unpredictable.
 
   // groups of nodes
   {
-    MEDMEM::GROUP myGroup;
-    myGroup.setName("SomeNodes");
-    myGroup.setMesh(myMeshing);
-    myGroup.setEntity(MED_EN::MED_NODE);
-    myGroup.setNumberOfGeometricType(1);
+    MEDMEM::GROUP *myGroup=new MEDMEM::GROUP;
+    myGroup->setName("SomeNodes");
+    myGroup->setMesh(myMeshing);
+    myGroup->setEntity(MED_EN::MED_NODE);
+    myGroup->setNumberOfGeometricType(1);
     MED_EN::medGeometryElement myTypes[1] = {MED_EN::MED_NONE};
-    myGroup.setGeometricType(myTypes);
+    myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[1] = {4};
-    myGroup.setNumberOfElements(myNumberOfElements);
+    myGroup->setNumberOfElements(myNumberOfElements);
     const int index[1+1] = {1,5};
     const int value[4] = {1,4,5,7};
-    myGroup.setNumber(index,value);
-    myMeshing->addGroup(myGroup);
+    myGroup->setNumber(index,value);
+    myMeshing->addGroup(*myGroup);
+    myGroup->removeReference();
   }
   {
-    MEDMEM::GROUP myGroup;
-    myGroup.setName("OtherNodes");
-    myGroup.setMesh(myMeshing);
-    myGroup.setEntity(MED_EN::MED_NODE);
-    myGroup.setNumberOfGeometricType(1);
+    MEDMEM::GROUP *myGroup=new MEDMEM::GROUP;
+    myGroup->setName("OtherNodes");
+    myGroup->setMesh(myMeshing);
+    myGroup->setEntity(MED_EN::MED_NODE);
+    myGroup->setNumberOfGeometricType(1);
     MED_EN::medGeometryElement myTypes[1] = {MED_EN::MED_NONE};
-    myGroup.setGeometricType(myTypes);
+    myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[1] = {3};
-    myGroup.setNumberOfElements(myNumberOfElements);
+    myGroup->setNumberOfElements(myNumberOfElements);
     const int index[1+1] = {1,4};
     const int value[3] = {2,3,6};
-    myGroup.setNumber(index,value);
-    myMeshing->addGroup(myGroup);
+    myGroup->setNumber(index,value);
+    myMeshing->addGroup(*myGroup);
+    myGroup->removeReference();
   }
 
   // groups of cells
   {
-    MEDMEM::GROUP myGroup;
-    myGroup.setName("SomeCells");
-    myGroup.setMesh(myMeshing);
-    myGroup.setEntity(MED_EN::MED_CELL);
-    myGroup.setNumberOfGeometricType(3);
+    MEDMEM::GROUP *myGroup=new MEDMEM::GROUP;
+    myGroup->setName("SomeCells");
+    myGroup->setMesh(myMeshing);
+    myGroup->setEntity(MED_EN::MED_CELL);
+    myGroup->setNumberOfGeometricType(3);
     MED_EN::medGeometryElement myTypes[3] = {MED_EN::MED_TETRA4,MED_EN::MED_PYRA5,MED_EN::MED_HEXA8};
-    myGroup.setGeometricType(myTypes);
+    myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[3] = {4,1,2};
-    myGroup.setNumberOfElements(myNumberOfElements);
+    myGroup->setNumberOfElements(myNumberOfElements);
     const int index[3+1] = {1,5,6,8};
     const int value[4+1+2] = {2,7,8,12,  13,  15,16};
-    myGroup.setNumber(index,value);
-    myMeshing->addGroup(myGroup);
+    myGroup->setNumber(index,value);
+    myMeshing->addGroup(*myGroup);
+    myGroup->removeReference();
   }
   {
-    MEDMEM::GROUP myGroup;
-    myGroup.setName("OtherCells");
-    myGroup.setMesh(myMeshing);
-    myGroup.setEntity(MED_EN::MED_CELL);
-    myGroup.setNumberOfGeometricType(2);
+    MEDMEM::GROUP *myGroup=new MEDMEM::GROUP;
+    myGroup->setName("OtherCells");
+    myGroup->setMesh(myMeshing);
+    myGroup->setEntity(MED_EN::MED_CELL);
+    myGroup->setNumberOfGeometricType(2);
     MED_EN::medGeometryElement myTypes[] = {MED_EN::MED_TETRA4,MED_EN::MED_PYRA5};
-    myGroup.setGeometricType(myTypes);
+    myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[] = {4,1};
-    myGroup.setNumberOfElements(myNumberOfElements);
+    myGroup->setNumberOfElements(myNumberOfElements);
     const int index[2+1] = {1,5,6};
     const int value[4+1] = {3,4,5,9,  14};
-    myGroup.setNumber(index,value);
-    myMeshing->addGroup(myGroup);
+    myGroup->setNumber(index,value);
+    myMeshing->addGroup(*myGroup);
+    myGroup->removeReference();
   }
 
   // groups of faces
   {
-    MEDMEM::GROUP myGroup;
-    myGroup.setName("SomeFaces");
-    myGroup.setMesh(myMeshing);
-    myGroup.setEntity(MED_EN::MED_FACE);
-    myGroup.setNumberOfGeometricType(2);
+    MEDMEM::GROUP *myGroup=new MEDMEM::GROUP;
+    myGroup->setName("SomeFaces");
+    myGroup->setMesh(myMeshing);
+    myGroup->setEntity(MED_EN::MED_FACE);
+    myGroup->setNumberOfGeometricType(2);
     MED_EN::medGeometryElement myTypes[2] = {MED_EN::MED_TRIA3,MED_EN::MED_QUAD4};
-    myGroup.setGeometricType(myTypes);
+    myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[2] = {2,3};
-    myGroup.setNumberOfElements(myNumberOfElements);
+    myGroup->setNumberOfElements(myNumberOfElements);
     const int index[2+1] = {1,3,6};
     const int value[2+3] = {2,4,  5,6,8};
-    myGroup.setNumber(index,value);
-    myMeshing->addGroup(myGroup);
+    myGroup->setNumber(index,value);
+    myMeshing->addGroup(*myGroup);
+    myGroup->removeReference();
   }
   {
-    MEDMEM::GROUP myGroup;
-    myGroup.setName("OtherFaces");
-    myGroup.setMesh(myMeshing);
-    myGroup.setEntity(MED_EN::MED_FACE);
-    myGroup.setNumberOfGeometricType(1);
+    MEDMEM::GROUP *myGroup=new MEDMEM::GROUP;
+    myGroup->setName("OtherFaces");
+    myGroup->setMesh(myMeshing);
+    myGroup->setEntity(MED_EN::MED_FACE);
+    myGroup->setNumberOfGeometricType(1);
     MED_EN::medGeometryElement myTypes[1] = {MED_EN::MED_TRIA3};
-    myGroup.setGeometricType(myTypes);
+    myGroup->setGeometricType(myTypes);
     const int myNumberOfElements[1] = {2};
-    myGroup.setNumberOfElements(myNumberOfElements);
+    myGroup->setNumberOfElements(myNumberOfElements);
     const int index[1+1] = {1,3};
     const int value[2] = {1,3};
-    myGroup.setNumber(index,value);
-    myMeshing->addGroup(myGroup);
+    myGroup->setNumber(index,value);
+    myMeshing->addGroup(*myGroup);
+    myGroup->removeReference();
   }
 
   return myMeshing;
@@ -689,7 +654,12 @@ MEDMEMTest_TmpFilesRemover::~MEDMEMTest_TmpFilesRemover()
 {
   set<string>::iterator it = myTmpFiles.begin();
   for (; it != myTmpFiles.end(); it++) {
+#ifdef WNT
+    //if (GetFileAttributes((*it).data()) & FILE_ATTRIBUTE_NORMAL)
+    if (GetFileAttributes((*it).data()) != INVALID_FILE_ATTRIBUTES)
+#else
     if (access((*it).data(), F_OK) == 0)
+#endif
       remove((*it).data());
   }
   myTmpFiles.clear();

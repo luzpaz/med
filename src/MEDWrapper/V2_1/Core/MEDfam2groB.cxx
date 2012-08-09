@@ -76,12 +76,12 @@ namespace med_2_1{
 
 med_err 
 MEDfam2groB(med_int nfam,med_int *numfam,med_int *numfamnoe,
-	    med_int nnoeuds,med_int *numfamele,med_int nelements, 
-	    char *grofam,int *indfamgro,med_int *numnoeuds,
-	    med_int *numele,med_int ngn,med_int nge,med_int nindn, 
-	    med_int ninde,char *nomgronoe,char *nomgroele,
-	    int *indgronoe,int *indgroele,
-	    med_int *tabgronoe,med_int *tabgroele)
+            med_int nnoeuds,med_int *numfamele,med_int nelements, 
+            char *grofam,int *indfamgro,med_int *numnoeuds,
+            med_int *numele,med_int ngn,med_int nge,med_int nindn, 
+            med_int ninde,char *nomgronoe,char *nomgroele,
+            int *indgronoe,int *indgroele,
+            med_int *tabgronoe,med_int *tabgroele)
 {
   int i,j,k;
   char groupe[MED_TAILLE_LNOM];
@@ -106,77 +106,77 @@ MEDfam2groB(med_int nfam,med_int *numfam,med_int *numfamnoe,
   for (i=1;i<=nfam;i++)
       {
         numc = *(numfam+i-1);
-	nnoe = 0;
-	nele = 0;
+        nnoe = 0;
+        nele = 0;
         if (numc > 0)
-	    for (j=0;j<nnoeuds;j++)
-	      if (*(numfamnoe+j) == numc)
-		nnoe++;
-	if (numc < 0)
-	  for (j=0;j<nelements;j++)
-	    if (*(numfamele+j) == numc)
-	      nele++; 	  
+            for (j=0;j<nnoeuds;j++)
+              if (*(numfamnoe+j) == numc)
+                nnoe++;
+        if (numc < 0)
+          for (j=0;j<nelements;j++)
+            if (*(numfamele+j) == numc)
+              nele++;     
         for (j=0;j<(*(indfamgro+i)-*(indfamgro+i-1))/MED_TAILLE_LNOM; j++)
-	  {
-	    strncpy(groupe, grofam+*(indfamgro+i-1)+j*MED_TAILLE_LNOM,
-		    MED_TAILLE_LNOM);
-	    if (numc > 0)
-	      {
+          {
+            strncpy(groupe, grofam+*(indfamgro+i-1)+j*MED_TAILLE_LNOM,
+                    MED_TAILLE_LNOM);
+            if (numc > 0)
+              {
                 if (nn == 0)
-		  {
-		    strncpy(nomgronoe,groupe,MED_TAILLE_LNOM);
-		    nn = 1;
+                  {
+                    strncpy(nomgronoe,groupe,MED_TAILLE_LNOM);
+                    nn = 1;
                     pos = 1;
-		  }
-		else
-		  {
-		    flag = 0;
-		    for (k=0; k<nn;k++)
-		      if (strncmp(groupe,nomgronoe+k*MED_TAILLE_LNOM,
-				  MED_TAILLE_LNOM) == 0)
-			{
-			  flag = 1;
-			  pos = k+1;
-			}
-		    if (flag == 0)
-		      {
-			strncpy(nomgronoe+nn*MED_TAILLE_LNOM,groupe, 
-				MED_TAILLE_LNOM);
-			pos = nn + 1;
-			nn = nn + 1;
-		      }
-		  }
-		*(indgronoe+pos) = *(indgronoe+pos) + nnoe;
-	      } 
-	    if (numc < 0)
-	      {
+                  }
+                else
+                  {
+                    flag = 0;
+                    for (k=0; k<nn;k++)
+                      if (strncmp(groupe,nomgronoe+k*MED_TAILLE_LNOM,
+                                  MED_TAILLE_LNOM) == 0)
+                        {
+                          flag = 1;
+                          pos = k+1;
+                        }
+                    if (flag == 0)
+                      {
+                        strncpy(nomgronoe+nn*MED_TAILLE_LNOM,groupe, 
+                                MED_TAILLE_LNOM);
+                        pos = nn + 1;
+                        nn = nn + 1;
+                      }
+                  }
+                *(indgronoe+pos) = *(indgronoe+pos) + nnoe;
+              } 
+            if (numc < 0)
+              {
                 if (ne == 0)
-		  {
-		    strncpy(nomgroele,groupe,MED_TAILLE_LNOM);
-		    ne = 1;
-		    pos = 1;
-		  }
-		else
-		  {
-		    flag = 0;
-		    for (k=0; k<ne;k++)
-		      if (strncmp(groupe,nomgroele+k*MED_TAILLE_LNOM,
-				  MED_TAILLE_LNOM) == 0)
-			{
-			  flag = 1;
-			  pos = k + 1;
-			}
-		    if (flag == 0)
-		      {
-			strncpy(nomgroele+ne*MED_TAILLE_LNOM,groupe, 
-				MED_TAILLE_LNOM);
-			pos = ne + 1;
-			ne = ne + 1;
-		      }
-		  }
-		*(indgroele+pos) = *(indgroele+pos) + nele;
-	      }
-	  } 
+                  {
+                    strncpy(nomgroele,groupe,MED_TAILLE_LNOM);
+                    ne = 1;
+                    pos = 1;
+                  }
+                else
+                  {
+                    flag = 0;
+                    for (k=0; k<ne;k++)
+                      if (strncmp(groupe,nomgroele+k*MED_TAILLE_LNOM,
+                                  MED_TAILLE_LNOM) == 0)
+                        {
+                          flag = 1;
+                          pos = k + 1;
+                        }
+                    if (flag == 0)
+                      {
+                        strncpy(nomgroele+ne*MED_TAILLE_LNOM,groupe, 
+                                MED_TAILLE_LNOM);
+                        pos = ne + 1;
+                        ne = ne + 1;
+                      }
+                  }
+                *(indgroele+pos) = *(indgroele+pos) + nele;
+              }
+          } 
       }
   *(nomgronoe+ngn*MED_TAILLE_LNOM) = '\0';
   *(nomgroele+nge*MED_TAILLE_LNOM) = '\0';
@@ -189,27 +189,27 @@ MEDfam2groB(med_int nfam,med_int *numfam,med_int *numfamnoe,
       *(indgronoe+i) = *(indgronoe+i-1) + *(indgronoe+i);
       strncpy(groupe,nomgronoe+(i-1)*MED_TAILLE_LNOM,MED_TAILLE_LNOM);
       for (j=1;j<=nfam;j++)
-	  {
-	    numc = *(numfam+j-1);
-	    if (numc > 0)
-	      {
-		flag = 0;
-		for (k=0;k<(*(indfamgro+j)-*(indfamgro+j-1))/MED_TAILLE_LNOM;
-		     k++)
-		  if (! strncmp(groupe,
-				grofam+*(indfamgro+j-1)+k*MED_TAILLE_LNOM,
-				MED_TAILLE_LNOM))
-		    flag = 1;
-		if (flag == 1)
-		  for (k=0;k<nnoeuds;k++)
-		    if (*(numfamnoe+k) == numc)
-		      {
-			*(tabgronoe+*(indgronoe+i-1)+cpt) = *(numnoeuds+k);
-			cpt++;
-		      }
-	      }
-	  }
-    }	      
+          {
+            numc = *(numfam+j-1);
+            if (numc > 0)
+              {
+                flag = 0;
+                for (k=0;k<(*(indfamgro+j)-*(indfamgro+j-1))/MED_TAILLE_LNOM;
+                     k++)
+                  if (! strncmp(groupe,
+                                grofam+*(indfamgro+j-1)+k*MED_TAILLE_LNOM,
+                                MED_TAILLE_LNOM))
+                    flag = 1;
+                if (flag == 1)
+                  for (k=0;k<nnoeuds;k++)
+                    if (*(numfamnoe+k) == numc)
+                      {
+                        *(tabgronoe+*(indgronoe+i-1)+cpt) = *(numnoeuds+k);
+                        cpt++;
+                      }
+              }
+          }
+    }         
   
   for (i=1;i<=nge;i++)
     {
@@ -217,26 +217,26 @@ MEDfam2groB(med_int nfam,med_int *numfam,med_int *numfamnoe,
       *(indgroele+i) = *(indgroele+i-1) + *(indgroele+i);  
       strncpy(groupe,nomgroele+(i-1)*MED_TAILLE_LNOM,MED_TAILLE_LNOM);
       for (j=1;j<=nfam;j++)
-	  {
-	    numc = *(numfam+j-1);
-	    if (numc < 0)
-	      {
-		flag = 0;
-		for (k=0;k<(*(indfamgro+j)-*(indfamgro+j-1))/MED_TAILLE_LNOM;
-		     k++)
-		  if (! strncmp(groupe,
-				grofam+*(indfamgro+j-1)+k*MED_TAILLE_LNOM,
-				MED_TAILLE_LNOM))
-		    flag = 1;
-		if (flag == 1)
-		  for (k=0;k<nelements;k++)
-		    if (*(numfamele+k) == numc)
-		      {
-			*(tabgroele+*(indgroele+i-1)+cpt) = *(numele+k);
-			cpt++;
-		      }
-	      }
-	  }
+          {
+            numc = *(numfam+j-1);
+            if (numc < 0)
+              {
+                flag = 0;
+                for (k=0;k<(*(indfamgro+j)-*(indfamgro+j-1))/MED_TAILLE_LNOM;
+                     k++)
+                  if (! strncmp(groupe,
+                                grofam+*(indfamgro+j-1)+k*MED_TAILLE_LNOM,
+                                MED_TAILLE_LNOM))
+                    flag = 1;
+                if (flag == 1)
+                  for (k=0;k<nelements;k++)
+                    if (*(numfamele+k) == numc)
+                      {
+                        *(tabgroele+*(indgroele+i-1)+cpt) = *(numele+k);
+                        cpt++;
+                      }
+              }
+          }
     }
   
   return 0;

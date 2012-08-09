@@ -1,23 +1,24 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #include "MEDSPLITTERTest.hxx"
-#include <cppunit/TestAssert.h>
+#include "MEDSPLITTERTest_Utils.hxx"
 
 #include "MEDMEM_ConnectZone.hxx" 
 #include "MEDMEM_DriversDef.hxx"
@@ -35,7 +36,7 @@
 #include "MEDSPLITTER_MESHCollection.hxx"
 #include "MEDSPLITTER_MESHCollectionDriver.hxx"
 
-#ifdef ENABLE_METIS
+#ifdef MED_ENABLE_METIS
 #include "MEDSPLITTER_METISGraph.hxx"
 #endif
 //#include "MEDSPLITTER_SCOTCHGraph.hxx"
@@ -43,6 +44,7 @@
 #include "MEDMEM_Exception.hxx"
 
 #include <string>
+#include <cppunit/TestAssert.h>
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
 //#define ENABLE_FAULTS
@@ -103,17 +105,13 @@ using namespace MEDMEM;
  
 void MEDSPLITTERTest::testParallelTopology_graph_constructor()
 {
-#ifndef ENABLE_METIS
+#ifndef MED_ENABLE_METIS
   CPPUNIT_FAIL("METIS is not available. Please, check your compilation.");
 #else
-  string data_dir                   = getenv("MED_ROOT_DIR");
-  string tmp_dir                    = getenv("TMP");
-  if (tmp_dir == "")
-    tmp_dir = "/tmp";
-  string filename_rd                = data_dir + "/share/salome/resources/med/carre_en_quad4_import22.med";  
-  string filename_para_wr            = tmp_dir + "/myWrField_seq_pointe22_";
-  string filename_para_med0           = tmp_dir + "/myWrField_seq_pointe22_1.med";
-  string filename_para_med1           = tmp_dir + "/myWrField_seq_pointe22_2.med";
+  string filename_rd        = MEDSPLITTERTest_Utils::getResourceFile("carre_en_quad4.med");
+  string filename_para_wr   = MEDSPLITTERTest_Utils::makeTmpFile("myWrField_seq_pointe22_");
+  string filename_para_med0 = MEDSPLITTERTest_Utils::makeTmpFile("myWrField_seq_pointe22_1.med");
+  string filename_para_med1 = MEDSPLITTERTest_Utils::makeTmpFile("myWrField_seq_pointe22_2.med");
   
   string meshname="carre_en_quad4";
   MESHCollection collection(filename_rd,meshname);
@@ -131,43 +129,43 @@ void MEDSPLITTERTest::testParallelTopology_graph_constructor()
   Topology* topology = new ParallelTopology (cell_graph, 2, collection.getMeshDimension());
   
   
-	/*
-	 * test_SPLITTER_square
-	 * 
-	 * computes a partitioning for the following geometry
-	 * 
-	 * 
-	 * 
-	 * 7------------8------------9
-	 * |            |            |
-	 * |            |            |
-	 * |     3      |     4      |
-	 * |            |            |
-	 * |            |            |
-	 * 4------------5------------6
-	 * |            |            |
-	 * |            |            |
-	 * |     1      |     2      |
-	 * |            |            |
-	 * |            |            |
-	 * 1------------2------------3 
-	 *
-	 * Result of the 2 domain split :
-	 *  
-	 * 5------------6 5------------6
-	 * |            | |            |
-	 * |            | |            |
-	 * |     2      | |     2      |
-	 * |            | |            |
-	 * |            | |            |
-	 * 1------------2 1------------2
-	 * |            | |            |
-	 * |            | |            |
-	 * |     1      | |     1      |
-	 * |            | |            |
-	 * |            | |            |
-	 * 4------------3 4------------3 
-	 */
+        /*
+         * test_SPLITTER_square
+         * 
+         * computes a partitioning for the following geometry
+         * 
+         * 
+         * 
+         * 7------------8------------9
+         * |            |            |
+         * |            |            |
+         * |     3      |     4      |
+         * |            |            |
+         * |            |            |
+         * 4------------5------------6
+         * |            |            |
+         * |            |            |
+         * |     1      |     2      |
+         * |            |            |
+         * |            |            |
+         * 1------------2------------3 
+         *
+         * Result of the 2 domain split :
+         *  
+         * 5------------6 5------------6
+         * |            | |            |
+         * |            | |            |
+         * |     2      | |     2      |
+         * |            | |            |
+         * |            | |            |
+         * 1------------2 1------------2
+         * |            | |            |
+         * |            | |            |
+         * |     1      | |     1      |
+         * |            | |            |
+         * |            | |            |
+         * 4------------3 4------------3 
+         */
  
   int iglobal[3]={1,2,3};
   int* iloc=new int[3];
@@ -176,17 +174,17 @@ void MEDSPLITTERTest::testParallelTopology_graph_constructor()
   int iproc_answer[3]={0,1,0};
   topology->convertGlobalCellList(iglobal,3,iloc,iproc);
   for(int i=0; i<3; i++)
-		{ 
-			CPPUNIT_ASSERT_EQUAL(iloc_answer[i], iloc[i]);
-			CPPUNIT_ASSERT_EQUAL(iproc_answer[i],iproc[i]);
-		}
+                { 
+                        CPPUNIT_ASSERT_EQUAL(iloc_answer[i], iloc[i]);
+                        CPPUNIT_ASSERT_EQUAL(iproc_answer[i],iproc[i]);
+                }
   int* global_2 = new int[3];
   topology->convertCellToGlobal(0,iloc,3,global_2);
   int global_answer[3]={1,1,3};
   for (int i=0; i<3; i++)
-		{
-			CPPUNIT_ASSERT_EQUAL(global_answer[i],global_2[i]);
-		}
+                {
+                        CPPUNIT_ASSERT_EQUAL(global_answer[i],global_2[i]);
+                }
   
   CPPUNIT_ASSERT_EQUAL(topology->getCellNumber(0),2);  
   CPPUNIT_ASSERT_EQUAL(topology->getCellNumber(1),2);
@@ -210,10 +208,10 @@ void MEDSPLITTERTest::testParallelTopology_graph_constructor()
   int iloc_node_answer[3]={4,3,3};
   int iproc_node_answer[3]={0,0,1};
   for(int i=0; i<3; i++)
-		{ 
-			CPPUNIT_ASSERT_EQUAL(iloc_node_answer[i], iloc[i]);
-			CPPUNIT_ASSERT_EQUAL(iproc_node_answer[i],iproc[i]);
-		}
+                { 
+                        CPPUNIT_ASSERT_EQUAL(iloc_node_answer[i], iloc[i]);
+                        CPPUNIT_ASSERT_EQUAL(iproc_node_answer[i],iproc[i]);
+                }
   int* local_nodes;
   int* ip_nodes;
   int* full_array;
@@ -223,10 +221,10 @@ void MEDSPLITTERTest::testParallelTopology_graph_constructor()
   int iloc_node_wt_answer[4]={4,3,4,3};
   int iproc_node_wt_answer[4]={0,0,1,1};
   for(int i=0; i<4; i++)
-		{ 
-			CPPUNIT_ASSERT_EQUAL(iloc_node_wt_answer[i], local_nodes[i]);
-			CPPUNIT_ASSERT_EQUAL(iproc_node_wt_answer[i],ip_nodes[i]);
-		}
+                { 
+                        CPPUNIT_ASSERT_EQUAL(iloc_node_wt_answer[i], local_nodes[i]);
+                        CPPUNIT_ASSERT_EQUAL(iproc_node_wt_answer[i],ip_nodes[i]);
+                }
   delete topology;
   delete[] iloc;
   delete[]iproc;
@@ -234,5 +232,5 @@ void MEDSPLITTERTest::testParallelTopology_graph_constructor()
   delete[] local_nodes;
   delete[] ip_nodes;
   delete[] full_array;
-#endif // ENABLE_METIS
+#endif // MED_ENABLE_METIS
 }

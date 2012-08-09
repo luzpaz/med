@@ -1,34 +1,34 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  File   : 
-//  Author : 
-//  Module : 
-//  $Header$
-//
+
 #ifndef MED_Structures_HeaderFile
 #define MED_Structures_HeaderFile
 
 #include "MED_Common.hxx"
 #include "MED_Utilities.hxx"
+
+#ifdef WNT
+#pragma warning(disable:4251)
+#endif
 
 namespace MED
 {
@@ -42,21 +42,21 @@ namespace MED
   MEDWRAPPER_EXPORT
   std::string 
   GetString(TInt theId, TInt theStep, 
-	    const TString& theString);
+            const TString& theString);
   
   //! Set a substring in the sequence of the strings
   MEDWRAPPER_EXPORT 
   void
   SetString(TInt theId, TInt theStep, 
-		 TString& theString, 
-		 const std::string& theValue);
+                 TString& theString, 
+                 const std::string& theValue);
 
   //! Set a substring in the sequence of the strings
   MEDWRAPPER_EXPORT
   void
   SetString(TInt theId, TInt theStep, 
-		 TString& theString, 
-		 const TString& theValue);
+                 TString& theString, 
+                 const TString& theValue);
 
   //---------------------------------------------------------------
   //! Define a parent class for all MEDWrapper classes
@@ -107,12 +107,17 @@ namespace MED
     TInt myDim; //!< Dimension of the mesh (0, 1, 2 or 3)
     TInt GetDim() const { return myDim;} //!< Gets dimension of the mesh
 
+    TInt mySpaceDim;
+    TInt GetSpaceDim() const { return mySpaceDim; }
+
     EMaillage myType; //!< Type of the mesh
     EMaillage GetType() const { return myType;} //!< Gets type of the mesh
 
     TString myDesc; //!< Description of the mesh
     virtual std::string GetDesc() const = 0; //!< Get description for the mesh
     virtual void SetDesc(const std::string& theValue) = 0; //!< Sets description for the mesh
+
+    
   };
   
 
@@ -197,6 +202,12 @@ namespace MED
     EBooleen myIsElemNum;
     //! Let know if the mesh elements are indexed
     EBooleen IsElemNum() const { return myIsElemNum;}
+    
+    //! Defines if the mesh elements family are indexed
+    EBooleen myIsFamNum;
+    //! Let know if the mesh elements family are indexed
+    EBooleen IsFamNum() const { return myIsFamNum;}
+    
 
     //! Contains sequence of the indexes for the mesh elements
     PElemNum myElemNum;
@@ -285,7 +296,7 @@ namespace MED
 
     virtual TInt GetConnDim() const = 0; //!< Gives step in the connectivity sequence
 
-    PElemNum myConn; //!< Defines sequence which describe connectivity for ech of mesh cell
+    PElemNum myConn; //!< Defines sequence which describe connectivity for each of mesh cell
 
     //! Gives connectivities for mesh cell by its number (const version)
     TCConnSlice GetConnSlice(TInt theElemId) const;
@@ -323,6 +334,19 @@ namespace MED
     TCConnSlice GetConnSlice(TInt theElemId) const;
     //! Gives connectivities for polygon by its number
     TConnSlice GetConnSlice(TInt theElemId);
+  };
+
+  //---------------------------------------------------------------
+  //! Define a class representing MED_BALL structure element.
+  //
+  //  This could be a generic class for any structure element
+  //  holding any number of contant and variable attributes
+  //  but it's too hard to implement
+  //
+  struct MEDWRAPPER_EXPORT TBallInfo: 
+    virtual TCellInfo
+  {
+    TFloatVector myDiameters;
   };
 
   //---------------------------------------------------------------
@@ -399,6 +423,7 @@ namespace MED
     virtual std::string GetUnitName(TInt theId) const = 0;
     //! Set unit for the component by its order number
     virtual void SetUnitName(TInt theId, const std::string& theValue) = 0;
+
   };
 
 
@@ -556,9 +581,9 @@ namespace MED
     //! Initialize the class
     void
     Allocate(TInt theNbElem,
-	     TInt theNbGauss,
-	     TInt theNbComp,
-	     EModeSwitch theMode = eFULL_INTERLACE);
+             TInt theNbGauss,
+             TInt theNbComp,
+             EModeSwitch theMode = eFULL_INTERLACE);
 
     //! Returns size of the value container
     size_t
@@ -602,9 +627,9 @@ namespace MED
     //! Initialize the class
     void
     Allocate(TInt theNbElem,
-	     TInt theNbGauss,
-	     TInt theNbComp,
-	     EModeSwitch theMode = eFULL_INTERLACE)
+             TInt theNbGauss,
+             TInt theNbComp,
+             EModeSwitch theMode = eFULL_INTERLACE)
     {
       TMeshValueBase::Allocate(theNbElem, theNbGauss, theNbComp, theMode);
       myValue.resize(theNbElem * this->GetStep());
@@ -640,18 +665,18 @@ namespace MED
     {
       TCValueSliceArr aValueSliceArr(myNbGauss);
       if(GetModeSwitch() == eFULL_INTERLACE){
-	TInt anId = theElemId * myStep;
-	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
-	  aValueSliceArr[aGaussId] =
-	    TCValueSlice(myValue, std::slice(anId, myNbComp, 1));
-	  anId += myNbComp;
-	}
+        TInt anId = theElemId * myStep;
+        for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+          aValueSliceArr[aGaussId] =
+            TCValueSlice(myValue, std::slice(anId, myNbComp, 1));
+          anId += myNbComp;
+        }
       }
       else{
-	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
-	  aValueSliceArr[aGaussId] =
-	    TCValueSlice(myValue, std::slice(theElemId, myNbComp, myStep));
-	}
+        for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+          aValueSliceArr[aGaussId] =
+            TCValueSlice(myValue, std::slice(theElemId, myNbComp, myStep));
+        }
       }
       return aValueSliceArr;
     }
@@ -662,18 +687,18 @@ namespace MED
     {
       TValueSliceArr aValueSliceArr(myNbGauss);
       if(GetModeSwitch() == eFULL_INTERLACE){
-	TInt anId = theElemId*myStep;
-	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
-	  aValueSliceArr[aGaussId] =
-	    TValueSlice(myValue, std::slice(anId, myNbComp, 1));
-	  anId += myNbComp;
-	}
+        TInt anId = theElemId*myStep;
+        for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+          aValueSliceArr[aGaussId] =
+            TValueSlice(myValue, std::slice(anId, myNbComp, 1));
+          anId += myNbComp;
+        }
       }
       else{
-	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
-	  aValueSliceArr[aGaussId] =
-	    TValueSlice(myValue, std::slice(theElemId, myNbComp, myStep));
-	}
+        for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+          aValueSliceArr[aGaussId] =
+            TValueSlice(myValue, std::slice(theElemId, myNbComp, myStep));
+        }
       }
       return aValueSliceArr;
     }
@@ -684,18 +709,18 @@ namespace MED
     {
       TCValueSliceArr aValueSliceArr(myNbComp);
       if(GetModeSwitch() == eFULL_INTERLACE){
-	TInt anId = theElemId*myStep;
-	for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
-	  aValueSliceArr[aCompId] =
-	    TCValueSlice(myValue, std::slice(anId, myNbGauss, myNbComp));
-	  anId += 1;
-	}
+        TInt anId = theElemId*myStep;
+        for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
+          aValueSliceArr[aCompId] =
+            TCValueSlice(myValue, std::slice(anId, myNbGauss, myNbComp));
+          anId += 1;
+        }
       }
       else{
-	for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
-	  aValueSliceArr[aCompId] =
-	    TCValueSlice(myValue, std::slice(theElemId, myNbGauss, myStep));
-	}
+        for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
+          aValueSliceArr[aCompId] =
+            TCValueSlice(myValue, std::slice(theElemId, myNbGauss, myStep));
+        }
       }
       return aValueSliceArr;
     }
@@ -705,22 +730,22 @@ namespace MED
     GetCompValueSliceArr(TInt theElemId)
     {
       if(GetModeSwitch() == eFULL_INTERLACE){
-	TValueSliceArr aValueSliceArr(myNbComp);
-	TInt anId = theElemId*myStep;
-	for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
-	  aValueSliceArr[aCompId] =
-	    TValueSlice(myValue, std::slice(anId, myNbGauss, myNbComp));
-	  anId += 1;
-	}
-	return aValueSliceArr;
+        TValueSliceArr aValueSliceArr(myNbComp);
+        TInt anId = theElemId*myStep;
+        for(TInt aCompId = 0; aCompId < myNbComp; aCompId++){
+          aValueSliceArr[aCompId] =
+            TValueSlice(myValue, std::slice(anId, myNbGauss, myNbComp));
+          anId += 1;
+        }
+        return aValueSliceArr;
       }
       else{
-	TValueSliceArr aValueSliceArr(myNbGauss);
-	for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
-	  aValueSliceArr[aGaussId] =
-	    TValueSlice(myValue,std::slice(theElemId, myNbComp, myStep));
-	}
-	return aValueSliceArr;
+        TValueSliceArr aValueSliceArr(myNbGauss);
+        for(TInt aGaussId = 0; aGaussId < myNbGauss; aGaussId++){
+          aValueSliceArr[aGaussId] =
+            TValueSlice(myValue,std::slice(theElemId, myNbComp, myStep));
+        }
+        return aValueSliceArr;
       }
     }
   };
@@ -771,10 +796,10 @@ namespace MED
     virtual 
     void
     AllocateValue(EGeometrieElement theGeom,
-		  TInt theNbElem,
-		  TInt theNbGauss,
-		  TInt theNbComp,
-		  EModeSwitch theMode = eFULL_INTERLACE) = 0;
+                  TInt theNbElem,
+                  TInt theNbGauss,
+                  TInt theNbComp,
+                  EModeSwitch theMode = eFULL_INTERLACE) = 0;
     
     virtual 
     size_t
@@ -830,7 +855,7 @@ namespace MED
     {
       typename TTGeom2Value::const_iterator anIter = myGeom2Value.find(theGeom);
       if(anIter == myGeom2Value.end())
-	EXCEPTION(std::runtime_error,"TTimeStampValue::GetMeshValuePtr - myGeom2Value.find(theGeom) fails");
+        EXCEPTION(std::runtime_error,"TTimeStampValue::GetMeshValuePtr - myGeom2Value.find(theGeom) fails");
       return anIter->second;
     }
 
@@ -840,8 +865,8 @@ namespace MED
     {
       myGeomSet.insert(theGeom);
       if(myGeom2Value.find(theGeom) == myGeom2Value.end()){
-	myGeom2Value[theGeom] = PTMeshValue(new TTMeshValue());
-	return myGeom2Value[theGeom];
+        myGeom2Value[theGeom] = PTMeshValue(new TTMeshValue());
+        return myGeom2Value[theGeom];
       }
       return myGeom2Value[theGeom];
     }
@@ -880,7 +905,7 @@ namespace MED
   template<class TMeshValueTypeFrom, class TMeshValueTypeTo>
   void
   CopyTimeStampValue(SharedPtr<TTimeStampValue<TMeshValueTypeFrom> > theTimeStampValueFrom,
-		     SharedPtr<TTimeStampValue<TMeshValueTypeTo> > theTimeStampValueTo)
+                     SharedPtr<TTimeStampValue<TMeshValueTypeTo> > theTimeStampValueTo)
   {
     typedef TTimeStampValue<TMeshValueTypeFrom> TimeStampValueTypeFrom;
     typedef TTimeStampValue<TMeshValueTypeTo> TimeStampValueTypeTo;
@@ -893,21 +918,21 @@ namespace MED
       const typename TimeStampValueTypeFrom::TTMeshValue& aMeshValue = *anIter->second;
       typename TimeStampValueTypeTo::TTMeshValue& aMeshValue2 = theTimeStampValueTo->GetMeshValue(aGeom);
       aMeshValue2.Allocate(aMeshValue.myNbElem, 
-			   aMeshValue.myNbGauss, 
-			   aMeshValue.myNbComp,
-			   aMeshValue.myModeSwitch);
+                           aMeshValue.myNbGauss, 
+                           aMeshValue.myNbComp,
+                           aMeshValue.myModeSwitch);
       const typename TimeStampValueTypeFrom::TTMeshValue::TValue& aValue = aMeshValue.myValue;
       typename TimeStampValueTypeTo::TTMeshValue::TValue& aValue2 = aMeshValue2.myValue;
       TInt aSize = aValue.size();
       for(TInt anId = 0; anId < aSize; anId++)
-	aValue2[anId] = TElementTo(aValue[anId]);
+        aValue2[anId] = TElementTo(aValue[anId]);
     }
   }
 
   template<class TMeshValueType>
   void
   CopyTimeStampValue(SharedPtr<TTimeStampValue<TMeshValueType> > theTimeStampValueFrom,
-		     SharedPtr<TTimeStampValue<TMeshValueType> > theTimeStampValueTo)
+                     SharedPtr<TTimeStampValue<TMeshValueType> > theTimeStampValueTo)
   {
     typedef TTimeStampValue<TMeshValueType> TimeStampValueType;
     typename TimeStampValueType::TTGeom2Value& aGeom2Value = theTimeStampValueFrom->myGeom2Value;
@@ -924,18 +949,18 @@ namespace MED
   inline
   void
   CopyTimeStampValueBase(const PTimeStampValueBase& theValueFrom, 
-			 const PTimeStampValueBase& theValueTo)
+                         const PTimeStampValueBase& theValueTo)
   {
     if(theValueFrom->GetTypeChamp() == theValueTo->GetTypeChamp()){
       if(theValueFrom->GetTypeChamp() == eFLOAT64)
-	CopyTimeStampValue<TFloatMeshValue>(theValueFrom, theValueTo);
+        CopyTimeStampValue<TFloatMeshValue>(theValueFrom, theValueTo);
       else if(theValueFrom->GetTypeChamp() == eINT)
-	CopyTimeStampValue<TIntMeshValue>(theValueFrom, theValueTo);
+        CopyTimeStampValue<TIntMeshValue>(theValueFrom, theValueTo);
     }else{
       if(theValueFrom->GetTypeChamp() == eFLOAT64 && theValueTo->GetTypeChamp() == eINT)
-	CopyTimeStampValue<TFloatMeshValue, TIntMeshValue>(theValueFrom, theValueTo);
+        CopyTimeStampValue<TFloatMeshValue, TIntMeshValue>(theValueFrom, theValueTo);
       else if(theValueFrom->GetTypeChamp() == eINT && theValueTo->GetTypeChamp() == eFLOAT64)
-	CopyTimeStampValue<TIntMeshValue, TFloatMeshValue>(theValueFrom, theValueTo);
+        CopyTimeStampValue<TIntMeshValue, TFloatMeshValue>(theValueFrom, theValueTo);
     }
   }
 
@@ -949,7 +974,7 @@ namespace MED
   typedef std::map<TInt,TFloatVector> TIndexes;
   typedef std::map<TInt,TString> TNames;
   
-  //! Define a base class which represents MED Grille 
+  //! Define a base class which represents MED Grille (structured mesh)
   struct MEDWRAPPER_EXPORT TGrilleInfo:
     virtual TModeSwitchInfo
   {
@@ -963,8 +988,8 @@ namespace MED
     TNodeCoord& GetNodeCoord();
     //! Gives coordinates for mesh node by its number, array index from 0
     TNodeCoord GetCoord(TInt theId);
-    //! Gives ids of nodes for mesh cell by its number, array index from 0
-    TIntVector GetConn(TInt theId);
+    //! Gives ids of nodes for mesh cell or sub-cell by its number, array index from 0
+    TIntVector GetConn(TInt theId, const bool isSub=false);
 
     EGrilleType myGrilleType; //!< Defines grille type (eGRILLE_CARTESIENNE,eGRILLE_POLAIRE,eGRILLE_STANDARD)
     //!Gets grille type (const version)
@@ -1004,12 +1029,14 @@ namespace MED
     
     TInt GetNbNodes();//! Return count of all points
     TInt GetNbCells();//! Return count of all cells
+    TInt GetNbSubCells();//! Return count of all entities of <mesh dimension-1>
     EGeometrieElement GetGeom();//! Return geometry of cells (calculated from mesh dimension)
+    EGeometrieElement GetSubGeom();//! Return geometry of subcells (calculated from mesh dimension)
     EEntiteMaillage GetEntity();//! Return entity (eMAILLE)
+    EEntiteMaillage GetSubEntity();//! Return sub entity
 
     /*!
      *Vector of grille structure (Example: {3,4,5}, 3 nodes in X axe, 4 nodes in Y axe, ...)
-     *Used only for eGRILLE_STANDARD
      */
     TIntVector myGrilleStructure;
     //!Gets grille structure(const version)
@@ -1027,6 +1054,15 @@ namespace MED
     TInt GetFamNum(TInt theId) const;
     //! Set number of a MED FAMILY for the mesh element with the  order number
     void SetFamNum(TInt theId, TInt theVal);
+    
+    /*!
+     *Defines sequence MED Family indexes for sub entites
+     */
+    TElemNum myFamSubNum; 
+    //! Get number of a MED FAMILY by order number of sub element
+    TInt GetFamSubNum(TInt theId) const;
+    //! Set number of a MED FAMILY for theId-th sub element
+    void SetFamSubNum(TInt theId, TInt theVal);
     
     /*!
      *Defines sequence MED Family indexes for corresponding mesh nodes

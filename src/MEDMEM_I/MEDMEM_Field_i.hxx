@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //=============================================================================
 // File      : MEDMEM_Field_i.hxx
 // Project   : SALOME
@@ -52,7 +53,7 @@
 
 namespace MEDMEM {
 class MEDMEM_I_EXPORT FIELD_i: public virtual POA_SALOME_MED::FIELD,
-	       public SALOME::GenericObj_i
+               public SALOME::GenericObj_i
 {
 public :
         static map < int, ::MEDMEM::FIELD_ * > fieldMap ;
@@ -64,7 +65,7 @@ protected :
     // are protected because it is not supposed to be instancied
 
     ::MEDMEM::FIELD_ * const  _fieldTptr;
-    const int	_corbaIndex;
+    const int   _corbaIndex;
     string  _FieldId;
     FIELD_i();
     FIELD_i(MEDMEM::FIELD_ * const field, bool ownCppPtr);
@@ -74,30 +75,30 @@ public :
     // Associated internal methods
     ~FIELD_i();
 
-    char *   		    getName() 	     throw (SALOME::SALOME_Exception);
+    char *                  getName()        throw (SALOME::SALOME_Exception);
     void                    setName(const char* theName)
-					     throw (SALOME::SALOME_Exception);
+                                             throw (SALOME::SALOME_Exception);
 
-    char *   		    getDescription() throw (SALOME::SALOME_Exception);
+    char *                  getDescription() throw (SALOME::SALOME_Exception);
     SALOME_MED::SUPPORT_ptr getSupport()     throw (SALOME::SALOME_Exception);
-    CORBA::Long             getNumberOfComponents()   	   
-					     throw (SALOME::SALOME_Exception);
+    CORBA::Long             getNumberOfComponents()        
+                                             throw (SALOME::SALOME_Exception);
     char *                  getComponentName(CORBA::Long i)   
-					     throw (SALOME::SALOME_Exception);
+                                             throw (SALOME::SALOME_Exception);
     char *                  getComponentUnit(CORBA::Long i)   
-					     throw (SALOME::SALOME_Exception);
+                                             throw (SALOME::SALOME_Exception);
     char *                  getComponentDescription(CORBA::Long i)   
-					     throw (SALOME::SALOME_Exception);
-    CORBA::Long             getIterationNumber()   	       
-					     throw (SALOME::SALOME_Exception);
+                                             throw (SALOME::SALOME_Exception);
+    CORBA::Long             getIterationNumber()               
+                                             throw (SALOME::SALOME_Exception);
     CORBA::Long             getOrderNumber() throw (SALOME::SALOME_Exception);
     CORBA::Boolean getGaussPresence();
     CORBA::Double           getTime()        throw (SALOME::SALOME_Exception);
     CORBA::Long             getCorbaIndex()  throw (SALOME::SALOME_Exception);
 
-    SALOME_MED::string_array * getComponentsNames()  throw (SALOME::SALOME_Exception);
-    SALOME_MED::string_array * getComponentsUnits()  throw (SALOME::SALOME_Exception);
-    SALOME_MED::string_array * getComponentsDescriptions()  throw (SALOME::SALOME_Exception);
+    SALOME_TYPES::ListOfString * getComponentsNames()  throw (SALOME::SALOME_Exception);
+    SALOME_TYPES::ListOfString * getComponentsUnits()  throw (SALOME::SALOME_Exception);
+    SALOME_TYPES::ListOfString * getComponentsDescriptions()  throw (SALOME::SALOME_Exception);
 
     void addInStudy(SALOMEDS::Study_ptr myStudy,
                     SALOME_MED::FIELD_ptr myIor)
@@ -110,12 +111,12 @@ public :
                                       SALOMEDS::StudyBuilder::LockProtection);
 
     CORBA::Long addDriver (SALOME_MED::medDriverTypes driverType, 
-			   const char* fileName, const char* fieldName)
-                    	                  throw (SALOME::SALOME_Exception);
+                           const char* fileName, const char* fieldName)
+                                          throw (SALOME::SALOME_Exception);
     void        rmDriver  (CORBA::Long i) throw (SALOME::SALOME_Exception);
     void        read      (CORBA::Long i) throw (SALOME::SALOME_Exception);
     void        write     (CORBA::Long i, const char* driverFieldName)
-                    		          throw (SALOME::SALOME_Exception);
+                                          throw (SALOME::SALOME_Exception);
     // Cuisine Interne
     MEDMEM::FIELD_ * constructConstField() const;
 

@@ -1,27 +1,27 @@
- //  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 /*
   File Support.hxx
-  $Header$
 */
 
 #ifndef SUPPORT_HXX
@@ -44,6 +44,7 @@
 
 namespace MEDMEM {
 
+  class GMESH;
   class MESH;
 
 /*!
@@ -62,7 +63,7 @@ protected:
     Support name.
     \endif
   */
-  string                   _name;
+  std::string                   _name;
 
  /*!
     \if developper
@@ -70,21 +71,21 @@ protected:
     is NULL.
     \endif
   */
-  mutable string                   _meshName;
+  mutable std::string                   _meshName;
 
   /*!
     \if developper
     Description of the support (optional).
     \endif
   */
-  string                   _description;
+  std::string                   _description;
 
   /*!
     \if developper
     Reference to the mesh on which the support is defined.
     \endif
   */
-  mutable MESH *                   _mesh;
+  mutable const GMESH *            _mesh;
 
   /*!
     \if developper
@@ -162,14 +163,12 @@ protected:
     \endif
   */
 
-  vector< string > _profilNames;
-
+  std::vector< std::string > _profilNames;
 public:
-
   SUPPORT();
-  SUPPORT(MESH* Mesh, string Name="", MED_EN::medEntityMesh Entity=MED_EN::MED_CELL);
+  //SUPPORT(GMESH* Mesh, std::string Name="", MED_EN::medEntityMesh Entity=MED_EN::MED_CELL);
   SUPPORT(const SUPPORT & m);
-  virtual ~SUPPORT();
+public:
   friend MEDMEM_EXPORT ostream & operator<<(ostream &os,const SUPPORT &my);
 
   SUPPORT& operator=(const SUPPORT &support);
@@ -177,45 +176,43 @@ public:
   bool deepCompare(const SUPPORT &support) const;
   void update();
 
-  inline void setName(string Name);
-  inline void setDescription(string Description);
-  void setMesh(MESH *Mesh) const;
-  void setMeshDirectly(MESH *Mesh) const { _mesh=Mesh; }
-  inline void setMeshName(const string & meshName);
+  inline void setName(const std::string& Name);
+  inline void setDescription(const std::string& Description);
+  void        setMesh(const GMESH *Mesh) const;
+  void        setMeshName(const string & meshName);
   inline void setAll(bool All);
-  inline void setEntity(MED_EN::medEntityMesh Entity);
-  inline void setNumberOfGeometricType(int NumberOfGeometricType);
-  inline void setGeometricType(const MED_EN::medGeometryElement *GeometricType);
-  inline void setNumberOfElements(const int *NumberOfElements);
-  //inline void setTotalNumberOfElements(int TotalNumberOfElements);
-  inline void setNumber(MEDSKYLINEARRAY * Number);
-  inline void setNumber(const int * index, const int* value, bool shallowCopy=false);
+  void        setEntity(MED_EN::medEntityMesh Entity);
+  void        setNumberOfGeometricType(int NumberOfGeometricType);
+  void        setGeometricType(const MED_EN::medGeometryElement *GeometricType);
+  void        setNumberOfElements(const int *NumberOfElements);
+  void        setNumber(MEDSKYLINEARRAY * Number);
+  void        setNumber(const int * index, const int* value, bool shallowCopy=false);
 
-  inline string getName() const;
-  inline string getDescription() const;
-  virtual inline MESH * getMesh() const;
-  string getMeshName() const;
+  inline const std::string&    getName() const;
+  inline const std::string&    getDescription() const;
+  virtual inline const GMESH * getMesh() const;
+  std::string                  getMeshName() const;
   inline MED_EN::medEntityMesh getEntity() const;
 
   inline bool   isOnAllElements() const;
   inline int    getNumberOfTypes() const;
   inline const MED_EN::medGeometryElement* getTypes() const ;
-  inline int    getNumberOfElements(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
-  inline  const int * getNumberOfElements() const throw (MEDEXCEPTION);
-  virtual inline MEDSKYLINEARRAY *  getnumber() const throw (MEDEXCEPTION);
-  virtual inline MEDSKYLINEARRAY *  getnumberFromFile() const throw (MEDEXCEPTION);
-  virtual inline const int *  getNumber(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
-  virtual inline const int *  getNumberFromFile(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
-  virtual inline const int *  getNumberIndex() const throw (MEDEXCEPTION);
+  int           getNumberOfElements(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
+  const int *   getNumberOfElements() const throw (MEDEXCEPTION);
+  virtual MEDSKYLINEARRAY *   getnumber() const throw (MEDEXCEPTION);
+  virtual MEDSKYLINEARRAY *   getnumberFromFile() const throw (MEDEXCEPTION);
+  virtual const int *         getNumber(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
+  virtual const int *         getNumberFromFile(MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
+  virtual        const int *  getNumberIndex() const throw (MEDEXCEPTION);
   virtual int getValIndFromGlobalNumber(const int number) const throw (MEDEXCEPTION);
 
-  void blending(SUPPORT * mySupport) throw (MEDEXCEPTION) ;
+  void blending(const SUPPORT * mySupport) throw (MEDEXCEPTION) ;
 
   // Les numéros d'entités dans les profils doivent être croissant
   // pour respecter la norme MED
-  void setpartial(string Description, int NumberOfGeometricType,
-		  int TotalNumberOfEntity, MED_EN::medGeometryElement *GeometricType,
-		  int *NumberOfEntity, int *NumberValue);
+  void setpartial(const std::string& Description, int NumberOfGeometricType,
+                  int TotalNumberOfEntity, const MED_EN::medGeometryElement *GeometricType,
+                  const int *NumberOfEntity, const int *NumberValue);
 
   void setpartial(MEDSKYLINEARRAY * number, bool shallowCopy=false) throw (MEDEXCEPTION);
 
@@ -224,157 +221,36 @@ public:
   
   // Si les noms de profils ne sont pas positionnés, les profils ne seront
   // pas écrits par MEDFICHIER.
-  void   setProfilNames(vector<string> profilNames) throw (MEDEXCEPTION);
+  void   setProfilNames(const std::vector<std::string>& profilNames) throw (MEDEXCEPTION);
   //string getProfilName(const MED_EN::medGeometryElement GeometricType) const throw (MEDEXCEPTION);
-  vector<string> getProfilNames() const throw (MEDEXCEPTION);
+  std::vector<std::string> getProfilNames() const throw (MEDEXCEPTION);
 
   void getBoundaryElements() throw (MEDEXCEPTION);
-  void changeElementsNbs(MED_EN::medEntityMesh entity, const int *renumberingFromOldToNew, int limitNbClassicPoly, const int *renumberingFromOldToNewPoly=0);
-  void intersecting(SUPPORT * mySupport) throw (MEDEXCEPTION) ;
+  void changeElementsNbs(MED_EN::medEntityMesh entity, const int *renumberingFromOldToNew);
+  void intersecting(const SUPPORT * mySupport) throw (MEDEXCEPTION) ;
   bool belongsTo(const SUPPORT& other, bool deepCompare=false) const;
   SUPPORT *getComplement() const;
   SUPPORT *substract(const SUPPORT& other) const throw (MEDEXCEPTION) ;
   SUPPORT *getBoundaryElements(MED_EN::medEntityMesh Entity) const throw (MEDEXCEPTION);
-  void fillFromNodeList(const list<int>& listOfNode) throw (MEDEXCEPTION);
-  void fillFromElementList(const list<int>& listOfElt) throw (MEDEXCEPTION);
+  SUPPORT* buildSupportOnNode() const throw (MEDEXCEPTION);
+  void fillFromNodeList(const std::list<int>& listOfNode) throw (MEDEXCEPTION);
+  void fillFromElementList(const std::list<int>& listOfElt) throw (MEDEXCEPTION);
   void clearDataOnNumbers();
-  MESH* makeMesh();
-  //A.G. Addings for RC
-  virtual void addReference() const;
-  virtual void removeReference() const;
-protected:
-  static list<int> *sub(int start,int end,const int *idsToSuppress,int lgthIdsToSuppress);
-  static list<int> *sub(const int *ids,int lgthIds,const int *idsToSuppress,int lgthIdsToSuppress);
+  MESH* makeMesh() const;
+ protected:
+  virtual ~SUPPORT();
+ protected:
+  static std::list<int> *sub(int start,int end,const int *idsToSuppress,int lgthIdsToSuppress);
+  static std::list<int> *sub(const int *ids,int lgthIds,const int *idsToSuppress,int lgthIdsToSuppress);
 };
 
 // _____________________
 // Methodes Inline
 // _____________________
 
-/*!\if MEDMEM_ug 
-\addtogroup SUPPORT_query
-@{
-\endif
-*/
-
-/*!
-  This method returns the number of all elements of the type GeometricType.
-
-  If isOnAllElements is false, it returns the number of elements in the
-  support otherwise it returns number of elements in the mesh.
-
-  Example : number of MED_TRIA3 or MED_ALL_ELEMENTS elements
-  in support.
-
-  Note : If SUPPORT is defined on MED_NODE, use MED_ALL_ELEMENTS as
-         medGeometryElement GeometricType and it will return the number
-	 of nodes in the support (or in the mesh).
-*/
-//-----------------------------------------------------------------------------
-inline int SUPPORT::getNumberOfElements(MED_EN::medGeometryElement GeometricType) const
-  throw (MEDEXCEPTION)
-//-----------------------------------------------------------------------------
-{
-  if (GeometricType==MED_EN::MED_ALL_ELEMENTS)
-    return _totalNumberOfElements;
-  for (int i=0;i<_numberOfGeometricType;i++)
-    if (_geometricType[i]==GeometricType)
-      return _numberOfElements[i];
-  throw MEDEXCEPTION("Support::getNumberOfElements : Geometric type not found !") ;
-}
-
-  /*! Returns the total number of elements in the support. */
-//-----------------------------------------------------------------------------
-inline  const int * SUPPORT::getNumberOfElements() const throw (MEDEXCEPTION) {
-//-----------------------------------------------------------------------------
-  return _numberOfElements;
-}
-
-//---------------------------------------------------------------------
-inline MEDSKYLINEARRAY * SUPPORT::getnumber() const
-  throw (MEDEXCEPTION)
-//---------------------------------------------------------------------
-{
-  if (_number==NULL)
-    throw MEDEXCEPTION("Support::getnumber : Not defined !") ;
-  return _number ;
-}
-
-//---------------------------------------------------------------------
-inline MEDSKYLINEARRAY * SUPPORT::getnumberFromFile() const
-  throw (MEDEXCEPTION)
-//---------------------------------------------------------------------
-{
-  if (_number_fromfile==NULL)
-    throw MEDEXCEPTION("Support::getnumberFromFile : Not defined !") ;
-  return _number_fromfile ;
-}
-
-/*!
-  If isOnAllElements is false, returns an array which contains
-  all number of given medGeometryElement.
-
-  Numbering is global, ie numbers are bounded by 1 and
-  MESH::getNumberOfElement(entity,MED_ALL_ELEMENTS) and not by 1 and
-  MESH::getNumberOfElement(entity,geomElement).
-
-  Note : If SUPPORT is defined on MED_NODE, use MED_NONE
-  medGeometryElement type.
-*/
-//---------------------------------------------------------------------
-inline const int * SUPPORT::getNumber(MED_EN::medGeometryElement GeometricType) const
-  throw (MEDEXCEPTION)
-//---------------------------------------------------------------------
-{
-  const char * LOC = "Support::getNumber : " ;
-  if (_isOnAllElts)
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined, support is on all entity !")) ;
-  if (GeometricType==MED_EN::MED_ALL_ELEMENTS)
-    return _number->getValue() ;
-  for (int i=0;i<_numberOfGeometricType;i++)
-    if (_geometricType[i]==GeometricType)
-      return _number->getI(i+1) ;
-  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"GeometricType not found !")) ;
-}
-
-//---------------------------------------------------------------------
-inline const int * SUPPORT::getNumberFromFile(MED_EN::medGeometryElement GeometricType) const
-  throw (MEDEXCEPTION)
-//---------------------------------------------------------------------
-{
-  const char * LOC = "Support::getNumberFromFile : " ;
-//   if (_isOnAllElts)
-//     throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined, support is on all entity !")) ;
-  if (GeometricType==MED_EN::MED_ALL_ELEMENTS)
-    return _number_fromfile->getValue() ;
-  for (int i=0;i<_numberOfGeometricType;i++)
-    if (_geometricType[i]==GeometricType)
-      return _number_fromfile->getI(i+1) ;
-  throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"GeometricType not found !")) ;
-}
-
-/*!
-  If isOnAllElements is false, returns index of element number.
-  Use it with getNumber(MED_ALL_ELEMENTS).
-
-  Note : See getConnectivityIndex for details.
-*/
-//-------------------------------------------
-inline const int * SUPPORT::getNumberIndex() const
-//-------------------------------------------
-  throw (MEDEXCEPTION)
-{
-  if (_isOnAllElts)
-    throw MEDEXCEPTION("Support::getNumberIndex : Not defined, support is on all entity !") ;
-  return _number->getIndex() ;
-}
-/*! \if MEDMEM_ug
-@}
-\endif */
-
 /*! set the attribute _name to Name */
 //--------------------------------------
-inline void SUPPORT::setName(string Name)
+inline void SUPPORT::setName(const std::string& Name)
 //--------------------------------------
 {
   _name=Name;
@@ -382,24 +258,10 @@ inline void SUPPORT::setName(string Name)
 
 /*! set the attribute _description to Description */
 //--------------------------------------------------
-inline void SUPPORT::setDescription(string Description)
+inline void SUPPORT::setDescription(const std::string& Description)
 //--------------------------------------------------
 {
   _description=Description;
-}
-
-
-/*! set the meshName if there is ni reference _mesh to Mesh */
-//--------------------------------------
-inline void SUPPORT::setMeshName(const string & meshName)
-//--------------------------------------
-{
-  const char * LOC = "SUPPORT::setMeshName(const string & meshName) : ";
-
-  if (_mesh)
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Setting meshName is not possible when an associated mesh is set !")) ;
-
-  _meshName=meshName;
 }
 
   /*! \if MEDMEM_ug
@@ -411,9 +273,9 @@ inline void SUPPORT::setMeshName(const string & meshName)
 /*! Creates a support on all elements of the type specified in the constructor.
 
   Even if _isonAllElts is true, geometric types defining the FIELD's SUPPORT
-  must be read from the SUPPORT not from the associated MESH (the geometric
+  must be read from the SUPPORT not from the associated GMESH (the geometric
   types defining the FIELD's SUPPORT may be a subset of the geometric types
-  defined in the MESH even if for each SUPPORT geometric type all MESH entities
+  defined in the GMESH even if for each SUPPORT geometric type all MESH entities
   are used).
 */
 //------------------------------------------
@@ -424,109 +286,17 @@ inline void SUPPORT::setAll(bool All)
 }
   /*! \if MEDMEM_ug  @} \endif */
 
-/*! set the attribute _entity to Entity */
-//------------------------------------------
-inline void SUPPORT::setEntity(MED_EN::medEntityMesh Entity)
-{
-  _entity=Entity;
-}
-
-/*! set the attribute _numberOfGeometricType to NumberOfGeometricType */
-//---------------------------------------------------------------------
-inline void SUPPORT::setNumberOfGeometricType(int NumberOfGeometricType)
-//---------------------------------------------------------------------
-{
-  _numberOfGeometricType=NumberOfGeometricType;
-
-  _geometricType.set(0);
-  _numberOfElements.set(0);
-}
-
-/*! set the attribute _geometricType to geometricType */
-//---------------------------------------------------------------------
-inline void SUPPORT::setGeometricType(const MED_EN::medGeometryElement *GeometricType)
-//---------------------------------------------------------------------
-{
-  if (!_geometricType)
-    _geometricType.set(_numberOfGeometricType);
-  for (int i=0;i<_numberOfGeometricType;i++)
-    _geometricType[i] = GeometricType[i];
-
-  if (_profilNames.empty())
-    {
-      // giving a default value to profile names
-      vector<string> prof_names( _numberOfGeometricType);
-      for (int itype=0; itype < _numberOfGeometricType; itype++)
-	{
-	  ostringstream typestr;
-	  typestr<<_name<<"_type"<<_geometricType[itype];
-	  prof_names[itype]=typestr.str();
-	}
-      _profilNames=prof_names;
-    }
-}
-
-
-/*!
-  Set the attribute _numberOfElements to NumberOfElements and
-  calculate the total number of elements.
-*/
-//----------------------------------------------------------
-inline void SUPPORT::setNumberOfElements(const int *NumberOfElements)
-//----------------------------------------------------------
-{
-  if (_numberOfElements == NULL)
-    if (_numberOfGeometricType)
-      _numberOfElements.set(_numberOfGeometricType,NumberOfElements);
-    else
-      _numberOfElements.set(0);
-  _totalNumberOfElements = 0 ;
-  for (int i=0;i<_numberOfGeometricType;i++)
-    _totalNumberOfElements+=_numberOfElements[i];
-}
-
-/*! set the attribute _totalNumberOfElements to TotalNumberOfElements */
-//--------------------------------------------------------------------
-//inline void SUPPORT::setTotalNumberOfElements(int TotalNumberOfElements)
-//--------------------------------------------------------------------
-//{
-//  _totalNumberOfElements=TotalNumberOfElements;
-//}
-
-/*! set the attribute _number to Number */
-//---------------------------------------------------
-inline void SUPPORT::setNumber(MEDSKYLINEARRAY * Number)
-//---------------------------------------------------
-{
-  const char * LOC = "SUPPORT::setNumber(MEDSKYLINEARRAY * Number)";
-  if ( _isOnAllElts )
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Support is on all elements")) ;
-
-  if (_number != NULL) delete _number ;
-  _number=Number;
-}
-
-/*! set the attribute _number with index and value arrays */
-//---------------------------------------------------
-inline void SUPPORT::setNumber(const int * index, const int* value, bool shallowCopy)
-//---------------------------------------------------
-{
-  if (_number != NULL) delete _number ;
-  _number= new MEDSKYLINEARRAY(_numberOfGeometricType,_totalNumberOfElements,index,value,shallowCopy);
-}
-
 /*! returns the name of the support. */
 //------------------------------------
-inline string SUPPORT::getName() const
+inline const std::string& SUPPORT::getName() const
 //------------------------------------
 {
   return _name;
 }
 
-
 /*! returns the description of the support. */
 //--------------------------------------------
-inline string SUPPORT::getDescription() const
+inline const std::string& SUPPORT::getDescription() const
 //--------------------------------------------
 {
   return _description;
@@ -534,7 +304,7 @@ inline string SUPPORT::getDescription() const
 
 /*! returns a reference to the mesh */
 //------------------------------------
-inline MESH * SUPPORT::getMesh() const
+inline const GMESH * SUPPORT::getMesh() const
 //------------------------------------
 {
   return _mesh;

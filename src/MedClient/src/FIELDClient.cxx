@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 template<class T, class INTERLACING_TAG>
 FIELDClient<T,INTERLACING_TAG>::FIELDClient(typename FIELDI_TRAITS<T,INTERLACING_TAG>::SimpleFieldCorbaPtrType ptrCorba,MEDMEM::SUPPORT * S):_fieldPtr(FIELDI_TRAITS<T,INTERLACING_TAG>::SimpleFieldGlobalType::_duplicate(ptrCorba)),_refCounter(1)
 {
@@ -31,7 +32,7 @@ FIELDClient<T,INTERLACING_TAG>::FIELDClient(typename FIELDI_TRAITS<T,INTERLACING
   else
     MEDMEM::FIELD<T,INTERLACING_TAG>::setSupport(S);
   
-  setName(_fieldPtr->getName());
+  this->setName(_fieldPtr->getName());
 
   MEDMEM::FIELD<T,INTERLACING_TAG>::setDescription(_fieldPtr->getDescription());
   int nc = _fieldPtr->getNumberOfComponents();
@@ -41,7 +42,7 @@ FIELDClient<T,INTERLACING_TAG>::FIELDClient(typename FIELDI_TRAITS<T,INTERLACING
 
   string * _s = new string[nc];
 
-  SALOME_MED::string_array_var s;
+  SALOME_TYPES::ListOfString_var s;
   s = _fieldPtr->getComponentsNames();
   for (int i=0; i<nc; i++)
     _s[i] = s[i];
@@ -58,9 +59,9 @@ FIELDClient<T,INTERLACING_TAG>::FIELDClient(typename FIELDI_TRAITS<T,INTERLACING
   MEDMEM::FIELD<T,INTERLACING_TAG>::setMEDComponentsUnits(_s);
 
   delete [] _s;
-  setIterationNumber(_fieldPtr->getIterationNumber());
-  setTime(_fieldPtr->getTime());
-  setOrderNumber(_fieldPtr->getOrderNumber());
+  this->setIterationNumber(_fieldPtr->getIterationNumber());
+  this->setTime(_fieldPtr->getTime());
+  this->setOrderNumber(_fieldPtr->getOrderNumber());
   fillCopy();
 }
 
@@ -84,7 +85,6 @@ void FIELDClient<T,INTERLACING_TAG>::fillCopy()
 template<class T, class INTERLACING_TAG>
 FIELDClient<T,INTERLACING_TAG>::~FIELDClient()
 {
-  _fieldPtr->Destroy();
   CORBA::release(_fieldPtr);
   /* CCAR : better put in FIELD_ destructor if support is a SUPPORTClient
   if(FIELD<T,INTERLACING_TAG>::_support)

@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 //  File   : testUSkyLineArray.cxx
 //  Module : MED
 //
@@ -33,7 +31,7 @@ int main (int argc, char ** argv)
 {
 
   int NumberOfCell = 3 ; // 1 triangle,1 quadrangle,1 triangle
-  int Size = 10 ;	 // 10 nodes
+  int Size = 10 ;        // 10 nodes
 
   int * index = new int[NumberOfCell+1];
   index[0]=1;
@@ -58,7 +56,7 @@ int main (int argc, char ** argv)
   const int * ArrayIndex ;
   try
   {
-  	ArrayIndex = myArray->getIndex() ;
+        ArrayIndex = myArray->getIndex() ;
   }
   catch ( const std::exception &e )
   {
@@ -101,7 +99,7 @@ int main (int argc, char ** argv)
   try
   {
         ASSERT_MED(myArray->getNumberOf()==NumberOfCell);
-  	cout << myArray->getNumberOf() << endl;
+        cout << myArray->getNumberOf() << endl;
   }
   catch ( const std::exception &e )
   {
@@ -146,7 +144,7 @@ int main (int argc, char ** argv)
     const int * cell;
     try
     {
-	cell = myArray->getI(i) ;
+        cell = myArray->getI(i) ;
     }
     catch ( const std::exception &e )
     {
@@ -167,7 +165,7 @@ int main (int argc, char ** argv)
     int numberof;
     try
     {
- 	numberof= myArray->getNumberOfI(i) ;
+        numberof= myArray->getNumberOfI(i) ;
         ASSERT_MED(numberof==index[i]-index[i-1]);
     }
     catch ( const std::exception &e )
@@ -189,35 +187,35 @@ int main (int argc, char ** argv)
     cout << " - " ;
     for (int j=0;j<numberof;j++)
     {
-    	cout << cell[j] << " " ;
-	try
-	{
-		int verif=myArray->getIJ(i,j+1);
-		if (verif != cell[j])
-		{
-			cout << "----------------------------------" << endl;
-			cout << " incoherence dans les valeurs :   " << endl;
-			cout << " cell[" << j << "] : " << cell[j] << endl;
-			cout << " getIJ(" << i <<"," << j << ") : " << verif << endl;
-			cout << "----------------------------------" << endl;
-        		return EXIT_FAILURE ;
-		}
-	}
-	catch ( const std::exception &e )
-    	{
-        	cout << "----------------------------------" << endl;
-        	cout << "pb avec getIJ, valeurs de i / j : " << i << " " << j<< endl;
-        	cout << "----------------------------------" << endl;
-        	MESSAGE_MED( "catched exception : " << e.what() ) ;
-        	return EXIT_FAILURE ;
-    	}
-    	catch (...)
-    	{
-        	cout << "----------------------------------" << endl;
-        	cout << "pb avec getIJ, valeurs de i / j : " << i << " " << j<< endl;
-        	cout << "----------------------------------" << endl;
-        	return EXIT_FAILURE ;
-    	}
+        cout << cell[j] << " " ;
+        try
+        {
+                int verif=myArray->getIJ(i,j+1);
+                if (verif != cell[j])
+                {
+                        cout << "----------------------------------" << endl;
+                        cout << " incoherence dans les valeurs :   " << endl;
+                        cout << " cell[" << j << "] : " << cell[j] << endl;
+                        cout << " getIJ(" << i <<"," << j << ") : " << verif << endl;
+                        cout << "----------------------------------" << endl;
+                        return EXIT_FAILURE ;
+                }
+        }
+        catch ( const std::exception &e )
+        {
+                cout << "----------------------------------" << endl;
+                cout << "pb avec getIJ, valeurs de i / j : " << i << " " << j<< endl;
+                cout << "----------------------------------" << endl;
+                MESSAGE_MED( "catched exception : " << e.what() ) ;
+                return EXIT_FAILURE ;
+        }
+        catch (...)
+        {
+                cout << "----------------------------------" << endl;
+                cout << "pb avec getIJ, valeurs de i / j : " << i << " " << j<< endl;
+                cout << "----------------------------------" << endl;
+                return EXIT_FAILURE ;
+        }
     }
     cout << endl ;
   }

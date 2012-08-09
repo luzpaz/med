@@ -68,17 +68,17 @@ MEDnChamp(med_idt fid, int indice)
        */
       num = indice-1;
       if ((ret = _MEDobjetIdentifier(fid,chemin,num,nomdatagroup)) < 0)
-	return -1;
+        return -1;
       strcat(chemin,nomdatagroup);
       /*
        * On recupere le nombre de composants
        */
       if ((datagroup = _MEDdatagroupOuvrir(fid,chemin)) < 0) 
-	return -1;
+        return -1;
       if ((ret = _MEDattrEntierLire(datagroup,MED_NOM_NCO,&n2)) < 0)
-	return -1;
+        return -1;
       if ((ret = _MEDdatagroupFermer(datagroup)) < 0)
-	return -1;
+        return -1;
     }
 
   return n2;

@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //=============================================================================
 // File      : MEDMEM_Support_i.hxx
 // Project   : SALOME
@@ -45,8 +46,8 @@ namespace MEDMEM {
 class SUPPORT;
 
 class MEDMEM_I_EXPORT SUPPORT_i: virtual public POA_SALOME_MED::SUPPORT,
-		   virtual public SALOMEMultiComm,
-		   virtual public SALOME::GenericObj_i
+                   virtual public SALOMEMultiComm,
+                   virtual public SALOME::GenericObj_i
 {
 public :
     static std::map < int,::MEDMEM::SUPPORT *> supportMap;
@@ -70,48 +71,48 @@ public:
     SUPPORT_i(const SUPPORT_i & s);
 
     // IDL Methods
-    char *               getName() 	   throw (SALOME::SALOME_Exception);
+    char *               getName()         throw (SALOME::SALOME_Exception);
     char *               getDescription()  throw (SALOME::SALOME_Exception);
-    SALOME_MED::MESH_ptr getMesh() 	   throw (SALOME::SALOME_Exception);
+    SALOME_MED::GMESH_ptr getMesh()         throw (SALOME::SALOME_Exception);
     CORBA::Boolean       isOnAllElements() throw (SALOME::SALOME_Exception);
     SALOME_MED::medEntityMesh getEntity()  throw (SALOME::SALOME_Exception);
-    CORBA::Long    	 getNumberOfElements(SALOME_MED::medGeometryElement geomElement) 
-					   throw (SALOME::SALOME_Exception);
+    CORBA::Long          getNumberOfElements(SALOME_MED::medGeometryElement geomElement) 
+                                           throw (SALOME::SALOME_Exception);
     CORBA::Long          getNumberOfTypes()
                                            throw (SALOME::SALOME_Exception);
-    SALOME_MED::long_array* getNumber(SALOME_MED::medGeometryElement geomElement) 
-					   throw (SALOME::SALOME_Exception);
+    SALOME_TYPES::ListOfLong* getNumber(SALOME_MED::medGeometryElement geomElement) 
+                                           throw (SALOME::SALOME_Exception);
 
-    SALOME_MED::long_array* getNumberFromFile(SALOME_MED::medGeometryElement geomElement) 
+    SALOME_TYPES::ListOfLong* getNumberFromFile(SALOME_MED::medGeometryElement geomElement) 
                                            throw (SALOME::SALOME_Exception);
 
     SALOME::SenderInt_ptr getSenderForNumber(SALOME_MED::medGeometryElement geomElement) 
                                            throw (SALOME::SALOME_Exception);
-    SALOME_MED::long_array* getNumberIndex() 
-					   throw (SALOME::SALOME_Exception);
+    SALOME_TYPES::ListOfLong* getNumberIndex() 
+                                           throw (SALOME::SALOME_Exception);
     SALOME::SenderInt_ptr getSenderForNumberIndex() 
                                            throw (SALOME::SALOME_Exception);
     CORBA::Long          getNumberOfGaussPoint(SALOME_MED::medGeometryElement geomElement) 
-					   throw (SALOME::SALOME_Exception);
-    SALOME_MED::long_array* getNumbersOfGaussPoint()
+                                           throw (SALOME::SALOME_Exception);
+    SALOME_TYPES::ListOfLong* getNumbersOfGaussPoint()
                                            throw (SALOME::SALOME_Exception);
 
     SALOME_MED::medGeometryElement_array* getTypes() 
-					   throw (SALOME::SALOME_Exception);
+                                           throw (SALOME::SALOME_Exception);
 
     void getBoundaryElements()             throw (SALOME::SALOME_Exception);
 
 
   // Others
   void           addInStudy (SALOMEDS::Study_ptr myStudy, 
-			  SALOME_MED::SUPPORT_ptr myIor)
+                          SALOME_MED::SUPPORT_ptr myIor)
     throw (SALOME::SALOME_Exception, SALOMEDS::StudyBuilder::LockProtection);
 
   static std::string getEntryPath (const MEDMEM::SUPPORT * aSupport);
 
   void release();
-  //					Cuisine interne
-  CORBA::Long 	 getCorbaIndex()   throw (SALOME::SALOME_Exception);
+  //                                    Cuisine interne
+  CORBA::Long    getCorbaIndex()   throw (SALOME::SALOME_Exception);
   SALOME_MED::SUPPORT::supportInfos * getSupportGlobal()   throw (SALOME::SALOME_Exception);
 };
 }

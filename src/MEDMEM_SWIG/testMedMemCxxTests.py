@@ -1,24 +1,26 @@
-#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+#  -*- coding: iso-8859-1 -*-
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+# CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+
 from libMEDMEM_Swig import *
 
 import os,string
@@ -88,12 +90,6 @@ rootFileTest.append("")
 meshTest.append("")
 fieldTest.append("")
 
-testExecfiles.append("test_MEDMEM_PolyConnectivity")
-argListTest.append("")
-rootFileTest.append("")
-meshTest.append("")
-fieldTest.append("")
-
 testExecfiles.append("test_affect_medarray")
 argListTest.append("")
 rootFileTest.append("")
@@ -125,12 +121,6 @@ meshTest.append("")
 fieldTest.append("")
 
 testExecfiles.append("test_MEDMEM_ModulusArray")
-argListTest.append("")
-rootFileTest.append("")
-meshTest.append("")
-fieldTest.append("")
-
-testExecfiles.append("test_MEDMEM_PolyhedronArray")
 argListTest.append("")
 rootFileTest.append("")
 meshTest.append("")
@@ -280,11 +270,12 @@ argListTest.append(os.path.join(filesPath,"maillage_chemvalIV_cas1_40elts.sauve"
 meshTest.append("")
 fieldTest.append("")
 
-testExecfiles.append("test_gibi_driver")
-rootFileTest.append("maill_mistra_elim")
-argListTest.append(os.path.join(filesPath,"maill_mistra_elim.sauve"))
-meshTest.append("")
-fieldTest.append("")
+# no resource file named maill_mistra_elim.sauve
+# testExecfiles.append("test_gibi_driver")
+# rootFileTest.append("maill_mistra_elim")
+# argListTest.append(os.path.join(filesPath,"maill_mistra_elim.sauve"))
+# meshTest.append("")
+# fieldTest.append("")
 
 testExecfiles.append("test_gibi_driver")
 rootFileTest.append("mail_test1-1-qua")
@@ -407,16 +398,17 @@ fieldTest.append("")
 argListTest.append(os.path.join(filesPath,"mesh.med") + " " + "'Mesh 1'")
 
 testExecfiles.append("test_copie_family")
-rootFileTest.append("maillage_UniSegFam")
-meshTest.append("maillage_CHEMVAL_100elts")
+rootFileTest.append("pointe")
+meshTest.append("maa1")
 fieldTest.append("")
-argListTest.append(os.path.join(filesPath,"maillage_UniSegFam.med") + " " + "maillage_CHEMVAL_100elts")
-                   
-testExecfiles.append("test_copie_family")
-rootFileTest.append("carre_en_quad4")
-meshTest.append("carre_en_quad4")
-fieldTest.append("")
-argListTest.append(os.path.join(filesPath,"carre_en_quad4.med") + " " + "carre_en_quad4")
+argListTest.append(os.path.join(filesPath,"pointe.med") + " " + "maa1")
+
+# no nodal families in carre_en_quad4.med
+# testExecfiles.append("test_copie_family")
+# rootFileTest.append("carre_en_quad4")
+# meshTest.append("carre_en_quad4")
+# fieldTest.append("")
+# argListTest.append(os.path.join(filesPath,"carre_en_quad4.med") + " " + "carre_en_quad4")
 
 testExecfiles.append("test_copie_family")
 rootFileTest.append("cube_hexa8")
@@ -430,11 +422,12 @@ meshTest.append("maa1")
 fieldTest.append("")
 argListTest.append(os.path.join(filesPath,"test19.med") + " " + "maa1")
 
-testExecfiles.append("test_copie_family")
-rootFileTest.append("carre_en_quad4_seg2")
-meshTest.append("carre_en_quad4_seg2")
-fieldTest.append("")
-argListTest.append(os.path.join(filesPath,"carre_en_quad4_seg2.med") + " " + "carre_en_quad4_seg2")
+# no nodal families in carre_en_quad4_seg2.med
+# testExecfiles.append("test_copie_family")
+# rootFileTest.append("carre_en_quad4_seg2")
+# meshTest.append("carre_en_quad4_seg2")
+# fieldTest.append("")
+# argListTest.append(os.path.join(filesPath,"carre_en_quad4_seg2.med") + " " + "carre_en_quad4_seg2")
 
 testExecfiles.append("test_copie_family")
 rootFileTest.append("cube_hexa8_quad4")
@@ -448,23 +441,26 @@ meshTest.append("maa1")
 fieldTest.append("")
 argListTest.append(os.path.join(filesPath,"pointe.med") + " " + "maa1")
 
-testExecfiles.append("test_copie_group")
-rootFileTest.append("mesh")
-meshTest.append("Mesh 1")
-fieldTest.append("")
-argListTest.append(os.path.join(filesPath,"mesh.med") + " " + "'Mesh 1'")
+# no nodal grous in mesh.med
+# testExecfiles.append("test_copie_group")
+# rootFileTest.append("mesh")
+# meshTest.append("Mesh 1")
+# fieldTest.append("")
+# argListTest.append(os.path.join(filesPath,"mesh.med") + " " + "'Mesh 1'")
 
-testExecfiles.append("test_copie_group")
-rootFileTest.append("maillage_UniSegFam")
-meshTest.append("maillage_CHEMVAL_100elts")
-fieldTest.append("")
-argListTest.append(os.path.join(filesPath,"maillage_UniSegFam.med") + " " + "maillage_CHEMVAL_100elts")
-                   
-testExecfiles.append("test_copie_group")
-rootFileTest.append("carre_en_quad4")
-meshTest.append("carre_en_quad4")
-fieldTest.append("")
-argListTest.append(os.path.join(filesPath,"carre_en_quad4.med") + " " + "carre_en_quad4")
+# no nodal grous in maillage_UniSegFam.med
+# testExecfiles.append("test_copie_group")
+# rootFileTest.append("maillage_UniSegFam")
+# meshTest.append("maillage_CHEMVAL_100elts")
+# fieldTest.append("")
+# argListTest.append(os.path.join(filesPath,"maillage_UniSegFam.med") + " " + "maillage_CHEMVAL_100elts")
+
+# no nodal grous in maillage_UniSegFam.med
+# testExecfiles.append("test_copie_group")
+# rootFileTest.append("carre_en_quad4")
+# meshTest.append("carre_en_quad4")
+# fieldTest.append("")
+# argListTest.append(os.path.join(filesPath,"carre_en_quad4.med") + " " + "carre_en_quad4")
 
 testExecfiles.append("test_copie_group")
 rootFileTest.append("cube_hexa8")
@@ -478,11 +474,12 @@ meshTest.append("maa1")
 fieldTest.append("")
 argListTest.append(os.path.join(filesPath,"test19.med") + " " + "maa1")
 
-testExecfiles.append("test_copie_group")
-rootFileTest.append("carre_en_quad4_seg2")
-meshTest.append("carre_en_quad4_seg2")
-fieldTest.append("")
-argListTest.append(os.path.join(filesPath,"carre_en_quad4_seg2.med") + " " + "carre_en_quad4_seg2")
+# no nodal grous in carre_en_quad4_seg2.med
+# testExecfiles.append("test_copie_group")
+# rootFileTest.append("carre_en_quad4_seg2")
+# meshTest.append("carre_en_quad4_seg2")
+# fieldTest.append("")
+# argListTest.append(os.path.join(filesPath,"carre_en_quad4_seg2.med") + " " + "carre_en_quad4_seg2")
 
 testExecfiles.append("test_copie_group")
 rootFileTest.append("cube_hexa8_quad4")

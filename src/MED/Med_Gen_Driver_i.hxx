@@ -1,29 +1,30 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  MED MED : implemetation of MED idl descriptions
 //  File   : Med_Gen_Driver_i.hxx
 //  Author : Paul RASCLE, EDF
 //  Module : MED
-//
+
 #ifndef _MED_GEN_DRIVER_I_HXX_
 #define _MED_GEN_DRIVER_I_HXX_
 
@@ -59,31 +60,31 @@ public:
   // inherited methods from SALOMEDS::Driver
 
   SALOMEDS::TMPFile* Save(SALOMEDS::SComponent_ptr theComponent,
-			  const char* theURL,
-			  bool isMultiFile);
+                          const char* theURL,
+                          bool isMultiFile);
   SALOMEDS::TMPFile* SaveASCII(SALOMEDS::SComponent_ptr theComponent,
-			       const char* theURL,
-			       bool isMultiFile);
+                               const char* theURL,
+                               bool isMultiFile);
 
   CORBA::Boolean Load(SALOMEDS::SComponent_ptr theComponent,
-		      const SALOMEDS::TMPFile& theStream,
-		      const char* theURL,
-		      bool isMultiFile);
+                      const SALOMEDS::TMPFile& theStream,
+                      const char* theURL,
+                      bool isMultiFile);
   CORBA::Boolean LoadASCII(SALOMEDS::SComponent_ptr theComponent,
-			   const SALOMEDS::TMPFile& theStream,
-			   const char* theURL,
-			   bool isMultiFile);
+                           const SALOMEDS::TMPFile& theStream,
+                           const char* theURL,
+                           bool isMultiFile);
 
   void Close(SALOMEDS::SComponent_ptr theComponent);
 
   char* IORToLocalPersistentID(SALOMEDS::SObject_ptr theSObject,
-			       const char* IORString,
-			       CORBA::Boolean isMultiFile,
-			       CORBA::Boolean isASCII);
+                               const char* IORString,
+                               CORBA::Boolean isMultiFile,
+                               CORBA::Boolean isASCII);
   char* LocalPersistentIDToIOR(SALOMEDS::SObject_ptr theSObject,
-			       const char* aLocalPersistentID,
-			       CORBA::Boolean isMultiFile,
-			       CORBA::Boolean isASCII)
+                               const char* aLocalPersistentID,
+                               CORBA::Boolean isMultiFile,
+                               CORBA::Boolean isASCII)
     throw(SALOME::SALOME_Exception);
 
   bool CanPublishInStudy(CORBA::Object_ptr theIOR);
@@ -98,14 +99,14 @@ public:
 
   CORBA::Boolean CanPaste(const char* theComponentName, CORBA::Long theObjectID);
   SALOMEDS::SObject_ptr PasteInto(const SALOMEDS::TMPFile& theStream,
-				  CORBA::Long theObjectID,
-				  SALOMEDS::SObject_ptr theObject);
+                                  CORBA::Long theObjectID,
+                                  SALOMEDS::SObject_ptr theObject);
 
   // this method of SALOMEDS::Driver must be implemented in Component
   //char* ComponentDataType();
 
   // to be defined in Component
-  virtual Engines::Component_ptr GetComponentInstance() = 0;
+  virtual Engines::EngineComponent_ptr GetComponentInstance() = 0;
 
 private:
   static std::map<std::string, MEDMEM::MED_i*> _MedCorbaObj;

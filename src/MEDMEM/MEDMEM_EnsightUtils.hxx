@@ -1,27 +1,26 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
+//
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
+// License as published by the Free Software Foundation; either
 // version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 // Lesser General Public License for more details.
 //
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File      : MEDMEM_EnsightUtils.hxx
 // Created   : Tue May 27 12:24:11 2008
 // Author    : Edward AGAPOV (eap)
-
-
+//
 #ifndef MEDMEM_EnsightUtils_HeaderFile
 #define MEDMEM_EnsightUtils_HeaderFile
 
@@ -34,6 +33,12 @@
 #include <set>
 #include <float.h>
 #include <cmath>
+
+#ifdef WNT
+# define isnan _isnan
+#else
+# include <unistd.h>
+#endif
 
 namespace MEDMEM {
 
@@ -186,10 +191,7 @@ namespace MEDMEM_ENSIGHT { // INTERNAL MATTERS
   static inline float _toFloat (const double & value) {
     if ( value >  FLT_MAX ) return  FLT_MAX;
     if ( value < -FLT_MAX ) return -FLT_MAX;
-#ifdef WNT
-#else
     if ( isnan( value ))    throw MEDEXCEPTION(compatibilityPb("NaN value not allowed"));
-#endif
     return float( value );
   }
   static inline float _toFloat (const int & value) { return float( value ); }
@@ -362,7 +364,7 @@ private:
  */
 // ==============================================================================
 
-class _CaseFileDriver_User: public GENDRIVER
+class MEDMEM_EXPORT _CaseFileDriver_User: public GENDRIVER
 {
 protected:
 
@@ -420,9 +422,11 @@ public:
   static bool isTimeStepEnd(const char* line)
   { return ( strncmp( line, TIME_STEP_END, TIME_STEP_END_LEN ) == 0 ); }
 
-  static bool isToWriteEntity(const medEntityMesh entity, const MESH* mesh);
+  static bool isToWriteEntity(const medEntityMesh entity, const GMESH* mesh);
 
   ~_CaseFileDriver_User();
+
+  void merge( const GENDRIVER& driver);
 
 private:
 
@@ -526,11 +530,11 @@ struct _Support
 
 struct _InterMed : public _intermediateMED
 {
-  MESH * _medMesh;
-  bool   _isOwnMedMesh; //!< whether to delete _medMesh
-  int    _nbUsers;      //!< to know when to delete _medMesh
+  MESH* _medMesh;
+  bool  _isOwnMedMesh; //!< whether to delete _medMesh
+  int   _nbUsers;      //!< to know when to delete _medMesh
 
-  bool   _needSubParts; //!< true if there are fields needing _SubPart data
+  bool  _needSubParts; //!< true if there are fields needing _SubPart data
 
   map< _SubPartDesc, _SubPart > _subPartDescribed;
 
@@ -538,7 +542,7 @@ struct _InterMed : public _intermediateMED
 
   void addSubPart(const _SubPart& subPart);
 
-  ~_InterMed() { if ( _isOwnMedMesh ) { delete _medMesh; _medMesh=0; }}
+  ~_InterMed();
 };
 
 // ==============================================================================
@@ -793,14 +797,14 @@ private:
   template <typename T> T* get(int nb, bool inverseBytes=false)
   {
     size_t bufSize = nb * sizeof( T );
-    if ( bufSize > _maxPos - _pos )
+    if ( int(bufSize) > _maxPos - _pos )
       throw _exception;
     T* buf = new T[ nb ];
 #ifdef WNT
 #else
     ssize_t nBytesRead = ::read (_file, buf, bufSize );
     _pos += nBytesRead;
-    if ( nBytesRead < bufSize ) {
+    if ( int(nBytesRead) < int(bufSize) ) {
       delete buf;
       throw _exception;
     }
@@ -808,18 +812,10 @@ private:
       int* intBuf = ((int*) buf) - 1;
       int* bufEnd = (int*)((char*) buf + nBytesRead);
       while ( ++intBuf < bufEnd )
-        *intBuf = InverseInt( *intBuf );
+        *intBuf = MEDMEM::swapBytes( *intBuf );
     }
 #endif
     return buf;
-  }
-  //!<  swap bytes of int
-  int InverseInt (const int theValue)
-  {
-    return (0 | (( theValue & 0x000000ff ) << 24 )
-            |   (( theValue & 0x0000ff00 ) << 8  )
-            |   (( theValue & 0x00ff0000 ) >> 8  )
-            |   (( theValue >> 24 ) & 0x000000ff ) );
   }
 };
 

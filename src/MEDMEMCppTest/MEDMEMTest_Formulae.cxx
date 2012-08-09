@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
@@ -347,8 +345,17 @@ void MEDMEMTest::testFormulae()
     CPPUNIT_ASSERT_DOUBLES_EQUAL(-11.7 * koeff, poly_normal[2], 0.0000001); // Nz
 
     // Invalid Polygon (four points on one line)
-    CPPUNIT_ASSERT_THROW(INTERP_KERNEL::calculateNormalForPolyg(polygon_si, /*nbOfPtsInPolygs*/4,
-                                                                poly_normal),exception);
+    bool isException=false;
+    try
+      {
+        INTERP_KERNEL::calculateNormalForPolyg(polygon_si, /*nbOfPtsInPolygs*/4,
+                                               poly_normal);
+      }
+    catch(std::exception& e)
+      {
+        isException=true;
+      }
+    CPPUNIT_ASSERT(isException);
     //MEDMEMTest_DumpArray<double>(cout, poly_normal, 3, "Invalid Polygon normal");
     //#ifdef ENABLE_FORCED_FAILURES
     // (BUG) division on zero in CalculateNormalForPolyg(), if polygon is singular

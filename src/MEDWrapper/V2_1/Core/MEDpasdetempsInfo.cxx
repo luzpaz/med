@@ -27,9 +27,9 @@ namespace med_2_1{
 
 med_err 
 MEDpasdetempsInfo(med_idt fid,char *champ
-		  ,med_entite_maillage type_ent, med_geometrie_element type_geo,
-		  int indice, char *maa, med_int * ngauss, med_int * numdt, char * dt_unit, med_float * dt, 
-		  med_int * numo)
+                  ,med_entite_maillage type_ent, med_geometrie_element type_geo,
+                  int indice, char *maa, med_int * ngauss, med_int * numdt, char * dt_unit, med_float * dt, 
+                  med_int * numo)
 {
 
   med_err ret=0;
@@ -56,7 +56,7 @@ MEDpasdetempsInfo(med_idt fid,char *champ
   if ((type_ent != MED_NOEUD))
     {
       if ((ret = _MEDnomGeometrie(tmp1,type_geo)) < 0)
-	return -1;
+        return -1;
       strcat(nomdatagroup1,".");
       strcat(nomdatagroup1,tmp1);
     }

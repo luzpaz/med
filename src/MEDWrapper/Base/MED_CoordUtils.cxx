@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 //  File   : 
 //  Author : 
 //  Module : 
@@ -106,7 +107,7 @@ namespace MED
   TFloat 
   TCoordHelper
   ::GetCoord(TCCoordSlice& theCoordSlice, 
-	     TInt theCoordId)
+             TInt theCoordId)
   {
     return (*myGetCoord[theCoordId])(theCoordSlice);
   }
@@ -126,37 +127,37 @@ namespace MED
         // 1D - always along X
         // 2D - always in XOY plane
         anIsDimPresent[iDim] = iDim < aMeshDimension;
-// 	std::string aName = theNodeInfo->GetCoordName(iDim);
+//      std::string aName = theNodeInfo->GetCoordName(iDim);
 //         if ( aName.size() > 1 ) // PAL12148, aName has size 8 or 16
 //           aName = aName.substr(0,1);
-// 	if(aName == "x" || aName == "X")
-// 	  anIsDimPresent[eX] = true;
-// 	else if(aName == "y" || aName == "Y")
-// 	  anIsDimPresent[eY] = true;
-// 	else if(aName == "z" || aName == "Z")
-// 	  anIsDimPresent[eZ] = true;
+//      if(aName == "x" || aName == "X")
+//        anIsDimPresent[eX] = true;
+//      else if(aName == "y" || aName == "Y")
+//        anIsDimPresent[eY] = true;
+//      else if(aName == "z" || aName == "Z")
+//        anIsDimPresent[eZ] = true;
       }
 
       switch(aMeshDimension){
       case 3:
-	aCoordHelper.reset(new TCoordHelper(aXYZGetCoord));
-	break;
+        aCoordHelper.reset(new TCoordHelper(aXYZGetCoord));
+        break;
       case 2:
-	if(anIsDimPresent[eY] && anIsDimPresent[eZ])
-	  aCoordHelper.reset(new TCoordHelper(aYZGetCoord));
-	else if(anIsDimPresent[eX] && anIsDimPresent[eZ])
-	  aCoordHelper.reset(new TCoordHelper(aXZGetCoord));
-	else
-	  aCoordHelper.reset(new TCoordHelper(aXYGetCoord));
-	break;
+        if(anIsDimPresent[eY] && anIsDimPresent[eZ])
+          aCoordHelper.reset(new TCoordHelper(aYZGetCoord));
+        else if(anIsDimPresent[eX] && anIsDimPresent[eZ])
+          aCoordHelper.reset(new TCoordHelper(aXZGetCoord));
+        else
+          aCoordHelper.reset(new TCoordHelper(aXYGetCoord));
+        break;
       case 1:
-	if(anIsDimPresent[eY])
-	  aCoordHelper.reset(new TCoordHelper(aYGetCoord));
-	else if(anIsDimPresent[eZ])
-	  aCoordHelper.reset(new TCoordHelper(aZGetCoord));
-	else
-	  aCoordHelper.reset(new TCoordHelper(aXGetCoord));
-	break;
+        if(anIsDimPresent[eY])
+          aCoordHelper.reset(new TCoordHelper(aYGetCoord));
+        else if(anIsDimPresent[eZ])
+          aCoordHelper.reset(new TCoordHelper(aZGetCoord));
+        else
+          aCoordHelper.reset(new TCoordHelper(aXGetCoord));
+        break;
       }
     }
     return aCoordHelper;

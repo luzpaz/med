@@ -45,16 +45,16 @@ med_err _MEDnomGeometrie(char *nom_geo,med_geometrie_element type_geo);
 
 extern
 med_err _MEDparametresGeometrie(med_entite_maillage type_ent, 
-			       med_geometrie_element type_geo, int *dim, int *nnoe,
-			       int *ndes);
+                               med_geometrie_element type_geo, int *dim, int *nnoe,
+                               int *ndes);
 extern
 med_err _MEDnomDataset(char *nom_dataset,med_table quoi,
-		       med_connectivite type_conn);
+                       med_connectivite type_conn);
 
 /* Geometrie des objets MED */
 extern 
 med_err _MEDGeometrieElement(med_geometrie_element typ_geo[],
-			     med_entite_maillage typ_ent);
+                             med_entite_maillage typ_ent);
 
 }
 

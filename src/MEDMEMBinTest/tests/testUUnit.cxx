@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 //  File   : testUUnit.cxx
 //  Module : MED
 //
@@ -38,7 +36,7 @@ int main (int argc, char ** argv)
   UNIT testu;
   try
   {
-  	testu.setName("ForTesting") ;
+        testu.setName("ForTesting") ;
   }
   catch ( const std::exception &e )
   {
@@ -58,7 +56,7 @@ int main (int argc, char ** argv)
 
   try
   {
-  	testu.setDescription("all values are setted 10") ;
+        testu.setDescription("all values are setted 10") ;
   }
   catch ( const std::exception &e )
   {
@@ -78,7 +76,7 @@ int main (int argc, char ** argv)
 
   try
   {
-  	testu.setMasse(10);
+        testu.setMasse(10);
   }
   catch ( const std::exception &e )
   {
@@ -98,7 +96,7 @@ int main (int argc, char ** argv)
 
   try
   {
-  	testu.setLength(10);
+        testu.setLength(10);
   }
   catch ( const std::exception &e )
   {
@@ -118,7 +116,7 @@ int main (int argc, char ** argv)
 
   try
   {
-  	testu.setTime(10);
+        testu.setTime(10);
   }
   catch ( const std::exception &e )
   {
@@ -138,7 +136,7 @@ int main (int argc, char ** argv)
 
   try
   {
-  	testu.setTemperature(10);
+        testu.setTemperature(10);
   }
   catch ( const std::exception &e )
   {
@@ -158,7 +156,7 @@ int main (int argc, char ** argv)
 
   try
   {
-  	testu.setMatterQuantity(10);
+        testu.setMatterQuantity(10);
   }
   catch ( const std::exception &e )
   {
@@ -178,7 +176,7 @@ int main (int argc, char ** argv)
 
   try
   {
-  	testu.setCurrentStrength(10) ;
+        testu.setCurrentStrength(10) ;
   }
   catch ( const std::exception &e )
   {
@@ -198,7 +196,7 @@ int main (int argc, char ** argv)
 
   try
   {
-  	testu.setLightIntensity(10) ;
+        testu.setLightIntensity(10) ;
   }
   catch ( const std::exception &e )
   {
@@ -219,7 +217,7 @@ int main (int argc, char ** argv)
 
   try
   {
-  	cout << testu.getName() << endl ;
+        cout << testu.getName() << endl ;
   }
   catch ( const std::exception &e )
   {
@@ -239,7 +237,7 @@ int main (int argc, char ** argv)
 
   try
   {
-  	cout << testu.getDescription() << endl ;
+        cout << testu.getDescription() << endl ;
   }
   catch ( const std::exception &e )
   {
@@ -259,7 +257,7 @@ int main (int argc, char ** argv)
 
   try
   {
-  	cout << testu.getMasse() << endl ;
+        cout << testu.getMasse() << endl ;
   }
   catch ( const std::exception &e )
   {
@@ -279,7 +277,7 @@ int main (int argc, char ** argv)
 
   try
   {
-  	cout << testu.getLength() << endl ;
+        cout << testu.getLength() << endl ;
   }
   catch ( const std::exception &e )
   {
@@ -299,7 +297,7 @@ int main (int argc, char ** argv)
 
   try
   {
-  	cout << testu.getTime() << endl ;
+        cout << testu.getTime() << endl ;
   }
   catch ( const std::exception &e )
   {
@@ -319,7 +317,7 @@ int main (int argc, char ** argv)
 
   try
   {
-  	cout << testu.getTemperature() << endl ;
+        cout << testu.getTemperature() << endl ;
   }
   catch ( const std::exception &e )
   {
@@ -339,7 +337,7 @@ int main (int argc, char ** argv)
 
   try
   {
-  	cout << testu.getMatterQuantity() << endl ;
+        cout << testu.getMatterQuantity() << endl ;
   }
   catch ( const std::exception &e )
   {
@@ -359,7 +357,7 @@ int main (int argc, char ** argv)
 
   try
   {
-  	cout << testu.getCurrentStrength() << endl ;
+        cout << testu.getCurrentStrength() << endl ;
   }
   catch ( const std::exception &e )
   {
@@ -379,7 +377,7 @@ int main (int argc, char ** argv)
 
   try
   {
-  	cout << testu.getLightIntensity() << endl ;
+        cout << testu.getLightIntensity() << endl ;
   }
   catch ( const std::exception &e )
   {
@@ -399,4 +397,4 @@ int main (int argc, char ** argv)
 
   return EXIT_SUCCESS ;
 
-} ;
+}

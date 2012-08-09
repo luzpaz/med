@@ -1,27 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+
+#ifndef WNT
+#include <fenv.h>
+#endif
 
 #include "MEDMEM_Utilities.hxx"
 
@@ -329,7 +331,7 @@ namespace {
     for ( int t = 0; t < nbTypes; ++t )
       nbElem[ t ] = index[ t+1 ] - index[ t ];
 
-    SUPPORT* newSup = new SUPPORT();
+    SUPPORT* newSup = new SUPPORT;
     newSup->setMesh                 ( support->getMesh() );
     newSup->setNumberOfGeometricType( nbTypes );
     newSup->setGeometricType        ( support->getTypes() );
@@ -352,7 +354,8 @@ namespace {
   {
     medEntityMesh entity = field->getSupport()->getEntity();
     SUPPORT* support = interSupport->medSupport( entity );
-    field->setSupport( support );
+    field->setSupport( new SUPPORT( *support ));
+    field->getSupport()->removeReference(); // support belongs to field only
 
     int j, nbComponents = field->getNumberOfComponents();
     int      nbElements = field->getSupport()->getNumberOfElements(MED_ALL_ELEMENTS);
@@ -550,7 +553,7 @@ ENSIGHT_FIELD_DRIVER::~ENSIGHT_FIELD_DRIVER()
 void ENSIGHT_FIELD_DRIVER::setFieldName(const string & fieldName) throw (MEDEXCEPTION)
 {
   const char* LOC = "ENSIGHT_FIELD_DRIVER::setFieldName(): ";
-  if ( fieldName.size() > MAX_FIELD_NAME_LENGTH )
+  if ( (int)fieldName.size() > MAX_FIELD_NAME_LENGTH )
     throw MEDEXCEPTION( compatibilityPb(LOC) << "too long name (> " <<
                         MAX_FIELD_NAME_LENGTH << "): " << fieldName);
 
@@ -675,29 +678,33 @@ void ENSIGHT_FIELD_RDONLY_DRIVER::read (void)
   const char * LOC = "ENSIGHT_FIELD_RDONLY_DRIVER::read() : " ;
   BEGIN_OF_MED(LOC);
 
-  openConst(false); // check if can read case file
-
   _CaseFileDriver caseFile( getCaseFileName(), this);
-  caseFile.read();
 
-  // find out index of variable to read
-  int variableIndex = caseFile.getVariableIndex( _fieldName );
-  if ( !variableIndex )
-    variableIndex = caseFile.getVariableIndex( _ptrField->getName() );
-  if ( !variableIndex ) {
-    if ( !_fieldName.empty() )
-      throw MEDEXCEPTION
-        (LOCALIZED(STRING(LOC) << "no field found by name |" << _fieldName << "|"));
-    else
-      throw MEDEXCEPTION
-        (LOCALIZED(STRING(LOC) << "no field found by name |" << _ptrField->getName() << "|"));
+  if ( getDataFileName().empty() ) // find out what to read
+  {
+    openConst(false); // check if can read case file
+
+    caseFile.read();
+
+    // find out index of variable to read
+    int variableIndex = caseFile.getVariableIndex( _fieldName );
+    if ( !variableIndex )
+      variableIndex = caseFile.getVariableIndex( _ptrField->getName() );
+    if ( !variableIndex ) {
+      if ( !_fieldName.empty() )
+        throw MEDEXCEPTION
+          (LOCALIZED(STRING(LOC) << "no field found by name |" << _fieldName << "|"));
+      else
+        throw MEDEXCEPTION
+          (LOCALIZED(STRING(LOC) << "no field found by name |" << _ptrField->getName() << "|"));
+    }
+
+    //  here data from Case File is passed:
+    // * field name
+    // * number of components
+    // * etc.
+    caseFile.setDataFileName( variableIndex, _fieldStep, this );
   }
-
-  //  here data from Case File is passed:
-  // * field name
-  // * number of components
-  // * etc.
-  caseFile.setDataFileName( variableIndex, _fieldStep, this );
 
   openConst(true); // check if can read data file
 
@@ -731,6 +738,10 @@ void ENSIGHT_FIELD_RDONLY_DRIVER::read (void)
   {
     // Read values
 
+#ifndef WNT
+    int curExcept = fedisableexcept( FE_ALL_EXCEPT ); //!< there may be nan values
+#endif
+
     if ( isBinaryDataFile( getDataFileName() ) ) // binary
     {
       if ( isGoldFormat() ) // Gold
@@ -753,6 +764,12 @@ void ENSIGHT_FIELD_RDONLY_DRIVER::read (void)
         read6ASCII();
       }
     }
+
+#ifndef WNT
+    feclearexcept( FE_ALL_EXCEPT );
+    if ( curExcept >= 0 )
+      feenableexcept( curExcept );
+#endif
   }
 }
 
@@ -1126,8 +1143,8 @@ ENSIGHT_FIELD_WRONLY_DRIVER::ENSIGHT_FIELD_WRONLY_DRIVER()
 //=======================================================================
 
 ENSIGHT_FIELD_WRONLY_DRIVER::ENSIGHT_FIELD_WRONLY_DRIVER(const string & fileName,
-                                                         FIELD_ *       ptrField)
-  :ENSIGHT_FIELD_DRIVER(fileName,ptrField,MED_EN::WRONLY)
+                                                         const FIELD_ * ptrField)
+  :ENSIGHT_FIELD_DRIVER(fileName,(FIELD_*)ptrField,MED_EN::WRONLY)
 {
 }
 
@@ -1177,7 +1194,7 @@ void ENSIGHT_FIELD_WRONLY_DRIVER::read (void)
  * \brief Return pointer to the value of the i-th element
  */
 //================================================================================
-
+const char* getValuePointer( int i, const FIELD_* field );
 const char* getValuePointer( int i, const FIELD_* field )
 {
   switch ( field->getInterlacingType() ) {
@@ -1376,7 +1393,7 @@ void ENSIGHT_FIELD_WRONLY_DRIVER::write(void) const
 
   const FIELD_* field     = _ptrField;
   const SUPPORT * support = field->getSupport();
-  const MESH * mesh       = support->getMesh();
+  const GMESH * mesh      = support->getMesh();
 
   int dt              = field->getIterationNumber();
   int it              = field->getOrderNumber();
@@ -1414,10 +1431,11 @@ void ENSIGHT_FIELD_WRONLY_DRIVER::write(void) const
                           << " in EnSight6 format, it's support " << support->getName()
                           << " is not stored in geo file, use EnSight Gold format instead");
     isPartial = " partial";
-    SUPPORT tmpSupport;
-    tmpSupport.setAll(true);
-    tmpSupport.setEntity( entity );
-    partNum = getPartNumber( &tmpSupport );
+    SUPPORT *tmpSupport=new SUPPORT;
+    tmpSupport->setAll(true);
+    tmpSupport->setEntity( entity );
+    partNum = getPartNumber( tmpSupport );
+    tmpSupport->removeReference();
   }
 
   // supports to write the field for

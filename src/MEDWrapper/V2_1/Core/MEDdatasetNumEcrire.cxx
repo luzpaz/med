@@ -1,22 +1,3 @@
-// Copyright (C) 2005  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
-// 
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public
-// License as published by the Free Software Foundation; either 
-// version 2.1 of the License.
-// 
-// This library is distributed in the hope that it will be useful 
-// but WITHOUT ANY WARRANTY; without even the implied warranty of 
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public  
-// License along with this library; if not, write to the Free Software 
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-//
-// See http://www.salome-platform.org/
-//
 /*************************************************************************
 * COPYRIGHT (C) 1999 - 2002  EDF R&D
 * THIS LIBRARY IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY
@@ -66,9 +47,9 @@ namespace med_2_1{
 
 med_err 
 _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
-		     med_mode_switch interlace, med_size nbdim, med_size fixdim, 
-		     med_size psize, med_ssize * pfltab, med_int ngauss,
-		     med_size *size,  unsigned char *val, med_mode_acces mode)
+                     med_mode_switch interlace, med_size nbdim, med_size fixdim, 
+                     med_size psize, med_ssize * pfltab, med_int ngauss,
+                     med_size *size,  unsigned char *val, med_mode_acces mode)
 {
   med_idt    dataset, dataspace = 0, memspace = 0;
 #ifdef HDF_NEW_API
@@ -93,9 +74,9 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
     {
     case MED_REEL64 :
       /* 1) IA32 is LE but due to an (?HDF convertion BUG?) when using H5T_NATIVE_DOUBLE/MED_REEL64? under PCLINUX
-	 the file read under SGI is incorrect
-	 2) Compaq OSF/1 is LE, since we force SGI64,SUN4SOL2,HP to write double in LE even if they are BE, mips OSF/1 must be BE
-	 REM  : Be careful of compatibility between MED files when changing this (med2.2)                    */
+         the file read under SGI is incorrect
+         2) Compaq OSF/1 is LE, since we force SGI64,SUN4SOL2,HP to write double in LE even if they are BE, mips OSF/1 must be BE
+         REM  : Be careful of compatibility between MED files when changing this (med2.2)                    */
 #if defined(PCLINUX) || defined(PCLINUX64) || defined(PCLINUX64_32) || defined(OSF1) || defined( PPRO_NT )
       type_hdf = H5T_IEEE_F64BE;
 #else     
@@ -107,7 +88,7 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
 #if defined(PCLINUX) || defined(PCLINUX64) || defined(PCLINUX64_32)
       type_hdf = H5T_STD_I32BE;
       if ((H5Tconvert(H5T_NATIVE_INT,H5T_STD_I32BE,(hsize_t)*size,(void *)val,NULL,(hid_t)0)) < 0) 
-	  return -1;
+          return -1;
 #else
       type_hdf = H5T_NATIVE_INT;
 #endif
@@ -129,20 +110,20 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
       /* When we'll use the compression mode, the space used by unused values would be easily compressed       */
   
       if ((dataspace = H5Screate_simple(1,size,NULL)) < 0)
-	return -1;
+        return -1;
       if ((dataset = H5Dcreate(pere,nom,type_hdf,dataspace,
-			       H5P_DEFAULT)) < 0)
-	return -1;      
+                               H5P_DEFAULT)) < 0)
+        return -1;      
     }
   else
     if (mode != MED_REMP)
       {
-	H5Dclose(dataset);
-	return -1;
+        H5Dclose(dataset);
+        return -1;
       }
     else
       if ((dataspace = H5Dget_space(dataset)) <0)
-	return -1;
+        return -1;
 
 
   switch(interlace) 
@@ -151,146 +132,146 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
       
       /*Initialisation des indices de boucle du traitement de l'entrelacement en fonction de la dimension fixee*/
       if ( fixdim != MED_ALL) 
-	{ 
-	  firstdim = (int)fixdim-1;
-	  lastdim  = (int)fixdim;
-	  dimutil  = 1;
-	} else	{
-	  firstdim = 0;
-	  lastdim  = (int)nbdim;
-	  dimutil  = (int)nbdim; 
-	}
+        { 
+          firstdim = (int)fixdim-1;
+          lastdim  = (int)fixdim;
+          dimutil  = 1;
+        } else  {
+          firstdim = 0;
+          lastdim  = (int)nbdim;
+          dimutil  = (int)nbdim; 
+        }
 
       count [0] = (*size)/(nbdim);
 
 
       if ( psize == MED_NOPF ) {  
 
-	/* Creation d'un data space mémoire de dimension 1, de longeur size, et de longeur maxi size */
-	if ( (memspace = H5Screate_simple (1, size, NULL)) <0)
-	  return -1;
-	
-	stride[0] = nbdim;  
+        /* Creation d'un data space mémoire de dimension 1, de longeur size, et de longeur maxi size */
+        if ( (memspace = H5Screate_simple (1, size, NULL)) <0)
+          return -1;
+        
+        stride[0] = nbdim;  
 
-	for (dim=firstdim; dim < lastdim; dim++) {
-	  
-	  start_mem[0] = dim;
-	  if ( (ret = H5Sselect_hyperslab (memspace, H5S_SELECT_SET, start_mem, stride, 
-					   count, NULL)) <0)
-	    return -1; 
-	  
-	  start_data[0] = dim*count[0];
-	  if ( (ret = H5Sselect_hyperslab (dataspace, H5S_SELECT_SET, start_data, NULL, 
-					   count, NULL)) <0)
-	    return -1; 
-	  
-	  if ((ret = H5Dwrite(dataset,type_hdf,memspace,dataspace,
-			      H5P_DEFAULT, val)) < 0)
-	    return -1;
-	}
-	
+        for (dim=firstdim; dim < lastdim; dim++) {
+          
+          start_mem[0] = dim;
+          if ( (ret = H5Sselect_hyperslab (memspace, H5S_SELECT_SET, start_mem, stride, 
+                                           count, NULL)) <0)
+            return -1; 
+          
+          start_data[0] = dim*count[0];
+          if ( (ret = H5Sselect_hyperslab (dataspace, H5S_SELECT_SET, start_data, NULL, 
+                                           count, NULL)) <0)
+            return -1; 
+          
+          if ((ret = H5Dwrite(dataset,type_hdf,memspace,dataspace,
+                              H5P_DEFAULT, val)) < 0)
+            return -1;
+        }
+        
       } else { /* psize != MED_NOPF */
-	
-	pflsize [0] = psize*ngauss*nbdim;
-	pcount  [0] = psize*ngauss*dimutil;
+        
+        pflsize [0] = psize*ngauss*nbdim;
+        pcount  [0] = psize*ngauss*dimutil;
 #ifdef HDF_NEW_API
-	pflmem      = (med_size *) malloc (sizeof(med_size)*pcount[0]);
-	pfldsk      = (med_size *) malloc (sizeof(med_size)*pcount[0]);
+        pflmem      = (med_size *) malloc (sizeof(med_size)*(size_t)pcount[0]);
+        pfldsk      = (med_size *) malloc (sizeof(med_size)*(size_t)pcount[0]);
 #else
-	pflmem      = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)pcount[0]);
-	pfldsk      = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)pcount[0]);
+        pflmem      = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)pcount[0]);
+        pfldsk      = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)pcount[0]);
 #endif
-	
-	switch(pflmod)
-	  { /* switch pflmod pout FULL_INTERLACE*/
-	  case MED_GLOBALE :
+        
+        switch(pflmod)
+          { /* switch pflmod pout FULL_INTERLACE*/
+          case MED_GLOBALE :
 
-	    /* Creation d'un data space mémoire de dimension 1, de longeur size, et de longeur maxi size */
-	    if ( (memspace = H5Screate_simple (1, size, NULL)) <0)
-	      return -1;
+            /* Creation d'un data space mémoire de dimension 1, de longeur size, et de longeur maxi size */
+            if ( (memspace = H5Screate_simple (1, size, NULL)) <0)
+              return -1;
 
-	    for (dim=firstdim; dim < lastdim; dim++) {
-	      
-	      for (i=0; i < psize; i++)              /* i balaye les élements du profil */
-		for (j=0; j < ngauss; j++) {         
-		  index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
-		  pflmem[index] = (pfltab[i]-1)*ngauss*nbdim + j*nbdim+dim;
-		  pfldsk[index] = dim*count[0] + (pfltab[i]-1)*ngauss+j;	     
-		}
-	    }
-	     
+            for (dim=firstdim; dim < lastdim; dim++) {
+              
+              for (i=0; i < psize; i++)              /* i balaye les élements du profil */
+                for (j=0; j < ngauss; j++) {         
+                  index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
+                  pflmem[index] = (pfltab[i]-1)*ngauss*nbdim + j*nbdim+dim;
+                  pfldsk[index] = dim*count[0] + (pfltab[i]-1)*ngauss+j;             
+                }
+            }
+             
 #ifdef HDF_NEW_API2
-	    if ( (ret = H5Sselect_elements(memspace,H5S_SELECT_SET, pcount[0], (const hsize_t *) pflmem ) ) <0) 
-	      return -1; 
-	      
-	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, pcount[0], (const hsize_t *) pfldsk ) ) <0) 
-	      return -1; 
+            if ( (ret = H5Sselect_elements(memspace,H5S_SELECT_SET, (size_t)pcount[0], (const hsize_t *) pflmem ) ) <0) 
+              return -1; 
+              
+            if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, (size_t)pcount[0], (const hsize_t *) pfldsk ) ) <0) 
+              return -1; 
 #elif defined HDF_NEW_API
-	    if ( (ret = H5Sselect_elements(memspace,H5S_SELECT_SET, pcount[0], (const hsize_t **) pflmem ) ) <0) 
-	      return -1; 
-	      
-	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, pcount[0], (const hsize_t **) pfldsk ) ) <0) 
-	      return -1; 
+            if ( (ret = H5Sselect_elements(memspace,H5S_SELECT_SET, (size_t)pcount[0], (const hsize_t **) pflmem ) ) <0) 
+              return -1; 
+              
+            if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, (size_t)pcount[0], (const hsize_t **) pfldsk ) ) <0) 
+              return -1; 
 #else
-	    if ( (ret = H5Sselect_elements(memspace,H5S_SELECT_SET, (size_t)pcount[0], (const hssize_t **) pflmem ) ) <0) 
-	      return -1; 
-	      
-	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, (size_t)pcount[0], (const hssize_t **) pfldsk ) ) <0) 
-	      return -1; 
+            if ( (ret = H5Sselect_elements(memspace,H5S_SELECT_SET, (size_t)pcount[0], (const hssize_t **) pflmem ) ) <0) 
+              return -1; 
+              
+            if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, (size_t)pcount[0], (const hssize_t **) pfldsk ) ) <0) 
+              return -1; 
 #endif
-	    
-	    break;
-	    
-	  case MED_COMPACT :
+            
+            break;
+            
+          case MED_COMPACT :
 
-	    /* Creation d'un data space mémoire de dimension 1, de la longeur du profil          */
-	    /* La dimension utilisée est ici nbdim, même pour un profil compact on suppose       */
-	    /*  que l'utilisateur a toutes les coordonées stockées, même si il en demande qu'une */ 
+            /* Creation d'un data space mémoire de dimension 1, de la longeur du profil          */
+            /* La dimension utilisée est ici nbdim, même pour un profil compact on suppose       */
+            /*  que l'utilisateur a toutes les coordonées stockées, même si il en demande qu'une */ 
 
-	    if ( (memspace = H5Screate_simple (1, pflsize, NULL)) <0)
-	      return -1;
-	    
-	    for (dim=firstdim; dim < lastdim; dim++) {
-	      
-	      for (i=0; i < psize; i++)              /* i balaye les élements du profil */
-		for (j=0; j < ngauss; j++) {         
-		  index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
-		  pflmem[index] = i*ngauss*nbdim + j*nbdim+dim;
-		  pfldsk[index] = dim*count[0] + (pfltab[i]-1)*ngauss+j;	     
-		}
-	    }
-	    
+            if ( (memspace = H5Screate_simple (1, pflsize, NULL)) <0)
+              return -1;
+            
+            for (dim=firstdim; dim < lastdim; dim++) {
+              
+              for (i=0; i < psize; i++)              /* i balaye les élements du profil */
+                for (j=0; j < ngauss; j++) {         
+                  index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
+                  pflmem[index] = i*ngauss*nbdim + j*nbdim+dim;
+                  pfldsk[index] = dim*count[0] + (pfltab[i]-1)*ngauss+j;             
+                }
+            }
+            
 #ifdef HDF_NEW_API2
-	    if ( (ret = H5Sselect_elements(memspace,H5S_SELECT_SET, pcount[0], (const hsize_t *) pflmem ) ) <0) 
-	      return -1; 
-	    
-	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, pcount[0], (const hsize_t *) pfldsk ) ) <0) 
-	      return -1; 
+            if ( (ret = H5Sselect_elements(memspace,H5S_SELECT_SET, (size_t)pcount[0], (const hsize_t *) pflmem ) ) <0) 
+              return -1; 
+            
+            if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, (size_t)pcount[0], (const hsize_t *) pfldsk ) ) <0) 
+              return -1; 
 #elif defined HDF_NEW_API
-	    if ( (ret = H5Sselect_elements(memspace,H5S_SELECT_SET, pcount[0], (const hsize_t **) pflmem ) ) <0) 
-	      return -1; 
-	    
-	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, pcount[0], (const hsize_t **) pfldsk ) ) <0) 
-	      return -1; 
+            if ( (ret = H5Sselect_elements(memspace,H5S_SELECT_SET, (size_t)pcount[0], (const hsize_t **) pflmem ) ) <0) 
+              return -1; 
+            
+            if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, (size_t)pcount[0], (const hsize_t **) pfldsk ) ) <0) 
+              return -1; 
 #else
-	    if ( (ret = H5Sselect_elements(memspace,H5S_SELECT_SET, (size_t)pcount[0], (const hssize_t **) pflmem ) ) <0) 
-	      return -1; 
-	    
-	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, (size_t)pcount[0], (const hssize_t **) pfldsk ) ) <0) 
-	      return -1; 
+            if ( (ret = H5Sselect_elements(memspace,H5S_SELECT_SET, (size_t)pcount[0], (const hssize_t **) pflmem ) ) <0) 
+              return -1; 
+            
+            if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET, (size_t)pcount[0], (const hssize_t **) pfldsk ) ) <0) 
+              return -1; 
 #endif
-	     
-	    break;
-	  
-	  default :
-	    return -1; 
-	  }
+             
+            break;
+          
+          default :
+            return -1; 
+          }
 
-	if ((ret = H5Dwrite(dataset,type_hdf,memspace,dataspace,H5P_DEFAULT, val)) < 0)
-	  return -1;
-	
-	free(pflmem);
-	free(pfldsk);
+        if ((ret = H5Dwrite(dataset,type_hdf,memspace,dataspace,H5P_DEFAULT, val)) < 0)
+          return -1;
+        
+        free(pflmem);
+        free(pfldsk);
       }
       
       
@@ -303,133 +284,133 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
       count[0] = (*size)/nbdim;
 
       if ( psize == MED_NOPF ) {  
-	
-	if ( fixdim != MED_ALL) 
-	  start_data[0] = (fixdim-1)*count[0];
-	else {
-	  count[0] = *size;
-	  start_data[0] =  0;
-	};
-	
-	if ( (ret = H5Sselect_hyperslab (dataspace, H5S_SELECT_SET, start_data, NULL, 
-					 count, NULL)) <0)
-	  return -1; 
-	
-	if ((ret = H5Dwrite(dataset,type_hdf,dataspace,dataspace,
-			    H5P_DEFAULT, val)) < 0)
-	  return -1;
-	
+        
+        if ( fixdim != MED_ALL) 
+          start_data[0] = (fixdim-1)*count[0];
+        else {
+          count[0] = *size;
+          start_data[0] =  0;
+        };
+        
+        if ( (ret = H5Sselect_hyperslab (dataspace, H5S_SELECT_SET, start_data, NULL, 
+                                         count, NULL)) <0)
+          return -1; 
+        
+        if ((ret = H5Dwrite(dataset,type_hdf,dataspace,dataspace,
+                            H5P_DEFAULT, val)) < 0)
+          return -1;
+        
       } else {
 
-	if ( fixdim != MED_ALL) 
-	  { 
-	    firstdim = (int)fixdim-1;
-	    lastdim  = (int)fixdim;
-	    dimutil  = 1;
-	  } else	{
-	    firstdim = 0;
-	    lastdim  = (int)nbdim;
-	    dimutil  = (int)nbdim; 
-	  }
-	
-	pflsize [0] = psize*ngauss*nbdim;
-  	pcount  [0] = psize*ngauss*dimutil; /* nom pas très coherent avec count !!! A revoir */	
+        if ( fixdim != MED_ALL) 
+          { 
+            firstdim = (int)fixdim-1;
+            lastdim  = (int)fixdim;
+            dimutil  = 1;
+          } else        {
+            firstdim = 0;
+            lastdim  = (int)nbdim;
+            dimutil  = (int)nbdim; 
+          }
+        
+        pflsize [0] = psize*ngauss*nbdim;
+        pcount  [0] = psize*ngauss*dimutil; /* nom pas très coherent avec count !!! A revoir */      
 #ifdef HDF_NEW_API
-	pfldsk     = (med_size *) malloc(sizeof(med_size)*pcount[0]);
+        pfldsk     = (med_size *) malloc(sizeof(med_size)*(size_t)pcount[0]);
 #else
-	pfldsk     = (med_ssize *) malloc(sizeof(med_ssize)*(size_t)pcount[0]);
+        pfldsk     = (med_ssize *) malloc(sizeof(med_ssize)*(size_t)pcount[0]);
 #endif
 
-	switch(pflmod)
-	  { /*switch plfmod pour NO_INTERLACE */
-	  case MED_GLOBALE :
-	    
-	    for (dim=firstdim; dim < lastdim; dim++) {
-	      
-	      for (i=0; i < psize; i++)              /* i balaye le nbre d'élements du profil                */
-		for (j=0; j < ngauss; j++) { 
-		  index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
-		  pfldsk[index] = dim*count[0]+(pfltab[i]-1)*ngauss+j;	    
-		}
-	    }
-	    
+        switch(pflmod)
+          { /*switch plfmod pour NO_INTERLACE */
+          case MED_GLOBALE :
+            
+            for (dim=firstdim; dim < lastdim; dim++) {
+              
+              for (i=0; i < psize; i++)              /* i balaye le nbre d'élements du profil                */
+                for (j=0; j < ngauss; j++) { 
+                  index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
+                  pfldsk[index] = dim*count[0]+(pfltab[i]-1)*ngauss+j;      
+                }
+            }
+            
 #ifdef HDF_NEW_API2
-	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,pcount[0], (const hsize_t *) pfldsk ) ) <0) 
-	      return -1;
+            if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,(size_t)pcount[0], (const hsize_t *) pfldsk ) ) <0) 
+              return -1;
 #elif defined HDF_NEW_API
-	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,pcount[0], (const hsize_t **) pfldsk ) ) <0) 
-	      return -1;
+            if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,(size_t)pcount[0], (const hsize_t **) pfldsk ) ) <0) 
+              return -1;
 #else
-	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,(size_t)pcount[0], (const hssize_t **) pfldsk ) ) <0) 
-	      return -1;
+            if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,(size_t)pcount[0], (const hssize_t **) pfldsk ) ) <0) 
+              return -1;
 #endif
-	    
-	    if ((ret = H5Dwrite(dataset,type_hdf,dataspace,dataspace,H5P_DEFAULT, val)) < 0)
-	      return -1;
-	    
-	    break;
-	    
-	  case MED_COMPACT :
-	    
-	    /* Creation d'un data space mémoire de dimension 1, de la longeur du profil          */
-	    /* La dimension utilisée est ici nbdim, même pour un profil compact on suppose       */
-	    /*  que l'utilisateur a toutes les coordonées stockées, même si il en demande qu'une */ 
+            
+            if ((ret = H5Dwrite(dataset,type_hdf,dataspace,dataspace,H5P_DEFAULT, val)) < 0)
+              return -1;
+            
+            break;
+            
+          case MED_COMPACT :
+            
+            /* Creation d'un data space mémoire de dimension 1, de la longeur du profil          */
+            /* La dimension utilisée est ici nbdim, même pour un profil compact on suppose       */
+            /*  que l'utilisateur a toutes les coordonées stockées, même si il en demande qu'une */ 
 
-	    if ( (memspace = H5Screate_simple (1, pflsize, NULL)) <0)
-	      return -1;
+            if ( (memspace = H5Screate_simple (1, pflsize, NULL)) <0)
+              return -1;
 
 #ifdef HDF_NEW_API
-	    pflmem     = (med_size *) malloc (sizeof(med_size)*pcount[0]);
+            pflmem     = (med_size *) malloc (sizeof(med_size)*(size_t)pcount[0]);
 #else
-	    pflmem     = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)pcount[0]);
+            pflmem     = (med_ssize *) malloc (sizeof(med_ssize)*(size_t)pcount[0]);
 #endif
-	    
-	    /* Le profil COMPACT est contigüe, mais il est possible que l'on selectionne uniquemenent une dimension*/
-	    
-	    for (dim=firstdim; dim < lastdim; dim++) {
-	      
-	      for (i=0; i < psize; i++)              /* i balaye le nbre d'élements du profil                */
-		for (j=0; j < ngauss; j++) {
-		  index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
-	          pflmem[index] = dim*(psize*ngauss) + (pfltab[i]-1)*ngauss+j;
-		  pfldsk[index] = dim*count[0]  + (pfltab[i]-1)*ngauss+j;	    
-		}
-	    }
-	     
+            
+            /* Le profil COMPACT est contigüe, mais il est possible que l'on selectionne uniquemenent une dimension*/
+            
+            for (dim=firstdim; dim < lastdim; dim++) {
+              
+              for (i=0; i < psize; i++)              /* i balaye le nbre d'élements du profil                */
+                for (j=0; j < ngauss; j++) {
+                  index = i*ngauss+j + (dim-firstdim)*((int)psize*ngauss);
+                  pflmem[index] = dim*(psize*ngauss) + (pfltab[i]-1)*ngauss+j;
+                  pfldsk[index] = dim*count[0]  + (pfltab[i]-1)*ngauss+j;           
+                }
+            }
+             
 #ifdef HDF_NEW_API2
-	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET,pcount[0], (const hsize_t *) pflmem ) ) <0) 
-	      return -1; 
-	      
-	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,pcount[0], (const hsize_t *) pfldsk ) ) <0) 
-	      return -1;
+            if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET,(size_t)pcount[0], (const hsize_t *) pflmem ) ) <0) 
+              return -1; 
+              
+            if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,(size_t)pcount[0], (const hsize_t *) pfldsk ) ) <0) 
+              return -1;
 #elif defined HDF_NEW_API
-	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET,pcount[0], (const hsize_t **) pflmem ) ) <0) 
-	      return -1; 
-	      
-	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,pcount[0], (const hsize_t **) pfldsk ) ) <0) 
-	      return -1;
+            if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET,(size_t)pcount[0], (const hsize_t **) pflmem ) ) <0) 
+              return -1; 
+              
+            if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,(size_t)pcount[0], (const hsize_t **) pfldsk ) ) <0) 
+              return -1;
 #else
-	    if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET,(size_t)pcount[0], (const hssize_t **) pflmem ) ) <0) 
-	      return -1; 
-	      
-	    if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,(size_t)pcount[0], (const hssize_t **) pfldsk ) ) <0) 
-	      return -1;
+            if ( (ret = H5Sselect_elements(memspace ,H5S_SELECT_SET,(size_t)pcount[0], (const hssize_t **) pflmem ) ) <0) 
+              return -1; 
+              
+            if ( (ret = H5Sselect_elements(dataspace,H5S_SELECT_SET,(size_t)pcount[0], (const hssize_t **) pfldsk ) ) <0) 
+              return -1;
 #endif
-	   
-	    if ((ret = H5Dwrite(dataset,type_hdf,memspace,dataspace,H5P_DEFAULT, val)) < 0)
-	      return -1;
+           
+            if ((ret = H5Dwrite(dataset,type_hdf,memspace,dataspace,H5P_DEFAULT, val)) < 0)
+              return -1;
 
-	    free(pflmem);
-	    
-	    break;
-	    
-	  default :
-	    return -1;	    
-	    
-	  }
+            free(pflmem);
+            
+            break;
+            
+          default :
+            return -1;      
+            
+          }
    
-	free(pfldsk);
-	
+        free(pfldsk);
+        
       };
 
       break;
@@ -452,7 +433,7 @@ _MEDdatasetNumEcrire(med_idt pere,char *nom, med_type_champ type,
 #if defined(PCLINUX) || defined(PCLINUX64) || defined(PCLINUX64_32)
   if (type == MED_INT32)
       if ((H5Tconvert(H5T_STD_I32BE,H5T_NATIVE_INT,(hsize_t)*size,(void *)val,NULL,(hid_t)0)) < 0) 
-	  return -1;
+          return -1;
 #endif 
   
   return 0;

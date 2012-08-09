@@ -1,21 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef __MEDNORMALIZEDUNSTRUCTUREDMESH_HXX__
 #define __MEDNORMALIZEDUNSTRUCTUREDMESH_HXX__
 
@@ -37,6 +38,7 @@ public:
   static const INTERP_KERNEL::NumberingPolicy My_numPol=INTERP_KERNEL::ALL_FORTRAN_MODE;
 public:
   MEDNormalizedUnstructuredMesh(const MEDMEM::MESH *mesh);
+  ~MEDNormalizedUnstructuredMesh();
   void getBoundingBox(double *boundingBox) const;
   INTERP_KERNEL::NormalizedCellType getTypeOfElement(int eltId) const;
   unsigned char getNumberOfNodesOfElement(int eltId) const;
@@ -45,9 +47,15 @@ public:
   const int *getConnectivityPtr() const;
   const double *getCoordinatesPtr() const;
   const int *getConnectivityIndexPtr() const;
-  void ReleaseTempArrays();
+  void releaseTempArrays();
+protected:
+  void prepare();
 protected:
   const MEDMEM::MESH *_meshInMedMode;
+  int *_conn_for_interp;
+  bool _own_conn_for_interp;
+  int *_conn_index_for_interp;
+  bool _own_conn_index_for_interp;
 };
 
 #endif

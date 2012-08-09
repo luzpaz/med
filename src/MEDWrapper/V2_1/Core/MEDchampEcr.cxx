@@ -50,8 +50,8 @@ namespace med_2_1{
 
 med_err 
 MEDchampEcr(med_idt fid, char *maa, char *cha,unsigned char *val,med_mode_switch interlace,med_int nbelem,med_int ngauss, 
-	    med_int numco, char * profil, med_mode_acces mode, med_entite_maillage type_ent, 
-	    med_geometrie_element type_geo, med_int numdt,char * dt_unit, med_float dt, med_int numo)
+            med_int numco, char * profil, med_mode_acces mode, med_entite_maillage type_ent, 
+            med_geometrie_element type_geo, med_int numdt,char * dt_unit, med_float dt, med_int numo)
 {
   med_err ret;
   med_idt chid,datagroup1,datagroup2;
@@ -88,7 +88,7 @@ MEDchampEcr(med_idt fid, char *maa, char *cha,unsigned char *val,med_mode_switch
   if ((type_ent != MED_NOEUD))
     {
       if ((ret = _MEDnomGeometrie(tmp1,type_geo)) < 0)
-	return -1;
+        return -1;
       strcat(nomdatagroup1,".");
       strcat(nomdatagroup1,tmp1);
     }
@@ -110,7 +110,7 @@ MEDchampEcr(med_idt fid, char *maa, char *cha,unsigned char *val,med_mode_switch
   else   
     if (datagroup2 < 0)
       if ((datagroup2 = _MEDdatagroupCreer(datagroup1,nomdatagroup2)) < 0)   
-	return -1;   
+        return -1;   
   
   /*Cree ou ouvre (en mode MED_REMP) l'attribut MED_NOM_NDT */
   if ((ret = _MEDattrEntierEcrire(datagroup2,MED_NOM_NDT,&numdt,mode)) < 0)
@@ -149,7 +149,7 @@ MEDchampEcr(med_idt fid, char *maa, char *cha,unsigned char *val,med_mode_switch
 
   /*Cree ou ouvre (en mode MED_REMP) l'attribut  MED_NOM_UNI */ 
   if ( strlen(dt_unit) == 0) {
-    if ((ret = _MEDattrStringEcrire(datagroup2,MED_NOM_UNI,MED_TAILLE_PNOM,"        ",mode)) < 0)
+    if ((ret = _MEDattrStringEcrire(datagroup2,MED_NOM_UNI,MED_TAILLE_PNOM,(char*)"        ",mode)) < 0)
       return -1;
   } else
     if ((ret = _MEDattrStringEcrire(datagroup2,MED_NOM_UNI,MED_TAILLE_PNOM,dt_unit,mode)) < 0)
@@ -198,27 +198,27 @@ MEDchampEcr(med_idt fid, char *maa, char *cha,unsigned char *val,med_mode_switch
     {
     case MED_REEL64 :
       if ((ret =  _MEDdatasetNumEcrire(datagroup2,MED_NOM_CO,MED_REEL64,interlace,ncomp,numco,psize,pfltab,ngauss,dimd,val,
-				       mode)) < 0)
-	return -1;
+                                       mode)) < 0)
+        return -1;
       break;
 
     case MED_INT32 :
 #if defined(HAVE_F77INT64)
      if ((ret =  _MEDdatasetNumEcrire(datagroup2,MED_NOM_CO,MED_INT64,interlace,ncomp,numco,psize,pfltab,ngauss,dimd,val,
-				       mode)) < 0)
-	return -1;
+                                       mode)) < 0)
+        return -1;
 #else
       if ((ret =  _MEDdatasetNumEcrire(datagroup2,MED_NOM_CO,MED_INT32,interlace,ncomp,numco,psize,pfltab,ngauss,dimd,val,
-				       mode)) < 0)
-	return -1;
+                                       mode)) < 0)
+        return -1;
 #endif
       break;
 
     case MED_INT64 :
 #if defined(HAVE_F77INT64)
      if ((ret =  _MEDdatasetNumEcrire(datagroup2,MED_NOM_CO,MED_INT64,interlace,ncomp,numco,psize,pfltab,ngauss,dimd,val,
-				       mode)) < 0)
-	return -1;
+                                       mode)) < 0)
+        return -1;
 #else
      return -1;
 #endif

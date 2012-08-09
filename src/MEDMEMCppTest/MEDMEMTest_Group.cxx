@@ -1,24 +1,22 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #include "MEDMEMTest.hxx"
 #include <cppunit/Message.h>
 #include <cppunit/TestAssert.h>
@@ -53,11 +51,10 @@ using namespace MED_EN;
  */
 void MEDMEMTest::testGroup()
 {
-  string datadir  = getenv("MED_ROOT_DIR");
-  string filename = datadir + "/share/salome/resources/med/pointe.med" ;
+  string filename = getResourceFile("pointe.med") ;
   string meshname = "maa1";
 
-  MESH * myMesh= new MESH() ;
+  MESH * myMesh=new MESH;
   myMesh->setName(meshname);
   MED_MESH_RDONLY_DRIVER myMeshDriver(filename,myMesh);
   myMeshDriver.setMeshName(meshname);
@@ -72,7 +69,7 @@ void MEDMEMTest::testGroup()
   CPPUNIT_ASSERT(NumberOfFamillies != 0);
 
   vector<FAMILY*> aFamilies = myGroup->getFamilies();
-  CPPUNIT_ASSERT(NumberOfFamillies == aFamilies.size());
+  CPPUNIT_ASSERT(NumberOfFamillies == (int)aFamilies.size());
   list<FAMILY*> aList;
 
   for (int j=1;j<=NumberOfFamillies;j++)
@@ -93,14 +90,13 @@ void MEDMEMTest::testGroup()
 
   GROUP* myGroup2 = new GROUP(*myGroup);
 
-  cout<<*myGroup2<<endl;
   ostringstream os;
   os << *myGroup2;
   CPPUNIT_ASSERT(os.str() != "");
 
-  GROUP myGroup3;
+  GROUP *myGroup3=new GROUP;
   try{
-    myGroup3 = *myGroup2;
+    *myGroup3 = *myGroup2;
   }
   catch (const std::exception &e)
   {
@@ -111,9 +107,10 @@ void MEDMEMTest::testGroup()
     CPPUNIT_FAIL("Unknown exception");
   }
 
-  CPPUNIT_ASSERT_EQUAL(myGroup3, *myGroup2);
+  CPPUNIT_ASSERT_EQUAL(*myGroup3, *myGroup2);
+  myGroup3->removeReference();
 
-  GROUP myGroup4;
+  GROUP *myGroup4=new GROUP;
   const GROUP * Group = myMesh->getGroup(MED_NODE,2);
   CPPUNIT_ASSERT(Group != NULL);
 
@@ -121,19 +118,19 @@ void MEDMEMTest::testGroup()
   CPPUNIT_ASSERT(NumberOfFamillies1 != 0);
   if(NumberOfFamillies1)
   {
-    myGroup4.setNumberOfFamilies(NumberOfFamillies1);
-    myGroup4.setFamilies(Group->getFamilies());
-    for(int i = 1; i <= myGroup4.getNumberOfFamilies(); i++ )
+    myGroup4->setNumberOfFamilies(NumberOfFamillies1);
+    myGroup4->setFamilies(Group->getFamilies());
+    for(int i = 1; i <= myGroup4->getNumberOfFamilies(); i++ )
     {
-      CPPUNIT_ASSERT_EQUAL(myGroup4.getFamily(i), Group->getFamily(i));
+      CPPUNIT_ASSERT_EQUAL(myGroup4->getFamily(i), Group->getFamily(i));
     }
   }
-
+  myGroup4->removeReference();
   if(aList.size())
   {
     try{
-      GROUP myGroup5("newFamily", aList);
-      cout<< myGroup5 <<endl;
+      GROUP *myGroup5=new GROUP("newFamily", aList);
+      myGroup5->removeReference();
     }
     catch (const std::exception &e)
     {
@@ -144,7 +141,6 @@ void MEDMEMTest::testGroup()
       CPPUNIT_FAIL("Unknown exception");
     }
   }
-
-  delete myGroup2;
-  delete myMesh ;
+  myGroup2->removeReference();
+  myMesh->removeReference() ;
 }

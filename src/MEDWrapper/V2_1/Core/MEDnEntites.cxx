@@ -56,7 +56,7 @@ MEDnEntites(med_idt fid,char *maa,med_entite_maillage typ_ent,
         break;
 
      case MED_NOEUD :
-	total = MEDnEntMaa(fid,maa,MED_COOR,MED_NOEUD,(med_geometrie_element)0,(med_connectivite)0);
+        total = MEDnEntMaa(fid,maa,MED_COOR,MED_NOEUD,(med_geometrie_element)0,(med_connectivite)0);
         break;
 
      default :

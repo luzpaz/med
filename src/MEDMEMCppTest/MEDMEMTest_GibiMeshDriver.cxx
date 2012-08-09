@@ -1,30 +1,27 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
 #include <MEDMEM_GibiMeshDriver.hxx>
 #include <MEDMEM_Mesh.hxx>
-#include <MEDMEM_Med.hxx>
 
 // use this define to enable lines, execution of which leads to Segmentation Fault
 //#define ENABLE_FAULTS
@@ -98,28 +95,24 @@ using namespace MED_EN;
 
 void MEDMEMTest::testGibiMeshDriver()
 {
-  MESH *aMesh                      = new MESH();
+  MESH *aMesh                      = new MESH;
   MESH *aMesh_NULL                 = NULL;
-  MESH *aMesh_2                    = new MESH();
-  MED  *aMed                       = new MED();
-  MED  *aMed_1                     = NULL;
+  MESH *aMesh_2                    = new MESH;
+  vector<FIELD_*>       rdFields;
+  vector<const FIELD_*> wrFields;
 
-  string data_dir                  = getenv("MED_ROOT_DIR");
-  string tmp_dir                   = getenv("TMP") ? getenv("TMP") : "/tmp";
-
-  string filename_rd               = data_dir + "/share/salome/resources/med/Darcy3_3D_H_10x10x10.sauve";
-  string filenamemed_rd            = data_dir + "/share/salome/resources/med/elle_3D_HPr_10x10x10.sauve";
-  string filename_wr               = tmp_dir  + "/myWr_Darcy3_3D_H_10x10x10.sauve";
-  string tmpfile                   = tmp_dir  + "/tmp.sauve";
-  string tmpfile_rdwr              = tmp_dir  + "/rdwr_tmp.sauve";
-  string filenamemed_wr            = tmp_dir  + "/myWrMed_elle_3D_HPr_10x10x10.sauve";
-  string tmpfilemed                = tmp_dir  + "/tmpmed.sauve";
+  string filename_rd               = getResourceFile("Darcy3_3D_H_10x10x10.sauve");
+  string filenamemed_rd            = getResourceFile("test_2D.sauve");
+  string filename_wr               = makeTmpFile("myWr_Darcy3_3D_H_10x10x10.sauve");
+  string tmpfile                   = makeTmpFile("tmp.sauve");
+  string tmpfile_rdwr              = makeTmpFile("rdwr_tmp.sauve");
+  string filenamemed_wr            = makeTmpFile("myWrMed_elle_3D_HPr_10x10x10.sauve");
+  string tmpfilemed                = makeTmpFile("tmpmed.sauve");
   string meshname                  = "Darcy3_3D_H_10x10x10";
   string newmeshname               = "new" + meshname;
   string fileNotExistsName_rd      = "notExists.sauve";
   string fileNotExistsName_wr      = "/path_not_exists/file_not_exists.sauve";
-  string filename_rdwr             =  tmp_dir  + "/myRdWr_Darcy3_3D_H_10x10x10.sauve";
-  string fcopy                     = "cp " + filename_rd + " " + filename_rdwr;
+  string filename_rdwr             = makeTmpFile("myRdWr_Darcy3_3D_H_10x10x10.sauve", filename_rd);
 
   // To remove tmp files from disk
   MEDMEMTest_TmpFilesRemover aRemover;
@@ -141,6 +134,11 @@ void MEDMEMTest::testGibiMeshDriver()
       //Creation of an incorrect read only driver
       GIBI_MESH_RDONLY_DRIVER *aInvalidGibiRdDriver =
         new GIBI_MESH_RDONLY_DRIVER(fileNotExistsName_rd, aMesh);
+      /************************************************************************/
+      // WARNING: if you have memory access error just after this constructor,
+      // this means that MEDMEMCppTest has been compiled w/o -DHAS_XDR
+      // while MEDMEM, with -DHAS_XDR
+      /************************************************************************/
 
       //Trying open not existing file
       CPPUNIT_ASSERT_THROW(aInvalidGibiRdDriver->open(), MEDEXCEPTION);
@@ -162,12 +160,7 @@ void MEDMEMTest::testGibiMeshDriver()
     CPPUNIT_ASSERT_NO_THROW(aGibiRdDriver->open());
 
     //Trying open file secondary.
-    //#ifdef ENABLE_FORCED_FAILURES
-    //This case is not work, seems it BUG
-    // SHOULD THROW
-    //CPPUNIT_ASSERT_THROW(aGibiRdDriver->open(), MEDEXCEPTION);
     CPPUNIT_ASSERT_NO_THROW(aGibiRdDriver->open());
-    //#endif
 
     //Test setMeshName() and getMeshName() methods
     CPPUNIT_ASSERT_NO_THROW(aGibiRdDriver->setMeshName(meshname));
@@ -175,13 +168,6 @@ void MEDMEMTest::testGibiMeshDriver()
 
     //Test read() method
     CPPUNIT_ASSERT_NO_THROW(aGibiRdDriver->read());
-    // Source and destination overlap in memcpy(0x35DBF040, 0x35DBF06D, 101)
-    //  at 0x3414D97E: memcpy (mac_replace_strmem.c:113)
-    //  by 0x3492EDE9: MEDMEM::GIBI_MESH_RDONLY_DRIVER::getLine(char*&) (MEDMEM_GibiMeshDriver.cxx:942)
-    //  by 0x349407FD: MEDMEM::GIBI_MESH_RDONLY_DRIVER::getNextLine(char*&, bool) (MEDMEM_GibiMeshDriver.hxx:168)
-    //  by 0x349268B1: MEDMEM::GIBI_MESH_RDONLY_DRIVER::readFile(MEDMEM::_intermediateMED*, bool) (MEDMEM_GibiMeshDriver.cxx:209)
-    //  by 0x3492F58B: MEDMEM::GIBI_MESH_RDONLY_DRIVER::read() (MEDMEM_GibiMeshDriver.cxx:1058)
-    //  by 0x3436DEA6: MEDMEMTest::testGibiMeshDriver() (MEDMEMTest_GibiMeshDriver.cxx:168)
 
     //Trying fill not empty mesh
     CPPUNIT_ASSERT_THROW(aGibiRdDriver->read(), MEDEXCEPTION);
@@ -254,12 +240,7 @@ void MEDMEMTest::testGibiMeshDriver()
     //Test open() method
     CPPUNIT_ASSERT_NO_THROW(aGibiWrDriver->open());
 
-    //Trying open file secondary.
-    //#ifdef ENABLE_FORCED_FAILURES
-    // (BUG) No exception on attempt to open an opened file for the second time
-    //CPPUNIT_ASSERT_THROW(aGibiWrDriver->open(), MEDEXCEPTION);
     CPPUNIT_ASSERT_NO_THROW(aGibiWrDriver->open());
-    //#endif
 
     //Test setMeshName() and getMeshName() methods
     CPPUNIT_ASSERT_NO_THROW(aGibiWrDriver->setMeshName(newmeshname));
@@ -295,9 +276,6 @@ void MEDMEMTest::testGibiMeshDriver()
 
   //-------------------------------Test GIBI READ/WRITE part---------------------------------//
   {
-    //Copy file
-    system(fcopy.c_str());
-
     {
       //Creation a incorrect gibi read/write driver
       GIBI_MESH_RDWR_DRIVER *aInvalidGibiRdWrDriver =
@@ -365,7 +343,7 @@ void MEDMEMTest::testGibiMeshDriver()
   {
     {
       GIBI_MED_RDONLY_DRIVER *aInvalidMedGibiRdDriver =
-        new GIBI_MED_RDONLY_DRIVER(fileNotExistsName_rd, aMed);
+        new GIBI_MED_RDONLY_DRIVER(fileNotExistsName_rd, rdFields);
 
       //Trying open not exising file
       CPPUNIT_ASSERT_THROW(aInvalidMedGibiRdDriver->open(), MEDEXCEPTION);
@@ -375,7 +353,7 @@ void MEDMEMTest::testGibiMeshDriver()
 
     //Creation a correct Gibi read only driver (normal constructor)
     GIBI_MED_RDONLY_DRIVER *aGibiMedRdDriver =
-      new GIBI_MED_RDONLY_DRIVER(filenamemed_rd, aMed);
+      new GIBI_MED_RDONLY_DRIVER(filenamemed_rd, rdFields);
 
     //Check driver
     CPPUNIT_ASSERT(aGibiMedRdDriver);
@@ -400,7 +378,7 @@ void MEDMEMTest::testGibiMeshDriver()
     CPPUNIT_ASSERT_THROW(aGibiMedRdDriver->write(), MEDEXCEPTION);
 
     //Check Med
-    CPPUNIT_ASSERT(aMed);
+    CPPUNIT_ASSERT_EQUAL(1,int(rdFields.size()));
 
     //Test close method
     CPPUNIT_ASSERT_NO_THROW(aGibiMedRdDriver->close());
@@ -431,6 +409,8 @@ void MEDMEMTest::testGibiMeshDriver()
     //CPPUNIT_ASSERT(medrostr1.str() == medrostr2.str());
     //#endif
 
+    rdFields[0]->removeReference();
+
     delete aGibiMedRdDriver;
   }
 
@@ -439,7 +419,7 @@ void MEDMEMTest::testGibiMeshDriver()
     {
       //Creation a incorrect gibi med write only driver
       GIBI_MED_WRONLY_DRIVER *aInvalidGibiMedWrDriver =
-        new GIBI_MED_WRONLY_DRIVER(fileNotExistsName_wr, aMed, aMesh);
+        new GIBI_MED_WRONLY_DRIVER(fileNotExistsName_wr, wrFields, aMesh);
 
       //Trying open non existing file
       CPPUNIT_ASSERT_THROW(aInvalidGibiMedWrDriver->open(), MEDEXCEPTION);
@@ -447,12 +427,12 @@ void MEDMEMTest::testGibiMeshDriver()
       delete aInvalidGibiMedWrDriver;
     }
 
-    //Trying create gibi med write only driver with null MED and MESH
-    CPPUNIT_ASSERT_THROW(new GIBI_MED_WRONLY_DRIVER(tmpfilemed, aMed_1, aMesh_NULL), MEDEXCEPTION);
+    //Trying create gibi med write only driver with null MESH
+    CPPUNIT_ASSERT_THROW(new GIBI_MED_WRONLY_DRIVER(tmpfilemed, wrFields, aMesh_NULL), MEDEXCEPTION);
 
     //Creation a correct gibi med write only drivers
     GIBI_MED_WRONLY_DRIVER *aGibiMedWrDriver =
-      new GIBI_MED_WRONLY_DRIVER(filenamemed_wr, aMed, aMesh);
+      new GIBI_MED_WRONLY_DRIVER(filenamemed_wr, wrFields, aMesh);
 
     //Check driver
     CPPUNIT_ASSERT(aGibiMedWrDriver);
@@ -507,8 +487,7 @@ void MEDMEMTest::testGibiMeshDriver()
 
     delete aGibiMedWrDriver;
   }
-
   //Delete all objects
-  delete aMesh;
-  delete aMesh_2;
+  aMesh->removeReference();
+  aMesh_2->removeReference();
 }

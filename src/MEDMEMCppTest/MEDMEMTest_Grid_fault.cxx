@@ -1,32 +1,29 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-//
+
 #include "MEDMEMTest.hxx"
 #include <cppunit/TestAssert.h>
 
 #include "MEDMEM_define.hxx"
 #include "MEDMEM_Grid.hxx"
 #include "MEDMEM_Mesh.hxx"
-#include "MEDMEM_Med.hxx"
-#include "MEDMEM_MedMedDriver.hxx"
+#include "MEDMEM_MedFileBrowser.hxx"
 #include "MEDMEM_MedMeshDriver.hxx"
 
 #include <sstream>
@@ -44,7 +41,7 @@ using namespace MED_EN;
 
 
 /*!
- *  Check methods (44), defined in MEDMEM_Grid.hxx:
+ *  Check methods (23), defined in MEDMEM_Grid.hxx:
  *  class GRID: public MESH {
  *   (+) GRID();
  *   (+) GRID(const MED_EN::med_grid_type type);
@@ -57,15 +54,7 @@ using namespace MED_EN;
  *   (NOT IMPLEMENTED) GRID & operator=(const GRID &m);
  *   (+) virtual ~GRID();
  *   (+) virtual void init();
- *   (tested together with getCoordinateptr() as it is called
- *    internally from there first of all.
- *    Moreover, fillCoordinates should be made private to avoid
- *    ambiguity druing in GRID class usage.) void fillCoordinates() const;
- *   (tested together with getConnectivityptr()) void fillConnectivity() const;
- *   (+) inline void makeUnstructured();//fill coordinates and connectivity of MESH
- *   (+) void fillMeshAfterRead();
- *   (+) void writeUnstructured(int index=0, const string & driverName = "");
- *   (+) void read(int index=0);
+ *   (+) virtual const MESH * convertInMESH() const
  *   (+) inline int getNodeNumber(const int i, const int j=0, const int k=0) const;
  *   (+) inline int getCellNumber(const int i, const int j=0, const int k=0) const;
  *   (+) int getEdgeNumber
@@ -81,49 +70,20 @@ using namespace MED_EN;
  *   (+) inline MED_EN::med_grid_type getGridType() const;
  *   (+) int getArrayLength(const int Axis) const throw (MEDEXCEPTION);
  *   (+) const double getArrayValue (const int Axis, const int i) const throw (MEDEXCEPTION);
- *   (+) inline const COORDINATE * getCoordinateptr() const;
- *   (+) inline const double * getCoordinates(MED_EN::medModeSwitch Mode) const;
- *   (+) inline const double getCoordinate(int Number,int Axis) const;
  *   (+) inline int getNumberOfTypes(MED_EN::medEntityMesh Entity) const;
- *   (+) inline int getNumberOfTypesWithPoly(MED_EN::medEntityMesh Entity) const;
  *   (+) inline const MED_EN::medGeometryElement * getTypes(MED_EN::medEntityMesh Entity) const;
- *   (+) MED_EN::medGeometryElement * getTypesWithPoly(MED_EN::medEntityMesh Entity) const;
- *   (+) inline const CELLMODEL * getCellsTypes(MED_EN::medEntityMesh Entity) const;
- *   (+) const int * getGlobalNumberingIndex(MED_EN::medEntityMesh Entity) const;
  *   (+) inline int getNumberOfElements
  *                (MED_EN::medEntityMesh Entity, MED_EN::medGeometryElement Type) const;
- *   (+) inline int getNumberOfElementsWithPoly
- *                (MED_EN::medEntityMesh Entity, MED_EN::medGeometryElement Type) const;
- *   (+) inline bool existConnectivity
- *                (MED_EN::medConnectivity ConnectivityType, MED_EN::medEntityMesh Entity) const;
  *   (+) inline MED_EN::medGeometryElement getElementType
  *                (MED_EN::medEntityMesh Entity, int Number) const;
- *   (+) inline MED_EN::medGeometryElement getElementTypeWithPoly
- *                (MED_EN::medEntityMesh Entity, int Number) const;
- *   (+) inline void calculateConnectivity(MED_EN::medModeSwitch Mode,
- *                                             MED_EN::medConnectivity ConnectivityType,
- *                                               MED_EN::medEntityMesh Entity) const;
- *   (+) inline const CONNECTIVITY* getConnectivityptr() const;
- *   (+) inline const int * getConnectivity
- *             (MED_EN::medModeSwitch Mode, MED_EN::medConnectivity ConnectivityType,
- *                MED_EN::medEntityMesh Entity, MED_EN::medGeometryElement Type) const;
- *   (+) inline const int * getConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
- *                                          MED_EN::medEntityMesh Entity) const;
- *   (+) inline const int * getReverseConnectivity(MED_EN::medConnectivity ConnectivityType,
- *                                            MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
- *   (+) inline const int * getReverseConnectivityIndex(MED_EN::medConnectivity ConnectivityType,
- *                                                 MED_EN::medEntityMesh Entity=MED_EN::MED_CELL) const;
  *   (+) inline void setGridType(MED_EN::med_grid_type gridType);
  *  }
  */
-void MEDMEMTest_testGrid()
+static void MEDMEMTest_testGrid()
 {
-  string datadir  = getenv("MED_ROOT_DIR");
-  string filename = datadir + "/share/salome/resources/med/test19.med" ;
-  string tmp_dir  = getenv("TMP") ? getenv("TMP") : "/tmp";
-  if (tmp_dir == "")
-    tmp_dir = "/tmp";
-  string filenameout21 = tmp_dir + "/myGridWrite_grid21.med";
+  string filename      = getResourceFile("test19.med") ;
+  string filenameout21 = makeTmpFile("myGridWrite_grid21.med");
+  ostringstream out;
 
   // To remove tmp files from disk
   MEDMEMTest_TmpFilesRemover aRemover;
@@ -137,24 +97,24 @@ void MEDMEMTest_testGrid()
     aRemover1.Register(filenameout21);
   }
 
-  MED * myMed = new MED() ;
-  MED_MED_RDONLY_DRIVER myMeshDriver (filename, myMed);
-  myMeshDriver.open();
-  myMeshDriver.readFileStruct();
-  myMeshDriver.close();
+  MEDFILEBROWSER * myMed = new MEDFILEBROWSER(filename);
 
   int nbMeshes = myMed->getNumberOfMeshes();
   CPPUNIT_ASSERT(nbMeshes);
 
-  deque<string> mesh_names = myMed->getMeshNames();
+  vector<string> mesh_names = myMed->getMeshNames();
   CPPUNIT_ASSERT(mesh_names.size() != 0);
 
   //////////////////////////////
   // test1 "CARTESIAN GRID"   //
   //////////////////////////////
   {
-    MESH* myMesh = myMed->getMesh(mesh_names[0]);
-    myMesh->read();
+    CPPUNIT_ASSERT(myMed->isStructuredMesh(mesh_names[0]));
+
+    CPPUNIT_ASSERT_THROW( MESH(MED_DRIVER, myMed->getFileName(), mesh_names[0]), MEDEXCEPTION);
+
+    GMESH* myMesh = new GRID(MED_DRIVER, myMed->getFileName(), mesh_names[0]);
+    std::auto_ptr<GMESH> meshDeleter(myMesh);
 
     CPPUNIT_ASSERT(myMesh != NULL);
     CPPUNIT_ASSERT(myMesh->getIsAGrid());
@@ -175,12 +135,13 @@ void MEDMEMTest_testGrid()
     med_grid_type grid_type = myGrid->getGridType();
     CPPUNIT_ASSERT_MESSAGE("Wrong grid type", grid_type == MED_CARTESIAN);
 
-    const double * coordinates = myGrid->getCoordinates(MED_FULL_INTERLACE);
+    const MESH* mesh = myGrid->convertInMESH();
+    const double * coordinates = mesh->getCoordinates(MED_FULL_INTERLACE);
     int SpaceDimension = myGrid->getSpaceDimension();
     for (int axe = 0; axe < SpaceDimension; axe++) {
       for (int num = 0; num < myGrid->getNumberOfNodes(); num++) {
         double coordinate;
-        CPPUNIT_ASSERT_NO_THROW(coordinate = myGrid->getCoordinate(num + 1, axe + 1));
+        CPPUNIT_ASSERT_NO_THROW(coordinate = mesh->getCoordinate(num + 1, axe + 1));
         //cout << "coordinate = " << coordinate << endl;
         CPPUNIT_ASSERT(fabs(coordinate - coordinates[(num * SpaceDimension)+axe]) < 0.001);
       }
@@ -267,109 +228,91 @@ void MEDMEMTest_testGrid()
     }*/
 
     bool existConnect = false;
-    CPPUNIT_ASSERT_NO_THROW(existConnect = myGrid->existConnectivity(MED_NODAL, MED_CELL));
+    CPPUNIT_ASSERT_NO_THROW(existConnect = mesh->existConnectivity(MED_NODAL, MED_CELL));
     if (!existConnect) {
-      CPPUNIT_ASSERT_NO_THROW(myGrid->calculateConnectivity(MED_FULL_INTERLACE, MED_NODAL, MED_CELL));
-      CPPUNIT_ASSERT(myGrid->existConnectivity(MED_NODAL, MED_CELL));
+      CPPUNIT_ASSERT_NO_THROW(mesh->calculateConnectivity( MED_NODAL, MED_CELL));
+      CPPUNIT_ASSERT(mesh->existConnectivity(MED_NODAL, MED_CELL));
     }
 
     const int* Connectivity;
     const int* connectivity_index;
-    CPPUNIT_ASSERT_NO_THROW(Connectivity = myGrid->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                                                   MED_CELL, types[0]));
-    CPPUNIT_ASSERT_NO_THROW(connectivity_index = myGrid->getConnectivityIndex(MED_NODAL, MED_CELL));
-    cout << "Nodal connectivity" << endl;
+    CPPUNIT_ASSERT_NO_THROW(Connectivity = mesh->getConnectivity( MED_NODAL,
+                                                                 MED_CELL, types[0]));
+    CPPUNIT_ASSERT_NO_THROW(connectivity_index = mesh->getConnectivityIndex(MED_NODAL, MED_CELL));
+    out << "Nodal connectivity" << endl;
     for (int j = 0; j < nbElem; j++) {
-      cout << "Element "<< j+1 << " : ";
+      out << "Element "<< j+1 << " : ";
       for (int k = connectivity_index[j]; k < connectivity_index[j+1]; k++)
-        cout << Connectivity[k-1] << " ";
-      cout << endl;
+        out << Connectivity[k-1] << " ";
+      out << endl;
     }
 
     const int * ReverseNodalConnectivity;
     const int * ReverseConnectivityIndex;
-    CPPUNIT_ASSERT_NO_THROW(ReverseNodalConnectivity = myGrid->getReverseConnectivity(MED_NODAL));
-    CPPUNIT_ASSERT_NO_THROW(ReverseConnectivityIndex = myGrid->getReverseConnectivityIndex(MED_NODAL));
+    CPPUNIT_ASSERT_NO_THROW(ReverseNodalConnectivity = mesh->getReverseConnectivity(MED_NODAL));
+    CPPUNIT_ASSERT_NO_THROW(ReverseConnectivityIndex = mesh->getReverseConnectivityIndex(MED_NODAL));
     for (int i = 0; i < nbNodes; i++) {
-      cout << "Node "<< i+1 << " : ";
+      out << "Node "<< i+1 << " : ";
       for (int j = ReverseConnectivityIndex[i]; j < ReverseConnectivityIndex[i+1]; j++)
-        cout << ReverseNodalConnectivity[j-1] << " ";
-      cout << endl;
+        out << ReverseNodalConnectivity[j-1] << " ";
+      out << endl;
     }
 
     const int* myGlobalNbIdx;
-    CPPUNIT_ASSERT_NO_THROW(myGlobalNbIdx = myGrid->getGlobalNumberingIndex(MED_CELL));
+    CPPUNIT_ASSERT_NO_THROW(myGlobalNbIdx = mesh->getGlobalNumberingIndex(MED_CELL));
     for (int i = 0; i <= nbTypesCell; i++) {
       if (i == nbTypesCell) {
         CPPUNIT_ASSERT_THROW(myGrid->getElementType(MED_CELL, myGlobalNbIdx[i]), MEDEXCEPTION);
         break;
       }
-      medGeometryElement aElem, geomPolyElem;
+      medGeometryElement aElem;
       CPPUNIT_ASSERT_NO_THROW(aElem = myGrid->getElementType(MED_CELL, myGlobalNbIdx[i]));
-      CPPUNIT_ASSERT_NO_THROW(geomPolyElem = myGrid->getElementTypeWithPoly(MED_CELL, myGlobalNbIdx[i]));
       CPPUNIT_ASSERT(types[0] == aElem);
-      CPPUNIT_ASSERT(geomPolyElem == aElem);
     }
 
-    CPPUNIT_ASSERT_NO_THROW(existConnect = myGrid->existConnectivity(MED_DESCENDING, MED_CELL));
+    CPPUNIT_ASSERT_NO_THROW(existConnect = mesh->existConnectivity(MED_DESCENDING, MED_CELL));
     if (!existConnect) {
-      CPPUNIT_ASSERT_NO_THROW(myGrid->calculateConnectivity(MED_FULL_INTERLACE, MED_DESCENDING, MED_CELL));
-      CPPUNIT_ASSERT(myGrid->existConnectivity(MED_DESCENDING, MED_CELL));
+      CPPUNIT_ASSERT_NO_THROW(mesh->calculateConnectivity( MED_DESCENDING, MED_CELL));
+      CPPUNIT_ASSERT(mesh->existConnectivity(MED_DESCENDING, MED_CELL));
     }
 
     const int* ConnectivityDes;
     const int* connectivity_index_des;
-    CPPUNIT_ASSERT_NO_THROW(ConnectivityDes = myGrid->getConnectivity(MED_FULL_INTERLACE, MED_DESCENDING,
-                                                                      MED_CELL, MED_ALL_ELEMENTS));
+    CPPUNIT_ASSERT_NO_THROW(ConnectivityDes = mesh->getConnectivity( MED_DESCENDING,
+                                                                    MED_CELL, MED_ALL_ELEMENTS));
     CPPUNIT_ASSERT_NO_THROW(connectivity_index_des =
-                            myGrid->getConnectivityIndex(MED_DESCENDING, MED_CELL));
-    cout<<"Descending connectivity"<<endl;
+                            mesh->getConnectivityIndex(MED_DESCENDING, MED_CELL));
+    out<<"Descending connectivity"<<endl;
     for (int j = 0; j < nbElem; j++) {
-      cout << "Element "<< j+1 << " : ";
+      out << "Element "<< j+1 << " : ";
       for (int k = connectivity_index_des[j]; k < connectivity_index_des[j+1]; k++)
-        cout << ConnectivityDes[k-1] << " ";
-      cout << endl;
+        out << ConnectivityDes[k-1] << " ";
+      out << endl;
     }
 
     const int * ReverseDesConnectivity;
     const int * ReverseConnectivityIndexDes;
-    CPPUNIT_ASSERT_NO_THROW(ReverseDesConnectivity = myGrid->getReverseConnectivity(MED_DESCENDING));
+    CPPUNIT_ASSERT_NO_THROW(ReverseDesConnectivity = mesh->getReverseConnectivity(MED_DESCENDING));
     CPPUNIT_ASSERT_NO_THROW(ReverseConnectivityIndexDes =
-                            myGrid->getReverseConnectivityIndex(MED_DESCENDING));
+                            mesh->getReverseConnectivityIndex(MED_DESCENDING));
     for (int i = 0; i < nbNodes; i++) {
-      cout << "Node "<< i+1 << " : ";
+      out << "Node "<< i+1 << " : ";
       for (int j = ReverseConnectivityIndexDes[i]; j < ReverseConnectivityIndexDes[i+1]; j++)
-        cout << ReverseDesConnectivity[j-1] << " ";
-      cout << endl;
+        out << ReverseDesConnectivity[j-1] << " ";
+      out << endl;
     }
+    mesh->removeReference();
 
-    //TEST POLY
-    {
-      int nbPolytypes;
-      //test getNumberOfTypesWithPoly() - a grid has one type
-      CPPUNIT_ASSERT_NO_THROW(nbPolytypes = myGrid->getNumberOfTypesWithPoly(MED_CELL));
-      CPPUNIT_ASSERT(nbPolytypes == 1 );
-
-      const MED_EN::medGeometryElement * PolyTypes, *Types;
-      CPPUNIT_ASSERT_NO_THROW(PolyTypes = myGrid->getTypesWithPoly(MED_CELL));
-      CPPUNIT_ASSERT_NO_THROW(Types = myGrid->getTypes(MED_CELL));
-      CPPUNIT_ASSERT_EQUAL(PolyTypes[nbPolytypes-1],Types[nbPolytypes-1]);
-
-      for (int t = 0; t < nbPolytypes; t++) {
-        int nbElPoly, nbEl;
-        CPPUNIT_ASSERT_NO_THROW(nbElPoly = myGrid->getNumberOfElementsWithPoly(MED_CELL, PolyTypes[t]));
-        CPPUNIT_ASSERT_NO_THROW(nbEl = myGrid->getNumberOfElements(MED_CELL, PolyTypes[t]));
-        CPPUNIT_ASSERT(nbElPoly == nbEl);
-      }
-    }
   }
 
   //////////////////////////////
   // test2 "MED_BODY_FITTED"  //
   //////////////////////////////
   {
-    MESH* myMesh1 = myMed->getMesh(mesh_names[1]);
-    myMesh1->read();
+    CPPUNIT_ASSERT_THROW( MESH(MED_DRIVER, myMed->getFileName(), mesh_names[1]), MEDEXCEPTION);
+
+    GMESH* myMesh1 = new GRID(MED_DRIVER,myMed->getFileName(),mesh_names[1]);
+    std::auto_ptr<GMESH> meshDeleter(myMesh1);
 
     CPPUNIT_ASSERT(myMesh1 != NULL);
     CPPUNIT_ASSERT(myMesh1->getIsAGrid());
@@ -402,32 +345,36 @@ void MEDMEMTest_testGrid()
     const int* BodyConnectivity;
     const int* body_connectivity_index;
     int ijkNodeBody[3];
-    CPPUNIT_ASSERT_NO_THROW(BodyConnectivity = myGrid1->getConnectivity(MED_FULL_INTERLACE, MED_NODAL,
-                                                                        MED_CELL, types1[0]));
-    CPPUNIT_ASSERT_NO_THROW(body_connectivity_index = myGrid1->getConnectivityIndex(MED_NODAL, MED_CELL));
-    cout<<"Nodal connectivity"<<endl;
+    const MESH* mesh = myGrid1->convertInMESH();
+    CPPUNIT_ASSERT_NO_THROW(BodyConnectivity = mesh->getConnectivity( MED_NODAL,
+                                                                     MED_CELL, types1[0]));
+    CPPUNIT_ASSERT_NO_THROW(body_connectivity_index = mesh->getConnectivityIndex(MED_NODAL, MED_CELL));
+    out<<"Nodal connectivity"<<endl;
     for (int j = 0; j < nbElem; j++) {
-      cout << "Element "<< j+1 << " : ";
+      out << "Element "<< j+1 << " : ";
       for (int k = body_connectivity_index[j]; k < body_connectivity_index[j+1]; k++){
         CPPUNIT_ASSERT_NO_THROW(myGrid1->getNodePosition(BodyConnectivity[k-1], ijkNodeBody[0],
                                                          ijkNodeBody[1], ijkNodeBody[2]));
-        cout << BodyConnectivity[k-1] << " ";
+        out << BodyConnectivity[k-1] << " ";
       }
-      cout << endl;
+      out << endl;
     }
+    mesh->removeReference();
   }
 
   ///////////////////////////////////////////////////
   // test3 "maa1" which in fact is not a pure GRID //
   ///////////////////////////////////////////////////
   {
-    MESH* myMesh2 = NULL;
+    GMESH* myMesh2 = NULL;
 
-    myMesh2 = myMed->getMesh(mesh_names[2]);
-    myMesh2->read();
+    CPPUNIT_ASSERT_THROW( myMesh2 = new GRID( MED_DRIVER,myMed->getFileName(),mesh_names[2]),
+                          MEDEXCEPTION );
+    CPPUNIT_ASSERT_NO_THROW( myMesh2 = new MESH( MED_DRIVER,myMed->getFileName(),mesh_names[2]));
 
     CPPUNIT_ASSERT(myMesh2 != NULL);
     CPPUNIT_ASSERT(!(myMesh2->getIsAGrid()));
+    myMesh2->removeReference();
   }
 
   delete myMed;
@@ -444,7 +391,7 @@ void MEDMEMTest_testGrid()
     CPPUNIT_ASSERT(!myGrid2->getArrayLength(1));
     CPPUNIT_ASSERT(!myGrid2->getArrayLength(2));
     CPPUNIT_ASSERT(!myGrid2->getArrayLength(3));
-    delete myGrid2;
+    myGrid2->removeReference();
   }
 
   // Constructor with grid type, setGridType()
@@ -453,7 +400,7 @@ void MEDMEMTest_testGrid()
     CPPUNIT_ASSERT(myGrid2->getGridType() == MED_POLAR);
     myGrid2->setGridType(MED_CARTESIAN);
     CPPUNIT_ASSERT(myGrid2->getGridType() == MED_CARTESIAN);
-    delete myGrid2;
+    myGrid2->removeReference();
   }
 
   // Constructor with coordinate values, getArrayValue(), init()
@@ -465,7 +412,7 @@ void MEDMEMTest_testGrid()
     {
       xyz[i].resize(i + 2);
       for ( int j = 0; j < i + 2; j++ )
-	xyz[i][j] = j;
+        xyz[i][j] = j;
     }
     vector<string> Coord_Names;
     Coord_Names.resize(nbCoords);
@@ -498,12 +445,13 @@ void MEDMEMTest_testGrid()
     // "true" in some map element during iteration means duplicated node position.
     // "false" in some map element after iteration means empty node position.
     map<int, bool> found;
-    for ( int i1 = 0; i1 < xyz[0].size(); i1++ )
-      for ( int i2 = 0; i2 < xyz[1].size(); i2++ )
-	for ( int i3 = 0; i3 < xyz[2].size(); i3++ )
-	  found[int(xyz[0][i1] * 100 + xyz[1][i2] * 10 + xyz[2][i3])] = false;
+    for ( unsigned i1 = 0; i1 < xyz[0].size(); i1++ )
+      for ( unsigned i2 = 0; i2 < xyz[1].size(); i2++ )
+        for ( unsigned i3 = 0; i3 < xyz[2].size(); i3++ )
+          found[ xyz[0][i1] * 100 + xyz[1][i2] * 10 + xyz[2][i3] ] = false;
 
-    COORDINATE* coords = (COORDINATE*)myGrid2->getCoordinateptr();
+    const MESH* mesh = myGrid2->convertInMESH();
+    COORDINATE* coords = (COORDINATE*)mesh->getCoordinateptr();
     CPPUNIT_ASSERT(coords);
     for (int num = 0; num < myGrid2->getNumberOfNodes(); num++) {
       int x = int(coords->getCoordinate(num + 1, 1));
@@ -518,7 +466,7 @@ void MEDMEMTest_testGrid()
 
     // Testing fillConnectivity() and getConnectivityptr()
     // Basic testing: presence of connectivity arrays, element types and number of elements
-    CONNECTIVITY* conn = (CONNECTIVITY*)myGrid2->getConnectivityptr();
+    CONNECTIVITY* conn = (CONNECTIVITY*)mesh->getConnectivityptr();
     CPPUNIT_ASSERT(conn);
     bool hasFaces = myGrid2->getArrayLength(3), hasEdges = myGrid2->getArrayLength(2);
     medGeometryElement aCellGeometry;
@@ -529,7 +477,7 @@ void MEDMEMTest_testGrid()
     CPPUNIT_ASSERT(conn->existConnectivity(MED_NODAL,      MED_CELL));
     CPPUNIT_ASSERT(conn->existConnectivity(MED_DESCENDING, MED_CELL));
     //test getCellsTypes
-    CELLMODEL* cellmodel = (CELLMODEL*)myGrid2->getCellsTypes(MED_CELL);
+    CELLMODEL* cellmodel = (CELLMODEL*)mesh->getCellsTypes(MED_CELL);
     CPPUNIT_ASSERT(cellmodel);
 
     int nbCells, nbFaces, nbEdges;
@@ -553,7 +501,7 @@ void MEDMEMTest_testGrid()
       CPPUNIT_ASSERT(aFaceCount[1] - 1 == nbFaces);
       CPPUNIT_ASSERT(conn->existConnectivity(MED_NODAL, MED_FACE));
       //test getCellsTypes
-      CELLMODEL* cellmodelF = (CELLMODEL*)myGrid2->getCellsTypes(MED_FACE);
+      CELLMODEL* cellmodelF = (CELLMODEL*)mesh->getCellsTypes(MED_FACE);
       CPPUNIT_ASSERT(cellmodelF);
     }
     if (hasEdges){
@@ -571,7 +519,7 @@ void MEDMEMTest_testGrid()
       CPPUNIT_ASSERT(anEdgeCount[1] - 1 == nbEdges);
       CPPUNIT_ASSERT(conn->existConnectivity(MED_NODAL, MED_EDGE));
       //test getCellsTypes
-      CELLMODEL* cellmodelE = (CELLMODEL*)myGrid2->getCellsTypes(MED_EDGE);
+      CELLMODEL* cellmodelE = (CELLMODEL*)mesh->getCellsTypes(MED_EDGE);
       CPPUNIT_ASSERT(cellmodelE);
 
     }
@@ -579,7 +527,7 @@ void MEDMEMTest_testGrid()
     // Testing getArrayValue()
     for ( int ii = 1; ii <= nbCoords; ii++ )
       for ( int jj = 0; jj < ii + 1; jj++ )
-	CPPUNIT_ASSERT(myGrid2->getArrayValue(ii, jj) == xyz[ii - 1][jj]);
+        CPPUNIT_ASSERT(myGrid2->getArrayValue(ii, jj) == xyz[ii - 1][jj]);
 
     CPPUNIT_ASSERT_THROW(myGrid2->getArrayValue(nbCoords + 1, 0), MEDEXCEPTION);
     CPPUNIT_ASSERT_THROW(myGrid2->getArrayValue(1, myGrid2->getArrayLength(1) + 1), MEDEXCEPTION);
@@ -592,7 +540,7 @@ void MEDMEMTest_testGrid()
 
     try
     {
-      idGridV21 = myGrid2->addDriver(MED_DRIVER,filenameout21);
+      idGridV21 = const_cast<MESH*>(mesh)->addDriver(MED_DRIVER,filenameout21);
     }
     catch(MEDEXCEPTION &e)
     {
@@ -604,7 +552,7 @@ void MEDMEMTest_testGrid()
     }
 
     // write this driver to file as an unstructured mesh
-    CPPUNIT_ASSERT_NO_THROW(myGrid2->writeUnstructured(idGridV21));
+    CPPUNIT_ASSERT_NO_THROW(mesh->write(idGridV21));
 
     GRID* myGrid3 = new GRID();
     // add new driver for myGrid3
@@ -618,12 +566,12 @@ void MEDMEMTest_testGrid()
     // Testing getArrayValue()
     for ( int ii = 1; ii <= nbCoords; ii++ )
       for ( int jj = 0; jj < ii + 1; jj++ )
-	CPPUNIT_ASSERT(myGrid3->getArrayValue(ii, jj) == xyz[ii - 1][jj]);
+        CPPUNIT_ASSERT(myGrid3->getArrayValue(ii, jj) == xyz[ii - 1][jj]);
 
     CPPUNIT_ASSERT(myGrid3->getGridType() == MED_POLAR);
 //#endif
 
-    delete myGrid3;
+    myGrid3->removeReference();
 
     //test init()
     CPPUNIT_ASSERT_NO_THROW(myGrid2->init());
@@ -633,13 +581,14 @@ void MEDMEMTest_testGrid()
     CPPUNIT_ASSERT(myGrid2->getArrayLength(3) == 0);
 //#ifdef ENABLE_FAULTS
     // (BUG) Segmentation Fault
-    myGrid2->makeUnstructured();
+    //myGrid2->makeUnstructured();
 //#endif
 //#ifdef ENABLE_FORCED_FAILURES
 //    CPPUNIT_FAIL("ERROR:makeUnstructured() - there is no check if grid is empty or not");
 //#endif
 
-    delete myGrid2;
+    myGrid2->removeReference();
+    mesh->removeReference();
   }
 
 //#ifdef ENABLE_FORCED_FAILURES
@@ -659,13 +608,13 @@ void MEDMEMTest_testGrid()
     int nbElem;
     CPPUNIT_ASSERT_NO_THROW(nbElem = myGrid2->getNumberOfElements(MED_CELL,types2[0]));
     CPPUNIT_ASSERT(nbElem);
-    delete myGrid2;
+    myGrid2->removeReference();
   }
 //#endif
 
   {
     GRID* myGrid4 = new GRID();
-    filename = datadir + "/share/salome/resources/med/pointe.med";
+    filename = getResourceFile("pointe.med");
     myGrid4->setName("maa1");
     MED_MESH_RDONLY_DRIVER myMeshDriver(filename, myGrid4);
     myMeshDriver.setMeshName("maa1");
@@ -692,7 +641,7 @@ void MEDMEMTest_testGrid()
     CPPUNIT_ASSERT(myGrid4->getArrayLength(2) != 0);
     CPPUNIT_ASSERT(myGrid4->getArrayLength(3) != 0);*/
 
-    delete myGrid4;
+    myGrid4->removeReference();
   }
 }
 

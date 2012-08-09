@@ -53,20 +53,20 @@ MEDfichEntete(med_idt fid, med_fich_info quoi, char str[])
       strncpy(chemin,MED_MAA,strlen(MED_MAA)-1);
       chemin[MED_TAILLE_MAA-1] = '\0';
       if ((root = _MEDdatagroupOuvrir(fid,chemin)) < 0)
-	return -1;
+        return -1;
 
       /*
        * On regarde si l'attribut existe
        * Si non => erreur
        * Si oui => on le copie dans str
        */
-      if ((ret = _MEDattrStringLire(root,MED_NOM_DESCRIPTEUR,
-				    MED_TAILLE_DESC,locale)) < 0)
-	return -1;
+      if ((ret = _MEDattrStringLire(root,(char*)MED_NOM_DESCRIPTEUR,
+                                    MED_TAILLE_DESC,locale)) < 0)
+        return -1;
       strcpy(str,locale);
       
       if ((ret = _MEDdatagroupFermer(root)) < 0)
-	return -1;
+        return -1;
 
       break;
       

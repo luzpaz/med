@@ -31,7 +31,7 @@ namespace med_2_1{
 
 med_int 
 MEDnPasdetemps(med_idt fid,char *cha,med_entite_maillage type_ent, 
-	       med_geometrie_element type_geo)
+               med_geometrie_element type_geo)
 
 {
   med_err ret;
@@ -57,7 +57,7 @@ MEDnPasdetemps(med_idt fid,char *cha,med_entite_maillage type_ent,
   if ((type_ent != MED_NOEUD))
     {
       if ((ret = _MEDnomGeometrie(tmp1,type_geo)) < 0)
-	return -1;
+        return -1;
       strcat(nomdatagroup1,".");
       strcat(nomdatagroup1,tmp1);
     }

@@ -1,24 +1,25 @@
 #!/usr/bin/env python
-# Copyright (C) 2005  OPEN CASCADE, CEA, EDF R&D, LEG
-#           PRINCIPIA R&D, EADS CCR, Lip6, BV, CEDRAT
+#  -*- coding: iso-8859-1 -*-
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
+#
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
-# License as published by the Free Software Foundation; either 
+# License as published by the Free Software Foundation; either
 # version 2.1 of the License.
-# 
-# This library is distributed in the hope that it will be useful 
-# but WITHOUT ANY WARRANTY; without even the implied warranty of 
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-# Lesser General Public License for more details.
-# 
-# You should have received a copy of the GNU Lesser General Public  
-# License along with this library; if not, write to the Free Software 
-# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-# 
-# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-# 
-############################################################################
 #
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+#
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+#
+
+############################################################################
 # This script tests conversion of MEDMEM to EnSight by performing following
 # operations on available med files:
 # - read med file into MEDMEM and breifly dump it's content;
@@ -26,9 +27,8 @@
 # - checks generated EnSight files using ens_checker utility (if available);
 # - read generated EnSight file into MEDMEM and breifly dump it's content;
 # - store MEDMEM to med file.
-#
 ############################################################################
-
+#
 from medmem import *
 from dumpMEDMEM import *
 from re import search
@@ -45,7 +45,7 @@ formats = [
 
 tmpDir  = os.getenv("TMP")
 if not tmpDir:
-    tmpDir = os.getenv("TMPDIR")
+    tmpDir = os.getenv("TMPDIR","/tmp")
 
 inDir = os.path.join(os.getenv("MED_ROOT_DIR"), "share","salome","resources","med")
 if not os.access(inDir, os.F_OK):
@@ -70,8 +70,8 @@ else:
 dumpMesh = False
 dumpMesh = True
 
-dumpField= True
 dumpField= False
+dumpField= True
 
 def check_ens(casefile, logfile):
     cmd = "(cd %s; ens_checker %s > %s 2>&1)" % (outDir, casefile, logfile)
@@ -101,12 +101,11 @@ from dircache import listdir
 
 # all files sorted by size increasing
 medFiles = [
-#     "maillage_chemvalIV_cas1_40elts.med"
+     "ChampsDarcy.med"
 #     ,"Old_maillage_chemvalIV_cas1_40elts.med"
 #     ,"maillage_UniSegFam.med"
 #     ,"champ1.med"
 #     ,"carre_en_quad4.med"
-#     ,"maillage_UniSegFam_import22.med"
 #     ,"poly3D.med"
 #     ,"Old_Deff_fdt_5.8_castem_vf_diff_conc_dom.med"
 #     ,"Old_Deff_fdt_5.8_castem_efmh_diff_conc_dom.med"
@@ -115,19 +114,14 @@ medFiles = [
 #     ,"carre_en_quad4_seg2.med"
 #     ,"polyedres.med"
 #     ,"Fields_group3D.med"
-#     ,"carre_en_quad4_import22.med"
 #     ,"maillage_5_5_5.med"
 #     ,"cube_hexa8.med"
-#     ,"carre_en_quad4_seg2_import22.med"
 #     ,"new_pointe.med"
 #     ,"mesh.med"
 #     ,"cube_hexa8_quad4.med"
-#     ,"cube_hexa8_import22.med"
 #     ,"jurassique.med"
 #     ,"test_2D.med"
-#     ,"mesh_import22.med"
 #     ,"pointe_4fields.med"
-#     ,"cube_hexa8_quad4_import22.med"
 #     ,"pointe.med"
 #     ,"test19.med"
 #     ,"extendedtransport53_triangles.med"
@@ -136,7 +130,6 @@ medFiles = [
 #     ,"zzzz121b_without_tr6.med"
 #     ,"trio_2D.med"
 #     ,"essaiminimail.med"
-#     ,"pointe_import22.med"
 #     ,"maill.0.med"
 #     ,"elle_3D_HPr_2x2x2_2.med"
 #     ,"maill.00_nofield.med"
@@ -199,12 +192,10 @@ medFiles = [
 #     ,"Mistrat.med"
 #     ,"Old_ChampsDarcy.med"
 #     ,"ChampsDarcy.med"
-#     ,"Mistrat_import22.med"
 #     ,"resu.2.med"
 #     ,"maill.2.med"
 #     ,"TimeStamps.med"
 #     ,"hexa_28320_ELEM.med"
-#     ,"TimeStamps_import22.med"
     ]
 
 badFiles = [ # files that can't be read by MEDMEM
@@ -223,18 +214,35 @@ for medFile in medFiles: # loop on med files in inDir
     # read MED file
     medFile = os.path.join( inDir, medFile )
     print "reading",medFile
+    fields = []
     try:
-        med = MED(MED_DRIVER, medFile)
-        med.read();
-        m2m_nom  = med.getMeshName(0)
-        mesh = med.getMesh(m2m_nom)
+        med = MEDFILEBROWSER(medFile)
+        if med.getNumberOfMeshes() < 1: continue
+        m2m_nom  = med.getMeshNames()[0]
+        if med.isStructuredMesh(m2m_nom):
+            mesh = GRID(MED_DRIVER,medFile,m2m_nom);
+        else:
+            mesh = MESH(MED_DRIVER,medFile,m2m_nom);
+            pass
+
+        for f_name in med.getFieldNames():
+            if med.getMeshName(f_name) != mesh.getName(): continue
+            dtit_list = med.getFieldIteration( f_name )
+            for dtit in dtit_list:
+                if med.getFieldType( f_name ) == MED_REEL64:
+                    field = FIELDDOUBLE(MED_DRIVER, medFile, f_name, dtit.dt, dtit.it, mesh )
+                else:
+                    field = FIELDINT(MED_DRIVER, medFile, f_name, dtit.dt, dtit.it, mesh )
+                    pass
+                fields.append( field )
     except:
         print sys.exc_value
         continue
 
     ShowMesh( mesh )
+    print "Nb Fields",len(fields)
     #ShowGroups( mesh )
-    ## ShowFields( med )
+    #ShowFields( fields, 10 )
 
     basename = os.path.join( outDir, basename ) + '.'
     checkFile = basename + "ens_checker"
@@ -277,10 +285,13 @@ for medFile in medFiles: # loop on med files in inDir
         # check_ens(ensFile, checkFile)
 
         # write EnSight
-        medEnsDriver = ENSIGHT_MED_WRONLY_DRIVER (ensFile, med)
         print "writting", ensFile
         try:
-            medEnsDriver.write()
+            if fields:
+                medEnsDriver = ENSIGHT_MED_WRONLY_DRIVER (ensFile, fields)
+                medEnsDriver.write()
+            else:
+                mesh.write( ENSIGHT_DRIVER, ensFile )
         except:
             if not compatibilityPb():
                 sys.exit(1)
@@ -291,19 +302,21 @@ for medFile in medFiles: # loop on med files in inDir
 
         # read generated EnSight into MEDMEM
         print "reading",ensFile
-        medFromEns = MED(ENSIGHT_DRIVER, ensFile)
-        medFromEns.read();
+        if fields:
+            medFromEns = ENSIGHT_MED_RDONLY_DRIVER(ensFile)
+            fields = medFromEns.read()
+            mesh = fields[0].getSupport().getMesh()
+        else:
+            mesh = MESH(ENSIGHT_DRIVER, ensFile, "")
 
         # dump generated EnSight
-        m2m_nom  = medFromEns.getMeshName(0)
-        mesh = medFromEns.getMesh(m2m_nom)
         if dumpMesh:
-            ShowMesh( mesh )
-            #ShowMesh( mesh, 10, [10,10,10] )
+            #ShowMesh( mesh )
+            ShowMesh( mesh, 10, [10,10,10] )
             #ShowGroups( mesh )
             pass
         if dumpField:
-            ShowFields( medFromEns )
+            ShowFields( fields, 10 )
             pass
 
         # write EnSight to MED
@@ -311,8 +324,10 @@ for medFile in medFiles: # loop on med files in inDir
         deleteFile(wFile)
         print "write",wFile
         try:
-            wdrv = medFromEns.addDriver(MED_DRIVER,wFile)
-            medFromEns.write( wdrv )
+            mesh.write( MED_DRIVER,wFile )
+            for f in fields:
+                fTyped = f.castToTypedField()
+                fTyped.write(MED_DRIVER,wFile)
         except:
             import traceback
             traceback.print_exc()

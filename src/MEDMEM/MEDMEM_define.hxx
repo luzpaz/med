@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef DEFINE_HXX
 #define DEFINE_HXX
 
@@ -28,10 +29,44 @@
 #include <assert.h>
 
 // UTILE AUX DEUX NAMESPACES
-extern "C"{
 #include <hdf5.h>
-}
 
+namespace med_2_3 {
+  extern "C" { 
+    #include <med.h>
+        med_err MEDfieldComputingStepInfo(const med_idt fid,
+                                    const char * const fieldname,
+                                    const int csit,
+                                    med_int * const numdt,
+                                    med_int * const numit,
+                                    med_float * const dt);
+  
+  med_err MEDmeshEntityFamilyNumberRd(const med_idt               fid,
+                                      const char*  const          meshname,
+                                      const med_int               numdt,
+                                      const med_int               numit,
+                                      const med_entity_type       entitype,
+                                      const med_geometry_type     geotype,
+                                      med_int * const             number);
+
+  med_err MEDmeshEntityNumberRd(const med_idt               fid,
+                                const char*  const          meshname,
+                                const med_int               numdt,
+                                const med_int               numit,
+                                const med_entity_type       entitype,
+                                const med_geometry_type     geotype,
+                                med_int * const             number);
+
+  med_err MEDfieldCr( const med_idt fid,
+                      const char * const fieldname,
+                      const med_field_type fieldtype,
+                      const med_int nbofcomponent,
+                      const char * const componentname,
+                      const char * const componentunit,
+                      const char * const dtunit,
+                      const char * const meshname);
+  }
+}
 
 namespace MED_EN {
   extern "C" { // on est la
@@ -45,6 +80,63 @@ namespace MED_EN {
 // #define MED_TAILLE_LNOM  80
 // #define MED_TAILLE_PNOM   8
 
+#ifdef MED_NONE
+#undef MED_NONE
+#endif
+#ifdef MED_POINT1
+#undef MED_POINT1
+#endif
+#ifdef MED_SEG2
+#undef MED_SEG2
+#endif
+#ifdef MED_SEG3
+#undef MED_SEG3
+#endif
+#ifdef MED_TRIA3
+#undef MED_TRIA3
+#endif
+#ifdef MED_QUAD4
+#undef MED_QUAD4
+#endif
+#ifdef MED_TRIA6
+#undef MED_TRIA6
+#endif
+#ifdef MED_QUAD8
+#undef MED_QUAD8
+#endif
+#ifdef MED_TETRA4
+#undef MED_TETRA4
+#endif
+#ifdef MED_PYRA5
+#undef MED_PYRA5
+#endif
+#ifdef MED_PENTA6
+#undef MED_PENTA6
+#endif
+#ifdef MED_HEXA8
+#undef MED_HEXA8
+#endif
+#ifdef MED_TETRA10
+#undef MED_TETRA10
+#endif
+#ifdef MED_PYRA13
+#undef MED_PYRA13
+#endif
+#ifdef MED_PENTA15
+#undef MED_PENTA15
+#endif
+#ifdef MED_HEXA20
+#undef MED_HEXA20
+#endif
+#ifdef MED_POLYGON
+#undef MED_POLYGON
+#endif
+#ifdef MED_POLYHEDRA
+#undef MED_POLYHEDRA
+#endif
+#ifdef MED_ALL_ELEMENTS
+#undef MED_ALL_ELEMENTS
+#endif
 
     typedef long medGeometryElement;
     const medGeometryElement MED_NONE = 0;
@@ -168,7 +260,7 @@ typedef hssize_t       med_ssize;
 typedef herr_t         med_err;
 
 /* types elementaires */
-typedef int	       med_int;
+typedef int            med_int;
 typedef double         med_float;
 #endif
 
@@ -190,9 +282,9 @@ typedef double         med_float;
 
   }
 
-// valeurs des algos de connexites
-#define FRACT_ALGO 10
-#define MAX_LOOP 200
+  // valeurs des algos de connexites
+  const int FRACT_ALGO = 10;
+  const int MAX_LOOP   = 200;
 // fin
 
 // Valeurs de IO_MED
@@ -200,11 +292,11 @@ typedef double         med_float;
 //#define WRITE 1
 
 
-#define MED_CLOSED   0
-#define MED_OPENED   1
-#define MED_INVALID -1
-#define MED_ERROR   -1
-#define MED_VALID    0
+  const int MED_CLOSED   = 0;
+  const int MED_OPENED   = 1;
+  const int MED_INVALID  = -1;
+  const int MED_ERROR    = -1;
+  const int MED_VALID    = 0;
 //#define MED_NULL     NULL
 
 //#define MED_RDONLY RDONLY
@@ -218,12 +310,9 @@ typedef double         med_float;
 //#define MED_CREATE MED_CREA
 // Fin
 
-#define FAUX 0
-#define VRAI 1
-#define longueur_string 100
-#define PRECISION 0.0000001
-// #define undefined -1
-#define MED_UNDEFINED -1
+  const int longueur_string = 100;
+  const double PRECISION = 0.0000001;
+  const int MED_UNDEFINED = -1;
 
 // type des connectivites
 //#define CONN_NOD 0
@@ -231,25 +320,25 @@ typedef double         med_float;
 //#define CONN_DESC_TOT 2
 
 // valeurs de type_interpolation
-#define P1                 0
-#define pseudo_P2          1
-#define trilineaire        2
-#define P2_adapte          3
-#define VF_conservatif     4
-#define VF_non_conservatif 5
-// valeurs de type_mapping
-#define connexite   0
-#define conn_octree 1
-#define brutal      2
+  const int P1                 = 0;
+  const int pseudo_P2          = 1;
+  const int trilineaire        = 2;
+  const int P2_adapte          = 3;
+  const int VF_conservatif     = 4;
+  const int VF_non_conservatif = 5;
+  // valeurs de type_mapping
+  const int connexite   = 0;
+  const int conn_octree = 1;
+  const int brutal      = 2;
 // valeurs des type_support
-#define support_noeud 0
-#define support_maille 1
+  const int support_noeud = 0;
+  const int support_maille = 1;
 // retour des fonctions
-#define OK 0
-#define KO 1
+  //const int OK = 0;
+  //const int KO = 1;
 
 //maximum number of groups handled by the Family Group converter
-#define MAX_NB_GROUP 100000
+  const int MAX_NB_GROUP = 100000;
   /*
     enum definition for the used Med File version V2.1 or V2.2
     because of incompatibility between them.

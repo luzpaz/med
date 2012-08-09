@@ -20,9 +20,7 @@
 #define MED_H
 
 
-extern "C"{
 #include <hdf5.h>
-}
 
 namespace med_2_1{
   
@@ -46,10 +44,10 @@ typedef enum {MED_GRID_D1=0, MED_GRID_D2=1, MED_GRID_D3=2,
 /* Fin de l'integration*/
 
 typedef enum {MED_FULL_INTERLACE,
-	      MED_NO_INTERLACE}  med_mode_switch; 
+              MED_NO_INTERLACE}  med_mode_switch; 
 
 typedef enum {MED_GLOBALE,
-	      MED_COMPACT }  med_mode_profil; 
+              MED_COMPACT }  med_mode_profil; 
 
 typedef enum {MED_LECT,MED_ECRI,MED_REMP} med_mode_acces; 
 
@@ -63,9 +61,9 @@ typedef enum {MED_REEL64=6, MED_INT32=24,MED_INT64=26, MED_INT} med_type_champ;
 #define MED_NBR_GEOMETRIE_FACE 4
 #define MED_NBR_GEOMETRIE_ARETE 2
 typedef enum {MED_POINT1=1, MED_SEG2=102, MED_SEG3=103, MED_TRIA3=203,
-	      MED_QUAD4=204, MED_TRIA6=206,MED_QUAD8=208, MED_TETRA4=304,
-	      MED_PYRA5=305, MED_PENTA6=306, MED_HEXA8=308, MED_TETRA10=310, 
-	      MED_PYRA13=313, MED_PENTA15=315, MED_HEXA20=320}
+              MED_QUAD4=204, MED_TRIA6=206,MED_QUAD8=208, MED_TETRA4=304,
+              MED_PYRA5=305, MED_PENTA6=306, MED_HEXA8=308, MED_TETRA10=310, 
+              MED_PYRA13=313, MED_PENTA15=315, MED_HEXA20=320}
 med_geometrie_element;
 
 typedef enum {MED_NOD, MED_DESC} med_connectivite ; 

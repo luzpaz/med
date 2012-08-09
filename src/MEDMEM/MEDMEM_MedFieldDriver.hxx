@@ -1,47 +1,42 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef MED_FIELD_DRIVER_HXX
 #define MED_FIELD_DRIVER_HXX
 
-#include <string>
-
-#include "MEDMEM_define.hxx"
-
 #include "MEDMEM_GenDriver.hxx"
-#include "MEDMEM_Utilities.hxx"
-
-#include "MEDMEM_STRING.hxx"
-#include "MEDMEM_Exception.hxx"
-// #include "MEDMEM_Unit.hxx"
-// #include "MEDMEM_Array.hxx"
-// #include "MEDMEM_Support.hxx"
-// #include "MEDMEM_Mesh.hxx"
-#include "MEDMEM_Compatibility21_22.hxx"
-#include "MEDMEM_FieldForward.hxx"
 
 namespace MEDMEM {
 template <class T> class MED_FIELD_RDWR_DRIVER;
 template <class T> class MED_FIELD_RDONLY_DRIVER;
 template <class T> class MED_FIELD_WRONLY_DRIVER;
+
+/*!
+
+  Driver Med for FIELD.
+
+  Generic part : implement open and close methods.
+
+*/
 
 template <class T> class MED_FIELD_DRIVER : public GENDRIVER
 {
@@ -54,53 +49,26 @@ protected:
   //      _ptrField( (FIELD<T> *) ptrField )
   //   Cela cast toujours le ptrField en FullInterlace
   //   Cela ne pose cependant pas de pb de fonctionement aux drivers
-  FIELD<T> *     _ptrField;
-  string         _fieldName;
-  int            _fieldNum;
+  FIELD<T> *       _ptrField;
+  std::string      _fieldName;
+  int              _fieldNum;
+  med_2_3::med_idt _medIdt;
 
 public :
 
-  /*!
-    Constructor.
-  */
-  MED_FIELD_DRIVER():
-    GENDRIVER(MED_DRIVER),
-    _ptrField((FIELD<T> *) MED_NULL),
-    _fieldName(""),_fieldNum(MED_INVALID)
-  {}
-  /*!
-    Constructor.
-  */
+  MED_FIELD_DRIVER();
+
   template <class INTERLACING_TAG>
-  MED_FIELD_DRIVER(const string & fileName, FIELD<T, INTERLACING_TAG> * ptrField,
-		   MED_EN::med_mode_acces accessMode)
-    : GENDRIVER(fileName, accessMode, MED_DRIVER),
-      _ptrField((FIELD<T> *) ptrField),
-      _fieldName(""),_fieldNum(MED_INVALID)
-  {
-  }
+  MED_FIELD_DRIVER(const std::string &         fileName,
+                   FIELD<T, INTERLACING_TAG> * ptrField,
+                   MED_EN::med_mode_acces      accessMode);
 
-  /*!
-    Copy constructor.
-  */
-  MED_FIELD_DRIVER(const MED_FIELD_DRIVER & fieldDriver):
-    GENDRIVER(fieldDriver),
-    _ptrField(fieldDriver._ptrField),
-    _fieldName(fieldDriver._fieldName),
-    _fieldNum(fieldDriver._fieldNum)
-  {
-  }
+  MED_FIELD_DRIVER(const MED_FIELD_DRIVER & fieldDriver);
 
-  /*!
-    Destructor.
-  */
-  virtual ~MED_FIELD_DRIVER()
-  {
-    MESSAGE_MED("MED_FIELD_DRIVER::~MED_FIELD_DRIVER() has been destroyed");
-  }
+  virtual ~MED_FIELD_DRIVER();
 
-  virtual void open() throw (MEDEXCEPTION) = 0;
-  virtual void close() =0;
+  virtual void open() throw (MEDEXCEPTION);
+  virtual void close();
   virtual void write( void ) const = 0 ;
   virtual void read ( void ) = 0 ;
   /*!
@@ -108,16 +76,50 @@ public :
 
     It could be different than the name of the FIELD object.
   */
-  virtual void   setFieldName(const string & fieldName) { _fieldName = fieldName; }
+  virtual void   setFieldName(const std::string & fieldName) { _fieldName = fieldName; }
   /*!
     Get the name of the FIELD asked in file.
   */
-  virtual string getFieldName() const { return _fieldName; }
+  virtual std::string getFieldName() const { return _fieldName; }
+
 protected:
   virtual GENDRIVER * copy ( void ) const = 0 ;
-  friend class MED_FIELD_RDWR_DRIVER<T>;
-  friend class MED_FIELD_RDONLY_DRIVER<T>;
-  friend class MED_FIELD_WRONLY_DRIVER<T>;
+
+  bool createFieldSupportPart1(med_2_3::med_idt        id,
+                               const std::string &     fieldName,
+                               med_2_3::med_int        ndt,
+                               med_2_3::med_int        od,
+                               SUPPORT &               support,
+                               std::string &           meshName,
+                               std::vector<int> &      numberOfElementsOfTypeC,
+                               std::vector<int> &      numberOfGaussPoint,
+                               std::vector<std::string>& gaussModelName,
+                               std::vector<std::string>& profilName,
+                               int &                   totalNumberOfElWg,
+                               MED_EN::medEntityMesh & fieldMedFileEntity,
+                               MED_EN::medEntityMesh   preferEntity=MED_EN::MED_ALL_ENTITIES
+                               ) const throw (MEDEXCEPTION);
+
+  void getMeshGeometricTypeFromFile(med_2_3::med_idt      id,
+                                    std::string &              meshName,
+                                    MED_EN::medEntityMesh entite,
+                                    std::vector<MED_EN::medGeometryElement> & geoType,
+                                    std::vector<int> &         nbOfElOfType,
+                                    std::vector<int> &         nbOfElOfTypeC
+                                    ) const throw(MEDEXCEPTION);
+
+  void getMeshGeometricTypeFromMESH( const GMESH * meshPtr,
+                                     MED_EN::medEntityMesh  entity,
+                                     std::vector<MED_EN::medGeometryElement> & geoType,
+                                     std::vector<int> &nbOfElOfType,
+                                     std::vector<int> &nbOfElOfTypeC
+                                     ) const throw(MEDEXCEPTION);
+
+  int getMeshDimensionFromFile(med_2_3::med_idt id, const string & meshName) const;
+        
+  MED_EN::medEntityMesh getMEDMEMEntityFromMEDType(MED_EN::medGeometryElement type,
+                                                   int                        mesh_dim) const;
+
 };
 
 /*!
@@ -128,48 +130,26 @@ protected:
 
 */
 
-template <class T> class IMED_FIELD_RDONLY_DRIVER : public virtual MED_FIELD_DRIVER<T>
+template <class T> class MED_FIELD_RDONLY_DRIVER : public virtual MED_FIELD_DRIVER<T>
 {
-
 public :
 
-  /*!
-    Constructor.
-  */
-  IMED_FIELD_RDONLY_DRIVER() {}
+  MED_FIELD_RDONLY_DRIVER();
 
-  /*!
-    Constructor.
-  */
   template <class INTERLACING_TAG>
-  IMED_FIELD_RDONLY_DRIVER(const string & fileName,
-			   FIELD<T, INTERLACING_TAG> * ptrField):
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDONLY)
-  {
-  const char* LOC = "IMED_FIELD_RDONLY_DRIVER::IMED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
-  BEGIN_OF_MED(LOC);
-  END_OF_MED(LOC);
-  }
+  MED_FIELD_RDONLY_DRIVER(const string &              fileName,
+                          FIELD<T, INTERLACING_TAG> * ptrField);
 
-  /*!
-    Copy constructor.
-  */
-  IMED_FIELD_RDONLY_DRIVER(const IMED_FIELD_RDONLY_DRIVER & fieldDriver):
-    MED_FIELD_DRIVER<T>(fieldDriver) {}
+  MED_FIELD_RDONLY_DRIVER(const MED_FIELD_RDONLY_DRIVER & fieldDriver);
 
-  /*!
-    Destructor.
-  */
-  virtual ~IMED_FIELD_RDONLY_DRIVER() {}
+  virtual ~MED_FIELD_RDONLY_DRIVER() {};
 
-  // CREER UNE METHODE POUR LIRE LA LISTE DES MAILLAGES .....
-
-  /*!
-    Return a MEDEXCEPTION : it is the read-only driver.
-  */
   void write( void ) const throw (MEDEXCEPTION) ;
+  void read ( void ) throw (MEDEXCEPTION) ;
 
-  friend class MED_FIELD_RDONLY_DRIVER<T>;
+private:
+  GENDRIVER * copy( void ) const ;
+
 };
 
 /*!
@@ -180,44 +160,32 @@ public :
 
 */
 
-template <class T> class IMED_FIELD_WRONLY_DRIVER : public virtual MED_FIELD_DRIVER<T> {
-
+template <class T> class MED_FIELD_WRONLY_DRIVER : public virtual MED_FIELD_DRIVER<T>
+{
 public :
 
-  /*!
-    Constructor.
-  */
-  IMED_FIELD_WRONLY_DRIVER() {}
+  MED_FIELD_WRONLY_DRIVER();
 
-  /*!
-    Constructor.
-  */
   template <class INTERLACING_TAG>
-  IMED_FIELD_WRONLY_DRIVER(const string & fileName,
-			   FIELD<T, INTERLACING_TAG> * ptrField):
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::WRONLY)
-  {
-  const char* LOC = "MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
-  BEGIN_OF_MED(LOC);
-  END_OF_MED(LOC);
-  }
+  MED_FIELD_WRONLY_DRIVER(const string &              fileName,
+                          FIELD<T, INTERLACING_TAG> * ptrField);
+
+  MED_FIELD_WRONLY_DRIVER(const MED_FIELD_WRONLY_DRIVER & fieldDriver);
+
+  virtual ~MED_FIELD_WRONLY_DRIVER();
 
   /*!
-    Copy constructor.
+    Write FIELD in the specified file.
   */
-  IMED_FIELD_WRONLY_DRIVER(const IMED_FIELD_WRONLY_DRIVER & fieldDriver):
-    MED_FIELD_DRIVER<T>(fieldDriver) {}
-
-  /*!
-    Destructor.
-  */
-  virtual ~IMED_FIELD_WRONLY_DRIVER() {};
+  void write( void ) const throw (MEDEXCEPTION) ;
   /*!
     Return a MEDEXCEPTION : it is the write-only driver.
   */
   void read ( void ) throw (MEDEXCEPTION) ;
 
-  friend class MED_FIELD_WRONLY_DRIVER<T>;
+private:
+  GENDRIVER * copy( void ) const ;
+
 };
 
 
@@ -229,235 +197,40 @@ public :
 
 */
 
-template <class T> class IMED_FIELD_RDWR_DRIVER : public virtual IMED_FIELD_RDONLY_DRIVER<T>,
-						  public virtual IMED_FIELD_WRONLY_DRIVER<T>
+template <class T> class MED_FIELD_RDWR_DRIVER : public MED_FIELD_RDONLY_DRIVER<T>, public MED_FIELD_WRONLY_DRIVER<T>
 {
-
 public :
 
-  /*!
-    Constructor.
-  */
-  IMED_FIELD_RDWR_DRIVER() {}
+  MED_FIELD_RDWR_DRIVER();
 
-  /*!
-    Constructor.
-  */
   template <class INTERLACING_TAG>
-  IMED_FIELD_RDWR_DRIVER(const string & fileName,
-			 FIELD<T, INTERLACING_TAG> * ptrField):
-    IMED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField),
-    IMED_FIELD_WRONLY_DRIVER<T>(fileName,ptrField),
-    MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDWR)
-  {
-  const char* LOC = "MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
-  BEGIN_OF_MED(LOC);
-    //_accessMode = MED_RDWR ;
-  END_OF_MED(LOC);
-  }
+  MED_FIELD_RDWR_DRIVER(const string &              fileName,
+                        FIELD<T, INTERLACING_TAG> * ptrField);
 
-  /*!
-    Copy constructor.
-  */
-  IMED_FIELD_RDWR_DRIVER(const IMED_FIELD_RDWR_DRIVER & fieldDriver):
-    IMED_FIELD_RDONLY_DRIVER<T>(fieldDriver),
-    IMED_FIELD_WRONLY_DRIVER<T>(fieldDriver),
-    MED_FIELD_DRIVER<T>(fieldDriver)
-  {
-  }
+  MED_FIELD_RDWR_DRIVER(const MED_FIELD_RDWR_DRIVER & fieldDriver);
 
   /*!
     Destructor.
   */
-  ~IMED_FIELD_RDWR_DRIVER() {}
+  ~MED_FIELD_RDWR_DRIVER();
 
-  friend class MED_FIELD_RDWR_DRIVER<T>;
-};
-
-}
-
-namespace MEDMEM {
-
-template <class T> class MED_FIELD_RDONLY_DRIVER : public virtual IMED_FIELD_RDONLY_DRIVER<T>
-{
-
-public :
-  MED_FIELD_RDONLY_DRIVER();
-
-  template <class INTERLACING_TAG>
-  MED_FIELD_RDONLY_DRIVER(const string & fileName,
-			  FIELD<T, INTERLACING_TAG> * ptrField);
-
-  MED_FIELD_RDONLY_DRIVER(const MED_FIELD_RDONLY_DRIVER & fieldDriver):IMED_FIELD_RDONLY_DRIVER<T>(fieldDriver) { _concreteFieldDrv = fieldDriver._concreteFieldDrv->copy(); }
-  virtual ~MED_FIELD_RDONLY_DRIVER() {     if (_concreteFieldDrv) delete _concreteFieldDrv; }
-  virtual void read ( void ) throw (MEDEXCEPTION) { _concreteFieldDrv->read(); }
-  virtual MED_EN::med_mode_acces getAccessMode() const { return _concreteFieldDrv->getAccessMode(); }
-  virtual void write( void ) const throw (MEDEXCEPTION) { _concreteFieldDrv->write(); }
-  virtual void open() throw (MEDEXCEPTION) { _concreteFieldDrv->open(); }
-  virtual void close() { _concreteFieldDrv->close(); }
-  virtual void   setFieldName(const string & fieldName) { _concreteFieldDrv->setFieldName(fieldName); }
-  virtual string getFieldName() const { return MED_FIELD_DRIVER<T>::getFieldName(); }
-  virtual void setFileName ( const string & fileName) {_concreteFieldDrv->setFileName(fileName); }
-  
-private:
-  virtual GENDRIVER * copy ( void ) const { return new MED_FIELD_RDONLY_DRIVER<T>(*this); }
-protected:
-  GENDRIVER * _concreteFieldDrv;
-};
-
-template <class T> class MED_FIELD_WRONLY_DRIVER : public virtual IMED_FIELD_WRONLY_DRIVER<T> {
-public :
-  MED_FIELD_WRONLY_DRIVER();
-
-  template <class INTERLACING_TAG>
-  MED_FIELD_WRONLY_DRIVER(const string & fileName,
-			  FIELD<T, INTERLACING_TAG> * ptrField);
-
-  MED_FIELD_WRONLY_DRIVER(const MED_FIELD_WRONLY_DRIVER & fieldDriver):IMED_FIELD_WRONLY_DRIVER<T>(fieldDriver) { _concreteFieldDrv = fieldDriver._concreteFieldDrv->copy(); }
-  virtual ~MED_FIELD_WRONLY_DRIVER() {    if (_concreteFieldDrv) delete _concreteFieldDrv;}
-  virtual void read ( void ) throw (MEDEXCEPTION) { _concreteFieldDrv->read(); }
-  virtual MED_EN::med_mode_acces getAccessMode() const { return _concreteFieldDrv->getAccessMode(); }
-  virtual void write( void ) const throw (MEDEXCEPTION) { _concreteFieldDrv->write(); }
-  virtual void open() throw (MEDEXCEPTION) { _concreteFieldDrv->open(); }
-  virtual void close() { _concreteFieldDrv->close(); }
-  virtual void   setFieldName(const string & fieldName) { _concreteFieldDrv->setFieldName(fieldName); }
-  virtual string getFieldName() const { return MED_FIELD_DRIVER<T>::getFieldName(); }
-  virtual void setFileName ( const string & fileName) {_concreteFieldDrv->setFileName(fileName); }
-private:
-  virtual GENDRIVER * copy ( void ) const { return new MED_FIELD_WRONLY_DRIVER<T>(*this); }
-protected:
-  GENDRIVER * _concreteFieldDrv;
-};
-
-template <class T> class MED_FIELD_RDWR_DRIVER : public virtual IMED_FIELD_RDWR_DRIVER<T> {
-public:
-  MED_FIELD_RDWR_DRIVER();
   /*!
-    Constructor.
+    Write FIELD in the specified file.
   */
-  template <class INTERLACING_TAG>
-  MED_FIELD_RDWR_DRIVER(const string & fileName,
-			FIELD<T, INTERLACING_TAG> * ptrField);
+  void write(void) const throw (MEDEXCEPTION) ;
+  /*!
+    Read FIELD in the specified file.
+  */
+  void read (void) throw (MEDEXCEPTION) ;
 
-  MED_FIELD_RDWR_DRIVER(const MED_FIELD_RDWR_DRIVER & fieldDriver):
-    IMED_FIELD_RDWR_DRIVER<T>(fieldDriver)
-  { _concreteFieldDrv = fieldDriver._concreteFieldDrv->copy(); }
-  ~MED_FIELD_RDWR_DRIVER() {    if (_concreteFieldDrv) delete _concreteFieldDrv;}
-  virtual void read ( void ) throw (MEDEXCEPTION) { _concreteFieldDrv->read(); }
-  virtual MED_EN::med_mode_acces getAccessMode() const { return _concreteFieldDrv->getAccessMode(); }
-  virtual void write( void ) const throw (MEDEXCEPTION) { _concreteFieldDrv->write(); }
-  virtual void open() throw (MEDEXCEPTION) { _concreteFieldDrv->open(); }
-  virtual void close() { _concreteFieldDrv->close(); }
-  virtual void   setFieldName(const string & fieldName) { _concreteFieldDrv->setFieldName(fieldName); }
-  virtual string getFieldName() const { return MED_FIELD_DRIVER<T>::getFieldName(); }
-  virtual void setFileName ( const string & fileName) {_concreteFieldDrv->setFileName(fileName); }
 private:
-  virtual GENDRIVER * copy ( void ) const { return new MED_FIELD_RDWR_DRIVER<T>(*this); }
-protected:
-  GENDRIVER * _concreteFieldDrv;
+  GENDRIVER * copy( void ) const ;
+
 };
-}
 
-/*-------------------------*/
-/* template implementation */
-/*-------------------------*/
-/*--------------------- DRIVER PART -------------------------------*/
+} //End namespace MEDMEM
 
-// template <class T> void MED_FIELD_DRIVER<T>::setFieldName(const string & fieldName)
-// {
-//   _fieldName = fieldName;
-// }
-
-// template <class T> string  MED_FIELD_DRIVER<T>::getFieldName() const
-// {
-//   return _fieldName;
-// }
-
-#include "MEDMEM_DriverFactory.hxx"
-#include "MEDMEM_MedFieldDriver21.hxx"
-#include "MEDMEM_MedFieldDriver22.hxx"
-
-
-/*--------------------- RDONLY PART -------------------------------*/
-namespace MEDMEM {
-
-template <class T> void IMED_FIELD_RDONLY_DRIVER<T>::write( void ) const
-  throw (MEDEXCEPTION)
-{
-  throw MEDEXCEPTION("MED_FIELD_RDONLY_DRIVER::write : Can't write with a RDONLY driver !");
-}
-
-template <class T>  MED_FIELD_RDONLY_DRIVER<T>::MED_FIELD_RDONLY_DRIVER() {
-    MESSAGE_MED("You are using the default constructor of the Field read only Driver and it is 2.1 one");
-    _concreteFieldDrv=new MED_FIELD_RDONLY_DRIVER21<T>();
-}
-
-template <class T> template < class INTERLACING_TAG >
-MED_FIELD_RDONLY_DRIVER<T>::MED_FIELD_RDONLY_DRIVER(const string & fileName,
-						    FIELD<T, INTERLACING_TAG> * ptrField):
-  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDONLY),
-  IMED_FIELD_RDONLY_DRIVER<T>(fileName,ptrField)
-{
-  const char* LOC = "MED_FIELD_RDONLY_DRIVER::MED_FIELD_RDONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
-  BEGIN_OF_MED(LOC);
-
-    _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::RDONLY);
-
-  END_OF_MED(LOC);
-}
-
-/*--------------------- WRONLY PART -------------------------------*/
-
-template <class T> void IMED_FIELD_WRONLY_DRIVER<T>::read (void)
-  throw (MEDEXCEPTION)
-{
-  throw MEDEXCEPTION("MED_FIELD_WRONLY_DRIVER::read : Can't read with a WRONLY driver !");
-}
-
-template <class T>  MED_FIELD_WRONLY_DRIVER<T>::MED_FIELD_WRONLY_DRIVER() {
-    MESSAGE_MED("You are using the default constructor of the Field write only Driver and it is 2.1 one");
-
-    _concreteFieldDrv=new MED_FIELD_WRONLY_DRIVER21<T>();
-}
-
-template <class T> template < class INTERLACING_TAG >
-MED_FIELD_WRONLY_DRIVER<T>::MED_FIELD_WRONLY_DRIVER(const string & fileName,
-						    FIELD<T, INTERLACING_TAG> * ptrField):
-  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::WRONLY),
-  IMED_FIELD_WRONLY_DRIVER<T>( fileName, ptrField)
-{
-  const char* LOC = "MED_FIELD_WRONLY_DRIVER::MED_FIELD_WRONLY_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
-  BEGIN_OF_MED(LOC);
-
-  _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::WRONLY/*ECRI*/);
-
-  END_OF_MED(LOC);
-}
-
-/*--------------------- RDWR PART -------------------------------*/
-
-template <class T>  MED_FIELD_RDWR_DRIVER<T>::MED_FIELD_RDWR_DRIVER() {
-    MESSAGE_MED("You are using the default constructor of the Field read/write Driver and it is 2.1 one");
-
-    _concreteFieldDrv=new MED_FIELD_RDWR_DRIVER21<T>();
-}
-
-template <class T> template < class INTERLACING_TAG >
-MED_FIELD_RDWR_DRIVER<T>::MED_FIELD_RDWR_DRIVER(const string & fileName,
-						FIELD<T, INTERLACING_TAG> * ptrField):
-  MED_FIELD_DRIVER<T>(fileName,ptrField,MED_EN::RDWR),
-  IMED_FIELD_RDWR_DRIVER<T>(fileName,ptrField)
-{
-  const char* LOC = "MED_FIELD_RDWR_DRIVER::MED_FIELD_RDWR_DRIVER(const string & fileName, const FIELD<T> * ptrField)";
-  BEGIN_OF_MED(LOC);
-
-  _concreteFieldDrv = DRIVERFACTORY::buildFieldDriverFromFile(fileName,ptrField,MED_EN::RDWR);
-
-  END_OF_MED(LOC);
-}
-
-
-}//End namespace MEDMEM
-/*-----------------------------------------------------------------*/
+// implementation
+#include "MEDMEM_MedFieldDriver.txx"
 
 #endif /* MED_FIELD_DRIVER_HXX */

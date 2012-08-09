@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef __MEDMEM_UTILITIES
 #define __MEDMEM_UTILITIES
 
@@ -28,48 +29,66 @@
 #ifndef WIN32
 #include <libgen.h>
 #endif
-inline std::string getBaseName( const std::string& dataname ) {
-  std::string aBaseName = "";
-#ifndef WIN32
-  aBaseName = basename((char*)dataname.c_str());
-#else
-  for ( int i = dataname.size()-1; i >= 0; i-- ) {
-    char aSymb = dataname[i];
-    if ( dataname[i] == '\\' || dataname[i] == '/' )
-      break;
-    aBaseName = dataname[i] + aBaseName;
-  }
-#endif
-  return aBaseName;
-}
 
-inline std::string getDirName(const std::string& dataname ) {
-  std::string aDirName = "";
+namespace MEDMEM
+{
+  inline std::string getBaseName( const std::string& dataname )
+  {
+    std::string aBaseName = "";
 #ifndef WIN32
-  aDirName = dirname((char*)dataname.c_str());
+    aBaseName = basename((char*)dataname.c_str());
 #else
-  bool aFindLine = false;
-  for ( int i = dataname.size()-1; i >= 0; i-- ) {
-    char aSymb = dataname[i];
+    for ( int i = dataname.size()-1; i >= 0; i-- ) {
+      char aSymb = dataname[i];
+      if ( dataname[i] == '\\' || dataname[i] == '/' )
+        break;
+      aBaseName = dataname[i] + aBaseName;
+    }
+#endif
+    return aBaseName;
+  }
+
+  inline std::string getDirName(const std::string& dataname )
+  {
+    std::string aDirName = "";
+#ifndef WIN32
+    aDirName = dirname((char*)dataname.c_str());
+#else
+    bool aFindLine = false;
+    for ( int i = dataname.size()-1; i >= 0; i-- ) {
+      char aSymb = dataname[i];
+      if ( !aFindLine )
+        aFindLine = dataname[i] == '\\' || dataname[i] == '/';
+      else
+        aDirName = dataname[i] + aDirName;
+    }
     if ( !aFindLine )
-      aFindLine = dataname[i] == '\\' || dataname[i] == '/';
-    else
-      aDirName = dataname[i] + aDirName;
-  }
-  if ( !aFindLine )
-    aDirName = '.';
+      aDirName = '.';
 #endif
-  return aDirName;
-}
+    return aDirName;
+  }
 
-/*!
-* \brief Make a name valid. So far, removes white spaces from name end
-*/
-inline std::string healName(const std::string& name ) {
-  size_t last = name.size()-1;
-  while ( last >= 0 && isspace( name[last] ))
-    last--;
-  return name.substr( 0, last + 1 );
+  /*!
+   * \brief Make a name valid. So far, removes white spaces from name end
+   */
+  inline std::string healName(const std::string& name )
+  {
+    size_t last = name.size()-1;
+    while ( last >= 0 && ( isspace( name[last] ) || !name[last] ))
+      last--;
+    return name.substr( 0, last + 1 );
+  }
+
+  /*!
+   * Change order of bytes for other endianness
+   */
+  inline int swapBytes(const int theValue)
+  {
+    return (0 | (( theValue & 0x000000ff ) << 24 )
+            |   (( theValue & 0x0000ff00 ) << 8  )
+            |   (( theValue & 0x00ff0000 ) >> 8  )
+            |   (( theValue >> 24 ) & 0x000000ff ) );
+  }
 }
 
 #  include <cstdlib>
@@ -86,21 +105,21 @@ using namespace std;
 /* --- To print date and time of compilation of current source on stdout --- */
 
 # if defined ( __GNUC__ )
-# define COMPILER_MED		"g++" ;
+# define COMPILER_MED           "g++" ;
 # elif defined ( __sun )
-# define COMPILER_MED		"CC" ;
+# define COMPILER_MED           "CC" ;
 # elif defined ( __KCC )
-# define COMPILER_MED		"KCC" ;
+# define COMPILER_MED           "KCC" ;
 # elif defined ( __PGI )
-# define COMPILER_MED		"pgCC" ;
+# define COMPILER_MED           "pgCC" ;
 # else
-# define COMPILER_MED		"undefined" ;
+# define COMPILER_MED           "undefined" ;
 # endif
 
 # ifdef INFOS_COMPILATION_MED
 # undef INFOS_COMPILATION_MED
 # endif
-# define INFOS_COMPILATION_MED	{\
+# define INFOS_COMPILATION_MED  {\
   cerr << flush;\
   cout << __FILE__ ;\
   cout << " [" << __LINE__ << "] : " ;\

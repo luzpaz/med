@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #define private public
 #define protected public
 #include "TESTMEDCLIENT_Gen_i.hxx"
@@ -40,10 +41,10 @@ using namespace std;
 extern "C"
 {
   PortableServer::ObjectId *TESTMEDCLIENTEngine_factory(CORBA::ORB_ptr orb,
-							PortableServer::POA_ptr poa,
-							PortableServer::ObjectId * contId, 
-							const char *instanceName, 
-							const char *interfaceName)
+                                                        PortableServer::POA_ptr poa,
+                                                        PortableServer::ObjectId * contId, 
+                                                        const char *instanceName, 
+                                                        const char *interfaceName)
   {
     TESTMEDCLIENT_Gen_i *ret=new TESTMEDCLIENT_Gen_i(orb,poa,contId,instanceName,interfaceName);
     return ret->getId();
@@ -51,10 +52,10 @@ extern "C"
 }
 
 TESTMEDCLIENT_Gen_i::TESTMEDCLIENT_Gen_i(CORBA::ORB_ptr orb,
-	    PortableServer::POA_ptr poa,
-	    PortableServer::ObjectId * contId, 
-	    const char *instanceName, 
-					 const char *interfaceName):Engines_Component_i(orb,poa,contId,instanceName,interfaceName)
+            PortableServer::POA_ptr poa,
+            PortableServer::ObjectId * contId, 
+            const char *instanceName, 
+                                         const char *interfaceName):Engines_Component_i(orb,poa,contId,instanceName,interfaceName)
 {
   _thisObj = this ;
   _id = _poa->activate_object(_thisObj);
@@ -79,7 +80,7 @@ void TESTMEDCLIENT_Gen_i::go(SALOME_MED::MED_ptr objMed)
   for(int k=0;k<n;k++)
     {
       for(int l=0;l<dim;l++)
-	cout << *(tabRet++) << " ";
+        cout << *(tabRet++) << " ";
       cout << endl;
     }
   int nbOfElt=mesh.getNumberOfTypes(MED_FACE);
@@ -112,7 +113,7 @@ void TESTMEDCLIENT_Gen_i::go(SALOME_MED::MED_ptr objMed)
   for(int p=0;p<nbOfElt;p++){
     for(int p1=0;p1<4;p1++)
       {
-	cout << tabConec[4*p+p1] << " ";
+        cout << tabConec[4*p+p1] << " ";
       }
     cout << endl;
   }
@@ -184,10 +185,10 @@ void TESTMEDCLIENT_Gen_i::go2(SALOME_MED::MED_ptr objMed)
     {
 //       for(int r2j=0;r2j<nbOfValField;r2j++)
       {
-// 	cout << ptOf2[r2j*3+r2i] << " " << ptOf[r2i*nbOfValField+r2j] << " | ";
-	      double val = values[r2];
-	      if ( (val < 1.0) || (val > 100.0))
-		cout << val << " ";
+//      cout << ptOf2[r2j*3+r2i] << " " << ptOf[r2i*nbOfValField+r2j] << " | ";
+              double val = values[r2];
+              if ( (val < 1.0) || (val > 100.0))
+                cout << val << " ";
       }
     }
   delete myFieldDouble;

@@ -1,29 +1,28 @@
-#  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-#  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-#  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-#
+
 #  MED MedCorba_Swig : binding of MED CORBA objects woth Python
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-lib_LTLIBRARIES = _libMedCorba_Swig.la
+salomepython_PYTHON = libMedCorba_Swig.py
+salomepyexec_LTLIBRARIES = _libMedCorba_Swig.la
 
 if MED_SWIG_1_3_21
 SWIG_DEF = libMedCorba_Swig.i dummy.i
@@ -53,14 +52,13 @@ libMedCorba_Swig_wrap.cxx: $(SWIG_DEF) $(SWIG_DEP)
 #############################################################################
 
 _libMedCorba_Swig_la_CPPFLAGS = $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) \
-	$(PYTHON_INCLUDES) $(MED2_INCLUDES) $(HDF5_INCLUDES) ${KERNEL_CXXFLAGS} \
+	$(PYTHON_INCLUDES) $(MED3_INCLUDES) $(HDF5_INCLUDES) ${KERNEL_CXXFLAGS} \
 	-I$(srcdir)/../MEDMEM_I -I$(srcdir)/../MEDMEM -I$(srcdir)/../MEDMEM_SWIG -I$(srcdir)/../MED -I$(srcdir)/../MEDWrapper/V2_1/Core \
-	-I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases -I$(top_builddir)/salome_adm/unix -I$(top_builddir)/idl
-_libMedCorba_Swig_la_LDFLAGS  = -module $(PYTHON_LIBS) $(MED2_LIBS) $(HDF5_LIBS)  ${KERNEL_LDFLAGS} -lSALOMELocalTrace \
+	-I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases -I$(srcdir)/../INTERP_KERNEL/GaussPoints -I$(top_builddir)/idl
+_libMedCorba_Swig_la_LDFLAGS  = -module $(PYTHON_LIBS) $(MED3_LIBS_C_ONLY) $(HDF5_LIBS)  ${KERNEL_LDFLAGS} -lSALOMELocalTrace \
 	../MEDMEM_I/libMEDMEMImpl.la ../MEDMEM/libmedmem.la ../INTERP_KERNEL/libinterpkernel.la ../MED/libMEDEngine.la
 ###  ../MEDMEM_SWIG/_libMEDMEM_Swig.la
 
 dist_salomescript_DATA   = medcorba_test.py batchmode_medcorba_test.py batchmode_medcorba_test1.py
-nodist_salomescript_DATA = libMedCorba_Swig.py
 
 CLEANFILES = libMedCorba_Swig.py libMedCorba_Swig_wrap.cxx

@@ -26,8 +26,8 @@ namespace med_2_1{
 
 med_err 
 MEDfamCr(med_idt fid,char* maa,char *famille,med_int numero, 
-	 med_int *attr_ident, med_int *attr_val, char *attr_desc, 
-	 med_int n_attr,char *groupe, med_int n_groupe)
+         med_int *attr_ident, med_int *attr_val, char *attr_desc, 
+         med_int n_attr,char *groupe, med_int n_groupe)
 {
   med_idt root, datagroup, famid;
   med_err ret;
@@ -76,27 +76,27 @@ MEDfamCr(med_idt fid,char* maa,char *famille,med_int numero,
        * On cree le Data Group 
        */
       if ((datagroup = _MEDdatagroupCreer(famid,MED_NOM_GRO)) < 0)
-	return -1;
+        return -1;
 
       /*
        * L'attribut "NBR"
        */
       if ((ret = _MEDattrEntierEcrire(datagroup,MED_NOM_NBR,&n_groupe,MED_REMP)) < 0)
-	return -1;
+        return -1;
       
       /* 
        * Data Set des noms des groupes "NOM"
        */
       dimd[0] = n_groupe*MED_TAILLE_LNOM+1;
       if ((ret = _MEDdatasetStringEcrire(datagroup,MED_NOM_NOM,dimd,groupe,
-				      MED_REMP))<0)
-	return -1;
+                                      MED_REMP))<0)
+        return -1;
 
       /* 
        * On ferme le Data Group
        */
       if ((ret = _MEDdatagroupFermer(datagroup)) < 0)
-	return -1;
+        return -1;
     }
 
   /*
@@ -106,13 +106,13 @@ MEDfamCr(med_idt fid,char* maa,char *famille,med_int numero,
   if (n_attr > 0)
     {
       if ((datagroup = _MEDdatagroupCreer(famid,MED_NOM_ATT)) < 0)
-	return -1;
+        return -1;
 
       /*
        * L'attribut "NBR"
        */
       if ((ret = _MEDattrEntierEcrire(datagroup,MED_NOM_NBR,&n_attr,MED_REMP)) < 0)
-	return -1;
+        return -1;
       
       /*
        * Le Data Set "IDE"
@@ -120,12 +120,12 @@ MEDfamCr(med_idt fid,char* maa,char *famille,med_int numero,
       dimd[0] = n_attr;
 #if defined(HAVE_F77INT64)
       if ((ret = _MEDdatasetNumEcrire(datagroup,MED_NOM_IDE,MED_INT64,MED_NO_INTERLACE,MED_DIM1,MED_ALL,MED_NOPF,0,MED_NOPG,dimd,
-				   (unsigned char *)attr_ident,MED_REMP)) < 0)
-	return -1;    
+                                   (unsigned char *)attr_ident,MED_REMP)) < 0)
+        return -1;    
 #else
       if ((ret = _MEDdatasetNumEcrire(datagroup,MED_NOM_IDE,MED_INT32,MED_NO_INTERLACE,MED_DIM1,MED_ALL,MED_NOPF,0,MED_NOPG,dimd,
-				   (unsigned char *)attr_ident,MED_REMP)) < 0)
-	return -1;      
+                                   (unsigned char *)attr_ident,MED_REMP)) < 0)
+        return -1;      
 #endif
 
       /*
@@ -134,12 +134,12 @@ MEDfamCr(med_idt fid,char* maa,char *famille,med_int numero,
       dimd[0] = n_attr;
 #if defined(HAVE_F77INT64)
       if ((ret = _MEDdatasetNumEcrire(datagroup,MED_NOM_VAL,MED_INT64,MED_NO_INTERLACE,MED_DIM1,MED_ALL,MED_NOPF,0,MED_NOPG,dimd,
-				   (unsigned char*)attr_val,MED_REMP)) < 0)
-	return -1;
+                                   (unsigned char*)attr_val,MED_REMP)) < 0)
+        return -1;
 #else
       if ((ret = _MEDdatasetNumEcrire(datagroup,MED_NOM_VAL,MED_INT32,MED_NO_INTERLACE,MED_DIM1,MED_ALL,MED_NOPF,0,MED_NOPG,dimd,
-				   (unsigned char*)attr_val,MED_REMP)) < 0)
-	return -1;
+                                   (unsigned char*)attr_val,MED_REMP)) < 0)
+        return -1;
 #endif
 
       /*
@@ -147,14 +147,14 @@ MEDfamCr(med_idt fid,char* maa,char *famille,med_int numero,
        */
       dimd[0] = n_attr*MED_TAILLE_DESC+1;
       if ((ret = _MEDdatasetStringEcrire(datagroup,MED_NOM_DES,dimd,attr_desc,
-				      MED_REMP)) < 0)
-	return -1;
+                                      MED_REMP)) < 0)
+        return -1;
 
       /* 
        * On ferme le Data Group
        */
       if ((ret = _MEDdatagroupFermer(datagroup)) < 0)
-	return -1;
+        return -1;
     }
 
   /* 

@@ -1,36 +1,39 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 // File      : MEDMEM_Grid.hxx
 // Created   : Wed Dec 18 08:35:26 2002
 // Descr     : class containing structured mesh data
 // Author    : Edward AGAPOV (eap)
 // Project   : SALOME Pro
 // Module    : MED 
-
-
+//
 #include "MEDMEM_Grid.hxx"
+#include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_SkyLineArray.hxx"
 #include "MEDMEM_DriverFactory.hxx"
+
+#include <memory>
 
 using namespace std;
 using namespace MEDMEM;
@@ -51,6 +54,15 @@ These methods enable the user to convert a position on the grid to a global elem
 These methods are the different constructors for the grid objects.
 
 */
+
+namespace
+{
+  const string* defaultStrings()
+  {
+    static const string str[3] = { "UNDEFINED", "UNDEFINED", "UNDEFINED" };
+    return str;
+  }
+}
 
 //=======================================================================
 //function : GRID
@@ -84,54 +96,71 @@ size of vector \a xyz_array.
  *\param coord_unit names of the different coordinate units
  *\param type  grid type (MED_POLAR, MED_CARTESIAN)
 */
-GRID::GRID(const std::vector<std::vector<double> >& xyz_array,const std::vector<std::string>& coord_name, 
-					 const std::vector<std::string>& coord_unit, const MED_EN::med_grid_type type) : _gridType(type)
+GRID::GRID(const std::vector<std::vector<double> >& xyz_array,
+           const std::vector<std::string>&          coord_name,
+           const std::vector<std::string>&          coord_unit,
+           const MED_EN::med_grid_type              type)
+  :_gridType(type)
 {
     init(); // PAL 12136
     _is_default_gridType = false;
 
     _spaceDimension = xyz_array.size();
-    _meshDimension  = _spaceDimension; // PAL14482
 
-    // compute & set _numberOfNodes
-    int NumberOfNodes=1 ;
-    for(int i=0;i!=xyz_array.size();++i)
-	NumberOfNodes*=xyz_array[i].size();
-    _numberOfNodes = NumberOfNodes ;
-    
     // create a non allocated COORDINATE
     _coordinate = new COORDINATE(_spaceDimension, &coord_name[0], &coord_unit[0]);
     string coordinateSystem = "UNDEFINED";
     if( _gridType == MED_CARTESIAN) 
-	coordinateSystem = "CARTESIAN";
+      coordinateSystem = "CARTESIAN";
     else if ( _gridType == MED_POLAR) 
-	coordinateSystem = "CYLINDRICAL";
+      coordinateSystem = "CYLINDRICAL";
     _coordinate->setCoordinatesSystem(coordinateSystem);
 
     // set the GRID part
     if (_spaceDimension>=1)
     {
-	_iArrayLength=xyz_array[0].size();
-	_iArray=new double[_iArrayLength];
-	std::copy(xyz_array[0].begin(),xyz_array[0].end(),_iArray);
+        _iArrayLength=xyz_array[0].size();
+        _iArray=new double[_iArrayLength];
+        std::copy(xyz_array[0].begin(),xyz_array[0].end(),_iArray);
     }
     if (_spaceDimension>=2)
     {
-	_jArrayLength=xyz_array[1].size();
-	_jArray=new double[_jArrayLength];
-	std::copy(xyz_array[1].begin(),xyz_array[1].end(),_jArray);
+        _jArrayLength=xyz_array[1].size();
+        _jArray=new double[_jArrayLength];
+        std::copy(xyz_array[1].begin(),xyz_array[1].end(),_jArray);
     }
     if (_spaceDimension>=3)
     {
-	_kArrayLength=xyz_array[2].size();
-	_kArray=new double[_kArrayLength];
-	std::copy(xyz_array[2].begin(),xyz_array[2].end(),_kArray);
+        _kArrayLength=xyz_array[2].size();
+        _kArray=new double[_kArrayLength];
+        std::copy(xyz_array[2].begin(),xyz_array[2].end(),_kArray);
     }
-
-    _is_coordinates_filled  = false;
-    _is_connectivity_filled = false;
-    _isAGrid = true;
 }
+
+//================================================================================
+/*!
+ * \brief Reads a GRID form the file
+ *  \param driverType - type of driver to read the specified file
+ *  \param fileName - the file name to read
+ *  \param driverName - name of a grid to read
+ */
+//================================================================================
+
+GRID::GRID(driverTypes driverType, const string &  fileName, const string &  driverName)
+{
+  
+  const char* LOC = "GRID::GRID(driverTypes , const string &  , const string &) : ";
+  BEGIN_OF_MED(LOC);
+  
+  init();
+  auto_ptr<GENDRIVER> myDriver (DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,driverName,RDONLY));
+  myDriver->open();
+  myDriver->read();
+  myDriver->close();
+
+  END_OF_MED(LOC);
+}
+
 /*!\if MEDMEM_ug @} \endif */
 
 //=======================================================================
@@ -163,6 +192,7 @@ GRID::GRID(const GRID& otherGrid) {
 
 GRID::~GRID() {
   MESSAGE_MED("GRID::~GRID() : Destroying the Grid");
+  if ( _coordinate ) delete _coordinate; _coordinate = 0;
   if ( _iArray != (double* ) NULL) delete [] _iArray;
   if ( _jArray != (double* ) NULL) delete [] _jArray;
   if ( _kArray != (double* ) NULL) delete [] _kArray;
@@ -175,19 +205,27 @@ GRID::~GRID() {
 
 void GRID::init()
 {
+  GMESH::init();
+
   _gridType = MED_CARTESIAN;
   _is_default_gridType = true;
-
+  _coordinate = 0;
   _iArray = _jArray = _kArray = (double* ) NULL;
   _iArrayLength = _jArrayLength = _kArrayLength = 0;
 
-  _is_coordinates_filled  = false;
-  _is_connectivity_filled = false;
-
-  MESH::init();
-
-  _isAGrid = true;
 }
+
+//================================================================================
+/*!
+ * \brief Return true if contains no elements
+ */
+//================================================================================
+
+bool GRID::isEmpty() const
+{
+  return !_iArrayLength && !_coordinate;
+}
+
 
 //=======================================================================
 //function: operator=
@@ -198,583 +236,307 @@ GRID & GRID::operator=(const GRID & otherGrid)
 {
   // NOT IMPLEMENTED
 
-  MESH::operator=(otherGrid);
+  GMESH::operator=(otherGrid);
   return *this;
 }
 
 //=======================================================================
-//function : GRID
-//purpose  : Create a GRID object using a MESH driver of type
-//           (MED_DRIVER, ....) associated with file <fileName>. 
+/*!
+  Returns true if mesh \a other has same
+  coordinates (to 1E-15 precision ) and same connectivity as the calling object.
+  Information like name or description is not taken into account
+  for the comparison.
+*/
 //=======================================================================
 
-GRID::GRID(driverTypes driverType, const string &  fileName,
-           const string &  driverName)// : MESH(driverType, fileName, driverName)
+bool GRID::deepCompare(const GMESH& gother) const
 {
-  
-  const char* LOC = "GRID::GRID(driverTypes , const string &  , const string &) : ";
-  BEGIN_OF_MED(LOC);
-  
-  init();
-  GENDRIVER *myDriver=DRIVERFACTORY::buildDriverForMesh(driverType,fileName,this,driverName,RDONLY);
-  int current = addDriver(*myDriver);
-  delete myDriver;
-  _drivers[current]->open();
-  _drivers[current]->read();
-  _drivers[current]->close();
+  if ( gother.getIsAGrid() != getIsAGrid())
+    return false;
+  const GRID& other = static_cast<const GRID&>( gother );
 
-  fillMeshAfterRead();
+  if ( getSpaceDimension() != other.getSpaceDimension() )
+    return false;
 
-  END_OF_MED(LOC);
-};
+  if ( _gridType != other._gridType )
+    return false;
 
+  if( bool( _coordinate) != bool(other._coordinate))
+    return false;
+
+  if ( _coordinate->getNumberOfNodes() > 0 )
+  {
+    if ( _coordinate->getNumberOfNodes() != other._coordinate->getNumberOfNodes() )
+      return false;
+    const int size = _coordinate->getNumberOfNodes() * getSpaceDimension();
+    const double* coord1=_coordinate->getCoordinates(MED_FULL_INTERLACE);
+    const double* coord2=other._coordinate->getCoordinates(MED_FULL_INTERLACE);
+    for(int i = 0 ; i < size; i++ )
+      if ( !(fabs(coord1[i]-coord2[i])<1e-15))
+        return false;
+  }
+
+  if ( _iArrayLength != other._iArrayLength )
+    return false;
+  if ( _jArrayLength != other._jArrayLength )
+    return false;
+  if ( _kArrayLength != other._kArrayLength )
+    return false;
+
+  if ( bool(_iArray) != bool(other._iArray) )
+    return false;
+  if ( bool(_jArray) != bool(other._jArray) )
+    return false;
+  if ( bool(_kArray) != bool(other._kArray) )
+    return false;
+
+  if ( _iArray )
+    for ( int i = 0; i < _iArrayLength; ++i )
+      if ( !(fabs(_iArray[i]-other._iArray[i])<1e-15))
+        return false;
+  if ( _jArray )
+    for ( int i = 0; i < _jArrayLength; ++i )
+      if ( !(fabs(_jArray[i]-other._jArray[i])<1e-15))
+        return false;
+  if ( _kArray )
+    for ( int i = 0; i < _kArrayLength; ++i )
+      if ( !(fabs(_kArray[i]-other._kArray[i])<1e-15))
+        return false;
+
+  return true;
+}
+
+//================================================================================
+/*!
+ * \brief print my contents
+ */
+//================================================================================
+
+void GRID::printMySelf(std::ostream &os) const
+{
+  // TODO
+  cout << "NOT IMPLEMENTED" << endl;
+}
+
+//================================================================================
+/*!
+ * \brief Create an unstructured MESH. Call removeReference() after having finished using it!!!
+ */
+//================================================================================
+
+const MESH * GRID::convertInMESH() const
+{
+  MESHING* mesh = new MESHING;
+  mesh->setName( getName() );
+
+  int i, j, k;
+
+  // ---------------
+  // 1. Coordinates
+  // ---------------
+
+  PointerOf< double > coords;
+  if ( _gridType == MED_BODY_FITTED )
+  {
+    if ( !_coordinate )
+      throw MEDEXCEPTION
+        (LOCALIZED("GRID::convertInMESH() : _coordinate of MED_BODY_FITTED GRID not defined !"));
+    coords.set( _coordinate->getCoordinates(MED_FULL_INTERLACE));
+  }
+  else
+  {
+    coords.set( getSpaceDimension() * getNumberOfNodes() );
+    double* coord = coords;
+    switch ( getSpaceDimension() )
+    {
+    case 3:
+      for (k=0; k < _kArrayLength; ++k) 
+        for (j=0; j < _jArrayLength; ++j)
+          for (i=0; i < _iArrayLength; ++i)
+            *coord++ = _iArray[i], *coord++ = _jArray[j], *coord++ = _kArray[k];
+      break;
+
+    case 2:
+      for (j=0; j < _jArrayLength; ++j)
+        for (i=0; i < _iArrayLength; ++i)
+          *coord++ = _iArray[i], *coord++ = _jArray[j];
+      break;
+
+    case 1:
+      coords.set(_iArray);
+      break;
+    }
+  }
+  mesh->setCoordinates( getSpaceDimension(),
+                        getNumberOfNodes(),
+                        (const double *) coords,
+                        getCoordinatesSystem(),
+                        MED_EN::MED_FULL_INTERLACE);
+  mesh->setCoordinatesNames( getCoordinatesNames() );
+  mesh->setCoordinatesUnits( getCoordinatesUnits() );
+
+  // ----------------
+  // 2. Connectivity
+  // ----------------
+
+  // 2.1 Cells
+  // ---------
+  medEntityMesh subEntity;
+  {
+    mesh->setNumberOfTypes( getNumberOfTypes(MED_CELL), MED_CELL );
+    mesh->setTypes( getTypes( MED_CELL), MED_CELL );
+    int nbCells = getNumberOfElements( MED_CELL, MED_ALL_ELEMENTS );
+    mesh->setNumberOfElements( &nbCells, MED_CELL );
+
+    vector<int> conn;
+    switch ( _spaceDimension )
+    {
+    case 3: // HEXA8
+      for ( k = 0; k < _kArrayLength-1; ++k )
+        for ( j = 0; j < _jArrayLength-1; ++j )
+          for ( i = 0; i < _iArrayLength-1; ++i )
+          {
+            conn.push_back( getNodeNumber( i  , j  , k  ));
+            conn.push_back( getNodeNumber( i  , j+1, k  ));
+            conn.push_back( getNodeNumber( i+1, j+1, k  ));
+            conn.push_back( getNodeNumber( i+1, j  , k  ));
+            conn.push_back( getNodeNumber( i  , j  , k+1));
+            conn.push_back( getNodeNumber( i  , j+1, k+1));
+            conn.push_back( getNodeNumber( i+1, j+1, k+1));
+            conn.push_back( getNodeNumber( i+1, j  , k+1));
+          }
+      subEntity = MED_FACE;
+      break;
+
+    case 2: // QUAD4
+      for ( j = 0; j < _jArrayLength-1; ++j )
+        for ( i = 0; i < _iArrayLength-1; ++i )
+        {
+          int n1 = 1 + i + j*_iArrayLength;
+          conn.push_back( n1 );
+          conn.push_back( n1 + _iArrayLength );
+          conn.push_back( n1 + _iArrayLength + 1 );
+          conn.push_back( n1 + 1 );
+        }
+      subEntity = MED_EDGE;
+      break;
+
+    case 1: // SEG2
+      for ( i = 0; i < _iArrayLength-1; ++i )
+      {
+        conn.push_back( i + 1 );
+        conn.push_back( i + 2 );
+      }
+      break;
+    }
+    mesh->setConnectivity( MED_CELL, getTypes(MED_CELL)[0], &conn[0] );
+  }
+
+  // 2.2 sub entities
+  // -----------------
+
+  if ( _spaceDimension > 1 )
+  {
+    mesh->setNumberOfTypes( getNumberOfTypes(subEntity), subEntity );
+    mesh->setTypes( getTypes( subEntity), subEntity );
+    int nbCells = getNumberOfElements( subEntity, MED_ALL_ELEMENTS );
+    mesh->setNumberOfElements( &nbCells, subEntity );
+
+    vector<int> conn;
+    switch ( _spaceDimension )
+    {
+    case 3: // QUAD4
+
+      // normal to OX
+      for ( k = 0; k < _kArrayLength-1; ++k )
+        for ( j = 0; j < _jArrayLength-1; ++j )
+          for ( i = 0; i < _iArrayLength; ++i )
+          {
+            conn.push_back( getNodeNumber( i, j  , k  ));
+            conn.push_back( getNodeNumber( i, j  , k+1));
+            conn.push_back( getNodeNumber( i, j+1, k+1));
+            conn.push_back( getNodeNumber( i, j+1, k  ));
+          }
+      // normal to OY
+      for ( k = 0; k < _kArrayLength-1; ++k )
+        for ( j = 0; j < _jArrayLength; ++j )
+          for ( i = 0; i < _iArrayLength-1; ++i )
+          {
+            conn.push_back( getNodeNumber( i  , j, k  ));
+            conn.push_back( getNodeNumber( i+1, j, k  ));
+            conn.push_back( getNodeNumber( i+1, j, k+1));
+            conn.push_back( getNodeNumber( i  , j, k+1));
+          }
+      // normal to OZ
+      for ( k = 0; k < _kArrayLength; ++k )
+        for ( j = 0; j < _jArrayLength-1; ++j )
+          for ( i = 0; i < _iArrayLength-1; ++i )
+          {
+            conn.push_back( getNodeNumber( i  , j  , k));
+            conn.push_back( getNodeNumber( i  , j+1, k));
+            conn.push_back( getNodeNumber( i+1, j+1, k));
+            conn.push_back( getNodeNumber( i+1, j  , k));
+          }
+      break;
+
+    case 2: // SEG2
+
+      // || OX
+      for ( j = 0; j < _jArrayLength; ++j )
+        for ( i = 0; i < _iArrayLength-1; ++i )
+        {
+          int n1 = 1 + i + j*_iArrayLength;
+          conn.push_back( n1 );
+          conn.push_back( n1 + 1 );
+        }
+      // || OY
+      for ( j = 0; j < _jArrayLength-1; ++j )
+        for ( i = 0; i < _iArrayLength; ++i )
+        {
+          int n1 = 1 + i + j*_iArrayLength;
+          conn.push_back( n1 );
+          conn.push_back( n1 + _iArrayLength );
+        }
+      break;
+
+    }
+    mesh->setConnectivity( subEntity, getTypes(subEntity)[0], &conn[0] );
+  }
+
+  // 3. Groups and Families
+  // -----------------------
+
+  const vector<GROUP*>* groups[] = { &_groupNode, &_groupCell, &_groupFace, &_groupEdge };
+  for ( i = 0; i < 4; ++i )
+    for ( j = 0; j < (int)groups[i]->size(); ++j )
+      mesh->addGroup( * groups[i]->at( j ));
+
+  return mesh;
+}
+
+//=======================================================================
 /*!
   return the GRID Geometric type, without computing all connectivity
 */
+//=======================================================================
+
 const medGeometryElement * GRID::getTypes(MED_EN::medEntityMesh entity) const
 {
-    static const medGeometryElement _gridGeometry[4]={MED_HEXA8,MED_QUAD4,MED_SEG2,MED_POINT1};
-    int i=0;
-    if(entity==MED_CELL)
-    {
-	i=3-_spaceDimension;
-    }
-    else if(entity==MED_FACE && _spaceDimension>2 )
-	i=1;
-    else if(entity==MED_EDGE && _spaceDimension>1 )
-	i=2;
-    else if(entity==MED_NODE && _spaceDimension>0)
-	i=3;
-    else 
-	throw MEDEXCEPTION(LOCALIZED("CONNECTIVITY::getGeometricTypes : Entity not defined !"));
-    return &_gridGeometry[i];
-}
-
-MED_EN::medGeometryElement * GRID::getTypesWithPoly(MED_EN::medEntityMesh Entity) const
-{
-  int size=getNumberOfTypesWithPoly(Entity);
-  MED_EN::medGeometryElement *ret=new MED_EN::medGeometryElement[size];
-  memcpy(ret,getTypes(Entity),size*sizeof(MED_EN::medGeometryElement));
-  return ret;
-}
-
-//=======================================================================
-//function : fillMeshAfterRead
-//purpose  : 
-//=======================================================================
-
-void GRID::fillMeshAfterRead()
-{
- // fill not only MESH  (:-)
-  _is_coordinates_filled  = false;
-  _is_connectivity_filled = false;
-
-  if (_gridType == MED_BODY_FITTED)
+  static const medGeometryElement _gridGeometry[4]={MED_HEXA8,MED_QUAD4,MED_SEG2,MED_POINT1};
+  int i=0;
+  if(entity==MED_CELL)
   {
-    _is_coordinates_filled = true;
-
-    // nb of nodes in each direction is not known, set anything
-    // in order to be able to work anyhow
-//     INFOS_MED("GRID::fillMeshAfterRead(): This stub must be removed");
-//     switch (_spaceDimension) {
-//     case 1:
-//       _iArrayLength = _numberOfNodes;
-//       _jArrayLength = 0;
-//       _kArrayLength = 0;
-//       break;
-//     case 2:
-//       _iArrayLength = 2;
-//       _jArrayLength = _numberOfNodes / _iArrayLength;
-//       _kArrayLength = 0;
-//       break;
-//     default:
-//       _iArrayLength = 2;
-//       _jArrayLength = _numberOfNodes / _iArrayLength / 2;
-//       _kArrayLength = _numberOfNodes / _iArrayLength / _jArrayLength;
-//     }
-    //cout << "ARRAY LENGTHS: " << _iArrayLength << " " << _jArrayLength
-//      << " " << _kArrayLength << endl;
+    i=3-_spaceDimension;
   }
-//   else {
-//     int NbNodes = _iArrayLength;
-//     if (_jArrayLength)
-//       NbNodes *= _jArrayLength;
-//     if (_kArrayLength)
-//       NbNodes *= _kArrayLength;
-//     MESH::_numberOfNodes = NbNodes;
-//   }
-
-  MESH::_meshDimension = MESH::_spaceDimension;
-}
-
-//=======================================================================
-//function : fillCoordinates
-//purpose  : 
-//=======================================================================
-
-void GRID::fillCoordinates() const
-{
-  if (_is_coordinates_filled)
-    return;
-
-  if (!_coordinate)
-    return;
-  
-  const char* LOC = "GRID::fillCoordinates()";
-  BEGIN_OF_MED(LOC);
-  
-  // if coordonate has not been allocated, perform shalow copy, transfer ownership of matrix
-  if(_coordinate->getSpaceDimension()*_coordinate->getNumberOfNodes() == 0)
-      _coordinate->setCoordinates(new MEDARRAY<double>(_spaceDimension,_numberOfNodes,MED_FULL_INTERLACE),true); 
-
-  double* myCoord = const_cast <double *> ( _coordinate->getCoordinates(MED_FULL_INTERLACE) );
-
-  bool hasJ = _jArrayLength, hasK = _kArrayLength;
-  int J = hasJ ? _jArrayLength : 1;
-  int K = hasK ? _kArrayLength : 1;
-  //int nb, !! UNUSED VARIABLE !!
-  int i, j, k;
-  for (k=0; k < K; ++k) {
-    for (j=0; j < J; ++j) {
-      for (i=0; i < _iArrayLength; ++i) {
-        
-        * myCoord = _iArray[ i ];
-        ++ myCoord;
-        
-        if (hasJ)
-        {
-          * myCoord = _jArray[ j ];
-          ++ myCoord;
-          
-          if (hasK)
-          {
-            * myCoord = _kArray[ k ];
-            ++ myCoord;
-          }
-        }
-      }
-    }
-  }
-      
-  (const_cast <GRID *> (this))->_is_coordinates_filled = true;
-  END_OF_MED(LOC);
-}
-
-//=======================================================================
-//function : makeConnectivity
-//purpose  : 
-//=======================================================================
-
-CONNECTIVITY * GRID::makeConnectivity (MED_EN::medEntityMesh           Entity,
-																			 MED_EN::medGeometryElement Geometry,
-				       int                NbEntities,
-				       int                NbNodes,
-				       int                nbMeshNodes,
-				       const int *                    NodeNumbers)
-  const
-{
-  CONNECTIVITY * Connectivity     = new CONNECTIVITY(Entity) ;
-  Connectivity->_numberOfNodes    = nbMeshNodes ;
-  Connectivity->_entityDimension  = Geometry/100 ;
-  
-  int numberOfGeometricType    = 1;
-  Connectivity->_numberOfTypes = numberOfGeometricType;
-
-  Connectivity->_count    = new int [numberOfGeometricType + 1] ;
-  Connectivity->_count[0] = 1;
-  Connectivity->_count[1] = 1 + NbEntities;
-
-  Connectivity->_type    = new CELLMODEL [numberOfGeometricType];
-  Connectivity->_type[0] = CELLMODEL( Geometry ) ;
-
-  Connectivity->_geometricTypes    = new medGeometryElement [ numberOfGeometricType ];
-  Connectivity->_geometricTypes[0] = Geometry;
-
-  //  Connectivity->_nodal = new MEDSKYLINEARRAY() ;
-  int * skyLineArrayIndex = new int [NbEntities + 1];
-  int i, j, nbEntityNodes = Connectivity->_type[0].getNumberOfNodes();
-  for (i=0, j=1; i <= NbEntities; ++i, j += nbEntityNodes)
-    skyLineArrayIndex [ i ] = j;
-  
-  //  Connectivity->_nodal->setMEDSKYLINEARRAY (NbEntities, NbNodes,
-  //skyLineArrayIndex, NodeNumbers);
-
-  Connectivity->_nodal = new MEDSKYLINEARRAY (NbEntities, NbNodes,
-					       skyLineArrayIndex, NodeNumbers);
-
-  delete [] skyLineArrayIndex;
-
-  // test connectivity right away
-//   for (med_int j = 0; j < numberOfGeometricType; j++)
-//   {
-//     int node_number = Connectivity->_type[j].getNumberOfNodes();
-//     for (med_int k = Connectivity->_count[j]; k < Connectivity->_count[j+1]; k++)
-//       for (med_int local_node_number = 1 ; local_node_number < node_number+1; local_node_number++)
-//       {
-//         cout << "MEDSKYLINEARRAY::getIJ(" << k << ", " << local_node_number << endl;
-//         med_int global_node = Connectivity->_nodal->getIJ(k,local_node_number) ;
-//         cout << "...= " << global_node << endl;
-//       }
-//   }
-  
-  return Connectivity;
-}
-
-//=======================================================================
-//function : fillConnectivity
-//purpose  : fill _coordinates and _connectivity of MESH if not yet done
-//=======================================================================
-
-void GRID::fillConnectivity() const
-{
-  if (_is_connectivity_filled)
-  {
-    MESSAGE_MED("GRID::fillConnectivity(): Already filled");
-    return;
-  }
-
-  const char * LOC = "GRID::fillConnectivity() ";
-  BEGIN_OF_MED(LOC);
-  
-  int nbCells, nbFaces, nbEdges;
-  int nbCNodes, nbFNodes, nbENodes, nbMeshNodes;
-  int indexC, indexF, indexE;
-  int * nodeCNumbers, * nodeFNumbers, * nodeENumbers;
-  // about descending connectivity
-  int nbSub, nbRevSub, indexSub, indexRevSub, * subNumbers, * subRevNumbers;
-
-  bool hasFaces = _kArrayLength, hasEdges = _jArrayLength;
-  
-  int iLenMin1 = _iArrayLength-1, jLenMin1 = _jArrayLength-1;
-  int kLenMin1 = _kArrayLength-1, ijLenMin1 = iLenMin1 * jLenMin1;
-  if (!hasEdges) jLenMin1 = 1;
-  if (!hasFaces) kLenMin1 = 1;
-
-  // nb of cells and of their connectivity nodes
-
-  nbCells = iLenMin1 * jLenMin1 * kLenMin1;
-  nbMeshNodes = _iArrayLength * (_jArrayLength ? _jArrayLength : 1) * (_kArrayLength ? _kArrayLength : 1);
-  nbCNodes = nbCells * 2 * (hasEdges ? 2 : 1) * (hasFaces ? 2 : 1);
-  nodeCNumbers = new int [ nbCNodes ];
-
-  // nb of faces and of their connectivity nodes
-
-  if (hasFaces) {
-    nbFaces  = _iArrayLength * jLenMin1 * kLenMin1;
-    nbFaces += _jArrayLength * kLenMin1 * iLenMin1;
-    nbFaces += _kArrayLength * iLenMin1 * jLenMin1;
-    nbFNodes = nbFaces * 4;
-    nodeFNumbers = new int [ nbFNodes ];
-  } else
-    nbFaces = nbFNodes = 0;
-
-  // nb of edges and of their connectivity nodes
-
-  if (hasEdges) {
-    if (_kArrayLength) { // 3d grid
-      nbEdges  = iLenMin1 * _jArrayLength * _kArrayLength;
-      nbEdges += jLenMin1 * _kArrayLength * _iArrayLength;
-      nbEdges += kLenMin1 * _iArrayLength * _jArrayLength;
-    }
-    else if (_jArrayLength) { // 2d
-      nbEdges  = iLenMin1 * _jArrayLength;
-      nbEdges += jLenMin1 * _iArrayLength;
-    }
-    nbENodes = nbEdges * 2;
-    nodeENumbers = new int [ nbENodes ];
-  } else
-    nbEdges = nbENodes = 0;
-
-  // nb of descending connectivity Elements
-  
-  if (hasFaces)
-  {
-    nbSub = nbCells * 6;
-    nbRevSub = nbFaces * 2;
-  }
+  else if(entity==MED_FACE && _spaceDimension>2 )
+    i=1;
+  else if(entity==MED_EDGE && _spaceDimension>1 )
+    i=2;
+  else if(entity==MED_NODE && _spaceDimension>0)
+    i=3;
   else
-  {
-    nbSub = nbCells * 4;
-    nbRevSub = nbEdges * 2;
-  }
-  subNumbers = new int [ nbSub ];
-  subRevNumbers = new int [ nbRevSub ];
-  for (int r=0; r<nbRevSub; ++r)
-    subRevNumbers[ r ] = 0;
-
-  int nSubI = 1, nSubJ, nSubK; // subelement numbers
-  if (hasFaces)
-  {
-    nSubJ = getFaceNumber(2, 0, 0, 0);
-    nSubK = getFaceNumber(3, 0, 0, 0);
-  }
-  else
-    nSubJ = getEdgeNumber(2, 0, 0, 0);
-  
-
-  // fill cell node numbers and descending element numbers
-
-
-  indexC = indexF = indexE = indexSub = indexRevSub = -1;
-  int iNode = 0, iCell = 0;
-  int ijLen = _iArrayLength * _jArrayLength;
-  int i, j, k, n1, n2, n3 ,n4;
-  
-  int I = _iArrayLength;
-  int J = _jArrayLength ? _jArrayLength : 2; // pass at least once
-  int K = _kArrayLength ? _kArrayLength : 2;
-  // pass by all but last nodes in all directions
-  for (k = 1; k < K; ++k ) {
-    for (j = 1; j < J; ++j ) {
-      for (i = 1; i < I; ++i ) {
-
-        ++iCell;
-        
-        n1 = ++iNode; // iNode
-        n2 = n1 + 1;
-        nodeCNumbers [ ++indexC ] = n1;
-        nodeCNumbers [ ++indexC ] = n2;
-
-        if (hasEdges) { // at least 2d
-          n3 = n2 + I;
-          n4 = n3 - 1;
-          nodeCNumbers [ ++indexC ] = n3;
-          nodeCNumbers [ ++indexC ] = n4;
-        }
-        if (hasFaces) { // 3d
-          nodeCNumbers [ ++indexC ] = n1 + ijLen;
-          nodeCNumbers [ ++indexC ] = n2 + ijLen;
-          nodeCNumbers [ ++indexC ] = n3 + ijLen;
-          nodeCNumbers [ ++indexC ] = n4 + ijLen;
-
-          // descending faces
-          n1 = nSubI;
-          n2 = n1 + 1;
-          n3 = (n1-1) * 2;
-          n4 = (n2-1) * 2 + 1;
-          subNumbers [ ++indexSub ] = n1;
-          subRevNumbers[ n3 ] = iCell;
-          subNumbers [ ++indexSub ] = n2;
-          subRevNumbers[ n4 ] = -iCell;
-          n1 = nSubJ;
-          n2 = n1 + iLenMin1;
-          n3 = (n1-1) * 2;
-          n4 = (n2-1) * 2 + 1;
-          subNumbers [ ++indexSub ] = n1;
-          subRevNumbers[ n3 ] = iCell;
-          subNumbers [ ++indexSub ] = n2;
-          subRevNumbers[ n4 ] = -iCell;
-          n1 = nSubK;
-          n2 = n1 + ijLenMin1;
-          n3 = (n1-1) * 2;
-          n4 = (n2-1) * 2 + 1;
-          subNumbers [ ++indexSub ] = n1;
-          subRevNumbers[ n3 ] = iCell;
-          subNumbers [ ++indexSub ] = n2;
-          subRevNumbers[ n4 ] = -iCell;
-        }
-        else
-        {
-          // descending edges
-          n1 = nSubI;
-          n2 = n1 + iLenMin1;
-          n3 = (n1-1) * 2;
-          n4 = (n2-1) * 2 + 1;
-          subNumbers [ ++indexSub ] = n1;
-          subRevNumbers[ n3 ] = iCell;
-          subNumbers [ ++indexSub ] = n2;
-          subRevNumbers[ n4 ] = -iCell;
-          n1 = nSubJ;
-          n2 = n1 + 1;
-          n3 = (n1-1) * 2;
-          n4 = (n2-1) * 2 + 1;
-          subNumbers [ ++indexSub ] = n1;
-          subRevNumbers[ n3 ] = iCell;
-          subNumbers [ ++indexSub ] = n2;
-          subRevNumbers[ n4 ] = -iCell;
-        }
-        ++nSubI; ++nSubJ; ++nSubK;
-      }
-      ++iNode; // skip the last node in a row
-      if (hasFaces)
-        ++nSubI;
-      else
-        ++nSubJ;
-    }
-    iNode += I; // skip the whole last row
-  }
-
-  // fill face node numbers
-
-  int ax, AX = hasFaces ? 3 : 0;
-  for (ax = 1; ax <= AX; ++ax) {
-
-    iNode = 0;
-    
-    I = _iArrayLength;
-    J = _jArrayLength;
-    K = _kArrayLength;
-    switch (ax) {
-    case 1:  --J; --K; break;
-    case 2:  --K; --I; break;
-    default: --I; --J;
-    }
-    for (k = 1; k <= K; ++k ) {
-      for (j = 1; j <= J; ++j ) {
-        for (i = 1; i <= I; ++i ) {
-
-          n1 = ++iNode;
-
-          switch (ax) {
-          case 1: // nodes for faces normal to i direction
-            n2 = n1 + ijLen;
-            n3 = n2 + I;
-            n4 = n1 + I;
-            break;
-          case 2: // nodes for faces normal to j direction
-            n2 = n1 + 1;
-            n3 = n2 + ijLen;
-            n4 = n3 - 1;
-            break;
-          default: // nodes for faces normal to k direction
-            n2 = n1 + I;
-            n3 = n2 + 1;
-            n4 = n1 + 1;
-          }
-          nodeFNumbers [ ++indexF ] = n1;
-          nodeFNumbers [ ++indexF ] = n2;
-          nodeFNumbers [ ++indexF ] = n3;
-          nodeFNumbers [ ++indexF ] = n4;
-        }
-        if (ax != 1) ++iNode;
-      }
-      if (ax != 2) iNode += _iArrayLength;
-    }
-  }
-  if (nbFNodes != indexF+1) {
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Wrong nbFNodes : " \
-                                        << nbFNodes << " indexF : " << indexF ));
-  }
-
-  // fill edge node numbers
-
-  AX = hasEdges ? _spaceDimension : 0;
-  for (ax = 1; ax <= AX; ++ax) {
-
-    iNode = 0;
-    
-    I = _iArrayLength;
-    J = _jArrayLength;
-    K = _kArrayLength;
-    if (K == 0) K = 1;
-    
-    switch (ax) {
-    case 1:  --I; break;
-    case 2:  --J; break;
-    default: --K;
-    }
-    for (k = 1; k <= K; ++k ) {
-      for (j = 1; j <= J; ++j ) {
-        for (i = 1; i <= I; ++i ) {
-
-          n1 = ++iNode;
-
-          switch (ax) {
-          case 1: // nodes for edges going along i direction
-            n2 = n1 + 1;
-            break;
-          case 2: // nodes for edges going along j direction
-            n2 = n1 + _iArrayLength;
-            break;
-          default: // nodes for edges going along k direction
-            n2 = n1 + ijLen;
-          }
-          nodeENumbers [ ++indexE ] = n1;
-          nodeENumbers [ ++indexE ] = n2;
-        }
-        if (ax == 1) ++iNode;
-      }
-      if (ax == 2) iNode += _iArrayLength;
-    }
-  }
-  if (nbENodes != indexE+1) {
-    throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << "Wrong nbENodes : " \
-                                        << nbENodes << " indexE : " << indexE ));
-  }
-
-  
-  CONNECTIVITY * CellCNCT, * FaceCNCT, * EdgeCNCT;
-
-  // make connectivity for CELL
-  
-  medGeometryElement aCellGeometry;
-  if (_kArrayLength)      aCellGeometry = MED_HEXA8;
-  else if (_jArrayLength) aCellGeometry = MED_QUAD4;
-  else                    aCellGeometry = MED_SEG2;
-
-  // nodal
-  CellCNCT = makeConnectivity (MED_CELL, aCellGeometry, nbCells, nbCNodes, nbMeshNodes, nodeCNumbers);
-
-  delete [] nodeCNumbers;
-
-  // descending
-  {
-    //    CellCNCT->_descending = new MEDSKYLINEARRAY() ;
-    int * skyLineArrayIndex = new int [nbCells + 1];
-    int nbEntitySub = CellCNCT->_type[0].getNumberOfConstituents(1);
-    for (i=0, j=1; i <= nbCells; ++i, j += nbEntitySub)
-      skyLineArrayIndex [ i ] = j;
-    //    CellCNCT->_descending->setMEDSKYLINEARRAY (nbCells, nbSub,
-    //                                               skyLineArrayIndex, subNumbers);
-    CellCNCT->_descending = new MEDSKYLINEARRAY (nbCells, nbSub,
-						 skyLineArrayIndex,
-						 subNumbers);
-    delete [] skyLineArrayIndex;
-  }
-  delete [] subNumbers;
-
-  // reverse descending
-  {
-    //    CellCNCT->_reverseDescendingConnectivity = new MEDSKYLINEARRAY() ;
-    nbSub = nbRevSub/2;
-    int * skyLineArrayIndex = new int [nbSub + 1];
-    for (i=0, j=1; i <= nbSub; ++i, j += 2)
-      skyLineArrayIndex [ i ] = j;
-    //    CellCNCT->_reverseDescendingConnectivity->setMEDSKYLINEARRAY
-    //      (nbSub, nbRevSub, skyLineArrayIndex, subRevNumbers);
-
-    CellCNCT->_reverseDescendingConnectivity =
-      new MEDSKYLINEARRAY(nbSub, nbRevSub, skyLineArrayIndex, subRevNumbers);
-
-    delete [] skyLineArrayIndex;
-  }
-  delete [] subRevNumbers;
-  
-  // make connectivity for FACE and/or EDGE
-  
-  if (hasFaces) {
-    FaceCNCT = makeConnectivity (MED_FACE, MED_QUAD4, nbFaces, nbFNodes, nbMeshNodes, nodeFNumbers);
-
-    delete [] nodeFNumbers;
-
-    CellCNCT->_constituent = FaceCNCT;
-  }
-  if (hasEdges) {
-    EdgeCNCT = makeConnectivity (MED_EDGE, MED_SEG2, nbEdges, nbENodes, nbMeshNodes, nodeENumbers);
-
-    delete [] nodeENumbers;
-
-    if (hasFaces)
-      FaceCNCT->_constituent = EdgeCNCT;
-    else
-      CellCNCT->_constituent = EdgeCNCT;
-  }
-
-  MESH::_connectivity  = CellCNCT;
-
-  (const_cast <GRID *> (this))->_is_connectivity_filled = true;
-
-  END_OF_MED(LOC);
+    throw MEDEXCEPTION(LOCALIZED("CONNECTIVITY::getGeometricTypes : Entity not defined !"));
+  return &_gridGeometry[i];
 }
 
 //=======================================================================
@@ -829,11 +591,6 @@ const double GRID::getArrayValue (const int Axis, const int i) const throw (MEDE
 \endif
  */
 
-//=======================================================================
-//function : getEdgeNumber
-//purpose  : 
-//=======================================================================
-
 /*!
 \if MEDMEM_ug
 \addtogroup GRID_connectivity
@@ -849,10 +606,14 @@ Axis [1,2,3] means one of directions: along \a i, \a j or \a k.
 For cell constituents (FACE or EDGE), Axis selects one of those having same  \f$ (i, j, k )\f$ :
 - a FACE which is normal to direction along given \a Axis;
 - an EDGE going along given \a Axis.
+ \a i, \a j and \a k counts from zero.
 
 Exception for \a Axis out of range.
 For 2D grids, \a k is a dummy argument. */
+
+//================================================================================
 /*! Edge position to number conversion method*/
+//================================================================================
 
 int GRID::getEdgeNumber(const int Axis, const int i, const int j, const int k)
   const throw (MEDEXCEPTION)
@@ -889,6 +650,7 @@ int GRID::getEdgeNumber(const int Axis, const int i, const int j, const int k)
   return Nb;
 }
 
+//================================================================================
 /*!
 Returns a NODE, EDGE, FACE, CELL number by its position in the grid.
 Axis [1,2,3] means one of directions: along i, j or k
@@ -897,6 +659,7 @@ For Cell contituents (FACE or EDGE), Axis selects one of those having same (i,j,
 - an EDGE going along given Axis.
 Exception for Axis out of range
 */
+//================================================================================
 
 int GRID::getFaceNumber(const int Axis, const int i, const int j, const int k)
   const throw (MEDEXCEPTION)
@@ -912,18 +675,14 @@ int GRID::getFaceNumber(const int Axis, const int i, const int j, const int k)
   int Len[4] = {0,_iArrayLength-1, _jArrayLength-1, _kArrayLength-1 }, I=1, J=2, K=3;
 
   Len[Axis]++;
-  int Nb = 1 + i + j*Len[ I ] + k*Len[ J ]*Len[ K ];
+  int Nb = 1 + i + j*Len[ I ] + k*Len[ I ]*Len[ J ];
   Len[Axis]--;
-  
-  if (Axis > 1) { // add all faces in i direction
-    Len[I]++ ;
-    Nb += Len[ I ]*Len[ J ]*Len[ K ];
-    Len[I]-- ;
-  }
-  if (Axis > 2) { // add all faces in j direction
-    Len[J]++ ;
-    Nb += Len[ I ]*Len[ J ]*Len[ K ];
-  }
+
+  if (Axis > 1) // add all faces nornal to i direction
+    Nb += ( Len[ I ]+1 )*Len[ J ]*Len[ K ];
+
+  if (Axis > 2) // add all faces nornal to j direction
+    Nb += Len[ I ]*( Len[ J ]+1 )*Len[ K ];
 
   END_OF_MED(LOC);
 
@@ -939,13 +698,17 @@ int GRID::getFaceNumber(const int Axis, const int i, const int j, const int k)
 \a getXXXPosition functions enable the user to convert
 a number into a \f$ (i,j,k) \f$ position. 
            Axis [1,2,3] means one of directions: along i, j or k
-           For Cell contituents (FACE or EDGE), Axis selects one of those having same (i,j,k):
+           For Cell constituents (FACE or EDGE), Axis selects one of those having same (i,j,k):
            - a FACE which is normal to direction along given Axis;
            - an EDGE going along given Axis.
 
     Exception for Number out of range.
 */
+
+//================================================================================
 /*! Node number to position conversion method */
+//================================================================================
+
 void GRID::getNodePosition(const int Number, int& i, int& j, int& k) const
   throw (MEDEXCEPTION)
 {
@@ -953,7 +716,7 @@ void GRID::getNodePosition(const int Number, int& i, int& j, int& k) const
   
   BEGIN_OF_MED(LOC);
 
-  if (Number <= 0 || Number > _numberOfNodes)
+  if (Number <= 0 || Number > getNumberOfNodes() )
     throw MED_EXCEPTION ( LOCALIZED(STRING(LOC) << "Number is out of range: " << Number));
 
   int Len[] = {_iArrayLength, _jArrayLength, _kArrayLength }, I=0, J=1;
@@ -1134,55 +897,317 @@ void GRID::getFacePosition(const int Number, int& Axis, int& i, int& j, int& k)
 @}
 \endif
 */
-//=======================================================================
-//function : writeUnstructured
-//purpose  : write a Grid as an Unstructured mesh
-//=======================================================================
 
-void GRID::writeUnstructured(int index, const string & driverName)
+//================================================================================
+/*! Get the number of different geometric types for a given entity type.
+
+    medEntityMesh entity : MED_CELL, MED_FACE, MED_EDGE, MED_NODE,
+    MED_ALL_ENTITIES
+
+*/
+//================================================================================
+
+int GRID::getNumberOfTypes(MED_EN::medEntityMesh entity) const
 {
-  const char * LOC = "GRID::writeUnstructured(int index=0, const string & driverName) : ";
-  BEGIN_OF_MED(LOC);
-
-  if ( _drivers[index] ) {
-
-    makeUnstructured();
-    _isAGrid = false;
-    
-    _drivers[index]->open();   
-    if (driverName != "") _drivers[index]->setMeshName(driverName); 
-    _drivers[index]->write(); 
-    _drivers[index]->close(); 
-
-    _isAGrid = true;
-  }
-  else
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-                                    << "The index given is invalid, index must be between  0 and |" 
-                                    << _drivers.size() 
-                                    )
-                         ); 
-  END_OF_MED(LOC);
+  MESSAGE_MED("GRID::getNumberOfTypes(medEntityMesh entity) : "<<entity);
+  return 1; // a grid has one type
 }
 
-void GRID::read(int index)  
-{ 
-  const char * LOC = "GRID::read(int index=0) : ";
-  BEGIN_OF_MED(LOC);
+//================================================================================
+/*!
+  Return the number of element of given geometric type of given entity. Return 0 if query is not defined.
+*/
+//================================================================================
 
-  if (_drivers[index]) {
-    _drivers[index]->open();   
-    _drivers[index]->read(); 
-    _drivers[index]->close(); 
+int GRID::getNumberOfElements(MED_EN::medEntityMesh entity, MED_EN::medGeometryElement Type) const
+{
+  int numberOfElements=0;
+
+  // Cas où le nombre d'éléments n'est pas nul
+  if (entity==MED_EN::MED_FACE && (Type==MED_EN::MED_QUAD4 || Type==MED_EN::MED_ALL_ELEMENTS) && getMeshDimension()>2)
+    numberOfElements=
+      (_iArrayLength-1)*(_jArrayLength-1)*(_kArrayLength  )+
+      (_iArrayLength-1)*(_jArrayLength  )*(_kArrayLength-1)+
+      (_iArrayLength  )*(_jArrayLength-1)*(_kArrayLength-1);
+
+  else if (entity==MED_EN::MED_EDGE && (Type==MED_EN::MED_SEG2 || Type==MED_EN::MED_ALL_ELEMENTS))
+    if ( _spaceDimension==2)
+      numberOfElements=_iArrayLength*(_jArrayLength-1) + (_iArrayLength-1)*_jArrayLength;
+    else if ( _spaceDimension==1)
+      numberOfElements=_iArrayLength-1;
+    else // 3D
+      numberOfElements=
+        (_iArrayLength*(_jArrayLength-1) + (_iArrayLength-1)*_jArrayLength) * _kArrayLength +
+        _iArrayLength*_jArrayLength*(_kArrayLength-1);
+
+  else if (entity==MED_EN::MED_NODE && (Type==MED_EN::MED_NONE || Type==MED_EN::MED_ALL_ELEMENTS) && _spaceDimension>0)
+    numberOfElements=getNumberOfNodes();
+
+  else if (entity==MED_EN::MED_CELL && _spaceDimension==3 && (Type==MED_EN::MED_HEXA8 || Type==MED_EN::MED_ALL_ELEMENTS) )
+    numberOfElements=(_iArrayLength-1)*(_jArrayLength-1)*(_kArrayLength-1);
+
+  else if (entity==MED_EN::MED_CELL && _spaceDimension==2 && (Type==MED_EN::MED_QUAD4 || Type==MED_EN::MED_ALL_ELEMENTS))
+    numberOfElements=(_iArrayLength-1)*(_jArrayLength-1);
+
+  else if (entity==MED_EN::MED_CELL && _spaceDimension==1 && (Type==MED_EN::MED_SEG2 || Type==MED_EN::MED_ALL_ELEMENTS) )
+    numberOfElements=_iArrayLength-1;
+
+  MESSAGE_MED("GRID::getNumberOfElements - entity=" << entity << " Type=" << Type);
+  MESSAGE_MED("_spaceDimension=" << _spaceDimension << "  numberOfElements=" << numberOfElements);
+
+  return numberOfElements;
+}
+
+//================================================================================
+/*!
+  Return the geometric type of global element Number of entity Entity.
+*/
+//================================================================================
+
+MED_EN::medGeometryElement GRID::getElementType(MED_EN::medEntityMesh Entity,int Number) const
+{
+  return getTypes(Entity)[0];
+}
+
+//================================================================================
+/*!
+ * \brief Return mesh dimension
+ */
+//================================================================================
+
+int GRID::getMeshDimension() const
+{
+  return getSpaceDimension();
+}
+
+//================================================================================
+/*!
+ * \brief It is a grid
+ */
+//================================================================================
+
+bool GRID::getIsAGrid() const
+{
+  return true;
+}
+
+//================================================================================
+/*!
+ * \brief Return number of nodes
+ */
+//================================================================================
+
+int GRID::getNumberOfNodes() const
+{
+  if ( _gridType == MED_EN::MED_BODY_FITTED )
+    return _coordinate ? _coordinate->getNumberOfNodes() : 0;
+
+  switch ( _spaceDimension )
+  {
+  case 3: return _iArrayLength * _jArrayLength * _kArrayLength;
+  case 2: return _iArrayLength * _jArrayLength;
+  case 1: return _iArrayLength;
   }
-  else
-    throw MED_EXCEPTION ( LOCALIZED( STRING(LOC) 
-                                     << "The index given is invalid, index must be between  0 and |" 
-                                     << _drivers.size() 
-                                     )
-                          );
-  if (_isAGrid)
-    fillMeshAfterRead();
+  return 0;
+}
 
-  END_OF_MED(LOC);
+//=======================================================================
+/*!
+ * Returns "CARTESIAN", "CYLINDRICAL" or "SPHERICAL"
+ */
+//=======================================================================
+
+std::string         GRID::getCoordinatesSystem() const
+{
+  return _coordinate ? _coordinate->getCoordinatesSystem() : defaultStrings()[0];
+}
+
+//=======================================================================
+/*!
+ * Returns an array with names of coordinates. \n
+ *     Example : \n
+ *     - x,y,z \n
+ *     - r,teta,phi \n
+ *     - ...
+ */
+//=======================================================================
+
+const std::string * GRID::getCoordinatesNames() const
+{
+  return _coordinate ? _coordinate->getCoordinatesNames() : defaultStrings();
+}
+
+//=======================================================================
+/*!
+ * Returns an array with units of coordinates (cm, m, mm, ...)
+ * It could be empty. We suppose we are IS (meter).
+ */
+//=======================================================================
+
+const std::string * GRID::getCoordinatesUnits() const
+{
+  return _coordinate ? _coordinate->getCoordinatesUnits() : defaultStrings();
+}
+
+//=======================================================================
+/*!
+  Returns a support which reference all elements on the boundary of mesh.
+  For a d-dimensional mesh, a boundary element is defined as a d-1 dimension
+  element that is referenced by only one element in the full descending connectivity.
+
+  This method can also return the list of nodes that belong to the boundary elements.
+
+  WARNING: This method can recalculate descending connectivity from partial to full form,
+  so that partial SUPPORT on d-1 dimension elements becomes invalid.
+
+  \param Entity entity on which the boundary is desired. It has to be either \a MED_NODE or the
+  d-1 dimension entity type (MED_FACE in 3D, MED_EDGE in 2D).
+*/
+//=======================================================================
+
+SUPPORT * GRID::getBoundaryElements(MED_EN::medEntityMesh Entity) const throw (MEDEXCEPTION)
+{
+  const char * LOC = "GMESH::getBoundaryElements() : " ;
+  if ( _spaceDimension < 2 )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not implemented in " << _spaceDimension <<"D space !"));
+
+  if ( _gridType == MED_POLAR) 
+    throw MEDEXCEPTION("GRID::getBoundaryElements() : not implemented on MED_POLAR grig");
+
+
+  medEntityMesh entityToParse=Entity;
+  if(_spaceDimension == 3)
+    if (Entity != MED_FACE)
+      {
+        if(Entity==MED_NODE)
+          entityToParse=MED_FACE;
+        else
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 3D mesh for entity "<<Entity<<" !"));
+      }
+  if(_spaceDimension == 2)
+    if(Entity != MED_EDGE)
+      {
+        if(Entity==MED_NODE)
+          entityToParse=MED_EDGE;
+        else
+          throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"Not defined in 2D mesh for entity "<<Entity<<" !"));
+      }
+  list<int> bnd_elems1, bnd_elems2;
+  int numberOf = getNumberOfElements(entityToParse,MED_ALL_ELEMENTS) ;
+
+  if ( _coordinate->getNumberOfNodes() > 0 ) // BODY FITTED
+    {
+      throw MEDEXCEPTION("GRID::getBoundaryElements() : not implemented on BOBY FITTED grig");
+    }
+  else if ( entityToParse == MED_FACE ) // 3D CARTESIAN
+    {
+      const int nb_x = getArrayLength( 1 ) - 1;
+      const int nb_y = getArrayLength( 2 ) - 1;
+      const int nb_z = getArrayLength( 3 ) - 1;
+      // normal to OX
+      for ( int z = 0; z < nb_z; ++z )
+        for ( int y = 0; y < nb_y; ++y )
+          {
+            bnd_elems1.push_back( getFaceNumber( 1, 0,    y, z ));
+            bnd_elems2.push_back( getFaceNumber( 1, nb_x, y, z ));
+          }
+      bnd_elems1.splice( bnd_elems1.end(), bnd_elems2 ); // to have ids in increasing order
+
+      // normal to OY
+      for ( int z = 0; z < nb_z; ++z )
+        for ( int x = 0; x < nb_x; ++x )
+          {
+            bnd_elems1.push_back( getFaceNumber( 2, x, 0,    z ));
+            bnd_elems2.push_back( getFaceNumber( 2, x, nb_y, z ));
+          }
+      bnd_elems1.splice( bnd_elems1.end(), bnd_elems2 );
+
+      // normal to OZ
+      for ( int y = 0; y < nb_y; ++y )
+        for ( int x = 0; x < nb_x; ++x )
+          {
+            bnd_elems1.push_back( getFaceNumber( 3, x, y, 0    ));
+            bnd_elems2.push_back( getFaceNumber( 3, x, y, nb_z ));
+          }
+      bnd_elems1.splice( bnd_elems1.end(), bnd_elems2 );
+    }
+  else
+    {
+      const int nb_x = getArrayLength( 1 ) - 1;
+      const int nb_y = getArrayLength( 2 ) - 1;
+      // edge || OX
+      for ( int x = 0; x < nb_x; ++x )
+        {
+          bnd_elems1.push_back( getEdgeNumber( 1, x, 0 ));
+          bnd_elems2.push_back( getEdgeNumber( 1, x, nb_y ));
+        }
+      bnd_elems1.splice( bnd_elems1.end(), bnd_elems2 ); // to have ids in increasing order
+      // edge || OY
+      for ( int y = 0; y < nb_y; ++y )
+        {
+          bnd_elems1.push_back( getEdgeNumber( 2, y, 0 ));
+          bnd_elems2.push_back( getEdgeNumber( 2, y, nb_x ));
+        }
+      bnd_elems1.splice( bnd_elems1.end(), bnd_elems2 );
+    }
+
+  if ( bnd_elems1.empty() && numberOf != 0 )
+    throw MEDEXCEPTION(LOCALIZED(STRING(LOC)<<"No boundary elements found by reverse descending connectivity for entity "<<Entity<<" !"));
+
+  if ( Entity == MED_NODE )
+    return buildSupportOnNodeFromElementList(bnd_elems1,entityToParse);
+  else
+    return buildSupportOnElementsFromElementList(bnd_elems1,entityToParse);
+}
+
+SUPPORT * GRID::getSkin(const SUPPORT * Support3D) throw (MEDEXCEPTION)
+{
+  throw MEDEXCEPTION("GRID::getSkin() : Not implemented yet");
+}
+SUPPORT *GRID::buildSupportOnNodeFromElementList(const std::list<int>& listOfElt,
+                                                 MED_EN::medEntityMesh entity) const
+  throw (MEDEXCEPTION)
+{
+  throw MEDEXCEPTION("GRID::buildSupportOnNodeFromElementList() : Not implemented yet");
+}
+void GRID::fillSupportOnNodeFromElementList(const std::list<int>& listOfElt,
+                                            SUPPORT *             supportToFill) const
+  throw (MEDEXCEPTION)
+{
+  throw MEDEXCEPTION("GRID::fillSupportOnNodeFromElementList() : Not implemented yet");
+}
+
+FIELD<double>* GRID::getVolume (const SUPPORT * Support, bool isAbs) const
+  throw (MEDEXCEPTION)
+{
+  throw MEDEXCEPTION("GRID::getVolume() : Not implemented yet");
+}
+
+FIELD<double>* GRID::getArea (const SUPPORT * Support) const
+  throw (MEDEXCEPTION)
+{
+  throw MEDEXCEPTION("GRID::getArea() : Not implemented yet");
+}
+
+FIELD<double>* GRID::getLength (const SUPPORT * Support) const
+  throw (MEDEXCEPTION)
+{
+  throw MEDEXCEPTION("GRID::getLength() : Not implemented yet");
+}
+
+FIELD<double>* GRID::getNormal (const SUPPORT * Support) const
+  throw (MEDEXCEPTION)
+{
+  throw MEDEXCEPTION("GRID::getNormal() : Not implemented yet");
+}
+
+FIELD<double>* GRID::getBarycenter (const SUPPORT * Support) const
+  throw (MEDEXCEPTION)
+{
+  throw MEDEXCEPTION("GRID::getBarycenter() : Not implemented yet");
+}
+
+vector< vector<double> >   GRID::getBoundingBox() const
+{
+  throw MEDEXCEPTION("GRID::getBoundingBox() : Not implemented yet");
 }

@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 #ifndef UTILCLIENT_HXX_
 #define UTILCLIENT_HXX_
 
@@ -28,8 +29,8 @@
 
 namespace MEDMEM {
 template <typename TLocal, 
-	  typename TCorbaSeq,
-	  typename Tint>
+          typename TCorbaSeq,
+          typename Tint>
 inline void convertCorbaArray (TLocal * & T, Tint &nT, const TCorbaSeq & S)
 {
   Tint i, n = S->length();
@@ -43,8 +44,8 @@ inline void convertCorbaArray (TLocal * & T, Tint &nT, const TCorbaSeq & S)
 }
 
 template <typename TLocal, 
-	  typename TCorbaSeq,
-	  typename Tint>
+          typename TCorbaSeq,
+          typename Tint>
 inline void convertCorbaArray2 (TLocal& tab, Tint &nT, const TCorbaSeq s)
 {
   Tint i, n = s.length();
@@ -57,10 +58,10 @@ inline void convertCorbaArray2 (TLocal& tab, Tint &nT, const TCorbaSeq s)
 }
 
 template <typename TCorba,
-	  typename TLocal,
-	  typename TCorbaSeq>
+          typename TLocal,
+          typename TCorbaSeq>
 inline void convertCorbaArray (TLocal * & T, long &nT, const TCorbaSeq & S,
-			       void *f)
+                               void *f)
 {
   int i, n = S->length();
   SCRUTE(n);
@@ -79,9 +80,9 @@ inline void convertCorbaArray (TLocal * & T, long &nT, const TCorbaSeq & S,
 }
 
 template <typename TLocal,
-	  typename TCorbaSeq>
+          typename TCorbaSeq>
 inline void convertCorbaArray (std::vector<TLocal> & T, int &nT, 
-			       const TCorbaSeq & S)
+                               const TCorbaSeq & S)
 {
   int i, n = S->length();
   SCRUTE(n);
@@ -98,11 +99,11 @@ inline void convertCorbaArray (std::vector<TLocal> & T, int &nT,
 
 
 template <typename TCorba,
-	  typename TLocal,
-	  typename TCorbaSeq>
+          typename TLocal,
+          typename TCorbaSeq>
 inline void convertCorbaArray (std::vector<TLocal> & T, int &nT, 
-			       const TCorbaSeq & S,
-			       void *f)
+                               const TCorbaSeq & S,
+                               void *f)
 {
   int i, n = S->length();
   SCRUTE(n);
@@ -123,12 +124,12 @@ inline void convertCorbaArray (std::vector<TLocal> & T, int &nT,
 
 
 template <typename TCorba,
-	  typename TLocal,
-	  typename TCorbaSeq,
-	  typename TInfo>
+          typename TLocal,
+          typename TCorbaSeq,
+          typename TInfo>
 inline void convertCorbaArray (std::vector<TLocal> & T, 
-			       const TCorbaSeq & S,
-			       void *f, TInfo M)
+                               const TCorbaSeq & S,
+                               void *f, TInfo M)
 {
   int i, n = S->length();
   SCRUTE(n);

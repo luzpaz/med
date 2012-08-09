@@ -35,7 +35,7 @@ namespace med_2_1{
 
 med_err 
 _MEDdatasetStringEcrire(med_idt pere,char *nom,med_size *dimd,
-			char *val, med_mode_acces mode)
+                        char *val, med_mode_acces mode)
 {
   med_idt dataset;
   med_idt datatype = 0;
@@ -45,32 +45,32 @@ _MEDdatasetStringEcrire(med_idt pere,char *nom,med_size *dimd,
   if ((dataset = H5Dopen(pere,nom)) < 0)
     {
       if ((dataspace = H5Screate_simple(1,dimd,NULL)) < 0)
-	return -1;
+        return -1;
       if((datatype = H5Tcopy(H5T_C_S1)) < 0)
-	return -1;
+        return -1;
       if((ret = H5Tset_size(datatype,1)) < 0)
-	return -1;
+        return -1;
       if ((dataset = H5Dcreate(pere,nom,datatype,dataspace,
-			     H5P_DEFAULT)) < 0)
-	return -1;    
+                             H5P_DEFAULT)) < 0)
+        return -1;    
     }
   else
     if (mode != MED_REMP)
       {
-	H5Dclose(dataset);
-	return -1;
+        H5Dclose(dataset);
+        return -1;
       }
     else
       {
       if ((dataspace = H5Screate_simple(1,dimd,NULL)) < 0)
-	return -1;
+        return -1;
       if((datatype = H5Tcopy(H5T_C_S1)) < 0)
-	return -1;
+        return -1;
       if((ret = H5Tset_size(datatype,1)) < 0)
-	return -1;
+        return -1;
       }
   if ((ret = H5Dwrite(dataset,datatype,H5S_ALL,H5S_ALL,
-		      H5P_DEFAULT, val)) < 0)
+                      H5P_DEFAULT, val)) < 0)
     return -1;
   if (dataspace)
     if((ret = H5Sclose(dataspace)) < 0)

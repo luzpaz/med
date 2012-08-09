@@ -26,7 +26,7 @@ namespace med_2_1{
 
 med_err
 MEDchampCr(med_idt fid, char *champ, med_type_champ type, char *comp,
-	   char *unit,med_int ncomp)
+           char *unit,med_int ncomp)
 {
   med_err ret = 0;
   med_idt root,gid;

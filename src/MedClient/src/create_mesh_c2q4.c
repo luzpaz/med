@@ -1,24 +1,25 @@
-//  Copyright (C) 2007-2008  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 //
-//  Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-//  CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
+// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
 //
-//  This library is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU Lesser General Public
-//  License as published by the Free Software Foundation; either
-//  version 2.1 of the License.
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
 //
-//  This library is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-//  Lesser General Public License for more details.
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
 //
-//  You should have received a copy of the GNU Lesser General Public
-//  License along with this library; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-//  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+
 /*
   creation d'une geometrie 2d : un cube [0,1]^2
   maillé uniformement en quadrangle reguliers;
@@ -142,19 +143,19 @@ int main (int argc, char **argv)
   for(j=0;j<nnoe_dir;j++)
     {
       for (i=0;i<nnoe_dir;i++)
-	{
-	  int ij = j*nnoe_dir+i;
+        {
+          int ij = j*nnoe_dir+i;
 
-	  numnoe[ij] = ij+1;
-	  nufano[ij] = 0;
+          numnoe[ij] = ij+1;
+          nufano[ij] = 0;
 
-	  coo[mdim*ij] = ((med_float) i)*hxsize;
-	  coo[mdim*ij+1] = ((med_float) j)*hysize;
+          coo[mdim*ij] = ((med_float) i)*hxsize;
+          coo[mdim*ij+1] = ((med_float) j)*hysize;
 
-	  /*
-	  printf("Coordonnées %d   X = %lf  Y = %lf\n",(ij+1),coo[mdim*ij],coo[mdim*ij+1]);
-	  */
-	}
+          /*
+          printf("Coordonnées %d   X = %lf  Y = %lf\n",(ij+1),coo[mdim*ij],coo[mdim*ij+1]);
+          */
+        }
     }
 
   /*
@@ -164,27 +165,27 @@ int main (int argc, char **argv)
   for(j=0;j<nelt_dir;j++)
     {
       for (i=0;i<nelt_dir;i++)
-	{
-	  int ij = j*nelt_dir+i;
+        {
+          int ij = j*nelt_dir+i;
 
-	  numquad4[ij] = ij+1;
-	  nufaquad4[ij] = 0;
+          numquad4[ij] = ij+1;
+          nufaquad4[ij] = 0;
 
-	  indexN4 = j*nnoe_dir+i+1;
-	  indexN3 = indexN4+1;
-	  indexN1 = indexN4+nnoe_dir;
-	  indexN2 = indexN3+nnoe_dir;
+          indexN4 = j*nnoe_dir+i+1;
+          indexN3 = indexN4+1;
+          indexN1 = indexN4+nnoe_dir;
+          indexN2 = indexN3+nnoe_dir;
 
-	  quad4[4*ij] = indexN1;
-	  quad4[4*ij+1] = indexN2;
-	  quad4[4*ij+2] = indexN3;
-	  quad4[4*ij+3] = indexN4;
+          quad4[4*ij] = indexN1;
+          quad4[4*ij+1] = indexN2;
+          quad4[4*ij+2] = indexN3;
+          quad4[4*ij+3] = indexN4;
 
-	  /*
-	  printf("Connectivitée %d  i1 = %d  i2 = %d  i3 = %d  i4 = %d\n",(ij+1),quad4[4*ij],quad4[4*ij+1],quad4[4*ij+2],quad4[4*ij+3]);
-	  */
+          /*
+          printf("Connectivitée %d  i1 = %d  i2 = %d  i3 = %d  i4 = %d\n",(ij+1),quad4[4*ij],quad4[4*ij+1],quad4[4*ij+2],quad4[4*ij+3]);
+          */
 
-	}
+        }
     }
 
   /*
@@ -198,28 +199,28 @@ int main (int argc, char **argv)
    for(i=0;i<nnoe;i++)
      {
        DbleVectNode[mdim*i] =
-	 (med_float) (1+(int) (100.0*rand()/(RAND_MAX+1.0)));
+         (med_float) (1+(int) (100.0*rand()/(RAND_MAX+1.0)));
 
        DbleVectNode[mdim*i+1] =
-	 (med_float) (1+(int) (100.0*rand()/(RAND_MAX+1.0)));
+         (med_float) (1+(int) (100.0*rand()/(RAND_MAX+1.0)));
 
        /*
-	 printf("i %d DbleVectNode %lf %lf\n",i,DbleVectNode[mdim*i],
-	 DbleVectNode[mdim*i+1]);
+         printf("i %d DbleVectNode %lf %lf\n",i,DbleVectNode[mdim*i],
+         DbleVectNode[mdim*i+1]);
        */
      }
 
    for(i=0;i<nquad4;i++)
      {
        DbleVectCell[mdim*i] =
-	 (med_float) (1+(int) (100.0*rand()/(RAND_MAX+1.0)));
+         (med_float) (1+(int) (100.0*rand()/(RAND_MAX+1.0)));
 
        DbleVectCell[mdim*i+1] =
-	 (med_float) (1+(int) (1000*rand()/(RAND_MAX+1.0)));
+         (med_float) (1+(int) (1000*rand()/(RAND_MAX+1.0)));
 
        /*
-	 printf("i %d DbleVectCell %lf %lf\n",i,DbleVectCell[mdim*i],
-	 DbleVectCell[mdim*i+1]);
+         printf("i %d DbleVectCell %lf %lf\n",i,DbleVectCell[mdim*i],
+         DbleVectCell[mdim*i+1]);
        */
      }
 
@@ -250,8 +251,8 @@ int main (int argc, char **argv)
 
   if (ret == 0)
     ret = MEDnoeudsEcr(fid,maa,mdim,coo,MED_FULL_INTERLACE,MED_CART,
-		       nomcoo,unicoo,nomnoe,MED_FAUX,numnoe,MED_VRAI,
-		       nufano,nnoe,WRONLY);
+                       nomcoo,unicoo,nomnoe,MED_FAUX,numnoe,MED_VRAI,
+                       nufano,nnoe,WRONLY);
   printf("%d\n",ret);
 
   /*
@@ -264,8 +265,8 @@ int main (int argc, char **argv)
 
   if (ret == 0) 
     ret = MEDelementsEcr(fid,maa,mdim,quad4,MED_FULL_INTERLACE,
-			 nomquad4,MED_FAUX,numquad4,MED_VRAI,nufaquad4,nquad4,
-			 MED_MAILLE,MED_QUAD4,MED_NOD,WRONLY);
+                         nomquad4,MED_FAUX,numquad4,MED_VRAI,nufaquad4,nquad4,
+                         MED_MAILLE,MED_QUAD4,MED_NOD,WRONLY);
   printf("%d \n",ret);
 
   /***************************************************************************/
@@ -285,7 +286,7 @@ int main (int argc, char **argv)
       strcpy(nomfam,"FAMILLE_0");
       numfam = 0;
       ret = MEDfamCr(fid,maa,nomfam,numfam,&attide,&attval,attdes,0,
-		     gro,0);
+                     gro,0);
     }
   printf("%d \n",ret);
 
@@ -297,39 +298,39 @@ int main (int argc, char **argv)
   if (ret == 0)
     {
       ret = MEDchampCr(fid,champDbleVectNode,MED_REEL64,compDbleVectNode,
-		       unitDbleVectNode,mdim);
+                       unitDbleVectNode,mdim);
 
       printf("MEDchampCr DbleVectNode : %d \n",ret);
 
       if (ret == 0)
-	{
-	  ret = MEDchampEcr(fid, maa, champDbleVectNode,
-			    (unsigned char *)DbleVectNode,
-			    MED_NO_INTERLACE, nnoe,
-			    MED_NOPG, MED_ALL, MED_NOPFL, WRONLY, MED_NOEUD, 
-			    0, MED_NOPDT,"        ", 0., MED_NONOR);
-	
-	  printf("MEDchampEcr DbleVectNode : %d \n",ret);
-	}
+        {
+          ret = MEDchampEcr(fid, maa, champDbleVectNode,
+                            (unsigned char *)DbleVectNode,
+                            MED_NO_INTERLACE, nnoe,
+                            MED_NOPG, MED_ALL, MED_NOPFL, WRONLY, MED_NOEUD, 
+                            0, MED_NOPDT,"        ", 0., MED_NONOR);
+        
+          printf("MEDchampEcr DbleVectNode : %d \n",ret);
+        }
     }
 
   if (ret == 0)
     {
       ret = MEDchampCr(fid,champDbleVectCell,MED_REEL64,compDbleVectCell,
-		       unitDbleVectCell,mdim);
+                       unitDbleVectCell,mdim);
 
       printf("MEDchampCr DbleVectCell : %d \n",ret);
 
       if (ret == 0)
-	{
-	  ret = MEDchampEcr(fid, maa, champDbleVectCell,
-			    (unsigned char *)DbleVectCell,
-			    MED_NO_INTERLACE, nquad4,
-			    MED_NOPG, MED_ALL, MED_NOPFL, WRONLY, MED_MAILLE,
-			    MED_QUAD4, MED_NOPDT,"        ", 0., MED_NONOR);
-	
-	  printf("MEDchampEcr DbleVectCell : %d \n",ret);
-	}
+        {
+          ret = MEDchampEcr(fid, maa, champDbleVectCell,
+                            (unsigned char *)DbleVectCell,
+                            MED_NO_INTERLACE, nquad4,
+                            MED_NOPG, MED_ALL, MED_NOPFL, WRONLY, MED_MAILLE,
+                            MED_QUAD4, MED_NOPDT,"        ", 0., MED_NONOR);
+        
+          printf("MEDchampEcr DbleVectCell : %d \n",ret);
+        }
     }
 
   /***************************************************************************/
