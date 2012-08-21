@@ -564,6 +564,7 @@ else
     else
         # --with-interp-kernel-only=no mode
         obligatory_vars="$obligatory_vars python_ok boost_ok swig_ok hdf5_ok med3_ok $splitter_obligatory_vars"
+        optional_vars="$optional_vars $splitter_optional_vars $renumber_optional_vars"
     fi
 fi
 
