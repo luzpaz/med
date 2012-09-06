@@ -2,8 +2,8 @@
 #  -*- coding: iso-8859-1 -*-
 #
 # This file is a set of basic use case to test (from the python
-# context) the functions developped in XMED and MED modules for the
-# field operations.
+# context) the functions developped in MED modules for the field
+# operations.
 #
 # (gboulant - 16/6/2011)
 #
