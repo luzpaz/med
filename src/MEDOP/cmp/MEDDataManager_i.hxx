@@ -58,8 +58,9 @@ typedef map<long,MEDCouplingFieldDouble*>::iterator FieldDoubleMapIterator;
 typedef map<long,MEDCouplingUMesh*> MeshMap;
 typedef map<long,MEDCouplingUMesh*>::iterator MeshMapIterator;
 
-class MEDDataManager_i: public POA_MEDOP::MEDDataManager,
-			public SALOME::GenericObj_i
+#include "MEDOP.hxx"
+class MEDOP_EXPORT MEDDataManager_i: public POA_MEDOP::MEDDataManager,
+				     public SALOME::GenericObj_i
 {
 public:
 

@@ -31,9 +31,9 @@
 //#include CORBA_SERVER_HEADER(MEDCalculator)
 #include "SALOME_Component_i.hxx"
 
-class MEDOPFactory_i:
-  public POA_MEDOP::MEDOPFactory,
-  public Engines_Component_i 
+#include "MEDOP.hxx"
+class MEDOP_EXPORT MEDOPFactory_i: public POA_MEDOP::MEDOPFactory,
+				   public Engines_Component_i
 {
   
 public:

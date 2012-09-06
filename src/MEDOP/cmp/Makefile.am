@@ -25,7 +25,8 @@ mypkgpythondir =$(salomepythondir)/xmed
 mypkgpython_PYTHON = \
 	test_xmed.py
 
-salomeinclude_HEADERS =\
+salomeinclude_HEADERS =      \
+	MEDOP.hxx            \
 	MEDDataManager_i.hxx \
 	MEDOPFactory_i.hxx
 
