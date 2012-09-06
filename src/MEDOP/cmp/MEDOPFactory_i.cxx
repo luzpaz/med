@@ -29,7 +29,7 @@ using namespace std;
 #include <string>
 
 #include "MEDDataManager_i.hxx"
-//#include "MEDCalculator_i.hxx"
+#include "MEDCalculator_i.hxx"
 
 //=============================================================================
 /*!
@@ -59,13 +59,11 @@ MEDOP::MEDDataManager_ptr MEDOPFactory_i::getDataManager() {
   return medDataManagerPtr;
 }
 
-/*
 MEDOP::MEDCalculator_ptr MEDOPFactory_i::getCalculator() {
   MEDCalculator_i * medCalculator = MEDCalculator_i::getInstance();
   MEDOP::MEDCalculator_ptr medCalculatorPtr = medCalculator->_this();
   return medCalculatorPtr;
 }
-*/
 
 extern "C"
 {

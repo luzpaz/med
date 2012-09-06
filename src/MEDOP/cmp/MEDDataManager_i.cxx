@@ -81,6 +81,16 @@ const char * MEDDataManager_i::source_to_file(const char * source)
  * fields).
  */
 MEDOP::DatasourceHandler * MEDDataManager_i::addDatasource(const char *filepath) {
+
+  // We first check that this datasource is not already registered  
+  long sourceid = getDatasourceId(filepath);
+  if ( sourceid != LONG_UNDEFINED ) {
+    // The file is already registered under the identifier sourceid
+    LOG("WRN: The file "<<filepath<<" is already registered with id="<<ToString(sourceid));
+    return new MEDOP::DatasourceHandler(*_datasourceHandlerMap[sourceid]);
+  }
+
+  // Then we check that the file is readable by MEDLoader
   MEDLoader::CheckFileForRead(filepath);
 
   // Initialise the datasource handler
@@ -181,6 +191,19 @@ MEDOP::DatasourceHandler * MEDDataManager_i::addDatasource(const char *filepath)
   
   return new MEDOP::DatasourceHandler(*datasourceHandler);
 }
+
+long MEDDataManager_i::getDatasourceId(const char *filepath) {
+  const char * uri = file_to_source(filepath);
+  DatasourceHandlerMapIterator it = _datasourceHandlerMap.begin();  
+  while ( it != _datasourceHandlerMap.end() ) {
+    if ( strcmp(it->second->uri,uri) == 0 ) {
+      return it->first;
+    }
+    ++it;
+  }
+  return LONG_UNDEFINED;
+}
+
 
 MEDOP::MeshHandler * MEDDataManager_i::getMesh(CORBA::Long meshId) {
   if ( _meshHandlerMap.count(meshId) == 0 ) {

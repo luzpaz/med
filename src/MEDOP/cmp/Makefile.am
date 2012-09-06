@@ -21,18 +21,20 @@
 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-mypkgpythondir =$(salomepythondir)/xmed
-mypkgpython_PYTHON = \
+mypkgpythondir = $(salomescriptdir)/xmed
+mypkgpython_SCRIPTS = \
 	test_xmed.py
 
 salomeinclude_HEADERS =      \
 	MEDOP.hxx            \
 	MEDDataManager_i.hxx \
+	MEDCalculator_i.hxx  \
 	MEDOPFactory_i.hxx
 
 lib_LTLIBRARIES = libMEDOPFactoryEngine.la
-libMEDOPFactoryEngine_la_SOURCES=\
-	MEDDataManager_i.cxx \
+libMEDOPFactoryEngine_la_SOURCES = \
+	MEDDataManager_i.cxx       \
+	MEDCalculator_i.cxx        \
 	MEDOPFactory_i.cxx
 
 libMEDOPFactoryEngine_la_LDFLAGS = -no-undefined -version-info=0:0:0

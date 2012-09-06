@@ -28,7 +28,7 @@
 #include <SALOMEconfig.h>
 #include CORBA_SERVER_HEADER(MEDOPFactory)
 #include CORBA_SERVER_HEADER(MEDDataManager)
-//#include CORBA_SERVER_HEADER(MEDCalculator)
+#include CORBA_SERVER_HEADER(MEDCalculator)
 #include "SALOME_Component_i.hxx"
 
 #include "MEDOP.hxx"
@@ -44,8 +44,10 @@ public:
 		 const char *interfaceName);
   virtual ~MEDOPFactory_i();
 
+  /*! Returns the singleton instance of the data manager */
   MEDOP::MEDDataManager_ptr getDataManager();
-  //MEDOP::MEDCalculator_ptr getCalculator();
+  /*! Returns the singleton instance of the calculator */
+  MEDOP::MEDCalculator_ptr getCalculator();
   
 };
 

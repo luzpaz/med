@@ -24,7 +24,7 @@
 #include "SALOME_Component.idl"
 #include "SALOME_Exception.idl"
 #include "MEDDataManager.idl"
-// #include "MEDCalculator.idl"
+#include "MEDCalculator.idl"
 
 /*!
  * This module contains the interface required for starting with MED
@@ -40,7 +40,7 @@ module MEDOP
   {
 
     MEDOP::MEDDataManager getDataManager();
-    //MEDOP::MEDCalculator getCalculator();
+    MEDOP::MEDCalculator getCalculator();
 
   };
 };

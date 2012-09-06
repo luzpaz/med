@@ -154,10 +154,10 @@ private:
 
   const char * file_to_source(const char * filepath);
   const char * source_to_file(const char * source);
+  long getDatasourceId(const char *filepath);
 
   MEDCouplingUMesh * getUMesh(long meshHandlerId);
   long getUMeshId(const MEDCouplingMesh * mesh);
-
 };
 
 #endif // _MED_DATAMANAGER_I_HXX_
