@@ -45,14 +45,15 @@ mainpkg+= \
 testpkg = \
 	properties.py
 
-testscripts=\
-	tests/test_medoperation.py \
-	tests/test_medEventListener.py \
-	tests/test_medvisualisation.py
-
 mypkgpython_PYTHON = \
 	$(mainpkg) \
 	$(testpkg)
 
-mypkgpython_SCRIPTS=\
+mybindir = $(salomescriptdir)/xmed
+testscripts=\
+	tests/test_xmed_fieldOperations.py \
+	tests/test_xmed_uiEventListener.py \
+	tests/test_xmed_visualisation.py
+
+mybin_SCRIPTS=\
 	$(testscripts)

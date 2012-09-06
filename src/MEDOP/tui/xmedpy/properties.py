@@ -8,7 +8,7 @@ try:
 except KeyError, e:
     raise RuntimeError("MED_ROOT_DIR should be defined to load the test data")
 
-RESDIR=os.path.join(MED_ROOT_DIR, "share", "salome", "resources", "medop_testfiles")
+RESDIR=os.path.join(MED_ROOT_DIR,"share","salome","resources","med","medop_testfiles")
 
 def testdata_01():
     testFileName = "testfield.med"
