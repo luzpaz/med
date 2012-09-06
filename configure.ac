@@ -743,6 +743,8 @@ AC_OUTPUT([ \
         src/MedClient/test/environ/csh/stopContainer \
         src/MedClient/test/test1/Makefile \
         src/MedClient/test/test2/Makefile \
+	src/MEDOP/Makefile \
+	src/MEDOP/cmp/Makefile \
         src/MEDGUI/Makefile \
         doc/Makefile \
         doc/MEDMEM/Makefile \

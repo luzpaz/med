@@ -26,7 +26,18 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 EXTRA_DIST += CMakeLists.txt
 
-BASEIDL_FILES = MED.idl MED_Gen.idl Compo1Py.idl MEDCouplingCorbaServant.idl MEDCouplingCorbaServantTest.idl ParaMEDCouplingCorbaServant.idl
+BASEIDL_FILES = \
+	MED.idl MED_Gen.idl Compo1Py.idl \
+	MEDCouplingCorbaServant.idl      \
+	MEDCouplingCorbaServantTest.idl  \
+	ParaMEDCouplingCorbaServant.idl
+
+MEDOPIDL_FILES =             \
+	MEDOPFactory.idl     \
+	MEDDataManager.idl
+
+#	MEDCalculator.idl    \
+#        MEDEventListener.idl
 
 MPIIDL_FILES = ParaMEDMEMComponent.idl
 
@@ -34,6 +45,7 @@ IDL_FILES = $(BASEIDL_FILES)
 if MPI_IS_OK
 IDL_FILES += $(MPIIDL_FILES)
 endif
+IDL_FILES += $(MEDOPIDL_FILES)
 
 IDL_FILES_PY=$(IDL_FILES:%.idl=%_idl.py)
 
@@ -44,7 +56,14 @@ dist_salomeidl_DATA = $(IDL_FILES)
 lib_LTLIBRARIES = libSalomeIDLMED.la libSalomeIDLMEDTests.la
 
 # Sources built from idl files
-BASEIDL_SOURCES = MEDSK.cc MED_GenSK.cc MEDCouplingCorbaServantSK.cc Compo1PySK.cc ParaMEDCouplingCorbaServantSK.cc
+BASEIDL_SOURCES = \
+	MEDSK.cc MED_GenSK.cc Compo1PySK.cc \
+	MEDCouplingCorbaServantSK.cc        \
+	ParaMEDCouplingCorbaServantSK.cc
+
+MEDOPIDL_SOURCES =          \
+	MEDOPFactorySK.cc   \
+	MEDDataManagerSK.cc
 
 MPIIDL_SOURCES = ParaMEDMEMComponentSK.cc
 
@@ -52,14 +71,24 @@ IDL_SOURCES = $(BASEIDL_SOURCES)
 if MPI_IS_OK
   IDL_SOURCES += $(MPIIDL_SOURCES)
 endif
+IDL_SOURCES += $(MEDOPIDL_SOURCES)
 
 nodist_libSalomeIDLMED_la_SOURCES = $(IDL_SOURCES)
 
 # header files must be exported: other modules have to use this library
-nodist_salomeinclude_HEADERS = MED.hh MED_Gen.hh MEDCouplingCorbaServant.hh Compo1Py.hh MEDCouplingCorbaServantTest.hh ParaMEDCouplingCorbaServant.hh
+nodist_salomeinclude_HEADERS =         \
+	MED.hh MED_Gen.hh Compo1Py.hh  \
+	MEDCouplingCorbaServant.hh     \
+	MEDCouplingCorbaServantTest.hh \
+	ParaMEDCouplingCorbaServant.hh
+
 if MPI_IS_OK
   nodist_salomeinclude_HEADERS += ParaMEDMEMComponent.hh
 endif
+
+nodist_salomeinclude_HEADERS += \
+	MEDOPFactory.hh         \
+	MEDDataManager.hh
 
 libSalomeIDLMED_la_CPPFLAGS =			\
 	-I$(top_builddir)/idl			\
@@ -78,33 +107,14 @@ OMNIORB_IDLPYFLAGS  = @OMNIORB_IDLPYFLAGS@ -I$(top_builddir)/idl/salome -I$(KERN
 IDLCXXFLAGS = -bcxx @IDLCXXFLAGS@ -I$(top_builddir)/idl/salome -I$(KERNEL_ROOT_DIR)/idl/salome
 IDLPYFLAGS  = @IDLPYFLAGS@ -I$(KERNEL_ROOT_DIR)/idl/salome
 
+SUFFIXES = .idl .hh SK.cc
+
+%SK.cc %.hh : %.idl
+	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
+
 MEDSK.cc : MED.idl
 	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
 MED.hh : MEDSK.cc
-
-MED_GenSK.cc : MED_Gen.idl
-	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
-MED_Gen.hh : MED_GenSK.cc
-
-ParaMEDMEMComponentSK.cc : ParaMEDMEMComponent.idl
-	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
-ParaMEDMEMComponent.hh : ParaMEDMEMComponentSK.cc
-
-MEDCouplingCorbaServantSK.cc : MEDCouplingCorbaServant.idl
-	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
-MEDCouplingCorbaServant.hh : MEDCouplingCorbaServantSK.cc
-
-ParaMEDCouplingCorbaServantSK.cc : ParaMEDCouplingCorbaServant.idl
-	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
-ParaMEDCouplingCorbaServant.hh : ParaMEDCouplingCorbaServantSK.cc
-
-Compo1PySK.cc : Compo1Py.idl
-	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
-Compo1Py.hh : Compo1PySK.cc
-
-MEDCouplingCorbaServantTestSK.cc : MEDCouplingCorbaServantTest.idl
-	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
-MEDCouplingCorbaServantTest.hh : MEDCouplingCorbaServantTestSK.cc
 
 install-exec-local: $(IDL_FILES:%=$(top_srcdir)/idl/%)
 	$(INSTALL) -d  $(DESTDIR)$(salomepythondir)
