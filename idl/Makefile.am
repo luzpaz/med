@@ -33,9 +33,9 @@ BASEIDL_FILES = \
 	ParaMEDCouplingCorbaServant.idl
 
 MEDOPIDL_FILES =             \
-	MEDOPFactory.idl     \
 	MEDDataManager.idl   \
 	MEDCalculator.idl    \
+	MEDOPFactory.idl     \
 	MEDEventListener.idl
 
 MPIIDL_FILES = ParaMEDMEMComponent.idl
@@ -61,9 +61,9 @@ BASEIDL_SOURCES = \
 	ParaMEDCouplingCorbaServantSK.cc
 
 MEDOPIDL_SOURCES =          \
-	MEDOPFactorySK.cc   \
 	MEDDataManagerSK.cc \
 	MEDCalculatorSK.cc  \
+	MEDOPFactorySK.cc   \
 	MEDEventListenerSK.cc
 
 MPIIDL_SOURCES = ParaMEDMEMComponentSK.cc
@@ -88,9 +88,9 @@ if MPI_IS_OK
 endif
 
 nodist_salomeinclude_HEADERS += \
-	MEDOPFactory.hh         \
 	MEDDataManager.hh       \
 	MEDCalculator.hh        \
+	MEDOPFactory.hh         \
 	MEDEventListener.hh
 
 libSalomeIDLMED_la_CPPFLAGS =			\
