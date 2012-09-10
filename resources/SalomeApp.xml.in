@@ -24,10 +24,10 @@
 <document>
   <section name="MED">
     <!-- Major module parameters -->
-    <parameter name="name" value="Med"/>
-    <parameter name="icon" value="ModuleMed.png"/>
+    <parameter name="name" value="MED"/>
+    <parameter name="icon" value="MEDOP.png"/>
     <parameter name="documentation" value="med_help"/>
-    <parameter name="library"       value="MEDGUI"/>
+    <parameter name="library"       value="MEDOPGUI"/>
     <parameter name="version"       value="@VERSION@"/>
   </section>
   <section name="med_help" >

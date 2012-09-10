@@ -749,6 +749,8 @@ AC_OUTPUT([ \
 	src/MEDOP/tui/xmedpy/Makefile \
 	src/MEDOP/res/Makefile \
 	src/MEDOP/res/testfiles/Makefile \
+	src/MEDOP/gui/dialogs/Makefile \
+	src/MEDOP/gui/Makefile \
         src/MEDGUI/Makefile \
         doc/Makefile \
         doc/MEDMEM/Makefile \

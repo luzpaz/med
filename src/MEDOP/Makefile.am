@@ -22,4 +22,4 @@
 # - tui: package containing the python user interface
 # - gui: package containing the graphical user interface (the GUI part of the MED module)
 
-SUBDIRS= cmp tui res
+SUBDIRS= cmp tui res gui
