@@ -17,24 +17,16 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-# Author : Guillaume Boulant (EDF) 
+# author: Guillaume Boulant (EDF/R&D, 2012)
 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-SUBDIRS = testfiles
-salomeres_DATA= \
-        MEDOP.png \
-        MEDOP_small.png \
-        datasource_add.png \
-        datasource.png \
-        datasource_mesh.png \
-        datasource_field.png \
-        datasource_expandfield.png \
-        datasource_view.png \
-        datasource_use.png \
-        datasource_changeUnderlyingMesh.png \
-        image_add.png \
-        workspace_save.png \
-        workspace_clean.png
+toolsbindir = $(bindir)/@MODULE_NAME@
 
-EXTRA_DIST+=$(salomeres_DATA)
+toolsbin_DATA=\
+	xmedimages.py
+
+toolsbin_SCRIPTS=\
+	image2med.py
+
+EXTRA_DIST += $(toolsbin_SCRIPTS)

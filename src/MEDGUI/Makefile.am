@@ -37,20 +37,27 @@ dist_libMEDGUI_la_SOURCES = MEDGUIFileContentDial.h MEDGUISelection.hxx \
 
 MOC_FILES= MEDGUI_moc.cxx MEDGUIFileContentDial_moc.cxx MEDGUISelectComponents_moc.cxx
 
+# meta object implementation files generation (moc)
+%_moc.cxx: %.h
+	$(MOC) $< -o $@
+
+# translation (*.qm) files generation (lrelease)
+%.qm: %.ts
+	$(LRELEASE) $< -qm $@
+
+EXTRA_DIST += $(MOC_FILES:%_moc.cxx=%.h) $(nodist_salomeres_DATA:%.qm=%.ts)
+
 ui_%.h: %.ui
 	${QTDIR}/bin/uic $< -o $@
 
 .hxx_moc.cxx :
 	${QTDIR}/bin/moc -p . -o $@ $<
 
-%_moc.cxx: %.hxx
-	${QTDIR}/bin/moc $< -o $@
-
 .qrc_qrc.cxx :
 	${QTDIR}/bin/rcc -name $(*F)  $< -o $@
 
 clean-local-qt :
-	rm -f *_moc.cxx *_qrc.cxx ui_*.h
+	rm -f *_moc.cxx *_qrc.cxx ui_*.h *.qm
 
 clean-local: clean-local-qt
 

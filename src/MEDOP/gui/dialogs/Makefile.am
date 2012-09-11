@@ -33,7 +33,6 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 ui_%.hxx: %.ui
 	$(UIC) -o $@ $<
 
-
 QT_CXXFLAGS  = @QT_INCLUDES@ @QT_MT_INCLUDES@
 CAS_CXXFLAGS = @CAS_CPPFLAGS@ @CAS_CXXFLAGS@
 OMNIORB_CXXFLAGS = @CORBA_INCLUDES@ @CORBA_CXXFLAGS@

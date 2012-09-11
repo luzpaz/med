@@ -43,4 +43,4 @@ imgfiles=\
 	irm_test1.png \
 	irm_test2.png
 
-EXTRA_DIST=$(mysalomeres_DATA)
+EXTRA_DIST+=$(mysalomeres_DATA)

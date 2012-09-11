@@ -23,14 +23,21 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 SUBDIRS = dialogs
 
-# moc-files generation
+#
+# ---------------------------------------------------------
+# Generation rules to create moc files from QObject headers
+# and form source files from ui files
+# ---------------------------------------------------------
+# WRN: this rules could be integrated in the make_common_starter.am.
+# For that, we first have to make the naming convention of Q_OBJECT
+# files be the same between MEDGUI (old GUI) and MEDOP/gui (new GUI).
 %_moc.cxx: %.hxx
 	$(MOC) $< -o $@
 
 %.qm: %.ts
 	$(LRELEASE) $< -qm $@
 
-EXTRA_DIST=$(MOC_FILES:%_moc.cxx=%.h) $(nodist_salomeres_DATA:%.qm=%.ts)
+EXTRA_DIST+=$(MOC_FILES:%_moc.cxx=%.h) $(nodist_salomeres_DATA:%.qm=%.ts)
 
 mostlyclean-local:
 	rm -f @builddir@/*_moc.cxx

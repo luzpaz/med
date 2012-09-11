@@ -115,9 +115,9 @@ SUFFIXES = .idl .hh SK.cc
 %SK.cc %.hh : %.idl
 	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
 
-MEDSK.cc : MED.idl
-	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
-MED.hh : MEDSK.cc
+# MEDSK.cc : MED.idl
+#	$(OMNIORB_IDL) $(IDLCXXFLAGS) $(OMNIORB_IDLCXXFLAGS) $<
+# MED.hh : MEDSK.cc
 
 install-exec-local: $(IDL_FILES:%=$(top_srcdir)/idl/%)
 	$(INSTALL) -d  $(DESTDIR)$(salomepythondir)

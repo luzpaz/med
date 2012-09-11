@@ -751,6 +751,11 @@ AC_OUTPUT([ \
 	src/MEDOP/res/testfiles/Makefile \
 	src/MEDOP/gui/dialogs/Makefile \
 	src/MEDOP/gui/Makefile \
+	src/MEDOP/exe/Makefile \
+	src/MEDOP/exe/appligen/Makefile \
+	src/MEDOP/exe/appligen/config_appli.xml \
+	src/MEDOP/exe/appligen/appligen.sh \
+	src/MEDOP/exe/image2med/Makefile \
         src/MEDGUI/Makefile \
         doc/Makefile \
         doc/MEDMEM/Makefile \

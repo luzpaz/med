@@ -17,24 +17,23 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-# Author : Guillaume Boulant (EDF) 
+# author: Guillaume Boulant (EDF/R&D, 2012)
 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-SUBDIRS = testfiles
-salomeres_DATA= \
-        MEDOP.png \
-        MEDOP_small.png \
-        datasource_add.png \
-        datasource.png \
-        datasource_mesh.png \
-        datasource_field.png \
-        datasource_expandfield.png \
-        datasource_view.png \
-        datasource_use.png \
-        datasource_changeUnderlyingMesh.png \
-        image_add.png \
-        workspace_save.png \
-        workspace_clean.png
+appligenbindir = $(bindir)/@MODULE_NAME@/appligen
 
-EXTRA_DIST+=$(salomeres_DATA)
+appligenbin_DATA= \
+	envappli.sh \
+	config_appli.xml       \
+	appli-splashscreen.jpg \
+	SalomeApp.xml
+
+appligenbin_SCRIPTS=\
+	appligen.sh
+
+EXTRA_DIST += $(appligenbin_DATA) $(appligenbin_SCRIPTS)
+
+
+envappli.sh:
+	$(srcdir)/genenv.sh envappli.sh
