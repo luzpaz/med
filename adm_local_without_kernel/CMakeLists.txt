@@ -17,6 +17,8 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-include $(top_srcdir)/adm_local/unix/make_common_starter.am
-
-SUBDIRS = config_files
+SET(input ${CMAKE_CURRENT_SOURCE_DIR}/SALOMEconfig.h.in)
+SET(output ${CMAKE_CURRENT_BINARY_DIR}/SALOMEconfig.h)
+MESSAGE(STATUS "Creation of ${output}")
+CONFIGURE_FILE(${input} ${output})
+INSTALL(FILES ${output} DESTINATION ${MED_salomeinclude_HEADERS})

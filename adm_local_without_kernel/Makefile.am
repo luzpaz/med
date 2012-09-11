@@ -22,3 +22,9 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 SUBDIRS = unix
 
 EXTRA_DIST += cmake_files
+
+EXTRA_DIST += SALOMEconfig.h.in
+
+if !MED_ENABLE_KERNEL
+  nodist_salomeinclude_HEADERS = SALOMEconfig.h
+endif

@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2012  CEA/DEN, EDF R&D
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -28,10 +28,12 @@ SET(VERSION "6.5.0")
 SET(VERSION_DEV "1")
 
 SET(KERNEL_ROOT_DIR $ENV{KERNEL_ROOT_DIR})
-FILE(TO_CMAKE_PATH $ENV{KERNEL_ROOT_DIR} KERNEL_ROOT_DIR)
-
 IF(KERNEL_ROOT_DIR)
+  FILE(TO_CMAKE_PATH $ENV{KERNEL_ROOT_DIR} KERNEL_ROOT_DIR)
   SET(MED_ENABLE_KERNEL ON)
+  
+  SET(SALOME_MACROS_DIR ${KERNEL_ROOT_DIR}/salome_adm/cmake_files)
+  
   INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindPLATFORM.cmake)
   INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindPYTHON.cmake)
   INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindMPI.cmake)
@@ -45,15 +47,10 @@ IF(KERNEL_ROOT_DIR)
   INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindDOXYGEN.cmake)
   INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindLIBBATCH.cmake)
   INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindKERNEL.cmake)
-ELSE(KERNEL_ROOT_DIR)
-  INCLUDE(${CMAKE_SOURCE_DIR}/adm_local_without_kernel/cmake_files/FindPLATFORM.cmake)
-  INCLUDE(${CMAKE_SOURCE_DIR}/adm_local_without_kernel/cmake_files/FindMPI.cmake)
-ENDIF(KERNEL_ROOT_DIR)
 
-SET(GUI_ROOT_DIR $ENV{GUI_ROOT_DIR})
-FILE(TO_CMAKE_PATH $ENV{GUI_ROOT_DIR} GUI_ROOT_DIR)
-
-IF(GUI_ROOT_DIR)
+  SET(GUI_ROOT_DIR $ENV{GUI_ROOT_DIR})
+  FILE(TO_CMAKE_PATH $ENV{GUI_ROOT_DIR} GUI_ROOT_DIR)
+  IF(GUI_ROOT_DIR)
   SET(MED_ENABLE_GUI ON)
   INCLUDE(${GUI_ROOT_DIR}/adm_local/cmake_files/FindCAS.cmake)
   INCLUDE(${GUI_ROOT_DIR}/adm_local/cmake_files/FindQT4.cmake)
@@ -62,7 +59,21 @@ IF(GUI_ROOT_DIR)
   INCLUDE(${GUI_ROOT_DIR}/adm_local/cmake_files/FindQWT.cmake)
   INCLUDE(${GUI_ROOT_DIR}/adm_local/cmake_files/FindSIPPYQT.cmake)
   INCLUDE(${GUI_ROOT_DIR}/adm_local/cmake_files/FindGUI.cmake)
-ENDIF(GUI_ROOT_DIR)
+  ENDIF(GUI_ROOT_DIR)
+ELSE(KERNEL_ROOT_DIR)
+  SET(SALOME_MACROS_DIR ${CMAKE_SOURCE_DIR}/adm_local_without_kernel/cmake_files)
+  
+  INCLUDE(${CMAKE_SOURCE_DIR}/adm_local_without_kernel/cmake_files/FindPLATFORM.cmake)
+  INCLUDE(${CMAKE_SOURCE_DIR}/adm_local_without_kernel/cmake_files/FindMPI.cmake)
+  INCLUDE(${CMAKE_SOURCE_DIR}/adm_local_without_kernel/cmake_files/FindBOOST.cmake)
+  INCLUDE(${CMAKE_SOURCE_DIR}/adm_local_without_kernel/cmake_files/FindCPPUNIT.cmake)
+  INCLUDE(${CMAKE_SOURCE_DIR}/adm_local_without_kernel/cmake_files/FindHDF5.cmake)
+  INCLUDE(${CMAKE_SOURCE_DIR}/adm_local_without_kernel/cmake_files/FindPYTHON.cmake)
+  INCLUDE(${CMAKE_SOURCE_DIR}/adm_local_without_kernel/cmake_files/FindLIBXML2.cmake)
+  INCLUDE(${CMAKE_SOURCE_DIR}/adm_local_without_kernel/cmake_files/FindPTHREADS.cmake)
+  INCLUDE(${CMAKE_SOURCE_DIR}/adm_local_without_kernel/cmake_files/FindSWIG.cmake)
+
+ENDIF(KERNEL_ROOT_DIR)
 
 INCLUDE(${CMAKE_SOURCE_DIR}/adm_local/cmake_files/FindPARMETIS.cmake)
 INCLUDE(${CMAKE_SOURCE_DIR}/adm_local/cmake_files/FindMETIS.cmake)
@@ -112,6 +123,8 @@ SET(MED_admlocalcmake adm_local/cmake_files)
 
 IF(MED_ENABLE_KERNEL)
   ADD_SUBDIRECTORY(idl)
+ELSE(MED_ENABLE_KERNEL)
+  ADD_SUBDIRECTORY(adm_local_without_kernel)
 ENDIF(MED_ENABLE_KERNEL)
 ADD_SUBDIRECTORY(adm_local)
 ADD_SUBDIRECTORY(src)
