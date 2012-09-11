@@ -22,7 +22,7 @@
 #include "MEDSPLITTER.hxx"
 
 namespace MEDSPLITTER {
-  class MEDSPLITTER_EXPORT SCOTCHGraph:public Graph
+  class MEDSPLITTERCPP_EXPORT SCOTCHGraph:public Graph
   {
   public:
     SCOTCHGraph();

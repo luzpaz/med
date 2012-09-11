@@ -30,7 +30,7 @@ namespace MEDPARTITIONER
   class MeshCollection;
   class ParaDomainSelector;
 
-  class MEDPARTITIONER_EXPORT MeshCollectionDriver
+  class MEDPARTITIONERCPP_EXPORT MeshCollectionDriver
   {
   public:
     MeshCollectionDriver(MeshCollection*);

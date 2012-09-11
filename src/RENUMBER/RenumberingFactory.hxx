@@ -26,7 +26,7 @@
 
 namespace MED_RENUMBER
 {
-  RENUMBER_EXPORT Renumbering* RenumberingFactory(const std::string& s);
+  RENUMBERCPP_EXPORT Renumbering* RenumberingFactory(const std::string& s);
 }
 
 #endif /*RENUMBERINGFACTORY_HXX_*/

@@ -48,7 +48,7 @@ namespace MEDPARTITIONER
   typedef std::multimap<std::pair<int,int>, std::pair<int,int> > NodeMapping ;
   typedef std::vector<std::pair<int,int> >  NodeList;
   
-  class MEDPARTITIONER_EXPORT MeshCollection
+  class MEDPARTITIONERCPP_EXPORT MeshCollection
   {
   public:
     MeshCollection();

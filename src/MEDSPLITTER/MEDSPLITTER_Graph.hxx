@@ -28,7 +28,7 @@ namespace MEDSPLITTER {
         
 class ParaDomainSelector;
 
-class MEDSPLITTER_EXPORT Graph
+class MEDSPLITTERCPP_EXPORT Graph
 {
   public:
     typedef enum {METIS,SCOTCH} splitter_type;

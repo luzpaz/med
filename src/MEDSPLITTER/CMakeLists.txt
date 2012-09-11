@@ -17,23 +17,23 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-ADD_SUBDIRECTORY(Test)
-
+IF(CPPUNIT_IS_OK)
+  ADD_SUBDIRECTORY(Test)
+ENDIF(CPPUNIT_IS_OK)
+  
 INCLUDE_DIRECTORIES(
-  ${PARMETIS_INCLUDES_DIR}
-  ${METIS_INCLUDES_DIR}
-  ${SCOTCH_INCLUDES_DIR}
-  ${BOOST_INCLUDES_DIR}
-  ${METIS_INCLUDES_DIR}
-  ${LIBXML_INCLUDES_DIR}
-  ${MED3_INCLUDES_DIR}
-  ${HDF5_INCLUDES_DIR}
-  ${MPI_INCLUDES_DIR}
+  ${PARMETIS_INCLUDE_DIRS}
+  ${METIS_INCLUDE_DIRS}
+  ${SCOTCH_INCLUDE_DIRS}
+  ${BOOST_INCLUDE_DIRS}
+  ${METIS_INCLUDE_DIRS}
+  ${LIBXML_INCLUDE_DIRS}
+  ${MED3_INCLUDE_DIRS}
+  ${HDF5_INCLUDE_DIRS}
+  ${MPI_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/../MEDMEM
   ${CMAKE_CURRENT_SOURCE_DIR}/../INTERP_KERNEL
   ${CMAKE_CURRENT_SOURCE_DIR}/../INTERP_KERNEL/Bases
-  ${CMAKE_CURRENT_SOURCE_DIR}/../INTERP_KERNEL/Geometric2D
-  ${CMAKE_CURRENT_SOURCE_DIR}/../INTERP_KERNEL/ExprEval
   ${CMAKE_CURRENT_SOURCE_DIR}/../INTERP_KERNEL/GaussPoints
   )
 
@@ -74,47 +74,55 @@ SET(medsplittercpp_SOURCES
   MEDSPLITTER_JointExchangeData.cxx
   )
 
-SET(medsplittercpp_FLAGS "${HDF5_FLAGS} ${MED3_FLAGS} ${BOOST_FLAGS} ${LIBXML_FLAGS}")
-SET(medsplittercpp_LDFLAGS medmem ${LIBXML_LIBS})
+SET(medsplittercpp_DEFINITIONS "${HDF5_DEFINITIONS} ${MED3_DEFINITIONS} ${BOOST_DEFINITIONS} ${LIBXML_DEFINITIONS} ${MPI_DEFINITIONS} ${PLATFORM_DEFINITIONS}")
+SET(medsplittercpp_LDFLAGS medmem ${LIBXML_LIBS} interpkernel ${MPI_LIBS} ${HDF5_LIBS} ${MED3_LIBS_C_ONLY} ${STDLIB} ${PLATFORM_LIBS})
 
 IF(MED_ENABLE_SCOTCH)
   SET(medsplittercpp_SOURCES ${medsplittercpp_SOURCES} MEDSPLITTER_SCOTCHGraph.cxx)
   SET(medsplittercpp_HEADERS_HXX ${medsplittercpp_HEADERS_HXX} MEDSPLITTER_SCOTCHGraph.hxx)
-  SET(medsplittercpp_FLAGS "${medsplittercpp_FLAGS} ${SCOTCH_FLAGS}")
+  SET(medsplittercpp_DEFINITIONS "${medsplittercpp_DEFINITIONS} ${SCOTCH_DEFINITIONS}")
   SET(medsplittercpp_LDFLAGS ${medsplittercpp_LDFLAGS} ${SCOTCH_LIBS})
 ENDIF(MED_ENABLE_SCOTCH)
+
+IF(MED_ENABLE_METIS)
+  SET(medsplittercpp_HEADERS_HXX ${medsplittercpp_HEADERS_HXX} MEDSPLITTER_METISGraph.hxx)
+ENDIF(MED_ENABLE_METIS)
 
 IF(MPI_IS_OK)
   IF(MED_ENABLE_PARMETIS)
     SET(medsplittercpp_SOURCES ${medsplittercpp_SOURCES} MEDSPLITTER_METISGraph.cxx)
-    SET(medsplittercpp_HEADERS_HXX ${medsplittercpp_HEADERS_HXX} MEDSPLITTER_METISGraph.hxx)
-    SET(medsplittercpp_FLAGS "${medsplittercpp_FLAGS} ${MPI_FLAGS} ${PARMETIS_FLAGS}")
-    SET(medsplittercpp_LDFLAGS ${medsplittercpp_LDFLAGS} ${PARMETIS_LIBS} ${MPI_LIBS})
+    SET(medsplittercpp_DEFINITIONS "${medsplittercpp_DEFINITIONS} ${MPI_DEFINITIONS} ${PARMETIS_DEFINITIONS}")
+    SET(medsplittercpp_LDFLAGS ${medsplittercpp_LDFLAGS} ${PARMETIS_LIBS})
   ENDIF(MED_ENABLE_PARMETIS)
 ELSE(MPI_IS_OK)
   IF(MED_ENABLE_METIS)
     SET(medsplittercpp_SOURCES ${medsplittercpp_SOURCES} MEDSPLITTER_METISGraph.cxx)
-    SET(medsplittercpp_HEADERS_HXX ${medsplittercpp_HEADERS_HXX} MEDSPLITTER_METISGraph.hxx)
-    SET(medsplittercpp_FLAGS "${medsplittercpp_FLAGS} ${METIS_FLAGS}")
+    SET(medsplittercpp_DEFINITIONS "${medsplittercpp_DEFINITIONS} ${METIS_DEFINITIONS}")
     SET(medsplittercpp_LDFLAGS ${medsplittercpp_LDFLAGS} ${METIS_LIBS})
   ENDIF(MED_ENABLE_METIS)
 ENDIF(MPI_IS_OK)
 
+SET(medsplitter_LDFLAGS ${medsplittercpp_LDFLAGS})
+IF(MED_ENABLE_KERNEL)
+  INCLUDE_DIRECTORIES(${KERNEL_ROOT_DIR}/include/salome)
+  SET(medsplittercpp_LDFLAGS ${medsplittercpp_LDFLAGS} ${BOSST_LIBS} ${SALOMELocalTrace})
+  SET(medsplitter_LDFLAGS ${medsplittercpp_LDFLAGS} ${SALOMEBasics})
+ENDIF(MED_ENABLE_KERNEL)
+
+ADD_EXECUTABLE(medsplitter medsplitter.cxx)
+SET_TARGET_PROPERTIES(medsplitter PROPERTIES COMPILE_FLAGS "${medsplittercpp_DEFINITIONS}")
+TARGET_LINK_LIBRARIES(medsplitter medsplittercpp ${medsplitter_LDFLAGS})
+INSTALL(TARGETS medsplitter DESTINATION ${MED_salomebin_BINS})
 
 IF(MPI_IS_OK)
   ADD_EXECUTABLE(medsplitter_para medsplitter_para.cxx)
-  SET_TARGET_PROPERTIES(medsplitter_para PROPERTIES COMPILE_FLAGS "${medsplittercpp_FLAGS}")
-  TARGET_LINK_LIBRARIES(medsplitter_para medsplittercpp)
+  SET_TARGET_PROPERTIES(medsplitter_para PROPERTIES COMPILE_FLAGS "${medsplittercpp_DEFINITIONS}")
+  TARGET_LINK_LIBRARIES(medsplitter_para medsplittercpp ${medsplitter_LDFLAGS})
   INSTALL(TARGETS medsplitter_para DESTINATION ${MED_salomebin_BINS})
-ELSE(MPI_IS_OK)
-  ADD_EXECUTABLE(medsplitter medsplitter.cxx)
-  SET_TARGET_PROPERTIES(medsplitter PROPERTIES COMPILE_FLAGS "${medsplittercpp_FLAGS}")
-  TARGET_LINK_LIBRARIES(medsplitter medsplittercpp)
-  INSTALL(TARGETS medsplitter DESTINATION ${MED_salomebin_BINS})
 ENDIF(MPI_IS_OK)
 
 ADD_LIBRARY(medsplittercpp SHARED ${medsplittercpp_SOURCES})
-SET_TARGET_PROPERTIES(medsplittercpp PROPERTIES COMPILE_FLAGS "${medsplittercpp_FLAGS}")
+SET_TARGET_PROPERTIES(medsplittercpp PROPERTIES COMPILE_FLAGS "${medsplittercpp_DEFINITIONS}")
 TARGET_LINK_LIBRARIES(medsplittercpp ${medsplittercpp_LDFLAGS})
 INSTALL(TARGETS medsplittercpp DESTINATION ${MED_salomelib_LIBS})
 

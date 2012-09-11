@@ -29,7 +29,7 @@
 
 namespace MEDPARTITIONER
 {
-  class MEDPARTITIONER_EXPORT ConnectZone
+  class MEDPARTITIONERCPP_EXPORT ConnectZone
   {
   public :
     ConnectZone();

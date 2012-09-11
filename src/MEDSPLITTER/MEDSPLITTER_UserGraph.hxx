@@ -24,7 +24,7 @@
 
 namespace MEDSPLITTER
 {
-  class MEDSPLITTER_EXPORT UserGraph : public Graph
+  class MEDSPLITTERCPP_EXPORT UserGraph : public Graph
   {
   public:
     UserGraph(MEDMEM::MEDSKYLINEARRAY*, const int*, int);

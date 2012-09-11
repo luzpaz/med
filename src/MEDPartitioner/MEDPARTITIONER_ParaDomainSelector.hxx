@@ -38,7 +38,7 @@ namespace MEDPARTITIONER
   /*!
    * \brief Communication helper in parallel mode
    */
-  class MEDPARTITIONER_EXPORT ParaDomainSelector
+  class MEDPARTITIONERCPP_EXPORT ParaDomainSelector
   {
   public:
     ParaDomainSelector(bool mesure_memory=false);

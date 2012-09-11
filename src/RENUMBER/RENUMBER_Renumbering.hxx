@@ -22,7 +22,7 @@
 #include "RENUMBERDefines.hxx"
 #include <vector>
 
-class RENUMBER_EXPORT Renumbering
+class RENUMBERCPP_EXPORT Renumbering
 {
 public:
   virtual void renumber(const int* graphe,const int* index_graphe,int nb_cell,std::vector<int>& iperm,std::vector<int>& perm)=0;

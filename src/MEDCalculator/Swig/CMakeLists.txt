@@ -17,14 +17,14 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/InstallAndCompilePythonFile.cmake)
+INCLUDE(${SALOME_MACROS_DIR}/InstallAndCompilePythonFile.cmake)
 FIND_PACKAGE(SWIG REQUIRED)
 INCLUDE(${SWIG_USE_FILE})
 
 INCLUDE_DIRECTORIES(
-  ${PYTHON_INCLUDES_DIR}
-  ${MED3_INCLUDES_DIR}
-  ${HDF5_INCLUDES_DIR}
+  ${PYTHON_INCLUDE_DIRS}
+  ${MED3_INCLUDE_DIRS}
+  ${HDF5_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/..
   ${CMAKE_CURRENT_SOURCE_DIR}/../../MEDLoader
@@ -45,10 +45,10 @@ TARGET_LINK_LIBRARIES(medcalculatorspython interpkernel ${PYTHON_LIBS})
 INSTALL(TARGETS medcalculatorspython DESTINATION ${MED_salomelib_LIBS})
 
 SET_SOURCE_FILES_PROPERTIES(MEDCalculator.i PROPERTIES CPLUSPLUS ON)
-SET_SOURCE_FILES_PROPERTIES(MEDCalculator.i PROPERTIES SWIG_FLAGS "-shadow")
+SET_SOURCE_FILES_PROPERTIES(MEDCalculator.i PROPERTIES SWIG_DEFINITIONS "-shadow")
 
 SWIG_ADD_MODULE(MEDCalculator python MEDCalculator.i)
-SWIG_LINK_LIBRARIES(MEDCalculator ${PYTHON_LIBRARIES} medcalculator)
+SWIG_LINK_LIBRARIES(MEDCalculator ${PYTHON_LIBS} medcalculator)
 
 FILE(GLOB medcalculatorspython_HEADERS_HXX "${CMAKE_CURRENT_SOURCE_DIR}/*.hxx")
 INSTALL(FILES ${medcalculatorspython_HEADERS_HXX} DESTINATION ${MED_salomeinclude_HEADERS})

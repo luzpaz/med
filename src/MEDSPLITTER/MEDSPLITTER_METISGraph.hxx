@@ -22,7 +22,7 @@
 #include "MEDSPLITTER_Graph.hxx"
 
 namespace MEDSPLITTER {
-  class MEDSPLITTER_EXPORT METISGraph:public Graph
+  class MEDSPLITTERCPP_EXPORT METISGraph:public Graph
   {
   public:
     METISGraph();

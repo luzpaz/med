@@ -49,7 +49,7 @@ namespace MEDSPLITTER
    * 2) global cell ids for the sake of detecting cell/cell joints using global graph
    * 3) global face ids for the sake of not losing face sharing among domains
    */
-  class MEDSPLITTER_EXPORT MeshSendReceive
+  class MEDSPLITTERCPP_EXPORT MeshSendReceive
   {
   public:
 

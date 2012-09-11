@@ -45,7 +45,7 @@ namespace MEDSPLITTER
 
   typedef enum{MedAscii, MedXML, Undefined} DriverType;
 
-  class MEDSPLITTER_EXPORT MESHCollection
+  class MEDSPLITTERCPP_EXPORT MESHCollection
   {
 
   public:

@@ -44,7 +44,7 @@ namespace MEDSPLITTER
 /*!
  * \brief Communication helper in parallel mode
  */
-class MEDSPLITTER_EXPORT ParaDomainSelector
+class MEDSPLITTERCPP_EXPORT ParaDomainSelector
 {
 public:
 

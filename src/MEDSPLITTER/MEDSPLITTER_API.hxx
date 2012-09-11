@@ -22,7 +22,7 @@
 
 #include "MEDSPLITTER.hxx"
 
-MEDSPLITTER_EXPORT
+MEDSPLITTERCPP_EXPORT
 extern "C" int medsplitter(const char* inputfilename,
                            const char* mesh,
                            const char* outputfilename,  
@@ -35,7 +35,7 @@ extern "C" int medsplitter(const char* inputfilename,
                            int familysplitting,
                            int emptygroups);
 
-MEDSPLITTER_EXPORT
+MEDSPLITTERCPP_EXPORT
 extern "C" int medsplitter_para(const char* inputfilename, 
                                 const char* outputfilename,  
                                 const int   nprocs,

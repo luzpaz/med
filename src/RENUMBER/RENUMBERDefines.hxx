@@ -22,13 +22,13 @@
 
 //export symbols
 #ifdef WIN32
-# if defined RENUMBER_EXPORTS || defined renumber_EXPORTS
-#  define RENUMBER_EXPORT __declspec(dllexport)
+# if defined RENUMBERCPP_EXPORTS || defined renumbercpp_EXPORTS
+#  define RENUMBERCPP_EXPORT __declspec(dllexport)
 # else
-#  define RENUMBER_EXPORT __declspec(dllimport)
+#  define RENUMBERCPP_EXPORT __declspec(dllimport)
 # endif
 #else
-# define RENUMBER_EXPORT
+# define RENUMBERCPP_EXPORT
 #endif 
 
 #endif // __RENUMBERDEFINES_HXX__

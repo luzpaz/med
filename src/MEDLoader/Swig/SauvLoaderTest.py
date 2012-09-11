@@ -155,7 +155,7 @@ class SauvLoaderTest(unittest.TestCase):
         fof = fieldOnFaces.getFieldOnMeshAtLevel(f1.getTypeOfField(),io1[i][0],io1[i][1],um1)
         self.assertTrue( d.isEqual( fof.getArray(), 1e-12 ))
 
-        os.remove( sauvFile )
+        # os.remove( sauvFile )
         pass
     pass
 

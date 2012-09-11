@@ -26,7 +26,7 @@
 
 namespace MEDPARTITIONER 
 {
-  class MEDPARTITIONER_EXPORT SkyLineArray
+  class MEDPARTITIONERCPP_EXPORT SkyLineArray
   {
   private:
     std::vector<int> _index;

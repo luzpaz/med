@@ -26,7 +26,7 @@ namespace MEDSPLITTER
   class MESHCollection;
   class ParaDomainSelector;
 
-  class MEDSPLITTER_EXPORT MESHCollectionDriver
+  class MEDSPLITTERCPP_EXPORT MESHCollectionDriver
   {
   public:
 
