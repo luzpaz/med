@@ -110,6 +110,7 @@ salomeinclude_HEADERS =              \
 # Unit test programs
 # ---------------------------------------------------------
 #
+
 bin_PROGRAMS = dlgTester
 
 dlgTester_SOURCES = \
@@ -120,9 +121,16 @@ dlgTester_SOURCES = \
 dlgTester_CPPFLAGS = \
 	$(QT_CXXFLAGS)
 
-dlgTester_LDFLAGS = \
-	$(QT_LIBS) \
-	libMEDOPGUI_dialogs.la
+# WARN: for the building of binary executable programs, you must use
+# the LDADD option instead of the LDFLAGS used for library. The impact
+# is in the expression of dependencies between the executable program
+# and the library it relies on. In parallel construction (e.g. make
+# -j8), the makefile try to generate the program while the library
+# (file .la) is not generated.
+
+dlgTester_LDADD = \
+	libMEDOPGUI_dialogs.la \
+	$(QT_LIBS)
 
 
 mostlyclean-local:
