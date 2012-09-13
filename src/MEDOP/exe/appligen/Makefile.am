@@ -34,6 +34,21 @@ appligenbin_SCRIPTS=\
 
 EXTRA_DIST += $(appligenbin_DATA) $(appligenbin_SCRIPTS)
 
+config_appli.xml: config_appli_model.xml
+	cat $< | sed \
+	-e s~__GEOM_ROOT_DIR__~$(GEOM_ROOT_DIR)~g \
+	-e s~__SMESH_ROOT_DIR__~$(SMESH_ROOT_DIR)~g \
+	-e s~__BLSURFPLUGIN_ROOT_DIR__~$(BLSURFPLUGIN_ROOT_DIR)~g \
+	-e s~__GHS3DPLUGIN_ROOT_DIR__~$(GHS3DPLUGIN_ROOT_DIR)~g \
+	-e s~__NETGENPLUGIN_ROOT_DIR__~$(NETGENPLUGIN_ROOT_DIR)~g \
+	-e s~__VISU_ROOT_DIR__~$(VISU_ROOT_DIR)~g \
+	-e s~__YACS_ROOT_DIR__~$(YACS_ROOT_DIR)~g \
+	-e s~__PARAVIS_ROOT_DIR__~$(PARAVIS_ROOT_DIR)~g \
+	> tmp; mv tmp $@
 
 envappli.sh:
 	$(srcdir)/genenv.sh envappli.sh
+
+
+mostlyclean-local:
+	rm -f @builddir@/config_appli.xml @builddir@/envappli.sh

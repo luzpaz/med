@@ -37,9 +37,12 @@
  */
 
 #include "MEDOPModule.hxx"
+#include "MEDGUI.h"
 extern "C" {
   CAM_Module* createModule()
   {
+    MedGUI * medgui = new MedGUI();
+
     return new MEDOPModule();
   }
 }

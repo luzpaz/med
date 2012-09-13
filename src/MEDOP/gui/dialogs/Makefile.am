@@ -92,7 +92,7 @@ libMEDOPGUI_dialogs_la_CPPFLAGS = \
 	$(GUI_CXXFLAGS)          \
 	-I$(srcdir)/..
 
-libMEDOPGUI_dialogs_la_LDFLAGS =                 \
+libMEDOPGUI_dialogs_la_LDFLAGS =                \
 	$(QT_LDFLAGS)                           \
 	$(GUI_LDFLAGS) -lSalomeGuiHelpers       \
 	$(OMNIORB_LIBS)

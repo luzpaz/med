@@ -55,7 +55,7 @@ salomeinclude_HEADERS =          \
 	MEDOPModule.hxx          \
 	DatasourceController.hxx
 
-dist_libMEDOPGUI_la_SOURCES =        \
+dist_libMEDOPGUI_la_SOURCES =    \
 	MEDOPFactoryClient.cxx   \
 	XmedConsoleDriver.cxx    \
 	WorkspaceController.cxx  \
@@ -82,7 +82,9 @@ QT_LDFLAGS = $(QT_MT_LIBS)
 
 CAS_CXXFLAGS = @CAS_CPPFLAGS@ @CAS_CXXFLAGS@
 
-libMEDOPGUI_la_CPPFLAGS =         \
+BOOST_CXXFLAGS=@BOOST_CPPFLAGS@
+
+libMEDOPGUI_la_CPPFLAGS =     \
 	$(QT_CXXFLAGS)        \
 	$(CAS_CXXFLAGS)       \
 	$(OMNIORB_CXXFLAGS)   \
@@ -92,18 +94,27 @@ libMEDOPGUI_la_CPPFLAGS =         \
 	$(MED_CXXFLAGS)       \
 	-I$(srcdir)/dialogs   \
 	-I$(builddir)/dialogs \
-	-I$(srcdir)/../cmp   \
+	-I$(srcdir)/../cmp    \
 	-I$(top_builddir)/idl
 
-libMEDOPGUI_la_LDFLAGS  =                                 \
-	$(QT_LDFLAGS)                                 \
-	$(top_builddir)/idl/libSalomeIDLMED.la       \
-	dialogs/libMEDOPGUI_dialogs.la                 \
-	../cmp/libMEDOPFactoryEngine.la                      \
+# KEEP_MEDGUI=1
+
+# if KEEP_MEDGUI
+libMEDOPGUI_la_CPPFLAGS += \
+	-I$(srcdir)/../../MEDGUI
+
+libMEDOPGUI_la_LDFLAGS  =                                              \
+	$(top_builddir)/idl/libSalomeIDLMED.la                         \
+	dialogs/libMEDOPGUI_dialogs.la                                 \
+	../cmp/libMEDOPFactoryEngine.la                                \
 	$(KERNEL_LDFLAGS) -lSalomeLifeCycleCORBA -lSalomeKernelHelpers \
 	$(GUI_LDFLAGS) -lSalomeApp -lSalomeGuiHelpers -lSalomeTreeData \
+	$(QT_LDFLAGS)                                                  \
+	$(BOOST_LIBS)                                                  \
 	$(OMNIORB_LIBS)
 
+libMEDOPGUI_la_LDFLAGS += \
+	../../MEDGUI/libMEDGUI.la
 
 # resources files
 nodist_salomeres_DATA = \
