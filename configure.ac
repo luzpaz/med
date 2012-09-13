@@ -281,6 +281,15 @@ gui_ok=no
 
 WITHIHM="no"
 
+# This flags should be used to switch between the MEDMEM GUI (defined
+# in the MEDGUI package) and the MEDOP GUI (defined in the MEDOP
+# package). In any case the module factory function is provided by the
+# MEDOP GUI library (package MEDOP/gui) and this factory function
+# creates weither a MedGUI instance or a MEDOPModule instance,
+# depending on the value of this flags. The default is to use the new
+# MEDOP GUI. 
+AM_CONDITIONAL(WITH_MEDMEMGUI,test "1" = "0")
+
 ###
 # Other tests should be performed only in --with-interp-kernel-only=no mode
 ###
@@ -743,6 +752,7 @@ AC_OUTPUT([ \
         src/MedClient/test/environ/csh/stopContainer \
         src/MedClient/test/test1/Makefile \
         src/MedClient/test/test2/Makefile \
+        src/MEDGUI/Makefile \
 	src/MEDOP/Makefile \
 	src/MEDOP/cmp/Makefile \
 	src/MEDOP/tui/Makefile \
@@ -756,7 +766,6 @@ AC_OUTPUT([ \
 	src/MEDOP/exe/appligen/config_appli_model.xml \
 	src/MEDOP/exe/appligen/appligen.sh \
 	src/MEDOP/exe/image2med/Makefile \
-        src/MEDGUI/Makefile \
         doc/Makefile \
         doc/MEDMEM/Makefile \
         doc/MEDMEM/MEDMEM_Content.tex \

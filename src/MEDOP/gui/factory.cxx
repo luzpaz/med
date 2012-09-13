@@ -36,13 +36,32 @@
  * configuration below is MEDOPModule.
  */
 
+#include <MED_version.h>
 #include "MEDOPModule.hxx"
+
+#ifdef __WITH_MEDMEMGUI__
 #include "MEDGUI.h"
+#endif
+
 extern "C" {
+
+  /*! This function is the factory for the GUI Module */
   CAM_Module* createModule()
   {
-    MedGUI * medgui = new MedGUI();
+    CAM_Module * medModule;
 
-    return new MEDOPModule();
+#ifdef __WITH_MEDMEMGUI__
+    medModule = new MedGUI();
+#else    
+    medModule = new MEDOPModule();
+#endif
+
+    return medModule;
   }
+
+  /*! This function specifies the version of the module to be displayed in the about dialog box */
+  char* getModuleVersion() {
+    return (char*)MED_VERSION_STR;
+  }
+
 }

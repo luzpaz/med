@@ -71,11 +71,15 @@ libMEDGUI_la_CPPFLAGS= $(QT_INCLUDES) $(VTK_INCLUDES) @CAS_CPPFLAGS@ $(PYTHON_IN
 	-I$(top_builddir) -I$(top_builddir)/idl -I$(srcdir)/../MEDCoupling -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../MEDCoupling -I$(srcdir)/../MEDLoader -I$(srcdir)/../MEDCalculator
 
-libMEDGUI_la_LDFLAGS= \
+libMEDGUI_la_LDFLAGS = \
 	$(QT_MT_LIBS) $(CAS_KERNEL) $(BOOST_LIBS) \
-	../../idl/libSalomeIDLMED.la ../MEDCalculator/libmedcalculator.la \
 	$(KERNEL_LDFLAGS) -lSalomeLifeCycleCORBA -lOpUtil -lSALOMELocalTrace \
 	$(GUI_LDFLAGS) -lSalomeApp -lCAM -lLightApp -lqtx -lsuit -lSalomeObject
+
+libMEDGUI_la_LIBADD = \
+	$(top_builddir)/idl/libSalomeIDLMED.la \
+	$(top_builddir)/src/MEDCalculator/libmedcalculator.la
+
 
 # .po files to transform in .qm
 nodist_salomeres_DATA= \

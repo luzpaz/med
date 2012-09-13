@@ -95,26 +95,27 @@ libMEDOPGUI_la_CPPFLAGS =     \
 	-I$(srcdir)/dialogs   \
 	-I$(builddir)/dialogs \
 	-I$(srcdir)/../cmp    \
-	-I$(top_builddir)/idl
+	-I$(top_builddir)/idl \
+	-I$(top_builddir)
 
-# KEEP_MEDGUI=1
-
-# if KEEP_MEDGUI
-libMEDOPGUI_la_CPPFLAGS += \
-	-I$(srcdir)/../../MEDGUI
-
-libMEDOPGUI_la_LDFLAGS  =                                              \
-	$(top_builddir)/idl/libSalomeIDLMED.la                         \
-	dialogs/libMEDOPGUI_dialogs.la                                 \
-	../cmp/libMEDOPFactoryEngine.la                                \
+libMEDOPGUI_la_LDFLAGS  = \
+	-no-undefined -version-info=0:0:0                              \
 	$(KERNEL_LDFLAGS) -lSalomeLifeCycleCORBA -lSalomeKernelHelpers \
 	$(GUI_LDFLAGS) -lSalomeApp -lSalomeGuiHelpers -lSalomeTreeData \
 	$(QT_LDFLAGS)                                                  \
 	$(BOOST_LIBS)                                                  \
 	$(OMNIORB_LIBS)
 
-libMEDOPGUI_la_LDFLAGS += \
-	../../MEDGUI/libMEDGUI.la
+# Specify MED internal libraries to be linked in
+libMEDOPGUI_la_LIBADD  =                         \
+	$(top_builddir)/idl/libSalomeIDLMED.la   \
+	dialogs/libMEDOPGUI_dialogs.la           \
+	../cmp/libMEDOPFactoryEngine.la
+
+if WITH_MEDMEMGUI
+libMEDOPGUI_la_CPPFLAGS += "-D__WITH_MEDMEMGUI__" -I$(top_srcdir)/src/MEDGUI
+libMEDOPGUI_la_LIBADD += $(top_builddir)/src/MEDGUI/libMEDGUI.la
+endif
 
 # resources files
 nodist_salomeres_DATA = \

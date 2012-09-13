@@ -92,9 +92,10 @@ libMEDOPGUI_dialogs_la_CPPFLAGS = \
 	$(GUI_CXXFLAGS)          \
 	-I$(srcdir)/..
 
-libMEDOPGUI_dialogs_la_LDFLAGS =                \
-	$(QT_LDFLAGS)                           \
-	$(GUI_LDFLAGS) -lSalomeGuiHelpers       \
+libMEDOPGUI_dialogs_la_LDFLAGS = \
+	-no-undefined -version-info=0:0:0 \
+	$(QT_LDFLAGS)                     \
+	$(GUI_LDFLAGS) -lSalomeGuiHelpers \
 	$(OMNIORB_LIBS)
 
 salomeinclude_HEADERS =              \
