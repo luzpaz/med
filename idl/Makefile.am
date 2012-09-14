@@ -127,7 +127,7 @@ install-exec-local: $(IDL_FILES:%=$(top_srcdir)/idl/%)
 
 # we want to remove only staff generated for IDL files and nothing more
 uninstall-local:
-	@for modulen in SALOME_MED SALOME_TEST Compo1Py_ORB ; do \
+	@for modulen in SALOME_MED SALOME_TEST Compo1Py_ORB MEDOP ; do \
 	  test -d $(DESTDIR)$(salomepythondir)/$${modulen} && echo "Removing $(DESTDIR)$(salomepythondir)/$${modulen}" && rm -rf $(DESTDIR)$(salomepythondir)/$${modulen} ; \
 	  test -d $(DESTDIR)$(salomepythondir)/$${modulen}__POA && echo "Removing $(DESTDIR)$(salomepythondir)/$${modulen}__POA" && rm -rf $(DESTDIR)$(salomepythondir)/$${modulen}__POA ; \
 	done ; \
