@@ -105,4 +105,4 @@ DIST_SUBDIRS= \
 	MEDMEMBinTest MEDMEMCppTest INTERP_KERNELTest ParaMEDMEM ParaMEDMEM_Swig MEDLoader \
 	MEDSPLITTER MEDSPLITTER_Swig MEDPartitioner RENUMBER MEDCouplingCorba MEDCouplingCorba_Swig \
 	MEDMEM_I MED MED_SWIG MedCorba_Swig ParaMEDLoader MedClient ParaMEDMEMComponent \
-	ParaMEDCouplingCorba MEDCalculator MEDGUI ParaMEDMEMTest
+	ParaMEDCouplingCorba MEDCalculator MEDGUI MEDOP ParaMEDMEMTest
