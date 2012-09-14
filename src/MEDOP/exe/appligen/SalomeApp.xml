@@ -11,7 +11,7 @@
     <parameter name="portkill"   value="no"/>
     <parameter name="killall"    value="no"/>
     <parameter name="noexcepthandler"  value="no"/>
-    <parameter name="modules"    value="KERNEL,GUI,MED,GEOM,SMESH,XMED,VISU,YACS,PARAVIS"/>
+    <parameter name="modules"    value="KERNEL,GUI,GEOM,SMESH,MED,VISU,YACS,PARAVIS"/>
     <parameter name="pyModules"  value=""/>
     <parameter name="embedded"   value="SalomeAppEngine,study,cppContainer,registry,moduleCatalog"/>
     <parameter name="standalone" value="pyContainer"/>

@@ -21,7 +21,10 @@
 # - cmp: package containing the SALOME components
 # - tui: package containing the python user interface
 # - gui: package containing the graphical user interface (the GUI part of the MED module)
+# - res: folder containing data files (resources)
+# - exe: folder containing small executable programs for MED data processing
+# - doc: folder containing the documentation of the MEDOP package 
 
-SUBDIRS= cmp tui res gui exe
+SUBDIRS= cmp tui res gui exe doc/sphinx
 
 EXTRA_DIST = README.txt

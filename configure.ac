@@ -270,6 +270,7 @@ echo testing html generators
 echo ---------------------------------------------
 echo
 
+CHECK_SPHINX
 CHECK_HTML_GENERATORS
 
 ###
@@ -766,6 +767,8 @@ AC_OUTPUT([ \
 	src/MEDOP/exe/appligen/config_appli_model.xml \
 	src/MEDOP/exe/appligen/appligen.sh \
 	src/MEDOP/exe/image2med/Makefile \
+	src/MEDOP/doc/sphinx/conf.py \
+	src/MEDOP/doc/sphinx/Makefile \
         doc/Makefile \
         doc/MEDMEM/Makefile \
         doc/MEDMEM/MEDMEM_Content.tex \
