@@ -23,10 +23,6 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 toolsbindir = $(bindir)/@MODULE_NAME@
 
-toolsbin_DATA=\
+dist_toolsbin_SCRIPTS=\
+	image2med.py \
 	xmedimages.py
-
-toolsbin_SCRIPTS=\
-	image2med.py
-
-EXTRA_DIST += $(toolsbin_SCRIPTS)
