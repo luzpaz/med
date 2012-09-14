@@ -37,7 +37,7 @@ SUBDIRS = dialogs
 %.qm: %.ts
 	$(LRELEASE) $< -qm $@
 
-EXTRA_DIST+=$(MOC_FILES:%_moc.cxx=%.h) $(nodist_salomeres_DATA:%.qm=%.ts)
+EXTRA_DIST+=$(MOC_FILES:%_moc.cxx=%.hxx) $(nodist_salomeres_DATA:%.qm=%.ts)
 
 mostlyclean-local:
 	rm -f @builddir@/*_moc.cxx
@@ -53,7 +53,8 @@ salomeinclude_HEADERS =          \
 	XmedDataModel.hxx        \
 	MEDEventListener_i.hxx   \
 	MEDOPModule.hxx          \
-	DatasourceController.hxx
+	DatasourceController.hxx \
+	DatasourceConstants.hxx
 
 dist_libMEDOPGUI_la_SOURCES =    \
 	MEDOPFactoryClient.cxx   \

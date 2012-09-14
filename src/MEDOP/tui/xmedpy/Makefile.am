@@ -55,5 +55,5 @@ testscripts=\
 	tests/test_xmed_uiEventListener.py \
 	tests/test_xmed_visualisation.py
 
-mybin_SCRIPTS=\
+dist_mybin_SCRIPTS=\
 	$(testscripts)

@@ -22,7 +22,7 @@
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 SUBDIRS = testfiles
-salomeres_DATA= \
+dist_salomeres_DATA= \
         MEDOP.png \
         MEDOP_small.png \
         datasource_add.png \
@@ -36,5 +36,3 @@ salomeres_DATA= \
         image_add.png \
         workspace_save.png \
         workspace_clean.png
-
-EXTRA_DIST+=$(salomeres_DATA)

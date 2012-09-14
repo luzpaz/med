@@ -135,3 +135,5 @@ dlgTester_LDADD = \
 
 mostlyclean-local:
 	rm -f @builddir@/*_moc.cxx @builddir@/ui_*.hxx
+
+EXTRA_DIST += $(UIC_FILES:ui_%.hxx=%.ui)

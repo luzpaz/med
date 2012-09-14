@@ -22,7 +22,7 @@
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 mypkgpythondir = $(salomescriptdir)/xmed
-mypkgpython_SCRIPTS = \
+dist_mypkgpython_SCRIPTS = \
 	test_medop_components.py
 
 salomeinclude_HEADERS =      \

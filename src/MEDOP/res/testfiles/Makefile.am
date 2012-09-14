@@ -23,7 +23,7 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 mysalomeresdir = $(salomeresdir)/medop_testfiles
 
-mysalomeres_DATA= \
+dist_mysalomeres_DATA= \
 	$(medfiles) \
 	$(imgfiles)
 
@@ -37,10 +37,12 @@ medfiles=\
 	parametric_01.med \
 	parametric_02.med \
 	enceinte-axis-E500000.med \
-	enceinte-axis-E600000.med
+	enceinte-axis-E600000.med \
+	entaille.med \
+	padderoutput.med
 
 imgfiles=\
 	irm_test1.png \
 	irm_test2.png
 
-EXTRA_DIST+=$(mysalomeres_DATA)
+EXTRA_DIST += README.txt champ_altitude_MAP.pgm

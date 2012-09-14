@@ -23,3 +23,5 @@
 # - gui: package containing the graphical user interface (the GUI part of the MED module)
 
 SUBDIRS= cmp tui res gui exe
+
+EXTRA_DIST = README.txt
