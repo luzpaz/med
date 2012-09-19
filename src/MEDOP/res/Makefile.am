@@ -35,4 +35,5 @@ dist_salomeres_DATA= \
         datasource_changeUnderlyingMesh.png \
         image_add.png \
         workspace_save.png \
-        workspace_clean.png
+        workspace_clean.png \
+	folder.png

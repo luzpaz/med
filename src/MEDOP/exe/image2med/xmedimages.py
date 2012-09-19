@@ -1,24 +1,24 @@
 #  -*- coding: iso-8859-1 -*-
-#  Copyright (C) 2011  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 #
-#  This library is free software; you can redistribute it and/or
-#  modify it under the terms of the GNU Lesser General Public
-#  License as published by the Free Software Foundation; either
-#  version 2.1 of the License.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License.
 #
-#  This library is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-#  Lesser General Public License for more details.
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-#  You should have received a copy of the GNU Lesser General Public
-#  License along with this library; if not, write to the Free Software
-#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-# Author : Guillaume Boulant (EDF) 
 
+# Author : Guillaume Boulant (EDF) 
 
 import MEDCoupling as MC
 import MEDLoader as ML
@@ -123,16 +123,26 @@ class FieldBuilder:
 # ===================================================================
 #
 
-def TEST_image2med():
+def getTestImagePath():
     import os
-    XMED_ROOT_DIR=os.environ["XMED_ROOT_DIR"]
-    RESDIR=os.path.join(XMED_ROOT_DIR, "share", "salome", "resources", "xmed", "datadir")
+    MED_ROOT_DIR=os.environ["MED_ROOT_DIR"]
+    RESDIR=os.path.join(MED_ROOT_DIR, "share", "salome", "resources", "med", "medop_testfiles")
     imgFileName="irm_test1.png"
     imgFilePath=os.path.join(RESDIR,imgFileName)
+    return imgFilePath
 
+def TEST_pil():
+    imgFilePath = getTestImagePath()
+    img=Image.open(imageFilepath)
+    imgbw=ImageOps.grayscale(img)
+    
+
+def TEST_image2med():
+    imgFilePath = getTestImagePath()
     builder = FieldBuilder()    
     builder.image2med(imgFilePath,"image.med")
 
 # ===================================================================
 if __name__ == "__main__":
-    TEST_image2med()
+    TEST_pil()
+    #TEST_image2med()

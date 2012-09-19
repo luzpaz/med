@@ -49,7 +49,7 @@ mypkgpython_PYTHON = \
 	$(mainpkg) \
 	$(testpkg)
 
-mybindir = $(salomescriptdir)/xmed
+mybindir = $(salomescriptdir)/med
 testscripts=\
 	tests/test_xmed_fieldOperations.py \
 	tests/test_xmed_uiEventListener.py \

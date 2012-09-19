@@ -13,8 +13,8 @@ DlgImageToMed::DlgImageToMed(QDialog *parent) : GenericDialog(parent)
 {
   ui.setupUi(this->getPanel());
   
-  QString moduleName = "XMED";
-  QPixmap aPixmap = GUI::getResourcesManager()->loadPixmap( moduleName, "XMED_load.png" );
+  QString moduleName = "MED";
+  QPixmap aPixmap = GUI::getResourcesManager()->loadPixmap( moduleName, "folder.png" );
   QIcon icon(aPixmap);
   ui.btnImageFileChooser->setIcon(icon);
   ui.btnMedFileChooser->setIcon(icon);
