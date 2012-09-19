@@ -34,10 +34,12 @@
 #include <SALOMEconfig.h>
 #include CORBA_SERVER_HEADER(SALOME_Component)
 
+#include "MEDOPGUI.hxx"
+
 /*!
  * This class defines the gui of the MEDOP module.
  */
-class MEDOPModule: public StandardApp_Module
+class MEDOPGUI_EXPORT MEDOPModule: public StandardApp_Module
 {
   Q_OBJECT
 

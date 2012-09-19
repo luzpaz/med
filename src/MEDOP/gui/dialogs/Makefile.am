@@ -103,7 +103,8 @@ salomeinclude_HEADERS =              \
 	DlgAlias.hxx                 \
 	DlgUseInWorkspace.hxx        \
 	DlgChangeUnderlyingMesh.hxx  \
-	DlgImageToMed.hxx
+	DlgImageToMed.hxx  \
+	MEDOPGUIdialogs.hxx
 
 #
 # ---------------------------------------------------------

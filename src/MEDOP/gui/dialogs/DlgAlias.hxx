@@ -3,8 +3,9 @@
 
 #include <QtGui>
 #include "ui_DlgAlias.hxx"
+#include "MEDOPGUIdialogs.hxx"
 
-class DlgAlias : public QDialog
+class MEDOPGUI_DIALOGS_EXPORT DlgAlias : public QDialog
 {
   Q_OBJECT
     

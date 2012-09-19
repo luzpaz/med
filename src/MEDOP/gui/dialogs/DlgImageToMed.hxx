@@ -5,7 +5,9 @@
 #include "ui_DlgImageToMed.hxx"
 #include "GenericDialog.hxx"
 
-class DlgImageToMed : public GenericDialog
+#include "MEDOPGUIdialogs.hxx"
+
+class MEDOPGUI_DIALOGS_EXPORT DlgImageToMed : public GenericDialog
 {
   Q_OBJECT
     

@@ -1,4 +1,4 @@
-// Copyright (C) 2011  CEA/DEN, EDF R&D, OPEN CASCADE
+// Copyright (C) 2007-2012  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -16,29 +16,18 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-// Author : Guillaume Boulant (EDF) 
 
-#ifndef XMEDCONSOLEDRIVER_HXX
-#define XMEDCONSOLEDRIVER_HXX
+#ifndef MEDOPGUIDIALOGS_HXX_
+#define MEDOPGUIDIALOGS_HXX_
 
-#include <SalomeApp_Application.h>
-#include <PyConsole_Console.h>
+#ifdef WIN32
+# if defined MEDOPGUI_DIALOGS_EXPORTS || defined MEDOPGUI_dialogs_EXPORTS
+#  define MEDOPGUI_DIALOGS_EXPORT __declspec( dllexport )
+# else
+#  define MEDOPGUI_DIALOGS_EXPORT __declspec( dllimport )
+# endif
+#else
+# define MEDOPGUI_DIALOGS_EXPORT
+#endif
 
-#include <QStringList>
-
-#include "MEDOPGUI.hxx"
-
-class MEDOPGUI_EXPORT XmedConsoleDriver {
-
-public:
-  XmedConsoleDriver(SalomeApp_Application * application);
-
-  void setup();
-  void exec(QStringList commands);
-
-private:
-  PyConsole_Console * _pyConsole;
-  bool _importXmedDone;
-};
-
-#endif //XMEDCONSOLEDRIVER_HXX
+#endif //MEDOPGUIDIALOGS_HXX_

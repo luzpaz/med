@@ -25,10 +25,12 @@
 #include CORBA_SERVER_HEADER(MEDEventListener)
 #include "SALOME_GenericObj_i.hh"
 
+#include "MEDOPGUI.hxx"
+
 #include <QObject>
 
 // Multiple inheritance requires QObject to be first
-class MEDEventListener_i: public QObject,
+class MEDOPGUI_EXPORT MEDEventListener_i: public QObject,
 			  public POA_MEDOP::MEDEventListener,
 			  public SALOME::GenericObj_i
 			  

@@ -6,9 +6,9 @@
 #include "GenericDialog.hxx"
 
 #include <SALOME_AppStudyEditor.hxx>
+#include "MEDOPGUIdialogs.hxx"
 
-
-class DlgChangeUnderlyingMesh : public GenericDialog
+class MEDOPGUI_DIALOGS_EXPORT DlgChangeUnderlyingMesh : public GenericDialog
 {
   Q_OBJECT
   

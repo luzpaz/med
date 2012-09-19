@@ -8,6 +8,7 @@
 #include "MEDEventListener_i.hxx"
 #include "XmedConsoleDriver.hxx"
 #include "DatasourceController.hxx"
+#include "MEDOPGUI.hxx"
 
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(MEDDataManager)
@@ -20,7 +21,7 @@
  * and containing a tree view for rendering a hierarchical data
  * model. This datamodel contains the objects used in the workspace.
  */
-class WorkspaceController: public TreeGuiManager {
+class MEDOPGUI_EXPORT WorkspaceController: public TreeGuiManager {
 
   Q_OBJECT
 

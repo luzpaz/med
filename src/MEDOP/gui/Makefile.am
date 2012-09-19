@@ -54,7 +54,8 @@ salomeinclude_HEADERS =          \
 	MEDEventListener_i.hxx   \
 	MEDOPModule.hxx          \
 	DatasourceController.hxx \
-	DatasourceConstants.hxx
+	DatasourceConstants.hxx \
+	MEDOPGUI.hxx
 
 dist_libMEDOPGUI_la_SOURCES =    \
 	MEDOPFactoryClient.cxx   \

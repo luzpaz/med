@@ -38,6 +38,7 @@
 
 #include <MED_version.h>
 #include "MEDOPModule.hxx"
+#include "MEDOPGUI.hxx"
 
 #ifdef __WITH_MEDMEMGUI__
 #include "MEDGUI.h"
@@ -46,7 +47,7 @@
 extern "C" {
 
   /*! This function is the factory for the GUI Module */
-  CAM_Module* createModule()
+  MEDOPGUI_EXPORT CAM_Module* createModule()
   {
     CAM_Module * medModule;
 
@@ -60,7 +61,7 @@ extern "C" {
   }
 
   /*! This function specifies the version of the module to be displayed in the about dialog box */
-  char* getModuleVersion() {
+  MEDOPGUI_EXPORT char* getModuleVersion() {
     return (char*)MED_VERSION_STR;
   }
 

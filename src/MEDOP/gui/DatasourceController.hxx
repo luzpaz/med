@@ -13,7 +13,7 @@
 
 #include "XmedDataModel.hxx"
 #include "DlgChangeUnderlyingMesh.hxx"
-
+#include "MEDOPGUI.hxx"
 //
 // The DatasourceController defines data structures and classes to
 // manage the usage of objects in the data space. The data space is
@@ -46,7 +46,7 @@ typedef struct {
 // Datasource controller
 // ==============================================================
 //
-class DatasourceController: public QObject {
+class MEDOPGUI_EXPORT DatasourceController: public QObject {
   Q_OBJECT
 
 public:

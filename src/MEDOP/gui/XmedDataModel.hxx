@@ -4,6 +4,8 @@
 #include <SALOMEconfig.h>
 #include CORBA_CLIENT_HEADER(MEDDataManager)
 
+#include "MEDOPGUI.hxx"
+
 //
 // =================================================================
 // Definition of an atom in the data model as an implementation of
@@ -11,7 +13,7 @@
 // =================================================================
 //
 #include "DataObject.hxx"
-class XmedDataObject: public DataObject {
+class MEDOPGUI_EXPORT XmedDataObject: public DataObject {
 public:
   XmedDataObject();
   virtual string getPath();
@@ -34,7 +36,7 @@ private:
 // =================================================================
 //
 #include "DataModel.hxx"
-class XmedDataModel: public DataModel {
+class MEDOPGUI_EXPORT XmedDataModel: public DataModel {
 public:
   XmedDataModel():DataModel() {};
   virtual DataObject * newDataObject();
@@ -56,7 +58,7 @@ public:
 //
 #include "DataProcessor.hxx"
 
-class XmedDataProcessor : public DataProcessor {
+class MEDOPGUI_EXPORT XmedDataProcessor : public DataProcessor {
 public:
   XmedDataProcessor(DataModel * dataModel):DataProcessor(dataModel) {};
 

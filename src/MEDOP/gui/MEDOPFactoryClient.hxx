@@ -31,15 +31,17 @@
 #include CORBA_CLIENT_HEADER(MEDDataManager)
 #include CORBA_CLIENT_HEADER(MEDCalculator)
 
+#include "MEDOPGUI.hxx"
+
 // This helper manages static variables binded on main objects of the
 // XMED context, so that they could be initialized once and shared in
 // the whole gui context. It prevents to defined an attribute in each
 // class while this instance are singleton instances.
 
 namespace MEDOPFactoryClient {
-  MEDOP::MEDOPFactory_ptr getFactory();
-  MEDOP::MEDDataManager_ptr getDataManager();
-  MEDOP::MEDCalculator_ptr getCalculator();
+  MEDOPGUI_EXPORT MEDOP::MEDOPFactory_ptr getFactory();
+  MEDOPGUI_EXPORT MEDOP::MEDDataManager_ptr getDataManager();
+  MEDOPGUI_EXPORT MEDOP::MEDCalculator_ptr getCalculator();
 }
 
 #endif // _MEDOPFACTORY_CLIENT_HXX_
