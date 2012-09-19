@@ -20,14 +20,3 @@
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 SUBDIRS = config_files
-
-EXTRA_DIST += SALOMEconfig.h.in
-
-if !MED_ENABLE_KERNEL
-  nodist_salomeinclude_HEADERS = SALOMEconfig.h
-endif
-
-##################################
-# not-used (obsolete?) files
-##################################
-# depend.in make_module.in sstream.in

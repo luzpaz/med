@@ -674,7 +674,7 @@ sed -i "s%\(\s*\)\(for searchdir in \$searchdirs; do\)%\1for sss in \$searchdirs
 ],[])
 
 AC_OUTPUT([ \
-        adm_local_without_kernel/unix/SALOMEconfig.h \
+        adm_local_without_kernel/SALOMEconfig.h \
         Makefile \
         MED_version.h \
         adm_local/unix/config_files/Makefile \
