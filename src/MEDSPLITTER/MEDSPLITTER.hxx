@@ -26,7 +26,7 @@
 #define MEDSPLITTER_HXX_
 
 #ifdef WIN32
-# if defined MEDSPLITTER_EXPORTS || defined medsplitter_EXPORTS
+# if defined MEDSPLITTERCPP_EXPORTS || defined medsplittercpp_EXPORTS
 #  define MEDSPLITTER_EXPORT __declspec( dllexport )
 # else
 #  define MEDSPLITTER_EXPORT __declspec( dllimport )
