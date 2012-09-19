@@ -52,7 +52,7 @@ public:
 };
 
 extern "C"
-PortableServer::ObjectId * MEDOPFactoryEngine_factory(CORBA::ORB_ptr orb,
+MEDOP_EXPORT PortableServer::ObjectId * MEDOPFactoryEngine_factory(CORBA::ORB_ptr orb,
 					       PortableServer::POA_ptr poa,
 					       PortableServer::ObjectId * contId,
 					       const char *instanceName,

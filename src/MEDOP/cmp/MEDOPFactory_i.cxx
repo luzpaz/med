@@ -22,7 +22,6 @@
 
 // Authors : Guillaume Boulant (EDF) - 01/06/2011
 
-using namespace std;
 #include "MEDOPFactory_i.hxx"
 #include "utilities.h"
 
@@ -30,6 +29,8 @@ using namespace std;
 
 #include "MEDDataManager_i.hxx"
 #include "MEDCalculator_i.hxx"
+
+using namespace std;
 
 //=============================================================================
 /*!

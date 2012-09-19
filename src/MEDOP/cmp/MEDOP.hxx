@@ -20,8 +20,8 @@
 #ifndef __MEDOP_HXX__
 #define __MEDOP_HXX__
 
-#ifdef WNT
-#  if defined medop_EXPORTS
+#ifdef WIN32
+# if defined medop_EXPORTS || defined MEDOPFactoryEngine_EXPORTS || defined MEDOPFACTORYENGINE_EXPORTS 
 #    define MEDOP_EXPORT __declspec( dllexport )
 #  else
 #    define MEDOP_EXPORT __declspec( dllimport )
