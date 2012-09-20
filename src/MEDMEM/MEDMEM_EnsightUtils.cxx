@@ -30,7 +30,7 @@
 #include "MEDMEM_EnsightFieldDriver.hxx"
 #include "MEDMEM_DriverTools.hxx"
 
-#ifdef WNT
+#ifdef WIN32
 #include <io.h>
 #else
 #include <unistd.h>
@@ -112,7 +112,7 @@ namespace MEDMEM
   }
 }
 
-#ifdef WNT
+#ifdef WIN32
 #define FILE_SEPARATOR '\\'
 #else
 #define FILE_SEPARATOR '/'
@@ -1832,7 +1832,7 @@ void _CaseFileDriver_User::merge( const GENDRIVER& driver)
 
 bool _CaseFileDriver_User::isBinaryDataFile(const string& dataFileName)
 {
-#ifdef WNT
+#ifdef WIN32
   int _file = ::_open (dataFileName.c_str(), _O_RDONLY|_O_BINARY);
 #else
   int _file = ::open (dataFileName.c_str(), O_RDONLY);
@@ -2394,7 +2394,7 @@ std::ostream& operator << (std::ostream& os, const _SubPartDesc& desc)
 
 _ASCIIFileReader::_ASCIIFileReader(const string& fileName) throw (MEDEXCEPTION)
 {
-#ifdef WNT
+#ifdef WIN32
   _file = ::_open (fileName.c_str(), _O_RDONLY|_O_BINARY);
 #else
   _file = ::open (fileName.c_str(), O_RDONLY);
@@ -2779,7 +2779,7 @@ _ASCIIFileReader::~_ASCIIFileReader()
 _BinaryFileReader::_BinaryFileReader(const string& fileName) throw (MEDEXCEPTION)
   : _exception(STRING("Unexpected EOF ") << fileName), _mySwapBytes(false)
 {
-#ifdef WNT
+#ifdef WIN32
   _file = ::_open (fileName.c_str(), _O_RDONLY|_O_BINARY);
 #else
   _file = ::open (fileName.c_str(), O_RDONLY);
@@ -2877,7 +2877,7 @@ void _BinaryFileReader::skipTimeStepBeginning() throw (MEDEXCEPTION)
 _BinaryFileWriter::_BinaryFileWriter(const string& fileName)  throw (MEDEXCEPTION)
   : _exception(STRING("Can't write into ") << fileName)
 {
-#ifdef WNT
+#ifdef WIN32
   _file = ::_open (fileName.c_str(), _O_WRONLY|_O_BINARY|_O_TRUNC);
 #else
   _file = ::open (fileName.c_str(), O_WRONLY|O_TRUNC); //length shall be truncated to 0

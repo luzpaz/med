@@ -23,7 +23,7 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 #include "SALOMEconfig.h"
-#ifdef WNT
+#ifdef WIN32
 #define NOMINMAX
 #endif
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServantTest)

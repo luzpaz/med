@@ -21,7 +21,7 @@
 #ifndef __MEDCOUPLINGCORBA_HXX__
 #define __MEDCOUPLINGCORBA_HXX__
 
-#ifdef WNT
+#ifdef WIN32
 #  if defined medcouplingcorba_EXPORTS
 #    define MEDCOUPLINGCORBA_EXPORT __declspec( dllexport )
 #  else

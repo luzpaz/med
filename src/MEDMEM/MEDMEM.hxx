@@ -27,7 +27,7 @@
 #ifndef _MEDMEM_HXX_
 #define _MEDMEM_HXX_
 
-#ifdef WNT
+#ifdef WIN32
  #if defined MEDMEM_EXPORTS || defined medmem_EXPORTS
   #if defined WIN32
    #define MEDMEM_EXPORT __declspec( dllexport )
@@ -45,7 +45,7 @@
  #define MEDMEM_EXPORT
 #endif
 
-#ifdef WNT
+#ifdef WIN32
 #pragma warning(disable:4251) // Warning DLL Interface ...
 #pragma warning(disable:4290) // Warning Exception ...
 #endif

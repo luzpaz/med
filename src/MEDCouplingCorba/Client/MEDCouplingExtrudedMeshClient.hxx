@@ -22,7 +22,7 @@
 #define __MEDCOUPLINGEXTRUDEDMESHCLIENT_HXX__
 
 #include "SALOMEconfig.h"
-#ifdef WNT
+#ifdef WIN32
 #define NOMINMAX
 #endif
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)

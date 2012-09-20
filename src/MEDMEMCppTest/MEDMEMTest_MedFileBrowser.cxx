@@ -25,7 +25,7 @@
 // #include <sstream>
 // #include <cmath>
 
-#ifdef WNT
+#ifdef WIN32
 #include <windows.h>
 #endif
 

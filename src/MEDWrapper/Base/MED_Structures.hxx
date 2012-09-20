@@ -26,7 +26,7 @@
 #include "MED_Common.hxx"
 #include "MED_Utilities.hxx"
 
-#ifdef WNT
+#ifdef WIN32
 #pragma warning(disable:4251)
 #endif
 

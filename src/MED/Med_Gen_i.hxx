@@ -45,7 +45,7 @@ namespace MEDMEM {
   class MED_i;
 }
 
-#ifdef WNT
+#ifdef WIN32
  #if defined MED_EXPORTS || defined MEDEngine_EXPORTS
   #if defined WIN32
    #define MED_EXPORT __declspec( dllexport )

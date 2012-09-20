@@ -141,7 +141,7 @@ struct MEDMEM_EXPORT _groupe
                                       */
   const _maille& maille(int index) { return *mailles[index]; }
   bool empty() const { return mailles.empty() && groupes.empty(); }
-#ifdef WNT
+#ifdef WIN32
   int  size()  const { return (mailles.size()>relocMap.size())?mailles.size():relocMap.size(); }
 #else
   int  size()  const { return std::max( mailles.size(), relocMap.size() ); }
@@ -167,7 +167,7 @@ struct MEDMEM_EXPORT _fieldBase {
     std::string & compName( int i_comp ) { return _comp_names[ i_comp ]; }
     bool isValidNbGauss() const { return *std::max_element( _nb_gauss.begin(), _nb_gauss.end() ) ==
                                     *std::min_element( _nb_gauss.begin(), _nb_gauss.end() ); }
-#ifdef WNT
+#ifdef WIN32
     int nbGauss() const { return (1>_nb_gauss[0])?1:_nb_gauss[0]; }
 #else
     int nbGauss() const { return std::max( 1, _nb_gauss[0] ); }

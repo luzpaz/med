@@ -29,7 +29,7 @@
 
 #include "MED_Structures.hxx"
 
-#ifdef WNT
+#ifdef WIN32
 #pragma warning(disable:4250)
 #endif
 

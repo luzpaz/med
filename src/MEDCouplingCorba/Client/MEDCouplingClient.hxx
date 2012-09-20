@@ -21,7 +21,7 @@
 #ifndef __MEDCOUPLINGCLIENT_HXX__
 #define __MEDCOUPLINGCLIENT_HXX__
 
-#ifdef WNT
+#ifdef WIN32
 #  if defined medcouplingclient_EXPORTS
 #    define MEDCOUPLINGCLIENT_EXPORT __declspec( dllexport )
 #  else

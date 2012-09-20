@@ -28,7 +28,7 @@
 #include <cppunit/Message.h>
 #include <cppunit/TestAssert.h>
 
-#ifdef WNT
+#ifdef WIN32
 #include <windows.h>
 #endif
 
@@ -186,7 +186,7 @@ void MEDMEMTest::testDesactivateFacesComputation()
   MEDMEM::GIBI_MESH_WRONLY_DRIVER *gibidriver=new MEDMEM::GIBI_MESH_WRONLY_DRIVER(tmpGibiFile,mesh );
   id=mesh->addDriver(*gibidriver);
   mesh->write(id);
-#ifdef WNT
+#ifdef WIN32
   CPPUNIT_ASSERT( GetFileAttributes(tmpGibiFile.c_str()) != INVALID_FILE_ATTRIBUTES );
 #else
   CPPUNIT_ASSERT( access(tmpGibiFile.c_str(), F_OK) == 0 );

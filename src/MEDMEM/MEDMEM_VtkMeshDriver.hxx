@@ -143,7 +143,7 @@ public:
         while ( ++intBuf < bufEnd )
           *intBuf = swapBytes( *intBuf );
       }
-#ifdef WNT
+#ifdef WIN32
     ssize_t nbWritten = ::_write( _binaryFile, toWrite, nbValues * sizeof(T));
 #else
     ssize_t nbWritten = ::write( _binaryFile, toWrite, nbValues * sizeof(T));

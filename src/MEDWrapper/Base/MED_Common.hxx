@@ -39,7 +39,7 @@
 #include "MED_SharedPtr.hxx"
 #include "MED_SliceArray.hxx"
 
-#ifdef WNT
+#ifdef WIN32
 #pragma warning(disable:4099)
 #endif
 

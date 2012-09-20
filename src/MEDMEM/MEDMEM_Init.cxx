@@ -49,7 +49,7 @@ MEDMEM::INIT::INIT()
 
   if (traceKind == NULL)
     {
-#ifndef WNT
+#ifndef WIN32
       setenv("SALOME_trace","local",1);
 #else
       _putenv("SALOME_trace=%TEMP%\\local");

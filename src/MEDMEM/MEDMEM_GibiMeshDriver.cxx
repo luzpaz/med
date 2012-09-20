@@ -51,7 +51,7 @@ class FIELD_;
 
 #include <stdio.h>
 #include <fcntl.h>
-#ifdef WNT
+#ifdef WIN32
 #include <io.h>
 #else
 #include <unistd.h>
@@ -1427,7 +1427,7 @@ GIBI_MESH_DRIVER::GIBI_MESH_DRIVER(const string &         fileName,
   int pos=fileName.find(ext,0);
   int pos1=fileName.rfind('/');
   if ( pos < 0 || pos >= (int)fileName.size() ) pos = fileName.size();
-#ifdef WNT
+#ifdef WIN32
   if ( pos1 < 0 || pos1 >= (int)fileName.size() ) pos1 = fileName.rfind('\\');
 #endif
   if ( pos1 < 0 || pos1 >= (int)fileName.size() ) pos1 = -1;
@@ -1518,7 +1518,7 @@ void GIBI_MESH_RDONLY_DRIVER::open()
 //   if ( aMode != MED_EN::MED_LECT && aMode != MED_EN::MED_REMP )
 //     throw MEDEXCEPTION(LOCALIZED(STRING(LOC) << " Bad file mode access ! " << aMode));
 
-#ifdef WNT
+#ifdef WIN32
   _File = ::_open (_fileName.c_str(), _O_RDONLY|_O_BINARY);
 #else
   _File = ::open (_fileName.c_str(), O_RDONLY);
@@ -1565,7 +1565,7 @@ void GIBI_MESH_RDONLY_DRIVER::open()
       xdr_destroy((XDR*)_xdrs);
       free((XDR*)_xdrs);
       fclose(_xdrs_file);
-#ifdef WNT
+#ifdef WIN32
       _File = ::_open (_fileName.c_str(), _O_RDONLY|_O_BINARY);
 #else
       ::close (_File); // ? needed ?
@@ -2606,7 +2606,7 @@ void GIBI_MESH_WRONLY_DRIVER::open()
   }
   //change for windows compilation
   if ( !_gibi ||
-#ifdef WNT
+#ifdef WIN32
       !_gibi.is_open()
 #else
       !_gibi.rdbuf()->is_open()
