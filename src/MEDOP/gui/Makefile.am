@@ -95,7 +95,7 @@ libMEDOPGUI_la_CPPFLAGS =     \
 	$(GUI_CXXFLAGS)       \
 	$(MED_CXXFLAGS)       \
 	-I$(srcdir)/dialogs   \
-	-I$(builddir)/dialogs \
+	-Idialogs \
 	-I$(srcdir)/../cmp    \
 	-I$(top_builddir)/idl \
 	-I$(top_builddir)
