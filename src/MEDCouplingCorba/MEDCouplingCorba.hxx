@@ -16,11 +16,12 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+// Author : Anthony Geay (CEA/DEN)
 
 #ifndef __MEDCOUPLINGCORBA_HXX__
 #define __MEDCOUPLINGCORBA_HXX__
 
-#ifdef WNT
+#ifdef WIN32
 #  if defined medcouplingcorba_EXPORTS
 #    define MEDCOUPLINGCORBA_EXPORT __declspec( dllexport )
 #  else

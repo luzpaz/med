@@ -22,7 +22,7 @@
 #include <list>
 #include <stdexcept>
 
-#ifdef WNT
+#ifdef WIN32
 #include <windows.h>
 #else
 #include <unistd.h>
@@ -77,7 +77,7 @@ std::string getTmpDirectory()
 
   std::string tmpd = "";
   for ( std::list<std::string>::iterator dir = dirs.begin(); dir != dirs.end() && tmpd == "" ; ++dir ) {
-#ifdef WNT
+#ifdef WIN32
     if ( GetFileAttributes(dir->data()) & FILE_ATTRIBUTE_DIRECTORY )
 #else
     if ( access( dir->data(), W_OK ) == 0 )
@@ -106,7 +106,7 @@ std::string makeTmpFile( const std::string& tmpfile, const std::string& srcfile 
 {
   std::string tmpf = fixSlashes( getTmpDirectory() + "/" + tmpfile );
   if ( srcfile != "" ) {
-#ifdef WNT
+#ifdef WIN32
     std::string cmd  = "copy " + fixSlashes( srcfile ) + " " + tmpf;
 #else
     std::string cmd  = "cp " + srcfile + " " + tmpf + " ; chmod +w " + tmpf;
@@ -125,7 +125,7 @@ std::string makeTmpFile( const std::string& tmpfile, const std::string& srcfile 
 
 std::string fixSlashes( const std::string& path)
 {
-#ifdef WNT
+#ifdef WIN32
   std::string fixedpath = path;
   for ( int i=0; i < path.size(); ++i )
     if (path[i] == '/')

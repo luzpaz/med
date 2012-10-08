@@ -16,13 +16,14 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+// Author : Anthony Geay (CEA/DEN)
 
 #ifndef __MEDCOUPLINGCORBAFIELDFACTORYCOMPONENTSERV_HXX__
 #define __MEDCOUPLINGCORBAFIELDFACTORYCOMPONENTSERV_HXX__
 
 #include <cppunit/extensions/HelperMacros.h>
 #include "SALOMEconfig.h"
-#ifdef WNT
+#ifdef WIN32
 #define NOMINMAX
 #endif
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServantTest)

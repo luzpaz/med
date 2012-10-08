@@ -27,7 +27,7 @@
 #ifndef _MED_WrapperFactory_HXX_
 #define _MED_WrapperFactory_HXX_
 
-#ifdef WNT
+#ifdef WIN32
  #if defined MEDWRAPPER_FACTORY_EXPORTS || defined MEDWrapper_EXPORTS
   #if defined WIN32
    #define MEDWRAPPER_FACTORY_EXPORT __declspec( dllexport )

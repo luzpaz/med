@@ -78,6 +78,17 @@
 
 <!-- Component list -->
 <component-list>
+
+	<component>
+                <component-name>MEDOPFactory</component-name>
+		<component-username>MEDOP Factory</component-username>
+		<component-type>MED</component-type>
+		<component-author>Guillaume Boulant</component-author>
+		<component-version>@VERSION@</component-version>
+		<component-comment>Factory of SALOME components for MED Field operations</component-comment>
+		<component-multistudy>0</component-multistudy>
+        </component>
+
 	<component>
 		<!-- Component identification -->
 		<component-name>MED</component-name>

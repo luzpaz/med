@@ -33,7 +33,7 @@
 #include <cmath>
 #include <stdexcept>
 
-#ifdef WNT
+#ifdef WIN32
 #include <windows.h>
 #endif
 
@@ -654,7 +654,7 @@ MEDMEMTest_TmpFilesRemover::~MEDMEMTest_TmpFilesRemover()
 {
   set<string>::iterator it = myTmpFiles.begin();
   for (; it != myTmpFiles.end(); it++) {
-#ifdef WNT
+#ifdef WIN32
     //if (GetFileAttributes((*it).data()) & FILE_ATTRIBUTE_NORMAL)
     if (GetFileAttributes((*it).data()) != INVALID_FILE_ATTRIBUTES)
 #else

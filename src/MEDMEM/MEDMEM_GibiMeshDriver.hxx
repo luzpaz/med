@@ -45,7 +45,7 @@
 #include <iomanip>
 /////
 
-#ifdef WNT
+#ifdef WIN32
 #else
 #define HAS_XDR
 #endif

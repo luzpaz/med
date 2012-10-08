@@ -1,0 +1,17 @@
+<application>
+<prerequisites path="@prefix@/bin/salome/@MODULE_NAME@/appligen/envappli.sh"/>
+
+<modules>
+  <module name="KERNEL" path="@KERNEL_ROOT_DIR@"/>
+  <module name="GUI" path="@GUI_ROOT_DIR@"/>
+  <module name="GEOM" path="__GEOM_ROOT_DIR__"/>
+  <module name="SMESH" path="__SMESH_ROOT_DIR__"/>
+  <module name="BLSURFPLUGIN" gui="no" path="__BLSURFPLUGIN_ROOT_DIR__"/>
+  <module name="GHS3DPLUGIN" gui="no" path="__GHS3DPLUGIN_ROOT_DIR__"/>
+  <module name="NETGENPLUGIN" gui="no" path="__NETGENPLUGIN_ROOT_DIR__"/>
+  <module name="MED" path="@prefix@"/>
+  <module name="VISU" path="__VISU_ROOT_DIR__"/>
+  <module name="YACS" path="__YACS_ROOT_DIR__"/>
+  <module name="PARAVIS" path="__PARAVIS_ROOT_DIR__"/>
+</modules>
+</application>

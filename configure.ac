@@ -270,6 +270,7 @@ echo testing html generators
 echo ---------------------------------------------
 echo
 
+CHECK_SPHINX
 CHECK_HTML_GENERATORS
 
 ###
@@ -280,6 +281,15 @@ gui_ok=no
 # CHECK_GUI ONLY if MED_WITH_KERNEL is yes
 
 WITHIHM="no"
+
+# This flags should be used to switch between the MEDMEM GUI (defined
+# in the MEDGUI package) and the MEDOP GUI (defined in the MEDOP
+# package). In any case the module factory function is provided by the
+# MEDOP GUI library (package MEDOP/gui) and this factory function
+# creates weither a MedGUI instance or a MEDOPModule instance,
+# depending on the value of this flags. The default is to use the new
+# MEDOP GUI. 
+AM_CONDITIONAL(WITH_MEDMEMGUI,test "1" = "0")
 
 ###
 # Other tests should be performed only in --with-interp-kernel-only=no mode
@@ -564,6 +574,7 @@ else
     else
         # --with-interp-kernel-only=no mode
         obligatory_vars="$obligatory_vars python_ok boost_ok swig_ok hdf5_ok med3_ok $splitter_obligatory_vars"
+        optional_vars="$optional_vars $splitter_optional_vars $renumber_optional_vars"
     fi
 fi
 
@@ -663,7 +674,7 @@ sed -i "s%\(\s*\)\(for searchdir in \$searchdirs; do\)%\1for sss in \$searchdirs
 ],[])
 
 AC_OUTPUT([ \
-        adm_local_without_kernel/unix/SALOMEconfig.h \
+        adm_local_without_kernel/SALOMEconfig.h \
         Makefile \
         MED_version.h \
         adm_local/unix/config_files/Makefile \
@@ -740,6 +751,21 @@ AC_OUTPUT([ \
         src/MedClient/test/test1/Makefile \
         src/MedClient/test/test2/Makefile \
         src/MEDGUI/Makefile \
+	src/MEDOP/Makefile \
+	src/MEDOP/cmp/Makefile \
+	src/MEDOP/tui/Makefile \
+	src/MEDOP/tui/xmedpy/Makefile \
+	src/MEDOP/res/Makefile \
+	src/MEDOP/res/testfiles/Makefile \
+	src/MEDOP/gui/dialogs/Makefile \
+	src/MEDOP/gui/Makefile \
+	src/MEDOP/exe/Makefile \
+	src/MEDOP/exe/appligen/Makefile \
+	src/MEDOP/exe/appligen/config_appli_model.xml \
+	src/MEDOP/exe/appligen/appligen.sh \
+	src/MEDOP/exe/image2med/Makefile \
+	src/MEDOP/doc/sphinx/conf.py \
+	src/MEDOP/doc/sphinx/Makefile \
         doc/Makefile \
         doc/MEDMEM/Makefile \
         doc/MEDMEM/MEDMEM_Content.tex \

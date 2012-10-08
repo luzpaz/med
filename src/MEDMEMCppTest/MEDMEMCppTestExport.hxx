@@ -20,7 +20,7 @@
 #ifndef _MEDMEMCPPTESTEXPORT_HXX_
 #define _MEDMEMCPPTESTEXPORT_HXX_
 
-#ifdef WNT
+#ifdef WIN32
 #  if defined MEDMEMCppTest_EXPORTS
 #    define MEDMEMCPPTEST_EXPORT __declspec( dllexport )
 #  else

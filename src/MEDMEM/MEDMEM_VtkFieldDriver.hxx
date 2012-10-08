@@ -42,7 +42,7 @@
 #include "MEDMEM_CellModel.hxx"
 #include "MEDMEM_VtkMeshDriver.hxx"
 
-#ifdef WNT
+#ifdef WIN32
 #include <io.h>
 #else
 #include <unistd.h>
@@ -378,14 +378,14 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
 
   // check if dataStr is already present in the file
   bool toWriteDataStr = true;
-#ifdef WNT
+#ifdef WIN32
   int vtkFile = ::_open (_fileName.c_str(), _O_RDONLY|_O_BINARY);
 #else
   int vtkFile = ::open (_fileName.c_str(), O_RDONLY);
 #endif
   if ( vtkFile > 0 )
   {
-#ifdef WNT
+#ifdef WIN32
     ssize_t fileSize = ::_lseek( vtkFile, 0, SEEK_END); ::lseek( vtkFile, 0, SEEK_SET);
     char* buf = new char[ fileSize ];
     ::_read (vtkFile, buf, fileSize );
@@ -398,7 +398,7 @@ template <class T> void VTK_FIELD_DRIVER<T>::writeAppend(void) const
     while ( ++vtkData < vtkDataEnd && toWriteDataStr )
       toWriteDataStr = ( strncmp( dataStr.data(), vtkData, dataStr.size()) != 0 );
     delete [] buf;
-#ifdef WNT
+#ifdef WIN32
     ::_close (vtkFile);
 #else
     ::close (vtkFile);

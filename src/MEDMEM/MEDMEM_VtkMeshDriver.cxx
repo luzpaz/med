@@ -521,7 +521,7 @@ bool _VTK_BinaryWriter::open(bool append) const
       // opening
       _VTK_BinaryWriter* mutableMe =(_VTK_BinaryWriter*) this;
       int append_flag = 0;
-#ifdef WNT
+#ifdef WIN32
       if ( append ) append_flag = _O_APPEND;
       mutableMe->_binaryFile = ::_open (_fileName.c_str(), _O_WRONLY|_O_BINARY|append_flag);
 #else
@@ -538,7 +538,7 @@ bool _VTK_BinaryWriter::close() const
 {
   if ( _binaryFile )
     {
-#ifdef WNT
+#ifdef WIN32
       ::_close (_binaryFile);
 #else
       ::close (_binaryFile);

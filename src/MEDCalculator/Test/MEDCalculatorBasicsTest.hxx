@@ -16,6 +16,7 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
+// Author : Anthony Geay (CEA/DEN)
 
 #ifndef __MEDCALCULATORBASICSTEST_HXX__
 #define __MEDCALCULATORBASICSTEST_HXX__

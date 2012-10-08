@@ -101,7 +101,7 @@ PORFLOW_MESH_DRIVER::PORFLOW_MESH_DRIVER(const string & fileName,
   const string ext=".inp"; // expected extension
   string::size_type pos=fileName.find(ext,0);
   string::size_type pos1=fileName.rfind('/');
-#ifdef WNT
+#ifdef WIN32
   if (pos1 == string::npos ) pos1=fileName.rfind('\\');
 #endif
   if (pos1 != string::npos )
@@ -386,7 +386,7 @@ void PORFLOW_MESH_RDONLY_DRIVER::read(void)
     // the directory name will be used to locate the files included in _fileName.
     string dirName;
     string::size_type pos=_fileName.rfind('/');
-#ifdef WNT
+#ifdef WIN32
     if (pos == string::npos ) pos=_fileName.rfind('\\');
 #endif
     if (pos != string::npos )

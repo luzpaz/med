@@ -325,7 +325,7 @@ void ReadMed(const char* theFileName,
   CopyMed(theFileName,theFileName2,theVersion,theNbCopy);
 }
 
-#ifdef WNT
+#ifdef WIN32
 #pragma warning(disable:4101) // exc unreferenced ... ??
 #endif
 

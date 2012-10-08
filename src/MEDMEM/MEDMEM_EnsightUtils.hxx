@@ -34,7 +34,7 @@
 #include <float.h>
 #include <cmath>
 
-#ifdef WNT
+#ifdef WIN32
 # define isnan _isnan
 #else
 # include <unistd.h>
@@ -610,7 +610,7 @@ public:
   }
   float  getReal() throw (MEDEXCEPTION) {
     if ( eof() ) throw MEDEXCEPTION("Unexpected EOF");
-#ifdef WNT
+#ifdef WIN32
 #else
     return strtof(_ptr, &_ptr);
 #endif
@@ -800,7 +800,7 @@ private:
     if ( int(bufSize) > _maxPos - _pos )
       throw _exception;
     T* buf = new T[ nb ];
-#ifdef WNT
+#ifdef WIN32
 #else
     ssize_t nBytesRead = ::read (_file, buf, bufSize );
     _pos += nBytesRead;
@@ -878,7 +878,7 @@ private:
   template <typename T>
   void add(const T* data, int nbValues) throw (MEDEXCEPTION)
   {
-#ifdef WNT
+#ifdef WIN32
 #else
     ssize_t nbWritten = ::write( _file, (const void *) data, nbValues * sizeof(T));
     if ( nbWritten < 0 ) throw _exception;

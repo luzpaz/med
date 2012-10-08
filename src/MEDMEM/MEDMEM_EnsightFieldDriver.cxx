@@ -21,7 +21,7 @@
 #include <sstream>
 #include <iomanip>
 
-#ifndef WNT
+#ifndef WIN32
 #include <fenv.h>
 #endif
 
@@ -738,7 +738,7 @@ void ENSIGHT_FIELD_RDONLY_DRIVER::read (void)
   {
     // Read values
 
-#ifndef WNT
+#ifndef WIN32
     int curExcept = fedisableexcept( FE_ALL_EXCEPT ); //!< there may be nan values
 #endif
 
@@ -765,7 +765,7 @@ void ENSIGHT_FIELD_RDONLY_DRIVER::read (void)
       }
     }
 
-#ifndef WNT
+#ifndef WIN32
     feclearexcept( FE_ALL_EXCEPT );
     if ( curExcept >= 0 )
       feenableexcept( curExcept );

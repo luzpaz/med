@@ -64,7 +64,7 @@ class MEDMEM_EXPORT CONNECTIVITY
         sum+=key[i]*(i+key.size());
       return sum;
     }
-// #ifdef WNT
+// #ifdef WIN32
 //     static const size_t bucket_size = 4;
 //     static const size_t min_buckets = 8;
 //     bool operator()(const vector<int>& key1, const vector<int>& key2) const

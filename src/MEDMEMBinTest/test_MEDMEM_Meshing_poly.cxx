@@ -21,7 +21,7 @@
 //
 #include "MEDMEM_Meshing.hxx"
 #include "MEDMEM_DriverFactory.hxx"
-#ifdef WNT
+#ifdef WIN32
 #include <io.h>
 #define access _access
 #define W_OK 02

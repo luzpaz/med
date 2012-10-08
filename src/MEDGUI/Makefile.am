@@ -37,20 +37,27 @@ dist_libMEDGUI_la_SOURCES = MEDGUIFileContentDial.h MEDGUISelection.hxx \
 
 MOC_FILES= MEDGUI_moc.cxx MEDGUIFileContentDial_moc.cxx MEDGUISelectComponents_moc.cxx
 
+# meta object implementation files generation (moc)
+%_moc.cxx: %.h
+	$(MOC) $< -o $@
+
+# translation (*.qm) files generation (lrelease)
+%.qm: %.ts
+	$(LRELEASE) $< -qm $@
+
+EXTRA_DIST += $(MOC_FILES:%_moc.cxx=%.h) $(nodist_salomeres_DATA:%.qm=%.ts)
+
 ui_%.h: %.ui
 	${QTDIR}/bin/uic $< -o $@
 
 .hxx_moc.cxx :
 	${QTDIR}/bin/moc -p . -o $@ $<
 
-%_moc.cxx: %.hxx
-	${QTDIR}/bin/moc $< -o $@
-
 .qrc_qrc.cxx :
 	${QTDIR}/bin/rcc -name $(*F)  $< -o $@
 
 clean-local-qt :
-	rm -f *_moc.cxx *_qrc.cxx ui_*.h
+	rm -f *_moc.cxx *_qrc.cxx ui_*.h *.qm
 
 clean-local: clean-local-qt
 
@@ -64,11 +71,15 @@ libMEDGUI_la_CPPFLAGS= $(QT_INCLUDES) $(VTK_INCLUDES) @CAS_CPPFLAGS@ $(PYTHON_IN
 	-I$(top_builddir) -I$(top_builddir)/idl -I$(srcdir)/../MEDCoupling -I$(srcdir)/../INTERP_KERNEL -I$(srcdir)/../INTERP_KERNEL/Bases \
 	-I$(srcdir)/../MEDCoupling -I$(srcdir)/../MEDLoader -I$(srcdir)/../MEDCalculator
 
-libMEDGUI_la_LDFLAGS= \
+libMEDGUI_la_LDFLAGS = \
 	$(QT_MT_LIBS) $(CAS_KERNEL) $(BOOST_LIBS) \
-	../../idl/libSalomeIDLMED.la ../MEDCalculator/libmedcalculator.la \
 	$(KERNEL_LDFLAGS) -lSalomeLifeCycleCORBA -lOpUtil -lSALOMELocalTrace \
 	$(GUI_LDFLAGS) -lSalomeApp -lCAM -lLightApp -lqtx -lsuit -lSalomeObject
+
+libMEDGUI_la_LIBADD = \
+	$(top_builddir)/idl/libSalomeIDLMED.la \
+	$(top_builddir)/src/MEDCalculator/libmedcalculator.la
+
 
 # .po files to transform in .qm
 nodist_salomeres_DATA= \
