@@ -32,7 +32,7 @@ appligenbin_DATA= \
 appligenbin_SCRIPTS=\
 	appligen.sh
 
-EXTRA_DIST += $(appligenbin_DATA) $(appligenbin_SCRIPTS)
+EXTRA_DIST += $(appligenbin_DATA) $(appligenbin_SCRIPTS) genenv.sh README.txt
 
 config_appli.xml: config_appli_model.xml
 	cat $< | sed \

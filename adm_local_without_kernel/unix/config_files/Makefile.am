@@ -42,6 +42,7 @@ dist_admlocalwithoutkernelm4_DATA = \
     check_mpich.m4 \
     check_openmpi.m4 \
     check_swig.m4 \
+    check_sphinx.m4 \
     enable_pthreads.m4 \
     production.m4 \
     python.m4 \

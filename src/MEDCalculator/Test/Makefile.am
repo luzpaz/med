@@ -20,8 +20,6 @@
 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-EXTRA_DIST += CMakeLists.txt
-
 bin_PROGRAMS= TestMEDCalculator
 
 TestMEDCalculator_CPPFLAGS=@CPPUNIT_INCLUDES@ @PTHREAD_CFLAGS@ $(PYTHON_INCLUDES) -I$(srcdir)/.. -I$(srcdir)/../Swig -I$(srcdir)/../../INTERP_KERNEL/Bases -I$(srcdir)/../../INTERP_KERNELTest -I$(srcdir)/../../INTERP_KERNEL -I$(srcdir)/../../INTERP_KERNEL/Geometric2D -I$(srcdir)/../../MEDCoupling -I$(srcdir)/../../MEDLoader

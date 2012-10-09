@@ -31,6 +31,11 @@ else !MED_ENABLE_KERNEL
 endif
 
 # ============================================================
+# Cmake files wildcard (to add then to the distribution)
+# ============================================================
+CMAKEFILES    = $(notdir $(wildcard $(srcdir)/CMakeLists.txt))
+
+# ============================================================
 # This file defines the common definitions used in several
 # Makefile. This file must be included, if needed, by the file
 # Makefile.am.
@@ -66,7 +71,7 @@ sharedpkgpythondir = $(salomepythondir)/shared_modules
 # Documentation directory
 docdir             = $(datadir)/doc/salome
 
-EXTRA_DIST =
+EXTRA_DIST         = $(CMAKEFILES)
 
 # tests
 tests: unittest

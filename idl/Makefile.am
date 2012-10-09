@@ -24,8 +24,6 @@
 #
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-EXTRA_DIST += CMakeLists.txt
-
 BASEIDL_FILES = \
 	MED.idl MED_Gen.idl Compo1Py.idl \
 	MEDCouplingCorbaServant.idl      \
