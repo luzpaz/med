@@ -25,6 +25,8 @@
 # - exe: folder containing small executable programs for MED data processing
 # - doc: folder containing the documentation of the MEDOP package 
 
-SUBDIRS= cmp tui res gui exe doc/sphinx
+include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-EXTRA_DIST = README.txt
+SUBDIRS= cmp tui res gui exe doc
+
+EXTRA_DIST += README.txt

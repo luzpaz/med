@@ -37,7 +37,7 @@ SUBDIRS = dialogs
 %.qm: %.ts
 	$(LRELEASE) $< -qm $@
 
-EXTRA_DIST+=$(MOC_FILES:%_moc.cxx=%.hxx) $(nodist_salomeres_DATA:%.qm=%.ts)
+EXTRA_DIST+=$(MOC_FILES:%_moc.cxx=%.hxx) $(nodist_salomeres_DATA:%.qm=%.ts) test
 
 mostlyclean-local:
 	rm -f @builddir@/*_moc.cxx

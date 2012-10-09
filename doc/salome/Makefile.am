@@ -22,6 +22,9 @@
 # Date : 30/11/2001
 # $Header$
 #
+
+include $(top_srcdir)/adm_local/unix/make_common_starter.am
+
 SUBDIRS    = tui
 SUBDIRSTUI = tui
 

@@ -19,4 +19,7 @@
 
 #  MED MedClient : tool to transfer MED CORBA from server producer of MED object to a client using those MED object
 #
+
+include $(top_srcdir)/adm_local/unix/make_common_starter.am
+
 SUBDIRS = src test
