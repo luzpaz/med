@@ -29,6 +29,8 @@ module SALOME_MED
   interface MEDCouplingTimeLabelCorbaInterface
   {
     long getTimeLabel();
+    string versionStr();
+    void versionMajMinRel(out long maj, out long min, out long releas);
   };
 
   interface MEDCouplingRefCountCorbaInterface : SALOME::ExportableObject, MEDCouplingTimeLabelCorbaInterface

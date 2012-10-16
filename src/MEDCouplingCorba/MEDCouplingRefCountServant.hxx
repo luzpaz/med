@@ -41,6 +41,8 @@ namespace ParaMEDMEM
     void UnRegister();
     void Destroy(); // obsolete
     CORBA::Long getTimeLabel();
+    char *versionStr();
+    void versionMajMinRel(CORBA::Long_out maj, CORBA::Long_out minor, CORBA::Long_out releas);
     SALOME::StringSeq *GetExportableFormats();
   protected:
     int _ref_counter;

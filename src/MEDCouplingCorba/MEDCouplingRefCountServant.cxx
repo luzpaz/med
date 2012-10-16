@@ -52,6 +52,16 @@ CORBA::Long MEDCouplingRefCountServant::getTimeLabel()
   return -1;
 }
 
+char *MEDCouplingRefCountServant::versionStr()
+{
+  return CORBA::string_dup(MEDCouplingVersionStr());
+}
+
+void MEDCouplingRefCountServant::versionMajMinRel(CORBA::Long_out maj, CORBA::Long_out minor, CORBA::Long_out releas)
+{
+  MEDCouplingVersionMajMinRel(maj,minor,releas);
+}
+
 SALOME::StringSeq *MEDCouplingRefCountServant::GetExportableFormats()
 {
   SALOME::StringSeq *ret=new SALOME::StringSeq;
