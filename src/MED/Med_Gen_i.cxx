@@ -26,6 +26,7 @@
 //  Module : MED
 
 #include "Med_Gen_i.hxx"
+#include "MED_version.h"
 
 #include "MEDMEM_Mesh.hxx"
 #include "MEDMEM_Med_i.hxx"
@@ -586,6 +587,16 @@ char* Med_Gen_i::ComponentDataType()
 {
   MESSAGE("Med_Gen_i::ComponentDataType");
   return CORBA::string_dup("MED") ; /* What is this type ? */
+}
+
+// Version information
+char* Med_Gen_i::getVersion()
+{
+#if SALOMEMED_DEVELOPMENT
+  return CORBA::string_dup(SALOMEMED_VERSION_STR"dev");
+#else
+  return CORBA::string_dup(SALOMEMED_VERSION_STR);
+#endif
 }
 
 

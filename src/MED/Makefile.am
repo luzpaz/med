@@ -27,7 +27,9 @@ dist_libMEDEngine_la_SOURCES= Med_Gen_i.cxx Med_Gen_Driver_i.cxx
 salomeinclude_HEADERS = Med_Gen_i.hxx Med_Gen_Driver_i.hxx
 
 libMEDEngine_la_CPPFLAGS= $(MED3_INCLUDES) $(HDF5_INCLUDES) ${KERNEL_CXXFLAGS} @CORBA_CXXFLAGS@ @CORBA_INCLUDES@ \
-	-I$(srcdir)/../MEDMEM_I -I$(top_builddir)/idl \
+	-I$(srcdir)/../MEDMEM_I \
+	-I$(top_builddir) \
+	-I$(top_builddir)/idl \
 	-I$(srcdir)/../MEDMEM \
 	-I$(srcdir)/../INTERP_KERNEL \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \

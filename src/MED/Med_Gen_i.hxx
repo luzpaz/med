@@ -123,6 +123,9 @@ public:
   char* ComponentDataType();
   virtual Engines::EngineComponent_ptr GetComponentInstance();
 
+  // Version information
+  virtual char* getVersion();
+  
 private:
   //static std::string _myFileName;
   //static std::string _saveFileName;
