@@ -54,7 +54,6 @@ MEDDataManager_i::MEDDataManager_i()
   _sourceLastId = 0;
   _meshLastId = 0;
   _fieldseriesLastId = 0;
-  _medEventListenerIOR = NULL;
 }
 MEDDataManager_i::~MEDDataManager_i()
 {
@@ -765,11 +764,7 @@ void MEDDataManager_i::serverlog() {
  * request the data manager (the python console for example).
  */
 void MEDDataManager_i::setEventListenerIOR(const char * ior) {
-  if ( _medEventListenerIOR != NULL ) {
-    free(_medEventListenerIOR);
-  }
-  _medEventListenerIOR = (char *)malloc(sizeof(char)*strlen(ior));
-  strcpy(_medEventListenerIOR, ior);
+  _medEventListenerIOR = ior;
 }
 /*!
  * Return the IOR of the event listener that resides in the
@@ -784,12 +779,10 @@ void MEDDataManager_i::setEventListenerIOR(const char * ior) {
  * In a C++ SALOME context: (to do if needed)
  */
 char * MEDDataManager_i::getEventListenerIOR() {
-  if ( _medEventListenerIOR == NULL ) {
+  if ( _medEventListenerIOR == "" ) {
     throw KERNEL::createSalomeException("The event listener IOR is not defined");
   }
   // WARN: return a copy because the pointer memory will be released
   // (CORBA specification)
-  char * ior = (char *)malloc(sizeof(char)*strlen(_medEventListenerIOR));
-  strcpy(ior, _medEventListenerIOR);
-  return ior;
+  return CORBA::string_dup( _medEventListenerIOR.c_str() );
 }

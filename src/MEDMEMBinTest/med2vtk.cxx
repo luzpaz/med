@@ -38,8 +38,16 @@ using namespace std;
 using namespace MEDMEM;
 static void usage(char * name)
 {
-  cout << "  " << name << " <input med file> <output vtk file> " <<endl ;
-  cout << "    " << "(the two file name are mandatory)" << endl ;
+  string prog = name;
+#ifdef WIN32
+  int pos = prog.rfind( '\\' );
+#else
+  int pos = prog.rfind( '/' );
+#endif
+  if ( pos >= 0 )
+    prog = prog.substr( pos+1 );
+  cout << "  " << prog.c_str() << " <input med file> <output vtk file> " << endl ;
+  cout << "  " << "Note: both file names are mandatory" << endl ;
   exit(-1);
 }
 

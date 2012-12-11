@@ -137,7 +137,7 @@ private:
   MeshMap _meshMap;
   FieldPersistencyMap _fieldPersistencyMap;
 
-  char * _medEventListenerIOR;
+  string _medEventListenerIOR;
 
   MEDOP::FieldHandler * newFieldHandler(const char * fieldname,
 					const char * meshname,

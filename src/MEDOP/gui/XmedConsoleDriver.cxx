@@ -22,7 +22,9 @@
 #include "Utils_SALOME_Exception.hxx"
 
 XmedConsoleDriver::XmedConsoleDriver(SalomeApp_Application * application) {
-  _pyConsole = application->pythonConsole();
+
+  bool forcePythonConsole = true;
+  _pyConsole = application->pythonConsole(forcePythonConsole);
   if ( !_pyConsole ) {
     const char * msg = "The python console can't be obtained from the SALOME application";
     throw SALOME_Exception(msg);

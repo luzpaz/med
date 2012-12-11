@@ -62,7 +62,8 @@ namespace INTERP_KERNEL
                                  const int *descBg, const int *descEnd, const std::vector<std::vector<int> >& intersectEdges);
     void buildFromCrudeDataArray2(const std::map<int,INTERP_KERNEL::Node *>& mapp, bool isQuad, const int *nodalBg, const double *coords, const int *descBg, const int *descEnd, const std::vector<std::vector<int> >& intersectEdges,
                                   const INTERP_KERNEL::QuadraticPolygon& pol1, const int *descBg1, const int *descEnd1, const std::vector<std::vector<int> >& intersectEdges1,
-                                  const std::vector< std::vector<int> >& colinear1);
+                                  const std::vector< std::vector<int> >& colinear1,
+                                  std::map<int,std::vector<INTERP_KERNEL::ElementaryEdge *> >& alreadyExistingIn2);
     void updateLocOfEdgeFromCrudeDataArray2(const int *descBg, const int *descEnd, const std::vector<std::vector<int> >& intersectEdges, const INTERP_KERNEL::QuadraticPolygon& pol1, const int *descBg1, const int *descEnd1, const std::vector<std::vector<int> >& intersectEdges1, const std::vector< std::vector<int> >& colinear1) const;
     void appendEdgeFromCrudeDataArray(std::size_t edgeId, const std::map<int,INTERP_KERNEL::Node *>& mapp, bool isQuad, const int *nodalBg, const double *coords,
                                       const int *descBg,  const int *descEnd, const std::vector<std::vector<int> >& intersectEdges);
@@ -79,11 +80,12 @@ namespace INTERP_KERNEL
     void intersectForPoint(const QuadraticPolygon& other, std::vector< int >& numberOfCreatedPointsPerEdge) const;
   public://Only public for tests reasons
     void performLocatingOperation(QuadraticPolygon& pol2) const;
+    void performLocatingOperationSlow(QuadraticPolygon& pol2) const;
     static void SplitPolygonsEachOther(QuadraticPolygon& pol1, QuadraticPolygon& pol2, int& nbOfSplits);
     std::vector<QuadraticPolygon *> buildIntersectionPolygons(const QuadraticPolygon& pol1, const QuadraticPolygon& pol2) const;
     bool amIAChanceToBeCompletedBy(const QuadraticPolygon& pol1Splitted, const QuadraticPolygon& pol2NotSplitted, bool& direction);
-    static void ComputeResidual(const std::set<Edge *>& notUsedInPol1, const std::set<Edge *>& edgesInPol2OnBoundary, int idThis,
-                                std::vector<double>& addCoordsQuadratic, std::vector<int>& conn, std::vector<int>& connI, std::vector<int>& nb1);
+    static void ComputeResidual(const QuadraticPolygon& pol1, const std::set<Edge *>& notUsedInPol1, const std::set<Edge *>& edgesInPol2OnBoundary, const std::map<INTERP_KERNEL::Node *,int>& mapp, int offset, int idThis,
+                                std::vector<double>& addCoordsQuadratic, std::vector<int>& conn, std::vector<int>& connI, std::vector<int>& nb1, std::vector<int>& nb2);
   protected:
     std::list<QuadraticPolygon *> zipConsecutiveInSegments() const;
     void dumpInXfigFile(std::ostream& stream, int resolution, const Bounds& box) const;

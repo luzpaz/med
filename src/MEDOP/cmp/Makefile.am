@@ -49,7 +49,7 @@ libMEDOPFactoryEngine_la_CPPFLAGS = \
 	-I$(top_srcdir)/src/INTERP_KERNEL \
 	-I$(top_srcdir)/src/MEDLoader \
 	$(KERNEL_CXXFLAGS) \
-	$(MED2_CXXFLAGS) \
+	$(MED3_INCLUDES) \
 	$(HDF5_CXXFLAGS) \
 	$(OMNIORB_CXXFLAGS)
 
@@ -59,6 +59,6 @@ libMEDOPFactoryEngine_la_LIBADD = \
 	$(top_builddir)/src/MEDCoupling/libmedcoupling.la \
 	$(top_builddir)/src/MEDLoader/libmedloader.la \
 	$(top_builddir)/src/INTERP_KERNEL/libinterpkernel.la \
-	$(MED2_LIBS) \
+	$(MED3_LIBS_C_ONLY) \
 	$(HDF5_LIBS) \
 	$(OMNIORB_LIBS)
