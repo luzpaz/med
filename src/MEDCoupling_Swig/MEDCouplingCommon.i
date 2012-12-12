@@ -4677,7 +4677,7 @@ namespace ParaMEDMEM
      return ret;
    }
 
-   void transformWithIndArr(PyObject *li)
+   void transformWithIndArr(PyObject *li) throw(INTERP_KERNEL::Exception)
    {
      void *da=0;
      int res1=SWIG_ConvertPtr(li,&da,SWIGTYPE_p_ParaMEDMEM__DataArrayInt, 0 |  0 );
