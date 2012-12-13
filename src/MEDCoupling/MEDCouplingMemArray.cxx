@@ -627,16 +627,12 @@ void DataArrayDouble::reverse() throw(INTERP_KERNEL::Exception)
  */
  void DataArrayDouble::checkMonotonic(bool increasing, double eps) const throw(INTERP_KERNEL::Exception)
 {
-  if(!isMonotonic(increasing, eps))
+  if(!isMonotonic(increasing,eps))
     {
       if (increasing)
-        {
-          throw INTERP_KERNEL::Exception("DataArrayDouble::checkMonotonic : 'this' is not INCREASING monotonic !");
-        }
+        throw INTERP_KERNEL::Exception("DataArrayDouble::checkMonotonic : 'this' is not INCREASING monotonic !");
       else
-        {
-          throw INTERP_KERNEL::Exception("DataArrayDouble::checkMonotonic : 'this' is not DECREASING monotonic !");
-        }
+        throw INTERP_KERNEL::Exception("DataArrayDouble::checkMonotonic : 'this' is not DECREASING monotonic !");
     }
 }
 
@@ -655,7 +651,7 @@ bool DataArrayDouble::isMonotonic(bool increasing, double eps) const throw(INTER
     return true;
   double ref=ptr[0];
   double absEps=fabs(eps);
-  if (increasing)
+  if(increasing)
     {
       for(int i=1;i<nbOfElements;i++)
         {
@@ -3799,6 +3795,54 @@ void DataArrayInt::reverse() throw(INTERP_KERNEL::Exception)
 }
 
 /*!
+ * This method check that array consistently INCREASING or DECREASING in value.
+ */
+void DataArrayInt::checkMonotonic(bool increasing) const throw(INTERP_KERNEL::Exception)
+{
+  if(!isMonotonic(increasing))
+    {
+      if (increasing)
+        throw INTERP_KERNEL::Exception("DataArrayInt::checkMonotonic : 'this' is not INCREASING monotonic !");
+      else
+        throw INTERP_KERNEL::Exception("DataArrayInt::checkMonotonic : 'this' is not DECREASING monotonic !");
+    }
+}
+
+/*!
+ * This method check that array consistently INCREASING or DECREASING in value.
+ */
+bool DataArrayInt::isMonotonic(bool increasing) const throw(INTERP_KERNEL::Exception)
+{
+  checkAllocated();
+  if(getNumberOfComponents()!=1)
+    throw INTERP_KERNEL::Exception("DataArrayInt::isMonotonic : only supported with 'this' array with ONE component !");
+  int nbOfElements=getNumberOfTuples();
+  const int *ptr=getConstPointer();
+  if(nbOfElements==0)
+    return true;
+  int ref=ptr[0];
+  if(increasing)
+    {
+      for(int i=1;i<nbOfElements;i++)
+        {
+          if(ptr[i]<ref)
+            return false;
+          ref=ptr[i];
+        }
+    }
+  else
+    {
+      for(int i=1;i<nbOfElements;i++)
+        {
+          if(ptr[i]>ref)
+            return false;
+          ref=ptr[i];
+        }
+    }
+  return true;
+}
+
+/*!
  * This method expects that 'this' and 'other' have the same number of tuples and exactly one component both. If not an exception will be thrown.
  * This method retrieves a newly created array with same number of tuples than 'this' and 'other' with one component.
  * The returned array 'ret' contains the correspondance from 'this' to 'other' that is to say for every i so that 0<=i<getNumberOfTuples()
@@ -4183,7 +4227,15 @@ DataArrayInt *DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2(int nbOfOldTu
             {
               int grpId=-(pt[iNode]+2);
               for(int j=cIPtr[grpId];j<cIPtr[grpId+1];j++)
-                pt[cPtr[j]]=newNb;
+                {
+                  if(cPtr[j]>=0 && cPtr[j]<nbOfOldTuples)
+                    pt[cPtr[j]]=newNb;
+                  else
+                    {
+                      std::ostringstream oss; oss << "DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2 : With element #" << j << " value is " << cPtr[j] << " should be in [0," << nbOfOldTuples << ") !";
+                      throw INTERP_KERNEL::Exception(oss.str().c_str());
+                    }
+                }
               newNb++;
             }
         }

@@ -357,6 +357,8 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT DataArrayInt *buildPermutationArr(const DataArrayInt& other) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void sort(bool asc=true) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void reverse() throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void checkMonotonic(bool increasing) const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT bool isMonotonic(bool increasing) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void fillWithZero() throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void fillWithValue(int val) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void iota(int init=0) throw(INTERP_KERNEL::Exception);

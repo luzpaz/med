@@ -1672,3 +1672,43 @@ void MEDCouplingBasicsTest5::testDAIPartitionByDifferentValues1()
   CPPUNIT_ASSERT(std::equal(expected2_3,expected2_3+4,e[3]->begin()));
   e[0]->decrRef(); e[1]->decrRef(); e[2]->decrRef(); e[3]->decrRef();
 }
+
+void MEDCouplingBasicsTest5::testDAICheckMonotonic1()
+{
+  const int data1[6]={-1,0,2,2,4,5};
+  const int data2[6]={6,2,0,-8,-9,-56};
+  const int data3[6]={-1,0,3,2,4,6};
+  const int data4[6]={7,5,2,3,0,-6};
+  DataArrayInt *d=DataArrayInt::New();
+  d->useArray(data1,false,CPP_DEALLOC,6,1);
+  CPPUNIT_ASSERT(d->isMonotonic(true));
+  CPPUNIT_ASSERT(!d->isMonotonic(false));
+  d->checkMonotonic(true);
+  CPPUNIT_ASSERT_THROW(d->checkMonotonic(false),INTERP_KERNEL::Exception);
+  d->useArray(data2,false,CPP_DEALLOC,6,1);
+  CPPUNIT_ASSERT(d->isMonotonic(false));
+  CPPUNIT_ASSERT(!d->isMonotonic(true));
+  d->checkMonotonic(false);
+  CPPUNIT_ASSERT_THROW(d->checkMonotonic(true),INTERP_KERNEL::Exception);
+  d->useArray(data3,false,CPP_DEALLOC,6,1);
+  CPPUNIT_ASSERT(!d->isMonotonic(false));
+  CPPUNIT_ASSERT(!d->isMonotonic(true));
+  CPPUNIT_ASSERT_THROW(d->checkMonotonic(true),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT_THROW(d->checkMonotonic(false),INTERP_KERNEL::Exception);
+  d->useArray(data4,false,CPP_DEALLOC,6,1);
+  CPPUNIT_ASSERT(!d->isMonotonic(false));
+  CPPUNIT_ASSERT(!d->isMonotonic(true));
+  CPPUNIT_ASSERT_THROW(d->checkMonotonic(true),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT_THROW(d->checkMonotonic(false),INTERP_KERNEL::Exception);
+  d->useArray(data4,false,CPP_DEALLOC,0,1);
+  CPPUNIT_ASSERT(d->isMonotonic(true));
+  CPPUNIT_ASSERT(d->isMonotonic(false));
+  d->checkMonotonic(true);
+  d->checkMonotonic(false);
+  d->useArray(data4,false,CPP_DEALLOC,3,2);//throw because nbComp!=1
+  CPPUNIT_ASSERT_THROW(d->isMonotonic(true),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT_THROW(d->isMonotonic(false),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT_THROW(d->checkMonotonic(true),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT_THROW(d->checkMonotonic(false),INTERP_KERNEL::Exception);
+  d->decrRef();
+}

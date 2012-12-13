@@ -10397,6 +10397,43 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertRaises(InterpKernelException,m3D.getCellsInBoundingBox,[(0,3,0),(3,0,1)],-1e-12)
         pass
 
+    def testDAICheckMonotonic1(self):
+        data1=[-1,0,2,2,4,5]
+        data2=[6,2,0,-8,-9,-56]
+        data3=[-1,0,3,2,4,6]
+        data4=[7,5,2,3,0,-6]
+        d=DataArrayInt.New(data1);
+        self.assertTrue(d.isMonotonic(True));
+        self.assertTrue(not d.isMonotonic(False));
+        d.checkMonotonic(True);
+        self.assertRaises(InterpKernelException,d.checkMonotonic,False)
+        d=DataArrayInt.New(data2);
+        self.assertTrue(d.isMonotonic(False));
+        self.assertTrue(not d.isMonotonic(True));
+        d.checkMonotonic(False);
+        self.assertRaises(InterpKernelException,d.checkMonotonic,True)
+        d=DataArrayInt.New(data3);
+        self.assertTrue(not d.isMonotonic(False));
+        self.assertTrue(not d.isMonotonic(True));
+        self.assertRaises(InterpKernelException,d.checkMonotonic,True)
+        self.assertRaises(InterpKernelException,d.checkMonotonic,False)
+        d=DataArrayInt.New(data4);
+        self.assertTrue(not d.isMonotonic(False));
+        self.assertTrue(not d.isMonotonic(True));
+        self.assertRaises(InterpKernelException,d.checkMonotonic,True)
+        self.assertRaises(InterpKernelException,d.checkMonotonic,False)
+        d=DataArrayInt.New(0,1)
+        self.assertTrue(d.isMonotonic(True));
+        self.assertTrue(d.isMonotonic(False));
+        d.checkMonotonic(True);
+        d.checkMonotonic(False);
+        d=DataArrayInt.New(data4,3,2);#throw because nbComp!=1
+        self.assertRaises(InterpKernelException,d.isMonotonic,True)
+        self.assertRaises(InterpKernelException,d.isMonotonic,False)
+        self.assertRaises(InterpKernelException,d.checkMonotonic,True)
+        self.assertRaises(InterpKernelException,d.checkMonotonic,False)
+        pass
+
     def setUp(self):
         pass
     pass
