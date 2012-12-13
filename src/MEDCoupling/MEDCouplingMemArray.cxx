@@ -383,6 +383,8 @@ int DataArray::GetNumberOfItemGivenBES(int begin, int end, int step, const char 
       std::ostringstream oss; oss << msg << " : end before begin !";
       throw INTERP_KERNEL::Exception(oss.str().c_str());
     }
+  if(end==begin)
+    return 0;
   if(step<=0)
     {
       std::ostringstream oss; oss << msg << " : invalid step should be > 0 !";
@@ -4207,7 +4209,7 @@ DataArrayInt *DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2(int nbOfOldTu
 {
   if(!arr || !arrI)
     throw INTERP_KERNEL::Exception("DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2 : presence of NULL ref of DataArrayInt in input !");
-  DataArrayInt *ret=DataArrayInt::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
   ret->alloc(nbOfOldTuples,1);
   int *pt=ret->getPointer();
   std::fill(pt,pt+nbOfOldTuples,-1);
@@ -4241,6 +4243,7 @@ DataArrayInt *DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2(int nbOfOldTu
         }
     }
   newNbOfTuples=newNb;
+  ret->incrRef();
   return ret;
 }
 

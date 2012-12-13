@@ -8128,6 +8128,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertEqual(7,newNbTuple);
         self.assertEqual(1,ret.getNumberOfComponents());
         self.assertEqual(expected,ret.getValues());
+        self.assertRaises(InterpKernelException,DataArrayInt.BuildOld2NewArrayFromSurjectiveFormat2,9,a,b);
         pass
 
     def testDADIReverse1(self):
@@ -10432,6 +10433,42 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertRaises(InterpKernelException,d.isMonotonic,False)
         self.assertRaises(InterpKernelException,d.checkMonotonic,True)
         self.assertRaises(InterpKernelException,d.checkMonotonic,False)
+        pass
+
+    def testSwigDASetItemOnEmpty1(self):
+        d=DataArrayInt(0,1)
+        isThrow=False
+        try:
+            d[0:1000:2]=4
+        except InterpKernelException as e:
+            isThrow=True
+            pass
+        self.assertTrue(isThrow)
+        d[:]=4
+        d[::2]=5
+        #
+        d=DataArrayDouble(0,1)
+        isThrow=False
+        try:
+            d[0:1000:2]=4
+        except InterpKernelException as e:
+            isThrow=True
+            pass
+        self.assertTrue(isThrow)
+        d[:]=4
+        d[::2]=5
+        d=DataArrayInt([],0,1)
+        d2=DataArrayInt(0)
+        self.assertTrue(d2.isEqual(d))
+        d=DataArrayDouble([],0,1)
+        d2=DataArrayDouble(0)
+        self.assertTrue(d2.isEqual(d,1e-12))
+        pass
+
+    def testSwigDAITransformWithIndArr1(self):
+        arr=DataArrayInt([0,4,5,1])
+        d=DataArrayInt([7,8,9,10])
+        self.assertRaises(InterpKernelException,arr.transformWithIndArr,d)
         pass
 
     def setUp(self):

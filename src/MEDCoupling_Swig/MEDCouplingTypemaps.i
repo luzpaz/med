@@ -453,6 +453,8 @@ static std::vector<int> fillArrayWithPyListInt2(PyObject *pyLi, int& nbOfTuples,
           PyObject *o=PyList_GetItem(pyLi,i);
           fillArrayWithPyListInt3(o,size2,ret);
         }
+      if(size1==0)
+        size2=1;
     }
   else if(PyTuple_Check(pyLi))
     {
@@ -462,6 +464,8 @@ static std::vector<int> fillArrayWithPyListInt2(PyObject *pyLi, int& nbOfTuples,
           PyObject *o=PyTuple_GetItem(pyLi,i);
           fillArrayWithPyListInt3(o,size2,ret);
         }
+      if(size1==0)
+        size2=1;
     }
   else
     throw INTERP_KERNEL::Exception("fillArrayWithPyListInt2 : Unrecognized type ! Should be a tuple or a list !");
@@ -696,6 +700,8 @@ static std::vector<double> fillArrayWithPyListDbl2(PyObject *pyLi, int& nbOfTupl
           PyObject *o=PyList_GetItem(pyLi,i);
           fillArrayWithPyListDbl3(o,size2,ret);
         }
+      if(size1==0)
+        size2=1;
     }
   else if(PyTuple_Check(pyLi))
     {
@@ -705,6 +711,8 @@ static std::vector<double> fillArrayWithPyListDbl2(PyObject *pyLi, int& nbOfTupl
           PyObject *o=PyTuple_GetItem(pyLi,i);
           fillArrayWithPyListDbl3(o,size2,ret);
         }
+      if(size1==0)
+        size2=1;
     }
   else
     throw INTERP_KERNEL::Exception("fillArrayWithPyListDbl2 : Unrecognized type ! Should be a tuple or a list !");
@@ -1107,13 +1115,14 @@ static void convertObjToPossibleCpp2(PyObject *value, int nbelem, int& sw, int& 
     }
   if(PySlice_Check(value))
     {
-      Py_ssize_t strt,stp,step;
+      Py_ssize_t strt=2,stp=2,step=2;
       PySliceObject *oC=reinterpret_cast<PySliceObject *>(value);
       if(PySlice_GetIndices(oC,nbelem,&strt,&stp,&step)!=0)
-        {
-          std::ostringstream oss; oss << "Slice in subscriptable object DataArray invalid : number of elemnts is : " << nbelem;
-          throw INTERP_KERNEL::Exception(oss.str().c_str());
-        }
+        if(nbelem!=0 || strt!=0 || stp!=0)
+          {
+            std::ostringstream oss; oss << "Slice in subscriptable object DataArray invalid : number of elements is : " << nbelem;
+            throw INTERP_KERNEL::Exception(oss.str().c_str());
+          }
       p.first=strt;
       p.second.first=stp;
       p.second.second=step;
@@ -1197,13 +1206,14 @@ static void convertObjToPossibleCpp22(PyObject *value, int nbelem, int& sw, int&
     }
   if(PySlice_Check(value))
     {
-      Py_ssize_t strt,stp,step;
+      Py_ssize_t strt=2,stp=2,step=2;
       PySliceObject *oC=reinterpret_cast<PySliceObject *>(value);
       if(PySlice_GetIndices(oC,nbelem,&strt,&stp,&step)!=0)
-        {
-          std::ostringstream oss; oss << "Slice in subscriptable object DataArray invalid : number of elemnts is : " << nbelem;
-          throw INTERP_KERNEL::Exception(oss.str().c_str());
-        }
+        if(nbelem!=0 || strt!=0 || stp!=0)
+          {
+            std::ostringstream oss; oss << "Slice in subscriptable object DataArray invalid : number of elements is : " << nbelem;
+            throw INTERP_KERNEL::Exception(oss.str().c_str());
+          }
       p.first=strt;
       p.second.first=stp;
       p.second.second=step;
