@@ -106,6 +106,7 @@ void VTK_MED_DRIVER::write() const
   // so we write the first mesh only
 
   const int NumberOfMeshes = ( !_fields.empty() ) ? 1 : 0;
+  int err_count = 0;
 
   for (int i=0; i<NumberOfMeshes; i++)
   {
@@ -114,19 +115,27 @@ void VTK_MED_DRIVER::write() const
     for (unsigned j=0; j<_fields.size(); j++)
     {
       const FIELD_ * myField = _fields.at(j);
-      if( myMesh == myField->getSupport()->getMesh() )
+      try
       {
-        if (MED_NODE == myField->getSupport()->getEntity())
-        {
-          if (myField->getSupport()->isOnAllElements())
-          {
-            writeField(myField,STRING(myField->getName()) << "_" << myField->getIterationNumber() << "_" << myField->getOrderNumber() ) ;
-          }
-          else
-          {
-            MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
-          }
+	if( myMesh == myField->getSupport()->getMesh() )
+	{
+	  if (MED_NODE == myField->getSupport()->getEntity())
+	  {
+	    if (myField->getSupport()->isOnAllElements())
+	    {
+	      writeField(myField,STRING(myField->getName()) << "_" << myField->getIterationNumber() << "_" << myField->getOrderNumber() ) ;
+	    }
+	    else
+	    {
+	      MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" which is not on all nodes !");
+	    }
+	  }
         }
+      }
+      catch ( MED_EXCEPTION& e )
+	{
+	  err_count++;
+	  MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" : "<<e.what());
       }
     }
 
@@ -134,21 +143,33 @@ void VTK_MED_DRIVER::write() const
     for (unsigned j=0; j<_fields.size(); j++)
     {
       const FIELD_ * myField = _fields.at(j);
-      if( myMesh == myField->getSupport()->getMesh() )
-        if (MED_CELL == myField->getSupport()->getEntity())
-        {
-          if (myField->getSupport()->isOnAllElements())
-          {
-            writeField(myField,STRING(myField->getName()) << "_" << myField->getIterationNumber() << "_" << myField->getOrderNumber() );
-          }
-          else
-          {
-            MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" which is not on all cells !");
-          }
+      try
+      {
+	if( myMesh == myField->getSupport()->getMesh() )
+	{
+	  if (MED_CELL == myField->getSupport()->getEntity())
+	  {
+	    if (myField->getSupport()->isOnAllElements())
+	    {
+	      writeField(myField,STRING(myField->getName()) << "_" << myField->getIterationNumber() << "_" << myField->getOrderNumber() );
+	    }
+	    else
+	    {
+	      MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" which is not on all cells !");
+	    }
+	  }
         }
+      }
+      catch ( MED_EXCEPTION& e )
+      {
+	err_count++;
+	MESSAGE_MED(PREFIX_MED << "Could not write field "<<myField->getName()<<" : "<<e.what());
+      }
     }
   } // loop on meshes
 
+  if (err_count > 0)
+    throw MED_EXCEPTION( LOCALIZED( STRING(LOC) << "Some errors have been found during writing !" ) );
   END_OF_MED(LOC);
 }
 

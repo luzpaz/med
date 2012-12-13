@@ -93,9 +93,3 @@ unittest: $(UNIT_TEST_PROG)
 	        fi; \
 	    done; \
 	fi;
-
-# documentation
-html-local: $(DOX_INPUT_FILE)
-	@if test "x$(DOX_INPUT_FILE)" != "x"; then \
-	    doxygen $(DOX_INPUT_FILE);             \
-	fi;

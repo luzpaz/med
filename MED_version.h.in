@@ -31,8 +31,10 @@
   MED_VERSION is (major << 16) + (minor << 8) + patch.
 */
 
-#define MED_VERSION_STR "@VERSION@"
-#define MED_VERSION     @XVERSION@
-#define MED_DEVELOPMENT @VERSION_DEV@
+// MED_VERSION is reserved enum of MEDMEM,
+// thus we use alternative constant name for SALOME MED module
+#define SALOMEMED_VERSION_STR "@VERSION@"
+#define SALOMEMED_VERSION     @XVERSION@
+#define SALOMEMED_DEVELOPMENT @VERSION_DEV@
 
 #endif // __MED_VERSION_H__

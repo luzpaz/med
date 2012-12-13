@@ -62,7 +62,7 @@ extern "C" {
 
   /*! This function specifies the version of the module to be displayed in the about dialog box */
   MEDOPGUI_EXPORT char* getModuleVersion() {
-    return (char*)MED_VERSION_STR;
+    return (char*)SALOMEMED_VERSION_STR;
   }
 
 }

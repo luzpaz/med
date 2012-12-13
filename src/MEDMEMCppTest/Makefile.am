@@ -71,7 +71,9 @@ libMEDMEMCppTest_la_CPPFLAGS= @CPPUNIT_INCLUDES@ $(MED3_INCLUDES) $(HDF5_INCLUDE
 	-I$(srcdir)/../MEDMEM \
 	-I$(srcdir)/../INTERP_KERNEL \
 	-I$(srcdir)/../INTERP_KERNEL/Bases \
-	-I$(srcdir)/../INTERP_KERNEL/GaussPoints
+	-I$(srcdir)/../INTERP_KERNEL/GaussPoints \
+	-I$(srcdir)/../INTERP_KERNEL/Geometric2D
+
 libMEDMEMCppTest_la_LDFLAGS= $(MED3_LIBS_C_ONLY) @CPPUNIT_LIBS@ \
 	../MEDMEM/libmedmem.la
 
