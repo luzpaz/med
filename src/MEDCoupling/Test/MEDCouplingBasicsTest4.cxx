@@ -1898,6 +1898,7 @@ void MEDCouplingBasicsTest4::testDAIBuildOld2NewArrayFromSurjectiveFormat2()
   CPPUNIT_ASSERT_EQUAL(7,newNbTuple);
   CPPUNIT_ASSERT_EQUAL(1,ret->getNumberOfComponents());
   CPPUNIT_ASSERT(std::equal(expected,expected+10,ret->getConstPointer()));
+  CPPUNIT_ASSERT_THROW(DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2(9,a,b,newNbTuple),INTERP_KERNEL::Exception);
   ret->decrRef();
   b->decrRef();
   a->decrRef();
