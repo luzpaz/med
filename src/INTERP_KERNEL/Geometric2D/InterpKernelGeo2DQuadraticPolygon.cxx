@@ -1228,7 +1228,6 @@ void QuadraticPolygon::ComputeResidual(const QuadraticPolygon& pol1, const std::
           for(std::list<QuadraticPolygon *>::iterator it6=pol1ZipConsumed[*it1].begin();it6!=pol1ZipConsumed[*it1].end();it6++)
             delete *it6;
           delete *it1;
-          it1=retPolsUnderContruction.erase(it1);
         }
     }
 }
