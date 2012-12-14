@@ -6363,6 +6363,7 @@ namespace ParaMEDMEM
     TypeOfTimeDiscretization getTimeDiscretization() const throw(INTERP_KERNEL::Exception);
     double getIJ(int tupleId, int compoId) const throw(INTERP_KERNEL::Exception);
     double getIJK(int cellId, int nodeIdInCell, int compoId) const throw(INTERP_KERNEL::Exception);
+    void synchronizeTimeWithMesh() throw(INTERP_KERNEL::Exception);
     void setArray(DataArrayDouble *array) throw(INTERP_KERNEL::Exception);
     void setEndArray(DataArrayDouble *array) throw(INTERP_KERNEL::Exception);
     void setTime(double val, int iteration, int order) throw(INTERP_KERNEL::Exception);

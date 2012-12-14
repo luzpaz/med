@@ -398,8 +398,9 @@ MEDCouplingFieldDouble *MEDCouplingExtrudedMesh::getMeasureField(bool) const
   int nbOf1DCells=_mesh1D->getNumberOfCells();
   int nbOf3DCells=nbOf2DCells*nbOf1DCells;
   const int *renum=_mesh3D_ids->getConstPointer();
-  MEDCouplingFieldDouble *ret=MEDCouplingFieldDouble::New(ON_CELLS,NO_TIME);
+  MEDCouplingFieldDouble *ret=MEDCouplingFieldDouble::New(ON_CELLS,ONE_TIME);
   ret->setMesh(this);
+  ret->synchronizeTimeWithMesh();
   DataArrayDouble *da=DataArrayDouble::New();
   da->alloc(nbOf3DCells,1);
   double *retPtr=da->getPointer();

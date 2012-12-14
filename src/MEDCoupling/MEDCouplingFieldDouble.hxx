@@ -72,6 +72,7 @@ namespace ParaMEDMEM
     void setTimeValue(double val) throw(INTERP_KERNEL::Exception) { _time_discr->setTimeValue(val); }
     void setEndTimeValue(double val) throw(INTERP_KERNEL::Exception) { _time_discr->setEndTimeValue(val); }
     void setTime(double val, int iteration, int order) { _time_discr->setTime(val,iteration,order); }
+    void synchronizeTimeWithMesh() throw(INTERP_KERNEL::Exception);
     void setStartTime(double val, int iteration, int order) { _time_discr->setStartTime(val,iteration,order); }
     void setEndTime(double val, int iteration, int order) { _time_discr->setEndTime(val,iteration,order); }
     double getTime(int& iteration, int& order) const { return _time_discr->getTime(iteration,order); }

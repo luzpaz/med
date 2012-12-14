@@ -1086,6 +1086,21 @@ void MEDCouplingFieldDouble::setNature(NatureOfField nat) throw(INTERP_KERNEL::E
   _type->checkCompatibilityWithNature(nat);
 }
 
+/*!
+ * This method synchronizes time information (time, iteration, order, time unit) regarding the information in \c this->_mesh.
+ * \throw If no mesh is set in this. Or if \a this is not compatible with time setting (typically NO_TIME)
+ */
+void MEDCouplingFieldDouble::synchronizeTimeWithMesh() throw(INTERP_KERNEL::Exception)
+{
+  if(!_mesh)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::synchronizeTimeWithMesh : no mesh set in this !");
+  int it=-1,ordr=-1;
+  double val=_mesh->getTime(it,ordr);
+  std::string timeUnit(_mesh->getTimeUnit());
+  setTime(val,it,ordr);
+  setTimeUnit(timeUnit.c_str());
+}
+
 double MEDCouplingFieldDouble::getIJK(int cellId, int nodeIdInCell, int compoId) const
 {
   return _type->getIJK(_mesh,getArray(),cellId,nodeIdInCell,compoId);

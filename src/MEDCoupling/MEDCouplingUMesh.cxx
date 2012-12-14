@@ -3042,7 +3042,7 @@ MEDCouplingFieldDouble *MEDCouplingUMesh::getMeasureField(bool isAbs) const
   std::string name="MeasureOfMesh_";
   name+=getName();
   int nbelem=getNumberOfCells();
-  MEDCouplingFieldDouble *field=MEDCouplingFieldDouble::New(ON_CELLS);
+  MEDCouplingFieldDouble *field=MEDCouplingFieldDouble::New(ON_CELLS,ONE_TIME);
   field->setName(name.c_str());
   DataArrayDouble* array=DataArrayDouble::New();
   array->alloc(nbelem,1);
@@ -3050,6 +3050,7 @@ MEDCouplingFieldDouble *MEDCouplingUMesh::getMeasureField(bool isAbs) const
   field->setArray(array) ;
   array->decrRef();
   field->setMesh(const_cast<MEDCouplingUMesh *>(this));
+  field->synchronizeTimeWithMesh();
   if(getMeshDimension()!=-1)
     {
       int ipt;

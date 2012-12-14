@@ -952,7 +952,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         name=f3.getName();
         self.assertEqual(name,"MeasureOfMesh_");
         self.assertEqual(f3.getTypeOfField(),ON_CELLS);
-        self.assertEqual(f3.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f3.getTimeDiscretization(),ONE_TIME);
         self.assertEqual(1,f3.getNumberOfComponents());
         self.assertEqual(7,f3.getNumberOfTuples());
         values=[0.25,0.125,0.125,0.25,0.25,0.5,0.5]
@@ -7952,9 +7952,9 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         f1=m.getMeasureField(True)
         f1.getArray().setInfoOnComponent(0,"P [N/m^2]")
         bary=m.getBarycenterAndOwner()
-        f2=f1.buildNewTimeReprFromThis(ONE_TIME,False)
+        f2=f1.buildNewTimeReprFromThis(NO_TIME,False)
         f2.setArray(bary)
-        self.assertRaises(InterpKernelException,f2.copyTinyAttrFrom,f1)
+        self.assertRaises(InterpKernelException,f1.copyTinyAttrFrom,f2)
         pass
 
     def testDaDSetPartOfValuesAdv1(self):
