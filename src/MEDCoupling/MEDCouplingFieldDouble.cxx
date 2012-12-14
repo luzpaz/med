@@ -191,6 +191,12 @@ std::string MEDCouplingFieldDouble::advancedRepr() const
   return ret.str();
 }
 
+void MEDCouplingFieldDouble::writeVTK(const char *fileName) const throw(INTERP_KERNEL::Exception)
+{
+  std::vector<const MEDCouplingFieldDouble *> fs(1,this);
+  MEDCouplingFieldDouble::WriteVTK(fileName,fs);
+}
+
 bool MEDCouplingFieldDouble::isEqualIfNotWhy(const MEDCouplingField *other, double meshPrec, double valsPrec, std::string& reason) const throw(INTERP_KERNEL::Exception)
 {
   if(!other)

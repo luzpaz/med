@@ -41,6 +41,7 @@ namespace ParaMEDMEM
     void copyTinyAttrFrom(const MEDCouplingFieldDouble *other) throw(INTERP_KERNEL::Exception);
     std::string simpleRepr() const;
     std::string advancedRepr() const;
+    void writeVTK(const char *fileName) const throw(INTERP_KERNEL::Exception);
     bool isEqualIfNotWhy(const MEDCouplingField *other, double meshPrec, double valsPrec, std::string& reason) const throw(INTERP_KERNEL::Exception);
     bool isEqualWithoutConsideringStr(const MEDCouplingField *other, double meshPrec, double valsPrec) const;
     bool areCompatibleForMerge(const MEDCouplingField *other) const;

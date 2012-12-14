@@ -6355,6 +6355,7 @@ namespace ParaMEDMEM
     void copyTinyAttrFrom(const MEDCouplingFieldDouble *other) throw(INTERP_KERNEL::Exception);
     std::string simpleRepr() const;
     std::string advancedRepr() const;
+    void writeVTK(const char *fileName) const throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *clone(bool recDeepCpy) const;
     MEDCouplingFieldDouble *cloneWithMesh(bool recDeepCpy) const;
     MEDCouplingFieldDouble *deepCpy() const;
