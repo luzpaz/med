@@ -1925,7 +1925,7 @@ MEDCouplingFieldDouble *MEDFileFieldPerMesh::getFieldOnMeshAtLevel(TypeOfField t
           return finishField(type,glob,dads,locs,mesh,isPfl);
         }
       else
-        return finishField3(glob,dads,locs,mesh,notNullPflsPerGeoType3[0],isPfl);
+        return finishFieldNode2(glob,dads,locs,mesh,notNullPflsPerGeoType3[0],isPfl);
     }
 }
 
@@ -2117,15 +2117,14 @@ MEDCouplingFieldDouble *MEDFileFieldPerMesh::finishField2(TypeOfField type, cons
 /*!
  * This method is the complement of MEDFileFieldPerMesh::finishField2 method except that this method works for node profiles.
  */
-MEDCouplingFieldDouble *MEDFileFieldPerMesh::finishField3(const MEDFileFieldGlobsReal *glob,
-                                                          const std::vector<std::pair<int,int> >& dads, const std::vector<int>& locs,
-                                                          const MEDCouplingMesh *mesh, const DataArrayInt *da, bool& isPfl) const throw(INTERP_KERNEL::Exception)
+MEDCouplingFieldDouble *MEDFileFieldPerMesh::finishFieldNode2(const MEDFileFieldGlobsReal *glob,
+                                                              const std::vector<std::pair<int,int> >& dads, const std::vector<int>& locs,
+                                                              const MEDCouplingMesh *mesh, const DataArrayInt *da, bool& isPfl) const throw(INTERP_KERNEL::Exception)
 {
   if(da->isIdentity())
     {
       int nbOfTuples=da->getNumberOfTuples();
-      const std::vector<INTERP_KERNEL::NormalizedCellType> geoTypes2(1,INTERP_KERNEL::NORM_ERROR);
-      if(nbOfTuples==ComputeNbOfElems(glob,ON_NODES,geoTypes2,dads,locs))//No problem for NORM_ERROR because it is in context of node
+      if(nbOfTuples==mesh->getNumberOfNodes())//No problem for NORM_ERROR because it is in context of node
         return finishField(ON_NODES,glob,dads,locs,mesh,isPfl);
     }
   // Treatment of particular case where nodal field on pfl is requested with a meshDimRelToMax=1.
@@ -2167,7 +2166,7 @@ MEDCouplingFieldDouble *MEDFileFieldPerMesh::finishField3(const MEDFileFieldGlob
     }
   else
     {
-      std::ostringstream oss; oss << "MEDFileFieldPerMesh::finishField3 : The field on nodes lies on a node profile so that it is impossible to find a submesh having exactly the same nodes of that profile !!!";
+      std::ostringstream oss; oss << "MEDFileFieldPerMesh::finishFieldNode2 : The field on nodes lies on a node profile so that it is impossible to find a submesh having exactly the same nodes of that profile !!!";
       oss << "So it is impossible to return a well definied MEDCouplingFieldDouble instance on specified mesh on a specified meshDim !" << std::endl;
       oss << "To retrieve correctly such a field you have 3 possibilities :" << std::endl;
       oss << " - use an another meshDim compatible with the field on nodes (MED file does not have such information)" << std::endl;
@@ -3515,7 +3514,7 @@ MEDCouplingFieldDouble *MEDFileField1TSWithoutSDA::getFieldAtLevel(TypeOfField t
   if(mName==0)
     mm=MEDFileMesh::New(glob->getFileName(),getMeshName().c_str(),getMeshIteration(),getMeshOrder());
   else
-    mm=MEDFileMesh::New(glob->getFileName(),mName,-1,-1);
+    mm=MEDFileMesh::New(glob->getFileName(),mName,getMeshIteration(),getMeshOrder());
   return MEDFileField1TSWithoutSDA::getFieldOnMeshAtLevel(type,meshDimRelToMax,renumPol,glob,mm);
 }
 
@@ -3535,7 +3534,7 @@ MEDCouplingFieldDouble *MEDFileField1TSWithoutSDA::getFieldAtTopLevel(TypeOfFiel
   if(mName==0)
     mm=MEDFileMesh::New(glob->getFileName(),getMeshName().c_str(),getMeshIteration(),getMeshOrder());
   else
-    mm=MEDFileMesh::New(glob->getFileName(),mName,-1,-1);
+    mm=MEDFileMesh::New(glob->getFileName(),mName,getMeshIteration(),getMeshOrder());
   int absDim=getDimension();
   int meshDimRelToMax=absDim-mm->getMeshDimension();
   return MEDFileField1TSWithoutSDA::getFieldOnMeshAtLevel(type,meshDimRelToMax,renumPol,glob,mm);
