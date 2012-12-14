@@ -1364,7 +1364,7 @@ void MEDCouplingBasicsTest1::testMergeField1()
   std::string name=f3->getName();
   CPPUNIT_ASSERT(name=="MeasureOfMesh_");
   CPPUNIT_ASSERT(f3->getTypeOfField()==ON_CELLS);
-  CPPUNIT_ASSERT(f3->getTimeDiscretization()==NO_TIME);
+  CPPUNIT_ASSERT(f3->getTimeDiscretization()==ONE_TIME);
   CPPUNIT_ASSERT_EQUAL(1,f3->getNumberOfComponents());
   CPPUNIT_ASSERT_EQUAL(7,f3->getNumberOfTuples());
   double values[7]={0.25,0.125,0.125,0.25,0.25,0.5,0.5};

@@ -1712,3 +1712,64 @@ void MEDCouplingBasicsTest5::testDAICheckMonotonic1()
   CPPUNIT_ASSERT_THROW(d->checkMonotonic(false),INTERP_KERNEL::Exception);
   d->decrRef();
 }
+
+void MEDCouplingBasicsTest5::testIntersect2DMeshesTmp6()
+{
+  // coordinates
+  DataArrayDouble *coords=DataArrayDouble::New();
+  const double coordsData[16]={2.7554552980815448e-15,45,-45,5.5109105961630896e-15,-31.819805153394636,31.81980515339464,2.8779199779962799e-15,47,2.8166876380389124e-15,46,-47,5.7558399559925599e-15,-33.234018715767732,33.234018715767739,-46,5.6333752760778247e-15};
+  coords->useArray(coordsData,false,CPP_DEALLOC,8,2);
+  // connectivity
+  DataArrayInt *conn=DataArrayInt::New();
+  const int connData[9]={8,0,3,5,1,4,6,7,2};
+  conn->useArray(connData,false,CPP_DEALLOC,9,1);
+  DataArrayInt *connI=DataArrayInt::New();
+  const int connIData[2]={0,9};
+  connI->useArray(connIData,false,CPP_DEALLOC,2,1);
+  MEDCouplingUMesh *m1=MEDCouplingUMesh::New("Fixe",2);
+  m1->setCoords(coords);
+  m1->setConnectivity(conn,connI,true);
+  coords->decrRef(); conn->decrRef(); connI->decrRef();
+  //
+  coords=DataArrayDouble::New();
+  const double coordsData2[26]={-7.3800475508445391,41.854329503018846,-3.7041190667754655,42.338274668899189,-3.7041190667754655,45.338274668899189,-7.3800475508445382,44.854329503018839,-5.5473631693521845,42.136406608386956,-3.7041190667754655,43.838274668899189,-5.5420833088100014,45.09630208595901,-7.3800475508445382,43.354329503018839,-3.7041190667754651,52.338274668899189,-7.3800475508445382,51.854329503018839,-3.7041190667754655,48.838274668899189,-5.5420833088100014,52.09630208595901,-7.3800475508445382,48.354329503018839};
+  coords->useArray(coordsData2,false,CPP_DEALLOC,13,2);
+  // connectivity
+  conn=DataArrayInt::New();
+  const int connData2[18]={8,0,1,2,3,4,5,6,7,8,3,2,8,9,6,10,11,12};
+  conn->useArray(connData2,false,CPP_DEALLOC,18,1);
+  connI=DataArrayInt::New();
+  const int connIData2[3]={0,9,18};
+  connI->useArray(connIData2,false,CPP_DEALLOC,3,1);
+  //
+  MEDCouplingUMesh *m2=MEDCouplingUMesh::New("Mobile",2);
+  m2->setCoords(coords);
+  m2->setConnectivity(conn,connI,true);
+  coords->decrRef(); conn->decrRef(); connI->decrRef();
+  //
+  DataArrayInt *d1=0,*d2=0;
+  MEDCouplingUMesh *m3=MEDCouplingUMesh::Intersect2DMeshes(m1,m2,1e-10,d1,d2);
+  CPPUNIT_ASSERT_EQUAL(4,m3->getNumberOfCells());
+  CPPUNIT_ASSERT_EQUAL(4,d1->getNumberOfTuples());
+  CPPUNIT_ASSERT_EQUAL(4,d2->getNumberOfTuples());
+  CPPUNIT_ASSERT_EQUAL(43,m3->getNumberOfNodes());
+  bool areMerged=false;
+  int newNbOfNodes=-1;
+  m3->mergeNodes(1e-12,areMerged,newNbOfNodes)->decrRef();
+  CPPUNIT_ASSERT_EQUAL(35,m3->getNumberOfNodes());
+  m3->zipCoords();
+  CPPUNIT_ASSERT_EQUAL(23,m3->getNumberOfNodes());
+  //
+  MEDCouplingFieldDouble *f=m3->getMeasureField(true);
+  const double *vals=f->getArray()->getConstPointer();
+  const double valuesExpected[4]={1.6603638692585716,5.747555728471923,129.68907101754394,7.4162714498559694};
+  for(int i=0;i<4;i++)
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(valuesExpected[i],vals[i],1e-12);
+  f->decrRef();
+  //
+  m1->decrRef();
+  m2->decrRef();
+  m3->decrRef();
+  d1->decrRef();
+  d2->decrRef();
+}
