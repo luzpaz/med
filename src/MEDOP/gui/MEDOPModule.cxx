@@ -31,13 +31,8 @@
 #include "MEDOPFactoryClient.hxx"
 
 MEDOPModule::MEDOPModule() :
-  StandardApp_Module(),
-  LightApp_Module("MED")
+  StandardApp_Module()
 {
-  // Note that the explicit call to the constructor of LightApp_Module
-  // is needed because the class LightApp_Module does not have
-  // canonical constructor (with no arguments).
-
   // Note also that we can't use the getApp() function here because
   // the initialize(...) function has not been called yet.
 
