@@ -10471,6 +10471,42 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertRaises(InterpKernelException,arr.transformWithIndArr,d)
         pass
 
+    def testIntersect2DMeshesTmp6(self):
+        # coordinates
+        coords=DataArrayDouble.New([2.7554552980815448e-15,45,-45,5.5109105961630896e-15,-31.819805153394636,31.81980515339464,2.8779199779962799e-15,47,2.8166876380389124e-15,46,-47,5.7558399559925599e-15,-33.234018715767732,33.234018715767739,-46,5.6333752760778247e-15],8,2);
+        # connectivity
+        conn=DataArrayInt.New([8,0,3,5,1,4,6,7,2])
+        connI=DataArrayInt.New([0,9]);
+        m1=MEDCouplingUMesh.New("Fixe",2);
+        m1.setCoords(coords);
+        m1.setConnectivity(conn,connI,True);
+        #
+        coords=DataArrayDouble.New([-7.3800475508445391,41.854329503018846,-3.7041190667754655,42.338274668899189,-3.7041190667754655,45.338274668899189,-7.3800475508445382,44.854329503018839,-5.5473631693521845,42.136406608386956,-3.7041190667754655,43.838274668899189,-5.5420833088100014,45.09630208595901,-7.3800475508445382,43.354329503018839,-3.7041190667754651,52.338274668899189,-7.3800475508445382,51.854329503018839,-3.7041190667754655,48.838274668899189,-5.5420833088100014,52.09630208595901,-7.3800475508445382,48.354329503018839],13,2);
+        # connectivity
+        conn=DataArrayInt.New([8,0,1,2,3,4,5,6,7,8,3,2,8,9,6,10,11,12]);
+        connI=DataArrayInt.New([0,9,18]);
+        #
+        m2=MEDCouplingUMesh.New("Mobile",2);
+        m2.setCoords(coords);
+        m2.setConnectivity(conn,connI,True);
+        #
+        m3,d1,d2=MEDCouplingUMesh.Intersect2DMeshes(m1,m2,1e-10);
+        self.assertTrue(d1.isEqual(DataArrayInt([0,0,0,0])));
+        self.assertTrue(d2.isEqual(DataArrayInt([0,1,-1,-1])));
+        self.assertEqual(4,m3.getNumberOfCells());
+        self.assertEqual(4,d1.getNumberOfTuples());
+        self.assertEqual(4,d2.getNumberOfTuples());
+        self.assertEqual(43,m3.getNumberOfNodes());
+        dI,areMerged,newNbOfNodes=m3.mergeNodes(1e-12)
+        self.assertEqual(35,m3.getNumberOfNodes());
+        m3.zipCoords();
+        self.assertEqual(23,m3.getNumberOfNodes());
+        #
+        f=m3.getMeasureField(True);
+        valuesExpected=DataArrayDouble([1.6603638692585716,5.747555728471923,129.68907101754394,7.4162714498559694])
+        self.assertTrue(f.getArray().isEqual(valuesExpected,1e-12))
+        pass
+
     def setUp(self):
         pass
     pass
