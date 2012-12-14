@@ -1582,6 +1582,96 @@ class MEDLoaderTest(unittest.TestCase):
         f3_ter.renumberCells([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,17,18,16,19])
         self.assertTrue(f.isEqual(f3_ter,1e-12,1e-12))
         pass
+
+    # Testing profile on nodes when the profile is identity but not on all nodes.
+    def testMEDFieldPflOnNode1(self):
+        fname="Pyfile51.med"
+        coo=DataArrayDouble([0.,0.,0.5,0.,1.,0.,0.,0.5,0.5,0.5,1.,0.5,0.,1.,0.5,1.,1.,1.],9,2)
+        m0=MEDCouplingUMesh("Mesh",2)
+        m0.allocateCells(5)
+        m0.insertNextCell(NORM_TRI3,[1,4,2])
+        m0.insertNextCell(NORM_TRI3,[4,5,2])
+        m0.insertNextCell(NORM_QUAD4,[0,3,4,1])
+        m0.insertNextCell(NORM_QUAD4,[3,6,7,4])
+        m0.insertNextCell(NORM_QUAD4,[4,7,8,5])
+        m0.finishInsertingCells()
+        m0.setCoords(coo)
+        m1=MEDCouplingUMesh(m0.getName(),1)
+        m1.allocateCells(9)
+        conn1=[0,1,0,3,3,4,4,1,5,4,2,4,1,2,3,6,5,8]
+        for i in xrange(9):
+            m1.insertNextCell(NORM_SEG2,conn1[2*i:2*i+2])
+            pass
+        m1.finishInsertingCells()
+        m1.setCoords(coo)
+        #
+        m=MEDFileUMesh()
+        m.setMeshAtLevel(0,m0)
+        m.setMeshAtLevel(-1,m1)
+        #
+        dt=3 ; it=2 ; tim=4.5
+        fieldNode0=MEDCouplingFieldDouble(ON_NODES,ONE_TIME)
+        fieldNode0.setName("fieldNode0")
+        fieldNode0.setTime(tim,dt,it)
+        pfl0=DataArrayInt([0,1,2,3,4]) ; pfl0.setName("PflIdentity0") # important to keep like that
+        arr=DataArrayDouble([10,11,12,13,14])
+        fieldNode0.setArray(arr)
+        f0=MEDFileField1TS()
+        f0.setFieldProfile(fieldNode0,m,0,pfl0)
+        m.write(fname,2) ; f0.write(fname,0)
+        fieldNode1=MEDCouplingFieldDouble(ON_NODES,ONE_TIME)
+        fieldNode1.setName("fieldNode1")
+        fieldNode1.setTime(tim,dt,it)
+        pfl1=DataArrayInt([0,1,2,3,4,5,6]) ; pfl1.setName("PflIdentity1")
+        arr1=DataArrayDouble([20,21,22,23,24,25,26])
+        fieldNode1.setArray(arr1)
+        f1=MEDFileField1TS()
+        f1.setFieldProfile(fieldNode1,m,-1,pfl1)
+        f1.write(fname,0)
+        del m,f0,m0,m1,f1
+        ## Reading from file
+        m=MEDFileMesh.New(fname)
+        m0=m.getMeshAtLevel(0)
+        m00=m0.deepCpy() ; m00=m00[[0,2]] ; m00.setName(m.getName()) ; m00.zipCoords()
+        fieldNode0.setMesh(m00)
+        f0=MEDFileField1TS.New(fname,fieldNode0.getName(),dt,it)
+        ff0_1=f0.getFieldOnMeshAtLevel(ON_NODES,m0)
+        ff0_1.checkCoherency()
+        self.assertTrue(ff0_1.isEqual(fieldNode0,1e-12,1e-12))
+        ff0_2=f0.getFieldAtLevel(ON_NODES,0)
+        ff0_2.checkCoherency()
+        self.assertTrue(ff0_2.isEqual(fieldNode0,1e-12,1e-12))
+        ff0_3=f0.getFieldOnMeshAtLevel(ON_NODES,0,m)
+        ff0_3.checkCoherency()
+        self.assertTrue(ff0_3.isEqual(fieldNode0,1e-12,1e-12))
+        ff0_4=MEDLoader.ReadFieldNode(fname,m.getName(),0,fieldNode0.getName(),dt,it)
+        ff0_4.checkCoherency()
+        self.assertTrue(ff0_4.isEqual(fieldNode0,1e-12,1e-12))
+        f1=MEDFileField1TS.New(fname,fieldNode1.getName(),dt,it)
+        m1=m.getMeshAtLevel(-1)
+        m10=m1.deepCpy() ; m10=m10[[0,1,2,3,4,5,6,7]] ; m10.setName(m.getName()) ; m10.zipCoords()
+        fieldNode1.setMesh(m10)
+        ff1_1=f1.getFieldOnMeshAtLevel(ON_NODES,m1)
+        ff1_1.checkCoherency()
+        self.assertTrue(ff1_1.isEqual(fieldNode1,1e-12,1e-12))
+        ff1_2=f1.getFieldAtLevel(ON_NODES,-1)
+        ff1_2.checkCoherency()
+        self.assertTrue(ff1_2.isEqual(fieldNode1,1e-12,1e-12))
+        ff1_3=f1.getFieldOnMeshAtLevel(ON_NODES,-1,m)
+        ff1_3.checkCoherency()
+        self.assertTrue(ff1_3.isEqual(fieldNode1,1e-12,1e-12))
+        ff1_4=MEDLoader.ReadFieldNode(fname,m.getName(),-1,fieldNode1.getName(),dt,it)
+        ff1_4.checkCoherency()
+        self.assertTrue(ff1_4.getMesh().isEqual(m10,1e-12))
+        self.assertRaises(InterpKernelException,f1.getFieldOnMeshAtLevel,ON_NODES,m0) # error because impossible to build a sub mesh at level 0 lying on nodes [0,1,2,3,4,5,6]
+        self.assertRaises(InterpKernelException,f1.getFieldAtLevel,ON_NODES,0) # error because impossible to build a sub mesh at level 0 lying on nodes [0,1,2,3,4,5,6]
+        self.assertRaises(InterpKernelException,f1.getFieldOnMeshAtLevel,ON_NODES,0,m) # error because impossible to build a sub mesh at level 0 lying on nodes [0,1,2,3,4,5,6]
+        arr_r,pfl1_r=f1.getFieldWithProfile(ON_NODES,-1,m)
+        arr_r.setName(fieldNode1.getArray().getName())
+        self.assertTrue(arr_r.isEqual(fieldNode1.getArray(),1e-12))
+        pfl1_r.setName(pfl1.getName())
+        self.assertTrue(pfl1_r.isEqual(pfl1))
+        pass
     pass
 
 unittest.main()
