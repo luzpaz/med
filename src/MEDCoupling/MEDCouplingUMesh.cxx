@@ -1894,19 +1894,27 @@ DataArrayInt *MEDCouplingUMesh::getCellIdsFullyIncludedInNodeIds(const int *part
  */
 void MEDCouplingUMesh::fillCellIdsToKeepFromNodeIds(const int *begin, const int *end, bool fullyIn, std::vector<int>& cellIdsKept) const
 {
-  std::set<int> fastFinder(begin,end);
+  checkConnectivityFullyDefined();
+  int tmp=-1;
+  int sz=getNodalConnectivity()->getMaxValue(tmp); sz=std::max(sz,0)+1;
+  std::vector<bool> fastFinder(sz,false);
+  for(const int *work=begin;work!=end;work++)
+    if(*work>=0 && *work<sz)
+      fastFinder[*work]=true;
   int nbOfCells=getNumberOfCells();
   const int *conn=getNodalConnectivity()->getConstPointer();
   const int *connIndex=getNodalConnectivityIndex()->getConstPointer();
   for(int i=0;i<nbOfCells;i++)
     {
-      std::set<int> connOfCell(conn+connIndex[i]+1,conn+connIndex[i+1]);
-      connOfCell.erase(-1);//polyhedron separator
-      int refLgth=(int)connOfCell.size();
-      std::set<int> locMerge;
-      std::insert_iterator< std::set<int> > it(locMerge,locMerge.begin());
-      std::set_intersection(connOfCell.begin(),connOfCell.end(),fastFinder.begin(),fastFinder.end(),it);
-      if(((int)locMerge.size()==refLgth && fullyIn) || (locMerge.size()!=0 && !fullyIn))
+      int ref=0,nbOfHit=0;
+      for(const int *work2=conn+connIndex[i]+1;work2!=conn+connIndex[i+1];work2++)
+        if(*work2>=0)
+          {
+            ref++;
+            if(fastFinder[*work2])
+              nbOfHit++;
+          }
+      if((ref==nbOfHit && fullyIn) || (nbOfHit!=0 && !fullyIn))
         cellIdsKept.push_back(i);
     }
 }
