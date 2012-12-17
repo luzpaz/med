@@ -1261,7 +1261,7 @@ DataArrayDouble *DataArrayDouble::getDifferentValues(double prec, int limitTuple
   findCommonTuples(prec,limitTupleId,c0,cI0);
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> c(c0),cI(cI0);
   int newNbOfTuples=-1;
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> o2n=DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2(getNumberOfTuples(),c0,cI0,newNbOfTuples);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> o2n=DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2(getNumberOfTuples(),c0->begin(),cI0->begin(),cI0->end(),newNbOfTuples);
   return renumberAndReduce(o2n->getConstPointer(),newNbOfTuples);
 }
 
@@ -4202,22 +4202,22 @@ void DataArrayInt::changeSurjectiveFormat(int targetNb, DataArrayInt *&arr, Data
  *
  * @param nbOfOldTuples is the number of tuples in initial array.
  * @param arr is the list of tuples ids grouped by 'arrI' array
- * @param arrI is the entry point of 'arr' array. arrI->getNumberOfTuples()-1 is the number of common groups > 1 tuple.
+ * @param arrIBg is the entry point of 'arr' array. arrI->getNumberOfTuples()-1 is the number of common groups > 1 tuple.
+ * @param arrIEnd is the entry point of 'arr' array (end not included)
  * @param newNbOfTuples output parameter that retrieves the new number of tuples after surjection application
  */
-DataArrayInt *DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2(int nbOfOldTuples, const DataArrayInt *arr, const DataArrayInt *arrI, int &newNbOfTuples) throw(INTERP_KERNEL::Exception)
+DataArrayInt *DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2(int nbOfOldTuples, const int *arr, const int *arrIBg, const int *arrIEnd, int &newNbOfTuples) throw(INTERP_KERNEL::Exception)
 {
-  if(!arr || !arrI)
+  if(!arr || !arrIBg || !arrIEnd)
     throw INTERP_KERNEL::Exception("DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2 : presence of NULL ref of DataArrayInt in input !");
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
   ret->alloc(nbOfOldTuples,1);
   int *pt=ret->getPointer();
   std::fill(pt,pt+nbOfOldTuples,-1);
-  int nbOfGrps=arrI->getNumberOfTuples()-1;
-  const int *cIPtr=arrI->getConstPointer();
-  const int *cPtr=arr->getConstPointer();
+  int nbOfGrps=((int)std::distance(arrIBg,arrIEnd))-1;
+  const int *cIPtr=arrIBg;
   for(int i=0;i<nbOfGrps;i++)
-    pt[cPtr[cIPtr[i]]]=-(i+2);
+    pt[arr[cIPtr[i]]]=-(i+2);
   int newNb=0;
   for(int iNode=0;iNode<nbOfOldTuples;iNode++)
     {
@@ -4230,11 +4230,11 @@ DataArrayInt *DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2(int nbOfOldTu
               int grpId=-(pt[iNode]+2);
               for(int j=cIPtr[grpId];j<cIPtr[grpId+1];j++)
                 {
-                  if(cPtr[j]>=0 && cPtr[j]<nbOfOldTuples)
-                    pt[cPtr[j]]=newNb;
+                  if(arr[j]>=0 && arr[j]<nbOfOldTuples)
+                    pt[arr[j]]=newNb;
                   else
                     {
-                      std::ostringstream oss; oss << "DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2 : With element #" << j << " value is " << cPtr[j] << " should be in [0," << nbOfOldTuples << ") !";
+                      std::ostringstream oss; oss << "DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2 : With element #" << j << " value is " << arr[j] << " should be in [0," << nbOfOldTuples << ") !";
                       throw INTERP_KERNEL::Exception(oss.str().c_str());
                     }
                 }

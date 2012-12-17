@@ -1892,13 +1892,13 @@ void MEDCouplingBasicsTest4::testDAIBuildOld2NewArrayFromSurjectiveFormat2()
   b->alloc(3,1);
   std::copy(arrI,arrI+3,b->getPointer());
   int newNbTuple=-1;
-  DataArrayInt *ret=DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2(10,a,b,newNbTuple);
+  DataArrayInt *ret=DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2(10,a->begin(),b->begin(),b->end(),newNbTuple);
   const int expected[10]={0,1,2,0,3,4,5,4,6,4};
   CPPUNIT_ASSERT_EQUAL(10,ret->getNbOfElems());
   CPPUNIT_ASSERT_EQUAL(7,newNbTuple);
   CPPUNIT_ASSERT_EQUAL(1,ret->getNumberOfComponents());
   CPPUNIT_ASSERT(std::equal(expected,expected+10,ret->getConstPointer()));
-  CPPUNIT_ASSERT_THROW(DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2(9,a,b,newNbTuple),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT_THROW(DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2(9,a->begin(),b->begin(),b->end(),newNbTuple),INTERP_KERNEL::Exception);
   ret->decrRef();
   b->decrRef();
   a->decrRef();
