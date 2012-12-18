@@ -611,8 +611,7 @@ DataArrayInt *MEDFileUMeshSplitL1::getFamilyPartArr(const int *idsBg, const int 
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> da=_fam->getIdsEqualList(idsBg,idsEnd);
   if(renum)
     return renumIfNeededArr(da);
-  da->incrRef();
-  return da;
+  return da.retn();
 }
 
 MEDCouplingUMesh *MEDFileUMeshSplitL1::getWholeMesh(bool renum) const
@@ -622,8 +621,7 @@ MEDCouplingUMesh *MEDFileUMeshSplitL1::getWholeMesh(bool renum) const
     tmp=_m;
   else
     tmp=_m_by_types;
-  tmp->incrRef();
-  return tmp;
+  return tmp.retn();
 }
 
 const DataArrayInt *MEDFileUMeshSplitL1::getFamilyField() const

@@ -2084,8 +2084,7 @@ MEDCouplingFieldDouble *MEDFileFieldPerMesh::finishField(TypeOfField type, const
         }
     }
   //
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -2110,8 +2109,7 @@ MEDCouplingFieldDouble *MEDFileFieldPerMesh::finishField2(TypeOfField type, cons
   m2->setName(mesh->getName());
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=finishField(type,glob,dads,locs,m2,isPfl);
   isPfl=true;
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -2143,8 +2141,7 @@ MEDCouplingFieldDouble *MEDFileFieldPerMesh::finishFieldNode2(const MEDFileField
           meshuc->finishInsertingCells();
           ret->setMesh(meshuc);
           ret->checkCoherency();
-          ret->incrRef();
-          return ret;
+          return ret.retn();
         }
     }
   //
@@ -2161,8 +2158,7 @@ MEDCouplingFieldDouble *MEDFileFieldPerMesh::finishFieldNode2(const MEDFileField
       ret->getArray()->renumberInPlace(da3->getConstPointer());
       mesh2->setName(mesh->getName());
       ret->setMesh(mesh2);
-      ret->incrRef();
-      return ret;
+      return ret.retn();
     }
   else
     {
@@ -2200,8 +2196,7 @@ DataArrayDouble *MEDFileFieldPerMesh::finishField4(const std::vector<std::pair<i
   for(int i=0;i<nbOfComp;i++)
     da->setInfoOnComponent(i,infos[i].c_str());
   safePfl->incrRef();
-  da->incrRef();
-  return da;
+  return da.retn();
 }
 
 MEDFileFieldPerMesh::MEDFileFieldPerMesh(med_idt fid, MEDFileField1TSWithoutSDA *fath, int meshCsit, int meshIteration, int meshOrder) throw(INTERP_KERNEL::Exception):_mesh_iteration(meshIteration),_mesh_order(meshOrder),
@@ -3554,8 +3549,7 @@ MEDCouplingFieldDouble *MEDFileField1TSWithoutSDA::getFieldOnMeshAtLevel(TypeOfF
     case 0:
       {
         //no need to test _field_per_mesh.empty() because geMeshName has already done it
-        ret->incrRef();
-        return ret;
+        return ret.retn();
       }
     case 3:
     case 1:
@@ -3574,10 +3568,7 @@ MEDCouplingFieldDouble *MEDFileField1TSWithoutSDA::getFieldOnMeshAtLevel(TypeOfF
             ret->renumberCells(cellRenum->getConstPointer(),true);
           }
         if(renumPol==1)
-          {
-            ret->incrRef();
-            return ret;
-          }
+          return ret.retn();
       }
     case 2:
       {
@@ -3595,8 +3586,7 @@ MEDCouplingFieldDouble *MEDFileField1TSWithoutSDA::getFieldOnMeshAtLevel(TypeOfF
             MEDCouplingAutoRefCountObjectPtr<DataArrayInt> nodeRenumSafe=nodeRenum->checkAndPreparePermutation();
             ret->renumberNodes(nodeRenumSafe->getConstPointer());
           }
-        ret->incrRef();
-        return ret;
+        return ret.retn();
       }
     default:
       throw INTERP_KERNEL::Exception("MEDFileField1TSWithoutSDA::getFieldOnMeshAtLevel : unsupported renum policy ! Dealing with policy 0 1 2 and 3 !");
@@ -4837,8 +4827,7 @@ MEDFileField1TS *MEDFileFieldMultiTS::getTimeStepAtPos(int pos) const throw(INTE
   const MEDFileField1TSWithoutSDA *item=_content->getTimeStepAtPos2(pos);
   MEDCouplingAutoRefCountObjectPtr<MEDFileField1TS> ret=MEDFileField1TS::New(*item,false);
   ret->shallowCpyGlobs(*this);
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 MEDFileField1TS *MEDFileFieldMultiTS::getTimeStep(int iteration, int order) const throw(INTERP_KERNEL::Exception)
@@ -5481,8 +5470,7 @@ MEDFileFieldMultiTS *MEDFileFields::getFieldAtPos(int i) const throw(INTERP_KERN
   const MEDFileFieldMultiTSWithoutSDA *fmts=_fields[i];
   MEDCouplingAutoRefCountObjectPtr<MEDFileFieldMultiTS> ret=MEDFileFieldMultiTS::New(*fmts,false);
   ret->shallowCpyGlobs(*this);
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 MEDFileFieldMultiTS *MEDFileFields::getFieldWithName(const char *fieldName) const throw(INTERP_KERNEL::Exception)

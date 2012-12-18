@@ -58,15 +58,13 @@ MEDFileMesh *MEDFileMesh::New(const char *fileName) throw(INTERP_KERNEL::Excepti
       {
         MEDCouplingAutoRefCountObjectPtr<MEDFileUMesh> ret=MEDFileUMesh::New();
         ret->loadUMeshFromFile(fid,ms.front().c_str(),dt,it);
-        ret->incrRef();
-        return (MEDFileUMesh *)ret;
+        return (MEDFileUMesh *)ret.retn();
       }
     case CARTESIAN:
       {
         MEDCouplingAutoRefCountObjectPtr<MEDFileCMesh> ret=MEDFileCMesh::New();
         ret->loadCMeshFromFile(fid,ms.front().c_str(),dt,it);
-        ret->incrRef();
-        return (MEDFileCMesh *)ret;
+        return (MEDFileCMesh *)ret.retn();
       }
     default:
       {
@@ -90,15 +88,13 @@ MEDFileMesh *MEDFileMesh::New(const char *fileName, const char *mName, int dt, i
       {
         MEDCouplingAutoRefCountObjectPtr<MEDFileUMesh> ret=MEDFileUMesh::New();
         ret->loadUMeshFromFile(fid,mName,dt,it);
-        ret->incrRef();
-        return (MEDFileUMesh *)ret;
+        return (MEDFileUMesh *)ret.retn();
       }
     case CARTESIAN:
       {
         MEDCouplingAutoRefCountObjectPtr<MEDFileCMesh> ret=MEDFileCMesh::New();
         ret->loadCMeshFromFile(fid,mName,dt,it);
-        ret->incrRef();
-        return (MEDFileCMesh *)ret;
+        return (MEDFileCMesh *)ret.retn();
       }
     default:
       {
@@ -855,7 +851,7 @@ DataArrayInt *MEDFileMesh::getAllFamiliesIdsReferenced() const throw(INTERP_KERN
     v.insert((*it).second);
   ret->alloc((int)v.size(),1);
   std::copy(v.begin(),v.end(),ret->getPointer());
-  ret->incrRef(); return ret;
+  return ret.retn();
 }
 
 /*!
@@ -1832,8 +1828,7 @@ MEDCouplingUMesh *MEDFileUMesh::getFamilies(int meshDimRelToMaxExt, const std::v
       MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> ret=MEDCouplingUMesh::New();
       MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> c=_coords->selectByTupleId(arr->getConstPointer(),arr->getConstPointer()+arr->getNbOfElems());
       ret->setCoords(c);
-      ret->incrRef();
-      return ret;
+      return ret.retn();
     }
   std::vector<int> famIds=getFamiliesIds(fams);
   const MEDFileUMeshSplitL1 *l1=getMeshAtLevSafe(meshDimRelToMaxExt);
@@ -1858,10 +1853,7 @@ DataArrayInt *MEDFileUMesh::getFamiliesArr(int meshDimRelToMaxExt, const std::ve
           if(renum)
             return MEDFileUMeshSplitL1::Renumber(_num_coords,da);
           else
-            {
-              da->incrRef();
-              return da;
-            }
+            return da.retn();
         }
       else
         throw INTERP_KERNEL::Exception("MEDFileUMesh::getFamiliesArr : no family array specified on nodes !");
@@ -2110,9 +2102,9 @@ void MEDFileUMesh::duplicateNodesOnM1Group(const char *grpNameM1, DataArrayInt *
       newFam->setPartOfValuesSimple1(0,nbNodes,newNbOfNodes,1,0,1,1);
       _fam_coords=newFam;
     }
-  nodesDuplicated=nodeIdsToDuplicate; nodeIdsToDuplicate->incrRef();
-  cellsModified=cellsToModifyConn0; cellsToModifyConn0->incrRef();
-  cellsNotModified=cellsToModifyConn1; cellsToModifyConn1->incrRef();
+  nodesDuplicated=nodeIdsToDuplicate.retn();
+  cellsModified=cellsToModifyConn0.retn();
+  cellsNotModified=cellsToModifyConn1.retn();
 }
 
 /*!
@@ -2180,7 +2172,7 @@ bool MEDFileUMesh::unPolyze(std::vector<int>& oldCode, std::vector<int>& newCode
     {
       MEDCouplingAutoRefCountObjectPtr<DataArrayInt> renumCells=DataArrayInt::Aggregate(renumCellsSplited);
       MEDCouplingAutoRefCountObjectPtr<DataArrayInt> o2nRenumCellRet=renumCells->buildPermArrPerLevel();
-      o2nRenumCell=o2nRenumCellRet; o2nRenumCellRet->incrRef();
+      o2nRenumCell=o2nRenumCellRet.retn();
     }
   return ret;
 }
@@ -2803,10 +2795,7 @@ DataArrayInt *MEDFileCMesh::getFamiliesArr(int meshDimRelToMaxExt, const std::ve
           if(renum)
             return MEDFileUMeshSplitL1::Renumber(_num_nodes,da);
           else
-            {
-              da->incrRef();
-              return da;
-            }
+            return da.retn();
         }
       else
         throw INTERP_KERNEL::Exception("MEDFileCMesh::getFamiliesArr : no family array specified on nodes !");
@@ -2823,10 +2812,7 @@ DataArrayInt *MEDFileCMesh::getFamiliesArr(int meshDimRelToMaxExt, const std::ve
           if(renum)
             return MEDFileUMeshSplitL1::Renumber(_num_cells,da);
           else
-            {
-              da->incrRef();
-              return da;
-            }
+            return da.retn();
         }
       else
         throw INTERP_KERNEL::Exception("MEDFileCMesh::getFamiliesArr : no family array specified on cells !");
