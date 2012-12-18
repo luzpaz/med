@@ -117,8 +117,8 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT std::string getUnitOnComponent(int i) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void setInfoOnComponent(int i, const char *info) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT int getNumberOfComponents() const { return (int)_info_on_compo.size(); }
-    MEDCOUPLING_EXPORT int getNumberOfTuples() const { return _nb_of_tuples; }
-    MEDCOUPLING_EXPORT int getNbOfElems() const { return ((int)_info_on_compo.size())*_nb_of_tuples; }
+    MEDCOUPLING_EXPORT virtual int getNumberOfTuples() const = 0;
+    MEDCOUPLING_EXPORT int getNbOfElems() const { return ((int)_info_on_compo.size())*getNumberOfTuples(); }
     MEDCOUPLING_EXPORT void checkNbOfTuples(int nbOfTuples, const char *msg) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void checkNbOfComps(int nbOfCompo, const char *msg) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void checkNbOfTuplesAndComp(const DataArray& other, const char *msg) const throw(INTERP_KERNEL::Exception);
@@ -131,13 +131,12 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT static std::string GetUnitFromInfo(const std::string& info) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT virtual void reprCppStream(const char *varName, std::ostream& stream) const = 0;
   protected:
-    DataArray():_nb_of_tuples(-1) { }
+    DataArray() { }
   protected:
     static void CheckValueInRange(int ref, int value, const char *msg) throw(INTERP_KERNEL::Exception);
     static void CheckValueInRangeEx(int value, int start, int end, const char *msg) throw(INTERP_KERNEL::Exception);
     static void CheckClosingParInRange(int ref, int value, const char *msg) throw(INTERP_KERNEL::Exception);
   protected:
-    int _nb_of_tuples;
     std::string _name;
     std::vector<std::string> _info_on_compo;
   };
@@ -155,6 +154,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT static DataArrayDouble *New();
     MEDCOUPLING_EXPORT bool isAllocated() const;
     MEDCOUPLING_EXPORT void checkAllocated() const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT int getNumberOfTuples() const { return _info_on_compo.empty()?0:_mem.getNbOfElem()/getNumberOfComponents(); }
     MEDCOUPLING_EXPORT void setInfoAndChangeNbOfCompo(const std::vector<std::string>& info) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT double doubleValue() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT bool empty() const throw(INTERP_KERNEL::Exception);
@@ -353,6 +353,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT static DataArrayInt *New();
     MEDCOUPLING_EXPORT bool isAllocated() const;
     MEDCOUPLING_EXPORT void checkAllocated() const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT int getNumberOfTuples() const { return _info_on_compo.empty()?0:_mem.getNbOfElem()/getNumberOfComponents(); }
     MEDCOUPLING_EXPORT void setInfoAndChangeNbOfCompo(const std::vector<std::string>& info) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT int intValue() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT int getHashCode() const throw(INTERP_KERNEL::Exception);
@@ -489,7 +490,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT std::vector<DataArrayInt *> partitionByDifferentValues(std::vector<int>& differentIds) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void useArray(const int *array, bool ownership, DeallocType type, int nbOfTuple, int nbOfCompo);
     MEDCOUPLING_EXPORT void useExternalArrayWithRWAccess(const int *array, int nbOfTuple, int nbOfCompo);
-    MEDCOUPLING_EXPORT void writeOnPlace(int id, int element0, const int *others, int sizeOfOthers) { _nb_of_tuples=std::max<int>(_nb_of_tuples,id+sizeOfOthers+1); _mem.writeOnPlace(id,element0,others,sizeOfOthers); }
+    MEDCOUPLING_EXPORT void writeOnPlace(int id, int element0, const int *others, int sizeOfOthers) { _mem.writeOnPlace(id,element0,others,sizeOfOthers); }
     MEDCOUPLING_EXPORT static DataArrayInt *Add(const DataArrayInt *a1, const DataArrayInt *a2) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void addEqual(const DataArrayInt *other) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static DataArrayInt *Substract(const DataArrayInt *a1, const DataArrayInt *a2) throw(INTERP_KERNEL::Exception);

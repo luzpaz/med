@@ -130,12 +130,6 @@ void DataArray::copyPartOfStringInfoFrom2(const std::vector<int>& compoIds, cons
 bool DataArray::areInfoEqualsIfNotWhy(const DataArray& other, std::string& reason) const
 {
   std::ostringstream oss;
-  if(_nb_of_tuples!=other._nb_of_tuples)
-    {
-      oss << "Number of tuples of DataArray mismatch : this number of tuples=" << _nb_of_tuples << " other number of tuples=" << other._nb_of_tuples;
-      reason=oss.str();
-      return false;
-    }
   if(_name!=other._name)
     {
       oss << "Names DataArray mismatch : this name=\"" << _name << " other name=\"" << other._name << "\" !";
@@ -553,10 +547,6 @@ void DataArrayDouble::reserve(int nbOfElems) throw(INTERP_KERNEL::Exception)
   else if(nbCompo==0)
     {
       _mem.reserve(nbOfElems);
-      if(_nb_of_tuples==-1)
-        _nb_of_tuples=0;
-      else
-        _nb_of_tuples=std::min<int>(_nb_of_tuples,nbOfElems);
       _info_on_compo.resize(1);
     }
   else
@@ -566,10 +556,7 @@ void DataArrayDouble::reserve(int nbOfElems) throw(INTERP_KERNEL::Exception)
 void DataArrayDouble::pushBackSilent(double val) throw(INTERP_KERNEL::Exception)
 {
   if(getNumberOfComponents()==1)
-    {
-      _mem.pushBack(val);
-      _nb_of_tuples++;
-    }
+    _mem.pushBack(val);
   else
     throw INTERP_KERNEL::Exception("DataArrayDouble::pushBackSilent : not available for DataArrayDouble with number of components different than 1 !");
 }
@@ -577,11 +564,7 @@ void DataArrayDouble::pushBackSilent(double val) throw(INTERP_KERNEL::Exception)
 double DataArrayDouble::popBackSilent() throw(INTERP_KERNEL::Exception)
 {
   if(getNumberOfComponents()==1)
-    {
-      double ret=_mem.popBack();
-      _nb_of_tuples--;
-      return ret;
-    }
+    return _mem.popBack();
   else
     throw INTERP_KERNEL::Exception("DataArrayDouble::pushBackSilent : not available for DataArrayDouble with number of components different than 1 !");
 }
@@ -606,9 +589,8 @@ void DataArrayDouble::alloc(int nbOfTuple, int nbOfCompo) throw(INTERP_KERNEL::E
 {
   if(nbOfTuple<0 || nbOfCompo<0)
     throw INTERP_KERNEL::Exception("DataArrayDouble::alloc : request for negative length of data !");
-  _nb_of_tuples=nbOfTuple;
   _info_on_compo.resize(nbOfCompo);
-  _mem.alloc(nbOfCompo*_nb_of_tuples);
+  _mem.alloc(nbOfCompo*nbOfTuple);
   declareAsNew();
 }
 
@@ -813,8 +795,7 @@ bool DataArrayDouble::isEqualWithoutConsideringStr(const DataArrayDouble& other,
 void DataArrayDouble::reAlloc(int nbOfTuples) throw(INTERP_KERNEL::Exception)
 {
   checkAllocated();
-  _mem.reAlloc((int)(_info_on_compo.size())*nbOfTuples);
-  _nb_of_tuples=nbOfTuples;
+  _mem.reAlloc(getNumberOfComponents()*nbOfTuples);
   declareAsNew();
 }
 
@@ -1140,7 +1121,6 @@ void DataArrayDouble::rearrange(int newNbOfCompo) throw(INTERP_KERNEL::Exception
   int nbOfElems=getNbOfElems();
   if(nbOfElems%newNbOfCompo!=0)
     throw INTERP_KERNEL::Exception("DataArrayDouble::rearrange : nbOfElems%newNbOfCompo!=0 !");
-  _nb_of_tuples=nbOfElems/newNbOfCompo;
   _info_on_compo.clear();
   _info_on_compo.resize(newNbOfCompo);
   declareAsNew();
@@ -1680,7 +1660,6 @@ void DataArrayDouble::SetArrayIn(DataArrayDouble *newArray, DataArrayDouble* &ar
 
 void DataArrayDouble::useArray(const double *array, bool ownership, DeallocType type, int nbOfTuple, int nbOfCompo)
 {
-  _nb_of_tuples=nbOfTuple;
   _info_on_compo.resize(nbOfCompo);
   _mem.useArray(array,ownership,type,nbOfTuple*nbOfCompo);
   declareAsNew();
@@ -1688,7 +1667,6 @@ void DataArrayDouble::useArray(const double *array, bool ownership, DeallocType 
 
 void DataArrayDouble::useExternalArrayWithRWAccess(const double *array, int nbOfTuple, int nbOfCompo)
 {
-  _nb_of_tuples=nbOfTuple;
   _info_on_compo.resize(nbOfCompo);
   _mem.useExternalArrayWithRWAccess(array,nbOfTuple*nbOfCompo);
   declareAsNew();
@@ -3524,10 +3502,6 @@ void DataArrayInt::reserve(int nbOfElems) throw(INTERP_KERNEL::Exception)
   else if(nbCompo==0)
     {
       _mem.reserve(nbOfElems);
-      if(_nb_of_tuples==-1)
-        _nb_of_tuples=0;
-      else
-        _nb_of_tuples=std::min<int>(_nb_of_tuples,nbOfElems);
       _info_on_compo.resize(1);
     }
   else
@@ -3537,10 +3511,7 @@ void DataArrayInt::reserve(int nbOfElems) throw(INTERP_KERNEL::Exception)
 void DataArrayInt::pushBackSilent(int val) throw(INTERP_KERNEL::Exception)
 {
   if(getNumberOfComponents()==1)
-    {
-      _mem.pushBack(val);
-      _nb_of_tuples++;
-    }
+    _mem.pushBack(val);
   else
     throw INTERP_KERNEL::Exception("DataArrayInt::pushBackSilent : not available for DataArrayInt with number of components different than 1 !");
 }
@@ -3548,11 +3519,7 @@ void DataArrayInt::pushBackSilent(int val) throw(INTERP_KERNEL::Exception)
 int DataArrayInt::popBackSilent() throw(INTERP_KERNEL::Exception)
 {
   if(getNumberOfComponents()==1)
-    {
-      int ret=_mem.popBack();
-      _nb_of_tuples--;
-      return ret;
-    }
+    return _mem.popBack();
   else
     throw INTERP_KERNEL::Exception("DataArrayInt::pushBackSilent : not available for DataArrayInt with number of components different than 1 !");
 }
@@ -3577,9 +3544,8 @@ void DataArrayInt::alloc(int nbOfTuple, int nbOfCompo) throw(INTERP_KERNEL::Exce
 {
   if(nbOfTuple<0 || nbOfCompo<0)
     throw INTERP_KERNEL::Exception("DataArrayInt::alloc : request for negative length of data !");
-  _nb_of_tuples=nbOfTuple;
   _info_on_compo.resize(nbOfCompo);
-  _mem.alloc(nbOfCompo*_nb_of_tuples);
+  _mem.alloc(nbOfCompo*nbOfTuple);
   declareAsNew();
 }
 
@@ -3958,7 +3924,6 @@ DataArrayInt *DataArrayInt::buildPermutationArr(const DataArrayInt& other) const
 
 void DataArrayInt::useArray(const int *array, bool ownership,  DeallocType type, int nbOfTuple, int nbOfCompo)
 {
-  _nb_of_tuples=nbOfTuple;
   _info_on_compo.resize(nbOfCompo);
   _mem.useArray(array,ownership,type,nbOfTuple*nbOfCompo);
   declareAsNew();
@@ -3966,7 +3931,6 @@ void DataArrayInt::useArray(const int *array, bool ownership,  DeallocType type,
 
 void DataArrayInt::useExternalArrayWithRWAccess(const int *array, int nbOfTuple, int nbOfCompo)
 {
-  _nb_of_tuples=nbOfTuple;
   _info_on_compo.resize(nbOfCompo);
   _mem.useExternalArrayWithRWAccess(array,nbOfTuple*nbOfCompo);
   declareAsNew();
@@ -4454,7 +4418,6 @@ void DataArrayInt::rearrange(int newNbOfCompo) throw(INTERP_KERNEL::Exception)
   int nbOfElems=getNbOfElems();
   if(nbOfElems%newNbOfCompo!=0)
     throw INTERP_KERNEL::Exception("DataArrayInt::rearrange : nbOfElems%newNbOfCompo!=0 !");
-  _nb_of_tuples=nbOfElems/newNbOfCompo;
   _info_on_compo.clear();
   _info_on_compo.resize(newNbOfCompo);
   declareAsNew();
@@ -4505,8 +4468,7 @@ DataArrayInt *DataArrayInt::changeNbOfComponents(int newNbOfComp, int dftValue) 
 void DataArrayInt::reAlloc(int nbOfTuples) throw(INTERP_KERNEL::Exception)
 {
   checkAllocated();
-  _mem.reAlloc((int)_info_on_compo.size()*nbOfTuples);
-  _nb_of_tuples=nbOfTuples;
+  _mem.reAlloc(getNumberOfComponents()*nbOfTuples);
   declareAsNew();
 }
 
