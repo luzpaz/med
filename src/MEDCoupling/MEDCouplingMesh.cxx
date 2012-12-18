@@ -235,8 +235,7 @@ MEDCouplingFieldDouble *MEDCouplingMesh::fillFromAnalytic(TypeOfField t, int nbO
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(t,NO_TIME);
   ret->setMesh(this);
   ret->fillFromAnalytic(nbOfComp,func);
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -295,8 +294,7 @@ MEDCouplingFieldDouble *MEDCouplingMesh::fillFromAnalytic(TypeOfField t, int nbO
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(t,NO_TIME);
   ret->setMesh(this);
   ret->fillFromAnalytic(nbOfComp,func);
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -315,8 +313,7 @@ MEDCouplingFieldDouble *MEDCouplingMesh::fillFromAnalytic2(TypeOfField t, int nb
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(t,NO_TIME);
   ret->setMesh(this);
   ret->fillFromAnalytic2(nbOfComp,func);
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -335,8 +332,7 @@ MEDCouplingFieldDouble *MEDCouplingMesh::fillFromAnalytic3(TypeOfField t, int nb
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(t,NO_TIME);
   ret->setMesh(this);
   ret->fillFromAnalytic3(nbOfComp,varsOrder,func);
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!

@@ -1383,7 +1383,7 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::extractSlice3D(const double *ori
         }
     }
   ret->setArrays(newArr);
-  ret->incrRef(); return ret;
+  return ret.retn();
 }
 
 /*!

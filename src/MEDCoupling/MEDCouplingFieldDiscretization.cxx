@@ -488,8 +488,7 @@ DataArrayDouble *MEDCouplingFieldDiscretizationP0::getValueOnMulti(const DataArr
         oss << ") detected outside mesh : unable to apply P0::getValueOnMulti ! ";
         throw INTERP_KERNEL::Exception(oss.str().c_str());
       }
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -522,7 +521,7 @@ DataArrayInt *MEDCouplingFieldDiscretizationP0::computeTupleIdsToSelectFromCellI
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
   ret->alloc((int)std::distance(startCellIds,endCellIds),1);
   std::copy(startCellIds,endCellIds,ret->getPointer());
-  ret->incrRef(); return ret;
+  return ret.retn();
 }
 
 /*!
@@ -747,8 +746,7 @@ DataArrayDouble *MEDCouplingFieldDiscretizationP1::getValueOnMulti(const DataArr
         oss << ") detected outside mesh : unable to apply P1::getValueOnMulti ! ";
         throw INTERP_KERNEL::Exception(oss.str().c_str());
       }
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 MEDCouplingFieldDiscretizationPerCell::MEDCouplingFieldDiscretizationPerCell():_discr_per_cell(0)
@@ -992,8 +990,7 @@ DataArrayInt *MEDCouplingFieldDiscretizationGauss::getOffsetArr(const MEDCouplin
           throw INTERP_KERNEL::Exception(oss.str().c_str());
         }
     }
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 void MEDCouplingFieldDiscretizationGauss::renumberArraysForCell(const MEDCouplingMesh *mesh, const std::vector<DataArrayDouble *>& arrays,
@@ -1407,8 +1404,7 @@ DataArrayInt *MEDCouplingFieldDiscretizationGauss::buildNbOfGaussPointPerCellFie
       valsToFill[i]=_loc[*w].getNumberOfGaussPt();
     else
       throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationGauss::buildNbOfGaussPointPerCellField : orphan cell detected !");
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -1745,8 +1741,7 @@ DataArrayDouble *MEDCouplingFieldDiscretizationKriging::getValueOnMulti(const Da
   MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::New();
   ret->alloc(nbOfTargetPoints,nbOfCompo);
   INTERP_KERNEL::matrixProduct(KnewiK->getConstPointer(),1,nbOfPts+delta,matrix3->getConstPointer(),nbOfPts+delta,nbOfTargetPoints*nbOfCompo,ret->getPointer());
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -1779,8 +1774,7 @@ DataArrayDouble *MEDCouplingFieldDiscretizationKriging::computeVectorOfCoefficie
   double *work=std::copy(arr->begin(),arr->end(),arr2->getPointer());
   std::fill(work,work+isDrift,0.);
   INTERP_KERNEL::matrixProduct(matrixInv->getConstPointer(),nbOfPts+isDrift,nbOfPts+isDrift,arr2->getConstPointer(),nbOfPts+isDrift,1,KnewiK->getPointer());
-  KnewiK->incrRef();
-  return KnewiK;
+  return KnewiK.retn();
 }
 
 /*!
@@ -1850,7 +1844,6 @@ DataArrayDouble *MEDCouplingFieldDiscretizationKriging::performDrift(const DataA
       destWork+=spaceDimension;
     }
   //
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 

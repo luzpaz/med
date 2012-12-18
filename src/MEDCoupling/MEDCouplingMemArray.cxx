@@ -936,8 +936,7 @@ DataArrayDouble *DataArrayDouble::selectByTupleIdSafe(const int *new2OldBg, cons
     else
       throw INTERP_KERNEL::Exception("DataArrayInt::selectByTupleIdSafe : some ids has been detected to be out of [0,this->getNumberOfTuples) !");
   ret->copyStringInfoFrom(*this);
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -959,8 +958,7 @@ DataArrayDouble *DataArrayDouble::selectByTupleId2(int bg, int end2, int step) c
   for(int i=0;i<newNbOfTuples;i++,srcPt+=step*nbComp)
     std::copy(srcPt,srcPt+nbComp,pt+i*nbComp);
   ret->copyStringInfoFrom(*this);
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -1017,8 +1015,7 @@ DataArrayDouble *DataArrayDouble::selectByTupleRanges(const std::vector<std::pai
   double *work=ret->getPointer();
   for(std::vector<std::pair<int,int> >::const_iterator it=ranges.begin();it!=ranges.end();it++)
     work=std::copy(src+(*it).first*nbOfComp,src+(*it).second*nbOfComp,work);
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -1133,8 +1130,7 @@ DataArrayDouble *DataArrayDouble::keepSelectedComponents(const std::vector<int>&
   for(int i=0;i<nbOfTuples;i++)
     for(std::size_t j=0;j<newNbOfCompo;j++,nc++)
       *nc=oldc[i*oldNbOfCompo+compoIds[j]];
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -1242,8 +1238,7 @@ DataArrayDouble *DataArrayDouble::duplicateEachTupleNTimes(int nbTimes) const th
         *retPtr=val;
     }
   ret->copyStringInfoFrom(*this);
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -1721,8 +1716,7 @@ DataArrayDouble *DataArrayDouble::computeBBoxPerTuple(double epsilon)const throw
           bboxPtr[2*nbOfCompo*i+2*j+1]=dataPtr[nbOfCompo*i+j]+epsilon;
         }
     }
-  bbox->incrRef();
-  return bbox;
+  return bbox.retn();
 }
 
 /*!
@@ -2228,8 +2222,7 @@ DataArrayDouble *DataArrayDouble::buildEuclidianDistanceDenseMatrix() const thro
           outData[j*nbOfTuples+i]=dist;
         }
     }
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -2279,8 +2272,7 @@ DataArrayDouble *DataArrayDouble::buildEuclidianDistanceDenseMatrixWith(const Da
           outData[i*nbOfTuples+j]=dist;
         }
     }
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 void DataArrayDouble::sortPerTuple(bool asc) throw(INTERP_KERNEL::Exception)
@@ -2862,8 +2854,7 @@ DataArrayDouble *DataArrayDouble::Add(const DataArrayDouble *a1, const DataArray
     }
   else
     throw INTERP_KERNEL::Exception("Nb of tuples mismatch for array Add !");
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 void DataArrayDouble::addEqual(const DataArrayDouble *other) throw(INTERP_KERNEL::Exception)
@@ -2924,8 +2915,7 @@ DataArrayDouble *DataArrayDouble::Substract(const DataArrayDouble *a1, const Dat
           ret->alloc(nbOfTuple2,nbOfComp1);
           std::transform(a1->begin(),a1->end(),a2->begin(),ret->getPointer(),std::minus<double>());
           ret->copyStringInfoFrom(*a1);
-          ret->incrRef();
-          return ret;
+          return ret.retn();
         }
       else if(nbOfComp2==1)
         {
@@ -2937,8 +2927,7 @@ DataArrayDouble *DataArrayDouble::Substract(const DataArrayDouble *a1, const Dat
           for(int i=0;i<nbOfTuple1;i++)
             res=std::transform(a1Ptr+i*nbOfComp1,a1Ptr+(i+1)*nbOfComp1,res,std::bind2nd(std::minus<double>(),a2Ptr[i]));
           ret->copyStringInfoFrom(*a1);
-          ret->incrRef();
-          return ret;
+          return ret.retn();
         }
       else
         {
@@ -2956,8 +2945,7 @@ DataArrayDouble *DataArrayDouble::Substract(const DataArrayDouble *a1, const Dat
       for(int i=0;i<nbOfTuple1;i++)
         pt=std::transform(a1ptr+i*nbOfComp1,a1ptr+(i+1)*nbOfComp1,a2ptr,pt,std::minus<double>());
       ret->copyStringInfoFrom(*a1);
-      ret->incrRef();
-      return ret;
+      return ret.retn();
     }
   else
     {
@@ -3075,8 +3063,7 @@ DataArrayDouble *DataArrayDouble::Multiply(const DataArrayDouble *a1, const Data
     }
   else
     throw INTERP_KERNEL::Exception("Nb of tuples mismatch for array Multiply !");
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 void DataArrayDouble::multiplyEqual(const DataArrayDouble *other) throw(INTERP_KERNEL::Exception)
@@ -3137,8 +3124,7 @@ DataArrayDouble *DataArrayDouble::Divide(const DataArrayDouble *a1, const DataAr
           ret->alloc(nbOfTuple2,nbOfComp1);
           std::transform(a1->begin(),a1->end(),a2->begin(),ret->getPointer(),std::divides<double>());
           ret->copyStringInfoFrom(*a1);
-          ret->incrRef();
-          return ret;
+          return ret.retn();
         }
       else if(nbOfComp2==1)
         {
@@ -3150,8 +3136,7 @@ DataArrayDouble *DataArrayDouble::Divide(const DataArrayDouble *a1, const DataAr
           for(int i=0;i<nbOfTuple1;i++)
             res=std::transform(a1Ptr+i*nbOfComp1,a1Ptr+(i+1)*nbOfComp1,res,std::bind2nd(std::divides<double>(),a2Ptr[i]));
           ret->copyStringInfoFrom(*a1);
-          ret->incrRef();
-          return ret;
+          return ret.retn();
         }
       else
         {
@@ -3169,8 +3154,7 @@ DataArrayDouble *DataArrayDouble::Divide(const DataArrayDouble *a1, const DataAr
       for(int i=0;i<nbOfTuple1;i++)
         pt=std::transform(a1ptr+i*nbOfComp1,a1ptr+(i+1)*nbOfComp1,a2ptr,pt,std::divides<double>());
       ret->copyStringInfoFrom(*a1);
-      ret->incrRef();
-      return ret;
+      return ret.retn();
     }
   else
     {
@@ -3678,12 +3662,9 @@ void DataArrayInt::splitByValueRange(const int *arrBg, const int *arrEnd,
     }
   ret3->alloc((int)castsDetected.size(),1);
   std::copy(castsDetected.begin(),castsDetected.end(),ret3->getPointer());
-  ret1->incrRef();
-  castArr=ret1;
-  ret2->incrRef();
-  rankInsideCast=ret2;
-  ret3->incrRef();
-  castsPresent=ret3;
+  castArr=ret1.retn();
+  rankInsideCast=ret2.retn();
+  castsPresent=ret3.retn();
 }
 
 /*!
@@ -3716,8 +3697,7 @@ DataArrayInt *DataArrayInt::transformWithIndArrR(const int *indArrBg, const int 
           throw INTERP_KERNEL::Exception(oss.str().c_str());
         }
     }
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -3877,8 +3857,7 @@ DataArrayInt *DataArrayInt::buildPermutationArr(const DataArrayInt& other) const
         }
       retToFill[i]=(*it).second;
     }
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 void DataArrayInt::useArray(const int *array, bool ownership,  DeallocType type, int nbOfTuple, int nbOfCompo)
@@ -4040,8 +4019,7 @@ DataArrayInt *DataArrayInt::selectByTupleIdSafe(const int *new2OldBg, const int 
     else
       throw INTERP_KERNEL::Exception("DataArrayInt::selectByTupleIdSafe : some ids has been detected to be out of [0,this->getNumberOfTuples) !");
   ret->copyStringInfoFrom(*this);
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -4063,8 +4041,7 @@ DataArrayInt *DataArrayInt::selectByTupleId2(int bg, int end2, int step) const t
   for(int i=0;i<newNbOfTuples;i++,srcPt+=step*nbComp)
     std::copy(srcPt,srcPt+nbComp,pt+i*nbComp);
   ret->copyStringInfoFrom(*this);
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -4121,8 +4098,7 @@ DataArrayInt *DataArrayInt::selectByTupleRanges(const std::vector<std::pair<int,
   int *work=ret->getPointer();
   for(std::vector<std::pair<int,int> >::const_iterator it=ranges.begin();it!=ranges.end();it++)
     work=std::copy(src+(*it).first*nbOfComp,src+(*it).second*nbOfComp,work);
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -4188,10 +4164,8 @@ void DataArrayInt::changeSurjectiveFormat(int targetNb, DataArrayInt *&arr, Data
   int *retPtr=ret->getPointer();
   for(std::vector< std::vector<int> >::const_iterator it1=tmp.begin();it1!=tmp.end();it1++)
     retPtr=std::copy((*it1).begin(),(*it1).end(),retPtr);
-  ret->incrRef();
-  retI->incrRef();
-  arr=ret;
-  arrI=retI;
+  arr=ret.retn();
+  arrI=retI.retn();
 }
 
 /*!
@@ -4241,8 +4215,7 @@ DataArrayInt *DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2(int nbOfOldTu
         }
     }
   newNbOfTuples=newNb;
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -4293,8 +4266,7 @@ DataArrayInt *DataArrayInt::buildPermArrPerLevel() const throw(INTERP_KERNEL::Ex
   for(int i=0;i<nbOfTuples;i++,pt++,opt++)
     *opt+=m[*pt];
   //
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -4458,8 +4430,7 @@ DataArrayInt *DataArrayInt::keepSelectedComponents(const std::vector<int>& compo
   for(int i=0;i<nbOfTuples;i++)
     for(int j=0;j<newNbOfCompo;j++,nc++)
       *nc=oldc[i*oldNbOfCompo+compoIds[j]];
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -5427,8 +5398,7 @@ DataArrayInt *DataArrayInt::MakePartition(const std::vector<const DataArrayInt *
         tmp.insert(retPtr[*p]);
       fidsOfGroups[grId].insert(fidsOfGroups[grId].end(),tmp.begin(),tmp.end());
     }
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 DataArrayInt *DataArrayInt::BuildUnion(const std::vector<const DataArrayInt *>& arr) throw(INTERP_KERNEL::Exception)
@@ -5583,8 +5553,7 @@ DataArrayInt *DataArrayInt::buildUnique() const throw(INTERP_KERNEL::Exception)
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
   ret->alloc(std::distance(data,last),1);
   std::copy(data,last,ret->getPointer());
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -5714,8 +5683,7 @@ DataArrayInt *DataArrayInt::buildExplicitArrByRanges(const DataArrayInt *offsets
       for(int j=0;j<off;j++,retPtr++)
         *retPtr=start+j;
     }
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -5764,8 +5732,7 @@ DataArrayInt *DataArrayInt::findRangeIdForEachTuple(const DataArrayInt *ranges) 
           throw INTERP_KERNEL::Exception(oss.str().c_str());
         }
     }
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -5814,8 +5781,7 @@ DataArrayInt *DataArrayInt::findIdInRangeForEachTuple(const DataArrayInt *ranges
           throw INTERP_KERNEL::Exception(oss.str().c_str());
         }
     }
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -5843,8 +5809,7 @@ DataArrayInt *DataArrayInt::duplicateEachTupleNTimes(int nbTimes) const throw(IN
         *retPtr=val;
     }
   ret->copyStringInfoFrom(*this);
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -5962,8 +5927,7 @@ DataArrayInt *DataArrayInt::Add(const DataArrayInt *a1, const DataArrayInt *a2) 
     }
   else
     throw INTERP_KERNEL::Exception("Nb of tuples mismatch for array Add !");
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 void DataArrayInt::addEqual(const DataArrayInt *other) throw(INTERP_KERNEL::Exception)
@@ -6024,8 +5988,7 @@ DataArrayInt *DataArrayInt::Substract(const DataArrayInt *a1, const DataArrayInt
           ret->alloc(nbOfTuple2,nbOfComp1);
           std::transform(a1->begin(),a1->end(),a2->begin(),ret->getPointer(),std::minus<int>());
           ret->copyStringInfoFrom(*a1);
-          ret->incrRef();
-          return ret;
+          return ret.retn();
         }
       else if(nbOfComp2==1)
         {
@@ -6037,8 +6000,7 @@ DataArrayInt *DataArrayInt::Substract(const DataArrayInt *a1, const DataArrayInt
           for(int i=0;i<nbOfTuple1;i++)
             res=std::transform(a1Ptr+i*nbOfComp1,a1Ptr+(i+1)*nbOfComp1,res,std::bind2nd(std::minus<int>(),a2Ptr[i]));
           ret->copyStringInfoFrom(*a1);
-          ret->incrRef();
-          return ret;
+          return ret.retn();
         }
       else
         {
@@ -6056,8 +6018,7 @@ DataArrayInt *DataArrayInt::Substract(const DataArrayInt *a1, const DataArrayInt
       for(int i=0;i<nbOfTuple1;i++)
         pt=std::transform(a1ptr+i*nbOfComp1,a1ptr+(i+1)*nbOfComp1,a2ptr,pt,std::minus<int>());
       ret->copyStringInfoFrom(*a1);
-      ret->incrRef();
-      return ret;
+      return ret.retn();
     }
   else
     {
@@ -6170,8 +6131,7 @@ DataArrayInt *DataArrayInt::Multiply(const DataArrayInt *a1, const DataArrayInt 
     }
   else
     throw INTERP_KERNEL::Exception("Nb of tuples mismatch for array Multiply !");
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 void DataArrayInt::multiplyEqual(const DataArrayInt *other) throw(INTERP_KERNEL::Exception)
@@ -6232,8 +6192,7 @@ DataArrayInt *DataArrayInt::Divide(const DataArrayInt *a1, const DataArrayInt *a
           ret->alloc(nbOfTuple2,nbOfComp1);
           std::transform(a1->begin(),a1->end(),a2->begin(),ret->getPointer(),std::divides<int>());
           ret->copyStringInfoFrom(*a1);
-          ret->incrRef();
-          return ret;
+          return ret.retn();
         }
       else if(nbOfComp2==1)
         {
@@ -6245,8 +6204,7 @@ DataArrayInt *DataArrayInt::Divide(const DataArrayInt *a1, const DataArrayInt *a
           for(int i=0;i<nbOfTuple1;i++)
             res=std::transform(a1Ptr+i*nbOfComp1,a1Ptr+(i+1)*nbOfComp1,res,std::bind2nd(std::divides<int>(),a2Ptr[i]));
           ret->copyStringInfoFrom(*a1);
-          ret->incrRef();
-          return ret;
+          return ret.retn();
         }
       else
         {
@@ -6264,8 +6222,7 @@ DataArrayInt *DataArrayInt::Divide(const DataArrayInt *a1, const DataArrayInt *a
       for(int i=0;i<nbOfTuple1;i++)
         pt=std::transform(a1ptr+i*nbOfComp1,a1ptr+(i+1)*nbOfComp1,a2ptr,pt,std::divides<int>());
       ret->copyStringInfoFrom(*a1);
-      ret->incrRef();
-      return ret;
+      return ret.retn();
     }
   else
     {
@@ -6332,8 +6289,7 @@ DataArrayInt *DataArrayInt::Modulus(const DataArrayInt *a1, const DataArrayInt *
           ret->alloc(nbOfTuple2,nbOfComp1);
           std::transform(a1->begin(),a1->end(),a2->begin(),ret->getPointer(),std::modulus<int>());
           ret->copyStringInfoFrom(*a1);
-          ret->incrRef();
-          return ret;
+          return ret.retn();
         }
       else if(nbOfComp2==1)
         {
@@ -6345,8 +6301,7 @@ DataArrayInt *DataArrayInt::Modulus(const DataArrayInt *a1, const DataArrayInt *
           for(int i=0;i<nbOfTuple1;i++)
             res=std::transform(a1Ptr+i*nbOfComp1,a1Ptr+(i+1)*nbOfComp1,res,std::bind2nd(std::modulus<int>(),a2Ptr[i]));
           ret->copyStringInfoFrom(*a1);
-          ret->incrRef();
-          return ret;
+          return ret.retn();
         }
       else
         {
@@ -6364,8 +6319,7 @@ DataArrayInt *DataArrayInt::Modulus(const DataArrayInt *a1, const DataArrayInt *
       for(int i=0;i<nbOfTuple1;i++)
         pt=std::transform(a1ptr+i*nbOfComp1,a1ptr+(i+1)*nbOfComp1,a2ptr,pt,std::modulus<int>());
       ret->copyStringInfoFrom(*a1);
-      ret->incrRef();
-      return ret;
+      return ret.retn();
     }
   else
     {
@@ -6452,8 +6406,7 @@ DataArrayInt *DataArrayInt::Range(int begin, int end, int step) throw(INTERP_KER
       for(int i=begin;i>end;i+=step,ptr++)
         *ptr=i;
     }
-  ret->incrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
