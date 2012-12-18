@@ -1466,21 +1466,21 @@ void MEDCouplingUMesh::findCommonCellsBase(int startCellId, int compType, std::v
 }
 
 /*!
- * This method could potentially modify 'this'. This method merges cells if there are cells equal in 'this'. The comparison is specified by 'compType'.
- * This method keeps the coordiantes of 'this'.
+ * This method find cells that are cells equal (regarding \a compType) in \a this. The comparison is specified by \a compType.
+ * This method keeps the coordiantes of \a this. This method is time consuming and is called 
  *
- * @param compType input specifying the technique used to compare cells each other.
+ * \param [in] compType input specifying the technique used to compare cells each other.
  *   - 0 : exactly. A cell is detected to be the same if and only if the connectivity is exactly the same without permutation and types same too. This is the strongest policy.
  *   - 1 : permutation same orientation. cell1 and cell2 are considered equal if the connectivity of cell2 can be deduced by those of cell1 by direct permutation (with exactly the same orientation)
  * and their type equal. For 1D mesh the policy 1 is equivalent to 0.
  *   - 2 : nodal. cell1 and cell2 are equal if and only if cell1 and cell2 have same type and have the same nodes constituting connectivity. This is the laziest policy. This policy
  * can be used for users not sensitive to orientation of cell
- * @return the correspondance array old to new.
+ * \param [in] startCellId specifies the cellId starting from which the equality computation will be carried out. By default it is 0, which it means that all cells in \a this will be scanned.
+ * \param [out] newNbOfCells
+ * \return the correspondance array old to new in a newly allocated array.
  * 
- * \warning This method modifies can modify significantly the geometric type order in \a this.
- * In view of the MED file writing, a renumbering of cells in \a this (using MEDCouplingUMesh::sortCellsInMEDFileFrmt) should be necessary.
  */
-DataArrayInt *MEDCouplingUMesh::zipConnectivityTraducer(int compType, int startCellId) throw(INTERP_KERNEL::Exception)
+DataArrayInt *MEDCouplingUMesh::findEqualCells(int compType, int startCellId, int& newNbOfCells) const throw(INTERP_KERNEL::Exception)
 {
   checkConnectivityFullyDefined();
   int nbOfCells=getNumberOfCells();
@@ -1559,46 +1559,36 @@ DataArrayInt *MEDCouplingUMesh::zipConnectivityTraducer(int compType, int startC
             }
         }
     }
-  // BuildOld2NewArrayFromSurjectiveFormat2();
-  DataArrayInt *ret=DataArrayInt::New();
-  ret->alloc(nbOfCells,1);
-  int *retPtr=ret->getPointer();
-  std::fill(retPtr,retPtr+nbOfCells,0);
-  const std::size_t nbOfTupleSmCells=commonCellsI.size()-1;
-  int id=-1;
-  std::vector<int> cellsToKeep;
-  for(std::size_t i=0;i<nbOfTupleSmCells;i++)
-    {
-      for(std::vector<int>::const_iterator it=commonCells.begin()+commonCellsI[i];it!=commonCells.begin()+commonCellsI[i+1];it++)
-        retPtr[*it]=id;
-      id--;
-    }
-  id=0;
-  std::map<int,int> m;
-  for(int i=0;i<nbOfCells;i++)
-    {
-      int val=retPtr[i];
-      if(val==0)
-        {
-          retPtr[i]=id++;
-          cellsToKeep.push_back(i);
-        }
-      else
-        {
-          std::map<int,int>::const_iterator iter=m.find(val);
-          if(iter==m.end())
-            {
-              m[val]=id;
-              retPtr[i]=id++;
-              cellsToKeep.push_back(i);
-            }
-          else
-            retPtr[i]=(*iter).second;
-        }
-    }
-  MEDCouplingUMesh *self=(MEDCouplingUMesh *)buildPartOfMySelf(&cellsToKeep[0],&cellsToKeep[0]+cellsToKeep.size(),true);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2(nbOfCells,&commonCells[0],&commonCellsI[0],
+                                                                                                          &commonCellsI[0]+commonCellsI.size(),newNbOfCells);
+  ret->incrRef();
+  return ret;
+}
+
+/*!
+ * This method could potentially modify \a this. This method merges cells if there are cells equal in \a this. The comparison is specified by \a compType.
+ * This method keeps the coordiantes of \a this.
+ *
+ * \param [in] compType input specifying the technique used to compare cells each other.
+ *   - 0 : exactly. A cell is detected to be the same if and only if the connectivity is exactly the same without permutation and types same too. This is the strongest policy.
+ *   - 1 : permutation same orientation. cell1 and cell2 are considered equal if the connectivity of cell2 can be deduced by those of cell1 by direct permutation (with exactly the same orientation)
+ * and their type equal. For 1D mesh the policy 1 is equivalent to 0.
+ *   - 2 : nodal. cell1 and cell2 are equal if and only if cell1 and cell2 have same type and have the same nodes constituting connectivity. This is the laziest policy. This policy
+ * can be used for users not sensitive to orientation of cell
+ * \param [in] startCellId specifies the cellId starting from which the equality computation will be carried out. By default it is 0, which it means that all cells in \a this will be scanned
+ * \return the correspondance array old to new in a newly allocated array.
+ * 
+ * \warning This method modifies can modify significantly the geometric type order in \a this.
+ * In view of the MED file writing, a renumbering of cells in \a this (using MEDCouplingUMesh::sortCellsInMEDFileFrmt) should be necessary.
+ */
+DataArrayInt *MEDCouplingUMesh::zipConnectivityTraducer(int compType, int startCellId) throw(INTERP_KERNEL::Exception)
+{
+  int newNbOfCells=-1;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=findEqualCells(compType,startCellId,newNbOfCells);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret2=ret->invertArrayO2N2N2O(newNbOfCells);
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> self=static_cast<MEDCouplingUMesh *>(buildPartOfMySelf(ret2->begin(),ret2->end(),true));
   setConnectivity(self->getNodalConnectivity(),self->getNodalConnectivityIndex(),true);
-  self->decrRef();
+  ret->incrRef();
   return ret;
 }
 

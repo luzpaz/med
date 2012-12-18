@@ -4208,8 +4208,6 @@ void DataArrayInt::changeSurjectiveFormat(int targetNb, DataArrayInt *&arr, Data
  */
 DataArrayInt *DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2(int nbOfOldTuples, const int *arr, const int *arrIBg, const int *arrIEnd, int &newNbOfTuples) throw(INTERP_KERNEL::Exception)
 {
-  if(!arr || !arrIBg || !arrIEnd)
-    throw INTERP_KERNEL::Exception("DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2 : presence of NULL ref of DataArrayInt in input !");
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
   ret->alloc(nbOfOldTuples,1);
   int *pt=ret->getPointer();

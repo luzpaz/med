@@ -1676,6 +1676,17 @@ namespace ParaMEDMEM
           PyList_SetItem(res,i,PyInt_FromLong(*iL));
         return res;
       }
+
+      PyObject *findEqualCells(int compType, int startCellId=0) const throw(INTERP_KERNEL::Exception)
+      {
+        int newNbOfCells=-1;
+        DataArrayInt *ret0=self->findEqualCells(compType,startCellId,newNbOfCells);
+        PyObject *res = PyList_New(2);
+        PyList_SetItem(res,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+        PyList_SetItem(res,1,SWIG_From_int(newNbOfCells));
+        return res;
+      }
+
       PyObject *mergeNodes(double precision) throw(INTERP_KERNEL::Exception)
       {
         bool ret1;
