@@ -1409,63 +1409,6 @@ bool MEDCouplingUMesh::areCellsEqualInPool(const std::vector<int>& candidates, i
 }
 
 /*!
- * This method common cells base regarding 'compType' comparison policy described in ParaMEDMEM::MEDCouplingUMesh::zipConnectivityTraducer for details.
- * This method returns 2 values 'res' and 'resI'.
- * If 'res' and 'resI' are not empty before calling this method they will be cleared before set.
- * The format of 'res' and 'resI' is as explained here.
- * resI.size()-1 is the number of set of cells equal.
- * The nth set is [res.begin()+resI[n];res.begin()+resI[n+1]) with 0<=n<resI.size()-1 
- */
-template<int SPACEDIM>
-void MEDCouplingUMesh::findCommonCellsBase(int startCellId, int compType, std::vector<int>& res, std::vector<int>& resI) const
-{
-  res.clear(); resI.clear();
-  resI.push_back(0);
-  std::vector<double> bbox;
-  int nbOfCells=getNumberOfCells();
-  getBoundingBoxForBBTree(bbox);
-  double bb[2*SPACEDIM];
-  double eps=getCaracteristicDimension();
-  eps*=1.e-12;
-  BBTree<SPACEDIM,int> myTree(&bbox[0],0,0,nbOfCells,-eps);
-  const int *conn=getNodalConnectivity()->getConstPointer();
-  const int *connI=getNodalConnectivityIndex()->getConstPointer();
-  const double *coords=getCoords()->getConstPointer();
-  std::vector<bool> isFetched(nbOfCells);
-  for(int k=startCellId;k<nbOfCells;k++)
-    {
-      if(!isFetched[k])
-        {
-          for(int j=0;j<SPACEDIM;j++)
-            { bb[2*j]=std::numeric_limits<double>::max(); bb[2*j+1]=-std::numeric_limits<double>::max(); }
-          for(const int *pt=conn+connI[k]+1;pt!=conn+connI[k+1];pt++)
-            if(*pt>-1)
-              {
-                for(int j=0;j<SPACEDIM;j++)
-                  {
-                    bb[2*j]=std::min(bb[2*j],coords[SPACEDIM*(*pt)+j]);
-                    bb[2*j+1]=std::max(bb[2*j+1],coords[SPACEDIM*(*pt)+j]);
-                  }
-              }
-          std::vector<int> candidates1;
-          myTree.getIntersectingElems(bb,candidates1);
-          std::vector<int> candidates;
-          for(std::vector<int>::const_iterator iter=candidates1.begin();iter!=candidates1.end();iter++)
-            if(!isFetched[*iter])
-              candidates.push_back(*iter);
-          if(areCellsEqualInPool(candidates,compType,res))
-            {
-              int pos=resI.back();
-              resI.push_back((int)res.size());
-              for(std::vector<int>::const_iterator it=res.begin()+pos;it!=res.end();it++)
-                isFetched[*it]=true;
-            }
-          isFetched[k]=true;
-        }
-    }
-}
-
-/*!
  * This method find cells that are cells equal (regarding \a compType) in \a this. The comparison is specified by \a compType.
  * This method keeps the coordiantes of \a this. This method is time consuming and is called 
  *
@@ -1476,16 +1419,17 @@ void MEDCouplingUMesh::findCommonCellsBase(int startCellId, int compType, std::v
  *   - 2 : nodal. cell1 and cell2 are equal if and only if cell1 and cell2 have same type and have the same nodes constituting connectivity. This is the laziest policy. This policy
  * can be used for users not sensitive to orientation of cell
  * \param [in] startCellId specifies the cellId starting from which the equality computation will be carried out. By default it is 0, which it means that all cells in \a this will be scanned.
- * \param [out] newNbOfCells
+ * \param [out] commonCells
+ * \param [out] commonCellsI
  * \return the correspondance array old to new in a newly allocated array.
  * 
  */
-DataArrayInt *MEDCouplingUMesh::findEqualCells(int compType, int startCellId, int& newNbOfCells) const throw(INTERP_KERNEL::Exception)
+void MEDCouplingUMesh::findCommonCells(int compType, int startCellId, std::vector<int>& commonCells, std::vector<int>& commonCellsI) const throw(INTERP_KERNEL::Exception)
 {
   checkConnectivityFullyDefined();
   int nbOfCells=getNumberOfCells();
-  std::vector<int> commonCells;
-  std::vector<int> commonCellsI(1,0);
+  commonCells.clear();
+  commonCellsI.resize(1); commonCellsI[0]=0;
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> revNodal=DataArrayInt::New(),revNodalI=DataArrayInt::New();
   getReverseNodalConnectivity(revNodal,revNodalI);
   const int *revNodalPtr=revNodal->getConstPointer(),*revNodalIPtr=revNodalI->getConstPointer();
@@ -1559,10 +1503,6 @@ DataArrayInt *MEDCouplingUMesh::findEqualCells(int compType, int startCellId, in
             }
         }
     }
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2(nbOfCells,&commonCells[0],&commonCellsI[0],
-                                                                                                          &commonCellsI[0]+commonCellsI.size(),newNbOfCells);
-  ret->incrRef();
-  return ret;
 }
 
 /*!
@@ -1583,8 +1523,11 @@ DataArrayInt *MEDCouplingUMesh::findEqualCells(int compType, int startCellId, in
  */
 DataArrayInt *MEDCouplingUMesh::zipConnectivityTraducer(int compType, int startCellId) throw(INTERP_KERNEL::Exception)
 {
+  std::vector<int> commonCells,commonCellsI;
+  findCommonCells(compType,startCellId,commonCells,commonCellsI);
   int newNbOfCells=-1;
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=findEqualCells(compType,startCellId,newNbOfCells);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2(getNumberOfCells(),&commonCells[0],&commonCellsI[0],
+                                                                                                          &commonCellsI[0]+commonCellsI.size(),newNbOfCells);
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret2=ret->invertArrayO2N2N2O(newNbOfCells);
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> self=static_cast<MEDCouplingUMesh *>(buildPartOfMySelf(ret2->begin(),ret2->end(),true));
   setConnectivity(self->getNodalConnectivity(),self->getNodalConnectivityIndex(),true);
@@ -1607,6 +1550,14 @@ bool MEDCouplingUMesh::areCellsIncludedIn(const MEDCouplingUMesh *other, int com
 {
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> mesh=MergeUMeshesOnSameCoords(this,other);
   int nbOfCells=getNumberOfCells();
+  static const int possibleCompType[]={0,1,2};
+  if(std::find(possibleCompType,possibleCompType+sizeof(possibleCompType)/sizeof(int),compType)==possibleCompType+sizeof(possibleCompType)/sizeof(int))
+    {
+      std::ostringstream oss; oss << "MEDCouplingUMesh::areCellsIncludedIn : only following policies are possible : ";
+      std::copy(possibleCompType,possibleCompType+sizeof(possibleCompType)/sizeof(int),std::ostream_iterator<int>(oss," "));
+      oss << " !";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
+    }
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> o2n=mesh->zipConnectivityTraducer(compType,nbOfCells);
   arr=o2n->substr(nbOfCells);
   arr->setName(other->getName());
@@ -1628,30 +1579,9 @@ bool MEDCouplingUMesh::areCellsIncludedIn(const MEDCouplingUMesh *other, int com
 bool MEDCouplingUMesh::areCellsIncludedIn2(const MEDCouplingUMesh *other, DataArrayInt *& arr) const throw(INTERP_KERNEL::Exception)
 {
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> mesh=MergeUMeshesOnSameCoords(this,other);
-  int spaceDim=mesh->getSpaceDimension();
-  std::vector<int> commonCells;
-  std::vector<int> commonCellsI;
+  std::vector<int> commonCells,commonCellsI;
   int thisNbCells=getNumberOfCells();
-  switch(spaceDim)
-    {
-    case 3:
-      {
-        findCommonCellsBase<3>(thisNbCells,7,commonCells,commonCellsI);
-        break;
-      }
-    case 2:
-      {
-        findCommonCellsBase<2>(thisNbCells,7,commonCells,commonCellsI);
-        break;
-      }
-    case 1:
-      {
-        findCommonCellsBase<1>(thisNbCells,7,commonCells,commonCellsI);
-        break;
-      }
-    default:
-      throw INTERP_KERNEL::Exception("Invalid spaceDimension : must be 1, 2 or 3.");
-    }
+  mesh->findCommonCells(7,thisNbCells,commonCells,commonCellsI);
   int otherNbCells=other->getNumberOfCells();
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> arr2=DataArrayInt::New();
   arr2->alloc(otherNbCells,1);

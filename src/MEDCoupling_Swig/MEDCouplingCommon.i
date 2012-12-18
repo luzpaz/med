@@ -1677,13 +1677,16 @@ namespace ParaMEDMEM
         return res;
       }
 
-      PyObject *findEqualCells(int compType, int startCellId=0) const throw(INTERP_KERNEL::Exception)
+      PyObject *findCommonCells(int compType, int startCellId=0) const throw(INTERP_KERNEL::Exception)
       {
-        int newNbOfCells=-1;
-        DataArrayInt *ret0=self->findEqualCells(compType,startCellId,newNbOfCells);
+        std::vector<int> v0,v1;
+        self->findCommonCells(compType,startCellId,v0,v1);
+        DataArrayInt *v0a=DataArrayInt::New(),*v1a=DataArrayInt::New();
+        v0a->alloc((int)v0.size(),1); std::copy(v0.begin(),v0.end(),v0a->getPointer());
+        v1a->alloc((int)v1.size(),1); std::copy(v1.begin(),v1.end(),v1a->getPointer());
         PyObject *res = PyList_New(2);
-        PyList_SetItem(res,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
-        PyList_SetItem(res,1,SWIG_From_int(newNbOfCells));
+        PyList_SetItem(res,0,SWIG_NewPointerObj(SWIG_as_voidptr(v0a),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+        PyList_SetItem(res,1,SWIG_NewPointerObj(SWIG_as_voidptr(v1a),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
         return res;
       }
 

@@ -5508,6 +5508,10 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertEqual(pt[1],tmp.getIJ(0,1));
         ret,tmp=m2.areCellsIncludedIn(m,0)
         self.assertTrue(not ret);
+        m3=MEDCouplingUMesh.MergeUMeshesOnSameCoords(m,m2)
+        c,cI=m3.findCommonCells(2,m.getNumberOfCells())
+        self.assertTrue(c.isEqual(DataArrayInt([1,5,3,6])))
+        self.assertTrue(cI.isEqual(DataArrayInt([0,2,4])))
         pass
 
     def testSwigErrorProtection1(self):

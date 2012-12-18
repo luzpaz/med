@@ -109,7 +109,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT DataArrayInt *computeNbOfNodesPerCell() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayInt *zipCoordsTraducer() throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayInt *zipConnectivityTraducer(int compType, int startCellId=0) throw(INTERP_KERNEL::Exception);
-    MEDCOUPLING_EXPORT DataArrayInt *findEqualCells(int compType, int startCellId, int& newNbOfCells) const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void findCommonCells(int compType, int startCellId, std::vector<int>& commonCells, std::vector<int>& commonCellsI) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT bool areCellsIncludedIn(const MEDCouplingUMesh *other, int compType, DataArrayInt *& arr) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT bool areCellsIncludedIn2(const MEDCouplingUMesh *other, DataArrayInt *& arr) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void getReverseNodalConnectivity(DataArrayInt *revNodal, DataArrayInt *revNodalIndx) const throw(INTERP_KERNEL::Exception);
@@ -252,8 +252,6 @@ namespace ParaMEDMEM
     DataArrayDouble *fillExtCoordsUsingTranslAndAutoRotation(const MEDCouplingUMesh *mesh1D, bool isQuad) const throw(INTERP_KERNEL::Exception);
     DataArrayDouble *fillExtCoordsUsingTranslAndAutoRotation2D(const MEDCouplingUMesh *mesh1D, bool isQuad) const throw(INTERP_KERNEL::Exception);
     DataArrayDouble *fillExtCoordsUsingTranslAndAutoRotation3D(const MEDCouplingUMesh *mesh1D, bool isQuad) const throw(INTERP_KERNEL::Exception);
-    template<int SPACEDIM>
-    void findCommonCellsBase(int startCellId, int compType, std::vector<int>& res, std::vector<int>& resI) const;
     bool areCellsEqualInPool(const std::vector<int>& candidates, int compType, std::vector<int>& result) const;
     MEDCouplingUMesh *buildPartOfMySelfKeepCoords(const int *begin, const int *end) const;
     MEDCouplingUMesh *buildPartOfMySelfKeepCoords2(int start, int end, int step) const;
