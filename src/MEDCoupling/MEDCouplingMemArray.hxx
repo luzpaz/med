@@ -55,11 +55,13 @@ namespace ParaMEDMEM
   class MemArray
   {
   public:
-    MemArray():_nb_of_elem(-1),_ownership(false),_dealloc(CPP_DEALLOC) { }
+    MemArray():_nb_of_elem(0),_nb_of_elem_alloc(0),_ownership(false),_dealloc(CPP_DEALLOC) { }
     MemArray(const MemArray<T>& other);
     bool isNull() const { return _pointer.isNull(); }
     const T *getConstPointerLoc(int offset) const { return _pointer.getConstPointerLoc(offset); }
     const T *getConstPointer() const { return _pointer.getConstPointer(); }
+    int getNbOfElem() const { return _nb_of_elem; }
+    int getNbOfElemAllocated() const { return _nb_of_elem_alloc; }
     T *getPointer() { return _pointer.getPointer(); }
     MemArray<T> &operator=(const MemArray<T>& other);
     T operator[](int id) const { return _pointer.getConstPointer()[id]; }
@@ -73,16 +75,21 @@ namespace ParaMEDMEM
     void sort(bool asc);
     void reverse();
     void alloc(int nbOfElements) throw(INTERP_KERNEL::Exception);
+    void reserve(int newNbOfElements) throw(INTERP_KERNEL::Exception);
     void reAlloc(int newNbOfElements) throw(INTERP_KERNEL::Exception);
     void useArray(const T *array, bool ownership, DeallocType type, int nbOfElem);
     void useExternalArrayWithRWAccess(const T *array, int nbOfElem);
     void writeOnPlace(int id, T element0, const T *others, int sizeOfOthers);
+    void pushBack(T elem) throw(INTERP_KERNEL::Exception);
+    T popBack() throw(INTERP_KERNEL::Exception);
+    void pack() const;
     ~MemArray() { destroy(); }
   private:
     void destroy();
     static void destroyPointer(T *pt, DeallocType type);
   private:
     int _nb_of_elem;
+    int _nb_of_elem_alloc;
     bool _ownership;
     MEDCouplingPointer<T> _pointer;
     DeallocType _dealloc;
@@ -154,6 +161,11 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT DataArrayDouble *deepCpy() const;
     MEDCOUPLING_EXPORT DataArrayDouble *performCpy(bool deepCpy) const;
     MEDCOUPLING_EXPORT void cpyFrom(const DataArrayDouble& other) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void reserve(int nbOfElems) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void pushBackSilent(double val) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT double popBackSilent() throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void pack() const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT int getNbOfElemAllocated() const { return _mem.getNbOfElemAllocated(); }
     MEDCOUPLING_EXPORT void alloc(int nbOfTuple, int nbOfCompo) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void allocIfNecessary(int nbOfTuple, int nbOfCompo);
     MEDCOUPLING_EXPORT void fillWithZero() throw(INTERP_KERNEL::Exception);
@@ -348,6 +360,11 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT DataArrayInt *deepCpy() const;
     MEDCOUPLING_EXPORT DataArrayInt *performCpy(bool deepCpy) const;
     MEDCOUPLING_EXPORT void cpyFrom(const DataArrayInt& other) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void reserve(int nbOfElems) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void pushBackSilent(int val) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT int popBackSilent() throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void pack() const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT int getNbOfElemAllocated() const { return _mem.getNbOfElemAllocated(); }
     MEDCOUPLING_EXPORT void alloc(int nbOfTuple, int nbOfCompo) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void allocIfNecessary(int nbOfTuple, int nbOfCompo);
     MEDCOUPLING_EXPORT bool isEqual(const DataArrayInt& other) const;
@@ -472,7 +489,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT std::vector<DataArrayInt *> partitionByDifferentValues(std::vector<int>& differentIds) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void useArray(const int *array, bool ownership, DeallocType type, int nbOfTuple, int nbOfCompo);
     MEDCOUPLING_EXPORT void useExternalArrayWithRWAccess(const int *array, int nbOfTuple, int nbOfCompo);
-    MEDCOUPLING_EXPORT void writeOnPlace(int id, int element0, const int *others, int sizeOfOthers) { _mem.writeOnPlace(id,element0,others,sizeOfOthers); }
+    MEDCOUPLING_EXPORT void writeOnPlace(int id, int element0, const int *others, int sizeOfOthers) { _nb_of_tuples=std::max<int>(_nb_of_tuples,id+sizeOfOthers+1); _mem.writeOnPlace(id,element0,others,sizeOfOthers); }
     MEDCOUPLING_EXPORT static DataArrayInt *Add(const DataArrayInt *a1, const DataArrayInt *a2) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void addEqual(const DataArrayInt *other) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static DataArrayInt *Substract(const DataArrayInt *a1, const DataArrayInt *a2) throw(INTERP_KERNEL::Exception);

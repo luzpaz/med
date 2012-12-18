@@ -10511,6 +10511,66 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(f.getArray().isEqual(valuesExpected,1e-12))
         pass
 
+    def testDAPushBack(self):
+        d=DataArrayDouble(0,1)
+        for i in xrange(8):
+            d.pushBackSilent(i)
+            pass
+        self.assertEqual(d.getNumberOfTuples(),8)
+        self.assertEqual(d.getNbOfElemAllocated(),8)
+        d.pushBackSilent(4.44)
+        self.assertEqual(d.getNumberOfTuples(),9)
+        self.assertEqual(d.getNbOfElemAllocated(),16)
+        self.assertTrue(d.isEqual(DataArrayDouble([0.,1.,2.,3.,4.,5.,6.,7.,4.44]),1e-12))
+        e=d.deepCpy()
+        self.assertEqual(e.getNumberOfTuples(),9)
+        self.assertEqual(e.getNbOfElemAllocated(),9)
+        self.assertTrue(e.isEqual(DataArrayDouble([0.,1.,2.,3.,4.,5.,6.,7.,4.44]),1e-12))
+        self.assertAlmostEqual(d.popBackSilent(),4.44,12)
+        self.assertEqual(d.getNumberOfTuples(),8)
+        self.assertEqual(d.getNbOfElemAllocated(),16)
+        self.assertTrue(d.isEqual(DataArrayDouble([0.,1.,2.,3.,4.,5.,6.,7.]),1e-12))
+        f=DataArrayDouble()
+        f.reserve(1000)
+        f.pushBackSilent(4.)
+        self.assertTrue(f.isEqual(DataArrayDouble([4.]),1e-12))
+        self.assertEqual(f.getNumberOfTuples(),1)
+        self.assertEqual(f.getNbOfElemAllocated(),1000)
+        ff=f[:]
+        self.assertTrue(ff.isEqual(DataArrayDouble([4.]),1e-12))
+        self.assertEqual(ff.getNumberOfTuples(),1)
+        self.assertEqual(ff.getNbOfElemAllocated(),1)
+        #
+        d=DataArrayInt(0,1)
+        for i in xrange(8):
+            d.pushBackSilent(i)
+            pass
+        self.assertEqual(d.getNumberOfTuples(),8)
+        self.assertEqual(d.getNbOfElemAllocated(),8)
+        d.pushBackSilent(444)
+        self.assertEqual(d.getNumberOfTuples(),9)
+        self.assertEqual(d.getNbOfElemAllocated(),16)
+        self.assertTrue(d.isEqual(DataArrayInt([0,1,2,3,4,5,6,7,444])))
+        e=d.deepCpy()
+        self.assertEqual(e.getNumberOfTuples(),9)
+        self.assertEqual(e.getNbOfElemAllocated(),9)
+        self.assertTrue(e.isEqual(DataArrayInt([0,1,2,3,4,5,6,7,444])))
+        self.assertEqual(d.popBackSilent(),444)
+        self.assertEqual(d.getNumberOfTuples(),8)
+        self.assertEqual(d.getNbOfElemAllocated(),16)
+        self.assertTrue(d.isEqual(DataArrayInt([0,1,2,3,4,5,6,7])))
+        f=DataArrayInt()
+        f.reserve(1000)
+        f.pushBackSilent(4)
+        self.assertTrue(f.isEqual(DataArrayInt([4])))
+        self.assertEqual(f.getNumberOfTuples(),1)
+        self.assertEqual(f.getNbOfElemAllocated(),1000)
+        ff=f[:]
+        self.assertTrue(ff.isEqual(DataArrayInt([4])))
+        self.assertEqual(ff.getNumberOfTuples(),1)
+        self.assertEqual(ff.getNbOfElemAllocated(),1)
+        pass
+
     def setUp(self):
         pass
     pass

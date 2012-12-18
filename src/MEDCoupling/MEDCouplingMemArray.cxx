@@ -543,6 +543,54 @@ void DataArrayDouble::cpyFrom(const DataArrayDouble& other) throw(INTERP_KERNEL:
   copyStringInfoFrom(other);
 }
 
+void DataArrayDouble::reserve(int nbOfElems) throw(INTERP_KERNEL::Exception)
+{
+  int nbCompo=getNumberOfComponents();
+  if(nbCompo==1)
+    {
+      _mem.reserve(nbOfElems);
+    }
+  else if(nbCompo==0)
+    {
+      _mem.reserve(nbOfElems);
+      if(_nb_of_tuples==-1)
+        _nb_of_tuples=0;
+      else
+        _nb_of_tuples=std::min<int>(_nb_of_tuples,nbOfElems);
+      _info_on_compo.resize(1);
+    }
+  else
+    throw INTERP_KERNEL::Exception("DataArrayDouble::reserve : not available for DataArrayDouble with number of components different than 1 !");
+}
+
+void DataArrayDouble::pushBackSilent(double val) throw(INTERP_KERNEL::Exception)
+{
+  if(getNumberOfComponents()==1)
+    {
+      _mem.pushBack(val);
+      _nb_of_tuples++;
+    }
+  else
+    throw INTERP_KERNEL::Exception("DataArrayDouble::pushBackSilent : not available for DataArrayDouble with number of components different than 1 !");
+}
+
+double DataArrayDouble::popBackSilent() throw(INTERP_KERNEL::Exception)
+{
+  if(getNumberOfComponents()==1)
+    {
+      double ret=_mem.popBack();
+      _nb_of_tuples--;
+      return ret;
+    }
+  else
+    throw INTERP_KERNEL::Exception("DataArrayDouble::pushBackSilent : not available for DataArrayDouble with number of components different than 1 !");
+}
+
+void DataArrayDouble::pack() const throw(INTERP_KERNEL::Exception)
+{
+  _mem.pack();
+}
+
 void DataArrayDouble::allocIfNecessary(int nbOfTuple, int nbOfCompo)
 {
   if(isAllocated())
@@ -3466,6 +3514,54 @@ void DataArrayInt::cpyFrom(const DataArrayInt& other) throw(INTERP_KERNEL::Excep
   copyStringInfoFrom(other);
 }
 
+void DataArrayInt::reserve(int nbOfElems) throw(INTERP_KERNEL::Exception)
+{
+  int nbCompo=getNumberOfComponents();
+  if(nbCompo==1)
+    {
+      _mem.reserve(nbOfElems);
+    }
+  else if(nbCompo==0)
+    {
+      _mem.reserve(nbOfElems);
+      if(_nb_of_tuples==-1)
+        _nb_of_tuples=0;
+      else
+        _nb_of_tuples=std::min<int>(_nb_of_tuples,nbOfElems);
+      _info_on_compo.resize(1);
+    }
+  else
+    throw INTERP_KERNEL::Exception("DataArrayInt::reserve : not available for DataArrayInt with number of components different than 1 !");
+}
+
+void DataArrayInt::pushBackSilent(int val) throw(INTERP_KERNEL::Exception)
+{
+  if(getNumberOfComponents()==1)
+    {
+      _mem.pushBack(val);
+      _nb_of_tuples++;
+    }
+  else
+    throw INTERP_KERNEL::Exception("DataArrayInt::pushBackSilent : not available for DataArrayInt with number of components different than 1 !");
+}
+
+int DataArrayInt::popBackSilent() throw(INTERP_KERNEL::Exception)
+{
+  if(getNumberOfComponents()==1)
+    {
+      int ret=_mem.popBack();
+      _nb_of_tuples--;
+      return ret;
+    }
+  else
+    throw INTERP_KERNEL::Exception("DataArrayInt::pushBackSilent : not available for DataArrayInt with number of components different than 1 !");
+}
+
+void DataArrayInt::pack() const throw(INTERP_KERNEL::Exception)
+{
+  _mem.pack();
+}
+
 void DataArrayInt::allocIfNecessary(int nbOfTuple, int nbOfCompo)
 {
   if(isAllocated())
@@ -3480,7 +3576,7 @@ void DataArrayInt::allocIfNecessary(int nbOfTuple, int nbOfCompo)
 void DataArrayInt::alloc(int nbOfTuple, int nbOfCompo) throw(INTERP_KERNEL::Exception)
 {
   if(nbOfTuple<0 || nbOfCompo<0)
-    throw INTERP_KERNEL::Exception("DataArrayDouble::alloc : request for negative length of data !");
+    throw INTERP_KERNEL::Exception("DataArrayInt::alloc : request for negative length of data !");
   _nb_of_tuples=nbOfTuple;
   _info_on_compo.resize(nbOfCompo);
   _mem.alloc(nbOfCompo*_nb_of_tuples);
@@ -3982,7 +4078,7 @@ DataArrayInt *DataArrayInt::renumberAndReduce(const int *old2New, int newNbOfTup
 }
 
 /*!
- * This method is a generalization of DataArrayDouble::substr method because a not contigous range can be specified here.
+ * This method is a generalization of DataArrayInt::substr method because a not contigous range can be specified here.
  * This method is equavalent to DataArrayInt::renumberAndReduce except that convention in input is new2old and \b not old2new.
  */
 DataArrayInt *DataArrayInt::selectByTupleId(const int *new2OldBg, const int *new2OldEnd) const
@@ -4105,7 +4201,7 @@ DataArrayInt *DataArrayInt::selectByTupleRanges(const std::vector<std::pair<int,
  * This method works only for arrays having single component.
  * If this contains the array a1 containing [9,10,0,6,4,11,3,7] this method returns an array a2 [5,6,0,3,2,7,1,4].
  * By doing a1.renumber(a2) the user will obtain array a3 equal to a1 sorted.
- * This method is useful for renumbering (in MED file for example). This method is used by MEDCouplingFieldDouble::renumberCells when check is set to true.
+ * This method is useful for renumbering (in MED file for example). This method is used by MEDCouplingFieldInt::renumberCells when check is set to true.
  * This method throws an exception if more 2 or more elements in 'this' are same.
  */
 DataArrayInt *DataArrayInt::checkAndPreparePermutation() const throw(INTERP_KERNEL::Exception)
@@ -4169,7 +4265,7 @@ void DataArrayInt::changeSurjectiveFormat(int targetNb, DataArrayInt *&arr, Data
 }
 
 /*!
- * This static method computes a old 2 new format DataArrayInt instance from a zip representation of a surjective format (retrived by DataArrayDouble::findCommonTuples for example)
+ * This static method computes a old 2 new format DataArrayInt instance from a zip representation of a surjective format (retrived by DataArrayInt::findCommonTuples for example)
  * The retrieved array minimizes the permutation.
  * Let's take an example : 
  * If 'nbOfOldTuples'==10 and 'arr'==[0,3, 5,7,9] and 'arrI'==[0,2,5] it returns the following array [0,1,2,0,3,4,5,4,6,4] and newNbOfTuples==7.

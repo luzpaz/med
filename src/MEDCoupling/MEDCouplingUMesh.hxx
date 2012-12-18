@@ -287,8 +287,6 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT static const INTERP_KERNEL::NormalizedCellType MEDMEM_ORDER[N_MEDMEM_ORDER];
     /// @endcond
   private:
-    //! this iterator stores current position in _nodal_connec array.
-    mutable int _iterator;
     int _mesh_dim;
     DataArrayInt *_nodal_connec;
     DataArrayInt *_nodal_connec_index;

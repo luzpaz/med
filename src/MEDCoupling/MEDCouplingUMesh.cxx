@@ -88,8 +88,7 @@ void MEDCouplingUMesh::updateTime() const
     }
 }
 
-MEDCouplingUMesh::MEDCouplingUMesh():_iterator(-1),_mesh_dim(-2),
-                                     _nodal_connec(0),_nodal_connec_index(0)
+MEDCouplingUMesh::MEDCouplingUMesh():_mesh_dim(-2),_nodal_connec(0),_nodal_connec_index(0)
 {
 }
 
@@ -125,10 +124,6 @@ void MEDCouplingUMesh::checkCoherency() const throw(INTERP_KERNEL::Exception)
         throw INTERP_KERNEL::Exception("Nodal connectivity index array is expected to be with number of components set to one !");
       if(_nodal_connec_index->getInfoOnComponent(0)!="")
         throw INTERP_KERNEL::Exception("Nodal connectivity index array is expected to have no info on its single component !");
-    }
-  if(_iterator!=-1)
-    {
-      throw INTERP_KERNEL::Exception("It appears that finishInsertingCells method has not been invoked after a insertNextCell session !");
     }
 }
 
@@ -216,14 +211,11 @@ void MEDCouplingUMesh::allocateCells(int nbOfCells)
     {
       _nodal_connec->decrRef();
     }
-
   _nodal_connec_index=DataArrayInt::New();
-  _nodal_connec_index->alloc(nbOfCells+1,1);
-  int *pt=_nodal_connec_index->getPointer();
-  pt[0]=0;
+  _nodal_connec_index->reserve(nbOfCells+1);
+  _nodal_connec_index->pushBackSilent(0);
   _nodal_connec=DataArrayInt::New();
-  _nodal_connec->alloc(2*nbOfCells,1);
-  _iterator=0;
+  _nodal_connec->reserve(2*nbOfCells);
   _types.clear();
   declareAsNew();
 }
@@ -241,15 +233,11 @@ void MEDCouplingUMesh::insertNextCell(INTERP_KERNEL::NormalizedCellType type, in
     throw INTERP_KERNEL::Exception("MEDCouplingUMesh::insertNextCell : nodal connectivity not set ! invoke allocateCells before calling insertNextCell !");
   if((int)cm.getDimension()==_mesh_dim)
     {
-      int nbOfElems=_nodal_connec_index->getNbOfElems()-1;
-      if(_iterator>=nbOfElems)
-        throw INTERP_KERNEL::Exception("MEDCouplingUMesh::insertNextCell : allocation of cells was wide enough ! Call insertNextCell with higher value or call finishInsertingCells !");
-      int *pt=_nodal_connec_index->getPointer();
-      int idx=pt[_iterator];
-      
+      int idx=_nodal_connec_index->back();
+      int val=idx+size+1;
+      _nodal_connec_index->pushBackSilent(val);
       _nodal_connec->writeOnPlace(idx,type,nodalConnOfCell,size);
       _types.insert(type);
-      pt[++_iterator]=idx+size+1;
     }
   else
     {
@@ -265,12 +253,8 @@ void MEDCouplingUMesh::insertNextCell(INTERP_KERNEL::NormalizedCellType type, in
  */
 void MEDCouplingUMesh::finishInsertingCells()
 {
-  const int *pt=_nodal_connec_index->getConstPointer();
-  int idx=pt[_iterator];
-
-  _nodal_connec->reAlloc(idx);
-  _nodal_connec_index->reAlloc(_iterator+1);
-  _iterator=-1;
+  _nodal_connec->pack();
+  _nodal_connec_index->pack();
   _nodal_connec->declareAsNew();
   _nodal_connec_index->declareAsNew();
   updateTime();
@@ -2720,7 +2704,7 @@ void MEDCouplingUMesh::setConnectivity(DataArrayInt *conn, DataArrayInt *connInd
  * Copy constructor. If 'deepCpy' is false 'this' is a shallow copy of other.
  * If 'deeCpy' is true all arrays (coordinates and connectivities) are deeply copied.
  */
-MEDCouplingUMesh::MEDCouplingUMesh(const MEDCouplingUMesh& other, bool deepCopy):MEDCouplingPointSet(other,deepCopy),_iterator(-1),_mesh_dim(other._mesh_dim),
+MEDCouplingUMesh::MEDCouplingUMesh(const MEDCouplingUMesh& other, bool deepCopy):MEDCouplingPointSet(other,deepCopy),_mesh_dim(other._mesh_dim),
                                                                                  _nodal_connec(0),_nodal_connec_index(0),
                                                                                 _types(other._types)
 {
@@ -2775,10 +2759,7 @@ void MEDCouplingUMesh::checkConnectivityFullyDefined() const throw(INTERP_KERNEL
 int MEDCouplingUMesh::getNumberOfCells() const
 { 
   if(_nodal_connec_index)
-    if(_iterator==-1)
-      return _nodal_connec_index->getNumberOfTuples()-1;
-    else
-      return _iterator;
+    return _nodal_connec_index->getNumberOfTuples()-1;
   else
     if(_mesh_dim==-1)
       return 1;
