@@ -36,7 +36,7 @@ typedef double (*MYFUNCPTR)(double);
 using namespace ParaMEDMEM;
 
 template<int SPACEDIM>
-void DataArrayDouble::findCommonTuplesAlg(const double *bbox, int nbNodes, int limitNodeId, double prec, std::vector<int>& c, std::vector<int>& cI) const
+void DataArrayDouble::findCommonTuplesAlg(const double *bbox, int nbNodes, int limitNodeId, double prec, DataArrayInt *c, DataArrayInt *cI) const
 {
   const double *coordsPtr=getConstPointer();
   BBTree<SPACEDIM,int> myTree(bbox,0,0,nbNodes,prec/10);
@@ -59,9 +59,9 @@ void DataArrayDouble::findCommonTuplesAlg(const double *bbox, int nbNodes, int l
                     }
               if(!commonNodes.empty())
                 {
-                  cI.push_back(cI.back()+(int)commonNodes.size()+1);
-                  c.push_back(i);
-                  c.insert(c.end(),commonNodes.begin(),commonNodes.end());
+                  cI->pushBackSilent(cI->back()+(int)commonNodes.size()+1);
+                  c->pushBackSilent(i);
+                  c->insertAtTheEnd(commonNodes.begin(),commonNodes.end());
                 }
             }
         }
@@ -70,7 +70,7 @@ void DataArrayDouble::findCommonTuplesAlg(const double *bbox, int nbNodes, int l
 
 template<int SPACEDIM>
 void DataArrayDouble::FindTupleIdsNearTuplesAlg(const BBTree<SPACEDIM,int>& myTree, const double *pos, int nbOfTuples, double eps,
-                                                std::vector<int>& c, std::vector<int>& cI)
+                                                DataArrayInt *c, DataArrayInt *cI)
 {
   for(int i=0;i<nbOfTuples;i++)
     {
@@ -79,8 +79,8 @@ void DataArrayDouble::FindTupleIdsNearTuplesAlg(const BBTree<SPACEDIM,int>& myTr
       std::vector<int> commonNodes;
       for(std::vector<int>::const_iterator it=intersectingElems.begin();it!=intersectingElems.end();it++)
         commonNodes.push_back(*it);
-      cI.push_back(cI.back()+(int)commonNodes.size());
-      c.insert(c.end(),commonNodes.begin(),commonNodes.end());
+      cI->pushBackSilent(cI->back()+(int)commonNodes.size());
+      c->insertAtTheEnd(commonNodes.begin(),commonNodes.end());
     }
 }
 
@@ -555,8 +555,14 @@ void DataArrayDouble::reserve(int nbOfElems) throw(INTERP_KERNEL::Exception)
 
 void DataArrayDouble::pushBackSilent(double val) throw(INTERP_KERNEL::Exception)
 {
-  if(getNumberOfComponents()==1)
+  int nbCompo=getNumberOfComponents();
+  if(nbCompo==1)
     _mem.pushBack(val);
+  else if(nbCompo==0)
+    {
+      _info_on_compo.resize(1);
+      _mem.pushBack(val);
+    }
   else
     throw INTERP_KERNEL::Exception("DataArrayDouble::pushBackSilent : not available for DataArrayDouble with number of components different than 1 !");
 }
@@ -1215,12 +1221,10 @@ void DataArrayDouble::findCommonTuples(double prec, int limitTupleId, DataArrayI
     throw INTERP_KERNEL::Exception("DataArrayDouble::findCommonTuples : Unexpected spacedim of coords. Must be 1, 2 or 3.");
   
   int nbOfTuples=getNumberOfTuples();
-  comm=DataArrayInt::New();
-  commIndex=DataArrayInt::New();
   //
   MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> bbox=computeBBoxPerTuple(prec);
   //
-  std::vector<int> c,cI(1);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> c(DataArrayInt::New()),cI(DataArrayInt::New()); c->alloc(0,1); cI->pushBackSilent(0);
   switch(nbOfCompo)
     {
     case 3:
@@ -1235,10 +1239,8 @@ void DataArrayDouble::findCommonTuples(double prec, int limitTupleId, DataArrayI
     default:
       throw INTERP_KERNEL::Exception("DataArrayDouble::findCommonTuples : nb of components managed are 1,2 and 3 ! not implemented for other number of components !");
     }
-  commIndex->alloc((int)cI.size(),1);
-  std::copy(cI.begin(),cI.end(),commIndex->getPointer());
-  comm->alloc(cI.back(),1);
-  std::copy(c.begin(),c.end(),comm->getPointer());
+  comm=c.retn();
+  commIndex=cI.retn();
 }
 
 /*!
@@ -1763,7 +1765,7 @@ DataArrayDouble *DataArrayDouble::computeBBoxPerTuple(double epsilon)const throw
  *
  * \sa MEDCouplingPointSet::getNodeIdsNearPoints, DataArrayDouble::getDifferentValues
  */
-void DataArrayDouble::computeTupleIdsNearTuples(const DataArrayDouble *other, double eps, std::vector<int>& c, std::vector<int>& cI) const throw(INTERP_KERNEL::Exception)
+void DataArrayDouble::computeTupleIdsNearTuples(const DataArrayDouble *other, double eps, DataArrayInt *& c, DataArrayInt *& cI) const throw(INTERP_KERNEL::Exception)
 {
   if(!other)
     throw INTERP_KERNEL::Exception("DataArrayDouble::computeTupleIdsNearTuples : input pointer other is null !");
@@ -1774,32 +1776,31 @@ void DataArrayDouble::computeTupleIdsNearTuples(const DataArrayDouble *other, do
   if(nbOfCompo!=otherNbOfCompo)
     throw INTERP_KERNEL::Exception("DataArrayDouble::computeTupleIdsNearTuples : number of components should be equal between this and other !");
   int nbOfTuplesOther=other->getNumberOfTuples();
-  std::vector<int> ret;
-  c.clear();
-  cI.resize(1); cI[0]=0;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> cArr(DataArrayInt::New()),cIArr(DataArrayInt::New()); cArr->alloc(0,1); cIArr->pushBackSilent(0);
   switch(nbOfCompo)
     {
     case 3:
       {
         BBTree<3,int> myTree(bbox->getConstPointer(),0,0,getNumberOfTuples(),eps/10);
-        FindTupleIdsNearTuplesAlg<3>(myTree,other->getConstPointer(),nbOfTuplesOther,eps,c,cI);
+        FindTupleIdsNearTuplesAlg<3>(myTree,other->getConstPointer(),nbOfTuplesOther,eps,cArr,cIArr);
         break;
       }
     case 2:
       {
         BBTree<2,int> myTree(bbox->getConstPointer(),0,0,getNumberOfTuples(),eps/10);
-        FindTupleIdsNearTuplesAlg<2>(myTree,other->getConstPointer(),nbOfTuplesOther,eps,c,cI);
+        FindTupleIdsNearTuplesAlg<2>(myTree,other->getConstPointer(),nbOfTuplesOther,eps,cArr,cIArr);
         break;
       }
     case 1:
       {
         BBTree<1,int> myTree(bbox->getConstPointer(),0,0,getNumberOfTuples(),eps/10);
-        FindTupleIdsNearTuplesAlg<1>(myTree,other->getConstPointer(),nbOfTuplesOther,eps,c,cI);
+        FindTupleIdsNearTuplesAlg<1>(myTree,other->getConstPointer(),nbOfTuplesOther,eps,cArr,cIArr);
         break;
       }
     default:
       throw INTERP_KERNEL::Exception("Unexpected spacedim of coords for computeTupleIdsNearTuples. Must be 1, 2 or 3.");
     }
+  c=cArr.retn(); cI=cIArr.retn();
 }
 
 /*!
@@ -3510,8 +3511,14 @@ void DataArrayInt::reserve(int nbOfElems) throw(INTERP_KERNEL::Exception)
 
 void DataArrayInt::pushBackSilent(int val) throw(INTERP_KERNEL::Exception)
 {
-  if(getNumberOfComponents()==1)
+  int nbCompo=getNumberOfComponents();
+  if(nbCompo==1)
     _mem.pushBack(val);
+  else if(nbCompo==0)
+    {
+      _info_on_compo.resize(1);
+      _mem.pushBack(val);
+    }
   else
     throw INTERP_KERNEL::Exception("DataArrayInt::pushBackSilent : not available for DataArrayInt with number of components different than 1 !");
 }

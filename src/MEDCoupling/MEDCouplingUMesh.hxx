@@ -109,7 +109,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT DataArrayInt *computeNbOfNodesPerCell() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayInt *zipCoordsTraducer() throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayInt *zipConnectivityTraducer(int compType, int startCellId=0) throw(INTERP_KERNEL::Exception);
-    MEDCOUPLING_EXPORT void findCommonCells(int compType, int startCellId, std::vector<int>& commonCells, std::vector<int>& commonCellsI) const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void findCommonCells(int compType, int startCellId, DataArrayInt *& commonCellsArr, DataArrayInt *& commonCellsIArr) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT bool areCellsIncludedIn(const MEDCouplingUMesh *other, int compType, DataArrayInt *& arr) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT bool areCellsIncludedIn2(const MEDCouplingUMesh *other, DataArrayInt *& arr) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void getReverseNodalConnectivity(DataArrayInt *revNodal, DataArrayInt *revNodalIndx) const throw(INTERP_KERNEL::Exception);
@@ -161,7 +161,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT void getCellsContainingPoints(const double *pos, int nbOfPoints, double eps, std::vector<int>& elts, std::vector<int>& eltsIndex) const;
     MEDCOUPLING_EXPORT void checkButterflyCells(std::vector<int>& cells, double eps=1e-12) const;
     MEDCOUPLING_EXPORT DataArrayInt *convexEnvelop2D() throw(INTERP_KERNEL::Exception);
-    MEDCOUPLING_EXPORT void findAndCorrectBadOriented3DExtrudedCells(std::vector<int>& cells) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT DataArrayInt *findAndCorrectBadOriented3DExtrudedCells() throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void getBoundingBoxForBBTree(std::vector<double>& bbox) const;
     MEDCOUPLING_EXPORT MEDCouplingUMesh *buildExtrudedMesh(const MEDCouplingUMesh *mesh1D, int policy);
     MEDCOUPLING_EXPORT bool isFullyQuadratic() const;
@@ -215,11 +215,11 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT static void MergeNodesOnUMeshesSharingSameCoords(const std::vector<MEDCouplingUMesh *>& meshes, double eps) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static bool IsPolygonWellOriented(bool isQuadratic, const double *vec, const int *begin, const int *end, const double *coords);
     MEDCOUPLING_EXPORT static bool IsPolyhedronWellOriented(const int *begin, const int *end, const double *coords);
-    MEDCOUPLING_EXPORT static void SimplifyPolyhedronCell(double eps, const DataArrayDouble *coords, const int *begin, const int *end, std::vector<int>& res) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT static void SimplifyPolyhedronCell(double eps, const DataArrayDouble *coords, const int *begin, const int *end, DataArrayInt *res) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static void ComputeVecAndPtOfFace(double eps, const double *coords, const int *begin, const int *end, double *v, double *p) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static void TryToCorrectPolyhedronOrientation(int *begin, int *end, const double *coords) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static MEDCouplingUMesh *Intersect2DMeshes(const MEDCouplingUMesh *m1, const MEDCouplingUMesh *m2, double eps, DataArrayInt *&cellNb1, DataArrayInt *&cellNb2) throw(INTERP_KERNEL::Exception);
-    MEDCOUPLING_EXPORT static bool BuildConvexEnvelopOf2DCellJarvis(const double *coords, const int *nodalConnBg, const int *nodalConnEnd, std::vector<int>& nodalConnecOut) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT static bool BuildConvexEnvelopOf2DCellJarvis(const double *coords, const int *nodalConnBg, const int *nodalConnEnd, DataArrayInt *nodalConnecOut) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static bool RemoveIdsFromIndexedArrays(const int *idsToRemoveBg, const int *idsToRemoveEnd, DataArrayInt *arr, DataArrayInt *arrIndx, int offsetForRemoval=0) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static void ExtractFromIndexedArrays(const int *idsOfSelectBg, const int *idsOfSelectEnd, const DataArrayInt *arrIn, const DataArrayInt *arrIndxIn,
                                                             DataArrayInt* &arrOut, DataArrayInt* &arrIndexOut) throw(INTERP_KERNEL::Exception);
@@ -245,14 +245,14 @@ namespace ParaMEDMEM
     DataArrayInt *simplexizePol0() throw(INTERP_KERNEL::Exception);
     DataArrayInt *simplexizePol1() throw(INTERP_KERNEL::Exception);
     void subDivide2DMesh(const int *nodeSubdived, const int *nodeIndxSubdived, const int *desc, const int *descIndex) throw(INTERP_KERNEL::Exception);
-    void fillCellIdsToKeepFromNodeIds(const int *begin, const int *end, bool fullyIn, std::vector<int>& cellIdsKept) const;
+    void fillCellIdsToKeepFromNodeIds(const int *begin, const int *end, bool fullyIn, DataArrayInt *&cellIdsKeptArr) const;
     void split3DCurveWithPlane(const double *origin, const double *vec, double eps, std::vector<int>& cut3DCurve) throw(INTERP_KERNEL::Exception);
     MEDCouplingUMesh *buildExtrudedMeshFromThisLowLev(int nbOfNodesOf1Lev, bool isQuad) const;
     DataArrayDouble *fillExtCoordsUsingTranslation(const MEDCouplingUMesh *mesh1D, bool isQuad) const;
     DataArrayDouble *fillExtCoordsUsingTranslAndAutoRotation(const MEDCouplingUMesh *mesh1D, bool isQuad) const throw(INTERP_KERNEL::Exception);
     DataArrayDouble *fillExtCoordsUsingTranslAndAutoRotation2D(const MEDCouplingUMesh *mesh1D, bool isQuad) const throw(INTERP_KERNEL::Exception);
     DataArrayDouble *fillExtCoordsUsingTranslAndAutoRotation3D(const MEDCouplingUMesh *mesh1D, bool isQuad) const throw(INTERP_KERNEL::Exception);
-    bool areCellsEqualInPool(const std::vector<int>& candidates, int compType, std::vector<int>& result) const;
+    bool areCellsEqualInPool(const std::vector<int>& candidates, int compType, DataArrayInt *result) const;
     MEDCouplingUMesh *buildPartOfMySelfKeepCoords(const int *begin, const int *end) const;
     MEDCouplingUMesh *buildPartOfMySelfKeepCoords2(int start, int end, int step) const;
     template<int SPACEDIM>
@@ -280,7 +280,7 @@ namespace ParaMEDMEM
                                               const int *nodal3DCurve, const int *nodalIndx3DCurve,
                                               const int *desc, const int *descIndx, std::vector< std::pair<int,int> >& cut3DSurf) throw(INTERP_KERNEL::Exception);
     void assemblyForSplitFrom3DSurf(const std::vector< std::pair<int,int> >& cut3DSurf,
-                                    const int *desc, const int *descIndx, std::vector<int>& nodalRes, std::vector<int>& nodalResIndx, std::vector<int>& cellIds) const throw(INTERP_KERNEL::Exception);
+                                    const int *desc, const int *descIndx, DataArrayInt *nodalRes, DataArrayInt *nodalResIndx, DataArrayInt *cellIds) const throw(INTERP_KERNEL::Exception);
   public:
     MEDCOUPLING_EXPORT static DataArrayInt *ComputeRangesFromTypeDistribution(const std::vector<int>& code) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static const int N_MEDMEM_ORDER=24;

@@ -94,6 +94,22 @@ namespace ParaMEDMEM
   }
   
   template<class T>
+  template<class InputIterator>
+  void MemArray<T>::insertAtTheEnd(InputIterator first, InputIterator last)
+  {
+    T *pointer=_pointer.getPointer();
+    while(first!=last)
+      {
+        if(_nb_of_elem>=_nb_of_elem_alloc || _nb_of_elem==0)
+          {
+            reserve(_nb_of_elem_alloc>0?2*_nb_of_elem_alloc:1);
+            pointer=_pointer.getPointer();
+          }
+        pointer[_nb_of_elem++]=*first++;
+      }
+  }
+  
+  template<class T>
   void MemArray<T>::pushBack(T elem) throw(INTERP_KERNEL::Exception)
   {
     if(_nb_of_elem>=_nb_of_elem_alloc)

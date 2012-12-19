@@ -10540,6 +10540,11 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(ff.isEqual(DataArrayDouble([4.]),1e-12))
         self.assertEqual(ff.getNumberOfTuples(),1)
         self.assertEqual(ff.getNbOfElemAllocated(),1)
+        d=DataArrayDouble()
+        d.pushBackSilent(4.44)
+        d.pushBackSilent(5.55)
+        d.pushBackSilent(6.66)
+        self.assertTrue(d.isEqual(DataArrayDouble([4.44,5.55,6.66]),1e-12))
         #
         d=DataArrayInt(0,1)
         for i in xrange(8):
@@ -10569,6 +10574,11 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(ff.isEqual(DataArrayInt([4])))
         self.assertEqual(ff.getNumberOfTuples(),1)
         self.assertEqual(ff.getNbOfElemAllocated(),1)
+        d=DataArrayInt()
+        d.pushBackSilent(444)
+        d.pushBackSilent(555)
+        d.pushBackSilent(666)
+        self.assertTrue(d.isEqual(DataArrayInt([444,555,666])))
         pass
 
     def setUp(self):

@@ -1589,11 +1589,11 @@ void MEDCouplingBasicsTest4::testFindAndCorrectBadOriented3DExtrudedCells1()
   m->insertNextCell(INTERP_KERNEL::NORM_HEXA8,8,conn+48);
   m->finishInsertingCells();
   //
-  std::vector<int> v;
-  m->findAndCorrectBadOriented3DExtrudedCells(v);
-  CPPUNIT_ASSERT_EQUAL(4,(int)v.size());
-  CPPUNIT_ASSERT(std::equal(v.begin(),v.end(),invalidCells));
+  DataArrayInt *v=m->findAndCorrectBadOriented3DExtrudedCells();
+  CPPUNIT_ASSERT_EQUAL(4,v->getNumberOfTuples());
+  CPPUNIT_ASSERT(std::equal(v->begin(),v->end(),invalidCells));
   CPPUNIT_ASSERT(std::equal(connExp,connExp+64,m->getNodalConnectivity()->getConstPointer()));
+  v->decrRef();
   //
   m->decrRef();
 }

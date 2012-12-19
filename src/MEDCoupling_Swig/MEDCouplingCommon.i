@@ -294,6 +294,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::MEDCouplingUMesh::buildPartOrthogonalField;
 %newobject ParaMEDMEM::MEDCouplingUMesh::keepCellIdsByType;
 %newobject ParaMEDMEM::MEDCouplingUMesh::Build0DMeshFromCoords;
+%newobject ParaMEDMEM::MEDCouplingUMesh::findAndCorrectBadOriented3DExtrudedCells;
 %newobject ParaMEDMEM::MEDCouplingUMesh::findCellIdsOnBoundary;
 %newobject ParaMEDMEM::MEDCouplingUMesh::computeSkin;
 %newobject ParaMEDMEM::MEDCouplingUMesh::getCellIdsLyingOnNodes;
@@ -1109,6 +1110,7 @@ namespace ParaMEDMEM
                std::copy(nodes.begin(),nodes.end(),ret->getPointer());
                return SWIG_NewPointerObj(SWIG_as_voidptr(ret),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 );
              }
+           
            PyObject *getNodeIdsNearPoint(PyObject *pt, double eps) const throw(INTERP_KERNEL::Exception)
            {
              double val;
@@ -1119,16 +1121,13 @@ namespace ParaMEDMEM
              int spaceDim=self->getSpaceDimension();
              const char msg[]="Python wrap of MEDCouplingPointSet::getNodeIdsNearPoint : ";
              const double *pos=convertObjToPossibleCpp5_Safe(pt,sw,val,a,aa,bb,msg,1,spaceDim,true);
-             std::vector<int> tmp=self->getNodeIdsNearPoint(pos,eps);
-             DataArrayInt *ret=DataArrayInt::New();
-             ret->alloc((int)tmp.size(),1);
-             std::copy(tmp.begin(),tmp.end(),ret->getPointer());
+             DataArrayInt *ret=self->getNodeIdsNearPoint(pos,eps);
              return SWIG_NewPointerObj(SWIG_as_voidptr(ret),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 );
            }
 
            PyObject *getNodeIdsNearPoints(PyObject *pt, int nbOfNodes, double eps) const throw(INTERP_KERNEL::Exception)
            {
-             std::vector<int> c,cI;
+             DataArrayInt *c=0,*cI=0;
              //
              double val;
              DataArrayDouble *a;
@@ -1140,22 +1139,14 @@ namespace ParaMEDMEM
              const double *pos=convertObjToPossibleCpp5_Safe(pt,sw,val,a,aa,bb,msg,nbOfNodes,spaceDim,true);
              self->getNodeIdsNearPoints(pos,nbOfNodes,eps,c,cI);
              PyObject *ret=PyTuple_New(2);
-             MEDCouplingAutoRefCountObjectPtr<DataArrayInt> d0=DataArrayInt::New();
-             MEDCouplingAutoRefCountObjectPtr<DataArrayInt> d1=DataArrayInt::New();
-             d0->alloc(c.size(),1);
-             d1->alloc(cI.size(),1);
-             std::copy(c.begin(),c.end(),d0->getPointer());
-             std::copy(cI.begin(),cI.end(),d1->getPointer());
-             PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(d0),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
-             PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(d1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
-             d0->incrRef();
-             d1->incrRef();
+             PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(c),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+             PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(cI),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
              return ret;
            }
 
            PyObject *getNodeIdsNearPoints(PyObject *pt, double eps) const throw(INTERP_KERNEL::Exception)
            {
-             std::vector<int> c,cI;
+             DataArrayInt *c=0,*cI=0;
              int spaceDim=self->getSpaceDimension();
              void *da=0;
              int res1=SWIG_ConvertPtr(pt,&da,SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, 0 |  0 );
@@ -1185,16 +1176,8 @@ namespace ParaMEDMEM
                  self->getNodeIdsNearPoints(da2->getConstPointer(),size,eps,c,cI);
                }
              PyObject *ret=PyTuple_New(2);
-             MEDCouplingAutoRefCountObjectPtr<DataArrayInt> d0=DataArrayInt::New();
-             MEDCouplingAutoRefCountObjectPtr<DataArrayInt> d1=DataArrayInt::New();
-             d0->alloc(c.size(),1);
-             d1->alloc(cI.size(),1);
-             std::copy(c.begin(),c.end(),d0->getPointer());
-             std::copy(cI.begin(),cI.end(),d1->getPointer());
-             PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(d0),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
-             PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(d1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
-             d0->incrRef();
-             d1->incrRef();
+             PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(c),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+             PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(cI),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
              return ret;
            }
 
@@ -1431,6 +1414,7 @@ namespace ParaMEDMEM
     MEDCouplingFieldDouble *getSkewField() const throw(INTERP_KERNEL::Exception);
     DataArrayInt *convexEnvelop2D() throw(INTERP_KERNEL::Exception);
     std::string cppRepr() const throw(INTERP_KERNEL::Exception);
+    DataArrayInt *findAndCorrectBadOriented3DExtrudedCells() throw(INTERP_KERNEL::Exception);
     static MEDCouplingUMesh *Build0DMeshFromCoords(DataArrayDouble *da) throw(INTERP_KERNEL::Exception);
     static MEDCouplingUMesh *MergeUMeshes(const MEDCouplingUMesh *mesh1, const MEDCouplingUMesh *mesh2) throw(INTERP_KERNEL::Exception);
     static MEDCouplingUMesh *MergeUMeshesOnSameCoords(const MEDCouplingUMesh *mesh1, const MEDCouplingUMesh *mesh2) throw(INTERP_KERNEL::Exception);
@@ -1679,14 +1663,11 @@ namespace ParaMEDMEM
 
       PyObject *findCommonCells(int compType, int startCellId=0) const throw(INTERP_KERNEL::Exception)
       {
-        std::vector<int> v0,v1;
+        DataArrayInt *v0=0,*v1=0;
         self->findCommonCells(compType,startCellId,v0,v1);
-        DataArrayInt *v0a=DataArrayInt::New(),*v1a=DataArrayInt::New();
-        v0a->alloc((int)v0.size(),1); std::copy(v0.begin(),v0.end(),v0a->getPointer());
-        v1a->alloc((int)v1.size(),1); std::copy(v1.begin(),v1.end(),v1a->getPointer());
         PyObject *res = PyList_New(2);
-        PyList_SetItem(res,0,SWIG_NewPointerObj(SWIG_as_voidptr(v0a),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
-        PyList_SetItem(res,1,SWIG_NewPointerObj(SWIG_as_voidptr(v1a),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+        PyList_SetItem(res,0,SWIG_NewPointerObj(SWIG_as_voidptr(v0),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+        PyList_SetItem(res,1,SWIG_NewPointerObj(SWIG_as_voidptr(v1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
         return res;
       }
 
@@ -2081,16 +2062,6 @@ namespace ParaMEDMEM
       {
         std::vector<int> cells;
         self->arePolyhedronsNotCorrectlyOriented(cells);
-        DataArrayInt *ret=DataArrayInt::New();
-        ret->alloc((int)cells.size(),1);
-        std::copy(cells.begin(),cells.end(),ret->getPointer());
-        return SWIG_NewPointerObj(SWIG_as_voidptr(ret),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 );
-      }
-
-      PyObject *findAndCorrectBadOriented3DExtrudedCells() throw(INTERP_KERNEL::Exception)
-      {
-        std::vector<int> cells;
-        self->findAndCorrectBadOriented3DExtrudedCells(cells);
         DataArrayInt *ret=DataArrayInt::New();
         ret->alloc((int)cells.size(),1);
         std::copy(cells.begin(),cells.end(),ret->getPointer());
@@ -3260,14 +3231,11 @@ namespace ParaMEDMEM
      const char msg[]="Python wrap of DataArrayDouble::computeTupleIdsNearTuples : ";
      const double *pos=convertObjToPossibleCpp5_Safe2(pt,sw,val,a,aa,bb,msg,nbComp,true,nbTuples);
      MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> inpu=DataArrayDouble::New(); inpu->useArray(pos,false,CPP_DEALLOC,nbTuples,nbComp);
-     std::vector<int> c,cI;
+     DataArrayInt *c=0,*cI=0;
      self->computeTupleIdsNearTuples(inpu,eps,c,cI);
-     DataArrayInt *ret0=DataArrayInt::New(),*ret1=DataArrayInt::New();
-     ret0->alloc((int)c.size(),1); std::copy(c.begin(),c.end(),ret0->getPointer());
-     ret1->alloc((int)cI.size(),1); std::copy(cI.begin(),cI.end(),ret1->getPointer());
      PyObject *ret=PyTuple_New(2);
-     PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
-     PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+     PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(c),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+     PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(cI),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
      return ret;
    }
 
@@ -4190,20 +4158,12 @@ namespace ParaMEDMEM
    
    PyObject *computeTupleIdsNearTuples(const DataArrayDouble *other, double eps)
    {
-     std::vector<int> c,cI;
+     DataArrayInt *c=0,*cI=0;
      //
      self->computeTupleIdsNearTuples(other,eps,c,cI);
      PyObject *ret=PyTuple_New(2);
-     MEDCouplingAutoRefCountObjectPtr<DataArrayInt> d0=DataArrayInt::New();
-     MEDCouplingAutoRefCountObjectPtr<DataArrayInt> d1=DataArrayInt::New();
-     d0->alloc(c.size(),1);
-     d1->alloc(cI.size(),1);
-     std::copy(c.begin(),c.end(),d0->getPointer());
-     std::copy(cI.begin(),cI.end(),d1->getPointer());
-     PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(d0),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
-     PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(d1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
-     d0->incrRef();
-     d1->incrRef();
+     PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(c),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+     PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(cI),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
      return ret;
    }
  };
