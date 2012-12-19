@@ -1951,8 +1951,6 @@ DataArrayInt *MEDCouplingUMesh::findCellIdsOnBoundary() const throw(INTERP_KERNE
   //
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> tmp=revDescIndx->deltaShiftIndex();
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> faceIds=tmp->getIdsEqual(1); tmp=(DataArrayInt*)0;
-  int nbOfFaces=faceIds->getNumberOfTuples();
-  const int *faces=faceIds->getConstPointer();
   const int *revDescPtr=revDesc->getConstPointer();
   const int *revDescIndxPtr=revDescIndx->getConstPointer();
   int nbOfCells=getNumberOfCells();
