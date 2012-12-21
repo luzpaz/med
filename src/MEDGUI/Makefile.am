@@ -48,7 +48,7 @@ MOC_FILES= MEDGUI_moc.cxx MEDGUIFileContentDial_moc.cxx MEDGUISelectComponents_m
 EXTRA_DIST += $(MOC_FILES:%_moc.cxx=%.h) $(nodist_salomeres_DATA:%.qm=%.ts)
 
 ui_%.h: %.ui
-	${QTDIR}/bin/uic $< -o $@
+	${UIC} $< -o $@
 
 .hxx_moc.cxx :
 	${QTDIR}/bin/moc -p . -o $@ $<
