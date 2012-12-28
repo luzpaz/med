@@ -42,7 +42,6 @@
 #include "PointLocator3DIntersectorP0P0.hxx"
 
 #include "MEDCouplingAutoRefCountObjectPtr.hxx"
-#include "BBTree.txx"
 
 #ifdef HAVE_MPI2
 #include <mpi.h>
@@ -145,13 +144,13 @@ MEDPARTITIONER::MeshCollection::MeshCollection(MeshCollection& initialCollection
     std::cout<<"treating cell and face families"<<std::endl;
   
   castIntField(initialCollection.getMesh(),
-                this->getMesh(),
-                initialCollection.getCellFamilyIds(),
-                "cellFamily");
+               this->getMesh(),
+               initialCollection.getCellFamilyIds(),
+               "cellFamily");
   castIntField(initialCollection.getFaceMesh(), 
-                this->getFaceMesh(),
-                initialCollection.getFaceFamilyIds(),
-                "faceFamily");
+               this->getFaceMesh(),
+               initialCollection.getFaceFamilyIds(),
+               "faceFamily");
 
   //treating groups
 #ifdef HAVE_MPI2
@@ -289,13 +288,13 @@ void MEDPARTITIONER::MeshCollection::castCellMeshes(MeshCollection& initialColle
                   array->decrRef(); // array is not used in this case
                 }
               _mesh[inew]->zipCoords();
-                
+
             }
         }
       for (int i=0;i<(int)splitMeshes[inew].size();i++)
         if (splitMeshes[inew][i]!=0)
           splitMeshes[inew][i]->decrRef();
-    }  
+    }
   if (MyGlobals::_Verbose>300)
     std::cout << "proc " << rank << " : castCellMeshes end fusing" << std::endl;
 }
@@ -313,21 +312,23 @@ void MEDPARTITIONER::MeshCollection::createNodeMapping( MeshCollection& initialC
     {
 
       double* bbox;
-      BBTree<3>* tree; 
+      BBTreeOfDim* tree = 0;
+      int dim = 3;
       if (!isParallelMode() || (_domain_selector->isMyDomain(iold)))
         {
           //      std::map<pair<double,pair<double, double> >, int > nodeClassifier;
-          int nvertices=initialCollection.getMesh(iold)->getNumberOfNodes();
-          bbox=new double[nvertices*2*3];
           ParaMEDMEM::DataArrayDouble* coords = initialCollection.getMesh(iold)->getCoords();
           double* coordsPtr=coords->getPointer();
+          dim = coords->getNumberOfComponents();
+          int nvertices=initialCollection.getMesh(iold)->getNumberOfNodes();
+          bbox=new double[nvertices*2*dim];
 
-          for (int i=0; i<nvertices*3;i++)
+          for (int i=0; i<nvertices*dim;i++)
             {
               bbox[i*2]=coordsPtr[i]-1e-8;
               bbox[i*2+1]=coordsPtr[i]+1e-8;
             }
-          tree=new BBTree<3>(bbox,0,0,nvertices,1e-9);
+          tree=new BBTreeOfDim( dim, bbox,0,0,nvertices,1e-9);
         }
 
       for (int inew=0; inew<_topology->nbDomain(); inew++)
@@ -343,7 +344,7 @@ void MEDPARTITIONER::MeshCollection::createNodeMapping( MeshCollection& initialC
               ParaMEDMEM::DataArrayDouble* coords = mesh->getCoords();
               for (int inode=0; inode<mesh->getNumberOfNodes();inode++)
                 {
-                  double* coordsPtr=coords->getPointer()+inode*3;
+                  double* coordsPtr=coords->getPointer()+inode*dim;
                   vector<int> elems;
                   tree->getElementsAroundPoint(coordsPtr,elems);
                   if (elems.size()==0) continue;
@@ -353,52 +354,55 @@ void MEDPARTITIONER::MeshCollection::createNodeMapping( MeshCollection& initialC
             }
           else if (!isParallelMode() || (_domain_selector->isMyDomain(inew) && _domain_selector->isMyDomain(iold)))
 #else
-          if (!isParallelMode() || (_domain_selector->isMyDomain(inew) && _domain_selector->isMyDomain(iold)))
+            if (!isParallelMode() || (_domain_selector->isMyDomain(inew) && _domain_selector->isMyDomain(iold)))
 #endif
-            {
-              ParaMEDMEM::DataArrayDouble* coords = getMesh(inew)->getCoords();
-              for (int inode=0; inode<_mesh[inew]->getNumberOfNodes();inode++)
-                {
-                  double* coordsPtr=coords->getPointer()+inode*3;
-                  vector<int> elems;
-                  tree->getElementsAroundPoint(coordsPtr,elems);
-                  if (elems.size()==0) continue;
-                  nodeMapping.insert(make_pair(make_pair(iold,elems[0]),make_pair(inew,inode)));
-                }
-            }
+              {
+                ParaMEDMEM::DataArrayDouble* coords = getMesh(inew)->getCoords();
+                for (int inode=0; inode<_mesh[inew]->getNumberOfNodes();inode++)
+                  {
+                    double* coordsPtr=coords->getPointer()+inode*dim;
+                    vector<int> elems;
+                    tree->getElementsAroundPoint(coordsPtr,elems);
+                    if (elems.size()==0) continue;
+                    nodeMapping.insert(make_pair(make_pair(iold,elems[0]),make_pair(inew,inode)));
+                  }
+              }
         }
       if (!isParallelMode() || (_domain_selector->isMyDomain(iold)))
         {
           delete tree;
           delete[] bbox;
         }
-    } 
+    }
 
 }
 
 void getNodeIds(ParaMEDMEM::MEDCouplingUMesh& meshOne, ParaMEDMEM::MEDCouplingUMesh& meshTwo, std::vector<int>& nodeIds)
 {
   using std::vector;
+  using MEDPARTITIONER::BBTreeOfDim;
   if (!&meshOne || !&meshTwo) return;  //empty or not existing
   double* bbox;
-  BBTree<3>* tree;
+  BBTreeOfDim* tree = 0;
   int nv1=meshOne.getNumberOfNodes();
-  bbox=new double[nv1*6];
   ParaMEDMEM::DataArrayDouble* coords=meshOne.getCoords();
+  int dim = coords->getNumberOfComponents();
+
+  bbox=new double[nv1*2*dim];
   double* coordsPtr=coords->getPointer();
-  for (int i=0; i<nv1*3; i++)
+  for (int i=0; i<nv1*dim; i++)
     {
       bbox[i*2]=coordsPtr[i]-1e-8;
       bbox[i*2+1]=coordsPtr[i]+1e-8;
     }
-  tree=new BBTree<3>(bbox,0,0,nv1,1e-9);
-  
+  tree=new BBTreeOfDim( dim, bbox,0,0,nv1,1e-9);
+
   int nv2=meshTwo.getNumberOfNodes();
   nodeIds.resize(nv2,-1);
   coords=meshTwo.getCoords();
   for (int inode=0; inode<nv2; inode++)
     {
-      double* coordsPtr2=coords->getPointer()+inode*3;
+      double* coordsPtr2=coords->getPointer()+inode*dim;
       vector<int> elems;
       tree->getElementsAroundPoint(coordsPtr2,elems);
       if (elems.size()==0) continue;
@@ -600,9 +604,9 @@ void MEDPARTITIONER::MeshCollection::castFaceMeshes(MeshCollection& initialColle
 
 
 void MEDPARTITIONER::MeshCollection::castIntField(std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastFrom,
-                                   std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastTo,
-                                   std::vector<ParaMEDMEM::DataArrayInt*>& arrayFrom,
-                                   std::string nameArrayTo)
+                                                  std::vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastTo,
+                                                  std::vector<ParaMEDMEM::DataArrayInt*>& arrayFrom,
+                                                  std::string nameArrayTo)
 {
   using std::vector;
   
@@ -613,16 +617,15 @@ void MEDPARTITIONER::MeshCollection::castIntField(std::vector<ParaMEDMEM::MEDCou
   //preparing bounding box trees for accelerating source-target node identifications
   if (MyGlobals::_Verbose>99)
     std::cout<<"making accelerating structures"<<std::endl;
-  std::vector<BBTree<3,int>* > acceleratingStructures(ioldMax);
+  std::vector<BBTreeOfDim* > acceleratingStructures(ioldMax);
   std::vector<ParaMEDMEM::DataArrayDouble*>bbox(ioldMax);
   for (int iold =0; iold< ioldMax; iold++)
     if (isParallelMode() && _domain_selector->isMyDomain(iold))
       {
         ParaMEDMEM::DataArrayDouble* sourceCoords=meshesCastFrom[iold]->getBarycenterAndOwner();
         bbox[iold]=sourceCoords->computeBBoxPerTuple(1.e-6);
-        acceleratingStructures[iold]=new BBTree<3,int> (bbox[iold]->getConstPointer(),0,0,bbox[iold]->getNumberOfTuples());
+        acceleratingStructures[iold]=new BBTreeOfDim( sourceCoords->getNumberOfComponents(), bbox[iold]->getConstPointer(),0,0,bbox[iold]->getNumberOfTuples());
       }
-
   // send-recv operations
 #ifdef HAVE_MPI2
   for (int inew=0; inew<inewMax; inew++)
@@ -689,29 +692,30 @@ void MEDPARTITIONER::MeshCollection::remapIntField(int inew, int iold,
                                                     const ParaMEDMEM::MEDCouplingUMesh& targetMesh,
                                                     const int* fromArray,
                                                     std::string nameArrayTo,
-                                                    const BBTree<3,int>* myTree)
+                                                    const BBTreeOfDim* myTree)
 {
 
   if (sourceMesh.getNumberOfCells()<=0) return; //empty mesh could exist
   ParaMEDMEM::DataArrayDouble* targetCoords=targetMesh.getBarycenterAndOwner();
   const double*  tc=targetCoords->getConstPointer();
   int targetSize=targetMesh.getNumberOfCells();
-  int sourceSize=sourceMesh.getNumberOfCells();
-if (MyGlobals::_Verbose>200)
-std::cout<<"remap vers target de taille "<<targetSize<<std::endl;
+  // int sourceSize=sourceMesh.getNumberOfCells(); // unused variable
+  if (MyGlobals::_Verbose>200)
+    std::cout<<"remap vers target de taille "<<targetSize<<std::endl;
   std::vector<int> ccI;
   std::string str,cle;
   str=nameArrayTo+"_toArray";
   cle=Cle1ToStr(str,inew);
   int* toArray;
   
-  const BBTree<3>* tree;
+  const BBTreeOfDim* tree;
   bool cleantree=false;
   ParaMEDMEM::DataArrayDouble* sourceBBox=0;
+  int dim = targetCoords->getNumberOfComponents();
   if (myTree==0)
     {
       sourceBBox=sourceMesh.getBarycenterAndOwner()->computeBBoxPerTuple(1e-8);
-      tree=new BBTree<3> (sourceBBox->getConstPointer(),0,0, sourceBBox->getNumberOfTuples(),1e-10);
+      tree=new BBTreeOfDim( dim, sourceBBox->getConstPointer(),0,0, sourceBBox->getNumberOfTuples(),1e-10);
       cleantree=true;
     }
   else tree=myTree;
@@ -730,14 +734,22 @@ std::cout<<"remap vers target de taille "<<targetSize<<std::endl;
     {
       toArray=_map_dataarray_int.find(cle)->second->getPointer();
     }
-  
+
+  std::map< int, int > isource2nb; // count coincident elements
+  std::map<int,int>::iterator i2nb;
+
   for (int itargetnode=0; itargetnode<targetSize; itargetnode++)    
     {
       std::vector<int> intersectingElems;
-      tree->getElementsAroundPoint(tc+itargetnode*3,intersectingElems); // to be changed in 2D
+      tree->getElementsAroundPoint(tc+itargetnode*dim,intersectingElems);
       if (intersectingElems.size()!=0)
         {
           int isourcenode=intersectingElems[0];
+          if ( intersectingElems.size() > 1 )
+            {
+              i2nb = isource2nb.insert( std::make_pair( isourcenode, 0 )).first;
+              isourcenode = intersectingElems[ i2nb->second++ ];
+            }
           toArray[itargetnode]=fromArray[isourcenode];
           ccI.push_back(itargetnode);
           ccI.push_back(isourcenode);
@@ -751,12 +763,11 @@ std::cout<<"remap vers target de taille "<<targetSize<<std::endl;
     std::cout << "proc " << MyGlobals::_Rank << " : map memorize '" << str << "'\n";
 
   _map_dataarray_int[str]=CreateDataArrayIntFromVector(ccI, 2);
-  
+
   targetCoords->decrRef();
   if (cleantree) delete tree;
   if (sourceBBox !=0) sourceBBox->decrRef();
-  
- }
+}
 
 void MEDPARTITIONER::MeshCollection::castAllFields(MeshCollection& initialCollection, std::string nameArrayTo)
 {
@@ -1336,10 +1347,12 @@ void MEDPARTITIONER::MeshCollection::buildCellGraph(MEDPARTITIONER::SkyLineArray
   if (MyGlobals::_Verbose>50)
     std::cout<<"getting nodal connectivity"<<std::endl;
   //looking for reverse nodal connectivity i global numbering
+  int meshDim = 3;
   for (int idomain=0; idomain<nbdomain; idomain++)
     {
       if (isParallelMode() && !_domain_selector->isMyDomain(idomain))
         continue;
+      meshDim = _mesh[idomain]->getMeshDimension();
     
       ParaMEDMEM::DataArrayInt* index=ParaMEDMEM::DataArrayInt::New();
       ParaMEDMEM::DataArrayInt* revConn=ParaMEDMEM::DataArrayInt::New();
@@ -1428,9 +1441,9 @@ void MEDPARTITIONER::MeshCollection::buildCellGraph(MEDPARTITIONER::SkyLineArray
   for (std::map<pair<int,int>,int>::const_iterator it=cell2cellcounter.begin();
        it!=cell2cellcounter.end();
        it++)
-    if (it->second>=3) 
+    if (it->second>=meshDim)
       {
-        cell2cell.insert(std::make_pair(it->first.first,it->first.second)); //should be adapted for 2D!
+        cell2cell.insert(std::make_pair(it->first.first,it->first.second));
         cell2cell.insert(std::make_pair(it->first.second, it->first.first));
       }
 
@@ -1473,7 +1486,7 @@ void MEDPARTITIONER::MeshCollection::buildCellGraph(MEDPARTITIONER::SkyLineArray
           index.push_back(idep);
         }
     }
-  
+
   array=new MEDPARTITIONER::SkyLineArray(index,value);
 
   if (MyGlobals::_Verbose>100)
@@ -1721,13 +1734,13 @@ void MEDPARTITIONER::MeshCollection::filterFaceOnCell()
           getNodeIds(*mcel, *mfac, nodeIds);
           if (nodeIds.size()==0)
             continue;  //one empty mesh nothing to do
-      
+
           ParaMEDMEM::DataArrayInt *revNodalCel=ParaMEDMEM::DataArrayInt::New();
           ParaMEDMEM::DataArrayInt *revNodalIndxCel=ParaMEDMEM::DataArrayInt::New();
           mcel->getReverseNodalConnectivity(revNodalCel,revNodalIndxCel);
           int *revC=revNodalCel->getPointer();
           int *revIndxC=revNodalIndxCel->getPointer();
-      
+
           std::vector< int > faceOnCell;
           std::vector< int > faceNotOnCell;
           int nbface=mfac->getNumberOfCells();
@@ -1737,11 +1750,20 @@ void MEDPARTITIONER::MeshCollection::filterFaceOnCell()
               std::vector< int > inodesFace;
               mfac->getNodeIdsOfCell(iface, inodesFace);
               int nbnodFace=inodesFace.size();
+              if ( nbnodFace != mfac->getNumberOfNodesInCell( iface ))
+                continue; // invalid node ids
               //set inodesFace in mcel
-              for (int i=0; i<nbnodFace; i++) inodesFace[i]=nodeIds[inodesFace[i]];
+              int nbok = 0;
+              for (int i=0; i<nbnodFace; i++)
+                nbok += (( inodesFace[i]=nodeIds[inodesFace[i]] ) >= 0 );
+              if ( nbok != nbnodFace )
+                continue;
               int inod=inodesFace[0];
               if (inod<0)
-                std::cout << "filterFaceOnCell problem 1" << std::endl;
+                {
+                  std::cout << "filterFaceOnCell problem 1" << std::endl;
+                  continue;
+                }
               int nbcell=revIndxC[inod+1]-revIndxC[inod];
               for (int j=0; j<nbcell; j++) //look for each cell with inod
                 {
