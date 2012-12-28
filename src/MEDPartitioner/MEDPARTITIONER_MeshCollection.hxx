@@ -22,6 +22,7 @@
 
 #include "MEDPARTITIONER.hxx"
 #include "MEDPARTITIONER_Graph.hxx"
+#include "MEDPARTITIONER_Utils.hxx"
 
 #include "MEDCouplingUMesh.hxx"
 
@@ -156,11 +157,11 @@ namespace MEDPARTITIONER
 
     
     void remapIntField(int inew, int iold, 
-                        const ParaMEDMEM::MEDCouplingUMesh& sourceMesh,
-                        const ParaMEDMEM::MEDCouplingUMesh& targetMesh,
-                        const int* fromArray,
-                        std::string nameArrayTo,
-                       const BBTree<3,int>* tree);
+                       const ParaMEDMEM::MEDCouplingUMesh& sourceMesh,
+                       const ParaMEDMEM::MEDCouplingUMesh& targetMesh,
+                       const int* fromArray,
+                       std::string nameArrayTo,
+                       const BBTreeOfDim* tree);
 
     void remapDoubleField(int inew, int iold,
                            ParaMEDMEM::DataArrayDouble* fromArray,
