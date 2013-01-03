@@ -657,100 +657,108 @@ MEDCouplingUMesh *MEDCouplingUMesh::buildDescendingConnectivityGen(DataArrayInt 
   checkConnectivityFullyDefined();
   int nbOfCells=getNumberOfCells();
   int nbOfNodes=getNumberOfNodes();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> revNodalIndx=DataArrayInt::New(); revNodalIndx->alloc(nbOfNodes+1,1); revNodalIndx->fillWithZero();
+  int *revNodalIndxPtr=revNodalIndx->getPointer();
   const int *conn=_nodal_connec->getConstPointer();
   const int *connIndex=_nodal_connec_index->getConstPointer();
-  std::vector< std::vector<int> > descMeshConnB(nbOfCells);
-  std::vector< std::vector<int> > revDescMeshConnB;
-  std::vector< std::vector<int> > revNodalB(nbOfNodes);
-  std::vector<int> meshDM1Conn;
-  std::vector<int> meshDM1ConnIndex(1); meshDM1ConnIndex[0]=0;
-  std::vector<int> meshDM1Type;
-  for(int eltId=0;eltId<nbOfCells;eltId++)
+  std::string name="Mesh constituent of "; name+=getName();
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> ret=MEDCouplingUMesh::New(name.c_str(),getMeshDimension()-1);
+  ret->setCoords(getCoords());
+  ret->allocateCells(2*nbOfCells);
+  descIndx->alloc(nbOfCells+1,1);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> revDesc2(DataArrayInt::New()); revDesc2->reserve(2*nbOfCells);
+  int *descIndxPtr=descIndx->getPointer(); *descIndxPtr++=0;
+  for(int eltId=0;eltId<nbOfCells;eltId++,descIndxPtr++)
     {
       int pos=connIndex[eltId];
       int posP1=connIndex[eltId+1];
       const INTERP_KERNEL::CellModel& cm=INTERP_KERNEL::CellModel::GetCellModel((INTERP_KERNEL::NormalizedCellType)conn[pos]);
       unsigned nbOfSons=cm.getNumberOfSons2(conn+pos+1,posP1-pos-1);
-      int *tmp=new int[posP1-pos];
+      INTERP_KERNEL::AutoPtr<int> tmp=new int[posP1-pos];
       for(unsigned i=0;i<nbOfSons;i++)
         {
           INTERP_KERNEL::NormalizedCellType cmsId;
           unsigned nbOfNodesSon=cm.fillSonCellNodalConnectivity2(i,conn+pos+1,posP1-pos-1,tmp,cmsId);
-          const INTERP_KERNEL::CellModel& cms=INTERP_KERNEL::CellModel::GetCellModel(cmsId);
-          std::set<int> shareableCells(revNodalB[tmp[0]].begin(),revNodalB[tmp[0]].end());
-          for(unsigned j=1;j<nbOfNodesSon && !shareableCells.empty();j++)
+          for(unsigned k=0;k<nbOfNodesSon;k++)
+            if(tmp[k]>=0)
+              revNodalIndxPtr[tmp[k]+1]++;
+          ret->insertNextCell(cmsId,nbOfNodesSon,tmp);
+          revDesc2->pushBackSilent(eltId);
+        }
+      descIndxPtr[0]=descIndxPtr[-1]+(int)nbOfSons;
+    }
+  int nbOfCellsM1=ret->getNumberOfCells();
+  std::transform(revNodalIndxPtr+1,revNodalIndxPtr+nbOfNodes+1,revNodalIndxPtr,revNodalIndxPtr+1,std::plus<int>());
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> revNodal=DataArrayInt::New(); revNodal->alloc(revNodalIndx->back(),1);
+  std::fill(revNodal->getPointer(),revNodal->getPointer()+revNodalIndx->back(),-1);
+  int *revNodalPtr=revNodal->getPointer();
+  const int *connM1=ret->getNodalConnectivity()->getConstPointer();
+  const int *connIndexM1=ret->getNodalConnectivityIndex()->getConstPointer();
+  for(int eltId=0;eltId<nbOfCellsM1;eltId++)
+    {
+      const int *strtNdlConnOfCurCell=connM1+connIndexM1[eltId]+1;
+      const int *endNdlConnOfCurCell=connM1+connIndexM1[eltId+1];
+      for(const int *iter=strtNdlConnOfCurCell;iter!=endNdlConnOfCurCell;iter++)
+        if(*iter>=0)//for polyhedrons
+          *std::find_if(revNodalPtr+revNodalIndxPtr[*iter],revNodalPtr+revNodalIndxPtr[*iter+1],std::bind2nd(std::equal_to<int>(),-1))=eltId;
+    }
+  //
+  DataArrayInt *commonCells=0,*commonCellsI=0;
+  FindCommonCellsAlg(3,0,ret->getNodalConnectivity(),ret->getNodalConnectivityIndex(),revNodal,revNodalIndx,commonCells,commonCellsI);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> commonCellsTmp(commonCells),commonCellsITmp(commonCellsI);
+  const int *commonCellsPtr(commonCells->getConstPointer()),*commonCellsIPtr(commonCellsI->getConstPointer());
+  int newNbOfCellsM1=-1;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> o2nM1=DataArrayInt::BuildOld2NewArrayFromSurjectiveFormat2(nbOfCellsM1,commonCells->begin(),
+                                                                                                            commonCellsI->begin(),commonCellsI->end(),newNbOfCellsM1);
+  std::vector<bool> isImpacted(nbOfCellsM1,false);
+  for(const int *work=commonCellsI->begin();work!=commonCellsI->end()-1;work++)
+    for(int work2=work[0];work2!=work[1];work2++)
+      isImpacted[commonCellsPtr[work2]]=true;
+  const int *o2nM1Ptr=o2nM1->getConstPointer();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> n2oM1=o2nM1->invertArrayO2N2N2OBis(newNbOfCellsM1);
+  const int *n2oM1Ptr=n2oM1->getConstPointer();
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> ret2=static_cast<MEDCouplingUMesh *>(ret->buildPartOfMySelf(n2oM1->begin(),n2oM1->end(),true));
+  ret2->setName(name.c_str());
+  desc->alloc(descIndx->back(),1);
+  int *descPtr=desc->getPointer();
+  const INTERP_KERNEL::CellModel& cmsDft=INTERP_KERNEL::CellModel::GetCellModel(INTERP_KERNEL::NORM_POINT1);
+  for(int i=0;i<nbOfCellsM1;i++,descPtr++)
+    {
+      if(!isImpacted[i])
+        *descPtr=nbrer(o2nM1Ptr[i],0,cmsDft,false,0,0);
+      else
+        {
+          if(i!=n2oM1Ptr[o2nM1Ptr[i]])
             {
-              std::set<int> tmp2(revNodalB[tmp[j]].begin(),revNodalB[tmp[j]].end());
-              std::set<int> tmp3;
-              std::set_intersection(tmp2.begin(),tmp2.end(),shareableCells.begin(),shareableCells.end(),inserter(tmp3,tmp3.begin()));
-              shareableCells=tmp3;
-            }
-          std::list<int> shareableCellsL(shareableCells.begin(),shareableCells.end());
-          std::set<int> ref(tmp,tmp+nbOfNodesSon);
-          for(std::list<int>::iterator iter=shareableCellsL.begin();iter!=shareableCellsL.end();)
-            {
-              if(cms.isCompatibleWith((INTERP_KERNEL::NormalizedCellType)meshDM1Type[*iter]))
-                {
-                  std::set<int> ref2(meshDM1Conn.begin()+meshDM1ConnIndex[*iter],meshDM1Conn.begin()+meshDM1ConnIndex[(*iter)+1]);
-                  if(ref==ref2)
-                    break;
-                  else
-                    iter=shareableCellsL.erase(iter);
-                }
-              else
-                iter=shareableCellsL.erase(iter);
-            }
-          if(shareableCellsL.empty())
-            {
-              meshDM1Conn.insert(meshDM1Conn.end(),tmp,tmp+nbOfNodesSon);
-              meshDM1ConnIndex.push_back(meshDM1ConnIndex.back()+nbOfNodesSon);
-              int cellDM1Id=(int)meshDM1Type.size();
-              meshDM1Type.push_back((int)cmsId);
-              for(unsigned k=0;k<nbOfNodesSon;k++)
-                revNodalB[tmp[k]].push_back(cellDM1Id);
-              revDescMeshConnB.resize(cellDM1Id+1);
-              revDescMeshConnB.back().push_back(eltId);
-              descMeshConnB[eltId].push_back(nbrer(cellDM1Id,0,cms,false,0,0));
+              const INTERP_KERNEL::CellModel& cms=INTERP_KERNEL::CellModel::GetCellModel((INTERP_KERNEL::NormalizedCellType)connM1[connIndexM1[i]]);
+              *descPtr=nbrer(o2nM1Ptr[i],connIndexM1[i+1]-connIndexM1[i]-1,cms,true,connM1+connIndexM1[n2oM1Ptr[o2nM1Ptr[i]]]+1,connM1+connIndexM1[i]+1);
             }
           else
-            {
-              int DM1cellId=shareableCellsL.front();
-              revDescMeshConnB[DM1cellId].push_back(eltId);
-              descMeshConnB[eltId].push_back(nbrer(DM1cellId,nbOfNodesSon,cms,true,tmp,&meshDM1Conn[meshDM1ConnIndex[DM1cellId]]));
-            }
+            *descPtr=nbrer(o2nM1Ptr[i],0,cmsDft,false,0,0);
         }
-      delete [] tmp;
     }
-  revNodalB.clear();
-  //
-  std::string name="Mesh constituent of "; name+=getName();
-  MEDCouplingUMesh *ret=MEDCouplingUMesh::New(name.c_str(),getMeshDimension()-1);
-  ret->setCoords(getCoords());
-  int nbOfCellsInConstituent=(int)meshDM1Type.size();
-  ret->allocateCells(nbOfCellsInConstituent);
-  revDescIndx->alloc(nbOfCellsInConstituent+1,1);
-  int *tmp3=revDescIndx->getPointer(); tmp3[0]=0;
-  for(int ii=0;ii<nbOfCellsInConstituent;ii++)
+  revDesc->reserve(newNbOfCellsM1);
+  revDescIndx->alloc(newNbOfCellsM1+1,1);
+  int *revDescIndxPtr=revDescIndx->getPointer(); *revDescIndxPtr++=0;
+  const int *revDesc2Ptr=revDesc2->getConstPointer();
+  for(int i=0;i<newNbOfCellsM1;i++,revDescIndxPtr++)
     {
-      ret->insertNextCell((INTERP_KERNEL::NormalizedCellType)meshDM1Type[ii],meshDM1ConnIndex[ii+1]-meshDM1ConnIndex[ii],&meshDM1Conn[meshDM1ConnIndex[ii]]);
-      tmp3[ii+1]=tmp3[ii]+((int)revDescMeshConnB[ii].size());
+      int oldCellIdM1=n2oM1Ptr[i];
+      if(!isImpacted[oldCellIdM1])
+        {
+          revDesc->pushBackSilent(revDesc2Ptr[oldCellIdM1]);
+          revDescIndxPtr[0]=revDescIndxPtr[-1]+1;
+        }
+      else
+        {
+          for(int j=commonCellsIPtr[0];j<commonCellsIPtr[1];j++)
+            revDesc->pushBackSilent(revDesc2Ptr[commonCellsPtr[j]]);
+          revDescIndxPtr[0]=revDescIndxPtr[-1]+commonCellsIPtr[1]-commonCellsIPtr[0];
+          commonCellsIPtr++;
+        }
     }
-  ret->finishInsertingCells();
-  revDesc->alloc(tmp3[nbOfCellsInConstituent],1);
-  tmp3=revDesc->getPointer();
-  for(std::vector< std::vector<int> >::const_iterator iter2=revDescMeshConnB.begin();iter2!=revDescMeshConnB.end();iter2++)
-    tmp3=std::copy((*iter2).begin(),(*iter2).end(),tmp3);
-  meshDM1Type.clear(); meshDM1ConnIndex.clear(); meshDM1Conn.clear();
-  descIndx->alloc(nbOfCells+1,1);
-  tmp3=descIndx->getPointer(); tmp3[0]=0;
-  for(int jj=0;jj<nbOfCells;jj++)
-    tmp3[jj+1]=tmp3[jj]+((int)descMeshConnB[jj].size());
-  desc->alloc(tmp3[nbOfCells],1);
-  tmp3=desc->getPointer();
-  for(std::vector< std::vector<int> >::const_iterator iter3=descMeshConnB.begin();iter3!=descMeshConnB.end();iter3++)
-    tmp3=std::copy((*iter3).begin(),(*iter3).end(),tmp3);
   //
-  return ret;
+  return ret2.retn();
 }
 
 struct MEDCouplingAccVisit
@@ -1180,10 +1188,12 @@ int MEDCouplingUMesh::AreCellsEqual(const int *conn, const int *connI, int cell1
       return AreCellsEqual1(conn,connI,cell1,cell2);
     case 2:
       return AreCellsEqual2(conn,connI,cell1,cell2);
+    case 3:
+      return AreCellsEqual3(conn,connI,cell1,cell2);
     case 7:
       return AreCellsEqual7(conn,connI,cell1,cell2);
     }
-  throw INTERP_KERNEL::Exception("Unknown comparison asked ! Must be in 0,1 or 2.");
+  throw INTERP_KERNEL::Exception("Unknown comparison asked ! Must be in 0,1,2 or 3.");
 }
 
 /*!
@@ -1242,6 +1252,20 @@ int MEDCouplingUMesh::AreCellsEqual2(const int *conn, const int *connI, int cell
           std::set<int> s2(conn+connI[cell2]+1,conn+connI[cell2+1]);
           return s1==s2?1:0;
         }
+    }
+  return 0;
+}
+
+/*!
+ * This method is less restrictive than AreCellsEqual2. Here the geometric type is absolutely not taken into account !
+ */
+int MEDCouplingUMesh::AreCellsEqual3(const int *conn, const int *connI, int cell1, int cell2)
+{
+  if(connI[cell1+1]-connI[cell1]==connI[cell2+1]-connI[cell2])
+    {
+      std::set<int> s1(conn+connI[cell1]+1,conn+connI[cell1+1]);
+      std::set<int> s2(conn+connI[cell2]+1,conn+connI[cell2+1]);
+      return s1==s2?1:0;
     }
   return 0;
 }

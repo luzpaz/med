@@ -95,6 +95,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT static int AreCellsEqual0(const int *conn, const int *connI, int cell1, int cell2);
     MEDCOUPLING_EXPORT static int AreCellsEqual1(const int *conn, const int *connI, int cell1, int cell2);
     MEDCOUPLING_EXPORT static int AreCellsEqual2(const int *conn, const int *connI, int cell1, int cell2);
+    MEDCOUPLING_EXPORT static int AreCellsEqual3(const int *conn, const int *connI, int cell1, int cell2);
     MEDCOUPLING_EXPORT static int AreCellsEqual7(const int *conn, const int *connI, int cell1, int cell2);
     MEDCOUPLING_EXPORT bool areCellsFrom2MeshEqual(const MEDCouplingUMesh *other, int cellId, double prec) const;
     MEDCOUPLING_EXPORT void convertToPolyTypes(const int *cellIdsToConvertBg, const int *cellIdsToConvertEnd);
@@ -234,7 +235,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT static void SetPartOfIndexedArraysSameIdx2(int start, int end, int step, DataArrayInt *arrInOut, const DataArrayInt *arrIndxIn,
                                                                   const DataArrayInt *srcArr, const DataArrayInt *srcArrIndex) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static DataArrayInt *ComputeSpreadZoneGradually(const DataArrayInt *arrIn, const DataArrayInt *arrIndxIn) throw(INTERP_KERNEL::Exception);
-    MEDCOUPLING_EXPORT static void FindCommonCellsAlg(int compType, int startCellId,  const DataArrayInt *nodal, const DataArrayInt *nodalI, const DataArrayInt *revNodal, const DataArrayInt *revNodalI,
+    MEDCOUPLING_EXPORT static void FindCommonCellsAlg(int compType, int startCellId, const DataArrayInt *nodal, const DataArrayInt *nodalI, const DataArrayInt *revNodal, const DataArrayInt *revNodalI,
                                                       DataArrayInt *& commonCellsArr, DataArrayInt *& commonCellsIArr) throw(INTERP_KERNEL::Exception);
   private:
     MEDCouplingUMesh();
