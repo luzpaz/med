@@ -91,11 +91,11 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT std::string getVTKDataSetType() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void writeVTKLL(std::ostream& ofs, const std::string& cellData, const std::string& pointData) const throw(INTERP_KERNEL::Exception);
     //tools
-    MEDCOUPLING_EXPORT int areCellsEqual(int cell1, int cell2, int compType) const;
-    MEDCOUPLING_EXPORT int areCellsEqual0(int cell1, int cell2) const;
-    MEDCOUPLING_EXPORT int areCellsEqual1(int cell1, int cell2) const;
-    MEDCOUPLING_EXPORT int areCellsEqual2(int cell1, int cell2) const;
-    MEDCOUPLING_EXPORT int areCellsEqual7(int cell1, int cell2) const;
+    MEDCOUPLING_EXPORT static int AreCellsEqual(const int *conn, const int *connI, int cell1, int cell2, int compType);
+    MEDCOUPLING_EXPORT static int AreCellsEqual0(const int *conn, const int *connI, int cell1, int cell2);
+    MEDCOUPLING_EXPORT static int AreCellsEqual1(const int *conn, const int *connI, int cell1, int cell2);
+    MEDCOUPLING_EXPORT static int AreCellsEqual2(const int *conn, const int *connI, int cell1, int cell2);
+    MEDCOUPLING_EXPORT static int AreCellsEqual7(const int *conn, const int *connI, int cell1, int cell2);
     MEDCOUPLING_EXPORT bool areCellsFrom2MeshEqual(const MEDCouplingUMesh *other, int cellId, double prec) const;
     MEDCOUPLING_EXPORT void convertToPolyTypes(const int *cellIdsToConvertBg, const int *cellIdsToConvertEnd);
     MEDCOUPLING_EXPORT void convertAllToPoly();
@@ -234,6 +234,8 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT static void SetPartOfIndexedArraysSameIdx2(int start, int end, int step, DataArrayInt *arrInOut, const DataArrayInt *arrIndxIn,
                                                                   const DataArrayInt *srcArr, const DataArrayInt *srcArrIndex) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static DataArrayInt *ComputeSpreadZoneGradually(const DataArrayInt *arrIn, const DataArrayInt *arrIndxIn) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT static void FindCommonCellsAlg(int compType, int startCellId,  const DataArrayInt *nodal, const DataArrayInt *nodalI, const DataArrayInt *revNodal, const DataArrayInt *revNodalI,
+                                                      DataArrayInt *& commonCellsArr, DataArrayInt *& commonCellsIArr) throw(INTERP_KERNEL::Exception);
   private:
     MEDCouplingUMesh();
     MEDCouplingUMesh(const MEDCouplingUMesh& other, bool deepCopy);
@@ -252,7 +254,7 @@ namespace ParaMEDMEM
     DataArrayDouble *fillExtCoordsUsingTranslAndAutoRotation(const MEDCouplingUMesh *mesh1D, bool isQuad) const throw(INTERP_KERNEL::Exception);
     DataArrayDouble *fillExtCoordsUsingTranslAndAutoRotation2D(const MEDCouplingUMesh *mesh1D, bool isQuad) const throw(INTERP_KERNEL::Exception);
     DataArrayDouble *fillExtCoordsUsingTranslAndAutoRotation3D(const MEDCouplingUMesh *mesh1D, bool isQuad) const throw(INTERP_KERNEL::Exception);
-    bool areCellsEqualInPool(const std::vector<int>& candidates, int compType, DataArrayInt *result) const;
+    static bool AreCellsEqualInPool(const std::vector<int>& candidates, int compType, const int *conn, const int *connI, DataArrayInt *result) ;
     MEDCouplingUMesh *buildPartOfMySelfKeepCoords(const int *begin, const int *end) const;
     MEDCouplingUMesh *buildPartOfMySelfKeepCoords2(int start, int end, int step) const;
     template<int SPACEDIM>

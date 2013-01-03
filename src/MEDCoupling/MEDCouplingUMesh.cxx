@@ -1170,18 +1170,18 @@ DataArrayInt *MEDCouplingUMesh::zipCoordsTraducer() throw(INTERP_KERNEL::Excepti
  * This method stands if 'cell1' and 'cell2' are equals regarding 'compType' policy.
  * The semantic of 'compType' is specified in MEDCouplingUMesh::zipConnectivityTraducer method.
  */
-int MEDCouplingUMesh::areCellsEqual(int cell1, int cell2, int compType) const
+int MEDCouplingUMesh::AreCellsEqual(const int *conn, const int *connI, int cell1, int cell2, int compType)
 {
   switch(compType)
     {
     case 0:
-      return areCellsEqual0(cell1,cell2);
+      return AreCellsEqual0(conn,connI,cell1,cell2);
     case 1:
-      return areCellsEqual1(cell1,cell2);
+      return AreCellsEqual1(conn,connI,cell1,cell2);
     case 2:
-      return areCellsEqual2(cell1,cell2);
+      return AreCellsEqual2(conn,connI,cell1,cell2);
     case 7:
-      return areCellsEqual7(cell1,cell2);
+      return AreCellsEqual7(conn,connI,cell1,cell2);
     }
   throw INTERP_KERNEL::Exception("Unknown comparison asked ! Must be in 0,1 or 2.");
 }
@@ -1189,10 +1189,8 @@ int MEDCouplingUMesh::areCellsEqual(int cell1, int cell2, int compType) const
 /*!
  * This method is the last step of the MEDCouplingUMesh::zipConnectivityTraducer with policy 0.
  */
-int MEDCouplingUMesh::areCellsEqual0(int cell1, int cell2) const
+int MEDCouplingUMesh::AreCellsEqual0(const int *conn, const int *connI, int cell1, int cell2)
 {
-  const int *conn=getNodalConnectivity()->getConstPointer();
-  const int *connI=getNodalConnectivityIndex()->getConstPointer();
   if(connI[cell1+1]-connI[cell1]==connI[cell2+1]-connI[cell2])
     return std::equal(conn+connI[cell1]+1,conn+connI[cell1+1],conn+connI[cell2]+1)?1:0;
   return 0;
@@ -1201,10 +1199,8 @@ int MEDCouplingUMesh::areCellsEqual0(int cell1, int cell2) const
 /*!
  * This method is the last step of the MEDCouplingUMesh::zipConnectivityTraducer with policy 1.
  */
-int MEDCouplingUMesh::areCellsEqual1(int cell1, int cell2) const
+int MEDCouplingUMesh::AreCellsEqual1(const int *conn, const int *connI, int cell1, int cell2)
 {
-  const int *conn=getNodalConnectivity()->getConstPointer();
-  const int *connI=getNodalConnectivityIndex()->getConstPointer();
   int sz=connI[cell1+1]-connI[cell1];
   if(sz==connI[cell2+1]-connI[cell2])
     {
@@ -1227,7 +1223,7 @@ int MEDCouplingUMesh::areCellsEqual1(int cell1, int cell2) const
                 return std::equal(conn+connI[cell1]+1,conn+connI[cell1+1],conn+connI[cell2]+1)?1:0;//case of SEG2 and SEG3
             }
           else
-            throw INTERP_KERNEL::Exception("MEDCouplingUMesh::areCellsEqual1 : not implemented yet for meshdim == 3 !");
+            throw INTERP_KERNEL::Exception("MEDCouplingUMesh::AreCellsEqual1 : not implemented yet for meshdim == 3 !");
         }
     }
   return 0;
@@ -1236,10 +1232,8 @@ int MEDCouplingUMesh::areCellsEqual1(int cell1, int cell2) const
 /*!
  * This method is the last step of the MEDCouplingUMesh::zipConnectivityTraducer with policy 2.
  */
-int MEDCouplingUMesh::areCellsEqual2(int cell1, int cell2) const
+int MEDCouplingUMesh::AreCellsEqual2(const int *conn, const int *connI, int cell1, int cell2)
 {
-  const int *conn=getNodalConnectivity()->getConstPointer();
-  const int *connI=getNodalConnectivityIndex()->getConstPointer();
   if(connI[cell1+1]-connI[cell1]==connI[cell2+1]-connI[cell2])
     {
       if(conn[connI[cell1]]==conn[connI[cell2]])
@@ -1255,10 +1249,8 @@ int MEDCouplingUMesh::areCellsEqual2(int cell1, int cell2) const
 /*!
  * This method is the last step of the MEDCouplingUMesh::zipConnectivityTraducer with policy 7.
  */
-int MEDCouplingUMesh::areCellsEqual7(int cell1, int cell2) const
+int MEDCouplingUMesh::AreCellsEqual7(const int *conn, const int *connI, int cell1, int cell2)
 {
-  const int *conn=getNodalConnectivity()->getConstPointer();
-  const int *connI=getNodalConnectivityIndex()->getConstPointer();
   int sz=connI[cell1+1]-connI[cell1];
   if(sz==connI[cell2+1]-connI[cell2])
     {
@@ -1310,7 +1302,7 @@ int MEDCouplingUMesh::areCellsEqual7(int cell1, int cell2) const
                 }
             }
           else
-            throw INTERP_KERNEL::Exception("MEDCouplingUMesh::areCellsEqual7 : not implemented yet for meshdim == 3 !");
+            throw INTERP_KERNEL::Exception("MEDCouplingUMesh::AreCellsEqual7 : not implemented yet for meshdim == 3 !");
         }
     }
   return 0;
@@ -1352,7 +1344,7 @@ bool MEDCouplingUMesh::areCellsFrom2MeshEqual(const MEDCouplingUMesh *other, int
  * If in 'candidates' pool -1 value is considered as an empty value.
  * WARNING this method returns only ONE set of result !
  */
-bool MEDCouplingUMesh::areCellsEqualInPool(const std::vector<int>& candidates, int compType, DataArrayInt *result) const
+bool MEDCouplingUMesh::AreCellsEqualInPool(const std::vector<int>& candidates, int compType, const int *conn, const int *connI, DataArrayInt *result)
 {
   if(candidates.size()<1)
     return false;
@@ -1361,7 +1353,7 @@ bool MEDCouplingUMesh::areCellsEqualInPool(const std::vector<int>& candidates, i
   int start=(*iter++);
   for(;iter!=candidates.end();iter++)
     {
-      int status=areCellsEqual(start,*iter,compType);
+      int status=AreCellsEqual(conn,connI,start,*iter,compType);
       if(status!=0)
         {
           if(!ret)
@@ -1396,14 +1388,20 @@ bool MEDCouplingUMesh::areCellsEqualInPool(const std::vector<int>& candidates, i
  */
 void MEDCouplingUMesh::findCommonCells(int compType, int startCellId, DataArrayInt *& commonCellsArr, DataArrayInt *& commonCellsIArr) const throw(INTERP_KERNEL::Exception)
 {
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> commonCells=DataArrayInt::New(),commonCellsI=DataArrayInt::New();
   checkConnectivityFullyDefined();
-  int nbOfCells=getNumberOfCells();
-  commonCellsI->reserve(1); commonCellsI->pushBackSilent(0);
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> revNodal=DataArrayInt::New(),revNodalI=DataArrayInt::New();
   getReverseNodalConnectivity(revNodal,revNodalI);
+  FindCommonCellsAlg(compType,startCellId,_nodal_connec,_nodal_connec_index,revNodal,revNodalI,commonCellsArr,commonCellsIArr);
+}
+
+void MEDCouplingUMesh::FindCommonCellsAlg(int compType, int startCellId, const DataArrayInt *nodal, const DataArrayInt *nodalI, const DataArrayInt *revNodal, const DataArrayInt *revNodalI,
+                                          DataArrayInt *& commonCellsArr, DataArrayInt *& commonCellsIArr) throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> commonCells=DataArrayInt::New(),commonCellsI=DataArrayInt::New();
+  int nbOfCells=nodalI->getNumberOfTuples()-1;
+  commonCellsI->reserve(1); commonCellsI->pushBackSilent(0);
   const int *revNodalPtr=revNodal->getConstPointer(),*revNodalIPtr=revNodalI->getConstPointer();
-  const int *connPtr=getNodalConnectivity()->getConstPointer(),*connIPtr=getNodalConnectivityIndex()->getConstPointer();
+  const int *connPtr=nodal->getConstPointer(),*connIPtr=nodalI->getConstPointer();
   std::vector<bool> isFetched(nbOfCells,false);
   if(startCellId==0)
     {
@@ -1429,7 +1427,7 @@ void MEDCouplingUMesh::findCommonCells(int compType, int startCellId, DataArrayI
                   }
               if(v2.size()>1)
                 {
-                  if(areCellsEqualInPool(v2,compType,commonCells))
+                  if(AreCellsEqualInPool(v2,compType,connPtr,connIPtr,commonCells))
                     {
                       int pos=commonCellsI->back();
                       commonCellsI->pushBackSilent(commonCells->getNumberOfTuples());
@@ -1462,7 +1460,7 @@ void MEDCouplingUMesh::findCommonCells(int compType, int startCellId, DataArrayI
                   }
               if(v2.size()>1)
                 {
-                  if(areCellsEqualInPool(v2,compType,commonCells))
+                  if(AreCellsEqualInPool(v2,compType,connPtr,connIPtr,commonCells))
                     {
                       int pos=commonCellsI->back();
                       commonCellsI->pushBackSilent(commonCells->getNumberOfTuples());
