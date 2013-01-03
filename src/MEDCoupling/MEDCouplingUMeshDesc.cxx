@@ -21,6 +21,7 @@
 #include "MEDCouplingUMeshDesc.hxx"
 #include "CellModel.hxx"
 #include "MEDCouplingMemArray.hxx"
+#include "MEDCouplingAutoRefCountObjectPtr.hxx"
 
 #include <limits>
 #include <sstream>
@@ -266,8 +267,9 @@ void MEDCouplingUMeshDesc::unserialization(const std::vector<double>& tinyInfoD,
   setMeshDimension(tinyInfo[2]);
 }
 
-void MEDCouplingUMeshDesc::getCellsInBoundingBox(const double *bbox, double eps, std::vector<int>& elems) const
+DataArrayInt *MEDCouplingUMeshDesc::getCellsInBoundingBox(const double *bbox, double eps) const
 {
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> elems=DataArrayInt::New(); elems->alloc(0,1);
   int dim=getSpaceDimension();
   double* elem_bb=new double[2*dim];
   const int* conn      = _desc_connec->getConstPointer();
@@ -303,16 +305,16 @@ void MEDCouplingUMeshDesc::getCellsInBoundingBox(const double *bbox, double eps,
                 }
             }
         }
-      if (intersectsBoundingBox(elem_bb, bbox, dim, eps))
-        {
-          elems.push_back(ielem);
-        }
+      if(intersectsBoundingBox(elem_bb, bbox, dim, eps))
+        elems->pushBackSilent(ielem);
     }
   delete [] elem_bb;
+  return elems.retn();
 }
 
-void MEDCouplingUMeshDesc::getCellsInBoundingBox(const INTERP_KERNEL::DirectedBoundingBox &bbox, double eps, std::vector<int>& elems)
+DataArrayInt *MEDCouplingUMeshDesc::getCellsInBoundingBox(const INTERP_KERNEL::DirectedBoundingBox &bbox, double eps)
 {
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> elems=DataArrayInt::New(); elems->alloc(0,1);
   int dim=getSpaceDimension();
   double* elem_bb=new double[2*dim];
   const int* conn      = _desc_connec->getConstPointer();
@@ -349,11 +351,10 @@ void MEDCouplingUMeshDesc::getCellsInBoundingBox(const INTERP_KERNEL::DirectedBo
             }
         }
       if (intersectsBoundingBox(bbox, elem_bb, dim, eps))
-        {
-          elems.push_back(ielem);
-        }
+        elems->pushBackSilent(ielem);
     }
   delete [] elem_bb;
+  return elems.retn();
 }
 
 DataArrayInt *MEDCouplingUMeshDesc::mergeNodes(double precision, bool& areNodesMerged, int& newNbOfNodes)

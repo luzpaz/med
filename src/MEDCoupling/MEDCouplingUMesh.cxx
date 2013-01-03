@@ -2325,15 +2325,16 @@ void MEDCouplingUMesh::renumberCells(const int *old2NewBg, bool check) throw(INT
  * Warning 'elems' is incremented during the call so if elems is not empty before call returned elements will be
  * added in 'elems' parameter.
  */
-void MEDCouplingUMesh::getCellsInBoundingBox(const double *bbox, double eps, std::vector<int>& elems) const
+DataArrayInt *MEDCouplingUMesh::getCellsInBoundingBox(const double *bbox, double eps) const
 {
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> elems=DataArrayInt::New(); elems->alloc(0,1);
   if(getMeshDimension()==-1)
     {
-      elems.push_back(0);
-      return;
+      elems->pushBackSilent(0);
+      return elems.retn();
     }
   int dim=getSpaceDimension();
-  double* elem_bb=new double[2*dim];
+  INTERP_KERNEL::AutoPtr<double> elem_bb=new double[2*dim];
   const int* conn      = getNodalConnectivity()->getConstPointer();
   const int* conn_index= getNodalConnectivityIndex()->getConstPointer();
   const double* coords = getCoords()->getConstPointer();
@@ -2365,11 +2366,9 @@ void MEDCouplingUMesh::getCellsInBoundingBox(const double *bbox, double eps, std
             }
         }
       if (intersectsBoundingBox(elem_bb, bbox, dim, eps))
-        {
-          elems.push_back(ielem);
-        }
+        elems->pushBackSilent(ielem);
     }
-  delete [] elem_bb;
+  return elems.retn();
 }
 
 /*!
@@ -2377,15 +2376,16 @@ void MEDCouplingUMesh::getCellsInBoundingBox(const double *bbox, double eps, std
  * Warning 'elems' is incremented during the call so if elems is not empty before call returned elements will be
  * added in 'elems' parameter.
  */
-void MEDCouplingUMesh::getCellsInBoundingBox(const INTERP_KERNEL::DirectedBoundingBox& bbox, double eps, std::vector<int>& elems)
+DataArrayInt *MEDCouplingUMesh::getCellsInBoundingBox(const INTERP_KERNEL::DirectedBoundingBox& bbox, double eps)
 {
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> elems=DataArrayInt::New(); elems->alloc(0,1);
   if(getMeshDimension()==-1)
     {
-      elems.push_back(0);
-      return;
+      elems->pushBackSilent(0);
+      return elems.retn();
     }
   int dim=getSpaceDimension();
-  double* elem_bb=new double[2*dim];
+  INTERP_KERNEL::AutoPtr<double> elem_bb=new double[2*dim];
   const int* conn      = getNodalConnectivity()->getConstPointer();
   const int* conn_index= getNodalConnectivityIndex()->getConstPointer();
   const double* coords = getCoords()->getConstPointer();
@@ -2416,12 +2416,10 @@ void MEDCouplingUMesh::getCellsInBoundingBox(const INTERP_KERNEL::DirectedBoundi
                 }
             }
         }
-      if (intersectsBoundingBox(bbox, elem_bb, dim, eps))
-        {
-          elems.push_back(ielem);
-        }
+      if(intersectsBoundingBox(bbox, elem_bb, dim, eps))
+        elems->pushBackSilent(ielem);
     }
-  delete [] elem_bb;
+  return elems.retn();
 }
 
 /*!
@@ -3379,7 +3377,7 @@ DataArrayInt *MEDCouplingUMesh::getCellIdsCrossingPlane(const double *origin, co
   double vec2[3];
   vec2[0]=vec[1]; vec2[1]=-vec[0]; vec2[2]=0.;//vec2 is the result of cross product of vec with (0,0,1)
   double angle=acos(vec[2]/normm);
-  std::vector<int> cellIds;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> cellIds;
   double bbox[6];
   if(angle>eps)
     {
@@ -3389,18 +3387,15 @@ DataArrayInt *MEDCouplingUMesh::getCellIdsCrossingPlane(const double *origin, co
       mw->setCoords(coo);
       mw->getBoundingBox(bbox);
       bbox[4]=origin[2]-eps; bbox[5]=origin[2]+eps;
-      mw->getCellsInBoundingBox(bbox,eps,cellIds);
+      cellIds=mw->getCellsInBoundingBox(bbox,eps);
     }
   else
     {
       getBoundingBox(bbox);
       bbox[4]=origin[2]-eps; bbox[5]=origin[2]+eps;
-      getCellsInBoundingBox(bbox,eps,cellIds);
+      cellIds=getCellsInBoundingBox(bbox,eps);
     }
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
-  ret->alloc((int)cellIds.size(),1);
-  std::copy(cellIds.begin(),cellIds.end(),ret->getPointer());
-  return ret.retn();
+  return cellIds.retn();
 }
 
 /*!

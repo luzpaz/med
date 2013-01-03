@@ -256,6 +256,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::MEDCouplingMesh::buildUnstructured;
 %newobject ParaMEDMEM::MEDCouplingMesh::MergeMeshes;
 %newobject ParaMEDMEM::MEDCouplingPointSet::zipCoordsTraducer;
+%newobject ParaMEDMEM::MEDCouplingPointSet::getCellsInBoundingBox;
 %newobject ParaMEDMEM::MEDCouplingPointSet::findBoundaryNodes;
 %newobject ParaMEDMEM::MEDCouplingPointSet::buildBoundaryMesh;
 %newobject ParaMEDMEM::MEDCouplingPointSet::MergeNodesArray;
@@ -931,7 +932,7 @@ namespace ParaMEDMEM
       void serialize(DataArrayInt *&a1, DataArrayDouble *&a2) const throw(INTERP_KERNEL::Exception);
       void unserialization(const std::vector<double>& tinyInfoD, const std::vector<int>& tinyInfo, const DataArrayInt *a1, DataArrayDouble *a2,
                            const std::vector<std::string>& littleStrings) throw(INTERP_KERNEL::Exception);
-      virtual void getCellsInBoundingBox(const INTERP_KERNEL::DirectedBoundingBox& bbox, double eps, std::vector<int>& elems) throw(INTERP_KERNEL::Exception);
+      virtual DataArrayInt *getCellsInBoundingBox(const INTERP_KERNEL::DirectedBoundingBox& bbox, double eps) throw(INTERP_KERNEL::Exception);
       virtual DataArrayInt *zipCoordsTraducer() throw(INTERP_KERNEL::Exception);
       virtual DataArrayInt *findBoundaryNodes() const;
       %extend 
@@ -1183,9 +1184,6 @@ namespace ParaMEDMEM
 
            PyObject *getCellsInBoundingBox(PyObject *bbox, double eps) const throw(INTERP_KERNEL::Exception)
            {
-             std::vector<int> elems;
-             //
-             //
              double val;
              DataArrayDouble *a;
              DataArrayDoubleTuple *aa;
@@ -1195,11 +1193,8 @@ namespace ParaMEDMEM
              const char msg[]="Python wrap of MEDCouplingPointSet::getCellsInBoundingBox : ";
              const double *tmp=convertObjToPossibleCpp5_Safe(bbox,sw,val,a,aa,bb,msg,spaceDim,2,true);
              //
-             self->getCellsInBoundingBox(tmp,eps,elems);
-             DataArrayInt *ret=DataArrayInt::New();
-             ret->alloc((int)elems.size(),1);
-             std::copy(elems.begin(),elems.end(),ret->getPointer());
-             return SWIG_NewPointerObj(SWIG_as_voidptr(ret),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 );
+             DataArrayInt *elems=self->getCellsInBoundingBox(tmp,eps);
+             return SWIG_NewPointerObj(SWIG_as_voidptr(elems),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 );
            }
 
            void duplicateNodesInCoords(PyObject *li) throw(INTERP_KERNEL::Exception)
