@@ -3771,6 +3771,7 @@ DataArrayInt *DataArrayInt::transformWithIndArrR(const int *indArrBg, const int 
 
 /*!
  * This method invert array 'di' that is a conversion map from Old to New numbering to New to Old numbering.
+ * Example : If \a this contains [0,1,2,0,3,4,5,4,6,4] this method will return [3,1,2,4,9,6,8]
  */
 DataArrayInt *DataArrayInt::invertArrayO2N2N2O(int newNbOfElem) const
 {
@@ -3780,6 +3781,23 @@ DataArrayInt *DataArrayInt::invertArrayO2N2N2O(int newNbOfElem) const
   const int *old2New=getConstPointer();
   int *pt=ret->getPointer();
   for(int i=0;i!=nbOfOldNodes;i++)
+    if(old2New[i]!=-1)
+      pt[old2New[i]]=i;
+  return ret;
+}
+
+/*!
+ * This method is similar to DataArrayInt::invertArrayO2N2N2O except that 
+ * Example : If \a this contains [0,1,2,0,3,4,5,4,6,4] this method will return [0,1,2,4,5,6,8] whereas DataArrayInt::invertArrayO2N2N2O returns [3,1,2,4,9,6,8]
+ */
+DataArrayInt *DataArrayInt::invertArrayO2N2N2OBis(int newNbOfElem) const throw(INTERP_KERNEL::Exception)
+{
+  DataArrayInt *ret=DataArrayInt::New();
+  ret->alloc(newNbOfElem,1);
+  int nbOfOldNodes=getNumberOfTuples();
+  const int *old2New=getConstPointer();
+  int *pt=ret->getPointer();
+  for(int i=nbOfOldNodes-1;i>=0;i--)
     if(old2New[i]!=-1)
       pt[old2New[i]]=i;
   return ret;

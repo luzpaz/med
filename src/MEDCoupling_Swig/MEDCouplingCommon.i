@@ -143,6 +143,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayInt::renumberAndReduce;
 %newobject ParaMEDMEM::DataArrayInt::invertArrayO2N2N2O;
 %newobject ParaMEDMEM::DataArrayInt::invertArrayN2O2O2N;
+%newobject ParaMEDMEM::DataArrayInt::invertArrayO2N2N2OBis;
 %newobject ParaMEDMEM::DataArrayInt::getIdsEqual;
 %newobject ParaMEDMEM::DataArrayInt::getIdsNotEqual;
 %newobject ParaMEDMEM::DataArrayInt::getIdsEqualList;
