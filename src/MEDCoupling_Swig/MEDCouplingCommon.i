@@ -2770,17 +2770,17 @@ namespace ParaMEDMEM
      return DataArrayDouble::New();
    }
 
-   static DataArrayDouble *New(PyObject *elt0, PyObject *elt1=0, PyObject *elt2=0) throw(INTERP_KERNEL::Exception)
+   static DataArrayDouble *New(PyObject *elt0, PyObject *nbOfTuples=0, PyObject *elt2=0) throw(INTERP_KERNEL::Exception)
    {
      const char *msg="ParaMEDMEM::DataArrayDouble::New : Available API are : \n-DataArrayDouble.New()\n--DataArrayDouble.New([1.,3.,4.])\n-DataArrayDouble.New([1.,3.,4.],3)\n-DataArrayDouble.New([1.,3.,4.,5.],2,2)\n-DataArrayDouble.New(5)\n-DataArrayDouble.New(5,2) !";
      if(PyList_Check(elt0) || PyTuple_Check(elt0))
        {
-         if(elt1)
+         if(nbOfTuples)
            {
-             if(PyInt_Check(elt1))
+             if(PyInt_Check(nbOfTuples))
                {
-                 int nbOfTuples=PyInt_AS_LONG(elt1);
-                 if(nbOfTuples<0)
+                 int nbOfTuples1=PyInt_AS_LONG(nbOfTuples);
+                 if(nbOfTuples1<0)
                    throw INTERP_KERNEL::Exception("DataArrayDouble::New : should be a positive set of allocated memory !");
                  if(elt2)
                    {
@@ -2790,8 +2790,8 @@ namespace ParaMEDMEM
                          if(nbOfCompo<0)
                            throw INTERP_KERNEL::Exception("DataArrayDouble::New : should be a positive number of components !");
                          MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::New();
-                         std::vector<double> tmp=fillArrayWithPyListDbl2(elt0,nbOfTuples,nbOfCompo);
-                         ret->alloc(nbOfTuples,nbOfCompo); std::copy(tmp.begin(),tmp.end(),ret->getPointer());
+                         std::vector<double> tmp=fillArrayWithPyListDbl2(elt0,nbOfTuples1,nbOfCompo);
+                         ret->alloc(nbOfTuples1,nbOfCompo); std::copy(tmp.begin(),tmp.end(),ret->getPointer());
                          ret->incrRef();
                          return ret;
                        }
@@ -2802,8 +2802,8 @@ namespace ParaMEDMEM
                    {//DataArrayDouble.New([1.,3.,4.],3)
                      MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::New();
                      int tmpp1=-1;
-                     std::vector<double> tmp=fillArrayWithPyListDbl2(elt0,nbOfTuples,tmpp1);
-                     ret->alloc(nbOfTuples,tmpp1); std::copy(tmp.begin(),tmp.end(),ret->getPointer());
+                     std::vector<double> tmp=fillArrayWithPyListDbl2(elt0,nbOfTuples1,tmpp1);
+                     ret->alloc(nbOfTuples1,tmpp1); std::copy(tmp.begin(),tmp.end(),ret->getPointer());
                      ret->incrRef();
                      return ret;
                    }
@@ -2823,20 +2823,20 @@ namespace ParaMEDMEM
        }
      else if(PyInt_Check(elt0))
        {
-         int nbOfTuples=PyInt_AS_LONG(elt0);
-         if(nbOfTuples<0)
+         int nbOfTuples1=PyInt_AS_LONG(elt0);
+         if(nbOfTuples1<0)
            throw INTERP_KERNEL::Exception("DataArrayDouble::New : should be a positive set of allocated memory !");
-         if(elt1)
+         if(nbOfTuples)
            {
              if(!elt2)
                {
-                 if(PyInt_Check(elt1))
+                 if(PyInt_Check(nbOfTuples))
                    {//DataArrayDouble.New(5,2)
-                     int nbOfCompo=PyInt_AS_LONG(elt1);
+                     int nbOfCompo=PyInt_AS_LONG(nbOfTuples);
                      if(nbOfCompo<0)
                        throw INTERP_KERNEL::Exception("DataArrayDouble::New : should be a positive number of components !");
                      MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::New();
-                     ret->alloc(nbOfTuples,nbOfCompo);
+                     ret->alloc(nbOfTuples1,nbOfCompo);
                      ret->incrRef();
                      return ret;
                    }
@@ -2849,7 +2849,7 @@ namespace ParaMEDMEM
          else
            {//DataArrayDouble.New(5)
              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::New();
-             ret->alloc(nbOfTuples,1);
+             ret->alloc(nbOfTuples1,1);
              ret->incrRef();
              return ret;
            }
@@ -2858,9 +2858,9 @@ namespace ParaMEDMEM
        throw INTERP_KERNEL::Exception(msg);
    }
    
-   DataArrayDouble(PyObject *elt0, PyObject *elt1=0, PyObject *elt2=0) throw(INTERP_KERNEL::Exception)
+   DataArrayDouble(PyObject *elt0, PyObject *nbOfTuples=0, PyObject *elt2=0) throw(INTERP_KERNEL::Exception)
    {
-     return ParaMEDMEM_DataArrayDouble_New__SWIG_1(elt0,elt1,elt2);
+     return ParaMEDMEM_DataArrayDouble_New__SWIG_1(elt0,nbOfTuples,elt2);
    }
 
    std::string __str__() const
@@ -2889,20 +2889,51 @@ namespace ParaMEDMEM
    {
      return self->iterator();
    }
-
-   void setValues(PyObject *li, int nbOfTuples, int nbOfElsPerTuple) throw(INTERP_KERNEL::Exception)
+   
+   void setValues(PyObject *li, PyObject *nbOfTuples=0, PyObject *nbOfComp=0) throw(INTERP_KERNEL::Exception)
    {
-     double *tmp=new double[nbOfTuples*nbOfElsPerTuple];
-     try
+     const char *msg="ParaMEDMEM::DataArrayDouble::setValues : Available API are : \n-DataArrayDouble.setValues([1.,3.,4.])\n-DataArrayDouble.setValues([1.,3.,4.],3)\n-DataArrayDouble.setValues([1.,3.,4.,5.],2,2)\n-DataArrayDouble.setValues([(1.,1.7),(3.,3.7),(4.,4.7)])\n !";
+     if(PyList_Check(li) || PyTuple_Check(li))
        {
-         fillArrayWithPyListDbl(li,tmp,nbOfTuples*nbOfElsPerTuple,0.,false);
+         if(nbOfTuples)
+           {
+             if(PyInt_Check(nbOfTuples))
+               {
+                 int nbOfTuples1=PyInt_AS_LONG(nbOfTuples);
+                 if(nbOfTuples1<0)
+                   throw INTERP_KERNEL::Exception("DataArrayDouble::setValues : should be a positive set of allocated memory !");
+                 if(nbOfComp)
+                   {
+                     if(PyInt_Check(nbOfComp))
+                       {//DataArrayDouble.setValues([1.,3.,4.,5.],2,2)
+                         int nbOfCompo=PyInt_AS_LONG(nbOfComp);
+                         if(nbOfCompo<0)
+                           throw INTERP_KERNEL::Exception("DataArrayDouble::setValues : should be a positive number of components !");
+                         std::vector<double> tmp=fillArrayWithPyListDbl2(li,nbOfTuples1,nbOfCompo);
+                         self->alloc(nbOfTuples1,nbOfCompo); std::copy(tmp.begin(),tmp.end(),self->getPointer());
+                       }
+                     else
+                       throw INTERP_KERNEL::Exception(msg);
+                   }
+                 else
+                   {//DataArrayDouble.setValues([1.,3.,4.],3)
+                     int tmpp1=-1;
+                     std::vector<double> tmp=fillArrayWithPyListDbl2(li,nbOfTuples1,tmpp1);
+                     self->alloc(nbOfTuples1,tmpp1); std::copy(tmp.begin(),tmp.end(),self->getPointer());
+                   }
+               }
+             else
+               throw INTERP_KERNEL::Exception(msg);
+           }
+         else
+           {// DataArrayDouble.setValues([1.,3.,4.])
+             int tmpp1=-1,tmpp2=-1;
+             std::vector<double> tmp=fillArrayWithPyListDbl2(li,tmpp1,tmpp2);
+             self->alloc(tmpp1,tmpp2); std::copy(tmp.begin(),tmp.end(),self->getPointer());
+           }
        }
-     catch(INTERP_KERNEL::Exception& e)
-       {
-         delete [] tmp;
-         throw e;
-       }
-     self->useArray(tmp,true,CPP_DEALLOC,nbOfTuples,nbOfElsPerTuple);
+     else
+       throw INTERP_KERNEL::Exception(msg);
    }
 
    PyObject *getValues() throw(INTERP_KERNEL::Exception)
@@ -4470,28 +4501,28 @@ namespace ParaMEDMEM
      return DataArrayInt::New();
    }
 
-   static DataArrayInt *New(PyObject *elt0, PyObject *elt1=0, PyObject *elt2=0) throw(INTERP_KERNEL::Exception)
+   static DataArrayInt *New(PyObject *elt0, PyObject *nbOfTuples=0, PyObject *nbOfComp=0) throw(INTERP_KERNEL::Exception)
    {
      const char *msg="ParaMEDMEM::DataArrayInt::New : Available API are : \n-DataArrayInt.New()\n--DataArrayInt.New([1,3,4])\n-DataArrayInt.New([1,3,4],3)\n-DataArrayInt.New([1,3,4,5],2,2)\n-DataArrayInt.New(5)\n-DataArrayInt.New(5,2) !";
      if(PyList_Check(elt0) || PyTuple_Check(elt0))
        {
-         if(elt1)
+         if(nbOfTuples)
            {
-             if(PyInt_Check(elt1))
+             if(PyInt_Check(nbOfTuples))
                {
-                 int nbOfTuples=PyInt_AS_LONG(elt1);
-                 if(nbOfTuples<0)
+                 int nbOfTuples1=PyInt_AS_LONG(nbOfTuples);
+                 if(nbOfTuples1<0)
                    throw INTERP_KERNEL::Exception("DataArrayInt::New : should be a positive set of allocated memory !");
-                 if(elt2)
+                 if(nbOfComp)
                    {
-                     if(PyInt_Check(elt2))
+                     if(PyInt_Check(nbOfComp))
                        {//DataArrayInt.New([1,3,4,5],2,2)
-                         int nbOfCompo=PyInt_AS_LONG(elt2);
+                         int nbOfCompo=PyInt_AS_LONG(nbOfComp);
                          if(nbOfCompo<0)
                            throw INTERP_KERNEL::Exception("DataArrayInt::New : should be a positive number of components !");
                          MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
-                         std::vector<int> tmp=fillArrayWithPyListInt2(elt0,nbOfTuples,nbOfCompo);
-                         ret->alloc(nbOfTuples,nbOfCompo); std::copy(tmp.begin(),tmp.end(),ret->getPointer());
+                         std::vector<int> tmp=fillArrayWithPyListInt2(elt0,nbOfTuples1,nbOfCompo);
+                         ret->alloc(nbOfTuples1,nbOfCompo); std::copy(tmp.begin(),tmp.end(),ret->getPointer());
                          ret->incrRef();
                          return ret;
                        }
@@ -4502,8 +4533,8 @@ namespace ParaMEDMEM
                    {//DataArrayInt.New([1,3,4],3)
                      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
                      int tmpp1=-1;
-                     std::vector<int> tmp=fillArrayWithPyListInt2(elt0,nbOfTuples,tmpp1);
-                     ret->alloc(nbOfTuples,tmpp1); std::copy(tmp.begin(),tmp.end(),ret->getPointer());
+                     std::vector<int> tmp=fillArrayWithPyListInt2(elt0,nbOfTuples1,tmpp1);
+                     ret->alloc(nbOfTuples1,tmpp1); std::copy(tmp.begin(),tmp.end(),ret->getPointer());
                      ret->incrRef();
                      return ret;
                    }
@@ -4523,20 +4554,20 @@ namespace ParaMEDMEM
        }
      else if(PyInt_Check(elt0))
        {
-         int nbOfTuples=PyInt_AS_LONG(elt0);
-         if(nbOfTuples<0)
+         int nbOfTuples1=PyInt_AS_LONG(elt0);
+         if(nbOfTuples1<0)
            throw INTERP_KERNEL::Exception("DataArrayInt::New : should be a positive set of allocated memory !");
-         if(elt1)
+         if(nbOfTuples)
            {
-             if(!elt2)
+             if(!nbOfComp)
                {
-                 if(PyInt_Check(elt1))
+                 if(PyInt_Check(nbOfTuples))
                    {//DataArrayInt.New(5,2)
-                     int nbOfCompo=PyInt_AS_LONG(elt1);
+                     int nbOfCompo=PyInt_AS_LONG(nbOfTuples);
                      if(nbOfCompo<0)
                        throw INTERP_KERNEL::Exception("DataArrayInt::New : should be a positive number of components !");
                      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
-                     ret->alloc(nbOfTuples,nbOfCompo);
+                     ret->alloc(nbOfTuples1,nbOfCompo);
                      ret->incrRef();
                      return ret;
                    }
@@ -4549,7 +4580,7 @@ namespace ParaMEDMEM
          else
            {//DataArrayInt.New(5)
              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
-             ret->alloc(nbOfTuples,1);
+             ret->alloc(nbOfTuples1,1);
              ret->incrRef();
              return ret;
            }
@@ -4558,9 +4589,9 @@ namespace ParaMEDMEM
        throw INTERP_KERNEL::Exception(msg);
    }
 
-   DataArrayInt(PyObject *elt0, PyObject *elt1=0, PyObject *elt2=0) throw(INTERP_KERNEL::Exception)
+   DataArrayInt(PyObject *elt0, PyObject *nbOfTuples=0, PyObject *nbOfComp=0) throw(INTERP_KERNEL::Exception)
    {
-     return ParaMEDMEM_DataArrayInt_New__SWIG_1(elt0,elt1,elt2);
+     return ParaMEDMEM_DataArrayInt_New__SWIG_1(elt0,nbOfTuples,nbOfComp);
    }
 
    std::string __str__() const
@@ -4604,19 +4635,50 @@ namespace ParaMEDMEM
      return ret;
    }
 
-   void setValues(PyObject *li, int nbOfTuples, int nbOfElsPerTuple) throw(INTERP_KERNEL::Exception)
+   void setValues(PyObject *li, PyObject *nbOfTuples=0, PyObject *nbOfComp=0) throw(INTERP_KERNEL::Exception)
    {
-     int *tmp=new int[nbOfTuples*nbOfElsPerTuple];
-     try
+     const char *msg="ParaMEDMEM::DataArrayInt::setValues : Available API are : \n-DataArrayInt.setValues([1,3,4])\n-DataArrayInt.setValues([1,3,4],3)\n-DataArrayInt.setValues([1,3,4,5],2,2)\n-DataArrayInt.New(5)\n !";
+     if(PyList_Check(li) || PyTuple_Check(li))
        {
-         fillArrayWithPyListInt(li,tmp,nbOfTuples*nbOfElsPerTuple,0,false);
+         if(nbOfTuples)
+           {
+             if(PyInt_Check(nbOfTuples))
+               {
+                 int nbOfTuples1=PyInt_AS_LONG(nbOfTuples);
+                 if(nbOfTuples<0)
+                   throw INTERP_KERNEL::Exception("DataArrayInt::setValue : should be a positive set of allocated memory !");
+                 if(nbOfComp)
+                   {
+                     if(PyInt_Check(nbOfComp))
+                       {//DataArrayInt.setValues([1,3,4,5],2,2)
+                         int nbOfCompo=PyInt_AS_LONG(nbOfComp);
+                         if(nbOfCompo<0)
+                           throw INTERP_KERNEL::Exception("DataArrayInt::setValue : should be a positive number of components !");
+                         std::vector<int> tmp=fillArrayWithPyListInt2(li,nbOfTuples1,nbOfCompo);
+                         self->alloc(nbOfTuples1,nbOfCompo); std::copy(tmp.begin(),tmp.end(),self->getPointer());
+                       }
+                     else
+                       throw INTERP_KERNEL::Exception(msg);
+                   }
+                 else
+                   {//DataArrayInt.setValues([1,3,4],3)
+                     int tmpp1=-1;
+                     std::vector<int> tmp=fillArrayWithPyListInt2(li,nbOfTuples1,tmpp1);
+                     self->alloc(nbOfTuples1,tmpp1); std::copy(tmp.begin(),tmp.end(),self->getPointer());
+                   }
+               }
+             else
+               throw INTERP_KERNEL::Exception(msg);
+           }
+         else
+           {// DataArrayInt.setValues([1,3,4])
+             int tmpp1=-1,tmpp2=-1;
+             std::vector<int> tmp=fillArrayWithPyListInt2(li,tmpp1,tmpp2);
+             self->alloc(tmpp1,tmpp2); std::copy(tmp.begin(),tmp.end(),self->getPointer());
+           }
        }
-     catch(INTERP_KERNEL::Exception& e)
-       {
-         delete [] tmp;
-         throw e;
-       }
-     self->useArray(tmp,true,CPP_DEALLOC,nbOfTuples,nbOfElsPerTuple);
+     else
+       throw INTERP_KERNEL::Exception(msg);
    }
 
    PyObject *getValues() throw(INTERP_KERNEL::Exception)

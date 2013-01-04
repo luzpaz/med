@@ -5725,31 +5725,31 @@ class MEDCouplingBasicsTest(unittest.TestCase):
 
     def testSwigErrorProtection3(self):
         da=DataArrayInt.New()
-        da.setValues([1,2,3,4],4,3)
+        da.setValues([1,2,3,4,0,0,0,0,0,0,0,0],4,3)
         self.assertEqual([1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0],da.getValues())
         self.assertEqual(3,da.getNumberOfComponents());
         self.assertEqual(4,da.getNumberOfTuples());
         da=DataArrayInt.New()
-        da.setValues((1,2,3,4,4,3),4,3)
+        da.setValues(((1,2,3),(4,4,3),(0,0,0),(0,0,0)),4,3)
         self.assertEqual([1, 2, 3, 4, 4, 3, 0, 0, 0, 0, 0, 0],da.getValues())
         self.assertEqual(3,da.getNumberOfComponents());
         self.assertEqual(4,da.getNumberOfTuples());
-        da.setValues(10*[1]+290*[2],4,3)
+        da.setValues((10*[1]+290*[2])[:12],4,3)
         self.assertEqual(10*[1]+[2,2],da.getValues())
         self.assertEqual(3,da.getNumberOfComponents());
         self.assertEqual(4,da.getNumberOfTuples());
         #
         da=DataArrayDouble.New()
-        da.setValues([1,2,3.,4],4,3)
+        da.setValues([1,2,3.,4,0,0,0,0,0,0,0,0],4,3)
         self.assertEqual([1., 2., 3., 4., 0., 0., 0., 0., 0., 0., 0., 0.],da.getValues())
         self.assertEqual(3,da.getNumberOfComponents());
         self.assertEqual(4,da.getNumberOfTuples());
         da=DataArrayDouble.New()
-        da.setValues((1,2,3,4.,4,3),4,3)
+        da.setValues(((1,2,3),(4.,4,3),(0,0,0),(0,0,0)),4,3)
         self.assertEqual([1., 2., 3., 4., 4., 3., 0., 0., 0., 0., 0., 0.],da.getValues())
         self.assertEqual(3,da.getNumberOfComponents());
         self.assertEqual(4,da.getNumberOfTuples());
-        da.setValues(10*[1]+290*[2],4,3)
+        da.setValues((10*[1]+290*[2])[:12],4,3)
         self.assertEqual(10*[1.]+[2.,2.],da.getValues())
         self.assertEqual(3,da.getNumberOfComponents());
         self.assertEqual(4,da.getNumberOfTuples());
@@ -8157,7 +8157,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         for i in xrange(6):
             self.assertAlmostEqual(arr2[5-i],b.getIJ(i,0),14);
             pass
-        b.setValues(arr2,5,1);
+        b.setValues(arr2[:5],5,1);
         self.assertAlmostEqual(9.,b.back(),14)
         b.reverse();
         for i in xrange(5):
