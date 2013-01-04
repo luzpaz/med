@@ -384,6 +384,7 @@ class MEDLoaderTest(unittest.TestCase):
         mm.write("Pyfile17_bis.med",2)
         ff=MEDFileFieldMultiTS("Pyfile17.med")
         tsExpected=[[1,2],[3,4],[5,6]]
+        self.assertEqual(3,len(ff))
         for pos,f1ts in enumerate(ff):
             self.assertEqual(tsExpected[pos],f1ts.getTime()[:2])
             self.assertEqual(type(f1ts),MEDFileField1TS)

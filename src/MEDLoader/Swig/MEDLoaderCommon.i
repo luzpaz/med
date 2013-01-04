@@ -1207,9 +1207,14 @@ namespace ParaMEDMEM
          }
          
          std::string __str__() const throw(INTERP_KERNEL::Exception)
-           {
-             return self->simpleRepr();
-           }
+         {
+           return self->simpleRepr();
+         }
+
+         int __len__() const throw(INTERP_KERNEL::Exception)
+         {
+           return self->getNumberOfTS();
+         }
 
          MEDFileField1TS *__getitem__(PyObject *elt0) const throw(INTERP_KERNEL::Exception)
          {
