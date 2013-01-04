@@ -164,7 +164,9 @@ class MEDLoaderTest(unittest.TestCase):
         t=mm.getGroupArr(0,"GrpOnAllCell")
         self.assertTrue(t.getValues()==range(5))
         #
-        mm.write(outFileName,2);
+        mmCpy=mm.deepCpy()
+        self.assertTrue(mm.isEqual(mmCpy,1e-12)[0]) ; del mm
+        mmCpy.write(outFileName,2);
         #
         mm=MEDFileMesh.New(outFileName)
         mbis=mm.getMeshAtLevel(0)

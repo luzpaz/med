@@ -378,27 +378,20 @@ MEDFileUMeshPermCompute::operator MEDCouplingUMesh *() const
   if((MEDCouplingUMesh *)_m==0)
     {
       updateTime();
-      MEDCouplingUMesh *ret=(MEDCouplingUMesh *)_st->_m_by_types->deepCpy();
-      _m=ret;
+      _m=static_cast<MEDCouplingUMesh *>(_st->_m_by_types->deepCpy());
       _m->renumberCells(_st->_num->getConstPointer(),true);
-      ret->incrRef();
-      return ret;
+      return _m.retn();
     }
   else
     {
       if(_mpt_time==_st->_m_by_types->getTimeOfThis() && _num_time==_st->_num->getTimeOfThis())
-        {
-          _m->incrRef();
-          return _m;
-        }
+        return _m.retn();
       else
         {
           updateTime();
-          MEDCouplingUMesh *ret=(MEDCouplingUMesh *)_st->_m_by_types->deepCpy();
-          _m=ret;
+          _m=static_cast<MEDCouplingUMesh *>(_st->_m_by_types->deepCpy());
           _m->renumberCells(_st->_num->getConstPointer(),true);
-          ret->incrRef();
-          return ret;
+          return _m.retn();
         }
     }
 }
@@ -412,6 +405,10 @@ void MEDFileUMeshPermCompute::updateTime() const
 {
   _mpt_time=_st->_m_by_types->getTimeOfThis();
   _num_time=_st->_num->getTimeOfThis();
+}
+
+MEDFileUMeshSplitL1::MEDFileUMeshSplitL1(const MEDFileUMeshSplitL1& other):_m_by_types(other._m_by_types),_fam(other._fam),_num(other._num),_rev_num(other._rev_num),_m(this)
+{
 }
 
 MEDFileUMeshSplitL1::MEDFileUMeshSplitL1(const MEDFileUMeshL2& l2, const char *mName, int id):_m(this)
@@ -461,6 +458,20 @@ MEDFileUMeshSplitL1::MEDFileUMeshSplitL1(MEDCouplingUMesh *m):_m(this)
 MEDFileUMeshSplitL1::MEDFileUMeshSplitL1(MEDCouplingUMesh *m, bool newOrOld):_m(this)
 {
   assignMesh(m,newOrOld);
+}
+
+MEDFileUMeshSplitL1 *MEDFileUMeshSplitL1::deepCpy() const
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileUMeshSplitL1> ret=new MEDFileUMeshSplitL1(*this);
+  if((const MEDCouplingUMesh*)_m_by_types)
+    ret->_m_by_types=static_cast<MEDCouplingUMesh*>(_m_by_types->deepCpy());
+  if((const DataArrayInt *)_fam)
+    ret->_fam=_fam->deepCpy();
+  if((const DataArrayInt *)_num)
+    ret->_num=_num->deepCpy();
+  if((const DataArrayInt *)_rev_num)
+    ret->_rev_num=_rev_num->deepCpy();
+  return ret.retn();
 }
 
 bool MEDFileUMeshSplitL1::isEqual(const MEDFileUMeshSplitL1 *other, double eps, std::string& what) const

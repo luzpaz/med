@@ -1342,6 +1342,32 @@ MEDFileUMesh *MEDFileUMesh::New()
   return new MEDFileUMesh;
 }
 
+MEDFileMesh *MEDFileUMesh::shallowCpy() const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileUMesh> ret=new MEDFileUMesh(*this);
+  return ret.retn();
+}
+
+MEDFileMesh *MEDFileUMesh::deepCpy() const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileUMesh> ret=new MEDFileUMesh(*this);
+  if((const DataArrayDouble*)_coords)
+    ret->_coords=_coords->deepCpy();
+  if((const DataArrayInt*)_fam_coords)
+    ret->_fam_coords=_fam_coords->deepCpy();
+  if((const DataArrayInt*)_num_coords)
+    ret->_num_coords=_num_coords->deepCpy();
+  if((const DataArrayInt*)_rev_num_coords)
+    ret->_rev_num_coords=_rev_num_coords->deepCpy();
+  std::size_t i=0;
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileUMeshSplitL1> >::const_iterator it=_ms.begin();it!=_ms.end();it++,i++)
+    {
+      if((const MEDFileUMeshSplitL1 *)(*it))
+        ret->_ms[i]=(*it)->deepCpy();
+    }
+  return ret.retn();
+}
+
 bool MEDFileUMesh::isEqual(const MEDFileMesh *other, double eps, std::string& what) const
 {
   if(!MEDFileMesh::isEqual(other,eps,what))
@@ -1424,7 +1450,6 @@ bool MEDFileUMesh::isEqual(const MEDFileMesh *other, double eps, std::string& wh
             return false;
         }
     }
-  //std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileUMeshSplitL1> > _ms;
   return true;
 }
 
@@ -2444,6 +2469,32 @@ std::string MEDFileCMesh::simpleRepr() const
 std::string MEDFileCMesh::advancedRepr() const
 {
   return simpleRepr();
+}
+
+MEDFileMesh *MEDFileCMesh::shallowCpy() const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileCMesh> ret=new MEDFileCMesh(*this);
+  return ret.retn();
+}
+
+MEDFileMesh *MEDFileCMesh::deepCpy() const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileCMesh> ret=new MEDFileCMesh(*this);
+  if((const MEDCouplingCMesh*)_cmesh)
+    ret->_cmesh=static_cast<MEDCouplingCMesh*>(_cmesh->deepCpy());
+  if((const DataArrayInt*)_fam_nodes)
+    ret->_fam_nodes=_fam_nodes->deepCpy();
+  if((const DataArrayInt*)_num_nodes)
+    ret->_num_nodes=_num_nodes->deepCpy();
+  if((const DataArrayInt*)_fam_cells)
+    ret->_fam_cells=_fam_cells->deepCpy();
+  if((const DataArrayInt*)_num_cells)
+    ret->_num_cells=_num_cells->deepCpy();
+  if((const DataArrayInt*)_rev_num_nodes)
+    ret->_rev_num_nodes=_rev_num_nodes->deepCpy();
+  if((const DataArrayInt*)_rev_num_cells)
+    ret->_rev_num_cells=_rev_num_cells->deepCpy();
+  return ret.retn();
 }
 
 bool MEDFileCMesh::isEqual(const MEDFileMesh *other, double eps, std::string& what) const

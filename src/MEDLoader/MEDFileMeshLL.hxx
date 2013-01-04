@@ -116,9 +116,11 @@ namespace ParaMEDMEM
   {
     friend class MEDFileUMeshPermCompute;
   public:
+    MEDFileUMeshSplitL1(const MEDFileUMeshSplitL1& other);
     MEDFileUMeshSplitL1(const MEDFileUMeshL2& l2, const char *mName, int id);
     MEDFileUMeshSplitL1(MEDCouplingUMesh *m);
     MEDFileUMeshSplitL1(MEDCouplingUMesh *m, bool newOrOld);
+    MEDFileUMeshSplitL1 *deepCpy() const;
     bool isEqual(const MEDFileUMeshSplitL1 *other, double eps, std::string& what) const;
     void clearNonDiscrAttributes() const;
     void synchronizeTinyInfo(const MEDFileMesh& master) const;
