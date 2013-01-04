@@ -88,11 +88,13 @@ using namespace ParaMEDMEM;
 %newobject ParaMEDMEM::MEDFileMeshes::__iter__;
 
 %newobject ParaMEDMEM::MEDFileFields::New;
+%newobject ParaMEDMEM::MEDFileFields::deepCpy;
 %newobject ParaMEDMEM::MEDFileFields::getFieldWithName;
 %newobject ParaMEDMEM::MEDFileFields::getFieldAtPos;
 %newobject ParaMEDMEM::MEDFileFields::__getitem__;
 %newobject ParaMEDMEM::MEDFileFields::__iter__;
 %newobject ParaMEDMEM::MEDFileFieldMultiTS::New;
+%newobject ParaMEDMEM::MEDFileFieldMultiTS::deepCpy;
 %newobject ParaMEDMEM::MEDFileFieldMultiTS::getTimeStepAtPos;
 %newobject ParaMEDMEM::MEDFileFieldMultiTS::getTimeStep;
 %newobject ParaMEDMEM::MEDFileFieldMultiTS::getTimeStepGivenTime;
@@ -104,6 +106,7 @@ using namespace ParaMEDMEM;
 %newobject ParaMEDMEM::MEDFileFieldMultiTS::getFieldAtLevelOld;
 %newobject ParaMEDMEM::MEDFileFieldMultiTS::getUndergroundDataArray;
 %newobject ParaMEDMEM::MEDFileField1TS::New;
+%newobject ParaMEDMEM::MEDFileField1TS::deepCpy;
 %newobject ParaMEDMEM::MEDFileField1TS::getFieldAtLevel;
 %newobject ParaMEDMEM::MEDFileField1TS::getFieldAtTopLevel;
 %newobject ParaMEDMEM::MEDFileField1TS::getFieldOnMeshAtLevel;
@@ -827,6 +830,7 @@ namespace ParaMEDMEM
   {
   public:
     void shallowCpyGlobs(const MEDFileFieldGlobsReal& other) throw(INTERP_KERNEL::Exception);
+    void deepCpyGlobs(const MEDFileFieldGlobsReal& other) throw(INTERP_KERNEL::Exception);
     std::vector<std::string> getPfls() const throw(INTERP_KERNEL::Exception);
     std::vector<std::string> getLocs() const throw(INTERP_KERNEL::Exception);
     bool existsPfl(const char *pflName) const throw(INTERP_KERNEL::Exception);
@@ -944,6 +948,7 @@ namespace ParaMEDMEM
     void setProfileNameOnLeaf(const char *mName, INTERP_KERNEL::NormalizedCellType typ, int locId, const char *newPflName, bool forceRenameOnGlob=false) throw(INTERP_KERNEL::Exception);
     void setLocNameOnLeaf(const char *mName, INTERP_KERNEL::NormalizedCellType typ, int locId, const char *newLocName, bool forceRenameOnGlob=false) throw(INTERP_KERNEL::Exception);
     void copyTinyInfoFrom(const MEDCouplingFieldDouble *field) throw(INTERP_KERNEL::Exception);
+    MEDFileField1TS *deepCpy() const throw(INTERP_KERNEL::Exception);
     //
     int getDimension() const throw(INTERP_KERNEL::Exception);
     int getIteration() const throw(INTERP_KERNEL::Exception);
@@ -1169,6 +1174,7 @@ namespace ParaMEDMEM
     static MEDFileFieldMultiTS *New() throw(INTERP_KERNEL::Exception);
     static MEDFileFieldMultiTS *New(const char *fileName) throw(INTERP_KERNEL::Exception);
     static MEDFileFieldMultiTS *New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
+    MEDFileFieldMultiTS *deepCpy() const throw(INTERP_KERNEL::Exception);
     //
     MEDFileField1TS *getTimeStepAtPos(int pos) const throw(INTERP_KERNEL::Exception);
     MEDFileField1TS *getTimeStep(int iteration, int order) const throw(INTERP_KERNEL::Exception);
@@ -1554,6 +1560,7 @@ namespace ParaMEDMEM
   public:
     static MEDFileFields *New() throw(INTERP_KERNEL::Exception);
     static MEDFileFields *New(const char *fileName) throw(INTERP_KERNEL::Exception);
+    MEDFileFields *deepCpy() const throw(INTERP_KERNEL::Exception);
     void write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception);
     int getNumberOfFields() const;
     std::vector<std::string> getFieldsNames() const throw(INTERP_KERNEL::Exception);

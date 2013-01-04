@@ -100,6 +100,11 @@ MEDFileFieldLoc::MEDFileFieldLoc(const char *locName, INTERP_KERNEL::NormalizedC
   _nb_gauss_pt=_w.size();
 }
 
+MEDFileFieldLoc *MEDFileFieldLoc::deepCpy() const
+{
+  return new MEDFileFieldLoc(*this);
+}
+
 void MEDFileFieldLoc::simpleRepr(std::ostream& oss) const
 {
   static const char OFF7[]="\n    ";
@@ -388,6 +393,13 @@ MEDFileFieldPerMeshPerTypePerDisc *MEDFileFieldPerMeshPerTypePerDisc::New(MEDFil
 MEDFileFieldPerMeshPerTypePerDisc *MEDFileFieldPerMeshPerTypePerDisc::New(const MEDFileFieldPerMeshPerTypePerDisc& other)
 {
   return new MEDFileFieldPerMeshPerTypePerDisc(other);
+}
+
+MEDFileFieldPerMeshPerTypePerDisc *MEDFileFieldPerMeshPerTypePerDisc::deepCpy(MEDFileFieldPerMeshPerType *father) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileFieldPerMeshPerTypePerDisc> ret=new MEDFileFieldPerMeshPerTypePerDisc(*this);
+  ret->_father=father;
+  return ret.retn();
 }
 
 MEDFileFieldPerMeshPerTypePerDisc::MEDFileFieldPerMeshPerTypePerDisc(MEDFileFieldPerMeshPerType *fath, TypeOfField atype, int profileIt) throw(INTERP_KERNEL::Exception)
@@ -919,6 +931,19 @@ MEDFileFieldPerMeshPerType *MEDFileFieldPerMeshPerType::New(MEDFileFieldPerMesh 
   return new MEDFileFieldPerMeshPerType(fath,geoType);
 }
 
+MEDFileFieldPerMeshPerType *MEDFileFieldPerMeshPerType::deepCpy(MEDFileFieldPerMesh *father) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileFieldPerMeshPerType> ret=new MEDFileFieldPerMeshPerType(*this);
+  ret->_father=father;
+  std::size_t i=0;
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileFieldPerMeshPerTypePerDisc> >::const_iterator it=_field_pm_pt_pd.begin();it!=_field_pm_pt_pd.end();it++,i++)
+    {
+      if((const MEDFileFieldPerMeshPerTypePerDisc *)*it)
+        ret->_field_pm_pt_pd[i]=(*it)->deepCpy(const_cast<MEDFileFieldPerMeshPerType *>(this));
+    }
+  return ret.retn();
+}
+
 void MEDFileFieldPerMeshPerType::assignFieldNoProfile(int& start, int offset, int nbOfCells, const MEDCouplingFieldDouble *field, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
 {
   std::vector<int> pos=addNewEntryIfNecessary(field,offset,nbOfCells);
@@ -1424,6 +1449,19 @@ MEDFileFieldPerMesh *MEDFileFieldPerMesh::NewOnRead(med_idt fid, MEDFileField1TS
 MEDFileFieldPerMesh *MEDFileFieldPerMesh::New(MEDFileField1TSWithoutSDA *fath, const MEDCouplingMesh *mesh)
 {
   return new MEDFileFieldPerMesh(fath,mesh);
+}
+
+MEDFileFieldPerMesh *MEDFileFieldPerMesh::deepCpy(MEDFileField1TSWithoutSDA *father) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr< MEDFileFieldPerMesh > ret=new MEDFileFieldPerMesh(*this);
+  ret->_father=father;
+  std::size_t i=0;
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr< MEDFileFieldPerMeshPerType > >::const_iterator it=_field_pm_pt.begin();it!=_field_pm_pt.end();it++,i++)
+    {
+      if((const MEDFileFieldPerMeshPerType *)*it)
+        ret->_field_pm_pt[i]=(*it)->deepCpy(const_cast<MEDFileFieldPerMesh *>(this));
+    }
+  return ret.retn();
 }
 
 void MEDFileFieldPerMesh::simpleRepr(int bkOffset, std::ostream& oss, int id) const
@@ -2355,6 +2393,24 @@ MEDFileFieldGlobs *MEDFileFieldGlobs::New()
   return new MEDFileFieldGlobs;
 }
 
+MEDFileFieldGlobs *MEDFileFieldGlobs::deepCpy() const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileFieldGlobs> ret=new MEDFileFieldGlobs(*this);
+  std::size_t i=0;
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> >::const_iterator it=_pfls.begin();it!=_pfls.end();it++,i++)
+    {
+      if((const DataArrayInt *)*it)
+        ret->_pfls[i]=(*it)->deepCpy();
+    }
+  i=0;
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileFieldLoc> >::const_iterator it=_locs.begin();it!=_locs.end();it++,i++)
+    {
+      if((const MEDFileFieldLoc*)*it)
+        ret->_locs[i]=(*it)->deepCpy();
+    }
+  return ret.retn();
+}
+
 MEDFileFieldGlobs::MEDFileFieldGlobs(const char *fname):_file_name(fname)
 {
 }
@@ -2731,6 +2787,13 @@ MEDFileFieldGlobsReal::~MEDFileFieldGlobsReal()
 void MEDFileFieldGlobsReal::shallowCpyGlobs(const MEDFileFieldGlobsReal& other)
 {
   _globals=other._globals;
+}
+
+void MEDFileFieldGlobsReal::deepCpyGlobs(const MEDFileFieldGlobsReal& other)
+{
+  _globals=other._globals;
+  if((const MEDFileFieldGlobs *)_globals)
+    _globals=other._globals->deepCpy();
 }
 
 void MEDFileFieldGlobsReal::appendGlobs(const MEDFileFieldGlobsReal& other, double eps) throw(INTERP_KERNEL::Exception)
@@ -3709,6 +3772,20 @@ const MEDFileFieldPerMeshPerTypePerDisc *MEDFileField1TSWithoutSDA::getLeafGiven
   return _field_per_mesh[mid]->getLeafGivenTypeAndLocId(typ,locId);
 }
 
+MEDFileField1TSWithoutSDA *MEDFileField1TSWithoutSDA::deepCpy() const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileField1TSWithoutSDA> ret=new MEDFileField1TSWithoutSDA(*this);
+  if((const DataArrayDouble *)_arr)
+    ret->_arr=_arr->deepCpy();
+  std::size_t i=0;
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr< MEDFileFieldPerMesh > >::const_iterator it=_field_per_mesh.begin();it!=_field_per_mesh.end();it++,i++)
+    {
+      if((const MEDFileFieldPerMesh *)*it)
+        ret->_field_per_mesh[i]=(*it)->deepCpy(const_cast<MEDFileField1TSWithoutSDA *>(this));
+    }
+  return ret.retn();
+}
+
 DataArrayDouble *MEDFileField1TSWithoutSDA::getOrCreateAndGetArray()
 {
   DataArrayDouble *ret=_arr;
@@ -3736,9 +3813,9 @@ MEDFileField1TS *MEDFileField1TS::New(const char *fileName, const char *fieldNam
 /*!
  * \warning this is a shallow copy constructor
  */
-MEDFileField1TS *MEDFileField1TS::New(const MEDFileField1TSWithoutSDA& other, bool deepCpy)
+MEDFileField1TS *MEDFileField1TS::New(const MEDFileField1TSWithoutSDA& other, bool shallowCopyOfContent)
 {
-  return new MEDFileField1TS(other,deepCpy);
+  return new MEDFileField1TS(other,shallowCopyOfContent);
 }
 
 MEDFileField1TS *MEDFileField1TS::New()
@@ -3856,9 +3933,9 @@ catch(INTERP_KERNEL::Exception& e)
 /*!
  * \warning this is a shallow copy constructor
  */
-MEDFileField1TS::MEDFileField1TS(const MEDFileField1TSWithoutSDA& other, bool deepCpy)
+MEDFileField1TS::MEDFileField1TS(const MEDFileField1TSWithoutSDA& other, bool shallowCopyOfContent)
 {
-  if(!deepCpy)
+  if(!shallowCopyOfContent)
     {
       const MEDFileField1TSWithoutSDA *otherPtr(&other);
       otherPtr->incrRef();
@@ -4084,6 +4161,15 @@ void MEDFileField1TS::setLocNameOnLeaf(const char *mName, INTERP_KERNEL::Normali
     }
 }
 
+MEDFileField1TS *MEDFileField1TS::deepCpy() const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileField1TS> ret=new MEDFileField1TS(*this);
+  if((const MEDFileField1TSWithoutSDA *)_content)
+    ret->_content=_content->deepCpy();
+  ret->deepCpyGlobs(*this);
+  return ret.retn();
+}
+
 int MEDFileField1TS::copyTinyInfoFrom(const MEDCouplingFieldDouble *field) throw(INTERP_KERNEL::Exception)
 {
   return _content->copyTinyInfoFrom(field);
@@ -4282,9 +4368,21 @@ try:_name(fieldName),_infos(infos),_field_type(ft)
   finishLoading(fid,nbOfStep);
 }
 catch(INTERP_KERNEL::Exception& e)
-  {
-    throw e;
-  }
+{
+  throw e;
+}
+
+MEDFileFieldMultiTSWithoutSDA *MEDFileFieldMultiTSWithoutSDA::deepCpy() const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileFieldMultiTSWithoutSDA> ret=new MEDFileFieldMultiTSWithoutSDA(*this);
+  std::size_t i=0;
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileField1TSWithoutSDA> >::const_iterator it=_time_steps.begin();it!=_time_steps.end();it++,i++)
+    {
+      if((const MEDFileField1TSWithoutSDA *)*it)
+        ret->_time_steps[i]=(*it)->deepCpy();
+    }
+  return ret.retn();
+}
 
 const std::vector<std::string>& MEDFileFieldMultiTSWithoutSDA::getInfo() const throw(INTERP_KERNEL::Exception)
 {
@@ -4817,9 +4915,18 @@ MEDFileFieldMultiTS *MEDFileFieldMultiTS::New(const char *fileName, const char *
   return new MEDFileFieldMultiTS(fileName,fieldName);
 }
 
-MEDFileFieldMultiTS *MEDFileFieldMultiTS::New(const MEDFileFieldMultiTSWithoutSDA& other, bool deepCpy)
+MEDFileFieldMultiTS *MEDFileFieldMultiTS::New(const MEDFileFieldMultiTSWithoutSDA& other, bool shallowCopyOfContent)
 {
-  return new MEDFileFieldMultiTS(other,deepCpy);
+  return new MEDFileFieldMultiTS(other,shallowCopyOfContent);
+}
+
+MEDFileFieldMultiTS *MEDFileFieldMultiTS::deepCpy() const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileFieldMultiTS> ret=new MEDFileFieldMultiTS(*this);
+  if((const MEDFileFieldMultiTSWithoutSDA *)_content)
+    ret->_content=_content->deepCpy();
+  ret->deepCpyGlobs(*this);
+  return ret.retn();
 }
 
 MEDFileField1TS *MEDFileFieldMultiTS::getTimeStepAtPos(int pos) const throw(INTERP_KERNEL::Exception)
@@ -5002,9 +5109,9 @@ catch(INTERP_KERNEL::Exception& e)
     throw e;
   }
 
-MEDFileFieldMultiTS::MEDFileFieldMultiTS(const MEDFileFieldMultiTSWithoutSDA& other, bool deepCpy)
+MEDFileFieldMultiTS::MEDFileFieldMultiTS(const MEDFileFieldMultiTSWithoutSDA& other, bool shallowCopyOfContent)
 {
-  if(!deepCpy)
+  if(!shallowCopyOfContent)
     {
       const MEDFileFieldMultiTSWithoutSDA *otherPtr(&other);
       otherPtr->incrRef();
@@ -5181,6 +5288,19 @@ MEDFileFields *MEDFileFields::New()
 MEDFileFields *MEDFileFields::New(const char *fileName) throw(INTERP_KERNEL::Exception)
 {
   return new MEDFileFields(fileName);
+}
+
+MEDFileFields *MEDFileFields::deepCpy() const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileFields> ret=new MEDFileFields(*this);
+  std::size_t i=0;
+  for( std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileFieldMultiTSWithoutSDA> >::const_iterator it=_fields.begin();it!=_fields.end();it++,i++)
+    {
+      if((const MEDFileFieldMultiTSWithoutSDA*)*it)
+        ret->_fields[i]=(*it)->deepCpy();
+    }
+  ret->deepCpyGlobs(*this);
+  return ret.retn();
 }
 
 int MEDFileFields::getNumberOfFields() const
