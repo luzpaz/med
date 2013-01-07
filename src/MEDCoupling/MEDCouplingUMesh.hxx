@@ -107,6 +107,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT std::vector<DataArrayInt *> partitionBySpreadZone() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayInt *computeFetchedNodeIds() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayInt *getNodeIdsInUse(int& nbrOfNodesInUse) const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void computeNodeIdsAlg(std::vector<bool>& nodeIdsInUse) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayInt *computeNbOfNodesPerCell() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayInt *zipCoordsTraducer() throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayInt *zipConnectivityTraducer(int compType, int startCellId=0) throw(INTERP_KERNEL::Exception);

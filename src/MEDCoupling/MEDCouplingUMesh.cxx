@@ -1105,6 +1105,30 @@ DataArrayInt *MEDCouplingUMesh::computeFetchedNodeIds() const throw(INTERP_KERNE
 }
 
 /*!
+ * \param [in,out] nodeIdsInUse an array of size typically equal to nbOfNodes.
+ * \sa MEDCouplingUMesh::getNodeIdsInUse
+ */
+void MEDCouplingUMesh::computeNodeIdsAlg(std::vector<bool>& nodeIdsInUse) const throw(INTERP_KERNEL::Exception)
+{
+  int nbOfNodes=(int)nodeIdsInUse.size();
+  int nbOfCells=getNumberOfCells();
+  const int *connIndex=_nodal_connec_index->getConstPointer();
+  const int *conn=_nodal_connec->getConstPointer();
+  for(int i=0;i<nbOfCells;i++)
+    for(int j=connIndex[i]+1;j<connIndex[i+1];j++)
+      if(conn[j]>=0)
+        {
+          if(conn[j]<nbOfNodes)
+            nodeIdsInUse[conn[j]]=true;
+          else
+            {
+              std::ostringstream oss; oss << "MEDCouplingUMesh::getNodeIdsInUse : In cell #" << i  << " presence of node id " <<  conn[j] << " not in [0," << nbOfNodes << ") !";
+              throw INTERP_KERNEL::Exception(oss.str().c_str());
+            }
+        }
+}
+
+/*!
  * Array returned is the correspondance in \b old \b to \b new format (that's why 'nbrOfNodesInUse' is returned too).
  * The returned array is newly created and should be dealt by the caller.
  * To retrieve the new to old format the user can use DataArrayInt::invertArrayO2N2N2O method.
@@ -1112,12 +1136,14 @@ DataArrayInt *MEDCouplingUMesh::computeFetchedNodeIds() const throw(INTERP_KERNE
  * -1 values in returned array means that the corresponding node never appear in any nodal connectivity of cells constituting 'this'.
  * @param [out] nbrOfNodesInUse out parameter that specifies how many of nodes in 'this' is really used in nodal connectivity.
  * @return a newly allocated DataArrayInt that tells for each nodeid in \b this if it is unused (-1) or used (the corresponding new id)
+ * \throw if a cell contains in its nodal connectivity a node id >= nb of nodes an exception will be thrown.
+ * \sa MEDCouplingUMesh::computeNodeIdsAlg
  */
 DataArrayInt *MEDCouplingUMesh::getNodeIdsInUse(int& nbrOfNodesInUse) const throw(INTERP_KERNEL::Exception)
 {
   nbrOfNodesInUse=-1;
   int nbOfNodes=getNumberOfNodes();
-  DataArrayInt *ret=DataArrayInt::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
   ret->alloc(nbOfNodes,1);
   int *traducer=ret->getPointer();
   std::fill(traducer,traducer+nbOfNodes,-1);
@@ -1127,10 +1153,18 @@ DataArrayInt *MEDCouplingUMesh::getNodeIdsInUse(int& nbrOfNodesInUse) const thro
   for(int i=0;i<nbOfCells;i++)
     for(int j=connIndex[i]+1;j<connIndex[i+1];j++)
       if(conn[j]>=0)
-        traducer[conn[j]]=1;
+        {
+          if(conn[j]<nbOfNodes)
+            traducer[conn[j]]=1;
+          else
+            {
+              std::ostringstream oss; oss << "MEDCouplingUMesh::getNodeIdsInUse : In cell #" << i  << " presence of node id " <<  conn[j] << " not in [0," << nbOfNodes << ") !";
+              throw INTERP_KERNEL::Exception(oss.str().c_str());
+            }
+        }
   nbrOfNodesInUse=(int)std::count(traducer,traducer+nbOfNodes,1);
   std::transform(traducer,traducer+nbOfNodes,traducer,MEDCouplingAccVisit());
-  return ret;
+  return ret.retn();
 }
 
 /*!

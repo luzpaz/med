@@ -78,6 +78,7 @@ using namespace ParaMEDMEM;
 %newobject ParaMEDMEM::MEDFileUMesh::getLevelM1Mesh;
 %newobject ParaMEDMEM::MEDFileUMesh::getLevelM2Mesh;
 %newobject ParaMEDMEM::MEDFileUMesh::getLevelM3Mesh;
+%newobject ParaMEDMEM::MEDFileUMesh::zipCoords;
 %newobject ParaMEDMEM::MEDFileCMesh::New;
 %newobject ParaMEDMEM::MEDFileMeshMultiTS::New;
 %newobject ParaMEDMEM::MEDFileMeshMultiTS::getOneTimeStep;
@@ -583,6 +584,7 @@ namespace ParaMEDMEM
     void setGroupsFromScratch(int meshDimRelToMax, const std::vector<const MEDCouplingUMesh *>& ms) throw(INTERP_KERNEL::Exception);
     void setGroupsOnSetMesh(int meshDimRelToMax, const std::vector<const MEDCouplingUMesh *>& ms, bool renum) throw(INTERP_KERNEL::Exception);
     void optimizeFamilies() throw(INTERP_KERNEL::Exception);
+    DataArrayInt *zipCoords() throw(INTERP_KERNEL::Exception);
     %extend
        { 
          MEDFileUMesh(const char *fileName, const char *mName, int dt=-1, int it=-1) throw(INTERP_KERNEL::Exception)

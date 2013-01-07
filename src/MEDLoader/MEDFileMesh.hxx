@@ -212,6 +212,7 @@ namespace ParaMEDMEM
     void duplicateNodesOnM1Group(const char *grpNameM1, DataArrayInt *&nodesDuplicated, DataArrayInt *&cellsModified, DataArrayInt *&cellsNotModified) throw(INTERP_KERNEL::Exception);
     // tools
     bool unPolyze(std::vector<int>& oldCode, std::vector<int>& newCode, DataArrayInt *& o2nRenumCell) throw(INTERP_KERNEL::Exception);
+    DataArrayInt *zipCoords() throw(INTERP_KERNEL::Exception);
   private:
     void writeLL(med_idt fid) const throw(INTERP_KERNEL::Exception);
     MEDFileUMesh();

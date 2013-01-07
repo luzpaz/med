@@ -695,6 +695,14 @@ void MEDFileUMeshSplitL1::write(med_idt fid, const char *mName, int mdim) const
     }
 }
 
+void MEDFileUMeshSplitL1::renumberNodesInConn(const int *newNodeNumbersO2N) throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingUMesh *m(_m_by_types);
+  if(!m)
+    return;
+  m->renumberNodesInConn(newNodeNumbersO2N);
+}
+
 void MEDFileUMeshSplitL1::changeFamilyIdArr(int oldId, int newId) throw(INTERP_KERNEL::Exception)
 {
   DataArrayInt *arr=_fam;

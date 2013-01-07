@@ -145,6 +145,8 @@ namespace ParaMEDMEM
     void setRenumArr(DataArrayInt *renumArr);
     void changeFamilyIdArr(int oldId, int newId) throw(INTERP_KERNEL::Exception);
     //
+    void renumberNodesInConn(const int *newNodeNumbersO2N) throw(INTERP_KERNEL::Exception);
+    //
     static void ClearNonDiscrAttributes(const MEDCouplingMesh *tmp);
     static std::vector<int> GetNewFamiliesNumber(int nb, const std::map<std::string,int>& families);
     static void TraduceFamilyNumber(const std::vector< std::vector<int> >& fidsGrps, std::map<std::string,int>& familyIds,

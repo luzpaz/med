@@ -2202,6 +2202,59 @@ bool MEDFileUMesh::unPolyze(std::vector<int>& oldCode, std::vector<int>& newCode
   return ret;
 }
 
+struct MEDLoaderAccVisit1
+{
+  MEDLoaderAccVisit1():_new_nb_of_nodes(0) { }
+  int operator()(bool val) { return val?_new_nb_of_nodes++:-1; }
+  int _new_nb_of_nodes;
+};
+
+/*!
+ * Array returned is the correspondance in \b old \b to \b new format. The returned array is newly created and should be dealt by the caller.
+ * The maximum value stored in returned array is the number of nodes of \a this minus 1 after call of this method.
+ * The size of returned array is the number of nodes of the old (previous to the call of this method) number of nodes.
+ * -1 values in returned array means that the corresponding old node is no more used.
+ *
+ * \return newly allocated array containing correspondance in \b old \b to \b new format. If all nodes in \a this are fetched NULL pointer is returned and nothing
+ *         is modified in \a this.
+ * \throw If no coordinates are set in \a this or if there is in any available mesh in \a this a cell having a nodal connectivity containing a node id not in the range of
+ *  set coordinates.
+ */
+DataArrayInt *MEDFileUMesh::zipCoords() throw(INTERP_KERNEL::Exception)
+{
+  const DataArrayDouble *coo=getCoords();
+  if(!coo)
+    throw INTERP_KERNEL::Exception("MEDFileUMesh::zipCoords : no coordinates set in this !");
+  int nbOfNodes=coo->getNumberOfTuples();
+  std::vector<bool> nodeIdsInUse(nbOfNodes,false);
+  std::vector<int> neLevs=getNonEmptyLevels();
+  for(std::vector<int>::const_iterator lev=neLevs.begin();lev!=neLevs.end();lev++)
+    {
+      MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> m=getMeshAtLevel(*lev);
+      m->computeNodeIdsAlg(nodeIdsInUse);
+    }
+  int nbrOfNodesInUse=(int)std::count(nodeIdsInUse.begin(),nodeIdsInUse.end(),true);
+  if(nbrOfNodesInUse==nbOfNodes)
+    return 0;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New(); ret->alloc(nbOfNodes,1);
+  std::transform(nodeIdsInUse.begin(),nodeIdsInUse.end(),ret->getPointer(),MEDLoaderAccVisit1());
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret2=ret->invertArrayO2N2N2OBis(nbrOfNodesInUse);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> newCoords=coo->selectByTupleId(ret2->begin(),ret2->end());
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newFamCoords;
+  if((const DataArrayInt *)_fam_coords)
+    newFamCoords=_fam_coords->selectByTupleId(ret2->begin(),ret2->end());
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newNumCoords;
+  if((const DataArrayInt *)_num_coords)
+    newNumCoords=_num_coords->selectByTupleId(ret2->begin(),ret2->end());
+  _coords=newCoords; _fam_coords=newFamCoords; _num_coords=newNumCoords;
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileUMeshSplitL1> >::iterator it=_ms.begin();it!=_ms.end();it++)
+    {
+      if((MEDFileUMeshSplitL1*)*it)
+        (*it)->renumberNodesInConn(ret->begin());
+    }
+  return ret.retn();
+}
+
 void MEDFileUMesh::addNodeGroup(const std::string& name, const std::vector<int>& ids) throw(INTERP_KERNEL::Exception)
 {
   const DataArrayDouble *coords=_coords;

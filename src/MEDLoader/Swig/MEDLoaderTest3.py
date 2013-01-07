@@ -1770,6 +1770,32 @@ class MEDLoaderTest(unittest.TestCase):
         pfl1_r.setName(pfl1.getName())
         self.assertTrue(pfl1_r.isEqual(pfl1))
         pass
+
+    def testMEDFileUMeshZipCoords1(self):
+        m=MEDFileUMesh()
+        coo=DataArrayDouble(30) ; coo.iota(1.) ; coo.rearrange(3) ; coo.setInfoOnComponents(["aaa [b]","cc [dd]", "e [fff]"])
+        m0=MEDCouplingUMesh("toto",2) ; m0.allocateCells(0) ; m0.insertNextCell(NORM_TRI3,[1,2,3]) ; m0.insertNextCell(NORM_QUAD4,[2,4,3,4]) ; m0.insertNextCell(NORM_POLYGON,[1,6,6,6,2])
+        m1=MEDCouplingUMesh("toto",1) ; m1.allocateCells(0) ; m1.insertNextCell(NORM_SEG2,[1,6]) ; m1.insertNextCell(NORM_SEG2,[7,3])
+        m2=MEDCouplingUMesh("toto",0) ; m2.allocateCells(0) ; m2.insertNextCell(NORM_POINT1,[2]) ; m2.insertNextCell(NORM_POINT1,[6]) ; m2.insertNextCell(NORM_POINT1,[8])
+        m0.setCoords(coo) ; m.setMeshAtLevel(0,m0)
+        m1.setCoords(coo) ; m.setMeshAtLevel(-1,m1)
+        m2.setCoords(coo) ; m.setMeshAtLevel(-2,m2)
+        numCoo=DataArrayInt(10) ; numCoo.iota(3) ; m.setRenumFieldArr(1,numCoo)
+        famCoo=DataArrayInt(10) ; famCoo.iota(4) ; m.setFamilyFieldArr(1,famCoo)
+        da=DataArrayInt([20,30,40]) ; m.setRenumFieldArr(0,da) ; da=DataArrayInt([200,300,400]) ; m.setFamilyFieldArr(0,da)
+        da=DataArrayInt([50,60]) ; m.setRenumFieldArr(-1,da) ; da=DataArrayInt([500,600]) ; m.setFamilyFieldArr(-1,da)
+        da=DataArrayInt([70,80,90]) ; m.setRenumFieldArr(-2,da) ; da=DataArrayInt([700,800,900]) ; m.setFamilyFieldArr(-2,da)
+        o2n=m.zipCoords()
+        self.assertTrue(o2n.isEqual(DataArrayInt([-1,0,1,2,3,-1,4,5,6,-1])))
+        self.assertTrue(m.getNumberFieldAtLevel(1).isEqual(DataArrayInt([4,5,6,7,9,10,11])))
+        self.assertTrue(m.getFamilyFieldAtLevel(1).isEqual(DataArrayInt([5,6,7,8,10,11,12])))
+        self.assertTrue(m.getMeshAtLevel(0).getNodalConnectivity().isEqual(DataArrayInt([3,0,1,2,4,1,3,2,3,5,0,4,4,4,1])))
+        self.assertTrue(m.getMeshAtLevel(0).getNodalConnectivityIndex().isEqual(DataArrayInt([0,4,9,15])))
+        self.assertTrue(m.getMeshAtLevel(-1).getNodalConnectivity().isEqual(DataArrayInt([1,0,4,1,5,2])))
+        self.assertTrue(m.getMeshAtLevel(-1).getNodalConnectivityIndex().isEqual(DataArrayInt([0,3,6])))
+        self.assertTrue(m.getMeshAtLevel(-2).getNodalConnectivity().isEqual(DataArrayInt([0,1,0,4,0,6])))
+        self.assertTrue(m.getMeshAtLevel(-2).getNodalConnectivityIndex().isEqual(DataArrayInt([0,2,4,6])))
+        pass
     pass
 
 unittest.main()
