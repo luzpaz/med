@@ -645,6 +645,7 @@ class MEDLoaderTest(unittest.TestCase):
         #
         ff1.setFieldProfile(f1,mm1,0,da)
         ff1.changePflsNames([(["sup1_NORM_QUAD4"],"ForV650")])
+        ff1=ff1.deepCpy()
         ff1.write(fname,0)
         #
         vals,pfl=ff1.getFieldWithProfile(ON_CELLS,0,mm1) ; vals.setName("")
@@ -652,6 +653,8 @@ class MEDLoaderTest(unittest.TestCase):
         self.assertTrue(vals.isEqual(d,1e-14))
         #
         ff2=MEDFileField1TS.New(fname,f1.getName(),-1,-1)
+        ff3=MEDFileField1TS.New(fname,f1.getName(),-1,-1)
+        ff2.deepCpyGlobs(ff3)
         sbt=ff2.getFieldSplitedByType2()
         self.assertEqual(3,sbt[0][0])#TRI3
         self.assertEqual(0,sbt[0][1][0][0])#CELL For TRI3
@@ -682,6 +685,7 @@ class MEDLoaderTest(unittest.TestCase):
         ff1.appendFieldProfile(f1,mm1,0,da)
         f1.setTime(1.2,1,2) ; e=d.applyFunc("2*x") ; e.copyStringInfoFrom(d) ; f1.setArray(e) ;
         ff1.appendFieldProfile(f1,mm1,0,da)
+        ff1=ff1.deepCpy()
         ff1.write(fname,0)
         #
         vals,pfl=ff1.getFieldWithProfile(ON_CELLS,1,2,0,mm1) ; vals.setName("")
@@ -915,6 +919,7 @@ class MEDLoaderTest(unittest.TestCase):
         ff1.appendFieldProfile(f1,mm1,0,da)
         ffs.resize(1)
         ffs.setFieldAtPos(0,ff1)
+        ffs=ffs.deepCpy()
         ffs.write(fname,0)
         #
         ffsr=MEDFileFields.New(fname)
@@ -1765,7 +1770,6 @@ class MEDLoaderTest(unittest.TestCase):
         pfl1_r.setName(pfl1.getName())
         self.assertTrue(pfl1_r.isEqual(pfl1))
         pass
-
     pass
 
 unittest.main()

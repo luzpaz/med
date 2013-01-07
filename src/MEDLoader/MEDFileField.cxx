@@ -939,7 +939,7 @@ MEDFileFieldPerMeshPerType *MEDFileFieldPerMeshPerType::deepCpy(MEDFileFieldPerM
   for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileFieldPerMeshPerTypePerDisc> >::const_iterator it=_field_pm_pt_pd.begin();it!=_field_pm_pt_pd.end();it++,i++)
     {
       if((const MEDFileFieldPerMeshPerTypePerDisc *)*it)
-        ret->_field_pm_pt_pd[i]=(*it)->deepCpy(const_cast<MEDFileFieldPerMeshPerType *>(this));
+        ret->_field_pm_pt_pd[i]=(*it)->deepCpy((MEDFileFieldPerMeshPerType *)ret);
     }
   return ret.retn();
 }
@@ -1459,7 +1459,7 @@ MEDFileFieldPerMesh *MEDFileFieldPerMesh::deepCpy(MEDFileField1TSWithoutSDA *fat
   for(std::vector< MEDCouplingAutoRefCountObjectPtr< MEDFileFieldPerMeshPerType > >::const_iterator it=_field_pm_pt.begin();it!=_field_pm_pt.end();it++,i++)
     {
       if((const MEDFileFieldPerMeshPerType *)*it)
-        ret->_field_pm_pt[i]=(*it)->deepCpy(const_cast<MEDFileFieldPerMesh *>(this));
+        ret->_field_pm_pt[i]=(*it)->deepCpy((MEDFileFieldPerMesh *)(ret));
     }
   return ret.retn();
 }
@@ -3781,7 +3781,7 @@ MEDFileField1TSWithoutSDA *MEDFileField1TSWithoutSDA::deepCpy() const throw(INTE
   for(std::vector< MEDCouplingAutoRefCountObjectPtr< MEDFileFieldPerMesh > >::const_iterator it=_field_per_mesh.begin();it!=_field_per_mesh.end();it++,i++)
     {
       if((const MEDFileFieldPerMesh *)*it)
-        ret->_field_per_mesh[i]=(*it)->deepCpy(const_cast<MEDFileField1TSWithoutSDA *>(this));
+        ret->_field_per_mesh[i]=(*it)->deepCpy((MEDFileField1TSWithoutSDA *)ret);
     }
   return ret.retn();
 }
