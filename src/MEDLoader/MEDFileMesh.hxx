@@ -98,6 +98,10 @@ namespace ParaMEDMEM
     int getFamilyId(const char *name) const throw(INTERP_KERNEL::Exception);
     int getMaxFamilyId() const throw(INTERP_KERNEL::Exception);
     int getMinFamilyId() const throw(INTERP_KERNEL::Exception);
+    int getTheMaxFamilyId() const throw(INTERP_KERNEL::Exception);
+    int getTheMinFamilyId() const throw(INTERP_KERNEL::Exception);
+    virtual int getMaxFamilyIdInArrays() const throw(INTERP_KERNEL::Exception) = 0;
+    virtual int getMinFamilyIdInArrays() const throw(INTERP_KERNEL::Exception) = 0;
     DataArrayInt *getAllFamiliesIdsReferenced() const throw(INTERP_KERNEL::Exception);
     std::vector<int> getFamiliesIds(const std::vector<std::string>& famNames) const throw(INTERP_KERNEL::Exception);
     std::string getFamilyNameGivenId(int id) const throw(INTERP_KERNEL::Exception);
@@ -164,6 +168,8 @@ namespace ParaMEDMEM
     void clearNonDiscrAttributes() const;
     ~MEDFileUMesh();
     //
+    int getMaxFamilyIdInArrays() const throw(INTERP_KERNEL::Exception);
+    int getMinFamilyIdInArrays() const throw(INTERP_KERNEL::Exception);
     int getMeshDimension() const throw(INTERP_KERNEL::Exception);
     int getSpaceDimension() const throw(INTERP_KERNEL::Exception);
     std::string simpleRepr() const;
@@ -202,7 +208,7 @@ namespace ParaMEDMEM
     void eraseGroupsAtLevel(int meshDimRelToMaxExt) throw(INTERP_KERNEL::Exception);
     void setFamilyFieldArr(int meshDimRelToMaxExt, DataArrayInt *famArr) throw(INTERP_KERNEL::Exception);
     void setRenumFieldArr(int meshDimRelToMaxExt, DataArrayInt *renumArr) throw(INTERP_KERNEL::Exception);
-    void addNodeGroup(const std::string& name, const std::vector<int>& ids) throw(INTERP_KERNEL::Exception);
+    void addNodeGroup(const DataArrayInt *ids) throw(INTERP_KERNEL::Exception);
     void removeMeshAtLevel(int meshDimRelToMax) throw(INTERP_KERNEL::Exception);
     void setMeshAtLevel(int meshDimRelToMax, MEDCouplingUMesh *m, bool newOrOld=false) throw(INTERP_KERNEL::Exception);
     void setMeshAtLevelGen(int meshDimRelToMax, MEDCouplingUMesh *m, bool newOrOld) throw(INTERP_KERNEL::Exception);
@@ -243,6 +249,8 @@ namespace ParaMEDMEM
     MEDFileMesh *deepCpy() const throw(INTERP_KERNEL::Exception);
     MEDFileMesh *shallowCpy() const throw(INTERP_KERNEL::Exception);
     bool isEqual(const MEDFileMesh *other, double eps, std::string& what) const;
+    int getMaxFamilyIdInArrays() const throw(INTERP_KERNEL::Exception);
+    int getMinFamilyIdInArrays() const throw(INTERP_KERNEL::Exception);
     int getMeshDimension() const throw(INTERP_KERNEL::Exception);
     std::string simpleRepr() const;
     std::string advancedRepr() const;

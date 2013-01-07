@@ -843,6 +843,20 @@ int MEDFileMesh::getMinFamilyId() const throw(INTERP_KERNEL::Exception)
   return ret;
 }
 
+int MEDFileMesh::getTheMaxFamilyId() const throw(INTERP_KERNEL::Exception)
+{
+  int m1=getMaxFamilyId();
+  int m2=getMaxFamilyIdInArrays();
+  return std::max(m1,m2);
+}
+
+int MEDFileMesh::getTheMinFamilyId() const throw(INTERP_KERNEL::Exception)
+{
+  int m1=getMinFamilyId();
+  int m2=getMinFamilyIdInArrays();
+  return std::min(m1,m2);
+}
+
 DataArrayInt *MEDFileMesh::getAllFamiliesIdsReferenced() const throw(INTERP_KERNEL::Exception)
 {
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
@@ -1687,6 +1701,52 @@ std::vector<std::string> MEDFileUMesh::getGroupsOnSpecifiedLev(int meshDimRelToM
   return ret;
 }
 
+int MEDFileUMesh::getMaxFamilyIdInArrays() const throw(INTERP_KERNEL::Exception)
+{
+  int ret=-std::numeric_limits<int>::max(),tmp=-1;
+  if((const DataArrayInt *)_fam_coords)
+    {
+      int val=_fam_coords->getMaxValue(tmp);
+      ret=std::max(ret,val);
+    }
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileUMeshSplitL1> >::const_iterator it=_ms.begin();it!=_ms.end();it++)
+    {
+      if((const MEDFileUMeshSplitL1 *)(*it))
+        {
+          const DataArrayInt *da=(*it)->getFamilyField();
+          if(da)
+            {
+              int val=_fam_coords->getMaxValue(tmp);
+              ret=std::max(ret,val);
+            }
+        }
+    }
+  return ret;
+}
+
+int MEDFileUMesh::getMinFamilyIdInArrays() const throw(INTERP_KERNEL::Exception)
+{
+  int ret=std::numeric_limits<int>::max(),tmp=-1;
+  if((const DataArrayInt *)_fam_coords)
+    {
+      int val=_fam_coords->getMinValue(tmp);
+      ret=std::min(ret,val);
+    }
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileUMeshSplitL1> >::const_iterator it=_ms.begin();it!=_ms.end();it++)
+    {
+      if((const MEDFileUMeshSplitL1 *)(*it))
+        {
+          const DataArrayInt *da=(*it)->getFamilyField();
+          if(da)
+            {
+              int val=_fam_coords->getMinValue(tmp);
+              ret=std::min(ret,val);
+            }
+        }
+    }
+  return ret;
+}
+
 int MEDFileUMesh::getMeshDimension() const throw(INTERP_KERNEL::Exception)
 {
   int lev=0;
@@ -2239,14 +2299,14 @@ DataArrayInt *MEDFileUMesh::zipCoords() throw(INTERP_KERNEL::Exception)
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New(); ret->alloc(nbOfNodes,1);
   std::transform(nodeIdsInUse.begin(),nodeIdsInUse.end(),ret->getPointer(),MEDLoaderAccVisit1());
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret2=ret->invertArrayO2N2N2OBis(nbrOfNodesInUse);
-  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> newCoords=coo->selectByTupleId(ret2->begin(),ret2->end());
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> newCoords=coo->selectByTupleIdSafe(ret2->begin(),ret2->end());
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newFamCoords;
   if((const DataArrayInt *)_fam_coords)
-    newFamCoords=_fam_coords->selectByTupleId(ret2->begin(),ret2->end());
+    newFamCoords=_fam_coords->selectByTupleIdSafe(ret2->begin(),ret2->end());
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newNumCoords;
   if((const DataArrayInt *)_num_coords)
-    newNumCoords=_num_coords->selectByTupleId(ret2->begin(),ret2->end());
-  _coords=newCoords; _fam_coords=newFamCoords; _num_coords=newNumCoords;
+    newNumCoords=_num_coords->selectByTupleIdSafe(ret2->begin(),ret2->end());
+  _coords=newCoords; _fam_coords=newFamCoords; _num_coords=newNumCoords; _rev_num_coords=0;
   for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileUMeshSplitL1> >::iterator it=_ms.begin();it!=_ms.end();it++)
     {
       if((MEDFileUMeshSplitL1*)*it)
@@ -2255,14 +2315,65 @@ DataArrayInt *MEDFileUMesh::zipCoords() throw(INTERP_KERNEL::Exception)
   return ret.retn();
 }
 
-void MEDFileUMesh::addNodeGroup(const std::string& name, const std::vector<int>& ids) throw(INTERP_KERNEL::Exception)
-{
+/*!
+ * This method is here only to add a group on node.
+ * MEDFileUMesh::setGroupsAtLevel with 1 in the first parameter.
+ *
+ * \param [in] ids node ids of and group name of the new group to add. The ids should be sorted and different each other (MED file norm).
+ */
+void MEDFileUMesh::addNodeGroup(const DataArrayInt *ids) throw(INTERP_KERNEL::Exception)
+{ 
+if(!ids)
+    throw INTERP_KERNEL::Exception("MEDFileUMesh::addNodeGroup : NULL pointer in input !");
+  std::string grpName(ids->getName());
+  if(grpName.empty())
+    throw INTERP_KERNEL::Exception("MEDFileUMesh::addNodeGroup : empty group name ! MED file format do not accept empty group name !");
+  ids->checkStrictlyMonotonic(true);
+  std::vector<std::string> grpsNames=getGroupsNames();
+  if(std::find(grpsNames.begin(),grpsNames.end(),grpName)!=grpsNames.end())
+    {
+      std::ostringstream oss; oss << "MEDFileUMesh::addNodeGroup : Group with name \"" << grpName << "\" already exists ! Destroy it before calling this method !";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
+    }
   const DataArrayDouble *coords=_coords;
   if(!coords)
-    throw INTERP_KERNEL::Exception("addNodeGroup : no coords set !");
-  DataArrayInt *sub=_fam_coords->selectByTupleIdSafe(&ids[0],&ids[0]+ids.size());
-  std::set<int> ssub(sub->getConstPointer(),sub->getConstPointer()+sub->getNumberOfTuples());
-  
+    throw INTERP_KERNEL::Exception("MEDFileUMesh::addNodeGroup : no coords set !");
+  int nbOfNodes=coords->getNumberOfTuples();
+  if(!((DataArrayInt *)_fam_coords))
+    { _fam_coords=DataArrayInt::New(); _fam_coords->alloc(nbOfNodes,1); _fam_coords->fillWithZero(); }
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> famIds=_fam_coords->selectByTupleIdSafe(ids->begin(),ids->end());
+  std::set<int> diffFamIds=famIds->getDifferentValues();
+  std::size_t sz=0;
+  std::vector<int> familyIds;
+  std::vector< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> > idsPerfamiliyIds;
+  int maxVal=getTheMaxFamilyId()+1;
+  for(std::set<int>::const_iterator famId=diffFamIds.begin();famId!=diffFamIds.end();famId++)
+    {
+      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ids2Tmp=famIds->getIdsEqual(*famId);
+      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ids2=ids->selectByTupleId(ids2Tmp->begin(),ids2Tmp->end());
+      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ids1=_fam_coords->getIdsEqual(*famId);
+      DataArrayInt *ret0=0,*ret1=0;
+      ids1->splitInTwoPartsWith(ids2,ret0,ret1);
+      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret00(ret0),ret11(ret1);
+      if(ret0->empty())
+        { familyIds.push_back(*famId); idsPerfamiliyIds.push_back(ret00); sz++; }
+      else
+        {
+          familyIds.push_back(maxVal); idsPerfamiliyIds.push_back(ret00);
+          familyIds.push_back(maxVal+1); idsPerfamiliyIds.push_back(ret11);
+          maxVal+=2; sz+=2;
+        }
+    }
+  std::vector<std::string> fams;
+  for(std::size_t i=0;i<sz;i++)
+    {
+      DataArrayInt *da=idsPerfamiliyIds[i];
+      bool created(false);
+      if(!da->empty())
+        _fam_coords->setPartOfValuesSimple3(familyIds[i],da->begin(),da->end(),0,1,1);
+      fams.push_back(findOrCreateAndGiveFamilyWithId(familyIds[i],created));
+    }
+  setFamiliesOnGroup(grpName.c_str(),fams);
 }
 
 void MEDFileUMesh::setFamilyNameAttachedOnId(int id, const std::string& newFamName) throw(INTERP_KERNEL::Exception)
@@ -2505,6 +2616,16 @@ MEDFileCMesh *MEDFileCMesh::New(const char *fileName, const char *mName, int dt,
   MEDFileUtilities::CheckFileForRead(fileName);
   MEDFileUtilities::AutoFid fid=MEDfileOpen(fileName,MED_ACC_RDONLY);
   return new MEDFileCMesh(fid,mName,dt,it);
+}
+
+int MEDFileCMesh::getMaxFamilyIdInArrays() const throw(INTERP_KERNEL::Exception)
+{
+  throw INTERP_KERNEL::Exception("Tony");
+}
+
+int MEDFileCMesh::getMinFamilyIdInArrays() const throw(INTERP_KERNEL::Exception)
+{
+  throw INTERP_KERNEL::Exception("Tony");
 }
 
 int MEDFileCMesh::getMeshDimension() const throw(INTERP_KERNEL::Exception)

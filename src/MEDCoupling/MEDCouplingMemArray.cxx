@@ -3894,21 +3894,73 @@ bool DataArrayInt::isMonotonic(bool increasing) const throw(INTERP_KERNEL::Excep
     {
       for(int i=1;i<nbOfElements;i++)
         {
-          if(ptr[i]<ref)
+          if(ptr[i]>=ref)
+            ref=ptr[i];
+          else
             return false;
-          ref=ptr[i];
         }
     }
   else
     {
       for(int i=1;i<nbOfElements;i++)
         {
-          if(ptr[i]>ref)
+          if(ptr[i]<=ref)
+            ref=ptr[i];
+          else
             return false;
-          ref=ptr[i];
         }
     }
   return true;
+}
+
+/*!
+ * This method check that array consistently INCREASING or DECREASING in value.
+ */
+bool DataArrayInt::isStrictlyMonotonic(bool increasing) const throw(INTERP_KERNEL::Exception)
+{
+  checkAllocated();
+  if(getNumberOfComponents()!=1)
+    throw INTERP_KERNEL::Exception("DataArrayInt::isStrictlyMonotonic : only supported with 'this' array with ONE component !");
+  int nbOfElements=getNumberOfTuples();
+  const int *ptr=getConstPointer();
+  if(nbOfElements==0)
+    return true;
+  int ref=ptr[0];
+  if(increasing)
+    {
+      for(int i=1;i<nbOfElements;i++)
+        {
+          if(ptr[i]>ref)
+            ref=ptr[i];
+          else
+            return false;
+        }
+    }
+  else
+    {
+      for(int i=1;i<nbOfElements;i++)
+        {
+          if(ptr[i]<ref)
+            ref=ptr[i];
+          else
+            return false;
+        }
+    }
+  return true;
+}
+
+/*!
+ * This method check that array consistently INCREASING or DECREASING in value.
+ */
+void DataArrayInt::checkStrictlyMonotonic(bool increasing) const throw(INTERP_KERNEL::Exception)
+{
+  if(!isStrictlyMonotonic(increasing))
+    {
+      if (increasing)
+        throw INTERP_KERNEL::Exception("DataArrayInt::checkStrictlyMonotonic : 'this' is not strictly INCREASING monotonic !");
+      else
+        throw INTERP_KERNEL::Exception("DataArrayInt::checkStrictlyMonotonic : 'this' is not strictly DECREASING monotonic !");
+    }
 }
 
 /*!
@@ -4923,15 +4975,12 @@ DataArrayInt *DataArrayInt::getIdsEqual(int val) const throw(INTERP_KERNEL::Exce
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("DataArrayInt::getIdsEqual : the array must have only one component, you can call 'rearrange' method before !");
   const int *cptr=getConstPointer();
-  std::vector<int> res;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret(DataArrayInt::New()); ret->alloc(0,1);
   int nbOfTuples=getNumberOfTuples();
   for(int i=0;i<nbOfTuples;i++,cptr++)
     if(*cptr==val)
-      res.push_back(i);
-  DataArrayInt *ret=DataArrayInt::New();
-  ret->alloc((int)res.size(),1);
-  std::copy(res.begin(),res.end(),ret->getPointer());
-  return ret;
+      ret->pushBackSilent(i);
+  return ret.retn();
 }
 
 DataArrayInt *DataArrayInt::getIdsNotEqual(int val) const throw(INTERP_KERNEL::Exception)
@@ -4939,15 +4988,12 @@ DataArrayInt *DataArrayInt::getIdsNotEqual(int val) const throw(INTERP_KERNEL::E
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("DataArrayInt::getIdsNotEqual : the array must have only one component, you can call 'rearrange' method before !");
   const int *cptr=getConstPointer();
-  std::vector<int> res;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret(DataArrayInt::New()); ret->alloc(0,1);
   int nbOfTuples=getNumberOfTuples();
   for(int i=0;i<nbOfTuples;i++,cptr++)
     if(*cptr!=val)
-      res.push_back(i);
-  DataArrayInt *ret=DataArrayInt::New();
-  ret->alloc((int)res.size(),1);
-  std::copy(res.begin(),res.end(),ret->getPointer());
-  return ret;
+      ret->pushBackSilent(i);
+  return ret.retn();
 }
 
 /*!
@@ -5552,6 +5598,32 @@ DataArrayInt *DataArrayInt::BuildIntersection(const std::vector<const DataArrayI
   ret->alloc((int)r.size(),1);
   std::copy(r.begin(),r.end(),ret->getPointer());
   return ret;
+}
+
+/*!
+ * \a this is expected to have one component and to be sorted ascendingly (as for \a other).
+ * 
+ * \param [in] other an array with one component and expected to be sorted ascendingly.
+ * \param [out] idsInThisNotInOther list of ids in \a this but not in \a other.
+ * \param [out] idsInThisAndInOther list of ids in \a this and in \a other.
+ */
+void DataArrayInt::splitInTwoPartsWith(const DataArrayInt *other, DataArrayInt *&idsInThisNotInOther, DataArrayInt *&idsInThisAndInOther) const throw(INTERP_KERNEL::Exception)
+{
+  static const char *MSG="DataArrayInt::splitInTwoPartsWith : only single component allowed !";
+  if(!other) throw INTERP_KERNEL::Exception("DataArrayInt::splitInTwoPartsWith : NULL input array !");
+  checkAllocated(); other->checkAllocated();
+  if(getNumberOfComponents()!=1) throw INTERP_KERNEL::Exception(MSG);
+  if(other->getNumberOfComponents()!=1) throw INTERP_KERNEL::Exception(MSG);
+  const int *pt1Bg(begin()),*pt1End(end()),*pt2Bg(other->begin()),*pt2End(other->end()),*work2(pt2Bg);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret0(DataArrayInt::New()),ret1(DataArrayInt::New()); ret0->alloc(0,1); ret1->alloc(0,1);
+  for(const int *work1=pt1Bg;work1!=pt1End;work1++)
+    {
+      if(work2!=pt2End && *work1==*work2)
+        { ret1->pushBackSilent(*work1); work2++; }
+      else
+        { ret0->pushBackSilent(*work1); }
+    }
+  idsInThisNotInOther=ret0.retn(); idsInThisAndInOther=ret1.retn();
 }
 
 DataArrayInt *DataArrayInt::buildComplement(int nbOfElement) const throw(INTERP_KERNEL::Exception)
