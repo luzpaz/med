@@ -1796,6 +1796,68 @@ class MEDLoaderTest(unittest.TestCase):
         self.assertTrue(m.getMeshAtLevel(-2).getNodalConnectivity().isEqual(DataArrayInt([0,1,0,4,0,6])))
         self.assertTrue(m.getMeshAtLevel(-2).getNodalConnectivityIndex().isEqual(DataArrayInt([0,2,4,6])))
         pass
+
+    def testMEDUMeshAddNodeGroup1(self):
+        fname="Pyfile53.med"
+        m=MEDFileUMesh()
+        coo=DataArrayDouble(39) ; coo.iota(1.) ; coo.rearrange(3) ; coo.setInfoOnComponents(["aaa [b]","cc [dd]", "e [fff]"])
+        m0=MEDCouplingUMesh("toto",2) ; m0.allocateCells(0) ; m0.insertNextCell(NORM_TRI3,[1,2,3]) ; m0.insertNextCell(NORM_QUAD4,[2,4,3,4]) ; m0.insertNextCell(NORM_POLYGON,[1,6,6,6,2])
+        m1=MEDCouplingUMesh("toto",1) ; m1.allocateCells(0) ; m1.insertNextCell(NORM_SEG2,[1,6]) ; m1.insertNextCell(NORM_SEG2,[7,3])
+        m2=MEDCouplingUMesh("toto",0) ; m2.allocateCells(0) ; m2.insertNextCell(NORM_POINT1,[2]) ; m2.insertNextCell(NORM_POINT1,[6]) ; m2.insertNextCell(NORM_POINT1,[8])
+        m0.setCoords(coo) ; m.setMeshAtLevel(0,m0)
+        m1.setCoords(coo) ; m.setMeshAtLevel(-1,m1)
+        m2.setCoords(coo) ; m.setMeshAtLevel(-2,m2)
+        #
+        mm=m.deepCpy()
+        famCoo=DataArrayInt([0,2,0,3,2,0,-1,0,0,0,0,-1,3]) ; mm.setFamilyFieldArr(1,famCoo)
+        da0=DataArrayInt([0,0,0]) ; mm.setFamilyFieldArr(0,da0)
+        da1=DataArrayInt([0,3]) ; mm.setFamilyFieldArr(-1,da1)
+        da2=DataArrayInt([0,0,0]) ; mm.setFamilyFieldArr(-2,da2)
+        mm.setFamilyId("MyFam",2)
+        mm.setFamilyId("MyOtherFam",3)
+        mm.setFamilyId("MyOther-1",-1)
+        mm.setFamiliesOnGroup("grp0",["MyOtherFam"])
+        mm.setFamiliesOnGroup("grpA",["MyOther-1"])
+        #
+        daTest=DataArrayInt([1,3,4,6,9,10,12]) ; daTest.setName("grp1")
+        mm.addNodeGroup(daTest)
+        self.assertTrue(mm.getGroupArr(1,daTest.getName()).isEqual(daTest))
+        self.assertTrue(mm.getFamilyFieldAtLevel(1).isEqual(DataArrayInt([6,2,6,8,2,6,5,6,6,7,7,4,8])))
+        for lev,arr in [(0,da0),(-1,da1),(-2,da2)]:
+            self.assertTrue(mm.getFamilyFieldAtLevel(lev).isEqual(arr))
+            pass
+        self.assertEqual(mm.getFamiliesNames(),('Family_4','Family_5','Family_7','Family_8','MyFam','MyOther-1','MyOtherFam'))
+        self.assertEqual(mm.getGroupsNames(),('grp0','grp1','grpA'))
+        self.assertEqual(mm.getFamilyNameGivenId(3),'MyOtherFam')
+        self.assertEqual(mm.getFamilyNameGivenId(2),'MyFam')
+        for famName,famId in [('Family_4',4),('Family_5',5),('Family_7',7),('Family_8',8)]:
+            self.assertEqual(mm.getFamilyNameGivenId(famId),famName)
+            pass
+        self.assertEqual(mm.getFamiliesOnGroup("grp0"),('MyOtherFam','Family_8'))
+        da=DataArrayInt([3,12]) ; da.setName("grp0")
+        self.assertTrue(mm.getGroupArr(1,"grp0").isEqual(da))
+        da.setValues([1])
+        self.assertTrue(mm.getGroupArr(-1,"grp0").isEqual(da))
+        mm.write(fname,2)
+        mm=MEDFileMesh.New(fname)
+        self.assertTrue(mm.getGroupArr(1,daTest.getName()).isEqual(daTest))
+        self.assertTrue(mm.getFamilyFieldAtLevel(1).isEqual(DataArrayInt([6,2,6,8,2,6,5,6,6,7,7,4,8])))
+        for lev,arr in [(0,da0),(-1,da1),(-2,da2)]:
+            self.assertTrue(mm.getFamilyFieldAtLevel(lev).isEqual(arr))
+            pass
+        self.assertEqual(mm.getFamiliesNames(),('FAMILLE_ZERO','Family_4','Family_5','Family_7','Family_8','MyFam','MyOther-1','MyOtherFam'))
+        self.assertEqual(mm.getGroupsNames(),('grp0','grp1','grpA'))
+        self.assertEqual(mm.getFamilyNameGivenId(3),'MyOtherFam')
+        self.assertEqual(mm.getFamilyNameGivenId(2),'MyFam')
+        for famName,famId in [('Family_4',4),('Family_5',5),('Family_7',7),('Family_8',8)]:
+            self.assertEqual(mm.getFamilyNameGivenId(famId),famName)
+            pass
+        self.assertEqual(mm.getFamiliesOnGroup("grp0"),('Family_8','MyOtherFam'))
+        da=DataArrayInt([3,12]) ; da.setName("grp0")
+        self.assertTrue(mm.getGroupArr(1,"grp0").isEqual(da))
+        da.setValues([1])
+        self.assertTrue(mm.getGroupArr(-1,"grp0").isEqual(da))
+        pass
     pass
 
 unittest.main()

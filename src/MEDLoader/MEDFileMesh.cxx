@@ -745,6 +745,26 @@ void MEDFileMesh::addFamilyOnAllGroupsHaving(const char *famName, const char *ot
     }
 }
 
+void MEDFileMesh::changeAllGroupsContainingFamily(const char *familyNameToChange, const std::vector<std::string>& newFamiliesNames) throw(INTERP_KERNEL::Exception)
+{
+  ChangeAllGroupsContainingFamily(_groups,familyNameToChange,newFamiliesNames);
+}
+
+void MEDFileMesh::ChangeAllGroupsContainingFamily(std::map<std::string, std::vector<std::string> >& groups, const char *familyNameToChange, const std::vector<std::string>& newFamiliesNames) throw(INTERP_KERNEL::Exception)
+{
+  std::string fam(familyNameToChange);
+  for(std::map<std::string, std::vector<std::string> >::iterator it=groups.begin();it!=groups.end();it++)
+    {
+      std::vector<std::string>& fams((*it).second);
+      std::vector<std::string>::iterator it2=std::find(fams.begin(),fams.end(),fam);
+      if(it2!=fams.end())
+        {
+          fams.erase(it2);
+          fams.insert(fams.end(),newFamiliesNames.begin(),newFamiliesNames.end());
+        }
+    }
+}
+
 /*!
  * If it exists a family whose family id is equal to 'id' this method behaves as MEDFileMesh::getFamilyNameGivenId.
  * In this case, 'this' internal states remains unchanged and 'created' out parameter will be set to false.
@@ -755,9 +775,22 @@ void MEDFileMesh::addFamilyOnAllGroupsHaving(const char *famName, const char *ot
  */
 std::string MEDFileMesh::findOrCreateAndGiveFamilyWithId(int id, bool& created) throw(INTERP_KERNEL::Exception)
 {
-  std::vector<std::string> famAlreadyExisting(_families.size());
+  return FindOrCreateAndGiveFamilyWithId(_families,id,created);
+}
+
+/*!
+ * If it exists a family whose family id is equal to 'id' this method behaves as MEDFileMesh::getFamilyNameGivenId.
+ * In this case, 'this' internal states remains unchanged and 'created' out parameter will be set to false.
+ * If there is no family whose family id is equal to 'id' a family is created with a name different from those
+ * already existing. In this case 'created' will be returned with a value set to true, and internal state
+ * will be modified.
+ * This method will throws an exception if it is not possible to create a unique family name.
+ */
+std::string MEDFileMesh::FindOrCreateAndGiveFamilyWithId(std::map<std::string,int>& families, int id, bool& created) throw(INTERP_KERNEL::Exception)
+{
+  std::vector<std::string> famAlreadyExisting(families.size());
   int ii=0;
-  for(std::map<std::string,int>::const_iterator it=_families.begin();it!=_families.end();it++,ii++)
+  for(std::map<std::string,int>::const_iterator it=families.begin();it!=families.end();it++,ii++)
     {
       if((*it).second!=id)
         {
@@ -772,7 +805,7 @@ std::string MEDFileMesh::findOrCreateAndGiveFamilyWithId(int id, bool& created) 
   created=true;
   std::ostringstream oss; oss << "Family_" << id;
   std::string ret=CreateNameNotIn(oss.str(),famAlreadyExisting);
-  _families[ret]=id;
+  families[ret]=id;
   return ret;
 }
 
@@ -845,14 +878,18 @@ int MEDFileMesh::getMinFamilyId() const throw(INTERP_KERNEL::Exception)
 
 int MEDFileMesh::getTheMaxFamilyId() const throw(INTERP_KERNEL::Exception)
 {
-  int m1=getMaxFamilyId();
+  int m1=-std::numeric_limits<int>::max();
+  for(std::map<std::string,int>::const_iterator it=_families.begin();it!=_families.end();it++)
+    m1=std::max((*it).second,m1);
   int m2=getMaxFamilyIdInArrays();
   return std::max(m1,m2);
 }
 
 int MEDFileMesh::getTheMinFamilyId() const throw(INTERP_KERNEL::Exception)
 {
-  int m1=getMinFamilyId();
+  int m1=std::numeric_limits<int>::max();
+  for(std::map<std::string,int>::const_iterator it=_families.begin();it!=_families.end();it++)
+    m1=std::min((*it).second,m1);
   int m2=getMinFamilyIdInArrays();
   return std::min(m1,m2);
 }
@@ -1016,7 +1053,7 @@ void MEDFileMesh::normalizeFamIdsTrio() throw(INTERP_KERNEL::Exception)
 /*!
  * This method normalizes fam id with the following policy.
  * Level #0 famids < 0, Level #-1 famids < 0 and for Level #1 famids >= 0
- * This policy is those used by SMESH and Trio and that is the opposite of those in MED file.
+ * This policy is those defined in the MED file format but is the opposite of those implemented in SMESH and Trio.
  * This method will throw an exception if a same family id is detected in different level.
  */
 void MEDFileMesh::normalizeFamIdsMEDFile() throw(INTERP_KERNEL::Exception)
@@ -2323,7 +2360,7 @@ DataArrayInt *MEDFileUMesh::zipCoords() throw(INTERP_KERNEL::Exception)
  */
 void MEDFileUMesh::addNodeGroup(const DataArrayInt *ids) throw(INTERP_KERNEL::Exception)
 { 
-if(!ids)
+  if(!ids)
     throw INTERP_KERNEL::Exception("MEDFileUMesh::addNodeGroup : NULL pointer in input !");
   std::string grpName(ids->getName());
   if(grpName.empty())
@@ -2341,12 +2378,18 @@ if(!ids)
   int nbOfNodes=coords->getNumberOfTuples();
   if(!((DataArrayInt *)_fam_coords))
     { _fam_coords=DataArrayInt::New(); _fam_coords->alloc(nbOfNodes,1); _fam_coords->fillWithZero(); }
+  std::list< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> > allFamIds=getAllNonNullFamilyIds();
+  allFamIds.erase(std::find(allFamIds.begin(),allFamIds.end(),_fam_coords));
+  //
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> famIds=_fam_coords->selectByTupleIdSafe(ids->begin(),ids->end());
   std::set<int> diffFamIds=famIds->getDifferentValues();
-  std::size_t sz=0;
   std::vector<int> familyIds;
   std::vector< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> > idsPerfamiliyIds;
   int maxVal=getTheMaxFamilyId()+1;
+  std::map<std::string,int> families(_families);
+  std::map<std::string, std::vector<std::string> > groups(_groups);
+  std::vector<std::string> fams;
+  bool created(false);
   for(std::set<int>::const_iterator famId=diffFamIds.begin();famId!=diffFamIds.end();famId++)
     {
       MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ids2Tmp=famIds->getIdsEqual(*famId);
@@ -2356,24 +2399,45 @@ if(!ids)
       ids1->splitInTwoPartsWith(ids2,ret0,ret1);
       MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret00(ret0),ret11(ret1);
       if(ret0->empty())
-        { familyIds.push_back(*famId); idsPerfamiliyIds.push_back(ret00); sz++; }
+        {
+          bool isFamPresent=false;
+          for(std::list< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> >::const_iterator itl=allFamIds.begin();itl!=allFamIds.end() && !isFamPresent;itl++)
+            isFamPresent=(*itl)->presenceOfValue(*famId);
+          if(!isFamPresent)
+            { familyIds.push_back(*famId); idsPerfamiliyIds.push_back(ret00); fams.push_back(FindOrCreateAndGiveFamilyWithId(families,*famId,created)); } // adding *famId in grp
+          else
+            {
+              familyIds.push_back(maxVal); idsPerfamiliyIds.push_back(ret11); std::string locFamName=FindOrCreateAndGiveFamilyWithId(families,maxVal,created);
+              fams.push_back(locFamName);
+              if(existsFamily(*famId))
+                {
+                  std::string locFamName2=getFamilyNameGivenId(*famId); std::vector<std::string> v(2); v[0]=locFamName2; v[1]=locFamName;
+                  ChangeAllGroupsContainingFamily(groups,getFamilyNameGivenId(*famId).c_str(),v);
+                }
+              maxVal++;
+            } // modifying all other groups on *famId to lie on maxVal and lie the grp on maxVal
+        }
       else
         {
-          familyIds.push_back(maxVal); idsPerfamiliyIds.push_back(ret00);
-          familyIds.push_back(maxVal+1); idsPerfamiliyIds.push_back(ret11);
-          maxVal+=2; sz+=2;
+          familyIds.push_back(maxVal); idsPerfamiliyIds.push_back(ret00); // modifying all other groups on *famId to lie on maxVal and on maxVal+1
+          familyIds.push_back(maxVal+1); idsPerfamiliyIds.push_back(ret11);//grp lie only on maxVal+1
+          std::string n2(FindOrCreateAndGiveFamilyWithId(families,maxVal+1,created)); fams.push_back(n2);
+          if(existsFamily(*famId))
+            {
+              std::string n1(FindOrCreateAndGiveFamilyWithId(families,maxVal,created)); std::vector<std::string> v(2); v[0]=n1; v[1]=n2;
+              ChangeAllGroupsContainingFamily(groups,getFamilyNameGivenId(*famId).c_str(),v);
+            }
+          maxVal+=2;
         }
     }
-  std::vector<std::string> fams;
-  for(std::size_t i=0;i<sz;i++)
+  for(std::size_t i=0;i<familyIds.size();i++)
     {
       DataArrayInt *da=idsPerfamiliyIds[i];
-      bool created(false);
-      if(!da->empty())
-        _fam_coords->setPartOfValuesSimple3(familyIds[i],da->begin(),da->end(),0,1,1);
-      fams.push_back(findOrCreateAndGiveFamilyWithId(familyIds[i],created));
+      _fam_coords->setPartOfValuesSimple3(familyIds[i],da->begin(),da->end(),0,1,1);
     }
-  setFamiliesOnGroup(grpName.c_str(),fams);
+  _families=families;
+  _groups=groups;
+  _groups[grpName]=fams;
 }
 
 void MEDFileUMesh::setFamilyNameAttachedOnId(int id, const std::string& newFamName) throw(INTERP_KERNEL::Exception)
@@ -2577,6 +2641,25 @@ void MEDFileUMesh::changeFamilyIdArr(int oldId, int newId) throw(INTERP_KERNEL::
           sp->changeFamilyIdArr(oldId,newId);
         }
     }
+}
+
+std::list< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> > MEDFileUMesh::getAllNonNullFamilyIds() const
+{
+  std::list< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> > ret;
+  const DataArrayInt *da(_fam_coords);
+  if(da)
+    { da->incrRef(); ret.push_back(MEDCouplingAutoRefCountObjectPtr<DataArrayInt>(const_cast<DataArrayInt *>(da))); }
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileUMeshSplitL1> >::const_iterator it=_ms.begin();it!=_ms.end();it++)
+    {
+      const MEDFileUMeshSplitL1 *elt(*it);
+      if(elt)
+        {
+          da=elt->getFamilyField();
+          if(da)
+            { da->incrRef(); ret.push_back(MEDCouplingAutoRefCountObjectPtr<DataArrayInt>(const_cast<DataArrayInt *>(da))); }
+        }
+    }
+  return ret;
 }
 
 void MEDFileUMesh::computeRevNum() const
