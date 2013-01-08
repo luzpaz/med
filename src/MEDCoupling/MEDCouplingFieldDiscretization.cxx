@@ -449,6 +449,8 @@ void MEDCouplingFieldDiscretizationP0::checkCoherencyBetween(const MEDCouplingMe
 
 MEDCouplingFieldDouble *MEDCouplingFieldDiscretizationP0::getMeasureField(const MEDCouplingMesh *mesh, bool isAbs) const
 {
+  if(!mesh)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationP0::getMeasureField : mesh instance specified is NULL !");
   return mesh->getMeasureField(isAbs);
 }
 
@@ -684,6 +686,8 @@ void MEDCouplingFieldDiscretizationP1::checkCompatibilityWithNature(NatureOfFiel
 
 MEDCouplingFieldDouble *MEDCouplingFieldDiscretizationP1::getMeasureField(const MEDCouplingMesh *mesh, bool isAbs) const
 {
+  if(!mesh)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationP1::getMeasureField : mesh instance specified is NULL !");
   return mesh->getMeasureFieldOnNode(isAbs);
 }
 
@@ -1180,6 +1184,8 @@ void MEDCouplingFieldDiscretizationGauss::checkCoherencyBetween(const MEDCouplin
 
 MEDCouplingFieldDouble *MEDCouplingFieldDiscretizationGauss::getMeasureField(const MEDCouplingMesh *mesh, bool isAbs) const
 {
+  if(!mesh)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationGauss::getMeasureField : mesh instance specified is NULL !");
   throw INTERP_KERNEL::Exception("Not implemented yet !");
 }
 
@@ -1601,6 +1607,8 @@ void MEDCouplingFieldDiscretizationGaussNE::checkCoherencyBetween(const MEDCoupl
 
 MEDCouplingFieldDouble *MEDCouplingFieldDiscretizationGaussNE::getMeasureField(const MEDCouplingMesh *mesh, bool isAbs) const
 {
+  if(!mesh)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationGaussNE::getMeasureField : mesh instance specified is NULL !");
   throw INTERP_KERNEL::Exception("Not implemented yet !");
 }
 
@@ -1701,6 +1709,8 @@ bool MEDCouplingFieldDiscretizationKriging::isEqualIfNotWhy(const MEDCouplingFie
 
 MEDCouplingFieldDouble *MEDCouplingFieldDiscretizationKriging::getMeasureField(const MEDCouplingMesh *mesh, bool isAbs) const
 {
+  if(!mesh)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationKriging::getMeasureField : mesh instance specified is NULL !");
   throw INTERP_KERNEL::Exception("getMeasureField on FieldDiscretizationKriging : not implemented yet !");
 }
 
