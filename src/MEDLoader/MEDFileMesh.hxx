@@ -213,6 +213,7 @@ namespace ParaMEDMEM
     void setFamilyFieldArr(int meshDimRelToMaxExt, DataArrayInt *famArr) throw(INTERP_KERNEL::Exception);
     void setRenumFieldArr(int meshDimRelToMaxExt, DataArrayInt *renumArr) throw(INTERP_KERNEL::Exception);
     void addNodeGroup(const DataArrayInt *ids) throw(INTERP_KERNEL::Exception);
+    void addGroup(int meshDimRelToMaxExt, const DataArrayInt *ids) throw(INTERP_KERNEL::Exception);
     void removeMeshAtLevel(int meshDimRelToMax) throw(INTERP_KERNEL::Exception);
     void setMeshAtLevel(int meshDimRelToMax, MEDCouplingUMesh *m, bool newOrOld=false) throw(INTERP_KERNEL::Exception);
     void setMeshAtLevelGen(int meshDimRelToMax, MEDCouplingUMesh *m, bool newOrOld) throw(INTERP_KERNEL::Exception);
@@ -236,6 +237,7 @@ namespace ParaMEDMEM
     void synchronizeTinyInfoOnLeaves() const;
     void changeFamilyIdArr(int oldId, int newId) throw(INTERP_KERNEL::Exception);
     std::list< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> > getAllNonNullFamilyIds() const;
+    void addGroupUnderground(const DataArrayInt *ids, DataArrayInt *famArr) throw(INTERP_KERNEL::Exception);
   private:
     std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileUMeshSplitL1> > _ms;
     MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> _coords;

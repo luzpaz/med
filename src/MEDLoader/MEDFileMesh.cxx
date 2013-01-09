@@ -2356,32 +2356,57 @@ DataArrayInt *MEDFileUMesh::zipCoords() throw(INTERP_KERNEL::Exception)
  * This method is here only to add a group on node.
  * MEDFileUMesh::setGroupsAtLevel with 1 in the first parameter.
  *
- * \param [in] ids node ids of and group name of the new group to add. The ids should be sorted and different each other (MED file norm).
+ * \param [in] ids node ids and group name of the new group to add. The ids should be sorted and different each other (MED file norm).
  */
 void MEDFileUMesh::addNodeGroup(const DataArrayInt *ids) throw(INTERP_KERNEL::Exception)
-{ 
-  if(!ids)
-    throw INTERP_KERNEL::Exception("MEDFileUMesh::addNodeGroup : NULL pointer in input !");
-  std::string grpName(ids->getName());
-  if(grpName.empty())
-    throw INTERP_KERNEL::Exception("MEDFileUMesh::addNodeGroup : empty group name ! MED file format do not accept empty group name !");
-  ids->checkStrictlyMonotonic(true);
-  std::vector<std::string> grpsNames=getGroupsNames();
-  if(std::find(grpsNames.begin(),grpsNames.end(),grpName)!=grpsNames.end())
-    {
-      std::ostringstream oss; oss << "MEDFileUMesh::addNodeGroup : Group with name \"" << grpName << "\" already exists ! Destroy it before calling this method !";
-      throw INTERP_KERNEL::Exception(oss.str().c_str());
-    }
+{
   const DataArrayDouble *coords=_coords;
   if(!coords)
     throw INTERP_KERNEL::Exception("MEDFileUMesh::addNodeGroup : no coords set !");
   int nbOfNodes=coords->getNumberOfTuples();
   if(!((DataArrayInt *)_fam_coords))
     { _fam_coords=DataArrayInt::New(); _fam_coords->alloc(nbOfNodes,1); _fam_coords->fillWithZero(); }
-  std::list< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> > allFamIds=getAllNonNullFamilyIds();
-  allFamIds.erase(std::find(allFamIds.begin(),allFamIds.end(),_fam_coords));
   //
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> famIds=_fam_coords->selectByTupleIdSafe(ids->begin(),ids->end());
+  addGroupUnderground(ids,_fam_coords);
+}
+
+void MEDFileUMesh::addGroup(int meshDimRelToMaxExt, const DataArrayInt *ids) throw(INTERP_KERNEL::Exception)
+{
+  std::vector<int> levs=getNonEmptyLevelsExt();
+  if(std::find(levs.begin(),levs.end(),meshDimRelToMaxExt)==levs.end())
+    { 
+      std::ostringstream oss; oss << "MEDFileUMesh::addGroup : level " << meshDimRelToMaxExt << " not available ! Should be in ";
+      std::copy(levs.begin(),levs.end(),std::ostream_iterator<int>(oss," ")); oss << " !"; throw INTERP_KERNEL::Exception(oss.str().c_str());
+    }
+  if(meshDimRelToMaxExt==1)
+    { addNodeGroup(ids); return ; }
+  MEDFileUMeshSplitL1 *lev=getMeshAtLevSafe(meshDimRelToMaxExt);
+  DataArrayInt *fam=lev->getOrCreateAndGetFamilyField();
+  addGroupUnderground(ids,fam);
+}
+
+/*!
+ * \param [in] ids ids and group name of the new group to add. The ids should be sorted and different each other (MED file norm).
+ * \parma [in,out] famArr family array on level of interest to be renumbered. The input pointer should be not NULL (no check of that will be performed)
+ */
+void MEDFileUMesh::addGroupUnderground(const DataArrayInt *ids, DataArrayInt *famArr) throw(INTERP_KERNEL::Exception)
+{
+  if(!ids)
+    throw INTERP_KERNEL::Exception("MEDFileUMesh::addGroup : NULL pointer in input !");
+  std::string grpName(ids->getName());
+  if(grpName.empty())
+    throw INTERP_KERNEL::Exception("MEDFileUMesh::addGroup : empty group name ! MED file format do not accept empty group name !");
+  ids->checkStrictlyMonotonic(true);
+  famArr->incrRef(); MEDCouplingAutoRefCountObjectPtr<DataArrayInt> famArrTmp(famArr);
+  std::vector<std::string> grpsNames=getGroupsNames();
+  if(std::find(grpsNames.begin(),grpsNames.end(),grpName)!=grpsNames.end())
+    {
+      std::ostringstream oss; oss << "MEDFileUMesh::addGroup : Group with name \"" << grpName << "\" already exists ! Destroy it before calling this method !";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
+    }
+  std::list< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> > allFamIds=getAllNonNullFamilyIds();
+  allFamIds.erase(std::find(allFamIds.begin(),allFamIds.end(),famArrTmp));
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> famIds=famArr->selectByTupleIdSafe(ids->begin(),ids->end());
   std::set<int> diffFamIds=famIds->getDifferentValues();
   std::vector<int> familyIds;
   std::vector< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> > idsPerfamiliyIds;
@@ -2394,7 +2419,7 @@ void MEDFileUMesh::addNodeGroup(const DataArrayInt *ids) throw(INTERP_KERNEL::Ex
     {
       MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ids2Tmp=famIds->getIdsEqual(*famId);
       MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ids2=ids->selectByTupleId(ids2Tmp->begin(),ids2Tmp->end());
-      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ids1=_fam_coords->getIdsEqual(*famId);
+      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ids1=famArr->getIdsEqual(*famId);
       DataArrayInt *ret0=0,*ret1=0;
       ids1->splitInTwoPartsWith(ids2,ret0,ret1);
       MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret00(ret0),ret11(ret1);
@@ -2433,7 +2458,7 @@ void MEDFileUMesh::addNodeGroup(const DataArrayInt *ids) throw(INTERP_KERNEL::Ex
   for(std::size_t i=0;i<familyIds.size();i++)
     {
       DataArrayInt *da=idsPerfamiliyIds[i];
-      _fam_coords->setPartOfValuesSimple3(familyIds[i],da->begin(),da->end(),0,1,1);
+      famArr->setPartOfValuesSimple3(familyIds[i],da->begin(),da->end(),0,1,1);
     }
   _families=families;
   _groups=groups;

@@ -133,6 +133,7 @@ namespace ParaMEDMEM
     MEDCouplingUMesh *getFamilyPart(const int *idsBg, const int *idsEnd, bool renum) const;
     DataArrayInt *getFamilyPartArr(const int *idsBg, const int *idsEnd, bool renum) const;
     MEDCouplingUMesh *getWholeMesh(bool renum) const;
+    DataArrayInt *getOrCreateAndGetFamilyField() throw(INTERP_KERNEL::Exception);
     const DataArrayInt *getFamilyField() const;
     const DataArrayInt *getNumberField() const;
     const DataArrayInt *getRevNumberField() const;

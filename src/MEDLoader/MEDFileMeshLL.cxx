@@ -635,6 +635,18 @@ MEDCouplingUMesh *MEDFileUMeshSplitL1::getWholeMesh(bool renum) const
   return tmp.retn();
 }
 
+DataArrayInt *MEDFileUMeshSplitL1::getOrCreateAndGetFamilyField() throw(INTERP_KERNEL::Exception)
+{
+  if((DataArrayInt *)_fam)
+    return _fam;
+  MEDCouplingUMesh *m(_m_by_types);
+  if(!m)
+    throw INTERP_KERNEL::Exception("MEDFileUMeshSplitL1::getOrCreateAndGetFamilyField : impossible to create a family field array because no mesh specified on this level !");
+  int nbOfTuples=m->getNumberOfCells();
+  _fam=DataArrayInt::New(); _fam->alloc(nbOfTuples,1); _fam->fillWithZero();
+  return _fam;
+}
+
 const DataArrayInt *MEDFileUMeshSplitL1::getFamilyField() const
 {
   return _fam;
