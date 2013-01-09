@@ -26,9 +26,9 @@
 #include "InterpKernelHashMap.hxx"
 #include "VectorUtils.hxx"
 
-#include <assert.h>
-#include <vector>
 #include <functional>
+#include <vector>
+#include <cassert>
 #include <map>
 #include <set>
 
