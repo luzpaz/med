@@ -10633,6 +10633,104 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertEqual(0,d.getNbOfElemAllocated())
         pass
 
+    def testDAIBuildSubstractionOptimized1(self):
+        da1=DataArrayInt.New([1,3,5,6,7,9,13])
+        da2=DataArrayInt.New([3,5,9])
+        da3=DataArrayInt.New([1,3,5])
+        da4=DataArrayInt.New([1,3,5,6,7,9,13])
+        #
+        a=da1.buildSubstractionOptimized(da2);
+        self.assertTrue(a.isEqual(DataArrayInt([1,6,7,13])));
+        #
+        a=da1.buildSubstractionOptimized(da3);
+        self.assertTrue(a.isEqual(DataArrayInt([6,7,9,13])));
+        #
+        a=da1.buildSubstractionOptimized(da4);
+        self.assertTrue(a.isEqual(DataArrayInt([])));
+        pass
+
+    def testDAIIsStrictlyMonotonic1(self):
+        da1=DataArrayInt.New([1,3,5,6,7,9,13])
+        self.assertTrue(da1.isStrictlyMonotonic(True));
+        da1.checkStrictlyMonotonic(True);
+        self.assertTrue(da1.isMonotonic(True));
+        da1.checkMonotonic(True);
+        self.assertTrue(not da1.isStrictlyMonotonic(False));
+        self.assertRaises(InterpKernelException,da1.checkStrictlyMonotonic,False)
+        self.assertTrue(not da1.isMonotonic(False));
+        self.assertRaises(InterpKernelException,da1.checkMonotonic,False)
+        #
+        da1=DataArrayInt.New([1,3,5,6,6,9,13])
+        self.assertTrue(not da1.isStrictlyMonotonic(True));
+        self.assertRaises(InterpKernelException,da1.checkStrictlyMonotonic,True)
+        self.assertTrue(da1.isMonotonic(True));
+        da1.checkMonotonic(True);
+        self.assertTrue(not da1.isStrictlyMonotonic(False));
+        self.assertRaises(InterpKernelException,da1.checkStrictlyMonotonic,False)
+        self.assertTrue(not da1.isMonotonic(False));
+        self.assertRaises(InterpKernelException,da1.checkMonotonic,False)
+        #
+        da1=DataArrayInt.New([1,3,5,6,5,9,13])
+        self.assertTrue(not da1.isStrictlyMonotonic(True));
+        self.assertRaises(InterpKernelException,da1.checkStrictlyMonotonic,True)
+        self.assertTrue(not da1.isMonotonic(True));
+        self.assertRaises(InterpKernelException,da1.checkMonotonic,True)
+        self.assertTrue(not da1.isStrictlyMonotonic(False));
+        self.assertRaises(InterpKernelException,da1.checkStrictlyMonotonic,False)
+        self.assertTrue(not da1.isMonotonic(False));
+        self.assertRaises(InterpKernelException,da1.checkMonotonic,False)
+        #
+        da1=DataArrayInt.New([13,9,7,6,5,3,1])
+        self.assertTrue(not da1.isStrictlyMonotonic(True));
+        self.assertRaises(InterpKernelException,da1.checkStrictlyMonotonic,True)
+        self.assertTrue(not da1.isMonotonic(True));
+        self.assertRaises(InterpKernelException,da1.checkMonotonic,True)
+        self.assertTrue(da1.isStrictlyMonotonic(False));
+        da1.checkStrictlyMonotonic(False);
+        self.assertTrue(da1.isMonotonic(False));
+        da1.checkMonotonic(False);
+        #
+        da1=DataArrayInt.New([13,9,6,6,5,3,1])
+        self.assertTrue(not da1.isStrictlyMonotonic(True));
+        self.assertRaises(InterpKernelException,da1.checkStrictlyMonotonic,True)
+        self.assertTrue(not da1.isMonotonic(True));
+        self.assertRaises(InterpKernelException,da1.checkMonotonic,True)
+        self.assertTrue(not da1.isStrictlyMonotonic(False));
+        self.assertRaises(InterpKernelException,da1.checkStrictlyMonotonic,False)
+        self.assertTrue(da1.isMonotonic(False));
+        da1.checkMonotonic(False);
+        #
+        da1=DataArrayInt.New([13,9,5,6,5,3,1])
+        self.assertTrue(not da1.isStrictlyMonotonic(True));
+        self.assertRaises(InterpKernelException,da1.checkStrictlyMonotonic,True)
+        self.assertTrue(not da1.isMonotonic(True));
+        self.assertRaises(InterpKernelException,da1.checkMonotonic,True)
+        self.assertTrue(not da1.isStrictlyMonotonic(False));
+        self.assertRaises(InterpKernelException,da1.checkStrictlyMonotonic,False)
+        self.assertTrue(not da1.isMonotonic(False));
+        self.assertRaises(InterpKernelException,da1.checkMonotonic,False)
+        #
+        da1=DataArrayInt.New([])
+        self.assertTrue(da1.isStrictlyMonotonic(True));
+        da1.checkStrictlyMonotonic(True);
+        self.assertTrue(da1.isMonotonic(True));
+        da1.checkMonotonic(True);
+        self.assertTrue(da1.isStrictlyMonotonic(False));
+        da1.checkStrictlyMonotonic(False);
+        self.assertTrue(da1.isMonotonic(False));
+        da1.checkMonotonic(False);
+        #
+        da1=DataArrayInt.New([13])
+        self.assertTrue(da1.isStrictlyMonotonic(True));
+        da1.checkStrictlyMonotonic(True);
+        self.assertTrue(da1.isMonotonic(True));
+        da1.checkMonotonic(True);
+        self.assertTrue(da1.isStrictlyMonotonic(False));
+        da1.checkStrictlyMonotonic(False);
+        self.assertTrue(da1.isMonotonic(False));
+        da1.checkMonotonic(False);
+        pass
+
     def setUp(self):
         pass
     pass

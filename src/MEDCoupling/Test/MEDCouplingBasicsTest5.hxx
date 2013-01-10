@@ -71,6 +71,8 @@ namespace ParaMEDMEM
     CPPUNIT_TEST( testDAIPartitionByDifferentValues1 );
     CPPUNIT_TEST( testDAICheckMonotonic1 );
     CPPUNIT_TEST( testIntersect2DMeshesTmp6 );
+    CPPUNIT_TEST( testDAIBuildSubstractionOptimized1 );
+    CPPUNIT_TEST( testDAIIsStrictlyMonotonic1 );
     CPPUNIT_TEST_SUITE_END();
   public:
     void testUMeshTessellate2D1();
@@ -108,6 +110,8 @@ namespace ParaMEDMEM
     void testDAIPartitionByDifferentValues1();
     void testDAICheckMonotonic1();
     void testIntersect2DMeshesTmp6();
+    void testDAIBuildSubstractionOptimized1();
+    void testDAIIsStrictlyMonotonic1();
   };
 }
 

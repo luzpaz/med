@@ -1773,3 +1773,136 @@ void MEDCouplingBasicsTest5::testIntersect2DMeshesTmp6()
   d1->decrRef();
   d2->decrRef();
 }
+
+void MEDCouplingBasicsTest5::testDAIBuildSubstractionOptimized1()
+{
+  const int tab1[7]={1,3,5,6,7,9,13};
+  const int tab2[3]={3,5,9};
+  const int tab3[3]={1,3,5};
+  DataArrayInt *da1=DataArrayInt::New(); da1->useArray(tab1,false,CPP_DEALLOC,7,1);
+  DataArrayInt *da2=DataArrayInt::New(); da2->useArray(tab2,false,CPP_DEALLOC,3,1);
+  DataArrayInt *da3=DataArrayInt::New(); da3->useArray(tab3,false,CPP_DEALLOC,3,1);
+  DataArrayInt *da4=DataArrayInt::New(); da4->useArray(tab1,false,CPP_DEALLOC,7,1);
+  //
+  DataArrayInt *a=0;
+  a=da1->buildSubstractionOptimized(da2);
+  CPPUNIT_ASSERT_EQUAL(4,a->getNumberOfTuples());
+  CPPUNIT_ASSERT_EQUAL(1,a->getNumberOfComponents());
+  const int expected1_0[4]={1,6,7,13};
+  CPPUNIT_ASSERT(std::equal(expected1_0,expected1_0+4,a->begin()));
+  a->decrRef();
+  //
+  a=da1->buildSubstractionOptimized(da3);
+  CPPUNIT_ASSERT_EQUAL(4,a->getNumberOfTuples());
+  CPPUNIT_ASSERT_EQUAL(1,a->getNumberOfComponents());
+  const int expected2_0[4]={6,7,9,13};
+  CPPUNIT_ASSERT(std::equal(expected2_0,expected2_0+4,a->begin()));
+  a->decrRef();
+  //
+  a=da1->buildSubstractionOptimized(da4);
+  CPPUNIT_ASSERT_EQUAL(0,a->getNumberOfTuples());
+  CPPUNIT_ASSERT_EQUAL(1,a->getNumberOfComponents());
+  a->decrRef();
+  //
+  da1->decrRef();
+  da2->decrRef();
+  da3->decrRef();
+  da4->decrRef();
+}
+
+void MEDCouplingBasicsTest5::testDAIIsStrictlyMonotonic1()
+{
+  const int tab1[7]={1,3,5,6,7,9,13};
+  DataArrayInt *da1=DataArrayInt::New(); da1->useArray(tab1,false,CPP_DEALLOC,7,1);
+  CPPUNIT_ASSERT(da1->isStrictlyMonotonic(true));
+  da1->checkStrictlyMonotonic(true);
+  CPPUNIT_ASSERT(da1->isMonotonic(true));
+  da1->checkMonotonic(true);
+  CPPUNIT_ASSERT(!da1->isStrictlyMonotonic(false));
+  CPPUNIT_ASSERT_THROW(da1->checkStrictlyMonotonic(false),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT(!da1->isMonotonic(false));
+  CPPUNIT_ASSERT_THROW(da1->checkMonotonic(false),INTERP_KERNEL::Exception);
+  da1->decrRef();
+  //
+  int tab2[7]={1,3,5,6,6,9,13};
+  da1=DataArrayInt::New(); da1->useArray(tab2,false,CPP_DEALLOC,7,1);
+  CPPUNIT_ASSERT(!da1->isStrictlyMonotonic(true));
+  CPPUNIT_ASSERT_THROW(da1->checkStrictlyMonotonic(true),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT(da1->isMonotonic(true));
+  da1->checkMonotonic(true);
+  CPPUNIT_ASSERT(!da1->isStrictlyMonotonic(false));
+  CPPUNIT_ASSERT_THROW(da1->checkStrictlyMonotonic(false),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT(!da1->isMonotonic(false));
+  CPPUNIT_ASSERT_THROW(da1->checkMonotonic(false),INTERP_KERNEL::Exception);
+  da1->decrRef();
+  //
+  const int tab3[7]={1,3,5,6,5,9,13};
+  da1=DataArrayInt::New(); da1->useArray(tab3,false,CPP_DEALLOC,7,1);
+  CPPUNIT_ASSERT(!da1->isStrictlyMonotonic(true));
+  CPPUNIT_ASSERT_THROW(da1->checkStrictlyMonotonic(true),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT(!da1->isMonotonic(true));
+  CPPUNIT_ASSERT_THROW(da1->checkMonotonic(true),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT(!da1->isStrictlyMonotonic(false));
+  CPPUNIT_ASSERT_THROW(da1->checkStrictlyMonotonic(false),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT(!da1->isMonotonic(false));
+  CPPUNIT_ASSERT_THROW(da1->checkMonotonic(false),INTERP_KERNEL::Exception);
+  da1->decrRef();
+  //
+  const int tab4[7]={13,9,7,6,5,3,1};
+  da1=DataArrayInt::New(); da1->useArray(tab4,false,CPP_DEALLOC,7,1);
+  CPPUNIT_ASSERT(!da1->isStrictlyMonotonic(true));
+  CPPUNIT_ASSERT_THROW(da1->checkStrictlyMonotonic(true),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT(!da1->isMonotonic(true));
+  CPPUNIT_ASSERT_THROW(da1->checkMonotonic(true),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT(da1->isStrictlyMonotonic(false));
+  da1->checkStrictlyMonotonic(false);
+  CPPUNIT_ASSERT(da1->isMonotonic(false));
+  da1->checkMonotonic(false);
+  da1->decrRef();
+  //
+  const int tab5[7]={13,9,6,6,5,3,1};
+  da1=DataArrayInt::New(); da1->useArray(tab5,false,CPP_DEALLOC,7,1);
+  CPPUNIT_ASSERT(!da1->isStrictlyMonotonic(true));
+  CPPUNIT_ASSERT_THROW(da1->checkStrictlyMonotonic(true),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT(!da1->isMonotonic(true));
+  CPPUNIT_ASSERT_THROW(da1->checkMonotonic(true),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT(!da1->isStrictlyMonotonic(false));
+  CPPUNIT_ASSERT_THROW(da1->checkStrictlyMonotonic(false),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT(da1->isMonotonic(false));
+  da1->checkMonotonic(false);
+  da1->decrRef();
+  //
+  const int tab6[7]={13,9,5,6,5,3,1};
+  da1=DataArrayInt::New(); da1->useArray(tab6,false,CPP_DEALLOC,7,1);
+  CPPUNIT_ASSERT(!da1->isStrictlyMonotonic(true));
+  CPPUNIT_ASSERT_THROW(da1->checkStrictlyMonotonic(true),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT(!da1->isMonotonic(true));
+  CPPUNIT_ASSERT_THROW(da1->checkMonotonic(true),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT(!da1->isStrictlyMonotonic(false));
+  CPPUNIT_ASSERT_THROW(da1->checkStrictlyMonotonic(false),INTERP_KERNEL::Exception);
+  CPPUNIT_ASSERT(!da1->isMonotonic(false));
+  CPPUNIT_ASSERT_THROW(da1->checkMonotonic(false),INTERP_KERNEL::Exception);
+  da1->decrRef();
+  //
+  da1=DataArrayInt::New(); da1->useArray(tab1,false,CPP_DEALLOC,0,1);
+  CPPUNIT_ASSERT(da1->isStrictlyMonotonic(true));
+  da1->checkStrictlyMonotonic(true);
+  CPPUNIT_ASSERT(da1->isMonotonic(true));
+  da1->checkMonotonic(true);
+  CPPUNIT_ASSERT(da1->isStrictlyMonotonic(false));
+  da1->checkStrictlyMonotonic(false);
+  CPPUNIT_ASSERT(da1->isMonotonic(false));
+  da1->checkMonotonic(false);
+  da1->decrRef();
+  //
+  da1=DataArrayInt::New(); da1->useArray(tab1,false,CPP_DEALLOC,1,1);
+  CPPUNIT_ASSERT(da1->isStrictlyMonotonic(true));
+  da1->checkStrictlyMonotonic(true);
+  CPPUNIT_ASSERT(da1->isMonotonic(true));
+  da1->checkMonotonic(true);
+  CPPUNIT_ASSERT(da1->isStrictlyMonotonic(false));
+  da1->checkStrictlyMonotonic(false);
+  CPPUNIT_ASSERT(da1->isMonotonic(false));
+  da1->checkMonotonic(false);
+  da1->decrRef();
+}
