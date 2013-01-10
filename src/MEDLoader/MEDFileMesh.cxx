@@ -2420,19 +2420,17 @@ void MEDFileUMesh::addGroupUnderground(const DataArrayInt *ids, DataArrayInt *fa
       MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ids2Tmp=famIds->getIdsEqual(*famId);
       MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ids2=ids->selectByTupleId(ids2Tmp->begin(),ids2Tmp->end());
       MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ids1=famArr->getIdsEqual(*famId);
-      DataArrayInt *ret0=0,*ret1=0;
-      ids1->splitInTwoPartsWith(ids2,ret0,ret1);
-      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret00(ret0),ret11(ret1);
+      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret0(ids1->buildSubstractionOptimized(ids2));
       if(ret0->empty())
         {
           bool isFamPresent=false;
           for(std::list< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> >::const_iterator itl=allFamIds.begin();itl!=allFamIds.end() && !isFamPresent;itl++)
             isFamPresent=(*itl)->presenceOfValue(*famId);
           if(!isFamPresent)
-            { familyIds.push_back(*famId); idsPerfamiliyIds.push_back(ret00); fams.push_back(FindOrCreateAndGiveFamilyWithId(families,*famId,created)); } // adding *famId in grp
+            { familyIds.push_back(*famId); idsPerfamiliyIds.push_back(ret0); fams.push_back(FindOrCreateAndGiveFamilyWithId(families,*famId,created)); } // adding *famId in grp
           else
             {
-              familyIds.push_back(maxVal); idsPerfamiliyIds.push_back(ret11); std::string locFamName=FindOrCreateAndGiveFamilyWithId(families,maxVal,created);
+              familyIds.push_back(maxVal); idsPerfamiliyIds.push_back(ids2); std::string locFamName=FindOrCreateAndGiveFamilyWithId(families,maxVal,created);
               fams.push_back(locFamName);
               if(existsFamily(*famId))
                 {
@@ -2444,8 +2442,8 @@ void MEDFileUMesh::addGroupUnderground(const DataArrayInt *ids, DataArrayInt *fa
         }
       else
         {
-          familyIds.push_back(maxVal); idsPerfamiliyIds.push_back(ret00); // modifying all other groups on *famId to lie on maxVal and on maxVal+1
-          familyIds.push_back(maxVal+1); idsPerfamiliyIds.push_back(ret11);//grp lie only on maxVal+1
+          familyIds.push_back(maxVal); idsPerfamiliyIds.push_back(ret0); // modifying all other groups on *famId to lie on maxVal and on maxVal+1
+          familyIds.push_back(maxVal+1); idsPerfamiliyIds.push_back(ids2);//grp lie only on maxVal+1
           std::string n2(FindOrCreateAndGiveFamilyWithId(families,maxVal+1,created)); fams.push_back(n2);
           if(existsFamily(*famId))
             {
@@ -2728,12 +2726,34 @@ MEDFileCMesh *MEDFileCMesh::New(const char *fileName, const char *mName, int dt,
 
 int MEDFileCMesh::getMaxFamilyIdInArrays() const throw(INTERP_KERNEL::Exception)
 {
-  throw INTERP_KERNEL::Exception("Tony");
+  int ret=-std::numeric_limits<int>::max(),tmp=-1;
+  if((const DataArrayInt *)_fam_nodes)
+    {
+      int val=_fam_nodes->getMaxValue(tmp);
+      ret=std::max(ret,val);
+    }
+  if((const DataArrayInt *)_fam_cells)
+    {
+      int val=_fam_cells->getMaxValue(tmp);
+      ret=std::max(ret,val);
+    }
+  return ret;
 }
 
 int MEDFileCMesh::getMinFamilyIdInArrays() const throw(INTERP_KERNEL::Exception)
 {
-  throw INTERP_KERNEL::Exception("Tony");
+  int ret=std::numeric_limits<int>::max(),tmp=-1;
+  if((const DataArrayInt *)_fam_nodes)
+    {
+      int val=_fam_nodes->getMinValue(tmp);
+      ret=std::min(ret,val);
+    }
+  if((const DataArrayInt *)_fam_cells)
+    {
+      int val=_fam_cells->getMinValue(tmp);
+      ret=std::min(ret,val);
+    }
+  return ret;
 }
 
 int MEDFileCMesh::getMeshDimension() const throw(INTERP_KERNEL::Exception)

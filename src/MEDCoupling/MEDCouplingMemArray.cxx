@@ -5600,32 +5600,6 @@ DataArrayInt *DataArrayInt::BuildIntersection(const std::vector<const DataArrayI
   return ret;
 }
 
-/*!
- * \a this is expected to have one component and to be sorted ascendingly (as for \a other).
- * 
- * \param [in] other an array with one component and expected to be sorted ascendingly.
- * \param [out] idsInThisNotInOther list of ids in \a this but not in \a other.
- * \param [out] idsInThisAndInOther list of ids in \a this and in \a other.
- */
-void DataArrayInt::splitInTwoPartsWith(const DataArrayInt *other, DataArrayInt *&idsInThisNotInOther, DataArrayInt *&idsInThisAndInOther) const throw(INTERP_KERNEL::Exception)
-{
-  static const char *MSG="DataArrayInt::splitInTwoPartsWith : only single component allowed !";
-  if(!other) throw INTERP_KERNEL::Exception("DataArrayInt::splitInTwoPartsWith : NULL input array !");
-  checkAllocated(); other->checkAllocated();
-  if(getNumberOfComponents()!=1) throw INTERP_KERNEL::Exception(MSG);
-  if(other->getNumberOfComponents()!=1) throw INTERP_KERNEL::Exception(MSG);
-  const int *pt1Bg(begin()),*pt1End(end()),*pt2Bg(other->begin()),*pt2End(other->end()),*work2(pt2Bg);
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret0(DataArrayInt::New()),ret1(DataArrayInt::New()); ret0->alloc(0,1); ret1->alloc(0,1);
-  for(const int *work1=pt1Bg;work1!=pt1End;work1++)
-    {
-      if(work2!=pt2End && *work1==*work2)
-        { ret1->pushBackSilent(*work1); work2++; }
-      else
-        { ret0->pushBackSilent(*work1); }
-    }
-  idsInThisNotInOther=ret0.retn(); idsInThisAndInOther=ret1.retn();
-}
-
 DataArrayInt *DataArrayInt::buildComplement(int nbOfElement) const throw(INTERP_KERNEL::Exception)
 {
    checkAllocated();
@@ -5650,6 +5624,9 @@ DataArrayInt *DataArrayInt::buildComplement(int nbOfElement) const throw(INTERP_
    return ret;
 }
 
+/*!
+ * \sa DataArrayInt::buildSubstractionOptimized
+ */
 DataArrayInt *DataArrayInt::buildSubstraction(const DataArrayInt *other) const throw(INTERP_KERNEL::Exception)
 {
   if(!other)
@@ -5672,6 +5649,33 @@ DataArrayInt *DataArrayInt::buildSubstraction(const DataArrayInt *other) const t
   ret->alloc((int)r.size(),1);
   std::copy(r.begin(),r.end(),ret->getPointer());
   return ret;
+}
+
+/*!
+ * \a this is expected to have one component and to be sorted ascendingly (as for \a other).
+ * \a other is expected to be a part of \a this. If not DataArrayInt::buildSubstraction should be called instead.
+ * 
+ * \param [in] other an array with one component and expected to be sorted ascendingly.
+ * \ret list of ids in \a this but not in \a other.
+ * \sa DataArrayInt::buildSubstraction
+ */
+DataArrayInt *DataArrayInt::buildSubstractionOptimized(const DataArrayInt *other) const throw(INTERP_KERNEL::Exception)
+{
+  static const char *MSG="DataArrayInt::buildSubstractionOptimized : only single component allowed !";
+  if(!other) throw INTERP_KERNEL::Exception("DataArrayInt::buildSubstractionOptimized : NULL input array !");
+  checkAllocated(); other->checkAllocated();
+  if(getNumberOfComponents()!=1) throw INTERP_KERNEL::Exception(MSG);
+  if(other->getNumberOfComponents()!=1) throw INTERP_KERNEL::Exception(MSG);
+  const int *pt1Bg(begin()),*pt1End(end()),*pt2Bg(other->begin()),*pt2End(other->end()),*work1(pt1Bg),*work2(pt2Bg);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret(DataArrayInt::New()); ret->alloc(0,1);
+  for(;work1!=pt1End;work1++)
+    {
+      if(work2!=pt2End && *work1==*work2)
+        work2++;
+      else
+        ret->pushBackSilent(*work1);
+    }
+  return ret.retn();
 }
 
 DataArrayInt *DataArrayInt::buildUnion(const DataArrayInt *other) const throw(INTERP_KERNEL::Exception)

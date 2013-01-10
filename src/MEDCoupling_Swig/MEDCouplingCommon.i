@@ -164,6 +164,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayInt::buildComplement;
 %newobject ParaMEDMEM::DataArrayInt::buildUnion;
 %newobject ParaMEDMEM::DataArrayInt::buildSubstraction;
+%newobject ParaMEDMEM::DataArrayInt::buildSubstractionOptimized;
 %newobject ParaMEDMEM::DataArrayInt::buildIntersection;
 %newobject ParaMEDMEM::DataArrayInt::buildUnique;
 %newobject ParaMEDMEM::DataArrayInt::deltaShiftIndex;
@@ -848,10 +849,10 @@ namespace ParaMEDMEM
 %extend ParaMEDMEM::DataArrayInt
 {
   PyObject *getDifferentValues() const throw(INTERP_KERNEL::Exception)
-   {
-     std::set<int> ret=self->getDifferentValues();
-     return convertIntArrToPyList3(ret);
-   }
+  {
+    std::set<int> ret=self->getDifferentValues();
+    return convertIntArrToPyList3(ret);
+  }
 
   PyObject *partitionByDifferentValues() const throw(INTERP_KERNEL::Exception)
   {
