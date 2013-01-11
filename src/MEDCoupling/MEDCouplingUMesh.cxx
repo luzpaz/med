@@ -235,6 +235,13 @@ void MEDCouplingUMesh::insertNextCell(INTERP_KERNEL::NormalizedCellType type, in
     throw INTERP_KERNEL::Exception("MEDCouplingUMesh::insertNextCell : nodal connectivity not set ! invoke allocateCells before calling insertNextCell !");
   if((int)cm.getDimension()==_mesh_dim)
     {
+      if(!cm.isDynamic())
+        if(size!=(int)cm.getNumberOfNodes())
+          {
+            std::ostringstream oss; oss << "MEDCouplingUMesh::insertNextCell : Trying to push a " << cm.getRepr() << " cell with a size of " << size;
+            oss << " ! Expecting " << cm.getNumberOfNodes() << " !";
+            throw INTERP_KERNEL::Exception(oss.str().c_str());
+          }
       int idx=_nodal_connec_index->back();
       int val=idx+size+1;
       _nodal_connec_index->pushBackSilent(val);
@@ -3841,54 +3848,6 @@ DataArrayInt *MEDCouplingUMesh::convexEnvelop2D() throw(INTERP_KERNEL::Exception
 }
 
 /*!
- * This method is expected to be applied on a mesh with spaceDim==3 and meshDim==3. If not an exception will be thrown.
- * This method analyzes only linear extruded 3D cells (NORM_HEXA8,NORM_PENTA6,NORM_HEXGP12...)
- * If some extruded cells does not fulfill the MED norm for extruded cells (first face of 3D cell should be oriented to the exterior of the 3D cell).
- * Some viewers are very careful of that (SMESH), but ParaVis ignore that.
- */
-DataArrayInt *MEDCouplingUMesh::findAndCorrectBadOriented3DExtrudedCells() throw(INTERP_KERNEL::Exception)
-{
-  const char msg[]="check3DCellsWellOriented detection works only for 3D cells !";
-  if(getMeshDimension()!=3)
-    throw INTERP_KERNEL::Exception(msg);
-  int spaceDim=getSpaceDimension();
-  if(spaceDim!=3)
-    throw INTERP_KERNEL::Exception(msg);
-  //
-  int nbOfCells=getNumberOfCells();
-  int *conn=_nodal_connec->getPointer();
-  const int *connI=_nodal_connec_index->getConstPointer();
-  const double *coo=getCoords()->getConstPointer();
-  double vec0[3],vec1[3];
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> cells(DataArrayInt::New());
-  for(int i=0;i<nbOfCells;i++)
-    {
-      const INTERP_KERNEL::CellModel& cm=INTERP_KERNEL::CellModel::GetCellModel((INTERP_KERNEL::NormalizedCellType)conn[connI[i]]);
-      if(cm.isExtruded() && !cm.isDynamic() && !cm.isQuadratic())
-        {
-          INTERP_KERNEL::AutoPtr<int> tmp=new int[connI[i+1]-connI[i]-1];
-          int nbOfNodes=cm.fillSonCellNodalConnectivity(0,conn+connI[i]+1,tmp);
-          INTERP_KERNEL::areaVectorOfPolygon<int,INTERP_KERNEL::ALL_C_MODE>(tmp,nbOfNodes,coo,vec0);
-          const double *pt0=coo+3*conn[connI[i]+1];
-          const double *pt1=coo+3*conn[connI[i]+nbOfNodes+1];
-          vec1[0]=pt0[0]-pt1[0]; vec1[1]=pt0[1]-pt1[1]; vec1[2]=pt0[2]-pt1[2];
-          double dot=vec0[0]*vec1[0]+vec0[1]*vec1[1]+vec0[2]*vec1[2];
-          if(dot<0)
-            {
-              cells->pushBackSilent(i);
-              std::copy(conn+connI[i]+1,conn+connI[i+1],(int *)tmp);
-              for(int j=1;j<nbOfNodes;j++)
-                {
-                  conn[connI[i]+1+j]=tmp[nbOfNodes-j];
-                  conn[connI[i]+1+j+nbOfNodes]=tmp[nbOfNodes+nbOfNodes-j];
-                }
-            }
-        }
-    }
-  return cells.retn();
-}
-
-/*!
  * This method is \b NOT const because it can modify 'this'.
  * 'this' is expected to be an unstructured mesh with meshDim==2 and spaceDim==3. If not an exception will be thrown.
  * @param mesh1D is an unstructured mesh with MeshDim==1 and spaceDim==3. If not an exception will be thrown.
@@ -4792,7 +4751,9 @@ void MEDCouplingUMesh::arePolyhedronsNotCorrectlyOriented(std::vector<int>& cell
 
 /*!
  * This method tries to orient correctly polhedrons cells.
- * @throw when 'this' is not a mesh with meshdim==3 and spacedim==3. An exception is also thrown when the attempt of reparation fails.
+ * 
+ * \throw when 'this' is not a mesh with meshdim==3 and spacedim==3. An exception is also thrown when the attempt of reparation fails.
+ * \sa MEDCouplingUMesh::findAndCorrectBadOriented3DCells
  */
 void MEDCouplingUMesh::orientCorrectlyPolyhedrons() throw(INTERP_KERNEL::Exception)
 {
@@ -4802,20 +4763,120 @@ void MEDCouplingUMesh::orientCorrectlyPolyhedrons() throw(INTERP_KERNEL::Excepti
   int *conn=_nodal_connec->getPointer();
   const int *connI=_nodal_connec_index->getConstPointer();
   const double *coordsPtr=_coords->getConstPointer();
-  bool isModified=false;
   for(int i=0;i<nbOfCells;i++)
     {
       INTERP_KERNEL::NormalizedCellType type=(INTERP_KERNEL::NormalizedCellType)conn[connI[i]];
       if(type==INTERP_KERNEL::NORM_POLYHED)
         if(!IsPolyhedronWellOriented(conn+connI[i]+1,conn+connI[i+1],coordsPtr))
-          {
-            TryToCorrectPolyhedronOrientation(conn+connI[i]+1,conn+connI[i+1],coordsPtr);
-            isModified=true;
-          }
+          TryToCorrectPolyhedronOrientation(conn+connI[i]+1,conn+connI[i+1],coordsPtr);
     }
-  if(isModified)
-    _nodal_connec->declareAsNew();
   updateTime();
+}
+
+/*!
+ * This method is expected to be applied on a mesh with spaceDim==3 and meshDim==3. If not an exception will be thrown.
+ * This method analyzes only linear extruded 3D cells (NORM_HEXA8,NORM_PENTA6,NORM_HEXGP12...)
+ * If some extruded cells does not fulfill the MED norm for extruded cells (first face of 3D cell should be oriented to the exterior of the 3D cell).
+ * Some viewers are very careful of that (SMESH), but ParaVis ignore that.
+ *
+ * \ret a newly allocated int array with one components containing cell ids renumbered to fit the convention of MED (MED file and MEDCoupling)
+ * \sa MEDCouplingUMesh::findAndCorrectBadOriented3DCells
+ */
+DataArrayInt *MEDCouplingUMesh::findAndCorrectBadOriented3DExtrudedCells() throw(INTERP_KERNEL::Exception)
+{
+  const char msg[]="check3DCellsWellOriented detection works only for 3D cells !";
+  if(getMeshDimension()!=3)
+    throw INTERP_KERNEL::Exception(msg);
+  int spaceDim=getSpaceDimension();
+  if(spaceDim!=3)
+    throw INTERP_KERNEL::Exception(msg);
+  //
+  int nbOfCells=getNumberOfCells();
+  int *conn=_nodal_connec->getPointer();
+  const int *connI=_nodal_connec_index->getConstPointer();
+  const double *coo=getCoords()->getConstPointer();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> cells(DataArrayInt::New()); cells->alloc(0,1);
+  for(int i=0;i<nbOfCells;i++)
+    {
+      const INTERP_KERNEL::CellModel& cm=INTERP_KERNEL::CellModel::GetCellModel((INTERP_KERNEL::NormalizedCellType)conn[connI[i]]);
+      if(cm.isExtruded() && !cm.isDynamic() && !cm.isQuadratic())
+        {
+          if(!Is3DExtrudedStaticCellWellOriented(conn+connI[i]+1,conn+connI[i+1],coo))
+            {
+              CorrectExtrudedStaticCell(conn+connI[i]+1,conn+connI[i+1]);
+              cells->pushBackSilent(i);
+            }
+        }
+    }
+  return cells.retn();
+}
+
+/*!
+ * This method is a faster method to correct orientation of all 3D cells in \a this.
+ * This method works only if \a this is a 3D mesh, that is to say a mesh with mesh dimension 3 and a space dimension 3.
+ * This method makes the hypothesis that \a this a coherent that is to say MEDCouplingUMesh::checkCoherency2 should throw no exception.
+ * 
+ * \ret a newly allocated int array with one components containing cell ids renumbered to fit the convention of MED (MED file and MEDCoupling)
+ * \sa MEDCouplingUMesh::orientCorrectlyPolyhedrons, 
+ */
+DataArrayInt *MEDCouplingUMesh::findAndCorrectBadOriented3DCells() throw(INTERP_KERNEL::Exception)
+{
+  if(getMeshDimension()!=3 || getSpaceDimension()!=3)
+    throw INTERP_KERNEL::Exception("Invalid mesh to apply findAndCorrectBadOriented3DCells on it : must be meshDim==3 and spaceDim==3 !");
+  int nbOfCells=getNumberOfCells();
+  int *conn=_nodal_connec->getPointer();
+  const int *connI=_nodal_connec_index->getConstPointer();
+  const double *coordsPtr=_coords->getConstPointer();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New(); ret->alloc(0,1);
+  for(int i=0;i<nbOfCells;i++)
+    {
+      INTERP_KERNEL::NormalizedCellType type=(INTERP_KERNEL::NormalizedCellType)conn[connI[i]];
+      switch(type)
+        {
+        case INTERP_KERNEL::NORM_TETRA4:
+          {
+            if(!IsTetra4WellOriented(conn+connI[i]+1,conn+connI[i+1],coordsPtr))
+              {
+                std::swap(*(conn+connI[i]+2),*(conn+connI[i]+3));
+                ret->pushBackSilent(i);
+              }
+            break;
+          }
+        case INTERP_KERNEL::NORM_PYRA5:
+          {
+            if(!IsPyra5WellOriented(conn+connI[i]+1,conn+connI[i+1],coordsPtr))
+              {
+                std::swap(*(conn+connI[i]+2),*(conn+connI[i]+4));
+                ret->pushBackSilent(i);
+              }
+            break;
+          }
+        case INTERP_KERNEL::NORM_PENTA6:
+        case INTERP_KERNEL::NORM_HEXA8:
+        case INTERP_KERNEL::NORM_HEXGP12:
+          {
+            if(!Is3DExtrudedStaticCellWellOriented(conn+connI[i]+1,conn+connI[i+1],coordsPtr))
+              {
+                CorrectExtrudedStaticCell(conn+connI[i]+1,conn+connI[i+1]);
+                ret->pushBackSilent(i);
+              }
+            break;
+          }
+        case INTERP_KERNEL::NORM_POLYHED:
+          {
+            if(!IsPolyhedronWellOriented(conn+connI[i]+1,conn+connI[i+1],coordsPtr))
+              {
+                TryToCorrectPolyhedronOrientation(conn+connI[i]+1,conn+connI[i+1],coordsPtr);
+                ret->pushBackSilent(i);
+              }
+            break;
+          }
+        default:
+          throw INTERP_KERNEL::Exception("MEDCouplingUMesh::orientCorrectly3DCells : Your mesh contains type of cell not supported yet ! send mail to anthony.geay@cea.fr to add it !");
+        }
+    }
+  updateTime();
+  return ret.retn();
 }
 
 /*!
@@ -6234,6 +6295,58 @@ bool MEDCouplingUMesh::IsPolyhedronWellOriented(const int *begin, const int *end
       bgFace=endFace+1;
     }
   return INTERP_KERNEL::calculateVolumeForPolyh2<int,INTERP_KERNEL::ALL_C_MODE>(begin,(int)std::distance(begin,end),coords)>-EPS_FOR_POLYH_ORIENTATION;
+}
+
+/*!
+ * The 3D extruded static cell (PENTA6,HEXA8,HEXAGP12...) its connectivity nodes in [begin,end).
+ */
+bool MEDCouplingUMesh::Is3DExtrudedStaticCellWellOriented(const int *begin, const int *end, const double *coords)
+{
+  double vec0[3],vec1[3];
+  std::size_t sz=std::distance(begin,end);
+  if(sz%2!=0)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::Is3DExtrudedStaticCellWellOriented : the length of nodal connectivity of extruded cell is not even !");
+  int nbOfNodes=(int)sz/2;
+  INTERP_KERNEL::areaVectorOfPolygon<int,INTERP_KERNEL::ALL_C_MODE>(begin,nbOfNodes,coords,vec0);
+  const double *pt0=coords+3*begin[0];
+  const double *pt1=coords+3*begin[nbOfNodes];
+  vec1[0]=pt1[0]-pt0[0]; vec1[1]=pt1[1]-pt0[1]; vec1[2]=pt1[2]-pt0[2];
+  return (vec0[0]*vec1[0]+vec0[1]*vec1[1]+vec0[2]*vec1[2])<0.;
+}
+
+void MEDCouplingUMesh::CorrectExtrudedStaticCell(int *begin, int *end)
+{
+  std::size_t sz=std::distance(begin,end);
+  INTERP_KERNEL::AutoPtr<int> tmp=new int[sz];
+  std::size_t nbOfNodes(sz/2);
+  std::copy(begin,end,(int *)tmp);
+  for(std::size_t j=1;j<nbOfNodes;j++)
+    {
+      begin[j]=tmp[nbOfNodes-j];
+      begin[j+nbOfNodes]=tmp[nbOfNodes+nbOfNodes-j];
+    }
+}
+
+bool MEDCouplingUMesh::IsTetra4WellOriented(const int *begin, const int *end, const double *coords)
+{
+  std::size_t sz=std::distance(begin,end);
+  if(sz!=4)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::IsTetra4WellOriented : Tetra4 cell with not 4 nodes ! Call checkCoherency2 !");
+  double vec0[3],vec1[3];
+  const double *pt0=coords+3*begin[0],*pt1=coords+3*begin[1],*pt2=coords+3*begin[2],*pt3=coords+3*begin[3];
+  vec0[0]=pt1[0]-pt0[0]; vec0[1]=pt1[1]-pt0[1]; vec0[2]=pt1[2]-pt0[2]; vec1[0]=pt2[0]-pt0[0]; vec1[1]=pt2[1]-pt0[1]; vec1[2]=pt2[2]-pt0[2]; 
+  return ((vec0[1]*vec1[2]-vec0[2]*vec1[1])*(pt3[0]-pt0[0])+(vec0[2]*vec1[0]-vec0[0]*vec1[2])*(pt3[1]-pt0[1])+(vec0[0]*vec1[1]-vec0[1]*vec1[0])*(pt3[2]-pt0[2]))<0;
+}
+
+bool MEDCouplingUMesh::IsPyra5WellOriented(const int *begin, const int *end, const double *coords)
+{
+  std::size_t sz=std::distance(begin,end);
+  if(sz!=5)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::IsPyra5WellOriented : Pyra5 cell with not 5 nodes ! Call checkCoherency2 !");
+  double vec0[3];
+  INTERP_KERNEL::areaVectorOfPolygon<int,INTERP_KERNEL::ALL_C_MODE>(begin,4,coords,vec0);
+  const double *pt0=coords+3*begin[0],*pt1=coords+3*begin[4];
+  return (vec0[0]*(pt1[0]-pt0[0])+vec0[1]*(pt1[1]-pt0[1])+vec0[2]*(pt1[2]-pt0[2]))<0.;
 }
 
 /*!

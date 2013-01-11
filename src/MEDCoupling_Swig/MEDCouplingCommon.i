@@ -298,6 +298,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::MEDCouplingUMesh::keepCellIdsByType;
 %newobject ParaMEDMEM::MEDCouplingUMesh::Build0DMeshFromCoords;
 %newobject ParaMEDMEM::MEDCouplingUMesh::findAndCorrectBadOriented3DExtrudedCells;
+%newobject ParaMEDMEM::MEDCouplingUMesh::findAndCorrectBadOriented3DCells;
 %newobject ParaMEDMEM::MEDCouplingUMesh::findCellIdsOnBoundary;
 %newobject ParaMEDMEM::MEDCouplingUMesh::computeSkin;
 %newobject ParaMEDMEM::MEDCouplingUMesh::getCellIdsLyingOnNodes;
@@ -1412,6 +1413,7 @@ namespace ParaMEDMEM
     DataArrayInt *convexEnvelop2D() throw(INTERP_KERNEL::Exception);
     std::string cppRepr() const throw(INTERP_KERNEL::Exception);
     DataArrayInt *findAndCorrectBadOriented3DExtrudedCells() throw(INTERP_KERNEL::Exception);
+    DataArrayInt *findAndCorrectBadOriented3DCells() throw(INTERP_KERNEL::Exception);
     static MEDCouplingUMesh *Build0DMeshFromCoords(DataArrayDouble *da) throw(INTERP_KERNEL::Exception);
     static MEDCouplingUMesh *MergeUMeshes(const MEDCouplingUMesh *mesh1, const MEDCouplingUMesh *mesh2) throw(INTERP_KERNEL::Exception);
     static MEDCouplingUMesh *MergeUMeshesOnSameCoords(const MEDCouplingUMesh *mesh1, const MEDCouplingUMesh *mesh2) throw(INTERP_KERNEL::Exception);

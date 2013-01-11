@@ -164,6 +164,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT void checkButterflyCells(std::vector<int>& cells, double eps=1e-12) const;
     MEDCOUPLING_EXPORT DataArrayInt *convexEnvelop2D() throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayInt *findAndCorrectBadOriented3DExtrudedCells() throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT DataArrayInt *findAndCorrectBadOriented3DCells() throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void getBoundingBoxForBBTree(std::vector<double>& bbox) const;
     MEDCOUPLING_EXPORT MEDCouplingUMesh *buildExtrudedMesh(const MEDCouplingUMesh *mesh1D, int policy);
     MEDCOUPLING_EXPORT bool isFullyQuadratic() const;
@@ -217,6 +218,10 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT static void MergeNodesOnUMeshesSharingSameCoords(const std::vector<MEDCouplingUMesh *>& meshes, double eps) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static bool IsPolygonWellOriented(bool isQuadratic, const double *vec, const int *begin, const int *end, const double *coords);
     MEDCOUPLING_EXPORT static bool IsPolyhedronWellOriented(const int *begin, const int *end, const double *coords);
+    MEDCOUPLING_EXPORT static bool Is3DExtrudedStaticCellWellOriented(const int *begin, const int *end, const double *coords);
+    MEDCOUPLING_EXPORT static void CorrectExtrudedStaticCell(int *begin, int *end);
+    MEDCOUPLING_EXPORT static bool IsTetra4WellOriented(const int *begin, const int *end, const double *coords);
+    MEDCOUPLING_EXPORT static bool IsPyra5WellOriented(const int *begin, const int *end, const double *coords);
     MEDCOUPLING_EXPORT static void SimplifyPolyhedronCell(double eps, const DataArrayDouble *coords, const int *begin, const int *end, DataArrayInt *res) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static void ComputeVecAndPtOfFace(double eps, const double *coords, const int *begin, const int *end, double *v, double *p) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static void TryToCorrectPolyhedronOrientation(int *begin, int *end, const double *coords) throw(INTERP_KERNEL::Exception);
