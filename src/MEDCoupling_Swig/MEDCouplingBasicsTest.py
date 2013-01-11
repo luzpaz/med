@@ -7908,6 +7908,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertEqual(4,len(v));
         self.assertEqual(v.getValues(),invalidCells);
         self.assertEqual(connExp,m.getNodalConnectivity().getValues());
+        self.assertTrue(m.findAndCorrectBadOriented3DExtrudedCells().empty())
         #
         pass
 
@@ -10729,6 +10730,92 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         da1.checkStrictlyMonotonic(False);
         self.assertTrue(da1.isMonotonic(False));
         da1.checkMonotonic(False);
+        pass
+
+    def testFindAndCorrectBadOriented3DCells1(self):
+        nbOfDisc=20
+        vects=([0,0,-1],[0.3,0.7,0.2],[-0.3,0.7,0.2],[-0.3,-0.7,0.2])
+        #
+        m0=MEDCouplingUMesh("m",3) ; m0.allocateCells(0); m0.insertNextCell(NORM_TETRA4,[0,1,2,3]); #Well oriented
+        m1=MEDCouplingUMesh("m",3) ; m1.allocateCells(0); m1.insertNextCell(NORM_PYRA5,[0,1,2,3,4]); #Well oriented
+        m2=MEDCouplingUMesh("m",3) ; m2.allocateCells(0); m2.insertNextCell(NORM_PENTA6,[0,1,2,3,4,5]); #Well oriented 
+        m3=MEDCouplingUMesh("m",3) ; m3.allocateCells(0); m3.insertNextCell(NORM_HEXA8,[0,1,2,3,4,5,6,7]); #Well oriented
+        m4=MEDCouplingUMesh("m",3) ; m4.allocateCells(0)
+        self.assertRaises(InterpKernelException,m4.insertNextCell,NORM_HEXGP12,[0,1,2,3,4,5,6,7,8,9,10,11,12]);
+        m4.insertNextCell(NORM_HEXGP12,[0,1,2,3,4,5,6,7,8,9,10,11]); #Well oriented
+        c0=DataArrayDouble([0.,0.,0.,0.,1.,0.,1.,0.,0.,0.,0.,1.],4,3) ; m0.setCoords(c0)
+        c1=DataArrayDouble([0.,0.,0.,0.,1.,0.,1.,1.,0.,1.,0.,0.,0.,0.,1.],5,3) ; m1.setCoords(c1)
+        c2=DataArrayDouble([0.,0.,0.,0.,1.,0.,1.,0.,0., 0.,0.,1.,0.,1.,1.,1.,0.,1.],6,3) ; m2.setCoords(c2)
+        c3=DataArrayDouble([0.,0.,0.,0.,1.,0.,1.,1.,0.,1.,0.,0.,0.,0.,1.,0.,1.,1.,1.,1.,1.,1.,0.,1.],8,3) ; m3.setCoords(c3)
+        c4=DataArrayDouble([0.,0.,0.,0.,1.,0.,1.,1.,0.,1.,0.,0.,0.8,0.,0.,0.45,0.,0.,   0.,0.,1.,0.,1.,1.,1.,1.,1.,1.,0.,1.,0.8,0.,1.,0.45,0.,1.],12,3) ; m4.setCoords(c4)
+        m=MEDCouplingMesh.MergeMeshes([m0,m1,m2,m3,m4])
+        expected1=DataArrayDouble([0.16666666666666666,0.3333333333333333,0.5,1.,1.])
+        for v in vects:
+            for i in xrange(nbOfDisc):
+                mm=m.deepCpy()
+                mm.rotate([0.,0.,0.],[0.3,0.7,0.2],float(i)/float(nbOfDisc)*2*pi)
+                mm2=mm.deepCpy()
+                self.assertTrue(mm.getMeasureField(False).getArray().isEqual(expected1,1e-14))
+                self.assertTrue(mm.findAndCorrectBadOriented3DCells().empty())
+                self.assertTrue(mm.isEqual(mm2,1e-14))
+                self.assertTrue(mm.getMeasureField(False).getArray().isEqual(expected1,1e-14))
+                mm.convertAllToPoly()
+                self.assertTrue(mm.getMeasureField(False).getArray().isEqual(expected1,1e-14))
+                pass
+            pass
+        #
+        mOK=m.deepCpy()
+        m0=MEDCouplingUMesh("m",3) ; m0.allocateCells(0); m0.insertNextCell(NORM_TETRA4,[0,2,1,3]); #Not well oriented
+        m1=MEDCouplingUMesh("m",3) ; m1.allocateCells(0); m1.insertNextCell(NORM_PYRA5,[0,1,2,3,4]); #Well oriented 
+        m2=MEDCouplingUMesh("m",3) ; m2.allocateCells(0); m2.insertNextCell(NORM_PENTA6,[0,1,2,3,4,5]); #Well oriented 
+        m3=MEDCouplingUMesh("m",3) ; m3.allocateCells(0); m3.insertNextCell(NORM_HEXA8,[0,3,2,1,4,7,6,5]); #Not well oriented
+        m4=MEDCouplingUMesh("m",3) ; m4.allocateCells(0); m4.insertNextCell(NORM_HEXGP12,[0,5,4,3,2,1,6,11,10,9,8,7]); #Not well oriented
+        m0.setCoords(c0) ; m1.setCoords(c1) ; m2.setCoords(c2) ; m3.setCoords(c3) ; m4.setCoords(c4)
+        m=MEDCouplingMesh.MergeMeshes([m0,m1,m2,m3,m4])
+        expected2=DataArrayDouble([-0.16666666666666666,0.3333333333333333,0.5,-1.,-1.])
+        for v in vects:
+            for i in xrange(nbOfDisc):
+                mm=m.deepCpy()
+                mm.rotate([0.,0.,0.],[0.3,0.7,0.2],float(i)/float(nbOfDisc)*2*pi)
+                mm2=mm.deepCpy() ; mm3=mm.deepCpy() ; mm3.convertAllToPoly()
+                self.assertTrue(mm3.getMeasureField(False).getArray().isEqual(expected2,1e-14))
+                self.assertTrue(mm.getMeasureField(False).getArray().isEqual(expected2,1e-14))
+                self.assertTrue(mm.findAndCorrectBadOriented3DCells().isEqual(DataArrayInt([0,3,4])))
+                mOK.setCoords(mm.getCoords())
+                self.assertTrue(mm.isEqual(mOK,1e-14))
+                self.assertTrue(mm.getMeasureField(False).getArray().isEqual(expected1,1e-14))
+                mmm=mm.deepCpy()
+                self.assertTrue(mmm.findAndCorrectBadOriented3DCells().empty())
+                mm.convertAllToPoly()
+                self.assertTrue(mm.getMeasureField(False).getArray().isEqual(expected1,1e-14))
+                pass
+            pass
+        #
+        m0=MEDCouplingUMesh("m",3) ; m0.allocateCells(0); m0.insertNextCell(NORM_TETRA4,[0,1,2,3]); #Well oriented
+        m1=MEDCouplingUMesh("m",3) ; m1.allocateCells(0); m1.insertNextCell(NORM_PYRA5,[0,3,2,1,4]); #Not well oriented 
+        m2=MEDCouplingUMesh("m",3) ; m2.allocateCells(0); m2.insertNextCell(NORM_PENTA6,[0,2,1,3,5,4]); #Not well oriented 
+        m3=MEDCouplingUMesh("m",3) ; m3.allocateCells(0); m3.insertNextCell(NORM_HEXA8,[0,1,2,3,4,5,6,7]); #Well oriented
+        m4=MEDCouplingUMesh("m",3) ; m4.allocateCells(0); m4.insertNextCell(NORM_HEXGP12,range(12)); #Well oriented
+        m0.setCoords(c0) ; m1.setCoords(c1) ; m2.setCoords(c2) ; m3.setCoords(c3) ; m4.setCoords(c4)
+        m=MEDCouplingMesh.MergeMeshes([m0,m1,m2,m3,m4])
+        expected3=DataArrayDouble([0.16666666666666666,-0.3333333333333333,-0.5,1.,1.])
+        for v in vects:
+            for i in xrange(nbOfDisc):
+                mm=m.deepCpy()
+                mm.rotate([0.,0.,0.],[0.3,0.7,0.2],float(i)/float(nbOfDisc)*2*pi)
+                mm2=mm.deepCpy() ; mm3=mm.deepCpy() ; mm3.convertAllToPoly()
+                self.assertTrue(mm3.getMeasureField(False).getArray().isEqual(expected3,1e-14))
+                self.assertTrue(mm.getMeasureField(False).getArray().isEqual(expected3,1e-14))
+                self.assertTrue(mm.findAndCorrectBadOriented3DCells().isEqual(DataArrayInt([1,2])))
+                mOK.setCoords(mm.getCoords())
+                self.assertTrue(mm.isEqual(mOK,1e-14))
+                self.assertTrue(mm.getMeasureField(False).getArray().isEqual(expected1,1e-14))
+                mmm=mm.deepCpy()
+                self.assertTrue(mmm.findAndCorrectBadOriented3DCells().empty())
+                mm.convertAllToPoly()
+                self.assertTrue(mm.getMeasureField(False).getArray().isEqual(expected1,1e-14))
+                pass
+            pass
         pass
 
     def setUp(self):
