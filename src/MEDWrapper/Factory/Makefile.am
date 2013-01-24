@@ -48,9 +48,9 @@ bin_PROGRAMS = MED_Test mprint_version
 dist_MED_Test_SOURCES= MED_Test.cxx
 MED_Test_CPPFLAGS= $(libMEDWrapper_la_CPPFLAGS)
 MED_Test_LDADD= $(libMEDWrapper_la_LDFLAGS) ../Base/libMEDWrapperBase.la ../V2_1/Core/libmed_V2_1.la \
-	$(BOOST_LIB_THREAD) libMEDWrapper.la
+	$(BOOST_LIB_THREAD) $(BOOST_LIB_SYSTEM) libMEDWrapper.la
 
 dist_mprint_version_SOURCES= mprint_version.cxx
 mprint_version_CPPFLAGS= $(libMEDWrapper_la_CPPFLAGS)
 mprint_version_LDADD= $(libMEDWrapper_la_LDFLAGS) ../Base/libMEDWrapperBase.la ../V2_1/Core/libmed_V2_1.la \
-	$(BOOST_LIB_THREAD) libMEDWrapper.la $(MED3_LIBS_C_ONLY)
+	$(BOOST_LIB_THREAD) $(BOOST_LIB_SYSTEM) libMEDWrapper.la $(MED3_LIBS_C_ONLY)
