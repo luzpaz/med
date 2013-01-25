@@ -4767,8 +4767,18 @@ void MEDCouplingUMesh::orientCorrectlyPolyhedrons() throw(INTERP_KERNEL::Excepti
     {
       INTERP_KERNEL::NormalizedCellType type=(INTERP_KERNEL::NormalizedCellType)conn[connI[i]];
       if(type==INTERP_KERNEL::NORM_POLYHED)
-        if(!IsPolyhedronWellOriented(conn+connI[i]+1,conn+connI[i+1],coordsPtr))
-          TryToCorrectPolyhedronOrientation(conn+connI[i]+1,conn+connI[i+1],coordsPtr);
+        {
+          try
+            {
+              if(!IsPolyhedronWellOriented(conn+connI[i]+1,conn+connI[i+1],coordsPtr))
+                TryToCorrectPolyhedronOrientation(conn+connI[i]+1,conn+connI[i+1],coordsPtr);
+            }
+          catch(INTERP_KERNEL::Exception& e)
+            {
+              std::ostringstream oss; oss << "Something wrong in polyhedron #" << i << " : " << e.what();
+              throw INTERP_KERNEL::Exception(oss.str().c_str());
+            }
+        }
     }
   updateTime();
 }
@@ -6500,42 +6510,63 @@ void MEDCouplingUMesh::ComputeVecAndPtOfFace(double eps, const double *coords, c
  */
 void MEDCouplingUMesh::TryToCorrectPolyhedronOrientation(int *begin, int *end, const double *coords) throw(INTERP_KERNEL::Exception)
 {
-  std::vector<std::pair<int,int> > edges;
+  std::list< std::pair<int,int> > edgesOK,edgesFinished;
   std::size_t nbOfFaces=std::count(begin,end,-1)+1;
-  int *bgFace=begin;
-  std::vector<bool> isPerm(nbOfFaces);
-  for(std::size_t i=0;i<nbOfFaces;i++)
+  std::vector<bool> isPerm(nbOfFaces,false);//field on faces False: I don't know, True : oriented
+  isPerm[0]=true;
+  int *bgFace=begin,*endFace=std::find(begin+1,end,-1);
+  std::size_t nbOfEdgesInFace=std::distance(bgFace,endFace);
+  for(std::size_t l=0;l<nbOfEdgesInFace;l++) { std::pair<int,int> p1(bgFace[l],bgFace[(l+1)%nbOfEdgesInFace]); edgesOK.push_back(p1); }
+  //
+  while(std::find(isPerm.begin(),isPerm.end(),false)!=isPerm.end())
     {
-      int *endFace=std::find(bgFace+1,end,-1);
-      std::size_t nbOfEdgesInFace=std::distance(bgFace,endFace);
-      for(std::size_t l=0;l<nbOfEdgesInFace;l++)
+      bgFace=begin;
+      std::size_t smthChanged=0;
+      for(std::size_t i=0;i<nbOfFaces;i++)
         {
-          std::pair<int,int> p1(bgFace[l],bgFace[(l+1)%nbOfEdgesInFace]);
-          edges.push_back(p1);
-        }
-      int *bgFace2=endFace+1;
-      for(std::size_t k=i+1;k<nbOfFaces;k++)
-        {
-          int *endFace2=std::find(bgFace2+1,end,-1);
-          std::size_t nbOfEdgesInFace2=std::distance(bgFace2,endFace2);
-          for(std::size_t j=0;j<nbOfEdgesInFace2;j++)
+          endFace=std::find(bgFace+1,end,-1);
+          nbOfEdgesInFace=std::distance(bgFace,endFace);
+          if(!isPerm[i])
             {
-              std::pair<int,int> p2(bgFace2[j],bgFace2[(j+1)%nbOfEdgesInFace2]);
-              if(std::find(edges.begin(),edges.end(),p2)!=edges.end())
+              bool b;
+              for(std::size_t j=0;j<nbOfEdgesInFace;j++)
                 {
-                  if(isPerm[k])
-                    throw INTERP_KERNEL::Exception("Fail to repare polyhedron ! Polyedron looks bad !");
-                  std::vector<int> tmp(nbOfEdgesInFace2-1);
-                  std::copy(bgFace2+1,endFace2,tmp.rbegin());
-                  std::copy(tmp.begin(),tmp.end(),bgFace2+1);
-                  isPerm[k]=true;
-                  continue;
+                  std::pair<int,int> p1(bgFace[j],bgFace[(j+1)%nbOfEdgesInFace]);
+                  std::pair<int,int> p2(p1.second,p1.first);
+                  bool b1=std::find(edgesOK.begin(),edgesOK.end(),p1)!=edgesOK.end();
+                  bool b2=std::find(edgesOK.begin(),edgesOK.end(),p2)!=edgesOK.end();
+                  if(b1 || b2) { b=b2; isPerm[i]=true; smthChanged++; break; }
+                }
+              if(isPerm[i])
+                { 
+                  if(!b)
+                    std::reverse(bgFace+1,endFace);
+                  for(std::size_t j=0;j<nbOfEdgesInFace;j++)
+                    {
+                      std::pair<int,int> p1(bgFace[j],bgFace[(j+1)%nbOfEdgesInFace]);
+                      std::pair<int,int> p2(p1.second,p1.first);
+                      if(std::find(edgesOK.begin(),edgesOK.end(),p1)!=edgesOK.end())
+                        { std::ostringstream oss; oss << "Face #" << j << " of polyhedron looks bad !"; throw INTERP_KERNEL::Exception(oss.str().c_str()); }
+                      if(std::find(edgesFinished.begin(),edgesFinished.end(),p1)!=edgesFinished.end() || std::find(edgesFinished.begin(),edgesFinished.end(),p2)!=edgesFinished.end())
+                        { std::ostringstream oss; oss << "Face #" << j << " of polyhedron looks bad !"; throw INTERP_KERNEL::Exception(oss.str().c_str()); }
+                      std::list< std::pair<int,int> >::iterator it=std::find(edgesOK.begin(),edgesOK.end(),p2);
+                      if(it!=edgesOK.end())
+                        {
+                          edgesOK.erase(it);
+                          edgesFinished.push_back(p1);
+                        }
+                      else
+                        edgesOK.push_back(p1);
+                    }
                 }
             }
-          bgFace2=endFace2+1;
+          bgFace=endFace+1;
         }
-      bgFace=endFace+1;
+      if(smthChanged==0)
+        { throw INTERP_KERNEL::Exception("The polyhedron looks too bad to be repaired !"); }
     }
+  if(!edgesOK.empty())
+    { throw INTERP_KERNEL::Exception("The polyhedron looks too bad to be repaired : Some edges are shared only once !"); }
   if(INTERP_KERNEL::calculateVolumeForPolyh2<int,INTERP_KERNEL::ALL_C_MODE>(begin,(int)std::distance(begin,end),coords)<-EPS_FOR_POLYH_ORIENTATION)
     {//not lucky ! The first face was not correctly oriented : reorient all faces...
       bgFace=begin;

@@ -10818,6 +10818,28 @@ class MEDCouplingBasicsTest(unittest.TestCase):
             pass
         pass
 
+    def testSwigCellOrientation1(self):
+        coords=DataArrayDouble([-0.21606,-0.10803,0.29999999999999999,-0.21606,-0.10803,0.37700000000000006,0,-0.10803,0.29999999999999999,0,-0.10803,0.37700000000000006,0,0.10803,0.29999999999999999,0,0.10803,0.37700000000000006,-0.21606,0.10803,0.29999999999999999,-0.21606,0.10803,0.37700000000000006,0,0.03601,0.29999999999999999,0,0.03601,0.37700000000000006,0,-0.03601,0.29999999999999999,0,-0.03601,0.37700000000000006],12,3)
+        conn=[[0,2,10,8,4,6],[1,3,11,9,5,7],[0,1,3,2],[2,3,11,10],[10,11,9,8],[8,9,5,4],[4,5,7,6],[6,7,1,0]]
+        for i in xrange(256):
+            mesh=MEDCouplingUMesh("FluidMesh_1",3);
+            mesh.allocateCells(0)
+            conn2=[elt[:] for elt in conn]
+            code=bin(i)[2:] ; code='0'*(8-len(code))+code
+            for face,rev in zip(conn2,code):
+                if bool(int(rev)):
+                    face.reverse()
+                    pass
+                pass
+            conn3=[elt+[-1] for elt in conn2]
+            conn3=sum(conn3,[])[:-1]
+            mesh.insertNextCell(NORM_POLYHED,conn3)
+            mesh.setCoords(coords)
+            mesh.orientCorrectlyPolyhedrons()
+            self.assertTrue(mesh.getBarycenterAndOwner().isEqual(DataArrayDouble([-0.10803,0.,0.3385],1,3),1e-12))
+            pass
+        pass
+
     def setUp(self):
         pass
     pass
