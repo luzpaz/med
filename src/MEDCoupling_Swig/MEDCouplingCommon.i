@@ -4624,7 +4624,15 @@ namespace ParaMEDMEM
    {
      return self->iterator();
    }
-
+   
+   PyObject *accumulate() const throw(INTERP_KERNEL::Exception)
+   {
+     int sz=self->getNumberOfComponents();
+     INTERP_KERNEL::AutoPtr<int> tmp=new int[sz];
+     self->accumulate(tmp);
+     return convertIntArrToPyList(tmp,sz);
+   }
+   
    static PyObject *BuildOld2NewArrayFromSurjectiveFormat2(int nbOfOldTuples, PyObject *arr, PyObject *arrI) throw(INTERP_KERNEL::Exception)
    {
      int newNbOfTuples=-1;

@@ -10853,6 +10853,25 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(m1.checkConsecutiveCellTypesForMEDFileFrmt())
         pass
 
+    def testSwigDAAccumulate1(self):
+        d=DataArrayInt(10) ; d.iota(0)
+        self.assertEqual([45],d.accumulate())
+        self.assertEqual(45,d.accumulate(0))
+        d=DataArrayInt(30) ; d.iota(0) ; d.rearrange(3)
+        self.assertEqual([135,145,155],d.accumulate())
+        self.assertEqual(135,d.accumulate(0))
+        self.assertEqual(145,d.accumulate(1))
+        self.assertEqual(155,d.accumulate(2))
+        d=DataArrayDouble(10) ; d.iota(0.)
+        self.assertEqual([45.],d.accumulate())
+        self.assertEqual(45.,d.accumulate(0))
+        d=DataArrayDouble(30) ; d.iota(0) ; d.rearrange(3)
+        self.assertEqual([135.,145.,155.],d.accumulate())
+        self.assertEqual(135.,d.accumulate(0))
+        self.assertEqual(145.,d.accumulate(1))
+        self.assertEqual(155.,d.accumulate(2))
+        pass
+
     def setUp(self):
         pass
     pass

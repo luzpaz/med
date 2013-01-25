@@ -5184,6 +5184,32 @@ bool DataArrayInt::presenceOfValue(const std::vector<int>& vals) const throw(INT
   return locateValue(vals)!=-1;
 }
 
+
+void DataArrayInt::accumulate(int *res) const throw(INTERP_KERNEL::Exception)
+{
+  checkAllocated();
+  const int *ptr=getConstPointer();
+  int nbTuple=getNumberOfTuples();
+  int nbComps=getNumberOfComponents();
+  std::fill(res,res+nbComps,0);
+  for(int i=0;i<nbTuple;i++)
+    std::transform(ptr+i*nbComps,ptr+(i+1)*nbComps,res,res,std::plus<int>());
+}
+
+int DataArrayInt::accumulate(int compId) const throw(INTERP_KERNEL::Exception)
+{
+  checkAllocated();
+  const int *ptr=getConstPointer();
+  int nbTuple=getNumberOfTuples();
+  int nbComps=getNumberOfComponents();
+  if(compId>=nbComps)
+    throw INTERP_KERNEL::Exception("DataArrayInt::accumulate : Invalid compId specified : No such nb of components !");
+  int ret=0;
+  for(int i=0;i<nbTuple;i++)
+    ret+=ptr[i*nbComps+compId];
+  return ret;
+}
+
 DataArrayInt *DataArrayInt::Aggregate(const DataArrayInt *a1, const DataArrayInt *a2, int offsetA2)
 {
   if(!a1 || !a2)
