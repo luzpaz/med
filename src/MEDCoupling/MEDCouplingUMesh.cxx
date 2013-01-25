@@ -5451,6 +5451,17 @@ bool MEDCouplingUMesh::checkConsecutiveCellTypes() const
 }
 
 /*!
+ * This method is a specialization of MEDCouplingUMesh::checkConsecutiveCellTypesAndOrder method that is called here.
+ * The geometric type order is specified by MED file.
+ * 
+ * \sa  MEDCouplingUMesh::checkConsecutiveCellTypesAndOrder
+ */
+bool MEDCouplingUMesh::checkConsecutiveCellTypesForMEDFileFrmt() const throw(INTERP_KERNEL::Exception)
+{
+  return checkConsecutiveCellTypesAndOrder(MEDMEM_ORDER,MEDMEM_ORDER+N_MEDMEM_ORDER);
+}
+
+/*!
  * This method performs the same job as checkConsecutiveCellTypes except that the order of types sequence is analyzed to check
  * that the order is specified in array defined by [orderBg,orderEnd). 
  */

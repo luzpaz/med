@@ -1389,6 +1389,7 @@ namespace ParaMEDMEM
     DataArrayInt *findCellIdsOnBoundary() const throw(INTERP_KERNEL::Exception);
     MEDCouplingUMesh *computeSkin() const throw(INTERP_KERNEL::Exception);
     bool checkConsecutiveCellTypes() const throw(INTERP_KERNEL::Exception);
+    bool checkConsecutiveCellTypesForMEDFileFrmt() const throw(INTERP_KERNEL::Exception);
     DataArrayInt *rearrange2ConsecutiveCellTypes() throw(INTERP_KERNEL::Exception);
     DataArrayInt *sortCellsInMEDFileFrmt() throw(INTERP_KERNEL::Exception);
     DataArrayInt *convertCellArrayPerGeoType(const DataArrayInt *da) const throw(INTERP_KERNEL::Exception);

@@ -10840,6 +10840,19 @@ class MEDCouplingBasicsTest(unittest.TestCase):
             pass
         pass
 
+    def testSwigCheckConsecutiveCellTypesForMEDFileFrmt1(self):
+        m1=MEDCouplingUMesh("",2) ; m1.allocateCells(0)
+        m1.insertNextCell(NORM_QUAD4,[0,1,2,3])
+        m1.insertNextCell(NORM_TRI3,[0,1,2])
+        d=DataArrayDouble(4,3) ; d[:]=0.
+        m1.setCoords(d)
+        self.assertTrue(m1.checkConsecutiveCellTypes())
+        self.assertTrue(not m1.checkConsecutiveCellTypesForMEDFileFrmt())
+        m1.renumberCells([1,0])
+        self.assertTrue(m1.checkConsecutiveCellTypes())
+        self.assertTrue(m1.checkConsecutiveCellTypesForMEDFileFrmt())
+        pass
+
     def setUp(self):
         pass
     pass
