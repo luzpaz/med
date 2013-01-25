@@ -301,8 +301,6 @@ namespace ParaMEDMEM
     DataArrayInt *_nodal_connec;
     DataArrayInt *_nodal_connec_index;
     std::set<INTERP_KERNEL::NormalizedCellType> _types;
-  private:
-    static const char PART_OF_NAME[];
   public:
     static double EPS_FOR_POLYH_ORIENTATION;
   };

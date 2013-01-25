@@ -372,7 +372,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertEqual(NORM_QUAD4,mesh.getAllTypes()[1]);
         self.assertEqual(1,len(subMesh.getAllTypes()));
         self.assertEqual(NORM_QUAD4,subMesh.getAllTypes()[0]);
-        self.assertEqual(name,"PartOf_Toto");
+        self.assertEqual(name,"Toto");
         self.assertEqual(2,subMesh.getNumberOfCells());
         subConn=[4,0,3,4,1,4,7,8,5,4];
         subConnIndex=[0,5,10];
@@ -387,7 +387,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertEqual(2,len(subMesh.getAllTypes()));
         self.assertEqual(NORM_TRI3,subMesh.getAllTypes()[0]);
         self.assertEqual(NORM_QUAD4,subMesh.getAllTypes()[1]);
-        self.assertEqual(name,"PartOf_Toto");
+        self.assertEqual(name,"Toto");
         self.assertEqual(3,subMesh.getNumberOfCells());
         subConn2=[4,0,3,4,1,3,4,5,2,4,6,7,4,3]
         subConnIndex2=[0,5,9,14]

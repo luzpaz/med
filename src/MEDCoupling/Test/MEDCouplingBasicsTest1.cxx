@@ -581,7 +581,7 @@ void MEDCouplingBasicsTest1::testBuildPartOfMySelf()
   CPPUNIT_ASSERT_EQUAL(INTERP_KERNEL::NORM_QUAD4,*(++(mesh->getAllTypes().begin())));
   CPPUNIT_ASSERT_EQUAL(1,(int)subMesh->getAllTypes().size());
   CPPUNIT_ASSERT_EQUAL(INTERP_KERNEL::NORM_QUAD4,*subMesh->getAllTypes().begin());
-  CPPUNIT_ASSERT(name=="PartOf_Toto");
+  CPPUNIT_ASSERT(name=="Toto");
   CPPUNIT_ASSERT(mesh->getCoords()==subMesh->getCoords());
   CPPUNIT_ASSERT_EQUAL(2,subMesh->getNumberOfCells());
   const int subConn[10]={4,0,3,4,1,4,7,8,5,4};
@@ -599,7 +599,7 @@ void MEDCouplingBasicsTest1::testBuildPartOfMySelf()
   CPPUNIT_ASSERT_EQUAL(2,(int)subMesh->getAllTypes().size());
   CPPUNIT_ASSERT_EQUAL(INTERP_KERNEL::NORM_TRI3,*subMesh->getAllTypes().begin());
   CPPUNIT_ASSERT_EQUAL(INTERP_KERNEL::NORM_QUAD4,*(++(subMesh->getAllTypes().begin())));
-  CPPUNIT_ASSERT(name=="PartOf_Toto");
+  CPPUNIT_ASSERT(name=="Toto");
   CPPUNIT_ASSERT(mesh->getCoords()==subMesh->getCoords());
   CPPUNIT_ASSERT_EQUAL(3,subMesh->getNumberOfCells());
   const int subConn2[14]={4,0,3,4,1,3,4,5,2,4,6,7,4,3};
@@ -612,7 +612,7 @@ void MEDCouplingBasicsTest1::testBuildPartOfMySelf()
   MEDCouplingPointSet *subMeshSimple2=subMeshSimple->buildPartOfMySelf(tab3,tab3+3,true);
   subMesh->decrRef();
   name=subMeshSimple2->getName();
-  CPPUNIT_ASSERT(name=="PartOf_Toto");
+  CPPUNIT_ASSERT(name=="Toto");
   subMeshSimple2->decrRef();
   //
   mesh->decrRef();

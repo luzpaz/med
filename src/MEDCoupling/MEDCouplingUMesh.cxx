@@ -46,8 +46,6 @@
 
 using namespace ParaMEDMEM;
 
-const char MEDCouplingUMesh::PART_OF_NAME[]="PartOf_";
-
 double MEDCouplingUMesh::EPS_FOR_POLYH_ORIENTATION=1.e-14;
 
 const INTERP_KERNEL::NormalizedCellType MEDCouplingUMesh::MEDMEM_ORDER[N_MEDMEM_ORDER] = { INTERP_KERNEL::NORM_POINT1, INTERP_KERNEL::NORM_SEG2, INTERP_KERNEL::NORM_SEG3, INTERP_KERNEL::NORM_SEG4, INTERP_KERNEL::NORM_POLYL, INTERP_KERNEL::NORM_TRI3, INTERP_KERNEL::NORM_QUAD4, INTERP_KERNEL::NORM_TRI6, INTERP_KERNEL::NORM_TRI7, INTERP_KERNEL::NORM_QUAD8, INTERP_KERNEL::NORM_QUAD9, INTERP_KERNEL::NORM_POLYGON, INTERP_KERNEL::NORM_QPOLYG, INTERP_KERNEL::NORM_TETRA4, INTERP_KERNEL::NORM_PYRA5, INTERP_KERNEL::NORM_PENTA6, INTERP_KERNEL::NORM_HEXA8, INTERP_KERNEL::NORM_HEXGP12, INTERP_KERNEL::NORM_TETRA10, INTERP_KERNEL::NORM_PYRA13, INTERP_KERNEL::NORM_PENTA15, INTERP_KERNEL::NORM_HEXA20, INTERP_KERNEL::NORM_HEXA27, INTERP_KERNEL::NORM_POLYHED };
@@ -725,7 +723,7 @@ MEDCouplingUMesh *MEDCouplingUMesh::buildDescendingConnectivityGen(DataArrayInt 
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> n2oM1=o2nM1->invertArrayO2N2N2OBis(newNbOfCellsM1);
   const int *n2oM1Ptr=n2oM1->getConstPointer();
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> ret2=static_cast<MEDCouplingUMesh *>(ret->buildPartOfMySelf(n2oM1->begin(),n2oM1->end(),true));
-  ret2->setName(name.c_str());
+  ret2->copyTinyInfoFrom(this);
   desc->alloc(descIndx->back(),1);
   int *descPtr=desc->getPointer();
   const INTERP_KERNEL::CellModel& cmsDft=INTERP_KERNEL::CellModel::GetCellModel(INTERP_KERNEL::NORM_POINT1);
@@ -2950,17 +2948,6 @@ MEDCouplingUMesh *MEDCouplingUMesh::buildPartOfMySelfKeepCoords2(int start, int 
   ret->setConnectivity(newConn,newConnI,false);
   ret->_types=types;
   ret->copyTinyInfoFrom(this);
-  std::string name(getName());
-  std::size_t sz=strlen(PART_OF_NAME);
-  if(name.length()>=sz)
-    name=name.substr(0,sz);
-  if(name!=PART_OF_NAME)
-    {
-      std::ostringstream stream; stream << PART_OF_NAME << getName();
-      ret->setName(stream.str().c_str());
-    }
-  else
-    ret->setName(getName());
   return ret.retn();
 }
 
@@ -3010,17 +2997,6 @@ MEDCouplingUMesh *MEDCouplingUMesh::buildPartOfMySelfKeepCoords(const int *begin
   connRetArr->decrRef();
   connIndexRetArr->decrRef();
   ret->copyTinyInfoFrom(this);
-  std::string name(getName());
-  std::size_t sz=strlen(PART_OF_NAME);
-  if(name.length()>=sz)
-    name=name.substr(0,sz);
-  if(name!=PART_OF_NAME)
-    {
-      std::ostringstream stream; stream << PART_OF_NAME << getName();
-      ret->setName(stream.str().c_str());
-    }
-  else
-    ret->setName(getName());
   return ret.retn();
 }
 
