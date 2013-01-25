@@ -101,21 +101,8 @@ namespace INTERP_KERNEL
 
     std::string filterInterpolationMethod(const std::string& meth) const;
 
-    void init()
-    {  
-      _print_level=0;
-      _intersection_type=Triangulation;
-      _precision=1e-12;
-      _median_plane=DFT_MEDIAN_PLANE;
-      _do_rotate=true;
-      _bounding_box_adjustment=DFT_SURF3D_ADJ_EPS;
-      _bounding_box_adjustment_abs=0.;
-      _max_distance_for_3Dsurf_intersect=DFT_MAX_DIST_3DSURF_INTERSECT;
-      _orientation=0;
-      _measure_abs=true;
-      _splitting_policy=GENERAL_48;
-      _P1P0_bary_method=false;
-    }
+    void init();
+    
     bool setInterpolationOptions(long print_level,
                                  std::string intersection_type,
                                  double precision,
