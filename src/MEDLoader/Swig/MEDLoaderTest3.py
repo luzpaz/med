@@ -1929,6 +1929,40 @@ class MEDLoaderTest(unittest.TestCase):
         da.setValues([1])
         self.assertTrue(mm.getGroupArr(-1,"grp0").isEqual(da))
         pass
+
+    def testHeapMem1(self):
+        m=MEDCouplingCMesh()
+        arr=DataArrayDouble(10,1) ; arr.iota(0)
+        m.setCoords(arr,arr)
+        m=m.buildUnstructured()
+        m.setName("mm")
+        f=m.getMeasureField(ON_CELLS)
+        self.assertIn(m.getHeapMemorySize(),xrange(3552-100,3552+100))
+        self.assertIn(f.getHeapMemorySize(),xrange(4215-100,4215+100))
+        #
+        mm=MEDFileUMesh()
+        mm.setMeshAtLevel(0,m)
+        self.assertIn(mm.getHeapMemorySize(),xrange(3889-100,3889+100))
+        ff=MEDFileField1TS()
+        ff.setFieldNoProfileSBT(f)
+        self.assertIn(ff.getHeapMemorySize(),xrange(711-10,711+10))
+        #
+        fff=MEDFileFieldMultiTS()
+        fff.appendFieldNoProfileSBT(f)
+        self.assertIn(fff.getHeapMemorySize(),xrange(743-10,743+10))
+        self.assertIn(fff[-1,-1].getHeapMemorySize(),xrange(711-10,711+10))
+        f.setTime(1.,0,-1)
+        fff.appendFieldNoProfileSBT(f)
+        self.assertIn(fff.getHeapMemorySize(),xrange(1462-10,1462+10))
+        self.assertIn(fff[0,-1].getHeapMemorySize(),xrange(711-10,711+10))
+        f2=f[:50]
+        f2.setTime(2.,1,-1)
+        pfl=DataArrayInt.Range(0,50,1) ; pfl.setName("pfl")
+        fff.appendFieldProfile(f2,mm,0,pfl)
+        self.assertIn(fff.getHeapMemorySize(),xrange(2178-100,2178+100))
+        self.assertIn(fff.getProfile("pfl_NORM_QUAD4").getHeapMemorySize(),xrange(215-10,215+10))
+        self.assertIn(fff[1,-1].getHeapMemorySize(),xrange(700-10,700+10))
+        pass
     pass
 
 unittest.main()
