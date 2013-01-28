@@ -6559,11 +6559,8 @@ void MEDCouplingUMesh::TryToCorrectPolyhedronOrientation(int *begin, int *end, c
       bgFace=begin;
       for(std::size_t i=0;i<nbOfFaces;i++)
         {
-          int *endFace=std::find(bgFace+1,end,-1);
-          std::size_t nbOfEdgesInFace=std::distance(bgFace,endFace);
-          std::vector<int> tmp(nbOfEdgesInFace-1);
-          std::copy(bgFace+1,endFace,tmp.rbegin());
-          std::copy(tmp.begin(),tmp.end(),bgFace+1);
+          endFace=std::find(bgFace+1,end,-1);
+          std::reverse(bgFace+1,endFace);
           bgFace=endFace+1;
         }
     }
