@@ -81,8 +81,10 @@ using namespace ParaMEDMEM;
 %newobject ParaMEDMEM::MEDFileUMesh::zipCoords;
 %newobject ParaMEDMEM::MEDFileCMesh::New;
 %newobject ParaMEDMEM::MEDFileMeshMultiTS::New;
+%newobject ParaMEDMEM::MEDFileMeshMultiTS::deepCpy;
 %newobject ParaMEDMEM::MEDFileMeshMultiTS::getOneTimeStep;
 %newobject ParaMEDMEM::MEDFileMeshes::New;
+%newobject ParaMEDMEM::MEDFileMeshes::deepCpy;
 %newobject ParaMEDMEM::MEDFileMeshes::getMeshAtPos;
 %newobject ParaMEDMEM::MEDFileMeshes::getMeshWithName;
 %newobject ParaMEDMEM::MEDFileMeshes::__getitem__;
@@ -115,6 +117,7 @@ using namespace ParaMEDMEM;
 %newobject ParaMEDMEM::MEDFileField1TS::getUndergroundDataArray;
 
 %newobject ParaMEDMEM::MEDFileData::New;
+%newobject ParaMEDMEM::MEDFileData::deepCpy;
 %newobject ParaMEDMEM::MEDFileData::getMeshes;
 %newobject ParaMEDMEM::MEDFileData::getFields;
 
@@ -684,6 +687,7 @@ namespace ParaMEDMEM
     static MEDFileMeshMultiTS *New();
     static MEDFileMeshMultiTS *New(const char *fileName) throw(INTERP_KERNEL::Exception);
     static MEDFileMeshMultiTS *New(const char *fileName, const char *mName) throw(INTERP_KERNEL::Exception);
+    MEDFileMeshMultiTS *deepCpy() const throw(INTERP_KERNEL::Exception);
     const char *getName() const throw(INTERP_KERNEL::Exception);
     void write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception);
     void setOneTimeStep(MEDFileMesh *mesh1TimeStep) throw(INTERP_KERNEL::Exception);
@@ -741,6 +745,7 @@ namespace ParaMEDMEM
   public:
     static MEDFileMeshes *New();
     static MEDFileMeshes *New(const char *fileName) throw(INTERP_KERNEL::Exception);
+    MEDFileMeshes *deepCpy() const throw(INTERP_KERNEL::Exception);
     void write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception);
     int getNumberOfMeshes() const throw(INTERP_KERNEL::Exception);
     std::vector<std::string> getMeshesNames() const throw(INTERP_KERNEL::Exception);
@@ -1635,6 +1640,7 @@ namespace ParaMEDMEM
   public:
     static MEDFileData *New(const char *fileName) throw(INTERP_KERNEL::Exception);
     static MEDFileData *New();
+    MEDFileData *deepCpy() const throw(INTERP_KERNEL::Exception);
     void setFields(MEDFileFields *fields) throw(INTERP_KERNEL::Exception);
     void setMeshes(MEDFileMeshes *meshes) throw(INTERP_KERNEL::Exception);
     int getNumberOfFields() const throw(INTERP_KERNEL::Exception);
