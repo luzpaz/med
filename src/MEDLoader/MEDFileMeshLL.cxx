@@ -460,6 +460,24 @@ MEDFileUMeshSplitL1::MEDFileUMeshSplitL1(MEDCouplingUMesh *m, bool newOrOld):_m(
   assignMesh(m,newOrOld);
 }
 
+std::size_t MEDFileUMeshSplitL1::getHeapMemorySize() const
+{
+  std::size_t ret=0;
+  if((const MEDCouplingUMesh *)_m_by_types)
+    {
+      ret+=_m_by_types->getHeapMemorySize();
+      if((const DataArrayDouble *)_m_by_types->getCoords())
+        ret-=_m_by_types->getCoords()->getHeapMemorySize();
+    }
+  if((const  DataArrayInt*)_fam)
+    ret+=_fam->getHeapMemorySize();
+  if((const  DataArrayInt*)_num)
+    ret+=_num->getHeapMemorySize();
+  if((const  DataArrayInt*)_rev_num)
+    ret+=_rev_num->getHeapMemorySize();
+  return ret;
+}
+
 MEDFileUMeshSplitL1 *MEDFileUMeshSplitL1::deepCpy() const
 {
   MEDCouplingAutoRefCountObjectPtr<MEDFileUMeshSplitL1> ret=new MEDFileUMeshSplitL1(*this);

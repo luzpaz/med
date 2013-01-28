@@ -75,6 +75,14 @@ void MEDCouplingPointSet::updateTime() const
     }
 }
 
+std::size_t MEDCouplingPointSet::getHeapMemorySize() const
+{
+  std::size_t ret=0;
+  if(_coords)
+    ret+=_coords->getHeapMemorySize();
+  return MEDCouplingMesh::getHeapMemorySize()+ret;
+}
+
 void MEDCouplingPointSet::setCoords(const DataArrayDouble *coords)
 {
   if( coords != _coords )

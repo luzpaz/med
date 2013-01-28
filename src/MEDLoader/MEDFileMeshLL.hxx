@@ -38,6 +38,7 @@ namespace ParaMEDMEM
   {
   public:
     MEDFileMeshL2();
+    std::size_t getHeapMemorySize() const { return 0; }
     const char *getName() const { return _name.getReprForWrite(); }
     const char *getDescription() const { return _description.getReprForWrite(); }
     const char *getTimeUnit() const { return _dt_unit.getReprForWrite(); }
@@ -120,6 +121,7 @@ namespace ParaMEDMEM
     MEDFileUMeshSplitL1(const MEDFileUMeshL2& l2, const char *mName, int id);
     MEDFileUMeshSplitL1(MEDCouplingUMesh *m);
     MEDFileUMeshSplitL1(MEDCouplingUMesh *m, bool newOrOld);
+    std::size_t getHeapMemorySize() const;
     MEDFileUMeshSplitL1 *deepCpy() const;
     bool isEqual(const MEDFileUMeshSplitL1 *other, double eps, std::string& what) const;
     void clearNonDiscrAttributes() const;

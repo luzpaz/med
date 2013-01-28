@@ -1080,6 +1080,14 @@ void MEDCouplingFieldDouble::updateTime() const
   updateTimeWith(*_time_discr);
 }
 
+std::size_t MEDCouplingFieldDouble::getHeapMemorySize() const
+{
+  std::size_t ret=0;
+  if(_time_discr)
+    ret+=_time_discr->getHeapMemorySize();
+  return MEDCouplingField::getHeapMemorySize()+ret;
+}
+
 void MEDCouplingFieldDouble::setNature(NatureOfField nat) throw(INTERP_KERNEL::Exception)
 {
   MEDCouplingField::setNature(nat);

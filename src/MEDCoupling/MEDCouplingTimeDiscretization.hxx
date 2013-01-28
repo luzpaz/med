@@ -40,6 +40,7 @@ namespace ParaMEDMEM
     MEDCouplingTimeDiscretization(const MEDCouplingTimeDiscretization& other, bool deepCpy);
   public:
     void updateTime() const;
+    virtual std::size_t getHeapMemorySize() const;
     static MEDCouplingTimeDiscretization *New(TypeOfTimeDiscretization type);
     void setTimeUnit(const char *unit) { _time_unit=unit; }
     const char *getTimeUnit() const { return _time_unit.c_str(); }
@@ -350,6 +351,7 @@ namespace ParaMEDMEM
     ~MEDCouplingTwoTimeSteps();
   public:
     void updateTime() const;
+    std::size_t getHeapMemorySize() const;
     void copyTinyAttrFrom(const MEDCouplingTimeDiscretization& other) throw(INTERP_KERNEL::Exception);
     void copyTinyStringsFrom(const MEDCouplingTimeDiscretization& other);
     const DataArrayDouble *getEndArray() const;

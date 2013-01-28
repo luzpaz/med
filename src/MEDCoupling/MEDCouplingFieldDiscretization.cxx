@@ -128,6 +128,11 @@ void MEDCouplingFieldDiscretization::updateTime() const
 {
 }
 
+std::size_t MEDCouplingFieldDiscretization::getHeapMemorySize() const
+{
+  return 0;
+}
+
 /*!
  * Computes normL1 of DataArrayDouble instance arr.
  * @param res output parameter expected to be of size arr->getNumberOfComponents();
@@ -781,6 +786,14 @@ void MEDCouplingFieldDiscretizationPerCell::updateTime() const
     updateTimeWith(*_discr_per_cell);
 }
 
+std::size_t MEDCouplingFieldDiscretizationPerCell::getHeapMemorySize() const
+{
+  std::size_t ret=0;
+  if(_discr_per_cell)
+    ret+=_discr_per_cell->getHeapMemorySize();
+  return ret;
+}
+
 void MEDCouplingFieldDiscretizationPerCell::checkCoherencyBetween(const MEDCouplingMesh *mesh, const DataArrayDouble *da) const throw(INTERP_KERNEL::Exception)
 {
   if(!_discr_per_cell)
@@ -951,6 +964,14 @@ std::string MEDCouplingFieldDiscretizationGauss::getStringRepr() const
       oss << "++++++++++" << std::endl;
     }
   return oss.str();
+}
+
+std::size_t MEDCouplingFieldDiscretizationGauss::getHeapMemorySize() const
+{
+  std::size_t ret=_loc.capacity()*sizeof(MEDCouplingGaussLocalization);
+  for(std::vector<MEDCouplingGaussLocalization>::const_iterator it=_loc.begin();it!=_loc.end();it++)
+    ret+=(*it).getHeapMemorySize();
+  return MEDCouplingFieldDiscretizationPerCell::getHeapMemorySize()+ret;
 }
 
 const char *MEDCouplingFieldDiscretizationGauss::getRepr() const

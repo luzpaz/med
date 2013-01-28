@@ -35,6 +35,7 @@ namespace ParaMEDMEM
   public:
     static MEDFileMesh *New(const char *fileName) throw(INTERP_KERNEL::Exception);
     static MEDFileMesh *New(const char *fileName, const char *mName, int dt=-1, int it=-1) throw(INTERP_KERNEL::Exception);
+    std::size_t getHeapMemorySize() const;
     virtual MEDFileMesh *deepCpy() const throw(INTERP_KERNEL::Exception) = 0;
     virtual MEDFileMesh *shallowCpy() const throw(INTERP_KERNEL::Exception) = 0;
     virtual bool isEqual(const MEDFileMesh *other, double eps, std::string& what) const;
@@ -166,6 +167,7 @@ namespace ParaMEDMEM
     static MEDFileUMesh *New(const char *fileName, const char *mName, int dt=-1, int it=-1) throw(INTERP_KERNEL::Exception);
     static MEDFileUMesh *New(const char *fileName) throw(INTERP_KERNEL::Exception);
     static MEDFileUMesh *New();
+    std::size_t getHeapMemorySize() const;
     MEDFileMesh *deepCpy() const throw(INTERP_KERNEL::Exception);
     MEDFileMesh *shallowCpy() const throw(INTERP_KERNEL::Exception);
     bool isEqual(const MEDFileMesh *other, double eps, std::string& what) const;
@@ -253,6 +255,7 @@ namespace ParaMEDMEM
     static MEDFileCMesh *New();
     static MEDFileCMesh *New(const char *fileName) throw(INTERP_KERNEL::Exception);
     static MEDFileCMesh *New(const char *fileName, const char *mName, int dt=-1, int it=-1) throw(INTERP_KERNEL::Exception);
+    std::size_t getHeapMemorySize() const;
     MEDFileMesh *deepCpy() const throw(INTERP_KERNEL::Exception);
     MEDFileMesh *shallowCpy() const throw(INTERP_KERNEL::Exception);
     bool isEqual(const MEDFileMesh *other, double eps, std::string& what) const;
@@ -300,6 +303,8 @@ namespace ParaMEDMEM
     static MEDFileMeshMultiTS *New();
     static MEDFileMeshMultiTS *New(const char *fileName) throw(INTERP_KERNEL::Exception);
     static MEDFileMeshMultiTS *New(const char *fileName, const char *mName) throw(INTERP_KERNEL::Exception);
+    MEDFileMeshMultiTS *deepCpy() const throw(INTERP_KERNEL::Exception);
+    std::size_t getHeapMemorySize() const;
     const char *getName() const throw(INTERP_KERNEL::Exception);
     void setName(const char *newMeshName) throw(INTERP_KERNEL::Exception);
     bool changeNames(const std::vector< std::pair<std::string,std::string> >& modifTab) throw(INTERP_KERNEL::Exception);
@@ -323,6 +328,8 @@ namespace ParaMEDMEM
   public:
     static MEDFileMeshes *New();
     static MEDFileMeshes *New(const char *fileName) throw(INTERP_KERNEL::Exception);
+    MEDFileMeshes *deepCpy() const throw(INTERP_KERNEL::Exception);
+    std::size_t getHeapMemorySize() const;
     std::string simpleRepr() const;
     void simpleReprWithoutHeader(std::ostream& oss) const;
     void write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception);

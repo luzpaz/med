@@ -378,7 +378,57 @@ namespace INTERP_KERNEL
 }
 
 %include "MEDCouplingTimeLabel.hxx"
-%include "MEDCouplingRefCountObject.hxx"
+
+namespace ParaMEDMEM
+{
+  typedef enum
+    {
+      C_DEALLOC = 2,
+      CPP_DEALLOC = 3
+    } DeallocType;
+
+  typedef enum
+    {
+      ON_CELLS = 0,
+      ON_NODES = 1,
+      ON_GAUSS_PT = 2,
+      ON_GAUSS_NE = 3,
+      ON_NODES_KR = 4
+    } TypeOfField;
+
+  typedef enum
+    {
+      NO_TIME = 4,
+      ONE_TIME = 5,
+      LINEAR_TIME = 6,
+      CONST_ON_TIME_INTERVAL = 7
+    } TypeOfTimeDiscretization;
+
+  const char *MEDCouplingVersionStr();
+  int MEDCouplingVersion();
+  PyObject *MEDCouplingVersionMajMinRel()
+  {
+    int tmp0=0,tmp1=0,tmp2=0;
+    MEDCouplingVersionMajMinRel(tmp0,tmp1,tmp2);
+    PyObject *res = PyList_New(3);
+    PyList_SetItem(res,0,SWIG_From_int(tmp0));
+    PyList_SetItem(res,1,SWIG_From_int(tmp1));
+    PyList_SetItem(res,2,SWIG_From_int(tmp2));
+    return res;
+  }
+
+  class MEDCOUPLING_EXPORT RefCountObject
+  {
+  protected:
+    RefCountObject();
+    RefCountObject(const RefCountObject& other);
+    ~RefCountObject();
+  public:
+    bool decrRef() const;
+    void incrRef() const;
+    virtual std::size_t getHeapMemorySize() const;
+  };
+}
 
 namespace ParaMEDMEM
 {
@@ -7185,19 +7235,6 @@ namespace ParaMEDMEM
       }
   };
 }
-
-%inline %{
-  PyObject *MEDCouplingVersionMajMinRel()
-  {
-    int tmp0=0,tmp1=0,tmp2=0;
-    MEDCouplingVersionMajMinRel(tmp0,tmp1,tmp2);
-    PyObject *res = PyList_New(3);
-    PyList_SetItem(res,0,SWIG_From_int(tmp0));
-    PyList_SetItem(res,1,SWIG_From_int(tmp1));
-    PyList_SetItem(res,2,SWIG_From_int(tmp2));
-    return res;
-  }
-%}
 
 %pythoncode %{
 import os

@@ -107,6 +107,18 @@ void MEDCouplingCMesh::updateTime() const
     updateTimeWith(*_z_array);
 }
 
+std::size_t MEDCouplingCMesh::getHeapMemorySize() const
+{
+  std::size_t ret=0;
+  if(_x_array)
+    ret+=_x_array->getHeapMemorySize();
+  if(_y_array)
+    ret+=_y_array->getHeapMemorySize();
+  if(_z_array)
+    ret+=_z_array->getHeapMemorySize();
+  return MEDCouplingMesh::getHeapMemorySize()+ret;
+}
+
 /*!
  * This method copyies all tiny strings from other (name and components name).
  * @throw if other and this have not same mesh type.

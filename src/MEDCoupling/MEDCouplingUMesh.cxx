@@ -73,6 +73,16 @@ MEDCouplingUMesh *MEDCouplingUMesh::clone(bool recDeepCpy) const
   return new MEDCouplingUMesh(*this,recDeepCpy);
 }
 
+std::size_t MEDCouplingUMesh::getHeapMemorySize() const
+{
+  std::size_t ret=0;
+  if(_nodal_connec)
+    ret+=_nodal_connec->getHeapMemorySize();
+  if(_nodal_connec_index)
+    ret+=_nodal_connec_index->getHeapMemorySize();
+  return MEDCouplingPointSet::getHeapMemorySize()+ret;
+}
+
 void MEDCouplingUMesh::updateTime() const
 {
   MEDCouplingPointSet::updateTime();

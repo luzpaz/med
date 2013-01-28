@@ -84,6 +84,16 @@ void DataArrayDouble::FindTupleIdsNearTuplesAlg(const BBTree<SPACEDIM,int>& myTr
     }
 }
 
+std::size_t DataArray::getHeapMemorySize() const
+{
+  std::size_t sz1=_name.capacity();
+  std::size_t sz2=_info_on_compo.capacity();
+  std::size_t sz3=0;
+  for(std::vector<std::string>::const_iterator it=_info_on_compo.begin();it!=_info_on_compo.end();it++)
+    sz3+=(*it).capacity();
+  return sz1+sz2+sz3;
+}
+
 void DataArray::setName(const char *name)
 {
   _name=name;
@@ -454,6 +464,13 @@ void DataArrayDouble::checkAllocated() const throw(INTERP_KERNEL::Exception)
 {
   if(!isAllocated())
     throw INTERP_KERNEL::Exception("DataArrayDouble::checkAllocated : Array is defined but not allocated ! Call alloc or setValues method first !");
+}
+
+std::size_t DataArrayDouble::getHeapMemorySize() const
+{
+  std::size_t sz=(std::size_t)_mem.getNbOfElemAllocated();
+  sz*=sizeof(double);
+  return DataArray::getHeapMemorySize()+sz;
 }
 
 /*!
@@ -3392,6 +3409,13 @@ void DataArrayInt::checkAllocated() const throw(INTERP_KERNEL::Exception)
 {
   if(!isAllocated())
     throw INTERP_KERNEL::Exception("DataArrayInt::checkAllocated : Array is defined but not allocated ! Call alloc or setValues method first !");
+}
+
+std::size_t DataArrayInt::getHeapMemorySize() const
+{
+  std::size_t sz=(std::size_t)_mem.getNbOfElemAllocated();
+  sz*=sizeof(int);
+  return DataArray::getHeapMemorySize()+sz;
 }
 
 /*!

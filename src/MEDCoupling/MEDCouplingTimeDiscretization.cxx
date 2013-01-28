@@ -92,6 +92,14 @@ void MEDCouplingTimeDiscretization::updateTime() const
     updateTimeWith(*_array);
 }
 
+std::size_t MEDCouplingTimeDiscretization::getHeapMemorySize() const
+{
+  std::size_t ret=_time_unit.capacity();
+  if(_array)
+    ret+=_array->getHeapMemorySize();
+  return ret;
+}
+
 bool MEDCouplingTimeDiscretization::areCompatible(const MEDCouplingTimeDiscretization *other) const
 {
   if(std::fabs(_time_tolerance-other->_time_tolerance)>1.e-16)
@@ -2037,6 +2045,14 @@ void MEDCouplingTwoTimeSteps::updateTime() const
   MEDCouplingTimeDiscretization::updateTime();
   if(_end_array)
     updateTimeWith(*_end_array);
+}
+
+std::size_t MEDCouplingTwoTimeSteps::getHeapMemorySize() const
+{
+  std::size_t ret=0;
+  if(_end_array)
+    ret+=_end_array->getHeapMemorySize();
+  return MEDCouplingTimeDiscretization::getHeapMemorySize()+ret;
 }
 
 void MEDCouplingTwoTimeSteps::copyTinyAttrFrom(const MEDCouplingTimeDiscretization& other) throw(INTERP_KERNEL::Exception)

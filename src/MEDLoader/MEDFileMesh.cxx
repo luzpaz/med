@@ -38,6 +38,20 @@ MEDFileMesh::MEDFileMesh():_order(-1),_iteration(-1),_time(0.)
 {
 }
 
+std::size_t MEDFileMesh::getHeapMemorySize() const
+{
+  std::size_t ret=_dt_unit.capacity()+_name.capacity()+_univ_name.capacity()+_desc_name.capacity();
+  for(std::map<std::string, std::vector<std::string> >::const_iterator it=_groups.begin();it!=_groups.end();it++)
+    {
+      ret+=(*it).first.capacity()+(*it).second.capacity()*sizeof(std::string);
+      for(std::vector<std::string>::const_iterator it2=(*it).second.begin();it2!=(*it).second.end();it2++)
+        ret+=(*it2).capacity();
+    }
+  for(std::map<std::string,int>::const_iterator it=_families.begin();it!=_families.end();it++)
+    ret+=(*it).first.capacity()+sizeof(int);
+  return ret;
+}
+
 MEDFileMesh *MEDFileMesh::New(const char *fileName) throw(INTERP_KERNEL::Exception)
 {
   std::vector<std::string> ms=MEDLoader::GetMeshNames(fileName);
@@ -1393,6 +1407,24 @@ MEDFileUMesh *MEDFileUMesh::New()
   return new MEDFileUMesh;
 }
 
+std::size_t MEDFileUMesh::getHeapMemorySize() const
+{
+  std::size_t ret=MEDFileMesh::getHeapMemorySize();
+  if((const DataArrayDouble*)_coords)
+    ret+=_coords->getHeapMemorySize();
+  if((const DataArrayInt *)_fam_coords)
+    ret+=_fam_coords->getHeapMemorySize();
+  if((const DataArrayInt *)_num_coords)
+    ret+=_num_coords->getHeapMemorySize();
+  if((const DataArrayInt *)_rev_num_coords)
+    ret+=_rev_num_coords->getHeapMemorySize();
+  ret+=_ms.capacity()*(sizeof(MEDCouplingAutoRefCountObjectPtr<MEDFileUMeshSplitL1>));
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileUMeshSplitL1> >::const_iterator it=_ms.begin();it!=_ms.end();it++)
+    if((const MEDFileUMeshSplitL1*) *it)
+      ret+=(*it)->getHeapMemorySize();
+  return ret;
+}
+
 MEDFileMesh *MEDFileUMesh::shallowCpy() const throw(INTERP_KERNEL::Exception)
 {
   MEDCouplingAutoRefCountObjectPtr<MEDFileUMesh> ret=new MEDFileUMesh(*this);
@@ -2724,6 +2756,26 @@ MEDFileCMesh *MEDFileCMesh::New(const char *fileName, const char *mName, int dt,
   return new MEDFileCMesh(fid,mName,dt,it);
 }
 
+std::size_t MEDFileCMesh::getHeapMemorySize() const
+{
+  std::size_t ret=MEDFileMesh::getHeapMemorySize();
+  if((const MEDCouplingCMesh *)_cmesh)
+    ret+=_cmesh->getHeapMemorySize();
+  if((const DataArrayInt*)_fam_nodes)
+    ret+=_fam_nodes->getHeapMemorySize();
+  if((const DataArrayInt*)_num_nodes)
+    ret+=_num_nodes->getHeapMemorySize();
+  if((const DataArrayInt*)_fam_cells)
+    ret+=_fam_cells->getHeapMemorySize();
+  if((const DataArrayInt*)_num_cells)
+    ret+=_num_cells->getHeapMemorySize();
+  if((const DataArrayInt*)_rev_num_nodes)
+    ret+=_rev_num_nodes->getHeapMemorySize();
+  if((const DataArrayInt*)_rev_num_cells)
+    ret+=_rev_num_cells->getHeapMemorySize();
+  return ret;
+}
+
 int MEDFileCMesh::getMaxFamilyIdInArrays() const throw(INTERP_KERNEL::Exception)
 {
   int ret=-std::numeric_limits<int>::max(),tmp=-1;
@@ -3270,6 +3322,26 @@ MEDFileMeshMultiTS *MEDFileMeshMultiTS::New(const char *fileName, const char *mN
   return new MEDFileMeshMultiTS(fileName,mName);
 }
 
+MEDFileMeshMultiTS *MEDFileMeshMultiTS::deepCpy() const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileMeshMultiTS> ret=MEDFileMeshMultiTS::New();
+  std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileMesh> > meshOneTs(_mesh_one_ts.size());
+  std::size_t i=0;
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileMesh> >::const_iterator it=_mesh_one_ts.begin();it!=_mesh_one_ts.end();it++,i++)
+    if((const MEDFileMesh *)*it)
+      meshOneTs[i]=(*it)->deepCpy();
+  ret->_mesh_one_ts=meshOneTs;
+  return ret.retn();
+}
+
+std::size_t MEDFileMeshMultiTS::getHeapMemorySize() const
+{
+  std::size_t ret=_mesh_one_ts.capacity()*sizeof(MEDCouplingAutoRefCountObjectPtr<MEDFileMesh>);
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileMesh> >::const_iterator it=_mesh_one_ts.begin();it!=_mesh_one_ts.end();it++)
+    ret+=(*it)->getHeapMemorySize();
+  return ret;
+}
+
 const char *MEDFileMeshMultiTS::getName() const throw(INTERP_KERNEL::Exception)
 {
   if(_mesh_one_ts.empty())
@@ -3525,6 +3597,27 @@ try
 catch(INTERP_KERNEL::Exception& e)
   {
   }
+
+MEDFileMeshes *MEDFileMeshes::deepCpy() const throw(INTERP_KERNEL::Exception)
+{
+  std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileMeshMultiTS> > meshes(_meshes.size());
+  std::size_t i=0;
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileMeshMultiTS> >::const_iterator it=_meshes.begin();it!=_meshes.end();it++,i++)
+    if((const MEDFileMeshMultiTS *)*it)
+      meshes[i]=(*it)->deepCpy();
+  MEDCouplingAutoRefCountObjectPtr<MEDFileMeshes> ret=MEDFileMeshes::New();
+  ret->_meshes=meshes;
+  return ret.retn();
+}
+
+std::size_t MEDFileMeshes::getHeapMemorySize() const
+{
+  std::size_t ret=_meshes.capacity()*(sizeof(MEDCouplingAutoRefCountObjectPtr<MEDFileMeshMultiTS>));
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileMeshMultiTS> >::const_iterator it=_meshes.begin();it!=_meshes.end();it++)
+    if((const MEDFileMeshMultiTS*)*it)
+      ret+=(*it)->getHeapMemorySize();
+  return ret; 
+}
 
 std::string MEDFileMeshes::simpleRepr() const
 {

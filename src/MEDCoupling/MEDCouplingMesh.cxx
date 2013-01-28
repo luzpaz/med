@@ -43,6 +43,11 @@ MEDCouplingMesh::MEDCouplingMesh(const MEDCouplingMesh& other):_name(other._name
 {
 }
 
+std::size_t MEDCouplingMesh::getHeapMemorySize() const
+{
+  return _name.capacity()+_description.capacity()+_time_unit.capacity();
+}
+
 /*!
  * This method is only for ParaMEDMEM in ParaFIELD constructor.
  */

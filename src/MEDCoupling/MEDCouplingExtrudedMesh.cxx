@@ -64,6 +64,18 @@ MEDCouplingMeshType MEDCouplingExtrudedMesh::getType() const
   return EXTRUDED;
 }
 
+std::size_t MEDCouplingExtrudedMesh::getHeapMemorySize() const
+{
+  std::size_t ret=0;
+  if(_mesh2D)
+    ret+=_mesh2D->getHeapMemorySize();
+  if(_mesh1D)
+    ret+=_mesh1D->getHeapMemorySize();
+  if(_mesh3D_ids)
+    ret+=_mesh3D_ids->getHeapMemorySize();
+  return MEDCouplingMesh::getHeapMemorySize()+ret;
+}
+
 /*!
  * This method copyies all tiny strings from other (name and components name).
  * @throw if other and this have not same mesh type.

@@ -58,6 +58,21 @@ MEDCouplingUMeshDesc *MEDCouplingUMeshDesc::New(const char *meshName, int meshDi
   return ret;
 }
 
+std::size_t MEDCouplingUMeshDesc::getHeapMemorySize() const
+{
+  std::size_t ret=0;
+  if(_desc_connec)
+    ret+=_desc_connec->getHeapMemorySize();
+  if(_desc_connec_index)
+    ret+=_desc_connec_index->getHeapMemorySize();
+  if(_nodal_connec_face)
+    ret+=_nodal_connec_face->getHeapMemorySize();
+  if(_nodal_connec_face_index)
+    ret+=_nodal_connec_face_index->getHeapMemorySize();
+  return MEDCouplingPointSet::getHeapMemorySize()+ret;
+}
+
+
 MEDCouplingMesh *MEDCouplingUMeshDesc::deepCpy() const
 {
   throw INTERP_KERNEL::Exception("Not implemented yet !");
