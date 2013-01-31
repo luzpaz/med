@@ -10872,6 +10872,23 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertEqual(155.,d.accumulate(2))
         pass
 
+    def testSwigUMeshDistanceToMesh1(self):
+        m=MEDCouplingUMesh("toto",2)
+        coords=DataArrayDouble([2.3,3.4,5.6,6.5,-4.3,3.2,-9.8,7.6,-5.4],3,3)
+        m.setCoords(coords)
+        m.allocateCells(0)
+        m.insertNextCell(NORM_TRI3,[0,1,2])
+        a,b,c=m.distanceToPoint([-0.335,2.27,1.21])
+        self.assertEqual(0,b) ; self.assertEqual(0,c)
+        self.assertAlmostEqual(0.022360988100374124,a,14);
+        a,b,c=m.distanceToPoint(DataArrayDouble([-0.335,2.27,1.21],1,3))
+        self.assertEqual(0,b) ; self.assertEqual(0,c)
+        self.assertAlmostEqual(0.022360988100374124,a,14);
+        a,b=coords.distanceToTuple([-0.335,2.27,1.21])
+        self.assertAlmostEqual(5.243302871282566,a,14)
+        self.assertEqual(0,b)
+        pass
+
     def setUp(self):
         pass
     pass
