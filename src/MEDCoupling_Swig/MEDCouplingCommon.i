@@ -811,18 +811,18 @@ namespace ParaMEDMEM
           return ret;
         }
 
-         void translate(PyObject *vector) throw(INTERP_KERNEL::Exception)
-         {
-           double val;
-           DataArrayDouble *a;
-           DataArrayDoubleTuple *aa;
-           std::vector<double> bb;
-           int sw;
-           int spaceDim=self->getSpaceDimension();
-           const char msg[]="Python wrap of MEDCouplingPointSet::translate : ";
-           const double *vectorPtr=convertObjToPossibleCpp5_Safe(vector,sw,val,a,aa,bb,msg,1,spaceDim,true);
-           self->translate(vectorPtr);
-         }
+        void translate(PyObject *vector) throw(INTERP_KERNEL::Exception)
+        {
+          double val;
+          DataArrayDouble *a;
+          DataArrayDoubleTuple *aa;
+          std::vector<double> bb;
+          int sw;
+          int spaceDim=self->getSpaceDimension();
+          const char msg[]="Python wrap of MEDCouplingPointSet::translate : ";
+          const double *vectorPtr=convertObjToPossibleCpp5_Safe(vector,sw,val,a,aa,bb,msg,1,spaceDim,true);
+          self->translate(vectorPtr);
+        }
 
          void rotate(PyObject *center, double alpha) throw(INTERP_KERNEL::Exception)
          {
@@ -1729,6 +1729,25 @@ namespace ParaMEDMEM
         PyList_SetItem(res,0,SWIG_NewPointerObj(SWIG_as_voidptr(v0),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
         PyList_SetItem(res,1,SWIG_NewPointerObj(SWIG_as_voidptr(v1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
         return res;
+      }
+      
+      PyObject *distanceToPoint(PyObject *point) const throw(INTERP_KERNEL::Exception)
+      {
+        double val;
+        DataArrayDouble *a;
+        DataArrayDoubleTuple *aa;
+        std::vector<double> bb;
+        int sw;
+        int nbOfCompo=self->getSpaceDimension();
+        const double *pt=convertObjToPossibleCpp5_Safe(point,sw,val,a,aa,bb,"Python wrap of MEDCouplingUMesh::distanceToPoint",1,nbOfCompo,true);
+        //
+        int cellId=-1,nodeId=-1;
+        double ret0=self->distanceToPoint(pt,pt+nbOfCompo,cellId,nodeId);
+        PyObject *ret=PyTuple_New(3);
+        PyTuple_SetItem(ret,0,PyFloat_FromDouble(ret0));
+        PyTuple_SetItem(ret,1,PyInt_FromLong(cellId));
+        PyTuple_SetItem(ret,2,PyInt_FromLong(nodeId));
+        return ret;
       }
 
       PyObject *mergeNodes(double precision) throw(INTERP_KERNEL::Exception)
@@ -3273,6 +3292,24 @@ namespace ParaMEDMEM
      PyList_SetItem(res,0,SWIG_NewPointerObj(SWIG_as_voidptr(comm),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
      PyList_SetItem(res,1,SWIG_NewPointerObj(SWIG_as_voidptr(commIndex),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
      return res;
+   }
+
+   PyObject *distanceToTuple(PyObject *tuple) const throw(INTERP_KERNEL::Exception)
+   {
+     double val;
+     DataArrayDouble *a;
+     DataArrayDoubleTuple *aa;
+     std::vector<double> bb;
+     int sw;
+     int tupleId=-1,nbTuples=-1,nbOfCompo=self->getNumberOfComponents();
+     const double *pt=convertObjToPossibleCpp5_Safe(tuple,sw,val,a,aa,bb,"Python wrap of DataArrayDouble::distanceToTuple",1,nbOfCompo,true);
+     //
+     int cellId=-1,nodeId=-1;
+     double ret0=self->distanceToTuple(pt,pt+nbOfCompo,tupleId);
+     PyObject *ret=PyTuple_New(2);
+     PyTuple_SetItem(ret,0,PyFloat_FromDouble(ret0));
+     PyTuple_SetItem(ret,1,PyInt_FromLong(tupleId));
+     return ret;
    }
 
    void setSelectedComponents(const DataArrayDouble *a, PyObject *li) throw(INTERP_KERNEL::Exception)

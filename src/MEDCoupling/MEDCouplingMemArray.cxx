@@ -1956,6 +1956,45 @@ void DataArrayDouble::accumulate(double *res) const throw(INTERP_KERNEL::Excepti
     std::transform(ptr+i*nbComps,ptr+(i+1)*nbComps,res,res,std::plus<double>());
 }
 
+/*!
+ * This method returns the min distance from an external tuple defined by [ \a tupleBg , \a tupleEnd ) to \a this and
+ * the first tuple in \a this that matches the returned distance. If there is no tuples in \a this an exception will be thrown.
+ *
+ *
+ * \a this is expected to be allocated and expected to have a number of components equal to the distance from \a tupleBg to
+ * \a tupleEnd. If not an exception will be thrown.
+ *
+ * \param [in] tupleBg start pointer (included) of input external tuple
+ * \param [in] tupleEnd end pointer (not included) of input external tuple
+ * \param [out] tupleId the tuple id in \a this that matches the min of distance between \a this and input external tuple
+ * \return the min distance.
+ * \sa MEDCouplingUMesh::distanceToPoint
+ */
+double DataArrayDouble::distanceToTuple(const double *tupleBg, const double *tupleEnd, int& tupleId) const throw(INTERP_KERNEL::Exception)
+{
+  checkAllocated();
+  int nbTuple=getNumberOfTuples();
+  int nbComps=getNumberOfComponents();
+  if(nbComps!=(int)std::distance(tupleBg,tupleEnd))
+    { std::ostringstream oss; oss << "DataArrayDouble::distanceToTuple : size of input tuple is " << std::distance(tupleBg,tupleEnd) << " should be equal to the number of components in this : " << nbComps << " !"; throw INTERP_KERNEL::Exception(oss.str().c_str()); }
+  if(nbTuple==0)
+    throw INTERP_KERNEL::Exception("DataArrayDouble::distanceToTuple : no tuple in this ! No distance to compute !");
+  double ret0=std::numeric_limits<double>::max();
+  tupleId=-1;
+  const double *work=getConstPointer();
+  for(int i=0;i<nbTuple;i++)
+    {
+      double val=0.;
+      for(int j=0;j<nbComps;j++,work++) 
+        val+=(*work-tupleBg[j])*((*work-tupleBg[j]));
+      if(val>=ret0)
+        continue;
+      else
+        { ret0=val; tupleId=i; }
+    }
+  return sqrt(ret0);
+}
+
 double DataArrayDouble::accumulate(int compId) const throw(INTERP_KERNEL::Exception)
 {
   checkAllocated();

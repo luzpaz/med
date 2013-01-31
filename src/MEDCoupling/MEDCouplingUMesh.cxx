@@ -1068,7 +1068,7 @@ void MEDCouplingUMesh::simplifyPolyhedra(double eps) throw(INTERP_KERNEL::Except
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> connINew=DataArrayInt::New();
   connINew->alloc(nbOfCells+1,1);
   int *connINewPtr=connINew->getPointer(); *connINewPtr++=0;
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> connNew=DataArrayInt::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> connNew=DataArrayInt::New(); connNew->alloc(0,1);
   bool changed=false;
   for(int i=0;i<nbOfCells;i++,connINewPtr++)
     {
@@ -1470,7 +1470,7 @@ void MEDCouplingUMesh::findCommonCells(int compType, int startCellId, DataArrayI
 void MEDCouplingUMesh::FindCommonCellsAlg(int compType, int startCellId, const DataArrayInt *nodal, const DataArrayInt *nodalI, const DataArrayInt *revNodal, const DataArrayInt *revNodalI,
                                           DataArrayInt *& commonCellsArr, DataArrayInt *& commonCellsIArr) throw(INTERP_KERNEL::Exception)
 {
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> commonCells=DataArrayInt::New(),commonCellsI=DataArrayInt::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> commonCells=DataArrayInt::New(),commonCellsI=DataArrayInt::New(); commonCells->alloc(0,1);
   int nbOfCells=nodalI->getNumberOfTuples()-1;
   commonCellsI->reserve(1); commonCellsI->pushBackSilent(0);
   const int *revNodalPtr=revNodal->getConstPointer(),*revNodalIPtr=revNodalI->getConstPointer();
@@ -1908,7 +1908,7 @@ DataArrayInt *MEDCouplingUMesh::getCellIdsFullyIncludedInNodeIds(const int *part
  */
 void MEDCouplingUMesh::fillCellIdsToKeepFromNodeIds(const int *begin, const int *end, bool fullyIn, DataArrayInt *&cellIdsKeptArr) const
 {
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> cellIdsKept=DataArrayInt::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> cellIdsKept=DataArrayInt::New(); cellIdsKept->alloc(0,1);
   checkConnectivityFullyDefined();
   int tmp=-1;
   int sz=getNodalConnectivity()->getMaxValue(tmp); sz=std::max(sz,0)+1;
@@ -3319,7 +3319,7 @@ MEDCouplingUMesh *MEDCouplingUMesh::buildSlice3D(const double *origin, const dou
                               mDesc1->getNodalConnectivity()->getConstPointer(),mDesc1->getNodalConnectivityIndex()->getConstPointer(),
                               desc1->getConstPointer(),descIndx1->getConstPointer(),cut3DSurf);
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> conn(DataArrayInt::New()),connI(DataArrayInt::New()),cellIds2(DataArrayInt::New());
-  connI->pushBackSilent(0);
+  connI->pushBackSilent(0); conn->alloc(0,1); cellIds2->alloc(0,1);
   subMesh->assemblyForSplitFrom3DSurf(cut3DSurf,desc2->getConstPointer(),descIndx2->getConstPointer(),conn,connI,cellIds2);
   if(cellIds2->empty())
     throw INTERP_KERNEL::Exception("MEDCouplingUMesh::buildSlice3D : No 3D cells in this intercepts the specified plane !");
@@ -3374,6 +3374,7 @@ MEDCouplingUMesh *MEDCouplingUMesh::buildSlice3DSurf(const double *origin, const
                               mDesc1->getNodalConnectivity()->getConstPointer(),mDesc1->getNodalConnectivityIndex()->getConstPointer(),
                               desc1->getConstPointer(),descIndx1->getConstPointer(),cut3DSurf);
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> conn(DataArrayInt::New()),connI(DataArrayInt::New()),cellIds2(DataArrayInt::New()); connI->pushBackSilent(0);
+  conn->alloc(0,1);
   const int *nodal=subMesh->getNodalConnectivity()->getConstPointer();
   const int *nodalI=subMesh->getNodalConnectivityIndex()->getConstPointer();
   for(int i=0;i<ncellsSub;i++)
@@ -3514,6 +3515,133 @@ void MEDCouplingUMesh::project1D(const double *pt, const double *v, double eps, 
        res[i]=std::accumulate(tmp,tmp+3,0.);
      }
    f->decrRef();
+}
+
+/*!
+ * This method computes the distance from a point \a pt to \a this and the first \a cellId and \a nodeId in \a this corresponding to the returned distance. 
+ * \a this is expected to be a mesh so that its space dimension is equal to its
+ * mesh dimension + 1. Furthermore only mesh dimension 1 and 2 are supported for the moment.
+ * Distance from \a ptBg to \a ptEnd is expected to be equal to the space dimension. \a this is also expected to be fully defined (connectivity and coordinates).
+ * 
+ * This method firstly find the closer node in \a this to the requested point whose coordinates are defined by [ \a ptBg, \a ptEnd ). Then for this node found 
+ * the cells sharing this node (if any) are considered to find if the distance to these cell are smaller than the result found previously. If no cells are linked
+ * to the node that minimizes distance with the input point then -1 is returned in cellId.
+ *
+ * So this method is more accurate (so, more costly) than simply searching for the closest point in \a this.
+ * If only this information is enough for you simply call \c getCoords()->distanceToTuple on \a this.
+ *
+ * \param [in] ptBg the start pointer (included) of the coordinates of the point
+ * \param [in] ptEnd the end pointer (not included) of the coordinates of the point
+ * \param [out] cellId that corresponds to minimal distance. If the closer node is not linked to any cell in \a this -1 is returned.
+ * \return the positive value of the distance.
+ * \throw if distance from \a ptBg to \a ptEnd is not equal to the space dimension. An exception is also thrown if mesh dimension of \a this is not equal to space
+ * dimension - 1.
+ * \sa DataArrayDouble::distanceToTuple
+ */
+double MEDCouplingUMesh::distanceToPoint(const double *ptBg, const double *ptEnd, int& cellId, int& nodeId) const throw(INTERP_KERNEL::Exception)
+{
+  int meshDim=getMeshDimension(),spaceDim=getSpaceDimension();
+  if(meshDim!=spaceDim-1)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::distanceToPoint works only for spaceDim=meshDim+1 !");
+  if(meshDim!=2 && meshDim!=1)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::distanceToPoint : only mesh dimension 2 and 1 are implemented !");
+  checkFullyDefined();
+  if((int)std::distance(ptBg,ptEnd)!=spaceDim)
+    { std::ostringstream oss; oss << "MEDCouplingUMesh::distanceToPoint : input point has to have dimension equal to the space dimension of this (" << spaceDim << ") !"; throw INTERP_KERNEL::Exception(oss.str().c_str()); }
+  nodeId=-1;
+  double ret0=_coords->distanceToTuple(ptBg,ptEnd,nodeId);
+  if(nodeId==-1)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::distanceToPoint : something wrong with nodes in this !");
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> cellIds=getCellIdsLyingOnNodes(&nodeId,&nodeId+1,false);
+  switch(meshDim)
+    {
+    case 2:
+      {
+        distanceToPoint3DSurfAlg(ptBg,cellIds,ret0,cellId);
+        return ret0;
+      }
+    case 1:
+      {
+        distanceToPoint2DCurveAlg(ptBg,cellIds,ret0,cellId);
+        return ret0;
+      }
+    default:
+      throw INTERP_KERNEL::Exception("MEDCouplingUMesh::distanceToPoint : only mesh dimension 2 and 1 are implemented !");
+    }
+  
+  return ret0;
+}
+
+
+/*!
+ * \param [in] pt the start pointer (included) of the coordinates of the point
+ * \param [in] cellIds
+ * \param [in,out] ret0 the min distance between \a this and the external input point
+ * \param [out] cellId that corresponds to minimal distance. If the closer node is not linked to any cell in \a this -1 is returned.
+ * \sa MEDCouplingUMesh::distanceToPoint
+ */
+void MEDCouplingUMesh::distanceToPoint3DSurfAlg(const double *pt, const DataArrayInt *cellIds, double& ret0, int& cellId) const throw(INTERP_KERNEL::Exception)
+{
+  const double *coords=_coords->getConstPointer();
+  cellId=-1; 
+  if(cellIds->empty())
+    return;
+  const int *ptr=_nodal_connec->getConstPointer();
+  const int *ptrI=_nodal_connec_index->getConstPointer();
+  for(const int *zeCell=cellIds->begin();zeCell!=cellIds->end();zeCell++)
+    {
+      switch((INTERP_KERNEL::NormalizedCellType)ptr[ptrI[*zeCell]])
+        {
+        case INTERP_KERNEL::NORM_TRI3:
+          {
+            double tmp=INTERP_KERNEL::DistanceFromPtToTriInSpaceDim3(pt,coords+3*ptr[ptrI[*zeCell]+1],coords+3*ptr[ptrI[*zeCell]+2],coords+3*ptr[ptrI[*zeCell]+3]);
+            if(tmp<ret0)
+              { ret0=tmp; cellId=*zeCell; }
+            break;
+          }
+        case INTERP_KERNEL::NORM_QUAD4:
+        case INTERP_KERNEL::NORM_POLYGON:
+          {
+            double tmp=INTERP_KERNEL::DistanceFromPtToPolygonInSpaceDim3(pt,ptr+ptrI[*zeCell]+1,ptr+ptrI[*zeCell+1],coords);
+            if(tmp<ret0)
+              { ret0=tmp; cellId=*zeCell; }
+            break;
+          }
+        default:
+          throw INTERP_KERNEL::Exception("MEDCouplingUMesh::distanceToPoint3DSurfAlg : not managed cell type ! Supporting TRI3, QUAD4 and POLYGON !");
+        }
+    }
+}
+
+/*!
+ * \param [in] pt the start pointer (included) of the coordinates of the point
+ * \param [in] cellIds
+ * \param [in,out] ret0 the min distance between \a this and the external input point
+ * \param [out] cellId that corresponds to minimal distance. If the closer node is not linked to any cell in \a this -1 is returned.
+ * \sa MEDCouplingUMesh::distanceToPoint
+ */
+void MEDCouplingUMesh::distanceToPoint2DCurveAlg(const double *pt, const DataArrayInt *cellIds, double& ret0, int& cellId) const throw(INTERP_KERNEL::Exception)
+{
+  const double *coords=_coords->getConstPointer();
+  if(cellIds->empty())
+    { cellId=-1; return; }
+  const int *ptr=_nodal_connec->getConstPointer();
+  const int *ptrI=_nodal_connec_index->getConstPointer();
+  for(const int *zeCell=cellIds->begin();zeCell!=cellIds->end();zeCell++)
+    {
+       switch((INTERP_KERNEL::NormalizedCellType)ptr[ptrI[*zeCell]])
+        {
+        case INTERP_KERNEL::NORM_SEG2:
+          {
+            double tmp=INTERP_KERNEL::DistanceFromPtToSegInSpaceDim2(pt,coords+2*ptr[ptrI[*zeCell]+1],coords+2*ptr[ptrI[*zeCell]+2]);
+            if(tmp<ret0)
+              { ret0=tmp; cellId=*zeCell; }
+            break;
+          }
+        default:
+          throw INTERP_KERNEL::Exception("MEDCouplingUMesh::distanceToPoint2DCurveAlg : not managed cell type ! Supporting SEG2 !");
+        }
+    }
 }
 
 /*!
@@ -3818,6 +3946,7 @@ DataArrayInt *MEDCouplingUMesh::convexEnvelop2D() throw(INTERP_KERNEL::Exception
   const int *nodalConnecIndexIn=_nodal_connec_index->getConstPointer();
   std::set<INTERP_KERNEL::NormalizedCellType> types;
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> isChanged(DataArrayInt::New());
+  isChanged->alloc(0,1);
   for(int i=0;i<nbOfCells;i++,workIndexOut++)
     {
       int pos=nodalConnecOut->getNumberOfTuples();
@@ -5628,6 +5757,7 @@ MEDCouplingUMesh *MEDCouplingUMesh::AggregateSortedByTypeMeshesOnSameCoords(cons
   std::vector< MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> > m1ssmSingleAuto;
   int fake=0,rk=0;
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret1(DataArrayInt::New()),ret2(DataArrayInt::New());
+  ret1->alloc(0,1); ret2->alloc(0,1);
   for(std::vector<const MEDCouplingUMesh *>::const_iterator it=ms2.begin();it!=ms2.end();it++,rk++)
     {
       if(meshDim!=(*it)->getMeshDimension())
