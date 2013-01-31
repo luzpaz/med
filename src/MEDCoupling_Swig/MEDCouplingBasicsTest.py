@@ -10887,6 +10887,33 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         a,b=coords.distanceToTuple([-0.335,2.27,1.21])
         self.assertAlmostEqual(5.243302871282566,a,14)
         self.assertEqual(0,b)
+        #
+        m=MEDCouplingUMesh("toto",2)
+        coords=DataArrayDouble([0.,0.,0., 8.,0.,0., 8.,8.,0., 0.,8.,0.],4,3)
+        m.setCoords(coords)
+        m.allocateCells(0)
+        m.insertNextCell(NORM_QUAD4,[0,1,2,3])
+        a,b,c=m.distanceToPoint([5.,2.,0.1])
+        self.assertAlmostEqual(0.1,a,14) ; self.assertEqual(0,b) ; self.assertEqual(1,c)
+        a,b,c=m.distanceToPoint([5.,-2.,4.])
+        self.assertAlmostEqual(sqrt(2*2+4*4),a,14) ; self.assertEqual(0,b) ; self.assertEqual(1,c)
+        a,b,c=m.distanceToPoint([11.,3.,4.])
+        self.assertAlmostEqual(sqrt(3*3+4*4),a,14) ; self.assertEqual(0,b) ; self.assertEqual(1,c)
+        a,b,c=m.distanceToPoint([4.,12.,5.])
+        self.assertAlmostEqual(sqrt(4*4+5*5),a,14) ; self.assertEqual(0,b) ; self.assertEqual(2,c)
+        d=DataArrayDouble([-1.2,3.,2.],1,3)
+        for elt in d:
+            a,b,c=m.distanceToPoint(d)
+            self.assertAlmostEqual(sqrt(1.2*1.2+2*2),a,14) ; self.assertEqual(0,b) ; self.assertEqual(0,c)
+            pass
+        #
+        m=MEDCouplingUMesh("toto",1)
+        coords=DataArrayDouble([0.,0.,4.,0.,0.,4.],3,2) ; m.setCoords(coords)
+        m.allocateCells(0) ; m.insertNextCell(NORM_SEG2,[0,1]) ; m.insertNextCell(NORM_SEG2,[1,2])
+        a,b,c=m.distanceToPoint([-0.1,4.1])
+        self.assertAlmostEqual(0.14142135623730925,a,14) ; self.assertEqual(-1,b) ; self.assertEqual(2,c)
+        a,b,c=m.distanceToPoint([0.,3.9])
+        self.assertAlmostEqual(0.07071067811865482,a,14) ; self.assertEqual(1,b) ; self.assertEqual(2,c)
         pass
 
     def setUp(self):

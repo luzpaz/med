@@ -19,13 +19,15 @@
 // Author : Anthony Geay (CEA/DEN)
 
 #include "VolSurfUser.hxx"
+#include "InterpKernelAutoPtr.hxx"
 
 #include <cmath>
 #include <limits>
+#include <algorithm>
 
 namespace INTERP_KERNEL
 {
-  double DistanceFromPtToSegInSpaceDim2(const double *pt, const double *pt0Seg2, const double *pt1Seg2) throw(INTERP_KERNEL::Exception)
+  double SquareDistanceFromPtToSegInSpaceDim2(const double *pt, const double *pt0Seg2, const double *pt1Seg2) throw(INTERP_KERNEL::Exception)
   {
     double dx=pt1Seg2[0]-pt0Seg2[0],dy=pt1Seg2[1]-pt0Seg2[1];
     double norm=sqrt(dx*dx+dy*dy);
@@ -37,7 +39,7 @@ namespace INTERP_KERNEL
     if(dotP<0. || dotP>norm)
       return std::numeric_limits<double>::max();
     double x=pt0Seg2[0]+dotP*dx,y=pt0Seg2[1]+dotP*dy;
-    return sqrt((x-pt[0])*(x-pt[0])+(y-pt[1])*(y-pt[1]));
+    return (x-pt[0])*(x-pt[0])+(y-pt[1])*(y-pt[1]);
   }
 
   double DistanceFromPtToTriInSpaceDim3(const double *pt, const double *pt0Tri3, const double *pt1Tri3, const double *pt2Tri3) throw(INTERP_KERNEL::Exception)
@@ -56,12 +58,12 @@ namespace INTERP_KERNEL
     int nbOfHint=0;
     if(xy[0]>0. && xy[0]<xy1[0])
       { ret=std::min(ret,sqrt(z*z+xy[1]*xy[1])); nbOfHint++; } //distance pt to edge [pt0Tri3,pt1Tri3]
-    double tmp=DistanceFromPtToSegInSpaceDim2(xy,xy1,xy2); //distance pt to edge [pt1Tri3,pt2Tri3]
+    double tmp=SquareDistanceFromPtToSegInSpaceDim2(xy,xy1,xy2); //distance pt to edge [pt1Tri3,pt2Tri3]
     if(tmp!=std::numeric_limits<double>::max())
-      { ret=std::min(ret,tmp); nbOfHint++; }
-    tmp=DistanceFromPtToSegInSpaceDim2(xy,xy2,xy0);//distance pt to edge [pt2Tri3,pt0Tri3]
+      { ret=std::min(ret,sqrt(z*z+tmp)); nbOfHint++; }
+    tmp=SquareDistanceFromPtToSegInSpaceDim2(xy,xy2,xy0);//distance pt to edge [pt2Tri3,pt0Tri3]
     if(tmp!=std::numeric_limits<double>::max())
-      { ret=std::min(ret,tmp); nbOfHint++; }
+      { ret=std::min(ret,sqrt(z*z+tmp)); nbOfHint++; }
     if(nbOfHint==3)
       ret=std::min(ret,fabs(z));
     return ret;
@@ -69,16 +71,51 @@ namespace INTERP_KERNEL
 
   double DistanceFromPtToPolygonInSpaceDim3(const double *pt, const int *connOfPolygonBg, const int *connOfPolygonEnd, const double *coords) throw(INTERP_KERNEL::Exception)
   {
-    return 0.;
+    std::size_t nbOfEdges=std::distance(connOfPolygonBg,connOfPolygonEnd);
+    if(nbOfEdges<3)
+      throw INTERP_KERNEL::Exception("DistanceFromPtToPolygonInSpaceDim3 : trying to compute a distance to a polygon containing less than 3 edges !");
+    double baryOfNodes[3]={0.,0.,0.};
+    for(std::size_t i=0;i<nbOfEdges;i++)
+      { baryOfNodes[0]+=coords[3*connOfPolygonBg[i]]; baryOfNodes[1]+=coords[3*connOfPolygonBg[i]+1]; baryOfNodes[2]+=coords[3*connOfPolygonBg[i]+2]; }
+    std::transform(baryOfNodes,baryOfNodes+3,baryOfNodes,std::bind2nd(std::multiplies<double>(),1./((double)nbOfEdges)));
+    double matrix[12];
+    if(!ComputeRotTranslationMatrixToPut3PointsOnOXY(coords+3*connOfPolygonBg[0],coords+3*connOfPolygonBg[1],baryOfNodes,matrix))
+      return std::numeric_limits<double>::max();
+    INTERP_KERNEL::AutoPtr<double> ptXY=new double[2*nbOfEdges]; ptXY[0]=0.; ptXY[1]=0.;
+    ptXY[2]=matrix[0]*coords[3*connOfPolygonBg[1]]+matrix[1]*coords[3*connOfPolygonBg[1]+1]+matrix[2]*coords[3*connOfPolygonBg[1]+2]+matrix[3]; ptXY[3]=0.;
+    for(std::size_t i=2;i<nbOfEdges;i++)
+      {
+        ptXY[2*i]=matrix[0]*coords[3*connOfPolygonBg[i]]+matrix[1]*coords[3*connOfPolygonBg[i]+1]+matrix[2]*coords[3*connOfPolygonBg[i]+2]+matrix[3];
+        ptXY[2*i+1]=matrix[4]*coords[3*connOfPolygonBg[i]]+matrix[5]*coords[3*connOfPolygonBg[i]+1]+matrix[6]*coords[3*connOfPolygonBg[i]+2]+matrix[7];
+      }
+    double xy[2]={matrix[0]*pt[0]+matrix[1]*pt[1]+matrix[2]*pt[2]+matrix[3],matrix[4]*pt[0]+matrix[5]*pt[1]+matrix[6]*pt[2]+matrix[7]};
+    double z=matrix[8]*pt[0]+matrix[9]*pt[1]+matrix[10]*pt[2]+matrix[11];
+    double ret=std::numeric_limits<double>::max();
+    std::size_t nbOfHint=0;
+    for(std::size_t i=0;i<nbOfEdges;i++)
+      {
+        double tmp=SquareDistanceFromPtToSegInSpaceDim2(xy,((double *)ptXY)+2*i,((double *)ptXY)+2*((i+1)%nbOfEdges));
+        if(tmp!=std::numeric_limits<double>::max())
+          { ret=std::min(ret,sqrt(z*z+tmp)); nbOfHint++; }
+      }
+    if(nbOfHint==nbOfEdges)
+      ret=std::min(ret,fabs(z));
+    return ret;
   }
 
+  /*!
+   * \param [out] matrix contain a dense matrix of size 12 with 3 rows containing each 4 colums. This matrix is the reduction of 4x4 matrix but the last
+   *              line containing [0,0,0,1] is omitted.
+   */
   bool ComputeRotTranslationMatrixToPut3PointsOnOXY(const double *p0, const double *p1, const double *p2, double *matrix)
   {
     double norm=sqrt((p1[0]-p0[0])*(p1[0]-p0[0])+(p1[1]-p0[1])*(p1[1]-p0[1])+(p1[2]-p0[2])*(p1[2]-p0[2]));
     double c=(p1[0]-p0[0])/norm;
     double s=sqrt(1-c*c);
     double y=p1[2]-p0[2],z=p0[1]-p1[1];
-    norm=sqrt(y*y+z*z); y/=norm; z/=norm;
+    norm=sqrt(y*y+z*z);
+    if(norm!=0.)
+      { y/=norm; z/=norm; }
     double r0[9]={c,-z*s,y*s,
                   z*s,y*y*(1-c)+c,y*z*(1-c),
                   -y*s,z*y*(1-c),z*z*(1-c)+c};

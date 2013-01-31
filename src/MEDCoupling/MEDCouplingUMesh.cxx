@@ -3633,7 +3633,8 @@ void MEDCouplingUMesh::distanceToPoint2DCurveAlg(const double *pt, const DataArr
         {
         case INTERP_KERNEL::NORM_SEG2:
           {
-            double tmp=INTERP_KERNEL::DistanceFromPtToSegInSpaceDim2(pt,coords+2*ptr[ptrI[*zeCell]+1],coords+2*ptr[ptrI[*zeCell]+2]);
+            double tmp=INTERP_KERNEL::SquareDistanceFromPtToSegInSpaceDim2(pt,coords+2*ptr[ptrI[*zeCell]+1],coords+2*ptr[ptrI[*zeCell]+2]);
+            if(tmp!=std::numeric_limits<double>::max()) tmp=sqrt(tmp);
             if(tmp<ret0)
               { ret0=tmp; cellId=*zeCell; }
             break;
