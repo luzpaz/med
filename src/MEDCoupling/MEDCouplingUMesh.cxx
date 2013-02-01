@@ -7643,7 +7643,7 @@ DataArrayInt *MEDCouplingUMesh::ComputeSpreadZoneGradually(const DataArrayInt *a
   const int *arrIndxPtr=arrIndxIn->getConstPointer();
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> arro=DataArrayInt::New();
   arro->alloc(nbOfTuples,1);
-  arro->fillWithValue(-1);
+  arro->fillWithValue(-1); arro->setIJ(0,0,1);
   int *arroPtr=arro->getPointer();
   std::set<int> s; s.insert(0);
   while(!s.empty())
