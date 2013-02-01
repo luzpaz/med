@@ -281,6 +281,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::MEDCouplingUMesh::MergeUMeshes;
 %newobject ParaMEDMEM::MEDCouplingUMesh::MergeUMeshesOnSameCoords;
 %newobject ParaMEDMEM::MEDCouplingUMesh::ComputeSpreadZoneGradually;
+%newobject ParaMEDMEM::MEDCouplingUMesh::ComputeSpreadZoneGraduallyFromSeed;
 %newobject ParaMEDMEM::MEDCouplingUMesh::buildNewNumberingFromCommNodesFrmt;
 %newobject ParaMEDMEM::MEDCouplingUMesh::rearrange2ConsecutiveCellTypes;
 %newobject ParaMEDMEM::MEDCouplingUMesh::sortCellsInMEDFileFrmt;
@@ -717,55 +718,44 @@ namespace ParaMEDMEM
 
          PyObject *buildPart(PyObject *li) const throw(INTERP_KERNEL::Exception)
          {
-           void *da=0;
-           int res1=SWIG_ConvertPtr(li,&da,SWIGTYPE_p_ParaMEDMEM__DataArrayInt, 0 |  0 );
-           if (!SWIG_IsOK(res1))
-             {
-               int size;
-               INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(li,&size);
-               MEDCouplingMesh *ret=self->buildPart(tmp,((const int *)tmp)+size);
-               return convertMesh(ret, SWIG_POINTER_OWN | 0 );
+           int szArr,sw,iTypppArr;
+           std::vector<int> stdvecTyyppArr;
+           const int *tmp=convertObjToPossibleCpp1_Safe(li,sw,szArr,iTypppArr,stdvecTyyppArr);
+           MEDCouplingMesh *ret=self->buildPart(tmp,tmp+szArr);
+           if(sw==3)//DataArrayInt
+             { 
+               void *argp; SWIG_ConvertPtr(li,&argp,SWIGTYPE_p_ParaMEDMEM__DataArrayInt,0|0);
+               DataArrayInt *argpt=reinterpret_cast< ParaMEDMEM::DataArrayInt * >(argp);
+               std::string name=argpt->getName();
+               if(!name.empty())
+                 ret->setName(name.c_str());
              }
-           else
-             {
-               DataArrayInt *da2=reinterpret_cast< DataArrayInt * >(da);
-               if(!da2)
-                 throw INTERP_KERNEL::Exception("Not null DataArrayInt instance expected !");
-               da2->checkAllocated();
-               MEDCouplingMesh *ret=self->buildPart(da2->getConstPointer(),da2->getConstPointer()+da2->getNbOfElems());
-               ret->setName(da2->getName().c_str());
-               return convertMesh(ret, SWIG_POINTER_OWN | 0 );
-             }
+           return convertMesh(ret, SWIG_POINTER_OWN | 0 );
          }
         
-        PyObject *buildPartAndReduceNodes(PyObject *li) const throw(INTERP_KERNEL::Exception)
-        {
-          void *da=0;
-          DataArrayInt *arr=0;
-          MEDCouplingMesh *ret=0;
-           int res1=SWIG_ConvertPtr(li,&da,SWIGTYPE_p_ParaMEDMEM__DataArrayInt, 0 |  0 );
-           if (!SWIG_IsOK(res1))
-             {
-               int size;
-               INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(li,&size);
-               ret=self->buildPartAndReduceNodes(tmp,((const int *)tmp)+size,arr);
+         PyObject *buildPartAndReduceNodes(PyObject *li) const throw(INTERP_KERNEL::Exception)
+         {
+           int szArr,sw,iTypppArr;
+           std::vector<int> stdvecTyyppArr;
+           DataArrayInt *arr=0;
+           const int *tmp=convertObjToPossibleCpp1_Safe(li,sw,szArr,iTypppArr,stdvecTyyppArr);
+           MEDCouplingMesh *ret=self->buildPartAndReduceNodes(tmp,tmp+szArr,arr);
+           if(sw==3)//DataArrayInt
+             { 
+               void *argp; SWIG_ConvertPtr(li,&argp,SWIGTYPE_p_ParaMEDMEM__DataArrayInt,0|0);
+               DataArrayInt *argpt=reinterpret_cast< ParaMEDMEM::DataArrayInt * >(argp);
+               std::string name=argpt->getName();
+               if(!name.empty())
+                 ret->setName(name.c_str());
              }
-           else
-             {
-               DataArrayInt *da2=reinterpret_cast< DataArrayInt * >(da);
-               if(!da2)
-                 throw INTERP_KERNEL::Exception("Not null DataArrayInt instance expected !");
-               da2->checkAllocated();
-               ret=self->buildPartAndReduceNodes(da2->getConstPointer(),da2->getConstPointer()+da2->getNbOfElems(),arr);
-               ret->setName(da2->getName().c_str());
-             }
-          PyObject *res = PyList_New(2);
-          PyObject *obj0=convertMesh(ret, SWIG_POINTER_OWN | 0 );
-          PyObject *obj1=SWIG_NewPointerObj(SWIG_as_voidptr(arr),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 );
-          PyList_SetItem(res,0,obj0);
-          PyList_SetItem(res,1,obj1);
-          return res;
-        }
+           //
+           PyObject *res = PyList_New(2);
+           PyObject *obj0=convertMesh(ret, SWIG_POINTER_OWN | 0 );
+           PyObject *obj1=SWIG_NewPointerObj(SWIG_as_voidptr(arr),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 );
+           PyList_SetItem(res,0,obj0);
+           PyList_SetItem(res,1,obj1);
+           return res;
+         }
 
         PyObject *getDistributionOfTypes() const throw(INTERP_KERNEL::Exception)
         {
@@ -1021,111 +1011,74 @@ namespace ParaMEDMEM
              ret1->incrRef();
              return SWIG_NewPointerObj((void*)ret1,SWIGTYPE_p_ParaMEDMEM__DataArrayDouble,SWIG_POINTER_OWN | 0);
            }
+           
            PyObject *buildPartOfMySelf(PyObject *li, bool keepCoords=true) const throw(INTERP_KERNEL::Exception)
            {
-             void *da=0;
-             int res1=SWIG_ConvertPtr(li,&da,SWIGTYPE_p_ParaMEDMEM__DataArrayInt, 0 |  0 );
-             if (!SWIG_IsOK(res1))
-               {
-                 int size;
-                 INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(li,&size);
-                 MEDCouplingPointSet *ret=self->buildPartOfMySelf(tmp,((const int *)tmp)+size,keepCoords);
-                 return convertMesh(ret, SWIG_POINTER_OWN | 0 );
+             int szArr,sw,iTypppArr;
+             std::vector<int> stdvecTyyppArr;
+             const int *tmp=convertObjToPossibleCpp1_Safe(li,sw,szArr,iTypppArr,stdvecTyyppArr);
+             MEDCouplingPointSet *ret=self->buildPartOfMySelf(tmp,tmp+szArr,keepCoords);
+             if(sw==3)//DataArrayInt
+               { 
+                 void *argp; SWIG_ConvertPtr(li,&argp,SWIGTYPE_p_ParaMEDMEM__DataArrayInt,0|0);
+                 DataArrayInt *argpt=reinterpret_cast< ParaMEDMEM::DataArrayInt * >(argp);
+                 std::string name=argpt->getName();
+                 if(!name.empty())
+                   ret->setName(name.c_str());
                }
-             else
-               {
-                 DataArrayInt *da2=reinterpret_cast< DataArrayInt * >(da);
-                 if(!da2)
-                   throw INTERP_KERNEL::Exception("Not null DataArrayInt instance expected !");
-                 da2->checkAllocated();
-                 MEDCouplingPointSet *ret=self->buildPartOfMySelf(da2->getConstPointer(),da2->getConstPointer()+da2->getNbOfElems(),keepCoords);
-                 ret->setName(da2->getName().c_str());
-                 return convertMesh(ret, SWIG_POINTER_OWN | 0 );
-               }
+             return convertMesh(ret, SWIG_POINTER_OWN | 0 );
            }
+           
            PyObject *buildPartOfMySelfNode(PyObject *li, bool fullyIn) const throw(INTERP_KERNEL::Exception)
            {
-             void *da=0;
-             int res1=SWIG_ConvertPtr(li,&da,SWIGTYPE_p_ParaMEDMEM__DataArrayInt, 0 |  0 );
-             if (!SWIG_IsOK(res1))
-               {
-                 int size;
-                 INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(li,&size);
-                 MEDCouplingPointSet *ret=self->buildPartOfMySelfNode(tmp,((const int *)tmp)+size,fullyIn);
-                 return convertMesh(ret, SWIG_POINTER_OWN | 0 );
+             int szArr,sw,iTypppArr;
+             std::vector<int> stdvecTyyppArr;
+             const int *tmp=convertObjToPossibleCpp1_Safe(li,sw,szArr,iTypppArr,stdvecTyyppArr);
+             MEDCouplingPointSet *ret=self->buildPartOfMySelfNode(tmp,tmp+szArr,fullyIn);
+             if(sw==3)//DataArrayInt
+               { 
+                 void *argp; SWIG_ConvertPtr(li,&argp,SWIGTYPE_p_ParaMEDMEM__DataArrayInt,0|0);
+                 DataArrayInt *argpt=reinterpret_cast< ParaMEDMEM::DataArrayInt * >(argp);
+                 std::string name=argpt->getName();
+                 if(!name.empty())
+                   ret->setName(name.c_str());
                }
-             else
-               {
-                 DataArrayInt *da2=reinterpret_cast< DataArrayInt * >(da);
-                 if(!da2)
-                   throw INTERP_KERNEL::Exception("Not null DataArrayInt instance expected !");
-                 da2->checkAllocated();
-                 MEDCouplingPointSet *ret=self->buildPartOfMySelfNode(da2->getConstPointer(),da2->getConstPointer()+da2->getNbOfElems(),fullyIn);
-                 ret->setName(da2->getName().c_str());
-                 return convertMesh(ret, SWIG_POINTER_OWN | 0 );
-               }
+             return convertMesh(ret, SWIG_POINTER_OWN | 0 );
            }
+
            PyObject *buildFacePartOfMySelfNode(PyObject *li, bool fullyIn) const throw(INTERP_KERNEL::Exception)
            {
-             void *da=0;
-             int res1=SWIG_ConvertPtr(li,&da,SWIGTYPE_p_ParaMEDMEM__DataArrayInt, 0 |  0 );
-             if (!SWIG_IsOK(res1))
-               {
-                 int size;
-                 INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(li,&size);
-                 MEDCouplingPointSet *ret=self->buildFacePartOfMySelfNode(tmp,((const int *)tmp)+size,fullyIn);
-                 return convertMesh(ret, SWIG_POINTER_OWN | 0 );
+             int szArr,sw,iTypppArr;
+             std::vector<int> stdvecTyyppArr;
+             const int *tmp=convertObjToPossibleCpp1_Safe(li,sw,szArr,iTypppArr,stdvecTyyppArr);
+             MEDCouplingPointSet *ret=self->buildFacePartOfMySelfNode(tmp,tmp+szArr,fullyIn);
+             if(sw==3)//DataArrayInt
+               { 
+                 void *argp; SWIG_ConvertPtr(li,&argp,SWIGTYPE_p_ParaMEDMEM__DataArrayInt,0|0);
+                 DataArrayInt *argpt=reinterpret_cast< ParaMEDMEM::DataArrayInt * >(argp);
+                 std::string name=argpt->getName();
+                 if(!name.empty())
+                   ret->setName(name.c_str());
                }
-             else
-               {
-                 DataArrayInt *da2=reinterpret_cast< DataArrayInt * >(da);
-                 if(!da2)
-                   throw INTERP_KERNEL::Exception("Not null DataArrayInt instance expected !");
-                 da2->checkAllocated();
-                 MEDCouplingPointSet *ret=self->buildFacePartOfMySelfNode(da2->getConstPointer(),da2->getConstPointer()+da2->getNbOfElems(),fullyIn);
-                 ret->setName(da2->getName().c_str());
-                 return convertMesh(ret, SWIG_POINTER_OWN | 0 );
-               }
+             return convertMesh(ret, SWIG_POINTER_OWN | 0 );
            }
 
            void renumberNodes(PyObject *li, int newNbOfNodes) throw(INTERP_KERNEL::Exception)
            {
-             void *da=0;
-             int res1=SWIG_ConvertPtr(li,&da,SWIGTYPE_p_ParaMEDMEM__DataArrayInt, 0 | 0 );
-             if (!SWIG_IsOK(res1))
-               {
-                 int size;
-                 INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(li,&size);
-                 self->renumberNodes(tmp,newNbOfNodes);
-               }
-             else
-               {
-                 DataArrayInt *da2=reinterpret_cast< DataArrayInt * >(da);
-                 if(!da2)
-                   throw INTERP_KERNEL::Exception("Not null DataArrayInt instance expected !");
-                 da2->checkAllocated();
-                 self->renumberNodes(da2->getConstPointer(),newNbOfNodes);
-               }
+             int szArr,sw,iTypppArr;
+             std::vector<int> stdvecTyyppArr;
+             const int *tmp=convertObjToPossibleCpp1_Safe(li,sw,szArr,iTypppArr,stdvecTyyppArr);
+             self->renumberNodes(tmp,newNbOfNodes);
            }
+
            void renumberNodes2(PyObject *li, int newNbOfNodes) throw(INTERP_KERNEL::Exception)
            {
-             void *da=0;
-             int res1=SWIG_ConvertPtr(li,&da,SWIGTYPE_p_ParaMEDMEM__DataArrayInt, 0 | 0 );
-             if (!SWIG_IsOK(res1))
-               {
-                 int size;
-                 INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(li,&size);
-                 self->renumberNodes2(tmp,newNbOfNodes);
-               }
-             else
-               {
-                 DataArrayInt *da2=reinterpret_cast< DataArrayInt * >(da);
-                 if(!da2)
-                   throw INTERP_KERNEL::Exception("Not null DataArrayInt instance expected !");
-                 da2->checkAllocated();
-                 self->renumberNodes2(da2->getConstPointer(),newNbOfNodes);
-               }
+             int szArr,sw,iTypppArr;
+             std::vector<int> stdvecTyyppArr;
+             const int *tmp=convertObjToPossibleCpp1_Safe(li,sw,szArr,iTypppArr,stdvecTyyppArr);
+             self->renumberNodes2(tmp,newNbOfNodes);
            }
+
            PyObject *findNodesOnLine(PyObject *pt, PyObject *vec, double eps) const throw(INTERP_KERNEL::Exception)
              {
                int spaceDim=self->getSpaceDimension();
@@ -1202,33 +1155,15 @@ namespace ParaMEDMEM
            {
              DataArrayInt *c=0,*cI=0;
              int spaceDim=self->getSpaceDimension();
-             void *da=0;
-             int res1=SWIG_ConvertPtr(pt,&da,SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, 0 |  0 );
-             if (!SWIG_IsOK(res1))
-               {
-                 int size;
-                 INTERP_KERNEL::AutoPtr<double> tmp=convertPyToNewDblArr2(pt,&size);
-                 int nbOfPoints=size/spaceDim;
-                 if(size%spaceDim!=0)
-                   {
-                     throw INTERP_KERNEL::Exception("MEDCouplingPointSet::getCellsContainingPoints : Invalid list length ! Must be a multiple of self.getSpaceDimension() !");
-                   }
-                 self->getNodeIdsNearPoints(tmp,nbOfPoints,eps,c,cI);
-               }
-             else
-               {
-                 DataArrayDouble *da2=reinterpret_cast< DataArrayDouble * >(da);
-                 if(!da2)
-                   throw INTERP_KERNEL::Exception("MEDCouplingPointSet::getCellsContainingPoints : Not null DataArrayDouble instance expected !");
-                 da2->checkAllocated();
-                 int size=da2->getNumberOfTuples();
-                 int nbOfCompo=da2->getNumberOfComponents();
-                 if(nbOfCompo!=spaceDim)
-                   {
-                     throw INTERP_KERNEL::Exception("MEDCouplingPointSet::getCellsContainingPoints : Invalid DataArrayDouble nb of components ! Expected same as self.getSpaceDimension() !");
-                   }
-                 self->getNodeIdsNearPoints(da2->getConstPointer(),size,eps,c,cI);
-               }
+             double val;
+             DataArrayDouble *a;
+             DataArrayDoubleTuple *aa;
+             std::vector<double> bb;
+             int sw;
+             int nbOfTuples=-1;
+             const double *ptPtr=convertObjToPossibleCpp5_Safe2(pt,sw,val,a,aa,bb,"Python wrap of MEDCouplingUMesh::getNodeIdsNearPoints",spaceDim,true,nbOfTuples);
+             self->getNodeIdsNearPoints(ptPtr,nbOfTuples,eps,c,cI);
+             //
              PyObject *ret=PyTuple_New(2);
              PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(c),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
              PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(cI),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
@@ -1708,6 +1643,19 @@ namespace ParaMEDMEM
         PyObject *res = PyList_New(result.size());
         for (int i=0;iL!=result.end(); i++, iL++)
           PyList_SetItem(res,i,PyInt_FromLong(*iL));
+        return res;
+      }
+      
+      static PyObject *ComputeSpreadZoneGraduallyFromSeed(PyObject *seed, const DataArrayInt *arrIn, const DataArrayInt *arrIndxIn, int nbOfDepthPeeling=-1) throw(INTERP_KERNEL::Exception)
+      {
+        int szArr,sw,iTypppArr;
+        std::vector<int> stdvecTyyppArr;
+        const int *seedPtr=convertObjToPossibleCpp1_Safe(seed,sw,szArr,iTypppArr,stdvecTyyppArr);
+        int nbOfDepthPeelingPerformed=0;
+        DataArrayInt *ret0=MEDCouplingUMesh::ComputeSpreadZoneGraduallyFromSeed(seedPtr,seedPtr+szArr,arrIn,arrIndxIn,nbOfDepthPeeling,nbOfDepthPeelingPerformed);
+        PyObject *res=PyTuple_New(2);
+        PyTuple_SetItem(res,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+        PyTuple_SetItem(res,1,PyInt_FromLong(nbOfDepthPeelingPerformed));
         return res;
       }
 

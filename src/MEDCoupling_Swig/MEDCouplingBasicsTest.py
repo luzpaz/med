@@ -10934,6 +10934,16 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(zones[1].isEqual(DataArrayInt([1,2])))
         self.assertTrue(zones[2].isEqual(DataArrayInt([3,4])))
         self.assertTrue(zones[3].isEqual(DataArrayInt([5])))
+        #
+        n,ni=m.computeNeighborsOfCells()
+        a,b=MEDCouplingUMesh.ComputeSpreadZoneGraduallyFromSeed(0,n,ni)
+        self.assertEqual(13,b) ; self.assertEqual(125,len(a)) ; self.assertTrue(a.isIdentity())
+        a,b=MEDCouplingUMesh.ComputeSpreadZoneGraduallyFromSeed([1],n,ni)
+        self.assertEqual(12,b) ; self.assertEqual(125,len(a)) ; self.assertTrue(a.isIdentity())
+        a,b=MEDCouplingUMesh.ComputeSpreadZoneGraduallyFromSeed((2,),n,ni)
+        self.assertEqual(11,b) ; self.assertEqual(125,len(a)) ; self.assertTrue(a.isIdentity())
+        a,b=MEDCouplingUMesh.ComputeSpreadZoneGraduallyFromSeed(DataArrayInt([3]),n,ni)
+        self.assertEqual(12,b) ; self.assertEqual(125,len(a)) ; self.assertTrue(a.isIdentity())
         pass
 
     def setUp(self):

@@ -244,6 +244,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT static void SetPartOfIndexedArraysSameIdx2(int start, int end, int step, DataArrayInt *arrInOut, const DataArrayInt *arrIndxIn,
                                                                   const DataArrayInt *srcArr, const DataArrayInt *srcArrIndex) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static DataArrayInt *ComputeSpreadZoneGradually(const DataArrayInt *arrIn, const DataArrayInt *arrIndxIn) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT static DataArrayInt *ComputeSpreadZoneGraduallyFromSeed(const int *seedBg, const int *seedEnd, const DataArrayInt *arrIn, const DataArrayInt *arrIndxIn, int nbOfDepthPeeling, int& nbOfDepthPeelingPerformed) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static void FindCommonCellsAlg(int compType, int startCellId, const DataArrayInt *nodal, const DataArrayInt *nodalI, const DataArrayInt *revNodal, const DataArrayInt *revNodalI,
                                                       DataArrayInt *& commonCellsArr, DataArrayInt *& commonCellsIArr) throw(INTERP_KERNEL::Exception);
   private:
@@ -278,6 +279,7 @@ namespace ParaMEDMEM
     DataArrayInt *buildUnionOf3DMesh() const throw(INTERP_KERNEL::Exception);
     void distanceToPoint3DSurfAlg(const double *pt, const DataArrayInt *cellIds, double& ret0, int& cellId) const throw(INTERP_KERNEL::Exception);
     void distanceToPoint2DCurveAlg(const double *pt, const DataArrayInt *cellIds, double& ret0, int& cellId) const throw(INTERP_KERNEL::Exception);
+    static DataArrayInt *ComputeSpreadZoneGraduallyFromSeedAlg(std::vector<bool>& fetched, const int *seedBg, const int *seedEnd, const DataArrayInt *arrIn, const DataArrayInt *arrIndxIn, int nbOfDepthPeeling, int& nbOfDepthPeelingPerformed) throw(INTERP_KERNEL::Exception);
     static void FillInCompact3DMode(int spaceDim, int nbOfNodesInCell, const int *conn, const double *coo, double *zipFrmt) throw(INTERP_KERNEL::Exception);
     static void AppendExtrudedCell(const int *connBg, const int *connEnd, int nbOfNodesPerLev, bool isQuad, std::vector<int>& ret);
     static void IntersectDescending2DMeshes(const MEDCouplingUMesh *m1, const MEDCouplingUMesh *m2, double eps,

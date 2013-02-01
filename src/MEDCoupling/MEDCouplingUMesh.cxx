@@ -7628,41 +7628,86 @@ void MEDCouplingUMesh::SetPartOfIndexedArraysSameIdx(const int *idsOfSelectBg, c
  * \param [in] arrIn arr origin array from which the extraction will be done.
  * \param [in] arrIndxIn is the input index array allowing to walk into \b arrIn
  * \return a newly allocated DataArray that stores all ids fetched by the gradually spread process.
+ * \sa MEDCouplingUMesh::ComputeSpreadZoneGraduallyFromSeed, MEDCouplingUMesh::partitionBySpreadZone
  */
 DataArrayInt *MEDCouplingUMesh::ComputeSpreadZoneGradually(const DataArrayInt *arrIn, const DataArrayInt *arrIndxIn) throw(INTERP_KERNEL::Exception)
 {
-  if(!arrIn || !arrIndxIn)
-    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::ExtractFromIndexedArrays : input pointer is NULL !");
+  int seed=0,nbOfDepthPeelingPerformed=0;
+  return ComputeSpreadZoneGraduallyFromSeed(&seed,&seed+1,arrIn,arrIndxIn,-1,nbOfDepthPeelingPerformed);
+}
+
+/*!
+ * This method works on a pair input (\b arrIn, \b arrIndxIn) where \b arr indexes is in \b arrIndxIn.
+ * This method expects that these two input arrays come from the output of MEDCouplingUMesh::computeNeighborsOfCells method.
+ * This method start from id 0 that will be contained in output DataArrayInt. It searches then all neighbors of id0 regarding arrIn[arrIndxIn[0]:arrIndxIn[0+1]].
+ * Then it is repeated recursively until either all ids are fetched or no more ids are reachable step by step.
+ * A negative value in \b arrIn means that it is ignored.
+ * This method is usefull to see if a mesh is contiguous regarding its connectivity. If it is not the case the size of returned array is different from arrIndxIn->getNumberOfTuples()-1.
+ * \param [in] seedBg the begin pointer (included) of an array containing the seed of the search zone
+ * \param [in] seedEnd the end pointer (not included) of an array containing the seed of the search zone
+ * \param [in] arrIn arr origin array from which the extraction will be done.
+ * \param [in] arrIndxIn is the input index array allowing to walk into \b arrIn
+ * \param [in] nbOfDepthPeeling the max number of peels requested in search. By default -1, that is to say, no limit.
+ * \param [out] nbOfDepthPeelingPerformed the number of peels effectively performed. May be different from \a nbOfDepthPeeling
+ * \return a newly allocated DataArray that stores all ids fetched by the gradually spread process.
+ * \sa MEDCouplingUMesh::partitionBySpreadZone
+ */
+DataArrayInt *MEDCouplingUMesh::ComputeSpreadZoneGraduallyFromSeed(const int *seedBg, const int *seedEnd, const DataArrayInt *arrIn, const DataArrayInt *arrIndxIn, int nbOfDepthPeeling, int& nbOfDepthPeelingPerformed) throw(INTERP_KERNEL::Exception)
+{
+  nbOfDepthPeelingPerformed=0;
+  if(!arrIndxIn)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::ComputeSpreadZoneGraduallyFromSeed : arrIndxIn input pointer is NULL !");
   int nbOfTuples=arrIndxIn->getNumberOfTuples()-1;
   if(nbOfTuples<=0)
     {
       DataArrayInt *ret=DataArrayInt::New(); ret->alloc(0,1);
       return ret;
     }
+  //
+  std::vector<bool> fetched(nbOfTuples,false);
+  return ComputeSpreadZoneGraduallyFromSeedAlg(fetched,seedBg,seedEnd,arrIn,arrIndxIn,nbOfDepthPeeling,nbOfDepthPeelingPerformed);
+}
+
+DataArrayInt *MEDCouplingUMesh::ComputeSpreadZoneGraduallyFromSeedAlg(std::vector<bool>& fetched, const int *seedBg, const int *seedEnd, const DataArrayInt *arrIn, const DataArrayInt *arrIndxIn, int nbOfDepthPeeling, int& nbOfDepthPeelingPerformed) throw(INTERP_KERNEL::Exception)
+{
+  nbOfDepthPeelingPerformed=0;
+  if(!seedBg || !seedEnd || !arrIn || !arrIndxIn)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::ComputeSpreadZoneGraduallyFromSeedAlg : some input pointer is NULL !");
+  int nbOfTuples=arrIndxIn->getNumberOfTuples()-1;
+  std::vector<bool> fetched2(nbOfTuples,false);
+  int i=0;
+  for(const int *seedElt=seedBg;seedElt!=seedEnd;seedElt++,i++)
+    {
+      if(*seedElt>=0 && *seedElt<nbOfTuples)
+        { fetched[*seedElt]=true; fetched2[*seedElt]=true; }
+      else
+        { std::ostringstream oss; oss << "MEDCouplingUMesh::ComputeSpreadZoneGraduallyFromSeedAlg : At pos #" << i << " of seeds value is " << *seedElt << "! Should be in [0," << nbOfTuples << ") !"; throw INTERP_KERNEL::Exception(oss.str().c_str()); }
+    }
   const int *arrInPtr=arrIn->getConstPointer();
   const int *arrIndxPtr=arrIndxIn->getConstPointer();
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> arro=DataArrayInt::New();
-  arro->alloc(nbOfTuples,1);
-  arro->fillWithValue(-1); arro->setIJ(0,0,1);
-  int *arroPtr=arro->getPointer();
-  std::set<int> s; s.insert(0);
-  while(!s.empty())
+  int targetNbOfDepthPeeling=nbOfDepthPeeling!=-1?nbOfDepthPeeling:std::numeric_limits<int>::max();
+  std::vector<int> idsToFetch1(seedBg,seedEnd);
+  std::vector<int> idsToFetch2;
+  std::vector<int> *idsToFetch=&idsToFetch1;
+  std::vector<int> *idsToFetchOther=&idsToFetch2;
+  while(!idsToFetch->empty() && nbOfDepthPeelingPerformed<targetNbOfDepthPeeling)
     {
-      std::set<int> s2;
-      for(std::set<int>::const_iterator it=s.begin();it!=s.end();it++)
-        {
-          for(const int *work=arrInPtr+arrIndxPtr[*it];work!=arrInPtr+arrIndxPtr[*it+1];work++)
-            {
-              if(*work>=0 && arroPtr[*work]<0)
-                {
-                  arroPtr[*work]=1;
-                  s2.insert(*work);
-                }
-            }
-        }
-      s=s2;
+      for(std::vector<int>::const_iterator it=idsToFetch->begin();it!=idsToFetch->end();it++)
+        for(const int *it2=arrInPtr+arrIndxPtr[*it];it2!=arrInPtr+arrIndxPtr[*it+1];it2++)
+          if(!fetched[*it2])
+            { fetched[*it2]=true; fetched2[*it2]=true; idsToFetchOther->push_back(*it2); }
+      std::swap(idsToFetch,idsToFetchOther);
+      idsToFetchOther->clear();
+      nbOfDepthPeelingPerformed++;
     }
-  return arro->getIdsEqual(1);
+  int lgth=(int)std::count(fetched2.begin(),fetched2.end(),true);
+  i=0;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New(); ret->alloc(lgth,1);
+  int *retPtr=ret->getPointer();
+  for(std::vector<bool>::const_iterator it=fetched2.begin();it!=fetched2.end();it++,i++)
+    if(*it)
+      *retPtr++=i;
+  return ret.retn();
 }
 
 /*!
@@ -7831,6 +7876,28 @@ MEDCouplingUMesh *MEDCouplingUMesh::buildSpreadZonesWithPoly() const throw(INTER
  */
 std::vector<DataArrayInt *> MEDCouplingUMesh::partitionBySpreadZone() const throw(INTERP_KERNEL::Exception)
 {
+  //#if 0
+  int nbOfCellsCur=getNumberOfCells();
+  std::vector<DataArrayInt *> ret;
+  if(nbOfCellsCur<=0)
+    return ret;
+  DataArrayInt *neigh=0,*neighI=0;
+  computeNeighborsOfCells(neigh,neighI);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> neighAuto(neigh),neighIAuto(neighI);
+  std::vector<bool> fetchedCells(nbOfCellsCur,false);
+  std::vector< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> > ret2;
+  int seed=0;
+  while(seed<nbOfCellsCur)
+    {
+      int nbOfPeelPerformed=0;
+      ret2.push_back(ComputeSpreadZoneGraduallyFromSeedAlg(fetchedCells,&seed,&seed+1,neigh,neighI,-1,nbOfPeelPerformed));
+      seed=(int)std::distance(fetchedCells.begin(),std::find(fetchedCells.begin()+seed,fetchedCells.end(),false));
+    }
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> >::iterator it=ret2.begin();it!=ret2.end();it++)
+    ret.push_back((*it).retn());
+  return ret;
+  //#endif
+#if 0
   int nbOfCellsCur=getNumberOfCells();
   DataArrayInt *neigh=0,*neighI=0;
   computeNeighborsOfCells(neigh,neighI);
@@ -7858,6 +7925,7 @@ std::vector<DataArrayInt *> MEDCouplingUMesh::partitionBySpreadZone() const thro
   for(std::vector<DataArrayInt *>::const_iterator it=ret.begin();it!=ret.end();it++)
     (*it)->incrRef();
   return ret;
+#endif
 }
 
 /*!
