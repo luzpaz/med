@@ -10922,6 +10922,20 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertAlmostEqual(0.07071067811865482,a,14) ; self.assertEqual(1,b) ; self.assertEqual(2,c)
         pass
 
+    def testSwigNonRegressionPartitionBySpreadZone1(self):
+        m=MEDCouplingCMesh()
+        arr=DataArrayDouble(6) ; arr.iota(0.)
+        m.setCoords(arr,arr,arr)
+        m=m.buildUnstructured()
+        mPart=m[50,80,85,87,92,122]
+        zones=mPart.partitionBySpreadZone()
+        self.assertEqual(4,len(zones))
+        self.assertTrue(zones[0].isEqual(DataArrayInt([0])))
+        self.assertTrue(zones[1].isEqual(DataArrayInt([1,2])))
+        self.assertTrue(zones[2].isEqual(DataArrayInt([3,4])))
+        self.assertTrue(zones[3].isEqual(DataArrayInt([5])))
+        pass
+
     def setUp(self):
         pass
     pass
