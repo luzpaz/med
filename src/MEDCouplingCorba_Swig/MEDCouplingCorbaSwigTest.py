@@ -509,7 +509,7 @@ class MEDCouplingCorbaServBasicsTest:
         d0=DataArrayDouble.New();
         d0.setValues(vals0,5,1);
         d1=DataArrayDouble.New();
-        d1.setValues(vals1,5,1);
+        d1.setValues(vals1[:5],5,1);
         d1_1=DataArrayDouble.New();
         d1_1.setValues(vals1_1,5,1);
         d2=DataArrayDouble.New();
