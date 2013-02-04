@@ -30,6 +30,7 @@
 
 namespace ParaMEDMEM
 {
+  class MEDCouplingMesh;
   class DataArrayDouble;
   class TimeLabel;
 
@@ -58,6 +59,7 @@ namespace ParaMEDMEM
     virtual MEDCouplingTimeDiscretization *buildNewTimeReprFromThis(TypeOfTimeDiscretization type, bool deepCpy) const;
     virtual std::string getStringRepr() const = 0;
     virtual TypeOfTimeDiscretization getEnum() const = 0;
+    virtual void synchronizeTimeWith(const MEDCouplingMesh *mesh) throw(INTERP_KERNEL::Exception) = 0;
     virtual MEDCouplingTimeDiscretization *aggregate(const MEDCouplingTimeDiscretization *other) const = 0;
     virtual MEDCouplingTimeDiscretization *aggregate(const std::vector<const MEDCouplingTimeDiscretization *>& other) const = 0;
     virtual MEDCouplingTimeDiscretization *meld(const MEDCouplingTimeDiscretization *other) const = 0;
@@ -159,6 +161,7 @@ namespace ParaMEDMEM
     MEDCouplingNoTimeLabel(const MEDCouplingTimeDiscretization& other, bool deepCpy);
     std::string getStringRepr() const;
     TypeOfTimeDiscretization getEnum() const { return DISCRETIZATION; }
+    void synchronizeTimeWith(const MEDCouplingMesh *mesh) throw(INTERP_KERNEL::Exception);
     MEDCouplingTimeDiscretization *aggregate(const MEDCouplingTimeDiscretization *other) const;
     MEDCouplingTimeDiscretization *aggregate(const std::vector<const MEDCouplingTimeDiscretization *>& other) const;
     MEDCouplingTimeDiscretization *meld(const MEDCouplingTimeDiscretization *other) const;
@@ -219,6 +222,7 @@ namespace ParaMEDMEM
     std::string getStringRepr() const;
     void copyTinyAttrFrom(const MEDCouplingTimeDiscretization& other) throw(INTERP_KERNEL::Exception);
     TypeOfTimeDiscretization getEnum() const { return DISCRETIZATION; }
+    void synchronizeTimeWith(const MEDCouplingMesh *mesh) throw(INTERP_KERNEL::Exception);
     MEDCouplingTimeDiscretization *aggregate(const MEDCouplingTimeDiscretization *other) const;
     MEDCouplingTimeDiscretization *aggregate(const std::vector<const MEDCouplingTimeDiscretization *>& other) const;
     MEDCouplingTimeDiscretization *meld(const MEDCouplingTimeDiscretization *other) const;
@@ -301,6 +305,7 @@ namespace ParaMEDMEM
     void getValueOnTime(int eltId, double time, double *value) const throw(INTERP_KERNEL::Exception);
     void getValueOnDiscTime(int eltId, int iteration, int order, double *value) const throw(INTERP_KERNEL::Exception);
     TypeOfTimeDiscretization getEnum() const { return DISCRETIZATION; }
+    void synchronizeTimeWith(const MEDCouplingMesh *mesh) throw(INTERP_KERNEL::Exception);
     std::string getStringRepr() const;
     MEDCouplingTimeDiscretization *aggregate(const MEDCouplingTimeDiscretization *other) const;
     MEDCouplingTimeDiscretization *aggregate(const std::vector<const MEDCouplingTimeDiscretization *>& other) const;
@@ -351,6 +356,7 @@ namespace ParaMEDMEM
     ~MEDCouplingTwoTimeSteps();
   public:
     void updateTime() const;
+    void synchronizeTimeWith(const MEDCouplingMesh *mesh) throw(INTERP_KERNEL::Exception);
     std::size_t getHeapMemorySize() const;
     void copyTinyAttrFrom(const MEDCouplingTimeDiscretization& other) throw(INTERP_KERNEL::Exception);
     void copyTinyStringsFrom(const MEDCouplingTimeDiscretization& other);

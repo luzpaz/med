@@ -964,11 +964,14 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         pass
 
     def testFillFromAnalytic(self):
-        m=MEDCouplingDataForTest.build2DTargetMesh_1();             
+        m=MEDCouplingDataForTest.build2DTargetMesh_1();
+        m.setTime(3.4,5,6); m.setTimeUnit("us");
         f1=m.fillFromAnalytic(ON_CELLS,1,"x+y");
+        self.assertAlmostEqual(3.4,f1.getTime()[0],12) ; self.assertEqual(5,f1.getTime()[1]) ; self.assertEqual(6,f1.getTime()[2])
+        self.assertEqual("us",f1.getTimeUnit())
         f1.checkCoherency();                    
         self.assertEqual(f1.getTypeOfField(),ON_CELLS);
-        self.assertEqual(f1.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f1.getTimeDiscretization(),ONE_TIME);
         self.assertEqual(1,f1.getNumberOfComponents());
         self.assertEqual(5,f1.getNumberOfTuples());
         values1=[-0.1,0.23333333333333336,0.56666666666666665,0.4,0.9]
@@ -981,7 +984,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         f1=m.fillFromAnalytic(ON_NODES,1,"x+y");
         f1.checkCoherency();
         self.assertEqual(f1.getTypeOfField(),ON_NODES);
-        self.assertEqual(f1.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f1.getTimeDiscretization(),ONE_TIME);
         self.assertEqual(1,f1.getNumberOfComponents());
         self.assertEqual(9,f1.getNumberOfTuples());
         values2=[-0.6,-0.1,0.4,-0.1,0.4,0.9,0.4,0.9,1.4]
@@ -994,7 +997,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         f1=m.fillFromAnalytic(ON_NODES,2,"(x+y)*IVec+(2*(x+y))*JVec");
         f1.checkCoherency();
         self.assertEqual(f1.getTypeOfField(),ON_NODES);
-        self.assertEqual(f1.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f1.getTimeDiscretization(),ONE_TIME);
         self.assertEqual(2,f1.getNumberOfComponents());
         self.assertEqual(9,f1.getNumberOfTuples());
         values3=[-0.6,-1.2,-0.1,-0.2,0.4,0.8,-0.1,-0.2,0.4,0.8,0.9,1.8,0.4,0.8,0.9,1.8,1.4,2.8]
@@ -1020,7 +1023,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         f1=m.fillFromAnalytic(ON_CELLS,1,"y+x");
         f1.checkCoherency();
         self.assertEqual(f1.getTypeOfField(),ON_CELLS);
-        self.assertEqual(f1.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f1.getTimeDiscretization(),ONE_TIME);
         self.assertEqual(1,f1.getNumberOfComponents());
         self.assertEqual(5,f1.getNumberOfTuples());
         values1=[-0.1,0.23333333333333336,0.56666666666666665,0.4,0.9]
@@ -1033,7 +1036,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         f1=m.fillFromAnalytic(ON_NODES,1,"y+2*x");
         f1.checkCoherency();
         self.assertEqual(f1.getTypeOfField(),ON_NODES);
-        self.assertEqual(f1.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f1.getTimeDiscretization(),ONE_TIME);
         self.assertEqual(1,f1.getNumberOfComponents());
         self.assertEqual(9,f1.getNumberOfTuples());
         values2=[-0.9,0.1,1.1,-0.4,0.6,1.6,0.1,1.1,2.1]
@@ -1045,7 +1048,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         f1=m.fillFromAnalytic(ON_NODES,1,"2.*x+y");
         f1.checkCoherency();
         self.assertEqual(f1.getTypeOfField(),ON_NODES);
-        self.assertEqual(f1.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f1.getTimeDiscretization(),ONE_TIME);
         self.assertEqual(1,f1.getNumberOfComponents());
         self.assertEqual(9,f1.getNumberOfTuples());
         tmp=f1.getArray().getValues();
@@ -1058,7 +1061,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         f1=m.fillFromAnalytic(ON_NODES,2,"(x+y)*IVec+2*(x+y)*JVec");
         f1.checkCoherency();
         self.assertEqual(f1.getTypeOfField(),ON_NODES);
-        self.assertEqual(f1.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f1.getTimeDiscretization(),ONE_TIME);
         self.assertEqual(2,f1.getNumberOfComponents());
         self.assertEqual(9,f1.getNumberOfTuples());
         values3=[-0.6,-1.2,-0.1,-0.2,0.4,0.8,-0.1,-0.2,0.4,0.8,0.9,1.8,0.4,0.8,0.9,1.8,1.4,2.8]
@@ -1080,12 +1083,12 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         f1=m.fillFromAnalytic(ON_NODES,2,"(x+y)*IVec+(2*(x+y))*JVec");
         f1.checkCoherency();
         self.assertEqual(f1.getTypeOfField(),ON_NODES);
-        self.assertEqual(f1.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f1.getTimeDiscretization(),ONE_TIME);
         self.assertEqual(2,f1.getNumberOfComponents());
         self.assertEqual(9,f1.getNumberOfTuples());
         f1.applyFunc(1,"x+y");
         self.assertEqual(f1.getTypeOfField(),ON_NODES);
-        self.assertEqual(f1.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f1.getTimeDiscretization(),ONE_TIME);
         self.assertEqual(1,f1.getNumberOfComponents());
         self.assertEqual(9,f1.getNumberOfTuples());
         values1=[-1.8,-0.3,1.2,-0.3,1.2,2.7,1.2,2.7,4.2]
@@ -1101,7 +1104,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         f1=m.fillFromAnalytic(ON_NODES,2,"(x+y)*IVec+2*(x+y)*JVec");
         f1.checkCoherency();
         self.assertEqual(f1.getTypeOfField(),ON_NODES);
-        self.assertEqual(f1.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f1.getTimeDiscretization(),ONE_TIME);
         self.assertEqual(2,f1.getNumberOfComponents());
         self.assertEqual(9,f1.getNumberOfTuples());
         #
@@ -1111,7 +1114,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertRaises(InterpKernelException, f2.applyFunc, "a/0");
         f2.applyFunc("abs(u)^2.4+2*u");
         self.assertEqual(f1.getTypeOfField(),ON_NODES);
-        self.assertEqual(f1.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f1.getTimeDiscretization(),ONE_TIME);
         self.assertEqual(2,f1.getNumberOfComponents());
         self.assertEqual(9,f1.getNumberOfTuples());
         values2=[-0.9065304805418678, -0.85105859001709905, -0.19601892829446504, -0.37898777756476987,
@@ -1127,7 +1130,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         #
         f1.applyFunc(1,"x+y");
         self.assertEqual(f1.getTypeOfField(),ON_NODES);
-        self.assertEqual(f1.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f1.getTimeDiscretization(),ONE_TIME);
         self.assertEqual(1,f1.getNumberOfComponents());
         self.assertEqual(9,f1.getNumberOfTuples());
         values1=[-1.8,-0.3,1.2,-0.3,1.2,2.7,1.2,2.7,4.2]
@@ -1147,7 +1150,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         f3=f1+f2;
         f3.checkCoherency();
         self.assertEqual(f3.getTypeOfField(),ON_NODES);
-        self.assertEqual(f3.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f3.getTimeDiscretization(),ONE_TIME);
         values1=[-1.2,-0.2,0.8,-0.2,0.8,1.8,0.8,1.8,2.8]
         tmp=f3.getArray().getValues();
         self.assertEqual(len(values1),len(tmp))
@@ -1158,7 +1161,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         f3=f1*f2;
         f3.checkCoherency();
         self.assertEqual(f3.getTypeOfField(),ON_NODES);
-        self.assertEqual(f3.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f3.getTimeDiscretization(),ONE_TIME);
         values2=[0.36,0.01,0.16,0.01,0.16,0.81,0.16,0.81,1.96]
         tmp=f3.getArray().getValues();
         self.assertEqual(len(values2),len(tmp))
@@ -1170,7 +1173,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         f4=f1-f3;
         f4.checkCoherency();
         self.assertEqual(f4.getTypeOfField(),ON_NODES);
-        self.assertEqual(f4.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f4.getTimeDiscretization(),ONE_TIME);
         values3=[0.6,0.1,-0.4,0.1,-0.4,-0.9,-0.4,-0.9,-1.4]
         tmp=f4.getArray().getValues();
         self.assertEqual(len(values3),len(tmp))
@@ -1182,20 +1185,20 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         f4=f3/f2;
         f4.checkCoherency();
         self.assertEqual(f4.getTypeOfField(),ON_NODES);
-        self.assertEqual(f4.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f4.getTimeDiscretization(),ONE_TIME);
         tmp=f4.getArray().getValues();
         for i in xrange(len(tmp)):
             self.assertTrue(abs(tmp[i]-2.)<1.e-12)
             pass
         #
-        f4=f2.buildNewTimeReprFromThis(ONE_TIME,False);
+        f4=f2.buildNewTimeReprFromThis(NO_TIME,False);
         f4.checkCoherency();
         self.assertEqual(f4.getTypeOfField(),ON_NODES);
-        self.assertEqual(f4.getTimeDiscretization(),ONE_TIME);
+        self.assertEqual(f4.getTimeDiscretization(),NO_TIME);
         self.assertRaises(InterpKernelException,f1.__add__,f4);
-        f5=f4.buildNewTimeReprFromThis(NO_TIME,False);
+        f5=f4.buildNewTimeReprFromThis(ONE_TIME,False);
         self.assertEqual(f5.getTypeOfField(),ON_NODES);
-        self.assertEqual(f5.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f5.getTimeDiscretization(),ONE_TIME);
         f3=f1+f5;
         tmp=f3.getArray().getValues();
         values4=[-1.2,-0.2,0.8,-0.2,0.8,1.8,0.8,1.8,2.8]
@@ -1204,14 +1207,14 @@ class MEDCouplingBasicsTest(unittest.TestCase):
             self.assertTrue(abs(tmp[i]-values4[i])<1.e-12)
             pass
         #
-        f4=f2.buildNewTimeReprFromThis(ONE_TIME,True);
+        f4=f2.buildNewTimeReprFromThis(NO_TIME,True);
         f4.checkCoherency();
         self.assertEqual(f4.getTypeOfField(),ON_NODES);
-        self.assertEqual(f4.getTimeDiscretization(),ONE_TIME);
+        self.assertEqual(f4.getTimeDiscretization(),NO_TIME);
         self.assertRaises(InterpKernelException,f1.__add__,f4);
-        f5=f4.buildNewTimeReprFromThis(NO_TIME,True);
+        f5=f4.buildNewTimeReprFromThis(ONE_TIME,True);
         self.assertEqual(f5.getTypeOfField(),ON_NODES);
-        self.assertEqual(f5.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f5.getTimeDiscretization(),ONE_TIME);
         f3=f1+f5;
         tmp=f3.getArray().getValues();
         values5=[-1.2,-0.2,0.8,-0.2,0.8,1.8,0.8,1.8,2.8]
@@ -1223,12 +1226,13 @@ class MEDCouplingBasicsTest(unittest.TestCase):
 
     def testOperationsOnFields2(self):
         m=MEDCouplingDataForTest.build3DSurfTargetMesh_1();
+        m.setTime(3.4,5,6); m.setTimeUnit("us");
         f1=m.fillFromAnalytic(ON_NODES,1,"x+y+z");
         f2=m.fillFromAnalytic(ON_NODES,1,"a*a+b+c*c");
         f3=f1/f2;
         f3.checkCoherency();
         self.assertEqual(f3.getTypeOfField(),ON_NODES);
-        self.assertEqual(f3.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f3.getTimeDiscretization(),ONE_TIME);
         expected1=[-2.4999999999999991, 1.2162162162162162, 0.77868852459016391,
                    0.7407407407407407, 1.129032258064516, 0.81632653061224492,
                    0.86538461538461531, 1.0919540229885056, 0.84302325581395343]
@@ -1239,6 +1243,8 @@ class MEDCouplingBasicsTest(unittest.TestCase):
             self.assertTrue(abs(expected1[i]-val[i])<1.e-12);
         #
         f1=m.buildOrthogonalField();
+        self.assertAlmostEqual(3.4,f1.getTime()[0],12) ; self.assertEqual(5,f1.getTime()[1]) ; self.assertEqual(6,f1.getTime()[2])
+        self.assertEqual("us",f1.getTimeUnit())
         f2=m.fillFromAnalytic(ON_CELLS,1,"x");
         f3=f1*f2;
         expected2=[-0.035355339059327376,0.,0.035355339059327376, 0.2592724864350674,0.,-0.2592724864350674, 0.37712361663282529,0.,-0.37712361663282529, -0.035355339059327376,0.,0.035355339059327376, 0.31819805153394637,0.,-0.31819805153394637]
@@ -1261,7 +1267,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         f1/=f2
         f1.checkCoherency();
         self.assertEqual(f1.getTypeOfField(),ON_NODES);
-        self.assertEqual(f1.getTimeDiscretization(),NO_TIME);
+        self.assertEqual(f1.getTimeDiscretization(),ONE_TIME);
         expected1=[-2.4999999999999991, 1.2162162162162162, 0.77868852459016391,
                    0.7407407407407407, 1.129032258064516, 0.81632653061224492,
                    0.86538461538461531, 1.0919540229885056, 0.84302325581395343]
@@ -3644,7 +3650,10 @@ class MEDCouplingBasicsTest(unittest.TestCase):
 
     def testGetEdgeRatioField1(self):
         m1=MEDCouplingDataForTest.build2DTargetMesh_1();
+        m1.setTime(3.4,5,6); m1.setTimeUnit("us");
         f1=m1.getEdgeRatioField();
+        self.assertAlmostEqual(3.4,f1.getTime()[0],12) ; self.assertEqual(5,f1.getTime()[1]) ; self.assertEqual(6,f1.getTime()[2])
+        self.assertEqual("us",f1.getTimeUnit())
         self.assertEqual(m1.getNumberOfCells(),f1.getNumberOfTuples());
         self.assertEqual(5,f1.getNumberOfTuples());
         self.assertEqual(1,f1.getNumberOfComponents());
@@ -6911,11 +6920,14 @@ class MEDCouplingBasicsTest(unittest.TestCase):
 
     def testFillFromAnalyticTwo1(self):
         m1=MEDCouplingDataForTest.build3DSurfTargetMesh_1();
+        m1.setTime(3.4,5,6); m1.setTimeUnit("us");
         self.assertRaises(InterpKernelException,m1.fillFromAnalytic2,ON_NODES,1,"y+z");
         m1.getCoords().setInfoOnComponent(0,"x [m]");
         m1.getCoords().setInfoOnComponent(1,"y");
         m1.getCoords().setInfoOnComponent(2,"z");
         f1=m1.fillFromAnalytic2(ON_NODES,1,"y+z");
+        self.assertAlmostEqual(3.4,f1.getTime()[0],12) ; self.assertEqual(5,f1.getTime()[1]) ; self.assertEqual(6,f1.getTime()[2])
+        self.assertEqual("us",f1.getTimeUnit())
         self.assertEqual(1,f1.getNumberOfComponents());
         self.assertEqual(9,f1.getNumberOfTuples());
         expected1=[0.2, 0.7, 1.2, 0.7, 1.2, 1.7, 1.2, 1.7, 2.2]
@@ -6926,11 +6938,14 @@ class MEDCouplingBasicsTest(unittest.TestCase):
 
     def testFillFromAnalyticThree1(self):
         m1=MEDCouplingDataForTest.build3DSurfTargetMesh_1();
+        m1.setTime(3.4,5,6); m1.setTimeUnit("us");
         vs=3*[None];
         vs[0]="x"; vs[1]="Y"; vs[2]="z";
         self.assertRaises(InterpKernelException,m1.fillFromAnalytic3,ON_NODES,1,vs,"y+z");
         vs[1]="y";
         f1=m1.fillFromAnalytic3(ON_NODES,1,vs,"y+z");
+        self.assertAlmostEqual(3.4,f1.getTime()[0],12) ; self.assertEqual(5,f1.getTime()[1]) ; self.assertEqual(6,f1.getTime()[2])
+        self.assertEqual("us",f1.getTimeUnit())
         self.assertEqual(1,f1.getNumberOfComponents());
         self.assertEqual(9,f1.getNumberOfTuples());
         expected1=[0.2, 0.7, 1.2, 0.7, 1.2, 1.7, 1.2, 1.7, 2.2]

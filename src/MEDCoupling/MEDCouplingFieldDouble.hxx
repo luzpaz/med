@@ -33,10 +33,11 @@ namespace ParaMEDMEM
   class MEDCOUPLING_EXPORT MEDCouplingFieldDouble : public MEDCouplingField
   {
   public:
-    static MEDCouplingFieldDouble *New(TypeOfField type, TypeOfTimeDiscretization td=NO_TIME);
-    static MEDCouplingFieldDouble *New(const MEDCouplingFieldTemplate *ft, TypeOfTimeDiscretization td=NO_TIME);
+    static MEDCouplingFieldDouble *New(TypeOfField type, TypeOfTimeDiscretization td=ONE_TIME);
+    static MEDCouplingFieldDouble *New(const MEDCouplingFieldTemplate *ft, TypeOfTimeDiscretization td=ONE_TIME);
     void setTimeUnit(const char *unit);
     const char *getTimeUnit() const;
+    void synchronizeTimeWithSupport() throw(INTERP_KERNEL::Exception);
     void copyTinyStringsFrom(const MEDCouplingFieldDouble *other) throw(INTERP_KERNEL::Exception);
     void copyTinyAttrFrom(const MEDCouplingFieldDouble *other) throw(INTERP_KERNEL::Exception);
     std::string simpleRepr() const;

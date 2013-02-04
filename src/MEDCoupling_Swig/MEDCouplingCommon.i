@@ -6440,10 +6440,11 @@ namespace ParaMEDMEM
   class MEDCouplingFieldDouble : public ParaMEDMEM::MEDCouplingField
   {
   public:
-    static MEDCouplingFieldDouble *New(TypeOfField type, TypeOfTimeDiscretization td=NO_TIME);
-    static MEDCouplingFieldDouble *New(const MEDCouplingFieldTemplate *ft, TypeOfTimeDiscretization td=NO_TIME);
+    static MEDCouplingFieldDouble *New(TypeOfField type, TypeOfTimeDiscretization td=ONE_TIME);
+    static MEDCouplingFieldDouble *New(const MEDCouplingFieldTemplate *ft, TypeOfTimeDiscretization td=ONE_TIME);
     void setTimeUnit(const char *unit);
     const char *getTimeUnit() const;
+    void synchronizeTimeWithSupport() throw(INTERP_KERNEL::Exception);
     void copyTinyStringsFrom(const MEDCouplingFieldDouble *other) throw(INTERP_KERNEL::Exception);
     void copyTinyAttrFrom(const MEDCouplingFieldDouble *other) throw(INTERP_KERNEL::Exception);
     std::string simpleRepr() const;
@@ -6534,12 +6535,12 @@ namespace ParaMEDMEM
     MEDCouplingFieldDouble *operator*(const MEDCouplingFieldDouble& other) const throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *operator/(const MEDCouplingFieldDouble& other) const throw(INTERP_KERNEL::Exception);
     %extend {
-      MEDCouplingFieldDouble(TypeOfField type, TypeOfTimeDiscretization td=NO_TIME)
+      MEDCouplingFieldDouble(TypeOfField type, TypeOfTimeDiscretization td=ONE_TIME)
       {
         return MEDCouplingFieldDouble::New(type,td);
       }
 
-      MEDCouplingFieldDouble(const MEDCouplingFieldTemplate *ft, TypeOfTimeDiscretization td=NO_TIME)
+      MEDCouplingFieldDouble(const MEDCouplingFieldTemplate *ft, TypeOfTimeDiscretization td=ONE_TIME)
       {
         return MEDCouplingFieldDouble::New(ft,td);
       }

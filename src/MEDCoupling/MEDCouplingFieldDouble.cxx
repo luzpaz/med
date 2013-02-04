@@ -54,6 +54,18 @@ const char *MEDCouplingFieldDouble::getTimeUnit() const
 }
 
 /*!
+ * This method if possible the time information (time unit, time iteration, time unit and time value) with its support
+ * that is to say its mesh.
+ * 
+ * \throw  If \c this->_mesh is null an exception will be thrown. An exception will also be throw if the spatial discretization is
+ *         NO_TIME.
+ */
+void MEDCouplingFieldDouble::synchronizeTimeWithSupport() throw(INTERP_KERNEL::Exception)
+{
+  _time_discr->synchronizeTimeWith(_mesh);
+}
+
+/*!
  * This method performs a copy of \a this **without any copy of the underlying mesh** ( see warning section of this method).
  * The copy of arrays is deep if \b recDeepCpy equals to true, no copy of arrays is done if \b recDeepCpy equals to false.
  *

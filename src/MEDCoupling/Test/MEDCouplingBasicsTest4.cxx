@@ -398,11 +398,16 @@ void MEDCouplingBasicsTest4::testApplyFuncThree1()
 void MEDCouplingBasicsTest4::testFillFromAnalyticTwo1()
 {
   MEDCouplingUMesh *m1=build3DSurfTargetMesh_1();
+  m1->setTime(3.4,5,6); m1->setTimeUnit("us");
+  int a,b;
   CPPUNIT_ASSERT_THROW(m1->fillFromAnalytic2(ON_NODES,1,"y+z"),INTERP_KERNEL::Exception);
   m1->getCoords()->setInfoOnComponent(0,"x [m]");
   m1->getCoords()->setInfoOnComponent(1,"y");
   m1->getCoords()->setInfoOnComponent(2,"z");
   MEDCouplingFieldDouble *f1=m1->fillFromAnalytic2(ON_NODES,1,"y+z");
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(3.4,f1->getTime(a,b),1.e-14);
+  CPPUNIT_ASSERT_EQUAL(5,a); CPPUNIT_ASSERT_EQUAL(6,b);
+  CPPUNIT_ASSERT_EQUAL(std::string(f1->getTimeUnit()),std::string("us"));
   CPPUNIT_ASSERT_EQUAL(1,f1->getNumberOfComponents());
   CPPUNIT_ASSERT_EQUAL(9,f1->getNumberOfTuples());
   const double expected1[9]={0.2, 0.7, 1.2, 0.7, 1.2, 1.7, 1.2, 1.7, 2.2};
@@ -415,11 +420,16 @@ void MEDCouplingBasicsTest4::testFillFromAnalyticTwo1()
 void MEDCouplingBasicsTest4::testFillFromAnalyticThree1()
 {
   MEDCouplingUMesh *m1=build3DSurfTargetMesh_1();
+  m1->setTime(3.4,5,6); m1->setTimeUnit("us");
+  int a,b;
   std::vector<std::string> vs(3);
   vs[0]="x"; vs[1]="Y"; vs[2]="z";
   CPPUNIT_ASSERT_THROW(m1->fillFromAnalytic3(ON_NODES,1,vs,"y+z"),INTERP_KERNEL::Exception);
   vs[1]="y";
   MEDCouplingFieldDouble *f1=m1->fillFromAnalytic3(ON_NODES,1,vs,"y+z");
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(3.4,f1->getTime(a,b),1.e-14);
+  CPPUNIT_ASSERT_EQUAL(5,a); CPPUNIT_ASSERT_EQUAL(6,b);
+  CPPUNIT_ASSERT_EQUAL(std::string(f1->getTimeUnit()),std::string("us"));
   CPPUNIT_ASSERT_EQUAL(1,f1->getNumberOfComponents());
   CPPUNIT_ASSERT_EQUAL(9,f1->getNumberOfTuples());
   const double expected1[9]={0.2, 0.7, 1.2, 0.7, 1.2, 1.7, 1.2, 1.7, 2.2};

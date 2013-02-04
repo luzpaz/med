@@ -3136,7 +3136,7 @@ MEDCouplingFieldDouble *MEDCouplingUMesh::buildOrthogonalField() const
 {
   if((getMeshDimension()!=2) && (getMeshDimension()!=1 || getSpaceDimension()!=2))
     throw INTERP_KERNEL::Exception("Expected a umesh with ( meshDim == 2 spaceDim == 2 or 3 ) or ( meshDim == 1 spaceDim == 2 ) !");
-  MEDCouplingFieldDouble *ret=MEDCouplingFieldDouble::New(ON_CELLS,NO_TIME);
+  MEDCouplingFieldDouble *ret=MEDCouplingFieldDouble::New(ON_CELLS,ONE_TIME);
   DataArrayDouble *array=DataArrayDouble::New();
   int nbOfCells=getNumberOfCells();
   int nbComp=getMeshDimension()+1;
@@ -3182,6 +3182,7 @@ MEDCouplingFieldDouble *MEDCouplingUMesh::buildOrthogonalField() const
   ret->setArray(array);
   array->decrRef();
   ret->setMesh(this);
+  ret->synchronizeTimeWithSupport();
   return ret;
 }
 
@@ -3193,7 +3194,7 @@ MEDCouplingFieldDouble *MEDCouplingUMesh::buildPartOrthogonalField(const int *be
 {
   if((getMeshDimension()!=2) && (getMeshDimension()!=1 || getSpaceDimension()!=2))
     throw INTERP_KERNEL::Exception("Expected a umesh with ( meshDim == 2 spaceDim == 2 or 3 ) or ( meshDim == 1 spaceDim == 2 ) !");
-  MEDCouplingFieldDouble *ret=MEDCouplingFieldDouble::New(ON_CELLS,NO_TIME);
+  MEDCouplingFieldDouble *ret=MEDCouplingFieldDouble::New(ON_CELLS,ONE_TIME);
   DataArrayDouble *array=DataArrayDouble::New();
   std::size_t nbelems=std::distance(begin,end);
   int nbComp=getMeshDimension()+1;
@@ -3239,6 +3240,7 @@ MEDCouplingFieldDouble *MEDCouplingUMesh::buildPartOrthogonalField(const int *be
   ret->setArray(array);
   array->decrRef();
   ret->setMesh(this);
+  ret->synchronizeTimeWithSupport();
   return ret;
 }
 
@@ -3252,7 +3254,7 @@ MEDCouplingFieldDouble *MEDCouplingUMesh::buildDirectionVectorField() const
     throw INTERP_KERNEL::Exception("Expected a umesh with meshDim == 1 for buildDirectionVectorField !");
    if(_types.size()!=1 || *(_types.begin())!=INTERP_KERNEL::NORM_SEG2)
      throw INTERP_KERNEL::Exception("Expected a umesh with only NORM_SEG2 type of elements for buildDirectionVectorField !");
-   MEDCouplingFieldDouble *ret=MEDCouplingFieldDouble::New(ON_CELLS,NO_TIME);
+   MEDCouplingFieldDouble *ret=MEDCouplingFieldDouble::New(ON_CELLS,ONE_TIME);
    DataArrayDouble *array=DataArrayDouble::New();
    int nbOfCells=getNumberOfCells();
    int spaceDim=getSpaceDimension();
@@ -3270,6 +3272,7 @@ MEDCouplingFieldDouble *MEDCouplingUMesh::buildDirectionVectorField() const
    ret->setArray(array);
    array->decrRef();
    ret->setMesh(this);
+   ret->synchronizeTimeWithSupport();
    return ret;   
 }
 
@@ -5038,7 +5041,7 @@ MEDCouplingFieldDouble *MEDCouplingUMesh::getEdgeRatioField() const throw(INTERP
     throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getEdgeRatioField : SpaceDimension must be equal to 2 or 3 !");
   if(meshDim!=2 && meshDim!=3)
     throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getEdgeRatioField : MeshDimension must be equal to 2 or 3 !");
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(ON_CELLS,NO_TIME);
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(ON_CELLS,ONE_TIME);
   ret->setMesh(this);
   int nbOfCells=getNumberOfCells();
   DataArrayDouble *arr=DataArrayDouble::New();
@@ -5079,6 +5082,7 @@ MEDCouplingFieldDouble *MEDCouplingUMesh::getEdgeRatioField() const throw(INTERP
       conn+=connI[i+1]-connI[i];
     }
   ret->setName("EdgeRatio");
+  ret->synchronizeTimeWithSupport();
   return ret.retn();
 }
 
@@ -5097,7 +5101,7 @@ MEDCouplingFieldDouble *MEDCouplingUMesh::getAspectRatioField() const throw(INTE
     throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getAspectRatioField : SpaceDimension must be equal to 2 or 3 !");
   if(meshDim!=2 && meshDim!=3)
     throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getAspectRatioField : MeshDimension must be equal to 2 or 3 !");
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(ON_CELLS,NO_TIME);
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(ON_CELLS,ONE_TIME);
   ret->setMesh(this);
   int nbOfCells=getNumberOfCells();
   DataArrayDouble *arr=DataArrayDouble::New();
@@ -5138,6 +5142,7 @@ MEDCouplingFieldDouble *MEDCouplingUMesh::getAspectRatioField() const throw(INTE
       conn+=connI[i+1]-connI[i];
     }
   ret->setName("AspectRatio");
+  ret->synchronizeTimeWithSupport();
   return ret.retn();
 }
 
@@ -5156,7 +5161,7 @@ MEDCouplingFieldDouble *MEDCouplingUMesh::getWarpField() const throw(INTERP_KERN
     throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getWarpField : SpaceDimension must be equal to 3 !");
   if(meshDim!=2)
     throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getWarpField : MeshDimension must be equal to 2 !");
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(ON_CELLS,NO_TIME);
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(ON_CELLS,ONE_TIME);
   ret->setMesh(this);
   int nbOfCells=getNumberOfCells();
   DataArrayDouble *arr=DataArrayDouble::New();
@@ -5185,6 +5190,7 @@ MEDCouplingFieldDouble *MEDCouplingUMesh::getWarpField() const throw(INTERP_KERN
       conn+=connI[i+1]-connI[i];
     }
   ret->setName("Warp");
+  ret->synchronizeTimeWithSupport();
   return ret.retn();
 }
 
@@ -5203,7 +5209,7 @@ MEDCouplingFieldDouble *MEDCouplingUMesh::getSkewField() const throw(INTERP_KERN
     throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getSkewField : SpaceDimension must be equal to 3 !");
   if(meshDim!=2)
     throw INTERP_KERNEL::Exception("MEDCouplingUMesh::getSkewField : MeshDimension must be equal to 2 !");
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(ON_CELLS,NO_TIME);
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(ON_CELLS,ONE_TIME);
   ret->setMesh(this);
   int nbOfCells=getNumberOfCells();
   DataArrayDouble *arr=DataArrayDouble::New();
@@ -5232,6 +5238,7 @@ MEDCouplingFieldDouble *MEDCouplingUMesh::getSkewField() const throw(INTERP_KERN
       conn+=connI[i+1]-connI[i];
     }
   ret->setName("Skew");
+  ret->synchronizeTimeWithSupport();
   return ret.retn();
 }
 
