@@ -110,12 +110,12 @@ void MEDCouplingCMesh::updateTime() const
 std::size_t MEDCouplingCMesh::getHeapMemorySize() const
 {
   std::size_t ret=0;
-  if(_x_array)
-    ret+=_x_array->getHeapMemorySize();
-  if(_y_array)
-    ret+=_y_array->getHeapMemorySize();
-  if(_z_array)
-    ret+=_z_array->getHeapMemorySize();
+  std::set<DataArrayDouble *> s;
+  s.insert(_x_array); s.insert(_y_array); s.insert(_z_array);
+  s.erase(NULL);
+  for(std::set<DataArrayDouble *>::const_iterator it=s.begin();it!=s.end();it++)
+    if(*it)
+      ret+=(*it)->getHeapMemorySize();
   return MEDCouplingMesh::getHeapMemorySize()+ret;
 }
 
