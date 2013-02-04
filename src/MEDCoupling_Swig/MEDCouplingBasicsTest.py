@@ -10961,6 +10961,39 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertEqual(12,b) ; self.assertEqual(125,len(a)) ; self.assertTrue(a.isIdentity())
         pass
 
+    def testSwigUMeshInsertNextCell1(self):
+        m=MEDCouplingUMesh("toto",2)
+        #
+        coords=DataArrayDouble([0.,0.,1.,1.,1.,0.]) ; m.setCoords(coords)
+        da=DataArrayInt([0,1,2])
+        m.allocateCells(0)
+        for i in xrange(5):
+            m.insertNextCell(NORM_TRI3,da)
+            pass
+        self.assertTrue(m.getNodalConnectivity().isEqual(DataArrayInt([3,0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3,0,1,2])))
+        self.assertTrue(m.getNodalConnectivityIndex().isEqual(DataArrayInt([0,4,8,12,16,20])))
+        #
+        da=DataArrayInt([0,1,2,3])
+        m.allocateCells(0)
+        for i in xrange(5):
+            m.insertNextCell(NORM_TRI3,3,da)
+            pass
+        self.assertTrue(m.getNodalConnectivity().isEqual(DataArrayInt([3,0,1,2,3,0,1,2,3,0,1,2,3,0,1,2,3,0,1,2])))
+        self.assertTrue(m.getNodalConnectivityIndex().isEqual(DataArrayInt([0,4,8,12,16,20])))
+        #
+        da=DataArrayInt([0,1])
+        m.allocateCells(0)
+        self.assertRaises(InterpKernelException,m.insertNextCell,NORM_TRI3,3,da)
+        #
+        da=DataArrayInt([0,1,2,0,1,3,0,1,4,0,1,5,0,1,6],5,3)
+        m.allocateCells(0)
+        for t in da:
+            m.insertNextCell(NORM_TRI3,t)
+            pass
+        self.assertTrue(m.getNodalConnectivity().isEqual(DataArrayInt([3,0,1,2,3,0,1,3,3,0,1,4,3,0,1,5,3,0,1,6])))
+        self.assertTrue(m.getNodalConnectivityIndex().isEqual(DataArrayInt([0,4,8,12,16,20])))
+        pass
+
     def setUp(self):
         pass
     pass

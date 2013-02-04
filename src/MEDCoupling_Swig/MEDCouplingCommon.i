@@ -1605,11 +1605,12 @@ namespace ParaMEDMEM
 
       void insertNextCell(INTERP_KERNEL::NormalizedCellType type, int size, PyObject *li) throw(INTERP_KERNEL::Exception)
       {
-        int sz;
-        INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(li,&sz);
-        if(size>sz)
+        int szArr,sw,iTypppArr;
+        std::vector<int> stdvecTyyppArr;
+        const int *tmp=convertObjToPossibleCpp1_Safe(li,sw,szArr,iTypppArr,stdvecTyyppArr);
+        if(size>szArr)
           {
-            std::ostringstream oss; oss << "Wrap of MEDCouplingUMesh::insertNextCell : request of connectivity with length " << size << " whereas the length of input is " << sz << " !";
+            std::ostringstream oss; oss << "Wrap of MEDCouplingUMesh::insertNextCell : request of connectivity with length " << size << " whereas the length of input is " << szArr << " !";
             throw INTERP_KERNEL::Exception(oss.str().c_str());
           }
         self->insertNextCell(type,size,tmp);
@@ -1617,9 +1618,10 @@ namespace ParaMEDMEM
 
       void insertNextCell(INTERP_KERNEL::NormalizedCellType type, PyObject *li) throw(INTERP_KERNEL::Exception)
       {
-        int sz;
-        INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(li,&sz);
-        self->insertNextCell(type,sz,tmp);
+        int szArr,sw,iTypppArr;
+        std::vector<int> stdvecTyyppArr;
+        const int *tmp=convertObjToPossibleCpp1_Safe(li,sw,szArr,iTypppArr,stdvecTyyppArr);
+        self->insertNextCell(type,szArr,tmp);
       }
       
       DataArrayInt *getNodalConnectivity() throw(INTERP_KERNEL::Exception)
