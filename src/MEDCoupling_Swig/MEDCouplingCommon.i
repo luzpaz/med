@@ -29,6 +29,7 @@
 #include "MEDCouplingUMesh.hxx"
 #include "MEDCouplingExtrudedMesh.hxx"
 #include "MEDCouplingCMesh.hxx"
+#include "MEDCouplingCurveLinearMesh.hxx"
 #include "MEDCouplingField.hxx"
 #include "MEDCouplingFieldDouble.hxx"
 #include "MEDCouplingFieldTemplate.hxx"
@@ -56,6 +57,11 @@ using namespace INTERP_KERNEL;
 }
 
 %typemap(out) ParaMEDMEM::MEDCouplingPointSet*
+{
+  $result=convertMesh($1,$owner);
+}
+
+%typemap(out) ParaMEDMEM::MEDCouplingStructuredMesh*
 {
   $result=convertMesh($1,$owner);
 }
@@ -314,6 +320,9 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::MEDCouplingCMesh::New;
 %newobject ParaMEDMEM::MEDCouplingCMesh::clone;
 %newobject ParaMEDMEM::MEDCouplingCMesh::getCoordsAt;
+%newobject ParaMEDMEM::MEDCouplingCurveLinearMesh::New;
+%newobject ParaMEDMEM::MEDCouplingCurveLinearMesh::clone;
+%newobject ParaMEDMEM::MEDCouplingCurveLinearMesh::getCoords;
 %newobject ParaMEDMEM::MEDCouplingMultiFields::New;
 %newobject ParaMEDMEM::MEDCouplingMultiFields::deepCpy;
 %newobject ParaMEDMEM::MEDCouplingFieldOverTime::New;
@@ -438,7 +447,8 @@ namespace ParaMEDMEM
       UNSTRUCTURED = 5,
       UNSTRUCTURED_DESC = 6,
       CARTESIAN = 7,
-      EXTRUDED = 8
+      EXTRUDED = 8,
+      CURVE_LINEAR = 9
     } MEDCouplingMeshType;
 
   class DataArrayInt;
@@ -2459,7 +2469,15 @@ namespace ParaMEDMEM
     }
   };
 
-  class MEDCouplingCMesh : public ParaMEDMEM::MEDCouplingMesh
+  class MEDCouplingStructuredMesh : public ParaMEDMEM::MEDCouplingMesh
+  {
+  public:
+    void updateTime() const throw(INTERP_KERNEL::Exception);
+    int getCellIdFromPos(int i, int j, int k) const throw(INTERP_KERNEL::Exception);
+    int getNodeIdFromPos(int i, int j, int k) const throw(INTERP_KERNEL::Exception);
+  };
+
+  class MEDCouplingCMesh : public ParaMEDMEM::MEDCouplingStructuredMesh
   {
   public:
     static MEDCouplingCMesh *New();
@@ -2469,7 +2487,6 @@ namespace ParaMEDMEM
                    const DataArrayDouble *coordsY=0,
                    const DataArrayDouble *coordsZ=0) throw(INTERP_KERNEL::Exception);
     void setCoordsAt(int i, const DataArrayDouble *arr) throw(INTERP_KERNEL::Exception);
-    void updateTime() const throw(INTERP_KERNEL::Exception);
     %extend {
       MEDCouplingCMesh()
       {
@@ -2492,6 +2509,45 @@ namespace ParaMEDMEM
       }
     }
   };
+
+  class MEDCouplingCurveLinearMesh : public ParaMEDMEM::MEDCouplingStructuredMesh
+  {
+  public:
+    static MEDCouplingCurveLinearMesh *New();
+    static MEDCouplingCurveLinearMesh *New(const char *meshName);
+    MEDCouplingCurveLinearMesh *clone(bool recDeepCpy) const;
+    void setCoords(const DataArrayDouble *coords) throw(INTERP_KERNEL::Exception);
+    std::vector<int> getNodeGridStructure() const throw(INTERP_KERNEL::Exception);
+    %extend {
+      MEDCouplingCurveLinearMesh()
+      {
+        return MEDCouplingCurveLinearMesh::New();
+      }
+      MEDCouplingCurveLinearMesh(const char *meshName)
+      {
+        return MEDCouplingCurveLinearMesh::New(meshName);
+      }
+      std::string __str__() const
+      {
+        return self->simpleRepr();
+      }
+      DataArrayDouble *getCoords() throw(INTERP_KERNEL::Exception)
+      {
+        DataArrayDouble *ret=self->getCoords();
+        if(ret)
+          ret->incrRef();
+        return ret;
+      }
+      void setNodeGridStructure(PyObject *gridStruct) throw(INTERP_KERNEL::Exception)
+      {
+        int szArr,sw,iTypppArr;
+        std::vector<int> stdvecTyyppArr;
+        const int *tmp=convertObjToPossibleCpp1_Safe(gridStruct,sw,szArr,iTypppArr,stdvecTyyppArr);
+        self->setNodeGridStructure(tmp,tmp+szArr);
+      }
+    }
+  };
+  
 }
 %extend ParaMEDMEM::MEDCouplingFieldDiscretizationKriging
 {

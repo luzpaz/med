@@ -37,7 +37,8 @@ namespace ParaMEDMEM
       UNSTRUCTURED = 5,
       UNSTRUCTURED_DESC = 6,
       CARTESIAN = 7,
-      EXTRUDED = 8
+      EXTRUDED = 8,
+      CURVE_LINEAR = 9
     } MEDCouplingMeshType;
 
   class DataArrayInt;
