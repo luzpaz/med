@@ -309,8 +309,6 @@ const DataArrayDouble *MEDCouplingCurveLinearMesh::getCoords() const throw(INTER
 
 void MEDCouplingCurveLinearMesh::setCoords(const DataArrayDouble *coords) throw(INTERP_KERNEL::Exception)
 {
-  if(coords)
-    coords->checkNbOfComps(1,"MEDCouplingCurveLinearMesh::setCoords");
   if(coords!=(const DataArrayDouble *)_coords)
     {
       _coords=const_cast<DataArrayDouble *>(coords);

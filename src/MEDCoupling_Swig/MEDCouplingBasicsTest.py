@@ -10992,6 +10992,22 @@ class MEDCouplingBasicsTest(unittest.TestCase):
             pass
         self.assertTrue(m.getNodalConnectivity().isEqual(DataArrayInt([3,0,1,2,3,0,1,3,3,0,1,4,3,0,1,5,3,0,1,6])))
         self.assertTrue(m.getNodalConnectivityIndex().isEqual(DataArrayInt([0,4,8,12,16,20])))
+        self.assertRaises(InterpKernelException,m.insertNextCell,NORM_TRI3,None)
+        pass
+
+    def testSwigCurveLinearMesh1(self):
+        m=MEDCouplingCurveLinearMesh("toto")
+        m.setNodeGridStructure([2,3])
+        coords=DataArrayDouble([0.,0., 2.,0., 0.,1., 1.9,1.1, 0.3,1.9, 2.2,2.1],6,2)
+        m.setCoords(coords)
+        m.checkCoherency()
+        m0=m.deepCpy()
+        self.assertTrue(m0.isEqual(m,1e-12))
+        m.getCoords().setInfoOnComponents(["X [m]","Y [m]"])
+        self.assertTrue(not m0.isEqual(m,1e-12))
+        m0=m.deepCpy()
+        self.assertTrue(m0.isEqual(m,1e-12))
+        self.assertEqual(m.getNodeGridStructure(),(2,3))
         pass
 
     def setUp(self):
