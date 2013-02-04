@@ -76,7 +76,15 @@ module SALOME_MED
   {
   };
 
-  interface MEDCouplingCMeshCorbaInterface : MEDCouplingMeshCorbaInterface
+  interface MEDCouplingStructuredMeshCorbaInterface : MEDCouplingMeshCorbaInterface
+  {
+  };
+
+  interface MEDCouplingCMeshCorbaInterface : MEDCouplingStructuredMeshCorbaInterface
+  {
+  };
+
+  interface MEDCouplingCurveLinearMeshCorbaInterface : MEDCouplingStructuredMeshCorbaInterface
   {
   };
 

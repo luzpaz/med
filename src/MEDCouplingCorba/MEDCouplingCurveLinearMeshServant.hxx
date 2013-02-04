@@ -29,16 +29,16 @@
 
 namespace ParaMEDMEM
 {
-  class MEDCouplingCMesh;
+  class MEDCouplingCurveLinearMesh;
 
-  class MEDCOUPLINGCORBA_EXPORT MEDCouplingCMeshServant : MEDCouplingStructuredMeshServant, public virtual POA_SALOME_MED::MEDCouplingCMeshCorbaInterface
+  class MEDCOUPLINGCORBA_EXPORT MEDCouplingCurveLinearMeshServant : MEDCouplingStructuredMeshServant, public virtual POA_SALOME_MED::MEDCouplingCMeshCorbaInterface
   {
   public:
-    typedef MEDCouplingCMesh CppType;
-    MEDCouplingCMeshServant(const MEDCouplingCMesh *cppPointerOfMesh);
-    ~MEDCouplingCMeshServant();
+    typedef MEDCouplingCurveLinearMesh CppType;
+    MEDCouplingCurveLinearMeshServant(const MEDCouplingCurveLinearMesh *cppPointerOfMesh);
+    ~MEDCouplingCurveLinearMeshServant();
   private:
-    const MEDCouplingCMesh *getPointer() const { return (const MEDCouplingCMesh *)(_cpp_pointer); }
+    const MEDCouplingCurveLinearMesh *getPointer() const { return (const MEDCouplingCurveLinearMesh *)(_cpp_pointer); }
   };
 }
 

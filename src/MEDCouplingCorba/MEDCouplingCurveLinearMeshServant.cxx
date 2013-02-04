@@ -18,28 +18,16 @@
 //
 // Author : Anthony Geay (CEA/DEN)
 
-#ifndef __MEDCOUPLINGCMESHSERVANT_HXX__
-#define __MEDCOUPLINGCMESHSERVANT_HXX__
+#include "MEDCouplingCurveLinearMeshServant.hxx"
 
-#include "SALOMEconfig.h"
+#include "MEDCouplingCurveLinearMesh.hxx"
 
-#include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
-#include "MEDCouplingStructuredMeshServant.hxx"
-#include "MEDCouplingCorba.hxx"
+using namespace ParaMEDMEM;
 
-namespace ParaMEDMEM
+MEDCouplingCurveLinearMeshServant::MEDCouplingCurveLinearMeshServant(const MEDCouplingCurveLinearMesh *cppPointerOfMesh):MEDCouplingStructuredMeshServant(cppPointerOfMesh)
 {
-  class MEDCouplingCMesh;
-
-  class MEDCOUPLINGCORBA_EXPORT MEDCouplingCMeshServant : MEDCouplingStructuredMeshServant, public virtual POA_SALOME_MED::MEDCouplingCMeshCorbaInterface
-  {
-  public:
-    typedef MEDCouplingCMesh CppType;
-    MEDCouplingCMeshServant(const MEDCouplingCMesh *cppPointerOfMesh);
-    ~MEDCouplingCMeshServant();
-  private:
-    const MEDCouplingCMesh *getPointer() const { return (const MEDCouplingCMesh *)(_cpp_pointer); }
-  };
 }
 
-#endif
+MEDCouplingCurveLinearMeshServant::~MEDCouplingCurveLinearMeshServant()
+{
+}

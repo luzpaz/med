@@ -18,27 +18,31 @@
 //
 // Author : Anthony Geay (CEA/DEN)
 
-#ifndef __MEDCOUPLINGCMESHSERVANT_HXX__
-#define __MEDCOUPLINGCMESHSERVANT_HXX__
+#ifndef __MEDCOUPLINGSTRUCTUREDMESHSERVANT_HXX__
+#define __MEDCOUPLINGSTRUCTUREDMESHSERVANT_HXX__
 
 #include "SALOMEconfig.h"
 
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
-#include "MEDCouplingStructuredMeshServant.hxx"
+#include "MEDCouplingMeshServant.hxx"
 #include "MEDCouplingCorba.hxx"
+
+#include <vector>
 
 namespace ParaMEDMEM
 {
-  class MEDCouplingCMesh;
-
-  class MEDCOUPLINGCORBA_EXPORT MEDCouplingCMeshServant : MEDCouplingStructuredMeshServant, public virtual POA_SALOME_MED::MEDCouplingCMeshCorbaInterface
+  class MEDCouplingStructuredMesh;
+  class DataArrayInt;
+  class DataArrayDouble;
+  
+  class MEDCOUPLINGCORBA_EXPORT MEDCouplingStructuredMeshServant : public MEDCouplingMeshServant,
+                                                                   public virtual POA_SALOME_MED::MEDCouplingStructuredMeshCorbaInterface
   {
-  public:
-    typedef MEDCouplingCMesh CppType;
-    MEDCouplingCMeshServant(const MEDCouplingCMesh *cppPointerOfMesh);
-    ~MEDCouplingCMeshServant();
+  protected:
+    MEDCouplingStructuredMeshServant(const MEDCouplingStructuredMesh *cppPointerOfMesh);
+    ~MEDCouplingStructuredMeshServant();
   private:
-    const MEDCouplingCMesh *getPointer() const { return (const MEDCouplingCMesh *)(_cpp_pointer); }
+    const MEDCouplingStructuredMesh *getPointer() const { return (const MEDCouplingStructuredMesh *)(_cpp_pointer); }
   };
 }
 

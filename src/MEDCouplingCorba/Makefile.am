@@ -34,6 +34,8 @@ salomeinclude_HEADERS=                        \
 	MEDCouplingMeshServant.hxx            \
 	MEDCouplingPointSetServant.hxx        \
 	MEDCouplingExtrudedMeshServant.hxx    \
+	MEDCouplingStructuredMeshServant.hxx  \
+	MEDCouplingCurveLinearMeshServant.hxx \
 	MEDCouplingCMeshServant.hxx           \
 	MEDCouplingUMeshServant.hxx           \
 	MEDCouplingFieldServant.hxx           \
@@ -45,20 +47,22 @@ salomeinclude_HEADERS=                        \
 	DataArrayIntServant.hxx               \
 	DataArrayServant.hxx
 
-dist_libmedcouplingcorba_la_SOURCES=         \
-	MEDCouplingRefCountServant.cxx       \
-	MEDCouplingMeshServant.cxx           \
-	MEDCouplingPointSetServant.cxx       \
-	MEDCouplingExtrudedMeshServant.cxx   \
-	MEDCouplingCMeshServant.cxx          \
-	MEDCouplingUMeshServant.cxx          \
-	MEDCouplingFieldServant.cxx          \
-	MEDCouplingFieldDoubleServant.cxx    \
-	MEDCouplingFieldTemplateServant.cxx  \
-	MEDCouplingMultiFieldsServant.cxx    \
-	MEDCouplingFieldOverTimeServant.cxx  \
-	DataArrayDoubleServant.cxx           \
-	DataArrayIntServant.cxx              \
+dist_libmedcouplingcorba_la_SOURCES=          \
+	MEDCouplingRefCountServant.cxx        \
+	MEDCouplingMeshServant.cxx            \
+	MEDCouplingPointSetServant.cxx        \
+	MEDCouplingExtrudedMeshServant.cxx    \
+	MEDCouplingStructuredMeshServant.cxx  \
+	MEDCouplingCurveLinearMeshServant.cxx \
+	MEDCouplingCMeshServant.cxx           \
+	MEDCouplingUMeshServant.cxx           \
+	MEDCouplingFieldServant.cxx           \
+	MEDCouplingFieldDoubleServant.cxx     \
+	MEDCouplingFieldTemplateServant.cxx   \
+	MEDCouplingMultiFieldsServant.cxx     \
+	MEDCouplingFieldOverTimeServant.cxx   \
+	DataArrayDoubleServant.cxx            \
+	DataArrayIntServant.cxx               \
 	DataArrayServant.cxx
 
 libmedcouplingcorba_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) -I$(top_builddir)/idl ${KERNEL_CXXFLAGS} \
