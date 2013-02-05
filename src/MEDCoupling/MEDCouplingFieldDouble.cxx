@@ -1,25 +1,3 @@
-/*!
- * Builds a newly created field, that the caller will have the responsability to deal with.
- * \n This method makes the assumption that the field \a this is correctly defined when this method is called (\c this->checkCoherency() returns without any exception thrown), **no check of this will be done**.
- * \n This method returns a restriction of \a this so that only tuples id specified in [ \a partBg , \a partEnd ) will be contained in returned field. 
- * \n Parameter [\a partBg, \a partEnd ) specifies \b cell \b ids \b whatever \b the \b spatial \b discretization of \a this
- * (\ref ParaMEDMEM::ON_CELLS "ON_CELLS", \ref ParaMEDMEM::ON_NODES "ON_CELLS", \ref ParaMEDMEM::ON_GAUSS_PT "ON_GAUSS_PT", \ref ParaMEDMEM::ON_GAUSS_NE "ON_GAUSS_NE")
- *
- * \param [in] partEnd end (not included) of input range cell ids to select [ \a partBg, \a partEnd
- * \return a newly allocated field the caller should deal with.
- * 
- * \throw if there is presence of an invalid cell id in [ \a partBg, \a partEnd ) regarding the number of cells of \c this->getMesh()
- *
- * \ref cpp_mcfielddouble_subpart1 "Here a C++ example."
- *
- * \ref py_mcfielddouble_subpart1 "Here a Python example."
- * \sa ParaMEDMEM::MEDCouplingFieldDouble::buildSubPart(const DataArrayInt *) const
- */
-
-
-
-
-
 // Copyright (C) 2007-2012  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
