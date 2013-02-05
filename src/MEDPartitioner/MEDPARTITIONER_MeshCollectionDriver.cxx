@@ -250,32 +250,33 @@ void MeshCollectionDriver::writeMedFile(int idomain, const std::string& distfile
       meshes.push_back(faceMesh);
     }
   
-  ParaMEDMEM::MEDCouplingUMesh* boundaryMesh=0;
-  if (MyGlobals::_Creates_Boundary_Faces>0)
-    {
-      //try to write Boundary meshes
-      bool keepCoords=false; //TODO or true
-      boundaryMesh=(ParaMEDMEM::MEDCouplingUMesh *) cellMesh->buildBoundaryMesh(keepCoords);
-      boundaryMesh->setName("boundaryMesh");
-    }
-  
+  //ParaMEDMEM::MEDCouplingUMesh* boundaryMesh=0;
+  // if (MyGlobals::_Creates_Boundary_Faces>0)
+  //   {
+  //     //try to write Boundary meshes
+  //     bool keepCoords=false; //TODO or true
+  //     boundaryMesh=(ParaMEDMEM::MEDCouplingUMesh *) cellMesh->buildBoundaryMesh(keepCoords);
+  //     boundaryMesh->setName("boundaryMesh");
+  //   }
+
   MEDLoader::WriteUMeshes(distfilename.c_str(), meshes, true);
   if (faceMeshFilter!=0)
     faceMeshFilter->decrRef();
-  
-  if (boundaryMesh!=0)
-    {
-      //doing that testMesh becomes second mesh sorted by alphabetical order of name
-      MEDLoader::WriteUMesh(distfilename.c_str(), boundaryMesh, false);
-      boundaryMesh->decrRef();
-    }
+
+  // if (boundaryMesh!=0)
+  //   {
+  //     //doing that testMesh becomes second mesh sorted by alphabetical order of name
+  //     MEDLoader::WriteUMesh(distfilename.c_str(), boundaryMesh, false);
+  //     boundaryMesh->decrRef();
+  //   }
   ParaMEDMEM::MEDFileUMesh* mfm=ParaMEDMEM::MEDFileUMesh::New(distfilename.c_str(), _collection->getMesh(idomain)->getName());
-  
+
   mfm->setFamilyInfo(_collection->getFamilyInfo());
   mfm->setGroupInfo(_collection->getGroupInfo());
-  
+
   std::string key=Cle1ToStr("faceFamily_toArray",idomain);
-  if (_collection->getMapDataArrayInt().find(key)!=_collection->getMapDataArrayInt().end())
+  if ( meshes.size() == 2 &&
+      _collection->getMapDataArrayInt().find(key)!=_collection->getMapDataArrayInt().end())
     {
       ParaMEDMEM::DataArrayInt *fam=_collection->getMapDataArrayInt().find(key)->second;
       ParaMEDMEM::DataArrayInt *famFilter=0;
@@ -292,18 +293,19 @@ void MeshCollectionDriver::writeMedFile(int idomain, const std::string& distfile
           for (int i=0; i<nbTuples; i++)
             pfamFilter[i]=pfam[index[i]];
           fam=famFilter;
-          mfm->setFamilyFieldArr(-1,fam);
-          famFilter->decrRef();
         }
+      mfm->setFamilyFieldArr(-1,fam);
+      if ( famFilter )
+        famFilter->decrRef();
     }
-  
+
   key=Cle1ToStr("cellFamily_toArray",idomain);
   if (_collection->getMapDataArrayInt().find(key)!=_collection->getMapDataArrayInt().end())
     mfm->setFamilyFieldArr(0,_collection->getMapDataArrayInt().find(key)->second);
-  
+
   mfm->write(distfilename.c_str(),0);
   key="/inewFieldDouble="+IntToStr(idomain)+"/";
-    
+
   std::map<std::string,ParaMEDMEM::DataArrayDouble*>::iterator it;
   int nbfFieldFound=0;
   for (it=_collection->getMapDataArrayDouble().begin() ; it!=_collection->getMapDataArrayDouble().end(); it++)
