@@ -69,7 +69,7 @@ MEDPARTITIONER::MeshCollection::MeshCollection()
     _domain_selector( 0 ),
     _i_non_empty_mesh(-1),
     _driver_type(MEDPARTITIONER::MedXml),
-    _subdomain_boundary_creates(false),
+    _subdomain_boundary_creates( MyGlobals::_Creates_Boundary_Faces ),
     _family_splitting(false),
     _create_empty_groups(false),
     _joint_finder(0)
@@ -98,7 +98,7 @@ MEDPARTITIONER::MeshCollection::MeshCollection(MeshCollection& initialCollection
     _i_non_empty_mesh(-1),
     _name(initialCollection._name),
     _driver_type(MEDPARTITIONER::MedXml),
-    _subdomain_boundary_creates(false),
+    _subdomain_boundary_creates(MyGlobals::_Creates_Boundary_Faces),
     _family_splitting(family_splitting),
     _create_empty_groups(create_empty_groups),
     _joint_finder(0)
@@ -425,26 +425,26 @@ void MEDPARTITIONER::MeshCollection::castFaceMeshes(MeshCollection& initialColle
   //the old faces on the new ones
   //splitMeshes[4][2] contains the faces from old domain 2
   //that have to be added to domain 4
-  
+
   using std::vector;
   using std::map;
   using std::multimap;
   using std::pair;
   using std::make_pair;
-  
+
   if (MyGlobals::_Verbose>10)
     std::cout << "proc " << MyGlobals::_Rank << " : castFaceMeshes" << std::endl;
   if (_topology==0)
     throw INTERP_KERNEL::Exception("Topology has not been defined on call to castFaceMeshes");
-  
+
   int nbNewDomain=_topology->nbDomain();
   int nbOldDomain=initialCollection.getTopology()->nbDomain();
-  
+
   vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastFrom=initialCollection.getFaceMesh();
   vector<ParaMEDMEM::MEDCouplingUMesh*>& meshesCastTo=this->getFaceMesh();
-  
+
   vector< vector<ParaMEDMEM::MEDCouplingUMesh*> > splitMeshes;
-  
+
   splitMeshes.resize(nbNewDomain);
   for (int inew=0; inew<nbNewDomain; inew++)
     {
@@ -452,7 +452,7 @@ void MEDPARTITIONER::MeshCollection::castFaceMeshes(MeshCollection& initialColle
     }
   new2oldIds.resize(nbOldDomain);
   for (int iold=0; iold<nbOldDomain; iold++) new2oldIds[iold].resize(nbNewDomain);
-  
+
   //init null pointer for empty meshes
   for (int inew=0; inew<nbNewDomain; inew++)
     {
@@ -583,7 +583,16 @@ void MEDPARTITIONER::MeshCollection::castFaceMeshes(MeshCollection& initialColle
             if (umesh->getNumberOfCells()>0)
                 myMeshes.push_back(umesh);
         }
-      
+
+      ParaMEDMEM::MEDCouplingUMesh *bndMesh = 0;
+      if ( _subdomain_boundary_creates )
+        {
+          bndMesh =
+            ((ParaMEDMEM::MEDCouplingUMesh *)_mesh[inew]->buildBoundaryMesh(/*keepCoords=*/true));
+          if (bndMesh->getNumberOfCells()>0)
+            myMeshes.push_back( bndMesh );
+        }
+
       if (myMeshes.size()>0)
         {
           meshesCastTo[inew]=ParaMEDMEM::MEDCouplingUMesh::MergeUMeshes(myMeshes);
@@ -596,6 +605,8 @@ void MEDPARTITIONER::MeshCollection::castFaceMeshes(MeshCollection& initialColle
       for (int iold=0; iold<nbOldDomain; iold++)
         if (splitMeshes[inew][iold]!=0)
           splitMeshes[inew][iold]->decrRef();
+      if ( bndMesh )
+        bndMesh->decrRef();
     }
   if (MyGlobals::_Verbose>300)
     std::cout << "proc " << MyGlobals::_Rank << " : castFaceMeshes end fusing" << std::endl;
@@ -625,6 +636,7 @@ void MEDPARTITIONER::MeshCollection::castIntField(std::vector<ParaMEDMEM::MEDCou
         ParaMEDMEM::DataArrayDouble* sourceCoords=meshesCastFrom[iold]->getBarycenterAndOwner();
         bbox[iold]=sourceCoords->computeBBoxPerTuple(1.e-6);
         acceleratingStructures[iold]=new BBTreeOfDim( sourceCoords->getNumberOfComponents(), bbox[iold]->getConstPointer(),0,0,bbox[iold]->getNumberOfTuples());
+        sourceCoords->decrRef();
       }
   // send-recv operations
 #ifdef HAVE_MPI2
@@ -699,7 +711,7 @@ void MEDPARTITIONER::MeshCollection::remapIntField(int inew, int iold,
   ParaMEDMEM::DataArrayDouble* targetCoords=targetMesh.getBarycenterAndOwner();
   const double*  tc=targetCoords->getConstPointer();
   int targetSize=targetMesh.getNumberOfCells();
-  // int sourceSize=sourceMesh.getNumberOfCells(); // unused variable
+  int sourceSize=sourceMesh.getNumberOfCells();
   if (MyGlobals::_Verbose>200)
     std::cout<<"remap vers target de taille "<<targetSize<<std::endl;
   std::vector<int> ccI;
@@ -750,9 +762,12 @@ void MEDPARTITIONER::MeshCollection::remapIntField(int inew, int iold,
               i2nb = isource2nb.insert( std::make_pair( isourcenode, 0 )).first;
               isourcenode = intersectingElems[ i2nb->second++ ];
             }
-          toArray[itargetnode]=fromArray[isourcenode];
-          ccI.push_back(itargetnode);
-          ccI.push_back(isourcenode);
+          if ( isourcenode < sourceSize ) // protection from invalid elements
+            {
+              toArray[itargetnode]=fromArray[isourcenode];
+              ccI.push_back(itargetnode);
+              ccI.push_back(isourcenode);
+            }
         }
     }
   if (MyGlobals::_Verbose>200)
@@ -917,6 +932,220 @@ void MEDPARTITIONER::MeshCollection::remapDoubleField(int inew, int iold,
     }
 }
 
+//================================================================================
+/*!
+ * \brief Find faces common with neighbor domains and put them in "JOINT_n_p_Faces"
+ *        group (where "n" and "p" are domain IDs)
+ */
+//================================================================================
+
+void MEDPARTITIONER::MeshCollection::buildConnectZones()
+{
+  if ( getMeshDimension() < 2 )
+    return;
+
+  std::vector<ParaMEDMEM::MEDCouplingUMesh*>& faceMeshes = getFaceMesh();
+  int nbMeshes = faceMeshes.size();
+
+  //preparing bounding box trees for accelerating search of coincident faces
+  std::vector<BBTreeOfDim* >            bbTrees(nbMeshes);
+  std::vector<ParaMEDMEM::DataArrayDouble*>bbox(nbMeshes);
+  for (int inew = 0; inew < nbMeshes-1; inew++)
+    if (isParallelMode() && _domain_selector->isMyDomain(inew))
+      {
+        ParaMEDMEM::DataArrayDouble* bcCoords = faceMeshes[inew]->getBarycenterAndOwner();
+        bbox   [inew] = bcCoords->computeBBoxPerTuple(1.e-6);
+        bbTrees[inew] = new BBTreeOfDim( bcCoords->getNumberOfComponents(),
+                                         bbox[inew]->getConstPointer(),0,0,
+                                         bbox[inew]->getNumberOfTuples());
+        bcCoords->decrRef();
+      }
+
+  // loop on domains to find joint faces between them
+  for (int inew1 = 0; inew1 < nbMeshes; inew1++ )
+    {
+      for (int inew2 = inew1+1; inew2 < nbMeshes; inew2++ )
+        {
+          ParaMEDMEM::MEDCouplingUMesh* mesh1 = 0;
+          ParaMEDMEM::MEDCouplingUMesh* mesh2 = 0;
+          ParaMEDMEM::MEDCouplingUMesh* recvMesh = 0;
+          bool mesh1Here = true, mesh2Here = true;
+          if (isParallelMode())
+            {
+#ifdef HAVE_MPI2
+              mesh1Here = _domain_selector->isMyDomain(inew1);
+              mesh2Here = _domain_selector->isMyDomain(inew2);
+              if ( !mesh1Here && mesh2Here )
+                {
+                  //send mesh2 to domain of mesh1
+                  _domain_selector->sendMesh(*faceMeshes[inew2],
+                                             _domain_selector->getProcessorID(inew1));
+                }
+              else if ( mesh1Here && !mesh2Here )
+                {
+                  //receiving mesh2 from a distant domain
+                  _domain_selector->recvMesh(recvMesh,_domain_selector->getProcessorID(inew2));
+                  mesh2 = recvMesh;
+                }
+#endif
+            }
+          if ( mesh1Here && !mesh1 ) mesh1 = faceMeshes[ inew1 ];
+          if ( mesh2Here && !mesh2 ) mesh2 = faceMeshes[ inew2 ];
+
+          // find coincident faces
+          std::vector< int > faces1, faces2;
+          if ( mesh1 && mesh2 )
+            {
+              const ParaMEDMEM::DataArrayDouble* coords2 = mesh2->getBarycenterAndOwner();
+              const double*   c2 = coords2->getConstPointer();
+              const int      dim = coords2->getNumberOfComponents();
+              const int nbFaces2 = mesh2->getNumberOfCells();
+              const int nbFaces1 = mesh1->getNumberOfCells();
+
+              for (int i2 = 0; i2 < nbFaces2; i2++)
+                {
+                  std::vector<int> coincFaces;
+                  bbTrees[inew1]->getElementsAroundPoint( c2+i2*dim, coincFaces );
+                  if (coincFaces.size()!=0)
+                    {
+                      int i1 = coincFaces[0];
+                      // if ( coincFaces.size() > 1 )
+                      //   {
+                      //     i2nb = isource2nb.insert( std::make_pair( i1 , 0 )).first;
+                      //     i1  = coincFaces[ i2nb->second++ ];
+                      //   }
+                      if ( i1  < nbFaces1 ) // protection from invalid elements
+                        {
+                          faces1.push_back( i1 );
+                          faces2.push_back( i2 );
+                        }
+                    }
+                }
+              coords2->decrRef();
+            }
+
+          if ( isParallelMode())
+            {
+#ifdef HAVE_MPI2
+              if ( mesh1Here && !mesh2Here )
+                {
+                  //send faces2 to domain of recvMesh
+                  SendIntVec(faces2, _domain_selector->getProcessorID(inew2));
+                }
+              else if ( !mesh1Here && mesh2Here )
+                {
+                  //receiving ids of faces from a domain of mesh1
+                  RecvIntVec(faces2, _domain_selector->getProcessorID(inew1));
+                }
+#endif
+            }
+          if ( recvMesh )
+            recvMesh->decrRef();
+
+          // Create group "JOINT_inew1_inew2_Faces" and corresponding families
+          for ( int is2nd = 0; is2nd < 2; ++is2nd )
+            {
+              createJointGroup( is2nd ? faces2 : faces1,
+                                inew1 , inew2, is2nd );
+            }
+
+        } // loop on the 2nd domains (inew2)
+    } // loop on the 1st domains (inew1)
+
+
+  // delete bounding box trees
+  for (int inew = 0; inew < nbMeshes-1; inew++)
+    if (isParallelMode() && _domain_selector->isMyDomain(inew))
+      {
+        bbox[inew]->decrRef();
+        delete bbTrees[inew];
+      }
+}
+
+//================================================================================
+/*!
+ * \brief Create group "JOINT_inew1_inew2_Faces" and corresponding families
+ *  \param faces - face ids to include into the group
+ *  \param inew1 - index of the 1st domain
+ *  \param inew2 - index of the 2nd domain
+ *  \param is2nd - in which (1st or 2nd) domain to create the group
+ */
+//================================================================================
+
+void MEDPARTITIONER::MeshCollection::createJointGroup( const std::vector< int >& faces,
+                                                       const int                 inew1,
+                                                       const int                 inew2,
+                                                       const bool                is2nd )
+{
+  // get the name of JOINT group
+  std::string groupName;
+  {
+    std::ostringstream oss;
+    oss << "JOINT_"
+        << (is2nd ? inew2 : inew1 ) << "_"
+        << (is2nd ? inew1 : inew2 ) << "_"
+        << ( getMeshDimension()==2 ? "Edge" : "Face" );
+    groupName = oss.str();
+  }
+
+  // remove existing "JOINT_*" group
+  _group_info.erase( groupName );
+
+  // get family IDs array
+  int* famIDs = 0;
+  int inew = (is2nd ? inew2 : inew1 );
+  std::string cle = Cle1ToStr( "faceFamily_toArray", inew );
+  if ( !_map_dataarray_int.count(cle) )
+    {
+      ParaMEDMEM::DataArrayInt* p=ParaMEDMEM::DataArrayInt::New();
+      p->alloc( _face_mesh[ inew ]->getNumberOfCells(), 1 );
+      p->fillWithZero();
+      famIDs = p->getPointer();
+      _map_dataarray_int[cle]=p;
+    }
+  else
+    {
+      famIDs = _map_dataarray_int.find(cle)->second->getPointer();
+    }
+
+  // find a family ID of an existing JOINT group
+  int familyID = 0;
+  std::map<std::string, int>::iterator name2id = _family_info.find( groupName );
+  if ( name2id != _family_info.end() )
+    familyID = name2id->second;
+
+  // remove faces from the familyID-the family
+  if ( familyID != 0 )
+    for ( size_t i = 0; i < faces.size(); ++i )
+      if ( famIDs[i] == familyID )
+        famIDs[i] = 0;
+
+  if ( faces.empty() )
+    return;
+
+  if ( familyID == 0 )  // generate a family ID for JOINT group
+    {
+      std::set< int > familyIDs;
+      for ( name2id = _family_info.begin(); name2id != _family_info.end(); ++name2id )
+        familyIDs.insert( name2id->second );
+      // find the next free family ID
+      int freeIdCount = inew1 * getNbOfGlobalMeshes() + inew2 + is2nd;
+      do
+        {
+          if ( !familyIDs.count( ++familyID ))
+            --freeIdCount;
+        }
+      while ( freeIdCount > 0 );
+    }
+  // push faces to familyID-th group
+  for ( size_t i = 0; i < faces.size(); ++i )
+    famIDs[ faces[i] ] = familyID;
+
+  // register JOINT group and family
+  _family_info[ groupName ] = familyID; // name of the group and family is same
+  _group_info [ groupName ].push_back( groupName );
+}
+
 /*! constructing the MESH collection from a distributed file
  *
  * \param filename name of the master file containing the list of all the MED files
@@ -928,7 +1157,7 @@ MEDPARTITIONER::MeshCollection::MeshCollection(const std::string& filename)
     _domain_selector( 0 ),
     _i_non_empty_mesh(-1),
     _driver_type(MEDPARTITIONER::Undefined),
-    _subdomain_boundary_creates(false),
+    _subdomain_boundary_creates(MyGlobals::_Creates_Boundary_Faces),
     _family_splitting(false),
     _create_empty_groups(false),
     _joint_finder(0)
@@ -972,7 +1201,7 @@ MEDPARTITIONER::MeshCollection::MeshCollection(const std::string& filename, Para
     _domain_selector( &domainSelector ),
     _i_non_empty_mesh(-1),
     _driver_type(MEDPARTITIONER::Undefined),
-    _subdomain_boundary_creates(false),
+    _subdomain_boundary_creates(MyGlobals::_Creates_Boundary_Faces),
     _family_splitting(false),
     _create_empty_groups(false),
     _joint_finder(0)
@@ -1132,7 +1361,7 @@ MEDPARTITIONER::MeshCollection::MeshCollection(const std::string& filename, cons
     _i_non_empty_mesh(-1),
     _name(meshname),
     _driver_type(MEDPARTITIONER::MedXml),
-    _subdomain_boundary_creates(false),
+    _subdomain_boundary_creates(MyGlobals::_Creates_Boundary_Faces),
     _family_splitting(false),
     _create_empty_groups(false),
     _joint_finder(0)
@@ -1197,8 +1426,8 @@ MEDPARTITIONER::MeshCollection::~MeshCollection()
 void MEDPARTITIONER::MeshCollection::write(const std::string& filename)
 {
   //building the connect zones necessary for writing joints
-  //   if (_topology->nbDomain()>1)
-  //     buildConnectZones();
+  if (_topology->nbDomain()>1 && _subdomain_boundary_creates )
+    buildConnectZones();
   //suppresses link with driver so that it can be changed for writing
   delete _driver;
   _driver=0;
