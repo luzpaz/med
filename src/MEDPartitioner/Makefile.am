@@ -114,18 +114,19 @@ libmedpartitioner_la_CXXFLAGS = @CXXTMPDPTHFLAGS@
 libmedpartitioner_la_LDFLAGS+= $(MED3_LIBS_C_ONLY) $(HDF5_LIBS) $(STDLIB) $(LIBXML_LIBS) $(MPI_LIBS) ../INTERP_KERNEL/libinterpkernel.la ../MEDCoupling/libmedcoupling.la ../MEDLoader/libmedloader.la
 
 # Executables targets
+
+bin_PROGRAMS= medpartitioner
+dist_medpartitioner_SOURCES= medpartitioner.cxx
+medpartitioner_CPPFLAGS= $(libmedpartitioner_la_CPPFLAGS)
+medpartitioner_LDADD= $(libmedpartitioner_la_LDFLAGS) -lm libmedpartitioner.la
+medpartitioner_CXXFLAGS = @CXXTMPDPTHFLAGS@
+
 if MED_ENABLE_PARMETIS
   bin_PROGRAMS=medpartitioner_para
   dist_medpartitioner_para_SOURCES= medpartitioner_para.cxx
   medpartitioner_para_CPPFLAGS= $(libmedpartitioner_la_CPPFLAGS)
   medpartitioner_para_LDADD= $(libmedpartitioner_la_LDFLAGS) -lm libmedpartitioner.la
   medpartitioner_para_CXXFLAGS=@CXXTMPDPTHFLAGS@
-else
-  bin_PROGRAMS= medpartitioner
-  dist_medpartitioner_SOURCES= medpartitioner.cxx
-  medpartitioner_CPPFLAGS= $(libmedpartitioner_la_CPPFLAGS)
-  medpartitioner_LDADD= $(libmedpartitioner_la_LDFLAGS) -lm libmedpartitioner.la
-  medpartitioner_CXXFLAGS = @CXXTMPDPTHFLAGS@
 endif
 
 
