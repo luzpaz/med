@@ -1,3 +1,25 @@
+/*!
+ * Builds a newly created field, that the caller will have the responsability to deal with.
+ * \n This method makes the assumption that the field \a this is correctly defined when this method is called (\c this->checkCoherency() returns without any exception thrown), **no check of this will be done**.
+ * \n This method returns a restriction of \a this so that only tuples id specified in [ \a partBg , \a partEnd ) will be contained in returned field. 
+ * \n Parameter [\a partBg, \a partEnd ) specifies \b cell \b ids \b whatever \b the \b spatial \b discretization of \a this
+ * (\ref ParaMEDMEM::ON_CELLS "ON_CELLS", \ref ParaMEDMEM::ON_NODES "ON_CELLS", \ref ParaMEDMEM::ON_GAUSS_PT "ON_GAUSS_PT", \ref ParaMEDMEM::ON_GAUSS_NE "ON_GAUSS_NE")
+ *
+ * \param [in] partEnd end (not included) of input range cell ids to select [ \a partBg, \a partEnd
+ * \return a newly allocated field the caller should deal with.
+ * 
+ * \throw if there is presence of an invalid cell id in [ \a partBg, \a partEnd ) regarding the number of cells of \c this->getMesh()
+ *
+ * \ref cpp_mcfielddouble_subpart1 "Here a C++ example."
+ *
+ * \ref py_mcfielddouble_subpart1 "Here a Python example."
+ * \sa ParaMEDMEM::MEDCouplingFieldDouble::buildSubPart(const DataArrayInt *) const
+ */
+
+
+
+
+
 // Copyright (C) 2007-2012  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
@@ -33,21 +55,47 @@
 
 using namespace ParaMEDMEM;
 
+/*!
+ * Creates a new instance of MEDCouplingFieldDouble of given type. The caller is responsable for the returned field.
+ *
+ * \param [in] type type of spatial discretization of a created field (\ref ParaMEDMEM::ON_CELLS "ON_CELLS", \ref ParaMEDMEM::ON_NODES "ON_NODES", \ref ParaMEDMEM::ON_GAUSS_PT "ON_GAUSS_PT", \ref ParaMEDMEM::ON_GAUSS_NE "ON_GAUSS_NE", \ref ParaMEDMEM::ON_NODES_KR "ON_NODES_KR").
+ * \param [in] td type of time discretization of a created field (\ref ParaMEDMEM::NO_TIME "NO_TIME", \ref ParaMEDMEM::ONE_TIME "ONE_TIME", \ref ParaMEDMEM::LINEAR_TIME "LINEAR_TIME", \ref ParaMEDMEM::CONST_ON_TIME_INTERVAL "CONST_ON_TIME_INTERVAL").
+ 
+ * \return a newly allocated field the caller should deal with.
+ */
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::New(TypeOfField type, TypeOfTimeDiscretization td)
 {
   return new MEDCouplingFieldDouble(type,td);
 }
 
+/*!
+ * Creates a new instance of MEDCouplingFieldDouble of given type. The caller is responsable for the returned field.
+ *
+ * \param [in] ft \ref MEDCouplingFieldTemplatesPage "field template" defining its spatial discretization and supporting mesh.
+ * \param [in] td type of time discretization of a created field (\ref ParaMEDMEM::NO_TIME "NO_TIME", \ref ParaMEDMEM::ONE_TIME "ONE_TIME", \ref ParaMEDMEM::LINEAR_TIME "LINEAR_TIME", \ref ParaMEDMEM::CONST_ON_TIME_INTERVAL "CONST_ON_TIME_INTERVAL")
+ 
+ * \return a newly allocated field the caller should deal with.
+ */
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::New(const MEDCouplingFieldTemplate *ft, TypeOfTimeDiscretization td)
 {
   return new MEDCouplingFieldDouble(ft,td);
 }
 
+/*!
+ * Sets time \a unit of \a this field.
+ *
+ * \param [in] unit \a unit (string) in which time is measured.
+ */
 void MEDCouplingFieldDouble::setTimeUnit(const char *unit)
 {
   _time_discr->setTimeUnit(unit);
 }
 
+/*!
+ * Returns a time unit of \a this field.
+ *
+ * \return a string describing units in which time is measured.
+ */
 const char *MEDCouplingFieldDouble::getTimeUnit() const
 {
   return _time_discr->getTimeUnit();
@@ -74,11 +122,12 @@ void MEDCouplingFieldDouble::synchronizeTimeWithSupport() throw(INTERP_KERNEL::E
  * It allows the user to perform methods
  * MEDCouplingFieldDouble::AddFields, MEDCouplingFieldDouble::MultiplyFields with \a this and the returned field.
  * 
- * \warning The \b underlying \b mesh of the returned field is \b always the same (same pointer) than \a this \b whatever \b the \b value \b of \b recDeepCpy \b parameter.
+ * \warning The \b underlying \b mesh of the returned field is \b always the same (same pointer) than \a this **whatever the value** of \a recDeepCpy parameter.
  * If the user wants to duplicated deeply the underlying mesh he should call MEDCouplingFieldDouble::cloneWithMesh method or MEDCouplingFieldDouble::deepCpy instead.
  *
- * \param [in] recDeepCpy specifies if underlying arrays in \a this should be copied of only attached to the returned field.
+ * \param [in] recDeepCpy specifies if underlying arrays in \a this should be copied or only attached to the returned field.
  * \return a newly allocated MEDCouplingFieldDouble instance that the caller should deal with.
+ * \sa ParaMEDMEM::MEDCouplingFieldDouble::cloneWithMesh(bool recDeepCpy) const
  */
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::clone(bool recDeepCpy) const
 {
@@ -86,12 +135,17 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::clone(bool recDeepCpy) const
 }
 
 /*!
- * This method behaves exactly like MEDCouplingFieldDouble::clone method \b except \b that \b here \b the \b underlying \b mesh \b is \b systematically
- * (whatever the value of the input parameter 'recDeepCpy') \b deeply \b duplicated.\n \n
+ * This method behaves exactly like MEDCouplingFieldDouble::clone method **except that here the underlying mesh is systematically **
+ * (whatever the value of the input parameter \a recDeepCpy) **deeply duplicated**.
+ *
  * The result of \c cloneWithMesh(true) is exactly the same than calling \ref MEDCouplingFieldDouble::deepCpy "deepCpy".
  * 
  * So the resulting field of this call cannot be called with \a this with the following methods MEDCouplingFieldDouble::AddFields, MEDCouplingFieldDouble::MultiplyFields ...
  * To avoid to deep copy the underlying mesh the user should call MEDCouplingFieldDouble::clone method instead.
+
+ * \param [in] recDeepCpy specifies if underlying arrays in \a this should be copied or only attached to the returned field.
+ * \return a newly allocated MEDCouplingFieldDouble instance that the caller should deal with.
+ * \sa ParaMEDMEM::MEDCouplingFieldDouble::clone(bool recDeepCpy) const
  */
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::cloneWithMesh(bool recDeepCpy) const
 {
@@ -106,16 +160,31 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::cloneWithMesh(bool recDeepCpy) c
 }
 
 /*!
- * This method performs a deepCpy of \a this \b mesh \b included !
+ * This method performs a deepCpy of \a this (**mesh included**)!
  * So the resulting field of this call cannot be called with \a this with following methods MEDCouplingFieldDouble::AddFields, MEDCouplingFieldDouble::MultiplyFields ...
- * To avoid to deep copy the underlying mesh the user should call MEDCouplingFieldDouble::clone method instead.
+ * To avoid deep copying the underlying mesh the user should call MEDCouplingFieldDouble::clone method instead.
  * This method is exactly equivalent to MEDCouplingFieldDouble::cloneWithMesh called with parameter true.
+ *
+ * \return a newly allocated MEDCouplingFieldDouble instance that the caller should deal with.
+ * \sa ParaMEDMEM::MEDCouplingFieldDouble::cloneWithMesh(bool recDeepCpy) const
  */
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::deepCpy() const
 {
   return cloneWithMesh(true);
 }
 
+/*!
+ * TODOC
+ * 
+ * \param [in] td type of time discretization of a created field (\ref ParaMEDMEM::NO_TIME "NO_TIME", \ref ParaMEDMEM::ONE_TIME "ONE_TIME", \ref ParaMEDMEM::LINEAR_TIME "LINEAR_TIME", \ref ParaMEDMEM::CONST_ON_TIME_INTERVAL "CONST_ON_TIME_INTERVAL").
+ * \param [in] deepCopy specifies if underlying arrays in \a this should be copied or only attached to the returned field.
+ * \return a newly allocated MEDCouplingFieldDouble instance that the caller should deal with.
+ *
+ * \ref cpp_mcfielddouble_buildnewtimereprfromthis "Here a C++ example."
+ 
+ * \ref py_mcfielddouble_buildnewtimereprfromthis "Here a Python example."
+ * \sa ParaMEDMEM::MEDCouplingFieldDouble::clone(bool recDeepCpy) const
+ */
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::buildNewTimeReprFromThis(TypeOfTimeDiscretization td, bool deepCopy) const
 {
   MEDCouplingTimeDiscretization *tdo=_time_discr->buildNewTimeReprFromThis(td,deepCopy);
