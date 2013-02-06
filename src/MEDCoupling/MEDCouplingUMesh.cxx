@@ -26,6 +26,7 @@
 #include "InterpolationUtils.hxx"
 #include "PointLocatorAlgos.txx"
 #include "BBTree.txx"
+#include "SplitterTetra.hxx"
 #include "DirectedBoundingBox.hxx"
 #include "InterpKernelMeshQuality.hxx"
 #include "InterpKernelCellSimplify.hxx"
@@ -4513,12 +4514,15 @@ void MEDCouplingUMesh::tessellate2DCurve(double eps) throw(INTERP_KERNEL::Except
 
 /*!
  * This methods modify this by converting each cells into simplex cell, that is too say triangle for meshdim==2 or tetra for meshdim==3.
- * This cut into simplex is performed following the parameter 'policy'. This method so typically increases the number of cells of this.
- * This method returns new2old array that specifies a each cell of 'this' after the call what was its id it comes.
+ * This cut into simplex is performed following the parameter \a policy. This method so typically increases the number of cells of \a this.
+ * This method \b keeps the number of nodes \b unchanged. That's why the splitting policy in 3D INTERP_KERNEL::GENERAL_24 and INTERP_KERNEL::GENERAL_48 are not available here.
+ * This method returns new2old newly allocated array that specifies a each cell of \a this after the call what was its id it comes.
  * 
- * The semantic of 'policy' parameter :
+ * The semantic of \a policy parameter :
  * - 1 only QUAD4. For QUAD4 the cut is done along 0-2 diagonal for QUAD4
  * - 2 only QUAD4. For QUAD4 the cut is done along 1-3 diagonal for QUAD4
+ * - PLANAR_FACE_5 only HEXA8. All HEXA8 are split into 5 TETRA4
+ * - PLANAR_FACE_6 only HEXA8. All HEXA8 are split into 6 TETRA4
  */
 DataArrayInt *MEDCouplingUMesh::simplexize(int policy) throw(INTERP_KERNEL::Exception)
 {
@@ -4528,8 +4532,12 @@ DataArrayInt *MEDCouplingUMesh::simplexize(int policy) throw(INTERP_KERNEL::Exce
       return simplexizePol0();
     case 1:
       return simplexizePol1();
+    case (int) INTERP_KERNEL::PLANAR_FACE_5:
+      return simplexizePlanarFace5();
+    case (int) INTERP_KERNEL::PLANAR_FACE_6:
+      return simplexizePlanarFace6();
     default:
-      throw INTERP_KERNEL::Exception("MEDCouplingUMesh::simplexize : unrecognized policy ! Must be 0 or 1 !");
+      throw INTERP_KERNEL::Exception("MEDCouplingUMesh::simplexize : unrecognized policy ! Must be :\n  - 0 or 1 (only available for meshdim=2) \n  - PLANAR_FACE_5, PLANAR_FACE_6  (only for meshdim=3)");
     }
 }
 
@@ -4555,20 +4563,17 @@ bool MEDCouplingUMesh::areOnlySimplexCells() const throw(INTERP_KERNEL::Exceptio
  */
 DataArrayInt *MEDCouplingUMesh::simplexizePol0() throw(INTERP_KERNEL::Exception)
 {
+  checkConnectivityFullyDefined();
   if(getMeshDimension()!=2)
     throw INTERP_KERNEL::Exception("MEDCouplingUMesh::simplexizePol0 : this policy is only available for mesh with meshdim == 2 !");
   int nbOfCells=getNumberOfCells();
-  DataArrayInt *ret=DataArrayInt::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
   int nbOfCutCells=getNumberOfCellsWithType(INTERP_KERNEL::NORM_QUAD4);
   ret->alloc(nbOfCells+nbOfCutCells,1);
-  if(nbOfCutCells==0)
-    {
-      ret->iota(0);
-      return ret;
-    }
+  if(nbOfCutCells==0) { ret->iota(0); return ret.retn(); }
   int *retPt=ret->getPointer();
-  DataArrayInt *newConn=DataArrayInt::New();
-  DataArrayInt *newConnI=DataArrayInt::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newConn=DataArrayInt::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newConnI=DataArrayInt::New();
   newConnI->alloc(nbOfCells+nbOfCutCells+1,1);
   newConn->alloc(getMeshLength()+3*nbOfCutCells,1);
   int *pt=newConn->getPointer();
@@ -4598,12 +4603,12 @@ DataArrayInt *MEDCouplingUMesh::simplexizePol0() throw(INTERP_KERNEL::Exception)
         }
     }
   _nodal_connec->decrRef();
-  _nodal_connec=newConn;
+  _nodal_connec=newConn.retn();
   _nodal_connec_index->decrRef();
-  _nodal_connec_index=newConnI;
+  _nodal_connec_index=newConnI.retn();
   computeTypes();
   updateTime();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -4611,20 +4616,17 @@ DataArrayInt *MEDCouplingUMesh::simplexizePol0() throw(INTERP_KERNEL::Exception)
  */
 DataArrayInt *MEDCouplingUMesh::simplexizePol1() throw(INTERP_KERNEL::Exception)
 {
+  checkConnectivityFullyDefined();
   if(getMeshDimension()!=2)
     throw INTERP_KERNEL::Exception("MEDCouplingUMesh::simplexizePol0 : this policy is only available for mesh with meshdim == 2 !");
   int nbOfCells=getNumberOfCells();
-  DataArrayInt *ret=DataArrayInt::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
   int nbOfCutCells=getNumberOfCellsWithType(INTERP_KERNEL::NORM_QUAD4);
   ret->alloc(nbOfCells+nbOfCutCells,1);
-  if(nbOfCutCells==0)
-    {
-      ret->iota(0);
-      return ret;
-    }
+  if(nbOfCutCells==0) { ret->iota(0); return ret.retn(); }
   int *retPt=ret->getPointer();
-  DataArrayInt *newConn=DataArrayInt::New();
-  DataArrayInt *newConnI=DataArrayInt::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newConn=DataArrayInt::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newConnI=DataArrayInt::New();
   newConnI->alloc(nbOfCells+nbOfCutCells+1,1);
   newConn->alloc(getMeshLength()+3*nbOfCutCells,1);
   int *pt=newConn->getPointer();
@@ -4654,12 +4656,116 @@ DataArrayInt *MEDCouplingUMesh::simplexizePol1() throw(INTERP_KERNEL::Exception)
         }
     }
   _nodal_connec->decrRef();
-  _nodal_connec=newConn;
+  _nodal_connec=newConn.retn();
   _nodal_connec_index->decrRef();
-  _nodal_connec_index=newConnI;
+  _nodal_connec_index=newConnI.retn();
   computeTypes();
   updateTime();
-  return ret;
+  return ret.retn();
+}
+
+/*!
+ * This method implements policy INTERP_KERNEL::PLANAR_FACE_5 of virtual method ParaMEDMEM::MEDCouplingUMesh::simplexize.
+ */
+DataArrayInt *MEDCouplingUMesh::simplexizePlanarFace5() throw(INTERP_KERNEL::Exception)
+{
+  checkConnectivityFullyDefined();
+  if(getMeshDimension()!=3)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::simplexizePlanarFace5 : this policy is only available for mesh with meshdim == 3 !");
+  int nbOfCells=getNumberOfCells();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
+  int nbOfCutCells=getNumberOfCellsWithType(INTERP_KERNEL::NORM_HEXA8);
+  ret->alloc(nbOfCells+4*nbOfCutCells,1);
+  if(nbOfCutCells==0) { ret->iota(0); return ret.retn(); }
+  int *retPt=ret->getPointer();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newConn=DataArrayInt::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newConnI=DataArrayInt::New();
+  newConnI->alloc(nbOfCells+4*nbOfCutCells+1,1);
+  newConn->alloc(getMeshLength()+16*nbOfCutCells,1);//21
+  int *pt=newConn->getPointer();
+  int *ptI=newConnI->getPointer();
+  ptI[0]=0;
+  const int *oldc=_nodal_connec->getConstPointer();
+  const int *ci=_nodal_connec_index->getConstPointer();
+  for(int i=0;i<nbOfCells;i++,ci++)
+    {
+      if((INTERP_KERNEL::NormalizedCellType)oldc[ci[0]]==INTERP_KERNEL::NORM_HEXA8)
+        {
+          for(int j=0;j<5;j++,pt+=5,ptI++)
+            {
+              pt[0]=(int)INTERP_KERNEL::NORM_TETRA4;
+              pt[1]=oldc[ci[0]+INTERP_KERNEL::SPLIT_NODES_5_WO[4*j+0]+1]; pt[2]=oldc[ci[0]+INTERP_KERNEL::SPLIT_NODES_5_WO[4*j+1]+1]; pt[3]=oldc[ci[0]+INTERP_KERNEL::SPLIT_NODES_5_WO[4*j+2]+1]; pt[4]=oldc[ci[0]+INTERP_KERNEL::SPLIT_NODES_5_WO[4*j+3]+1];
+              *retPt++=i;
+              ptI[1]=ptI[0]+5;
+            }
+        }
+      else
+        {
+          pt=std::copy(oldc+ci[0],oldc+ci[1],pt);
+          ptI[1]=ptI[0]+ci[1]-ci[0];
+          ptI++;
+          *retPt++=i;
+        }
+    }
+  _nodal_connec->decrRef();
+  _nodal_connec=newConn.retn();
+  _nodal_connec_index->decrRef();
+  _nodal_connec_index=newConnI.retn();
+  computeTypes();
+  updateTime();
+  return ret.retn();
+}
+
+/*!
+ * This method implements policy INTERP_KERNEL::PLANAR_FACE_6 of virtual method ParaMEDMEM::MEDCouplingUMesh::simplexize.
+ */
+DataArrayInt *MEDCouplingUMesh::simplexizePlanarFace6() throw(INTERP_KERNEL::Exception)
+{
+  checkConnectivityFullyDefined();
+  if(getMeshDimension()!=3)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::simplexizePlanarFace6 : this policy is only available for mesh with meshdim == 3 !");
+  int nbOfCells=getNumberOfCells();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
+  int nbOfCutCells=getNumberOfCellsWithType(INTERP_KERNEL::NORM_HEXA8);
+  ret->alloc(nbOfCells+5*nbOfCutCells,1);
+  if(nbOfCutCells==0) { ret->iota(0); return ret.retn(); }
+  int *retPt=ret->getPointer();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newConn=DataArrayInt::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newConnI=DataArrayInt::New();
+  newConnI->alloc(nbOfCells+5*nbOfCutCells+1,1);
+  newConn->alloc(getMeshLength()+21*nbOfCutCells,1);
+  int *pt=newConn->getPointer();
+  int *ptI=newConnI->getPointer();
+  ptI[0]=0;
+  const int *oldc=_nodal_connec->getConstPointer();
+  const int *ci=_nodal_connec_index->getConstPointer();
+  for(int i=0;i<nbOfCells;i++,ci++)
+    {
+      if((INTERP_KERNEL::NormalizedCellType)oldc[ci[0]]==INTERP_KERNEL::NORM_HEXA8)
+        {
+          for(int j=0;j<6;j++,pt+=5,ptI++)
+            {
+              pt[0]=(int)INTERP_KERNEL::NORM_TETRA4;
+              pt[1]=oldc[ci[0]+INTERP_KERNEL::SPLIT_NODES_6_WO[4*j+0]+1]; pt[2]=oldc[ci[0]+INTERP_KERNEL::SPLIT_NODES_6_WO[4*j+1]+1]; pt[3]=oldc[ci[0]+INTERP_KERNEL::SPLIT_NODES_6_WO[4*j+2]+1]; pt[4]=oldc[ci[0]+INTERP_KERNEL::SPLIT_NODES_6_WO[4*j+3]+1];
+              *retPt++=i;
+              ptI[1]=ptI[0]+5;
+            }
+        }
+      else
+        {
+          pt=std::copy(oldc+ci[0],oldc+ci[1],pt);
+          ptI[1]=ptI[0]+ci[1]-ci[0];
+          ptI++;
+          *retPt++=i;
+        }
+    }
+  _nodal_connec->decrRef();
+  _nodal_connec=newConn.retn();
+  _nodal_connec_index->decrRef();
+  _nodal_connec_index=newConnI.retn();
+  computeTypes();
+  updateTime();
+  return ret.retn();
 }
 
 /*!

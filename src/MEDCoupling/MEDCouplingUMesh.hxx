@@ -257,6 +257,8 @@ namespace ParaMEDMEM
     //tools
     DataArrayInt *simplexizePol0() throw(INTERP_KERNEL::Exception);
     DataArrayInt *simplexizePol1() throw(INTERP_KERNEL::Exception);
+    DataArrayInt *simplexizePlanarFace5() throw(INTERP_KERNEL::Exception);
+    DataArrayInt *simplexizePlanarFace6() throw(INTERP_KERNEL::Exception);
     void subDivide2DMesh(const int *nodeSubdived, const int *nodeIndxSubdived, const int *desc, const int *descIndex) throw(INTERP_KERNEL::Exception);
     void fillCellIdsToKeepFromNodeIds(const int *begin, const int *end, bool fullyIn, DataArrayInt *&cellIdsKeptArr) const;
     void split3DCurveWithPlane(const double *origin, const double *vec, double eps, std::vector<int>& cut3DCurve) throw(INTERP_KERNEL::Exception);
