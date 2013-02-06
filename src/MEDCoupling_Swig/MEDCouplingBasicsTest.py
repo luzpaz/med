@@ -11010,6 +11010,40 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertEqual(m.getNodeGridStructure(),(2,3))
         pass
 
+    def testSimplexize3(self):
+        m=MEDCouplingUMesh("toto",3)
+        m.allocateCells(0)
+        m.insertNextCell(NORM_TETRA4,[0,1,2,3])
+        m.insertNextCell(NORM_HEXA8,[4,5,6,7,8,9,10,11])
+        m.insertNextCell(NORM_HEXA8,[12,13,14,15,16,17,18,19])
+        m.insertNextCell(NORM_TETRA4,[20,21,22,23])
+        c1=DataArrayDouble([0.,0.,0.,0.,1.,0.,1.,0.,0.,0.,0.,1.],4,3)
+        c2=DataArrayDouble([0.,0.,0.,0.,1.,0.,1.,1.,0.,1.,0.,0., 0.,0.,1.,0.,1.,1.,1.,1.,1.,1.,0.,1.],8,3) ; c2+=[2.,0.,0.]
+        c3=c2+[2.,0.,0.]
+        c4=c1+[6.,0.,0.]
+        c=DataArrayDouble.Aggregate([c1,c2,c3,c4])
+        m.setCoords(c)
+        m.checkCoherency2()
+        #
+        m1=m.deepCpy()
+        d1=m1.simplexize(PLANAR_FACE_5)
+        m1.checkCoherency2()
+        vol1=m1.getMeasureField(ON_CELLS).getArray()
+        self.assertTrue(vol1.isEqual(DataArrayDouble([1./6, 1./6, 1./6,1./6, 1./6, 1./3,1./6, 1./6, 1./6, 1./6, 1./3, 1./6]),1e-12))
+        self.assertEqual(m1.getNodalConnectivity().getValues(),[14,0,1,2,3,14,4,9,5,6,14,4,8,9,11,14,4,7,11,6,14,9,11,10,6,14,4,9,6,11,14,12,17,13,14,14,12,16,17,19,14,12,15,19,14,14,17,19,18,14,14,12,17,14,19,14,20,21,22,23])
+        self.assertEqual(m1.getNodalConnectivityIndex().getValues(),[0,5,10,15,20,25,30,35,40,45,50,55,60])
+        self.assertTrue(d1.isEqual(DataArrayInt([0,1,1,1,1,1,2,2,2,2,2,3])))
+        #
+        m2=m.deepCpy()
+        d2=m2.simplexize(PLANAR_FACE_6)
+        m2.checkCoherency2()
+        vol2=m2.getMeasureField(ON_CELLS).getArray()
+        self.assertTrue(vol2.isEqual(DataArrayDouble([1./6, 1./6, 1./6,1./6, 1./6, 1./6,1./6,1./6, 1./6, 1./6, 1./6, 1./6,1./6,1./6]),1e-12))
+        self.assertEqual(m2.getNodalConnectivity().getValues(),[14,0,1,2,3,14,4,9,5,10,14,4,5,6,10,14,4,8,9,10,14,4,11,8,10,14,4,6,7,10,14,4,7,11,10,14,12,17,13,18,14,12,13,14,18,14,12,16,17,18,14,12,19,16,18,14,12,14,15,18,14,12,15,19,18,14,20,21,22,23])
+        self.assertEqual(m2.getNodalConnectivityIndex().getValues(),[0,5,10,15,20,25,30,35,40,45,50,55,60,65,70])
+        self.assertTrue(d2.isEqual(DataArrayInt([0,1,1,1,1,1,1,2,2,2,2,2,2,3])))
+        pass
+
     def setUp(self):
         pass
     pass

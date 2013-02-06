@@ -1906,3 +1906,72 @@ void MEDCouplingBasicsTest5::testDAIIsStrictlyMonotonic1()
   da1->checkMonotonic(false);
   da1->decrRef();
 }
+
+void MEDCouplingBasicsTest5::testSimplexize3()
+{
+  const int conn[24]={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23};
+  MEDCouplingUMesh *m=MEDCouplingUMesh::New("toto",3);
+  m->allocateCells(0);
+  m->insertNextCell(INTERP_KERNEL::NORM_TETRA4,4,conn+0);
+  m->insertNextCell(INTERP_KERNEL::NORM_HEXA8,8,conn+4);
+  m->insertNextCell(INTERP_KERNEL::NORM_HEXA8,8,conn+12);
+  m->insertNextCell(INTERP_KERNEL::NORM_TETRA4,4,conn+20);
+  const double coords[72]={0.,0.,0.,0.,1.,0.,1.,0.,0.,0.,0.,1.,2.,0.,0.,2.,1.,0.,3.,1.,0.,3.,0.,0.,2.,0.,1.,2.,1.,1.,3.,1.,1.,3.,0.,1.,4.,0.,0.,4.,1.,0.,5.,1.,0.,5.,0.,0.,4.,0.,1.,4.,1.,1.,5.,1.,1.,5.,0.,1.,6.,0.,0.,6.,1.,0.,7.,0.,0.,6.,0.,1.};
+  DataArrayDouble *c=DataArrayDouble::New();
+  c->useArray(coords,false,CPP_DEALLOC,24,3);
+  m->setCoords(c);
+  c->decrRef();
+  m->checkCoherency2();
+  //
+  MEDCouplingUMesh *m1=static_cast<MEDCouplingUMesh *>(m->deepCpy());
+  DataArrayInt *d1=m1->simplexize(INTERP_KERNEL::PLANAR_FACE_5);
+  m1->checkCoherency2();
+  MEDCouplingFieldDouble *f1=m1->getMeasureField(ON_CELLS);
+  const double vol1Expected[12]={1./6, 1./6, 1./6,1./6, 1./6, 1./3,1./6, 1./6, 1./6, 1./6, 1./3, 1./6};
+  CPPUNIT_ASSERT_EQUAL(1,f1->getArray()->getNumberOfComponents());
+  CPPUNIT_ASSERT_EQUAL(12,f1->getArray()->getNumberOfTuples());
+  for(int i=0;i<12;i++)
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(vol1Expected[i],f1->getIJ(i,0),1e-12);
+  const int connExpected1[60]={14,0,1,2,3,14,4,9,5,6,14,4,8,9,11,14,4,7,11,6,14,9,11,10,6,14,4,9,6,11,14,12,17,13,14,14,12,16,17,19,14,12,15,19,14,14,17,19,18,14,14,12,17,14,19,14,20,21,22,23};
+  const int connIExpected1[13]={0,5,10,15,20,25,30,35,40,45,50,55,60};
+  const int n2o1[12]={0,1,1,1,1,1,2,2,2,2,2,3};
+  CPPUNIT_ASSERT_EQUAL(1,m1->getNodalConnectivity()->getNumberOfComponents());
+  CPPUNIT_ASSERT_EQUAL(60,m1->getNodalConnectivity()->getNumberOfTuples());
+  CPPUNIT_ASSERT_EQUAL(1,m1->getNodalConnectivityIndex()->getNumberOfComponents());
+  CPPUNIT_ASSERT_EQUAL(13,m1->getNodalConnectivityIndex()->getNumberOfTuples());
+  CPPUNIT_ASSERT(std::equal(connExpected1,connExpected1+60,m1->getNodalConnectivity()->begin()));
+  CPPUNIT_ASSERT(std::equal(connIExpected1,connIExpected1+13,m1->getNodalConnectivityIndex()->begin()));
+  CPPUNIT_ASSERT_EQUAL(1,d1->getNumberOfComponents());
+  CPPUNIT_ASSERT_EQUAL(12,d1->getNumberOfTuples());
+  CPPUNIT_ASSERT(std::equal(n2o1,n2o1+12,d1->begin()));
+  f1->decrRef();
+  m1->decrRef();
+  d1->decrRef();
+  //
+  MEDCouplingUMesh *m2=static_cast<MEDCouplingUMesh *>(m->deepCpy());
+  DataArrayInt *d2=m2->simplexize(INTERP_KERNEL::PLANAR_FACE_6);
+  m2->checkCoherency2();
+  MEDCouplingFieldDouble *f2=m2->getMeasureField(ON_CELLS);
+  const double vol2Expected[14]={1./6, 1./6, 1./6,1./6, 1./6, 1./6,1./6,1./6, 1./6, 1./6, 1./6, 1./6,1./6,1./6};
+  CPPUNIT_ASSERT_EQUAL(1,f2->getArray()->getNumberOfComponents());
+  CPPUNIT_ASSERT_EQUAL(14,f2->getArray()->getNumberOfTuples());
+  for(int i=0;i<14;i++)
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(vol2Expected[i],f2->getIJ(i,0),1e-12);
+  const int connExpected2[70]={14,0,1,2,3,14,4,9,5,10,14,4,5,6,10,14,4,8,9,10,14,4,11,8,10,14,4,6,7,10,14,4,7,11,10,14,12,17,13,18,14,12,13,14,18,14,12,16,17,18,14,12,19,16,18,14,12,14,15,18,14,12,15,19,18,14,20,21,22,23};
+  const int connIExpected2[15]={0,5,10,15,20,25,30,35,40,45,50,55,60,65,70};
+  const int n2o2[14]={0,1,1,1,1,1,1,2,2,2,2,2,2,3};
+  CPPUNIT_ASSERT_EQUAL(1,m2->getNodalConnectivity()->getNumberOfComponents());
+  CPPUNIT_ASSERT_EQUAL(70,m2->getNodalConnectivity()->getNumberOfTuples());
+  CPPUNIT_ASSERT_EQUAL(1,m2->getNodalConnectivityIndex()->getNumberOfComponents());
+  CPPUNIT_ASSERT_EQUAL(15,m2->getNodalConnectivityIndex()->getNumberOfTuples());
+  CPPUNIT_ASSERT(std::equal(connExpected2,connExpected2+70,m2->getNodalConnectivity()->begin()));
+  CPPUNIT_ASSERT(std::equal(connIExpected2,connIExpected2+15,m2->getNodalConnectivityIndex()->begin()));
+  CPPUNIT_ASSERT_EQUAL(1,d2->getNumberOfComponents());
+  CPPUNIT_ASSERT_EQUAL(14,d2->getNumberOfTuples());
+  CPPUNIT_ASSERT(std::equal(n2o2,n2o2+14,d2->begin()));
+  f2->decrRef();
+  m2->decrRef();
+  d2->decrRef();
+  //
+  m->decrRef();
+}
