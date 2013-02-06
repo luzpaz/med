@@ -18,28 +18,18 @@
 //
 // Author : Anthony Geay (CEA/DEN)
 
-#ifndef __MEDCOUPLINGCURVELINEARMESHSERVANT_HXX__
-#define __MEDCOUPLINGCURVELINEARMESHSERVANT_HXX__
+#include "MEDCouplingCurveLinearMeshClient.hxx"
+#include "MEDCouplingMeshClient.hxx"
+#include "MEDCouplingCurveLinearMesh.hxx"
+#include "MEDCouplingMemArray.hxx"
 
-#include "SALOMEconfig.h"
+#include <vector>
 
-#include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
-#include "MEDCouplingStructuredMeshServant.hxx"
-#include "MEDCouplingCorba.hxx"
+using namespace ParaMEDMEM;
 
-namespace ParaMEDMEM
+MEDCouplingCurveLinearMesh *MEDCouplingCurveLinearMeshClient::New(SALOME_MED::MEDCouplingCurveLinearMeshCorbaInterface_ptr meshPtr)
 {
-  class MEDCouplingCurveLinearMesh;
-
-  class MEDCOUPLINGCORBA_EXPORT MEDCouplingCurveLinearMeshServant : MEDCouplingStructuredMeshServant, public virtual POA_SALOME_MED::MEDCouplingCurveLinearMeshCorbaInterface
-  {
-  public:
-    typedef MEDCouplingCurveLinearMesh CppType;
-    MEDCouplingCurveLinearMeshServant(const MEDCouplingCurveLinearMesh *cppPointerOfMesh);
-    ~MEDCouplingCurveLinearMeshServant();
-  private:
-    const MEDCouplingCurveLinearMesh *getPointer() const { return (const MEDCouplingCurveLinearMesh *)(_cpp_pointer); }
-  };
+  MEDCouplingCurveLinearMesh *ret=MEDCouplingCurveLinearMesh::New();
+  MEDCouplingMeshClient::fillMeshFromCorbaData(ret,meshPtr);
+  return ret;
 }
-
-#endif

@@ -22,29 +22,31 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 lib_LTLIBRARIES= libmedcouplingclient.la
 
-salomeinclude_HEADERS=                      \
-	MEDCouplingClient.hxx               \
-	MEDCouplingMeshClient.hxx           \
-	MEDCouplingUMeshClient.hxx          \
-	MEDCouplingExtrudedMeshClient.hxx   \
-	MEDCouplingCMeshClient.hxx          \
-	MEDCouplingFieldDoubleClient.hxx    \
-	MEDCouplingFieldTemplateClient.hxx  \
-	MEDCouplingMultiFieldsClient.hxx    \
-	MEDCouplingFieldOverTimeClient.hxx  \
-	DataArrayDoubleClient.hxx           \
+salomeinclude_HEADERS=                        \
+	MEDCouplingClient.hxx                 \
+	MEDCouplingMeshClient.hxx             \
+	MEDCouplingUMeshClient.hxx            \
+	MEDCouplingExtrudedMeshClient.hxx     \
+	MEDCouplingCMeshClient.hxx            \
+	MEDCouplingCurveLinearMeshClient.hxx  \
+	MEDCouplingFieldDoubleClient.hxx      \
+	MEDCouplingFieldTemplateClient.hxx    \
+	MEDCouplingMultiFieldsClient.hxx      \
+	MEDCouplingFieldOverTimeClient.hxx    \
+	DataArrayDoubleClient.hxx             \
 	DataArrayIntClient.hxx
 
-dist_libmedcouplingclient_la_SOURCES=       \
-	MEDCouplingMeshClient.cxx           \
-	MEDCouplingUMeshClient.cxx          \
-	MEDCouplingExtrudedMeshClient.cxx   \
-	MEDCouplingCMeshClient.cxx          \
-	MEDCouplingFieldDoubleClient.cxx    \
-	MEDCouplingFieldTemplateClient.cxx  \
-	MEDCouplingMultiFieldsClient.cxx    \
-	MEDCouplingFieldOverTimeClient.cxx  \
-	DataArrayDoubleClient.cxx           \
+dist_libmedcouplingclient_la_SOURCES=         \
+	MEDCouplingMeshClient.cxx             \
+	MEDCouplingUMeshClient.cxx            \
+	MEDCouplingExtrudedMeshClient.cxx     \
+	MEDCouplingCMeshClient.cxx            \
+	MEDCouplingCurveLinearMeshClient.cxx  \
+	MEDCouplingFieldDoubleClient.cxx      \
+	MEDCouplingFieldTemplateClient.cxx    \
+	MEDCouplingMultiFieldsClient.cxx      \
+	MEDCouplingFieldOverTimeClient.cxx    \
+	DataArrayDoubleClient.cxx             \
 	DataArrayIntClient.cxx
 
 libmedcouplingclient_la_CPPFLAGS= $(CORBA_CXXFLAGS) $(CORBA_INCLUDES) -I$(top_builddir)/idl ${KERNEL_CXXFLAGS} \

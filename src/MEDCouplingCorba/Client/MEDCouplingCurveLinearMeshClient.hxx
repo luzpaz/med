@@ -18,27 +18,24 @@
 //
 // Author : Anthony Geay (CEA/DEN)
 
-#ifndef __MEDCOUPLINGCURVELINEARMESHSERVANT_HXX__
-#define __MEDCOUPLINGCURVELINEARMESHSERVANT_HXX__
+#ifndef __MEDCOUPLINGCURVELINEARMESHCLIENT_HXX__
+#define __MEDCOUPLINGCURVELINEARMESHCLIENT_HXX__
 
 #include "SALOMEconfig.h"
-
+#ifdef WIN32
+#define NOMINMAX
+#endif
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
-#include "MEDCouplingStructuredMeshServant.hxx"
-#include "MEDCouplingCorba.hxx"
+#include "MEDCouplingClient.hxx"
 
 namespace ParaMEDMEM
 {
   class MEDCouplingCurveLinearMesh;
 
-  class MEDCOUPLINGCORBA_EXPORT MEDCouplingCurveLinearMeshServant : MEDCouplingStructuredMeshServant, public virtual POA_SALOME_MED::MEDCouplingCurveLinearMeshCorbaInterface
+  class MEDCOUPLINGCLIENT_EXPORT MEDCouplingCurveLinearMeshClient
   {
   public:
-    typedef MEDCouplingCurveLinearMesh CppType;
-    MEDCouplingCurveLinearMeshServant(const MEDCouplingCurveLinearMesh *cppPointerOfMesh);
-    ~MEDCouplingCurveLinearMeshServant();
-  private:
-    const MEDCouplingCurveLinearMesh *getPointer() const { return (const MEDCouplingCurveLinearMesh *)(_cpp_pointer); }
+    static MEDCouplingCurveLinearMesh *New(SALOME_MED::MEDCouplingCurveLinearMeshCorbaInterface_ptr mesh);
   };
 }
 
