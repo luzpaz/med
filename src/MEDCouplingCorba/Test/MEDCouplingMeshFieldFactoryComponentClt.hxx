@@ -52,6 +52,7 @@ namespace SALOME_TEST
     CPPUNIT_TEST( checkCorbaFetchingM1D );
     CPPUNIT_TEST( checkCorbaFetchingExtruded );
     CPPUNIT_TEST( checkCorbaFetchingCMesh );
+    CPPUNIT_TEST( checkCorbaFetchingCurveLinearMesh );
     CPPUNIT_TEST( checkCorbaField2DNTFetching );
     CPPUNIT_TEST( checkCorbaField2DNTMultiFetching );
     CPPUNIT_TEST( checkCorbaField2DNTMultiFetchingMT );
@@ -93,6 +94,7 @@ namespace SALOME_TEST
     void checkCorbaFetchingM1D();
     void checkCorbaFetchingExtruded();
     void checkCorbaFetchingCMesh();
+    void checkCorbaFetchingCurveLinearMesh();
     void checkCorbaField2DNTFetching();
     void checkCorbaField2DNTMultiFetching();
     void checkCorbaField2DNTMultiFetchingMT();

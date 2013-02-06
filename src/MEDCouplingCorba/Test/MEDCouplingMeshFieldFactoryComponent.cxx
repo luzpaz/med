@@ -27,6 +27,7 @@
 #include "MEDCouplingMemArray.hxx"
 #include "MEDCouplingUMesh.hxx"
 #include "MEDCouplingCMesh.hxx"
+#include "MEDCouplingCurveLinearMesh.hxx"
 
 #include <cmath>
 #include <algorithm>
@@ -211,6 +212,27 @@ namespace SALOME_TEST
     //
     a1->decrRef();
     a2->decrRef();
+    //
+    targetMesh->checkCoherency();
+    //
+    return targetMesh;
+  }
+
+  ParaMEDMEM::MEDCouplingCurveLinearMesh *MEDCouplingCorbaServBasicsTest::buildCLMesh()
+  {
+    ParaMEDMEM::MEDCouplingCurveLinearMesh *targetMesh=ParaMEDMEM::MEDCouplingCurveLinearMesh::New();
+    targetMesh->setTime(2.3,4,5);
+    targetMesh->setTimeUnit("us");
+    targetMesh->setName("Example of Cuve linear mesh");
+    targetMesh->setDescription("buildCLMesh");
+    ParaMEDMEM::DataArrayDouble *a1=ParaMEDMEM::DataArrayDouble::New();
+    a1->alloc(3*20,1);
+    a1->iota(7.);
+    a1->rearrange(3);
+    targetMesh->setCoords(a1);
+    a1->decrRef();
+    int structure[2]={4,5};
+    targetMesh->setNodeGridStructure(structure,structure+2);
     //
     targetMesh->checkCoherency();
     //
