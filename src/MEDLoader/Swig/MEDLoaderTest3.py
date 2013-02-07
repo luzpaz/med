@@ -1967,6 +1967,39 @@ class MEDLoaderTest(unittest.TestCase):
         self.assertIn(fff.getProfile("pfl_NORM_QUAD4").getHeapMemorySize(),xrange(215-10,215+10))
         self.assertIn(fff[1,-1].getHeapMemorySize(),xrange(700-10,700+10))
         pass
+
+    def testCurveLinearMesh1(self):
+        fname="Pyfile55.med"
+        mesh=MEDCouplingCurveLinearMesh();
+        mesh.setTime(2.3,4,5);
+        mesh.setTimeUnit("us");
+        mesh.setName("Example of Cuve linear mesh");
+        mesh.setDescription("buildCLMesh");
+        a1=DataArrayDouble(3*20,1);
+        a1.iota(7.) ; a1.rearrange(3);
+        mesh.setCoords(a1);
+        mesh.setNodeGridStructure([4,5]);
+        mesh.checkCoherency();
+        #
+        m=MEDFileCurveLinearMesh()
+        m.setMesh(mesh)
+        d=DataArrayInt(20) ; d.iota(4)
+        m.setFamilyFieldArr(1,d)
+        d3=DataArrayInt(20) ; d3.iota(400)
+        m.setRenumFieldArr(1,d3)
+        d2=DataArrayInt(12) ; d2.iota(40)
+        m.setFamilyFieldArr(0,d2)
+        d4=DataArrayInt(21) ; d4.iota(4000)
+        self.assertRaises(InterpKernelException,m.setRenumFieldArr,1,d4)
+        d4.popBackSilent()
+        m.setRenumFieldArr(1,d4)
+        m.write(fname,2)
+        #
+        m1=MEDFileCurveLinearMesh(fname)
+        mm=m1.getMesh()
+        self.assertTrue(mm.isEqual(mesh,1e-12))
+        pass
+
     pass
 
 unittest.main()

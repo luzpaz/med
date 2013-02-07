@@ -1363,6 +1363,21 @@ void MEDFileMesh::dealWithTinyInfo(const MEDCouplingMesh *m) throw(INTERP_KERNEL
             }
         }
     }
+  if(_desc_name.empty())
+    _desc_name=m->getDescription();
+  else
+    {
+      std::string name(m->getDescription());
+      if(!name.empty())
+        {
+          if(_desc_name!=name)
+            {
+              std::ostringstream oss; oss << "MEDFileMesh::dealWithTinyInfo : description of current MEDfile mesh is '" << _desc_name << "' whereas name of input mesh is : '";
+              oss << name << "' ! Names must match !";
+              throw INTERP_KERNEL::Exception(oss.str().c_str());
+            }
+        }
+    }
 }
 
 void MEDFileMesh::getFamilyRepr(std::ostream& oss) const
@@ -2930,24 +2945,46 @@ void MEDFileStructuredMesh::setFamilyFieldArr(int meshDimRelToMaxExt, DataArrayI
 {
   if(meshDimRelToMaxExt!=0 && meshDimRelToMaxExt!=1)
     throw INTERP_KERNEL::Exception("MEDFileStructuredMesh::setRenumFieldArr : Only available for levels 0 or 1 !");
+  const MEDCouplingStructuredMesh *mesh=getStructuredMesh();
+  if(!mesh)
+    throw INTERP_KERNEL::Exception("MEDFileStructuredMesh::setFamilyFieldArr : no structured mesh specified ! Impossible to set family array !");
+  if(meshDimRelToMaxExt==0)
+    {
+      int nbCells=mesh->getNumberOfCells();
+      famArr->checkNbOfTuplesAndComp(nbCells,1,"MEDFileStructuredMesh::setFamilyArr : Problem in size of Family arr ! Mismatch with number of cells of mesh !");
+      _fam_cells=famArr;
+    }
+  else
+    {
+      int nbNodes=mesh->getNumberOfNodes();
+      famArr->checkNbOfTuplesAndComp(nbNodes,1,"MEDFileStructuredMesh::setFamilyArr : Problem in size of Family arr ! Mismatch with number of nodes of mesh !");
+      _fam_nodes=famArr;
+    }
   if(famArr)
     famArr->incrRef();
-  if(meshDimRelToMaxExt==0)
-    _fam_cells=famArr;
-  else
-    _fam_nodes=famArr;
 }
 
 void MEDFileStructuredMesh::setRenumFieldArr(int meshDimRelToMaxExt, DataArrayInt *renumArr) throw(INTERP_KERNEL::Exception)
 {
   if(meshDimRelToMaxExt!=0 && meshDimRelToMaxExt!=1)
     throw INTERP_KERNEL::Exception("MEDFileStructuredMesh::setRenumFieldArr : Only available for levels 0 or 1 !");
+  const MEDCouplingStructuredMesh *mesh=getStructuredMesh();
+  if(!mesh)
+    throw INTERP_KERNEL::Exception("MEDFileStructuredMesh::setRenumFieldArr : no structured mesh specified ! Impossible to set number array !");
+  if(meshDimRelToMaxExt==0)
+    {
+      int nbCells=mesh->getNumberOfCells();
+      renumArr->checkNbOfTuplesAndComp(nbCells,1,"MEDFileStructuredMesh::setRenumFieldArr : Problem in size of Renum arr ! Mismatch with number of cells of mesh !");
+      _num_cells=renumArr;
+    }
+  else
+    {
+      int nbNodes=mesh->getNumberOfNodes();
+      renumArr->checkNbOfTuplesAndComp(nbNodes,1,"MEDFileStructuredMesh::setFamilyArr : Problem in size of Family arr ! Mismatch with number of nodes of mesh !");
+      _num_nodes=renumArr;
+    }
   if(renumArr)
     renumArr->incrRef();
-  if(meshDimRelToMaxExt==0)
-    _num_cells=renumArr;
-  else
-    _num_nodes=renumArr;
 }
 
 const DataArrayInt *MEDFileStructuredMesh::getFamilyFieldAtLevel(int meshDimRelToMaxExt) const throw(INTERP_KERNEL::Exception)
@@ -3161,6 +3198,10 @@ void MEDFileStructuredMesh::writeStructuredLL(med_idt fid, const char *maa) cons
     MEDmeshEntityFamilyNumberWr(fid,maa,_iteration,_order,MED_CELL,geoTypeReq,_fam_cells->getNumberOfTuples(),_fam_cells->getConstPointer());
   if((const DataArrayInt *)_fam_nodes)
     MEDmeshEntityFamilyNumberWr(fid,maa,_iteration,_order,MED_NODE,MED_NONE,_fam_nodes->getNumberOfTuples(),_fam_nodes->getConstPointer());
+  if((const DataArrayInt *)_num_cells)
+    MEDmeshEntityNumberWr(fid,maa,_iteration,_order,MED_CELL,geoTypeReq,_num_cells->getNumberOfTuples(),_num_cells->getConstPointer());
+  if((const DataArrayInt *)_num_nodes)
+    MEDmeshEntityNumberWr(fid,maa,_iteration,_order,MED_NODE,MED_NONE,_num_nodes->getNumberOfTuples(),_num_nodes->getConstPointer());
   //
   MEDFileUMeshL2::WriteFamiliesAndGrps(fid,maa,_families,_groups,_too_long_str);
 }
