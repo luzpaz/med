@@ -81,8 +81,22 @@ int MEDFileMeshL2::GetMeshIdFromName(med_idt fid, const char *mname, ParaMEDMEM:
       meshType=UNSTRUCTURED;
       break;
     case MED_STRUCTURED_MESH:
-      meshType=CARTESIAN;
-      break;
+      {
+        med_grid_type gt;
+        MEDmeshGridTypeRd(fid,mname,&gt);
+        switch(gt)
+          {
+          case MED_CARTESIAN_GRID:
+            meshType=CARTESIAN;
+            break;
+          case MED_CURVILINEAR_GRID:
+            meshType=CURVE_LINEAR;
+            break;
+          default:
+            throw INTERP_KERNEL::Exception("MEDFileUMeshL2::getMeshIdFromName : unrecognized structured mesh type ! Supported are :\n - cartesian\n - curve linear\n");
+          }
+        break;
+      }
     default:
       throw INTERP_KERNEL::Exception("MEDFileUMeshL2::getMeshIdFromName : unrecognized mesh type !");
     }
@@ -135,8 +149,22 @@ std::vector<std::string> MEDFileMeshL2::getAxisInfoOnMesh(med_idt fid, int mId, 
       meshType=UNSTRUCTURED;
       break;
     case MED_STRUCTURED_MESH:
-      meshType=CARTESIAN;
-      break;
+      {
+        med_grid_type gt;
+        MEDmeshGridTypeRd(fid,mName,&gt);
+        switch(gt)
+          {
+          case MED_CARTESIAN_GRID:
+            meshType=CARTESIAN;
+            break;
+          case MED_CURVILINEAR_GRID:
+            meshType=CURVE_LINEAR;
+            break;
+          default:
+            throw INTERP_KERNEL::Exception("MEDFileUMeshL2::getAxisInfoOnMesh : unrecognized structured mesh type ! Supported are :\n - cartesian\n - curve linear\n");
+          }
+        break;
+      }
     default:
       throw INTERP_KERNEL::Exception("MEDFileUMeshL2::getMeshIdFromName : unrecognized mesh type !");
     }
@@ -334,7 +362,7 @@ void MEDFileCMeshL2::loadAll(med_idt fid, int mId, const char *mName, int dt, in
   med_grid_type gridtype;
   MEDmeshGridTypeRd(fid,mName,&gridtype);
   if(gridtype!=MED_CARTESIAN_GRID)
-    throw INTERP_KERNEL::Exception("Invalid cartesion mesh type ! Only Cartesian Grid supported ! Curvilinear grid will come soon !");
+    throw INTERP_KERNEL::Exception("Invalid structured mesh ! Expected cartesian mesh type !");
   _cmesh=MEDCouplingCMesh::New();
   for(int i=0;i<Mdim;i++)
     {
@@ -362,6 +390,36 @@ med_data_type MEDFileCMeshL2::GetDataTypeCorrespondingToSpaceId(int id) throw(IN
     default:
       throw INTERP_KERNEL::Exception("Invalid meshdim detected in Cartesian Grid !");
     }
+}
+
+MEDFileCLMeshL2::MEDFileCLMeshL2()
+{
+}
+
+void MEDFileCLMeshL2::loadAll(med_idt fid, int mId, const char *mName, int dt, int it) throw(INTERP_KERNEL::Exception)
+{
+  _name.set(mName);
+  int nstep;
+  int Mdim;
+  ParaMEDMEM::MEDCouplingMeshType meshType;
+  std::vector<std::string> infosOnComp=getAxisInfoOnMesh(fid,mId,mName,meshType,nstep,Mdim);
+  if(meshType!=CURVE_LINEAR)
+    throw INTERP_KERNEL::Exception("Invalid mesh type ! You are expected a structured one whereas in file it is not a structured !");
+  _time=CheckMeshTimeStep(fid,mName,nstep,dt,it);
+  _iteration=dt;
+  _order=it;
+  //
+  _clmesh=MEDCouplingCurveLinearMesh::New();
+  INTERP_KERNEL::AutoPtr<int> stGrid=new int[Mdim];
+  MEDmeshGridStructRd(fid,mName,dt,it,stGrid);
+  _clmesh->setNodeGridStructure(stGrid,((int *)stGrid)+Mdim);
+  med_bool chgt=MED_FALSE,trsf=MED_FALSE;
+  int nbNodes=MEDmeshnEntity(fid,mName,dt,it,MED_NODE,MED_NONE,MED_COORDINATE,MED_NO_CMODE,&chgt,&trsf);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> da=DataArrayDouble::New();
+  da->alloc(nbNodes,infosOnComp.size());
+  da->setInfoOnComponents(infosOnComp);
+  MEDmeshNodeCoordinateRd(fid,mName,dt,it,MED_FULL_INTERLACE,da->getPointer());
+  _clmesh->setCoords(da);
 }
 
 MEDFileUMeshPermCompute::MEDFileUMeshPermCompute(const MEDFileUMeshSplitL1* st):_st(st),_mpt_time(0),_num_time(0)

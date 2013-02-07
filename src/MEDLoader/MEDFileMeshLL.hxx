@@ -26,6 +26,7 @@
 
 #include "MEDCouplingUMesh.hxx"
 #include "MEDCouplingCMesh.hxx"
+#include "MEDCouplingCurveLinearMesh.hxx"
 #include "MEDCouplingAutoRefCountObjectPtr.hxx"
 
 #include "med.h"
@@ -84,7 +85,11 @@ namespace ParaMEDMEM
     MEDCouplingAutoRefCountObjectPtr<DataArrayInt> _num_coords;
   };
 
-  class MEDFileCMeshL2 : public MEDFileMeshL2
+  class MEDFileStrMeshL2 : public MEDFileMeshL2
+  {
+  };
+
+  class MEDFileCMeshL2 : public MEDFileStrMeshL2
   {
   public:
     MEDFileCMeshL2();
@@ -94,6 +99,16 @@ namespace ParaMEDMEM
     static med_data_type GetDataTypeCorrespondingToSpaceId(int id) throw(INTERP_KERNEL::Exception);
   private:
     MEDCouplingAutoRefCountObjectPtr<MEDCouplingCMesh> _cmesh;
+  };
+  
+  class MEDFileCLMeshL2 : public MEDFileStrMeshL2
+  {
+  public:
+    MEDFileCLMeshL2();
+    void loadAll(med_idt fid, int mId, const char *mName, int dt, int it) throw(INTERP_KERNEL::Exception);
+    MEDCouplingCurveLinearMesh *getMesh() { return _clmesh; }
+  private:
+    MEDCouplingAutoRefCountObjectPtr<MEDCouplingCurveLinearMesh> _clmesh;
   };
 
   class MEDFileMesh;

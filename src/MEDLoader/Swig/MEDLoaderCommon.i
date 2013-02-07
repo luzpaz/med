@@ -80,6 +80,7 @@ using namespace ParaMEDMEM;
 %newobject ParaMEDMEM::MEDFileUMesh::getLevelM3Mesh;
 %newobject ParaMEDMEM::MEDFileUMesh::zipCoords;
 %newobject ParaMEDMEM::MEDFileCMesh::New;
+%newobject ParaMEDMEM::MEDFileCurveLinearMesh::New;
 %newobject ParaMEDMEM::MEDFileMeshMultiTS::New;
 %newobject ParaMEDMEM::MEDFileMeshMultiTS::deepCpy;
 %newobject ParaMEDMEM::MEDFileMeshMultiTS::getOneTimeStep;
@@ -647,7 +648,11 @@ namespace ParaMEDMEM
        }
   };
 
-  class MEDFileCMesh : public MEDFileMesh
+  class MEDFileStructuredMesh : public MEDFileMesh
+  {
+  };
+
+  class MEDFileCMesh : public MEDFileStructuredMesh
   {
   public:
     static MEDFileCMesh *New();
@@ -677,6 +682,40 @@ namespace ParaMEDMEM
            if(tmp)
              tmp->incrRef();
            return SWIG_NewPointerObj(SWIG_as_voidptr(tmp),SWIGTYPE_p_ParaMEDMEM__MEDCouplingCMesh, SWIG_POINTER_OWN | 0 );
+         }
+       }
+  };
+
+  class MEDFileCurveLinearMesh : public MEDFileStructuredMesh
+  {
+  public:
+    static MEDFileCurveLinearMesh *New();
+    static MEDFileCurveLinearMesh *New(const char *fileName) throw(INTERP_KERNEL::Exception);
+    static MEDFileCurveLinearMesh *New(const char *fileName, const char *mName, int dt=-1, int it=-1) throw(INTERP_KERNEL::Exception);
+    void setMesh(MEDCouplingCurveLinearMesh *m) throw(INTERP_KERNEL::Exception);
+    %extend
+       {
+         MEDFileCurveLinearMesh()
+         {
+           return MEDFileCurveLinearMesh::New();
+         }
+
+         MEDFileCurveLinearMesh(const char *fileName) throw(INTERP_KERNEL::Exception)
+         {
+           return MEDFileCurveLinearMesh::New(fileName);
+         }
+
+         MEDFileCurveLinearMesh(const char *fileName, const char *mName, int dt=-1, int it=-1) throw(INTERP_KERNEL::Exception)
+         {
+           return MEDFileCurveLinearMesh::New(fileName,mName,dt,it);
+         }
+         
+         PyObject *getMesh() const throw(INTERP_KERNEL::Exception)
+         {
+           const MEDCouplingCurveLinearMesh *tmp=self->getMesh();
+           if(tmp)
+             tmp->incrRef();
+           return SWIG_NewPointerObj(SWIG_as_voidptr(tmp),SWIGTYPE_p_ParaMEDMEM__MEDCouplingCurveLinearMesh, SWIG_POINTER_OWN | 0 );
          }
        }
   };
