@@ -113,6 +113,7 @@ if test "x${parmetis_headers_ok}" = "xyes" ; then
     # And metis.h #include parmetis.h + mpi.h
     metis_ok=yes
     ENABLE_METIS="yes"
+    METISDIR=${PARMETISDIR}
     METIS_CPPFLAGS="-DMED_ENABLE_METIS -I${METISDIR}/METISLib ${PARMETIS_CPPFLAGS}"
     METIS_LIBS="-L${METISDIR} -lmetis ${MPI_LIBS}"
   fi
@@ -123,6 +124,9 @@ AC_MSG_RESULT(for ParMETIS: $parmetis_ok)
 AC_SUBST(ENABLE_PARMETIS)
 AC_SUBST(PARMETIS_CPPFLAGS)
 AC_SUBST(PARMETIS_LIBS)
+AC_SUBST(ENABLE_METIS)
+AC_SUBST(METIS_CPPFLAGS)
+AC_SUBST(METIS_LIBS)
 
 AC_LANG_RESTORE
 
