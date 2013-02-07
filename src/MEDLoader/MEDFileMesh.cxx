@@ -80,6 +80,12 @@ MEDFileMesh *MEDFileMesh::New(const char *fileName) throw(INTERP_KERNEL::Excepti
         ret->loadCMeshFromFile(fid,ms.front().c_str(),dt,it);
         return (MEDFileCMesh *)ret.retn();
       }
+    case CURVE_LINEAR:
+      {
+        MEDCouplingAutoRefCountObjectPtr<MEDFileCurveLinearMesh> ret=MEDFileCurveLinearMesh::New();
+        ret->loadCLMeshFromFile(fid,ms.front().c_str(),dt,it);
+        return (MEDFileCMesh *)ret.retn();
+      }
     default:
       {
         std::ostringstream oss; oss << "MEDFileMesh::New : MED file exists and has mesh '" << ms.front() << "' exists but unsupported type yet !";
