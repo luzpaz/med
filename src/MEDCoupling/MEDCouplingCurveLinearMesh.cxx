@@ -525,7 +525,7 @@ void MEDCouplingCurveLinearMesh::writeVTKLL(std::ostream& ofs, const std::string
   if(meshDim<=0 || meshDim>3)
     throw INTERP_KERNEL::Exception("MEDCouplingCurveLinearMesh::writeVTKLL : meshDim invalid ! must be in [1,2,3] !");
   for(int i=0;i<3;i++)
-    { int val=i<meshDim?_structure[i]-1:1; extent << "0 " <<  val << " "; }
+    { int val=i<meshDim?_structure[i]-1:0; extent << "0 " <<  val << " "; }
   ofs << "  <" << getVTKDataSetType() << " WholeExtent=\"" << extent.str() << "\">\n";
   ofs << "    <Piece Extent=\"" << extent.str() << "\">\n";
   ofs << "      <PointData>\n" << pointData << std::endl;
