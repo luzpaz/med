@@ -24,7 +24,7 @@ AC_DEFUN([CHECK_METIS],[
 
 dnl metis could be already found by CHECK_PARMETIS procedure
 
-if [ "x${metis_ok}" != "xyes" ] ; then
+if [[ "x${metis_ok}" != "xyes" ]] ; then
 
 AC_CHECKING(for METIS Library)
 
