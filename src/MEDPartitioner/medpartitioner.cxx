@@ -110,7 +110,7 @@ int main(int argc, char** argv)
       else if (TestArg(argv[i],"--output-file",value)) output=value;
       else if (TestArg(argv[i],"--split-method",value)) library=value;
       else if (TestArg(argv[i],"--ndomains",value)) ndomains=atoi(value.c_str());
-      else if (TestArg(argv[i],"--creates-boundary-faces",value)) MyGlobals::_Creates_Boundary_Faces=atoi(value.c_str());
+      else if (TestArg(argv[i],"--creates-boundary-faces",value)) MyGlobals::_Creates_Boundary_Faces=1;
       else if (TestArg(argv[i],"--dump-cpu-memory",value)) mesure_memory=true;
       else 
         {
