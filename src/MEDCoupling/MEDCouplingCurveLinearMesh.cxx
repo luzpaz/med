@@ -520,7 +520,29 @@ void MEDCouplingCurveLinearMesh::unserialization(const std::vector<double>& tiny
 
 void MEDCouplingCurveLinearMesh::writeVTKLL(std::ostream& ofs, const std::string& cellData, const std::string& pointData) const throw(INTERP_KERNEL::Exception)
 {
-  throw INTERP_KERNEL::Exception("MEDCouplingCurveLinearMesh::writeVTKLL : not implemented yet !");
+  std::ostringstream extent;
+  int meshDim=(int)_structure.size();
+  if(meshDim<=0 || meshDim>3)
+    throw INTERP_KERNEL::Exception("MEDCouplingCurveLinearMesh::writeVTKLL : meshDim invalid ! must be in [1,2,3] !");
+  for(int i=0;i<3;i++)
+    { int val=i<meshDim?_structure[i]-1:1; extent << "0 " <<  val << " "; }
+  ofs << "  <" << getVTKDataSetType() << " WholeExtent=\"" << extent.str() << "\">\n";
+  ofs << "    <Piece Extent=\"" << extent.str() << "\">\n";
+  ofs << "      <PointData>\n" << pointData << std::endl;
+  ofs << "      </PointData>\n";
+  ofs << "      <CellData>\n" << cellData << std::endl;
+  ofs << "      </CellData>\n";
+  ofs << "      <Points>\n";
+  if(getSpaceDimension()==3)
+    _coords->writeVTK(ofs,8,"Points");
+  else
+    {
+      MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> coo=_coords->changeNbOfComponents(3,0.);
+      coo->writeVTK(ofs,8,"Points");
+    }
+  ofs << "      </Points>\n";
+  ofs << "    </Piece>\n";
+  ofs << "  </" << getVTKDataSetType() << ">\n";
 }
 
 std::string MEDCouplingCurveLinearMesh::getVTKDataSetType() const throw(INTERP_KERNEL::Exception)
