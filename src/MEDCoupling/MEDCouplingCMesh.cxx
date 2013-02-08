@@ -736,7 +736,36 @@ void MEDCouplingCMesh::unserialization(const std::vector<double>& tinyInfoD, con
 
 void MEDCouplingCMesh::writeVTKLL(std::ostream& ofs, const std::string& cellData, const std::string& pointData) const throw(INTERP_KERNEL::Exception)
 {
-  throw INTERP_KERNEL::Exception("MEDCouplingCMesh::writeVTKLL : not implemented yet !");
+  std::ostringstream extent;
+  DataArrayDouble *thisArr[3]={_x_array,_y_array,_z_array};
+  for(int i=0;i<3;i++)
+    {
+      if(thisArr[i])
+        { extent << "0 " <<  thisArr[i]->getNumberOfTuples()-1 << " "; }
+      else
+        { extent << "0 0 "; }
+    }
+  ofs << "  <" << getVTKDataSetType() << " WholeExtent=\"" << extent.str() << "\">\n";
+  ofs << "    <Piece Extent=\"" << extent.str() << "\">\n";
+  ofs << "      <PointData>\n" << pointData << std::endl;
+  ofs << "      </PointData>\n";
+  ofs << "      <CellData>\n" << cellData << std::endl;
+  ofs << "      </CellData>\n";
+  ofs << "      <Coordinates>\n";
+  for(int i=0;i<3;i++)
+    {
+      if(thisArr[i])
+        thisArr[i]->writeVTK(ofs,8,"Array");
+      else
+        {
+          MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> coo=DataArrayDouble::New(); coo->alloc(1,1);
+          coo->setIJ(0,0,0.);
+          coo->writeVTK(ofs,8,"Array");
+        }
+    }
+  ofs << "      </Coordinates>\n";
+  ofs << "    </Piece>\n";
+  ofs << "  </" << getVTKDataSetType() << ">\n";
 }
 
 std::string MEDCouplingCMesh::getVTKDataSetType() const throw(INTERP_KERNEL::Exception)
