@@ -11059,6 +11059,9 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         li1=[1.,2.,4.,0.5,1.,2.]
         self.assertTrue(cl.getMeasureField(False).getArray().isEqual(DataArrayDouble(li1),1e-14))
         self.assertTrue(u.getMeasureField(False).getArray().isEqual(DataArrayDouble(li1),1e-14))
+        li1_1=[0.5,0.5,2.,0.5,5.,0.5,0.5,1.25,2.,1.25,5.,1.25]
+        self.assertTrue(cl.getBarycenterAndOwner().isEqual(DataArrayDouble(li1_1,6,2),1e-14))
+        self.assertTrue(u.getBarycenterAndOwner().isEqual(DataArrayDouble(li1_1,6,2),1e-14))
         #3D
         c.setCoords(arr1,arr2,arr2)
         u=c.buildUnstructured()
@@ -11068,8 +11071,11 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         cl.setNodeGridStructure([4,3,3])
         cl.checkCoherency2()
         li2=[1.,2.,4.,0.5, 1.,2.,0.5,1.,2.,0.25,0.5,1.]
+        li2_1=[0.5,0.5,0.5,2.,0.5,0.5,5.,0.5,0.5,0.5,1.25,0.5,2.,1.25,0.5,5.,1.25,0.5,0.5,0.5,1.25,2.,0.5,1.25,5.,0.5,1.25,0.5,1.25,1.25,2.,1.25,1.25,5.,1.25,1.25]
         self.assertTrue(cl.getMeasureField(False).getArray().isEqual(DataArrayDouble(li2),1e-14))
         self.assertTrue(u.getMeasureField(False).getArray().isEqual(DataArrayDouble(li2),1e-14))
+        self.assertTrue(cl.getBarycenterAndOwner().isEqual(DataArrayDouble(li2_1,12,3),1e-14))
+        self.assertTrue(u.getBarycenterAndOwner().isEqual(DataArrayDouble(li2_1,12,3),1e-14))
         #1D spaceDim 1
         coo=DataArrayDouble(5) ; coo.iota(0.)
         coo=coo*coo
@@ -11077,15 +11083,21 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         cl.setNodeGridStructure([5])
         cl.checkCoherency2()
         li3=[1.,3.,5.,7.]
+        li3_1=[0.5,2.5,6.5,12.5]
         self.assertTrue(cl.getMeasureField(False).getArray().isEqual(DataArrayDouble(li3),1e-14))
         self.assertTrue(cl.buildUnstructured().getMeasureField(False).getArray().isEqual(DataArrayDouble(li3),1e-14))
+        self.assertTrue(cl.getBarycenterAndOwner().isEqual(DataArrayDouble(li3_1),1e-14))
+        self.assertTrue(cl.buildUnstructured().getBarycenterAndOwner().isEqual(DataArrayDouble(li3_1),1e-14))
         #1D spaceDim 2
         coo=DataArrayDouble.Meld(coo,coo)
         cl.setCoords(coo)
         cl.checkCoherency2()
         li4=[sqrt(2.)*elt for elt in [1.,3.,5.,7.]]
+        li4_1=[0.5,0.5,2.5,2.5,6.5,6.5,12.5,12.5]
         self.assertTrue(cl.getMeasureField(False).getArray().isEqual(DataArrayDouble(li4),1e-14))
         self.assertTrue(cl.buildUnstructured().getMeasureField(False).getArray().isEqual(DataArrayDouble(li4),1e-14))
+        self.assertTrue(cl.getBarycenterAndOwner().isEqual(DataArrayDouble(li4_1,4,2),1e-14))
+        self.assertTrue(cl.buildUnstructured().getBarycenterAndOwner().isEqual(DataArrayDouble(li4_1,4,2),1e-14))
         pass
 
     def setUp(self):

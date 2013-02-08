@@ -89,6 +89,9 @@ namespace ParaMEDMEM
     void getMeasureFieldMeshDim1(bool isAbs, MEDCouplingFieldDouble *field) const throw(INTERP_KERNEL::Exception);
     void getMeasureFieldMeshDim2(bool isAbs, MEDCouplingFieldDouble *field) const throw(INTERP_KERNEL::Exception);
     void getMeasureFieldMeshDim3(bool isAbs, MEDCouplingFieldDouble *field) const throw(INTERP_KERNEL::Exception);
+    void getBarycenterAndOwnerMeshDim3(DataArrayDouble *bary) const;
+    void getBarycenterAndOwnerMeshDim2(DataArrayDouble *bary) const;
+    void getBarycenterAndOwnerMeshDim1(DataArrayDouble *bary) const;
   private:
     MEDCouplingCurveLinearMesh();
     MEDCouplingCurveLinearMesh(const MEDCouplingCurveLinearMesh& other, bool deepCpy);

@@ -24,6 +24,7 @@
 #include "MEDCouplingFieldDouble.hxx"
 
 #include "VolSurfUser.txx"
+#include "PointLocatorAlgos.txx"
 
 #include <functional>
 #include <algorithm>
@@ -354,7 +355,7 @@ MEDCouplingFieldDouble *MEDCouplingCurveLinearMesh::getMeasureField(bool isAbs) 
     case 1:
       { getMeasureFieldMeshDim1(isAbs,field); return field.retn(); }
     default:
-      throw INTERP_KERNEL::Exception("MEDCouplingCurveLinearMesh::getMeasureField : space dimension must be in [1,2,3] !");
+      throw INTERP_KERNEL::Exception("MEDCouplingCurveLinearMesh::getMeasureField : mesh dimension must be in [1,2,3] !");
     }
 }
 
@@ -465,9 +466,157 @@ MEDCouplingFieldDouble *MEDCouplingCurveLinearMesh::buildOrthogonalField() const
   return ret;
 }
 
+/// @cond INTERNAL
+
+namespace ParaMEDMEM
+{
+  template<const int SPACEDIMM>
+  class DummyClsMCL
+  {
+  public:
+    static const int MY_SPACEDIM=SPACEDIMM;
+    static const int MY_MESHDIM=8;
+    typedef int MyConnType;
+    static const INTERP_KERNEL::NumberingPolicy My_numPol=INTERP_KERNEL::ALL_C_MODE;
+    // begin
+    // useless, but for windows compilation ...
+    const double* getCoordinatesPtr() const { return 0; }
+    const int* getConnectivityPtr() const { return 0; }
+    const int* getConnectivityIndexPtr() const { return 0; }
+    INTERP_KERNEL::NormalizedCellType getTypeOfElement(int) const { return (INTERP_KERNEL::NormalizedCellType)0; }
+    // end
+  };
+}
+
+/// @endcond
+
 int MEDCouplingCurveLinearMesh::getCellContainingPoint(const double *pos, double eps) const
 {
-  throw INTERP_KERNEL::Exception("MEDCouplingCurveLinearMesh::getCellContainingPoint : not implemented yet !");
+  checkCoherency();
+  int spaceDim=getSpaceDimension();
+  const double *coords=_coords->getConstPointer();
+  int nodeId=-1;
+  _coords->distanceToTuple(pos,pos+spaceDim,nodeId);
+  if(nodeId<0)
+    throw INTERP_KERNEL::Exception("MEDCouplingCurveLinearMesh::getCellContainingPoint : internal problem 1 !");
+  int conn[8];
+  int nbOfNodes=getNumberOfNodes();
+  if(nbOfNodes==1)
+    throw INTERP_KERNEL::Exception("MEDCouplingCurveLinearMesh::getCellContainingPoint : No cells in this !");
+  switch(getMeshDimension())
+    {
+    case 1:
+      if(spaceDim==1)
+        {
+          if(nodeId>0)
+            {
+              conn[0]=nodeId-1; conn[1]=nodeId;
+              if(INTERP_KERNEL::PointLocatorAlgos<DummyClsMCL<1> >::isElementContainsPoint(pos,INTERP_KERNEL::NORM_SEG2,coords,conn,2,eps))
+                return nodeId-1;
+            }
+          if(nodeId<nbOfNodes-1)
+            {
+              conn[0]=nodeId; conn[1]=nodeId+1;
+              if(INTERP_KERNEL::PointLocatorAlgos<DummyClsMCL<1> >::isElementContainsPoint(pos,INTERP_KERNEL::NORM_SEG2,coords,conn,2,eps))
+                return nodeId;
+            }
+        }
+    case 2:
+      if(spaceDim==2)
+        {
+          int ny=nodeId/_structure[0],nx=nodeId-ny*_structure[0];
+          if(nx>0 && ny>0)
+            {
+              conn[0]=nx-1+_structure[0]*(ny-1); conn[1]=nx-1+_structure[0]*ny; conn[2]=nx+_structure[0]*ny; conn[3]=nx+_structure[0]*(ny-1);
+              if(INTERP_KERNEL::PointLocatorAlgos<DummyClsMCL<2> >::isElementContainsPoint(pos,INTERP_KERNEL::NORM_QUAD4,coords,conn,4,eps))
+                return nx-1+(ny-1)*_structure[0];
+            }
+          if(nx<_structure[0]-1 && ny>0)
+            {
+              conn[0]=nx+_structure[0]*(ny-1); conn[1]=nx+_structure[0]*ny; conn[2]=nx+1+_structure[0]*ny; conn[3]=nx+1+_structure[0]*(ny-1);
+              if(INTERP_KERNEL::PointLocatorAlgos<DummyClsMCL<2> >::isElementContainsPoint(pos,INTERP_KERNEL::NORM_QUAD4,coords,conn,4,eps))
+                return nx+(ny-1)*_structure[0];
+            }
+          if(nx>0 && ny<_structure[1]-1)
+            {
+              conn[0]=nx-1+_structure[0]*ny; conn[1]=nx-1+_structure[0]*(ny+1); conn[2]=nx+_structure[0]*(ny+1); conn[3]=nx+_structure[0]*ny;
+              if(INTERP_KERNEL::PointLocatorAlgos<DummyClsMCL<2> >::isElementContainsPoint(pos,INTERP_KERNEL::NORM_QUAD4,coords,conn,4,eps))
+                return nx-1+ny*_structure[0];
+            }
+          if(nx<_structure[0]-1 && ny<_structure[1]-1)
+            {
+              conn[0]=nx+_structure[0]*ny; conn[1]=nx+_structure[0]*(ny+1); conn[2]=nx+1+_structure[0]*(ny+1); conn[3]=nx+1+_structure[0]*ny;
+              if(INTERP_KERNEL::PointLocatorAlgos<DummyClsMCL<2> >::isElementContainsPoint(pos,INTERP_KERNEL::NORM_QUAD4,coords,conn,4,eps))
+                return nx+ny*_structure[0];
+            }
+        }
+    case 3:
+      {
+        if(spaceDim==3)
+          {
+            int nY=_structure[0]*_structure[1];
+            int nz=nodeId/_structure[1]; int ny=(nodeId-nz*nY)/_structure[0]; int nx=(nodeId-nz*nY)-_structure[0]*ny;
+            if(nx>0 && ny>0 && nz>0)
+              {
+                conn[0]=nx-1+_structure[0]*(ny-1)+nY*(nz-1); conn[1]=nx-1+_structure[2]*ny+nY*(nz-1); conn[2]=nx+_structure[2]*ny+nY*(nz-1); conn[3]=nx+_structure[0]*(ny-1)+nY*(nz-1);
+                conn[4]=nx-1+_structure[0]*(ny-1)+nY*nz; conn[5]=nx-1+_structure[0]*ny+nY*nz; conn[6]=nx+_structure[0]*ny+nY*nz; conn[7]=nx+_structure[0]*(ny-1)+nY*nz;
+                if(INTERP_KERNEL::PointLocatorAlgos<DummyClsMCL<3> >::isElementContainsPoint(pos,INTERP_KERNEL::NORM_HEXA8,coords,conn,8,eps))
+                  return nx-1+(ny-1)*_structure[0]+(nz-1)*nY;
+              }
+            if(nx<_structure[0]-1 && ny>0 && nz>0)
+              {
+                conn[0]=nx+_structure[0]*(ny-1)+nY*(nz-1); conn[1]=nx+_structure[0]*ny+nY*(nz-1); conn[2]=nx+1+_structure[0]*ny+nY*(nz-1); conn[3]=nx+1+_structure[0]*(ny-1)+nY*(nz-1);
+                conn[4]=nx+_structure[0]*(ny-1)+nY*nz; conn[5]=nx+_structure[0]*ny+nY*nz; conn[6]=nx+1+_structure[0]*ny+nY*nz; conn[7]=nx+1+_structure[0]*(ny-1)+nY*nz;
+                if(INTERP_KERNEL::PointLocatorAlgos<DummyClsMCL<3> >::isElementContainsPoint(pos,INTERP_KERNEL::NORM_HEXA8,coords,conn,8,eps))
+                  return nx+(ny-1)*_structure[0]+(nz-1)*nY;
+              }
+            if(nx>0 && ny<_structure[1]-1 && nz>0)
+              {
+                conn[0]=nx-1+_structure[0]*ny+nY*(nz-1); conn[1]=nx-1+_structure[0]*(ny+1)+nY*(nz-1); conn[2]=nx+_structure[0]*(ny+1)+nY*(nz-1); conn[3]=nx+_structure[0]*ny+nY*(nz-1);
+                conn[4]=nx-1+_structure[0]*ny+nY*nz; conn[5]=nx-1+_structure[0]*(ny+1)+nY*nz; conn[6]=nx+_structure[0]*(ny+1)+nY*nz; conn[7]=nx+_structure[0]*ny+nY*nz;
+                if(INTERP_KERNEL::PointLocatorAlgos<DummyClsMCL<3> >::isElementContainsPoint(pos,INTERP_KERNEL::NORM_HEXA8,coords,conn,8,eps))
+                  return nx-1+ny*_structure[0]+(nz-1)*nY;
+              }
+            if(nx<_structure[0]-1 && ny<_structure[1]-1 && nz>0)
+              {
+                conn[0]=nx+_structure[0]*ny+nY*(nz-1); conn[1]=nx+_structure[0]*(ny+1)+nY*(nz-1); conn[2]=nx+1+_structure[0]*(ny+1)+nY*(nz-1); conn[3]=nx+1+_structure[0]*ny+nY*(nz-1);
+                conn[4]=nx+_structure[0]*ny+nY*nz; conn[5]=nx+_structure[0]*(ny+1)+nY*nz; conn[6]=nx+1+_structure[0]*(ny+1)+nY*nz; conn[7]=nx+1+_structure[0]*ny+nY*nz;
+                if(INTERP_KERNEL::PointLocatorAlgos<DummyClsMCL<3> >::isElementContainsPoint(pos,INTERP_KERNEL::NORM_HEXA8,coords,conn,8,eps))
+                  return nx+ny*_structure[0]+(nz-1)*nY;
+              }
+            if(nx>0 && ny>0 && nz<_structure[2]-1)
+              {
+                conn[0]=nx-1+_structure[0]*(ny-1)+nY*(nz-1); conn[1]=nx-1+_structure[2]*ny+nY*(nz-1); conn[2]=nx+_structure[2]*ny+nY*(nz-1); conn[3]=nx+_structure[0]*(ny-1)+nY*(nz-1);
+                conn[4]=nx-1+_structure[0]*(ny-1)+nY*nz; conn[5]=nx-1+_structure[0]*ny+nY*nz; conn[6]=nx+_structure[0]*ny+nY*nz; conn[7]=nx+_structure[0]*(ny-1)+nY*nz;
+                if(INTERP_KERNEL::PointLocatorAlgos<DummyClsMCL<3> >::isElementContainsPoint(pos,INTERP_KERNEL::NORM_HEXA8,coords,conn,8,eps))
+                  return nx-1+(ny-1)*_structure[0]+nz*nY;
+              }
+            if(nx<_structure[0]-1 && ny>0 && nz<_structure[2]-1)
+              {
+                conn[0]=nx+_structure[0]*(ny-1)+nY*(nz-1); conn[1]=nx+_structure[0]*ny+nY*(nz-1); conn[2]=nx+1+_structure[0]*ny+nY*(nz-1); conn[3]=nx+1+_structure[0]*(ny-1)+nY*(nz-1);
+                conn[4]=nx+_structure[0]*(ny-1)+nY*nz; conn[5]=nx+_structure[0]*ny+nY*nz; conn[6]=nx+1+_structure[0]*ny+nY*nz; conn[7]=nx+1+_structure[0]*(ny-1)+nY*nz;
+                if(INTERP_KERNEL::PointLocatorAlgos<DummyClsMCL<3> >::isElementContainsPoint(pos,INTERP_KERNEL::NORM_HEXA8,coords,conn,8,eps))
+                  return nx+(ny-1)*_structure[0]+nz*nY;
+              }
+            if(nx>0 && ny<_structure[1]-1 && nz<_structure[2]-1)
+              {
+                conn[0]=nx-1+_structure[0]*ny+nY*(nz-1); conn[1]=nx-1+_structure[0]*(ny+1)+nY*(nz-1); conn[2]=nx+_structure[0]*(ny+1)+nY*(nz-1); conn[3]=nx+_structure[0]*ny+nY*(nz-1);
+                conn[4]=nx-1+_structure[0]*ny+nY*nz; conn[5]=nx-1+_structure[0]*(ny+1)+nY*nz; conn[6]=nx+_structure[0]*(ny+1)+nY*nz; conn[7]=nx+_structure[0]*ny+nY*nz;
+                if(INTERP_KERNEL::PointLocatorAlgos<DummyClsMCL<3> >::isElementContainsPoint(pos,INTERP_KERNEL::NORM_HEXA8,coords,conn,8,eps))
+                  return nx-1+ny*_structure[0]+nz*nY;
+              }
+            if(nx<_structure[0]-1 && ny<_structure[1]-1 && nz<_structure[2]-1)
+              {
+                conn[0]=nx+_structure[0]*ny+nY*(nz-1); conn[1]=nx+_structure[0]*(ny+1)+nY*(nz-1); conn[2]=nx+1+_structure[0]*(ny+1)+nY*(nz-1); conn[3]=nx+1+_structure[0]*ny+nY*(nz-1);
+                conn[4]=nx+_structure[0]*ny+nY*nz; conn[5]=nx+_structure[0]*(ny+1)+nY*nz; conn[6]=nx+1+_structure[0]*(ny+1)+nY*nz; conn[7]=nx+1+_structure[0]*ny+nY*nz;
+                if(INTERP_KERNEL::PointLocatorAlgos<DummyClsMCL<3> >::isElementContainsPoint(pos,INTERP_KERNEL::NORM_HEXA8,coords,conn,8,eps))
+                  return nx+ny*_structure[0]+nz*nY;
+              }
+          }
+      }
+    default:
+      throw INTERP_KERNEL::Exception("MEDCouplingCurveLinearMesh::getCellContainingPoint : mesh dimension managed are 1, 2 or 3 !");
+    }
 }
 
 void MEDCouplingCurveLinearMesh::rotate(const double *center, const double *vector, double angle)
@@ -533,7 +682,84 @@ DataArrayDouble *MEDCouplingCurveLinearMesh::getCoordinatesAndOwner() const
 
 DataArrayDouble *MEDCouplingCurveLinearMesh::getBarycenterAndOwner() const
 {
-  throw INTERP_KERNEL::Exception("MEDCouplingCurveLinearMesh::getBarycenterAndOwner : not implemented yet !");
+  checkCoherency();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::New();
+  int spaceDim=getSpaceDimension();
+  int meshDim=getMeshDimension();
+  int nbOfCells=getNumberOfCells();
+  ret->alloc(nbOfCells,spaceDim);
+  ret->copyStringInfoFrom(*getCoords());
+  switch(meshDim)
+    {
+    case 3:
+      { getBarycenterAndOwnerMeshDim3(ret); return ret.retn(); }
+    case 2:
+      { getBarycenterAndOwnerMeshDim2(ret); return ret.retn(); }
+    case 1:
+      { getBarycenterAndOwnerMeshDim1(ret); return ret.retn(); }
+    default:
+      throw INTERP_KERNEL::Exception("MEDCouplingCurveLinearMesh::getBarycenterAndOwner : mesh dimension must be in [1,2,3] !");
+    }
+}
+
+/*!
+ * \param [in,out] bary Barycenter array feeded with good values.
+ * \sa MEDCouplingCurveLinearMesh::getBarycenterAndOwner
+ */
+void MEDCouplingCurveLinearMesh::getBarycenterAndOwnerMeshDim3(DataArrayDouble *bary) const
+{
+  int nbOfCells=getNumberOfCells();
+  double *ptToFill=bary->getPointer();
+  const double *coor=_coords->getConstPointer();
+  if(getSpaceDimension()!=3)
+    throw INTERP_KERNEL::Exception("MEDCouplingCurveLinearMesh::getBarycenterAndOwnerMeshDim3 : with meshDim 3 only space dimension 3 is possible !");
+  int nX=_structure[0]-1,nY=(_structure[0]-1)*(_structure[1]-1);
+  int nY1=_structure[0]*_structure[1];
+  int conn[8];
+  for(int i=0;i<nbOfCells;i++)
+    {
+      int cz=i/nY;
+      int cy=(i-cz*nY)/nX;
+      int cx=(i-cz*nY)-nX*cy;
+      conn[0]=cz*nY1+cy*(nX+1)+cx; conn[1]=cz*nY1+(cy+1)*(nX+1)+cx; conn[2]=cz*nY1+(cy+1)*(nX+1)+1+cx; conn[3]=cz*nY1+cy*(nX+1)+cx+1;
+      conn[4]=(cz+1)*nY1+cy*(nX+1)+cx; conn[5]=(cz+1)*nY1+(cy+1)*(nX+1)+cx; conn[6]=(cz+1)*nY1+(cy+1)*(nX+1)+1+cx; conn[7]=(cz+1)*nY1+cy*(nX+1)+cx+1;
+      INTERP_KERNEL::computeBarycenter2<int,INTERP_KERNEL::ALL_C_MODE>(INTERP_KERNEL::NORM_HEXA8,conn,8,coor,3,ptToFill);
+      ptToFill+=3;
+    }
+}
+
+/*!
+ * \param [in,out] bary Barycenter array feeded with good values.
+ * \sa MEDCouplingCurveLinearMesh::getBarycenterAndOwner
+ */
+void MEDCouplingCurveLinearMesh::getBarycenterAndOwnerMeshDim2(DataArrayDouble *bary) const
+{
+  int nbcells=getNumberOfCells();
+  int spaceDim=getSpaceDimension();
+  double *ptToFill=bary->getPointer();
+  const double *coor=_coords->getConstPointer();
+  if(spaceDim!=2 && spaceDim!=3)
+    throw INTERP_KERNEL::Exception("MEDCouplingCurveLinearMesh::getBarycenterAndOwnerMeshDim2 : with meshDim 2 only space dimension 2 and 3 are possible !");
+  int nX=_structure[0]-1;
+  int conn[4];
+  for(int i=0;i<nbcells;i++)
+    {
+      int cy=i/nX,cx=i-cy*nX;
+      conn[0]=cy*(nX+1)+cx; conn[1]=(cy+1)*(nX+1)+cx; conn[2]=(cy+1)*(nX+1)+1+cx; conn[3]=cy*(nX+1)+cx+1;
+      INTERP_KERNEL::computeBarycenter2<int,INTERP_KERNEL::ALL_C_MODE>(INTERP_KERNEL::NORM_QUAD4,conn,4,coor,spaceDim,ptToFill);
+      ptToFill+=spaceDim;
+    }
+}
+
+/*!
+ * \param [in,out] bary Barycenter array feeded with good values.
+ * \sa MEDCouplingCurveLinearMesh::getBarycenterAndOwner
+ */
+void MEDCouplingCurveLinearMesh::getBarycenterAndOwnerMeshDim1(DataArrayDouble *bary) const
+{
+  int spaceDim=getSpaceDimension();
+  std::transform(_coords->begin()+spaceDim,_coords->end(),_coords->begin(),bary->getPointer(),std::plus<double>());
+  std::transform(bary->begin(),bary->end(),bary->getPointer(),std::bind2nd(std::multiplies<double>(),0.5));
 }
 
 void MEDCouplingCurveLinearMesh::renumberCells(const int *old2NewBg, bool check) throw(INTERP_KERNEL::Exception)
