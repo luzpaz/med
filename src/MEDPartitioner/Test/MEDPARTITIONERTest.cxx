@@ -893,7 +893,7 @@ void MEDPARTITIONERTest::testMeshCollectionComplexPartitionMetis()
 
 void MEDPARTITIONERTest::testMetisSmallSize()
 {
-#if !defined(HAVE_MPI2)
+  //#if !defined(HAVE_MPI2)
   setSmallSize();
   createTestMeshes();
   std::string MetisOrScotch("metis");
@@ -901,7 +901,7 @@ void MEDPARTITIONERTest::testMetisSmallSize()
   verifyMetisOrScotchMedpartitionerOnSmallSizeForMesh(MetisOrScotch);
   verifyMetisOrScotchMedpartitionerOnSmallSizeForFieldOnCells(MetisOrScotch);
   verifyMetisOrScotchMedpartitionerOnSmallSizeForFieldOnGaussNe(MetisOrScotch);
-#endif
+  //#endif
 }
 #endif
 
@@ -975,7 +975,7 @@ void MEDPARTITIONERTest::testMeshCollectionComplexPartitionScotch()
 
 void MEDPARTITIONERTest::testScotchSmallSize()
 {
-#if !defined(HAVE_MPI2)
+  //#if !defined(HAVE_MPI2)
   setSmallSize();
   createTestMeshes();
   std::string MetisOrScotch("scotch");
@@ -983,7 +983,7 @@ void MEDPARTITIONERTest::testScotchSmallSize()
   verifyMetisOrScotchMedpartitionerOnSmallSizeForMesh(MetisOrScotch);
   verifyMetisOrScotchMedpartitionerOnSmallSizeForFieldOnCells(MetisOrScotch);
   verifyMetisOrScotchMedpartitionerOnSmallSizeForFieldOnGaussNe(MetisOrScotch);
-#endif
+  //#endif
 }
 #endif
 
