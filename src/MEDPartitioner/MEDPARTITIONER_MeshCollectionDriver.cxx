@@ -228,18 +228,18 @@ void MeshCollectionDriver::writeMedFile(int idomain, const std::string& distfile
   std::vector<const ParaMEDMEM::MEDCouplingUMesh*> meshes;
   ParaMEDMEM::MEDCouplingUMesh* cellMesh=_collection->getMesh(idomain);
   ParaMEDMEM::MEDCouplingUMesh* faceMesh=_collection->getFaceMesh(idomain);
-  ParaMEDMEM::MEDCouplingUMesh* faceMeshFilter=0;
+  //ParaMEDMEM::MEDCouplingUMesh* faceMeshFilter=0;
   
   std::string finalMeshName=ExtractFromDescription(MyGlobals::_General_Informations[0], "finalMeshName=");
-  std::string cleFilter=Cle1ToStr("filterFaceOnCell",idomain);
-  ParaMEDMEM::DataArrayInt* filter=0;
-  if (_collection->getMapDataArrayInt().find(cleFilter)!=_collection->getMapDataArrayInt().end())
-    {
-      filter=_collection->getMapDataArrayInt().find(cleFilter)->second;
-      int* index=filter->getPointer();
-      faceMeshFilter=(ParaMEDMEM::MEDCouplingUMesh *) faceMesh->buildPartOfMySelf(index,index+filter->getNbOfElems(),true);
-      faceMesh=faceMeshFilter;
-    }
+  // std::string cleFilter=Cle1ToStr("filterFaceOnCell",idomain);
+  // ParaMEDMEM::DataArrayInt* filter=0;
+  // if (_collection->getMapDataArrayInt().find(cleFilter)!=_collection->getMapDataArrayInt().end())
+  //   {
+  //     filter=_collection->getMapDataArrayInt().find(cleFilter)->second;
+  //     int* index=filter->getPointer();
+  //     faceMeshFilter=(ParaMEDMEM::MEDCouplingUMesh *) faceMesh->buildPartOfMySelf(index,index+filter->getNbOfElems(),true);
+  //     faceMesh=faceMeshFilter;
+  //   }
   cellMesh->setName(finalMeshName.c_str());
   meshes.push_back(cellMesh);
   
@@ -260,8 +260,8 @@ void MeshCollectionDriver::writeMedFile(int idomain, const std::string& distfile
   //   }
 
   MEDLoader::WriteUMeshes(distfilename.c_str(), meshes, true);
-  if (faceMeshFilter!=0)
-    faceMeshFilter->decrRef();
+  // if (faceMeshFilter!=0)
+  //   faceMeshFilter->decrRef();
 
   // if (boundaryMesh!=0)
   //   {
@@ -279,24 +279,7 @@ void MeshCollectionDriver::writeMedFile(int idomain, const std::string& distfile
       _collection->getMapDataArrayInt().find(key)!=_collection->getMapDataArrayInt().end())
     {
       ParaMEDMEM::DataArrayInt *fam=_collection->getMapDataArrayInt().find(key)->second;
-      ParaMEDMEM::DataArrayInt *famFilter=0;
-      if (filter!=0)
-        {
-          int* index=filter->getPointer();
-          int nbTuples=filter->getNbOfElems();
-          //not the good one...buildPartOfMySelf do not exist for DataArray 
-          //Filter=fam->renumberAndReduce(index, filter->getNbOfElems());
-          famFilter=ParaMEDMEM::DataArrayInt::New();
-          famFilter->alloc(nbTuples,1);
-          int* pfamFilter=famFilter->getPointer();
-          int* pfam=fam->getPointer();
-          for (int i=0; i<nbTuples; i++)
-            pfamFilter[i]=pfam[index[i]];
-          fam=famFilter;
-        }
       mfm->setFamilyFieldArr(-1,fam);
-      if ( famFilter )
-        famFilter->decrRef();
     }
 
   key=Cle1ToStr("cellFamily_toArray",idomain);
