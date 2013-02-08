@@ -345,6 +345,10 @@ if test "$with_interp_kernel_only" != "yes" ; then
         echo 
         CHECK_PARMETIS dnl parmetis_ok is set to yes by CHECK_PARMETIS
 
+        if test "x$parmetis_ok" != "xyes"; then
+                CHECK_PARMETISV4
+        fi
+
         echo  
         echo --------------------------------------------- 
         echo testing METIS 
