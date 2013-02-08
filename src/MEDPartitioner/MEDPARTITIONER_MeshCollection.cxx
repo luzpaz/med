@@ -47,10 +47,12 @@
 #include <mpi.h>
 #endif
 
-#if defined(MED_ENABLE_PARMETIS) || defined(MED_ENABLE_METIS)
+#ifdef MED_ENABLE_PARMETIS
+#include "MEDPARTITIONER_ParMetisGraph.hxx"
+#endif
+#ifdef MED_ENABLE_METIS
 #include "MEDPARTITIONER_MetisGraph.hxx"
 #endif
-
 #ifdef MED_ENABLE_SCOTCH
 #include "MEDPARTITIONER_ScotchGraph.hxx"
 #endif
@@ -420,7 +422,6 @@ void MEDPARTITIONER::MeshCollection::castFaceMeshes(MeshCollection& initialColle
                                                     const std::multimap<std::pair<int,int>, std::pair<int,int> >& nodeMapping,
                                                     std::vector<std::vector<std::vector<int> > >& new2oldIds)
 {
-
   //splitMeshes structure will contain the partition of 
   //the old faces on the new ones
   //splitMeshes[4][2] contains the faces from old domain 2
@@ -536,7 +537,7 @@ void MEDPARTITIONER::MeshCollection::castFaceMeshes(MeshCollection& initialColle
           std::cout<<"proc "<<MyGlobals::_Rank<<" : castFaceMeshes empty mesh from iodDomain "<<iold<<std::endl;
         }
     }
-  
+
 #ifdef HAVE_MPI2
   //send/receive stuff
   if (isParallelMode())
@@ -585,7 +586,9 @@ void MEDPARTITIONER::MeshCollection::castFaceMeshes(MeshCollection& initialColle
         }
 
       ParaMEDMEM::MEDCouplingUMesh *bndMesh = 0;
-      if ( _subdomain_boundary_creates )
+      if ( _subdomain_boundary_creates &&
+           _mesh[inew] &&
+           _mesh[inew]->getNumberOfCells()>0 )
         {
           bndMesh =
             ((ParaMEDMEM::MEDCouplingUMesh *)_mesh[inew]->buildBoundaryMesh(/*keepCoords=*/true));
@@ -944,16 +947,20 @@ void MEDPARTITIONER::MeshCollection::buildConnectZones()
   if ( getMeshDimension() < 2 )
     return;
 
-  std::vector<ParaMEDMEM::MEDCouplingUMesh*>& faceMeshes = getFaceMesh();
+  using ParaMEDMEM::MEDCouplingUMesh;
+  using ParaMEDMEM::DataArrayDouble;
+  using ParaMEDMEM::DataArrayInt;
+
+  std::vector<MEDCouplingUMesh*>& faceMeshes = getFaceMesh();
   int nbMeshes = faceMeshes.size();
 
   //preparing bounding box trees for accelerating search of coincident faces
-  std::vector<BBTreeOfDim* >            bbTrees(nbMeshes);
-  std::vector<ParaMEDMEM::DataArrayDouble*>bbox(nbMeshes);
+  std::vector<BBTreeOfDim* >   bbTrees(nbMeshes);
+  std::vector<DataArrayDouble*>bbox   (nbMeshes);
   for (int inew = 0; inew < nbMeshes-1; inew++)
-    if (isParallelMode() && _domain_selector->isMyDomain(inew))
+    if ( !isParallelMode() || _domain_selector->isMyDomain(inew) )
       {
-        ParaMEDMEM::DataArrayDouble* bcCoords = faceMeshes[inew]->getBarycenterAndOwner();
+        DataArrayDouble* bcCoords = faceMeshes[inew]->getBarycenterAndOwner();
         bbox   [inew] = bcCoords->computeBBoxPerTuple(1.e-6);
         bbTrees[inew] = new BBTreeOfDim( bcCoords->getNumberOfComponents(),
                                          bbox[inew]->getConstPointer(),0,0,
@@ -966,9 +973,9 @@ void MEDPARTITIONER::MeshCollection::buildConnectZones()
     {
       for (int inew2 = inew1+1; inew2 < nbMeshes; inew2++ )
         {
-          ParaMEDMEM::MEDCouplingUMesh* mesh1 = 0;
-          ParaMEDMEM::MEDCouplingUMesh* mesh2 = 0;
-          ParaMEDMEM::MEDCouplingUMesh* recvMesh = 0;
+          MEDCouplingUMesh* mesh1 = 0;
+          MEDCouplingUMesh* mesh2 = 0;
+          //MEDCouplingUMesh* recvMesh = 0;
           bool mesh1Here = true, mesh2Here = true;
           if (isParallelMode())
             {
@@ -984,8 +991,10 @@ void MEDPARTITIONER::MeshCollection::buildConnectZones()
               else if ( mesh1Here && !mesh2Here )
                 {
                   //receiving mesh2 from a distant domain
-                  _domain_selector->recvMesh(recvMesh,_domain_selector->getProcessorID(inew2));
-                  mesh2 = recvMesh;
+                  _domain_selector->recvMesh(mesh2,_domain_selector->getProcessorID(inew2));
+                  if ( faceMeshes[ inew2 ] )
+                    faceMeshes[ inew2 ]->decrRef();
+                  faceMeshes[ inew2 ] = mesh2;
                 }
 #endif
             }
@@ -996,7 +1005,7 @@ void MEDPARTITIONER::MeshCollection::buildConnectZones()
           std::vector< int > faces1, faces2;
           if ( mesh1 && mesh2 )
             {
-              const ParaMEDMEM::DataArrayDouble* coords2 = mesh2->getBarycenterAndOwner();
+              const DataArrayDouble* coords2 = mesh2->getBarycenterAndOwner();
               const double*   c2 = coords2->getConstPointer();
               const int      dim = coords2->getNumberOfComponents();
               const int nbFaces2 = mesh2->getNumberOfCells();
@@ -1039,8 +1048,8 @@ void MEDPARTITIONER::MeshCollection::buildConnectZones()
                 }
 #endif
             }
-          if ( recvMesh )
-            recvMesh->decrRef();
+          // if ( recvMesh )
+          //   recvMesh->decrRef();
 
           // Create group "JOINT_inew1_inew2_Faces" and corresponding families
           for ( int is2nd = 0; is2nd < 2; ++is2nd )
@@ -1094,20 +1103,23 @@ void MEDPARTITIONER::MeshCollection::createJointGroup( const std::vector< int >&
   // get family IDs array
   int* famIDs = 0;
   int inew = (is2nd ? inew2 : inew1 );
+  int totalNbFaces =  _face_mesh[ inew ] ? _face_mesh[ inew ]->getNumberOfCells() : 0;
   std::string cle = Cle1ToStr( "faceFamily_toArray", inew );
   if ( !_map_dataarray_int.count(cle) )
     {
-      ParaMEDMEM::DataArrayInt* p=ParaMEDMEM::DataArrayInt::New();
-      p->alloc( _face_mesh[ inew ]->getNumberOfCells(), 1 );
-      p->fillWithZero();
-      famIDs = p->getPointer();
-      _map_dataarray_int[cle]=p;
+      if ( totalNbFaces > 0 )
+        {
+          ParaMEDMEM::DataArrayInt* p=ParaMEDMEM::DataArrayInt::New();
+          p->alloc( totalNbFaces, 1 );
+          p->fillWithZero();
+          famIDs = p->getPointer();
+          _map_dataarray_int[cle]=p;
+        }
     }
   else
     {
       famIDs = _map_dataarray_int.find(cle)->second->getPointer();
     }
-
   // find a family ID of an existing JOINT group
   int familyID = 0;
   std::map<std::string, int>::iterator name2id = _family_info.find( groupName );
@@ -1115,8 +1127,8 @@ void MEDPARTITIONER::MeshCollection::createJointGroup( const std::vector< int >&
     familyID = name2id->second;
 
   // remove faces from the familyID-the family
-  if ( familyID != 0 )
-    for ( size_t i = 0; i < faces.size(); ++i )
+  if ( familyID != 0 && famIDs )
+    for ( size_t i = 0; i < totalNbFaces; ++i )
       if ( famIDs[i] == familyID )
         famIDs[i] = 0;
 
@@ -1137,7 +1149,10 @@ void MEDPARTITIONER::MeshCollection::createJointGroup( const std::vector< int >&
         }
       while ( freeIdCount > 0 );
     }
+
   // push faces to familyID-th group
+  if ( faces.back() >= totalNbFaces )
+    throw INTERP_KERNEL::Exception("MeshCollection::createJointGroup(): to high face ID");
   for ( size_t i = 0; i < faces.size(); ++i )
     famIDs[ faces[i] ] = familyID;
 
@@ -1759,18 +1774,30 @@ MEDPARTITIONER::Topology* MEDPARTITIONER::MeshCollection::createPartition(int nb
   int* edgeweights=0;
   buildCellGraph(array,edgeweights);
   
-  Graph* cellGraph;
+  Graph* cellGraph = 0;
   switch (split)
     {
     case Graph::METIS:
-#if defined(MED_ENABLE_PARMETIS) || defined(MED_ENABLE_METIS)
-      if (MyGlobals::_Verbose>10)
-        std::cout << "METISGraph" << std::endl;
-      cellGraph=new METISGraph(array,edgeweights);
-#else
-      throw INTERP_KERNEL::Exception("MeshCollection::createPartition : PARMETIS/METIS is not available. Check your products, please.");
+      if ( isParallelMode() && MyGlobals::_World_Size > 1 )
+      {
+#ifdef MED_ENABLE_PARMETIS
+        if (MyGlobals::_Verbose>10)
+          std::cout << "ParMETISGraph" << std::endl;
+        cellGraph=new ParMETISGraph(array,edgeweights);
 #endif
+      }
+      if ( !cellGraph )
+      {
+#ifdef MED_ENABLE_METIS
+        if (MyGlobals::_Verbose>10)
+          std::cout << "METISGraph" << std::endl;
+        cellGraph=new METISGraph(array,edgeweights);
+#endif
+      }
+      if ( !cellGraph )
+        throw INTERP_KERNEL::Exception("MeshCollection::createPartition : PARMETIS/METIS is not available. Check your products, please.");
       break;
+
     case Graph::SCOTCH:
 #ifdef MED_ENABLE_SCOTCH
       if (MyGlobals::_Verbose>10)
@@ -1951,7 +1978,7 @@ void MEDPARTITIONER::MeshCollection::filterFaceOnCell()
 {
   for (int inew=0; inew<_topology->nbDomain(); inew++)
     {
-      if (isParallelMode() && _domain_selector->isMyDomain(inew))
+      if (!isParallelMode() || _domain_selector->isMyDomain(inew))
         {
           if (MyGlobals::_Verbose>200) 
             std::cout << "proc " << MyGlobals::_Rank << " : filterFaceOnCell on inewDomain " << inew << " nbOfFaces " << _face_mesh[inew]->getNumberOfCells() << std::endl;
@@ -2013,15 +2040,38 @@ void MEDPARTITIONER::MeshCollection::filterFaceOnCell()
                     std::cout << "face NOT on cell " << iface << " " << faceOnCell.size()-1 << std::endl;
                 }
             }
-      
+
           revNodalCel->decrRef();
           revNodalIndxCel->decrRef();
-      
-          std::string keyy;
-          keyy=Cle1ToStr("filterFaceOnCell",inew);
-          _map_dataarray_int[keyy]=CreateDataArrayIntFromVector(faceOnCell);
-          keyy=Cle1ToStr("filterNotFaceOnCell",inew);
-          _map_dataarray_int[keyy]=CreateDataArrayIntFromVector(faceNotOnCell);
+
+          // std::string keyy;
+          // keyy=Cle1ToStr("filterFaceOnCell",inew);
+          // _map_dataarray_int[keyy]=CreateDataArrayIntFromVector(faceOnCell);
+          // keyy=Cle1ToStr("filterNotFaceOnCell",inew);
+          // _map_dataarray_int[keyy]=CreateDataArrayIntFromVector(faceNotOnCell);
+
+          // filter the face mesh
+          if ( faceOnCell.empty() )
+            _face_mesh[inew] = CreateEmptyMEDCouplingUMesh();
+          else
+            _face_mesh[inew] = (ParaMEDMEM::MEDCouplingUMesh *)
+              mfac->buildPartOfMySelf( &faceOnCell[0], &faceOnCell[0] + faceOnCell.size(),true);
+          mfac->decrRef();
+
+          // filter the face families
+          std::string key = Cle1ToStr("faceFamily_toArray",inew);
+          if ( getMapDataArrayInt().count( key ))
+            {
+              ParaMEDMEM::DataArrayInt * &     fam = getMapDataArrayInt()[ key ];
+              ParaMEDMEM::DataArrayInt * famFilter = ParaMEDMEM::DataArrayInt::New();
+              famFilter->alloc(faceOnCell.size(),1);
+              int* pfamFilter = famFilter->getPointer();
+              int* pfam       = fam->getPointer();
+              for ( size_t i=0; i<faceOnCell.size(); i++ )
+                pfamFilter[i]=pfam[faceOnCell[i]];
+              fam->decrRef();
+              fam = famFilter;
+            }
         }
     }
 }
