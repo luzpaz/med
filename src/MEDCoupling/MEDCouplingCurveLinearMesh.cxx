@@ -23,6 +23,8 @@
 #include "MEDCouplingMemArray.hxx"
 #include "MEDCouplingFieldDouble.hxx"
 
+#include "VolSurfUser.txx"
+
 #include <functional>
 #include <algorithm>
 #include <sstream>
@@ -338,7 +340,104 @@ void MEDCouplingCurveLinearMesh::getBoundingBox(double *bbox) const
 
 MEDCouplingFieldDouble *MEDCouplingCurveLinearMesh::getMeasureField(bool isAbs) const
 {
-  throw INTERP_KERNEL::Exception("MEDCouplingCurveLinearMesh::getMeasureField : not implemented yet !");
+  checkCoherency();
+  int meshDim=getMeshDimension();
+  std::string name="MeasureOfMesh_"; name+=getName();
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> field=MEDCouplingFieldDouble::New(ON_CELLS,ONE_TIME);
+  field->setName(name.c_str()); field->setMesh(const_cast<MEDCouplingCurveLinearMesh *>(this)); field->synchronizeTimeWithMesh();
+  switch(meshDim)
+    {
+    case 3:
+      { getMeasureFieldMeshDim3(isAbs,field); return field.retn(); }
+    case 2:
+      { getMeasureFieldMeshDim2(isAbs,field); return field.retn(); }
+    case 1:
+      { getMeasureFieldMeshDim1(isAbs,field); return field.retn(); }
+    default:
+      throw INTERP_KERNEL::Exception("MEDCouplingCurveLinearMesh::getMeasureField : space dimension must be in [1,2,3] !");
+    }
+}
+
+/*!
+ * \param [in,out] f field feeded with good values.
+ * \sa MEDCouplingCurveLinearMesh::getMeasureField
+ */
+void MEDCouplingCurveLinearMesh::getMeasureFieldMeshDim1(bool isAbs, MEDCouplingFieldDouble *field) const throw(INTERP_KERNEL::Exception)
+{
+  int nbnodes=getNumberOfNodes();
+  int spaceDim=getSpaceDimension();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> arr=DataArrayDouble::New(); field->setArray(arr);
+  if(nbnodes==0)
+    { arr->alloc(0,1); return; }
+  if(spaceDim==1)
+    {
+      arr->alloc(nbnodes-1,1);
+      std::transform(_coords->begin()+1,_coords->end(),_coords->begin(),arr->getPointer(),std::minus<double>());
+      if(isAbs)
+        arr->abs();
+    }
+  else
+    {
+      MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> tmp=DataArrayDouble::New(); tmp->alloc(nbnodes-1,spaceDim);
+      std::transform(_coords->begin()+spaceDim,_coords->end(),_coords->begin(),tmp->getPointer(),std::minus<double>());
+      MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> tmp2=tmp->magnitude(); field->setArray(tmp2);
+    }
+}
+
+/*!
+ * \param [in,out] f field feeded with good values.
+ * \sa MEDCouplingCurveLinearMesh::getMeasureField
+ */
+void MEDCouplingCurveLinearMesh::getMeasureFieldMeshDim2(bool isAbs, MEDCouplingFieldDouble *field) const throw(INTERP_KERNEL::Exception)
+{
+  int nbcells=getNumberOfCells();
+  int spaceDim=getSpaceDimension();
+  if(spaceDim!=2 && spaceDim!=3)
+    throw INTERP_KERNEL::Exception("MEDCouplingCurveLinearMesh::getMeasureFieldMeshDim2 : with meshDim 2 only space dimension 2 and 3 are possible !");
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> arr=DataArrayDouble::New(); field->setArray(arr);
+  arr->alloc(nbcells,1);
+  double *pt=arr->getPointer();
+  const double *coords=_coords->begin();
+  int nX=_structure[0]-1;
+  int conn[4];
+  for(int i=0;i<nbcells;i++,pt++)
+    {
+      int cy=i/nX,cx=i-cy*nX;
+      conn[0]=cy*(nX+1)+cx; conn[1]=(cy+1)*(nX+1)+cx; conn[2]=(cy+1)*(nX+1)+1+cx; conn[3]=cy*(nX+1)+cx+1;
+      *pt=INTERP_KERNEL::computeVolSurfOfCell2<int,INTERP_KERNEL::ALL_C_MODE>(INTERP_KERNEL::NORM_QUAD4,conn,4,coords,spaceDim);
+    }
+  if(isAbs)
+    arr->abs();
+}
+
+/*!
+ * \param [in,out] f field feeded with good values.
+ * \sa MEDCouplingCurveLinearMesh::getMeasureField
+ */
+void MEDCouplingCurveLinearMesh::getMeasureFieldMeshDim3(bool isAbs, MEDCouplingFieldDouble *field) const throw(INTERP_KERNEL::Exception)
+{
+  int nbcells=getNumberOfCells();
+  int spaceDim=getSpaceDimension();
+  if(spaceDim!=3)
+    throw INTERP_KERNEL::Exception("MEDCouplingCurveLinearMesh::getMeasureFieldMeshDim3 : with meshDim 3 only space dimension 3 is possible !");
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> arr=DataArrayDouble::New(); field->setArray(arr);
+  arr->alloc(nbcells,1);
+  double *pt=arr->getPointer();
+  const double *coords=_coords->begin();
+  int nX=_structure[0]-1,nY=(_structure[0]-1)*(_structure[1]-1);
+  int nY1=_structure[0]*_structure[1];
+  int conn[8];
+  for(int i=0;i<nbcells;i++,pt++)
+    {
+      int cz=i/nY;
+      int cy=(i-cz*nY)/nX;
+      int cx=(i-cz*nY)-nX*cy;
+      conn[0]=cz*nY1+cy*(nX+1)+cx; conn[1]=cz*nY1+(cy+1)*(nX+1)+cx; conn[2]=cz*nY1+(cy+1)*(nX+1)+1+cx; conn[3]=cz*nY1+cy*(nX+1)+cx+1;
+      conn[4]=(cz+1)*nY1+cy*(nX+1)+cx; conn[5]=(cz+1)*nY1+(cy+1)*(nX+1)+cx; conn[6]=(cz+1)*nY1+(cy+1)*(nX+1)+1+cx; conn[7]=(cz+1)*nY1+cy*(nX+1)+cx+1;
+      *pt=INTERP_KERNEL::computeVolSurfOfCell2<int,INTERP_KERNEL::ALL_C_MODE>(INTERP_KERNEL::NORM_HEXA8,conn,8,coords,3);
+    }
+  if(isAbs)
+    arr->abs();
 }
 
 /*!
@@ -421,8 +520,7 @@ void MEDCouplingCurveLinearMesh::scale(const double *point, double factor)
 
 MEDCouplingMesh *MEDCouplingCurveLinearMesh::mergeMyselfWith(const MEDCouplingMesh *other) const
 {
-  //not implemented yet !
-  return 0;
+  throw INTERP_KERNEL::Exception("MEDCouplingCurveLinearMesh::mergeMyselfWith : not available for CurveLinear Mesh !");
 }
 
 DataArrayDouble *MEDCouplingCurveLinearMesh::getCoordinatesAndOwner() const

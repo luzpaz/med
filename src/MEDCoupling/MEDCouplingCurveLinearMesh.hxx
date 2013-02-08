@@ -86,6 +86,10 @@ namespace ParaMEDMEM
     void unserialization(const std::vector<double>& tinyInfoD, const std::vector<int>& tinyInfo, const DataArrayInt *a1, DataArrayDouble *a2,
                          const std::vector<std::string>& littleStrings);
   private:
+    void getMeasureFieldMeshDim1(bool isAbs, MEDCouplingFieldDouble *field) const throw(INTERP_KERNEL::Exception);
+    void getMeasureFieldMeshDim2(bool isAbs, MEDCouplingFieldDouble *field) const throw(INTERP_KERNEL::Exception);
+    void getMeasureFieldMeshDim3(bool isAbs, MEDCouplingFieldDouble *field) const throw(INTERP_KERNEL::Exception);
+  private:
     MEDCouplingCurveLinearMesh();
     MEDCouplingCurveLinearMesh(const MEDCouplingCurveLinearMesh& other, bool deepCpy);
     ~MEDCouplingCurveLinearMesh();

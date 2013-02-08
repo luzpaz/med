@@ -11044,6 +11044,50 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(d2.isEqual(DataArrayInt([0,1,1,1,1,1,1,2,2,2,2,2,2,3])))
         pass
 
+    def testSwigCurveLinearMesh2(self):
+        c=MEDCouplingCMesh()
+        #2D
+        arr1=DataArrayDouble([0,1,3,7])
+        arr2=DataArrayDouble([0,1,1.5])
+        c.setCoords(arr1,arr2)
+        u=c.buildUnstructured()
+        coo=u.getCoords()
+        cl=MEDCouplingCurveLinearMesh()
+        cl.setCoords(coo)
+        cl.setNodeGridStructure([4,3])
+        cl.checkCoherency2()
+        li1=[1.,2.,4.,0.5,1.,2.]
+        self.assertTrue(cl.getMeasureField(False).getArray().isEqual(DataArrayDouble(li1),1e-14))
+        self.assertTrue(u.getMeasureField(False).getArray().isEqual(DataArrayDouble(li1),1e-14))
+        #3D
+        c.setCoords(arr1,arr2,arr2)
+        u=c.buildUnstructured()
+        coo=u.getCoords()
+        cl=MEDCouplingCurveLinearMesh()
+        cl.setCoords(coo)
+        cl.setNodeGridStructure([4,3,3])
+        cl.checkCoherency2()
+        li2=[1.,2.,4.,0.5, 1.,2.,0.5,1.,2.,0.25,0.5,1.]
+        self.assertTrue(cl.getMeasureField(False).getArray().isEqual(DataArrayDouble(li2),1e-14))
+        self.assertTrue(u.getMeasureField(False).getArray().isEqual(DataArrayDouble(li2),1e-14))
+        #1D spaceDim 1
+        coo=DataArrayDouble(5) ; coo.iota(0.)
+        coo=coo*coo
+        cl.setCoords(coo)
+        cl.setNodeGridStructure([5])
+        cl.checkCoherency2()
+        li3=[1.,3.,5.,7.]
+        self.assertTrue(cl.getMeasureField(False).getArray().isEqual(DataArrayDouble(li3),1e-14))
+        self.assertTrue(cl.buildUnstructured().getMeasureField(False).getArray().isEqual(DataArrayDouble(li3),1e-14))
+        #1D spaceDim 2
+        coo=DataArrayDouble.Meld(coo,coo)
+        cl.setCoords(coo)
+        cl.checkCoherency2()
+        li4=[sqrt(2.)*elt for elt in [1.,3.,5.,7.]]
+        self.assertTrue(cl.getMeasureField(False).getArray().isEqual(DataArrayDouble(li4),1e-14))
+        self.assertTrue(cl.buildUnstructured().getMeasureField(False).getArray().isEqual(DataArrayDouble(li4),1e-14))
+        pass
+
     def setUp(self):
         pass
     pass
