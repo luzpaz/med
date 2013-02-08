@@ -6026,13 +6026,12 @@ MEDCouplingMesh *MEDCouplingUMesh::mergeMyselfWith(const MEDCouplingMesh *other)
  */
 DataArrayDouble *MEDCouplingUMesh::getBarycenterAndOwner() const
 {
-  DataArrayDouble *ret=DataArrayDouble::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::New();
   int spaceDim=getSpaceDimension();
   int nbOfCells=getNumberOfCells();
   ret->alloc(nbOfCells,spaceDim);
   ret->copyStringInfoFrom(*getCoords());
   double *ptToFill=ret->getPointer();
-  double *tmp=new double[spaceDim];
   const int *nodal=_nodal_connec->getConstPointer();
   const int *nodalI=_nodal_connec_index->getConstPointer();
   const double *coor=_coords->getConstPointer();
@@ -6042,8 +6041,7 @@ DataArrayDouble *MEDCouplingUMesh::getBarycenterAndOwner() const
       INTERP_KERNEL::computeBarycenter2<int,INTERP_KERNEL::ALL_C_MODE>(type,nodal+nodalI[i]+1,nodalI[i+1]-nodalI[i]-1,coor,spaceDim,ptToFill);
       ptToFill+=spaceDim;
     }
-  delete [] tmp;
-  return ret;
+  return ret.retn();
 }
 
 /*!
