@@ -114,13 +114,13 @@ int MEDCouplingStructuredMesh::getNumberOfCellsWithType(INTERP_KERNEL::Normalize
 
 void MEDCouplingStructuredMesh::getNodeIdsOfCell(int cellId, std::vector<int>& conn) const
 {
-  int spaceDim=getSpaceDimension();
+  int meshDim=getMeshDimension();
   int tmpCell[3],tmpNode[3];
   getSplitCellValues(tmpCell);
   getSplitNodeValues(tmpNode);
   int tmp2[3];
-  GetPosFromId(cellId,spaceDim,tmpCell,tmp2);
-  switch(spaceDim)
+  GetPosFromId(cellId,meshDim,tmpCell,tmp2);
+  switch(meshDim)
     {
     case 1:
       conn.push_back(tmp2[0]); conn.push_back(tmp2[0]+1);
@@ -198,12 +198,12 @@ void MEDCouplingStructuredMesh::splitProfilePerType(const DataArrayInt *profile,
 
 MEDCouplingUMesh *MEDCouplingStructuredMesh::buildUnstructured() const throw(INTERP_KERNEL::Exception)
 {
-  int spaceDim=getSpaceDimension();
-  MEDCouplingUMesh *ret=MEDCouplingUMesh::New(getName(),spaceDim);
+  int meshDim=getMeshDimension();
+  MEDCouplingUMesh *ret=MEDCouplingUMesh::New(getName(),meshDim);
   DataArrayDouble *coords=getCoordinatesAndOwner();
   ret->setCoords(coords);
   coords->decrRef();
-  switch(spaceDim)
+  switch(meshDim)
     {
     case 1:
       fill1DUnstructuredMesh(ret);
@@ -351,26 +351,26 @@ int MEDCouplingStructuredMesh::getCellIdFromPos(int i, int j, int k) const
 {
   int tmp[3]={i,j,k};
   int tmp2[3];
-  int spaceDim=getSpaceDimension();
+  int meshDim=getMeshDimension();
   getSplitCellValues(tmp2);
-  std::transform(tmp,tmp+spaceDim,tmp2,tmp,std::multiplies<int>());
-  return std::accumulate(tmp,tmp+spaceDim,0);
+  std::transform(tmp,tmp+meshDim,tmp2,tmp,std::multiplies<int>());
+  return std::accumulate(tmp,tmp+meshDim,0);
 }
 
 int MEDCouplingStructuredMesh::getNodeIdFromPos(int i, int j, int k) const
 {
   int tmp[3]={i,j,k};
   int tmp2[3];
-  int spaceDim=getSpaceDimension();
+  int meshDim=getMeshDimension();
   getSplitNodeValues(tmp2);
-  std::transform(tmp,tmp+spaceDim,tmp2,tmp,std::multiplies<int>());
-  return std::accumulate(tmp,tmp+spaceDim,0);
+  std::transform(tmp,tmp+meshDim,tmp2,tmp,std::multiplies<int>());
+  return std::accumulate(tmp,tmp+meshDim,0);
 }
 
-void MEDCouplingStructuredMesh::GetPosFromId(int nodeId, int spaceDim, const int *split, int *res)
+void MEDCouplingStructuredMesh::GetPosFromId(int nodeId, int meshDim, const int *split, int *res)
 {
   int work=nodeId;
-  for(int i=spaceDim-1;i>=0;i--)
+  for(int i=meshDim-1;i>=0;i--)
     {
       int pos=work/split[i];
       work=work%split[i];

@@ -32,7 +32,7 @@ namespace ParaMEDMEM
     INTERP_KERNEL::NormalizedCellType getTypeOfCell(int cellId) const;
     std::set<INTERP_KERNEL::NormalizedCellType> getAllGeoTypes() const;
     int getNumberOfCellsWithType(INTERP_KERNEL::NormalizedCellType type) const;
-    static void GetPosFromId(int nodeId, int spaceDim, const int *split, int *res);
+    static void GetPosFromId(int nodeId, int meshDim, const int *split, int *res);
     void getNodeIdsOfCell(int cellId, std::vector<int>& conn) const;
     std::size_t getHeapMemorySize() const;
     void copyTinyStringsFrom(const MEDCouplingMesh *other) throw(INTERP_KERNEL::Exception);
