@@ -721,8 +721,8 @@ void MEDCouplingCurveLinearMesh::getBarycenterAndOwnerMeshDim3(DataArrayDouble *
       int cz=i/nY;
       int cy=(i-cz*nY)/nX;
       int cx=(i-cz*nY)-nX*cy;
-      conn[0]=cz*nY1+cy*(nX+1)+cx; conn[1]=cz*nY1+(cy+1)*(nX+1)+cx; conn[2]=cz*nY1+(cy+1)*(nX+1)+1+cx; conn[3]=cz*nY1+cy*(nX+1)+cx+1;
-      conn[4]=(cz+1)*nY1+cy*(nX+1)+cx; conn[5]=(cz+1)*nY1+(cy+1)*(nX+1)+cx; conn[6]=(cz+1)*nY1+(cy+1)*(nX+1)+1+cx; conn[7]=(cz+1)*nY1+cy*(nX+1)+cx+1;
+      conn[0]=cz*nY1+cy*(nX+1)+cx+1; conn[1]=cz*nY1+cy*(nX+1)+cx; conn[2]=cz*nY1+(cy+1)*(nX+1)+cx; conn[3]=cz*nY1+(cy+1)*(nX+1)+1+cx;
+      conn[4]=(cz+1)*nY1+cy*(nX+1)+cx+1; conn[5]=(cz+1)*nY1+cy*(nX+1)+cx; conn[6]=(cz+1)*nY1+(cy+1)*(nX+1)+cx; conn[7]=(cz+1)*nY1+(cy+1)*(nX+1)+1+cx;
       INTERP_KERNEL::computeBarycenter2<int,INTERP_KERNEL::ALL_C_MODE>(INTERP_KERNEL::NORM_HEXA8,conn,8,coor,3,ptToFill);
       ptToFill+=3;
     }
