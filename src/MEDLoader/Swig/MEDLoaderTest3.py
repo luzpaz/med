@@ -1998,6 +1998,10 @@ class MEDLoaderTest(unittest.TestCase):
         m1=MEDFileCurveLinearMesh(fname)
         mm=m1.getMesh()
         self.assertTrue(mm.isEqual(mesh,1e-12))
+        #
+        m1=MEDFileMesh.New(fname)
+        self.assertTrue(isinstance(m1,MEDFileCurveLinearMesh))
+        self.assertTrue(m1.getMesh().isEqual(mesh,1e-12))
         pass
 
     pass
