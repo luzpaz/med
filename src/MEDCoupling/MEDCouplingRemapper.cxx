@@ -149,7 +149,7 @@ MEDCouplingFieldDouble *MEDCouplingRemapper::reverseTransferField(const MEDCoupl
 {
   if(_target_method!=targetField->getDiscretization()->getStringRepr())
     throw INTERP_KERNEL::Exception("Incoherency with prepare call for target field");
-  MEDCouplingFieldDouble *ret=MEDCouplingFieldDouble::New(MEDCouplingFieldDiscretization::getTypeOfFieldFromStringRepr(_target_method.c_str()),targetField->getTimeDiscretization());
+  MEDCouplingFieldDouble *ret=MEDCouplingFieldDouble::New(MEDCouplingFieldDiscretization::getTypeOfFieldFromStringRepr(_src_method.c_str()),targetField->getTimeDiscretization());
   ret->copyTinyAttrFrom(targetField);
   ret->setNature(targetField->getNature());
   ret->setMesh(_src_mesh);

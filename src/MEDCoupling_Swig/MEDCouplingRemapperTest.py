@@ -318,6 +318,27 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(f11.getArray().isEqual(expected2,1e-13))
         self.assertTrue(f22.getArray().isEqual(expected2,1e-13))
         pass
+
+    def testCellToNodeReverse3D(self):
+        c=DataArrayDouble([0.,1.,2.5])
+        cc=MEDCouplingCMesh()
+        cc.setCoords(c,c,c)
+        um=cc.buildUnstructured()
+        f=um.getMeasureField(ON_CELLS)
+        #
+        n2o=um.simplexize(PLANAR_FACE_5)
+        f.setArray(f.getArray()[n2o])
+        f.checkCoherency()
+        f.setNature(ConservativeVolumic)
+        p=MEDCouplingRemapper()
+        p.setP1P0BaryMethod(True)
+        p.prepare(um,um,"P1P0")
+        fNode=p.reverseTransferField(f,1e300)
+        #
+        integExpected=34.328125
+        self.assertAlmostEqual(fNode.integral(False)[0],integExpected,14)
+        self.assertAlmostEqual(f.integral(False)[0],integExpected,14)
+        pass
     
     def build2DSourceMesh_1(self):
         sourceCoords=[-0.3,-0.3, 0.7,-0.3, -0.3,0.7, 0.7,0.7]
