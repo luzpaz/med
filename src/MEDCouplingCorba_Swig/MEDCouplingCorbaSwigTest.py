@@ -175,6 +175,21 @@ class MEDCouplingCorbaServBasicsTest:
         #
         return targetMesh;
 
+    def buildCLMesh(self):
+        targetMesh=MEDCouplingCurveLinearMesh();
+        targetMesh.setTime(2.3,4,5);
+        targetMesh.setTimeUnit("us");
+        targetMesh.setName("Example of Cuve linear mesh");
+        targetMesh.setDescription("buildCLMesh");
+        a1=DataArrayDouble(3*20,1);
+        a1.iota(7.) ; a1.rearrange(3);
+        targetMesh.setCoords(a1);
+        targetMesh.setNodeGridStructure([4,5]);
+        #
+        targetMesh.checkCoherency();
+        #
+        return targetMesh;
+
     def buildFieldScalarOn2DNT(self):
         mesh=self.build2DMesh();
         fieldOnCells=MEDCouplingFieldDouble.New(ON_CELLS,NO_TIME);
@@ -509,7 +524,7 @@ class MEDCouplingCorbaServBasicsTest:
         d0=DataArrayDouble.New();
         d0.setValues(vals0,5,1);
         d1=DataArrayDouble.New();
-        d1.setValues(vals1,5,1);
+        d1.setValues(vals1[:5],5,1);
         d1_1=DataArrayDouble.New();
         d1_1.setValues(vals1_1,5,1);
         d2=DataArrayDouble.New();

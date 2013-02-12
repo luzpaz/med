@@ -24,14 +24,14 @@
 #include "SALOMEconfig.h"
 
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
-#include "MEDCouplingMeshServant.hxx"
+#include "MEDCouplingStructuredMeshServant.hxx"
 #include "MEDCouplingCorba.hxx"
 
 namespace ParaMEDMEM
 {
   class MEDCouplingCMesh;
 
-  class MEDCOUPLINGCORBA_EXPORT MEDCouplingCMeshServant : MEDCouplingMeshServant, public virtual POA_SALOME_MED::MEDCouplingCMeshCorbaInterface
+  class MEDCOUPLINGCORBA_EXPORT MEDCouplingCMeshServant : MEDCouplingStructuredMeshServant, public virtual POA_SALOME_MED::MEDCouplingCMeshCorbaInterface
   {
   public:
     typedef MEDCouplingCMesh CppType;

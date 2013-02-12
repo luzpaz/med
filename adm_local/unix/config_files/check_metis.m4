@@ -22,6 +22,10 @@ dnl
 
 AC_DEFUN([CHECK_METIS],[
 
+dnl metis could be already found by CHECK_PARMETIS procedure
+
+if [[ "x${metis_ok}" != "xyes" ]] ; then
+
 AC_CHECKING(for METIS Library)
 
 AC_LANG_SAVE
@@ -136,5 +140,7 @@ AC_SUBST(METIS_LIBS)
 AC_SUBST(ENABLE_METIS)
 
 AC_LANG_RESTORE
+
+fi
 
 ])dnl

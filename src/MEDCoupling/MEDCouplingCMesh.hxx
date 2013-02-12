@@ -22,14 +22,14 @@
 #define __PARAMEDMEM_MEDCOUPLINGCMESH_HXX__
 
 #include "MEDCoupling.hxx"
-#include "MEDCouplingMesh.hxx"
+#include "MEDCouplingStructuredMesh.hxx"
 
 namespace ParaMEDMEM
 {
   class DataArrayDouble;
   class MEDCouplingUMesh;
 
-  class MEDCOUPLING_EXPORT MEDCouplingCMesh : public MEDCouplingMesh
+  class MEDCOUPLING_EXPORT MEDCouplingCMesh : public MEDCouplingStructuredMesh
   {
   public:
     static MEDCouplingCMesh *New();
@@ -37,6 +37,7 @@ namespace ParaMEDMEM
     MEDCouplingMesh *deepCpy() const;
     MEDCouplingCMesh *clone(bool recDeepCpy) const;
     void updateTime() const;
+    std::size_t getHeapMemorySize() const;
     MEDCouplingMeshType getType() const { return CARTESIAN; }
     void copyTinyStringsFrom(const MEDCouplingMesh *other) throw(INTERP_KERNEL::Exception);
     bool isEqualIfNotWhy(const MEDCouplingMesh *other, double prec, std::string& reason) const throw(INTERP_KERNEL::Exception);
@@ -52,13 +53,6 @@ namespace ParaMEDMEM
     int getNumberOfNodes() const;
     int getSpaceDimension() const;
     int getMeshDimension() const;
-    int getCellIdFromPos(int i, int j, int k) const;
-    int getNodeIdFromPos(int i, int j, int k) const;
-    static void GetPosFromId(int nodeId, int spaceDim, const int *split, int *res);
-    INTERP_KERNEL::NormalizedCellType getTypeOfCell(int cellId) const;
-    std::set<INTERP_KERNEL::NormalizedCellType> getAllGeoTypes() const;
-    int getNumberOfCellsWithType(INTERP_KERNEL::NormalizedCellType type) const;
-    void getNodeIdsOfCell(int cellId, std::vector<int>& conn) const;
     void getCoordinatesOfNode(int nodeId, std::vector<double>& coo) const throw(INTERP_KERNEL::Exception);
     std::string simpleRepr() const;
     std::string advancedRepr() const;
@@ -69,17 +63,9 @@ namespace ParaMEDMEM
                    const DataArrayDouble *coordsY=0,
                    const DataArrayDouble *coordsZ=0);
     // tools
-    std::vector<int> getDistributionOfTypes() const throw(INTERP_KERNEL::Exception);
-    DataArrayInt *checkTypeConsistencyAndContig(const std::vector<int>& code, const std::vector<const DataArrayInt *>& idsPerType) const throw(INTERP_KERNEL::Exception);
-    void splitProfilePerType(const DataArrayInt *profile, std::vector<int>& code, std::vector<DataArrayInt *>& idsInPflPerType, std::vector<DataArrayInt *>& idsPerType) const throw(INTERP_KERNEL::Exception);
-    MEDCouplingUMesh *buildUnstructured() const throw(INTERP_KERNEL::Exception);
-    MEDCouplingMesh *buildPart(const int *start, const int *end) const;
-    MEDCouplingMesh *buildPartAndReduceNodes(const int *start, const int *end, DataArrayInt*& arr) const;
-    DataArrayInt *simplexize(int policy) throw(INTERP_KERNEL::Exception);
     void getBoundingBox(double *bbox) const;
     MEDCouplingFieldDouble *getMeasureField(bool isAbs) const;
     MEDCouplingFieldDouble *getMeasureFieldOnNode(bool isAbs) const;
-    MEDCouplingFieldDouble *buildOrthogonalField() const;
     int getCellContainingPoint(const double *pos, double eps) const;
     void rotate(const double *center, const double *vector, double angle);
     void translate(const double *vector);
@@ -88,12 +74,10 @@ namespace ParaMEDMEM
     DataArrayDouble *getCoordinatesAndOwner() const;
     DataArrayDouble *getBarycenterAndOwner() const;
     void renumberCells(const int *old2NewBg, bool check=true) throw(INTERP_KERNEL::Exception);
-    void fill1DUnstructuredMesh(MEDCouplingUMesh *m) const;
-    void fill2DUnstructuredMesh(MEDCouplingUMesh *m) const;
-    void fill3DUnstructuredMesh(MEDCouplingUMesh *m) const;
     //some useful methods
     void getSplitCellValues(int *res) const;
     void getSplitNodeValues(int *res) const;
+    void getNodeGridStructure(int *res) const;
     //serialisation-unserialization
     void getTinySerializationInformation(std::vector<double>& tinyInfoD, std::vector<int>& tinyInfo, std::vector<std::string>& littleStrings) const;
     void resizeForUnserialization(const std::vector<int>& tinyInfo, DataArrayInt *a1, DataArrayDouble *a2, std::vector<std::string>& littleStrings) const;

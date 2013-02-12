@@ -84,7 +84,7 @@ void MEDCouplingRefCountServant::Register()
 void MEDCouplingRefCountServant::UnRegister()
 {
   if(_cpp_pointer)
-    ((RefCountObject *)_cpp_pointer)->decrRef();
+    const_cast<RefCountObject *>(_cpp_pointer)->decrRef();
   _ref_counter--;
   if(_ref_counter<=0)
     {

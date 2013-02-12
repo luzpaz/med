@@ -30,6 +30,7 @@ namespace ParaMEDMEM
   class MEDCouplingFieldTemplate;
   class MEDCouplingExtrudedMesh;
   class MEDCouplingCMesh;
+  class MEDCouplingCurveLinearMesh;
   class DataArrayDouble;
   class DataArrayInt;
   class MEDCouplingMultiFields;
@@ -49,6 +50,7 @@ namespace SALOME_TEST
     static ParaMEDMEM::MEDCouplingUMesh *buildM1DMesh();
     static ParaMEDMEM::MEDCouplingExtrudedMesh *buildExtrudedMesh(ParaMEDMEM::MEDCouplingUMesh *&m2D);
     static ParaMEDMEM::MEDCouplingCMesh *buildCMesh();
+    static ParaMEDMEM::MEDCouplingCurveLinearMesh *buildCLMesh();
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldScalarOn2DNT();
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldNodeScalarOn2DNT();
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldScalarOn3DNT();

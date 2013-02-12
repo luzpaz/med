@@ -58,4 +58,4 @@ else
   libMEDWrapperBase_la_CPPFLAGS+= -I$(top_builddir)/adm_local_without_kernel/unix
 endif
 libMEDWrapperBase_la_CPPFLAGS+= $(MED_CPPFLAGS)
-libMEDWrapperBase_la_LDFLAGS= $(BOOST_LIB_THREAD) $(BOOST_LIB_DATE_TIME)
+libMEDWrapperBase_la_LDFLAGS= $(BOOST_LIB_THREAD) $(BOOST_LIB_SYSTEM) $(BOOST_LIB_DATE_TIME)

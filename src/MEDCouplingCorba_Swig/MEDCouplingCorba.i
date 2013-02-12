@@ -28,6 +28,7 @@
 #include "MEDCouplingUMeshServant.hxx"
 #include "MEDCouplingExtrudedMeshServant.hxx"
 #include "MEDCouplingCMeshServant.hxx"
+#include "MEDCouplingCurveLinearMeshServant.hxx"
 #include "DataArrayDoubleServant.hxx"
 #include "DataArrayIntServant.hxx"
 #include "MEDCouplingCorbaTypemaps.i"
@@ -119,6 +120,18 @@ namespace ParaMEDMEM
          static PyObject *_this(const MEDCouplingCMesh *cppPointerOfMesh)
          {
            return buildServantAndActivate<MEDCouplingCMeshServant>(cppPointerOfMesh);
+         }
+       }
+  };
+
+  class MEDCouplingCurveLinearMeshServant
+  {
+  public:
+    %extend
+       {
+         static PyObject *_this(const MEDCouplingCurveLinearMesh *cppPointerOfMesh)
+         {
+           return buildServantAndActivate<MEDCouplingCurveLinearMeshServant>(cppPointerOfMesh);
          }
        }
   };

@@ -40,6 +40,7 @@ namespace ParaMEDMEM
   public:
     MEDCalculatorDBSliceField(int iter, int order);
     MEDCalculatorDBSliceField(MEDCouplingFieldDouble *f);
+    std::size_t getHeapMemorySize() const { return 0; }
     bool isFetched() const { return _field!=0; }
     void getDtIt(int& it, int& order) const { it=_iteration;  order=_order; }
     void setField(MEDCouplingFieldDouble *f) const;
