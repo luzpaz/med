@@ -338,7 +338,7 @@ namespace ParaMEDMEM
   {
   public:
     static MEDFileMesh *New(const char *fileName) throw(INTERP_KERNEL::Exception);
-    static MEDFileMesh *New(const char *fileName, const char *mName, int dt=-1, int it=-1);
+    static MEDFileMesh *New(const char *fileName, const char *mName, int dt=-1, int it=-1) throw(INTERP_KERNEL::Exception);
     virtual MEDFileMesh *deepCpy() const throw(INTERP_KERNEL::Exception);
     virtual MEDFileMesh *shallowCpy() const throw(INTERP_KERNEL::Exception);
     virtual void clearNonDiscrAttributes() const;
@@ -358,8 +358,8 @@ namespace ParaMEDMEM
     void setTimeUnit(const char *unit);
     const char *getTimeUnit() const;
     virtual int getNumberOfNodes() const throw(INTERP_KERNEL::Exception);
-    std::vector<int> getNonEmptyLevels() const;
-    std::vector<int> getNonEmptyLevelsExt() const;
+    std::vector<int> getNonEmptyLevels() const throw(INTERP_KERNEL::Exception);
+    std::vector<int> getNonEmptyLevelsExt() const throw(INTERP_KERNEL::Exception);
     void write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception);
     int getSizeAtLevel(int meshDimRelToMaxExt) const throw(INTERP_KERNEL::Exception);
     //
@@ -428,7 +428,7 @@ namespace ParaMEDMEM
            return MEDFileMesh::New(fileName);
          }
 
-         MEDFileMesh(const char *fileName, const char *mName, int dt=-1, int it=-1)
+         MEDFileMesh(const char *fileName, const char *mName, int dt=-1, int it=-1) throw(INTERP_KERNEL::Exception)
          {
            return MEDFileMesh::New(fileName,mName,dt,it);
          }

@@ -29,6 +29,7 @@ class MEDLoaderTest(unittest.TestCase):
         fileName="Pyfile18.med"
         mname="ExampleOfMultiDimW"
         medmesh=MEDFileMesh.New(fileName,mname)
+        self.assertRaises(InterpKernelException,MEDFileMesh.New,fileName,"")
         self.assertEqual((0,-1),medmesh.getNonEmptyLevels())
         m1_0=medmesh.getLevel0Mesh(True)
         m1_1=MEDLoader.ReadUMeshFromFile(fileName,mname,0)
