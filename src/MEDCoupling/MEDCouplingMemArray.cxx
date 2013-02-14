@@ -360,13 +360,13 @@ void DataArray::CheckValueInRangeEx(int value, int start, int end, const char *m
     {
       if(value!=start || end!=start)
         {
-          std::ostringstream oss; oss << "DataArray::CheckValueInRange : " << msg  << " ! Expected start " << start << " of range in [0," << value << "[ !";
+          std::ostringstream oss; oss << "DataArray::CheckValueInRangeEx : " << msg  << " ! Expected start " << start << " of input range, in [0," << value << "[ !";
           throw INTERP_KERNEL::Exception(oss.str().c_str());
         }
     }
   if(end<0 || end>value)
     {
-      std::ostringstream oss; oss << "DataArray::CheckClosingParInRange : " << msg  << " ! Expected start " << end << " of range in [0," << value << "[ !";
+      std::ostringstream oss; oss << "DataArray::CheckValueInRangeEx : " << msg  << " ! Expected end " << end << " of input range, in [0," << value << "] !";
       throw INTERP_KERNEL::Exception(oss.str().c_str());
     }
 }
@@ -375,7 +375,7 @@ void DataArray::CheckClosingParInRange(int ref, int value, const char *msg) thro
 {
   if(value<0 || value>ref)
     {
-      std::ostringstream oss; oss << "DataArray::CheckClosingParInRange : " << msg  << " ! Expected a range in [0," << ref << "] having closing open parenthesis " << value << " !";
+      std::ostringstream oss; oss << "DataArray::CheckClosingParInRange : " << msg  << " ! Expected input range in [0," << ref << "] having closing open parenthesis " << value << " !";
       throw INTERP_KERNEL::Exception(oss.str().c_str());
     }
 }
