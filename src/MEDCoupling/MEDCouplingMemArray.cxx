@@ -1314,7 +1314,7 @@ void DataArrayDouble::setSelectedComponents(const DataArrayDouble *a, const std:
   copyPartOfStringInfoFrom2(compoIds,*a);
   std::size_t partOfCompoSz=compoIds.size();
   int nbOfCompo=getNumberOfComponents();
-  int nbOfTuples=getNumberOfTuples();
+  int nbOfTuples=std::min(getNumberOfTuples(),a->getNumberOfTuples());
   const double *ac=a->getConstPointer();
   double *nc=getPointer();
   for(int i=0;i<nbOfTuples;i++)
@@ -4666,10 +4666,12 @@ void DataArrayInt::meldWith(const DataArrayInt *other) throw(INTERP_KERNEL::Exce
 
 void DataArrayInt::setSelectedComponents(const DataArrayInt *a, const std::vector<int>& compoIds) throw(INTERP_KERNEL::Exception)
 {
+  if(!a)
+    throw INTERP_KERNEL::Exception("DataArrayInt::setSelectedComponents : input DataArrayInt is NULL !");
   copyPartOfStringInfoFrom2(compoIds,*a);
   std::size_t partOfCompoSz=compoIds.size();
   int nbOfCompo=getNumberOfComponents();
-  int nbOfTuples=getNumberOfTuples();
+  int nbOfTuples=std::min(getNumberOfTuples(),a->getNumberOfTuples());
   const int *ac=a->getConstPointer();
   int *nc=getPointer();
   for(int i=0;i<nbOfTuples;i++)
