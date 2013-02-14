@@ -49,6 +49,11 @@ namespace ParaMEDMEM
          {
            return buildServantAndActivate<MEDCouplingFieldDoubleServant>(cppPointerOfMesh);
          }
+         
+         static PyObject *_this2(const MEDCouplingFieldDouble *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<MEDCouplingFieldDoubleServant>(cppPointerOfMesh);
+         }
        }
   };
 
@@ -60,6 +65,11 @@ namespace ParaMEDMEM
          static PyObject *_this(const MEDCouplingFieldTemplate *cppPointerOfMesh)
          {
            return buildServantAndActivate<MEDCouplingFieldTemplateServant>(cppPointerOfMesh);
+         }
+         
+         static PyObject *_this2(const MEDCouplingFieldTemplate *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<MEDCouplingFieldTemplateServant>(cppPointerOfMesh);
          }
        }
   };
@@ -73,6 +83,11 @@ namespace ParaMEDMEM
          {
            return buildServantAndActivate<MEDCouplingMultiFieldsServant>(cppPointerOfMesh);
          }
+
+         static PyObject *_this2(const MEDCouplingMultiFields *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<MEDCouplingMultiFieldsServant>(cppPointerOfMesh);
+         }
        }
   };
 
@@ -84,6 +99,11 @@ namespace ParaMEDMEM
          static PyObject *_this(const MEDCouplingFieldOverTime *cppPointerOfMesh)
          {
            return buildServantAndActivate<MEDCouplingFieldOverTimeServant>(cppPointerOfMesh);
+         }
+
+         static PyObject *_this2(const MEDCouplingFieldOverTime *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<MEDCouplingFieldOverTimeServant>(cppPointerOfMesh);
          }
        }
   };
@@ -97,6 +117,11 @@ namespace ParaMEDMEM
          {
            return buildServantAndActivate<MEDCouplingUMeshServant>(cppPointerOfMesh);
          }
+
+         static PyObject *_this2(const MEDCouplingUMesh *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<MEDCouplingUMeshServant>(cppPointerOfMesh);
+         }
        }
   };
 
@@ -108,6 +133,11 @@ namespace ParaMEDMEM
          static PyObject *_this(const MEDCouplingExtrudedMesh *cppPointerOfMesh)
          {
            return buildServantAndActivate<MEDCouplingExtrudedMeshServant>(cppPointerOfMesh);
+         }
+
+         static PyObject *_this2(const MEDCouplingExtrudedMesh *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<MEDCouplingExtrudedMeshServant>(cppPointerOfMesh);
          }
        }
   };
@@ -121,6 +151,11 @@ namespace ParaMEDMEM
          {
            return buildServantAndActivate<MEDCouplingCMeshServant>(cppPointerOfMesh);
          }
+         
+         static PyObject *_this2(const MEDCouplingCMesh *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<MEDCouplingCMeshServant>(cppPointerOfMesh);
+         }
        }
   };
 
@@ -132,6 +167,11 @@ namespace ParaMEDMEM
          static PyObject *_this(const MEDCouplingCurveLinearMesh *cppPointerOfMesh)
          {
            return buildServantAndActivate<MEDCouplingCurveLinearMeshServant>(cppPointerOfMesh);
+         }
+
+         static PyObject *_this2(const MEDCouplingCurveLinearMesh *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<MEDCouplingCurveLinearMeshServant>(cppPointerOfMesh);
          }
        }
   };
@@ -145,6 +185,11 @@ namespace ParaMEDMEM
          {
            return buildServantAndActivate<DataArrayDoubleServant>(cppPointerOfMesh);
          }
+
+         static PyObject *_this2(const DataArrayDouble *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<DataArrayDoubleServant>(cppPointerOfMesh);
+         }
        }
   };
 
@@ -156,6 +201,11 @@ namespace ParaMEDMEM
          static PyObject *_this(const DataArrayInt *cppPointerOfMesh)
          {
            return buildServantAndActivate<DataArrayIntServant>(cppPointerOfMesh);
+         }
+
+         static PyObject *_this2(const DataArrayInt *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<DataArrayIntServant>(cppPointerOfMesh);
          }
        }
   };
