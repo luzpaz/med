@@ -1521,7 +1521,7 @@ void DataArrayDouble::setPartOfValuesSimple3(double a, const int *bgTuples, cons
  */
 void DataArrayDouble::setPartOfValuesAdv(const DataArrayDouble *a, const DataArrayInt *tuplesSelec) throw(INTERP_KERNEL::Exception)
 {
-  if(!a)
+  if(!a || !tuplesSelec)
     throw INTERP_KERNEL::Exception("DataArrayDouble::setPartOfValuesAdv : input DataArrayDouble is NULL !");
   checkAllocated();
   a->checkAllocated();
@@ -4878,7 +4878,7 @@ void DataArrayInt::setPartOfValuesSimple3(int a, const int *bgTuples, const int 
  */
 void DataArrayInt::setPartOfValuesAdv(const DataArrayInt *a, const DataArrayInt *tuplesSelec) throw(INTERP_KERNEL::Exception)
 {
-  if(!a)
+  if(!a || !tuplesSelec)
     throw INTERP_KERNEL::Exception("DataArrayInt::setPartOfValuesAdv : DataArrayInt pointer in input is NULL !");
   checkAllocated();
   a->checkAllocated();
