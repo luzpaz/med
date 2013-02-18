@@ -2001,7 +2001,7 @@ double DataArrayDouble::accumulate(int compId) const throw(INTERP_KERNEL::Except
   const double *ptr=getConstPointer();
   int nbTuple=getNumberOfTuples();
   int nbComps=getNumberOfComponents();
-  if(compId>=nbComps)
+  if(compId<0 || compId>=nbComps)
     throw INTERP_KERNEL::Exception("DataArrayDouble::accumulate : Invalid compId specified : No such nb of components !");
   double ret=0.;
   for(int i=0;i<nbTuple;i++)
@@ -2379,6 +2379,7 @@ void DataArrayDouble::abs() throw(INTERP_KERNEL::Exception)
   double *ptr=getPointer();
   int nbOfElems=getNbOfElems();
   std::transform(ptr,ptr+nbOfElems,ptr,std::ptr_fun<double,double>(fabs));
+  declareAsNew();
 }
 
 void DataArrayDouble::applyLin(double a, double b, int compoId) throw(INTERP_KERNEL::Exception)
@@ -5267,7 +5268,7 @@ int DataArrayInt::accumulate(int compId) const throw(INTERP_KERNEL::Exception)
   const int *ptr=getConstPointer();
   int nbTuple=getNumberOfTuples();
   int nbComps=getNumberOfComponents();
-  if(compId>=nbComps)
+  if(compId<0 || compId>=nbComps)
     throw INTERP_KERNEL::Exception("DataArrayInt::accumulate : Invalid compId specified : No such nb of components !");
   int ret=0;
   for(int i=0;i<nbTuple;i++)
@@ -5370,6 +5371,7 @@ void DataArrayInt::abs() throw(INTERP_KERNEL::Exception)
   int *ptr=getPointer();
   int nbOfElems=getNbOfElems();
   std::transform(ptr,ptr+nbOfElems,ptr,std::ptr_fun<int,int>(std::abs));
+  declareAsNew();
 }
 
 void DataArrayInt::applyLin(int a, int b, int compoId) throw(INTERP_KERNEL::Exception)
