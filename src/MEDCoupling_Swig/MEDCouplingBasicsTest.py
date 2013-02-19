@@ -149,6 +149,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         targetMesh.insertNextCell(NORM_POINT1,1,[7]);
         targetMesh.insertNextCell(NORM_POINT1,1,[6]);
         targetMesh.finishInsertingCells();
+        self.assertRaises(InterpKernelException,targetMesh.checkCoherency);
         myCoords=DataArrayDouble.New();
         myCoords.setValues(targetCoords,9,3);
         targetMesh.setCoords(myCoords);
@@ -11131,6 +11132,39 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         dv.setSelectedComponents(da,[1,0])
         #
         self.assertTrue(dv.isEqual(DataArrayInt([2,1,0,0,4,3,0,0,6,5,0,0,0,0,0,0],4,4)))
+        pass
+
+    def testSwigSetItem3(self):
+        # 1-2 false
+        d=DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[3]=[1,2]
+        self.assertTrue(d.isEqual(DataArrayDouble([0,0,0,0,0,0,1,2,0,0,0,0],6,2),1e-14))
+        # 2-2 false
+        d=DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[[5,3]]=[1,2]
+        self.assertTrue(d.isEqual(DataArrayDouble([0,0,0,0,0,0,1,2,0,0,1,2],6,2),1e-14))
+        # 3-2 false
+        d=DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[:]=[1,2]
+        self.assertTrue(d.isEqual(DataArrayDouble([1,2,1,2,1,2,1,2,1,2,1,2],6,2),1e-14))
+        # 4-2 false
+        d=DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[DataArrayInt([0,3,4])]=[1,2]
+        self.assertTrue(d.isEqual(DataArrayDouble([1,2,0,0,0,0,1,2,1,2,0,0],6,2),1e-14))
+        # 5-2
+        d=DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[5,1]=[7]
+        self.assertTrue(d.isEqual(DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,7],6,2),1e-14))
+        # 6-2 false
+        d=DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[[3,5],1]=[7]
+        self.assertTrue(d.isEqual(DataArrayDouble([0,0,0,0,0,0,0,7,0,0,0,7],6,2),1e-14))
+        # 7-2 false
+        d=DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[:-1:2,1]=[7]
+        self.assertTrue(d.isEqual(DataArrayDouble([0,7,0,0,0,7,0,0,0,7,0,0],6,2),1e-14))
+        # 8-2 
+        
         pass
 
     def setUp(self):
