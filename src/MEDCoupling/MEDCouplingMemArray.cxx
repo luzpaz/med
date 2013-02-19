@@ -1339,14 +1339,34 @@ void DataArrayDouble::setPartOfValues1(const DataArrayDouble *a, int bgTuples, i
   int nbOfTuples=getNumberOfTuples();
   DataArray::CheckValueInRangeEx(nbOfTuples,bgTuples,endTuples,"invalid tuple value");
   DataArray::CheckValueInRangeEx(nbComp,bgComp,endComp,"invalid component value");
-  a->checkNbOfElems(newNbOfTuples*newNbOfComp,msg);
-  if(strictCompoCompare)
-    a->checkNbOfTuplesAndComp(newNbOfTuples,newNbOfComp,msg);
-  double *pt=getPointer()+bgTuples*nbComp+bgComp;
+  bool assignTech=true;
+  if(a->getNbOfElems()==newNbOfTuples*newNbOfComp)
+    {
+      if(strictCompoCompare)
+        a->checkNbOfTuplesAndComp(newNbOfTuples,newNbOfComp,msg);
+    }
+  else
+    {
+      a->checkNbOfTuplesAndComp(1,newNbOfComp,msg);
+      assignTech=false;
+    }
   const double *srcPt=a->getConstPointer();
-  for(int i=0;i<newNbOfTuples;i++,pt+=stepTuples*nbComp)
-    for(int j=0;j<newNbOfComp;j++,srcPt++)
-      pt[j*stepComp]=*srcPt;
+  double *pt=getPointer()+bgTuples*nbComp+bgComp;
+  if(assignTech)
+    {
+      for(int i=0;i<newNbOfTuples;i++,pt+=stepTuples*nbComp)
+        for(int j=0;j<newNbOfComp;j++,srcPt++)
+          pt[j*stepComp]=*srcPt;
+    }
+  else
+    {
+      for(int i=0;i<newNbOfTuples;i++,pt+=stepTuples*nbComp)
+        {
+          const double *srcPt2=srcPt;
+          for(int j=0;j<newNbOfComp;j++,srcPt2++)
+            pt[j*stepComp]=*srcPt2;
+        }
+    }
 }
 
 /*!
@@ -4697,14 +4717,34 @@ void DataArrayInt::setPartOfValues1(const DataArrayInt *a, int bgTuples, int end
   int nbOfTuples=getNumberOfTuples();
   DataArray::CheckValueInRangeEx(nbOfTuples,bgTuples,endTuples,"invalid tuple value");
   DataArray::CheckValueInRangeEx(nbComp,bgComp,endComp,"invalid component value");
-  a->checkNbOfElems(newNbOfTuples*newNbOfComp,msg);
-  if(strictCompoCompare)
-    a->checkNbOfTuplesAndComp(newNbOfTuples,newNbOfComp,msg);
+  bool assignTech=true;
+  if(a->getNbOfElems()==newNbOfTuples*newNbOfComp)
+    {
+      if(strictCompoCompare)
+        a->checkNbOfTuplesAndComp(newNbOfTuples,newNbOfComp,msg);
+    }
+  else
+    {
+      a->checkNbOfTuplesAndComp(1,newNbOfComp,msg);
+      assignTech=false;
+    }
   int *pt=getPointer()+bgTuples*nbComp+bgComp;
   const int *srcPt=a->getConstPointer();
-  for(int i=0;i<newNbOfTuples;i++,pt+=stepTuples*nbComp)
-    for(int j=0;j<newNbOfComp;j++,srcPt++)
-      pt[j*stepComp]=*srcPt;
+  if(assignTech)
+    {
+      for(int i=0;i<newNbOfTuples;i++,pt+=stepTuples*nbComp)
+        for(int j=0;j<newNbOfComp;j++,srcPt++)
+          pt[j*stepComp]=*srcPt;
+    }
+  else
+    {
+      for(int i=0;i<newNbOfTuples;i++,pt+=stepTuples*nbComp)
+        {
+          const int *srcPt2=srcPt;
+          for(int j=0;j<newNbOfComp;j++,srcPt2++)
+            pt[j*stepComp]=*srcPt2;
+        }
+    }
 }
 
 /*!
