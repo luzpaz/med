@@ -3700,27 +3700,18 @@ namespace ParaMEDMEM
          }
        case 11:
          {
-           int bb=pt1.first;
-           int ee=pt1.second.first;
-           int ss=pt1.second.second;
-           if(ee<bb || ss<=0)
-             throw INTERP_KERNEL::Exception("Invalid slice in tuple selection");
-           int nbOfE=(ee-bb)/ss;
-           std::vector<int> nv(nbOfE);
-           for(int jj=0;jj<nbOfE;jj++)
-             nv[jj]=bb+jj*ss;
            switch(sw1)
              {
              case 1:
-               self->setPartOfValuesSimple2(i1,&nv[0],&nv[0]+nv.size(),&vc1[0],&vc1[0]+vc1.size());
+               self->setPartOfValuesSimple4(i1,pt1.first,pt1.second.first,pt1.second.second,&vc1[0],&vc1[0]+vc1.size());
                return self;
              case 2:
                tmp=DataArrayDouble::New();
                tmp->useArray(&v1[0],false,CPP_DEALLOC,1,v1.size());
-               self->setPartOfValues2(tmp,&nv[0],&nv[0]+nv.size(),&vc1[0],&vc1[0]+vc1.size(),false);
+               self->setPartOfValues4(tmp,pt1.first,pt1.second.first,pt1.second.second,&vc1[0],&vc1[0]+vc1.size(),false);
                return self;
              case 3:
-               self->setPartOfValues2(d1,&nv[0],&nv[0]+nv.size(),&vc1[0],&vc1[0]+vc1.size());
+               self->setPartOfValues4(d1,pt1.first,pt1.second.first,pt1.second.second,&vc1[0],&vc1[0]+vc1.size());
                return self;
              default:
                throw INTERP_KERNEL::Exception(msg);
@@ -5624,31 +5615,22 @@ namespace ParaMEDMEM
          }
        case 11:
          {
-           int bb=pt1.first;
-           int ee=pt1.second.first;
-           int ss=pt1.second.second;
-           if(ee<bb || ss<=0)
-             throw INTERP_KERNEL::Exception("Invalid slice in tuple selection");
-           int nbOfE=(ee-bb)/ss;
-           std::vector<int> nv(nbOfE);
-           for(int jj=0;jj<nbOfE;jj++)
-             nv[jj]=bb+jj*ss;
            switch(sw1)
              {
              case 1:
-               self->setPartOfValuesSimple2(i1,&nv[0],&nv[0]+nv.size(),&vc1[0],&vc1[0]+vc1.size());
+               self->setPartOfValuesSimple4(i1,pt1.first,pt1.second.first,pt1.second.second,&vc1[0],&vc1[0]+vc1.size());
                return self;
              case 2:
                tmp=DataArrayInt::New();
                tmp->useArray(&v1[0],false,CPP_DEALLOC,1,v1.size());
-               self->setPartOfValues2(tmp,&nv[0],&nv[0]+nv.size(),&vc1[0],&vc1[0]+vc1.size(),false);
+               self->setPartOfValues4(tmp,pt1.first,pt1.second.first,pt1.second.second,&vc1[0],&vc1[0]+vc1.size(),false);
                return self;
              case 3:
-               self->setPartOfValues2(d1,&nv[0],&nv[0]+nv.size(),&vc1[0],&vc1[0]+vc1.size());
+               self->setPartOfValues4(d1,pt1.first,pt1.second.first,pt1.second.second,&vc1[0],&vc1[0]+vc1.size());
                return self;
              case 4:
                tmp=dd1->buildDAInt(1,self->getNumberOfComponents());
-               self->setPartOfValues2(tmp,&nv[0],&nv[0]+nv.size(),&vc1[0],&vc1[0]+vc1.size());
+               self->setPartOfValues4(tmp,pt1.first,pt1.second.first,pt1.second.second,&vc1[0],&vc1[0]+vc1.size());
                return self;
              default:
                throw INTERP_KERNEL::Exception(msg);

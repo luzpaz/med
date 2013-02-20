@@ -1534,6 +1534,66 @@ void DataArrayDouble::setPartOfValuesSimple3(double a, const int *bgTuples, cons
       }
 }
 
+void DataArrayDouble::setPartOfValues4(const DataArrayDouble *a, int bgTuples, int endTuples, int stepTuples, const int *bgComp, const int *endComp, bool strictCompoCompare) throw(INTERP_KERNEL::Exception)
+{
+  if(!a)
+    throw INTERP_KERNEL::Exception("DataArrayDouble::setPartOfValues4 : input DataArrayDouble is NULL !");
+  const char msg[]="DataArrayDouble::setPartOfValues4";
+  checkAllocated();
+  a->checkAllocated();
+  int newNbOfTuples=DataArray::GetNumberOfItemGivenBES(bgTuples,endTuples,stepTuples,msg);
+  int newNbOfComp=(int)std::distance(bgComp,endComp);
+  int nbComp=getNumberOfComponents();
+  for(const int *z=bgComp;z!=endComp;z++)
+    DataArray::CheckValueInRange(nbComp,*z,"invalid component id");
+  int nbOfTuples=getNumberOfTuples();
+  DataArray::CheckValueInRangeEx(nbOfTuples,bgTuples,endTuples,"invalid tuple value");
+  bool assignTech=true;
+  if(a->getNbOfElems()==newNbOfTuples*newNbOfComp)
+    {
+      if(strictCompoCompare)
+        a->checkNbOfTuplesAndComp(newNbOfTuples,newNbOfComp,msg);
+    }
+  else
+    {
+      a->checkNbOfTuplesAndComp(1,newNbOfComp,msg);
+      assignTech=false;
+    }
+  const double *srcPt=a->getConstPointer();
+  double *pt=getPointer()+bgTuples*nbComp;
+  if(assignTech)
+    {
+      for(int i=0;i<newNbOfTuples;i++,pt+=stepTuples*nbComp)
+        for(const int *z=bgComp;z!=endComp;z++,srcPt++)
+          pt[*z]=*srcPt;
+    }
+  else
+    {
+      for(int i=0;i<newNbOfTuples;i++,pt+=stepTuples*nbComp)
+        {
+          const double *srcPt2=srcPt;
+          for(const int *z=bgComp;z!=endComp;z++,srcPt2++)
+            pt[*z]=*srcPt2;
+        }
+    }
+}
+
+void DataArrayDouble::setPartOfValuesSimple4(double a, int bgTuples, int endTuples, int stepTuples, const int *bgComp, const int *endComp) throw(INTERP_KERNEL::Exception)
+{
+  const char msg[]="DataArrayDouble::setPartOfValuesSimple4";
+  checkAllocated();
+  int newNbOfTuples=DataArray::GetNumberOfItemGivenBES(bgTuples,endTuples,stepTuples,msg);
+  int nbComp=getNumberOfComponents();
+  for(const int *z=bgComp;z!=endComp;z++)
+    DataArray::CheckValueInRange(nbComp,*z,"invalid component id");
+  int nbOfTuples=getNumberOfTuples();
+  DataArray::CheckValueInRangeEx(nbOfTuples,bgTuples,endTuples,"invalid tuple value");
+  double *pt=getPointer()+bgTuples*nbComp;
+  for(int i=0;i<newNbOfTuples;i++,pt+=stepTuples*nbComp)
+    for(const int *z=bgComp;z!=endComp;z++)
+      pt[*z]=a;
+}
+
 /*!
  * 'this', 'a' and 'tuplesSelec' are expected to be defined. If not an exception will be thrown.
  * @param a is an array having exactly the same number of components than 'this'
@@ -4910,6 +4970,66 @@ void DataArrayInt::setPartOfValuesSimple3(int a, const int *bgTuples, const int 
         DataArray::CheckValueInRange(nbOfTuples,*w,"invalid tuple id");
         pt[(*w)*nbComp+j*stepComp]=a;
       }
+}
+
+void DataArrayInt::setPartOfValues4(const DataArrayInt *a, int bgTuples, int endTuples, int stepTuples, const int *bgComp, const int *endComp, bool strictCompoCompare) throw(INTERP_KERNEL::Exception)
+{
+  if(!a)
+    throw INTERP_KERNEL::Exception("DataArrayInt::setPartOfValues4 : input DataArrayInt is NULL !");
+  const char msg[]="DataArrayInt::setPartOfValues4";
+  checkAllocated();
+  a->checkAllocated();
+  int newNbOfTuples=DataArray::GetNumberOfItemGivenBES(bgTuples,endTuples,stepTuples,msg);
+  int newNbOfComp=(int)std::distance(bgComp,endComp);
+  int nbComp=getNumberOfComponents();
+  for(const int *z=bgComp;z!=endComp;z++)
+    DataArray::CheckValueInRange(nbComp,*z,"invalid component id");
+  int nbOfTuples=getNumberOfTuples();
+  DataArray::CheckValueInRangeEx(nbOfTuples,bgTuples,endTuples,"invalid tuple value");
+  bool assignTech=true;
+  if(a->getNbOfElems()==newNbOfTuples*newNbOfComp)
+    {
+      if(strictCompoCompare)
+        a->checkNbOfTuplesAndComp(newNbOfTuples,newNbOfComp,msg);
+    }
+  else
+    {
+      a->checkNbOfTuplesAndComp(1,newNbOfComp,msg);
+      assignTech=false;
+    }
+  const int *srcPt=a->getConstPointer();
+  int *pt=getPointer()+bgTuples*nbComp;
+  if(assignTech)
+    {
+      for(int i=0;i<newNbOfTuples;i++,pt+=stepTuples*nbComp)
+        for(const int *z=bgComp;z!=endComp;z++,srcPt++)
+          pt[*z]=*srcPt;
+    }
+  else
+    {
+      for(int i=0;i<newNbOfTuples;i++,pt+=stepTuples*nbComp)
+        {
+          const int *srcPt2=srcPt;
+          for(const int *z=bgComp;z!=endComp;z++,srcPt2++)
+            pt[*z]=*srcPt2;
+        }
+    }
+}
+
+void DataArrayInt::setPartOfValuesSimple4(int a, int bgTuples, int endTuples, int stepTuples, const int *bgComp, const int *endComp) throw(INTERP_KERNEL::Exception)
+{
+  const char msg[]="DataArrayInt::setPartOfValuesSimple4";
+  checkAllocated();
+  int newNbOfTuples=DataArray::GetNumberOfItemGivenBES(bgTuples,endTuples,stepTuples,msg);
+  int nbComp=getNumberOfComponents();
+  for(const int *z=bgComp;z!=endComp;z++)
+    DataArray::CheckValueInRange(nbComp,*z,"invalid component id");
+  int nbOfTuples=getNumberOfTuples();
+  DataArray::CheckValueInRangeEx(nbOfTuples,bgTuples,endTuples,"invalid tuple value");
+  int *pt=getPointer()+bgTuples*nbComp;
+  for(int i=0;i<newNbOfTuples;i++,pt+=stepTuples*nbComp)
+    for(const int *z=bgComp;z!=endComp;z++)
+      pt[*z]=a;
 }
 
 /*!

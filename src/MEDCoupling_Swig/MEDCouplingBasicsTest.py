@@ -11135,14 +11135,14 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         pass
 
     def testSwigSetItem3(self):
-        # 1-2 false
+        # 1-2 
         d=DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
         d[3]=[1,2]
         self.assertTrue(d.isEqual(DataArrayDouble([0,0,0,0,0,0,1,2,0,0,0,0],6,2),1e-14))
         # 2-2 false
         d=DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
-        d[[5,3]]=[1,2]
-        self.assertTrue(d.isEqual(DataArrayDouble([0,0,0,0,0,0,1,2,0,0,1,2],6,2),1e-14))
+        d[[5,3,2]]=[1,2]
+        self.assertTrue(d.isEqual(DataArrayDouble([0,0,0,0,1,2,1,2,0,0,1,2],6,2),1e-14))
         # 3-2 false
         d=DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
         d[:]=[1,2]
@@ -11163,8 +11163,98 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         d=DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
         d[:-1:2,1]=[7]
         self.assertTrue(d.isEqual(DataArrayDouble([0,7,0,0,0,7,0,0,0,7,0,0],6,2),1e-14))
-        # 8-2 
-        
+        # 8-2 false
+        d=DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[DataArrayInt([0,3,4]),1]=[7]
+        self.assertTrue(d.isEqual(DataArrayDouble([0,7,0,0,0,0,0,7,0,7,0,0],6,2),1e-14))
+        # 9-2
+        d=DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[3,[1,0]]=[7,8]
+        self.assertTrue(d.isEqual(DataArrayDouble([0,0,0,0,0,0,8,7,0,0,0,0],6,2),1e-14))
+        # 10-2 false
+        d=DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[[1,3,4],[1,0]]=[7,8]
+        self.assertTrue(d.isEqual(DataArrayDouble([0,0,8,7,0,0,8,7,8,7,0,0],6,2),1e-14))
+        # 11-2 false
+        d=DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[1::2,[1,0]]=[7,8]
+        self.assertTrue(d.isEqual(DataArrayDouble([0,0,8,7,0,0,8,7,0,0,8,7],6,2),1e-14))
+        # 12-2 false
+        d=DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[DataArrayInt([1,4]),[1,0]]=[7,8]
+        self.assertTrue(d.isEqual(DataArrayDouble([0,0,8,7,0,0,0,0,8,7,0,0],6,2),1e-14))
+        # 13-2
+        d=DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[1,:-1]=[9]
+        self.assertTrue(d.isEqual(DataArrayDouble([0,0,9,0,0,0,0,0,0,0,0,0],6,2),1e-14))
+        # 14-2 false
+        d=DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[[1,4,5],:]=[7,8]
+        self.assertTrue(d.isEqual(DataArrayDouble([0,0,7,8,0,0,0,0,7,8,7,8],6,2),1e-14))
+        # 15-2 false
+        d=DataArrayDouble([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[1::2,:]=[3,9]
+        self.assertTrue(d.isEqual(DataArrayDouble([0,0,3,9,0,0,3,9,0,0,3,9],6,2),1e-14))
+        # 1-2 
+        d=DataArrayInt([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[3]=[1,2]
+        self.assertTrue(d.isEqual(DataArrayInt([0,0,0,0,0,0,1,2,0,0,0,0],6,2)))
+        # 2-2 false
+        d=DataArrayInt([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[[5,3,2]]=[1,2]
+        self.assertTrue(d.isEqual(DataArrayInt([0,0,0,0,1,2,1,2,0,0,1,2],6,2)))
+        # 3-2 false
+        d=DataArrayInt([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[:]=[1,2]
+        self.assertTrue(d.isEqual(DataArrayInt([1,2,1,2,1,2,1,2,1,2,1,2],6,2)))
+        # 4-2 false
+        d=DataArrayInt([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[DataArrayInt([0,3,4])]=[1,2]
+        self.assertTrue(d.isEqual(DataArrayInt([1,2,0,0,0,0,1,2,1,2,0,0],6,2)))
+        # 5-2
+        d=DataArrayInt([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[5,1]=[7]
+        self.assertTrue(d.isEqual(DataArrayInt([0,0,0,0,0,0,0,0,0,0,0,7],6,2)))
+        # 6-2 false
+        d=DataArrayInt([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[[3,5],1]=[7]
+        self.assertTrue(d.isEqual(DataArrayInt([0,0,0,0,0,0,0,7,0,0,0,7],6,2)))
+        # 7-2 false
+        d=DataArrayInt([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[:-1:2,1]=[7]
+        self.assertTrue(d.isEqual(DataArrayInt([0,7,0,0,0,7,0,0,0,7,0,0],6,2)))
+        # 8-2 false
+        d=DataArrayInt([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[DataArrayInt([0,3,4]),1]=[7]
+        self.assertTrue(d.isEqual(DataArrayInt([0,7,0,0,0,0,0,7,0,7,0,0],6,2)))
+        # 9-2
+        d=DataArrayInt([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[3,[1,0]]=[7,8]
+        self.assertTrue(d.isEqual(DataArrayInt([0,0,0,0,0,0,8,7,0,0,0,0],6,2)))
+        # 10-2 false
+        d=DataArrayInt([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[[1,3,4],[1,0]]=[7,8]
+        self.assertTrue(d.isEqual(DataArrayInt([0,0,8,7,0,0,8,7,8,7,0,0],6,2)))
+        # 11-2 false
+        d=DataArrayInt([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[1::2,[1,0]]=[7,8]
+        self.assertTrue(d.isEqual(DataArrayInt([0,0,8,7,0,0,8,7,0,0,8,7],6,2)))
+        # 12-2 false
+        d=DataArrayInt([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[DataArrayInt([1,4]),[1,0]]=[7,8]
+        self.assertTrue(d.isEqual(DataArrayInt([0,0,8,7,0,0,0,0,8,7,0,0],6,2)))
+        # 13-2
+        d=DataArrayInt([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[1,:-1]=[9]
+        self.assertTrue(d.isEqual(DataArrayInt([0,0,9,0,0,0,0,0,0,0,0,0],6,2)))
+        # 14-2 false
+        d=DataArrayInt([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[[1,4,5],:]=[7,8]
+        self.assertTrue(d.isEqual(DataArrayInt([0,0,7,8,0,0,0,0,7,8,7,8],6,2)))
+        # 15-2 false
+        d=DataArrayInt([0,0,0,0,0,0,0,0,0,0,0,0],6,2)
+        d[1::2,:]=[3,9]
+        self.assertTrue(d.isEqual(DataArrayInt([0,0,3,9,0,0,3,9,0,0,3,9],6,2)))
         pass
 
     def setUp(self):
