@@ -3885,8 +3885,8 @@ void DataArrayInt::splitByValueRange(const int *arrBg, const int *arrEnd,
  * This method sweeps all the values (tuples) in 'this' (it should be allocated) and for each value v on place i, place indArr[v] will have 
  * value i.
  * indArr[v] where 'indArr' is defined by ['indArrBg','indArrEnd').
- * This method is half/safe that is to say if there is location i so that indArr[v] is not in [0,this->getNumberOfTuples()) an exception
- * will be thrown.
+ * This method is safe that is to say if there is location i so that indArr[v] is not in [0,this->getNumberOfTuples()) an exception
+ * will be thrown. An exception is also throw if there is a location i so that \a this[i] not in [0,distance(indArrBg,indArrEnd)) !
  */
 DataArrayInt *DataArrayInt::transformWithIndArrR(const int *indArrBg, const int *indArrEnd) const throw(INTERP_KERNEL::Exception)
 {
@@ -3901,12 +3901,20 @@ DataArrayInt *DataArrayInt::transformWithIndArrR(const int *indArrBg, const int 
   int *tmp=ret->getPointer();
   for(int i=0;i<nbOfTuples;i++,pt++)
     {
-      int pos=indArrBg[*pt];
-      if(pos>=0 && pos<nbElemsIn)
-        tmp[pos]=i;
+      if(*pt>=0 && *pt<nbElemsIn)
+        {
+          int pos=indArrBg[*pt];
+          if(pos>=0 && pos<nbOfTuples)
+            tmp[pos]=i;
+          else
+            {
+              std::ostringstream oss; oss << "DataArrayInt::transformWithIndArrR : error on tuple #" << i << " value of new pos is " << pos << " ( indArrBg[" << *pt << "]) ! Should be in [0," << nbOfTuples << ") !";
+              throw INTERP_KERNEL::Exception(oss.str().c_str());
+            }
+        }
       else
         {
-          std::ostringstream oss; oss << "DataArrayInt::transformWithIndArrR : error on tuple #" << i << " value is " << *pt << " and indirectionnal array as a size equal to " << nbElemsIn;
+          std::ostringstream oss; oss << "DataArrayInt::transformWithIndArrR : error on tuple #" << i << " value is " << *pt << " and indirectionnal array as a size equal to " << nbElemsIn << " !";
           throw INTERP_KERNEL::Exception(oss.str().c_str());
         }
     }
