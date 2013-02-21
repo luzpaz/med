@@ -860,6 +860,7 @@ DataArrayDouble *DataArrayDouble::toNoInterlace() const throw(INTERP_KERNEL::Exc
  */
 void DataArrayDouble::renumberInPlace(const int *old2New)
 {
+  checkAllocated();
   int nbTuples=getNumberOfTuples();
   int nbOfCompo=getNumberOfComponents();
   double *tmp=new double[nbTuples*nbOfCompo];
@@ -877,6 +878,7 @@ void DataArrayDouble::renumberInPlace(const int *old2New)
  */
 void DataArrayDouble::renumberInPlaceR(const int *new2Old)
 {
+  checkAllocated();
   int nbTuples=getNumberOfTuples();
   int nbOfCompo=getNumberOfComponents();
   double *tmp=new double[nbTuples*nbOfCompo];
@@ -894,6 +896,7 @@ void DataArrayDouble::renumberInPlaceR(const int *new2Old)
  */
 DataArrayDouble *DataArrayDouble::renumber(const int *old2New) const
 {
+  checkAllocated();
   int nbTuples=getNumberOfTuples();
   int nbOfCompo=getNumberOfComponents();
   DataArrayDouble *ret=DataArrayDouble::New();
@@ -913,6 +916,7 @@ DataArrayDouble *DataArrayDouble::renumber(const int *old2New) const
  */
 DataArrayDouble *DataArrayDouble::renumberR(const int *new2Old) const
 {
+  checkAllocated();
   int nbTuples=getNumberOfTuples();
   int nbOfCompo=getNumberOfComponents();
   DataArrayDouble *ret=DataArrayDouble::New();
@@ -934,6 +938,7 @@ DataArrayDouble *DataArrayDouble::renumberR(const int *new2Old) const
  */
 DataArrayDouble *DataArrayDouble::renumberAndReduce(const int *old2New, int newNbOfTuple) const
 {
+  checkAllocated();
   int nbTuples=getNumberOfTuples();
   int nbOfCompo=getNumberOfComponents();
   DataArrayDouble *ret=DataArrayDouble::New();
@@ -956,6 +961,7 @@ DataArrayDouble *DataArrayDouble::renumberAndReduce(const int *old2New, int newN
  */
 DataArrayDouble *DataArrayDouble::selectByTupleId(const int *new2OldBg, const int *new2OldEnd) const
 {
+  checkAllocated();
   DataArrayDouble *ret=DataArrayDouble::New();
   int nbComp=getNumberOfComponents();
   ret->alloc((int)std::distance(new2OldBg,new2OldEnd),nbComp);
@@ -974,6 +980,7 @@ DataArrayDouble *DataArrayDouble::selectByTupleId(const int *new2OldBg, const in
  */
 DataArrayDouble *DataArrayDouble::selectByTupleIdSafe(const int *new2OldBg, const int *new2OldEnd) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::New();
   int nbComp=getNumberOfComponents();
   int oldNbOfTuples=getNumberOfTuples();
@@ -1001,6 +1008,7 @@ DataArrayDouble *DataArrayDouble::selectByTupleIdSafe(const int *new2OldBg, cons
  */
 DataArrayDouble *DataArrayDouble::selectByTupleId2(int bg, int end2, int step) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::New();
   int nbComp=getNumberOfComponents();
   int newNbOfTuples=GetNumberOfItemGivenBES(bg,end2,step,"DataArrayDouble::selectByTupleId2 : ");
@@ -1080,6 +1088,7 @@ DataArrayDouble *DataArrayDouble::selectByTupleRanges(const std::vector<std::pai
  */
 DataArrayDouble *DataArrayDouble::substr(int tupleIdBg, int tupleIdEnd) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   int nbt=getNumberOfTuples();
   if(tupleIdBg<0)
     throw INTERP_KERNEL::Exception("DataArrayDouble::substr : The tupleIdBg parameter must be greater than 0 !");
@@ -1299,6 +1308,7 @@ DataArrayDouble *DataArrayDouble::duplicateEachTupleNTimes(int nbTimes) const th
  */
 DataArrayDouble *DataArrayDouble::getDifferentValues(double prec, int limitTupleId) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   DataArrayInt *c0=0,*cI0=0;
   findCommonTuples(prec,limitTupleId,c0,cI0);
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> c(c0),cI(cI0);
@@ -1311,6 +1321,7 @@ void DataArrayDouble::setSelectedComponents(const DataArrayDouble *a, const std:
 {
   if(!a)
     throw INTERP_KERNEL::Exception("DataArrayDouble::setSelectedComponents : input DataArrayDouble is NULL !");
+  checkAllocated();
   copyPartOfStringInfoFrom2(compoIds,*a);
   std::size_t partOfCompoSz=compoIds.size();
   int nbOfCompo=getNumberOfComponents();
@@ -1866,6 +1877,7 @@ void DataArrayDouble::computeTupleIdsNearTuples(const DataArrayDouble *other, do
 {
   if(!other)
     throw INTERP_KERNEL::Exception("DataArrayDouble::computeTupleIdsNearTuples : input pointer other is null !");
+  checkAllocated();
   MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> bbox=computeBBoxPerTuple(eps);
   other->checkAllocated();
   int nbOfCompo=getNumberOfComponents();
@@ -1925,6 +1937,7 @@ void DataArrayDouble::recenterForMaxPrecision(double eps) throw(INTERP_KERNEL::E
 
 double DataArrayDouble::getMaxValue(int& tupleId) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("DataArrayDouble::getMaxValue : must be applied on DataArrayDouble with only one component, you can call 'rearrange' method before or call 'getMaxValueInArray' method !");
   int nbOfTuples=getNumberOfTuples();
@@ -1957,6 +1970,7 @@ double DataArrayDouble::getMaxValue2(DataArrayInt*& tupleIds) const throw(INTERP
 
 double DataArrayDouble::getMinValue(int& tupleId) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("DataArrayDouble::getMinValue : must be applied on DataArrayDouble with only one component, you can call 'rearrange' method before call 'getMinValueInArray' method !");
   int nbOfTuples=getNumberOfTuples();
@@ -2091,6 +2105,7 @@ double DataArrayDouble::accumulate(int compId) const throw(INTERP_KERNEL::Except
 
 DataArrayDouble *DataArrayDouble::fromPolarToCart() const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   int nbOfComp=getNumberOfComponents();
   if(nbOfComp!=2)
     throw INTERP_KERNEL::Exception("DataArrayDouble::fromPolarToCart : must be an array with exactly 2 components !");
@@ -2109,6 +2124,7 @@ DataArrayDouble *DataArrayDouble::fromPolarToCart() const throw(INTERP_KERNEL::E
 
 DataArrayDouble *DataArrayDouble::fromCylToCart() const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   int nbOfComp=getNumberOfComponents();
   if(nbOfComp!=3)
     throw INTERP_KERNEL::Exception("DataArrayDouble::fromCylToCart : must be an array with exactly 3 components !");
@@ -2129,6 +2145,7 @@ DataArrayDouble *DataArrayDouble::fromCylToCart() const throw(INTERP_KERNEL::Exc
 
 DataArrayDouble *DataArrayDouble::fromSpherToCart() const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   int nbOfComp=getNumberOfComponents();
   if(nbOfComp!=3)
     throw INTERP_KERNEL::Exception("DataArrayDouble::fromSpherToCart : must be an array with exactly 3 components !");
@@ -2148,6 +2165,7 @@ DataArrayDouble *DataArrayDouble::fromSpherToCart() const throw(INTERP_KERNEL::E
 
 DataArrayDouble *DataArrayDouble::doublyContractedProduct() const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   int nbOfComp=getNumberOfComponents();
   if(nbOfComp!=6)
     throw INTERP_KERNEL::Exception("DataArrayDouble::doublyContractedProduct : must be an array with exactly 6 components !");
@@ -2191,6 +2209,7 @@ DataArrayDouble *DataArrayDouble::determinant() const throw(INTERP_KERNEL::Excep
 
 DataArrayDouble *DataArrayDouble::eigenValues() const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   int nbOfComp=getNumberOfComponents();
   if(nbOfComp!=6)
     throw INTERP_KERNEL::Exception("DataArrayDouble::eigenValues : must be an array with exactly 6 components !");
@@ -2206,6 +2225,7 @@ DataArrayDouble *DataArrayDouble::eigenValues() const throw(INTERP_KERNEL::Excep
 
 DataArrayDouble *DataArrayDouble::eigenVectors() const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   int nbOfComp=getNumberOfComponents();
   if(nbOfComp!=6)
     throw INTERP_KERNEL::Exception("DataArrayDouble::eigenVectors : must be an array with exactly 6 components !");
@@ -2226,6 +2246,7 @@ DataArrayDouble *DataArrayDouble::eigenVectors() const throw(INTERP_KERNEL::Exce
 
 DataArrayDouble *DataArrayDouble::inverse() const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   int nbOfComp=getNumberOfComponents();
   if(nbOfComp!=6 && nbOfComp!=9 && nbOfComp!=4)
     throw INTERP_KERNEL::Exception("DataArrayDouble::inversion : must be an array with 4,6 or 9 components !");
@@ -2273,6 +2294,7 @@ if(nbOfComp==6)
 
 DataArrayDouble *DataArrayDouble::trace() const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   int nbOfComp=getNumberOfComponents();
   if(nbOfComp!=6 && nbOfComp!=9 && nbOfComp!=4)
     throw INTERP_KERNEL::Exception("DataArrayDouble::trace : must be an array with 4,6 or 9 components !");
@@ -2295,6 +2317,7 @@ DataArrayDouble *DataArrayDouble::trace() const throw(INTERP_KERNEL::Exception)
 
 DataArrayDouble *DataArrayDouble::deviator() const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   int nbOfComp=getNumberOfComponents();
   if(nbOfComp!=6)
     throw INTERP_KERNEL::Exception("DataArrayDouble::deviator : must be an array with exactly 6 components !");
@@ -2756,6 +2779,7 @@ DataArrayDoubleIterator *DataArrayDouble::iterator()
 
 DataArrayInt *DataArrayDouble::getIdsInRange(double vmin, double vmax) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("DataArrayDouble::getIdsInRange : this must have exactly one component !");
   const double *cptr=getConstPointer();
@@ -3026,6 +3050,8 @@ void DataArrayDouble::addEqual(const DataArrayDouble *other) throw(INTERP_KERNEL
   if(!other)
     throw INTERP_KERNEL::Exception("DataArrayDouble::addEqual : input DataArrayDouble instance is NULL !");
   const char *msg="Nb of tuples mismatch for DataArrayDouble::addEqual  !";
+  checkAllocated();
+  other->checkAllocated();
   int nbOfTuple=getNumberOfTuples();
   int nbOfTuple2=other->getNumberOfTuples();
   int nbOfComp=getNumberOfComponents();
@@ -3123,6 +3149,8 @@ void DataArrayDouble::substractEqual(const DataArrayDouble *other) throw(INTERP_
   if(!other)
     throw INTERP_KERNEL::Exception("DataArrayDouble::substractEqual : input DataArrayDouble instance is NULL !");
   const char *msg="Nb of tuples mismatch for DataArrayDouble::substractEqual  !";
+  checkAllocated();
+  other->checkAllocated();
   int nbOfTuple=getNumberOfTuples();
   int nbOfTuple2=other->getNumberOfTuples();
   int nbOfComp=getNumberOfComponents();
@@ -3235,6 +3263,8 @@ void DataArrayDouble::multiplyEqual(const DataArrayDouble *other) throw(INTERP_K
   if(!other)
     throw INTERP_KERNEL::Exception("DataArrayDouble::multiplyEqual : input DataArrayDouble instance is NULL !");
   const char *msg="Nb of tuples mismatch for DataArrayDouble::multiplyEqual !";
+  checkAllocated();
+  other->checkAllocated();
   int nbOfTuple=getNumberOfTuples();
   int nbOfTuple2=other->getNumberOfTuples();
   int nbOfComp=getNumberOfComponents();
@@ -3332,6 +3362,8 @@ void DataArrayDouble::divideEqual(const DataArrayDouble *other) throw(INTERP_KER
   if(!other)
     throw INTERP_KERNEL::Exception("DataArrayDouble::divideEqual : input DataArrayDouble instance is NULL !");
   const char *msg="Nb of tuples mismatch for DataArrayDouble::divideEqual !";
+  checkAllocated();
+  other->checkAllocated();
   int nbOfTuple=getNumberOfTuples();
   int nbOfTuple2=other->getNumberOfTuples();
   int nbOfComp=getNumberOfComponents();
@@ -3742,6 +3774,7 @@ std::string DataArrayInt::reprZip() const
 
 void DataArrayInt::writeVTK(std::ostream& ofs, int indent, const char *type, const char *nameInFile) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   std::string idt(indent,' ');
   ofs << idt << "<DataArray type=\"" << type << "\" Name=\"" << nameInFile << "\" NumberOfComponents=\"" << getNumberOfComponents() << "\"";
   ofs << " format=\"ascii\" RangeMin=\"" << getMinValueInArray() << "\" RangeMax=\"" << getMaxValueInArray() << "\">\n" << idt;
@@ -3799,6 +3832,7 @@ void DataArrayInt::reprCppStream(const char *varName, std::ostream& stream) cons
  */
 void DataArrayInt::transformWithIndArr(const int *indArrBg, const int *indArrEnd) throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("Call transformWithIndArr method on DataArrayInt with only one component, you can call 'rearrange' method before !");
   int nbElemsIn=(int)std::distance(indArrBg,indArrEnd);
@@ -3837,6 +3871,7 @@ void DataArrayInt::transformWithIndArr(const int *indArrBg, const int *indArrEnd
 void DataArrayInt::splitByValueRange(const int *arrBg, const int *arrEnd,
                                      DataArrayInt *& castArr, DataArrayInt *& rankInsideCast, DataArrayInt *& castsPresent) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("Call splitByValueRange  method on DataArrayInt with only one component, you can call 'rearrange' method before !");
   int nbOfTuples=getNumberOfTuples();
@@ -3890,6 +3925,7 @@ void DataArrayInt::splitByValueRange(const int *arrBg, const int *arrEnd,
  */
 DataArrayInt *DataArrayInt::transformWithIndArrR(const int *indArrBg, const int *indArrEnd) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("Call transformWithIndArrR method on DataArrayInt with only one component, you can call 'rearrange' method before !");
   int nbElemsIn=(int)std::distance(indArrBg,indArrEnd);
@@ -3927,7 +3963,7 @@ DataArrayInt *DataArrayInt::transformWithIndArrR(const int *indArrBg, const int 
  */
 DataArrayInt *DataArrayInt::invertArrayO2N2N2O(int newNbOfElem) const
 {
-  DataArrayInt *ret=DataArrayInt::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
   ret->alloc(newNbOfElem,1);
   int nbOfOldNodes=getNumberOfTuples();
   const int *old2New=getConstPointer();
@@ -3935,7 +3971,7 @@ DataArrayInt *DataArrayInt::invertArrayO2N2N2O(int newNbOfElem) const
   for(int i=0;i!=nbOfOldNodes;i++)
     if(old2New[i]!=-1)
       pt[old2New[i]]=i;
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -3944,7 +3980,7 @@ DataArrayInt *DataArrayInt::invertArrayO2N2N2O(int newNbOfElem) const
  */
 DataArrayInt *DataArrayInt::invertArrayO2N2N2OBis(int newNbOfElem) const throw(INTERP_KERNEL::Exception)
 {
-  DataArrayInt *ret=DataArrayInt::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
   ret->alloc(newNbOfElem,1);
   int nbOfOldNodes=getNumberOfTuples();
   const int *old2New=getConstPointer();
@@ -3952,7 +3988,7 @@ DataArrayInt *DataArrayInt::invertArrayO2N2N2OBis(int newNbOfElem) const throw(I
   for(int i=nbOfOldNodes-1;i>=0;i--)
     if(old2New[i]!=-1)
       pt[old2New[i]]=i;
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -3960,7 +3996,8 @@ DataArrayInt *DataArrayInt::invertArrayO2N2N2OBis(int newNbOfElem) const throw(I
  */
 DataArrayInt *DataArrayInt::invertArrayN2O2O2N(int oldNbOfElem) const
 {
-  DataArrayInt *ret=DataArrayInt::New();
+  checkAllocated();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
   ret->alloc(oldNbOfElem,1);
   const int *new2Old=getConstPointer();
   int *pt=ret->getPointer();
@@ -3968,7 +4005,7 @@ DataArrayInt *DataArrayInt::invertArrayN2O2O2N(int oldNbOfElem) const
   int nbOfNewElems=getNumberOfTuples();
   for(int i=0;i<nbOfNewElems;i++)
     pt[new2Old[i]]=i;
-  return ret;
+  return ret.retn();
 }
 
 bool DataArrayInt::isEqualIfNotWhy(const DataArrayInt& other, std::string& reason) const
@@ -4124,9 +4161,11 @@ void DataArrayInt::checkStrictlyMonotonic(bool increasing) const throw(INTERP_KE
  */
 DataArrayInt *DataArrayInt::buildPermutationArr(const DataArrayInt& other) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   if(getNumberOfComponents()!=1 || other.getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("DataArrayInt::buildPermutationArr : 'this' and 'other' have to have exactly ONE component !");
   int nbTuple=getNumberOfTuples();
+  other.checkAllocated();
   if(nbTuple!=other.getNumberOfTuples())
     throw INTERP_KERNEL::Exception("DataArrayInt::buildPermutationArr : 'this' and 'other' must have the same number of tuple !");
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
@@ -4167,6 +4206,7 @@ void DataArrayInt::useExternalArrayWithRWAccess(const int *array, int nbOfTuple,
 
 DataArrayInt *DataArrayInt::fromNoInterlace() const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   if(_mem.isNull())
     throw INTERP_KERNEL::Exception("DataArrayInt::fromNoInterlace : Not defined array !");
   int *tab=_mem.fromNoInterlace(getNumberOfComponents());
@@ -4177,6 +4217,7 @@ DataArrayInt *DataArrayInt::fromNoInterlace() const throw(INTERP_KERNEL::Excepti
 
 DataArrayInt *DataArrayInt::toNoInterlace() const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   if(_mem.isNull())
     throw INTERP_KERNEL::Exception("DataArrayInt::toNoInterlace : Not defined array !");
   int *tab=_mem.toNoInterlace(getNumberOfComponents());
@@ -4187,6 +4228,7 @@ DataArrayInt *DataArrayInt::toNoInterlace() const throw(INTERP_KERNEL::Exception
 
 void DataArrayInt::renumberInPlace(const int *old2New)
 {
+  checkAllocated();
   int nbTuples=getNumberOfTuples();
   int nbOfCompo=getNumberOfComponents();
   int *tmp=new int[nbTuples*nbOfCompo];
@@ -4200,6 +4242,7 @@ void DataArrayInt::renumberInPlace(const int *old2New)
 
 void DataArrayInt::renumberInPlaceR(const int *new2Old)
 {
+  checkAllocated();
   int nbTuples=getNumberOfTuples();
   int nbOfCompo=getNumberOfComponents();
   int *tmp=new int[nbTuples*nbOfCompo];
@@ -4218,6 +4261,7 @@ void DataArrayInt::renumberInPlaceR(const int *new2Old)
  */
 DataArrayInt *DataArrayInt::renumber(const int *old2New) const
 {
+  checkAllocated();
   int nbTuples=getNumberOfTuples();
   int nbOfCompo=getNumberOfComponents();
   DataArrayInt *ret=DataArrayInt::New();
@@ -4233,6 +4277,7 @@ DataArrayInt *DataArrayInt::renumber(const int *old2New) const
 
 DataArrayInt *DataArrayInt::renumberR(const int *new2Old) const
 {
+  checkAllocated();
   int nbTuples=getNumberOfTuples();
   int nbOfCompo=getNumberOfComponents();
   DataArrayInt *ret=DataArrayInt::New();
@@ -4254,6 +4299,7 @@ DataArrayInt *DataArrayInt::renumberR(const int *new2Old) const
  */
 DataArrayInt *DataArrayInt::renumberAndReduce(const int *old2New, int newNbOfTuple) const
 {
+  checkAllocated();
   int nbTuples=getNumberOfTuples();
   int nbOfCompo=getNumberOfComponents();
   DataArrayInt *ret=DataArrayInt::New();
@@ -4276,7 +4322,8 @@ DataArrayInt *DataArrayInt::renumberAndReduce(const int *old2New, int newNbOfTup
  */
 DataArrayInt *DataArrayInt::selectByTupleId(const int *new2OldBg, const int *new2OldEnd) const
 {
-  DataArrayInt *ret=DataArrayInt::New();
+  checkAllocated();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
   int nbComp=getNumberOfComponents();
   ret->alloc((int)std::distance(new2OldBg,new2OldEnd),nbComp);
   ret->copyStringInfoFrom(*this);
@@ -4286,7 +4333,7 @@ DataArrayInt *DataArrayInt::selectByTupleId(const int *new2OldBg, const int *new
   for(const int *w=new2OldBg;w!=new2OldEnd;w++,i++)
     std::copy(srcPt+(*w)*nbComp,srcPt+((*w)+1)*nbComp,pt+i*nbComp);
   ret->copyStringInfoFrom(*this);
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -4294,6 +4341,7 @@ DataArrayInt *DataArrayInt::selectByTupleId(const int *new2OldBg, const int *new
  */
 DataArrayInt *DataArrayInt::selectByTupleIdSafe(const int *new2OldBg, const int *new2OldEnd) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
   int nbComp=getNumberOfComponents();
   int oldNbOfTuples=getNumberOfTuples();
@@ -4321,6 +4369,7 @@ DataArrayInt *DataArrayInt::selectByTupleIdSafe(const int *new2OldBg, const int 
  */
 DataArrayInt *DataArrayInt::selectByTupleId2(int bg, int end2, int step) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
   int nbComp=getNumberOfComponents();
   int newNbOfTuples=GetNumberOfItemGivenBES(bg,end2,step,"DataArrayInt::selectByTupleId2 : ");
@@ -4345,10 +4394,10 @@ DataArrayInt *DataArrayInt::selectByTupleRanges(const std::vector<std::pair<int,
   int nbOfTuplesThis=getNumberOfTuples();
   if(ranges.empty())
     {
-      DataArrayInt *ret=DataArrayInt::New();
+      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
       ret->alloc(0,nbOfComp);
       ret->copyStringInfoFrom(*this);
-      return ret;
+      return ret.retn();
     }
   int ref=ranges.front().first;
   int nbOfTuples=0;
@@ -4613,6 +4662,7 @@ DataArrayDouble *DataArrayInt::convertToDblArr() const
  */
 DataArrayInt *DataArrayInt::substr(int tupleIdBg, int tupleIdEnd) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   int nbt=getNumberOfTuples();
   if(tupleIdBg<0)
     throw INTERP_KERNEL::Exception("DataArrayInt::substr : The tupleIdBg parameter must be greater than 0 !");
@@ -4757,6 +4807,8 @@ void DataArrayInt::setSelectedComponents(const DataArrayInt *a, const std::vecto
 {
   if(!a)
     throw INTERP_KERNEL::Exception("DataArrayInt::setSelectedComponents : input DataArrayInt is NULL !");
+  checkAllocated();
+  a->checkAllocated();
   copyPartOfStringInfoFrom2(compoIds,*a);
   std::size_t partOfCompoSz=compoIds.size();
   int nbOfCompo=getNumberOfComponents();
@@ -5206,6 +5258,7 @@ DataArrayIntIterator *DataArrayInt::iterator()
 
 DataArrayInt *DataArrayInt::getIdsEqual(int val) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("DataArrayInt::getIdsEqual : the array must have only one component, you can call 'rearrange' method before !");
   const int *cptr=getConstPointer();
@@ -5219,6 +5272,7 @@ DataArrayInt *DataArrayInt::getIdsEqual(int val) const throw(INTERP_KERNEL::Exce
 
 DataArrayInt *DataArrayInt::getIdsNotEqual(int val) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("DataArrayInt::getIdsNotEqual : the array must have only one component, you can call 'rearrange' method before !");
   const int *cptr=getConstPointer();
@@ -5238,9 +5292,9 @@ DataArrayInt *DataArrayInt::getIdsNotEqual(int val) const throw(INTERP_KERNEL::E
  */
 int DataArrayInt::changeValue(int oldValue, int newValue) throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("DataArrayInt::changeValue : the array must have only one component, you can call 'rearrange' method before !");
-  checkAllocated();
   int *start=getPointer();
   int *end2=start+getNbOfElems();
   int ret=0;
@@ -5303,6 +5357,7 @@ DataArrayInt *DataArrayInt::getIdsNotEqualList(const int *valsBg, const int *val
  */
 int DataArrayInt::locateTuple(const std::vector<int>& tupl) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   int nbOfCompo=getNumberOfComponents();
   if(nbOfCompo==0)
     throw INTERP_KERNEL::Exception("DataArrayInt::locateTuple : 0 components in 'this' !");
@@ -5335,6 +5390,7 @@ int DataArrayInt::locateTuple(const std::vector<int>& tupl) const throw(INTERP_K
  */
 int DataArrayInt::search(const std::vector<int>& vals) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   int nbOfCompo=getNumberOfComponents();
   if(nbOfCompo!=1)
     throw INTERP_KERNEL::Exception("DataArrayInt::search : works only for DataArrayInt instance with one component !");
@@ -5354,6 +5410,7 @@ int DataArrayInt::search(const std::vector<int>& vals) const throw(INTERP_KERNEL
  */
 int DataArrayInt::locateValue(int value) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("DataArrayInt::presenceOfValue : the array must have only one component, you can call 'rearrange' method before !");
   const int *cptr=getConstPointer();
@@ -5372,6 +5429,7 @@ int DataArrayInt::locateValue(int value) const throw(INTERP_KERNEL::Exception)
  */
 int DataArrayInt::locateValue(const std::vector<int>& vals) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("DataArrayInt::presenceOfValue : the array must have only one component, you can call 'rearrange' method before !");
   std::set<int> vals2(vals.begin(),vals.end());
@@ -5489,6 +5547,7 @@ DataArrayInt *DataArrayInt::Aggregate(const std::vector<const DataArrayInt *>& a
 
 int DataArrayInt::getMaxValue(int& tupleId) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("DataArrayInt::getMaxValue : must be applied on DataArrayInt with only one component !");
   int nbOfTuples=getNumberOfTuples();
@@ -5512,6 +5571,7 @@ int DataArrayInt::getMaxValueInArray() const throw(INTERP_KERNEL::Exception)
 
 int DataArrayInt::getMinValue(int& tupleId) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("DataArrayInt::getMaxValue : must be applied on DataArrayInt with only one component !");
   int nbOfTuples=getNumberOfTuples();
@@ -5639,6 +5699,7 @@ void DataArrayInt::applyModulus(int val) throw(INTERP_KERNEL::Exception)
  */
 DataArrayInt *DataArrayInt::getIdsInRange(int vmin, int vmax) const throw(INTERP_KERNEL::Exception)
 {
+  checkAllocated();
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("DataArrayInt::getIdsInRange : this must have exactly one component !");
   const int *cptr=getConstPointer();
@@ -6355,6 +6416,7 @@ void DataArrayInt::addEqual(const DataArrayInt *other) throw(INTERP_KERNEL::Exce
   if(!other)
     throw INTERP_KERNEL::Exception("DataArrayInt::addEqual : input DataArrayInt instance is NULL !");
   const char *msg="Nb of tuples mismatch for DataArrayInt::addEqual  !";
+  checkAllocated(); other->checkAllocated();
   int nbOfTuple=getNumberOfTuples();
   int nbOfTuple2=other->getNumberOfTuples();
   int nbOfComp=getNumberOfComponents();
@@ -6452,6 +6514,7 @@ void DataArrayInt::substractEqual(const DataArrayInt *other) throw(INTERP_KERNEL
   if(!other)
     throw INTERP_KERNEL::Exception("DataArrayInt::substractEqual : input DataArrayInt instance is NULL !");
   const char *msg="Nb of tuples mismatch for DataArrayInt::substractEqual  !";
+  checkAllocated(); other->checkAllocated();
   int nbOfTuple=getNumberOfTuples();
   int nbOfTuple2=other->getNumberOfTuples();
   int nbOfComp=getNumberOfComponents();
@@ -6559,6 +6622,7 @@ void DataArrayInt::multiplyEqual(const DataArrayInt *other) throw(INTERP_KERNEL:
   if(!other)
     throw INTERP_KERNEL::Exception("DataArrayInt::multiplyEqual : input DataArrayInt instance is NULL !");
   const char *msg="Nb of tuples mismatch for DataArrayInt::multiplyEqual !";
+  checkAllocated(); other->checkAllocated();
   int nbOfTuple=getNumberOfTuples();
   int nbOfTuple2=other->getNumberOfTuples();
   int nbOfComp=getNumberOfComponents();
@@ -6656,6 +6720,7 @@ void DataArrayInt::divideEqual(const DataArrayInt *other) throw(INTERP_KERNEL::E
   if(!other)
     throw INTERP_KERNEL::Exception("DataArrayInt::divideEqual : input DataArrayInt instance is NULL !");
   const char *msg="Nb of tuples mismatch for DataArrayInt::divideEqual !";
+  checkAllocated(); other->checkAllocated();
   int nbOfTuple=getNumberOfTuples();
   int nbOfTuple2=other->getNumberOfTuples();
   int nbOfComp=getNumberOfComponents();
@@ -6753,6 +6818,7 @@ void DataArrayInt::modulusEqual(const DataArrayInt *other) throw(INTERP_KERNEL::
   if(!other)
     throw INTERP_KERNEL::Exception("DataArrayInt::modulusEqual : input DataArrayInt instance is NULL !");
   const char *msg="Nb of tuples mismatch for DataArrayInt::modulusEqual !";
+  checkAllocated(); other->checkAllocated();
   int nbOfTuple=getNumberOfTuples();
   int nbOfTuple2=other->getNumberOfTuples();
   int nbOfComp=getNumberOfComponents();
