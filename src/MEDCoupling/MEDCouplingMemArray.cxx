@@ -847,7 +847,7 @@ DataArrayDouble *DataArrayDouble::fromNoInterlace() const throw(INTERP_KERNEL::E
 DataArrayDouble *DataArrayDouble::toNoInterlace() const throw(INTERP_KERNEL::Exception)
 {
   if(_mem.isNull())
-    throw INTERP_KERNEL::Exception("DataArrayDouble::fromNoInterlace : Not defined array !");
+    throw INTERP_KERNEL::Exception("DataArrayDouble::toNoInterlace : Not defined array !");
   double *tab=_mem.toNoInterlace(getNumberOfComponents());
   DataArrayDouble *ret=DataArrayDouble::New();
   ret->useArray(tab,true,CPP_DEALLOC,getNumberOfTuples(),getNumberOfComponents());
@@ -3886,7 +3886,7 @@ void DataArrayInt::splitByValueRange(const int *arrBg, const int *arrEnd,
  * value i.
  * indArr[v] where 'indArr' is defined by ['indArrBg','indArrEnd').
  * This method is safe that is to say if there is location i so that indArr[v] is not in [0,this->getNumberOfTuples()) an exception
- * will be thrown. An exception is also throw if there is a location i so that \a this[i] not in [0,distance(indArrBg,indArrEnd)) !
+ * will be thrown. An exception is also thrown if there is a location i so that \a this[i] not in [0,distance(indArrBg,indArrEnd)) !
  */
 DataArrayInt *DataArrayInt::transformWithIndArrR(const int *indArrBg, const int *indArrEnd) const throw(INTERP_KERNEL::Exception)
 {
