@@ -4484,11 +4484,11 @@ void DataArrayInt::changeSurjectiveFormat(int targetNb, DataArrayInt *&arr, Data
   for(int i=0;i<nbOfTuples;i++)
     {
       int tmp2=input[i];
-      if(tmp2<targetNb)
+      if(tmp2>=0 && tmp2<targetNb)
         tmp[tmp2].push_back(i);
       else
         {
-          std::ostringstream oss; oss << "DataArrayInt::changeSurjectiveFormat : At pos " << i << " presence of element " << tmp2 << " higher than " << targetNb;
+          std::ostringstream oss; oss << "DataArrayInt::changeSurjectiveFormat : At pos " << i << " presence of element " << tmp2 << " ! should be in [0," << targetNb << ") !";
           throw INTERP_KERNEL::Exception(oss.str().c_str());
         }
     }
