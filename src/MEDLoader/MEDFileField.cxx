@@ -2219,7 +2219,7 @@ MEDCouplingFieldDouble *MEDFileFieldPerMesh::finishFieldNode2(const MEDFileField
   int nnodes=mesh2->getNumberOfNodes();
   if(nnodes==da->getNbOfElems())
     {
-      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> da3=da->transformWithIndArrR(arr2->getConstPointer(),arr2->getConstPointer()+arr2->getNbOfElems());
+      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> da3=da->transformWithIndArrR(arr2->begin(),arr2->end());
       ret->getArray()->renumberInPlace(da3->getConstPointer());
       mesh2->setName(mesh->getName());
       ret->setMesh(mesh2);
