@@ -2090,7 +2090,7 @@ static const int * getGibi2MedConnectivity( const medGeometryElement type )
 {
   static vector<const int*> conn;
   static int hexa20 [] = {0,6,4,2, 12,18,16,14, 7,5,3,1, 19,17,15,13, 8,11,10,9};
-  static int penta15[] = {0,2,4, 9,11,13, 1,3,5, 10,12,14, 6,7,3};
+  static int penta15[] = {0,2,4, 9,11,13, 1,3,5, 10,12,14, 6,8,7};
   static int pyra13 [] = {0,2,4,6, 12, 1,3,5,7, 8,9,10,11};
   static int tetra10[] = {0,2,4, 9, 1,3,5, 6,7,8};
   static int quad8  [] = {0,2,4,6, 1,3,5,7};
