@@ -251,6 +251,8 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayDoubleTuple::buildDADouble;
 %newobject ParaMEDMEM::MEDCouplingMesh::deepCpy;
 %newobject ParaMEDMEM::MEDCouplingMesh::checkTypeConsistencyAndContig;
+%newobject ParaMEDMEM::MEDCouplingMesh::computeNbOfNodesPerCell;
+%newobject ParaMEDMEM::MEDCouplingMesh::giveCellsWithType;
 %newobject ParaMEDMEM::MEDCouplingMesh::getCoordinatesAndOwner;
 %newobject ParaMEDMEM::MEDCouplingMesh::getBarycenterAndOwner;
 %newobject ParaMEDMEM::MEDCouplingMesh::buildOrthogonalField;
@@ -277,13 +279,11 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::MEDCouplingUMesh::__iter__;
 %newobject ParaMEDMEM::MEDCouplingUMesh::__getitem__;
 %newobject ParaMEDMEM::MEDCouplingUMesh::cellsByType;
-%newobject ParaMEDMEM::MEDCouplingUMesh::giveCellsWithType;
 %newobject ParaMEDMEM::MEDCouplingUMesh::zipConnectivityTraducer;
 %newobject ParaMEDMEM::MEDCouplingUMesh::buildDescendingConnectivity;
 %newobject ParaMEDMEM::MEDCouplingUMesh::buildDescendingConnectivity2;
 %newobject ParaMEDMEM::MEDCouplingUMesh::buildExtrudedMesh;
 %newobject ParaMEDMEM::MEDCouplingUMesh::buildSpreadZonesWithPoly;
-%newobject ParaMEDMEM::MEDCouplingUMesh::computeNbOfNodesPerCell;
 %newobject ParaMEDMEM::MEDCouplingUMesh::MergeUMeshes;
 %newobject ParaMEDMEM::MEDCouplingUMesh::MergeUMeshesOnSameCoords;
 %newobject ParaMEDMEM::MEDCouplingUMesh::ComputeSpreadZoneGradually;
@@ -491,6 +491,8 @@ namespace ParaMEDMEM
     virtual int getMeshDimension() const throw(INTERP_KERNEL::Exception);
     virtual DataArrayDouble *getCoordinatesAndOwner() const throw(INTERP_KERNEL::Exception);
     virtual DataArrayDouble *getBarycenterAndOwner() const throw(INTERP_KERNEL::Exception);
+    virtual DataArrayInt *giveCellsWithType(INTERP_KERNEL::NormalizedCellType type) const throw(INTERP_KERNEL::Exception);
+    virtual DataArrayInt *computeNbOfNodesPerCell() const throw(INTERP_KERNEL::Exception);
     virtual int getNumberOfCellsWithType(INTERP_KERNEL::NormalizedCellType type) const throw(INTERP_KERNEL::Exception);
     virtual INTERP_KERNEL::NormalizedCellType getTypeOfCell(int cellId) const throw(INTERP_KERNEL::Exception);
     virtual std::string simpleRepr() const;
@@ -1375,7 +1377,6 @@ namespace ParaMEDMEM
     int getNumberOfNodesInCell(int cellId) const throw(INTERP_KERNEL::Exception);
     int getMeshLength() const throw(INTERP_KERNEL::Exception);
     void computeTypes() throw(INTERP_KERNEL::Exception);
-    DataArrayInt *giveCellsWithType(INTERP_KERNEL::NormalizedCellType type) const throw(INTERP_KERNEL::Exception);
     std::string reprConnectivityOfThis() const throw(INTERP_KERNEL::Exception);
     MEDCouplingUMesh *buildSetInstanceFromThis(int spaceDim) const throw(INTERP_KERNEL::Exception);
     //tools
@@ -1390,7 +1391,6 @@ namespace ParaMEDMEM
     DataArrayInt *convertCellArrayPerGeoType(const DataArrayInt *da) const throw(INTERP_KERNEL::Exception);
     DataArrayInt *computeFetchedNodeIds() const throw(INTERP_KERNEL::Exception);
     DataArrayInt *zipConnectivityTraducer(int compType, int startCellId=0) throw(INTERP_KERNEL::Exception);
-    DataArrayInt *computeNbOfNodesPerCell() const throw(INTERP_KERNEL::Exception);
     MEDCouplingUMesh *buildDescendingConnectivity(DataArrayInt *desc, DataArrayInt *descIndx, DataArrayInt *revDesc, DataArrayInt *revDescIndx) const throw(INTERP_KERNEL::Exception);
     MEDCouplingUMesh *buildDescendingConnectivity2(DataArrayInt *desc, DataArrayInt *descIndx, DataArrayInt *revDesc, DataArrayInt *revDescIndx) const throw(INTERP_KERNEL::Exception);
     void orientCorrectlyPolyhedrons() throw(INTERP_KERNEL::Exception);
