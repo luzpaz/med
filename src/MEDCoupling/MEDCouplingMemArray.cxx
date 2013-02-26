@@ -5894,12 +5894,12 @@ DataArrayInt *DataArrayInt::BuildIntersection(const std::vector<const DataArrayI
     {
       (*it)->checkAllocated();
       if((*it)->getNumberOfComponents()!=1)
-        throw INTERP_KERNEL::Exception("DataArrayInt::BuildUnion : only single component allowed !");
+        throw INTERP_KERNEL::Exception("DataArrayInt::BuildIntersection : only single component allowed !");
       int tmp1;
       valm=std::min((*it)->getMinValue(tmp1),valm);
     }
   if(valm<0)
-    throw INTERP_KERNEL::Exception("DataArrayInt::BuildUnion : a negative value has been detected !");
+    throw INTERP_KERNEL::Exception("DataArrayInt::BuildIntersection : a negative value has been detected !");
   //
   std::set<int> r;
   for(std::vector<const DataArrayInt *>::const_iterator it=a.begin();it!=a.end();it++)
