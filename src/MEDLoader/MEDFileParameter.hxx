@@ -64,6 +64,7 @@ namespace ParaMEDMEM
     bool isEqual(const MEDFileParameter1TS *other, double eps, std::string& what) const;
     std::size_t getHeapMemorySize() const;
     void readValue(med_idt fid, const std::string& name) throw(INTERP_KERNEL::Exception);
+    std::string simpleRepr() const;
   protected:
     MEDFileParameterDouble1TSWTI();
     MEDFileParameterDouble1TSWTI(int iteration, int order, double time);
@@ -124,6 +125,7 @@ namespace ParaMEDMEM
     void setName(const char *name) { _name=name; }
     std::size_t getHeapMemorySize() const;
     MEDFileParameterMultiTS *deepCpy() const throw(INTERP_KERNEL::Exception);
+    bool isEqual(const MEDFileParameterMultiTS *other, double eps, std::string& what) const;
     void write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception);
     void writeLL(med_idt fid, const MEDFileWritable& mw) const throw(INTERP_KERNEL::Exception);
     std::string simpleRepr() const;
@@ -131,6 +133,7 @@ namespace ParaMEDMEM
     double getDoubleValue(int iteration, int order) const throw(INTERP_KERNEL::Exception);
     int getPosOfTimeStep(int iteration, int order) const throw(INTERP_KERNEL::Exception);
     int getPosGivenTime(double time, double eps=1e-8) const throw(INTERP_KERNEL::Exception);
+    MEDFileParameter1TS *getTimeStepAtPos(int posId) const throw(INTERP_KERNEL::Exception);
     void eraseTimeStepIds(const int *startIds, const int *endIds) throw(INTERP_KERNEL::Exception);
     std::vector< std::pair<int,int> > getIterations() const throw(INTERP_KERNEL::Exception);
     std::vector< std::pair<int,int> > getTimeSteps(std::vector<double>& ret1) const throw(INTERP_KERNEL::Exception);
@@ -152,6 +155,7 @@ namespace ParaMEDMEM
     static MEDFileParameters *New(const char *fileName) throw(INTERP_KERNEL::Exception);
     std::size_t getHeapMemorySize() const;
     MEDFileParameters *deepCpy() const throw(INTERP_KERNEL::Exception);
+    bool isEqual(const MEDFileParameters *other, double eps, std::string& what) const;
     void write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception);
     void writeLL(med_idt fid) const throw(INTERP_KERNEL::Exception);
     std::vector<std::string> getParamsNames() const throw(INTERP_KERNEL::Exception);

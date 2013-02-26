@@ -91,10 +91,9 @@ void MEDFileData::setMeshes(MEDFileMeshes *meshes) throw(INTERP_KERNEL::Exceptio
 
 void MEDFileData::setParams(MEDFileParameters *params) throw(INTERP_KERNEL::Exception)
 {
-  if(!params)
+  if(params)
     params->incrRef();
   _params=params;
-  
 }
 
 int MEDFileData::getNumberOfFields() const throw(INTERP_KERNEL::Exception)
@@ -140,7 +139,7 @@ std::string MEDFileData::simpleRepr() const
       tmp2->simpleReprWithoutHeader(oss);
     }
   else
-    oss << "No meshes set !!!\n";
+    oss << "No meshes set !!!\n\n";
   oss << "Params part :\n*************\n\n";
   const MEDFileParameters *tmp3=_params;
   if(tmp3)
@@ -223,6 +222,7 @@ try
   {
     _fields=MEDFileFields::New(fileName);
     _meshes=MEDFileMeshes::New(fileName);
+    _params=MEDFileParameters::New(fileName);
   }
 catch(INTERP_KERNEL::Exception& e)
   {

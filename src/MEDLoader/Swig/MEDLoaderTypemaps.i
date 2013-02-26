@@ -39,6 +39,8 @@ static PyObject* convertMEDFileParameter1TS(ParaMEDMEM::MEDFileParameter1TS* p1t
   PyObject *ret=0;
   if(dynamic_cast<MEDFileParameterDouble1TS *>(p1ts))
     ret=SWIG_NewPointerObj((void*)p1ts,SWIGTYPE_p_ParaMEDMEM__MEDFileParameterDouble1TS,owner);
+  if(dynamic_cast<MEDFileParameterDouble1TSWTI *>(p1ts))
+    ret=SWIG_NewPointerObj((void*)p1ts,SWIGTYPE_p_ParaMEDMEM__MEDFileParameterDouble1TSWTI,owner);
   if(!ret)
     throw INTERP_KERNEL::Exception("Not recognized type of MEDFileParameter1TS on downcast !");
   return ret;

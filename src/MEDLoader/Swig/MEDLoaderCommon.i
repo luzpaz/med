@@ -133,10 +133,13 @@ using namespace ParaMEDMEM;
 %newobject ParaMEDMEM::MEDFileParameterDouble1TS::deepCpy;
 %newobject ParaMEDMEM::MEDFileParameterMultiTS::New;
 %newobject ParaMEDMEM::MEDFileParameterMultiTS::deepCpy;
+%newobject ParaMEDMEM::MEDFileParameterMultiTS::getTimeStepAtPos;
+%newobject ParaMEDMEM::MEDFileParameterMultiTS::__getitem__;
 %newobject ParaMEDMEM::MEDFileParameters::New;
 %newobject ParaMEDMEM::MEDFileParameters::deepCpy;
 %newobject ParaMEDMEM::MEDFileParameters::getParamAtPos;
 %newobject ParaMEDMEM::MEDFileParameters::getParamWithName;
+%newobject ParaMEDMEM::MEDFileParameters::__getitem__;
 
 %newobject ParaMEDMEM::SauvWriter::New;
 %newobject ParaMEDMEM::SauvReader::New;
@@ -152,6 +155,7 @@ using namespace ParaMEDMEM;
 %feature("unref") MEDFileFieldMultiTS "$this->decrRef();"
 %feature("unref") MEDFileFields "$this->decrRef();"
 %feature("unref") MEDFileParameter1TS "$this->decrRef();"
+%feature("unref") MEDFileParameterDouble1TSWTI "$this->decrRef();"
 %feature("unref") MEDFileParameterDouble1TS "$this->decrRef();"
 %feature("unref") MEDFileParameterMultiTS "$this->decrRef();"
 %feature("unref") MEDFileParameters "$this->decrRef();"
@@ -1712,6 +1716,14 @@ namespace ParaMEDMEM
   public:
     void setValue(double val) throw(INTERP_KERNEL::Exception);
     double getValue() const throw(INTERP_KERNEL::Exception);
+    std::string simpleRepr() const;
+    %extend
+    {
+      std::string __str__() const throw(INTERP_KERNEL::Exception)
+      {
+        return self->simpleRepr();
+      }
+    }
   };
 
   class MEDFileParameterTinyInfo : public MEDFileWritable
@@ -1813,6 +1825,18 @@ namespace ParaMEDMEM
         return self->simpleRepr();
       }
       
+      PyObject *isEqual(const MEDFileParameterMultiTS *other, double eps) const
+      {
+        std::string what;
+        bool ret0=self->isEqual(other,eps,what);
+        PyObject *res=PyList_New(2);
+        PyObject *ret0Py=ret0?Py_True:Py_False;
+        Py_XINCREF(ret0Py);
+        PyList_SetItem(res,0,ret0Py);
+        PyList_SetItem(res,1,PyString_FromString(what.c_str()));
+        return res;
+      }
+      
       void eraseTimeStepIds(PyObject *ids) throw(INTERP_KERNEL::Exception)
       {
         int sw;
@@ -1843,6 +1867,84 @@ namespace ParaMEDMEM
           default:
             throw INTERP_KERNEL::Exception("MEDFileParameterMultiTS::eraseTimeStepIds : unexpected input array type recognized !");
           }
+      }
+
+      int getTimeStepId(PyObject *elt0) const throw(INTERP_KERNEL::Exception)
+      {
+        if(elt0 && PyInt_Check(elt0))
+          {//fmts[3]
+            int pos=PyInt_AS_LONG(elt0);
+            return pos;
+          }
+        else if(elt0 && PyTuple_Check(elt0))
+          {
+            if(PyTuple_Size(elt0)==2)
+              {
+                PyObject *o0=PyTuple_GetItem(elt0,0);
+                PyObject *o1=PyTuple_GetItem(elt0,1);
+                if(PyInt_Check(o0) && PyInt_Check(o1))
+                  {//fmts(1,-1)
+                    int iter=PyInt_AS_LONG(o0);
+                    int order=PyInt_AS_LONG(o1);
+                    return self->getPosOfTimeStep(iter,order);
+                  }
+                else
+                  throw INTERP_KERNEL::Exception("MEDFileParameterMultiTS::getTimeStepId : invalid input param ! input is a tuple of size 2 but two integers are expected in this tuple to request a time steps !");
+              }
+            else
+              throw INTERP_KERNEL::Exception("MEDFileParameterMultiTS::getTimeStepId : invalid input param ! input is a tuple of size != 2 ! two integers are expected in this tuple to request a time steps !");
+          }
+        else if(elt0 && PyFloat_Check(elt0))
+          {
+            double val=PyFloat_AS_DOUBLE(elt0);
+            return self->getPosGivenTime(val);
+          }
+        else
+          throw INTERP_KERNEL::Exception("MEDFileParameterMultiTS::getTimeStepId : invalid input params ! expected fmts[int], fmts[int,int] or fmts[double] to request time step !");
+      }
+
+      MEDFileParameter1TS *__getitem__(PyObject *elt0) const throw(INTERP_KERNEL::Exception)
+      {
+        MEDFileParameter1TS *ret=self->getTimeStepAtPos(ParaMEDMEM_MEDFileParameterMultiTS_getTimeStepId(self,elt0));
+        if(ret)
+          ret->incrRef();
+        return ret;
+      }
+
+      std::vector<int> getTimeStepIds(PyObject *elts) const throw(INTERP_KERNEL::Exception)
+      {
+        if(PyList_Check(elts))
+          {
+            int sz=PyList_Size(elts);
+            std::vector<int> ret(sz);
+            for(int i=0;i<sz;i++)
+              {
+                PyObject *elt=PyList_GetItem(elts,i);
+                ret[i]=ParaMEDMEM_MEDFileParameterMultiTS_getTimeStepId(self,elt);
+              }
+            return ret;
+          }
+        else
+          {
+            std::vector<int> ret(1);
+            ret[0]=ParaMEDMEM_MEDFileParameterMultiTS_getTimeStepId(self,elts);
+            return ret;
+          }
+      }
+
+      void __delitem__(PyObject *elts) throw(INTERP_KERNEL::Exception)
+      {
+        std::vector<int> idsToRemove=ParaMEDMEM_MEDFileParameterMultiTS_getTimeStepIds(self,elts);
+        if(!idsToRemove.empty())
+          self->eraseTimeStepIds(&idsToRemove[0],&idsToRemove[0]+idsToRemove.size());
+      }
+      
+      MEDFileParameter1TS *getTimeStepAtPos(int posId) const throw(INTERP_KERNEL::Exception)
+      {
+        MEDFileParameter1TS *ret=self->getTimeStepAtPos(posId);
+        if(ret)
+          ret->incrRef();
+        return ret;
       }
 
       PyObject *getIterations() const throw(INTERP_KERNEL::Exception)
@@ -1911,6 +2013,26 @@ namespace ParaMEDMEM
         return self->simpleRepr();
       }
 
+      MEDFileParameterMultiTS *__getitem__(PyObject *obj) throw(INTERP_KERNEL::Exception)
+      {
+        if(PyInt_Check(obj))
+          {
+            MEDFileParameterMultiTS *ret=self->getParamAtPos((int)PyInt_AS_LONG(obj));
+            if(ret)
+              ret->incrRef();
+            return ret;
+          }
+        else if(PyString_Check(obj))
+          {
+            MEDFileParameterMultiTS *ret=self->getParamWithName(PyString_AsString(obj));
+            if(ret)
+              ret->incrRef();
+            return ret;
+          }
+        else
+          throw INTERP_KERNEL::Exception("MEDFileParameters::__getitem__ : only integer or string with meshname supported !");
+      }
+      
       MEDFileParameterMultiTS *getParamAtPos(int i) const throw(INTERP_KERNEL::Exception)
       {
         MEDFileParameterMultiTS *ret=self->getParamAtPos(i);
@@ -1925,6 +2047,18 @@ namespace ParaMEDMEM
         if(ret)
           ret->incrRef();
         return ret;
+      }
+      
+      PyObject *isEqual(const MEDFileParameters *other, double eps) const
+      {
+        std::string what;
+        bool ret0=self->isEqual(other,eps,what);
+        PyObject *res=PyList_New(2);
+        PyObject *ret0Py=ret0?Py_True:Py_False;
+        Py_XINCREF(ret0Py);
+        PyList_SetItem(res,0,ret0Py);
+        PyList_SetItem(res,1,PyString_FromString(what.c_str()));
+        return res;
       }
     }
   };

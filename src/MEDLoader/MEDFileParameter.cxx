@@ -70,6 +70,13 @@ std::size_t MEDFileParameterDouble1TSWTI::getHeapMemorySize() const
   return sizeof(MEDFileParameterDouble1TSWTI);
 }
 
+std::string MEDFileParameterDouble1TSWTI::simpleRepr() const
+{
+  std::ostringstream oss;
+  simpleRepr2(0,oss);
+  return oss.str();
+}
+
 void MEDFileParameterDouble1TSWTI::simpleRepr2(int bkOffset, std::ostream& oss) const
 {
   std::string startOfLine(bkOffset,' ');
@@ -478,6 +485,25 @@ MEDFileParameterMultiTS *MEDFileParameterMultiTS::deepCpy() const throw(INTERP_K
   return new MEDFileParameterMultiTS(*this,true);
 }
 
+bool MEDFileParameterMultiTS::isEqual(const MEDFileParameterMultiTS *other, double eps, std::string& what) const
+{
+  if(!other)
+    { what="other is null !"; return false; }
+  if(_param_per_ts.size()!=other->_param_per_ts.size())
+    { what="number of time steps differs !"; return false; }
+  std::ostringstream oss;
+  for(std::size_t i=0;i<_param_per_ts.size();i++)
+    {
+      const MEDFileParameter1TS *a(_param_per_ts[i]),*b(other->_param_per_ts[i]);
+      if((a && !b) || (!a && b))
+        { oss << "At time step id #" << i << " pointer is defined on one side not in the other !"; what=oss.str(); return false; }
+      if(a)
+        if(!a->isEqual(b,eps,what))
+          { oss << " At time step id #" << i << " non equality !"; what+=oss.str(); return false; }
+    }
+  return true;
+}
+
 void MEDFileParameterMultiTS::write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception)
 {
   med_access_mode medmod=MEDFileUtilities::TraduceWriteMode(mode);
@@ -491,7 +517,7 @@ void MEDFileParameterMultiTS::writeLL(med_idt fid, const MEDFileWritable& mw) co
   for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileParameter1TS> >::const_iterator it=_param_per_ts.begin();it!=_param_per_ts.end();it++)
     {
       const MEDFileParameter1TS *elt(*it);
-      if(dynamic_cast<const MEDFileParameterDouble1TS *>(elt))
+      if(dynamic_cast<const MEDFileParameterDouble1TSWTI *>(elt))
         diffType.insert(MED_FLOAT64);
     }
   if(diffType.size()>1)
@@ -587,6 +613,19 @@ int MEDFileParameterMultiTS::getPosGivenTime(double time, double eps) const thro
         }
     }
   throw INTERP_KERNEL::Exception(oss.str().c_str());
+}
+
+/*!
+ * \return an internal pointer that can be null. Warning the caller is \b not responsible of the returned pointer.
+ */
+MEDFileParameter1TS *MEDFileParameterMultiTS::getTimeStepAtPos(int posId) const throw(INTERP_KERNEL::Exception)
+{
+  if(posId<0 || posId>=(int)_param_per_ts.size())
+    {
+      std::ostringstream oss; oss << "MEDFileParameterMultiTS::getTimeStepAtPos : invalid pos ! Should be in [0," << _param_per_ts.size() << ") !";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
+    }
+  return const_cast<MEDFileParameter1TS *>(static_cast<const MEDFileParameter1TS *>(_param_per_ts[posId]));
 }
 
 void MEDFileParameterMultiTS::eraseTimeStepIds(const int *startIds, const int *endIds) throw(INTERP_KERNEL::Exception)
@@ -689,6 +728,25 @@ std::size_t MEDFileParameters::getHeapMemorySize() const
 MEDFileParameters *MEDFileParameters::deepCpy() const throw(INTERP_KERNEL::Exception)
 {
   return new MEDFileParameters(*this,true);
+}
+
+bool MEDFileParameters::isEqual(const MEDFileParameters *other, double eps, std::string& what) const
+{
+  if(!other)
+    { what="other is null !"; return false; }
+  if(_params.size()!=other->_params.size())
+    { what="number of parameters differs !"; return false; }
+  std::ostringstream oss;
+  for(std::size_t i=0;i<_params.size();i++)
+    {
+      const MEDFileParameterMultiTS *a(_params[i]),*b(other->_params[i]);
+      if((a && !b) || (!a && b))
+        { oss << "At param with id #" << i << " pointer is defined on one side not in the other !"; what=oss.str(); return false; }
+      if(a)
+        if(!a->isEqual(b,eps,what))
+          { oss << " At param with id #" << i << " non equality !"; what+=oss.str(); return false; }
+    }
+  return true;
 }
 
 MEDFileParameters::MEDFileParameters(const MEDFileParameters& other, bool deepCopy):MEDFileWritable(other),_params(other._params)
@@ -825,7 +883,7 @@ int MEDFileParameters::getPosFromParamName(const char *paramName) const throw(IN
       const MEDFileParameterMultiTS *elt(*it);
       if(elt)
         {
-          if(elt->getName()==paramName)
+          if(std::string(elt->getName())==paramName)
             return ret;
           else
             oss << elt->getName() << ", ";
