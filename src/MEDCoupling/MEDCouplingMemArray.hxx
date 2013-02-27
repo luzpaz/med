@@ -168,6 +168,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT void cpyFrom(const DataArrayDouble& other) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void reserve(int nbOfElems) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void pushBackSilent(double val) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void pushBackValsSilent(const double *valsBg, const double *valsEnd) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT double popBackSilent() throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void pack() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT int getNbOfElemAllocated() const { return _mem.getNbOfElemAllocated(); }
@@ -375,6 +376,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT void cpyFrom(const DataArrayInt& other) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void reserve(int nbOfElems) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void pushBackSilent(int val) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void pushBackValsSilent(const int *valsBg, const int *valsEnd) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT int popBackSilent() throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void pack() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT int getNbOfElemAllocated() const { return _mem.getNbOfElemAllocated(); }

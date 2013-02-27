@@ -4358,7 +4358,7 @@ void MEDCouplingUMesh::convertQuadraticCellsToLinear() throw(INTERP_KERNEL::Exce
   _types.clear();
   for(int i=0;i<nbOfCells;i++,ociptr++)
     {
-      INTERP_KERNEL::NormalizedCellType type=getTypeOfCell(i);
+      INTERP_KERNEL::NormalizedCellType type=(INTERP_KERNEL::NormalizedCellType)icptr[iciptr[i]];
       const INTERP_KERNEL::CellModel& cm=INTERP_KERNEL::CellModel::GetCellModel(type);
       if(!cm.isQuadratic())
         {
@@ -4378,6 +4378,115 @@ void MEDCouplingUMesh::convertQuadraticCellsToLinear() throw(INTERP_KERNEL::Exce
         }
     }
   setConnectivity(newConn,newConnI,false);
+}
+
+/*!
+ * This method converts all linear cell in \a this to quadratic one.
+ * Contrary to MEDCouplingUMesh::convertQuadraticCellsToLinear method, here it is needed to specify the target
+ * type of cells expected. For example INTERP_KERNEL::NORM_TRI3 can be converted to INTERP_KERNEL::NORM_TRI6 if \a conversionType is equal to 0 (the default)
+ * or to INTERP_KERNEL::NORM_TRI7 if \a conversionType is equal to 1. All non linear cells and polyhedron in \a this are let untouched.
+ * Contrary to MEDCouplingUMesh::convertQuadraticCellsToLinear method, the coordinates in \a this can be become bigger. All created nodes will be put at the
+ * end of the existing coordinates.
+ * 
+ * \param [in] conversionType specifies the type of conversion expected. Only 0 (default) and 1 are supported presently. 0 those that creates the 'most' simple
+ *             corresponding quadratic cells. 1 is those creating the 'most' complex.
+ * \return a newly created DataArrayInt instance that the caller should deal with containing cell ids of converted cells.
+ * 
+ * \throw if \a this is not fully defined. It throws too if \a conversionType is not in [0,1].
+ *
+ * \sa MEDCouplingUMesh::convertQuadraticCellsToLinear
+ */
+DataArrayInt *MEDCouplingUMesh::convertLinearCellsToQuadratic(int conversionType) throw(INTERP_KERNEL::Exception)
+{
+  DataArrayInt *conn=0,*connI=0;
+  DataArrayDouble *coords=0;
+  std::set<INTERP_KERNEL::NormalizedCellType> types;
+  checkFullyDefined();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret,connSafe,connISafe;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> coordsSafe;
+  int meshDim=getMeshDimension();
+  switch(conversionType)
+    {
+    case 0:
+      switch(meshDim)
+        {
+        case 1:
+          ret=convertLinearCellsToQuadratic1D0(conn,connI,coords,types);
+          connSafe=conn; connISafe=connI; coordsSafe=coords;
+        case 2:
+          ret=convertLinearCellsToQuadratic2D0(conn,connI,coords,types);
+          connSafe=conn; connISafe=connI; coordsSafe=coords;
+        default:
+          throw INTERP_KERNEL::Exception("MEDCouplingUMesh::convertLinearCellsToQuadratic : conversion of type 0 mesh dimensions available are [1] !");
+        }
+      //case 1:
+      //return convertLinearCellsToQuadratic1();
+    default:
+      throw INTERP_KERNEL::Exception("MEDCouplingUMesh::convertLinearCellsToQuadratic : conversion type available are 0 (default, the simplest) and 1 (the most complex) !");
+    }
+  setConnectivity(connSafe,connISafe,false);
+  _types=types;
+  setCoords(coordsSafe);
+  return ret.retn();
+}
+
+/*!
+ * Implementes \a conversionType 0 for meshes with meshDim = 1, of MEDCouplingUMesh::convertLinearCellsToQuadratic method.
+ * \return a newly created DataArrayInt instance that the caller should deal with containing cell ids of converted cells.
+ * \sa MEDCouplingUMesh::convertLinearCellsToQuadratic.
+ */
+DataArrayInt *MEDCouplingUMesh::convertLinearCellsToQuadratic1D0(DataArrayInt *&conn, DataArrayInt *&connI, DataArrayDouble *& coords, std::set<INTERP_KERNEL::NormalizedCellType>& types) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> bary=getBarycenterAndOwner();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newConn=DataArrayInt::New(); newConn->alloc(0,1);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newConnI=DataArrayInt::New(); newConnI->alloc(1,1); newConnI->setIJ(0,0,0);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New(); ret->alloc(0,1);
+  int nbOfCells=getNumberOfCells();
+  int nbOfNodes=getNumberOfNodes();
+  const int *cPtr=_nodal_connec->getConstPointer();
+  const int *icPtr=_nodal_connec_index->getConstPointer();
+  int lastVal=0,offset=nbOfNodes;
+  for(int i=0;i<nbOfCells;i++,icPtr++)
+    {
+      INTERP_KERNEL::NormalizedCellType type=(INTERP_KERNEL::NormalizedCellType)cPtr[*icPtr];
+      if(type==INTERP_KERNEL::NORM_SEG2)
+        {
+          types.insert(INTERP_KERNEL::NORM_SEG3);
+          newConn->pushBackSilent((int)INTERP_KERNEL::NORM_SEG3);
+          newConn->pushBackValsSilent(cPtr+cPtr[0]+1,cPtr+cPtr[0]+3);
+          newConn->pushBackSilent(offset++);
+          newConnI->pushBackSilent(lastVal+4);
+          ret->pushBackSilent(i);
+          lastVal+=4;
+        }
+      else
+        {
+          types.insert(type);
+          int tmp=lastVal+(icPtr[1]-icPtr[0]);
+          newConnI->pushBackSilent(tmp);
+          newConn->pushBackValsSilent(cPtr+cPtr[0],cPtr+cPtr[1]);
+          lastVal=tmp;
+        }
+    }
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> tmp=bary->selectByTupleIdSafe(ret->begin(),ret->end());
+  conn=newConn.retn(); connI=newConnI.retn(); coords=DataArrayDouble::Aggregate(getCoords(),tmp);
+  return ret.retn();
+}
+
+/*!
+ * Implementes \a conversionType 0 for meshes with meshDim = 2, of MEDCouplingUMesh::convertLinearCellsToQuadratic method.
+ * \return a newly created DataArrayInt instance that the caller should deal with containing cell ids of converted cells.
+ * \sa MEDCouplingUMesh::convertLinearCellsToQuadratic.
+ */
+DataArrayInt *MEDCouplingUMesh::convertLinearCellsToQuadratic2D0(DataArrayInt *&conn, DataArrayInt *&connI, DataArrayDouble *& coords, std::set<INTERP_KERNEL::NormalizedCellType>& types) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> desc(DataArrayInt::New()),descI(DataArrayInt::New());
+  DataArrayInt *tmp2=DataArrayInt::New(),*tmp3=DataArrayInt::New();
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> m1D=buildDescendingConnectivity2(desc,descI,tmp2,tmp3); tmp2->decrRef(); tmp3->decrRef();
+  DataArrayInt *conn1D=0,*conn1DI=0;
+  std::set<INTERP_KERNEL::NormalizedCellType> types1D;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret1D=m1D->convertLinearCellsToQuadratic1D0(conn1D,conn1DI,coords,types1D); ret1D=0;
+  return 0;//tony
 }
 
 /*!

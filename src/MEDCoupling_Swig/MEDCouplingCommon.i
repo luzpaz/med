@@ -295,6 +295,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::MEDCouplingUMesh::computeFetchedNodeIds;
 %newobject ParaMEDMEM::MEDCouplingUMesh::getRenumArrForConsecutiveCellTypesSpec;
 %newobject ParaMEDMEM::MEDCouplingUMesh::buildDirectionVectorField;
+%newobject ParaMEDMEM::MEDCouplingUMesh::convertLinearCellsToQuadratic;
 %newobject ParaMEDMEM::MEDCouplingUMesh::getEdgeRatioField;
 %newobject ParaMEDMEM::MEDCouplingUMesh::getAspectRatioField;
 %newobject ParaMEDMEM::MEDCouplingUMesh::getWarpField;
@@ -1400,6 +1401,7 @@ namespace ParaMEDMEM
     void tessellate2D(double eps) throw(INTERP_KERNEL::Exception);
     void tessellate2DCurve(double eps) throw(INTERP_KERNEL::Exception);
     void convertQuadraticCellsToLinear() throw(INTERP_KERNEL::Exception);
+    DataArrayInt *convertLinearCellsToQuadratic(int conversionType=0) throw(INTERP_KERNEL::Exception);
     void convertDegeneratedCells() throw(INTERP_KERNEL::Exception);
     bool areOnlySimplexCells() const throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *getEdgeRatioField() const throw(INTERP_KERNEL::Exception);

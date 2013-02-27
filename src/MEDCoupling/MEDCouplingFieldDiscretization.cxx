@@ -1607,7 +1607,6 @@ void MEDCouplingFieldDiscretizationGaussNE::integral(const MEDCouplingMesh *mesh
   if(!mesh || !arr)
     throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationGaussNE::integral : input mesh or array is null !");
   int nbOfCompo=arr->getNumberOfComponents();
-  int nbOfTuples=arr->getNumberOfTuples();
   std::fill(res,res+nbOfCompo,0.);
   //
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> vol=getMeasureField(mesh,isWAbs);

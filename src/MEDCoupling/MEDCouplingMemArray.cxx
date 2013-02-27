@@ -584,12 +584,26 @@ void DataArrayDouble::pushBackSilent(double val) throw(INTERP_KERNEL::Exception)
     throw INTERP_KERNEL::Exception("DataArrayDouble::pushBackSilent : not available for DataArrayDouble with number of components different than 1 !");
 }
 
+void DataArrayDouble::pushBackValsSilent(const double *valsBg, const double *valsEnd) throw(INTERP_KERNEL::Exception)
+{
+  int nbCompo=getNumberOfComponents();
+  if(nbCompo==1)
+    _mem.insertAtTheEnd(valsBg,valsEnd);
+  else if(nbCompo==0)
+    {
+      _info_on_compo.resize(1);
+      _mem.insertAtTheEnd(valsBg,valsEnd);
+    }
+  else
+    throw INTERP_KERNEL::Exception("DataArrayDouble::pushBackValsSilent : not available for DataArrayDouble with number of components different than 1 !");
+}
+
 double DataArrayDouble::popBackSilent() throw(INTERP_KERNEL::Exception)
 {
   if(getNumberOfComponents()==1)
     return _mem.popBack();
   else
-    throw INTERP_KERNEL::Exception("DataArrayDouble::pushBackSilent : not available for DataArrayDouble with number of components different than 1 !");
+    throw INTERP_KERNEL::Exception("DataArrayDouble::popBackSilent : not available for DataArrayDouble with number of components different than 1 !");
 }
 
 void DataArrayDouble::pack() const throw(INTERP_KERNEL::Exception)
@@ -962,7 +976,7 @@ DataArrayDouble *DataArrayDouble::renumberAndReduce(const int *old2New, int newN
 DataArrayDouble *DataArrayDouble::selectByTupleId(const int *new2OldBg, const int *new2OldEnd) const
 {
   checkAllocated();
-  DataArrayDouble *ret=DataArrayDouble::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::New();
   int nbComp=getNumberOfComponents();
   ret->alloc((int)std::distance(new2OldBg,new2OldEnd),nbComp);
   ret->copyStringInfoFrom(*this);
@@ -972,7 +986,7 @@ DataArrayDouble *DataArrayDouble::selectByTupleId(const int *new2OldBg, const in
   for(const int *w=new2OldBg;w!=new2OldEnd;w++,i++)
     std::copy(srcPt+(*w)*nbComp,srcPt+((*w)+1)*nbComp,pt+i*nbComp);
   ret->copyStringInfoFrom(*this);
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -3699,12 +3713,26 @@ void DataArrayInt::pushBackSilent(int val) throw(INTERP_KERNEL::Exception)
     throw INTERP_KERNEL::Exception("DataArrayInt::pushBackSilent : not available for DataArrayInt with number of components different than 1 !");
 }
 
+void DataArrayInt::pushBackValsSilent(const int *valsBg, const int *valsEnd) throw(INTERP_KERNEL::Exception)
+{
+  int nbCompo=getNumberOfComponents();
+  if(nbCompo==1)
+    _mem.insertAtTheEnd(valsBg,valsEnd);
+  else if(nbCompo==0)
+    {
+      _info_on_compo.resize(1);
+      _mem.insertAtTheEnd(valsBg,valsEnd);
+    }
+  else
+    throw INTERP_KERNEL::Exception("DataArrayInt::pushBackValsSilent : not available for DataArrayInt with number of components different than 1 !");
+}
+
 int DataArrayInt::popBackSilent() throw(INTERP_KERNEL::Exception)
 {
   if(getNumberOfComponents()==1)
     return _mem.popBack();
   else
-    throw INTERP_KERNEL::Exception("DataArrayInt::pushBackSilent : not available for DataArrayInt with number of components different than 1 !");
+    throw INTERP_KERNEL::Exception("DataArrayInt::popBackSilent : not available for DataArrayInt with number of components different than 1 !");
 }
 
 void DataArrayInt::pack() const throw(INTERP_KERNEL::Exception)
