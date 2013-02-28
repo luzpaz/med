@@ -19,7 +19,7 @@
 // Author : Anthony Geay (CEA/DEN)
 
 template<class TServant>
-static PyObject *buildServantAndActivate(const typename TServant::CppType *pt)
+static PyObject *buildServantAndActivateCore(const typename TServant::CppType *pt, std::string& iorOut)
 {
   int argc=0;
   TServant *serv=new TServant(pt);
@@ -30,6 +30,7 @@ static PyObject *buildServantAndActivate(const typename TServant::CppType *pt)
   mgr->activate();
   CORBA::Object_var ret=serv->_this();
   char *ior=orb->object_to_string(ret);
+  iorOut=ior;
   PyObject *iorPython=PyString_FromString(ior);
   PyObject* pdict=PyDict_New();
   PyDict_SetItemString(pdict, "__builtins__", PyEval_GetBuiltins());
@@ -44,3 +45,20 @@ static PyObject *buildServantAndActivate(const typename TServant::CppType *pt)
   return corbaObj;
 }
 
+template<class TServant>
+static PyObject *buildServantAndActivate(const typename TServant::CppType *pt)
+{
+  std::string dummy;
+  return buildServantAndActivateCore<TServant>(pt,dummy);
+}
+
+template<class TServant>
+static PyObject *buildServantAndActivate2(const typename TServant::CppType *pt)
+{
+  std::string ret1Cpp;
+  PyObject *ret0Py=buildServantAndActivateCore<TServant>(pt,ret1Cpp);
+  PyObject *ret=PyTuple_New(2);
+  PyTuple_SetItem(ret,0,ret0Py);
+  PyTuple_SetItem(ret,1,PyString_FromString(ret1Cpp.c_str()));
+  return ret;
+}
