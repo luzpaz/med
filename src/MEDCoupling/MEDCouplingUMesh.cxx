@@ -4002,7 +4002,7 @@ MEDCouplingUMesh *MEDCouplingUMesh::buildExtrudedMesh(const MEDCouplingUMesh *me
   if(!mesh1D->isContiguous1D())
     throw INTERP_KERNEL::Exception("buildExtrudedMesh : 1D mesh passed in parameter is not contiguous !");
   if(getSpaceDimension()!=mesh1D->getSpaceDimension())
-    throw INTERP_KERNEL::Exception("Invalid call to buildExtrudedMesh this and mesh1D must have same dimension !");
+    throw INTERP_KERNEL::Exception("Invalid call to buildExtrudedMesh this and mesh1D must have same space dimension !");
   if((getMeshDimension()!=2 || getSpaceDimension()!=3) && (getMeshDimension()!=1 || getSpaceDimension()!=2))
     throw INTERP_KERNEL::Exception("Invalid 'this' for buildExtrudedMesh method : must be (meshDim==2 and spaceDim==3) or (meshDim==1 and spaceDim==2) !");
   if(mesh1D->getMeshDimension()!=1)
@@ -4537,7 +4537,7 @@ DataArrayInt *MEDCouplingUMesh::convertLinearCellsToQuadratic2DAnd3D0(const MEDC
   const int *cPtr=_nodal_connec->getConstPointer();
   const int *icPtr=_nodal_connec_index->getConstPointer();
   int lastVal=0;
-  for(int i=0;i<nbOfCells;i++,icPtr++)
+  for(int i=0;i<nbOfCells;i++,icPtr++,descIPtr++)
     {
       INTERP_KERNEL::NormalizedCellType typ=(INTERP_KERNEL::NormalizedCellType)cPtr[*icPtr];
       const INTERP_KERNEL::CellModel& cm=INTERP_KERNEL::CellModel::GetCellModel(typ);
@@ -4546,9 +4546,9 @@ DataArrayInt *MEDCouplingUMesh::convertLinearCellsToQuadratic2DAnd3D0(const MEDC
           INTERP_KERNEL::NormalizedCellType typ2=cm.getQuadraticType();
           types.insert(typ2); newConn->pushBackSilent(typ2);
           newConn->pushBackValsSilent(cPtr+icPtr[0]+1,cPtr+icPtr[1]);
-          for(const int *d=descPtr+descIPtr[i];d!=descPtr+descIPtr[i+1];d++)
+          for(const int *d=descPtr+descIPtr[0];d!=descPtr+descIPtr[1];d++)
             newConn->pushBackSilent(c1DPtr[c1DIPtr[*d]+3]);
-	  lastVal+=2*(icPtr[1]-icPtr[0])-1;
+	  lastVal+=(icPtr[1]-icPtr[0])+(descIPtr[1]-descIPtr[0]);
 	  newConnI->pushBackSilent(lastVal);
           ret->pushBackSilent(i);
         }
