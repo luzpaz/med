@@ -131,7 +131,11 @@ dlgTester_CPPFLAGS = \
 
 dlgTester_LDADD = \
 	libMEDOPGUI_dialogs.la \
-	$(QT_LIBS)
+	$(QT_LIBS) \
+	$(KERNEL_LDFLAGS) -lSalomeKernelHelpers -lSALOMEBasics -lSALOMELocalTrace \
+	-lSalomeNS -lSalomeLifeCycleCORBA -lSalomeContainer -lSalomeNotification \
+	-lSalomeGenericObj -lSalomeIDLKernel \
+	$(GUI_LDFLAGS) -lSalomeGuiHelpers -lSalomeApp
 
 
 mostlyclean-local:
