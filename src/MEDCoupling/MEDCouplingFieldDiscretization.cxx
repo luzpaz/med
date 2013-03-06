@@ -399,7 +399,7 @@ bool MEDCouplingFieldDiscretizationP0::isEqualIfNotWhy(const MEDCouplingFieldDis
   return ret;
 }
 
-int MEDCouplingFieldDiscretizationP0::getNumberOfTuples(const MEDCouplingMesh *mesh) const
+int MEDCouplingFieldDiscretizationP0::getNumberOfTuples(const MEDCouplingMesh *mesh) const throw(INTERP_KERNEL::Exception)
 {
   return mesh->getNumberOfCells();
 }
@@ -555,7 +555,7 @@ MEDCouplingMesh *MEDCouplingFieldDiscretizationP0::buildSubMeshData(const MEDCou
   return ret;
 }
 
-int MEDCouplingFieldDiscretizationOnNodes::getNumberOfTuples(const MEDCouplingMesh *mesh) const
+int MEDCouplingFieldDiscretizationOnNodes::getNumberOfTuples(const MEDCouplingMesh *mesh) const throw(INTERP_KERNEL::Exception)
 {
   return mesh->getNumberOfNodes();
 }
@@ -988,11 +988,11 @@ const char *MEDCouplingFieldDiscretizationGauss::getRepr() const
   return REPR;
 }
 
-int MEDCouplingFieldDiscretizationGauss::getNumberOfTuples(const MEDCouplingMesh *) const throw (INTERP_KERNEL::Exception)
+int MEDCouplingFieldDiscretizationGauss::getNumberOfTuples(const MEDCouplingMesh *) const throw(INTERP_KERNEL::Exception)
 {
   int ret=0;
   if (_discr_per_cell == 0)
-	  throw INTERP_KERNEL::Exception("Discretization is not initialized!");
+    throw INTERP_KERNEL::Exception("Discretization is not initialized!");
   const int *dcPtr=_discr_per_cell->getConstPointer();
   int nbOfTuples=_discr_per_cell->getNumberOfTuples();
   for(const int *w=dcPtr;w!=dcPtr+nbOfTuples;w++)
@@ -1527,7 +1527,7 @@ bool MEDCouplingFieldDiscretizationGaussNE::isEqualIfNotWhy(const MEDCouplingFie
   return ret;
 }
 
-int MEDCouplingFieldDiscretizationGaussNE::getNumberOfTuples(const MEDCouplingMesh *mesh) const
+int MEDCouplingFieldDiscretizationGaussNE::getNumberOfTuples(const MEDCouplingMesh *mesh) const throw(INTERP_KERNEL::Exception)
 {
   int ret=0;
   int nbOfCells=mesh->getNumberOfCells();
