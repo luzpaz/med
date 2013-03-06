@@ -217,7 +217,7 @@ namespace ParaMEDMEM
     std::string getStringRepr() const;
     const char *getRepr() const;
     std::size_t getHeapMemorySize() const;
-    int getNumberOfTuples(const MEDCouplingMesh *mesh) const;
+    int getNumberOfTuples(const MEDCouplingMesh *mesh) const throw (INTERP_KERNEL::Exception);
     int getNumberOfMeshPlaces(const MEDCouplingMesh *mesh) const;
     DataArrayInt *getOffsetArr(const MEDCouplingMesh *mesh) const;
     void renumberArraysForCell(const MEDCouplingMesh *mesh, const std::vector<DataArrayDouble *>& arrays,

@@ -2830,8 +2830,9 @@ void MEDCouplingUMesh::computeTypes()
       const int *conn=_nodal_connec->getConstPointer();
       const int *connIndex=_nodal_connec_index->getConstPointer();
       int nbOfElem=_nodal_connec_index->getNbOfElems()-1;
-      for(const int *pt=connIndex;pt!=connIndex+nbOfElem;pt++)
-        _types.insert((INTERP_KERNEL::NormalizedCellType)conn[*pt]);
+      if (nbOfElem > 0)
+    	  for(const int *pt=connIndex;pt !=connIndex+nbOfElem;pt++)
+    		  _types.insert((INTERP_KERNEL::NormalizedCellType)conn[*pt]);
     }
 }
 

@@ -49,6 +49,7 @@ void MEDCouplingBasicsTest2::testGaussPointField1()
   //
   MEDCouplingUMesh *m=build2DTargetMesh_1();
   MEDCouplingFieldDouble *f=MEDCouplingFieldDouble::New(ON_GAUSS_PT,NO_TIME);
+  CPPUNIT_ASSERT_THROW(f->getNumberOfTuples(), INTERP_KERNEL::Exception); // Sanity check!
   f->setMesh(m);
   CPPUNIT_ASSERT_EQUAL(5,f->getNumberOfMeshPlacesExpected());
   CPPUNIT_ASSERT_EQUAL(0,f->getNbOfGaussLocalization());

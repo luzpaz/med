@@ -988,9 +988,11 @@ const char *MEDCouplingFieldDiscretizationGauss::getRepr() const
   return REPR;
 }
 
-int MEDCouplingFieldDiscretizationGauss::getNumberOfTuples(const MEDCouplingMesh *) const
+int MEDCouplingFieldDiscretizationGauss::getNumberOfTuples(const MEDCouplingMesh *) const throw (INTERP_KERNEL::Exception)
 {
   int ret=0;
+  if (_discr_per_cell == 0)
+	  throw INTERP_KERNEL::Exception("Discretization is not initialized!");
   const int *dcPtr=_discr_per_cell->getConstPointer();
   int nbOfTuples=_discr_per_cell->getNumberOfTuples();
   for(const int *w=dcPtr;w!=dcPtr+nbOfTuples;w++)
