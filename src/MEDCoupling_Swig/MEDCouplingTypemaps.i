@@ -1454,7 +1454,7 @@ static const double *convertObjToPossibleCpp5_Safe2(PyObject *value, int& sw, do
               throw INTERP_KERNEL::Exception(oss.str().c_str());
             }
           else
-            return 0;
+            { nbTuples=0; return 0; }
         }
     }
   status=SWIG_ConvertPtr(value,&argp,SWIGTYPE_p_ParaMEDMEM__DataArrayDoubleTuple,0|0);
@@ -1462,15 +1462,28 @@ static const double *convertObjToPossibleCpp5_Safe2(PyObject *value, int& sw, do
     {  
       e=reinterpret_cast< ParaMEDMEM::DataArrayDoubleTuple * >(argp);
       sw=3;
-      if(e->getNumberOfCompo()==nbCompExpected)
+      if(e)
         {
-          nbTuples=1;
-          return e->getConstPointer();
+          if(e->getNumberOfCompo()==nbCompExpected)
+            {
+              nbTuples=1;
+              return e->getConstPointer();
+            }
+          else
+            {
+              std::ostringstream oss; oss << msg << "nb of components expected to be " <<  nbCompExpected << " , and input DataArrayDoubleTuple has " << e->getNumberOfCompo() << " components !";
+              throw INTERP_KERNEL::Exception(oss.str().c_str());
+            }
         }
       else
         {
-          std::ostringstream oss; oss << msg << "nb of components expected to be " <<  nbCompExpected << " , and input DataArrayDoubleTuple has " << e->getNumberOfCompo() << " components !";
-          throw INTERP_KERNEL::Exception(oss.str().c_str());
+          if(throwIfNullPt)
+            {
+              std::ostringstream oss; oss << msg << " null pointer not accepted!";
+              throw INTERP_KERNEL::Exception(oss.str().c_str());
+            }
+          else
+            { nbTuples=0; return 0; }
         }
     }
   throw INTERP_KERNEL::Exception("4 types accepted : integer, double, DataArrayDouble, DataArrayDoubleTuple");

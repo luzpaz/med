@@ -903,6 +903,14 @@ namespace ParaMEDMEM
 
 %extend ParaMEDMEM::DataArrayInt
 {
+  void pushBackValsSilent(PyObject *li) throw(INTERP_KERNEL::Exception)
+  {
+    int szArr,sw,iTypppArr;
+    std::vector<int> stdvecTyyppArr;
+    const int *tmp=convertObjToPossibleCpp1_Safe(li,sw,szArr,iTypppArr,stdvecTyyppArr);
+    self->pushBackValsSilent(tmp,tmp+szArr);
+  }
+
   PyObject *getDifferentValues() const throw(INTERP_KERNEL::Exception)
   {
     std::set<int> ret=self->getDifferentValues();
@@ -2952,6 +2960,18 @@ namespace ParaMEDMEM
    DataArrayDouble(PyObject *elt0, PyObject *nbOfTuples=0, PyObject *elt2=0) throw(INTERP_KERNEL::Exception)
    {
      return ParaMEDMEM_DataArrayDouble_New__SWIG_1(elt0,nbOfTuples,elt2);
+   }
+
+   void pushBackValsSilent(PyObject *li) throw(INTERP_KERNEL::Exception)
+   {
+     double val;
+     DataArrayDouble *a;
+     DataArrayDoubleTuple *aa;
+     std::vector<double> bb;
+     int sw,nbTuples=-1;
+     const char msg[]="Python wrap of DataArrayDouble::pushBackValsSilent : ";
+     const double *tmp=convertObjToPossibleCpp5_Safe2(li,sw,val,a,aa,bb,msg,1,true,nbTuples);
+     self->pushBackValsSilent(tmp,tmp+nbTuples);
    }
 
    std::string __str__() const
