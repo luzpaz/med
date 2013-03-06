@@ -2831,8 +2831,8 @@ void MEDCouplingUMesh::computeTypes()
       const int *connIndex=_nodal_connec_index->getConstPointer();
       int nbOfElem=_nodal_connec_index->getNbOfElems()-1;
       if (nbOfElem > 0)
-    	  for(const int *pt=connIndex;pt !=connIndex+nbOfElem;pt++)
-    		  _types.insert((INTERP_KERNEL::NormalizedCellType)conn[*pt]);
+        for(const int *pt=connIndex;pt !=connIndex+nbOfElem;pt++)
+          _types.insert((INTERP_KERNEL::NormalizedCellType)conn[*pt]);
     }
 }
 
@@ -4453,15 +4453,15 @@ DataArrayInt *MEDCouplingUMesh::convertLinearCellsToQuadratic(int conversionType
         case 1:
           ret=convertLinearCellsToQuadratic1D0(conn,connI,coords,types);
           connSafe=conn; connISafe=connI; coordsSafe=coords;
-	  break;
+          break;
         case 2:
           ret=convertLinearCellsToQuadratic2D0(conn,connI,coords,types);
           connSafe=conn; connISafe=connI; coordsSafe=coords;
-	  break;
+          break;
         case 3:
           ret=convertLinearCellsToQuadratic3D0(conn,connI,coords,types);
           connSafe=conn; connISafe=connI; coordsSafe=coords;
-	  break;
+          break;
         default:
           throw INTERP_KERNEL::Exception("MEDCouplingUMesh::convertLinearCellsToQuadratic : conversion of type 0 mesh dimensions available are [1,2,3] !");
         }
@@ -4502,7 +4502,7 @@ DataArrayInt *MEDCouplingUMesh::convertLinearCellsToQuadratic1D0(DataArrayInt *&
           newConn->pushBackSilent((int)INTERP_KERNEL::NORM_SEG3);
           newConn->pushBackValsSilent(cPtr+icPtr[0]+1,cPtr+icPtr[0]+3);
           newConn->pushBackSilent(offset++);
-	  lastVal+=4;
+          lastVal+=4;
           newConnI->pushBackSilent(lastVal);
           ret->pushBackSilent(i);
         }
@@ -4549,8 +4549,8 @@ DataArrayInt *MEDCouplingUMesh::convertLinearCellsToQuadratic2DAnd3D0(const MEDC
           newConn->pushBackValsSilent(cPtr+icPtr[0]+1,cPtr+icPtr[1]);
           for(const int *d=descPtr+descIPtr[0];d!=descPtr+descIPtr[1];d++)
             newConn->pushBackSilent(c1DPtr[c1DIPtr[*d]+3]);
-	  lastVal+=(icPtr[1]-icPtr[0])+(descIPtr[1]-descIPtr[0]);
-	  newConnI->pushBackSilent(lastVal);
+          lastVal+=(icPtr[1]-icPtr[0])+(descIPtr[1]-descIPtr[0]);
+          newConnI->pushBackSilent(lastVal);
           ret->pushBackSilent(i);
         }
       else
