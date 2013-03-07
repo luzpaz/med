@@ -27,7 +27,6 @@
 #include "InterpKernelException.hxx"
 #include "BBTree.txx"
 
-#include <set>
 #include <string>
 #include <vector>
 #include <iterator>
