@@ -11310,6 +11310,40 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(a.getCoords().isEqual(DataArrayDouble([-0.3,-0.3,0.0,0.2,-0.3,0.0,0.7,-0.3,0.0,-0.3,0.2,0.0,0.2,0.2,0.0,0.7,0.2,0.0,-0.3,0.7,0.0,0.2,0.7,0.0,0.7,0.7,0.0,-0.3,-0.3,1.0,0.2,-0.3,1.0,0.7,-0.3,1.0,-0.3,0.2,1.0,0.2,0.2,1.0,0.7,0.2,1.0,-0.3,0.7,1.0,0.2,0.7,1.0,0.7,0.7,1.0,-0.3,-0.05,0.0,-0.05,0.2,0.0,0.2,-0.05,0.0,-0.05,-0.3,0.0,-0.3,-0.05,1.0,-0.05,0.2,1.0,0.2,-0.05,1.0,-0.05,-0.3,1.0,-0.3,-0.3,0.5,-0.3,0.2,0.5,0.2,0.2,0.5,0.2,-0.3,0.5,0.45,-0.05,0.0,0.45,-0.3,0.0,0.45,-0.05,1.0,0.45,-0.3,1.0,0.7,-0.3,0.5,0.45,0.2,0.0,0.7,-0.05,0.0,0.45,0.2,1.0,0.7,-0.05,1.0,0.7,0.2,0.5,-0.05,0.7,0.0,0.2,0.45,0.0,-0.3,0.45,0.0,-0.05,0.7,1.0,0.2,0.45,1.0,-0.3,0.45,1.0,-0.3,0.7,0.5,0.2,0.7,0.5,0.45,0.7,0.0,0.7,0.45,0.0,0.45,0.7,1.0,0.7,0.45,1.0,0.7,0.7,0.5],53,3),1e-14))
         pass
 
+    def testSwig2DataArrayPushBackValsSilent1(self):
+        d=DataArrayDouble()
+        d.pushBackValsSilent([4,5,6])
+        self.assertTrue(d.isEqual(DataArrayDouble([4.,5.,6.]),1e-14))
+        e=DataArrayDouble([1,2,3],1,3)
+        for t in e: d.pushBackValsSilent(t)
+        self.assertTrue(d.isEqual(DataArrayDouble([4.,5.,6.,1.,2.,3.]),1e-14))
+        d.pushBackValsSilent(DataArrayDouble([9,10.]))
+        self.assertTrue(d.isEqual(DataArrayDouble([4.,5.,6.,1.,2.,3.,9.,10.]),1e-14))
+        d.pushBackValsSilent(DataArrayDouble(0,1))
+        self.assertTrue(d.isEqual(DataArrayDouble([4.,5.,6.,1.,2.,3.,9.,10.]),1e-14))
+        e=DataArrayDouble([1,2,3],3,1)
+        for t in e: d.pushBackValsSilent(t)
+        self.assertTrue(d.isEqual(DataArrayDouble([4.,5.,6.,1.,2.,3.,9.,10.,1.,2.,3.]),1e-14))
+        d.pushBackValsSilent(77)
+        self.assertTrue(d.isEqual(DataArrayDouble([4.,5.,6.,1.,2.,3.,9.,10.,1.,2.,3.,77.]),1e-14))
+        #
+        d=DataArrayInt()
+        d.pushBackValsSilent([4,5,6])
+        self.assertTrue(d.isEqual(DataArrayInt([4,5,6])))
+        e=DataArrayInt([1,2,3],1,3)
+        for t in e: d.pushBackValsSilent(t)
+        self.assertTrue(d.isEqual(DataArrayInt([4,5,6,1,2,3])))
+        d.pushBackValsSilent(DataArrayInt([9,10]))
+        self.assertTrue(d.isEqual(DataArrayInt([4,5,6,1,2,3,9,10])))
+        d.pushBackValsSilent(DataArrayInt(0,1))
+        self.assertTrue(d.isEqual(DataArrayInt([4,5,6,1,2,3,9,10])))
+        e=DataArrayInt([1,2,3],3,1)
+        for t in e: d.pushBackValsSilent(t)
+        self.assertTrue(d.isEqual(DataArrayInt([4,5,6,1,2,3,9,10,1,2,3])))
+        d.pushBackValsSilent(77)
+        self.assertTrue(d.isEqual(DataArrayInt([4,5,6,1,2,3,9,10,1,2,3,77])))
+        pass
+
     def setUp(self):
         pass
     pass

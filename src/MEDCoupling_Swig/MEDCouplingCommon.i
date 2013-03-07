@@ -2965,12 +2965,10 @@ namespace ParaMEDMEM
    void pushBackValsSilent(PyObject *li) throw(INTERP_KERNEL::Exception)
    {
      double val;
-     DataArrayDouble *a;
-     DataArrayDoubleTuple *aa;
      std::vector<double> bb;
      int sw,nbTuples=-1;
      const char msg[]="Python wrap of DataArrayDouble::pushBackValsSilent : ";
-     const double *tmp=convertObjToPossibleCpp5_Safe2(li,sw,val,a,aa,bb,msg,1,true,nbTuples);
+     const double *tmp=convertObjToPossibleCpp5_SingleCompo(li,sw,val,bb,msg,true,nbTuples);
      self->pushBackValsSilent(tmp,tmp+nbTuples);
    }
 
