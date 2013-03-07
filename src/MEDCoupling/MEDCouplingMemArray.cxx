@@ -6324,13 +6324,16 @@ DataArrayInt *DataArrayInt::duplicateEachTupleNTimes(int nbTimes) const throw(IN
 /*!
  * This method returns all different values found in \a this. This method throws if \a this has not been allocated.
  * But the number of components can be different from one.
+ * \return a newly allocated array (that should be dealt by the caller) containing different values in \a this.
  */
-std::set<int> DataArrayInt::getDifferentValues() const throw(INTERP_KERNEL::Exception)
+DataArrayInt *DataArrayInt::getDifferentValues() const throw(INTERP_KERNEL::Exception)
 {
   checkAllocated();
   std::set<int> ret;
   ret.insert(begin(),end());
-  return ret;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret2=DataArrayInt::New(); ret2->alloc((int)ret.size(),1);
+  std::copy(ret.begin(),ret.end(),ret2->getPointer());
+  return ret2.retn();
 }
 
 /*!

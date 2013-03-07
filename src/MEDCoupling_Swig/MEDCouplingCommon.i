@@ -180,6 +180,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayInt::duplicateEachTupleNTimes;
 %newobject ParaMEDMEM::DataArrayInt::buildPermutationArr;
 %newobject ParaMEDMEM::DataArrayInt::buildPermArrPerLevel;
+%newobject ParaMEDMEM::DataArrayInt::getDifferentValues;
 %newobject ParaMEDMEM::DataArrayInt::__neg__;
 %newobject ParaMEDMEM::DataArrayInt::__add__;
 %newobject ParaMEDMEM::DataArrayInt::__radd__;
@@ -911,12 +912,6 @@ namespace ParaMEDMEM
     self->pushBackValsSilent(tmp,tmp+szArr);
   }
 
-  PyObject *getDifferentValues() const throw(INTERP_KERNEL::Exception)
-  {
-    std::set<int> ret=self->getDifferentValues();
-    return convertIntArrToPyList3(ret);
-  }
-
   PyObject *partitionByDifferentValues() const throw(INTERP_KERNEL::Exception)
   {
     std::vector<int> ret1;
@@ -959,7 +954,6 @@ namespace ParaMEDMEM
 }
 
 %ignore ParaMEDMEM::DataArray::getInfoOnComponents;
-%ignore ParaMEDMEM::DataArrayInt::getDifferentValues;
 %ignore ParaMEDMEM::DataArrayInt::partitionByDifferentValues;
 %ignore ParaMEDMEM::MEDCouplingFieldDiscretizationPerCell::getArrayOfDiscIds;
 %ignore ParaMEDMEM::MEDCouplingFieldDiscretization::clonePart;

@@ -564,6 +564,17 @@ private:
   const INTERP_KERNEL::CellModel& _cm;
 };
 
+class MinusOneSonsGeneratorBiQuadratic
+{
+public:
+  MinusOneSonsGeneratorBiQuadratic(const INTERP_KERNEL::CellModel& cm):_cm(cm) { }
+  unsigned getNumberOfSons2(const int *conn, int lgth) const { return _cm.getNumberOfSons2(conn,lgth); }
+  unsigned fillSonCellNodalConnectivity2(int sonId, const int *nodalConn, int lgth, int *sonNodalConn, INTERP_KERNEL::NormalizedCellType& typeOfSon) const { return _cm.fillSonCellNodalConnectivity4(sonId,nodalConn,lgth,sonNodalConn,typeOfSon); }
+  static const int DELTA=1;
+private:
+  const INTERP_KERNEL::CellModel& _cm;
+};
+
 class MinusTwoSonsGenerator
 {
 public:
@@ -708,6 +719,8 @@ void MEDCouplingUMesh::ComputeNeighborsOfCellsAdv(const DataArrayInt *desc, cons
 template<class SonsGenerator>
 MEDCouplingUMesh *MEDCouplingUMesh::buildDescendingConnectivityGen(DataArrayInt *desc, DataArrayInt *descIndx, DataArrayInt *revDesc, DataArrayInt *revDescIndx, DimM1DescNbrer nbrer) const throw(INTERP_KERNEL::Exception)
 {
+  if(!desc || !descIndx || !revDesc || !revDescIndx)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::buildDescendingConnectivityGen : present of a null pointer in input !");
   checkConnectivityFullyDefined();
   int nbOfCells=getNumberOfCells();
   int nbOfNodes=getNumberOfNodes();
@@ -4466,8 +4479,27 @@ DataArrayInt *MEDCouplingUMesh::convertLinearCellsToQuadratic(int conversionType
           throw INTERP_KERNEL::Exception("MEDCouplingUMesh::convertLinearCellsToQuadratic : conversion of type 0 mesh dimensions available are [1,2,3] !");
         }
       break;
-      //case 1:
-      //return convertLinearCellsToQuadratic1();
+    case 1:
+      {
+        switch(meshDim)
+        {
+        case 1:
+          ret=convertLinearCellsToQuadratic1D0(conn,connI,coords,types);//it is not a bug. In 1D policy 0 and 1 are equals
+          connSafe=conn; connISafe=connI; coordsSafe=coords;
+          break;
+        case 2:
+          ret=convertLinearCellsToQuadratic2D1(conn,connI,coords,types);
+          connSafe=conn; connISafe=connI; coordsSafe=coords;
+          break;
+        case 3:
+          ret=convertLinearCellsToQuadratic3D1(conn,connI,coords,types);
+          connSafe=conn; connISafe=connI; coordsSafe=coords;
+          break;
+        default:
+          throw INTERP_KERNEL::Exception("MEDCouplingUMesh::convertLinearCellsToQuadratic : conversion of type 1 mesh dimensions available are [1,2,3] !");
+        }
+        break;
+      }
     default:
       throw INTERP_KERNEL::Exception("MEDCouplingUMesh::convertLinearCellsToQuadratic : conversion type available are 0 (default, the simplest) and 1 (the most complex) !");
     }
@@ -4515,7 +4547,7 @@ DataArrayInt *MEDCouplingUMesh::convertLinearCellsToQuadratic1D0(DataArrayInt *&
         }
     }
   MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> tmp=bary->selectByTupleIdSafe(ret->begin(),ret->end());
-  conn=newConn.retn(); connI=newConnI.retn(); coords=DataArrayDouble::Aggregate(getCoords(),tmp);
+  coords=DataArrayDouble::Aggregate(getCoords(),tmp); conn=newConn.retn(); connI=newConnI.retn();
   return ret.retn();
 }
 
@@ -4578,6 +4610,58 @@ DataArrayInt *MEDCouplingUMesh::convertLinearCellsToQuadratic2D0(DataArrayInt *&
   return convertLinearCellsToQuadratic2DAnd3D0(m1D,desc,descI,conn,connI,coords,types);
 }
 
+DataArrayInt *MEDCouplingUMesh::convertLinearCellsToQuadratic2D1(DataArrayInt *&conn, DataArrayInt *&connI, DataArrayDouble *& coords, std::set<INTERP_KERNEL::NormalizedCellType>& types) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> desc(DataArrayInt::New()),descI(DataArrayInt::New()),tmp2(DataArrayInt::New()),tmp3(DataArrayInt::New());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> m1D=buildDescendingConnectivity(desc,descI,tmp2,tmp3); tmp2=0; tmp3=0;
+  //
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newConn=DataArrayInt::New(); newConn->alloc(0,1);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newConnI=DataArrayInt::New(); newConnI->alloc(1,1); newConnI->setIJ(0,0,0);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New(); ret->alloc(0,1);
+  //
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> bary=getBarycenterAndOwner();
+  const int *descPtr(desc->begin()),*descIPtr(descI->begin());
+  DataArrayInt *conn1D=0,*conn1DI=0;
+  std::set<INTERP_KERNEL::NormalizedCellType> types1D;
+  DataArrayDouble *coordsTmp=0;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret1D=m1D->convertLinearCellsToQuadratic1D0(conn1D,conn1DI,coordsTmp,types1D); ret1D=0;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> coordsTmpSafe(coordsTmp);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> conn1DSafe(conn1D),conn1DISafe(conn1DI);
+  const int *c1DPtr=conn1D->begin();
+  const int *c1DIPtr=conn1DI->begin();
+  int nbOfCells=getNumberOfCells();
+  const int *cPtr=_nodal_connec->getConstPointer();
+  const int *icPtr=_nodal_connec_index->getConstPointer();
+  int lastVal=0,offset=coordsTmpSafe->getNumberOfTuples();
+  for(int i=0;i<nbOfCells;i++,icPtr++,descIPtr++)
+    {
+      INTERP_KERNEL::NormalizedCellType typ=(INTERP_KERNEL::NormalizedCellType)cPtr[*icPtr];
+      const INTERP_KERNEL::CellModel& cm=INTERP_KERNEL::CellModel::GetCellModel(typ);
+      if(!cm.isQuadratic())
+        {
+          INTERP_KERNEL::NormalizedCellType typ2=cm.getQuadraticType2();
+          types.insert(typ2); newConn->pushBackSilent(typ2);
+          newConn->pushBackValsSilent(cPtr+icPtr[0]+1,cPtr+icPtr[1]);
+          for(const int *d=descPtr+descIPtr[0];d!=descPtr+descIPtr[1];d++)
+            newConn->pushBackSilent(c1DPtr[c1DIPtr[*d]+3]);
+          newConn->pushBackSilent(offset+ret->getNumberOfTuples());
+          lastVal+=(icPtr[1]-icPtr[0])+(descIPtr[1]-descIPtr[0])+1;
+          newConnI->pushBackSilent(lastVal);
+          ret->pushBackSilent(i);
+        }
+      else
+        {
+          types.insert(typ);
+          lastVal+=(icPtr[1]-icPtr[0]);
+          newConnI->pushBackSilent(lastVal);
+          newConn->pushBackValsSilent(cPtr+icPtr[0],cPtr+icPtr[1]);
+        }
+    }
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> tmp=bary->selectByTupleIdSafe(ret->begin(),ret->end());
+  coords=DataArrayDouble::Aggregate(coordsTmpSafe,tmp); conn=newConn.retn(); connI=newConnI.retn();
+  return ret.retn();
+}
+
 /*!
  * Implementes \a conversionType 0 for meshes with meshDim = 3, of MEDCouplingUMesh::convertLinearCellsToQuadratic method.
  * \return a newly created DataArrayInt instance that the caller should deal with containing cell ids of converted cells.
@@ -4588,6 +4672,85 @@ DataArrayInt *MEDCouplingUMesh::convertLinearCellsToQuadratic3D0(DataArrayInt *&
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> desc(DataArrayInt::New()),descI(DataArrayInt::New()),tmp2(DataArrayInt::New()),tmp3(DataArrayInt::New());
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> m1D=explode3DMeshTo1D(desc,descI,tmp2,tmp3); tmp2=0; tmp3=0;
   return convertLinearCellsToQuadratic2DAnd3D0(m1D,desc,descI,conn,connI,coords,types);
+}
+
+DataArrayInt *MEDCouplingUMesh::convertLinearCellsToQuadratic3D1(DataArrayInt *&conn, DataArrayInt *&connI, DataArrayDouble *& coords, std::set<INTERP_KERNEL::NormalizedCellType>& types) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> desc2(DataArrayInt::New()),desc2I(DataArrayInt::New()),tmp2(DataArrayInt::New()),tmp3(DataArrayInt::New());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> m2D=buildDescendingConnectivityGen<MinusOneSonsGeneratorBiQuadratic>(desc2,desc2I,tmp2,tmp3,MEDCouplingFastNbrer); tmp2=0; tmp3=0;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> desc1(DataArrayInt::New()),desc1I(DataArrayInt::New()),tmp4(DataArrayInt::New()),tmp5(DataArrayInt::New());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> m1D=explode3DMeshTo1D(desc1,desc1I,tmp4,tmp5); tmp4=0; tmp5=0;
+  //
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newConn=DataArrayInt::New(); newConn->alloc(0,1);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newConnI=DataArrayInt::New(); newConnI->alloc(1,1); newConnI->setIJ(0,0,0);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New(),ret2=DataArrayInt::New(); ret->alloc(0,1); ret2->alloc(0,1);
+  //
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> bary=getBarycenterAndOwner();
+  const int *descPtr(desc1->begin()),*descIPtr(desc1I->begin()),*desc2Ptr(desc2->begin()),*desc2IPtr(desc2I->begin());
+  DataArrayInt *conn1D=0,*conn1DI=0,*conn2D=0,*conn2DI=0;
+  std::set<INTERP_KERNEL::NormalizedCellType> types1D,types2D;
+  DataArrayDouble *coordsTmp=0,*coordsTmp2=0;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret1D=m1D->convertLinearCellsToQuadratic1D0(conn1D,conn1DI,coordsTmp,types1D); ret1D=DataArrayInt::New(); ret1D->alloc(0,1);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> conn1DSafe(conn1D),conn1DISafe(conn1DI);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> coordsTmpSafe(coordsTmp);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret2D=m2D->convertLinearCellsToQuadratic2D1(conn2D,conn2DI,coordsTmp2,types2D); ret2D=DataArrayInt::New(); ret2D->alloc(0,1);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> coordsTmp2Safe(coordsTmp2);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> conn2DSafe(conn2D),conn2DISafe(conn2DI);
+  const int *c1DPtr=conn1D->begin(),*c1DIPtr=conn1DI->begin(),*c2DPtr=conn2D->begin(),*c2DIPtr=conn2DI->begin();
+  int nbOfCells=getNumberOfCells();
+  const int *cPtr=_nodal_connec->getConstPointer();
+  const int *icPtr=_nodal_connec_index->getConstPointer();
+  int lastVal=0,offset=coordsTmpSafe->getNumberOfTuples();
+  for(int i=0;i<nbOfCells;i++,icPtr++,descIPtr++,desc2IPtr++)
+    {
+      INTERP_KERNEL::NormalizedCellType typ=(INTERP_KERNEL::NormalizedCellType)cPtr[*icPtr];
+      const INTERP_KERNEL::CellModel& cm=INTERP_KERNEL::CellModel::GetCellModel(typ);
+      if(!cm.isQuadratic())
+        {
+          INTERP_KERNEL::NormalizedCellType typ2=cm.getQuadraticType2();
+          if(typ2==INTERP_KERNEL::NORM_ERROR)
+            {
+              std::ostringstream oss; oss << "MEDCouplingUMesh::convertLinearCellsToQuadratic3D1 : On cell #" << i << " the linear cell type does not support advanced quadratization !";
+              throw INTERP_KERNEL::Exception(oss.str().c_str());
+            }
+          types.insert(typ2); newConn->pushBackSilent(typ2);
+          newConn->pushBackValsSilent(cPtr+icPtr[0]+1,cPtr+icPtr[1]);
+          for(const int *d=descPtr+descIPtr[0];d!=descPtr+descIPtr[1];d++)
+            newConn->pushBackSilent(c1DPtr[c1DIPtr[*d]+3]);
+          for(const int *d=desc2Ptr+desc2IPtr[0];d!=desc2Ptr+desc2IPtr[1];d++)
+            {
+              int nodeId2=c2DPtr[c2DIPtr[(*d)+1]-1];
+              int tmpPos=newConn->getNumberOfTuples();
+              newConn->pushBackSilent(nodeId2);
+              ret2D->pushBackSilent(nodeId2); ret1D->pushBackSilent(tmpPos);
+            }
+          newConn->pushBackSilent(offset+ret->getNumberOfTuples());
+          lastVal+=(icPtr[1]-icPtr[0])+(descIPtr[1]-descIPtr[0])+(desc2IPtr[1]-desc2IPtr[0])+1;
+          newConnI->pushBackSilent(lastVal);
+          ret->pushBackSilent(i);
+        }
+      else
+        {
+          types.insert(typ);
+          lastVal+=(icPtr[1]-icPtr[0]);
+          newConnI->pushBackSilent(lastVal);
+          newConn->pushBackValsSilent(cPtr+icPtr[0],cPtr+icPtr[1]);
+        }
+    }
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> diffRet2D=ret2D->getDifferentValues();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> o2nRet2D=diffRet2D->invertArrayN2O2O2N(coordsTmp2Safe->getNumberOfTuples());
+  coordsTmp2Safe=coordsTmp2Safe->selectByTupleId(diffRet2D->begin(),diffRet2D->end());
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> tmp=bary->selectByTupleIdSafe(ret->begin(),ret->end());
+  std::vector<const DataArrayDouble *> v(3); v[0]=coordsTmpSafe; v[1]=coordsTmp2Safe; v[2]=tmp;
+  int *c=newConn->getPointer();
+  const int *cI(newConnI->begin());
+  for(const int *elt=ret1D->begin();elt!=ret1D->end();elt++)
+    c[*elt]=o2nRet2D->getIJ(c[*elt],0)+offset;
+  offset=coordsTmp2Safe->getNumberOfTuples();
+  for(const int *elt=ret->begin();elt!=ret->end();elt++)
+    c[cI[(*elt)+1]-1]+=offset;
+  coords=DataArrayDouble::Aggregate(v); conn=newConn.retn(); connI=newConnI.retn();
+  return ret.retn();
 }
 
 /*!
@@ -7104,7 +7267,7 @@ void MEDCouplingUMesh::writeVTKLL(std::ostream& ofs, const std::string& cellData
   int nbOfCells=getNumberOfCells();
   if(nbOfCells<=0)
     throw INTERP_KERNEL::Exception("MEDCouplingUMesh::writeVTK : the unstructured mesh has no cells !");
-  static const int PARAMEDMEM2VTKTYPETRADUCER[INTERP_KERNEL::NORM_MAXTYPE+1]={1,3,21,5,9,7,22,-1,23,-1,-1,-1,-1,-1,10,14,13,-1,12,-1,24,-1,16,27,-1,26,-1,-1,-1,-1,25,42,-1,4};
+  static const int PARAMEDMEM2VTKTYPETRADUCER[INTERP_KERNEL::NORM_MAXTYPE+1]={1,3,21,5,9,7,22,34,23,28,-1,-1,-1,-1,10,14,13,-1,12,-1,24,-1,16,27,-1,26,-1,29,-1,-1,25,42,-1,4};
   ofs << "  <" << getVTKDataSetType() << ">\n";
   ofs << "    <Piece NumberOfPoints=\"" << getNumberOfNodes() << "\" NumberOfCells=\"" << nbOfCells << "\">\n";
   ofs << "      <PointData>\n" << pointData << std::endl;

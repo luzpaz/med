@@ -5729,8 +5729,8 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         arr=[1,2,3,2,2,3,5,1,5,5,2,2]
         da1.setValues(arr,4,3);
         s=da1.getDifferentValues();
-        expected1=[1,2,3,5]
-        self.assertEqual(expected1,s);
+        expected1=DataArrayInt([1,2,3,5])
+        self.assertTrue(expected1.isEqual(s));
         pass
 
     def testSwigErrorProtection3(self):
@@ -11342,6 +11342,35 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(d.isEqual(DataArrayInt([4,5,6,1,2,3,9,10,1,2,3])))
         d.pushBackValsSilent(77)
         self.assertTrue(d.isEqual(DataArrayInt([4,5,6,1,2,3,9,10,1,2,3,77])))
+        pass
+
+    def testSwig2ConvertLinearCellsToQuadratic2(self):
+        m2D=MEDCouplingDataForTest.build2DTargetMesh_1()
+        ret=m2D.convertLinearCellsToQuadratic(1)
+        self.assertTrue(ret.isIdentity())
+        self.assertEqual(5,len(ret))
+        m2D.checkCoherency1()
+        coordsExp=DataArrayDouble([-0.3,-0.3,0.2,-0.3,0.7,-0.3,-0.3,0.2,0.2,0.2,0.7,0.2,-0.3,0.7,0.2,0.7,0.7,0.7,-0.3,-0.05,-0.05,0.2,0.2,-0.05,-0.05,-0.3,0.45,-0.05,0.45,-0.3,0.45,0.2,0.7,-0.05,-0.05,0.7,0.2,0.45,-0.3,0.45,0.45,0.7,0.7,0.45,-0.05,-0.05,0.3666666666666667,-0.1333333333333333,0.5333333333333332,0.03333333333333334,-0.05,0.45,0.45,0.45],27,2)
+        self.assertTrue(m2D.getCoords().isEqual(coordsExp,1e-14))
+        self.assertTrue(m2D.getNodalConnectivity().isEqual(DataArrayInt([9,0,3,4,1,9,10,11,12,22,7,1,4,2,11,13,14,23,7,4,5,2,15,16,13,24,9,6,7,4,3,17,18,10,19,25,9,7,8,5,4,20,21,15,18,26])))
+        self.assertTrue(m2D.getNodalConnectivityIndex().isEqual(DataArrayInt([0,10,18,26,36,46])))
+        #
+        m2D=MEDCouplingDataForTest.build2DTargetMesh_1()[(0,3)] ; m2D.zipCoords()
+        m2D.changeSpaceDimension(3)
+        arr=DataArrayDouble(3);  arr.iota(0) ; z=MEDCouplingCMesh() ; z.setCoords(arr)
+        m1D=z.buildUnstructured() ; m1D.setCoords(arr.changeNbOfComponents(3,0.))
+        m1D.getCoords()[:]=m1D.getCoords()[:,[1,2,0]]
+        cooTmp=m2D.getCoords()[:]
+        m3D=m2D.buildExtrudedMesh(m1D,0)
+        ret=m3D.convertLinearCellsToQuadratic(1)
+        m3D.writeVTK("m3D.vtu")
+        self.assertTrue(ret.isIdentity())
+        self.assertEqual(4,len(ret))
+        m3D.checkCoherency1()
+        coordsExp2=DataArrayDouble([-0.3,-0.3,0.0,0.2,-0.3,0.0,-0.3,0.2,0.0,0.2,0.2,0.0,-0.3,0.7,0.0,0.2,0.7,0.0,-0.3,-0.3,1.0,0.2,-0.3,1.0,-0.3,0.2,1.0,0.2,0.2,1.0,-0.3,0.7,1.0,0.2,0.7,1.0,-0.3,-0.3,2.0,0.2,-0.3,2.0,-0.3,0.2,2.0,0.2,0.2,2.0,-0.3,0.7,2.0,0.2,0.7,2.0,-0.3,-0.05,0.0,-0.05,0.2,0.0,0.2,-0.05,0.0,-0.05,-0.3,0.0,-0.3,-0.05,1.0,-0.05,0.2,1.0,0.2,-0.05,1.0,-0.05,-0.3,1.0,-0.3,-0.3,0.5,-0.3,0.2,0.5,0.2,0.2,0.5,0.2,-0.3,0.5,-0.05,0.7,0.0,0.2,0.45,0.0,-0.3,0.45,0.0,-0.05,0.7,1.0,0.2,0.45,1.0,-0.3,0.45,1.0,-0.3,0.7,0.5,0.2,0.7,0.5,-0.3,-0.05,2.0,-0.05,0.2,2.0,0.2,-0.05,2.0,-0.05,-0.3,2.0,-0.3,-0.3,1.5,-0.3,0.2,1.5,0.2,0.2,1.5,0.2,-0.3,1.5,-0.05,0.7,2.0,0.2,0.45,2.0,-0.3,0.45,2.0,-0.3,0.7,1.5,0.2,0.7,1.5,-0.05,-0.05,0.0,-0.3,-0.05,0.5,-0.05,0.2,0.5,0.2,-0.05,0.5,-0.05,-0.05,1.0,-0.05,0.45,0.0,-0.05,0.7,0.5,0.2,0.45,0.5,-0.05,0.45,1.0,-0.3,-0.05,1.5,-0.05,0.2,1.5,0.2,-0.05,1.5,-0.05,-0.05,2.0,-0.05,0.7,1.5,0.2,0.45,1.5,-0.05,0.45,2.0,-0.05,-0.05,0.5,-0.05,0.45,0.5,-0.05,-0.05,1.5,-0.05,0.45,1.5],71,3)
+        self.assertTrue(m3D.getCoords().isEqual(coordsExp2,1e-14))
+        self.assertTrue(m3D.getNodalConnectivity().isEqual(DataArrayInt([27,0,2,3,1,6,8,9,7,18,19,20,21,22,23,24,25,26,27,28,29,51,52,53,54,55,51,67,27,4,5,3,2,10,11,9,8,30,31,19,32,33,34,23,35,36,37,28,27,56,57,58,53,59,56,68,27,6,8,9,7,12,14,15,13,22,23,24,25,38,39,40,41,42,43,44,45,55,60,61,62,63,55,69,27,10,11,9,8,16,17,15,14,33,34,23,35,46,47,39,48,49,50,44,43,59,64,65,61,66,59,70])))
+        self.assertTrue(m3D.getNodalConnectivityIndex().isEqual(DataArrayInt([0,28,56,84,112])))
         pass
 
     def setUp(self):

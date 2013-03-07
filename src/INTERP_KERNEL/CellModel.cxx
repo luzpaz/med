@@ -116,6 +116,7 @@ namespace INTERP_KERNEL
     _reverse_extruded_type=NORM_ERROR;
     _linear_type=NORM_ERROR;
     _quadratic_type=NORM_ERROR;
+    _quadratic_type2=NORM_ERROR;
     _nb_of_little_sons=std::numeric_limits<unsigned>::max();
     switch(type)
       {
@@ -126,7 +127,7 @@ namespace INTERP_KERNEL
         break;
       case NORM_SEG2:
         {
-          _nb_of_pts=2; _nb_of_sons=2; _dim=1; _extruded_type=NORM_QUAD4; _quadratic_type=NORM_SEG3; _is_simplex=true; _is_extruded=true; _reverse_extruded_type=NORM_POINT1;
+          _nb_of_pts=2; _nb_of_sons=2; _dim=1; _extruded_type=NORM_QUAD4; _quadratic_type=NORM_SEG3; _quadratic_type2=NORM_SEG3; _is_simplex=true; _is_extruded=true; _reverse_extruded_type=NORM_POINT1;
           _sons_type[0]=NORM_POINT1; _sons_type[1]=NORM_POINT1;
           _sons_con[0][0]=0; _nb_of_sons_con[0]=1;
           _sons_con[1][0]=1; _nb_of_sons_con[1]=1;
@@ -169,7 +170,7 @@ namespace INTERP_KERNEL
         break;
       case NORM_HEXA8:
         {
-          _nb_of_pts=8; _nb_of_sons=6; _dim=3; _quadratic_type=NORM_HEXA20; _is_simplex=false; _is_extruded=true; _reverse_extruded_type=NORM_QUAD4;
+          _nb_of_pts=8; _nb_of_sons=6; _dim=3; _quadratic_type=NORM_HEXA20; _quadratic_type2=NORM_HEXA27; _is_simplex=false; _is_extruded=true; _reverse_extruded_type=NORM_QUAD4;
           _sons_type[0]=NORM_QUAD4; _sons_type[1]=NORM_QUAD4; _sons_type[2]=NORM_QUAD4; _sons_type[3]=NORM_QUAD4; _sons_type[4]=NORM_QUAD4; _sons_type[5]=NORM_QUAD4;
           _sons_con[0][0]=0; _sons_con[0][1]=1; _sons_con[0][2]=2; _sons_con[0][3]=3; _nb_of_sons_con[0]=4;
           _sons_con[1][0]=4; _sons_con[1][1]=7; _sons_con[1][2]=6; _sons_con[1][3]=5; _nb_of_sons_con[1]=4;
@@ -193,7 +194,7 @@ namespace INTERP_KERNEL
         break;
       case NORM_QUAD4:
         {
-          _nb_of_pts=4; _nb_of_sons=4; _dim=2; _quadratic_type=NORM_QUAD8; _is_simplex=false; _is_extruded=true;
+          _nb_of_pts=4; _nb_of_sons=4; _dim=2; _quadratic_type=NORM_QUAD8; _quadratic_type2=NORM_QUAD9; _is_simplex=false; _is_extruded=true;
           _sons_type[0]=NORM_SEG2; _sons_type[1]=NORM_SEG2; _sons_type[2]=NORM_SEG2; _sons_type[3]=NORM_SEG2;
           _sons_con[0][0]=0; _sons_con[0][1]=1; _nb_of_sons_con[0]=2;
           _sons_con[1][0]=1; _sons_con[1][1]=2; _nb_of_sons_con[1]=2;
@@ -203,7 +204,7 @@ namespace INTERP_KERNEL
         break;
       case NORM_TRI3:
         {
-          _nb_of_pts=3; _nb_of_sons=3; _dim=2; _quadratic_type=NORM_TRI6; _is_simplex=true;
+          _nb_of_pts=3; _nb_of_sons=3; _dim=2; _quadratic_type=NORM_TRI6; _quadratic_type2=NORM_TRI7; _is_simplex=true;
           _sons_type[0]=NORM_SEG2; _sons_type[1]=NORM_SEG2; _sons_type[2]=NORM_SEG2;
           _sons_con[0][0]=0; _sons_con[0][1]=1; _nb_of_sons_con[0]=2;
           _sons_con[1][0]=1; _sons_con[1][1]=2; _nb_of_sons_con[1]=2;
@@ -519,6 +520,20 @@ namespace INTERP_KERNEL
         else
           throw INTERP_KERNEL::Exception("CellModel::fillSonCellNodalConnectivity2 : no sons on NORM_POLYL !");
       }
+  }
+  
+  /*!
+   * Equivalent to CellModel::fillSonCellNodalConnectivity2 except for HEXA8 where the order of sub faces is not has MED file numbering for transformation HEXA8->HEXA27
+   */
+  unsigned CellModel::fillSonCellNodalConnectivity4(int sonId, const int *nodalConn, int lgth, int *sonNodalConn, NormalizedCellType& typeOfSon) const
+  {
+    if(_type==NORM_HEXA8)
+      {
+        static const int permutation[6]={0,2,3,4,1};
+        return fillSonCellNodalConnectivity2(permutation[sonId],nodalConn,lgth,sonNodalConn,typeOfSon);
+      }
+    else
+      return fillSonCellNodalConnectivity2(sonId,nodalConn,lgth,sonNodalConn,typeOfSon);
   }
 
   unsigned CellModel::fillSonEdgesNodalConnectivity3D(int sonId, const int *nodalConn, int lgth, int *sonNodalConn, NormalizedCellType& typeOfSon) const
