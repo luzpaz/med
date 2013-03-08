@@ -2898,7 +2898,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertAlmostEqual(8.,f.getMaxValue(),14);
         self.assertAlmostEqual(0.,f.getMinValue(),14);
         self.assertAlmostEqual(5.,f.getAverageValue(),14);
-        self.assertAlmostEqual(5.125,f.getWeightedAverageValue(),14);
+        self.assertAlmostEqual(5.125,f.getWeightedAverageValue(0,True),14);
         a1.setIJ(0,2,9.5);
         self.assertAlmostEqual(9.5,f.getMaxValue(),14);
         self.assertAlmostEqual(0.,f.getMinValue(),14);
@@ -11371,6 +11371,78 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(m3D.getCoords().isEqual(coordsExp2,1e-14))
         self.assertTrue(m3D.getNodalConnectivity().isEqual(DataArrayInt([27,0,2,3,1,6,8,9,7,18,19,20,21,22,23,24,25,26,27,28,29,51,52,53,54,55,51,67,27,4,5,3,2,10,11,9,8,30,31,19,32,33,34,23,35,36,37,28,27,56,57,58,53,59,56,68,27,6,8,9,7,12,14,15,13,22,23,24,25,38,39,40,41,42,43,44,45,55,60,61,62,63,55,69,27,10,11,9,8,16,17,15,14,33,34,23,35,46,47,39,48,49,50,44,43,59,64,65,61,66,59,70])))
         self.assertTrue(m3D.getNodalConnectivityIndex().isEqual(DataArrayInt([0,28,56,84,112])))
+        pass
+
+    def testSwig2GaussNEIntegral1(self):
+        m2D=MEDCouplingDataForTest.build2DTargetMesh_1()
+        m0=m2D[0] ; m0.zipCoords()
+        m1=m2D[[1,2]] ; m1.zipCoords()
+        m2=m2D[[3,4]] ; m2.zipCoords()
+        m0.convertLinearCellsToQuadratic(1)
+        m1.convertLinearCellsToQuadratic(0)
+        m2.convertLinearCellsToQuadratic(1)
+        m=MEDCouplingUMesh.MergeUMeshes([m0,m1,m2])
+        m.mergeNodes(1e-12)
+        f=MEDCouplingFieldDouble(ON_GAUSS_NE)
+        f.setMesh(m)
+        arr=DataArrayDouble([1.1,2.2,3.3,4.4,5.5,6.6,7.7,8.8,9.9,
+                             11.1,12.2,13.3,14.4,15.5,16.6,
+                             21.1,22.2,23.3,24.4,25.5,26.6,
+                             31.1,32.2,33.3,34.4,35.5,36.6,37.7,38.8,39.9,
+                             41.1,42.2,43.3,44.4,45.5,46.6,47.7,48.8,49.9])
+        arr2=DataArrayDouble(len(arr),2)
+        arr2[:,0]=arr ; arr2[:,1]=arr+100
+        f.setArray(arr2)
+        f.checkCoherency()
+        res=f.integral(False)
+        # a=25./81 ; b=40./81 ; c=64./81
+        # p1=0.11169079483905 ; p2=0.0549758718227661
+        # 1st compo
+        # c0=(a*(1.1+2.2+3.3+4.4)+b*(5.5+6.6+7.7+8.8)+c*9.9)*0.25/3.9999999999999978 ; c0=1.5837962962962973
+        # c1=(p2*(11.1+12.2+13.3)+p1*(14.4+15.5+16.6))*0.125/0.4999999999854482 ; c1=1.8014347172346943
+        # c2=(p2*(21.1+22.2+23.3)+p1*(24.4+25.5+26.6))*0.125/0.4999999999854482 ; c2=3.0514347172346943
+        # c3=(a*(31.1+32.2+33.3+34.4)+b*(35.5+36.6+37.7+38.8)+c*39.9)*0.25/3.9999999999999978 ; c3=9.0837962962963
+        # c4=(a*(41.1+42.2+43.3+44.4)+b*(45.5+46.6+47.7+48.8)+c*49.9)*0.25/3.9999999999999978 ; c4=11.583796296296303
+        # c0+c1+c2+c3+c4=27.104258323358287
+        integExp0=27.104258323358287
+        self.assertAlmostEqual(res[0],integExp0,13)
+        # 2nd compo
+        # c0=(a*(101.1+102.2+103.3+104.4)+b*(105.5+106.6+107.7+108.8)+c*109.9)*0.25/3.9999999999999978 ; c0=26.58379629629631
+        # c1=(p2*(111.1+112.2+113.3)+p1*(114.4+115.5+116.6))*0.125/0.4999999999854482 ; c1=14.301434717234699
+        # c2=(p2*(121.1+122.2+123.3)+p1*(124.4+125.5+126.6))*0.125/0.4999999999854482 ; c2=15.5514347172347
+        # c3=(a*(131.1+132.2+133.3+134.4)+b*(135.5+136.6+137.7+138.8)+c*139.9)*0.25/3.9999999999999978 ; c3=34.08379629629631
+        # c4=(a*(141.1+142.2+143.3+144.4)+b*(145.5+146.6+147.7+148.8)+c*149.9)*0.25/3.9999999999999978 ; c4=36.58379629629632
+        # c0+c1+c2+c3+c4=127.10425832335835
+        integExp1=127.10425832335835
+        self.assertAlmostEqual(res[1],integExp1,12)
+        meas=f.getDiscretization().getMeasureField(f.getMesh(),False)
+        intPerTuple=meas*f
+        res2=intPerTuple.accumulate()
+        self.assertAlmostEqual(res2[0],integExp0,13)
+        self.assertAlmostEqual(res2[1],integExp1,12)
+        #
+        meas2=f.buildMeasureField(False)
+        intPerTuple=meas2*f
+        res3=intPerTuple.accumulate()
+        self.assertAlmostEqual(res3[0],integExp0,13)
+        self.assertAlmostEqual(res3[1],integExp1,12)
+        #
+        res4=f.getWeightedAverageValue(False) # res4==res2 because sum of area of mesh is equal to 1
+        self.assertAlmostEqual(res4[0],integExp0,13)
+        self.assertAlmostEqual(res4[1],integExp1,12)
+        #
+        m.scale([0,0],2.)
+        #
+        res5=f.getWeightedAverageValue() # res4==res4 because weighted average is not sensitive to the scaling
+        self.assertAlmostEqual(res5[0],integExp0,13)
+        self.assertAlmostEqual(res5[1],integExp1,12)
+        meas3=f.buildMeasureField(False)
+        delta=4*meas2.getArray()-meas3.getArray()
+        delta.abs()
+        self.assertTrue(delta.isUniform(0.,1e-16))
+        res6=f.integral(False)
+        self.assertAlmostEqual(res6[0],4.*integExp0,12)
+        self.assertAlmostEqual(res6[1],4.*integExp1,11)
         pass
 
     def setUp(self):

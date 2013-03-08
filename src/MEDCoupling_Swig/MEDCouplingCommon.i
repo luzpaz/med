@@ -86,6 +86,12 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::MEDCouplingFieldDiscretization::getOffsetArr;
 %newobject ParaMEDMEM::MEDCouplingFieldDiscretization::clone;
 %newobject ParaMEDMEM::MEDCouplingFieldDiscretization::clonePart;
+%newobject ParaMEDMEM::MEDCouplingFieldDiscretization::getMeasureField;
+%newobject ParaMEDMEM::MEDCouplingFieldDiscretization::getOffsetArr;
+%newobject ParaMEDMEM::MEDCouplingFieldDiscretization::getLocalizationOfDiscValues;
+%newobject ParaMEDMEM::MEDCouplingFieldDiscretization::getValueOnMulti;
+%newobject ParaMEDMEM::MEDCouplingFieldDiscretization::computeTupleIdsToSelectFromCellIds;
+%newobject ParaMEDMEM::MEDCouplingFieldDiscretization::buildSubMeshData;
 %newobject ParaMEDMEM::MEDCouplingField::buildMeasureField;
 %newobject ParaMEDMEM::MEDCouplingField::getLocalizationOfDiscr;
 %newobject ParaMEDMEM::MEDCouplingField::computeTupleIdsToSelectFromCellIds;
@@ -6576,7 +6582,8 @@ namespace ParaMEDMEM
     double getAverageValue() const throw(INTERP_KERNEL::Exception);
     double norm2() const throw(INTERP_KERNEL::Exception);
     double normMax() const throw(INTERP_KERNEL::Exception);
-    double getWeightedAverageValue() const throw(INTERP_KERNEL::Exception);
+    //do not put a default value to isWAbs because confusion in python with overloaded getWeightedAverageValue method
+    double getWeightedAverageValue(int compId, bool isWAbs) const throw(INTERP_KERNEL::Exception);
     double integral(int compId, bool isWAbs) const throw(INTERP_KERNEL::Exception);
     double normL1(int compId) const throw(INTERP_KERNEL::Exception);
     double normL2(int compId) const throw(INTERP_KERNEL::Exception);
@@ -6798,32 +6805,35 @@ namespace ParaMEDMEM
         int sz=self->getNumberOfComponents();
         INTERP_KERNEL::AutoPtr<double> tmp=new double[sz];
         self->accumulate(tmp);
-        PyObject *ret=convertDblArrToPyList(tmp,sz);
-        return ret;
+        return convertDblArrToPyList(tmp,sz);
       }
       PyObject *integral(bool isWAbs) const throw(INTERP_KERNEL::Exception)
       {
         int sz=self->getNumberOfComponents();
         INTERP_KERNEL::AutoPtr<double> tmp=new double[sz];
         self->integral(isWAbs,tmp);
-        PyObject *ret=convertDblArrToPyList(tmp,sz);
-        return ret;
+        return convertDblArrToPyList(tmp,sz);
+      }
+      PyObject *getWeightedAverageValue(bool isWAbs=true) const throw(INTERP_KERNEL::Exception)
+      {
+        int sz=self->getNumberOfComponents();
+        INTERP_KERNEL::AutoPtr<double> tmp=new double[sz];
+        self->getWeightedAverageValue(tmp,isWAbs);
+        return convertDblArrToPyList(tmp,sz);
       }
       PyObject *normL1() const throw(INTERP_KERNEL::Exception)
       {
         int sz=self->getNumberOfComponents();
         INTERP_KERNEL::AutoPtr<double> tmp=new double[sz];
         self->normL1(tmp);
-        PyObject *ret=convertDblArrToPyList(tmp,sz);
-        return ret;
+        return convertDblArrToPyList(tmp,sz);
       }
       PyObject *normL2() const throw(INTERP_KERNEL::Exception)
       {
         int sz=self->getNumberOfComponents();
         INTERP_KERNEL::AutoPtr<double> tmp=new double[sz];
         self->normL2(tmp);
-        PyObject *ret=convertDblArrToPyList(tmp,sz);
-        return ret;
+        return convertDblArrToPyList(tmp,sz);
       }
       void renumberCells(PyObject *li, bool check=true) throw(INTERP_KERNEL::Exception)
       {

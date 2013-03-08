@@ -26,6 +26,8 @@
 #include "MEDCouplingAutoRefCountObjectPtr.hxx"
 #include "MEDCouplingNatureOfField.hxx"
 
+#include "InterpKernelAutoPtr.hxx"
+
 #include <sstream>
 #include <limits>
 #include <algorithm>
@@ -751,17 +753,44 @@ double MEDCouplingFieldDouble::normMax() const throw(INTERP_KERNEL::Exception)
  * \a this is expected to be a field with exactly \b one component. If not an exception will be thrown.
  * To getAverageValue on vector field applyFunc is needed before. This method looks only \b default array \b and \b only \b default.
  * If default array does not exist, an exception will be thrown.
+ * 
+ * \param [out] res the location where the result will be stored. \a res is expected to be a location with \c this->getNumberOfComponents() places available.
+ * \param [in] isWAbs specifies if abs is applied on measure on underlying mesh before performing computation. For a user already sure that all cells of its underlying mesh
+ *                    are all well oriented this parameter can be set to false to be 'faster'. By default this parameter is true.
  */
-double MEDCouplingFieldDouble::getWeightedAverageValue() const throw(INTERP_KERNEL::Exception)
+void MEDCouplingFieldDouble::getWeightedAverageValue(double *res, bool isWAbs) const throw(INTERP_KERNEL::Exception)
 {
   if(getArray()==0)
     throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::getWeightedAverageValue : no default array defined !");
-  MEDCouplingFieldDouble *w=buildMeasureField(true);
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> w=buildMeasureField(isWAbs);
   double deno=w->getArray()->accumulate(0);
-  w->getArray()->multiplyEqual(getArray());
-  double res=w->getArray()->accumulate(0);
-  w->decrRef();
-  return res/deno;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> arr=getArray()->deepCpy();
+  arr->multiplyEqual(w->getArray());
+  std::transform(arr->begin(),arr->end(),arr->getPointer(),std::bind2nd(std::multiplies<double>(),1./deno));
+  arr->accumulate(res);
+}
+
+/*!
+ * This method returns the average value in \a this weighted by ParaMEDMEM::MEDCouplingField::buildMeasureField.
+ * \a this is expected to be a field with exactly \b one component. If not an exception will be thrown.
+ * To getAverageValue on vector field applyFunc is needed before. This method looks only \b default array \b and \b only \b default.
+ * If default array does not exist, an exception will be thrown.
+ * 
+ * \param [in] compId The component id that should be in [0, \c this->getNumberOfComponents() ). If not an INTERP_KERNEL::Exception will be thrown.
+ * \param [in] isWAbs specifies if abs is applied on measure on underlying mesh before performing computation. For a user already sure that all cells of its underlying mesh
+ *                    are all well oriented this parameter can be set to false to be 'faster'. By default this parameter is true in C++ not in python (overloading confusion).
+ */
+double MEDCouplingFieldDouble::getWeightedAverageValue(int compId, bool isWAbs) const throw(INTERP_KERNEL::Exception)
+{
+  int nbComps=getArray()->getNumberOfComponents();
+  if(compId<0 || compId>=nbComps)
+    {
+      std::ostringstream oss; oss << "MEDCouplingFieldDouble::getWeightedAverageValue : Invalid compId specified : No such nb of components ! Should be in [0," << nbComps << ") !";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
+    }
+  INTERP_KERNEL::AutoPtr<double> res=new double[nbComps];
+  getWeightedAverageValue(res,isWAbs);
+  return res[compId];
 }
 
 /*!
@@ -776,21 +805,14 @@ double MEDCouplingFieldDouble::normL1(int compId) const throw(INTERP_KERNEL::Exc
   if(!_mesh)
     throw INTERP_KERNEL::Exception("No mesh underlying this field to perform normL1");
   int nbComps=getArray()->getNumberOfComponents();
-  if(compId>=nbComps)
-    throw INTERP_KERNEL::Exception("Invalid compId specified : No such nb of components !");
-  double *res=new double[nbComps];
-  try
+  if(compId<0 || compId>=nbComps)
     {
-      _type->normL1(_mesh,getArray(),res);
+      std::ostringstream oss; oss << "MEDCouplingFieldDouble::normL1 : Invalid compId specified : No such nb of components ! Should be in [0," << nbComps << ") !";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
     }
-  catch(INTERP_KERNEL::Exception& e)
-    {
-      delete [] res;
-      throw e;
-    }
-  double ret=res[compId];
-  delete [] res;
-  return ret;
+  INTERP_KERNEL::AutoPtr<double> res=new double[nbComps];
+  _type->normL1(_mesh,getArray(),res);
+  return res[compId];
 }
 
 /*!
@@ -819,21 +841,14 @@ double MEDCouplingFieldDouble::normL2(int compId) const throw(INTERP_KERNEL::Exc
   if(!_mesh)
     throw INTERP_KERNEL::Exception("No mesh underlying this field to perform normL2");
   int nbComps=getArray()->getNumberOfComponents();
-  if(compId>=nbComps)
-    throw INTERP_KERNEL::Exception("Invalid compId specified : No such nb of components !");
-  double *res=new double[nbComps];
-  try
+  if(compId<0 || compId>=nbComps)
     {
-      _type->normL2(_mesh,getArray(),res);
+      std::ostringstream oss; oss << "MEDCouplingFieldDouble::normL2 : Invalid compId specified : No such nb of components ! Should be in [0," << nbComps << ") !";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
     }
-  catch(INTERP_KERNEL::Exception& e)
-    {
-      delete [] res;
-      throw e;
-    }
-  double ret=res[compId];
-  delete [] res;
-  return ret;
+  INTERP_KERNEL::AutoPtr<double> res=new double[nbComps];
+  _type->normL2(_mesh,getArray(),res);
+  return res[compId];
 }
 
 /*!
@@ -860,21 +875,14 @@ double MEDCouplingFieldDouble::integral(int compId, bool isWAbs) const throw(INT
   if(!_mesh)
     throw INTERP_KERNEL::Exception("No mesh underlying this field to perform integral");
   int nbComps=getArray()->getNumberOfComponents();
-  if(compId>=nbComps)
-    throw INTERP_KERNEL::Exception("Invalid compId specified : No such nb of components !");
-  double *res=new double[nbComps];
-  try
+  if(compId<0 || compId>=nbComps)
     {
-      _type->integral(_mesh,getArray(),isWAbs,res);
+      std::ostringstream oss; oss << "MEDCouplingFieldDouble::integral : Invalid compId specified : No such nb of components ! Should be in [0," << nbComps << ") !";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
     }
-  catch(INTERP_KERNEL::Exception& e)
-    {
-      delete [] res;
-      throw e;
-    }
-  double ret=res[compId];
-  delete [] res;
-  return ret;
+  INTERP_KERNEL::AutoPtr<double> res=new double[nbComps];
+  _type->integral(_mesh,getArray(),isWAbs,res);
+  return res[compId];
 }
 
 /*!

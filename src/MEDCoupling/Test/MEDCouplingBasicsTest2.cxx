@@ -1094,7 +1094,7 @@ void MEDCouplingBasicsTest2::testGetMaxValue1()
   CPPUNIT_ASSERT_DOUBLES_EQUAL(8.,f->getMaxValue(),1e-14);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(0.,f->getMinValue(),1e-14);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(5.,f->getAverageValue(),1e-14);
-  CPPUNIT_ASSERT_DOUBLES_EQUAL(5.125,f->getWeightedAverageValue(),1e-14);
+  CPPUNIT_ASSERT_DOUBLES_EQUAL(5.125,f->getWeightedAverageValue(0),1e-14);
   a1->setIJ(0,2,9.5);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(9.5,f->getMaxValue(),1e-14);
   CPPUNIT_ASSERT_DOUBLES_EQUAL(0.,f->getMinValue(),1e-14);
