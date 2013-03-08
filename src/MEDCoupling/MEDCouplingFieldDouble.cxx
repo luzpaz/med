@@ -56,7 +56,7 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::New(TypeOfField type, TypeOfTime
  
  * \return a newly allocated field the caller should deal with.
  */
-MEDCouplingFieldDouble *MEDCouplingFieldDouble::New(const MEDCouplingFieldTemplate *ft, TypeOfTimeDiscretization td)
+MEDCouplingFieldDouble *MEDCouplingFieldDouble::New(const MEDCouplingFieldTemplate& ft, TypeOfTimeDiscretization td)
 {
   return new MEDCouplingFieldDouble(ft,td);
 }
@@ -546,12 +546,12 @@ MEDCouplingFieldDouble::MEDCouplingFieldDouble(TypeOfField type, TypeOfTimeDiscr
 {
 }
 
-MEDCouplingFieldDouble::MEDCouplingFieldDouble(const MEDCouplingFieldTemplate *ft, TypeOfTimeDiscretization td):MEDCouplingField(*ft),
+MEDCouplingFieldDouble::MEDCouplingFieldDouble(const MEDCouplingFieldTemplate& ft, TypeOfTimeDiscretization td):MEDCouplingField(ft),
                                                                                                                 _time_discr(MEDCouplingTimeDiscretization::New(td))
 {
 }
 
-MEDCouplingFieldDouble::MEDCouplingFieldDouble(const MEDCouplingFieldDouble& other, bool deepCopy):MEDCouplingField(other),
+MEDCouplingFieldDouble::MEDCouplingFieldDouble(const MEDCouplingFieldDouble& other, bool deepCopy):MEDCouplingField(other,deepCopy),
                                                                                                    _time_discr(other._time_discr->performCpy(deepCopy))
 {
 }
