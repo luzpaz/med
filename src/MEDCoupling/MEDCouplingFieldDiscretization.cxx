@@ -101,7 +101,7 @@ MEDCouplingFieldDiscretization *MEDCouplingFieldDiscretization::New(TypeOfField 
     }
 }
 
-TypeOfField MEDCouplingFieldDiscretization::getTypeOfFieldFromStringRepr(const char *repr) throw(INTERP_KERNEL::Exception)
+TypeOfField MEDCouplingFieldDiscretization::GetTypeOfFieldFromStringRepr(const char *repr) throw(INTERP_KERNEL::Exception)
 {
   std::string reprCpp(repr);
   if(reprCpp==MEDCouplingFieldDiscretizationP0::REPR)

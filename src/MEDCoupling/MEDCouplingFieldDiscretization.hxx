@@ -47,7 +47,7 @@ namespace ParaMEDMEM
     void setPrecision(double val) { _precision=val; }
     void updateTime() const;
     std::size_t getHeapMemorySize() const;
-    static TypeOfField getTypeOfFieldFromStringRepr(const char *repr) throw(INTERP_KERNEL::Exception);
+    static TypeOfField GetTypeOfFieldFromStringRepr(const char *repr) throw(INTERP_KERNEL::Exception);
     virtual TypeOfField getEnum() const = 0;
     virtual bool isEqual(const MEDCouplingFieldDiscretization *other, double eps) const;
     virtual bool isEqualIfNotWhy(const MEDCouplingFieldDiscretization *other, double eps, std::string& reason) const = 0;
