@@ -38,7 +38,7 @@ IF(KERNEL_ROOT_DIR)
   
   SET(SALOME_MACROS_DIR ${KERNEL_ROOT_DIR}/salome_adm/cmake_files)
   
-  INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/deprecated/FindPLATFORM.cmake)
+  INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/FindPLATFORM.cmake)
   INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/deprecated/FindPYTHON.cmake)
   if(SALOME_USE_MPI)
     INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/deprecated/FindMPI.cmake)
