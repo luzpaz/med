@@ -25,6 +25,8 @@
 #include "MEDCouplingTimeLabel.hxx"
 #include "InterpolationOptions.hxx"
 #include "MEDCouplingNatureOfField.hxx"
+#include "MEDCouplingAutoRefCountObjectPtr.hxx"
+
 #include "InterpKernelException.hxx"
 
 #include <map>
@@ -33,7 +35,6 @@
 namespace ParaMEDMEM
 {
   class MEDCouplingMesh;
-  class MEDCouplingUMesh;
   class MEDCouplingFieldDouble;
   class MEDCouplingFieldTemplate;
 }
@@ -63,12 +64,14 @@ namespace ParaMEDMEM
     MEDCOUPLINGREMAPPER_EXPORT const std::vector<std::map<int,double> >& getCrudeMatrix() const;
     MEDCOUPLINGREMAPPER_EXPORT static void PrintMatrix(const std::vector<std::map<int,double> >& m);
   private:
-    int prepareUU(const char *method) throw(INTERP_KERNEL::Exception);
-    int prepareEE(const char *method) throw(INTERP_KERNEL::Exception);
-    int prepareUC(const char *method) throw(INTERP_KERNEL::Exception);
-    int prepareCU(const char *method) throw(INTERP_KERNEL::Exception);
-    int prepareCC(const char *method) throw(INTERP_KERNEL::Exception);
+    int prepareUU() throw(INTERP_KERNEL::Exception);
+    int prepareEE() throw(INTERP_KERNEL::Exception);
+    int prepareUC() throw(INTERP_KERNEL::Exception);
+    int prepareCU() throw(INTERP_KERNEL::Exception);
+    int prepareCC() throw(INTERP_KERNEL::Exception);
     void updateTime() const;
+    void checkPrepare() const throw(INTERP_KERNEL::Exception);
+    std::string checkAndGiveInterpolationMethodStr(std::string& srcMeth, std::string& trgMeth) const throw(INTERP_KERNEL::Exception);
     void releaseData(bool matrixSuppression);
     void transferUnderground(const MEDCouplingFieldDouble *srcField, MEDCouplingFieldDouble *targetField, bool isDftVal, double dftValue) throw(INTERP_KERNEL::Exception);
     void computeDeno(NatureOfField nat, const MEDCouplingFieldDouble *srcField, const MEDCouplingFieldDouble *trgField);
@@ -86,10 +89,8 @@ namespace ParaMEDMEM
     static void ComputeColSumAndRowSum(const std::vector<std::map<int,double> >& matrixDeno,
                                        std::vector<std::map<int,double> >& deno, std::vector<std::map<int,double> >& denoReverse);
   private:
-    MEDCouplingMesh *_src_mesh;
-    MEDCouplingMesh *_target_mesh;
-    std::string _src_method;
-    std::string _target_method;
+    MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldTemplate> _src_ft;
+    MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldTemplate> _target_ft;
     NatureOfField _nature_of_deno;
     unsigned int _time_deno_update;
     std::vector<std::map<int,double> > _matrix;
