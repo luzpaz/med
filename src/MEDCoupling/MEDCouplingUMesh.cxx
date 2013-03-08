@@ -6035,7 +6035,9 @@ bool MEDCouplingUMesh::checkConsecutiveCellTypesForMEDFileFrmt() const throw(INT
 
 /*!
  * This method performs the same job as checkConsecutiveCellTypes except that the order of types sequence is analyzed to check
- * that the order is specified in array defined by [orderBg,orderEnd). 
+ * that the order is specified in array defined by [orderBg,orderEnd).
+ * If there is some geo types in \a this \b NOT in [ \a orderBg, \a orderEnd ) it is OK (return true) if contiguous.
+ * If there is some geo types in [ \a orderBg, \a orderEnd ) \b NOT in \a this it is OK too (return true) if contiguous.
  */
 bool MEDCouplingUMesh::checkConsecutiveCellTypesAndOrder(const INTERP_KERNEL::NormalizedCellType *orderBg, const INTERP_KERNEL::NormalizedCellType *orderEnd) const
 {
@@ -6043,15 +6045,32 @@ bool MEDCouplingUMesh::checkConsecutiveCellTypesAndOrder(const INTERP_KERNEL::No
   const int *conn=_nodal_connec->getConstPointer();
   const int *connI=_nodal_connec_index->getConstPointer();
   int nbOfCells=getNumberOfCells();
+  if(nbOfCells==0)
+    return true;
   int lastPos=-1;
+  std::set<INTERP_KERNEL::NormalizedCellType> sg;
   for(const int *i=connI;i!=connI+nbOfCells;)
     {
       INTERP_KERNEL::NormalizedCellType curType=(INTERP_KERNEL::NormalizedCellType)conn[*i];
-      int pos=(int)std::distance(orderBg,std::find(orderBg,orderEnd,curType));
-      if(pos<=lastPos)
-        return false;
-      lastPos=pos;
-      i=std::find_if(i+1,connI+nbOfCells,ParaMEDMEMImpl::ConnReader(conn,(int)curType));
+      const INTERP_KERNEL::NormalizedCellType *isTypeExists=std::find(orderBg,orderEnd,curType);
+      if(isTypeExists!=orderEnd)
+        {
+          int pos=(int)std::distance(orderBg,isTypeExists);
+          if(pos<=lastPos)
+            return false;
+          lastPos=pos;
+          i=std::find_if(i+1,connI+nbOfCells,ParaMEDMEMImpl::ConnReader(conn,(int)curType));
+        }
+      else
+        {
+          if(sg.find(curType)==sg.end())
+            {
+              i=std::find_if(i+1,connI+nbOfCells,ParaMEDMEMImpl::ConnReader(conn,(int)curType));
+              sg.insert(curType);
+            }
+          else
+            return false;
+        }
     }
   return true;
 }
