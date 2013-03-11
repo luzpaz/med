@@ -215,6 +215,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT void findCommonTuples(double prec, int limitTupleId, DataArrayInt *&comm, DataArrayInt *&commIndex) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayDouble *duplicateEachTupleNTimes(int nbTimes) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayDouble *getDifferentValues(double prec, int limitTupleId=-1) const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT DataArrayInt *findClosestTupleId(const DataArrayDouble *other) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void setSelectedComponents(const DataArrayDouble *a, const std::vector<int>& compoIds) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void setPartOfValues1(const DataArrayDouble *a, int bgTuples, int endTuples, int stepTuples, int bgComp, int endComp, int stepComp, bool strictCompoCompare=true) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void setPartOfValuesSimple1(double a, int bgTuples, int endTuples, int stepTuples, int bgComp, int endComp, int stepComp) throw(INTERP_KERNEL::Exception);
@@ -315,6 +316,10 @@ namespace ParaMEDMEM
   public:
     template<int SPACEDIM>
     void findCommonTuplesAlg(const double *bbox, int nbNodes, int limitNodeId, double prec, DataArrayInt *c, DataArrayInt *cI) const;
+    template<int SPACEDIM>
+    static void FindClosestTupleIdAlg(const BBTree<SPACEDIM,int>& myTree, double dist, const double *pos, int nbOfTuples, const double *thisPt, int thisNbOfTuples, int *res);
+    template<int SPACEDIM>
+    static int ComputeBasicClosestTupleIdAlg(const std::vector<int>& elems, const double *thisPt, const double *zePt);
     template<int SPACEDIM>
     static void FindTupleIdsNearTuplesAlg(const BBTree<SPACEDIM,int>& myTree, const double *pos, int nbOfTuples, double eps,
                                           DataArrayInt *c, DataArrayInt *cI);

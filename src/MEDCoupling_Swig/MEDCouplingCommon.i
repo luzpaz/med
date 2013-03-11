@@ -245,6 +245,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayDouble::fromCylToCart;
 %newobject ParaMEDMEM::DataArrayDouble::fromSpherToCart;
 %newobject ParaMEDMEM::DataArrayDouble::getDifferentValues;
+%newobject ParaMEDMEM::DataArrayDouble::findClosestTupleId;
 %newobject ParaMEDMEM::DataArrayDouble::duplicateEachTupleNTimes;
 %newobject ParaMEDMEM::DataArrayDouble::__neg__;
 %newobject ParaMEDMEM::DataArrayDouble::__add__;

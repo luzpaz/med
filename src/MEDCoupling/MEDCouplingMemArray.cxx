@@ -84,6 +84,47 @@ void DataArrayDouble::FindTupleIdsNearTuplesAlg(const BBTree<SPACEDIM,int>& myTr
     }
 }
 
+template<int SPACEDIM>
+int DataArrayDouble::ComputeBasicClosestTupleIdAlg(const std::vector<int>& elems, const double *thisPt, const double *zePt)
+{
+  double val=std::numeric_limits<double>::max();
+  int ret=-1;
+  for(std::vector<int>::const_iterator it=elems.begin();it!=elems.end();it++)
+    {
+      double tmp=0.;
+      for(int j=0;j<SPACEDIM;j++) tmp+=thisPt[SPACEDIM*(*it)+j]-zePt[j];
+      if(tmp<val)
+        { val=tmp; ret=*it; }
+    }
+  return ret;
+}
+
+template<int SPACEDIM>
+void DataArrayDouble::FindClosestTupleIdAlg(const BBTree<SPACEDIM,int>& myTree, double dist, const double *pos, int nbOfTuples, const double *thisPt, int thisNbOfTuples, int *res)
+{
+  double distOpt(dist);
+  const double *p(pos);
+  int *r(res);
+  double bbox[2*SPACEDIM];
+  for(int i=0;i<nbOfTuples;i++,p+=SPACEDIM,r++)
+    {
+      double failVal(distOpt),okVal(std::numeric_limits<double>::max());
+      int nbOfTurn=15;
+      while(nbOfTurn>0)
+        {
+          for(int j=0;j<SPACEDIM;j++) { bbox[2*j]=p[j]-distOpt; bbox[2*j]=p[j]+distOpt; }
+          std::vector<int> elems;
+          myTree.getIntersectingElems(bbox,elems); nbOfTurn--;
+          if(elems.empty())
+            { failVal=distOpt; distOpt=okVal==std::numeric_limits<double>::max()?2*distOpt:(okVal+failVal)/2.; continue; }
+          if( elems.size()<=15 || nbOfTurn>0)
+            { *r=ComputeBasicClosestTupleIdAlg<SPACEDIM>(elems,thisPt,p); break; }
+          else
+            { okVal=distOpt; distOpt=(distOpt+failVal)/2.; continue; }
+        }
+    }
+}
+
 std::size_t DataArray::getHeapMemorySize() const
 {
   std::size_t sz1=_name.capacity();
@@ -1308,6 +1349,65 @@ DataArrayDouble *DataArrayDouble::duplicateEachTupleNTimes(int nbTimes) const th
         *retPtr=val;
     }
   ret->copyStringInfoFrom(*this);
+  return ret.retn();
+}
+
+/*!
+ * This methods returns for each tuple in \a other which tuple in \a this is the closest.
+ * So \a this and \a other have to have the same number of components.
+ *
+ * \return a newly allocated (new object to be dealt by the caller) DataArrayInt having \c other->getNumberOfTuples() tuples and one components.
+ */
+DataArrayInt *DataArrayDouble::findClosestTupleId(const DataArrayDouble *other) const throw(INTERP_KERNEL::Exception)
+{
+  if(!other)
+    throw INTERP_KERNEL::Exception("DataArrayDouble::findClosestTupleId : other instance is NULL !");
+  checkAllocated(); other->checkAllocated();
+  int nbOfCompo=getNumberOfComponents();
+  if(nbOfCompo!=other->getNumberOfComponents())
+    {
+      std::ostringstream oss; oss << "DataArrayDouble::findClosestTupleId : number of components in this is " << nbOfCompo;
+      oss << ", whereas number of components in other is " << other->getNumberOfComponents() << "! Should be equal !";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
+    }
+  int nbOfTuples=other->getNumberOfTuples();
+  int thisNbOfTuples=getNumberOfTuples();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New(); ret->alloc(nbOfTuples,1);
+  double bounds[6];
+  getMinMaxPerComponent(bounds);
+  switch(nbOfCompo)
+    {
+    case 3:
+      {
+        double xDelta(fabs(bounds[1]-bounds[0])),yDelta(fabs(bounds[3]-bounds[2])),zDelta(fabs(bounds[5]-bounds[4]));
+        double delta=std::max(xDelta,yDelta); delta=std::max(delta,zDelta);
+        double characSize=pow((delta*delta*delta)/thisNbOfTuples,1./3.);
+        MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> bbox=computeBBoxPerTuple(characSize*1e-12);
+        BBTree<3,int> myTree(bbox->getConstPointer(),0,0,getNumberOfTuples(),characSize*1e-12);
+        FindClosestTupleIdAlg<3>(myTree,2.*characSize,other->begin(),nbOfTuples,begin(),thisNbOfTuples,ret->getPointer());
+        break;
+      }
+    case 2:
+      {
+        double xDelta(fabs(bounds[1]-bounds[0])),yDelta(fabs(bounds[3]-bounds[2]));
+        double delta=std::max(xDelta,yDelta);
+        double characSize=sqrt((delta*delta)/thisNbOfTuples);
+        MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> bbox=computeBBoxPerTuple(characSize*1e-12);
+        BBTree<2,int> myTree(bbox->getConstPointer(),0,0,getNumberOfTuples(),characSize*1e-12);
+        FindClosestTupleIdAlg<2>(myTree,2.*characSize,other->begin(),nbOfTuples,begin(),thisNbOfTuples,ret->getPointer());
+        break;
+      }
+    case 1:
+      {
+        double characSize=fabs(bounds[1]-bounds[0])/thisNbOfTuples;
+        MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> bbox=computeBBoxPerTuple(characSize*1e-12);
+        BBTree<1,int> myTree(bbox->getConstPointer(),0,0,getNumberOfTuples(),characSize*1e-12);
+        FindClosestTupleIdAlg<1>(myTree,2.*characSize,other->begin(),nbOfTuples,begin(),thisNbOfTuples,ret->getPointer());
+        break;
+      }
+    default:
+      throw INTERP_KERNEL::Exception("Unexpected spacedim of coords for findClosestTupleId. Must be 1, 2 or 3.");
+    }
   return ret.retn();
 }
 
@@ -5345,13 +5445,11 @@ DataArrayInt *DataArrayInt::getIdsEqualList(const int *valsBg, const int *valsEn
   const int *cptr=getConstPointer();
   std::vector<int> res;
   int nbOfTuples=getNumberOfTuples();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret(DataArrayInt::New()); ret->alloc(0,1);
   for(int i=0;i<nbOfTuples;i++,cptr++)
     if(vals2.find(*cptr)!=vals2.end())
-      res.push_back(i);
-  DataArrayInt *ret=DataArrayInt::New();
-  ret->alloc((int)res.size(),1);
-  std::copy(res.begin(),res.end(),ret->getPointer());
-  return ret;
+      ret->pushBackSilent(i);
+  return ret.retn();
 }
 
 DataArrayInt *DataArrayInt::getIdsNotEqualList(const int *valsBg, const int *valsEnd) const throw(INTERP_KERNEL::Exception)
@@ -5362,13 +5460,11 @@ DataArrayInt *DataArrayInt::getIdsNotEqualList(const int *valsBg, const int *val
   const int *cptr=getConstPointer();
   std::vector<int> res;
   int nbOfTuples=getNumberOfTuples();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret(DataArrayInt::New()); ret->alloc(0,1);
   for(int i=0;i<nbOfTuples;i++,cptr++)
     if(vals2.find(*cptr)==vals2.end())
-      res.push_back(i);
-  DataArrayInt *ret=DataArrayInt::New();
-  ret->alloc((int)res.size(),1);
-  std::copy(res.begin(),res.end(),ret->getPointer());
-  return ret;
+      ret->pushBackSilent(i);
+  return ret.retn();
 }
 
 /*!
