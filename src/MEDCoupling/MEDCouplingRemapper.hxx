@@ -41,6 +41,14 @@ namespace ParaMEDMEM
 
 namespace ParaMEDMEM
 {
+  typedef enum
+    {
+      IK_ONLY_PREFERED = 0,
+      NOT_IK_ONLY_PREFERED = 1,
+      IK_ONLY_FORCED = 2,
+      NOT_IK_ONLY_FORCED =3
+    } InterpolationMatrixPolicy;
+
   class MEDCouplingRemapper : public TimeLabel, public INTERP_KERNEL::InterpolationOptions
   {
   public:
@@ -56,6 +64,8 @@ namespace ParaMEDMEM
     MEDCOUPLINGREMAPPER_EXPORT bool setOptionInt(const std::string& key, int value);
     MEDCOUPLINGREMAPPER_EXPORT bool setOptionDouble(const std::string& key, double value);
     MEDCOUPLINGREMAPPER_EXPORT bool setOptionString(const std::string& key, const std::string& value);
+    MEDCOUPLINGREMAPPER_EXPORT int getInterpolationMatrixPolicy() const;
+    MEDCOUPLINGREMAPPER_EXPORT void setInterpolationMatrixPolicy(int newInterpMatPol) throw(INTERP_KERNEL::Exception);
     //
     MEDCOUPLINGREMAPPER_EXPORT int nullifiedTinyCoeffInCrudeMatrixAbs(double maxValAbs) throw(INTERP_KERNEL::Exception);
     MEDCOUPLINGREMAPPER_EXPORT int nullifiedTinyCoeffInCrudeMatrix(double scaleFactor) throw(INTERP_KERNEL::Exception);
@@ -64,11 +74,19 @@ namespace ParaMEDMEM
     MEDCOUPLINGREMAPPER_EXPORT const std::vector<std::map<int,double> >& getCrudeMatrix() const;
     MEDCOUPLINGREMAPPER_EXPORT static void PrintMatrix(const std::vector<std::map<int,double> >& m);
   private:
-    int prepareUU() throw(INTERP_KERNEL::Exception);
-    int prepareEE() throw(INTERP_KERNEL::Exception);
-    int prepareUC() throw(INTERP_KERNEL::Exception);
-    int prepareCU() throw(INTERP_KERNEL::Exception);
-    int prepareCC() throw(INTERP_KERNEL::Exception);
+    int prepareInterpKernelOnly() throw(INTERP_KERNEL::Exception);
+    int prepareInterpKernelOnlyUU() throw(INTERP_KERNEL::Exception);
+    int prepareInterpKernelOnlyEE() throw(INTERP_KERNEL::Exception);
+    int prepareInterpKernelOnlyUC() throw(INTERP_KERNEL::Exception);
+    int prepareInterpKernelOnlyCU() throw(INTERP_KERNEL::Exception);
+    int prepareInterpKernelOnlyCC() throw(INTERP_KERNEL::Exception);
+    //
+    int prepareNotInterpKernelOnly() throw(INTERP_KERNEL::Exception);
+    int prepareNotInterpKernelOnlyGaussGauss() throw(INTERP_KERNEL::Exception);
+    //
+    static int CheckInterpolationMethodManageableByNotOnlyInterpKernel(const std::string& method) throw(INTERP_KERNEL::Exception);
+    //
+    bool isInterpKernelOnlyOrNotOnly() const throw(INTERP_KERNEL::Exception);
     void updateTime() const;
     void checkPrepare() const throw(INTERP_KERNEL::Exception);
     std::string checkAndGiveInterpolationMethodStr(std::string& srcMeth, std::string& trgMeth) const throw(INTERP_KERNEL::Exception);
@@ -91,6 +109,7 @@ namespace ParaMEDMEM
   private:
     MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldTemplate> _src_ft;
     MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldTemplate> _target_ft;
+    InterpolationMatrixPolicy _interp_matrix_pol;
     NatureOfField _nature_of_deno;
     unsigned int _time_deno_update;
     std::vector<std::map<int,double> > _matrix;
