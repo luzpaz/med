@@ -868,7 +868,7 @@ void MEDCouplingFieldDouble::normL2(double *res) const throw(INTERP_KERNEL::Exce
 /*!
  * Returns the accumulation (the sum) of comId_th component of each tuples weigthed by the field
  * returns by getWeightingField relative of the _type of field of default array.
- * This method is usefull to check the conservativity of interpolation method.
+ * This method is useful to check the conservativity of interpolation method.
  */
 double MEDCouplingFieldDouble::integral(int compId, bool isWAbs) const throw(INTERP_KERNEL::Exception)
 {
@@ -888,7 +888,7 @@ double MEDCouplingFieldDouble::integral(int compId, bool isWAbs) const throw(INT
 /*!
  * Returns the accumulation (the sum) of each tuples weigthed by the field
  * returns by getWeightingField relative of the _type of field of default array.
- * This method is usefull to check the conservativity of interpolation method.
+ * This method is useful to check the conservativity of interpolation method.
  */
 void MEDCouplingFieldDouble::integral(bool isWAbs, double *res) const throw(INTERP_KERNEL::Exception)
 {

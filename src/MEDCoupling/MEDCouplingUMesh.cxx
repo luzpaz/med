@@ -952,7 +952,7 @@ void MEDCouplingUMesh::convertAllToPoly()
  * When called 'this' is an invalid mesh on MED sense. This method will correct that for polyhedra.
  * In case of presence of polyhedron that has not the extruded aspect (2 faces with the same number of nodes) an exception is thrown and 'this'
  * remains unchanged.
- * This method is usefull only for users that wants to build extruded unstructured mesh.
+ * This method is useful only for users that wants to build extruded unstructured mesh.
  * This method is a convenient one that avoids boring polyhedra setting during insertNextCell process.
  * In case of success, 'this' has be corrected contains the same number of cells and is valid in MED sense.
  */
@@ -3143,7 +3143,7 @@ DataArrayDouble *MEDCouplingUMesh::getPartMeasureField(bool isAbs, const int *be
 }
 
 /*!
- * This methods returns a field on nodes and no time. This method is usefull to check "P1*" conservative interpolators.
+ * This methods returns a field on nodes and no time. This method is useful to check "P1*" conservative interpolators.
  * This field returns the getMeasureField of the dualMesh in P1 sens of 'this'.
  */
 MEDCouplingFieldDouble *MEDCouplingUMesh::getMeasureFieldOnNode(bool isAbs) const
@@ -5202,7 +5202,7 @@ void MEDCouplingUMesh::subDivide2DMesh(const int *nodeSubdived, const int *nodeI
  * nodal connectivity will be transform to a NORM_TRI3 cell.
  * This method works \b only \b on \b linear cells.
  * This method works on nodes ids, that is to say a call to ParaMEDMEM::MEDCouplingUMesh::mergeNodes
- * method could be usefull before calling this method in case of presence of several pair of nodes located on same position.
+ * method could be useful before calling this method in case of presence of several pair of nodes located on same position.
  * This method throws an exception if 'this' is not fully defined (connectivity).
  * This method throws an exception too if a "too" degenerated cell is detected. For example a NORM_TRI3 with 3 times the same node id.
  */
@@ -5988,7 +5988,7 @@ MEDCouplingUMesh *MEDCouplingUMesh::emulateMEDMEMBDC(const MEDCouplingUMesh *nM1
 
 /*!
  * This method sorts cell in this so that cells are sorted by cell type specified by MEDMEM and so for MED file.
- * It avoids to deal with renum in MEDLoader so it is usefull for MED file R/W with multi types.
+ * It avoids to deal with renum in MEDLoader so it is useful for MED file R/W with multi types.
  * This method returns a newly allocated array old2New.
  * This method expects that connectivity of this is set. If not an exception will be thrown. Coordinates are not taken into account.
  */
@@ -6676,7 +6676,7 @@ MEDCouplingUMesh *MEDCouplingUMesh::FuseUMeshesOnSameCoords(const std::vector<co
  * But mesh in \b meshes \b can \b have \b different \b mesh \b dimension \b each \b other.
  *
  * This method performs nothing if size of \b meshes is in [0,1].
- * This method is particulary usefull in MEDLoader context to build a \ref ParaMEDMEM::MEDFileUMesh "MEDFileUMesh" instance that expects that underlying
+ * This method is particulary useful in MEDLoader context to build a \ref ParaMEDMEM::MEDFileUMesh "MEDFileUMesh" instance that expects that underlying
  * coordinates DataArrayDouble instance.
  *
  * \param [in,out] meshes : vector containing no null instance of MEDCouplingUMesh that in case of success of this method will be modified.
@@ -6731,7 +6731,7 @@ void MEDCouplingUMesh::PutUMeshesOnSameAggregatedCoords(const std::vector<MEDCou
  * If \b meshes share the same instance of DataArrayDouble as coordinates and that this instance is null, this method do nothing and no exception will be thrown.
  *
  * This method performs nothing if size of \b meshes is empty.
- * This method is particulary usefull in MEDLoader context to perform a treatment of a MEDFileUMesh instance on different levels.
+ * This method is particulary useful in MEDLoader context to perform a treatment of a MEDFileUMesh instance on different levels.
  * coordinates DataArrayDouble instance.
  *
  * \param [in,out] meshes :vector containing no null instance of MEDCouplingUMesh sharing the same DataArrayDouble instance of coordinates, that in case of success of this method will be modified.
@@ -8090,7 +8090,7 @@ void MEDCouplingUMesh::SetPartOfIndexedArraysSameIdx(const int *idsOfSelectBg, c
  * This method start from id 0 that will be contained in output DataArrayInt. It searches then all neighbors of id0 regarding arrIn[arrIndxIn[0]:arrIndxIn[0+1]].
  * Then it is repeated recursively until either all ids are fetched or no more ids are reachable step by step.
  * A negative value in \b arrIn means that it is ignored.
- * This method is usefull to see if a mesh is contiguous regarding its connectivity. If it is not the case the size of returned array is different from arrIndxIn->getNumberOfTuples()-1.
+ * This method is useful to see if a mesh is contiguous regarding its connectivity. If it is not the case the size of returned array is different from arrIndxIn->getNumberOfTuples()-1.
  * 
  * \param [in] arrIn arr origin array from which the extraction will be done.
  * \param [in] arrIndxIn is the input index array allowing to walk into \b arrIn
@@ -8109,7 +8109,7 @@ DataArrayInt *MEDCouplingUMesh::ComputeSpreadZoneGradually(const DataArrayInt *a
  * This method start from id 0 that will be contained in output DataArrayInt. It searches then all neighbors of id0 regarding arrIn[arrIndxIn[0]:arrIndxIn[0+1]].
  * Then it is repeated recursively until either all ids are fetched or no more ids are reachable step by step.
  * A negative value in \b arrIn means that it is ignored.
- * This method is usefull to see if a mesh is contiguous regarding its connectivity. If it is not the case the size of returned array is different from arrIndxIn->getNumberOfTuples()-1.
+ * This method is useful to see if a mesh is contiguous regarding its connectivity. If it is not the case the size of returned array is different from arrIndxIn->getNumberOfTuples()-1.
  * \param [in] seedBg the begin pointer (included) of an array containing the seed of the search zone
  * \param [in] seedEnd the end pointer (not included) of an array containing the seed of the search zone
  * \param [in] arrIn arr origin array from which the extraction will be done.

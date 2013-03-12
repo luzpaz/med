@@ -1448,7 +1448,7 @@ DataArrayInt *MEDCouplingFieldDiscretizationGauss::buildNbOfGaussPointPerCellFie
 /*!
  * This method makes the assumption that _discr_per_cell is set.
  * This method reduces as much as possible number size of _loc.
- * This method is usefull when several set on same cells has been done and that some Gauss Localization are no more used.
+ * This method is useful when several set on same cells has been done and that some Gauss Localization are no more used.
  */
 void MEDCouplingFieldDiscretizationGauss::zipGaussLocalizations()
 {
@@ -1478,7 +1478,7 @@ void MEDCouplingFieldDiscretizationGauss::zipGaussLocalizations()
 }
 
 /*!
- * This method is usefull when 'this' describes a field discretization with several gauss discretization on a \b same cell type.
+ * This method is useful when 'this' describes a field discretization with several gauss discretization on a \b same cell type.
  * For example same NORM_TRI3 cells having 6 gauss points and others with 12 gauss points.
  * This method returns 2 arrays with same size : the return value and 'locIds' output parameter.
  * For a given i into [0,locIds.size) ret[i] represents the set of cell ids of i_th set an locIds[i] represents the set of discretisation of the set.
