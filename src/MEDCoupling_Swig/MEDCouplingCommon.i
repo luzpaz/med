@@ -3257,6 +3257,17 @@ namespace ParaMEDMEM
        }
    }
 
+   PyObject *minimalDistanceTo(const DataArrayDouble *other) const throw(INTERP_KERNEL::Exception)
+   {
+     int thisTupleId,otherTupleId;
+     double r0=self->minimalDistanceTo(other,thisTupleId,otherTupleId);
+     PyObject *ret=PyTuple_New(3);
+     PyTuple_SetItem(ret,0,PyFloat_FromDouble(r0));
+     PyTuple_SetItem(ret,1,PyInt_FromLong(thisTupleId));
+     PyTuple_SetItem(ret,2,PyInt_FromLong(otherTupleId));
+     return ret;
+   }
+
    PyObject *getMaxValue() const throw(INTERP_KERNEL::Exception)
    {
      int tmp;

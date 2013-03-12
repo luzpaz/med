@@ -85,42 +85,26 @@ void DataArrayDouble::FindTupleIdsNearTuplesAlg(const BBTree<SPACEDIM,int>& myTr
 }
 
 template<int SPACEDIM>
-int DataArrayDouble::ComputeBasicClosestTupleIdAlg(const std::vector<int>& elems, const double *thisPt, const double *zePt)
-{
-  double val=std::numeric_limits<double>::max();
-  int ret=-1;
-  for(std::vector<int>::const_iterator it=elems.begin();it!=elems.end();it++)
-    {
-      double tmp=0.;
-      for(int j=0;j<SPACEDIM;j++) tmp+=thisPt[SPACEDIM*(*it)+j]-zePt[j];
-      if(tmp<val)
-        { val=tmp; ret=*it; }
-    }
-  return ret;
-}
-
-template<int SPACEDIM>
-void DataArrayDouble::FindClosestTupleIdAlg(const BBTree<SPACEDIM,int>& myTree, double dist, const double *pos, int nbOfTuples, const double *thisPt, int thisNbOfTuples, int *res)
+void DataArrayDouble::FindClosestTupleIdAlg(const BBTreePts<SPACEDIM,int>& myTree, double dist, const double *pos, int nbOfTuples, const double *thisPt, int thisNbOfTuples, int *res)
 {
   double distOpt(dist);
   const double *p(pos);
   int *r(res);
-  double bbox[2*SPACEDIM];
   for(int i=0;i<nbOfTuples;i++,p+=SPACEDIM,r++)
     {
-      double failVal(distOpt),okVal(std::numeric_limits<double>::max());
       int nbOfTurn=15;
-      while(nbOfTurn>0)
+      while(true)
         {
-          for(int j=0;j<SPACEDIM;j++) { bbox[2*j]=p[j]-distOpt; bbox[2*j]=p[j]+distOpt; }
-          std::vector<int> elems;
-          myTree.getIntersectingElems(bbox,elems); nbOfTurn--;
-          if(elems.empty())
-            { failVal=distOpt; distOpt=okVal==std::numeric_limits<double>::max()?2*distOpt:(okVal+failVal)/2.; continue; }
-          if( elems.size()<=15 || nbOfTurn>0)
-            { *r=ComputeBasicClosestTupleIdAlg<SPACEDIM>(elems,thisPt,p); break; }
+          int elem=-1;
+          double ret=myTree.getElementsAroundPoint2(p,distOpt,elem); nbOfTurn--;
+          if(ret!=std::numeric_limits<double>::max())
+            {
+              distOpt=ret>1e-4?ret:dist;
+              *r=elem;
+              break;
+            }
           else
-            { okVal=distOpt; distOpt=(distOpt+failVal)/2.; continue; }
+            { distOpt=2*distOpt; continue; }
         }
     }
 }
@@ -1353,10 +1337,41 @@ DataArrayDouble *DataArrayDouble::duplicateEachTupleNTimes(int nbTimes) const th
 }
 
 /*!
+ * This methods returns the minimal distance between the two set of points \a this and \a other.
+ * So \a this and \a other have to have the same number of components. If not an INTERP_KERNEL::Exception will be thrown.
+ * This method works only if number of components of \a this (equal to those of \a other) is in 1, 2 or 3.
+ *
+ * \param [out] thisTupleId the tuple id in \a this corresponding to the returned minimal distance
+ * \param [out] otherTupleId the tuple id in \a other corresponding to the returned minimal distance
+ * \return the minimal distance between the two set of points \a this and \a other.
+ * \sa DataArrayDouble::findClosestTupleId
+ */
+double DataArrayDouble::minimalDistanceTo(const DataArrayDouble *other, int& thisTupleId, int& otherTupleId) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> part1=findClosestTupleId(other);
+  int nbOfCompo(getNumberOfComponents());
+  int otherNbTuples(other->getNumberOfTuples());
+  const double *thisPt(begin()),*otherPt(other->begin());
+  const int *part1Pt(part1->begin());
+  double ret=std::numeric_limits<double>::max();
+  for(int i=0;i<otherNbTuples;i++,part1Pt++,otherPt+=nbOfCompo)
+    {
+      double tmp(0.);
+      for(int j=0;j<nbOfCompo;j++)
+        tmp+=(otherPt[j]-thisPt[nbOfCompo*(*part1Pt)+j])*(otherPt[j]-thisPt[nbOfCompo*(*part1Pt)+j]);
+      if(tmp<ret)
+        { ret=tmp; thisTupleId=*part1Pt; otherTupleId=i; }
+    }
+  return sqrt(ret);
+}
+
+/*!
  * This methods returns for each tuple in \a other which tuple in \a this is the closest.
- * So \a this and \a other have to have the same number of components.
+ * So \a this and \a other have to have the same number of components. If not an INTERP_KERNEL::Exception will be thrown.
+ * This method works only if number of components of \a this (equal to those of \a other) is in 1, 2 or 3.
  *
  * \return a newly allocated (new object to be dealt by the caller) DataArrayInt having \c other->getNumberOfTuples() tuples and one components.
+ * \sa DataArrayDouble::minimalDistanceTo
  */
 DataArrayInt *DataArrayDouble::findClosestTupleId(const DataArrayDouble *other) const throw(INTERP_KERNEL::Exception)
 {
@@ -1381,28 +1396,28 @@ DataArrayInt *DataArrayDouble::findClosestTupleId(const DataArrayDouble *other) 
       {
         double xDelta(fabs(bounds[1]-bounds[0])),yDelta(fabs(bounds[3]-bounds[2])),zDelta(fabs(bounds[5]-bounds[4]));
         double delta=std::max(xDelta,yDelta); delta=std::max(delta,zDelta);
-        double characSize=pow((delta*delta*delta)/thisNbOfTuples,1./3.);
+        double characSize=pow((delta*delta*delta)/((double)thisNbOfTuples),1./3.);
         MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> bbox=computeBBoxPerTuple(characSize*1e-12);
-        BBTree<3,int> myTree(bbox->getConstPointer(),0,0,getNumberOfTuples(),characSize*1e-12);
-        FindClosestTupleIdAlg<3>(myTree,2.*characSize,other->begin(),nbOfTuples,begin(),thisNbOfTuples,ret->getPointer());
+        BBTreePts<3,int> myTree(bbox->getConstPointer(),0,0,getNumberOfTuples(),characSize*1e-12);
+        FindClosestTupleIdAlg<3>(myTree,3.*characSize*characSize,other->begin(),nbOfTuples,begin(),thisNbOfTuples,ret->getPointer());
         break;
       }
     case 2:
       {
         double xDelta(fabs(bounds[1]-bounds[0])),yDelta(fabs(bounds[3]-bounds[2]));
         double delta=std::max(xDelta,yDelta);
-        double characSize=sqrt((delta*delta)/thisNbOfTuples);
+        double characSize=sqrt(delta/(double)thisNbOfTuples);
         MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> bbox=computeBBoxPerTuple(characSize*1e-12);
-        BBTree<2,int> myTree(bbox->getConstPointer(),0,0,getNumberOfTuples(),characSize*1e-12);
-        FindClosestTupleIdAlg<2>(myTree,2.*characSize,other->begin(),nbOfTuples,begin(),thisNbOfTuples,ret->getPointer());
+        BBTreePts<2,int> myTree(bbox->getConstPointer(),0,0,getNumberOfTuples(),characSize*1e-12);
+        FindClosestTupleIdAlg<2>(myTree,2.*characSize*characSize,other->begin(),nbOfTuples,begin(),thisNbOfTuples,ret->getPointer());
         break;
       }
     case 1:
       {
         double characSize=fabs(bounds[1]-bounds[0])/thisNbOfTuples;
         MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> bbox=computeBBoxPerTuple(characSize*1e-12);
-        BBTree<1,int> myTree(bbox->getConstPointer(),0,0,getNumberOfTuples(),characSize*1e-12);
-        FindClosestTupleIdAlg<1>(myTree,2.*characSize,other->begin(),nbOfTuples,begin(),thisNbOfTuples,ret->getPointer());
+        BBTreePts<1,int> myTree(bbox->getConstPointer(),0,0,getNumberOfTuples(),characSize*1e-12);
+        FindClosestTupleIdAlg<1>(myTree,1.*characSize*characSize,other->begin(),nbOfTuples,begin(),thisNbOfTuples,ret->getPointer());
         break;
       }
     default:
