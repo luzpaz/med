@@ -715,11 +715,11 @@ int MEDCouplingRemapper::prepareNotInterpKernelOnlyGaussGauss() throw(INTERP_KER
   const double *trgLocPtr=trgLoc->begin();
   int trgSpaceDim=trgLoc->getNumberOfComponents();
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> srcOffsetArr=_src_ft->getDiscretization()->getOffsetArr(_src_ft->getMesh());
-  if(trgSpaceDim!=srcOffsetArr->getNumberOfComponents())
+  if(trgSpaceDim!=_src_ft->getMesh()->getSpaceDimension())
     {
       std::ostringstream oss; oss << "MEDCouplingRemapper::prepareNotInterpKernelOnlyGaussGauss : space dimensions mismatch between source and target !";
       oss << " Target discretization localization has dimension " << trgSpaceDim << ", whereas the space dimension of source is equal to ";
-      oss << srcOffsetArr->getNumberOfComponents() << " !";
+      oss << _src_ft->getMesh()->getSpaceDimension() << " !";
       throw INTERP_KERNEL::Exception(oss.str().c_str());
     }
   const int *srcOffsetArrPtr=srcOffsetArr->begin();
@@ -848,8 +848,8 @@ std::string MEDCouplingRemapper::checkAndGiveInterpolationMethodStr(std::string&
     throw INTERP_KERNEL::Exception("MEDCouplingRemapper::checkAndGiveInterpolationMethodStr : it appears that no all field templates have been set !");
   if(!s->getMesh() || !t->getMesh())
     throw INTERP_KERNEL::Exception("MEDCouplingRemapper::checkAndGiveInterpolationMethodStr : it appears that no all field templates have their mesh set !");
-  srcMeth=_src_ft->getDiscretization()->getStringRepr();
-  trgMeth=_target_ft->getDiscretization()->getStringRepr();
+  srcMeth=_src_ft->getDiscretization()->getRepr();
+  trgMeth=_target_ft->getDiscretization()->getRepr();
   std::string method(srcMeth); method+=trgMeth;
   return method;
 }
