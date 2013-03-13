@@ -174,9 +174,9 @@ MEDCouplingFieldDouble *MEDCouplingRemapper::transferField(const MEDCouplingFiel
   if(_src_ft->getDiscretization()->getStringRepr()!=srcField->getDiscretization()->getStringRepr())
     throw INTERP_KERNEL::Exception("Incoherency with prepare call for source field");
   MEDCouplingFieldDouble *ret=MEDCouplingFieldDouble::New(*_target_ft,srcField->getTimeDiscretization());
-  ret->copyAllTinyAttrFrom(srcField);
   ret->setNature(srcField->getNature());
   transfer(srcField,ret,dftValue);
+  ret->copyAllTinyAttrFrom(srcField);//perform copy of tiny strings after and not before transfer because the array will be created on transfer
   return ret;
 }
 
@@ -186,9 +186,9 @@ MEDCouplingFieldDouble *MEDCouplingRemapper::reverseTransferField(const MEDCoupl
   if(_target_ft->getDiscretization()->getStringRepr()!=targetField->getDiscretization()->getStringRepr())
     throw INTERP_KERNEL::Exception("Incoherency with prepare call for target field");
   MEDCouplingFieldDouble *ret=MEDCouplingFieldDouble::New(*_src_ft,targetField->getTimeDiscretization());
-  ret->copyAllTinyAttrFrom(targetField);
   ret->setNature(targetField->getNature());
   reverseTransfer(ret,targetField,dftValue);
+  ret->copyAllTinyAttrFrom(targetField);//perform copy of tiny strings after and not before reverseTransfer because the array will be created on reverseTransfer
   return ret;
 }
 
@@ -760,6 +760,11 @@ int MEDCouplingRemapper::prepareNotInterpKernelOnlyGaussGauss() throw(INTERP_KER
       for(const int *orphanTrgId=orphanTrgIds->begin();orphanTrgId!=orphanTrgIds->end();orphanTrgId++,srcIdPerTrgPtr++)
         _matrix[*orphanTrgId][*srcIdPerTrgPtr]=2.;
     }
+  _deno_multiply.clear();
+  _deno_multiply.resize(_matrix.size());
+  _deno_reverse_multiply.clear();
+  _deno_reverse_multiply.resize(srcLoc->getNumberOfTuples());
+  declareAsNew();
   return 1;
 }
 
