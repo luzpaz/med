@@ -355,10 +355,7 @@ MEDCouplingField::MEDCouplingField(const MEDCouplingField& other, bool deepCopy)
   if(deepCopy)
     _type=other._type->clone();
   else
-    {
-      _type=other._type;
-      _type->incrRef();
-    }
+    _type=other._type;
 }
 
 /*!

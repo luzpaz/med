@@ -711,6 +711,8 @@ int MEDCouplingRemapper::prepareInterpKernelOnlyCC() throw(INTERP_KERNEL::Except
 
 int MEDCouplingRemapper::prepareNotInterpKernelOnlyGaussGauss() throw(INTERP_KERNEL::Exception)
 {
+  if(getIntersectionType()!=INTERP_KERNEL::PointLocator)
+      throw INTERP_KERNEL::Exception("MEDCouplingRemapper::prepareNotInterpKernelOnlyGaussGauss : The intersection type is not supported ! Only PointLocator is supported for Gauss->Gauss interpolation ! Please invoke setIntersectionType(PointLocator) on the MEDCouplingRemapper instance !");
   MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> trgLoc=_target_ft->getLocalizationOfDiscr();
   const double *trgLocPtr=trgLoc->begin();
   int trgSpaceDim=trgLoc->getNumberOfComponents();
