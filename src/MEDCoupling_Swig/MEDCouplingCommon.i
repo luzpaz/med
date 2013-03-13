@@ -969,8 +969,8 @@ namespace ParaMEDMEM
 %include "NormalizedUnstructuredMesh.hxx"
 %include "MEDCouplingNatureOfField.hxx"
 %include "MEDCouplingTimeDiscretization.hxx"
-%include "MEDCouplingFieldDiscretization.hxx"
 %include "MEDCouplingGaussLocalization.hxx"
+%include "MEDCouplingFieldDiscretization.hxx"
 
 namespace ParaMEDMEM
 {
