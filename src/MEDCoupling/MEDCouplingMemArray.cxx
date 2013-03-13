@@ -92,14 +92,13 @@ void DataArrayDouble::FindClosestTupleIdAlg(const BBTreePts<SPACEDIM,int>& myTre
   int *r(res);
   for(int i=0;i<nbOfTuples;i++,p+=SPACEDIM,r++)
     {
-      int nbOfTurn=15;
       while(true)
         {
           int elem=-1;
-          double ret=myTree.getElementsAroundPoint2(p,distOpt,elem); nbOfTurn--;
+          double ret=myTree.getElementsAroundPoint2(p,distOpt,elem);
           if(ret!=std::numeric_limits<double>::max())
             {
-              distOpt=ret>1e-4?ret:dist;
+              distOpt=std::max(ret,1e-4);
               *r=elem;
               break;
             }
@@ -1770,8 +1769,7 @@ DataArrayInt *DataArrayDouble::findClosestTupleId(const DataArrayDouble *other) 
         double xDelta(fabs(bounds[1]-bounds[0])),yDelta(fabs(bounds[3]-bounds[2])),zDelta(fabs(bounds[5]-bounds[4]));
         double delta=std::max(xDelta,yDelta); delta=std::max(delta,zDelta);
         double characSize=pow((delta*delta*delta)/((double)thisNbOfTuples),1./3.);
-        MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> bbox=computeBBoxPerTuple(characSize*1e-12);
-        BBTreePts<3,int> myTree(bbox->getConstPointer(),0,0,getNumberOfTuples(),characSize*1e-12);
+        BBTreePts<3,int> myTree(begin(),0,0,getNumberOfTuples(),characSize*1e-12);
         FindClosestTupleIdAlg<3>(myTree,3.*characSize*characSize,other->begin(),nbOfTuples,begin(),thisNbOfTuples,ret->getPointer());
         break;
       }
@@ -1780,16 +1778,14 @@ DataArrayInt *DataArrayDouble::findClosestTupleId(const DataArrayDouble *other) 
         double xDelta(fabs(bounds[1]-bounds[0])),yDelta(fabs(bounds[3]-bounds[2]));
         double delta=std::max(xDelta,yDelta);
         double characSize=sqrt(delta/(double)thisNbOfTuples);
-        MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> bbox=computeBBoxPerTuple(characSize*1e-12);
-        BBTreePts<2,int> myTree(bbox->getConstPointer(),0,0,getNumberOfTuples(),characSize*1e-12);
+        BBTreePts<2,int> myTree(begin(),0,0,getNumberOfTuples(),characSize*1e-12);
         FindClosestTupleIdAlg<2>(myTree,2.*characSize*characSize,other->begin(),nbOfTuples,begin(),thisNbOfTuples,ret->getPointer());
         break;
       }
     case 1:
       {
         double characSize=fabs(bounds[1]-bounds[0])/thisNbOfTuples;
-        MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> bbox=computeBBoxPerTuple(characSize*1e-12);
-        BBTreePts<1,int> myTree(bbox->getConstPointer(),0,0,getNumberOfTuples(),characSize*1e-12);
+        BBTreePts<1,int> myTree(begin(),0,0,getNumberOfTuples(),characSize*1e-12);
         FindClosestTupleIdAlg<1>(myTree,1.*characSize*characSize,other->begin(),nbOfTuples,begin(),thisNbOfTuples,ret->getPointer());
         break;
       }
