@@ -9,48 +9,35 @@
 
 namespace ParaMEDMEM
 {
-//================================================================================
 /*!
  * Returns the attribute \a _name of \a this array.
  * See \ref MEDCouplingArrayBasicsName "DataArrays infos" for more information.
  *  \return std::string - array name
  */
-//================================================================================
-
 std::string DataArray::getName() const {}
 
-//================================================================================
 /*!
  * Returns number of components of \a this array.
  * See \ref MEDCouplingArrayBasicsTuplesAndCompo "DataArrays infos" for more information.
  *  \return int - number of components
  */
-//================================================================================
-
 int DataArray::getNumberOfComponents() const {}
 
-//================================================================================
 /*!
  * Returns number of tuples of \a this array.
  * See \ref MEDCouplingArrayBasicsName "DataArrays infos" for more information.
  *  \return int - number of tuples
  */
-//================================================================================
-
 int DataArray::getNumberOfTuples() const {}
 
-//================================================================================
 /*!
  * Returns number of elements of \a this array.
  * See \ref MEDCouplingArrayBasicsName "DataArrays infos" for more information.
  *  \return int - number of elements == <em> this->getNumberOfTuples() * 
  *          this->getNumberOfComponents() </em>
  */
-//================================================================================
-
 int DataArray::getNbOfElems() const {}
 
-//================================================================================
 /*!
  * Throws an exception if number of elements in \a this array differs from a given one.
  * See \ref MEDCouplingArrayBasicsName "DataArrays infos" for more information.
@@ -58,11 +45,8 @@ int DataArray::getNbOfElems() const {}
  *  \param [in] msg - message to return within the thrown exception.
  *  \throw if <em> this->getNbOfElems() != nbOfElems</em>.
  */
-//================================================================================
-
 void DataArray::checkNbOfElems(int nbOfElems, const char *msg) const {}
 
-//================================================================================
 /*!
  * Returns values of a specified tuple.
  *  \param [in] tupleId - index of the tuple of interest.
@@ -70,40 +54,28 @@ void DataArray::checkNbOfElems(int nbOfElems, const char *msg) const {}
  *         must be allocated by the caller and be of size not less than \a
  *         this->getNumberOfComponents().
  */
-//================================================================================
-
 void DataArrayDouble::getTuple(int tupleId, double *res) const {}
 
-//================================================================================
 /*!
  * Returns a value of a specified element of \a this array.
  *  \param [in] tupleId - index of the tuple of interest.
  *  \param [in] compoId - index of the component of interest.
  *  \return double - the value of \a compoId-th component of \a tupleId-th tuple.
  */
-//================================================================================
-
 double DataArrayDouble::getIJ(int tupleId, int compoId) const {}
 
-//================================================================================
 /*!
  * Returns a pointer to the first element of the raw data of \a this array.
  *  \return double* - the pointer to the value of 0-th tuple and 0-th component.
  */
-//================================================================================
-
 double * DataArrayDouble::getPointer() {}
 
-//================================================================================
 /*!
  * Returns a const pointer to the first element of the raw data of \a this array.
  *  \return const double* - the pointer to the value of 0-th tuple and 0-th component.
  */
-//================================================================================
-
 const double * DataArrayDouble::getConstPointer() const {}
 
-//================================================================================
 /*!
  * Assigns a given value to a specified element of \a this array.
  *  \param [in] tupleId - index of the tuple to modify.
@@ -111,11 +83,8 @@ const double * DataArrayDouble::getConstPointer() const {}
  *  \param [in] newVal - the value to assign to the value at \a compoId-th component
  *              of \a tupleId-th tuple. 
  */
-//================================================================================
-
 void DataArrayDouble::setIJ(int tupleId, int compoId, double newVal) {}
 
-//================================================================================
 /*!
  * Assigns a given value to a specified element of \a this array which is not marked
  * as changed.
@@ -124,11 +93,8 @@ void DataArrayDouble::setIJ(int tupleId, int compoId, double newVal) {}
  *  \param [in] newVal - the value to assign to the value at \a compoId-th component
  *              of \a tupleId-th tuple.
  */
-//================================================================================
-
 void DataArrayDouble::setIJSilent(int tupleId, int compoId, double newVal) {}
 
-//================================================================================
 /*!
  * Copies values from another array starting from a specified element of \a this.
  *  \param [in] id - index of element to assign the value \a element0 to.
@@ -137,19 +103,13 @@ void DataArrayDouble::setIJSilent(int tupleId, int compoId, double newVal) {}
  *         element of \a this.
  *  \param [in] sizeOfOthers - number of values to copy from \a others.
  */
-//================================================================================
-
 void DataArrayDouble::writeOnPlace(int id, double element0, const double *others, int sizeOfOthers) {}
 
-//================================================================================
 /*!
  * Does nothing because this class does not aggregate any TimeLabel instance.
  */
-//================================================================================
-
 void DataArrayDouble::updateTime() const {}
 
-//================================================================================
 /*!
  * Returns values of a specified tuple.
  *  \param [in] tupleId - index of the tuple of interest.
@@ -159,23 +119,17 @@ void DataArrayDouble::updateTime() const {}
  *
  *  \ref py_mcdataarrayint_getTuple "Here is a Python example".
  */
-//================================================================================
-
 void DataArrayInt::getTuple(int tupleId, int *res) const {}
 
-//================================================================================
 /*!
  * Returns a value of a specified element of \a this array.
  *  \param [in] tupleId - index of the tuple of interest.
  *  \param [in] compoId - index of the component of interest.
  *  \return int - the value of \a compoId-th component of \a tupleId-th tuple.
  */
-//================================================================================
-
 int DataArrayInt::getIJ(int tupleId, int compoId) const {}
 
 
-//================================================================================
 /*!
  * Assigns a given value to a specified element of \a this array.
  *  \param [in] tupleId - index of the tuple to modify.
@@ -186,12 +140,9 @@ int DataArrayInt::getIJ(int tupleId, int compoId) const {}
  *          setIJSilent() for modification of muliple values of array and to call
  *          declareAsNew() after the modification is done.
  */
-//================================================================================
-
 void DataArrayInt::setIJ(int tupleId, int compoId, int newVal) {}
 
 
-//================================================================================
 /*!
  * Assigns a given value to a specified element of \a this array which is \b not marked
  * as changed.
@@ -200,29 +151,20 @@ void DataArrayInt::setIJ(int tupleId, int compoId, int newVal) {}
  *  \param [in] newVal - the value to assign to the value at \a compoId-th component
  *              of \a tupleId-th tuple.
  */
-//================================================================================
-
 void DataArrayInt::setIJSilent(int tupleId, int compoId, int newVal) {}
 
-//================================================================================
 /*!
  * Returns a pointer to the first element of the raw data of \a this array.
  *  \return int* - the pointer to the value of 0-th tuple and 0-th component.
  */
-//================================================================================
-
 int * DataArrayInt::getPointer() {}
 
-//================================================================================
 /*!
  * Returns a const pointer to the first element of the raw data of \a this array.
  *  \return const int* - the pointer to the value of 0-th tuple and 0-th component.
  */
-//================================================================================
-
 const int * DataArrayInt::getConstPointer() const {}
 
-//================================================================================
 /*!
  * Copies values from another array starting from a given element of \a this.
  *  \param [in] id - index of element to assign the value \a element0 to.
@@ -231,8 +173,6 @@ const int * DataArrayInt::getConstPointer() const {}
  *         element of \a this.
  *  \param [in] sizeOfOthers - number of values to copy from \a others.
  */
-//================================================================================
-
 void DataArrayInt::writeOnPlace(int id, int element0, const int *others, int sizeOfOthers) {}
 
 }
