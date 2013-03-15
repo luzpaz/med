@@ -101,7 +101,7 @@ CORBA::Long MEDCouplingMultiFieldsServant::getMainTinyInfo(SALOME_TYPES::ListOfL
 void MEDCouplingMultiFieldsServant::getTinyInfo(CORBA::Long id, SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfDouble_out da, SALOME_TYPES::ListOfString_out sa)
 {
   const MEDCouplingFieldDouble *f=getPointer()->getFieldWithId(id);
-  MEDCouplingFieldTemplate *f2=MEDCouplingFieldTemplate::New(f);
+  MEDCouplingFieldTemplate *f2=MEDCouplingFieldTemplate::New(*f);
   la=new SALOME_TYPES::ListOfLong;
   std::vector<int> tinyInfo;
   f2->getTinySerializationIntInformation(tinyInfo);
@@ -128,7 +128,7 @@ void MEDCouplingMultiFieldsServant::getTinyInfo(CORBA::Long id, SALOME_TYPES::Li
 void MEDCouplingMultiFieldsServant::getSerialisationData(CORBA::Long id, SALOME_TYPES::ListOfLong_out la)
 {
   const MEDCouplingFieldDouble *f=getPointer()->getFieldWithId(id);
-  MEDCouplingFieldTemplate *f2=MEDCouplingFieldTemplate::New(f);
+  MEDCouplingFieldTemplate *f2=MEDCouplingFieldTemplate::New(*f);
   DataArrayInt *dataInt;
   f2->serialize(dataInt);
   //

@@ -485,7 +485,7 @@ namespace SALOME_TEST
   ParaMEDMEM::MEDCouplingFieldTemplate *MEDCouplingCorbaServBasicsTest::buildFieldTemplateCellOn2D()
   {
     ParaMEDMEM::MEDCouplingFieldDouble *f1=buildFieldScalarOn2DNT();
-    ParaMEDMEM::MEDCouplingFieldTemplate *f2=ParaMEDMEM::MEDCouplingFieldTemplate::New(f1);
+    ParaMEDMEM::MEDCouplingFieldTemplate *f2=ParaMEDMEM::MEDCouplingFieldTemplate::New(*f1);
     f2->setNature(ParaMEDMEM::NoNature);
     f1->decrRef();
     return f2;
@@ -494,7 +494,7 @@ namespace SALOME_TEST
   ParaMEDMEM::MEDCouplingFieldTemplate *MEDCouplingCorbaServBasicsTest::buildFieldTemplateNodeOn2D()
   {
     ParaMEDMEM::MEDCouplingFieldDouble *f1=buildFieldNodeScalarOn2DNT();
-    ParaMEDMEM::MEDCouplingFieldTemplate *f2=ParaMEDMEM::MEDCouplingFieldTemplate::New(f1);
+    ParaMEDMEM::MEDCouplingFieldTemplate *f2=ParaMEDMEM::MEDCouplingFieldTemplate::New(*f1);
     f2->setNature(ParaMEDMEM::ConservativeVolumic);
     f1->decrRef();
     return f2;
@@ -503,7 +503,7 @@ namespace SALOME_TEST
   ParaMEDMEM::MEDCouplingFieldTemplate *MEDCouplingCorbaServBasicsTest::buildFieldTemplateGaussPtOn2D()
   {
     ParaMEDMEM::MEDCouplingFieldDouble *f1=buildFieldGaussPt2DWT();
-    ParaMEDMEM::MEDCouplingFieldTemplate *f2=ParaMEDMEM::MEDCouplingFieldTemplate::New(f1);
+    ParaMEDMEM::MEDCouplingFieldTemplate *f2=ParaMEDMEM::MEDCouplingFieldTemplate::New(*f1);
     f2->setNature(ParaMEDMEM::Integral);
     f1->decrRef();
     return f2;
@@ -512,7 +512,7 @@ namespace SALOME_TEST
   ParaMEDMEM::MEDCouplingFieldTemplate *MEDCouplingCorbaServBasicsTest::buildFieldTemplateGaussNEOn2D()
   {
     ParaMEDMEM::MEDCouplingFieldDouble *f1=buildFieldGaussPtNE2DWT();
-    ParaMEDMEM::MEDCouplingFieldTemplate *f2=ParaMEDMEM::MEDCouplingFieldTemplate::New(f1);
+    ParaMEDMEM::MEDCouplingFieldTemplate *f2=ParaMEDMEM::MEDCouplingFieldTemplate::New(*f1);
     f2->setNature(ParaMEDMEM::IntegralGlobConstraint);
     f1->decrRef();
     return f2;

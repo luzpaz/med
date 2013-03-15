@@ -38,7 +38,7 @@ static PyObject *buildServantAndActivateCore(const typename TServant::CppType *p
   PyRun_String("import CORBA", Py_single_input, pdict, pdict);
   PyRun_String("orbTmp15634=CORBA.ORB_init([''])",Py_single_input,pdict, pdict);
   PyObject* orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
-  PyObject *corbaObj=PyObject_CallMethod(orbPython,(char*)"string_to_object",(char*)"O",iorPython);
+  PyObject *corbaObj=PyObject_CallMethod(orbPython,const_cast<char*>("string_to_object"),const_cast<char*>("O"),iorPython);
   Py_DECREF(pdict);
   Py_DECREF(iorPython);
   CORBA::string_free(ior);
