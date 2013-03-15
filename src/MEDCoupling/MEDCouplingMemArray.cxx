@@ -1063,6 +1063,15 @@ void DataArrayDouble::reprCppStream(const char *varName, std::ostream& stream) c
   stream << varName << "->setName(\"" << getName() << "\");" << std::endl;
 }
 
+/*!
+ * Equivalent to DataArrayDouble::isEqual except that if false the reason of
+ * mismatch is given.
+ * 
+ * \param [in] other the instance to be compared with \a this
+ * \param [in] prec the precision to compare numeric data of the arrays.
+ * \param [out] reason In case of inequality returns the reason.
+ * \sa DataArrayDouble::isEqual
+ */
 bool DataArrayDouble::isEqualIfNotWhy(const DataArrayDouble& other, double prec, std::string& reason) const
 {
   if(!areInfoEqualsIfNotWhy(other,reason))
@@ -3916,15 +3925,12 @@ DataArrayInt *DataArrayDouble::getIdsInRange(double vmin, double vmax) const thr
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("DataArrayDouble::getIdsInRange : this must have exactly one component !");
   const double *cptr=getConstPointer();
-  std::vector<int> res;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New(); ret->alloc(0,1);
   int nbOfTuples=getNumberOfTuples();
   for(int i=0;i<nbOfTuples;i++,cptr++)
     if(*cptr>=vmin && *cptr<=vmax)
-      res.push_back(i);
-  DataArrayInt *ret=DataArrayInt::New();
-  ret->alloc((int)res.size(),1);
-  std::copy(res.begin(),res.end(),ret->getPointer());
-  return ret;
+      ret->pushBackSilent(i);
+  return ret.retn();
 }
 
 /*!
@@ -5619,6 +5625,14 @@ DataArrayInt *DataArrayInt::invertArrayN2O2O2N(int oldNbOfElem) const
   return ret.retn();
 }
 
+/*!
+ * Equivalent to DataArrayInt::isEqual except that if false the reason of
+ * mismatch is given.
+ * 
+ * \param [in] other the instance to be compared with \a this
+ * \param [out] reason In case of inequality returns the reason.
+ * \sa DataArrayInt::isEqual
+ */
 bool DataArrayInt::isEqualIfNotWhy(const DataArrayInt& other, std::string& reason) const
 {
   if(!areInfoEqualsIfNotWhy(other,reason))
@@ -7978,15 +7992,12 @@ DataArrayInt *DataArrayInt::getIdsInRange(int vmin, int vmax) const throw(INTERP
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("DataArrayInt::getIdsInRange : this must have exactly one component !");
   const int *cptr=getConstPointer();
-  std::vector<int> res;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New(); ret->alloc(0,1);
   int nbOfTuples=getNumberOfTuples();
   for(int i=0;i<nbOfTuples;i++,cptr++)
     if(*cptr>=vmin && *cptr<vmax)
-      res.push_back(i);
-  DataArrayInt *ret=DataArrayInt::New();
-  ret->alloc((int)res.size(),1);
-  std::copy(res.begin(),res.end(),ret->getPointer());
-  return ret;
+      ret->pushBackSilent(i);
+  return ret.retn();
 }
 
 /*!
