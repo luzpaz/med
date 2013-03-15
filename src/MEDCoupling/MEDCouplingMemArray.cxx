@@ -1678,7 +1678,6 @@ void DataArrayDouble::meldWith(const DataArrayDouble *other) throw(INTERP_KERNEL
  *               [ \a commIndex[1], \a commIndex[2] ). \a commIndex->getNumberOfTuples()-1
  *               gives the number of groups of coincident tuples.
  *  \throw If \a this is not allocated.
- *  \throw If \a this and \a other arrays have different number of tuples.
  *  \throw If the number of components is not in [1,2,3].
  *
  *  \ref cpp_mcdataarraydouble_findcommontuples "Here is a C++ example".
@@ -5559,9 +5558,8 @@ DataArrayInt *DataArrayInt::transformWithIndArrR(const int *indArrBg, const int 
  *          The caller is to delete this result array using decrRef() as it is no more
  *          needed.
  * 
- *  \ref cpp_mcdataarrayint_invertarrayo2n2n2o "Here is a C++ example".
- *
- *  \ref py_mcdataarrayint_invertarrayo2n2n2o "Here is a Python example".
+ *  \ref cpp_mcdataarrayint_invertarrayo2n2n2o "Here is a C++ example".<br>
+ *  \ref py_mcdataarrayint_invertarrayo2n2n2o  "Here is a Python example".
  */
 DataArrayInt *DataArrayInt::invertArrayO2N2N2O(int newNbOfElem) const
 {
