@@ -700,6 +700,14 @@ void DataArrayDouble::cpyFrom(const DataArrayDouble& other) throw(INTERP_KERNEL:
   copyStringInfoFrom(other);
 }
 
+/*!
+ * This method reserve nbOfElems elements in memory ( nbOfElems*8 bytes ) \b without impacting the number of tuples in \a this.
+ * If \a this has already been allocated, this method checks that \a this has only one component. If not an INTERP_KERNEL::Exception will be thrown.
+ * If \a this has not already been allocated, number of components is set to one.
+ * This method allows to reduce number of reallocations on invokation of DataArrayDouble::pushBackSilent and DataArrayDouble::pushBackValsSilent on \a this.
+ * 
+ * \sa DataArrayDouble::pack, DataArrayDouble::pushBackSilent, DataArrayDouble::pushBackValsSilent
+ */
 void DataArrayDouble::reserve(int nbOfElems) throw(INTERP_KERNEL::Exception)
 {
   int nbCompo=getNumberOfComponents();
@@ -716,6 +724,14 @@ void DataArrayDouble::reserve(int nbOfElems) throw(INTERP_KERNEL::Exception)
     throw INTERP_KERNEL::Exception("DataArrayDouble::reserve : not available for DataArrayDouble with number of components different than 1 !");
 }
 
+/*!
+ * This method adds at the end of \a this the single value \a val. This method do \b not update its time label to avoid useless incrementation
+ * of counter. So the caller is expected to call TimeLabel::declareAsNew on \a this at the end of the push session.
+ *
+ * \param [in] val the value to be added in \a this
+ * \throw If \a this has already been allocated with number of components different from one.
+ * \sa DataArrayDouble::pushBackValsSilent
+ */
 void DataArrayDouble::pushBackSilent(double val) throw(INTERP_KERNEL::Exception)
 {
   int nbCompo=getNumberOfComponents();
@@ -730,6 +746,16 @@ void DataArrayDouble::pushBackSilent(double val) throw(INTERP_KERNEL::Exception)
     throw INTERP_KERNEL::Exception("DataArrayDouble::pushBackSilent : not available for DataArrayDouble with number of components different than 1 !");
 }
 
+/*!
+ * This method adds at the end of \a this a serie of values [\c valsBg,\c valsEnd). This method do \b not update its time label to avoid useless incrementation
+ * of counter. So the caller is expected to call TimeLabel::declareAsNew on \a this at the end of the push session.
+ *
+ *  \param [in] valsBg - an array of values to push at the end of \this.
+ *  \param [in] valsEnd - specifies the end of the array \a valsBg, so that
+ *              the last value of \a valsBg is \a valsEnd[ -1 ].
+ * \throw If \a this has already been allocated with number of components different from one.
+ * \sa DataArrayDouble::pushBackSilent
+ */
 void DataArrayDouble::pushBackValsSilent(const double *valsBg, const double *valsEnd) throw(INTERP_KERNEL::Exception)
 {
   int nbCompo=getNumberOfComponents();
@@ -744,6 +770,11 @@ void DataArrayDouble::pushBackValsSilent(const double *valsBg, const double *val
     throw INTERP_KERNEL::Exception("DataArrayDouble::pushBackValsSilent : not available for DataArrayDouble with number of components different than 1 !");
 }
 
+/*!
+ * This method returns silently ( without updating time label in \a this ) the last value, if any and suppress it.
+ * \throw If \a this is already empty.
+ * \throw If \a this has number of components different from one.
+ */
 double DataArrayDouble::popBackSilent() throw(INTERP_KERNEL::Exception)
 {
   if(getNumberOfComponents()==1)
@@ -752,6 +783,11 @@ double DataArrayDouble::popBackSilent() throw(INTERP_KERNEL::Exception)
     throw INTERP_KERNEL::Exception("DataArrayDouble::popBackSilent : not available for DataArrayDouble with number of components different than 1 !");
 }
 
+/*!
+ * This method \b do \b not modify content of \a this. It only modify its memory footprint if the allocated memory is to high regarding real data to store.
+ *
+ * \sa DataArrayDouble::getHeapMemorySize, DataArrayDouble::reserve
+ */
 void DataArrayDouble::pack() const throw(INTERP_KERNEL::Exception)
 {
   _mem.pack();
@@ -2225,6 +2261,40 @@ void DataArrayDouble::setPartOfValuesSimple3(double a, const int *bgTuples, cons
       }
 }
 
+/*!
+ * Copy all values from another DataArrayDouble into specified tuples and components
+ * of \a this array. Textual data is not copied.
+ * The tree parameters defining set of indices of tuples and components are similar to
+ * the tree parameters of the Python function \c range(\c start,\c stop,\c step).
+ *  \param [in] a - the array to copy values from.
+ *  \param [in] bgTuples - index of the first tuple of \a this array to assign values to.
+ *  \param [in] endTuples - index of the tuple before which the tuples to assign to
+ *              are located.
+ *  \param [in] stepTuples - index increment to get index of the next tuple to assign to.
+ *  \param [in] bgComp - pointer to an array of component indices of \a this array to
+ *              assign \a a to.
+ *  \param [in] endComp - specifies the end of the array \a bgTuples, so that
+ *              pointer to a component index (\a pi) varies as this: 
+ *              \a bgComp <= \a pi < \a endComp.
+ *  \param [in] strictCompoCompare - if \a true (by default), then \a a->getNumberOfComponents() 
+ *              must be equal to the number of columns to assign to, else an
+ *              exception is thrown; if \a false, then it is only required that \a
+ *              a->getNbOfElems() equals to number of values to assign to (this condition
+ *              must be respected even if \a strictCompoCompare is \a true). The number of 
+ *              values to assign to is given by following Python expression:
+ *              \a nbTargetValues = 
+ *              \c len(\c range(\a bgTuples,\a endTuples,\a stepTuples)) *
+ *              \c len(\c range(\a bgComp,\a endComp,\a stepComp)).
+ *  \throw If \a a is NULL.
+ *  \throw If \a a is not allocated.
+ *  \throw If \a this is not allocated.
+ *  \throw If parameters specifying tuples and components to assign to do not give a
+ *            non-empty range of increasing indices.
+ *  \throw If \a a->getNbOfElems() != \a nbTargetValues.
+ *  \throw If \a strictCompoCompare == \a true && \a a->getNumberOfComponents() !=
+ *            \c len(\c range(\a bgComp,\a endComp,\a stepComp)).
+ *
+ */
 void DataArrayDouble::setPartOfValues4(const DataArrayDouble *a, int bgTuples, int endTuples, int stepTuples, const int *bgComp, const int *endComp, bool strictCompoCompare) throw(INTERP_KERNEL::Exception)
 {
   if(!a)
@@ -5061,6 +5131,14 @@ void DataArrayInt::cpyFrom(const DataArrayInt& other) throw(INTERP_KERNEL::Excep
   copyStringInfoFrom(other);
 }
 
+/*!
+ * This method reserve nbOfElems elements in memory ( nbOfElems*4 bytes ) \b without impacting the number of tuples in \a this.
+ * If \a this has already been allocated, this method checks that \a this has only one component. If not an INTERP_KERNEL::Exception will be thrown.
+ * If \a this has not already been allocated, number of components is set to one.
+ * This method allows to reduce number of reallocations on invokation of DataArrayInt::pushBackSilent and DataArrayInt::pushBackValsSilent on \a this.
+ * 
+ * \sa DataArrayInt::pack, DataArrayInt::pushBackSilent, DataArrayInt::pushBackValsSilent
+ */
 void DataArrayInt::reserve(int nbOfElems) throw(INTERP_KERNEL::Exception)
 {
   int nbCompo=getNumberOfComponents();
@@ -5077,6 +5155,14 @@ void DataArrayInt::reserve(int nbOfElems) throw(INTERP_KERNEL::Exception)
     throw INTERP_KERNEL::Exception("DataArrayInt::reserve : not available for DataArrayInt with number of components different than 1 !");
 }
 
+/*!
+ * This method adds at the end of \a this the single value \a val. This method do \b not update its time label to avoid useless incrementation
+ * of counter. So the caller is expected to call TimeLabel::declareAsNew on \a this at the end of the push session.
+ *
+ * \param [in] val the value to be added in \a this
+ * \throw If \a this has already been allocated with number of components different from one.
+ * \sa DataArrayInt::pushBackValsSilent
+ */
 void DataArrayInt::pushBackSilent(int val) throw(INTERP_KERNEL::Exception)
 {
   int nbCompo=getNumberOfComponents();
@@ -5091,6 +5177,16 @@ void DataArrayInt::pushBackSilent(int val) throw(INTERP_KERNEL::Exception)
     throw INTERP_KERNEL::Exception("DataArrayInt::pushBackSilent : not available for DataArrayInt with number of components different than 1 !");
 }
 
+/*!
+ * This method adds at the end of \a this a serie of values [\c valsBg,\c valsEnd). This method do \b not update its time label to avoid useless incrementation
+ * of counter. So the caller is expected to call TimeLabel::declareAsNew on \a this at the end of the push session.
+ *
+ *  \param [in] valsBg - an array of values to push at the end of \this.
+ *  \param [in] valsEnd - specifies the end of the array \a valsBg, so that
+ *              the last value of \a valsBg is \a valsEnd[ -1 ].
+ * \throw If \a this has already been allocated with number of components different from one.
+ * \sa DataArrayInt::pushBackSilent
+ */
 void DataArrayInt::pushBackValsSilent(const int *valsBg, const int *valsEnd) throw(INTERP_KERNEL::Exception)
 {
   int nbCompo=getNumberOfComponents();
@@ -5105,6 +5201,11 @@ void DataArrayInt::pushBackValsSilent(const int *valsBg, const int *valsEnd) thr
     throw INTERP_KERNEL::Exception("DataArrayInt::pushBackValsSilent : not available for DataArrayInt with number of components different than 1 !");
 }
 
+/*!
+ * This method returns silently ( without updating time label in \a this ) the last value, if any and suppress it.
+ * \throw If \a this is already empty.
+ * \throw If \a this has number of components different from one.
+ */
 int DataArrayInt::popBackSilent() throw(INTERP_KERNEL::Exception)
 {
   if(getNumberOfComponents()==1)
@@ -5113,6 +5214,11 @@ int DataArrayInt::popBackSilent() throw(INTERP_KERNEL::Exception)
     throw INTERP_KERNEL::Exception("DataArrayInt::popBackSilent : not available for DataArrayInt with number of components different than 1 !");
 }
 
+/*!
+ * This method \b do \b not modify content of \a this. It only modify its memory footprint if the allocated memory is to high regarding real data to store.
+ *
+ * \sa DataArrayInt::getHeapMemorySize, DataArrayInt::reserve
+ */
 void DataArrayInt::pack() const throw(INTERP_KERNEL::Exception)
 {
   _mem.pack();
