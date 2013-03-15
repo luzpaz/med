@@ -1155,7 +1155,7 @@ namespace ParaMEDMEM
              return SWIG_NewPointerObj(SWIG_as_voidptr(ret),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 );
            }
 
-           PyObject *getNodeIdsNearPoints(PyObject *pt, int nbOfNodes, double eps) const throw(INTERP_KERNEL::Exception)
+           PyObject *getNodeIdsNearPoints(PyObject *pt, int nbOfPoints, double eps) const throw(INTERP_KERNEL::Exception)
            {
              DataArrayInt *c=0,*cI=0;
              //
@@ -1166,8 +1166,8 @@ namespace ParaMEDMEM
              int sw;
              int spaceDim=self->getSpaceDimension();
              const char msg[]="Python wrap of MEDCouplingPointSet::getNodeIdsNearPoints : ";
-             const double *pos=convertObjToPossibleCpp5_Safe(pt,sw,val,a,aa,bb,msg,nbOfNodes,spaceDim,true);
-             self->getNodeIdsNearPoints(pos,nbOfNodes,eps,c,cI);
+             const double *pos=convertObjToPossibleCpp5_Safe(pt,sw,val,a,aa,bb,msg,nbOfPoints,spaceDim,true);
+             self->getNodeIdsNearPoints(pos,nbOfPoints,eps,c,cI);
              PyObject *ret=PyTuple_New(2);
              PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(c),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
              PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(cI),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
