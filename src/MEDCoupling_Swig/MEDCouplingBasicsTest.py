@@ -11445,6 +11445,52 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertAlmostEqual(res6[1],4.*integExp1,11)
         pass
 
+    def testSwig2SlowDADFindClosestTupleId(self):
+        nbPts=[10,]
+        for nbPt in nbPts:
+            d=DataArrayDouble(nbPt) ; d.iota() ; d*=1./(nbPt-1)
+            c=MEDCouplingCMesh() ; c.setCoords(d,d) ; m=c.buildUnstructured() ; pts=m.getCoords() ; del m
+            #
+            d0=DataArrayDouble((nbPt-1)*(nbPt-1)) ; d0.iota() ; d0*=(3./((nbPt-1)*(nbPt-1))) ; d0=d0.applyFunc("exp(x)-1")
+            d1=DataArrayDouble((nbPt-1)*(nbPt-1)) ; d1.iota()
+            d2=DataArrayDouble.Meld(d0,d1) ; d2=d2.fromPolarToCart() ; d2+=[0.32,0.73]
+            ids=pts.findClosestTupleId(d2)
+            #print "Start of costly computation"
+            idsExpected=DataArrayInt(len(d2))
+            tmp=1e300
+            for i,elt in enumerate(d2):
+                l,m=(pts-elt).magnitude().getMinValue()
+                idsExpected.setIJSilent(i,0,m)
+                if l<tmp:
+                    tmp=l ; tmp1=m ; tmp2=i
+                    pass
+                pass
+            #print "End of costly computation"
+            self.assertTrue(idsExpected.isEqual(ids))
+            a,b,c=pts.minimalDistanceTo(d2)
+            self.assertEqual(tmp,a)
+            self.assertEqual(tmp1,b)
+            self.assertEqual(tmp2,c)
+            #
+            l=[d2[:,i] for i in [0,1]]
+            for elt in l: elt.reverse()
+            d2i=DataArrayDouble.Meld(l)
+            ids1=pts.findClosestTupleId(d2i)
+            idsExpectedI=idsExpected.deepCpy() ; idsExpectedI.reverse()
+            self.assertTrue(idsExpectedI.isEqual(ids1))
+            #
+            l=[pts[:,i] for i in [0,1]]
+            for elt in l: elt.reverse()
+            ptsi=DataArrayDouble.Meld(l)
+            ids2=ptsi.findClosestTupleId(d2)
+            idsExpected2=nbPt*nbPt-1-ids
+            self.assertTrue(idsExpected2.isEqual(ids2))
+            #
+            ids3=ptsi.findClosestTupleId(d2i)
+            idsExpected3=idsExpected2.deepCpy() ; idsExpected3.reverse()
+            self.assertTrue(idsExpected3.isEqual(ids3))
+            pass
+
     def setUp(self):
         pass
     pass
