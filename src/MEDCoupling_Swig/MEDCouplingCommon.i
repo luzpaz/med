@@ -437,7 +437,7 @@ namespace ParaMEDMEM
     return res;
   }
 
-  class MEDCOUPLING_EXPORT RefCountObject
+  class RefCountObject
   {
   protected:
     RefCountObject();
