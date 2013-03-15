@@ -400,6 +400,10 @@ void MEDCouplingPointSet::rotate(const double *center, const double *vector, dou
  */
 void MEDCouplingPointSet::translate(const double *vector)
 {
+  if(!vector)
+    throw INTERP_KERNEL::Exception("MEDCouplingPointSet::translate : NULL input vector !");
+  if(!_coords)
+    throw INTERP_KERNEL::Exception("MEDCouplingPointSet::translate : no coordinates set !");
   double *coords=_coords->getPointer();
   int nbNodes=getNumberOfNodes();
   int dim=getSpaceDimension();
@@ -417,6 +421,10 @@ void MEDCouplingPointSet::translate(const double *vector)
  */
 void MEDCouplingPointSet::scale(const double *point, double factor)
 {
+  if(!point)
+    throw INTERP_KERNEL::Exception("MEDCouplingPointSet::scale : NULL input point !");
+  if(!_coords)
+    throw INTERP_KERNEL::Exception("MEDCouplingPointSet::scale : no coordinates set !");
   double *coords=_coords->getPointer();
   int nbNodes=getNumberOfNodes();
   int dim=getSpaceDimension();
