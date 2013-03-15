@@ -655,9 +655,15 @@ void MEDCouplingPointSet::findNodesOnPlane(const double *pt, const double *vec, 
 {
   if(getSpaceDimension()!=3)
     throw INTERP_KERNEL::Exception("MEDCouplingPointSet::findNodesOnPlane : Invalid spacedim to be applied on this ! Must be equal to 3 !");
+  if(!pt)
+    throw INTERP_KERNEL::Exception("MEDCouplingPointSet::findNodesOnPlane : NULL point pointer specified !");
+  if(!vec)
+    throw INTERP_KERNEL::Exception("MEDCouplingPointSet::findNodesOnPlane : NULL vector pointer specified !");
   int nbOfNodes=getNumberOfNodes();
   double a=vec[0],b=vec[1],c=vec[2],d=-pt[0]*vec[0]-pt[1]*vec[1]-pt[2]*vec[2];
   double deno=sqrt(a*a+b*b+c*c);
+  if(deno<std::numeric_limits<double>::min())
+    throw INTERP_KERNEL::Exception("MEDCouplingPointSet::findNodesOnPlane : vector pointer specified has norm equal to 0. !");
   const double *work=_coords->getConstPointer();
   for(int i=0;i<nbOfNodes;i++)
     {
@@ -689,6 +695,10 @@ void MEDCouplingPointSet::findNodesOnLine(const double *pt, const double *vec, d
   int spaceDim=getSpaceDimension();
   if(spaceDim!=2 && spaceDim!=3)
     throw INTERP_KERNEL::Exception("MEDCouplingPointSet::findNodesOnLine : Invalid spacedim to be applied on this ! Must be equal to 2 or 3 !");
+  if(!pt)
+    throw INTERP_KERNEL::Exception("MEDCouplingPointSet::findNodesOnLine : NULL point pointer specified !");
+  if(!vec)
+    throw INTERP_KERNEL::Exception("MEDCouplingPointSet::findNodesOnLine : NULL vector pointer specified !");
   int nbOfNodes=getNumberOfNodes();
   double den=0.;
   for(int i=0;i<spaceDim;i++)
