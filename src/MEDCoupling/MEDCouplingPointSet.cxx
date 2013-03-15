@@ -803,6 +803,8 @@ void MEDCouplingPointSet::Rotate3DAlg(const double *center, const double *vect, 
   double matrix[9];
   double matrixTmp[9];
   double norm=sqrt(vect[0]*vect[0]+vect[1]*vect[1]+vect[2]*vect[2]);
+  if(norm<std::numeric_limits<double>::min())
+    throw INTERP_KERNEL::Exception("MEDCouplingPointSet::Rotate3DAlg : magnitude of input vector is too close of 0. !");
   std::transform(vect,vect+3,vectorNorm,std::bind2nd(std::multiplies<double>(),1/norm));
   //rotation matrix computation
   matrix[0]=cosa; matrix[1]=0.; matrix[2]=0.; matrix[3]=0.; matrix[4]=cosa; matrix[5]=0.; matrix[6]=0.; matrix[7]=0.; matrix[8]=cosa;
