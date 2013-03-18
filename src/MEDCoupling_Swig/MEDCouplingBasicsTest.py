@@ -2669,6 +2669,12 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(nodeCor==None);
         cellCor=0;
         self.assertTrue(nodeCor==None);
+        a,b=mesh1.checkDeepEquivalWith(mesh2,0,1e-12);
+        self.assertEqual(renum,list(a.getValues()))
+        self.assertTrue(b==None);
+        mesh2.setCoords(mesh1.getCoords())
+        a=mesh1.checkDeepEquivalOnSameNodesWith(mesh2,0,1e-12);
+        self.assertEqual(renum,list(a.getValues()))
         #4th test : cell and node permutation by keeping the first the middle and the last as it is.
         mesh2=MEDCouplingDataForTest.build2DTargetMesh_3();
         renum2=[0,2,1,3,4,5,6,8,7,9,10]
