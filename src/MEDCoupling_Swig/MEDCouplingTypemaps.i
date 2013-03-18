@@ -17,6 +17,8 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
+#include "InterpKernelAutoPtr.hxx"
+
 #ifdef WITH_NUMPY2
 #include <numpy/arrayobject.h>
 #endif
@@ -52,6 +54,18 @@ static PyObject *convertFieldDiscretization(ParaMEDMEM::MEDCouplingFieldDiscreti
     ret=SWIG_NewPointerObj(reinterpret_cast<void*>(fd),SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDiscretizationKriging,owner);
   if(!ret)
     throw INTERP_KERNEL::Exception("Not recognized type of field discretization on downcast !");
+  return ret;
+}
+
+static PyObject *convertDataArrayChar(ParaMEDMEM::DataArrayChar *dac, int owner) throw(INTERP_KERNEL::Exception)
+{
+  PyObject *ret=0;
+  if(dynamic_cast<ParaMEDMEM::DataArrayByte *>(dac))
+    ret=SWIG_NewPointerObj((void*)dac,SWIGTYPE_p_ParaMEDMEM__DataArrayByte,owner);
+  if(dynamic_cast<ParaMEDMEM::DataArrayAsciiChar *>(dac))
+    ret=SWIG_NewPointerObj((void*)dac,SWIGTYPE_p_ParaMEDMEM__DataArrayAsciiChar,owner);
+  if(!ret)
+    throw INTERP_KERNEL::Exception("Not recognized type of DataArrayChar on downcast !");
   return ret;
 }
 
@@ -502,6 +516,18 @@ static PyObject *convertDblArrToPyListOfTuple(const double *vals, int nbOfComp, 
       for(int j=0;j<nbOfComp;j++)
         PyTuple_SetItem(t,j,PyFloat_FromDouble(vals[i*nbOfComp+j]));
       PyList_SetItem(ret,i,t);
+    }
+  return ret;
+}
+
+static PyObject *convertCharArrToPyListOfTuple(const char *vals, int nbOfComp, int nbOfTuples) throw(INTERP_KERNEL::Exception)
+{
+  PyObject *ret=PyList_New(nbOfTuples);
+  INTERP_KERNEL::AutoPtr<char> tmp=new char[nbOfComp+1]; tmp[nbOfComp]='\0';
+  for(int i=0;i<nbOfTuples;i++)
+    {
+      std::copy(vals+i*nbOfComp,vals+(i+1)*nbOfComp,(char *)tmp);
+      PyList_SetItem(ret,i,PyString_FromString(tmp));
     }
   return ret;
 }
