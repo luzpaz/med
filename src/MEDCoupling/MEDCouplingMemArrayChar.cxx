@@ -1865,7 +1865,7 @@ std::string DataArrayByteTuple::repr() const throw(INTERP_KERNEL::Exception)
 {
   std::ostringstream oss; oss << "(";
   for(int i=0;i<_nb_of_compo-1;i++)
-    oss << _pt[i] << ", ";
+    oss << (int)_pt[i] << ", ";
   oss << _pt[_nb_of_compo-1] << ")";
   return oss.str();
 }
@@ -1906,6 +1906,78 @@ DataArrayByte *DataArrayByteTuple::buildDAByte(int nbOfTuples, int nbOfCompo) co
 DataArrayAsciiChar *DataArrayAsciiChar::New()
 {
   return new DataArrayAsciiChar;
+}
+
+/*!
+ * Returns a new instance of DataArrayAsciiChar. The caller is to delete this array
+ * using decrRef() as it is no more needed. 
+ * \param [in] st the string. This input string should have a length greater than 0. If not an excpetion will be thrown.
+ */
+DataArrayAsciiChar *DataArrayAsciiChar::New(const std::string& st) throw(INTERP_KERNEL::Exception)
+{
+  return new DataArrayAsciiChar(st);
+}
+
+/*!
+ * \param [in] st the string. This input string should have a length greater than 0. If not an excpetion will be thrown.
+ */
+DataArrayAsciiChar::DataArrayAsciiChar(const std::string& st) throw(INTERP_KERNEL::Exception)
+{
+  std::size_t lgth=st.length();
+  if(lgth==0)
+    throw INTERP_KERNEL::Exception("DataArrayAsciiChar contructor with string ! Size of input string is null !");
+  alloc(1,lgth);
+  std::copy(st.begin(),st.begin()+lgth,getPointer());
+}
+
+/*!
+ * Returns a new instance of DataArrayAsciiChar. The caller is to delete this array
+ * using decrRef() as it is no more needed. 
+ * This constructor uses \a vst input vector of strings to initialize itself. For all strings whose length is lower than max length of strings in
+ * \a vst the remaining locations in memory will be set to character \a defaultChar.
+ *
+ * \param [in] defaultChar the default character used to fill not defined locations in \a this
+ * \param [in] vst vector of strings. This input vector must be non empty. \a this will have its component size set to the max lgth of strings contained
+ *             in \a vst. If all strings are empty an INTERP_KERNEL::Exception will be thrown.
+ *
+ * \throw If input \a vst is empty.
+ * \throw If all strings in \a vst are empty.
+ */
+DataArrayAsciiChar *DataArrayAsciiChar::New(const std::vector<std::string>& vst, char defaultChar) throw(INTERP_KERNEL::Exception)
+{
+  return new DataArrayAsciiChar(vst,defaultChar);
+}
+
+/*!
+ * This constructor uses \a vst input vector of strings to initialize itself. For all strings whose length is lower than max length of strings in
+ * \a vst the remaining locations in memory will be set to character \a defaultChar.
+ *
+ * \param [in] defaultChar the default character used to fill not defined locations in \a this
+ * \param [in] vst vector of strings. This input vector must be non empty. \a this will have its component size set to the max lgth of strings contained
+ *             in \a vst. If all strings are empty an INTERP_KERNEL::Exception will be thrown.
+ *
+ * \throw If input \a vst is empty.
+ * \throw If all strings in \a vst are empty.
+ */
+DataArrayAsciiChar::DataArrayAsciiChar(const std::vector<std::string>& vst, char defaultChar) throw(INTERP_KERNEL::Exception)
+{
+  if(vst.empty())
+    throw INTERP_KERNEL::Exception("DataArrayAsciiChar contructor with vector of strings ! Empty array !");
+  std::size_t nbCompo=0;
+  for(std::vector<std::string>::const_iterator it=vst.begin();it!=vst.end();it++)
+    nbCompo=std::max(nbCompo,(*it).length());
+  if(nbCompo==0)
+    throw INTERP_KERNEL::Exception("DataArrayAsciiChar contructor with vector of strings ! All strings in not empty vector are empty !");
+  int nbTuples=(int)vst.size();
+  alloc(nbTuples,(int)nbCompo);
+  char *pt=getPointer();
+  for(int i=0;i<nbTuples;i++,pt+=nbCompo)
+    {
+      const std::string& tmp=vst[i];
+      std::size_t sz=tmp.length();
+      std::copy(tmp.begin(),tmp.begin()+sz,pt);
+      std::fill(pt+sz,pt+nbCompo,defaultChar);
+    }
 }
 
 DataArrayAsciiCharIterator *DataArrayAsciiChar::iterator()
@@ -1982,13 +2054,23 @@ void DataArrayAsciiChar::reprZipStream(std::ostream& stream) const throw(INTERP_
 void DataArrayAsciiChar::reprWithoutNameStream(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
 {
   DataArray::reprWithoutNameStream(stream);
-  _mem.repr(getNumberOfComponents(),stream);
+  if(_mem.reprHeader(getNumberOfComponents(),stream))
+    {
+      const char *data=begin();
+      int nbOfTuples=getNumberOfTuples();
+      int nbCompo=getNumberOfComponents();
+      for(int i=0;i<nbOfTuples;i++,data+=nbCompo)
+        {
+          stream << "Tuple #" << i << " : \"";
+          std::copy(data,data+nbCompo,std::ostream_iterator<char>(stream));
+          stream << "\"\n";
+        }
+    }
 }
 
 void DataArrayAsciiChar::reprZipWithoutNameStream(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
 {
-  DataArray::reprWithoutNameStream(stream);
-  _mem.reprZip(getNumberOfComponents(),stream);
+  reprWithoutNameStream(stream);
 }
 
 void DataArrayAsciiChar::reprCppStream(const char *varName, std::ostream& stream) const throw(INTERP_KERNEL::Exception)
@@ -2055,10 +2137,8 @@ DataArrayAsciiCharTuple::DataArrayAsciiCharTuple(char *pt, int nbOfComp):_pt(pt)
 
 std::string DataArrayAsciiCharTuple::repr() const throw(INTERP_KERNEL::Exception)
 {
-  std::ostringstream oss; oss << "(";
-  for(int i=0;i<_nb_of_compo-1;i++)
-    oss << _pt[i] << ", ";
-  oss << _pt[_nb_of_compo-1] << ")";
+  std::ostringstream oss;
+  std::copy(_pt,_pt+_nb_of_compo,std::ostream_iterator<char>(oss));
   return oss.str();
 }
 

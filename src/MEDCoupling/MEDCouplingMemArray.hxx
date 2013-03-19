@@ -68,6 +68,7 @@ namespace ParaMEDMEM
     T& operator[](int id) { return _pointer.getPointer()[id]; }
     bool isEqual(const MemArray<T>& other, T prec, std::string& reason) const;
     void repr(int sl, std::ostream& stream) const;
+    bool reprHeader(int sl, std::ostream& stream) const;
     void reprZip(int sl, std::ostream& stream) const;
     void fillWithValue(const T& val);
     T *fromNoInterlace(int nbOfComp) const;
@@ -726,6 +727,8 @@ namespace ParaMEDMEM
   {
   public:
     MEDCOUPLING_EXPORT static DataArrayAsciiChar *New();
+    MEDCOUPLING_EXPORT static DataArrayAsciiChar *New(const std::string& st) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT static DataArrayAsciiChar *New(const std::vector<std::string>& vst, char defaultChar) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayChar *buildEmptySpecializedDAChar() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayAsciiCharIterator *iterator();
     MEDCOUPLING_EXPORT DataArrayAsciiChar *deepCpy() const;
@@ -739,6 +742,8 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT bool isEqualIfNotWhy(const DataArrayChar& other, std::string& reason) const throw(INTERP_KERNEL::Exception);
   private:
     DataArrayAsciiChar() { }
+    DataArrayAsciiChar(const std::string& st) throw(INTERP_KERNEL::Exception);
+    DataArrayAsciiChar(const std::vector<std::string>& vst, char defaultChar) throw(INTERP_KERNEL::Exception);
   };
 
   class DataArrayAsciiCharTuple;
