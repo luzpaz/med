@@ -11588,6 +11588,28 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertEqual(['ABGYY','CdGYY','EFGYY','GHGYY','IJGYY','ABGYY','CdGYY','EFGYY','GHGYY','IJGYY'],dd4.toStrList())
         dd5=DataArrayChar.Aggregate([dd4,dd3,dd4])
         self.assertEqual(['ABGYY','CdGYY','EFGYY','GHGYY','IJGYY','ABGYY','CdGYY','EFGYY','GHGYY','IJGYY','ABGYY','CdGYY','EFGYY','GHGYY','IJGYY','ABGYY','CdGYY','EFGYY','GHGYY','IJGYY','ABGYY','CdGYY','EFGYY','GHGYY','IJGYY'],dd5.toStrList())
+        # getitem, __iter__,__setitem__
+        a=list(dd3)
+        self.assertEqual("ABGYY",str(a[0]))
+        dd4=dd3[::2]
+        self.assertEqual(['ABGYY','EFGYY','IJGYY'],dd4.toStrList())
+        dd4=dd3[(3,2,1)]
+        self.assertEqual(['GHGYY','EFGYY','CdGYY'],dd4.toStrList())
+        dd4=dd3[:]
+        dd4[::2]=["12","345","67890"]
+        self.assertEqual(['12   ','CdGYY','345  ','GHGYY','67890'],dd4.toStrList())
+        dd4=dd3[:]
+        dd4[[1,2]]=" "
+        self.assertEqual(['ABGYY','     ','     ','GHGYY','IJGYY'],dd4.toStrList())
+        dd4=dd3[:]
+        dd4[4]='12345'
+        self.assertEqual(['ABGYY','CdGYY','EFGYY','GHGYY','12345'],dd4.toStrList())
+        dd4[0]=dd4[1]
+        self.assertEqual(['CdGYY','CdGYY','EFGYY','GHGYY','12345'],dd4.toStrList())
+        dd4=DataArrayAsciiChar(["abc","de","fghi"])
+        self.assertEqual(['abc ','de  ','fghi'],dd4.toStrList())
+        dd4=DataArrayAsciiChar(["abc","de","fghi"],"t")
+        self.assertEqual(['abct','dett','fghi'],dd4.toStrList())
         pass
 
     def setUp(self):
