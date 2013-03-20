@@ -164,6 +164,7 @@ class MEDLoaderBasicsTest(unittest.TestCase):
         myMesh.setName(meshName)
         MEDLoader.WriteUMesh("wFile1.med",myMesh,True)
 #! [PySnippetMeshAdvAPI1_1]
+        os.remove("wFile1.med")
 #! [PySnippetMeshAdvAPI1_2]
         self.assertTrue(isinstance(myMesh,MEDCouplingUMesh))
         myMesh.setName(meshName)
