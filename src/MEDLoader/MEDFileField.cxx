@@ -3860,6 +3860,26 @@ const DataArrayDouble *MEDFileField1TSWithoutSDA::getOrCreateAndGetArray() const
   return ret2;
 }
 
+/*!
+ * This methods returns a new instance (to be dealt by the caller).
+ * This method returns for the first field in the file \a fileName the first time step of this first field, if
+ * such field exists and time step exists. If not, an INTERP_KERNEL::Exception will be thrown.
+ */
+MEDFileField1TS *MEDFileField1TS::New(const char *fileName) throw(INTERP_KERNEL::Exception)
+{
+  return new MEDFileField1TS(fileName);
+}
+
+/*!
+ * This methods returns a new instance (to be dealt by the caller).
+ * This method returns the first time step of the field \a fieldName in file \a fieldName, if
+ * such field exists. If not, an INTERP_KERNEL::Exception will be thrown.
+ */
+MEDFileField1TS *MEDFileField1TS::New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
+{
+  return new MEDFileField1TS(fileName,fieldName);
+}
+
 MEDFileField1TS *MEDFileField1TS::New(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception)
 {
   return new MEDFileField1TS(fileName,fieldName,iteration,order);
@@ -3913,47 +3933,91 @@ void MEDFileField1TS::write(const char *fileName, int mode) const throw(INTERP_K
   writeLL(fid);
 }
 
+MEDFileField1TS::MEDFileField1TS(const char *fileName) throw(INTERP_KERNEL::Exception)
+try:MEDFileFieldGlobsReal(fileName)
+{
+  MEDFileUtilities::CheckFileForRead(fileName);
+  MEDFileUtilities::AutoFid fid=MEDfileOpen(fileName,MED_ACC_RDONLY);
+  med_field_type typcha;
+  //
+  int nbFields=MEDnField(fid);
+  if(nbFields<1)
+    {
+      std::ostringstream oss; oss << "MEDFileField1TS(fileName) : no field present in file \'" << fileName << "\' !";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
+    }
+  int ncomp=MEDfieldnComponent(fid,1);
+  INTERP_KERNEL::AutoPtr<char> comp=MEDLoaderBase::buildEmptyString(ncomp*MED_SNAME_SIZE);
+  INTERP_KERNEL::AutoPtr<char> unit=MEDLoaderBase::buildEmptyString(ncomp*MED_SNAME_SIZE);
+  INTERP_KERNEL::AutoPtr<char> dtunit=MEDLoaderBase::buildEmptyString(MED_LNAME_SIZE);
+  INTERP_KERNEL::AutoPtr<char> nomcha=MEDLoaderBase::buildEmptyString(MED_NAME_SIZE);
+  INTERP_KERNEL::AutoPtr<char> nomMaa=MEDLoaderBase::buildEmptyString(MED_NAME_SIZE);
+  med_bool localMesh;
+  int nbOfStep;
+  MEDfieldInfo(fid,1,nomcha,nomMaa,&localMesh,&typcha,comp,unit,dtunit,&nbOfStep);
+  std::string fieldName(nomcha);
+  if(nbOfStep<1)
+    {
+      std::ostringstream oss; oss << "MEDFileField1TS(fileName) : file \'" << fileName << "\' contains field with name \'" << fieldName << "\' but there is no time steps on it !";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
+    }
+  std::vector<std::string> infos(ncomp);
+  for(int j=0;j<ncomp;j++)
+    infos[j]=MEDLoaderBase::buildUnionUnit((char *)comp+j*MED_SNAME_SIZE,MED_SNAME_SIZE,(char *)unit+j*MED_SNAME_SIZE,MED_SNAME_SIZE);
+  _content=MEDFileField1TSWithoutSDA::New(fieldName.c_str(),-1,-1,-1/*iteration*/,-1/*order*/,std::vector<std::string>());
+  _content->getOrCreateAndGetArray()->setInfoAndChangeNbOfCompo(infos);
+  //
+  med_int numdt,numit;
+  med_float dt;
+  MEDfieldComputingStepInfo(fid,fieldName.c_str(),1,&numdt,&numit,&dt);
+  _content->setTime(numdt,numit,dt);
+  _content->_csit=1;
+  _content->_field_type=MEDFileUtilities::TraduceFieldType(typcha);
+  _content->finishLoading(fid);
+  //
+  loadGlobals(fid);
+}
+catch(INTERP_KERNEL::Exception& e)
+  {
+    throw e;
+  }
+
+MEDFileField1TS::MEDFileField1TS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
+try:MEDFileFieldGlobsReal(fileName),_content(MEDFileField1TSWithoutSDA::New(fieldName,-1,-1,-1/*iteration*/,-1/*order*/,std::vector<std::string>()))
+{
+  MEDFileUtilities::CheckFileForRead(fileName);
+  MEDFileUtilities::AutoFid fid=MEDfileOpen(fileName,MED_ACC_RDONLY);
+  med_field_type typcha;
+  int nbSteps=locateField(fid,fileName,fieldName,typcha);
+  if(nbSteps<1)
+    {
+      std::ostringstream oss; oss << "MEDFileField1TS(fileName,fieldName) : file \'" << fileName << "\' contains field with name \'" << fieldName << "\' but there is no time steps on it !";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
+    }
+  //
+  med_int numdt,numit;
+  med_float dt;
+  MEDfieldComputingStepInfo(fid,fieldName,1,&numdt,&numit,&dt);
+  _content->setTime(numdt,numit,dt);
+  _content->_csit=1;
+  _content->_field_type=MEDFileUtilities::TraduceFieldType(typcha);
+  _content->finishLoading(fid);
+  //
+  loadGlobals(fid);
+}
+catch(INTERP_KERNEL::Exception& e)
+  {
+    throw e;
+  }
+
 MEDFileField1TS::MEDFileField1TS(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception)
 try:MEDFileFieldGlobsReal(fileName),_content(MEDFileField1TSWithoutSDA::New(fieldName,-1,-1,iteration,order,std::vector<std::string>()))
 {
   MEDFileUtilities::CheckFileForRead(fileName);
   MEDFileUtilities::AutoFid fid=MEDfileOpen(fileName,MED_ACC_RDONLY);
-  int nbFields=MEDnField(fid);
   med_field_type typcha;
+  int nbOfStep2=locateField(fid,fileName,fieldName,typcha);
   bool found=false;
-  std::vector<std::string> fns(nbFields);
-  int nbOfStep2=-1;
-  for(int i=0;i<nbFields && !found;i++)
-    {
-      int ncomp=MEDfieldnComponent(fid,i+1);
-      INTERP_KERNEL::AutoPtr<char> comp=MEDLoaderBase::buildEmptyString(ncomp*MED_SNAME_SIZE);
-      INTERP_KERNEL::AutoPtr<char> unit=MEDLoaderBase::buildEmptyString(ncomp*MED_SNAME_SIZE);
-      INTERP_KERNEL::AutoPtr<char> dtunit=MEDLoaderBase::buildEmptyString(MED_LNAME_SIZE);
-      INTERP_KERNEL::AutoPtr<char> nomcha=MEDLoaderBase::buildEmptyString(MED_NAME_SIZE);
-      INTERP_KERNEL::AutoPtr<char> nomMaa=MEDLoaderBase::buildEmptyString(MED_NAME_SIZE);
-      med_bool localMesh;
-      int nbOfStep;
-      MEDfieldInfo(fid,i+1,nomcha,nomMaa,&localMesh,&typcha,comp,unit,dtunit,&nbOfStep);
-      std::string tmp(nomcha);
-      fns[i]=tmp;
-      found=(tmp==fieldName);
-      if(found)
-        {
-          nbOfStep2=nbOfStep;
-          std::string mname=MEDLoaderBase::buildStringFromFortran(nomMaa,MED_NAME_SIZE);
-          std::vector<std::string> infos(ncomp);
-          for(int j=0;j<ncomp;j++)
-            infos[j]=MEDLoaderBase::buildUnionUnit((char *)comp+j*MED_SNAME_SIZE,MED_SNAME_SIZE,(char *)unit+j*MED_SNAME_SIZE,MED_SNAME_SIZE);
-          _content->getOrCreateAndGetArray()->setInfoAndChangeNbOfCompo(infos);
-        }
-    }
-  if(!found)
-    {
-      std::ostringstream oss; oss << "No such field '" << fieldName << "' in file '" << fileName << "' ! Available fields are : ";
-      std::copy(fns.begin(),fns.end(),std::ostream_iterator<std::string>(oss," "));
-      throw INTERP_KERNEL::Exception(oss.str().c_str());
-    }
-  found=false;
   std::vector< std::pair<int,int> > dtits(nbOfStep2);
   for(int i=0;i<nbOfStep2 && !found;i++)
     {
@@ -4004,6 +4068,52 @@ MEDFileField1TS::MEDFileField1TS(const MEDFileField1TSWithoutSDA& other, bool sh
 
 MEDFileField1TS::MEDFileField1TS():_content(new MEDFileField1TSWithoutSDA)
 {
+}
+
+/*!
+ * This method throws an INTERP_KERNEL::Exception if \a fieldName field is not in file pointed by \a fid and with name \a fileName.
+ * 
+ * \param [out]
+ * \return in case of success the number of time steps available for the field with name \a fieldName.
+ */
+int MEDFileField1TS::locateField(med_idt fid, const char *fileName, const char *fieldName, med_field_type& typcha) throw(INTERP_KERNEL::Exception)
+{
+  int nbFields=MEDnField(fid);
+  bool found=false;
+  std::vector<std::string> fns(nbFields);
+  int nbOfStep2=-1;
+  for(int i=0;i<nbFields && !found;i++)
+    {
+      int ncomp=MEDfieldnComponent(fid,i+1);
+      INTERP_KERNEL::AutoPtr<char> comp=MEDLoaderBase::buildEmptyString(ncomp*MED_SNAME_SIZE);
+      INTERP_KERNEL::AutoPtr<char> unit=MEDLoaderBase::buildEmptyString(ncomp*MED_SNAME_SIZE);
+      INTERP_KERNEL::AutoPtr<char> dtunit=MEDLoaderBase::buildEmptyString(MED_LNAME_SIZE);
+      INTERP_KERNEL::AutoPtr<char> nomcha=MEDLoaderBase::buildEmptyString(MED_NAME_SIZE);
+      INTERP_KERNEL::AutoPtr<char> nomMaa=MEDLoaderBase::buildEmptyString(MED_NAME_SIZE);
+      med_bool localMesh;
+      int nbOfStep;
+      MEDfieldInfo(fid,i+1,nomcha,nomMaa,&localMesh,&typcha,comp,unit,dtunit,&nbOfStep);
+      std::string tmp(nomcha);
+      fns[i]=tmp;
+      found=(tmp==fieldName);
+      if(found)
+        {
+          nbOfStep2=nbOfStep;
+          std::string mname=MEDLoaderBase::buildStringFromFortran(nomMaa,MED_NAME_SIZE);
+          std::vector<std::string> infos(ncomp);
+          for(int j=0;j<ncomp;j++)
+            infos[j]=MEDLoaderBase::buildUnionUnit((char *)comp+j*MED_SNAME_SIZE,MED_SNAME_SIZE,(char *)unit+j*MED_SNAME_SIZE,MED_SNAME_SIZE);
+          _content->getOrCreateAndGetArray()->setInfoAndChangeNbOfCompo(infos);
+        }
+    }
+  if(!found)
+    {
+      std::ostringstream oss; oss << "No such field '" << fieldName << "' in file '" << fileName << "' ! Available fields are : ";
+      for(std::vector<std::string>::const_iterator it=fns.begin();it!=fns.end();it++)
+        oss << "\"" << *it << "\" ";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
+    }
+  return nbOfStep2;
 }
 
 /*!

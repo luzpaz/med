@@ -1020,6 +1020,8 @@ namespace ParaMEDMEM
   {
   public:
     static MEDFileField1TS *New(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception);
+    static MEDFileField1TS *New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
+    static MEDFileField1TS *New(const char *fileName) throw(INTERP_KERNEL::Exception);
     static MEDFileField1TS *New();
     void write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *getFieldAtLevel(TypeOfField type, int meshDimRelToMax, int renumPol=0) const throw(INTERP_KERNEL::Exception);
@@ -1048,6 +1050,16 @@ namespace ParaMEDMEM
     void setTime(int iteration, int order, double val) throw(INTERP_KERNEL::Exception);
     %extend
        {
+         MEDFileField1TS(const char *fileName) throw(INTERP_KERNEL::Exception)
+         {
+           return MEDFileField1TS::New(fileName);
+         }
+         
+         MEDFileField1TS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
+         {
+           return MEDFileField1TS::New(fileName,fieldName);
+         }
+
          MEDFileField1TS(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception)
          {
            return MEDFileField1TS::New(fileName,fieldName,iteration,order);

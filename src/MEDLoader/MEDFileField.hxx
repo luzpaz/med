@@ -497,6 +497,8 @@ namespace ParaMEDMEM
   class MEDLOADER_EXPORT MEDFileField1TS : public RefCountObject, public MEDFileWritable, public MEDFileFieldGlobsReal
   {
   public:
+    static MEDFileField1TS *New(const char *fileName) throw(INTERP_KERNEL::Exception);
+    static MEDFileField1TS *New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
     static MEDFileField1TS *New(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception);
     static MEDFileField1TS *New(const MEDFileField1TSWithoutSDA& other, bool shallowCopyOfContent);
     static MEDFileField1TS *New();
@@ -560,9 +562,12 @@ namespace ParaMEDMEM
     void changeLocsRefsNamesGen(const std::vector< std::pair<std::vector<std::string>, std::string > >& mapOfModif) throw(INTERP_KERNEL::Exception);
   private:
     void writeLL(med_idt fid) const throw(INTERP_KERNEL::Exception);
+    MEDFileField1TS(const char *fileName) throw(INTERP_KERNEL::Exception);
+    MEDFileField1TS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
     MEDFileField1TS(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception);
     MEDFileField1TS(const MEDFileField1TSWithoutSDA& other, bool shallowCopyOfContent);
     MEDFileField1TS();
+    int locateField(med_idt fid, const char *fileName, const char *fieldName, med_field_type& typcha) throw(INTERP_KERNEL::Exception);
   protected:
     MEDCouplingAutoRefCountObjectPtr<MEDFileField1TSWithoutSDA> _content;
   };

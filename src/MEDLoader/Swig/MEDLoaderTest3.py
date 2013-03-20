@@ -375,6 +375,7 @@ class MEDLoaderTest(unittest.TestCase):
         self.assertEqual(('DALLE','DALQ1','DALQ2','DALT3','MESH'),m.getGroupsOnSpecifiedLev(0))
         #
         m.write(fileName,2)
+        self.assertRaises(InterpKernelException,MEDFileField1TS,fileName)#throw because no field in file fileName
         pass
 
     def funcToTestDelItem(self,ff):
@@ -424,6 +425,12 @@ class MEDLoaderTest(unittest.TestCase):
         f=ff.getFieldAtLevel(ON_GAUSS_PT,0)
         f2=MEDLoader.ReadFieldGauss("Pyfile13.med",'2DMesh_2',0,'MyFirstFieldOnGaussPoint',1,5)
         self.assertTrue(f.isEqual(f2,1e-12,1e-12))
+        ff3=MEDFileField1TS.New("Pyfile13.med","MyFirstFieldOnGaussPoint")
+        f3=ff3.getFieldAtLevel(ON_GAUSS_PT,0)
+        self.assertTrue(f.isEqual(f3,1e-12,1e-12))
+        ff4=MEDFileField1TS.New("Pyfile13.med")
+        f4=ff4.getFieldAtLevel(ON_GAUSS_PT,0)
+        self.assertTrue(f.isEqual(f4,1e-12,1e-12))
         pass
 
     #gauss NE
