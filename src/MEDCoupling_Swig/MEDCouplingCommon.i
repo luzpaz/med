@@ -221,6 +221,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayByte::deepCpy;
 %newobject ParaMEDMEM::DataArrayByte::performCpy;
 %newobject ParaMEDMEM::DataArrayByteTuple::buildDAByte;
+%newobject ParaMEDMEM::DataArrayChar::substr;
 %newobject ParaMEDMEM::DataArrayAsciiChar::New;
 %newobject ParaMEDMEM::DataArrayAsciiChar::__iter__;
 %newobject ParaMEDMEM::DataArrayAsciiChar::deepCpy;
@@ -372,6 +373,8 @@ using namespace INTERP_KERNEL;
 %feature("unref") MEDCouplingExtrudedMesh "$this->decrRef();"
 %feature("unref") MEDCouplingCMesh "$this->decrRef();"
 %feature("unref") DataArrayInt "$this->decrRef();"
+%feature("unref") DataArrayAsciiChar "$this->decrRef();"
+%feature("unref") DataArrayByte "$this->decrRef();"
 %feature("unref") MEDCouplingField "$this->decrRef();"
 %feature("unref") MEDCouplingFieldDiscretizationP0 "$this->decrRef();"
 %feature("unref") MEDCouplingFieldDiscretizationP1 "$this->decrRef();"
@@ -1831,8 +1834,9 @@ namespace ParaMEDMEM
      std::vector<int> stdvecTyyppArr;
      std::pair<int, std::pair<int,int> > sTyyppArr;
      ParaMEDMEM::DataArrayInt *daIntTyypp=0;
-     int nbOfCompo=self->getNumberOfTuples();
-     convertObjToPossibleCpp2(obj,nbOfCompo,sw1,iTypppArr,stdvecTyyppArr,sTyyppArr,daIntTyypp);
+     int nbOfCompo=self->getNumberOfComponents();
+     int nbOfTuples=self->getNumberOfTuples();
+     convertObjToPossibleCpp2(obj,nbOfTuples,sw1,iTypppArr,stdvecTyyppArr,sTyyppArr,daIntTyypp);
      int sw2;
      char vc; std::string sc; std::vector<std::string> vsc; DataArrayChar *dacc=0;
      convertObjToPossibleCpp6(value,sw2,vc,sc,vsc,dacc);

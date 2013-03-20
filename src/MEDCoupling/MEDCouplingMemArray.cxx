@@ -1507,11 +1507,11 @@ DataArrayDouble *DataArrayDouble::substr(int tupleIdBg, int tupleIdEnd) const th
   else
     trueEnd=nbt;
   int nbComp=getNumberOfComponents();
-  DataArrayDouble *ret=DataArrayDouble::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::New();
   ret->alloc(trueEnd-tupleIdBg,nbComp);
   ret->copyStringInfoFrom(*this);
   std::copy(getConstPointer()+tupleIdBg*nbComp,getConstPointer()+trueEnd*nbComp,ret->getPointer());
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -6544,11 +6544,11 @@ DataArrayInt *DataArrayInt::substr(int tupleIdBg, int tupleIdEnd) const throw(IN
   else
     trueEnd=nbt;
   int nbComp=getNumberOfComponents();
-  DataArrayInt *ret=DataArrayInt::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
   ret->alloc(trueEnd-tupleIdBg,nbComp);
   ret->copyStringInfoFrom(*this);
   std::copy(getConstPointer()+tupleIdBg*nbComp,getConstPointer()+trueEnd*nbComp,ret->getPointer());
-  return ret;
+  return ret.retn();
 }
 
 /*!

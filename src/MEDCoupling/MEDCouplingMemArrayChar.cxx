@@ -619,6 +619,45 @@ void DataArrayChar::rearrange(int newNbOfCompo) throw(INTERP_KERNEL::Exception)
 }
 
 /*!
+ * Returns a shorten copy of \a this array. The new DataArrayChar contains all
+ * tuples starting from the \a tupleIdBg-th tuple and including all tuples located before
+ * the \a tupleIdEnd-th one. This methods has a similar behavior as std::string::substr().
+ * This method is a specialization of selectByTupleId2().
+ *  \param [in] tupleIdBg - index of the first tuple to copy from \a this array.
+ *  \param [in] tupleIdEnd - index of the tuple before which the tuples to copy are located.
+ *          If \a tupleIdEnd == -1, all the tuples till the end of \a this array are copied.
+ *  \return DataArrayChar * - the new instance of DataArrayChar that the caller
+ *          is to delete using decrRef() as it is no more needed.
+ *  \throw If \a tupleIdBg < 0.
+ *  \throw If \a tupleIdBg > \a this->getNumberOfTuples().
+    \throw If \a tupleIdEnd != -1 && \a tupleIdEnd < \a this->getNumberOfTuples().
+ *  \sa DataArrayChar::selectByTupleId2
+ */
+DataArrayChar *DataArrayChar::substr(int tupleIdBg, int tupleIdEnd) const throw(INTERP_KERNEL::Exception)
+{
+  checkAllocated();
+  int nbt=getNumberOfTuples();
+  if(tupleIdBg<0)
+    throw INTERP_KERNEL::Exception("DataArrayChar::substr : The tupleIdBg parameter must be greater than 0 !");
+  if(tupleIdBg>nbt)
+    throw INTERP_KERNEL::Exception("DataArrayChar::substr : The tupleIdBg parameter is greater than number of tuples !");
+  int trueEnd=tupleIdEnd;
+  if(tupleIdEnd!=-1)
+    {
+      if(tupleIdEnd>nbt)
+        throw INTERP_KERNEL::Exception("DataArrayChar::substr : The tupleIdBg parameter is greater or equal than number of tuples !");
+    }
+  else
+    trueEnd=nbt;
+  int nbComp=getNumberOfComponents();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayChar> ret=buildEmptySpecializedDAChar();
+  ret->alloc(trueEnd-tupleIdBg,nbComp);
+  ret->copyStringInfoFrom(*this);
+  std::copy(getConstPointer()+tupleIdBg*nbComp,getConstPointer()+trueEnd*nbComp,ret->getPointer());
+  return ret.retn();
+}
+
+/*!
  * Returns a shorten or extended copy of \a this array. If \a newNbOfComp is less
  * than \a this->getNumberOfComponents() then the result array is shorten as each tuple
  * is truncated to have \a newNbOfComp components, keeping first components. If \a

@@ -326,6 +326,7 @@ namespace ParaMEDMEM
     static void FindTupleIdsNearTuplesAlg(const BBTree<SPACEDIM,int>& myTree, const double *pos, int nbOfTuples, double eps,
                                           DataArrayInt *c, DataArrayInt *cI);
   private:
+    ~DataArrayDouble() { }
     DataArrayDouble() { }
   private:
     MemArray<double> _mem;
@@ -540,6 +541,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT bool resizeForUnserialization(const std::vector<int>& tinyInfoI);
     MEDCOUPLING_EXPORT void finishUnserialization(const std::vector<int>& tinyInfoI, const std::vector<std::string>& tinyInfoS);
   private:
+    ~DataArrayInt() { }
     DataArrayInt() { }
   private:
     MemArray<int> _mem;
@@ -615,6 +617,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT DataArrayChar *selectByTupleId2(int bg, int end, int step) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT bool isUniform(char val) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void rearrange(int newNbOfCompo) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT DataArrayChar *substr(int tupleIdBg, int tupleIdEnd=-1) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayChar *changeNbOfComponents(int newNbOfComp, char dftValue) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayChar *keepSelectedComponents(const std::vector<int>& compoIds) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void meldWith(const DataArrayChar *other) throw(INTERP_KERNEL::Exception);
@@ -687,6 +690,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT void reprCppStream(const char *varName, std::ostream& stream) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT bool isEqualIfNotWhy(const DataArrayChar& other, std::string& reason) const throw(INTERP_KERNEL::Exception);
   private:
+    ~DataArrayByte() { }
     DataArrayByte() { }
   };
 
@@ -741,6 +745,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT void reprCppStream(const char *varName, std::ostream& stream) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT bool isEqualIfNotWhy(const DataArrayChar& other, std::string& reason) const throw(INTERP_KERNEL::Exception);
   private:
+    ~DataArrayAsciiChar() { }
     DataArrayAsciiChar() { }
     DataArrayAsciiChar(const std::string& st) throw(INTERP_KERNEL::Exception);
     DataArrayAsciiChar(const std::vector<std::string>& vst, char defaultChar) throw(INTERP_KERNEL::Exception);
