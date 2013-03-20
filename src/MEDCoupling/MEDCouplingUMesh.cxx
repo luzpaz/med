@@ -1295,7 +1295,7 @@ int MEDCouplingUMesh::AreCellsEqual(const int *conn, const int *connI, int cell1
     case 7:
       return AreCellsEqual7(conn,connI,cell1,cell2);
     }
-  throw INTERP_KERNEL::Exception("Unknown comparison asked ! Must be in 0,1,2 or 3.");
+  throw INTERP_KERNEL::Exception("Unknown comparison asked ! Must be in 0,1,2,3 or 7.");
 }
 
 /*!
