@@ -19,6 +19,7 @@
 #
 
 from MEDCouplingRemapper import *
+from MEDCouplingDataForTest import MEDCouplingDataForTest
 from math import *
 import unittest
 
@@ -353,6 +354,26 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         integExpected=34.328125
         self.assertAlmostEqual(fNode.integral(False)[0],integExpected,14)
         self.assertAlmostEqual(f.integral(False)[0],integExpected,14)
+        pass
+
+    def testGauss2Gauss2DValidated(self):
+        srcFt=MEDCouplingDataForTest.buildFieldOnGauss_1()
+        trgFt=MEDCouplingDataForTest.buildFieldOnGauss_2()
+        src=MEDCouplingFieldDouble(srcFt)
+        self.assertEqual(srcFt.getMesh().getHiddenCppPointer(),src.getMesh().getHiddenCppPointer())
+        self.assertEqual(srcFt.getDiscretization().getHiddenCppPointer(),src.getDiscretization().getHiddenCppPointer())
+        #values given by ASTER usecase
+        src.setArray(DataArrayDouble([1.,1.,0.,0.,1.,1.,1.,1.,0.,0.,1.,1.,1.,1.,1.,1.,0.,0.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,0.,0.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,0.,0.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,0.,0.,0.,0.,0.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,0.,0.,0.,0.,0.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.]))
+        src.getArray().setInfoOnComponents(["DOMA"])
+        rem=MEDCouplingRemapper()
+        rem.setIntersectionType(PointLocator)
+        rem.prepareEx(srcFt,trgFt)
+        trg=rem.transferField(src,1e300)
+        self.assertEqual(trg.getMesh().getHiddenCppPointer(),trgFt.getMesh().getHiddenCppPointer())
+        self.assertEqual(trg.getDiscretization().getHiddenCppPointer(),trgFt.getDiscretization().getHiddenCppPointer())
+        #values given after interpolation in ASTER
+        arrExpected=DataArrayDouble([1.,1.,1.,0.,0.,0.,1.,1.,1.,1.,1.,0.,0.,0.,1.,1.,1.,1.,1.,0.,0.,0.,1.,1.,1.,1.,1.,0.,0.,0.,1.,1.,1.,1.,1.,0.,0.,0.,1.,1.,1.,1.,1.,1.,1.,0.,0.,1.,0.,1.,1.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,1.,0.,1.,1.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,1.,0.,1.,1.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,1.,0.,1.,1.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,1.,0.,1.,1.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,1.,0.,0.,0.,0.,1.,1.,1.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,1.,0.,0.,0.,0.,1.,1.,1.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,1.,0.,0.,0.,0.,1.,1.,1.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,1.,0.,0.,0.,0.,1.,1.,1.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,1.,0.,0.,0.,0.,1.,1.,1.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,1.,0.,0.,0.,1.,0.,0.,1.,1.,0.,0.,1.,0.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,1.,0.,0.,0.,1.,0.,0.,1.,1.,0.,0.,1.,0.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,1.,0.,0.,0.,1.,0.,0.,1.,1.,0.,0.,1.,0.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,1.,0.,0.,0.,1.,0.,0.,1.,1.,0.,0.,1.,0.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,1.,0.,0.,0.,1.,0.,0.,1.,1.,0.,0.,1.,0.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.]) ; arrExpected.setInfoOnComponents(["DOMA"])
+        self.assertTrue(trg.getArray().isEqual(arrExpected,1e-12))
         pass
     
     def build2DSourceMesh_1(self):

@@ -52,6 +52,7 @@ namespace ParaMEDMEM
     virtual bool isEqual(const MEDCouplingFieldDiscretization *other, double eps) const;
     virtual bool isEqualIfNotWhy(const MEDCouplingFieldDiscretization *other, double eps, std::string& reason) const = 0;
     virtual bool isEqualWithoutConsideringStr(const MEDCouplingFieldDiscretization *other, double eps) const;
+    virtual MEDCouplingFieldDiscretization *deepCpy() const;
     virtual MEDCouplingFieldDiscretization *clone() const = 0;
     virtual MEDCouplingFieldDiscretization *clonePart(const int *startCellIds, const int *endCellIds) const;
     virtual std::string getStringRepr() const = 0;

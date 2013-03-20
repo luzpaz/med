@@ -129,6 +129,15 @@ bool MEDCouplingFieldDiscretization::isEqualWithoutConsideringStr(const MEDCoupl
 }
 
 /*!
+ * This method is an alias of MEDCouplingFieldDiscretization::clone. It is only here for coherency with all the remaining of MEDCoupling.
+ * \sa MEDCouplingFieldDiscretization::clone.
+ */
+MEDCouplingFieldDiscretization *MEDCouplingFieldDiscretization::deepCpy() const
+{
+  return clone();
+}
+
+/*!
  * For all field discretization excepted GaussPts the [ \a startCellIds, \a endCellIds ) has no impact on the cloned instance.
  */
 MEDCouplingFieldDiscretization *MEDCouplingFieldDiscretization::clonePart(const int *startCellIds, const int *endCellIds) const
@@ -375,6 +384,11 @@ TypeOfField MEDCouplingFieldDiscretizationP0::getEnum() const
   return TYPE;
 }
 
+/*!
+ * This method is simply called by MEDCouplingFieldDiscretization::deepCpy. It performs the deep copy of \a this.
+ *
+ * \sa MEDCouplingFieldDiscretization::deepCpy.
+ */
 MEDCouplingFieldDiscretization *MEDCouplingFieldDiscretizationP0::clone() const
 {
   return new MEDCouplingFieldDiscretizationP0;
@@ -668,6 +682,11 @@ TypeOfField MEDCouplingFieldDiscretizationP1::getEnum() const
   return TYPE;
 }
 
+/*!
+ * This method is simply called by MEDCouplingFieldDiscretization::deepCpy. It performs the deep copy of \a this.
+ *
+ * \sa MEDCouplingFieldDiscretization::deepCpy.
+ */
 MEDCouplingFieldDiscretization *MEDCouplingFieldDiscretizationP1::clone() const
 {
   return new MEDCouplingFieldDiscretizationP1;
@@ -777,6 +796,9 @@ MEDCouplingFieldDiscretizationPerCell::~MEDCouplingFieldDiscretizationPerCell()
     _discr_per_cell->decrRef();
 }
 
+/*!
+ * This constructor deep copies ParaMEDMEM::DataArrayInt instance from other (if any).
+ */
 MEDCouplingFieldDiscretizationPerCell::MEDCouplingFieldDiscretizationPerCell(const MEDCouplingFieldDiscretizationPerCell& other, const int *startCellIds, const int *endCellIds):_discr_per_cell(0)
 {
   DataArrayInt *arr=other._discr_per_cell;
@@ -942,6 +964,11 @@ bool MEDCouplingFieldDiscretizationGauss::isEqualWithoutConsideringStr(const MED
   return true;
 }
 
+/*!
+ * This method is simply called by MEDCouplingFieldDiscretization::deepCpy. It performs the deep copy of \a this.
+ *
+ * \sa MEDCouplingFieldDiscretization::deepCpy.
+ */
 MEDCouplingFieldDiscretization *MEDCouplingFieldDiscretizationGauss::clone() const
 {
   return new MEDCouplingFieldDiscretizationGauss(*this);
@@ -1503,6 +1530,11 @@ TypeOfField MEDCouplingFieldDiscretizationGaussNE::getEnum() const
   return TYPE;
 }
 
+/*!
+ * This method is simply called by MEDCouplingFieldDiscretization::deepCpy. It performs the deep copy of \a this.
+ *
+ * \sa MEDCouplingFieldDiscretization::deepCpy.
+ */
 MEDCouplingFieldDiscretization *MEDCouplingFieldDiscretizationGaussNE::clone() const
 {
   return new MEDCouplingFieldDiscretizationGaussNE(*this);
@@ -1828,6 +1860,11 @@ const char *MEDCouplingFieldDiscretizationKriging::getRepr() const
   return REPR;
 }
 
+/*!
+ * This method is simply called by MEDCouplingFieldDiscretization::deepCpy. It performs the deep copy of \a this.
+ *
+ * \sa MEDCouplingFieldDiscretization::deepCpy.
+ */
 MEDCouplingFieldDiscretization *MEDCouplingFieldDiscretizationKriging::clone() const
 {
   return new MEDCouplingFieldDiscretizationKriging;

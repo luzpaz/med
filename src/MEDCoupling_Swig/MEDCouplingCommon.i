@@ -89,6 +89,7 @@ using namespace INTERP_KERNEL;
 %feature("docstring");
 
 %newobject ParaMEDMEM::MEDCouplingFieldDiscretization::getOffsetArr;
+%newobject ParaMEDMEM::MEDCouplingFieldDiscretization::deepCpy;
 %newobject ParaMEDMEM::MEDCouplingFieldDiscretization::clone;
 %newobject ParaMEDMEM::MEDCouplingFieldDiscretization::clonePart;
 %newobject ParaMEDMEM::MEDCouplingFieldDiscretization::getMeasureField;
@@ -7540,7 +7541,34 @@ namespace ParaMEDMEM
       }
     }
   };
-
+  
+  class MEDCouplingFieldTemplate : public ParaMEDMEM::MEDCouplingField
+  {
+  public:
+    static MEDCouplingFieldTemplate *New(const MEDCouplingFieldDouble& f) throw(INTERP_KERNEL::Exception);
+    static MEDCouplingFieldTemplate *New(TypeOfField type);
+    std::string simpleRepr() const throw(INTERP_KERNEL::Exception);
+    std::string advancedRepr() const throw(INTERP_KERNEL::Exception);
+    void updateTime() const;
+    %extend
+       {
+         MEDCouplingFieldTemplate(const MEDCouplingFieldDouble& f) throw(INTERP_KERNEL::Exception)
+         {
+           return MEDCouplingFieldTemplate::New(f);
+         }
+         
+         MEDCouplingFieldTemplate(TypeOfField type) throw(INTERP_KERNEL::Exception)
+         {
+           return MEDCouplingFieldTemplate::New(type);
+         }
+         
+         std::string __str__() const throw(INTERP_KERNEL::Exception)
+           {
+             return self->simpleRepr();
+           }
+       }
+  };
+  
   class MEDCouplingFieldDouble : public ParaMEDMEM::MEDCouplingField
   {
   public:
@@ -8064,33 +8092,6 @@ namespace ParaMEDMEM
         MEDCouplingFieldDouble::WriteVTK(fileName,tmp);
       }
     }
-  };
-
-  class MEDCouplingFieldTemplate : public ParaMEDMEM::MEDCouplingField
-  {
-  public:
-    static MEDCouplingFieldTemplate *New(const MEDCouplingFieldDouble& f) throw(INTERP_KERNEL::Exception);
-    static MEDCouplingFieldTemplate *New(TypeOfField type);
-    std::string simpleRepr() const throw(INTERP_KERNEL::Exception);
-    std::string advancedRepr() const throw(INTERP_KERNEL::Exception);
-    void updateTime() const;
-    %extend
-       {
-         MEDCouplingFieldTemplate(const MEDCouplingFieldDouble& f) throw(INTERP_KERNEL::Exception)
-         {
-           return MEDCouplingFieldTemplate::New(f);
-         }
-         
-         MEDCouplingFieldTemplate(TypeOfField type) throw(INTERP_KERNEL::Exception)
-         {
-           return MEDCouplingFieldTemplate::New(type);
-         }
-         
-         std::string __str__() const throw(INTERP_KERNEL::Exception)
-           {
-             return self->simpleRepr();
-           }
-       }
   };
 
   class MEDCouplingMultiFields : public RefCountObject, public TimeLabel
