@@ -2058,6 +2058,60 @@ class MEDLoaderTest(unittest.TestCase):
         self.assertEqual(2,data2.getNumberOfParams())
         self.assertAlmostEqual(data2.getParams()["B"][1,2].getValue(),567.89,13)
         pass
+
+    def testNamesOnCellAndNodesInMeshes1(self):
+        fname="Pyfile58.med"
+        fname2="Pyfile59.med"
+        m=MEDLoaderDataForTest.build3DSurfMesh_1()
+        m1=m.buildDescendingConnectivity()[0]
+        m1.sortCellsInMEDFileFrmt()
+        #
+        mm=MEDFileUMesh()
+        mm.setMeshAtLevel(0,m)
+        mm.setMeshAtLevel(-1,m1)
+        namesCellL0=DataArrayAsciiChar(6,16)
+        namesCellL0[:]=["CellL0#%.3d      "%(i) for i in xrange(6)]
+        mm.setNameFieldAtLevel(0,namesCellL0)
+        namesCellL1=DataArrayAsciiChar.Aggregate([namesCellL0,namesCellL0,namesCellL0.substr(2)])
+        namesCellL1[:]=["CellLM1#%.3d     "%(i) for i in xrange(16)]
+        mm.setNameFieldAtLevel(-1,namesCellL1)
+        namesNodes=namesCellL1.substr(4,16)
+        namesNodes[:]=["Node#%.3d        "%(i) for i in xrange(12)]
+        mm.setNameFieldAtLevel(1,namesNodes)
+        mm.write(fname,2)
+        #
+        mmr=MEDFileMesh.New(fname)
+        self.assertTrue(mm.getNameFieldAtLevel(0).isEqual(DataArrayAsciiChar(["CellL0#%.3d      "%(i) for i in xrange(6)])))
+        self.assertTrue(mm.getNameFieldAtLevel(-1).isEqual(DataArrayAsciiChar(["CellLM1#%.3d     "%(i) for i in xrange(16)])))
+        self.assertTrue(mm.getNameFieldAtLevel(1).isEqual(DataArrayAsciiChar(["Node#%.3d        "%(i) for i in xrange(12)])))
+        self.assertTrue(mm.isEqual(mmr,1e-12)[0])
+        mmr.getNameFieldAtLevel(1).setIJ(0,0,'M')
+        self.assertTrue(not mm.isEqual(mmr,1e-12)[0])
+        mmr.getNameFieldAtLevel(1).setIJ(0,0,'N')
+        self.assertTrue(mm.isEqual(mmr,1e-12)[0])
+        mmCpy=mm.deepCpy()
+        self.assertTrue(mm.isEqual(mmCpy,1e-12)[0])
+        #
+        c=MEDCouplingCMesh()
+        arr=DataArrayDouble([0.,1.1,2.3])
+        c.setCoords(arr,arr)
+        c.setName("cmesh")
+        cc=MEDFileCMesh()
+        cc.setMesh(c)
+        cc.setNameFieldAtLevel(0,DataArrayAsciiChar(["Cell#%.3d        "%(i) for i in xrange(4)]))
+        cc.setNameFieldAtLevel(1,DataArrayAsciiChar(["Node#%.3d        "%(i) for i in xrange(9)]))
+        cc.write(fname2,2)
+        ccr=MEDFileMesh.New(fname2)
+        self.assertTrue(ccr.getNameFieldAtLevel(0).isEqual(DataArrayAsciiChar(["Cell#%.3d        "%(i) for i in xrange(4)])))
+        self.assertTrue(ccr.getNameFieldAtLevel(1).isEqual(DataArrayAsciiChar(["Node#%.3d        "%(i) for i in xrange(9)])))
+        self.assertTrue(cc.isEqual(ccr,1e-12)[0])
+        ccr.getNameFieldAtLevel(1).setIJ(0,0,'M')
+        self.assertTrue(not cc.isEqual(ccr,1e-12)[0])
+        ccr.getNameFieldAtLevel(1).setIJ(0,0,'N')
+        self.assertTrue(cc.isEqual(ccr,1e-12)[0])
+        ccCpy=cc.deepCpy()
+        self.assertTrue(cc.isEqual(ccCpy,1e-12)[0])
+        pass
     pass
 
 unittest.main()
