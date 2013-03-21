@@ -988,6 +988,16 @@ namespace ParaMEDMEM
     PyTuple_SetItem(pyRet,1,pyRet1);
     return pyRet;
   }
+  
+  PyObject *searchRangesInListOfIds(const DataArrayInt *listOfIds) const throw(INTERP_KERNEL::Exception)
+  {
+    DataArrayInt *ret0=0,*ret1=0;
+    self->searchRangesInListOfIds(listOfIds,ret0,ret1);
+    PyObject *pyRet=PyTuple_New(2);
+    PyTuple_SetItem(pyRet,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+    PyTuple_SetItem(pyRet,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+    return pyRet;
+  }
 }
 
 %extend ParaMEDMEM::DataArrayChar
