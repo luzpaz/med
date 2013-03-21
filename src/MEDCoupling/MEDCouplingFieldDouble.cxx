@@ -516,7 +516,7 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::buildSubPart(const int *partBg, 
   MEDCouplingFieldDouble *ret=clone(false);//quick shallow copy.
   const MEDCouplingFieldDiscretization *disc=getDiscretization();
   if(disc)
-    ret->setDiscretization(disc->clonePart(partBg,partEnd));
+    ret->setDiscretization(MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDiscretization>(disc->clonePart(partBg,partEnd)));
   ret->setMesh(m);
   std::vector<DataArrayDouble *> arrays;
   _time_discr->getArrays(arrays);

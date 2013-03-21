@@ -388,6 +388,13 @@ int MEDCouplingField::getNumberOfTuplesExpected() const throw(INTERP_KERNEL::Exc
     throw INTERP_KERNEL::Exception("MEDCouplingField::getNumberOfTuplesExpected : Empty mesh !");
 }
 
+void MEDCouplingField::setDiscretization(MEDCouplingFieldDiscretization *newDisc)
+{
+  _type=newDisc;
+  if(newDisc)
+    newDisc->incrRef();
+}
+
 /*!
  * This method returns number of mesh placed expected regarding its discretization and its _mesh attribute.
  * This method expected a not null _mesh instance. If null, an exception will be thrown.
