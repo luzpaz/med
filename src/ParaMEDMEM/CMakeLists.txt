@@ -66,3 +66,7 @@ INSTALL(TARGETS paramedmem DESTINATION ${MED_salomelib_LIBS})
 
 FILE(GLOB paramedmem_HEADERS_HXX "${CMAKE_CURRENT_SOURCE_DIR}/*.hxx")
 INSTALL(FILES ${paramedmem_HEADERS_HXX} DESTINATION ${MED_salomeinclude_HEADERS})
+
+# To allow usage as SWIG dependencies:
+SET(paramedmem_HEADERS_HXX PARENT_SCOPE)
+

@@ -55,3 +55,6 @@ INSTALL(TARGETS medloader DESTINATION ${MED_salomelib_LIBS})
 
 FILE(GLOB medloader_HEADERS_HXX "${CMAKE_CURRENT_SOURCE_DIR}/*.hxx")
 INSTALL(FILES ${medloader_HEADERS_HXX} DESTINATION ${MED_salomeinclude_HEADERS})
+
+# To allow usage as SWIG dependencies:
+SET(medloader_HEADERS_HXX PARENT_SCOPE)

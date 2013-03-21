@@ -71,3 +71,7 @@ INSTALL(TARGETS medcouplingremapper DESTINATION ${MED_salomelib_LIBS})
 FILE(GLOB medcoupling_HEADERS_HXX "${CMAKE_CURRENT_SOURCE_DIR}/*.hxx")
 FILE(GLOB medcoupling_HEADERS_TXX "${CMAKE_CURRENT_SOURCE_DIR}/*.txx")
 INSTALL(FILES ${medcoupling_HEADERS_HXX} ${medcoupling_HEADERS_TXX} DESTINATION ${MED_salomeinclude_HEADERS})
+
+# To allow usage as SWIG dependencies:
+SET(medcoupling_HEADERS_HXX PARENT_SCOPE)
+SET(medcoupling_HEADERS_TXX PARENT_SCOPE)

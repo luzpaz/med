@@ -59,3 +59,6 @@ INSTALL(TARGETS medcouplingcorba DESTINATION ${MED_salomelib_LIBS})
 
 FILE(GLOB medcouplingcorba_HEADERS_HXX "${CMAKE_CURRENT_SOURCE_DIR}/*.hxx")
 INSTALL(FILES ${medcouplingcorba_HEADERS_HXX} DESTINATION ${MED_salomeinclude_HEADERS})
+
+# To allow usage as SWIG dependencies:
+SET(medcouplingcorba_HEADERS_HXX PARENT_SCOPE)
