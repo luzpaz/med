@@ -1987,65 +1987,8 @@ namespace ParaMEDMEM
    }
 }
 
-%extend ParaMEDMEM::MEDCouplingFieldDiscretization
-{
-  MEDCouplingFieldDiscretization *clonePart(PyObject *li)
-  {
-    int sz=0,sw=-1,val1=-1;
-    std::vector<int> val2;
-    const int *inp=convertObjToPossibleCpp1_Safe(li,sw,sz,val1,val2);
-    return self->clonePart(inp,inp+sz);
-  }
-  
-  PyObject *computeMeshRestrictionFromTupleIds(const MEDCouplingMesh *mesh, PyObject *tupleIds) const throw(INTERP_KERNEL::Exception)
-  {
-    std::vector<int> vVal; int iVal=-1;
-    int sz=-1,sw=0;
-    const int *tupleIdsBg=convertObjToPossibleCpp1_Safe(tupleIds,sw,sz,iVal,vVal);
-    if(sw==0)
-      throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretization::computeMeshRestrictionFromTupleIds : none parameter in input !");
-    DataArrayInt *ret0=0,*ret1=0;
-    self->computeMeshRestrictionFromTupleIds(mesh,tupleIdsBg,tupleIdsBg+sz,ret0,ret1);
-    PyObject *pyRet=PyTuple_New(2);
-    PyTuple_SetItem(pyRet,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
-    PyTuple_SetItem(pyRet,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
-    return pyRet;
-  }
-}
-
-%extend ParaMEDMEM::MEDCouplingFieldDiscretizationPerCell
-{
-  PyObject *getArrayOfDiscIds() const
-  {
-    DataArrayInt *ret=const_cast<DataArrayInt *>(self->getArrayOfDiscIds());
-    if(ret)
-      ret->incrRef();
-    return SWIG_NewPointerObj(SWIG_as_voidptr(ret),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 );
-  }
-
-  PyObject *splitIntoSingleGaussDicrPerCellType() const throw(INTERP_KERNEL::Exception)
-  {
-    std::vector<int> ret1;
-    std::vector<DataArrayInt *> ret0=self->splitIntoSingleGaussDicrPerCellType(ret1);
-    std::size_t sz=ret0.size();
-    PyObject *pyRet=PyTuple_New(2);
-    PyObject *pyRet0=PyList_New((int)sz);
-    PyObject *pyRet1=PyList_New((int)sz);
-    for(std::size_t i=0;i<sz;i++)
-      {
-        PyList_SetItem(pyRet0,i,SWIG_NewPointerObj(SWIG_as_voidptr(ret0[i]),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
-        PyList_SetItem(pyRet1,i,PyInt_FromLong(ret1[i]));
-      }
-    PyTuple_SetItem(pyRet,0,pyRet0);
-    PyTuple_SetItem(pyRet,1,pyRet1);
-    return pyRet;
-  }
-}
-
 %ignore ParaMEDMEM::DataArray::getInfoOnComponents;
 %ignore ParaMEDMEM::DataArrayInt::partitionByDifferentValues;
-%ignore ParaMEDMEM::MEDCouplingFieldDiscretizationPerCell::getArrayOfDiscIds;
-%ignore ParaMEDMEM::MEDCouplingFieldDiscretization::clonePart;
 %ignore ParaMEDMEM::DataArrayChar::getIJ;
 %ignore ParaMEDMEM::DataArrayChar::getIJSafe;
 %ignore ParaMEDMEM::DataArrayChar::search;
@@ -2058,6 +2001,9 @@ namespace ParaMEDMEM
 %include "MEDCouplingTimeDiscretization.hxx"
 %include "MEDCouplingGaussLocalization.hxx"
 %include "MEDCouplingFieldDiscretization.hxx"
+
+%ignore ParaMEDMEM::MEDCouplingFieldDiscretization::clonePart;
+%ignore ParaMEDMEM::MEDCouplingFieldDiscretizationPerCell::getArrayOfDiscIds;
 
 namespace ParaMEDMEM
 {
@@ -3653,6 +3599,86 @@ namespace ParaMEDMEM
   };
   
 }
+
+%extend ParaMEDMEM::MEDCouplingFieldDiscretization
+{
+  MEDCouplingFieldDiscretization *clonePart(PyObject *li)
+  {
+    int sz=0,sw=-1,val1=-1;
+    std::vector<int> val2;
+    const int *inp=convertObjToPossibleCpp1_Safe(li,sw,sz,val1,val2);
+    return self->clonePart(inp,inp+sz);
+  }
+  
+  PyObject *computeMeshRestrictionFromTupleIds(const MEDCouplingMesh *mesh, PyObject *tupleIds) const throw(INTERP_KERNEL::Exception)
+  {
+    std::vector<int> vVal; int iVal=-1;
+    int sz=-1,sw=0;
+    const int *tupleIdsBg=convertObjToPossibleCpp1_Safe(tupleIds,sw,sz,iVal,vVal);
+    if(sw==0)
+      throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretization::computeMeshRestrictionFromTupleIds : none parameter in input !");
+    DataArrayInt *ret0=0,*ret1=0;
+    self->computeMeshRestrictionFromTupleIds(mesh,tupleIdsBg,tupleIdsBg+sz,ret0,ret1);
+    PyObject *pyRet=PyTuple_New(2);
+    PyTuple_SetItem(pyRet,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+    PyTuple_SetItem(pyRet,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+    return pyRet;
+  }
+}
+
+%extend ParaMEDMEM::MEDCouplingFieldDiscretizationP0
+{
+  PyObject *computeMeshRestrictionFromTupleIds(const MEDCouplingMesh *mesh, PyObject *tupleIds) const throw(INTERP_KERNEL::Exception)
+  { return ParaMEDMEM_MEDCouplingFieldDiscretization_computeMeshRestrictionFromTupleIds__SWIG_1(self,mesh,tupleIds); }
+}
+
+%extend ParaMEDMEM::MEDCouplingFieldDiscretizationOnNodes
+{
+  PyObject *computeMeshRestrictionFromTupleIds(const MEDCouplingMesh *mesh, PyObject *tupleIds) const throw(INTERP_KERNEL::Exception)
+  { return ParaMEDMEM_MEDCouplingFieldDiscretization_computeMeshRestrictionFromTupleIds__SWIG_1(self,mesh,tupleIds); }
+}
+
+%extend ParaMEDMEM::MEDCouplingFieldDiscretizationGauss
+{
+  PyObject *computeMeshRestrictionFromTupleIds(const MEDCouplingMesh *mesh, PyObject *tupleIds) const throw(INTERP_KERNEL::Exception)
+  { return ParaMEDMEM_MEDCouplingFieldDiscretization_computeMeshRestrictionFromTupleIds__SWIG_1(self,mesh,tupleIds); }
+}
+
+%extend ParaMEDMEM::MEDCouplingFieldDiscretizationGaussNE
+{
+  PyObject *computeMeshRestrictionFromTupleIds(const MEDCouplingMesh *mesh, PyObject *tupleIds) const throw(INTERP_KERNEL::Exception)
+  { return ParaMEDMEM_MEDCouplingFieldDiscretization_computeMeshRestrictionFromTupleIds__SWIG_1(self,mesh,tupleIds); }
+}
+
+%extend ParaMEDMEM::MEDCouplingFieldDiscretizationPerCell
+{
+  PyObject *getArrayOfDiscIds() const
+  {
+    DataArrayInt *ret=const_cast<DataArrayInt *>(self->getArrayOfDiscIds());
+    if(ret)
+      ret->incrRef();
+    return SWIG_NewPointerObj(SWIG_as_voidptr(ret),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 );
+  }
+
+  PyObject *splitIntoSingleGaussDicrPerCellType() const throw(INTERP_KERNEL::Exception)
+  {
+    std::vector<int> ret1;
+    std::vector<DataArrayInt *> ret0=self->splitIntoSingleGaussDicrPerCellType(ret1);
+    std::size_t sz=ret0.size();
+    PyObject *pyRet=PyTuple_New(2);
+    PyObject *pyRet0=PyList_New((int)sz);
+    PyObject *pyRet1=PyList_New((int)sz);
+    for(std::size_t i=0;i<sz;i++)
+      {
+        PyList_SetItem(pyRet0,i,SWIG_NewPointerObj(SWIG_as_voidptr(ret0[i]),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+        PyList_SetItem(pyRet1,i,PyInt_FromLong(ret1[i]));
+      }
+    PyTuple_SetItem(pyRet,0,pyRet0);
+    PyTuple_SetItem(pyRet,1,pyRet1);
+    return pyRet;
+  }
+}
+
 %extend ParaMEDMEM::MEDCouplingFieldDiscretizationKriging
 {
   PyObject *computeVectorOfCoefficients(const MEDCouplingMesh *mesh, const DataArrayDouble *arr) const
