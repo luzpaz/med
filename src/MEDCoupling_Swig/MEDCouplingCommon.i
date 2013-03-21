@@ -2064,7 +2064,8 @@ namespace ParaMEDMEM
            PyObject *getCoords() throw(INTERP_KERNEL::Exception)
            {
              DataArrayDouble *ret1=self->getCoords();
-             ret1->incrRef();
+             if (ret1)
+                ret1->incrRef();
              return SWIG_NewPointerObj((void*)ret1,SWIGTYPE_p_ParaMEDMEM__DataArrayDouble,SWIG_POINTER_OWN | 0);
            }
            
