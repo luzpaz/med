@@ -1996,6 +1996,21 @@ namespace ParaMEDMEM
     const int *inp=convertObjToPossibleCpp1_Safe(li,sw,sz,val1,val2);
     return self->clonePart(inp,inp+sz);
   }
+  
+  PyObject *computeMeshRestrictionFromTupleIds(const MEDCouplingMesh *mesh, PyObject *tupleIds) const throw(INTERP_KERNEL::Exception)
+  {
+    std::vector<int> vVal; int iVal=-1;
+    int sz=-1,sw=0;
+    const int *tupleIdsBg=convertObjToPossibleCpp1_Safe(tupleIds,sw,sz,iVal,vVal);
+    if(sw==0)
+      throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretization::computeMeshRestrictionFromTupleIds : none parameter in input !");
+    DataArrayInt *ret0=0,*ret1=0;
+    self->computeMeshRestrictionFromTupleIds(mesh,tupleIdsBg,tupleIdsBg+sz,ret0,ret1);
+    PyObject *pyRet=PyTuple_New(2);
+    PyTuple_SetItem(pyRet,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+    PyTuple_SetItem(pyRet,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+    return pyRet;
+  }
 }
 
 %extend ParaMEDMEM::MEDCouplingFieldDiscretizationPerCell

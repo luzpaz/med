@@ -480,12 +480,17 @@ DataArrayDouble *MEDCouplingFieldDiscretizationP0::getLocalizationOfDiscValues(c
   return mesh->getBarycenterAndOwner();
 }
 
-void MEDCouplingFieldDiscretizationP0::computeMeshRestrictionFromTupleIds(const MEDCouplingMesh *mesh, const int *partBg, const int *partEnd,
-                                                                          DataArrayInt *&cellRest)
+void MEDCouplingFieldDiscretizationP0::computeMeshRestrictionFromTupleIds(const MEDCouplingMesh *mesh, const int *tupleIdsBg, const int *tupleIdsEnd,
+                                                                          DataArrayInt *&cellRestriction, DataArrayInt *&trueTupleRestriction) const throw(INTERP_KERNEL::Exception)
 {
-  cellRest=DataArrayInt::New();
-  cellRest->alloc((int)std::distance(partBg,partEnd),1);
-  std::copy(partBg,partEnd,cellRest->getPointer());
+  if(!mesh)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationP0::computeMeshRestrictionFromTupleIds : NULL input mesh !");
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> tmp=DataArrayInt::New();
+  tmp->alloc((int)std::distance(tupleIdsBg,tupleIdsEnd),1);
+  std::copy(tupleIdsBg,tupleIdsEnd,tmp->getPointer());
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> tmp2(tmp->deepCpy());
+  cellRestriction=tmp.retn();
+  trueTupleRestriction=tmp2.retn();
 }
 
 void MEDCouplingFieldDiscretizationP0::checkCompatibilityWithNature(NatureOfField nat) const throw(INTERP_KERNEL::Exception)
@@ -629,10 +634,19 @@ DataArrayDouble *MEDCouplingFieldDiscretizationOnNodes::getLocalizationOfDiscVal
   return mesh->getCoordinatesAndOwner();
 }
 
-void MEDCouplingFieldDiscretizationOnNodes::computeMeshRestrictionFromTupleIds(const MEDCouplingMesh *mesh, const int *partBg, const int *partEnd,
-                                                                               DataArrayInt *&cellRest)
+void MEDCouplingFieldDiscretizationOnNodes::computeMeshRestrictionFromTupleIds(const MEDCouplingMesh *mesh, const int *tupleIdsBg, const int *tupleIdsEnd,
+                                                                               DataArrayInt *&cellRestriction, DataArrayInt *&trueTupleRestriction) const throw(INTERP_KERNEL::Exception)
 {
-  cellRest=mesh->getCellIdsFullyIncludedInNodeIds(partBg,partEnd);
+  if(!mesh)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationOnNodes::computeMeshRestrictionFromTupleIds : NULL input mesh !");
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret1=mesh->getCellIdsFullyIncludedInNodeIds(tupleIdsBg,tupleIdsEnd);
+  const MEDCouplingUMesh *meshc=dynamic_cast<const MEDCouplingUMesh *>(mesh);
+  if(!meshc)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationOnNodes::computeMeshRestrictionFromTupleIds : trying to subpart field on nodes by node ids ! Your mesh has to be unstructured !");
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> meshPart=static_cast<MEDCouplingUMesh *>(meshc->buildPartOfMySelf(ret1->begin(),ret1->end(),true));
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret2=meshPart->computeFetchedNodeIds();
+  cellRestriction=ret1.retn();
+  trueTupleRestriction=ret2.retn();
 }
 
 void MEDCouplingFieldDiscretizationOnNodes::checkCoherencyBetween(const MEDCouplingMesh *mesh, const DataArrayDouble *da) const throw(INTERP_KERNEL::Exception)
@@ -1169,9 +1183,11 @@ DataArrayDouble *MEDCouplingFieldDiscretizationGauss::getLocalizationOfDiscValue
   return ret.retn();
 }
 
-void MEDCouplingFieldDiscretizationGauss::computeMeshRestrictionFromTupleIds(const MEDCouplingMesh *mesh, const int *partBg, const int *partEnd,
-                                                                             DataArrayInt *&cellRest)
+void MEDCouplingFieldDiscretizationGauss::computeMeshRestrictionFromTupleIds(const MEDCouplingMesh *mesh, const int *tupleIdsBg, const int *tupleIdsEnd,
+                                                                             DataArrayInt *&cellRestriction, DataArrayInt *&trueTupleRestriction) const throw(INTERP_KERNEL::Exception)
 {
+  if(!mesh)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationGauss::computeMeshRestrictionFromTupleIds : NULL input mesh !");
   throw INTERP_KERNEL::Exception("Not implemented yet !");
 }
 
@@ -1871,10 +1887,41 @@ const double *MEDCouplingFieldDiscretizationGaussNE::GetRefCoordsFromGeometricTy
     }
 }
 
-void MEDCouplingFieldDiscretizationGaussNE::computeMeshRestrictionFromTupleIds(const MEDCouplingMesh *mesh, const int *partBg, const int *partEnd,
-                                                                               DataArrayInt *&cellRest)
+void MEDCouplingFieldDiscretizationGaussNE::computeMeshRestrictionFromTupleIds(const MEDCouplingMesh *mesh, const int *tupleIdsBg, const int *tupleIdsEnd,
+                                                                               DataArrayInt *&cellRestriction, DataArrayInt *&trueTupleRestriction) const throw(INTERP_KERNEL::Exception)
 {
-  throw INTERP_KERNEL::Exception("Not implemented yet !");
+  if(!mesh)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationGaussNE::computeMeshRestrictionFromTupleIds : NULL input mesh !");
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> tmp=DataArrayInt::New(); tmp->alloc((int)std::distance(tupleIdsBg,tupleIdsEnd),1);
+  std::copy(tupleIdsBg,tupleIdsEnd,tmp->getPointer());
+  tmp->sort(true);
+  tmp=tmp->buildUnique();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> nbOfNodesPerCell=mesh->computeNbOfNodesPerCell();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret0=DataArrayInt::New(); ret0->alloc(0,1);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret1=DataArrayInt::New(); ret1->alloc(0,1);
+  nbOfNodesPerCell->computeOffsets2();
+  //
+  const int *tupEnd(tmp->end()),*offBg(nbOfNodesPerCell->begin()),*offEnd(nbOfNodesPerCell->end()-1);
+  const int *tupPtr(tmp->begin()),*offPtr(offBg);
+  while(tupPtr!=tupEnd && offPtr!=offEnd)
+    {
+      if(*tupPtr==*offPtr)
+        {
+          int i=offPtr[0];
+          while(i<offPtr[1] && (*tupPtr==(offPtr[0]+i)) && tupPtr!=tupEnd) { i++; tupPtr++; }
+          if(i==offPtr[1])
+            {
+              ret0->pushBackSilent((int)std::distance(offBg,offPtr));
+              ret1->pushBackValsSilent(tupPtr-(offPtr[1]-offPtr[0]),tupPtr);
+              offPtr++;
+            }
+        }
+      else
+        { if(*tupPtr<*offPtr) tupPtr++; else offPtr++; }
+    }
+  //
+  cellRestriction=ret0.retn();
+  trueTupleRestriction=ret1.retn();
 }
 
 void MEDCouplingFieldDiscretizationGaussNE::checkCompatibilityWithNature(NatureOfField nat) const throw(INTERP_KERNEL::Exception)
