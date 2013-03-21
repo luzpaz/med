@@ -11644,6 +11644,41 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(DataArrayDouble(f.normL2()).isEqual(DataArrayDouble([58.16846378340898,1046.1241521947334]),1e-12))
         pass
 
+    def testSwig2FieldDiscretizationComputeMeshRestrictionFromTupleIds1(self):
+        m=MEDCouplingDataForTest.build3DSurfTargetMesh_1()
+        f=MEDCouplingFieldDouble(ON_GAUSS_NE)
+        f.setMesh(m)
+        a,b=f.getDiscretization().computeMeshRestrictionFromTupleIds(f.getMesh(),[3,4,5,6,8,9,10,14,15,16,17])
+        self.assertTrue(a.isEqual(DataArrayInt([1,4])))
+        self.assertTrue(b.isEqual(DataArrayInt([4,5,6,14,15,16,17])))
+        a,b=f.getDiscretization().computeMeshRestrictionFromTupleIds(f.getMesh(),DataArrayInt([0,1,2,3,5,7,8,9,10,11,12,18]))
+        self.assertTrue(a.isEqual(DataArrayInt([0,2])))
+        self.assertTrue(b.isEqual(DataArrayInt([0,1,2,3,7,8,9])))
+        #
+        f=MEDCouplingFieldDouble(ON_CELLS)
+        f.setMesh(m)
+        a,b=f.getDiscretization().computeMeshRestrictionFromTupleIds(f.getMesh(),[3,4])
+        self.assertTrue(a.isEqual(DataArrayInt([3,4])))
+        self.assertTrue(b.isEqual(DataArrayInt([3,4])))
+        #
+        f=MEDCouplingFieldDouble(ON_NODES)
+        f.setMesh(m)
+        a,b=f.getDiscretization().computeMeshRestrictionFromTupleIds(f.getMesh(),[1,2,3,4])
+        self.assertTrue(a.isEqual(DataArrayInt([1])))
+        self.assertTrue(b.isEqual(DataArrayInt([1,2,4])))
+        #
+        f=MEDCouplingDataForTest.buildFieldOnGauss_1()
+        a,b=f.getDiscretization().computeMeshRestrictionFromTupleIds(f.getMesh(),[0,11,12,13,14,15,17,18,19,36,37,38,115,117,118,119,120,121,122,123,124,125])
+        self.assertTrue(a.isEqual(DataArrayInt([0,11,12,18,35])))
+        self.assertTrue(b.isEqual(DataArrayInt([0,11,12,13,14,15,36,37,38,117,118,119,120,121,122,123,124,125])))
+        #
+        d=DataArrayInt([0,3,7,9,15,18])
+        e=DataArrayInt([0,1,2,3,7,8,15,16,17])
+        a,b=d.searchRangesInListOfIds(e)
+        self.assertTrue(a.isEqual(DataArrayInt([0,2,4])))
+        self.assertTrue(b.isEqual(DataArrayInt([0,1,2,7,8,15,16,17])))
+        pass
+
     def setUp(self):
         pass
     pass

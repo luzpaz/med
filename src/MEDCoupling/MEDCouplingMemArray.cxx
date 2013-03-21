@@ -8548,6 +8548,60 @@ void DataArrayInt::computeOffsets2() throw(INTERP_KERNEL::Exception)
   declareAsNew();
 }
 
+/*!
+ * Returns two new DataArrayInt instances whose contents is computed from that of \a this and \a listOfIds arrays as follows.
+ * \a this is expected to be an offset format ( as returned by DataArrayInt::computeOffsets2 ) that is to say with one component
+ * and ** sorted strictly increasingly **. \a listOfIds is expected to be sorted ascendingly (not strictly needed for \a listOfIds).
+ * This methods searches in \a this, considered as a set of contiguous \c this->getNumberOfComponents() ranges, all ids in \a listOfIds
+ * filling completely one of the ranges in \a this.
+ *
+ * \param [in] listOfIds a list of ids that has to be sorted ascendingly.
+ * \param [out] rangeIdsFetched the range ids fetched
+ * \param [out] idsInInputListThatFetch contains the list of ids in \a listOfIds that are \b fully included in a range in \a this. So
+ *              \a idsInInputListThatFetch is a part of input \a listOfIds.
+ *
+ * \sa DataArrayInt::computeOffsets2
+ *
+ *  \b Example: <br>
+ *          - \a this : [0,3,7,9,15,18]
+ *          - \a listOfIds contains  [0,1,2,3,7,8,15,16,17]
+ *          - \a rangeIdsFetched result array: [0,2,4]
+ *          - \a idsInInputListThatFetch result array: [0,1,2,7,8,15,16,17]
+ * In this example id 3 in input \a listOfIds is alone so it do not appear in output \a idsInInputListThatFetch.
+ * <br>
+ */
+void DataArrayInt::searchRangesInListOfIds(const DataArrayInt *listOfIds, DataArrayInt *& rangeIdsFetched, DataArrayInt *& idsInInputListThatFetch) const throw(INTERP_KERNEL::Exception)
+{
+  if(!listOfIds)
+    throw INTERP_KERNEL::Exception("DataArrayInt::searchRangesInListOfIds : input list of ids is null !");
+  listOfIds->checkAllocated(); checkAllocated();
+  if(listOfIds->getNumberOfComponents()!=1)
+    throw INTERP_KERNEL::Exception("DataArrayInt::searchRangesInListOfIds : input list of ids must have exactly one component !");
+  if(getNumberOfComponents()!=1)
+    throw INTERP_KERNEL::Exception("DataArrayInt::searchRangesInListOfIds : this must have exactly one component !");
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret0=DataArrayInt::New(); ret0->alloc(0,1);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret1=DataArrayInt::New(); ret1->alloc(0,1);
+  const int *tupEnd(listOfIds->end()),*offBg(begin()),*offEnd(end()-1);
+  const int *tupPtr(listOfIds->begin()),*offPtr(offBg);
+  while(tupPtr!=tupEnd && offPtr!=offEnd)
+    {
+      if(*tupPtr==*offPtr)
+        {
+          int i=offPtr[0];
+          while(i<offPtr[1] && *tupPtr==i && tupPtr!=tupEnd) { i++; tupPtr++; }
+          if(i==offPtr[1])
+            {
+              ret0->pushBackSilent((int)std::distance(offBg,offPtr));
+              ret1->pushBackValsSilent(tupPtr-(offPtr[1]-offPtr[0]),tupPtr);
+              offPtr++;
+            }
+        }
+      else
+        { if(*tupPtr<*offPtr) tupPtr++; else offPtr++; }
+    }
+  rangeIdsFetched=ret0.retn();
+  idsInInputListThatFetch=ret1.retn();
+}
 
 /*!
  * Returns a new DataArrayInt whose contents is computed from that of \a this and \a

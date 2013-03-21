@@ -1188,7 +1188,13 @@ void MEDCouplingFieldDiscretizationGauss::computeMeshRestrictionFromTupleIds(con
 {
   if(!mesh)
     throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationGauss::computeMeshRestrictionFromTupleIds : NULL input mesh !");
-  throw INTERP_KERNEL::Exception("Not implemented yet !");
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> tmp=DataArrayInt::New(); tmp->alloc((int)std::distance(tupleIdsBg,tupleIdsEnd),1);
+  std::copy(tupleIdsBg,tupleIdsEnd,tmp->getPointer());
+  tmp->sort(true);
+  tmp=tmp->buildUnique();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> nbOfNodesPerCell=buildNbOfGaussPointPerCellField();
+  nbOfNodesPerCell->computeOffsets2();
+  nbOfNodesPerCell->searchRangesInListOfIds(tmp,cellRestriction,trueTupleRestriction);
 }
 
 /*!
@@ -1897,31 +1903,8 @@ void MEDCouplingFieldDiscretizationGaussNE::computeMeshRestrictionFromTupleIds(c
   tmp->sort(true);
   tmp=tmp->buildUnique();
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> nbOfNodesPerCell=mesh->computeNbOfNodesPerCell();
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret0=DataArrayInt::New(); ret0->alloc(0,1);
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret1=DataArrayInt::New(); ret1->alloc(0,1);
   nbOfNodesPerCell->computeOffsets2();
-  //
-  const int *tupEnd(tmp->end()),*offBg(nbOfNodesPerCell->begin()),*offEnd(nbOfNodesPerCell->end()-1);
-  const int *tupPtr(tmp->begin()),*offPtr(offBg);
-  while(tupPtr!=tupEnd && offPtr!=offEnd)
-    {
-      if(*tupPtr==*offPtr)
-        {
-          int i=offPtr[0];
-          while(i<offPtr[1] && (*tupPtr==(offPtr[0]+i)) && tupPtr!=tupEnd) { i++; tupPtr++; }
-          if(i==offPtr[1])
-            {
-              ret0->pushBackSilent((int)std::distance(offBg,offPtr));
-              ret1->pushBackValsSilent(tupPtr-(offPtr[1]-offPtr[0]),tupPtr);
-              offPtr++;
-            }
-        }
-      else
-        { if(*tupPtr<*offPtr) tupPtr++; else offPtr++; }
-    }
-  //
-  cellRestriction=ret0.retn();
-  trueTupleRestriction=ret1.retn();
+  nbOfNodesPerCell->searchRangesInListOfIds(tmp,cellRestriction,trueTupleRestriction);
 }
 
 void MEDCouplingFieldDiscretizationGaussNE::checkCompatibilityWithNature(NatureOfField nat) const throw(INTERP_KERNEL::Exception)
