@@ -64,6 +64,7 @@ const char MEDCouplingFieldDiscretizationKriging::REPR[]="KRIGING";
 
 const TypeOfField MEDCouplingFieldDiscretizationKriging::TYPE=ON_NODES_KR;
 
+// doc is here http://www.code-aster.org/V2/doc/default/fr/man_r/r3/r3.01.01.pdf
 const double MEDCouplingFieldDiscretizationGaussNE::FGP_SEG2[2]={1.,1.};
 const double MEDCouplingFieldDiscretizationGaussNE::FGP_SEG3[3]={0.5555555555555556,0.5555555555555556,0.8888888888888888};
 const double MEDCouplingFieldDiscretizationGaussNE::FGP_SEG4[4]={0.347854845137454,0.347854845137454,0.652145154862546,0.652145154862546};
@@ -77,6 +78,24 @@ const double MEDCouplingFieldDiscretizationGaussNE::FGP_PENTA6[6]={0.16666666666
 const double MEDCouplingFieldDiscretizationGaussNE::FGP_HEXA8[8]={1.,1.,1.,1.,1.,1.,1.,1.};
 const double MEDCouplingFieldDiscretizationGaussNE::FGP_HEXA27[27]={0.1714677640603567,0.1714677640603567,0.1714677640603567,0.1714677640603567,0.1714677640603567,0.1714677640603567,0.1714677640603567,0.1714677640603567,0.27434842249657065,0.27434842249657065,0.27434842249657065,0.27434842249657065,0.27434842249657065,0.27434842249657065,0.27434842249657065,0.27434842249657065,0.27434842249657065,0.27434842249657065,0.27434842249657065,0.27434842249657065,0.43895747599451296,0.43895747599451296,0.43895747599451296,0.43895747599451296,0.43895747599451296,0.43895747599451296,0.7023319615912208};
 const double MEDCouplingFieldDiscretizationGaussNE::FGP_PYRA5[5]={0.13333333333333333,0.13333333333333333,0.13333333333333333,0.13333333333333333,0.13333333333333333};
+const double MEDCouplingFieldDiscretizationGaussNE::REF_SEG2[2]={-1.,1.};
+const double MEDCouplingFieldDiscretizationGaussNE::REF_SEG3[3]={-1.,0.,1.};
+const double MEDCouplingFieldDiscretizationGaussNE::REF_SEG4[4]={-1.,1.,-0.3333333333333333,0.3333333333333333};
+const double MEDCouplingFieldDiscretizationGaussNE::REF_TRI3[6]={0.,0.,1.,0.,0.,1.};
+const double MEDCouplingFieldDiscretizationGaussNE::REF_TRI6[12]={0.,0.,1.,0.,0.,1.,0.5,0.,0.5,0.5,0.,0.5};
+const double MEDCouplingFieldDiscretizationGaussNE::REF_TRI7[14]={0.,0.,1.,0.,0.,1.,0.5,0.,0.5,0.5,0.,0.5,0.3333333333333333,0.3333333333333333};
+const double MEDCouplingFieldDiscretizationGaussNE::REF_QUAD4[8]={-1.,-1.,1.,-1.,1.,1.,-1.,1.};
+const double MEDCouplingFieldDiscretizationGaussNE::REF_QUAD8[16]={-1.,-1.,1.,-1.,1.,1.,-1.,1.,0.,-1.,1.,0.,0.,1.,-1.,0.};
+const double MEDCouplingFieldDiscretizationGaussNE::REF_QUAD9[18]={-1.,-1.,1.,-1.,1.,1.,-1.,1.,0.,-1.,1.,0.,0.,1.,-1.,0.,0.,0.};
+const double MEDCouplingFieldDiscretizationGaussNE::REF_TETRA4[12]={0.,1.,0.,0.,0.,1.,0.,0.,0.,1.,0.,0.};
+const double MEDCouplingFieldDiscretizationGaussNE::REF_TETRA10[30]={0.,1.,0.,0.,0.,1.,0.,0.,0.,1.,0.,0.,0.,0.5,0.5,0.,0.,0.5,0.,0.5,0.,0.5,0.5,0.,0.5,0.,0.5,0.5,0.,0.};
+const double MEDCouplingFieldDiscretizationGaussNE::REF_PENTA6[18]={-1.,1.,0.,-1.,0.,1.,-1.,0.,0.,1.,1.,0.,1.,0.,1.,1.,0.,0.};
+const double MEDCouplingFieldDiscretizationGaussNE::REF_PENTA15[45]={-1.,1.,0.,-1.,0.,1.,-1.,0.,0.,1.,1.,0.,1.,0.,1.,1.,0.,0.,-1.,0.5,0.5,-1.,0.,0.5,-1.,0.5,0.,0.,1.,0.,0.,0.,1.,0.,0.,0.,1.,0.5,0.5,1.,0.,0.5,1.,0.5,0.};
+const double MEDCouplingFieldDiscretizationGaussNE::REF_HEXA8[24]={-1.,-1.,-1.,1.,-1.,-1.,1.,1.,-1.,-1.,1.,-1.,-1.,-1.,1.,1.,-1.,1.,1.,1.,1.,-1.,1.,1.};
+const double MEDCouplingFieldDiscretizationGaussNE::REF_HEXA20[60]={-1.,-1.,-1.,1.,-1.,-1.,1.,1.,-1.,-1.,1.,-1.,-1.,-1.,1.,1.,-1.,1.,1.,1.,1.,-1.,1.,1.,0.,-1.,-1.,1.,0.,-1.,0.,1.,-1.,-1.,0.,-1.,-1.,-1.,0.,1.,-1.,0.,1.,1.,0.,-1.,1.,0.,0.,-1.,1.,1.,0.,1.,0.,1.,1.,-1.,0.,1.};
+const double MEDCouplingFieldDiscretizationGaussNE::REF_HEXA27[81]={-1.,-1.,-1.,1.,-1.,-1.,1.,1.,-1.,-1.,1.,-1.,-1.,-1.,1.,1.,-1.,1.,1.,1.,1.,-1.,1.,1.,0.,-1.,-1.,1.,0.,-1.,0.,1.,-1.,-1.,0.,-1.,-1.,-1.,0.,1.,-1.,0.,1.,1.,0.,-1.,1.,0.,0.,-1.,1.,1.,0.,1.,0.,1.,1.,-1.,0.,1.,0.,0.,-1.,0.,-1.,0.,1.,0.,0.,0.,1.,0.,-1.,0.,0.,0.,0.,1.,0.,0.,0.};
+const double MEDCouplingFieldDiscretizationGaussNE::REF_PYRA5[15]={1.,0.,0.,0.,1.,0.,-1.,0.,0.,0.,-1.,0.,0.,0.,1.};
+const double MEDCouplingFieldDiscretizationGaussNE::REF_PYRA13[39]={1.,0.,0.,0.,1.,0.,-1.,0.,0.,0.,-1.,0.,0.,0.,1.,0.5,0.5,0.,-0.5,0.5,0.,-0.5,-0.5,0.,0.5,-0.5,0.,0.5,0.,0.5,0.,0.5,0.5,-0.5,0.,0.5,0.,-0.5,0.5};
 
 MEDCouplingFieldDiscretization::MEDCouplingFieldDiscretization():_precision(DFLT_PRECISION)
 {
@@ -1091,7 +1110,7 @@ DataArrayDouble *MEDCouplingFieldDiscretizationGauss::getLocalizationOfDiscValue
   checkNoOrphanCells();
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> umesh=mesh->buildUnstructured();//in general do nothing
   int nbOfTuples=getNumberOfTuples(mesh);
-  DataArrayDouble *ret=DataArrayDouble::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::New();
   int spaceDim=mesh->getSpaceDimension();
   ret->alloc(nbOfTuples,spaceDim);
   std::vector< int > locIds;
@@ -1121,7 +1140,7 @@ DataArrayDouble *MEDCouplingFieldDiscretizationGauss::getLocalizationOfDiscValue
         calculator.calculateCoords(cli.getType(),coords,spaceDim,conn+connI[*w]+1,valsToFill+spaceDim*(ptrOffsets[*w]));
     }
   ret->copyStringInfoFrom(*umesh->getCoords());
-  return ret;
+  return ret.retn();
 }
 
 void MEDCouplingFieldDiscretizationGauss::computeMeshRestrictionFromTupleIds(const MEDCouplingMesh *mesh, const int *partBg, const int *partEnd,
@@ -1633,7 +1652,21 @@ void MEDCouplingFieldDiscretizationGaussNE::renumberArraysForCell(const MEDCoupl
 
 DataArrayDouble *MEDCouplingFieldDiscretizationGaussNE::getLocalizationOfDiscValues(const MEDCouplingMesh *mesh) const
 {
-  throw INTERP_KERNEL::Exception("Not implemented yet !");
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::New();
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> umesh=mesh->buildUnstructured();//in general do nothing
+  int nbOfTuples=getNumberOfTuples(umesh);
+  int spaceDim=mesh->getSpaceDimension();
+  ret->alloc(nbOfTuples,spaceDim);
+  const double *coords=umesh->getCoords()->begin();
+  const int *connI=umesh->getNodalConnectivityIndex()->getConstPointer();
+  const int *conn=umesh->getNodalConnectivity()->getConstPointer();
+  int nbCells=umesh->getNumberOfCells();
+  double *retPtr=ret->getPointer();
+  for(int i=0;i<nbCells;i++,connI++)
+    for(const int *w=conn+connI[0]+1;w!=conn+connI[1];w++)
+      if(*w>=0)
+        retPtr=std::copy(coords+(*w)*spaceDim,coords+((*w)+1)*spaceDim,retPtr);
+  return ret.retn();
 }
 
 /*!
@@ -1720,6 +1753,69 @@ const double *MEDCouplingFieldDiscretizationGaussNE::GetWeightArrayFromGeometric
       return FGP_PYRA5;
     default:
       throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationGaussNE::GetWeightArrayFromGeometricType : only SEG[2,3,4], TRI[3,6,7], QUAD[4,9], TETRA4, PENTA6, HEXA[8,27], PYRA5 supported !");
+    }
+}
+
+const double *MEDCouplingFieldDiscretizationGaussNE::GetRefCoordsFromGeometricType(INTERP_KERNEL::NormalizedCellType geoType, std::size_t& lgth) throw(INTERP_KERNEL::Exception)
+{
+  switch(geoType)
+    {
+    case INTERP_KERNEL::NORM_SEG2:
+      lgth=(int)sizeof(REF_SEG2)/sizeof(double);
+      return REF_SEG2;
+    case INTERP_KERNEL::NORM_SEG3:
+      lgth=(int)sizeof(REF_SEG3)/sizeof(double);
+      return REF_SEG3;
+    case INTERP_KERNEL::NORM_SEG4:
+      lgth=(int)sizeof(REF_SEG4)/sizeof(double);
+      return REF_SEG4;
+    case INTERP_KERNEL::NORM_TRI3:
+      lgth=(int)sizeof(REF_TRI3)/sizeof(double);
+      return REF_TRI3;
+    case INTERP_KERNEL::NORM_TRI6:
+      lgth=(int)sizeof(REF_TRI6)/sizeof(double);
+      return REF_TRI6;
+    case INTERP_KERNEL::NORM_TRI7:
+      lgth=(int)sizeof(REF_TRI7)/sizeof(double);
+      return REF_TRI7;
+    case INTERP_KERNEL::NORM_QUAD4:
+      lgth=(int)sizeof(REF_QUAD4)/sizeof(double);
+      return REF_QUAD4;
+    case INTERP_KERNEL::NORM_QUAD8:
+      lgth=(int)sizeof(REF_QUAD8)/sizeof(double);
+      return REF_QUAD8;
+    case INTERP_KERNEL::NORM_QUAD9:
+      lgth=(int)sizeof(REF_QUAD9)/sizeof(double);
+      return REF_QUAD9;
+    case INTERP_KERNEL::NORM_TETRA4:
+      lgth=(int)sizeof(REF_TETRA4)/sizeof(double);
+      return REF_TETRA4;
+    case INTERP_KERNEL::NORM_TETRA10:
+      lgth=(int)sizeof(REF_TETRA10)/sizeof(double);
+      return REF_TETRA10;
+    case INTERP_KERNEL::NORM_PENTA6:
+      lgth=(int)sizeof(REF_PENTA6)/sizeof(double);
+      return REF_PENTA6;
+    case INTERP_KERNEL::NORM_PENTA15:
+      lgth=(int)sizeof(REF_PENTA15)/sizeof(double);
+      return REF_PENTA15;
+    case INTERP_KERNEL::NORM_HEXA8:
+      lgth=(int)sizeof(REF_HEXA8)/sizeof(double);
+      return REF_HEXA8;
+    case INTERP_KERNEL::NORM_HEXA20:
+      lgth=(int)sizeof(REF_HEXA20)/sizeof(double);
+      return REF_HEXA20;
+    case INTERP_KERNEL::NORM_HEXA27:
+      lgth=(int)sizeof(REF_HEXA27)/sizeof(double);
+      return REF_HEXA27;
+    case INTERP_KERNEL::NORM_PYRA5:
+      lgth=(int)sizeof(REF_PYRA5)/sizeof(double);
+      return REF_PYRA5;
+    case INTERP_KERNEL::NORM_PYRA13:
+      lgth=(int)sizeof(REF_PYRA13)/sizeof(double);
+      return REF_PYRA13;
+    default:
+      throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationGaussNE::GetRefCoordsFromGeometricType : only SEG[2,3,4], TRI[3,6,7], QUAD[4,8,9], TETRA[4,10], PENTA[6,15], HEXA[8,20,27], PYRA[5,13] supported !");
     }
 }
 

@@ -11612,6 +11612,20 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertEqual(['abct','dett','fghi'],dd4.toStrList())
         pass
 
+    def testSwig2GaussNELocalizationOfDiscValues(self):
+        m=MEDCouplingDataForTest.build2DTargetMesh_3()[[0,1,3,4,5,6,8,9]] # suppression of polygons
+        f=MEDCouplingFieldDouble(ON_GAUSS_NE)
+        f.setMesh(m)
+        loc=f.getLocalizationOfDiscr()
+        self.assertEqual(42,len(loc))
+        self.assertTrue(loc.isEqual(DataArrayDouble([0.,0.,1.,0.,0.5,1.,0.,0.,1.,0.,1.,1.,0.,1.,0.,0.,1.,0.,0.5,1.,0.5,0.,0.75,0.5,0.25,0.5,0.,0.,1.,0.,1.,1.,0.,1.,0.5,0.,1.,0.5,0.5,1.,0.,0.5,0.,0.,0.5,1.,1.,0.,0.,0.,0.,1.,1.,1.,1.,0.,0.,0.,0.5,1.,1.,0.,0.25,0.5,0.75,0.5,0.5,0.,0.,0.,0.,1.,1.,1.,1.,0.,0.,0.5,0.5,1.,1.,0.5,0.5,0.],42,2),1e-13))
+        m.changeSpaceDimension(3)
+        m.getCoords()[:,2]=7.
+        loc=f.getLocalizationOfDiscr()
+        self.assertEqual(42,len(loc))
+        self.assertTrue(loc.isEqual(DataArrayDouble([0.,0.,7.,1.,0.,7.,0.5,1.,7.,0.,0.,7.,1.,0.,7.,1.,1.,7.,0.,1.,7.,0.,0.,7.,1.,0.,7.,0.5,1.,7.,0.5,0.,7.,0.75,0.5,7.,0.25,0.5,7.,0.,0.,7.,1.,0.,7.,1.,1.,7.,0.,1.,7.,0.5,0.,7.,1.,0.5,7.,0.5,1.,7.,0.,0.5,7.,0.,0.,7.,0.5,1.,7.,1.,0.,7.,0.,0.,7.,0.,1.,7.,1.,1.,7.,1.,0.,7.,0.,0.,7.,0.5,1.,7.,1.,0.,7.,0.25,0.5,7.,0.75,0.5,7.,0.5,0.,7.,0.,0.,7.,0.,1.,7.,1.,1.,7.,1.,0.,7.,0.,0.5,7.,0.5,1.,7.,1.,0.5,7.,0.5,0.,7.],42,3),1e-13))
+        pass
+
     def setUp(self):
         pass
     pass

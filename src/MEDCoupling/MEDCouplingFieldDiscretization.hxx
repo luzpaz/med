@@ -303,6 +303,7 @@ namespace ParaMEDMEM
     void renumberValuesOnCells(double epsOnVals, const MEDCouplingMesh *mesh, const int *old2New, int newSz, DataArrayDouble *arr) const;
     void renumberValuesOnCellsR(const MEDCouplingMesh *mesh, const int *new2old, int newSz, DataArrayDouble *arr) const;
     static const double *GetWeightArrayFromGeometricType(INTERP_KERNEL::NormalizedCellType geoType, std::size_t& lgth) throw(INTERP_KERNEL::Exception);
+    static const double *GetRefCoordsFromGeometricType(INTERP_KERNEL::NormalizedCellType geoType, std::size_t& lgth) throw(INTERP_KERNEL::Exception);
   protected:
     MEDCouplingFieldDiscretizationGaussNE(const MEDCouplingFieldDiscretizationGaussNE& other);
   public:
@@ -325,6 +326,24 @@ namespace ParaMEDMEM
     static const double FGP_HEXA27[27];
     static const double FGP_PYRA5[5];
     //static const double FGP_PYRA13[13];
+    static const double REF_SEG2[2];
+    static const double REF_SEG3[3];
+    static const double REF_SEG4[4];
+    static const double REF_TRI3[6];
+    static const double REF_TRI6[12];
+    static const double REF_TRI7[14];
+    static const double REF_QUAD4[8];
+    static const double REF_QUAD8[16];
+    static const double REF_QUAD9[18];
+    static const double REF_TETRA4[12];
+    static const double REF_TETRA10[30];
+    static const double REF_PENTA6[18];
+    static const double REF_PENTA15[45];
+    static const double REF_HEXA8[24];
+    static const double REF_HEXA20[60];
+    static const double REF_HEXA27[81];
+    static const double REF_PYRA5[15];
+    static const double REF_PYRA13[39];
   };
 
   class MEDCOUPLING_EXPORT MEDCouplingFieldDiscretizationKriging : public MEDCouplingFieldDiscretizationOnNodes
