@@ -41,6 +41,11 @@ void ParaMEDMEM::MEDCouplingVersionMajMinRel(int& maj, int& minor, int& releas)
   releas=(ver & 0xFF);
 }
 
+int ParaMEDMEM::MEDCouplingSizeOfVoidStar()
+{
+  return 8*sizeof(std::size_t);
+}
+
 RefCountObject::RefCountObject():_cnt(1)
 {
 }

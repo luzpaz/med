@@ -464,6 +464,7 @@ namespace ParaMEDMEM
 
   const char *MEDCouplingVersionStr();
   int MEDCouplingVersion();
+  int MEDCouplingSizeOfVoidStar();
   PyObject *MEDCouplingVersionMajMinRel()
   {
     int tmp0=0,tmp1=0,tmp2=0;

@@ -52,7 +52,7 @@ void DataArrayChar::checkAllocated() const throw(INTERP_KERNEL::Exception)
 
 std::size_t DataArrayChar::getHeapMemorySize() const
 {
-  std::size_t sz=(std::size_t)_mem.getNbOfElemAllocated();
+  std::size_t sz=_mem.getNbOfElemAllocated();
   return DataArray::getHeapMemorySize()+sz;
 }
 
@@ -91,14 +91,14 @@ void DataArrayChar::setInfoAndChangeNbOfCompo(const std::vector<std::string>& in
 int DataArrayChar::getHashCode() const throw(INTERP_KERNEL::Exception)
 {
   checkAllocated();
-  int nbOfElems=getNbOfElems();
+  std::size_t nbOfElems=getNbOfElems();
   int ret=nbOfElems*65536;
   int delta=3;
   if(nbOfElems>48)
     delta=nbOfElems/8;
   int ret0=0;
   const char *pt=begin();
-  for(int i=0;i<nbOfElems;i+=delta)
+  for(std::size_t i=0;i<nbOfElems;i+=delta)
     ret0+=pt[i];
   return ret+ret0;
 }
@@ -126,10 +126,10 @@ void DataArrayChar::cpyFrom(const DataArrayChar& other) throw(INTERP_KERNEL::Exc
   int nbOfTuples=other.getNumberOfTuples();
   int nbOfComp=other.getNumberOfComponents();
   allocIfNecessary(nbOfTuples,nbOfComp);
-  int nbOfElems=nbOfTuples*nbOfComp;
+  std::size_t nbOfElems=(std::size_t)nbOfTuples*nbOfComp;
   char *pt=getPointer();
   const char *ptI=other.getConstPointer();
-  for(int i=0;i<nbOfElems;i++)
+  for(std::size_t i=0;i<nbOfElems;i++)
     pt[i]=ptI[i];
   copyStringInfoFrom(other);
 }
@@ -142,7 +142,7 @@ void DataArrayChar::cpyFrom(const DataArrayChar& other) throw(INTERP_KERNEL::Exc
  * 
  * \sa DataArrayChar::pack, DataArrayChar::pushBackSilent, DataArrayChar::pushBackValsSilent
  */
-void DataArrayChar::reserve(int nbOfElems) throw(INTERP_KERNEL::Exception)
+void DataArrayChar::reserve(std::size_t nbOfElems) throw(INTERP_KERNEL::Exception)
 {
   int nbCompo=getNumberOfComponents();
   if(nbCompo==1)
@@ -258,7 +258,7 @@ void DataArrayChar::alloc(int nbOfTuple, int nbOfCompo) throw(INTERP_KERNEL::Exc
   if(nbOfTuple<0 || nbOfCompo<0)
     throw INTERP_KERNEL::Exception("DataArrayChar::alloc : request for negative length of data !");
   _info_on_compo.resize(nbOfCompo);
-  _mem.alloc(nbOfCompo*nbOfTuple);
+  _mem.alloc(nbOfCompo*(std::size_t)nbOfTuple);
   declareAsNew();
 }
 
@@ -354,7 +354,7 @@ std::string DataArrayChar::reprZip() const throw(INTERP_KERNEL::Exception)
 void DataArrayChar::reAlloc(int nbOfTuples) throw(INTERP_KERNEL::Exception)
 {
   checkAllocated();
-  _mem.reAlloc(getNumberOfComponents()*nbOfTuples);
+  _mem.reAlloc(getNumberOfComponents()*(std::size_t)nbOfTuples);
   declareAsNew();
 }
 
@@ -368,7 +368,7 @@ DataArrayInt *DataArrayChar::convertToIntArr() const throw(INTERP_KERNEL::Except
   checkAllocated();
   DataArrayInt *ret=DataArrayInt::New();
   ret->alloc(getNumberOfTuples(),getNumberOfComponents());
-  int nbOfVals=getNbOfElems();
+  std::size_t nbOfVals=getNbOfElems();
   const char *src=getConstPointer();
   int *dest=ret->getPointer();
   std::copy(src,src+nbOfVals,dest);
@@ -605,14 +605,20 @@ bool DataArrayChar::isUniform(char val) const throw(INTERP_KERNEL::Exception)
  *  \param [in] newNbOfComp - number of components for \a this array to have.
  *  \throw If \a this is not allocated
  *  \throw If getNbOfElems() % \a newNbOfCompo != 0.
+ *  \throw If \a newNbOfCompo is lower than 1.
+ *  \throw If the rearrange method would lead to a number of tuples higher than 2147483647 (maximal capacity of int32 !).
  *  \warning This method erases all (name and unit) component info set before!
  */
 void DataArrayChar::rearrange(int newNbOfCompo) throw(INTERP_KERNEL::Exception)
 {
   checkAllocated();
-  int nbOfElems=getNbOfElems();
+  if(newNbOfCompo<1)
+    throw INTERP_KERNEL::Exception("DataArrayChar::rearrange : input newNbOfCompo must be > 0 !");
+  std::size_t nbOfElems=getNbOfElems();
   if(nbOfElems%newNbOfCompo!=0)
     throw INTERP_KERNEL::Exception("DataArrayChar::rearrange : nbOfElems%newNbOfCompo!=0 !");
+  if(nbOfElems/newNbOfCompo>(std::size_t)std::numeric_limits<int>::max())
+    throw INTERP_KERNEL::Exception("DataArrayChar::rearrange : the rearrangement leads to too high number of tuples (> 2147483647) !");
   _info_on_compo.clear();
   _info_on_compo.resize(newNbOfCompo);
   declareAsNew();
@@ -816,7 +822,7 @@ void DataArrayChar::setPartOfValues1(const DataArrayChar *a, int bgTuples, int e
   DataArray::CheckValueInRangeEx(nbOfTuples,bgTuples,endTuples,"invalid tuple value");
   DataArray::CheckValueInRangeEx(nbComp,bgComp,endComp,"invalid component value");
   bool assignTech=true;
-  if(a->getNbOfElems()==newNbOfTuples*newNbOfComp)
+  if(a->getNbOfElems()==(std::size_t)newNbOfTuples*newNbOfComp)
     {
       if(strictCompoCompare)
         a->checkNbOfTuplesAndComp(newNbOfTuples,newNbOfComp,msg);
@@ -934,7 +940,7 @@ void DataArrayChar::setPartOfValues2(const DataArrayChar *a, const int *bgTuples
   int newNbOfTuples=(int)std::distance(bgTuples,endTuples);
   int newNbOfComp=(int)std::distance(bgComp,endComp);
   bool assignTech=true;
-  if(a->getNbOfElems()==newNbOfTuples*newNbOfComp)
+  if(a->getNbOfElems()==(std::size_t)newNbOfTuples*newNbOfComp)
     {
       if(strictCompoCompare)
         a->checkNbOfTuplesAndComp(newNbOfTuples,newNbOfComp,msg);
@@ -953,7 +959,7 @@ void DataArrayChar::setPartOfValues2(const DataArrayChar *a, const int *bgTuples
           DataArray::CheckValueInRange(nbOfTuples,*w,"invalid tuple id");
           for(const int *z=bgComp;z!=endComp;z++,srcPt++)
             {    
-              pt[(*w)*nbComp+(*z)]=*srcPt;
+              pt[(std::size_t)(*w)*nbComp+(*z)]=*srcPt;
             }
         }
     }
@@ -965,7 +971,7 @@ void DataArrayChar::setPartOfValues2(const DataArrayChar *a, const int *bgTuples
           DataArray::CheckValueInRange(nbOfTuples,*w,"invalid tuple id");
           for(const int *z=bgComp;z!=endComp;z++,srcPt2++)
             {    
-              pt[(*w)*nbComp+(*z)]=*srcPt2;
+              pt[(std::size_t)(*w)*nbComp+(*z)]=*srcPt2;
             }
         }
     }
@@ -1003,7 +1009,7 @@ void DataArrayChar::setPartOfValuesSimple2(char a, const int *bgTuples, const in
     for(const int *z=bgComp;z!=endComp;z++)
       {
         DataArray::CheckValueInRange(nbOfTuples,*w,"invalid tuple id");
-        pt[(*w)*nbComp+(*z)]=a;
+        pt[(std::size_t)(*w)*nbComp+(*z)]=a;
       }
 }
 
@@ -1064,7 +1070,7 @@ void DataArrayChar::setPartOfValues3(const DataArrayChar *a, const int *bgTuples
   DataArray::CheckValueInRangeEx(nbComp,bgComp,endComp,"invalid component value");
   int newNbOfTuples=(int)std::distance(bgTuples,endTuples);
   bool assignTech=true;
-  if(a->getNbOfElems()==newNbOfTuples*newNbOfComp)
+  if(a->getNbOfElems()==(std::size_t)newNbOfTuples*newNbOfComp)
     {
       if(strictCompoCompare)
         a->checkNbOfTuplesAndComp(newNbOfTuples,newNbOfComp,msg);
@@ -1082,7 +1088,7 @@ void DataArrayChar::setPartOfValues3(const DataArrayChar *a, const int *bgTuples
         for(int j=0;j<newNbOfComp;j++,srcPt++)
           {
             DataArray::CheckValueInRange(nbOfTuples,*w,"invalid tuple id");
-            pt[(*w)*nbComp+j*stepComp]=*srcPt;
+            pt[(std::size_t)(*w)*nbComp+j*stepComp]=*srcPt;
           }
     }
   else
@@ -1093,7 +1099,7 @@ void DataArrayChar::setPartOfValues3(const DataArrayChar *a, const int *bgTuples
           for(int j=0;j<newNbOfComp;j++,srcPt2++)
             {
               DataArray::CheckValueInRange(nbOfTuples,*w,"invalid tuple id");
-              pt[(*w)*nbComp+j*stepComp]=*srcPt2;
+              pt[(std::size_t)(*w)*nbComp+j*stepComp]=*srcPt2;
             }
         }
     }
@@ -1155,7 +1161,7 @@ void DataArrayChar::setPartOfValues4(const DataArrayChar *a, int bgTuples, int e
   int nbOfTuples=getNumberOfTuples();
   DataArray::CheckValueInRangeEx(nbOfTuples,bgTuples,endTuples,"invalid tuple value");
   bool assignTech=true;
-  if(a->getNbOfElems()==newNbOfTuples*newNbOfComp)
+  if(a->getNbOfElems()==(std::size_t)newNbOfTuples*newNbOfComp)
     {
       if(strictCompoCompare)
         a->checkNbOfTuplesAndComp(newNbOfTuples,newNbOfComp,msg);
@@ -1284,7 +1290,7 @@ char DataArrayChar::getIJSafe(int tupleId, int compoId) const throw(INTERP_KERNE
       std::ostringstream oss; oss << "DataArrayChar::getIJSafe : request for compoId " << compoId << " should be in [0," << getNumberOfComponents() << ") !";
       throw INTERP_KERNEL::Exception(oss.str().c_str());
     }
-  return _mem[tupleId*((int)_info_on_compo.size())+compoId];
+  return _mem[tupleId*_info_on_compo.size()+compoId];
 }
 
 /*!
@@ -1364,7 +1370,7 @@ int DataArrayChar::search(const std::vector<char>& vals) const throw(INTERP_KERN
   if(nbOfCompo!=1)
     throw INTERP_KERNEL::Exception("DataArrayChar::search : works only for DataArrayChar instance with one component !");
   const char *cptr=getConstPointer();
-  int nbOfVals=getNbOfElems();
+  std::size_t nbOfVals=getNbOfElems();
   const char *loc=std::search(cptr,cptr+nbOfVals,vals.begin(),vals.end());
   if(loc!=cptr+nbOfVals)
     return std::distance(cptr,loc);
@@ -1395,7 +1401,7 @@ int DataArrayChar::locateTuple(const std::vector<char>& tupl) const throw(INTERP
       throw INTERP_KERNEL::Exception(oss.str().c_str());
     }
   const char *cptr=getConstPointer();
-  int nbOfVals=getNbOfElems();
+  std::size_t nbOfVals=getNbOfElems();
   for(const char *work=cptr;work!=cptr+nbOfVals;)
     {
       work=std::search(work,cptr+nbOfVals,tupl.begin(),tupl.end());
@@ -1735,14 +1741,14 @@ DataArrayChar *DataArrayChar::Meld(const std::vector<const DataArrayChar *>& arr
 void DataArrayChar::useArray(const char *array, bool ownership,  DeallocType type, int nbOfTuple, int nbOfCompo) throw(INTERP_KERNEL::Exception)
 {
   _info_on_compo.resize(nbOfCompo);
-  _mem.useArray(array,ownership,type,nbOfTuple*nbOfCompo);
+  _mem.useArray(array,ownership,type,(std::size_t)nbOfTuple*nbOfCompo);
   declareAsNew();
 }
 
 void DataArrayChar::useExternalArrayWithRWAccess(const char *array, int nbOfTuple, int nbOfCompo) throw(INTERP_KERNEL::Exception)
 {
   _info_on_compo.resize(nbOfCompo);
-  _mem.useExternalArrayWithRWAccess(array,nbOfTuple*nbOfCompo);
+  _mem.useExternalArrayWithRWAccess(array,(std::size_t)nbOfTuple*nbOfCompo);
   declareAsNew();
 }
 

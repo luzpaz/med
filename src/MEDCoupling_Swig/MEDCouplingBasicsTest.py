@@ -10622,7 +10622,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertEqual(5,d.popBackSilent())
         e=DataArrayInt([7,8,9,10]) ; e.copyStringInfoFrom(d) ; self.assertTrue(d.isEqual(e))
         self.assertEqual(8,d.getNbOfElemAllocated())
-        self.assertRaises(InterpKernelException,d.reserve,-1)
+        self.assertRaises(OverflowError,d.reserve,-1)
         e=DataArrayInt([7,8,9,10]) ; e.copyStringInfoFrom(d) ; self.assertTrue(d.isEqual(e))
         self.assertEqual(8,d.getNbOfElemAllocated())
         d.reserve(0)
@@ -10648,7 +10648,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertEqual(5.,d.popBackSilent())
         e=DataArrayDouble([7,8,9,10]) ; e.copyStringInfoFrom(d) ; self.assertTrue(d.isEqual(e,1e-14))
         self.assertEqual(8,d.getNbOfElemAllocated())
-        self.assertRaises(InterpKernelException,d.reserve,-1)
+        self.assertRaises(OverflowError,d.reserve,-1)
         e=DataArrayDouble([7,8,9,10]) ; e.copyStringInfoFrom(d) ; self.assertTrue(d.isEqual(e,1e-14))
         self.assertEqual(8,d.getNbOfElemAllocated())
         d.reserve(0)
@@ -11677,6 +11677,19 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         a,b=d.searchRangesInListOfIds(e)
         self.assertTrue(a.isEqual(DataArrayInt([0,2,4])))
         self.assertTrue(b.isEqual(DataArrayInt([0,1,2,7,8,15,16,17])))
+        pass
+    
+    def testSwig2BigMem(self):
+        if MEDCouplingSizeOfVoidStar()==64:
+            d=DataArrayAsciiChar(223456789,16)
+            self.assertTrue(d.getNumberOfTuples(),223456789)
+            self.assertTrue(d.getNumberOfComponents(),16)
+            d.setIJ(223456788,5,"r")
+            self.assertTrue(d.getIJ(223456788,5),'r')
+            d[223456787]="1234567890123456"
+            self.assertTrue(d[223456787],'1234567890123456')
+            self.assertRaises(InterpKernelException,d.rearrange,1)# fails because it would lead to nb of tuples > 2147483647
+            pass
         pass
 
     def setUp(self):

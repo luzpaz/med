@@ -2552,7 +2552,7 @@ INTERP_KERNEL::NormalizedCellType MEDCouplingUMesh::getTypeOfCell(int cellId) co
 {
   const int *ptI=_nodal_connec_index->getConstPointer();
   const int *pt=_nodal_connec->getConstPointer();
-  if(cellId>=0 && cellId<_nodal_connec_index->getNbOfElems()-1)
+  if(cellId>=0 && cellId<(int)_nodal_connec_index->getNbOfElems()-1)
     return (INTERP_KERNEL::NormalizedCellType) pt[ptI[cellId]];
   else
     {
