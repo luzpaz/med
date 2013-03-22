@@ -53,7 +53,7 @@ WorkspaceController::WorkspaceController(StandardApp_Module * salomeModule)
   // Connect the signals emitted from the MEDEventListener to slot of
   // this class.
   connect(_medEventListener, SIGNAL(medEventSignal(const MEDOP::MedEvent*)),
-	  this, SLOT(processMedEvent(const MEDOP::MedEvent*)));
+    this, SLOT(processMedEvent(const MEDOP::MedEvent*)));
   // >>> WARN:
   // Note that this class must be mocked (Q_OBJECT + moc file
   // generated from header file) so that to be able to connect a
@@ -183,8 +183,8 @@ void WorkspaceController::_importItem(QString itemNameId) {
  * variable).   
  */
 void WorkspaceController::_importFieldIntoConsole(MEDOP::FieldHandler * fieldHandler,
-						  bool askForOptions,
-						  const char * alias)
+              bool askForOptions,
+              const char * alias)
 {
   STDLOG("alias="<<alias);
 
@@ -399,8 +399,8 @@ void WorkspaceController::processDatasourceEvent(const DatasourceEvent * event) 
     STDLOG("Define a proxy variable in the console with name : "<<QCHARSTAR(event->objectalias));
     bool askForOptions = false;
     _importFieldIntoConsole(dataObject->getFieldHandler(),
-			    askForOptions,
-			    QCHARSTAR(event->objectalias));
+          askForOptions,
+          QCHARSTAR(event->objectalias));
   }
   else if ( event->eventtype == DatasourceEvent::EVENT_VIEW_OBJECT ) {
     QStringList commands;
@@ -436,6 +436,6 @@ void WorkspaceController::OnSaveWorkspace() {
 #include <QMessageBox>
 void WorkspaceController::OnCleanWorkspace() {
   QMessageBox::warning(_salomeModule->getApp()->desktop(),
-		       tr("Not implemented yet"),
-		       tr("This function is not implemented yet"));  
+           tr("Not implemented yet"),
+           tr("This function is not implemented yet"));
 }

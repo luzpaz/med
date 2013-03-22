@@ -13,7 +13,7 @@ namespace MEDOPFactoryClient {
     static MEDOP::MEDOPFactory_ptr engine;
     if(CORBA::is_nil(engine)){
       Engines::EngineComponent_var component =
-	KERNEL::getLifeCycleCORBA()->FindOrLoad_Component( "FactoryServer","MEDOPFactory" );
+  KERNEL::getLifeCycleCORBA()->FindOrLoad_Component( "FactoryServer","MEDOPFactory" );
       engine = MEDOP::MEDOPFactory::_narrow(component);
     }
     return engine;

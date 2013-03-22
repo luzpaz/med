@@ -40,9 +40,9 @@ string XmedDataObject::_getTypedFieldLabel() {
   // cells, values on nodes, ...). This spatial discretization is
   // specified by the TypeOfField that is an integer value in this
   // list:
-  // 0 = ON_CELLS 	
-  // 1 = ON_NODES 	
-  // 2 = ON_GAUSS_PT 	
+  // 0 = ON_CELLS
+  // 1 = ON_NODES
+  // 2 = ON_GAUSS_PT
   // 3 = ON_GAUSS_NE
   if ( _fieldHandler.type < 0 || 
        _fieldHandler.type >= XmedDataObject::NB_TYPE_OF_FIELDS ) {

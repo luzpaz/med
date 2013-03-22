@@ -47,8 +47,8 @@ private:
   void _importItem(QString itemNameId);
   void _importItemList(QStringList itemNameIdList);
   void _importFieldIntoConsole(MEDOP::FieldHandler * fieldHandler,
-			       bool askForOptions,
-			       const char * alias=NULL);
+              bool askForOptions,
+              const char * alias=NULL);
 
   void _exportItemList(QStringList itemNameIdList);
   void _saveItemList(QStringList itemNameIdList);

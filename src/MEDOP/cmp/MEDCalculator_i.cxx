@@ -56,7 +56,7 @@ MEDCalculator_i::~MEDCalculator_i()
  * MEDDataManager.
  */
 MEDOP::FieldHandler * MEDCalculator_i::add(const MEDOP::FieldHandler & f1_hdl,
-					   const MEDOP::FieldHandler & f2_hdl)
+             const MEDOP::FieldHandler & f2_hdl)
 {
   // We first check that both operandes share the same mesh id. Note
   // that it's not strictly required because the MEDCoupling operation
@@ -98,7 +98,7 @@ MEDOP::FieldHandler * MEDCalculator_i::add(const MEDOP::FieldHandler & f1_hdl,
   //
   long meshHandlerId = f1_hdl.meshid;
   MEDOP::FieldHandler * fieldResultHandler = _medDataManager->addField(field_result,
-								       meshHandlerId);
+                       meshHandlerId);
   
   // >>>>>>>>>
   // _GBO_ We should test here if the iteration and order of the input
@@ -121,7 +121,7 @@ MEDOP::FieldHandler * MEDCalculator_i::add(const MEDOP::FieldHandler & f1_hdl,
  * MEDDataManager.
  */
 MEDOP::FieldHandler * MEDCalculator_i::sub(const MEDOP::FieldHandler & f1_hdl,
-					   const MEDOP::FieldHandler & f2_hdl)
+             const MEDOP::FieldHandler & f2_hdl)
 {
   if ( f1_hdl.meshid != f2_hdl.meshid ) {
     std::string message = 
@@ -146,7 +146,7 @@ MEDOP::FieldHandler * MEDCalculator_i::sub(const MEDOP::FieldHandler & f1_hdl,
 
   long meshHandlerId = f1_hdl.meshid;
   MEDOP::FieldHandler * fieldResultHandler = _medDataManager->addField(field_result,
-								       meshHandlerId);
+                       meshHandlerId);
   return fieldResultHandler;
 }
 
@@ -160,7 +160,7 @@ MEDOP::FieldHandler * MEDCalculator_i::sub(const MEDOP::FieldHandler & f1_hdl,
  * MEDDataManager.
  */
 MEDOP::FieldHandler * MEDCalculator_i::mul(const MEDOP::FieldHandler & f1_hdl,
-					   const MEDOP::FieldHandler & f2_hdl)
+             const MEDOP::FieldHandler & f2_hdl)
 {
   if ( f1_hdl.meshid != f2_hdl.meshid ) {
     std::string message = 
@@ -184,7 +184,7 @@ MEDOP::FieldHandler * MEDCalculator_i::mul(const MEDOP::FieldHandler & f1_hdl,
 
   long meshHandlerId = f1_hdl.meshid;
   MEDOP::FieldHandler * fieldResultHandler = _medDataManager->addField(field_result,
-								       meshHandlerId);
+                       meshHandlerId);
   return fieldResultHandler;
 }
 
@@ -198,7 +198,7 @@ MEDOP::FieldHandler * MEDCalculator_i::mul(const MEDOP::FieldHandler & f1_hdl,
  * MEDDataManager.
  */
 MEDOP::FieldHandler * MEDCalculator_i::div(const MEDOP::FieldHandler & f1_hdl,
-					   const MEDOP::FieldHandler & f2_hdl)
+             const MEDOP::FieldHandler & f2_hdl)
 {
   if ( f1_hdl.meshid != f2_hdl.meshid ) {
     std::string message = 
@@ -223,7 +223,7 @@ MEDOP::FieldHandler * MEDCalculator_i::div(const MEDOP::FieldHandler & f1_hdl,
 
   long meshHandlerId = f1_hdl.meshid;
   MEDOP::FieldHandler * fieldResultHandler = _medDataManager->addField(field_result,
-								       meshHandlerId);
+                       meshHandlerId);
   return fieldResultHandler;
 }
 
@@ -261,7 +261,7 @@ MEDOP::FieldHandler * MEDCalculator_i::pow(const MEDOP::FieldHandler & f_hdl, CO
 
   long meshHandlerId = f_hdl.meshid;
   MEDOP::FieldHandler * fieldResultHandler = _medDataManager->addField(field_result,
-								       meshHandlerId);
+                       meshHandlerId);
   return fieldResultHandler;
 }
 
@@ -304,7 +304,7 @@ MEDOP::FieldHandler * MEDCalculator_i::lin(const MEDOP::FieldHandler & f_hdl, do
 
   long meshHandlerId = f_hdl.meshid;
   MEDOP::FieldHandler * fieldResultHandler = _medDataManager->addField(field_result,
-								       meshHandlerId);
+                       meshHandlerId);
   return fieldResultHandler;
 
 }
@@ -339,7 +339,7 @@ MEDOP::FieldHandler * MEDCalculator_i::dup(const MEDOP::FieldHandler & f_hdl)
 
   long meshHandlerId = f_hdl.meshid;
   MEDOP::FieldHandler * fieldResultHandler = _medDataManager->addField(field_result,
-								       meshHandlerId);
+                       meshHandlerId);
   return fieldResultHandler;
 }
 
@@ -355,7 +355,7 @@ MEDOP::FieldHandler * MEDCalculator_i::dup(const MEDOP::FieldHandler & f_hdl)
  * apply on the whole field (as if specified N=numberOfComponents).
  */
 MEDOP::FieldHandler * MEDCalculator_i::fct(const MEDOP::FieldHandler & f_hdl,
-					   const char * function, CORBA::Long nbResComponents)
+             const char * function, CORBA::Long nbResComponents)
 {
   MEDCouplingFieldDouble* field = _medDataManager->getFieldDouble(&f_hdl);
 
@@ -364,7 +364,7 @@ MEDOP::FieldHandler * MEDCalculator_i::fct(const MEDOP::FieldHandler & f_hdl,
   try {
     field_result = field->clone(true);
     if ( (nbResComponents == MEDOP::NBCOMP_DEFAULT ) ||
-	 (nbResComponents < 1) || (nbResComponents > field_result->getNumberOfComponents()) ) {
+   (nbResComponents < 1) || (nbResComponents > field_result->getNumberOfComponents()) ) {
       field_result->applyFunc(function);
     }
     else {
@@ -382,6 +382,6 @@ MEDOP::FieldHandler * MEDCalculator_i::fct(const MEDOP::FieldHandler & f_hdl,
 
   long meshHandlerId = f_hdl.meshid;
   MEDOP::FieldHandler * fieldResultHandler = _medDataManager->addField(field_result,
-								       meshHandlerId);
+                       meshHandlerId);
   return fieldResultHandler;
 }

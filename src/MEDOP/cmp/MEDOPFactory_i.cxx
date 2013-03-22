@@ -39,10 +39,10 @@ using namespace std;
 //=============================================================================
 
 MEDOPFactory_i::MEDOPFactory_i(CORBA::ORB_ptr orb,
-	PortableServer::POA_ptr poa,
-	PortableServer::ObjectId * contId, 
-	const char *instanceName, 
-	const char *interfaceName) :
+  PortableServer::POA_ptr poa,
+  PortableServer::ObjectId * contId,
+  const char *instanceName,
+  const char *interfaceName) :
   Engines_Component_i(orb, poa, contId, instanceName, interfaceName)
 {
   MESSAGE("activate object");
@@ -69,17 +69,17 @@ MEDOP::MEDCalculator_ptr MEDOPFactory_i::getCalculator() {
 extern "C"
 {
   PortableServer::ObjectId * MEDOPFactoryEngine_factory(
-			       CORBA::ORB_ptr orb,
-			       PortableServer::POA_ptr poa, 
-			       PortableServer::ObjectId * contId,
-			       const char *instanceName, 
-		       	       const char *interfaceName)
+             CORBA::ORB_ptr orb,
+             PortableServer::POA_ptr poa,
+             PortableServer::ObjectId * contId,
+             const char *instanceName,
+                    const char *interfaceName)
   {
     MESSAGE("PortableServer::ObjectId * MEDOPEngine_factory()");
     SCRUTE(interfaceName);
     MEDOPFactory_i * factory = new MEDOPFactory_i(orb, poa, contId,
-						  instanceName,
-						  interfaceName);
+              instanceName,
+              interfaceName);
     return factory->getId() ;
   }
 }

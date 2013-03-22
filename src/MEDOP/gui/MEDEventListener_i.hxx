@@ -31,9 +31,9 @@
 
 // Multiple inheritance requires QObject to be first
 class MEDOPGUI_EXPORT MEDEventListener_i: public QObject,
-			  public POA_MEDOP::MEDEventListener,
-			  public SALOME::GenericObj_i
-			  
+        public POA_MEDOP::MEDEventListener,
+        public SALOME::GenericObj_i
+
 {
   Q_OBJECT
 

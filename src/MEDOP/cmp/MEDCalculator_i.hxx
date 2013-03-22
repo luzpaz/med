@@ -34,7 +34,7 @@
 
 #include "MEDOP.hxx"
 class MEDOP_EXPORT MEDCalculator_i: public POA_MEDOP::MEDCalculator,
-				    public SALOME::GenericObj_i
+            public SALOME::GenericObj_i
 {
 public:
 
@@ -52,7 +52,7 @@ public:
   MEDOP::FieldHandler * dup(const MEDOP::FieldHandler & f_hdl);
 
   MEDOP::FieldHandler * fct(const MEDOP::FieldHandler & f_hdl,
-			    const char * function, CORBA::Long nbResComponents);
+          const char * function, CORBA::Long nbResComponents);
 
   // 
   // ===========================================================

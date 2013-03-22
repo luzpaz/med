@@ -5,7 +5,7 @@
 #include <QMessageBox>
 
 DlgChangeUnderlyingMesh::DlgChangeUnderlyingMesh(SALOME_AppStudyEditor * studyEditor,
-						 QDialog * parent)
+             QDialog * parent)
   : GenericDialog(parent)
 {
   ui.setupUi(this->getPanel());
@@ -32,8 +32,8 @@ int DlgChangeUnderlyingMesh::getMeshId() {
 void DlgChangeUnderlyingMesh::accept() {
   if ( _meshId == -1 ) {
     QMessageBox::warning(this,
-			 tr("Data verification"),
-			 tr("You must select a mesh in the explorer and clic the button Mesh"));
+       tr("Data verification"),
+       tr("You must select a mesh in the explorer and clic the button Mesh"));
   }
   else {
     GenericDialog::accept();

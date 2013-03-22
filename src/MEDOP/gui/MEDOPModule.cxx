@@ -82,7 +82,7 @@ void MEDOPModule::createModuleWidgets() {
   _workspaceController->setDataModel(_xmedDataModel);
 
   connect(_datasourceController, SIGNAL(datasourceSignal(const DatasourceEvent *)),
-	  _workspaceController, SLOT(processDatasourceEvent(const DatasourceEvent *)));
+    _workspaceController, SLOT(processDatasourceEvent(const DatasourceEvent *)));
 }
 
 bool MEDOPModule::activateModule( SUIT_Study* theStudy )

@@ -117,7 +117,7 @@ MEDOP::DatasourceHandler * MEDDataManager_i::addDatasource(const char *filepath)
     // associated fields, i.e. fields whose spatial support is this
     // mesh.
     vector<string> fieldNames = MEDLoader::GetAllFieldNamesOnMesh(filepath,
-								  meshName);
+                  meshName);
     int nbOfFields = fieldNames.size();
     for (int iField = 0; iField < nbOfFields; iField++) {
       const char * fieldName = fieldNames[iField].c_str();
@@ -128,9 +128,9 @@ MEDOP::DatasourceHandler * MEDDataManager_i::addDatasource(const char *filepath)
       // cells, values on nodes, ...). This spatial discretization is
       // specified by the TypeOfField that is an integer value in this
       // list:
-      // 0 = ON_CELLS 	
-      // 1 = ON_NODES 	
-      // 2 = ON_GAUSS_PT 	
+      // 0 = ON_CELLS
+      // 1 = ON_NODES
+      // 2 = ON_GAUSS_PT
       // 3 = ON_GAUSS_NE
 
       // As a consequence, before loading values of a field, we have
@@ -138,52 +138,52 @@ MEDOP::DatasourceHandler * MEDDataManager_i::addDatasource(const char *filepath)
       // this field and to chooose one.
 
       vector<TypeOfField> listOfTypes = MEDLoader::GetTypesOfField(filepath,
-								   meshName,
-								   fieldName);
+                   meshName,
+                   fieldName);
       int nbOfTypes = listOfTypes.size();
       for (int iType = 0; iType < nbOfTypes; iType++) {
-	LOG("---- type "<<iType<<" of field "<<iField<< " = " << listOfTypes[iType]);
+  LOG("---- type "<<iType<<" of field "<<iField<< " = " << listOfTypes[iType]);
 
-	// Then, we can get the iterations associated to this field on
-	// this type of spatial discretization:
-	std::vector< std::pair<int,int> > fieldIterations = 
-	  MEDLoader::GetFieldIterations(listOfTypes[iType],
-					filepath,
-					meshName,
-					fieldName);
-	
-	int nbFieldIterations = fieldIterations.size();
-	LOG("---- nb. iterations = " << nbFieldIterations);
+  // Then, we can get the iterations associated to this field on
+  // this type of spatial discretization:
+  std::vector< std::pair<int,int> > fieldIterations =
+    MEDLoader::GetFieldIterations(listOfTypes[iType],
+          filepath,
+          meshName,
+          fieldName);
 
-	// We can define the timeseries of fields (fieldseries) for
-	// this type. A fieldseries is a macro object that handle the whole
-	// set of time iterations of a field.
-	MEDOP::FieldseriesHandler * fieldseriesHandler = new MEDOP::FieldseriesHandler();
-	fieldseriesHandler->id     = _fieldseriesLastId; _fieldseriesLastId++;
-	fieldseriesHandler->name   = fieldName;
-	fieldseriesHandler->type   = listOfTypes[iType];
-	fieldseriesHandler->meshid = meshHandler->id;
-	fieldseriesHandler->nbIter = nbFieldIterations;
-	_fieldseriesHandlerMap[fieldseriesHandler->id] = fieldseriesHandler;
+  int nbFieldIterations = fieldIterations.size();
+  LOG("---- nb. iterations = " << nbFieldIterations);
 
-	// We can then load meta-data concerning all iterations
-	for (int iterationIdx=0; iterationIdx<nbFieldIterations; iterationIdx++) {
-	  
-	  int iteration = fieldIterations[iterationIdx].first;
-	  int order = fieldIterations[iterationIdx].second;
-	  
-	  const char * source = datasourceHandler->uri;
-	  MEDOP::FieldHandler * fieldHandler = newFieldHandler(fieldName,
-							       meshName,
-							       listOfTypes[iType],
-							       iteration,
-							       order,
-							       source);
-	  
-	  fieldHandler->meshid = meshHandler->id;
-	  fieldHandler->fieldseriesId = fieldseriesHandler->id;
-	  _fieldHandlerMap[fieldHandler->id] = fieldHandler;
-	}
+  // We can define the timeseries of fields (fieldseries) for
+  // this type. A fieldseries is a macro object that handle the whole
+  // set of time iterations of a field.
+  MEDOP::FieldseriesHandler * fieldseriesHandler = new MEDOP::FieldseriesHandler();
+  fieldseriesHandler->id     = _fieldseriesLastId; _fieldseriesLastId++;
+  fieldseriesHandler->name   = fieldName;
+  fieldseriesHandler->type   = listOfTypes[iType];
+  fieldseriesHandler->meshid = meshHandler->id;
+  fieldseriesHandler->nbIter = nbFieldIterations;
+  _fieldseriesHandlerMap[fieldseriesHandler->id] = fieldseriesHandler;
+
+  // We can then load meta-data concerning all iterations
+  for (int iterationIdx=0; iterationIdx<nbFieldIterations; iterationIdx++) {
+
+    int iteration = fieldIterations[iterationIdx].first;
+    int order = fieldIterations[iterationIdx].second;
+
+    const char * source = datasourceHandler->uri;
+    MEDOP::FieldHandler * fieldHandler = newFieldHandler(fieldName,
+                     meshName,
+                     listOfTypes[iType],
+                     iteration,
+                     order,
+                     source);
+
+    fieldHandler->meshid = meshHandler->id;
+    fieldHandler->fieldseriesId = fieldseriesHandler->id;
+    _fieldHandlerMap[fieldHandler->id] = fieldHandler;
+  }
       }
     }
   }
@@ -342,7 +342,7 @@ char * MEDDataManager_i::getFieldRepresentation(CORBA::Long fieldHandlerId) {
 }
 
 void MEDDataManager_i::saveFields(const char * filepath,
-				  const MEDOP::FieldIdList & fieldIdList)
+          const MEDOP::FieldIdList & fieldIdList)
 {
   LOG("saveFields to : " << filepath);
 
@@ -443,11 +443,11 @@ void MEDDataManager_i::savePersistentFields(const char * filepath) {
  * variable)
  */
 MEDOP::FieldHandler * MEDDataManager_i::newFieldHandler(const char * fieldname,
-							const char * meshname,
-							TypeOfField  type,
-							long         iteration,
-							long         order,
-							const char * source)
+              const char * meshname,
+              TypeOfField  type,
+              long         iteration,
+              long         order,
+              const char * source)
 {
   MEDOP::FieldHandler * fieldHandler = new MEDOP::FieldHandler();
   fieldHandler->id = _fieldLastId; _fieldLastId++;
@@ -471,10 +471,10 @@ MEDOP::FieldHandler * MEDDataManager_i::newFieldHandler(const char * fieldname,
  * name while the mesh has not been updated.
  */
 MEDOP::FieldHandler * MEDDataManager_i::updateFieldHandler(CORBA::Long fieldHandlerId,
-							   const char * fieldname,
-							   long         iteration,
-							   long         order,
-							   const char * source) {
+                 const char * fieldname,
+                 long         iteration,
+                 long         order,
+                 const char * source) {
   FieldHandlerMapIterator fieldIt = _fieldHandlerMap.find(fieldHandlerId);
   if ( fieldIt != _fieldHandlerMap.end() ) {
     // Update the attributes
@@ -505,7 +505,7 @@ MEDCouplingUMesh * MEDDataManager_i::getUMesh(long meshHandlerId) {
     LOG("getUMesh: the mesh must be loaded. meshid="<<meshHandlerId);    
     if ( _meshHandlerMap[meshHandlerId] == NULL ) {
       std::string message = 
-	std::string("No mesh for id=") + ToString(meshHandlerId);
+  std::string("No mesh for id=") + ToString(meshHandlerId);
       LOG("getUMesh: "<<message);
       throw KERNEL::createSalomeException(message.c_str());
     }
@@ -591,12 +591,12 @@ MEDCouplingFieldDouble * MEDDataManager_i::getFieldDouble(const MEDOP::FieldHand
   TypeOfField type = (TypeOfField)fieldHandler->type;
   int meshDimRelToMax = 0;
   MEDCouplingFieldDouble * myField = MEDLoader::ReadField(type,
-							  filepath,
-							  meshName,
-							  meshDimRelToMax,
-							  fieldHandler->fieldname,
-							  fieldHandler->iteration,
-							  fieldHandler->order);
+                filepath,
+                meshName,
+                meshDimRelToMax,
+                fieldHandler->fieldname,
+                fieldHandler->iteration,
+                fieldHandler->order);
   myField->setMesh(myMesh);
   _fieldDoubleMap[fieldHandler->id] = myField;
   return myField;
@@ -613,7 +613,7 @@ MEDCouplingFieldDouble * MEDDataManager_i::getFieldDouble(const MEDOP::FieldHand
  * @return a copy of the FieldHandler registered in the internal map for this field.
  */
 MEDOP::FieldHandler * MEDDataManager_i::addField(MEDCouplingFieldDouble * fieldDouble,
-						 long meshHandlerId)
+             long meshHandlerId)
 {
   const char * fieldName = fieldDouble->getName();
   const char * meshName  = fieldDouble->getMesh()->getName();
@@ -633,11 +633,11 @@ MEDOP::FieldHandler * MEDDataManager_i::addField(MEDCouplingFieldDouble * fieldD
   // the field has been created with.
   string * source = new string("mem://"); source->append(fieldName);
   MEDOP::FieldHandler * fieldHandler = newFieldHandler(fieldName,
-						       meshName,
-						       type,
-						       iteration,
-						       order,
-						       source->c_str());
+                   meshName,
+                   type,
+                   iteration,
+                   order,
+                   source->c_str());
 
   if ( meshHandlerId == LONG_UNDEFINED ) {
     // We have to gess the id of the underlying mesh to preserve data
@@ -675,16 +675,16 @@ MEDOP::FieldHandler * MEDDataManager_i::addField(MEDCouplingFieldDouble * fieldD
  * specified field.
  */
 void MEDDataManager_i::updateFieldMetadata(CORBA::Long  fieldHandlerId,
-					   const char * fieldname,
-					   CORBA::Long  iteration,
-					   CORBA::Long  order,
-					   const char * source)
+             const char * fieldname,
+             CORBA::Long  iteration,
+             CORBA::Long  order,
+             const char * source)
 {
   // We have to update the field handler registered in the internal
   // map AND the associated fieldDouble loaded in memory.
   MEDOP::FieldHandler * fieldHandler = getFieldHandler(fieldHandlerId);
   updateFieldHandler(fieldHandlerId,fieldname,iteration,order,source);
-		     
+
   MEDCouplingFieldDouble* fieldDouble = getFieldDouble(fieldHandler);
   fieldDouble->setName(fieldname);
 
