@@ -955,14 +955,16 @@ namespace ParaMEDMEM
        PyObject *getLocalizationFromId(int locId) const throw(INTERP_KERNEL::Exception)
        {
          const MEDFileFieldLoc *loc=&self->getLocalizationFromId(locId);
-         loc->incrRef();
+         if(loc)
+           loc->incrRef();
          return SWIG_NewPointerObj(SWIG_as_voidptr(loc),SWIGTYPE_p_ParaMEDMEM__MEDFileFieldLoc, SWIG_POINTER_OWN | 0 );
        }
        
        PyObject *getLocalization(const char *locName) const throw(INTERP_KERNEL::Exception)
        {
          const MEDFileFieldLoc *loc=&self->getLocalization(locName);
-         loc->incrRef();
+         if(loc)
+           loc->incrRef();
          return SWIG_NewPointerObj(SWIG_as_voidptr(loc),SWIGTYPE_p_ParaMEDMEM__MEDFileFieldLoc, SWIG_POINTER_OWN | 0 );
        }
        

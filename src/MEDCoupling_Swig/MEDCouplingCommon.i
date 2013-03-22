@@ -3513,19 +3513,22 @@ namespace ParaMEDMEM
       PyObject *getMesh2D() const throw(INTERP_KERNEL::Exception)
       {
         MEDCouplingUMesh *ret=self->getMesh2D();
-        ret->incrRef();
+        if(ret)
+          ret->incrRef();
         return convertMesh(ret, SWIG_POINTER_OWN | 0 );
       }
       PyObject *getMesh1D() const throw(INTERP_KERNEL::Exception)
       {
         MEDCouplingUMesh *ret=self->getMesh1D();
-        ret->incrRef();
+        if(ret)
+          ret->incrRef();
         return convertMesh(ret, SWIG_POINTER_OWN | 0 );
       }
       PyObject *getMesh3DIds() const throw(INTERP_KERNEL::Exception)
       {
         DataArrayInt *ret=self->getMesh3DIds();
-        ret->incrRef();
+        if(ret)
+          ret->incrRef();
         return SWIG_NewPointerObj(SWIG_as_voidptr(ret),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 );
       } 
     }
