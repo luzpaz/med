@@ -2098,6 +2098,17 @@ class MEDLoaderTest(unittest.TestCase):
         self.assertTrue(mm.isEqual(mmr,1e-12)[0])
         mmCpy=mm.deepCpy()
         self.assertTrue(mm.isEqual(mmCpy,1e-12)[0])
+        # remove names on nodes
+        mmCpy.setNameFieldAtLevel(1,None)
+        self.assertTrue(not mm.isEqual(mmCpy,1e-12)[0])
+        mm.setNameFieldAtLevel(1,None)
+        self.assertTrue(mm.isEqual(mmCpy,1e-12)[0])
+        mm.setNameFieldAtLevel(-1,None)
+        mm.write(fname,2)
+        mmr=MEDFileMesh.New(fname)
+        self.assertEqual(mmr.getNameFieldAtLevel(1),None)
+        self.assertTrue(mmr.getNameFieldAtLevel(0).isEqual(DataArrayAsciiChar(["CellL0#%.3d      "%(i) for i in xrange(6)])))
+        self.assertEqual(mmr.getNameFieldAtLevel(-1),None)
         #
         c=MEDCouplingCMesh()
         arr=DataArrayDouble([0.,1.1,2.3])
