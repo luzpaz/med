@@ -390,6 +390,38 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         arrExpected2.setIJ(82,0,1.)
         self.assertTrue(src.getArray().isEqual(arrExpected2,1e-12))
         pass
+
+    def testGauss2Gauss3DValidated(self):
+        srcFt=MEDCouplingDataForTest.buildFieldOnGauss_3()
+        trgFt=MEDCouplingDataForTest.buildFieldOnGauss_4()
+        src=MEDCouplingFieldDouble(srcFt)
+        self.assertEqual(srcFt.getMesh().getHiddenCppPointer(),src.getMesh().getHiddenCppPointer())
+        self.assertEqual(srcFt.getDiscretization().getHiddenCppPointer(),src.getDiscretization().getHiddenCppPointer())
+        #values given by ASTER usecase
+        src.setArray(DataArrayDouble([0.,1.,1.,1.,1.,1.,0.,0.,0.,0.,0.,0.,0.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,0.,0.,0.,1.,1.,0.,0.,1.,1.,1.,1.,0.,0.,1.,1.,0.,0.]))
+        src.getArray().setInfoOnComponents(["DOMA"])
+        rem=MEDCouplingRemapper()
+        rem.setIntersectionType(PointLocator)
+        rem.prepareEx(srcFt,trgFt)
+        trg=rem.transferField(src,1e300)
+        self.assertEqual(trg.getMesh().getHiddenCppPointer(),trgFt.getMesh().getHiddenCppPointer())
+        self.assertEqual(trg.getDiscretization().getHiddenCppPointer(),trgFt.getDiscretization().getHiddenCppPointer())
+        #values given after interpolation in ASTER
+        arrExpected=DataArrayDouble([0.,1.,1.,1.,1.,1.,0.,0.,0.,0.,0.,0.,0.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,1.,0.,0.,0.,1.,1.,0.,0.,1.,1.,1.,1.,0.,1.,1.,1.,0.,1.]) ; arrExpected.setInfoOnComponents(["DOMA"])
+        self.assertTrue(trg.getArray().isEqual(arrExpected,1e-12))
+        #
+        # second part of the test : reverse source and target
+        #
+        rem.prepareEx(trgFt,srcFt)# sorry trgFt is in the place of source and srcFt in the place of target it is not a bug
+        trg=MEDCouplingFieldDouble(trgFt)
+        #values given after interpolation in ASTER
+        trg.setArray(DataArrayDouble([0.,1.,1.,1.,1.,1.,0.,0.,0.,0.,0.,0.,0.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,0.,1.,1.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.]))
+        trg.getArray().setInfoOnComponents(["DOMA"])
+        src=rem.transferField(trg,1e300)
+        #values given after interpolation in ASTER
+        arrExpected2=DataArrayDouble([0.,1.,1.,1.,1.,1.,0.,0.,0.,0.,0.,0.,0.,0.,0.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,1.,0.,1.,0.,1.,0.,1.,1.,1.,0.,1.,1.,1.,1.,0.,1.,1.,1.,0.,1.]) ; arrExpected2.setInfoOnComponents(["DOMA"])
+        self.assertTrue(src.getArray().isEqual(arrExpected2,1e-12))
+        pass
     
     def build2DSourceMesh_1(self):
         sourceCoords=[-0.3,-0.3, 0.7,-0.3, -0.3,0.7, 0.7,0.7]
