@@ -74,7 +74,7 @@ namespace ParaMEDMEM
     T *fromNoInterlace(int nbOfComp) const;
     T *toNoInterlace(int nbOfComp) const;
     void sort(bool asc);
-    void reverse();
+    void reverse(int nbOfComp);
     void alloc(std::size_t nbOfElements) throw(INTERP_KERNEL::Exception);
     void reserve(std::size_t newNbOfElements) throw(INTERP_KERNEL::Exception);
     void reAlloc(std::size_t newNbOfElements) throw(INTERP_KERNEL::Exception);
@@ -494,6 +494,8 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT void applyDivideBy(int val) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void applyModulus(int val) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void applyRModulus(int val) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void applyPow(int val) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void applyRPow(int val) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayInt *getIdsInRange(int vmin, int vmax) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static DataArrayInt *Aggregate(const DataArrayInt *a1, const DataArrayInt *a2, int offsetA2);
     MEDCOUPLING_EXPORT static DataArrayInt *Aggregate(const std::vector<const DataArrayInt *>& arr) throw(INTERP_KERNEL::Exception);
@@ -533,6 +535,8 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT void divideEqual(const DataArrayInt *other) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static DataArrayInt *Modulus(const DataArrayInt *a1, const DataArrayInt *a2) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void modulusEqual(const DataArrayInt *other) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT static DataArrayInt *Pow(const DataArrayInt *a1, const DataArrayInt *a2) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void powEqual(const DataArrayInt *other) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void updateTime() const { }
   public:
     MEDCOUPLING_EXPORT static int *CheckAndPreparePermutation(const int *start, const int *end);
@@ -604,6 +608,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT bool isEqual(const DataArrayChar& other) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT virtual bool isEqualIfNotWhy(const DataArrayChar& other, std::string& reason) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT bool isEqualWithoutConsideringStr(const DataArrayChar& other) const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void reverse() throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void fillWithZero() throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void fillWithValue(char val) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT std::string repr() const throw(INTERP_KERNEL::Exception);

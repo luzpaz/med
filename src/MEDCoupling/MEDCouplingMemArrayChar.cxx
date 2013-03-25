@@ -302,6 +302,18 @@ bool DataArrayChar::isEqualWithoutConsideringStr(const DataArrayChar& other) con
 }
 
 /*!
+ * Reverse the array values.
+ *  \throw If \a this->getNumberOfComponents() < 1.
+ *  \throw If \a this is not allocated.
+ */
+void DataArrayChar::reverse() throw(INTERP_KERNEL::Exception)
+{
+  checkAllocated();
+  _mem.reverse(getNumberOfComponents());
+  declareAsNew();
+}
+
+/*!
  * Assign zero to all values in \a this array. To know more on filling arrays see
  * \ref MEDCouplingArrayFill.
  * \throw If \a this is not allocated.

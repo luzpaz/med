@@ -310,10 +310,26 @@ namespace ParaMEDMEM
   }
 
   template<class T>
-  void MemArray<T>::reverse()
+  void MemArray<T>::reverse(int nbOfComp)
   {
+    if(nbOfComp<1)
+      throw INTERP_KERNEL::Exception("MemArray<T>::reverse : only supported with 'this' array with ONE or more than ONE component !");
     T *pt=_pointer.getPointer();
-    std::reverse(pt,pt+_nb_of_elem);
+    if(nbOfComp==1)
+      {
+        std::reverse(pt,pt+_nb_of_elem);
+        return ;
+      }
+    else
+      {
+        T *pt2=pt+_nb_of_elem-nbOfComp;
+        std::size_t nbOfTuples=_nb_of_elem/nbOfComp;
+        for(std::size_t i=0;i<nbOfTuples/2;i++,pt+=nbOfComp,pt2-=nbOfComp)
+          {
+            for(int j=0;j<nbOfComp;j++)
+              std::swap(pt[j],pt2[j]);
+          }
+      }
   }
 
   template<class T>

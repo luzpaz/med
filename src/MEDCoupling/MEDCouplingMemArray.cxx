@@ -909,19 +909,19 @@ void DataArrayDouble::sort(bool asc) throw(INTERP_KERNEL::Exception)
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("DataArrayDouble::sort : only supported with 'this' array with ONE component !");
   _mem.sort(asc);
+  declareAsNew();
 }
 
 /*!
  * Reverse the array values.
- *  \throw If \a this->getNumberOfComponents() != 1.
+ *  \throw If \a this->getNumberOfComponents() < 1.
  *  \throw If \a this is not allocated.
  */
 void DataArrayDouble::reverse() throw(INTERP_KERNEL::Exception)
 {
   checkAllocated();
-  if(getNumberOfComponents()!=1)
-    throw INTERP_KERNEL::Exception("DataArrayDouble::reverse : only supported with 'this' array with ONE component !");
-  _mem.reverse();
+  _mem.reverse(getNumberOfComponents());
+  declareAsNew();
 }
 
 /*!
@@ -5698,19 +5698,19 @@ void DataArrayInt::sort(bool asc) throw(INTERP_KERNEL::Exception)
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("DataArrayInt::sort : only supported with 'this' array with ONE component !");
   _mem.sort(asc);
+  declareAsNew();
 }
 
 /*!
  * Reverse the array values.
- *  \throw If \a this->getNumberOfComponents() != 1.
+ *  \throw If \a this->getNumberOfComponents() < 1.
  *  \throw If \a this is not allocated.
  */
 void DataArrayInt::reverse() throw(INTERP_KERNEL::Exception)
 {
   checkAllocated();
-  if(getNumberOfComponents()!=1)
-    throw INTERP_KERNEL::Exception("DataArrayInt::reverse : only supported with 'this' array with ONE component !");
-  _mem.reverse();
+  _mem.reverse(getNumberOfComponents());
+  declareAsNew();
 }
 
 /*!
@@ -8044,6 +8044,69 @@ void DataArrayInt::applyRModulus(int val) throw(INTERP_KERNEL::Exception)
 }
 
 /*!
+ * Modify all elements of \a this array, so that
+ * an element _x_ becomes <em> val ^ x </em>.
+ *  \param [in] val - the value used to apply pow on all array elements.
+ *  \throw If \a this is not allocated.
+ *  \throw If \a val < 0.
+ */
+void DataArrayInt::applyPow(int val) throw(INTERP_KERNEL::Exception)
+{
+  checkAllocated();
+  if(val<0)
+    throw INTERP_KERNEL::Exception("DataArrayInt::applyPow : input pow in < 0 !");
+  int *ptr=getPointer();
+  std::size_t nbOfElems=getNbOfElems();
+  if(val==0)
+    {
+      std::fill(ptr,ptr+nbOfElems,1.);
+      return ;
+    }
+  for(std::size_t i=0;i<nbOfElems;i++,ptr++)
+    {
+      int tmp=1;
+      for(int j=0;j<val;j++)
+        tmp*=*ptr;
+      *ptr=tmp;
+    }
+  declareAsNew();
+}
+
+/*!
+ * Modify all elements of \a this array, so that
+ * an element _x_ becomes \f$ val ^ x \f$.
+ *  \param [in] val - the value used to apply pow on all array elements.
+ *  \throw If \a this is not allocated.
+ *  \throw If there is an element < 0 in \a this array.
+ *  \warning If an exception is thrown because of presence of 0 element in \a this 
+ *           array, all elements processed before detection of the zero element remain
+ *           modified.
+ */
+void DataArrayInt::applyRPow(int val) throw(INTERP_KERNEL::Exception)
+{
+  checkAllocated();
+  int *ptr=getPointer();
+  std::size_t nbOfElems=getNbOfElems();
+  for(std::size_t i=0;i<nbOfElems;i++,ptr++)
+    {
+      if(*ptr>=0)
+        {
+          int tmp=1;
+          for(int j=0;j<*ptr;j++)
+            tmp*=val;
+          *ptr=val;
+        }
+      else
+        {
+          std::ostringstream oss; oss << "DataArrayInt::applyRPow : presence of negative value in tuple #" << i/getNumberOfComponents() << " component #" << i%getNumberOfComponents();
+          oss << " !";
+          throw INTERP_KERNEL::Exception(oss.str().c_str());
+        }
+    }
+  declareAsNew();
+}
+
+/*!
  * Returns a new DataArrayInt by aggregating two given arrays, so that (1) the number
  * of components in the result array is a sum of the number of components of given arrays
  * and (2) the number of tuples in the result array is same as that of each of given
@@ -9594,6 +9657,94 @@ void DataArrayInt::modulusEqual(const DataArrayInt *other) throw(INTERP_KERNEL::
     }
   else
     throw INTERP_KERNEL::Exception(msg);
+  declareAsNew();
+}
+
+/*!
+ * Returns a new DataArrayInt that is the result of pow of two given arrays. There are 3
+ * valid cases.
+ *
+ *  \param [in] a1 - an array to pow up.
+ *  \param [in] a2 - another array to sum up.
+ *  \return DataArrayInt * - the new instance of DataArrayInt.
+ *          The caller is to delete this result array using decrRef() as it is no more
+ *          needed.
+ *  \throw If either \a a1 or \a a2 is NULL.
+ *  \throw If \a a1->getNumberOfTuples() != \a a2->getNumberOfTuples()
+ *  \throw If \a a1->getNumberOfComponents() != 1 or \a a2->getNumberOfComponents() != 1.
+ *  \throw If there is a negative value in \a a2.
+ */
+DataArrayInt *DataArrayInt::Pow(const DataArrayInt *a1, const DataArrayInt *a2) throw(INTERP_KERNEL::Exception)
+{
+  if(!a1 || !a2)
+    throw INTERP_KERNEL::Exception("DataArrayInt::Pow : at least one of input instances is null !");
+  int nbOfTuple=a1->getNumberOfTuples();
+  int nbOfTuple2=a2->getNumberOfTuples();
+  int nbOfComp=a1->getNumberOfComponents();
+  int nbOfComp2=a2->getNumberOfComponents();
+  if(nbOfTuple!=nbOfTuple2)
+    throw INTERP_KERNEL::Exception("DataArrayInt::Pow : number of tuples mismatches !");
+  if(nbOfComp!=1 || nbOfComp2!=1)
+    throw INTERP_KERNEL::Exception("DataArrayInt::Pow : number of components of both arrays must be equal to 1 !");
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New(); ret->alloc(nbOfTuple,1);
+  const int *ptr1(a1->begin()),*ptr2(a2->begin());
+  int *ptr=ret->getPointer();
+  for(int i=0;i<nbOfTuple;i++,ptr1++,ptr2++,ptr++)
+    {
+      if(*ptr2>=0)
+        {
+          int tmp=1;
+          for(int j=0;j<*ptr2;j++)
+            tmp*=*ptr1;
+          *ptr=tmp;
+        }
+      else
+        {
+          std::ostringstream oss; oss << "DataArrayInt::Pow : on tuple #" << i << " of a2 value is < 0 (" << *ptr2 << ") !";
+          throw INTERP_KERNEL::Exception(oss.str().c_str());
+        }
+    }
+  return ret.retn();
+}
+
+/*!
+ * Apply pow on values of another DataArrayInt to values of \a this one.
+ *
+ *  \param [in] other - an array to pow to \a this one.
+ *  \throw If \a other is NULL.
+ *  \throw If \a this->getNumberOfTuples() != \a other->getNumberOfTuples()
+ *  \throw If \a this->getNumberOfComponents() != 1 or \a other->getNumberOfComponents() != 1
+ *  \throw If there is a negative value in \a other.
+ */
+void DataArrayInt::powEqual(const DataArrayInt *other) throw(INTERP_KERNEL::Exception)
+{
+  if(!other)
+    throw INTERP_KERNEL::Exception("DataArrayInt::powEqual : input instance is null !");
+  int nbOfTuple=getNumberOfTuples();
+  int nbOfTuple2=other->getNumberOfTuples();
+  int nbOfComp=getNumberOfComponents();
+  int nbOfComp2=other->getNumberOfComponents();
+  if(nbOfTuple!=nbOfTuple2)
+    throw INTERP_KERNEL::Exception("DataArrayInt::powEqual : number of tuples mismatches !");
+  if(nbOfComp!=1 || nbOfComp2!=1)
+    throw INTERP_KERNEL::Exception("DataArrayInt::powEqual : number of components of both arrays must be equal to 1 !");
+  int *ptr=getPointer();
+  const int *ptrc=other->begin();
+  for(int i=0;i<nbOfTuple;i++,ptrc++,ptr++)
+    {
+      if(*ptrc>=0)
+        {
+          int tmp=1;
+          for(int j=0;j<*ptrc;j++)
+            tmp*=*ptr;
+          *ptr=tmp;
+        }
+      else
+        {
+          std::ostringstream oss; oss << "DataArrayInt::powEqual : on tuple #" << i << " of other value is < 0 (" << *ptrc << ") !";
+          throw INTERP_KERNEL::Exception(oss.str().c_str());
+        }
+    }
   declareAsNew();
 }
 
