@@ -76,6 +76,9 @@ namespace MEDPARTITIONER
 
     //creation of the cell graph
     void buildCellGraph(MEDPARTITIONER::SkyLineArray* & array,int *& edgeweights );
+   //creation of the cell graph
+    void buildParallelCellGraph(MEDPARTITIONER::SkyLineArray* & array,int *& edgeweights );
+
     //creation and partition of the associated graph
     Topology* createPartition(int nbdomain, Graph::splitter_type type = Graph::METIS,
                               const std::string& ="", int* edgeweights=0, int* verticesweights=0);
