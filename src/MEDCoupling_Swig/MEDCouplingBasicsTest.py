@@ -4570,7 +4570,6 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         dbl2.alloc(7,2);
         self.assertRaises(InterpKernelException, dbl2.isUniform, 10., 1e-15);
         self.assertRaises(InterpKernelException, dbl2.sort);
-        self.assertRaises(InterpKernelException, dbl2.reverse);
         self.assertRaises(InterpKernelException, dbl2.iota, 10.);
         
         dbl=DataArrayDouble.New();
@@ -4578,7 +4577,6 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertRaises(InterpKernelException, dbl.iota, 10.);
         self.assertRaises(InterpKernelException, dbl.isUniform, 10., 1e-15);
         self.assertRaises(InterpKernelException, dbl.sort);
-        self.assertRaises(InterpKernelException, dbl.reverse);
         self.assertRaises(InterpKernelException, dbl.fromNoInterlace);
         self.assertRaises(InterpKernelException, dbl.toNoInterlace);
         
@@ -11690,6 +11688,30 @@ class MEDCouplingBasicsTest(unittest.TestCase):
             self.assertTrue(d[223456787],'1234567890123456')
             self.assertRaises(InterpKernelException,d.rearrange,1)# fails because it would lead to nb of tuples > 2147483647
             pass
+        pass
+
+    def testSwig2DAReverseMultiCompo1(self):
+        d=DataArrayDouble(6,2)
+        d[:,0]=range(6)
+        d[:,1]=range(10,16)
+        d.reverse()
+        self.assertTrue(d.isEqual(DataArrayDouble([5.,15.,4.,14.,3.,13.,2.,12.,1.,11.,0.,10.],6,2),1e-14))
+        d=DataArrayDouble(7,2)
+        d[:,0]=range(7)
+        d[:,1]=range(10,17)
+        d.reverse()
+        self.assertTrue(d.isEqual(DataArrayDouble([6.,16.,5.,15.,4.,14.,3.,13.,2.,12.,1.,11.,0.,10.],7,2),1e-14))
+        #
+        d=DataArrayInt(6,2)
+        d[:,0]=range(6)
+        d[:,1]=range(10,16)
+        d.reverse()
+        self.assertTrue(d.isEqual(DataArrayInt([5,15,4,14,3,13,2,12,1,11,0,10],6,2)))
+        d=DataArrayInt(7,2)
+        d[:,0]=range(7)
+        d[:,1]=range(10,17)
+        d.reverse()
+        self.assertTrue(d.isEqual(DataArrayInt([6,16,5,15,4,14,3,13,2,12,1,11,0,10],7,2)))
         pass
 
     def setUp(self):

@@ -59,6 +59,9 @@ def ParaMEDMEMDataArrayIntIdiv(self,*args):
 def ParaMEDMEMDataArrayIntImod(self,*args):
     import _MEDCoupling
     return _MEDCoupling.DataArrayInt____imod___(self, self, *args)
+def ParaMEDMEMDataArrayIntIpow(self,*args):
+    import _MEDCoupling
+    return _MEDCoupling.DataArrayInt____ipow___(self, self, *args)
 def ParaMEDMEMDataArrayDoubleTupleIadd(self,*args):
     import _MEDCoupling
     return _MEDCoupling.DataArrayDoubleTuple____iadd___(self, self, *args)

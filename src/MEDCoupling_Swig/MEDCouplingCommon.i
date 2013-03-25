@@ -174,6 +174,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayInt::Substract;
 %newobject ParaMEDMEM::DataArrayInt::Multiply;
 %newobject ParaMEDMEM::DataArrayInt::Divide;
+%newobject ParaMEDMEM::DataArrayInt::Pow;
 %newobject ParaMEDMEM::DataArrayInt::BuildUnion;
 %newobject ParaMEDMEM::DataArrayInt::BuildIntersection;
 %newobject ParaMEDMEM::DataArrayInt::Range;
@@ -204,6 +205,8 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayInt::__rdiv__;
 %newobject ParaMEDMEM::DataArrayInt::__mod__;
 %newobject ParaMEDMEM::DataArrayInt::__rmod__;
+%newobject ParaMEDMEM::DataArrayInt::__pow__;
+%newobject ParaMEDMEM::DataArrayInt::__rpow__;
 %newobject ParaMEDMEM::DataArrayIntTuple::buildDAInt;
 %newobject ParaMEDMEM::DataArrayChar::convertToIntArr;
 %newobject ParaMEDMEM::DataArrayChar::renumber;
@@ -7455,6 +7458,113 @@ namespace ParaMEDMEM
          {
            MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaaa=aaa->buildDAInt(1,self->getNumberOfComponents());
            self->modulusEqual(aaaa);
+           Py_XINCREF(trueSelf);
+           return trueSelf;
+         }
+       default:
+         throw INTERP_KERNEL::Exception(msg);
+       }
+   }
+
+   DataArrayInt *__pow__(PyObject *obj) throw(INTERP_KERNEL::Exception)
+   {
+     const char msg[]="Unexpected situation in __pow__ !";
+     int val;
+     DataArrayInt *a;
+     std::vector<int> aa;
+     DataArrayIntTuple *aaa;
+     int sw;
+     convertObjToPossibleCpp1(obj,sw,val,aa,a,aaa);
+     switch(sw)
+       {
+       case 1:
+         {
+           MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=self->deepCpy();
+           ret->applyPow(val);
+           return ret.retn();
+         }
+       case 2:
+         {
+           MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaa=DataArrayInt::New(); aaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
+           return DataArrayInt::Pow(self,aaa);
+         }
+       case 3:
+         {
+           return DataArrayInt::Pow(self,a);
+         }
+       case 4:
+         {
+           MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaaa=aaa->buildDAInt(1,self->getNumberOfComponents());
+           return DataArrayInt::Pow(self,aaaa);
+         }
+       default:
+         throw INTERP_KERNEL::Exception(msg);
+       }
+   }
+
+   DataArrayInt *__rpow__(PyObject *obj) throw(INTERP_KERNEL::Exception)
+   {
+     const char msg[]="Unexpected situation in __rpow__ !";
+     int val;
+     DataArrayInt *a;
+     std::vector<int> aa;
+     DataArrayIntTuple *aaa;
+     int sw;
+     convertObjToPossibleCpp1(obj,sw,val,aa,a,aaa);
+     switch(sw)
+       {
+       case 1:
+         {
+           MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=self->deepCpy();
+           ret->applyRPow(val);
+           return ret.retn();
+         }
+       case 2:
+         {
+           MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaa=DataArrayInt::New(); aaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
+           return DataArrayInt::Pow(aaa,self);
+         }
+       case 3:
+         {
+           return DataArrayInt::Pow(a,self);
+         }
+       case 4:
+         {
+           MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaaa=aaa->buildDAInt(1,self->getNumberOfComponents());
+           return DataArrayInt::Pow(aaaa,self);
+         }
+       default:
+         throw INTERP_KERNEL::Exception(msg);
+       }
+   }
+   
+   PyObject *___ipow___(PyObject *trueSelf, PyObject *obj) throw(INTERP_KERNEL::Exception)
+   {
+     const char msg[]="Unexpected situation in __ipow__ !";
+     int val;
+     DataArrayInt *a;
+     std::vector<int> aa;
+     DataArrayIntTuple *aaa;
+     int sw;
+     convertObjToPossibleCpp1(obj,sw,val,aa,a,aaa);
+     switch(sw)
+       {
+       case 1:
+         {
+           self->applyPow(val);
+           Py_XINCREF(trueSelf);
+           return trueSelf;
+         }
+       case 3:
+         {
+           self->powEqual(a);
+           Py_XINCREF(trueSelf);
+           return trueSelf;
+         }
+       case 4:
+         {
+           MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaaa=aaa->buildDAInt(1,self->getNumberOfComponents());
+           self->powEqual(aaaa);
            Py_XINCREF(trueSelf);
            return trueSelf;
          }
