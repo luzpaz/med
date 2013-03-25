@@ -3205,8 +3205,10 @@ MEDCouplingFieldDouble *MEDCouplingUMesh::buildOrthogonalField() const
         }
       else
         {
-          for(int i=0;i<nbOfCells;i++)
-            { vals[3*i]=0.; vals[3*i+1]=0.; vals[3*i+2]=1.; }
+          MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> isAbs=getMeasureField(false);
+          const double *isAbsPtr=isAbs->getArray()->begin();
+          for(int i=0;i<nbOfCells;i++,isAbsPtr++)
+            { vals[3*i]=0.; vals[3*i+1]=0.; vals[3*i+2]=*isAbsPtr>0.?1.:-1.; }
         }
     }
   else//meshdimension==1
