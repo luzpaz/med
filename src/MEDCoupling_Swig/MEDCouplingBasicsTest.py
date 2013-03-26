@@ -11714,7 +11714,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(d.isEqual(DataArrayInt([6,16,5,15,4,14,3,13,2,12,1,11,0,10],7,2)))
         pass
 
-    def testSwig2DAPow1(self):
+    def testSwigDAPow1(self):
         d=DataArrayInt(10)
         d.iota(0)
         d1=d.deepCpy()
@@ -11757,6 +11757,27 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue((d4**d3).isEqual(DataArrayDouble([1.,sqrt(2.),1.4422495703074083,sqrt(2.)]),1e-14))
         d4**=d3
         self.assertTrue(d4.isEqual(DataArrayDouble([1.,sqrt(2.),1.4422495703074083,sqrt(2.)]),1e-14))
+        pass
+    
+    def testSwig2Baryenter3DForCellsWithVolumeZero1(self):
+        coo=DataArrayDouble([0.,0.,0.,1.,0.,0.,0.,1.,0.],3,3)
+        m2=MEDCouplingUMesh("mesh",2)
+        m2.allocateCells(0)
+        m2.insertNextCell(NORM_POLYGON,[0,1,2])
+        m2.setCoords(coo)
+        m2.checkCoherency1()
+        #
+        coo2=DataArrayDouble([0.,0.,0.,0.,0.,0.,0.,0.,2.],3,3)
+        m1=MEDCouplingUMesh("mesh",1)
+        m1.allocateCells(0)
+        m1.insertNextCell(NORM_SEG2,[0,1])
+        m1.insertNextCell(NORM_SEG2,[1,2])
+        m1.setCoords(coo2)
+        m1.checkCoherency1()
+        #
+        m3=m2.buildExtrudedMesh(m1,0)
+        m3.insertNextCell(NORM_POLYHED,[3,4,5,-1,8,7,6,-1,4,3,6,7,-1,5,4,7,8,-1,5,4,-1,3,5,8,6])# addition of face #4 with null surface
+        self.assertTrue(m3.getBarycenterAndOwner().isEqual(DataArrayDouble([0.3333333333333333,0.3333333333333333,0.,0.3333333333333333,0.3333333333333333,1.,0.3333333333333333,0.3333333333333333,1.],3,3),1e-13))
         pass
 
     def setUp(self):
