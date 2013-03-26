@@ -2217,7 +2217,7 @@ MEDCouplingFieldDouble *MEDFileFieldPerMesh::finishFieldNode2(const MEDFileField
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingMesh> mesh2=mesh->buildPartAndReduceNodes(cellIds->getConstPointer(),cellIds->getConstPointer()+cellIds->getNbOfElems(),arr2);
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> arr3(arr2);
   int nnodes=mesh2->getNumberOfNodes();
-  if(nnodes==da->getNbOfElems())
+  if(nnodes==(int)da->getNbOfElems())
     {
       MEDCouplingAutoRefCountObjectPtr<DataArrayInt> da3=da->transformWithIndArrR(arr2->begin(),arr2->end());
       ret->getArray()->renumberInPlace(da3->getConstPointer());
@@ -3667,7 +3667,7 @@ MEDCouplingFieldDouble *MEDFileField1TSWithoutSDA::getFieldOnMeshAtLevel(TypeOfF
         //no need to test _field_per_mesh.empty() because geMeshName has already done it
         if(cellRenum)
           {
-            if(cellRenum->getNbOfElems()!=mesh->getNumberOfCells())
+            if((int)cellRenum->getNbOfElems()!=mesh->getNumberOfCells())
               {
                 std::ostringstream oss; oss << "MEDFileField1TSWithoutSDA::getFieldOnMeshAtLevel : Request of simple renumbering but it seems that underlying mesh \"" << mesh->getName() << "\" of requested field ";
                 oss << "\"" << getName() << "\" has partial renumbering (some geotype has no renumber) !";
@@ -3685,7 +3685,7 @@ MEDCouplingFieldDouble *MEDFileField1TSWithoutSDA::getFieldOnMeshAtLevel(TypeOfF
           throw INTERP_KERNEL::Exception(msg1);
         if(nodeRenum)
           {
-            if(nodeRenum->getNbOfElems()!=mesh->getNumberOfNodes())
+            if((int)nodeRenum->getNbOfElems()!=mesh->getNumberOfNodes())
               {
                 std::ostringstream oss; oss << "MEDFileField1TSWithoutSDA::getFieldOnMeshAtLevel : Request of simple renumbering but it seems that underlying mesh \"" << mesh->getName() << "\" of requested field ";
                 oss << "\"" << getName() << "\" not defined on all nodes !";
