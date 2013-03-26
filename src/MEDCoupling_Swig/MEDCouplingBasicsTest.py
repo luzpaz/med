@@ -11778,6 +11778,8 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         m3=m2.buildExtrudedMesh(m1,0)
         m3.insertNextCell(NORM_POLYHED,[3,4,5,-1,8,7,6,-1,4,3,6,7,-1,5,4,7,8,-1,5,4,-1,3,5,8,6])# addition of face #4 with null surface
         self.assertTrue(m3.getBarycenterAndOwner().isEqual(DataArrayDouble([0.3333333333333333,0.3333333333333333,0.,0.3333333333333333,0.3333333333333333,1.,0.3333333333333333,0.3333333333333333,1.],3,3),1e-13))
+        m4,a,b,c,d=m3.buildDescendingConnectivity()
+        self.assertTrue(m4.getBarycenterAndOwner().isEqual(DataArrayDouble([0.3333333333333333,0.3333333333333333,0.,0.3333333333333333,0.3333333333333333,0.,0.5,0.,0.,0.5,0.5,0.,0.,0.5,0.,0.3333333333333333,0.3333333333333333,2.,0.5,0.,1.,0.5,0.5,1.,0.,0.5,1.,0.5,0.5,0.],10,3),1e-13))
         pass
 
     def setUp(self):

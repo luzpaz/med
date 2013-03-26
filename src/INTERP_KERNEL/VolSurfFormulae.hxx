@@ -501,31 +501,70 @@ namespace INTERP_KERNEL
     double area[3];
     areaVectorOfPolygon<ConnType,numPol>(connec,lgth,coords,area);
     double norm=sqrt(area[0]*area[0]+area[1]*area[1]+area[2]*area[2]);
-    area[0]/=norm; area[1]/=norm; area[2]/=norm;
-    res[0]=0.; res[1]=0.; res[2]=0.;
-    for(int i=1;i<lgth-1;i++)
+    if(norm>std::numeric_limits<double>::min())
       {
-        double v[3];
-        double tmpArea[3];
-        v[0]=(coords[3*OTT<ConnType,numPol>::coo2C(connec[0])]+
-              coords[3*OTT<ConnType,numPol>::coo2C(connec[i])]+
-              coords[3*OTT<ConnType,numPol>::coo2C(connec[i+1])])/3.;
-        v[1]=(coords[3*OTT<ConnType,numPol>::coo2C(connec[0])+1]+
-              coords[3*OTT<ConnType,numPol>::coo2C(connec[i])+1]+
-              coords[3*OTT<ConnType,numPol>::coo2C(connec[i+1])+1])/3.;
-        v[2]=(coords[3*OTT<ConnType,numPol>::coo2C(connec[0])+2]+
-              coords[3*OTT<ConnType,numPol>::coo2C(connec[i])+2]+
-              coords[3*OTT<ConnType,numPol>::coo2C(connec[i+1])+2])/3.;
-        ConnType tmpConn[3]={connec[0],connec[i],connec[i+1]};
-        areaVectorOfPolygon<ConnType,numPol>(tmpConn,3,coords,tmpArea);
-        double norm2=sqrt(tmpArea[0]*tmpArea[0]+tmpArea[1]*tmpArea[1]+tmpArea[2]*tmpArea[2]);
-        if(norm2>1e-12)
+        area[0]/=norm; area[1]/=norm; area[2]/=norm;
+        res[0]=0.; res[1]=0.; res[2]=0.;
+        for(int i=1;i<lgth-1;i++)
           {
-            tmpArea[0]/=norm2; tmpArea[1]/=norm2; tmpArea[2]/=norm2;
-            double signOfArea=area[0]*tmpArea[0]+area[1]*tmpArea[1]+area[2]*tmpArea[2];
-            res[0]+=signOfArea*norm2*v[0]/norm; res[1]+=signOfArea*norm2*v[1]/norm; res[2]+=signOfArea*norm2*v[2]/norm;
+            double v[3];
+            double tmpArea[3];
+            v[0]=(coords[3*OTT<ConnType,numPol>::coo2C(connec[0])]+
+                  coords[3*OTT<ConnType,numPol>::coo2C(connec[i])]+
+                  coords[3*OTT<ConnType,numPol>::coo2C(connec[i+1])])/3.;
+            v[1]=(coords[3*OTT<ConnType,numPol>::coo2C(connec[0])+1]+
+                  coords[3*OTT<ConnType,numPol>::coo2C(connec[i])+1]+
+                  coords[3*OTT<ConnType,numPol>::coo2C(connec[i+1])+1])/3.;
+            v[2]=(coords[3*OTT<ConnType,numPol>::coo2C(connec[0])+2]+
+                  coords[3*OTT<ConnType,numPol>::coo2C(connec[i])+2]+
+                  coords[3*OTT<ConnType,numPol>::coo2C(connec[i+1])+2])/3.;
+            ConnType tmpConn[3]={connec[0],connec[i],connec[i+1]};
+            areaVectorOfPolygon<ConnType,numPol>(tmpConn,3,coords,tmpArea);
+            double norm2=sqrt(tmpArea[0]*tmpArea[0]+tmpArea[1]*tmpArea[1]+tmpArea[2]*tmpArea[2]);
+            if(norm2>1e-12)
+              {
+                tmpArea[0]/=norm2; tmpArea[1]/=norm2; tmpArea[2]/=norm2;
+                double signOfArea=area[0]*tmpArea[0]+area[1]*tmpArea[1]+area[2]*tmpArea[2];
+                res[0]+=signOfArea*norm2*v[0]/norm; res[1]+=signOfArea*norm2*v[1]/norm; res[2]+=signOfArea*norm2*v[2]/norm;
+              }
           }
-      }   
+      }
+    else
+      {
+        res[0]=0.; res[1]=0.; res[2]=0.;
+        if(lgth<1)
+          throw INTERP_KERNEL::Exception("computePolygonBarycenter3D : lgth of polygon is < 1 !");
+        norm=0.;
+        double v[3];
+        for(int i=0;i<lgth;i++)
+          {
+            v[0]=coords[3*OTT<ConnType,numPol>::coo2C(connec[(i+1)%lgth])]-coords[3*OTT<ConnType,numPol>::coo2C(connec[i])];
+            v[1]=coords[3*OTT<ConnType,numPol>::coo2C(connec[(i+1)%lgth])+1]-coords[3*OTT<ConnType,numPol>::coo2C(connec[i])+1];
+            v[2]=coords[3*OTT<ConnType,numPol>::coo2C(connec[(i+1)%lgth])+2]-coords[3*OTT<ConnType,numPol>::coo2C(connec[i])+2];
+            double norm2=sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);
+            res[0]+=(coords[3*OTT<ConnType,numPol>::coo2C(connec[(i+1)%lgth])]+coords[3*OTT<ConnType,numPol>::coo2C(connec[i])])/2.*norm2;
+            res[1]+=(coords[3*OTT<ConnType,numPol>::coo2C(connec[(i+1)%lgth])+1]+coords[3*OTT<ConnType,numPol>::coo2C(connec[i])+1])/2.*norm2;
+            res[2]+=(coords[3*OTT<ConnType,numPol>::coo2C(connec[(i+1)%lgth])+2]+coords[3*OTT<ConnType,numPol>::coo2C(connec[i])+2])/2.*norm2;
+            norm+=norm2;
+          }
+        if(norm>std::numeric_limits<double>::min())
+          {
+            res[0]/=norm; res[1]/=norm; res[2]/=norm;
+            return;
+          }
+        else
+          {
+            res[0]=0.; res[1]=0.; res[2]=0.;
+            for(int i=0;i<lgth;i++)
+              {
+                res[0]+=coords[3*OTT<ConnType,numPol>::coo2C(connec[i])];
+                res[1]+=coords[3*OTT<ConnType,numPol>::coo2C(connec[i])+1];
+                res[2]+=coords[3*OTT<ConnType,numPol>::coo2C(connec[i])+2];
+              }
+            res[0]/=lgth; res[1]/=lgth; res[2]/=lgth;
+            return;
+          }
+      }
   }
 
   inline double integrationOverA3DLine(double u1, double v1, double u2, double v2, double A, double B, double C)
