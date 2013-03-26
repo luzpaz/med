@@ -970,6 +970,14 @@ namespace ParaMEDMEM
 
 %extend ParaMEDMEM::DataArrayInt
 {
+  
+  std::string __repr__() const throw(INTERP_KERNEL::Exception)
+  {
+    std::ostringstream oss;
+    self->reprQuickOverview(oss);
+    return oss.str();
+  }
+  
   void pushBackValsSilent(PyObject *li) throw(INTERP_KERNEL::Exception)
   {
     int szArr,sw,iTypppArr;
@@ -1009,7 +1017,7 @@ namespace ParaMEDMEM
 
 %extend ParaMEDMEM::DataArrayChar
 {
-   int __len__() const throw(INTERP_KERNEL::Exception)
+  int __len__() const throw(INTERP_KERNEL::Exception)
    {
      if(self->isAllocated())
        {
@@ -1348,6 +1356,13 @@ namespace ParaMEDMEM
      return ParaMEDMEM_DataArrayByte_New__SWIG_1(elt0,nbOfTuples,nbOfComp);
    }
    
+   std::string __repr__() const throw(INTERP_KERNEL::Exception)
+   {
+     std::ostringstream oss;
+     self->reprQuickOverview(oss);
+     return oss.str();
+   }
+  
    int __int__() const throw(INTERP_KERNEL::Exception)
    {
      return (int) self->byteValue();
@@ -1644,6 +1659,13 @@ namespace ParaMEDMEM
    DataArrayAsciiChar(PyObject *elt0, PyObject *nbOfTuples=0, PyObject *nbOfComp=0) throw(INTERP_KERNEL::Exception)
    {
      return ParaMEDMEM_DataArrayAsciiChar_New__SWIG_3(elt0,nbOfTuples,nbOfComp);
+   }
+
+   std::string __repr__() const throw(INTERP_KERNEL::Exception)
+   {
+     std::ostringstream oss;
+     self->reprQuickOverview(oss);
+     return oss.str();
    }
 
    DataArrayAsciiCharIterator *__iter__() throw(INTERP_KERNEL::Exception)
@@ -4096,6 +4118,13 @@ namespace ParaMEDMEM
      const char msg[]="Python wrap of DataArrayDouble::pushBackValsSilent : ";
      const double *tmp=convertObjToPossibleCpp5_SingleCompo(li,sw,val,bb,msg,true,nbTuples);
      self->pushBackValsSilent(tmp,tmp+nbTuples);
+   }
+
+   std::string __repr__() const throw(INTERP_KERNEL::Exception)
+   {
+     std::ostringstream oss;
+     self->reprQuickOverview(oss);
+     return oss.str();
    }
 
    std::string __str__() const throw(INTERP_KERNEL::Exception)

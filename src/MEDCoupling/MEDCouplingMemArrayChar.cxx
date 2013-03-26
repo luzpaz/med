@@ -1847,7 +1847,18 @@ void DataArrayByte::reprZipStream(std::ostream& stream) const throw(INTERP_KERNE
 void DataArrayByte::reprWithoutNameStream(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
 {
   DataArray::reprWithoutNameStream(stream);
-  _mem.repr(getNumberOfComponents(),stream);
+  if(_mem.reprHeader(getNumberOfComponents(),stream))
+    {
+      const char *data=begin();
+      int nbOfTuples=getNumberOfTuples();
+      int nbCompo=getNumberOfComponents();
+      for(int i=0;i<nbOfTuples;i++,data+=nbCompo)
+        {
+          stream << "Tuple #" << i << " : ";
+          std::copy(data,data+nbCompo,std::ostream_iterator<int>(stream," "));//it is not a bug int here not char because it is not ASCII here contrary to DataArrayAsciiChar
+          stream << "\n";
+        }
+    }
 }
 
 void DataArrayByte::reprZipWithoutNameStream(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
@@ -1871,6 +1882,57 @@ void DataArrayByte::reprCppStream(const char *varName, std::ostream& stream) con
   else
     stream << varName << "->alloc(" << nbTuples << "," << nbComp << ");" << std::endl;
   stream << varName << "->setName(\"" << getName() << "\");" << std::endl;
+}
+
+/*!
+ * Method that gives a quick overvien of \a this for python.
+ */
+void DataArrayByte::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
+{
+  static const std::size_t MAX_NB_OF_BYTE_IN_REPR=300;
+  stream << "DataArrayByte C++ instance at " << this << ". ";
+  if(isAllocated())
+    {
+      int nbOfCompo=(int)_info_on_compo.size();
+      if(nbOfCompo>=1)
+        {
+          int nbOfTuples=getNumberOfTuples();
+          stream << "Number of tuples : " << nbOfTuples << ". Number of components : " << nbOfCompo << "." << std::endl;
+          const char *data=begin();
+          std::ostringstream oss2; oss2 << "[";
+          std::string oss2Str(oss2.str());
+          bool isFinished=true;
+          for(int i=0;i<nbOfTuples && isFinished;i++)
+            {
+              if(nbOfCompo>1)
+                {
+                  oss2 << "(";
+                  for(int j=0;j<nbOfCompo;j++,data++)
+                    {
+                      oss2 << (int)*data;
+                      if(j!=nbOfCompo-1) oss2 << ", ";
+                    }
+                  oss2 << ")";
+                }
+              else
+                { oss2 << (int)*data; data++; }
+              if(i!=nbOfTuples-1) oss2 << ", ";
+              std::string oss3Str(oss2.str());
+              if(oss3Str.length()<MAX_NB_OF_BYTE_IN_REPR)
+                oss2Str=oss3Str;
+              else
+                isFinished=false;
+            }
+          stream << oss2Str;
+          if(!isFinished)
+            stream << "... ";
+          stream << "]";
+        }
+      else
+        stream << "Number of components : 0.";
+    }
+  else
+    stream << "*** No data allocated ****";
 }
 
 bool DataArrayByte::isEqualIfNotWhy(const DataArrayChar& other, std::string& reason) const throw(INTERP_KERNEL::Exception)
@@ -2145,6 +2207,65 @@ void DataArrayAsciiChar::reprCppStream(const char *varName, std::ostream& stream
   else
     stream << varName << "->alloc(" << nbTuples << "," << nbComp << ");" << std::endl;
   stream << varName << "->setName(\"" << getName() << "\");" << std::endl;
+}
+
+/*!
+ * Method that gives a quick overvien of \a this for python.
+ */
+void DataArrayAsciiChar::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
+{
+  static const std::size_t MAX_NB_OF_BYTE_IN_REPR=300;
+  stream << "DataArrayAsciiChar C++ instance at " << this << ". ";
+  if(isAllocated())
+    {
+      int nbOfCompo=(int)_info_on_compo.size();
+      if(nbOfCompo>=1)
+        {
+          int nbOfTuples=getNumberOfTuples();
+          stream << "Number of tuples : " << nbOfTuples << ". Number of components : " << nbOfCompo << "." << std::endl;
+          const char *data=begin();
+          std::ostringstream oss2; oss2 << "[";
+          std::string oss2Str(oss2.str());
+          bool isFinished=true;
+          for(int i=0;i<nbOfTuples && isFinished;i++)
+            {
+              bool isAscii=true;
+              for(int j=0;j<nbOfCompo;j++)
+                if(data[j]<32) isAscii=false;
+              if(isAscii)
+                {
+                  oss2 << "\'";
+                  for(int j=0;j<nbOfCompo;j++,data++)
+                    oss2 << *data;
+                  oss2 << "\'";
+                }
+              else
+                {
+                  oss2 << "(";
+                  for(int j=0;j<nbOfCompo;j++,data++)
+                    {
+                      oss2 << (int)*data;
+                      if(j!=nbOfCompo-1) oss2 << ", ";
+                    }
+                  oss2 << ")";
+                }
+              if(i!=nbOfTuples-1) oss2 << ", ";
+              std::string oss3Str(oss2.str());
+              if(oss3Str.length()<MAX_NB_OF_BYTE_IN_REPR)
+                oss2Str=oss3Str;
+              else
+                isFinished=false;
+            }
+          stream << oss2Str;
+          if(!isFinished)
+            stream << "... ";
+          stream << "]";
+        }
+      else
+        stream << "Number of components : 0.";
+    }
+  else
+    stream << "*** No data allocated ****";
 }
 
 bool DataArrayAsciiChar::isEqualIfNotWhy(const DataArrayChar& other, std::string& reason) const throw(INTERP_KERNEL::Exception)

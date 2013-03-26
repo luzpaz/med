@@ -11782,6 +11782,64 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(m4.getBarycenterAndOwner().isEqual(DataArrayDouble([0.3333333333333333,0.3333333333333333,0.,0.3333333333333333,0.3333333333333333,0.,0.5,0.,0.,0.5,0.5,0.,0.,0.5,0.,0.3333333333333333,0.3333333333333333,2.,0.5,0.,1.,0.5,0.5,1.,0.,0.5,1.,0.5,0.5,0.],10,3),1e-13))
         pass
 
+    def testSwigRepr1(self):
+        d=DataArrayDouble()
+        self.assertTrue(len(d.__repr__())<100)
+        d.alloc(1000,0) ; self.assertTrue(len(d.__repr__())<100)
+        for i in xrange(100):
+            d.alloc(i,1) ; d.iota(1.1234567890123456) ; d*=1e123
+            self.assertTrue(len(d.__repr__())<500)
+            pass
+        for i in xrange(50):
+            d.alloc(i,2) ; d.rearrange(1) ; d.iota(1.1234567890123456) ; d.rearrange(2) ; d*=1e123
+            self.assertTrue(len(d.__repr__())<500)
+            pass
+        d.alloc(4000,1) ; d.iota() ; self.assertTrue(len(d.__repr__())<500)
+        for i in xrange(2,4):
+            d.alloc(362880,1) ; d.iota() ; d.rearrange(i) ; self.assertTrue(len(d.__repr__())<500)
+            pass
+        d.alloc(0,9)
+        self.assertTrue(len(d.__repr__())<100)
+        #
+        d=DataArrayInt()
+        self.assertTrue(len(d.__repr__())<100)
+        d.alloc(1000,0) ; self.assertTrue(len(d.__repr__())<100)
+        for i in xrange(100):
+            d.alloc(i,1) ; d.iota(123456789)
+            self.assertTrue(len(d.__repr__())<500)
+            pass
+        for i in xrange(50):
+            d.alloc(i,2) ; d.rearrange(1) ; d.iota(123456789) ; d.rearrange(2)
+            self.assertTrue(len(d.__repr__())<500)
+            pass
+        d.alloc(4000,1) ; d.iota() ; self.assertTrue(len(d.__repr__())<500)
+        for i in xrange(2,10):
+            d.alloc(362880,1) ; d.iota() ; d.rearrange(i) ; self.assertTrue(len(d.__repr__())<500)
+            pass
+        d.alloc(0,9)
+        self.assertTrue(len(d.__repr__())<100)
+        #
+        d=DataArrayAsciiChar()
+        d.alloc(1000,0) ; self.assertTrue(len(d.__repr__())<100)
+        d.alloc(2,16) ; d[:]='1234567890ABCDEF'
+        self.assertTrue(len(d.__repr__())<500)
+        d.alloc(2000,16) ; d[:]='1234567890ABCDEF'
+        self.assertTrue(len(d.__repr__())<500)
+        d.alloc(0,16) ; d[:]='1234567890ABCDEF'
+        self.assertTrue(len(d.__repr__())<100)
+        #
+        d=DataArrayByte()
+        self.assertTrue(len(d.__repr__())<100)
+        d.alloc(1000,0) ; self.assertTrue(len(d.__repr__())<100)
+        d.alloc(0,16) ; self.assertTrue(len(d.__repr__())<100)
+        d.alloc(5,1) ; d.fillWithValue(127)
+        self.assertTrue(len(d.__repr__())<200)
+        d.alloc(1000,1) ; d.fillWithValue(127)
+        self.assertTrue(len(d.__repr__())<500)
+        d.alloc(1000,3) ; d.fillWithValue(127)
+        self.assertTrue(len(d.__repr__())<500)
+        pass
+
     def setUp(self):
         pass
     pass
