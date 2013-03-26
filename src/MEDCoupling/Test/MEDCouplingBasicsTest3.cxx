@@ -837,7 +837,6 @@ void MEDCouplingBasicsTest3::testElementaryDAThrowAndSpecialCases()
   dbl2->alloc(7,2);
   CPPUNIT_ASSERT_THROW(dbl2->isUniform(10.,1e-15),INTERP_KERNEL::Exception);
   CPPUNIT_ASSERT_THROW(dbl2->sort(),INTERP_KERNEL::Exception);
-  CPPUNIT_ASSERT_THROW(dbl2->reverse(),INTERP_KERNEL::Exception);
   CPPUNIT_ASSERT_THROW(dbl2->iota(10.),INTERP_KERNEL::Exception);
   
   DataArrayDouble *dbl=DataArrayDouble::New();
