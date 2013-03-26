@@ -244,6 +244,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayDouble::Substract;
 %newobject ParaMEDMEM::DataArrayDouble::Multiply;
 %newobject ParaMEDMEM::DataArrayDouble::Divide;
+%newobject ParaMEDMEM::DataArrayDouble::Pow;
 %newobject ParaMEDMEM::DataArrayDouble::substr;
 %newobject ParaMEDMEM::DataArrayDouble::changeNbOfComponents;
 %newobject ParaMEDMEM::DataArrayDouble::keepSelectedComponents;
@@ -288,6 +289,8 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayDouble::__rmul__;
 %newobject ParaMEDMEM::DataArrayDouble::__div__;
 %newobject ParaMEDMEM::DataArrayDouble::__rdiv__;
+%newobject ParaMEDMEM::DataArrayDouble::__pow__;
+%newobject ParaMEDMEM::DataArrayDouble::__rpow__;
 %newobject ParaMEDMEM::DataArrayDoubleTuple::buildDADouble;
 %newobject ParaMEDMEM::MEDCouplingMesh::deepCpy;
 %newobject ParaMEDMEM::MEDCouplingMesh::checkDeepEquivalOnSameNodesWith;
@@ -5429,6 +5432,116 @@ namespace ParaMEDMEM
          {
            MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=DataArrayDouble::New(); aaa->useArray(&bb[0],false,CPP_DEALLOC,1,(int)bb.size());
            self->divideEqual(aaa);
+           Py_XINCREF(trueSelf);
+           return trueSelf;
+         }
+       default:
+         throw INTERP_KERNEL::Exception(msg);
+       }
+   }
+   
+   DataArrayDouble *__pow__(PyObject *obj) throw(INTERP_KERNEL::Exception)
+   {
+     const char msg[]="Unexpected situation in __pow__ !";
+     double val;
+     DataArrayDouble *a;
+     DataArrayDoubleTuple *aa;
+     std::vector<double> bb;
+     int sw;
+     convertObjToPossibleCpp5(obj,sw,val,a,aa,bb);
+     switch(sw)
+       {
+       case 1:
+         {
+           MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=self->deepCpy();
+           ret->applyPow(val);
+           return ret.retn();
+         }
+       case 2:
+         {
+           return DataArrayDouble::Pow(self,a);
+         }
+       case 3:
+         {
+           MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=aa->buildDADouble(1,self->getNumberOfComponents());
+           return DataArrayDouble::Pow(self,aaa);
+         }
+       case 4:
+         {
+           MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=DataArrayDouble::New(); aaa->useArray(&bb[0],false,CPP_DEALLOC,1,(int)bb.size());
+           return DataArrayDouble::Pow(self,aaa);
+         }
+       default:
+         throw INTERP_KERNEL::Exception(msg);
+       }
+   }
+
+   DataArrayDouble *__rpow__(PyObject *obj) throw(INTERP_KERNEL::Exception)
+   {
+     const char msg[]="Unexpected situation in __rpow__ !";
+     double val;
+     DataArrayDouble *a;
+     DataArrayDoubleTuple *aa;
+     std::vector<double> bb;
+     int sw;
+     convertObjToPossibleCpp5(obj,sw,val,a,aa,bb);
+     switch(sw)
+       {
+       case 1:
+         {
+           MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=self->deepCpy();
+           ret->applyRPow(val);
+           return ret.retn();
+         }
+       case 3:
+         {
+           MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=aa->buildDADouble(1,self->getNumberOfComponents());
+           return DataArrayDouble::Pow(aaa,self);
+         }
+       case 4:
+         {
+           MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=DataArrayDouble::New(); aaa->useArray(&bb[0],false,CPP_DEALLOC,1,(int)bb.size());
+           return DataArrayDouble::Pow(aaa,self);
+         }
+       default:
+         throw INTERP_KERNEL::Exception(msg);
+       }
+   }
+
+   PyObject *___ipow___(PyObject *trueSelf, PyObject *obj) throw(INTERP_KERNEL::Exception)
+   {
+     const char msg[]="Unexpected situation in __ipow__ !";
+     double val;
+     DataArrayDouble *a;
+     DataArrayDoubleTuple *aa;
+     std::vector<double> bb;
+     int sw;
+     convertObjToPossibleCpp5(obj,sw,val,a,aa,bb);
+     switch(sw)
+       {
+       case 1:
+         {
+           self->applyPow(val);
+           Py_XINCREF(trueSelf);
+           return trueSelf;
+         }
+       case 2:
+         {
+           self->powEqual(a);
+           Py_XINCREF(trueSelf);
+           return trueSelf;
+         }
+       case 3:
+         {
+           MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=aa->buildDADouble(1,self->getNumberOfComponents());
+           self->powEqual(aaa);
+           Py_XINCREF(trueSelf);
+           return trueSelf;
+         }
+       case 4:
+         {
+           MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=DataArrayDouble::New(); aaa->useArray(&bb[0],false,CPP_DEALLOC,1,(int)bb.size());
+           self->powEqual(aaa);
            Py_XINCREF(trueSelf);
            return trueSelf;
          }

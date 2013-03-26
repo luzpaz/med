@@ -11714,6 +11714,51 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(d.isEqual(DataArrayInt([6,16,5,15,4,14,3,13,2,12,1,11,0,10],7,2)))
         pass
 
+    def testSwig2DAPow1(self):
+        d=DataArrayInt(10)
+        d.iota(0)
+        d1=d.deepCpy()
+        d.setIJ(2,0,-2)
+        self.assertTrue((d**2).isEqual(DataArrayInt([0,1,4,9,16,25,36,49,64,81])))
+        self.assertTrue((d**3).isEqual(DataArrayInt([0,1,-8,27,64,125,216,343,512,729])))
+        for elt in [d]:
+            elt**=2
+            pass
+        self.assertTrue(d.isEqual(DataArrayInt([0,1,4,9,16,25,36,49,64,81])))
+        self.assertTrue((d1[:4]**d1[:4]).isEqual(DataArrayInt([1,1,4,27])))
+        self.assertTrue((3**d1[:4]).isEqual(DataArrayInt([1,3,9,27])))
+        d2=d1[:4]
+        d2**=d2
+        self.assertTrue(d2.isEqual(DataArrayInt([1,1,4,27])))
+        self.assertRaises(InterpKernelException,d2.__pow__,-1)#non supporting negative pow in DataArrayInt.__pow__
+        self.assertRaises(InterpKernelException,d2.__ipow__,-1)#non supporting negative pow in DataArrayInt.__pow__
+        #
+        d=DataArrayDouble(10)
+        d.iota(0)
+        d1=d.deepCpy()
+        d.setIJ(2,0,-2.)
+        self.assertTrue((d**2).isEqual(DataArrayDouble([0,1,4,9,16,25,36,49,64,81]),1e-12))
+        self.assertTrue((d**3).isEqual(DataArrayDouble([0,1,-8,27,64,125,216,343,512,729]),1e-12))
+        self.assertRaises(InterpKernelException,d.__pow__,3.1)#3.1 is double not integer -> not supporting negative values in d
+        for elt in [d]:
+            elt**=2
+            pass
+        self.assertTrue(d.isEqual(DataArrayDouble([0,1,4,9,16,25,36,49,64,81]),1e-12))
+        self.assertTrue((d1[:4]**d1[:4]).isEqual(DataArrayDouble([1,1,4,27]),1e-12))
+        self.assertTrue((3**d1[:4]).isEqual(DataArrayDouble([1,3,9,27]),1e-12))
+        d2=d1[:4]
+        d2**=d2
+        self.assertTrue(d2.isEqual(DataArrayDouble([1,1,4,27]),1e-12))
+        d2**=-0.5
+        self.assertTrue(d2.isEqual(DataArrayDouble([1,1,1./2,1./sqrt(27.)]),1e-14))
+        d3=-1./d1[1:5]
+        self.assertTrue((3**d3).isEqual(DataArrayDouble([0.3333333333333333,0.5773502691896257,0.6933612743506348,0.7598356856515925]),1e-14))
+        d4=d3.deepCpy() ; d4.abs()
+        self.assertTrue((d4**d3).isEqual(DataArrayDouble([1.,sqrt(2.),1.4422495703074083,sqrt(2.)]),1e-14))
+        d4**=d3
+        self.assertTrue(d4.isEqual(DataArrayDouble([1.,sqrt(2.),1.4422495703074083,sqrt(2.)]),1e-14))
+        pass
+
     def setUp(self):
         pass
     pass

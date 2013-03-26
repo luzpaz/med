@@ -22,6 +22,7 @@ DataArrayDouble.__iadd__=ParaMEDMEMDataArrayDoubleIadd
 DataArrayDouble.__isub__=ParaMEDMEMDataArrayDoubleIsub
 DataArrayDouble.__imul__=ParaMEDMEMDataArrayDoubleImul
 DataArrayDouble.__idiv__=ParaMEDMEMDataArrayDoubleIdiv
+DataArrayDouble.__ipow__=ParaMEDMEMDataArrayDoubleIpow
 
 DataArrayInt.__iadd__=ParaMEDMEMDataArrayIntIadd
 DataArrayInt.__isub__=ParaMEDMEMDataArrayIntIsub

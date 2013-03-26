@@ -287,6 +287,8 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT void applyLin(double a, double b, int compoId) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void applyLin(double a, double b) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void applyInv(double numerator) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void applyPow(double val) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void applyRPow(double val) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayDouble *negate() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayDouble *applyFunc(int nbOfComp, FunctionToEvaluate func) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayDouble *applyFunc(int nbOfComp, const char *func) const throw(INTERP_KERNEL::Exception);
@@ -312,6 +314,8 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT void multiplyEqual(const DataArrayDouble *other) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static DataArrayDouble *Divide(const DataArrayDouble *a1, const DataArrayDouble *a2) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void divideEqual(const DataArrayDouble *other) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT static DataArrayDouble *Pow(const DataArrayDouble *a1, const DataArrayDouble *a2) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void powEqual(const DataArrayDouble *other) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void updateTime() const { }
   public:
     MEDCOUPLING_EXPORT void getTinySerializationIntInformation(std::vector<int>& tinyInfo) const;

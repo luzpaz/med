@@ -3620,6 +3620,66 @@ DataArrayDouble *DataArrayDouble::negate() const throw(INTERP_KERNEL::Exception)
 }
 
 /*!
+ * Modify all elements of \a this array, so that
+ * an element _x_ becomes <em> val ^ x </em>. Contrary to DataArrayInt::applyPow
+ * all values in \a this have to be >= 0 if val is \b not integer.
+ *  \param [in] val - the value used to apply pow on all array elements.
+ *  \throw If \a this is not allocated.
+ *  \warning If an exception is thrown because of presence of 0 element in \a this 
+ *           array and \a val is \b not integer, all elements processed before detection of the zero element remain
+ *           modified.
+ */
+void DataArrayDouble::applyPow(double val) throw(INTERP_KERNEL::Exception)
+{
+  checkAllocated();
+  double *ptr=getPointer();
+  std::size_t nbOfElems=getNbOfElems();
+  int val2=(int)val;
+  bool isInt=((double)val2)==val;
+  if(!isInt)
+    {
+      for(std::size_t i=0;i<nbOfElems;i++,ptr++)
+        {
+          if(*ptr>=0)
+            *ptr=pow(*ptr,val);
+          else
+            {
+              std::ostringstream oss; oss << "DataArrayDouble::applyPow (double) : At elem # " << i << " value is " << *ptr << " ! must be >=0. !";
+              throw INTERP_KERNEL::Exception(oss.str().c_str());
+            }
+        }
+    }
+  else
+    {
+      for(std::size_t i=0;i<nbOfElems;i++,ptr++)
+        *ptr=pow(*ptr,val2);
+    }
+  declareAsNew();
+}
+
+/*!
+ * Modify all elements of \a this array, so that
+ * an element _x_ becomes \f$ val ^ x \f$.
+ *  \param [in] val - the value used to apply pow on all array elements.
+ *  \throw If \a this is not allocated.
+ *  \throw If \a val < 0.
+ *  \warning If an exception is thrown because of presence of 0 element in \a this 
+ *           array, all elements processed before detection of the zero element remain
+ *           modified.
+ */
+void DataArrayDouble::applyRPow(double val) throw(INTERP_KERNEL::Exception)
+{
+  checkAllocated();
+  if(val<0.)
+    throw INTERP_KERNEL::Exception("DataArrayDouble::applyRPow : the input value has to be >= 0 !");
+  double *ptr=getPointer();
+  std::size_t nbOfElems=getNbOfElems();
+  for(std::size_t i=0;i<nbOfElems;i++,ptr++)
+    *ptr=pow(val,*ptr);
+  declareAsNew();
+}
+
+/*!
  * Returns a new DataArrayDouble created from \a this one by applying \a
  * FunctionToEvaluate to every tuple of \a this array. Textual data is not copied.
  * For more info see \ref MEDCouplingArrayApplyFunc
@@ -4830,6 +4890,86 @@ void DataArrayDouble::divideEqual(const DataArrayDouble *other) throw(INTERP_KER
     }
   else
     throw INTERP_KERNEL::Exception(msg);
+  declareAsNew();
+}
+
+/*!
+ * Returns a new DataArrayDouble that is the result of pow of two given arrays. There are 3
+ * valid cases.
+ *
+ *  \param [in] a1 - an array to pow up.
+ *  \param [in] a2 - another array to sum up.
+ *  \return DataArrayDouble * - the new instance of DataArrayDouble.
+ *          The caller is to delete this result array using decrRef() as it is no more
+ *          needed.
+ *  \throw If either \a a1 or \a a2 is NULL.
+ *  \throw If \a a1->getNumberOfTuples() != \a a2->getNumberOfTuples()
+ *  \throw If \a a1->getNumberOfComponents() != 1 or \a a2->getNumberOfComponents() != 1.
+ *  \throw If there is a negative value in \a a1.
+ */
+DataArrayDouble *DataArrayDouble::Pow(const DataArrayDouble *a1, const DataArrayDouble *a2) throw(INTERP_KERNEL::Exception)
+{
+  if(!a1 || !a2)
+    throw INTERP_KERNEL::Exception("DataArrayDouble::Pow : at least one of input instances is null !");
+  int nbOfTuple=a1->getNumberOfTuples();
+  int nbOfTuple2=a2->getNumberOfTuples();
+  int nbOfComp=a1->getNumberOfComponents();
+  int nbOfComp2=a2->getNumberOfComponents();
+  if(nbOfTuple!=nbOfTuple2)
+    throw INTERP_KERNEL::Exception("DataArrayDouble::Pow : number of tuples mismatches !");
+  if(nbOfComp!=1 || nbOfComp2!=1)
+    throw INTERP_KERNEL::Exception("DataArrayDouble::Pow : number of components of both arrays must be equal to 1 !");
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::New(); ret->alloc(nbOfTuple,1);
+  const double *ptr1(a1->begin()),*ptr2(a2->begin());
+  double *ptr=ret->getPointer();
+  for(int i=0;i<nbOfTuple;i++,ptr1++,ptr2++,ptr++)
+    {
+      if(*ptr1>=0)
+        {
+          *ptr=pow(*ptr1,*ptr2);
+        }
+      else
+        {
+          std::ostringstream oss; oss << "DataArrayDouble::Pow : on tuple #" << i << " of a1 value is < 0 (" << *ptr1 << ") !";
+          throw INTERP_KERNEL::Exception(oss.str().c_str());
+        }
+    }
+  return ret.retn();
+}
+
+/*!
+ * Apply pow on values of another DataArrayDouble to values of \a this one.
+ *
+ *  \param [in] other - an array to pow to \a this one.
+ *  \throw If \a other is NULL.
+ *  \throw If \a this->getNumberOfTuples() != \a other->getNumberOfTuples()
+ *  \throw If \a this->getNumberOfComponents() != 1 or \a other->getNumberOfComponents() != 1
+ *  \throw If there is a negative value in \a this.
+ */
+void DataArrayDouble::powEqual(const DataArrayDouble *other) throw(INTERP_KERNEL::Exception)
+{
+  if(!other)
+    throw INTERP_KERNEL::Exception("DataArrayDouble::powEqual : input instance is null !");
+  int nbOfTuple=getNumberOfTuples();
+  int nbOfTuple2=other->getNumberOfTuples();
+  int nbOfComp=getNumberOfComponents();
+  int nbOfComp2=other->getNumberOfComponents();
+  if(nbOfTuple!=nbOfTuple2)
+    throw INTERP_KERNEL::Exception("DataArrayDouble::powEqual : number of tuples mismatches !");
+  if(nbOfComp!=1 || nbOfComp2!=1)
+    throw INTERP_KERNEL::Exception("DataArrayDouble::powEqual : number of components of both arrays must be equal to 1 !");
+  double *ptr=getPointer();
+  const double *ptrc=other->begin();
+  for(int i=0;i<nbOfTuple;i++,ptrc++,ptr++)
+    {
+      if(*ptr>=0)
+        *ptr=pow(*ptr,*ptrc);
+      else
+        {
+          std::ostringstream oss; oss << "DataArrayDouble::powEqual : on tuple #" << i << " of this value is < 0 (" << *ptr << ") !";
+          throw INTERP_KERNEL::Exception(oss.str().c_str());
+        }
+    }
   declareAsNew();
 }
 
@@ -8094,7 +8234,7 @@ void DataArrayInt::applyRPow(int val) throw(INTERP_KERNEL::Exception)
           int tmp=1;
           for(int j=0;j<*ptr;j++)
             tmp*=val;
-          *ptr=val;
+          *ptr=tmp;
         }
       else
         {
