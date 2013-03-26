@@ -328,6 +328,9 @@ def ParaMEDMEMDataArrayIntTupleImul(self,*args):
 def ParaMEDMEMDataArrayIntTupleIdiv(self,*args):
     import _ParaMEDMEM
     return _ParaMEDMEM.DataArrayIntTuple____idiv___(self, self, *args)
+def ParaMEDMEMDataArrayIntTupleImod(self,*args):
+    import _ParaMEDMEM
+    return _ParaMEDMEM.DataArrayIntTuple____imod___(self, self, *args)
 %}
 
 %include "MEDCouplingFinalize.i"
