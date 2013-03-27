@@ -7442,7 +7442,27 @@ void MEDCouplingUMesh::writeVTKLL(std::ostream& ofs, const std::string& cellData
 
 void MEDCouplingUMesh::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
 {
-  stream << "MEDCouplingUMesh C++ instance at " << this << ". ";
+  stream << "MEDCouplingUMesh C++ instance at " << this << ".";
+  if(_mesh_dim==-2)
+    { stream << " Not set !"; return ; }
+  stream << " Mesh dimension : " << _mesh_dim << ".";
+  if(_mesh_dim==-1)
+    return ;
+  if(!_coords)
+    { stream << " No coordinates set !"; return ; }
+  if(!_coords->isAllocated())
+    { stream << " Coordinates set but not allocated !"; return ; }
+  stream << " Space dimension : " << _coords->getNumberOfComponents() << "." << std::endl;
+  stream << "Number of nodes : " << _coords->getNumberOfTuples() << ".";
+  if(!_nodal_connec_index)
+    { stream << std::endl << "Nodal connectivity NOT set !"; return ; }
+  if(!_nodal_connec_index->isAllocated())
+    { stream << std::endl << "Nodal connectivity set but not allocated !"; return ; }
+  int lgth=_nodal_connec_index->getNumberOfTuples();
+  int cpt=_nodal_connec_index->getNumberOfComponents();
+  if(cpt!=1 || lgth<1)
+    return ;
+  stream << std::endl << "Number of cells : " << lgth-1 << ".";
 }
 
 std::string MEDCouplingUMesh::getVTKDataSetType() const throw(INTERP_KERNEL::Exception)
