@@ -529,7 +529,7 @@ namespace INTERP_KERNEL
   {
     if(_type==NORM_HEXA8)
       {
-        static const int permutation[6]={0,2,3,4,1};
+        static const int permutation[6]={0,2,3,4,5,1};
         return fillSonCellNodalConnectivity2(permutation[sonId],nodalConn,lgth,sonNodalConn,typeOfSon);
       }
     else

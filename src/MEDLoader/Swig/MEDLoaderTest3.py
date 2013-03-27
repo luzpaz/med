@@ -2130,6 +2130,45 @@ class MEDLoaderTest(unittest.TestCase):
         ccCpy=cc.deepCpy()
         self.assertTrue(cc.isEqual(ccCpy,1e-12)[0])
         pass
+
+    def testToExportInExamples1(self):
+        m=MEDCouplingCMesh()
+        arr=DataArrayDouble([0.,1.,2.,3.,4.])
+        m.setCoords(arr,arr)
+        m=m.buildUnstructured() ; m.setName("mesh")
+        grp1=DataArrayInt([0,1,2,4,5,6,8,9,10,12,13,14]) ; grp1.setName("grp1")
+        grp2=DataArrayInt([3,7,11,15]) ; grp2.setName("grp2")
+        m2=m.computeSkin()
+        mm=MEDFileUMesh()
+        mm.setMeshAtLevel(0,m)
+        mm.setMeshAtLevel(-1,m2)
+        mm.setGroupsAtLevel(0,[grp1,grp2])
+        mm.write("example.med",2)
+        #
+        m0=mm.getMeshAtLevel(0)
+        m1=mm.getMeshAtLevel(-1)
+        grp1=mm.getGroupArr(0,"grp1")
+        grp2=mm.getGroupArr(0,"grp2")
+        grps=[grp1,grp2]
+        whichGrp=DataArrayInt(m0.getNumberOfCells())
+        whichGrp.fillWithValue(-1)
+        for grpId,grp in enumerate(grps):
+            whichGrp[grp]=grpId
+            pass
+        a,b,bI,c,cI=m0.buildDescendingConnectivity()
+        e,f=a.areCellsIncludedIn(m1,2)
+        self.assertTrue(e)
+        c2,c2I=MEDCouplingUMesh.ExtractFromIndexedArrays(f,c,cI)
+        self.assertTrue(c2I.deltaShiftIndex().isUniform(1))
+        c2.transformWithIndArr(whichGrp)
+        splitOfM1=len(grps)*[None]
+        for grpId,grp in enumerate(grps):
+            tmp=c2.getIdsEqual(grpId)
+            splitOfM1[grpId]=tmp
+            pass
+        splitOfM1[0].isEqual(DataArrayInt([0,1,2,3,6,8,10,11,12,13]))
+        splitOfM1[1].isEqual(DataArrayInt([4,5,7,9,14,15]))
+        pass
     pass
 
 unittest.main()
