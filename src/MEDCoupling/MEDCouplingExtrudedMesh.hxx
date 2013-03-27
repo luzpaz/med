@@ -100,6 +100,7 @@ namespace ParaMEDMEM
     void serialize(DataArrayInt *&a1, DataArrayDouble *&a2) const;
     void unserialization(const std::vector<double>& tinyInfoD, const std::vector<int>& tinyInfo, const DataArrayInt *a1, DataArrayDouble *a2,
                          const std::vector<std::string>& littleStrings);
+    void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
   private:
     MEDCouplingExtrudedMesh(const MEDCouplingUMesh *mesh3D, const MEDCouplingUMesh *mesh2D, int cell2DId) throw(INTERP_KERNEL::Exception);
     MEDCouplingExtrudedMesh(const MEDCouplingExtrudedMesh& other, bool deepCopy);
@@ -116,7 +117,6 @@ namespace ParaMEDMEM
     void computeBaryCenterOfFace(const std::vector<int>& nodalConnec, int lev1DId);
     ~MEDCouplingExtrudedMesh();
     void writeVTKLL(std::ostream& ofs, const std::string& cellData, const std::string& pointData) const throw(INTERP_KERNEL::Exception);
-    void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
     std::string getVTKDataSetType() const throw(INTERP_KERNEL::Exception);
   private:
     MEDCouplingUMesh *_mesh2D;

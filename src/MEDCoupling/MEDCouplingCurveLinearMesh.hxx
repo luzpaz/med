@@ -86,6 +86,7 @@ namespace ParaMEDMEM
     void serialize(DataArrayInt *&a1, DataArrayDouble *&a2) const;
     void unserialization(const std::vector<double>& tinyInfoD, const std::vector<int>& tinyInfo, const DataArrayInt *a1, DataArrayDouble *a2,
                          const std::vector<std::string>& littleStrings);
+    void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
   private:
     void getMeasureFieldMeshDim1(bool isAbs, MEDCouplingFieldDouble *field) const throw(INTERP_KERNEL::Exception);
     void getMeasureFieldMeshDim2(bool isAbs, MEDCouplingFieldDouble *field) const throw(INTERP_KERNEL::Exception);
@@ -98,7 +99,6 @@ namespace ParaMEDMEM
     MEDCouplingCurveLinearMesh(const MEDCouplingCurveLinearMesh& other, bool deepCpy);
     ~MEDCouplingCurveLinearMesh();
     void writeVTKLL(std::ostream& ofs, const std::string& cellData, const std::string& pointData) const throw(INTERP_KERNEL::Exception);
-    void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
     std::string getVTKDataSetType() const throw(INTERP_KERNEL::Exception);
   private:
     MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> _coords;

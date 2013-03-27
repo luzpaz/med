@@ -2519,6 +2519,13 @@ namespace ParaMEDMEM
         return self->simpleRepr();
       }
       
+      std::string __repr__() const throw(INTERP_KERNEL::Exception)
+      {
+        std::ostringstream oss;
+        self->reprQuickOverview(oss);
+        return oss.str();
+      }
+      
       MEDCouplingUMeshCellIterator *__iter__() throw(INTERP_KERNEL::Exception)
       {
         return self->cellIterator();
@@ -3540,6 +3547,14 @@ namespace ParaMEDMEM
       {
         return self->simpleRepr();
       }
+
+      std::string __repr__() const throw(INTERP_KERNEL::Exception)
+      {
+        std::ostringstream oss;
+        self->reprQuickOverview(oss);
+        return oss.str();
+      }
+      
       PyObject *getMesh2D() const throw(INTERP_KERNEL::Exception)
       {
         MEDCouplingUMesh *ret=self->getMesh2D();
@@ -3595,6 +3610,12 @@ namespace ParaMEDMEM
       {
         return self->simpleRepr();
       }
+      std::string __repr__() const throw(INTERP_KERNEL::Exception)
+      {
+        std::ostringstream oss;
+        self->reprQuickOverview(oss);
+        return oss.str();
+      }
       DataArrayDouble *getCoordsAt(int i) throw(INTERP_KERNEL::Exception)
       {
         DataArrayDouble *ret=self->getCoordsAt(i);
@@ -3625,6 +3646,12 @@ namespace ParaMEDMEM
       std::string __str__() const throw(INTERP_KERNEL::Exception) 
       {
         return self->simpleRepr();
+      }
+      std::string __repr__() const throw(INTERP_KERNEL::Exception)
+      {
+        std::ostringstream oss;
+        self->reprQuickOverview(oss);
+        return oss.str();
       }
       DataArrayDouble *getCoords() throw(INTERP_KERNEL::Exception)
       {
