@@ -6384,9 +6384,13 @@ MEDCouplingMesh *MEDCouplingUMesh::mergeMyselfWith(const MEDCouplingMesh *other)
 }
 
 /*!
- * Returns an array with this->getNumberOfCells() tuples and this->getSpaceDimension() dimension.
- * The false barycenter is computed that is to say barycenter of a cell is computed using average on each
- * components of coordinates of the cell.
+ * This method is ** very badly named ** : This method computes the center of inertia of each cells in \a this.
+ * So this method is not a right choice for degnerated meshes (not well oriented, cells with measure close to zero).
+ *
+ * \return a newly allocated DataArrayDouble instance that the caller has to deal with. The returned 
+ *          DataArrayDouble instance will have \c this->getNumberOfCells() tuples and \c this->getSpaceDimension() components.
+ * 
+ * \sa MEDCouplingUMesh::computeIsoBarycenterOfNodesPerCell
  */
 DataArrayDouble *MEDCouplingUMesh::getBarycenterAndOwner() const
 {
@@ -6404,6 +6408,80 @@ DataArrayDouble *MEDCouplingUMesh::getBarycenterAndOwner() const
       INTERP_KERNEL::NormalizedCellType type=(INTERP_KERNEL::NormalizedCellType)nodal[nodalI[i]];
       INTERP_KERNEL::computeBarycenter2<int,INTERP_KERNEL::ALL_C_MODE>(type,nodal+nodalI[i]+1,nodalI[i+1]-nodalI[i]-1,coor,spaceDim,ptToFill);
       ptToFill+=spaceDim;
+    }
+  return ret.retn();
+}
+
+/*!
+ * This method computes for each cell in \a this, the location of the iso barycenter of nodes constituting
+ * the cell. Contrary to badly named MEDCouplingUMesh::getBarycenterAndOwner method that returns the center of inertia of the 
+ * 
+ * \return a newly allocated DataArrayDouble instance that the caller has to deal with. The returned 
+ *          DataArrayDouble instance will have \c this->getNumberOfCells() tuples and \c this->getSpaceDimension() components.
+ * 
+ * \sa MEDCouplingUMesh::getBarycenterAndOwner
+ * \throw If \a this is not fully defined (coordinates and connectivity)
+ * \throw If there is presence in nodal connectivity in \a this of node ids not in [0, \c this->getNumberOfNodes() )
+ */
+DataArrayDouble *MEDCouplingUMesh::computeIsoBarycenterOfNodesPerCell() const throw(INTERP_KERNEL::Exception)
+{
+  checkFullyDefined();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::New();
+  int spaceDim=getSpaceDimension();
+  int nbOfCells=getNumberOfCells();
+  int nbOfNodes=getNumberOfNodes();
+  ret->alloc(nbOfCells,spaceDim);
+  double *ptToFill=ret->getPointer();
+  const int *nodal=_nodal_connec->getConstPointer();
+  const int *nodalI=_nodal_connec_index->getConstPointer();
+  const double *coor=_coords->getConstPointer();
+  for(int i=0;i<nbOfCells;i++,ptToFill+=spaceDim)
+    {
+      INTERP_KERNEL::NormalizedCellType type=(INTERP_KERNEL::NormalizedCellType)nodal[nodalI[i]];
+      std::fill(ptToFill,ptToFill+spaceDim,0.);
+      if(type!=INTERP_KERNEL::NORM_POLYHED)
+        {
+          for(const int *conn=nodal+nodalI[i]+1;conn!=nodal+nodalI[i+1];conn++)
+            {
+              if(*conn>=0 && *conn<nbOfNodes)
+                std::transform(coor+spaceDim*conn[0],coor+spaceDim*(conn[0]+1),ptToFill,ptToFill,std::plus<double>());
+              else
+                {
+                  std::ostringstream oss; oss << "MEDCouplingUMesh::computeIsoBarycenterOfNodesPerCell : on cell #" << i << " presence of nodeId #" << *conn << " should be in [0," <<   nbOfNodes << ") !";
+                  throw INTERP_KERNEL::Exception(oss.str().c_str());
+                }
+            }
+          int nbOfNodesInCell=nodalI[i+1]-nodalI[i]-1;
+          if(nbOfNodesInCell>0)
+            std::transform(ptToFill,ptToFill+spaceDim,ptToFill,std::bind2nd(std::multiplies<double>(),1./(double)nbOfNodesInCell));
+          else
+            {
+              std::ostringstream oss; oss << "MEDCouplingUMesh::computeIsoBarycenterOfNodesPerCell : on cell #" << i << " presence of cell with no nodes !";
+              throw INTERP_KERNEL::Exception(oss.str().c_str());
+            }
+        }
+      else
+        {
+          std::set<int> s(nodal+nodalI[i]+1,nodal+nodalI[i+1]);
+          s.erase(-1);
+          for(std::set<int>::const_iterator it=s.begin();it!=s.end();it++)
+            {
+              if(*it>=0 && *it<nbOfNodes)
+                std::transform(coor+spaceDim*(*it),coor+spaceDim*((*it)+1),ptToFill,ptToFill,std::plus<double>());
+              else
+                {
+                  std::ostringstream oss; oss << "MEDCouplingUMesh::computeIsoBarycenterOfNodesPerCell : on cell polyhedron cell #" << i << " presence of nodeId #" << *it << " should be in [0," <<   nbOfNodes << ") !";
+                  throw INTERP_KERNEL::Exception(oss.str().c_str());
+                }
+            }
+          if(!s.empty())
+            std::transform(ptToFill,ptToFill+spaceDim,ptToFill,std::bind2nd(std::multiplies<double>(),1./(double)s.size()));
+          else
+            {
+              std::ostringstream oss; oss << "MEDCouplingUMesh::computeIsoBarycenterOfNodesPerCell : on polyhedron cell #" << i << " there are no nodes !";
+              throw INTERP_KERNEL::Exception(oss.str().c_str());
+            }
+        }
     }
   return ret.retn();
 }

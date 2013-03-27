@@ -74,6 +74,7 @@ namespace ParaMEDMEM
     MEDCouplingMesh *mergeMyselfWith(const MEDCouplingMesh *other) const;
     DataArrayDouble *getCoordinatesAndOwner() const;
     DataArrayDouble *getBarycenterAndOwner() const;
+    DataArrayDouble *computeIsoBarycenterOfNodesPerCell() const throw(INTERP_KERNEL::Exception);
     void renumberCells(const int *old2NewBg, bool check=true) throw(INTERP_KERNEL::Exception);
     //some useful methods
     void getSplitCellValues(int *res) const;

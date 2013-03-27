@@ -11839,6 +11839,32 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         d.alloc(1000,3) ; d.fillWithValue(127)
         self.assertTrue(len(d.__repr__())<500)
         pass
+    
+    def testSwig2MeshComputeIsoBarycenterOfNodesPerCell1(self):
+        coo=DataArrayDouble([26.17509821414239,5.0374,200.,26.175098214142388,-5.0374,200.,17.450065476094927,20.1496,200.,8.725032738047464,25.187,200.,43.62516369023732,5.0374,200.,34.90013095218986,10.0748,200.,34.900130952189855,-10.0748,200.,43.625163690237315,-5.0374,200.,26.175098214142402,25.187,200.,26.175098214142395,35.2618,200.,17.45006547609493,40.2992,200.,8.725032738047469,35.2618,200.,26.17509821414239,5.0374,200.,26.175098214142388,-5.0374,200.,17.450065476094927,20.1496,200.,8.725032738047464,25.187,200.,43.62516369023732,5.0374,200.,34.90013095218986,10.0748,200.,34.900130952189855,-10.0748,200.,43.625163690237315,-5.0374,200.,26.175098214142402,25.187,200.,26.175098214142395,35.2618,200.,17.45006547609493,40.2992,200.,8.725032738047469,35.2618,200.],24,3)
+        m=MEDCouplingUMesh.New("toto",3)
+        m.allocateCells(0)
+        m.insertNextCell(NORM_POLYHED,[4,5,0,1,6,7,-1,19,18,13,12,17,16,-1,5,4,16,17,-1,0,5,17,12,-1,1,0,12,13,-1,6,1,13,18,-1,7,6,18,19,-1,4,7,19,16])
+        m.insertNextCell(NORM_POLYHED,[9,10,11,3,2,8,-1,20,14,15,23,22,21,-1,10,9,21,22,-1,11,10,22,23,-1,3,11,23,15,-1,2,3,15,14,-1,8,2,14,20,-1,9,8,20,21])
+        m.setCoords(coo)
+        m.checkCoherency1()
+        #
+        dReference=DataArrayDouble([(34.900130952189848,0.,200),(17.450065476094931,30.2244,200.)])
+        self.assertTrue(m.computeIsoBarycenterOfNodesPerCell().isEqual(dReference,1e-12))
+        m.getNodalConnectivity().setIJ(87,0,24)
+        self.assertRaises(InterpKernelException,m.computeIsoBarycenterOfNodesPerCell)
+        m.getNodalConnectivity().setIJ(87,0,-2)
+        self.assertRaises(InterpKernelException,m.computeIsoBarycenterOfNodesPerCell)
+        m.getNodalConnectivity().setIJ(87,0,21)# put again 21 as at the beginning
+        #
+        self.assertTrue(m.unPolyze())
+        self.assertEqual([NORM_HEXGP12],m.getAllTypes())
+        self.assertTrue(m.computeIsoBarycenterOfNodesPerCell().isEqual(dReference,1e-12))
+        m.getNodalConnectivity().setIJ(25,0,24)
+        self.assertRaises(InterpKernelException,m.computeIsoBarycenterOfNodesPerCell)
+        m.getNodalConnectivity().setIJ(25,0,-1)
+        self.assertRaises(InterpKernelException,m.computeIsoBarycenterOfNodesPerCell)
+        pass
 
     def setUp(self):
         pass

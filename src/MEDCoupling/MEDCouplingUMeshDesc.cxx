@@ -529,3 +529,7 @@ std::string MEDCouplingUMeshDesc::getVTKDataSetType() const throw(INTERP_KERNEL:
   throw INTERP_KERNEL::Exception("MEDCouplingUMeshDesc::getVTKDataSetType : not implemented yet !");
 }
 
+DataArrayDouble *MEDCouplingUMeshDesc::computeIsoBarycenterOfNodesPerCell() const throw(INTERP_KERNEL::Exception)
+{
+  throw INTERP_KERNEL::Exception("MEDCouplingUMeshDesc::computeIsoBarycenterOfNodesPerCell : not implemented yet !");
+}

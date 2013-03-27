@@ -734,8 +734,12 @@ DataArrayDouble *MEDCouplingExtrudedMesh::getCoordinatesAndOwner() const
 
 DataArrayDouble *MEDCouplingExtrudedMesh::getBarycenterAndOwner() const
 {
-  //not yet implemented
-  return 0;
+  throw INTERP_KERNEL::Exception("MEDCouplingExtrudedMesh::getBarycenterAndOwner : not yet implemented !");
+}
+
+DataArrayDouble *MEDCouplingExtrudedMesh::computeIsoBarycenterOfNodesPerCell() const throw(INTERP_KERNEL::Exception)
+{
+  throw INTERP_KERNEL::Exception("MEDCouplingExtrudedMesh::computeIsoBarycenterOfNodesPerCell: not yet implemented !");
 }
 
 void MEDCouplingExtrudedMesh::computeExtrusionAlg(const MEDCouplingUMesh *mesh3D) throw(INTERP_KERNEL::Exception)

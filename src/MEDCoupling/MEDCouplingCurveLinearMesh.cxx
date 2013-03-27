@@ -706,6 +706,11 @@ DataArrayDouble *MEDCouplingCurveLinearMesh::getBarycenterAndOwner() const
     }
 }
 
+DataArrayDouble *MEDCouplingCurveLinearMesh::computeIsoBarycenterOfNodesPerCell() const throw(INTERP_KERNEL::Exception)
+{
+  return MEDCouplingCurveLinearMesh::getBarycenterAndOwner();
+}
+
 /*!
  * \param [in,out] bary Barycenter array feeded with good values.
  * \sa MEDCouplingCurveLinearMesh::getBarycenterAndOwner
