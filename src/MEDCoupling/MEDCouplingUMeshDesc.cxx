@@ -533,3 +533,8 @@ DataArrayDouble *MEDCouplingUMeshDesc::computeIsoBarycenterOfNodesPerCell() cons
 {
   throw INTERP_KERNEL::Exception("MEDCouplingUMeshDesc::computeIsoBarycenterOfNodesPerCell : not implemented yet !");
 }
+
+void MEDCouplingUMeshDesc::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
+{
+  stream << "MEDCouplingUMeshDesc C++ instance at " << this << ".";
+}

@@ -773,6 +773,11 @@ void MEDCouplingCMesh::writeVTKLL(std::ostream& ofs, const std::string& cellData
   ofs << "  </" << getVTKDataSetType() << ">\n";
 }
 
+void MEDCouplingCMesh::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
+{
+  stream << "MEDCouplingCMesh C++ instance at " << this << ".";
+}
+
 std::string MEDCouplingCMesh::getVTKDataSetType() const throw(INTERP_KERNEL::Exception)
 {
   return std::string("RectilinearGrid");

@@ -116,6 +116,7 @@ namespace ParaMEDMEM
     void computeBaryCenterOfFace(const std::vector<int>& nodalConnec, int lev1DId);
     ~MEDCouplingExtrudedMesh();
     void writeVTKLL(std::ostream& ofs, const std::string& cellData, const std::string& pointData) const throw(INTERP_KERNEL::Exception);
+    void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
     std::string getVTKDataSetType() const throw(INTERP_KERNEL::Exception);
   private:
     MEDCouplingUMesh *_mesh2D;

@@ -97,6 +97,7 @@ namespace ParaMEDMEM
     void computeTypes();
     void checkFullyDefined() const throw(INTERP_KERNEL::Exception);
     void writeVTKLL(std::ostream& ofs, const std::string& cellData, const std::string& pointData) const throw(INTERP_KERNEL::Exception);
+    void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
     std::string getVTKDataSetType() const throw(INTERP_KERNEL::Exception);
   private:
     int _mesh_dim;

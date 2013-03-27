@@ -878,6 +878,11 @@ void MEDCouplingCurveLinearMesh::writeVTKLL(std::ostream& ofs, const std::string
   ofs << "  </" << getVTKDataSetType() << ">\n";
 }
 
+void MEDCouplingCurveLinearMesh::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
+{
+  stream << "MEDCouplingCurveLinearMesh C++ instance at " << this << ".";
+}
+
 std::string MEDCouplingCurveLinearMesh::getVTKDataSetType() const throw(INTERP_KERNEL::Exception)
 {
   return std::string("StructuredGrid");

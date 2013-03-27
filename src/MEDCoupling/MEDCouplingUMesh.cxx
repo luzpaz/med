@@ -7440,6 +7440,11 @@ void MEDCouplingUMesh::writeVTKLL(std::ostream& ofs, const std::string& cellData
   ofs << "  </" << getVTKDataSetType() << ">\n";
 }
 
+void MEDCouplingUMesh::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
+{
+  stream << "MEDCouplingUMesh C++ instance at " << this << ". ";
+}
+
 std::string MEDCouplingUMesh::getVTKDataSetType() const throw(INTERP_KERNEL::Exception)
 {
   return std::string("UnstructuredGrid");

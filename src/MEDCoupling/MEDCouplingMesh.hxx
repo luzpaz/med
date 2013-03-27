@@ -135,6 +135,7 @@ namespace ParaMEDMEM
     void writeVTKAdvanced(const char *fileName, const std::string& cda, const std::string& pda) const throw(INTERP_KERNEL::Exception);
     /// @endcond
     virtual void writeVTKLL(std::ostream& ofs, const std::string& cellData, const std::string& pointData) const throw(INTERP_KERNEL::Exception) = 0;
+    virtual void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception) = 0;
   protected:
     MEDCouplingMesh();
     MEDCouplingMesh(const MEDCouplingMesh& other);
