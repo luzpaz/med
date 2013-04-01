@@ -1,3 +1,21 @@
+// Copyright (C) 2007-2013  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 
 // Author : Guillaume Boulant (EDF) 
 
@@ -187,8 +205,8 @@ void DatasourceController::OnAddImagesource()
   int error = system(command.c_str());
   if ( error != 0 ) {
     QMessageBox::critical(_salomeModule->getApp()->desktop(),
-		       tr("Operation failed"),
-		       tr("The creation of med data from the image file failed"));
+           tr("Operation failed"),
+           tr("The creation of med data from the image file failed"));
     return;
   }
 
@@ -279,8 +297,8 @@ void DatasourceController::OnUseInWorkspace() {
     bool isInWorkspace = _studyEditor->getParameterBool(soField,OBJECT_IS_IN_WORKSPACE);
     if ( isInWorkspace ) {
       QMessageBox::warning(_salomeModule->getApp()->desktop(),
-			   tr("Operation not allowed"),
-			   tr("This field is already defined in the workspace"));
+         tr("Operation not allowed"),
+         tr("This field is already defined in the workspace"));
       return;
     }
 
@@ -320,27 +338,27 @@ void DatasourceController::OnUseInWorkspace() {
 
       bool isInWorkspace = _studyEditor->getParameterBool(soField,OBJECT_IS_IN_WORKSPACE);
       if ( !isInWorkspace ) {
-	int fieldId = _studyEditor->getParameterInt(soField,OBJECT_ID);
-	MEDOP::FieldHandler * fieldHandler =
-	  MEDOPFactoryClient::getDataManager()->getFieldHandler(fieldId);
-	DatasourceEvent * event = new DatasourceEvent();
-	event->eventtype = DatasourceEvent::EVENT_IMPORT_OBJECT;
-	XmedDataObject * dataObject = new XmedDataObject();
-	dataObject->setFieldHandler(*fieldHandler);
-	event->objectdata  = dataObject;
-	emit datasourceSignal(event);
-	// Note that this signal is processed by the WorkspaceController
-	
-	// Tag the item to prevent double import
-	_studyEditor->setParameterBool(soField,OBJECT_IS_IN_WORKSPACE,true);
-	// Tag the field as persistent on the server. It means that a
-	// saving of the workspace will save at least this field (maybe it
-	// should be an option?)
-	MEDOPFactoryClient::getDataManager()->markAsPersistent(fieldId, true);
+  int fieldId = _studyEditor->getParameterInt(soField,OBJECT_ID);
+  MEDOP::FieldHandler * fieldHandler =
+    MEDOPFactoryClient::getDataManager()->getFieldHandler(fieldId);
+  DatasourceEvent * event = new DatasourceEvent();
+  event->eventtype = DatasourceEvent::EVENT_IMPORT_OBJECT;
+  XmedDataObject * dataObject = new XmedDataObject();
+  dataObject->setFieldHandler(*fieldHandler);
+  event->objectdata  = dataObject;
+  emit datasourceSignal(event);
+  // Note that this signal is processed by the WorkspaceController
+
+  // Tag the item to prevent double import
+  _studyEditor->setParameterBool(soField,OBJECT_IS_IN_WORKSPACE,true);
+  // Tag the field as persistent on the server. It means that a
+  // saving of the workspace will save at least this field (maybe it
+  // should be an option?)
+  MEDOPFactoryClient::getDataManager()->markAsPersistent(fieldId, true);
       }
       else {
-	STDLOG("The field "<<_studyEditor->getName(soField)<<
-	       " is already defined in the workspace");
+  STDLOG("The field "<<_studyEditor->getName(soField)<<
+         " is already defined in the workspace");
       }
     }
   }

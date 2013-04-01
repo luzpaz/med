@@ -1,7 +1,4 @@
-// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
-//
-// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2007-2013  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -34,7 +31,7 @@
 
 #include "MEDOP.hxx"
 class MEDOP_EXPORT MEDCalculator_i: public POA_MEDOP::MEDCalculator,
-				    public SALOME::GenericObj_i
+            public SALOME::GenericObj_i
 {
 public:
 
@@ -52,7 +49,7 @@ public:
   MEDOP::FieldHandler * dup(const MEDOP::FieldHandler & f_hdl);
 
   MEDOP::FieldHandler * fct(const MEDOP::FieldHandler & f_hdl,
-			    const char * function, CORBA::Long nbResComponents);
+          const char * function, CORBA::Long nbResComponents);
 
   // 
   // ===========================================================
