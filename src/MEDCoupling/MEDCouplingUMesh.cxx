@@ -1006,9 +1006,9 @@ void MEDCouplingUMesh::convertExtrudedPolyhedra() throw(INTERP_KERNEL::Exception
               newc[j]=c[ci[i]+1+n1+(n1-j)%n1];
               newc[n1+5*j]=-1;
               newc[n1+5*j+1]=c[ci[i]+1+j];
-              newc[n1+5*j+2]=c[ci[i]+1+(j+1)%n1];
+              newc[n1+5*j+2]=c[ci[i]+1+j+n1];
               newc[n1+5*j+3]=c[ci[i]+1+(j+1)%n1+n1];
-              newc[n1+5*j+4]=c[ci[i]+1+j+n1];
+              newc[n1+5*j+4]=c[ci[i]+1+(j+1)%n1];
             }
           newc+=n1*6;
         }
