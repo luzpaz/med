@@ -1577,9 +1577,16 @@ void IntermediateMED::orientFaces3D()
                               if ( lfIt2 != linkFacesMap.end() )
                                 {
                                   list<const Cell*> & ff = lfIt2->second;
-                                  ff.erase( find( ff.begin(), ff.end(), badFace ));
-                                  if ( ff.empty() )
-                                    linkFacesMap.erase( lfIt2 );
+                                  list<const Cell*>::iterator lfIt3 = find( ff.begin(), ff.end(), badFace );
+                                  // check if badFace has been found,
+                                  // else we can't erase it
+                                  // case of degenerated face in edge
+                                  if (lfIt3 != ff.end())
+                                    {
+                                      ff.erase( lfIt3 );
+                                      if ( ff.empty() )
+                                        linkFacesMap.erase( lfIt2 );
+                                    }
                                 }
                             }
                           badFace->_reverse = true; // reverse
