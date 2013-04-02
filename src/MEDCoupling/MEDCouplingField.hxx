@@ -84,6 +84,7 @@ namespace ParaMEDMEM
     const MEDCouplingGaussLocalization& getGaussLocalization(int locId) const throw(INTERP_KERNEL::Exception);
     void updateTime() const;
     std::size_t getHeapMemorySize() const;
+    virtual void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception) = 0;
   protected:
     MEDCouplingField(TypeOfField type);
     MEDCouplingField(const MEDCouplingField& other, bool deepCopy=true);

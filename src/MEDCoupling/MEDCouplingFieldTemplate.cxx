@@ -119,3 +119,10 @@ void MEDCouplingFieldTemplate::serialize(DataArrayInt *&dataInt) const
   _type->getSerializationIntArray(dataInt);
 }
 
+void MEDCouplingFieldTemplate::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
+{
+  stream << "MEDCouplingFieldTemplate C++ instance at " << this << ".";
+  const MEDCouplingFieldDiscretization *fd(_type);
+  if(!fd)
+    stream << " No spatial discretization set !";
+}

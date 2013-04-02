@@ -187,6 +187,7 @@ namespace ParaMEDMEM
   public:
     const MEDCouplingTimeDiscretization *getTimeDiscretizationUnderGround() const { return _time_discr; }
     MEDCouplingTimeDiscretization *getTimeDiscretizationUnderGround() { return _time_discr; }
+    void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
   private:
     MEDCouplingFieldDouble(TypeOfField type, TypeOfTimeDiscretization td);
     MEDCouplingFieldDouble(const MEDCouplingFieldTemplate& ft, TypeOfTimeDiscretization td);

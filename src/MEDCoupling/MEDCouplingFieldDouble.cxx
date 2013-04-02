@@ -1830,3 +1830,7 @@ void MEDCouplingFieldDouble::WriteVTK(const char *fileName, const std::vector<co
     }
   m->writeVTKAdvanced(fileName,coss.str(),noss.str());
 }
+
+void MEDCouplingFieldDouble::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
+{
+}
