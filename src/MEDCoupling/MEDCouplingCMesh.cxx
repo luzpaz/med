@@ -776,6 +776,50 @@ void MEDCouplingCMesh::writeVTKLL(std::ostream& ofs, const std::string& cellData
 void MEDCouplingCMesh::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
 {
   stream << "MEDCouplingCMesh C++ instance at " << this << ".";
+  const DataArrayDouble *thisArr[3]={_x_array,_y_array,_z_array};
+  std::ostringstream stream2[3];
+  bool isDef[3];
+  int nbOfCells=1,nbOfNodes=1;
+  for(int i=0;i<3;i++)
+    {
+      isDef[i]=thisArr[i]!=0;
+      if(isDef[i])
+        {    
+          char tmp='X'+i;
+          stream2[i] << tmp << " positions array ";
+          if(!thisArr[i]->isAllocated())
+            stream2[i] << "set but not allocated.";
+          else
+            {
+              int nbCompo=thisArr[i]->getNumberOfComponents();
+              if(nbCompo==1)
+                {
+                  int nbTuples=thisArr[i]->getNumberOfTuples();
+                  if(nbTuples<1)
+                    { stream2[i] << "set and allocated - WARNING number of elements < 1 !"; nbOfCells=-1; nbOfNodes=-1; }
+                  else
+                    {
+                      stream2[i] << "(length=" << nbTuples << ")" << ": ";
+                      thisArr[i]->reprQuickOverviewData(stream2[i],200);
+                      if(nbOfCells!=-1)
+                        { nbOfNodes*=nbTuples; nbOfCells*=nbTuples-1; }
+                    }
+                }
+              else
+                { stream2[i] << "set and allocated - WARNING number of components != 1 !"; nbOfCells=-1; nbOfNodes=-1; }
+            }
+        }
+    }
+  if(!isDef[0] && !isDef[1] && !isDef[2])
+    { stream << " No arrays set !"; return; }
+  if(nbOfCells>=0)
+    { stream << std::endl << "Number of cells : " << nbOfCells << ". Number of nodes : " << nbOfNodes << "."; }
+  for(int i=0;i<3;i++)
+    {
+      if(isDef[i])
+        stream << std::endl << stream2[i].str();
+    }
+    
 }
 
 std::string MEDCouplingCMesh::getVTKDataSetType() const throw(INTERP_KERNEL::Exception)

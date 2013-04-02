@@ -1077,42 +1077,49 @@ void DataArrayDouble::reprQuickOverview(std::ostream& stream) const throw(INTERP
         {
           int nbOfTuples=getNumberOfTuples();
           stream << "Number of tuples : " << nbOfTuples << ". Number of components : " << nbOfCompo << "." << std::endl;
-          const double *data=begin();
-          std::ostringstream oss2; oss2 << "[";
-          oss2.precision(17);
-          std::string oss2Str(oss2.str());
-          bool isFinished=true;
-          for(int i=0;i<nbOfTuples && isFinished;i++)
-            {
-              if(nbOfCompo>1)
-                {
-                  oss2 << "(";
-                  for(int j=0;j<nbOfCompo;j++,data++)
-                    {
-                      oss2 << *data;
-                      if(j!=nbOfCompo-1) oss2 << ", ";
-                    }
-                  oss2 << ")";
-                }
-              else
-                oss2 << *data++;
-              if(i!=nbOfTuples-1) oss2 << ", ";
-              std::string oss3Str(oss2.str());
-              if(oss3Str.length()<MAX_NB_OF_BYTE_IN_REPR)
-                oss2Str=oss3Str;
-              else
-                isFinished=false;
-            }
-          stream << oss2Str;
-          if(!isFinished)
-            stream << "... ";
-          stream << "]";
+          reprQuickOverviewData(stream,MAX_NB_OF_BYTE_IN_REPR);
         }
       else
         stream << "Number of components : 0.";
     }
   else
     stream << "*** No data allocated ****";
+}
+
+void DataArrayDouble::reprQuickOverviewData(std::ostream& stream, std::size_t maxNbOfByteInRepr) const throw(INTERP_KERNEL::Exception)
+{
+  const double *data=begin();
+  int nbOfTuples=getNumberOfTuples();
+  int nbOfCompo=(int)_info_on_compo.size();
+  std::ostringstream oss2; oss2 << "[";
+  oss2.precision(17);
+  std::string oss2Str(oss2.str());
+  bool isFinished=true;
+  for(int i=0;i<nbOfTuples && isFinished;i++)
+    {
+      if(nbOfCompo>1)
+        {
+          oss2 << "(";
+          for(int j=0;j<nbOfCompo;j++,data++)
+            {
+              oss2 << *data;
+              if(j!=nbOfCompo-1) oss2 << ", ";
+            }
+          oss2 << ")";
+        }
+      else
+        oss2 << *data++;
+      if(i!=nbOfTuples-1) oss2 << ", ";
+      std::string oss3Str(oss2.str());
+      if(oss3Str.length()<maxNbOfByteInRepr)
+        oss2Str=oss3Str;
+      else
+        isFinished=false;
+    }
+  stream << oss2Str;
+  if(!isFinished)
+    stream << "... ";
+  stream << "]";
 }
 
 /*!
@@ -5590,41 +5597,48 @@ void DataArrayInt::reprQuickOverview(std::ostream& stream) const throw(INTERP_KE
         {
           int nbOfTuples=getNumberOfTuples();
           stream << "Number of tuples : " << nbOfTuples << ". Number of components : " << nbOfCompo << "." << std::endl;
-          const int *data=begin();
-          std::ostringstream oss2; oss2 << "[";
-          std::string oss2Str(oss2.str());
-          bool isFinished=true;
-          for(int i=0;i<nbOfTuples && isFinished;i++)
-            {
-              if(nbOfCompo>1)
-                {
-                  oss2 << "(";
-                  for(int j=0;j<nbOfCompo;j++,data++)
-                    {
-                      oss2 << *data;
-                      if(j!=nbOfCompo-1) oss2 << ", ";
-                    }
-                  oss2 << ")";
-                }
-              else
-                oss2 << *data++;
-              if(i!=nbOfTuples-1) oss2 << ", ";
-              std::string oss3Str(oss2.str());
-              if(oss3Str.length()<MAX_NB_OF_BYTE_IN_REPR)
-                oss2Str=oss3Str;
-              else
-                isFinished=false;
-            }
-          stream << oss2Str;
-          if(!isFinished)
-            stream << "... ";
-          stream << "]";
+          reprQuickOverviewData(stream,MAX_NB_OF_BYTE_IN_REPR);
         }
       else
         stream << "Number of components : 0.";
     }
   else
     stream << "*** No data allocated ****";
+}
+
+void DataArrayInt::reprQuickOverviewData(std::ostream& stream, std::size_t maxNbOfByteInRepr) const throw(INTERP_KERNEL::Exception)
+{
+  const int *data=begin();
+  int nbOfTuples=getNumberOfTuples();
+  int nbOfCompo=(int)_info_on_compo.size();
+  std::ostringstream oss2; oss2 << "[";
+  std::string oss2Str(oss2.str());
+  bool isFinished=true;
+  for(int i=0;i<nbOfTuples && isFinished;i++)
+    {
+      if(nbOfCompo>1)
+        {
+          oss2 << "(";
+          for(int j=0;j<nbOfCompo;j++,data++)
+            {
+              oss2 << *data;
+              if(j!=nbOfCompo-1) oss2 << ", ";
+            }
+          oss2 << ")";
+        }
+      else
+        oss2 << *data++;
+      if(i!=nbOfTuples-1) oss2 << ", ";
+      std::string oss3Str(oss2.str());
+      if(oss3Str.length()<maxNbOfByteInRepr)
+        oss2Str=oss3Str;
+      else
+        isFinished=false;
+    }
+  stream << oss2Str;
+  if(!isFinished)
+    stream << "... ";
+  stream << "]";
 }
 
 /*!

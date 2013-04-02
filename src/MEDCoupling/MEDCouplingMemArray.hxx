@@ -139,6 +139,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT virtual void reprZipWithoutNameStream(std::ostream& stream) const throw(INTERP_KERNEL::Exception) = 0;
     MEDCOUPLING_EXPORT virtual void reprCppStream(const char *varName, std::ostream& stream) const throw(INTERP_KERNEL::Exception) = 0;
     MEDCOUPLING_EXPORT virtual void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception) = 0;
+    MEDCOUPLING_EXPORT virtual void reprQuickOverviewData(std::ostream& stream, std::size_t maxNbOfByteInRepr) const throw(INTERP_KERNEL::Exception) = 0;
   protected:
     DataArray() { }
   protected:
@@ -197,6 +198,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT void reprZipWithoutNameStream(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void reprCppStream(const char *varName, std::ostream& stream) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void reprQuickOverviewData(std::ostream& stream, std::size_t maxNbOfByteInRepr) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT bool isEqual(const DataArrayDouble& other, double prec) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT bool isEqualIfNotWhy(const DataArrayDouble& other, double prec, std::string& reason) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT bool isEqualWithoutConsideringStr(const DataArrayDouble& other, double prec) const throw(INTERP_KERNEL::Exception);
@@ -419,6 +421,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT void reprZipWithoutNameStream(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void reprCppStream(const char *varName, std::ostream& stream) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void reprQuickOverviewData(std::ostream& stream, std::size_t maxNbOfByteInRepr) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void transformWithIndArr(const int *indArrBg, const int *indArrEnd) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayInt *transformWithIndArrR(const int *indArrBg, const int *indArrEnd) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void splitByValueRange(const int *arrBg, const int *arrEnd,
@@ -703,6 +706,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT void reprZipWithoutNameStream(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void reprCppStream(const char *varName, std::ostream& stream) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void reprQuickOverviewData(std::ostream& stream, std::size_t maxNbOfByteInRepr) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT bool isEqualIfNotWhy(const DataArrayChar& other, std::string& reason) const throw(INTERP_KERNEL::Exception);
   private:
     ~DataArrayByte() { }
@@ -759,6 +763,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT void reprZipWithoutNameStream(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void reprCppStream(const char *varName, std::ostream& stream) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void reprQuickOverviewData(std::ostream& stream, std::size_t maxNbOfByteInRepr) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT bool isEqualIfNotWhy(const DataArrayChar& other, std::string& reason) const throw(INTERP_KERNEL::Exception);
   private:
     ~DataArrayAsciiChar() { }
