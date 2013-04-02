@@ -4893,8 +4893,9 @@ DataArrayInt *MEDCouplingUMesh::simplexize(int policy) throw(INTERP_KERNEL::Exce
 bool MEDCouplingUMesh::areOnlySimplexCells() const throw(INTERP_KERNEL::Exception)
 {
   checkFullyDefined();
-  if(getMeshDimension()<1)
-    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::areOnlySimplexCells : only available with meshes having a meshdim >= 1 !");
+  int mdim=getMeshDimension();
+  if(mdim<1 || mdim>3)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::areOnlySimplexCells : only available with meshes having a meshdim 1, 2 or 3 !");
   int nbCells=getNumberOfCells();
   const int *conn=_nodal_connec->getConstPointer();
   const int *connI=_nodal_connec_index->getConstPointer();
