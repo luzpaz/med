@@ -7933,9 +7933,16 @@ namespace ParaMEDMEM
          }
          
          std::string __str__() const throw(INTERP_KERNEL::Exception)
-           {
-             return self->simpleRepr();
-           }
+         {
+           return self->simpleRepr();
+         }
+         
+         std::string __repr__() const throw(INTERP_KERNEL::Exception)
+         {
+           std::ostringstream oss;
+           self->reprQuickOverview(oss);
+           return oss.str();
+         }
        }
   };
   
@@ -8051,6 +8058,13 @@ namespace ParaMEDMEM
       std::string __str__() const throw(INTERP_KERNEL::Exception)
       {
         return self->simpleRepr();
+      }
+
+      std::string __repr__() const throw(INTERP_KERNEL::Exception)
+      {
+        std::ostringstream oss;
+        self->reprQuickOverview(oss);
+        return oss.str();
       }
 
       DataArrayDouble *getArray() throw(INTERP_KERNEL::Exception)

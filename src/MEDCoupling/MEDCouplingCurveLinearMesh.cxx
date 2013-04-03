@@ -889,7 +889,7 @@ void MEDCouplingCurveLinearMesh::writeVTKLL(std::ostream& ofs, const std::string
 
 void MEDCouplingCurveLinearMesh::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
 {
-  stream << "MEDCouplingCurveLinearMesh C++ instance at " << this << "." << std::endl;
+  stream << "MEDCouplingCurveLinearMesh C++ instance at " << this << ". Name : \"" << getName() << "\".";
   stream << "Nodal structure : [";
   for(std::size_t i=0;i<_structure.size();i++)
     {

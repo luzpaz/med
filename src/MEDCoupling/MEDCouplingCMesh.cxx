@@ -775,7 +775,7 @@ void MEDCouplingCMesh::writeVTKLL(std::ostream& ofs, const std::string& cellData
 
 void MEDCouplingCMesh::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
 {
-  stream << "MEDCouplingCMesh C++ instance at " << this << ".";
+  stream << "MEDCouplingCMesh C++ instance at " << this << ". Name : \"" << getName() << "\".";
   const DataArrayDouble *thisArr[3]={_x_array,_y_array,_z_array};
   std::ostringstream stream2[3];
   bool isDef[3];

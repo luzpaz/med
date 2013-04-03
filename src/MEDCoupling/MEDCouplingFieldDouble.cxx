@@ -1846,4 +1846,5 @@ void MEDCouplingFieldDouble::WriteVTK(const char *fileName, const std::vector<co
 
 void MEDCouplingFieldDouble::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
 {
+  stream << "MEDCouplingFieldDouble C++ instance at " << this << ". Name : \"" << _name << "\"." << std::endl;
 }

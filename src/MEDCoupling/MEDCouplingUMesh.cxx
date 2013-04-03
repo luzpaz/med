@@ -2629,7 +2629,10 @@ std::string MEDCouplingUMesh::simpleRepr() const
   double tt=getTime(tmpp1,tmpp2);
   ret << "Time attached to the mesh [unit] : " << tt << " [" << getTimeUnit() << "]\n";
   ret << "Iteration : " << tmpp1  << " Order : " << tmpp2 << "\n";
-  ret << "Mesh dimension : " << _mesh_dim << "\nSpace dimension : ";
+  if(_mesh_dim>=-1)
+    { ret << "Mesh dimension : " << _mesh_dim << "\nSpace dimension : "; }
+  else
+    { ret << " Mesh dimension has not been set or is invalid !"; }
   if(_coords!=0)
     {
       const int spaceDim=getSpaceDimension();
@@ -7443,7 +7446,7 @@ void MEDCouplingUMesh::writeVTKLL(std::ostream& ofs, const std::string& cellData
 
 void MEDCouplingUMesh::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
 {
-  stream << "MEDCouplingUMesh C++ instance at " << this << ".";
+  stream << "MEDCouplingUMesh C++ instance at " << this << ". Name : \"" << getName() << "\".";
   if(_mesh_dim==-2)
     { stream << " Not set !"; return ; }
   stream << " Mesh dimension : " << _mesh_dim << ".";

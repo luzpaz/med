@@ -124,7 +124,7 @@ void MEDCouplingFieldTemplate::serialize(DataArrayInt *&dataInt) const
 
 void MEDCouplingFieldTemplate::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
 {
-  stream << "MEDCouplingFieldTemplate C++ instance at " << this << "." << std::endl;
+  stream << "MEDCouplingFieldTemplate C++ instance at " << this << ". Name : \"" << _name << "\"." << std::endl;
   const char *nat=0;
   try
     {
@@ -141,4 +141,11 @@ void MEDCouplingFieldTemplate::reprQuickOverview(std::ostream& stream) const thr
   stream << std::endl;
   if(!_mesh)
     stream << "No mesh support defined !";
+  else
+    {
+      std::ostringstream oss;
+      _mesh->reprQuickOverview(oss);
+      std::string tmp(oss.str());
+      stream << "Mesh info : " << tmp.substr(0,tmp.find('\n'));
+    }
 }
