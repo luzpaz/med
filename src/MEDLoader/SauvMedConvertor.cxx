@@ -2383,7 +2383,7 @@ int DoubleField::setValues( double * valPtr, const int iSub, const int elemShift
     THROW_IK_EXCEPTION("SauvMedConvertor.cxx: support size mismatches field size");
   // compute nb values in previous subs
   int valsShift = 0;
-  for ( int iS = iSub-1, shift = elemShift; shift > 0; )
+  for ( int iS = iSub-1, shift = elemShift; shift > 0; --iS)
   {
     int nbE = _sub[iS]._support->size();
     shift -= nbE;
