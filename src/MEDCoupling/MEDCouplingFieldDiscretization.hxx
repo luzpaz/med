@@ -98,6 +98,7 @@ namespace ParaMEDMEM
     virtual std::set<int> getGaussLocalizationIdsOfOneType(INTERP_KERNEL::NormalizedCellType type) const throw(INTERP_KERNEL::Exception);
     virtual void getCellIdsHavingGaussLocalization(int locId, std::vector<int>& cellIds) const throw(INTERP_KERNEL::Exception);
     virtual const MEDCouplingGaussLocalization& getGaussLocalization(int locId) const throw(INTERP_KERNEL::Exception);
+    virtual void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception) = 0;
     virtual ~MEDCouplingFieldDiscretization();
   protected:
     MEDCouplingFieldDiscretization();
@@ -135,6 +136,7 @@ namespace ParaMEDMEM
     void renumberValuesOnCellsR(const MEDCouplingMesh *mesh, const int *new2old, int newSz, DataArrayDouble *arr) const;
     MEDCouplingMesh *buildSubMeshData(const MEDCouplingMesh *mesh, const int *start, const int *end, DataArrayInt *&di) const;
     DataArrayInt *computeTupleIdsToSelectFromCellIds(const MEDCouplingMesh *mesh, const int *startCellIds, const int *endCellIds) const;
+    void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
   public:
     static const char REPR[];
     static const TypeOfField TYPE;
@@ -173,6 +175,7 @@ namespace ParaMEDMEM
     MEDCouplingFieldDouble *getMeasureField(const MEDCouplingMesh *mesh, bool isAbs) const;
     void getValueOn(const DataArrayDouble *arr, const MEDCouplingMesh *mesh, const double *loc, double *res) const;
     DataArrayDouble *getValueOnMulti(const DataArrayDouble *arr, const MEDCouplingMesh *mesh, const double *loc, int nbOfPoints) const;
+    void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
   public:
     static const char REPR[];
     static const TypeOfField TYPE;
@@ -257,6 +260,7 @@ namespace ParaMEDMEM
     void getCellIdsHavingGaussLocalization(int locId, std::vector<int>& cellIds) const throw(INTERP_KERNEL::Exception);
     const MEDCouplingGaussLocalization& getGaussLocalization(int locId) const throw(INTERP_KERNEL::Exception);
     DataArrayInt *buildNbOfGaussPointPerCellField() const throw(INTERP_KERNEL::Exception);
+    void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
   protected:
     MEDCouplingFieldDiscretizationGauss(const MEDCouplingFieldDiscretizationGauss& other, const int *startCellIds=0, const int *endCellIds=0);
     void zipGaussLocalizations();
@@ -302,6 +306,7 @@ namespace ParaMEDMEM
     void renumberValuesOnNodes(double epsOnVals, const int *old2New, int newNbOfNodes, DataArrayDouble *arr) const;
     void renumberValuesOnCells(double epsOnVals, const MEDCouplingMesh *mesh, const int *old2New, int newSz, DataArrayDouble *arr) const;
     void renumberValuesOnCellsR(const MEDCouplingMesh *mesh, const int *new2old, int newSz, DataArrayDouble *arr) const;
+    void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
     static const double *GetWeightArrayFromGeometricType(INTERP_KERNEL::NormalizedCellType geoType, std::size_t& lgth) throw(INTERP_KERNEL::Exception);
     static const double *GetRefCoordsFromGeometricType(INTERP_KERNEL::NormalizedCellType geoType, std::size_t& lgth) throw(INTERP_KERNEL::Exception);
   protected:
@@ -358,6 +363,7 @@ namespace ParaMEDMEM
     MEDCouplingFieldDouble *getMeasureField(const MEDCouplingMesh *mesh, bool isAbs) const;
     void getValueOn(const DataArrayDouble *arr, const MEDCouplingMesh *mesh, const double *loc, double *res) const;
     DataArrayDouble *getValueOnMulti(const DataArrayDouble *arr, const MEDCouplingMesh *mesh, const double *loc, int nbOfPoints) const;
+    void reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception);
   public://specific part
     DataArrayDouble *computeVectorOfCoefficients(const MEDCouplingMesh *mesh, const DataArrayDouble *arr, int& isDrift) const;
   protected:

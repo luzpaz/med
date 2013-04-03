@@ -121,8 +121,21 @@ void MEDCouplingFieldTemplate::serialize(DataArrayInt *&dataInt) const
 
 void MEDCouplingFieldTemplate::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
 {
-  stream << "MEDCouplingFieldTemplate C++ instance at " << this << ".";
+  stream << "MEDCouplingFieldTemplate C++ instance at " << this << "." << std::endl;
+  const char *nat=0;
+  try
+    {
+      nat=MEDCouplingNatureOfField::GetRepr(_nature);
+      stream << "Nature of field : " << nat << ".\n";
+    }
+  catch(INTERP_KERNEL::Exception& e)
+    {  }
   const MEDCouplingFieldDiscretization *fd(_type);
   if(!fd)
     stream << " No spatial discretization set !";
+  else
+    fd->reprQuickOverview(stream);
+  stream << std::endl;
+  if(!_mesh)
+    stream << "No mesh support defined !";
 }

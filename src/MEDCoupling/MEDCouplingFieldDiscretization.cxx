@@ -493,6 +493,11 @@ void MEDCouplingFieldDiscretizationP0::computeMeshRestrictionFromTupleIds(const 
   trueTupleRestriction=tmp2.retn();
 }
 
+void MEDCouplingFieldDiscretizationP0::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
+{
+  stream << "P0 spatial discretization.";
+}
+
 void MEDCouplingFieldDiscretizationP0::checkCompatibilityWithNature(NatureOfField nat) const throw(INTERP_KERNEL::Exception)
 {
 }
@@ -826,6 +831,11 @@ DataArrayDouble *MEDCouplingFieldDiscretizationP1::getValueOnMulti(const DataArr
         throw INTERP_KERNEL::Exception(oss.str().c_str());
       }
   return ret.retn();
+}
+
+void MEDCouplingFieldDiscretizationP1::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
+{
+  stream << "P1 spatial discretization.";
 }
 
 MEDCouplingFieldDiscretizationPerCell::MEDCouplingFieldDiscretizationPerCell():_discr_per_cell(0)
@@ -1582,6 +1592,11 @@ DataArrayInt *MEDCouplingFieldDiscretizationGauss::buildNbOfGaussPointPerCellFie
   return ret.retn();
 }
 
+void MEDCouplingFieldDiscretizationGauss::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
+{
+  stream << "Gauss points spatial discretization.";
+}
+
 /*!
  * This method makes the assumption that _discr_per_cell is set.
  * This method reduces as much as possible number size of _loc.
@@ -2024,6 +2039,11 @@ void MEDCouplingFieldDiscretizationGaussNE::renumberValuesOnCellsR(const MEDCoup
   throw INTERP_KERNEL::Exception("Not implemented yet !");
 }
 
+void MEDCouplingFieldDiscretizationGaussNE::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
+{
+  stream << "Gauss points on nodes per element spatial discretization.";
+}
+
 MEDCouplingFieldDiscretizationGaussNE::MEDCouplingFieldDiscretizationGaussNE(const MEDCouplingFieldDiscretizationGaussNE& other):MEDCouplingFieldDiscretization(other)
 {
 }
@@ -2113,6 +2133,11 @@ DataArrayDouble *MEDCouplingFieldDiscretizationKriging::getValueOnMulti(const Da
   ret->alloc(nbOfTargetPoints,nbOfCompo);
   INTERP_KERNEL::matrixProduct(KnewiK->getConstPointer(),1,nbOfPts+delta,matrix3->getConstPointer(),nbOfPts+delta,nbOfTargetPoints*nbOfCompo,ret->getPointer());
   return ret.retn();
+}
+
+void MEDCouplingFieldDiscretizationKriging::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
+{
+  stream << "Kriging spatial discretization.";
 }
 
 /*!
