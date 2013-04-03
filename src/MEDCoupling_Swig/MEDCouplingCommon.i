@@ -521,6 +521,21 @@ namespace ParaMEDMEM
     }
   }
 
+  %extend MEDCouplingGaussLocalization
+  {
+    std::string __str__() const throw(INTERP_KERNEL::Exception)
+    {
+      return self->getStringRepr();
+    }
+
+    std::string __repr__() const throw(INTERP_KERNEL::Exception)
+    {
+      std::ostringstream oss; oss << "MEDCouplingGaussLocalization C++ instance at " << self << "." << std::endl;
+      oss << self->getStringRepr();
+      return oss.str();
+    }
+  }
+
   class MEDCouplingMesh : public RefCountObject, public TimeLabel
   {
   public:

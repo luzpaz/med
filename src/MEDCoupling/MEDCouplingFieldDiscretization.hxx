@@ -191,6 +191,7 @@ namespace ParaMEDMEM
   {
   public:
     const DataArrayInt *getArrayOfDiscIds() const;
+    void setArrayOfDiscIds(const DataArrayInt *adids) throw(INTERP_KERNEL::Exception);
     void checkNoOrphanCells() const throw(INTERP_KERNEL::Exception);
     std::vector<DataArrayInt *> splitIntoSingleGaussDicrPerCellType(std::vector< int >& locIds) const throw(INTERP_KERNEL::Exception);
   protected:
@@ -252,6 +253,8 @@ namespace ParaMEDMEM
     void setGaussLocalizationOnCells(const MEDCouplingMesh *m, const int *begin, const int *end, const std::vector<double>& refCoo,
                                      const std::vector<double>& gsCoo, const std::vector<double>& wg) throw(INTERP_KERNEL::Exception);
     void clearGaussLocalizations() throw(INTERP_KERNEL::Exception);
+    void setGaussLocalization(int locId, const MEDCouplingGaussLocalization& loc) throw(INTERP_KERNEL::Exception);
+    void resizeLocalizationVector(int newSz) throw(INTERP_KERNEL::Exception);
     MEDCouplingGaussLocalization& getGaussLocalization(int locId) throw(INTERP_KERNEL::Exception);
     int getNbOfGaussLocalization() const throw(INTERP_KERNEL::Exception);
     int getGaussLocalizationIdOfOneCell(int cellId) const throw(INTERP_KERNEL::Exception);

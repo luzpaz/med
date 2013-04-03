@@ -195,6 +195,7 @@ void MEDCouplingField::setMesh(const MEDCouplingMesh *mesh)
       if(_mesh)
         _mesh->decrRef();
       _mesh=mesh;
+      declareAsNew();
       if(_mesh)
         {
           _mesh->incrRef();

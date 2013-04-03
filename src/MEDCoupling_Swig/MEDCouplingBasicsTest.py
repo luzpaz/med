@@ -11903,6 +11903,37 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(d.isEqual(DataArrayInt([0,0,0,0,0,0])))
         self.assertTrue(e.isEqual(DataArrayInt([0,1,2,3,4,5,6])))
         pass
+    
+    def testSwigAdvGauss(self):
+        f=MEDCouplingFieldTemplate(ON_GAUSS_PT)
+        f.setDiscretization(None)
+        f.__repr__() ; f.__str__()
+        #
+        f=MEDCouplingFieldTemplate(ON_GAUSS_PT)
+        d=f.getDiscretization()
+        i=DataArrayInt() ; i.alloc(10,1) ; i.iota(1)
+        d.setArrayOfDiscIds(i)
+        f.__repr__() ; f.__str__()
+        i2=d.getArrayOfDiscIds()
+        self.assertEqual(i.__repr__(),i2.__repr__())
+        #
+        f=MEDCouplingFieldDouble(ON_GAUSS_PT)
+        f.setDiscretization(None)
+        f.__repr__() ; f.__str__()
+        #
+        f=MEDCouplingFieldDouble(ON_GAUSS_PT)
+        d=f.getDiscretization()
+        i=DataArrayInt() ; i.alloc(10,1) ; i.iota(1)
+        d.setArrayOfDiscIds(i)
+        f.__repr__() ; f.__str__()
+        #
+        gl=MEDCouplingGaussLocalization(NORM_SEG2,[0,1],[0.5],[1.])
+        gl.setWeights([3.])
+        gl.__repr__() ; gl.__str__()
+        gl=MEDCouplingGaussLocalization(NORM_ERROR)
+        gl.setWeights([3.])
+        gl.__repr__() ; gl.__str__()
+        pass
 
     def setUp(self):
         pass

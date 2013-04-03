@@ -213,17 +213,30 @@ std::string MEDCouplingFieldDouble::simpleRepr() const
   std::ostringstream ret;
   ret << "FieldDouble with name : \"" << getName() << "\"\n";
   ret << "Description of field is : \"" << getDescription() << "\"\n";
-  ret << "FieldDouble space discretization is : " << _type->getStringRepr() << "\n";
-  ret << "FieldDouble time discretization is : " << _time_discr->getStringRepr() << "\n";
-  ret << "FieldDouble nature of field is : " << MEDCouplingNatureOfField::GetRepr(_nature) << "\n";
+  if(_type)
+    { ret << "FieldDouble space discretization is : " << _type->getStringRepr() << "\n"; }
+  else
+    { ret << "FieldDouble has no spatial discretization !\n"; }
+  if(_time_discr)
+    { ret << "FieldDouble time discretization is : " << _time_discr->getStringRepr() << "\n"; }
+  else
+    { ret << "FieldDouble has no time discretization !\n"; }
+  ret << "FieldDouble nature of field is : \"" << MEDCouplingNatureOfField::GetReprNoThrow(_nature) << "\"\n";
   if(getArray())
     {
-      int nbOfCompo=getArray()->getNumberOfComponents();
-      ret << "FieldDouble default array has " << nbOfCompo << " components and " << getArray()->getNumberOfTuples() << " tuples.\n";
-      ret << "FieldDouble default array has following info on components : ";
-      for(int i=0;i<nbOfCompo;i++)
-        ret << "\"" << getArray()->getInfoOnComponent(i) << "\" ";
-      ret << "\n";
+      if(getArray()->isAllocated())
+        {
+          int nbOfCompo=getArray()->getNumberOfComponents();
+          ret << "FieldDouble default array has " << nbOfCompo << " components and " << getArray()->getNumberOfTuples() << " tuples.\n";
+          ret << "FieldDouble default array has following info on components : ";
+          for(int i=0;i<nbOfCompo;i++)
+            ret << "\"" << getArray()->getInfoOnComponent(i) << "\" ";
+          ret << "\n";
+        }
+      else
+        {
+          ret << "Array set but not allocated !\n";
+        }
     }
   if(_mesh)
     ret << "Mesh support information :\n__________________________\n" << _mesh->simpleRepr();

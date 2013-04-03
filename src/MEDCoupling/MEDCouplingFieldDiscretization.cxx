@@ -978,6 +978,19 @@ const DataArrayInt *MEDCouplingFieldDiscretizationPerCell::getArrayOfDiscIds() c
   return _discr_per_cell;
 }
 
+void MEDCouplingFieldDiscretizationPerCell::setArrayOfDiscIds(const DataArrayInt *adids) throw(INTERP_KERNEL::Exception)
+{
+  if(adids!=_discr_per_cell)
+    {
+      if(_discr_per_cell)
+        _discr_per_cell->decrRef();
+      _discr_per_cell=const_cast<DataArrayInt *>(adids);
+      if(_discr_per_cell)
+        _discr_per_cell->incrRef();
+      declareAsNew();
+    }
+}
+
 MEDCouplingFieldDiscretizationGauss::MEDCouplingFieldDiscretizationGauss()
 {
 }
@@ -1492,6 +1505,25 @@ void MEDCouplingFieldDiscretizationGauss::clearGaussLocalizations() throw(INTERP
       _discr_per_cell=0;
     }
   _loc.clear();
+}
+
+void MEDCouplingFieldDiscretizationGauss::setGaussLocalization(int locId, const MEDCouplingGaussLocalization& loc) throw(INTERP_KERNEL::Exception)
+{
+  if(locId<0)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationGauss::setGaussLocalization : localization id has to be >=0 !");
+  int sz=(int)_loc.size();
+  MEDCouplingGaussLocalization gLoc(INTERP_KERNEL::NORM_ERROR);
+  if(locId>=sz)
+    _loc.resize(locId+1,gLoc);
+  _loc[locId]=loc;
+}
+
+void MEDCouplingFieldDiscretizationGauss::resizeLocalizationVector(int newSz) throw(INTERP_KERNEL::Exception)
+{
+  if(newSz<0)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationGauss::resizeLocalizationVector : new size has to be >=0 !");
+  MEDCouplingGaussLocalization gLoc(INTERP_KERNEL::NORM_ERROR);
+  _loc.resize(newSz,gLoc);
 }
 
 MEDCouplingGaussLocalization& MEDCouplingFieldDiscretizationGauss::getGaussLocalization(int locId) throw(INTERP_KERNEL::Exception)
@@ -2242,4 +2274,3 @@ DataArrayDouble *MEDCouplingFieldDiscretizationKriging::performDrift(const DataA
   //
   return ret.retn();
 }
-
