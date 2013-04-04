@@ -374,6 +374,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::MEDCouplingMultiFields::deepCpy;
 %newobject ParaMEDMEM::MEDCouplingFieldOverTime::New;
 
+%feature("unref") DataArray "$this->decrRef();"
 %feature("unref") DataArrayDouble "$this->decrRef();"
 %feature("unref") MEDCouplingPointSet "$this->decrRef();"
 %feature("unref") MEDCouplingMesh "$this->decrRef();"
