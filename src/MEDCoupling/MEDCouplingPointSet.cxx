@@ -244,9 +244,9 @@ void MEDCouplingPointSet::getCoordinatesOfNode(int nodeId, std::vector<double>& 
  * permutation to remove duplicated nodes.
  *  \param [in] precision - minimal absolute distance between two nodes at which they are
  *              considered not coincident.
- *  \param [in] limitNodeId - limit node id. Nodes with id strictly lower than \a 
- *              limitTupleId are \b not considered. Put -1 to this parameter to have
- *              all nodes treated.
+ *  \param [in] limitNodeId - limit node id. If all nodes within a group of coincident
+ *              nodes have id strictly lower than \a limitTupleId then they are not
+ *              returned. Put -1 to this parameter to have all nodes returned.
  *  \param [out] areNodesMerged - is set to \a true if any coincident nodes found.
  *  \param [out] newNbOfNodes - returns number of unique nodes.
  *  \return DataArrayInt * - the permutation array in "Old to New" mode. For more 
@@ -272,9 +272,9 @@ DataArrayInt *MEDCouplingPointSet::buildPermArrayForMergeNode(double precision, 
  * A pair of arrays (\a comm, \a commIndex) is called "Surjective Format 2".
  *  \param [in] prec - minimal absolute distance between two nodes at which they are
  *              considered not coincident.
- *  \param [in] limitNodeId - limit node id. Nodes with id strictly lower than \a 
- *              limitTupleId are \b not considered. Put -1 to this parameter to have
- *              all nodes treated.
+ *  \param [in] limitNodeId - limit node id. If all nodes within a group of coincident
+ *              nodes have id strictly lower than \a limitTupleId then they are not
+ *              returned. Put -1 to this parameter to have all nodes treated.
  *  \param [out] comm - the array holding ids of coincident nodes.
  *               \a comm->getNumberOfComponents() == 1. 
  *               \a comm->getNumberOfTuples() == \a commIndex->back(). The caller
@@ -471,9 +471,9 @@ double MEDCouplingPointSet::getCaracteristicDimension() const
  * This method recenter coordinates of nodes in \b this in order to be centered at the origin to benefit about the advantages of the precision to be around the box
  * around origin of 'radius' 1.
  *
+ * \warning this method is non const and alterates coordinates in \b this without modifying.
  * \param [in] eps absolute epsilon. under that value of delta between max and min no scale is performed.
  *
- * \warning this method is non const and alterates coordinates in \b this without modifying.
  */
 void MEDCouplingPointSet::recenterForMaxPrecision(double eps) throw(INTERP_KERNEL::Exception)
 {
