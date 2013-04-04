@@ -80,6 +80,8 @@ std::string MEDCouplingFieldTemplate::advancedRepr() const
 
 void MEDCouplingFieldTemplate::getTinySerializationIntInformation(std::vector<int>& tinyInfo) const
 {
+  if(!((const MEDCouplingFieldDiscretization *)_type))
+    throw INTERP_KERNEL::Exception("No spatial discretization underlying this field to perform getTinySerializationIntInformation !");
   tinyInfo.clear();
   tinyInfo.push_back((int)_type->getEnum());
   tinyInfo.push_back((int)_nature);
@@ -91,6 +93,8 @@ void MEDCouplingFieldTemplate::getTinySerializationIntInformation(std::vector<in
 
 void MEDCouplingFieldTemplate::getTinySerializationDbleInformation(std::vector<double>& tinyInfo) const
 {
+  if(!((const MEDCouplingFieldDiscretization *)_type))
+    throw INTERP_KERNEL::Exception("No spatial discretization underlying this field to perform getTinySerializationDbleInformation !");
   tinyInfo.clear();
   _type->getTinySerializationDbleInformation(tinyInfo);
 }
@@ -104,6 +108,8 @@ void MEDCouplingFieldTemplate::getTinySerializationStrInformation(std::vector<st
 
 void MEDCouplingFieldTemplate::resizeForUnserialization(const std::vector<int>& tinyInfoI, DataArrayInt *&dataInt)
 {
+  if(!((const MEDCouplingFieldDiscretization *)_type))
+    throw INTERP_KERNEL::Exception("No spatial discretization underlying this field to perform resizeForUnserialization !");
   dataInt=0;
   std::vector<int> tinyInfoITmp(tinyInfoI.begin()+2,tinyInfoI.end());
   _type->resizeForUnserialization(tinyInfoITmp,dataInt);
@@ -111,6 +117,8 @@ void MEDCouplingFieldTemplate::resizeForUnserialization(const std::vector<int>& 
 
 void MEDCouplingFieldTemplate::finishUnserialization(const std::vector<int>& tinyInfoI, const std::vector<double>& tinyInfoD, const std::vector<std::string>& tinyInfoS)
 {
+  if(!((const MEDCouplingFieldDiscretization *)_type))
+    throw INTERP_KERNEL::Exception("No spatial discretization underlying this field to perform finishUnserialization !");
   _nature=(NatureOfField)tinyInfoI[1];
   _type->finishUnserialization(tinyInfoD);
   _name=tinyInfoS[0];
