@@ -142,6 +142,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT virtual void reprQuickOverviewData(std::ostream& stream, std::size_t maxNbOfByteInRepr) const throw(INTERP_KERNEL::Exception) = 0;
   protected:
     DataArray() { }
+    ~DataArray() { }
   protected:
     static void CheckValueInRange(int ref, int value, const char *msg) throw(INTERP_KERNEL::Exception);
     static void CheckValueInRangeEx(int value, int start, int end, const char *msg) throw(INTERP_KERNEL::Exception);
