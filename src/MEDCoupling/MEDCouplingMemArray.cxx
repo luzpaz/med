@@ -383,10 +383,10 @@ std::string DataArray::GetUnitFromInfo(const std::string& info) throw(INTERP_KER
  * Sets information on a component specified by an index.
  * To know more on format of this information
  * see \ref MEDCouplingArrayBasicsCompoName "DataArrays infos".
+ *  \warning Don't pass NULL as \a info!
  *  \param [in] i - the index (zero based) of the component of interest.
  *  \param [in] info - the string containing the information.
  *  \throw If \a i is not a valid component index.
- *  \warning Don't pass NULL as \a info!
  */
 void DataArray::setInfoOnComponent(int i, const char *info) throw(INTERP_KERNEL::Exception)
 {
@@ -655,7 +655,8 @@ bool DataArrayDouble::empty() const throw(INTERP_KERNEL::Exception)
 /*!
  * Returns a full copy of \a this. For more info on copying data arrays see
  * \ref MEDCouplingArrayBasicsCopyDeep.
- *  \return DataArrayDouble * - a new instance of DataArrayDouble.
+ *  \return DataArrayDouble * - a new instance of DataArrayDouble. The caller is to
+ *          delete this array using decrRef() as it is no more needed. 
  */
 DataArrayDouble *DataArrayDouble::deepCpy() const throw(INTERP_KERNEL::Exception)
 {
@@ -1199,10 +1200,10 @@ DataArrayInt *DataArrayDouble::convertToIntArr() const
  * arranged in memory. If \a this array holds 2 components of 3 values:
  * \f$ x_0,x_1,x_2,y_0,y_1,y_2 \f$, then the result array holds these values arranged
  * as follows: \f$ x_0,y_0,x_1,y_1,x_2,y_2 \f$.
+ *  \warning Do not confuse this method with transpose()!
  *  \return DataArrayDouble * - the new instance of DataArrayDouble that the caller
  *          is to delete using decrRef() as it is no more needed.
  *  \throw If \a this is not allocated.
- *  \warning Do not confuse this method with transpose()!
  */
 DataArrayDouble *DataArrayDouble::fromNoInterlace() const throw(INTERP_KERNEL::Exception)
 {
@@ -1219,10 +1220,10 @@ DataArrayDouble *DataArrayDouble::fromNoInterlace() const throw(INTERP_KERNEL::E
  * arranged in memory. If \a this array holds 2 components of 3 values:
  * \f$ x_0,y_0,x_1,y_1,x_2,y_2 \f$, then the result array holds these values arranged
  * as follows: \f$ x_0,x_1,x_2,y_0,y_1,y_2 \f$.
+ *  \warning Do not confuse this method with transpose()!
  *  \return DataArrayDouble * - the new instance of DataArrayDouble that the caller
  *          is to delete using decrRef() as it is no more needed.
  *  \throw If \a this is not allocated.
- *  \warning Do not confuse this method with transpose()!
  */
 DataArrayDouble *DataArrayDouble::toNoInterlace() const throw(INTERP_KERNEL::Exception)
 {
@@ -1614,6 +1615,7 @@ DataArrayDouble *DataArrayDouble::changeNbOfComponents(int newNbOfComp, double d
 /*!
  * Changes the number of components within \a this array so that its raw data **does
  * not** change, instead splitting this data into tuples changes.
+ *  \warning This method erases all (name and unit) component info set before!
  *  \param [in] newNbOfComp - number of components for \a this array to have.
  *  \throw If \a this is not allocated
  *  \throw If getNbOfElems() % \a newNbOfCompo != 0.
@@ -1641,9 +1643,9 @@ void DataArrayDouble::rearrange(int newNbOfCompo) throw(INTERP_KERNEL::Exception
  * of tuples, and inversely its number of tuples to become equal to its number of 
  * components. So that its raw data **does not** change, instead splitting this
  * data into tuples changes.
- *  \throw If \a this is not allocated.
  *  \warning This method erases all (name and unit) component info set before!
  *  \warning Do not confuse this method with fromNoInterlace() and toNoInterlace()!
+ *  \throw If \a this is not allocated.
  *  \sa rearrange()
  */
 void DataArrayDouble::transpose() throw(INTERP_KERNEL::Exception)
@@ -1740,8 +1742,8 @@ void DataArrayDouble::meldWith(const DataArrayDouble *other) throw(INTERP_KERNEL
  * MEDCouplingUMesh::mergeNodes().
  *  \param [in] prec - minimal absolute distance between two tuples at which they are
  *              considered not coincident.
- *  \param [in] limitTupleId - limit tuple id. Tuples with id strictly lower than \a 
- *              limitTupleId are not considered.
+ *  \param [in] limitTupleId - limit tuple id. If all tuples within a group of coincident
+ *              tuples have id strictly lower than \a limitTupleId then they are not returned.
  *  \param [out] comm - the array holding ids (== indices) of coincident tuples. 
  *               \a comm->getNumberOfComponents() == 1. 
  *               \a comm->getNumberOfTuples() == \a commIndex->back().
@@ -1913,8 +1915,8 @@ DataArrayInt *DataArrayDouble::findClosestTupleId(const DataArrayDouble *other) 
  * that coincident tuples are excluded.
  *  \param [in] prec - minimal absolute distance between two tuples at which they are
  *              considered not coincident.
- *  \param [in] limitTupleId - limit tuple id. Tuples with id strictly lower than \a 
- *              limiTupleId are not considered and thus not excluded.
+ *  \param [in] limitTupleId - limit tuple id. If all tuples within a group of coincident
+ *              tuples have id strictly lower than \a limitTupleId then they are not excluded.
  *  \return DataArrayDouble * - the new instance of DataArrayDouble that the caller
  *          is to delete using decrRef() as it is no more needed.
  *  \throw If \a this is not allocated.
@@ -3629,12 +3631,12 @@ void DataArrayDouble::applyLin(double a, double b) throw(INTERP_KERNEL::Exceptio
 /*!
  * Modify all elements of \a this array, so that
  * an element _x_ becomes \f$ numerator / x \f$.
- *  \param [in] numerator - the numerator used to modify array elements.
- *  \throw If \a this is not allocated.
- *  \throw If there is an element equal to 0.0 in \a this array.
  *  \warning If an exception is thrown because of presence of 0.0 element in \a this 
  *           array, all elements processed before detection of the zero element remain
  *           modified.
+ *  \param [in] numerator - the numerator used to modify array elements.
+ *  \throw If \a this is not allocated.
+ *  \throw If there is an element equal to 0.0 in \a this array.
  */
 void DataArrayDouble::applyInv(double numerator) throw(INTERP_KERNEL::Exception)
 {
@@ -4824,6 +4826,7 @@ void DataArrayDouble::multiplyEqual(const DataArrayDouble *other) throw(INTERP_K
  *
  * Info on components is copied either from the first array (in the first case) or from
  * the array with maximal number of elements (getNbOfElems()).
+ *  \warning No check of division by zero is performed!
  *  \param [in] a1 - a numerator array.
  *  \param [in] a2 - a denominator array.
  *  \return DataArrayDouble * - the new instance of DataArrayDouble.
@@ -4833,7 +4836,6 @@ void DataArrayDouble::multiplyEqual(const DataArrayDouble *other) throw(INTERP_K
  *  \throw If \a a1->getNumberOfTuples() != \a a2->getNumberOfTuples() and
  *         \a a1->getNumberOfComponents() != \a a2->getNumberOfComponents() and
  *         none of them has number of tuples or components equal to 1.
- *  \warning No check of division by zero is performed!
  */
 DataArrayDouble *DataArrayDouble::Divide(const DataArrayDouble *a1, const DataArrayDouble *a2) throw(INTERP_KERNEL::Exception)
 {
@@ -4901,12 +4903,12 @@ DataArrayDouble *DataArrayDouble::Divide(const DataArrayDouble *a1, const DataAr
  * 3.  The arrays have same number of components and \a other array has one tuple. Then
  *   _a_ [ i, j ] /= _a2_ [ 0, j ].
  *
+ *  \warning No check of division by zero is performed!
  *  \param [in] other - an array to divide \a this one by.
  *  \throw If \a other is NULL.
  *  \throw If \a this->getNumberOfTuples() != \a other->getNumberOfTuples() and
  *         \a this->getNumberOfComponents() != \a other->getNumberOfComponents() and
  *         \a other has number of both tuples and components not equal to 1.
- *  \warning No check of division by zero is performed!
  */
 void DataArrayDouble::divideEqual(const DataArrayDouble *other) throw(INTERP_KERNEL::Exception)
 {
@@ -5677,6 +5679,8 @@ void DataArrayInt::transformWithIndArr(const int *indArrBg, const int *indArrEnd
  * Computes distribution of values of \a this one-dimensional array between given value
  * ranges (casts). This method is typically useful for entity number spliting by types,
  * for example. 
+ *  \warning The values contained in \a arrBg should be sorted ascendently. No
+ *           check of this is be done. If not, the result is not warranted. 
  *  \param [in] arrBg - the array of ascending values defining the value ranges. The i-th
  *         value of \a arrBg (\a arrBg[ i ]) gives the lowest value of the i-th range,
  *         and the greatest value of the i-th range equals to \a arrBg[ i+1 ] - 1. \a
@@ -5716,9 +5720,6 @@ void DataArrayInt::transformWithIndArr(const int *indArrBg, const int *indArrEnd
  *  \throw If \a this->getNumberOfComponents() != 1.
  *  \throw If \a arrEnd - arrBg < 2.
  *  \throw If any value of \a this is not less than \a arrEnd[-1].
- *  \warning The values contained in \a arrBg should be sorted ascendently. No
- *           check of this is be done. If not, the result is not warranted. 
- * 
  */
 void DataArrayInt::splitByValueRange(const int *arrBg, const int *arrEnd,
                                      DataArrayInt *& castArr, DataArrayInt *& rankInsideCast, DataArrayInt *& castsPresent) const throw(INTERP_KERNEL::Exception)
@@ -6161,10 +6162,10 @@ void DataArrayInt::useExternalArrayWithRWAccess(const int *array, int nbOfTuple,
  * arranged in memory. If \a this array holds 2 components of 3 values:
  * \f$ x_0,x_1,x_2,y_0,y_1,y_2 \f$, then the result array holds these values arranged
  * as follows: \f$ x_0,y_0,x_1,y_1,x_2,y_2 \f$.
+ *  \warning Do not confuse this method with transpose()!
  *  \return DataArrayInt * - the new instance of DataArrayInt that the caller
  *          is to delete using decrRef() as it is no more needed.
  *  \throw If \a this is not allocated.
- *  \warning Do not confuse this method with transpose()!
  */
 DataArrayInt *DataArrayInt::fromNoInterlace() const throw(INTERP_KERNEL::Exception)
 {
@@ -6182,10 +6183,10 @@ DataArrayInt *DataArrayInt::fromNoInterlace() const throw(INTERP_KERNEL::Excepti
  * arranged in memory. If \a this array holds 2 components of 3 values:
  * \f$ x_0,y_0,x_1,y_1,x_2,y_2 \f$, then the result array holds these values arranged
  * as follows: \f$ x_0,x_1,x_2,y_0,y_1,y_2 \f$.
+ *  \warning Do not confuse this method with transpose()!
  *  \return DataArrayInt * - the new instance of DataArrayInt that the caller
  *          is to delete using decrRef() as it is no more needed.
  *  \throw If \a this is not allocated.
- *  \warning Do not confuse this method with transpose()!
  */
 DataArrayInt *DataArrayInt::toNoInterlace() const throw(INTERP_KERNEL::Exception)
 {
@@ -6817,6 +6818,7 @@ DataArrayInt *DataArrayInt::substr(int tupleIdBg, int tupleIdEnd) const throw(IN
 /*!
  * Changes the number of components within \a this array so that its raw data **does
  * not** change, instead splitting this data into tuples changes.
+ *  \warning This method erases all (name and unit) component info set before!
  *  \param [in] newNbOfComp - number of components for \a this array to have.
  *  \throw If \a this is not allocated
  *  \throw If getNbOfElems() % \a newNbOfCompo != 0.
@@ -6844,9 +6846,9 @@ void DataArrayInt::rearrange(int newNbOfCompo) throw(INTERP_KERNEL::Exception)
  * of tuples, and inversely its number of tuples to become equal to its number of 
  * components. So that its raw data **does not** change, instead splitting this
  * data into tuples changes.
- *  \throw If \a this is not allocated.
  *  \warning This method erases all (name and unit) component info set before!
  *  \warning Do not confuse this method with fromNoInterlace() and toNoInterlace()!
+ *  \throw If \a this is not allocated.
  *  \sa rearrange()
  */
 void DataArrayInt::transpose() throw(INTERP_KERNEL::Exception)
@@ -8182,12 +8184,12 @@ DataArrayInt *DataArrayInt::negate() const throw(INTERP_KERNEL::Exception)
 /*!
  * Modify all elements of \a this array, so that
  * an element _x_ becomes \f$ numerator / x \f$.
- *  \param [in] numerator - the numerator used to modify array elements.
- *  \throw If \a this is not allocated.
- *  \throw If there is an element equal to 0 in \a this array.
  *  \warning If an exception is thrown because of presence of 0 element in \a this 
  *           array, all elements processed before detection of the zero element remain
  *           modified.
+ *  \param [in] numerator - the numerator used to modify array elements.
+ *  \throw If \a this is not allocated.
+ *  \throw If there is an element equal to 0 in \a this array.
  */
 void DataArrayInt::applyInv(int numerator) throw(INTERP_KERNEL::Exception)
 {
@@ -8272,12 +8274,12 @@ DataArrayInt *DataArrayInt::getIdsInRange(int vmin, int vmax) const throw(INTERP
 /*!
  * Modify all elements of \a this array, so that
  * an element _x_ becomes <em> val % x </em>.
- *  \param [in] val - the divident used to modify array elements.
- *  \throw If \a this is not allocated.
- *  \throw If there is an element equal to or less than 0 in \a this array.
  *  \warning If an exception is thrown because of presence of an element <= 0 in \a this 
  *           array, all elements processed before detection of the zero element remain
  *           modified.
+ *  \param [in] val - the divident used to modify array elements.
+ *  \throw If \a this is not allocated.
+ *  \throw If there is an element equal to or less than 0 in \a this array.
  */
 void DataArrayInt::applyRModulus(int val) throw(INTERP_KERNEL::Exception)
 {
@@ -9647,6 +9649,7 @@ void DataArrayInt::multiplyEqual(const DataArrayInt *other) throw(INTERP_KERNEL:
  *
  * Info on components is copied either from the first array (in the first case) or from
  * the array with maximal number of elements (getNbOfElems()).
+ *  \warning No check of division by zero is performed!
  *  \param [in] a1 - a numerator array.
  *  \param [in] a2 - a denominator array.
  *  \return DataArrayInt * - the new instance of DataArrayInt.
@@ -9656,7 +9659,6 @@ void DataArrayInt::multiplyEqual(const DataArrayInt *other) throw(INTERP_KERNEL:
  *  \throw If \a a1->getNumberOfTuples() != \a a2->getNumberOfTuples() and
  *         \a a1->getNumberOfComponents() != \a a2->getNumberOfComponents() and
  *         none of them has number of tuples or components equal to 1.
- *  \warning No check of division by zero is performed!
  */
 DataArrayInt *DataArrayInt::Divide(const DataArrayInt *a1, const DataArrayInt *a2) throw(INTERP_KERNEL::Exception)
 {
@@ -9724,12 +9726,12 @@ DataArrayInt *DataArrayInt::Divide(const DataArrayInt *a1, const DataArrayInt *a
  * 3.  The arrays have same number of components and \a other array has one tuple. Then
  *   _a_ [ i, j ] /= _a2_ [ 0, j ].
  *
+ *  \warning No check of division by zero is performed!
  *  \param [in] other - an array to divide \a this one by.
  *  \throw If \a other is NULL.
  *  \throw If \a this->getNumberOfTuples() != \a other->getNumberOfTuples() and
  *         \a this->getNumberOfComponents() != \a other->getNumberOfComponents() and
  *         \a other has number of both tuples and components not equal to 1.
- *  \warning No check of division by zero is performed!
  */
 void DataArrayInt::divideEqual(const DataArrayInt *other) throw(INTERP_KERNEL::Exception)
 {
@@ -9790,6 +9792,7 @@ void DataArrayInt::divideEqual(const DataArrayInt *other) throw(INTERP_KERNEL::E
  *
  * Info on components is copied either from the first array (in the first case) or from
  * the array with maximal number of elements (getNbOfElems()).
+ *  \warning No check of division by zero is performed!
  *  \param [in] a1 - a dividend array.
  *  \param [in] a2 - a divisor array.
  *  \return DataArrayInt * - the new instance of DataArrayInt.
@@ -9799,7 +9802,6 @@ void DataArrayInt::divideEqual(const DataArrayInt *other) throw(INTERP_KERNEL::E
  *  \throw If \a a1->getNumberOfTuples() != \a a2->getNumberOfTuples() and
  *         \a a1->getNumberOfComponents() != \a a2->getNumberOfComponents() and
  *         none of them has number of tuples or components equal to 1.
- *  \warning No check of division by zero is performed!
  */
 DataArrayInt *DataArrayInt::Modulus(const DataArrayInt *a1, const DataArrayInt *a2) throw(INTERP_KERNEL::Exception)
 {
@@ -9867,12 +9869,12 @@ DataArrayInt *DataArrayInt::Modulus(const DataArrayInt *a1, const DataArrayInt *
  * 3.  The arrays have same number of components and \a other array has one tuple. Then
  *   _a_ [ i, j ] %= _a2_ [ 0, j ].
  *
+ *  \warning No check of division by zero is performed!
  *  \param [in] other - a divisor array.
  *  \throw If \a other is NULL.
  *  \throw If \a this->getNumberOfTuples() != \a other->getNumberOfTuples() and
  *         \a this->getNumberOfComponents() != \a other->getNumberOfComponents() and
  *         \a other has number of both tuples and components not equal to 1.
- *  \warning No check of division by zero is performed!
  */
 void DataArrayInt::modulusEqual(const DataArrayInt *other) throw(INTERP_KERNEL::Exception)
 {
