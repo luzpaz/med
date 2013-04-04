@@ -31,7 +31,7 @@ BUILT_SOURCES = $(UIC_FILES)
 EXTRA_DIST+= MEDGUIFileContentDial.ui MEDGUISelectComponents.ui
 
 dist_libMEDGUI_la_SOURCES = MEDGUIFileContentDial.h MEDGUISelection.hxx \
-	MEDGUI.h MEDGUI.cxx MEDGUIFileContentDial.cxx MEDGUISelection.cxx \
+	MEDGUIFileContentDial.cxx MEDGUISelection.cxx \
 	MEDGUISelectComponents.h MEDGUISelectComponents.cxx MEDGUIDataBaseDockWidget.hxx \
 	MEDGUIDataBaseDockWidget.cxx
 

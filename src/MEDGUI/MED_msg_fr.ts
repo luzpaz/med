@@ -128,19 +128,4 @@
         <translation>Tester un menu contextuel</translation>
     </message>
 </context>
-<context>
-    <name>MedGUI</name>
-    <message>
-        <source>MED_MEN_ALL_FILES</source>
-        <translation>Tous les Fichiers ( * )</translation>
-    </message>
-    <message>
-        <source>MED_MEN_IMPORT</source>
-        <translation>Importer</translation>
-    </message>
-    <message>
-        <source>MED_MEN_IMPORT_MED</source>
-        <translation>Fichiers MED ( *.med )</translation>
-    </message>
-</context>
 </TS>

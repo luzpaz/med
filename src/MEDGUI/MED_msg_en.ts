@@ -128,19 +128,4 @@
         <translation>Popup test</translation>
     </message>
 </context>
-<context>
-    <name>MedGUI</name>
-    <message>
-        <source>MED_MEN_ALL_FILES</source>
-        <translation>All Files ( * )</translation>
-    </message>
-    <message>
-        <source>MED_MEN_IMPORT</source>
-        <translation>Import</translation>
-    </message>
-    <message>
-        <source>MED_MEN_IMPORT_MED</source>
-        <translation>MED Files ( *.med )</translation>
-    </message>
-</context>
 </TS>
