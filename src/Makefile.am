@@ -59,14 +59,10 @@ endif
 
 if !MED_ENABLE_MICROMED
 
-  BASE_SUBDIRS = MEDWrapper MEDMEM MEDCoupling_Swig MEDMEM_SWIG MEDMEMBinTest
+  BASE_SUBDIRS = MEDWrapper MEDCoupling_Swig
 
 if MPI_IS_OK
     PARAMEDMEM_SUBDIRS += ParaMEDMEM_Swig
-endif
-
-if CPPUNIT_IS_OK
-    BASE_SUBDIRS += MEDMEMCppTest
 endif
 
 if MED_ENABLE_SPLITTER
@@ -78,7 +74,7 @@ if MED_ENABLE_RENUMBER
 endif
 
 if MED_ENABLE_KERNEL
-    KERNEL_SUBDIRS = MEDCouplingCorba MEDCouplingCorba_Swig MEDMEM_I MED MedCorba_Swig MED_SWIG MedClient
+    KERNEL_SUBDIRS = MEDCouplingCorba MEDCouplingCorba_Swig
 
 if MPI_IS_OK
   KERNEL_SUBDIRS += ParaMEDCouplingCorba ParaMEDMEMComponent
@@ -101,8 +97,8 @@ SUBDIRS = $(COMMON_SUBDIRS) $(PARAMEDMEM_SUBDIRS) $(BASE_SUBDIRS) $(INTERPTEST_S
           $(SPLITTER_SUBDIRS) $(RENUMBER_SUBDIRS) $(KERNEL_SUBDIRS) $(GUI_SUBDIRS)
 
 DIST_SUBDIRS= \
-	MEDWrapper INTERP_KERNEL MEDMEM MEDCoupling MEDCoupling_Swig MEDMEM_SWIG    \
-	MEDMEMBinTest MEDMEMCppTest INTERP_KERNELTest ParaMEDMEM ParaMEDMEM_Swig MEDLoader \
+	MEDWrapper INTERP_KERNEL MEDCoupling MEDCoupling_Swig  \
+	INTERP_KERNELTest ParaMEDMEM ParaMEDMEM_Swig MEDLoader \
 	MEDSPLITTER MEDSPLITTER_Swig MEDPartitioner RENUMBER MEDCouplingCorba MEDCouplingCorba_Swig \
-	MEDMEM_I MED MED_SWIG MedCorba_Swig ParaMEDLoader MedClient ParaMEDMEMComponent \
+	ParaMEDLoader ParaMEDMEMComponent \
 	ParaMEDCouplingCorba MEDCalculator MEDGUI MEDOP ParaMEDMEMTest
