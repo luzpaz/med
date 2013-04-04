@@ -66,7 +66,7 @@ if MPI_IS_OK
 endif
 
 if MED_ENABLE_SPLITTER
-    SPLITTER_SUBDIRS = MEDSPLITTER MEDSPLITTER_Swig MEDPartitioner
+    SPLITTER_SUBDIRS = MEDPartitioner
 endif
 
 if MED_ENABLE_RENUMBER
@@ -99,6 +99,6 @@ SUBDIRS = $(COMMON_SUBDIRS) $(PARAMEDMEM_SUBDIRS) $(BASE_SUBDIRS) $(INTERPTEST_S
 DIST_SUBDIRS= \
 	MEDWrapper INTERP_KERNEL MEDCoupling MEDCoupling_Swig  \
 	INTERP_KERNELTest ParaMEDMEM ParaMEDMEM_Swig MEDLoader \
-	MEDSPLITTER MEDSPLITTER_Swig MEDPartitioner RENUMBER MEDCouplingCorba MEDCouplingCorba_Swig \
+	MEDPartitioner RENUMBER MEDCouplingCorba MEDCouplingCorba_Swig \
 	ParaMEDLoader ParaMEDMEMComponent \
 	ParaMEDCouplingCorba MEDCalculator MEDGUI MEDOP ParaMEDMEMTest
