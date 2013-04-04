@@ -25,7 +25,7 @@
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 BASEIDL_FILES = \
-	MED.idl MED_Gen.idl Compo1Py.idl \
+	MED.idl                          \
 	MEDCouplingCorbaServant.idl      \
 	MEDCouplingCorbaServantTest.idl  \
 	ParaMEDCouplingCorbaServant.idl
