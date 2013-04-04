@@ -27,6 +27,995 @@
 #include "MEDCouplingMultiFields.hxx"
 
 
+void CppExample_MEDCouplingUMesh_areCellsIncludedIn()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_areCellsIncludedIn_1]
+  MEDCouplingUMesh *mesh1=MEDCouplingUMesh::New();
+  mesh1->setMeshDimension(2);
+  mesh1->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mesh1->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);    // #0
+  mesh1->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);  // #1
+  mesh1->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);  // #2
+  mesh1->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+10); // #3
+  mesh1->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+14); // #4
+  mesh1->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh1->setCoords(coordsArr);
+  //! [CppSnippet_MEDCouplingUMesh_areCellsIncludedIn_1]
+  //! [CppSnippet_MEDCouplingUMesh_areCellsIncludedIn_2]
+  const int cells2[3] = { 4,2,0 }; // even cells selected
+  MEDCouplingUMesh* mesh2 = (MEDCouplingUMesh*) mesh1->buildPartOfMySelf( cells2, cells2+3, true );
+  //! [CppSnippet_MEDCouplingUMesh_areCellsIncludedIn_2]
+  //! [CppSnippet_MEDCouplingUMesh_areCellsIncludedIn_3]
+  int compType = 0; // the strongest policy
+  DataArrayInt *corr2to1, *corr1to2;
+  // a larger mesh1 includes a smaller mesh2
+  CPPUNIT_ASSERT( mesh1->areCellsIncludedIn( mesh2, compType, corr2to1 ));
+  CPPUNIT_ASSERT( std::equal( cells2, cells2+3, corr2to1->getConstPointer() ));
+  //! [CppSnippet_MEDCouplingUMesh_areCellsIncludedIn_3]
+  //! [CppSnippet_MEDCouplingUMesh_areCellsIncludedIn_4]
+  // the smaller mesh2 does NOT include the larger mesh1
+  CPPUNIT_ASSERT( ! mesh2->areCellsIncludedIn( mesh1, compType, corr1to2 ));
+  const int corr1to2Expected[5] = {2, 3, 1, 4, 0};
+  CPPUNIT_ASSERT(std::equal( corr1to2Expected, corr1to2Expected+5, corr1to2->getConstPointer() ));
+  //! [CppSnippet_MEDCouplingUMesh_areCellsIncludedIn_4]
+  mesh1->decrRef();
+  mesh2->decrRef();
+  corr2to1->decrRef();
+  corr1to2->decrRef();
+}
+
+void CppExample_MEDCouplingUMesh_findAndCorrectBadOriented3DExtrudedCells()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_findAndCorrectBadOriented3DExtrudedCells_1]
+  // 2D coordinates of 5 base nodes
+  const double coords[5*2]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2 };
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->useExternalArrayWithRWAccess( coords, 5, 2 );
+  // coordinates of 5 top nodes
+  DataArrayDouble *coordsArr2 = coordsArr->deepCpy();
+  // 3D coordinates of base + top nodes
+  coordsArr  = coordsArr-> changeNbOfComponents( 3, 0 );
+  coordsArr2 = coordsArr2->changeNbOfComponents( 3, 1 );
+  coordsArr = DataArrayDouble::Aggregate( coordsArr, coordsArr2 );
+  // mesh
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setCoords(coordsArr);coordsArr->decrRef();
+  mesh->setMeshDimension(3);
+  mesh->allocateCells(2);
+  // connectivity of reversed HEXA8 and PENTA6
+  const int conn[8+6]={0,1,4,3, 5,6,9,8, 1,2,4, 6,7,9};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_HEXA8, 8,conn+0);
+  mesh->insertNextCell(INTERP_KERNEL::NORM_PENTA6,6,conn+8);
+  mesh->finishInsertingCells();
+  //! [CppSnippet_MEDCouplingUMesh_findAndCorrectBadOriented3DExtrudedCells_1]
+  //! [CppSnippet_MEDCouplingUMesh_findAndCorrectBadOriented3DExtrudedCells_2]
+  DataArrayInt* fixedCells = mesh->findAndCorrectBadOriented3DExtrudedCells();
+  CPPUNIT_ASSERT( fixedCells->getNumberOfTuples() == 2 ); // 2 cells fixed
+  fixedCells = mesh->findAndCorrectBadOriented3DExtrudedCells();
+  CPPUNIT_ASSERT( fixedCells->getNumberOfTuples() == 0 ); // no bad cells
+  //! [CppSnippet_MEDCouplingUMesh_findAndCorrectBadOriented3DExtrudedCells_2]
+}
+
+void CppExample_MEDCouplingUMesh_arePolyhedronsNotCorrectlyOriented()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_arePolyhedronsNotCorrectlyOriented_1]
+  // 2D coordinates of 5 base nodes
+  const double coords[5*2]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2 };
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->useExternalArrayWithRWAccess( coords, 5, 2 );
+  // coordinates of 5 top nodes
+  DataArrayDouble *coordsArr2 = coordsArr->deepCpy();
+  // 3D coordinates of base + top nodes
+  coordsArr  = coordsArr-> changeNbOfComponents( 3, 0 );
+  coordsArr2 = coordsArr2->changeNbOfComponents( 3, 1 );
+  coordsArr = DataArrayDouble::Aggregate( coordsArr, coordsArr2 );
+  // mesh
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setCoords(coordsArr);coordsArr->decrRef();
+  mesh->setMeshDimension(3);
+  mesh->allocateCells(2);
+  // connectivity of a HEXA8 + a reversed PENTA6
+  const int conn[8+6]={0,3,4,1, 5,8,9,6, 1,2,4, 6,7,9};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_POLYHED,8,conn); //  "extruded" polyhedron
+  mesh->insertNextCell(INTERP_KERNEL::NORM_POLYHED,6,conn+8);
+  mesh->finishInsertingCells();
+  // fix connectivity of NORM_POLYHED's
+  mesh->convertExtrudedPolyhedra();
+  //! [CppSnippet_MEDCouplingUMesh_arePolyhedronsNotCorrectlyOriented_1]
+  //! [CppSnippet_MEDCouplingUMesh_arePolyhedronsNotCorrectlyOriented_2]
+  std::vector<int> badCellIds;
+  mesh->arePolyhedronsNotCorrectlyOriented( badCellIds );
+  CPPUNIT_ASSERT( badCellIds.size() == 1 ); //  one polyhedron is KO
+  // fix invalid rolyherdons
+  mesh->orientCorrectlyPolyhedrons();
+  // re-check orientation
+  badCellIds.clear(); // as badCellIds is not cleared by arePolyhedronsNotCorrectlyOriented()
+  mesh->arePolyhedronsNotCorrectlyOriented( badCellIds );
+  CPPUNIT_ASSERT( badCellIds.size() == 0 ); // connectivity is OK
+  //! [CppSnippet_MEDCouplingUMesh_arePolyhedronsNotCorrectlyOriented_2]
+}
+
+void CppExample_MEDCouplingUMesh_are2DCellsNotCorrectlyOriented()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_are2DCellsNotCorrectlyOriented_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,2,4, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);    // 0
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);  // 1
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);  // 2
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+10); // 3
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+14); // 4
+  mesh->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  mesh->changeSpaceDimension(3);
+  //! [CppSnippet_MEDCouplingUMesh_are2DCellsNotCorrectlyOriented_1]
+  //! [CppSnippet_MEDCouplingUMesh_are2DCellsNotCorrectlyOriented_2]
+  const double vec[3] = {0.,0.,-1.};
+  std::vector<int> badCellIds;
+  mesh->are2DCellsNotCorrectlyOriented( vec, false, badCellIds );
+  CPPUNIT_ASSERT( badCellIds.size() == 1 ); //  one cell is reversed
+  // fix orientation
+  mesh->orientCorrectly2DCells( vec, false );
+  // re-check orientation
+  badCellIds.clear(); // as badCellIds is not cleared by are2DCellsNotCorrectlyOriented()
+  mesh->are2DCellsNotCorrectlyOriented( vec, false, badCellIds );
+  CPPUNIT_ASSERT( badCellIds.size() == 0 ); // the orientation is OK
+  //! [CppSnippet_MEDCouplingUMesh_are2DCellsNotCorrectlyOriented_2]
+}
+
+void CppExample_MEDCouplingUMesh_getCellsContainingPoints()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_getCellsContainingPoints_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);    // 0
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);  // 1
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);  // 2
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+10); // 3
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+14); // 4
+  mesh->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  //! [CppSnippet_MEDCouplingUMesh_getCellsContainingPoints_1]
+  //! [CppSnippet_MEDCouplingUMesh_getCellsContainingPoints_2]
+  const double pos[3*2] = { 10., 10,               // point out of the mesh
+                            0.3, 0.3,              // point located somewhere inside the mesh
+                            coords[2], coords[3]}; // point at the node #1
+  const double eps = 1e-4; // ball radius
+  std::vector<int> cells, cellsIndex;
+  mesh->getCellsContainingPoints( pos, 3, eps, cells, cellsIndex );
+  const int cellsExpected[3]={4, 0, 1};
+  const int cellsIndexExpected[4]={0, 0, 1, 3};
+  CPPUNIT_ASSERT(std::equal( cellsExpected,      cellsExpected+3,      &cells[0]));
+  CPPUNIT_ASSERT(std::equal( cellsIndexExpected, cellsIndexExpected+4, &cellsIndex[0]));
+  //! [CppSnippet_MEDCouplingUMesh_getCellsContainingPoints_2]
+}
+
+void CppExample_MEDCouplingUMesh_getCellsContainingPoint()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_getCellsContainingPoint_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);    // 0
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);  // 1
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);  // 2
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+10); // 3
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+14); // 4
+  mesh->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  //! [CppSnippet_MEDCouplingUMesh_getCellsContainingPoint_1]
+  //! [CppSnippet_MEDCouplingUMesh_getCellsContainingPoint_2]
+  const double* coords4  = coords + 4*2; // coordinates of the node #4
+  const double eps = 1e-4; // ball radius
+  const double pos[2] = { coords4[0] + eps, coords4[1] - eps }; // ball center
+  std::vector<int> cellIds;
+  mesh->getCellsContainingPoint( pos, eps, cellIds );
+  CPPUNIT_ASSERT ( cellIds.size() == mesh->getNumberOfCells() );
+  //! [CppSnippet_MEDCouplingUMesh_getCellsContainingPoint_2]
+}
+
+void CppExample_MEDCouplingUMesh_buildPartOrthogonalField()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_buildPartOrthogonalField_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);    // 0
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);  // 1
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);  // 2
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+10); // 3
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+14); // 4
+  mesh->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  //! [CppSnippet_MEDCouplingUMesh_buildPartOrthogonalField_1]
+  //! [CppSnippet_MEDCouplingUMesh_buildPartOrthogonalField_2]
+  const int part[4] = {1,2,3,4}; // cell #0 is omitted
+  MEDCouplingFieldDouble* vecField=mesh->buildPartOrthogonalField( part, part+4 );
+  CPPUNIT_ASSERT ( vecField->getArray()->getNumberOfTuples() == 4 );
+  CPPUNIT_ASSERT ( vecField->getArray()->getNumberOfComponents() == 3 );
+  //! [CppSnippet_MEDCouplingUMesh_buildPartOrthogonalField_2]
+}
+
+void CppExample_MEDCouplingUMesh_getPartMeasureField()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_getPartMeasureField_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,2,4, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);    // 0
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);  // 1
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);  // 2
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+10); // 3
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+14); // 4
+  mesh->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  //! [CppSnippet_MEDCouplingUMesh_getPartMeasureField_1]
+  //! [CppSnippet_MEDCouplingUMesh_getPartMeasureField_2]
+  const bool isAbs = true;
+  const int part[4] = {1,2,3,4}; // cell #0 is omitted
+  DataArrayDouble* areaArr=mesh->getPartMeasureField( isAbs, part, part+4 );
+  CPPUNIT_ASSERT( areaArr->getIJ(0,0) > 0 ); // orientation ignored
+  areaArr=mesh->getPartMeasureField( !isAbs, part, part+4 );
+  CPPUNIT_ASSERT( areaArr->getIJ(0,0) < 0 ); // orientation considered
+  CPPUNIT_ASSERT ( areaArr->getNumberOfTuples() == 4 );
+  //! [CppSnippet_MEDCouplingUMesh_getPartMeasureField_2]
+  //! [CppSnippet_MEDCouplingUMesh_getPartMeasureField_3]
+  const int cellIds[4] = {1,2,3,4}; // cell #0 is omitted
+  DataArrayDouble* baryCenters=mesh->getPartBarycenterAndOwner( cellIds, cellIds+4 );
+  CPPUNIT_ASSERT( baryCenters->getNumberOfTuples() == 4 );
+  CPPUNIT_ASSERT( baryCenters->getNumberOfComponents() == mesh->getSpaceDimension() );
+  //! [CppSnippet_MEDCouplingUMesh_getPartMeasureField_3]
+}
+
+void CppExample_MEDCouplingUMesh_getCellsInBoundingBox()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_getCellsInBoundingBox_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(1);
+  const double coords[3*2]={0.,0., 0.,1., 1.,1};
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->useExternalArrayWithRWAccess(coords, 3,2);
+  mesh->setCoords(coordsArr);
+  mesh->allocateCells(1);
+  const int conn[3]={0,1,2};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3,conn);
+  mesh->finishInsertingCells();
+  //! [CppSnippet_MEDCouplingUMesh_getCellsInBoundingBox_1]
+  //! [CppSnippet_MEDCouplingUMesh_getCellsInBoundingBox_2]
+  const double bbox[] = {1., 1., 1.001,1.001}; // xMin, xMax, yMin, yMax
+  DataArrayInt* cellIdsArr = mesh->getCellsInBoundingBox( bbox, 0.0 );
+  CPPUNIT_ASSERT( cellIdsArr->getNumberOfTuples() == 0 );
+  cellIdsArr = mesh->getCellsInBoundingBox( bbox, 0.1 );
+  CPPUNIT_ASSERT( cellIdsArr->getNumberOfTuples() == 1 );
+  //! [CppSnippet_MEDCouplingUMesh_getCellsInBoundingBox_2]
+}
+
+void CppExample_MEDCouplingUMesh_renumberNodesInConn()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_renumberNodesInConn_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(1);
+  const int conn[4]={4,3,2,1};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);
+  mesh->finishInsertingCells();
+  //! [CppSnippet_MEDCouplingUMesh_renumberNodesInConn_1]
+  //! [CppSnippet_MEDCouplingUMesh_renumberNodesInConn_2]
+  const int old2newIds[] = {-1,3,2,1,0};
+  mesh->renumberNodesInConn( old2newIds );
+  const int nodes0Expected[] = {0,1,2,3};
+  std::vector<int> nodes0;
+  mesh->getNodeIdsOfCell( 0, nodes0 );
+  CPPUNIT_ASSERT(std::equal( nodes0Expected, nodes0Expected+4, &nodes0[0] ));
+  //! [CppSnippet_MEDCouplingUMesh_renumberNodesInConn_2]
+}
+
+void CppExample_MEDCouplingUMesh_renumberNodes()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_renumberNodes_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  const double coords[4*2]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.3};
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->useExternalArrayWithRWAccess(coords, 4,2);
+  mesh->setCoords(coordsArr);
+  mesh->allocateCells(0);
+  mesh->finishInsertingCells();
+  //! [CppSnippet_MEDCouplingUMesh_renumberNodes_1]
+  //! [CppSnippet_MEDCouplingUMesh_renumberNodes_2]
+  const int newIds[] = { 2,1,0,-1 };
+  mesh->renumberNodes(newIds, 3);
+  coordsArr = mesh->getCoords(); // get a shorten array
+  const double coordsExpected[3*2]={0.7,-0.3, 0.2,-0.3, -0.3,-0.3};
+  DataArrayDouble *coordsExpectedArr=DataArrayDouble::New();
+  coordsExpectedArr->useExternalArrayWithRWAccess(coordsExpected, 3,2);
+  CPPUNIT_ASSERT( coordsExpectedArr->isEqual( *coordsArr, 1e-13 ));
+  //! [CppSnippet_MEDCouplingUMesh_renumberNodes_2]
+  //! [CppSnippet_MEDCouplingUMesh_renumberNodes_3]
+  coordsArr->useExternalArrayWithRWAccess(coords, 4,2); // restore old nodes
+  const int newIds2[] = { 2,1,0,2 };
+  mesh->renumberNodes2(newIds2, 3);
+  coordsArr = mesh->getCoords(); // get a shorten array
+  const double coordsExpected2[3*2]={0.7,-0.3, 0.2,-0.3, -0.3, 0.0};
+  DataArrayDouble *coordsExpectedArr2=DataArrayDouble::New();
+  coordsExpectedArr2->useExternalArrayWithRWAccess(coordsExpected, 3,2);
+  CPPUNIT_ASSERT( coordsExpectedArr2->isEqual( *coordsArr, 1e-13 ));
+  //! [CppSnippet_MEDCouplingUMesh_renumberNodes_3]
+  coordsExpectedArr->decrRef();
+  coordsExpectedArr2->decrRef();
+  coordsArr->decrRef();
+  mesh->decrRef();
+}
+
+void CppExample_MEDCouplingUMesh_findBoundaryNodes()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_findBoundaryNodes_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);    // 0
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);  // 1
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);  // 2
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+10); // 3
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+14); // 4
+  mesh->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  //! [CppSnippet_MEDCouplingUMesh_findBoundaryNodes_1]
+  //! [CppSnippet_MEDCouplingUMesh_findBoundaryNodes_2]
+  DataArrayInt* nodeIdsArr=mesh->findBoundaryNodes();
+  CPPUNIT_ASSERT( nodeIdsArr->getNumberOfTuples() == mesh->getNumberOfNodes() - 1 );
+  //! [CppSnippet_MEDCouplingUMesh_findBoundaryNodes_2]
+  nodeIdsArr->decrRef();
+  coordsArr->decrRef();
+  mesh->decrRef();
+}
+
+void CppExample_MEDCouplingUMesh_buildBoundaryMesh()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_buildBoundaryMesh_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);    // 0
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);  // 1
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);  // 2
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+10); // 3
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+14); // 4
+  mesh->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  //! [CppSnippet_MEDCouplingUMesh_buildBoundaryMesh_1]
+  //! [CppSnippet_MEDCouplingUMesh_buildBoundaryMesh_2]
+  MEDCouplingPointSet* mesh1=mesh->buildBoundaryMesh(true);
+  MEDCouplingPointSet* mesh2=mesh->buildBoundaryMesh(false);
+  CPPUNIT_ASSERT(  coordsArr->isEqual( *mesh1->getCoords(), 1e-13 )); // same nodes
+  CPPUNIT_ASSERT( !coordsArr->isEqual( *mesh2->getCoords(), 1e-13 )); // different nodes
+  //! [CppSnippet_MEDCouplingUMesh_buildBoundaryMesh_2]
+  coordsArr->decrRef();
+  mesh->decrRef();
+  mesh1->decrRef();
+  mesh2->decrRef();
+}
+
+void CppExample_MEDCouplingUMesh_buildFacePartOfMySelfNode()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_buildFacePartOfMySelfNode_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);    // 0
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);  // 1
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);  // 2
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+10); // 3
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+14); // 4
+  mesh->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  coordsArr->decrRef();
+  //! [CppSnippet_MEDCouplingUMesh_buildFacePartOfMySelfNode_1]
+  //! [CppSnippet_MEDCouplingUMesh_buildFacePartOfMySelfNode_2]
+  std::vector<int> nodes;
+  mesh->getNodeIdsOfCell( 0, nodes );
+  const bool allNodes = true;
+  MEDCouplingUMesh* mesh1 = (MEDCouplingUMesh*)mesh->buildFacePartOfMySelfNode( &nodes[0], &nodes[0]+nodes.size(), allNodes);
+  CPPUNIT_ASSERT( mesh1->getNumberOfCells() == 4 ); // 4 segments bounding QUAD4 #0 only
+  MEDCouplingUMesh* mesh2 = (MEDCouplingUMesh*)mesh->buildFacePartOfMySelfNode( &nodes[0], &nodes[0]+nodes.size(),!allNodes);
+  CPPUNIT_ASSERT( mesh2->getNumberOfCells() == 9 ); // more segments added
+  //! [CppSnippet_MEDCouplingUMesh_buildFacePartOfMySelfNode_2]
+  mesh->decrRef();
+  mesh1->decrRef();
+  mesh2->decrRef();
+}
+
+void CppExample_MEDCouplingUMesh_buildPartOfMySelfNode()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_buildPartOfMySelfNode_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);    // 0
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);  // 1
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);  // 2
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+10); // 3
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+14); // 4
+  mesh->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  coordsArr->decrRef();
+  //! [CppSnippet_MEDCouplingUMesh_buildPartOfMySelfNode_1]
+  //! [CppSnippet_MEDCouplingUMesh_buildPartOfMySelfNode_2]
+  std::vector<int> nodes;
+  mesh->getNodeIdsOfCell( 0, nodes );
+  const bool allNodes = true;
+  MEDCouplingUMesh* mesh1 = (MEDCouplingUMesh*)mesh->buildPartOfMySelfNode( &nodes[0], &nodes[0]+nodes.size(), allNodes);
+  MEDCouplingUMesh* mesh2 = (MEDCouplingUMesh*)mesh->buildPartOfMySelfNode( &nodes[0], &nodes[0]+nodes.size(),!allNodes);
+  CPPUNIT_ASSERT_EQUAL( mesh1->getNumberOfCells(), 1 );
+  CPPUNIT_ASSERT_EQUAL( mesh2->getNumberOfCells(), mesh->getNumberOfCells() );
+  //! [CppSnippet_MEDCouplingUMesh_buildPartOfMySelfNode_2]
+  mesh->decrRef();
+  mesh1->decrRef();
+  mesh2->decrRef();
+}
+
+void CppExample_MEDCouplingUMesh_getCellIdsLyingOnNodes()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_getCellIdsLyingOnNodes_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);    // 0
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);  // 1
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);  // 2
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+10); // 3
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+14); // 4
+  mesh->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  coordsArr->decrRef();
+  //! [CppSnippet_MEDCouplingUMesh_getCellIdsLyingOnNodes_1]
+  //! [CppSnippet_MEDCouplingUMesh_getCellIdsLyingOnNodes_2]
+  std::vector<int> nodes;
+  mesh->getNodeIdsOfCell( 0, nodes );
+  const bool allNodes = true;
+  DataArrayInt* cellIdsArr1 = mesh->getCellIdsLyingOnNodes( &nodes[0], &nodes[0]+nodes.size(), allNodes);
+  DataArrayInt* cellIdsArr2 = mesh->getCellIdsLyingOnNodes( &nodes[0], &nodes[0]+nodes.size(),!allNodes);
+  CPPUNIT_ASSERT_EQUAL( cellIdsArr1->getNumberOfTuples(), 1 );
+  CPPUNIT_ASSERT_EQUAL( cellIdsArr2->getNumberOfTuples(), mesh->getNumberOfCells() );
+  //! [CppSnippet_MEDCouplingUMesh_getCellIdsLyingOnNodes_2]
+  mesh->decrRef();
+  cellIdsArr1->decrRef();
+  cellIdsArr2->decrRef();
+}
+
+void CppExample_MEDCouplingUMesh_getCellIdsFullyIncludedInNodeIds()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_getCellIdsFullyIncludedInNodeIds_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);    // 0
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);  // 1
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);  // 2
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+10); // 3
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+14); // 4
+  mesh->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  coordsArr->decrRef();
+  //! [CppSnippet_MEDCouplingUMesh_getCellIdsFullyIncludedInNodeIds_1]
+  //! [CppSnippet_MEDCouplingUMesh_getCellIdsFullyIncludedInNodeIds_2]
+  const int cellIds[2]={1,2};
+  std::vector<int> nodes;
+  mesh->getNodeIdsOfCell( cellIds[0], nodes );
+  mesh->getNodeIdsOfCell( cellIds[1], nodes );
+  DataArrayInt* cellIdsArr = mesh->getCellIdsFullyIncludedInNodeIds( &nodes[0], &nodes[0]+nodes.size());
+  CPPUNIT_ASSERT(std::equal( cellIds, cellIds+2, cellIdsArr->getPointer() ));
+  //! [CppSnippet_MEDCouplingUMesh_getCellIdsFullyIncludedInNodeIds_2]
+  mesh->decrRef();
+  cellIdsArr->decrRef();
+}
+
+void CppExample_MEDCouplingUMesh_buildPartOfMySelf()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_buildPartOfMySelf_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);    // 0
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);  // 1
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);  // 2
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+10); // 3
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+14); // 4
+  mesh->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  //! [CppSnippet_MEDCouplingUMesh_buildPartOfMySelf_1]
+  //! [CppSnippet_MEDCouplingUMesh_buildPartOfMySelf_2]
+  const int cellIds[2]={1,2};
+  MEDCouplingUMesh* mesh2=(MEDCouplingUMesh*)mesh->buildPartOfMySelf(cellIds,cellIds+2,true);
+  MEDCouplingUMesh* mesh3=(MEDCouplingUMesh*)mesh->buildPartOfMySelf(cellIds,cellIds+2,false);
+  CPPUNIT_ASSERT(  coordsArr->isEqual( *mesh2->getCoords(), 1e-13 )); // same nodes
+  CPPUNIT_ASSERT( !coordsArr->isEqual( *mesh3->getCoords(), 1e-13 )); // different nodes
+  for ( int i = 0; i < 2; ++i )
+    {
+      std::vector<int> nodes1, nodes2;
+      mesh ->getNodeIdsOfCell(cellIds[i], nodes1);
+      mesh2->getNodeIdsOfCell(i, nodes2);
+      CPPUNIT_ASSERT( nodes1 == nodes2 ); // cell #cellIds[i] was copied
+    }
+  //! [CppSnippet_MEDCouplingUMesh_buildPartOfMySelf_2]
+  coordsArr->decrRef();
+  mesh->decrRef();
+  mesh2->decrRef();
+  mesh3->decrRef();
+}
+
+void CppExample_MEDCouplingUMesh_mergeNodes()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_mergeNodes_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,4,2, 4,5,2};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);
+  mesh->finishInsertingCells();
+  const double coords[6*2]={0.3,-0.301,  // #0
+                            0.2,-0.3,    // #1
+                            0.3,-0.302,  // #2 ~~ #0
+                            1.1,0.0,     // #3
+                            1.1,0.0,     // #4 == #3
+                            0.3,-0.303}; // #5 ~~ #0
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(6,2);
+  std::copy(coords,coords+6*2,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  coordsArr->decrRef();
+  //! [CppSnippet_MEDCouplingUMesh_mergeNodes_1]
+  //! [CppSnippet_MEDCouplingUMesh_mergeNodes_2]
+  bool areNodesMerged; int newNbOfNodes;
+  DataArrayInt *arr=mesh->mergeNodes(0.004,areNodesMerged,newNbOfNodes);
+  const int idsExpected[6] = {0, 1, 0, 2, 2, 0};
+  CPPUNIT_ASSERT(std::equal(idsExpected,idsExpected+6,arr->getPointer()));
+  CPPUNIT_ASSERT( areNodesMerged );
+  CPPUNIT_ASSERT_EQUAL( 3, newNbOfNodes );
+  //! [CppSnippet_MEDCouplingUMesh_mergeNodes_2]
+  //! [CppSnippet_MEDCouplingUMesh_mergeNodes_3]
+  const double* baryCoords2 = coords + 2*2; // initial coordinates of node #2
+  coordsArr=mesh->getCoords(); // retrieve a new shorten coord array
+  CPPUNIT_ASSERT( fabs( baryCoords2[1] - coordsArr->getIJ(0,1)) > 1e-4 ); // Y of node #0 differs from that of baryCoords2
+  // restore coordinates
+  coordsArr->alloc(6,2);
+  std::copy(coords,coords+6*2,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  // call mergeNodes2()
+  arr = mesh->mergeNodes2(0.004,areNodesMerged,newNbOfNodes);
+  coordsArr=mesh->getCoords(); // retrieve a new shorten coord array
+  CPPUNIT_ASSERT_DOUBLES_EQUAL( baryCoords2[1], coordsArr->getIJ(0,1), 13 ); // Y of node #0 equals to that of baryCoords2
+  //! [CppSnippet_MEDCouplingUMesh_mergeNodes_3]
+  coordsArr->decrRef();
+  mesh->decrRef();
+  arr->decrRef();
+}
+
+void CppExample_MEDCouplingUMesh_zipConnectivityTraducer()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_zipConnectivityTraducer_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[11]={0,3,4,1, 1,4,2, 4,1,0,3};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+0); // 0     
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4); // 1     
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4); // 2 == 1
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+0); // 3 == 0
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+7); // 4 ~~ 0
+  mesh->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  coordsArr->decrRef();
+  //! [CppSnippet_MEDCouplingUMesh_zipConnectivityTraducer_1]
+  //! [CppSnippet_MEDCouplingUMesh_zipConnectivityTraducer_2]
+  const int oldNbCells = mesh->getNumberOfCells();
+  DataArrayInt *arr = mesh->zipConnectivityTraducer(0);
+  CPPUNIT_ASSERT_EQUAL( oldNbCells-2, mesh->getNumberOfCells() );
+  const int idsExpected[5] = {0, 1, 1, 0, 2};
+  CPPUNIT_ASSERT(std::equal(idsExpected,idsExpected+5,arr->getPointer()));
+  //! [CppSnippet_MEDCouplingUMesh_zipConnectivityTraducer_2]
+  mesh->decrRef();
+  arr->decrRef();
+}
+
+void CppExample_MEDCouplingUMesh_zipCoordsTraducer()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_zipCoordsTraducer_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);    // 0
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);  // 1
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);  // 2
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+10); // 3
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+14); // 4
+  mesh->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  coordsArr->decrRef();
+  //! [CppSnippet_MEDCouplingUMesh_zipCoordsTraducer_1]
+  //! [CppSnippet_MEDCouplingUMesh_zipCoordsTraducer_2]
+  const int cellIds[2]={1,2};
+  MEDCouplingUMesh* mesh2=(MEDCouplingUMesh*)mesh->buildPartOfMySelf(cellIds,cellIds+2,true);
+  DataArrayInt *arr=mesh2->zipCoordsTraducer();
+  CPPUNIT_ASSERT_EQUAL( 4, mesh2->getNumberOfNodes() ); // nb of nodes decreased
+  CPPUNIT_ASSERT_EQUAL( mesh->getNumberOfNodes(), arr->getNumberOfTuples() );
+  const int idsExpected[9] = {-1,0,1,-1,2,3,-1,-1,-1}; // -1 for unused nodes
+  CPPUNIT_ASSERT(std::equal(idsExpected,idsExpected+9,arr->getPointer()));
+  //! [CppSnippet_MEDCouplingUMesh_zipCoordsTraducer_2]
+  mesh->decrRef();
+  mesh2->decrRef();
+  arr->decrRef();
+}
+
+void CppExample_MEDCouplingUMesh_getNodeIdsInUse()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_getNodeIdsInUse_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);    // 0
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);  // 1
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);  // 2
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+10); // 3
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+14); // 4
+  mesh->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  coordsArr->decrRef();
+  //! [CppSnippet_MEDCouplingUMesh_getNodeIdsInUse_1]
+  //! [CppSnippet_MEDCouplingUMesh_getNodeIdsInUse_2]
+  const int cellIds[2]={1,2};
+  MEDCouplingUMesh* mesh2=(MEDCouplingUMesh*)mesh->buildPartOfMySelf(cellIds,cellIds+2,true);
+  int newNbOfNodes = 0;
+  DataArrayInt *arr=mesh2->getNodeIdsInUse( newNbOfNodes );
+  const int idsExpected[9] = {-1,0,1,-1,2,3,-1,-1,-1};
+  CPPUNIT_ASSERT(std::equal(idsExpected,idsExpected+9,arr->getPointer()));
+  //! [CppSnippet_MEDCouplingUMesh_getNodeIdsInUse_2]
+  //! [CppSnippet_MEDCouplingUMesh_getNodeIdsInUse_3]
+  DataArrayInt *arr2=arr->invertArrayO2N2N2O(newNbOfNodes);
+  const int idsExpected2[4] = {1,2,4,5};
+  CPPUNIT_ASSERT(std::equal(idsExpected2,idsExpected2+4,arr2->getPointer()));
+  //! [CppSnippet_MEDCouplingUMesh_getNodeIdsInUse_3]
+  mesh->decrRef();
+  mesh2->decrRef();
+  arr->decrRef();
+  arr2->decrRef();
+}
+
+void CppExample_MEDCouplingUMesh_convertToPolyTypes()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_convertToPolyTypes_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);    // 0
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);  // 1
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);  // 2
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+10); // 3
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+14); // 4
+  mesh->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  coordsArr->decrRef();
+  //! [CppSnippet_MEDCouplingUMesh_convertToPolyTypes_1]
+  //! [CppSnippet_MEDCouplingUMesh_convertToPolyTypes_2]
+  const int cells[2]={1,3};
+  mesh->convertToPolyTypes(cells, cells+2);
+  CPPUNIT_ASSERT( mesh->getTypeOfCell(0) == INTERP_KERNEL::NORM_QUAD4 );
+  CPPUNIT_ASSERT( mesh->getTypeOfCell(1) == INTERP_KERNEL::NORM_POLYGON );
+  CPPUNIT_ASSERT( mesh->getTypeOfCell(2) == INTERP_KERNEL::NORM_TRI3 );
+  CPPUNIT_ASSERT( mesh->getTypeOfCell(3) == INTERP_KERNEL::NORM_POLYGON );
+  //! [CppSnippet_MEDCouplingUMesh_convertToPolyTypes_2]
+}
+
+void CppExample_MEDCouplingUMesh_buildDescendingConnectivity2()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_buildDescendingConnectivity2_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);    // 0
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);  // 1
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);  // 2
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+10); // 3
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+14); // 4
+  mesh->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  coordsArr->decrRef();
+  //! [CppSnippet_MEDCouplingUMesh_buildDescendingConnectivity2_1]
+  //! [CppSnippet_MEDCouplingUMesh_buildDescendingConnectivity2_2]
+  DataArrayInt *desc       =DataArrayInt::New();
+  DataArrayInt *descIndx   =DataArrayInt::New();
+  DataArrayInt *revDesc    =DataArrayInt::New();
+  DataArrayInt *revDescIndx=DataArrayInt::New();
+  MEDCouplingUMesh * mesh2 = mesh->buildDescendingConnectivity2(desc,descIndx,revDesc,revDescIndx);
+  const int descExpected[]        = {0,1,2,3, 2,4,5, 6,7,4, 8,9,1,10, 11,12,6,9};
+  const int descIndxExpected[]    = {0,4,7,10,14,18};
+  const int revDescExpected[]     = {0, 0,3, 0,1, 0, 1,2, 1, 2,4, 2, 3, 3,4, 3, 4, 4};
+  const int revDescIndxExpected[] = {0,1,3,5,6,8,9,11,12,13,15,16,17,18};
+  CPPUNIT_ASSERT(std::equal(descExpected,descExpected+18,desc->getPointer()));
+  CPPUNIT_ASSERT(std::equal(descIndxExpected,descIndxExpected+6,descIndx->getPointer()));
+  CPPUNIT_ASSERT(std::equal(revDescExpected,revDescExpected+18,revDesc->getPointer()));
+  CPPUNIT_ASSERT(std::equal(revDescIndxExpected,revDescIndxExpected+14,revDescIndx->getPointer()));
+  //! [CppSnippet_MEDCouplingUMesh_buildDescendingConnectivity2_2]
+  //! [CppSnippet_MEDCouplingUMesh_buildDescendingConnectivity2_3]
+  const int cell2ConnExpect[] = {4,1};
+  std::vector<int> cell2Conn;
+  mesh2->getNodeIdsOfCell( 3-1, cell2Conn ); // cell #3 in FORTRAN mode
+  CPPUNIT_ASSERT(std::equal(cell2ConnExpect,cell2ConnExpect+2,&cell2Conn[0]));
+  //! [CppSnippet_MEDCouplingUMesh_buildDescendingConnectivity2_3]
+  desc->decrRef();
+  descIndx->decrRef();
+  revDesc->decrRef();
+  revDescIndx->decrRef();
+  mesh->decrRef();
+  mesh2->decrRef();
+}
+
+void CppExample_MEDCouplingUMesh_buildDescendingConnectivity()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_buildDescendingConnectivity_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);    // 0
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);  // 1
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);  // 2
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+10); // 3
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+14); // 4
+  mesh->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  coordsArr->decrRef();
+  //! [CppSnippet_MEDCouplingUMesh_buildDescendingConnectivity_1]
+  //! [CppSnippet_MEDCouplingUMesh_buildDescendingConnectivity_2]
+  DataArrayInt *desc       =DataArrayInt::New();
+  DataArrayInt *descIndx   =DataArrayInt::New();
+  DataArrayInt *revDesc    =DataArrayInt::New();
+  DataArrayInt *revDescIndx=DataArrayInt::New();
+  MEDCouplingUMesh * mesh2 = mesh->buildDescendingConnectivity(desc,descIndx,revDesc,revDescIndx);
+  const int descExpected[]        = {0,1,2,3, 2,4,5, 6,7,4, 8,9,1,10, 11,12,6,9};
+  const int descIndxExpected[]    = {0,4,7,10,14,18};
+  const int revDescExpected[]     = {0, 0,3, 0,1, 0, 1,2, 1, 2,4, 2, 3, 3,4, 3, 4, 4};
+  const int revDescIndxExpected[] = {0,1,3,5,6,8,9,11,12,13,15,16,17,18};
+  CPPUNIT_ASSERT(std::equal(descExpected,descExpected+18,desc->getPointer()));
+  CPPUNIT_ASSERT(std::equal(descIndxExpected,descIndxExpected+6,descIndx->getPointer()));
+  CPPUNIT_ASSERT(std::equal(revDescExpected,revDescExpected+18,revDesc->getPointer()));
+  CPPUNIT_ASSERT(std::equal(revDescIndxExpected,revDescIndxExpected+14,revDescIndx->getPointer()));
+  //! [CppSnippet_MEDCouplingUMesh_buildDescendingConnectivity_2]
+  desc->decrRef();
+  descIndx->decrRef();
+  revDesc->decrRef();
+  revDescIndx->decrRef();
+  mesh->decrRef();
+  mesh2->decrRef();
+}
+
+void CppExample_MEDCouplingUMesh_getReverseNodalConnectivity()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_getReverseNodalConnectivity_1]
+  MEDCouplingUMesh *mesh=MEDCouplingUMesh::New();
+  mesh->setMeshDimension(2);
+  mesh->allocateCells(5);
+  const int conn[18]={0,3,4,1, 1,4,2, 4,5,2, 6,7,4,3, 7,8,5,4};
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn);    // 0
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+4);  // 1
+  mesh->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+7);  // 2
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+10); // 3
+  mesh->insertNextCell(INTERP_KERNEL::NORM_QUAD4,4,conn+14); // 4
+  mesh->finishInsertingCells();
+  DataArrayDouble *coordsArr=DataArrayDouble::New();
+  coordsArr->alloc(9,2);
+  const double coords[18]={-0.3,-0.3, 0.2,-0.3, 0.7,-0.3, -0.3,0.2, 0.2,0.2, 0.7,0.2, -0.3,0.7, 0.2,0.7, 0.7,0.7 };
+  std::copy(coords,coords+18,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);
+  coordsArr->decrRef();
+  //! [CppSnippet_MEDCouplingUMesh_getReverseNodalConnectivity_1]
+  //! [CppSnippet_MEDCouplingUMesh_getReverseNodalConnectivity_2]
+  DataArrayInt *revNodal=DataArrayInt::New();
+  DataArrayInt *revNodalIndx=DataArrayInt::New();
+  mesh->getReverseNodalConnectivity(revNodal,revNodalIndx);
+  const int revNodalExpected[18]={0,0,1,1,2,0,3,0,1,2,3,4,2,4,3,3,4,4};
+  const int revNodalIndexExpected[10]={0,1,3,5,7,12,14,15,17,18};
+  CPPUNIT_ASSERT(std::equal(revNodalExpected,revNodalExpected+18,revNodal->getPointer()));
+  CPPUNIT_ASSERT(std::equal(revNodalIndexExpected,revNodalIndexExpected+10,revNodalIndx->getPointer()));
+  //! [CppSnippet_MEDCouplingUMesh_getReverseNodalConnectivity_2]
+  revNodal->decrRef();
+  revNodalIndx->decrRef();
+  mesh->decrRef();
+}
+
+void CppExample_MEDCouplingUMesh_checkDeepEquivalWith()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingUMesh_checkDeepEquivalWith_1]
+  // mesh 1
+  MEDCouplingUMesh *mesh1=MEDCouplingUMesh::New();
+  {
+    mesh1->setMeshDimension(2);
+    const double coords[4*2]={0.0,0.0,  // #0
+                              1.0,0.0,  // #1
+                              1.0,1.0,  // #2
+                              0.0,1.0}; // #3
+    DataArrayDouble *coordsArr=DataArrayDouble::New();
+    coordsArr->useExternalArrayWithRWAccess( coords, 4, 2 );
+    mesh1->setCoords(coordsArr);
+    coordsArr->decrRef();
+    mesh1->allocateCells(2);
+    const int conn[6]={0,1,2, 1,2,3};
+    mesh1->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+0);  // #0
+    mesh1->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+3);  // #1
+    mesh1->finishInsertingCells();
+  }
+  // mesh 2
+  MEDCouplingUMesh *mesh2=MEDCouplingUMesh::New();
+  {
+    mesh2->setMeshDimension(2);
+    const double coords[4*2]={0.0,1.0,    // #0 = #3
+                              0.0,0.0,    // #1 = #0
+                              1.0,0.0,    // #2 = #1
+                              1.0,1.001}; // #3 ~ #2
+    DataArrayDouble *coordsArr=DataArrayDouble::New();
+    coordsArr->useExternalArrayWithRWAccess( coords, 4, 2 );
+    mesh2->setCoords(coordsArr);
+    coordsArr->decrRef();
+    mesh2->allocateCells(2);
+    const int conn[6]={2,3,0, 3,1,2};
+    mesh2->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+0);  // #0 = #1
+    mesh2->insertNextCell(INTERP_KERNEL::NORM_TRI3,3, conn+3);  // #1 ~ #0
+    mesh2->finishInsertingCells();
+  }
+  //! [CppSnippet_MEDCouplingUMesh_checkDeepEquivalWith_1]
+  //! [CppSnippet_MEDCouplingUMesh_checkDeepEquivalWith_2]
+  int cellCompPol = 1; // "permuted same orientation" - policy of medium severity
+  DataArrayInt *nOld2New, *cOld2New;
+  mesh1->checkDeepEquivalWith( mesh2, cellCompPol, 0.002, cOld2New, nOld2New );
+  const int nOld2NewExpected[4] = { 3, 0, 1, 2 };
+  const int cOld2NewExpected[2] = { 1, 0 };
+  CPPUNIT_ASSERT(std::equal(nOld2NewExpected,nOld2NewExpected+4,nOld2New->getConstPointer()));
+  CPPUNIT_ASSERT(std::equal(cOld2NewExpected,cOld2NewExpected+2,cOld2New->getConstPointer()));
+  //! [CppSnippet_MEDCouplingUMesh_checkDeepEquivalWith_2]
+  //! [CppSnippet_MEDCouplingUMesh_checkDeepEquivalWith_3]
+  cOld2New->decrRef(); // else memory leaks
+  CPPUNIT_ASSERT_THROW ( mesh1->checkDeepEquivalOnSameNodesWith( mesh2, cellCompPol, 0.002, cOld2New ), INTERP_KERNEL::Exception );
+  mesh2->setCoords( mesh1->getCoords() ); // make meshes share the same coordinates array
+  mesh2->allocateCells(2);
+  const int conn[6]={1,2,3, 1,0,2};
+  mesh2->insertNextCell(INTERP_KERNEL::NORM_TRI3,3,conn+0); // #0 = #1
+  mesh2->insertNextCell(INTERP_KERNEL::NORM_TRI3,3,conn+3); // #1 ~ #0
+  mesh2->finishInsertingCells();
+  cellCompPol = 2; // the weakest policy
+  cOld2New->decrRef();
+  mesh1->checkDeepEquivalOnSameNodesWith( mesh2, cellCompPol, 0, cOld2New );
+  //! [CppSnippet_MEDCouplingUMesh_checkDeepEquivalWith_3]
+  nOld2New->decrRef();
+  cOld2New->decrRef();
+  mesh1->decrRef();
+  mesh2->decrRef();
+}
+
 void CppExample_MEDCouplingPointSet_scale()
 {
   using namespace ParaMEDMEM;
@@ -490,11 +1479,11 @@ void CppSnippetUMeshStdBuild1()
   mesh->finishInsertingCells();
   //! [CppSnippetUMeshStdBuild1_3]
   //! [CppSnippetUMeshStdBuild1_4]
-  ParaMEDMEM::DataArrayDouble *myCoords=ParaMEDMEM::DataArrayDouble::New();
-  myCoords->alloc(9,3);//here myCoords are declared to have 3 components, mesh will deduce that its spaceDim==3. 
-  std::copy(coords,coords+27,myCoords->getPointer());
-  mesh->setCoords(myCoords);//myCorrds contains 9 tuples, that is to say mesh contains 9 nodes.
-  myCoords->decrRef();
+  ParaMEDMEM::DataArrayDouble *coordsArr=ParaMEDMEM::DataArrayDouble::New();
+  coordsArr->alloc(9,3);//here coordsArr are declared to have 3 components, mesh will deduce that its spaceDim==3. 
+  std::copy(coords,coords+27,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);//coordsArr contains 9 tuples, that is to say mesh contains 9 nodes.
+  coordsArr->decrRef();
   //! [CppSnippetUMeshStdBuild1_4]
   mesh->checkCoherency();
   //! [CppSnippetUMeshStdBuild1_5]
@@ -570,11 +1559,11 @@ void CppSnippetUMeshAdvBuild1()
   nodalConnI->decrRef();// nodalConnI DataArrayInt instance is owned by mesh after call to setConnectivity method. No more need here -> decrRef()
   //! [CppSnippetUMeshAdvBuild1_3]
   //! [CppSnippetUMeshAdvBuild1_4]
-  ParaMEDMEM::DataArrayDouble *myCoords=ParaMEDMEM::DataArrayDouble::New();
-  myCoords->alloc(9,3);//here myCoords are declared to have 3 components, mesh will deduce that its spaceDim==3. 
-  std::copy(coords,coords+27,myCoords->getPointer());
-  mesh->setCoords(myCoords);//myCorrds contains 9 tuples, that is to say mesh contains 9 nodes.
-  myCoords->decrRef();
+  ParaMEDMEM::DataArrayDouble *coordsArr=ParaMEDMEM::DataArrayDouble::New();
+  coordsArr->alloc(9,3);//here coordsArr are declared to have 3 components, mesh will deduce that its spaceDim==3. 
+  std::copy(coords,coords+27,coordsArr->getPointer());
+  mesh->setCoords(coordsArr);//coordsArr contains 9 tuples, that is to say mesh contains 9 nodes.
+  coordsArr->decrRef();
   //! [CppSnippetUMeshAdvBuild1_4]
   mesh->checkCoherency();
   //! [CppSnippetUMeshAdvBuild1_5]
@@ -588,98 +1577,98 @@ void CppSnippetDataArrayBuild1()
   const int nbOfNodes=12;
   double coords[3*nbOfNodes]={2.,3.,4.,3.,4.,5.,4.,5.,6.,5.,6.,7.,6.,7.,8.,7.,8.,9.,8.,9.,10.,9.,10.,11.,10.,11.,12.,11.,12.,13.,12.,13.,14.,13.,14.,15.};
   //
-  ParaMEDMEM::DataArrayDouble *myCoords=0;
+  ParaMEDMEM::DataArrayDouble *coordsArr=0;
   double *tmp=0;
   //! [CppSnippetDataArrayBuild1_0]
   //
   //! [CppSnippetDataArrayBuild1_1]
-  myCoords=ParaMEDMEM::DataArrayDouble::New();
-  myCoords->useArray(coords,false,ParaMEDMEM::CPP_DEALLOC,nbOfNodes,3);
-  //now use myCoords as you need
+  coordsArr=ParaMEDMEM::DataArrayDouble::New();
+  coordsArr->useArray(coords,false,ParaMEDMEM::CPP_DEALLOC,nbOfNodes,3);
+  //now use coordsArr as you need
   //...
-  //myCoords is no more useful here : release it
-  myCoords->decrRef();
+  //coordsArr is no more useful here : release it
+  coordsArr->decrRef();
   //! [CppSnippetDataArrayBuild1_1]
   //! [CppSnippetDataArrayBuild1_2]
-  myCoords=ParaMEDMEM::DataArrayDouble::New();
+  coordsArr=ParaMEDMEM::DataArrayDouble::New();
   tmp=new double[3*nbOfNodes];
   std::copy(coords,coords+3*nbOfNodes,tmp);
-  myCoords->useArray(tmp,true,ParaMEDMEM::CPP_DEALLOC,nbOfNodes,3);
-  //now use myCoords as you need
+  coordsArr->useArray(tmp,true,ParaMEDMEM::CPP_DEALLOC,nbOfNodes,3);
+  //now use coordsArr as you need
   //...
-  //myCoords is no more useful, release it
-  myCoords->decrRef();
+  //coordsArr is no more useful, release it
+  coordsArr->decrRef();
   //! [CppSnippetDataArrayBuild1_2]
   //! [CppSnippetDataArrayBuild1_3]
-  myCoords=ParaMEDMEM::DataArrayDouble::New();
+  coordsArr=ParaMEDMEM::DataArrayDouble::New();
   tmp=(double *)malloc(3*nbOfNodes*sizeof(double));
   std::copy(coords,coords+3*nbOfNodes,tmp);
-  myCoords->useArray(tmp,true,ParaMEDMEM::C_DEALLOC,nbOfNodes,3);
-  //now use myCoords as you need
+  coordsArr->useArray(tmp,true,ParaMEDMEM::C_DEALLOC,nbOfNodes,3);
+  //now use coordsArr as you need
   //...
-  //myCoords is no more useful here : release it
-  myCoords->decrRef();
+  //coordsArr is no more useful here : release it
+  coordsArr->decrRef();
   //! [CppSnippetDataArrayBuild1_3]
   //! [CppSnippetDataArrayBuild1_4]
-  myCoords=ParaMEDMEM::DataArrayDouble::New();
-  myCoords->alloc(nbOfNodes,3);
-  tmp=myCoords->getPointer();
+  coordsArr=ParaMEDMEM::DataArrayDouble::New();
+  coordsArr->alloc(nbOfNodes,3);
+  tmp=coordsArr->getPointer();
   std::copy(coords,coords+3*nbOfNodes,tmp);
-  myCoords->declareAsNew();//you have modified data pointed by internal pointer notify object
-  //now use myCoords as you need
+  coordsArr->declareAsNew();//you have modified data pointed by internal pointer notify object
+  //now use coordsArr as you need
   //...
-  //myCoords is no more useful here : release it
-  myCoords->decrRef();
+  //coordsArr is no more useful here : release it
+  coordsArr->decrRef();
   //! [CppSnippetDataArrayBuild1_4]
-  myCoords=ParaMEDMEM::DataArrayDouble::New();
-  myCoords->alloc(nbOfNodes,3);
-  tmp=myCoords->getPointer();
+  coordsArr=ParaMEDMEM::DataArrayDouble::New();
+  coordsArr->alloc(nbOfNodes,3);
+  tmp=coordsArr->getPointer();
   std::copy(coords,coords+3*nbOfNodes,tmp);
-  ParaMEDMEM::DataArrayDouble *myCoordsCpy=0;
+  ParaMEDMEM::DataArrayDouble *coordsArrCpy=0;
   //! [CppSnippetDataArrayBuild1_5]
-  myCoordsCpy=myCoords->deepCpy();
+  coordsArrCpy=coordsArr->deepCpy();
   //! [CppSnippetDataArrayBuild1_5]
   //! [CppSnippetDataArrayBuild1_6]
-  CPPUNIT_ASSERT(myCoordsCpy->isEqual(*myCoords,1e-12));
-  myCoordsCpy->setIJ(0,0,1000.);
-  CPPUNIT_ASSERT(!myCoordsCpy->isEqual(*myCoords,1e-12));//myCoordsCpy only has been modified
+  CPPUNIT_ASSERT(coordsArrCpy->isEqual(*coordsArr,1e-12));
+  coordsArrCpy->setIJ(0,0,1000.);
+  CPPUNIT_ASSERT(!coordsArrCpy->isEqual(*coordsArr,1e-12));//coordsArrCpy only has been modified
   //! [CppSnippetDataArrayBuild1_6]
   //! [CppSnippetDataArrayBuild1_7]
-  myCoordsCpy->decrRef();
+  coordsArrCpy->decrRef();
   //! [CppSnippetDataArrayBuild1_7]
   //! [CppSnippetDataArrayBuild1_5bis]
-  myCoordsCpy=myCoords->performCpy(true);
+  coordsArrCpy=coordsArr->performCpy(true);
   //! [CppSnippetDataArrayBuild1_5bis]
-  CPPUNIT_ASSERT(myCoordsCpy->isEqual(*myCoords,1e-12));
-  myCoordsCpy->setIJ(0,0,1000.);
-  CPPUNIT_ASSERT(!myCoordsCpy->isEqual(*myCoords,1e-12));//myCoordsCpy only has been modified
-  myCoordsCpy->decrRef();
+  CPPUNIT_ASSERT(coordsArrCpy->isEqual(*coordsArr,1e-12));
+  coordsArrCpy->setIJ(0,0,1000.);
+  CPPUNIT_ASSERT(!coordsArrCpy->isEqual(*coordsArr,1e-12));//coordsArrCpy only has been modified
+  coordsArrCpy->decrRef();
   //! [CppSnippetDataArrayBuild1_8]
-  myCoordsCpy=myCoords->performCpy(false);
+  coordsArrCpy=coordsArr->performCpy(false);
   //! [CppSnippetDataArrayBuild1_8]
   //! [CppSnippetDataArrayBuild1_9]
-  CPPUNIT_ASSERT(myCoordsCpy->isEqual(*myCoords,1e-12));
-  myCoordsCpy->setIJ(0,0,1000.);
-  CPPUNIT_ASSERT(myCoordsCpy->isEqual(*myCoords,1e-12));//myCoords and myCoordsCpy have been modified simultaneously
+  CPPUNIT_ASSERT(coordsArrCpy->isEqual(*coordsArr,1e-12));
+  coordsArrCpy->setIJ(0,0,1000.);
+  CPPUNIT_ASSERT(coordsArrCpy->isEqual(*coordsArr,1e-12));//coordsArr and coordsArrCpy have been modified simultaneously
   //! [CppSnippetDataArrayBuild1_9]
   //! [CppSnippetDataArrayBuild1_10]
-  myCoordsCpy->decrRef();
+  coordsArrCpy->decrRef();
   //! [CppSnippetDataArrayBuild1_10]
   //! [CppSnippetDataArrayBuild1_11]
-  myCoordsCpy=ParaMEDMEM::DataArrayDouble::New();
+  coordsArrCpy=ParaMEDMEM::DataArrayDouble::New();
   //! [CppSnippetDataArrayBuild1_11]
   //! [CppSnippetDataArrayBuild1_12]
-  myCoordsCpy->cpyFrom(*myCoords);
+  coordsArrCpy->cpyFrom(*coordsArr);
   //! [CppSnippetDataArrayBuild1_12]
   //! [CppSnippetDataArrayBuild1_13]
-  CPPUNIT_ASSERT(myCoordsCpy->isEqual(*myCoords,1e-12));
-  myCoordsCpy->setIJ(0,0,2000.);
-  CPPUNIT_ASSERT(!myCoordsCpy->isEqual(*myCoords,1e-12));//myCoordsCpy only has been modified
+  CPPUNIT_ASSERT(coordsArrCpy->isEqual(*coordsArr,1e-12));
+  coordsArrCpy->setIJ(0,0,2000.);
+  CPPUNIT_ASSERT(!coordsArrCpy->isEqual(*coordsArr,1e-12));//coordsArrCpy only has been modified
   //! [CppSnippetDataArrayBuild1_13]
   //! [CppSnippetDataArrayBuild1_14]
-  myCoordsCpy->decrRef();
+  coordsArrCpy->decrRef();
   //! [CppSnippetDataArrayBuild1_14]
-  myCoords->decrRef();
+  coordsArr->decrRef();
   //! [CppSnippetDataArrayBuild1_14]
 }
 
@@ -817,6 +1806,41 @@ void CppSnippetFieldDoubleBuild4()
 
 int main(int argc, char *argv[])
 {
+  CppExample_MEDCouplingUMesh_areCellsIncludedIn();
+  CppExample_MEDCouplingUMesh_findAndCorrectBadOriented3DExtrudedCells();
+  CppExample_MEDCouplingUMesh_arePolyhedronsNotCorrectlyOriented();
+  CppExample_MEDCouplingUMesh_are2DCellsNotCorrectlyOriented();
+  CppExample_MEDCouplingUMesh_getCellsContainingPoints();
+  CppExample_MEDCouplingUMesh_getCellsContainingPoint();
+  CppExample_MEDCouplingUMesh_buildPartOrthogonalField();
+  CppExample_MEDCouplingUMesh_getPartMeasureField();
+  CppExample_MEDCouplingUMesh_getCellsInBoundingBox();
+  CppExample_MEDCouplingUMesh_renumberNodesInConn();
+  CppExample_MEDCouplingUMesh_renumberNodes();
+  CppExample_MEDCouplingUMesh_findBoundaryNodes();
+  CppExample_MEDCouplingUMesh_buildBoundaryMesh();
+  CppExample_MEDCouplingUMesh_buildFacePartOfMySelfNode();
+  CppExample_MEDCouplingUMesh_buildPartOfMySelfNode();
+  CppExample_MEDCouplingUMesh_getCellIdsLyingOnNodes();
+  CppExample_MEDCouplingUMesh_getCellIdsFullyIncludedInNodeIds();
+  CppExample_MEDCouplingUMesh_buildPartOfMySelf();
+  CppExample_MEDCouplingUMesh_mergeNodes();
+  CppExample_MEDCouplingUMesh_zipConnectivityTraducer();
+  CppExample_MEDCouplingUMesh_zipCoordsTraducer();
+  CppExample_MEDCouplingUMesh_getNodeIdsInUse();
+  CppExample_MEDCouplingUMesh_convertToPolyTypes();
+  CppExample_MEDCouplingUMesh_buildDescendingConnectivity2();
+  CppExample_MEDCouplingUMesh_buildDescendingConnectivity();
+  CppExample_MEDCouplingUMesh_getReverseNodalConnectivity();
+  CppExample_MEDCouplingUMesh_checkDeepEquivalWith();
+  CppExample_MEDCouplingPointSet_scale();
+  CppExample_MEDCouplingPointSet_translate();
+  CppExample_MEDCouplingPointSet_rotate();
+  CppExample_MEDCouplingPointSet_getBoundingBox();
+  CppExample_MEDCouplingPointSet_getNodeIdsNearPoint();
+  CppExample_MEDCouplingPointSet_getNodeIdsNearPoints();
+  CppExample_MEDCouplingPointSet_findCommonNodes();
+  CppExample_MEDCouplingPointSet_getCoordinatesOfNode();
   CppExample_DataArrayInt_buildPermutationArr();
   CppExample_DataArrayInt_invertArrayO2N2N2O();
   CppExample_DataArrayInt_invertArrayN2O2O2N();
