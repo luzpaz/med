@@ -1847,4 +1847,27 @@ void MEDCouplingFieldDouble::WriteVTK(const char *fileName, const std::vector<co
 void MEDCouplingFieldDouble::reprQuickOverview(std::ostream& stream) const throw(INTERP_KERNEL::Exception)
 {
   stream << "MEDCouplingFieldDouble C++ instance at " << this << ". Name : \"" << _name << "\"." << std::endl;
+  const char *nat=0;
+  try
+    {
+      nat=MEDCouplingNatureOfField::GetRepr(_nature);
+      stream << "Nature of field : " << nat << ".\n";
+    }
+  catch(INTERP_KERNEL::Exception& e)
+    {  }
+  const MEDCouplingFieldDiscretization *fd(_type);
+  if(!fd)
+    stream << " No spatial discretization set !";
+  else
+    fd->reprQuickOverview(stream);
+  stream << std::endl;
+  if(!_mesh)
+    stream << "No mesh support defined !";
+  else
+    {
+      std::ostringstream oss;
+      _mesh->reprQuickOverview(oss);
+      std::string tmp(oss.str());
+      stream << "Mesh info : " << tmp.substr(0,tmp.find('\n'));
+    }
 }
