@@ -1857,7 +1857,7 @@ void MEDCouplingFieldDouble::reprQuickOverview(std::ostream& stream) const throw
     {  }
   const MEDCouplingFieldDiscretization *fd(_type);
   if(!fd)
-    stream << " No spatial discretization set !";
+    stream << "No spatial discretization set !";
   else
     fd->reprQuickOverview(stream);
   stream << std::endl;
