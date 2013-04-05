@@ -54,7 +54,7 @@ lib_LTLIBRARIES = libSalomeIDLMED.la libSalomeIDLMEDTests.la
 
 # Sources built from idl files
 BASEIDL_SOURCES = \
-	MEDSK.cc MED_GenSK.cc Compo1PySK.cc \
+	MEDSK.cc \
 	MEDCouplingCorbaServantSK.cc        \
 	ParaMEDCouplingCorbaServantSK.cc
 
@@ -76,7 +76,7 @@ nodist_libSalomeIDLMED_la_SOURCES = $(IDL_SOURCES)
 
 # header files must be exported: other modules have to use this library
 nodist_salomeinclude_HEADERS =         \
-	MED.hh MED_Gen.hh Compo1Py.hh  \
+	MED.hh \
 	MEDCouplingCorbaServant.hh     \
 	MEDCouplingCorbaServantTest.hh \
 	ParaMEDCouplingCorbaServant.hh
