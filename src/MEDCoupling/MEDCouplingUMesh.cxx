@@ -2592,7 +2592,7 @@ void MEDCouplingUMesh::renumberNodes(const int *newNodeNumbers, int newNbOfNodes
  *         this->getNumberOfNodes(), in "Old to New" mode. 
  *         See \ref MEDCouplingArrayRenumbering for more info on renumbering modes.
  *  \param [in] newNbOfNodes - number of nodes remaining after renumbering, which is
- *         actually the maximal id in \a newNodeNumbers.
+ *         actually one more than the maximal id in \a newNodeNumbers.
  *  \throw If the coordinates array is not set.
  *  \throw If the nodal connectivity of cells is not defined.
  *
