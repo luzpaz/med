@@ -282,15 +282,6 @@ gui_ok=no
 
 WITHIHM="no"
 
-# This flags should be used to switch between the MEDMEM GUI (defined
-# in the MEDGUI package) and the MEDOP GUI (defined in the MEDOP
-# package). In any case the module factory function is provided by the
-# MEDOP GUI library (package MEDOP/gui) and this factory function
-# creates weither a MedGUI instance or a MEDOPModule instance,
-# depending on the value of this flags. The default is to use the new
-# MEDOP GUI. 
-AM_CONDITIONAL(WITH_MEDMEMGUI,test "1" = "0")
-
 ###
 # Other tests should be performed only in --with-interp-kernel-only=no mode
 ###
@@ -700,12 +691,6 @@ AC_OUTPUT([ \
         src/MEDWrapper/Base/Makefile \
         src/MEDWrapper/Factory/Makefile \
         src/MEDWrapper/V2_2/Makefile \
-        src/MEDMEM/Doxyfile_med_devel \
-        src/MEDMEM/Doxyfile_med_user \
-        src/MEDMEM/Makefile \
-        src/MEDMEM_SWIG/Makefile \
-        src/MEDMEMBinTest/Makefile \
-        src/MEDMEMCppTest/Makefile \
         src/INTERP_KERNEL/Makefile \
         src/INTERP_KERNELTest/Makefile \
         src/MEDCoupling/Makefile \
@@ -722,9 +707,6 @@ AC_OUTPUT([ \
         src/MEDCalculator/Makefile \
         src/MEDCalculator/Swig/Makefile \
         src/MEDCalculator/Test/Makefile \
-        src/MEDSPLITTER/Makefile \
-        src/MEDSPLITTER/Test/Makefile \
-        src/MEDSPLITTER_Swig/Makefile \
         src/MEDPartitioner/Makefile \
         src/MEDPartitioner/Test/Makefile \
         src/RENUMBER/Makefile \
@@ -734,27 +716,6 @@ AC_OUTPUT([ \
         src/ParaMEDLoader/Makefile \
         src/ParaMEDMEMTest/Makefile \
         src/ParaMEDMEM_Swig/Makefile \
-        src/MEDMEM_I/Makefile \
-        src/MED/Makefile \
-        src/MedCorba_Swig/Makefile \
-        src/MED_SWIG/Makefile \
-        src/MedClient/Makefile \
-        src/MedClient/src/Makefile \
-        src/MedClient/test/Makefile \
-        src/MedClient/test/environ/Makefile \
-        src/MedClient/test/environ/runContainer \
-        src/MedClient/test/environ/runEnvironTests \
-        src/MedClient/test/environ/runTestMedCorba \
-        src/MedClient/test/environ/stopContainer \
-        src/MedClient/test/environ/csh/init1 \
-        src/MedClient/test/environ/csh/init2 \
-        src/MedClient/test/environ/csh/init3 \
-        src/MedClient/test/environ/csh/Makefile \
-        src/MedClient/test/environ/csh/runContainer \
-        src/MedClient/test/environ/csh/runEnvironTests \
-        src/MedClient/test/environ/csh/stopContainer \
-        src/MedClient/test/test1/Makefile \
-        src/MedClient/test/test2/Makefile \
         src/MEDGUI/Makefile \
 	src/MEDOP/Makefile \
 	src/MEDOP/cmp/Makefile \
@@ -773,11 +734,6 @@ AC_OUTPUT([ \
 	src/MEDOP/doc/sphinx/conf.py \
 	src/MEDOP/doc/sphinx/Makefile \
         doc/Makefile \
-        doc/MEDMEM/Makefile \
-        doc/MEDMEM/MEDMEM_Content.tex \
-        doc/MEDMEM/MEDMEM_UML_light.png \
-        doc/MEDMEM/MEDMEM_UML.png \
-        doc/MEDMEM/MEDMEM_UsersGuide.tex \
         doc/salome/Makefile \
         doc/salome/tui/Makefile \
         doc/salome/tui/doxyfile \
