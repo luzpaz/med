@@ -27,6 +27,17 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         #! [PySnippet_MEDCouplingUMesh__1]
         return
 
+    def testExample_MEDCouplingCMesh_getCoordsAt(self):
+        #! [PySnippet_MEDCouplingCMesh_getCoordsAt_1]
+        coords = [1.,2.,4.]
+        x=DataArrayDouble.New(coords,3,1)
+        mesh=MEDCouplingCMesh.New()
+        mesh.setCoordsAt(0,x)
+        x2=mesh.getCoordsAt(0)
+        assert coords == x2.getValues()
+        #! [PySnippet_MEDCouplingCMesh_getCoordsAt_1]
+        return
+
     def testExample_MEDCouplingUMesh_areCellsIncludedIn(self):
         #! [PySnippet_MEDCouplingUMesh_areCellsIncludedIn_1]
         mesh1=MEDCouplingUMesh.New();

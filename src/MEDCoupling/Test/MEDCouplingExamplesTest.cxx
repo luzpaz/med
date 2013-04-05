@@ -26,6 +26,19 @@
 #include "MEDCouplingMemArray.hxx"
 #include "MEDCouplingMultiFields.hxx"
 
+void CppExample_MEDCouplingPointSet_getCoordsAt()
+{
+  using namespace ParaMEDMEM;
+  //! [CppSnippet_MEDCouplingCMesh_getCoordsAt_1]
+  const double coords[3] = {1.,2.,4.};
+  DataArrayDouble* x = DataArrayDouble::New();
+  x->useExternalArrayWithRWAccess( coords, 3, 1 );
+  MEDCouplingCMesh *mesh=MEDCouplingCMesh::New();
+  mesh->setCoordsAt(0,x);
+  const DataArrayDouble* x2=mesh->getCoordsAt(0);
+  CPPUNIT_ASSERT( x2->isEqual( *x, 1e-13 ));
+  //! [CppSnippet_MEDCouplingCMesh_getCoordsAt_1]
+}
 
 void CppExample_MEDCouplingUMesh_areCellsIncludedIn()
 {
@@ -1806,6 +1819,7 @@ void CppSnippetFieldDoubleBuild4()
 
 int main(int argc, char *argv[])
 {
+  CppExample_MEDCouplingPointSet_getCoordsAt();
   CppExample_MEDCouplingUMesh_areCellsIncludedIn();
   CppExample_MEDCouplingUMesh_findAndCorrectBadOriented3DExtrudedCells();
   CppExample_MEDCouplingUMesh_arePolyhedronsNotCorrectlyOriented();

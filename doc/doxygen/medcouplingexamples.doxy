@@ -3,6 +3,24 @@
 
 
 
+\anchor cpp_mcumesh_
+<br><h2>  </h2>
+
+First, we create a 2D mesh with 3 QUAD4 and 2 TRI3 cells.
+\snippet MEDCouplingExamplesTest.cxx CppSnippet_MEDCouplingUMesh_
+\snippet MEDCouplingExamplesTest.py PySnippet_MEDCouplingUMesh_
+\snippet MEDCouplingExamplesTest.py Snippet_MEDCouplingUMesh_
+
+
+\anchor cpp_mccmesh_getCoordsAt
+<br><h2> Getting node coordinates </h2>
+
+We create an 1D Cartesian mesh and retrieves node coordinates using
+\ref ParaMEDMEM::MEDCouplingCMesh::getCoordsAt "getCoordsAt()".
+\snippet MEDCouplingExamplesTest.cxx CppSnippet_MEDCouplingCMesh_getCoordsAt_1
+
+
+
 \anchor cpp_mcumesh_areCellsIncludedIn
 <br><h2> Cells correspondence in two meshes </h2>
 
