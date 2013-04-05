@@ -391,10 +391,10 @@ std::string MEDCouplingCMesh::advancedRepr() const
 /*!
  * Returns a DataArrayDouble holding positions of nodes along a given axis.
  * For more info on Cartesian meshes, see \ref MEDCouplingCMeshPage.
- *  \param [in] i - an index of axis, a value from [1,2,3].
+ *  \param [in] i - an index of axis, a value from [0,1,2].
  *  \return const DataArrayDouble * - a pointer to the data array of node coordinates
  *         referred by \a this mesh.
- *  \throw If \a i is not one of [1,2,3].
+ *  \throw If \a i is not one of [0,1,2].
  *
  *  \ref cpp_mccmesh_getCoordsAt "Here is a C++ example".<br>
  *  \ref  py_mccmesh_getCoordsAt "Here is a Python example".
@@ -417,10 +417,10 @@ const DataArrayDouble *MEDCouplingCMesh::getCoordsAt(int i) const throw(INTERP_K
 /*!
  * Returns a DataArrayDouble holding positions of nodes along a given axis.
  * For more info on Cartesian meshes, see \ref MEDCouplingCMeshPage.
- *  \param [in] i - an index of axis, a value from [1,2,3].
+ *  \param [in] i - an index of axis, a value from [0,1,2].
  *  \return const DataArrayDouble * - a pointer to the data array of node coordinates
  *         referred by \a this mesh.
- *  \throw If \a i is not one of [1,2,3].
+ *  \throw If \a i is not one of [0,1,2].
  *
  *  \ref cpp_mccmesh_getCoordsAt "Here is a C++ example".<br>
  *  \ref  py_mccmesh_getCoordsAt "Here is a Python example".
@@ -443,11 +443,11 @@ DataArrayDouble *MEDCouplingCMesh::getCoordsAt(int i) throw(INTERP_KERNEL::Excep
 /*!
  * Sets node coordinates along a given axis. For more info on Cartesian meshes, see 
  * \ref MEDCouplingCMeshPage.
- *  \param [in] i - an index of axis, a value in range [1,2,3].
+ *  \param [in] i - an index of axis, a value in range [0,1,2].
  *  \param [in] arr - DataArrayDouble holding positions of nodes along the i-th
  *         axis. It must be an array of one component.
  *  \throw If \a arr->getNumberOfComponents() != 1.
- *  \throw If \a i is not one of [1,2,3].
+ *  \throw If \a i is not one of [0,1,2].
  *
  *  \ref medcouplingcppexamplesCmeshStdBuild1 "Here is a C++ example".<br>
  *  \ref  medcouplingpyexamplesCmeshStdBuild1 "Here is a Python example".
