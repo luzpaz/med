@@ -35,7 +35,7 @@ dist_libMEDGUI_la_SOURCES = MEDGUIFileContentDial.h MEDGUISelection.hxx \
 	MEDGUISelectComponents.h MEDGUISelectComponents.cxx MEDGUIDataBaseDockWidget.hxx \
 	MEDGUIDataBaseDockWidget.cxx
 
-MOC_FILES= MEDGUI_moc.cxx MEDGUIFileContentDial_moc.cxx MEDGUISelectComponents_moc.cxx
+MOC_FILES= MEDGUIFileContentDial_moc.cxx MEDGUISelectComponents_moc.cxx
 
 # meta object implementation files generation (moc)
 %_moc.cxx: %.h
