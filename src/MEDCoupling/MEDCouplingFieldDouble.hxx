@@ -53,7 +53,7 @@ namespace ParaMEDMEM
     bool areCompatibleForMeld(const MEDCouplingFieldDouble *other) const;
     void renumberCells(const int *old2NewBg, bool check=true) throw(INTERP_KERNEL::Exception);
     void renumberCellsWithoutMesh(const int *old2NewBg, bool check=true) throw(INTERP_KERNEL::Exception);
-    void renumberNodes(const int *old2NewBg) throw(INTERP_KERNEL::Exception);
+    void renumberNodes(const int *old2NewBg, double eps=1e-15) throw(INTERP_KERNEL::Exception);
     void renumberNodesWithoutMesh(const int *old2NewBg, int newNbOfNodes, double eps=1e-15) throw(INTERP_KERNEL::Exception);
     DataArrayInt *getIdsInRange(double vmin, double vmax) const throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *buildSubPart(const DataArrayInt *part) const throw(INTERP_KERNEL::Exception);
@@ -139,8 +139,8 @@ namespace ParaMEDMEM
     void finishUnserialization(const std::vector<int>& tinyInfoI, const std::vector<double>& tinyInfoD, const std::vector<std::string>& tinyInfoS);
     void serialize(DataArrayInt *&dataInt, std::vector<DataArrayDouble *>& arrays) const;
     //
-    void changeUnderlyingMesh(const MEDCouplingMesh *other, int levOfCheck, double prec) throw(INTERP_KERNEL::Exception);
-    void substractInPlaceDM(const MEDCouplingFieldDouble *f, int levOfCheck, double prec) throw(INTERP_KERNEL::Exception);
+    void changeUnderlyingMesh(const MEDCouplingMesh *other, int levOfCheck, double precOnMesh, double eps=1e-15) throw(INTERP_KERNEL::Exception);
+    void substractInPlaceDM(const MEDCouplingFieldDouble *f, int levOfCheck, double precOnMesh, double eps=1e-15) throw(INTERP_KERNEL::Exception);
     bool mergeNodes(double eps, double epsOnVals=1e-15) throw(INTERP_KERNEL::Exception);
     bool mergeNodes2(double eps, double epsOnVals=1e-15) throw(INTERP_KERNEL::Exception);
     bool zipCoords(double epsOnVals=1e-15) throw(INTERP_KERNEL::Exception);

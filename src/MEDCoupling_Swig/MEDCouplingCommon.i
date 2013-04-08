@@ -2890,8 +2890,8 @@ namespace ParaMEDMEM
     void setTimeValue(double val) throw(INTERP_KERNEL::Exception);
     void setEndTimeValue(double val) throw(INTERP_KERNEL::Exception);
     void updateTime() const throw(INTERP_KERNEL::Exception);
-    void changeUnderlyingMesh(const MEDCouplingMesh *other, int levOfCheck, double prec) throw(INTERP_KERNEL::Exception);
-    void substractInPlaceDM(const MEDCouplingFieldDouble *f, int levOfCheck, double prec) throw(INTERP_KERNEL::Exception);
+    void changeUnderlyingMesh(const MEDCouplingMesh *other, int levOfCheck, double precOnMesh, double eps=1e-15) throw(INTERP_KERNEL::Exception);
+    void substractInPlaceDM(const MEDCouplingFieldDouble *f, int levOfCheck, double precOnMesh, double eps=1e-15) throw(INTERP_KERNEL::Exception);
     bool mergeNodes(double eps, double epsOnVals=1e-15) throw(INTERP_KERNEL::Exception);
     bool mergeNodes2(double eps, double epsOnVals=1e-15) throw(INTERP_KERNEL::Exception);
     bool zipCoords(double epsOnVals=1e-15) throw(INTERP_KERNEL::Exception);
@@ -3204,7 +3204,7 @@ namespace ParaMEDMEM
             self->renumberCells(da2->getConstPointer(),check);
           }
       }
-      void renumberNodes(PyObject *li) throw(INTERP_KERNEL::Exception)
+      void renumberNodes(PyObject *li, double eps=1e-15) throw(INTERP_KERNEL::Exception)
       {
         void *da=0;
         int res1=SWIG_ConvertPtr(li,&da,SWIGTYPE_p_ParaMEDMEM__DataArrayInt, 0 |  0 );
@@ -3212,7 +3212,7 @@ namespace ParaMEDMEM
           {
             int size;
             INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(li,&size);
-            self->renumberNodes(tmp);
+            self->renumberNodes(tmp,eps);
           }
         else
           {
@@ -3220,7 +3220,7 @@ namespace ParaMEDMEM
             if(!da2)
               throw INTERP_KERNEL::Exception("Not null DataArrayInt instance expected !");
             da2->checkAllocated();
-            self->renumberNodes(da2->getConstPointer());
+            self->renumberNodes(da2->getConstPointer(),eps);
           }
       }
 

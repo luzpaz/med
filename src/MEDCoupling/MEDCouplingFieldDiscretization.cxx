@@ -355,6 +355,8 @@ void MEDCouplingFieldDiscretization::getCellIdsHavingGaussLocalization(int locId
 
 void MEDCouplingFieldDiscretization::RenumberEntitiesFromO2NArr(double eps, const int *old2NewPtr, int newNbOfEntity, DataArrayDouble *arr, const char *msg)
 {
+  if(!arr)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretization::RenumberEntitiesFromO2NArr : input array is NULL !");
   int oldNbOfElems=arr->getNumberOfTuples();
   int nbOfComp=arr->getNumberOfComponents();
   int newNbOfTuples=newNbOfEntity;

@@ -436,8 +436,10 @@ void MEDCouplingFieldDouble::renumberCellsWithoutMesh(const int *old2NewBg, bool
 /*!
  * This method performs a clone of mesh and a renumbering of underlying nodes of it. The number of nodes remains not compulsory the same as renumberCells method.
  * The values of field are impacted in consequence to have the same geometrical field.
+ * 
+ * \sa MEDCouplingFieldDouble::renumberNodesWithoutMesh
  */
-void MEDCouplingFieldDouble::renumberNodes(const int *old2NewBg) throw(INTERP_KERNEL::Exception)
+void MEDCouplingFieldDouble::renumberNodes(const int *old2NewBg, double eps) throw(INTERP_KERNEL::Exception)
 {
   const MEDCouplingPointSet *meshC=dynamic_cast<const MEDCouplingPointSet *>(_mesh);
   if(!meshC)
@@ -445,15 +447,17 @@ void MEDCouplingFieldDouble::renumberNodes(const int *old2NewBg) throw(INTERP_KE
   int nbOfNodes=meshC->getNumberOfNodes();
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingPointSet> meshC2((MEDCouplingPointSet *)meshC->deepCpy());
   int newNbOfNodes=*std::max_element(old2NewBg,old2NewBg+nbOfNodes)+1;
-  renumberNodesWithoutMesh(old2NewBg,newNbOfNodes);
+  renumberNodesWithoutMesh(old2NewBg,newNbOfNodes,eps);
   meshC2->renumberNodes(old2NewBg,newNbOfNodes);
   setMesh(meshC2);
 }
 
 /*!
  * \b WARNING : use this method with lot of care !
- * This method performs half job of MEDCouplingFieldDouble::renumberNodes. That is to say no permutation of cells is done on underlying mesh.
- * That is to say, the field content is changed by this method.
+ * ** WARNING : in case of throw the content in array can be partially modified until the exception raises **
+ * This method performs half job of MEDCouplingFieldDouble::renumberNodes. That is to say no permutation of nodes is done on underlying mesh.
+ * That is to say, the field content is changed by this method. As the API suggests, this method can performs the half job of nodes contraction.
+ * That's why an epsilon is given to specify a threshold of error in case of two nodes are merged but the difference of values on these nodes are higher than \a eps.
  */
 void MEDCouplingFieldDouble::renumberNodesWithoutMesh(const int *old2NewBg, int newNbOfNodes, double eps) throw(INTERP_KERNEL::Exception)
 {
@@ -1375,21 +1379,21 @@ void MEDCouplingFieldDouble::serialize(DataArrayInt *&dataInt, std::vector<DataA
 }
 
 /*!
- * This method tries to to change the mesh support of \a this following the parameter 'levOfCheck' and 'prec'.
+ * This method tries to to change the mesh support of \a this following the parameter 'levOfCheck' and 'precOnMesh'.
  * Semantic of 'levOfCheck' is explained in MEDCouplingMesh::checkGeoEquivalWith method. This method is used to perform the job.
  * If this->_mesh is not defined or other an exeption will be throw.
  */
-void MEDCouplingFieldDouble::changeUnderlyingMesh(const MEDCouplingMesh *other, int levOfCheck, double prec) throw(INTERP_KERNEL::Exception)
+void MEDCouplingFieldDouble::changeUnderlyingMesh(const MEDCouplingMesh *other, int levOfCheck, double precOnMesh, double eps) throw(INTERP_KERNEL::Exception)
 {
   if(_mesh==0 || other==0)
     throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::changeUnderlyingMesh : is expected to operate on not null meshes !");
   DataArrayInt *cellCor=0,*nodeCor=0;
-  other->checkGeoEquivalWith(_mesh,levOfCheck,prec,cellCor,nodeCor);
+  other->checkGeoEquivalWith(_mesh,levOfCheck,precOnMesh,cellCor,nodeCor);
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> cellCor2(cellCor),nodeCor2(nodeCor);
   if(cellCor)
     renumberCellsWithoutMesh(cellCor->getConstPointer(),false);
   if(nodeCor)
-    renumberNodesWithoutMesh(nodeCor->getConstPointer(),_mesh->getNumberOfNodes());
+    renumberNodesWithoutMesh(nodeCor->getConstPointer(),nodeCor->getMaxValueInArray()+1,eps);
   setMesh(const_cast<MEDCouplingMesh *>(other));
 }
 
@@ -1398,14 +1402,18 @@ void MEDCouplingFieldDouble::changeUnderlyingMesh(const MEDCouplingMesh *other, 
  * No interpolation will be done here only an analyze of two underlying mesh will be done to see if the meshes are geometrically equivalent. If yes, the eventual renumbering will be done and operator-= applyed after.
  * This method requires that 'f' and \a this are coherent (check coherency) and that 'f' and \a this would be coherent for a merge.
  * Semantic of 'levOfCheck' is explained in MEDCouplingMesh::checkGeoEquivalWith method.
+ * \param [in] precOnMesh precision for the mesh comparison between \c this->getMesh() and \c f->getMesh()
+ * \param [in] eps the precision on values that can appear in case of 
  */
-void MEDCouplingFieldDouble::substractInPlaceDM(const MEDCouplingFieldDouble *f, int levOfCheck, double prec) throw(INTERP_KERNEL::Exception)
+void MEDCouplingFieldDouble::substractInPlaceDM(const MEDCouplingFieldDouble *f, int levOfCheck, double precOnMesh, double eps) throw(INTERP_KERNEL::Exception)
 {
   checkCoherency();
+  if(!f)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::substractInPlaceDM : input field is NULL !");
   f->checkCoherency();
   if(!areCompatibleForMerge(f))
-    throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::diffWith : Fields are not compatible ; unable to apply mergeFields on them !");
-  changeUnderlyingMesh(f->getMesh(),levOfCheck,prec);
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::substractInPlaceDM : Fields are not compatible ; unable to apply mergeFields on them !");
+  changeUnderlyingMesh(f->getMesh(),levOfCheck,precOnMesh,eps);
   operator-=(*f);
 }
 
@@ -1500,7 +1508,7 @@ bool MEDCouplingFieldDouble::zipConnectivity(int compType, double epsOnVals) thr
 {
   const MEDCouplingUMesh *meshC=dynamic_cast<const MEDCouplingUMesh *>(_mesh);
   if(!meshC)
-    throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::zipCoords : Invalid support mesh to apply zipCoords on it : must be a MEDCouplingPointSet one !");
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::zipConnectivity : Invalid support mesh to apply zipCoords on it : must be a MEDCouplingPointSet one !");
   if(!((const MEDCouplingFieldDiscretization *)_type))
     throw INTERP_KERNEL::Exception("No spatial discretization underlying this field to perform zipConnectivity !");
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> meshC2((MEDCouplingUMesh *)meshC->deepCpy());
