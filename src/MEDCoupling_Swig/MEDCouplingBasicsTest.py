@@ -11935,6 +11935,35 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         gl.__repr__() ; gl.__str__()
         pass
 
+    def testSwig2NonRegressionBugSubstractInPlaceDM(self):
+        m0=MEDCouplingCMesh()
+        arr=DataArrayDouble(5,1) ; arr.iota(0.)
+        m0.setCoords(arr,arr)
+        m0=m0.buildUnstructured()
+        m00=m0[::2] ; m00.simplexize(0) ; m01=m0[1::2]
+        m0=MEDCouplingUMesh.MergeUMeshes([m00,m01])
+        m0.getCoords()[:]*=1/4.
+        m0.setName("mesh")
+        #
+        NodeField=MEDCouplingFieldDouble(ON_NODES,ONE_TIME) ; NodeField.setTime(5.6,5,6) ; NodeField.setMesh(m0)
+        NodeField.setName("NodeField")
+        NodeField.fillFromAnalytic(1,"exp(-((x-1)*(x-1)+(y-1)*(y-1)))") ; NodeField.getArray().setInfoOnComponent(0,"powernode [W]")
+        proc0=m0.getCellsInBoundingBox([(0.,0.4),(0.,0.4)],1e-10)
+        proc1=proc0.buildComplement(m0.getNumberOfCells())
+        #
+        NodeField0=NodeField[proc0] ; NodeField0.getMesh().setName(m0.getName())
+        NodeField1=NodeField[proc1] ; NodeField1.getMesh().setName(m0.getName())
+        #
+        NodeField_read=MEDCouplingFieldDouble.MergeFields([NodeField0,NodeField1])
+        NodeField_read.mergeNodes(1e-10)
+        NodeFieldCpy=NodeField.deepCpy()
+        NodeFieldCpy.mergeNodes(1e-10)
+        NodeField.checkCoherency()
+        self.assertTrue(not NodeField.getArray().isUniform(0.,1e-12))
+        NodeField.substractInPlaceDM(NodeField_read,10,1e-12)
+        self.assertTrue(NodeField.getArray().isUniform(0.,1e-12))
+        pass
+
     def setUp(self):
         pass
     pass
