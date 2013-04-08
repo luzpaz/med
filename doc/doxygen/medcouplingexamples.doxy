@@ -3,13 +3,97 @@
 
 
 
-\anchor cpp_mcumesh_
+\anchor cpp_mcmesh_
 <br><h2>  </h2>
 
 First, we create a 2D mesh with 3 QUAD4 and 2 TRI3 cells.
 \snippet MEDCouplingExamplesTest.cxx CppSnippet_MEDCouplingUMesh_
 \snippet MEDCouplingExamplesTest.py PySnippet_MEDCouplingUMesh_
 \snippet MEDCouplingExamplesTest.py Snippet_MEDCouplingUMesh_
+
+
+\anchor cpp_mcmesh_fillFromAnalytic3
+<br><h2> Creating a field using a formular </h2>
+
+First, we create a 2D Cartesian mesh constituted by 2 cells.
+\snippet MEDCouplingExamplesTest.cxx CppSnippet_MEDCouplingMesh_fillFromAnalytic3_1
+Now we use
+\ref ParaMEDMEM::MEDCouplingMesh::fillFromAnalytic3 "fillFromAnalytic3()"
+to get a \ref ParaMEDMEM::MEDCouplingFieldDouble "MEDCouplingFieldDouble" on cells filled
+with values computed using a formular \b func. This formular is applied to coordinates of
+each point (barycenter) for which the field value is computed. We want to get the
+field on cells, with 3 components computed as follows. (In \b func, we refer to the
+first component of a point using the variable "a", and to the second component, using
+the variable "b").
+- Component #0 = the second coordinate of the point; hence "IVec * b" in \b func.
+- Component #1 = the first coordinate of the point; hence "JVec * a".
+- Component #2 = distance between the point and SC origin (0.,0.); hence 
+"KVec * sqrt( a*a + b*b )".
+
+In addition we want to add 10.0 to each component computed as described above, hence
+"10" in \b func.
+\snippet MEDCouplingExamplesTest.cxx CppSnippet_MEDCouplingMesh_fillFromAnalytic3_2
+Now we ascertain that the result field is as we expect. We check the second tuple of
+the \b field. We get barycenter of the cell #1 and checks that values of the second
+tuple are computed as we want.
+\snippet MEDCouplingExamplesTest.cxx CppSnippet_MEDCouplingMesh_fillFromAnalytic3_3
+
+
+
+\anchor cpp_mcmesh_fillFromAnalytic2
+<br><h2> Creating a field using a formular </h2>
+
+First, we create a 2D Cartesian mesh constituted by 2 cells.
+Note that we set names to coordinates arrays ("a" and "b" ) which will be used to refer to
+corresponding coordinates within a function.
+\snippet MEDCouplingExamplesTest.cxx CppSnippet_MEDCouplingMesh_fillFromAnalytic2_1
+Now we use
+\ref ParaMEDMEM::MEDCouplingMesh::fillFromAnalytic2 "fillFromAnalytic2()"
+to get a \ref ParaMEDMEM::MEDCouplingFieldDouble "MEDCouplingFieldDouble" on cells filled
+with values computed using a formular \b func. This formular is applied to coordinates of
+each point (barycenter) for which the field value is computed. We want to get the
+field on cells, with 3 components computed as follows. (In \b func, we refer to the
+first component of a point using the variable "a", and to the second component, using
+the variable "b").
+- Component #0 = the second coordinate of the point; hence "IVec * b" in \b func.
+- Component #1 = the first coordinate of the point; hence "JVec * a".
+- Component #2 = distance between the point and SC origin (0.,0.); hence 
+"KVec * sqrt( a*a + b*b )".
+
+In addition we want to add 10.0 to each component computed as described above, hence
+"10" in \b func.
+\snippet MEDCouplingExamplesTest.cxx CppSnippet_MEDCouplingMesh_fillFromAnalytic2_2
+Now we ascertain that the result field is as we expect. We check the second tuple of
+the \b field. We get barycenter of the cell #1 and checks that values of the second
+tuple are computed as we want.
+\snippet MEDCouplingExamplesTest.cxx CppSnippet_MEDCouplingMesh_fillFromAnalytic2_3
+
+
+\anchor cpp_mcmesh_fillFromAnalytic
+<br><h2> Creating a field using a formular </h2>
+
+First, we create a 2D Cartesian mesh constituted by 2 cells.
+\snippet MEDCouplingExamplesTest.cxx CppSnippet_MEDCouplingMesh_fillFromAnalytic_1
+Now we use
+\ref ParaMEDMEM::MEDCouplingMesh::fillFromAnalytic "fillFromAnalytic()"
+to get a \ref ParaMEDMEM::MEDCouplingFieldDouble "MEDCouplingFieldDouble" on cells filled 
+with values computed using a formular \b func. This formular is applied to coordinates of
+each point (barycenter) for which the field value is computed. We want to get the
+field on cells, with 3 components computed as follows. (In \b func, we refer to the
+first component of a point using the variable "a", and to the second component, using
+the variable "b").
+- Component #0 = the second coordinate of the point; hence "IVec * b" in \b func.
+- Component #1 = the first coordinate of the point; hence "JVec * a".
+- Component #2 = distance between the point and SC origin (0.,0.); hence 
+"KVec * sqrt( a*a + b*b )".
+
+In addition we want to add 10.0 to each component computed as described above, hence
+"10" in \b func.
+\snippet MEDCouplingExamplesTest.cxx CppSnippet_MEDCouplingMesh_fillFromAnalytic_2
+Now we ascertain that the result field is as we expect. We check the second tuple of
+the \b field. We get barycenter of the cell #1 and checks that values of the second
+tuple are computed as we want.
+\snippet MEDCouplingExamplesTest.cxx CppSnippet_MEDCouplingMesh_fillFromAnalytic_3
 
 
 \anchor cpp_mccmesh_getCoordsAt

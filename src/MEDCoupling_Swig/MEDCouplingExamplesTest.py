@@ -20,11 +20,92 @@
 
 from MEDCoupling import *
 import unittest
-from math import pi
+from math import pi, sqrt
 
 class MEDCouplingBasicsTest(unittest.TestCase):
     def testExample_MEDCouplingUMesh_(self):
         #! [PySnippet_MEDCouplingUMesh__1]
+        return
+
+    def testExample_MEDCouplingMesh_fillFromAnalytic3(self):
+        #! [PySnippet_MEDCouplingMesh_fillFromAnalytic3_1]
+        coords = [0.,2.,4.,6.] #  6. is not used
+        x=DataArrayDouble.New(coords[:3],3,1)
+        y=DataArrayDouble.New(coords[:2],2,1)
+        mesh=MEDCouplingCMesh.New()
+        mesh.setCoords(x,y)
+        #! [PySnippet_MEDCouplingMesh_fillFromAnalytic3_1]
+        #! [PySnippet_MEDCouplingMesh_fillFromAnalytic3_2]
+        func = "IVec * b + JVec * a + KVec * sqrt( a*a + b*b ) + 10"
+        varNames=["a","b"] # names used to refer to X and Y coord components
+        field=mesh.fillFromAnalytic3(ON_CELLS,3,varNames,func)
+        #! [PySnippet_MEDCouplingMesh_fillFromAnalytic3_2]
+        #! [PySnippet_MEDCouplingMesh_fillFromAnalytic3_3]
+        vals1 = field.getArray().getTuple(1) # values of the cell #1
+        assert len( vals1 ) == 3 # 3 components in the field
+        #
+        bc = mesh.getBarycenterAndOwner() # func is applied to barycenters of cells
+        bc1 = bc.getTuple(1) # coordinates of the second point
+        #
+        dist = sqrt( bc1[0]*bc1[0] + bc1[1]*bc1[1] ) # "sqrt( a*a + b*b )"
+        self.assertAlmostEqual( vals1[0], 10 + bc1[1], 13 ) # "10 + IVec * b"
+        self.assertAlmostEqual( vals1[1], 10 + bc1[0], 13 ) # "10 + JVec * a"
+        self.assertAlmostEqual( vals1[2], 10 + dist  , 13 ) # "10 + KVec * sqrt( a*a + b*b )"
+        #! [PySnippet_MEDCouplingMesh_fillFromAnalytic3_3]
+        return
+
+    def testExample_MEDCouplingMesh_fillFromAnalytic2(self):
+        #! [PySnippet_MEDCouplingMesh_fillFromAnalytic2_1]
+        coords = [0.,2.,4.,6.] #  6. is not used
+        x=DataArrayDouble.New(coords[:3],3,1)
+        y=DataArrayDouble.New(coords[:2],2,1)
+        x.setInfoOnComponent(0,"a") # name used to refer to X coordinate within a function
+        y.setInfoOnComponent(0,"b") # name used to refer to Y coordinate within a function
+        mesh=MEDCouplingCMesh.New()
+        mesh.setCoords(x,y)
+        #! [PySnippet_MEDCouplingMesh_fillFromAnalytic2_1]
+        #! [PySnippet_MEDCouplingMesh_fillFromAnalytic2_2]
+        func = "IVec * b + JVec * a + KVec * sqrt( a*a + b*b ) + 10"
+        field=mesh.fillFromAnalytic2(ON_CELLS,3,func)
+        #! [PySnippet_MEDCouplingMesh_fillFromAnalytic2_2]
+        #! [PySnippet_MEDCouplingMesh_fillFromAnalytic2_3]
+        vals1 = field.getArray().getTuple(1) # values of the cell #1
+        assert len( vals1 ) == 3 # 3 components in the field
+        #
+        bc = mesh.getBarycenterAndOwner() # func is applied to barycenters of cells
+        bc1 = bc.getTuple(1) # coordinates of the second point
+        #
+        dist = sqrt( bc1[0]*bc1[0] + bc1[1]*bc1[1] ) # "sqrt( a*a + b*b )"
+        self.assertAlmostEqual( vals1[0], 10 + bc1[1], 13 ) # "10 + IVec * b"
+        self.assertAlmostEqual( vals1[1], 10 + bc1[0], 13 ) # "10 + JVec * a"
+        self.assertAlmostEqual( vals1[2], 10 + dist  , 13 ) # "10 + KVec * sqrt( a*a + b*b )"
+        #! [PySnippet_MEDCouplingMesh_fillFromAnalytic2_3]
+        return
+
+    def testExample_MEDCouplingMesh_fillFromAnalytic(self):
+        #! [PySnippet_MEDCouplingMesh_fillFromAnalytic_1]
+        coords = [0.,2.,4.,6.] #  6. is not used
+        x=DataArrayDouble.New(coords[:3],3,1)
+        y=DataArrayDouble.New(coords[:2],2,1)
+        mesh=MEDCouplingCMesh.New()
+        mesh.setCoords(x,y)
+        #! [PySnippet_MEDCouplingMesh_fillFromAnalytic_1]
+        #! [PySnippet_MEDCouplingMesh_fillFromAnalytic_2]
+        func = "IVec * b + JVec * a + KVec * sqrt( a*a + b*b ) + 10"
+        field=mesh.fillFromAnalytic(ON_CELLS,3,func)
+        #! [PySnippet_MEDCouplingMesh_fillFromAnalytic_2]
+        #! [PySnippet_MEDCouplingMesh_fillFromAnalytic_3]
+        vals1 = field.getArray().getTuple(1) # values of the cell #1
+        assert len( vals1 ) == 3 # 3 components in the field
+        #
+        bc = mesh.getBarycenterAndOwner() # func is applied to barycenters of cells
+        bc1 = bc.getTuple(1) # coordinates of the second point
+        #
+        dist = sqrt( bc1[0]*bc1[0] + bc1[1]*bc1[1] ) # "sqrt( a*a + b*b )"
+        self.assertAlmostEqual( vals1[0], 10 + bc1[1], 13 ) # "10 + IVec * b"
+        self.assertAlmostEqual( vals1[1], 10 + bc1[0], 13 ) # "10 + JVec * a"
+        self.assertAlmostEqual( vals1[2], 10 + dist  , 13 ) # "10 + KVec * sqrt( a*a + b*b )"
+        #! [PySnippet_MEDCouplingMesh_fillFromAnalytic_3]
         return
 
     def testExample_MEDCouplingCMesh_getCoordsAt(self):
