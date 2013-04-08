@@ -1355,7 +1355,7 @@ namespace ParaMEDMEM
     void updateTime() const;
     void checkCoherency() const throw(INTERP_KERNEL::Exception);
     void setMeshDimension(int meshDim) throw(INTERP_KERNEL::Exception);
-    void allocateCells(int nbOfCells) throw(INTERP_KERNEL::Exception);
+    void allocateCells(int nbOfCells=0) throw(INTERP_KERNEL::Exception);
     void finishInsertingCells() throw(INTERP_KERNEL::Exception);
     MEDCouplingUMeshCellByTypeEntry *cellsByType() throw(INTERP_KERNEL::Exception);
     void setConnectivity(DataArrayInt *conn, DataArrayInt *connIndex, bool isComputingTypes=true) throw(INTERP_KERNEL::Exception);
