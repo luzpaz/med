@@ -100,15 +100,12 @@ bool MEDCouplingMesh::isEqualIfNotWhy(const MEDCouplingMesh *other, double prec,
   return true;
 }
 
-//================================================================================
 /*!
  * Checks if \a this and another MEDCouplingMesh are fully equal.
  *  \param [in] other - an instance of MEDCouplingMesh to compare with \a this one.
  *  \param [in] prec - precision value used to compare node coordinates.
  *  \return bool - \c true if the two meshes are equal, \c false else.
  */
-//================================================================================
-
 bool MEDCouplingMesh::isEqual(const MEDCouplingMesh *other, double prec) const throw(INTERP_KERNEL::Exception)
 {
   std::string tmp;
@@ -281,7 +278,6 @@ void MEDCouplingMesh::copyTinyInfoFrom(const MEDCouplingMesh *other) throw(INTER
   _order=other->_order;
 }
 
-//================================================================================
 /*!
  * \anchor mcmesh_fillFromAnalytic
  * Creates a new MEDCouplingFieldDouble of a given type, one time, with given number of
@@ -321,8 +317,6 @@ void MEDCouplingMesh::copyTinyInfoFrom(const MEDCouplingMesh *other) throw(INTER
  *  \ref cpp_mcmesh_fillFromAnalytic "Here is a C++ example".<br>
  *  \ref  py_mcmesh_fillFromAnalytic "Here is a Python example".
  */
-//================================================================================
-
 MEDCouplingFieldDouble *MEDCouplingMesh::fillFromAnalytic(TypeOfField t, int nbOfComp, const char *func) const
 {
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(t,ONE_TIME);
@@ -332,7 +326,6 @@ MEDCouplingFieldDouble *MEDCouplingMesh::fillFromAnalytic(TypeOfField t, int nbO
   return ret.retn();
 }
 
-//================================================================================
 /*!
  * Creates a new MEDCouplingFieldDouble of a given type, one time, with given number of
  * components, lying on \a this mesh, with contents got by applying a specified
@@ -373,8 +366,6 @@ MEDCouplingFieldDouble *MEDCouplingMesh::fillFromAnalytic(TypeOfField t, int nbO
  *  \ref cpp_mcmesh_fillFromAnalytic2 "Here is a C++ example".<br>
  *  \ref  py_mcmesh_fillFromAnalytic2 "Here is a Python example".
  */
-//================================================================================
-
 MEDCouplingFieldDouble *MEDCouplingMesh::fillFromAnalytic2(TypeOfField t, int nbOfComp, const char *func) const
 {
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(t,ONE_TIME);
@@ -384,7 +375,6 @@ MEDCouplingFieldDouble *MEDCouplingMesh::fillFromAnalytic2(TypeOfField t, int nb
   return ret.retn();
 }
 
-//================================================================================
 /*!
  * Creates a new MEDCouplingFieldDouble of a given type, one time, with given number of
  * components, lying on \a this mesh, with contents got by applying a specified
@@ -427,8 +417,6 @@ MEDCouplingFieldDouble *MEDCouplingMesh::fillFromAnalytic2(TypeOfField t, int nb
  *  \ref cpp_mcmesh_fillFromAnalytic3 "Here is a C++ example".<br>
  *  \ref  py_mcmesh_fillFromAnalytic3 "Here is a Python example".
  */
-//================================================================================
-
 MEDCouplingFieldDouble *MEDCouplingMesh::fillFromAnalytic3(TypeOfField t, int nbOfComp, const std::vector<std::string>& varsOrder, const char *func) const
 {
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(t,ONE_TIME);
@@ -438,7 +426,6 @@ MEDCouplingFieldDouble *MEDCouplingMesh::fillFromAnalytic3(TypeOfField t, int nb
   return ret.retn();
 }
 
-//================================================================================
 /*!
  * Creates a new MEDCouplingMesh by concatenating two given meshes, if possible.
  * Cells and nodes of
@@ -452,8 +439,6 @@ MEDCouplingFieldDouble *MEDCouplingMesh::fillFromAnalytic3(TypeOfField t, int nb
  *          is no more needed.
  *  \throw If the meshes are of different mesh type.
  */
-//================================================================================
-
 MEDCouplingMesh *MEDCouplingMesh::MergeMeshes(const MEDCouplingMesh *mesh1, const MEDCouplingMesh *mesh2) throw(INTERP_KERNEL::Exception)
 {
   if(!mesh1)
@@ -463,7 +448,6 @@ MEDCouplingMesh *MEDCouplingMesh::MergeMeshes(const MEDCouplingMesh *mesh1, cons
   return mesh1->mergeMyselfWith(mesh2);
 }
 
-//================================================================================
 /*!
  * Creates a new MEDCouplingMesh by concatenating all given meshes, if possible.
  * Cells and nodes of
@@ -482,8 +466,6 @@ MEDCouplingMesh *MEDCouplingMesh::MergeMeshes(const MEDCouplingMesh *mesh1, cons
  *  \throw If \a meshes[ *i* ]->getMeshDimension() < 0.
  *  \throw If the \a meshes are of different dimension (getMeshDimension()).
  */
-//================================================================================
-
 MEDCouplingMesh *MEDCouplingMesh::MergeMeshes(std::vector<const MEDCouplingMesh *>& meshes) throw(INTERP_KERNEL::Exception)
 {
   std::vector< MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> > ms1(meshes.size());
@@ -590,14 +572,11 @@ void MEDCouplingMesh::getCellsContainingPoints(const double *pos, int nbOfPoints
     }
 }
 
-//================================================================================
 /*!
  * Writes \a this mesh into a VTK format file named as specified.
  *  \param [in] fileName - the name of the file to write in.
  *  \throw If \a fileName is not a writable file.
  */
-//================================================================================
-
 void MEDCouplingMesh::writeVTK(const char *fileName) const throw(INTERP_KERNEL::Exception)
 {
   std::string cda,pda;
