@@ -3738,9 +3738,7 @@ namespace ParaMEDMEM
               if(!self->getArray())
                 throw INTERP_KERNEL::Exception(msg2);
               MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=DataArrayDouble::New(); aaa->useArray(&bb[0],false,CPP_DEALLOC,1,(int)bb.size());
-              MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret2=self->clone(false);
-              ret2->setArray(aaa);
-              *self+=*ret2;
+              self->getArray()->addEqual(aaa);
               Py_XINCREF(trueSelf);
               return trueSelf;
             }

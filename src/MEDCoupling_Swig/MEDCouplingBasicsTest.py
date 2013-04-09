@@ -12152,6 +12152,9 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         f+=f2
         f.checkCoherency()
         self.assertTrue(f.getArray().isEqual(DataArrayDouble([(2,9),(5,14),(8,19),(11,24),(14,29)]),1e-12))
+        f+=[0.1,0.2]
+        f.checkCoherency()
+        self.assertTrue(f.getArray().isEqual(DataArrayDouble([(2.1,9.2),(5.1,14.2),(8.1,19.2),(11.1,24.2),(14.1,29.2)]),1e-12))
         pass
 
     def setUp(self):
