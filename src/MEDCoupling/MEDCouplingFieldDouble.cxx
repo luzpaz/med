@@ -1937,6 +1937,42 @@ const MEDCouplingFieldDouble &MEDCouplingFieldDouble::operator/=(const MEDCoupli
 }
 
 /*!
+ * Directly called by MEDCouplingFieldDouble::operator^.
+ * 
+ * \sa MEDCouplingFieldDouble::operator^
+ */
+MEDCouplingFieldDouble *MEDCouplingFieldDouble::PowFields(const MEDCouplingFieldDouble *f1, const MEDCouplingFieldDouble *f2) throw(INTERP_KERNEL::Exception)
+{
+  if(!f1)
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::PowFields : input field is NULL !");
+  if(!f1->areCompatibleForMul(f2))
+    throw INTERP_KERNEL::Exception("Fields are not compatible ; unable to apply PowFields on them !");
+  MEDCouplingTimeDiscretization *td=f1->_time_discr->pow(f2->_time_discr);
+  td->copyTinyAttrFrom(*f1->_time_discr);
+  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
+  ret->setMesh(f1->getMesh());
+  return ret;
+}
+
+/*!
+ * Directly call MEDCouplingFieldDouble::PowFields static method.
+ * 
+ * \sa MEDCouplingFieldDouble::PowFields
+ */
+MEDCouplingFieldDouble *MEDCouplingFieldDouble::operator^(const MEDCouplingFieldDouble& other) const throw(INTERP_KERNEL::Exception)
+{
+  return PowFields(this,&other);
+}
+
+const MEDCouplingFieldDouble &MEDCouplingFieldDouble::operator^=(const MEDCouplingFieldDouble& other) throw(INTERP_KERNEL::Exception)
+{
+  if(!areCompatibleForDiv(&other))
+    throw INTERP_KERNEL::Exception("Fields are not compatible ; unable to apply /= on them !");
+  _time_discr->powEqual(other._time_discr);
+  return *this;
+}
+
+/*!
  * This method writes the field series 'fs' in the VTK file 'fileName'.
  * If 'fs' is empty no file is written. If fields lies on more than one mesh an exception will be thrown and no file will be written too.
  * If the single mesh is empty an exception will be thrown.

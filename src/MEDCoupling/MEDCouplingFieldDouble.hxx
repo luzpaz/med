@@ -183,6 +183,9 @@ namespace ParaMEDMEM
     MEDCouplingFieldDouble *operator/(const MEDCouplingFieldDouble& other) const throw(INTERP_KERNEL::Exception) { return DivideFields(this,&other); }
     const MEDCouplingFieldDouble &operator/=(const MEDCouplingFieldDouble& other) throw(INTERP_KERNEL::Exception);
     static MEDCouplingFieldDouble *DivideFields(const MEDCouplingFieldDouble *f1, const MEDCouplingFieldDouble *f2) throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *operator^(const MEDCouplingFieldDouble& other) const throw(INTERP_KERNEL::Exception);
+    const MEDCouplingFieldDouble &operator^=(const MEDCouplingFieldDouble& other) throw(INTERP_KERNEL::Exception);
+    static MEDCouplingFieldDouble *PowFields(const MEDCouplingFieldDouble *f1, const MEDCouplingFieldDouble *f2) throw(INTERP_KERNEL::Exception);
     static void WriteVTK(const char *fileName, const std::vector<const MEDCouplingFieldDouble *>& fs) throw(INTERP_KERNEL::Exception);
   public:
     const MEDCouplingTimeDiscretization *getTimeDiscretizationUnderGround() const { return _time_discr; }
