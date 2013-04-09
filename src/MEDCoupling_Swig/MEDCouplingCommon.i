@@ -3701,6 +3701,13 @@ namespace ParaMEDMEM
         return trueSelf;
       }
 
+      PyObject *___ipow___(PyObject *trueSelf, const MEDCouplingFieldDouble& other) throw(INTERP_KERNEL::Exception)
+      {
+        *self^=other;
+        Py_XINCREF(trueSelf);
+        return trueSelf;
+      }
+
       static MEDCouplingFieldDouble *MergeFields(PyObject *li) throw(INTERP_KERNEL::Exception)
       {
         std::vector<const MEDCouplingFieldDouble *> tmp;
