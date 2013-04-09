@@ -129,9 +129,11 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::MultiplyFields;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::DivideFields;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::min;
+%newobject ParaMEDMEM::MEDCouplingFieldDouble::negate;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::getIdsInRange;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::buildSubPart;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::__getitem__;
+%newobject ParaMEDMEM::MEDCouplingFieldDouble::__neg__;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::__add__;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::__sub__;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::__mul__;
@@ -2946,6 +2948,7 @@ namespace ParaMEDMEM
     static MEDCouplingFieldDouble *MultiplyFields(const MEDCouplingFieldDouble *f1, const MEDCouplingFieldDouble *f2) throw(INTERP_KERNEL::Exception);
     static MEDCouplingFieldDouble *DivideFields(const MEDCouplingFieldDouble *f1, const MEDCouplingFieldDouble *f2) throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *min(const MEDCouplingFieldDouble& other) const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *negate() const throw(INTERP_KERNEL::Exception);
     %extend {
       MEDCouplingFieldDouble(TypeOfField type, TypeOfTimeDiscretization td=ONE_TIME)
       {
@@ -3671,6 +3674,11 @@ namespace ParaMEDMEM
           default:
             { throw INTERP_KERNEL::Exception(msg); }
           }
+      }
+
+      MEDCouplingFieldDouble *__neg__() const throw(INTERP_KERNEL::Exception)
+      {
+        return self->negate();
       }
 
       PyObject *___iadd___(PyObject *trueSelf, const MEDCouplingFieldDouble& other) throw(INTERP_KERNEL::Exception)

@@ -1852,6 +1852,17 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::MinFields(const MEDCouplingField
   return ret;
 }
 
+MEDCouplingFieldDouble *MEDCouplingFieldDouble::negate() const throw(INTERP_KERNEL::Exception)
+{
+  if(!((const MEDCouplingFieldDiscretization *)_type))
+    throw INTERP_KERNEL::Exception("No spatial discretization underlying this field to perform negate !");
+  MEDCouplingTimeDiscretization *td=_time_discr->negate();
+  td->copyTinyAttrFrom(*_time_discr);
+  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
+  ret->setMesh(getMesh());
+  return ret;
+}
+
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::AddFields(const MEDCouplingFieldDouble *f1, const MEDCouplingFieldDouble *f2) throw(INTERP_KERNEL::Exception)
 {
   if(!f1)

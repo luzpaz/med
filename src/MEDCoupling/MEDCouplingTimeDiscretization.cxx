@@ -517,6 +517,27 @@ MEDCouplingTimeDiscretization *MEDCouplingTimeDiscretization::magnitude() const 
   return ret;
 }
 
+MEDCouplingTimeDiscretization *MEDCouplingTimeDiscretization::negate() const throw(INTERP_KERNEL::Exception)
+{
+  std::vector<DataArrayDouble *> arrays;
+  getArrays(arrays);
+  std::vector< MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> > arrays2(arrays.size());
+  for(int j=0;j<(int)arrays.size();j++)
+    {
+      if(arrays[j])
+        arrays2[j]=arrays[j]->negate();
+      else
+        arrays2[j]=0;
+    }
+  std::vector<DataArrayDouble *> arrays3(arrays.size());
+  for(int j=0;j<(int)arrays.size();j++)
+    arrays3[j]=arrays2[j];
+  MEDCouplingTimeDiscretization *ret=MEDCouplingTimeDiscretization::New(getEnum());
+  ret->setTimeUnit(getTimeUnit());
+  ret->setArrays(arrays3,0);
+  return ret;
+}
+
 MEDCouplingTimeDiscretization *MEDCouplingTimeDiscretization::maxPerTuple() const throw(INTERP_KERNEL::Exception)
 {
   std::vector<DataArrayDouble *> arrays;

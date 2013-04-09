@@ -128,6 +128,7 @@ namespace ParaMEDMEM
     virtual MEDCouplingTimeDiscretization *trace() const throw(INTERP_KERNEL::Exception);
     virtual MEDCouplingTimeDiscretization *deviator() const throw(INTERP_KERNEL::Exception);
     virtual MEDCouplingTimeDiscretization *magnitude() const throw(INTERP_KERNEL::Exception);
+    virtual MEDCouplingTimeDiscretization *negate() const throw(INTERP_KERNEL::Exception);
     virtual MEDCouplingTimeDiscretization *maxPerTuple() const throw(INTERP_KERNEL::Exception);
     virtual MEDCouplingTimeDiscretization *keepSelectedComponents(const std::vector<int>& compoIds) const throw(INTERP_KERNEL::Exception);
     virtual void setSelectedComponents(const MEDCouplingTimeDiscretization *other, const std::vector<int>& compoIds) throw(INTERP_KERNEL::Exception);
