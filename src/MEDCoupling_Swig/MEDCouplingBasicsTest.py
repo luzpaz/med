@@ -12123,6 +12123,35 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         ff=f**f2
         ff.checkCoherency()
         self.assertTrue(ff.getArray().isEqual(DataArrayDouble([2,3,64,25,1]),1e-12))
+        ## MEDCouplingFieldDouble.__iadd__
+        m=MEDCouplingDataForTest.build2DTargetMesh_1()
+        f=MEDCouplingFieldDouble(ON_CELLS)
+        f.setMesh(m)
+        arr=DataArrayDouble(5,2)
+        arr[:,0]=range(5) ; arr[:,1]=2*arr[:,0]
+        f2=f.clone(True)
+        self.assertRaises(InterpKernelException,f.__iadd__,2)
+        self.assertRaises(InterpKernelException,f.__iadd__,range(5))
+        self.assertRaises(InterpKernelException,f.__iadd__,arr)
+        self.assertRaises(InterpKernelException,f.__iadd__,f2)
+        f.setArray(DataArrayDouble())
+        self.assertRaises(InterpKernelException,f.__iadd__,2)
+        self.assertRaises(InterpKernelException,f.__iadd__,range(5))
+        self.assertRaises(InterpKernelException,f.__iadd__,arr)
+        self.assertRaises(InterpKernelException,f.__iadd__,f2)
+        f.getArray().alloc(5,2)
+        f.getArray()[:,0]=range(5) ; f.getArray()[:,1]=f.getArray()[:,0]+7
+        f.checkCoherency()
+        f+=2
+        f.checkCoherency()
+        self.assertTrue(f.getArray().isEqual(DataArrayDouble([(2,9),(3,10),(4,11),(5,12),(6,13)]),1e-12))
+        f+=arr
+        f.checkCoherency()
+        self.assertTrue(f.getArray().isEqual(DataArrayDouble([(2,9),(4,12),(6,15),(8,18),(10,21)]),1e-12))
+        f2.setArray(arr)
+        f+=f2
+        f.checkCoherency()
+        self.assertTrue(f.getArray().isEqual(DataArrayDouble([(2,9),(5,14),(8,19),(11,24),(14,29)]),1e-12))
         pass
 
     def setUp(self):

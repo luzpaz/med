@@ -3681,11 +3681,72 @@ namespace ParaMEDMEM
         return self->negate();
       }
 
-      PyObject *___iadd___(PyObject *trueSelf, const MEDCouplingFieldDouble& other) throw(INTERP_KERNEL::Exception)
+      PyObject *___iadd___(PyObject *trueSelf, PyObject *obj) throw(INTERP_KERNEL::Exception)
       {
-        *self+=other;
-        Py_XINCREF(trueSelf);
-        return trueSelf;
+        const char msg[]="Unexpected situation in MEDCouplingFieldDouble.__iadd__ ! Expecting a not null MEDCouplingFieldDouble or DataArrayDouble or DataArrayDoubleTuple instance, or a list of double, or a double.";
+        const char msg2[]="in MEDCouplingFieldDouble.__iadd__ : self field has no Array of values set !";
+        void *argp;
+        //
+        if(SWIG_IsOK(SWIG_ConvertPtr(obj,&argp,SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble,0|0)))
+          {
+            MEDCouplingFieldDouble *other=reinterpret_cast< ParaMEDMEM::MEDCouplingFieldDouble * >(argp);
+            if(other)
+              {
+                *self+=*other;
+                Py_XINCREF(trueSelf);
+                return trueSelf;
+              }
+            else
+              throw INTERP_KERNEL::Exception(msg);
+          }
+        //
+        double val;
+        DataArrayDouble *a;
+        DataArrayDoubleTuple *aa;
+        std::vector<double> bb;
+        int sw;
+        convertObjToPossibleCpp5(obj,sw,val,a,aa,bb);
+        switch(sw)
+          {
+          case 1:
+            {
+              if(!self->getArray())
+                throw INTERP_KERNEL::Exception(msg2);
+              self->getArray()->applyLin(1.,val);
+              Py_XINCREF(trueSelf);
+              return trueSelf;
+            }
+          case 2:
+            {
+              MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret2=self->clone(false);
+              ret2->setArray(a);
+              *self+=*ret2;
+              Py_XINCREF(trueSelf);
+              return trueSelf;
+            }
+          case 3:
+            {
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=aa->buildDADouble(1,self->getNumberOfComponents());
+              MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret2=self->clone(false);
+              ret2->setArray(aaa);
+              *self+=*ret2;
+              Py_XINCREF(trueSelf);
+              return trueSelf;
+            }
+          case 4:
+            {
+              if(!self->getArray())
+                throw INTERP_KERNEL::Exception(msg2);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=DataArrayDouble::New(); aaa->useArray(&bb[0],false,CPP_DEALLOC,1,(int)bb.size());
+              MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret2=self->clone(false);
+              ret2->setArray(aaa);
+              *self+=*ret2;
+              Py_XINCREF(trueSelf);
+              return trueSelf;
+            }
+          default:
+            { throw INTERP_KERNEL::Exception(msg); }
+          }
       }
       
       PyObject *___isub___(PyObject *trueSelf, const MEDCouplingFieldDouble& other) throw(INTERP_KERNEL::Exception)
