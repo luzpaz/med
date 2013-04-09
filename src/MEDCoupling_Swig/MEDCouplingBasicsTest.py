@@ -11964,6 +11964,40 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(NodeField.getArray().isUniform(0.,1e-12))
         pass
 
+    def testSwigFieldOperationOpen1(self):
+        m=MEDCouplingDataForTest.build2DTargetMesh_1()
+        f=MEDCouplingFieldDouble(ON_CELLS)
+        f.setMesh(m)
+        arr=DataArrayDouble(5,2)
+        arr[:,0]=range(5) ; arr[:,1]=2*arr[:,0]
+        f2=f.clone(True)
+        self.assertRaises(InterpKernelException,f.__add__,2)
+        self.assertRaises(InterpKernelException,f.__add__,range(5))
+        self.assertRaises(InterpKernelException,f.__add__,arr)
+        self.assertRaises(InterpKernelException,f.__add__,f2)
+        f.setArray(DataArrayDouble())
+        self.assertRaises(InterpKernelException,f.__add__,2)
+        self.assertRaises(InterpKernelException,f.__add__,range(5))
+        self.assertRaises(InterpKernelException,f.__add__,arr)
+        self.assertRaises(InterpKernelException,f.__add__,f2)
+        self.assertRaises(InterpKernelException,f.__getitem__,(slice(None),0))
+        f.getArray().alloc(5,2)
+        f.getArray()[:,0]=range(5) ; f.getArray()[:,1]=f.getArray()[:,0]+7
+        ff=f+2
+        ff.checkCoherency()
+        self.assertTrue(ff.getArray().isEqual(DataArrayDouble([(2, 9), (3, 10), (4, 11), (5, 12), (6, 13)]),1e-12))
+        ff=f+arr
+        ff.checkCoherency()
+        self.assertTrue(ff.getArray().isEqual(DataArrayDouble([(0, 7), (2, 10), (4, 13), (6, 16), (8, 19)]),1e-12))
+        self.assertRaises(InterpKernelException,f.__add__,f2)
+        f2.setArray(arr)
+        ff=f+f2
+        ff.checkCoherency()
+        self.assertTrue(ff.getArray().isEqual(DataArrayDouble([(0, 7), (2, 10), (4, 13), (6, 16), (8, 19)]),1e-12))
+        ff=f+[5,8]
+        self.assertTrue(ff.getArray().isEqual(DataArrayDouble([(5, 15), (6, 16), (7, 17), (8, 18), (9, 19)]),1e-12))
+        pass
+
     def setUp(self):
         pass
     pass
