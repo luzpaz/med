@@ -133,9 +133,9 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::buildSubPart;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::__getitem__;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::__add__;
-%newobject ParaMEDMEM::MEDCouplingFieldDouble::operator-;
-%newobject ParaMEDMEM::MEDCouplingFieldDouble::operator*;
-%newobject ParaMEDMEM::MEDCouplingFieldDouble::operator/;
+%newobject ParaMEDMEM::MEDCouplingFieldDouble::__sub__;
+%newobject ParaMEDMEM::MEDCouplingFieldDouble::__mul__;
+%newobject ParaMEDMEM::MEDCouplingFieldDouble::__div__;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::clone;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::cloneWithMesh;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::deepCpy;
@@ -2945,9 +2945,6 @@ namespace ParaMEDMEM
     static MEDCouplingFieldDouble *MultiplyFields(const MEDCouplingFieldDouble *f1, const MEDCouplingFieldDouble *f2) throw(INTERP_KERNEL::Exception);
     static MEDCouplingFieldDouble *DivideFields(const MEDCouplingFieldDouble *f1, const MEDCouplingFieldDouble *f2) throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *min(const MEDCouplingFieldDouble& other) const throw(INTERP_KERNEL::Exception);
-    MEDCouplingFieldDouble *operator-(const MEDCouplingFieldDouble& other) const throw(INTERP_KERNEL::Exception);
-    MEDCouplingFieldDouble *operator*(const MEDCouplingFieldDouble& other) const throw(INTERP_KERNEL::Exception);
-    MEDCouplingFieldDouble *operator/(const MEDCouplingFieldDouble& other) const throw(INTERP_KERNEL::Exception);
     %extend {
       MEDCouplingFieldDouble(TypeOfField type, TypeOfTimeDiscretization td=ONE_TIME)
       {
@@ -3396,6 +3393,209 @@ namespace ParaMEDMEM
                 throw INTERP_KERNEL::Exception(msg2);
               MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=DataArrayDouble::New(); aaa->useArray(&bb[0],false,CPP_DEALLOC,1,(int)bb.size());
               MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::Add(self->getArray(),aaa);
+              MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret2=self->clone(false);
+              ret2->setArray(ret);
+              return ret2.retn();
+            }
+          default:
+            { throw INTERP_KERNEL::Exception(msg); }
+          }
+      }
+
+      MEDCouplingFieldDouble *__sub__(PyObject *obj) throw(INTERP_KERNEL::Exception)
+      {
+        const char msg[]="Unexpected situation in MEDCouplingFieldDouble.__sub__ ! Expecting a not null MEDCouplingFieldDouble or DataArrayDouble or DataArrayDoubleTuple instance, or a list of double, or a double.";
+        const char msg2[]="in MEDCouplingFieldDouble.__sub__ : self field has no Array of values set !";
+        void *argp;
+        //
+        if(SWIG_IsOK(SWIG_ConvertPtr(obj,&argp,SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble,0|0)))
+          {
+            MEDCouplingFieldDouble *other=reinterpret_cast< ParaMEDMEM::MEDCouplingFieldDouble * >(argp);
+            if(other)
+              return (*self)-(*other);
+            else
+              throw INTERP_KERNEL::Exception(msg);
+          }
+        //
+        double val;
+        DataArrayDouble *a;
+        DataArrayDoubleTuple *aa;
+        std::vector<double> bb;
+        int sw;
+        convertObjToPossibleCpp5(obj,sw,val,a,aa,bb);
+        switch(sw)
+          {
+          case 1:
+            {
+              if(!self->getArray())
+                throw INTERP_KERNEL::Exception(msg2);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=self->getArray()->deepCpy();
+              ret->applyLin(1.,-val);
+              MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret2=self->clone(false);
+              ret2->setArray(ret);
+              return ret2.retn();
+            }
+          case 2:
+            {
+              if(!self->getArray())
+                throw INTERP_KERNEL::Exception(msg2);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::Substract(self->getArray(),a);
+              MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret2=self->clone(false);
+              ret2->setArray(ret);
+              return ret2.retn();
+            }
+          case 3:
+            {
+              if(!self->getArray())
+                throw INTERP_KERNEL::Exception(msg2);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=aa->buildDADouble(1,self->getNumberOfComponents());
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::Substract(self->getArray(),aaa);
+              MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret2=self->clone(false);
+              ret2->setArray(ret);
+              return ret2.retn();
+            }
+          case 4:
+            {
+              if(!self->getArray())
+                throw INTERP_KERNEL::Exception(msg2);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=DataArrayDouble::New(); aaa->useArray(&bb[0],false,CPP_DEALLOC,1,(int)bb.size());
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::Substract(self->getArray(),aaa);
+              MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret2=self->clone(false);
+              ret2->setArray(ret);
+              return ret2.retn();
+            }
+          default:
+            { throw INTERP_KERNEL::Exception(msg); }
+          }
+      }
+
+      MEDCouplingFieldDouble *__mul__(PyObject *obj) throw(INTERP_KERNEL::Exception)
+      {
+        const char msg[]="Unexpected situation in MEDCouplingFieldDouble.__mul__ ! Expecting a not null MEDCouplingFieldDouble or DataArrayDouble or DataArrayDoubleTuple instance, or a list of double, or a double.";
+        const char msg2[]="in MEDCouplingFieldDouble.__mul__ : self field has no Array of values set !";
+        void *argp;
+        //
+        if(SWIG_IsOK(SWIG_ConvertPtr(obj,&argp,SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble,0|0)))
+          {
+            MEDCouplingFieldDouble *other=reinterpret_cast< ParaMEDMEM::MEDCouplingFieldDouble * >(argp);
+            if(other)
+              return (*self)*(*other);
+            else
+              throw INTERP_KERNEL::Exception(msg);
+          }
+        //
+        double val;
+        DataArrayDouble *a;
+        DataArrayDoubleTuple *aa;
+        std::vector<double> bb;
+        int sw;
+        convertObjToPossibleCpp5(obj,sw,val,a,aa,bb);
+        switch(sw)
+          {
+          case 1:
+            {
+              if(!self->getArray())
+                throw INTERP_KERNEL::Exception(msg2);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=self->getArray()->deepCpy();
+              ret->applyLin(val,0.);
+              MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret2=self->clone(false);
+              ret2->setArray(ret);
+              return ret2.retn();
+            }
+          case 2:
+            {
+              if(!self->getArray())
+                throw INTERP_KERNEL::Exception(msg2);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::Multiply(self->getArray(),a);
+              MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret2=self->clone(false);
+              ret2->setArray(ret);
+              return ret2.retn();
+            }
+          case 3:
+            {
+              if(!self->getArray())
+                throw INTERP_KERNEL::Exception(msg2);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=aa->buildDADouble(1,self->getNumberOfComponents());
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::Multiply(self->getArray(),aaa);
+              MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret2=self->clone(false);
+              ret2->setArray(ret);
+              return ret2.retn();
+            }
+          case 4:
+            {
+              if(!self->getArray())
+                throw INTERP_KERNEL::Exception(msg2);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=DataArrayDouble::New(); aaa->useArray(&bb[0],false,CPP_DEALLOC,1,(int)bb.size());
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::Multiply(self->getArray(),aaa);
+              MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret2=self->clone(false);
+              ret2->setArray(ret);
+              return ret2.retn();
+            }
+          default:
+            { throw INTERP_KERNEL::Exception(msg); }
+          }
+      }
+
+      MEDCouplingFieldDouble *__div__(PyObject *obj) throw(INTERP_KERNEL::Exception)
+      {
+        const char msg[]="Unexpected situation in MEDCouplingFieldDouble.__div__ ! Expecting a not null MEDCouplingFieldDouble or DataArrayDouble or DataArrayDoubleTuple instance, or a list of double, or a double.";
+        const char msg2[]="in MEDCouplingFieldDouble.__div__ : self field has no Array of values set !";
+        void *argp;
+        //
+        if(SWIG_IsOK(SWIG_ConvertPtr(obj,&argp,SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble,0|0)))
+          {
+            MEDCouplingFieldDouble *other=reinterpret_cast< ParaMEDMEM::MEDCouplingFieldDouble * >(argp);
+            if(other)
+              return (*self)/(*other);
+            else
+              throw INTERP_KERNEL::Exception(msg);
+          }
+        //
+        double val;
+        DataArrayDouble *a;
+        DataArrayDoubleTuple *aa;
+        std::vector<double> bb;
+        int sw;
+        convertObjToPossibleCpp5(obj,sw,val,a,aa,bb);
+        switch(sw)
+          {
+          case 1:
+            {
+              if(val==0.)
+                throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble.__div__ : trying to divide by zero !");
+              if(!self->getArray())
+                throw INTERP_KERNEL::Exception(msg2);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=self->getArray()->deepCpy();
+              ret->applyLin(1./val,0);
+              MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret2=self->clone(false);
+              ret2->setArray(ret);
+              return ret2.retn();
+            }
+          case 2:
+            {
+              if(!self->getArray())
+                throw INTERP_KERNEL::Exception(msg2);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::Divide(self->getArray(),a);
+              MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret2=self->clone(false);
+              ret2->setArray(ret);
+              return ret2.retn();
+            }
+          case 3:
+            {
+              if(!self->getArray())
+                throw INTERP_KERNEL::Exception(msg2);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=aa->buildDADouble(1,self->getNumberOfComponents());
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::Divide(self->getArray(),aaa);
+              MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret2=self->clone(false);
+              ret2->setArray(ret);
+              return ret2.retn();
+            }
+          case 4:
+            {
+              if(!self->getArray())
+                throw INTERP_KERNEL::Exception(msg2);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=DataArrayDouble::New(); aaa->useArray(&bb[0],false,CPP_DEALLOC,1,(int)bb.size());
+              MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::Divide(self->getArray(),aaa);
               MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret2=self->clone(false);
               ret2->setArray(ret);
               return ret2.retn();
