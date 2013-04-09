@@ -3641,7 +3641,8 @@ MEDCouplingFieldDouble *MEDCouplingUMesh::getMeasureFieldOnNode(bool isAbs) cons
 
 /*!
  * Returns a new MEDCouplingFieldDouble holding normal vectors to cells of \a this
- * mesh. The computed vectors have <em> this->getMeshDimension()+1 </em> components
+ * mesh. The returned normal vectors to each cell have a norm2 equal to 1.
+ * The computed vectors have <em> this->getMeshDimension()+1 </em> components
  * and are normalized.
  * <br> \a this can be either 
  * - a  2D mesh in 2D or 3D space or 
