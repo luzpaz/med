@@ -148,12 +148,12 @@ void MEDCouplingFieldTemplate::reprQuickOverview(std::ostream& stream) const thr
     fd->reprQuickOverview(stream);
   stream << std::endl;
   if(!_mesh)
-    stream << "No mesh support defined !";
+    stream << "\nNo mesh support defined !";
   else
     {
       std::ostringstream oss;
       _mesh->reprQuickOverview(oss);
       std::string tmp(oss.str());
-      stream << "Mesh info : " << tmp.substr(0,tmp.find('\n'));
+      stream << "\nMesh info : " << tmp.substr(0,tmp.find('\n'));
     }
 }

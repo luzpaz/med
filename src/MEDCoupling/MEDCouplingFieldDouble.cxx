@@ -1994,12 +1994,25 @@ void MEDCouplingFieldDouble::reprQuickOverview(std::ostream& stream) const throw
     fd->reprQuickOverview(stream);
   stream << std::endl;
   if(!_mesh)
-    stream << "No mesh support defined !";
+    stream << "\nNo mesh support defined !";
   else
     {
       std::ostringstream oss;
       _mesh->reprQuickOverview(oss);
       std::string tmp(oss.str());
-      stream << "Mesh info : " << tmp.substr(0,tmp.find('\n'));
+      stream << "\nMesh info : " << tmp.substr(0,tmp.find('\n'));
+    }
+  if(_time_discr)
+    {
+      const DataArrayDouble *arr=_time_discr->getArray();
+      if(arr)
+        {
+          stream << "\n\nArray info : ";
+          arr->reprQuickOverview(stream);
+        }
+      else
+        {
+          stream << "\n\nNo data array set !";
+        }
     }
 }
