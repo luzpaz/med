@@ -4037,13 +4037,12 @@ DataArrayDoubleIterator *DataArrayDouble::iterator() throw(INTERP_KERNEL::Except
  * array whose values are within a given range. Textual data is not copied.
  *  \param [in] vmin - a lowest acceptable value.
  *  \param [in] vmax - a greatest acceptable value.
- *  \return DataArrayDouble * - the new instance of DataArrayDouble.
+ *  \return DataArrayInt * - the new instance of DataArrayInt.
  *          The caller is to delete this result array using decrRef() as it is no more
  *          needed.
- *  \throw If \a this->getNumberOfComponents() != 1
+ *  \throw If \a this->getNumberOfComponents() != 1.
  *
- *  \ref cpp_mcdataarraydouble_getidsinrange "Here is a C++ example".
- *
+ *  \ref cpp_mcdataarraydouble_getidsinrange "Here is a C++ example".<br>
  *  \ref py_mcdataarraydouble_getidsinrange "Here is a Python example".
  */
 DataArrayInt *DataArrayDouble::getIdsInRange(double vmin, double vmax) const throw(INTERP_KERNEL::Exception)
