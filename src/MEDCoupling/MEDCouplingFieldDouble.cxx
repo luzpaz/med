@@ -130,14 +130,13 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::clone(bool recDeepCpy) const
  */
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::cloneWithMesh(bool recDeepCpy) const
 {
-  MEDCouplingFieldDouble *ret=clone(recDeepCpy);
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=clone(recDeepCpy);
   if(_mesh)
     {
-      MEDCouplingMesh *mCpy=_mesh->deepCpy();
+      MEDCouplingAutoRefCountObjectPtr<MEDCouplingMesh> mCpy=_mesh->deepCpy();
       ret->setMesh(mCpy);
-      mCpy->decrRef();
     }
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -172,11 +171,11 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::buildNewTimeReprFromThis(TypeOfT
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDiscretization> disc;
   if(_type)
     disc=_type->clone();
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(getNature(),tdo,disc.retn());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(getNature(),tdo,disc.retn());
   ret->setMesh(getMesh());
   ret->setName(getName());
   ret->setDescription(getDescription());
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -553,6 +552,7 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::buildSubPart(const int *partBg, 
   std::vector<DataArrayDouble *> arrays;
   _time_discr->getArrays(arrays);
   std::vector<DataArrayDouble *> arrs;
+  std::vector< MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> > arrsSafe;
   const int *arrSelBg=arrSelect->begin();
   const int *arrSelEnd=arrSelect->end();
   for(std::vector<DataArrayDouble *>::const_iterator iter=arrays.begin();iter!=arrays.end();iter++)
@@ -560,12 +560,9 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::buildSubPart(const int *partBg, 
       DataArrayDouble *arr=0;
       if(*iter)
         arr=(*iter)->selectByTupleIdSafe(arrSelBg,arrSelEnd);
-      arrs.push_back(arr);
+      arrs.push_back(arr); arrsSafe.push_back(arr);
     }
   ret->_time_discr->setArrays(arrs,0);
-  for(std::vector<DataArrayDouble *>::const_iterator iter=arrs.begin();iter!=arrs.end();iter++)
-    if(*iter)
-      (*iter)->decrRef();
   return ret.retn();
 }
 
@@ -671,6 +668,7 @@ double MEDCouplingFieldDouble::getMaxValue2(DataArrayInt*& tupleIds) const throw
   double ret=-std::numeric_limits<double>::max();
   bool isExistingArr=false;
   tupleIds=0;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret1;
   for(std::vector<DataArrayDouble *>::const_iterator iter=arrays.begin();iter!=arrays.end();iter++)
     {
       if(*iter)
@@ -678,14 +676,14 @@ double MEDCouplingFieldDouble::getMaxValue2(DataArrayInt*& tupleIds) const throw
           isExistingArr=true;
           DataArrayInt *tmp;
           ret=std::max(ret,(*iter)->getMaxValue2(tmp));
-          if(!tupleIds)
-            tupleIds=tmp;
-          else
-            tmp->decrRef();
+          MEDCouplingAutoRefCountObjectPtr<DataArrayInt> tmpSafe(tmp);
+          if(!((const DataArrayInt *)ret1))
+            ret1=tmpSafe;
         }
     }
   if(!isExistingArr)
     throw INTERP_KERNEL::Exception("getMaxValue2 : No arrays defined !");
+  tupleIds=ret1.retn();
   return ret;
 }
 
@@ -728,6 +726,7 @@ double MEDCouplingFieldDouble::getMinValue2(DataArrayInt*& tupleIds) const throw
   double ret=-std::numeric_limits<double>::max();
   bool isExistingArr=false;
   tupleIds=0;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret1;
   for(std::vector<DataArrayDouble *>::const_iterator iter=arrays.begin();iter!=arrays.end();iter++)
     {
       if(*iter)
@@ -735,14 +734,14 @@ double MEDCouplingFieldDouble::getMinValue2(DataArrayInt*& tupleIds) const throw
           isExistingArr=true;
           DataArrayInt *tmp;
           ret=std::max(ret,(*iter)->getMinValue2(tmp));
-          if(!tupleIds)
-            tupleIds=tmp;
-          else
-            tmp->decrRef();
+          MEDCouplingAutoRefCountObjectPtr<DataArrayInt> tmpSafe(tmp);
+          if(!((const DataArrayInt *)ret1))
+            ret1=tmpSafe;
         }
     }
   if(!isExistingArr)
     throw INTERP_KERNEL::Exception("getMinValue2 : No arrays defined !");
+  tupleIds=ret1.retn();
   return ret;
 }
 
@@ -1596,10 +1595,10 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::doublyContractedProduct() const 
     throw INTERP_KERNEL::Exception("No spatial discretization underlying this field to perform doublyContractedProduct !");
   MEDCouplingTimeDiscretization *td=_time_discr->doublyContractedProduct();
   td->copyTinyAttrFrom(*_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
   ret->setName("DoublyContractedProduct");
   ret->setMesh(getMesh());
-  return ret;
+  return ret.retn();
 }
 
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::determinant() const throw(INTERP_KERNEL::Exception)
@@ -1608,10 +1607,10 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::determinant() const throw(INTERP
     throw INTERP_KERNEL::Exception("No spatial discretization underlying this field to perform determinant !");
   MEDCouplingTimeDiscretization *td=_time_discr->determinant();
   td->copyTinyAttrFrom(*_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
   ret->setName("Determinant");
   ret->setMesh(getMesh());
-  return ret;
+  return ret.retn();
 }
 
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::eigenValues() const throw(INTERP_KERNEL::Exception)
@@ -1620,10 +1619,10 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::eigenValues() const throw(INTERP
     throw INTERP_KERNEL::Exception("No spatial discretization underlying this field to perform eigenValues !");
   MEDCouplingTimeDiscretization *td=_time_discr->eigenValues();
   td->copyTinyAttrFrom(*_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
   ret->setName("EigenValues");
   ret->setMesh(getMesh());
-  return ret;
+  return ret.retn();
 }
 
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::eigenVectors() const throw(INTERP_KERNEL::Exception)
@@ -1632,10 +1631,10 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::eigenVectors() const throw(INTER
     throw INTERP_KERNEL::Exception("No spatial discretization underlying this field to perform eigenVectors !");
   MEDCouplingTimeDiscretization *td=_time_discr->eigenVectors();
   td->copyTinyAttrFrom(*_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
   ret->setName("EigenVectors");
   ret->setMesh(getMesh());
-  return ret;
+  return ret.retn();
 }
 
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::inverse() const throw(INTERP_KERNEL::Exception)
@@ -1644,10 +1643,10 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::inverse() const throw(INTERP_KER
     throw INTERP_KERNEL::Exception("No spatial discretization underlying this field to perform inverse !");
   MEDCouplingTimeDiscretization *td=_time_discr->inverse();
   td->copyTinyAttrFrom(*_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
   ret->setName("Inversion");
   ret->setMesh(getMesh());
-  return ret;
+  return ret.retn();
 }
 
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::trace() const throw(INTERP_KERNEL::Exception)
@@ -1656,10 +1655,10 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::trace() const throw(INTERP_KERNE
     throw INTERP_KERNEL::Exception("No spatial discretization underlying this field to perform trace !");
   MEDCouplingTimeDiscretization *td=_time_discr->trace();
   td->copyTinyAttrFrom(*_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
   ret->setName("Trace");
   ret->setMesh(getMesh());
-  return ret;
+  return ret.retn();
 }
 
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::deviator() const throw(INTERP_KERNEL::Exception)
@@ -1668,10 +1667,10 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::deviator() const throw(INTERP_KE
     throw INTERP_KERNEL::Exception("No spatial discretization underlying this field to perform deviator !");
   MEDCouplingTimeDiscretization *td=_time_discr->deviator();
   td->copyTinyAttrFrom(*_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
-  ret->setName("Trace");
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
+  ret->setName("Deviator");
   ret->setMesh(getMesh());
-  return ret;
+  return ret.retn();
 }
 
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::magnitude() const throw(INTERP_KERNEL::Exception)
@@ -1680,10 +1679,10 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::magnitude() const throw(INTERP_K
     throw INTERP_KERNEL::Exception("No spatial discretization underlying this field to perform magnitude !");
   MEDCouplingTimeDiscretization *td=_time_discr->magnitude();
   td->copyTinyAttrFrom(*_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
   ret->setName("Magnitude");
   ret->setMesh(getMesh());
-  return ret;
+  return ret.retn();
 }
 
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::maxPerTuple() const throw(INTERP_KERNEL::Exception)
@@ -1692,12 +1691,12 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::maxPerTuple() const throw(INTERP
     throw INTERP_KERNEL::Exception("No spatial discretization underlying this field to perform maxPerTuple !");
   MEDCouplingTimeDiscretization *td=_time_discr->maxPerTuple();
   td->copyTinyAttrFrom(*_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
   std::ostringstream oss;
   oss << "Max_" << getName();
   ret->setName(oss.str().c_str());
   ret->setMesh(getMesh());
-  return ret;
+  return ret.retn();
 }
 
 void MEDCouplingFieldDouble::changeNbOfComponents(int newNbOfComp, double dftValue) throw(INTERP_KERNEL::Exception)
@@ -1711,10 +1710,10 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::keepSelectedComponents(const std
     throw INTERP_KERNEL::Exception("No spatial discretization underlying this field to perform keepSelectedComponents !");
   MEDCouplingTimeDiscretization *td=_time_discr->keepSelectedComponents(compoIds);
   td->copyTinyAttrFrom(*_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
   ret->setName(getName());
   ret->setMesh(getMesh());
-  return ret;
+  return ret.retn();
 }
 
 void MEDCouplingFieldDouble::setSelectedComponents(const MEDCouplingFieldDouble *f, const std::vector<int>& compoIds) throw(INTERP_KERNEL::Exception)
@@ -1739,15 +1738,14 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::MergeFields(const MEDCouplingFie
     throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::MergeFields : no time discr of f1 !");
   if(!f1->_type)
     throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::MergeFields : no spatial discr of f1 !");
-  MEDCouplingMesh *m=m1->mergeMyselfWith(m2);
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingMesh> m=m1->mergeMyselfWith(m2);
   MEDCouplingTimeDiscretization *td=f1->_time_discr->aggregate(f2->_time_discr);
   td->copyTinyAttrFrom(*f1->_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
   ret->setMesh(m);
-  m->decrRef();
   ret->setName(f1->getName());
   ret->setDescription(f1->getDescription());
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -1782,11 +1780,11 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::MergeFields(const std::vector<co
   m->setName(ms2[0]->getName()); m->setDescription(ms2[0]->getDescription());
   MEDCouplingTimeDiscretization *td=tds[0]->aggregate(tds);
   td->copyTinyAttrFrom(*(a[0]->_time_discr));
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(a[0]->getNature(),td,a[0]->_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(a[0]->getNature(),td,a[0]->_type->clone());
   ret->setMesh(m);
   ret->setName(a[0]->getName());
   ret->setDescription(a[0]->getDescription());
-  return ret;
+  return ret.retn();
 }
 
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::MeldFields(const MEDCouplingFieldDouble *f1, const MEDCouplingFieldDouble *f2) throw(INTERP_KERNEL::Exception)
@@ -1795,9 +1793,9 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::MeldFields(const MEDCouplingFiel
     throw INTERP_KERNEL::Exception("Fields are not compatible ; unable to apply MeldFields on them !");
   MEDCouplingTimeDiscretization *td=f1->_time_discr->meld(f2->_time_discr);
   td->copyTinyAttrFrom(*f1->_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
   ret->setMesh(f1->getMesh());
-  return ret;
+  return ret.retn();
 }
 
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::DotFields(const MEDCouplingFieldDouble *f1, const MEDCouplingFieldDouble *f2) throw(INTERP_KERNEL::Exception)
@@ -1821,9 +1819,9 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::CrossProductFields(const MEDCoup
     throw INTERP_KERNEL::Exception("Fields are not compatible ; unable to apply CrossProductFields on them !");
   MEDCouplingTimeDiscretization *td=f1->_time_discr->crossProduct(f2->_time_discr);
   td->copyTinyAttrFrom(*f1->_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
   ret->setMesh(f1->getMesh());
-  return ret;
+  return ret.retn();
 }
 
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::MaxFields(const MEDCouplingFieldDouble *f1, const MEDCouplingFieldDouble *f2) throw(INTERP_KERNEL::Exception)
@@ -1834,9 +1832,9 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::MaxFields(const MEDCouplingField
     throw INTERP_KERNEL::Exception("Fields are not compatible ; unable to apply MaxFields on them !");
   MEDCouplingTimeDiscretization *td=f1->_time_discr->max(f2->_time_discr);
   td->copyTinyAttrFrom(*f1->_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
   ret->setMesh(f1->getMesh());
-  return ret;
+  return ret.retn();
 }
 
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::MinFields(const MEDCouplingFieldDouble *f1, const MEDCouplingFieldDouble *f2) throw(INTERP_KERNEL::Exception)
@@ -1847,9 +1845,9 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::MinFields(const MEDCouplingField
     throw INTERP_KERNEL::Exception("Fields are not compatible ; unable to apply MinFields on them !");
   MEDCouplingTimeDiscretization *td=f1->_time_discr->min(f2->_time_discr);
   td->copyTinyAttrFrom(*f1->_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
   ret->setMesh(f1->getMesh());
-  return ret;
+  return ret.retn();
 }
 
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::negate() const throw(INTERP_KERNEL::Exception)
@@ -1858,9 +1856,9 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::negate() const throw(INTERP_KERN
     throw INTERP_KERNEL::Exception("No spatial discretization underlying this field to perform negate !");
   MEDCouplingTimeDiscretization *td=_time_discr->negate();
   td->copyTinyAttrFrom(*_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(getNature(),td,_type->clone());
   ret->setMesh(getMesh());
-  return ret;
+  return ret.retn();
 }
 
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::AddFields(const MEDCouplingFieldDouble *f1, const MEDCouplingFieldDouble *f2) throw(INTERP_KERNEL::Exception)
@@ -1871,9 +1869,9 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::AddFields(const MEDCouplingField
     throw INTERP_KERNEL::Exception("Fields are not compatible ; unable to apply AddFields on them !");
   MEDCouplingTimeDiscretization *td=f1->_time_discr->add(f2->_time_discr);
   td->copyTinyAttrFrom(*f1->_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
   ret->setMesh(f1->getMesh());
-  return ret;
+  return ret.retn();
 }
 
 const MEDCouplingFieldDouble &MEDCouplingFieldDouble::operator+=(const MEDCouplingFieldDouble& other) throw(INTERP_KERNEL::Exception)
@@ -1892,9 +1890,9 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::SubstractFields(const MEDCouplin
     throw INTERP_KERNEL::Exception("Fields are not compatible ; unable to apply SubstractFields on them !");
   MEDCouplingTimeDiscretization *td=f1->_time_discr->substract(f2->_time_discr);
   td->copyTinyAttrFrom(*f1->_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
   ret->setMesh(f1->getMesh());
-  return ret;
+  return ret.retn();
 }
 
 const MEDCouplingFieldDouble &MEDCouplingFieldDouble::operator-=(const MEDCouplingFieldDouble& other) throw(INTERP_KERNEL::Exception)
@@ -1913,9 +1911,9 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::MultiplyFields(const MEDCoupling
     throw INTERP_KERNEL::Exception("Fields are not compatible ; unable to apply MultiplyFields on them !");
   MEDCouplingTimeDiscretization *td=f1->_time_discr->multiply(f2->_time_discr);
   td->copyTinyAttrFrom(*f1->_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
   ret->setMesh(f1->getMesh());
-  return ret;
+  return ret.retn();
 }
 
 const MEDCouplingFieldDouble &MEDCouplingFieldDouble::operator*=(const MEDCouplingFieldDouble& other) throw(INTERP_KERNEL::Exception)
@@ -1934,9 +1932,9 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::DivideFields(const MEDCouplingFi
     throw INTERP_KERNEL::Exception("Fields are not compatible ; unable to apply DivideFields on them !");
   MEDCouplingTimeDiscretization *td=f1->_time_discr->divide(f2->_time_discr);
   td->copyTinyAttrFrom(*f1->_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
   ret->setMesh(f1->getMesh());
-  return ret;
+  return ret.retn();
 }
 
 const MEDCouplingFieldDouble &MEDCouplingFieldDouble::operator/=(const MEDCouplingFieldDouble& other) throw(INTERP_KERNEL::Exception)
@@ -1960,9 +1958,9 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::PowFields(const MEDCouplingField
     throw INTERP_KERNEL::Exception("Fields are not compatible ; unable to apply PowFields on them !");
   MEDCouplingTimeDiscretization *td=f1->_time_discr->pow(f2->_time_discr);
   td->copyTinyAttrFrom(*f1->_time_discr);
-  MEDCouplingFieldDouble *ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=new MEDCouplingFieldDouble(f1->getNature(),td,f1->_type->clone());
   ret->setMesh(f1->getMesh());
-  return ret;
+  return ret.retn();
 }
 
 /*!
