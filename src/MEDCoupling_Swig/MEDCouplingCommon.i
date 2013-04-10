@@ -3327,7 +3327,7 @@ namespace ParaMEDMEM
                 }
               case 3:
                 {
-                  int nbOfComp=(slic.second.first-1-slic.first)/slic.second.second+1;
+                  int nbOfComp=DataArray::GetNumberOfItemGivenBESRelative(slic.first,slic.second.first,slic.second.second,"MEDCouplingFieldDouble::__getitem__ : invalid range in 2nd parameter (components) !");
                   std::vector<int> v2(nbOfComp);
                   for(int i=0;i<nbOfComp;i++)
                     v2[i]=slic.first+i*slic.second.second;
