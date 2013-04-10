@@ -139,7 +139,6 @@ namespace ParaMEDMEM
     void setIJSilent(int tupleId, int compoId, double newVal) throw(INTERP_KERNEL::Exception);
     double *getPointer() throw(INTERP_KERNEL::Exception);
     void checkNoNullValues() const throw(INTERP_KERNEL::Exception);
-    void getMinMaxPerComponent(double *bounds) const throw(INTERP_KERNEL::Exception);
     DataArrayDouble *computeBBoxPerTuple(double epsilon=0.0) const throw(INTERP_KERNEL::Exception);
     void recenterForMaxPrecision(double eps) throw(INTERP_KERNEL::Exception);
     double getMaxValue(int& tupleId) const throw(INTERP_KERNEL::Exception);
@@ -687,10 +686,9 @@ namespace ParaMEDMEM
         DataArrayDoubleTuple *aa;
         std::vector<double> bb;
         int sw;
-        int tupleId=-1,nbTuples=-1,nbOfCompo=self->getNumberOfComponents();
+        int tupleId=-1,nbOfCompo=self->getNumberOfComponents();
         const double *pt=convertObjToPossibleCpp5_Safe(tuple,sw,val,a,aa,bb,"Python wrap of DataArrayDouble::distanceToTuple",1,nbOfCompo,true);
         //
-        int cellId=-1,nodeId=-1;
         double ret0=self->distanceToTuple(pt,pt+nbOfCompo,tupleId);
         PyObject *ret=PyTuple_New(2);
         PyTuple_SetItem(ret,0,PyFloat_FromDouble(ret0));
@@ -1210,14 +1208,30 @@ namespace ParaMEDMEM
         return self->negate();
       }
 
-      DataArrayDouble *__add__(PyObject *obj) throw(INTERP_KERNEL::Exception)
+      PyObject *__add__(PyObject *obj) throw(INTERP_KERNEL::Exception)
       {
-        const char msg[]="Unexpected situation in __add__ !";
+        const char msg[]="Unexpected situation in DataArrayDouble.__add__ !";
         double val;
         DataArrayDouble *a;
         DataArrayDoubleTuple *aa;
         std::vector<double> bb;
         int sw;
+        //
+        void *argp;
+        if(SWIG_IsOK(SWIG_ConvertPtr(obj,&argp,SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble,0|0)))
+          {
+            MEDCouplingFieldDouble *other=reinterpret_cast< ParaMEDMEM::MEDCouplingFieldDouble * >(argp);
+            if(other)
+              {
+                PyObject *tmp=SWIG_NewPointerObj(SWIG_as_voidptr(self),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, 0 | 0 );
+                MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=ParaMEDMEM_MEDCouplingFieldDouble___radd__Impl(other,tmp);
+                Py_XDECREF(tmp);
+                return SWIG_NewPointerObj(SWIG_as_voidptr(ret.retn()),SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble, SWIG_POINTER_OWN | 0 );
+              }
+            else
+              throw INTERP_KERNEL::Exception(msg);
+          }
+        //
         convertObjToPossibleCpp5(obj,sw,val,a,aa,bb);
         switch(sw)
           {
@@ -1225,21 +1239,21 @@ namespace ParaMEDMEM
             {
               MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=self->deepCpy();
               ret->applyLin(1.,val);
-              return ret.retn();
+              return SWIG_NewPointerObj(SWIG_as_voidptr(ret.retn()),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 );
             }
           case 2:
             {
-              return DataArrayDouble::Add(self,a);
+              return SWIG_NewPointerObj(SWIG_as_voidptr(DataArrayDouble::Add(self,a)),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 );
             }
           case 3:
             {
               MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=aa->buildDADouble(1,self->getNumberOfComponents());
-              return DataArrayDouble::Add(self,aaa);
+              return SWIG_NewPointerObj(SWIG_as_voidptr(DataArrayDouble::Add(self,aaa)),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 );
             }
           case 4:
             {
               MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=DataArrayDouble::New(); aaa->useArray(&bb[0],false,CPP_DEALLOC,1,(int)bb.size());
-              return DataArrayDouble::Add(self,aaa);
+              return SWIG_NewPointerObj(SWIG_as_voidptr(DataArrayDouble::Add(self,aaa)),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 );
             }
           default:
             throw INTERP_KERNEL::Exception(msg);
@@ -1320,7 +1334,7 @@ namespace ParaMEDMEM
           }
       }
 
-      DataArrayDouble *__sub__(PyObject *obj) throw(INTERP_KERNEL::Exception)
+      PyObject *__sub__(PyObject *obj) throw(INTERP_KERNEL::Exception)
       {
         const char msg[]="Unexpected situation in __sub__ !";
         double val;
@@ -1328,6 +1342,22 @@ namespace ParaMEDMEM
         DataArrayDoubleTuple *aa;
         std::vector<double> bb;
         int sw;
+        //
+        void *argp;
+        if(SWIG_IsOK(SWIG_ConvertPtr(obj,&argp,SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble,0|0)))
+          {
+            MEDCouplingFieldDouble *other=reinterpret_cast< ParaMEDMEM::MEDCouplingFieldDouble * >(argp);
+            if(other)
+              {
+                PyObject *tmp=SWIG_NewPointerObj(SWIG_as_voidptr(self),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, 0 | 0 );
+                MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=ParaMEDMEM_MEDCouplingFieldDouble___rsub__Impl(other,tmp);
+                Py_XDECREF(tmp);
+                return SWIG_NewPointerObj(SWIG_as_voidptr(ret.retn()),SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble, SWIG_POINTER_OWN | 0 );
+              }
+            else
+              throw INTERP_KERNEL::Exception(msg);
+          }
+        //
         convertObjToPossibleCpp5(obj,sw,val,a,aa,bb);
         switch(sw)
           {
@@ -1335,21 +1365,21 @@ namespace ParaMEDMEM
             {
               MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=self->deepCpy();
               ret->applyLin(1.,-val);
-              return ret.retn();
+              return SWIG_NewPointerObj(SWIG_as_voidptr(ret.retn()),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 );
             }
           case 2:
             {
-              return DataArrayDouble::Substract(self,a);
+              return SWIG_NewPointerObj(SWIG_as_voidptr(DataArrayDouble::Substract(self,a)),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 );
             }
           case 3:
             {
               MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=aa->buildDADouble(1,self->getNumberOfComponents());
-              return DataArrayDouble::Substract(self,aaa);
+              return SWIG_NewPointerObj(SWIG_as_voidptr(DataArrayDouble::Substract(self,aaa)),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 );
             }
           case 4:
             {
               MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=DataArrayDouble::New(); aaa->useArray(&bb[0],false,CPP_DEALLOC,1,(int)bb.size());
-              return DataArrayDouble::Substract(self,aaa);
+              return SWIG_NewPointerObj(SWIG_as_voidptr(DataArrayDouble::Substract(self,aaa)),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 );
             }
           default:
             throw INTERP_KERNEL::Exception(msg);
@@ -1430,7 +1460,7 @@ namespace ParaMEDMEM
           }
       }
 
-      DataArrayDouble *__mul__(PyObject *obj) throw(INTERP_KERNEL::Exception)
+      PyObject *__mul__(PyObject *obj) throw(INTERP_KERNEL::Exception)
       {
         const char msg[]="Unexpected situation in __mul__ !";
         double val;
@@ -1438,6 +1468,22 @@ namespace ParaMEDMEM
         DataArrayDoubleTuple *aa;
         std::vector<double> bb;
         int sw;
+        //
+        void *argp;
+        if(SWIG_IsOK(SWIG_ConvertPtr(obj,&argp,SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble,0|0)))
+          {
+            MEDCouplingFieldDouble *other=reinterpret_cast< ParaMEDMEM::MEDCouplingFieldDouble * >(argp);
+            if(other)
+              {
+                PyObject *tmp=SWIG_NewPointerObj(SWIG_as_voidptr(self),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, 0 | 0 );
+                MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=ParaMEDMEM_MEDCouplingFieldDouble___rmul__Impl(other,tmp);
+                Py_XDECREF(tmp);
+                return SWIG_NewPointerObj(SWIG_as_voidptr(ret.retn()),SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble, SWIG_POINTER_OWN | 0 );
+              }
+            else
+              throw INTERP_KERNEL::Exception(msg);
+          }
+        //
         convertObjToPossibleCpp5(obj,sw,val,a,aa,bb);
         switch(sw)
           {
@@ -1445,21 +1491,21 @@ namespace ParaMEDMEM
             {
               MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=self->deepCpy();
               ret->applyLin(val,0.);
-              return ret.retn();
+              return SWIG_NewPointerObj(SWIG_as_voidptr(ret.retn()),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 );
             }
           case 2:
             {
-              return DataArrayDouble::Multiply(self,a);
+              return SWIG_NewPointerObj(SWIG_as_voidptr(DataArrayDouble::Multiply(self,a)),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 );
             }
           case 3:
             {
               MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=aa->buildDADouble(1,self->getNumberOfComponents());
-              return DataArrayDouble::Multiply(self,aaa);
+              return SWIG_NewPointerObj(SWIG_as_voidptr(DataArrayDouble::Multiply(self,aaa)),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 );
             }
           case 4:
             {
               MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=DataArrayDouble::New(); aaa->useArray(&bb[0],false,CPP_DEALLOC,1,(int)bb.size());
-              return DataArrayDouble::Multiply(self,aaa);
+              return SWIG_NewPointerObj(SWIG_as_voidptr(DataArrayDouble::Multiply(self,aaa)),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 );
             }
           default:
             throw INTERP_KERNEL::Exception(msg);
@@ -1540,7 +1586,7 @@ namespace ParaMEDMEM
           }
       }
 
-      DataArrayDouble *__div__(PyObject *obj) throw(INTERP_KERNEL::Exception)
+      PyObject *__div__(PyObject *obj) throw(INTERP_KERNEL::Exception)
       {
         const char msg[]="Unexpected situation in __div__ !";
         double val;
@@ -1548,6 +1594,22 @@ namespace ParaMEDMEM
         DataArrayDoubleTuple *aa;
         std::vector<double> bb;
         int sw;
+        //
+        void *argp;
+        if(SWIG_IsOK(SWIG_ConvertPtr(obj,&argp,SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble,0|0)))
+          {
+            MEDCouplingFieldDouble *other=reinterpret_cast< ParaMEDMEM::MEDCouplingFieldDouble * >(argp);
+            if(other)
+              {
+                PyObject *tmp=SWIG_NewPointerObj(SWIG_as_voidptr(self),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, 0 | 0 );
+                MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=ParaMEDMEM_MEDCouplingFieldDouble___rdiv__Impl(other,tmp);
+                Py_XDECREF(tmp);
+                return SWIG_NewPointerObj(SWIG_as_voidptr(ret.retn()),SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble, SWIG_POINTER_OWN | 0 );
+              }
+            else
+              throw INTERP_KERNEL::Exception(msg);
+          }
+        //
         convertObjToPossibleCpp5(obj,sw,val,a,aa,bb);
         switch(sw)
           {
@@ -1557,21 +1619,21 @@ namespace ParaMEDMEM
                 throw INTERP_KERNEL::Exception("DataArrayDouble::__div__ : trying to divide by zero !");
               MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=self->deepCpy();
               ret->applyLin(1/val,0.);
-              return ret.retn();
+              return SWIG_NewPointerObj(SWIG_as_voidptr(ret.retn()),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 );
             }
           case 2:
             {
-              return DataArrayDouble::Divide(self,a);
+              return SWIG_NewPointerObj(SWIG_as_voidptr(DataArrayDouble::Divide(self,a)),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 );
             }
           case 3:
             {
               MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=aa->buildDADouble(1,self->getNumberOfComponents());
-              return DataArrayDouble::Divide(self,aaa);
+              return SWIG_NewPointerObj(SWIG_as_voidptr(DataArrayDouble::Divide(self,aaa)),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 );
             }
           case 4:
             {
               MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aaa=DataArrayDouble::New(); aaa->useArray(&bb[0],false,CPP_DEALLOC,1,(int)bb.size());
-              return DataArrayDouble::Divide(self,aaa);
+              return SWIG_NewPointerObj(SWIG_as_voidptr(DataArrayDouble::Divide(self,aaa)),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 );
             }
           default:
             throw INTERP_KERNEL::Exception(msg);
@@ -3406,8 +3468,8 @@ namespace ParaMEDMEM
             }
           case 2:
             {
-              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaa=DataArrayInt::New(); aaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
-              return DataArrayInt::Add(self,aaa);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaaa=DataArrayInt::New(); aaaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
+              return DataArrayInt::Add(self,aaaa);
             }
           case 3:
             {
@@ -3442,8 +3504,8 @@ namespace ParaMEDMEM
             }
           case 2:
             {
-              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaa=DataArrayInt::New(); aaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
-              return DataArrayInt::Add(self,aaa);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaaa=DataArrayInt::New(); aaaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
+              return DataArrayInt::Add(self,aaaa);
             }
           case 4:
             {
@@ -3516,8 +3578,8 @@ namespace ParaMEDMEM
             }
           case 2:
             {
-              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaa=DataArrayInt::New(); aaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
-              return DataArrayInt::Substract(self,aaa);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaaa=DataArrayInt::New(); aaaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
+              return DataArrayInt::Substract(self,aaaa);
             }
           case 3:
             {
@@ -3552,8 +3614,8 @@ namespace ParaMEDMEM
             }
           case 2:
             {
-              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaa=DataArrayInt::New(); aaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
-              return DataArrayInt::Substract(aaa,self);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaaa=DataArrayInt::New(); aaaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
+              return DataArrayInt::Substract(aaaa,self);
             }
           case 4:
             {
@@ -3626,8 +3688,8 @@ namespace ParaMEDMEM
             }
           case 2:
             {
-              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaa=DataArrayInt::New(); aaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
-              return DataArrayInt::Multiply(self,aaa);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaaa=DataArrayInt::New(); aaaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
+              return DataArrayInt::Multiply(self,aaaa);
             }
           case 3:
             {
@@ -3662,8 +3724,8 @@ namespace ParaMEDMEM
             }
           case 2:
             {
-              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaa=DataArrayInt::New(); aaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
-              return DataArrayInt::Multiply(self,aaa);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaaa=DataArrayInt::New(); aaaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
+              return DataArrayInt::Multiply(self,aaaa);
             }
           case 4:
             {
@@ -3736,8 +3798,8 @@ namespace ParaMEDMEM
             }
           case 2:
             {
-              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaa=DataArrayInt::New(); aaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
-              return DataArrayInt::Divide(self,aaa);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaaa=DataArrayInt::New(); aaaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
+              return DataArrayInt::Divide(self,aaaa);
             }
           case 3:
             {
@@ -3772,8 +3834,8 @@ namespace ParaMEDMEM
             }
           case 2:
             {
-              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaa=DataArrayInt::New(); aaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
-              return DataArrayInt::Divide(aaa,self);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaaa=DataArrayInt::New(); aaaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
+              return DataArrayInt::Divide(aaaa,self);
             }
           case 4:
             {
@@ -3846,8 +3908,8 @@ namespace ParaMEDMEM
             }
           case 2:
             {
-              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaa=DataArrayInt::New(); aaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
-              return DataArrayInt::Modulus(self,aaa);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaaa=DataArrayInt::New(); aaaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
+              return DataArrayInt::Modulus(self,aaaa);
             }
           case 3:
             {
@@ -3882,8 +3944,8 @@ namespace ParaMEDMEM
             }
           case 2:
             {
-              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaa=DataArrayInt::New(); aaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
-              return DataArrayInt::Modulus(aaa,self);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaaa=DataArrayInt::New(); aaaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
+              return DataArrayInt::Modulus(aaaa,self);
             }
           case 3:
             {
@@ -3953,8 +4015,8 @@ namespace ParaMEDMEM
             }
           case 2:
             {
-              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaa=DataArrayInt::New(); aaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
-              return DataArrayInt::Pow(self,aaa);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaaa=DataArrayInt::New(); aaaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
+              return DataArrayInt::Pow(self,aaaa);
             }
           case 3:
             {
@@ -3989,8 +4051,8 @@ namespace ParaMEDMEM
             }
           case 2:
             {
-              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaa=DataArrayInt::New(); aaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
-              return DataArrayInt::Pow(aaa,self);
+              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> aaaa=DataArrayInt::New(); aaaa->useArray(&aa[0],false,CPP_DEALLOC,1,(int)aa.size());
+              return DataArrayInt::Pow(aaaa,self);
             }
           case 3:
             {
