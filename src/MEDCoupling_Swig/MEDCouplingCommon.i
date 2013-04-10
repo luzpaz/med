@@ -3290,7 +3290,57 @@ namespace ParaMEDMEM
 
       MEDCouplingFieldDouble *__getitem__(PyObject *li) const throw(INTERP_KERNEL::Exception)
       {
-        return ParaMEDMEM_MEDCouplingFieldDouble_buildSubPart(self,li);
+        const char msg[]="MEDCouplingFieldDouble::__getitem__ : invalid call  Available API are : \n-myField[dataArrayInt]\n-myField[slice]\n-myField[pythonListOfCellIds]\n-myField[integer]\n-myField[dataArrayInt,1]\n-myField[slice,1]\n-myField[pythonListOfCellIds,1]\n-myField[integer,1]\n";
+        if(PyTuple_Check(li))
+          {
+            Py_ssize_t sz=PyTuple_Size(li);
+            if(sz!=2)
+              throw INTERP_KERNEL::Exception(msg);
+            PyObject *elt0=PyTuple_GetItem(li,0),*elt1=PyTuple_GetItem(li,1);
+            int sw;
+            int singleVal;
+            std::vector<int> multiVal;
+            std::pair<int, std::pair<int,int> > slic;
+            ParaMEDMEM::DataArrayInt *daIntTyypp=0;
+            if(!self->getArray())
+              throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::__getitem__ : no array set on field to deduce number of components !");
+            try
+              { convertObjToPossibleCpp2(elt1,self->getArray()->getNumberOfComponents(),sw,singleVal,multiVal,slic,daIntTyypp); }
+            catch(INTERP_KERNEL::Exception& e)
+              { std::ostringstream oss; oss << "MEDCouplingFieldDouble::__getitem__ : invalid type in 2nd parameter (compo) !" << e.what(); throw INTERP_KERNEL::Exception(oss.str().c_str()); }
+            MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret0=ParaMEDMEM_MEDCouplingFieldDouble_buildSubPart(self,elt0);
+            DataArrayDouble *ret0Arr=ret0->getArray();
+            if(!ret0Arr)
+              throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::__getitem__ : no array exists to apply restriction on component on it !");
+            switch(sw)
+              {
+              case 1:
+                {
+                  std::vector<int> v2(1,singleVal);
+                  ret0->setArray(ret0Arr->keepSelectedComponents(v2));
+                  return ret0.retn();
+                }
+              case 2:
+                {
+                  ret0->setArray(ret0Arr->keepSelectedComponents(multiVal));
+                  return ret0.retn();
+                }
+              case 3:
+                {
+                  int nbOfComp=(slic.second.first-1-slic.first)/slic.second.second+1;
+                  std::vector<int> v2(nbOfComp);
+                  for(int i=0;i<nbOfComp;i++)
+                    v2[i]=slic.first+i*slic.second.second;
+                  ret0->setArray(ret0Arr->keepSelectedComponents(v2));
+                  return ret0.retn();
+                }
+              default:
+                throw INTERP_KERNEL::Exception(msg);
+              }
+            
+          }
+        else
+          return ParaMEDMEM_MEDCouplingFieldDouble_buildSubPart(self,li);
       }
 
       PyObject *getMaxValue2() const throw(INTERP_KERNEL::Exception)

@@ -123,7 +123,6 @@ namespace ParaMEDMEM
     void rearrange(int newNbOfCompo) throw(INTERP_KERNEL::Exception);
     void transpose() throw(INTERP_KERNEL::Exception);
     DataArrayDouble *changeNbOfComponents(int newNbOfComp, double dftValue) const throw(INTERP_KERNEL::Exception);
-    DataArrayDouble *keepSelectedComponents(const std::vector<int>& compoIds) const throw(INTERP_KERNEL::Exception);
     void meldWith(const DataArrayDouble *other) throw(INTERP_KERNEL::Exception);
     DataArrayDouble *duplicateEachTupleNTimes(int nbTimes) const throw(INTERP_KERNEL::Exception);
     DataArrayDouble *getDifferentValues(double prec, int limitTupleId=-1) const throw(INTERP_KERNEL::Exception);
@@ -2123,7 +2122,6 @@ namespace ParaMEDMEM
     void rearrange(int newNbOfCompo) throw(INTERP_KERNEL::Exception);
     void transpose() throw(INTERP_KERNEL::Exception);
     DataArrayInt *changeNbOfComponents(int newNbOfComp, int dftValue) const throw(INTERP_KERNEL::Exception);
-    DataArrayInt *keepSelectedComponents(const std::vector<int>& compoIds) const throw(INTERP_KERNEL::Exception);
     void meldWith(const DataArrayInt *other) throw(INTERP_KERNEL::Exception);
     void setPartOfValues1(const DataArrayInt *a, int bgTuples, int endTuples, int stepTuples, int bgComp, int endComp, int stepComp, bool strictCompoCompare=true) throw(INTERP_KERNEL::Exception);
     void setPartOfValuesSimple1(int a, int bgTuples, int endTuples, int stepTuples, int bgComp, int endComp, int stepComp) throw(INTERP_KERNEL::Exception);
@@ -4424,7 +4422,6 @@ namespace ParaMEDMEM
     void rearrange(int newNbOfCompo) throw(INTERP_KERNEL::Exception);
     DataArrayChar *substr(int tupleIdBg, int tupleIdEnd=-1) const throw(INTERP_KERNEL::Exception);
     DataArrayChar *changeNbOfComponents(int newNbOfComp, char dftValue) const throw(INTERP_KERNEL::Exception);
-    DataArrayChar *keepSelectedComponents(const std::vector<int>& compoIds) const throw(INTERP_KERNEL::Exception);
     void meldWith(const DataArrayChar *other) throw(INTERP_KERNEL::Exception);
     void setPartOfValuesAdv(const DataArrayChar *a, const DataArrayChar *tuplesSelec) throw(INTERP_KERNEL::Exception);
     char back() const throw(INTERP_KERNEL::Exception);
