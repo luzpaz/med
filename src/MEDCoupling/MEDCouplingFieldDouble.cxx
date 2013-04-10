@@ -545,7 +545,7 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::buildSubPart(const int *partBg, 
   DataArrayInt *arrSelect;
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingMesh> m=_type->buildSubMeshData(_mesh,partBg,partEnd,arrSelect);
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> arrSelect2(arrSelect);
-  MEDCouplingFieldDouble *ret=clone(false);//quick shallow copy.
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=clone(false);//quick shallow copy.
   const MEDCouplingFieldDiscretization *disc=getDiscretization();
   if(disc)
     ret->setDiscretization(MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDiscretization>(disc->clonePart(partBg,partEnd)));
@@ -566,7 +566,7 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::buildSubPart(const int *partBg, 
   for(std::vector<DataArrayDouble *>::const_iterator iter=arrs.begin();iter!=arrs.end();iter++)
     if(*iter)
       (*iter)->decrRef();
-  return ret;
+  return ret.retn();
 }
 
 TypeOfTimeDiscretization MEDCouplingFieldDouble::getTimeDiscretization() const
