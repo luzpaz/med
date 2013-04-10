@@ -756,6 +756,7 @@ namespace ParaMEDMEM
       PyObject *__getitem__(PyObject *obj) throw(INTERP_KERNEL::Exception)
       {
         const char msg[]="Unexpected situation in DataArrayDouble::__getitem__ !";
+        const char msg2[]="DataArrayDouble::__getitem__ : Mismatch of slice values in 2nd parameter (components) !";
         self->checkAllocated();
         int nbOfTuples=self->getNumberOfTuples();
         int nbOfComponents=self->getNumberOfComponents();
@@ -821,7 +822,7 @@ namespace ParaMEDMEM
           case 13:
             {
               ret=self->selectByTupleIdSafe(&it1,&it1+1);
-              int nbOfComp=(pc1.second.first-1-pc1.first)/pc1.second.second+1;
+              int nbOfComp=DataArray::GetNumberOfItemGivenBESRelative(pc1.first,pc1.second.first,pc1.second.second,msg2);
               std::vector<int> v2(nbOfComp);
               for(int i=0;i<nbOfComp;i++)
                 v2[i]=pc1.first+i*pc1.second.second;
@@ -830,7 +831,7 @@ namespace ParaMEDMEM
           case 14:
             {
               ret=self->selectByTupleIdSafe(&vt1[0],&vt1[0]+vt1.size());
-              int nbOfComp=(pc1.second.first-1-pc1.first)/pc1.second.second+1;
+              int nbOfComp=DataArray::GetNumberOfItemGivenBESRelative(pc1.first,pc1.second.first,pc1.second.second,msg2);
               std::vector<int> v2(nbOfComp);
               for(int i=0;i<nbOfComp;i++)
                 v2[i]=pc1.first+i*pc1.second.second;
@@ -839,7 +840,7 @@ namespace ParaMEDMEM
           case 15:
             {
               ret=self->selectByTupleId2(pt1.first,pt1.second.first,pt1.second.second);
-              int nbOfComp=(pc1.second.first-1-pc1.first)/pc1.second.second+1;
+              int nbOfComp=DataArray::GetNumberOfItemGivenBESRelative(pc1.first,pc1.second.first,pc1.second.second,msg2);
               std::vector<int> v2(nbOfComp);
               for(int i=0;i<nbOfComp;i++)
                 v2[i]=pc1.first+i*pc1.second.second;
@@ -848,7 +849,7 @@ namespace ParaMEDMEM
           case 16:
             {
               ret=self->selectByTupleIdSafe(dt1->getConstPointer(),dt1->getConstPointer()+dt1->getNbOfElems());
-              int nbOfComp=(pc1.second.first-1-pc1.first)/pc1.second.second+1;
+              int nbOfComp=DataArray::GetNumberOfItemGivenBESRelative(pc1.first,pc1.second.first,pc1.second.second,msg2);
               std::vector<int> v2(nbOfComp);
               for(int i=0;i<nbOfComp;i++)
                 v2[i]=pc1.first+i*pc1.second.second;
@@ -1855,6 +1856,7 @@ namespace ParaMEDMEM
 
       PyObject *__getitem__(PyObject *obj) throw(INTERP_KERNEL::Exception)
       {
+        const char msg2[]="DataArrayDoubleTuple::__getitem__ : Mismatch of slice values in 2nd parameter (components) !";
         int sw;
         int singleVal;
         std::vector<int> multiVal;
@@ -1905,7 +1907,7 @@ namespace ParaMEDMEM
             }
           case 3:
             {
-              int sz=DataArray::GetNumberOfItemGivenBES(slic.first,slic.second.first,slic.second.second,"");
+              int sz=DataArray::GetNumberOfItemGivenBES(slic.first,slic.second.first,slic.second.second,msg2);
               PyObject *t=PyTuple_New(sz);
               for(int j=0;j<sz;j++)
                 PyTuple_SetItem(t,j,PyFloat_FromDouble(pt[slic.first+j*slic.second.second]));
@@ -1919,6 +1921,7 @@ namespace ParaMEDMEM
       DataArrayDoubleTuple *__setitem__(PyObject *obj, PyObject *value) throw(INTERP_KERNEL::Exception)
       {
         const char msg[]="DataArrayDoubleTuple::__setitem__ : unrecognized type entered, int, slice, list<int>, tuple<int> !";
+        const char msg2[]="DataArrayDoubleTuple::__setitem__ : Mismatch of slice values in 2nd parameter (components) !";
         int sw1,sw2;
         double singleValV;
         std::vector<double> multiValV;
@@ -2025,7 +2028,7 @@ namespace ParaMEDMEM
             }
           case 3:
             {
-              int sz=DataArray::GetNumberOfItemGivenBES(slic.first,slic.second.first,slic.second.second,"");
+              int sz=DataArray::GetNumberOfItemGivenBES(slic.first,slic.second.first,slic.second.second,msg2);
               switch(sw1)
                 {
                 case 1:
@@ -2863,6 +2866,7 @@ namespace ParaMEDMEM
       PyObject *__getitem__(PyObject *obj) throw(INTERP_KERNEL::Exception)
       {
         const char msg[]="Unexpected situation in DataArrayInt::__getitem__ !";
+        const char msg2[]="DataArrayInt::__getitem__ : Mismatch of slice values in 2nd parameter (components) !";
         self->checkAllocated();
         int nbOfTuples=self->getNumberOfTuples();
         int nbOfComponents=self->getNumberOfComponents();
@@ -2930,7 +2934,7 @@ namespace ParaMEDMEM
           case 13:
             {
               ret=self->selectByTupleIdSafe(&it1,&it1+1);
-              int nbOfComp=(pc1.second.first-1-pc1.first)/pc1.second.second+1;
+              int nbOfComp=DataArray::GetNumberOfItemGivenBESRelative(pc1.first,pc1.second.first,pc1.second.second,msg2);
               std::vector<int> v2(nbOfComp);
               for(int i=0;i<nbOfComp;i++)
                 v2[i]=pc1.first+i*pc1.second.second;
@@ -2939,7 +2943,7 @@ namespace ParaMEDMEM
           case 14:
             {
               ret=self->selectByTupleIdSafe(&vt1[0],&vt1[0]+vt1.size());
-              int nbOfComp=(pc1.second.first-1-pc1.first)/pc1.second.second+1;
+              int nbOfComp=DataArray::GetNumberOfItemGivenBESRelative(pc1.first,pc1.second.first,pc1.second.second,msg2);
               std::vector<int> v2(nbOfComp);
               for(int i=0;i<nbOfComp;i++)
                 v2[i]=pc1.first+i*pc1.second.second;
@@ -2948,7 +2952,7 @@ namespace ParaMEDMEM
           case 15:
             {
               ret=self->selectByTupleId2(pt1.first,pt1.second.first,pt1.second.second);
-              int nbOfComp=(pc1.second.first-1-pc1.first)/pc1.second.second+1;
+              int nbOfComp=DataArray::GetNumberOfItemGivenBESRelative(pc1.first,pc1.second.first,pc1.second.second,msg2);
               std::vector<int> v2(nbOfComp);
               for(int i=0;i<nbOfComp;i++)
                 v2[i]=pc1.first+i*pc1.second.second;
@@ -2957,7 +2961,7 @@ namespace ParaMEDMEM
           case 16:
             {
               ret=self->selectByTupleIdSafe(dt1->getConstPointer(),dt1->getConstPointer()+dt1->getNbOfElems());
-              int nbOfComp=(pc1.second.first-1-pc1.first)/pc1.second.second+1;
+              int nbOfComp=DataArray::GetNumberOfItemGivenBESRelative(pc1.first,pc1.second.first,pc1.second.second,msg2);
               std::vector<int> v2(nbOfComp);
               for(int i=0;i<nbOfComp;i++)
                 v2[i]=pc1.first+i*pc1.second.second;
@@ -4169,6 +4173,7 @@ namespace ParaMEDMEM
   
       PyObject *__getitem__(PyObject *obj) throw(INTERP_KERNEL::Exception)
       {
+        const char msg2[]="DataArrayIntTuple::__getitem__ : Mismatch of slice values in 2nd parameter (components) !";
         int sw;
         int singleVal;
         std::vector<int> multiVal;
@@ -4219,7 +4224,7 @@ namespace ParaMEDMEM
             }
           case 3:
             {
-              int sz=DataArray::GetNumberOfItemGivenBES(slic.first,slic.second.first,slic.second.second,"");
+              int sz=DataArray::GetNumberOfItemGivenBES(slic.first,slic.second.first,slic.second.second,msg2);
               PyObject *t=PyTuple_New(sz);
               for(int j=0;j<sz;j++)
                 PyTuple_SetItem(t,j,PyInt_FromLong(pt[slic.first+j*slic.second.second]));
@@ -4233,6 +4238,7 @@ namespace ParaMEDMEM
       DataArrayIntTuple *__setitem__(PyObject *obj, PyObject *value) throw(INTERP_KERNEL::Exception)
       {
         const char msg[]="DataArrayIntTuple::__setitem__ : unrecognized type entered, int, slice, list<int>, tuple<int> !";
+        const char msg2[]="DataArrayIntTuple::__setitem__ : Mismatch of slice values in 2nd parameter (components) !";
         int sw1,sw2;
         int singleValV;
         std::vector<int> multiValV;
@@ -4340,7 +4346,7 @@ namespace ParaMEDMEM
             }
           case 3:
             {
-              int sz=DataArray::GetNumberOfItemGivenBES(slic.first,slic.second.first,slic.second.second,"");
+              int sz=DataArray::GetNumberOfItemGivenBES(slic.first,slic.second.first,slic.second.second,msg2);
               switch(sw1)
                 {
                 case 1:
