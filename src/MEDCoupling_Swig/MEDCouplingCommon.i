@@ -93,6 +93,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::MEDCouplingFieldDiscretization::deepCpy;
 %newobject ParaMEDMEM::MEDCouplingFieldDiscretization::clone;
 %newobject ParaMEDMEM::MEDCouplingFieldDiscretization::clonePart;
+%newobject ParaMEDMEM::MEDCouplingFieldDiscretization::clonePartRange;
 %newobject ParaMEDMEM::MEDCouplingFieldDiscretization::getMeasureField;
 %newobject ParaMEDMEM::MEDCouplingFieldDiscretization::getOffsetArr;
 %newobject ParaMEDMEM::MEDCouplingFieldDiscretization::getLocalizationOfDiscValues;
@@ -133,6 +134,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::negate;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::getIdsInRange;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::buildSubPart;
+%newobject ParaMEDMEM::MEDCouplingFieldDouble::buildSubPartRange;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::__getitem__;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::__neg__;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::__add__;
@@ -300,6 +302,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::MEDCouplingMesh::checkDeepEquivalOnSameNodesWith;
 %newobject ParaMEDMEM::MEDCouplingMesh::checkTypeConsistencyAndContig;
 %newobject ParaMEDMEM::MEDCouplingMesh::computeNbOfNodesPerCell;
+%newobject ParaMEDMEM::MEDCouplingMesh::buildPartRange;
 %newobject ParaMEDMEM::MEDCouplingMesh::giveCellsWithType;
 %newobject ParaMEDMEM::MEDCouplingMesh::getCoordinatesAndOwner;
 %newobject ParaMEDMEM::MEDCouplingMesh::getBarycenterAndOwner;
@@ -554,6 +557,7 @@ namespace ParaMEDMEM
     virtual DataArrayDouble *computeIsoBarycenterOfNodesPerCell() const throw(INTERP_KERNEL::Exception);
     virtual DataArrayInt *giveCellsWithType(INTERP_KERNEL::NormalizedCellType type) const throw(INTERP_KERNEL::Exception);
     virtual DataArrayInt *computeNbOfNodesPerCell() const throw(INTERP_KERNEL::Exception);
+    virtual MEDCouplingMesh *buildPartRange(int beginCellIds, int endCellIds, int stepCellIds) const throw(INTERP_KERNEL::Exception);
     virtual int getNumberOfCellsWithType(INTERP_KERNEL::NormalizedCellType type) const throw(INTERP_KERNEL::Exception);
     virtual INTERP_KERNEL::NormalizedCellType getTypeOfCell(int cellId) const throw(INTERP_KERNEL::Exception);
     virtual std::string simpleRepr() const throw(INTERP_KERNEL::Exception);
@@ -844,6 +848,23 @@ namespace ParaMEDMEM
            return res;
          }
 
+         PyObject *buildPartRangeAndReduceNodes(int beginCellIds, int endCellIds, int stepCellIds) const throw(INTERP_KERNEL::Exception)
+         {
+           int a,b,c;
+           DataArrayInt *arr=0;
+           MEDCouplingMesh *ret=self->buildPartRangeAndReduceNodes(beginCellIds,endCellIds,stepCellIds,a,b,c,arr);
+           PyObject *res = PyTuple_New(2);
+           PyObject *obj0=convertMesh(ret, SWIG_POINTER_OWN | 0 );
+           PyObject *obj1=0;
+           if(arr)
+             obj1=SWIG_NewPointerObj(SWIG_as_voidptr(arr),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 );
+           else
+             obj1=PySlice_New(PyInt_FromLong(a),PyInt_FromLong(b),PyInt_FromLong(b));
+           PyTuple_SetItem(res,0,obj0);
+           PyTuple_SetItem(res,1,obj1);
+           return res;
+         }
+
         PyObject *getDistributionOfTypes() const throw(INTERP_KERNEL::Exception)
         {
           std::vector<int> vals=self->getDistributionOfTypes();
@@ -955,6 +976,7 @@ namespace ParaMEDMEM
 %include "MEDCouplingFieldDiscretization.hxx"
 
 %ignore ParaMEDMEM::MEDCouplingFieldDiscretization::clonePart;
+%ignore ParaMEDMEM::MEDCouplingFieldDiscretization::buildSubMeshDataRange;
 %ignore ParaMEDMEM::MEDCouplingFieldDiscretizationPerCell::getArrayOfDiscIds;
 
 namespace ParaMEDMEM
@@ -2586,6 +2608,23 @@ namespace ParaMEDMEM
     const int *inp=convertObjToPossibleCpp1_Safe(li,sw,sz,val1,val2);
     return self->clonePart(inp,inp+sz);
   }
+
+  PyObject *buildSubMeshDataRange(const MEDCouplingMesh *mesh, int beginCellIds, int endCellIds, int stepCellIds, int& beginOut, int& endOut, int& stepOut, DataArrayInt *&di) const throw(INTERP_KERNEL::Exception)
+  {
+    DataArrayInt *ret1=0;
+    int bb,ee,ss;
+    MEDCouplingMesh *ret0=self->buildSubMeshDataRange(mesh,begin,end,step,bb,ee,ss,ret1);
+    PyObject *res=PyTuple_New(2);
+    PyTuple_SetItem(res,0,convertMesh(ret0, SWIG_POINTER_OWN | 0 ));
+    if(ret1)
+      PyTuple_SetItem(res,1,SWIG_NewPointerObj((void*)ret1,SWIGTYPE_p_ParaMEDMEM__DataArrayInt,SWIG_POINTER_OWN | 0));
+    else
+      {
+        PyObject *res1=PySlice_New(PyInt_FromLong(bb),PyInt_FromLong(ee),PyInt_FromLong(ss));
+        PyTuple_SetItem(res,1,res1);
+      }
+    return res;
+  }
   
   PyObject *computeMeshRestrictionFromTupleIds(const MEDCouplingMesh *mesh, PyObject *tupleIds) const throw(INTERP_KERNEL::Exception)
   {
@@ -2758,6 +2797,23 @@ namespace ParaMEDMEM
         PyObject *res = PyList_New(2);
         PyList_SetItem(res,0,convertMesh(ret0, SWIG_POINTER_OWN | 0 ));
         PyList_SetItem(res,1,SWIG_NewPointerObj((void*)ret1,SWIGTYPE_p_ParaMEDMEM__DataArrayInt,SWIG_POINTER_OWN | 0));
+        return res;
+      }
+
+      PyObject *buildSubMeshDataRange(int begin, int end, int step) const throw(INTERP_KERNEL::Exception)
+      {
+        DataArrayInt *ret1=0;
+        int bb,ee,ss;
+        MEDCouplingMesh *ret0=self->buildSubMeshDataRange(begin,end,step,bb,ee,ss,ret1);
+        PyObject *res=PyTuple_New(2);
+        PyTuple_SetItem(res,0,convertMesh(ret0, SWIG_POINTER_OWN | 0 ));
+        if(ret1)
+          PyTuple_SetItem(res,1,SWIG_NewPointerObj((void*)ret1,SWIGTYPE_p_ParaMEDMEM__DataArrayInt,SWIG_POINTER_OWN | 0));
+        else
+          {
+            PyObject *res1=PySlice_New(PyInt_FromLong(bb),PyInt_FromLong(ee),PyInt_FromLong(ss));
+            PyTuple_SetItem(res,1,res1);
+          }
         return res;
       }
 
@@ -2935,6 +2991,7 @@ namespace ParaMEDMEM
     double normL1(int compId) const throw(INTERP_KERNEL::Exception);
     double normL2(int compId) const throw(INTERP_KERNEL::Exception);
     DataArrayInt *getIdsInRange(double vmin, double vmax) const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *buildSubPartRange(int begin, int end, int step) const throw(INTERP_KERNEL::Exception);
     static MEDCouplingFieldDouble *MergeFields(const MEDCouplingFieldDouble *f1, const MEDCouplingFieldDouble *f2) throw(INTERP_KERNEL::Exception);
     static MEDCouplingFieldDouble *MeldFields(const MEDCouplingFieldDouble *f1, const MEDCouplingFieldDouble *f2) throw(INTERP_KERNEL::Exception);
     static MEDCouplingFieldDouble *DotFields(const MEDCouplingFieldDouble *f1, const MEDCouplingFieldDouble *f2) throw(INTERP_KERNEL::Exception);
@@ -3270,8 +3327,7 @@ namespace ParaMEDMEM
             }
           case 3:
             {
-              MEDCouplingAutoRefCountObjectPtr<DataArrayInt> rg=DataArrayInt::Range(slic.first,slic.second.first,slic.second.second);
-              return self->buildSubPart(rg->begin(),rg->end());
+              return self->buildSubPartRange(slic.first,slic.second.first,slic.second.second);
             }
           case 4:
             {
@@ -3314,12 +3370,14 @@ namespace ParaMEDMEM
               case 1:
                 {
                   std::vector<int> v2(1,singleVal);
-                  ret0->setArray(ret0Arr->keepSelectedComponents(v2));
+                  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aarr=ret0Arr->keepSelectedComponents(v2);
+                  ret0->setArray(aarr);
                   return ret0.retn();
                 }
               case 2:
                 {
-                  ret0->setArray(ret0Arr->keepSelectedComponents(multiVal));
+                  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aarr=ret0Arr->keepSelectedComponents(multiVal);
+                  ret0->setArray(aarr);
                   return ret0.retn();
                 }
               case 3:
@@ -3328,7 +3386,8 @@ namespace ParaMEDMEM
                   std::vector<int> v2(nbOfComp);
                   for(int i=0;i<nbOfComp;i++)
                     v2[i]=slic.first+i*slic.second.second;
-                  ret0->setArray(ret0Arr->keepSelectedComponents(v2));
+                  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aarr=ret0Arr->keepSelectedComponents(v2);
+                  ret0->setArray(aarr);
                   return ret0.retn();
                 }
               default:

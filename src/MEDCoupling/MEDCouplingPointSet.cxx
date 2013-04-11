@@ -1062,6 +1062,11 @@ MEDCouplingMesh *MEDCouplingPointSet::buildPartRange(int beginCellIds, int endCe
 /*!
  * This method specialized the MEDCouplingMesh::buildPartRangeAndReduceNodes
  *
+ * \param [out] beginOut valid only if \a arr not NULL !
+ * \param [out] endOut valid only if \a arr not NULL !
+ * \param [out] stepOut valid only if \a arr not NULL !
+ * \param [out] arr correspondance old to new in node ids.
+ * 
  * \sa MEDCouplingUMesh::buildPartOfMySelf2
  */
 MEDCouplingMesh *MEDCouplingPointSet::buildPartRangeAndReduceNodes(int beginCellIds, int endCellIds, int stepCellIds, int& beginOut, int& endOut, int& stepOut, DataArrayInt*& arr) const throw(INTERP_KERNEL::Exception)

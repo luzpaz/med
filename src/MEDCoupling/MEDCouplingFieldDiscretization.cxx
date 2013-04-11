@@ -778,9 +778,12 @@ MEDCouplingMesh *MEDCouplingFieldDiscretizationOnNodes::buildSubMeshDataRange(co
     throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationOnNodes::buildSubMeshDataRange : NULL input mesh !");
   DataArrayInt *diTmp=0;
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingMesh> ret=mesh->buildPartRangeAndReduceNodes(beginCellIds,endCellIds,stepCellIds,beginOut,endOut,stepOut,diTmp);
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> diTmpSafe(diTmp);
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> di2=diTmpSafe->invertArrayO2N2N2O(ret->getNumberOfNodes());
-  di=di2.retn();
+  if(diTmp)
+    {
+      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> diTmpSafe(diTmp);
+      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> di2=diTmpSafe->invertArrayO2N2N2O(ret->getNumberOfNodes());
+      di=di2.retn();
+    }
   return ret.retn();
 }
 
