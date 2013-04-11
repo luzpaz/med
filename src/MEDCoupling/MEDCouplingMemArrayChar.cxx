@@ -580,7 +580,7 @@ DataArrayChar *DataArrayChar::selectByTupleId2(int bg, int end2, int step) const
   checkAllocated();
   MEDCouplingAutoRefCountObjectPtr<DataArrayChar> ret=buildEmptySpecializedDAChar();
   int nbComp=getNumberOfComponents();
-  int newNbOfTuples=GetNumberOfItemGivenBES(bg,end2,step,"DataArrayInt::selectByTupleId2 : ");
+  int newNbOfTuples=GetNumberOfItemGivenBESRelative(bg,end2,step,"DataArrayInt::selectByTupleId2 : ");
   ret->alloc(newNbOfTuples,nbComp);
   char *pt=ret->getPointer();
   const char *srcPt=getConstPointer()+bg*nbComp;

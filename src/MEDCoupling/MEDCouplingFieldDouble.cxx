@@ -496,15 +496,15 @@ DataArrayInt *MEDCouplingFieldDouble::getIdsInRange(double vmin, double vmax) co
  *
  * If \a this is field on node lying on a mesh that have 10 cells and 11 nodes for example. If part contains following cellIds [3,7,6].
  * \a this is currently contains 11 tuples. If the restriction of mesh to 3 cells leads to a mesh with 6 nodes, the returned field,
- * will contain 6 tuples and this field will lie on this restricted mesh. 
+ * will contain 6 tuples and this field will lie on this restricted mesh.
+ *
+ * \sa MEDCouplingFieldDouble::buildSubPartRange
  */
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::buildSubPart(const DataArrayInt *part) const throw(INTERP_KERNEL::Exception)
 {
   if(part==0)
     throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::buildSubPart : not empty array must be passed to this method !");
-  const int *start=part->getConstPointer();
-  const int *end=start+part->getNbOfElems();
-  return buildSubPart(start,end);
+  return buildSubPart(part->begin(),part->end());
 }
 
 /*!
@@ -535,7 +535,7 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::buildSubPart(const DataArrayInt 
  * \ref cpp_mcfielddouble_subpart1 "Here a C++ example."
  *
  * \ref py_mcfielddouble_subpart1 "Here a Python example."
- * \sa ParaMEDMEM::MEDCouplingFieldDouble::buildSubPart(const DataArrayInt *) const
+ * \sa ParaMEDMEM::MEDCouplingFieldDouble::buildSubPart(const DataArrayInt *) const, MEDCouplingFieldDouble::buildSubPartRange
  */
 MEDCouplingFieldDouble *MEDCouplingFieldDouble::buildSubPart(const int *partBg, const int *partEnd) const throw(INTERP_KERNEL::Exception)
 {
@@ -560,6 +560,49 @@ MEDCouplingFieldDouble *MEDCouplingFieldDouble::buildSubPart(const int *partBg, 
       DataArrayDouble *arr=0;
       if(*iter)
         arr=(*iter)->selectByTupleIdSafe(arrSelBg,arrSelEnd);
+      arrs.push_back(arr); arrsSafe.push_back(arr);
+    }
+  ret->_time_discr->setArrays(arrs,0);
+  return ret.retn();
+}
+
+/*!
+ * This method is equivalent to MEDCouplingFieldDouble::buildSubPart, the only difference is that the input range of cell ids is
+ * given using a range given \a begin, \a end and \a step to optimize the part computation.
+ * 
+ * \sa MEDCouplingFieldDouble::buildSubPart
+ */
+MEDCouplingFieldDouble *MEDCouplingFieldDouble::buildSubPartRange(int begin, int end, int step) const throw(INTERP_KERNEL::Exception)
+{
+  if(!((const MEDCouplingFieldDiscretization *)_type))
+    throw INTERP_KERNEL::Exception("MEDCouplingFieldDouble::buildSubPart : Expecting a not NULL spatial discretization !");
+  DataArrayInt *arrSelect;
+  int beginOut,endOut,stepOut;
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingMesh> m=_type->buildSubMeshDataRange(_mesh,begin,end,step,beginOut,endOut,stepOut,arrSelect);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> arrSelect2(arrSelect);
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=clone(false);//quick shallow copy.
+  const MEDCouplingFieldDiscretization *disc=getDiscretization();
+  if(disc)
+    ret->setDiscretization(MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDiscretization>(disc->clonePartRange(begin,end,step)));
+  ret->setMesh(m);
+  std::vector<DataArrayDouble *> arrays;
+  _time_discr->getArrays(arrays);
+  std::vector<DataArrayDouble *> arrs;
+  std::vector< MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> > arrsSafe;
+  for(std::vector<DataArrayDouble *>::const_iterator iter=arrays.begin();iter!=arrays.end();iter++)
+    {
+      DataArrayDouble *arr=0;
+      if(*iter)
+        {
+          if(arrSelect)
+            {
+              const int *arrSelBg=arrSelect->begin();
+              const int *arrSelEnd=arrSelect->end();
+              arr=(*iter)->selectByTupleIdSafe(arrSelBg,arrSelEnd);
+            }
+          else
+            arr=(*iter)->selectByTupleId2(beginOut,endOut,stepOut);
+        }
       arrs.push_back(arr); arrsSafe.push_back(arr);
     }
   ret->_time_discr->setArrays(arrs,0);

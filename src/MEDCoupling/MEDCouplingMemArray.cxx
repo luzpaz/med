@@ -1435,7 +1435,7 @@ DataArrayDouble *DataArrayDouble::selectByTupleIdSafe(const int *new2OldBg, cons
     if(*w>=0 && *w<oldNbOfTuples)
       std::copy(srcPt+(*w)*nbComp,srcPt+((*w)+1)*nbComp,pt+i*nbComp);
     else
-      throw INTERP_KERNEL::Exception("DataArrayInt::selectByTupleIdSafe : some ids has been detected to be out of [0,this->getNumberOfTuples) !");
+      throw INTERP_KERNEL::Exception("DataArrayDouble::selectByTupleIdSafe : some ids has been detected to be out of [0,this->getNumberOfTuples) !");
   ret->copyStringInfoFrom(*this);
   return ret.retn();
 }
@@ -1453,7 +1453,6 @@ DataArrayDouble *DataArrayDouble::selectByTupleIdSafe(const int *new2OldBg, cons
  *  \param [in] step - index increment to get index of the next tuple to copy.
  *  \return DataArrayDouble * - the new instance of DataArrayDouble that the caller
  *          is to delete using decrRef() as it is no more needed.
- *  \throw If (\a end2 < \a bg) or (\a step <= 0).
  *  \sa DataArrayDouble::substr.
  */
 DataArrayDouble *DataArrayDouble::selectByTupleId2(int bg, int end2, int step) const throw(INTERP_KERNEL::Exception)
@@ -1461,7 +1460,7 @@ DataArrayDouble *DataArrayDouble::selectByTupleId2(int bg, int end2, int step) c
   checkAllocated();
   MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::New();
   int nbComp=getNumberOfComponents();
-  int newNbOfTuples=GetNumberOfItemGivenBES(bg,end2,step,"DataArrayDouble::selectByTupleId2 : ");
+  int newNbOfTuples=GetNumberOfItemGivenBESRelative(bg,end2,step,"DataArrayDouble::selectByTupleId2 : ");
   ret->alloc(newNbOfTuples,nbComp);
   double *pt=ret->getPointer();
   const double *srcPt=getConstPointer()+bg*nbComp;
@@ -6416,7 +6415,6 @@ DataArrayInt *DataArrayInt::selectByTupleIdSafe(const int *new2OldBg, const int 
  *  \param [in] step - index increment to get index of the next tuple to copy.
  *  \return DataArrayInt * - the new instance of DataArrayInt that the caller
  *          is to delete using decrRef() as it is no more needed.
- *  \throw If (\a end2 < \a bg) or (\a step <= 0).
  *  \sa DataArrayInt::substr.
  */
 DataArrayInt *DataArrayInt::selectByTupleId2(int bg, int end2, int step) const throw(INTERP_KERNEL::Exception)
@@ -6424,7 +6422,7 @@ DataArrayInt *DataArrayInt::selectByTupleId2(int bg, int end2, int step) const t
   checkAllocated();
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
   int nbComp=getNumberOfComponents();
-  int newNbOfTuples=GetNumberOfItemGivenBES(bg,end2,step,"DataArrayInt::selectByTupleId2 : ");
+  int newNbOfTuples=GetNumberOfItemGivenBESRelative(bg,end2,step,"DataArrayInt::selectByTupleId2 : ");
   ret->alloc(newNbOfTuples,nbComp);
   int *pt=ret->getPointer();
   const int *srcPt=getConstPointer()+bg*nbComp;

@@ -394,13 +394,32 @@ MEDCouplingField::MEDCouplingField(const MEDCouplingField& other, bool deepCopy)
 
 /*!
  * This method returns a submesh of 'mesh' instance constituting cell ids contained in array defined as an interval [start;end).
- * @param di is an array returned that specifies entity ids (nodes, cells ids...) in mesh 'mesh' of entity in returned submesh.
+ * @param di is an array returned that specifies entity ids (nodes, cells, Gauss points... ) in array.
+ * 
+ * \sa MEDCouplingField::buildSubMeshDataRange
  */
 MEDCouplingMesh *MEDCouplingField::buildSubMeshData(const int *start, const int *end, DataArrayInt *&di) const
 {
   if(!((const MEDCouplingFieldDiscretization *)_type))
     throw INTERP_KERNEL::Exception("Spatial discretization not set ! Impossible to call buildSubMeshData method !");
   return _type->buildSubMeshData(_mesh,start,end,di);
+}
+
+/*!
+ * This method returns a submesh of 'mesh' instance constituting cell ids defined by a range given by the 3 following inputs \a begin, \a end and \a step.
+ * 
+ * \param [out] beginOut Valid only if \a di is NULL
+ * \param [out] endOut Valid only if \a di is NULL
+ * \param [out] stepOut Valid only if \a di is NULL
+ * \param [out] di is an array returned that specifies entity ids (nodes, cells, Gauss points... ) in array if no output range is foundable.
+ * 
+ * \sa MEDCouplingField::buildSubMeshData
+ */
+MEDCouplingMesh *MEDCouplingField::buildSubMeshDataRange(int begin, int end, int step, int& beginOut, int& endOut, int& stepOut, DataArrayInt *&di) const
+{
+  if(!((const MEDCouplingFieldDiscretization *)_type))
+    throw INTERP_KERNEL::Exception("Spatial discretization not set ! Impossible to call buildSubMeshDataRange method !");
+  return _type->buildSubMeshDataRange(_mesh,begin,end,step,beginOut,endOut,stepOut,di);
 }
 
 /*!

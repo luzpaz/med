@@ -259,11 +259,11 @@ DataArrayInt *MEDCouplingPointSet::buildPermArrayForMergeNode(double precision, 
   DataArrayInt *comm,*commI;
   findCommonNodes(precision,limitNodeId,comm,commI);
   int oldNbOfNodes=getNumberOfNodes();
-  DataArrayInt *ret=buildNewNumberingFromCommonNodesFormat(comm,commI,newNbOfNodes);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=buildNewNumberingFromCommonNodesFormat(comm,commI,newNbOfNodes);
   areNodesMerged=(oldNbOfNodes!=newNbOfNodes);
   comm->decrRef();
   commI->decrRef();
-  return ret;
+  return ret.retn();
 }
 
 /*!
@@ -1044,11 +1044,32 @@ MEDCouplingMesh *MEDCouplingPointSet::buildPart(const int *start, const int *end
  */
 MEDCouplingMesh *MEDCouplingPointSet::buildPartAndReduceNodes(const int *start, const int *end, DataArrayInt*& arr) const
 {
-  MEDCouplingPointSet *ret=buildPartOfMySelf(start,end,true);
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingPointSet> ret=buildPartOfMySelf(start,end,true);
   arr=ret->zipCoordsTraducer();
-  return ret;
+  return ret.retn();
 }
 
+/*!
+ * This method specialized the MEDCouplingMesh::buildPartRange
+ *
+ * \sa MEDCouplingUMesh::buildPartOfMySelf2
+ */
+MEDCouplingMesh *MEDCouplingPointSet::buildPartRange(int beginCellIds, int endCellIds, int stepCellIds) const throw(INTERP_KERNEL::Exception)
+{
+  return buildPartOfMySelf2(beginCellIds,endCellIds,stepCellIds,true);
+}
+
+/*!
+ * This method specialized the MEDCouplingMesh::buildPartRangeAndReduceNodes
+ *
+ * \sa MEDCouplingUMesh::buildPartOfMySelf2
+ */
+MEDCouplingMesh *MEDCouplingPointSet::buildPartRangeAndReduceNodes(int beginCellIds, int endCellIds, int stepCellIds, int& beginOut, int& endOut, int& stepOut, DataArrayInt*& arr) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingPointSet> ret=buildPartOfMySelf2(beginCellIds,endCellIds,stepCellIds,true);
+  arr=ret->zipCoordsTraducer();
+  return ret.retn();
+}
 
 /*!
  * 'This' is expected to be of spaceDim==2. Idem for 'center' and 'vect'

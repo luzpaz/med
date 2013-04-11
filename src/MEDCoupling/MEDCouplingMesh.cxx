@@ -232,6 +232,28 @@ bool MEDCouplingMesh::areCompatibleForMerge(const MEDCouplingMesh *other) const
 }
 
 /*!
+ * This method is equivalent to MEDCouplingMesh::buildPart method except that here the cell ids are specified using slice \a beginCellIds \a endCellIds and \a stepCellIds.
+ *
+ * \sa MEDCouplingMesh::buildPart
+ */
+MEDCouplingMesh *MEDCouplingMesh::buildPartRange(int beginCellIds, int endCellIds, int stepCellIds) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> cellIds=DataArrayInt::Range(beginCellIds,endCellIds,stepCellIds);
+  return buildPart(cellIds->begin(),cellIds->end());
+}
+
+/*!
+ * This method is equivalent to MEDCouplingMesh::buildPartAndReduceNodes method except that here the cell ids are specified using slice \a beginCellIds \a endCellIds and \a stepCellIds.
+ *
+ * \sa MEDCouplingMesh::buildPartAndReduceNodes
+ */
+MEDCouplingMesh *MEDCouplingMesh::buildPartRangeAndReduceNodes(int beginCellIds, int endCellIds, int stepCellIds, int& beginOut, int& endOut, int& stepOut, DataArrayInt*& arr) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> cellIds=DataArrayInt::Range(beginCellIds,endCellIds,stepCellIds);
+  return buildPartAndReduceNodes(cellIds->begin(),cellIds->end(),arr);
+}
+
+/*!
  * This method builds a field lying on 'this' with 'nbOfComp' components.
  * 'func' is a pointer that points to a function that takes 2 arrays in parameter and returns a boolean.
  * The first array is a in-param of size this->getSpaceDimension and the second an out param of size 'nbOfComp'.
