@@ -1178,6 +1178,10 @@ int MEDCouplingFieldDiscretizationGauss::getNumberOfMeshPlaces(const MEDCoupling
   return mesh->getNumberOfCells();
 }
 
+/*!
+ * This method is redevelopped for performance reasons, but it is equivalent to a call to MEDCouplingFieldDiscretizationGauss::buildNbOfGaussPointPerCellField
+ * and a call to DataArrayDouble::computeOffsets2 on the returned array.
+ */
 DataArrayInt *MEDCouplingFieldDiscretizationGauss::getOffsetArr(const MEDCouplingMesh *mesh) const
 {
   if(!mesh)
@@ -1487,20 +1491,10 @@ DataArrayInt *MEDCouplingFieldDiscretizationGauss::computeTupleIdsToSelectFromCe
 {
   if(!mesh)
     throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationGauss::computeTupleIdsToSelectFromCellIds : null mesh !");
-  if(!_discr_per_cell)
-    throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationGauss::computeTupleIdsToSelectFromCellIds : null discretization ids !");
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> nbOfNodesPerCell=buildNbOfGaussPointPerCellField();//check of _discr_per_cell not NULL pointer
   int nbOfCells=mesh->getNumberOfCells();
   if(_discr_per_cell->getNumberOfTuples()!=nbOfCells)
     throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationGauss::computeTupleIdsToSelectFromCellIds : mismatch of nb of tuples of cell ids array and number of cells !");
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> nbOfNodesPerCell=DataArrayInt::New(); nbOfNodesPerCell->alloc(nbOfCells,1);
-  int *retPtr=nbOfNodesPerCell->getPointer();
-  const int *pt=_discr_per_cell->getConstPointer();
-  int nbMaxOfLocId=(int)_loc.size();
-  for(int i=0;i<nbOfCells;i++,retPtr++,pt++)
-    {
-      if(*pt>=0 && *pt<nbMaxOfLocId)
-        *retPtr=_loc[*pt].getNumberOfGaussPt();
-    }
   nbOfNodesPerCell->computeOffsets2();
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> sel=DataArrayInt::New(); sel->useArray(startCellIds,false,CPP_DEALLOC,(int)std::distance(startCellIds,endCellIds),1);
   return sel->buildExplicitArrByRanges(nbOfNodesPerCell);
@@ -1694,11 +1688,23 @@ DataArrayInt *MEDCouplingFieldDiscretizationGauss::buildNbOfGaussPointPerCellFie
   const int *w=_discr_per_cell->getConstPointer();
   ret->alloc(nbOfTuples,1);
   int *valsToFill=ret->getPointer();
+  int nbMaxOfLocId=(int)_loc.size();
   for(int i=0;i<nbOfTuples;i++,w++)
     if(*w!=DFT_INVALID_LOCID_VALUE)
-      valsToFill[i]=_loc[*w].getNumberOfGaussPt();
+      {
+        if(*w>=0 && *w<nbMaxOfLocId)
+          valsToFill[i]=_loc[*w].getNumberOfGaussPt();
+        else
+          {
+            std::ostringstream oss; oss << "MEDCouplingFieldDiscretizationGauss::buildNbOfGaussPointPerCellField : cell #" << i << " has invalid id (" << *w << ") ! Should be in [0," << nbMaxOfLocId << ") !";
+            throw INTERP_KERNEL::Exception(oss.str().c_str());
+          }
+      }
     else
-      throw INTERP_KERNEL::Exception("MEDCouplingFieldDiscretizationGauss::buildNbOfGaussPointPerCellField : orphan cell detected !");
+      {
+        std::ostringstream oss; oss << "MEDCouplingFieldDiscretizationGauss::buildNbOfGaussPointPerCellField : cell #" << i << " is detected as orphan !";
+        throw INTERP_KERNEL::Exception(oss.str().c_str());
+      }
   return ret.retn();
 }
 
