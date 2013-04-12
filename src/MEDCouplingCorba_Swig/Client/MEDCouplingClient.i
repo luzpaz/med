@@ -405,6 +405,9 @@ def ParaMEDMEMMEDCouplingFieldDoubleImul(self,*args):
 def ParaMEDMEMMEDCouplingFieldDoubleIdiv(self,*args):
     import _MEDCouplingClient
     return _MEDCouplingClient.MEDCouplingFieldDouble____idiv___(self, self, *args)
+def ParaMEDMEMMEDCouplingFieldDoubleIpow(self,*args):
+    import _MEDCouplingClient
+    return _MEDCouplingClient.MEDCouplingFieldDouble____ipow___(self, self, *args)
 def ParaMEDMEMDataArrayIntIadd(self,*args):
     import _MEDCouplingClient
     return _MEDCouplingClient.DataArrayInt____iadd___(self, self, *args)

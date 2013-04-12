@@ -51,7 +51,7 @@ MEDCalculatorBrowserField::~MEDCalculatorBrowserField()
 MEDCalculatorBrowserField::MEDCalculatorBrowserField(const char *fname, const char *fieldName) : _name(fieldName), _file_name(fname), _selection(false)
 {
   std::vector< std::string > meshNames=MEDLoader::GetMeshNamesOnField(fname,fieldName);
-  std::vector< std::pair< std::pair<int,int>, double > > dtits=MEDLoader::GetAllFieldIterations(fname,meshNames[0].c_str(),fieldName);
+  std::vector< std::pair< std::pair<int,int>, double > > dtits=MEDLoader::GetAllFieldIterations(fname, fieldName);
   for(std::vector<std::pair< std::pair<int,int>, double > >::const_iterator iter=dtits.begin();iter!=dtits.end();iter++)
     {
       _steps.push_back(MEDCalculatorBrowserStep((*iter).first.first,(*iter).first.second,(*iter).second,meshNames[0]));
