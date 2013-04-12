@@ -174,10 +174,12 @@ public:
   }
  
   /*! returns in \a elems the list of elements potentially containing the point pointed to by \a xx
-    \param xx pointer to query point coords
-    \param elems list of elements (given in 0-indexing) intersecting the bounding box
-    \sa BBTreePts::getElementsAroundPoint2
-  */
+   * ** Infinite norm is used here not norm 2 ! ***
+   * 
+   *  \param xx pointer to query point coords
+   *  \param elems list of elements (given in 0-indexing) intersecting the bounding box
+   * \sa BBTreePts::getElementsAroundPoint2
+   */
   void getElementsAroundPoint(const double* xx, std::vector<ConnType>& elems) const
   {
     //  terminal node : return list of elements intersecting bb
