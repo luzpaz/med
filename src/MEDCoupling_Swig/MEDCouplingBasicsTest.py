@@ -12535,6 +12535,20 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         f.checkCoherency()
         pass
 
+    def testSwig2ComputeTupleIdsNearTupleBug1(self):
+        coords=[1.1,0.0, 1.1,0.0 ];
+        coordsArr=DataArrayDouble(coords,2,2);
+        mesh=MEDCouplingUMesh();
+        mesh.setCoords(coordsArr);
+        points=[1.1, 0.002]
+        c,cI=mesh.getNodeIdsNearPoints(points,0.00185);
+        self.assertTrue(c.isEqual(DataArrayInt([])))
+        self.assertTrue(cI.isEqual(DataArrayInt([0,0])))
+        c,cI=mesh.getNodeIdsNearPoints(points,0.00200000000000001);
+        self.assertTrue(c.isEqual(DataArrayInt([0,1])))
+        self.assertTrue(cI.isEqual(DataArrayInt([0,2])))
+        pass
+
     def setUp(self):
         pass
     pass
