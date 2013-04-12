@@ -418,7 +418,7 @@ void SauvWriter::fillGroupSubMeshes()
       const vector<string>& famNames = g2ff->second;
       if ( famNames.empty() ) continue;
       std::vector<SubMesh*> famSubMeshes( famNames.size() );
-      int k = 0;
+      std::size_t k = 0;
       for ( size_t i = 0; i < famNames.size(); ++i )
         {
           int famID = _fileMesh->getFamilyId( famNames[i].c_str() );
