@@ -39,7 +39,7 @@ template<int SPACEDIM>
 void DataArrayDouble::findCommonTuplesAlg(const double *bbox, int nbNodes, int limitNodeId, double prec, DataArrayInt *c, DataArrayInt *cI) const
 {
   const double *coordsPtr=getConstPointer();
-  BBTree<SPACEDIM,int> myTree(bbox,0,0,nbNodes,prec/10);
+  BBTreePts<SPACEDIM,int> myTree(bbox,0,0,nbNodes,prec);
   std::vector<bool> isDone(nbNodes);
   for(int i=0;i<nbNodes;i++)
     {
@@ -1769,19 +1769,17 @@ void DataArrayDouble::findCommonTuples(double prec, int limitTupleId, DataArrayI
   
   int nbOfTuples=getNumberOfTuples();
   //
-  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> bbox=computeBBoxPerTuple(prec);
-  //
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> c(DataArrayInt::New()),cI(DataArrayInt::New()); c->alloc(0,1); cI->pushBackSilent(0);
   switch(nbOfCompo)
     {
     case 3:
-      findCommonTuplesAlg<3>(bbox->getConstPointer(),nbOfTuples,limitTupleId,prec,c,cI);
+      findCommonTuplesAlg<3>(begin(),nbOfTuples,limitTupleId,prec,c,cI);
       break;
     case 2:
-      findCommonTuplesAlg<2>(bbox->getConstPointer(),nbOfTuples,limitTupleId,prec,c,cI);
+      findCommonTuplesAlg<2>(begin(),nbOfTuples,limitTupleId,prec,c,cI);
       break;
     case 1:
-      findCommonTuplesAlg<1>(bbox->getConstPointer(),nbOfTuples,limitTupleId,prec,c,cI);
+      findCommonTuplesAlg<1>(begin(),nbOfTuples,limitTupleId,prec,c,cI);
       break;
     default:
       throw INTERP_KERNEL::Exception("DataArrayDouble::findCommonTuples : nb of components managed are 1,2 and 3 ! not implemented for other number of components !");
