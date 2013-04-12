@@ -303,7 +303,7 @@ void MEDCouplingPointSet::findCommonNodes(double prec, int limitNodeId, DataArra
  *  \param [in] pos - pointer to coordinates of the point.  This array is expected to
  *         be of length \a this->getSpaceDimension() at least, else the
  *         behavior is not warranted.
- *  \param [in] eps - the lowest distance between a point and a node at which the node is
+ *  \param [in] eps - the lowest distance between a point and a node (using infinite norm) at which the node is
  *          not returned by this method.
  *  \return DataArrayInt * - a new instance of DataArrayInt holding ids of nodes
  *          close to the point. The caller is to delete this
@@ -328,7 +328,7 @@ DataArrayInt *MEDCouplingPointSet::getNodeIdsNearPoint(const double *pos, double
  *         behavior is not warranted.
  *  \param [in] nbOfPoints - number of points whose coordinates are given by \a pos
  *         parameter. 
- *  \param [in] eps - the lowest distance between a point and a node at which the node is
+ *  \param [in] eps - the lowest distance between (using infinite norm) a point and a node at which the node is
  *         not returned by this method.
  *  \param [out] c - array returning ids of nodes located closer than \a eps to the
  *         given points. The caller

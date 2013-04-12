@@ -69,7 +69,7 @@ void DataArrayDouble::findCommonTuplesAlg(const double *bbox, int nbNodes, int l
 }
 
 template<int SPACEDIM>
-void DataArrayDouble::FindTupleIdsNearTuplesAlg(const BBTree<SPACEDIM,int>& myTree, const double *pos, int nbOfTuples, double eps,
+void DataArrayDouble::FindTupleIdsNearTuplesAlg(const BBTreePts<SPACEDIM,int>& myTree, const double *pos, int nbOfTuples, double eps,
                                                 DataArrayInt *c, DataArrayInt *cI)
 {
   for(int i=0;i<nbOfTuples;i++)
@@ -2766,7 +2766,7 @@ DataArrayDouble *DataArrayDouble::computeBBoxPerTuple(double epsilon)const throw
  * Two tuples are considered equal if the euclidian distance between the two tuples is lower than \a eps.
  * 
  * \param [in] other a DataArrayDouble having same number of components than \a this.
- * \param [in] eps absolute precision representing euclidian distance between 2 tuples behind which 2 tuples are considered equal.
+ * \param [in] eps absolute precision representing distance (using infinite norm) between 2 tuples behind which 2 tuples are considered equal.
  * \param [out] c will contain the set of tuple ids in \a this that are equal to to the tuple ids in \a other contiguously.
  *             \a cI allows to extract information in \a c.
  * \param [out] cI is an indirection array that allows to extract the data contained in \a c.
@@ -2784,7 +2784,6 @@ void DataArrayDouble::computeTupleIdsNearTuples(const DataArrayDouble *other, do
   if(!other)
     throw INTERP_KERNEL::Exception("DataArrayDouble::computeTupleIdsNearTuples : input pointer other is null !");
   checkAllocated();
-  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> bbox=computeBBoxPerTuple(eps);
   other->checkAllocated();
   int nbOfCompo=getNumberOfComponents();
   int otherNbOfCompo=other->getNumberOfComponents();
@@ -2796,19 +2795,19 @@ void DataArrayDouble::computeTupleIdsNearTuples(const DataArrayDouble *other, do
     {
     case 3:
       {
-        BBTree<3,int> myTree(bbox->getConstPointer(),0,0,getNumberOfTuples(),eps/10);
+        BBTreePts<3,int> myTree(begin(),0,0,getNumberOfTuples(),eps);
         FindTupleIdsNearTuplesAlg<3>(myTree,other->getConstPointer(),nbOfTuplesOther,eps,cArr,cIArr);
         break;
       }
     case 2:
       {
-        BBTree<2,int> myTree(bbox->getConstPointer(),0,0,getNumberOfTuples(),eps/10);
+        BBTreePts<2,int> myTree(begin(),0,0,getNumberOfTuples(),eps);
         FindTupleIdsNearTuplesAlg<2>(myTree,other->getConstPointer(),nbOfTuplesOther,eps,cArr,cIArr);
         break;
       }
     case 1:
       {
-        BBTree<1,int> myTree(bbox->getConstPointer(),0,0,getNumberOfTuples(),eps/10);
+        BBTreePts<1,int> myTree(begin(),0,0,getNumberOfTuples(),eps);
         FindTupleIdsNearTuplesAlg<1>(myTree,other->getConstPointer(),nbOfTuplesOther,eps,cArr,cIArr);
         break;
       }

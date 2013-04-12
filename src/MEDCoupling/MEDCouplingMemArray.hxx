@@ -333,7 +333,7 @@ namespace ParaMEDMEM
     template<int SPACEDIM>
     static void FindClosestTupleIdAlg(const BBTreePts<SPACEDIM,int>& myTree, double dist, const double *pos, int nbOfTuples, const double *thisPt, int thisNbOfTuples, int *res);
     template<int SPACEDIM>
-    static void FindTupleIdsNearTuplesAlg(const BBTree<SPACEDIM,int>& myTree, const double *pos, int nbOfTuples, double eps,
+    static void FindTupleIdsNearTuplesAlg(const BBTreePts<SPACEDIM,int>& myTree, const double *pos, int nbOfTuples, double eps,
                                           DataArrayInt *c, DataArrayInt *cI);
   private:
     ~DataArrayDouble() { }

@@ -188,8 +188,7 @@ public:
             const double* const bb_ptr=_pts+_elems[i]*dim;
             bool intersects = true;
             for(int idim=0;idim<dim;idim++)
-              if(std::abs(bb_ptr[idim]-xx[idim])>_epsilon)
-                intersects=false;
+              intersects=intersects && (std::abs(bb_ptr[idim]-xx[idim])<=_epsilon);
             if(intersects)
               elems.push_back(_elems[i]);
           }

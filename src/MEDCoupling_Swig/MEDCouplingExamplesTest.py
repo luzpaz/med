@@ -989,7 +989,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
                 0.2,-0.3,   # 1
                 0.3,-0.302, # 2
                 1.1,0.0,    # 3
-                0.3,-0.303];# 4
+                0.3,-0.30299999999999];# 4
         coordsArr=DataArrayDouble.New();
         coordsArr.setValues(coords,5,2);
         mesh=MEDCouplingUMesh.New();
@@ -1023,7 +1023,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
                 1.1, 0.002]   # ~ nodes #3, #4 and #5
         ids,idsIndex=mesh.getNodeIdsNearPoints(points,3,0.003);
         assert ids.getValues() == [1, 3, 4, 5]
-        print idsIndex.getValues()
+        assert idsIndex.getValues() == [0, 1, 1, 4]
         #! [PySnippet_MEDCouplingPointSet_getNodeIdsNearPoints_2]
         return
 
@@ -1069,7 +1069,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         dv.alloc( 6, 1 )
         dv.iota(7)
         dv.rearrange( 2 )
-        print dv.getTuple( 1 )
+        assert dv.getTuple( 1 ) == [9,10]
 #! [Snippet_DataArrayInt_getTuple_1]
 #! [Snippet_DataArrayInt_getTuple_2]
         for tpl in dv:
