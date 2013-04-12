@@ -12516,6 +12516,25 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(f[-2:0:-1,0].getArray().isEqual(arr[[11,12,13,6,7,8,9,10,2,3,4,5],0],1e-12))
         pass
 
+    def testSwig2FieldDoubleApplyFuncBug1(self):
+        f=MEDCouplingFieldDouble(ON_CELLS)
+        f.setMesh(MEDCouplingDataForTest.build2DTargetMesh_1())
+        f.applyFunc(3,700.)
+        f.checkCoherency()
+        self.assertEqual(3,f.getArray().getNumberOfComponents())
+        f.getArray().rearrange(1)
+        self.assertTrue(f.getArray().isUniform(700.,1e-10))
+        f.getArray().rearrange(3)
+        f.checkCoherency()
+        f.applyFunc(4,800.)
+        f.checkCoherency()
+        self.assertEqual(4,f.getArray().getNumberOfComponents())
+        f.getArray().rearrange(1)
+        self.assertTrue(f.getArray().isUniform(800.,1e-10))
+        f.getArray().rearrange(4)
+        f.checkCoherency()
+        pass
+
     def setUp(self):
         pass
     pass
