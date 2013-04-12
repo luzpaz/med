@@ -1399,7 +1399,7 @@ void CppExample_DataArrayDouble_findCommonTuples()
   //! [CppSnippet_DataArrayDouble_findCommonTuples1]
   //! [CppSnippet_DataArrayDouble_findCommonTuples2]
   DataArrayInt *c=0,*cI=0;
-  da->findCommonTuples(1e-1,-1,c,cI);
+  da->findCommonTuples(1.01e-1,-1,c,cI);
 
   const int expected3[5]={0,3,4,1,2};
   const int expected4[3]={0,3,5};

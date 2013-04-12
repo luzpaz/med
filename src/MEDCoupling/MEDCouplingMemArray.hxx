@@ -26,7 +26,6 @@
 #include "MEDCouplingRefCountObject.hxx"
 #include "InterpKernelException.hxx"
 #include "BBTreePts.txx"
-#include "BBTree.txx"
 
 #include <string>
 #include <vector>

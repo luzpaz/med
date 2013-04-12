@@ -1739,7 +1739,7 @@ void DataArrayDouble::meldWith(const DataArrayDouble *other) throw(INTERP_KERNEL
  *
  * This method is typically used by MEDCouplingPointSet::findCommonNodes() and
  * MEDCouplingUMesh::mergeNodes().
- *  \param [in] prec - minimal absolute distance between two tuples at which they are
+ *  \param [in] prec - minimal absolute distance between two tuples (infinite norm) at which they are
  *              considered not coincident.
  *  \param [in] limitTupleId - limit tuple id. If all tuples within a group of coincident
  *              tuples have id strictly lower than \a limitTupleId then they are not returned.

@@ -1500,7 +1500,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         da.setValues(array2,6,2)
 #! [PySnippet_DataArrayDouble_findCommonTuples1]
 #! [PySnippet_DataArrayDouble_findCommonTuples2]
-        c,cI=da.findCommonTuples(1e-1);
+        c,cI=da.findCommonTuples(1.01e-1);
         expected3=[0,3,4,1,2]
         expected4=[0,3,5]
         self.assertEqual(expected3,c.getValues())

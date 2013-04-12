@@ -7587,7 +7587,7 @@ void MEDCouplingUMesh::PutUMeshesOnSameAggregatedCoords(const std::vector<MEDCou
  * ParaMEDMEM::MEDFileUMesh "MEDFileUMesh" instance that expects that underlying
  * MEDCouplingUMesh'es of different dimension share the same nodal connectivity array. 
  *  \param [in,out] meshes - a vector of meshes to update.
- *  \param [in] eps - the precision used to detect coincident nodes.
+ *  \param [in] eps - the precision used to detect coincident nodes (infinite norm).
  *  \throw If any of \a meshes is NULL.
  *  \throw If the \a meshes do not share the same node coordinates array.
  *  \throw If the nodal connectivity of cells is not defined in any of \a meshes.
