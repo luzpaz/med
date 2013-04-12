@@ -1073,7 +1073,7 @@ MEDCouplingFieldDouble &MEDCouplingFieldDouble::operator=(double value) throw(IN
   if(!((const MEDCouplingFieldDiscretization *)_type))
     throw INTERP_KERNEL::Exception("No spatial discretization underlying this field to perform operator = !");
   int nbOfTuple=_type->getNumberOfTuples(_mesh);
-  _time_discr->setUniformValue(nbOfTuple,1,value);
+  _time_discr->setOrCreateUniformValueOnAllComponents(nbOfTuple,value);
   return *this;
 }
 

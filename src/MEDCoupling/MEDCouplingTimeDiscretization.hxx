@@ -135,6 +135,7 @@ namespace ParaMEDMEM
     virtual void changeNbOfComponents(int newNbOfComp, double dftValue) throw(INTERP_KERNEL::Exception);
     virtual void sortPerTuple(bool asc) throw(INTERP_KERNEL::Exception);
     virtual void setUniformValue(int nbOfTuple, int nbOfCompo, double value);
+    virtual void setOrCreateUniformValueOnAllComponents(int nbOfTuple, double value);
     virtual void applyLin(double a, double b, int compoId);
     virtual void applyFunc(int nbOfComp, FunctionToEvaluate func);
     virtual void applyFunc(int nbOfComp, const char *func);
