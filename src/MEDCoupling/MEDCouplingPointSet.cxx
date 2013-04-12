@@ -270,7 +270,7 @@ DataArrayInt *MEDCouplingPointSet::buildPermArrayForMergeNode(double precision, 
  * Finds nodes coincident within \a prec tolerance.
  * Ids of coincident nodes are stored in output arrays.
  * A pair of arrays (\a comm, \a commIndex) is called "Surjective Format 2".
- *  \param [in] prec - minimal absolute distance between two nodes at which they are
+ *  \param [in] prec - minimal absolute distance (using infinite norm) between two nodes at which they are
  *              considered not coincident.
  *  \param [in] limitNodeId - limit node id. If all nodes within a group of coincident
  *              nodes have id strictly lower than \a limitTupleId then they are not

@@ -2015,7 +2015,7 @@ DataArrayInt *MEDCouplingUMesh::mergeNodes2(double precision, bool& areNodesMerg
  * coordinates (and so more expensive) than simple equality.
  *  \param [in] other - the other mesh whose node coordinates array will be used by
  *         \a this mesh in case of their equality.
- *  \param [in] epsilon - the precision used to compare coordinates.
+ *  \param [in] epsilon - the precision used to compare coordinates (using infinite norm).
  *  \throw If the coordinates array of \a this is not set.
  *  \throw If the coordinates array of \a other is not set.
  *  \throw If the coordinates of \a this and \a other do not match.
