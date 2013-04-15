@@ -231,6 +231,14 @@ void DatasourceController::OnExpandField()
     long fieldseriesId = _studyEditor->getParameterInt(soFieldseries,OBJECT_ID);
     STDLOG("Expand the field timeseries "<<fieldseriesId);
 
+    // If fieldseriesId equals -1, then it means that it is not a
+    // fieldseries managed by the MED module, and we stop this
+    // function process.
+    if ( fieldseriesId < 0 )
+      continue;
+    // _GBO_ A better correction should be to no display the
+    // contextual menu if the selected object is not conform
+
     // Then retrieve the list of fields in this timeseries
     MEDOP::FieldHandlerList * fieldHandlerList =
       MEDOPFactoryClient::getDataManager()->getFieldListInFieldseries(fieldseriesId);
@@ -263,6 +271,11 @@ void DatasourceController::OnVisualize() {
   for (int i=0; i<listOfSObject->size(); i++) {
     SALOMEDS::SObject_var soField = listOfSObject->at(i);
     int fieldId = _studyEditor->getParameterInt(soField,OBJECT_ID);
+    // If fieldId equals -1, then it means that it is not a field
+    // managed by the MED module, and we stop this function process.
+    if ( fieldId < 0 )
+      continue;
+
     MEDOP::FieldHandler * fieldHandler = MEDOPFactoryClient::getDataManager()->getFieldHandler(fieldId);
 
     DatasourceEvent * event = new DatasourceEvent();
@@ -303,6 +316,16 @@ void DatasourceController::OnUseInWorkspace() {
     }
 
     int fieldId = _studyEditor->getParameterInt(soField,OBJECT_ID);
+
+    // If fieldId equals -1, then it means that it is not a field
+    // managed by the MED module, and we stop this function process.
+    if ( fieldId < 0 ) {
+      QMessageBox::warning(_salomeModule->getApp()->desktop(),
+         tr("Operation not allowed"),
+         tr("This element is not a field object"));
+      return;
+    }
+
     MEDOP::FieldHandler * fieldHandler =
       MEDOPFactoryClient::getDataManager()->getFieldHandler(fieldId);
 
