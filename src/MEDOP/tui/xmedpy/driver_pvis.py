@@ -71,8 +71,8 @@ def pvis_scalarmap(filename,meshname,fieldname,typeOfField,iteration=-1):
 def TEST_scalarmap():
     import os
     from xmed import properties
-    properties.setup(properties.testdata_02) # test with nodes
-    #properties.setup(properties.testdata_03) # test with cells
+    #properties.setup(properties.testdata_02) # test with nodes
+    properties.setup(properties.testdata_03) # test with cells
     pvis_scalarmap(properties.testFilePath,
                    properties.testMeshName,
                    properties.testFieldName,

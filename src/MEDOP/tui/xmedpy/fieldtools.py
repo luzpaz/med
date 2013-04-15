@@ -161,7 +161,7 @@ def save(filename):
 # Field Data visualization
 VIEWER_VISU    = "VISU"
 VIEWER_PARAVIS = "PARAVIS"
-VIEWER_DEFAULT = VIEWER_VISU
+VIEWER_DEFAULT = VIEWER_PARAVIS
 
 VIEWER_TMP_FILE = "/tmp/medop_viewer.med"
 
