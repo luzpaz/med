@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Sélection d'un alias pour le champ</string>
+   <string>SELECT_AN_ALIAS_FOR_THE_FIELD</string>
   </property>
   <layout class="QHBoxLayout">
    <property name="spacing">
@@ -398,7 +398,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Vous pouvez définir un alias pour manipuler le champ dans la console:</string>
+        <string>DEFINE_AN_ALIAS</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
@@ -416,7 +416,7 @@
        <item>
         <widget class="QLabel" name="lblAlias">
          <property name="text">
-          <string>Alias</string>
+          <string>ALIAS</string>
          </property>
         </widget>
        </item>
@@ -433,7 +433,7 @@
         </font>
        </property>
        <property name="text">
-        <string>(cette operation définit une variable de nom &lt;alias&gt; dans la console TUI. Tapez &quot;&lt;alias&gt;.help()&quot;  pour voir les fonctions à disposition, ou tou simplement &quot;doc&quot;)</string>
+        <string>MSG_OPERATION_DEFINES_VARIABLE</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>

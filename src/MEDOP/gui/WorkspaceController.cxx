@@ -17,7 +17,7 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-// Author : Guillaume Boulant (EDF) 
+// Author : Guillaume Boulant (EDF)
 
 #include "WorkspaceController.hxx"
 #include "QtHelper.hxx"
@@ -64,7 +64,7 @@ WorkspaceController::WorkspaceController(StandardApp_Module * salomeModule)
   // console that could retrieve this IOR using the
   // getEventListenerIOR() function of the MEDDataManager.
   SalomeApp_Application * salomeApp = salomeModule->getApp();
-  const char * medEventListenerIOR = 
+  const char * medEventListenerIOR =
     salomeApp->orb()->object_to_string(medEventListenerServant);
   MEDOPFactoryClient::getDataManager()->setEventListenerIOR(medEventListenerIOR);
 
@@ -81,12 +81,12 @@ WorkspaceController::WorkspaceController(StandardApp_Module * salomeModule)
   // Customize the treeview rendering the datamodel with specific
   // action for the popup menu
   this->getDataTreeView()->clearActions();
-  _actionIds.display    = this->getDataTreeView()->addAction(QObject::tr("Visualiser  (une carte scalaire)"));
-  _actionIds.useInTui   = this->getDataTreeView()->addAction(QObject::tr("Utiliser    (dans la console)"));
-  _actionIds.exportToPv = this->getDataTreeView()->addAction(QObject::tr("Exporter    (vers PARAVIS)"));
-  _actionIds.save       = this->getDataTreeView()->addAction(QObject::tr("Sauvegarder (dans un fichier med)"));
-  _actionIds.remove     = this->getDataTreeView()->addAction(QObject::tr("Supprimer   (de lespace de travail)"));
-  
+  _actionIds.display    = this->getDataTreeView()->addAction(tr("VISUALIZE_SCALAR_MAP"));
+  _actionIds.useInTui   = this->getDataTreeView()->addAction(tr("USE_IN_CONSOLE"));
+  _actionIds.exportToPv = this->getDataTreeView()->addAction(tr("EXPORT_TO_PARAVIS"));
+  _actionIds.save       = this->getDataTreeView()->addAction(tr("SAVE_AS_MED"));
+  _actionIds.remove     = this->getDataTreeView()->addAction(tr("REMOVE_FROM_WORKSPACE"));
+
   // -------------------------------------------------------------
   // Initialize the python console. Note that this must be done at
   // last because the setup will try to initiate a connection to the
@@ -96,25 +96,25 @@ WorkspaceController::WorkspaceController(StandardApp_Module * salomeModule)
 }
 
 WorkspaceController::~WorkspaceController() {
-  MEDEventListener_i::release();  
+  MEDEventListener_i::release();
 }
 
 /**
  * This creates the GUI actions for driving the Workspace. The
  * WorkspaceController creates itself this actions and implements the
- * connected slots. 
+ * connected slots.
  */
 void WorkspaceController::createActions() {
 
-  QString label   = QString("Save workspace");
-  QString tooltip = QString("Save the workspace (fields and meshes) in a med file");
-  QString icon    = QString("workspace_save.png");
+  QString label   = tr("LAB_SAVE_WORKSPACE");
+  QString tooltip = tr("TIP_SAVE_WORKSPACE");
+  QString icon    = tr("ICO_WORKSPACE_SAVE");
   int actionId = _salomeModule->createStandardAction(label,this,SLOT(OnSaveWorkspace()),icon,tooltip);
   _salomeModule->addActionInToolbar(actionId);
 
-  label   = QString("Clean workspace");
-  tooltip = QString("Clean all data in the workspace");
-  icon    = QString("workspace_clean.png");
+  label   = tr("LAB_CLEAN_WORKSPACE");
+  tooltip = tr("TIP_CLEAN_WORKSPACE");
+  icon    = tr("ICO_WORKSPACE_CLEAN");
   actionId = _salomeModule->createStandardAction(label,this,SLOT(OnCleanWorkspace()),icon,tooltip);
   _salomeModule->addActionInToolbar(actionId);
 }
@@ -177,18 +177,18 @@ void WorkspaceController::_importItem(QString itemNameId) {
   // to this item (iteNameId is a TreeView id, Qt stuff only).
   XmedDataObject * dataObject =
     (XmedDataObject *)dataModel->getDataObject(QS2S(itemNameId));
-  
+
   if ( dataObject == NULL ) {
     LOG("WorkspaceController: WARN! No data object associated to the item "<<itemNameId);
     return;
   }
-  
+
   // Then, we can request this data object to obtain the associated
   // FieldHandler.
   MEDOP::FieldHandler * fieldHandler = dataObject->getFieldHandler();
   STDLOG("Field: mesh="<<fieldHandler->meshname<<" name="<<fieldHandler->fieldname);
-  
-  // Finally, we can import the field 
+
+  // Finally, we can import the field
   bool askForOptions = true;
   _importFieldIntoConsole(fieldHandler, askForOptions);
 }
@@ -198,7 +198,7 @@ void WorkspaceController::_importItem(QString itemNameId) {
  * means to define a field proxy variable in the python context to
  * manipulate the field. We can raise a gui to specify some import
  * options or simply specify the alias (i.e. the name of the python
- * variable).   
+ * variable).
  */
 void WorkspaceController::_importFieldIntoConsole(MEDOP::FieldHandler * fieldHandler,
               bool askForOptions,
@@ -217,7 +217,7 @@ void WorkspaceController::_importFieldIntoConsole(MEDOP::FieldHandler * fieldHan
 
   // We can propose to the user to specify some additionnal
   // informations concerning what must be imported.
-  // 
+  //
   // In this version, we just ask the alias the field will be
   // manipulated with. The default alias is the field name. This alias
   // should be asked to the user to get a short name to manipulate.
@@ -258,12 +258,12 @@ void WorkspaceController::processMedEvent(const MEDOP::MedEvent * event) {
     STDLOG("No data model associated to this tree view");
     return;
   }
-  
+
   if ( event->type == MEDOP::EVENT_ADDNEW_FIELD ) {
     STDLOG("add new field");
     MEDOP::FieldHandler * fieldHandler =
       MEDOPFactoryClient::getDataManager()->getFieldHandler(event->fieldid);
-    
+
     XmedDataObject * dataObject = (XmedDataObject *)dataModel->newDataObject();
     dataObject->setFieldHandler(*fieldHandler);
     this->getDataTreeModel()->addData(dataObject);
@@ -273,7 +273,7 @@ void WorkspaceController::processMedEvent(const MEDOP::MedEvent * event) {
 
 /*!
  * This function save a list of fields in a med file. The med file
- * name is requested to the user using a file chooser dialog box 
+ * name is requested to the user using a file chooser dialog box
  */
 void WorkspaceController::_saveItemList(QStringList itemNameIdList) {
   XmedDataProcessor * dataProcessor = new XmedDataProcessor(this->getDataModel());
@@ -282,11 +282,11 @@ void WorkspaceController::_saveItemList(QStringList itemNameIdList) {
   delete dataProcessor;
 
   QStringList filter;
-  filter.append(QObject::tr("MED files (*.med)"));
+  filter.append(tr("FILE_FILTER_MED"));
   QString filename = SUIT_FileDlg::getFileName(_salomeModule->getApp()->desktop(),
                                                "",
                                                filter,
-                                               QObject::tr("Save selected fields"),
+                                               tr("SAVE_SELECTED_FIELDS"),
                                                false);
 
   if ( filename.isEmpty() ) return;
@@ -298,7 +298,7 @@ void WorkspaceController::_saveItemList(QStringList itemNameIdList) {
  * This function export the list of specified field item to PARAVIS
  * module. This consists in create a med file gathering the selected
  * items, then to import this file in PARAVIS, and finally to create a
- * scalar map of the first item to start the job. 
+ * scalar map of the first item to start the job.
  */
 void WorkspaceController::_exportItemList(QStringList itemNameIdList) {
   XmedDataProcessor * dataProcessor = new XmedDataProcessor(this->getDataModel());
@@ -344,7 +344,7 @@ void WorkspaceController::_exportItemList(QStringList itemNameIdList) {
  * This function sends a request to the SALOME data visualisation
  * (module VISU or PARAVIS) for displaying a scalar map of the fields
  * associated to the model items in the specified list.
- * 
+ *
  */
 void WorkspaceController::_viewItemList(QStringList itemNameIdList) {
 
@@ -365,7 +365,7 @@ void WorkspaceController::_viewItemList(QStringList itemNameIdList) {
     LOG("WorkspaceController: WARN! No data object associated to the item "<<itemNameId);
     return;
   }
-  
+
   // Then, we can request this data object to obtain the associated
   // FieldHandler.
   MEDOP::FieldHandler * fieldHandler = dataObject->getFieldHandler();
@@ -388,14 +388,14 @@ void WorkspaceController::processDatasourceEvent(const DatasourceEvent * event) 
     STDLOG("No data model associated to this tree view");
     return;
   }
-  
+
   // >>>
   // __GBO__ To know what to do we should test the type, because the
   // object could be a mesh, a timeseries or a single field. We test
   // here the case of a single field. Moreover, there could have
   // options such that "change the underlying mesh".
   // <<<
-  
+
   XmedDataObject * dataObject = event->objectdata;
 
   if ( event->eventtype == DatasourceEvent::EVENT_IMPORT_OBJECT ) {
@@ -435,12 +435,12 @@ void WorkspaceController::OnSaveWorkspace() {
 
   // Dialog to get the filename where the workspace must be saved into
   QStringList filter;
-  filter.append(QObject::tr("MED files (*.med)"));
+  filter.append(tr("FILE_FILTER_MED"));
 
   QString filename = SUIT_FileDlg::getFileName(_salomeModule->getApp()->desktop(),
                                                "",
                                                filter,
-                                               QObject::tr("Save workspace data"),
+                                               tr("SAVE_WORKSPACE_DATA"),
                                                false);
 
   if ( filename.isEmpty() ) return;
@@ -454,6 +454,6 @@ void WorkspaceController::OnSaveWorkspace() {
 #include <QMessageBox>
 void WorkspaceController::OnCleanWorkspace() {
   QMessageBox::warning(_salomeModule->getApp()->desktop(),
-           tr("Not implemented yet"),
-           tr("This function is not implemented yet"));
+           tr("NOT_IMPLEMENTED_YET"),
+           tr("FUNCTION_NOT_IMPLEMENTED"));
 }

@@ -10,7 +10,7 @@
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>Form</string>
+   <string>FORM</string>
   </property>
   <layout class="QHBoxLayout" >
    <property name="margin" >
@@ -46,14 +46,14 @@
          <item>
           <widget class="QLabel" name="label" >
            <property name="text" >
-            <string>Pression :</string>
+            <string>PRESSURE</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_2" >
            <property name="text" >
-            <string>Température :</string>
+            <string>TEMPERATURE</string>
            </property>
           </widget>
          </item>

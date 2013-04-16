@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>FORM</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_2">
    <item>
@@ -25,14 +25,14 @@
            <item>
             <widget class="QLabel" name="lblImageFile">
              <property name="text">
-              <string>Fichier Image:</string>
+              <string>IMAGE_FILE</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QLabel" name="lblMedFile">
              <property name="text">
-              <string>Fichier MED:</string>
+              <string>MED_FILE</string>
              </property>
             </widget>
            </item>
@@ -79,7 +79,7 @@
        <item>
         <widget class="QCheckBox" name="chkAutoLoad">
          <property name="text">
-          <string>Charger automatiquement</string>
+          <string>LOAD_AUTOMATICALLY</string>
          </property>
         </widget>
        </item>

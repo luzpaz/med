@@ -12,9 +12,9 @@
 DlgImageToMed::DlgImageToMed(QDialog *parent) : GenericDialog(parent)
 {
   ui.setupUi(this->getPanel());
-  
+
   QString moduleName = "MED";
-  QPixmap aPixmap = GUI::getResourcesManager()->loadPixmap( moduleName, "folder.png" );
+  QPixmap aPixmap = GUI::getResourcesManager()->loadPixmap( moduleName, tr("ICO_FOLDER") );
   QIcon icon(aPixmap);
   ui.btnImageFileChooser->setIcon(icon);
   ui.btnMedFileChooser->setIcon(icon);
@@ -40,7 +40,7 @@ void DlgImageToMed::setAutoLoaded(bool autoloaded) {
     ui.chkAutoLoad->setCheckState(Qt::Checked);
   }
   else {
-    ui.chkAutoLoad->setCheckState(Qt::Unchecked);    
+    ui.chkAutoLoad->setCheckState(Qt::Unchecked);
   }
 }
 
@@ -54,14 +54,14 @@ bool DlgImageToMed::isAutoLoaded() {
 
 void DlgImageToMed::OnBtnImageFileChooser() {
   QStringList filter;
-  filter.append(QObject::tr("Image files (*.png)"));
-  filter.append(QObject::tr("Image files (*.jpg)"));
-  filter.append(QObject::tr("Image files (*.pgm)"));
-  filter.append(QObject::tr("All files (*.*)"));
+  filter.append(tr("FILE_FILTER_PNG"));
+  filter.append(tr("FILE_FILTER_JPG"));
+  filter.append(tr("FILE_FILTER_PGM"));
+  filter.append(tr("FILE_FILTER_ALL"));
   QString filename = SUIT_FileDlg::getFileName(ui.btnImageFileChooser,
                                                "",
                                                filter,
-                                               QObject::tr("Select image file"),
+                                               tr("SELECT_IMAGE_FILE"),
                                                true);
   if ( filename.isEmpty() ) return;
   ui.txtImageFile->setText(filename);
@@ -72,11 +72,11 @@ void DlgImageToMed::OnBtnImageFileChooser() {
 
 void DlgImageToMed::OnBtnMedFileChooser() {
   QStringList filter;
-  filter.append(QObject::tr("MED files (*.med)"));
+  filter.append(tr("FILE_FILTER_MED"));
   QString filename = SUIT_FileDlg::getFileName(ui.btnMedFileChooser,
                                                "",
                                                filter,
-                                               QObject::tr("Specify a MED file"),
+                                               tr("SPECIFY_MED_FILE"),
                                                true);
   if ( filename.isEmpty() ) return;
   ui.txtMedFile->setText(filename);

@@ -17,7 +17,7 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-// Author : Guillaume Boulant (EDF) 
+// Author : Guillaume Boulant (EDF)
 
 #include "DatasourceController.hxx"
 #include "DatasourceConstants.hxx"
@@ -57,48 +57,48 @@ DatasourceController::~DatasourceController() {
 }
 
 void DatasourceController::createActions() {
-  // 
+  //
   // Main actions (toolbar and menubar)
   //
-  QString label   = QString("Add Data Source");
-  QString tooltip = QString("Add a file data source (file providing med data)");
-  QString icon    = QString("datasource_add.png");
+  QString label   = tr("LAB_ADD_DATA_SOURCE");
+  QString tooltip = tr("TIP_ADD_DATA_SOURCE");
+  QString icon    = tr("ICO_DATASOURCE_ADD");
   int actionId;
   actionId = _salomeModule->createStandardAction(label,this, SLOT(OnAddDatasource()),icon,tooltip);
   _salomeModule->addActionInToolbar(actionId);
 
-  label   = QString("Add Image Source");
-  tooltip = QString("Create a Data Source from an image file");
-  icon    = QString("image_add.png");
+  label   = tr("LAB_ADD_IMAGE_SOURCE");
+  tooltip = tr("TIP_ADD_IMAGE_SOURCE");
+  icon    = tr("ICO_IMAGE_ADD");
   actionId = _salomeModule->createStandardAction(label,this, SLOT(OnAddImagesource()),icon,tooltip);
   _salomeModule->addActionInToolbar(actionId);
-    
+
   //
   // Actions for popup menu only
   //
   // Expand field timeseries
-  label = QString("Expand field timeseries");
-  icon  = QString("datasource_expandfield.png");
+  label = tr("LAB_EXPAND_FIELD");
+  icon  = tr("ICO_DATASOURCE_EXPAND_FIELD");
   actionId = _salomeModule->createStandardAction(label,this,SLOT(OnExpandField()),icon);
   _salomeModule->addActionInPopupMenu(actionId);
-  
+
   // Create a control view
-  label = QString("Visualize");
-  icon  = QString("datasource_view.png");
+  label = tr("LAB_VISUALIZE");
+  icon  = tr("ICO_DATASOURCE_VIEW");
   actionId = _salomeModule->createStandardAction(label,this,SLOT(OnVisualize()),icon);
   _salomeModule->addActionInPopupMenu(actionId);
 
   // Use in workspace
-  label = QString("Use in workspace");
-  icon  = QString("datasource_use.png");
+  label = tr("LAB_USE_IN_WORKSPACE");
+  icon  = tr("ICO_DATASOURCE_USE");
   actionId = _salomeModule->createStandardAction(label,this,SLOT(OnUseInWorkspace()),icon);
   _salomeModule->addActionInPopupMenu(actionId);
 
   // Change underlying mesh (note that this action creates a new field in
   // the workspace that corresponds to a copy of the selected field
   // modified by the change of the underlying mesh.
-  label = QString("Change underlying mesh");
-  icon  = QString("datasource_changeUnderlyingMesh.png");
+  label = tr("LAB_CHANGE_MESH");
+  icon  = tr("ICO_DATASOURCE_CHANGE_MESH");
   actionId = _salomeModule->createStandardAction(label,this,SLOT(OnChangeUnderlyingMesh()),icon);
   _salomeModule->addActionInPopupMenu(actionId);
 }
@@ -122,28 +122,28 @@ MEDOP::DatasourceHandler * DatasourceController::addDatasource(const char * file
   SALOMEDS::SComponent_var root = _studyEditor->findRoot(QCHARSTAR(_salomeModule->moduleName()));
   SALOMEDS::SObject_var soDatasource = _studyEditor->newObject(root);
   _studyEditor->setName(soDatasource,datasourceHandler->name);
-  _studyEditor->setIcon(soDatasource,"datasource.png");
+  _studyEditor->setIcon(soDatasource,tr("ICO_DATASOURCE").toStdString().c_str());
   _studyEditor->setParameterInt(soDatasource,OBJECT_ID,datasourceHandler->id);
-  
+
 
   // We can add the meshes as children of the datasource
-  MEDOP::MeshHandlerList * meshHandlerList = 
+  MEDOP::MeshHandlerList * meshHandlerList =
     MEDOPFactoryClient::getDataManager()->getMeshList(datasourceHandler->id);
-  
+
   for(CORBA::ULong iMesh=0; iMesh<meshHandlerList->length(); iMesh++) {
     MEDOP::MeshHandler meshHandler = (*meshHandlerList)[iMesh];
     SALOMEDS::SObject_var soMesh = _studyEditor->newObject(soDatasource);
     _studyEditor->setName(soMesh,meshHandler.name);
-    _studyEditor->setIcon(soMesh,"datasource_mesh.png");
+    _studyEditor->setIcon(soMesh,tr("ICO_DATASOURCE_MESH").toStdString().c_str());
     _studyEditor->setParameterInt(soMesh,OBJECT_ID,meshHandler.id);
     _studyEditor->setParameterBool(soMesh,OBJECT_IS_IN_WORKSPACE,false);
-    
+
 
     // We add the field timeseries defined on this mesh, as children
     // of the mesh SObject
     MEDOP::FieldseriesHandlerList * fieldseriesHandlerList =
       MEDOPFactoryClient::getDataManager()->getFieldseriesListOnMesh(meshHandler.id);
-    
+
     for(CORBA::ULong iFieldseries=0; iFieldseries<fieldseriesHandlerList->length(); iFieldseries++) {
       MEDOP::FieldseriesHandler fieldseriesHandler = (*fieldseriesHandlerList)[iFieldseries];
       SALOMEDS::SObject_var soFieldseries = _studyEditor->newObject(soMesh);
@@ -152,7 +152,7 @@ MEDOP::DatasourceHandler * DatasourceController::addDatasource(const char * file
       label +=" ("+std::string(XmedDataObject::mapTypeOfFieldLabel[fieldseriesHandler.type])+")";
       _studyEditor->setName(soFieldseries,label.c_str());
 
-      _studyEditor->setIcon(soFieldseries,"datasource_field.png");
+      _studyEditor->setIcon(soFieldseries,tr("ICO_DATASOURCE_FIELD").toStdString().c_str());
       _studyEditor->setParameterInt(soFieldseries,OBJECT_ID,fieldseriesHandler.id);
       _studyEditor->setParameterBool(soFieldseries,OBJECT_IS_IN_WORKSPACE,false);
     }
@@ -166,12 +166,12 @@ void DatasourceController::OnAddDatasource()
 {
   // Dialog to get the filename where the input data are read from
   QStringList filter;
-  filter.append(QObject::tr("MED files (*.med)"));
+  filter.append(tr("FILE_FILTER_MED"));
 
   QString filename = SUIT_FileDlg::getFileName(_salomeModule->getApp()->desktop(),
                                                "",
                                                filter,
-                                               QObject::tr("Import MED fields"),
+                                               tr("IMPORT_MED_FIELDS"),
                                                true);
 
   if ( filename.isEmpty() ) return;
@@ -197,7 +197,7 @@ void DatasourceController::OnAddImagesource()
   QString imageFilename = dialog.getImageFilepath();
   QString medFilename   = dialog.getMedFilepath();
   bool autoLoad         = dialog.isAutoLoaded();
-  
+
   std::string ROOT_DIR(getenv("MED_ROOT_DIR"));
   std::string command(ROOT_DIR+"/bin/salome/med/image2med.py");
   command += " -i "+QS2S(imageFilename);
@@ -224,10 +224,10 @@ void DatasourceController::OnExpandField()
 
   // Get the selected objects in the study (SObject)
   SALOME_StudyEditor::SObjectList * listOfSObject = _studyEditor->getSelectedObjects();
-  for (int i=0; i<listOfSObject->size(); i++) {  
+  for (int i=0; i<listOfSObject->size(); i++) {
     SALOMEDS::SObject_var soFieldseries = listOfSObject->at(i);
 
-    // First retrieve the fieldseries id associated to this study object 
+    // First retrieve the fieldseries id associated to this study object
     long fieldseriesId = _studyEditor->getParameterInt(soFieldseries,OBJECT_ID);
     STDLOG("Expand the field timeseries "<<fieldseriesId);
 
@@ -283,7 +283,7 @@ void DatasourceController::OnVisualize() {
     XmedDataObject * dataObject = new XmedDataObject();
     dataObject->setFieldHandler(*fieldHandler);
     event->objectdata  = dataObject;
-    emit datasourceSignal(event);    
+    emit datasourceSignal(event);
   }
 
 }
@@ -302,7 +302,7 @@ void DatasourceController::OnUseInWorkspace() {
     // _GBO_ Note that it works only for a single field but the
     // XmedDataObject will be improved to deal with mesh, timeseries
     // and single field in a futur version. We suppose here that a
-    // single field has been selected. 
+    // single field has been selected.
     // <<<
 
     SALOMEDS::SObject_var soField = listOfSObject->at(0);
@@ -398,7 +398,7 @@ void DatasourceController::OnChangeUnderlyingMesh() {
   SALOME_StudyEditor::SObjectList * listOfSObject = _studyEditor->getSelectedObjects();
   if ( listOfSObject->size() > 0 ) {
     SALOMEDS::SObject_var soField = listOfSObject->at(0);
-    int fieldId = _studyEditor->getParameterInt(soField,OBJECT_ID);    
+    int fieldId = _studyEditor->getParameterInt(soField,OBJECT_ID);
     // _GBO_ : the dialog should not be modal, so that we can choose a
     // mesh in the browser. Then we have to emit a signal from the
     // dialog.accept, connected to a slot of the DatasourceControler
@@ -415,7 +415,7 @@ void DatasourceController::OnChangeUnderlyingMeshInputValidated() {
   int fieldId = _dlgChangeUnderlyingMesh->getFieldId();
   MEDOP::FieldHandler * fieldHandler =
     MEDOPFactoryClient::getDataManager()->getFieldHandler(fieldId);
-  
+
   // We don't modify the original field but create first a duplicate
   MEDOP::FieldHandler * duplicate = MEDOPFactoryClient::getCalculator()->dup(*fieldHandler);
   MEDOPFactoryClient::getDataManager()->changeUnderlyingMesh(duplicate->id, meshId);
@@ -434,9 +434,9 @@ void DatasourceController::OnChangeUnderlyingMeshInputValidated() {
   event->objectdata  = dataObject;
   emit datasourceSignal(event);
   // Note that this signal is processed by the WorkspaceController
-  
+
   // Tag the item to prevent double import
   //_studyEditor->setParameterBool(soField,OBJECT_IS_IN_WORKSPACE,true);
-  
-  
+
+
 }

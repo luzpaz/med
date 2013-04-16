@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>FORM</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_2">
    <item>
@@ -388,7 +388,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Sélectionnez un maillage dans l'explorateur:</string>
+          <string>SELECT_MESH</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -400,7 +400,7 @@
          <item>
           <widget class="QPushButton" name="btnSelectMesh">
            <property name="text">
-            <string>Maillage -&gt;</string>
+            <string>MESH_GT</string>
            </property>
           </widget>
          </item>
@@ -417,7 +417,7 @@
           </font>
          </property>
          <property name="text">
-          <string>(L'explorateur donne une vue des sources de données med  (maillage et champs) référencés dans l'espace de données)</string>
+          <string>MSG_EXPLORER</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>

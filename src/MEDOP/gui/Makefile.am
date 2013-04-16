@@ -37,7 +37,7 @@ SUBDIRS = dialogs
 %.qm: %.ts
 	$(LRELEASE) $< -qm $@
 
-EXTRA_DIST+=$(MOC_FILES:%_moc.cxx=%.hxx) $(nodist_salomeres_DATA:%.qm=%.ts) test
+EXTRA_DIST+=$(MOC_FILES:%_moc.cxx=%.hxx) $(dist_salomeres_DATA:%.qm=%.ts) test
 
 mostlyclean-local:
 	rm -f @builddir@/*_moc.cxx
@@ -115,11 +115,12 @@ libMEDOPGUI_la_LIBADD  =                         \
 	../cmp/libMEDOPFactoryEngine.la
 
 if WITH_MEDMEMGUI
-libMEDOPGUI_la_CPPFLAGS += "-D__WITH_MEDMEMGUI__" -I$(top_srcdir)/src/MEDGUI
-libMEDOPGUI_la_LIBADD += $(top_builddir)/src/MEDGUI/libMEDGUI.la
+	libMEDOPGUI_la_CPPFLAGS += "-D__WITH_MEDMEMGUI__" -I$(top_srcdir)/src/MEDGUI
+	libMEDOPGUI_la_LIBADD += $(top_builddir)/src/MEDGUI/libMEDGUI.la
 endif
 
 # resources files
-nodist_salomeres_DATA = \
-	MEDOP_msg_en.qm \
-	MEDOP_msg_fr.qm
+dist_salomeres_DATA = \
+	MED_images.qm \
+	MED_msg_en.qm \
+	MED_msg_fr.qm
