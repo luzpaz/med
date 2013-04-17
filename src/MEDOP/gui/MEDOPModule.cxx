@@ -27,17 +27,6 @@
 
 #include "MEDOPFactoryClient.hxx"
 
-#include <QWidget>
-
-#include <SUIT_Desktop.h>
-#include <SUIT_ResourceMgr.h>
-#include <SUIT_Session.h>
-#include <SUIT_FileDlg.h>
-
-enum {
-  MEDOP_MENU_ACTION_ID_IMPORT_MED = 100
-};
-
 MEDOPModule::MEDOPModule() :
   StandardApp_Module()
 {
