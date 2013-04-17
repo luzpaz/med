@@ -67,6 +67,10 @@ void DatasourceController::createActions() {
   actionId = _salomeModule->createStandardAction(label,this, SLOT(OnAddDatasource()),icon,tooltip);
   _salomeModule->addActionInToolbar(actionId);
 
+  // This action has to be placed in the general file menu with the label "Import MED file"
+  int menuId = _salomeModule->createMenu( tr( "MEN_FILE" ), -1,  1 );
+  _salomeModule->addActionInMenubar(actionId, menuId);
+
   label   = tr("LAB_ADD_IMAGE_SOURCE");
   tooltip = tr("TIP_ADD_IMAGE_SOURCE");
   icon    = tr("ICO_IMAGE_ADD");
@@ -101,6 +105,7 @@ void DatasourceController::createActions() {
   icon  = tr("ICO_DATASOURCE_CHANGE_MESH");
   actionId = _salomeModule->createStandardAction(label,this,SLOT(OnChangeUnderlyingMesh()),icon);
   _salomeModule->addActionInPopupMenu(actionId);
+
 }
 
 /**
@@ -168,16 +173,30 @@ void DatasourceController::OnAddDatasource()
   QStringList filter;
   filter.append(tr("FILE_FILTER_MED"));
 
+  QString anInitialPath = "";
+  if ( SUIT_FileDlg::getLastVisitedPath().isEmpty() )
+    anInitialPath = QDir::currentPath();
+
+  /*
   QString filename = SUIT_FileDlg::getFileName(_salomeModule->getApp()->desktop(),
                                                "",
                                                filter,
                                                tr("IMPORT_MED_FIELDS"),
                                                true);
+  */
 
-  if ( filename.isEmpty() ) return;
+  QStringList filenames = SUIT_FileDlg::getOpenFileNames( _salomeModule->getApp()->desktop(),
+                                                          anInitialPath,
+                                                          filter,
+                                                          tr("IMPORT_MED_FIELDS") );
 
-  this->addDatasource(QCHARSTAR(filename));
-  _salomeModule->updateObjBrowser(true);
+  if ( filenames.count() <= 0 ) return;
+  for ( QStringList::ConstIterator itFile = filenames.begin();
+	itFile != filenames.end(); ++itFile ) {
+    QString filename = *itFile;
+    this->addDatasource(QCHARSTAR(filename));
+    _salomeModule->updateObjBrowser(true);
+  }
 }
 
 #include "DlgImageToMed.hxx"

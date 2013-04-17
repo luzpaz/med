@@ -52,25 +52,6 @@ MEDOPModule::MEDOPModule() :
 // This part implements the mandatory interface
 // =====================================================================
 //
-//=======================================================================
-// function : initialize
-// purpose  :
-//=======================================================================
-void MEDOPModule::initialize( CAM_Application* app ) {
-  StandardApp_Module::initialize( app );
-
-  QWidget* aParent = application()->desktop();
-  SUIT_ResourceMgr* resMgr = dynamic_cast<SUIT_ResourceMgr*>( SUIT_Session::session()->resourceMgr() );
-
-  QPixmap aPixmap = resMgr->loadPixmap("XMED", tr("ICO_IMPORT_MED"));
-  createAction( MEDOP_MENU_ACTION_ID_IMPORT_MED, tr("IMPORT_FROM_FILE"), QIcon(aPixmap),
-                tr("IMPORT_MED_FILE"), "", (Qt::CTRL + Qt::Key_M), aParent, false,
-                this, SLOT(onImportMedFile()));
-
-  int xmedId = createMenu( tr( "MEN_FILE" ), -1,  1 );
-  createMenu( MEDOP_MENU_ACTION_ID_IMPORT_MED, xmedId, 10 );
-}
-
 
 /*!
  * Returns the engine of the XMED module, i.e. the SALOME component
@@ -131,34 +112,4 @@ void MEDOPModule::createModuleActions() {
   _datasourceController->createActions();
   // Creating actions concerning the workspace
   _workspaceController->createActions();
-}
-
-void MEDOPModule::onImportMedFile()
-{
-  SalomeApp_Application* app = dynamic_cast<SalomeApp_Application*>( SUIT_Session::session()->activeApplication() );
-  if( !app )
-    return;
-  SUIT_Desktop* desktop = app->desktop();
-
-  QStringList filter;
-  filter.append( tr( "FILE_FILTER_MED" ) );
-
-  QString anInitialPath = "";
-  if ( SUIT_FileDlg::getLastVisitedPath().isEmpty() )
-    anInitialPath = QDir::currentPath();
-
-  QString caption = tr( "IMPORT_FROM_FILE" );
-  QStringList filenames = SUIT_FileDlg::getOpenFileNames( desktop,
-                                                          anInitialPath,
-                                                          filter,
-                                                          caption );
-
-  if ( filenames.count() <= 0 )
-    return;
-
-  for ( QStringList::ConstIterator itFile = filenames.begin(); itFile != filenames.end(); ++itFile ) {
-    QString filename = *itFile;
-    _datasourceController->addDatasource(QCHARSTAR(filename));
-    updateObjBrowser(true);
-  }
 }

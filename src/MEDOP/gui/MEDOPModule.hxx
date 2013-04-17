@@ -47,8 +47,6 @@ class MEDOPGUI_EXPORT MEDOPModule: public StandardApp_Module
 public:
   MEDOPModule();
 
-  virtual void                    initialize( CAM_Application* );
-
 protected:
   virtual Engines::EngineComponent_ptr getEngine() const;
   virtual QString studyIconName();
@@ -56,9 +54,6 @@ protected:
   virtual void createModuleActions();
   virtual bool activateModule( SUIT_Study* theStudy );
   virtual bool deactivateModule( SUIT_Study* theStudy );
-
- private slots:
-  void onImportMedFile();
 
 private:
   DatasourceController * _datasourceController;

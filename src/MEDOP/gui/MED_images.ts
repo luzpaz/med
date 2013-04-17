@@ -5,7 +5,7 @@
     <name>@default</name>
     <message>
       <source>ICO_IMPORT_MED</source>
-      <translation>fileimport-32.png</translation>
+      <translation>datasource_add.png</translation>
     </message>
     <message>
       <source>ICO_DATASOURCE</source>

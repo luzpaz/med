@@ -6,12 +6,12 @@
     <message>
       <location filename="MEDOP/gui/DatasourceController.cxx" line="45"/>
       <source>LAB_ADD_DATA_SOURCE</source>
-      <translation>Ajouter des données</translation>
+      <translation>Importer des données MED</translation>
     </message>
     <message>
       <location filename="MEDOP/gui/DatasourceController.cxx" line="46"/>
       <source>TIP_ADD_DATA_SOURCE</source>
-      <translation>Ajouter un fichier de données (au format MED)</translation>
+      <translation>Ajouter des données par import de fichiers MED</translation>
     </message>
     <message>
       <location filename="MEDOP/gui/DatasourceController.cxx" line="52"/>
@@ -21,7 +21,7 @@
     <message>
       <location filename="MEDOP/gui/DatasourceController.cxx" line="53"/>
       <source>TIP_ADD_IMAGE_SOURCE</source>
-      <translation>Créer des données à partir d'un fichier image</translation>
+      <translation>Ajouter des données par import d'un fichier image</translation>
     </message>
     <message>
       <location filename="MEDOP/gui/DatasourceController.cxx" line="62"/>
