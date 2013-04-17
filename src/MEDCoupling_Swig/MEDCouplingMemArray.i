@@ -2353,7 +2353,7 @@ namespace ParaMEDMEM
                 return ret.retn();
               }
           }
-#ifdef WITH_NUMPY2
+#ifdef WITH_NUMPY
         else if(PyArray_Check(elt0))
           {//DataArrayInt.New(numpyArray)
             int ndim=PyArray_NDIM(elt0);

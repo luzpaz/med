@@ -19,7 +19,7 @@
 
 #include "InterpKernelAutoPtr.hxx"
 
-#ifdef WITH_NUMPY2
+#ifdef WITH_NUMPY
 #include <numpy/arrayobject.h>
 
 void numarrintdeal(void *pt, void *wron)
@@ -185,33 +185,19 @@ static PyObject* convertMultiFields(ParaMEDMEM::MEDCouplingMultiFields *mfs, int
 
 static PyObject *convertIntArrToPyList(const int *ptr, int size) throw(INTERP_KERNEL::Exception)
 {
-#ifndef WITH_NUMPY2
   PyObject *ret=PyList_New(size);
   for(int i=0;i<size;i++)
     PyList_SetItem(ret,i,PyInt_FromLong(ptr[i]));
   return ret;
-#else
-  npy_intp dim = (npy_intp) size;
-  int *tmp=new int[size];
-  std::copy(ptr,ptr+size,tmp);
-  return PyArray_SimpleNewFromData(1,&dim,NPY_INT,const_cast<int *>(tmp));
-#endif
 }
 
 static PyObject *convertIntArrToPyList2(const std::vector<int>& v) throw(INTERP_KERNEL::Exception)
 {
-#ifndef WITH_NUMPY2
   int size=v.size();
   PyObject *ret=PyList_New(size);
   for(int i=0;i<size;i++)
     PyList_SetItem(ret,i,PyInt_FromLong(v[i]));
   return ret;
-#else
-  npy_intp dim = (npy_intp) v.size();
-  int *tmp=new int[v.size()];
-  std::copy(v.begin(),v.end(),tmp);
-  return PyArray_SimpleNewFromData(1,&dim,NPY_INT,tmp);
-#endif
 }
 
 static PyObject *convertIntArrToPyList3(const std::set<int>& v) throw(INTERP_KERNEL::Exception)
@@ -281,21 +267,7 @@ static int *convertPyToNewIntArr2(PyObject *pyLi, int *size) throw(INTERP_KERNEL
     }
   else
     {
-#ifndef WITH_NUMPY2
       throw INTERP_KERNEL::Exception("convertPyToNewIntArr2 : not a list");
-#else
-      if(PyArray_Check(pyLi))
-        {
-          npy_intp mySize = PyArray_SIZE(pyLi);
-          int *ret=(int *)PyArray_BYTES(pyLi);
-          *size=mySize;
-          return ret;
-        }
-      else
-        {
-          throw INTERP_KERNEL::Exception("convertPyToNewIntArr2 : not a list nor PyArray");
-        }
-#endif
     }
 }
 
@@ -392,20 +364,7 @@ static void convertPyToNewIntArr3(PyObject *pyLi, std::vector<int>& arr) throw(I
     }
   else
     {
-#ifndef WITH_NUMPY2
       throw INTERP_KERNEL::Exception("convertPyToNewIntArr3 : not a list nor a tuple");
-#else
-      if(PyArray_Check(pyLi))
-        {
-          npy_intp mySize = PyArray_SIZE(pyLi);
-          int *ret=(int *)PyArray_BYTES(pyLi);
-          arr.resize(mySize);
-          std::copy(ret,ret+mySize,arr.begin());
-          return ;
-        }
-      else
-        throw INTERP_KERNEL::Exception("convertPyToNewIntArr3 : not a list nor a tuple nor PyArray");
-#endif
     }
 }
 
