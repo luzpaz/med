@@ -22,7 +22,7 @@
 #ifdef WITH_NUMPY
 #include <numpy/arrayobject.h>
 
-void numarrintdeal(void *pt, void *wron)
+void numarrdeal(void *pt, void *wron)
 {
   PyObject *weakRefOnOwner=reinterpret_cast<PyObject *>(wron);
   PyObject *obj=PyWeakref_GetObject(weakRefOnOwner);
@@ -38,24 +38,32 @@ void numarrintdeal(void *pt, void *wron)
     free(pt);
 }
 
-struct PyCallBackDataArrayIntSt {
+template<class MCData>
+struct PyCallBackDataArraySt {
     PyObject_HEAD
-    ParaMEDMEM::DataArrayInt *_pt_mc;
+    MCData *_pt_mc;
 };
 
-typedef struct PyCallBackDataArrayIntSt PyCallBackDataArrayInt;
+typedef struct PyCallBackDataArraySt<ParaMEDMEM::DataArrayInt> PyCallBackDataArrayInt;
+typedef struct PyCallBackDataArraySt<ParaMEDMEM::DataArrayDouble> PyCallBackDataArrayDouble;
 
 extern "C"
 {
-  static int callbackmcdataarrayint___init__(PyObject *self, PyObject *args, PyObject *kwargs) { return 0; }
+  static int callbackmcdataarray___init__(PyObject *self, PyObject *args, PyObject *kwargs) { return 0; }
   
   static PyObject *callbackmcdataarrayint___new__(PyTypeObject *type, PyObject *args, PyObject *kwargs)
   {
     PyCallBackDataArrayInt *self = (PyCallBackDataArrayInt *) ( type->tp_alloc(type, 0) );
     return (PyObject *)self;
   }
+
+  static PyObject *callbackmcdataarraydouble___new__(PyTypeObject *type, PyObject *args, PyObject *kwargs)
+  {
+    PyCallBackDataArrayDouble *self = (PyCallBackDataArrayDouble *) ( type->tp_alloc(type, 0) );
+    return (PyObject *)self;
+  }
   
-  static void callbackmcdataarrayint_dealloc(PyObject *self)
+  static void callbackmcdataarray_dealloc(PyObject *self)
   {
     Py_TYPE(self)->tp_free(self);
   }
@@ -70,6 +78,17 @@ extern "C"
     Py_XINCREF(Py_None);
     return Py_None;
   }
+
+  static PyObject *callbackmcdataarraydouble_call(PyCallBackDataArrayDouble *self, PyObject *args, PyObject *kw)
+  {
+    if(self->_pt_mc)
+      {
+        ParaMEDMEM::MemArray<double>& mma=self->_pt_mc->accessToMemArray();
+        mma.destroy();
+      }
+    Py_XINCREF(Py_None);
+    return Py_None;
+  }
 }
 
 PyTypeObject PyCallBackDataArrayInt_RefType = {
@@ -77,7 +96,7 @@ PyTypeObject PyCallBackDataArrayInt_RefType = {
   "callbackmcdataarrayint",
   sizeof(PyCallBackDataArrayInt),
   0,
-  callbackmcdataarrayint_dealloc,            /*tp_dealloc*/
+  callbackmcdataarray_dealloc,            /*tp_dealloc*/
   0,                          /*tp_print*/
   0,                          /*tp_getattr*/
   0,                          /*tp_setattr*/
@@ -108,21 +127,129 @@ PyTypeObject PyCallBackDataArrayInt_RefType = {
   0,                          /*tp_descr_get*/
   0,                          /*tp_descr_set*/
   0,                          /*tp_dictoffset*/
-  callbackmcdataarrayint___init__,           /*tp_init*/
+  callbackmcdataarray___init__,           /*tp_init*/
   PyType_GenericAlloc,        /*tp_alloc*/
   callbackmcdataarrayint___new__,            /*tp_new*/
   PyObject_GC_Del,            /*tp_free*/
 };
 
-void numarrintdeal2(void *pt, void *obj)
+PyTypeObject PyCallBackDataArrayDouble_RefType = {
+  PyVarObject_HEAD_INIT(&PyType_Type, 0)
+  "callbackmcdataarraydouble",
+  sizeof(PyCallBackDataArrayDouble),
+  0,
+  callbackmcdataarray_dealloc,            /*tp_dealloc*/
+  0,                          /*tp_print*/
+  0,                          /*tp_getattr*/
+  0,                          /*tp_setattr*/
+  0,                          /*tp_compare*/
+  0,                          /*tp_repr*/
+  0,                          /*tp_as_number*/
+  0,                          /*tp_as_sequence*/
+  0,                          /*tp_as_mapping*/
+  0,                          /*tp_hash*/
+  (ternaryfunc)callbackmcdataarraydouble_call,  /*tp_call*/
+  0,                          /*tp_str*/
+  0,                          /*tp_getattro*/
+  0,                          /*tp_setattro*/
+  0,                          /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC | Py_TPFLAGS_BASETYPE,  /*tp_flags*/
+  0,                          /*tp_doc*/
+  0,                          /*tp_traverse*/
+  0,                          /*tp_clear*/
+  0,                          /*tp_richcompare*/
+  0,                          /*tp_weaklistoffset*/
+  0,                          /*tp_iter*/
+  0,                          /*tp_iternext*/
+  0,                          /*tp_methods*/
+  0,                          /*tp_members*/
+  0,                          /*tp_getset*/
+  0,                          /*tp_base*/
+  0,                          /*tp_dict*/
+  0,                          /*tp_descr_get*/
+  0,                          /*tp_descr_set*/
+  0,                          /*tp_dictoffset*/
+  callbackmcdataarray___init__,           /*tp_init*/
+  PyType_GenericAlloc,        /*tp_alloc*/
+  callbackmcdataarraydouble___new__,            /*tp_new*/
+  PyObject_GC_Del,            /*tp_free*/
+};
+
+template<class MCData>
+void numarrdeal2(void *pt, void *obj)
 {
+  typedef struct PyCallBackDataArraySt<MCData> PyCallBackDataArray;
   void **obj1=(void **)obj;
-  PyCallBackDataArrayInt *cbdaic=reinterpret_cast<PyCallBackDataArrayInt *>(obj1[0]);
+  PyCallBackDataArray *cbdaic=reinterpret_cast<PyCallBackDataArray *>(obj1[0]);
   PyObject *weakRefOnOwner=reinterpret_cast<PyObject *>(obj1[1]);
   cbdaic->_pt_mc=0;
-  Py_XDECREF(weakRefOnOwner); //tonyy
-  Py_XDECREF(cbdaic); //tonyy
+  Py_XDECREF(weakRefOnOwner);
+  Py_XDECREF(cbdaic);
   delete [] obj1;
+}
+
+template<class MCData, class T>
+MCData *BuildNewInstance(PyObject *elt0, int npyObjectType, PyTypeObject *pytype)
+{
+  int ndim=PyArray_NDIM(elt0);
+  if(ndim!=1)
+    throw INTERP_KERNEL::Exception("Input numpy array has not 1 dimension !");//to do 1 or 2.
+  if(PyArray_ObjectType(elt0,0)!=npyObjectType)
+    throw INTERP_KERNEL::Exception("Input numpy array has not of type INT32 !");//to do 1 or 2.
+  npy_intp stride=PyArray_STRIDE(elt0,0);
+  int itemSize=PyArray_ITEMSIZE(elt0);
+  if(itemSize<stride)
+    throw INTERP_KERNEL::Exception("Input numpy array has item size < stride !");
+  if(stride!=sizeof(T))
+    throw INTERP_KERNEL::Exception("Input numpy array has not stride set to 4 !");//to do
+  npy_intp sz=PyArray_DIM(elt0,0);
+  const char *data=PyArray_BYTES(elt0);
+  typename ParaMEDMEM::MEDCouplingAutoRefCountObjectPtr<MCData> ret=MCData::New();
+  if(PyArray_ISBEHAVED(elt0))//aligned and writeable and in machine byte-order
+    {
+      PyArrayObject *elt0C=reinterpret_cast<PyArrayObject *>(elt0);
+      PyArrayObject *eltOwning=(PyArray_FLAGS(elt0C) & NPY_OWNDATA)?elt0C:NULL;
+      int mask=NPY_OWNDATA; mask=~mask;
+      elt0C->flags&=mask;
+      PyObject *deepestObj=elt0;
+      PyObject *base=elt0C->base;
+      if(base) deepestObj=base;
+      while(base)
+        {
+          if(PyArray_Check(base))
+            {
+              PyArrayObject *baseC=reinterpret_cast<PyArrayObject *>(base);
+              eltOwning=(PyArray_FLAGS(baseC) & NPY_OWNDATA)?baseC:eltOwning;
+              baseC->flags&=mask;
+              base=baseC->base;
+              if(base) deepestObj=base;
+            }
+          else
+            break;
+        }
+      typename ParaMEDMEM::MemArray<T>& mma=ret->accessToMemArray();
+      if(eltOwning==NULL)
+        {
+          PyCallBackDataArraySt<MCData> *cb=PyObject_GC_New(PyCallBackDataArraySt<MCData>,pytype);
+          cb->_pt_mc=ret;
+          ret->useArray(reinterpret_cast<const T *>(data),true,ParaMEDMEM::C_DEALLOC,sz,1);
+          PyObject *ref=PyWeakref_NewRef(deepestObj,(PyObject *)cb);
+          void **objs=new void *[2]; objs[0]=cb; objs[1]=ref;
+          mma.setParameterForDeallocator(objs);
+          mma.setSpecificDeallocator(numarrdeal2<MCData>);
+          //"Impossible to share this numpy array chunk of data, because already shared by an another non numpy array object (maybe an another DataArrayInt instance) ! Release it, or perform a copy on the input array !");
+        }
+      else
+        {
+          ret->useArray(reinterpret_cast<const T *>(data),true,ParaMEDMEM::C_DEALLOC,sz,1);
+          PyObject *ref=PyWeakref_NewRef(reinterpret_cast<PyObject *>(eltOwning),NULL);
+          mma.setParameterForDeallocator(ref);
+          mma.setSpecificDeallocator(numarrdeal);
+        }
+    }
+  else if(PyArray_ISBEHAVED_RO(elt0))
+    ret->useArray(reinterpret_cast<const T *>(data),false,ParaMEDMEM::CPP_DEALLOC,sz,1);
+  return ret.retn();
 }
 
 #endif

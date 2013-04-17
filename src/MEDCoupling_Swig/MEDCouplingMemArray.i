@@ -284,6 +284,12 @@ namespace ParaMEDMEM
                 return ret.retn();
               }
           }
+#ifdef WITH_NUMPY
+        else if(PyArray_Check(elt0))
+          {//DataArrayDouble.New(numpyArray)
+            return BuildNewInstance<DataArrayDouble,double>(elt0,NPY_DOUBLE,&PyCallBackDataArrayDouble_RefType);
+          }
+#endif
         else
           throw INTERP_KERNEL::Exception(msg);
       }
@@ -2356,65 +2362,7 @@ namespace ParaMEDMEM
 #ifdef WITH_NUMPY
         else if(PyArray_Check(elt0))
           {//DataArrayInt.New(numpyArray)
-            int ndim=PyArray_NDIM(elt0);
-            if(ndim!=1)
-              throw INTERP_KERNEL::Exception("Input numpy array has not 1 dimension !");//to do 1 or 2.
-            if(PyArray_ObjectType(elt0,0)!=NPY_INT)
-              throw INTERP_KERNEL::Exception("Input numpy array has not of type INT32 !");//to do 1 or 2.
-            npy_intp stride=PyArray_STRIDE(elt0,0);
-            int itemSize=PyArray_ITEMSIZE(elt0);
-            if(itemSize<stride)
-              throw INTERP_KERNEL::Exception("Input numpy array has item size < stride !");
-            if(stride!=4)
-              throw INTERP_KERNEL::Exception("Input numpy array has not stride set to 4 !");//to do
-            npy_intp sz=PyArray_DIM(elt0,0);
-            const char *data=PyArray_BYTES(elt0);
-            MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
-            if(PyArray_ISBEHAVED(elt0))//aligned and writeable and in machine byte-order
-              {
-                PyArrayObject *elt0C=reinterpret_cast<PyArrayObject *>(elt0);
-                PyArrayObject *eltOwning=(PyArray_FLAGS(elt0C) & NPY_OWNDATA)?elt0C:NULL;
-                int mask=NPY_OWNDATA; mask=~mask;
-                elt0C->flags&=mask;
-                PyObject *deepestObj=elt0;
-                PyObject *base=elt0C->base;
-                if(base) deepestObj=base;
-                while(base)
-                  {
-                    if(PyArray_Check(base))
-                      {
-                        PyArrayObject *baseC=reinterpret_cast<PyArrayObject *>(base);
-                        eltOwning=(PyArray_FLAGS(baseC) & NPY_OWNDATA)?baseC:eltOwning;
-                        baseC->flags&=mask;
-                        base=baseC->base;
-                        if(base) deepestObj=base;
-                      }
-                    else
-                      break;
-                  }
-                MemArray<int>& mma=ret->accessToMemArray();
-                if(eltOwning==NULL)
-                  {
-                    PyCallBackDataArrayInt *cb=PyObject_GC_New(PyCallBackDataArrayInt,&PyCallBackDataArrayInt_RefType);
-                    cb->_pt_mc=ret;
-                    ret->useArray(reinterpret_cast<const int *>(data),true,C_DEALLOC,sz,1);
-                    PyObject *ref=PyWeakref_NewRef(deepestObj,(PyObject *)cb);
-                    void **objs=new void *[2]; objs[0]=cb; objs[1]=ref;
-                    mma.setParameterForDeallocator(objs);
-                    mma.setSpecificDeallocator(numarrintdeal2);
-                    //"Impossible to share this numpy array chunk of data, because already shared by an another non numpy array object (maybe an another DataArrayInt instance) ! Release it, or perform a copy on the input array !");
-                  }
-                else
-                  {
-                    ret->useArray(reinterpret_cast<const int *>(data),true,C_DEALLOC,sz,1);
-                    PyObject *ref=PyWeakref_NewRef(reinterpret_cast<PyObject *>(eltOwning),NULL);
-                    mma.setParameterForDeallocator(ref);
-                    mma.setSpecificDeallocator(numarrintdeal);
-                  }
-              }
-            else if(PyArray_ISBEHAVED_RO(elt0))
-              ret->useArray(reinterpret_cast<const int *>(data),false,CPP_DEALLOC,sz,1);
-            return ret.retn();
+            return BuildNewInstance<DataArrayInt,int>(elt0,NPY_INT,&PyCallBackDataArrayInt_RefType);
           }
 #endif
         else
