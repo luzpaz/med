@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2013  CEA/DEN, EDF R&D
+# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -17,23 +17,24 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-# Author : Guillaume Boulant (EDF) 
+# Author : Guillaume Boulant (EDF)
 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 SUBDIRS = testfiles
-dist_salomeres_DATA= \
-        MEDOP.png \
-        MEDOP_small.png \
-        datasource_add.png \
-        datasource.png \
-        datasource_mesh.png \
-        datasource_field.png \
-        datasource_expandfield.png \
-        datasource_view.png \
-        datasource_use.png \
-        datasource_changeUnderlyingMesh.png \
-        image_add.png \
-        workspace_save.png \
-        workspace_clean.png \
-	folder.png
+dist_salomeres_DATA=				\
+	datasource_add.png			\
+	datasource_changeUnderlyingMesh.png	\
+	datasource_expandfield.png		\
+	datasource_field.png			\
+	datasource_mesh.png			\
+	datasource.png				\
+	datasource_use.png			\
+	datasource_view.png			\
+	fileimport-32.png			\
+	folder.png				\
+	image_add.png				\
+	MEDOP.png				\
+	MEDOP_small.png				\
+	workspace_clean.png			\
+	workspace_save.png
