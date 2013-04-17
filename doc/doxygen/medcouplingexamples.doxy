@@ -2,17 +2,6 @@
 \page medcouplingcppexamples MEDCoupling C++ examples
 
 
-
-\anchor cpp_mcfielddouble_
-<br><h2>  </h2>
-
-First, we create a supporting 2D mesh and a field on it got using
-\ref ParaMEDMEM::MEDCouplingFieldDouble::fillFromAnalytic "fillFromAnalytic()".
-\snippet MEDCouplingExamplesTest.cxx CppSnippet_MEDCouplingFieldDouble_
-\snippet MEDCouplingExamplesTest.py PySnippet_MEDCouplingFieldDouble_
-\snippet MEDCouplingExamplesTest.py Snippet_MEDCouplingFieldDouble_
-
-
 \anchor cpp_mcfielddouble_WriteVTK
 <br><h2> Writting fields in a VTK file </h2>
 

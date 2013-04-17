@@ -23,9 +23,6 @@ import unittest
 from math import pi, sqrt
 
 class MEDCouplingBasicsTest(unittest.TestCase):
-    def testExample_MEDCouplingFieldDouble_(self):
-        #! [PySnippet_MEDCouplingFieldDouble__1]
-        return
 
     def testExample_MEDCouplingFieldDouble_WriteVTK(self):
         #! [PySnippet_MEDCouplingFieldDouble_WriteVTK_1]
