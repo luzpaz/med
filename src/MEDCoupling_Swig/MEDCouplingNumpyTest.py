@@ -20,7 +20,10 @@
 # 
 
 from MEDCoupling import *
-from numpy import *
+
+if MEDCouplingHasNumpyBindings():
+    from numpy import *
+    pass
 
 from sys import getrefcount
 
