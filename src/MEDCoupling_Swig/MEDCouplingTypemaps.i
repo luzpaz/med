@@ -21,6 +21,110 @@
 
 #ifdef WITH_NUMPY2
 #include <numpy/arrayobject.h>
+
+void numarrintdeal(void *pt, void *wron)
+{
+  PyObject *weakRefOnOwner=reinterpret_cast<PyObject *>(wron);
+  PyObject *obj=PyWeakref_GetObject(weakRefOnOwner);
+  if(obj!=Py_None)
+    {
+      Py_XINCREF(obj);
+      PyArrayObject *objC=reinterpret_cast<PyArrayObject *>(obj);
+      objC->flags|=NPY_OWNDATA;
+      Py_XDECREF(weakRefOnOwner);
+      Py_XDECREF(obj);
+    }
+  else
+    free(pt);
+}
+
+struct PyCallBackDataArrayIntSt {
+    PyObject_HEAD
+    ParaMEDMEM::DataArrayInt *_pt_mc;
+};
+
+typedef struct PyCallBackDataArrayIntSt PyCallBackDataArrayInt;
+
+extern "C"
+{
+  static int callbackmcdataarrayint___init__(PyObject *self, PyObject *args, PyObject *kwargs) { return 0; }
+  
+  static PyObject *callbackmcdataarrayint___new__(PyTypeObject *type, PyObject *args, PyObject *kwargs)
+  {
+    PyCallBackDataArrayInt *self = (PyCallBackDataArrayInt *) ( type->tp_alloc(type, 0) );
+    return (PyObject *)self;
+  }
+  
+  static void callbackmcdataarrayint_dealloc(PyObject *self)
+  {
+    Py_TYPE(self)->tp_free(self);
+  }
+  
+  static PyObject *callbackmcdataarrayint_call(PyCallBackDataArrayInt *self, PyObject *args, PyObject *kw)
+  {
+    if(self->_pt_mc)
+      {
+        ParaMEDMEM::MemArray<int>& mma=self->_pt_mc->accessToMemArray();
+        mma.destroy();
+      }
+    Py_XINCREF(Py_None);
+    return Py_None;
+  }
+}
+
+PyTypeObject PyCallBackDataArrayInt_RefType = {
+  PyVarObject_HEAD_INIT(&PyType_Type, 0)
+  "callbackmcdataarrayint",
+  sizeof(PyCallBackDataArrayInt),
+  0,
+  callbackmcdataarrayint_dealloc,            /*tp_dealloc*/
+  0,                          /*tp_print*/
+  0,                          /*tp_getattr*/
+  0,                          /*tp_setattr*/
+  0,                          /*tp_compare*/
+  0,                          /*tp_repr*/
+  0,                          /*tp_as_number*/
+  0,                          /*tp_as_sequence*/
+  0,                          /*tp_as_mapping*/
+  0,                          /*tp_hash*/
+  (ternaryfunc)callbackmcdataarrayint_call,  /*tp_call*/
+  0,                          /*tp_str*/
+  0,                          /*tp_getattro*/
+  0,                          /*tp_setattro*/
+  0,                          /*tp_as_buffer*/
+  Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC | Py_TPFLAGS_BASETYPE,  /*tp_flags*/
+  0,                          /*tp_doc*/
+  0,                          /*tp_traverse*/
+  0,                          /*tp_clear*/
+  0,                          /*tp_richcompare*/
+  0,                          /*tp_weaklistoffset*/
+  0,                          /*tp_iter*/
+  0,                          /*tp_iternext*/
+  0,                          /*tp_methods*/
+  0,                          /*tp_members*/
+  0,                          /*tp_getset*/
+  0,                          /*tp_base*/
+  0,                          /*tp_dict*/
+  0,                          /*tp_descr_get*/
+  0,                          /*tp_descr_set*/
+  0,                          /*tp_dictoffset*/
+  callbackmcdataarrayint___init__,           /*tp_init*/
+  PyType_GenericAlloc,        /*tp_alloc*/
+  callbackmcdataarrayint___new__,            /*tp_new*/
+  PyObject_GC_Del,            /*tp_free*/
+};
+
+void numarrintdeal2(void *pt, void *obj)
+{
+  void **obj1=(void **)obj;
+  PyCallBackDataArrayInt *cbdaic=reinterpret_cast<PyCallBackDataArrayInt *>(obj1[0]);
+  PyObject *weakRefOnOwner=reinterpret_cast<PyObject *>(obj1[1]);
+  cbdaic->_pt_mc=0;
+  Py_XDECREF(weakRefOnOwner); //tonyy
+  Py_XDECREF(cbdaic); //tonyy
+  delete [] obj1;
+}
+
 #endif
 
 static PyObject *convertMesh(ParaMEDMEM::MEDCouplingMesh *mesh, int owner) throw(INTERP_KERNEL::Exception)
