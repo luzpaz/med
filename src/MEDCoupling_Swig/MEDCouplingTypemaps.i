@@ -24,7 +24,8 @@
 
 void numarrdeal(void *pt, void *wron)
 {
-  PyObject *weakRefOnOwner=reinterpret_cast<PyObject *>(wron);
+  void **wronc=(void **)wron;
+  PyObject *weakRefOnOwner=reinterpret_cast<PyObject *>(wronc[0]);
   PyObject *obj=PyWeakref_GetObject(weakRefOnOwner);
   if(obj!=Py_None)
     {
@@ -35,7 +36,12 @@ void numarrdeal(void *pt, void *wron)
       Py_XDECREF(obj);
     }
   else
-    free(pt);
+    {
+      typedef void (*MyDeallocator)(void *,void *);
+      MyDeallocator deall=(MyDeallocator)wronc[1];
+      deall(pt,NULL);
+    }
+  delete [] wronc;
 }
 
 template<class MCData>
@@ -189,19 +195,25 @@ void numarrdeal2(void *pt, void *obj)
 }
 
 template<class MCData, class T>
-MCData *BuildNewInstance(PyObject *elt0, int npyObjectType, PyTypeObject *pytype)
+MCData *BuildNewInstance(PyObject *elt0, int npyObjectType, PyTypeObject *pytype, const char *msg)
 {
   int ndim=PyArray_NDIM(elt0);
   if(ndim!=1)
     throw INTERP_KERNEL::Exception("Input numpy array has not 1 dimension !");//to do 1 or 2.
   if(PyArray_ObjectType(elt0,0)!=npyObjectType)
-    throw INTERP_KERNEL::Exception("Input numpy array has not of type INT32 !");//to do 1 or 2.
+    {
+      std::ostringstream oss; oss << "Input numpy array has not of type " << msg << " !";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());//to do 1 or 2.
+    }
   npy_intp stride=PyArray_STRIDE(elt0,0);
   int itemSize=PyArray_ITEMSIZE(elt0);
   if(itemSize<stride)
     throw INTERP_KERNEL::Exception("Input numpy array has item size < stride !");
   if(stride!=sizeof(T))
-    throw INTERP_KERNEL::Exception("Input numpy array has not stride set to 4 !");//to do
+    {
+      std::ostringstream oss; oss << "Input numpy array has not stride set to " << sizeof(T) << " !";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
+    }
   npy_intp sz=PyArray_DIM(elt0,0);
   const char *data=PyArray_BYTES(elt0);
   typename ParaMEDMEM::MEDCouplingAutoRefCountObjectPtr<MCData> ret=MCData::New();
@@ -243,13 +255,54 @@ MCData *BuildNewInstance(PyObject *elt0, int npyObjectType, PyTypeObject *pytype
         {
           ret->useArray(reinterpret_cast<const T *>(data),true,ParaMEDMEM::C_DEALLOC,sz,1);
           PyObject *ref=PyWeakref_NewRef(reinterpret_cast<PyObject *>(eltOwning),NULL);
-          mma.setParameterForDeallocator(ref);
+          void **objs=new void *[2]; objs[0]=ref; objs[1]=(void*) ParaMEDMEM::MemArray<T>::CDeallocator;
+          mma.setParameterForDeallocator(objs);
           mma.setSpecificDeallocator(numarrdeal);
         }
     }
   else if(PyArray_ISBEHAVED_RO(elt0))
     ret->useArray(reinterpret_cast<const T *>(data),false,ParaMEDMEM::CPP_DEALLOC,sz,1);
   return ret.retn();
+}
+
+template<class MCData, class T>
+PyObject *ToNumPyArray(MCData *self, int npyObjectType, const char *MCDataStr)
+{
+  if(!self->isAllocated())
+    {
+      std::ostringstream oss; oss << MCDataStr << "::toNumPyArray : this is not allocated !";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
+    }
+  ParaMEDMEM::MemArray<T>& mem=self->accessToMemArray();
+  int nbComp=self->getNumberOfComponents();
+  if(nbComp!=1 && nbComp!=2)
+    {
+      std::ostringstream oss; oss << MCDataStr << "::toNumPyArray : number of components of this is " << nbComp << " ! Should 1 or 2 !"; 
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
+    }
+  std::size_t sz=self->getNbOfElems();
+  npy_intp dim[2];
+  dim[0]=(npy_intp)self->getNumberOfTuples(); dim[1]=2;
+  const T *bg=self->getConstPointer();
+  PyObject *ret=PyArray_SimpleNewFromData(nbComp,dim,npyObjectType,const_cast<T *>(bg));
+  if(mem.isDeallocatorCalled())
+    {
+      if(mem.getDeallocator()!=ParaMEDMEM::MemArray<T>::CDeallocator)
+        {
+          int mask=NPY_OWNDATA; mask=~mask;
+          (reinterpret_cast<PyArrayObject *>(ret))->flags&=mask;
+          return ret;
+        }
+      else
+        {
+          PyObject *ref=PyWeakref_NewRef(ret,NULL);
+          void **objs=new void *[2]; objs[0]=ref; objs[1]=(void*) ParaMEDMEM::MemArray<T>::CDeallocator;
+          mem.setParameterForDeallocator(objs);
+          mem.setSpecificDeallocator(numarrdeal);
+          return ret;
+        }
+    }
+  return ret;
 }
 
 #endif

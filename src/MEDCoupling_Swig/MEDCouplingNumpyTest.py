@@ -297,7 +297,56 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         self.assertTrue(a.flags["OWNDATA"])
         self.assertTrue(d.isEqual(DataArrayDouble([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]),1e-14))
         self.assertEqual(a.tolist(),[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19])
-        pass 
+        pass
+
+    @unittest.skipUnless(MEDCouplingHasNumpyBindings(),"requires numpy")
+    def test17(self):
+        d=DataArrayInt.Range(0,20,1)
+        d.rearrange(10)
+        self.assertRaises(InterpKernelException,d.toNumPyArray)# forbidden one or two components of d is accepted
+        d.rearrange(1)
+        a=d.toNumPyArray()
+        self.assertTrue(not a.flags["OWNDATA"])
+        a[-2:]=100
+        self.assertTrue(d.isEqual(DataArrayInt([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,100,100])))
+        self.assertEqual(a.tolist(),[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,100,100])
+        del a
+        self.assertTrue(d.isEqual(DataArrayInt([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,100,100])))
+        #
+        d.rearrange(2)
+        a=d.toNumPyArray()
+        self.assertTrue(not a.flags["OWNDATA"])
+        a[-2:]=200
+        self.assertTrue(d.isEqual(DataArrayInt([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,200,200,200,200],10,2)))
+        self.assertEqual(a.tolist(),[[0,1],[2,3],[4,5],[6,7],[8,9],[10,11],[12,13],[14,15],[200,200],[200,200]])
+        del a
+        self.assertTrue(d.isEqual(DataArrayInt([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,200,200,200,200],10,2)))
+        pass
+
+    @unittest.skipUnless(MEDCouplingHasNumpyBindings(),"requires numpy")
+    def test18(self):
+        d=DataArrayInt.Range(0,20,1)
+        d=d.convertToDblArr()
+        d.rearrange(10)
+        self.assertRaises(InterpKernelException,d.toNumPyArray)# forbidden one or two components of d is accepted
+        d.rearrange(1)
+        a=d.toNumPyArray()
+        self.assertTrue(not a.flags["OWNDATA"])
+        a[-2:]=100
+        self.assertTrue(d.isEqual(DataArrayDouble([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,100,100]),1e-14))
+        self.assertEqual(a.tolist(),[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,100,100])
+        del a
+        self.assertTrue(d.isEqual(DataArrayDouble([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,100,100]),1e-14))
+        #
+        d.rearrange(2)
+        a=d.toNumPyArray()
+        self.assertTrue(not a.flags["OWNDATA"])
+        a[-2:]=200
+        self.assertTrue(d.isEqual(DataArrayDouble([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,200,200,200,200],10,2),1e-14))
+        self.assertEqual(a.tolist(),[[0,1],[2,3],[4,5],[6,7],[8,9],[10,11],[12,13],[14,15],[200,200],[200,200]])
+        del a
+        self.assertTrue(d.isEqual(DataArrayDouble([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,200,200,200,200],10,2),1e-14))
+        pass
 
     def setUp(self):
         pass
