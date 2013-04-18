@@ -520,11 +520,14 @@ void MEDCouplingUMesh::checkDeepEquivalWith(const MEDCouplingMesh *other, int ce
   
   //
   da=m->zipConnectivityTraducer(cellCompPol);
-  int maxId=*std::max_element(da->getConstPointer(),da->getConstPointer()+getNumberOfCells());
-  pt=std::find_if(da->getConstPointer()+getNumberOfCells(),da->getConstPointer()+da->getNbOfElems(),std::bind2nd(std::greater<int>(),maxId));
+  int nbCells=getNumberOfCells();
+  int maxId=-1;
+  if(nbCells!=0)
+    maxId=*std::max_element(da->getConstPointer(),da->getConstPointer()+nbCells);
+  pt=std::find_if(da->getConstPointer()+nbCells,da->getConstPointer()+da->getNbOfElems(),std::bind2nd(std::greater<int>(),maxId));
   if(pt!=da->getConstPointer()+da->getNbOfElems())
     throw INTERP_KERNEL::Exception("checkDeepEquivalWith : some cells in other are not in this !");
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> cellCor2=da->selectByTupleId2(getNumberOfCells(),da->getNbOfElems(),1);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> cellCor2=da->selectByTupleId2(nbCells,da->getNbOfElems(),1);
   nodeCor=nodeCor2->isIdentity()?0:nodeCor2.retn();
   cellCor=cellCor2->isIdentity()?0:cellCor2.retn();
 }
