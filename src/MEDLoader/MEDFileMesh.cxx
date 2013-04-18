@@ -1830,7 +1830,7 @@ int MEDFileUMesh::getMaxFamilyIdInArrays() const throw(INTERP_KERNEL::Exception)
           const DataArrayInt *da=(*it)->getFamilyField();
           if(da)
             {
-              int val=_fam_coords->getMaxValue(tmp);
+              int val=da->getMaxValue(tmp);
               ret=std::max(ret,val);
             }
         }
@@ -1853,7 +1853,7 @@ int MEDFileUMesh::getMinFamilyIdInArrays() const throw(INTERP_KERNEL::Exception)
           const DataArrayInt *da=(*it)->getFamilyField();
           if(da)
             {
-              int val=_fam_coords->getMinValue(tmp);
+              int val=da->getMinValue(tmp);
               ret=std::min(ret,val);
             }
         }
