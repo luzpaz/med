@@ -34,7 +34,7 @@ using namespace ParaMEDMEM;
 
 const char MEDFileMesh::DFT_FAM_NAME[]="FAMILLE_ZERO";
 
-MEDFileMesh::MEDFileMesh():_order(-1),_iteration(-1),_time(0.)
+MEDFileMesh::MEDFileMesh():_order(-1),_iteration(-1),_time(0.),_univ_wr_status(true)
 {
 }
 
@@ -84,7 +84,7 @@ MEDFileMesh *MEDFileMesh::New(const char *fileName) throw(INTERP_KERNEL::Excepti
       {
         MEDCouplingAutoRefCountObjectPtr<MEDFileCurveLinearMesh> ret=MEDFileCurveLinearMesh::New();
         ret->loadCLMeshFromFile(fid,ms.front().c_str(),dt,it);
-        return (MEDFileCMesh *)ret.retn();
+        return (MEDFileCurveLinearMesh *)ret.retn();
       }
     default:
       {
@@ -115,6 +115,12 @@ MEDFileMesh *MEDFileMesh::New(const char *fileName, const char *mName, int dt, i
         MEDCouplingAutoRefCountObjectPtr<MEDFileCMesh> ret=MEDFileCMesh::New();
         ret->loadCMeshFromFile(fid,mName,dt,it);
         return (MEDFileCMesh *)ret.retn();
+      }
+    case CURVE_LINEAR:
+      {
+        MEDCouplingAutoRefCountObjectPtr<MEDFileCurveLinearMesh> ret=MEDFileCurveLinearMesh::New();
+        ret->loadCLMeshFromFile(fid,mName,dt,it);
+        return (MEDFileCurveLinearMesh *)ret.retn();
       }
     default:
       {
@@ -169,11 +175,7 @@ bool MEDFileMesh::isEqual(const MEDFileMesh *other, double eps, std::string& wha
       what="Names differ !";
       return false;
     }
-  if(_univ_name!=other->_univ_name)
-    {
-      what="Univ names differ !";
-      return false;
-    }
+  //univ_name has been ignored -> not a bug because it is a mutable attribute
   if(_desc_name!=other->_desc_name)
     {
       what="Description names differ !";
@@ -1640,6 +1642,7 @@ void MEDFileUMesh::loadUMeshFromFile(med_idt fid, const char *mName, int dt, int
   //
   setName(loaderl2.getName());
   setDescription(loaderl2.getDescription());
+  setUnivName(loaderl2.getUnivName());
   setIteration(loaderl2.getIteration());
   setOrder(loaderl2.getOrder());
   setTimeValue(loaderl2.getTime());
@@ -1675,6 +1678,7 @@ void MEDFileUMesh::writeLL(med_idt fid) const throw(INTERP_KERNEL::Exception)
       MEDLoaderBase::safeStrCpy2(u.c_str(),MED_SNAME_SIZE-1,unit+i*MED_SNAME_SIZE,_too_long_str);//MED_TAILLE_PNOM-1 to avoid to write '\0' on next compo
     }
   MEDmeshCr(fid,maa,spaceDim,mdim,MED_UNSTRUCTURED_MESH,desc,"",MED_SORT_DTIT,MED_CARTESIAN,comp,unit);
+  MEDmeshUniversalNameWr(fid,maa);
   MEDFileUMeshL2::WriteCoords(fid,maa,_iteration,_order,_time,_coords,_fam_coords,_num_coords,_name_coords);
   for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileUMeshSplitL1> >::const_iterator it=_ms.begin();it!=_ms.end();it++)
     if((const MEDFileUMeshSplitL1 *)(*it)!=0)
@@ -3287,6 +3291,7 @@ void MEDFileStructuredMesh::loadStrMeshFromFile(MEDFileStrMeshL2 *strm, med_idt 
 {
   setName(strm->getName());
   setDescription(strm->getDescription());
+  setUnivName(strm->getUnivName());
   setIteration(strm->getIteration());
   setOrder(strm->getOrder());
   setTimeValue(strm->getTime());
@@ -3558,6 +3563,7 @@ void MEDFileCMesh::writeLL(med_idt fid) const throw(INTERP_KERNEL::Exception)
       MEDLoaderBase::safeStrCpy2(u.c_str(),MED_SNAME_SIZE-1,unit+i*MED_SNAME_SIZE,_too_long_str);//MED_TAILLE_PNOM-1 to avoid to write '\0' on next compo
     }
   MEDmeshCr(fid,maa,spaceDim,meshDim,MED_STRUCTURED_MESH,desc,dtunit,MED_SORT_DTIT,MED_CARTESIAN,comp,unit);
+  MEDmeshUniversalNameWr(fid,maa);
   MEDmeshGridTypeWr(fid,maa,MED_CARTESIAN_GRID);
   for(int i=0;i<spaceDim;i++)
     {
@@ -3754,6 +3760,7 @@ void MEDFileCurveLinearMesh::writeLL(med_idt fid) const throw(INTERP_KERNEL::Exc
       MEDLoaderBase::safeStrCpy2(u.c_str(),MED_SNAME_SIZE-1,unit+i*MED_SNAME_SIZE,_too_long_str);//MED_TAILLE_PNOM-1 to avoid to write '\0' on next compo
     }
   MEDmeshCr(fid,maa,spaceDim,meshDim,MED_STRUCTURED_MESH,desc,dtunit,MED_SORT_DTIT,MED_CARTESIAN,comp,unit);
+  MEDmeshUniversalNameWr(fid,maa);
   MEDmeshGridTypeWr(fid,maa,MED_CURVILINEAR_GRID);
   std::vector<int> nodeGridSt=_clmesh->getNodeGridStructure();
   MEDmeshGridStructWr(fid,maa,_iteration,_order,_time,&nodeGridSt[0]);

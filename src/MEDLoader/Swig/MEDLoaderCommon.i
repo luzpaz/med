@@ -368,8 +368,9 @@ namespace ParaMEDMEM
     virtual void clearNonDiscrAttributes() const;
     void setName(const char *name);
     const char *getName();
-    void setUnivName(const char *name);
     const char *getUnivName() const;
+    bool getUnivNameWrStatus() const;
+    void setUnivNameWrStatus(bool newStatus);
     void setDescription(const char *name);
     const char *getDescription() const;
     void setOrder(int order);
