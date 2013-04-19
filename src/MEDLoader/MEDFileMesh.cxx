@@ -1356,6 +1356,8 @@ int MEDFileMesh::PutInThirdComponentOfCodeOffset(std::vector<int>& code, int str
  */
 void MEDFileMesh::dealWithTinyInfo(const MEDCouplingMesh *m) throw(INTERP_KERNEL::Exception)
 {
+  if(!m)
+    throw INTERP_KERNEL::Exception("MEDFileMesh::dealWithTinyInfo : input mesh in NULL !");
   if(_name.empty())
     _name=m->getName();
   else
