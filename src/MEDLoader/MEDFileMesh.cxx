@@ -2593,11 +2593,6 @@ void MEDFileUMesh::removeMeshAtLevel(int meshDimRelToMax) throw(INTERP_KERNEL::E
 
 void MEDFileUMesh::setMeshAtLevel(int meshDimRelToMax, MEDCouplingUMesh *m, bool newOrOld) throw(INTERP_KERNEL::Exception)
 {
-  setMeshAtLevelGen(meshDimRelToMax,m,newOrOld);
-}
-
-void MEDFileUMesh::setMeshAtLevelGen(int meshDimRelToMax, MEDCouplingUMesh *m, bool newOrOld) throw(INTERP_KERNEL::Exception)
-{
   dealWithTinyInfo(m);
   std::vector<int> levSet=getNonEmptyLevels();
   if(std::find(levSet.begin(),levSet.end(),meshDimRelToMax)==levSet.end())
