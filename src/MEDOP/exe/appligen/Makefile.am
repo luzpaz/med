@@ -23,16 +23,18 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 appligenbindir = $(bindir)/@MODULE_NAME@/appligen
 
-appligenbin_DATA= \
-	envappli.sh \
-	config_appli.xml       \
+dist_appligenbin_DATA= \
 	appli-splashscreen.jpg \
 	SalomeApp.xml
 
-appligenbin_SCRIPTS=\
+nodist_appligenbin_DATA= \
+	envappli.sh \
+	config_appli.xml
+
+nodist_appligenbin_SCRIPTS=\
 	appligen.sh
 
-EXTRA_DIST += $(appligenbin_DATA) $(appligenbin_SCRIPTS) genenv.sh README.txt
+EXTRA_DIST += genenv.sh README.txt
 
 config_appli.xml: config_appli_model.xml
 	cat $< | sed \
@@ -49,6 +51,4 @@ config_appli.xml: config_appli_model.xml
 envappli.sh:
 	$(srcdir)/genenv.sh envappli.sh
 
-
-mostlyclean-local:
-	rm -f @builddir@/config_appli.xml @builddir@/envappli.sh
+CLEANFILES = config_appli.xml envappli.sh
