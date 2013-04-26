@@ -624,7 +624,7 @@ class MEDLoaderDataForTest:
             f22Tmp.setArray(arr)
             f22Tmp.checkCoherency()
             f22Tmp.setName(f2Name)
-            f2.appendFieldNoProfileSBT(f22Tmp)
+            f2[it,order].setFieldNoProfileSBT(f22Tmp)
             pass
         fs.pushField(f2)
         # 3rd field - fProfileMultiLevs - The most complex one
@@ -651,7 +651,7 @@ class MEDLoaderDataForTest:
             f32Tmp.setArray(arr)
             f32Tmp.checkCoherency()
             f32Tmp.setName(f3Name)
-            f3.appendFieldProfile(f32Tmp,mm,-1,pfl2)
+            f3[it,order].setFieldProfile(f32Tmp,mm,-1,pfl2)
             pass
         fs.pushField(f3)
         #
