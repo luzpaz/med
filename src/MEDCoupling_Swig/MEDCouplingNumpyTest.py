@@ -106,6 +106,9 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         a[:]=2 # modifying a and d because a and d share the same chunk of data
         self.assertTrue(d.isUniform(2))
         del d # d is destroyed, a retrieves its ownership of its initial chunk of data
+        ##@@ Ensure a pass of the garbage collector so that the de-allocator of d is called 
+        import gc
+        gc.collect()
         self.assertTrue(a.flags["OWNDATA"])
         a[:]=4 # a can be used has usual
         self.assertTrue(DataArrayInt(a).isUniform(4))
@@ -122,6 +125,9 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         self.assertTrue(d.isUniform(6))
         self.assertTrue(e.isUniform(6))
         del a # a destroyed -> d no change because owned and e array is has no more data set
+        ##@@ Ensure a pass of the garbage collector so that the de-allocator of d is called 
+        import gc
+        gc.collect()
         self.assertTrue(d.isUniform(6))
         self.assertTrue(not e.isAllocated())
         pass
@@ -135,6 +141,9 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         e=DataArrayInt(b) # a not owned -> e only an access to chunk of a
         f=DataArrayInt(b) # a not owned -> e only an access to chunk of a
         del d # d removed -> a ownes again data
+        ##@@ Ensure a pass of the garbage collector so that the de-allocator of d is called 
+        import gc
+        gc.collect()
         self.assertTrue(e.isUniform(0))
         e[:]=6
         self.assertTrue(e.isUniform(6))
@@ -143,12 +152,18 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         self.assertEqual(a.tolist(),[[6,6],[6,6],[6,6],[6,6],[6,6],[6,6],[6,6],[6,6],[6,6],[6,6]])
         b[:]=arange(20)
         del b # no impact on e and f because a is the base of a.
+        ##@@ Ensure a pass of the garbage collector so that the de-allocator of d is called
+        gc.collect()
         self.assertTrue(f.isIdentity())
         self.assertTrue(e.isIdentity())
         del a # a destroyed, but as c has its base set to a, a exists -> e and f not allocated
+        ##@@ Ensure a pass of the garbage collector so that the de-allocator of d is called
+        gc.collect()
         self.assertTrue(f.isIdentity())
         self.assertTrue(e.isIdentity())
         del c # c killed -> a killed -> e and d are put into not allocated state
+        ##@@ Ensure a pass of the garbage collector so that the de-allocator of d is called
+        gc.collect()        
         self.assertTrue(not e.isAllocated())
         self.assertTrue(not f.isAllocated())
         pass
@@ -240,6 +255,9 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         a[:]=2 # modifying a and d because a and d share the same chunk of data
         self.assertTrue(d.isUniform(2,1e-14))
         del d # d is destroyed, a retrieves its ownership of its initial chunk of data
+        ##@@ Ensure a pass of the garbage collector so that the de-allocator of d is called
+        import gc
+        gc.collect()
         self.assertTrue(a.flags["OWNDATA"])
         a[:]=4 # a can be used has usual
         self.assertTrue(DataArrayDouble(a).isUniform(4,1e-14))
@@ -256,6 +274,9 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         self.assertTrue(d.isUniform(6,1e-14))
         self.assertTrue(e.isUniform(6,1e-14))
         del a # a destroyed -> d no change because owned and e array is has no more data set
+        ##@@ Ensure a pass of the garbage collector so that the de-allocator of d is called
+        import gc
+        gc.collect()
         self.assertTrue(d.isUniform(6,1e-14))
         self.assertTrue(not e.isAllocated())
         pass
@@ -269,6 +290,9 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         e=DataArrayDouble(b) # a not owned -> e only an access to chunk of a
         f=DataArrayDouble(b) # a not owned -> e only an access to chunk of a
         del d # d removed -> a ownes again data
+        ##@@ Ensure a pass of the garbage collector so that the de-allocator of d is called
+        import gc
+        gc.collect()
         self.assertTrue(e.isUniform(0,1e-14))
         e[:]=6
         self.assertTrue(e.isUniform(6,1e-14))
@@ -277,12 +301,18 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         self.assertEqual(a.tolist(),[[6,6],[6,6],[6,6],[6,6],[6,6],[6,6],[6,6],[6,6],[6,6],[6,6]])
         b[:]=arange(20)
         del b # no impact on e and f because a is the base of a.
+        ##@@ Ensure a pass of the garbage collector so that the de-allocator of d is called
+        gc.collect()
         self.assertTrue(f.isEqual(DataArrayDouble([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]),1e-14))
         self.assertTrue(e.isEqual(DataArrayDouble([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]),1e-14))
         del a # a destroyed, but as c has its base set to a, a exists -> e and f not allocated
+        ##@@ Ensure a pass of the garbage collector so that the de-allocator of d is called
+        gc.collect()
         self.assertTrue(f.isEqual(DataArrayDouble([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]),1e-14))
         self.assertTrue(e.isEqual(DataArrayDouble([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]),1e-14))
         del c # c killed -> a killed -> e and d are put into not allocated state
+        ##@@ Ensure a pass of the garbage collector so that the de-allocator of d is called
+        gc.collect()
         self.assertTrue(not e.isAllocated())
         self.assertTrue(not f.isAllocated())
         pass
@@ -311,6 +341,9 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         self.assertTrue(d.isEqual(DataArrayInt([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,100,100])))
         self.assertEqual(a.tolist(),[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,100,100])
         del a
+        ##@@ Ensure a pass of the garbage collector so that the de-allocator of d is called
+        import gc
+        gc.collect()
         self.assertTrue(d.isEqual(DataArrayInt([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,100,100])))
         #
         d.rearrange(2)
@@ -320,6 +353,8 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         self.assertTrue(d.isEqual(DataArrayInt([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,200,200,200,200],10,2)))
         self.assertEqual(a.tolist(),[[0,1],[2,3],[4,5],[6,7],[8,9],[10,11],[12,13],[14,15],[200,200],[200,200]])
         del a
+        ##@@ Ensure a pass of the garbage collector so that the de-allocator of d is called
+        gc.collect()
         self.assertTrue(d.isEqual(DataArrayInt([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,200,200,200,200],10,2)))
         pass
 
@@ -336,6 +371,9 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         self.assertTrue(d.isEqual(DataArrayDouble([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,100,100]),1e-14))
         self.assertEqual(a.tolist(),[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,100,100])
         del a
+        ##@@ Ensure a pass of the garbage collector so that the de-allocator of d is called
+        import gc
+        gc.collect()
         self.assertTrue(d.isEqual(DataArrayDouble([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,100,100]),1e-14))
         #
         d.rearrange(2)
@@ -345,6 +383,8 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         self.assertTrue(d.isEqual(DataArrayDouble([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,200,200,200,200],10,2),1e-14))
         self.assertEqual(a.tolist(),[[0,1],[2,3],[4,5],[6,7],[8,9],[10,11],[12,13],[14,15],[200,200],[200,200]])
         del a
+        ##@@ Ensure a pass of the garbage collector so that the de-allocator of d is called
+        gc.collect()
         self.assertTrue(d.isEqual(DataArrayDouble([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,200,200,200,200],10,2),1e-14))
         pass
 
