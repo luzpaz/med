@@ -2190,6 +2190,13 @@ class MEDLoaderTest(unittest.TestCase):
         splitOfM1[0].isEqual(DataArrayInt([0,1,2,3,6,8,10,11,12,13]))
         splitOfM1[1].isEqual(DataArrayInt([4,5,7,9,14,15]))
         pass
+
+    def testBugCorrection1(self):
+        fs=MEDFileFields()
+        fs.resize(3)
+        self.assertEqual(fs[0],None)
+        self.assertEqual(3,len(fs))
+        pass
     pass
 
 unittest.main()

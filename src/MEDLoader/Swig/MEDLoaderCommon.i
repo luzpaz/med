@@ -1708,6 +1708,11 @@ namespace ParaMEDMEM
            return self;
          }
 
+         int __len__() const throw(INTERP_KERNEL::Exception)
+         {
+           return self->getNumberOfFields();
+         }
+
          MEDFileFieldsIterator *__iter__() throw(INTERP_KERNEL::Exception)
          {
            return self->iterator();
