@@ -2197,6 +2197,52 @@ class MEDLoaderTest(unittest.TestCase):
         self.assertEqual(fs[0],None)
         self.assertEqual(3,len(fs))
         pass
+
+    def testCompareMEDFilesContainingOnlyFieldsOnCell1(self):
+        f1Name="Pyfile60.med"
+        f2Name="Pyfile61.med"
+        d1=MEDLoaderDataForTest.buildACompleteMEDDataStructureWithFieldsOnCells_1()
+        d1.write(f1Name,2)
+        d2=MEDLoaderDataForTest.buildACompleteMEDDataStructureWithFieldsOnCells_1()
+        d2.write(f2Name,2)
+        # reading and compare
+        d1=MEDFileData(f1Name) ; d2=MEDFileData(f2Name)
+        for mn in d1.getMeshes().getMeshesNames():
+            m1=d1.getMeshes()[mn]
+            m2=d2.getMeshes()[mn]
+            for lev in m1.getNonEmptyLevels():
+                grpsNames=m1.getGroupsOnSpecifiedLev(lev)
+                for grpName in grpsNames:
+                    self.assertTrue(m1.getGroupArr(lev,grpName).isEqual(m2.getGroupArr(lev,grpName))) # compare groups
+                    pass
+                pass
+            pass
+        for fieldn in d1.getFields().getFieldsNames():
+            f1=d1.getFields()[fieldn]
+            f2=d2.getFields()[fieldn]
+            for it,order,tim in f1.getTimeSteps():
+                f1t=f1[it,order]
+                f2t=f2[it,order]
+                if len(f1t.getPflsReallyUsed())!=0:
+                    # profile case
+                    for lev in f1t.getNonEmptyLevels()[1]:
+                        arr1,pfl1=f1t.getFieldWithProfile(ON_CELLS,lev,m1)
+                        arr2,pfl2=f2t.getFieldWithProfile(ON_CELLS,lev,m2)
+                        self.assertTrue(pfl1.isEqual(pfl2))
+                        self.assertTrue(arr1.isEqual(arr2,1e-10))
+                        pass
+                    pass
+                else:
+                    # no profile case
+                    for lev in f1t.getNonEmptyLevels()[1]:
+                        f1mc=f1t.getFieldOnMeshAtLevel(ON_CELLS,lev,m1)
+                        f2mc=f2t.getFieldOnMeshAtLevel(ON_CELLS,lev,m2)
+                        self.assertTrue(f1mc.isEqual(f2mc,1e-10,1e-10))
+                        pass
+                    pass
+                pass
+            pass
+        pass
     pass
 
 unittest.main()
