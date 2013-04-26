@@ -6655,6 +6655,8 @@ MEDFileFieldMultiTS *MEDFileFields::getFieldAtPos(int i) const throw(INTERP_KERN
       throw INTERP_KERNEL::Exception(oss.str().c_str());
     }
   const MEDFileFieldMultiTSWithoutSDA *fmts=_fields[i];
+  if(!fmts)
+    return 0;
   MEDCouplingAutoRefCountObjectPtr<MEDFileFieldMultiTS> ret=MEDFileFieldMultiTS::New(*fmts,false);
   ret->shallowCpyGlobs(*this);
   return ret.retn();
