@@ -873,6 +873,11 @@ namespace ParaMEDMEM
          {
            return self->iterator();
          }
+
+         int __len__() const throw(INTERP_KERNEL::Exception)
+         {
+           return self->getNumberOfMeshes();
+         }
          
          MEDFileMesh *getMeshAtPos(int i) const throw(INTERP_KERNEL::Exception)
            {
@@ -2059,6 +2064,11 @@ namespace ParaMEDMEM
           }
         else
           throw INTERP_KERNEL::Exception("MEDFileParameters::__getitem__ : only integer or string with meshname supported !");
+      }
+
+      int __len__() const throw(INTERP_KERNEL::Exception)
+      {
+        return self->getNumberOfParams();
       }
       
       MEDFileParameterMultiTS *getParamAtPos(int i) const throw(INTERP_KERNEL::Exception)
