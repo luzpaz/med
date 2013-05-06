@@ -40,6 +40,7 @@ void numarrdeal(void *pt, void *wron)
       typedef void (*MyDeallocator)(void *,void *);
       MyDeallocator deall=(MyDeallocator)wronc[1];
       deall(pt,NULL);
+      Py_XDECREF(weakRefOnOwner);
     }
   delete [] wronc;
 }
@@ -275,6 +276,75 @@ MCData *BuildNewInstance(PyObject *elt0, int npyObjectType, PyTypeObject *pytype
   return ret.retn();
 }
 
+
+int NumpyArrSetBaseObjectExt(PyArrayObject *arr, PyObject *obj)
+{
+    if (obj == NULL) {
+        PyErr_SetString(PyExc_ValueError,
+                "Cannot set the NumPy array 'base' "
+                "dependency to NULL after initialization");
+        return -1;
+    }
+    /*
+     * Allow the base to be set only once. Once the object which
+     * owns the data is set, it doesn't make sense to change it.
+     */
+    if (PyArray_BASE(arr) != NULL) {
+        Py_DECREF(obj);
+        PyErr_SetString(PyExc_ValueError,
+                "Cannot set the NumPy array 'base' "
+                "dependency more than once");
+        return -1;
+    }
+
+    /*
+     * Don't allow infinite chains of views, always set the base
+     * to the first owner of the data.  
+     * That is, either the first object which isn't an array, 
+     * or the first object which owns its own data.
+     */
+
+    while (PyArray_Check(obj) && (PyObject *)arr != obj) {
+        PyArrayObject *obj_arr = (PyArrayObject *)obj;
+        PyObject *tmp;
+ 
+
+        /* If this array owns its own data, stop collapsing */
+        if (PyArray_CHKFLAGS(obj_arr, NPY_OWNDATA)) {
+            break;
+        }   
+
+        tmp = PyArray_BASE(obj_arr);
+        /* If there's no base, stop collapsing */
+        if (tmp == NULL) {
+            break;
+        }
+        /* Stop the collapse new base when the would not be of the same 
+         * type (i.e. different subclass).
+         */
+        if (Py_TYPE(tmp) != Py_TYPE(arr)) {
+            break;
+        }
+
+
+        Py_INCREF(tmp);
+        Py_DECREF(obj);
+        obj = tmp;
+    }
+
+    /* Disallow circular references */
+    if ((PyObject *)arr == obj) {
+        Py_DECREF(obj);
+        PyErr_SetString(PyExc_ValueError,
+                "Cannot create a circular NumPy array 'base' dependency");
+        return -1;
+    }
+
+    arr->base = obj;
+
+    return 0;
+}
+
 template<class MCData, class T>
 PyObject *ToNumPyArray(MCData *self, int npyObjectType, const char *MCDataStr)
 {
@@ -297,19 +367,30 @@ PyObject *ToNumPyArray(MCData *self, int npyObjectType, const char *MCDataStr)
   PyObject *ret=PyArray_SimpleNewFromData(nbComp,dim,npyObjectType,const_cast<T *>(bg));
   if(mem.isDeallocatorCalled())
     {
-      if(mem.getDeallocator()!=ParaMEDMEM::MemArray<T>::CDeallocator)
+      if(mem.getDeallocator()!=numarrdeal)
         {
-          int mask=NPY_OWNDATA; mask=~mask;
-          (reinterpret_cast<PyArrayObject *>(ret))->flags&=mask;
+          PyObject *ref=PyWeakref_NewRef(ret,NULL);
+          void **objs=new void *[2]; objs[0]=ref; objs[1]=(void*) mem.getDeallocator();
+          mem.setParameterForDeallocator(objs);
+          mem.setSpecificDeallocator(numarrdeal);
           return ret;
         }
       else
         {
-          PyObject *ref=PyWeakref_NewRef(ret,NULL);
-          void **objs=new void *[2]; objs[0]=ref; objs[1]=(void*) ParaMEDMEM::MemArray<T>::CDeallocator;
-          mem.setParameterForDeallocator(objs);
-          mem.setSpecificDeallocator(numarrdeal);
-          return ret;
+          void **objs=(void **)mem.getParameterForDeallocator();
+          PyObject *weakRefOnOwner=(PyObject *)objs[0];
+          PyObject *obj=PyWeakref_GetObject(weakRefOnOwner);
+          if(obj!=Py_None)
+            {
+              Py_XINCREF(obj);
+              NumpyArrSetBaseObjectExt((PyArrayObject*)ret,obj);
+            }
+          else
+            {
+              Py_XDECREF(weakRefOnOwner);
+              PyObject *ref=PyWeakref_NewRef(ret,NULL);
+              objs[0]=ref;
+            }
         }
     }
   return ret;

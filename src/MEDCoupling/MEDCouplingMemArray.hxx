@@ -91,6 +91,7 @@ namespace ParaMEDMEM
     Deallocator getDeallocator() const { return _dealloc; }
     void setSpecificDeallocator(Deallocator dealloc) { _dealloc=dealloc; }
     void setParameterForDeallocator(void *param) { _param_for_deallocator=param; }
+    void *getParameterForDeallocator() const { return _param_for_deallocator; }
     void destroy();
     ~MemArray() { destroy(); }
   public:

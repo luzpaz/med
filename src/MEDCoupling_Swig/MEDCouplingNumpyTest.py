@@ -441,6 +441,105 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         self.assertRaises(InterpKernelException,DataArrayDouble.New,a,20,1)
         pass
 
+    @unittest.skipUnless(MEDCouplingHasNumpyBindings(),"requires numpy")
+    def test22(self):
+        d=DataArrayDouble(10)
+        d.iota()
+        a=d.toNumPyArray()
+        self.assertTrue(not a.flags["OWNDATA"])
+        del d
+        gc.collect()
+        self.assertTrue(a.flags["OWNDATA"])
+        self.assertEqual(a.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
+        #
+        d=DataArrayInt(10)
+        d.iota()
+        a=d.toNumPyArray()
+        self.assertTrue(not a.flags["OWNDATA"])
+        del d
+        gc.collect()
+        self.assertTrue(a.flags["OWNDATA"])
+        self.assertEqual(a.tolist(),[0,1,2,3,4,5,6,7,8,9])
+        pass
+
+    @unittest.skipUnless(MEDCouplingHasNumpyBindings(),"requires numpy")
+    def test23(self):
+        d=DataArrayDouble(10)
+        d.iota()
+        a=d.toNumPyArray()
+        b=d.toNumPyArray()
+        c=d.toNumPyArray()
+        self.assertTrue(not a.flags["OWNDATA"])
+        self.assertTrue(not b.flags["OWNDATA"])
+        self.assertTrue(not c.flags["OWNDATA"])
+        self.assertEqual(a.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
+        self.assertEqual(b.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
+        self.assertEqual(c.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
+        del d
+        gc.collect()
+        self.assertTrue(a.flags["OWNDATA"])
+        self.assertTrue(not b.flags["OWNDATA"])
+        self.assertTrue(not c.flags["OWNDATA"])
+        self.assertEqual(a.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
+        self.assertEqual(b.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
+        self.assertEqual(c.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
+        #
+        d=DataArrayInt(10)
+        d.iota()
+        a=d.toNumPyArray()
+        b=d.toNumPyArray()
+        c=d.toNumPyArray()
+        self.assertTrue(not a.flags["OWNDATA"])
+        self.assertTrue(not b.flags["OWNDATA"])
+        self.assertTrue(not c.flags["OWNDATA"])
+        self.assertEqual(a.tolist(),[0,1,2,3,4,5,6,7,8,9])
+        self.assertEqual(b.tolist(),[0,1,2,3,4,5,6,7,8,9])
+        self.assertEqual(c.tolist(),[0,1,2,3,4,5,6,7,8,9])
+        del d
+        gc.collect()
+        self.assertTrue(a.flags["OWNDATA"])
+        self.assertTrue(not b.flags["OWNDATA"])
+        self.assertTrue(not c.flags["OWNDATA"])
+        self.assertEqual(a.tolist(),[0,1,2,3,4,5,6,7,8,9])
+        self.assertEqual(b.tolist(),[0,1,2,3,4,5,6,7,8,9])
+        self.assertEqual(c.tolist(),[0,1,2,3,4,5,6,7,8,9])
+        pass
+
+    @unittest.skipUnless(MEDCouplingHasNumpyBindings(),"requires numpy")
+    def test24(self):
+        d=DataArrayDouble(10)
+        d.iota()
+        a=d.toNumPyArray()
+        self.assertEqual(a.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
+        self.assertTrue(not a.flags["OWNDATA"])
+        del a
+        gc.collect()
+        a=d.toNumPyArray()
+        self.assertEqual(a.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
+        self.assertTrue(not a.flags["OWNDATA"])
+        b=d.toNumPyArray()
+        self.assertEqual(a.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
+        self.assertEqual(b.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
+        self.assertTrue(not a.flags["OWNDATA"])
+        self.assertTrue(not b.flags["OWNDATA"])
+        #
+        d=DataArrayInt(10)
+        d.iota()
+        a=d.toNumPyArray()
+        self.assertEqual(a.tolist(),[0,1,2,3,4,5,6,7,8,9])
+        self.assertTrue(not a.flags["OWNDATA"])
+        del a
+        gc.collect()
+        a=d.toNumPyArray()
+        self.assertEqual(a.tolist(),[0,1,2,3,4,5,6,7,8,9])
+        self.assertTrue(not a.flags["OWNDATA"])
+        b=d.toNumPyArray()
+        self.assertEqual(a.tolist(),[0,1,2,3,4,5,6,7,8,9])
+        self.assertEqual(b.tolist(),[0,1,2,3,4,5,6,7,8,9])
+        self.assertTrue(not a.flags["OWNDATA"])
+        self.assertTrue(not b.flags["OWNDATA"])
+        pass
+
     def setUp(self):
         pass
     pass
