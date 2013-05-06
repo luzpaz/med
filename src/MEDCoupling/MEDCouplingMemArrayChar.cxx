@@ -770,7 +770,7 @@ void DataArrayChar::meldWith(const DataArrayChar *other) throw(INTERP_KERNEL::Ex
     throw INTERP_KERNEL::Exception("DataArrayChar::meldWith : mismatch of number of tuples !");
   int nbOfComp1=getNumberOfComponents();
   int nbOfComp2=other->getNumberOfComponents();
-  char *newArr=new char[nbOfTuples*(nbOfComp1+nbOfComp2)];
+  char *newArr=(char *)malloc(nbOfTuples*(nbOfComp1+nbOfComp2)*sizeof(char));
   char *w=newArr;
   const char *inp1=getConstPointer();
   const char *inp2=other->getConstPointer();
@@ -779,7 +779,7 @@ void DataArrayChar::meldWith(const DataArrayChar *other) throw(INTERP_KERNEL::Ex
       w=std::copy(inp1,inp1+nbOfComp1,w);
       w=std::copy(inp2,inp2+nbOfComp2,w);
     }
-  useArray(newArr,true,CPP_DEALLOC,nbOfTuples,nbOfComp1+nbOfComp2);
+  useArray(newArr,true,C_DEALLOC,nbOfTuples,nbOfComp1+nbOfComp2);
   std::vector<int> compIds(nbOfComp2);
   for(int i=0;i<nbOfComp2;i++)
     compIds[i]=nbOfComp1+i;

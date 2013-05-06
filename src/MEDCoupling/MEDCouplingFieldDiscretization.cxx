@@ -511,7 +511,7 @@ void MEDCouplingFieldDiscretizationP0::renumberArraysForCell(const MEDCouplingMe
         (*it)->renumberInPlace(array);
     }
   if(check)
-    delete [] array;
+    free(const_cast<int *>(array));
 }
 
 DataArrayDouble *MEDCouplingFieldDiscretizationP0::getLocalizationOfDiscValues(const MEDCouplingMesh *mesh) const
@@ -1067,7 +1067,7 @@ void MEDCouplingFieldDiscretizationPerCell::renumberCells(const int *old2NewBg, 
   _discr_per_cell=dpc;
   //
   if(check)
-    delete [] const_cast<int *>(array);
+    free(const_cast<int *>(array));
 }
 
 void MEDCouplingFieldDiscretizationPerCell::buildDiscrPerCellIfNecessary(const MEDCouplingMesh *mesh)
@@ -1326,7 +1326,7 @@ void MEDCouplingFieldDiscretizationGauss::renumberArraysForCell(const MEDCouplin
       (*it)->renumberInPlace(array2);
   delete [] array2;
   if(check)
-    delete [] const_cast<int*>(array);
+    free(const_cast<int*>(array));
 }
 
 DataArrayDouble *MEDCouplingFieldDiscretizationGauss::getLocalizationOfDiscValues(const MEDCouplingMesh *mesh) const
@@ -2002,7 +2002,7 @@ void MEDCouplingFieldDiscretizationGaussNE::renumberArraysForCell(const MEDCoupl
       (*it)->renumberInPlace(array2);
   delete [] array2;
   if(check)
-    delete [] const_cast<int *>(array);
+    free(const_cast<int *>(array));
 }
 
 DataArrayDouble *MEDCouplingFieldDiscretizationGaussNE::getLocalizationOfDiscValues(const MEDCouplingMesh *mesh) const

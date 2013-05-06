@@ -1211,7 +1211,7 @@ DataArrayDouble *DataArrayDouble::fromNoInterlace() const throw(INTERP_KERNEL::E
     throw INTERP_KERNEL::Exception("DataArrayDouble::fromNoInterlace : Not defined array !");
   double *tab=_mem.fromNoInterlace(getNumberOfComponents());
   DataArrayDouble *ret=DataArrayDouble::New();
-  ret->useArray(tab,true,CPP_DEALLOC,getNumberOfTuples(),getNumberOfComponents());
+  ret->useArray(tab,true,C_DEALLOC,getNumberOfTuples(),getNumberOfComponents());
   return ret;
 }
 
@@ -1231,7 +1231,7 @@ DataArrayDouble *DataArrayDouble::toNoInterlace() const throw(INTERP_KERNEL::Exc
     throw INTERP_KERNEL::Exception("DataArrayDouble::toNoInterlace : Not defined array !");
   double *tab=_mem.toNoInterlace(getNumberOfComponents());
   DataArrayDouble *ret=DataArrayDouble::New();
-  ret->useArray(tab,true,CPP_DEALLOC,getNumberOfTuples(),getNumberOfComponents());
+  ret->useArray(tab,true,C_DEALLOC,getNumberOfTuples(),getNumberOfComponents());
   return ret;
 }
 
@@ -1713,7 +1713,7 @@ void DataArrayDouble::meldWith(const DataArrayDouble *other) throw(INTERP_KERNEL
     throw INTERP_KERNEL::Exception("DataArrayDouble::meldWith : mismatch of number of tuples !");
   int nbOfComp1=getNumberOfComponents();
   int nbOfComp2=other->getNumberOfComponents();
-  double *newArr=new double[nbOfTuples*(nbOfComp1+nbOfComp2)];
+  double *newArr=(double *)malloc((nbOfTuples*(nbOfComp1+nbOfComp2))*sizeof(double));
   double *w=newArr;
   const double *inp1=getConstPointer();
   const double *inp2=other->getConstPointer();
@@ -1722,7 +1722,7 @@ void DataArrayDouble::meldWith(const DataArrayDouble *other) throw(INTERP_KERNEL
       w=std::copy(inp1,inp1+nbOfComp1,w);
       w=std::copy(inp2,inp2+nbOfComp2,w);
     }
-  useArray(newArr,true,CPP_DEALLOC,nbOfTuples,nbOfComp1+nbOfComp2);
+  useArray(newArr,true,C_DEALLOC,nbOfTuples,nbOfComp1+nbOfComp2);
   std::vector<int> compIds(nbOfComp2);
   for(int i=0;i<nbOfComp2;i++)
     compIds[i]=nbOfComp1+i;
@@ -6168,7 +6168,7 @@ DataArrayInt *DataArrayInt::fromNoInterlace() const throw(INTERP_KERNEL::Excepti
     throw INTERP_KERNEL::Exception("DataArrayInt::fromNoInterlace : Not defined array !");
   int *tab=_mem.fromNoInterlace(getNumberOfComponents());
   DataArrayInt *ret=DataArrayInt::New();
-  ret->useArray(tab,true,CPP_DEALLOC,getNumberOfTuples(),getNumberOfComponents());
+  ret->useArray(tab,true,C_DEALLOC,getNumberOfTuples(),getNumberOfComponents());
   return ret;
 }
 
@@ -6189,7 +6189,7 @@ DataArrayInt *DataArrayInt::toNoInterlace() const throw(INTERP_KERNEL::Exception
     throw INTERP_KERNEL::Exception("DataArrayInt::toNoInterlace : Not defined array !");
   int *tab=_mem.toNoInterlace(getNumberOfComponents());
   DataArrayInt *ret=DataArrayInt::New();
-  ret->useArray(tab,true,CPP_DEALLOC,getNumberOfTuples(),getNumberOfComponents());
+  ret->useArray(tab,true,C_DEALLOC,getNumberOfTuples(),getNumberOfComponents());
   return ret;
 }
 
@@ -6515,7 +6515,7 @@ DataArrayInt *DataArrayInt::checkAndPreparePermutation() const throw(INTERP_KERN
   const int *pt=getConstPointer();
   int *pt2=CheckAndPreparePermutation(pt,pt+nbTuples);
   DataArrayInt *ret=DataArrayInt::New();
-  ret->useArray(pt2,true,CPP_DEALLOC,nbTuples,1);
+  ret->useArray(pt2,true,C_DEALLOC,nbTuples,1);
   return ret;
 }
 
@@ -6960,7 +6960,7 @@ void DataArrayInt::meldWith(const DataArrayInt *other) throw(INTERP_KERNEL::Exce
     throw INTERP_KERNEL::Exception("DataArrayInt::meldWith : mismatch of number of tuples !");
   int nbOfComp1=getNumberOfComponents();
   int nbOfComp2=other->getNumberOfComponents();
-  int *newArr=new int[nbOfTuples*(nbOfComp1+nbOfComp2)];
+  int *newArr=(int *)malloc(nbOfTuples*(nbOfComp1+nbOfComp2)*sizeof(int));
   int *w=newArr;
   const int *inp1=getConstPointer();
   const int *inp2=other->getConstPointer();
@@ -6969,7 +6969,7 @@ void DataArrayInt::meldWith(const DataArrayInt *other) throw(INTERP_KERNEL::Exce
       w=std::copy(inp1,inp1+nbOfComp1,w);
       w=std::copy(inp2,inp2+nbOfComp2,w);
     }
-  useArray(newArr,true,CPP_DEALLOC,nbOfTuples,nbOfComp1+nbOfComp2);
+  useArray(newArr,true,C_DEALLOC,nbOfTuples,nbOfComp1+nbOfComp2);
   std::vector<int> compIds(nbOfComp2);
   for(int i=0;i<nbOfComp2;i++)
     compIds[i]=nbOfComp1+i;
@@ -8864,14 +8864,14 @@ void DataArrayInt::computeOffsets2() throw(INTERP_KERNEL::Exception)
   if(getNumberOfComponents()!=1)
     throw INTERP_KERNEL::Exception("DataArrayInt::computeOffsets2 : only single component allowed !");
   int nbOfTuples=getNumberOfTuples();
-  int *ret=new int[nbOfTuples+1];
+  int *ret=(int *)malloc((nbOfTuples+1)*sizeof(int));
   if(nbOfTuples==0)
     return ;
   const int *work=getConstPointer();
   ret[0]=0;
   for(int i=0;i<nbOfTuples;i++)
     ret[i+1]=work[i]+ret[i];
-  useArray(ret,true,CPP_DEALLOC,nbOfTuples+1,1);
+  useArray(ret,true,C_DEALLOC,nbOfTuples+1,1);
   declareAsNew();
 }
 
@@ -10016,14 +10016,14 @@ void DataArrayInt::powEqual(const DataArrayInt *other) throw(INTERP_KERNEL::Exce
 int *DataArrayInt::CheckAndPreparePermutation(const int *start, const int *end)
 {
   std::size_t sz=std::distance(start,end);
-  int *ret=new int[sz];
+  int *ret=(int *)malloc(sz*sizeof(int));
   int *work=new int[sz];
   std::copy(start,end,work);
   std::sort(work,work+sz);
   if(std::unique(work,work+sz)!=work+sz)
     {
       delete [] work;
-      delete [] ret;
+      free(ret);
       throw INTERP_KERNEL::Exception("Some elements are equals in the specified array !");
     }
   int *iter2=ret;

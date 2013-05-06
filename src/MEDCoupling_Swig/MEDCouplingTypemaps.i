@@ -824,7 +824,7 @@ static double *convertPyToNewDblArr2(PyObject *pyLi, int *size) throw(INTERP_KER
   if(PyList_Check(pyLi))
     {
       *size=PyList_Size(pyLi);
-      double *tmp=new double[*size];
+      double *tmp=(double *)malloc((*size)*sizeof(double));
       for(int i=0;i<*size;i++)
         {
           PyObject *o=PyList_GetItem(pyLi,i);
@@ -841,7 +841,7 @@ static double *convertPyToNewDblArr2(PyObject *pyLi, int *size) throw(INTERP_KER
             }
           else
             {
-              delete [] tmp;
+              free(tmp);
               throw INTERP_KERNEL::Exception("convertPyToNewDblArr2 : list must contain floats/integers only");
             }
         }
@@ -850,7 +850,7 @@ static double *convertPyToNewDblArr2(PyObject *pyLi, int *size) throw(INTERP_KER
   else if(PyTuple_Check(pyLi))
     {
       *size=PyTuple_Size(pyLi);
-      double *tmp=new double[*size];
+      double *tmp=(double *)malloc((*size)*sizeof(double));
       for(int i=0;i<*size;i++)
         {
           PyObject *o=PyTuple_GetItem(pyLi,i);
@@ -867,7 +867,7 @@ static double *convertPyToNewDblArr2(PyObject *pyLi, int *size) throw(INTERP_KER
             }
           else
             {
-              delete [] tmp;
+              free(tmp);
               throw INTERP_KERNEL::Exception("convertPyToNewDblArr2 : tuple must contain floats/integers only");
             }
         }

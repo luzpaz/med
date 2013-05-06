@@ -653,7 +653,7 @@ namespace ParaMEDMEM
            if (!SWIG_IsOK(res1))
              {
                int size;
-               INTERP_KERNEL::AutoPtr<double> tmp=convertPyToNewDblArr2(p,&size);
+               INTERP_KERNEL::AutoCPtr<double> tmp=convertPyToNewDblArr2(p,&size);
                int nbOfPoints=size/spaceDim;
                if(size%spaceDim!=0)
                  {
@@ -1246,8 +1246,8 @@ namespace ParaMEDMEM
            static void Rotate2DAlg(PyObject *center, double angle, int nbNodes, PyObject *coords) throw(INTERP_KERNEL::Exception)
            {
              int sz;
-             INTERP_KERNEL::AutoPtr<double> c=convertPyToNewDblArr2(center,&sz);
-             INTERP_KERNEL::AutoPtr<double> coo=convertPyToNewDblArr2(coords,&sz);
+             INTERP_KERNEL::AutoCPtr<double> c=convertPyToNewDblArr2(center,&sz);
+             INTERP_KERNEL::AutoCPtr<double> coo=convertPyToNewDblArr2(coords,&sz);
              ParaMEDMEM::MEDCouplingPointSet::Rotate2DAlg(c,angle,nbNodes,coo);
              for(int i=0;i<sz;i++)
                PyList_SetItem(coords,i,PyFloat_FromDouble(coo[i]));
@@ -1256,7 +1256,7 @@ namespace ParaMEDMEM
            static void Rotate2DAlg(PyObject *center, double angle, PyObject *coords) throw(INTERP_KERNEL::Exception)
            {
              int sz;
-             INTERP_KERNEL::AutoPtr<double> c=convertPyToNewDblArr2(center,&sz);
+             INTERP_KERNEL::AutoCPtr<double> c=convertPyToNewDblArr2(center,&sz);
              int sw,nbNodes=0;
              double val0;  ParaMEDMEM::DataArrayDouble *val1=0; ParaMEDMEM::DataArrayDoubleTuple *val2=0;
              std::vector<double> val3;
@@ -1270,9 +1270,9 @@ namespace ParaMEDMEM
            static void Rotate3DAlg(PyObject *center, PyObject *vect, double angle, int nbNodes, PyObject *coords) throw(INTERP_KERNEL::Exception)
            {
              int sz,sz2;
-             INTERP_KERNEL::AutoPtr<double> c=convertPyToNewDblArr2(center,&sz);
-             INTERP_KERNEL::AutoPtr<double> coo=convertPyToNewDblArr2(coords,&sz);
-             INTERP_KERNEL::AutoPtr<double> v=convertPyToNewDblArr2(vect,&sz2);
+             INTERP_KERNEL::AutoCPtr<double> c=convertPyToNewDblArr2(center,&sz);
+             INTERP_KERNEL::AutoCPtr<double> coo=convertPyToNewDblArr2(coords,&sz);
+             INTERP_KERNEL::AutoCPtr<double> v=convertPyToNewDblArr2(vect,&sz2);
              ParaMEDMEM::MEDCouplingPointSet::Rotate3DAlg(c,v,angle,nbNodes,coo);
              for(int i=0;i<sz;i++)
                PyList_SetItem(coords,i,PyFloat_FromDouble(coo[i]));
@@ -1281,7 +1281,7 @@ namespace ParaMEDMEM
            static void Rotate3DAlg(PyObject *center, PyObject *vect, double angle, PyObject *coords) throw(INTERP_KERNEL::Exception)
            {
              int sz,sz2;
-             INTERP_KERNEL::AutoPtr<double> c=convertPyToNewDblArr2(center,&sz);
+             INTERP_KERNEL::AutoCPtr<double> c=convertPyToNewDblArr2(center,&sz);
              int sw,nbNodes=0;
              double val0;  ParaMEDMEM::DataArrayDouble *val1=0; ParaMEDMEM::DataArrayDoubleTuple *val2=0;
              std::vector<double> val3;
@@ -1289,7 +1289,7 @@ namespace ParaMEDMEM
                                                             "Rotate3DAlg",3,true,nbNodes);
              if(sw!=2 && sw!=3)
                throw INTERP_KERNEL::Exception("Invalid call to MEDCouplingPointSet::Rotate3DAlg : try another overload method !");
-             INTERP_KERNEL::AutoPtr<double> v=convertPyToNewDblArr2(vect,&sz2);
+             INTERP_KERNEL::AutoCPtr<double> v=convertPyToNewDblArr2(vect,&sz2);
              ParaMEDMEM::MEDCouplingPointSet::Rotate3DAlg(c,v,angle,nbNodes,const_cast<double *>(coo));
            }
          }
@@ -3122,7 +3122,7 @@ namespace ParaMEDMEM
         if (!SWIG_IsOK(res1))
           {
             int size;
-            INTERP_KERNEL::AutoPtr<double> tmp=convertPyToNewDblArr2(li,&size);
+            INTERP_KERNEL::AutoCPtr<double> tmp=convertPyToNewDblArr2(li,&size);
             const MEDCouplingMesh *mesh=self->getMesh();
             if(!mesh)
               throw INTERP_KERNEL::Exception("Python wrap MEDCouplingFieldDouble::getValueOnMulti : lying on a null mesh !");
@@ -3174,18 +3174,16 @@ namespace ParaMEDMEM
         return convertDblArrToPyList(res,sz);
       }
 
-      void setValues(PyObject *li) throw(INTERP_KERNEL::Exception)
+      void setValues(PyObject *li, PyObject *nbOfTuples=0, PyObject *nbOfComp=0) throw(INTERP_KERNEL::Exception)
       {
         if(self->getArray()!=0)
-          {
-            int sz;
-            double *tmp=convertPyToNewDblArr2(li,&sz);
-            int nbTuples=self->getArray()->getNumberOfTuples();
-            int nbOfCompo=self->getArray()->getNumberOfComponents();
-            self->getArray()->useArray(tmp,true,CPP_DEALLOC,nbTuples,nbOfCompo);
-          }
+          ParaMEDMEM_DataArrayDouble_setValues__SWIG_0(self->getArray(),li,nbOfTuples,nbOfComp);
         else
-          throw INTERP_KERNEL::Exception("setValuesCpy : field must contain an array behind");
+          {
+            MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> arr=DataArrayDouble::New();
+            ParaMEDMEM_DataArrayDouble_setValues__SWIG_0(arr,li,nbOfTuples,nbOfComp);
+            self->setArray(arr);
+          }
       }
       
       PyObject *getTime() throw(INTERP_KERNEL::Exception)
