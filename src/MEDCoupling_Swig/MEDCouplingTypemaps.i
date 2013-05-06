@@ -198,23 +198,33 @@ template<class MCData, class T>
 MCData *BuildNewInstance(PyObject *elt0, int npyObjectType, PyTypeObject *pytype, const char *msg)
 {
   int ndim=PyArray_NDIM(elt0);
-  if(ndim!=1)
-    throw INTERP_KERNEL::Exception("Input numpy array has not 1 dimension !");//to do 1 or 2.
+  if(ndim!=1 && ndim!=2)
+    throw INTERP_KERNEL::Exception("Input numpy array should have dimension equal to 1 or 2 !");
   if(PyArray_ObjectType(elt0,0)!=npyObjectType)
     {
-      std::ostringstream oss; oss << "Input numpy array has not of type " << msg << " !";
-      throw INTERP_KERNEL::Exception(oss.str().c_str());//to do 1 or 2.
-    }
-  npy_intp stride=PyArray_STRIDE(elt0,0);
-  int itemSize=PyArray_ITEMSIZE(elt0);
-  if(itemSize<stride)
-    throw INTERP_KERNEL::Exception("Input numpy array has item size < stride !");
-  if(stride!=sizeof(T))
-    {
-      std::ostringstream oss; oss << "Input numpy array has not stride set to " << sizeof(T) << " !";
+      std::ostringstream oss; oss << "Input numpy array has not of type " << msg << " at component #0 !";
       throw INTERP_KERNEL::Exception(oss.str().c_str());
     }
-  npy_intp sz=PyArray_DIM(elt0,0);
+  if(ndim==2)
+    if(PyArray_ObjectType(elt0,1)!=npyObjectType)
+      {
+        std::ostringstream oss; oss << "Input numpy array has not of type " << msg << " at component #1 !";
+        throw INTERP_KERNEL::Exception(oss.str().c_str());
+      }
+  npy_intp sz0=PyArray_DIM(elt0,0);
+  npy_intp sz1=ndim==2?PyArray_DIM(elt0,1):1;
+  //
+  int itemSize=PyArray_ITEMSIZE(elt0);
+  if(itemSize!=sizeof(T))
+    {
+      std::ostringstream oss; oss << "Input numpy array has not itemSize set to " << sizeof(T) << " !";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
+    }
+  if(itemSize*sz1!=PyArray_STRIDE(elt0,0))
+    throw INTERP_KERNEL::Exception("Input numpy array has stride that mismatches the item size ! Data are not packed in the right way for DataArrays !");
+  if(ndim==2)
+    if(itemSize!=PyArray_STRIDE(elt0,1))
+      throw INTERP_KERNEL::Exception("Input numpy array has stride that mismatches the item size ! Data are not packed in the right way for DataArrays for component #1 !");
   const char *data=PyArray_BYTES(elt0);
   typename ParaMEDMEM::MEDCouplingAutoRefCountObjectPtr<MCData> ret=MCData::New();
   if(PyArray_ISBEHAVED(elt0))//aligned and writeable and in machine byte-order
@@ -244,7 +254,7 @@ MCData *BuildNewInstance(PyObject *elt0, int npyObjectType, PyTypeObject *pytype
         {
           PyCallBackDataArraySt<MCData> *cb=PyObject_GC_New(PyCallBackDataArraySt<MCData>,pytype);
           cb->_pt_mc=ret;
-          ret->useArray(reinterpret_cast<const T *>(data),true,ParaMEDMEM::C_DEALLOC,sz,1);
+          ret->useArray(reinterpret_cast<const T *>(data),true,ParaMEDMEM::C_DEALLOC,sz0,sz1);
           PyObject *ref=PyWeakref_NewRef(deepestObj,(PyObject *)cb);
           void **objs=new void *[2]; objs[0]=cb; objs[1]=ref;
           mma.setParameterForDeallocator(objs);
@@ -253,7 +263,7 @@ MCData *BuildNewInstance(PyObject *elt0, int npyObjectType, PyTypeObject *pytype
         }
       else
         {
-          ret->useArray(reinterpret_cast<const T *>(data),true,ParaMEDMEM::C_DEALLOC,sz,1);
+          ret->useArray(reinterpret_cast<const T *>(data),true,ParaMEDMEM::C_DEALLOC,sz0,sz1);
           PyObject *ref=PyWeakref_NewRef(reinterpret_cast<PyObject *>(eltOwning),NULL);
           void **objs=new void *[2]; objs[0]=ref; objs[1]=(void*) ParaMEDMEM::MemArray<T>::CDeallocator;
           mma.setParameterForDeallocator(objs);
@@ -261,7 +271,7 @@ MCData *BuildNewInstance(PyObject *elt0, int npyObjectType, PyTypeObject *pytype
         }
     }
   else if(PyArray_ISBEHAVED_RO(elt0))
-    ret->useArray(reinterpret_cast<const T *>(data),false,ParaMEDMEM::CPP_DEALLOC,sz,1);
+    ret->useArray(reinterpret_cast<const T *>(data),false,ParaMEDMEM::CPP_DEALLOC,sz0,sz1);
   return ret.retn();
 }
 

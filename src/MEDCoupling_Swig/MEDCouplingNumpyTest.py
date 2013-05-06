@@ -388,6 +388,44 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         self.assertTrue(d.isEqual(DataArrayDouble([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,200,200,200,200],10,2),1e-14))
         pass
 
+    @unittest.skipUnless(MEDCouplingHasNumpyBindings(),"requires numpy")
+    def test19(self):
+        sz=20
+        a=array(0,dtype=int32)
+        a.resize(sz/2,2)
+        a[:]=4
+        self.assertEqual(getrefcount(a),2)
+        d=DataArrayInt(a)
+        self.assertEqual(10,d.getNumberOfTuples())
+        self.assertEqual(2,d.getNumberOfComponents())
+        self.assertEqual(sz,d.getNbOfElems())
+        self.assertTrue(d.isEqual(DataArrayInt([(4,4),(4,4),(4,4),(4,4),(4,4),(4,4),(4,4),(4,4),(4,4),(4,4)])))
+        a[:]=7
+        self.assertTrue(d.isEqual(DataArrayInt([(7,7),(7,7),(7,7),(7,7),(7,7),(7,7),(7,7),(7,7),(7,7),(7,7)])))
+        #
+        b=a.reshape((2,5,2))
+        self.assertRaises(InterpKernelException,DataArrayInt.New,b) # b has not dimension in [0,1] !
+        pass
+
+    @unittest.skipUnless(MEDCouplingHasNumpyBindings(),"requires numpy")
+    def test20(self):
+        sz=20
+        a=array(0,dtype=float64)
+        a.resize(sz/2,2)
+        a[:]=4
+        self.assertEqual(getrefcount(a),2)
+        d=DataArrayDouble(a)
+        self.assertEqual(10,d.getNumberOfTuples())
+        self.assertEqual(2,d.getNumberOfComponents())
+        self.assertEqual(sz,d.getNbOfElems())
+        self.assertTrue(d.isEqual(DataArrayDouble([(4.,4.),(4.,4.),(4.,4.),(4.,4.),(4.,4.),(4.,4.),(4.,4.),(4.,4.),(4.,4.),(4.,4.)]),1e-14))
+        a[:]=7
+        self.assertTrue(d.isEqual(DataArrayDouble([(7.,7.),(7.,7.),(7.,7.),(7.,7.),(7.,7.),(7.,7.),(7.,7.),(7.,7.),(7.,7.),(7.,7.)]),1e-14))
+        #
+        b=a.reshape((2,5,2))
+        self.assertRaises(InterpKernelException,DataArrayDouble.New,b) # b has not dimension in [0,1] !
+        pass
+
     def setUp(self):
         pass
     pass
