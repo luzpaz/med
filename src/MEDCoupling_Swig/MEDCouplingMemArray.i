@@ -207,7 +207,12 @@ namespace ParaMEDMEM
 
       static DataArrayDouble *New(PyObject *elt0, PyObject *nbOfTuples=0, PyObject *elt2=0) throw(INTERP_KERNEL::Exception)
       {
-        const char *msg="ParaMEDMEM::DataArrayDouble::New : Available API are : \n-DataArrayDouble.New()\n-DataArrayDouble.New([1.,3.,4.])\n-DataArrayDouble.New([1.,3.,4.],3)\n-DataArrayDouble.New([1.,3.,4.,5.],2,2)\n-DataArrayDouble.New([1.,3.,4.,5.,7,8.],3,2)\n-DataArrayDouble.New(5)\n-DataArrayDouble.New(5,2) !";
+        const char *msgBase="ParaMEDMEM::DataArrayDouble::New : Available API are : \n-DataArrayDouble.New()\n-DataArrayDouble.New([1.,3.,4.])\n-DataArrayDouble.New([1.,3.,4.],3)\n-DataArrayDouble.New([1.,3.,4.,5.],2,2)\n-DataArrayDouble.New([1.,3.,4.,5.,7,8.],3,2)\n-DataArrayDouble.New([(1.,3.),(4.,5.),(7,8.)])\n-DataArrayDouble.New(5)\n-DataArrayDouble.New(5,2)";
+        std::string msg(msgBase);
+#ifdef WITH_NUMPY
+        msg+="\n-DataArrayDouble.New(numpy array with dtype=float64)";
+#endif
+        msg+=" !";
         if(PyList_Check(elt0) || PyTuple_Check(elt0))
           {
             if(nbOfTuples)
@@ -230,7 +235,7 @@ namespace ParaMEDMEM
                             return ret.retn();
                           }
                         else
-                          throw INTERP_KERNEL::Exception(msg);
+                          throw INTERP_KERNEL::Exception(msg.c_str());
                       }
                     else
                       {//DataArrayDouble.New([1.,3.,4.],3)
@@ -242,7 +247,7 @@ namespace ParaMEDMEM
                       }
                   }
                 else
-                  throw INTERP_KERNEL::Exception(msg);
+                  throw INTERP_KERNEL::Exception(msg.c_str());
               }
             else
               {// DataArrayDouble.New([1.,3.,4.])
@@ -272,10 +277,10 @@ namespace ParaMEDMEM
                         return ret.retn();
                       }
                     else
-                      throw INTERP_KERNEL::Exception(msg);
+                      throw INTERP_KERNEL::Exception(msg.c_str());
                   }
                 else
-                  throw INTERP_KERNEL::Exception(msg);
+                  throw INTERP_KERNEL::Exception(msg.c_str());
               }
             else
               {//DataArrayDouble.New(5)
@@ -285,13 +290,13 @@ namespace ParaMEDMEM
               }
           }
 #ifdef WITH_NUMPY
-        else if(PyArray_Check(elt0))
+        else if(PyArray_Check(elt0) && nbOfTuples==NULL && elt2==NULL)
           {//DataArrayDouble.New(numpyArray)
             return BuildNewInstance<DataArrayDouble,double>(elt0,NPY_DOUBLE,&PyCallBackDataArrayDouble_RefType,"FLOAT64");
           }
 #endif
         else
-          throw INTERP_KERNEL::Exception(msg);
+          throw INTERP_KERNEL::Exception(msg.c_str());
       }
    
       DataArrayDouble(PyObject *elt0, PyObject *nbOfTuples=0, PyObject *elt2=0) throw(INTERP_KERNEL::Exception)
@@ -2289,7 +2294,12 @@ namespace ParaMEDMEM
 
       static DataArrayInt *New(PyObject *elt0, PyObject *nbOfTuples=0, PyObject *nbOfComp=0) throw(INTERP_KERNEL::Exception)
       {
-        const char *msg="ParaMEDMEM::DataArrayInt::New : Available API are : \n-DataArrayInt.New()\n-DataArrayInt.New([1,3,4])\n-DataArrayInt.New([1,3,4],3)\n-DataArrayInt.New([1,3,4,5],2,2)\n-DataArrayInt.New([1,3,4,5,7,8],3,2)\n-DataArrayInt.New(5)\n-DataArrayInt.New(5,2) !";
+        const char *msgBase="ParaMEDMEM::DataArrayInt::New : Available API are : \n-DataArrayInt.New()\n-DataArrayInt.New([1,3,4])\n-DataArrayInt.New([1,3,4],3)\n-DataArrayInt.New([1,3,4,5],2,2)\n-DataArrayInt.New([1,3,4,5,7,8],3,2)\n-DataArrayInt.New([(1,3),(4,5),(7,8)])\n-DataArrayInt.New(5)\n-DataArrayInt.New(5,2)";
+        std::string msg(msgBase);
+#ifdef WITH_NUMPY
+        msg+="\n-DataArrayInt.New(numpy array with dtype=int32)";
+#endif
+        msg+=" !";
         if(PyList_Check(elt0) || PyTuple_Check(elt0))
           {
             if(nbOfTuples)
@@ -2312,7 +2322,7 @@ namespace ParaMEDMEM
                             return ret.retn();
                           }
                         else
-                          throw INTERP_KERNEL::Exception(msg);
+                          throw INTERP_KERNEL::Exception(msg.c_str());
                       }
                     else
                       {//DataArrayInt.New([1,3,4],3)
@@ -2324,7 +2334,7 @@ namespace ParaMEDMEM
                       }
                   }
                 else
-                  throw INTERP_KERNEL::Exception(msg);
+                  throw INTERP_KERNEL::Exception(msg.c_str());
               }
             else
               {// DataArrayInt.New([1,3,4])
@@ -2354,10 +2364,10 @@ namespace ParaMEDMEM
                         return ret.retn();
                       }
                     else
-                      throw INTERP_KERNEL::Exception(msg);
+                      throw INTERP_KERNEL::Exception(msg.c_str());
                   }
                 else
-                  throw INTERP_KERNEL::Exception(msg);
+                  throw INTERP_KERNEL::Exception(msg.c_str());
               }
             else
               {//DataArrayInt.New(5)
@@ -2367,13 +2377,13 @@ namespace ParaMEDMEM
               }
           }
 #ifdef WITH_NUMPY
-        else if(PyArray_Check(elt0))
+        else if(PyArray_Check(elt0) && nbOfTuples==NULL && nbOfComp==NULL)
           {//DataArrayInt.New(numpyArray)
             return BuildNewInstance<DataArrayInt,int>(elt0,NPY_INT,&PyCallBackDataArrayInt_RefType,"INT32");
           }
 #endif
         else
-          throw INTERP_KERNEL::Exception(msg);
+          throw INTERP_KERNEL::Exception(msg.c_str());
       }
 
       DataArrayInt(PyObject *elt0, PyObject *nbOfTuples=0, PyObject *nbOfComp=0) throw(INTERP_KERNEL::Exception)

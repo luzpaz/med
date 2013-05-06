@@ -426,6 +426,21 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         self.assertRaises(InterpKernelException,DataArrayDouble.New,b) # b has not dimension in [0,1] !
         pass
 
+    @unittest.skipUnless(MEDCouplingHasNumpyBindings(),"requires numpy")
+    def test21(self):
+        #tests that only DataArray*(npArray) contructor is available
+        a=array(0,dtype=int32)
+        a.resize(20)
+        DataArrayInt(a)
+        self.assertRaises(InterpKernelException,DataArrayInt.New,a,20)
+        self.assertRaises(InterpKernelException,DataArrayInt.New,a,20,1)
+        a=array(0,dtype=float64)
+        a.resize(20)
+        DataArrayDouble(a)
+        self.assertRaises(InterpKernelException,DataArrayDouble.New,a,20)
+        self.assertRaises(InterpKernelException,DataArrayDouble.New,a,20,1)
+        pass
+
     def setUp(self):
         pass
     pass
