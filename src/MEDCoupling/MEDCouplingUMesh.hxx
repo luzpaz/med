@@ -162,6 +162,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT bool isContiguous1D() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void project1D(const double *pt, const double *v, double eps, double *res) const;
     MEDCOUPLING_EXPORT double distanceToPoint(const double *ptBg, const double *ptEnd, int& cellId, int& nodeId) const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT DataArrayDouble *distanceToPoints(const DataArrayDouble *pts, DataArrayInt *& cellIds) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT int getCellContainingPoint(const double *pos, double eps) const;
     MEDCOUPLING_EXPORT void getCellsContainingPoint(const double *pos, double eps, std::vector<int>& elts) const;
     MEDCOUPLING_EXPORT void getCellsContainingPoints(const double *pos, int nbOfPoints, double eps, std::vector<int>& elts, std::vector<int>& eltsIndex) const;
@@ -290,8 +291,8 @@ namespace ParaMEDMEM
     MEDCouplingUMesh *buildDescendingConnectivityGen(DataArrayInt *desc, DataArrayInt *descIndx, DataArrayInt *revDesc, DataArrayInt *revDescIndx, DimM1DescNbrer nbrer) const throw(INTERP_KERNEL::Exception);
     DataArrayInt *buildUnionOf2DMesh() const throw(INTERP_KERNEL::Exception);
     DataArrayInt *buildUnionOf3DMesh() const throw(INTERP_KERNEL::Exception);
-    void distanceToPoint3DSurfAlg(const double *pt, const DataArrayInt *cellIds, double& ret0, int& cellId) const throw(INTERP_KERNEL::Exception);
-    void distanceToPoint2DCurveAlg(const double *pt, const DataArrayInt *cellIds, double& ret0, int& cellId) const throw(INTERP_KERNEL::Exception);
+    static void DistanceToPoint3DSurfAlg(const double *pt, const int *cellIdsBg, const int *cellIdsEnd, const double *coords, const int *nc, const int *ncI, double& ret0, int& cellId) throw(INTERP_KERNEL::Exception);
+    static void DistanceToPoint2DCurveAlg(const double *pt, const int *cellIdsBg, const int *cellIdsEnd, const double *coords, const int *nc, const int *ncI, double& ret0, int& cellId) throw(INTERP_KERNEL::Exception);
     static DataArrayInt *ComputeSpreadZoneGraduallyFromSeedAlg(std::vector<bool>& fetched, const int *seedBg, const int *seedEnd, const DataArrayInt *arrIn, const DataArrayInt *arrIndxIn, int nbOfDepthPeeling, int& nbOfDepthPeelingPerformed) throw(INTERP_KERNEL::Exception);
     static void FillInCompact3DMode(int spaceDim, int nbOfNodesInCell, const int *conn, const double *coo, double *zipFrmt) throw(INTERP_KERNEL::Exception);
     static void AppendExtrudedCell(const int *connBg, const int *connEnd, int nbOfNodesPerLev, bool isQuad, std::vector<int>& ret);
