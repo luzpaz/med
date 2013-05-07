@@ -22,6 +22,9 @@
 #ifdef WITH_NUMPY
 #include <numpy/arrayobject.h>
 
+// specific DataArray deallocator callback. This deallocator is used both in the constructor of DataArray and in the toNumPyArr
+// method. This dellocator uses weakref to determine if the linked numArr is still alive or not. If alive the ownership is given to it.
+// if no more alive the "standart" DataArray deallocator is called.
 void numarrdeal(void *pt, void *wron)
 {
   void **wronc=(void **)wron;
@@ -75,6 +78,8 @@ extern "C"
     Py_TYPE(self)->tp_free(self);
   }
   
+  // real callback called when a numpy arr having more than one DataArray instance client on it is destroyed.
+  // In this case, all the "weak" clients, except the first one, invoke this call back that desable the content of these "weak" clients.
   static PyObject *callbackmcdataarrayint_call(PyCallBackDataArrayInt *self, PyObject *args, PyObject *kw)
   {
     if(self->_pt_mc)
@@ -85,7 +90,9 @@ extern "C"
     Py_XINCREF(Py_None);
     return Py_None;
   }
-
+  
+  // real callback called when a numpy arr having more than one DataArray instance client on it is destroyed.
+  // In this case, all the "weak" clients, except the first one, invoke this call back that desable the content of these "weak" clients.
   static PyObject *callbackmcdataarraydouble_call(PyCallBackDataArrayDouble *self, PyObject *args, PyObject *kw)
   {
     if(self->_pt_mc)
@@ -182,6 +189,8 @@ PyTypeObject PyCallBackDataArrayDouble_RefType = {
   PyObject_GC_Del,            /*tp_free*/
 };
 
+// this is the second type of specific deallocator, only valid for the constructor of DataArrays taking numpy array
+// in input when an another DataArray is already client of this.
 template<class MCData>
 void numarrdeal2(void *pt, void *obj)
 {
@@ -368,7 +377,7 @@ PyObject *ToNumPyArray(MCData *self, int npyObjectType, const char *MCDataStr)
   if(mem.isDeallocatorCalled())
     {
       if(mem.getDeallocator()!=numarrdeal)
-        {
+        {// case for the first call of toNumPyArray
           PyObject *ref=PyWeakref_NewRef(ret,NULL);
           void **objs=new void *[2]; objs[0]=ref; objs[1]=(void*) mem.getDeallocator();
           mem.setParameterForDeallocator(objs);
@@ -376,17 +385,17 @@ PyObject *ToNumPyArray(MCData *self, int npyObjectType, const char *MCDataStr)
           return ret;
         }
       else
-        {
+        {// case for the second and other call of toNumPyArray
           void **objs=(void **)mem.getParameterForDeallocator();
           PyObject *weakRefOnOwner=(PyObject *)objs[0];
           PyObject *obj=PyWeakref_GetObject(weakRefOnOwner);
           if(obj!=Py_None)
-            {
+            {//the previous numArray exists let numpy deals the numpy array each other by declaring the still alive instance as base
               Py_XINCREF(obj);
               NumpyArrSetBaseObjectExt((PyArrayObject*)ret,obj);
             }
           else
-            {
+            {//the previous numArray no more exists -> declare the newly created numpy array as the first one.
               Py_XDECREF(weakRefOnOwner);
               PyObject *ref=PyWeakref_NewRef(ret,NULL);
               objs[0]=ref;

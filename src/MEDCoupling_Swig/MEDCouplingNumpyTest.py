@@ -512,15 +512,26 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         a=d.toNumPyArray()
         self.assertEqual(a.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
         self.assertTrue(not a.flags["OWNDATA"])
+        self.assertTrue(a.base is None)
         del a
         gc.collect()
         a=d.toNumPyArray()
         self.assertEqual(a.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
         self.assertTrue(not a.flags["OWNDATA"])
+        self.assertTrue(a.base is None)
         b=d.toNumPyArray()
         self.assertEqual(a.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
         self.assertEqual(b.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
         self.assertTrue(not a.flags["OWNDATA"])
+        self.assertTrue(not b.flags["OWNDATA"])
+        self.assertTrue(b.base is a)
+        del a
+        gc.collect()
+        self.assertEqual(b.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
+        self.assertTrue(not b.flags["OWNDATA"])
+        del d
+        gc.collect()
+        self.assertEqual(b.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
         self.assertTrue(not b.flags["OWNDATA"])
         #
         d=DataArrayInt(10)
@@ -528,15 +539,26 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         a=d.toNumPyArray()
         self.assertEqual(a.tolist(),[0,1,2,3,4,5,6,7,8,9])
         self.assertTrue(not a.flags["OWNDATA"])
+        self.assertTrue(a.base is None)
         del a
         gc.collect()
         a=d.toNumPyArray()
         self.assertEqual(a.tolist(),[0,1,2,3,4,5,6,7,8,9])
         self.assertTrue(not a.flags["OWNDATA"])
+        self.assertTrue(a.base is None)
         b=d.toNumPyArray()
         self.assertEqual(a.tolist(),[0,1,2,3,4,5,6,7,8,9])
         self.assertEqual(b.tolist(),[0,1,2,3,4,5,6,7,8,9])
         self.assertTrue(not a.flags["OWNDATA"])
+        self.assertTrue(not b.flags["OWNDATA"])
+        self.assertTrue(b.base is a)
+        del a
+        gc.collect()
+        self.assertEqual(b.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
+        self.assertTrue(not b.flags["OWNDATA"])
+        del d
+        gc.collect()
+        self.assertEqual(b.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
         self.assertTrue(not b.flags["OWNDATA"])
         pass
 
