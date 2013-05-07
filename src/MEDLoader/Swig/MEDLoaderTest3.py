@@ -2243,6 +2243,119 @@ class MEDLoaderTest(unittest.TestCase):
                 pass
             pass
         pass
+
+    def testNonRegBugNormalizeFamIdsMEDFile1(self):
+        m=MEDCouplingCMesh()
+        arr=DataArrayDouble([0.,1.,2.,3.,4.])
+        m.setCoords(arr,arr,arr)
+        m=m.buildUnstructured()
+        m2=m.buildDescendingConnectivity()[0]
+        m.setName("mesh")
+        g1=DataArrayInt([0,1,2,3]) ; g1.setName("g1")
+        g2=DataArrayInt([2,3,5,6]) ; g2.setName("g2")
+        g1Face=DataArrayInt([20,21,22,23]) ; g1Face.setName("g1Face")
+        g2Face=DataArrayInt([22,23,25,26]) ; g2Face.setName("g2Face")
+        g1Node=DataArrayInt([10,11,12,13]) ; g1Node.setName("g1Node")
+        g2Node=DataArrayInt([12,13,15,16]) ; g2Node.setName("g2Node")
+        mm=MEDFileUMesh()
+        mm.setMeshAtLevel(0,m)
+        mm.setGroupsAtLevel(0,[g1,g2])
+        s1=set(mm.getFamiliesOnGroup("g1")) ; s2=set(mm.getFamiliesOnGroup("g2"))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g1"),(0,))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g2"),(0,))
+        mm.normalizeFamIdsMEDFile()
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g1"),(0,))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g2"),(0,))
+        self.assertTrue(mm.getGroupArr(0,"g1").isEqual(g1))
+        self.assertTrue(mm.getGroupArr(0,"g2").isEqual(g2))
+        self.assertEqual(s1,set(mm.getFamiliesOnGroup("g1")))
+        self.assertEqual(s2,set(mm.getFamiliesOnGroup("g2")))
+        for g in mm.getGroupsOnSpecifiedLev(0):
+            for f in mm.getFamiliesIdsOnGroup(g):
+                self.assertTrue(f<0)
+                pass
+            pass
+        #
+        mm=MEDFileUMesh()
+        mm.setMeshAtLevel(0,m)
+        mm.setMeshAtLevel(-1,m2)
+        mm.setGroupsAtLevel(0,[g1,g2])
+        mm.setGroupsAtLevel(-1,[g1Face,g2Face])
+        s1=set(mm.getFamiliesOnGroup("g1")) ; s2=set(mm.getFamiliesOnGroup("g2"))
+        s3=set(mm.getFamiliesOnGroup("g1Face")) ; s4=set(mm.getFamiliesOnGroup("g2Face"))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g1"),(0,))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g2"),(0,))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g1Face"),(-1,))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g2Face"),(-1,))
+        mm.normalizeFamIdsMEDFile()
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g1"),(0,))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g2"),(0,))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g1Face"),(-1,))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g2Face"),(-1,))
+        self.assertTrue(mm.getGroupArr(0,"g1").isEqual(g1))
+        self.assertTrue(mm.getGroupArr(0,"g2").isEqual(g2))
+        self.assertTrue(mm.getGroupArr(-1,"g1Face").isEqual(g1Face))
+        self.assertTrue(mm.getGroupArr(-1,"g2Face").isEqual(g2Face))
+        self.assertEqual(s1,set(mm.getFamiliesOnGroup("g1")))
+        self.assertEqual(s2,set(mm.getFamiliesOnGroup("g2")))
+        self.assertEqual(s3,set(mm.getFamiliesOnGroup("g1Face")))
+        self.assertEqual(s4,set(mm.getFamiliesOnGroup("g2Face")))
+        for lev in [0,-1]:
+            for g in mm.getGroupsOnSpecifiedLev(lev):
+                for f in mm.getFamiliesIdsOnGroup(g):
+                    self.assertTrue(f<0)
+                    pass
+                pass
+            pass
+         #
+        mm=MEDFileUMesh()
+        mm.setMeshAtLevel(0,m)
+        mm.setMeshAtLevel(-1,m2)
+        mm.setGroupsAtLevel(0,[g1,g2])
+        mm.setGroupsAtLevel(-1,[g1Face,g2Face])
+        mm.setGroupsAtLevel(1,[g1Node,g2Node])
+        s1=set(mm.getFamiliesOnGroup("g1")) ; s2=set(mm.getFamiliesOnGroup("g2"))
+        s3=set(mm.getFamiliesOnGroup("g1Face")) ; s4=set(mm.getFamiliesOnGroup("g2Face"))
+        s5=set(mm.getFamiliesOnGroup("g1Node")) ; s6=set(mm.getFamiliesOnGroup("g2Node"))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g1"),(0,))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g2"),(0,))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g1Face"),(-1,))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g2Face"),(-1,))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g1Node"),(1,))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g2Node"),(1,))
+        mm.normalizeFamIdsMEDFile()
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g1"),(0,))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g2"),(0,))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g1Face"),(-1,))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g2Face"),(-1,))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g1Node"),(1,))
+        self.assertEqual(mm.getGrpNonEmptyLevelsExt("g2Node"),(1,))
+        self.assertTrue(mm.getGroupArr(0,"g1").isEqual(g1))
+        self.assertTrue(mm.getGroupArr(0,"g2").isEqual(g2))
+        self.assertTrue(mm.getGroupArr(-1,"g1Face").isEqual(g1Face))
+        self.assertTrue(mm.getGroupArr(-1,"g2Face").isEqual(g2Face))
+        self.assertTrue(mm.getGroupArr(1,"g1Node").isEqual(g1Node))
+        self.assertTrue(mm.getGroupArr(1,"g2Node").isEqual(g2Node))
+        self.assertEqual(s1,set(mm.getFamiliesOnGroup("g1")))
+        self.assertEqual(s2,set(mm.getFamiliesOnGroup("g2")))
+        self.assertEqual(s3,set(mm.getFamiliesOnGroup("g1Face")))
+        self.assertEqual(s4,set(mm.getFamiliesOnGroup("g2Face")))
+        self.assertEqual(s5,set(mm.getFamiliesOnGroup("g1Node")))
+        self.assertEqual(s6,set(mm.getFamiliesOnGroup("g2Node")))
+        for lev in [0,-1]:
+            for g in mm.getGroupsOnSpecifiedLev(lev):
+                for f in mm.getFamiliesIdsOnGroup(g):
+                    self.assertTrue(f<0)
+                    pass
+                pass
+            pass
+        for g in mm.getGroupsOnSpecifiedLev(1):
+            for f in mm.getFamiliesIdsOnGroup(g):
+                self.assertTrue(f>0)
+                pass
+            pass
+        pass
+    
     pass
 
 unittest.main()
