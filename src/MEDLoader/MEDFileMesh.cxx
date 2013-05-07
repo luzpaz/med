@@ -1321,7 +1321,7 @@ void MEDFileMesh::normalizeFamIdsMEDFile() throw(INTERP_KERNEL::Exception)
   refId=-1;
   for(std::set<int>::const_reverse_iterator it2=levsS.rbegin();it2!=levsS.rend();it2++)
     {
-      const DataArrayInt *fam=getFamilyFieldAtLevel(1);
+      const DataArrayInt *fam=getFamilyFieldAtLevel(*it2);
       if(fam)
         {
           MEDCouplingAutoRefCountObjectPtr<DataArrayInt> tmp=fam->getDifferentValues();
