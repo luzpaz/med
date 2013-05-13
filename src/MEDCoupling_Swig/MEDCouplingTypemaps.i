@@ -369,7 +369,6 @@ PyObject *ToNumPyArray(MCData *self, int npyObjectType, const char *MCDataStr)
       std::ostringstream oss; oss << MCDataStr << "::toNumPyArray : number of components of this is " << nbComp << " ! Should 1 or 2 !"; 
       throw INTERP_KERNEL::Exception(oss.str().c_str());
     }
-  std::size_t sz=self->getNbOfElems();
   npy_intp dim[2];
   dim[0]=(npy_intp)self->getNumberOfTuples(); dim[1]=2;
   const T *bg=self->getConstPointer();
