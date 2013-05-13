@@ -3371,6 +3371,13 @@ void MEDFileUMesh::setRenumFieldArr(int meshDimRelToMaxExt, DataArrayInt *renumA
   return _ms[traducedRk]->setRenumArr(renumArr);
 }
 
+/*!
+ * Sets the optional names of mesh entities of a given dimension.
+ *  \param [in] meshDimRelToMaxExt - the relative dimension of mesh entities.
+ *  \param [in] nameArr - the array of the names.
+ *  \throw If there are no mesh entities of \a meshDimRelToMaxExt dimension in \a this mesh.
+ *  \throw If \a nameArr has an invalid size.
+ */
 void MEDFileUMesh::setNameFieldAtLevel(int meshDimRelToMaxExt, DataArrayAsciiChar *nameArr) throw(INTERP_KERNEL::Exception)
 {
   if(meshDimRelToMaxExt==1)
@@ -3382,14 +3389,14 @@ void MEDFileUMesh::setNameFieldAtLevel(int meshDimRelToMaxExt, DataArrayAsciiCha
         }
       DataArrayDouble *coo(_coords);
       if(!coo)
-        throw INTERP_KERNEL::Exception("MEDFileUMesh::setRenumFieldArr : the coordinates have not been set !");
-      nameArr->checkNbOfTuplesAndComp(coo->getNumberOfTuples(),MED_SNAME_SIZE,"MEDFileUMesh::setRenumArr : Problem in size of node numbering arr ! ");
+        throw INTERP_KERNEL::Exception("MEDFileUMesh::setNameFieldAtLevel : the coordinates have not been set !");
+      nameArr->checkNbOfTuplesAndComp(coo->getNumberOfTuples(),MED_SNAME_SIZE,"MEDFileUMesh::setNameFieldAtLevel : Problem in size of node numbering arr ! ");
       nameArr->incrRef();
       _name_coords=nameArr;
       return ;
     }
   if(meshDimRelToMaxExt>1)
-    throw INTERP_KERNEL::Exception("MEDFileUMesh::setRenumArr : Dimension request is invalid (>1) !");
+    throw INTERP_KERNEL::Exception("MEDFileUMesh::setNameFieldAtLevel : Dimension request is invalid (>1) !");
   int traducedRk=-meshDimRelToMaxExt;
   if(traducedRk>=(int)_ms.size())
     throw INTERP_KERNEL::Exception("Invalid mesh dim relative to max given ! To low !");
@@ -3744,6 +3751,13 @@ void MEDFileStructuredMesh::setRenumFieldArr(int meshDimRelToMaxExt, DataArrayIn
     renumArr->incrRef();
 }
 
+/*!
+ * Sets the optional names of mesh entities of a given dimension.
+ *  \param [in] meshDimRelToMaxExt - the relative dimension of mesh entities.
+ *  \param [in] nameArr - the array of the names.
+ *  \throw If there are no mesh entities of \a meshDimRelToMaxExt dimension in \a this mesh.
+ *  \throw If \a nameArr has an invalid size.
+ */
 void MEDFileStructuredMesh::setNameFieldAtLevel(int meshDimRelToMaxExt, DataArrayAsciiChar *nameArr) throw(INTERP_KERNEL::Exception)
 {
   if(meshDimRelToMaxExt!=0 && meshDimRelToMaxExt!=1)
