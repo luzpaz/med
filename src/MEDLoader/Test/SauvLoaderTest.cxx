@@ -161,7 +161,6 @@ void SauvLoaderTest::testSauv2MedOnA3SubsField()
 
   for (int i=0; i < field1d->getNumberOfTuples(); i++)
   {
-    bool ok = abs(values[i]-field1d->getIJ(i, 0)) < 1e-12;
     CPPUNIT_ASSERT_DOUBLES_EQUAL( values[i], field1d->getIJ(i, 0), 1e-12 );
   }
 }
