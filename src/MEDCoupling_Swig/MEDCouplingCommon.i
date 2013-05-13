@@ -1735,12 +1735,11 @@ namespace ParaMEDMEM
         int nbOfCompo=self->getSpaceDimension();
         const double *pt=convertObjToPossibleCpp5_Safe(point,sw,val,a,aa,bb,"Python wrap of MEDCouplingUMesh::distanceToPoint",1,nbOfCompo,true);
         //
-        int cellId=-1,nodeId=-1;
-        double ret0=self->distanceToPoint(pt,pt+nbOfCompo,cellId,nodeId);
-        PyObject *ret=PyTuple_New(3);
+        int cellId=-1;
+        double ret0=self->distanceToPoint(pt,pt+nbOfCompo,cellId);
+        PyObject *ret=PyTuple_New(2);
         PyTuple_SetItem(ret,0,PyFloat_FromDouble(ret0));
         PyTuple_SetItem(ret,1,PyInt_FromLong(cellId));
-        PyTuple_SetItem(ret,2,PyInt_FromLong(nodeId));
         return ret;
       }
 

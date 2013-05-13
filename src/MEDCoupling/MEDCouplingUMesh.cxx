@@ -26,6 +26,7 @@
 #include "InterpolationUtils.hxx"
 #include "PointLocatorAlgos.txx"
 #include "BBTree.txx"
+#include "BBTreeDst.txx"
 #include "SplitterTetra.hxx"
 #include "DirectedBoundingBox.hxx"
 #include "InterpKernelMeshQuality.hxx"
@@ -4095,14 +4096,14 @@ void MEDCouplingUMesh::project1D(const double *pt, const double *v, double eps, 
 }
 
 /*!
- * This method computes the distance from a point \a pt to \a this and the first \a cellId and \a nodeId in \a this corresponding to the returned distance. 
+ * This method computes the distance from a point \a pt to \a this and the first \a cellId in \a this corresponding to the returned distance. 
  * \a this is expected to be a mesh so that its space dimension is equal to its
  * mesh dimension + 1. Furthermore only mesh dimension 1 and 2 are supported for the moment.
  * Distance from \a ptBg to \a ptEnd is expected to be equal to the space dimension. \a this is also expected to be fully defined (connectivity and coordinates).
- * 
- * This method firstly find the closer node in \a this to the requested point whose coordinates are defined by [ \a ptBg, \a ptEnd ). Then for this node found 
- * the cells sharing this node (if any) are considered to find if the distance to these cell are smaller than the result found previously. If no cells are linked
- * to the node that minimizes distance with the input point then -1 is returned in cellId.
+ 
+ * WARNING, if there is some orphan nodes in \a this (nodes not fetched by any cells in \a this ( see MEDCouplingUMesh::zipCoords ) ) these nodes will ** not ** been taken
+ * into account in this method. Only cells and nodes lying on them are considered in the algorithm (even if one of these orphan nodes is closer than returned distance).
+ * A user that needs to consider orphan nodes should invoke DataArrayDouble::minimalDistanceTo method on the coordinates array of \a this.
  *
  * So this method is more accurate (so, more costly) than simply searching for the closest point in \a this.
  * If only this information is enough for you simply call \c getCoords()->distanceToTuple on \a this.
@@ -4115,7 +4116,7 @@ void MEDCouplingUMesh::project1D(const double *pt, const double *v, double eps, 
  * dimension - 1.
  * \sa DataArrayDouble::distanceToTuple, MEDCouplingUMesh::distanceToPoints
  */
-double MEDCouplingUMesh::distanceToPoint(const double *ptBg, const double *ptEnd, int& cellId, int& nodeId) const throw(INTERP_KERNEL::Exception)
+double MEDCouplingUMesh::distanceToPoint(const double *ptBg, const double *ptEnd, int& cellId) const throw(INTERP_KERNEL::Exception)
 {
   int meshDim=getMeshDimension(),spaceDim=getSpaceDimension();
   if(meshDim!=spaceDim-1)
@@ -4125,43 +4126,26 @@ double MEDCouplingUMesh::distanceToPoint(const double *ptBg, const double *ptEnd
   checkFullyDefined();
   if((int)std::distance(ptBg,ptEnd)!=spaceDim)
     { std::ostringstream oss; oss << "MEDCouplingUMesh::distanceToPoint : input point has to have dimension equal to the space dimension of this (" << spaceDim << ") !"; throw INTERP_KERNEL::Exception(oss.str().c_str()); }
-  nodeId=-1;
-  double ret0=_coords->distanceToTuple(ptBg,ptEnd,nodeId);
-  if(nodeId==-1)
-    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::distanceToPoint : something wrong with nodes in this !");
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> cellIds=getCellIdsLyingOnNodes(&nodeId,&nodeId+1,false);
-  const int *nc=_nodal_connec->begin(),*ncI=_nodal_connec_index->begin(); const double *coords=_coords->begin();
-  switch(meshDim)
-    {
-    case 2:
-      {
-        DistanceToPoint3DSurfAlg(ptBg,cellIds->begin(),cellIds->end(),coords,nc,ncI,ret0,cellId);
-        return ret0;
-      }
-    case 1:
-      {
-        DistanceToPoint2DCurveAlg(ptBg,cellIds->begin(),cellIds->end(),coords,nc,ncI,ret0,cellId);
-        return ret0;
-      }
-    default:
-      throw INTERP_KERNEL::Exception("MEDCouplingUMesh::distanceToPoint : only mesh dimension 2 and 1 are implemented !");
-    }
-  
-  return ret0;
+  DataArrayInt *ret1=0;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> pts=DataArrayDouble::New(); pts->useArray(ptBg,false,C_DEALLOC,1,spaceDim);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret0=distanceToPoints(pts,ret1);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret1Safe(ret1);
+  cellId=*ret1Safe->begin();
+  return *ret0->begin();
 }
 
 /*!
  * This method computes the distance from each point of points serie \a pts (stored in a DataArrayDouble in which each tuple represents a point)
- *  to \a this.  and the first \a cellId and \a nodeId in \a this corresponding to the returned distance. 
+ *  to \a this  and the first \a cellId in \a this corresponding to the returned distance. 
+ * WARNING, if there is some orphan nodes in \a this (nodes not fetched by any cells in \a this ( see MEDCouplingUMesh::zipCoords ) ) these nodes will ** not ** been taken
+ * into account in this method. Only cells and nodes lying on them are considered in the algorithm (even if one of these orphan nodes is closer than returned distance).
+ * A user that needs to consider orphan nodes should invoke DataArrayDouble::minimalDistanceTo method on the coordinates array of \a this.
+ * 
  * \a this is expected to be a mesh so that its space dimension is equal to its
  * mesh dimension + 1. Furthermore only mesh dimension 1 and 2 are supported for the moment.
  * Number of components of \a pts is expected to be equal to the space dimension. \a this is also expected to be fully defined (connectivity and coordinates).
- * 
- * This method firstly find the closer node in \a this to the requested point whose coordinates are defined by [ \a ptBg, \a ptEnd ). Then for this node found 
- * the cells sharing this node (if any) are considered to find if the distance to these cell are smaller than the result found previously. If no cells are linked
- * to the node that minimizes distance with the input point then -1 is returned in cellId.
  *
- * So this method is more accurate (so, more costly) than simply searching for the closest point in \a this.
+ * So this method is more accurate (so, more costly) than simply searching for each point in \a pts the closest point in \a this.
  * If only this information is enough for you simply call \c getCoords()->distanceToTuple on \a this.
  *
  * \param [in] pts the list of points in which each tuple represents a point
@@ -4193,14 +4177,40 @@ DataArrayDouble *MEDCouplingUMesh::distanceToPoints(const DataArrayDouble *pts, 
   int nbOfPts=pts->getNumberOfTuples();
   MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret0=DataArrayDouble::New(); ret0->alloc(nbOfPts,1);
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret1=DataArrayInt::New(); ret1->alloc(nbOfPts,1);
-  if(nbOfPts==0)
-    { cellIds=ret1.retn(); return ret0.retn(); }
+  const int *nc=_nodal_connec->begin(),*ncI=_nodal_connec_index->begin(); const double *coords=_coords->begin();
   double *ret0Ptr=ret0->getPointer(); int *ret1Ptr=ret1->getPointer(); const double *ptsPtr=pts->begin();
-  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> w=DataArrayDouble::New(); w->useArray(ptsPtr,false,C_DEALLOC,1,spaceDim);
-  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> tmp=DataArrayDouble::Substract(getCoords(),w);
-  tmp=tmp->magnitude();
-  for(int i=1;i<nbOfPts;i++,ret0Ptr++,ret1Ptr++,ptsPtr+=spaceDim)
+  std::vector<double> bbox;
+  getBoundingBoxForBBTree(bbox);
+  switch(spaceDim)
     {
+    case 3:
+      {
+        BBTreeDst<3> myTree(&bbox[0],0,0,nbCells);
+        for(int i=0;i<nbOfPts;i++,ret0Ptr++,ret1Ptr++,ptsPtr+=3)
+          {
+            double x=std::numeric_limits<double>::max();
+            std::vector<int> elems;
+            myTree.getMinDistanceOfMax(ptsPtr,x);
+            myTree.getElemsWhoseMinDistanceToPtSmallerThan(ptsPtr,x,elems);
+            DistanceToPoint3DSurfAlg(ptsPtr,&elems[0],&elems[0]+elems.size(),coords,nc,ncI,*ret0Ptr,*ret1Ptr);
+          }
+        break;
+      }
+    case 2:
+      {
+        BBTreeDst<2> myTree(&bbox[0],0,0,nbCells);
+        for(int i=0;i<nbOfPts;i++,ret0Ptr++,ret1Ptr++,ptsPtr+=2)
+          {
+            double x=std::numeric_limits<double>::max();
+            std::vector<int> elems;
+            myTree.getMinDistanceOfMax(ptsPtr,x);
+            myTree.getElemsWhoseMinDistanceToPtSmallerThan(ptsPtr,x,elems);
+            DistanceToPoint2DCurveAlg(ptsPtr,&elems[0],&elems[0]+elems.size(),coords,nc,ncI,*ret0Ptr,*ret1Ptr);
+          }
+        break;
+      }
+    default:
+      throw INTERP_KERNEL::Exception("MEDCouplingUMesh::distanceToPoints : only spacedim 2 and 3 supported !");
     }
   cellIds=ret1.retn();
   return ret0.retn();
@@ -4219,6 +4229,7 @@ DataArrayDouble *MEDCouplingUMesh::distanceToPoints(const DataArrayDouble *pts, 
 void MEDCouplingUMesh::DistanceToPoint3DSurfAlg(const double *pt, const int *cellIdsBg, const int *cellIdsEnd, const double *coords, const int *nc, const int *ncI, double& ret0, int& cellId) throw(INTERP_KERNEL::Exception)
 {
   cellId=-1;
+  ret0=std::numeric_limits<double>::max();
   for(const int *zeCell=cellIdsBg;zeCell!=cellIdsEnd;zeCell++)
     {
       switch((INTERP_KERNEL::NormalizedCellType)nc[ncI[*zeCell]])
@@ -4257,14 +4268,16 @@ void MEDCouplingUMesh::DistanceToPoint3DSurfAlg(const double *pt, const int *cel
 void MEDCouplingUMesh::DistanceToPoint2DCurveAlg(const double *pt, const int *cellIdsBg, const int *cellIdsEnd, const double *coords, const int *nc, const int *ncI, double& ret0, int& cellId) throw(INTERP_KERNEL::Exception)
 {
   cellId=-1;
+  ret0=std::numeric_limits<double>::max();
   for(const int *zeCell=cellIdsBg;zeCell!=cellIdsEnd;zeCell++)
     {
        switch((INTERP_KERNEL::NormalizedCellType)nc[ncI[*zeCell]])
         {
         case INTERP_KERNEL::NORM_SEG2:
           {
-            double tmp=INTERP_KERNEL::SquareDistanceFromPtToSegInSpaceDim2(pt,coords+2*nc[ncI[*zeCell]+1],coords+2*nc[ncI[*zeCell]+2]);
-            if(tmp!=std::numeric_limits<double>::max()) tmp=sqrt(tmp);
+            std::size_t uselessEntry=0;
+            double tmp=INTERP_KERNEL::SquareDistanceFromPtToSegInSpaceDim2(pt,coords+2*nc[ncI[*zeCell]+1],coords+2*nc[ncI[*zeCell]+2],uselessEntry);
+            tmp=sqrt(tmp);
             if(tmp<ret0)
               { ret0=tmp; cellId=*zeCell; }
             break;

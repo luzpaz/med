@@ -46,7 +46,7 @@ private:
   static const int MAX_LEVEL=20;
 public:
   BBTreeDst(const double* bbs, int* elems, int level, int nbelems):
-    _left(0),_right(0),_level(level),_bb(bbs),_terminal(0),_nbelems(nbelems),_bbox(0)
+    _left(0),_right(0),_level(level),_bb(bbs),_terminal(0),_nbelems(nbelems)
   {
     if((nbelems < MIN_NB_ELEMS || level> MAX_LEVEL))
       _terminal=new double[2*dim];
@@ -60,7 +60,7 @@ public:
       }
     double *nodes=new double[nbelems];
     for (int i=0; i<nbelems; i++)
-      nodes[i]=bbs[elem*dim*2+(level%dim)*2];
+      nodes[i]=bbs[_elems[i]*dim*2+(level%dim)*2];
     std::nth_element<double*>(nodes, nodes+nbelems/2, nodes+nbelems);
     double median = *(nodes+nbelems/2);
     delete [] nodes;
@@ -124,9 +124,10 @@ public:
       }
     else
       {
-        if(_min_right-pt[_level%dim]>minOfMaxDstsSq)
+        double minOfMaxDsts=sqrt(minOfMaxDstsSq);
+        if(_min_right-pt[_level%dim]>minOfMaxDsts)
           { _left->getElemsWhoseMinDistanceToPtSmallerThan(pt,minOfMaxDstsSq,elems); return ; }
-        if(pt[_level%dim]-_max_left>minOfMaxDstsSq)
+        if(pt[_level%dim]-_max_left>minOfMaxDsts)
           { _right->getElemsWhoseMinDistanceToPtSmallerThan(pt,minOfMaxDstsSq,elems); return ; }
         _left->getElemsWhoseMinDistanceToPtSmallerThan(pt,minOfMaxDstsSq,elems);
         _right->getElemsWhoseMinDistanceToPtSmallerThan(pt,minOfMaxDstsSq,elems);
@@ -146,6 +147,11 @@ public:
       }
     else
       {
+        double minOfMaxDsts=sqrt(minOfMaxDstsSq);
+        if(_min_right-pt[_level%dim]>minOfMaxDsts)
+          { _left->getMinDistanceOfMax(pt,minOfMaxDstsSq); return ; }
+        if(pt[_level%dim]-_max_left>minOfMaxDsts)
+          { _right->getMinDistanceOfMax(pt,minOfMaxDstsSq); return ; }
         _left->getMinDistanceOfMax(pt,minOfMaxDstsSq);
         _right->getMinDistanceOfMax(pt,minOfMaxDstsSq);
       }
@@ -155,27 +161,27 @@ public:
   {
     for(int j=0;j<dim;j++)
       {
-        _terminal[2*i]=std::numeric_limits<double>::max();
-        _terminal[2*i+1]=-std::numeric_limits<double>::max();
+        _terminal[2*j]=std::numeric_limits<double>::max();
+        _terminal[2*j+1]=-std::numeric_limits<double>::max();
       }
     for(int i=0;i<_nbelems;i++)
       {
         for(int j=0;j<dim;j++)
           {
-            _terminal[2*i]=std::min(_terminal[2*i],bbs[2*dim*_elems[i]+2*j]);
-            _terminal[2*i+1]=std::max(_terminal[2*i+1],bbs[2*dim*_elems[i]+2*j+1]);
+            _terminal[2*j]=std::min(_terminal[2*j],bbs[2*dim*_elems[i]+2*j]);
+            _terminal[2*j+1]=std::max(_terminal[2*j+1],bbs[2*dim*_elems[i]+2*j+1]);
           }
       }
   }
 
-  static doule GetMaxDistanceFromBBoxToPt(const double *bbox, const double *pt)
+  static double GetMaxDistanceFromBBoxToPt(const double *bbox, const double *pt)
   {
     if(bbox[0]<bbox[1])
       {
         double zeRes=0.;
         for (int idim=0; idim<dim; idim++)
           {
-            double val1=pt[i]-bbox[idim*2],val2=pt[i]-bbox[idim*2+1];
+            double val1=pt[idim]-bbox[idim*2],val2=pt[idim]-bbox[idim*2+1];
             double x=std::max(fabs(val1),fabs(val2));
             zeRes+=x*x;
           }
@@ -193,7 +199,7 @@ public:
         double zeRes=0.;
         for (int idim=0; idim<dim; idim++)
           {
-            double val1=pt[i]-bbox[idim*2],val2=pt[i]-bbox[idim*2+1];
+            double val1=pt[idim]-bbox[idim*2],val2=pt[idim]-bbox[idim*2+1];
             char pos=(( (0.<val1)-(val1<0.) )+( (0.<val2)-(val2<0.) ))/2;// sign(val) = (0.<val)-(val<0.)
             if(pos!=0)
               {
