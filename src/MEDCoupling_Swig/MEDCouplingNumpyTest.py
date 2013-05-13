@@ -562,6 +562,80 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         self.assertTrue(not b.flags["OWNDATA"])
         pass
 
+    def test25(self):
+        a=arange(10,dtype=int32)
+        b=DataArrayInt(a)
+        c=DataArrayInt(a)
+        d=DataArrayInt(a)
+        self.assertTrue(b.isIdentity()) ; self.assertEqual(len(b),10)
+        self.assertTrue(c.isIdentity()) ; self.assertEqual(len(c),10)
+        self.assertTrue(d.isIdentity()) ; self.assertEqual(len(d),10)
+        c.pushBackSilent(10) # c and a,b are dissociated
+        self.assertTrue(b.isIdentity()) ; self.assertEqual(len(b),10)
+        self.assertTrue(c.isIdentity()) ; self.assertEqual(len(c),11)
+        self.assertTrue(d.isIdentity()) ; self.assertEqual(len(d),10)
+        del a
+        gc.collect()
+        self.assertTrue(b.isIdentity()) ; self.assertEqual(len(b),10)
+        self.assertTrue(c.isIdentity()) ; self.assertEqual(len(c),11)
+        self.assertTrue(not d.isAllocated())
+        del b
+        gc.collect()
+        self.assertTrue(c.isIdentity()) ; self.assertEqual(len(c),11)
+        #
+        a=arange(10,dtype=int32)
+        b=DataArrayInt(a)
+        c=DataArrayInt(a)
+        self.assertTrue(b.isIdentity()) ; self.assertEqual(len(b),10)
+        self.assertTrue(c.isIdentity()) ; self.assertEqual(len(c),10)
+        b.pushBackSilent(10) # c and a,b are dissociated
+        self.assertTrue(b.isIdentity()) ; self.assertEqual(len(b),11)
+        self.assertTrue(c.isIdentity()) ; self.assertEqual(len(c),10)
+        del a
+        gc.collect()
+        self.assertTrue(b.isIdentity()) ; self.assertEqual(len(b),11)
+        self.assertTrue(not c.isAllocated())
+        del b
+        gc.collect()
+        self.assertTrue(not c.isAllocated())
+        #
+        a=float64(arange(5,dtype=int32))
+        b=DataArrayDouble(a)
+        c=DataArrayDouble(a)
+        d=DataArrayDouble(a)
+        self.assertTrue(b.isEqual(DataArrayDouble([0.,1.,2.,3.,4.]),1e-12))
+        self.assertTrue(c.isEqual(DataArrayDouble([0.,1.,2.,3.,4.]),1e-12))
+        self.assertTrue(d.isEqual(DataArrayDouble([0.,1.,2.,3.,4.]),1e-12))
+        c.pushBackSilent(10.) # c and a,b are dissociated
+        self.assertTrue(b.isEqual(DataArrayDouble([0.,1.,2.,3.,4.]),1e-12))
+        self.assertTrue(c.isEqual(DataArrayDouble([0.,1.,2.,3.,4.,10.]),1e-12))
+        self.assertTrue(d.isEqual(DataArrayDouble([0.,1.,2.,3.,4.]),1e-12))
+        del a
+        gc.collect()
+        self.assertTrue(b.isEqual(DataArrayDouble([0.,1.,2.,3.,4.]),1e-12))
+        self.assertTrue(c.isEqual(DataArrayDouble([0.,1.,2.,3.,4.,10.]),1e-12))
+        self.assertTrue(not d.isAllocated())
+        del b
+        gc.collect()
+        self.assertTrue(c.isEqual(DataArrayDouble([0.,1.,2.,3.,4.,10.]),1e-12))
+        #
+        a=float64(arange(5,dtype=int32))
+        b=DataArrayDouble(a)
+        c=DataArrayDouble(a)
+        self.assertTrue(b.isEqual(DataArrayDouble([0.,1.,2.,3.,4.]),1e-12))
+        self.assertTrue(c.isEqual(DataArrayDouble([0.,1.,2.,3.,4.]),1e-12))
+        b.pushBackSilent(10.) # c and a,b are dissociated
+        self.assertTrue(b.isEqual(DataArrayDouble([0.,1.,2.,3.,4.,10.]),1e-12))
+        self.assertTrue(c.isEqual(DataArrayDouble([0.,1.,2.,3.,4.]),1e-12))
+        del a
+        gc.collect()
+        self.assertTrue(b.isEqual(DataArrayDouble([0.,1.,2.,3.,4.,10.]),1e-12))
+        self.assertTrue(not c.isAllocated())
+        del b
+        gc.collect()
+        self.assertTrue(not c.isAllocated())
+        pass
+
     def setUp(self):
         pass
     pass
