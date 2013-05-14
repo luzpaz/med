@@ -124,6 +124,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT const std::vector<std::string> &getInfoOnComponents() const { return _info_on_compo; }
     MEDCOUPLING_EXPORT std::vector<std::string> &getInfoOnComponents() { return _info_on_compo; }
     MEDCOUPLING_EXPORT void setInfoOnComponents(const std::vector<std::string>& info) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT void setInfoAndChangeNbOfCompo(const std::vector<std::string>& info) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT std::vector<std::string> getVarsOnComponent() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT std::vector<std::string> getUnitsOnComponent() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT std::string getInfoOnComponent(int i) const throw(INTERP_KERNEL::Exception);
@@ -131,6 +132,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT std::string getUnitOnComponent(int i) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void setInfoOnComponent(int i, const char *info) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT int getNumberOfComponents() const { return (int)_info_on_compo.size(); }
+    MEDCOUPLING_EXPORT virtual bool isAllocated() const throw(INTERP_KERNEL::Exception) = 0;
     MEDCOUPLING_EXPORT virtual int getNumberOfTuples() const throw(INTERP_KERNEL::Exception) = 0;
     MEDCOUPLING_EXPORT virtual std::size_t getNbOfElems() const throw(INTERP_KERNEL::Exception) = 0;
     MEDCOUPLING_EXPORT virtual std::size_t getNbOfElemAllocated() const throw(INTERP_KERNEL::Exception) = 0;
@@ -179,7 +181,6 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT int getNumberOfTuples() const throw(INTERP_KERNEL::Exception) { return _info_on_compo.empty()?0:_mem.getNbOfElem()/getNumberOfComponents(); }
     MEDCOUPLING_EXPORT std::size_t getNbOfElems() const throw(INTERP_KERNEL::Exception) { return _mem.getNbOfElem(); }
     MEDCOUPLING_EXPORT std::size_t getHeapMemorySize() const;
-    MEDCOUPLING_EXPORT void setInfoAndChangeNbOfCompo(const std::vector<std::string>& info) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT double doubleValue() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT bool empty() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayDouble *deepCpy() const throw(INTERP_KERNEL::Exception);
@@ -397,7 +398,6 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT int getNumberOfTuples() const throw(INTERP_KERNEL::Exception) { return _info_on_compo.empty()?0:_mem.getNbOfElem()/getNumberOfComponents(); }
     MEDCOUPLING_EXPORT std::size_t getNbOfElems() const throw(INTERP_KERNEL::Exception) { return _mem.getNbOfElem(); }
     MEDCOUPLING_EXPORT std::size_t getHeapMemorySize() const;
-    MEDCOUPLING_EXPORT void setInfoAndChangeNbOfCompo(const std::vector<std::string>& info) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT int intValue() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT int getHashCode() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT bool empty() const throw(INTERP_KERNEL::Exception);
@@ -619,7 +619,6 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT int getNumberOfTuples() const throw(INTERP_KERNEL::Exception) { return _info_on_compo.empty()?0:_mem.getNbOfElem()/getNumberOfComponents(); }
     MEDCOUPLING_EXPORT std::size_t getNbOfElems() const throw(INTERP_KERNEL::Exception) { return _mem.getNbOfElem(); }
     MEDCOUPLING_EXPORT std::size_t getHeapMemorySize() const;
-    MEDCOUPLING_EXPORT void setInfoAndChangeNbOfCompo(const std::vector<std::string>& info) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT int getHashCode() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT bool empty() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void cpyFrom(const DataArrayChar& other) throw(INTERP_KERNEL::Exception);

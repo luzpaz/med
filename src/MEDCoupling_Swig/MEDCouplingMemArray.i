@@ -32,6 +32,7 @@ namespace ParaMEDMEM
     std::string cppRepr(const char *varName) const throw(INTERP_KERNEL::Exception);
     std::string getName() const;
     void setInfoOnComponents(const std::vector<std::string>& info) throw(INTERP_KERNEL::Exception);
+    void setInfoAndChangeNbOfCompo(const std::vector<std::string>& info) throw(INTERP_KERNEL::Exception);
     std::vector<std::string> getVarsOnComponent() const throw(INTERP_KERNEL::Exception);
     std::vector<std::string> getUnitsOnComponent() const throw(INTERP_KERNEL::Exception);
     std::string getInfoOnComponent(int i) const throw(INTERP_KERNEL::Exception);
@@ -39,6 +40,7 @@ namespace ParaMEDMEM
     std::string getUnitOnComponent(int i) const throw(INTERP_KERNEL::Exception);
     void setInfoOnComponent(int i, const char *info) throw(INTERP_KERNEL::Exception);
     int getNumberOfComponents() const;
+    virtual bool isAllocated() const throw(INTERP_KERNEL::Exception);
     virtual int getNumberOfTuples() const throw(INTERP_KERNEL::Exception);
     virtual std::size_t getNbOfElems() const throw(INTERP_KERNEL::Exception);
     virtual std::size_t getNbOfElemAllocated() const throw(INTERP_KERNEL::Exception);
@@ -87,9 +89,7 @@ namespace ParaMEDMEM
   {
   public:
     static DataArrayDouble *New();
-    bool isAllocated() const throw(INTERP_KERNEL::Exception);
     void checkAllocated() const throw(INTERP_KERNEL::Exception);
-    void setInfoAndChangeNbOfCompo(const std::vector<std::string>& info) throw(INTERP_KERNEL::Exception);
     double doubleValue() const throw(INTERP_KERNEL::Exception);
     bool empty() const throw(INTERP_KERNEL::Exception);
     DataArrayDouble *deepCpy() const throw(INTERP_KERNEL::Exception);
@@ -2159,9 +2159,7 @@ namespace ParaMEDMEM
   {
   public:
     static DataArrayInt *New();
-    bool isAllocated() const throw(INTERP_KERNEL::Exception);
     void checkAllocated() const throw(INTERP_KERNEL::Exception);
-    void setInfoAndChangeNbOfCompo(const std::vector<std::string>& info) throw(INTERP_KERNEL::Exception);
     int intValue() const throw(INTERP_KERNEL::Exception);
     int getHashCode() const throw(INTERP_KERNEL::Exception);
     bool empty() const throw(INTERP_KERNEL::Exception);
@@ -4493,9 +4491,7 @@ namespace ParaMEDMEM
   {
   public:
     virtual DataArrayChar *buildEmptySpecializedDAChar() const throw(INTERP_KERNEL::Exception) = 0;
-    bool isAllocated() const throw(INTERP_KERNEL::Exception);
     void checkAllocated() const throw(INTERP_KERNEL::Exception);
-    void setInfoAndChangeNbOfCompo(const std::vector<std::string>& info) throw(INTERP_KERNEL::Exception);
     int getHashCode() const throw(INTERP_KERNEL::Exception);
     bool empty() const throw(INTERP_KERNEL::Exception);
     void cpyFrom(const DataArrayChar& other) throw(INTERP_KERNEL::Exception);

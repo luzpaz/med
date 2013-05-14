@@ -57,32 +57,6 @@ std::size_t DataArrayChar::getHeapMemorySize() const
 }
 
 /*!
- * Sets information on all components. This method can change number of components
- * at certain conditions; if the conditions are not respected, an exception is thrown.
- * The number of components can be changed provided that \a this is not allocated.
- *
- * To know more on format of the component information see
- * \ref MEDCouplingArrayBasicsCompoName "DataArrays infos".
- *  \param [in] info - a vector of component infos.
- *  \throw If \a this->getNumberOfComponents() != \a info.size() && \a this->isAllocated()
- */
-void DataArrayChar::setInfoAndChangeNbOfCompo(const std::vector<std::string>& info) throw(INTERP_KERNEL::Exception)
-{
-  if(getNumberOfComponents()!=(int)info.size())
-    {
-      if(!isAllocated())
-        _info_on_compo=info;
-      else
-        {
-          std::ostringstream oss; oss << "DataArrayChar::setInfoAndChangeNbOfCompo : input is of size " << info.size() << " whereas number of components is equal to " << getNumberOfComponents() << "  and this is already allocated !";
-          throw INTERP_KERNEL::Exception(oss.str().c_str());
-        }
-    }
-  else
-    _info_on_compo=info;
-}
-
-/*!
  * Returns an integer value characterizing \a this array, which is useful for a quick
  * comparison of many instances of DataArrayInt.
  *  \return int - the hash value.

@@ -399,6 +399,32 @@ void DataArray::setInfoOnComponent(int i, const char *info) throw(INTERP_KERNEL:
     }
 }
 
+/*!
+ * Sets information on all components. This method can change number of components
+ * at certain conditions; if the conditions are not respected, an exception is thrown.
+ * The number of components can be changed provided that \a this is not allocated.
+ *
+ * To know more on format of the component information see
+ * \ref MEDCouplingArrayBasicsCompoName "DataArrays infos".
+ *  \param [in] info - a vector of component infos.
+ *  \throw If \a this->getNumberOfComponents() != \a info.size() && \a this->isAllocated()
+ */
+void DataArray::setInfoAndChangeNbOfCompo(const std::vector<std::string>& info) throw(INTERP_KERNEL::Exception)
+{
+  if(getNumberOfComponents()!=(int)info.size())
+    {
+      if(!isAllocated())
+        _info_on_compo=info;
+      else
+        {
+          std::ostringstream oss; oss << "DataArray::setInfoAndChangeNbOfCompo : input is of size " << info.size() << " whereas number of components is equal to " << getNumberOfComponents() << "  and this is already allocated !";
+          throw INTERP_KERNEL::Exception(oss.str().c_str());
+        }
+    }
+  else
+    _info_on_compo=info;
+}
+
 void DataArray::checkNbOfTuples(int nbOfTuples, const char *msg) const throw(INTERP_KERNEL::Exception)
 {
   if(getNumberOfTuples()!=nbOfTuples)
@@ -592,32 +618,6 @@ std::size_t DataArrayDouble::getHeapMemorySize() const
   std::size_t sz=_mem.getNbOfElemAllocated();
   sz*=sizeof(double);
   return DataArray::getHeapMemorySize()+sz;
-}
-
-/*!
- * Sets information on all components. This method can change number of components
- * at certain conditions; if the conditions are not respected, an exception is thrown.
- * The number of components can be changed provided that \a this is not allocated.
- *
- * To know more on format of the component information see
- * \ref MEDCouplingArrayBasicsCompoName "DataArrays infos".
- *  \param [in] info - a vector of component infos.
- *  \throw If \a this->getNumberOfComponents() != \a info.size() && \a this->isAllocated()
- */
-void DataArrayDouble::setInfoAndChangeNbOfCompo(const std::vector<std::string>& info) throw(INTERP_KERNEL::Exception)
-{
-  if(getNumberOfComponents()!=(int)info.size())
-    {
-      if(!isAllocated())
-        _info_on_compo=info;
-      else
-        {
-          std::ostringstream oss; oss << "DataArrayDouble::setInfoAndChangeNbOfCompo : input is of size " << info.size() << " whereas number of components is equal to " << getNumberOfComponents() << "  and this is already allocated !";
-          throw INTERP_KERNEL::Exception(oss.str().c_str());
-        }
-    }
-  else
-    _info_on_compo=info;
 }
 
 /*!
@@ -5208,32 +5208,6 @@ std::size_t DataArrayInt::getHeapMemorySize() const
   std::size_t sz=_mem.getNbOfElemAllocated();
   sz*=sizeof(int);
   return DataArray::getHeapMemorySize()+sz;
-}
-
-/*!
- * Sets information on all components. This method can change number of components
- * at certain conditions; if the conditions are not respected, an exception is thrown.
- * The number of components can be changed provided that \a this is not allocated.
- *
- * To know more on format of the component information see
- * \ref MEDCouplingArrayBasicsCompoName "DataArrays infos".
- *  \param [in] info - a vector of component infos.
- *  \throw If \a this->getNumberOfComponents() != \a info.size() && \a this->isAllocated()
- */
-void DataArrayInt::setInfoAndChangeNbOfCompo(const std::vector<std::string>& info) throw(INTERP_KERNEL::Exception)
-{
-  if(getNumberOfComponents()!=(int)info.size())
-    {
-      if(!isAllocated())
-        _info_on_compo=info;
-      else
-        {
-          std::ostringstream oss; oss << "DataArrayInt::setInfoAndChangeNbOfCompo : input is of size " << info.size() << " whereas number of components is equal to " << getNumberOfComponents() << "  and this is already allocated !";
-          throw INTERP_KERNEL::Exception(oss.str().c_str());
-        }
-    }
-  else
-    _info_on_compo=info;
 }
 
 /*!
