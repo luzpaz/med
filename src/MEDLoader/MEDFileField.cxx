@@ -4475,31 +4475,27 @@ try:MEDFileFieldGlobsReal(fileName)
   MEDFileUtilities::AutoFid fid=MEDfileOpen(fileName,MED_ACC_RDONLY);
   med_field_type typcha;
   //
-  int nbFields=MEDnField(fid);
-  if(nbFields<1)
+  std::vector<std::string> infos;
+  std::string dtunit,fieldName;
+  LocateField2(fid,fileName,0,true,fieldName,typcha,infos,dtunit);
+  switch(typcha)
     {
-      std::ostringstream oss; oss << "MEDFileField1TS(fileName) : no field present in file \'" << fileName << "\' !";
-      throw INTERP_KERNEL::Exception(oss.str().c_str());
+    case MED_FLOAT64:
+      {
+        _content=MEDFileField1TSWithoutSDA::New(fieldName.c_str(),-1,-1/*iteration*/,-1/*order*/,std::vector<std::string>());
+        break;
+      }
+    case MED_INT32:
+      {
+        _content=MEDFileIntField1TSWithoutSDA::New(fieldName.c_str(),-1,-1/*iteration*/,-1/*order*/,std::vector<std::string>());
+        break;
+      }
+    default:
+      {
+        std::ostringstream oss; oss << "MEDFileField1TS(fileName) : file \'" << fileName << "\' contains field with name \'" << fieldName << "\' but the type of field is not in [MED_FLOAT64, MED_INT32] !";
+        throw INTERP_KERNEL::Exception(oss.str().c_str());
+      }
     }
-  int ncomp=MEDfieldnComponent(fid,1);
-  INTERP_KERNEL::AutoPtr<char> comp=MEDLoaderBase::buildEmptyString(ncomp*MED_SNAME_SIZE);
-  INTERP_KERNEL::AutoPtr<char> unit=MEDLoaderBase::buildEmptyString(ncomp*MED_SNAME_SIZE);
-  INTERP_KERNEL::AutoPtr<char> dtunit=MEDLoaderBase::buildEmptyString(MED_LNAME_SIZE);
-  INTERP_KERNEL::AutoPtr<char> nomcha=MEDLoaderBase::buildEmptyString(MED_NAME_SIZE);
-  INTERP_KERNEL::AutoPtr<char> nomMaa=MEDLoaderBase::buildEmptyString(MED_NAME_SIZE);
-  med_bool localMesh;
-  int nbOfStep;
-  MEDfieldInfo(fid,1,nomcha,nomMaa,&localMesh,&typcha,comp,unit,dtunit,&nbOfStep);
-  std::string fieldName(nomcha);
-  if(nbOfStep<1)
-    {
-      std::ostringstream oss; oss << "MEDFileField1TS(fileName) : file \'" << fileName << "\' contains field with name \'" << fieldName << "\' but there is no time steps on it !";
-      throw INTERP_KERNEL::Exception(oss.str().c_str());
-    }
-  std::vector<std::string> infos(ncomp);
-  for(int j=0;j<ncomp;j++)
-    infos[j]=MEDLoaderBase::buildUnionUnit((char *)comp+j*MED_SNAME_SIZE,MED_SNAME_SIZE,(char *)unit+j*MED_SNAME_SIZE,MED_SNAME_SIZE);
-  _content=MEDFileField1TSWithoutSDA::New(fieldName.c_str(),-1,-1/*iteration*/,-1/*order*/,std::vector<std::string>());//tony 
   contentNotNullBase()->getOrCreateAndGetArray()->setInfoAndChangeNbOfCompo(infos);
   //
   med_int numdt,numit;
@@ -4523,12 +4519,18 @@ try:MEDFileFieldGlobsReal(fileName)
   MEDFileUtilities::AutoFid fid=MEDfileOpen(fileName,MED_ACC_RDONLY);
   med_field_type typcha;
   std::vector<std::string> infos;
-  int nbSteps=locateField(fid,fileName,fieldName,typcha,infos);
+  std::string dtunit;
+  int nbSteps=LocateField(fid,fileName,fieldName,typcha,infos,dtunit);
   switch(typcha)
     {
     case MED_FLOAT64:
       {
         _content=MEDFileField1TSWithoutSDA::New(fieldName,-1,-1/*iteration*/,-1/*order*/,std::vector<std::string>());
+        break;
+      }
+    case MED_INT32:
+      {
+        _content=MEDFileIntField1TSWithoutSDA::New(fieldName,-1,-1/*iteration*/,-1/*order*/,std::vector<std::string>());
         break;
       }
     default:
@@ -4566,12 +4568,18 @@ try:MEDFileFieldGlobsReal(fileName)
   MEDFileUtilities::AutoFid fid=MEDfileOpen(fileName,MED_ACC_RDONLY);
   med_field_type typcha;
   std::vector<std::string> infos;
-  int nbOfStep2=locateField(fid,fileName,fieldName,typcha,infos);
+  std::string dtunit;
+  int nbOfStep2=LocateField(fid,fileName,fieldName,typcha,infos,dtunit);
   switch(typcha)
     {
     case MED_FLOAT64:
       {
         _content=MEDFileField1TSWithoutSDA::New(fieldName,-1,iteration,order,std::vector<std::string>());
+        break;
+      }
+    case MED_INT32:
+      {
+        _content=MEDFileIntField1TSWithoutSDA::New(fieldName,-1,iteration,order,std::vector<std::string>());
         break;
       }
     default:
@@ -4633,13 +4641,41 @@ MEDFileAnyTypeField1TS::MEDFileAnyTypeField1TS(const MEDFileAnyTypeField1TSWitho
     }
 }
 
+int MEDFileAnyTypeField1TS::LocateField2(med_idt fid, const char *fileName, int fieldIdCFormat, bool checkFieldId, std::string& fieldName, med_field_type& typcha, std::vector<std::string>& infos, std::string& dtunitOut) throw(INTERP_KERNEL::Exception)
+{
+  if(checkFieldId)
+    {
+      int nbFields=MEDnField(fid);
+      if(fieldIdCFormat>=nbFields)
+        {
+          std::ostringstream oss; oss << "MEDFileAnyTypeField1TS::LocateField2(fileName) : in file \'" << fileName << "\' number of fields is " << nbFields << " ! Trying to request for id " << fieldIdCFormat << " !";
+          throw INTERP_KERNEL::Exception(oss.str().c_str());
+        }
+    }
+  int ncomp=MEDfieldnComponent(fid,fieldIdCFormat+1);
+  INTERP_KERNEL::AutoPtr<char> comp=MEDLoaderBase::buildEmptyString(ncomp*MED_SNAME_SIZE);
+  INTERP_KERNEL::AutoPtr<char> unit=MEDLoaderBase::buildEmptyString(ncomp*MED_SNAME_SIZE);
+  INTERP_KERNEL::AutoPtr<char> dtunit=MEDLoaderBase::buildEmptyString(MED_LNAME_SIZE);
+  INTERP_KERNEL::AutoPtr<char> nomcha=MEDLoaderBase::buildEmptyString(MED_NAME_SIZE);
+  INTERP_KERNEL::AutoPtr<char> nomMaa=MEDLoaderBase::buildEmptyString(MED_NAME_SIZE);
+  med_bool localMesh;
+  int nbOfStep;
+  MEDfieldInfo(fid,fieldIdCFormat+1,nomcha,nomMaa,&localMesh,&typcha,comp,unit,dtunit,&nbOfStep);
+  fieldName=MEDLoaderBase::buildStringFromFortran(nomcha,MED_NAME_SIZE);
+  dtunitOut=MEDLoaderBase::buildStringFromFortran(dtunit,MED_LNAME_SIZE);
+  infos.clear(); infos.resize(ncomp);
+  for(int j=0;j<ncomp;j++)
+    infos[j]=MEDLoaderBase::buildUnionUnit((char *)comp+j*MED_SNAME_SIZE,MED_SNAME_SIZE,(char *)unit+j*MED_SNAME_SIZE,MED_SNAME_SIZE);
+  return nbOfStep;
+}
+
 /*!
  * This method throws an INTERP_KERNEL::Exception if \a fieldName field is not in file pointed by \a fid and with name \a fileName.
  * 
  * \param [out]
  * \return in case of success the number of time steps available for the field with name \a fieldName.
  */
-int MEDFileAnyTypeField1TS::locateField(med_idt fid, const char *fileName, const char *fieldName, med_field_type& typcha, std::vector<std::string>& infos) throw(INTERP_KERNEL::Exception)
+int MEDFileAnyTypeField1TS::LocateField(med_idt fid, const char *fileName, const char *fieldName, med_field_type& typcha, std::vector<std::string>& infos, std::string& dtunitOut) throw(INTERP_KERNEL::Exception)
 {
   int nbFields=MEDnField(fid);
   bool found=false;
@@ -4647,26 +4683,10 @@ int MEDFileAnyTypeField1TS::locateField(med_idt fid, const char *fileName, const
   int nbOfStep2=-1;
   for(int i=0;i<nbFields && !found;i++)
     {
-      int ncomp=MEDfieldnComponent(fid,i+1);
-      INTERP_KERNEL::AutoPtr<char> comp=MEDLoaderBase::buildEmptyString(ncomp*MED_SNAME_SIZE);
-      INTERP_KERNEL::AutoPtr<char> unit=MEDLoaderBase::buildEmptyString(ncomp*MED_SNAME_SIZE);
-      INTERP_KERNEL::AutoPtr<char> dtunit=MEDLoaderBase::buildEmptyString(MED_LNAME_SIZE);
-      INTERP_KERNEL::AutoPtr<char> nomcha=MEDLoaderBase::buildEmptyString(MED_NAME_SIZE);
-      INTERP_KERNEL::AutoPtr<char> nomMaa=MEDLoaderBase::buildEmptyString(MED_NAME_SIZE);
-      med_bool localMesh;
-      int nbOfStep;
-      MEDfieldInfo(fid,i+1,nomcha,nomMaa,&localMesh,&typcha,comp,unit,dtunit,&nbOfStep);
-      std::string tmp(nomcha);
+      std::string tmp;
+      nbOfStep2=LocateField2(fid,fileName,i,false,tmp,typcha,infos,dtunitOut);
       fns[i]=tmp;
       found=(tmp==fieldName);
-      if(found)
-        {
-          nbOfStep2=nbOfStep;
-          std::string mname=MEDLoaderBase::buildStringFromFortran(nomMaa,MED_NAME_SIZE);
-          infos.clear(); infos.resize(ncomp);
-          for(int j=0;j<ncomp;j++)
-            infos[j]=MEDLoaderBase::buildUnionUnit((char *)comp+j*MED_SNAME_SIZE,MED_SNAME_SIZE,(char *)unit+j*MED_SNAME_SIZE,MED_SNAME_SIZE);
-        }
     }
   if(!found)
     {
@@ -4802,7 +4822,7 @@ void MEDFileAnyTypeField1TS::writeLL(med_idt fid) const throw(INTERP_KERNEL::Exc
     }
   if(getName().empty())
     throw INTERP_KERNEL::Exception("MEDFileField1TS::write : MED file does not accept field with empty name !");
-  MEDfieldCr(fid,getName().c_str(),MED_FLOAT64,nbComp,comp,unit,getDtUnit().c_str(),getMeshName().c_str());
+  MEDfieldCr(fid,getName().c_str(),getMEDFileFieldType(),nbComp,comp,unit,getDtUnit().c_str(),getMeshName().c_str());
   writeGlobals(fid,*this);
   contentNotNullBase()->writeLL(fid,*this);
 }
@@ -5023,7 +5043,9 @@ MEDFileAnyTypeField1TS *MEDFileAnyTypeField1TS::deepCpy() const throw(INTERP_KER
  */
 MEDFileField1TS *MEDFileField1TS::New(const char *fileName) throw(INTERP_KERNEL::Exception)
 {
-  return new MEDFileField1TS(fileName);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileField1TS> ret=new MEDFileField1TS(fileName);
+  ret->contentNotNull();
+  return ret.retn();
 }
 
 /*!
@@ -5038,7 +5060,9 @@ MEDFileField1TS *MEDFileField1TS::New(const char *fileName) throw(INTERP_KERNEL:
  */
 MEDFileField1TS *MEDFileField1TS::New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
 {
-  return new MEDFileField1TS(fileName,fieldName);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileField1TS> ret=new MEDFileField1TS(fileName,fieldName);
+  ret->contentNotNull();
+  return ret.retn();
 }
 
 /*!
@@ -5056,7 +5080,9 @@ MEDFileField1TS *MEDFileField1TS::New(const char *fileName, const char *fieldNam
  */
 MEDFileField1TS *MEDFileField1TS::New(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception)
 {
-  return new MEDFileField1TS(fileName,fieldName,iteration,order);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileField1TS> ret=new MEDFileField1TS(fileName,fieldName,iteration,order);
+  ret->contentNotNull();
+  return ret.retn();
 }
 
 /*!
@@ -5073,7 +5099,9 @@ MEDFileField1TS *MEDFileField1TS::New(const char *fileName, const char *fieldNam
  */
 MEDFileField1TS *MEDFileField1TS::New(const MEDFileField1TSWithoutSDA& other, bool shallowCopyOfContent)
 {
-  return new MEDFileField1TS(other,shallowCopyOfContent);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileField1TS> ret=new MEDFileField1TS(other,shallowCopyOfContent);
+  ret->contentNotNull();
+  return ret.retn();
 }
 
 /*!
@@ -5083,7 +5111,9 @@ MEDFileField1TS *MEDFileField1TS::New(const MEDFileField1TSWithoutSDA& other, bo
  */
 MEDFileField1TS *MEDFileField1TS::New()
 {
-  return new MEDFileField1TS;
+  MEDCouplingAutoRefCountObjectPtr<MEDFileField1TS> ret=new MEDFileField1TS;
+  ret->contentNotNull();
+  return ret.retn();
 }
 
 const MEDFileField1TSWithoutSDA *MEDFileField1TS::contentNotNull() const throw(INTERP_KERNEL::Exception)
@@ -5093,7 +5123,7 @@ const MEDFileField1TSWithoutSDA *MEDFileField1TS::contentNotNull() const throw(I
     throw INTERP_KERNEL::Exception("MEDFileField1TS::contentNotNull : the content pointer is null !");
   const MEDFileField1TSWithoutSDA *ret=dynamic_cast<const MEDFileField1TSWithoutSDA *>(pt);
   if(!ret)
-    throw INTERP_KERNEL::Exception("MEDFileField1TS::contentNotNull : the content pointer is not null but it is not of type double !");
+    throw INTERP_KERNEL::Exception("MEDFileField1TS::contentNotNull : the content pointer is not null but it is not of type double ! Reason is maybe that the read field has not the type FLOAT64 !");
   return ret;
 }
 
@@ -5104,7 +5134,7 @@ MEDFileField1TSWithoutSDA *MEDFileField1TS::contentNotNull() throw(INTERP_KERNEL
     throw INTERP_KERNEL::Exception("MEDFileField1TS::contentNotNull : the non const content pointer is null !");
   MEDFileField1TSWithoutSDA *ret=dynamic_cast<MEDFileField1TSWithoutSDA *>(pt);
   if(!ret)
-    throw INTERP_KERNEL::Exception("MEDFileField1TS::contentNotNull : the non const content pointer is not null but it is not of type double !");
+    throw INTERP_KERNEL::Exception("MEDFileField1TS::contentNotNull : the non const content pointer is not null but it is not of type double ! Reason is maybe that the read field has not the type FLOAT64 !");
   return ret;
 }
 
@@ -5538,18 +5568,33 @@ const DataArray *MEDFileIntField1TSWithoutSDA::getOrCreateAndGetArray() const
 }
 
 //=====================
-MEDFileIntField1TS *MEDFileIntField1TS::New(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception)
-{
-  return new MEDFileIntField1TS(fileName,fieldName,iteration,order);
-}
 
 MEDFileIntField1TS *MEDFileIntField1TS::New()
 {
-  return new MEDFileIntField1TS;
+  MEDCouplingAutoRefCountObjectPtr<MEDFileIntField1TS> ret=new MEDFileIntField1TS;
+  ret->contentNotNull();
+  return ret.retn();
 }
 
-MEDFileIntField1TS::MEDFileIntField1TS(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception):MEDFileAnyTypeField1TS(fileName,fieldName,iteration,order)
+MEDFileIntField1TS *MEDFileIntField1TS::New(const char *fileName) throw(INTERP_KERNEL::Exception)
 {
+  MEDCouplingAutoRefCountObjectPtr<MEDFileIntField1TS> ret=new MEDFileIntField1TS(fileName);
+  ret->contentNotNull();
+  return ret.retn();
+}
+
+MEDFileIntField1TS *MEDFileIntField1TS::New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileIntField1TS> ret=new MEDFileIntField1TS(fileName,fieldName);
+  ret->contentNotNull();
+  return ret.retn();
+}
+
+MEDFileIntField1TS *MEDFileIntField1TS::New(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileIntField1TS> ret=new MEDFileIntField1TS(fileName,fieldName,iteration,order);
+  ret->contentNotNull();
+  return ret.retn();
 }
 
 MEDFileIntField1TS::MEDFileIntField1TS()
@@ -5557,9 +5602,49 @@ MEDFileIntField1TS::MEDFileIntField1TS()
   _content=new MEDFileIntField1TSWithoutSDA;
 }
 
+MEDFileIntField1TS::MEDFileIntField1TS(const char *fileName) throw(INTERP_KERNEL::Exception)
+try:MEDFileAnyTypeField1TS(fileName)
+{
+}
+catch(INTERP_KERNEL::Exception& e)
+  { throw e; }
+
+MEDFileIntField1TS::MEDFileIntField1TS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
+try:MEDFileAnyTypeField1TS(fileName,fieldName)
+{
+}
+catch(INTERP_KERNEL::Exception& e)
+  { throw e; }
+
+MEDFileIntField1TS::MEDFileIntField1TS(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception):MEDFileAnyTypeField1TS(fileName,fieldName,iteration,order)
+{
+}
+
 MEDFileAnyTypeField1TS *MEDFileIntField1TS::shallowCpy() const throw(INTERP_KERNEL::Exception)
 {
   return new MEDFileIntField1TS(*this);
+}
+
+const MEDFileIntField1TSWithoutSDA *MEDFileIntField1TS::contentNotNull() const throw(INTERP_KERNEL::Exception)
+{
+  const MEDFileAnyTypeField1TSWithoutSDA *pt(_content);
+  if(!pt)
+    throw INTERP_KERNEL::Exception("MEDFileIntField1TS::contentNotNull : the content pointer is null !");
+  const MEDFileIntField1TSWithoutSDA *ret=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(pt);
+  if(!ret)
+    throw INTERP_KERNEL::Exception("MEDFileIntField1TS::contentNotNull : the content pointer is not null but it is not of type int32 ! Reason is maybe that the read field has not the type INT32 !");
+  return ret;
+}
+
+MEDFileIntField1TSWithoutSDA *MEDFileIntField1TS::contentNotNull() throw(INTERP_KERNEL::Exception)
+{
+  MEDFileAnyTypeField1TSWithoutSDA *pt(_content);
+  if(!pt)
+    throw INTERP_KERNEL::Exception("MEDFileIntField1TS::contentNotNull : the non const content pointer is null !");
+  MEDFileIntField1TSWithoutSDA *ret=dynamic_cast<MEDFileIntField1TSWithoutSDA *>(pt);
+  if(!ret)
+    throw INTERP_KERNEL::Exception("MEDFileIntField1TS::contentNotNull : the non const content pointer is not null but it is not of type int32 ! Reason is maybe that the read field has not the type INT32 !");
+  return ret;
 }
 
 //=====================
@@ -5825,7 +5910,7 @@ void MEDFileAnyTypeFieldMultiTSWithoutSDA::writeLL(med_idt fid, const MEDFileWri
     }
   if(_name.empty())
     throw INTERP_KERNEL::Exception("MEDFileFieldMultiTSWithoutSDA::write : MED file does not accept field with empty name !");
-  MEDfieldCr(fid,_name.c_str(),MED_FLOAT64,nbComp,comp,unit,getDtUnit().c_str(),getMeshName().c_str());
+  MEDfieldCr(fid,_name.c_str(),getMEDFileFieldType(),nbComp,comp,unit,getDtUnit().c_str(),getMeshName().c_str());
   int nbOfTS=_time_steps.size();
   for(int i=0;i<nbOfTS;i++)
     _time_steps[i]->writeLL(fid,opts);

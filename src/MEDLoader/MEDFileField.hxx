@@ -561,7 +561,8 @@ namespace ParaMEDMEM
     MEDFileAnyTypeField1TS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeField1TS(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeField1TS(const MEDFileAnyTypeField1TSWithoutSDA& other, bool shallowCopyOfContent);
-    int locateField(med_idt fid, const char *fileName, const char *fieldName, med_field_type& typcha, std::vector<std::string>& infos) throw(INTERP_KERNEL::Exception);
+    static int LocateField2(med_idt fid, const char *fileName, int fieldIdCFormat, bool checkFieldId, std::string& fieldName, med_field_type& typcha, std::vector<std::string>& infos, std::string& dtunitOut) throw(INTERP_KERNEL::Exception);
+    static int LocateField(med_idt fid, const char *fileName, const char *fieldName, med_field_type& typcha, std::vector<std::string>& infos, std::string& dtunitOut) throw(INTERP_KERNEL::Exception);
     void writeLL(med_idt fid) const throw(INTERP_KERNEL::Exception);
     // direct forwarding to MEDFileAnyTypeField1TSWithoutSDA instance _content
   public:
@@ -610,6 +611,7 @@ namespace ParaMEDMEM
     void changePflsRefsNamesGen(const std::vector< std::pair<std::vector<std::string>, std::string > >& mapOfModif) throw(INTERP_KERNEL::Exception);
     void changeLocsRefsNamesGen(const std::vector< std::pair<std::vector<std::string>, std::string > >& mapOfModif) throw(INTERP_KERNEL::Exception);
   protected:
+    virtual med_field_type getMEDFileFieldType() const = 0;
     MEDFileAnyTypeField1TSWithoutSDA *contentNotNullBase() throw(INTERP_KERNEL::Exception);
     const MEDFileAnyTypeField1TSWithoutSDA *contentNotNullBase() const throw(INTERP_KERNEL::Exception);
   protected:
@@ -646,6 +648,7 @@ namespace ParaMEDMEM
     std::vector< std::vector<DataArrayDouble *> > getFieldSplitedByType2(const char *mname, std::vector<INTERP_KERNEL::NormalizedCellType>& types, std::vector< std::vector<TypeOfField> >& typesF,
                                                                          std::vector< std::vector<std::string> >& pfls, std::vector< std::vector<std::string> >& locs) const throw(INTERP_KERNEL::Exception);
   private:
+    med_field_type getMEDFileFieldType() const { return MED_FLOAT64; }
     const MEDFileField1TSWithoutSDA *contentNotNull() const throw(INTERP_KERNEL::Exception);
     MEDFileField1TSWithoutSDA *contentNotNull() throw(INTERP_KERNEL::Exception);
   private:
@@ -659,12 +662,20 @@ namespace ParaMEDMEM
   class MEDLOADER_EXPORT MEDFileIntField1TS : public MEDFileAnyTypeField1TS
   {
   public:
-    MEDFileIntField1TS *New(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception);
     static MEDFileIntField1TS *New();
+    static MEDFileIntField1TS *New(const char *fileName) throw(INTERP_KERNEL::Exception);
+    static MEDFileIntField1TS *New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
+    static MEDFileIntField1TS *New(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeField1TS *shallowCpy() const throw(INTERP_KERNEL::Exception);
   private:
-    MEDFileIntField1TS(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception);
+    med_field_type getMEDFileFieldType() const { return MED_INT32; }
+    const MEDFileIntField1TSWithoutSDA *contentNotNull() const throw(INTERP_KERNEL::Exception);
+    MEDFileIntField1TSWithoutSDA *contentNotNull() throw(INTERP_KERNEL::Exception);
+  private:
     MEDFileIntField1TS();
+    MEDFileIntField1TS(const char *fileName) throw(INTERP_KERNEL::Exception);
+    MEDFileIntField1TS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
+    MEDFileIntField1TS(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception);
   };
   
   class MEDLOADER_EXPORT MEDFileAnyTypeFieldMultiTSWithoutSDA : public RefCountObject
@@ -712,6 +723,7 @@ namespace ParaMEDMEM
     void changePflsRefsNamesGen2(const std::vector< std::pair<std::vector<std::string>, std::string > >& mapOfModif) throw(INTERP_KERNEL::Exception);
     void changeLocsRefsNamesGen2(const std::vector< std::pair<std::vector<std::string>, std::string > >& mapOfModif) throw(INTERP_KERNEL::Exception);
   protected:
+    virtual med_field_type getMEDFileFieldType() const = 0;
     std::string getDtUnit() const throw(INTERP_KERNEL::Exception);
   protected:
     std::string _name;
@@ -732,6 +744,7 @@ namespace ParaMEDMEM
   protected:
     MEDFileFieldMultiTSWithoutSDA(const char *fieldName);
     MEDFileFieldMultiTSWithoutSDA(med_idt fid, const char *fieldName, int id, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception);
+    med_field_type getMEDFileFieldType() const { return MED_FLOAT64; }
     void copyTinyInfoFrom(const MEDCouplingFieldDouble *field) throw(INTERP_KERNEL::Exception);
     void checkCoherencyOfTinyInfo(const MEDCouplingFieldDouble *field) const throw(INTERP_KERNEL::Exception);
   public:
