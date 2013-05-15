@@ -4468,43 +4468,49 @@ MEDFileAnyTypeField1TS::MEDFileAnyTypeField1TS()
 {
 }
 
-MEDFileAnyTypeField1TS::MEDFileAnyTypeField1TS(const char *fileName) throw(INTERP_KERNEL::Exception)
-try:MEDFileFieldGlobsReal(fileName)
+MEDFileAnyTypeField1TSWithoutSDA *MEDFileAnyTypeField1TS::BuildContentFrom(med_idt fid, const char *fileName) throw(INTERP_KERNEL::Exception)
 {
-  MEDFileUtilities::CheckFileForRead(fileName);
-  MEDFileUtilities::AutoFid fid=MEDfileOpen(fileName,MED_ACC_RDONLY);
   med_field_type typcha;
   //
   std::vector<std::string> infos;
   std::string dtunit,fieldName;
   LocateField2(fid,fileName,0,true,fieldName,typcha,infos,dtunit);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> ret;
   switch(typcha)
     {
     case MED_FLOAT64:
       {
-        _content=MEDFileField1TSWithoutSDA::New(fieldName.c_str(),-1,-1/*iteration*/,-1/*order*/,std::vector<std::string>());
+        ret=MEDFileField1TSWithoutSDA::New(fieldName.c_str(),-1,-1/*iteration*/,-1/*order*/,std::vector<std::string>());
         break;
       }
     case MED_INT32:
       {
-        _content=MEDFileIntField1TSWithoutSDA::New(fieldName.c_str(),-1,-1/*iteration*/,-1/*order*/,std::vector<std::string>());
+        ret=MEDFileIntField1TSWithoutSDA::New(fieldName.c_str(),-1,-1/*iteration*/,-1/*order*/,std::vector<std::string>());
         break;
       }
     default:
       {
-        std::ostringstream oss; oss << "MEDFileField1TS(fileName) : file \'" << fileName << "\' contains field with name \'" << fieldName << "\' but the type of field is not in [MED_FLOAT64, MED_INT32] !";
+        std::ostringstream oss; oss << "MEDFileAnyTypeField1TS::BuildContentFrom(fileName) : file \'" << fileName << "\' contains field with name \'" << fieldName << "\' but the type of field is not in [MED_FLOAT64, MED_INT32] !";
         throw INTERP_KERNEL::Exception(oss.str().c_str());
       }
     }
-  contentNotNullBase()->getOrCreateAndGetArray()->setInfoAndChangeNbOfCompo(infos);
+  ret->getOrCreateAndGetArray()->setInfoAndChangeNbOfCompo(infos);
   //
   med_int numdt,numit;
   med_float dt;
   MEDfieldComputingStepInfo(fid,fieldName.c_str(),1,&numdt,&numit,&dt);
-  contentNotNullBase()->setTime(numdt,numit,dt);
-  contentNotNullBase()->_csit=1;
-  contentNotNullBase()->finishLoading(fid);
-  //
+  ret->setTime(numdt,numit,dt);
+  ret->_csit=1;
+  ret->finishLoading(fid);
+  return ret.retn();
+}
+
+MEDFileAnyTypeField1TS::MEDFileAnyTypeField1TS(const char *fileName) throw(INTERP_KERNEL::Exception)
+try:MEDFileFieldGlobsReal(fileName)
+{
+  MEDFileUtilities::CheckFileForRead(fileName);
+  MEDFileUtilities::AutoFid fid=MEDfileOpen(fileName,MED_ACC_RDONLY);
+  _content=BuildContentFrom(fid,fileName);
   loadGlobals(fid);
 }
 catch(INTERP_KERNEL::Exception& e)
@@ -4512,34 +4518,32 @@ catch(INTERP_KERNEL::Exception& e)
     throw e;
   }
 
-MEDFileAnyTypeField1TS::MEDFileAnyTypeField1TS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
-try:MEDFileFieldGlobsReal(fileName)
+MEDFileAnyTypeField1TSWithoutSDA *MEDFileAnyTypeField1TS::BuildContentFrom(med_idt fid, const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
 {
-  MEDFileUtilities::CheckFileForRead(fileName);
-  MEDFileUtilities::AutoFid fid=MEDfileOpen(fileName,MED_ACC_RDONLY);
   med_field_type typcha;
   std::vector<std::string> infos;
   std::string dtunit;
   int nbSteps=LocateField(fid,fileName,fieldName,typcha,infos,dtunit);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> ret;
   switch(typcha)
     {
     case MED_FLOAT64:
       {
-        _content=MEDFileField1TSWithoutSDA::New(fieldName,-1,-1/*iteration*/,-1/*order*/,std::vector<std::string>());
+        ret=MEDFileField1TSWithoutSDA::New(fieldName,-1,-1/*iteration*/,-1/*order*/,std::vector<std::string>());
         break;
       }
     case MED_INT32:
       {
-        _content=MEDFileIntField1TSWithoutSDA::New(fieldName,-1,-1/*iteration*/,-1/*order*/,std::vector<std::string>());
+        ret=MEDFileIntField1TSWithoutSDA::New(fieldName,-1,-1/*iteration*/,-1/*order*/,std::vector<std::string>());
         break;
       }
     default:
       {
-        std::ostringstream oss; oss << "MEDFileField1TS(fileName,fieldName) : file \'" << fileName << "\' contains field with name \'" << fieldName << "\' but the type of field is not in [MED_FLOAT64, MED_INT32] !";
+        std::ostringstream oss; oss << "MEDFileAnyTypeField1TS::BuildContentFrom(fileName,fieldName) : file \'" << fileName << "\' contains field with name \'" << fieldName << "\' but the type of field is not in [MED_FLOAT64, MED_INT32] !";
         throw INTERP_KERNEL::Exception(oss.str().c_str());
       }
     }
-  contentNotNullBase()->getOrCreateAndGetArray()->setInfoAndChangeNbOfCompo(infos);
+  ret->getOrCreateAndGetArray()->setInfoAndChangeNbOfCompo(infos);
   //
   if(nbSteps<1)
     {
@@ -4550,10 +4554,18 @@ try:MEDFileFieldGlobsReal(fileName)
   med_int numdt,numit;
   med_float dt;
   MEDfieldComputingStepInfo(fid,fieldName,1,&numdt,&numit,&dt);
-  contentNotNullBase()->setTime(numdt,numit,dt);
-  contentNotNullBase()->_csit=1;
-  contentNotNullBase()->finishLoading(fid);
-  //
+  ret->setTime(numdt,numit,dt);
+  ret->_csit=1;
+  ret->finishLoading(fid);
+  return ret.retn();
+}
+
+MEDFileAnyTypeField1TS::MEDFileAnyTypeField1TS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
+try:MEDFileFieldGlobsReal(fileName)
+{
+  MEDFileUtilities::CheckFileForRead(fileName);
+  MEDFileUtilities::AutoFid fid=MEDfileOpen(fileName,MED_ACC_RDONLY);
+  _content=BuildContentFrom(fid,fileName,fieldName);
   loadGlobals(fid);
 }
 catch(INTERP_KERNEL::Exception& e)
@@ -4561,34 +4573,83 @@ catch(INTERP_KERNEL::Exception& e)
     throw e;
   }
 
-MEDFileAnyTypeField1TS::MEDFileAnyTypeField1TS(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception)
-try:MEDFileFieldGlobsReal(fileName)
+MEDFileAnyTypeField1TS *MEDFileAnyTypeField1TS::BuildNewInstanceFromContent(MEDFileAnyTypeField1TSWithoutSDA *c, const char *fileName) throw(INTERP_KERNEL::Exception)
+{
+  if(!c)
+    throw INTERP_KERNEL::Exception("MEDFileAnyTypeField1TS::BuildNewInstanceFromContent : empty content in input : unable to build a new instance !");
+  if(dynamic_cast<const MEDFileField1TSWithoutSDA *>(c))
+    {
+      MEDCouplingAutoRefCountObjectPtr<MEDFileField1TS> ret=MEDFileField1TS::New();
+      ret->setFileName(fileName);
+      ret->_content=c;
+      return ret.retn();
+    }
+  if(dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(c))
+    {
+      MEDCouplingAutoRefCountObjectPtr<MEDFileIntField1TS> ret=MEDFileIntField1TS::New();
+      ret->setFileName(fileName);
+      ret->_content=c;
+      return ret.retn();
+    }
+  throw INTERP_KERNEL::Exception("MEDFileAnyTypeField1TS::BuildNewInstanceFromContent : internal error ! a content of type different from FLOAT64 and INT32 has been built but not intercepted !");
+}
+
+MEDFileAnyTypeField1TS *MEDFileAnyTypeField1TS::New(const char *fileName) throw(INTERP_KERNEL::Exception)
 {
   MEDFileUtilities::CheckFileForRead(fileName);
   MEDFileUtilities::AutoFid fid=MEDfileOpen(fileName,MED_ACC_RDONLY);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> c=BuildContentFrom(fid,fileName);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TS> ret=BuildNewInstanceFromContent(c,fileName);
+  ret->loadGlobals(fid);
+  return ret.retn();
+}
+
+MEDFileAnyTypeField1TS *MEDFileAnyTypeField1TS::New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
+{
+  MEDFileUtilities::CheckFileForRead(fileName);
+  MEDFileUtilities::AutoFid fid=MEDfileOpen(fileName,MED_ACC_RDONLY);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> c=BuildContentFrom(fid,fileName,fieldName);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TS> ret=BuildNewInstanceFromContent(c,fileName);
+  ret->loadGlobals(fid);
+  return ret.retn();
+}
+
+MEDFileAnyTypeField1TS *MEDFileAnyTypeField1TS::New(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception)
+{
+  MEDFileUtilities::CheckFileForRead(fileName);
+  MEDFileUtilities::AutoFid fid=MEDfileOpen(fileName,MED_ACC_RDONLY);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> c=BuildContentFrom(fid,fileName,fieldName,iteration,order);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TS> ret=BuildNewInstanceFromContent(c,fileName);
+  ret->loadGlobals(fid);
+  return ret.retn();
+}
+
+MEDFileAnyTypeField1TSWithoutSDA *MEDFileAnyTypeField1TS::BuildContentFrom(med_idt fid, const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception)
+{
   med_field_type typcha;
   std::vector<std::string> infos;
   std::string dtunit;
   int nbOfStep2=LocateField(fid,fileName,fieldName,typcha,infos,dtunit);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> ret;
   switch(typcha)
     {
     case MED_FLOAT64:
       {
-        _content=MEDFileField1TSWithoutSDA::New(fieldName,-1,iteration,order,std::vector<std::string>());
+        ret=MEDFileField1TSWithoutSDA::New(fieldName,-1,iteration,order,std::vector<std::string>());
         break;
       }
     case MED_INT32:
       {
-        _content=MEDFileIntField1TSWithoutSDA::New(fieldName,-1,iteration,order,std::vector<std::string>());
+        ret=MEDFileIntField1TSWithoutSDA::New(fieldName,-1,iteration,order,std::vector<std::string>());
         break;
       }
     default:
       {
-        std::ostringstream oss; oss << "MEDFileField1TS(fileName,fieldName,iteration,order) : file \'" << fileName << "\' contains field with name \'" << fieldName << "\' but the type of field is not in [MED_FLOAT64, MED_INT32] !";
+        std::ostringstream oss; oss << "MEDFileAnyTypeField1TS::BuildContentFrom(fileName,fieldName,iteration,order) : file \'" << fileName << "\' contains field with name \'" << fieldName << "\' but the type of field is not in [MED_FLOAT64, MED_INT32] !";
         throw INTERP_KERNEL::Exception(oss.str().c_str());
       }
     }
-  contentNotNullBase()->getOrCreateAndGetArray()->setInfoAndChangeNbOfCompo(infos);
+  ret->getOrCreateAndGetArray()->setInfoAndChangeNbOfCompo(infos);
   //
   bool found=false;
   std::vector< std::pair<int,int> > dtits(nbOfStep2);
@@ -4600,7 +4661,7 @@ try:MEDFileFieldGlobsReal(fileName)
       if(numdt==iteration && numit==order)
         {
           found=true;
-          contentNotNullBase()->_csit=i+1;
+          ret->_csit=i+1;
         }
       else
         dtits[i]=std::pair<int,int>(numdt,numit);
@@ -4612,8 +4673,16 @@ try:MEDFileFieldGlobsReal(fileName)
         oss << "(" << (*iter).first << "," << (*iter).second << "), ";
       throw INTERP_KERNEL::Exception(oss.str().c_str());
     }
-  contentNotNullBase()->finishLoading(fid);
-  //
+  ret->finishLoading(fid);
+  return ret.retn();
+}
+
+MEDFileAnyTypeField1TS::MEDFileAnyTypeField1TS(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception)
+try:MEDFileFieldGlobsReal(fileName)
+{
+  MEDFileUtilities::CheckFileForRead(fileName);
+  MEDFileUtilities::AutoFid fid=MEDfileOpen(fileName,MED_ACC_RDONLY);
+  _content=BuildContentFrom(fid,fileName,fieldName,iteration,order);
   loadGlobals(fid);
 }
 catch(INTERP_KERNEL::Exception& e)
