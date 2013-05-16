@@ -77,6 +77,11 @@ using namespace INTERP_KERNEL;
   $result=convertMultiFields($1,$owner);
 }
 
+%typemap(out) ParaMEDMEM::DataArray*
+{
+  $result=convertDataArray($1,$owner);
+}
+
 %typemap(out) ParaMEDMEM::DataArrayChar*
 {
   $result=convertDataArrayChar($1,$owner);

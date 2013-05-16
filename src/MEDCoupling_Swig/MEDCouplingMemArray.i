@@ -40,6 +40,7 @@ namespace ParaMEDMEM
     std::string getUnitOnComponent(int i) const throw(INTERP_KERNEL::Exception);
     void setInfoOnComponent(int i, const char *info) throw(INTERP_KERNEL::Exception);
     int getNumberOfComponents() const;
+    virtual void alloc(int nbOfTuple, int nbOfCompo=1) throw(INTERP_KERNEL::Exception);
     virtual bool isAllocated() const throw(INTERP_KERNEL::Exception);
     virtual int getNumberOfTuples() const throw(INTERP_KERNEL::Exception);
     virtual std::size_t getNbOfElems() const throw(INTERP_KERNEL::Exception);
@@ -100,7 +101,6 @@ namespace ParaMEDMEM
     void pushBackValsSilent(const double *valsBg, const double *valsEnd) throw(INTERP_KERNEL::Exception);
     double popBackSilent() throw(INTERP_KERNEL::Exception);
     void pack() const throw(INTERP_KERNEL::Exception);
-    void alloc(int nbOfTuple, int nbOfCompo=1) throw(INTERP_KERNEL::Exception);
     void allocIfNecessary(int nbOfTuple, int nbOfCompo) throw(INTERP_KERNEL::Exception);
     void fillWithZero() throw(INTERP_KERNEL::Exception);
     void fillWithValue(double val) throw(INTERP_KERNEL::Exception);
@@ -2170,7 +2170,6 @@ namespace ParaMEDMEM
     void pushBackSilent(int val) throw(INTERP_KERNEL::Exception);
     int popBackSilent() throw(INTERP_KERNEL::Exception);
     void pack() const throw(INTERP_KERNEL::Exception);
-    void alloc(int nbOfTuple, int nbOfCompo=1) throw(INTERP_KERNEL::Exception);
     void allocIfNecessary(int nbOfTuple, int nbOfCompo) throw(INTERP_KERNEL::Exception);
     bool isEqual(const DataArrayInt& other) const throw(INTERP_KERNEL::Exception);
     bool isEqualWithoutConsideringStr(const DataArrayInt& other) const throw(INTERP_KERNEL::Exception);
@@ -4500,7 +4499,6 @@ namespace ParaMEDMEM
     void pushBackValsSilent(const char *valsBg, const char *valsEnd) throw(INTERP_KERNEL::Exception);
     char popBackSilent() throw(INTERP_KERNEL::Exception);
     void pack() const throw(INTERP_KERNEL::Exception);
-    void alloc(int nbOfTuple, int nbOfCompo=1) throw(INTERP_KERNEL::Exception);
     void allocIfNecessary(int nbOfTuple, int nbOfCompo) throw(INTERP_KERNEL::Exception);
     bool isEqual(const DataArrayChar& other) const throw(INTERP_KERNEL::Exception);
     bool isEqualWithoutConsideringStr(const DataArrayChar& other) const throw(INTERP_KERNEL::Exception);

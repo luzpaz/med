@@ -452,6 +452,22 @@ static PyObject *convertDataArrayChar(ParaMEDMEM::DataArrayChar *dac, int owner)
   return ret;
 }
 
+static PyObject *convertDataArray(ParaMEDMEM::DataArray *dac, int owner) throw(INTERP_KERNEL::Exception)
+{
+  PyObject *ret=0;
+  if(dynamic_cast<ParaMEDMEM::DataArrayDouble *>(dac))
+    ret=SWIG_NewPointerObj((void*)dac,SWIGTYPE_p_ParaMEDMEM__DataArrayDouble,owner);
+  if(dynamic_cast<ParaMEDMEM::DataArrayInt *>(dac))
+    ret=SWIG_NewPointerObj((void*)dac,SWIGTYPE_p_ParaMEDMEM__DataArrayInt,owner);
+  if(dynamic_cast<ParaMEDMEM::DataArrayByte *>(dac))
+    ret=SWIG_NewPointerObj((void*)dac,SWIGTYPE_p_ParaMEDMEM__DataArrayByte,owner);
+  if(dynamic_cast<ParaMEDMEM::DataArrayAsciiChar *>(dac))
+    ret=SWIG_NewPointerObj((void*)dac,SWIGTYPE_p_ParaMEDMEM__DataArrayAsciiChar,owner);
+  if(!ret)
+    throw INTERP_KERNEL::Exception("Not recognized type of DataArray on downcast !");
+  return ret;
+}
+
 static PyObject* convertMultiFields(ParaMEDMEM::MEDCouplingMultiFields *mfs, int owner) throw(INTERP_KERNEL::Exception)
 {
   PyObject *ret=0;
