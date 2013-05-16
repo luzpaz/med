@@ -196,10 +196,10 @@ std::string MEDFileFieldLoc::repr() const
   return oss.str();
 }
 
-void MEDFileFieldPerMeshPerTypePerDisc::assignFieldNoProfile(int& start, int offset, int nbOfCells, const MEDCouplingFieldDouble *field, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
+void MEDFileFieldPerMeshPerTypePerDisc::assignFieldNoProfile(int& start, int offset, int nbOfCells, const MEDCouplingFieldDouble *field, const DataArray *arrr, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
 {
   _type=field->getTypeOfField();
-  const DataArrayDouble *da=field->getArray();
+  const DataArrayDouble *da=static_cast<const DataArrayDouble *>(arrr);//tony putain
   _start=start;
   switch(_type)
     {
@@ -272,7 +272,7 @@ void MEDFileFieldPerMeshPerTypePerDisc::assignFieldNoProfile(int& start, int off
  *             \b WARNING if not null the MED file profile can be subdivided again in case of Gauss points.
  * \param [in] mesh is the mesh coming from the MEDFileMesh instance in correspondance with the MEDFileField. The mesh inside the \a field is simply ignored.
  */
-void MEDFileFieldPerMeshPerTypePerDisc::assignFieldProfile(int& start, const DataArrayInt *multiTypePfl, const DataArrayInt *idsInPfl, DataArrayInt *locIds, int nbOfEltsInWholeMesh, const MEDCouplingFieldDouble *field, const MEDCouplingMesh *mesh, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
+void MEDFileFieldPerMeshPerTypePerDisc::assignFieldProfile(int& start, const DataArrayInt *multiTypePfl, const DataArrayInt *idsInPfl, DataArrayInt *locIds, int nbOfEltsInWholeMesh, const MEDCouplingFieldDouble *field, const DataArray *arrr, const MEDCouplingMesh *mesh, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
 {
   _profile.clear();
   _type=field->getTypeOfField();
@@ -290,7 +290,7 @@ void MEDFileFieldPerMeshPerTypePerDisc::assignFieldProfile(int& start, const Dat
           _profile=oss.str();
         }
     }
-  const DataArrayDouble *da=field->getArray();
+  const DataArrayDouble *da=static_cast<const DataArrayDouble *>(arrr);//tony putain
   _start=start;
   switch(_type)
     {
@@ -376,11 +376,11 @@ void MEDFileFieldPerMeshPerTypePerDisc::assignFieldProfile(int& start, const Dat
   start=_end;
 }
 
-void MEDFileFieldPerMeshPerTypePerDisc::assignNodeFieldNoProfile(int& start, const MEDCouplingFieldDouble *field, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
-{
+void MEDFileFieldPerMeshPerTypePerDisc::assignNodeFieldNoProfile(int& start, const MEDCouplingFieldDouble *field, const DataArray *arrr, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
+{//tony putain
   _start=start;
-  _nval=field->getArray()->getNumberOfTuples();
-  getArrayDouble()->setContigPartOfSelectedValues2(_start,field->getArray(),0,_nval,1);
+  _nval=arrr->getNumberOfTuples();
+  getArrayDouble()->setContigPartOfSelectedValues2(_start,static_cast<const DataArrayDouble *>(arrr),0,_nval,1);
   _end=_start+_nval;
   start=_end;
 }
@@ -970,11 +970,11 @@ MEDFileFieldPerMeshPerType *MEDFileFieldPerMeshPerType::deepCpy(MEDFileFieldPerM
   return ret.retn();
 }
 
-void MEDFileFieldPerMeshPerType::assignFieldNoProfile(int& start, int offset, int nbOfCells, const MEDCouplingFieldDouble *field, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
+void MEDFileFieldPerMeshPerType::assignFieldNoProfile(int& start, int offset, int nbOfCells, const MEDCouplingFieldDouble *field, const DataArray *arr, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
 {
   std::vector<int> pos=addNewEntryIfNecessary(field,offset,nbOfCells);
   for(std::vector<int>::const_iterator it=pos.begin();it!=pos.end();it++)
-    _field_pm_pt_pd[*it]->assignFieldNoProfile(start,offset,nbOfCells,field,glob);
+    _field_pm_pt_pd[*it]->assignFieldNoProfile(start,offset,nbOfCells,field,arr,glob);
 }
 
 /*!
@@ -986,27 +986,27 @@ void MEDFileFieldPerMeshPerType::assignFieldNoProfile(int& start, int offset, in
  * \param [in] nbOfEltsInWholeMesh nb of elts of type \a this->_geo_type in \b WHOLE mesh
  * \param [in] mesh is the mesh coming from the MEDFileMesh instance in correspondance with the MEDFileField. The mesh inside the \a field is simply ignored.
  */
-void MEDFileFieldPerMeshPerType::assignFieldProfile(int& start, const DataArrayInt *multiTypePfl, const DataArrayInt *idsInPfl, DataArrayInt *locIds, int nbOfEltsInWholeMesh, const MEDCouplingFieldDouble *field, const MEDCouplingMesh *mesh, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
+void MEDFileFieldPerMeshPerType::assignFieldProfile(int& start, const DataArrayInt *multiTypePfl, const DataArrayInt *idsInPfl, DataArrayInt *locIds, int nbOfEltsInWholeMesh, const MEDCouplingFieldDouble *field, const DataArray *arr, const MEDCouplingMesh *mesh, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
 {
   std::vector<int> pos=addNewEntryIfNecessary(field,idsInPfl);
   for(std::vector<int>::const_iterator it=pos.begin();it!=pos.end();it++)
-    _field_pm_pt_pd[*it]->assignFieldProfile(start,multiTypePfl,idsInPfl,locIds,nbOfEltsInWholeMesh,field,mesh,glob);
+    _field_pm_pt_pd[*it]->assignFieldProfile(start,multiTypePfl,idsInPfl,locIds,nbOfEltsInWholeMesh,field,arr,mesh,glob);
 }
 
-void MEDFileFieldPerMeshPerType::assignNodeFieldNoProfile(int& start, const MEDCouplingFieldDouble *field, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
+void MEDFileFieldPerMeshPerType::assignNodeFieldNoProfile(int& start, const MEDCouplingFieldDouble *field, const DataArray *arr, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
 {
   _field_pm_pt_pd.resize(1);
   _field_pm_pt_pd[0]=MEDFileFieldPerMeshPerTypePerDisc::New(this,ON_NODES,-3);
-  _field_pm_pt_pd[0]->assignNodeFieldNoProfile(start,field,glob);
+  _field_pm_pt_pd[0]->assignNodeFieldNoProfile(start,field,arr,glob);
 }
 
-void MEDFileFieldPerMeshPerType::assignNodeFieldProfile(int& start, const DataArrayInt *pfl, const MEDCouplingFieldDouble *field, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
+void MEDFileFieldPerMeshPerType::assignNodeFieldProfile(int& start, const DataArrayInt *pfl, const MEDCouplingFieldDouble *field, const DataArray *arr, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
 {
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> pfl2=pfl->deepCpy();
   //
   _field_pm_pt_pd.resize(1);
   _field_pm_pt_pd[0]=MEDFileFieldPerMeshPerTypePerDisc::New(this,ON_NODES,-3);
-  _field_pm_pt_pd[0]->assignFieldProfile(start,pfl,pfl2,pfl2,-1,field,0,glob);//mesh is not requested so 0 is send.
+  _field_pm_pt_pd[0]->assignFieldProfile(start,pfl,pfl2,pfl2,-1,field,arr,0,glob);//mesh is not requested so 0 is send.
 }
 
 std::vector<int> MEDFileFieldPerMeshPerType::addNewEntryIfNecessary(const MEDCouplingFieldDouble *field, int offset, int nbOfCells) throw(INTERP_KERNEL::Exception)
@@ -1538,7 +1538,7 @@ void MEDFileFieldPerMesh::copyTinyInfoFrom(const MEDCouplingMesh *mesh) throw(IN
   mesh->getTime(_mesh_iteration,_mesh_order);
 }
 
-void MEDFileFieldPerMesh::assignFieldNoProfileNoRenum(int& start, const std::vector<int>& code, const MEDCouplingFieldDouble *field, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
+void MEDFileFieldPerMesh::assignFieldNoProfileNoRenum(int& start, const std::vector<int>& code, const MEDCouplingFieldDouble *field, const DataArray *arr, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
 {
   int nbOfTypes=code.size()/3;
   int offset=0;
@@ -1547,7 +1547,7 @@ void MEDFileFieldPerMesh::assignFieldNoProfileNoRenum(int& start, const std::vec
       INTERP_KERNEL::NormalizedCellType type=(INTERP_KERNEL::NormalizedCellType)code[3*i];
       int nbOfCells=code[3*i+1];
       int pos=addNewEntryIfNecessary(type);
-      _field_pm_pt[pos]->assignFieldNoProfile(start,offset,nbOfCells,field,glob);
+      _field_pm_pt[pos]->assignFieldNoProfile(start,offset,nbOfCells,field,arr,glob);
       offset+=nbOfCells;
     }
 }
@@ -1561,7 +1561,7 @@ void MEDFileFieldPerMesh::assignFieldNoProfileNoRenum(int& start, const std::vec
  * \param [in] idsPerType is a vector containing the profiles needed to be created for MED file format. \b WARNING these processed MED file profiles can be subdivided again in case of Gauss points.
  * \param [in] mesh is the mesh coming from the MEDFileMesh instance in correspondance with the MEDFileField. The mesh inside the \a field is simply ignored.
  */
-void MEDFileFieldPerMesh::assignFieldProfile(int& start, const DataArrayInt *multiTypePfl, const std::vector<int>& code, const std::vector<int>& code2, const std::vector<DataArrayInt *>& idsInPflPerType, const std::vector<DataArrayInt *>& idsPerType, const MEDCouplingFieldDouble *field, const MEDCouplingMesh *mesh, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
+void MEDFileFieldPerMesh::assignFieldProfile(int& start, const DataArrayInt *multiTypePfl, const std::vector<int>& code, const std::vector<int>& code2, const std::vector<DataArrayInt *>& idsInPflPerType, const std::vector<DataArrayInt *>& idsPerType, const MEDCouplingFieldDouble *field, const DataArray *arr, const MEDCouplingMesh *mesh, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
 {
   int nbOfTypes=code.size()/3;
   for(int i=0;i<nbOfTypes;i++)
@@ -1578,20 +1578,20 @@ void MEDFileFieldPerMesh::assignFieldProfile(int& start, const DataArrayInt *mul
           break;
       if(found==nbOfTupes2)
         throw INTERP_KERNEL::Exception("MEDFileFieldPerMesh::assignFieldProfile : internal problem ! Should never happen ! Please report bug to anthony.geay@cea.fr !");
-      _field_pm_pt[pos]->assignFieldProfile(start,multiTypePfl,idsInPflPerType[i],pfl,code2[3*found+1],field,mesh,glob);
+      _field_pm_pt[pos]->assignFieldProfile(start,multiTypePfl,idsInPflPerType[i],pfl,code2[3*found+1],field,arr,mesh,glob);
     }
 }
 
-void MEDFileFieldPerMesh::assignNodeFieldNoProfile(int& start, const MEDCouplingFieldDouble *field, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
+void MEDFileFieldPerMesh::assignNodeFieldNoProfile(int& start, const MEDCouplingFieldDouble *field, const DataArray *arr, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
 {
   int pos=addNewEntryIfNecessary(INTERP_KERNEL::NORM_ERROR);
-  _field_pm_pt[pos]->assignNodeFieldNoProfile(start,field,glob);
+  _field_pm_pt[pos]->assignNodeFieldNoProfile(start,field,arr,glob);
 }
 
-void MEDFileFieldPerMesh::assignNodeFieldProfile(int& start, const DataArrayInt *pfl, const MEDCouplingFieldDouble *field, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
+void MEDFileFieldPerMesh::assignNodeFieldProfile(int& start, const DataArrayInt *pfl, const MEDCouplingFieldDouble *field, const DataArray *arr, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
 {
   int pos=addNewEntryIfNecessary(INTERP_KERNEL::NORM_ERROR);
-  _field_pm_pt[pos]->assignNodeFieldProfile(start,pfl,field,glob);
+  _field_pm_pt[pos]->assignNodeFieldProfile(start,pfl,field,arr,glob);
 }
 
 void MEDFileFieldPerMesh::prepareLoading(med_idt fid, int& start) throw(INTERP_KERNEL::Exception)
@@ -3795,6 +3795,133 @@ std::size_t MEDFileAnyTypeField1TSWithoutSDA::getHeapMemorySize() const
 }
 
 /*!
+ * Adds a MEDCouplingFieldDouble to \a this. The underlying mesh of the given field is
+ * checked if its elements are sorted suitable for writing to MED file ("STB" stands for
+ * "Sort By Type"), if not, an exception is thrown. 
+ *  \param [in] field - the field to add to \a this. The array of field \a field is ignored
+ *  \param [in] arr - the array of values.
+ *  \param [in,out] glob - the global data where profiles and localization present in
+ *          \a field, if any, are added.
+ *  \throw If the name of \a field is empty.
+ *  \throw If the data array of \a field is not set.
+ *  \throw If \a this->_arr is already allocated but has different number of components
+ *         than \a field.
+ *  \throw If the underlying mesh of \a field has no name.
+ *  \throw If elements in the mesh are not in the order suitable for writing to the MED file.
+ */
+void MEDFileAnyTypeField1TSWithoutSDA::setFieldNoProfileSBT(const MEDCouplingFieldDouble *field, const DataArray *arr, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
+{
+  const MEDCouplingMesh *mesh=field->getMesh();
+  //
+  TypeOfField type=field->getTypeOfField();
+  std::vector<DataArrayInt *> dummy;
+  int start=copyTinyInfoFrom(field,arr);
+  int pos=addNewEntryIfNecessary(mesh);
+  if(type!=ON_NODES)
+    {
+      std::vector<int> code=MEDFileField1TSWithoutSDA::CheckSBTMesh(mesh);
+      _field_per_mesh[pos]->assignFieldNoProfileNoRenum(start,code,field,arr,glob);
+    }
+  else
+    _field_per_mesh[pos]->assignNodeFieldNoProfile(start,field,arr,glob);
+}
+
+/*!
+ * Adds a MEDCouplingFieldDouble to \a this. Specified entities of a given dimension
+ * of a given mesh are used as the support of the given field (a real support is not used). 
+ * Elements of the given mesh must be sorted suitable for writing to MED file. 
+ * Order of underlying mesh entities of the given field specified by \a profile parameter
+ * is not prescribed; this method permutes field values to have them sorted by element
+ * type as required for writing to MED file. A new profile is added only if no equal
+ * profile is missing. 
+ *  \param [in] field - the field to add to \a this. The field double values are ignored.
+ *  \param [in] arrOfVals - the values of the field \a field used.
+ *  \param [in] mesh - the supporting mesh of \a field.
+ *  \param [in] meshDimRelToMax - a relative dimension of mesh entities \a field lies on.
+ *  \param [in] profile - ids of mesh entities on which corresponding field values lie.
+ *  \param [in,out] glob - the global data where profiles and localization present in
+ *          \a field, if any, are added.
+ *  \throw If either \a field or \a mesh or \a profile has an empty name.
+ *  \throw If there are no mesh entities of \a meshDimRelToMax dimension in \a mesh.
+ *  \throw If the data array of \a field is not set.
+ *  \throw If \a this->_arr is already allocated but has different number of components
+ *         than \a field.
+ *  \throw If elements in \a mesh are not in the order suitable for writing to the MED file.
+ *  \sa setFieldNoProfileSBT()
+ */
+void MEDFileAnyTypeField1TSWithoutSDA::setFieldProfile(const MEDCouplingFieldDouble *field, const DataArray *arrOfVals, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
+{
+  TypeOfField type=field->getTypeOfField();
+  int start=copyTinyInfoFrom(field,arrOfVals);
+  std::vector<DataArrayInt *> idsInPflPerType;
+  std::vector<DataArrayInt *> idsPerType;
+  std::vector<int> code,code2;
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingMesh> m=mesh->getGenMeshAtLevel(meshDimRelToMax);
+  if(type!=ON_NODES)
+    {
+      m->splitProfilePerType(profile,code,idsInPflPerType,idsPerType);
+      code2=m->getDistributionOfTypes();
+      //
+      std::vector< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> > idsInPflPerType2(idsInPflPerType.size());
+      for(std::size_t i=0;i<idsInPflPerType.size();i++)
+        idsInPflPerType2[i]=idsInPflPerType[i];
+      std::vector< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> > idsPerType2(idsPerType.size());
+      for(std::size_t i=0;i<idsPerType.size();i++)
+        idsPerType2[i]=idsPerType[i];
+      //
+      int pos=addNewEntryIfNecessary(m);
+      _field_per_mesh[pos]->assignFieldProfile(start,profile,code,code2,idsInPflPerType,idsPerType,field,arrOfVals,m,glob);
+    }
+  else
+    {
+      int pos=addNewEntryIfNecessary(m);
+      _field_per_mesh[pos]->assignNodeFieldProfile(start,profile,field,arrOfVals,glob);
+    }
+}
+
+/*!
+ * Copies tiny info and allocates \a this->_arr instance of DataArrayDouble to
+ * append data of a given MEDCouplingFieldDouble. So that the size of \a this->_arr becomes
+ * larger by the size of \a field. Returns an id of the first not filled
+ * tuple of \a this->_arr.
+ *  \param [in] field - the field to copy the info on components and the name from.
+ *  \return int - the id of first not initialized tuple of \a this->_arr.
+ *  \throw If the name of \a field is empty.
+ *  \throw If the data array of \a field is not set.
+ *  \throw If \a this->_arr is already allocated but has different number of components
+ *         than \a field.
+ */
+int MEDFileAnyTypeField1TSWithoutSDA::copyTinyInfoFrom(const MEDCouplingFieldDouble *field, const DataArray *arr) throw(INTERP_KERNEL::Exception)
+{
+  std::string name(field->getName());
+  getOrCreateAndGetArray()->setName(name.c_str());
+  if(name.empty())
+    throw INTERP_KERNEL::Exception("MEDFileField1TSWithoutSDA::copyTinyInfoFrom : unsupported fields with no name in MED file !");
+  if(!arr)
+    throw INTERP_KERNEL::Exception("MEDFileField1TSWithoutSDA::copyTinyInfoFrom : no array set !");
+  _dt=field->getTime(_iteration,_order);
+  int nbOfComponents=arr->getNumberOfComponents();
+  getOrCreateAndGetArray()->setInfoAndChangeNbOfCompo(arr->getInfoOnComponents());
+  if(!getOrCreateAndGetArray()->isAllocated())
+    {
+      getOrCreateAndGetArray()->alloc(arr->getNumberOfTuples(),arr->getNumberOfComponents());
+      return 0;
+    }
+  else
+    {
+      int oldNbOfTuples=getOrCreateAndGetArray()->getNumberOfTuples();
+      int newNbOfTuples=oldNbOfTuples+arr->getNumberOfTuples();
+      MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> tmp=DataArrayDouble::New();
+      tmp->alloc(newNbOfTuples,nbOfComponents);
+      tmp->copyStringInfoFrom(*getOrCreateAndGetArray());
+      DataArray *arrr=getOrCreateAndGetArray(); DataArrayDouble *_arr=static_cast<DataArrayDouble *>(arrr);//tony putain
+      std::copy(_arr->begin(),_arr->end(),tmp->getPointer());
+      setArray(tmp);
+      return oldNbOfTuples;
+    }
+}
+
+/*!
  * Returns number of components in \a this field
  *  \return int - the number of components.
  */
@@ -3892,48 +4019,6 @@ std::vector<int> MEDFileField1TSWithoutSDA::CheckSBTMesh(const MEDCouplingMesh *
 MEDFileField1TSWithoutSDA *MEDFileField1TSWithoutSDA::New(const char *fieldName, int csit, int iteration, int order, const std::vector<std::string>& infos)
 {
   return new MEDFileField1TSWithoutSDA(fieldName,csit,iteration,order,infos);
-}
-
-/*!
- * Copies tiny info and allocates \a this->_arr instance of DataArrayDouble to
- * append data of a given MEDCouplingFieldDouble. So that the size of \a this->_arr becomes
- * larger by the size of \a field. Returns an id of the first not filled
- * tuple of \a this->_arr.
- *  \param [in] field - the field to copy the info on components and the name from.
- *  \return int - the id of first not initialized tuple of \a this->_arr.
- *  \throw If the name of \a field is empty.
- *  \throw If the data array of \a field is not set.
- *  \throw If \a this->_arr is already allocated but has different number of components
- *         than \a field.
- */
-int MEDFileField1TSWithoutSDA::copyTinyInfoFrom(const MEDCouplingFieldDouble *field) throw(INTERP_KERNEL::Exception)
-{
-  std::string name(field->getName());
-  getOrCreateAndGetArrayDouble()->setName(name.c_str());
-  if(name.empty())
-    throw INTERP_KERNEL::Exception("MEDFileField1TSWithoutSDA::copyTinyInfoFrom : unsupported fields with no name in MED file !");
-  const DataArrayDouble *arr=field->getArray();
-  if(!arr)
-    throw INTERP_KERNEL::Exception("MEDFileField1TSWithoutSDA::copyTinyInfoFrom : no array set !");
-  _dt=field->getTime(_iteration,_order);
-  int nbOfComponents=arr->getNumberOfComponents();
-  getOrCreateAndGetArrayDouble()->setInfoAndChangeNbOfCompo(arr->getInfoOnComponents());
-  if(!getOrCreateAndGetArrayDouble()->isAllocated())
-    {
-      _arr->alloc(arr->getNumberOfTuples(),arr->getNumberOfComponents());
-      return 0;
-    }
-  else
-    {
-      int oldNbOfTuples=getOrCreateAndGetArrayDouble()->getNumberOfTuples();
-      int newNbOfTuples=oldNbOfTuples+arr->getNumberOfTuples();
-      MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> tmp=DataArrayDouble::New();
-      tmp->alloc(newNbOfTuples,nbOfComponents);
-      tmp->copyStringInfoFrom(*_arr);
-      std::copy(_arr->begin(),_arr->end(),tmp->getPointer());
-      _arr=tmp;
-      return oldNbOfTuples;
-    }
 }
 
 /*!
@@ -4051,89 +4136,6 @@ std::vector< std::vector<DataArrayDouble *> > MEDFileField1TSWithoutSDA::getFiel
         }
     }
   return ret;
-}
-
-/*!
- * Adds a MEDCouplingFieldDouble to \a this. The underlying mesh of the given field is
- * checked if its elements are sorted suitable for writing to MED file ("STB" stands for
- * "Sort By Type"), if not, an exception is thrown. 
- *  \param [in] field - the field to add to \a this.
- *  \param [in,out] glob - the global data where profiles and localization present in
- *          \a field, if any, are added.
- *  \throw If the name of \a field is empty.
- *  \throw If the data array of \a field is not set.
- *  \throw If \a this->_arr is already allocated but has different number of components
- *         than \a field.
- *  \throw If the underlying mesh of \a field has no name.
- *  \throw If elements in the mesh are not in the order suitable for writing to the MED file.
- */
-void MEDFileField1TSWithoutSDA::setFieldNoProfileSBT(const MEDCouplingFieldDouble *field, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
-{
-  const MEDCouplingMesh *mesh=field->getMesh();
-  //
-  TypeOfField type=field->getTypeOfField();
-  std::vector<DataArrayInt *> dummy;
-  int start=copyTinyInfoFrom(field);
-  int pos=addNewEntryIfNecessary(mesh);
-  if(type!=ON_NODES)
-    {
-      std::vector<int> code=MEDFileField1TSWithoutSDA::CheckSBTMesh(mesh);
-      _field_per_mesh[pos]->assignFieldNoProfileNoRenum(start,code,field,glob);
-    }
-  else
-    _field_per_mesh[pos]->assignNodeFieldNoProfile(start,field,glob);
-}
-
-/*!
- * Adds a MEDCouplingFieldDouble to \a this. Specified entities of a given dimension
- * of a given mesh are used as the support of the given field (a real support is not used). 
- * Elements of the given mesh must be sorted suitable for writing to MED file. 
- * Order of underlying mesh entities of the given field specified by \a profile parameter
- * is not prescribed; this method permutes field values to have them sorted by element
- * type as required for writing to MED file. A new profile is added only if no equal
- * profile is missing. 
- *  \param [in] field - the field to add to \a this.
- *  \param [in] mesh - the supporting mesh of \a field.
- *  \param [in] meshDimRelToMax - a relative dimension of mesh entities \a field lies on.
- *  \param [in] profile - ids of mesh entities on which corresponding field values lie.
- *  \param [in,out] glob - the global data where profiles and localization present in
- *          \a field, if any, are added.
- *  \throw If either \a field or \a mesh or \a profile has an empty name.
- *  \throw If there are no mesh entities of \a meshDimRelToMax dimension in \a mesh.
- *  \throw If the data array of \a field is not set.
- *  \throw If \a this->_arr is already allocated but has different number of components
- *         than \a field.
- *  \throw If elements in \a mesh are not in the order suitable for writing to the MED file.
- *  \sa setFieldNoProfileSBT()
- */
-void MEDFileField1TSWithoutSDA::setFieldProfile(const MEDCouplingFieldDouble *field, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
-{
-  TypeOfField type=field->getTypeOfField();
-  int start=copyTinyInfoFrom(field);
-  std::vector<DataArrayInt *> idsInPflPerType;
-  std::vector<DataArrayInt *> idsPerType;
-  std::vector<int> code,code2;
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingMesh> m=mesh->getGenMeshAtLevel(meshDimRelToMax);
-  if(type!=ON_NODES)
-    {
-      m->splitProfilePerType(profile,code,idsInPflPerType,idsPerType);
-      code2=m->getDistributionOfTypes();
-      //
-      std::vector< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> > idsInPflPerType2(idsInPflPerType.size());
-      for(std::size_t i=0;i<idsInPflPerType.size();i++)
-        idsInPflPerType2[i]=idsInPflPerType[i];
-      std::vector< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> > idsPerType2(idsPerType.size());
-      for(std::size_t i=0;i<idsPerType.size();i++)
-        idsPerType2[i]=idsPerType[i];
-      //
-      int pos=addNewEntryIfNecessary(m);
-      _field_per_mesh[pos]->assignFieldProfile(start,profile,code,code2,idsInPflPerType,idsPerType,field,m,glob);
-    }
-  else
-    {
-      int pos=addNewEntryIfNecessary(m);
-      _field_per_mesh[pos]->assignNodeFieldProfile(start,profile,field,glob);
-    }
 }
 
 /*!
@@ -4433,6 +4435,17 @@ MEDFileAnyTypeField1TSWithoutSDA *MEDFileField1TSWithoutSDA::deepCpy() const thr
         ret->_field_per_mesh[i]=(*it)->deepCpy((MEDFileField1TSWithoutSDA *)ret);
     }
   return ret.retn();
+}
+
+void MEDFileField1TSWithoutSDA::setArray(DataArray *arr) throw(INTERP_KERNEL::Exception)
+{
+  if(!arr)
+    _arr=0;
+  DataArrayDouble *arrC=dynamic_cast<DataArrayDouble *>(arr);
+  if(!arrC)
+    throw INTERP_KERNEL::Exception("MEDFileField1TSWithoutSDA::setArray : the input not null array is not of type DataArrayDouble !");
+  arrC->incrRef();
+  _arr=arrC;
 }
 
 DataArrayDouble *MEDFileField1TSWithoutSDA::getOrCreateAndGetArrayDouble()
@@ -5424,7 +5437,7 @@ DataArrayDouble *MEDFileField1TS::getFieldWithProfile(TypeOfField type, int mesh
 void MEDFileField1TS::setFieldNoProfileSBT(const MEDCouplingFieldDouble *field) throw(INTERP_KERNEL::Exception)
 {
   setFileName("");
-  contentNotNull()->setFieldNoProfileSBT(field,*this);
+  contentNotNull()->setFieldNoProfileSBT(field,field->getArray(),*this);
 }
 
 /*!
@@ -5451,7 +5464,7 @@ void MEDFileField1TS::setFieldNoProfileSBT(const MEDCouplingFieldDouble *field) 
 void MEDFileField1TS::setFieldProfile(const MEDCouplingFieldDouble *field, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile) throw(INTERP_KERNEL::Exception)
 {
   setFileName("");
-  contentNotNull()->setFieldProfile(field,mesh,meshDimRelToMax,profile,*this);
+  contentNotNull()->setFieldProfile(field,field->getArray(),mesh,meshDimRelToMax,profile,*this);
 }
 
 MEDFileAnyTypeField1TS *MEDFileField1TS::shallowCpy() const throw(INTERP_KERNEL::Exception)
@@ -5461,7 +5474,7 @@ MEDFileAnyTypeField1TS *MEDFileField1TS::shallowCpy() const throw(INTERP_KERNEL:
 
 int MEDFileField1TS::copyTinyInfoFrom(const MEDCouplingFieldDouble *field) throw(INTERP_KERNEL::Exception)
 {
-  return contentNotNull()->copyTinyInfoFrom(field);
+  return contentNotNull()->copyTinyInfoFrom(field,field->getArray());
 }
 
 DataArrayDouble *MEDFileField1TS::getUndergroundDataArray() const throw(INTERP_KERNEL::Exception)
@@ -5607,6 +5620,16 @@ MEDFileAnyTypeField1TSWithoutSDA *MEDFileIntField1TSWithoutSDA::deepCpy() const 
   return ret.retn();
 }
 
+void MEDFileIntField1TSWithoutSDA::setArray(DataArray *arr) throw(INTERP_KERNEL::Exception)
+{
+  if(!arr)
+    _arr=0;
+  DataArrayInt *arrC=dynamic_cast<DataArrayInt *>(arr);
+  if(!arrC)
+    throw INTERP_KERNEL::Exception("MEDFileIntField1TSWithoutSDA::setArray : the input not null array is not of type DataArrayInt !");
+  _arr=arrC;
+}
+
 DataArrayInt *MEDFileIntField1TSWithoutSDA::getOrCreateAndGetArrayInt()
 {
   DataArrayInt *ret=_arr;
@@ -5692,6 +5715,54 @@ MEDFileIntField1TS::MEDFileIntField1TS(const char *fileName, const char *fieldNa
 MEDFileAnyTypeField1TS *MEDFileIntField1TS::shallowCpy() const throw(INTERP_KERNEL::Exception)
 {
   return new MEDFileIntField1TS(*this);
+}
+
+/*!
+ * Adds a MEDCouplingFieldDouble to \a this. The underlying mesh of the given field is
+ * checked if its elements are sorted suitable for writing to MED file ("STB" stands for
+ * "Sort By Type"), if not, an exception is thrown. 
+ * For more info, see \ref AdvMEDLoaderAPIFieldRW
+ *  \param [in] field - the field to add to \a this. The field double values are ignored.
+ *  \param [in] arrOfVals - the values of the field \a field used.
+ *  \throw If the name of \a field is empty.
+ *  \throw If the data array of \a field is not set.
+ *  \throw If the data array is already allocated but has different number of components
+ *         than \a field.
+ *  \throw If the underlying mesh of \a field has no name.
+ *  \throw If elements in the mesh are not in the order suitable for writing to the MED file.
+ */
+void MEDFileIntField1TS::setFieldNoProfileSBT(const MEDCouplingFieldDouble *field, const DataArrayInt *arrOfVals) throw(INTERP_KERNEL::Exception)
+{
+  setFileName("");
+  contentNotNull()->setFieldNoProfileSBT(field,arrOfVals,*this);
+}
+
+/*!
+ * Adds a MEDCouplingFieldDouble to \a this. Specified entities of a given dimension
+ * of a given mesh are used as the support of the given field (a real support is not used). 
+ * Elements of the given mesh must be sorted suitable for writing to MED file.
+ * Order of underlying mesh entities of the given field specified by \a profile parameter
+ * is not prescribed; this method permutes field values to have them sorted by element
+ * type as required for writing to MED file. A new profile is added only if no equal
+ * profile is missing.
+ * For more info, see \ref AdvMEDLoaderAPIFieldRW
+ *  \param [in] field - the field to add to \a this. The field double values are ignored.
+ *  \param [in] arrOfVals - the values of the field \a field used.
+ *  \param [in] mesh - the supporting mesh of \a field.
+ *  \param [in] meshDimRelToMax - a relative dimension of mesh entities \a field lies on.
+ *  \param [in] profile - ids of mesh entities on which corresponding field values lie.
+ *  \throw If either \a field or \a mesh or \a profile has an empty name.
+ *  \throw If there are no mesh entities of \a meshDimRelToMax dimension in \a mesh.
+ *  \throw If the data array of \a field is not set.
+ *  \throw If the data array of \a this is already allocated but has different number of
+ *         components than \a field.
+ *  \throw If elements in \a mesh are not in the order suitable for writing to the MED file.
+ *  \sa setFieldNoProfileSBT()
+ */
+void MEDFileIntField1TS::setFieldProfile(const MEDCouplingFieldDouble *field, const DataArrayInt *arrOfVals, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile) throw(INTERP_KERNEL::Exception)
+{
+  setFileName("");
+  contentNotNull()->setFieldProfile(field,arrOfVals,mesh,meshDimRelToMax,profile,*this);
 }
 
 const MEDFileIntField1TSWithoutSDA *MEDFileIntField1TS::contentNotNull() const throw(INTERP_KERNEL::Exception)
@@ -6279,7 +6350,7 @@ void MEDFileFieldMultiTSWithoutSDA::appendFieldNoProfileSBT(const MEDCouplingFie
     {
       MEDFileField1TSWithoutSDA *objC=new MEDFileField1TSWithoutSDA;
       MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> obj(objC);
-      objC->setFieldNoProfileSBT(field,glob);
+      objC->setFieldNoProfileSBT(field,field->getArray(),glob);
       copyTinyInfoFrom(field);
       _time_steps.push_back(obj);
     }
@@ -6288,7 +6359,7 @@ void MEDFileFieldMultiTSWithoutSDA::appendFieldNoProfileSBT(const MEDCouplingFie
       checkCoherencyOfTinyInfo(field);
       MEDFileField1TSWithoutSDA *objC=new MEDFileField1TSWithoutSDA;
       MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> obj(objC);
-      objC->setFieldNoProfileSBT(field,glob);
+      objC->setFieldNoProfileSBT(field,field->getArray(),glob);
       _time_steps.push_back(obj);
     }
 }
@@ -6299,7 +6370,7 @@ void MEDFileFieldMultiTSWithoutSDA::appendFieldProfile(const MEDCouplingFieldDou
     {
       MEDFileField1TSWithoutSDA *objC=new MEDFileField1TSWithoutSDA;
       MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> obj(objC);
-      objC->setFieldProfile(field,mesh,meshDimRelToMax,profile,glob);
+      objC->setFieldProfile(field,field->getArray(),mesh,meshDimRelToMax,profile,glob);
       copyTinyInfoFrom(field);
       _time_steps.push_back(obj);
     }
@@ -6308,7 +6379,7 @@ void MEDFileFieldMultiTSWithoutSDA::appendFieldProfile(const MEDCouplingFieldDou
       checkCoherencyOfTinyInfo(field);
       MEDFileField1TSWithoutSDA *objC=new MEDFileField1TSWithoutSDA;
       MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> obj(objC);
-      objC->setFieldProfile(field,mesh,meshDimRelToMax,profile,glob);
+      objC->setFieldProfile(field,field->getArray(),mesh,meshDimRelToMax,profile,glob);
       _time_steps.push_back(obj);
     }
 }

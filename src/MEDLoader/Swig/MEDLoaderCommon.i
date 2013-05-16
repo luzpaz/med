@@ -1023,27 +1023,9 @@ namespace ParaMEDMEM
      }
   };
 
-  class MEDFileField1TS : public RefCountObject, public MEDFileFieldGlobsReal, public MEDFileWritable
+  class MEDFileAnyTypeField1TS : public RefCountObject, public MEDFileFieldGlobsReal, public MEDFileWritable
   {
   public:
-    static MEDFileField1TS *New(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception);
-    static MEDFileField1TS *New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
-    static MEDFileField1TS *New(const char *fileName) throw(INTERP_KERNEL::Exception);
-    static MEDFileField1TS *New();
-    void write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception);
-    MEDCouplingFieldDouble *getFieldAtLevel(TypeOfField type, int meshDimRelToMax, int renumPol=0) const throw(INTERP_KERNEL::Exception);
-    MEDCouplingFieldDouble *getFieldAtTopLevel(TypeOfField type, int renumPol=0) const throw(INTERP_KERNEL::Exception);
-    MEDCouplingFieldDouble *getFieldOnMeshAtLevel(TypeOfField type, const MEDCouplingMesh *mesh, int renumPol=0) const throw(INTERP_KERNEL::Exception);
-    MEDCouplingFieldDouble *getFieldOnMeshAtLevel(TypeOfField type, int meshDimRelToMax, const MEDFileMesh *mesh, int renumPol=0) const throw(INTERP_KERNEL::Exception);
-    MEDCouplingFieldDouble *getFieldAtLevelOld(TypeOfField type, const char *mname, int meshDimRelToMax, int renumPol=0) const throw(INTERP_KERNEL::Exception);
-    //
-    void setFieldNoProfileSBT(const MEDCouplingFieldDouble *field) throw(INTERP_KERNEL::Exception);
-    void setFieldProfile(const MEDCouplingFieldDouble *field, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile) throw(INTERP_KERNEL::Exception);
-    void setProfileNameOnLeaf(const char *mName, INTERP_KERNEL::NormalizedCellType typ, int locId, const char *newPflName, bool forceRenameOnGlob=false) throw(INTERP_KERNEL::Exception);
-    void setLocNameOnLeaf(const char *mName, INTERP_KERNEL::NormalizedCellType typ, int locId, const char *newLocName, bool forceRenameOnGlob=false) throw(INTERP_KERNEL::Exception);
-    void copyTinyInfoFrom(const MEDCouplingFieldDouble *field) throw(INTERP_KERNEL::Exception);
-    MEDFileField1TS *deepCpy() const throw(INTERP_KERNEL::Exception);
-    //
     int getDimension() const throw(INTERP_KERNEL::Exception);
     int getIteration() const throw(INTERP_KERNEL::Exception);
     int getOrder() const throw(INTERP_KERNEL::Exception);
@@ -1056,100 +1038,71 @@ namespace ParaMEDMEM
     const std::vector<std::string>& getInfo() const throw(INTERP_KERNEL::Exception);
     void setTime(int iteration, int order, double val) throw(INTERP_KERNEL::Exception);
     %extend
-       {
-         MEDFileField1TS(const char *fileName) throw(INTERP_KERNEL::Exception)
-         {
-           return MEDFileField1TS::New(fileName);
-         }
-         
-         MEDFileField1TS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
-         {
-           return MEDFileField1TS::New(fileName,fieldName);
-         }
+    {
+      PyObject *getTime() throw(INTERP_KERNEL::Exception)
+      {
+        int tmp1,tmp2;
+        double tmp0=self->getTime(tmp1,tmp2);
+        PyObject *res = PyList_New(3);
+        PyList_SetItem(res,0,SWIG_From_int(tmp1));
+        PyList_SetItem(res,1,SWIG_From_int(tmp2));
+        PyList_SetItem(res,2,SWIG_From_double(tmp0));
+        return res;
+      }
 
-         MEDFileField1TS(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception)
-         {
-           return MEDFileField1TS::New(fileName,fieldName,iteration,order);
-         }
+      PyObject *getDtIt() const throw(INTERP_KERNEL::Exception)
+      {
+        std::pair<int,int> res=self->getDtIt();
+        PyObject *elt=PyTuple_New(2);
+        PyTuple_SetItem(elt,0,SWIG_From_int(res.first));
+        PyTuple_SetItem(elt,1,SWIG_From_int(res.second));
+        return elt;
+      }
 
-         MEDFileField1TS()
-         {
-           return MEDFileField1TS::New();
-         }
-         
-         std::string __str__() const throw(INTERP_KERNEL::Exception)
-           {
-             return self->simpleRepr();
-           }
+      void setProfileNameOnLeaf(INTERP_KERNEL::NormalizedCellType typ, int locId, const char *newPflName, bool forceRenameOnGlob=false) throw(INTERP_KERNEL::Exception)
+      {
+        self->setProfileNameOnLeaf(0,typ,locId,newPflName,forceRenameOnGlob);
+      }
+      
+      void setLocNameOnLeaf(INTERP_KERNEL::NormalizedCellType typ, int locId, const char *newLocName, bool forceRenameOnGlob=false) throw(INTERP_KERNEL::Exception)
+      {
+        self->setLocNameOnLeaf(0,typ,locId,newLocName,forceRenameOnGlob);
+      }
 
-         PyObject *getFieldWithProfile(TypeOfField type, int meshDimRelToMax, const MEDFileMesh *mesh) const throw(INTERP_KERNEL::Exception)
-           {
-             DataArrayInt *ret1=0;
-             DataArrayDouble *ret0=self->getFieldWithProfile(type,meshDimRelToMax,mesh,ret1);
-             PyObject *ret=PyTuple_New(2);
-             PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 ));
-             PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
-             return ret;
-           }
+      bool changeMeshNames(PyObject *li) throw(INTERP_KERNEL::Exception)
+      {
+        std::vector< std::pair<std::string,std::string> > modifTab=convertVecPairStStFromPy(li);
+        return self->changeMeshNames(modifTab);
+      }
+      
+      PyObject *getTypesOfFieldAvailable() const throw(INTERP_KERNEL::Exception)
+      {
+        std::vector<TypeOfField> ret=self->getTypesOfFieldAvailable();
+        PyObject *ret2=PyList_New(ret.size());
+        for(int i=0;i<(int)ret.size();i++)
+          PyList_SetItem(ret2,i,SWIG_From_int(ret[i]));
+        return ret2;
+      }
 
-         void setProfileNameOnLeaf(INTERP_KERNEL::NormalizedCellType typ, int locId, const char *newPflName, bool forceRenameOnGlob=false) throw(INTERP_KERNEL::Exception)
-           {
-             self->setProfileNameOnLeaf(0,typ,locId,newPflName,forceRenameOnGlob);
-           }
-         
-         void setLocNameOnLeaf(INTERP_KERNEL::NormalizedCellType typ, int locId, const char *newLocName, bool forceRenameOnGlob=false) throw(INTERP_KERNEL::Exception)
-           {
-             self->setLocNameOnLeaf(0,typ,locId,newLocName,forceRenameOnGlob);
-           }
+      PyObject *getNonEmptyLevels(const char *mname=0) const throw(INTERP_KERNEL::Exception)
+      {
+        std::vector<int> ret1;
+        int ret0=self->getNonEmptyLevels(mname,ret1);
+        PyObject *elt=PyTuple_New(2);
+        PyTuple_SetItem(elt,0,SWIG_From_int(ret0));
+        PyTuple_SetItem(elt,1,convertIntArrToPyList2(ret1));
+        return elt;
+      }
 
-         PyObject *getTime() throw(INTERP_KERNEL::Exception)
-         {
-           int tmp1,tmp2;
-           double tmp0=self->getTime(tmp1,tmp2);
-           PyObject *res = PyList_New(3);
-           PyList_SetItem(res,0,SWIG_From_int(tmp1));
-           PyList_SetItem(res,1,SWIG_From_int(tmp2));
-           PyList_SetItem(res,2,SWIG_From_double(tmp0));
-           return res;
-         }
-         
-         PyObject *getDtIt() const throw(INTERP_KERNEL::Exception)
-         {
-           std::pair<int,int> res=self->getDtIt();
-           PyObject *elt=PyTuple_New(2);
-           PyTuple_SetItem(elt,0,SWIG_From_int(res.first));
-           PyTuple_SetItem(elt,1,SWIG_From_int(res.second));
-           return elt;
-         }
-         
-         PyObject *getTypesOfFieldAvailable() const throw(INTERP_KERNEL::Exception)
-         {
-           std::vector<TypeOfField> ret=self->getTypesOfFieldAvailable();
-           PyObject *ret2=PyList_New(ret.size());
-           for(int i=0;i<(int)ret.size();i++)
-             PyList_SetItem(ret2,i,SWIG_From_int(ret[i]));
-           return ret2;
-         }
-         
-         PyObject *getNonEmptyLevels(const char *mname=0) const throw(INTERP_KERNEL::Exception)
-         {
-           std::vector<int> ret1;
-           int ret0=self->getNonEmptyLevels(mname,ret1);
-           PyObject *elt=PyTuple_New(2);
-           PyTuple_SetItem(elt,0,SWIG_From_int(ret0));
-           PyTuple_SetItem(elt,1,convertIntArrToPyList2(ret1));
-           return elt;
-         }
-         
-         PyObject *getFieldSplitedByType(const char *mname=0) const throw(INTERP_KERNEL::Exception)
-         {
-           std::vector<INTERP_KERNEL::NormalizedCellType> types;
-           std::vector< std::vector<TypeOfField> > typesF;
-           std::vector< std::vector<std::string> > pfls;
-           std::vector< std::vector<std::string> > locs;
-           std::vector< std::vector< std::pair<int,int> > > ret=self->getFieldSplitedByType(mname,types,typesF,pfls,locs);
-           int sz=ret.size();
-           PyObject *ret2=PyList_New(sz);
+      PyObject *getFieldSplitedByType(const char *mname=0) const throw(INTERP_KERNEL::Exception)
+      {
+        std::vector<INTERP_KERNEL::NormalizedCellType> types;
+        std::vector< std::vector<TypeOfField> > typesF;
+        std::vector< std::vector<std::string> > pfls;
+        std::vector< std::vector<std::string> > locs;
+        std::vector< std::vector< std::pair<int,int> > > ret=self->getFieldSplitedByType(mname,types,typesF,pfls,locs);
+        int sz=ret.size();
+        PyObject *ret2=PyList_New(sz);
            for(int i=0;i<sz;i++)
              {
                const std::vector< std::pair<int,int> >& dadsI=ret[i];
@@ -1174,6 +1127,65 @@ namespace ParaMEDMEM
                PyList_SetItem(ret2,i,elt);
              }
            return ret2;
+      }
+    }
+  };
+
+  class MEDFileField1TS : public MEDFileAnyTypeField1TS
+  {
+  public:
+    static MEDFileField1TS *New(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception);
+    static MEDFileField1TS *New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
+    static MEDFileField1TS *New(const char *fileName) throw(INTERP_KERNEL::Exception);
+    static MEDFileField1TS *New();
+    void write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *getFieldAtLevel(TypeOfField type, int meshDimRelToMax, int renumPol=0) const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *getFieldAtTopLevel(TypeOfField type, int renumPol=0) const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *getFieldOnMeshAtLevel(TypeOfField type, const MEDCouplingMesh *mesh, int renumPol=0) const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *getFieldOnMeshAtLevel(TypeOfField type, int meshDimRelToMax, const MEDFileMesh *mesh, int renumPol=0) const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *getFieldAtLevelOld(TypeOfField type, const char *mname, int meshDimRelToMax, int renumPol=0) const throw(INTERP_KERNEL::Exception);
+    //
+    void setFieldNoProfileSBT(const MEDCouplingFieldDouble *field) throw(INTERP_KERNEL::Exception);
+    void setFieldProfile(const MEDCouplingFieldDouble *field, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile) throw(INTERP_KERNEL::Exception);
+    void setProfileNameOnLeaf(const char *mName, INTERP_KERNEL::NormalizedCellType typ, int locId, const char *newPflName, bool forceRenameOnGlob=false) throw(INTERP_KERNEL::Exception);
+    void setLocNameOnLeaf(const char *mName, INTERP_KERNEL::NormalizedCellType typ, int locId, const char *newLocName, bool forceRenameOnGlob=false) throw(INTERP_KERNEL::Exception);
+    void copyTinyInfoFrom(const MEDCouplingFieldDouble *field) throw(INTERP_KERNEL::Exception);
+    MEDFileField1TS *deepCpy() const throw(INTERP_KERNEL::Exception);
+    %extend
+       {
+         MEDFileField1TS(const char *fileName) throw(INTERP_KERNEL::Exception)
+         {
+           return MEDFileField1TS::New(fileName);
+         }
+         
+         MEDFileField1TS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
+         {
+           return MEDFileField1TS::New(fileName,fieldName);
+         }
+
+         MEDFileField1TS(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception)
+         {
+           return MEDFileField1TS::New(fileName,fieldName,iteration,order);
+         }
+
+         MEDFileField1TS()
+         {
+           return MEDFileField1TS::New();
+         }
+         
+         std::string __str__() const throw(INTERP_KERNEL::Exception)
+         {
+           return self->simpleRepr();
+         }
+         
+         PyObject *getFieldWithProfile(TypeOfField type, int meshDimRelToMax, const MEDFileMesh *mesh) const throw(INTERP_KERNEL::Exception)
+         {
+           DataArrayInt *ret1=0;
+           DataArrayDouble *ret0=self->getFieldWithProfile(type,meshDimRelToMax,mesh,ret1);
+           PyObject *ret=PyTuple_New(2);
+           PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 ));
+           PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+           return ret;
          }
 
          PyObject *getFieldSplitedByType2(const char *mname=0) const throw(INTERP_KERNEL::Exception)
@@ -1243,12 +1255,6 @@ namespace ParaMEDMEM
              }
            PyTuple_SetItem(ret,1,elt);
            return ret;
-         }
-         
-         bool changeMeshNames(PyObject *li) throw(INTERP_KERNEL::Exception)
-         {
-           std::vector< std::pair<std::string,std::string> > modifTab=convertVecPairStStFromPy(li);
-           return self->changeMeshNames(modifTab);
          }
        }
   };
