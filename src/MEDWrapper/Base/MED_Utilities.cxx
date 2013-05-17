@@ -19,11 +19,6 @@
 //
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-
-//  File   : 
-//  Author : 
-//  Module : 
-//  $Header$
 //
 #include "MED_Utilities.hxx"
 #include "MED_Common.hxx"
@@ -81,6 +76,7 @@ bool InitEntity2GeomSet()
   aGeomFACESet.insert(eTRIA3);
   aGeomFACESet.insert(eQUAD4);
   aGeomFACESet.insert(eTRIA6);
+  aGeomFACESet.insert(eTRIA7);
   aGeomFACESet.insert(eQUAD8);
   aGeomFACESet.insert(eQUAD9);
   aGeomFACESet.insert(ePOLYGONE);
