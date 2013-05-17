@@ -1302,6 +1302,26 @@ namespace ParaMEDMEM
     void setFieldProfile(const MEDCouplingFieldDouble *field, const DataArrayInt *arrOfVals, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile) throw(INTERP_KERNEL::Exception);
     %extend
     {
+      MEDFileIntField1TS() throw(INTERP_KERNEL::Exception)
+      {
+        return MEDFileIntField1TS::New();
+      }
+
+      MEDFileIntField1TS(const char *fileName) throw(INTERP_KERNEL::Exception)
+      {
+        return MEDFileIntField1TS::New(fileName);
+      }
+
+      MEDFileIntField1TS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
+      {
+        return MEDFileIntField1TS::New(fileName,fieldName);
+      }
+
+      MEDFileIntField1TS(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception)
+      {
+        return MEDFileIntField1TS::New(fileName,fieldName,iteration,order);
+      }
+
       DataArrayInt *getUndergroundDataArray() const throw(INTERP_KERNEL::Exception)
       {
         DataArrayInt *ret=self->getUndergroundDataArray();
@@ -1739,6 +1759,21 @@ namespace ParaMEDMEM
     void appendFieldProfile(const MEDCouplingFieldDouble *field, const DataArrayInt *arrOfVals, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile) throw(INTERP_KERNEL::Exception);
     %extend
     {
+      MEDFileIntFieldMultiTS()
+      {
+        return MEDFileIntFieldMultiTS::New();
+      }
+      
+      MEDFileIntFieldMultiTS(const char *fileName) throw(INTERP_KERNEL::Exception)
+      {
+        return MEDFileIntFieldMultiTS::New(fileName);
+      }
+      
+      MEDFileIntFieldMultiTS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
+      {
+        return MEDFileIntFieldMultiTS::New(fileName,fieldName);
+      }
+
       DataArrayInt *getUndergroundDataArray(int iteration, int order) const throw(INTERP_KERNEL::Exception)
       {
         DataArrayInt *ret=self->getUndergroundDataArray(iteration,order);
