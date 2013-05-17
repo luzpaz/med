@@ -568,8 +568,6 @@ namespace ParaMEDMEM
     static MEDFileAnyTypeField1TSWithoutSDA *BuildContentFrom(med_idt fid, const char *fileName) throw(INTERP_KERNEL::Exception);
     static MEDFileAnyTypeField1TSWithoutSDA *BuildContentFrom(med_idt fid, const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
     static MEDFileAnyTypeField1TSWithoutSDA *BuildContentFrom(med_idt fid, const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception);
-    static int LocateField2(med_idt fid, const char *fileName, int fieldIdCFormat, bool checkFieldId, std::string& fieldName, med_field_type& typcha, std::vector<std::string>& infos, std::string& dtunitOut) throw(INTERP_KERNEL::Exception);
-    static int LocateField(med_idt fid, const char *fileName, const char *fieldName, med_field_type& typcha, std::vector<std::string>& infos, std::string& dtunitOut) throw(INTERP_KERNEL::Exception);
     void writeLL(med_idt fid) const throw(INTERP_KERNEL::Exception);
     // direct forwarding to MEDFileAnyTypeField1TSWithoutSDA instance _content
   public:
@@ -607,6 +605,7 @@ namespace ParaMEDMEM
   public:
     void write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeField1TS *deepCpy() const throw(INTERP_KERNEL::Exception);
+    int copyTinyInfoFrom(const MEDCouplingFieldDouble *field, const DataArray *arr) throw(INTERP_KERNEL::Exception);
     virtual MEDFileAnyTypeField1TS *shallowCpy() const throw(INTERP_KERNEL::Exception) = 0;
   public:
     //! underground method see MEDFileField1TSWithoutSDA::setProfileNameOnLeaf
@@ -620,6 +619,9 @@ namespace ParaMEDMEM
     std::vector<std::string> getLocsReallyUsedMulti() const;
     void changePflsRefsNamesGen(const std::vector< std::pair<std::vector<std::string>, std::string > >& mapOfModif) throw(INTERP_KERNEL::Exception);
     void changeLocsRefsNamesGen(const std::vector< std::pair<std::vector<std::string>, std::string > >& mapOfModif) throw(INTERP_KERNEL::Exception);
+  public:
+    static int LocateField2(med_idt fid, const char *fileName, int fieldIdCFormat, bool checkFieldId, std::string& fieldName, med_field_type& typcha, std::vector<std::string>& infos, std::string& dtunitOut) throw(INTERP_KERNEL::Exception);
+    static int LocateField(med_idt fid, const char *fileName, const char *fieldName, int& posCFormat, med_field_type& typcha, std::vector<std::string>& infos, std::string& dtunitOut) throw(INTERP_KERNEL::Exception);
   protected:
     virtual med_field_type getMEDFileFieldType() const = 0;
     MEDFileAnyTypeField1TSWithoutSDA *contentNotNullBase() throw(INTERP_KERNEL::Exception);
@@ -651,7 +653,6 @@ namespace ParaMEDMEM
     // direct forwarding to MEDFileField1TSWithoutSDA instance _content
   public:
     MEDFileAnyTypeField1TS *shallowCpy() const throw(INTERP_KERNEL::Exception);
-    int copyTinyInfoFrom(const MEDCouplingFieldDouble *field) throw(INTERP_KERNEL::Exception);
     DataArrayDouble *getUndergroundDataArray() const throw(INTERP_KERNEL::Exception);
     DataArrayDouble *getUndergroundDataArrayExt(std::vector< std::pair<std::pair<INTERP_KERNEL::NormalizedCellType,int>,std::pair<int,int> > >& entries) const throw(INTERP_KERNEL::Exception);
     
@@ -676,10 +677,12 @@ namespace ParaMEDMEM
     static MEDFileIntField1TS *New(const char *fileName) throw(INTERP_KERNEL::Exception);
     static MEDFileIntField1TS *New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
     static MEDFileIntField1TS *New(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception);
+    static MEDFileIntField1TS *New(const MEDFileIntField1TSWithoutSDA& other, bool shallowCopyOfContent);
     MEDFileAnyTypeField1TS *shallowCpy() const throw(INTERP_KERNEL::Exception);
     //
     void setFieldNoProfileSBT(const MEDCouplingFieldDouble *field, const DataArrayInt *arrOfVals) throw(INTERP_KERNEL::Exception);
     void setFieldProfile(const MEDCouplingFieldDouble *field, const DataArrayInt *arrOfVals, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile) throw(INTERP_KERNEL::Exception);
+    DataArrayInt *getUndergroundDataArray() const throw(INTERP_KERNEL::Exception);
   private:
     med_field_type getMEDFileFieldType() const { return MED_INT32; }
     const MEDFileIntField1TSWithoutSDA *contentNotNull() const throw(INTERP_KERNEL::Exception);
@@ -689,6 +692,7 @@ namespace ParaMEDMEM
     MEDFileIntField1TS(const char *fileName) throw(INTERP_KERNEL::Exception);
     MEDFileIntField1TS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
     MEDFileIntField1TS(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception);
+    MEDFileIntField1TS(const MEDFileIntField1TSWithoutSDA& other, bool shallowCopyOfContent);
   };
   
   class MEDLOADER_EXPORT MEDFileAnyTypeFieldMultiTSWithoutSDA : public RefCountObject
@@ -702,6 +706,7 @@ namespace ParaMEDMEM
     std::size_t getHeapMemorySize() const;
     virtual MEDFileAnyTypeFieldMultiTSWithoutSDA *deepCpy() const throw(INTERP_KERNEL::Exception);
     virtual MEDFileAnyTypeFieldMultiTSWithoutSDA *shallowCpy() const throw(INTERP_KERNEL::Exception) = 0;
+    virtual MEDFileAnyTypeField1TSWithoutSDA *createNew1TSWithoutSDAEmptyInstance() const throw(INTERP_KERNEL::Exception) = 0;
     const std::vector<std::string>& getInfo() const throw(INTERP_KERNEL::Exception);
     const MEDFileAnyTypeField1TSWithoutSDA& getTimeStepEntry(int iteration, int order) const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeField1TSWithoutSDA& getTimeStepEntry(int iteration, int order) throw(INTERP_KERNEL::Exception);
@@ -719,6 +724,8 @@ namespace ParaMEDMEM
     std::vector< std::pair<int,int> > getTimeSteps(std::vector<double>& ret1) const throw(INTERP_KERNEL::Exception);
     void simpleRepr(int bkOffset, std::ostream& oss, int fmtsId) const;
     int getNonEmptyLevels(int iteration, int order, const char *mname, std::vector<int>& levs) const throw(INTERP_KERNEL::Exception);
+    void appendFieldNoProfileSBT(const MEDCouplingFieldDouble *field, const DataArray *arr, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception);
+    void appendFieldProfile(const MEDCouplingFieldDouble *field, const DataArray *arr, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception);
     std::vector< std::vector< std::pair<int,int> > > getFieldSplitedByType(int iteration, int order, const char *mname, std::vector<INTERP_KERNEL::NormalizedCellType>& types, std::vector< std::vector<TypeOfField> >& typesF, std::vector< std::vector<std::string> >& pfls, std::vector< std::vector<std::string> >& locs) const throw(INTERP_KERNEL::Exception);
     std::vector< std::vector<TypeOfField> > getTypesOfFieldAvailable() const throw(INTERP_KERNEL::Exception);
     DataArray *getUndergroundDataArray(int iteration, int order) const throw(INTERP_KERNEL::Exception);
@@ -738,6 +745,8 @@ namespace ParaMEDMEM
   protected:
     virtual med_field_type getMEDFileFieldType() const = 0;
     std::string getDtUnit() const throw(INTERP_KERNEL::Exception);
+    void copyTinyInfoFrom(const MEDCouplingFieldDouble *field, const DataArray *arr) throw(INTERP_KERNEL::Exception);
+    void checkCoherencyOfTinyInfo(const MEDCouplingFieldDouble *field, const DataArray *arr) const throw(INTERP_KERNEL::Exception);
   protected:
     std::string _name;
     std::vector<std::string> _infos;
@@ -751,17 +760,28 @@ namespace ParaMEDMEM
     MEDFileFieldMultiTSWithoutSDA(med_idt fid, int fieldId) throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeFieldMultiTSWithoutSDA *shallowCpy() const throw(INTERP_KERNEL::Exception);
     std::vector< std::vector<DataArrayDouble *> > getFieldSplitedByType2(int iteration, int order, const char *mname, std::vector<INTERP_KERNEL::NormalizedCellType>& types, std::vector< std::vector<TypeOfField> >& typesF, std::vector< std::vector<std::string> >& pfls, std::vector< std::vector<std::string> >& locs) const throw(INTERP_KERNEL::Exception);
-    
-    void appendFieldNoProfileSBT(const MEDCouplingFieldDouble *field, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception);
-    void appendFieldProfile(const MEDCouplingFieldDouble *field, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception);
   protected:
     MEDFileFieldMultiTSWithoutSDA(const char *fieldName);
     MEDFileFieldMultiTSWithoutSDA(med_idt fid, const char *fieldName, int id, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception);
     med_field_type getMEDFileFieldType() const { return MED_FLOAT64; }
-    void copyTinyInfoFrom(const MEDCouplingFieldDouble *field) throw(INTERP_KERNEL::Exception);
-    void checkCoherencyOfTinyInfo(const MEDCouplingFieldDouble *field) const throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeField1TSWithoutSDA *createNew1TSWithoutSDAEmptyInstance() const throw(INTERP_KERNEL::Exception);
   public:
     MEDFileFieldMultiTSWithoutSDA();
+  };
+
+  class MEDLOADER_EXPORT MEDFileIntFieldMultiTSWithoutSDA : public MEDFileAnyTypeFieldMultiTSWithoutSDA
+  {
+  public:
+    static MEDFileIntFieldMultiTSWithoutSDA *New(med_idt fid, const char *fieldName, int id, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception);
+    MEDFileIntFieldMultiTSWithoutSDA(med_idt fid, int fieldId) throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeFieldMultiTSWithoutSDA *shallowCpy() const throw(INTERP_KERNEL::Exception);
+  protected:
+    MEDFileIntFieldMultiTSWithoutSDA(const char *fieldName);
+    MEDFileIntFieldMultiTSWithoutSDA(med_idt fid, const char *fieldName, int id, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception);
+    med_field_type getMEDFileFieldType() const { return MED_INT32; }
+    MEDFileAnyTypeField1TSWithoutSDA *createNew1TSWithoutSDAEmptyInstance() const throw(INTERP_KERNEL::Exception);
+  public:
+    MEDFileIntFieldMultiTSWithoutSDA();
   };
 
   /*!
@@ -774,12 +794,21 @@ namespace ParaMEDMEM
     MEDFileAnyTypeFieldMultiTS(const char *fileName) throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeFieldMultiTS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeFieldMultiTS(const MEDFileAnyTypeFieldMultiTSWithoutSDA& other, bool shallowCopyOfContent);
+    static MEDFileAnyTypeFieldMultiTS *BuildNewInstanceFromContent(MEDFileAnyTypeFieldMultiTSWithoutSDA *c, const char *fileName) throw(INTERP_KERNEL::Exception);
+    static MEDFileAnyTypeFieldMultiTSWithoutSDA *BuildContentFrom(med_idt fid, const char *fileName) throw(INTERP_KERNEL::Exception);
+    static MEDFileAnyTypeFieldMultiTSWithoutSDA *BuildContentFrom(med_idt fid, const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
   public:
+    static MEDFileAnyTypeFieldMultiTS *New(const char *fileName) throw(INTERP_KERNEL::Exception);
+    static MEDFileAnyTypeFieldMultiTS *New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
     void write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception);
     void writeLL(med_idt fid) const throw(INTERP_KERNEL::Exception);
     std::size_t getHeapMemorySize() const;
     virtual MEDFileAnyTypeFieldMultiTS *deepCpy() const throw(INTERP_KERNEL::Exception);
     virtual MEDFileAnyTypeFieldMultiTS *shallowCpy() const throw(INTERP_KERNEL::Exception) = 0;
+    //
+    virtual MEDFileAnyTypeField1TS *getTimeStepAtPos(int pos) const throw(INTERP_KERNEL::Exception) = 0;
+    MEDFileAnyTypeField1TS *getTimeStep(int iteration, int order) const throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeField1TS *getTimeStepGivenTime(double time, double eps=1e-8) const throw(INTERP_KERNEL::Exception);
   public:// direct forwarding to MEDFileField1TSWithoutSDA instance _content
     std::string getName() const;
     void setName(const char *name);
@@ -799,6 +828,7 @@ namespace ParaMEDMEM
     int getNonEmptyLevels(int iteration, int order, const char *mname, std::vector<int>& levs) const throw(INTERP_KERNEL::Exception);
     std::vector< std::vector<TypeOfField> > getTypesOfFieldAvailable() const throw(INTERP_KERNEL::Exception);
     std::vector< std::vector< std::pair<int,int> > > getFieldSplitedByType(int iteration, int order, const char *mname, std::vector<INTERP_KERNEL::NormalizedCellType>& types, std::vector< std::vector<TypeOfField> >& typesF, std::vector< std::vector<std::string> >& pfls, std::vector< std::vector<std::string> >& locs) const throw(INTERP_KERNEL::Exception);
+    MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> getContent();
   public:
     std::vector<std::string> getPflsReallyUsed() const;
     std::vector<std::string> getLocsReallyUsed() const;
@@ -827,9 +857,9 @@ namespace ParaMEDMEM
     static MEDFileFieldMultiTS *New(const MEDFileFieldMultiTSWithoutSDA& other, bool shallowCopyOfContent);
     MEDFileAnyTypeFieldMultiTS *shallowCpy() const throw(INTERP_KERNEL::Exception);
     //
-    MEDFileField1TS *getTimeStepAtPos(int pos) const throw(INTERP_KERNEL::Exception);
-    MEDFileField1TS *getTimeStep(int iteration, int order) const throw(INTERP_KERNEL::Exception);
-    MEDFileField1TS *getTimeStepGivenTime(double time, double eps=1e-8) const throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeField1TS *getTimeStepAtPos(int pos) const throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeField1TS *getTimeStep(int iteration, int order) const throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeField1TS *getTimeStepGivenTime(double time, double eps=1e-8) const throw(INTERP_KERNEL::Exception);
     MEDFileFieldMultiTSIterator *iterator() throw(INTERP_KERNEL::Exception);
     //
     MEDCouplingFieldDouble *getFieldAtLevel(TypeOfField type, int iteration, int order, int meshDimRelToMax, int renumPol=0) const throw(INTERP_KERNEL::Exception);
@@ -844,10 +874,9 @@ namespace ParaMEDMEM
 std::vector< std::vector<DataArrayDouble *> > getFieldSplitedByType2(int iteration, int order, const char *mname, std::vector<INTERP_KERNEL::NormalizedCellType>& types, std::vector< std::vector<TypeOfField> >& typesF, std::vector< std::vector<std::string> >& pfls, std::vector< std::vector<std::string> >& locs) const throw(INTERP_KERNEL::Exception);
     DataArrayDouble *getUndergroundDataArray(int iteration, int order) const throw(INTERP_KERNEL::Exception);
     DataArrayDouble *getUndergroundDataArrayExt(int iteration, int order, std::vector< std::pair<std::pair<INTERP_KERNEL::NormalizedCellType,int>,std::pair<int,int> > >& entries) const throw(INTERP_KERNEL::Exception);
-  public:
+  private:
     const MEDFileFieldMultiTSWithoutSDA *contentNotNull() const throw(INTERP_KERNEL::Exception);
     MEDFileFieldMultiTSWithoutSDA *contentNotNull() throw(INTERP_KERNEL::Exception);
-    MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> getContent();
   private:
     MEDFileFieldMultiTS();
     MEDFileFieldMultiTS(const MEDFileFieldMultiTSWithoutSDA& other, bool shallowCopyOfContent);
@@ -855,12 +884,39 @@ std::vector< std::vector<DataArrayDouble *> > getFieldSplitedByType2(int iterati
     MEDFileFieldMultiTS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
   };
 
+  /*!
+   * User class.
+   */
+  class MEDLOADER_EXPORT MEDFileIntFieldMultiTS : public MEDFileAnyTypeFieldMultiTS
+  {
+  public:
+    static MEDFileIntFieldMultiTS *New();
+    static MEDFileIntFieldMultiTS *New(const char *fileName) throw(INTERP_KERNEL::Exception);
+    static MEDFileIntFieldMultiTS *New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
+    static MEDFileIntFieldMultiTS *New(const MEDFileIntFieldMultiTSWithoutSDA& other, bool shallowCopyOfContent);
+    MEDFileAnyTypeFieldMultiTS *shallowCpy() const throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeField1TS *getTimeStepAtPos(int pos) const throw(INTERP_KERNEL::Exception);
+    //
+    void appendFieldNoProfileSBT(const MEDCouplingFieldDouble *field, const DataArrayInt *arrOfVals) throw(INTERP_KERNEL::Exception);
+    void appendFieldProfile(const MEDCouplingFieldDouble *field, const DataArrayInt *arrOfVals, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile) throw(INTERP_KERNEL::Exception);
+    //
+    DataArrayInt *getUndergroundDataArray(int iteration, int order) const throw(INTERP_KERNEL::Exception);
+  private:
+    const MEDFileIntFieldMultiTSWithoutSDA *contentNotNull() const throw(INTERP_KERNEL::Exception);
+    MEDFileIntFieldMultiTSWithoutSDA *contentNotNull() throw(INTERP_KERNEL::Exception);
+  private:
+    MEDFileIntFieldMultiTS();
+    MEDFileIntFieldMultiTS(const MEDFileIntFieldMultiTSWithoutSDA& other, bool shallowCopyOfContent);
+    MEDFileIntFieldMultiTS(const char *fileName) throw(INTERP_KERNEL::Exception);
+    MEDFileIntFieldMultiTS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
+  };
+
   class MEDCOUPLING_EXPORT MEDFileFieldMultiTSIterator
   {
   public:
     MEDFileFieldMultiTSIterator(MEDFileFieldMultiTS *fmts);
     ~MEDFileFieldMultiTSIterator();
-    MEDFileField1TS *nextt();
+    MEDFileField1TS *nextt() throw(INTERP_KERNEL::Exception);
   private:
     MEDCouplingAutoRefCountObjectPtr<MEDFileFieldMultiTS> _fmts;
      int _iter_id;
@@ -888,10 +944,10 @@ std::vector< std::vector<DataArrayDouble *> > getFieldSplitedByType2(int iterati
     void simpleRepr(int bkOffset, std::ostream& oss) const;
     //
     void resize(int newSize) throw(INTERP_KERNEL::Exception);
-    void pushField(MEDFileFieldMultiTS *field) throw(INTERP_KERNEL::Exception);
-    void setFieldAtPos(int i, MEDFileFieldMultiTS *field) throw(INTERP_KERNEL::Exception);
-    MEDFileFieldMultiTS *getFieldAtPos(int i) const throw(INTERP_KERNEL::Exception);
-    MEDFileFieldMultiTS *getFieldWithName(const char *fieldName) const throw(INTERP_KERNEL::Exception);
+    void pushField(MEDFileAnyTypeFieldMultiTS *field) throw(INTERP_KERNEL::Exception);
+    void setFieldAtPos(int i, MEDFileAnyTypeFieldMultiTS *field) throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeFieldMultiTS *getFieldAtPos(int i) const throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeFieldMultiTS *getFieldWithName(const char *fieldName) const throw(INTERP_KERNEL::Exception);
     MEDFileFieldsIterator *iterator() throw(INTERP_KERNEL::Exception);
     void destroyFieldAtPos(int i) throw(INTERP_KERNEL::Exception);
     bool changeMeshNames(const std::vector< std::pair<std::string,std::string> >& modifTab) throw(INTERP_KERNEL::Exception);
@@ -916,7 +972,7 @@ std::vector< std::vector<DataArrayDouble *> > getFieldSplitedByType2(int iterati
   public:
     MEDFileFieldsIterator(MEDFileFields *fs);
     ~MEDFileFieldsIterator();
-    MEDFileFieldMultiTS *nextt();
+    MEDFileAnyTypeFieldMultiTS *nextt();
   private:
     MEDCouplingAutoRefCountObjectPtr<MEDFileFields> _fs;
      int _iter_id;

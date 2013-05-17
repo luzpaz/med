@@ -46,6 +46,32 @@ static PyObject* convertMEDFileParameter1TS(ParaMEDMEM::MEDFileParameter1TS* p1t
   return ret;
 }
 
+static PyObject* convertMEDFileField1TS(ParaMEDMEM::MEDFileAnyTypeField1TS *p, int owner) throw(INTERP_KERNEL::Exception)
+{
+  PyObject *ret=0;
+  if(dynamic_cast<MEDFileField1TS *>(p))
+    ret=SWIG_NewPointerObj((void*)p,SWIGTYPE_p_ParaMEDMEM__MEDFileField1TS,owner);
+  if(dynamic_cast<MEDFileIntField1TS *>(p))
+    ret=SWIG_NewPointerObj((void*)p,SWIGTYPE_p_ParaMEDMEM__MEDFileIntField1TS,owner);
+  if(!ret)
+    throw INTERP_KERNEL::Exception("Not recognized type of MEDFileAnyTypeField1TS on downcast !");
+  return ret;
+}
+
+static PyObject* convertMEDFileFieldMultiTS(ParaMEDMEM::MEDFileAnyTypeFieldMultiTS *p, int owner) throw(INTERP_KERNEL::Exception)
+{
+  PyObject *ret=0;
+  if(!p)
+    return SWIG_NewPointerObj((void*)0,SWIGTYPE_p_ParaMEDMEM__MEDFileFieldMultiTS,owner);
+  if(dynamic_cast<MEDFileFieldMultiTS *>(p))
+    ret=SWIG_NewPointerObj((void*)p,SWIGTYPE_p_ParaMEDMEM__MEDFileFieldMultiTS,owner);
+  if(dynamic_cast<MEDFileIntFieldMultiTS *>(p))
+    ret=SWIG_NewPointerObj((void*)p,SWIGTYPE_p_ParaMEDMEM__MEDFileIntFieldMultiTS,owner);
+  if(!ret)
+    throw INTERP_KERNEL::Exception("Not recognized type of MEDFileAnyTypeFieldMultiTS on downcast !");
+  return ret;
+}
+
 static std::vector<std::pair<int,int> > convertTimePairIdsFromPy(PyObject *pyLi) throw(INTERP_KERNEL::Exception)
 {
   std::vector<std::pair<int,int> > ret;

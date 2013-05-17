@@ -52,6 +52,16 @@ using namespace ParaMEDMEM;
   $result=convertMEDFileParameter1TS($1,$owner);
 }
 
+%typemap(out) ParaMEDMEM::MEDFileAnyTypeFieldMultiTS*
+{
+  $result=convertMEDFileFieldMultiTS($1,$owner);
+}
+
+%typemap(out) ParaMEDMEM::MEDFileAnyTypeField1TS*
+{
+  $result=convertMEDFileField1TS($1,$owner);
+}
+
 %newobject MEDLoader::ReadUMeshFromFamilies;
 %newobject MEDLoader::ReadUMeshFromGroups;
 %newobject MEDLoader::ReadUMeshFromFile;
@@ -103,25 +113,35 @@ using namespace ParaMEDMEM;
 %newobject ParaMEDMEM::MEDFileFields::getFieldAtPos;
 %newobject ParaMEDMEM::MEDFileFields::__getitem__;
 %newobject ParaMEDMEM::MEDFileFields::__iter__;
+
+%newobject ParaMEDMEM::MEDFileAnyTypeFieldMultiTS::New;
+%newobject ParaMEDMEM::MEDFileAnyTypeFieldMultiTS::deepCpy;
+%newobject ParaMEDMEM::MEDFileAnyTypeFieldMultiTS::shallowCpy;
+%newobject ParaMEDMEM::MEDFileAnyTypeFieldMultiTS::getTimeStepAtPos;
+%newobject ParaMEDMEM::MEDFileAnyTypeFieldMultiTS::getTimeStep;
+%newobject ParaMEDMEM::MEDFileAnyTypeFieldMultiTS::getTimeStepGivenTime;
+%newobject ParaMEDMEM::MEDFileAnyTypeFieldMultiTS::__getitem__;
 %newobject ParaMEDMEM::MEDFileFieldMultiTS::New;
-%newobject ParaMEDMEM::MEDFileFieldMultiTS::deepCpy;
-%newobject ParaMEDMEM::MEDFileFieldMultiTS::getTimeStepAtPos;
-%newobject ParaMEDMEM::MEDFileFieldMultiTS::getTimeStep;
-%newobject ParaMEDMEM::MEDFileFieldMultiTS::getTimeStepGivenTime;
-%newobject ParaMEDMEM::MEDFileFieldMultiTS::__getitem__;
 %newobject ParaMEDMEM::MEDFileFieldMultiTS::__iter__;
 %newobject ParaMEDMEM::MEDFileFieldMultiTS::getFieldAtLevel;
 %newobject ParaMEDMEM::MEDFileFieldMultiTS::getFieldAtTopLevel;
 %newobject ParaMEDMEM::MEDFileFieldMultiTS::getFieldOnMeshAtLevel;
 %newobject ParaMEDMEM::MEDFileFieldMultiTS::getFieldAtLevelOld;
 %newobject ParaMEDMEM::MEDFileFieldMultiTS::getUndergroundDataArray;
+%newobject ParaMEDMEM::MEDFileIntFieldMultiTS::New;
+%newobject ParaMEDMEM::MEDFileIntFieldMultiTS::getUndergroundDataArray;
+
+%newobject ParaMEDMEM::MEDFileAnyTypeField1TS::New;
+%newobject ParaMEDMEM::MEDFileAnyTypeField1TS::shallowCpy;
+%newobject ParaMEDMEM::MEDFileAnyTypeField1TS::deepCpy;
 %newobject ParaMEDMEM::MEDFileField1TS::New;
-%newobject ParaMEDMEM::MEDFileField1TS::deepCpy;
 %newobject ParaMEDMEM::MEDFileField1TS::getFieldAtLevel;
 %newobject ParaMEDMEM::MEDFileField1TS::getFieldAtTopLevel;
 %newobject ParaMEDMEM::MEDFileField1TS::getFieldOnMeshAtLevel;
 %newobject ParaMEDMEM::MEDFileField1TS::getFieldAtLevelOld;
 %newobject ParaMEDMEM::MEDFileField1TS::getUndergroundDataArray;
+%newobject ParaMEDMEM::MEDFileIntField1TS::New;
+%newobject ParaMEDMEM::MEDFileIntField1TS::getUndergroundDataArray;
 
 %newobject ParaMEDMEM::MEDFileData::New;
 %newobject ParaMEDMEM::MEDFileData::deepCpy;
@@ -1026,6 +1046,9 @@ namespace ParaMEDMEM
   class MEDFileAnyTypeField1TS : public RefCountObject, public MEDFileFieldGlobsReal, public MEDFileWritable
   {
   public:
+    static MEDFileAnyTypeField1TS *New(const char *fileName) throw(INTERP_KERNEL::Exception);
+    static MEDFileAnyTypeField1TS *New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
+    static MEDFileAnyTypeField1TS *New(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception);
     int getDimension() const throw(INTERP_KERNEL::Exception);
     int getIteration() const throw(INTERP_KERNEL::Exception);
     int getOrder() const throw(INTERP_KERNEL::Exception);
@@ -1037,6 +1060,8 @@ namespace ParaMEDMEM
     bool isDealingTS(int iteration, int order) const throw(INTERP_KERNEL::Exception);
     const std::vector<std::string>& getInfo() const throw(INTERP_KERNEL::Exception);
     void setTime(int iteration, int order, double val) throw(INTERP_KERNEL::Exception);
+    virtual MEDFileAnyTypeField1TS *shallowCpy() const throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeField1TS *deepCpy() const throw(INTERP_KERNEL::Exception);
     %extend
     {
       PyObject *getTime() throw(INTERP_KERNEL::Exception)
@@ -1149,8 +1174,6 @@ namespace ParaMEDMEM
     void setFieldProfile(const MEDCouplingFieldDouble *field, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile) throw(INTERP_KERNEL::Exception);
     void setProfileNameOnLeaf(const char *mName, INTERP_KERNEL::NormalizedCellType typ, int locId, const char *newPflName, bool forceRenameOnGlob=false) throw(INTERP_KERNEL::Exception);
     void setLocNameOnLeaf(const char *mName, INTERP_KERNEL::NormalizedCellType typ, int locId, const char *newLocName, bool forceRenameOnGlob=false) throw(INTERP_KERNEL::Exception);
-    void copyTinyInfoFrom(const MEDCouplingFieldDouble *field) throw(INTERP_KERNEL::Exception);
-    MEDFileField1TS *deepCpy() const throw(INTERP_KERNEL::Exception);
     %extend
        {
          MEDFileField1TS(const char *fileName) throw(INTERP_KERNEL::Exception)
@@ -1171,6 +1194,14 @@ namespace ParaMEDMEM
          MEDFileField1TS()
          {
            return MEDFileField1TS::New();
+         }
+
+         void copyTinyInfoFrom(const MEDCouplingFieldDouble *field) throw(INTERP_KERNEL::Exception)
+         {
+           const DataArrayDouble *arr=0;
+           if(field)
+             arr=field->getArray();
+           self->copyTinyInfoFrom(field,arr);
          }
          
          std::string __str__() const throw(INTERP_KERNEL::Exception)
@@ -1259,6 +1290,28 @@ namespace ParaMEDMEM
        }
   };
 
+  class MEDFileIntField1TS : public MEDFileAnyTypeField1TS
+  {
+  public:
+    static MEDFileIntField1TS *New();
+    static MEDFileIntField1TS *New(const char *fileName) throw(INTERP_KERNEL::Exception);
+    static MEDFileIntField1TS *New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
+    static MEDFileIntField1TS *New(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception);
+    //
+    void setFieldNoProfileSBT(const MEDCouplingFieldDouble *field, const DataArrayInt *arrOfVals) throw(INTERP_KERNEL::Exception);
+    void setFieldProfile(const MEDCouplingFieldDouble *field, const DataArrayInt *arrOfVals, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile) throw(INTERP_KERNEL::Exception);
+    %extend
+    {
+      DataArrayInt *getUndergroundDataArray() const throw(INTERP_KERNEL::Exception)
+      {
+        DataArrayInt *ret=self->getUndergroundDataArray();
+        if(ret)
+          ret->incrRef();
+        return ret;
+      }
+    }
+  };
+
   class MEDFileFieldMultiTSIterator
   {
   public:
@@ -1278,19 +1331,269 @@ namespace ParaMEDMEM
     }
   };
 
-  class MEDFileFieldMultiTS : public RefCountObject, public MEDFileFieldGlobsReal, public MEDFileWritable
+  class MEDFileAnyTypeFieldMultiTS : public RefCountObject, public MEDFileFieldGlobsReal, public MEDFileWritable
+  {
+  public:
+    static MEDFileAnyTypeFieldMultiTS *New(const char *fileName) throw(INTERP_KERNEL::Exception);
+    static MEDFileAnyTypeFieldMultiTS *New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeFieldMultiTS *deepCpy() const throw(INTERP_KERNEL::Exception);
+    virtual MEDFileAnyTypeFieldMultiTS *shallowCpy() const throw(INTERP_KERNEL::Exception);
+    std::string getName() const throw(INTERP_KERNEL::Exception);
+    void setName(const char *name) throw(INTERP_KERNEL::Exception);
+    std::string getMeshName() const throw(INTERP_KERNEL::Exception);
+    void setMeshName(const char *newMeshName) throw(INTERP_KERNEL::Exception);
+    const std::vector<std::string>& getInfo() const throw(INTERP_KERNEL::Exception);
+    int getNumberOfTS() const throw(INTERP_KERNEL::Exception);
+    void eraseEmptyTS() throw(INTERP_KERNEL::Exception);
+    int getPosOfTimeStep(int iteration, int order) const throw(INTERP_KERNEL::Exception);
+    int getPosGivenTime(double time, double eps=1e-8) const throw(INTERP_KERNEL::Exception);
+    void write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception);
+    //
+    virtual MEDFileAnyTypeField1TS *getTimeStepAtPos(int pos) const throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeField1TS *getTimeStep(int iteration, int order) const throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeField1TS *getTimeStepGivenTime(double time, double eps=1e-8) const throw(INTERP_KERNEL::Exception);
+    %extend
+    {
+      int __len__() const throw(INTERP_KERNEL::Exception)
+      {
+        return self->getNumberOfTS();
+      }
+
+      int getTimeId(PyObject *elt0) const throw(INTERP_KERNEL::Exception)
+      {
+        if(elt0 && PyInt_Check(elt0))
+          {//fmts[3]
+            int pos=PyInt_AS_LONG(elt0);
+            return pos;
+          }
+        else if(elt0 && PyTuple_Check(elt0))
+          {
+            if(PyTuple_Size(elt0)==2)
+              {
+                PyObject *o0=PyTuple_GetItem(elt0,0);
+                PyObject *o1=PyTuple_GetItem(elt0,1);
+                if(PyInt_Check(o0) && PyInt_Check(o1))
+                  {//fmts(1,-1)
+                    int iter=PyInt_AS_LONG(o0);
+                    int order=PyInt_AS_LONG(o1);
+                    return self->getPosOfTimeStep(iter,order);
+                  }
+                else
+                  throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTS::__getitem__ : invalid input param ! input is a tuple of size 2 but two integers are expected in this tuple to request a time steps !");
+              }
+            else
+              throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTS::__getitem__ : invalid input param ! input is a tuple of size != 2 ! two integers are expected in this tuple to request a time steps !");
+          }
+        else if(elt0 && PyFloat_Check(elt0))
+          {
+            double val=PyFloat_AS_DOUBLE(elt0);
+            return self->getPosGivenTime(val);
+          }
+        else
+          throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTS::__getitem__ : invalid input params ! expected fmts[int], fmts[int,int] or fmts[double] to request time step !");
+      }
+      
+      PyObject *getIterations() const
+      {
+        std::vector< std::pair<int,int> > res=self->getIterations();
+        PyObject *ret=PyList_New(res.size());
+        int rk=0;
+        for(std::vector< std::pair<int,int> >::const_iterator iter=res.begin();iter!=res.end();iter++,rk++)
+          {
+            PyObject *elt=PyTuple_New(2);
+            PyTuple_SetItem(elt,0,SWIG_From_int((*iter).first));
+            PyTuple_SetItem(elt,1,SWIG_From_int((*iter).second));
+            PyList_SetItem(ret,rk,elt);
+          }
+        return ret;
+      }
+      
+      PyObject *getTimeSteps() const throw(INTERP_KERNEL::Exception)
+      {
+        std::vector<double> ret1;
+        std::vector< std::pair<int,int> > ret=self->getTimeSteps(ret1);
+        std::size_t sz=ret.size();
+        PyObject *ret2=PyList_New(sz);
+        for(std::size_t i=0;i<sz;i++)
+          {
+            PyObject *elt=PyTuple_New(3);
+            PyTuple_SetItem(elt,0,SWIG_From_int(ret[i].first));
+            PyTuple_SetItem(elt,1,SWIG_From_int(ret[i].second));
+            PyTuple_SetItem(elt,2,SWIG_From_double(ret1[i]));
+            PyList_SetItem(ret2,i,elt);
+          }
+        return ret2;
+      }
+      
+      PyObject *getTypesOfFieldAvailable() const throw(INTERP_KERNEL::Exception)
+      {
+        std::vector< std::vector<TypeOfField> > ret=self->getTypesOfFieldAvailable();
+        PyObject *ret2=PyList_New(ret.size());
+        for(int i=0;i<(int)ret.size();i++)
+          {
+            const std::vector<TypeOfField>& rett=ret[i];
+            PyObject *ret3=PyList_New(rett.size());
+            for(int j=0;j<(int)rett.size();j++)
+              PyList_SetItem(ret3,j,SWIG_From_int(rett[j]));
+            PyList_SetItem(ret2,i,ret3);
+          }
+        return ret2;
+      }
+      
+      PyObject *getNonEmptyLevels(int iteration, int order, const char *mname=0) const throw(INTERP_KERNEL::Exception)
+      {
+        std::vector<int> ret1;
+        int ret0=self->getNonEmptyLevels(iteration,order,mname,ret1);
+        PyObject *elt=PyTuple_New(2);
+        PyTuple_SetItem(elt,0,SWIG_From_int(ret0));
+        PyTuple_SetItem(elt,1,convertIntArrToPyList2(ret1));
+        return elt;
+      }
+      
+      PyObject *getFieldSplitedByType(int iteration, int order, const char *mname=0) const throw(INTERP_KERNEL::Exception)
+      {
+        std::vector<INTERP_KERNEL::NormalizedCellType> types;
+        std::vector< std::vector<TypeOfField> > typesF;
+        std::vector< std::vector<std::string> > pfls;
+        std::vector< std::vector<std::string> > locs;
+        std::vector< std::vector< std::pair<int,int> > > ret=self->getFieldSplitedByType(iteration,order,mname,types,typesF,pfls,locs);
+        int sz=ret.size();
+        PyObject *ret2=PyList_New(sz);
+        for(int i=0;i<sz;i++)
+          {
+            const std::vector< std::pair<int,int> >& dadsI=ret[i];
+            const std::vector<TypeOfField>& typesFI=typesF[i];
+            const std::vector<std::string>& pflsI=pfls[i];
+            const std::vector<std::string>& locsI=locs[i];
+            PyObject *elt=PyTuple_New(2);
+            PyTuple_SetItem(elt,0,SWIG_From_int(types[i]));
+            int sz2=ret[i].size();
+            PyObject *elt2=PyList_New(sz2);
+            for(int j=0;j<sz2;j++)
+              {
+                PyObject *elt3=PyTuple_New(4);
+                PyTuple_SetItem(elt3,0,SWIG_From_int(typesFI[j]));
+                PyObject *elt4=PyTuple_New(2); PyTuple_SetItem(elt4,0,SWIG_From_int(dadsI[j].first)); PyTuple_SetItem(elt4,1,SWIG_From_int(dadsI[j].second));
+                PyTuple_SetItem(elt3,1,elt4);
+                PyTuple_SetItem(elt3,2,PyString_FromString(pflsI[j].c_str()));
+                PyTuple_SetItem(elt3,3,PyString_FromString(locsI[j].c_str()));
+                PyList_SetItem(elt2,j,elt3);
+              }
+            PyTuple_SetItem(elt,1,elt2);
+            PyList_SetItem(ret2,i,elt);
+          }
+        return ret2;
+      }
+
+      std::vector<int> getTimeIds(PyObject *elts) const throw(INTERP_KERNEL::Exception)
+      {
+        if(PyList_Check(elts))
+          {
+            int sz=PyList_Size(elts);
+            std::vector<int> ret(sz);
+            for(int i=0;i<sz;i++)
+              {
+                PyObject *elt=PyList_GetItem(elts,i);
+                ret[i]=ParaMEDMEM_MEDFileAnyTypeFieldMultiTS_getTimeId(self,elt);
+              }
+            return ret;
+          }
+        else
+          {
+            std::vector<int> ret(1);
+            ret[0]=ParaMEDMEM_MEDFileAnyTypeFieldMultiTS_getTimeId(self,elts);
+            return ret;
+          }
+      }
+      
+      void __delitem__(PyObject *elts) throw(INTERP_KERNEL::Exception)
+      {
+        std::vector<int> idsToRemove=ParaMEDMEM_MEDFileAnyTypeFieldMultiTS_getTimeIds(self,elts);
+        if(!idsToRemove.empty())
+          self->eraseTimeStepIds(&idsToRemove[0],&idsToRemove[0]+idsToRemove.size());
+      }
+      
+      void eraseTimeStepIds(PyObject *li) throw(INTERP_KERNEL::Exception)
+      {
+        int sw;
+        int pos1;
+        std::vector<int> pos2;
+        DataArrayInt *pos3=0;
+        DataArrayIntTuple *pos4=0;
+        convertObjToPossibleCpp1(li,sw,pos1,pos2,pos3,pos4);
+        switch(sw)
+          {
+          case 1:
+            {
+              self->eraseTimeStepIds(&pos1,&pos1+1);
+              return;
+            }
+          case 2:
+            {
+              if(pos2.empty())
+                return;
+              self->eraseTimeStepIds(&pos2[0],&pos2[0]+pos2.size());
+              return ;
+            }
+          case 3:
+            {
+              self->eraseTimeStepIds(pos3->begin(),pos3->end());
+              return ;
+            }
+          default:
+            throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTS::eraseTimeStepIds : unexpected input array type recognized !");
+          }
+      }
+
+      MEDFileAnyTypeField1TS *__getitem__(PyObject *elt0) const throw(INTERP_KERNEL::Exception)
+      {
+        if(elt0 && PyInt_Check(elt0))
+          {//fmts[3]
+            int pos=PyInt_AS_LONG(elt0);
+            return self->getTimeStepAtPos(pos);
+          }
+        else if(elt0 && PyTuple_Check(elt0))
+          {
+            if(PyTuple_Size(elt0)==2)
+              {
+                PyObject *o0=PyTuple_GetItem(elt0,0);
+                PyObject *o1=PyTuple_GetItem(elt0,1);
+                if(PyInt_Check(o0) && PyInt_Check(o1))
+                  {//fmts(1,-1)
+                    int iter=PyInt_AS_LONG(o0);
+                    int order=PyInt_AS_LONG(o1);
+                    return self->getTimeStep(iter,order);
+                  }
+                else
+                  throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTS::__getitem__ : invalid input param ! input is a tuple of size 2 but two integers are expected in this tuple to request a time steps !");
+              }
+            else
+              throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTS::__getitem__ : invalid input param ! input is a tuple of size != 2 ! two integers are expected in this tuple to request a time steps !");
+          }
+        else if(elt0 && PyFloat_Check(elt0))
+          {
+            double val=PyFloat_AS_DOUBLE(elt0);
+            return self->getTimeStepGivenTime(val);
+          }
+        else
+          throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTS::__getitem__ : invalid input params ! expected fmts[int], fmts[int,int] or fmts[double] to request time step !");
+      }
+
+      bool changeMeshNames(PyObject *li) throw(INTERP_KERNEL::Exception)
+      {
+        std::vector< std::pair<std::string,std::string> > modifTab=convertVecPairStStFromPy(li);
+        return self->changeMeshNames(modifTab);
+      }
+    }
+  };
+
+  class MEDFileFieldMultiTS : public MEDFileAnyTypeFieldMultiTS
   {
   public:
     static MEDFileFieldMultiTS *New() throw(INTERP_KERNEL::Exception);
     static MEDFileFieldMultiTS *New(const char *fileName) throw(INTERP_KERNEL::Exception);
     static MEDFileFieldMultiTS *New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
-    MEDFileFieldMultiTS *deepCpy() const throw(INTERP_KERNEL::Exception);
     //
-    MEDFileField1TS *getTimeStepAtPos(int pos) const throw(INTERP_KERNEL::Exception);
-    MEDFileField1TS *getTimeStep(int iteration, int order) const throw(INTERP_KERNEL::Exception);
-    MEDFileField1TS *getTimeStepGivenTime(double time, double eps=1e-8) const throw(INTERP_KERNEL::Exception);
-    //
-    void write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *getFieldAtLevel(TypeOfField type, int iteration, int order, int meshDimRelToMax, int renumPol=0) const throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *getFieldAtTopLevel(TypeOfField type, int iteration, int order, int renumPol=0) const throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *getFieldOnMeshAtLevel(TypeOfField type, int iteration, int order, int meshDimRelToMax, const MEDFileMesh *mesh, int renumPol=0) const throw(INTERP_KERNEL::Exception);
@@ -1299,16 +1602,6 @@ namespace ParaMEDMEM
     //
     void appendFieldNoProfileSBT(const MEDCouplingFieldDouble *field) throw(INTERP_KERNEL::Exception);
     void appendFieldProfile(const MEDCouplingFieldDouble *field, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile) throw(INTERP_KERNEL::Exception);
-    //
-    int getNumberOfTS() const throw(INTERP_KERNEL::Exception);
-    void eraseEmptyTS() throw(INTERP_KERNEL::Exception);
-    int getPosOfTimeStep(int iteration, int order) const throw(INTERP_KERNEL::Exception);
-    int getPosGivenTime(double time, double eps=1e-8) const throw(INTERP_KERNEL::Exception);
-    std::string getName() const throw(INTERP_KERNEL::Exception);
-    void setName(const char *name) throw(INTERP_KERNEL::Exception);
-    std::string getMeshName() const throw(INTERP_KERNEL::Exception);
-    void setMeshName(const char *newMeshName) throw(INTERP_KERNEL::Exception);
-    const std::vector<std::string>& getInfo() const throw(INTERP_KERNEL::Exception);
     %extend
        {
          MEDFileFieldMultiTS()
@@ -1331,150 +1624,19 @@ namespace ParaMEDMEM
            return self->simpleRepr();
          }
 
-         int __len__() const throw(INTERP_KERNEL::Exception)
-         {
-           return self->getNumberOfTS();
-         }
-
-         MEDFileField1TS *__getitem__(PyObject *elt0) const throw(INTERP_KERNEL::Exception)
-         {
-           if(elt0 && PyInt_Check(elt0))
-             {//fmts[3]
-               int pos=PyInt_AS_LONG(elt0);
-               return self->getTimeStepAtPos(pos);
-             }
-           else if(elt0 && PyTuple_Check(elt0))
-             {
-               if(PyTuple_Size(elt0)==2)
-                 {
-                   PyObject *o0=PyTuple_GetItem(elt0,0);
-                   PyObject *o1=PyTuple_GetItem(elt0,1);
-                   if(PyInt_Check(o0) && PyInt_Check(o1))
-                     {//fmts(1,-1)
-                       int iter=PyInt_AS_LONG(o0);
-                       int order=PyInt_AS_LONG(o1);
-                       return self->getTimeStep(iter,order);
-                     }
-                   else
-                     throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::__getitem__ : invalid input param ! input is a tuple of size 2 but two integers are expected in this tuple to request a time steps !");
-                 }
-               else
-                 throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::__getitem__ : invalid input param ! input is a tuple of size != 2 ! two integers are expected in this tuple to request a time steps !");
-             }
-           else if(elt0 && PyFloat_Check(elt0))
-             {
-               double val=PyFloat_AS_DOUBLE(elt0);
-               return self->getTimeStepGivenTime(val);
-             }
-           else
-             throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::__getitem__ : invalid input params ! expected fmts[int], fmts[int,int] or fmts[double] to request time step !");
-         }
-
          MEDFileFieldMultiTSIterator *__iter__() throw(INTERP_KERNEL::Exception)
          {
            return self->iterator();
          }
 
          PyObject *getFieldWithProfile(TypeOfField type, int iteration, int order, int meshDimRelToMax, const MEDFileMesh *mesh) const throw(INTERP_KERNEL::Exception)
-           {
-             DataArrayInt *ret1=0;
-             DataArrayDouble *ret0=self->getFieldWithProfile(type,iteration,order,meshDimRelToMax,mesh,ret1);
-             PyObject *ret=PyTuple_New(2);
-             PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 ));
-             PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
-             return ret;
-           }
-
-         PyObject *getIterations() const
          {
-           std::vector< std::pair<int,int> > res=self->getIterations();
-           PyObject *ret=PyList_New(res.size());
-           int rk=0;
-           for(std::vector< std::pair<int,int> >::const_iterator iter=res.begin();iter!=res.end();iter++,rk++)
-             {
-               PyObject *elt=PyTuple_New(2);
-               PyTuple_SetItem(elt,0,SWIG_From_int((*iter).first));
-               PyTuple_SetItem(elt,1,SWIG_From_int((*iter).second));
-               PyList_SetItem(ret,rk,elt);
-             }
+           DataArrayInt *ret1=0;
+           DataArrayDouble *ret0=self->getFieldWithProfile(type,iteration,order,meshDimRelToMax,mesh,ret1);
+           PyObject *ret=PyTuple_New(2);
+           PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__DataArrayDouble, SWIG_POINTER_OWN | 0 ));
+           PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
            return ret;
-         }
-
-         PyObject *getTimeSteps() const throw(INTERP_KERNEL::Exception)
-           {
-             std::vector<double> ret1;
-             std::vector< std::pair<int,int> > ret=self->getTimeSteps(ret1);
-             std::size_t sz=ret.size();
-             PyObject *ret2=PyList_New(sz);
-             for(std::size_t i=0;i<sz;i++)
-               {
-                 PyObject *elt=PyTuple_New(3);
-                 PyTuple_SetItem(elt,0,SWIG_From_int(ret[i].first));
-                 PyTuple_SetItem(elt,1,SWIG_From_int(ret[i].second));
-                 PyTuple_SetItem(elt,2,SWIG_From_double(ret1[i]));
-                 PyList_SetItem(ret2,i,elt);
-               }
-             return ret2;
-           }
-
-         PyObject *getTypesOfFieldAvailable() const throw(INTERP_KERNEL::Exception)
-         {
-           std::vector< std::vector<TypeOfField> > ret=self->getTypesOfFieldAvailable();
-           PyObject *ret2=PyList_New(ret.size());
-           for(int i=0;i<(int)ret.size();i++)
-             {
-               const std::vector<TypeOfField>& rett=ret[i];
-               PyObject *ret3=PyList_New(rett.size());
-               for(int j=0;j<(int)rett.size();j++)
-                 PyList_SetItem(ret3,j,SWIG_From_int(rett[j]));
-               PyList_SetItem(ret2,i,ret3);
-             }
-           return ret2;
-         }
-
-         PyObject *getNonEmptyLevels(int iteration, int order, const char *mname=0) const throw(INTERP_KERNEL::Exception)
-         {
-           std::vector<int> ret1;
-           int ret0=self->getNonEmptyLevels(iteration,order,mname,ret1);
-           PyObject *elt=PyTuple_New(2);
-           PyTuple_SetItem(elt,0,SWIG_From_int(ret0));
-           PyTuple_SetItem(elt,1,convertIntArrToPyList2(ret1));
-           return elt;
-         }
-
-         PyObject *getFieldSplitedByType(int iteration, int order, const char *mname=0) const throw(INTERP_KERNEL::Exception)
-         {
-           std::vector<INTERP_KERNEL::NormalizedCellType> types;
-           std::vector< std::vector<TypeOfField> > typesF;
-           std::vector< std::vector<std::string> > pfls;
-           std::vector< std::vector<std::string> > locs;
-           std::vector< std::vector< std::pair<int,int> > > ret=self->getFieldSplitedByType(iteration,order,mname,types,typesF,pfls,locs);
-           int sz=ret.size();
-           PyObject *ret2=PyList_New(sz);
-           for(int i=0;i<sz;i++)
-             {
-               const std::vector< std::pair<int,int> >& dadsI=ret[i];
-               const std::vector<TypeOfField>& typesFI=typesF[i];
-               const std::vector<std::string>& pflsI=pfls[i];
-               const std::vector<std::string>& locsI=locs[i];
-               PyObject *elt=PyTuple_New(2);
-               PyTuple_SetItem(elt,0,SWIG_From_int(types[i]));
-               int sz2=ret[i].size();
-               PyObject *elt2=PyList_New(sz2);
-               for(int j=0;j<sz2;j++)
-                 {
-                   PyObject *elt3=PyTuple_New(4);
-                   PyTuple_SetItem(elt3,0,SWIG_From_int(typesFI[j]));
-                   PyObject *elt4=PyTuple_New(2); PyTuple_SetItem(elt4,0,SWIG_From_int(dadsI[j].first)); PyTuple_SetItem(elt4,1,SWIG_From_int(dadsI[j].second));
-                   PyTuple_SetItem(elt3,1,elt4);
-                   PyTuple_SetItem(elt3,2,PyString_FromString(pflsI[j].c_str()));
-                   PyTuple_SetItem(elt3,3,PyString_FromString(locsI[j].c_str()));
-                   PyList_SetItem(elt2,j,elt3);
-                 }
-               PyTuple_SetItem(elt,1,elt2);
-               PyList_SetItem(ret2,i,elt);
-             }
-           return ret2;
          }
 
          PyObject *getFieldSplitedByType2(int iteration, int order, const char *mname=0) const throw(INTERP_KERNEL::Exception)
@@ -1517,6 +1679,7 @@ namespace ParaMEDMEM
              ret->incrRef();
            return ret;
          }
+         
          PyObject *getUndergroundDataArrayExt(int iteration, int order) const throw(INTERP_KERNEL::Exception)
          {
            std::vector< std::pair<std::pair<INTERP_KERNEL::NormalizedCellType,int>,std::pair<int,int> > > elt1Cpp;
@@ -1543,106 +1706,6 @@ namespace ParaMEDMEM
            PyTuple_SetItem(ret,1,elt);
            return ret;
          }
-
-         int getTimeId(PyObject *elt0) const throw(INTERP_KERNEL::Exception)
-         {
-           if(elt0 && PyInt_Check(elt0))
-             {//fmts[3]
-               int pos=PyInt_AS_LONG(elt0);
-               return pos;
-             }
-           else if(elt0 && PyTuple_Check(elt0))
-             {
-               if(PyTuple_Size(elt0)==2)
-                 {
-                   PyObject *o0=PyTuple_GetItem(elt0,0);
-                   PyObject *o1=PyTuple_GetItem(elt0,1);
-                   if(PyInt_Check(o0) && PyInt_Check(o1))
-                     {//fmts(1,-1)
-                       int iter=PyInt_AS_LONG(o0);
-                       int order=PyInt_AS_LONG(o1);
-                       return self->getPosOfTimeStep(iter,order);
-                     }
-                   else
-                     throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::__getitem__ : invalid input param ! input is a tuple of size 2 but two integers are expected in this tuple to request a time steps !");
-                 }
-               else
-                 throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::__getitem__ : invalid input param ! input is a tuple of size != 2 ! two integers are expected in this tuple to request a time steps !");
-             }
-           else if(elt0 && PyFloat_Check(elt0))
-             {
-               double val=PyFloat_AS_DOUBLE(elt0);
-               return self->getPosGivenTime(val);
-             }
-           else
-             throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::__getitem__ : invalid input params ! expected fmts[int], fmts[int,int] or fmts[double] to request time step !");
-         }
-
-         std::vector<int> getTimeIds(PyObject *elts) const throw(INTERP_KERNEL::Exception)
-         {
-           if(PyList_Check(elts))
-             {
-               int sz=PyList_Size(elts);
-               std::vector<int> ret(sz);
-               for(int i=0;i<sz;i++)
-                 {
-                   PyObject *elt=PyList_GetItem(elts,i);
-                   ret[i]=ParaMEDMEM_MEDFileFieldMultiTS_getTimeId(self,elt);
-                 }
-               return ret;
-             }
-           else
-             {
-               std::vector<int> ret(1);
-               ret[0]=ParaMEDMEM_MEDFileFieldMultiTS_getTimeId(self,elts);
-               return ret;
-             }
-         }
-
-         void __delitem__(PyObject *elts) throw(INTERP_KERNEL::Exception)
-         {
-           std::vector<int> idsToRemove=ParaMEDMEM_MEDFileFieldMultiTS_getTimeIds(self,elts);
-           if(!idsToRemove.empty())
-             self->eraseTimeStepIds(&idsToRemove[0],&idsToRemove[0]+idsToRemove.size());
-         }
-
-         void eraseTimeStepIds(PyObject *li) throw(INTERP_KERNEL::Exception)
-         {
-           int sw;
-           int pos1;
-           std::vector<int> pos2;
-           DataArrayInt *pos3=0;
-           DataArrayIntTuple *pos4=0;
-           convertObjToPossibleCpp1(li,sw,pos1,pos2,pos3,pos4);
-           switch(sw)
-             {
-             case 1:
-               {
-                 self->eraseTimeStepIds(&pos1,&pos1+1);
-                 return;
-               }
-             case 2:
-               {
-                 if(pos2.empty())
-                   return;
-                 self->eraseTimeStepIds(&pos2[0],&pos2[0]+pos2.size());
-                 return ;
-               }
-             case 3:
-               {
-                 self->eraseTimeStepIds(pos3->begin(),pos3->end());
-                 return ;
-               }
-             default:
-               throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::eraseTimeStepIds : unexpected input array type recognized !");
-             }
-         }
-
-         bool changeMeshNames(PyObject *li) throw(INTERP_KERNEL::Exception)
-         {
-           std::vector< std::pair<std::string,std::string> > modifTab=convertVecPairStStFromPy(li);
-           return self->changeMeshNames(modifTab);
-         }
        }
   };
 
@@ -1653,14 +1716,35 @@ namespace ParaMEDMEM
     {
       PyObject *next() throw(INTERP_KERNEL::Exception)
       {
-        MEDFileFieldMultiTS *ret=self->nextt();
+        MEDFileAnyTypeFieldMultiTS *ret=self->nextt();
         if(ret)
-          return SWIG_NewPointerObj(SWIG_as_voidptr(ret),SWIGTYPE_p_ParaMEDMEM__MEDFileFieldMultiTS,SWIG_POINTER_OWN | 0);
+          return convertMEDFileFieldMultiTS(ret, SWIG_POINTER_OWN | 0 );
         else
           {
             PyErr_SetString(PyExc_StopIteration,"No more data.");
             return 0;
           }
+      }
+    }
+  };
+
+  class MEDFileIntFieldMultiTS : public MEDFileAnyTypeFieldMultiTS
+  {
+  public:
+    static MEDFileIntFieldMultiTS *New();
+    static MEDFileIntFieldMultiTS *New(const char *fileName) throw(INTERP_KERNEL::Exception);
+    static MEDFileIntFieldMultiTS *New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
+    //
+    void appendFieldNoProfileSBT(const MEDCouplingFieldDouble *field, const DataArrayInt *arrOfVals) throw(INTERP_KERNEL::Exception);
+    void appendFieldProfile(const MEDCouplingFieldDouble *field, const DataArrayInt *arrOfVals, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile) throw(INTERP_KERNEL::Exception);
+    %extend
+    {
+      DataArrayInt *getUndergroundDataArray(int iteration, int order) const throw(INTERP_KERNEL::Exception)
+      {
+        DataArrayInt *ret=self->getUndergroundDataArray(iteration,order);
+        if(ret)
+          ret->incrRef();
+        return ret;
       }
     }
   };
@@ -1677,10 +1761,10 @@ namespace ParaMEDMEM
     std::vector<std::string> getMeshesNames() const throw(INTERP_KERNEL::Exception);
     //
     void resize(int newSize) throw(INTERP_KERNEL::Exception);
-    void pushField(MEDFileFieldMultiTS *field) throw(INTERP_KERNEL::Exception);
-    void setFieldAtPos(int i, MEDFileFieldMultiTS *field) throw(INTERP_KERNEL::Exception);
-    MEDFileFieldMultiTS *getFieldAtPos(int i) const throw(INTERP_KERNEL::Exception);
-    MEDFileFieldMultiTS *getFieldWithName(const char *fieldName) const throw(INTERP_KERNEL::Exception);
+    void pushField(MEDFileAnyTypeFieldMultiTS *field) throw(INTERP_KERNEL::Exception);
+    void setFieldAtPos(int i, MEDFileAnyTypeFieldMultiTS *field) throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeFieldMultiTS *getFieldAtPos(int i) const throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeFieldMultiTS *getFieldWithName(const char *fieldName) const throw(INTERP_KERNEL::Exception);
     void destroyFieldAtPos(int i) throw(INTERP_KERNEL::Exception);
     %extend
        {
@@ -1699,7 +1783,7 @@ namespace ParaMEDMEM
            return self->simpleRepr();
          }
          
-         MEDFileFieldMultiTS *__getitem__(PyObject *obj) throw(INTERP_KERNEL::Exception)
+         MEDFileAnyTypeFieldMultiTS *__getitem__(PyObject *obj) throw(INTERP_KERNEL::Exception)
          {
            if(PyInt_Check(obj))
              {

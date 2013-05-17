@@ -418,7 +418,7 @@ class MEDLoaderTest(unittest.TestCase):
     def testMEDField2(self):
         mm=MEDFileMesh.New("Pyfile19.med")
         mm.write("Pyfile19_bis.med",2)
-        ff=MEDFileFieldMultiTS.New("Pyfile19.med","VFieldOnNodes")
+        ff=MEDFileFieldMultiTS.New("Pyfile19.med")
         ff.write("Pyfile19_bis.med",0)
         self.assertEqual([('tyty','mm'),('uiop','MW')],MEDLoader.GetComponentsNamesOfField("Pyfile19_bis.med","VFieldOnNodes"))
         pass
