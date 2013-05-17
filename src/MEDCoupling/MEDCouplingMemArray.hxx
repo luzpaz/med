@@ -136,6 +136,9 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT virtual int getNumberOfTuples() const throw(INTERP_KERNEL::Exception) = 0;
     MEDCOUPLING_EXPORT virtual std::size_t getNbOfElems() const throw(INTERP_KERNEL::Exception) = 0;
     MEDCOUPLING_EXPORT virtual std::size_t getNbOfElemAllocated() const throw(INTERP_KERNEL::Exception) = 0;
+    MEDCOUPLING_EXPORT virtual void alloc(int nbOfTuple, int nbOfCompo=1) throw(INTERP_KERNEL::Exception) = 0;
+    MEDCOUPLING_EXPORT virtual void renumberInPlace(const int *old2New) throw(INTERP_KERNEL::Exception) = 0;
+    MEDCOUPLING_EXPORT virtual void renumberInPlaceR(const int *new2Old) throw(INTERP_KERNEL::Exception) = 0;
     MEDCOUPLING_EXPORT void checkNbOfTuples(int nbOfTuples, const char *msg) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void checkNbOfComps(int nbOfCompo, const char *msg) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void checkNbOfTuplesAndComp(const DataArray& other, const char *msg) const throw(INTERP_KERNEL::Exception);

@@ -80,6 +80,64 @@ namespace ParaMEDMEM
         convertPyToNewIntArr3(li,tmp);
         self->copyPartOfStringInfoFrom2(tmp,other);
       }
+
+      virtual void renumberInPlace(PyObject *li) throw(INTERP_KERNEL::Exception)
+      {
+        void *da=0;
+        int res1=SWIG_ConvertPtr(li,&da,SWIGTYPE_p_ParaMEDMEM__DataArrayInt, 0 |  0 );
+        if (!SWIG_IsOK(res1))
+          {
+            int size;
+            INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(li,&size);
+            if(size!=self->getNumberOfTuples())
+              {
+                throw INTERP_KERNEL::Exception("Invalid list length ! Must be equal to number of tuples !");
+              }
+            self->renumberInPlace(tmp);
+          }
+        else
+          {
+            DataArrayInt *da2=reinterpret_cast< DataArrayInt * >(da);
+            if(!da2)
+              throw INTERP_KERNEL::Exception("Not null DataArrayInt instance expected !");
+            da2->checkAllocated();
+            int size=self->getNumberOfTuples();
+            if(size!=self->getNumberOfTuples())
+              {
+                throw INTERP_KERNEL::Exception("Invalid list length ! Must be equal to number of tuples !");
+              }
+            self->renumberInPlace(da2->getConstPointer());
+          }
+      }
+
+      virtual void renumberInPlaceR(PyObject *li) throw(INTERP_KERNEL::Exception)
+      {
+        void *da=0;
+        int res1=SWIG_ConvertPtr(li,&da,SWIGTYPE_p_ParaMEDMEM__DataArrayInt, 0 |  0 );
+        if (!SWIG_IsOK(res1))
+          {
+            int size;
+            INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(li,&size);
+            if(size!=self->getNumberOfTuples())
+              {
+                throw INTERP_KERNEL::Exception("Invalid list length ! Must be equal to number of tuples !");
+              }
+            self->renumberInPlaceR(tmp);
+          }
+        else
+          {
+            DataArrayInt *da2=reinterpret_cast< DataArrayInt * >(da);
+            if(!da2)
+              throw INTERP_KERNEL::Exception("Not null DataArrayInt instance expected !");
+            da2->checkAllocated();
+            int size=self->getNumberOfTuples();
+            if(size!=self->getNumberOfTuples())
+              {
+                throw INTERP_KERNEL::Exception("Invalid list length ! Must be equal to number of tuples !");
+              }
+            self->renumberInPlaceR(da2->getConstPointer());
+          }
+      }
     }
   };
   
@@ -511,64 +569,6 @@ namespace ParaMEDMEM
                 throw INTERP_KERNEL::Exception("Invalid list length ! Must be equal to number of tuples !");
               }
             return self->renumberAndReduce(da2->getConstPointer(),newNbOfTuple);
-          }
-      }
-
-      void renumberInPlace(PyObject *li) throw(INTERP_KERNEL::Exception)
-      {
-        void *da=0;
-        int res1=SWIG_ConvertPtr(li,&da,SWIGTYPE_p_ParaMEDMEM__DataArrayInt, 0 |  0 );
-        if (!SWIG_IsOK(res1))
-          {
-            int size;
-            INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(li,&size);
-            if(size!=self->getNumberOfTuples())
-              {
-                throw INTERP_KERNEL::Exception("Invalid list length ! Must be equal to number of tuples !");
-              }
-            self->renumberInPlace(tmp);
-          }
-        else
-          {
-            DataArrayInt *da2=reinterpret_cast< DataArrayInt * >(da);
-            if(!da2)
-              throw INTERP_KERNEL::Exception("Not null DataArrayInt instance expected !");
-            da2->checkAllocated();
-            int size=self->getNumberOfTuples();
-            if(size!=self->getNumberOfTuples())
-              {
-                throw INTERP_KERNEL::Exception("Invalid list length ! Must be equal to number of tuples !");
-              }
-            self->renumberInPlace(da2->getConstPointer());
-          }
-      }
-
-      void renumberInPlaceR(PyObject *li) throw(INTERP_KERNEL::Exception)
-      {
-        void *da=0;
-        int res1=SWIG_ConvertPtr(li,&da,SWIGTYPE_p_ParaMEDMEM__DataArrayInt, 0 |  0 );
-        if (!SWIG_IsOK(res1))
-          {
-            int size;
-            INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(li,&size);
-            if(size!=self->getNumberOfTuples())
-              {
-                throw INTERP_KERNEL::Exception("Invalid list length ! Must be equal to number of tuples !");
-              }
-            self->renumberInPlaceR(tmp);
-          }
-        else
-          {
-            DataArrayInt *da2=reinterpret_cast< DataArrayInt * >(da);
-            if(!da2)
-              throw INTERP_KERNEL::Exception("Not null DataArrayInt instance expected !");
-            da2->checkAllocated();
-            int size=self->getNumberOfTuples();
-            if(size!=self->getNumberOfTuples())
-              {
-                throw INTERP_KERNEL::Exception("Invalid list length ! Must be equal to number of tuples !");
-              }
-            self->renumberInPlaceR(da2->getConstPointer());
           }
       }
 
@@ -2635,64 +2635,6 @@ namespace ParaMEDMEM
           }
       }
 
-      void renumberInPlace(PyObject *li) throw(INTERP_KERNEL::Exception)
-      {
-        void *da=0;
-        int res1=SWIG_ConvertPtr(li,&da,SWIGTYPE_p_ParaMEDMEM__DataArrayInt, 0 |  0 );
-        if (!SWIG_IsOK(res1))
-          {
-            int size;
-            INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(li,&size);
-            if(size!=self->getNumberOfTuples())
-              {
-                throw INTERP_KERNEL::Exception("Invalid list length ! Must be equal to number of tuples !");
-              }
-            self->renumberInPlace(tmp);
-          }
-        else
-          {
-            DataArrayInt *da2=reinterpret_cast< DataArrayInt * >(da);
-            if(!da2)
-              throw INTERP_KERNEL::Exception("Not null DataArrayInt instance expected !");
-            da2->checkAllocated();
-            int size=self->getNumberOfTuples();
-            if(size!=self->getNumberOfTuples())
-              {
-                throw INTERP_KERNEL::Exception("Invalid list length ! Must be equal to number of tuples !");
-              }
-            self->renumberInPlace(da2->getConstPointer());
-          }
-      }
-
-      void renumberInPlaceR(PyObject *li) throw(INTERP_KERNEL::Exception)
-      {
-        void *da=0;
-        int res1=SWIG_ConvertPtr(li,&da,SWIGTYPE_p_ParaMEDMEM__DataArrayInt, 0 |  0 );
-        if (!SWIG_IsOK(res1))
-          {
-            int size;
-            INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(li,&size);
-            if(size!=self->getNumberOfTuples())
-              {
-                throw INTERP_KERNEL::Exception("Invalid list length ! Must be equal to number of tuples !");
-              }
-            self->renumberInPlaceR(tmp);
-          }
-        else
-          {
-            DataArrayInt *da2=reinterpret_cast< DataArrayInt * >(da);
-            if(!da2)
-              throw INTERP_KERNEL::Exception("Not null DataArrayInt instance expected !");
-            da2->checkAllocated();
-            int size=self->getNumberOfTuples();
-            if(size!=self->getNumberOfTuples())
-              {
-                throw INTERP_KERNEL::Exception("Invalid list length ! Must be equal to number of tuples !");
-              }
-            self->renumberInPlaceR(da2->getConstPointer());
-          }
-      }
-
       DataArrayInt *renumberAndReduce(PyObject *li, int newNbOfTuple) throw(INTERP_KERNEL::Exception)
       {
         void *da=0;
@@ -4509,8 +4451,6 @@ namespace ParaMEDMEM
     std::string reprZip() const throw(INTERP_KERNEL::Exception);
     void reAlloc(int nbOfTuples) throw(INTERP_KERNEL::Exception);
     DataArrayInt *convertToIntArr() const throw(INTERP_KERNEL::Exception);
-    void renumberInPlace(const int *old2New) throw(INTERP_KERNEL::Exception);
-    void renumberInPlaceR(const int *new2Old) throw(INTERP_KERNEL::Exception);
     DataArrayChar *renumber(const int *old2New) const throw(INTERP_KERNEL::Exception);
     DataArrayChar *renumberR(const int *new2Old) const throw(INTERP_KERNEL::Exception);
     DataArrayChar *renumberAndReduce(const int *old2NewBg, int newNbOfTuple) const throw(INTERP_KERNEL::Exception);
@@ -4563,64 +4503,6 @@ namespace ParaMEDMEM
         PyTuple_SetItem(ret,0,ret0Py);
         PyTuple_SetItem(ret,1,PyString_FromString(ret1.c_str()));
         return ret;
-      }
-      
-      void renumberInPlace(PyObject *li) throw(INTERP_KERNEL::Exception)
-      {
-        void *da=0;
-        int res1=SWIG_ConvertPtr(li,&da,SWIGTYPE_p_ParaMEDMEM__DataArrayInt, 0 |  0 );
-        if (!SWIG_IsOK(res1))
-          {
-            int size;
-            INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(li,&size);
-            if(size!=self->getNumberOfTuples())
-              {
-                throw INTERP_KERNEL::Exception("Invalid list length ! Must be equal to number of tuples !");
-              }
-            self->renumberInPlace(tmp);
-          }
-        else
-          {
-            DataArrayInt *da2=reinterpret_cast< DataArrayInt * >(da);
-            if(!da2)
-              throw INTERP_KERNEL::Exception("Not null DataArrayInt instance expected !");
-            da2->checkAllocated();
-            int size=self->getNumberOfTuples();
-            if(size!=self->getNumberOfTuples())
-              {
-                throw INTERP_KERNEL::Exception("Invalid list length ! Must be equal to number of tuples !");
-              }
-            self->renumberInPlace(da2->getConstPointer());
-          }
-      }
-      
-      void renumberInPlaceR(PyObject *li) throw(INTERP_KERNEL::Exception)
-      {
-        void *da=0;
-        int res1=SWIG_ConvertPtr(li,&da,SWIGTYPE_p_ParaMEDMEM__DataArrayInt, 0 |  0 );
-        if (!SWIG_IsOK(res1))
-          {
-            int size;
-            INTERP_KERNEL::AutoPtr<int> tmp=convertPyToNewIntArr2(li,&size);
-            if(size!=self->getNumberOfTuples())
-              {
-                throw INTERP_KERNEL::Exception("Invalid list length ! Must be equal to number of tuples !");
-              }
-            self->renumberInPlaceR(tmp);
-          }
-        else
-          {
-            DataArrayInt *da2=reinterpret_cast< DataArrayInt * >(da);
-            if(!da2)
-           throw INTERP_KERNEL::Exception("Not null DataArrayInt instance expected !");
-            da2->checkAllocated();
-            int size=self->getNumberOfTuples();
-            if(size!=self->getNumberOfTuples())
-              {
-                throw INTERP_KERNEL::Exception("Invalid list length ! Must be equal to number of tuples !");
-              }
-            self->renumberInPlaceR(da2->getConstPointer());
-          }
       }
       
       DataArrayChar *renumber(PyObject *li) throw(INTERP_KERNEL::Exception)
