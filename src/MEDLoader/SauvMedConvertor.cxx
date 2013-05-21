@@ -2108,8 +2108,8 @@ void IntermediateMED::setFields( SauvUtilities::DoubleField* fld,
         }
       else
         {
-          fld->setValues( valPtr, iSub++ );
-          setTS( fld, values, medFields, mesh, iSub );
+          fld->setValues( valPtr, iSub );
+          setTS( fld, values, medFields, mesh, iSub++ );
         }
     }
 }
