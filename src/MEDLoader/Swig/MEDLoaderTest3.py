@@ -2356,6 +2356,50 @@ class MEDLoaderTest(unittest.TestCase):
             pass
         pass
     
+    def testNonRegressionMantis22212ChangeGrpName(self):
+        fileName="Pyfile62.med"
+        m2,m1,m0,f2,f1,f0,p,n2,n1,n0,fns,fids,grpns,famIdsPerGrp=MEDLoaderDataForTest.buildMultiLevelMesh_1()
+        m=MEDFileUMesh.New()
+        m.setCoords(m2.getCoords())
+        m.setMeshAtLevel(0,m2)
+        m.setMeshAtLevel(-1,m1)
+        m.setMeshAtLevel(-2,m0)
+        m.setFamilyFieldArr(0,f2)
+        m.setFamilyFieldArr(-1,f1)
+        m.setFamilyFieldArr(-2,f0)
+        m.setFamilyFieldArr(1,p)
+        nbOfFams=len(fns)
+        for i in xrange(nbOfFams):
+            m.addFamily(fns[i],fids[i])
+            pass
+        nbOfGrps=len(grpns)
+        for i in xrange(nbOfGrps):
+            m.setFamiliesIdsOnGroup(grpns[i],famIdsPerGrp[i])
+            pass
+        m.setName(m2.getName())
+        m.setDescription(m2.getDescription())
+        m.write(fileName,2)
+        #
+        mm0=MEDFileMesh.New(fileName)
+        mm1=MEDFileMesh.New(fileName)
+        groupNamesIni=MEDLoader.GetMeshGroupsNames(fileName,"ma")
+        for name in groupNamesIni:
+            mm1.changeGroupName(name,name+'N')
+            pass
+        mm1.write(fileName,2)
+        del mm1
+        #
+        mm2=MEDFileMesh.New(fileName)
+        for name in groupNamesIni:
+            for lev in mm0.getGrpNonEmptyLevelsExt(name):
+                arr0=mm0.getGroupArr(lev,name)
+                arr2=mm2.getGroupArr(lev,name+'N')
+                arr0.setName(name+'N')
+                self.assertTrue(arr0.isEqual(arr2))
+                pass
+            pass
+        pass
+
     pass
 
 unittest.main()
