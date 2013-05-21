@@ -1482,7 +1482,7 @@ DataArrayDouble *DataArrayDouble::selectByTupleId2(int bg, int end2, int step) c
  *  \throw If \a end > \a this->getNumberOfTuples().
  *  \throw If \a this is not allocated.
  */
-DataArrayDouble *DataArrayDouble::selectByTupleRanges(const std::vector<std::pair<int,int> >& ranges) const throw(INTERP_KERNEL::Exception)
+DataArray *DataArrayDouble::selectByTupleRanges(const std::vector<std::pair<int,int> >& ranges) const throw(INTERP_KERNEL::Exception)
 {
   checkAllocated();
   int nbOfComp=getNumberOfComponents();
@@ -6420,7 +6420,7 @@ DataArrayInt *DataArrayInt::selectByTupleId2(int bg, int end2, int step) const t
  *  \throw If \a end > \a this->getNumberOfTuples().
  *  \throw If \a this is not allocated.
  */
-DataArrayInt *DataArrayInt::selectByTupleRanges(const std::vector<std::pair<int,int> >& ranges) const throw(INTERP_KERNEL::Exception)
+DataArray *DataArrayInt::selectByTupleRanges(const std::vector<std::pair<int,int> >& ranges) const throw(INTERP_KERNEL::Exception)
 {
   checkAllocated();
   int nbOfComp=getNumberOfComponents();

@@ -1365,6 +1365,70 @@ void DataArrayChar::setContigPartOfSelectedValues2(int tupleIdStart, const DataA
 }
 
 /*!
+ * Returns a shorten copy of \a this array. The new DataArrayChar contains ranges
+ * of tuples specified by \a ranges parameter.
+ * For more info on renumbering see \ref MEDCouplingArrayRenumbering.
+ *  \param [in] ranges - std::vector of std::pair's each of which defines a range
+ *              of tuples in [\c begin,\c end) format.
+ *  \return DataArrayChar * - the new instance of DataArrayChar that the caller
+ *          is to delete using decrRef() as it is no more needed.
+ *  \throw If \a end < \a begin.
+ *  \throw If \a end > \a this->getNumberOfTuples().
+ *  \throw If \a this is not allocated.
+ */
+DataArray *DataArrayChar::selectByTupleRanges(const std::vector<std::pair<int,int> >& ranges) const throw(INTERP_KERNEL::Exception)
+{
+  checkAllocated();
+  int nbOfComp=getNumberOfComponents();
+  int nbOfTuplesThis=getNumberOfTuples();
+  if(ranges.empty())
+    {
+      MEDCouplingAutoRefCountObjectPtr<DataArrayChar> ret=buildEmptySpecializedDAChar();
+      ret->alloc(0,nbOfComp);
+      ret->copyStringInfoFrom(*this);
+      return ret.retn();
+    }
+  int ref=ranges.front().first;
+  int nbOfTuples=0;
+  bool isIncreasing=true;
+  for(std::vector<std::pair<int,int> >::const_iterator it=ranges.begin();it!=ranges.end();it++)
+    {
+      if((*it).first<=(*it).second)
+        {
+          if((*it).first>=0 && (*it).second<=nbOfTuplesThis)
+            {
+              nbOfTuples+=(*it).second-(*it).first;
+              if(isIncreasing)
+                isIncreasing=ref<=(*it).first;
+              ref=(*it).second;
+            }
+          else
+            {
+              std::ostringstream oss; oss << "DataArrayChar::selectByTupleRanges : on range #" << std::distance(ranges.begin(),it);
+              oss << " (" << (*it).first << "," << (*it).second << ") is greater than number of tuples of this :" << nbOfTuples << " !";
+              throw INTERP_KERNEL::Exception(oss.str().c_str());
+            }
+        }
+      else
+        {
+          std::ostringstream oss; oss << "DataArrayChar::selectByTupleRanges : on range #" << std::distance(ranges.begin(),it);
+          oss << " (" << (*it).first << "," << (*it).second << ") end is before begin !";
+          throw INTERP_KERNEL::Exception(oss.str().c_str());
+        }
+    }
+  if(isIncreasing && nbOfTuplesThis==nbOfTuples)
+    return deepCpy();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayChar> ret=buildEmptySpecializedDAChar();
+  ret->alloc(nbOfTuples,nbOfComp);
+  ret->copyStringInfoFrom(*this);
+  const char *src=getConstPointer();
+  char *work=ret->getPointer();
+  for(std::vector<std::pair<int,int> >::const_iterator it=ranges.begin();it!=ranges.end();it++)
+    work=std::copy(src+(*it).first*nbOfComp,src+(*it).second*nbOfComp,work);
+  return ret.retn();
+}
+
+/*!
  * Returns a value located at specified tuple and component.
  * This method is equivalent to DataArrayChar::getIJ() except that validity of
  * parameters is checked. So this method is safe but expensive if used to go through

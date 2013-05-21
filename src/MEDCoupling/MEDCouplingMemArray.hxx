@@ -143,6 +143,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT virtual void renumberInPlaceR(const int *new2Old) throw(INTERP_KERNEL::Exception) = 0;
     MEDCOUPLING_EXPORT virtual void setContigPartOfSelectedValues(int tupleIdStart, const DataArray *aBase, const DataArrayInt *tuplesSelec) throw(INTERP_KERNEL::Exception) = 0;
     MEDCOUPLING_EXPORT virtual void setContigPartOfSelectedValues2(int tupleIdStart, const DataArray *aBase, int bg, int end2, int step) throw(INTERP_KERNEL::Exception) = 0;
+    MEDCOUPLING_EXPORT virtual DataArray *selectByTupleRanges(const std::vector<std::pair<int,int> >& ranges) const throw(INTERP_KERNEL::Exception) = 0;
     MEDCOUPLING_EXPORT void checkNbOfTuples(int nbOfTuples, const char *msg) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void checkNbOfComps(int nbOfCompo, const char *msg) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void checkNbOfTuplesAndComp(const DataArray& other, const char *msg) const throw(INTERP_KERNEL::Exception);
@@ -234,7 +235,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT DataArrayDouble *selectByTupleId(const int *new2OldBg, const int *new2OldEnd) const;
     MEDCOUPLING_EXPORT DataArrayDouble *selectByTupleIdSafe(const int *new2OldBg, const int *new2OldEnd) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayDouble *selectByTupleId2(int bg, int end2, int step) const throw(INTERP_KERNEL::Exception);
-    MEDCOUPLING_EXPORT DataArrayDouble *selectByTupleRanges(const std::vector<std::pair<int,int> >& ranges) const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT DataArray *selectByTupleRanges(const std::vector<std::pair<int,int> >& ranges) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayDouble *substr(int tupleIdBg, int tupleIdEnd=-1) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void rearrange(int newNbOfCompo) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void transpose() throw(INTERP_KERNEL::Exception);
@@ -462,7 +463,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT DataArrayInt *selectByTupleId(const int *new2OldBg, const int *new2OldEnd) const;
     MEDCOUPLING_EXPORT DataArrayInt *selectByTupleIdSafe(const int *new2OldBg, const int *new2OldEnd) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayInt *selectByTupleId2(int bg, int end, int step) const throw(INTERP_KERNEL::Exception);
-    MEDCOUPLING_EXPORT DataArrayInt *selectByTupleRanges(const std::vector<std::pair<int,int> >& ranges) const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT DataArray *selectByTupleRanges(const std::vector<std::pair<int,int> >& ranges) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT DataArrayInt *checkAndPreparePermutation() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void changeSurjectiveFormat(int targetNb, DataArrayInt *&arr, DataArrayInt *&arrI) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT static DataArrayInt *BuildOld2NewArrayFromSurjectiveFormat2(int nbOfOldTuples, const int *arr, const int *arrIBg, const int *arrIEnd, int &newNbOfTuples) throw(INTERP_KERNEL::Exception);
@@ -621,6 +622,7 @@ namespace ParaMEDMEM
   {
   public:
     MEDCOUPLING_EXPORT virtual DataArrayChar *buildEmptySpecializedDAChar() const throw(INTERP_KERNEL::Exception) = 0;
+    MEDCOUPLING_EXPORT virtual DataArrayChar *deepCpy() const = 0;
     MEDCOUPLING_EXPORT bool isAllocated() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void checkAllocated() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT int getNumberOfTuples() const throw(INTERP_KERNEL::Exception) { return _info_on_compo.empty()?0:_mem.getNbOfElem()/getNumberOfComponents(); }
@@ -671,6 +673,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT void setPartOfValuesAdv(const DataArrayChar *a, const DataArrayChar *tuplesSelec) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void setContigPartOfSelectedValues(int tupleIdStart, const DataArray *aBase, const DataArrayInt *tuplesSelec) throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void setContigPartOfSelectedValues2(int tupleIdStart, const DataArray *aBase, int bg, int end2, int step) throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT DataArray *selectByTupleRanges(const std::vector<std::pair<int,int> >& ranges) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void getTuple(int tupleId, char *res) const { std::copy(_mem.getConstPointerLoc(tupleId*_info_on_compo.size()),_mem.getConstPointerLoc((tupleId+1)*_info_on_compo.size()),res); }
     MEDCOUPLING_EXPORT char getIJ(int tupleId, int compoId) const { return _mem[tupleId*_info_on_compo.size()+compoId]; }
     MEDCOUPLING_EXPORT char getIJSafe(int tupleId, int compoId) const throw(INTERP_KERNEL::Exception);
