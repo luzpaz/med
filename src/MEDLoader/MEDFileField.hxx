@@ -716,7 +716,7 @@ namespace ParaMEDMEM
     MEDFileAnyTypeFieldMultiTSWithoutSDA();
     MEDFileAnyTypeFieldMultiTSWithoutSDA(const char *fieldName);
     MEDFileAnyTypeFieldMultiTSWithoutSDA(med_idt fid, int fieldId) throw(INTERP_KERNEL::Exception);
-    MEDFileAnyTypeFieldMultiTSWithoutSDA(med_idt fid, const char *fieldName, int id, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeFieldMultiTSWithoutSDA(med_idt fid, const char *fieldName, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception);
   public:
     std::size_t getHeapMemorySize() const;
     virtual MEDFileAnyTypeFieldMultiTSWithoutSDA *deepCpy() const throw(INTERP_KERNEL::Exception);
@@ -771,13 +771,13 @@ namespace ParaMEDMEM
   class MEDLOADER_EXPORT MEDFileFieldMultiTSWithoutSDA : public MEDFileAnyTypeFieldMultiTSWithoutSDA
   {
   public:
-    static MEDFileFieldMultiTSWithoutSDA *New(med_idt fid, const char *fieldName, int id, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception);
+    static MEDFileFieldMultiTSWithoutSDA *New(med_idt fid, const char *fieldName, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception);
     MEDFileFieldMultiTSWithoutSDA(med_idt fid, int fieldId) throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeFieldMultiTSWithoutSDA *shallowCpy() const throw(INTERP_KERNEL::Exception);
     std::vector< std::vector<DataArrayDouble *> > getFieldSplitedByType2(int iteration, int order, const char *mname, std::vector<INTERP_KERNEL::NormalizedCellType>& types, std::vector< std::vector<TypeOfField> >& typesF, std::vector< std::vector<std::string> >& pfls, std::vector< std::vector<std::string> >& locs) const throw(INTERP_KERNEL::Exception);
   protected:
     MEDFileFieldMultiTSWithoutSDA(const char *fieldName);
-    MEDFileFieldMultiTSWithoutSDA(med_idt fid, const char *fieldName, int id, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception);
+    MEDFileFieldMultiTSWithoutSDA(med_idt fid, const char *fieldName, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception);
     med_field_type getMEDFileFieldType() const { return MED_FLOAT64; }
     MEDFileAnyTypeField1TSWithoutSDA *createNew1TSWithoutSDAEmptyInstance() const throw(INTERP_KERNEL::Exception);
   public:
@@ -787,12 +787,12 @@ namespace ParaMEDMEM
   class MEDLOADER_EXPORT MEDFileIntFieldMultiTSWithoutSDA : public MEDFileAnyTypeFieldMultiTSWithoutSDA
   {
   public:
-    static MEDFileIntFieldMultiTSWithoutSDA *New(med_idt fid, const char *fieldName, int id, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception);
+    static MEDFileIntFieldMultiTSWithoutSDA *New(med_idt fid, const char *fieldName, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception);
     MEDFileIntFieldMultiTSWithoutSDA(med_idt fid, int fieldId) throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeFieldMultiTSWithoutSDA *shallowCpy() const throw(INTERP_KERNEL::Exception);
   protected:
     MEDFileIntFieldMultiTSWithoutSDA(const char *fieldName);
-    MEDFileIntFieldMultiTSWithoutSDA(med_idt fid, const char *fieldName, int id, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception);
+    MEDFileIntFieldMultiTSWithoutSDA(med_idt fid, const char *fieldName, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception);
     med_field_type getMEDFileFieldType() const { return MED_INT32; }
     MEDFileAnyTypeField1TSWithoutSDA *createNew1TSWithoutSDAEmptyInstance() const throw(INTERP_KERNEL::Exception);
   public:

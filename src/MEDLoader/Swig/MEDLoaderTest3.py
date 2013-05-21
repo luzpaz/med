@@ -2400,6 +2400,107 @@ class MEDLoaderTest(unittest.TestCase):
             pass
         pass
 
+    def testInt32InMEDFileFieldStar1(self):
+        fname="Pyfile63.med"
+        f1=MEDLoaderDataForTest.buildVecFieldOnCells_1();
+        arr=f1.getArray().convertToIntArr()
+        f1.setArray(None)
+        m1=f1.getMesh()
+        mm1=MEDFileUMesh.New()
+        mm1.setCoords(m1.getCoords())
+        mm1.setMeshAtLevel(0,m1)
+        mm1.setName(m1.getName())
+        mm1.write(fname,2)
+        ff1=MEDFileIntField1TS()
+        ff1.setFieldNoProfileSBT(f1,arr)
+        a,b=ff1.getFieldOnMeshAtLevel(0,ON_CELLS,mm1)
+        self.assertEqual(b.getInfoOnComponents(),['power [MW/m^3]','density [g/cm^3]','temperature [K]'])
+        self.assertTrue(b.isEqual(arr))
+        self.assertTrue(a.isEqual(f1,1e-12,1e-12))
+        ff1.write(fname,0)
+        ff2=MEDFileAnyTypeField1TS.New(fname)
+        self.assertEqual(ff2.getName(),"VectorFieldOnCells")
+        self.assertEqual(ff2.getTime(),[0,1,2.0])
+        self.assertTrue(isinstance(ff2,MEDFileIntField1TS))
+        a,b=ff1.getFieldOnMeshAtLevel(0,ON_CELLS,mm1)
+        self.assertEqual(b.getInfoOnComponents(),['power [MW/m^3]','density [g/cm^3]','temperature [K]'])
+        self.assertTrue(b.isEqual(arr))
+        self.assertTrue(a.isEqual(f1,1e-12,1e-12))
+        ff2.setTime(1,2,3.)
+        c=ff2.getUndergroundDataArray() ; c*=2
+        ff2.write(fname,0) # 2 time steps in 
+        ffs1=MEDFileAnyTypeFieldMultiTS.New(fname,"VectorFieldOnCells")
+        self.assertEqual(ffs1.getTimeSteps(),[(0, 1, 2.0), (1, 2, 3.0)])
+        self.assertEqual(len(ffs1),2)
+        self.assertTrue(isinstance(ffs1,MEDFileIntFieldMultiTS))
+        a,b=ffs1[2.].getFieldOnMeshAtLevel(0,ON_CELLS,mm1)
+        self.assertTrue(b.isEqual(arr))
+        self.assertTrue(a.isEqual(f1,1e-12,1e-12))
+        a,b=ffs1[2.].getFieldOnMeshAtLevel(0,ON_CELLS,mm1)
+        self.assertTrue(b.isEqual(arr))
+        self.assertTrue(a.isEqual(f1,1e-12,1e-12))
+        it=ffs1.__iter__() ; it.next() ; ff2bis=it.next()
+        a,b=ff2bis.getFieldOnMeshAtLevel(0,ON_CELLS,mm1)
+        self.assertTrue(b.isEqual(2*arr))
+        f1.setTime(3.,1,2)
+        self.assertTrue(a.isEqual(f1,1e-12,1e-12))
+        bc=DataArrayInt(6,3) ; bc[:]=0 ; bc.setInfoOnComponents(['power [MW/m^3]','density [g/cm^3]','temperature [K]'])
+        for it in ffs1:
+            a,b=it.getFieldOnMeshAtLevel(0,ON_CELLS,mm1)
+            bc+=b
+            pass
+        self.assertTrue(bc.isEqual(3*arr))
+        nf1=MEDCouplingFieldDouble(ON_NODES)
+        nf1.setTime(9.,10,-1)
+        nf1.setMesh(f1.getMesh())
+        narr=DataArrayInt(12,2) ; narr.setInfoOnComponents(["aa [u1]","bbbvv [ppp]"]) ; narr[:,0]=range(12) ; narr[:,1]=2*narr[:,0]
+        nf1.setName("VectorFieldOnNodes")
+        nff1=MEDFileIntField1TS.New()
+        nff1.setFieldNoProfileSBT(nf1,narr)
+        self.assertEqual(nff1.getInfo(),('aa [u1]','bbbvv [ppp]'))
+        self.assertEqual(nff1.getTime(),[10,-1,9.0])
+        nff1.write(fname,0)
+        #
+        nf2=MEDCouplingFieldDouble(ON_NODES)
+        nf2.setTime(19.,20,-11)
+        nf2.setMesh(f1.getMesh())
+        narr2=DataArrayInt(8,2) ; narr.setInfoOnComponents(["aapfl [u1]","bbbvvpfl [ppp]"]) ; narr2[:,0]=range(8) ; narr2[:,0]+=10  ; narr2[:,1]=3*narr2[:,0]
+        nf2.setName("VectorFieldOnNodesPfl")
+        nff2=MEDFileIntField1TS.New()
+        npfl=DataArrayInt([1,2,4,5,6,7,10,11]) ; npfl.setName("npfl")
+        nff2.setFieldProfile(nf2,narr2,mm1,0,npfl)
+        nff2.getFieldWithProfile(ON_NODES,0,mm1)
+        a,b=nff2.getFieldWithProfile(ON_NODES,0,mm1) ; b.setName(npfl.getName()) ; narr2.setName(nff2.getName())
+        self.assertTrue(b.isEqual(npfl))
+        self.assertTrue(a.isEqual(narr2))
+        nff2.write(fname,0)
+        nff2bis=MEDFileIntField1TS(fname,"VectorFieldOnNodesPfl")
+        a,b=nff2bis.getFieldWithProfile(ON_NODES,0,mm1) ; b.setName(npfl.getName()) ; narr2.setName(nff2.getName())
+        self.assertTrue(b.isEqual(npfl))
+        self.assertTrue(a.isEqual(narr2))
+        #
+        nf3=MEDCouplingFieldDouble(ON_NODES)
+        nf3.setName("VectorFieldOnNodesDouble")
+        nf3.setTime(29.,30,-21)
+        nf3.setMesh(f1.getMesh())
+        nf3.setArray(f1.getMesh().getCoords())
+        nff3=MEDFileField1TS.New()
+        nff3.setFieldNoProfileSBT(nf3)
+        nff3.write(fname,0)
+        fs=MEDFileFields(fname)
+        self.assertEqual(len(fs),4)
+        ffs=[it for it in fs]
+        self.assertTrue(isinstance(ffs[0],MEDFileIntFieldMultiTS))
+        self.assertTrue(isinstance(ffs[1],MEDFileIntFieldMultiTS))
+        self.assertTrue(isinstance(ffs[2],MEDFileFieldMultiTS))
+        self.assertTrue(isinstance(ffs[3],MEDFileIntFieldMultiTS))
+        #
+        self.assertTrue(fs["VectorFieldOnCells"][0].getUndergroundDataArray().isEqualWithoutConsideringStr(arr))
+        self.assertTrue(fs["VectorFieldOnCells"][1,2].getUndergroundDataArray().isEqualWithoutConsideringStr(2*arr))
+        self.assertTrue(fs["VectorFieldOnNodesPfl"][0].getUndergroundDataArray().isEqualWithoutConsideringStr(narr2))
+        self.assertTrue(fs["VectorFieldOnNodes"][9.].getUndergroundDataArray().isEqualWithoutConsideringStr(narr))
+        self.assertTrue(fs["VectorFieldOnNodesDouble"][29.].getUndergroundDataArray().isEqualWithoutConsideringStr(f1.getMesh().getCoords(),1e-12))
+        pass
     pass
 
 unittest.main()

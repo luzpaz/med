@@ -681,11 +681,21 @@ void MEDFileFieldPerMeshPerTypePerDisc::writeLL(med_idt fid) const throw(INTERP_
   INTERP_KERNEL::NormalizedCellType geoType=getGeoType();
   med_geometry_type mgeoti;
   med_entity_type menti=MEDFileFieldPerMeshPerType::ConvertIntoMEDFileType(type,geoType,mgeoti);
-  const DataArrayDouble *arr=getArrayDouble();
-  const double *locToWrite=arr->getConstPointer()+_start*arr->getNumberOfComponents();
+  const DataArray *arr=getArray();
+  if(!arr)
+    throw INTERP_KERNEL::Exception("MEDFileFieldPerMeshPerTypePerDisc::writeLL : no array set !");
+  const DataArrayDouble *arrD=dynamic_cast<const DataArrayDouble *>(arr);
+  const DataArrayInt *arrI=dynamic_cast<const DataArrayInt *>(arr);
+  const unsigned char *locToWrite=0;
+  if(arrD)
+    locToWrite=reinterpret_cast<const unsigned char *>(arrD->getConstPointer()+_start*arr->getNumberOfComponents());
+  else if(arrI)
+    locToWrite=reinterpret_cast<const unsigned char *>(arrI->getConstPointer()+_start*arr->getNumberOfComponents());
+  else
+    throw INTERP_KERNEL::Exception("MEDFileFieldPerMeshPerTypePerDisc::writeLL : not recognized type of values ! Supported are FLOAT64 and INT32 !");
   MEDfieldValueWithProfileWr(fid,getName().c_str(),getIteration(),getOrder(),getTime(),menti,mgeoti,
                              MED_COMPACT_PFLMODE,_profile.c_str(),_localization.c_str(),MED_FULL_INTERLACE,MED_ALL_CONSTITUENT,_nval,
-                             reinterpret_cast<const unsigned char*>(locToWrite));
+                             locToWrite);
 }
 
 void MEDFileFieldPerMeshPerTypePerDisc::getCoarseData(TypeOfField& type, std::pair<int,int>& dad, std::string& pfl, std::string& loc) const throw(INTERP_KERNEL::Exception)
@@ -4783,14 +4793,14 @@ MEDFileAnyTypeField1TS *MEDFileAnyTypeField1TS::BuildNewInstanceFromContent(MEDF
     {
       MEDCouplingAutoRefCountObjectPtr<MEDFileField1TS> ret=MEDFileField1TS::New();
       ret->setFileName(fileName);
-      ret->_content=c;
+      ret->_content=c; c->incrRef();
       return ret.retn();
     }
   if(dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(c))
     {
       MEDCouplingAutoRefCountObjectPtr<MEDFileIntField1TS> ret=MEDFileIntField1TS::New();
       ret->setFileName(fileName);
-      ret->_content=c;
+      ret->_content=c; c->incrRef();
       return ret.retn();
     }
   throw INTERP_KERNEL::Exception("MEDFileAnyTypeField1TS::BuildNewInstanceFromContent : internal error ! a content of type different from FLOAT64 and INT32 has been built but not intercepted !");
@@ -6076,7 +6086,7 @@ catch(INTERP_KERNEL::Exception& e)
     throw e;
   }
 
-MEDFileAnyTypeFieldMultiTSWithoutSDA::MEDFileAnyTypeFieldMultiTSWithoutSDA(med_idt fid, const char *fieldName, int id, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception)
+MEDFileAnyTypeFieldMultiTSWithoutSDA::MEDFileAnyTypeFieldMultiTSWithoutSDA(med_idt fid, const char *fieldName, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception)
 try:_name(fieldName),_infos(infos)
 {
   finishLoading(fid,nbOfStep,fieldTyp);
@@ -6644,9 +6654,9 @@ void MEDFileAnyTypeFieldMultiTSWithoutSDA::appendFieldProfile(const MEDCouplingF
 
 //= MEDFileFieldMultiTSWithoutSDA
 
-MEDFileFieldMultiTSWithoutSDA *MEDFileFieldMultiTSWithoutSDA::New(med_idt fid, const char *fieldName, int id, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception)
+MEDFileFieldMultiTSWithoutSDA *MEDFileFieldMultiTSWithoutSDA::New(med_idt fid, const char *fieldName, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception)
 {
-  return new MEDFileFieldMultiTSWithoutSDA(fid,fieldName,id,fieldTyp,infos,nbOfStep);
+  return new MEDFileFieldMultiTSWithoutSDA(fid,fieldName,fieldTyp,infos,nbOfStep);
 }
 
 MEDFileFieldMultiTSWithoutSDA::MEDFileFieldMultiTSWithoutSDA()
@@ -6667,8 +6677,8 @@ try:MEDFileAnyTypeFieldMultiTSWithoutSDA(fid,fieldId)
 catch(INTERP_KERNEL::Exception& e)
   { throw e; }
 
-MEDFileFieldMultiTSWithoutSDA::MEDFileFieldMultiTSWithoutSDA(med_idt fid, const char *fieldName, int id, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception)
-try:MEDFileAnyTypeFieldMultiTSWithoutSDA(fid,fieldName,id,fieldTyp,infos,nbOfStep)
+MEDFileFieldMultiTSWithoutSDA::MEDFileFieldMultiTSWithoutSDA(med_idt fid, const char *fieldName, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception)
+try:MEDFileAnyTypeFieldMultiTSWithoutSDA(fid,fieldName,fieldTyp,infos,nbOfStep)
 {
 }
 catch(INTERP_KERNEL::Exception& e)
@@ -6780,14 +6790,14 @@ MEDFileAnyTypeFieldMultiTS *MEDFileAnyTypeFieldMultiTS::BuildNewInstanceFromCont
     {
       MEDCouplingAutoRefCountObjectPtr<MEDFileFieldMultiTS> ret=MEDFileFieldMultiTS::New();
       ret->setFileName(fileName);
-      ret->_content=c;
+      ret->_content=c;  c->incrRef();
       return ret.retn();
     }
   if(dynamic_cast<const MEDFileIntFieldMultiTSWithoutSDA *>(c))
     {
       MEDCouplingAutoRefCountObjectPtr<MEDFileIntFieldMultiTS> ret=MEDFileIntFieldMultiTS::New();
       ret->setFileName(fileName);
-      ret->_content=c;
+      ret->_content=c;  c->incrRef();
       return ret.retn();
     }
   throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTS::BuildNewInstanceFromContent : internal error ! a content of type different from FLOAT64 and INT32 has been built but not intercepted !");
@@ -6808,9 +6818,9 @@ catch(INTERP_KERNEL::Exception& e)
 
 //= MEDFileIntFieldMultiTSWithoutSDA
 
-MEDFileIntFieldMultiTSWithoutSDA *MEDFileIntFieldMultiTSWithoutSDA::New(med_idt fid, const char *fieldName, int id, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception)
+MEDFileIntFieldMultiTSWithoutSDA *MEDFileIntFieldMultiTSWithoutSDA::New(med_idt fid, const char *fieldName, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception)
 {
-  return new MEDFileIntFieldMultiTSWithoutSDA(fid,fieldName,id,fieldTyp,infos,nbOfStep);
+  return new MEDFileIntFieldMultiTSWithoutSDA(fid,fieldName,fieldTyp,infos,nbOfStep);
 }
 
 MEDFileIntFieldMultiTSWithoutSDA::MEDFileIntFieldMultiTSWithoutSDA()
@@ -6821,8 +6831,8 @@ MEDFileIntFieldMultiTSWithoutSDA::MEDFileIntFieldMultiTSWithoutSDA(const char *f
 {
 }
 
-MEDFileIntFieldMultiTSWithoutSDA::MEDFileIntFieldMultiTSWithoutSDA(med_idt fid, const char *fieldName, int id, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception)
-try:MEDFileAnyTypeFieldMultiTSWithoutSDA(fid,fieldName,id,fieldTyp,infos,nbOfStep)
+MEDFileIntFieldMultiTSWithoutSDA::MEDFileIntFieldMultiTSWithoutSDA(med_idt fid, const char *fieldName, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception)
+try:MEDFileAnyTypeFieldMultiTSWithoutSDA(fid,fieldName,fieldTyp,infos,nbOfStep)
 {
 }
 catch(INTERP_KERNEL::Exception& e)
@@ -8022,7 +8032,24 @@ try:MEDFileFieldGlobsReal(fileName)
         std::vector<std::string> infos;
         std::string fieldName,dtunit;
         int nbOfStep=MEDFileAnyTypeField1TS::LocateField2(fid,fileName,i,false,fieldName,typcha,infos,dtunit);
-        _fields[i]=MEDFileFieldMultiTSWithoutSDA::New(fid,fieldName.c_str(),i+1,typcha,infos,nbOfStep);
+        switch(typcha)
+          {
+          case MED_FLOAT64:
+            {
+              _fields[i]=MEDFileFieldMultiTSWithoutSDA::New(fid,fieldName.c_str(),typcha,infos,nbOfStep);
+              break;
+            }
+          case MED_INT32:
+            {
+              _fields[i]=MEDFileIntFieldMultiTSWithoutSDA::New(fid,fieldName.c_str(),typcha,infos,nbOfStep);
+              break;
+            }
+          default:
+            {
+              std::ostringstream oss; oss << "constructor MEDFileFields(fileName) : file \'" << fileName << "\' at pos #" << i << " field has name \'" << fieldName << "\' but the type of field is not in [MED_FLOAT64, MED_INT32] !";
+              throw INTERP_KERNEL::Exception(oss.str().c_str());
+            }
+          }
       }
     loadAllGlobals(fid);
   }

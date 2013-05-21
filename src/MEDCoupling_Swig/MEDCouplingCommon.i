@@ -157,6 +157,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::buildNewTimeReprFromThis;
 %newobject ParaMEDMEM::MEDCouplingFieldDouble::getValueOnMulti;
 %newobject ParaMEDMEM::MEDCouplingFieldTemplate::New;
+%newobject ParaMEDMEM::DataArray::selectByTupleRanges;
 %newobject ParaMEDMEM::DataArrayInt::New;
 %newobject ParaMEDMEM::DataArrayInt::__iter__;
 %newobject ParaMEDMEM::DataArrayInt::convertToDblArr;
@@ -168,7 +169,6 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayInt::selectByTupleId;
 %newobject ParaMEDMEM::DataArrayInt::selectByTupleIdSafe;
 %newobject ParaMEDMEM::DataArrayInt::selectByTupleId2;
-%newobject ParaMEDMEM::DataArrayInt::selectByTupleRanges;
 %newobject ParaMEDMEM::DataArrayInt::checkAndPreparePermutation;
 %newobject ParaMEDMEM::DataArrayInt::transformWithIndArrR;
 %newobject ParaMEDMEM::DataArrayInt::renumber;
@@ -223,6 +223,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayInt::__pow__;
 %newobject ParaMEDMEM::DataArrayInt::__rpow__;
 %newobject ParaMEDMEM::DataArrayIntTuple::buildDAInt;
+%newobject ParaMEDMEM::DataArrayChar::deepCpy;
 %newobject ParaMEDMEM::DataArrayChar::convertToIntArr;
 %newobject ParaMEDMEM::DataArrayChar::renumber;
 %newobject ParaMEDMEM::DataArrayChar::renumberR;
@@ -237,13 +238,11 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayChar::Meld;
 %newobject ParaMEDMEM::DataArrayByte::New;
 %newobject ParaMEDMEM::DataArrayByte::__iter__;
-%newobject ParaMEDMEM::DataArrayByte::deepCpy;
 %newobject ParaMEDMEM::DataArrayByte::performCpy;
 %newobject ParaMEDMEM::DataArrayByteTuple::buildDAByte;
 %newobject ParaMEDMEM::DataArrayChar::substr;
 %newobject ParaMEDMEM::DataArrayAsciiChar::New;
 %newobject ParaMEDMEM::DataArrayAsciiChar::__iter__;
-%newobject ParaMEDMEM::DataArrayAsciiChar::deepCpy;
 %newobject ParaMEDMEM::DataArrayAsciiChar::performCpy;
 %newobject ParaMEDMEM::DataArrayAsciiCharTuple::buildDAAsciiChar;
 %newobject ParaMEDMEM::DataArrayDouble::New;
@@ -267,7 +266,6 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayDouble::selectByTupleId;
 %newobject ParaMEDMEM::DataArrayDouble::selectByTupleIdSafe;
 %newobject ParaMEDMEM::DataArrayDouble::selectByTupleId2;
-%newobject ParaMEDMEM::DataArrayDouble::selectByTupleRanges;
 %newobject ParaMEDMEM::DataArrayDouble::negate;
 %newobject ParaMEDMEM::DataArrayDouble::applyFunc;
 %newobject ParaMEDMEM::DataArrayDouble::applyFunc2;
@@ -394,6 +392,7 @@ using namespace INTERP_KERNEL;
 %feature("unref") MEDCouplingExtrudedMesh "$this->decrRef();"
 %feature("unref") MEDCouplingCMesh "$this->decrRef();"
 %feature("unref") DataArrayInt "$this->decrRef();"
+%feature("unref") DataArrayChar "$this->decrRef();"
 %feature("unref") DataArrayAsciiChar "$this->decrRef();"
 %feature("unref") DataArrayByte "$this->decrRef();"
 %feature("unref") MEDCouplingField "$this->decrRef();"

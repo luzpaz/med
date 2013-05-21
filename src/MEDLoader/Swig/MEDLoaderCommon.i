@@ -121,8 +121,8 @@ using namespace ParaMEDMEM;
 %newobject ParaMEDMEM::MEDFileAnyTypeFieldMultiTS::getTimeStep;
 %newobject ParaMEDMEM::MEDFileAnyTypeFieldMultiTS::getTimeStepGivenTime;
 %newobject ParaMEDMEM::MEDFileAnyTypeFieldMultiTS::__getitem__;
+%newobject ParaMEDMEM::MEDFileAnyTypeFieldMultiTS::__iter__;
 %newobject ParaMEDMEM::MEDFileFieldMultiTS::New;
-%newobject ParaMEDMEM::MEDFileFieldMultiTS::__iter__;
 %newobject ParaMEDMEM::MEDFileFieldMultiTS::getFieldAtLevel;
 %newobject ParaMEDMEM::MEDFileFieldMultiTS::getFieldAtTopLevel;
 %newobject ParaMEDMEM::MEDFileFieldMultiTS::getFieldOnMeshAtLevel;
@@ -1053,6 +1053,7 @@ namespace ParaMEDMEM
     static MEDFileAnyTypeField1TS *New(const char *fileName) throw(INTERP_KERNEL::Exception);
     static MEDFileAnyTypeField1TS *New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
     static MEDFileAnyTypeField1TS *New(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception);
+    void write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception);
     int getDimension() const throw(INTERP_KERNEL::Exception);
     int getIteration() const throw(INTERP_KERNEL::Exception);
     int getOrder() const throw(INTERP_KERNEL::Exception);
@@ -1167,7 +1168,6 @@ namespace ParaMEDMEM
     static MEDFileField1TS *New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
     static MEDFileField1TS *New(const char *fileName) throw(INTERP_KERNEL::Exception);
     static MEDFileField1TS *New();
-    void write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *getFieldAtLevel(TypeOfField type, int meshDimRelToMax, int renumPol=0) const throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *getFieldAtTopLevel(TypeOfField type, int renumPol=0) const throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *getFieldOnMeshAtLevel(TypeOfField type, const MEDCouplingMesh *mesh, int renumPol=0) const throw(INTERP_KERNEL::Exception);
@@ -1629,6 +1629,11 @@ namespace ParaMEDMEM
           }
       }
 
+      MEDFileAnyTypeFieldMultiTSIterator *__iter__() throw(INTERP_KERNEL::Exception)
+      {
+        return self->iterator();
+      }
+
       MEDFileAnyTypeField1TS *__getitem__(PyObject *elt0) const throw(INTERP_KERNEL::Exception)
       {
         if(elt0 && PyInt_Check(elt0))
@@ -1706,11 +1711,6 @@ namespace ParaMEDMEM
          std::string __str__() const throw(INTERP_KERNEL::Exception)
          {
            return self->simpleRepr();
-         }
-
-         MEDFileAnyTypeFieldMultiTSIterator *__iter__() throw(INTERP_KERNEL::Exception)
-         {
-           return self->iterator();
          }
 
          PyObject *getFieldWithProfile(TypeOfField type, int iteration, int order, int meshDimRelToMax, const MEDFileMesh *mesh) const throw(INTERP_KERNEL::Exception)

@@ -160,6 +160,13 @@ namespace ParaMEDMEM
         DataArray *a=CheckAndRetrieveDataArrayInstance(aBase,"DataArray::setContigPartOfSelectedValues2 : 2nd parameter \"aBase\" should be of type DataArray");
         self->setContigPartOfSelectedValues2(tupleIdStart,a,bg,end2,step);
       }
+
+      virtual DataArray *selectByTupleRanges(PyObject *li) const throw(INTERP_KERNEL::Exception)
+      {
+        std::vector<std::pair<int,int> > ranges;
+        convertPyToVectorPairInt(li,ranges);
+        return self->selectByTupleRanges(ranges);
+      }
     }
   };
   
@@ -761,13 +768,6 @@ namespace ParaMEDMEM
         std::vector<const DataArrayDouble *> tmp;
         convertFromPyObjVectorOfObj<const DataArrayDouble *>(li,SWIGTYPE_p_ParaMEDMEM__DataArrayDouble,"DataArrayDouble",tmp);
         return DataArrayDouble::Meld(tmp);
-      }
-
-      DataArrayDouble *selectByTupleRanges(PyObject *li) const throw(INTERP_KERNEL::Exception)
-      {
-        std::vector<std::pair<int,int> > ranges;
-        convertPyToVectorPairInt(li,ranges);
-        return self->selectByTupleRanges(ranges);
       }
 
       PyObject *computeTupleIdsNearTuples(PyObject *pt, double eps) const throw(INTERP_KERNEL::Exception)
@@ -2813,13 +2813,6 @@ namespace ParaMEDMEM
         return res;
       }
 
-      DataArrayInt *selectByTupleRanges(PyObject *li) const throw(INTERP_KERNEL::Exception)
-      {
-        std::vector<std::pair<int,int> > ranges;
-        convertPyToVectorPairInt(li,ranges);
-        return self->selectByTupleRanges(ranges);
-      }
-
       static DataArrayInt *Meld(PyObject *li) throw(INTERP_KERNEL::Exception)
       {
         std::vector<const DataArrayInt *> tmp;
@@ -4450,6 +4443,7 @@ namespace ParaMEDMEM
   {
   public:
     virtual DataArrayChar *buildEmptySpecializedDAChar() const throw(INTERP_KERNEL::Exception) = 0;
+    virtual DataArrayChar *deepCpy() const throw(INTERP_KERNEL::Exception);
     void checkAllocated() const throw(INTERP_KERNEL::Exception);
     int getHashCode() const throw(INTERP_KERNEL::Exception);
     bool empty() const throw(INTERP_KERNEL::Exception);
@@ -4661,7 +4655,6 @@ namespace ParaMEDMEM
     static DataArrayByte *New();
     DataArrayChar *buildEmptySpecializedDAChar() const throw(INTERP_KERNEL::Exception);
     DataArrayByteIterator *iterator();
-    DataArrayByte *deepCpy() const;
     DataArrayByte *performCpy(bool deepCpy) const;
     char byteValue() const throw(INTERP_KERNEL::Exception);
     %extend
@@ -4964,7 +4957,6 @@ namespace ParaMEDMEM
     static DataArrayAsciiChar *New();
     DataArrayChar *buildEmptySpecializedDAChar() const throw(INTERP_KERNEL::Exception);
     DataArrayAsciiCharIterator *iterator();
-    DataArrayAsciiChar *deepCpy() const;
     DataArrayAsciiChar *performCpy(bool deepCpy) const;
     char asciiCharValue() const throw(INTERP_KERNEL::Exception);
     %extend
