@@ -799,6 +799,8 @@ namespace ParaMEDMEM
     MEDFileIntFieldMultiTSWithoutSDA();
   };
 
+  class MEDFileAnyTypeFieldMultiTSIterator;
+  
   /*!
    * User class.
    */
@@ -838,6 +840,7 @@ namespace ParaMEDMEM
     std::vector< std::pair<int,int> > getIterations() const;
     int getPosOfTimeStep(int iteration, int order) const throw(INTERP_KERNEL::Exception);
     int getPosGivenTime(double time, double eps=1e-8) const throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeFieldMultiTSIterator *iterator() throw(INTERP_KERNEL::Exception);
     bool changeMeshNames(const std::vector< std::pair<std::string,std::string> >& modifTab) throw(INTERP_KERNEL::Exception);
     const std::vector<std::string>& getInfo() const throw(INTERP_KERNEL::Exception);
     int getNonEmptyLevels(int iteration, int order, const char *mname, std::vector<int>& levs) const throw(INTERP_KERNEL::Exception);
@@ -858,8 +861,6 @@ namespace ParaMEDMEM
     MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> _content;
   };
 
-  class MEDFileFieldMultiTSIterator;
-
   /*!
    * User class.
    */
@@ -875,7 +876,6 @@ namespace ParaMEDMEM
     MEDFileAnyTypeField1TS *getTimeStepAtPos(int pos) const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeField1TS *getTimeStep(int iteration, int order) const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeField1TS *getTimeStepGivenTime(double time, double eps=1e-8) const throw(INTERP_KERNEL::Exception);
-    MEDFileFieldMultiTSIterator *iterator() throw(INTERP_KERNEL::Exception);
     //
     MEDCouplingFieldDouble *getFieldAtLevel(TypeOfField type, int iteration, int order, int meshDimRelToMax, int renumPol=0) const throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *getFieldAtTopLevel(TypeOfField type, int iteration, int order, int renumPol=0) const throw(INTERP_KERNEL::Exception);
@@ -933,14 +933,14 @@ std::vector< std::vector<DataArrayDouble *> > getFieldSplitedByType2(int iterati
     MEDFileIntFieldMultiTS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception);
   };
 
-  class MEDCOUPLING_EXPORT MEDFileFieldMultiTSIterator
+  class MEDCOUPLING_EXPORT MEDFileAnyTypeFieldMultiTSIterator
   {
   public:
-    MEDFileFieldMultiTSIterator(MEDFileFieldMultiTS *fmts);
-    ~MEDFileFieldMultiTSIterator();
-    MEDFileField1TS *nextt() throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeFieldMultiTSIterator(MEDFileAnyTypeFieldMultiTS *fmts);
+    ~MEDFileAnyTypeFieldMultiTSIterator();
+    MEDFileAnyTypeField1TS *nextt() throw(INTERP_KERNEL::Exception);
   private:
-    MEDCouplingAutoRefCountObjectPtr<MEDFileFieldMultiTS> _fmts;
+    MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTS> _fmts;
      int _iter_id;
      int _nb_iter;
   };

@@ -1396,16 +1396,16 @@ namespace ParaMEDMEM
     }
   };
 
-  class MEDFileFieldMultiTSIterator
+  class MEDFileAnyTypeFieldMultiTSIterator
   {
   public:
     %extend
     {
       PyObject *next() throw(INTERP_KERNEL::Exception)
       {
-        MEDFileField1TS *ret=self->nextt();
+        MEDFileAnyTypeField1TS *ret=self->nextt();
         if(ret)
-          return SWIG_NewPointerObj(SWIG_as_voidptr(ret),SWIGTYPE_p_ParaMEDMEM__MEDFileField1TS,SWIG_POINTER_OWN | 0);
+          return convertMEDFileField1TS(ret, SWIG_POINTER_OWN | 0 );
         else
           {
             PyErr_SetString(PyExc_StopIteration,"No more data.");
@@ -1708,7 +1708,7 @@ namespace ParaMEDMEM
            return self->simpleRepr();
          }
 
-         MEDFileFieldMultiTSIterator *__iter__() throw(INTERP_KERNEL::Exception)
+         MEDFileAnyTypeFieldMultiTSIterator *__iter__() throw(INTERP_KERNEL::Exception)
          {
            return self->iterator();
          }

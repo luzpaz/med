@@ -7121,6 +7121,11 @@ MEDFileAnyTypeField1TS *MEDFileAnyTypeFieldMultiTS::getTimeStepGivenTime(double 
   return getTimeStepAtPos(pos);
 }
 
+MEDFileAnyTypeFieldMultiTSIterator *MEDFileAnyTypeFieldMultiTS::iterator() throw(INTERP_KERNEL::Exception)
+{
+  return new MEDFileAnyTypeFieldMultiTSIterator(this);
+}
+
 //= MEDFileFieldMultiTS
 
 /*!
@@ -7207,11 +7212,6 @@ MEDFileAnyTypeField1TS *MEDFileFieldMultiTS::getTimeStepAtPos(int pos) const thr
     }
   std::ostringstream oss; oss << "MEDFileFieldMultiTS::getTimeStepAtPos : type of field at pos #" << pos << " is not FLOAT64 !";
   throw INTERP_KERNEL::Exception(oss.str().c_str());
-}
-
-MEDFileFieldMultiTSIterator *MEDFileFieldMultiTS::iterator() throw(INTERP_KERNEL::Exception)
-{
-  return new MEDFileFieldMultiTSIterator(this);
 }
 
 /*!
@@ -7499,7 +7499,9 @@ DataArrayDouble *MEDFileFieldMultiTS::getUndergroundDataArrayExt(int iteration, 
   return static_cast<DataArrayDouble *>(contentNotNull()->getUndergroundDataArrayExt(iteration,order,entries));
 }
 
-MEDFileFieldMultiTSIterator::MEDFileFieldMultiTSIterator(MEDFileFieldMultiTS *fmts):_fmts(fmts),_iter_id(0),_nb_iter(0)
+//= MEDFileAnyTypeFieldMultiTSIterator
+
+MEDFileAnyTypeFieldMultiTSIterator::MEDFileAnyTypeFieldMultiTSIterator(MEDFileAnyTypeFieldMultiTS *fmts):_fmts(fmts),_iter_id(0),_nb_iter(0)
 {
   if(fmts)
     {
@@ -7508,25 +7510,17 @@ MEDFileFieldMultiTSIterator::MEDFileFieldMultiTSIterator(MEDFileFieldMultiTS *fm
     }
 }
 
-MEDFileFieldMultiTSIterator::~MEDFileFieldMultiTSIterator() 
+MEDFileAnyTypeFieldMultiTSIterator::~MEDFileAnyTypeFieldMultiTSIterator() 
 {
 }
 
-MEDFileField1TS *MEDFileFieldMultiTSIterator::nextt() throw(INTERP_KERNEL::Exception)
+MEDFileAnyTypeField1TS *MEDFileAnyTypeFieldMultiTSIterator::nextt() throw(INTERP_KERNEL::Exception)
 {
   if(_iter_id<_nb_iter)
     {
-      MEDFileFieldMultiTS *fmts(_fmts);
+      MEDFileAnyTypeFieldMultiTS *fmts(_fmts);
       if(fmts)
-        {
-          MEDFileAnyTypeField1TS *elt=fmts->getTimeStepAtPos(_iter_id++);
-          if(!elt)
-            return 0;
-          MEDFileField1TS *eltC=dynamic_cast<MEDFileField1TS *>(elt);
-          if(!eltC)
-            throw INTERP_KERNEL::Exception("MEDFileFieldMultiTSIterator::nextt : presence of non double element !");
-          return eltC;
-        }
+        return fmts->getTimeStepAtPos(_iter_id++);
       else
         return 0;
     }
