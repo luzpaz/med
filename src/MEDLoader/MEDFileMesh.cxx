@@ -549,8 +549,8 @@ void MEDFileMesh::changeGroupName(const char *oldName, const char *newName) thro
       throw INTERP_KERNEL::Exception(oss.str().c_str());
     }
   std::string nname(newName);
-  it=_groups.find(nname);
-  if(it!=_groups.end())
+  std::map<std::string, std::vector<std::string> >::iterator it2=_groups.find(nname);
+  if(it2!=_groups.end())
     {
       std::ostringstream oss; oss << "Such groupname \"" << newName << "\" already exists ! Kill it before !";
       throw INTERP_KERNEL::Exception(oss.str().c_str());
