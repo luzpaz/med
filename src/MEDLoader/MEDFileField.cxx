@@ -2037,7 +2037,7 @@ MEDCouplingFieldDouble *MEDFileFieldPerMesh::getFieldOnMeshAtLevel(TypeOfField t
     }
 }
 
-DataArrayDouble *MEDFileFieldPerMesh::getFieldOnMeshAtLevelWithPfl(TypeOfField type, const MEDCouplingMesh *mesh, DataArrayInt *&pfl, const MEDFileFieldGlobsReal *glob) const throw(INTERP_KERNEL::Exception)
+DataArray *MEDFileFieldPerMesh::getFieldOnMeshAtLevelWithPfl(TypeOfField type, const MEDCouplingMesh *mesh, DataArrayInt *&pfl, const MEDFileFieldGlobsReal *glob) const throw(INTERP_KERNEL::Exception)
 {
   if(_field_pm_pt.empty())
     throw INTERP_KERNEL::Exception("MEDFileFieldPerMesh::getFieldOnMeshAtLevel : no types field set !");
@@ -2284,7 +2284,7 @@ MEDCouplingFieldDouble *MEDFileFieldPerMesh::finishFieldNode2(const MEDFileField
 /*!
  * This method is the most light method of field retrieving.
  */
-DataArrayDouble *MEDFileFieldPerMesh::finishField4(const std::vector<std::pair<int,int> >& dads, const DataArrayInt *pflIn, int nbOfElems, DataArrayInt *&pflOut) const throw(INTERP_KERNEL::Exception)
+DataArray *MEDFileFieldPerMesh::finishField4(const std::vector<std::pair<int,int> >& dads, const DataArrayInt *pflIn, int nbOfElems, DataArrayInt *&pflOut) const throw(INTERP_KERNEL::Exception)
 {
   if(!pflIn)
     {
@@ -2298,7 +2298,7 @@ DataArrayDouble *MEDFileFieldPerMesh::finishField4(const std::vector<std::pair<i
       pflOut->incrRef();
     }
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> safePfl(pflOut);
-  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> da=getArrayDouble()->selectByTupleRanges(dads);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> da=getArrayDouble()->selectByTupleRanges(dads);//tony a chier
   const std::vector<std::string>& infos=getInfo();
   int nbOfComp=infos.size();
   for(int i=0;i<nbOfComp;i++)
@@ -4142,6 +4142,29 @@ MEDCouplingFieldDouble *MEDFileAnyTypeField1TSWithoutSDA::getFieldOnMeshAtLevel(
     }
 }
 
+/*!
+ * Returns values and a profile of the field of a given type lying on a given support.
+ *  \param [in] type - a spatial discretization of the field.
+ *  \param [in] meshDimRelToMax - a relative dimension of the supporting mesh entities.
+ *  \param [in] mesh - the supporting mesh.
+ *  \param [out] pfl - a new instance of DataArrayInt holding ids of mesh entities the
+ *          field of interest lies on. If the field lies on all entities of the given
+ *          dimension, all ids in \a pfl are zero. The caller is to delete this array
+ *          using decrRef() as it is no more needed.  
+ *  \param [in] glob - the global data storing profiles and localization.
+ *  \return DataArrayDouble * - a new instance of DataArrayDouble holding values of the
+ *          field. The caller is to delete this array using decrRef() as it is no more needed.
+ *  \throw If there are no mesh entities of \a meshDimRelToMax dimension in \a mesh.
+ *  \throw If no field of \a this is lying on \a mesh.
+ *  \throw If no field values of the given \a type are available.
+ */
+DataArray *MEDFileAnyTypeField1TSWithoutSDA::getFieldWithProfile(TypeOfField type, int meshDimRelToMax, const MEDFileMesh *mesh, DataArrayInt *&pfl, const MEDFileFieldGlobsReal *glob) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingMesh> m=mesh->getGenMeshAtLevel(meshDimRelToMax);
+  int meshId=getMeshIdFromMeshName(mesh->getName());
+  return _field_per_mesh[meshId]->getFieldOnMeshAtLevelWithPfl(type,m,pfl,glob);
+}
+
 //= MEDFileField1TSWithoutSDA
 
 /*!
@@ -4318,29 +4341,6 @@ std::vector< std::vector<DataArrayDouble *> > MEDFileField1TSWithoutSDA::getFiel
         }
     }
   return ret;
-}
-
-/*!
- * Returns values and a profile of the field of a given type lying on a given support.
- *  \param [in] type - a spatial discretization of the field.
- *  \param [in] meshDimRelToMax - a relative dimension of the supporting mesh entities.
- *  \param [in] mesh - the supporting mesh.
- *  \param [out] pfl - a new instance of DataArrayInt holding ids of mesh entities the
- *          field of interest lies on. If the field lies on all entities of the given
- *          dimension, all ids in \a pfl are zero. The caller is to delete this array
- *          using decrRef() as it is no more needed.  
- *  \param [in] glob - the global data storing profiles and localization.
- *  \return DataArrayDouble * - a new instance of DataArrayDouble holding values of the
- *          field. The caller is to delete this array using decrRef() as it is no more needed.
- *  \throw If there are no mesh entities of \a meshDimRelToMax dimension in \a mesh.
- *  \throw If no field of \a this is lying on \a mesh.
- *  \throw If no field values of the given \a type are available.
- */
-DataArrayDouble *MEDFileField1TSWithoutSDA::getFieldWithProfile(TypeOfField type, int meshDimRelToMax, const MEDFileMesh *mesh, DataArrayInt *&pfl, const MEDFileFieldGlobsReal *glob) const throw(INTERP_KERNEL::Exception)
-{
-  MEDCouplingAutoRefCountObjectPtr<MEDCouplingMesh> m=mesh->getGenMeshAtLevel(meshDimRelToMax);
-  int meshId=getMeshIdFromMeshName(mesh->getName());
-  return _field_per_mesh[meshId]->getFieldOnMeshAtLevelWithPfl(type,m,pfl,glob);
 }
 
 /*!
@@ -5423,6 +5423,17 @@ void MEDFileField1TS::SetDataArrayDoubleInField(MEDCouplingFieldDouble *f, MEDCo
   f->setArray(arrOutC);
 }
 
+DataArrayDouble *MEDFileField1TS::ReturnSafelyDataArrayDouble(MEDCouplingAutoRefCountObjectPtr<DataArray>& arr) throw(INTERP_KERNEL::Exception)
+{
+  if(!((DataArray*)arr))
+    throw INTERP_KERNEL::Exception("MEDFileField1TS::ReturnSafelyDataArrayDouble : no array !");
+  DataArrayDouble *arrOutC=dynamic_cast<DataArrayDouble *>((DataArray*)arr);
+  if(!arrOutC)
+    throw INTERP_KERNEL::Exception("MEDFileField1TS::ReturnSafelyDataArrayDouble : mismatch between dataArrays type and MEDFileField1TS ! Expected double !");
+  arrOutC->incrRef();
+  return arrOutC;
+}
+
 MEDFileField1TS::MEDFileField1TS(const char *fileName) throw(INTERP_KERNEL::Exception)
 try:MEDFileAnyTypeField1TS(fileName)
 {
@@ -5491,6 +5502,7 @@ MEDCouplingFieldDouble *MEDFileField1TS::getFieldAtLevel(TypeOfField type, int m
   MEDFileField1TS::SetDataArrayDoubleInField(ret,arrOut);
   return ret.retn();
 }
+
 /*!
  * Returns a new MEDCouplingFieldDouble of a given type lying on
  * the top level cells of the first mesh in MED file. If \a this field 
@@ -5522,7 +5534,6 @@ MEDCouplingFieldDouble *MEDFileField1TS::getFieldAtTopLevel(TypeOfField type, in
   MEDFileField1TS::SetDataArrayDoubleInField(ret,arrOut);
   return ret.retn();
 }
-
 
 /*!
  * Returns a new MEDCouplingFieldDouble of given type lying on a given mesh.
@@ -5617,7 +5628,6 @@ MEDCouplingFieldDouble *MEDFileField1TS::getFieldAtLevelOld(TypeOfField type, co
   return ret.retn();
 }
 
-
 /*!
  * Returns values and a profile of the field of a given type lying on a given support.
  * For more info, see \ref AdvMEDLoaderAPIFieldRW
@@ -5636,7 +5646,8 @@ MEDCouplingFieldDouble *MEDFileField1TS::getFieldAtLevelOld(TypeOfField type, co
  */
 DataArrayDouble *MEDFileField1TS::getFieldWithProfile(TypeOfField type, int meshDimRelToMax, const MEDFileMesh *mesh, DataArrayInt *&pfl) const throw(INTERP_KERNEL::Exception)
 {
-  return contentNotNull()->getFieldWithProfile(type,meshDimRelToMax,mesh,pfl,this);
+  MEDCouplingAutoRefCountObjectPtr<DataArray> ret=contentNotNull()->getFieldWithProfile(type,meshDimRelToMax,mesh,pfl,this);
+  return MEDFileField1TS::ReturnSafelyDataArrayDouble(ret);
 }
 
 /*!
@@ -5851,6 +5862,168 @@ MEDCouplingFieldDouble *MEDFileIntField1TS::getFieldAtLevel(TypeOfField type, in
     throw INTERP_KERNEL::Exception("MEDFileIntField1TS::getFieldAtLevelOld : mismatch between dataArrays type and MEDFileIntField1TS ! Expected int32 !");
   arrOut=arrOutC;
   return ret.retn();
+}
+
+DataArrayInt *MEDFileIntField1TS::ReturnSafelyDataArrayInt(MEDCouplingAutoRefCountObjectPtr<DataArray>& arr) throw(INTERP_KERNEL::Exception)
+{
+  if(!((DataArray *)arr))
+    throw INTERP_KERNEL::Exception("MEDFileIntField1TS::ReturnSafelyDataArrayInt : input DataArray is NULL !");
+  DataArrayInt *arrC=dynamic_cast<DataArrayInt *>((DataArray *)arr);
+  if(!arrC)
+    throw INTERP_KERNEL::Exception("MEDFileIntField1TS::ReturnSafelyDataArrayInt : input DataArray is not of type INT32 !");
+  arrC->incrRef();
+  return arrC;
+}
+
+/*!
+ * Returns a new MEDCouplingFieldDouble of a given type lying on
+ * the top level cells of the first mesh in MED file. If \a this field 
+ * has not been constructed via file reading, an exception is thrown.
+ * For more info, see \ref AdvMEDLoaderAPIFieldRW
+ *  \param [in] type - a spatial discretization of interest.
+ *  \param [out] arrOut - the DataArrayInt containing values of field.
+ *  \param [in] renumPol - specifies how to permute values of the result field according to
+ *          the optional numbers of cells and nodes, if any. The valid values are
+ *          - 0 - do not permute.
+ *          - 1 - permute cells.
+ *          - 2 - permute nodes.
+ *          - 3 - permute cells and nodes.
+ *
+ *  \return MEDCouplingFieldDouble * - a new instance of MEDCouplingFieldDouble. The
+ *          caller is to delete this field using decrRef() as it is no more needed. 
+ *  \throw If \a this field has not been constructed via file reading.
+ *  \throw If the MED file is not readable.
+ *  \throw If there is no mesh in the MED file.
+ *  \throw If no field values of the given \a type.
+ *  \throw If no field values lying on the top level support.
+ *  \sa getFieldAtLevel()
+ */
+MEDCouplingFieldDouble *MEDFileIntField1TS::getFieldAtTopLevel(TypeOfField type, DataArrayInt* &arrOut, int renumPol) const throw(INTERP_KERNEL::Exception)
+{
+  if(getFileName2().empty())
+    throw INTERP_KERNEL::Exception("MEDFileField1TS::getFieldAtTopLevel : Request for a method that can be used for instances coming from file loading ! Use getFieldOnMeshAtTopLevel method instead !");
+  MEDCouplingAutoRefCountObjectPtr<DataArray> arr;
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=contentNotNull()->getFieldAtTopLevel(type,0,renumPol,this,arr);
+  arrOut=MEDFileIntField1TS::ReturnSafelyDataArrayInt(arr);
+  return ret.retn();
+}
+
+/*!
+ * Returns a new MEDCouplingFieldDouble of given type lying on a given mesh.
+ * For more info, see \ref AdvMEDLoaderAPIFieldRW
+ *  \param [in] type - a spatial discretization of the new field.
+ *  \param [in] mesh - the supporting mesh.
+ *  \param [out] arrOut - the DataArrayInt containing values of field.
+ *  \param [in] renumPol - specifies how to permute values of the result field according to
+ *          the optional numbers of cells and nodes, if any. The valid values are
+ *          - 0 - do not permute.
+ *          - 1 - permute cells.
+ *          - 2 - permute nodes.
+ *          - 3 - permute cells and nodes.
+ *
+ *  \return MEDCouplingFieldDouble * - a new instance of MEDCouplingFieldDouble. The
+ *          caller is to delete this field using decrRef() as it is no more needed. 
+ *  \throw If no field of \a this is lying on \a mesh.
+ *  \throw If the mesh is empty.
+ *  \throw If no field values of the given \a type are available.
+ *  \sa getFieldAtLevel()
+ *  \sa getFieldOnMeshAtLevel() 
+ */
+MEDCouplingFieldDouble *MEDFileIntField1TS::getFieldOnMeshAtLevel(TypeOfField type, const MEDCouplingMesh *mesh, DataArrayInt* &arrOut, int renumPol) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<DataArray> arr;
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=contentNotNull()->getFieldOnMeshAtLevel(type,renumPol,this,mesh,0,0,arr);
+  arrOut=MEDFileIntField1TS::ReturnSafelyDataArrayInt(arr);
+  return ret.retn();
+}
+
+/*!
+ * Returns a new MEDCouplingFieldDouble of a given type lying on a given support.
+ * For more info, see \ref AdvMEDLoaderAPIFieldRW
+ *  \param [in] type - a spatial discretization of interest.
+ *  \param [in] meshDimRelToMax - a relative dimension of the supporting mesh entities.
+ *  \param [out] arrOut - the DataArrayInt containing values of field.
+ *  \param [in] mesh - the supporting mesh.
+ *  \param [in] renumPol - specifies how to permute values of the result field according to
+ *          the optional numbers of cells and nodes, if any. The valid values are
+ *          - 0 - do not permute.
+ *          - 1 - permute cells.
+ *          - 2 - permute nodes.
+ *          - 3 - permute cells and nodes.
+ *
+ *  \return MEDCouplingFieldDouble * - a new instance of MEDCouplingFieldDouble. The
+ *          caller is to delete this field using decrRef() as it is no more needed. 
+ *  \throw If there are no mesh entities of \a meshDimRelToMax dimension in the mesh.
+ *  \throw If no field of \a this is lying on \a mesh.
+ *  \throw If no field values of the given \a type or given \a meshDimRelToMax are available.
+ *  \sa getFieldAtLevel()
+ *  \sa getFieldOnMeshAtLevel() 
+ */
+MEDCouplingFieldDouble *MEDFileIntField1TS::getFieldOnMeshAtLevel(TypeOfField type, int meshDimRelToMax, const MEDFileMesh *mesh, DataArrayInt* &arrOut, int renumPol) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<DataArray> arr;
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=contentNotNull()->getFieldOnMeshAtLevel(type,meshDimRelToMax,renumPol,this,mesh,arr);
+  arrOut=MEDFileIntField1TS::ReturnSafelyDataArrayInt(arr);
+  return ret.retn();
+}
+
+/*!
+ * Returns a new MEDCouplingFieldDouble of a given type lying on a given support.
+ * This method is called "Old" because in MED3 norm a field has only one meshName
+ * attached, so this method is for readers of MED2 files. If \a this field 
+ * has not been constructed via file reading, an exception is thrown.
+ * For more info, see \ref AdvMEDLoaderAPIFieldRW
+ *  \param [in] type - a spatial discretization of interest.
+ *  \param [in] mName - a name of the supporting mesh.
+ *  \param [in] meshDimRelToMax - a relative dimension of the supporting mesh entities.
+ *  \param [out] arrOut - the DataArrayInt containing values of field.
+ *  \param [in] renumPol - specifies how to permute values of the result field according to
+ *          the optional numbers of cells and nodes, if any. The valid values are
+ *          - 0 - do not permute.
+ *          - 1 - permute cells.
+ *          - 2 - permute nodes.
+ *          - 3 - permute cells and nodes.
+ *
+ *  \return MEDCouplingFieldDouble * - a new instance of MEDCouplingFieldDouble. The
+ *          caller is to delete this field using decrRef() as it is no more needed. 
+ *  \throw If the MED file is not readable.
+ *  \throw If there is no mesh named \a mName in the MED file.
+ *  \throw If there are no mesh entities of \a meshDimRelToMax dimension in the mesh.
+ *  \throw If \a this field has not been constructed via file reading.
+ *  \throw If no field of \a this is lying on the mesh named \a mName.
+ *  \throw If no field values of the given \a type or given \a meshDimRelToMax are available.
+ *  \sa getFieldAtLevel()
+ */
+MEDCouplingFieldDouble *MEDFileIntField1TS::getFieldAtLevelOld(TypeOfField type, const char *mname, int meshDimRelToMax, DataArrayInt* &arrOut, int renumPol) const throw(INTERP_KERNEL::Exception)
+{
+  if(getFileName2().empty())
+    throw INTERP_KERNEL::Exception("MEDFileField1TS::getFieldAtLevelOld : Request for a method that can be used for instances coming from file loading ! Use getFieldOnMeshAtLevel method instead !");
+  MEDCouplingAutoRefCountObjectPtr<DataArray> arr;
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=contentNotNull()->getFieldAtLevel(type,meshDimRelToMax,mname,renumPol,this,arr);
+  arrOut=MEDFileIntField1TS::ReturnSafelyDataArrayInt(arr);
+  return ret.retn();
+}
+
+/*!
+ * Returns values and a profile of the field of a given type lying on a given support.
+ * For more info, see \ref AdvMEDLoaderAPIFieldRW
+ *  \param [in] type - a spatial discretization of the field.
+ *  \param [in] meshDimRelToMax - a relative dimension of the supporting mesh entities.
+ *  \param [in] mesh - the supporting mesh.
+ *  \param [out] pfl - a new instance of DataArrayInt holding ids of mesh entities the
+ *          field of interest lies on. If the field lies on all entities of the given
+ *          dimension, all ids in \a pfl are zero. The caller is to delete this array
+ *          using decrRef() as it is no more needed.  
+ *  \return DataArrayInt * - a new instance of DataArrayInt holding values of the
+ *          field. The caller is to delete this array using decrRef() as it is no more needed.
+ *  \throw If there are no mesh entities of \a meshDimRelToMax dimension in \a mesh.
+ *  \throw If no field of \a this is lying on \a mesh.
+ *  \throw If no field values of the given \a type or given \a meshDimRelToMax are available.
+ */
+DataArrayInt *MEDFileIntField1TS::getFieldWithProfile(TypeOfField type, int meshDimRelToMax, const MEDFileMesh *mesh, DataArrayInt *&pfl) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<DataArray> arr=contentNotNull()->getFieldWithProfile(type,meshDimRelToMax,mesh,pfl,this);
+  return MEDFileIntField1TS::ReturnSafelyDataArrayInt(arr);
 }
 
 MEDFileIntField1TSWithoutSDA *MEDFileIntField1TS::contentNotNull() throw(INTERP_KERNEL::Exception)
@@ -7091,12 +7264,7 @@ MEDCouplingFieldDouble *MEDFileFieldMultiTS::getFieldAtTopLevel(TypeOfField type
     throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldAtTopLevel : mismatch of type of field !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> arrOut;
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=myF1TSC->getFieldAtTopLevel(type,0,renumPol,this,arrOut);
-  if(!((DataArray *)arrOut))
-    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldAtTopLevel : no array !");
-  DataArrayDouble *arrOutC=dynamic_cast<DataArrayDouble *>((DataArray *)arrOut);
-  if(!arrOutC)
-    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldAtTopLevel : mismatch between dataArrays type and MEDFileField1TS ! Expected double !");
-  ret->setArray(arrOutC);
+  MEDFileField1TS::SetDataArrayDoubleInField(ret,arrOut);
   return ret.retn();
 }
 
@@ -7130,12 +7298,7 @@ MEDCouplingFieldDouble *MEDFileFieldMultiTS::getFieldOnMeshAtLevel(TypeOfField t
     throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldOnMeshAtLevel : mismatch of type of field !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> arrOut;
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=myF1TSC->getFieldOnMeshAtLevel(type,meshDimRelToMax,renumPol,this,mesh,arrOut);
-  if(!((DataArray *)arrOut))
-    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldOnMeshAtLevel : no array !");
-  DataArrayDouble *arrOutC=dynamic_cast<DataArrayDouble *>((DataArray *)arrOut);
-  if(!arrOutC)
-    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldOnMeshAtLevel : mismatch between dataArrays type and MEDFileField1TS ! Expected double !");
-  ret->setArray(arrOutC);
+  MEDFileField1TS::SetDataArrayDoubleInField(ret,arrOut);
   return ret.retn();
 }
 
@@ -7167,12 +7330,7 @@ MEDCouplingFieldDouble *MEDFileFieldMultiTS::getFieldOnMeshAtLevel(TypeOfField t
     throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldOnMeshAtLevel : mismatch of type of field !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> arrOut;
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=myF1TSC->getFieldOnMeshAtLevel(type,renumPol,this,mesh,0,0,arrOut);
-  if(!((DataArray *)arrOut))
-    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldOnMeshAtLevel : no array !");
-  DataArrayDouble *arrOutC=dynamic_cast<DataArrayDouble *>((DataArray *)arrOut);
-  if(!arrOutC)
-    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldOnMeshAtLevel : mismatch between dataArrays type and MEDFileField1TS ! Expected double !");
-  ret->setArray(arrOutC);
+  MEDFileField1TS::SetDataArrayDoubleInField(ret,arrOut);
   return ret.retn();
 }
 
@@ -7219,7 +7377,8 @@ DataArrayDouble *MEDFileFieldMultiTS::getFieldWithProfile(TypeOfField type, int 
   const MEDFileField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileField1TSWithoutSDA *>(&myF1TS);//tony
   if(!myF1TSC)
     throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldWithProfile : mismatch of type of field !");
-  return myF1TSC->getFieldWithProfile(type,meshDimRelToMax,mesh,pfl,this);
+  MEDCouplingAutoRefCountObjectPtr<DataArray> ret=myF1TSC->getFieldWithProfile(type,meshDimRelToMax,mesh,pfl,this);
+  return MEDFileField1TS::ReturnSafelyDataArrayDouble(ret);
 }
 
 const MEDFileFieldMultiTSWithoutSDA *MEDFileFieldMultiTS::contentNotNull() const throw(INTERP_KERNEL::Exception)
@@ -7423,6 +7582,189 @@ MEDFileIntFieldMultiTS *MEDFileIntFieldMultiTS::New(const MEDFileIntFieldMultiTS
 MEDFileAnyTypeFieldMultiTS *MEDFileIntFieldMultiTS::shallowCpy() const throw(INTERP_KERNEL::Exception)
 {
   return new MEDFileIntFieldMultiTS(*this);
+}
+
+/*!
+ * Returns a new MEDCouplingFieldDouble of a given type, of a given time step, lying on
+ * mesh entities of a given dimension of the first mesh in MED file.
+ * For more info, see \ref AdvMEDLoaderAPIFieldRW
+ *  \param [in] type - a spatial discretization of interest.
+ *  \param [in] iteration - the iteration number of a required time step.
+ *  \param [in] order - the iteration order number of required time step.
+ *  \param [in] meshDimRelToMax - a relative dimension of the supporting mesh entities.
+ *  \param [out] arrOut - the DataArrayInt containing values of field.
+ *  \param [in] renumPol - specifies how to permute values of the result field according to
+ *          the optional numbers of cells and nodes, if any. The valid values are
+ *          - 0 - do not permute.
+ *          - 1 - permute cells.
+ *          - 2 - permute nodes.
+ *          - 3 - permute cells and nodes.
+ *
+ *  \return MEDCouplingFieldDouble * - a new instance of MEDCouplingFieldDouble. The
+ *          caller is to delete this field using decrRef() as it is no more needed. 
+ *  \throw If the MED file is not readable.
+ *  \throw If there is no mesh in the MED file.
+ *  \throw If there are no mesh entities of \a meshDimRelToMax dimension in the mesh.
+ *  \throw If no field values of the required parameters are available.
+ */
+MEDCouplingFieldDouble *MEDFileIntFieldMultiTS::getFieldAtLevel(TypeOfField type, int iteration, int order, int meshDimRelToMax, DataArrayInt* &arrOut, int renumPol) const throw(INTERP_KERNEL::Exception)
+{
+  const MEDFileAnyTypeField1TSWithoutSDA& myF1TS=contentNotNullBase()->getTimeStepEntry(iteration,order);
+  const MEDFileIntField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(&myF1TS);//tony
+  if(!myF1TSC)
+    throw INTERP_KERNEL::Exception("MEDFileIntFieldMultiTS::getFieldAtLevel : mismatch of type of field expecting INT32 !");
+  MEDCouplingAutoRefCountObjectPtr<DataArray> arr;
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=myF1TSC->getFieldAtLevel(type,meshDimRelToMax,0,renumPol,this,arr);
+  arrOut=MEDFileIntField1TS::ReturnSafelyDataArrayInt(arr);
+  return ret.retn();
+}
+
+/*!
+ * Returns a new MEDCouplingFieldDouble of a given type, of a given time step, lying on
+ * the top level cells of the first mesh in MED file.
+ * For more info, see \ref AdvMEDLoaderAPIFieldRW
+ *  \param [in] type - a spatial discretization of interest.
+ *  \param [in] iteration - the iteration number of a required time step.
+ *  \param [in] order - the iteration order number of required time step.
+ *  \param [out] arrOut - the DataArrayInt containing values of field.
+ *  \param [in] renumPol - specifies how to permute values of the result field according to
+ *          the optional numbers of cells and nodes, if any. The valid values are
+ *          - 0 - do not permute.
+ *          - 1 - permute cells.
+ *          - 2 - permute nodes.
+ *          - 3 - permute cells and nodes.
+ *
+ *  \return MEDCouplingFieldDouble * - a new instance of MEDCouplingFieldDouble. The
+ *          caller is to delete this field using decrRef() as it is no more needed. 
+ *  \throw If the MED file is not readable.
+ *  \throw If there is no mesh in the MED file.
+ *  \throw If no field values of the required parameters are available.
+ */
+MEDCouplingFieldDouble *MEDFileIntFieldMultiTS::getFieldAtTopLevel(TypeOfField type, int iteration, int order, DataArrayInt* &arrOut, int renumPol) const throw(INTERP_KERNEL::Exception)
+{
+  const MEDFileAnyTypeField1TSWithoutSDA& myF1TS=contentNotNullBase()->getTimeStepEntry(iteration,order);
+  const MEDFileIntField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(&myF1TS);//tony
+  if(!myF1TSC)
+    throw INTERP_KERNEL::Exception("MEDFileIntFieldMultiTS::getFieldAtTopLevel : mismatch of type of field !");
+  MEDCouplingAutoRefCountObjectPtr<DataArray> arr;
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=myF1TSC->getFieldAtTopLevel(type,0,renumPol,this,arr);
+  arrOut=MEDFileIntField1TS::ReturnSafelyDataArrayInt(arr);
+  return ret.retn();
+}
+
+/*!
+ * Returns a new MEDCouplingFieldDouble of a given type, of a given time step, lying on
+ * a given support.
+ * For more info, see \ref AdvMEDLoaderAPIFieldRW
+ *  \param [in] type - a spatial discretization of interest.
+ *  \param [in] iteration - the iteration number of a required time step.
+ *  \param [in] order - the iteration order number of required time step.
+ *  \param [out] arrOut - the DataArrayInt containing values of field.
+ *  \param [in] meshDimRelToMax - a relative dimension of the supporting mesh entities.
+ *  \param [in] mesh - the supporting mesh.
+ *  \param [in] renumPol - specifies how to permute values of the result field according to
+ *          the optional numbers of cells and nodes, if any. The valid values are
+ *          - 0 - do not permute.
+ *          - 1 - permute cells.
+ *          - 2 - permute nodes.
+ *          - 3 - permute cells and nodes.
+ *
+ *  \return MEDCouplingFieldDouble * - a new instance of MEDCouplingFieldDouble. The
+ *          caller is to delete this field using decrRef() as it is no more needed. 
+ *  \throw If there are no mesh entities of \a meshDimRelToMax dimension in the mesh.
+ *  \throw If no field of \a this is lying on \a mesh.
+ *  \throw If no field values of the required parameters are available.
+ */
+MEDCouplingFieldDouble *MEDFileIntFieldMultiTS::getFieldOnMeshAtLevel(TypeOfField type, int iteration, int order, int meshDimRelToMax, const MEDFileMesh *mesh, DataArrayInt* &arrOut, int renumPol) const throw(INTERP_KERNEL::Exception)
+{
+  const MEDFileAnyTypeField1TSWithoutSDA& myF1TS=contentNotNullBase()->getTimeStepEntry(iteration,order);
+  const MEDFileIntField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(&myF1TS);//tony
+  if(!myF1TSC)
+    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldOnMeshAtLevel : mismatch of type of field !");
+  MEDCouplingAutoRefCountObjectPtr<DataArray> arr;
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=myF1TSC->getFieldOnMeshAtLevel(type,meshDimRelToMax,renumPol,this,mesh,arr);
+  arrOut=MEDFileIntField1TS::ReturnSafelyDataArrayInt(arr);
+  return ret.retn();
+}
+
+/*!
+ * Returns a new MEDCouplingFieldDouble of given type, of a given time step, lying on a
+ * given support. 
+ * For more info, see \ref AdvMEDLoaderAPIFieldRW
+ *  \param [in] type - a spatial discretization of the new field.
+ *  \param [in] iteration - the iteration number of a required time step.
+ *  \param [in] order - the iteration order number of required time step.
+ *  \param [in] mesh - the supporting mesh.
+ *  \param [out] arrOut - the DataArrayInt containing values of field.
+ *  \param [in] renumPol - specifies how to permute values of the result field according to
+ *          the optional numbers of cells and nodes, if any. The valid values are
+ *          - 0 - do not permute.
+ *          - 1 - permute cells.
+ *          - 2 - permute nodes.
+ *          - 3 - permute cells and nodes.
+ *
+ *  \return MEDCouplingFieldDouble * - a new instance of MEDCouplingFieldDouble. The
+ *          caller is to delete this field using decrRef() as it is no more needed. 
+ *  \throw If no field of \a this is lying on \a mesh.
+ *  \throw If no field values of the required parameters are available.
+ */
+MEDCouplingFieldDouble *MEDFileIntFieldMultiTS::getFieldOnMeshAtLevel(TypeOfField type, int iteration, int order, const MEDCouplingMesh *mesh, DataArrayInt* &arrOut, int renumPol) const throw(INTERP_KERNEL::Exception)
+{
+  const MEDFileAnyTypeField1TSWithoutSDA& myF1TS=contentNotNullBase()->getTimeStepEntry(iteration,order);
+  const MEDFileIntField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(&myF1TS);//tony
+  if(!myF1TSC)
+    throw INTERP_KERNEL::Exception("MEDFileFieldIntMultiTS::getFieldOnMeshAtLevel : mismatch of type of field !");
+  MEDCouplingAutoRefCountObjectPtr<DataArray> arr;
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=myF1TSC->getFieldOnMeshAtLevel(type,renumPol,this,mesh,0,0,arr);
+  arrOut=MEDFileIntField1TS::ReturnSafelyDataArrayInt(arr);
+  return ret.retn();
+}
+
+/*!
+ * This method has a close behaviour than MEDFileIntFieldMultiTS::getFieldAtLevel.
+ * This method is called 'old' because the user should give the mesh name he wants to use for it's field.
+ * This method is useful for MED2 file format when field on different mesh was autorized.
+ */
+MEDCouplingFieldDouble *MEDFileIntFieldMultiTS::getFieldAtLevelOld(TypeOfField type, int iteration, int order, const char *mname, int meshDimRelToMax, DataArrayInt* &arrOut, int renumPol) const throw(INTERP_KERNEL::Exception)
+{
+  const MEDFileAnyTypeField1TSWithoutSDA& myF1TS=contentNotNullBase()->getTimeStepEntry(iteration,order);
+  const MEDFileIntField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(&myF1TS);//tony
+  if(!myF1TSC)
+    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldOnMeshAtLevel : mismatch of type of field !");
+  MEDCouplingAutoRefCountObjectPtr<DataArray> arr;
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=myF1TSC->getFieldAtLevel(type,meshDimRelToMax,mname,renumPol,this,arr);
+  arrOut=MEDFileIntField1TS::ReturnSafelyDataArrayInt(arr);
+  return ret.retn();
+}
+
+/*!
+ * Returns values and a profile of the field of a given type, of a given time step,
+ * lying on a given support.
+ * For more info, see \ref AdvMEDLoaderAPIFieldRW
+ *  \param [in] type - a spatial discretization of the field.
+ *  \param [in] iteration - the iteration number of a required time step.
+ *  \param [in] order - the iteration order number of required time step.
+ *  \param [in] meshDimRelToMax - a relative dimension of the supporting mesh entities.
+ *  \param [in] mesh - the supporting mesh.
+ *  \param [out] pfl - a new instance of DataArrayInt holding ids of mesh entities the
+ *          field of interest lies on. If the field lies on all entities of the given
+ *          dimension, all ids in \a pfl are zero. The caller is to delete this array
+ *          using decrRef() as it is no more needed.  
+ *  \param [in] glob - the global data storing profiles and localization.
+ *  \return DataArrayInt * - a new instance of DataArrayInt holding values of the
+ *          field. The caller is to delete this array using decrRef() as it is no more needed.
+ *  \throw If there are no mesh entities of \a meshDimRelToMax dimension in \a mesh.
+ *  \throw If no field of \a this is lying on \a mesh.
+ *  \throw If no field values of the required parameters are available.
+ */
+DataArrayInt *MEDFileIntFieldMultiTS::getFieldWithProfile(TypeOfField type, int iteration, int order, int meshDimRelToMax, const MEDFileMesh *mesh, DataArrayInt *&pfl) const throw(INTERP_KERNEL::Exception)
+{
+  const MEDFileAnyTypeField1TSWithoutSDA& myF1TS=contentNotNullBase()->getTimeStepEntry(iteration,order);
+  const MEDFileIntField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(&myF1TS);//tony
+  if(!myF1TSC)
+    throw INTERP_KERNEL::Exception("MEDFileIntFieldMultiTS::getFieldWithProfile : mismatch of type of field !");
+  MEDCouplingAutoRefCountObjectPtr<DataArray> ret=myF1TSC->getFieldWithProfile(type,meshDimRelToMax,mesh,pfl,this);
+  return MEDFileIntField1TS::ReturnSafelyDataArrayInt(ret);
 }
 
 /*!

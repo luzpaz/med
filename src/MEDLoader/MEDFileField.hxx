@@ -266,7 +266,7 @@ namespace ParaMEDMEM
     void changePflsRefsNamesGen(const std::vector< std::pair<std::vector<std::string>, std::string > >& mapOfModif) throw(INTERP_KERNEL::Exception);
     void changeLocsRefsNamesGen(const std::vector< std::pair<std::vector<std::string>, std::string > >& mapOfModif) throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *getFieldOnMeshAtLevel(TypeOfField type, const MEDFileFieldGlobsReal *glob, const MEDCouplingMesh *mesh, bool& isPfl, MEDCouplingAutoRefCountObjectPtr<DataArray> &arrOut) const throw(INTERP_KERNEL::Exception);
-    DataArrayDouble *getFieldOnMeshAtLevelWithPfl(TypeOfField type, const MEDCouplingMesh *mesh, DataArrayInt *&pfl, const MEDFileFieldGlobsReal *glob) const throw(INTERP_KERNEL::Exception);
+    DataArray *getFieldOnMeshAtLevelWithPfl(TypeOfField type, const MEDCouplingMesh *mesh, DataArrayInt *&pfl, const MEDFileFieldGlobsReal *glob) const throw(INTERP_KERNEL::Exception);
     void getUndergroundDataArrayExt(std::vector< std::pair<std::pair<INTERP_KERNEL::NormalizedCellType,int>,std::pair<int,int> > >& entries) const throw(INTERP_KERNEL::Exception);
     MEDFileFieldPerMeshPerTypePerDisc *getLeafGivenTypeAndLocId(INTERP_KERNEL::NormalizedCellType typ, int locId) throw(INTERP_KERNEL::Exception);
     const MEDFileFieldPerMeshPerTypePerDisc *getLeafGivenTypeAndLocId(INTERP_KERNEL::NormalizedCellType typ, int locId) const throw(INTERP_KERNEL::Exception);
@@ -281,7 +281,7 @@ namespace ParaMEDMEM
     MEDCouplingFieldDouble *finishFieldNode2(const MEDFileFieldGlobsReal *glob,
                                              const std::vector< std::pair<int,int> >& dads, const std::vector<int>& locs,
                                              const MEDCouplingMesh *mesh, const DataArrayInt *da, bool& isPfl, MEDCouplingAutoRefCountObjectPtr<DataArray> &arrOut) const throw(INTERP_KERNEL::Exception);
-    DataArrayDouble *finishField4(const std::vector< std::pair<int,int> >& dads, const DataArrayInt *pflIn, int nbOfElems, DataArrayInt *&pflOut) const throw(INTERP_KERNEL::Exception);
+    DataArray *finishField4(const std::vector< std::pair<int,int> >& dads, const DataArrayInt *pflIn, int nbOfElems, DataArrayInt *&pflOut) const throw(INTERP_KERNEL::Exception);
     void assignNewLeaves(const std::vector< MEDCouplingAutoRefCountObjectPtr< MEDFileFieldPerMeshPerTypePerDisc > >& leaves) throw(INTERP_KERNEL::Exception);
     static void SortArraysPerType(const MEDFileFieldGlobsReal *glob, TypeOfField type, 
                                   const std::vector<INTERP_KERNEL::NormalizedCellType>& geoTypes, const std::vector< std::pair<int,int> >& dads, const std::vector<const DataArrayInt *>& pfls, const std::vector<int>& locs,
@@ -478,6 +478,7 @@ namespace ParaMEDMEM
     MEDCouplingFieldDouble *getFieldOnMeshAtLevel(TypeOfField type, int meshDimRelToMax, int renumPol, const MEDFileFieldGlobsReal *glob, const MEDFileMesh *mesh, MEDCouplingAutoRefCountObjectPtr<DataArray> &arrOut) const throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *getFieldAtTopLevel(TypeOfField type, const char *mName, int renumPol, const MEDFileFieldGlobsReal *glob, MEDCouplingAutoRefCountObjectPtr<DataArray> &arrOut) const throw(INTERP_KERNEL::Exception);
     MEDCouplingFieldDouble *getFieldOnMeshAtLevel(TypeOfField type, int renumPol, const MEDFileFieldGlobsReal *glob, const MEDCouplingMesh *mesh, const DataArrayInt *cellRenum, const DataArrayInt *nodeRenum, MEDCouplingAutoRefCountObjectPtr<DataArray> &arrOut) const throw(INTERP_KERNEL::Exception);
+    DataArray *getFieldWithProfile(TypeOfField type, int meshDimRelToMax, const MEDFileMesh *mesh, DataArrayInt *&pfl, const MEDFileFieldGlobsReal *glob) const throw(INTERP_KERNEL::Exception);
   public:
     bool renumberEntitiesLyingOnMesh(const char *meshName, const std::vector<int>& oldCode, const std::vector<int>& newCode, const DataArrayInt *renumO2N, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception);
   public:
@@ -512,8 +513,6 @@ namespace ParaMEDMEM
     static void CheckMeshDimRel(int meshDimRelToMax) throw(INTERP_KERNEL::Exception);
     static std::vector<int> CheckSBTMesh(const MEDCouplingMesh *mesh) throw(INTERP_KERNEL::Exception);
     static MEDFileField1TSWithoutSDA *New(const char *fieldName, int csit, int iteration, int order, const std::vector<std::string>& infos);
-  public:
-    DataArrayDouble *getFieldWithProfile(TypeOfField type, int meshDimRelToMax, const MEDFileMesh *mesh, DataArrayInt *&pfl, const MEDFileFieldGlobsReal *glob) const throw(INTERP_KERNEL::Exception);
   public:
     MEDFileField1TSWithoutSDA();
     MEDFileField1TSWithoutSDA(const char *fieldName, int csit, int iteration, int order, const std::vector<std::string>& infos);
@@ -661,6 +660,7 @@ namespace ParaMEDMEM
                                                                          std::vector< std::vector<std::string> >& pfls, std::vector< std::vector<std::string> >& locs) const throw(INTERP_KERNEL::Exception);
   public:
     static void SetDataArrayDoubleInField(MEDCouplingFieldDouble *f, MEDCouplingAutoRefCountObjectPtr<DataArray>& arr) throw(INTERP_KERNEL::Exception);
+    static DataArrayDouble *ReturnSafelyDataArrayDouble(MEDCouplingAutoRefCountObjectPtr<DataArray>& arr) throw(INTERP_KERNEL::Exception);
   private:
     med_field_type getMEDFileFieldType() const { return MED_FLOAT64; }
     const MEDFileField1TSWithoutSDA *contentNotNull() const throw(INTERP_KERNEL::Exception);
@@ -684,10 +684,17 @@ namespace ParaMEDMEM
     MEDFileAnyTypeField1TS *shallowCpy() const throw(INTERP_KERNEL::Exception);
     //
     MEDCouplingFieldDouble *getFieldAtLevel(TypeOfField type, int meshDimRelToMax, DataArrayInt* &arrOut, int renumPol=0) const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *getFieldAtTopLevel(TypeOfField type, DataArrayInt* &arrOut, int renumPol=0) const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *getFieldOnMeshAtLevel(TypeOfField type, int meshDimRelToMax, const MEDFileMesh *mesh, DataArrayInt* &arrOut, int renumPol=0) const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *getFieldOnMeshAtLevel(TypeOfField type, const MEDCouplingMesh *mesh, DataArrayInt* &arrOut, int renumPol=0) const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *getFieldAtLevelOld(TypeOfField type, const char *mname, int meshDimRelToMax, DataArrayInt* &arrOut, int renumPol=0) const throw(INTERP_KERNEL::Exception);
+    DataArrayInt *getFieldWithProfile(TypeOfField type, int meshDimRelToMax, const MEDFileMesh *mesh, DataArrayInt *&pfl) const throw(INTERP_KERNEL::Exception);
     //
     void setFieldNoProfileSBT(const MEDCouplingFieldDouble *field, const DataArrayInt *arrOfVals) throw(INTERP_KERNEL::Exception);
     void setFieldProfile(const MEDCouplingFieldDouble *field, const DataArrayInt *arrOfVals, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile) throw(INTERP_KERNEL::Exception);
     DataArrayInt *getUndergroundDataArray() const throw(INTERP_KERNEL::Exception);
+  public:
+    static DataArrayInt *ReturnSafelyDataArrayInt(MEDCouplingAutoRefCountObjectPtr<DataArray>& arr) throw(INTERP_KERNEL::Exception);
   private:
     med_field_type getMEDFileFieldType() const { return MED_INT32; }
     const MEDFileIntField1TSWithoutSDA *contentNotNull() const throw(INTERP_KERNEL::Exception);
@@ -901,6 +908,13 @@ std::vector< std::vector<DataArrayDouble *> > getFieldSplitedByType2(int iterati
     static MEDFileIntFieldMultiTS *New(const MEDFileIntFieldMultiTSWithoutSDA& other, bool shallowCopyOfContent);
     MEDFileAnyTypeFieldMultiTS *shallowCpy() const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeField1TS *getTimeStepAtPos(int pos) const throw(INTERP_KERNEL::Exception);
+    //
+    MEDCouplingFieldDouble *getFieldAtLevel(TypeOfField type, int iteration, int order, int meshDimRelToMax, DataArrayInt* &arrOut, int renumPol=0) const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *getFieldAtTopLevel(TypeOfField type, int iteration, int order, DataArrayInt* &arrOut, int renumPol=0) const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *getFieldOnMeshAtLevel(TypeOfField type, int iteration, int order, int meshDimRelToMax, const MEDFileMesh *mesh, DataArrayInt* &arrOut, int renumPol=0) const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *getFieldOnMeshAtLevel(TypeOfField type, int iteration, int order, const MEDCouplingMesh *mesh, DataArrayInt* &arrOut, int renumPol=0) const throw(INTERP_KERNEL::Exception);
+    MEDCouplingFieldDouble *getFieldAtLevelOld(TypeOfField type, int iteration, int order, const char *mname, int meshDimRelToMax, DataArrayInt* &arrOut, int renumPol=0) const throw(INTERP_KERNEL::Exception);
+    DataArrayInt *getFieldWithProfile(TypeOfField type, int iteration, int order, int meshDimRelToMax, const MEDFileMesh *mesh, DataArrayInt *&pfl) const throw(INTERP_KERNEL::Exception);
     //
     void appendFieldNoProfileSBT(const MEDCouplingFieldDouble *field, const DataArrayInt *arrOfVals) throw(INTERP_KERNEL::Exception);
     void appendFieldProfile(const MEDCouplingFieldDouble *field, const DataArrayInt *arrOfVals, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile) throw(INTERP_KERNEL::Exception);
