@@ -2508,10 +2508,13 @@ void DataArrayDouble::setPartOfValuesAdv(const DataArrayDouble *a, const DataArr
  *  \throw If any tuple index given by \a tuplesSelec is out of a valid range for 
  *         \a a array.
  */
-void DataArrayDouble::setContigPartOfSelectedValues(int tupleIdStart, const DataArrayDouble *a, const DataArrayInt *tuplesSelec) throw(INTERP_KERNEL::Exception)
+void DataArrayDouble::setContigPartOfSelectedValues(int tupleIdStart, const DataArray *aBase, const DataArrayInt *tuplesSelec) throw(INTERP_KERNEL::Exception)
 {
-  if(!a || !tuplesSelec)
+  if(!aBase || !tuplesSelec)
     throw INTERP_KERNEL::Exception("DataArrayDouble::setContigPartOfSelectedValues : input DataArray is NULL !");
+  const DataArrayDouble *a=dynamic_cast<const DataArrayDouble *>(aBase);
+  if(!a)
+    throw INTERP_KERNEL::Exception("DataArrayDouble::setContigPartOfSelectedValues : input DataArray aBase is not a DataArrayDouble !");
   checkAllocated();
   a->checkAllocated();
   tuplesSelec->checkAllocated();
@@ -2567,10 +2570,13 @@ void DataArrayDouble::setContigPartOfSelectedValues(int tupleIdStart, const Data
  *            non-empty range of increasing indices or indices are out of a valid range
  *            for the array \a a.
  */
-void DataArrayDouble::setContigPartOfSelectedValues2(int tupleIdStart, const DataArrayDouble *a, int bg, int end2, int step) throw(INTERP_KERNEL::Exception)
+void DataArrayDouble::setContigPartOfSelectedValues2(int tupleIdStart, const DataArray *aBase, int bg, int end2, int step) throw(INTERP_KERNEL::Exception)
 {
+  if(!aBase)
+    throw INTERP_KERNEL::Exception("DataArrayDouble::setContigPartOfSelectedValues2 : input DataArray is NULL !");
+  const DataArrayDouble *a=dynamic_cast<const DataArrayDouble *>(aBase);
   if(!a)
-    throw INTERP_KERNEL::Exception("DataArrayDouble::setContigPartOfSelectedValues2 : input DataArrayDouble is NULL !");
+    throw INTERP_KERNEL::Exception("DataArrayDouble::setContigPartOfSelectedValues2 : input DataArray aBase is not a DataArrayDouble !");
   checkAllocated();
   a->checkAllocated();
   int nbOfComp=getNumberOfComponents();
@@ -7495,8 +7501,13 @@ void DataArrayInt::setPartOfValuesAdv(const DataArrayInt *a, const DataArrayInt 
  *  \throw If any tuple index given by \a tuplesSelec is out of a valid range for 
  *         \a a array.
  */
-void DataArrayInt::setContigPartOfSelectedValues(int tupleIdStart, const DataArrayInt*a, const DataArrayInt *tuplesSelec) throw(INTERP_KERNEL::Exception)
+void DataArrayInt::setContigPartOfSelectedValues(int tupleIdStart, const DataArray *aBase, const DataArrayInt *tuplesSelec) throw(INTERP_KERNEL::Exception)
 {
+  if(!aBase || !tuplesSelec)
+    throw INTERP_KERNEL::Exception("DataArrayInt::setContigPartOfSelectedValues : input DataArray is NULL !");
+  const DataArrayInt *a=dynamic_cast<const DataArrayInt *>(aBase);
+  if(!a)
+    throw INTERP_KERNEL::Exception("DataArrayInt::setContigPartOfSelectedValues : input DataArray aBase is not a DataArrayInt !");
   checkAllocated();
   a->checkAllocated();
   tuplesSelec->checkAllocated();
@@ -7552,8 +7563,13 @@ void DataArrayInt::setContigPartOfSelectedValues(int tupleIdStart, const DataArr
  *            non-empty range of increasing indices or indices are out of a valid range
  *            for the array \a a.
  */
-void DataArrayInt::setContigPartOfSelectedValues2(int tupleIdStart, const DataArrayInt *a, int bg, int end2, int step) throw(INTERP_KERNEL::Exception)
+void DataArrayInt::setContigPartOfSelectedValues2(int tupleIdStart, const DataArray *aBase, int bg, int end2, int step) throw(INTERP_KERNEL::Exception)
 {
+  if(!aBase)
+    throw INTERP_KERNEL::Exception("DataArrayInt::setContigPartOfSelectedValues2 : input DataArray is NULL !");
+  const DataArrayInt *a=dynamic_cast<const DataArrayInt *>(aBase);
+  if(!a)
+    throw INTERP_KERNEL::Exception("DataArrayInt::setContigPartOfSelectedValues2 : input DataArray aBase is not a DataArrayInt !");
   checkAllocated();
   a->checkAllocated();
   int nbOfComp=getNumberOfComponents();

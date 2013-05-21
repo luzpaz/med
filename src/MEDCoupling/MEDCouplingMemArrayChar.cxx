@@ -1252,6 +1252,119 @@ void DataArrayChar::setPartOfValuesAdv(const DataArrayChar *a, const DataArrayCh
 }
 
 /*!
+ * Copy some tuples from another DataArrayChar (\a a) into contiguous tuples
+ * of \a this array. Textual data is not copied. Both arrays must have equal number of
+ * components.
+ * The tuples to assign to are defined by index of the first tuple, and
+ * their number is defined by \a tuplesSelec->getNumberOfTuples().
+ * The tuples to copy are defined by values of a DataArrayChar.
+ * All components of selected tuples are copied.
+ *  \param [in] tupleIdStart - index of the first tuple of \a this array to assign
+ *              values to.
+ *  \param [in] a - the array to copy values from.
+ *  \param [in] tuplesSelec - the array specifying tuples of \a a to copy.
+ *  \throw If \a this is not allocated.
+ *  \throw If \a a is NULL.
+ *  \throw If \a a is not allocated.
+ *  \throw If \a tuplesSelec is NULL.
+ *  \throw If \a tuplesSelec is not allocated.
+ *  \throw If <em>this->getNumberOfComponents() != a->getNumberOfComponents()</em>.
+ *  \throw If \a tuplesSelec->getNumberOfComponents() != 1.
+ *  \throw If <em>tupleIdStart + tuplesSelec->getNumberOfTuples() > this->getNumberOfTuples().</em>
+ *  \throw If any tuple index given by \a tuplesSelec is out of a valid range for 
+ *         \a a array.
+ */
+void DataArrayChar::setContigPartOfSelectedValues(int tupleIdStart, const DataArray *aBase, const DataArrayInt *tuplesSelec) throw(INTERP_KERNEL::Exception)
+{
+  if(!aBase || !tuplesSelec)
+    throw INTERP_KERNEL::Exception("DataArrayChar::setContigPartOfSelectedValues : input DataArray is NULL !");
+  const DataArrayChar *a=dynamic_cast<const DataArrayChar *>(aBase);
+  if(!a)
+    throw INTERP_KERNEL::Exception("DataArrayChar::setContigPartOfSelectedValues : input DataArray aBase is not a DataArrayChar !");
+  checkAllocated();
+  a->checkAllocated();
+  tuplesSelec->checkAllocated();
+  int nbOfComp=getNumberOfComponents();
+  if(nbOfComp!=a->getNumberOfComponents())
+    throw INTERP_KERNEL::Exception("DataArrayChar::setContigPartOfSelectedValues : This and a do not have the same number of components !");
+  if(tuplesSelec->getNumberOfComponents()!=1)
+    throw INTERP_KERNEL::Exception("DataArrayChar::setContigPartOfSelectedValues : Expecting to have a tuple selector DataArrayChar instance with exactly 1 component !");
+  int thisNt=getNumberOfTuples();
+  int aNt=a->getNumberOfTuples();
+  int nbOfTupleToWrite=tuplesSelec->getNumberOfTuples();
+  char *valsToSet=getPointer()+tupleIdStart*nbOfComp;
+  if(tupleIdStart+nbOfTupleToWrite>thisNt)
+    throw INTERP_KERNEL::Exception("DataArrayChar::setContigPartOfSelectedValues : invalid number range of values to write !");
+  const char *valsSrc=a->getConstPointer();
+  for(const int *tuple=tuplesSelec->begin();tuple!=tuplesSelec->end();tuple++,valsToSet+=nbOfComp)
+    {
+      if(*tuple>=0 && *tuple<aNt)
+        {
+          std::copy(valsSrc+nbOfComp*(*tuple),valsSrc+nbOfComp*(*tuple+1),valsToSet);
+        }
+      else
+        {
+          std::ostringstream oss; oss << "DataArrayChar::setContigPartOfSelectedValues : Tuple #" << std::distance(tuplesSelec->begin(),tuple);
+          oss << " of 'tuplesSelec' request of tuple id #" << *tuple << " in 'a' ! It should be in [0," << aNt << ") !";
+          throw INTERP_KERNEL::Exception(oss.str().c_str());
+        }
+    }
+}
+
+/*!
+ * Copy some tuples from another DataArrayChar (\a a) into contiguous tuples
+ * of \a this array. Textual data is not copied. Both arrays must have equal number of
+ * components.
+ * The tuples to copy are defined by three values similar to parameters of
+ * the Python function \c range(\c start,\c stop,\c step).
+ * The tuples to assign to are defined by index of the first tuple, and
+ * their number is defined by number of tuples to copy.
+ * All components of selected tuples are copied.
+ *  \param [in] tupleIdStart - index of the first tuple of \a this array to assign
+ *              values to.
+ *  \param [in] a - the array to copy values from.
+ *  \param [in] bg - index of the first tuple to copy of the array \a a.
+ *  \param [in] end2 - index of the tuple of \a a before which the tuples to copy
+ *              are located.
+ *  \param [in] step - index increment to get index of the next tuple to copy.
+ *  \throw If \a this is not allocated.
+ *  \throw If \a a is NULL.
+ *  \throw If \a a is not allocated.
+ *  \throw If <em>this->getNumberOfComponents() != a->getNumberOfComponents()</em>.
+ *  \throw If <em>tupleIdStart + len(range(bg,end2,step)) > this->getNumberOfTuples().</em>
+ *  \throw If parameters specifying tuples to copy, do not give a
+ *            non-empty range of increasing indices or indices are out of a valid range
+ *            for the array \a a.
+ */
+void DataArrayChar::setContigPartOfSelectedValues2(int tupleIdStart, const DataArray *aBase, int bg, int end2, int step) throw(INTERP_KERNEL::Exception)
+{
+  if(!aBase)
+    throw INTERP_KERNEL::Exception("DataArrayChar::setContigPartOfSelectedValues2 : input DataArray is NULL !");
+  const DataArrayChar *a=dynamic_cast<const DataArrayChar *>(aBase);
+  if(!a)
+    throw INTERP_KERNEL::Exception("DataArrayChar::setContigPartOfSelectedValues2 : input DataArray aBase is not a DataArrayChar !");
+  checkAllocated();
+  a->checkAllocated();
+  int nbOfComp=getNumberOfComponents();
+  const char msg[]="DataArrayChar::setContigPartOfSelectedValues2";
+  int nbOfTupleToWrite=DataArray::GetNumberOfItemGivenBES(bg,end2,step,msg);
+  if(nbOfComp!=a->getNumberOfComponents())
+    throw INTERP_KERNEL::Exception("DataArrayChar::setContigPartOfSelectedValues2 : This and a do not have the same number of components !");
+  int thisNt=getNumberOfTuples();
+  int aNt=a->getNumberOfTuples();
+  char *valsToSet=getPointer()+tupleIdStart*nbOfComp;
+  if(tupleIdStart+nbOfTupleToWrite>thisNt)
+    throw INTERP_KERNEL::Exception("DataArrayChar::setContigPartOfSelectedValues2 : invalid number range of values to write !");
+  if(end2>aNt)
+    throw INTERP_KERNEL::Exception("DataArrayChar::setContigPartOfSelectedValues2 : invalid range of values to read !");
+  const char *valsSrc=a->getConstPointer()+bg*nbOfComp;
+  for(int i=0;i<nbOfTupleToWrite;i++,valsToSet+=nbOfComp,valsSrc+=step*nbOfComp)
+    {
+      std::copy(valsSrc,valsSrc+nbOfComp,valsToSet);
+    }
+}
+
+/*!
  * Returns a value located at specified tuple and component.
  * This method is equivalent to DataArrayChar::getIJ() except that validity of
  * parameters is checked. So this method is safe but expensive if used to go through

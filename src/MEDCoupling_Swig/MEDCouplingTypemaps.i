@@ -2475,3 +2475,28 @@ ParaMEDMEM::MEDCouplingFieldDouble *ParaMEDMEM_MEDCouplingFieldDouble___rdiv__Im
       { throw INTERP_KERNEL::Exception(msg); }
     }
 }
+
+static ParaMEDMEM::DataArray *CheckAndRetrieveDataArrayInstance(PyObject *obj, const char *msg)
+{
+  void *aBasePtrVS=0;
+  int status=SWIG_ConvertPtr(obj,&aBasePtrVS,SWIGTYPE_p_ParaMEDMEM__DataArray,0|0);
+  if(!SWIG_IsOK(status))
+    {
+      status=SWIG_ConvertPtr(obj,&aBasePtrVS,SWIGTYPE_p_ParaMEDMEM__DataArrayDouble,0|0);
+      if(!SWIG_IsOK(status))
+        {
+          status=SWIG_ConvertPtr(obj,&aBasePtrVS,SWIGTYPE_p_ParaMEDMEM__DataArrayInt,0|0);
+          if(!SWIG_IsOK(status))
+            {
+              status=SWIG_ConvertPtr(obj,&aBasePtrVS,SWIGTYPE_p_ParaMEDMEM__DataArrayAsciiChar,0|0);
+              if(!SWIG_IsOK(status))
+                {
+                  status=SWIG_ConvertPtr(obj,&aBasePtrVS,SWIGTYPE_p_ParaMEDMEM__DataArrayByte,0|0);
+                  std::ostringstream oss; oss << msg << " ! Accepted instances are DataArrayDouble, DataArrayInt, DataArrayAsciiChar, DataArrayByte !";
+                  throw INTERP_KERNEL::Exception(oss.str().c_str());
+                }
+            }
+        }
+    }
+  return reinterpret_cast< ParaMEDMEM::DataArray * >(aBasePtrVS);
+}

@@ -138,6 +138,28 @@ namespace ParaMEDMEM
             self->renumberInPlaceR(da2->getConstPointer());
           }
       }
+
+      //tuplesSelec in PyObject * because DataArrayInt is not already existing !
+      virtual void setContigPartOfSelectedValues(int tupleIdStart, PyObject *aBase, PyObject *tuplesSelec) throw(INTERP_KERNEL::Exception)
+      {
+        static const char msg[]="DataArray::setContigPartOfSelectedValues2 : 4th parameter \"tuplesSelec\" should be of type DataArrayInt";
+          DataArray *a=CheckAndRetrieveDataArrayInstance(aBase,"DataArray::setContigPartOfSelectedValues2 : 3rd parameter \"aBase\" should be of type DataArray");
+        DataArray *tuplesSelecPtr=CheckAndRetrieveDataArrayInstance(tuplesSelec,msg);
+        DataArrayInt *tuplesSelecPtr2=0;
+        if(tuplesSelecPtr)
+          {
+            tuplesSelecPtr2=dynamic_cast<DataArrayInt *>(tuplesSelecPtr);
+            if(!tuplesSelecPtr2)
+              throw INTERP_KERNEL::Exception(msg);
+          }
+        self->setContigPartOfSelectedValues(tupleIdStart,a,tuplesSelecPtr2);
+      }
+      
+      virtual void setContigPartOfSelectedValues2(int tupleIdStart, PyObject *aBase, int bg, int end2, int step) throw(INTERP_KERNEL::Exception)
+      {
+        DataArray *a=CheckAndRetrieveDataArrayInstance(aBase,"DataArray::setContigPartOfSelectedValues2 : 2nd parameter \"aBase\" should be of type DataArray");
+        self->setContigPartOfSelectedValues2(tupleIdStart,a,bg,end2,step);
+      }
     }
   };
   
@@ -188,8 +210,6 @@ namespace ParaMEDMEM
     void setPartOfValues1(const DataArrayDouble *a, int bgTuples, int endTuples, int stepTuples, int bgComp, int endComp, int stepComp, bool strictCompoCompare=true) throw(INTERP_KERNEL::Exception);
     void setPartOfValuesSimple1(double a, int bgTuples, int endTuples, int stepTuples, int bgComp, int endComp, int stepComp) throw(INTERP_KERNEL::Exception);
     void setPartOfValuesAdv(const DataArrayDouble *a, const DataArrayInt *tuplesSelec) throw(INTERP_KERNEL::Exception);
-    void setContigPartOfSelectedValues(int tupleIdStart, const DataArrayDouble *a, const DataArrayInt *tuplesSelec) throw(INTERP_KERNEL::Exception);
-    void setContigPartOfSelectedValues2(int tupleIdStart, const DataArrayDouble *a, int bg, int end2, int step) throw(INTERP_KERNEL::Exception);
     double getIJ(int tupleId, int compoId) const;
     double back() const throw(INTERP_KERNEL::Exception);
     double getIJSafe(int tupleId, int compoId) const throw(INTERP_KERNEL::Exception);
@@ -2206,8 +2226,6 @@ namespace ParaMEDMEM
     void setPartOfValues1(const DataArrayInt *a, int bgTuples, int endTuples, int stepTuples, int bgComp, int endComp, int stepComp, bool strictCompoCompare=true) throw(INTERP_KERNEL::Exception);
     void setPartOfValuesSimple1(int a, int bgTuples, int endTuples, int stepTuples, int bgComp, int endComp, int stepComp) throw(INTERP_KERNEL::Exception);
     void setPartOfValuesAdv(const DataArrayInt *a, const DataArrayInt *tuplesSelec) throw(INTERP_KERNEL::Exception);
-    void setContigPartOfSelectedValues(int tupleIdStart, const DataArrayInt*a, const DataArrayInt *tuplesSelec) throw(INTERP_KERNEL::Exception);
-    void setContigPartOfSelectedValues2(int tupleIdStart, const DataArrayInt *a, int bg, int end2, int step) throw(INTERP_KERNEL::Exception);
     void getTuple(int tupleId, int *res) const throw(INTERP_KERNEL::Exception);
     int getIJ(int tupleId, int compoId) const throw(INTERP_KERNEL::Exception);
     int getIJSafe(int tupleId, int compoId) const throw(INTERP_KERNEL::Exception);
