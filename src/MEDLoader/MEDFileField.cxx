@@ -199,13 +199,12 @@ std::string MEDFileFieldLoc::repr() const
 void MEDFileFieldPerMeshPerTypePerDisc::assignFieldNoProfile(int& start, int offset, int nbOfCells, const MEDCouplingFieldDouble *field, const DataArray *arrr, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
 {
   _type=field->getTypeOfField();
-  const DataArrayDouble *da=static_cast<const DataArrayDouble *>(arrr);//tony a chier
   _start=start;
   switch(_type)
     {
     case ON_CELLS:
       {
-        getArrayDouble()->setContigPartOfSelectedValues2(_start,da,offset,offset+nbOfCells,1);
+        getArray()->setContigPartOfSelectedValues2(_start,arrr,offset,offset+nbOfCells,1);
         _end=_start+nbOfCells;
         _nval=nbOfCells;
         break;
@@ -214,7 +213,7 @@ void MEDFileFieldPerMeshPerTypePerDisc::assignFieldNoProfile(int& start, int off
       {
         MEDCouplingAutoRefCountObjectPtr<DataArrayInt> arr=field->getDiscretization()->getOffsetArr(field->getMesh());
         const int *arrPtr=arr->getConstPointer();
-        getArrayDouble()->setContigPartOfSelectedValues2(_start,da,arrPtr[offset],arrPtr[offset+nbOfCells],1);
+        getArray()->setContigPartOfSelectedValues2(_start,arrr,arrPtr[offset],arrPtr[offset+nbOfCells],1);
         _end=_start+(arrPtr[offset+nbOfCells]-arrPtr[offset]);
         _nval=nbOfCells;
         break;
@@ -252,7 +251,7 @@ void MEDFileFieldPerMeshPerTypePerDisc::assignFieldNoProfile(int& start, int off
           }
         std::ostringstream oss2; oss2 << "Loc_" << getName() << "_" << INTERP_KERNEL::CellModel::GetCellModel(getGeoType()).getRepr() << "_" << _loc_id;
         _localization=oss2.str();
-        getArrayDouble()->setContigPartOfSelectedValues(_start,da,da4);
+        getArray()->setContigPartOfSelectedValues(_start,arrr,da4);
         _end=_start+_nval*nbi;
         glob.appendLoc(_localization.c_str(),getGeoType(),gsLoc.getRefCoords(),gsLoc.getGaussCoords(),gsLoc.getWeights());
         break;
@@ -290,21 +289,20 @@ void MEDFileFieldPerMeshPerTypePerDisc::assignFieldProfile(int& start, const Dat
           _profile=oss.str();
         }
     }
-  const DataArrayDouble *da=static_cast<const DataArrayDouble *>(arrr);//tony a chier
   _start=start;
   switch(_type)
     {
     case ON_NODES:
       {
          _nval=idsInPfl->getNumberOfTuples();
-         getArrayDouble()->setContigPartOfSelectedValues2(_start,da,0,da->getNumberOfTuples(),1);
+         getArray()->setContigPartOfSelectedValues2(_start,arrr,0,arrr->getNumberOfTuples(),1);
          _end=_start+_nval;
          break;
       }
     case ON_CELLS:
       {
         _nval=idsInPfl->getNumberOfTuples();
-        getArrayDouble()->setContigPartOfSelectedValues(_start,da,idsInPfl);
+        getArray()->setContigPartOfSelectedValues(_start,arrr,idsInPfl);
         _end=_start+_nval;
         break;
       }
@@ -317,7 +315,7 @@ void MEDFileFieldPerMeshPerTypePerDisc::assignFieldProfile(int& start, const Dat
         MEDCouplingAutoRefCountObjectPtr<DataArrayInt> tmp=idsInPfl->buildExplicitArrByRanges(arr3);
         int trueNval=tmp->getNumberOfTuples();
         _nval=idsInPfl->getNumberOfTuples();
-        getArrayDouble()->setContigPartOfSelectedValues(_start,da,tmp);
+        getArray()->setContigPartOfSelectedValues(_start,arrr,tmp);
         _end=_start+trueNval;
         break;
       }
@@ -346,7 +344,7 @@ void MEDFileFieldPerMeshPerTypePerDisc::assignFieldProfile(int& start, const Dat
             *tmpPtr++=j;
         //
         _nval=da4->getNumberOfTuples();
-        getArrayDouble()->setContigPartOfSelectedValues(_start,da,tmp);
+        getArray()->setContigPartOfSelectedValues(_start,arrr,tmp);
         _end=_start+trueNval;
         oss << "_loc_" << _loc_id;
         if(locIds)
@@ -377,10 +375,10 @@ void MEDFileFieldPerMeshPerTypePerDisc::assignFieldProfile(int& start, const Dat
 }
 
 void MEDFileFieldPerMeshPerTypePerDisc::assignNodeFieldNoProfile(int& start, const MEDCouplingFieldDouble *field, const DataArray *arrr, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
-{//tony a chier
+{
   _start=start;
   _nval=arrr->getNumberOfTuples();
-  getArrayDouble()->setContigPartOfSelectedValues2(_start,static_cast<const DataArrayDouble *>(arrr),0,_nval,1);
+  getArray()->setContigPartOfSelectedValues2(_start,arrr,0,_nval,1);
   _end=_start+_nval;
   start=_end;
 }
@@ -2168,7 +2166,7 @@ MEDCouplingFieldDouble *MEDFileFieldPerMesh::finishField(TypeOfField type, const
   isPfl=false;
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=MEDCouplingFieldDouble::New(type,ONE_TIME);
   ret->setMesh(mesh); ret->setName(getName().c_str()); ret->setTime(getTime(),getIteration(),getOrder()); ret->setTimeUnit(getDtUnit().c_str());
-  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> da=getArrayDouble()->selectByTupleRanges(dads);//tony a chier
+  MEDCouplingAutoRefCountObjectPtr<DataArray> da=getArray()->selectByTupleRanges(dads);
   const std::vector<std::string>& infos=getInfo();
   da->setInfoOnComponents(infos);
   da->setName("");
@@ -2189,7 +2187,7 @@ MEDCouplingFieldDouble *MEDFileFieldPerMesh::finishField(TypeOfField type, const
           offset+=nbOfElems;
         }
     }
-  arrOut=(DataArrayDouble *)da; da->incrRef();
+  arrOut=da;
   return ret.retn();
 }
 
@@ -2298,7 +2296,7 @@ DataArray *MEDFileFieldPerMesh::finishField4(const std::vector<std::pair<int,int
       pflOut->incrRef();
     }
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> safePfl(pflOut);
-  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> da=getArrayDouble()->selectByTupleRanges(dads);//tony a chier
+  MEDCouplingAutoRefCountObjectPtr<DataArray> da=getArray()->selectByTupleRanges(dads);
   const std::vector<std::string>& infos=getInfo();
   int nbOfComp=infos.size();
   for(int i=0;i<nbOfComp;i++)
@@ -3914,11 +3912,11 @@ int MEDFileAnyTypeField1TSWithoutSDA::copyTinyInfoFrom(const MEDCouplingFieldDou
     {
       int oldNbOfTuples=getOrCreateAndGetArray()->getNumberOfTuples();
       int newNbOfTuples=oldNbOfTuples+arr->getNumberOfTuples();
-      MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> tmp=DataArrayDouble::New();
+      MEDCouplingAutoRefCountObjectPtr<DataArray> tmp=createNewEmptyDataArrayInstance();
       tmp->alloc(newNbOfTuples,nbOfComponents);
       tmp->copyStringInfoFrom(*getOrCreateAndGetArray());
-      DataArray *arrr=getOrCreateAndGetArray(); DataArrayDouble *_arr=static_cast<DataArrayDouble *>(arrr);//tony a chier
-      std::copy(_arr->begin(),_arr->end(),tmp->getPointer());
+      DataArray *arrr=getOrCreateAndGetArray();      
+      tmp->setContigPartOfSelectedValues2(0,arrr,0,oldNbOfTuples,1);
       setArray(tmp);
       return oldNbOfTuples;
     }
@@ -4460,6 +4458,11 @@ void MEDFileField1TSWithoutSDA::setArray(DataArray *arr) throw(INTERP_KERNEL::Ex
   _arr=arrC;
 }
 
+DataArray *MEDFileField1TSWithoutSDA::createNewEmptyDataArrayInstance() const
+{
+  return DataArrayDouble::New();
+}
+
 DataArrayDouble *MEDFileField1TSWithoutSDA::getOrCreateAndGetArrayDouble()
 {
   DataArrayDouble *ret=_arr;
@@ -4624,6 +4627,11 @@ void MEDFileIntField1TSWithoutSDA::setArray(DataArray *arr) throw(INTERP_KERNEL:
   if(!arrC)
     throw INTERP_KERNEL::Exception("MEDFileIntField1TSWithoutSDA::setArray : the input not null array is not of type DataArrayInt !");
   _arr=arrC;
+}
+
+DataArray *MEDFileIntField1TSWithoutSDA::createNewEmptyDataArrayInstance() const
+{
+  return DataArrayInt::New();
 }
 
 DataArrayInt *MEDFileIntField1TSWithoutSDA::getOrCreateAndGetArrayInt()
@@ -6682,7 +6690,11 @@ MEDFileAnyTypeFieldMultiTSWithoutSDA *MEDFileFieldMultiTSWithoutSDA::shallowCpy(
  */
 std::vector< std::vector<DataArrayDouble *> > MEDFileFieldMultiTSWithoutSDA::getFieldSplitedByType2(int iteration, int order, const char *mname, std::vector<INTERP_KERNEL::NormalizedCellType>& types, std::vector< std::vector<TypeOfField> >& typesF, std::vector< std::vector<std::string> >& pfls, std::vector< std::vector<std::string> >& locs) const throw(INTERP_KERNEL::Exception)
 {
-  return (static_cast<const MEDFileField1TSWithoutSDA&>(getTimeStepEntry(iteration,order))).getFieldSplitedByType2(mname,types,typesF,pfls,locs);// tony
+  const MEDFileAnyTypeField1TSWithoutSDA& myF1TS=getTimeStepEntry(iteration,order);
+  const MEDFileField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileField1TSWithoutSDA *>(&myF1TS);
+  if(!myF1TSC)
+    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTSWithoutSDA::getFieldSplitedByType2 : mismatch of type of field expecting FLOAT64 !");
+  return myF1TSC->getFieldSplitedByType2(mname,types,typesF,pfls,locs);
 }
 
 MEDFileAnyTypeFieldMultiTS::MEDFileAnyTypeFieldMultiTS()
@@ -7194,7 +7206,7 @@ MEDFileAnyTypeField1TS *MEDFileFieldMultiTS::getTimeStepAtPos(int pos) const thr
       return ret.retn();
     }
   std::ostringstream oss; oss << "MEDFileFieldMultiTS::getTimeStepAtPos : type of field at pos #" << pos << " is not FLOAT64 !";
-  throw INTERP_KERNEL::Exception(oss.str().c_str());//tony
+  throw INTERP_KERNEL::Exception(oss.str().c_str());
 }
 
 MEDFileFieldMultiTSIterator *MEDFileFieldMultiTS::iterator() throw(INTERP_KERNEL::Exception)
@@ -7227,7 +7239,7 @@ MEDFileFieldMultiTSIterator *MEDFileFieldMultiTS::iterator() throw(INTERP_KERNEL
 MEDCouplingFieldDouble *MEDFileFieldMultiTS::getFieldAtLevel(TypeOfField type, int iteration, int order, int meshDimRelToMax, int renumPol) const throw(INTERP_KERNEL::Exception)
 {
   const MEDFileAnyTypeField1TSWithoutSDA& myF1TS=contentNotNullBase()->getTimeStepEntry(iteration,order);
-  const MEDFileField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileField1TSWithoutSDA *>(&myF1TS);//tony
+  const MEDFileField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileField1TSWithoutSDA *>(&myF1TS);
   if(!myF1TSC)
     throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldAtLevel : mismatch of type of field expecting FLOAT64 !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> arrOut;
@@ -7259,7 +7271,7 @@ MEDCouplingFieldDouble *MEDFileFieldMultiTS::getFieldAtLevel(TypeOfField type, i
 MEDCouplingFieldDouble *MEDFileFieldMultiTS::getFieldAtTopLevel(TypeOfField type, int iteration, int order, int renumPol) const throw(INTERP_KERNEL::Exception)
 {
   const MEDFileAnyTypeField1TSWithoutSDA& myF1TS=contentNotNullBase()->getTimeStepEntry(iteration,order);
-  const MEDFileField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileField1TSWithoutSDA *>(&myF1TS);//tony
+  const MEDFileField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileField1TSWithoutSDA *>(&myF1TS);
   if(!myF1TSC)
     throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldAtTopLevel : mismatch of type of field !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> arrOut;
@@ -7293,7 +7305,7 @@ MEDCouplingFieldDouble *MEDFileFieldMultiTS::getFieldAtTopLevel(TypeOfField type
 MEDCouplingFieldDouble *MEDFileFieldMultiTS::getFieldOnMeshAtLevel(TypeOfField type, int iteration, int order, int meshDimRelToMax, const MEDFileMesh *mesh, int renumPol) const throw(INTERP_KERNEL::Exception)
 {
   const MEDFileAnyTypeField1TSWithoutSDA& myF1TS=contentNotNullBase()->getTimeStepEntry(iteration,order);
-  const MEDFileField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileField1TSWithoutSDA *>(&myF1TS);//tony
+  const MEDFileField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileField1TSWithoutSDA *>(&myF1TS);
   if(!myF1TSC)
     throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldOnMeshAtLevel : mismatch of type of field !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> arrOut;
@@ -7325,7 +7337,7 @@ MEDCouplingFieldDouble *MEDFileFieldMultiTS::getFieldOnMeshAtLevel(TypeOfField t
 MEDCouplingFieldDouble *MEDFileFieldMultiTS::getFieldOnMeshAtLevel(TypeOfField type, int iteration, int order, const MEDCouplingMesh *mesh, int renumPol) const throw(INTERP_KERNEL::Exception)
 {
   const MEDFileAnyTypeField1TSWithoutSDA& myF1TS=contentNotNullBase()->getTimeStepEntry(iteration,order);
-  const MEDFileField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileField1TSWithoutSDA *>(&myF1TS);//tony
+  const MEDFileField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileField1TSWithoutSDA *>(&myF1TS);
   if(!myF1TSC)
     throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldOnMeshAtLevel : mismatch of type of field !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> arrOut;
@@ -7342,7 +7354,7 @@ MEDCouplingFieldDouble *MEDFileFieldMultiTS::getFieldOnMeshAtLevel(TypeOfField t
 MEDCouplingFieldDouble *MEDFileFieldMultiTS::getFieldAtLevelOld(TypeOfField type, const char *mname, int iteration, int order, int meshDimRelToMax, int renumPol) const throw(INTERP_KERNEL::Exception)
 {
   const MEDFileAnyTypeField1TSWithoutSDA& myF1TS=contentNotNullBase()->getTimeStepEntry(iteration,order);
-  const MEDFileField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileField1TSWithoutSDA *>(&myF1TS);//tony
+  const MEDFileField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileField1TSWithoutSDA *>(&myF1TS);
   if(!myF1TSC)
     throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldAtLevelOld : mismatch of type of field !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> arrOut;
@@ -7374,7 +7386,7 @@ MEDCouplingFieldDouble *MEDFileFieldMultiTS::getFieldAtLevelOld(TypeOfField type
 DataArrayDouble *MEDFileFieldMultiTS::getFieldWithProfile(TypeOfField type, int iteration, int order, int meshDimRelToMax, const MEDFileMesh *mesh, DataArrayInt *&pfl) const throw(INTERP_KERNEL::Exception)
 {
   const MEDFileAnyTypeField1TSWithoutSDA& myF1TS=contentNotNullBase()->getTimeStepEntry(iteration,order);
-  const MEDFileField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileField1TSWithoutSDA *>(&myF1TS);//tony
+  const MEDFileField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileField1TSWithoutSDA *>(&myF1TS);
   if(!myF1TSC)
     throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldWithProfile : mismatch of type of field !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> ret=myF1TSC->getFieldWithProfile(type,meshDimRelToMax,mesh,pfl,this);
@@ -7610,7 +7622,7 @@ MEDFileAnyTypeFieldMultiTS *MEDFileIntFieldMultiTS::shallowCpy() const throw(INT
 MEDCouplingFieldDouble *MEDFileIntFieldMultiTS::getFieldAtLevel(TypeOfField type, int iteration, int order, int meshDimRelToMax, DataArrayInt* &arrOut, int renumPol) const throw(INTERP_KERNEL::Exception)
 {
   const MEDFileAnyTypeField1TSWithoutSDA& myF1TS=contentNotNullBase()->getTimeStepEntry(iteration,order);
-  const MEDFileIntField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(&myF1TS);//tony
+  const MEDFileIntField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(&myF1TS);
   if(!myF1TSC)
     throw INTERP_KERNEL::Exception("MEDFileIntFieldMultiTS::getFieldAtLevel : mismatch of type of field expecting INT32 !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> arr;
@@ -7643,9 +7655,9 @@ MEDCouplingFieldDouble *MEDFileIntFieldMultiTS::getFieldAtLevel(TypeOfField type
 MEDCouplingFieldDouble *MEDFileIntFieldMultiTS::getFieldAtTopLevel(TypeOfField type, int iteration, int order, DataArrayInt* &arrOut, int renumPol) const throw(INTERP_KERNEL::Exception)
 {
   const MEDFileAnyTypeField1TSWithoutSDA& myF1TS=contentNotNullBase()->getTimeStepEntry(iteration,order);
-  const MEDFileIntField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(&myF1TS);//tony
+  const MEDFileIntField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(&myF1TS);
   if(!myF1TSC)
-    throw INTERP_KERNEL::Exception("MEDFileIntFieldMultiTS::getFieldAtTopLevel : mismatch of type of field !");
+    throw INTERP_KERNEL::Exception("MEDFileIntFieldMultiTS::getFieldAtTopLevel : mismatch of type of field ! INT32 expected !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> arr;
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=myF1TSC->getFieldAtTopLevel(type,0,renumPol,this,arr);
   arrOut=MEDFileIntField1TS::ReturnSafelyDataArrayInt(arr);
@@ -7678,9 +7690,9 @@ MEDCouplingFieldDouble *MEDFileIntFieldMultiTS::getFieldAtTopLevel(TypeOfField t
 MEDCouplingFieldDouble *MEDFileIntFieldMultiTS::getFieldOnMeshAtLevel(TypeOfField type, int iteration, int order, int meshDimRelToMax, const MEDFileMesh *mesh, DataArrayInt* &arrOut, int renumPol) const throw(INTERP_KERNEL::Exception)
 {
   const MEDFileAnyTypeField1TSWithoutSDA& myF1TS=contentNotNullBase()->getTimeStepEntry(iteration,order);
-  const MEDFileIntField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(&myF1TS);//tony
+  const MEDFileIntField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(&myF1TS);
   if(!myF1TSC)
-    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldOnMeshAtLevel : mismatch of type of field !");
+    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldOnMeshAtLevel : mismatch of type of field ! INT32 expected !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> arr;
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=myF1TSC->getFieldOnMeshAtLevel(type,meshDimRelToMax,renumPol,this,mesh,arr);
   arrOut=MEDFileIntField1TS::ReturnSafelyDataArrayInt(arr);
@@ -7711,9 +7723,9 @@ MEDCouplingFieldDouble *MEDFileIntFieldMultiTS::getFieldOnMeshAtLevel(TypeOfFiel
 MEDCouplingFieldDouble *MEDFileIntFieldMultiTS::getFieldOnMeshAtLevel(TypeOfField type, int iteration, int order, const MEDCouplingMesh *mesh, DataArrayInt* &arrOut, int renumPol) const throw(INTERP_KERNEL::Exception)
 {
   const MEDFileAnyTypeField1TSWithoutSDA& myF1TS=contentNotNullBase()->getTimeStepEntry(iteration,order);
-  const MEDFileIntField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(&myF1TS);//tony
+  const MEDFileIntField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(&myF1TS);
   if(!myF1TSC)
-    throw INTERP_KERNEL::Exception("MEDFileFieldIntMultiTS::getFieldOnMeshAtLevel : mismatch of type of field !");
+    throw INTERP_KERNEL::Exception("MEDFileFieldIntMultiTS::getFieldOnMeshAtLevel : mismatch of type of field ! INT32 expected !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> arr;
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=myF1TSC->getFieldOnMeshAtLevel(type,renumPol,this,mesh,0,0,arr);
   arrOut=MEDFileIntField1TS::ReturnSafelyDataArrayInt(arr);
@@ -7728,9 +7740,9 @@ MEDCouplingFieldDouble *MEDFileIntFieldMultiTS::getFieldOnMeshAtLevel(TypeOfFiel
 MEDCouplingFieldDouble *MEDFileIntFieldMultiTS::getFieldAtLevelOld(TypeOfField type, int iteration, int order, const char *mname, int meshDimRelToMax, DataArrayInt* &arrOut, int renumPol) const throw(INTERP_KERNEL::Exception)
 {
   const MEDFileAnyTypeField1TSWithoutSDA& myF1TS=contentNotNullBase()->getTimeStepEntry(iteration,order);
-  const MEDFileIntField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(&myF1TS);//tony
+  const MEDFileIntField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(&myF1TS);
   if(!myF1TSC)
-    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldOnMeshAtLevel : mismatch of type of field !");
+    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldOnMeshAtLevel : mismatch of type of field ! INT32 expected !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> arr;
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=myF1TSC->getFieldAtLevel(type,meshDimRelToMax,mname,renumPol,this,arr);
   arrOut=MEDFileIntField1TS::ReturnSafelyDataArrayInt(arr);
@@ -7760,9 +7772,9 @@ MEDCouplingFieldDouble *MEDFileIntFieldMultiTS::getFieldAtLevelOld(TypeOfField t
 DataArrayInt *MEDFileIntFieldMultiTS::getFieldWithProfile(TypeOfField type, int iteration, int order, int meshDimRelToMax, const MEDFileMesh *mesh, DataArrayInt *&pfl) const throw(INTERP_KERNEL::Exception)
 {
   const MEDFileAnyTypeField1TSWithoutSDA& myF1TS=contentNotNullBase()->getTimeStepEntry(iteration,order);
-  const MEDFileIntField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(&myF1TS);//tony
+  const MEDFileIntField1TSWithoutSDA *myF1TSC=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(&myF1TS);
   if(!myF1TSC)
-    throw INTERP_KERNEL::Exception("MEDFileIntFieldMultiTS::getFieldWithProfile : mismatch of type of field !");
+    throw INTERP_KERNEL::Exception("MEDFileIntFieldMultiTS::getFieldWithProfile : mismatch of type of field ! INT32 expected !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> ret=myF1TSC->getFieldWithProfile(type,meshDimRelToMax,mesh,pfl,this);
   return MEDFileIntField1TS::ReturnSafelyDataArrayInt(ret);
 }
@@ -7790,7 +7802,7 @@ MEDFileAnyTypeField1TS *MEDFileIntFieldMultiTS::getTimeStepAtPos(int pos) const 
       return ret.retn();
     }
   std::ostringstream oss; oss << "MEDFileIntFieldMultiTS::getTimeStepAtPos : type of field at pos #" << pos << " is not INT32 !";
-  throw INTERP_KERNEL::Exception(oss.str().c_str());//tony
+  throw INTERP_KERNEL::Exception(oss.str().c_str());
 }
 
 /*!
@@ -8194,13 +8206,18 @@ MEDFileAnyTypeFieldMultiTS *MEDFileFields::getFieldAtPos(int i) const throw(INTE
   const MEDFileAnyTypeFieldMultiTSWithoutSDA *fmts=_fields[i];
   if(!fmts)
     return 0;
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTS> ret;
   const MEDFileFieldMultiTSWithoutSDA *fmtsC=dynamic_cast<const MEDFileFieldMultiTSWithoutSDA *>(fmts);
-  if(!fmtsC)
+  const MEDFileIntFieldMultiTSWithoutSDA *fmtsC2=dynamic_cast<const MEDFileIntFieldMultiTSWithoutSDA *>(fmts);
+  if(fmtsC)
+    ret=MEDFileFieldMultiTS::New(*fmtsC,false);
+  else if(fmtsC2)
+    ret=MEDFileIntFieldMultiTS::New(*fmtsC2,false);
+  else
     {
-      std::ostringstream oss; oss << "MEDFileFields::getFieldAtPos : At pos #" << i << " field is not double !";
+      std::ostringstream oss; oss << "MEDFileFields::getFieldAtPos : At pos #" << i << " field is neither double (FLOAT64) nor integer (INT32) !";
       throw INTERP_KERNEL::Exception(oss.str().c_str());
     }
-  MEDCouplingAutoRefCountObjectPtr<MEDFileFieldMultiTS> ret=MEDFileFieldMultiTS::New(*fmtsC,false);//tony
   ret->shallowCpyGlobs(*this);
   return ret.retn();
 }

@@ -171,8 +171,12 @@ using namespace ParaMEDMEM;
 %feature("unref") MEDFileMeshMultiTS "$this->decrRef();"
 %feature("unref") MEDFileMeshes "$this->decrRef();"
 %feature("unref") MEDFileFieldLoc "$this->decrRef();"
+%feature("unref") MEDFileAnyTypeField1TS "$this->decrRef();"
 %feature("unref") MEDFileField1TS "$this->decrRef();"
+%feature("unref") MEDFileIntField1TS "$this->decrRef();"
+%feature("unref") MEDFileAnyTypeFieldMultiTS "$this->decrRef();"
 %feature("unref") MEDFileFieldMultiTS "$this->decrRef();"
+%feature("unref") MEDFileIntFieldMultiTS "$this->decrRef();"
 %feature("unref") MEDFileFields "$this->decrRef();"
 %feature("unref") MEDFileParameter1TS "$this->decrRef();"
 %feature("unref") MEDFileParameterDouble1TSWTI "$this->decrRef();"
@@ -1322,6 +1326,66 @@ namespace ParaMEDMEM
         return MEDFileIntField1TS::New(fileName,fieldName,iteration,order);
       }
 
+      PyObject *getFieldAtLevel(TypeOfField type, int meshDimRelToMax, int renumPol=0) const throw(INTERP_KERNEL::Exception)
+      {
+        DataArrayInt *ret1=0;
+        MEDCouplingFieldDouble *ret0=self->getFieldAtLevel(type,meshDimRelToMax,ret1,renumPol);
+        PyObject *ret=PyTuple_New(2);
+        PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble, SWIG_POINTER_OWN | 0 ));
+        PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+        return ret;
+      }
+
+      PyObject *getFieldAtTopLevel(TypeOfField type, int renumPol=0) const throw(INTERP_KERNEL::Exception)
+      {
+        DataArrayInt *ret1=0;
+        MEDCouplingFieldDouble *ret0=self->getFieldAtTopLevel(type,ret1,renumPol);
+        PyObject *ret=PyTuple_New(2);
+        PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble, SWIG_POINTER_OWN | 0 ));
+        PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+        return ret;
+      }
+
+      PyObject *getFieldOnMeshAtLevel(TypeOfField type, int meshDimRelToMax, const MEDFileMesh *mesh, int renumPol=0) const throw(INTERP_KERNEL::Exception)
+      {
+        DataArrayInt *ret1=0;
+        MEDCouplingFieldDouble *ret0=self->getFieldOnMeshAtLevel(type,meshDimRelToMax,mesh,ret1,renumPol);
+        PyObject *ret=PyTuple_New(2);
+        PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble, SWIG_POINTER_OWN | 0 ));
+        PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+        return ret;
+      }
+      
+      PyObject *getFieldOnMeshAtLevel(TypeOfField type, const MEDCouplingMesh *mesh, int renumPol=0) const throw(INTERP_KERNEL::Exception)
+      {
+        DataArrayInt *ret1=0;
+        MEDCouplingFieldDouble *ret0=self->getFieldOnMeshAtLevel(type,mesh,ret1,renumPol);
+        PyObject *ret=PyTuple_New(2);
+        PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble, SWIG_POINTER_OWN | 0 ));
+        PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+        return ret;
+      }
+      
+      PyObject *getFieldAtLevelOld(TypeOfField type, const char *mname, int meshDimRelToMax, int renumPol=0) const throw(INTERP_KERNEL::Exception)
+      {
+        DataArrayInt *ret1=0;
+        MEDCouplingFieldDouble *ret0=self->getFieldAtLevelOld(type,mname,meshDimRelToMax,ret1,renumPol);
+        PyObject *ret=PyTuple_New(2);
+        PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble, SWIG_POINTER_OWN | 0 ));
+        PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+        return ret;
+      }
+
+      PyObject *getFieldWithProfile(TypeOfField type, int meshDimRelToMax, const MEDFileMesh *mesh) const throw(INTERP_KERNEL::Exception)
+      {
+         DataArrayInt *ret1=0;
+         DataArrayInt *ret0=self->getFieldWithProfile(type,meshDimRelToMax,mesh,ret1);
+         PyObject *ret=PyTuple_New(2);
+         PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+         PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+         return ret;
+      }
+      
       DataArrayInt *getUndergroundDataArray() const throw(INTERP_KERNEL::Exception)
       {
         DataArrayInt *ret=self->getUndergroundDataArray();
@@ -1772,6 +1836,66 @@ namespace ParaMEDMEM
       MEDFileIntFieldMultiTS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
       {
         return MEDFileIntFieldMultiTS::New(fileName,fieldName);
+      }
+
+      PyObject *getFieldAtLevel(TypeOfField type, int iteration, int order, int meshDimRelToMax, int renumPol=0) const throw(INTERP_KERNEL::Exception)
+      {
+        DataArrayInt *ret1=0;
+        MEDCouplingFieldDouble *ret0=self->getFieldAtLevel(type,iteration,order,meshDimRelToMax,ret1,renumPol);
+        PyObject *ret=PyTuple_New(2);
+        PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble, SWIG_POINTER_OWN | 0 ));
+        PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+        return ret;
+      }
+
+      PyObject *getFieldAtTopLevel(TypeOfField type, int iteration, int order, int renumPol=0) const throw(INTERP_KERNEL::Exception)
+      {
+        DataArrayInt *ret1=0;
+        MEDCouplingFieldDouble *ret0=self->getFieldAtTopLevel(type,iteration,order,ret1,renumPol);
+        PyObject *ret=PyTuple_New(2);
+        PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble, SWIG_POINTER_OWN | 0 ));
+        PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+        return ret;
+      }
+
+      PyObject *getFieldOnMeshAtLevel(TypeOfField type, int iteration, int order, int meshDimRelToMax, const MEDFileMesh *mesh, int renumPol=0) const throw(INTERP_KERNEL::Exception)
+      {
+        DataArrayInt *ret1=0;
+        MEDCouplingFieldDouble *ret0=self->getFieldOnMeshAtLevel(type,iteration,order,meshDimRelToMax,mesh,ret1,renumPol);
+        PyObject *ret=PyTuple_New(2);
+        PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble, SWIG_POINTER_OWN | 0 ));
+        PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+        return ret;
+      }
+      
+      PyObject *getFieldOnMeshAtLevel(TypeOfField type, int iteration, int order, const MEDCouplingMesh *mesh, int renumPol=0) const throw(INTERP_KERNEL::Exception)
+      {
+        DataArrayInt *ret1=0;
+        MEDCouplingFieldDouble *ret0=self->getFieldOnMeshAtLevel(type,iteration,order,mesh,ret1,renumPol);
+        PyObject *ret=PyTuple_New(2);
+        PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble, SWIG_POINTER_OWN | 0 ));
+        PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+        return ret;
+      }
+      
+      PyObject *getFieldAtLevelOld(TypeOfField type, int iteration, int order, const char *mname, int meshDimRelToMax, int renumPol=0) const throw(INTERP_KERNEL::Exception)
+      {
+        DataArrayInt *ret1=0;
+        MEDCouplingFieldDouble *ret0=self->getFieldAtLevelOld(type,iteration,order,mname,meshDimRelToMax,ret1,renumPol);
+        PyObject *ret=PyTuple_New(2);
+        PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDouble, SWIG_POINTER_OWN | 0 ));
+        PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+        return ret;
+      }
+
+      PyObject *getFieldWithProfile(TypeOfField type, int iteration, int order, int meshDimRelToMax, const MEDFileMesh *mesh) const throw(INTERP_KERNEL::Exception)
+      {
+         DataArrayInt *ret1=0;
+         DataArrayInt *ret0=self->getFieldWithProfile(type,iteration,order,meshDimRelToMax,mesh,ret1);
+         PyObject *ret=PyTuple_New(2);
+         PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(ret0),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+         PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(ret1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+         return ret;
       }
 
       DataArrayInt *getUndergroundDataArray(int iteration, int order) const throw(INTERP_KERNEL::Exception)

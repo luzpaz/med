@@ -471,6 +471,7 @@ namespace ParaMEDMEM
     virtual DataArray *getUndergroundDataArray() const throw(INTERP_KERNEL::Exception) = 0;
     virtual DataArray *getUndergroundDataArrayExt(std::vector< std::pair<std::pair<INTERP_KERNEL::NormalizedCellType,int>,std::pair<int,int> > >& entries) const throw(INTERP_KERNEL::Exception) = 0;
     virtual void setArray(DataArray *arr) throw(INTERP_KERNEL::Exception) = 0;
+    virtual DataArray *createNewEmptyDataArrayInstance() const = 0;
     virtual DataArray *getOrCreateAndGetArray() = 0;
     virtual const DataArray *getOrCreateAndGetArray() const = 0; 
   public:
@@ -519,6 +520,7 @@ namespace ParaMEDMEM
     MEDFileAnyTypeField1TSWithoutSDA *shallowCpy() const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeField1TSWithoutSDA *deepCpy() const throw(INTERP_KERNEL::Exception);
     void setArray(DataArray *arr) throw(INTERP_KERNEL::Exception);
+    DataArray *createNewEmptyDataArrayInstance() const;
     DataArray *getOrCreateAndGetArray();
     const DataArray *getOrCreateAndGetArray() const;
     DataArrayDouble *getOrCreateAndGetArrayDouble();
@@ -541,6 +543,7 @@ namespace ParaMEDMEM
     DataArray *getUndergroundDataArray() const throw(INTERP_KERNEL::Exception);
     DataArray *getUndergroundDataArrayExt(std::vector< std::pair<std::pair<INTERP_KERNEL::NormalizedCellType,int>,std::pair<int,int> > >& entries) const throw(INTERP_KERNEL::Exception);
     void setArray(DataArray *arr) throw(INTERP_KERNEL::Exception);
+    DataArray *createNewEmptyDataArrayInstance() const;
     DataArray *getOrCreateAndGetArray();
     const DataArray *getOrCreateAndGetArray() const;
     DataArrayInt *getOrCreateAndGetArrayInt();
