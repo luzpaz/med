@@ -5411,6 +5411,18 @@ MEDFileField1TSWithoutSDA *MEDFileField1TS::contentNotNull() throw(INTERP_KERNEL
   return ret;
 }
 
+void MEDFileField1TS::SetDataArrayDoubleInField(MEDCouplingFieldDouble *f, MEDCouplingAutoRefCountObjectPtr<DataArray>& arr) throw(INTERP_KERNEL::Exception)
+{
+  if(!f)
+    throw INTERP_KERNEL::Exception("MEDFileField1TS::SetDataArrayDoubleInField : input field is NULL !");
+  if(!((DataArray*)arr))
+    throw INTERP_KERNEL::Exception("MEDFileField1TS::SetDataArrayDoubleInField : no array !");
+  DataArrayDouble *arrOutC=dynamic_cast<DataArrayDouble *>((DataArray*)arr);
+  if(!arrOutC)
+    throw INTERP_KERNEL::Exception("MEDFileField1TS::SetDataArrayDoubleInField : mismatch between dataArrays type and MEDFileField1TS ! Expected double !");
+  f->setArray(arrOutC);
+}
+
 MEDFileField1TS::MEDFileField1TS(const char *fileName) throw(INTERP_KERNEL::Exception)
 try:MEDFileAnyTypeField1TS(fileName)
 {
@@ -5476,12 +5488,7 @@ MEDCouplingFieldDouble *MEDFileField1TS::getFieldAtLevel(TypeOfField type, int m
     throw INTERP_KERNEL::Exception("MEDFileField1TS::getFieldAtLevel : Request for a method that can be used for instances coming from file loading ! Use getFieldOnMeshAtLevel method instead !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> arrOut;
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=contentNotNull()->getFieldAtLevel(type,meshDimRelToMax,0,renumPol,this,arrOut);
-  if(!((DataArray*)arrOut))
-    throw INTERP_KERNEL::Exception("MEDFileField1TS::getFieldAtLevel : no array !");
-  DataArrayDouble *arrOutC=dynamic_cast<DataArrayDouble *>((DataArray*)arrOut);
-  if(!arrOutC)
-    throw INTERP_KERNEL::Exception("MEDFileField1TS::getFieldAtLevel : mismatch between dataArrays type and MEDFileField1TS ! Expected double !");
-  ret->setArray(arrOutC);
+  MEDFileField1TS::SetDataArrayDoubleInField(ret,arrOut);
   return ret.retn();
 }
 /*!
@@ -5512,12 +5519,7 @@ MEDCouplingFieldDouble *MEDFileField1TS::getFieldAtTopLevel(TypeOfField type, in
     throw INTERP_KERNEL::Exception("MEDFileField1TS::getFieldAtTopLevel : Request for a method that can be used for instances coming from file loading ! Use getFieldOnMeshAtTopLevel method instead !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> arrOut;
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=contentNotNull()->getFieldAtTopLevel(type,0,renumPol,this,arrOut);
-  if(!((DataArray *)arrOut))
-    throw INTERP_KERNEL::Exception("MEDFileField1TS::getFieldAtLevel : no array !");
-  DataArrayDouble *arrOutC=dynamic_cast<DataArrayDouble *>((DataArray *)arrOut);
-  if(!arrOutC)
-    throw INTERP_KERNEL::Exception("MEDFileField1TS::getFieldAtTopLevel : mismatch between dataArrays type and MEDFileField1TS ! Expected double !");
-  ret->setArray(arrOutC);
+  MEDFileField1TS::SetDataArrayDoubleInField(ret,arrOut);
   return ret.retn();
 }
 
@@ -5546,12 +5548,7 @@ MEDCouplingFieldDouble *MEDFileField1TS::getFieldOnMeshAtLevel(TypeOfField type,
 {
   MEDCouplingAutoRefCountObjectPtr<DataArray> arrOut;
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=contentNotNull()->getFieldOnMeshAtLevel(type,renumPol,this,mesh,0,0,arrOut);
-  if(!((DataArray *)arrOut))
-    throw INTERP_KERNEL::Exception("MEDFileField1TS::getFieldOnMeshAtLevel : no array !");
-  DataArrayDouble *arrOutC=dynamic_cast<DataArrayDouble *>((DataArray *)arrOut);
-  if(!arrOutC)
-    throw INTERP_KERNEL::Exception("MEDFileField1TS::getFieldOnMeshAtLevel : mismatch between dataArrays type and MEDFileField1TS ! Expected double !");
-  ret->setArray(arrOutC);
+  MEDFileField1TS::SetDataArrayDoubleInField(ret,arrOut);
   return ret.retn();
 }
 
@@ -5580,12 +5577,7 @@ MEDCouplingFieldDouble *MEDFileField1TS::getFieldOnMeshAtLevel(TypeOfField type,
 {
   MEDCouplingAutoRefCountObjectPtr<DataArray> arrOut;
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=contentNotNull()->getFieldOnMeshAtLevel(type,meshDimRelToMax,renumPol,this,mesh,arrOut);
-  if(!((DataArray *)arrOut))
-    throw INTERP_KERNEL::Exception("MEDFileField1TS::getFieldOnMeshAtLevel : no array !");
-  DataArrayDouble *arrOutC=dynamic_cast<DataArrayDouble *>((DataArray *)arrOut);
-  if(!arrOutC)
-    throw INTERP_KERNEL::Exception("MEDFileField1TS::getFieldOnMeshAtLevel : mismatch between dataArrays type and MEDFileField1TS ! Expected double !");
-  ret->setArray(arrOutC);
+  MEDFileField1TS::SetDataArrayDoubleInField(ret,arrOut);
   return ret.retn();
 }
 
@@ -5621,12 +5613,7 @@ MEDCouplingFieldDouble *MEDFileField1TS::getFieldAtLevelOld(TypeOfField type, co
     throw INTERP_KERNEL::Exception("MEDFileField1TS::getFieldAtLevelOld : Request for a method that can be used for instances coming from file loading ! Use getFieldOnMeshAtLevel method instead !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> arrOut;
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=contentNotNull()->getFieldAtLevel(type,meshDimRelToMax,mname,renumPol,this,arrOut);
-  if(!((DataArray *)arrOut))
-    throw INTERP_KERNEL::Exception("MEDFileField1TS::getFieldAtLevelOld : no array !");
-  DataArrayDouble *arrOutC=dynamic_cast<DataArrayDouble *>((DataArray *)arrOut);
-  if(!arrOutC)
-    throw INTERP_KERNEL::Exception("MEDFileField1TS::getFieldAtLevelOld : mismatch between dataArrays type and MEDFileField1TS ! Expected double !");
-  ret->setArray(arrOutC);
+  MEDFileField1TS::SetDataArrayDoubleInField(ret,arrOut);
   return ret.retn();
 }
 
@@ -7072,12 +7059,7 @@ MEDCouplingFieldDouble *MEDFileFieldMultiTS::getFieldAtLevel(TypeOfField type, i
     throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldAtLevel : mismatch of type of field expecting FLOAT64 !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> arrOut;
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=myF1TSC->getFieldAtLevel(type,meshDimRelToMax,0,renumPol,this,arrOut);
-  if(!((DataArray *)arrOut))
-    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldAtLevelOld : no array !");
-  DataArrayDouble *arrOutC=dynamic_cast<DataArrayDouble *>((DataArray *)arrOut);
-  if(!arrOutC)
-    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldAtLevelOld : mismatch between dataArrays type and MEDFileField1TS ! Expected double !");
-  ret->setArray(arrOutC);
+  MEDFileField1TS::SetDataArrayDoubleInField(ret,arrOut);
   return ret.retn();
 }
 
@@ -7207,12 +7189,7 @@ MEDCouplingFieldDouble *MEDFileFieldMultiTS::getFieldAtLevelOld(TypeOfField type
     throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldAtLevelOld : mismatch of type of field !");
   MEDCouplingAutoRefCountObjectPtr<DataArray> arrOut;
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingFieldDouble> ret=myF1TSC->getFieldAtLevel(type,meshDimRelToMax,mname,renumPol,this,arrOut);
-  if(!((DataArray*)arrOut))
-    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldAtLevelOld : no array !");
-  DataArrayDouble *arrOutC=dynamic_cast<DataArrayDouble *>((DataArray*)arrOut);
-  if(!arrOutC)
-    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::getFieldAtLevelOld : mismatch between dataArrays type and MEDFileField1TS ! Expected double !");
-  ret->setArray(arrOutC);
+  MEDFileField1TS::SetDataArrayDoubleInField(ret,arrOut);
   return ret.retn();
 }
 

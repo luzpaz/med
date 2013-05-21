@@ -659,6 +659,8 @@ namespace ParaMEDMEM
     
     std::vector< std::vector<DataArrayDouble *> > getFieldSplitedByType2(const char *mname, std::vector<INTERP_KERNEL::NormalizedCellType>& types, std::vector< std::vector<TypeOfField> >& typesF,
                                                                          std::vector< std::vector<std::string> >& pfls, std::vector< std::vector<std::string> >& locs) const throw(INTERP_KERNEL::Exception);
+  public:
+    static void SetDataArrayDoubleInField(MEDCouplingFieldDouble *f, MEDCouplingAutoRefCountObjectPtr<DataArray>& arr) throw(INTERP_KERNEL::Exception);
   private:
     med_field_type getMEDFileFieldType() const { return MED_FLOAT64; }
     const MEDFileField1TSWithoutSDA *contentNotNull() const throw(INTERP_KERNEL::Exception);
