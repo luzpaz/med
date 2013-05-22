@@ -389,7 +389,7 @@ namespace ParaMEDMEM
     static MEDFileMesh *New(const char *fileName, const char *mName, int dt=-1, int it=-1) throw(INTERP_KERNEL::Exception);
     virtual MEDFileMesh *deepCpy() const throw(INTERP_KERNEL::Exception);
     virtual MEDFileMesh *shallowCpy() const throw(INTERP_KERNEL::Exception);
-    virtual void clearNonDiscrAttributes() const;
+    virtual void clearNonDiscrAttributes() const throw(INTERP_KERNEL::Exception);
     void setName(const char *name);
     const char *getName();
     const char *getUnivName() const;
@@ -412,18 +412,18 @@ namespace ParaMEDMEM
     void write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception);
     int getSizeAtLevel(int meshDimRelToMaxExt) const throw(INTERP_KERNEL::Exception);
     //
-    bool existsGroup(const char *groupName) const;
-    bool existsFamily(int famId) const;
-    bool existsFamily(const char *familyName) const;
-    void setFamilyId(const char *familyName, int id);
+    bool existsGroup(const char *groupName) const throw(INTERP_KERNEL::Exception);
+    bool existsFamily(int famId) const throw(INTERP_KERNEL::Exception);
+    bool existsFamily(const char *familyName) const throw(INTERP_KERNEL::Exception);
+    void setFamilyId(const char *familyName, int id) throw(INTERP_KERNEL::Exception);
     void setFamilyIdUnique(const char *familyName, int id) throw(INTERP_KERNEL::Exception);
     void addFamily(const char *familyName, int id) throw(INTERP_KERNEL::Exception);
     void addFamilyOnGrp(const char *grpName, const char *famName) throw(INTERP_KERNEL::Exception);
     virtual void createGroupOnAll(int meshDimRelToMaxExt, const char *groupName) throw(INTERP_KERNEL::Exception);
     virtual bool keepFamIdsOnlyOnLevs(const std::vector<int>& famIds, const std::vector<int>& levs) throw(INTERP_KERNEL::Exception);
-    void copyFamGrpMapsFrom(const MEDFileMesh& other);
-    const std::map<std::string,int>& getFamilyInfo() const;
-    const std::map<std::string, std::vector<std::string> >& getGroupInfo() const;
+    void copyFamGrpMapsFrom(const MEDFileMesh& other) throw(INTERP_KERNEL::Exception);
+    const std::map<std::string,int>& getFamilyInfo() const throw(INTERP_KERNEL::Exception);
+    const std::map<std::string, std::vector<std::string> >& getGroupInfo() const throw(INTERP_KERNEL::Exception);
     std::vector<std::string> getFamiliesOnGroup(const char *name) const throw(INTERP_KERNEL::Exception);
     std::vector<std::string> getFamiliesOnGroups(const std::vector<std::string>& grps) const throw(INTERP_KERNEL::Exception);
     std::vector<int> getFamiliesIdsOnGroup(const char *name) const throw(INTERP_KERNEL::Exception);
@@ -431,8 +431,8 @@ namespace ParaMEDMEM
     void setFamiliesIdsOnGroup(const char *name, const std::vector<int>& famIds) throw(INTERP_KERNEL::Exception);
     std::vector<std::string> getGroupsOnFamily(const char *name) const throw(INTERP_KERNEL::Exception);
     void setGroupsOnFamily(const char *famName, const std::vector<std::string>& grps) throw(INTERP_KERNEL::Exception);
-    std::vector<std::string> getGroupsNames() const;
-    std::vector<std::string> getFamiliesNames() const;
+    std::vector<std::string> getGroupsNames() const throw(INTERP_KERNEL::Exception);
+    std::vector<std::string> getFamiliesNames() const throw(INTERP_KERNEL::Exception);
     void assignFamilyNameWithGroupName() throw(INTERP_KERNEL::Exception);
     void removeGroup(const char *name) throw(INTERP_KERNEL::Exception);
     void removeFamily(const char *name) throw(INTERP_KERNEL::Exception);
@@ -930,7 +930,7 @@ namespace ParaMEDMEM
     const std::vector<double>& getRefCoords() const;
     const std::vector<double>& getGaussCoords() const;
     const std::vector<double>& getGaussWeights() const;
-    bool isEqual(const MEDFileFieldLoc& other, double eps) const;
+    bool isEqual(const MEDFileFieldLoc& other, double eps) const throw(INTERP_KERNEL::Exception);
   %extend
     {
       std::string __str__() const throw(INTERP_KERNEL::Exception)
@@ -1067,6 +1067,8 @@ namespace ParaMEDMEM
     void setTime(int iteration, int order, double val) throw(INTERP_KERNEL::Exception);
     virtual MEDFileAnyTypeField1TS *shallowCpy() const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeField1TS *deepCpy() const throw(INTERP_KERNEL::Exception);
+    std::string getDtUnit() const throw(INTERP_KERNEL::Exception);
+    void setDtUnit(const char *dtUnit) throw(INTERP_KERNEL::Exception);
     %extend
     {
       PyObject *getTime() throw(INTERP_KERNEL::Exception)
@@ -1429,6 +1431,8 @@ namespace ParaMEDMEM
     virtual MEDFileAnyTypeFieldMultiTS *shallowCpy() const throw(INTERP_KERNEL::Exception);
     std::string getName() const throw(INTERP_KERNEL::Exception);
     void setName(const char *name) throw(INTERP_KERNEL::Exception);
+    std::string getDtUnit() const throw(INTERP_KERNEL::Exception);
+    void setDtUnit(const char *dtUnit) throw(INTERP_KERNEL::Exception);
     std::string getMeshName() const throw(INTERP_KERNEL::Exception);
     void setMeshName(const char *newMeshName) throw(INTERP_KERNEL::Exception);
     const std::vector<std::string>& getInfo() const throw(INTERP_KERNEL::Exception);
@@ -1441,6 +1445,7 @@ namespace ParaMEDMEM
     virtual MEDFileAnyTypeField1TS *getTimeStepAtPos(int pos) const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeField1TS *getTimeStep(int iteration, int order) const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeField1TS *getTimeStepGivenTime(double time, double eps=1e-8) const throw(INTERP_KERNEL::Exception);
+    void synchronizeNameScope() throw(INTERP_KERNEL::Exception);
     %extend
     {
       int __len__() const throw(INTERP_KERNEL::Exception)
@@ -1482,7 +1487,7 @@ namespace ParaMEDMEM
           throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTS::__getitem__ : invalid input params ! expected fmts[int], fmts[int,int] or fmts[double] to request time step !");
       }
       
-      PyObject *getIterations() const
+      PyObject *getIterations() const throw(INTERP_KERNEL::Exception)
       {
         std::vector< std::pair<int,int> > res=self->getIterations();
         PyObject *ret=PyList_New(res.size());
@@ -1951,6 +1956,26 @@ namespace ParaMEDMEM
          {
            return self->simpleRepr();
          }
+
+         PyObject *getCommonIterations() const throw(INTERP_KERNEL::Exception)
+         {
+           bool ret1;
+           std::vector< std::pair<int,int> > ret0=self->getCommonIterations(ret1);
+           PyObject *ret=PyTuple_New(2);
+           PyObject *ret_0=PyList_New(ret0.size());
+           int rk=0;
+           for(std::vector< std::pair<int,int> >::const_iterator iter=ret0.begin();iter!=ret0.end();iter++,rk++)
+             {
+               PyObject *elt=PyTuple_New(2);
+               PyTuple_SetItem(elt,0,SWIG_From_int((*iter).first));
+               PyTuple_SetItem(elt,1,SWIG_From_int((*iter).second));
+               PyList_SetItem(ret_0,rk,elt);
+             }
+           PyTuple_SetItem(ret,0,ret_0);
+           PyObject *ret_1=ret1?Py_True:Py_False; Py_XINCREF(ret_1);
+           PyTuple_SetItem(ret,1,ret_1);
+           return ret;
+         }
          
          MEDFileAnyTypeFieldMultiTS *__getitem__(PyObject *obj) throw(INTERP_KERNEL::Exception)
          {
@@ -2066,7 +2091,7 @@ namespace ParaMEDMEM
         return self->simpleRepr();
       }
 
-      PyObject *isEqual(const MEDFileParameter1TS *other, double eps) const
+      PyObject *isEqual(const MEDFileParameter1TS *other, double eps) const throw(INTERP_KERNEL::Exception)
       {
         std::string what;
         bool ret0=self->isEqual(other,eps,what);
@@ -2117,7 +2142,7 @@ namespace ParaMEDMEM
         return self->simpleRepr();
       }
       
-      PyObject *isEqual(const MEDFileParameterMultiTS *other, double eps) const
+      PyObject *isEqual(const MEDFileParameterMultiTS *other, double eps) const throw(INTERP_KERNEL::Exception)
       {
         std::string what;
         bool ret0=self->isEqual(other,eps,what);
@@ -2346,7 +2371,7 @@ namespace ParaMEDMEM
         return ret;
       }
       
-      PyObject *isEqual(const MEDFileParameters *other, double eps) const
+      PyObject *isEqual(const MEDFileParameters *other, double eps) const throw(INTERP_KERNEL::Exception)
       {
         std::string what;
         bool ret0=self->isEqual(other,eps,what);

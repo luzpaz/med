@@ -2470,12 +2470,12 @@ class MEDLoaderTest(unittest.TestCase):
         npfl=DataArrayInt([1,2,4,5,6,7,10,11]) ; npfl.setName("npfl")
         nff2.setFieldProfile(nf2,narr2,mm1,0,npfl)
         nff2.getFieldWithProfile(ON_NODES,0,mm1)
-        a,b=nff2.getFieldWithProfile(ON_NODES,0,mm1) ; b.setName(npfl.getName()) ; narr2.setName(nff2.getName())
+        a,b=nff2.getFieldWithProfile(ON_NODES,0,mm1) ; b.setName(npfl.getName())
         self.assertTrue(b.isEqual(npfl))
         self.assertTrue(a.isEqual(narr2))
         nff2.write(fname,0)
         nff2bis=MEDFileIntField1TS(fname,"VectorFieldOnNodesPfl")
-        a,b=nff2bis.getFieldWithProfile(ON_NODES,0,mm1) ; b.setName(npfl.getName()) ; narr2.setName(nff2.getName())
+        a,b=nff2bis.getFieldWithProfile(ON_NODES,0,mm1) ; b.setName(npfl.getName())
         self.assertTrue(b.isEqual(npfl))
         self.assertTrue(a.isEqual(narr2))
         #
@@ -2514,6 +2514,35 @@ class MEDLoaderTest(unittest.TestCase):
         self.assertTrue(fs.changeMeshNames([('3DSurfMesh_1','3DSurfMesh')]))
         self.assertEqual(fs.getMeshesNames(),('3DSurfMesh','3DSurfMesh','3DSurfMesh','3DSurfMesh'))
         self.assertTrue(not fs.changeMeshNames([('3DSurfMesh_1','3DSurfMesh')]))
+        pass
+
+    def testMEDFileFields1(self):
+        fname="Pyfile64.med"
+        f1=MEDCouplingFieldDouble(ON_NODES)
+        f1.setTime(0.001,0,-1) ; f1.setTimeUnit("us")
+        c=DataArrayDouble(12) ; c.iota(); m=MEDCouplingCMesh() ; m.setCoordsAt(0,c) ; m.setName("mesh")
+        mm=MEDFileCMesh() ; mm.setMesh(m) ; mm.write(fname,2)
+        f1.setMesh(m)
+        arr=DataArrayDouble(12,2) ; arr.setInfoOnComponents(["aa [u1]","bbbvv [ppp]"]) ; arr[:,0]=range(12) ; arr[:,1]=2*arr[:,0]
+        f1.setArray(arr)
+        f1.setName("Field1")
+        ff1=MEDFileField1TS.New()
+        ff1.setFieldNoProfileSBT(f1)
+        self.assertEqual(ff1.getDtUnit(),"us")
+        ff1.write(fname,0)
+        f1.setTime(1.001,1,-1) ; ff1=MEDFileField1TS.New() ; ff1.setFieldNoProfileSBT(f1) ; ff1.write(fname,0)
+        f1.setTime(2.001,2,-1) ; ff1=MEDFileField1TS.New() ; ff1.setFieldNoProfileSBT(f1) ; ff1.write(fname,0)
+        #
+        self.assertEqual(MEDFileFields(fname).getCommonIterations(),([(0,-1),(1,-1),(2,-1)],False))
+        ff1s=MEDFileFieldMultiTS(fname,"Field1")
+        ff1s.setName("Field2")
+        ff1s.write(fname,0)
+        self.assertEqual(MEDFileFields(fname).getCommonIterations(),([(0,-1),(1,-1),(2,-1)],False))
+        f1.setTime(3.001,3,-1) ; ff1=MEDFileField1TS.New() ; ff1.setFieldNoProfileSBT(f1) ; ff1.write(fname,0)
+        self.assertEqual(MEDFileFields(fname).getCommonIterations(),([(0,-1),(1,-1),(2,-1)],True))
+        f1.setName("Field2") ; f1.setTime(3.001,3,-1) ; ff1=MEDFileField1TS.New() ; ff1.setFieldNoProfileSBT(f1) ; ff1.write(fname,0)
+        self.assertEqual(MEDFileFields(fname).getCommonIterations(),([(0,-1),(1,-1),(2,-1),(3,-1)],False))
+        self.assertEqual(MEDFileFields(fname)[1].getDtUnit(),"us")
         pass
     pass
 
