@@ -5482,9 +5482,12 @@ catch(INTERP_KERNEL::Exception& e)
  *
  * \warning this is a shallow copy constructor
  */
-MEDFileField1TS::MEDFileField1TS(const MEDFileField1TSWithoutSDA& other, bool shallowCopyOfContent):MEDFileAnyTypeField1TS(other,shallowCopyOfContent)
+MEDFileField1TS::MEDFileField1TS(const MEDFileField1TSWithoutSDA& other, bool shallowCopyOfContent)
+try:MEDFileAnyTypeField1TS(other,shallowCopyOfContent)
 {
 }
+catch(INTERP_KERNEL::Exception& e)
+  { throw e; }
 
 MEDFileField1TS::MEDFileField1TS()
 {
@@ -5794,9 +5797,12 @@ try:MEDFileAnyTypeField1TS(fileName,fieldName)
 catch(INTERP_KERNEL::Exception& e)
   { throw e; }
 
-MEDFileIntField1TS::MEDFileIntField1TS(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception):MEDFileAnyTypeField1TS(fileName,fieldName,iteration,order)
+MEDFileIntField1TS::MEDFileIntField1TS(const char *fileName, const char *fieldName, int iteration, int order) throw(INTERP_KERNEL::Exception)
+try:MEDFileAnyTypeField1TS(fileName,fieldName,iteration,order)
 {
 }
+catch(INTERP_KERNEL::Exception& e)
+  { throw e; }
 
 /*!
  * This constructor is a shallow copy constructor. If \a shallowCopyOfContent is true the content of \a other is shallow copied.
@@ -7171,7 +7177,9 @@ MEDFileFieldMultiTS *MEDFileFieldMultiTS::New()
  */
 MEDFileFieldMultiTS *MEDFileFieldMultiTS::New(const char *fileName) throw(INTERP_KERNEL::Exception)
 {
-  return new MEDFileFieldMultiTS(fileName);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileFieldMultiTS> ret=new MEDFileFieldMultiTS(fileName);
+  ret->contentNotNull();//to check that content type matches with \a this type.
+  return ret.retn();
 }
 
 /*!
@@ -7186,7 +7194,9 @@ MEDFileFieldMultiTS *MEDFileFieldMultiTS::New(const char *fileName) throw(INTERP
  */
 MEDFileFieldMultiTS *MEDFileFieldMultiTS::New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
 {
-  return new MEDFileFieldMultiTS(fileName,fieldName);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileFieldMultiTS> ret=new MEDFileFieldMultiTS(fileName,fieldName);
+  ret->contentNotNull();//to check that content type matches with \a this type.
+  return ret.retn();
 }
 
 /*!
@@ -7423,7 +7433,7 @@ const MEDFileFieldMultiTSWithoutSDA *MEDFileFieldMultiTS::contentNotNull() const
     throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::contentNotNull : the content pointer is null !");
   const MEDFileFieldMultiTSWithoutSDA *ret=dynamic_cast<const MEDFileFieldMultiTSWithoutSDA *>(pt);
   if(!ret)
-    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::contentNotNull : the content pointer is not null but it is not of type double !");
+    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::contentNotNull : the content pointer is not null but it is not of type double ! Reason is maybe that the read field has not the type FLOAT64 !");
   return ret;
 }
 
@@ -7434,7 +7444,7 @@ const MEDFileFieldMultiTSWithoutSDA *MEDFileFieldMultiTS::contentNotNull() const
     throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::contentNotNull : the non const content pointer is null !");
   MEDFileFieldMultiTSWithoutSDA *ret=dynamic_cast<MEDFileFieldMultiTSWithoutSDA *>(pt);
   if(!ret)
-    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::contentNotNull : the non const content pointer is not null but it is not of type double !");
+    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::contentNotNull : the non const content pointer is not null but it is not of type double ! Reason is maybe that the read field has not the type FLOAT64 !");
   return ret;
 }
 
@@ -7497,7 +7507,7 @@ catch(INTERP_KERNEL::Exception& e)
   { throw e; }
 
 MEDFileFieldMultiTS::MEDFileFieldMultiTS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
-try:MEDFileAnyTypeFieldMultiTS(fileName)
+try:MEDFileAnyTypeFieldMultiTS(fileName,fieldName)
 {
 }
 catch(INTERP_KERNEL::Exception& e)
@@ -7573,7 +7583,9 @@ MEDFileIntFieldMultiTS *MEDFileIntFieldMultiTS::New()
  */
 MEDFileIntFieldMultiTS *MEDFileIntFieldMultiTS::New(const char *fileName) throw(INTERP_KERNEL::Exception)
 {
-  return new MEDFileIntFieldMultiTS(fileName);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileIntFieldMultiTS> ret=new MEDFileIntFieldMultiTS(fileName);
+  ret->contentNotNull();//to check that content type matches with \a this type.
+  return ret.retn();
 }
 
 /*!
@@ -7588,7 +7600,9 @@ MEDFileIntFieldMultiTS *MEDFileIntFieldMultiTS::New(const char *fileName) throw(
  */
 MEDFileIntFieldMultiTS *MEDFileIntFieldMultiTS::New(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
 {
-  return new MEDFileIntFieldMultiTS(fileName,fieldName);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileIntFieldMultiTS> ret=new MEDFileIntFieldMultiTS(fileName,fieldName);
+  ret->contentNotNull();//to check that content type matches with \a this type.
+  return ret.retn();
 }
 
 /*!
@@ -7869,7 +7883,7 @@ const MEDFileIntFieldMultiTSWithoutSDA *MEDFileIntFieldMultiTS::contentNotNull()
     throw INTERP_KERNEL::Exception("MEDFileIntFieldMultiTS::contentNotNull : the content pointer is null !");
   const MEDFileIntFieldMultiTSWithoutSDA *ret=dynamic_cast<const MEDFileIntFieldMultiTSWithoutSDA *>(pt);
   if(!ret)
-    throw INTERP_KERNEL::Exception("MEDFileIntFieldMultiTS::contentNotNull : the content pointer is not null but it is not of type int !");
+    throw INTERP_KERNEL::Exception("MEDFileIntFieldMultiTS::contentNotNull : the content pointer is not null but it is not of type int ! Reason is maybe that the read field has not the type INT32 !");
   return ret;
 }
 
@@ -7880,7 +7894,7 @@ const MEDFileIntFieldMultiTSWithoutSDA *MEDFileIntFieldMultiTS::contentNotNull()
     throw INTERP_KERNEL::Exception("MEDFileIntFieldMultiTS::contentNotNull : the non const content pointer is null !");
   MEDFileIntFieldMultiTSWithoutSDA *ret=dynamic_cast<MEDFileIntFieldMultiTSWithoutSDA *>(pt);
   if(!ret)
-    throw INTERP_KERNEL::Exception("MEDFileIntFieldMultiTS::contentNotNull : the non const content pointer is not null but it is not of type int !");
+    throw INTERP_KERNEL::Exception("MEDFileIntFieldMultiTS::contentNotNull : the non const content pointer is not null but it is not of type int ! Reason is maybe that the read field has not the type INT32 !");
   return ret;
 }
 
@@ -7901,7 +7915,7 @@ catch(INTERP_KERNEL::Exception& e)
   { throw e; }
 
 MEDFileIntFieldMultiTS::MEDFileIntFieldMultiTS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
-try:MEDFileAnyTypeFieldMultiTS(fileName)
+try:MEDFileAnyTypeFieldMultiTS(fileName,fieldName)
 {
 }
 catch(INTERP_KERNEL::Exception& e)

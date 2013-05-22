@@ -215,7 +215,7 @@ std::vector< std::pair<std::string, std::string > > convertVecPairStStFromPy(PyO
                 throw INTERP_KERNEL::Exception(msg);
               PyObject *o0=PyTuple_GetItem(o,0);
               if(PyString_Check(o0))
-                p.second=std::string(PyString_AsString(o0));
+                p.first=std::string(PyString_AsString(o0));
               else
                 throw INTERP_KERNEL::Exception(msg);
               PyObject *o1=PyTuple_GetItem(o,1);
