@@ -364,15 +364,16 @@ PyObject *ToNumPyArray(MCData *self, int npyObjectType, const char *MCDataStr)
     }
   ParaMEDMEM::MemArray<T>& mem=self->accessToMemArray();
   int nbComp=self->getNumberOfComponents();
-  if(nbComp!=1 && nbComp!=2)
+  if(nbComp==0)
     {
-      std::ostringstream oss; oss << MCDataStr << "::toNumPyArray : number of components of this is " << nbComp << " ! Should 1 or 2 !"; 
+      std::ostringstream oss; oss << MCDataStr << "::toNumPyArray : number of components of this is 0 ! Should be > 0 !"; 
       throw INTERP_KERNEL::Exception(oss.str().c_str());
     }
+  int nbDims=nbComp==1?1:2;
   npy_intp dim[2];
-  dim[0]=(npy_intp)self->getNumberOfTuples(); dim[1]=2;
+  dim[0]=(npy_intp)self->getNumberOfTuples(); dim[1]=nbComp;
   const T *bg=self->getConstPointer();
-  PyObject *ret=PyArray_SimpleNewFromData(nbComp,dim,npyObjectType,const_cast<T *>(bg));
+  PyObject *ret=PyArray_SimpleNewFromData(nbDims,dim,npyObjectType,const_cast<T *>(bg));
   if(mem.isDeallocatorCalled())
     {
       if(mem.getDeallocator()!=numarrdeal)

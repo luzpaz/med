@@ -332,9 +332,6 @@ class MEDCouplingNumpyTest(unittest.TestCase):
     @unittest.skipUnless(MEDCouplingHasNumpyBindings(),"requires numpy")
     def test17(self):
         d=DataArrayInt.Range(0,20,1)
-        d.rearrange(10)
-        self.assertRaises(InterpKernelException,d.toNumPyArray)# forbidden one or two components of d is accepted
-        d.rearrange(1)
         a=d.toNumPyArray()
         self.assertTrue(not a.flags["OWNDATA"])
         a[-2:]=100
@@ -362,9 +359,6 @@ class MEDCouplingNumpyTest(unittest.TestCase):
     def test18(self):
         d=DataArrayInt.Range(0,20,1)
         d=d.convertToDblArr()
-        d.rearrange(10)
-        self.assertRaises(InterpKernelException,d.toNumPyArray)# forbidden one or two components of d is accepted
-        d.rearrange(1)
         a=d.toNumPyArray()
         self.assertTrue(not a.flags["OWNDATA"])
         a[-2:]=100
@@ -561,7 +555,8 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         self.assertEqual(b.tolist(),[0.,1.,2.,3.,4.,5.,6.,7.,8.,9.])
         self.assertTrue(not b.flags["OWNDATA"])
         pass
-
+    
+    @unittest.skipUnless(MEDCouplingHasNumpyBindings(),"requires numpy")
     def test25(self):
         a=arange(10,dtype=int32)
         b=DataArrayInt(a)
@@ -634,6 +629,30 @@ class MEDCouplingNumpyTest(unittest.TestCase):
         del b
         gc.collect()
         self.assertTrue(not c.isAllocated())
+        pass
+
+    @unittest.skipUnless(MEDCouplingHasNumpyBindings(),"requires numpy")
+    def test26(self):
+        d=DataArrayInt(15) ; d.iota()
+        d.rearrange(3)
+        a=d.toNumPyArray()
+        self.assertEqual(a.ndim,2)
+        self.assertEqual(a.size,15)
+        self.assertEqual(a.shape,(5,3))
+        self.assertEqual(a.strides,(12,4))
+        self.assertEqual(a.nbytes,60)
+        self.assertEqual(a.itemsize,4)
+        self.assertEqual(a.tolist(),[[0,1,2],[3,4,5],[6,7,8],[9,10,11],[12,13,14]])
+        #
+        d2=d.convertToDblArr()
+        a2=d2.toNumPyArray()
+        self.assertEqual(a2.ndim,2)
+        self.assertEqual(a2.size,15)
+        self.assertEqual(a2.shape,(5,3))
+        self.assertEqual(a2.strides,(24,8))
+        self.assertEqual(a2.nbytes,120)
+        self.assertEqual(a2.itemsize,8)
+        self.assertEqual(a2.tolist(),[[0.,1.,2.],[3.,4.,5.],[6.,7.,8.],[9.,10.,11.],[12.,13.,14.]])
         pass
 
     def setUp(self):
