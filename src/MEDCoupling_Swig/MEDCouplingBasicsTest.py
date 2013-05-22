@@ -583,6 +583,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(not fieldOnNodes1.isEqual(fieldOnCells1,1e-12,1e-15));
         #
         fieldOnCells2=MEDCouplingFieldDouble.New(ON_CELLS,ONE_TIME);
+        self.assertEqual(fieldOnCells2.getMesh(),None) # to check that convertMesh wrapping do not raise but return Py_None
         self.assertTrue(not fieldOnCells1.isEqual(fieldOnCells2,1e-12,1e-15));
         self.assertTrue(not fieldOnCells2.isEqual(fieldOnCells1,1e-12,1e-15));
         fieldOnCells1=MEDCouplingFieldDouble.New(ON_CELLS,ONE_TIME);

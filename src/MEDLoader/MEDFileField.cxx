@@ -39,6 +39,9 @@ extern med_geometry_type typmai3[32];
 
 using namespace ParaMEDMEM;
 
+const char MEDFileField1TSWithoutSDA::TYPE_STR[]="FLOAT64";
+const char MEDFileIntField1TSWithoutSDA::TYPE_STR[]="INT32";
+
 MEDFileFieldLoc *MEDFileFieldLoc::New(med_idt fid, const char *locName)
 {
   return new MEDFileFieldLoc(fid,locName);
@@ -3350,6 +3353,67 @@ void MEDFileFieldGlobsReal::appendLoc(const char *locName, INTERP_KERNEL::Normal
 
 //= MEDFileAnyTypeField1TSWithoutSDA
 
+/*!
+ * Prints a string describing \a this field into a stream. This string is outputted 
+ * by \c print Python command.
+ *  \param [in] bkOffset - number of white spaces printed at the beginning of each line.
+ *  \param [in,out] oss - the out stream.
+ *  \param [in] f1tsId - the field index within a MED file. If \a f1tsId < 0, the tiny
+ *          info id printed, else, not.
+ */
+void MEDFileAnyTypeField1TSWithoutSDA::simpleRepr(int bkOffset, std::ostream& oss, int f1tsId) const
+{
+  std::string startOfLine(bkOffset,' ');
+  oss << startOfLine << "Field ";
+  if(bkOffset==0)
+    oss << "[Type=" << getTypeStr() << "] ";
+  oss << "on One time Step ";
+  if(f1tsId>=0)
+    oss << "(" << f1tsId << ") ";
+  oss << "on iteration=" << _iteration << " order=" << _order << "." << std::endl;
+  oss << startOfLine << "Time attached is : " << _dt << " [" << _dt_unit << "]." << std::endl;
+  const DataArray *arr=getUndergroundDataArray();
+  if(arr)
+    {
+      const std::vector<std::string> &comps=arr->getInfoOnComponents();
+      if(f1tsId<0)
+        {
+          oss << startOfLine << "Field Name : \"" << arr->getName() << "\"." << std::endl;
+          oss << startOfLine << "Field has " << comps.size() << " components with the following infos :" << std::endl;
+          for(std::vector<std::string>::const_iterator it=comps.begin();it!=comps.end();it++)
+            oss << startOfLine << "  -  \"" << (*it) << "\"" << std::endl;
+        }
+      if(arr->isAllocated())
+        {
+          oss << startOfLine << "Whole field contains " << arr->getNumberOfTuples() << " tuples." << std::endl;
+        }
+      else
+        oss << startOfLine << "The array of the current field has not allocated yet !" << std::endl;
+    }
+  else
+    {
+      oss << startOfLine << "Field infos are empty ! Not defined yet !" << std::endl;
+    }
+  oss << startOfLine << "----------------------" << std::endl;
+  if(!_field_per_mesh.empty())
+    {
+      int i=0;
+      for(std::vector< MEDCouplingAutoRefCountObjectPtr< MEDFileFieldPerMesh > >::const_iterator it2=_field_per_mesh.begin();it2!=_field_per_mesh.end();it2++,i++)
+        {
+          const MEDFileFieldPerMesh *cur=(*it2);
+          if(cur)
+            cur->simpleRepr(bkOffset,oss,i);
+          else
+            oss << startOfLine << "Field per mesh #" << i << " is not defined !" << std::endl;
+        }
+    }
+  else
+    {
+      oss << startOfLine << "Field is not defined on any meshes !" << std::endl;
+    }
+  oss << startOfLine << "----------------------" << std::endl;
+}
+
 MEDFileAnyTypeField1TSWithoutSDA::MEDFileAnyTypeField1TSWithoutSDA(const char *fieldName, int csit, int iteration, int order):_iteration(iteration),_order(order),_csit(csit)
 {
 }
@@ -4235,64 +4299,6 @@ MEDFileField1TSWithoutSDA *MEDFileField1TSWithoutSDA::New(const char *fieldName,
 }
 
 /*!
- * Prints a string describing \a this field into a stream. This string is outputted 
- * by \c print Python command.
- *  \param [in] bkOffset - number of white spaces printed at the beginning of each line.
- *  \param [in,out] oss - the out stream.
- *  \param [in] f1tsId - the field index within a MED file. If \a f1tsId < 0, the tiny
- *          info id printed, else, not.
- */
-void MEDFileField1TSWithoutSDA::simpleRepr(int bkOffset, std::ostream& oss, int f1tsId) const
-{
-  std::string startOfLine(bkOffset,' ');
-  oss << startOfLine << "Field on One time Step ";
-  if(f1tsId>=0)
-    oss << "(" << f1tsId << ") ";
-  oss << "on iteration=" << _iteration << " order=" << _order << "." << std::endl;
-  oss << startOfLine << "Time attached is : " << _dt << " [" << _dt_unit << "]." << std::endl;
-  const DataArrayDouble *arr=_arr;
-  if(arr)
-    {
-      const std::vector<std::string> &comps=arr->getInfoOnComponents();
-      if(f1tsId<0)
-        {
-          oss << startOfLine << "Field Name : \"" << arr->getName() << "\"." << std::endl;
-          oss << startOfLine << "Field has " << comps.size() << " components with the following infos :" << std::endl;
-          for(std::vector<std::string>::const_iterator it=comps.begin();it!=comps.end();it++)
-            oss << startOfLine << "  -  \"" << (*it) << "\"" << std::endl;
-        }
-      if(arr->isAllocated())
-        {
-          oss << startOfLine << "Whole field contains " << arr->getNumberOfTuples() << " tuples." << std::endl;
-        }
-      else
-        oss << startOfLine << "The array of the current field has not allocated yet !" << std::endl;
-    }
-  else
-    {
-      oss << startOfLine << "Field infos are empty ! Not defined yet !" << std::endl;
-    }
-  oss << startOfLine << "----------------------" << std::endl;
-  if(!_field_per_mesh.empty())
-    {
-      int i=0;
-      for(std::vector< MEDCouplingAutoRefCountObjectPtr< MEDFileFieldPerMesh > >::const_iterator it2=_field_per_mesh.begin();it2!=_field_per_mesh.end();it2++,i++)
-        {
-          const MEDFileFieldPerMesh *cur=(*it2);
-          if(cur)
-            cur->simpleRepr(bkOffset,oss,i);
-          else
-            oss << startOfLine << "Field per mesh #" << i << " is not defined !" << std::endl;
-        }
-    }
-  else
-    {
-      oss << startOfLine << "Field is not defined on any meshes !" << std::endl;
-    }
-  oss << startOfLine << "----------------------" << std::endl;
-}
-
-/*!
  * Returns all attributes and values of parts of \a this field lying on a given mesh.
  * Each part differs from other ones by a type of supporting mesh entity. The _i_-th
  * item of every of returned sequences refers to the _i_-th part of \a this field.
@@ -4365,6 +4371,11 @@ DataArrayDouble *MEDFileField1TSWithoutSDA::getUndergroundDataArrayDouble() cons
     return const_cast<DataArrayDouble *>(ret);
   else
     return 0;
+}
+
+const char *MEDFileField1TSWithoutSDA::getTypeStr() const throw(INTERP_KERNEL::Exception)
+{
+  return TYPE_STR;
 }
 
 /*!
@@ -4522,6 +4533,11 @@ MEDFileIntField1TSWithoutSDA::MEDFileIntField1TSWithoutSDA(const char *fieldName
   arr->setInfoAndChangeNbOfCompo(infos);
 }
 
+const char *MEDFileIntField1TSWithoutSDA::getTypeStr() const throw(INTERP_KERNEL::Exception)
+{
+  return TYPE_STR;
+}
+
 /*!
  * Returns a pointer to the underground DataArrayInt instance. So the
  * caller should not decrRef() it. This method allows for a direct access to the field
@@ -4595,19 +4611,6 @@ DataArrayInt *MEDFileIntField1TSWithoutSDA::getUndergroundDataArrayIntExt(std::v
     throw INTERP_KERNEL::Exception("MEDFileField1TSWithoutSDA::getUndergroundDataArrayExt : no field specified !");
   _field_per_mesh[0]->getUndergroundDataArrayExt(entries);
   return getUndergroundDataArrayInt();
-}
-
-/*!
- * Prints a string describing \a this field into a stream. This string is outputted 
- * by \c print Python command.
- *  \param [in] bkOffset - number of white spaces printed at the beginning of each line.
- *  \param [in,out] oss - the out stream.
- *  \param [in] f1tsId - the field index within a MED file. If \a f1tsId < 0, the tiny
- *          info id printed, else, not.
- */
-void MEDFileIntField1TSWithoutSDA::simpleRepr(int bkOffset, std::ostream& oss, int f1tsId) const
-{
-  // to implement (to factorize)
 }
 
 MEDFileAnyTypeField1TSWithoutSDA *MEDFileIntField1TSWithoutSDA::shallowCpy() const throw(INTERP_KERNEL::Exception)
@@ -6218,7 +6221,7 @@ void MEDFileAnyTypeFieldMultiTSWithoutSDA::setName(const char *name)
 void MEDFileAnyTypeFieldMultiTSWithoutSDA::simpleRepr(int bkOffset, std::ostream& oss, int fmtsId) const
 {
   std::string startLine(bkOffset,' ');
-  oss << startLine << "Field multi time steps";
+  oss << startLine << "Field multi time steps [Type=" << getTypeStr() << "]";
   if(fmtsId>=0)
     oss << " (" << fmtsId << ")";
   oss << " has the following name: \"" << _name << "\"." << std::endl;
@@ -6689,6 +6692,11 @@ MEDFileAnyTypeField1TSWithoutSDA *MEDFileFieldMultiTSWithoutSDA::createNew1TSWit
   return new MEDFileField1TSWithoutSDA;
 }
 
+const char *MEDFileFieldMultiTSWithoutSDA::getTypeStr() const throw(INTERP_KERNEL::Exception)
+{
+  return MEDFileField1TSWithoutSDA::TYPE_STR;
+}
+
 MEDFileAnyTypeFieldMultiTSWithoutSDA *MEDFileFieldMultiTSWithoutSDA::shallowCpy() const throw(INTERP_KERNEL::Exception)
 {
   return new MEDFileFieldMultiTSWithoutSDA(*this);
@@ -6851,6 +6859,11 @@ catch(INTERP_KERNEL::Exception& e)
 MEDFileAnyTypeField1TSWithoutSDA *MEDFileIntFieldMultiTSWithoutSDA::createNew1TSWithoutSDAEmptyInstance() const throw(INTERP_KERNEL::Exception)
 {
   return new MEDFileIntField1TSWithoutSDA;
+}
+
+const char *MEDFileIntFieldMultiTSWithoutSDA::getTypeStr() const throw(INTERP_KERNEL::Exception)
+{
+  return MEDFileIntField1TSWithoutSDA::TYPE_STR;
 }
 
 MEDFileAnyTypeFieldMultiTSWithoutSDA *MEDFileIntFieldMultiTSWithoutSDA::shallowCpy() const throw(INTERP_KERNEL::Exception)

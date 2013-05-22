@@ -219,7 +219,7 @@ void SauvLoaderTest::testMed2Sauv()
   MEDFileFields* pointeFields = pointeMed->getFields();
   for ( int i = 0; i < pointeFields->getNumberOfFields(); ++i )
     {
-      MEDCouplingAutoRefCountObjectPtr<MEDFileFieldMultiTS> ts = dynamic_cast<MEDFileFieldMultiTS *>(pointeFields->getFieldAtPos(i));
+      MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTS> ts = pointeFields->getFieldAtPos(i);
       if ( std::string("fieldnodeint") == ts->getName())
         {
           pointeFields->destroyFieldAtPos( i );

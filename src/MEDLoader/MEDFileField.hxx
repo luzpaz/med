@@ -465,9 +465,10 @@ namespace ParaMEDMEM
     int copyTinyInfoFrom(const MEDCouplingFieldDouble *field, const DataArray *arr) throw(INTERP_KERNEL::Exception);
     void setFieldNoProfileSBT(const MEDCouplingFieldDouble *field, const DataArray *arr, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception);
     void setFieldProfile(const MEDCouplingFieldDouble *field, const DataArray *arrOfVals, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception);
-    virtual void simpleRepr(int bkOffset, std::ostream& oss, int f1tsId) const = 0;
+    virtual void simpleRepr(int bkOffset, std::ostream& oss, int f1tsId) const;
     virtual MEDFileAnyTypeField1TSWithoutSDA *deepCpy() const throw(INTERP_KERNEL::Exception) = 0;
     virtual MEDFileAnyTypeField1TSWithoutSDA *shallowCpy() const throw(INTERP_KERNEL::Exception) = 0;
+    virtual const char *getTypeStr() const throw(INTERP_KERNEL::Exception) = 0;
     virtual DataArray *getUndergroundDataArray() const throw(INTERP_KERNEL::Exception) = 0;
     virtual DataArray *getUndergroundDataArrayExt(std::vector< std::pair<std::pair<INTERP_KERNEL::NormalizedCellType,int>,std::pair<int,int> > >& entries) const throw(INTERP_KERNEL::Exception) = 0;
     virtual void setArray(DataArray *arr) throw(INTERP_KERNEL::Exception) = 0;
@@ -505,7 +506,7 @@ namespace ParaMEDMEM
   class MEDLOADER_EXPORT MEDFileField1TSWithoutSDA : public MEDFileAnyTypeField1TSWithoutSDA
   {
   public:
-    void simpleRepr(int bkOffset, std::ostream& oss, int f1tsId) const;
+    const char *getTypeStr() const throw(INTERP_KERNEL::Exception);
     DataArray *getUndergroundDataArray() const throw(INTERP_KERNEL::Exception);
     DataArray *getUndergroundDataArrayExt(std::vector< std::pair<std::pair<INTERP_KERNEL::NormalizedCellType,int>,std::pair<int,int> > >& entries) const throw(INTERP_KERNEL::Exception);
     DataArrayDouble *getUndergroundDataArrayDouble() const throw(INTERP_KERNEL::Exception);
@@ -527,6 +528,8 @@ namespace ParaMEDMEM
     const DataArrayDouble *getOrCreateAndGetArrayDouble() const;
   protected:
     MEDCouplingAutoRefCountObjectPtr< DataArrayDouble > _arr;
+  public:
+    static const char TYPE_STR[];
   };
 
   /*!
@@ -537,9 +540,9 @@ namespace ParaMEDMEM
   public:
     MEDFileIntField1TSWithoutSDA();
     static MEDFileIntField1TSWithoutSDA *New(const char *fieldName, int csit, int iteration, int order, const std::vector<std::string>& infos);
-    void simpleRepr(int bkOffset, std::ostream& oss, int f1tsId) const;
     MEDFileAnyTypeField1TSWithoutSDA *deepCpy() const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeField1TSWithoutSDA *shallowCpy() const throw(INTERP_KERNEL::Exception);
+    const char *getTypeStr() const throw(INTERP_KERNEL::Exception);
     DataArray *getUndergroundDataArray() const throw(INTERP_KERNEL::Exception);
     DataArray *getUndergroundDataArrayExt(std::vector< std::pair<std::pair<INTERP_KERNEL::NormalizedCellType,int>,std::pair<int,int> > >& entries) const throw(INTERP_KERNEL::Exception);
     void setArray(DataArray *arr) throw(INTERP_KERNEL::Exception);
@@ -554,6 +557,8 @@ namespace ParaMEDMEM
     MEDFileIntField1TSWithoutSDA(const char *fieldName, int csit, int iteration, int order, const std::vector<std::string>& infos);
   protected:
     MEDCouplingAutoRefCountObjectPtr< DataArrayInt > _arr;
+  public:
+    static const char TYPE_STR[];
   };
 
   /*!
@@ -720,6 +725,7 @@ namespace ParaMEDMEM
   public:
     std::size_t getHeapMemorySize() const;
     virtual MEDFileAnyTypeFieldMultiTSWithoutSDA *deepCpy() const throw(INTERP_KERNEL::Exception);
+    virtual const char *getTypeStr() const throw(INTERP_KERNEL::Exception) = 0;
     virtual MEDFileAnyTypeFieldMultiTSWithoutSDA *shallowCpy() const throw(INTERP_KERNEL::Exception) = 0;
     virtual MEDFileAnyTypeField1TSWithoutSDA *createNew1TSWithoutSDAEmptyInstance() const throw(INTERP_KERNEL::Exception) = 0;
     const std::vector<std::string>& getInfo() const throw(INTERP_KERNEL::Exception);
@@ -773,6 +779,7 @@ namespace ParaMEDMEM
   public:
     static MEDFileFieldMultiTSWithoutSDA *New(med_idt fid, const char *fieldName, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception);
     MEDFileFieldMultiTSWithoutSDA(med_idt fid, int fieldId) throw(INTERP_KERNEL::Exception);
+    const char *getTypeStr() const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeFieldMultiTSWithoutSDA *shallowCpy() const throw(INTERP_KERNEL::Exception);
     std::vector< std::vector<DataArrayDouble *> > getFieldSplitedByType2(int iteration, int order, const char *mname, std::vector<INTERP_KERNEL::NormalizedCellType>& types, std::vector< std::vector<TypeOfField> >& typesF, std::vector< std::vector<std::string> >& pfls, std::vector< std::vector<std::string> >& locs) const throw(INTERP_KERNEL::Exception);
   protected:
@@ -789,6 +796,7 @@ namespace ParaMEDMEM
   public:
     static MEDFileIntFieldMultiTSWithoutSDA *New(med_idt fid, const char *fieldName, med_field_type fieldTyp, const std::vector<std::string>& infos, int nbOfStep) throw(INTERP_KERNEL::Exception);
     MEDFileIntFieldMultiTSWithoutSDA(med_idt fid, int fieldId) throw(INTERP_KERNEL::Exception);
+    const char *getTypeStr() const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeFieldMultiTSWithoutSDA *shallowCpy() const throw(INTERP_KERNEL::Exception);
   protected:
     MEDFileIntFieldMultiTSWithoutSDA(const char *fieldName);

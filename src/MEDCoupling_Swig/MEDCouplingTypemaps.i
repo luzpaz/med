@@ -409,6 +409,11 @@ PyObject *ToNumPyArray(MCData *self, int npyObjectType, const char *MCDataStr)
 static PyObject *convertMesh(ParaMEDMEM::MEDCouplingMesh *mesh, int owner) throw(INTERP_KERNEL::Exception)
 {
   PyObject *ret=0;
+  if(!mesh)
+    {
+      Py_XINCREF(Py_None);
+      return Py_None;
+    }
   if(dynamic_cast<ParaMEDMEM::MEDCouplingUMesh *>(mesh))
     ret=SWIG_NewPointerObj((void*)mesh,SWIGTYPE_p_ParaMEDMEM__MEDCouplingUMesh,owner);
   if(dynamic_cast<ParaMEDMEM::MEDCouplingExtrudedMesh *>(mesh))
@@ -425,6 +430,11 @@ static PyObject *convertMesh(ParaMEDMEM::MEDCouplingMesh *mesh, int owner) throw
 static PyObject *convertFieldDiscretization(ParaMEDMEM::MEDCouplingFieldDiscretization *fd, int owner) throw(INTERP_KERNEL::Exception)
 {
   PyObject *ret=0;
+  if(!fd)
+    {
+      Py_XINCREF(Py_None);
+      return Py_None;
+    }
   if(dynamic_cast<ParaMEDMEM::MEDCouplingFieldDiscretizationP0 *>(fd))
     ret=SWIG_NewPointerObj(reinterpret_cast<void*>(fd),SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldDiscretizationP0,owner);
   if(dynamic_cast<ParaMEDMEM::MEDCouplingFieldDiscretizationP1 *>(fd))
@@ -443,6 +453,11 @@ static PyObject *convertFieldDiscretization(ParaMEDMEM::MEDCouplingFieldDiscreti
 static PyObject *convertDataArrayChar(ParaMEDMEM::DataArrayChar *dac, int owner) throw(INTERP_KERNEL::Exception)
 {
   PyObject *ret=0;
+  if(!dac)
+    {
+      Py_XINCREF(Py_None);
+      return Py_None;
+    }
   if(dynamic_cast<ParaMEDMEM::DataArrayByte *>(dac))
     ret=SWIG_NewPointerObj((void*)dac,SWIGTYPE_p_ParaMEDMEM__DataArrayByte,owner);
   if(dynamic_cast<ParaMEDMEM::DataArrayAsciiChar *>(dac))
@@ -455,6 +470,11 @@ static PyObject *convertDataArrayChar(ParaMEDMEM::DataArrayChar *dac, int owner)
 static PyObject *convertDataArray(ParaMEDMEM::DataArray *dac, int owner) throw(INTERP_KERNEL::Exception)
 {
   PyObject *ret=0;
+  if(!dac)
+    {
+      Py_XINCREF(Py_None);
+      return Py_None;
+    }
   if(dynamic_cast<ParaMEDMEM::DataArrayDouble *>(dac))
     ret=SWIG_NewPointerObj((void*)dac,SWIGTYPE_p_ParaMEDMEM__DataArrayDouble,owner);
   if(dynamic_cast<ParaMEDMEM::DataArrayInt *>(dac))
@@ -471,6 +491,11 @@ static PyObject *convertDataArray(ParaMEDMEM::DataArray *dac, int owner) throw(I
 static PyObject* convertMultiFields(ParaMEDMEM::MEDCouplingMultiFields *mfs, int owner) throw(INTERP_KERNEL::Exception)
 {
   PyObject *ret=0;
+  if(!mfs)
+    {
+      Py_XINCREF(Py_None);
+      return Py_None;
+    }
   if(dynamic_cast<ParaMEDMEM::MEDCouplingFieldOverTime *>(mfs))
     ret=SWIG_NewPointerObj((void*)mfs,SWIGTYPE_p_ParaMEDMEM__MEDCouplingFieldOverTime,owner);
   else

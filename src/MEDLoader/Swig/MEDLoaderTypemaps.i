@@ -23,6 +23,11 @@
 static PyObject* convertMEDFileMesh(ParaMEDMEM::MEDFileMesh* mesh, int owner) throw(INTERP_KERNEL::Exception)
 {
   PyObject *ret=0;
+  if(!mesh)
+    {
+      Py_XINCREF(Py_None);
+      return Py_None;
+    }
   if(dynamic_cast<ParaMEDMEM::MEDFileUMesh *>(mesh))
     ret=SWIG_NewPointerObj((void*)mesh,SWIGTYPE_p_ParaMEDMEM__MEDFileUMesh,owner);
   if(dynamic_cast<ParaMEDMEM::MEDFileCMesh *>(mesh))
@@ -37,6 +42,11 @@ static PyObject* convertMEDFileMesh(ParaMEDMEM::MEDFileMesh* mesh, int owner) th
 static PyObject* convertMEDFileParameter1TS(ParaMEDMEM::MEDFileParameter1TS* p1ts, int owner) throw(INTERP_KERNEL::Exception)
 {
   PyObject *ret=0;
+  if(!p1ts)
+    {
+      Py_XINCREF(Py_None);
+      return Py_None;
+    }
   if(dynamic_cast<MEDFileParameterDouble1TS *>(p1ts))
     ret=SWIG_NewPointerObj((void*)p1ts,SWIGTYPE_p_ParaMEDMEM__MEDFileParameterDouble1TS,owner);
   if(dynamic_cast<MEDFileParameterDouble1TSWTI *>(p1ts))
@@ -49,6 +59,11 @@ static PyObject* convertMEDFileParameter1TS(ParaMEDMEM::MEDFileParameter1TS* p1t
 static PyObject* convertMEDFileField1TS(ParaMEDMEM::MEDFileAnyTypeField1TS *p, int owner) throw(INTERP_KERNEL::Exception)
 {
   PyObject *ret=0;
+  if(!p)
+    {
+      Py_XINCREF(Py_None);
+      return Py_None;
+    }
   if(dynamic_cast<MEDFileField1TS *>(p))
     ret=SWIG_NewPointerObj((void*)p,SWIGTYPE_p_ParaMEDMEM__MEDFileField1TS,owner);
   if(dynamic_cast<MEDFileIntField1TS *>(p))
@@ -62,7 +77,10 @@ static PyObject* convertMEDFileFieldMultiTS(ParaMEDMEM::MEDFileAnyTypeFieldMulti
 {
   PyObject *ret=0;
   if(!p)
-    return SWIG_NewPointerObj((void*)0,SWIGTYPE_p_ParaMEDMEM__MEDFileFieldMultiTS,owner);
+    {
+      Py_XINCREF(Py_None);
+      return Py_None;
+    }
   if(dynamic_cast<MEDFileFieldMultiTS *>(p))
     ret=SWIG_NewPointerObj((void*)p,SWIGTYPE_p_ParaMEDMEM__MEDFileFieldMultiTS,owner);
   if(dynamic_cast<MEDFileIntFieldMultiTS *>(p))

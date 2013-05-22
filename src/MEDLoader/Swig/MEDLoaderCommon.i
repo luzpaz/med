@@ -1326,6 +1326,11 @@ namespace ParaMEDMEM
         return MEDFileIntField1TS::New(fileName,fieldName,iteration,order);
       }
 
+      std::string __str__() const throw(INTERP_KERNEL::Exception)
+      {
+        return self->simpleRepr();
+      }
+
       PyObject *getFieldAtLevel(TypeOfField type, int meshDimRelToMax, int renumPol=0) const throw(INTERP_KERNEL::Exception)
       {
         DataArrayInt *ret1=0;
@@ -1836,6 +1841,11 @@ namespace ParaMEDMEM
       MEDFileIntFieldMultiTS(const char *fileName, const char *fieldName) throw(INTERP_KERNEL::Exception)
       {
         return MEDFileIntFieldMultiTS::New(fileName,fieldName);
+      }
+
+      std::string __str__() const throw(INTERP_KERNEL::Exception)
+      {
+        return self->simpleRepr();
       }
 
       PyObject *getFieldAtLevel(TypeOfField type, int iteration, int order, int meshDimRelToMax, int renumPol=0) const throw(INTERP_KERNEL::Exception)
