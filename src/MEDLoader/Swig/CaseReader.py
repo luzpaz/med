@@ -27,7 +27,6 @@ class CaseReader:
     """ Converting a file in the Case format (Ensight) to the MED format.
     A new file with the same base name and the .med extension is created.
     """
-    dictPts={"hexa8":8,"quad4":4}
     dictMCTyp={"hexa8":NORM_HEXA8,"quad4":NORM_QUAD4}
     discSpatial={"element":ON_CELLS}
     dictCompo={"scalar":1,"vector":3}
@@ -51,7 +50,7 @@ class CaseReader:
         ct=self.dictMCTyp[typ]
         m=MEDCouplingUMesh(name,MEDCouplingUMesh.GetDimensionOfGeometricType(ct))
         m.setCoords(coo)
-        nbNodesPerCell=self.dictPts[typ]
+        nbNodesPerCell=MEDCouplingMesh.GetNumberOfNodesOfGeometricType(ct)
         cI=DataArrayInt(len(cells)+1) ; cI.iota() ; cI*=nbNodesPerCell+1
         #
         cells2=cells.reshape(len(cells),nbNodesPerCell)
@@ -83,7 +82,7 @@ class CaseReader:
             coo=np.memmap(fd,dtype='float32',mode='r',offset=pos,shape=(nbNodes,3))
             pos+=nbNodes*3*4 ; fd.seek(pos)#np.array(0,dtype='float%i'%(typeOfCoo)).nbytes
             typ=fd.read(80).strip() ; pos=fd.tell()
-            nbNodesPerCell=self.dictPts[typ]
+            nbNodesPerCell=MEDCouplingMesh.GetNumberOfNodesOfGeometricType(self.dictMCTyp[typ])
             nbCellsOfType=np.memmap(fd,dtype='int32',mode='r',offset=pos,shape=(1,)).tolist()[0]
             pos+=4
             cells=np.memmap(fd,dtype='int32',mode='r',offset=pos,shape=(nbCellsOfType,nbNodesPerCell))
