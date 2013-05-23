@@ -2465,7 +2465,7 @@ class MEDLoaderTest(unittest.TestCase):
         nf2.setTime(19.,20,-11)
         nf2.setMesh(f1.getMesh())
         narr2=DataArrayInt(8,2) ; narr.setInfoOnComponents(["aapfl [u1]","bbbvvpfl [ppp]"]) ; narr2[:,0]=range(8) ; narr2[:,0]+=10  ; narr2[:,1]=3*narr2[:,0]
-        nf2.setName("VectorFieldOnNodesPfl")
+        nf2.setName("VectorFieldOnNodesPfl") ; narr2.setName(nf2.getName())
         nff2=MEDFileIntField1TS.New()
         npfl=DataArrayInt([1,2,4,5,6,7,10,11]) ; npfl.setName("npfl")
         nff2.setFieldProfile(nf2,narr2,mm1,0,npfl)

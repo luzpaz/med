@@ -4243,7 +4243,9 @@ DataArray *MEDFileAnyTypeField1TSWithoutSDA::getFieldWithProfile(TypeOfField typ
 {
   MEDCouplingAutoRefCountObjectPtr<MEDCouplingMesh> m=mesh->getGenMeshAtLevel(meshDimRelToMax);
   int meshId=getMeshIdFromMeshName(mesh->getName());
-  return _field_per_mesh[meshId]->getFieldOnMeshAtLevelWithPfl(type,m,pfl,glob,nasc);
+  MEDCouplingAutoRefCountObjectPtr<DataArray> ret=_field_per_mesh[meshId]->getFieldOnMeshAtLevelWithPfl(type,m,pfl,glob,nasc);
+  ret->setName(nasc.getName().c_str());
+  return ret.retn();
 }
 
 //= MEDFileField1TSWithoutSDA
