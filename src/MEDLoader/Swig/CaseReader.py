@@ -21,7 +21,7 @@
 
 import numpy as np
 from MEDLoader import *
-import sys,re,os
+import sys,re
 
 class CaseReader:
     """ Converting a file in the Case format (Ensight) to the MED format.
