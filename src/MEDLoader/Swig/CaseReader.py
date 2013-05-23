@@ -22,7 +22,6 @@
 import numpy as np
 from MEDLoader import *
 import sys,re,os
-from optparse import OptionParser
 
 class CaseReader:
     """ Converting a file in the Case format (Ensight) to the MED format.
