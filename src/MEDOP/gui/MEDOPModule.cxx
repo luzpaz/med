@@ -28,7 +28,8 @@
 #include "MEDOPFactoryClient.hxx"
 
 MEDOPModule::MEDOPModule() :
-  StandardApp_Module()
+  StandardApp_Module(),
+  LightApp_Module("MED")
 {
   // Note also that we can't use the getApp() function here because
   // the initialize(...) function has not been called yet.
