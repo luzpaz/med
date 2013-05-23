@@ -90,6 +90,21 @@ class MEDCouplingBasicsTest(unittest.TestCase):
                  -0.305, 0.024155, 0.04183768725682622, -0.2863, 0.04831000000000001, -1.015761910347357e-17, -0.2863, 
                  0.09662000000000001, -1.832979297858306e-18, -0.2863, 0.120775, 0.04183768725682623, -0.2863, 0.09662000000000001,
                  0.08367537451365245, -0.2863, 0.04831000000000001, 0.08367537451365246, -0.2863 ]
+        self.assertEqual(MEDCouplingMesh.GetNumberOfNodesOfGeometricType(NORM_TRI3),3)
+        self.assertTrue(MEDCouplingMesh.IsStaticGeometricType(NORM_TRI3))
+        self.assertTrue(MEDCouplingMesh.IsLinearGeometricType(NORM_TRI3))
+        self.assertEqual(MEDCouplingMesh.GetDimensionOfGeometricType(NORM_TRI3),2)
+        self.assertEqual(MEDCouplingMesh.GetReprOfGeometricType(NORM_TRI3),"NORM_TRI3")
+        self.assertRaises(InterpKernelException,MEDCouplingMesh.GetNumberOfNodesOfGeometricType,NORM_POLYGON)
+        self.assertTrue(not MEDCouplingMesh.IsStaticGeometricType(NORM_POLYGON))
+        self.assertTrue(MEDCouplingMesh.IsLinearGeometricType(NORM_POLYGON))
+        self.assertEqual(MEDCouplingMesh.GetDimensionOfGeometricType(NORM_POLYGON),2)
+        self.assertEqual(MEDCouplingMesh.GetReprOfGeometricType(NORM_POLYGON),"NORM_POLYGON")
+        self.assertEqual(MEDCouplingMesh.GetNumberOfNodesOfGeometricType(NORM_TRI6),6)
+        self.assertTrue(MEDCouplingMesh.IsStaticGeometricType(NORM_TRI6))
+        self.assertTrue(not MEDCouplingMesh.IsLinearGeometricType(NORM_TRI6))
+        self.assertEqual(MEDCouplingMesh.GetDimensionOfGeometricType(NORM_TRI6),2)
+        self.assertEqual(MEDCouplingMesh.GetReprOfGeometricType(NORM_TRI6),"NORM_TRI6")
         mesh=MEDCouplingUMesh.New()
         mesh.setMeshDimension(2)
         mesh.allocateCells(8);

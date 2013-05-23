@@ -510,6 +510,39 @@ MEDCouplingMesh *MEDCouplingMesh::MergeMeshes(std::vector<const MEDCouplingMesh 
 }
 
 /*!
+ * \param [in] type the geometric type for which the number of nodes consituting it is asked.
+ * \return number of nodes consituting the input geometric type \a type.
+ * 
+ * \throw if type is dynamic as \c INTERP_KERNEL::NORM_POLYHED , \c INTERP_KERNEL::NORM_POLYGON , \c INTERP_KERNEL::NORM_QPOLYG
+ * \throw if type is equal to \c INTERP_KERNEL::NORM_ERROR or to an unexisting geometric type.
+ */
+int MEDCouplingMesh::GetNumberOfNodesOfGeometricType(INTERP_KERNEL::NormalizedCellType type) throw(INTERP_KERNEL::Exception)
+{
+  const INTERP_KERNEL::CellModel& cm=INTERP_KERNEL::CellModel::GetCellModel(type);
+  if(cm.isDynamic())
+    throw INTERP_KERNEL::Exception("MEDCouplingMesh::GetNumberOfNodesOfGeometricType : the input geometric type is dynamic ! Impossible to return a fixed number of nodes constituting it !");
+  return (int) cm.getNumberOfNodes();
+}
+
+/*!
+ * \param [in] type the geometric type for which the status static/dynamic is asked.
+ * \return true for static geometric type, false for dynamic geometric type.
+ * 
+ * \throw if type is equal to \c INTERP_KERNEL::NORM_ERROR or to an unexisting geometric type.
+ */
+bool MEDCouplingMesh::IsStaticGeometricType(INTERP_KERNEL::NormalizedCellType type) throw(INTERP_KERNEL::Exception)
+{
+  const INTERP_KERNEL::CellModel& cm=INTERP_KERNEL::CellModel::GetCellModel(type);
+  return !cm.isDynamic();
+}
+
+bool MEDCouplingMesh::IsLinearGeometricType(INTERP_KERNEL::NormalizedCellType type) throw(INTERP_KERNEL::Exception)
+{
+  const INTERP_KERNEL::CellModel& cm=INTERP_KERNEL::CellModel::GetCellModel(type);
+  return !cm.isQuadratic();
+}
+
+/*!
  * \param [in] type the geometric type for which the dimension is asked.
  * \return the dimension associated to the input geometric type \a type.
  * 
