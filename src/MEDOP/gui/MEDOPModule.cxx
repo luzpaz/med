@@ -28,8 +28,10 @@
 #include "MEDOPFactoryClient.hxx"
 
 MEDOPModule::MEDOPModule() :
-  StandardApp_Module(),
-  LightApp_Module("MED")
+#ifndef QT48_PORTING
+  LightApp_Module("MED"),
+#endif
+  StandardApp_Module()
 {
   // Note also that we can't use the getApp() function here because
   // the initialize(...) function has not been called yet.

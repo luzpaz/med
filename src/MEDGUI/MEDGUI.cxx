@@ -69,7 +69,11 @@ static CORBA::ORB_var   _orb;
  *
  */
 //=============================================================================
-MedGUI::MedGUI() : LightApp_Module( "MED" ),SalomeApp_Module( "MED" )
+MedGUI::MedGUI() : 
+#ifndef QT48_PORTING
+  LightApp_Module( "MED" ),
+#endif
+  SalomeApp_Module( "MED" )
 {
 }
 
