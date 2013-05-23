@@ -184,27 +184,3 @@ class CaseReader:
         return ret
 
     pass
-
-
-if __name__ == "__main__":
-    parser = OptionParser()
-    parser.set_usage("Convert a Case file to a MED file.\n   %prog [options] case_file")
-    (opts, args) = parser.parse_args()
-    
-    if len(args) != 1:
-        parser.print_usage()
-        exit(1)
-
-    fname=args[0]  #"cas_test_simple.case"
-    fOut=os.path.splitext(fname)[0]+".med"
-    ###
-    cr=CaseReader(fname)
-    try:
-        medfd=cr.loadInMEDFileDS()
-    except:
-        print "An error occured during the conversion!"
-        print "#######################################"
-        raise
-    medfd.write(fOut,2)
-    print "#########\nFile \"%s\" written !\n#########"%(fOut)
-
