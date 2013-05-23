@@ -443,10 +443,13 @@ namespace ParaMEDMEM
     void setFamilyInfo(const std::map<std::string,int>& info);
     void setGroupInfo(const std::map<std::string, std::vector<std::string> >&info);
     int getFamilyId(const char *name) const throw(INTERP_KERNEL::Exception);
+    int getMaxAbsFamilyId() const throw(INTERP_KERNEL::Exception);
     int getMaxFamilyId() const throw(INTERP_KERNEL::Exception);
     int getMinFamilyId() const throw(INTERP_KERNEL::Exception);
+    int getTheMaxAbsFamilyId() const throw(INTERP_KERNEL::Exception);
     int getTheMaxFamilyId() const throw(INTERP_KERNEL::Exception);
     int getTheMinFamilyId() const throw(INTERP_KERNEL::Exception);
+    virtual int getMaxAbsFamilyIdInArrays() const throw(INTERP_KERNEL::Exception);
     virtual int getMaxFamilyIdInArrays() const throw(INTERP_KERNEL::Exception);
     virtual int getMinFamilyIdInArrays() const throw(INTERP_KERNEL::Exception);
     DataArrayInt *getAllFamiliesIdsReferenced() const throw(INTERP_KERNEL::Exception);

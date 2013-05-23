@@ -100,10 +100,13 @@ namespace ParaMEDMEM
     void changeFamilyId(int oldId, int newId) throw(INTERP_KERNEL::Exception);
     void changeAllGroupsContainingFamily(const char *familyNameToChange, const std::vector<std::string>& newFamiliesNames) throw(INTERP_KERNEL::Exception);
     int getFamilyId(const char *name) const throw(INTERP_KERNEL::Exception);
+    int getMaxAbsFamilyId() const throw(INTERP_KERNEL::Exception);
     int getMaxFamilyId() const throw(INTERP_KERNEL::Exception);
     int getMinFamilyId() const throw(INTERP_KERNEL::Exception);
+    int getTheMaxAbsFamilyId() const throw(INTERP_KERNEL::Exception);
     int getTheMaxFamilyId() const throw(INTERP_KERNEL::Exception);
     int getTheMinFamilyId() const throw(INTERP_KERNEL::Exception);
+    virtual int getMaxAbsFamilyIdInArrays() const throw(INTERP_KERNEL::Exception) = 0;
     virtual int getMaxFamilyIdInArrays() const throw(INTERP_KERNEL::Exception) = 0;
     virtual int getMinFamilyIdInArrays() const throw(INTERP_KERNEL::Exception) = 0;
     DataArrayInt *getAllFamiliesIdsReferenced() const throw(INTERP_KERNEL::Exception);
@@ -181,6 +184,7 @@ namespace ParaMEDMEM
     void clearNonDiscrAttributes() const;
     ~MEDFileUMesh();
     //
+    int getMaxAbsFamilyIdInArrays() const throw(INTERP_KERNEL::Exception);
     int getMaxFamilyIdInArrays() const throw(INTERP_KERNEL::Exception);
     int getMinFamilyIdInArrays() const throw(INTERP_KERNEL::Exception);
     int getMeshDimension() const throw(INTERP_KERNEL::Exception);
@@ -247,7 +251,7 @@ namespace ParaMEDMEM
     void synchronizeTinyInfoOnLeaves() const;
     void changeFamilyIdArr(int oldId, int newId) throw(INTERP_KERNEL::Exception);
     std::list< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> > getAllNonNullFamilyIds() const;
-    void addGroupUnderground(const DataArrayInt *ids, DataArrayInt *famArr) throw(INTERP_KERNEL::Exception);
+    void addGroupUnderground(bool isNodeGroup, const DataArrayInt *ids, DataArrayInt *famArr) throw(INTERP_KERNEL::Exception);
   private:
     std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileUMeshSplitL1> > _ms;
     MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> _coords;
@@ -262,6 +266,7 @@ namespace ParaMEDMEM
     friend class MEDFileMesh;
   public:
     std::size_t getHeapMemorySize() const;
+    int getMaxAbsFamilyIdInArrays() const throw(INTERP_KERNEL::Exception);
     int getMaxFamilyIdInArrays() const throw(INTERP_KERNEL::Exception);
     int getMinFamilyIdInArrays() const throw(INTERP_KERNEL::Exception);
     bool isEqual(const MEDFileMesh *other, double eps, std::string& what) const;

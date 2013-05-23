@@ -1066,6 +1066,23 @@ std::vector<int> MEDFileMesh::getFamiliesIds(const std::vector<std::string>& fam
 }
 
 /*!
+ * Returns a maximal abs(id) of families in \a this mesh.
+ *  \return int - the maximal norm of family id.
+ *  \throw If there are no families in \a this mesh.
+ */
+int MEDFileMesh::getMaxAbsFamilyId() const throw(INTERP_KERNEL::Exception)
+{
+  if(_families.empty())
+    throw INTERP_KERNEL::Exception("MEDFileMesh::getMaxFamilyId : no families set !");
+  int ret=-std::numeric_limits<int>::max();
+  for(std::map<std::string,int>::const_iterator it=_families.begin();it!=_families.end();it++)
+    {
+      ret=std::max(std::abs((*it).second),ret);
+    }
+  return ret;
+}
+
+/*!
  * Returns a maximal id of families in \a this mesh.
  *  \return int - the maximal family id.
  *  \throw If there are no families in \a this mesh.
@@ -1073,7 +1090,7 @@ std::vector<int> MEDFileMesh::getFamiliesIds(const std::vector<std::string>& fam
 int MEDFileMesh::getMaxFamilyId() const throw(INTERP_KERNEL::Exception)
 {
   if(_families.empty())
-    throw INTERP_KERNEL::Exception("MEDFileUMesh::getMaxFamilyId : no families set !");
+    throw INTERP_KERNEL::Exception("MEDFileMesh::getMaxFamilyId : no families set !");
   int ret=-std::numeric_limits<int>::max();
   for(std::map<std::string,int>::const_iterator it=_families.begin();it!=_families.end();it++)
     {
@@ -1090,13 +1107,27 @@ int MEDFileMesh::getMaxFamilyId() const throw(INTERP_KERNEL::Exception)
 int MEDFileMesh::getMinFamilyId() const throw(INTERP_KERNEL::Exception)
 {
   if(_families.empty())
-    throw INTERP_KERNEL::Exception("MEDFileUMesh::getMinFamilyId : no families set !");
+    throw INTERP_KERNEL::Exception("MEDFileMesh::getMinFamilyId : no families set !");
   int ret=std::numeric_limits<int>::max();
   for(std::map<std::string,int>::const_iterator it=_families.begin();it!=_families.end();it++)
     {
       ret=std::min((*it).second,ret);
     }
   return ret;
+}
+
+/*!
+ * Returns a maximal id of families in \a this mesh. Not only named families are
+ * considered but all family fields as well.
+ *  \return int - the maximal family id.
+ */
+int MEDFileMesh::getTheMaxAbsFamilyId() const throw(INTERP_KERNEL::Exception)
+{
+  int m1=-std::numeric_limits<int>::max();
+  for(std::map<std::string,int>::const_iterator it=_families.begin();it!=_families.end();it++)
+    m1=std::max(std::abs((*it).second),m1);
+  int m2=getMaxAbsFamilyIdInArrays();
+  return std::max(m1,m2);
 }
 
 /*!
@@ -1113,6 +1144,11 @@ int MEDFileMesh::getTheMaxFamilyId() const throw(INTERP_KERNEL::Exception)
   return std::max(m1,m2);
 }
 
+/*!
+ * Returns a minimal id of families in \a this mesh. Not only named families are
+ * considered but all family fields as well.
+ *  \return int - the minimal family id.
+ */
 int MEDFileMesh::getTheMinFamilyId() const throw(INTERP_KERNEL::Exception)
 {
   int m1=std::numeric_limits<int>::max();
@@ -1565,8 +1601,8 @@ void MEDFileMesh::setGroupsAtLevel(int meshDimRelToMaxExt, const std::vector<con
     }
   int offset=1;
   if(!_families.empty())
-    offset=getMaxFamilyId()+1;
-  TranslateFamilyIds(offset,fam,fidsOfGroups);
+    offset=getMaxAbsFamilyId()+1;
+  TranslateFamilyIds(meshDimRelToMaxExt==1?offset:-offset,fam,fidsOfGroups);
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ids=fam->getDifferentValues();
   appendFamilyEntries(ids,fidsOfGroups,grpsName2);
   setFamilyFieldArr(meshDimRelToMaxExt,fam);
@@ -1599,9 +1635,13 @@ void MEDFileMesh::appendFamilyEntries(const DataArrayInt *famIds, const std::vec
 
 void MEDFileMesh::TranslateFamilyIds(int offset, DataArrayInt *famArr, std::vector< std::vector<int> >& famIdsPerGrp)
 {
-  famArr->applyLin(1,offset,0);
+  famArr->applyLin(offset>0?1:-1,offset,0);
   for(std::vector< std::vector<int> >::iterator it1=famIdsPerGrp.begin();it1!=famIdsPerGrp.end();it1++)
-    std::transform((*it1).begin(),(*it1).end(),(*it1).begin(),std::bind2nd(std::plus<int>(),offset));
+    {
+      if(offset<0)
+        std::transform((*it1).begin(),(*it1).end(),(*it1).begin(),std::negate<int>());
+      std::transform((*it1).begin(),(*it1).end(),(*it1).begin(),std::bind2nd(std::plus<int>(),offset));
+    }
 }
 
 /*!
@@ -2191,6 +2231,29 @@ std::vector<std::string> MEDFileUMesh::getGroupsOnSpecifiedLev(int meshDimRelToM
       std::vector<int> levs=getGrpNonEmptyLevelsExt((*it).c_str());
       if(std::find(levs.begin(),levs.end(),meshDimRelToMaxExt)!=levs.end())
         ret.push_back(*it);
+    }
+  return ret;
+}
+
+int MEDFileUMesh::getMaxAbsFamilyIdInArrays() const throw(INTERP_KERNEL::Exception)
+{
+  int ret=-std::numeric_limits<int>::max(),tmp=-1;
+  if((const DataArrayInt *)_fam_coords)
+    {
+      int val=_fam_coords->getMaxValue(tmp);
+      ret=std::max(ret,std::abs(val));
+    }
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileUMeshSplitL1> >::const_iterator it=_ms.begin();it!=_ms.end();it++)
+    {
+      if((const MEDFileUMeshSplitL1 *)(*it))
+        {
+          const DataArrayInt *da=(*it)->getFamilyField();
+          if(da)
+            {
+              int val=da->getMaxValue(tmp);
+              ret=std::max(ret,std::abs(val));
+            }
+        }
     }
   return ret;
 }
@@ -3027,9 +3090,19 @@ void MEDFileUMesh::addNodeGroup(const DataArrayInt *ids) throw(INTERP_KERNEL::Ex
   if(!((DataArrayInt *)_fam_coords))
     { _fam_coords=DataArrayInt::New(); _fam_coords->alloc(nbOfNodes,1); _fam_coords->fillWithZero(); }
   //
-  addGroupUnderground(ids,_fam_coords);
+  addGroupUnderground(true,ids,_fam_coords);
 }
 
+/*!
+ * Adds a group of nodes/cells/faces/edges to \a this mesh.
+ *  \param [in] ids - a DataArrayInt providing ids and a name of the group to add.
+ *          The ids should be sorted and different each other (MED file norm).
+ *  \throw If the node coordinates array is not set.
+ *  \throw If \a ids == \c NULL.
+ *  \throw If \a ids->getName() == "".
+ *  \throw If \a ids does not respect the MED file norm.
+ *  \throw If a group with name \a ids->getName() already exists.
+ */
 void MEDFileUMesh::addGroup(int meshDimRelToMaxExt, const DataArrayInt *ids) throw(INTERP_KERNEL::Exception)
 {
   std::vector<int> levs=getNonEmptyLevelsExt();
@@ -3042,14 +3115,14 @@ void MEDFileUMesh::addGroup(int meshDimRelToMaxExt, const DataArrayInt *ids) thr
     { addNodeGroup(ids); return ; }
   MEDFileUMeshSplitL1 *lev=getMeshAtLevSafe(meshDimRelToMaxExt);
   DataArrayInt *fam=lev->getOrCreateAndGetFamilyField();
-  addGroupUnderground(ids,fam);
+  addGroupUnderground(false,ids,fam);
 }
 
 /*!
  * \param [in] ids ids and group name of the new group to add. The ids should be sorted and different each other (MED file norm).
  * \parma [in,out] famArr family array on level of interest to be renumbered. The input pointer should be not \c NULL (no check of that will be performed)
  */
-void MEDFileUMesh::addGroupUnderground(const DataArrayInt *ids, DataArrayInt *famArr) throw(INTERP_KERNEL::Exception)
+void MEDFileUMesh::addGroupUnderground(bool isNodeGroup, const DataArrayInt *ids, DataArrayInt *famArr) throw(INTERP_KERNEL::Exception)
 {
   if(!ids)
     throw INTERP_KERNEL::Exception("MEDFileUMesh::addGroup : NULL pointer in input !");
@@ -3070,7 +3143,7 @@ void MEDFileUMesh::addGroupUnderground(const DataArrayInt *ids, DataArrayInt *fa
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> diffFamIds=famIds->getDifferentValues();
   std::vector<int> familyIds;
   std::vector< MEDCouplingAutoRefCountObjectPtr<DataArrayInt> > idsPerfamiliyIds;
-  int maxVal=getTheMaxFamilyId()+1;
+  int maxVal=getTheMaxAbsFamilyId()+1;
   std::map<std::string,int> families(_families);
   std::map<std::string, std::vector<std::string> > groups(_groups);
   std::vector<std::string> fams;
@@ -3090,7 +3163,8 @@ void MEDFileUMesh::addGroupUnderground(const DataArrayInt *ids, DataArrayInt *fa
             { familyIds.push_back(*famId); idsPerfamiliyIds.push_back(ret0); fams.push_back(FindOrCreateAndGiveFamilyWithId(families,*famId,created)); } // adding *famId in grp
           else
             {
-              familyIds.push_back(maxVal); idsPerfamiliyIds.push_back(ids2); std::string locFamName=FindOrCreateAndGiveFamilyWithId(families,maxVal,created);
+              familyIds.push_back(isNodeGroup?maxVal:-maxVal); idsPerfamiliyIds.push_back(ids2);
+              std::string locFamName=FindOrCreateAndGiveFamilyWithId(families,isNodeGroup?maxVal:-maxVal,created);
               fams.push_back(locFamName);
               if(existsFamily(*famId))
                 {
@@ -3102,12 +3176,12 @@ void MEDFileUMesh::addGroupUnderground(const DataArrayInt *ids, DataArrayInt *fa
         }
       else
         {
-          familyIds.push_back(maxVal); idsPerfamiliyIds.push_back(ret0); // modifying all other groups on *famId to lie on maxVal and on maxVal+1
-          familyIds.push_back(maxVal+1); idsPerfamiliyIds.push_back(ids2);//grp lie only on maxVal+1
-          std::string n2(FindOrCreateAndGiveFamilyWithId(families,maxVal+1,created)); fams.push_back(n2);
+          familyIds.push_back(isNodeGroup?maxVal:-maxVal); idsPerfamiliyIds.push_back(ret0); // modifying all other groups on *famId to lie on maxVal and on maxVal+1
+          familyIds.push_back(isNodeGroup?maxVal+1:-maxVal-1); idsPerfamiliyIds.push_back(ids2);//grp lie only on maxVal+1
+          std::string n2(FindOrCreateAndGiveFamilyWithId(families,isNodeGroup?maxVal+1:-maxVal-1,created)); fams.push_back(n2);
           if(existsFamily(*famId))
             {
-              std::string n1(FindOrCreateAndGiveFamilyWithId(families,maxVal,created)); std::vector<std::string> v(2); v[0]=n1; v[1]=n2;
+              std::string n1(FindOrCreateAndGiveFamilyWithId(families,isNodeGroup?maxVal:-maxVal,created)); std::vector<std::string> v(2); v[0]=n1; v[1]=n2;
               ChangeAllGroupsContainingFamily(groups,getFamilyNameGivenId(*famId).c_str(),v);
             }
           maxVal+=2;
@@ -3474,6 +3548,22 @@ std::size_t MEDFileStructuredMesh::getHeapMemorySize() const
     ret+=_rev_num_nodes->getHeapMemorySize();
   if((const DataArrayInt*)_rev_num_cells)
     ret+=_rev_num_cells->getHeapMemorySize();
+  return ret;
+}
+
+int MEDFileStructuredMesh::getMaxAbsFamilyIdInArrays() const throw(INTERP_KERNEL::Exception)
+{
+  int ret=-std::numeric_limits<int>::max(),tmp=-1;
+  if((const DataArrayInt *)_fam_nodes)
+    {
+      int val=_fam_nodes->getMaxValue(tmp);
+      ret=std::max(ret,std::abs(val));
+    }
+  if((const DataArrayInt *)_fam_cells)
+    {
+      int val=_fam_cells->getMaxValue(tmp);
+      ret=std::max(ret,std::abs(val));
+    }
   return ret;
 }
 

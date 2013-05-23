@@ -271,20 +271,20 @@ class MEDLoaderTest(unittest.TestCase):
         res=mm.isEqual(mm2,1e-12)
         self.assertTrue(res[0])
         l=list(mm2.getFamiliesOnGroup("G2")) ; l.sort()
-        self.assertEqual(['Family_10','Family_11','Family_3','Family_4','Family_7'],l)
+        self.assertEqual(['Family_-3','Family_-4','Family_-7','Family_10','Family_11'],l)
         mm2.keepFamIdsOnlyOnLevs([3],[-1])
         for lev in mm.getGrpNonEmptyLevelsExt("G2"):
             self.assertEqual(mm.getGroupArr(lev,"G2").getValues(),mm2.getGroupArr(lev,"G2").getValues())
             pass
         l=list(mm2.getFamiliesOnGroup("G2")) ; l.sort()
-        self.assertEqual(['Family_10','Family_11','Family_12','Family_3','Family_4','Family_7'],l)
+        self.assertEqual(['Family_-3','Family_-4','Family_-7','Family_10','Family_11'],l)
         #
-        self.assertEqual([7,7,6],mm2.getFamilyFieldAtLevel(-1).getValues())
-        mm2.getFamilyFieldAtLevel(-1).setIJ(1,0,8)
-        self.assertEqual([7,8,6],mm2.getFamilyFieldAtLevel(-1).getValues())
-        self.assertTrue(not mm2.existsFamily("Family_8"))
+        self.assertEqual([-7,-7,-6],mm2.getFamilyFieldAtLevel(-1).getValues())
+        mm2.getFamilyFieldAtLevel(-1).setIJ(1,0,-8)
+        self.assertEqual([-7,-8,-6],mm2.getFamilyFieldAtLevel(-1).getValues())
+        self.assertTrue(not mm2.existsFamily("Family_-8"))
         mm2.createGroupOnAll(-1,"GrpOnAllFace")
-        self.assertTrue(mm2.existsFamily("Family_8"))
+        self.assertTrue(mm2.existsFamily("Family_-8"))
         self.assertEqual(range(3),mm2.getGroupArr(-1,"GrpOnAllFace").getValues())
         pass
 
@@ -993,9 +993,9 @@ class MEDLoaderTest(unittest.TestCase):
         g3=DataArrayInt.New() ; g3.setValues([1,2,3],3,1) ; g3.setName("g3")
         mm.setGroupsAtLevel(0,[g1,g2],False)
         self.assertEqual(('g1','g2'),mm.getGroupsNames())
-        self.assertEqual(('Family_2','Family_3'),mm.getFamiliesNames())
-        self.assertEqual(('Family_2',),mm.getFamiliesOnGroup('g1'))
-        self.assertEqual(('Family_3',),mm.getFamiliesOnGroup('g2'))
+        self.assertEqual(('Family_-2','Family_-3'),mm.getFamiliesNames())
+        self.assertEqual(('Family_-2',),mm.getFamiliesOnGroup('g1'))
+        self.assertEqual(('Family_-3',),mm.getFamiliesOnGroup('g2'))
         mm.assignFamilyNameWithGroupName()
         self.assertEqual(('g1','g2'),mm.getGroupsNames())
         self.assertEqual(('g1','g2'),mm.getFamiliesNames())
@@ -1006,16 +1006,16 @@ class MEDLoaderTest(unittest.TestCase):
         mm.setMeshAtLevel(0,m)
         mm.setGroupsAtLevel(0,[g1,g2,g3],False)
         self.assertEqual(('g1','g2','g3'),mm.getGroupsNames())
-        self.assertEqual(('Family_2', 'Family_4', 'Family_5'),mm.getFamiliesNames())
-        self.assertEqual(('Family_2', 'Family_4'),mm.getFamiliesOnGroup('g1'))
-        self.assertEqual(('Family_5',),mm.getFamiliesOnGroup('g2'))
-        self.assertEqual(('Family_4','Family_5',),mm.getFamiliesOnGroup('g3'))
+        self.assertEqual(('Family_-2', 'Family_-4', 'Family_-5'),mm.getFamiliesNames())
+        self.assertEqual(('Family_-2', 'Family_-4'),mm.getFamiliesOnGroup('g1'))
+        self.assertEqual(('Family_-5',),mm.getFamiliesOnGroup('g2'))
+        self.assertEqual(('Family_-4','Family_-5',),mm.getFamiliesOnGroup('g3'))
         mm.assignFamilyNameWithGroupName() # here it does nothing because no such group-family bijection found
         self.assertEqual(('g1','g2','g3'),mm.getGroupsNames())
-        self.assertEqual(('Family_2', 'Family_4', 'Family_5'),mm.getFamiliesNames())
-        self.assertEqual(('Family_2', 'Family_4'),mm.getFamiliesOnGroup('g1'))
-        self.assertEqual(('Family_5',),mm.getFamiliesOnGroup('g2'))
-        self.assertEqual(('Family_4','Family_5',),mm.getFamiliesOnGroup('g3'))
+        self.assertEqual(('Family_-2', 'Family_-4', 'Family_-5'),mm.getFamiliesNames())
+        self.assertEqual(('Family_-2', 'Family_-4'),mm.getFamiliesOnGroup('g1'))
+        self.assertEqual(('Family_-5',),mm.getFamiliesOnGroup('g2'))
+        self.assertEqual(('Family_-4','Family_-5',),mm.getFamiliesOnGroup('g3'))
         mm.changeFamilyId(5,6)
         g=mm.getGroupArr(0,"g3")
         self.assertTrue(g.isEqual(g3));
@@ -1921,18 +1921,18 @@ class MEDLoaderTest(unittest.TestCase):
         daTest=DataArrayInt([1,3,4,6,9,10,12]) ; daTest.setName("grp1")
         mm.addGroup(0,daTest)
         self.assertTrue(mm.getGroupArr(0,daTest.getName()).isEqual(daTest))
-        self.assertTrue(mm.getFamilyFieldAtLevel(0).isEqual(DataArrayInt([6,2,6,8,2,6,5,6,6,7,7,4,8])))
+        self.assertTrue(mm.getFamilyFieldAtLevel(0).isEqual(DataArrayInt([-6,2,-6,-8,2,-6,-5,-6,-6,-7,-7,-4,-8])))
         for lev,arr in [(1,da0),(-1,da1),(-2,da2)]:
             self.assertTrue(mm.getFamilyFieldAtLevel(lev).isEqual(arr))
             pass
-        self.assertEqual(mm.getFamiliesNames(),('Family_4','Family_5','Family_7','Family_8','MyFam','MyOther-1','MyOtherFam'))
+        self.assertEqual(mm.getFamiliesNames(),('Family_-4','Family_-5','Family_-7','Family_-8','MyFam','MyOther-1','MyOtherFam'))
         self.assertEqual(mm.getGroupsNames(),('grp0','grp1','grpA'))
         self.assertEqual(mm.getFamilyNameGivenId(3),'MyOtherFam')
         self.assertEqual(mm.getFamilyNameGivenId(2),'MyFam')
-        for famName,famId in [('Family_4',4),('Family_5',5),('Family_7',7),('Family_8',8)]:
+        for famName,famId in [('Family_-4',-4),('Family_-5',-5),('Family_-7',-7),('Family_-8',-8)]:
             self.assertEqual(mm.getFamilyNameGivenId(famId),famName)
             pass
-        self.assertEqual(mm.getFamiliesOnGroup("grp0"),('MyOtherFam','Family_8'))
+        self.assertEqual(mm.getFamiliesOnGroup("grp0"),('MyOtherFam','Family_-8'))
         da=DataArrayInt([3,12]) ; da.setName("grp0")
         self.assertTrue(mm.getGroupArr(0,"grp0").isEqual(da))
         da.setValues([1])
@@ -1940,18 +1940,18 @@ class MEDLoaderTest(unittest.TestCase):
         mm.write(fname,2)
         mm=MEDFileMesh.New(fname)
         self.assertTrue(mm.getGroupArr(0,daTest.getName()).isEqual(daTest))
-        self.assertTrue(mm.getFamilyFieldAtLevel(0).isEqual(DataArrayInt([6,2,6,8,2,6,5,6,6,7,7,4,8])))
+        self.assertTrue(mm.getFamilyFieldAtLevel(0).isEqual(DataArrayInt([-6,2,-6,-8,2,-6,-5,-6,-6,-7,-7,-4,-8])))
         for lev,arr in [(1,da0),(-1,da1),(-2,da2)]:
             self.assertTrue(mm.getFamilyFieldAtLevel(lev).isEqual(arr))
             pass
-        self.assertEqual(mm.getFamiliesNames(),('FAMILLE_ZERO','Family_4','Family_5','Family_7','Family_8','MyFam','MyOther-1','MyOtherFam'))
+        self.assertEqual(mm.getFamiliesNames(),('FAMILLE_ZERO','Family_-4','Family_-5','Family_-7','Family_-8','MyFam','MyOther-1','MyOtherFam'))
         self.assertEqual(mm.getGroupsNames(),('grp0','grp1','grpA'))
         self.assertEqual(mm.getFamilyNameGivenId(3),'MyOtherFam')
         self.assertEqual(mm.getFamilyNameGivenId(2),'MyFam')
-        for famName,famId in [('Family_4',4),('Family_5',5),('Family_7',7),('Family_8',8)]:
+        for famName,famId in [('Family_-4',-4),('Family_-5',-5),('Family_-7',-7),('Family_-8',-8)]:
             self.assertEqual(mm.getFamilyNameGivenId(famId),famName)
             pass
-        self.assertEqual(mm.getFamiliesOnGroup("grp0"),('Family_8','MyOtherFam'))
+        self.assertEqual(mm.getFamiliesOnGroup("grp0"),('Family_-8','MyOtherFam'))
         da=DataArrayInt([3,12]) ; da.setName("grp0")
         self.assertTrue(mm.getGroupArr(0,"grp0").isEqual(da))
         da.setValues([1])
