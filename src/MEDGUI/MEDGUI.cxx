@@ -69,7 +69,7 @@ static CORBA::ORB_var   _orb;
  *
  */
 //=============================================================================
-MedGUI::MedGUI() : SalomeApp_Module( "MED" )
+MedGUI::MedGUI() : LightApp_Module( "MED" ),SalomeApp_Module( "MED" )
 {
 }
 
