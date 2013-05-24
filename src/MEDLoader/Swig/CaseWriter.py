@@ -123,8 +123,13 @@ time values:
                 a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(1,))
                 a[0]=nn ; a.flush() # number of nodes
                 mm.seek(mm.tell()+4)
+                coo=ms[0].getCoords()
+                spaceDim=coo.getNumberOfComponents()
+                if spaceDim!=3:
+                    coo=coo.changeNbOfComponents(3,0.)
+                    pass
                 a=np.memmap(f,dtype='float32',mode='w+',offset=mm.tell(),shape=(3,nn))
-                c=ms[0].getCoords().toNoInterlace() ; c.rearrange(1) ; cnp=c.toNumPyArray() ; cnp=cnp.reshape(3,nn)
+                c=coo.toNoInterlace() ; c.rearrange(1) ; cnp=c.toNumPyArray() ; cnp=cnp.reshape(3,nn)
                 a[:]=cnp ; a.flush() ; mm.seek(mm.tell()+3*nn*4)
                 for m in ms:
                     i=0
@@ -186,7 +191,7 @@ time values:
         for mdf in mdfs:
             nbCompo=mdf.getNumberOfComponents()
             if nbCompo not in dictCompo:
-                print "Field \"%s\" will be ignored because number of components is not in [1,3,6,9] supported by case files !"%(mdf.getName())
+                print "Field \"%s\" will be ignored because number of components (%i) is not in %s supported by case files !"%(mdf.getName(),nbCompo,str(dictCompo.keys()))
                 pass
             if nbCompo in dictVars:
                 dictVars[nbCompo].append(mdf)
@@ -203,12 +208,12 @@ time values:
                 ff=mdf[it]
                 for typ in ff.getTypesOfFieldAvailable():
                     l=self._l[:] ; l[-1]="%s%s.%s_%s"%(self._base_name_without_dir,str(iii).rjust(4,"0"),ff.getName(),MEDCouplingFieldDiscretization.New(typ).getStringRepr())
-                    fffn=os.path.sep.join(l)
+                    fffn=l[-1]
                     try:
-                        os.remove(fffn)
+                        os.remove(os.path.sep.join(l))
                     except:
                         pass
-                    f=open(fffn,"w+b")
+                    f=open(os.path.sep.join(l),"w+b")
                     summ=0
                     for geo,[(curTyp,(bg,end),pfl,loc)] in ff.getFieldSplitedByType():
                         if typ==curTyp:
