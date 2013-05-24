@@ -7099,6 +7099,12 @@ const std::vector<std::string>& MEDFileAnyTypeFieldMultiTS::getInfo() const thro
   return contentNotNullBase()->getInfo();
 }
 
+int MEDFileAnyTypeFieldMultiTS::getNumberOfComponents() const throw(INTERP_KERNEL::Exception)
+{
+  const std::vector<std::string> ret=getInfo();
+  return (int)ret.size();
+}
+
 void MEDFileAnyTypeFieldMultiTS::writeLL(med_idt fid) const throw(INTERP_KERNEL::Exception)
 {
   writeGlobals(fid,*this);

@@ -1439,6 +1439,7 @@ namespace ParaMEDMEM
     std::string getMeshName() const throw(INTERP_KERNEL::Exception);
     void setMeshName(const char *newMeshName) throw(INTERP_KERNEL::Exception);
     const std::vector<std::string>& getInfo() const throw(INTERP_KERNEL::Exception);
+    int getNumberOfComponents() const throw(INTERP_KERNEL::Exception);
     int getNumberOfTS() const throw(INTERP_KERNEL::Exception);
     void eraseEmptyTS() throw(INTERP_KERNEL::Exception);
     int getPosOfTimeStep(int iteration, int order) const throw(INTERP_KERNEL::Exception);
