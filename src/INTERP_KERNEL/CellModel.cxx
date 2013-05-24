@@ -449,6 +449,36 @@ namespace INTERP_KERNEL
     else//polyhedron
       return (lgth-std::count(conn,conn+lgth,-1))/2;
   }
+  
+  NormalizedCellType CellModel::getCorrespondingPolyType() const
+  {
+    switch(getDimension())
+      {
+      case 0:
+        return NORM_POINT1;
+      case 1:
+        {
+          if(!isQuadratic())
+            return NORM_POLYL;
+          throw INTERP_KERNEL::Exception("CellModel::getPolyType : no poly type for quadratic 1D !");
+        }
+      case 2:
+        {
+          if(!isQuadratic())
+            return NORM_POLYGON;
+          else
+            return NORM_QPOLYG;
+        }
+      case 3:
+        {
+          if(!isQuadratic())
+            return NORM_POLYHED;
+          throw INTERP_KERNEL::Exception("CellModel::getPolyType : no poly type for quadratic 3D !");
+        }
+      default:
+        throw INTERP_KERNEL::Exception("CellModel::getPolyType : only dimension 0, 1, 2, 3 are supported !");
+      }
+  }
 
   /*!
    * Equivalent to getSonType except that this method deals with dynamic type.

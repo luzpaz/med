@@ -510,7 +510,22 @@ MEDCouplingMesh *MEDCouplingMesh::MergeMeshes(std::vector<const MEDCouplingMesh 
 }
 
 /*!
- * \param [in] type the geometric type for which the number of nodes consituting it is asked.
+ * For example if \a type is INTERP_KERNEL::NORM_TRI3 , INTERP_KERNEL::NORM_POLYGON is returned.
+ * If \a type is INTERP_KERNEL::NORM_HEXA8 , INTERP_KERNEL::NORM_POLYHED is returned.
+ * 
+ * \param [in] type the geometric type for which the corresponding dynamic type, is asked.
+ * \return the corresponding dynamic type, able to store the input \a type.
+ * 
+ * \throw if type is equal to \c INTERP_KERNEL::NORM_ERROR or to an unexisting geometric type.
+ */
+INTERP_KERNEL::NormalizedCellType MEDCouplingMesh::GetCorrespondingPolyType(INTERP_KERNEL::NormalizedCellType type) throw(INTERP_KERNEL::Exception)
+{
+  const INTERP_KERNEL::CellModel& cm=INTERP_KERNEL::CellModel::GetCellModel(type);
+  return cm.getCorrespondingPolyType();
+}
+
+/*!
+ * \param [in] type the geometric type for which the number of nodes consituting it, is asked.
  * \return number of nodes consituting the input geometric type \a type.
  * 
  * \throw if type is dynamic as \c INTERP_KERNEL::NORM_POLYHED , \c INTERP_KERNEL::NORM_POLYGON , \c INTERP_KERNEL::NORM_QPOLYG
