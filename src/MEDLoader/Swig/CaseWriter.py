@@ -101,7 +101,8 @@ time values:
         for grpnm in mdm.getGroupsNames():
             ms3=[]
             for lev in mdm.getGrpNonEmptyLevels(grpnm)[:1]:
-                ms3.append(mdm.getGroup(lev,grpnm))
+                m=mdm.getGroup(lev,grpnm) ; m.zipCoords()
+                ms3.append(m)
                 pass
             ms2.append(ms3)
             pass
