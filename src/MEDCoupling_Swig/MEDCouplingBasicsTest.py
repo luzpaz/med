@@ -12645,6 +12645,11 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         a,b=m.distanceToPoint(pt)
         self.assertAlmostEqual(expectedDist,a,14)
         self.assertEqual(3,b)
+        #
+        fd=MEDCouplingFieldDiscretization.New(ON_CELLS)
+        self.assertEqual(24,fd.getNumberOfTuples(m))
+        fd=MEDCouplingFieldDiscretization.New(ON_NODES)
+        self.assertEqual(26,fd.getNumberOfTuples(m))
         pass
 
     def setUp(self):

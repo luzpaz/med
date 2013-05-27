@@ -94,6 +94,7 @@ using namespace INTERP_KERNEL;
 %feature("autodoc", "1");
 %feature("docstring");
 
+%newobject ParaMEDMEM::MEDCouplingFieldDiscretization::New;
 %newobject ParaMEDMEM::MEDCouplingFieldDiscretization::getOffsetArr;
 %newobject ParaMEDMEM::MEDCouplingFieldDiscretization::deepCpy;
 %newobject ParaMEDMEM::MEDCouplingFieldDiscretization::clone;
