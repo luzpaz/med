@@ -206,7 +206,7 @@ time values:
                     print "Field \"%s\" will be ignored because number of components (%i) is too big to be %s supported by case files !"%(mdf.getName(),nbCompo,str(dictCompo.keys()))
                     continue
                     pass
-                print "WARNING : Field \"%s\" will have its number of components components (%i) set to %i, in order to be supported by case files (must be in %s) !"%(mdf.getName(),nbCompo,l[0],str(dictCompo.keys()))
+                print "WARNING : Field \"%s\" will have its number of components (%i) set to %i, in order to be supported by case files (must be in %s) !"%(mdf.getName(),nbCompo,l[0],str(dictCompo.keys()))
                 nbCompo=l[0]
                 pass
             if nbCompo in dictVars:
