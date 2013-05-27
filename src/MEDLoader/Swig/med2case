@@ -27,6 +27,8 @@ import os
 
 parser = OptionParser()
 parser.set_usage("Convert a MED file to a Case file.\n   %prog [options] case_file")
+parser.add_option("-g", "--groups", action="store_true", dest="groups", default=False,
+                  help="Are groups in meshes stored in MEDFile exported in output case as subparts (default False)")
 (opts, args) = parser.parse_args()
 
 if len(args) != 1:
@@ -39,6 +41,7 @@ fOut=os.path.splitext(fname)[0]+".case"
 ###
 try:
     cw=CaseWriter.New()
+    cw.setExportingGroups(opts.groups)
     mfd=MEDFileData(fname)
     cw.setMEDFileDS(mfd)
     listOfWrittenFileNames=cw.write(fOut)

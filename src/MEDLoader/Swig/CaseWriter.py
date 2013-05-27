@@ -54,12 +54,23 @@ time values:
 
     def __init__(self):
         """ Constructor """
+        self.__export_groups=False
         pass
 
     def setMEDFileDS(self,medData):
         """ Input should be MEDFileData instance  """
         self._med_data=medData
         pass
+
+    def isExportingGroups(self):
+        """ return the status of exporting groups policy """
+        return self.__export_groups
+
+    def setExportingGroups(self,status):
+        assert(isinstance(status,bool))
+        self.__export_groups=status
+        pass
+        
 
     def write(self,fileName):
         """ Write into the specified fileName series the result """
@@ -95,13 +106,15 @@ time values:
         #
         assert(isinstance(mdm,MEDFileUMesh))
         ms2=[[mdm.getMeshAtLevel(lev) for lev in mdm.getNonEmptyLevels()[:1]]]
-        for grpnm in mdm.getGroupsNames():
-            ms3=[]
-            for lev in mdm.getGrpNonEmptyLevels(grpnm)[:1]:
-                m=mdm.getGroup(lev,grpnm) ; m.zipCoords()
-                ms3.append(m)
+        if self.__export_groups:
+            for grpnm in mdm.getGroupsNames():    
+                ms3=[]
+                for lev in mdm.getGrpNonEmptyLevels(grpnm)[:1]:
+                    m=mdm.getGroup(lev,grpnm) ; m.zipCoords()
+                    ms3.append(m)
+                    pass
+                ms2.append(ms3)
                 pass
-            ms2.append(ms3)
             pass
         for ms in ms2:
             nn=ms[0].getNumberOfNodes()
@@ -223,8 +236,12 @@ time values:
                 pass
             for iii,it in enumerate(its):
                 ff=mdf[it]
+                isMultiDisc=len(ff.getTypesOfFieldAvailable())>1
                 for typ in ff.getTypesOfFieldAvailable():
-                    l=self._l[:] ; l[-1]="%s%s.%s_%s"%(self._base_name_without_dir,str(iii).rjust(4,"0"),ff.getName(),MEDCouplingFieldDiscretization.New(typ).getStringRepr())
+                    l=self._l[:] ; l[-1]="%s%s.%s"%(self._base_name_without_dir,str(iii).rjust(4,"0"),ff.getName())
+                    if isMultiDisc:
+                        l[-1]="%s_%s"(l[-1],MEDCouplingFieldDiscretization.New(typ).getStringRepr())
+                        pass
                     fffn=l[-1]
                     try:
                         os.remove(os.path.sep.join(l))
@@ -239,7 +256,10 @@ time values:
                         pass
                     a=np.memmap(f,dtype='byte',mode='w+',offset=0,shape=(2*80+4+summ,)) ; a.flush() # truncate to set the size of the file
                     mm=mmap.mmap(f.fileno(),offset=0,length=0)
-                    k1="%s_%s"%(ff.getName(),MEDCouplingFieldDiscretization.New(typ).getStringRepr())
+                    k1=ff.getName()
+                    if isMultiDisc:
+                        k1="%s_%s"%(k1,MEDCouplingFieldDiscretization.New(typ).getStringRepr())
+                        pass
                     mm.write(self.__str80(k1))
                     mm.write(self.__str80("part"))
                     a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(1,))
