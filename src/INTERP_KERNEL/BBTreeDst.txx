@@ -176,7 +176,7 @@ public:
 
   static double GetMaxDistanceFromBBoxToPt(const double *bbox, const double *pt)
   {
-    if(bbox[0]<bbox[1])
+    if(bbox[0]<=bbox[1])
       {
         double zeRes=0.;
         for (int idim=0; idim<dim; idim++)
@@ -194,7 +194,7 @@ public:
   
   static double GetMinDistanceFromBBoxToPt(const double *bbox, const double *pt)
   {
-    if(bbox[0]<bbox[1])
+    if(bbox[0]<=bbox[1])
       {
         double zeRes=0.;
         for (int idim=0; idim<dim; idim++)
