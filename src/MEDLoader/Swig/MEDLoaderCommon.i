@@ -111,6 +111,7 @@ using namespace ParaMEDMEM;
 %newobject ParaMEDMEM::MEDFileFields::deepCpy;
 %newobject ParaMEDMEM::MEDFileFields::getFieldWithName;
 %newobject ParaMEDMEM::MEDFileFields::getFieldAtPos;
+%newobject ParaMEDMEM::MEDFileFields::partOfThisLyingOnSpecifiedMeshName;
 %newobject ParaMEDMEM::MEDFileFields::__getitem__;
 %newobject ParaMEDMEM::MEDFileFields::__iter__;
 
@@ -1943,6 +1944,7 @@ namespace ParaMEDMEM
     void setFieldAtPos(int i, MEDFileAnyTypeFieldMultiTS *field) throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeFieldMultiTS *getFieldAtPos(int i) const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeFieldMultiTS *getFieldWithName(const char *fieldName) const throw(INTERP_KERNEL::Exception);
+    MEDFileFields *partOfThisLyingOnSpecifiedMeshName(const char *meshName) const throw(INTERP_KERNEL::Exception);
     void destroyFieldAtPos(int i) throw(INTERP_KERNEL::Exception);
     %extend
        {

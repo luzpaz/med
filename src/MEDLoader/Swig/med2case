@@ -41,10 +41,13 @@ try:
     cw=CaseWriter.New()
     mfd=MEDFileData(fname)
     cw.setMEDFileDS(mfd)
-    cw.write(fOut)
+    listOfWrittenFileNames=cw.write(fOut)
 except InterpKernelException as e:
     print "An error occured during the conversion!"
     print "#######################################"
     raise e
-print "#########\nFile \"%s\" sucessfully written !\n#########"%(fOut)
-
+print "#########"
+for l in listOfWrittenFileNames:
+    print "File \"%s\" sucessfully written !"%(l)
+    pass
+print "#########"

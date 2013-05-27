@@ -8346,6 +8346,34 @@ MEDFileAnyTypeFieldMultiTS *MEDFileFields::getFieldWithName(const char *fieldNam
   return getFieldAtPos(getPosFromFieldName(fieldName));
 }
 
+/*!
+ * This method returns a new object containing part of \a this fields lying on mesh name specified by the input parameter \a meshName.
+ * This method can be seen as a filter applied on \a this, that returns an object containing
+ * reduced the list of fields compared to those in \a this. The returned object is a new object but the object on which it lies are only
+ * shallow copied from \a this.
+ * 
+ * \param [in] meshName - the name of the mesh on w
+ * \return a new object that the caller should deal with.
+ */
+MEDFileFields *MEDFileFields::partOfThisLyingOnSpecifiedMeshName(const char *meshName) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileFields> ret=MEDFileFields::New();
+  ret->shallowCpyGlobs(*this);
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> >::const_iterator it=_fields.begin();it!=_fields.end();it++)
+    {
+      const MEDFileAnyTypeFieldMultiTSWithoutSDA *cur=(*it);
+      if(!cur)
+        continue;
+      if(cur->getMeshName()==meshName)
+        {
+          cur->incrRef();
+          MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> cur2(const_cast<MEDFileAnyTypeFieldMultiTSWithoutSDA *>(cur));
+          ret->_fields.push_back(cur2);
+        }
+    }
+  return ret.retn();
+}
+
 MEDFileFieldsIterator *MEDFileFields::iterator() throw(INTERP_KERNEL::Exception)
 {
   return new MEDFileFieldsIterator(this);

@@ -68,39 +68,48 @@ time values:
         """ Write into the specified fileName series the result """
         self._file_name=fileName
         self._base_name_without_dir=os.path.splitext(os.path.basename(self._file_name))[0]
-        self._l=self._file_name.split(os.path.sep) ; self._l[-1]=os.path.splitext(self._l[-1])[0] ; self._base_name_with_dir=os.path.sep.join(self._l)
-        self._dico={"geofilewithoutpath":"%s.geo"%self._base_name_without_dir}
-        h0=self.header%self._dico
-        self.__writeMeshesPart(self._med_data.getMeshes())
-        h2=self.__writeFieldsPart(self._med_data.getFields())
-        fheader=open(self._file_name,"w") ; fheader.write((h0+h2)%self._dico)
-        pass
+        self._l=self._file_name.split(os.path.sep) ; self._l[-1]=os.path.splitext(self._l[-1])[0]
+        self._base_name_with_dir=os.path.sep.join(self._l)
+        self._real_written_file_name=[]
+        self._dico={}
+        for mesh in self._med_data.getMeshes():
+            additionnalFileNamePart=""
+            if len(self._med_data.getMeshes())!=1:
+                additionnalFileNamePart="_%s"%(mesh.getName())
+                pass
+            self._dico["geofilewithoutpath"]="%s%s.geo"%(self._base_name_without_dir,additionnalFileNamePart)
+            h0=self.header%self._dico
+            self.__writeMeshesPart(mesh,self._dico["geofilewithoutpath"])
+            #
+            h2=self.__writeFieldsPart(self._med_data.getFields().partOfThisLyingOnSpecifiedMeshName(mesh.getName()))
+            realWrittenCaseFileNameForCurMesh="%s%s.case"%(self._base_name_with_dir,additionnalFileNamePart)
+            fheader=open(realWrittenCaseFileNameForCurMesh,"w") ; fheader.write((h0+h2)%self._dico)
+            self._real_written_file_name.append(realWrittenCaseFileNameForCurMesh)
+            pass
+        return self._real_written_file_name
     
-    def __writeMeshesPart(self,mdms):
-        meshfn="%s.geo"%(self._base_name_with_dir,)
+    def __writeMeshesPart(self,mdm,meshfn):
         try:
             os.remove(meshfn)
         except:
             pass
         f=open(meshfn,"w+b")
         sz=5*80
-        ms1=[]
-        for mdm in mdms:
-            assert(isinstance(mdm,MEDFileUMesh))
-            ms2=[[mdm.getMeshAtLevel(lev) for lev in mdm.getNonEmptyLevels()[:1]]]
-            for grpnm in mdm.getGroupsNames():
-                ms3=[]
-                for lev in mdm.getGrpNonEmptyLevels(grpnm)[:1]:
-                    ms3.append(mdm.getGroup(lev,grpnm))
-                    pass
-                ms2.append(ms3)
+        #
+        assert(isinstance(mdm,MEDFileUMesh))
+        ms2=[[mdm.getMeshAtLevel(lev) for lev in mdm.getNonEmptyLevels()[:1]]]
+        for grpnm in mdm.getGroupsNames():
+            ms3=[]
+            for lev in mdm.getGrpNonEmptyLevels(grpnm)[:1]:
+                ms3.append(mdm.getGroup(lev,grpnm))
                 pass
-            for ms in ms2:
-                nn=ms[0].getNumberOfNodes()
-                sz+=self.__computeSizeOfGeoFile(ms,nn)
-                pass
-            ms1.append(ms2)
+            ms2.append(ms3)
             pass
+        for ms in ms2:
+            nn=ms[0].getNumberOfNodes()
+            sz+=self.__computeSizeOfGeoFile(ms,nn)
+            pass
+        pass
         a=np.memmap(f,dtype='byte',mode='w+',offset=0,shape=(sz,)) ; a.flush() # truncate to set the size of the file
         mm=mmap.mmap(f.fileno(),offset=0,length=0)
         mm.write(self.__str80("C Binary"))
@@ -108,76 +117,76 @@ time values:
         mm.write(self.__str80("Conversion using CaseWriter class"))
         mm.write(self.__str80("node id off"))
         mm.write(self.__str80("element id off"))
-        for ms2 in ms1:
-            for iii,ms in enumerate(ms2):
-                nn=ms[0].getNumberOfNodes()
-                mm.write(self.__str80("part"))
-                a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(1,))
-                a[0]=iii+1 ; a.flush() ; mm.seek(mm.tell()+4) # part number maybe to change ?
-                name=ms[0].getName()
-                if iii>0:
-                    name="%s_%s"%(ms2[0][0].getName(),name)
-                    pass
-                mm.write(self.__str80(name))
-                mm.write(self.__str80("coordinates"))
-                a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(1,))
-                a[0]=nn ; a.flush() # number of nodes
-                mm.seek(mm.tell()+4)
-                coo=ms[0].getCoords()
-                spaceDim=coo.getNumberOfComponents()
-                if spaceDim!=3:
-                    coo=coo.changeNbOfComponents(3,0.)
-                    pass
-                a=np.memmap(f,dtype='float32',mode='w+',offset=mm.tell(),shape=(3,nn))
-                c=coo.toNoInterlace() ; c.rearrange(1) ; cnp=c.toNumPyArray() ; cnp=cnp.reshape(3,nn)
-                a[:]=cnp ; a.flush() ; mm.seek(mm.tell()+3*nn*4)
-                for m in ms:
-                    i=0
-                    for typ2,nbelem,dummy in m.getDistributionOfTypes():
-                        typ=typ2
-                        if typ not in dictMCTyp:
-                            typ=MEDCouplingMesh.GetCorrespondingPolyType(typ)
-                            pass
-                        mp=m[i:i+nbelem]
-                        mm.write(self.__str80(dictMCTyp[typ]))
-                        a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(1,))
-                        a[0]=nbelem ; a.flush() ; mm.seek(mm.tell()+4)
-                        if typ!=NORM_POLYHED and typ!=NORM_POLYGON:
-                            nbNodesPerElem=MEDCouplingMesh.GetNumberOfNodesOfGeometricType(typ)
-                            c=mp.getNodalConnectivity() ; c.rearrange(nbNodesPerElem+1) ; c=c[:,1:] ; c.rearrange(1) ; c+=1
-                            a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(nbNodesPerElem*nbelem,))
-                            a[:]=c.toNumPyArray() ; a.flush() ; mm.seek(mm.tell()+nbNodesPerElem*nbelem*4)
-                            pass
-                        elif typ==NORM_POLYHED:
-                            mp.orientCorrectlyPolyhedrons()
-                            c=mp.computeNbOfFacesPerCell()
-                            a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(nbelem,))
-                            a[:]=c.toNumPyArray(); a.flush() ; mm.seek(mm.tell()+nbelem*4)
-                            c=mp.getNodalConnectivity()[:] ; c.pushBackSilent(-1) ; c[mp.getNodalConnectivityIndex()[:-1]]=-1 ; ids=c.getIdsEqual(-1) ; nbOfNodesPerFace=ids.deltaShiftIndex()-1
-                            a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(len(nbOfNodesPerFace),))
-                            a[:]=nbOfNodesPerFace.toNumPyArray() ; a.flush() ; mm.seek(mm.tell()+len(nbOfNodesPerFace)*4)
-                            ids2=ids.buildComplement(ids.back()+1)
-                            c2=mp.getNodalConnectivity()[ids2]+1
-                            a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(len(c2),))
-                            a[:]=c2.toNumPyArray() ; a.flush() ; mm.seek(mm.tell()+len(c2)*4)
-                            pass
-                        else:
-                            nbOfNodesPerCell=mp.getNodalConnectivityIndex().deltaShiftIndex()-1
-                            a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(len(nbOfNodesPerCell),))
-                            a[:]=nbOfNodesPerCell.toNumPyArray() ; a.flush() ; mm.seek(mm.tell()+len(nbOfNodesPerCell)*4)
-                            ids2=mp.getNodalConnectivityIndex().buildComplement(mp.getNodalConnectivityIndex().back()+1)
-                            c2=mp.getNodalConnectivity()[ids2]+1
-                            a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(len(c2),))
-                            a[:]=c2.toNumPyArray() ; a.flush() ; mm.seek(mm.tell()+len(c2)*4)
-                            pass
-                        i+=nbelem
+        for iii,ms in enumerate(ms2):
+            nn=ms[0].getNumberOfNodes()
+            mm.write(self.__str80("part"))
+            a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(1,))
+            a[0]=iii+1 ; a.flush() ; mm.seek(mm.tell()+4) # part number maybe to change ?
+            name=ms[0].getName()
+            if iii>0:
+                name="%s_%s"%(ms2[0][0].getName(),name)
+                pass
+            mm.write(self.__str80(name))
+            mm.write(self.__str80("coordinates"))
+            a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(1,))
+            a[0]=nn ; a.flush() # number of nodes
+            mm.seek(mm.tell()+4)
+            coo=ms[0].getCoords()
+            spaceDim=coo.getNumberOfComponents()
+            if spaceDim!=3:
+                coo=coo.changeNbOfComponents(3,0.)
+                pass
+            a=np.memmap(f,dtype='float32',mode='w+',offset=mm.tell(),shape=(3,nn))
+            c=coo.toNoInterlace() ; c.rearrange(1) ; cnp=c.toNumPyArray() ; cnp=cnp.reshape(3,nn)
+            a[:]=cnp ; a.flush() ; mm.seek(mm.tell()+3*nn*4)
+            for m in ms:
+                i=0
+                for typ2,nbelem,dummy in m.getDistributionOfTypes():
+                    typ=typ2
+                    if typ not in dictMCTyp:
+                        typ=MEDCouplingMesh.GetCorrespondingPolyType(typ)
                         pass
+                    mp=m[i:i+nbelem]
+                    mm.write(self.__str80(dictMCTyp[typ]))
+                    a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(1,))
+                    a[0]=nbelem ; a.flush() ; mm.seek(mm.tell()+4)
+                    if typ!=NORM_POLYHED and typ!=NORM_POLYGON:
+                        nbNodesPerElem=MEDCouplingMesh.GetNumberOfNodesOfGeometricType(typ)
+                        c=mp.getNodalConnectivity() ; c.rearrange(nbNodesPerElem+1) ; c=c[:,1:] ; c.rearrange(1) ; c+=1
+                        a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(nbNodesPerElem*nbelem,))
+                        a[:]=c.toNumPyArray() ; a.flush() ; mm.seek(mm.tell()+nbNodesPerElem*nbelem*4)
+                        pass
+                    elif typ==NORM_POLYHED:
+                        mp.orientCorrectlyPolyhedrons()
+                        c=mp.computeNbOfFacesPerCell()
+                        a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(nbelem,))
+                        a[:]=c.toNumPyArray(); a.flush() ; mm.seek(mm.tell()+nbelem*4)
+                        c=mp.getNodalConnectivity()[:] ; c.pushBackSilent(-1) ; c[mp.getNodalConnectivityIndex()[:-1]]=-1 ; ids=c.getIdsEqual(-1) ; nbOfNodesPerFace=ids.deltaShiftIndex()-1
+                        a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(len(nbOfNodesPerFace),))
+                        a[:]=nbOfNodesPerFace.toNumPyArray() ; a.flush() ; mm.seek(mm.tell()+len(nbOfNodesPerFace)*4)
+                        ids2=ids.buildComplement(ids.back()+1)
+                        c2=mp.getNodalConnectivity()[ids2]+1
+                        a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(len(c2),))
+                        a[:]=c2.toNumPyArray() ; a.flush() ; mm.seek(mm.tell()+len(c2)*4)
+                        pass
+                    else:
+                        nbOfNodesPerCell=mp.getNodalConnectivityIndex().deltaShiftIndex()-1
+                        a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(len(nbOfNodesPerCell),))
+                        a[:]=nbOfNodesPerCell.toNumPyArray() ; a.flush() ; mm.seek(mm.tell()+len(nbOfNodesPerCell)*4)
+                        ids2=mp.getNodalConnectivityIndex().buildComplement(mp.getNodalConnectivityIndex().back()+1)
+                        c2=mp.getNodalConnectivity()[ids2]+1
+                        a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(len(c2),))
+                        a[:]=c2.toNumPyArray() ; a.flush() ; mm.seek(mm.tell()+len(c2)*4)
+                        pass
+                    i+=nbelem
                     pass
                 pass
             pass
         pass
     
     def __writeFieldsPart(self,mdfs):
+        if not mdfs:
+            return ""
         self._ze_top_dict={}
         its,areForgottenTS=mdfs.getCommonIterations()
         if areForgottenTS:
@@ -191,7 +200,13 @@ time values:
         for mdf in mdfs:
             nbCompo=mdf.getNumberOfComponents()
             if nbCompo not in dictCompo:
-                print "Field \"%s\" will be ignored because number of components (%i) is not in %s supported by case files !"%(mdf.getName(),nbCompo,str(dictCompo.keys()))
+                l=filter(lambda x:x-nbCompo>0,dictCompo.keys())
+                if len(l)==0:
+                    print "Field \"%s\" will be ignored because number of components (%i) is too big to be %s supported by case files !"%(mdf.getName(),nbCompo,str(dictCompo.keys()))
+                    continue
+                    pass
+                print "WARNING : Field \"%s\" will have its number of components components (%i) set to %i, in order to be supported by case files (must be in %s) !"%(mdf.getName(),nbCompo,l[0],str(dictCompo.keys()))
+                nbCompo=l[0]
                 pass
             if nbCompo in dictVars:
                 dictVars[nbCompo].append(mdf)
@@ -203,7 +218,11 @@ time values:
         for mdf in mdfs:
             nbCompo=mdf.getNumberOfComponents()
             if nbCompo not in dictCompo:
-                continue;
+                l=filter(lambda x:x-nbCompo>0,dictCompo.keys())
+                if len(l)==0:
+                    continue;
+                nbCompo=l[0]
+                pass
             for iii,it in enumerate(its):
                 ff=mdf[it]
                 for typ in ff.getTypesOfFieldAvailable():
@@ -228,8 +247,10 @@ time values:
                     a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(1,))
                     a[0]=1 ; a.flush() ; mm.seek(mm.tell()+4) # part number maybe to change ?
                     for geo,[(curTyp,(bg,end),pfl,loc)] in ff.getFieldSplitedByType():
+                        if pfl!="":
+                            raise Exception("Field \"%s\" contains profiles ! Profiles are not supported yet !"%(mdf.getName()))
                         if typ==curTyp:
-                            arr=ff.getUndergroundDataArray()[bg:end].toNoInterlace()
+                            arr=ff.getUndergroundDataArray()[bg:end].changeNbOfComponents(nbCompo,0.) ; arr=arr.toNoInterlace()
                             if typ==ON_CELLS:
                                 mm.write(self.__str80(dictMCTyp[geo]))
                                 pass
@@ -240,7 +261,9 @@ time values:
                                 print "UnManaged type of field for field \"%s\" !"%(mdf.getName())
                                 pass
                             a=np.memmap(f,dtype='float32',mode='w+',offset=mm.tell(),shape=(nbCompo,end-bg))
-                            a[:]=arr.toNumPyArray() ; a.flush() ; mm.seek(mm.tell()+nbCompo*(end-bg)*4)
+                            b=arr.toNumPyArray() ; b=b.reshape(nbCompo,end-bg)
+                            a[:]=b
+                            a.flush() ; mm.seek(mm.tell()+nbCompo*(end-bg)*4)
                             pass
                         pass
                     k="%s per %s"%(dictCompo[nbCompo],discSpatial[typ])

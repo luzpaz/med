@@ -988,6 +988,7 @@ std::vector< std::vector<DataArrayDouble *> > getFieldSplitedByType2(int iterati
     void setFieldAtPos(int i, MEDFileAnyTypeFieldMultiTS *field) throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeFieldMultiTS *getFieldAtPos(int i) const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeFieldMultiTS *getFieldWithName(const char *fieldName) const throw(INTERP_KERNEL::Exception);
+    MEDFileFields *partOfThisLyingOnSpecifiedMeshName(const char *meshName) const throw(INTERP_KERNEL::Exception);
     MEDFileFieldsIterator *iterator() throw(INTERP_KERNEL::Exception);
     void destroyFieldAtPos(int i) throw(INTERP_KERNEL::Exception);
     bool changeMeshNames(const std::vector< std::pair<std::string,std::string> >& modifTab) throw(INTERP_KERNEL::Exception);
