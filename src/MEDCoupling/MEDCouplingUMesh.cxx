@@ -1063,7 +1063,7 @@ void MEDCouplingUMesh::convertToPolyTypes(const int *cellIdsToConvertBg, const i
           if(*iter>=0 && *iter<nbOfCells)
             {
               const INTERP_KERNEL::CellModel& cm=INTERP_KERNEL::CellModel::GetCellModel((INTERP_KERNEL::NormalizedCellType)conn[connIndex[*iter]]);
-              if(!cm.isDynamic())
+              if(!cm.isQuadratic())
                 conn[connIndex[*iter]]=INTERP_KERNEL::NORM_POLYGON;
               else
                 conn[connIndex[*iter]]=INTERP_KERNEL::NORM_QPOLYG;
