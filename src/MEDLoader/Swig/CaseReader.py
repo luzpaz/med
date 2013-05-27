@@ -69,7 +69,6 @@ class CaseReader(CaseIO):
                 raise Exception("Error on reading mesh #1 !")
             fd.seek(fd.tell()+80)
             meshName=fd.read(80).strip()
-            print meshName
             if fd.read(len("coordinates"))!="coordinates":
                 raise Exception("Error on reading mesh #2 !")
             pos=fd.tell()
@@ -105,7 +104,6 @@ class CaseReader(CaseIO):
         trueFileName=fileName.replace(stars,st%(it))
         fd=open(trueFileName,"r+b") ; fd.seek(0,2) ; end=fd.tell() ; fd.seek(0)
         name=fd.readline().strip().split(" ")[0]
-        print name
         if name!=fieldName:
             raise Exception("ConvertField : mismatch")
         pos=fd.tell()
@@ -116,8 +114,9 @@ class CaseReader(CaseIO):
             pos=fd.tell()+76 ; fd.seek(pos)
             meshId=np.memmap(fd,dtype='int32',mode='r',offset=pos,shape=(1)).tolist()[0]-1
             fd.seek(pos+4)
-            nbOfValues=mcmeshes[meshId].getNumberOfCells()
             typ=fd.read(80).strip() ; pos=fd.tell()
+            fdisc=MEDCouplingFieldDiscretization.New(self.discSpatial2[discr])
+            nbOfValues=fdisc.getNumberOfTuples(mcmeshes[meshId])
             vals=np.memmap(fd,dtype='float32',mode='r',offset=pos,shape=(nbOfValues,nbCompo))#np.memmap(fd,dtype='int32',mode='r',offset=159,shape=(1))
             vals2=DataArrayDouble(np.array(vals,dtype='float64'))
             pos+=nbOfValues*nbCompo*4 ; fd.seek(pos)
