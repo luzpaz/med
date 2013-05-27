@@ -21,15 +21,13 @@
 
 import numpy as np
 from MEDLoader import *
+from CaseIO import CaseIO
 import sys,re
 
-class CaseReader:
+class CaseReader(CaseIO):
     """ Converting a file in the Case format (Ensight) to the MED format.
     A new file with the same base name and the .med extension is created.
     """
-    dictMCTyp={"hexa8":NORM_HEXA8,"quad4":NORM_QUAD4}
-    discSpatial={"element":ON_CELLS}
-    dictCompo={"scalar":1,"vector":3}
 
     @classmethod
     def New(cls,fileName):
@@ -47,7 +45,7 @@ class CaseReader:
         nbCoords=len(coords)
         coo=np.array(coords,dtype="float64") ; coo=coo.reshape(nbCoords,3)
         coo=DataArrayDouble(coo) ; coo=coo.fromNoInterlace()
-        ct=self.dictMCTyp[typ]
+        ct=self.dictMCTyp2[typ]
         m=MEDCouplingUMesh(name,MEDCouplingUMesh.GetDimensionOfGeometricType(ct))
         m.setCoords(coo)
         nbNodesPerCell=MEDCouplingMesh.GetNumberOfNodesOfGeometricType(ct)
@@ -82,7 +80,7 @@ class CaseReader:
             coo=np.memmap(fd,dtype='float32',mode='r',offset=pos,shape=(nbNodes,3))
             pos+=nbNodes*3*4 ; fd.seek(pos)#np.array(0,dtype='float%i'%(typeOfCoo)).nbytes
             typ=fd.read(80).strip() ; pos=fd.tell()
-            nbNodesPerCell=MEDCouplingMesh.GetNumberOfNodesOfGeometricType(self.dictMCTyp[typ])
+            nbNodesPerCell=MEDCouplingMesh.GetNumberOfNodesOfGeometricType(self.dictMCTyp2[typ])
             nbCellsOfType=np.memmap(fd,dtype='int32',mode='r',offset=pos,shape=(1,)).tolist()[0]
             pos+=4
             cells=np.memmap(fd,dtype='int32',mode='r',offset=pos,shape=(nbCellsOfType,nbNodesPerCell))
@@ -123,7 +121,7 @@ class CaseReader:
             vals=np.memmap(fd,dtype='float32',mode='r',offset=pos,shape=(nbOfValues,nbCompo))#np.memmap(fd,dtype='int32',mode='r',offset=159,shape=(1))
             vals2=DataArrayDouble(np.array(vals,dtype='float64'))
             pos+=nbOfValues*nbCompo*4 ; fd.seek(pos)
-            f=MEDCouplingFieldDouble(self.discSpatial[discr],ONE_TIME) ; f.setName("%s_%s"%(fieldName,mcmeshes[meshId].getName()))
+            f=MEDCouplingFieldDouble(self.discSpatial2[discr],ONE_TIME) ; f.setName("%s_%s"%(fieldName,mcmeshes[meshId].getName()))
             f.setMesh(mcmeshes[meshId]) ; f.setArray(vals2) ; f.setTime(float(it),it,-1)
             f.checkCoherency()
             mlfields[locId+meshId].appendFieldNoProfileSBT(f)
@@ -144,7 +142,7 @@ class CaseReader:
         for i in xrange(ind+1,lines.index("TIME\n")):
             m=re.match("^([\w]+)[\s]+\per[\s]+([\w]+)[\s]*\:[\s]*([\w]+)[\s]+([\S]+)$",lines[i])
             if m:
-                spatialDisc=m.groups()[1] ; fieldName=m.groups()[2] ; nbOfCompo=self.dictCompo[m.groups()[0]] ; fieldFileName=m.groups()[3]
+                spatialDisc=m.groups()[1] ; fieldName=m.groups()[2] ; nbOfCompo=self.dictCompo2[m.groups()[0]] ; fieldFileName=m.groups()[3]
                 fieldsInfo.append((fieldName,spatialDisc,nbOfCompo,fieldFileName))
                 pass
             pass

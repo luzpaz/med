@@ -20,16 +20,13 @@
 # Author Anthony GEAY (CEA/DEN/DM2S/STMF/LGLS)
 
 import numpy as np
+from CaseIO import CaseIO
 from MEDLoader import *
 import sys,re,os,mmap
 
-dictMCTyp={NORM_HEXA8:"hexa8",NORM_POLYHED:"nfaced",NORM_QUAD4:"quad4",NORM_POLYGON:"nsided",NORM_POINT1:"point",NORM_SEG2:"bar2",NORM_SEG3:"bar3",NORM_TRI3:"tria3",NORM_TRI6:"tria6",NORM_QUAD8:"quad8",NORM_TETRA4:"tetra4",NORM_TETRA10:"tetra10",NORM_PYRA5:"pyramid5",NORM_PYRA13:"pyramid13",NORM_PENTA6:"penta6",NORM_PENTA15:"penta15",NORM_HEXA20:"hexa20"}
-discSpatial={ON_CELLS:"element",ON_NODES:"node"}
-dictCompo={1:"scalar",3:"vector",6:"tensor",9:"tensor9"}
-
 ### www-vis.lbl.gov/NERSC/Software/ensight/doc/OnlineHelp/UM-C11.pdf
 
-class CaseWriter:
+class CaseWriter(CaseIO):
     """ Converting MED file format in memory to a the Case file format (Ensight).
     A new file with the same base name and the .case extension is created with its depencies (.geo ...).
     """
@@ -144,11 +141,11 @@ time values:
                 i=0
                 for typ2,nbelem,dummy in m.getDistributionOfTypes():
                     typ=typ2
-                    if typ not in dictMCTyp:
+                    if typ not in self.dictMCTyp:
                         typ=MEDCouplingMesh.GetCorrespondingPolyType(typ)
                         pass
                     mp=m[i:i+nbelem]
-                    mm.write(self.__str80(dictMCTyp[typ]))
+                    mm.write(self.__str80(self.dictMCTyp[typ]))
                     a=np.memmap(f,dtype='int32',mode='w+',offset=mm.tell(),shape=(1,))
                     a[0]=nbelem ; a.flush() ; mm.seek(mm.tell()+4)
                     if typ!=NORM_POLYHED and typ!=NORM_POLYGON:
@@ -200,13 +197,13 @@ time values:
         dictVars={}
         for mdf in mdfs:
             nbCompo=mdf.getNumberOfComponents()
-            if nbCompo not in dictCompo:
-                l=filter(lambda x:x-nbCompo>0,dictCompo.keys())
+            if nbCompo not in self.dictCompo:
+                l=filter(lambda x:x-nbCompo>0,self.dictCompo.keys())
                 if len(l)==0:
-                    print "Field \"%s\" will be ignored because number of components (%i) is too big to be %s supported by case files !"%(mdf.getName(),nbCompo,str(dictCompo.keys()))
+                    print "Field \"%s\" will be ignored because number of components (%i) is too big to be %s supported by case files !"%(mdf.getName(),nbCompo,str(self.dictCompo.keys()))
                     continue
                     pass
-                print "WARNING : Field \"%s\" will have its number of components (%i) set to %i, in order to be supported by case files (must be in %s) !"%(mdf.getName(),nbCompo,l[0],str(dictCompo.keys()))
+                print "WARNING : Field \"%s\" will have its number of components (%i) set to %i, in order to be supported by case files (must be in %s) !"%(mdf.getName(),nbCompo,l[0],str(self.dictCompo.keys()))
                 nbCompo=l[0]
                 pass
             if nbCompo in dictVars:
@@ -218,8 +215,8 @@ time values:
             pass
         for mdf in mdfs:
             nbCompo=mdf.getNumberOfComponents()
-            if nbCompo not in dictCompo:
-                l=filter(lambda x:x-nbCompo>0,dictCompo.keys())
+            if nbCompo not in self.dictCompo:
+                l=filter(lambda x:x-nbCompo>0,self.dictCompo.keys())
                 if len(l)==0:
                     continue;
                 nbCompo=l[0]
@@ -253,7 +250,7 @@ time values:
                         if typ==curTyp:
                             arr=ff.getUndergroundDataArray()[bg:end].changeNbOfComponents(nbCompo,0.) ; arr=arr.toNoInterlace()
                             if typ==ON_CELLS:
-                                mm.write(self.__str80(dictMCTyp[geo]))
+                                mm.write(self.__str80(self.dictMCTyp[geo]))
                                 pass
                             elif typ==ON_NODES:
                                 mm.write(self.__str80("coordinates"))
@@ -267,7 +264,7 @@ time values:
                             a.flush() ; mm.seek(mm.tell()+nbCompo*(end-bg)*4)
                             pass
                         pass
-                    k="%s per %s"%(dictCompo[nbCompo],discSpatial[typ])
+                    k="%s per %s"%(self.dictCompo[nbCompo],self.discSpatial[typ])
                     if k in self._ze_top_dict:
                         if k1 in self._ze_top_dict[k]:
                             self._ze_top_dict[k][k1].append(fffn)
@@ -312,7 +309,7 @@ time values:
             i=0
             for typ2,nbelem,dummy in distribTypes:
                 typ=typ2
-                if typ not in dictMCTyp:
+                if typ not in self.dictMCTyp:
                     typ=MEDCouplingMesh.GetCorrespondingPolyType()
                     pass
                 if typ!=NORM_POLYHED and typ!=NORM_POLYGON:
