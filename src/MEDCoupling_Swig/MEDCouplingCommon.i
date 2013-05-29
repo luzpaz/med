@@ -494,7 +494,7 @@ namespace ParaMEDMEM
 
 %inline
 {
-  bool MEDCouplingHasNumpyBindings()
+  bool MEDCouplingHasNumPyBindings()
   {
 #ifdef WITH_NUMPY
     return true;
