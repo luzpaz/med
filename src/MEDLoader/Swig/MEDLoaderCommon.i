@@ -112,6 +112,8 @@ using namespace ParaMEDMEM;
 %newobject ParaMEDMEM::MEDFileFields::getFieldWithName;
 %newobject ParaMEDMEM::MEDFileFields::getFieldAtPos;
 %newobject ParaMEDMEM::MEDFileFields::partOfThisLyingOnSpecifiedMeshName;
+%newobject ParaMEDMEM::MEDFileFields::partOfThisLyingOnSpecifiedTimeSteps;
+%newobject ParaMEDMEM::MEDFileFields::partOfThisNotLyingOnSpecifiedTimeSteps;
 %newobject ParaMEDMEM::MEDFileFields::__getitem__;
 %newobject ParaMEDMEM::MEDFileFields::__iter__;
 
@@ -947,8 +949,15 @@ namespace ParaMEDMEM
   class MEDFileFieldGlobsReal
   {
   public:
+    void resetContent();
     void shallowCpyGlobs(const MEDFileFieldGlobsReal& other) throw(INTERP_KERNEL::Exception);
     void deepCpyGlobs(const MEDFileFieldGlobsReal& other) throw(INTERP_KERNEL::Exception);
+    void shallowCpyOnlyUsedGlobs(const MEDFileFieldGlobsReal& other) throw(INTERP_KERNEL::Exception);
+    void deepCpyOnlyUsedGlobs(const MEDFileFieldGlobsReal& other) throw(INTERP_KERNEL::Exception);
+    void appendGlobs(const MEDFileFieldGlobsReal& other, double eps) throw(INTERP_KERNEL::Exception);
+    void checkGlobsCoherency() const throw(INTERP_KERNEL::Exception);
+    void checkGlobsPflsPartCoherency() const throw(INTERP_KERNEL::Exception);
+    void checkGlobsLocsPartCoherency() const throw(INTERP_KERNEL::Exception);
     std::vector<std::string> getPfls() const throw(INTERP_KERNEL::Exception);
     std::vector<std::string> getLocs() const throw(INTERP_KERNEL::Exception);
     bool existsPfl(const char *pflName) const throw(INTERP_KERNEL::Exception);
@@ -1047,6 +1056,13 @@ namespace ParaMEDMEM
        {
          std::vector< std::pair<std::vector<std::string>, std::string > > v=convertVecPairVecStFromPy(li);
          self->changeLocsNamesInStruct(v);
+       }
+
+       std::string simpleReprGlobs() const throw(INTERP_KERNEL::Exception)
+       {
+         std::ostringstream oss;
+         self->simpleReprGlobs(oss);
+         return oss.str();
        }
      }
   };
@@ -1450,6 +1466,7 @@ namespace ParaMEDMEM
     virtual MEDFileAnyTypeField1TS *getTimeStepAtPos(int pos) const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeField1TS *getTimeStep(int iteration, int order) const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeField1TS *getTimeStepGivenTime(double time, double eps=1e-8) const throw(INTERP_KERNEL::Exception);
+    void pushBackTimeStep(MEDFileAnyTypeField1TS *f1ts) throw(INTERP_KERNEL::Exception);
     void synchronizeNameScope() throw(INTERP_KERNEL::Exception);
     %extend
     {
@@ -1607,9 +1624,23 @@ namespace ParaMEDMEM
       
       void __delitem__(PyObject *elts) throw(INTERP_KERNEL::Exception)
       {
-        std::vector<int> idsToRemove=ParaMEDMEM_MEDFileAnyTypeFieldMultiTS_getTimeIds(self,elts);
-        if(!idsToRemove.empty())
-          self->eraseTimeStepIds(&idsToRemove[0],&idsToRemove[0]+idsToRemove.size());
+        if(PySlice_Check(elts))
+          {
+            Py_ssize_t strt=2,stp=2,step=2;
+            PySliceObject *oC=reinterpret_cast<PySliceObject *>(elts);
+            if(PySlice_GetIndices(oC,self->getNumberOfTS(),&strt,&stp,&step)!=0)
+              {
+                self->eraseTimeStepIds2(strt,stp,step);
+              }
+            else
+              throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTS.__delitem__ : error in input slice !");
+          }
+        else
+          {
+            std::vector<int> idsToRemove=ParaMEDMEM_MEDFileAnyTypeFieldMultiTS_getTimeIds(self,elts);
+            if(!idsToRemove.empty())
+              self->eraseTimeStepIds(&idsToRemove[0],&idsToRemove[0]+idsToRemove.size());
+          }
       }
       
       void eraseTimeStepIds(PyObject *li) throw(INTERP_KERNEL::Exception)
@@ -1942,6 +1973,7 @@ namespace ParaMEDMEM
     void resize(int newSize) throw(INTERP_KERNEL::Exception);
     void pushField(MEDFileAnyTypeFieldMultiTS *field) throw(INTERP_KERNEL::Exception);
     void setFieldAtPos(int i, MEDFileAnyTypeFieldMultiTS *field) throw(INTERP_KERNEL::Exception);
+    int getPosFromFieldName(const char *fieldName) const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeFieldMultiTS *getFieldAtPos(int i) const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeFieldMultiTS *getFieldWithName(const char *fieldName) const throw(INTERP_KERNEL::Exception);
     MEDFileFields *partOfThisLyingOnSpecifiedMeshName(const char *meshName) const throw(INTERP_KERNEL::Exception);
@@ -1982,6 +2014,18 @@ namespace ParaMEDMEM
            PyTuple_SetItem(ret,1,ret_1);
            return ret;
          }
+
+         MEDFileFields *partOfThisLyingOnSpecifiedTimeSteps(PyObject *timeSteps) const throw(INTERP_KERNEL::Exception)
+         {
+           std::vector< std::pair<int,int> > ts=convertTimePairIdsFromPy(timeSteps);
+           return self->partOfThisLyingOnSpecifiedTimeSteps(ts);
+         }
+
+         MEDFileFields *partOfThisNotLyingOnSpecifiedTimeSteps(PyObject *timeSteps) const throw(INTERP_KERNEL::Exception)
+         {
+           std::vector< std::pair<int,int> > ts=convertTimePairIdsFromPy(timeSteps);
+           return self->partOfThisNotLyingOnSpecifiedTimeSteps(ts);
+         }
          
          MEDFileAnyTypeFieldMultiTS *__getitem__(PyObject *obj) throw(INTERP_KERNEL::Exception)
          {
@@ -2017,6 +2061,46 @@ namespace ParaMEDMEM
          {
            std::vector< std::pair<std::string,std::string> > modifTab=convertVecPairStStFromPy(li);
            return self->changeMeshNames(modifTab);
+         }
+
+         int getPosOfField(PyObject *elt0) const throw(INTERP_KERNEL::Exception)
+         {
+           if(elt0 && PyInt_Check(elt0))
+             {//fmts[3]
+               return PyInt_AS_LONG(elt0);
+             }
+           else if(elt0 && PyString_Check(elt0))
+             return self->getPosFromFieldName(PyString_AsString(elt0));
+           else
+             throw INTERP_KERNEL::Exception("MEDFileFields::getPosOfField : invalid input params ! expected fields[int], fields[string_of_field_name] !");
+         }
+         
+         std::vector<int> getPosOfFields(PyObject *elts) const throw(INTERP_KERNEL::Exception)
+         {
+           if(PyList_Check(elts))
+             {
+               int sz=PyList_Size(elts);
+               std::vector<int> ret(sz);
+               for(int i=0;i<sz;i++)
+                 {
+                   PyObject *elt=PyList_GetItem(elts,i);
+                   ret[i]=ParaMEDMEM_MEDFileFields_getPosOfField(self,elt);
+                 }
+               return ret;
+             }
+           else
+             {
+               std::vector<int> ret(1);
+               ret[0]=ParaMEDMEM_MEDFileFields_getPosOfField(self,elts);
+               return ret;
+             }
+         }
+         
+         void __delitem__(PyObject *elts) throw(INTERP_KERNEL::Exception)
+         {
+           std::vector<int> idsToRemove=ParaMEDMEM_MEDFileFields_getPosOfFields(self,elts);
+           if(!idsToRemove.empty())
+             self->destroyFieldsAtPos(&idsToRemove[0],&idsToRemove[0]+idsToRemove.size());
          }
        }
   };

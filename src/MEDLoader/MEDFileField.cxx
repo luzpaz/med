@@ -2416,6 +2416,18 @@ void MEDFileFieldGlobs::appendGlobs(const MEDFileFieldGlobs& other, double eps) 
     }
 }
 
+void MEDFileFieldGlobs::checkGlobsPflsPartCoherency(const std::vector<std::string>& pflsUsed) const throw(INTERP_KERNEL::Exception)
+{
+  for(std::vector<std::string>::const_iterator it=pflsUsed.begin();it!=pflsUsed.end();it++)
+    getProfile((*it).c_str());
+}
+
+void MEDFileFieldGlobs::checkGlobsLocsPartCoherency(const std::vector<std::string>& locsUsed) const throw(INTERP_KERNEL::Exception)
+{
+  for(std::vector<std::string>::const_iterator it=locsUsed.begin();it!=locsUsed.end();it++)
+    getLocalization((*it).c_str());
+}
+
 void MEDFileFieldGlobs::loadGlobals(med_idt fid, const MEDFileFieldGlobsReal& real) throw(INTERP_KERNEL::Exception)
 {
   std::vector<std::string> profiles=real.getPflsReallyUsed();
@@ -2479,6 +2491,62 @@ MEDFileFieldGlobs *MEDFileFieldGlobs::deepCpy() const throw(INTERP_KERNEL::Excep
       if((const MEDFileFieldLoc*)*it)
         ret->_locs[i]=(*it)->deepCpy();
     }
+  return ret.retn();
+}
+
+/*!
+ * \throw if a profile in \a pfls in not in \a this.
+ * \throw if a localization in \a locs in not in \a this.
+ * \sa MEDFileFieldGlobs::deepCpyPart
+ */
+MEDFileFieldGlobs *MEDFileFieldGlobs::shallowCpyPart(const std::vector<std::string>& pfls, const std::vector<std::string>& locs) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileFieldGlobs> ret=MEDFileFieldGlobs::New();
+  for(std::vector<std::string>::const_iterator it1=pfls.begin();it1!=pfls.end();it1++)
+    {
+      DataArrayInt *pfl=const_cast<DataArrayInt *>(getProfile((*it1).c_str()));
+      if(!pfl)
+        throw INTERP_KERNEL::Exception("MEDFileFieldGlobs::shallowCpyPart : internal error ! pfl null !");
+      pfl->incrRef();
+      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> pfl2(pfl);
+      ret->_pfls.push_back(pfl2);
+    }
+  for(std::vector<std::string>::const_iterator it2=locs.begin();it2!=locs.end();it2++)
+    {
+      MEDFileFieldLoc *loc=const_cast<MEDFileFieldLoc *>(&getLocalization((*it2).c_str()));
+      if(!loc)
+        throw INTERP_KERNEL::Exception("MEDFileFieldGlobs::shallowCpyPart : internal error ! loc null !");
+      loc->incrRef();
+      MEDCouplingAutoRefCountObjectPtr<MEDFileFieldLoc> loc2(loc);
+      ret->_locs.push_back(loc2);
+    }
+  ret->setFileName(getFileName());
+  return ret.retn();
+}
+
+/*!
+ * \throw if a profile in \a pfls in not in \a this.
+ * \throw if a localization in \a locs in not in \a this.
+ * \sa MEDFileFieldGlobs::shallowCpyPart
+ */
+MEDFileFieldGlobs *MEDFileFieldGlobs::deepCpyPart(const std::vector<std::string>& pfls, const std::vector<std::string>& locs) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileFieldGlobs> ret=MEDFileFieldGlobs::New();
+  for(std::vector<std::string>::const_iterator it1=pfls.begin();it1!=pfls.end();it1++)
+    {
+      DataArrayInt *pfl=const_cast<DataArrayInt *>(getProfile((*it1).c_str()));
+      if(!pfl)
+        throw INTERP_KERNEL::Exception("MEDFileFieldGlobs::deepCpyPart : internal error ! pfl null !");
+      ret->_pfls.push_back(pfl->deepCpy());
+    }
+  for(std::vector<std::string>::const_iterator it2=locs.begin();it2!=locs.end();it2++)
+    {
+      MEDFileFieldLoc *loc=const_cast<MEDFileFieldLoc *>(&getLocalization((*it2).c_str()));
+      if(!loc)
+        throw INTERP_KERNEL::Exception("MEDFileFieldGlobs::deepCpyPart : internal error ! loc null !");
+      ret->_locs.push_back(loc->deepCpy());
+    }
+  ret->setFileName(getFileName());
   return ret.retn();
 }
 
@@ -2618,6 +2686,9 @@ int MEDFileFieldGlobs::getLocalizationId(const char *loc) const throw(INTERP_KER
   return std::distance(_locs.begin(),it);
 }
 
+/*!
+ * The returned value is never null.
+ */
 const DataArrayInt *MEDFileFieldGlobs::getProfile(const char *pflName) const throw(INTERP_KERNEL::Exception)
 {
   std::string pflNameCpp(pflName);
@@ -2651,6 +2722,9 @@ MEDFileFieldLoc& MEDFileFieldGlobs::getLocalization(const char *locName) throw(I
   return getLocalizationFromId(getLocalizationId(locName));
 }
 
+/*!
+ * The returned value is never null.
+ */
 DataArrayInt *MEDFileFieldGlobs::getProfile(const char *pflName) throw(INTERP_KERNEL::Exception)
 {
   std::string pflNameCpp(pflName);
@@ -2860,14 +2934,21 @@ std::size_t MEDFileFieldGlobsReal::getHeapMemorySize() const
  * Returns a string describing profiles and Gauss points held in \a this.
  *  \return std::string - the description string.
  */
-void MEDFileFieldGlobsReal::simpleRepr(std::ostream& oss) const
+void MEDFileFieldGlobsReal::simpleReprGlobs(std::ostream& oss) const
 {
-  oss << "Globals information on fields :" << "\n*******************************\n\n";
   const MEDFileFieldGlobs *glob=_globals;
+  std::ostringstream oss2; oss2 << glob;
+  std::string stars(oss2.str().length(),'*');
+  oss << "Globals information on fields (at " << oss2.str() << "):" << "\n************************************" << stars  << "\n\n";
   if(glob)
     glob->simpleRepr(oss);
   else
     oss << "NO GLOBAL INFORMATION !\n";
+}
+
+void MEDFileFieldGlobsReal::resetContent()
+{
+  _globals=MEDFileFieldGlobs::New();
 }
 
 MEDFileFieldGlobsReal::~MEDFileFieldGlobsReal()
@@ -2881,6 +2962,30 @@ MEDFileFieldGlobsReal::~MEDFileFieldGlobsReal()
 void MEDFileFieldGlobsReal::shallowCpyGlobs(const MEDFileFieldGlobsReal& other)
 {
   _globals=other._globals;
+}
+
+/*!
+ * Copies references to ** only used ** by \a this, profiles and Gauss points from another MEDFileFieldGlobsReal.
+ *  \param [in] other - the other MEDFileFieldGlobsReal to copy data from.
+ */
+void MEDFileFieldGlobsReal::shallowCpyOnlyUsedGlobs(const MEDFileFieldGlobsReal& other) throw(INTERP_KERNEL::Exception)
+{
+  const MEDFileFieldGlobs *otherg(other._globals);
+  if(!otherg)
+    return ;
+  _globals=otherg->shallowCpyPart(getPflsReallyUsed(),getLocsReallyUsed());
+}
+
+/*!
+ * Copies deeply to ** only used ** by \a this, profiles and Gauss points from another MEDFileFieldGlobsReal.
+ *  \param [in] other - the other MEDFileFieldGlobsReal to copy data from.
+ */
+void MEDFileFieldGlobsReal::deepCpyOnlyUsedGlobs(const MEDFileFieldGlobsReal& other) throw(INTERP_KERNEL::Exception)
+{
+  const MEDFileFieldGlobs *otherg(other._globals);
+  if(!otherg)
+    return ;
+  _globals=otherg->deepCpyPart(getPflsReallyUsed(),getLocsReallyUsed());
 }
 
 void MEDFileFieldGlobsReal::deepCpyGlobs(const MEDFileFieldGlobsReal& other)
@@ -2900,32 +3005,56 @@ void MEDFileFieldGlobsReal::deepCpyGlobs(const MEDFileFieldGlobsReal& other)
  */
 void MEDFileFieldGlobsReal::appendGlobs(const MEDFileFieldGlobsReal& other, double eps) throw(INTERP_KERNEL::Exception)
 {
+  const MEDFileFieldGlobs *thisGlobals(_globals),*otherGlobals(other._globals);
+  if(thisGlobals==otherGlobals)
+    return ;
+  if(!thisGlobals)
+    {
+      _globals=other._globals;
+      return ;
+    }
   _globals->appendGlobs(*other._globals,eps);
+}
+
+void MEDFileFieldGlobsReal::checkGlobsCoherency() const throw(INTERP_KERNEL::Exception)
+{
+  checkGlobsPflsPartCoherency();
+  checkGlobsLocsPartCoherency();
+}
+
+void MEDFileFieldGlobsReal::checkGlobsPflsPartCoherency() const throw(INTERP_KERNEL::Exception)
+{
+  contentNotNull()->checkGlobsPflsPartCoherency(getPflsReallyUsed());
+}
+
+void MEDFileFieldGlobsReal::checkGlobsLocsPartCoherency() const throw(INTERP_KERNEL::Exception)
+{
+  contentNotNull()->checkGlobsLocsPartCoherency(getLocsReallyUsed());
 }
 
 void MEDFileFieldGlobsReal::loadProfileInFile(med_idt fid, int id, const char *pflName) throw(INTERP_KERNEL::Exception)
 {
-  _globals->loadProfileInFile(fid,id,pflName);
+  contentNotNull()->loadProfileInFile(fid,id,pflName);
 }
 
 void MEDFileFieldGlobsReal::loadProfileInFile(med_idt fid, int id)
 {
-  _globals->loadProfileInFile(fid,id);
+  contentNotNull()->loadProfileInFile(fid,id);
 }
 
 void MEDFileFieldGlobsReal::loadGlobals(med_idt fid) throw(INTERP_KERNEL::Exception)
 {
-  _globals->loadGlobals(fid,*this);
+  contentNotNull()->loadGlobals(fid,*this);
 }
 
 void MEDFileFieldGlobsReal::loadAllGlobals(med_idt fid) throw(INTERP_KERNEL::Exception)
 {
-  _globals->loadAllGlobals(fid);
+  contentNotNull()->loadAllGlobals(fid);
 }
 
 void MEDFileFieldGlobsReal::writeGlobals(med_idt fid, const MEDFileWritable& opt) const throw(INTERP_KERNEL::Exception)
 {
-  _globals->writeGlobals(fid,opt);
+  contentNotNull()->writeGlobals(fid,opt);
 }
 
 /*!
@@ -2935,7 +3064,7 @@ void MEDFileFieldGlobsReal::writeGlobals(med_idt fid, const MEDFileWritable& opt
  */
 std::vector<std::string> MEDFileFieldGlobsReal::getPfls() const
 {
-  return _globals->getPfls();
+  return contentNotNull()->getPfls();
 }
 
 /*!
@@ -2945,7 +3074,7 @@ std::vector<std::string> MEDFileFieldGlobsReal::getPfls() const
  */
 std::vector<std::string> MEDFileFieldGlobsReal::getLocs() const
 {
-  return _globals->getLocs();
+  return contentNotNull()->getLocs();
 }
 
 /*!
@@ -2955,7 +3084,7 @@ std::vector<std::string> MEDFileFieldGlobsReal::getLocs() const
  */
 bool MEDFileFieldGlobsReal::existsPfl(const char *pflName) const
 {
-  return _globals->existsPfl(pflName);
+  return contentNotNull()->existsPfl(pflName);
 }
 
 /*!
@@ -2965,17 +3094,17 @@ bool MEDFileFieldGlobsReal::existsPfl(const char *pflName) const
  */
 bool MEDFileFieldGlobsReal::existsLoc(const char *locName) const
 {
-  return _globals->existsLoc(locName);
+  return contentNotNull()->existsLoc(locName);
 }
 
 std::string MEDFileFieldGlobsReal::createNewNameOfPfl() const throw(INTERP_KERNEL::Exception)
 {
-  return _globals->createNewNameOfPfl();
+  return contentNotNull()->createNewNameOfPfl();
 }
 
 std::string MEDFileFieldGlobsReal::createNewNameOfLoc() const throw(INTERP_KERNEL::Exception)
 {
-  return _globals->createNewNameOfLoc();
+  return contentNotNull()->createNewNameOfLoc();
 }
 
 /*!
@@ -2984,7 +3113,7 @@ std::string MEDFileFieldGlobsReal::createNewNameOfLoc() const throw(INTERP_KERNE
  */
 void MEDFileFieldGlobsReal::setFileName(const char *fileName)
 {
-  _globals->setFileName(fileName);
+  contentNotNull()->setFileName(fileName);
 }
 
 /*!
@@ -2995,7 +3124,7 @@ void MEDFileFieldGlobsReal::setFileName(const char *fileName)
  */
 std::vector< std::vector<int> > MEDFileFieldGlobsReal::whichAreEqualProfiles() const
 {
-  return _globals->whichAreEqualProfiles();
+  return contentNotNull()->whichAreEqualProfiles();
 }
 
 /*!
@@ -3006,7 +3135,7 @@ std::vector< std::vector<int> > MEDFileFieldGlobsReal::whichAreEqualProfiles() c
  */
 std::vector< std::vector<int> > MEDFileFieldGlobsReal::whichAreEqualLocs(double eps) const
 {
-  return _globals->whichAreEqualLocs(eps);
+  return contentNotNull()->whichAreEqualLocs(eps);
 }
 
 /*!
@@ -3018,7 +3147,7 @@ std::vector< std::vector<int> > MEDFileFieldGlobsReal::whichAreEqualLocs(double 
  */
 void MEDFileFieldGlobsReal::changePflsNamesInStruct(const std::vector< std::pair<std::vector<std::string>, std::string > >& mapOfModif) throw(INTERP_KERNEL::Exception)
 {
-  _globals->changePflsNamesInStruct(mapOfModif);
+  contentNotNull()->changePflsNamesInStruct(mapOfModif);
 }
 
 /*!
@@ -3030,7 +3159,7 @@ void MEDFileFieldGlobsReal::changePflsNamesInStruct(const std::vector< std::pair
  */
 void MEDFileFieldGlobsReal::changeLocsNamesInStruct(const std::vector< std::pair<std::vector<std::string>, std::string > >& mapOfModif) throw(INTERP_KERNEL::Exception)
 {
-  _globals->changeLocsNamesInStruct(mapOfModif);
+  contentNotNull()->changeLocsNamesInStruct(mapOfModif);
 }
 
 /*!
@@ -3165,7 +3294,7 @@ std::vector< std::pair<std::vector<std::string>, std::string > > MEDFileFieldGlo
  */
 int MEDFileFieldGlobsReal::getNbOfGaussPtPerCell(int locId) const throw(INTERP_KERNEL::Exception)
 {
-  return _globals->getNbOfGaussPtPerCell(locId);
+  return contentNotNull()->getNbOfGaussPtPerCell(locId);
 }
 
 /*!
@@ -3176,7 +3305,7 @@ int MEDFileFieldGlobsReal::getNbOfGaussPtPerCell(int locId) const throw(INTERP_K
  */
 int MEDFileFieldGlobsReal::getLocalizationId(const char *loc) const throw(INTERP_KERNEL::Exception)
 {
-  return _globals->getLocalizationId(loc);
+  return contentNotNull()->getLocalizationId(loc);
 }
 
 /*!
@@ -3185,12 +3314,12 @@ int MEDFileFieldGlobsReal::getLocalizationId(const char *loc) const throw(INTERP
  */
 const char *MEDFileFieldGlobsReal::getFileName() const
 {
-  return _globals->getFileName();
+  return contentNotNull()->getFileName();
 }
 
 std::string MEDFileFieldGlobsReal::getFileName2() const
 {
-  return _globals->getFileName2();
+  return contentNotNull()->getFileName2();
 }
 
 /*!
@@ -3201,7 +3330,7 @@ std::string MEDFileFieldGlobsReal::getFileName2() const
  */
 const MEDFileFieldLoc& MEDFileFieldGlobsReal::getLocalization(const char *locName) const throw(INTERP_KERNEL::Exception)
 {
-  return _globals->getLocalization(locName);
+  return contentNotNull()->getLocalization(locName);
 }
 
 /*!
@@ -3212,7 +3341,7 @@ const MEDFileFieldLoc& MEDFileFieldGlobsReal::getLocalization(const char *locNam
  */
 const MEDFileFieldLoc& MEDFileFieldGlobsReal::getLocalizationFromId(int locId) const throw(INTERP_KERNEL::Exception)
 {
-  return _globals->getLocalizationFromId(locId);
+  return contentNotNull()->getLocalizationFromId(locId);
 }
 
 /*!
@@ -3223,7 +3352,7 @@ const MEDFileFieldLoc& MEDFileFieldGlobsReal::getLocalizationFromId(int locId) c
  */
 const DataArrayInt *MEDFileFieldGlobsReal::getProfile(const char *pflName) const throw(INTERP_KERNEL::Exception)
 {
-  return _globals->getProfile(pflName);
+  return contentNotNull()->getProfile(pflName);
 }
 
 /*!
@@ -3234,7 +3363,7 @@ const DataArrayInt *MEDFileFieldGlobsReal::getProfile(const char *pflName) const
  */
 const DataArrayInt *MEDFileFieldGlobsReal::getProfileFromId(int pflId) const throw(INTERP_KERNEL::Exception)
 {
-  return _globals->getProfileFromId(pflId);
+  return contentNotNull()->getProfileFromId(pflId);
 }
 
 /*!
@@ -3246,7 +3375,7 @@ const DataArrayInt *MEDFileFieldGlobsReal::getProfileFromId(int pflId) const thr
  */
 MEDFileFieldLoc& MEDFileFieldGlobsReal::getLocalizationFromId(int locId) throw(INTERP_KERNEL::Exception)
 {
-  return _globals->getLocalizationFromId(locId);
+  return contentNotNull()->getLocalizationFromId(locId);
 }
 
 /*!
@@ -3258,7 +3387,7 @@ MEDFileFieldLoc& MEDFileFieldGlobsReal::getLocalizationFromId(int locId) throw(I
  */
 MEDFileFieldLoc& MEDFileFieldGlobsReal::getLocalization(const char *locName) throw(INTERP_KERNEL::Exception)
 {
-  return _globals->getLocalization(locName);
+  return contentNotNull()->getLocalization(locName);
 }
 
 /*!
@@ -3269,7 +3398,7 @@ MEDFileFieldLoc& MEDFileFieldGlobsReal::getLocalization(const char *locName) thr
  */
 DataArrayInt *MEDFileFieldGlobsReal::getProfile(const char *pflName) throw(INTERP_KERNEL::Exception)
 {
-  return _globals->getProfile(pflName);
+  return contentNotNull()->getProfile(pflName);
 }
 
 /*!
@@ -3280,7 +3409,7 @@ DataArrayInt *MEDFileFieldGlobsReal::getProfile(const char *pflName) throw(INTER
  */
 DataArrayInt *MEDFileFieldGlobsReal::getProfileFromId(int pflId) throw(INTERP_KERNEL::Exception)
 {
-  return _globals->getProfileFromId(pflId);
+  return contentNotNull()->getProfileFromId(pflId);
 }
 
 /*!
@@ -3289,7 +3418,7 @@ DataArrayInt *MEDFileFieldGlobsReal::getProfileFromId(int pflId) throw(INTERP_KE
  */
 void MEDFileFieldGlobsReal::killProfileIds(const std::vector<int>& pflIds) throw(INTERP_KERNEL::Exception)
 {
-  _globals->killProfileIds(pflIds);
+  contentNotNull()->killProfileIds(pflIds);
 }
 
 /*!
@@ -3298,7 +3427,7 @@ void MEDFileFieldGlobsReal::killProfileIds(const std::vector<int>& pflIds) throw
  */
 void MEDFileFieldGlobsReal::killLocalizationIds(const std::vector<int>& locIds) throw(INTERP_KERNEL::Exception)
 {
-  _globals->killLocalizationIds(locIds);
+  contentNotNull()->killLocalizationIds(locIds);
 }
 
 /*!
@@ -3310,7 +3439,7 @@ void MEDFileFieldGlobsReal::killLocalizationIds(const std::vector<int>& locIds) 
  */
 void MEDFileFieldGlobsReal::appendProfile(DataArrayInt *pfl) throw(INTERP_KERNEL::Exception)
 {
-  _globals->appendProfile(pfl);
+  contentNotNull()->appendProfile(pfl);
 }
 
 /*!
@@ -3328,7 +3457,23 @@ void MEDFileFieldGlobsReal::appendProfile(DataArrayInt *pfl) throw(INTERP_KERNEL
  */
 void MEDFileFieldGlobsReal::appendLoc(const char *locName, INTERP_KERNEL::NormalizedCellType geoType, const std::vector<double>& refCoo, const std::vector<double>& gsCoo, const std::vector<double>& w) throw(INTERP_KERNEL::Exception)
 {
-  _globals->appendLoc(locName,geoType,refCoo,gsCoo,w);
+  contentNotNull()->appendLoc(locName,geoType,refCoo,gsCoo,w);
+}
+
+MEDFileFieldGlobs *MEDFileFieldGlobsReal::contentNotNull() throw(INTERP_KERNEL::Exception)
+{
+  MEDFileFieldGlobs *g(_globals);
+  if(!g)
+    throw INTERP_KERNEL::Exception("MEDFileFieldGlobsReal::contentNotNull : no content in not const !");
+  return g;
+}
+
+const MEDFileFieldGlobs *MEDFileFieldGlobsReal::contentNotNull() const throw(INTERP_KERNEL::Exception)
+{
+  const MEDFileFieldGlobs *g(_globals);
+  if(!g)
+    throw INTERP_KERNEL::Exception("MEDFileFieldGlobsReal::contentNotNull : no content in const !");
+  return g;
 }
 
 //= MEDFileFieldNameScope
@@ -3442,7 +3587,7 @@ MEDFileAnyTypeField1TSWithoutSDA::MEDFileAnyTypeField1TSWithoutSDA(const char *f
 {
 }
 
-MEDFileAnyTypeField1TSWithoutSDA::MEDFileAnyTypeField1TSWithoutSDA():_csit(-1)
+MEDFileAnyTypeField1TSWithoutSDA::MEDFileAnyTypeField1TSWithoutSDA():_iteration(-1),_order(-1),_dt(0.),_csit(-1)
 {
 }
 
@@ -5143,7 +5288,7 @@ std::string MEDFileAnyTypeField1TS::simpleRepr() const
 {
   std::ostringstream oss;
   contentNotNullBase()->simpleRepr(0,oss,-1);
-  MEDFileFieldGlobsReal::simpleRepr(oss);
+  simpleReprGlobs(oss);
   return oss.str();
 }
 
@@ -6131,6 +6276,100 @@ std::size_t MEDFileAnyTypeFieldMultiTSWithoutSDA::getHeapMemorySize() const
   return ret;
 }
 
+MEDFileAnyTypeFieldMultiTSWithoutSDA *MEDFileAnyTypeFieldMultiTSWithoutSDA::buildFromTimeStepIds(const int *startIds, const int *endIds) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> ret=createNew();
+  ret->setInfo(_infos);
+  int sz=(int)_time_steps.size();
+  for(const int *id=startIds;id!=endIds;id++)
+    {
+      if(*id>=0 && *id<sz)
+        {
+          const MEDFileAnyTypeField1TSWithoutSDA *tse=_time_steps[*id];
+          MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> tse2;
+          if(tse)
+            {
+              tse->incrRef();
+              tse2=(const_cast<MEDFileAnyTypeField1TSWithoutSDA *>(tse));
+            }
+          ret->pushBackTimeStep(tse2);
+        }
+      else
+        {
+          std::ostringstream oss; oss << "MEDFileAnyTypeFieldMultiTSWithoutSDA::buildFromTimeStepIds : At pos #" << std::distance(startIds,id) << " value is " << *id;
+          oss << " ! Should be in [0," << sz << ") !";
+          throw INTERP_KERNEL::Exception(oss.str().c_str());
+        }
+    }
+  if(ret->getNumberOfTS()>0)
+    ret->synchronizeNameScope();
+  ret->copyNameScope(*this);
+  return ret.retn();
+}
+
+MEDFileAnyTypeFieldMultiTSWithoutSDA *MEDFileAnyTypeFieldMultiTSWithoutSDA::buildFromTimeStepIds2(int bg, int end, int step) const throw(INTERP_KERNEL::Exception)
+{
+  static const char msg[]="MEDFileAnyTypeFieldMultiTSWithoutSDA::buildFromTimeStepIds2";
+  int nbOfEntriesToKeep=DataArrayInt::GetNumberOfItemGivenBESRelative(bg,end,step,msg);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> ret=createNew();
+  ret->setInfo(_infos);
+  int sz=(int)_time_steps.size();
+  int j=bg;
+  for(int i=0;i<nbOfEntriesToKeep;i++,j+=step)
+    {
+      if(j>=0 && j<sz)
+        {
+          const MEDFileAnyTypeField1TSWithoutSDA *tse=_time_steps[j];
+          MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> tse2;
+          if(tse)
+            {
+              tse->incrRef();
+              tse2=(const_cast<MEDFileAnyTypeField1TSWithoutSDA *>(tse));
+            }
+          ret->pushBackTimeStep(tse2);
+        }
+      else
+        {
+          std::ostringstream oss; oss << "MEDFileAnyTypeFieldMultiTSWithoutSDA::buildFromTimeStepIds : At pos #" << i << " value is " << j;
+          oss << " ! Should be in [0," << sz << ") !";
+          throw INTERP_KERNEL::Exception(oss.str().c_str());
+        }
+    }
+  if(ret->getNumberOfTS()>0)
+    ret->synchronizeNameScope();
+  ret->copyNameScope(*this);
+  return ret.retn();
+}
+
+MEDFileAnyTypeFieldMultiTSWithoutSDA *MEDFileAnyTypeFieldMultiTSWithoutSDA::partOfThisLyingOnSpecifiedTimeSteps(const std::vector< std::pair<int,int> >& timeSteps) const throw(INTERP_KERNEL::Exception)
+{
+  std::vector<int> ids(timeSteps.size());
+  for(std::size_t i=0;i<timeSteps.size();i++)
+    ids[i]=getTimeStepPos(timeSteps[i].first,timeSteps[i].second);
+  return buildFromTimeStepIds(&ids[0],&ids[0]+ids.size());
+}
+
+MEDFileAnyTypeFieldMultiTSWithoutSDA *MEDFileAnyTypeFieldMultiTSWithoutSDA::partOfThisNotLyingOnSpecifiedTimeSteps(const std::vector< std::pair<int,int> >& timeSteps) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> ret=createNew();
+  ret->setInfo(_infos);
+  std::vector< std::pair<int,int> > its=getIterations();
+  for(std::vector< std::pair<int,int> >::const_iterator it1=its.begin();it1!=its.end();it1++)
+    {
+      if(std::find(timeSteps.begin(),timeSteps.end(),*it1)==timeSteps.end())
+        {
+          const MEDFileAnyTypeField1TSWithoutSDA *tse=&getTimeStepEntry((*it1).first,(*it1).second);
+          tse->incrRef();
+          MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> tse2(const_cast<MEDFileAnyTypeField1TSWithoutSDA *>(tse));
+          ret->pushBackTimeStep(tse2);
+        }
+    }
+  if(ret->getNumberOfTS()!=0)
+    ret->synchronizeNameScope();
+  ret->copyNameScope(*this);
+  return ret.retn();
+}
+
 const std::vector<std::string>& MEDFileAnyTypeFieldMultiTSWithoutSDA::getInfo() const throw(INTERP_KERNEL::Exception)
 {
   /*if(_time_steps.empty())
@@ -6139,28 +6378,35 @@ const std::vector<std::string>& MEDFileAnyTypeFieldMultiTSWithoutSDA::getInfo() 
   return _infos;
 }
 
-const MEDFileAnyTypeField1TSWithoutSDA& MEDFileAnyTypeFieldMultiTSWithoutSDA::getTimeStepEntry(int iteration, int order) const throw(INTERP_KERNEL::Exception)
+void MEDFileAnyTypeFieldMultiTSWithoutSDA::setInfo(const std::vector<std::string>& info) throw(INTERP_KERNEL::Exception)
 {
-  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA>  >::const_iterator it=_time_steps.begin();it!=_time_steps.end();it++)
-    if((*it)->isDealingTS(iteration,order))
-      return *(*it);
-  std::ostringstream oss; oss << "MEDFileFieldMultiTS::getTimeStepEntry : Muli timestep field on time (" << iteration << "," << order << ") does not exist ! Available (iteration,order) are :\n";
+  _infos=info;
+}
+
+int MEDFileAnyTypeFieldMultiTSWithoutSDA::getTimeStepPos(int iteration, int order) const throw(INTERP_KERNEL::Exception)
+{
+  int ret=0;
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA>  >::const_iterator it=_time_steps.begin();it!=_time_steps.end();it++,ret++)
+    {
+      const MEDFileAnyTypeField1TSWithoutSDA *pt(*it);
+      if(pt->isDealingTS(iteration,order))
+        return ret;
+    }
+  std::ostringstream oss; oss << "MEDFileFieldMultiTS::getTimeStepPos : Muli timestep field on time (" << iteration << "," << order << ") does not exist ! Available (iteration,order) are :\n";
   std::vector< std::pair<int,int> > vp=getIterations();
   for(std::vector< std::pair<int,int> >::const_iterator it2=vp.begin();it2!=vp.end();it2++)
     oss << "(" << (*it2).first << "," << (*it2).second << ") ";
   throw INTERP_KERNEL::Exception(oss.str().c_str());
 }
 
+const MEDFileAnyTypeField1TSWithoutSDA& MEDFileAnyTypeFieldMultiTSWithoutSDA::getTimeStepEntry(int iteration, int order) const throw(INTERP_KERNEL::Exception)
+{
+  return *_time_steps[getTimeStepPos(iteration,order)];
+}
+
 MEDFileAnyTypeField1TSWithoutSDA& MEDFileAnyTypeFieldMultiTSWithoutSDA::getTimeStepEntry(int iteration, int order) throw(INTERP_KERNEL::Exception)
 {
-  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA>  >::iterator it=_time_steps.begin();it!=_time_steps.end();it++)
-    if((*it)->isDealingTS(iteration,order))
-      return *(*it);
-  std::ostringstream oss; oss << "MEDFileFieldMultiTS::getTimeStepEntry : Muli timestep field on time (" << iteration << "," << order << ") does not exist ! Available (iteration,order) are :\n";
-  std::vector< std::pair<int,int> > vp=getIterations();
-  for(std::vector< std::pair<int,int> >::const_iterator it2=vp.begin();it2!=vp.end();it2++)
-    oss << "(" << (*it2).first << "," << (*it2).second << ") ";
-  throw INTERP_KERNEL::Exception(oss.str().c_str());
+  return *_time_steps[getTimeStepPos(iteration,order)];
 }
 
 std::string MEDFileAnyTypeFieldMultiTSWithoutSDA::getMeshName() const throw(INTERP_KERNEL::Exception)
@@ -6266,6 +6512,15 @@ std::vector< std::pair<int,int> > MEDFileAnyTypeFieldMultiTSWithoutSDA::getTimeS
   return ret;
 }
 
+void MEDFileAnyTypeFieldMultiTSWithoutSDA::pushBackTimeStep(MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA>& tse) throw(INTERP_KERNEL::Exception)
+{
+  MEDFileAnyTypeField1TSWithoutSDA *tse2(tse);
+  if(!tse2)
+    throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTSWithoutSDA::pushBackTimeStep : input content object is null !");
+  checkCoherencyOfType(tse2);
+  _time_steps.push_back(tse);
+}
+
 void MEDFileAnyTypeFieldMultiTSWithoutSDA::synchronizeNameScope() throw(INTERP_KERNEL::Exception)
 {
   std::size_t nbOfCompo=_infos.size();
@@ -6357,7 +6612,7 @@ void MEDFileAnyTypeFieldMultiTSWithoutSDA::eraseEmptyTS() throw(INTERP_KERNEL::E
 
 void MEDFileAnyTypeFieldMultiTSWithoutSDA::eraseTimeStepIds(const int *startIds, const int *endIds) throw(INTERP_KERNEL::Exception)
 {
-  std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA>  > newTS;
+  std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> > newTS;
   int maxId=(int)_time_steps.size();
   int ii=0;
   std::set<int> idsToDel;
@@ -6376,6 +6631,24 @@ void MEDFileAnyTypeFieldMultiTSWithoutSDA::eraseTimeStepIds(const int *startIds,
   for(int iii=0;iii<maxId;iii++)
     if(idsToDel.find(iii)==idsToDel.end())
       newTS.push_back(_time_steps[iii]);
+  _time_steps=newTS;
+}
+
+void MEDFileAnyTypeFieldMultiTSWithoutSDA::eraseTimeStepIds2(int bg, int end, int step) throw(INTERP_KERNEL::Exception)
+{
+  static const char msg[]="MEDFileAnyTypeFieldMultiTSWithoutSDA::eraseTimeStepIds2";
+  int nbOfEntriesToKill=DataArrayInt::GetNumberOfItemGivenBESRelative(bg,end,step,msg);
+  if(nbOfEntriesToKill==0)
+    return ;
+  std::size_t sz=_time_steps.size();
+  std::vector<bool> b(sz,true);
+  int j=bg;
+  for(int i=0;i<nbOfEntriesToKill;i++,j+=step)
+    b[j]=false;
+  std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> > newTS;
+  for(std::size_t i=0;i<sz;i++)
+    if(b[i])
+      newTS.push_back(_time_steps[i]);
   _time_steps=newTS;
 }
 
@@ -6712,6 +6985,15 @@ MEDFileAnyTypeField1TSWithoutSDA *MEDFileFieldMultiTSWithoutSDA::createNew1TSWit
   return new MEDFileField1TSWithoutSDA;
 }
 
+void MEDFileFieldMultiTSWithoutSDA::checkCoherencyOfType(const MEDFileAnyTypeField1TSWithoutSDA *f1ts) const throw(INTERP_KERNEL::Exception)
+{
+  if(!f1ts)
+    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTSWithoutSDA::checkCoherencyOfType : input field1TS is NULL ! Impossible to check !");
+  const MEDFileField1TSWithoutSDA *f1tsC=dynamic_cast<const MEDFileField1TSWithoutSDA *>(f1ts);
+  if(!f1tsC)
+    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTSWithoutSDA::checkCoherencyOfType : the input field1TS is not a FLOAT64 type !");
+}
+
 const char *MEDFileFieldMultiTSWithoutSDA::getTypeStr() const throw(INTERP_KERNEL::Exception)
 {
   return MEDFileField1TSWithoutSDA::TYPE_STR;
@@ -6720,6 +7002,11 @@ const char *MEDFileFieldMultiTSWithoutSDA::getTypeStr() const throw(INTERP_KERNE
 MEDFileAnyTypeFieldMultiTSWithoutSDA *MEDFileFieldMultiTSWithoutSDA::shallowCpy() const throw(INTERP_KERNEL::Exception)
 {
   return new MEDFileFieldMultiTSWithoutSDA(*this);
+}
+
+MEDFileAnyTypeFieldMultiTSWithoutSDA *MEDFileFieldMultiTSWithoutSDA::createNew() const throw(INTERP_KERNEL::Exception)
+{
+  return new MEDFileFieldMultiTSWithoutSDA;
 }
 
 /*!
@@ -6883,6 +7170,15 @@ MEDFileAnyTypeField1TSWithoutSDA *MEDFileIntFieldMultiTSWithoutSDA::createNew1TS
   return new MEDFileIntField1TSWithoutSDA;
 }
 
+void MEDFileIntFieldMultiTSWithoutSDA::checkCoherencyOfType(const MEDFileAnyTypeField1TSWithoutSDA *f1ts) const throw(INTERP_KERNEL::Exception)
+{
+  if(!f1ts)
+    throw INTERP_KERNEL::Exception("MEDFileIntFieldMultiTSWithoutSDA::checkCoherencyOfType : input field1TS is NULL ! Impossible to check !");
+  const MEDFileIntField1TSWithoutSDA *f1tsC=dynamic_cast<const MEDFileIntField1TSWithoutSDA *>(f1ts);
+  if(!f1tsC)
+    throw INTERP_KERNEL::Exception("MEDFileIntFieldMultiTSWithoutSDA::checkCoherencyOfType : the input field1TS is not a INT32 type !");
+}
+
 const char *MEDFileIntFieldMultiTSWithoutSDA::getTypeStr() const throw(INTERP_KERNEL::Exception)
 {
   return MEDFileIntField1TSWithoutSDA::TYPE_STR;
@@ -6891,6 +7187,11 @@ const char *MEDFileIntFieldMultiTSWithoutSDA::getTypeStr() const throw(INTERP_KE
 MEDFileAnyTypeFieldMultiTSWithoutSDA *MEDFileIntFieldMultiTSWithoutSDA::shallowCpy() const throw(INTERP_KERNEL::Exception)
 {
   return new MEDFileIntFieldMultiTSWithoutSDA(*this);
+}
+
+MEDFileAnyTypeFieldMultiTSWithoutSDA *MEDFileIntFieldMultiTSWithoutSDA::createNew() const throw(INTERP_KERNEL::Exception)
+{
+  return new MEDFileIntFieldMultiTSWithoutSDA;
 }
 
 //= MEDFileAnyTypeFieldMultiTS
@@ -7014,9 +7315,30 @@ void MEDFileAnyTypeFieldMultiTS::eraseTimeStepIds(const int *startIds, const int
   contentNotNullBase()->eraseTimeStepIds(startIds,endIds);
 }
 
+void MEDFileAnyTypeFieldMultiTS::eraseTimeStepIds2(int bg, int end, int step) throw(INTERP_KERNEL::Exception)
+{
+  contentNotNullBase()->eraseTimeStepIds2(bg,end,step);
+}
+
 std::vector< std::pair<int,int> > MEDFileAnyTypeFieldMultiTS::getIterations() const
 {
   return contentNotNullBase()->getIterations();
+}
+
+void MEDFileAnyTypeFieldMultiTS::pushBackTimeStep(MEDFileAnyTypeField1TS *f1ts) throw(INTERP_KERNEL::Exception)
+{
+  if(!f1ts)
+    throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTSWithoutSDA::pushBackTimeStep : input pointer is NULL !");
+  checkCoherencyOfType(f1ts);
+  f1ts->incrRef();
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TS> f1tsSafe(f1ts);
+  MEDFileAnyTypeField1TSWithoutSDA *c=f1ts->contentNotNullBase();
+  c->incrRef();
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> cSafe(c);
+  if(!((MEDFileAnyTypeFieldMultiTSWithoutSDA *)_content))
+    throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTSWithoutSDA::pushBackTimeStep : no content in this !");
+  _content->pushBackTimeStep(cSafe);
+  appendGlobs(*f1ts,1e-12);
 }
 
 void MEDFileAnyTypeFieldMultiTS::synchronizeNameScope() throw(INTERP_KERNEL::Exception)
@@ -7099,6 +7421,11 @@ const std::vector<std::string>& MEDFileAnyTypeFieldMultiTS::getInfo() const thro
   return contentNotNullBase()->getInfo();
 }
 
+void MEDFileAnyTypeFieldMultiTS::setInfo(const std::vector<std::string>& info) throw(INTERP_KERNEL::Exception)
+{
+  return contentNotNullBase()->setInfo(info);
+}
+
 int MEDFileAnyTypeFieldMultiTS::getNumberOfComponents() const throw(INTERP_KERNEL::Exception)
 {
   const std::vector<std::string> ret=getInfo();
@@ -7133,7 +7460,7 @@ std::string MEDFileAnyTypeFieldMultiTS::simpleRepr() const
 {
   std::ostringstream oss;
   contentNotNullBase()->simpleRepr(0,oss,-1);
-  MEDFileFieldGlobsReal::simpleRepr(oss);
+  simpleReprGlobs(oss);
   return oss.str();
 }
 
@@ -7256,6 +7583,15 @@ MEDFileFieldMultiTS *MEDFileFieldMultiTS::New(const MEDFileFieldMultiTSWithoutSD
 MEDFileAnyTypeFieldMultiTS *MEDFileFieldMultiTS::shallowCpy() const throw(INTERP_KERNEL::Exception)
 {
   return new MEDFileFieldMultiTS(*this);
+}
+
+void MEDFileFieldMultiTS::checkCoherencyOfType(const MEDFileAnyTypeField1TS *f1ts) const throw(INTERP_KERNEL::Exception)
+{
+  if(!f1ts)
+    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::checkCoherencyOfType : input field1TS is NULL ! Impossible to check !");
+  const MEDFileField1TS *f1tsC=dynamic_cast<const MEDFileField1TS *>(f1ts);
+  if(!f1tsC)
+    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTS::checkCoherencyOfType : the input field1TS is not a FLOAT64 type !");
 }
 
 /*!
@@ -7662,6 +7998,15 @@ MEDFileIntFieldMultiTS *MEDFileIntFieldMultiTS::New(const MEDFileIntFieldMultiTS
 MEDFileAnyTypeFieldMultiTS *MEDFileIntFieldMultiTS::shallowCpy() const throw(INTERP_KERNEL::Exception)
 {
   return new MEDFileIntFieldMultiTS(*this);
+}
+
+void MEDFileIntFieldMultiTS::checkCoherencyOfType(const MEDFileAnyTypeField1TS *f1ts) const throw(INTERP_KERNEL::Exception)
+{
+  if(!f1ts)
+    throw INTERP_KERNEL::Exception("MEDFileIntFieldMultiTS::checkCoherencyOfType : input field1TS is NULL ! Impossible to check !");
+  const MEDFileIntField1TS *f1tsC=dynamic_cast<const MEDFileIntField1TS *>(f1ts);
+  if(!f1tsC)
+    throw INTERP_KERNEL::Exception("MEDFileIntFieldMultiTS::checkCoherencyOfType : the input field1TS is not a INT32 type !");
 }
 
 /*!
@@ -8112,7 +8457,7 @@ void MEDFileFields::simpleRepr(int bkOffset, std::ostream& oss) const
         }
       oss << startLine << chapter << std::endl;
     }
-  MEDFileFieldGlobsReal::simpleRepr(oss);
+  simpleReprGlobs(oss);
 }
 
 MEDFileFields::MEDFileFields()
@@ -8274,12 +8619,27 @@ void MEDFileFields::setFieldAtPos(int i, MEDFileAnyTypeFieldMultiTS *field) thro
 
 void MEDFileFields::destroyFieldAtPos(int i) throw(INTERP_KERNEL::Exception)
 {
-  if(i<0 || i>=(int)_fields.size())
+  destroyFieldsAtPos(&i,&i+1);
+}
+
+void MEDFileFields::destroyFieldsAtPos(const int *startIds, const int *endIds) throw(INTERP_KERNEL::Exception)
+{
+  std::vector<bool> b(_fields.size(),true);
+  for(const int *i=startIds;i!=endIds;i++)
     {
-      std::ostringstream oss; oss << "MEDFileFields::destroyMeshAtPos : Invalid given id in input (" << i << ") should be in [0," << _fields.size() << ") !";
-      throw INTERP_KERNEL::Exception(oss.str().c_str());
+      if(*i<0 || *i>=(int)_fields.size())
+        {
+          std::ostringstream oss; oss << "MEDFileFields::destroyFieldsAtPos : Invalid given id in input (" << *i << ") should be in [0," << _fields.size() << ") !";
+          throw INTERP_KERNEL::Exception(oss.str().c_str());
+        }
+      b[*i]=false;
     }
-  _fields.erase(_fields.begin()+i);
+  std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> > fields(std::count(b.begin(),b.end(),true));
+  std::size_t j=0;
+  for(std::size_t i=0;i<_fields.size();i++)
+    if(b[i])
+      fields[j++]=_fields[i];
+  _fields=fields;
 }
 
 bool MEDFileFields::changeMeshNames(const std::vector< std::pair<std::string,std::string> >& modifTab) throw(INTERP_KERNEL::Exception)
@@ -8360,7 +8720,7 @@ MEDFileAnyTypeFieldMultiTS *MEDFileFields::getFieldWithName(const char *fieldNam
 MEDFileFields *MEDFileFields::partOfThisLyingOnSpecifiedMeshName(const char *meshName) const throw(INTERP_KERNEL::Exception)
 {
   MEDCouplingAutoRefCountObjectPtr<MEDFileFields> ret=MEDFileFields::New();
-  ret->shallowCpyGlobs(*this);
+  ret->shallowCpyOnlyUsedGlobs(*this);
   for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> >::const_iterator it=_fields.begin();it!=_fields.end();it++)
     {
       const MEDFileAnyTypeFieldMultiTSWithoutSDA *cur=(*it);
@@ -8378,17 +8738,30 @@ MEDFileFields *MEDFileFields::partOfThisLyingOnSpecifiedMeshName(const char *mes
 
 /*!
  * This method returns a new object containing part of \a this fields lying ** exactly ** on the time steps specified by input parameter \a timeSteps.
- * This method can be seen as a filter applied on \a this, that returns an object containing
- * reduced the list of fields compared to those in \a this. The returned object is a new object but the object on which it lies are only
- * shallow copied from \a this.
+ * Input time steps are specified using a pair of integer (iteration, order).
+ * This method can be seen as a filter applied on \a this, that returns an object containing the same number of fields than those in \a this,
+ * but for each multitimestep only the time steps in \a timeSteps are kept.
+ * Typically the input parameter \a timeSteps comes from the call of MEDFileFields::getCommonIterations.
+ * 
+ * The returned object points to shallow copy of elements in \a this.
  * 
  * \param [in] timeSteps - the time steps given by a vector of pair of integers (iteration,order)
+ * \throw If there is a field in \a this that is \b not defined on a time step in the input \a timeSteps.
  * \sa MEDFileFields::getCommonIterations, MEDFileFields::partOfThisNotLyingOnSpecifiedTimeSteps
  */
 MEDFileFields *MEDFileFields::partOfThisLyingOnSpecifiedTimeSteps(const std::vector< std::pair<int,int> >& timeSteps) const throw(INTERP_KERNEL::Exception)
 {
-  //not implemented yet
-  return 0;
+  MEDCouplingAutoRefCountObjectPtr<MEDFileFields> ret=MEDFileFields::New();
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> >::const_iterator it=_fields.begin();it!=_fields.end();it++)
+    {
+      const MEDFileAnyTypeFieldMultiTSWithoutSDA *cur=(*it);
+      if(!cur)
+        continue;
+      MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> elt=cur->partOfThisLyingOnSpecifiedTimeSteps(timeSteps);
+      ret->_fields.push_back(elt);
+    }
+  ret->shallowCpyOnlyUsedGlobs(*this);
+  return ret.retn();
 }
 
 /*!
@@ -8396,8 +8769,18 @@ MEDFileFields *MEDFileFields::partOfThisLyingOnSpecifiedTimeSteps(const std::vec
  */
 MEDFileFields *MEDFileFields::partOfThisNotLyingOnSpecifiedTimeSteps(const std::vector< std::pair<int,int> >& timeSteps) const throw(INTERP_KERNEL::Exception)
 {
-  //not implemented yet
-  return 0;
+  MEDCouplingAutoRefCountObjectPtr<MEDFileFields> ret=MEDFileFields::New();
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> >::const_iterator it=_fields.begin();it!=_fields.end();it++)
+    {
+      const MEDFileAnyTypeFieldMultiTSWithoutSDA *cur=(*it);
+      if(!cur)
+        continue;
+      MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> elt=cur->partOfThisNotLyingOnSpecifiedTimeSteps(timeSteps);
+      if(elt->getNumberOfTS()!=0)
+        ret->_fields.push_back(elt);
+    }
+  ret->shallowCpyOnlyUsedGlobs(*this);
+  return ret.retn();
 }
 
 MEDFileFieldsIterator *MEDFileFields::iterator() throw(INTERP_KERNEL::Exception)

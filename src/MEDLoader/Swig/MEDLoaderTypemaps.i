@@ -253,9 +253,9 @@ std::vector< std::pair<std::vector<std::string>, std::string > > convertVecPairV
               PyObject *o0=PyTuple_GetItem(o,0);
               if(PyList_Check(o0))
                 {
-                  int size2=PyList_Size(o0);
-                  p.first.resize(size2);
-                  for(int j=0;j<size2;j++)
+                  int size3=PyList_Size(o0);
+                  p.first.resize(size3);
+                  for(int j=0;j<size3;j++)
                     {
                       PyObject *o0j=PyList_GetItem(o0,j);
                       if(PyString_Check(o0j))
