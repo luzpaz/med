@@ -8004,6 +8004,8 @@ MEDFileFields *MEDFileFields::deepCpy() const throw(INTERP_KERNEL::Exception)
  *
  * \param [out] areThereSomeForgottenTS - indicates to the caller if there is some time steps in \a this that are not present for all fields in \a this.
  * \return the sorted list of time steps (specified with a pair of integer iteration first and order second) present for all fields in \a this.
+ * 
+ * \sa MEDFileFields::partOfThisLyingOnSpecifiedTimeSteps, MEDFileFields::partOfThisNotLyingOnSpecifiedTimeSteps
  */
 std::vector< std::pair<int,int> > MEDFileFields::getCommonIterations(bool& areThereSomeForgottenTS) const throw(INTERP_KERNEL::Exception)
 {
@@ -8372,6 +8374,30 @@ MEDFileFields *MEDFileFields::partOfThisLyingOnSpecifiedMeshName(const char *mes
         }
     }
   return ret.retn();
+}
+
+/*!
+ * This method returns a new object containing part of \a this fields lying ** exactly ** on the time steps specified by input parameter \a timeSteps.
+ * This method can be seen as a filter applied on \a this, that returns an object containing
+ * reduced the list of fields compared to those in \a this. The returned object is a new object but the object on which it lies are only
+ * shallow copied from \a this.
+ * 
+ * \param [in] timeSteps - the time steps given by a vector of pair of integers (iteration,order)
+ * \sa MEDFileFields::getCommonIterations, MEDFileFields::partOfThisNotLyingOnSpecifiedTimeSteps
+ */
+MEDFileFields *MEDFileFields::partOfThisLyingOnSpecifiedTimeSteps(const std::vector< std::pair<int,int> >& timeSteps) const throw(INTERP_KERNEL::Exception)
+{
+  //not implemented yet
+  return 0;
+}
+
+/*!
+ * \sa MEDFileFields::getCommonIterations, MEDFileFields::partOfThisLyingOnSpecifiedTimeSteps
+ */
+MEDFileFields *MEDFileFields::partOfThisNotLyingOnSpecifiedTimeSteps(const std::vector< std::pair<int,int> >& timeSteps) const throw(INTERP_KERNEL::Exception)
+{
+  //not implemented yet
+  return 0;
 }
 
 MEDFileFieldsIterator *MEDFileFields::iterator() throw(INTERP_KERNEL::Exception)
