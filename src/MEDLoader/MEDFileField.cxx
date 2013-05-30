@@ -4170,6 +4170,16 @@ int MEDFileAnyTypeField1TSWithoutSDA::getNumberOfComponents() const
 }
 
 /*!
+ * Change info on components in \a this.
+ * \throw If size of \a infos is not equal to the number of components already in \a this.
+ */
+void MEDFileAnyTypeField1TSWithoutSDA::setInfo(const std::vector<std::string>& infos) throw(INTERP_KERNEL::Exception)
+{
+  DataArray *arr=getOrCreateAndGetArray();
+  arr->setInfoOnComponents(infos);//will throw an exception if number of components mimatches
+}
+
+/*!
  * Returns info on components of \a this field.
  *  \return const std::vector<std::string>& - a sequence of strings each being an
  *          information on _i_-th component.
@@ -5439,6 +5449,11 @@ void MEDFileAnyTypeField1TS::fillTypesOfFieldAvailable(std::vector<TypeOfField>&
   contentNotNullBase()->fillTypesOfFieldAvailable(types);
 }
 
+void MEDFileAnyTypeField1TS::setInfo(const std::vector<std::string>& infos) throw(INTERP_KERNEL::Exception)
+{
+  contentNotNullBase()->setInfo(infos);
+}
+
 const std::vector<std::string>& MEDFileAnyTypeField1TS::getInfo() const
 {
   return contentNotNullBase()->getInfo();
@@ -6276,6 +6291,10 @@ std::size_t MEDFileAnyTypeFieldMultiTSWithoutSDA::getHeapMemorySize() const
   return ret;
 }
 
+/*!
+ * If one of the id in [ \a startIds , \a endIds ) points to a null element, there is not throw. Simply, this empty element is added as if it were not
+ * NULL.
+ */
 MEDFileAnyTypeFieldMultiTSWithoutSDA *MEDFileAnyTypeFieldMultiTSWithoutSDA::buildFromTimeStepIds(const int *startIds, const int *endIds) const throw(INTERP_KERNEL::Exception)
 {
   MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> ret=createNew();
@@ -6307,6 +6326,10 @@ MEDFileAnyTypeFieldMultiTSWithoutSDA *MEDFileAnyTypeFieldMultiTSWithoutSDA::buil
   return ret.retn();
 }
 
+/*!
+ * If one of the id in the input range points to a null element, there is not throw. Simply, this empty element is added as if it were not
+ * NULL.
+ */
 MEDFileAnyTypeFieldMultiTSWithoutSDA *MEDFileAnyTypeFieldMultiTSWithoutSDA::buildFromTimeStepIds2(int bg, int end, int step) const throw(INTERP_KERNEL::Exception)
 {
   static const char msg[]="MEDFileAnyTypeFieldMultiTSWithoutSDA::buildFromTimeStepIds2";
@@ -6343,38 +6366,38 @@ MEDFileAnyTypeFieldMultiTSWithoutSDA *MEDFileAnyTypeFieldMultiTSWithoutSDA::buil
 
 MEDFileAnyTypeFieldMultiTSWithoutSDA *MEDFileAnyTypeFieldMultiTSWithoutSDA::partOfThisLyingOnSpecifiedTimeSteps(const std::vector< std::pair<int,int> >& timeSteps) const throw(INTERP_KERNEL::Exception)
 {
-  std::vector<int> ids(timeSteps.size());
-  for(std::size_t i=0;i<timeSteps.size();i++)
-    ids[i]=getTimeStepPos(timeSteps[i].first,timeSteps[i].second);
-  return buildFromTimeStepIds(&ids[0],&ids[0]+ids.size());
+  int id=0;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ids=DataArrayInt::New(); ids->alloc(0,1);
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> >::const_iterator it=_time_steps.begin();it!=_time_steps.end();it++,id++)
+    {
+      const MEDFileAnyTypeField1TSWithoutSDA *cur(*it);
+      if(!cur)
+        continue;
+      std::pair<int,int> p(cur->getIteration(),cur->getOrder());
+      if(std::find(timeSteps.begin(),timeSteps.end(),p)!=timeSteps.end())
+        ids->pushBackSilent(id);
+    }
+  return buildFromTimeStepIds(ids->begin(),ids->end());
 }
 
 MEDFileAnyTypeFieldMultiTSWithoutSDA *MEDFileAnyTypeFieldMultiTSWithoutSDA::partOfThisNotLyingOnSpecifiedTimeSteps(const std::vector< std::pair<int,int> >& timeSteps) const throw(INTERP_KERNEL::Exception)
 {
-  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> ret=createNew();
-  ret->setInfo(_infos);
-  std::vector< std::pair<int,int> > its=getIterations();
-  for(std::vector< std::pair<int,int> >::const_iterator it1=its.begin();it1!=its.end();it1++)
+  int id=0;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ids=DataArrayInt::New(); ids->alloc(0,1);
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> >::const_iterator it=_time_steps.begin();it!=_time_steps.end();it++,id++)
     {
-      if(std::find(timeSteps.begin(),timeSteps.end(),*it1)==timeSteps.end())
-        {
-          const MEDFileAnyTypeField1TSWithoutSDA *tse=&getTimeStepEntry((*it1).first,(*it1).second);
-          tse->incrRef();
-          MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> tse2(const_cast<MEDFileAnyTypeField1TSWithoutSDA *>(tse));
-          ret->pushBackTimeStep(tse2);
-        }
+      const MEDFileAnyTypeField1TSWithoutSDA *cur(*it);
+      if(!cur)
+        continue;
+      std::pair<int,int> p(cur->getIteration(),cur->getOrder());
+      if(std::find(timeSteps.begin(),timeSteps.end(),p)==timeSteps.end())
+        ids->pushBackSilent(id);
     }
-  if(ret->getNumberOfTS()!=0)
-    ret->synchronizeNameScope();
-  ret->copyNameScope(*this);
-  return ret.retn();
+  return buildFromTimeStepIds(ids->begin(),ids->end());
 }
 
 const std::vector<std::string>& MEDFileAnyTypeFieldMultiTSWithoutSDA::getInfo() const throw(INTERP_KERNEL::Exception)
 {
-  /*if(_time_steps.empty())
-    throw INTERP_KERNEL::Exception("MEDFileFieldMultiTSWithoutSDA::getInfos : not time steps !");
-    return _time_steps[0]->getInfo();*/ ////tony strange
   return _infos;
 }
 
@@ -6518,6 +6541,9 @@ void MEDFileAnyTypeFieldMultiTSWithoutSDA::pushBackTimeStep(MEDCouplingAutoRefCo
   if(!tse2)
     throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTSWithoutSDA::pushBackTimeStep : input content object is null !");
   checkCoherencyOfType(tse2);
+  if(_time_steps.empty())
+    setInfo(tse2->getInfo());
+  checkThatComponentsMatch(tse2->getInfo());
   _time_steps.push_back(tse);
 }
 
@@ -6573,6 +6599,7 @@ void MEDFileAnyTypeFieldMultiTSWithoutSDA::writeLL(med_idt fid, const MEDFileWri
 {
   if(_time_steps.empty())
     throw INTERP_KERNEL::Exception("MEDFileFieldMultiTSWithoutSDA::writeLL : no time steps set !");
+  checkThatNbOfCompoOfTSMatchThis();
   std::vector<std::string> infos(getInfo());
   int nbComp=infos.size();
   INTERP_KERNEL::AutoPtr<char> comp=MEDLoaderBase::buildEmptyString(nbComp*MED_SNAME_SIZE);
@@ -6890,15 +6917,43 @@ void MEDFileAnyTypeFieldMultiTSWithoutSDA::checkCoherencyOfTinyInfo(const MEDCou
     }
   if(!arr)
     throw INTERP_KERNEL::Exception("MEDFileFieldMultiTSWithoutSDA::checkCoherencyOfTinyInfo : no array set !");
-  if(_infos!=arr->getInfoOnComponents())
+  checkThatComponentsMatch(arr->getInfoOnComponents());
+}
+
+void MEDFileAnyTypeFieldMultiTSWithoutSDA::checkThatComponentsMatch(const std::vector<std::string>& compos) const throw(INTERP_KERNEL::Exception)
+{
+  static const char MSG[]="MEDFileFieldMultiTSWithoutSDA::checkThatComponentsMatch : ";
+  if(getInfo().size()!=compos.size())
     {
-      std::ostringstream oss; oss << MSG << "components ! should be \"";
+      std::ostringstream oss; oss << MSG << "mismatch of number of components between this (" << getInfo().size() << ") and ";
+      oss << " number of components of element to append (" << compos.size() << ") !";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
+    }
+  if(_infos!=compos)
+    {
+      std::ostringstream oss; oss << MSG << "components have same size but are different ! should be \"";
       std::copy(_infos.begin(),_infos.end(),std::ostream_iterator<std::string>(oss,", "));
       oss << " But compo in input fields are : ";
-      std::vector<std::string> tmp=arr->getInfoOnComponents();
-      std::copy(tmp.begin(),tmp.end(),std::ostream_iterator<std::string>(oss,", "));
+      std::copy(compos.begin(),compos.end(),std::ostream_iterator<std::string>(oss,", "));
       oss << " !";
       throw INTERP_KERNEL::Exception(oss.str().c_str());
+    }
+}
+
+void MEDFileAnyTypeFieldMultiTSWithoutSDA::checkThatNbOfCompoOfTSMatchThis() const throw(INTERP_KERNEL::Exception)
+{
+  std::size_t sz=_infos.size();
+  int j=0;
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> >::const_iterator it=_time_steps.begin();it!=_time_steps.end();it++,j++)
+    {
+      const MEDFileAnyTypeField1TSWithoutSDA *elt(*it);
+      if(elt)
+        if(elt->getInfo().size()!=sz)
+          {
+            std::ostringstream oss; oss << "MEDFileAnyTypeFieldMultiTSWithoutSDA::checkThatNbOfCompoOfTSMatchThis : At pos #" << j << " the number of components is equal to ";
+            oss << elt->getInfo().size() << " whereas it is expected to be equal to " << sz << " !";
+            throw INTERP_KERNEL::Exception(oss.str().c_str());
+          }
     }
 }
 
@@ -6906,46 +6961,26 @@ void MEDFileAnyTypeFieldMultiTSWithoutSDA::appendFieldNoProfileSBT(const MEDCoup
 {
   if(!field)
     throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTSWithoutSDA::appendFieldNoProfileSBT : input field is NULL !");
-  if(_time_steps.empty())
-    {
-      MEDFileAnyTypeField1TSWithoutSDA *objC=createNew1TSWithoutSDAEmptyInstance();
-      MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> obj(objC);
-      objC->setFieldNoProfileSBT(field,arr,glob,*this);
-      copyTinyInfoFrom(field,arr);
-      _time_steps.push_back(obj);
-    }
-  else
-    {
-      checkCoherencyOfTinyInfo(field,arr);
-      MEDFileAnyTypeField1TSWithoutSDA *objC=createNew1TSWithoutSDAEmptyInstance();
-      MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> obj(objC);
-      objC->setFieldNoProfileSBT(field,arr,glob,*this);
-      copyTinyInfoFrom(field,arr);
-      _time_steps.push_back(obj);
-    }
+  if(!_time_steps.empty())
+    checkCoherencyOfTinyInfo(field,arr);
+  MEDFileAnyTypeField1TSWithoutSDA *objC=createNew1TSWithoutSDAEmptyInstance();
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> obj(objC);
+  objC->setFieldNoProfileSBT(field,arr,glob,*this);
+  copyTinyInfoFrom(field,arr);
+  _time_steps.push_back(obj);
 }
 
 void MEDFileAnyTypeFieldMultiTSWithoutSDA::appendFieldProfile(const MEDCouplingFieldDouble *field, const DataArray *arr, const MEDFileMesh *mesh, int meshDimRelToMax, const DataArrayInt *profile, MEDFileFieldGlobsReal& glob) throw(INTERP_KERNEL::Exception)
 {
   if(!field)
     throw INTERP_KERNEL::Exception("MEDFileIntFieldMultiTSWithoutSDA::appendFieldNoProfileSBT : input field is NULL !");
-  if(_time_steps.empty())
-    {
-      MEDFileField1TSWithoutSDA *objC=new MEDFileField1TSWithoutSDA;
-      MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> obj(objC);
-      objC->setFieldProfile(field,arr,mesh,meshDimRelToMax,profile,glob,*this);
-      copyTinyInfoFrom(field,arr);
-      _time_steps.push_back(obj);
-    }
-  else
-    {
-      checkCoherencyOfTinyInfo(field,arr);
-      MEDFileField1TSWithoutSDA *objC=new MEDFileField1TSWithoutSDA;
-      MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> obj(objC);
-      objC->setFieldProfile(field,arr,mesh,meshDimRelToMax,profile,glob,*this);
-      copyTinyInfoFrom(field,arr);
-      _time_steps.push_back(obj);
-    }
+  if(!_time_steps.empty())
+    checkCoherencyOfTinyInfo(field,arr);
+  MEDFileField1TSWithoutSDA *objC=new MEDFileField1TSWithoutSDA;
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> obj(objC);
+  objC->setFieldProfile(field,arr,mesh,meshDimRelToMax,profile,glob,*this);
+  copyTinyInfoFrom(field,arr);
+  _time_steps.push_back(obj);
 }
 
 //= MEDFileFieldMultiTSWithoutSDA
@@ -7318,6 +7353,22 @@ void MEDFileAnyTypeFieldMultiTS::eraseTimeStepIds(const int *startIds, const int
 void MEDFileAnyTypeFieldMultiTS::eraseTimeStepIds2(int bg, int end, int step) throw(INTERP_KERNEL::Exception)
 {
   contentNotNullBase()->eraseTimeStepIds2(bg,end,step);
+}
+
+MEDFileAnyTypeFieldMultiTS *MEDFileAnyTypeFieldMultiTS::buildSubPart(const int *startIds, const int *endIds) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> c=contentNotNullBase()->buildFromTimeStepIds(startIds,endIds);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTS> ret=shallowCpy();
+  ret->_content=c;
+  return ret.retn();
+}
+
+MEDFileAnyTypeFieldMultiTS *MEDFileAnyTypeFieldMultiTS::buildSubPartSlice(int bg, int end, int step) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> c=contentNotNullBase()->buildFromTimeStepIds2(bg,end,step);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTS> ret=shallowCpy();
+  ret->_content=c;
+  return ret.retn();
 }
 
 std::vector< std::pair<int,int> > MEDFileAnyTypeFieldMultiTS::getIterations() const
@@ -8331,7 +8382,7 @@ std::size_t MEDFileFields::getHeapMemorySize() const
 
 MEDFileFields *MEDFileFields::deepCpy() const throw(INTERP_KERNEL::Exception)
 {
-  MEDCouplingAutoRefCountObjectPtr<MEDFileFields> ret=new MEDFileFields(*this);
+  MEDCouplingAutoRefCountObjectPtr<MEDFileFields> ret=shallowCpy();
   std::size_t i=0;
   for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> >::const_iterator it=_fields.begin();it!=_fields.end();it++,i++)
     {
@@ -8340,6 +8391,11 @@ MEDFileFields *MEDFileFields::deepCpy() const throw(INTERP_KERNEL::Exception)
     }
   ret->deepCpyGlobs(*this);
   return ret.retn();
+}
+
+MEDFileFields *MEDFileFields::shallowCpy() const throw(INTERP_KERNEL::Exception)
+{
+  return new MEDFileFields(*this);
 }
 
 /*!
@@ -8642,6 +8698,29 @@ void MEDFileFields::destroyFieldsAtPos(const int *startIds, const int *endIds) t
   _fields=fields;
 }
 
+void MEDFileFields::destroyFieldsAtPos2(int bg, int end, int step) throw(INTERP_KERNEL::Exception)
+{
+  static const char msg[]="MEDFileFields::destroyFieldsAtPos2";
+  int nbOfEntriesToKill=DataArrayInt::GetNumberOfItemGivenBESRelative(bg,end,step,msg);
+  std::vector<bool> b(_fields.size(),true);
+  int k=bg;
+  for(int i=0;i<nbOfEntriesToKill;i++,k+=step)
+    {
+      if(k<0 || k>=(int)_fields.size())
+        {
+          std::ostringstream oss; oss << "MEDFileFields::destroyFieldsAtPos2 : Invalid given id in input (" << k << ") should be in [0," << _fields.size() << ") !";
+          throw INTERP_KERNEL::Exception(oss.str().c_str());
+        }
+      b[k]=false;
+    }
+  std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> > fields(std::count(b.begin(),b.end(),true));
+  std::size_t j=0;
+  for(std::size_t i=0;i<_fields.size();i++)
+    if(b[i])
+      fields[j++]=_fields[i];
+  _fields=fields;
+}
+
 bool MEDFileFields::changeMeshNames(const std::vector< std::pair<std::string,std::string> >& modifTab) throw(INTERP_KERNEL::Exception)
 {
   bool ret=false;
@@ -8700,6 +8779,30 @@ MEDFileAnyTypeFieldMultiTS *MEDFileFields::getFieldAtPos(int i) const throw(INTE
       throw INTERP_KERNEL::Exception(oss.str().c_str());
     }
   ret->shallowCpyGlobs(*this);
+  return ret.retn();
+}
+
+/*!
+ * Return a shallow copy of \a this reduced to the fields ids defined in [ \a startIds , endIds ).
+ * This method is accessible in python using __getitem__ with a list in input.
+ * \return a new object that the caller should deal with.
+ */
+MEDFileFields *MEDFileFields::buildSubPart(const int *startIds, const int *endIds) const throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<MEDFileFields> ret=shallowCpy();
+  std::size_t sz=std::distance(startIds,endIds);
+  std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> > fields(sz);
+  int j=0;
+  for(const int *i=startIds;i!=endIds;i++,j++)
+    {
+      if(*i<0 || *i>=(int)_fields.size())
+        {
+          std::ostringstream oss; oss << "MEDFileFields::buildSubPart : Invalid given id in input (" << *i << ") should be in [0," << _fields.size() << ") !";
+          throw INTERP_KERNEL::Exception(oss.str().c_str());
+        }
+      fields[j]=_fields[*i];
+    }
+  ret->_fields=fields;
   return ret.retn();
 }
 

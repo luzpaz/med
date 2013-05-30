@@ -282,3 +282,58 @@ std::vector< std::pair<std::vector<std::string>, std::string > > convertVecPairV
     }
   throw INTERP_KERNEL::Exception(msg);
 }
+
+/*!
+ * Called by MEDFileAnyTypeFieldMultiTS::__getitem__ when \a elt0 is neither a list nor a slice.
+ * In this case a MEDFileAnyTypeField1TS object is returned.
+ */
+int MEDFileAnyTypeFieldMultiTSgetitemSingleTS__(const MEDFileAnyTypeFieldMultiTS *self, PyObject *elt0) throw(INTERP_KERNEL::Exception)
+{
+  if(elt0 && PyInt_Check(elt0))
+    {//fmts[3]
+      return PyInt_AS_LONG(elt0);
+    }
+  else if(elt0 && PyTuple_Check(elt0))
+    {
+      if(PyTuple_Size(elt0)==2)
+        {
+          PyObject *o0=PyTuple_GetItem(elt0,0);
+          PyObject *o1=PyTuple_GetItem(elt0,1);
+          if(PyInt_Check(o0) && PyInt_Check(o1))
+            {//fmts(1,-1)
+              int iter=PyInt_AS_LONG(o0);
+              int order=PyInt_AS_LONG(o1);
+              return self->getPosOfTimeStep(iter,order);
+            }
+          else
+            throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTS::__getitem__ : invalid input param ! input is a tuple of size 2 but two integers are expected in this tuple to request a time steps !");
+        }
+      else
+        throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTS::__getitem__ : invalid input param ! input is a tuple of size != 2 ! two integers are expected in this tuple to request a time steps !");
+    }
+  else if(elt0 && PyFloat_Check(elt0))
+    {
+      double val=PyFloat_AS_DOUBLE(elt0);
+      return self->getPosGivenTime(val);
+    }
+  else
+    throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTS::__getitem__ : invalid input params ! expected fmts[int], fmts[int,int], or fmts[double] to request one time step ! To request a series of time steps invoke fmts[slice], fmts[list of int], fmts[list of double], or fmts[list of int,int] !");
+}
+
+/*!
+ * Called by MEDFileAnyTypeFieldMultiTS::__getitem__ when \a obj is neither a list nor a slice.
+ * In this case a MEDFileAnyTypeField1TS object is returned.
+ */
+int MEDFileFieldsgetitemSingleTS__(const MEDFileFields *self, PyObject *obj) throw(INTERP_KERNEL::Exception)
+{
+  if(PyInt_Check(obj))
+    {
+      return (int)PyInt_AS_LONG(obj);
+    }
+  else if(PyString_Check(obj))
+    {
+      return self->getPosFromFieldName(PyString_AsString(obj));
+    }
+  else
+    throw INTERP_KERNEL::Exception("MEDFileFields::__getitem__ : only integer or string with fieldname supported !");
+}

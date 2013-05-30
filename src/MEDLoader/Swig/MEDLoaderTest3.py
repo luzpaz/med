@@ -2546,6 +2546,87 @@ class MEDLoaderTest(unittest.TestCase):
         self.assertEqual(MEDFileFields(fname).getCommonIterations(),([(0,-1),(1,-1),(2,-1),(3,-1)],False))
         self.assertEqual(MEDFileFields(fname)[1].getDtUnit(),"us")
         pass
+
+    # Multi time steps and multi fields management without Globals (profiles, locs) aspects
+    def testMEDFileFields2(self):
+        fname="Pyfile65.med"
+        # to check that all is initialize 
+        MEDFileField1TS().__str__()
+        MEDFileFieldMultiTS().__str__()
+        # building a mesh containing 4 tri3 + 5 quad4
+        tri=MEDCouplingUMesh("tri",2)
+        tri.allocateCells() ; tri.insertNextCell(NORM_TRI3,[0,1,2])
+        tri.setCoords(DataArrayDouble([(0.,0.),(0.,1.),(1.,0.)]))
+        tris=[tri.deepCpy() for i in xrange(4)]
+        for i,elt in enumerate(tris): elt.translate([i,0])
+        tris=MEDCouplingUMesh.MergeUMeshes(tris)
+        quad=MEDCouplingUMesh("quad",2)
+        quad.allocateCells() ; quad.insertNextCell(NORM_QUAD4,[0,1,2,3])
+        quad.setCoords(DataArrayDouble([(0.,0.),(0.,1.),(1.,1.),(1.,0.)]))
+        quads=[quad.deepCpy() for i in xrange(5)]
+        for i,elt in enumerate(quads): elt.translate([5+i,0])
+        quads=MEDCouplingUMesh.MergeUMeshes(quads)
+        m=MEDCouplingUMesh.MergeUMeshes(tris,quads)
+        m.setName("mesh") ; m.getCoords().setInfoOnComponents(["XX [m]","YYY [km]"])
+        #
+        fmts0_0=MEDFileFieldMultiTS()
+        fmts0_1=MEDFileFieldMultiTS()
+        # time steps
+        for i in xrange(10):
+            infos1=["aa [bb]","ccc [ddd]"] ; name1="1stField"
+            d=DataArrayDouble(18) ; d.iota(i*10) ; d.rearrange(2) ; d.setInfoOnComponents(infos1)
+            f=MEDCouplingFieldDouble(ON_CELLS) ; f.setName(name1) ; f.setArray(d) ; f.setMesh(m)
+            f.setTime(float(i+1)+0.1,i+1,-i-1)
+            fmts0_0.appendFieldNoProfileSBT(f)
+            f1ts=MEDFileField1TS() ; f1ts.setFieldNoProfileSBT(f) ; fmts0_1.pushBackTimeStep(f1ts)
+            self.assertEqual(fmts0_0.getInfo(),('aa [bb]','ccc [ddd]'))
+            self.assertEqual(fmts0_1.getInfo(),('aa [bb]','ccc [ddd]'))
+            if i>1:
+                # components names have been modified to generate errors
+                d.setInfoOnComponents(['aa [bb]','eee [dd]'])
+                self.assertRaises(InterpKernelException,fmts0_0.appendFieldNoProfileSBT,f)
+                self.assertRaises(InterpKernelException,f1ts.setInfo,['aa [bb]'])#throw because mismatch of number of components
+                f1ts.setInfo(['aa [bb]','eee [dd]'])
+                self.assertRaises(InterpKernelException,fmts0_1.pushBackTimeStep,f1ts)
+                pass
+            # add a mismatch of nb of compos
+            pass
+        fmts0_2=fmts0_0.deepCpy()
+        fmts0_3=fmts0_0.deepCpy()
+        fmts0_4=fmts0_0.deepCpy()
+        fmts0_5=fmts0_0.shallowCpy()
+        self.assertTrue(len(fmts0_0)==10 and len(fmts0_1)==10 and len(fmts0_2)==10 and len(fmts0_3)==10 and len(fmts0_4)==10 and len(fmts0_5)==10)
+        del fmts0_2[::2]
+        self.assertTrue(len(fmts0_2)==5 and fmts0_2.getIterations()==[(2,-2),(4,-4),(6,-6),(8,-8),(10,-10)])
+        del fmts0_3[[1.1,(6,-6),9]]
+        self.assertTrue(len(fmts0_3)==7 and fmts0_3.getIterations()==[(2,-2),(3,-3),(4,-4),(5,-5),(7,-7),(8,-8),(9,-9)])
+        fmts0_6=fmts0_4[[1.1,(6,-6),8]]
+        self.assertTrue(isinstance(fmts0_6,MEDFileFieldMultiTS))
+        self.assertTrue(len(fmts0_6)==3 and fmts0_6.getIterations()==[(1,-1),(6,-6),(9,-9)])
+        fmts0_7=fmts0_4[::-3]
+        self.assertTrue(isinstance(fmts0_7,MEDFileFieldMultiTS))
+        self.assertTrue(len(fmts0_7)==4 and fmts0_7.getIterations()==[(10,-10),(7,-7),(4,-4),(1,-1)])
+        #
+        fs0=MEDFileFields()
+        fs0.pushField(fmts0_0)
+        fmts0_2.setName("2ndField") ; fs0.pushField(fmts0_2)
+        fmts0_3.setName("3rdField") ; fs0.pushField(fmts0_3)
+        fmts0_4.setName("4thField") ; fs0.pushField(fmts0_4)
+        self.assertTrue(len(fs0)==4 and fs0.getFieldsNames()==('1stField','2ndField','3rdField','4thField'))
+        fs0.write(fname,2)
+        fs0=MEDFileFields(fname)
+        self.assertEqual(fs0.getCommonIterations(),([(2,-2),(4,-4),(8,-8)],True))
+        fs1=fs0.partOfThisLyingOnSpecifiedTimeSteps(fs0.getCommonIterations()[0])
+        self.assertTrue(fs1.getFieldsNames()==('1stField','2ndField','3rdField','4thField') and fs1.getCommonIterations()==([(2,-2),(4,-4),(8,-8)],False))
+        del fs1[["2ndField",3]]
+        self.assertTrue(fs1.getFieldsNames()==('1stField','3rdField') and fs1.getCommonIterations()==([(2,-2),(4,-4),(8,-8)],False))
+        fs2=fs0[[0,"4thField"]]
+        self.assertTrue(isinstance(fs2,MEDFileFields))
+        self.assertEqual(fs2.getFieldsNames(),('1stField','4thField'))
+        #
+        mm=MEDFileUMesh() ; mm.setMeshAtLevel(0,m) ; mm.write(fname,0)
+        pass
+
     pass
 
 unittest.main()

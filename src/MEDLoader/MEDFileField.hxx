@@ -482,6 +482,7 @@ namespace ParaMEDMEM
     int getNumberOfComponents() const;
     const std::vector<std::string>& getInfo() const;
     std::vector<std::string>& getInfo();
+    void setInfo(const std::vector<std::string>& infos) throw(INTERP_KERNEL::Exception);
     std::size_t getHeapMemorySize() const;
     int copyTinyInfoFrom(const MEDCouplingFieldDouble *field, const DataArray *arr) throw(INTERP_KERNEL::Exception);
     void setFieldNoProfileSBT(const MEDCouplingFieldDouble *field, const DataArray *arr, MEDFileFieldGlobsReal& glob, const MEDFileFieldNameScope& nasc) throw(INTERP_KERNEL::Exception);
@@ -623,6 +624,7 @@ namespace ParaMEDMEM
     std::pair<int,int> getDtIt() const;
     void fillIteration(std::pair<int,int>& p) const;
     void fillTypesOfFieldAvailable(std::vector<TypeOfField>& types) const throw(INTERP_KERNEL::Exception);
+    void setInfo(const std::vector<std::string>& infos) throw(INTERP_KERNEL::Exception);
     const std::vector<std::string>& getInfo() const;
     std::vector<std::string>& getInfo();
     std::vector<TypeOfField> getTypesOfFieldAvailable() const throw(INTERP_KERNEL::Exception);
@@ -797,6 +799,8 @@ namespace ParaMEDMEM
     virtual med_field_type getMEDFileFieldType() const = 0;
     void copyTinyInfoFrom(const MEDCouplingFieldDouble *field, const DataArray *arr) throw(INTERP_KERNEL::Exception);
     void checkCoherencyOfTinyInfo(const MEDCouplingFieldDouble *field, const DataArray *arr) const throw(INTERP_KERNEL::Exception);
+    void checkThatComponentsMatch(const std::vector<std::string>& compos) const throw(INTERP_KERNEL::Exception);
+    void checkThatNbOfCompoOfTSMatchThis() const throw(INTERP_KERNEL::Exception);
   protected:
     std::vector<std::string> _infos;
     std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> > _time_steps;
@@ -880,6 +884,8 @@ namespace ParaMEDMEM
     void eraseEmptyTS() throw(INTERP_KERNEL::Exception);
     void eraseTimeStepIds(const int *startIds, const int *endIds) throw(INTERP_KERNEL::Exception);
     void eraseTimeStepIds2(int bg, int end, int step) throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeFieldMultiTS *buildSubPart(const int *startIds, const int *endIds) const throw(INTERP_KERNEL::Exception);
+    MEDFileAnyTypeFieldMultiTS *buildSubPartSlice(int bg, int end, int step) const throw(INTERP_KERNEL::Exception);
     std::vector< std::pair<int,int> > getTimeSteps(std::vector<double>& ret1) const throw(INTERP_KERNEL::Exception);
     std::vector< std::pair<int,int> > getIterations() const;
     void pushBackTimeStep(MEDFileAnyTypeField1TS *f1ts) throw(INTERP_KERNEL::Exception);
@@ -1007,6 +1013,7 @@ std::vector< std::vector<DataArrayDouble *> > getFieldSplitedByType2(int iterati
     static MEDFileFields *New(const char *fileName) throw(INTERP_KERNEL::Exception);
     std::size_t getHeapMemorySize() const;
     MEDFileFields *deepCpy() const throw(INTERP_KERNEL::Exception);
+    MEDFileFields *shallowCpy() const throw(INTERP_KERNEL::Exception);
     void write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception);
     void writeLL(med_idt fid) const throw(INTERP_KERNEL::Exception);
     int getNumberOfFields() const;
@@ -1022,12 +1029,14 @@ std::vector< std::vector<DataArrayDouble *> > getFieldSplitedByType2(int iterati
     int getPosFromFieldName(const char *fieldName) const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeFieldMultiTS *getFieldAtPos(int i) const throw(INTERP_KERNEL::Exception);
     MEDFileAnyTypeFieldMultiTS *getFieldWithName(const char *fieldName) const throw(INTERP_KERNEL::Exception);
+    MEDFileFields *buildSubPart(const int *startIds, const int *endIds) const throw(INTERP_KERNEL::Exception);
     MEDFileFields *partOfThisLyingOnSpecifiedMeshName(const char *meshName) const throw(INTERP_KERNEL::Exception);
     MEDFileFields *partOfThisLyingOnSpecifiedTimeSteps(const std::vector< std::pair<int,int> >& timeSteps) const throw(INTERP_KERNEL::Exception);
     MEDFileFields *partOfThisNotLyingOnSpecifiedTimeSteps(const std::vector< std::pair<int,int> >& timeSteps) const throw(INTERP_KERNEL::Exception);
     MEDFileFieldsIterator *iterator() throw(INTERP_KERNEL::Exception);
     void destroyFieldAtPos(int i) throw(INTERP_KERNEL::Exception);
     void destroyFieldsAtPos(const int *startIds, const int *endIds) throw(INTERP_KERNEL::Exception);
+    void destroyFieldsAtPos2(int bg, int end, int step) throw(INTERP_KERNEL::Exception);
     bool changeMeshNames(const std::vector< std::pair<std::string,std::string> >& modifTab) throw(INTERP_KERNEL::Exception);
     bool renumberEntitiesLyingOnMesh(const char *meshName, const std::vector<int>& oldCode, const std::vector<int>& newCode, const DataArrayInt *renumO2N) throw(INTERP_KERNEL::Exception);
   public:
