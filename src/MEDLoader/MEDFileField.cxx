@@ -6542,7 +6542,10 @@ void MEDFileAnyTypeFieldMultiTSWithoutSDA::pushBackTimeStep(MEDCouplingAutoRefCo
     throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTSWithoutSDA::pushBackTimeStep : input content object is null !");
   checkCoherencyOfType(tse2);
   if(_time_steps.empty())
-    setInfo(tse2->getInfo());
+    {
+      setName(tse2->getName().c_str());
+      setInfo(tse2->getInfo());
+    }
   checkThatComponentsMatch(tse2->getInfo());
   _time_steps.push_back(tse);
 }

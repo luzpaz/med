@@ -2579,6 +2579,7 @@ class MEDLoaderTest(unittest.TestCase):
             f.setTime(float(i+1)+0.1,i+1,-i-1)
             fmts0_0.appendFieldNoProfileSBT(f)
             f1ts=MEDFileField1TS() ; f1ts.setFieldNoProfileSBT(f) ; fmts0_1.pushBackTimeStep(f1ts)
+            self.assertEqual(fmts0_1.getName(),name1)
             self.assertEqual(fmts0_0.getInfo(),('aa [bb]','ccc [ddd]'))
             self.assertEqual(fmts0_1.getInfo(),('aa [bb]','ccc [ddd]'))
             if i>1:
