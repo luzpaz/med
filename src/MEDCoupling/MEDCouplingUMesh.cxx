@@ -6799,7 +6799,7 @@ MEDCouplingUMesh *MEDCouplingUMesh::emulateMEDMEMBDC(const MEDCouplingUMesh *nM1
 DataArrayInt *MEDCouplingUMesh::sortCellsInMEDFileFrmt() throw(INTERP_KERNEL::Exception)
 {
   checkConnectivityFullyDefined();
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=getRenumArrForConsecutiveCellTypesSpec(MEDMEM_ORDER,MEDMEM_ORDER+N_MEDMEM_ORDER);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=getRenumArrForMEDFileFrmt();
   renumberCells(ret->getConstPointer(),false);
   return ret.retn();
 }
@@ -6916,6 +6916,18 @@ DataArrayInt *MEDCouplingUMesh::getLevArrPerCellTypes(const INTERP_KERNEL::Norma
     }
   nbPerType=tmpb.retn();
   return tmpa.retn();
+}
+
+/*!
+ * This method behaves exactly as MEDCouplingUMesh::getRenumArrForConsecutiveCellTypesSpec but the order is those defined in MED file spec.
+ *
+ * \return a new object containing the old to new correspondance.
+ *
+ * \sa MEDCouplingUMesh::getRenumArrForConsecutiveCellTypesSpec, MEDCouplingUMesh::sortCellsInMEDFileFrmt.
+ */
+DataArrayInt *MEDCouplingUMesh::getRenumArrForMEDFileFrmt() const throw(INTERP_KERNEL::Exception)
+{
+  return getRenumArrForConsecutiveCellTypesSpec(MEDMEM_ORDER,MEDMEM_ORDER+N_MEDMEM_ORDER);
 }
 
 /*!

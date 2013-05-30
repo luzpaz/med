@@ -349,6 +349,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::MEDCouplingUMesh::buildNewNumberingFromCommNodesFrmt;
 %newobject ParaMEDMEM::MEDCouplingUMesh::rearrange2ConsecutiveCellTypes;
 %newobject ParaMEDMEM::MEDCouplingUMesh::sortCellsInMEDFileFrmt;
+%newobject ParaMEDMEM::MEDCouplingUMesh::getRenumArrForMEDFileFrmt;
 %newobject ParaMEDMEM::MEDCouplingUMesh::convertCellArrayPerGeoType;
 %newobject ParaMEDMEM::MEDCouplingUMesh::computeFetchedNodeIds;
 %newobject ParaMEDMEM::MEDCouplingUMesh::getRenumArrForConsecutiveCellTypesSpec;
@@ -1429,6 +1430,7 @@ namespace ParaMEDMEM
     bool checkConsecutiveCellTypesForMEDFileFrmt() const throw(INTERP_KERNEL::Exception);
     DataArrayInt *rearrange2ConsecutiveCellTypes() throw(INTERP_KERNEL::Exception);
     DataArrayInt *sortCellsInMEDFileFrmt() throw(INTERP_KERNEL::Exception);
+    DataArrayInt *getRenumArrForMEDFileFrmt() const throw(INTERP_KERNEL::Exception);
     DataArrayInt *convertCellArrayPerGeoType(const DataArrayInt *da) const throw(INTERP_KERNEL::Exception);
     DataArrayInt *computeFetchedNodeIds() const throw(INTERP_KERNEL::Exception);
     DataArrayInt *zipConnectivityTraducer(int compType, int startCellId=0) throw(INTERP_KERNEL::Exception);
