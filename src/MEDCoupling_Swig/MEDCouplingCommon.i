@@ -502,6 +502,11 @@ namespace ParaMEDMEM
     return false;
 #endif
   }
+
+  std::string MEDCouplingCompletionScript()
+  {
+    return std::string("import rlcompleter, readline\nreadline.parse_and_bind('tab:complete')");
+  }
 }
 
 %include "MEDCouplingMemArray.i"
