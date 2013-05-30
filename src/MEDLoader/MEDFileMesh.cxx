@@ -1835,6 +1835,11 @@ MEDFileMesh *MEDFileUMesh::shallowCpy() const throw(INTERP_KERNEL::Exception)
   return ret.retn();
 }
 
+MEDFileMesh *MEDFileUMesh::createNewEmpty() const throw(INTERP_KERNEL::Exception)
+{
+  return new MEDFileUMesh;
+}
+
 MEDFileMesh *MEDFileUMesh::deepCpy() const throw(INTERP_KERNEL::Exception)
 {
   MEDCouplingAutoRefCountObjectPtr<MEDFileUMesh> ret=new MEDFileUMesh(*this);
@@ -4284,6 +4289,11 @@ MEDFileMesh *MEDFileCMesh::shallowCpy() const throw(INTERP_KERNEL::Exception)
   return ret.retn();
 }
 
+MEDFileMesh *MEDFileCMesh::createNewEmpty() const throw(INTERP_KERNEL::Exception)
+{
+  return new MEDFileCMesh;
+}
+
 MEDFileMesh *MEDFileCMesh::deepCpy() const throw(INTERP_KERNEL::Exception)
 {
   MEDCouplingAutoRefCountObjectPtr<MEDFileCMesh> ret=new MEDFileCMesh(*this);
@@ -4487,6 +4497,11 @@ MEDFileMesh *MEDFileCurveLinearMesh::shallowCpy() const throw(INTERP_KERNEL::Exc
 {
   MEDCouplingAutoRefCountObjectPtr<MEDFileCurveLinearMesh> ret=new MEDFileCurveLinearMesh(*this);
   return ret.retn();
+}
+
+MEDFileMesh *MEDFileCurveLinearMesh::createNewEmpty() const throw(INTERP_KERNEL::Exception)
+{
+  return new MEDFileCurveLinearMesh;
 }
 
 MEDFileMesh *MEDFileCurveLinearMesh::deepCpy() const throw(INTERP_KERNEL::Exception)

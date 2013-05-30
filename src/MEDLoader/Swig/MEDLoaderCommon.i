@@ -71,6 +71,7 @@ using namespace ParaMEDMEM;
 %newobject MEDLoader::ReadFieldGauss;
 %newobject MEDLoader::ReadFieldGaussNE;
 %newobject ParaMEDMEM::MEDFileMesh::New;
+%newobject ParaMEDMEM::MEDFileMesh::createNewEmpty;
 %newobject ParaMEDMEM::MEDFileMesh::deepCpy;
 %newobject ParaMEDMEM::MEDFileMesh::shallowCpy;
 %newobject ParaMEDMEM::MEDFileMesh::getGenMeshAtLevel;
@@ -389,6 +390,7 @@ namespace ParaMEDMEM
   public:
     static MEDFileMesh *New(const char *fileName) throw(INTERP_KERNEL::Exception);
     static MEDFileMesh *New(const char *fileName, const char *mName, int dt=-1, int it=-1) throw(INTERP_KERNEL::Exception);
+    virtual MEDFileMesh *createNewEmpty() const throw(INTERP_KERNEL::Exception);
     virtual MEDFileMesh *deepCpy() const throw(INTERP_KERNEL::Exception);
     virtual MEDFileMesh *shallowCpy() const throw(INTERP_KERNEL::Exception);
     virtual void clearNonDiscrAttributes() const throw(INTERP_KERNEL::Exception);

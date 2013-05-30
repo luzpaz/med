@@ -36,6 +36,7 @@ namespace ParaMEDMEM
     static MEDFileMesh *New(const char *fileName) throw(INTERP_KERNEL::Exception);
     static MEDFileMesh *New(const char *fileName, const char *mName, int dt=-1, int it=-1) throw(INTERP_KERNEL::Exception);
     std::size_t getHeapMemorySize() const;
+    virtual MEDFileMesh *createNewEmpty() const throw(INTERP_KERNEL::Exception) = 0;
     virtual MEDFileMesh *deepCpy() const throw(INTERP_KERNEL::Exception) = 0;
     virtual MEDFileMesh *shallowCpy() const throw(INTERP_KERNEL::Exception) = 0;
     virtual bool isEqual(const MEDFileMesh *other, double eps, std::string& what) const;
@@ -178,6 +179,7 @@ namespace ParaMEDMEM
     static MEDFileUMesh *New(const char *fileName) throw(INTERP_KERNEL::Exception);
     static MEDFileUMesh *New();
     std::size_t getHeapMemorySize() const;
+    MEDFileMesh *createNewEmpty() const throw(INTERP_KERNEL::Exception);
     MEDFileMesh *deepCpy() const throw(INTERP_KERNEL::Exception);
     MEDFileMesh *shallowCpy() const throw(INTERP_KERNEL::Exception);
     bool isEqual(const MEDFileMesh *other, double eps, std::string& what) const;
@@ -312,6 +314,7 @@ namespace ParaMEDMEM
     static MEDFileCMesh *New(const char *fileName) throw(INTERP_KERNEL::Exception);
     static MEDFileCMesh *New(const char *fileName, const char *mName, int dt=-1, int it=-1) throw(INTERP_KERNEL::Exception);
     std::size_t getHeapMemorySize() const;
+    MEDFileMesh *createNewEmpty() const throw(INTERP_KERNEL::Exception);
     MEDFileMesh *deepCpy() const throw(INTERP_KERNEL::Exception);
     MEDFileMesh *shallowCpy() const throw(INTERP_KERNEL::Exception);
     bool isEqual(const MEDFileMesh *other, double eps, std::string& what) const;
@@ -340,6 +343,7 @@ namespace ParaMEDMEM
     static MEDFileCurveLinearMesh *New(const char *fileName) throw(INTERP_KERNEL::Exception);
     static MEDFileCurveLinearMesh *New(const char *fileName, const char *mName, int dt=-1, int it=-1) throw(INTERP_KERNEL::Exception);
     std::size_t getHeapMemorySize() const;
+    MEDFileMesh *createNewEmpty() const throw(INTERP_KERNEL::Exception);
     MEDFileMesh *deepCpy() const throw(INTERP_KERNEL::Exception);
     MEDFileMesh *shallowCpy() const throw(INTERP_KERNEL::Exception);
     bool isEqual(const MEDFileMesh *other, double eps, std::string& what) const;
