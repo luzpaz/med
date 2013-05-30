@@ -2627,6 +2627,72 @@ class MEDLoaderTest(unittest.TestCase):
         mm=MEDFileUMesh() ; mm.setMeshAtLevel(0,m) ; mm.write(fname,0)
         pass
 
+    # Multi time steps and multi fields management with Globals (profiles, locs) aspects
+    def testMEDFileFields3(self):
+        fname="Pyfile66.med"
+        # building a mesh containing 4 tri3 + 5 quad4
+        tri=MEDCouplingUMesh("tri",2)
+        tri.allocateCells() ; tri.insertNextCell(NORM_TRI3,[0,1,2])
+        tri.setCoords(DataArrayDouble([(0.,0.),(0.,1.),(1.,0.)]))
+        tris=[tri.deepCpy() for i in xrange(4)]
+        for i,elt in enumerate(tris): elt.translate([i,0])
+        tris=MEDCouplingUMesh.MergeUMeshes(tris)
+        quad=MEDCouplingUMesh("quad",2)
+        quad.allocateCells() ; quad.insertNextCell(NORM_QUAD4,[0,1,2,3])
+        quad.setCoords(DataArrayDouble([(0.,0.),(0.,1.),(1.,1.),(1.,0.)]))
+        quads=[quad.deepCpy() for i in xrange(5)]
+        for i,elt in enumerate(quads): elt.translate([5+i,0])
+        quads=MEDCouplingUMesh.MergeUMeshes(quads)
+        m=MEDCouplingUMesh.MergeUMeshes(tris,quads)
+        m.setName("mesh") ; m.getCoords().setInfoOnComponents(["XX [m]","YYY [km]"])
+        #
+        mm=MEDFileUMesh() ; mm.setMeshAtLevel(0,m) ; mm.write(fname,2)
+        #
+        pfl=DataArrayInt([0,1,2,3,4,5,6]) ; pfl.setName("pfl")
+        pfl2=DataArrayInt([0,1,2,3,4,5,6,8]) ; pfl2.setName("pfl2")
+        fmts0_0=MEDFileFieldMultiTS()
+        fmts0_1=MEDFileFieldMultiTS()
+        # time steps
+        for i in xrange(10):
+            infos1=["aa [bb]","ccc [ddd]"] ; name1="1stField"
+            d=DataArrayDouble(14) ; d.iota(i*10) ; d.rearrange(2) ; d.setInfoOnComponents(infos1)
+            f=MEDCouplingFieldDouble(ON_CELLS) ; f.setName(name1) ; f.setArray(d) ; f.setMesh(m)
+            f.setTime(float(i+1)+0.1,i+1,-i-1)
+            fmts0_0.appendFieldProfile(f,mm,0,pfl)
+            f1ts=MEDFileField1TS() ; f1ts.setFieldProfile(f,mm,0,pfl) ; fmts0_1.pushBackTimeStep(f1ts)
+            self.assertEqual(fmts0_0.getInfo(),('aa [bb]','ccc [ddd]'))
+            self.assertEqual(fmts0_1.getInfo(),('aa [bb]','ccc [ddd]'))
+            pass
+        #
+        self.assertEqual(fmts0_0.getPfls(),10*('pfl_NORM_QUAD4',))
+        self.assertEqual(fmts0_1.getPfls(),('pfl_NORM_QUAD4',))
+        fmts0_0.zipPflsNames()
+        self.assertEqual(fmts0_0.getPfls(),('pfl_NORM_QUAD4',))
+        self.assertTrue(fmts0_1.getProfile("pfl_NORM_QUAD4").isEqual(fmts0_0.getProfile("pfl_NORM_QUAD4")))
+        fmts0_2=fmts0_0.deepCpy()
+        fmts0_3=fmts0_0.deepCpy()
+        fmts0_4=fmts0_0.deepCpy()
+        fs0=MEDFileFields()
+        fs0.pushField(fmts0_0)
+        fmts0_2.setName("2ndField") ; fs0.pushField(fmts0_2)
+        fmts0_3.setName("3rdField") ; fs0.pushField(fmts0_3)
+        fmts0_4.setName("4thField") ; fs0.pushField(fmts0_4)
+        self.assertEqual(fs0.getPfls(),('pfl_NORM_QUAD4',))
+        #
+        fmts0_5=MEDFileFieldMultiTS()
+        for i in xrange(7):
+            infos1=["aa [bb]","ccc [ddd]"] ; name1="1stField"
+            d=DataArrayDouble(16) ; d.iota(i*10) ; d.rearrange(2) ; d.setInfoOnComponents(infos1)
+            f=MEDCouplingFieldDouble(ON_CELLS) ; f.setName(name1) ; f.setArray(d) ; f.setMesh(m)
+            f.setTime(float(i+1)+0.1,i+1,-i-1)
+            f1ts=MEDFileField1TS() ; f1ts.setFieldProfile(f,mm,0,pfl2) ; fmts0_5.pushBackTimeStep(f1ts)
+            pass
+        fmts0_5.setName("5thField") ; fs0.pushField(fmts0_5)
+        self.assertEqual(fs0.getPfls(),('pfl_NORM_QUAD4','pfl2_NORM_QUAD4'))
+        fs0.checkGlobsCoherency()
+        fs0.write(fname,0)
+        pass
+
     pass
 
 unittest.main()
