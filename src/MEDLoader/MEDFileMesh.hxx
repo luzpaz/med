@@ -62,6 +62,9 @@ namespace ParaMEDMEM
     virtual int getNumberOfNodes() const throw(INTERP_KERNEL::Exception) = 0;
     virtual std::vector<int> getNonEmptyLevels() const = 0;
     virtual std::vector<int> getNonEmptyLevelsExt() const = 0;
+    virtual std::vector<int> getFamArrNonEmptyLevelsExt() const = 0;
+    virtual std::vector<int> getNumArrNonEmptyLevelsExt() const = 0;
+    virtual std::vector<int> getNameArrNonEmptyLevelsExt() const = 0;
     virtual void write(const char *fileName, int mode) const throw(INTERP_KERNEL::Exception);
     virtual void write(med_idt fid) const throw(INTERP_KERNEL::Exception);
     virtual int getSizeAtLevel(int meshDimRelToMaxExt) const throw(INTERP_KERNEL::Exception) = 0;
@@ -201,6 +204,9 @@ namespace ParaMEDMEM
     int getNumberOfNodes() const throw(INTERP_KERNEL::Exception);
     std::vector<int> getNonEmptyLevels() const;
     std::vector<int> getNonEmptyLevelsExt() const;
+    std::vector<int> getFamArrNonEmptyLevelsExt() const;
+    std::vector<int> getNumArrNonEmptyLevelsExt() const;
+    std::vector<int> getNameArrNonEmptyLevelsExt() const;
     std::vector<int> getGrpNonEmptyLevels(const char *grp) const throw(INTERP_KERNEL::Exception);
     std::vector<int> getGrpNonEmptyLevelsExt(const char *grp) const throw(INTERP_KERNEL::Exception);
     std::vector<int> getFamNonEmptyLevels(const char *fam) const throw(INTERP_KERNEL::Exception);
@@ -283,6 +289,9 @@ namespace ParaMEDMEM
     const DataArrayAsciiChar *getNameFieldAtLevel(int meshDimRelToMaxExt) const throw(INTERP_KERNEL::Exception);
     std::vector<int> getNonEmptyLevels() const;
     std::vector<int> getNonEmptyLevelsExt() const;
+    std::vector<int> getFamArrNonEmptyLevelsExt() const;
+    std::vector<int> getNumArrNonEmptyLevelsExt() const;
+    std::vector<int> getNameArrNonEmptyLevelsExt() const;
     MEDCouplingMesh *getGenMeshAtLevel(int meshDimRelToMax, bool renum=false) const throw(INTERP_KERNEL::Exception);
     int getSizeAtLevel(int meshDimRelToMaxExt) const throw(INTERP_KERNEL::Exception);
     int getNumberOfNodes() const throw(INTERP_KERNEL::Exception);

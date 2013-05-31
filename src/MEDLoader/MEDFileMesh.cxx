@@ -2112,6 +2112,57 @@ std::vector<int> MEDFileUMesh::getNonEmptyLevelsExt() const
   return ret0;
 }
 
+std::vector<int> MEDFileUMesh::getFamArrNonEmptyLevelsExt() const
+{
+  std::vector<int> ret;
+  const DataArrayInt *famCoo(_fam_coords);
+  if(famCoo)
+    ret.push_back(1);
+  int lev=0;
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileUMeshSplitL1> >::const_iterator it=_ms.begin();it!=_ms.end();it++,lev--)
+    {
+      const MEDFileUMeshSplitL1 *cur(*it);
+      if(cur)
+        if(cur->getFamilyField())
+          ret.push_back(lev);
+    }
+  return ret;
+}
+
+std::vector<int> MEDFileUMesh::getNumArrNonEmptyLevelsExt() const
+{
+  std::vector<int> ret;
+  const DataArrayInt *numCoo(_num_coords);
+  if(numCoo)
+    ret.push_back(1);
+  int lev=0;
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileUMeshSplitL1> >::const_iterator it=_ms.begin();it!=_ms.end();it++,lev--)
+    {
+      const MEDFileUMeshSplitL1 *cur(*it);
+      if(cur)
+        if(cur->getNumberField())
+          ret.push_back(lev);
+    }
+  return ret;
+}
+
+std::vector<int> MEDFileUMesh::getNameArrNonEmptyLevelsExt() const
+{
+  std::vector<int> ret;
+  const DataArrayAsciiChar *nameCoo(_name_coords);
+  if(nameCoo)
+    ret.push_back(1);
+  int lev=0;
+  for(std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileUMeshSplitL1> >::const_iterator it=_ms.begin();it!=_ms.end();it++,lev--)
+    {
+      const MEDFileUMeshSplitL1 *cur(*it);
+      if(cur)
+        if(cur->getNameField())
+          ret.push_back(lev);
+    }
+  return ret;
+}
+
 /*!
  * Returns all relative mesh levels (**excluding nodes**) where a given group is defined.
  * To include nodes, call getGrpNonEmptyLevelsExt() method.
@@ -3977,6 +4028,46 @@ std::vector<int> MEDFileStructuredMesh::getNonEmptyLevelsExt() const
 {
   std::vector<int> ret(2);
   ret[0]=1;
+  return ret;
+}
+
+/*!
+ * Returns the set of extensive levels (nodes included) where not NULL family arr are defined.
+ */
+std::vector<int> MEDFileStructuredMesh::getFamArrNonEmptyLevelsExt() const
+{
+  std::vector<int> ret;
+  const DataArrayInt *famNodes(_fam_nodes),*famCells(_fam_cells);
+  if(famNodes)
+    ret.push_back(1);
+  if(famCells)
+    ret.push_back(0);
+  return ret;
+}
+
+/*!
+ * Returns the set of extensive levels (nodes included) where not NULL numbering arr are defined.
+ */
+std::vector<int> MEDFileStructuredMesh::getNumArrNonEmptyLevelsExt() const
+{
+  std::vector<int> ret;
+  const DataArrayInt *numNodes(_num_nodes),*numCells(_num_cells);
+  if(numNodes)
+    ret.push_back(1);
+  if(numCells)
+    ret.push_back(0);
+  return ret;
+}
+
+/*!
+ * Returns the set of extensive levels (nodes included) where not NULL naming arr are defined.
+ */
+std::vector<int> MEDFileStructuredMesh::getNameArrNonEmptyLevelsExt() const
+{
+  std::vector<int> ret;
+  const DataArrayAsciiChar *namesCells(_names_cells);
+  if(namesCells)
+    ret.push_back(0);
   return ret;
 }
 
