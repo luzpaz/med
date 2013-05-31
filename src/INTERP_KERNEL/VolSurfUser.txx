@@ -34,12 +34,18 @@ namespace INTERP_KERNEL
     switch(type)
       {
       case INTERP_KERNEL::NORM_SEG2 :
-      case INTERP_KERNEL::NORM_SEG3 :
       case INTERP_KERNEL::NORM_SEG4 :
         {
           int N1 = OTT<ConnType,numPol>::coo2C(connec[0]);
           int N2 = OTT<ConnType,numPol>::coo2C(connec[1]);
           return INTERP_KERNEL::calculateLgthForSeg2(coords+(SPACEDIM*N1),coords+(SPACEDIM*N2),SPACEDIM);
+        }
+      case INTERP_KERNEL::NORM_SEG3 :
+        {
+          int beginNode = OTT<ConnType,numPol>::coo2C(connec[0]);
+          int endNode = OTT<ConnType,numPol>::coo2C(connec[1]);
+          int middleNode = OTT<ConnType,numPol>::coo2C(connec[2]);
+          return INTERP_KERNEL::calculateLgthForSeg3(coords+(SPACEDIM*beginNode),coords+(SPACEDIM*endNode),coords+(SPACEDIM*middleNode),SPACEDIM);
         }
       case INTERP_KERNEL::NORM_TRI3 :
         {

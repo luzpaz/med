@@ -23,6 +23,8 @@
 
 #include "InterpolationUtils.hxx"
 #include "InterpKernelException.hxx"
+#include "InterpKernelGeo2DEdgeLin.hxx"
+#include "InterpKernelGeo2DEdgeArcCircle.hxx"
 #include "InterpKernelGeo2DQuadraticPolygon.hxx"
 
 #include <sstream>
@@ -50,6 +52,18 @@ namespace INTERP_KERNEL
         for(int i=0;i<spaceDim;i++)
           ret+=(p2[i]-p1[i])*(p2[i]-p1[i]);
         return sqrt(ret);
+      }
+  }
+  
+  inline double calculateLgthForSeg3(const double *begin, const double *end, const double *middle, int spaceDim)
+  {
+    if(spaceDim==1)
+      return *end-*begin;
+    else
+      {
+        Edge *ed=Edge::BuildEdgeFrom3Points(begin,middle,end);
+        double ret=ed->getCurveLength(); ed->decrRef();
+        return ret;
       }
   }
 
