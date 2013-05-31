@@ -5057,6 +5057,7 @@ void MEDCouplingUMesh::convertQuadraticCellsToLinear() throw(INTERP_KERNEL::Exce
   checkFullyDefined();
   int nbOfCells=getNumberOfCells();
   int delta=0;
+  const int *iciptr=_nodal_connec_index->getConstPointer();
   for(int i=0;i<nbOfCells;i++)
     {
       INTERP_KERNEL::NormalizedCellType type=getTypeOfCell(i);
@@ -5065,17 +5066,19 @@ void MEDCouplingUMesh::convertQuadraticCellsToLinear() throw(INTERP_KERNEL::Exce
         {
           INTERP_KERNEL::NormalizedCellType typel=cm.getLinearType();
           const INTERP_KERNEL::CellModel& cml=INTERP_KERNEL::CellModel::GetCellModel(typel);
-          delta+=cm.getNumberOfNodes()-cml.getNumberOfNodes();
+          if(!cml.isDynamic())
+            delta+=cm.getNumberOfNodes()-cml.getNumberOfNodes();
+          else
+            delta+=(iciptr[i+1]-iciptr[i]-1)/2;
         }
     }
   if(delta==0)
     return ;
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newConn=DataArrayInt::New();
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newConnI=DataArrayInt::New();
+  const int *icptr=_nodal_connec->getConstPointer();
   newConn->alloc(getMeshLength()-delta,1);
   newConnI->alloc(nbOfCells+1,1);
-  const int *icptr=_nodal_connec->getConstPointer();
-  const int *iciptr=_nodal_connec_index->getConstPointer();
   int *ocptr=newConn->getPointer();
   int *ociptr=newConnI->getPointer();
   *ociptr=0;
@@ -5096,6 +5099,8 @@ void MEDCouplingUMesh::convertQuadraticCellsToLinear() throw(INTERP_KERNEL::Exce
           _types.insert(typel);
           const INTERP_KERNEL::CellModel& cml=INTERP_KERNEL::CellModel::GetCellModel(typel);
           int newNbOfNodes=cml.getNumberOfNodes();
+          if(cml.isDynamic())
+            newNbOfNodes=(iciptr[i+1]-iciptr[i]-1)/2;
           *ocptr++=(int)typel;
           ocptr=std::copy(icptr+iciptr[i]+1,icptr+iciptr[i]+newNbOfNodes+1,ocptr);
           ociptr[1]=ociptr[0]+newNbOfNodes+1;

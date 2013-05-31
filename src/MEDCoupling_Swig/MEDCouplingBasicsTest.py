@@ -12652,6 +12652,76 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertEqual(26,fd.getNumberOfTuples(m))
         pass
 
+    def testSwig2AreaBarySeg3Quad8Tri6QPolyg(self):
+        #QUAD8 representing a circle of center zeBary and radius zeRadius
+        zeBary=[5,6]
+        zeRadius=3
+        d=DataArrayDouble(8,2)
+        d[:,0]=zeRadius
+        d[:,1]=[87,-100,-170,110,5,-130,175,95] # angle in degree
+        d[:,1]*=pi/180. # angle in radian
+        d=d.fromPolarToCart()
+        d+=zeBary
+        m=MEDCouplingUMesh("quad8",2) ; m.allocateCells() ; m.insertNextCell(NORM_QUAD8,range(8)) ; m.setCoords(d)
+        self.assertTrue(m.getBarycenterAndOwner().isEqual(DataArrayDouble(zeBary,1,2),1e-13))
+        self.assertAlmostEqual(float(m.getMeasureField(False).getArray()),pi*zeRadius*zeRadius,12)
+        tri32D=m.buildDescendingConnectivity()[0][0] ; tri32D.zipCoords()
+        # spaceDim=3 QUAD8 becomes QUAD4 ... for the moment
+        m.setCoords(m.getCoords().changeNbOfComponents(3,0.))
+        m2=m.deepCpy()
+        m2.convertQuadraticCellsToLinear()
+        self.assertAlmostEqual(float(m.getMeasureField(False).getArray()),float(m2.getMeasureField(False).getArray()),12)
+        self.assertTrue(m.getBarycenterAndOwner().isEqual(m2.getBarycenterAndOwner(),1e-13))
+        #TRI6 representing a circle of center zeBary and radius zeRadius
+        zeBary=[5,6]
+        zeRadius=3
+        d=DataArrayDouble(6,2)
+        d[:,0]=zeRadius
+        d[:,1]=[87,-100,110,5,175,95] # angle in degree
+        d[:,1]*=pi/180. # angle in radian
+        d=d.fromPolarToCart()
+        d+=zeBary
+        m=MEDCouplingUMesh("tri6",2) ; m.allocateCells() ; m.insertNextCell(NORM_TRI6,range(6)) ; m.setCoords(d)
+        self.assertTrue(m.getBarycenterAndOwner().isEqual(DataArrayDouble(zeBary,1,2),1e-13))
+        self.assertAlmostEqual(float(m.getMeasureField(False).getArray()),pi*zeRadius*zeRadius,12)
+        # spaceDim=3 TRI6 becomes TRI3 ... for the moment
+        m.setCoords(m.getCoords().changeNbOfComponents(3,0.))
+        m2=m.deepCpy()
+        m2.convertQuadraticCellsToLinear()
+        self.assertAlmostEqual(float(m.getMeasureField(False).getArray()),float(m2.getMeasureField(False).getArray()),12)
+        self.assertTrue(m.getBarycenterAndOwner().isEqual(m2.getBarycenterAndOwner(),1e-13))
+        # QPOLYG representing a circle of center zeBary and radius zeRadius
+        zeBary=[5,6]
+        zeRadius=3
+        d=DataArrayDouble(10,2)
+        d[:,0]=zeRadius
+        d[:,1]=[87,-80,-100,-170,110,5,-90,-130,175,95] # angle in degree
+        d[:,1]*=pi/180. # angle in radian
+        d=d.fromPolarToCart()
+        d+=zeBary
+        m=MEDCouplingUMesh("qpolyg",2) ; m.allocateCells() ; m.insertNextCell(NORM_QPOLYG,range(10)) ; m.setCoords(d)
+        self.assertTrue(m.getBarycenterAndOwner().isEqual(DataArrayDouble(zeBary,1,2),1e-13))
+        self.assertAlmostEqual(float(m.getMeasureField(False).getArray()),pi*zeRadius*zeRadius,12)
+        # spaceDim=3 QPOLYG becomes POLYG ... for the moment
+        m.setCoords(m.getCoords().changeNbOfComponents(3,0.))
+        m2=m.deepCpy()
+        m2.convertQuadraticCellsToLinear() ; m2.checkCoherency2()
+        self.assertTrue(m2.getAllGeoTypes()==[NORM_POLYGON] and m2.getNodalConnectivity().getValues()==[5,0,1,2,3,4])
+        self.assertAlmostEqual(float(m.getMeasureField(False).getArray()),float(m2.getMeasureField(False).getArray()),12)
+        self.assertTrue(m.getBarycenterAndOwner().isEqual(m2.getBarycenterAndOwner(),1e-13))
+        # TRI3
+        self.assertAlmostEqual(float(tri32D.getMeasureField(False).getArray()),(87+100)*pi/180*zeRadius,13)
+        exp=DataArrayDouble(1,2) ; exp[:,0]=3 ; exp[:,1]=(87-100)/2. ; exp[:,1]*=pi/180. ;  exp=exp.fromPolarToCart() ; exp+=DataArrayDouble([5,6],1,2)
+        self.assertTrue(tri32D.getBarycenterAndOwner().isEqual(exp,1e-12))
+        # spaceDim=3 TRI3 becomes TRI2 ... for the moment
+        tri32D.changeSpaceDimension(3)
+        tri2=tri32D.deepCpy() ; tri2.convertQuadraticCellsToLinear()
+        self.assertAlmostEqual(float(tri32D.getMeasureField(False).getArray()),float(tri2.getMeasureField(False).getArray()),13)
+        self.assertTrue(tri32D.getBarycenterAndOwner().isEqual(tri2.getBarycenterAndOwner(),1e-12))
+        tri32D.changeSpaceDimension(1)
+        self.assertAlmostEqual(float(tri32D.getMeasureField(False).getArray()),-0.67795240172962323,12)
+        pass
+
     def setUp(self):
         pass
     pass
