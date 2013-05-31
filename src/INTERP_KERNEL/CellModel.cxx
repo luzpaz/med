@@ -397,7 +397,7 @@ namespace INTERP_KERNEL
         break;
       case NORM_POLYGON:
         {
-          _nb_of_pts=0; _nb_of_sons=0; _dim=2; _dyn=true; _extruded_type=NORM_POLYHED; _is_simplex=false;
+          _nb_of_pts=0; _nb_of_sons=0; _dim=2; _dyn=true; _extruded_type=NORM_POLYHED; _is_simplex=false; _quadratic_type=NORM_QPOLYG;
         }
         break;
       case NORM_POLYHED:
@@ -407,7 +407,7 @@ namespace INTERP_KERNEL
         break;
       case NORM_QPOLYG:
         {
-          _nb_of_pts=0; _nb_of_sons=0; _dim=2; _dyn=true; _is_simplex=false; _quadratic=true;
+          _nb_of_pts=0; _nb_of_sons=0; _dim=2; _dyn=true; _is_simplex=false; _quadratic=true; _linear_type=NORM_POLYGON;
         }
         break;
       case NORM_POLYL:
