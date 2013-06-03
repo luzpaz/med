@@ -504,9 +504,13 @@ namespace ParaMEDMEM
 #endif
   }
 
-  std::string MEDCouplingCompletionScript()
+  std::string MEDCouplingCompletionScript() throw(INTERP_KERNEL::Exception)
   {
-    return std::string("import rlcompleter, readline\nreadline.parse_and_bind('tab:complete')");
+    static const char script[]="import rlcompleter,readline\nreadline.parse_and_bind('tab:complete')";
+    std::ostringstream oss; oss << "MEDCouplingCompletionScript : error when trying to activate completion ! readline not present ?\nScript is :\n" << script;
+    if(PyRun_SimpleString(script)!=0)
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
+    return std::string(script);
   }
 }
 
