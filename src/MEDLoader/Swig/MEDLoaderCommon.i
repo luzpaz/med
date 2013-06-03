@@ -1185,6 +1185,16 @@ namespace ParaMEDMEM
              }
            return ret2;
       }
+
+      PyObject *splitComponents() const throw(INTERP_KERNEL::Exception)
+      {
+        std::vector< MEDCouplingAutoRefCountObjectPtr< MEDFileAnyTypeField1TS > > ret=self->splitComponents();
+        std::size_t sz=ret.size();
+        PyObject *retPy=PyList_New(sz);
+        for(std::size_t i=0;i<sz;i++)
+          PyList_SetItem(retPy,i,convertMEDFileField1TS(ret[i].retn(), SWIG_POINTER_OWN | 0 ));
+        return retPy;
+      }
     }
   };
 
@@ -1717,6 +1727,16 @@ namespace ParaMEDMEM
         std::vector< std::pair<std::string,std::string> > modifTab=convertVecPairStStFromPy(li);
         return self->changeMeshNames(modifTab);
       }
+
+      PyObject *splitComponents() const throw(INTERP_KERNEL::Exception)
+      {
+        std::vector< MEDCouplingAutoRefCountObjectPtr< MEDFileAnyTypeFieldMultiTS > > ret=self->splitComponents();
+        std::size_t sz=ret.size();
+        PyObject *retPy=PyList_New(sz);
+        for(std::size_t i=0;i<sz;i++)
+          PyList_SetItem(retPy,i,convertMEDFileFieldMultiTS(ret[i].retn(), SWIG_POINTER_OWN | 0 ));
+        return retPy;
+      }
     }
   };
 
@@ -2097,6 +2117,13 @@ namespace ParaMEDMEM
                ret[0]=ParaMEDMEM_MEDFileFields_getPosOfField(self,elts);
                return ret;
              }
+         }
+
+         void pushFields(PyObject *fields) throw(INTERP_KERNEL::Exception)
+         {
+           std::vector<MEDFileAnyTypeFieldMultiTS *> tmp;
+           convertFromPyObjVectorOfObj<ParaMEDMEM::MEDFileAnyTypeFieldMultiTS *>(fields,SWIGTYPE_p_ParaMEDMEM__MEDFileAnyTypeFieldMultiTS,"MEDFileAnyTypeFieldMultiTS",tmp);
+           self->pushFields(tmp);
          }
          
          void __delitem__(PyObject *elts) throw(INTERP_KERNEL::Exception)

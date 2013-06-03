@@ -2693,7 +2693,75 @@ class MEDLoaderTest(unittest.TestCase):
         fs0.checkGlobsCoherency()
         fs0.write(fname,0)
         pass
-
+    
+    def testSplitComponents1(self):
+        fname="Pyfile67.med"
+        # building a mesh containing 4 tri3 + 5 quad4
+        tri=MEDCouplingUMesh("tri",2)
+        tri.allocateCells() ; tri.insertNextCell(NORM_TRI3,[0,1,2])
+        tri.setCoords(DataArrayDouble([(0.,0.),(0.,1.),(1.,0.)]))
+        tris=[tri.deepCpy() for i in xrange(4)]
+        for i,elt in enumerate(tris): elt.translate([i,0])
+        tris=MEDCouplingUMesh.MergeUMeshes(tris)
+        quad=MEDCouplingUMesh("quad",2)
+        quad.allocateCells() ; quad.insertNextCell(NORM_QUAD4,[0,1,2,3])
+        quad.setCoords(DataArrayDouble([(0.,0.),(0.,1.),(1.,1.),(1.,0.)]))
+        quads=[quad.deepCpy() for i in xrange(5)]
+        for i,elt in enumerate(quads): elt.translate([5+i,0])
+        quads=MEDCouplingUMesh.MergeUMeshes(quads)
+        m=MEDCouplingUMesh.MergeUMeshes(tris,quads)
+        m.setName("mesh") ; m.getCoords().setInfoOnComponents(["XX [m]","YYY [km]"])
+        #
+        mm=MEDFileUMesh() ; mm.setMeshAtLevel(0,m) ; mm.write(fname,2)
+        #
+        pfl=DataArrayInt([0,1,2,3,4,5,6]) ; pfl.setName("pfl")
+        pfl2=DataArrayInt([0,1,2,3,4,5,6,8]) ; pfl2.setName("pfl2")
+        fs=MEDFileFields()
+        fmts0_1=MEDFileFieldMultiTS()
+        # time steps
+        infos1=['aa [bb]','ccc [ddd]',"ZZZZ [MW*s]"]
+        for i in xrange(10):
+            name1="1stField"
+            d=DataArrayDouble(21) ; d.iota(i*10) ; d.rearrange(3) ; d.setInfoOnComponents(infos1)
+            f=MEDCouplingFieldDouble(ON_CELLS) ; f.setName(name1) ; f.setArray(d) ; f.setMesh(m)
+            f.setTime(float(i+1)+0.1,i+1,-i-1)
+            f1ts=MEDFileField1TS() ; f1ts.setFieldProfile(f,mm,0,pfl) ; fmts0_1.pushBackTimeStep(f1ts)
+            self.assertEqual(fmts0_1.getInfo(),tuple(infos1))
+            pass
+        fs.pushField(fmts0_1)
+        self.assertEqual(1,len(fs))
+        l=fmts0_1.splitComponents()
+        self.assertEqual(3,len(l))
+        for elt in l: self.assertEqual(10,len(elt))
+        for elt in l: self.assertTrue(isinstance(elt,MEDFileFieldMultiTS))
+        for elt in l:
+            elt.setName("%s_%s"%(elt.getName(),DataArray.GetVarNameFromInfo(elt.getInfo()[0])))
+            pass
+        fs.pushFields(l)
+        self.assertEqual(4,len(fs))
+        for elt in fs: self.assertEqual(10,len(elt))
+        self.assertEqual(fs.getPfls(),('pfl_NORM_QUAD4',))
+        self.assertEqual(fs.getPflsReallyUsed(),('pfl_NORM_QUAD4',))
+        #
+        fs.write(fname,0) ; del fs
+        #
+        fs1=MEDFileFields(fname)
+        self.assertEqual(fs1.getPfls(),('pfl_NORM_QUAD4',))
+        self.assertEqual(fs1.getPflsReallyUsed(),('pfl_NORM_QUAD4',))
+        self.assertEqual(4,len(fs1))
+        for i in xrange(10):
+            for j,fieldName in enumerate(['1stField_aa','1stField_ccc','1stField_ZZZZ']):
+                f1ts=fs1[fieldName][i]
+                f=f1ts.getFieldOnMeshAtLevel(ON_CELLS,0,mm)
+                d=DataArrayDouble(21) ; d.iota(i*10) ; d.rearrange(3) ; d=d[:,j] ; d.setInfoOnComponent(0,infos1[j])
+                self.assertTrue(d.isEqual(f.getArray(),1e-13))
+                pass
+            f1ts=fs1["1stField"][i]
+            f=f1ts.getFieldOnMeshAtLevel(ON_CELLS,0,mm)
+            d=DataArrayDouble(21) ; d.iota(i*10) ; d.rearrange(3) ; d.setInfoOnComponents(infos1)
+            self.assertTrue(d.isEqual(f.getArray(),1e-13))
+            pass
+        pass
     pass
 
 unittest.main()

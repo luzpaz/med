@@ -3583,6 +3583,23 @@ void MEDFileAnyTypeField1TSWithoutSDA::simpleRepr(int bkOffset, std::ostream& os
   oss << startOfLine << "----------------------" << std::endl;
 }
 
+std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> > MEDFileAnyTypeField1TSWithoutSDA::splitComponents() const throw(INTERP_KERNEL::Exception)
+{
+  const DataArray *arr(getUndergroundDataArray());
+  if(!arr)
+    throw INTERP_KERNEL::Exception("MEDFileAnyTypeField1TSWithoutSDA::splitComponents : no array defined !");
+  int nbOfCompo=arr->getNumberOfComponents();
+  std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> > ret(nbOfCompo);
+  for(int i=0;i<nbOfCompo;i++)
+    {
+      ret[i]=deepCpy();
+      std::vector<int> v(1,i);
+      MEDCouplingAutoRefCountObjectPtr<DataArray> arr2=arr->keepSelectedComponents(v);
+      ret[i]->setArray(arr2);
+    }
+  return ret;
+}
+
 MEDFileAnyTypeField1TSWithoutSDA::MEDFileAnyTypeField1TSWithoutSDA(const char *fieldName, int csit, int iteration, int order):MEDFileFieldNameScope(fieldName),_iteration(iteration),_order(order),_csit(csit)
 {
 }
@@ -5489,6 +5506,27 @@ std::vector< std::vector<std::pair<int,int> > > MEDFileAnyTypeField1TS::getField
   return contentNotNullBase()->getFieldSplitedByType(mname,types,typesF,pfls,locs);
 }
 
+/*!
+ * This method returns as MEDFileAnyTypeField1TS new instances as number of components in \a this.
+ * The returned instances are deep copy of \a this except that for globals that are share with those contained in \a this.
+ * ** WARNING ** do no forget to rename the ouput instances to avoid to write n-times in the same MED file field !
+ */
+std::vector< MEDCouplingAutoRefCountObjectPtr< MEDFileAnyTypeField1TS > > MEDFileAnyTypeField1TS::splitComponents() const throw(INTERP_KERNEL::Exception)
+{
+  const MEDFileAnyTypeField1TSWithoutSDA *content(_content);
+  if(!content)
+    throw INTERP_KERNEL::Exception("MEDFileAnyTypeField1TS::splitComponents : no content in this ! Unable to split components !");
+  std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> > contentsSplit=content->splitComponents();
+  std::size_t sz(contentsSplit.size());
+  std::vector< MEDCouplingAutoRefCountObjectPtr< MEDFileAnyTypeField1TS > > ret(sz);
+  for(std::size_t i=0;i<sz;i++)
+    {
+      ret[i]=shallowCpy();
+      ret[i]->_content=contentsSplit[i];
+    }
+  return ret;
+}
+
 MEDFileAnyTypeField1TS *MEDFileAnyTypeField1TS::deepCpy() const throw(INTERP_KERNEL::Exception)
 {
   MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TS> ret=shallowCpy();
@@ -6899,6 +6937,32 @@ MEDFileAnyTypeFieldMultiTSWithoutSDA *MEDFileAnyTypeFieldMultiTSWithoutSDA::deep
   return ret.retn();
 }
 
+std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> > MEDFileAnyTypeFieldMultiTSWithoutSDA::splitComponents() const throw(INTERP_KERNEL::Exception)
+{
+  std::size_t sz(_infos.size()),sz2(_time_steps.size());
+  std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> > ret(sz);
+  std::vector< std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> > > ts(sz2);
+  for(std::size_t i=0;i<sz;i++)
+    {
+      ret[i]=shallowCpy();
+      ret[i]->_infos.resize(1); ret[i]->_infos[0]=_infos[i];
+    }
+  for(std::size_t i=0;i<sz2;i++)
+    {
+      std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeField1TSWithoutSDA> > ret1=_time_steps[i]->splitComponents();
+      if(ret1.size()!=sz)
+        {
+          std::ostringstream oss; oss << "MEDFileAnyTypeFieldMultiTSWithoutSDA::splitComponents : At rank #" << i << " number of components is " << ret1.size() << " whereas it should be for all time steps " << sz << " !";
+          throw INTERP_KERNEL::Exception(oss.str().c_str());
+        }
+      ts[i]=ret1;
+    }
+  for(std::size_t i=0;i<sz;i++)
+    for(std::size_t j=0;j<sz2;j++)
+      ret[i]->_time_steps[j]=ts[j][i];
+  return ret;
+}
+
 void MEDFileAnyTypeFieldMultiTSWithoutSDA::copyTinyInfoFrom(const MEDCouplingFieldDouble *field, const DataArray *arr) throw(INTERP_KERNEL::Exception)
 {
   _name=field->getName();
@@ -7524,6 +7588,27 @@ std::size_t MEDFileAnyTypeFieldMultiTS::getHeapMemorySize() const
   if((const MEDFileAnyTypeFieldMultiTSWithoutSDA*)_content)
     ret+=_content->getHeapMemorySize();
   return ret+MEDFileFieldGlobsReal::getHeapMemorySize();
+}
+
+/*!
+ * This method returns as MEDFileAnyTypeField1TS new instances as number of components in \a this.
+ * The returned instances are deep copy of \a this except that for globals that are share with those contained in \a this.
+ * ** WARNING ** do no forget to rename the ouput instances to avoid to write n-times in the same MED file field !
+ */
+std::vector< MEDCouplingAutoRefCountObjectPtr< MEDFileAnyTypeFieldMultiTS > > MEDFileAnyTypeFieldMultiTS::splitComponents() const throw(INTERP_KERNEL::Exception)
+{
+  const MEDFileAnyTypeFieldMultiTSWithoutSDA *content(_content);
+  if(!content)
+    throw INTERP_KERNEL::Exception("MEDFileAnyTypeFieldMultiTS::splitComponents : no content in this ! Unable to split components !");
+  std::vector< MEDCouplingAutoRefCountObjectPtr<MEDFileAnyTypeFieldMultiTSWithoutSDA> > contentsSplit=content->splitComponents();
+  std::size_t sz(contentsSplit.size());
+  std::vector< MEDCouplingAutoRefCountObjectPtr< MEDFileAnyTypeFieldMultiTS > > ret(sz);
+  for(std::size_t i=0;i<sz;i++)
+    {
+      ret[i]=shallowCpy();
+      ret[i]->_content=contentsSplit[i];
+    }
+  return ret;
 }
 
 MEDFileAnyTypeFieldMultiTS *MEDFileAnyTypeFieldMultiTS::deepCpy() const throw(INTERP_KERNEL::Exception)
@@ -8656,6 +8741,12 @@ void MEDFileFields::changeLocsRefsNamesGen(const std::vector< std::pair<std::vec
 void MEDFileFields::resize(int newSize) throw(INTERP_KERNEL::Exception)
 {
   _fields.resize(newSize);
+}
+
+void MEDFileFields::pushFields(const std::vector<MEDFileAnyTypeFieldMultiTS *>& fields) throw(INTERP_KERNEL::Exception)
+{
+  for(std::vector<MEDFileAnyTypeFieldMultiTS *>::const_iterator it=fields.begin();it!=fields.end();it++)
+    pushField(*it);
 }
 
 void MEDFileFields::pushField(MEDFileAnyTypeFieldMultiTS *field) throw(INTERP_KERNEL::Exception)
