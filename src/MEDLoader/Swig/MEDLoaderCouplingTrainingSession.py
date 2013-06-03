@@ -480,7 +480,9 @@ print "IntegralGlobConstraint %lf == %lf"%(srcField.getArray().accumulate()[0],t
 from numpy import *
 from math import acos
 
-data=MEDFileData("agitateur.med")
+med_root_dir=os.getenv("MED_ROOT_DIR")
+agitateur_file=os.path.join(os.getenv("MED_ROOT_DIR"),"share","salome","resources","med","agitateur.med")
+data=MEDFileData(agitateur_file)
 ts=data.getFields()[0].getTimeSteps()
 print ts
 #
