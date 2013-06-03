@@ -23,6 +23,7 @@ import unittest
 from math import pi,e,sqrt,cos,sin
 from datetime import datetime
 from MEDCouplingDataForTest import MEDCouplingDataForTest
+import rlcompleter,readline # this line has to be here, ot ensure a usability of MEDCoupling/MEDLoader. B4 removing it please notify to anthony.geay@cea.fr
 
 class MEDCouplingBasicsTest(unittest.TestCase):
     def testArray2(self):
