@@ -53,7 +53,9 @@ _MEDLoader_la_LDFLAGS  = -module $(MED3_LIBS_C_ONLY) $(HDF5_LIBS) $(PYTHON_LIBS)
 
 CLEANFILES = MEDLoader_wrap.cxx MEDLoader.py
 
-dist_salomescript_DATA= MEDLoaderDataForTest.py MEDLoaderTest.py MEDLoaderTest2.py MEDLoaderTest3.py MEDLoaderCouplingTrainingSession.py CaseIO.py CaseReader.py CaseWriter.py MEDLoaderSplitter.py case2med med2case libMEDLoader_Swig.py
+dist_salomescript_SCRIPTS = case2med med2case
+
+dist_salomescript_DATA= MEDLoaderDataForTest.py MEDLoaderTest.py MEDLoaderTest2.py MEDLoaderTest3.py MEDLoaderCouplingTrainingSession.py CaseIO.py CaseReader.py CaseWriter.py MEDLoaderSplitter.py libMEDLoader_Swig.py
 nodist_salomescript_DATA = MEDLoader.py
 
 UNIT_TEST_PROG = MEDLoaderTest.py MEDLoaderTest2.py
