@@ -567,7 +567,7 @@ MEDCouplingTimeDiscretization *MEDCouplingTimeDiscretization::keepSelectedCompon
   for(std::size_t j=0;j<arrays.size();j++)
     {
       if(arrays[j])
-        arrays2[j]=arrays[j]->keepSelectedComponents(compoIds);
+        arrays2[j]=static_cast<DataArrayDouble *>(arrays[j]->keepSelectedComponents(compoIds));
       else
         arrays2[j]=0;
     }

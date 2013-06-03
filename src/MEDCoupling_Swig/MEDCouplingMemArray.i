@@ -42,6 +42,7 @@ namespace ParaMEDMEM
     int getNumberOfComponents() const;
     virtual void alloc(int nbOfTuple, int nbOfCompo=1) throw(INTERP_KERNEL::Exception);
     virtual bool isAllocated() const throw(INTERP_KERNEL::Exception);
+    virtual void checkAllocated() const throw(INTERP_KERNEL::Exception);
     virtual int getNumberOfTuples() const throw(INTERP_KERNEL::Exception);
     virtual std::size_t getNbOfElems() const throw(INTERP_KERNEL::Exception);
     virtual std::size_t getNbOfElemAllocated() const throw(INTERP_KERNEL::Exception);
@@ -167,6 +168,14 @@ namespace ParaMEDMEM
         convertPyToVectorPairInt(li,ranges);
         return self->selectByTupleRanges(ranges);
       }
+
+      virtual PyObject *keepSelectedComponents(PyObject *li) const throw(INTERP_KERNEL::Exception)
+      {
+        std::vector<int> tmp;
+        convertPyToNewIntArr3(li,tmp);
+        DataArray *ret=self->keepSelectedComponents(tmp);
+        return convertDataArray(ret,SWIG_POINTER_OWN | 0 );
+      }
     }
   };
   
@@ -177,7 +186,6 @@ namespace ParaMEDMEM
   {
   public:
     static DataArrayDouble *New();
-    void checkAllocated() const throw(INTERP_KERNEL::Exception);
     double doubleValue() const throw(INTERP_KERNEL::Exception);
     bool empty() const throw(INTERP_KERNEL::Exception);
     DataArrayDouble *deepCpy() const throw(INTERP_KERNEL::Exception);
@@ -705,13 +713,6 @@ namespace ParaMEDMEM
         INTERP_KERNEL::AutoPtr<double> tmp=new double[sz];
         self->accumulate(tmp);
         return convertDblArrToPyList(tmp,sz);
-      }
-   
-      DataArrayDouble *keepSelectedComponents(PyObject *li) const throw(INTERP_KERNEL::Exception)
-      {
-        std::vector<int> tmp;
-        convertPyToNewIntArr3(li,tmp);
-        return self->keepSelectedComponents(tmp);
       }
 
       PyObject *findCommonTuples(double prec, int limitNodeId=-1) const throw(INTERP_KERNEL::Exception)
@@ -2189,7 +2190,6 @@ namespace ParaMEDMEM
   {
   public:
     static DataArrayInt *New();
-    void checkAllocated() const throw(INTERP_KERNEL::Exception);
     int intValue() const throw(INTERP_KERNEL::Exception);
     int getHashCode() const throw(INTERP_KERNEL::Exception);
     bool empty() const throw(INTERP_KERNEL::Exception);
@@ -2788,13 +2788,6 @@ namespace ParaMEDMEM
             da2->checkAllocated();
             return self->selectByTupleIdSafe(da2->getConstPointer(),da2->getConstPointer()+da2->getNbOfElems());
           }
-      }
-
-      DataArrayInt *keepSelectedComponents(PyObject *li) const throw(INTERP_KERNEL::Exception)
-      {
-        std::vector<int> tmp;
-        convertPyToNewIntArr3(li,tmp);
-        return self->keepSelectedComponents(tmp);
       }
 
       void setSelectedComponents(const DataArrayInt *a, PyObject *li) throw(INTERP_KERNEL::Exception)
@@ -4454,7 +4447,6 @@ namespace ParaMEDMEM
   public:
     virtual DataArrayChar *buildEmptySpecializedDAChar() const throw(INTERP_KERNEL::Exception) = 0;
     virtual DataArrayChar *deepCpy() const throw(INTERP_KERNEL::Exception);
-    void checkAllocated() const throw(INTERP_KERNEL::Exception);
     int getHashCode() const throw(INTERP_KERNEL::Exception);
     bool empty() const throw(INTERP_KERNEL::Exception);
     void cpyFrom(const DataArrayChar& other) throw(INTERP_KERNEL::Exception);
@@ -4632,13 +4624,6 @@ namespace ParaMEDMEM
             da2->checkAllocated();
             return self->selectByTupleIdSafe(da2->getConstPointer(),da2->getConstPointer()+da2->getNbOfElems());
           }
-      }
-      
-      DataArrayChar *keepSelectedComponents(PyObject *li) const throw(INTERP_KERNEL::Exception)
-      {
-        std::vector<int> tmp;
-        convertPyToNewIntArr3(li,tmp);
-        return self->keepSelectedComponents(tmp);
       }
       
       static DataArrayChar *Aggregate(PyObject *dachs) throw(INTERP_KERNEL::Exception)

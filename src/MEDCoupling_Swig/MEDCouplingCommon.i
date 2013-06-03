@@ -166,7 +166,6 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayInt::performCpy;
 %newobject ParaMEDMEM::DataArrayInt::substr;
 %newobject ParaMEDMEM::DataArrayInt::changeNbOfComponents;
-%newobject ParaMEDMEM::DataArrayInt::keepSelectedComponents;
 %newobject ParaMEDMEM::DataArrayInt::selectByTupleId;
 %newobject ParaMEDMEM::DataArrayInt::selectByTupleIdSafe;
 %newobject ParaMEDMEM::DataArrayInt::selectByTupleId2;
@@ -232,7 +231,6 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayChar::selectByTupleIdSafe;
 %newobject ParaMEDMEM::DataArrayChar::selectByTupleId2;
 %newobject ParaMEDMEM::DataArrayChar::changeNbOfComponents;
-%newobject ParaMEDMEM::DataArrayChar::keepSelectedComponents;
 %newobject ParaMEDMEM::DataArrayChar::getIdsEqual;
 %newobject ParaMEDMEM::DataArrayChar::getIdsNotEqual;
 %newobject ParaMEDMEM::DataArrayChar::Aggregate;
@@ -262,7 +260,6 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayDouble::Pow;
 %newobject ParaMEDMEM::DataArrayDouble::substr;
 %newobject ParaMEDMEM::DataArrayDouble::changeNbOfComponents;
-%newobject ParaMEDMEM::DataArrayDouble::keepSelectedComponents;
 %newobject ParaMEDMEM::DataArrayDouble::getIdsInRange;
 %newobject ParaMEDMEM::DataArrayDouble::selectByTupleId;
 %newobject ParaMEDMEM::DataArrayDouble::selectByTupleIdSafe;
@@ -3411,13 +3408,13 @@ namespace ParaMEDMEM
               case 1:
                 {
                   std::vector<int> v2(1,singleVal);
-                  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aarr=ret0Arr->keepSelectedComponents(v2);
+                  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aarr=static_cast<DataArrayDouble *>(ret0Arr->keepSelectedComponents(v2));
                   ret0->setArray(aarr);
                   return ret0.retn();
                 }
               case 2:
                 {
-                  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aarr=ret0Arr->keepSelectedComponents(multiVal);
+                  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aarr=static_cast<DataArrayDouble *>(ret0Arr->keepSelectedComponents(multiVal));
                   ret0->setArray(aarr);
                   return ret0.retn();
                 }
@@ -3427,7 +3424,7 @@ namespace ParaMEDMEM
                   std::vector<int> v2(nbOfComp);
                   for(int i=0;i<nbOfComp;i++)
                     v2[i]=slic.first+i*slic.second.second;
-                  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aarr=ret0Arr->keepSelectedComponents(v2);
+                  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> aarr=static_cast<DataArrayDouble *>(ret0Arr->keepSelectedComponents(v2));
                   ret0->setArray(aarr);
                   return ret0.retn();
                 }
