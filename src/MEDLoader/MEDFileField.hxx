@@ -892,6 +892,7 @@ namespace ParaMEDMEM
     MEDFileAnyTypeFieldMultiTS *buildSubPartSlice(int bg, int end, int step) const throw(INTERP_KERNEL::Exception);
     std::vector< std::pair<int,int> > getTimeSteps(std::vector<double>& ret1) const throw(INTERP_KERNEL::Exception);
     std::vector< std::pair<int,int> > getIterations() const;
+    void pushBackTimeSteps(const std::vector<MEDFileAnyTypeField1TS *>& f1ts) throw(INTERP_KERNEL::Exception);
     void pushBackTimeStep(MEDFileAnyTypeField1TS *f1ts) throw(INTERP_KERNEL::Exception);
     void synchronizeNameScope() throw(INTERP_KERNEL::Exception);
     int getPosOfTimeStep(int iteration, int order) const throw(INTERP_KERNEL::Exception);

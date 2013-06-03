@@ -1737,6 +1737,13 @@ namespace ParaMEDMEM
           PyList_SetItem(retPy,i,convertMEDFileFieldMultiTS(ret[i].retn(), SWIG_POINTER_OWN | 0 ));
         return retPy;
       }
+
+      void pushBackTimeSteps(PyObject *li) throw(INTERP_KERNEL::Exception)
+      {
+        std::vector<MEDFileAnyTypeField1TS *> tmp;
+        convertFromPyObjVectorOfObj<ParaMEDMEM::MEDFileAnyTypeField1TS *>(li,SWIGTYPE_p_ParaMEDMEM__MEDFileAnyTypeField1TS,"MEDFileAnyTypeField1TS",tmp);
+        self->pushBackTimeSteps(tmp);
+      }
     }
   };
 

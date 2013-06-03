@@ -7443,6 +7443,12 @@ std::vector< std::pair<int,int> > MEDFileAnyTypeFieldMultiTS::getIterations() co
   return contentNotNullBase()->getIterations();
 }
 
+void MEDFileAnyTypeFieldMultiTS::pushBackTimeSteps(const std::vector<MEDFileAnyTypeField1TS *>& f1ts) throw(INTERP_KERNEL::Exception)
+{
+  for(std::vector<MEDFileAnyTypeField1TS *>::const_iterator it=f1ts.begin();it!=f1ts.end();it++)
+    pushBackTimeStep(*it);
+}
+
 void MEDFileAnyTypeFieldMultiTS::pushBackTimeStep(MEDFileAnyTypeField1TS *f1ts) throw(INTERP_KERNEL::Exception)
 {
   if(!f1ts)
