@@ -3455,19 +3455,53 @@ DataArrayDouble *DataArrayDouble::magnitude() const throw(INTERP_KERNEL::Excepti
  *          The caller is to delete this result array using decrRef() as it is no more
  *          needed.
  *  \throw If \a this is not allocated.
+ *  \sa DataArrayDouble::maxPerTupleWithCompoId
  */
 DataArrayDouble *DataArrayDouble::maxPerTuple() const throw(INTERP_KERNEL::Exception)
 {
   checkAllocated();
   int nbOfComp=getNumberOfComponents();
-  DataArrayDouble *ret=DataArrayDouble::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::New();
   int nbOfTuple=getNumberOfTuples();
   ret->alloc(nbOfTuple,1);
   const double *src=getConstPointer();
   double *dest=ret->getPointer();
   for(int i=0;i<nbOfTuple;i++,dest++,src+=nbOfComp)
     *dest=*std::max_element(src,src+nbOfComp);
-  return ret;
+  return ret.retn();
+}
+
+/*!
+ * Computes the maximal value within every tuple of \a this array and it returns the first component
+ * id for each tuple that corresponds to the maximal value within the tuple.
+ * 
+ *  \param [out] compoIdOfMaxPerTuple - the new new instance of DataArrayInt containing the
+ *          same number of tuples and only one component.
+ *  \return DataArrayDouble * - the new instance of DataArrayDouble containing the
+ *          same number of tuples as \a this array and one component.
+ *          The caller is to delete this result array using decrRef() as it is no more
+ *          needed.
+ *  \throw If \a this is not allocated.
+ *  \sa DataArrayDouble::maxPerTuple
+ */
+DataArrayDouble *DataArrayDouble::maxPerTupleWithCompoId(DataArrayInt* &compoIdOfMaxPerTuple) const throw(INTERP_KERNEL::Exception)
+{
+  checkAllocated();
+  int nbOfComp=getNumberOfComponents();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret0=DataArrayDouble::New();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret1=DataArrayInt::New();
+  int nbOfTuple=getNumberOfTuples();
+  ret0->alloc(nbOfTuple,1); ret1->alloc(nbOfTuple,1);
+  const double *src=getConstPointer();
+  double *dest=ret0->getPointer(); int *dest1=ret1->getPointer();
+  for(int i=0;i<nbOfTuple;i++,dest++,dest1++,src+=nbOfComp)
+    {
+      const double *loc=std::max_element(src,src+nbOfComp);
+      *dest=*loc;
+      *dest1=(int)std::distance(src,loc);
+    }
+  compoIdOfMaxPerTuple=ret1.retn();
+  return ret0.retn();
 }
 
 /*!

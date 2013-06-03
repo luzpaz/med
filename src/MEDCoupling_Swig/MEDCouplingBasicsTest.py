@@ -3522,6 +3522,13 @@ class MEDCouplingBasicsTest(unittest.TestCase):
             self.assertAlmostEqual(5.6,f2.getIJ(i,0),13);
             pass
         #
+        d2,d2I=array.maxPerTupleWithCompoId()
+        self.assertEqual(1,d2.getNumberOfComponents());
+        self.assertEqual(5,d2.getNumberOfTuples());
+        for i in xrange(5):
+            self.assertAlmostEqual(5.6,d2.getIJ(i,0),13);
+            pass
+        self.assertTrue(d2I.isEqual(DataArrayInt([4,3,2,0,1])))
         pass
 
     def testChangeNbOfComponents(self):
