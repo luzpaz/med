@@ -58,34 +58,88 @@ class CaseReader(CaseIO):
         m.checkCoherency2()
         return m
 
+    def __traduceMeshForPolyhed(self,name,coords,arr0,arr1,arr2):
+        nbCoords=len(coords)
+        coo=np.array(coords,dtype="float64") ; coo=coo.reshape(nbCoords,3)
+        coo=DataArrayDouble(coo) ; coo=coo.fromNoInterlace()
+        m=MEDCouplingUMesh(name,3)
+        m.setCoords(coo)
+        #
+        arr2=arr2[:]-1
+        arr0mc0=DataArrayInt(arr0) ; arr0mc0.computeOffsets2()
+        arr0mc1=DataArrayInt(arr0).deepCpy()
+        arr0mc2=DataArrayInt(len(arr0),2) ; arr0mc2[:,0]=DataArrayInt(arr0)-1 ; arr0mc2[:,1]=1 ; arr0mc2.rearrange(1) ; arr0mc2.computeOffsets2()
+        arr0mc3=DataArrayInt.Range(0,2*len(arr0),2).buildExplicitArrByRanges(arr0mc2)
+        arr1mc0=DataArrayInt(arr1) ; arr1mc0.computeOffsets2()
+        arr1mc1=arr1mc0[arr0mc0] ; arr1mc1[1:]+=arr0mc0[1:] 
+        arr1mc2=DataArrayInt(arr1).deepCpy() ; arr1mc2+=1 ; arr1mc2.computeOffsets2()
+        arr2mc0=(arr1mc2[1:])[arr0mc3]
+        #
+        c=DataArrayInt(arr1.size+arr2.size) ; c[:]=0
+        c[arr1mc1[:-1]]=NORM_POLYHED
+        c[arr2mc0]=-1
+        a=arr2mc0.buildUnion(arr1mc1[:-1]).buildComplement(len(c))
+        c[a]=DataArrayInt(arr2)
+        #
+        m.setConnectivity(c,arr1mc1,True)
+        m.checkCoherency2()
+        return m
+
     def __convertGeo2MED(self,geoFileName):
         """ Convert all the geometry (all the meshes) contained in teh CASE file into MEDCouplingUMesh'es. """
         fd=open(geoFileName,"r+b") ; fd.seek(0,2) ; end=fd.tell() ; fd.seek(0) ; fd.readline() ; fd.readline()
         name=fd.readline().strip() ; fd.readline() ; fd.readline()
         pos=fd.tell()
         mcmeshes=[]
+        elt=fd.read(80) ; elt=elt.strip() ; pos+=80
         while pos!=end:
-            if fd.read(4)!="part":
+            if elt!="part":
                 raise Exception("Error on reading mesh #1 !")
-            fd.seek(fd.tell()+80)
+            fd.seek(fd.tell()+4)
             meshName=fd.read(80).strip()
             if fd.read(len("coordinates"))!="coordinates":
                 raise Exception("Error on reading mesh #2 !")
             pos=fd.tell()
-            typeOfCoo=np.memmap(fd,dtype='byte',mode='r',offset=pos,shape=(1)).tolist()[0]
+            typeOfCoo=np.memmap(fd,dtype='byte',mode='r',offset=int(pos),shape=(1)).tolist()[0]
             pos+=1+17*4
-            nbNodes=np.memmap(fd,dtype='int32',mode='r',offset=pos,shape=(1,)).tolist()[0]
+            nbNodes=np.memmap(fd,dtype='int32',mode='r',offset=int(pos),shape=(1,)).tolist()[0]
             pos+=4
-            coo=np.memmap(fd,dtype='float32',mode='r',offset=pos,shape=(nbNodes,3))
+            coo=np.memmap(fd,dtype='float32',mode='r',offset=int(pos),shape=(nbNodes,3))
             pos+=nbNodes*3*4 ; fd.seek(pos)#np.array(0,dtype='float%i'%(typeOfCoo)).nbytes
             typ=fd.read(80).strip() ; pos=fd.tell()
-            nbNodesPerCell=MEDCouplingMesh.GetNumberOfNodesOfGeometricType(self.dictMCTyp2[typ])
-            nbCellsOfType=np.memmap(fd,dtype='int32',mode='r',offset=pos,shape=(1,)).tolist()[0]
-            pos+=4
-            cells=np.memmap(fd,dtype='int32',mode='r',offset=pos,shape=(nbCellsOfType,nbNodesPerCell))
-            pos+=nbCellsOfType*nbNodesPerCell*4
-            fd.seek(pos)
-            mcmeshes.append(self.__traduceMesh(meshName,typ,coo,cells))
+            mcmeshes2=[]
+            while pos!=end and typ!="part":
+                mctyp=self.dictMCTyp2[typ]
+                nbCellsOfType=np.memmap(fd,dtype='int32',mode='r',offset=int(pos),shape=(1,)).tolist()[0]
+                pos+=4
+                if mctyp!=NORM_POLYHED and mctyp!=NORM_POLYGON:
+                    nbNodesPerCell=MEDCouplingMesh.GetNumberOfNodesOfGeometricType(mctyp)
+                    cells=np.memmap(fd,dtype='int32',mode='r',offset=pos,shape=(nbCellsOfType,nbNodesPerCell))
+                    pos+=nbCellsOfType*nbNodesPerCell*4
+                    fd.seek(pos)
+                    mcmeshes2.append(self.__traduceMesh(meshName,typ,coo,cells))
+                elif mctyp==NORM_POLYHED:
+                    nbOfFacesPerCell=np.memmap(fd,dtype='int32',mode='r',offset=int(pos),shape=(nbCellsOfType,))
+                    pos+=nbCellsOfType*4
+                    szOfNbOfNodesPerFacePerCellArr=nbOfFacesPerCell.sum()
+                    arr1=np.memmap(fd,dtype='int32',mode='r',offset=int(pos),shape=(szOfNbOfNodesPerFacePerCellArr,))#arr1 -> nbOfNodesPerFacePerCellArr
+                    pos+=szOfNbOfNodesPerFacePerCellArr*4
+                    szOfNodesPerFacePerCellArr=arr1.sum()
+                    arr2=np.memmap(fd,dtype='int32',mode='r',offset=int(pos),shape=(szOfNodesPerFacePerCellArr,))#arr2 -> nodesPerFacePerCellArr
+                    pos+=szOfNodesPerFacePerCellArr*4 ; fd.seek(pos)
+                    mcmeshes2.append(self.__traduceMeshForPolyhed(meshName,coo,nbOfFacesPerCell,arr1,arr2))
+                    pass
+                else:
+                    raise InterpKernelException("Polygons not yet implmented !")
+                if pos!=end:
+                    elt=fd.read(80) ; elt=elt.strip() ; typ=elt[:] ; pos+=80
+                    print elt,pos,end
+                    pass
+                pass
+            coo=mcmeshes2[0].getCoords() ; name=mcmeshes2[0].getName()
+            for itmesh in mcmeshes2: itmesh.setCoords(coo)
+            m=MEDCouplingUMesh.MergeUMeshesOnSameCoords(mcmeshes2) ; m.setName(name)
+            mcmeshes.append(m)
             pass
         #
         ms=MEDFileMeshes()
@@ -107,19 +161,25 @@ class CaseReader(CaseIO):
         if name!=fieldName:
             raise Exception("ConvertField : mismatch")
         pos=fd.tell()
+        st=fd.read(80) ; st=st.strip() ; pos=fd.tell()
         while pos!=end:
-            st=fd.read(4)
             if st!="part":
                 raise Exception("ConvertField : mismatch #2")
-            pos=fd.tell()+76 ; fd.seek(pos)
-            meshId=np.memmap(fd,dtype='int32',mode='r',offset=pos,shape=(1)).tolist()[0]-1
-            fd.seek(pos+4)
-            typ=fd.read(80).strip() ; pos=fd.tell()
             fdisc=MEDCouplingFieldDiscretization.New(self.discSpatial2[discr])
+            meshId=np.memmap(fd,dtype='int32',mode='r',offset=int(pos),shape=(1)).tolist()[0]-1
             nbOfValues=fdisc.getNumberOfTuples(mcmeshes[meshId])
-            vals=np.memmap(fd,dtype='float32',mode='r',offset=pos,shape=(nbOfValues,nbCompo))#np.memmap(fd,dtype='int32',mode='r',offset=159,shape=(1))
-            vals2=DataArrayDouble(np.array(vals,dtype='float64'))
-            pos+=nbOfValues*nbCompo*4 ; fd.seek(pos)
+            vals2=DataArrayDouble(nbOfValues,nbCompo)
+            fd.seek(pos+4)
+            st=fd.read(80).strip() ; pos=fd.tell()
+            offset=0
+            while pos!=end and st!="part":
+                nbOfValsOfTyp=mcmeshes[meshId].getNumberOfCellsWithType(self.dictMCTyp2[st])
+                vals=np.memmap(fd,dtype='float32',mode='r',offset=int(pos),shape=(nbOfValsOfTyp,nbCompo))#np.memmap(fd,dtype='int32',mode='r',offset=159,shape=(1))
+                vals2[offset:offset+nbOfValsOfTyp]=DataArrayDouble(np.array(vals,dtype='float64')).fromNoInterlace()
+                pos+=nbOfValsOfTyp*nbCompo*4 ; fd.seek(pos)
+                st=fd.read(80) ; st=st.strip() ; pos=fd.tell()
+                offset+=nbOfValsOfTyp
+                pass
             f=MEDCouplingFieldDouble(self.discSpatial2[discr],ONE_TIME) ; f.setName("%s_%s"%(fieldName,mcmeshes[meshId].getName()))
             f.setMesh(mcmeshes[meshId]) ; f.setArray(vals2) ; f.setTime(float(it),it,-1)
             f.checkCoherency()
