@@ -25,6 +25,8 @@ import os
 
 parser = OptionParser()
 parser.set_usage("Convert a Case file to a MED file.\n   %prog [options] case_file")
+parser.add_option("-c", "--currentdir", action="store_true", dest="here", default=False,
+                  help="Are generated MED file generated in current directory. By default not, MED file is generated in directory containing the input file (default False)")
 (opts, args) = parser.parse_args()
 
 if len(args) != 1:
@@ -33,7 +35,12 @@ if len(args) != 1:
     pass
     
 fname=args[0]  #"cas_test_simple.case"
-fOut=os.path.splitext(fname)[0]+".med"
+if opts.here:
+    fOut=os.path.splitext(os.path.basename(fname))[0]+".med"
+    pass
+else:
+    fOut=os.path.splitext(fname)[0]+".med"
+    pass
 ###
 cr=CaseReader(fname)
 try:

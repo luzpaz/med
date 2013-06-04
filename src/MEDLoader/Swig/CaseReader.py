@@ -38,6 +38,7 @@ class CaseReader(CaseIO):
     def __init__(self,fileName):
         """ Constructor """
         self._fileName=fileName
+        self._dirName=os.path.dirname(self._fileName)
         pass
 
     def __traduceMesh(self,name,typ,coords,cells):
@@ -104,7 +105,7 @@ class CaseReader(CaseIO):
 
     def __convertGeo2MED(self,geoFileName):
         """ Convert all the geometry (all the meshes) contained in teh CASE file into MEDCouplingUMesh'es. """
-        fd=open(geoFileName,"r+b") ; fd.seek(0,2) ; end=fd.tell() ; fd.seek(0) ; fd.readline() ; fd.readline()
+        fd=open(os.path.join(self._dirName,geoFileName),"r+b") ; fd.seek(0,2) ; end=fd.tell() ; fd.seek(0) ; fd.readline() ; fd.readline()
         name=fd.readline().strip() ; fd.readline() ; fd.readline()
         pos=fd.tell()
         mcmeshes=[]
@@ -177,7 +178,7 @@ class CaseReader(CaseIO):
         stars=re.search("[\*]+",fileName).group()
         st="%0"+str(len(stars))+"i"
         trueFileName=fileName.replace(stars,st%(it))
-        fd=open(trueFileName,"r+b") ; fd.seek(0,2) ; end=fd.tell() ; fd.seek(0)
+        fd=open(os.path.join(self._dirName,trueFileName),"r+b") ; fd.seek(0,2) ; end=fd.tell() ; fd.seek(0)
         name=fd.readline().strip().split(" ")[0]
         if name!=fieldName:
             raise Exception("ConvertField : mismatch")
