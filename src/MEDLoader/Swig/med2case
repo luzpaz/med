@@ -29,6 +29,8 @@ parser = OptionParser()
 parser.set_usage("Convert a MED file to a Case file.\n   %prog [options] case_file")
 parser.add_option("-g", "--groups", action="store_true", dest="groups", default=False,
                   help="Are groups in meshes stored in MEDFile exported in output case as subparts (default False)")
+parser.add_option("-c", "--currentdir", action="store_true", dest="here", default=False,
+                  help="Are generated case,geo files generated in current directory. By default not, files are generated in directory containing the input file  (default False)")
 (opts, args) = parser.parse_args()
 
 if len(args) != 1:
@@ -36,8 +38,13 @@ if len(args) != 1:
     exit(1)
     pass
     
-fname=args[0]  #"cas_test_simple.case"
-fOut=os.path.splitext(fname)[0]+".case"
+fname=os.path.abspath(args[0])  #"cas_test_simple.case"
+if opts.here:
+    fOut=os.path.splitext(os.path.basename(fname))[0]+".case"
+    pass
+else:
+    fOut=os.path.splitext(fname)[0]+".case"
+    pass
 ###
 try:
     cw=CaseWriter.New()

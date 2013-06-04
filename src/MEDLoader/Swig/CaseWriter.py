@@ -87,7 +87,7 @@ time values:
                 pass
             self._dico["geofilewithoutpath"]="%s%s.geo"%(self._base_name_without_dir,additionnalFileNamePart)
             h0=self.header%self._dico
-            self.__writeMeshesPart(mesh,self._dico["geofilewithoutpath"])
+            self.__writeMeshesPart(mesh,"%s%s.geo"%(self._base_name_with_dir,additionnalFileNamePart))
             #
             h2=self.__writeFieldsPart(self._med_data.getFields().partOfThisLyingOnSpecifiedMeshName(mesh.getName()))
             realWrittenCaseFileNameForCurMesh="%s%s.case"%(self._base_name_with_dir,additionnalFileNamePart)
