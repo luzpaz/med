@@ -195,7 +195,11 @@ class CaseReader(CaseIO):
             st=fd.read(80).strip() ; pos=fd.tell()
             offset=0
             while pos!=end and st!="part":
-                nbOfValsOfTyp=mcmeshes[meshId].getNumberOfCellsWithType(self.dictMCTyp2[st])
+                if st!="coordinates":
+                    nbOfValsOfTyp=mcmeshes[meshId].getNumberOfCellsWithType(self.dictMCTyp2[st])
+                else:
+                    nbOfValsOfTyp=nbOfValues
+                    pass
                 vals=np.memmap(fd,dtype='float32',mode='r',offset=int(pos),shape=(nbOfValsOfTyp,nbCompo))#np.memmap(fd,dtype='int32',mode='r',offset=159,shape=(1))
                 vals2[offset:offset+nbOfValsOfTyp]=DataArrayDouble(np.array(vals,dtype='float64')).fromNoInterlace()
                 pos+=nbOfValsOfTyp*nbCompo*4 ; fd.seek(pos)
