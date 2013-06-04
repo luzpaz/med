@@ -75,13 +75,30 @@ class CaseReader(CaseIO):
         arr1mc2=DataArrayInt(arr1).deepCpy() ; arr1mc2+=1 ; arr1mc2.computeOffsets2()
         arr2mc0=(arr1mc2[1:])[arr0mc3]
         #
-        c=DataArrayInt(arr1.size+arr2.size) ; c[:]=0
+        c=DataArrayInt(arr1.size+arr2.size)
         c[arr1mc1[:-1]]=NORM_POLYHED
         c[arr2mc0]=-1
         a=arr2mc0.buildUnion(arr1mc1[:-1]).buildComplement(len(c))
         c[a]=DataArrayInt(arr2)
         #
         m.setConnectivity(c,arr1mc1,True)
+        m.checkCoherency2()
+        return m
+
+    def __traduceMeshForPolygon(self,name,coords,arr0,arr1):
+        nbCoords=len(coords)
+        coo=np.array(coords,dtype="float64") ; coo=coo.reshape(nbCoords,3)
+        coo=DataArrayDouble(coo) ; coo=coo.fromNoInterlace()
+        m=MEDCouplingUMesh(name,2)
+        m.setCoords(coo)
+        #
+        arr0_0=DataArrayInt(arr0+1) ; arr0_0.computeOffsets2()
+        arr0_1=DataArrayInt(len(arr0),2) ; arr0_1[:,1]=DataArrayInt(arr0) ; arr0_1[:,0]=1 ; arr0_1.rearrange(1) ; arr0_1.computeOffsets2()
+        arr0_2=DataArrayInt.Range(1,2*len(arr0),2).buildExplicitArrByRanges(arr0_1)
+        c=DataArrayInt(len(arr0)+len(arr1)) ; c[:]=0 ; c[arr0_0[:-1]]=NORM_POLYGON
+        c[arr0_2]=DataArrayInt(arr1-1)
+        #
+        m.setConnectivity(c,arr0_0,True)
         m.checkCoherency2()
         return m
 
@@ -121,7 +138,7 @@ class CaseReader(CaseIO):
                 elif mctyp==NORM_POLYHED:
                     nbOfFacesPerCell=np.memmap(fd,dtype='int32',mode='r',offset=int(pos),shape=(nbCellsOfType,))
                     pos+=nbCellsOfType*4
-                    szOfNbOfNodesPerFacePerCellArr=nbOfFacesPerCell.sum()
+                    szOfNbOfNodesPerFacePerCellArr=int(nbOfFacesPerCell.sum())
                     arr1=np.memmap(fd,dtype='int32',mode='r',offset=int(pos),shape=(szOfNbOfNodesPerFacePerCellArr,))#arr1 -> nbOfNodesPerFacePerCellArr
                     pos+=szOfNbOfNodesPerFacePerCellArr*4
                     szOfNodesPerFacePerCellArr=arr1.sum()
@@ -130,10 +147,14 @@ class CaseReader(CaseIO):
                     mcmeshes2.append(self.__traduceMeshForPolyhed(meshName,coo,nbOfFacesPerCell,arr1,arr2))
                     pass
                 else:
-                    raise InterpKernelException("Polygons not yet implmented !")
+                    nbOfNodesPerCell=np.memmap(fd,dtype='int32',mode='r',offset=int(pos),shape=(nbCellsOfType,))
+                    pos+=nbCellsOfType*4
+                    szOfNbOfNodesPerCellArr=int(nbOfNodesPerCell.sum())
+                    arr1=np.memmap(fd,dtype='int32',mode='r',offset=int(pos),shape=(szOfNbOfNodesPerCellArr,))
+                    pos+=szOfNbOfNodesPerCellArr*4  ; fd.seek(pos)
+                    mcmeshes2.append(self.__traduceMeshForPolygon(meshName,coo,nbOfNodesPerCell,arr1))
                 if pos!=end:
                     elt=fd.read(80) ; elt=elt.strip() ; typ=elt[:] ; pos+=80
-                    print elt,pos,end
                     pass
                 pass
             coo=mcmeshes2[0].getCoords() ; name=mcmeshes2[0].getName()
@@ -235,6 +256,7 @@ class CaseReader(CaseIO):
             pass
         ret=MEDFileData()
         ret.setMeshes(m2)
+        del mlfields[filter(lambda x: len(mlfields[x])==0,range(len(mlfields)))]
         ret.setFields(mlfields)
         return ret
 
