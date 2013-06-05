@@ -968,14 +968,14 @@ namespace ParaMEDMEM
          void rotate(PyObject *center, PyObject *vector, double alpha) throw(INTERP_KERNEL::Exception)
          {
            const char msg[]="Python wrap of MEDCouplingPointSet::rotate : ";
-           double val;
-           DataArrayDouble *a;
-           DataArrayDoubleTuple *aa;
-           std::vector<double> bb;
+           double val,val2;
+           DataArrayDouble *a,*a2;
+           DataArrayDoubleTuple *aa,*aa2;
+           std::vector<double> bb,bb2;
            int sw;
            int spaceDim=self->getSpaceDimension();
            const double *centerPtr=convertObjToPossibleCpp5_Safe(center,sw,val,a,aa,bb,msg,1,spaceDim,true);
-           const double *vectorPtr=convertObjToPossibleCpp5_Safe(vector,sw,val,a,aa,bb,msg,1,spaceDim,false);
+           const double *vectorPtr=convertObjToPossibleCpp5_Safe(vector,sw,val2,a2,aa2,bb2,msg,1,spaceDim,false);//vectorPtr can be null in case of space dim 2
            self->rotate(centerPtr,vectorPtr,alpha);
          }
 

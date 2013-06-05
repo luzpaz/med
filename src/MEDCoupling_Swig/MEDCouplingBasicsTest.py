@@ -12730,6 +12730,17 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertAlmostEqual(float(tri32D.getMeasureField(False).getArray()),-0.67795240172962323,12)
         pass
 
+    # this bug 5/6/2013 is swig specific
+    def testSwigNonRegressionBugRotate3D1(self):
+        m=MEDCouplingUMesh.New()
+        dataArray=DataArrayDouble.New(100,3)
+        dataArray[:]=0.
+        dataArray[0]=[0.,1,3]
+        m.setCoords(dataArray[0])
+        m.rotate([0.,0.,3.],[1.,0.,0.],0.5*pi)
+        self.assertTrue(m.getCoords().isEqual(DataArrayDouble([0.,0.,4.],1,3),1e-15))
+        pass
+
     def setUp(self):
         pass
     pass
