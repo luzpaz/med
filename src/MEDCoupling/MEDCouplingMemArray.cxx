@@ -4070,8 +4070,8 @@ DataArrayDoubleIterator *DataArrayDouble::iterator() throw(INTERP_KERNEL::Except
 /*!
  * Returns a new DataArrayInt contating indices of tuples of \a this one-dimensional
  * array whose values are within a given range. Textual data is not copied.
- *  \param [in] vmin - a lowest acceptable value.
- *  \param [in] vmax - a greatest acceptable value.
+ *  \param [in] vmin - a lowest acceptable value (included).
+ *  \param [in] vmax - a greatest acceptable value (included).
  *  \return DataArrayInt * - the new instance of DataArrayInt.
  *          The caller is to delete this result array using decrRef() as it is no more
  *          needed.
@@ -8270,8 +8270,8 @@ void DataArrayInt::applyModulus(int val) throw(INTERP_KERNEL::Exception)
  * This method returns a newly allocated array storing stored ascendantly tuple ids in \b this so that
  * this[*id] in [\b vmin,\b vmax)
  * 
- * \param [in] vmin begin of range. This value is included in range.
- * \param [out] vmax end of range. This value is \b not included in range.
+ * \param [in] vmin begin of range. This value is included in range (included).
+ * \param [out] vmax end of range. This value is \b not included in range (excluded).
  * \return a newly allocated data array that the caller should deal with.
  */
 DataArrayInt *DataArrayInt::getIdsInRange(int vmin, int vmax) const throw(INTERP_KERNEL::Exception)
