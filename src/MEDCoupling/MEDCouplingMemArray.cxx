@@ -8542,14 +8542,13 @@ DataArrayInt *DataArrayInt::MakePartition(const std::vector<const DataArrayInt *
 
 /*!
  * Returns a new DataArrayInt which contains all elements of given one-dimensional
- * not negative arrays. The result array does not contain any duplicates and its values
+ * arrays. The result array does not contain any duplicates and its values
  * are sorted in ascending order.
  *  \param [in] arr - sequence of DataArrayInt's to unite.
  *  \return DataArrayInt * - a new instance of DataArrayInt. The caller is to delete this
  *         array using decrRef() as it is no more needed.
  *  \throw If any \a arr[i] is not allocated.
  *  \throw If \a arr[i]->getNumberOfComponents() != 1.
- *  \throw If any value of \a arr[i] is negative.
  */
 DataArrayInt *DataArrayInt::BuildUnion(const std::vector<const DataArrayInt *>& arr) throw(INTERP_KERNEL::Exception)
 {
@@ -8557,17 +8556,12 @@ DataArrayInt *DataArrayInt::BuildUnion(const std::vector<const DataArrayInt *>& 
   for(std::vector<const DataArrayInt *>::const_iterator it4=arr.begin();it4!=arr.end();it4++)
     if(*it4)
       a.push_back(*it4);
-  int valm=std::numeric_limits<int>::max();
   for(std::vector<const DataArrayInt *>::const_iterator it=a.begin();it!=a.end();it++)
     {
       (*it)->checkAllocated();
       if((*it)->getNumberOfComponents()!=1)
         throw INTERP_KERNEL::Exception("DataArrayInt::BuildUnion : only single component allowed !");
-      int tmp1;
-      valm=std::min((*it)->getMinValue(tmp1),valm);
     }
-  if(valm<0)
-    throw INTERP_KERNEL::Exception("DataArrayInt::BuildUnion : a negative value has been detected !");
   //
   std::set<int> r;
   for(std::vector<const DataArrayInt *>::const_iterator it=a.begin();it!=a.end();it++)
@@ -8584,14 +8578,13 @@ DataArrayInt *DataArrayInt::BuildUnion(const std::vector<const DataArrayInt *>& 
 
 /*!
  * Returns a new DataArrayInt which contains elements present in each of given one-dimensional
- * not negative arrays. The result array does not contain any duplicates and its values
+ * arrays. The result array does not contain any duplicates and its values
  * are sorted in ascending order.
  *  \param [in] arr - sequence of DataArrayInt's to intersect.
  *  \return DataArrayInt * - a new instance of DataArrayInt. The caller is to delete this
  *         array using decrRef() as it is no more needed.
  *  \throw If any \a arr[i] is not allocated.
  *  \throw If \a arr[i]->getNumberOfComponents() != 1.
- *  \throw If any value of \a arr[i] < 0.
  */
 DataArrayInt *DataArrayInt::BuildIntersection(const std::vector<const DataArrayInt *>& arr) throw(INTERP_KERNEL::Exception)
 {
@@ -8599,17 +8592,12 @@ DataArrayInt *DataArrayInt::BuildIntersection(const std::vector<const DataArrayI
   for(std::vector<const DataArrayInt *>::const_iterator it4=arr.begin();it4!=arr.end();it4++)
     if(*it4)
       a.push_back(*it4);
-  int valm=std::numeric_limits<int>::max();
   for(std::vector<const DataArrayInt *>::const_iterator it=a.begin();it!=a.end();it++)
     {
       (*it)->checkAllocated();
       if((*it)->getNumberOfComponents()!=1)
         throw INTERP_KERNEL::Exception("DataArrayInt::BuildIntersection : only single component allowed !");
-      int tmp1;
-      valm=std::min((*it)->getMinValue(tmp1),valm);
     }
-  if(valm<0)
-    throw INTERP_KERNEL::Exception("DataArrayInt::BuildIntersection : a negative value has been detected !");
   //
   std::set<int> r;
   for(std::vector<const DataArrayInt *>::const_iterator it=a.begin();it!=a.end();it++)
@@ -8735,7 +8723,7 @@ DataArrayInt *DataArrayInt::buildSubstractionOptimized(const DataArrayInt *other
 
 /*!
  * Returns a new DataArrayInt which contains all elements of \a this and a given
- * one-dimensional not negative arrays. The result array does not contain any duplicates
+ * one-dimensional arrays. The result array does not contain any duplicates
  * and its values are sorted in ascending order.
  *  \param [in] other - an array to unite with \a this one.
  *  \return DataArrayInt * - a new instance of DataArrayInt. The caller is to delete this
@@ -8743,7 +8731,6 @@ DataArrayInt *DataArrayInt::buildSubstractionOptimized(const DataArrayInt *other
  *  \throw If \a this or \a other is not allocated.
  *  \throw If \a this->getNumberOfComponents() != 1.
  *  \throw If \a other->getNumberOfComponents() != 1.
- *  \throw If any value of \a this or \a other is negative.
  */
 DataArrayInt *DataArrayInt::buildUnion(const DataArrayInt *other) const throw(INTERP_KERNEL::Exception)
 {
@@ -8755,7 +8742,7 @@ DataArrayInt *DataArrayInt::buildUnion(const DataArrayInt *other) const throw(IN
 
 /*!
  * Returns a new DataArrayInt which contains elements present in both \a this and a given
- * one-dimensional not negative arrays. The result array does not contain any duplicates
+ * one-dimensional arrays. The result array does not contain any duplicates
  * and its values are sorted in ascending order.
  *  \param [in] other - an array to intersect with \a this one.
  *  \return DataArrayInt * - a new instance of DataArrayInt. The caller is to delete this
@@ -8763,7 +8750,6 @@ DataArrayInt *DataArrayInt::buildUnion(const DataArrayInt *other) const throw(IN
  *  \throw If \a this or \a other is not allocated.
  *  \throw If \a this->getNumberOfComponents() != 1.
  *  \throw If \a other->getNumberOfComponents() != 1.
- *  \throw If any value of \a this or \a other is negative.
  */
 DataArrayInt *DataArrayInt::buildIntersection(const DataArrayInt *other) const throw(INTERP_KERNEL::Exception)
 {
