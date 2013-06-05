@@ -289,6 +289,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT double getMinValueInArray() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT double getMaxValue2(DataArrayInt*& tupleIds) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT double getMinValue2(DataArrayInt*& tupleIds) const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT int count(double value, double eps) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT double getAverageValue() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT double norm2() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT double normMax() const throw(INTERP_KERNEL::Exception);
@@ -515,6 +516,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT bool presenceOfTuple(const std::vector<int>& tupl) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT bool presenceOfValue(int value) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT bool presenceOfValue(const std::vector<int>& vals) const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT int count(int value) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void accumulate(int *res) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT int accumulate(int compId) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT int getMaxValue(int& tupleId) const throw(INTERP_KERNEL::Exception);

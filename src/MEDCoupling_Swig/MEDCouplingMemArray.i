@@ -238,6 +238,7 @@ namespace ParaMEDMEM
     double getMaxValueInArray() const throw(INTERP_KERNEL::Exception);
     double getMinValue(int& tupleId) const throw(INTERP_KERNEL::Exception);
     double getMinValueInArray() const throw(INTERP_KERNEL::Exception);
+    int count(double value, double eps) const throw(INTERP_KERNEL::Exception);
     double getAverageValue() const throw(INTERP_KERNEL::Exception);
     double norm2() const throw(INTERP_KERNEL::Exception);
     double normMax() const throw(INTERP_KERNEL::Exception);
@@ -2257,6 +2258,7 @@ namespace ParaMEDMEM
     bool presenceOfTuple(const std::vector<int>& tupl) const throw(INTERP_KERNEL::Exception);
     bool presenceOfValue(int value) const throw(INTERP_KERNEL::Exception);
     bool presenceOfValue(const std::vector<int>& vals) const throw(INTERP_KERNEL::Exception);
+    int count(int value) const throw(INTERP_KERNEL::Exception);
     void accumulate(int *res) const throw(INTERP_KERNEL::Exception);
     int accumulate(int compId) const throw(INTERP_KERNEL::Exception);
     int getMaxValue(int& tupleId) const throw(INTERP_KERNEL::Exception);

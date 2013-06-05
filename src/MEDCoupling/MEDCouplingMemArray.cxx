@@ -2948,6 +2948,29 @@ double DataArrayDouble::getMinValue2(DataArrayInt*& tupleIds) const throw(INTERP
 }
 
 /*!
+ * This method returns the number of values in \a this that are equals ( within an absolute precision of \a eps ) to input parameter \a value.
+ * This method only works for single component array.
+ *
+ * \return a value in [ 0, \c this->getNumberOfTuples() )
+ *
+ * \throw If \a this is not allocated
+ *
+ */
+int DataArrayDouble::count(double value, double eps) const throw(INTERP_KERNEL::Exception)
+{
+  int ret=0;
+  checkAllocated();
+  if(getNumberOfComponents()!=1)
+    throw INTERP_KERNEL::Exception("DataArrayDouble::count : must be applied on DataArrayDouble with only one component, you can call 'rearrange' method before !");
+  const double *vals=begin();
+  int nbOfTuples=getNumberOfTuples();
+  for(int i=0;i<nbOfTuples;i++,vals++)
+    if(fabs(*vals-value)<=eps)
+      ret++;
+  return ret;
+}
+
+/*!
  * Returns the average value of \a this one-dimensional array.
  *  \return double - the average value over all values of \a this array.
  *  \throw If \a this->getNumberOfComponents() != 1
@@ -7918,6 +7941,29 @@ int DataArrayInt::locateValue(const std::vector<int>& vals) const throw(INTERP_K
 }
 
 /*!
+ * This method returns the number of values in \a this that are equals to input parameter \a value.
+ * This method only works for single component array.
+ *
+ * \return a value in [ 0, \c this->getNumberOfTuples() )
+ *
+ * \throw If \a this is not allocated
+ *
+ */
+int DataArrayInt::count(int value) const throw(INTERP_KERNEL::Exception)
+{
+  int ret=0;
+  checkAllocated();
+  if(getNumberOfComponents()!=1)
+    throw INTERP_KERNEL::Exception("DataArrayInt::count : must be applied on DataArrayInt with only one component, you can call 'rearrange' method before !");
+  const int *vals=begin();
+  int nbOfTuples=getNumberOfTuples();
+  for(int i=0;i<nbOfTuples;i++,vals++)
+    if(*vals==value)
+      ret++;
+  return ret;
+}
+
+/*!
  * This method is an extension of DataArrayInt::presenceOfValue method because this method works for DataArrayInt with
  * any number of components excepted 0 (an INTERP_KERNEL::Exception is thrown in this case).
  * This method searches in \b this is there is a tuple that matched the input parameter \b tupl.
@@ -8063,7 +8109,7 @@ DataArrayInt *DataArrayInt::Aggregate(const std::vector<const DataArrayInt *>& a
 /*!
  * Returns the maximal value and its location within \a this one-dimensional array.
  *  \param [out] tupleId - index of the tuple holding the maximal value.
- *  \return double - the maximal value among all values of \a this array.
+ *  \return int - the maximal value among all values of \a this array.
  *  \throw If \a this->getNumberOfComponents() != 1
  *  \throw If \a this->getNumberOfTuples() < 1
  */
