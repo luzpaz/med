@@ -99,10 +99,14 @@ class MEDLoaderSplitter:
         m=mfm.getMeshAtLevel(0)
         for ret,ids in zip(ret0,idsLst):
             mlPart=mfm.createNewEmpty()
-            mPart=m[ids] ; mPart.zipCoords()
+            mPart=m[ids] ; trad=mPart.zipCoordsTraducer()
+            trad=trad.invertArrayO2N2N2O(mPart.getNumberOfNodes())
             mlPart.setMeshAtLevel(0,mPart)
             if 0 in mfm.getFamArrNonEmptyLevelsExt():
                 mlPart.setFamilyFieldArr(0,mfm.getFamilyFieldAtLevel(0)[ids])
+                pass
+            if 1 in mfm.getFamArrNonEmptyLevelsExt():
+                mlPart.setFamilyFieldArr(1,mfm.getFamilyFieldAtLevel(1)[trad])
                 pass
             mlPart.copyFamGrpMapsFrom(mfm)
             ret.pushMesh(mlPart)
