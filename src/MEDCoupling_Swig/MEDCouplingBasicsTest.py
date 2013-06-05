@@ -12741,6 +12741,53 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(m.getCoords().isEqual(DataArrayDouble([0.,0.,4.],1,3),1e-15))
         pass
 
+    def testSwig2DataArrayCount1(self):
+        d=DataArrayInt([])
+        self.assertEqual(0,d.getNumberOfTuples())
+        self.assertEqual(1,d.getNumberOfComponents())
+        self.assertEqual(0,d.count(0))
+        self.assertEqual(0,d.count(1))
+        self.assertEqual(0,d.count(-1))
+        d=DataArrayInt([2,1,-2,-3,2,0,0,7,2,-2,3,0])
+        self.assertEqual(12,d.getNumberOfTuples())
+        self.assertEqual(1,d.getNumberOfComponents())
+        self.assertEqual(3,d.count(0))
+        self.assertEqual(1,d.count(1))
+        self.assertEqual(0,d.count(-1))
+        self.assertEqual(2,d.count(-2))
+        self.assertEqual(3,d.count(2))
+        e=d.getDifferentValues()
+        f=DataArrayInt()
+        for it in e:
+            f.pushBackSilent(d.count(int(it)))
+            pass
+        self.assertEqual(12,f.accumulate()[0])
+        #
+        eps=1e-12
+        d=DataArrayDouble([])
+        self.assertEqual(0,d.getNumberOfTuples())
+        self.assertEqual(1,d.getNumberOfComponents())
+        self.assertEqual(0,d.count(0,eps))
+        self.assertEqual(0,d.count(1,eps))
+        self.assertEqual(0,d.count(-1,eps))
+        d=DataArrayDouble([2,1,-2,-3,2,0,eps/10,7,2+eps/10,-2,3,0])
+        self.assertEqual(12,d.getNumberOfTuples())
+        self.assertEqual(1,d.getNumberOfComponents())
+        self.assertEqual(3,d.count(0,eps))
+        self.assertEqual(1,d.count(1,eps))
+        self.assertEqual(0,d.count(-1,eps))
+        self.assertEqual(2,d.count(-2,eps))
+        self.assertEqual(3,d.count(2,eps))
+        self.assertEqual(3,d.count(2,eps))
+        self.assertEqual(2,d.count(2,eps/100))
+        e=d.getDifferentValues(eps)
+        f=DataArrayInt()
+        for it in e:
+            f.pushBackSilent(d.count(float(it),eps))
+            pass
+        self.assertEqual(12,f.accumulate()[0])
+        pass
+
     def setUp(self):
         pass
     pass
