@@ -1265,7 +1265,7 @@ DataArrayInt *MEDFileMesh::computeAllFamilyIdsInUse() const throw(INTERP_KERNEL:
       const DataArrayInt *arr=getFamilyFieldAtLevel(*it);//arr not null due to spec of getFamArrNonEmptyLevelsExt
       MEDCouplingAutoRefCountObjectPtr<DataArrayInt> dv=arr->getDifferentValues();
       if((DataArrayInt *) ret)
-        ret=dv->buildUnion(arr);
+        ret=dv->buildUnion(ret);
       else
         ret=dv;
     }
