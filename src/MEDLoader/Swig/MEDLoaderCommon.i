@@ -84,6 +84,7 @@ using namespace ParaMEDMEM;
 %newobject ParaMEDMEM::MEDFileMesh::getNodeFamilyArr;
 %newobject ParaMEDMEM::MEDFileMesh::getNodeFamiliesArr;
 %newobject ParaMEDMEM::MEDFileMesh::getAllFamiliesIdsReferenced;
+%newobject ParaMEDMEM::MEDFileMesh::computeAllFamilyIdsInUse;
 %newobject ParaMEDMEM::MEDFileUMesh::New;
 %newobject ParaMEDMEM::MEDFileUMesh::getCoords;
 %newobject ParaMEDMEM::MEDFileUMesh::getGroup;
@@ -441,8 +442,11 @@ namespace ParaMEDMEM
     std::vector<std::string> getGroupsNames() const throw(INTERP_KERNEL::Exception);
     std::vector<std::string> getFamiliesNames() const throw(INTERP_KERNEL::Exception);
     void assignFamilyNameWithGroupName() throw(INTERP_KERNEL::Exception);
+    std::vector<std::string> removeEmptyGroups() throw(INTERP_KERNEL::Exception);
     void removeGroup(const char *name) throw(INTERP_KERNEL::Exception);
     void removeFamily(const char *name) throw(INTERP_KERNEL::Exception);
+    std::vector<std::string> removeOrphanGroups() throw(INTERP_KERNEL::Exception);
+    std::vector<std::string> removeOrphanFamilies() throw(INTERP_KERNEL::Exception);
     void changeGroupName(const char *oldName, const char *newName) throw(INTERP_KERNEL::Exception);
     void changeFamilyName(const char *oldName, const char *newName) throw(INTERP_KERNEL::Exception);
     void changeFamilyId(int oldId, int newId) throw(INTERP_KERNEL::Exception);
@@ -460,6 +464,7 @@ namespace ParaMEDMEM
     virtual int getMaxFamilyIdInArrays() const throw(INTERP_KERNEL::Exception);
     virtual int getMinFamilyIdInArrays() const throw(INTERP_KERNEL::Exception);
     DataArrayInt *getAllFamiliesIdsReferenced() const throw(INTERP_KERNEL::Exception);
+    DataArrayInt *computeAllFamilyIdsInUse() const throw(INTERP_KERNEL::Exception);
     std::vector<int> getFamiliesIds(const std::vector<std::string>& famNames) const throw(INTERP_KERNEL::Exception);
     std::string getFamilyNameGivenId(int id) const throw(INTERP_KERNEL::Exception);
     bool ensureDifferentFamIdsPerLevel() throw(INTERP_KERNEL::Exception);

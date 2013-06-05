@@ -486,6 +486,27 @@ void MEDFileMesh::assignFamilyNameWithGroupName() throw(INTERP_KERNEL::Exception
 }
 
 /*!
+ * Removes all groups lying on no family. If there is no empty groups, \a this is let untouched.
+ * 
+ * \return the removed groups.
+ */
+std::vector<std::string> MEDFileMesh::removeEmptyGroups() throw(INTERP_KERNEL::Exception)
+{
+  std::vector<std::string> ret;
+  std::map<std::string, std::vector<std::string> > newGrps;
+  for(std::map<std::string, std::vector<std::string> >::const_iterator it=_groups.begin();it!=_groups.end();it++)
+    {
+      if((*it).second.empty())
+        ret.push_back((*it).first);
+      else
+        newGrps[(*it).first]=(*it).second;
+    }
+  if(!ret.empty())
+    _groups=newGrps;
+  return ret;
+}
+
+/*!
  * Removes a group from \a this mesh.
  *  \param [in] name - the name of the group to remove.
  *  \throw If no group with such a \a name exists.
@@ -528,6 +549,62 @@ void MEDFileMesh::removeFamily(const char *name) throw(INTERP_KERNEL::Exception)
       if(it4!=v.end())
         v.erase(it4);
     }
+}
+
+/*!
+ * Removes all groups in \a this that are orphan. A group is orphan if this group lies on
+ * a set of families, themselves orphan. A family is said orphan if its id appears nowhere in
+ * family field whatever its level. This method also suppresses the orphan families.
+ * 
+ * \return - The list of removed groups names. 
+ *
+ * \sa MEDFileMesh::removeOrphanFamilies.
+ */
+std::vector<std::string> MEDFileMesh::removeOrphanGroups() throw(INTERP_KERNEL::Exception)
+{
+  removeOrphanFamilies();
+  return removeEmptyGroups();
+}
+
+/*!
+ * Removes all families in \a this that are orphan. A family is said orphan if its id appears nowhere in
+ * family field whatever its level. Groups are updated in consequence, that is to say all groups lying on orphan family, will see their families list modified.
+ * 
+ * \return - The list of removed families names.
+ * \sa MEDFileMesh::removeOrphanGroups.
+ */
+std::vector<std::string> MEDFileMesh::removeOrphanFamilies() throw(INTERP_KERNEL::Exception)
+{
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> allFamIdsInUse=computeAllFamilyIdsInUse();
+  std::vector<std::string> ret;
+  if(!((DataArrayInt*)allFamIdsInUse))
+    {
+      ret=getFamiliesNames();
+      _families.clear(); _groups.clear();
+      return ret;
+    }
+  std::map<std::string,int> famMap;
+  std::map<std::string, std::vector<std::string> > grps(_groups);
+  for(std::map<std::string,int>::const_iterator it=_families.begin();it!=_families.end();it++)
+    {
+      if(allFamIdsInUse->presenceOfValue((*it).second))
+        famMap[(*it).first]=(*it).second;
+      else
+        {
+          ret.push_back((*it).first);
+          std::vector<std::string> grpsOnEraseFam=getGroupsOnFamily((*it).first.c_str());
+          for(std::vector<std::string>::const_iterator it2=grpsOnEraseFam.begin();it2!=grpsOnEraseFam.end();it2++)
+            {
+              std::map<std::string, std::vector<std::string> >::iterator it3=grps.find(*it2);//it3!=grps.empty() thanks to copy
+              std::vector<std::string>& famv=(*it3).second;
+              std::vector<std::string>::iterator it4=std::find(famv.begin(),famv.end(),(*it).first);//it4!=famv.end() thanks to copy
+              famv.erase(it4);
+            }
+        }
+    }
+  if(!ret.empty())
+    { _families=famMap; _groups=grps; }
+  return ret;
 }
 
 /*!
@@ -1158,6 +1235,11 @@ int MEDFileMesh::getTheMinFamilyId() const throw(INTERP_KERNEL::Exception)
   return std::min(m1,m2);
 }
 
+/*!
+ * This method only considers the maps. The contain of family array is ignored here.
+ * 
+ * \sa MEDFileMesh::computeAllFamilyIdsInUse
+ */
 DataArrayInt *MEDFileMesh::getAllFamiliesIdsReferenced() const throw(INTERP_KERNEL::Exception)
 {
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New();
@@ -1166,6 +1248,27 @@ DataArrayInt *MEDFileMesh::getAllFamiliesIdsReferenced() const throw(INTERP_KERN
     v.insert((*it).second);
   ret->alloc((int)v.size(),1);
   std::copy(v.begin(),v.end(),ret->getPointer());
+  return ret.retn();
+}
+
+/*!
+ * This method does not consider map of family name, family id. Only family field array on different levels is considered.
+ * 
+ * \sa MEDFileMesh::getAllFamiliesIdsReferenced
+ */
+DataArrayInt *MEDFileMesh::computeAllFamilyIdsInUse() const throw(INTERP_KERNEL::Exception)
+{
+  std::vector<int> famLevs=getFamArrNonEmptyLevelsExt();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret;
+  for(std::vector<int>::const_iterator it=famLevs.begin();it!=famLevs.end();it++)
+    {
+      const DataArrayInt *arr=getFamilyFieldAtLevel(*it);//arr not null due to spec of getFamArrNonEmptyLevelsExt
+      MEDCouplingAutoRefCountObjectPtr<DataArrayInt> dv=arr->getDifferentValues();
+      if((DataArrayInt *) ret)
+        ret=dv->buildUnion(arr);
+      else
+        ret=dv;
+    }
   return ret.retn();
 }
 
