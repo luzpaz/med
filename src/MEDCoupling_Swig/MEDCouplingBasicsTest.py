@@ -12737,8 +12737,19 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         dataArray[:]=0.
         dataArray[0]=[0.,1,3]
         m.setCoords(dataArray[0])
+        m1=m.deepCpy()
         m.rotate([0.,0.,3.],[1.,0.,0.],0.5*pi)
         self.assertTrue(m.getCoords().isEqual(DataArrayDouble([0.,0.,4.],1,3),1e-15))
+        #
+        d1=DataArrayDouble([0.,0.,3.],1,3) ; d2=DataArrayDouble([1.,0.,0.],1,3)
+        pts=[[0.,0.,3.],[(0.,0.,3.)],DataArrayDouble([0.,0.,3.],1,3),list(d1)[0]]
+        vec=[[1.,0.,0.],[(1.,0.,0.)],DataArrayDouble([1.,0.,0.],1,3),list(d2)[0]]
+        for p in pts:
+            for v in vec:
+                m2=m1.deepCpy()
+                m2.rotate(p,v,0.5*pi)
+                self.assertTrue(m2.getCoords().isEqual(DataArrayDouble([0.,0.,4.],1,3),1e-15))
+                pass
         pass
 
     def testSwig2DataArrayCount1(self):
