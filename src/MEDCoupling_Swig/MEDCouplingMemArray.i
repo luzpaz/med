@@ -318,7 +318,6 @@ namespace ParaMEDMEM
     double getAverageValue() const throw(INTERP_KERNEL::Exception);
     double norm2() const throw(INTERP_KERNEL::Exception);
     double normMax() const throw(INTERP_KERNEL::Exception);
-    void accumulate(double *res) const throw(INTERP_KERNEL::Exception);
     double accumulate(int compId) const throw(INTERP_KERNEL::Exception);
     DataArrayDouble *fromPolarToCart() const throw(INTERP_KERNEL::Exception);
     DataArrayDouble *fromCylToCart() const throw(INTERP_KERNEL::Exception);
@@ -790,6 +789,14 @@ namespace ParaMEDMEM
         INTERP_KERNEL::AutoPtr<double> tmp=new double[sz];
         self->accumulate(tmp);
         return convertDblArrToPyList(tmp,sz);
+      }
+
+      DataArrayDouble *accumulatePerChunck(PyObject *indexArr) const throw(INTERP_KERNEL::Exception)
+      {
+        int sw,sz,val;
+        std::vector<int> val2;
+        const int *bg=convertObjToPossibleCpp1_Safe(indexArr,sw,sz,val,val2);
+        return self->accumulatePerChunck(bg,bg+sz);
       }
 
       PyObject *findCommonTuples(double prec, int limitNodeId=-1) const throw(INTERP_KERNEL::Exception)
@@ -2335,7 +2342,6 @@ namespace ParaMEDMEM
     bool presenceOfValue(int value) const throw(INTERP_KERNEL::Exception);
     bool presenceOfValue(const std::vector<int>& vals) const throw(INTERP_KERNEL::Exception);
     int count(int value) const throw(INTERP_KERNEL::Exception);
-    void accumulate(int *res) const throw(INTERP_KERNEL::Exception);
     int accumulate(int compId) const throw(INTERP_KERNEL::Exception);
     int getMaxValue(int& tupleId) const throw(INTERP_KERNEL::Exception);
     int getMaxValueInArray() const throw(INTERP_KERNEL::Exception);

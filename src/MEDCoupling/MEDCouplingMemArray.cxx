@@ -3145,6 +3145,66 @@ double DataArrayDouble::accumulate(int compId) const throw(INTERP_KERNEL::Except
 }
 
 /*!
+ * This method accumulate using addition tuples in \a this using input index array [ \a bgOfIndex, \a endOfIndex ).
+ * The returned array will have same number of components than \a this and number of tuples equal to
+ * \c std::distance(bgOfIndex,endOfIndex) \b minus \b one.
+ *
+ * The input index array is expected to be ascendingly sorted in which the all referenced ids should be in [0, \c this->getNumberOfTuples).
+ * This method is quite useful for users that need to put a field on cells to field on nodes on the same mesh without a need of conservation.
+ *
+ * \param [in] bgOfIndex - begin (included) of the input index array.
+ * \param [in] endOfIndex - end (excluded) of the input index array.
+ * \return DataArrayDouble * - the new instance having the same number of components than \a this.
+ * 
+ * \throw If bgOfIndex or end is NULL.
+ * \throw If input index array is not ascendingly sorted.
+ * \throw If there is an id in [ \a bgOfIndex, \a endOfIndex ) not in [0, \c this->getNumberOfTuples).
+ * \throw If std::distance(bgOfIndex,endOfIndex)==0.
+ */
+DataArrayDouble *DataArrayDouble::accumulatePerChunck(const int *bgOfIndex, const int *endOfIndex) const throw(INTERP_KERNEL::Exception)
+{
+  if(!bgOfIndex || !endOfIndex)
+    throw INTERP_KERNEL::Exception("DataArrayDouble::accumulatePerChunck : input pointer NULL !");
+  checkAllocated();
+  int nbCompo=getNumberOfComponents();
+  int nbOfTuples=getNumberOfTuples();
+  int sz=(int)std::distance(bgOfIndex,endOfIndex);
+  if(sz<1)
+    throw INTERP_KERNEL::Exception("DataArrayDouble::accumulatePerChunck : invalid size of input index array !");
+  sz--;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayDouble> ret=DataArrayDouble::New(); ret->alloc(sz,nbCompo);
+  const int *w=bgOfIndex;
+  if(*w<0 || *w>=nbOfTuples)
+    throw INTERP_KERNEL::Exception("DataArrayDouble::accumulatePerChunck : The first element of the input index not in [0,nbOfTuples) !");
+  const double *srcPt=begin()+(*w)*nbCompo;
+  double *tmp=ret->getPointer();
+  for(int i=0;i<sz;i++,tmp+=nbCompo,w++)
+    {
+      std::fill(tmp,tmp+nbCompo,0.);
+      if(w[1]>=w[0])
+        {
+          for(int j=w[0];j<w[1];j++,srcPt+=nbCompo)
+            {
+              if(j>=0 && j<nbOfTuples)
+                std::transform(srcPt,srcPt+nbCompo,tmp,tmp,std::plus<double>());
+              else
+                {
+                  std::ostringstream oss; oss << "DataArrayDouble::accumulatePerChunck : At rank #" << i << " the input index array points to id " << j << " should be in [0," << nbOfTuples << ") !";
+                  throw INTERP_KERNEL::Exception(oss.str().c_str());
+                }
+            }
+        }
+      else
+        {
+          std::ostringstream oss; oss << "DataArrayDouble::accumulatePerChunck : At rank #" << i << " the input index array is not in ascendingly sorted.";
+          throw INTERP_KERNEL::Exception(oss.str().c_str());
+        }
+    }
+  ret->copyStringInfoFrom(*this);
+  return ret.retn();
+}
+
+/*!
  * Converts each 2D point defined by the tuple of \a this array from the Polar to the
  * Cartesian coordinate system. The two components of the tuple of \a this array are 
  * considered to contain (1) radius and (2) angle of the point in the Polar CS.

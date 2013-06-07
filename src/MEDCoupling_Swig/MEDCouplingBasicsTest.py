@@ -12891,6 +12891,50 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertEqual(d.getSlice(s,3,4),slice(5,2,-2))
         pass
 
+    def testSwig2AccumulatePerChunk1(self):
+        arr=DataArrayDouble(11) ; arr.iota()
+        m=MEDCouplingCMesh() ; m.setCoords(arr,arr)
+        m=m.buildUnstructured()
+        m0=m[::2] ; ids0=m0.simplexize(0) ; m1=m[1::2]
+        m=MEDCouplingUMesh.MergeUMeshesOnSameCoords(m0,m1) ; m.setName("mesh")
+        m.checkConsecutiveCellTypesForMEDFileFrmt()
+        #
+        formula="7-sqrt((x-5.)*(x-5.)+(y-5.)*(y-5.))"
+        f=MEDCouplingFieldDouble(ON_CELLS,ONE_TIME) ; f.setMesh(m)
+        f.fillFromAnalytic(1,formula)
+        f.setName("Field1") ; f.setTime(1.1,1,-1)
+        f.checkCoherency()
+        #
+        arr=f.getArray()
+        arr2=DataArrayDouble(len(arr),2) ; arr2[:,0]=arr
+        arr2=DataArrayDouble(len(arr),2) ; arr2[:,0]=arr ; arr2[:,1]=2*arr
+        f.setArray(arr2)
+        f.checkCoherency()
+        # here the compact code to obviously put field on cell to nodes
+        rn,rni=f.getMesh().getReverseNodalConnectivity()
+        arr2=f.getArray()[rn]
+        arr4=arr2.accumulatePerChunck(rni)
+        nbOfCellsSharingNodes=rni.deltaShiftIndex()
+        arr4/=nbOfCellsSharingNodes.convertToDblArr()
+        #
+        maxNbCSN=nbOfCellsSharingNodes.getMaxValue()[0]
+        arr3=DataArrayDouble(f.getMesh().getNumberOfNodes(),f.getArray().getNumberOfComponents()) ; arr3[:]=0.
+        for i in xrange(1,maxNbCSN+1):
+            ids=nbOfCellsSharingNodes.getIdsEqual(i)
+            if len(ids)==0:
+                continue
+            for j in range(i):
+                rni2=rni[ids] ; rni2+=j
+                arr3[ids]+=arr2[rni2]
+                pass
+            arr3[ids]/=i
+            pass
+        fNode=MEDCouplingFieldDouble(ON_NODES,ONE_TIME) ; fNode.setMesh(m)
+        fNode.setName("Field1Node") ; fNode.setTime(1.1,1,-1)
+        fNode.setArray(arr3) ; fNode.checkCoherency()
+        self.assertTrue(arr3.isEqual(arr4,1e-12))
+        pass
+
     def setUp(self):
         pass
     pass
