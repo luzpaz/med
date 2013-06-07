@@ -176,6 +176,60 @@ namespace ParaMEDMEM
         DataArray *ret=self->keepSelectedComponents(tmp);
         return convertDataArray(ret,SWIG_POINTER_OWN | 0 );
       }
+
+      static PyObject *GetSlice(PyObject *slic, int sliceId, int nbOfSlices) throw(INTERP_KERNEL::Exception)
+      {
+        if(!PySlice_Check(slic))
+          throw INTERP_KERNEL::Exception("DataArray::GetSlice (wrap) : expecting a pyslice as second (first) parameter !");
+        Py_ssize_t strt=2,stp=2,step=2;
+        PySliceObject *sly=reinterpret_cast<PySliceObject *>(slic);
+        if(PySlice_GetIndices(sly,std::numeric_limits<int>::max(),&strt,&stp,&step)!=0)
+          throw INTERP_KERNEL::Exception("DataArray::GetSlice (wrap) : the input slice is invalid !");
+        if(strt==std::numeric_limits<int>::max() || stp==std::numeric_limits<int>::max())
+          throw INTERP_KERNEL::Exception("DataArray::GetSlice (wrap) : the input slice contains some unknowns that can't be determined in static method ! Call DataArray::getSlice (non static) instead !");
+        int a,b;
+        DataArray::GetSlice(strt,stp,step,sliceId,nbOfSlices,a,b);
+        return PySlice_New(PyInt_FromLong(a),PyInt_FromLong(b),PyInt_FromLong(step));
+      }
+
+      PyObject *getSlice(PyObject *slic, int sliceId, int nbOfSlices) const throw(INTERP_KERNEL::Exception)
+      {
+        if(!PySlice_Check(slic))
+          throw INTERP_KERNEL::Exception("DataArray::getSlice (wrap) : expecting a pyslice as second (first) parameter !");
+        Py_ssize_t strt=2,stp=2,step=2;
+        PySliceObject *sly=reinterpret_cast<PySliceObject *>(slic);
+        if(PySlice_GetIndices(sly,self->getNumberOfTuples(),&strt,&stp,&step)!=0)
+          throw INTERP_KERNEL::Exception("DataArray::getSlice (wrap) : the input slice is invalid !");
+        int a,b;
+        DataArray::GetSlice(strt,stp,step,sliceId,nbOfSlices,a,b);
+        return PySlice_New(PyInt_FromLong(a),PyInt_FromLong(b),PyInt_FromLong(step));
+      }
+
+      static int GetNumberOfItemGivenBES(PyObject *slic) throw(INTERP_KERNEL::Exception)
+      {
+        if(!PySlice_Check(slic))
+          throw INTERP_KERNEL::Exception("DataArray::GetNumberOfItemGivenBES (wrap) : expecting a pyslice as second (first) parameter !");
+        Py_ssize_t strt=2,stp=2,step=2;
+        PySliceObject *sly=reinterpret_cast<PySliceObject *>(slic);
+        if(PySlice_GetIndices(sly,std::numeric_limits<int>::max(),&strt,&stp,&step)!=0)
+          throw INTERP_KERNEL::Exception("DataArray::GetNumberOfItemGivenBES (wrap) : the input slice is invalid !");
+        if(strt==std::numeric_limits<int>::max() || stp==std::numeric_limits<int>::max())
+          throw INTERP_KERNEL::Exception("DataArray::GetNumberOfItemGivenBES (wrap) : the input slice contains some unknowns that can't be determined in static method !");
+        return DataArray::GetNumberOfItemGivenBES(strt,stp,step,"");
+      }
+
+      static int GetNumberOfItemGivenBESRelative(PyObject *slic) throw(INTERP_KERNEL::Exception)
+      {
+        if(!PySlice_Check(slic))
+          throw INTERP_KERNEL::Exception("DataArray::GetNumberOfItemGivenBESRelative (wrap) : expecting a pyslice as second (first) parameter !");
+        Py_ssize_t strt=2,stp=2,step=2;
+        PySliceObject *sly=reinterpret_cast<PySliceObject *>(slic);
+        if(PySlice_GetIndices(sly,std::numeric_limits<int>::max(),&strt,&stp,&step)!=0)
+          throw INTERP_KERNEL::Exception("DataArray::GetNumberOfItemGivenBESRelative (wrap) : the input slice is invalid !");
+        if(strt==std::numeric_limits<int>::max() || stp==std::numeric_limits<int>::max())
+          throw INTERP_KERNEL::Exception("DataArray::GetNumberOfItemGivenBESRelative (wrap) : the input slice contains some unknowns that can't be determined in static method !");
+        return DataArray::GetNumberOfItemGivenBESRelative(strt,stp,step,"");
+      }
     }
   };
   

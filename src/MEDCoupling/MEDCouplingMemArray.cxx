@@ -514,6 +514,45 @@ void DataArray::CheckClosingParInRange(int ref, int value, const char *msg) thro
     }
 }
 
+/*!
+ * This method is useful to slice work among a pool of threads or processes. \a begin, \a end \a step is the input whole slice of work to perform, 
+ * typically it is a whole slice of tuples of DataArray or cells, nodes of a mesh...
+ *
+ * The input \a sliceId should be an id in [0, \a nbOfSlices) that specifies the slice of work.
+ *
+ * \param [in] start - the start of the input slice of the whole work to perform splitted into slices.
+ * \param [in] stop - the stop of the input slice of the whole work to perform splitted into slices.
+ * \param [in] step - the step (that can be <0) of the input slice of the whole work to perform splitted into slices.
+ * \param [in] sliceId - the slice id considered
+ * \param [in] nbOfSlices - the number of slices (typically the number of cores on which the work is expected to be sliced)
+ * \param [out] startSlice - the start of the slice considered
+ * \param [out] stopSlice - the stop of the slice consided
+ * 
+ * \throw If \a step == 0
+ * \throw If \a nbOfSlices not > 0
+ * \throw If \a sliceId not in [0,nbOfSlices)
+ */
+void DataArray::GetSlice(int start, int stop, int step, int sliceId, int nbOfSlices, int& startSlice, int& stopSlice) throw(INTERP_KERNEL::Exception)
+{
+  if(nbOfSlices<=0)
+    {
+      std::ostringstream oss; oss << "DataArray::GetSlice : nbOfSlices (" << nbOfSlices << ") must be > 0 !";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
+    }
+  if(sliceId<0 || sliceId>=nbOfSlices)
+    {
+      std::ostringstream oss; oss << "DataArray::GetSlice : sliceId (" << nbOfSlices << ") must be in [0 , nbOfSlices (" << nbOfSlices << ") ) !";
+      throw INTERP_KERNEL::Exception(oss.str().c_str());
+    }
+  int nbElems=GetNumberOfItemGivenBESRelative(start,stop,step,"DataArray::GetSlice");
+  int minNbOfElemsPerSlice=nbElems/nbOfSlices;
+  startSlice=start+minNbOfElemsPerSlice*step*sliceId;
+  if(sliceId<nbOfSlices-1)
+    stopSlice=start+minNbOfElemsPerSlice*step*(sliceId+1);
+  else
+    stopSlice=stop;
+}
+
 int DataArray::GetNumberOfItemGivenBES(int begin, int end, int step, const char *msg) throw(INTERP_KERNEL::Exception)
 {
   if(end<begin)
