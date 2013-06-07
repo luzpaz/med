@@ -8026,7 +8026,7 @@ void MEDCouplingUMesh::ComputeVecAndPtOfFace(double eps, const double *coords, c
   std::size_t nbPoints=std::distance(begin,end);
   if(nbPoints<3)
     throw INTERP_KERNEL::Exception("MEDCouplingUMesh::ComputeVecAndPtOfFace : < of 3 points in face ! not able to find a plane on that face !");
-  double vec[3];
+  double vec[3]={0.,0.,0.};
   std::size_t j=0;
   bool refFound=false;
   for(;j<nbPoints-1 && !refFound;j++)
@@ -8811,7 +8811,7 @@ bool MEDCouplingUMesh::BuildConvexEnvelopOf2DCellJarvis(const double *coords, co
           int nextNode=-1;
           int prevNode=-1;
           double resRef;
-          double angleNext;
+          double angleNext=0.;
           while(nextNode!=startNode)
             {
               nextNode=-1;
