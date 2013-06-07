@@ -12799,6 +12799,98 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertEqual(12,f.accumulate()[0])
         pass
 
+    def testSwig2DataArrayGetSlice1(self):
+        s=slice(2,18,1)
+        self.assertEqual(DataArray.GetNumberOfItemGivenBESRelative(s),16)
+        self.assertEqual(DataArray.GetNumberOfItemGivenBES(s),16)
+        self.assertEqual(DataArray.GetSlice(s,0,4),slice(2,6,1))
+        self.assertEqual(DataArray.GetSlice(s,1,4),slice(6,10,1))
+        self.assertEqual(DataArray.GetSlice(s,2,4),slice(10,14,1))
+        self.assertEqual(DataArray.GetSlice(s,3,4),slice(14,18,1))
+        #
+        s=slice(2,18,2)
+        self.assertEqual(DataArray.GetNumberOfItemGivenBESRelative(s),8)
+        self.assertEqual(DataArray.GetNumberOfItemGivenBES(s),8)
+        self.assertEqual(DataArray.GetSlice(s,0,4),slice(2,6,2))
+        self.assertEqual(DataArray.GetSlice(s,1,4),slice(6,10,2))
+        self.assertEqual(DataArray.GetSlice(s,2,4),slice(10,14,2))
+        self.assertEqual(DataArray.GetSlice(s,3,4),slice(14,18,2))
+        #
+        s=slice(1,18,1)
+        self.assertEqual(DataArray.GetSlice(s,0,4),slice(1,5,1))
+        self.assertEqual(DataArray.GetSlice(s,1,4),slice(5,9,1))
+        self.assertEqual(DataArray.GetSlice(s,2,4),slice(9,13,1))
+        self.assertEqual(DataArray.GetSlice(s,3,4),slice(13,18,1))# 18 not 17
+        #
+        s=slice(1,18,2)
+        self.assertEqual(DataArray.GetNumberOfItemGivenBESRelative(s),9)
+        self.assertEqual(DataArray.GetNumberOfItemGivenBES(s),9)
+        self.assertEqual(DataArray.GetSlice(s,0,4),slice(1,5,2))
+        self.assertEqual(DataArray.GetSlice(s,1,4),slice(5,9,2))
+        self.assertEqual(DataArray.GetSlice(s,2,4),slice(9,13,2))
+        self.assertEqual(DataArray.GetSlice(s,3,4),slice(13,18,2))# 18 not 17
+        #
+        s=slice(18,2,-1)
+        self.assertEqual(DataArray.GetSlice(s,0,4),slice(18,14,-1))
+        self.assertEqual(DataArray.GetSlice(s,1,4),slice(14,10,-1))
+        self.assertEqual(DataArray.GetSlice(s,2,4),slice(10,6,-1))
+        self.assertEqual(DataArray.GetSlice(s,3,4),slice(6,2,-1))
+        #
+        s=slice(18,2,-2)
+        self.assertEqual(DataArray.GetSlice(s,0,4),slice(18,14,-2))
+        self.assertEqual(DataArray.GetSlice(s,1,4),slice(14,10,-2))
+        self.assertEqual(DataArray.GetSlice(s,2,4),slice(10,6,-2))
+        self.assertEqual(DataArray.GetSlice(s,3,4),slice(6,2,-2))
+        #
+        s=slice(18,1,-1)
+        self.assertEqual(DataArray.GetSlice(s,0,4),slice(18,14,-1))
+        self.assertEqual(DataArray.GetSlice(s,1,4),slice(14,10,-1))
+        self.assertEqual(DataArray.GetSlice(s,2,4),slice(10,6,-1))
+        self.assertEqual(DataArray.GetSlice(s,3,4),slice(6,1,-1))# 1 not 2
+        #
+        s=slice(18,1,-2)
+        self.assertEqual(DataArray.GetNumberOfItemGivenBESRelative(s),9)
+        self.assertRaises(InterpKernelException,DataArray.GetNumberOfItemGivenBES,s)
+        self.assertEqual(sum([DataArray.GetNumberOfItemGivenBESRelative(DataArray.GetSlice(s,i,4)) for i in xrange(4)]),DataArray.GetNumberOfItemGivenBESRelative(s))
+        self.assertEqual(DataArray.GetSlice(s,0,4),slice(18,14,-2))
+        self.assertEqual(DataArray.GetSlice(s,1,4),slice(14,10,-2))
+        self.assertEqual(DataArray.GetSlice(s,2,4),slice(10,6,-2))
+        self.assertEqual(DataArray.GetSlice(s,3,4),slice(6,1,-2))# 1 not 2
+        self.assertRaises(InterpKernelException,DataArray.GetSlice,slice(0,None,2),0,4)
+        #
+        d=DataArrayInt.Range(0,18,1)
+        s=slice(2,None,1)
+        self.assertEqual(d.getNumberOfItemGivenBES(s),16)
+        self.assertEqual(d.getNumberOfItemGivenBESRelative(s),16)
+        self.assertEqual(d.getSlice(s,0,4),slice(2,6,1))
+        self.assertEqual(d.getSlice(s,1,4),slice(6,10,1))
+        self.assertEqual(d.getSlice(s,2,4),slice(10,14,1))
+        self.assertEqual(d.getSlice(s,3,4),slice(14,18,1))
+        #
+        d=DataArrayInt.Range(0,18,1)
+        s=slice(2,-2,1)
+        self.assertEqual(d.getSlice(s,0,4),slice(2,5,1))
+        self.assertEqual(d.getSlice(s,1,4),slice(5,8,1))
+        self.assertEqual(d.getSlice(s,2,4),slice(8,11,1))
+        self.assertEqual(d.getSlice(s,3,4),slice(11,16,1))
+        #
+        d=DataArrayInt.Range(0,18,1)
+        s=slice(None,None,1)
+        self.assertEqual(d.getSlice(s,0,4),slice(0,4,1))
+        self.assertEqual(d.getSlice(s,1,4),slice(4,8,1))
+        self.assertEqual(d.getSlice(s,2,4),slice(8,12,1))
+        self.assertEqual(d.getSlice(s,3,4),slice(12,18,1))
+        #
+        d=DataArrayInt.Range(0,18,1)
+        s=slice(None,2,-2)
+        self.assertRaises(InterpKernelException,d.getNumberOfItemGivenBES,s)
+        self.assertEqual(d.getNumberOfItemGivenBESRelative(s),8)
+        self.assertEqual(d.getSlice(s,0,4),slice(17,13,-2))
+        self.assertEqual(d.getSlice(s,1,4),slice(13,9,-2))
+        self.assertEqual(d.getSlice(s,2,4),slice(9,5,-2))
+        self.assertEqual(d.getSlice(s,3,4),slice(5,2,-2))
+        pass
+
     def setUp(self):
         pass
     pass

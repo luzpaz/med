@@ -230,6 +230,28 @@ namespace ParaMEDMEM
           throw INTERP_KERNEL::Exception("DataArray::GetNumberOfItemGivenBESRelative (wrap) : the input slice contains some unknowns that can't be determined in static method !");
         return DataArray::GetNumberOfItemGivenBESRelative(strt,stp,step,"");
       }
+
+      int getNumberOfItemGivenBES(PyObject *slic) const throw(INTERP_KERNEL::Exception)
+      {
+        if(!PySlice_Check(slic))
+          throw INTERP_KERNEL::Exception("DataArray::getNumberOfItemGivenBES (wrap) : expecting a pyslice as second (first) parameter !");
+        Py_ssize_t strt=2,stp=2,step=2;
+        PySliceObject *sly=reinterpret_cast<PySliceObject *>(slic);
+        if(PySlice_GetIndices(sly,self->getNumberOfTuples(),&strt,&stp,&step)!=0)
+          throw INTERP_KERNEL::Exception("DataArray::getNumberOfItemGivenBES (wrap) : the input slice is invalid !");
+        return DataArray::GetNumberOfItemGivenBES(strt,stp,step,"");
+      }
+
+      int getNumberOfItemGivenBESRelative(PyObject *slic) throw(INTERP_KERNEL::Exception)
+      {
+        if(!PySlice_Check(slic))
+          throw INTERP_KERNEL::Exception("DataArray::getNumberOfItemGivenBESRelative (wrap) : expecting a pyslice as second (first) parameter !");
+        Py_ssize_t strt=2,stp=2,step=2;
+        PySliceObject *sly=reinterpret_cast<PySliceObject *>(slic);
+        if(PySlice_GetIndices(sly,self->getNumberOfTuples(),&strt,&stp,&step)!=0)
+          throw INTERP_KERNEL::Exception("DataArray::getNumberOfItemGivenBESRelative (wrap) : the input slice is invalid !");
+        return DataArray::GetNumberOfItemGivenBESRelative(strt,stp,step,"");
+      }
     }
   };
   
