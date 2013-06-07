@@ -12936,6 +12936,16 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         #
         d=DataArrayInt.Range(0,20,1)
         self.assertTrue(d.accumulatePerChunck([2,4,12]).isEqual(DataArrayInt([5,60])))
+        #
+        a=DataArrayDouble(12) ; a.iota() ; a.rearrange(3)
+        b=DataArrayDouble(12) ; b.iota(20) ; b.rearrange(3)
+        ids=DataArrayInt([])
+        self.assertEqual(len(a[ids]),0)
+        self.assertEqual(len(b[ids]),0)
+        a2=a.deepCpy() ;  a2[ids]+=b[ids] ; self.assertTrue(a2.isEqual(a,1e-15))
+        a2=a.deepCpy() ;  a2[ids]*=b[ids] ; self.assertTrue(a2.isEqual(a,1e-15))
+        a2=a.deepCpy() ;  a2[ids]/=b[ids] ; self.assertTrue(a2.isEqual(a,1e-15))
+        a2=a.deepCpy() ;  a2[ids]-=b[ids] ; self.assertTrue(a2.isEqual(a,1e-15))
         pass
 
     def setUp(self):
