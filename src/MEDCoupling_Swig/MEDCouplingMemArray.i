@@ -2534,6 +2534,14 @@ namespace ParaMEDMEM
         self->accumulate(tmp);
         return convertIntArrToPyList(tmp,sz);
       }
+
+      DataArrayInt *accumulatePerChunck(PyObject *indexArr) const throw(INTERP_KERNEL::Exception)
+      {
+        int sw,sz,val;
+        std::vector<int> val2;
+        const int *bg=convertObjToPossibleCpp1_Safe(indexArr,sw,sz,val,val2);
+        return self->accumulatePerChunck(bg,bg+sz);
+      }
    
       static PyObject *BuildOld2NewArrayFromSurjectiveFormat2(int nbOfOldTuples, PyObject *arr, PyObject *arrI) throw(INTERP_KERNEL::Exception)
       {

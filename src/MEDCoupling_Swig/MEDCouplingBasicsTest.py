@@ -12933,6 +12933,9 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         fNode.setName("Field1Node") ; fNode.setTime(1.1,1,-1)
         fNode.setArray(arr3) ; fNode.checkCoherency()
         self.assertTrue(arr3.isEqual(arr4,1e-12))
+        #
+        d=DataArrayInt.Range(0,20,1)
+        self.assertTrue(d.accumulatePerChunck([2,4,12]).isEqual(DataArrayInt([5,60])))
         pass
 
     def setUp(self):

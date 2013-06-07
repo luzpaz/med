@@ -521,6 +521,7 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT int count(int value) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT void accumulate(int *res) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT int accumulate(int compId) const throw(INTERP_KERNEL::Exception);
+    MEDCOUPLING_EXPORT DataArrayInt *accumulatePerChunck(const int *bgOfIndex, const int *endOfIndex) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT int getMaxValue(int& tupleId) const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT int getMaxValueInArray() const throw(INTERP_KERNEL::Exception);
     MEDCOUPLING_EXPORT int getMinValue(int& tupleId) const throw(INTERP_KERNEL::Exception);

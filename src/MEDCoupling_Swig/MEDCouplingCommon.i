@@ -166,6 +166,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::DataArrayInt::performCpy;
 %newobject ParaMEDMEM::DataArrayInt::substr;
 %newobject ParaMEDMEM::DataArrayInt::changeNbOfComponents;
+%newobject ParaMEDMEM::DataArrayInt::accumulatePerChunck;
 %newobject ParaMEDMEM::DataArrayInt::selectByTupleId;
 %newobject ParaMEDMEM::DataArrayInt::selectByTupleIdSafe;
 %newobject ParaMEDMEM::DataArrayInt::selectByTupleId2;

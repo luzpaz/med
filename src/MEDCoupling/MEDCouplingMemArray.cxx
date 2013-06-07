@@ -8133,6 +8133,65 @@ int DataArrayInt::accumulate(int compId) const throw(INTERP_KERNEL::Exception)
 }
 
 /*!
+ * This method accumulate using addition tuples in \a this using input index array [ \a bgOfIndex, \a endOfIndex ).
+ * The returned array will have same number of components than \a this and number of tuples equal to
+ * \c std::distance(bgOfIndex,endOfIndex) \b minus \b one.
+ *
+ * The input index array is expected to be ascendingly sorted in which the all referenced ids should be in [0, \c this->getNumberOfTuples).
+ *
+ * \param [in] bgOfIndex - begin (included) of the input index array.
+ * \param [in] endOfIndex - end (excluded) of the input index array.
+ * \return DataArrayInt * - the new instance having the same number of components than \a this.
+ * 
+ * \throw If bgOfIndex or end is NULL.
+ * \throw If input index array is not ascendingly sorted.
+ * \throw If there is an id in [ \a bgOfIndex, \a endOfIndex ) not in [0, \c this->getNumberOfTuples).
+ * \throw If std::distance(bgOfIndex,endOfIndex)==0.
+ */
+DataArrayInt *DataArrayInt::accumulatePerChunck(const int *bgOfIndex, const int *endOfIndex) const throw(INTERP_KERNEL::Exception)
+{
+  if(!bgOfIndex || !endOfIndex)
+    throw INTERP_KERNEL::Exception("DataArrayInt::accumulatePerChunck : input pointer NULL !");
+  checkAllocated();
+  int nbCompo=getNumberOfComponents();
+  int nbOfTuples=getNumberOfTuples();
+  int sz=(int)std::distance(bgOfIndex,endOfIndex);
+  if(sz<1)
+    throw INTERP_KERNEL::Exception("DataArrayInt::accumulatePerChunck : invalid size of input index array !");
+  sz--;
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> ret=DataArrayInt::New(); ret->alloc(sz,nbCompo);
+  const int *w=bgOfIndex;
+  if(*w<0 || *w>=nbOfTuples)
+    throw INTERP_KERNEL::Exception("DataArrayInt::accumulatePerChunck : The first element of the input index not in [0,nbOfTuples) !");
+  const int *srcPt=begin()+(*w)*nbCompo;
+  int *tmp=ret->getPointer();
+  for(int i=0;i<sz;i++,tmp+=nbCompo,w++)
+    {
+      std::fill(tmp,tmp+nbCompo,0.);
+      if(w[1]>=w[0])
+        {
+          for(int j=w[0];j<w[1];j++,srcPt+=nbCompo)
+            {
+              if(j>=0 && j<nbOfTuples)
+                std::transform(srcPt,srcPt+nbCompo,tmp,tmp,std::plus<int>());
+              else
+                {
+                  std::ostringstream oss; oss << "DataArrayInt::accumulatePerChunck : At rank #" << i << " the input index array points to id " << j << " should be in [0," << nbOfTuples << ") !";
+                  throw INTERP_KERNEL::Exception(oss.str().c_str());
+                }
+            }
+        }
+      else
+        {
+          std::ostringstream oss; oss << "DataArrayInt::accumulatePerChunck : At rank #" << i << " the input index array is not in ascendingly sorted.";
+          throw INTERP_KERNEL::Exception(oss.str().c_str());
+        }
+    }
+  ret->copyStringInfoFrom(*this);
+  return ret.retn();
+}
+
+/*!
  * Returns a new DataArrayInt by concatenating two given arrays, so that (1) the number
  * of tuples in the result array is <em> a1->getNumberOfTuples() + a2->getNumberOfTuples() -
  * offsetA2</em> and (2)
