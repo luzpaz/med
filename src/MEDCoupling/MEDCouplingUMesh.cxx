@@ -2834,6 +2834,9 @@ void MEDCouplingUMesh::renumberCells(const int *old2NewBg, bool check) throw(INT
   //
   const int *conn=_nodal_connec->getConstPointer();
   const int *connI=_nodal_connec_index->getConstPointer();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> o2n=DataArrayInt::New(); o2n->useArray(array,false,C_DEALLOC,nbCells,1);
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> n2o=o2n->invertArrayO2N2N2O(nbCells);
+  const int *n2oPtr=n2o->begin();
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> newConn=DataArrayInt::New();
   newConn->alloc(_nodal_connec->getNumberOfTuples(),_nodal_connec->getNumberOfComponents());
   newConn->copyStringInfoFrom(*_nodal_connec);
@@ -2847,7 +2850,7 @@ void MEDCouplingUMesh::renumberCells(const int *old2NewBg, bool check) throw(INT
   newCI[0]=loc;
   for(int i=0;i<nbCells;i++)
     {
-      std::size_t pos=std::distance(array,std::find(array,array+nbCells,i));
+      int pos=n2oPtr[i];
       int nbOfElts=connI[pos+1]-connI[pos];
       newC=std::copy(conn+connI[pos],conn+connI[pos+1],newC);
       loc+=nbOfElts;

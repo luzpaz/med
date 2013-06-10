@@ -10240,9 +10240,12 @@ int *DataArrayInt::CheckAndPreparePermutation(const int *start, const int *end)
       free(ret);
       throw INTERP_KERNEL::Exception("Some elements are equals in the specified array !");
     }
+  std::map<int,int> m;
+  for(int *workPt=work;workPt!=work+sz;workPt++)
+    m[*workPt]=(int)std::distance(work,workPt);
   int *iter2=ret;
   for(const int *iter=start;iter!=end;iter++,iter2++)
-    *iter2=(int)std::distance(work,std::find(work,work+sz,*iter));
+    *iter2=m[*iter];
   delete [] work;
   return ret;
 }
