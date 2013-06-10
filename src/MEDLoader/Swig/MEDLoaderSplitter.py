@@ -57,10 +57,7 @@ class MEDLoaderSplitter:
     def __splitMEDFileField1TSCell(cls,f,f1ts,ids):
         fRet=f[ids]
         m=fRet.getMesh() ; m.zipCoords()
-        o2n=m.getRenumArrForMEDFileFrmt()
-        if not o2n.isIdentity():
-            fRet.renumberCells(o2n,False)
-            pass
+        o2n=m.getRenumArrForMEDFileFrmt() ; fRet.renumberCells(o2n,False)
         f1ts.setFieldNoProfileSBT(fRet)
         pass
     
