@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2012  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2013  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -49,6 +49,7 @@ namespace SALOME_TEST
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr getM1DMesh();
     SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_ptr getExtrudedMesh();
     SALOME_MED::MEDCouplingCMeshCorbaInterface_ptr getCMesh();
+    SALOME_MED::MEDCouplingCurveLinearMeshCorbaInterface_ptr getCLMesh();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldScalarOn2DNT();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldNodeScalarOn2DNT();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface_ptr getFieldScalarOn3DNT();

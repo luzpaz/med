@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -48,7 +48,7 @@ MOC_FILES= MEDGUI_moc.cxx MEDGUIFileContentDial_moc.cxx MEDGUISelectComponents_m
 EXTRA_DIST += $(MOC_FILES:%_moc.cxx=%.h) $(nodist_salomeres_DATA:%.qm=%.ts)
 
 ui_%.h: %.ui
-	${QTDIR}/bin/uic $< -o $@
+	${UIC} $< -o $@
 
 .hxx_moc.cxx :
 	${QTDIR}/bin/moc -p . -o $@ $<

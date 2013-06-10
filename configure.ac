@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -333,27 +333,33 @@ if test "$with_interp_kernel_only" != "yes" ; then
     
     if test "x$ENABLE_SPLITTER" = "xyes"; then
 
+        scotch_ok=no 
+        metis_ok=no 
+        parmetis_ok=no 
+        libxml_ok=no 
+
         echo  
         echo --------------------------------------------- 
         echo testing ParMETIS 
         echo ---------------------------------------------
         echo 
-        parmetis_ok=no 
         CHECK_PARMETIS dnl parmetis_ok is set to yes by CHECK_PARMETIS
+
+        if test "x$parmetis_ok" != "xyes"; then
+                CHECK_PARMETISV4
+        fi
 
         echo  
         echo --------------------------------------------- 
         echo testing METIS 
         echo ---------------------------------------------
         echo 
-        metis_ok=no 
         CHECK_METIS dnl metis_ok is set to yes by CHECK_METIS
         
         echo  
         echo --------------------------------------------- 
         echo testing SCOTCH 
         echo ---------------------------------------------
-        scotch_ok=no 
         CHECK_SCOTCH 
         dnl scotch_ok is set to yes by CHECK_SCOTCH    
         
@@ -361,7 +367,6 @@ if test "$with_interp_kernel_only" != "yes" ; then
         echo --------------------------------------------- 
         echo testing LIBXML2
         echo ---------------------------------------------
-        libxml_ok=no 
         CHECK_LIBXML 
         dnl libxml_ok is set to yes by CHECK_LIBXML         
         

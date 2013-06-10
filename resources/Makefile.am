@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2007-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -208,7 +208,9 @@ dist_salomeres_DATA = \
     blow5_ascii_pd_thickness \
     test_2D.sauve \
     allPillesTest.sauv \
-    BDC-714.sauv
+    BDC-714.sauv \
+    portico_3subs.sauv \
+    agitateur.med
 
 if !MED_ENABLE_MICROMED
   nodist_salomeres_SCRIPTS = MEDCatalog.xml SalomeApp.xml

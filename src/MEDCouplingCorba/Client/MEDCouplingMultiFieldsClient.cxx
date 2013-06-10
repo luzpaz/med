@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2012  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2013  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -82,21 +82,21 @@ void MEDCouplingMultiFieldsClient::BuildFullMultiFieldsCorbaFetch(MEDCouplingMul
   for(CORBA::Long i=0;i<nbOfFields;i++)
     {
       fieldPtr->getTinyInfo(i,tinyL,tinyD,tinyS);
-      int tinyLgth=tinyL->length();
-      std::vector<int> tinyLV(tinyLgth);
-      for(int j=0;j<tinyLgth;j++)
+      int tinyLgth2=tinyL->length();
+      std::vector<int> tinyLV(tinyLgth2);
+      for(int j=0;j<tinyLgth2;j++)
         tinyLV[j]=(*tinyL)[j];
       delete tinyL; tinyL=0;
       //
-      tinyLgth=tinyD->length();
-      std::vector<double> tinyLD(tinyLgth);
-      for(int j=0;j<tinyLgth;j++)
+      tinyLgth2=tinyD->length();
+      std::vector<double> tinyLD(tinyLgth2);
+      for(int j=0;j<tinyLgth2;j++)
         tinyLD[j]=(*tinyD)[j];
       delete tinyD; tinyD=0;
       //
-      tinyLgth=tinyS->length();
-      std::vector<std::string> tinyLS(tinyLgth);
-      for(int j=0;j<tinyLgth;j++)
+      tinyLgth2=tinyS->length();
+      std::vector<std::string> tinyLS(tinyLgth2);
+      for(int j=0;j<tinyLgth2;j++)
         tinyLS[j]=(*tinyS)[j];
       delete tinyS; tinyS=0;
       TypeOfField type=(TypeOfField) tinyLV[0];
@@ -107,9 +107,9 @@ void MEDCouplingMultiFieldsClient::BuildFullMultiFieldsCorbaFetch(MEDCouplingMul
       if(array0)
         {
           fieldPtr->getSerialisationData(i,tinyL);
-          tinyLgth=tinyL->length();
+          tinyLgth2=tinyL->length();
           int *ptr=array0->getPointer();
-          for(int j=0;j<tinyLgth;j++)
+          for(int j=0;j<tinyLgth2;j++)
             ptr[j]=(*tinyL)[j];
           delete tinyL; tinyL=0;
         }

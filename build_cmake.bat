@@ -1,4 +1,4 @@
-@REM Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
+@REM Copyright (C) 2007-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 @REM
 @REM This library is free software; you can redistribute it and/or
 @REM modify it under the terms of the GNU Lesser General Public
@@ -17,4 +17,4 @@
 @REM See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 @REM
 
-%PYTHONBIN% %KERNEL_ROOT_DIR%\salome_adm\cmake_files\am2cmake.py --med
+%PYTHONBIN% %KERNEL_ROOT_DIR%\salome_adm\cmake_files\deprecated\am2cmake.py --med

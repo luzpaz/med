@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2012  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2013  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -28,6 +28,7 @@
 #include "MEDCouplingUMeshServant.hxx"
 #include "MEDCouplingExtrudedMeshServant.hxx"
 #include "MEDCouplingCMeshServant.hxx"
+#include "MEDCouplingCurveLinearMeshServant.hxx"
 #include "DataArrayDoubleServant.hxx"
 #include "DataArrayIntServant.hxx"
 #include "MEDCouplingCorbaTypemaps.i"
@@ -48,6 +49,11 @@ namespace ParaMEDMEM
          {
            return buildServantAndActivate<MEDCouplingFieldDoubleServant>(cppPointerOfMesh);
          }
+         
+         static PyObject *_this2(const MEDCouplingFieldDouble *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<MEDCouplingFieldDoubleServant>(cppPointerOfMesh);
+         }
        }
   };
 
@@ -59,6 +65,11 @@ namespace ParaMEDMEM
          static PyObject *_this(const MEDCouplingFieldTemplate *cppPointerOfMesh)
          {
            return buildServantAndActivate<MEDCouplingFieldTemplateServant>(cppPointerOfMesh);
+         }
+         
+         static PyObject *_this2(const MEDCouplingFieldTemplate *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<MEDCouplingFieldTemplateServant>(cppPointerOfMesh);
          }
        }
   };
@@ -72,6 +83,11 @@ namespace ParaMEDMEM
          {
            return buildServantAndActivate<MEDCouplingMultiFieldsServant>(cppPointerOfMesh);
          }
+
+         static PyObject *_this2(const MEDCouplingMultiFields *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<MEDCouplingMultiFieldsServant>(cppPointerOfMesh);
+         }
        }
   };
 
@@ -83,6 +99,11 @@ namespace ParaMEDMEM
          static PyObject *_this(const MEDCouplingFieldOverTime *cppPointerOfMesh)
          {
            return buildServantAndActivate<MEDCouplingFieldOverTimeServant>(cppPointerOfMesh);
+         }
+
+         static PyObject *_this2(const MEDCouplingFieldOverTime *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<MEDCouplingFieldOverTimeServant>(cppPointerOfMesh);
          }
        }
   };
@@ -96,6 +117,11 @@ namespace ParaMEDMEM
          {
            return buildServantAndActivate<MEDCouplingUMeshServant>(cppPointerOfMesh);
          }
+
+         static PyObject *_this2(const MEDCouplingUMesh *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<MEDCouplingUMeshServant>(cppPointerOfMesh);
+         }
        }
   };
 
@@ -107,6 +133,11 @@ namespace ParaMEDMEM
          static PyObject *_this(const MEDCouplingExtrudedMesh *cppPointerOfMesh)
          {
            return buildServantAndActivate<MEDCouplingExtrudedMeshServant>(cppPointerOfMesh);
+         }
+
+         static PyObject *_this2(const MEDCouplingExtrudedMesh *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<MEDCouplingExtrudedMeshServant>(cppPointerOfMesh);
          }
        }
   };
@@ -120,6 +151,28 @@ namespace ParaMEDMEM
          {
            return buildServantAndActivate<MEDCouplingCMeshServant>(cppPointerOfMesh);
          }
+         
+         static PyObject *_this2(const MEDCouplingCMesh *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<MEDCouplingCMeshServant>(cppPointerOfMesh);
+         }
+       }
+  };
+
+  class MEDCouplingCurveLinearMeshServant
+  {
+  public:
+    %extend
+       {
+         static PyObject *_this(const MEDCouplingCurveLinearMesh *cppPointerOfMesh)
+         {
+           return buildServantAndActivate<MEDCouplingCurveLinearMeshServant>(cppPointerOfMesh);
+         }
+
+         static PyObject *_this2(const MEDCouplingCurveLinearMesh *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<MEDCouplingCurveLinearMeshServant>(cppPointerOfMesh);
+         }
        }
   };
 
@@ -132,6 +185,11 @@ namespace ParaMEDMEM
          {
            return buildServantAndActivate<DataArrayDoubleServant>(cppPointerOfMesh);
          }
+
+         static PyObject *_this2(const DataArrayDouble *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<DataArrayDoubleServant>(cppPointerOfMesh);
+         }
        }
   };
 
@@ -143,6 +201,11 @@ namespace ParaMEDMEM
          static PyObject *_this(const DataArrayInt *cppPointerOfMesh)
          {
            return buildServantAndActivate<DataArrayIntServant>(cppPointerOfMesh);
+         }
+
+         static PyObject *_this2(const DataArrayInt *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<DataArrayIntServant>(cppPointerOfMesh);
          }
        }
   };
@@ -161,6 +224,9 @@ def ParaMEDMEMDataArrayDoubleImul(self,*args):
 def ParaMEDMEMDataArrayDoubleIdiv(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayDouble____idiv___(self, self, *args)
+def ParaMEDMEMDataArrayDoubleIpow(self,*args):
+    import _MEDCouplingCorba
+    return _MEDCouplingCorba.DataArrayDouble____ipow___(self, self, *args)
 def ParaMEDMEMMEDCouplingFieldDoubleIadd(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.MEDCouplingFieldDouble____iadd___(self, self, *args)
@@ -173,6 +239,9 @@ def ParaMEDMEMMEDCouplingFieldDoubleImul(self,*args):
 def ParaMEDMEMMEDCouplingFieldDoubleIdiv(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.MEDCouplingFieldDouble____idiv___(self, self, *args)
+def ParaMEDMEMMEDCouplingFieldDoubleIpow(self,*args):
+    import _MEDCouplingCorba
+    return _MEDCouplingCorba.MEDCouplingFieldDouble____ipow___(self, self, *args)
 def ParaMEDMEMDataArrayIntIadd(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayInt____iadd___(self, self, *args)
@@ -188,6 +257,9 @@ def ParaMEDMEMDataArrayIntIdiv(self,*args):
 def ParaMEDMEMDataArrayIntImod(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayInt____imod___(self, self, *args)
+def ParaMEDMEMDataArrayIntIpow(self,*args):
+    import _MEDCouplingCorba
+    return _MEDCouplingCorba.DataArrayInt____ipow___(self, self, *args)
 def ParaMEDMEMDataArrayDoubleTupleIadd(self,*args):
     import _MEDCouplingCorba
     return _MEDCouplingCorba.DataArrayDoubleTuple____iadd___(self, self, *args)

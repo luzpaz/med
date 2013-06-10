@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2012  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2013  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,14 +24,14 @@
 #include "SALOMEconfig.h"
 
 #include CORBA_SERVER_HEADER(MEDCouplingCorbaServant)
-#include "MEDCouplingMeshServant.hxx"
+#include "MEDCouplingStructuredMeshServant.hxx"
 #include "MEDCouplingCorba.hxx"
 
 namespace ParaMEDMEM
 {
   class MEDCouplingCMesh;
 
-  class MEDCOUPLINGCORBA_EXPORT MEDCouplingCMeshServant : MEDCouplingMeshServant, public virtual POA_SALOME_MED::MEDCouplingCMeshCorbaInterface
+  class MEDCOUPLINGCORBA_EXPORT MEDCouplingCMeshServant : MEDCouplingStructuredMeshServant, public virtual POA_SALOME_MED::MEDCouplingCMeshCorbaInterface
   {
   public:
     typedef MEDCouplingCMesh CppType;

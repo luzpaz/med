@@ -1,3 +1,21 @@
+// Copyright (C) 2007-2013  CEA/DEN, EDF R&D
+//
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License.
+//
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+//
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
+//
 
 // Author : Guillaume Boulant (EDF) 
 
@@ -53,7 +71,7 @@ WorkspaceController::WorkspaceController(StandardApp_Module * salomeModule)
   // Connect the signals emitted from the MEDEventListener to slot of
   // this class.
   connect(_medEventListener, SIGNAL(medEventSignal(const MEDOP::MedEvent*)),
-	  this, SLOT(processMedEvent(const MEDOP::MedEvent*)));
+    this, SLOT(processMedEvent(const MEDOP::MedEvent*)));
   // >>> WARN:
   // Note that this class must be mocked (Q_OBJECT + moc file
   // generated from header file) so that to be able to connect a
@@ -183,8 +201,8 @@ void WorkspaceController::_importItem(QString itemNameId) {
  * variable).   
  */
 void WorkspaceController::_importFieldIntoConsole(MEDOP::FieldHandler * fieldHandler,
-						  bool askForOptions,
-						  const char * alias)
+              bool askForOptions,
+              const char * alias)
 {
   STDLOG("alias="<<alias);
 
@@ -399,8 +417,8 @@ void WorkspaceController::processDatasourceEvent(const DatasourceEvent * event) 
     STDLOG("Define a proxy variable in the console with name : "<<QCHARSTAR(event->objectalias));
     bool askForOptions = false;
     _importFieldIntoConsole(dataObject->getFieldHandler(),
-			    askForOptions,
-			    QCHARSTAR(event->objectalias));
+          askForOptions,
+          QCHARSTAR(event->objectalias));
   }
   else if ( event->eventtype == DatasourceEvent::EVENT_VIEW_OBJECT ) {
     QStringList commands;
@@ -436,6 +454,6 @@ void WorkspaceController::OnSaveWorkspace() {
 #include <QMessageBox>
 void WorkspaceController::OnCleanWorkspace() {
   QMessageBox::warning(_salomeModule->getApp()->desktop(),
-		       tr("Not implemented yet"),
-		       tr("This function is not implemented yet"));  
+           tr("Not implemented yet"),
+           tr("This function is not implemented yet"));
 }

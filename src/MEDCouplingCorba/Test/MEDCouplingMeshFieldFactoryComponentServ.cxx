@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2012  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2013  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,7 @@
 #include "MEDCouplingMultiFieldsServant.hxx"
 #include "MEDCouplingFieldOverTimeServant.hxx"
 #include "MEDCouplingExtrudedMeshServant.hxx"
+#include "MEDCouplingCurveLinearMeshServant.hxx"
 #include "MEDCouplingCMeshServant.hxx"
 #include "MEDCouplingUMeshServant.hxx"
 #include "DataArrayDoubleServant.hxx"
@@ -34,6 +35,7 @@
 #include "MEDCouplingMultiFields.hxx"
 #include "MEDCouplingFieldOverTime.hxx"
 #include "MEDCouplingExtrudedMesh.hxx"
+#include "MEDCouplingCurveLinearMesh.hxx"
 #include "MEDCouplingUMesh.hxx"
 #include "MEDCouplingCMesh.hxx"
 
@@ -126,6 +128,15 @@ namespace SALOME_TEST
     ParaMEDMEM::MEDCouplingCMeshServant *m=new ParaMEDMEM::MEDCouplingCMeshServant(m1);
     m1->decrRef();
     SALOME_MED::MEDCouplingCMeshCorbaInterface_ptr ret=m->_this();
+    return ret;
+  }
+
+  SALOME_MED::MEDCouplingCurveLinearMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getCLMesh()
+  {
+    ParaMEDMEM::MEDCouplingCurveLinearMesh *m1=MEDCouplingCorbaServBasicsTest::buildCLMesh();
+    ParaMEDMEM::MEDCouplingCurveLinearMeshServant *m=new ParaMEDMEM::MEDCouplingCurveLinearMeshServant(m1);
+    m1->decrRef();
+    SALOME_MED::MEDCouplingCurveLinearMeshCorbaInterface_ptr ret=m->_this();
     return ret;
   }
 

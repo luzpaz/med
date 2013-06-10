@@ -1,7 +1,4 @@
-// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
-//
-// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2007-2013  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -31,13 +28,11 @@
 #include "MEDOPFactoryClient.hxx"
 
 MEDOPModule::MEDOPModule() :
-  StandardApp_Module(),
-  LightApp_Module("MED")
+#ifndef QT48_PORTING
+  LightApp_Module("MED"),
+#endif
+  StandardApp_Module()
 {
-  // Note that the explicit call to the constructor of LightApp_Module
-  // is needed because the class LightApp_Module does not have
-  // canonical constructor (with no arguments).
-
   // Note also that we can't use the getApp() function here because
   // the initialize(...) function has not been called yet.
 
@@ -87,7 +82,7 @@ void MEDOPModule::createModuleWidgets() {
   _workspaceController->setDataModel(_xmedDataModel);
 
   connect(_datasourceController, SIGNAL(datasourceSignal(const DatasourceEvent *)),
-	  _workspaceController, SLOT(processDatasourceEvent(const DatasourceEvent *)));
+    _workspaceController, SLOT(processDatasourceEvent(const DatasourceEvent *)));
 }
 
 bool MEDOPModule::activateModule( SUIT_Study* theStudy )

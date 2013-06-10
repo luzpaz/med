@@ -1,7 +1,4 @@
-// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
-//
-// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2007-2013  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -39,10 +36,10 @@ using namespace std;
 //=============================================================================
 
 MEDOPFactory_i::MEDOPFactory_i(CORBA::ORB_ptr orb,
-	PortableServer::POA_ptr poa,
-	PortableServer::ObjectId * contId, 
-	const char *instanceName, 
-	const char *interfaceName) :
+  PortableServer::POA_ptr poa,
+  PortableServer::ObjectId * contId,
+  const char *instanceName,
+  const char *interfaceName) :
   Engines_Component_i(orb, poa, contId, instanceName, interfaceName)
 {
   MESSAGE("activate object");
@@ -69,17 +66,17 @@ MEDOP::MEDCalculator_ptr MEDOPFactory_i::getCalculator() {
 extern "C"
 {
   PortableServer::ObjectId * MEDOPFactoryEngine_factory(
-			       CORBA::ORB_ptr orb,
-			       PortableServer::POA_ptr poa, 
-			       PortableServer::ObjectId * contId,
-			       const char *instanceName, 
-		       	       const char *interfaceName)
+             CORBA::ORB_ptr orb,
+             PortableServer::POA_ptr poa,
+             PortableServer::ObjectId * contId,
+             const char *instanceName,
+                    const char *interfaceName)
   {
     MESSAGE("PortableServer::ObjectId * MEDOPEngine_factory()");
     SCRUTE(interfaceName);
     MEDOPFactory_i * factory = new MEDOPFactory_i(orb, poa, contId,
-						  instanceName,
-						  interfaceName);
+              instanceName,
+              interfaceName);
     return factory->getId() ;
   }
 }

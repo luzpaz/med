@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2012  CEA/DEN, EDF R&D
+# Copyright (C) 2007-2013  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -68,6 +68,10 @@ class MEDCouplingMeshFieldFactoryComponentPy(MEDCouplingCorbaServantTest_idl._0_
     def getCMesh(self):
         mesh=self._test.buildCMesh()
         return MEDCouplingCMeshServant._this(mesh)
+
+    def getCLMesh(self):
+        mesh=self._test.buildCLMesh()
+        return MEDCouplingCurveLinearMeshServant._this(mesh)
     
     def getFieldScalarOn2DNT(self):
         field=self._test.buildFieldScalarOn2DNT()

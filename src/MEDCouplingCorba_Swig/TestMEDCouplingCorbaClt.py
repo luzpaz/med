@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2012  CEA/DEN, EDF R&D
+# Copyright (C) 2007-2013  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -132,6 +132,15 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
         meshPtr.UnRegister();
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
         meshRef=test.buildCMesh();
+        self.assertTrue(_mesh_from_distant.isEqual(meshRef,1e-12))
+        pass
+
+    def testCorbaFetchingCLMesh(self):
+        meshPtr=self._objC.getCLMesh();
+        _mesh_from_distant=MEDCouplingCurveLinearMeshClient.New(meshPtr);
+        meshPtr.UnRegister();
+        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
+        meshRef=test.buildCLMesh();
         self.assertTrue(_mesh_from_distant.isEqual(meshRef,1e-12))
         pass
     

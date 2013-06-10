@@ -1,7 +1,4 @@
-// Copyright (C) 2007-2012  CEA/DEN, EDF R&D, OPEN CASCADE
-//
-// Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
-// CEDRAT, EDF R&D, LEG, PRINCIPIA R&D, BUREAU VERITAS
+// Copyright (C) 2007-2013  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -33,15 +30,15 @@
 
 #include "MEDOP.hxx"
 class MEDOP_EXPORT MEDOPFactory_i: public POA_MEDOP::MEDOPFactory,
-				   public Engines_Component_i
+           public Engines_Component_i
 {
   
 public:
   MEDOPFactory_i(CORBA::ORB_ptr orb,
-		 PortableServer::POA_ptr poa,
-		 PortableServer::ObjectId * contId, 
-		 const char *instanceName, 
-		 const char *interfaceName);
+     PortableServer::POA_ptr poa,
+     PortableServer::ObjectId * contId,
+     const char *instanceName,
+     const char *interfaceName);
   virtual ~MEDOPFactory_i();
 
   /*! Returns the singleton instance of the data manager */
@@ -53,9 +50,9 @@ public:
 
 extern "C"
 MEDOP_EXPORT PortableServer::ObjectId * MEDOPFactoryEngine_factory(CORBA::ORB_ptr orb,
-					       PortableServer::POA_ptr poa,
-					       PortableServer::ObjectId * contId,
-					       const char *instanceName,
-					       const char *interfaceName);
+                 PortableServer::POA_ptr poa,
+                 PortableServer::ObjectId * contId,
+                 const char *instanceName,
+                 const char *interfaceName);
 
 #endif

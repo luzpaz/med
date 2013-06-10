@@ -1,4 +1,4 @@
-// Copyright (C) 2007-2012  CEA/DEN, EDF R&D
+// Copyright (C) 2007-2013  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -30,6 +30,7 @@ namespace ParaMEDMEM
   class MEDCouplingFieldTemplate;
   class MEDCouplingExtrudedMesh;
   class MEDCouplingCMesh;
+  class MEDCouplingCurveLinearMesh;
   class DataArrayDouble;
   class DataArrayInt;
   class MEDCouplingMultiFields;
@@ -49,6 +50,7 @@ namespace SALOME_TEST
     static ParaMEDMEM::MEDCouplingUMesh *buildM1DMesh();
     static ParaMEDMEM::MEDCouplingExtrudedMesh *buildExtrudedMesh(ParaMEDMEM::MEDCouplingUMesh *&m2D);
     static ParaMEDMEM::MEDCouplingCMesh *buildCMesh();
+    static ParaMEDMEM::MEDCouplingCurveLinearMesh *buildCLMesh();
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldScalarOn2DNT();
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldNodeScalarOn2DNT();
     static ParaMEDMEM::MEDCouplingFieldDouble *buildFieldScalarOn3DNT();
