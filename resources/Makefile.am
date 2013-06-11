@@ -209,7 +209,8 @@ dist_salomeres_DATA = \
     test_2D.sauve \
     allPillesTest.sauv \
     BDC-714.sauv \
-    portico_3subs.sauv
+    portico_3subs.sauv \
+    agitateur.med
 
 if !MED_ENABLE_MICROMED
   nodist_salomeres_SCRIPTS = MEDCatalog.xml SalomeApp.xml
