@@ -21,30 +21,31 @@
 #ifndef __VOLSURFUSER_HXX__
 #define __VOLSURFUSER_HXX__
 
+#include "INTERPKERNELDefines.hxx"
 #include "InterpKernelException.hxx"
 #include "NormalizedUnstructuredMesh.hxx"
 
 namespace INTERP_KERNEL
 {
   template<class ConnType, NumberingPolicy numPolConn, int SPACEDIM>
-  double computeVolSurfOfCell(NormalizedCellType type, const ConnType *connec, int lgth, const double *coords);
+  INTERPKERNEL_EXPORT double computeVolSurfOfCell(NormalizedCellType type, const ConnType *connec, int lgth, const double *coords);
 
   template<class ConnType, NumberingPolicy numPolConn>
-  double computeVolSurfOfCell2(NormalizedCellType type, const ConnType *connec, int lgth, const double *coords, int spaceDim);
+  INTERPKERNEL_EXPORT double computeVolSurfOfCell2(NormalizedCellType type, const ConnType *connec, int lgth, const double *coords, int spaceDim);
 
   template<class ConnType, NumberingPolicy numPolConn, int SPACEDIM>
-  void computeBarycenter(NormalizedCellType type, const ConnType *connec, int lgth, const double *coords, double *res);
+  INTERPKERNEL_EXPORT void computeBarycenter(NormalizedCellType type, const ConnType *connec, int lgth, const double *coords, double *res);
 
   template<class ConnType, NumberingPolicy numPolConn>
-  void computeBarycenter2(NormalizedCellType type, const ConnType *connec, int lgth, const double *coords, int spaceDim, double *res);
+  INTERPKERNEL_EXPORT void computeBarycenter2(NormalizedCellType type, const ConnType *connec, int lgth, const double *coords, int spaceDim, double *res);
 
-  double SquareDistanceFromPtToSegInSpaceDim2(const double *pt, const double *pt0Seg2, const double *pt1Seg2) throw(INTERP_KERNEL::Exception);
+  INTERPKERNEL_EXPORT double SquareDistanceFromPtToSegInSpaceDim2(const double *pt, const double *pt0Seg2, const double *pt1Seg2) throw(INTERP_KERNEL::Exception);
 
-  double DistanceFromPtToTriInSpaceDim3(const double *pt, const double *pt0Tri3, const double *pt1Tri3, const double *pt2Tri3) throw(INTERP_KERNEL::Exception);
+  INTERPKERNEL_EXPORT double DistanceFromPtToTriInSpaceDim3(const double *pt, const double *pt0Tri3, const double *pt1Tri3, const double *pt2Tri3) throw(INTERP_KERNEL::Exception);
 
-  double DistanceFromPtToPolygonInSpaceDim3(const double *pt, const int *connOfPolygonBg, const int *connOfPolygonEnd, const double *coords) throw(INTERP_KERNEL::Exception);
+  INTERPKERNEL_EXPORT double DistanceFromPtToPolygonInSpaceDim3(const double *pt, const int *connOfPolygonBg, const int *connOfPolygonEnd, const double *coords) throw(INTERP_KERNEL::Exception);
 
-  bool ComputeRotTranslationMatrixToPut3PointsOnOXY(const double *pt0Tri3, const double *pt1Tri3, const double *pt2Tri3, double *matrix);
+  INTERPKERNEL_EXPORT bool ComputeRotTranslationMatrixToPut3PointsOnOXY(const double *pt0Tri3, const double *pt1Tri3, const double *pt2Tri3, double *matrix);
 }
 
 #endif
