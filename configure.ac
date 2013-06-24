@@ -696,10 +696,6 @@ AC_OUTPUT([ \
         bin/VERSION \
         idl/Makefile \
         src/Makefile \
-        src/MEDWrapper/Makefile \
-        src/MEDWrapper/Base/Makefile \
-        src/MEDWrapper/Factory/Makefile \
-        src/MEDWrapper/V2_2/Makefile \
         src/INTERP_KERNEL/Makefile \
         src/INTERP_KERNELTest/Makefile \
         src/MEDCoupling/Makefile \
