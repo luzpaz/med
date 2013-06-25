@@ -54,7 +54,7 @@ fi
 
 MED_ENABLE_MULTIPR=no
 
-if test -f ${MED_DIR}/idl/salome/MED.idl ; then
+if test -f ${MED_DIR}/idl/salome/MEDCouplingCorbaServant.idl ; then
    AC_MSG_RESULT(Using Med module distribution in ${MED_DIR})
    Med_ok=yes
 
