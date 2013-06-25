@@ -25,7 +25,6 @@
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
 BASEIDL_FILES = \
-	MED.idl                          \
 	MEDCouplingCorbaServant.idl      \
 	MEDCouplingCorbaServantTest.idl  \
 	ParaMEDCouplingCorbaServant.idl
@@ -54,7 +53,6 @@ lib_LTLIBRARIES = libSalomeIDLMED.la libSalomeIDLMEDTests.la
 
 # Sources built from idl files
 BASEIDL_SOURCES = \
-	MEDSK.cc \
 	MEDCouplingCorbaServantSK.cc        \
 	ParaMEDCouplingCorbaServantSK.cc
 
@@ -76,7 +74,6 @@ nodist_libSalomeIDLMED_la_SOURCES = $(IDL_SOURCES)
 
 # header files must be exported: other modules have to use this library
 nodist_salomeinclude_HEADERS =         \
-	MED.hh \
 	MEDCouplingCorbaServant.hh     \
 	MEDCouplingCorbaServantTest.hh \
 	ParaMEDCouplingCorbaServant.hh
