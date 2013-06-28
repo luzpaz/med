@@ -22,7 +22,6 @@ include $(top_srcdir)/adm_local/unix/make_common_starter.am
 admlocal_cmakedir = $(admlocaldir)/cmake_files
 
 dist_admlocal_cmake_DATA = \
-FindMEDFILE.cmake \
 FindMED.cmake \
 FindXDR.cmake \
 FindMETIS.cmake \
