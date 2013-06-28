@@ -38,6 +38,7 @@ dist_admlocalwithoutkernelm4_DATA = \
     check_htmlgen.m4 \
     check_lam.m4 \
     check_libxml.m4 \
+    check_med3.m4 \
     check_mpi.m4 \
     check_mpich.m4 \
     check_openmpi.m4 \
