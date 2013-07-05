@@ -1,3 +1,11 @@
+# - Sphinx detection
+#
+# Output variable: SPHINX_EXECUTABLE
+# 
+# The executable 'sphinx-build' is looked for and returned in the above variable.
+#
+
+###########################################################################
 # Copyright (C) 2007-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # Copyright (C) 2003-2007  OPEN CASCADE, EADS/CCR, LIP6, CEA/DEN,
@@ -19,15 +27,11 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+###########################################################################
 
-MACRO(INSTALL_AND_COMPILE_PYTHON_FILE PYFILE2COMPINST PYFILELOC)
-  INSTALL(CODE "SET(PYTHON_FILE ${f})")
-  FOREACH(input ${PYFILE2COMPINST})
-    GET_FILENAME_COMPONENT(inputname ${input} NAME)
-    INSTALL(FILES ${input} DESTINATION ${CMAKE_INSTALL_PREFIX}/${PYFILELOC})
-    INSTALL(CODE "MESSAGE(STATUS \"py compiling ${CMAKE_INSTALL_PREFIX}/${PYFILELOC}/${inputname}\")")
-    INSTALL(CODE "SET(CMD \"import py_compile ; py_compile.compile('${CMAKE_INSTALL_PREFIX}/${PYFILELOC}/${inputname}')\")")
-    INSTALL(CODE "EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c \"\${CMD}\")")
-    INSTALL(CODE "EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -O -c \"\${CMD}\")")
-  ENDFOREACH(input ${PYFILE2COMPINST})
-ENDMACRO(INSTALL_AND_COMPILE_PYTHON_FILE PYFILE2COMPINST PYFILELOC)
+FIND_PROGRAM(SPHINX_EXECUTABLE sphinx-build)
+
+# Handle the standard arguments of the find_package() command:
+INCLUDE(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(Sphinx REQUIRED_VARS SPHINX_EXECUTABLE)
+
