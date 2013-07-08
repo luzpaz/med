@@ -112,6 +112,7 @@ ENDIF()
 # Exposed GUI targets:
 SET(MED_interpkernel interpkernel)
 SET(MED_medcoupling medcoupling)
+SET(MED_medcouplingremapper medcouplingremapper)
 SET(MED_medloader medloader)
 SET(MED_paramedmem paramedmem)
 SET(MED_paramedloader paramedloader)
