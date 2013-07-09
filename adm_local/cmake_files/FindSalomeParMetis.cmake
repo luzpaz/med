@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2013  CEA/DEN, EDF R&D
+# Copyright (C) 2013  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,15 +16,13 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+# Author: Adrien Bruneton
+#
 
-SET(admlocal_cmake_DATA
-  FindXDR.cmake
-  FindMetis.cmake
-  FindSalomeMetis.cmake
-  FindParMetis.cmake
-  FindSalomeParMetis.cmake
-  FindScotch.cmake
-  FindSalomeScotch.cmake
-  )
+# Medfile detection dor Salome
+#
+#  !! Please read the generic detection procedure in SalomeMacros.cmake !!
+#
 
-INSTALL(FILES ${admlocal_cmake_DATA} DESTINATION ${SALOME_INSTALL_CMAKE_LOCAL})
+SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(ParMetis METIS_ROOT_DIR_EXP 0)
+#MARK_AS_ADVANCED()
