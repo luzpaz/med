@@ -72,8 +72,23 @@ ENDIF(SALOME_BUILD_GUI)
 # For all prerequisites, load the corresponding targets if the package was used 
 # in CONFIG mode. This ensures dependent projects link correctly
 # without having to set LD_LIBRARY_PATH:
-SET(_PREREQ CAS OpenGL PyQt4 Qt4 Qwt SIP VTK)
-SET(_PREREQ_CONFIG_DIR "@CAS_DIR@" "@OpenGL_DIR@" "@PyQt4_DIR@" "@Qt4_DIR@" "@Qwt_DIR@" "@SIP_DIR@" "@VTK_DIR@")
+
+SET(_PREREQ)
+SET(_PREREQ_CONFIG_DIR)
+
+IF(NOT SALOME_MED_STANDALONE)
+  LIST(APPEND _PREREQ             OmniORB)
+  LIST(APPEND _PREREQ_CONFIG_DIR "@OmniORB_DIR@" )
+  IF(SALOME_BUILD_GUI)
+    LIST(APPEND _PREREQ             Qt4)
+    LIST(APPEND _PREREQ_CONFIG_DIR "Qt4_DIR@" )
+  ENDIF()
+ENDIF()
+IF(NOT SALOME_MED_MICROMED)
+  LIST(APPEND _PREREQ             HDF5         MEDFile )
+  LIST(APPEND _PREREQ_CONFIG_DIR "@HDF5_DIR@"  "@MEDFile_DIR@")
+ENDIF()
+
 LIST(LENGTH _PREREQ_CONFIG_DIR _list_len)
 # Another CMake stupidity - FOREACH(... RANGE r) generates r+1 numbers ...
 MATH(EXPR _range "${_list_len}-1")
@@ -105,11 +120,17 @@ SET(SALOME_INSTALL_PYTHON_SHARED "@SALOME_INSTALL_PYTHON_SHARED@")
 SET(SALOME_INSTALL_RES "@SALOME_INSTALL_RES@")
 
 # Include KERNEL targets if they were not already loaded:
-IF(NOT (TARGET SALOMEBasics)) 
+IF(NOT (TARGET SALOMEBasics) AND NOT SALOME_MED_STANDALONE) 
   INCLUDE("${KERNEL_ROOT_DIR_EXP}/${SALOME_INSTALL_CMAKE}/SalomeKERNELTargets.cmake")
 ENDIF()
 
-# Exposed GUI targets:
+# Include GUI targets if they were not already loaded:
+IF(NOT (TARGET Event) AND SALOME_BUILD_GUI) 
+  INCLUDE("${GUI_ROOT_DIR_EXP}/${SALOME_INSTALL_CMAKE_LOCAL}/SalomeGUITargets.cmake")
+ENDIF()
+
+
+# Exposed MED targets:
 SET(MED_interpkernel interpkernel)
 SET(MED_medcoupling medcoupling)
 SET(MED_medcouplingremapper medcouplingremapper)
