@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2013  CEA/DEN, EDF R&D, OPEN CASCADE
+# Copyright (C) 2013  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,19 +16,13 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+# Author: Adrien Bruneton
+#
 
-# ------
+# Medfile detection dor Salome
+#
+#  !! Please read the generic detection procedure in SalomeMacros.cmake !!
+#
 
-MESSAGE(STATUS "Check for metis ...")
-
-SET(METIS_ROOT_DIR $ENV{METIS_ROOT_DIR} CACHE PATH "Path to the METIS.")
-IF(METIS_ROOT_DIR)
-  LIST(APPEND CMAKE_LIBRARY_PATH "${METIS_ROOT_DIR}")
-  LIST(APPEND CMAKE_INCLUDE_PATH "${METIS_ROOT_DIR}/Lib")
-ENDIF(METIS_ROOT_DIR)
-
-FIND_LIBRARY(METIS_LIBRARIES metis)
-FIND_PATH(METIS_INCLUDE_DIRS metis.h)
-
-INCLUDE(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(Metis REQUIRED_VARS METIS_INCLUDE_DIRS METIS_LIBRARIES)
+SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(Scotch SCOTCH_ROOT_DIR_EXP 0)
+#MARK_AS_ADVANCED()
