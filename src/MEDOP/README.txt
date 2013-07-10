@@ -23,3 +23,4 @@ This folder contains the packages for the MED fields operations:
 - gui: package containing the graphical user interface (the GUI part of the MED module)
 - res: resources files associated to the MEDOP package (icons, config files, data files, ...)
 - exe: additional executable programs that can be launched from the MEDOP framework
+- tut: folder containing a set of tutorials use cases to learn medmem usage from using the python API
