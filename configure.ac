@@ -731,9 +731,6 @@ AC_OUTPUT([ \
 	src/MEDOP/gui/dialogs/Makefile \
 	src/MEDOP/gui/Makefile \
 	src/MEDOP/exe/Makefile \
-	src/MEDOP/exe/appligen/Makefile \
-	src/MEDOP/exe/appligen/config_appli_model.xml \
-	src/MEDOP/exe/appligen/appligen.sh \
 	src/MEDOP/exe/image2med/Makefile \
 	src/MEDOP/doc/Makefile \
 	src/MEDOP/doc/sphinx/conf.py \
