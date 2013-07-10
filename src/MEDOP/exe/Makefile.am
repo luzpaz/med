@@ -19,4 +19,4 @@
 
 include $(top_srcdir)/adm_local/unix/make_common_starter.am
 
-SUBDIRS=appligen image2med
+SUBDIRS=image2med
