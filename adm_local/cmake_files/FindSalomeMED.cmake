@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2013  CEA/DEN, EDF R&D
+# Copyright (C) 2007-2013  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,16 +16,24 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+#
+# Author: Adrien Bruneton
+#
 
-SET(admlocal_cmake_DATA
-  FindXDR.cmake
-  FindMetis.cmake
-  FindSalomeMetis.cmake
-  FindParMetis.cmake
-  FindSalomeParMetis.cmake
-  FindScotch.cmake
-  FindSalomeScotch.cmake
-  FindSalomeMED.cmake
-  )
+# MED detection for Salome - this is typically called by dependent modules
+# (PARAVIS, etc ...)
+#
+# The detection is simpler than for other prerequisites.
+# See explanation in FindSalomeKERNEL.cmake.
+#
 
-INSTALL(FILES ${admlocal_cmake_DATA} DESTINATION ${SALOME_INSTALL_CMAKE_LOCAL})
+IF(NOT SalomeMED_FIND_QUIETLY)
+  MESSAGE(STATUS "Looking for Salome MED ...")
+ENDIF()
+
+SET(CMAKE_PREFIX_PATH "${MED_ROOT_DIR}")
+SALOME_FIND_PACKAGE(SalomeMED SalomeMED CONFIG)
+
+IF(NOT SalomeMED_FIND_QUIETLY)
+  MESSAGE(STATUS "Found Salome MED: ${MED_ROOT_DIR}")
+ENDIF()

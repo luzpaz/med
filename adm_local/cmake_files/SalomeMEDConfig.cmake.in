@@ -71,19 +71,12 @@ ENDIF(SALOME_BUILD_GUI)
 
 # For all prerequisites, load the corresponding targets if the package was used 
 # in CONFIG mode. This ensures dependent projects link correctly
-# without having to set LD_LIBRARY_PATH:
+# without having to set LD_LIBRARY_PATH.
+# Many of them will be automatically loaded from KERNEL or GUI:
 
 SET(_PREREQ)
 SET(_PREREQ_CONFIG_DIR)
 
-IF(NOT SALOME_MED_STANDALONE)
-  LIST(APPEND _PREREQ             OmniORB)
-  LIST(APPEND _PREREQ_CONFIG_DIR "@OmniORB_DIR@" )
-  IF(SALOME_BUILD_GUI)
-    LIST(APPEND _PREREQ             Qt4)
-    LIST(APPEND _PREREQ_CONFIG_DIR "Qt4_DIR@" )
-  ENDIF()
-ENDIF()
 IF(NOT SALOME_MED_MICROMED)
   LIST(APPEND _PREREQ             HDF5         MEDFile )
   LIST(APPEND _PREREQ_CONFIG_DIR "@HDF5_DIR@"  "@MEDFile_DIR@")
