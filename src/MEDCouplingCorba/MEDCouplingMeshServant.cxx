@@ -31,7 +31,7 @@ MEDCouplingMeshServant::MEDCouplingMeshServant(const MEDCouplingMesh *cppPointer
 
 char *MEDCouplingMeshServant::getName()
 {
-  return CORBA::string_dup(getPointer()->getName());
+  return CORBA::string_dup(getPointer()->getName().c_str());
 }
 
 void MEDCouplingMeshServant::getTinyInfo(SALOME_TYPES::ListOfDouble_out da, SALOME_TYPES::ListOfLong_out la, SALOME_TYPES::ListOfString_out sa)

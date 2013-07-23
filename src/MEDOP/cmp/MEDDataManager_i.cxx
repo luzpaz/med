@@ -583,7 +583,7 @@ MEDCouplingFieldDouble * MEDDataManager_i::getFieldDouble(const MEDOP::FieldHand
   long sourceid = _meshHandlerMap[meshid]->sourceid;
 
   const char * filepath = source_to_file((_datasourceHandlerMap[sourceid])->uri);
-  const char * meshName = myMesh->getName();
+  const char * meshName = myMesh->getName().c_str();
   LOG("getFieldDouble: field "<<fieldHandler->fieldname<<" loaded from file "<<filepath);
   TypeOfField type = (TypeOfField)fieldHandler->type;
   int meshDimRelToMax = 0;
@@ -612,8 +612,8 @@ MEDCouplingFieldDouble * MEDDataManager_i::getFieldDouble(const MEDOP::FieldHand
 MEDOP::FieldHandler * MEDDataManager_i::addField(MEDCouplingFieldDouble * fieldDouble,
              long meshHandlerId)
 {
-  const char * fieldName = fieldDouble->getName();
-  const char * meshName  = fieldDouble->getMesh()->getName();
+  const char * fieldName = fieldDouble->getName().c_str();
+  const char * meshName  = fieldDouble->getMesh()->getName().c_str();
   TypeOfField  type      = fieldDouble->getTypeOfField();
 
   int iteration, order;

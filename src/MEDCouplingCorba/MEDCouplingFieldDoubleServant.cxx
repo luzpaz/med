@@ -29,7 +29,7 @@ MEDCouplingFieldDoubleServant::MEDCouplingFieldDoubleServant(const MEDCouplingFi
 
 char *MEDCouplingFieldDoubleServant::getName()
 {
-  return CORBA::string_dup(getPointer()->getName());
+  return CORBA::string_dup(getPointer()->getName().c_str());
 }
 
 SALOME_TYPES::ListOfString *MEDCouplingFieldDoubleServant::getInfoOnComponents()
