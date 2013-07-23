@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS>
+  <context>
+    <name>@default</name>
+    <message>
+      <source>MED_BUT_OK</source>
+      <translation>わかりました</translation>
+    </message>
+    <message>
+      <source>MED_INF_FIELDNAME</source>
+      <translation>読み取るフィールドの名前を入力してください。</translation>
+    </message>
+    <message>
+      <source>MED_INF_MESHNAME</source>
+      <translation>読みたいメッシュの名前を入力してください。</translation>
+    </message>
+    <message>
+      <source>MED_INF_NOIOR</source>
+      <translation>オブジェクトは、IOR を持ちません。</translation>
+    </message>
+    <message>
+      <source>MED_INF_NOTIMPL</source>
+      <translation>実装言語このオブジェクトのいません。</translation>
+    </message>
+    <message>
+      <source>MED_WRN_WARNING</source>
+      <translation>警告</translation>
+    </message>
+    <message>
+      <source>MEN_SHOW</source>
+      <translation>ショー</translation>
+    </message>
+    <message>
+      <source>MEN_DUMPMESH</source>
+      <translation>メッシュをダンプします。</translation>
+    </message>
+    <message>
+      <source>MEN_DUMPSUBMESH</source>
+      <translation>サブメッシュをダンプします。</translation>
+    </message>
+    <message>
+      <source>MEN_HIDE</source>
+      <translation>非表示</translation>
+    </message>
+    <message>
+      <source>MEN_EXPLORE</source>
+      <translation>音楽配信マック ＆ ファイルを探索します。</translation>
+    </message>
+    <message>
+      <source>MEN_FIELDSEL</source>
+      <translation>フィールドの選択</translation>
+    </message>
+    <message>
+      <source>MEN_MESHSEL</source>
+      <translation>メッシュの選択</translation>
+    </message>
+    <message>
+      <source>MEN_POPUPTEST</source>
+      <translation>ポップアップ テスト</translation>
+    </message>
+    <message>
+      <source>STB_SHOW</source>
+      <translation>ショー</translation>
+    </message>
+    <message>
+      <source>STB_DUMPMESH</source>
+      <translation>メッシュをダンプします。</translation>
+    </message>
+    <message>
+      <source>STB_DUMPSUBMESH</source>
+      <translation>メッシュをダンプします。</translation>
+    </message>
+    <message>
+      <source>STB_HIDE</source>
+      <translation>非表示</translation>
+    </message>
+    <message>
+      <source>STB_EXPLORE</source>
+      <translation>音楽配信マック ＆ ファイルを探索します。</translation>
+    </message>
+    <message>
+      <source>STB_FIELDSEL</source>
+      <translation>フィールドを読み込む</translation>
+    </message>
+    <message>
+      <source>STB_MESHSEL</source>
+      <translation>メッシュを読む</translation>
+    </message>
+    <message>
+      <source>STB_POPUPTEST</source>
+      <translation>ポップアップ テスト</translation>
+    </message>
+    <message>
+      <source>TB_MED</source>
+      <translation>Med ツールバー</translation>
+    </message>
+    <message>
+      <source>TOP_SHOW</source>
+      <translation>ショー</translation>
+    </message>
+    <message>
+      <source>TOP_DUMPMESH</source>
+      <translation>メッシュをダンプします。</translation>
+    </message>
+    <message>
+      <source>TOP_DUMPSUBMESH</source>
+      <translation>サブメッシュをダンプします。</translation>
+    </message>
+    <message>
+      <source>TOP_HIDE</source>
+      <translation>非表示</translation>
+    </message>
+    <message>
+      <source>TOP_EXPLORE</source>
+      <translation>音楽配信マック ＆ ファイルを探索します。</translation>
+    </message>
+    <message>
+      <source>TOP_FIELDSEL</source>
+      <translation>フィールドの選択</translation>
+    </message>
+    <message>
+      <source>TOP_MESHSEL</source>
+      <translation>メッシュの選択</translation>
+    </message>
+    <message>
+      <source>TOP_POPUPTEST</source>
+      <translation>ポップアップ テスト</translation>
+    </message>
+  </context>
+  <context>
+    <name>MedGUI</name>
+    <message>
+      <source>MED_MEN_ALL_FILES</source>
+      <translation>すべてのファイル (*)</translation>
+    </message>
+    <message>
+      <source>MED_MEN_IMPORT</source>
+      <translation>インポート</translation>
+    </message>
+    <message>
+      <source>MED_MEN_IMPORT_MED</source>
+      <translation>医学ファイル (*.med)</translation>
+    </message>
+  </context>
+</TS>
