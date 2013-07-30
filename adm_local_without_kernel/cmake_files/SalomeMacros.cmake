@@ -205,8 +205,14 @@ ENDMACRO()
 # given when calling the command FIND_PACKAGE(SalomeXYZ). Those options are stored implicitly in 
 # CMake variables: xyz__FIND_QUIETLY, xyz_FIND_REQUIRED, etc ...
 # 
+# If a list of components was specified when invoking the initial FIND_PACKAGE(SalomeXyz ...) this is 
+# also handled properly.
+#
 # Modus is either MODULE or CONFIG (cf standard FIND_PACKAGE() documentation).
 # The last argument is optional and if set to TRUE will force the search to be OPTIONAL and QUIET.
+# If the package is looked for in CONFIG mode, the standard system paths are skipped. If you still want a 
+# system installation to be found in this mode, you have to set the ROOT_DIR variable explicitly to /usr (for
+# example). 
 #  
 # This macro is to be called from within the FindSalomeXXXX.cmake file.
 #
@@ -248,12 +254,12 @@ MACRO(SALOME_FIND_PACKAGE englobPkg stdPkg mode)
         FIND_PACKAGE(${stdPkg} ${${englobPkg}_FIND_VERSION} ${_tmp_exact} 
               NO_MODULE ${_tmp_quiet} ${_tmp_req} COMPONENTS ${${englobPkg}_FIND_COMPONENTS}
               PATH_SUFFIXES "salome_adm/cmake_files" "adm_local/cmake_files"
-              NO_CMAKE_BUILDS_PATH NO_CMAKE_PACKAGE_REGISTRY NO_CMAKE_SYSTEM_PACKAGE_REGISTRY)
+              NO_CMAKE_BUILDS_PATH NO_CMAKE_PACKAGE_REGISTRY NO_CMAKE_SYSTEM_PACKAGE_REGISTRY NO_CMAKE_SYSTEM_PATH)
       ELSE()
         FIND_PACKAGE(${stdPkg} ${${englobPkg}_FIND_VERSION} ${_tmp_exact} 
               NO_MODULE ${_tmp_quiet} ${_tmp_req}
               PATH_SUFFIXES "salome_adm/cmake_files" "adm_local/cmake_files"
-              NO_CMAKE_BUILDS_PATH NO_CMAKE_PACKAGE_REGISTRY NO_CMAKE_SYSTEM_PACKAGE_REGISTRY)
+              NO_CMAKE_BUILDS_PATH NO_CMAKE_PACKAGE_REGISTRY NO_CMAKE_SYSTEM_PACKAGE_REGISTRY NO_CMAKE_SYSTEM_PATH)
       ENDIF()
       MARK_AS_ADVANCED(${stdPkg}_DIR)
       
@@ -279,13 +285,12 @@ ENDMACRO()
 
 
 ####################################################################
-# SALOME_FIND_PACKAGE_DETECT_CONFLICTS(pkg referenceVariable upCount <component1> <component2> ...)
+# SALOME_FIND_PACKAGE_DETECT_CONFLICTS(pkg referenceVariable upCount)
 #    pkg              : name of the system package to be detected
 #    referenceVariable: variable containing a path that can be browsed up to 
 # retrieve the package root directory (xxx_ROOT_DIR)
 #    upCount          : number of times we have to go up from the path <referenceVariable>
 # to obtain the package root directory.
-#    <component_n>    : an optional list of components to be found.  
 #   
 # For example:  SALOME_FIND_PACKAGE_DETECT_CONFLICTS(SWIG SWIG_EXECUTABLE 2) 
 #
@@ -352,19 +357,36 @@ MACRO(SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS pkg referenceVariable upCount)
   ENDIF()
 
   # Otherwise try the standard way (module mode, with the standard CMake Find*** macro):
-  SALOME_FIND_PACKAGE("Salome${pkg}" ${pkg} MODULE)
+  # We do it quietly to produce our own error message:
+  SALOME_FIND_PACKAGE("Salome${pkg}" ${pkg} MODULE TRUE)
   
   # Set the "FOUND" variable for the SALOME wrapper:
   IF(${pkg_UC}_FOUND OR ${pkg}_FOUND)
     SET(SALOME${pkg_UC}_FOUND TRUE)
   ELSE()
     SET(SALOME${pkg_UC}_FOUND FALSE)
+    IF(NOT Salome${pkg}_FIND_QUIETLY)
+      IF(Salome${pkg}_FIND_REQUIRED)
+         MESSAGE(FATAL_ERROR "Package ${pkg} couldn't be found - did you set the corresponing root dir correctly? "
+         "It currently contains ${pkg_UC}_ROOT_DIR=${${pkg_UC}_ROOT_DIR}")
+      ELSE()
+         MESSAGE(WARNING "Package ${pkg} couldn't be found - did you set the corresponing root dir correctly? "
+         "It currently contains ${pkg_UC}_ROOT_DIR=${${pkg_UC}_ROOT_DIR}")
+      ENDIF()
+    ENDIF()
   ENDIF()
   
   IF (${pkg_UC}_FOUND OR ${pkg}_FOUND)
     ## 3. Set the root dir which was finally retained by going up "upDir" times
     ## from the given reference path. The variable "referenceVariable" may be a list.
     ## In this case we take its first element. 
+    
+    # First test if the variable exists and is not empty:
+    IF((NOT DEFINED ${referenceVariable}) OR ("${${referenceVariable}}" STREQUAL ""))
+      MESSAGE(WARNING "${pkg}: the reference variable '${referenceVariable}' used when calling the macro "
+      "SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS() does not exist or is empty.")
+    ENDIF()
+    
     LIST(LENGTH ${referenceVariable} _tmp_len)
     IF(_tmp_len)
        LIST(GET ${referenceVariable} 0 _tmp_ROOT_DIR)
@@ -425,3 +447,14 @@ MACRO(SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS pkg referenceVariable upCount)
   SET(Salome${pkg}_FOUND "${pkg}_FOUND")
 ENDMACRO(SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS)
 
+
+####################################################################
+# SALOME_ADD_MPI_TO_HDF5()
+# 
+# Overload the HDF5 flags so that they also contain MPI references.
+# This is to be used when HDF5 was compiled with MPI support;
+MACRO(SALOME_ADD_MPI_TO_HDF5)  
+  SET(HDF5_INCLUDE_DIRS ${HDF5_INCLUDE_DIRS} ${MPI_INCLUDE_DIRS})
+  SET(HDF5_DEFINITIONS "${HDF5_DEFINITIONS} ${MPI_DEFINITIONS}")
+  SET(HDF5_LIBRARIES ${HDF5_LIBRARIES} ${MPI_LIBRARIES})
+ENDMACRO(SALOME_ADD_MPI_TO_HDF5)
