@@ -22,6 +22,9 @@
 #include "MEDCouplingMeshFieldFactoryComponent.hxx"
 #include "MEDCouplingUMesh.hxx"
 #include "MEDCouplingUMeshClient.hxx"
+#include "MEDCoupling1GTUMesh.hxx"
+#include "MEDCoupling1SGTUMeshClient.hxx"
+#include "MEDCoupling1DGTUMeshClient.hxx"
 #include "MEDCouplingExtrudedMesh.hxx"
 #include "MEDCouplingExtrudedMeshClient.hxx"
 #include "MEDCouplingCMesh.hxx"
@@ -212,6 +215,30 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetchingCurveLine
   meshPtr->UnRegister();
   CORBA::release(meshPtr);
   ParaMEDMEM::MEDCouplingCurveLinearMesh *meshRef=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildCLMesh();
+  CPPUNIT_ASSERT(meshFromDistant->isEqual(meshRef,1e-12));
+  meshRef->decrRef();
+  meshFromDistant->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetching1SGTUMesh()
+{
+  SALOME_MED::MEDCoupling1SGTUMeshCorbaInterface_ptr meshPtr=_objC->get1SGTUMesh();
+  ParaMEDMEM::MEDCoupling1SGTUMesh *meshFromDistant=ParaMEDMEM::MEDCoupling1SGTUMeshClient::New(meshPtr);
+  meshPtr->UnRegister();
+  CORBA::release(meshPtr);
+  ParaMEDMEM::MEDCoupling1SGTUMesh *meshRef=SALOME_TEST::MEDCouplingCorbaServBasicsTest::build1SGTUMesh();
+  CPPUNIT_ASSERT(meshFromDistant->isEqual(meshRef,1e-12));
+  meshRef->decrRef();
+  meshFromDistant->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetching1DGTUMesh()
+{
+  SALOME_MED::MEDCoupling1DGTUMeshCorbaInterface_ptr meshPtr=_objC->get1DGTUMesh();
+  ParaMEDMEM::MEDCoupling1DGTUMesh *meshFromDistant=ParaMEDMEM::MEDCoupling1DGTUMeshClient::New(meshPtr);
+  meshPtr->UnRegister();
+  CORBA::release(meshPtr);
+  ParaMEDMEM::MEDCoupling1DGTUMesh *meshRef=SALOME_TEST::MEDCouplingCorbaServBasicsTest::build1DGTUMesh();
   CPPUNIT_ASSERT(meshFromDistant->isEqual(meshRef,1e-12));
   meshRef->decrRef();
   meshFromDistant->decrRef();
