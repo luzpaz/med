@@ -72,6 +72,14 @@ class MEDCouplingMeshFieldFactoryComponentPy(MEDCouplingCorbaServantTest_idl._0_
     def getCLMesh(self):
         mesh=self._test.buildCLMesh()
         return MEDCouplingCurveLinearMeshServant._this(mesh)
+
+    def get1SGTUMesh(self):
+        mesh=self._test.build1SGTUMesh()
+        return MEDCoupling1SGTUMeshServant._this(mesh)
+
+    def get1DGTUMesh(self):
+        mesh=self._test.build1DGTUMesh()
+        return MEDCoupling1DGTUMeshServant._this(mesh)
     
     def getFieldScalarOn2DNT(self):
         field=self._test.buildFieldScalarOn2DNT()

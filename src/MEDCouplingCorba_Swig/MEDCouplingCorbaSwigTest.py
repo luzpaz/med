@@ -190,6 +190,37 @@ class MEDCouplingCorbaServBasicsTest:
         #
         return targetMesh;
 
+    def build1SGTUMesh(self):
+        targetMesh=MEDCoupling1SGTUMesh("Mesh1SGT",NORM_QUAD4)
+        targetMesh.setTime(2.3,4,5)
+        targetMesh.setTimeUnit("us")
+        targetMesh.setDescription("My Description of 1SGTU");
+        a1=DataArrayDouble([1.,1.,0.,2.,1.,0.,3.,1.,0.,1.,0.,0.,2.,0.,0.,0.,0.,0.,0.,1.,0.,3.,0.,0.,4.,0.,0.,4.,1.,0.],10,3)
+        a1.setInfoOnComponents(["X1 [m]","YY2 [km]","ZZZ3 [km]"])
+        targetMesh.setCoords(a1)
+        a2=DataArrayInt([6,0,3,5,3,0,1,4,1,2,7,4,8,7,2,9],4*4,1)
+        targetMesh.setNodalConnectivity(a2)
+        #
+        targetMesh.checkCoherency();
+        #
+        return targetMesh;
+
+    def build1DGTUMesh(self):
+        targetMesh=MEDCoupling1DGTUMesh("Mesh1DGT",NORM_POLYGON);
+        targetMesh.setTime(2.3,4,5)
+        targetMesh.setTimeUnit("us")
+        targetMesh.setDescription("My Description of 1DGTU");
+        a1=DataArrayDouble([1.,1.,0.,2.,1.,0.,3.,1.,0.,1.,0.,0.,2.,0.,0.,0.,0.,0.,0.,1.,0.,3.,0.,0.,4.,0.,0.,4.,1.,0.],10,3)
+        a1.setInfoOnComponents(["X1 [m]","YY2 [km]","ZZZ3 [km]"])
+        targetMesh.setCoords(a1)
+        a2=DataArrayInt([6,0,3,5,3,0,1,4,1,2,7,4,8,7,2],15,1)
+        a3=DataArrayInt([0,4,8,12,15],5,1)
+        targetMesh.setNodalConnectivity(a2,a3)
+        #
+        targetMesh.checkCoherency();
+        #
+        return targetMesh;
+        
     def buildFieldScalarOn2DNT(self):
         mesh=self.build2DMesh();
         fieldOnCells=MEDCouplingFieldDouble.New(ON_CELLS,NO_TIME);

@@ -26,6 +26,8 @@
 #include "MEDCouplingFieldOverTimeServant.hxx"
 #include "MEDCouplingExtrudedMeshServant.hxx"
 #include "MEDCouplingCurveLinearMeshServant.hxx"
+#include "MEDCoupling1SGTUMeshServant.hxx"
+#include "MEDCoupling1DGTUMeshServant.hxx"
 #include "MEDCouplingCMeshServant.hxx"
 #include "MEDCouplingUMeshServant.hxx"
 #include "DataArrayDoubleServant.hxx"
@@ -36,6 +38,7 @@
 #include "MEDCouplingFieldOverTime.hxx"
 #include "MEDCouplingExtrudedMesh.hxx"
 #include "MEDCouplingCurveLinearMesh.hxx"
+#include "MEDCoupling1GTUMesh.hxx"
 #include "MEDCouplingUMesh.hxx"
 #include "MEDCouplingCMesh.hxx"
 
@@ -137,6 +140,24 @@ namespace SALOME_TEST
     ParaMEDMEM::MEDCouplingCurveLinearMeshServant *m=new ParaMEDMEM::MEDCouplingCurveLinearMeshServant(m1);
     m1->decrRef();
     SALOME_MED::MEDCouplingCurveLinearMeshCorbaInterface_ptr ret=m->_this();
+    return ret;
+  }
+
+  SALOME_MED::MEDCoupling1SGTUMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::get1SGTUMesh()
+  {
+    ParaMEDMEM::MEDCoupling1SGTUMesh *m1=MEDCouplingCorbaServBasicsTest::build1SGTUMesh();
+    ParaMEDMEM::MEDCoupling1SGTUMeshServant *m=new ParaMEDMEM::MEDCoupling1SGTUMeshServant(m1);
+    m1->decrRef();
+    SALOME_MED::MEDCoupling1SGTUMeshCorbaInterface_ptr ret=m->_this();
+    return ret;
+  }
+
+  SALOME_MED::MEDCoupling1DGTUMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::get1DGTUMesh()
+  {
+    ParaMEDMEM::MEDCoupling1DGTUMesh *m1=MEDCouplingCorbaServBasicsTest::build1DGTUMesh();
+    ParaMEDMEM::MEDCoupling1DGTUMeshServant *m=new ParaMEDMEM::MEDCoupling1DGTUMeshServant(m1);
+    m1->decrRef();
+    SALOME_MED::MEDCoupling1DGTUMeshCorbaInterface_ptr ret=m->_this();
     return ret;
   }
 

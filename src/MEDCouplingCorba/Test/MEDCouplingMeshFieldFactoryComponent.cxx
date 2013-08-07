@@ -25,6 +25,7 @@
 #include "MEDCouplingMultiFields.hxx"
 #include "MEDCouplingFieldOverTime.hxx"
 #include "MEDCouplingMemArray.hxx"
+#include "MEDCoupling1GTUMesh.hxx"
 #include "MEDCouplingUMesh.hxx"
 #include "MEDCouplingCMesh.hxx"
 #include "MEDCouplingCurveLinearMesh.hxx"
@@ -233,6 +234,47 @@ namespace SALOME_TEST
     a1->decrRef();
     int structure[2]={4,5};
     targetMesh->setNodeGridStructure(structure,structure+2);
+    //
+    targetMesh->checkCoherency();
+    //
+    return targetMesh;
+  }
+
+  ParaMEDMEM::MEDCoupling1SGTUMesh *MEDCouplingCorbaServBasicsTest::build1SGTUMesh()
+  {
+    ParaMEDMEM::MEDCoupling1SGTUMesh *targetMesh=ParaMEDMEM::MEDCoupling1SGTUMesh::New("Mesh1SGT",INTERP_KERNEL::NORM_QUAD4);
+    targetMesh->setTime(2.3,4,5);
+    targetMesh->setTimeUnit("us");
+    targetMesh->setDescription("My Description of 1SGTU");
+    ParaMEDMEM::DataArrayDouble *a1=ParaMEDMEM::DataArrayDouble::New(); a1->alloc(10,3); a1->setInfoOnComponent(0,"X1 [m]");  a1->setInfoOnComponent(1,"YY2 [km]"); a1->setInfoOnComponent(2,"ZZZ3 [km]");
+    const double coords[30]={1.,1.,0.,2.,1.,0.,3.,1.,0.,1.,0.,0.,2.,0.,0.,0.,0.,0.,0.,1.,0.,3.,0.,0.,4.,0.,0.,4.,1.,0.};
+    const int conn[16]={6,0,3,5,3,0,1,4,1,2,7,4,8,7,2,9};
+    std::copy(coords,coords+30,a1->getPointer()); targetMesh->setCoords(a1); a1->decrRef();
+    ParaMEDMEM::DataArrayInt *a2(ParaMEDMEM::DataArrayInt::New()); a2->alloc(4*4,1);
+    std::copy(conn,conn+16,a2->getPointer());
+    targetMesh->setNodalConnectivity(a2); a2->decrRef();
+    //
+    targetMesh->checkCoherency();
+    //
+    return targetMesh;
+  }
+  
+  ParaMEDMEM::MEDCoupling1DGTUMesh *MEDCouplingCorbaServBasicsTest::build1DGTUMesh()
+  {
+    ParaMEDMEM::MEDCoupling1DGTUMesh *targetMesh=ParaMEDMEM::MEDCoupling1DGTUMesh::New("Mesh1DGT",INTERP_KERNEL::NORM_POLYGON);
+    targetMesh->setTime(2.3,4,5);
+    targetMesh->setTimeUnit("us");
+    targetMesh->setDescription("My Description of 1DGTU");
+    ParaMEDMEM::DataArrayDouble *a1=ParaMEDMEM::DataArrayDouble::New(); a1->alloc(10,3); a1->setInfoOnComponent(0,"X1 [m]");  a1->setInfoOnComponent(1,"YY2 [km]"); a1->setInfoOnComponent(2,"ZZZ3 [km]");
+    const double coords[30]={1.,1.,0.,2.,1.,0.,3.,1.,0.,1.,0.,0.,2.,0.,0.,0.,0.,0.,0.,1.,0.,3.,0.,0.,4.,0.,0.,4.,1.,0.};
+    const int conn[15]={6,0,3,5,3,0,1,4,1,2,7,4,8,7,2};
+    const int conni[5]={0,4,8,12,15};
+    std::copy(coords,coords+30,a1->getPointer()); targetMesh->setCoords(a1); a1->decrRef();
+    ParaMEDMEM::DataArrayInt *a2(ParaMEDMEM::DataArrayInt::New()); a2->alloc(15,1);
+    std::copy(conn,conn+15,a2->getPointer());
+    ParaMEDMEM::DataArrayInt *a3(ParaMEDMEM::DataArrayInt::New()); a3->alloc(5,1);
+    std::copy(conni,conni+5,a3->getPointer());
+    targetMesh->setNodalConnectivity(a2,a3); a2->decrRef(); a3->decrRef();
     //
     targetMesh->checkCoherency();
     //
