@@ -243,7 +243,7 @@ namespace SALOME_TEST
   ParaMEDMEM::MEDCoupling1SGTUMesh *MEDCouplingCorbaServBasicsTest::build1SGTUMesh()
   {
     ParaMEDMEM::MEDCoupling1SGTUMesh *targetMesh=ParaMEDMEM::MEDCoupling1SGTUMesh::New("Mesh1SGT",INTERP_KERNEL::NORM_QUAD4);
-    targetMesh->setTime(2.3,4,5);
+    targetMesh->setTime(2.3,44,-55);
     targetMesh->setTimeUnit("us");
     targetMesh->setDescription("My Description of 1SGTU");
     ParaMEDMEM::DataArrayDouble *a1=ParaMEDMEM::DataArrayDouble::New(); a1->alloc(10,3); a1->setInfoOnComponent(0,"X1 [m]");  a1->setInfoOnComponent(1,"YY2 [km]"); a1->setInfoOnComponent(2,"ZZZ3 [km]");
@@ -262,7 +262,7 @@ namespace SALOME_TEST
   ParaMEDMEM::MEDCoupling1DGTUMesh *MEDCouplingCorbaServBasicsTest::build1DGTUMesh()
   {
     ParaMEDMEM::MEDCoupling1DGTUMesh *targetMesh=ParaMEDMEM::MEDCoupling1DGTUMesh::New("Mesh1DGT",INTERP_KERNEL::NORM_POLYGON);
-    targetMesh->setTime(2.3,4,5);
+    targetMesh->setTime(2.3,55,-66);
     targetMesh->setTimeUnit("us");
     targetMesh->setDescription("My Description of 1DGTU");
     ParaMEDMEM::DataArrayDouble *a1=ParaMEDMEM::DataArrayDouble::New(); a1->alloc(10,3); a1->setInfoOnComponent(0,"X1 [m]");  a1->setInfoOnComponent(1,"YY2 [km]"); a1->setInfoOnComponent(2,"ZZZ3 [km]");

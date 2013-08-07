@@ -192,7 +192,7 @@ class MEDCouplingCorbaServBasicsTest:
 
     def build1SGTUMesh(self):
         targetMesh=MEDCoupling1SGTUMesh("Mesh1SGT",NORM_QUAD4)
-        targetMesh.setTime(2.3,4,5)
+        targetMesh.setTime(2.3,44,-55)
         targetMesh.setTimeUnit("us")
         targetMesh.setDescription("My Description of 1SGTU");
         a1=DataArrayDouble([1.,1.,0.,2.,1.,0.,3.,1.,0.,1.,0.,0.,2.,0.,0.,0.,0.,0.,0.,1.,0.,3.,0.,0.,4.,0.,0.,4.,1.,0.],10,3)
@@ -207,7 +207,7 @@ class MEDCouplingCorbaServBasicsTest:
 
     def build1DGTUMesh(self):
         targetMesh=MEDCoupling1DGTUMesh("Mesh1DGT",NORM_POLYGON);
-        targetMesh.setTime(2.3,4,5)
+        targetMesh.setTime(2.3,55,-66)
         targetMesh.setTimeUnit("us")
         targetMesh.setDescription("My Description of 1DGTU");
         a1=DataArrayDouble([1.,1.,0.,2.,1.,0.,3.,1.,0.,1.,0.,0.,2.,0.,0.,0.,0.,0.,0.,1.,0.,3.,0.,0.,4.,0.,0.,4.,1.,0.],10,3)
