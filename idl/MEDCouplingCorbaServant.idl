@@ -72,6 +72,18 @@ module SALOME_MED
   {
   };
 
+  interface MEDCoupling1GTUMeshCorbaInterface : MEDCouplingPointSetCorbaInterface
+  {
+  };
+
+  interface MEDCoupling1SGTUMeshCorbaInterface : MEDCoupling1GTUMeshCorbaInterface
+  {
+  };
+
+  interface MEDCoupling1DGTUMeshCorbaInterface : MEDCoupling1GTUMeshCorbaInterface
+  {
+  };
+
   interface MEDCouplingExtrudedMeshCorbaInterface : MEDCouplingMeshCorbaInterface
   {
   };
