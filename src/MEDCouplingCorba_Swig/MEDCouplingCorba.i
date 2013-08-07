@@ -26,6 +26,8 @@
 #include "MEDCouplingMultiFieldsServant.hxx"
 #include "MEDCouplingFieldOverTimeServant.hxx"
 #include "MEDCouplingUMeshServant.hxx"
+#include "MEDCoupling1SGTUMeshServant.hxx"
+#include "MEDCoupling1DGTUMeshServant.hxx"
 #include "MEDCouplingExtrudedMeshServant.hxx"
 #include "MEDCouplingCMeshServant.hxx"
 #include "MEDCouplingCurveLinearMeshServant.hxx"
@@ -121,6 +123,40 @@ namespace ParaMEDMEM
          static PyObject *_this2(const MEDCouplingUMesh *cppPointerOfMesh)
          {
            return buildServantAndActivate2<MEDCouplingUMeshServant>(cppPointerOfMesh);
+         }
+       }
+  };
+
+  class MEDCoupling1SGTUMeshServant
+  {
+  public:
+    %extend
+       {
+         static PyObject *_this(const MEDCoupling1SGTUMesh *cppPointerOfMesh)
+         {
+           return buildServantAndActivate<MEDCoupling1SGTUMeshServant>(cppPointerOfMesh);
+         }
+
+         static PyObject *_this2(const MEDCoupling1SGTUMesh *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<MEDCoupling1SGTUMeshServant>(cppPointerOfMesh);
+         }
+       }
+  };
+
+  class MEDCoupling1DGTUMeshServant
+  {
+  public:
+    %extend
+       {
+         static PyObject *_this(const MEDCoupling1DGTUMesh *cppPointerOfMesh)
+         {
+           return buildServantAndActivate<MEDCoupling1DGTUMeshServant>(cppPointerOfMesh);
+         }
+
+         static PyObject *_this2(const MEDCoupling1DGTUMesh *cppPointerOfMesh)
+         {
+           return buildServantAndActivate2<MEDCoupling1DGTUMeshServant>(cppPointerOfMesh);
          }
        }
   };

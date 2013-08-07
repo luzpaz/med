@@ -26,6 +26,8 @@
 #include "MEDCouplingMultiFieldsClient.hxx"
 #include "MEDCouplingFieldOverTimeClient.hxx"
 #include "MEDCouplingUMeshClient.hxx"
+#include "MEDCoupling1SGTUMeshClient.hxx"
+#include "MEDCoupling1DGTUMeshClient.hxx"
 #include "MEDCouplingExtrudedMeshClient.hxx"
 #include "MEDCouplingCMeshClient.hxx"
 #include "MEDCouplingCurveLinearMeshClient.hxx"
@@ -42,6 +44,8 @@ using namespace ParaMEDMEM;
 %newobject ParaMEDMEM::MEDCouplingFieldDoubleClient::New;
 %newobject ParaMEDMEM::MEDCouplingFieldTemplateClient::New;
 %newobject ParaMEDMEM::MEDCouplingUMeshClient::New;
+%newobject ParaMEDMEM::MEDCoupling1SGTUMeshClient::New;
+%newobject ParaMEDMEM::MEDCoupling1DGTUMeshClient::New;
 %newobject ParaMEDMEM::MEDCouplingExtrudedMeshClient::New;
 %newobject ParaMEDMEM::MEDCouplingCMeshClient::New;
 %newobject ParaMEDMEM::MEDCouplingCurveLinearMeshClient::New;
@@ -211,6 +215,70 @@ namespace ParaMEDMEM
           Py_DECREF(pdict);
           Py_DECREF(iorMesh);
           MEDCouplingUMesh *ret=MEDCouplingUMeshClient::New(meshPtrCppC);
+          return ret;
+        } 
+      }
+  };
+
+  class MEDCoupling1SGTUMeshClient
+  {
+  public:
+    %extend
+      {
+        static MEDCoupling1SGTUMesh *New(PyObject *meshPtr) throw(INTERP_KERNEL::Exception)
+        {
+          PyObject* pdict=PyDict_New();
+          PyDict_SetItemString(pdict,"__builtins__",PyEval_GetBuiltins());
+          PyRun_String("import MEDCouplingCorbaServant_idl",Py_single_input,pdict, pdict);
+          PyRun_String("import CORBA",Py_single_input,pdict, pdict);
+          PyRun_String("orbTmp15634=CORBA.ORB_init([''])", Py_single_input,pdict, pdict);
+          PyObject *orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
+          // Ask omniORBpy to transform SUPPORT (python Corba) ptr to IOR string
+          PyObject *iorMesh=PyObject_CallMethod(orbPython,(char*)"object_to_string",(char*)"O",meshPtr);
+          if(!iorMesh)
+            throw INTERP_KERNEL::Exception("Error : the input parameter of MEDCoupling1SGTUMeshClient.New appears to differ from CORBA reference ! Expecting a 1SGTUMeshCorbaInterface CORBA reference !");
+          char *ior=PyString_AsString(iorMesh);
+          int argc=0;
+          CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
+          CORBA::Object_var meshPtrCpp=orb->string_to_object(ior);
+          SALOME_MED::MEDCoupling1SGTUMeshCorbaInterface_var meshPtrCppC=SALOME_MED::MEDCoupling1SGTUMeshCorbaInterface::_narrow(meshPtrCpp);
+          if(CORBA::is_nil(meshPtrCppC))
+            throw INTERP_KERNEL::Exception("error corba pointer is not a SALOME_MED.MEDCoupling1SGTUMeshInterface_ptr !");
+          Py_DECREF(pdict);
+          Py_DECREF(iorMesh);
+          MEDCoupling1SGTUMesh *ret=MEDCoupling1SGTUMeshClient::New(meshPtrCppC);
+          return ret;
+        } 
+      }
+  };
+
+  class MEDCoupling1DGTUMeshClient
+  {
+  public:
+    %extend
+      {
+        static MEDCoupling1DGTUMesh *New(PyObject *meshPtr) throw(INTERP_KERNEL::Exception)
+        {
+          PyObject* pdict=PyDict_New();
+          PyDict_SetItemString(pdict,"__builtins__",PyEval_GetBuiltins());
+          PyRun_String("import MEDCouplingCorbaServant_idl",Py_single_input,pdict, pdict);
+          PyRun_String("import CORBA",Py_single_input,pdict, pdict);
+          PyRun_String("orbTmp15634=CORBA.ORB_init([''])", Py_single_input,pdict, pdict);
+          PyObject *orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
+          // Ask omniORBpy to transform SUPPORT (python Corba) ptr to IOR string
+          PyObject *iorMesh=PyObject_CallMethod(orbPython,(char*)"object_to_string",(char*)"O",meshPtr);
+          if(!iorMesh)
+            throw INTERP_KERNEL::Exception("Error : the input parameter of MEDCoupling1DGTUMeshClient.New appears to differ from CORBA reference ! Expecting a 1DGTUMeshCorbaInterface CORBA reference !");
+          char *ior=PyString_AsString(iorMesh);
+          int argc=0;
+          CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
+          CORBA::Object_var meshPtrCpp=orb->string_to_object(ior);
+          SALOME_MED::MEDCoupling1DGTUMeshCorbaInterface_var meshPtrCppC=SALOME_MED::MEDCoupling1DGTUMeshCorbaInterface::_narrow(meshPtrCpp);
+          if(CORBA::is_nil(meshPtrCppC))
+            throw INTERP_KERNEL::Exception("error corba pointer is not a SALOME_MED.MEDCoupling1DGTUMeshInterface_ptr !");
+          Py_DECREF(pdict);
+          Py_DECREF(iorMesh);
+          MEDCoupling1DGTUMesh *ret=MEDCoupling1DGTUMeshClient::New(meshPtrCppC);
           return ret;
         } 
       }

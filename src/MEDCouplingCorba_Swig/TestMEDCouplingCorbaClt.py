@@ -143,6 +143,24 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
         meshRef=test.buildCLMesh();
         self.assertTrue(_mesh_from_distant.isEqual(meshRef,1e-12))
         pass
+
+    def testCorbaFetching1SGTUMesh(self):
+        meshPtr=self._objC.get1SGTUMesh();
+        _mesh_from_distant=MEDCoupling1SGTUMeshClient.New(meshPtr);
+        meshPtr.UnRegister();
+        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
+        meshRef=test.build1SGTUMesh();
+        self.assertTrue(_mesh_from_distant.isEqual(meshRef,1e-12))
+        pass
+
+    def testCorbaFetching1DGTUMesh(self):
+        meshPtr=self._objC.get1DGTUMesh();
+        _mesh_from_distant=MEDCoupling1DGTUMeshClient.New(meshPtr);
+        meshPtr.UnRegister();
+        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
+        meshRef=test.build1DGTUMesh();
+        self.assertTrue(_mesh_from_distant.isEqual(meshRef,1e-12))
+        pass
     
     def testCorbaField2DNTFetching(self):
         fieldPtr=self._objC.getFieldScalarOn2DNT();
