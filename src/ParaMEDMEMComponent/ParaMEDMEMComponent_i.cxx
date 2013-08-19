@@ -234,8 +234,7 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
                                                     CORBA::Double max_distance_for_3Dsurf_intersect,
                                                     CORBA::Long orientation,
                                                     CORBA::Boolean measure_abs,
-                                                    const char * splitting_policy,
-                                                    CORBA::Boolean P1P0_bary_method ) throw(SALOME::SALOME_Exception)
+                                                    const char * splitting_policy) throw(SALOME::SALOME_Exception)
 {
   except_st *est;
   void *ret_th;
@@ -262,7 +261,6 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
           st->orientation = orientation;
           st->measure_abs = measure_abs;
           st->splitting_policy = splitting_policy;
-          st->P1P0_bary_method = P1P0_bary_method;
           pthread_create(&(th[ip]),NULL,th_setinterpolationoptions,(void*)st);
         }
     }
@@ -280,8 +278,7 @@ void ParaMEDMEMComponent_i::setInterpolationOptions(const char * coupling,
                                                              max_distance_for_3Dsurf_intersect,
                                                              orientation,
                                                              measure_abs,
-                                                             splitting_policy,
-                                                             P1P0_bary_method );
+                                                             splitting_policy );
 
   if(!ret)
     {
@@ -511,8 +508,7 @@ void *th_setinterpolationoptions(void *s)
                                      st->max_distance_for_3Dsurf_intersect,
                                      st->orientation,
                                      st->measure_abs,
-                                     st->splitting_policy,
-                                     st->P1P0_bary_method);
+                                     st->splitting_policy);
     }
   catch(const SALOME::SALOME_Exception &ex)
     {

@@ -53,8 +53,7 @@ module SALOME_MED
                                  in double max_distance_for_3Dsurf_intersect,
                                  in long orientation,
                                  in boolean measure_abs,
-                                 in string splitting_policy,
-                                 in boolean P1P0_bary_method) raises (SALOME::SALOME_Exception);
+                                 in string splitting_policy) raises (SALOME::SALOME_Exception);
     void initializeCoupling(in string coupling, in string ior) raises (SALOME::SALOME_Exception);
     void terminateCoupling(in string coupling) raises (SALOME::SALOME_Exception);
   };

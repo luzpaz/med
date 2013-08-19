@@ -55,7 +55,6 @@ typedef struct
   long orientation;
   bool measure_abs;
   const char * splitting_policy;
-  bool P1P0_bary_method;
   std::string coupling;
   std::string ior;
   Engines::IORTab* tior;
@@ -91,8 +90,7 @@ namespace ParaMEDMEM
                                  CORBA::Double max_distance_for_3Dsurf_intersect,
                                  CORBA::Long orientation,
                                  CORBA::Boolean measure_abs,
-                                 const char * splitting_policy,
-                                 CORBA::Boolean P1P0_bary_method ) throw(SALOME::SALOME_Exception);
+                                 const char * splitting_policy ) throw(SALOME::SALOME_Exception);
     virtual void initializeCoupling(const char * coupling, const char * ior) throw(SALOME::SALOME_Exception);
     virtual void terminateCoupling(const char * coupling) throw(SALOME::SALOME_Exception);
     virtual void _getOutputField(const char * coupling, MEDCouplingFieldDouble* field);
