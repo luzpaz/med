@@ -36,6 +36,16 @@ MEDCalculatorDBSliceField::MEDCalculatorDBSliceField(MEDCouplingFieldDouble *f):
 {
 }
 
+std::size_t MEDCalculatorDBSliceField::getHeapMemorySizeWithoutChildren() const
+{
+  return 0;
+}
+
+std::vector<RefCountObject *> MEDCalculatorDBSliceField::getDirectChildren() const
+{
+  return std::vector<RefCountObject *>();
+}
+
 void MEDCalculatorDBSliceField::setField(MEDCouplingFieldDouble *f) const
 {
   if(_field!=f)

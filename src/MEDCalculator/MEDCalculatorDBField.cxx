@@ -46,6 +46,16 @@ MEDCalculatorDBFieldCst *MEDCalculatorDBField::New(double val)
   return new MEDCalculatorDBFieldCst(val);
 }
 
+std::size_t MEDCalculatorDBField::getHeapMemorySizeWithoutChildren() const
+{
+  return 0;
+}
+
+std::vector<RefCountObject *> MEDCalculatorDBField::getDirectChildren() const
+{
+  return std::vector<RefCountObject *>();
+}
+
 MEDCalculatorDBField *MEDCalculatorDBField::operator+(double val) const throw(INTERP_KERNEL::Exception)
 {
   MEDCouplingAutoRefCountObjectPtr<MEDCalculatorDBFieldCst> par2=new MEDCalculatorDBFieldCst(val);
