@@ -41,9 +41,9 @@ std::size_t MEDCalculatorDBSliceField::getHeapMemorySizeWithoutChildren() const
   return 0;
 }
 
-std::vector<RefCountObject *> MEDCalculatorDBSliceField::getDirectChildren() const
+std::vector<const BigMemoryObject *> MEDCalculatorDBSliceField::getDirectChildren() const
 {
-  return std::vector<RefCountObject *>();
+  return std::vector<const BigMemoryObject *>();
 }
 
 void MEDCalculatorDBSliceField::setField(MEDCouplingFieldDouble *f) const

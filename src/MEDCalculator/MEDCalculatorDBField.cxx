@@ -51,9 +51,9 @@ std::size_t MEDCalculatorDBField::getHeapMemorySizeWithoutChildren() const
   return 0;
 }
 
-std::vector<RefCountObject *> MEDCalculatorDBField::getDirectChildren() const
+std::vector<const BigMemoryObject *> MEDCalculatorDBField::getDirectChildren() const
 {
-  return std::vector<RefCountObject *>();
+  return std::vector<const BigMemoryObject *>();
 }
 
 MEDCalculatorDBField *MEDCalculatorDBField::operator+(double val) const throw(INTERP_KERNEL::Exception)
