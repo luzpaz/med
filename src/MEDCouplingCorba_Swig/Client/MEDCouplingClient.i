@@ -188,6 +188,74 @@ namespace ParaMEDMEM
       }
   };
 
+  class MEDCouplingMeshClient
+  {
+  public:
+    %extend
+      {
+        static MEDCouplingMesh *New(PyObject *meshPtr) throw(INTERP_KERNEL::Exception)
+        {
+          PyObject* pdict=PyDict_New();
+          PyDict_SetItemString(pdict,"__builtins__",PyEval_GetBuiltins());
+          PyRun_String("import MEDCouplingCorbaServant_idl",Py_single_input,pdict, pdict);
+          PyRun_String("import CORBA",Py_single_input,pdict, pdict);
+          PyRun_String("orbTmp15634=CORBA.ORB_init([''])", Py_single_input,pdict, pdict);
+          PyObject *orbPython=PyDict_GetItemString(pdict,"orbTmp15634");
+          // Ask omniORBpy to transform SUPPORT (python Corba) ptr to IOR string
+          PyObject *iorMesh=PyObject_CallMethod(orbPython,(char*)"object_to_string",(char*)"O",meshPtr);
+          if(!iorMesh)
+            throw INTERP_KERNEL::Exception("Error : the input parameter of MEDCouplingMeshClient.New appears to differ from CORBA reference ! Expecting a MeshCorbaInterface CORBA reference !");
+          char *ior=PyString_AsString(iorMesh);
+          int argc=0;
+          CORBA::ORB_var orb=CORBA::ORB_init(argc,0);
+          CORBA::Object_var meshPtrCpp=orb->string_to_object(ior);
+          SALOME_MED::MEDCouplingUMeshCorbaInterface_var meshPtrCppC1=SALOME_MED::MEDCouplingUMeshCorbaInterface::_narrow(meshPtrCpp);
+          if(!CORBA::is_nil(meshPtrCppC1))
+            {
+              Py_DECREF(pdict);
+              Py_DECREF(iorMesh);
+              return MEDCouplingUMeshClient::New(meshPtrCppC1);
+            }
+          SALOME_MED::MEDCouplingCMeshCorbaInterface_var meshPtrCppC2=SALOME_MED::MEDCouplingCMeshCorbaInterface::_narrow(meshPtrCpp);
+          if(!CORBA::is_nil(meshPtrCppC2))
+            {
+              Py_DECREF(pdict);
+              Py_DECREF(iorMesh);
+              return MEDCouplingCMeshClient::New(meshPtrCppC2);
+            }
+          SALOME_MED::MEDCouplingCurveLinearMeshCorbaInterface_var meshPtrCppC3=SALOME_MED::MEDCouplingCurveLinearMeshCorbaInterface::_narrow(meshPtrCpp);
+          if(!CORBA::is_nil(meshPtrCppC3))
+            {
+              Py_DECREF(pdict);
+              Py_DECREF(iorMesh);
+              return MEDCouplingCurveLinearMeshClient::New(meshPtrCppC3);
+            }
+          SALOME_MED::MEDCoupling1SGTUMeshCorbaInterface_var meshPtrCppC4=SALOME_MED::MEDCoupling1SGTUMeshCorbaInterface::_narrow(meshPtrCpp);
+          if(!CORBA::is_nil(meshPtrCppC4))
+            {
+              Py_DECREF(pdict);
+              Py_DECREF(iorMesh);
+              return MEDCoupling1SGTUMeshClient::New(meshPtrCppC4);
+            }
+          SALOME_MED::MEDCoupling1DGTUMeshCorbaInterface_var meshPtrCppC5=SALOME_MED::MEDCoupling1DGTUMeshCorbaInterface::_narrow(meshPtrCpp);
+          if(!CORBA::is_nil(meshPtrCppC5))
+            {
+              Py_DECREF(pdict);
+              Py_DECREF(iorMesh);
+              return MEDCoupling1DGTUMeshClient::New(meshPtrCppC5);
+            }
+          SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_var meshPtrCppC6=SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface::_narrow(meshPtrCpp);
+          if(!CORBA::is_nil(meshPtrCppC6))
+            {
+              Py_DECREF(pdict);
+              Py_DECREF(iorMesh);
+              return MEDCouplingExtrudedMeshClient::New(meshPtrCppC6);
+            }
+          throw INTERP_KERNEL::Exception("Error input corba pointer is not a managed mesh type !");
+        } 
+      }
+  };
+
   class MEDCouplingUMeshClient
   {
   public:

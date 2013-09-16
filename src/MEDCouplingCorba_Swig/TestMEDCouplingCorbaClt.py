@@ -34,8 +34,9 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
     def testContentOfFetched1DMesh(self):
         meshPtr=self._objC.get1DMesh();
         self.assertEqual("1DMeshForCorba",meshPtr.getName());
-        _mesh_from_distant=MEDCouplingUMeshClient.New(meshPtr);
+        _mesh_from_distant=MEDCouplingMeshClient.New(meshPtr);
         meshPtr.UnRegister();
+        self.assertTrue(isinstance(_mesh_from_distant,MEDCouplingUMesh))
         self.assertTrue(_mesh_from_distant.getSpaceDimension()==3);
         self.assertTrue(_mesh_from_distant.getMeshDimension()==1);
         test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()

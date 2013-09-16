@@ -38,8 +38,11 @@ class MEDCouplingMeshFieldFactoryComponentPy(MEDCouplingCorbaServantTest_idl._0_
         self._orb.shutdown(0)
 
     def get1DMesh(self):
+        import SALOME_MED
         mesh=self._test.build1DMesh()
-        return MEDCouplingUMeshServant._this(mesh)
+        ret=MEDCouplingUMeshServant._this(mesh)
+        assert isinstance(ret,SALOME_MED._objref_MEDCouplingUMeshCorbaInterface)
+        return ret
     
     def get2DMesh(self):
         mesh=self._test.build2DMesh()
