@@ -47,12 +47,12 @@ namespace ParaMEDMEM
   public:
     %extend
        {
-         static PyObject *_this(const MEDCouplingFieldDouble *cppPointerOfMesh)
+         static PyObject *_this(const MEDCouplingFieldDouble *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate<MEDCouplingFieldDoubleServant>(cppPointerOfMesh);
          }
          
-         static PyObject *_this2(const MEDCouplingFieldDouble *cppPointerOfMesh)
+         static PyObject *_this2(const MEDCouplingFieldDouble *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate2<MEDCouplingFieldDoubleServant>(cppPointerOfMesh);
          }
@@ -64,12 +64,12 @@ namespace ParaMEDMEM
   public:
     %extend
        {
-         static PyObject *_this(const MEDCouplingFieldTemplate *cppPointerOfMesh)
+         static PyObject *_this(const MEDCouplingFieldTemplate *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate<MEDCouplingFieldTemplateServant>(cppPointerOfMesh);
          }
          
-         static PyObject *_this2(const MEDCouplingFieldTemplate *cppPointerOfMesh)
+         static PyObject *_this2(const MEDCouplingFieldTemplate *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate2<MEDCouplingFieldTemplateServant>(cppPointerOfMesh);
          }
@@ -81,12 +81,12 @@ namespace ParaMEDMEM
   public:
     %extend
        {
-         static PyObject *_this(const MEDCouplingMultiFields *cppPointerOfMesh)
+         static PyObject *_this(const MEDCouplingMultiFields *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate<MEDCouplingMultiFieldsServant>(cppPointerOfMesh);
          }
 
-         static PyObject *_this2(const MEDCouplingMultiFields *cppPointerOfMesh)
+         static PyObject *_this2(const MEDCouplingMultiFields *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate2<MEDCouplingMultiFieldsServant>(cppPointerOfMesh);
          }
@@ -98,14 +98,59 @@ namespace ParaMEDMEM
   public:
     %extend
        {
-         static PyObject *_this(const MEDCouplingFieldOverTime *cppPointerOfMesh)
+         static PyObject *_this(const MEDCouplingFieldOverTime *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate<MEDCouplingFieldOverTimeServant>(cppPointerOfMesh);
          }
 
-         static PyObject *_this2(const MEDCouplingFieldOverTime *cppPointerOfMesh)
+         static PyObject *_this2(const MEDCouplingFieldOverTime *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate2<MEDCouplingFieldOverTimeServant>(cppPointerOfMesh);
+         }
+       }
+  };
+
+  class MEDCouplingMeshServant
+  {
+  public:
+    %extend
+       {
+         static PyObject *_this(const MEDCouplingMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
+         {
+           if(!cppPointerOfMesh)
+             throw INTERP_KERNEL::Exception("MEDCouplingMeshServant::_this : input pointer is NULL !");
+           if(dynamic_cast<const MEDCouplingUMesh *>(cppPointerOfMesh))
+             return buildServantAndActivate<MEDCouplingUMeshServant>(dynamic_cast<const MEDCouplingUMesh *>(cppPointerOfMesh));
+           if(dynamic_cast<const MEDCoupling1SGTUMesh *>(cppPointerOfMesh))
+             return buildServantAndActivate<MEDCoupling1SGTUMeshServant>(dynamic_cast<const MEDCoupling1SGTUMesh *>(cppPointerOfMesh));
+           if(dynamic_cast<const MEDCoupling1DGTUMesh *>(cppPointerOfMesh))
+             return buildServantAndActivate<MEDCoupling1DGTUMeshServant>(dynamic_cast<const MEDCoupling1DGTUMesh *>(cppPointerOfMesh));
+           if(dynamic_cast<const MEDCouplingExtrudedMesh *>(cppPointerOfMesh))
+             return buildServantAndActivate<MEDCouplingExtrudedMeshServant>(dynamic_cast<const MEDCouplingExtrudedMesh *>(cppPointerOfMesh));
+           if(dynamic_cast<const MEDCouplingCMesh *>(cppPointerOfMesh))
+             return buildServantAndActivate<MEDCouplingCMeshServant>(dynamic_cast<const MEDCouplingCMesh *>(cppPointerOfMesh));
+           if(dynamic_cast<const MEDCouplingCurveLinearMesh *>(cppPointerOfMesh))
+             return buildServantAndActivate<MEDCouplingCurveLinearMeshServant>(dynamic_cast<const MEDCouplingCurveLinearMesh *>(cppPointerOfMesh));
+           throw INTERP_KERNEL::Exception("MEDCouplingMeshServant::_this : unrecognized type (or not managed type) of Mesh in input !");
+         }
+
+         static PyObject *_this2(const MEDCouplingMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
+         {
+           if(!cppPointerOfMesh)
+             throw INTERP_KERNEL::Exception("MEDCouplingMeshServant::_this2 : input pointer is NULL !");
+           if(dynamic_cast<const MEDCouplingUMesh *>(cppPointerOfMesh))
+             return buildServantAndActivate2<MEDCouplingUMeshServant>(dynamic_cast<const MEDCouplingUMesh *>(cppPointerOfMesh));
+           if(dynamic_cast<const MEDCoupling1SGTUMesh *>(cppPointerOfMesh))
+             return buildServantAndActivate2<MEDCoupling1SGTUMeshServant>(dynamic_cast<const MEDCoupling1SGTUMesh *>(cppPointerOfMesh));
+           if(dynamic_cast<const MEDCoupling1DGTUMesh *>(cppPointerOfMesh))
+             return buildServantAndActivate2<MEDCoupling1DGTUMeshServant>(dynamic_cast<const MEDCoupling1DGTUMesh *>(cppPointerOfMesh));
+           if(dynamic_cast<const MEDCouplingExtrudedMesh *>(cppPointerOfMesh))
+             return buildServantAndActivate2<MEDCouplingExtrudedMeshServant>(dynamic_cast<const MEDCouplingExtrudedMesh *>(cppPointerOfMesh));
+           if(dynamic_cast<const MEDCouplingCMesh *>(cppPointerOfMesh))
+             return buildServantAndActivate2<MEDCouplingCMeshServant>(dynamic_cast<const MEDCouplingCMesh *>(cppPointerOfMesh));
+           if(dynamic_cast<const MEDCouplingCurveLinearMesh *>(cppPointerOfMesh))
+             return buildServantAndActivate2<MEDCouplingCurveLinearMeshServant>(dynamic_cast<const MEDCouplingCurveLinearMesh *>(cppPointerOfMesh));
+           throw INTERP_KERNEL::Exception("MEDCouplingMeshServant::_this2 : unrecognized type (or not managed type) of Mesh in input !");
          }
        }
   };
@@ -115,12 +160,12 @@ namespace ParaMEDMEM
   public:
     %extend
        {
-         static PyObject *_this(const MEDCouplingUMesh *cppPointerOfMesh)
+         static PyObject *_this(const MEDCouplingUMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate<MEDCouplingUMeshServant>(cppPointerOfMesh);
          }
 
-         static PyObject *_this2(const MEDCouplingUMesh *cppPointerOfMesh)
+         static PyObject *_this2(const MEDCouplingUMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate2<MEDCouplingUMeshServant>(cppPointerOfMesh);
          }
@@ -132,12 +177,12 @@ namespace ParaMEDMEM
   public:
     %extend
        {
-         static PyObject *_this(const MEDCoupling1SGTUMesh *cppPointerOfMesh)
+         static PyObject *_this(const MEDCoupling1SGTUMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate<MEDCoupling1SGTUMeshServant>(cppPointerOfMesh);
          }
 
-         static PyObject *_this2(const MEDCoupling1SGTUMesh *cppPointerOfMesh)
+         static PyObject *_this2(const MEDCoupling1SGTUMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate2<MEDCoupling1SGTUMeshServant>(cppPointerOfMesh);
          }
@@ -149,12 +194,12 @@ namespace ParaMEDMEM
   public:
     %extend
        {
-         static PyObject *_this(const MEDCoupling1DGTUMesh *cppPointerOfMesh)
+         static PyObject *_this(const MEDCoupling1DGTUMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate<MEDCoupling1DGTUMeshServant>(cppPointerOfMesh);
          }
 
-         static PyObject *_this2(const MEDCoupling1DGTUMesh *cppPointerOfMesh)
+         static PyObject *_this2(const MEDCoupling1DGTUMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate2<MEDCoupling1DGTUMeshServant>(cppPointerOfMesh);
          }
@@ -166,12 +211,12 @@ namespace ParaMEDMEM
   public:
     %extend
        {
-         static PyObject *_this(const MEDCouplingExtrudedMesh *cppPointerOfMesh)
+         static PyObject *_this(const MEDCouplingExtrudedMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate<MEDCouplingExtrudedMeshServant>(cppPointerOfMesh);
          }
 
-         static PyObject *_this2(const MEDCouplingExtrudedMesh *cppPointerOfMesh)
+         static PyObject *_this2(const MEDCouplingExtrudedMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate2<MEDCouplingExtrudedMeshServant>(cppPointerOfMesh);
          }
@@ -183,12 +228,12 @@ namespace ParaMEDMEM
   public:
     %extend
        {
-         static PyObject *_this(const MEDCouplingCMesh *cppPointerOfMesh)
+         static PyObject *_this(const MEDCouplingCMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate<MEDCouplingCMeshServant>(cppPointerOfMesh);
          }
          
-         static PyObject *_this2(const MEDCouplingCMesh *cppPointerOfMesh)
+         static PyObject *_this2(const MEDCouplingCMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate2<MEDCouplingCMeshServant>(cppPointerOfMesh);
          }
@@ -200,12 +245,12 @@ namespace ParaMEDMEM
   public:
     %extend
        {
-         static PyObject *_this(const MEDCouplingCurveLinearMesh *cppPointerOfMesh)
+         static PyObject *_this(const MEDCouplingCurveLinearMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate<MEDCouplingCurveLinearMeshServant>(cppPointerOfMesh);
          }
 
-         static PyObject *_this2(const MEDCouplingCurveLinearMesh *cppPointerOfMesh)
+         static PyObject *_this2(const MEDCouplingCurveLinearMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate2<MEDCouplingCurveLinearMeshServant>(cppPointerOfMesh);
          }
@@ -217,12 +262,12 @@ namespace ParaMEDMEM
   public:
     %extend
        {
-         static PyObject *_this(const DataArrayDouble *cppPointerOfMesh)
+         static PyObject *_this(const DataArrayDouble *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate<DataArrayDoubleServant>(cppPointerOfMesh);
          }
 
-         static PyObject *_this2(const DataArrayDouble *cppPointerOfMesh)
+         static PyObject *_this2(const DataArrayDouble *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate2<DataArrayDoubleServant>(cppPointerOfMesh);
          }
@@ -234,12 +279,12 @@ namespace ParaMEDMEM
   public:
     %extend
        {
-         static PyObject *_this(const DataArrayInt *cppPointerOfMesh)
+         static PyObject *_this(const DataArrayInt *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate<DataArrayIntServant>(cppPointerOfMesh);
          }
 
-         static PyObject *_this2(const DataArrayInt *cppPointerOfMesh)
+         static PyObject *_this2(const DataArrayInt *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate2<DataArrayIntServant>(cppPointerOfMesh);
          }
