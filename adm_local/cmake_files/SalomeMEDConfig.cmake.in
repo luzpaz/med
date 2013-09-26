@@ -41,6 +41,10 @@ ENDIF()
 # Package root dir:
 SET_AND_CHECK(MED_ROOT_DIR_EXP "@PACKAGE_CMAKE_INSTALL_PREFIX@")
 
+# Include directories and definitions
+SET_AND_CHECK(MED_INCLUDE_DIRS "${MED_ROOT_DIR_EXP}/@SALOME_INSTALL_HEADERS@")
+SET(MED_DEFINITIONS)
+
 #### Now the specificities
 
 # Options exported by the package:
