@@ -99,11 +99,6 @@
       <source>FORM</source>
       <translation>Formulaire</translation>
     </message>
-    <message>
-      <location filename="MEDOP/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="391"/>
-      <source>SELECT_MESH</source>
-      <translation>Selectionner un maillage dans l'explorateur:</translation>
-    </message>
     <message utf8="true">
       <location filename="MEDOP/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="403"/>
       <source>MESH_GT</source>
@@ -121,6 +116,7 @@
     </message>
     <message>
       <location filename="MEDOP/gui/dialogs/DlgChangeUnderlyingMesh.cxx" line="36"/>
+      <location filename="MEDOP/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="391"/>
       <source>SELECT_MESH</source>
       <translation>Vous devez sélectionner un maillage dans l'explorateur et cliquer sur le bouton Maillage</translation>
     </message>

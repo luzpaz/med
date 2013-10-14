@@ -99,11 +99,6 @@
       <source>FORM</source>
       <translation>Form</translation>
     </message>
-    <message>
-      <location filename="MEDOP/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="391"/>
-      <source>SELECT_MESH</source>
-      <translation>Select a mesh in explorer:</translation>
-    </message>
     <message utf8="true">
       <location filename="MEDOP/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="403"/>
       <source>MESH_GT</source>
@@ -121,6 +116,7 @@
     </message>
     <message>
       <location filename="MEDOP/gui/dialogs/DlgChangeUnderlyingMesh.cxx" line="36"/>
+      <location filename="MEDOP/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="391"/>
       <source>SELECT_MESH</source>
       <translation>You must select a mesh in the explorer and clic the button Mesh</translation>
     </message>
