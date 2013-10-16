@@ -108,6 +108,7 @@ MESH_ENTITIES::MESH_ENTITIES () : map<int, const list<MED_EN::medGeometryElement
       MED_QUAD4,
       MED_TRIA6,
       MED_QUAD8,
+      MED_POLYGON,
       MED_TETRA4,
       MED_PYRA5,
       MED_PENTA6,
@@ -116,7 +117,6 @@ MESH_ENTITIES::MESH_ENTITIES () : map<int, const list<MED_EN::medGeometryElement
       MED_PYRA13,
       MED_PENTA15,
       MED_HEXA20,
-      MED_POLYGON,
       MED_POLYHEDRA};
 
     list<MED_EN::medGeometryElement> geomList(T,T+sizeof(T)/sizeof(MED_EN::medGeometryElement));   
