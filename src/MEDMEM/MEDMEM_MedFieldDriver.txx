@@ -303,7 +303,7 @@ MED_FIELD_DRIVER<T>::createFieldSupportPart1(med_2_3::med_idt        id,
          /*profileit=*/1,med_2_3::MED_COMPACT_PFLMODE,
          pflnamep3,&profilesizep3,locnamep3,&ngauss);
 
-      if ( numberOfElements <= 0 )
+      if ( numberOfElements <= 0 && entityCurrent != medmem_entity)
         numberOfElements = med_2_3::MEDfieldnValueWithProfile
           (id,fieldName.c_str(),ndt,od,
            (med_2_3::med_entity_type) ( entityCurrent = medmem_entity ), // try the other entity !
@@ -437,11 +437,13 @@ MED_FIELD_DRIVER<T>::createFieldSupportPart1(med_2_3::med_idt        id,
   }
    
   //retrieves the right medmem entity type from field_dim and mesh_dim
-  int mesh_dim = MED_FIELD_DRIVER<T>::getMeshDimensionFromFile(id,meshName);
-  //if (mesh_dim==2 && field_dim==2) // 0020644: [CEA 384] Problem with 1D no structured meshing
-  if (mesh_dim==field_dim)
-    entity=MED_CELL;
-
+  if ( entity != MED_NODE )
+  {
+    int mesh_dim = MED_FIELD_DRIVER<T>::getMeshDimensionFromFile(id,meshName);
+    //if (mesh_dim==2 && field_dim==2) // 0020644: [CEA 384] Problem with 1D no structured meshing
+    if (mesh_dim==field_dim)
+      entity=MED_CELL;
+  }
   if ( alreadyFoundAnEntity) {
     support.setName(fieldName+" Support");
     support.setMeshName(meshName); // Vérifier que les différents noms de maillages lus soient identiques
@@ -488,7 +490,7 @@ MED_FIELD_DRIVER<T>::getMEDMEMEntityFromMEDType(medGeometryElement type,
 
 template <class T> int
 MED_FIELD_DRIVER<T>::getMeshDimensionFromFile(med_2_3::med_idt id,
-                                                const string &   meshName) const
+                                              const string &   meshName) const
 {
   const char* LOC = "MED_FIELD_DRIVER<T>::getMeshDimensionFromFile(...)";
   BEGIN_OF_MED(LOC);
@@ -539,15 +541,15 @@ MED_FIELD_DRIVER<T>::getMeshDimensionFromFile(med_2_3::med_idt id,
     and the MEDMEM entity*/
   const MED_EN::medEntityMesh entity = MED_EN::MED_CELL;
 
-  list<MED_EN::medGeometryElement>::const_iterator currentGeometry;
+  list<MED_EN::medGeometryElement>::const_reverse_iterator currentGeometry;
 
   med_2_3::med_int dtp3 = MED_NO_DT, itp3 = MED_NO_IT;
   med_2_3::med_float dtfp3 = MED_NO_DT;
   med_2_3::med_bool chp3,trp3;
   med_2_3::MEDmeshComputationStepInfo(id,meshName.c_str(),1,&dtp3,&itp3,&dtfp3);
 
-  for (currentGeometry  = (MED_EN::meshEntities[entity]).begin();
-       currentGeometry != (MED_EN::meshEntities[entity]).end(); currentGeometry++)
+  for (currentGeometry  = (MED_EN::meshEntities[entity]).rbegin();
+       currentGeometry != (MED_EN::meshEntities[entity]).rend(); currentGeometry++)
     {
       numberOfElements =
         med_2_3::MEDmeshnEntity( id, meshName.c_str(),
@@ -561,6 +563,7 @@ MED_FIELD_DRIVER<T>::getMeshDimensionFromFile(med_2_3::med_idt id,
       geometricType[numberOfGeometricType] = *currentGeometry;
 
       numberOfGeometricType++;
+      break;
     }
 
   //Because MEDFILE and MEDMEM differ on the definition of MED_CELL
@@ -630,13 +633,14 @@ MED_FIELD_DRIVER<T>::getMeshGeometricTypeFromFile(med_2_3::med_idt      id,
   bool alreadyFoundAnEntity = false;
   numberOfElementsOfTypeC[0]=0;
 
+  med_2_3::med_int dtp3,itp3;
+  med_2_3::med_float dtfp3;
+  med_2_3::med_bool chp3,trp3;
+  med_2_3::MEDmeshComputationStepInfo(id,meshName.c_str(),1,&dtp3,&itp3,&dtfp3);
+
   for (currentGeometry  = (MED_EN::meshEntities[entity]).begin();
        currentGeometry != (MED_EN::meshEntities[entity]).end(); currentGeometry++)
   {
-    med_2_3::med_int dtp3,itp3;
-    med_2_3::med_float dtfp3;
-    med_2_3::med_bool chp3,trp3;
-    med_2_3::MEDmeshComputationStepInfo(id,meshName.c_str(),1,&dtp3,&itp3,&dtfp3);
     numberOfElements =
       med_2_3::MEDmeshnEntity(id,meshName.c_str(),dtp3,itp3,(med_2_3::med_entity_type) medfile_entity,(med_2_3::med_geometry_type) *currentGeometry,quoi,med_2_3::MED_NODAL,&chp3,&trp3);
 
