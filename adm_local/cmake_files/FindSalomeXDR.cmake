@@ -1,4 +1,4 @@
-# Copyright (C) 2012-2013  CEA/DEN, EDF R&D
+# Copyright (C) 2013  CEA/DEN, EDF R&D, OPEN CASCADE
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,17 +16,15 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+# Author: Anthony Geay
+#
 
-SET(admlocal_cmake_DATA
-  FindXDR.cmake
-  FindSalomeXDR.cmake
-  FindMetis.cmake
-  FindSalomeMetis.cmake
-  FindParMetis.cmake
-  FindSalomeParMetis.cmake
-  FindScotch.cmake
-  FindSalomeScotch.cmake
-  FindSalomeMED.cmake
-  )
+# XDR detection dor Salome
+#
+#  !! Please read the generic detection procedure in SalomeMacros.cmake !!
+#
 
-INSTALL(FILES ${admlocal_cmake_DATA} DESTINATION ${SALOME_INSTALL_CMAKE_LOCAL})
+SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(XDR XDR_FOUND 1)
+#MARK_AS_ADVANCED()
+
+#SALOME_ACCUMULATE_HEADERS(XDR_INCLUDE_DIRS) # useless here because XDR is used only in CXX of MEDLoader
