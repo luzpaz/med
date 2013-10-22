@@ -53,9 +53,9 @@ SET(SALOME_MED_STANDALONE     @SALOME_MED_STANDALONE@)
 SET(SALOME_MED_MICROMED       @SALOME_MED_MICROMED@)
 SET(SALOME_MED_ENABLE_PYTHON  @SALOME_MED_ENABLE_PYTHON@)
 SET(SALOME_USE_MPI            @SALOME_USE_MPI@)
-SET(SALOME_BUILD_DOC          @SALOME_BUILD_DOC@)
-SET(SALOME_BUILD_TESTS        @SALOME_BUILD_TESTS@)
-SET(SALOME_BUILD_GUI          @SALOME_BUILD_GUI@)
+SET(SALOME_MED_BUILD_DOC      @SALOME_BUILD_DOC@)
+SET(SALOME_MED_BUILD_TESTS    @SALOME_BUILD_TESTS@)
+SET(SALOME_MED_BUILD_GUI      @SALOME_BUILD_GUI@)
 
 # Advanced options
 
@@ -69,9 +69,11 @@ ENDIF(NOT SALOME_MED_MICROMED)
 
 IF(NOT SALOME_MED_STANDALONE)
   SET_AND_CHECK(KERNEL_ROOT_DIR_EXP "@PACKAGE_KERNEL_ROOT_DIR@")
+  LIST(APPEND MED_DEFINITIONS "@KERNEL_DEFINITIONS@")
 ENDIF(NOT SALOME_MED_STANDALONE)
 IF(SALOME_BUILD_GUI)
   SET_AND_CHECK(GUI_ROOT_DIR_EXP "@PACKAGE_GUI_ROOT_DIR@")
+  LIST(APPEND MED_DEFINITIONS "@GUI_DEFINITIONS@")
 ENDIF(SALOME_BUILD_GUI)
 
 # For all prerequisites, load the corresponding targets if the package was used 
@@ -79,13 +81,12 @@ ENDIF(SALOME_BUILD_GUI)
 # without having to set LD_LIBRARY_PATH.
 # Many of them will be automatically loaded from KERNEL or GUI:
 
-SET(_PREREQ)
-SET(_PREREQ_CONFIG_DIR)
-
-IF(NOT SALOME_MED_MICROMED)
-  LIST(APPEND _PREREQ             HDF5         MEDFile )
-  LIST(APPEND _PREREQ_CONFIG_DIR "@HDF5_DIR@"  "@MEDFile_DIR@")
-ENDIF()
+SET(_PREREQ Metis ParMetis Scotch XDR CAS Qt4 CppUnit Graphviz Doxygen Sphinx MPI omniORB 
+            PThread Boost libXml2 Python HDF5 MEDFile)
+SET(_PREREQ_CONFIG_DIR "@Metis_DIR@" "@ParMetis_DIR@" "@Scotch_DIR@" "@XDR_DIR@" "@CAS_DIR@" "@Qt4_DIR@"
+                       "@CppUnit_DIR@" "@Graphviz_DIR@" "@Doxygen_DIR@" "@Sphinx_DIR@" "@MPI_DIR@" 
+                       "@omniORB_DIR@" "@PThread_DIR@" "@Boost_DIR@" "@libXml2_DIR@" 
+                       "@Python_DIR@" "@HDF5_DIR@"  "@MEDFile_DIR@")
 
 LIST(LENGTH _PREREQ_CONFIG_DIR _list_len)
 # Another CMake stupidity - FOREACH(... RANGE r) generates r+1 numbers ...
@@ -117,16 +118,19 @@ SET(SALOME_INSTALL_PYTHON "@SALOME_INSTALL_PYTHON@")
 SET(SALOME_INSTALL_PYTHON_SHARED "@SALOME_INSTALL_PYTHON_SHARED@")
 SET(SALOME_INSTALL_RES "@SALOME_INSTALL_RES@")
 
-# Include KERNEL targets if they were not already loaded:
-IF(NOT (TARGET SALOMEBasics) AND NOT SALOME_MED_STANDALONE) 
-  INCLUDE("${KERNEL_ROOT_DIR_EXP}/${SALOME_INSTALL_CMAKE}/SalomeKERNELTargets.cmake")
-ENDIF()
-
-# Include GUI targets if they were not already loaded:
-IF(NOT (TARGET Event) AND SALOME_BUILD_GUI) 
-  INCLUDE("${GUI_ROOT_DIR_EXP}/${SALOME_INSTALL_CMAKE_LOCAL}/SalomeGUITargets.cmake")
-ENDIF()
-
+IF(SALOME_BUILD_GUI) 
+  # Include GUI targets if they were not already loaded:
+  IF(NOT (TARGET Event)) 
+    INCLUDE("${GUI_ROOT_DIR_EXP}/${SALOME_INSTALL_CMAKE_LOCAL}/SalomeGUITargets.cmake")
+  ENDIF()
+ELSE(SALOME_BUILD_GUI)
+  IF(NOT SALOME_MED_STANDALONE) 
+    # Include KERNEL targets if they were not already loaded:
+    IF(NOT (TARGET SALOMEBasics) AND NOT SALOME_MED_STANDALONE) 
+      INCLUDE("${KERNEL_ROOT_DIR_EXP}/${SALOME_INSTALL_CMAKE}/SalomeKERNELTargets.cmake")
+    ENDIF()
+  ENDIF(NOT SALOME_MED_STANDALONE) 
+ENDIF(SALOME_BUILD_GUI)
 
 # Exposed MED targets:
 SET(MED_interpkernel interpkernel)
