@@ -655,23 +655,49 @@ ENDMACRO(SALOME_ACCUMULATE_HEADERS)
 # 2. Full list of environment variable names is stored in CMake variable
 #    _${PROJECT_NAME}_EXTRA_ENV.
 #
+# Notes:
+# - The arguments list can include optional CHECK or NOCHECK keywords:
+#   * For all arguments following CHECK keyword the macro perform an
+#     additional check (see below); this is the default mode, it is suitable
+#     for path variables (PATH, LD_LIBRARY_PATH, etc).
+#   * For all arguments following NOCHECK keyword, no additional check is
+#     performed.
+#   Checking an argument means that we check:
+#    - That the path actually exists
+#    - That this is not a standard system path (starting with "/usr"); this avoids
+#   polluting LD_LIBRARY_PATH or PATH with things like "/usr/lib64" ...
+#
 MACRO(SALOME_ACCUMULATE_ENVIRONMENT envvar)
+  SET(_is_check ON)
   FOREACH(_item ${ARGN})
-    IF(EXISTS ${_item})
-      IF(IS_DIRECTORY ${_item})
+    IF(${_item} STREQUAL "NOCHECK")
+      SET(_is_check OFF)
+    ELSEIF(${_item} STREQUAL "CHECK")
+      SET(_is_check ON)
+    ELSE()
+      IF(_is_check)
+        IF(NOT IS_DIRECTORY ${_item})
+          IF(TARGET ${_item})
+            GET_TARGET_PROPERTY(_item ${_item} LOCATION)
+          ENDIF()        
+          GET_FILENAME_COMPONENT(_item ${_item} PATH)  
+        ENDIF()    
+        IF(EXISTS ${_item})
+          STRING(REGEX MATCH "^/usr" _usr_find ${_item})
+          LIST(FIND _${PROJECT_NAME}_EXTRA_ENV_${envvar} ${_item} _res)
+          IF(NOT _usr_find AND _res EQUAL -1)
+              LIST(APPEND _${PROJECT_NAME}_EXTRA_ENV_${envvar} ${_item})
+          ENDIF()  
+        ENDIF()
+      ELSE(_is_check)
         LIST(FIND _${PROJECT_NAME}_EXTRA_ENV_${envvar} ${_item} _res)
-        IF(_res EQUAL -1)
+        IF( _res EQUAL -1)
           LIST(APPEND _${PROJECT_NAME}_EXTRA_ENV_${envvar} ${_item})
-        ENDIF()
-      ELSE()
-        GET_FILENAME_COMPONENT(_path_dir ${_item} PATH)
-        LIST(FIND _${PROJECT_NAME}_EXTRA_ENV_${envvar} ${_path_dir} _res)
-        IF(_res EQUAL -1)
-          LIST(APPEND _${PROJECT_NAME}_EXTRA_ENV_${envvar} ${_path_dir})
-        ENDIF()
-      ENDIF()
-    ENDIF()
+        ENDIF()  
+      ENDIF(_is_check)
+    ENDIF()   
   ENDFOREACH()
+  
   LIST(FIND _${PROJECT_NAME}_EXTRA_ENV ${envvar} _res)
   IF(_res EQUAL -1)
     LIST(APPEND _${PROJECT_NAME}_EXTRA_ENV ${envvar})
@@ -717,7 +743,7 @@ MACRO(SALOME_GENERATE_ENVIRONMENT_SCRIPT output script cmd opts)
         IF(${_item} STREQUAL "LD_LIBRARY_PATH")
           SET(_item PATH)
         ENDIF()
-        STRING(REPLACE "/" "\\" _env "${_env} @SET ${_item}=${_val}\;%${_item}%\n")
+        STRING(REPLACE "/" "\\" _env "${_env} @SET ${_item}=${_val};%${_item}%\n")
         SET(_ext "bat")
         SET(_call_cmd "call")
       ELSE(WIN32)
