@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>MEN_FILE_XMED</source>
-      <translation>Xmed</translation>
+      <translation>こんにちは</translation>
     </message>
     <message>
       <source>MEN_GET_BANNER</source>
@@ -41,7 +41,7 @@
     </message>
     <message>
       <source>MEN_FILE</source>
-      <translation>&amp; ファイル</translation>
+      <translation>ファイル(&amp;F)</translation>
     </message>
     <message>
       <source>STS_GET_BANNER</source>

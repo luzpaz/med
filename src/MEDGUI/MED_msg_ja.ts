@@ -5,23 +5,23 @@
     <name>@default</name>
     <message>
       <source>MED_BUT_OK</source>
-      <translation>わかりました</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>MED_INF_FIELDNAME</source>
-      <translation>読み取るフィールドの名前を入力してください。</translation>
+      <translation>読み取りするフィールドの名前を指定して下さい</translation>
     </message>
     <message>
       <source>MED_INF_MESHNAME</source>
-      <translation>読みたいメッシュの名前を入力してください。</translation>
+      <translation>読み取りするメッシュの名前を指定して下さい</translation>
     </message>
     <message>
       <source>MED_INF_NOIOR</source>
-      <translation>オブジェクトは、IOR を持ちません。</translation>
+      <translation>オブジェクトは、IOR を持たない</translation>
     </message>
     <message>
       <source>MED_INF_NOTIMPL</source>
-      <translation>実装言語このオブジェクトのいません。</translation>
+      <translation>このオブジェクトは実装されない</translation>
     </message>
     <message>
       <source>MED_WRN_WARNING</source>
@@ -29,15 +29,15 @@
     </message>
     <message>
       <source>MEN_SHOW</source>
-      <translation>ショー</translation>
+      <translation>表示</translation>
     </message>
     <message>
       <source>MEN_DUMPMESH</source>
-      <translation>メッシュをダンプします。</translation>
+      <translation>メッシュリスト</translation>
     </message>
     <message>
       <source>MEN_DUMPSUBMESH</source>
-      <translation>サブメッシュをダンプします。</translation>
+      <translation>サブメッシュリスト</translation>
     </message>
     <message>
       <source>MEN_HIDE</source>
@@ -45,7 +45,7 @@
     </message>
     <message>
       <source>MEN_EXPLORE</source>
-      <translation>音楽配信マック ＆ ファイルを探索します。</translation>
+      <translation>MED ファイルを探索</translation>
     </message>
     <message>
       <source>MEN_FIELDSEL</source>
@@ -57,19 +57,19 @@
     </message>
     <message>
       <source>MEN_POPUPTEST</source>
-      <translation>ポップアップ テスト</translation>
+      <translation>ポップアップテスト</translation>
     </message>
     <message>
       <source>STB_SHOW</source>
-      <translation>ショー</translation>
+      <translation>表示</translation>
     </message>
     <message>
       <source>STB_DUMPMESH</source>
-      <translation>メッシュをダンプします。</translation>
+      <translation>メッシュリスト</translation>
     </message>
     <message>
       <source>STB_DUMPSUBMESH</source>
-      <translation>メッシュをダンプします。</translation>
+      <translation>メッシュリスト</translation>
     </message>
     <message>
       <source>STB_HIDE</source>
@@ -77,35 +77,35 @@
     </message>
     <message>
       <source>STB_EXPLORE</source>
-      <translation>音楽配信マック ＆ ファイルを探索します。</translation>
+      <translation>MED ファイルを探索</translation>
     </message>
     <message>
       <source>STB_FIELDSEL</source>
-      <translation>フィールドを読み込む</translation>
+      <translation>フィールドを読み取り</translation>
     </message>
     <message>
       <source>STB_MESHSEL</source>
-      <translation>メッシュを読む</translation>
+      <translation>メッシュ読み込み</translation>
     </message>
     <message>
       <source>STB_POPUPTEST</source>
-      <translation>ポップアップ テスト</translation>
+      <translation>ポップアップテスト</translation>
     </message>
     <message>
       <source>TB_MED</source>
-      <translation>Med ツールバー</translation>
+      <translation>MED ツールバー</translation>
     </message>
     <message>
       <source>TOP_SHOW</source>
-      <translation>ショー</translation>
+      <translation>表示</translation>
     </message>
     <message>
       <source>TOP_DUMPMESH</source>
-      <translation>メッシュをダンプします。</translation>
+      <translation>メッシュリスト</translation>
     </message>
     <message>
       <source>TOP_DUMPSUBMESH</source>
-      <translation>サブメッシュをダンプします。</translation>
+      <translation>サブメッシュリスト</translation>
     </message>
     <message>
       <source>TOP_HIDE</source>
@@ -113,7 +113,7 @@
     </message>
     <message>
       <source>TOP_EXPLORE</source>
-      <translation>音楽配信マック ＆ ファイルを探索します。</translation>
+      <translation>MED ファイルを探索</translation>
     </message>
     <message>
       <source>TOP_FIELDSEL</source>
@@ -125,22 +125,7 @@
     </message>
     <message>
       <source>TOP_POPUPTEST</source>
-      <translation>ポップアップ テスト</translation>
-    </message>
-  </context>
-  <context>
-    <name>MedGUI</name>
-    <message>
-      <source>MED_MEN_ALL_FILES</source>
-      <translation>すべてのファイル (*)</translation>
-    </message>
-    <message>
-      <source>MED_MEN_IMPORT</source>
-      <translation>インポート</translation>
-    </message>
-    <message>
-      <source>MED_MEN_IMPORT_MED</source>
-      <translation>医学ファイル (*.med)</translation>
+      <translation>ポップアップテスト</translation>
     </message>
   </context>
 </TS>
