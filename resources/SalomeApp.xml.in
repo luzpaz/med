@@ -28,7 +28,7 @@
     <parameter name="icon" value="MEDOP.png"/>
     <parameter name="documentation" value="med_help"/>
     <parameter name="library"       value="MEDOPGUI"/>
-    <parameter name="version"       value="@VERSION@"/>
+    <parameter name="version"       value="@SALOMEMED_VERSION@"/>
   </section>
   <section name="med_help" >
     <parameter name="sub_menu"          value="%1 module"/>

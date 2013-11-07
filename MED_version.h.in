@@ -27,14 +27,22 @@
 #if !defined(__MED_VERSION_H__)
 #define __MED_VERSION_H__
 
-/*
-  MED_VERSION is (major << 16) + (minor << 8) + patch.
+/*!
+  Specify version of SALOME MED module, as follows
+
+  SALOMEMED_VERSION_MAJOR       : (integer) number identifying major version
+  SALOMEMED_VERSION_MINOR       : (integer) number identifying minor version
+  SALOMEMED_VERSION_MAINTENANCE : (integer) number identifying maintenance version
+  SALOMEMED_VERSION_STR         : (string)  complete version number "major.minor.maintenance"
+  SALOMEMED_VERSION             : (hex)     complete version number (major << 16) + (minor << 8) + maintenance
+  SALOMEMED_DEVELOPMENT         : (integer) indicates development version when set to 1
 */
 
-// MED_VERSION is reserved enum of MEDMEM,
-// thus we use alternative constant name for SALOME MED module
-#define SALOMEMED_VERSION_STR "@VERSION@"
-#define SALOMEMED_VERSION     @XVERSION@
-#define SALOMEMED_DEVELOPMENT @VERSION_DEV@
+#define SALOMEMED_VERSION_MAJOR       @SALOMEMED_MAJOR_VERSION@
+#define SALOMEMED_VERSION_MINOR       @SALOMEMED_MINOR_VERSION@
+#define SALOMEMED_VERSION_MAINTENANCE @SALOMEMED_PATCH_VERSION@
+#define SALOMEMED_VERSION_STR         "@SALOMEMED_VERSION@"
+#define SALOMEMED_VERSION             @SALOMEMED_XVERSION@
+#define SALOMEMED_DEVELOPMENT         @SALOMEMED_VERSION_DEV@
 
 #endif // __MED_VERSION_H__
