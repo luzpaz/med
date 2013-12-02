@@ -24,7 +24,7 @@
 #  !! Please read the generic detection procedure in SalomeMacros.cmake !!
 #
 
-SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(XDR XDR_FOUND 1)
+SALOME_FIND_PACKAGE_AND_DETECT_CONFLICTS(XDR XDR_INCLUDE_DIRS 1)
 #MARK_AS_ADVANCED()
 
 #IF(XDR_FOUND) # useless here because XDR is used only in CXX of MEDLoader
