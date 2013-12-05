@@ -9,19 +9,19 @@
     </message>
     <message>
       <source>MED_INF_FIELDNAME</source>
-      <translation>読み取りするフィールドの名前を指定して下さい</translation>
+      <translation>読み取るフィールドの名前を入力してください。</translation>
     </message>
     <message>
       <source>MED_INF_MESHNAME</source>
-      <translation>読み取りするメッシュの名前を指定して下さい</translation>
+      <translation>読みたいメッシュの名前を入力してください。</translation>
     </message>
     <message>
       <source>MED_INF_NOIOR</source>
-      <translation>オブジェクトは、IOR を持たない</translation>
+      <translation>Object has no IOR</translation>
     </message>
     <message>
       <source>MED_INF_NOTIMPL</source>
-      <translation>このオブジェクトは実装されない</translation>
+      <translation>Not Implemented for this Object</translation>
     </message>
     <message>
       <source>MED_WRN_WARNING</source>
@@ -33,11 +33,11 @@
     </message>
     <message>
       <source>MEN_DUMPMESH</source>
-      <translation>メッシュリスト</translation>
+      <translation>Dump Mesh</translation>
     </message>
     <message>
       <source>MEN_DUMPSUBMESH</source>
-      <translation>サブメッシュリスト</translation>
+      <translation>Dump SubMesh</translation>
     </message>
     <message>
       <source>MEN_HIDE</source>
@@ -45,7 +45,7 @@
     </message>
     <message>
       <source>MEN_EXPLORE</source>
-      <translation>MED ファイルを探索</translation>
+      <translation>Explore Med File</translation>
     </message>
     <message>
       <source>MEN_FIELDSEL</source>
@@ -57,7 +57,7 @@
     </message>
     <message>
       <source>MEN_POPUPTEST</source>
-      <translation>ポップアップテスト</translation>
+      <translation>Popup Test</translation>
     </message>
     <message>
       <source>STB_SHOW</source>
@@ -65,31 +65,31 @@
     </message>
     <message>
       <source>STB_DUMPMESH</source>
-      <translation>メッシュリスト</translation>
+      <translation>dump Mesh</translation>
     </message>
     <message>
       <source>STB_DUMPSUBMESH</source>
-      <translation>メッシュリスト</translation>
+      <translation>dump Mesh</translation>
     </message>
     <message>
       <source>STB_HIDE</source>
-      <translation>非表示</translation>
+      <translation>Hide</translation>
     </message>
     <message>
       <source>STB_EXPLORE</source>
-      <translation>MED ファイルを探索</translation>
+      <translation>Explore Med File</translation>
     </message>
     <message>
       <source>STB_FIELDSEL</source>
-      <translation>フィールドを読み取り</translation>
+      <translation>Read a field</translation>
     </message>
     <message>
       <source>STB_MESHSEL</source>
-      <translation>メッシュ読み込み</translation>
+      <translation>Read a mesh</translation>
     </message>
     <message>
       <source>STB_POPUPTEST</source>
-      <translation>ポップアップテスト</translation>
+      <translation>Popup test</translation>
     </message>
     <message>
       <source>TB_MED</source>
@@ -101,11 +101,11 @@
     </message>
     <message>
       <source>TOP_DUMPMESH</source>
-      <translation>メッシュリスト</translation>
+      <translation>Dump Mesh</translation>
     </message>
     <message>
       <source>TOP_DUMPSUBMESH</source>
-      <translation>サブメッシュリスト</translation>
+      <translation>Dump SubMesh</translation>
     </message>
     <message>
       <source>TOP_HIDE</source>
@@ -113,7 +113,7 @@
     </message>
     <message>
       <source>TOP_EXPLORE</source>
-      <translation>MED ファイルを探索</translation>
+      <translation>Explore Med File</translation>
     </message>
     <message>
       <source>TOP_FIELDSEL</source>
@@ -121,11 +121,11 @@
     </message>
     <message>
       <source>TOP_MESHSEL</source>
-      <translation>メッシュの選択</translation>
+      <translation>Mesh selection</translation>
     </message>
     <message>
       <source>TOP_POPUPTEST</source>
-      <translation>ポップアップテスト</translation>
+      <translation>Popup test</translation>
     </message>
   </context>
 </TS>

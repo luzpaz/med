@@ -96,7 +96,7 @@
     <name>XMEDGUI_maquette</name>
     <message>
       <source>BUT_OK</source>
-      <translation>わかりました</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>QUE_XMED_LABEL</source>
@@ -104,7 +104,7 @@
     </message>
     <message>
       <source>QUE_XMED_NAME</source>
-      <translation>あなたの名前を入力してください、</translation>
+      <translation>あなたの名前を入力してください。</translation>
     </message>
     <message>
       <source>INF_XMED_BANNER</source>
@@ -112,7 +112,7 @@
     </message>
     <message>
       <source>INF_XMED_MENU</source>
-      <translation>これはテストです。</translation>
+      <translation>これはただのテストです。</translation>
     </message>
   </context>
 </TS>
