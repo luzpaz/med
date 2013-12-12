@@ -29,6 +29,7 @@
 MEDGUIDataBaseDockWidget::MEDGUIDataBaseDockWidget(CAM_Application *app, QWidget * parent):QDockWidget(parent),_app(app)
 {
   setWindowTitle("MEDUtils DataBase");
+  setObjectName("MEDUtils DataBase");
   setMinimumWidth(270);
   setMinimumHeight(300);
   QWidget *content = new QWidget;
