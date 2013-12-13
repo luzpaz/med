@@ -2,6 +2,30 @@
 <context>
     <name>@default</name>
     <message>
+        <source>MEN_BUILDER3</source>
+        <translation type="unfinished">Load a python script</translation>
+    </message>
+    <message>
+        <source>STS_BUILDER3</source>
+        <translation type="unfinished">Load a python script</translation>
+    </message>
+    <message>
+        <source>TLT_BUILDER3</source>
+        <translation type="unfinished">Load a python script</translation>
+    </message>
+    <message>
+        <source>STS_LOAD_DXF</source>
+        <translation type="unfinished">Load DXF file</translation>
+    </message>
+    <message>
+        <source>MEN_LOAD_DXF</source>
+        <translation type="unfinished">Load DXF file</translation>
+    </message>
+    <message>
+        <source>TLT_LOAD_DXF</source>
+        <translation type="unfinished">Load DXF file</translation>
+    </message>
+    <message>
         <source>TLT_MY_NEW_ITEM</source>
         <translation>My menu item</translation>
     </message>
