@@ -600,8 +600,13 @@ class MEDCouplingCorbaServBasicsTest:
         return ret;
 
     def buildFileNameForIOR(self):
-        ret=os.getenv("TMP");
-        ret+="/entryPointMEDCouplingCorba.ior";
+        tmpdir=os.getenv("TMP", "/tmp");
+        username="";
+        if os.getenv("USERNAME"):
+            username = os.getenv("USERNAME")+"_";
+        elif os.getenv("USER"):
+            username = os.getenv("USER")+"_";
+        ret=tmpdir+"/"+username+"entryPointMEDCouplingCorba.ior";
         return ret;
     pass
 
