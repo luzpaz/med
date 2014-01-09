@@ -583,14 +583,13 @@ MEDCouplingFieldDouble * MEDDataManager_i::getFieldDouble(const MEDOP::FieldHand
   long sourceid = _meshHandlerMap[meshid]->sourceid;
 
   const char * filepath = source_to_file((_datasourceHandlerMap[sourceid])->uri);
-  std::string smeshname = myMesh->getName();
-  const char * meshName = smeshname.c_str();
+  std::string meshName(myMesh->getName());
   LOG("getFieldDouble: field "<<fieldHandler->fieldname<<" loaded from file "<<filepath);
   TypeOfField type = (TypeOfField)fieldHandler->type;
   int meshDimRelToMax = 0;
   MEDCouplingFieldDouble * myField = MEDLoader::ReadField(type,
                 filepath,
-                meshName,
+                meshName.c_str(),
                 meshDimRelToMax,
                 fieldHandler->fieldname,
                 fieldHandler->iteration,
@@ -613,8 +612,8 @@ MEDCouplingFieldDouble * MEDDataManager_i::getFieldDouble(const MEDOP::FieldHand
 MEDOP::FieldHandler * MEDDataManager_i::addField(MEDCouplingFieldDouble * fieldDouble,
              long meshHandlerId)
 {
-  const char * fieldName = fieldDouble->getName().c_str();
-  const char * meshName  = fieldDouble->getMesh()->getName().c_str();
+  std::string fieldName(fieldDouble->getName());
+  std::string meshName(fieldDouble->getMesh()->getName());
   TypeOfField  type      = fieldDouble->getTypeOfField();
 
   int iteration, order;
@@ -630,12 +629,12 @@ MEDOP::FieldHandler * MEDDataManager_i::addField(MEDCouplingFieldDouble * fieldD
   // the fielddouble name, because this name describes the operation
   // the field has been created with.
   string * source = new string("mem://"); source->append(fieldName);
-  MEDOP::FieldHandler * fieldHandler = newFieldHandler(fieldName,
-                   meshName,
-                   type,
-                   iteration,
-                   order,
-                   source->c_str());
+  MEDOP::FieldHandler * fieldHandler = newFieldHandler(fieldName.c_str(),
+                                                       meshName.c_str(),
+                                                       type,
+                                                       iteration,
+                                                       order,
+                                                       source->c_str());
 
   if ( meshHandlerId == LONG_UNDEFINED ) {
     // We have to gess the id of the underlying mesh to preserve data
