@@ -209,7 +209,7 @@ namespace SALOME_TEST
     std::copy(a2Data,a2Data+6,a2->getPointer());
     //
     targetMesh->setCoordsAt(0,a1);
-    targetMesh->setCoordsAt(2,a2);
+    targetMesh->setCoordsAt(1,a2);
     //
     a1->decrRef();
     a2->decrRef();

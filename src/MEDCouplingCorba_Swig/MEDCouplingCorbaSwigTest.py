@@ -168,7 +168,7 @@ class MEDCouplingCorbaServBasicsTest:
         a2.setInfoOnComponent(0,"SmthZ");
         #
         targetMesh.setCoordsAt(0,a1);
-        targetMesh.setCoordsAt(2,a2);
+        targetMesh.setCoordsAt(1,a2);
         #
         #
         targetMesh.checkCoherency();
