@@ -18,18 +18,20 @@
 #
 
 MESSAGE(STATUS "Check for XDR ...")
-SET(XDR_ROOT_DIR $ENV{XDR_ROOT_DIR} CACHE PATH "Path to the XDR.")
-IF(XDR_ROOT_DIR)
-  LIST(APPEND CMAKE_LIBRARY_PATH "${XDR_ROOT_DIR}/lib")
-  LIST(APPEND CMAKE_INCLUDE_PATH "${XDR_ROOT_DIR}/include")
-ENDIF(XDR_ROOT_DIR)
 
-FIND_LIBRARY(XDR_LIBRARIES xdr)
 FIND_PATH(XDR_INCLUDE_DIRS rpc/xdr.h)
 SET(XDR_DEFINITIONS "-DHAS_XDR")
 
 IF(WIN32)
-  LIST(APPEND XDR_INCLUDE_DIRS "${XDR_ROOT_DIR}/include/src/msvc")
+  FIND_LIBRARY(XDR_LIBRARIES xdr)                 # To get the .lib file from XDR
+  FIND_PATH(XDR_INCLUDE_DIRS2 src/msvc/stdint.h)  # To get the stdint.h from XDR (needed by types.h)
+  IF(XDR_INCLUDE_DIRS)
+    IF(XDR_INCLUDE_DIRS2)
+      LIST(APPEND XDR_INCLUDE_DIRS "${XDR_INCLUDE_DIRS2}")
+    ELSE()
+      SET(XDR_INCLUDE_DIRS "${XDR_INCLUDE_DIRS2}")  # Make the detection fail
+    ENDIF()
+  ENDIF()
 ENDIF(WIN32)
 
 INCLUDE(FindPackageHandleStandardArgs)
