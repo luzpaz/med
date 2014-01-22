@@ -149,8 +149,8 @@ private:
              long         order,
              const char * source);
 
-  const char * file_to_source(const char * filepath);
-  const char * source_to_file(const char * source);
+  std::string  file_to_source(const char * filepath);
+  std::string  source_to_file(const char * source);
   long getDatasourceId(const char *filepath);
 
   MEDCouplingUMesh * getUMesh(long meshHandlerId);
