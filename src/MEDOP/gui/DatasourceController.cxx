@@ -192,7 +192,7 @@ void DatasourceController::OnAddDatasource()
 
   if ( filenames.count() <= 0 ) return;
   for ( QStringList::ConstIterator itFile = filenames.begin();
-	itFile != filenames.end(); ++itFile ) {
+        itFile != filenames.end(); ++itFile ) {
     QString filename = *itFile;
     this->addDatasource(QCHARSTAR(filename));
     _salomeModule->updateObjBrowser(true);

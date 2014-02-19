@@ -168,7 +168,7 @@ class MEDCouplingCorbaServBasicsTest:
         a2.setInfoOnComponent(0,"SmthZ");
         #
         targetMesh.setCoordsAt(0,a1);
-        targetMesh.setCoordsAt(2,a2);
+        targetMesh.setCoordsAt(1,a2);
         #
         #
         targetMesh.checkCoherency();
@@ -600,8 +600,13 @@ class MEDCouplingCorbaServBasicsTest:
         return ret;
 
     def buildFileNameForIOR(self):
-        ret=os.getenv("TMP");
-        ret+="/entryPointMEDCouplingCorba.ior";
+        tmpdir=os.getenv("TMP", "/tmp");
+        username="";
+        if os.getenv("USERNAME"):
+            username = os.getenv("USERNAME")+"_";
+        elif os.getenv("USER"):
+            username = os.getenv("USER")+"_";
+        ret=tmpdir+"/"+username+"entryPointMEDCouplingCorba.ior";
         return ret;
     pass
 

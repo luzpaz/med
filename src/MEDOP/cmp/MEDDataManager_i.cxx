@@ -57,17 +57,18 @@ MEDDataManager_i::~MEDDataManager_i()
   LOG("Deleting MEDDataManager_i instance");
 }
 
-const char * MEDDataManager_i::file_to_source(const char * filepath)
+std::string MEDDataManager_i::file_to_source(const char * filepath)
 {
-  string * source = new string("file://");
-  source->append(filepath);
-  return source->c_str();;
+  string source("file://");
+  source.append(filepath);
+  return source;
 }
-const char * MEDDataManager_i::source_to_file(const char * source)
+
+std::string MEDDataManager_i::source_to_file(const char * source)
 {
-  string * filepath = new string(source);
-  filepath->replace(0,7,"");
-  return filepath->c_str();
+  string filepath(source);
+  filepath.replace(0,7,"");
+  return filepath;
 }
 
 /*!
@@ -93,7 +94,8 @@ MEDOP::DatasourceHandler * MEDDataManager_i::addDatasource(const char *filepath)
   MEDOP::DatasourceHandler * datasourceHandler = new MEDOP::DatasourceHandler();
   datasourceHandler->id = _sourceLastId; _sourceLastId++;
   datasourceHandler->name = (Kernel_Utils::GetBaseName(filepath)).c_str();
-  datasourceHandler->uri = file_to_source(filepath);
+  std::string tmp(file_to_source(filepath));
+  datasourceHandler->uri = CORBA::string_dup(tmp.c_str());
   _datasourceHandlerMap[datasourceHandler->id] = datasourceHandler;
 
   // We start by read the list of meshes (spatial supports of fields)
@@ -189,10 +191,10 @@ MEDOP::DatasourceHandler * MEDDataManager_i::addDatasource(const char *filepath)
 }
 
 long MEDDataManager_i::getDatasourceId(const char *filepath) {
-  const char * uri = file_to_source(filepath);
+  std::string uri(file_to_source(filepath));
   DatasourceHandlerMapIterator it = _datasourceHandlerMap.begin();  
   while ( it != _datasourceHandlerMap.end() ) {
-    if ( strcmp(it->second->uri,uri) == 0 ) {
+    if ( strcmp(it->second->uri,uri.c_str()) == 0 ) {
       return it->first;
     }
     ++it;
@@ -508,7 +510,7 @@ MEDCouplingUMesh * MEDDataManager_i::getUMesh(long meshHandlerId) {
     }
 
     long sourceid = _meshHandlerMap[meshHandlerId]->sourceid;
-    const char * filepath = source_to_file((_datasourceHandlerMap[sourceid])->uri);  
+    std::string filepath(source_to_file((_datasourceHandlerMap[sourceid])->uri));  
     const char * meshName = _meshHandlerMap[meshHandlerId]->name;
     int meshDimRelToMax = 0;
     myMesh = MEDLoader::ReadUMeshFromFile(filepath,meshName,meshDimRelToMax);
@@ -582,8 +584,8 @@ MEDCouplingFieldDouble * MEDDataManager_i::getFieldDouble(const MEDOP::FieldHand
 
   long sourceid = _meshHandlerMap[meshid]->sourceid;
 
-  const char * filepath = source_to_file((_datasourceHandlerMap[sourceid])->uri);
-  const char * meshName = myMesh->getName().c_str();
+  std::string filepath(source_to_file((_datasourceHandlerMap[sourceid])->uri));
+  std::string meshName(myMesh->getName());
   LOG("getFieldDouble: field "<<fieldHandler->fieldname<<" loaded from file "<<filepath);
   TypeOfField type = (TypeOfField)fieldHandler->type;
   int meshDimRelToMax = 0;
@@ -591,7 +593,7 @@ MEDCouplingFieldDouble * MEDDataManager_i::getFieldDouble(const MEDOP::FieldHand
                 filepath,
                 meshName,
                 meshDimRelToMax,
-                fieldHandler->fieldname,
+                std::string(fieldHandler->fieldname),
                 fieldHandler->iteration,
                 fieldHandler->order);
   myField->setMesh(myMesh);
@@ -612,8 +614,8 @@ MEDCouplingFieldDouble * MEDDataManager_i::getFieldDouble(const MEDOP::FieldHand
 MEDOP::FieldHandler * MEDDataManager_i::addField(MEDCouplingFieldDouble * fieldDouble,
              long meshHandlerId)
 {
-  const char * fieldName = fieldDouble->getName().c_str();
-  const char * meshName  = fieldDouble->getMesh()->getName().c_str();
+  std::string fieldName(fieldDouble->getName());
+  std::string meshName(fieldDouble->getMesh()->getName());
   TypeOfField  type      = fieldDouble->getTypeOfField();
 
   int iteration, order;
@@ -629,12 +631,12 @@ MEDOP::FieldHandler * MEDDataManager_i::addField(MEDCouplingFieldDouble * fieldD
   // the fielddouble name, because this name describes the operation
   // the field has been created with.
   string * source = new string("mem://"); source->append(fieldName);
-  MEDOP::FieldHandler * fieldHandler = newFieldHandler(fieldName,
-                   meshName,
-                   type,
-                   iteration,
-                   order,
-                   source->c_str());
+  MEDOP::FieldHandler * fieldHandler = newFieldHandler(fieldName.c_str(),
+                                                       meshName.c_str(),
+                                                       type,
+                                                       iteration,
+                                                       order,
+                                                       source->c_str());
 
   if ( meshHandlerId == LONG_UNDEFINED ) {
     // We have to gess the id of the underlying mesh to preserve data

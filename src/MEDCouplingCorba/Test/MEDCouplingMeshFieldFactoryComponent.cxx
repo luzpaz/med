@@ -209,7 +209,7 @@ namespace SALOME_TEST
     std::copy(a2Data,a2Data+6,a2->getPointer());
     //
     targetMesh->setCoordsAt(0,a1);
-    targetMesh->setCoordsAt(2,a2);
+    targetMesh->setCoordsAt(1,a2);
     //
     a1->decrRef();
     a2->decrRef();
@@ -772,9 +772,19 @@ namespace SALOME_TEST
 
   std::string MEDCouplingCorbaServBasicsTest::buildFileNameForIOR()
   {
-    std::string ret;
-    ret+=getenv("TMP");
-    ret+="/entryPointMEDCouplingCorba.ior";
+    std::string tmpdir;
+    if (getenv("TMP"))
+      tmpdir = getenv("TMP");
+    if (tmpdir == "")
+      tmpdir = "/tmp";
+
+    std::string username;
+    if ( getenv("USERNAME") )
+      username = std::string(getenv("USERNAME"))+"_";
+    else if ( getenv("USER") )
+      username = std::string(getenv("USER"))+"_";
+
+    std::string ret = tmpdir+"/"+username+"entryPointMEDCouplingCorba.ior";
     return ret;
   }
 }

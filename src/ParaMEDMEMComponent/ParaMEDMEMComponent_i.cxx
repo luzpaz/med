@@ -449,9 +449,9 @@ void ParaMEDMEMComponent_i::_initializeCoupling(SALOME_MED::MPIMEDCouplingFieldD
         st->compo = compo._retn();
         st->coupling = coupling;
         st->ior = lcompo;
-	
+        
         pthread_create(&(th[0]),NULL,th_initializecouplingdist,(void*)st);
-	  
+        
         //initializing the coupling on the local object
         initializeCoupling (coupling.c_str(), rcompo.c_str());
         pthread_join (th[0], &ret_th); 
