@@ -24,7 +24,7 @@ SET(XDR_DEFINITIONS "-DHAS_XDR")
 
 IF(WIN32)
   FIND_LIBRARY(XDR_LIBRARIES xdr)                 # To get the .lib file from XDR
-  FIND_PATH(XDR_INCLUDE_DIRS2 src/msvc/stdint.h)  # To get the stdint.h from XDR (needed by types.h)
+  FIND_PATH(XDR_INCLUDE_DIRS2 stdint.h PATH_SUFFIXES src/msvc)  # To get the stdint.h from XDR (needed by types.h)
   IF(XDR_INCLUDE_DIRS)
     IF(XDR_INCLUDE_DIRS2)
       LIST(APPEND XDR_INCLUDE_DIRS "${XDR_INCLUDE_DIRS2}")
