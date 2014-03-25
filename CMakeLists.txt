@@ -47,7 +47,7 @@ IF(NOT SALOME_MED_STANDALONE)
     LIST(APPEND CMAKE_MODULE_PATH "${KERNEL_ROOT_DIR}/salome_adm/cmake_files")
     INCLUDE(SalomeMacros)
     FIND_PACKAGE(SalomeKERNEL REQUIRED)
-    KERNEL_WITH_CORBA() #check whether KERNEL builded with CORBA
+    #KERNEL_WITH_CORBA() #check whether KERNEL builded with CORBA
     ADD_DEFINITIONS(${KERNEL_DEFINITIONS})
     INCLUDE_DIRECTORIES(${KERNEL_INCLUDE_DIRS})
     SET(_default_MPI ${SALOME_USE_MPI}) 
@@ -100,7 +100,7 @@ IF(NOT SALOME_MED_STANDALONE)
     LIST(APPEND CMAKE_MODULE_PATH "${KERNEL_ROOT_DIR}/salome_adm/cmake_files")
     INCLUDE(SalomeMacros)
     FIND_PACKAGE(SalomeKERNEL REQUIRED)
-    KERNEL_WITH_CORBA() #check whether KERNEL builded with CORBA
+    #KERNEL_WITH_CORBA() #check whether KERNEL builded with CORBA
   ELSE(EXISTS ${KERNEL_ROOT_DIR})
     MESSAGE(FATAL_ERROR "We absolutely need a Salome KERNEL, please define KERNEL_ROOT_DIR or turn option SALOME_MED_STANDALONE to ON !")
   ENDIF(EXISTS ${KERNEL_ROOT_DIR})
@@ -147,7 +147,7 @@ IF(SALOME_BUILD_GUI)
     IF(EXISTS ${GUI_ROOT_DIR})
       LIST(APPEND CMAKE_MODULE_PATH "${GUI_ROOT_DIR}/adm_local/cmake_files")
       FIND_PACKAGE(SalomeGUI REQUIRED)
-      FULL_GUI(TRUE) # check whether GUI builded in full mode and with CORBA
+      #FULL_GUI(TRUE) # check whether GUI builded in full mode and with CORBA
       ADD_DEFINITIONS(${GUI_DEFINITIONS})
       INCLUDE_DIRECTORIES(${GUI_INCLUDE_DIRS})
     ELSE(EXISTS ${GUI_ROOT_DIR})
