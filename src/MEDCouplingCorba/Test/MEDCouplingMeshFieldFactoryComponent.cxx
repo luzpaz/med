@@ -28,6 +28,7 @@
 #include "MEDCoupling1GTUMesh.hxx"
 #include "MEDCouplingUMesh.hxx"
 #include "MEDCouplingCMesh.hxx"
+#include "MEDCouplingIMesh.hxx"
 #include "MEDCouplingCurveLinearMesh.hxx"
 
 #include <cmath>
@@ -216,6 +217,25 @@ namespace SALOME_TEST
     //
     targetMesh->checkCoherency();
     //
+    return targetMesh;
+  }
+    
+
+  ParaMEDMEM::MEDCouplingIMesh *MEDCouplingCorbaServBasicsTest::buildIMesh()
+  {
+    ParaMEDMEM::MEDCouplingIMesh *targetMesh(ParaMEDMEM::MEDCouplingIMesh::New());
+    targetMesh->setTime(2.3,4,5);
+    targetMesh->setTimeUnit("us");
+    targetMesh->setName("Example of IMesh");
+    targetMesh->setDescription("buildIMesh");
+    int ns[3]={6,7,8};
+    double orig[3]={4.25,3.75,-6.125};
+    double inter[3]={0.5,0.375,0.75};
+    targetMesh->setSpaceDimension(3);
+    targetMesh->setNodeStruct(ns,ns+3);
+    targetMesh->setOrigin(orig,orig+3);
+    targetMesh->setDXYZ(inter,inter+3);
+    targetMesh->setAxisUnit("mm");
     return targetMesh;
   }
 

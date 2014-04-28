@@ -20,11 +20,18 @@
 
 #include "MEDCouplingMeshClient.hxx"
 #include "MEDCouplingUMeshClient.hxx"
+#include "MEDCoupling1SGTUMeshClient.hxx"
+#include "MEDCoupling1DGTUMeshClient.hxx"
 #include "MEDCouplingExtrudedMeshClient.hxx"
 #include "MEDCouplingExtrudedMesh.hxx"
 #include "MEDCouplingCMeshClient.hxx"
+#include "MEDCouplingCurveLinearMeshClient.hxx"
+#include "MEDCouplingIMeshClient.hxx"
 #include "MEDCouplingCMesh.hxx"
+#include "MEDCouplingCurveLinearMesh.hxx"
+#include "MEDCouplingIMesh.hxx"
 #include "MEDCouplingUMesh.hxx"
+#include "MEDCoupling1GTUMesh.hxx"
 
 #include <vector>
 
@@ -51,6 +58,34 @@ MEDCouplingMesh *MEDCouplingMeshClient::New(SALOME_MED::MEDCouplingMeshCorbaInte
     {
       MEDCouplingMesh *ret=MEDCouplingCMeshClient::New(cmeshPtr);
       CORBA::release(cmeshPtr);
+      return ret;
+    }
+  SALOME_MED::MEDCouplingCurveLinearMeshCorbaInterface_ptr clmeshPtr=SALOME_MED::MEDCouplingCurveLinearMeshCorbaInterface::_narrow(meshPtr);
+  if(!CORBA::is_nil(clmeshPtr))
+    {
+      MEDCouplingMesh *ret=MEDCouplingCurveLinearMeshClient::New(clmeshPtr);
+      CORBA::release(clmeshPtr);
+      return ret;
+    }
+  SALOME_MED::MEDCouplingIMeshCorbaInterface_ptr imeshPtr=SALOME_MED::MEDCouplingIMeshCorbaInterface::_narrow(meshPtr);
+  if(!CORBA::is_nil(imeshPtr))
+    {
+      MEDCouplingMesh *ret=MEDCouplingIMeshClient::New(imeshPtr);
+      CORBA::release(imeshPtr);
+      return ret;
+    }
+  SALOME_MED::MEDCoupling1SGTUMeshCorbaInterface_ptr umeshPtr0=SALOME_MED::MEDCoupling1SGTUMeshCorbaInterface::_narrow(meshPtr);
+  if(!CORBA::is_nil(umeshPtr0))
+    {
+      MEDCouplingMesh *ret=MEDCoupling1SGTUMeshClient::New(umeshPtr0);
+      CORBA::release(umeshPtr0);
+      return ret;
+    }
+  SALOME_MED::MEDCoupling1DGTUMeshCorbaInterface_ptr umeshPtr1=SALOME_MED::MEDCoupling1DGTUMeshCorbaInterface::_narrow(meshPtr);
+  if(!CORBA::is_nil(umeshPtr1))
+    {
+      MEDCouplingMesh *ret=MEDCoupling1DGTUMeshClient::New(umeshPtr1);
+      CORBA::release(umeshPtr1);
       return ret;
     }
   return 0;

@@ -175,6 +175,21 @@ class MEDCouplingCorbaServBasicsTest:
         #
         return targetMesh;
 
+    def buildIMesh(self):
+        targetMesh=MEDCouplingIMesh.New();
+        targetMesh.setTime(2.3,4,5);
+        targetMesh.setTimeUnit("us");
+        targetMesh.setName("Example of IMesh");
+        targetMesh.setDescription("buildIMesh");
+        #
+        targetMesh.setSpaceDimension(3);
+        targetMesh.setNodeStruct([6,7,8]);
+        targetMesh.setOrigin([4.25,3.75,-6.125]);
+        targetMesh.setDXYZ([0.5,0.375,0.75]);
+        targetMesh.setAxisUnit("mm");
+        #
+        return targetMesh
+
     def buildCLMesh(self):
         targetMesh=MEDCouplingCurveLinearMesh();
         targetMesh.setTime(2.3,4,5);

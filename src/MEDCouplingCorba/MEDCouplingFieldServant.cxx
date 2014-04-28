@@ -22,11 +22,18 @@
 #include "MEDCouplingMeshServant.hxx"
 #include "MEDCouplingUMeshServant.hxx"
 #include "MEDCouplingCMeshServant.hxx"
+#include "MEDCouplingIMeshServant.hxx"
+#include "MEDCouplingCurveLinearMeshServant.hxx"
 #include "MEDCouplingExtrudedMeshServant.hxx"
+#include "MEDCoupling1SGTUMeshServant.hxx"
+#include "MEDCoupling1DGTUMeshServant.hxx"
 #include "MEDCouplingField.hxx"
 #include "MEDCouplingUMesh.hxx"
 #include "MEDCouplingCMesh.hxx"
+#include "MEDCouplingIMesh.hxx"
+#include "MEDCouplingCurveLinearMesh.hxx"
 #include "MEDCouplingExtrudedMesh.hxx"
+#include "MEDCoupling1GTUMesh.hxx"
 
 using namespace ParaMEDMEM;
 
@@ -50,17 +57,45 @@ SALOME_MED::MEDCouplingMeshCorbaInterface_ptr MEDCouplingFieldServant::BuildCorb
       SALOME_MED::MEDCouplingCMeshCorbaInterface_ptr ret=retServ->_this();//let this line even if it seems fool
       return ret;
     }
+  const MEDCouplingIMesh *iMesh=dynamic_cast<const MEDCouplingIMesh *>(mesh);
+  if(iMesh)
+    {
+      MEDCouplingIMeshServant *retServ=new MEDCouplingIMeshServant(iMesh);
+      SALOME_MED::MEDCouplingIMeshCorbaInterface_ptr ret=retServ->_this();//let this line even if it seems fool
+      return ret;
+    }
   const MEDCouplingExtrudedMesh *eMesh=dynamic_cast<const MEDCouplingExtrudedMesh *>(mesh);
   if(eMesh)
     {
       MEDCouplingExtrudedMeshServant *retServ=new MEDCouplingExtrudedMeshServant(eMesh);
       return retServ->_this();
     }
+  const MEDCouplingCurveLinearMesh *clMesh=dynamic_cast<const MEDCouplingCurveLinearMesh *>(mesh);
+  if(clMesh)
+    {
+      MEDCouplingCurveLinearMeshServant *retServ=new MEDCouplingCurveLinearMeshServant(clMesh);
+      SALOME_MED::MEDCouplingCurveLinearMeshCorbaInterface_ptr ret=retServ->_this();//let this line even if it seems fool
+      return ret;
+    }
+  const MEDCoupling1SGTUMesh *u0Mesh=dynamic_cast<const MEDCoupling1SGTUMesh *>(mesh);
+  if(u0Mesh)
+    {
+      MEDCoupling1SGTUMeshServant *retServ=new MEDCoupling1SGTUMeshServant(u0Mesh);
+      SALOME_MED::MEDCoupling1SGTUMeshCorbaInterface_ptr ret=retServ->_this();//let this line even if it seems fool
+      return ret;
+    }
+  const MEDCoupling1DGTUMesh *u1Mesh=dynamic_cast<const MEDCoupling1DGTUMesh *>(mesh);
+  if(u1Mesh)
+    {
+      MEDCoupling1DGTUMeshServant *retServ=new MEDCoupling1DGTUMeshServant(u1Mesh);
+      SALOME_MED::MEDCoupling1DGTUMeshCorbaInterface_ptr ret=retServ->_this();//let this line even if it seems fool
+      return ret;
+    }
   throw INTERP_KERNEL::Exception("Not dealt mesh type !");
 }
 
 SALOME_MED::MEDCouplingMeshCorbaInterface_ptr MEDCouplingFieldServant::getMesh()
 {
-  const MEDCouplingMesh *mesh=getPointer()->getMesh();
+  const MEDCouplingMesh *mesh(getPointer()->getMesh());
   return BuildCorbaRefFromCppPointer(mesh);
 }

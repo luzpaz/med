@@ -40,6 +40,7 @@ module SALOME_TEST
     SALOME_MED::MEDCouplingCurveLinearMeshCorbaInterface getCLMesh();
     SALOME_MED::MEDCoupling1SGTUMeshCorbaInterface get1SGTUMesh();
     SALOME_MED::MEDCoupling1DGTUMeshCorbaInterface get1DGTUMesh();
+    SALOME_MED::MEDCouplingIMeshCorbaInterface getIMesh();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface getFieldScalarOn2DNT();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface getFieldNodeScalarOn2DNT();
     SALOME_MED::MEDCouplingFieldDoubleCorbaInterface getFieldScalarOn3DNT();

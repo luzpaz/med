@@ -136,6 +136,15 @@ class MEDCouplingCorbaServBasicsTestClt(unittest.TestCase):
         self.assertTrue(_mesh_from_distant.isEqual(meshRef,1e-12))
         pass
 
+    def testCorbaFetchingIMesh(self):
+        meshPtr=self._objC.getIMesh();
+        _mesh_from_distant=MEDCouplingIMeshClient.New(meshPtr);
+        meshPtr.UnRegister();
+        test=MEDCouplingCorbaSwigTest.MEDCouplingCorbaServBasicsTest()
+        meshRef=test.buildIMesh();
+        self.assertTrue(_mesh_from_distant.isEqual(meshRef,1e-12))
+        pass
+
     def testCorbaFetchingCLMesh(self):
         meshPtr=self._objC.getCLMesh();
         _mesh_from_distant=MEDCouplingCurveLinearMeshClient.New(meshPtr);

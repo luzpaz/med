@@ -30,6 +30,7 @@
 #include "MEDCoupling1DGTUMeshServant.hxx"
 #include "MEDCouplingExtrudedMeshServant.hxx"
 #include "MEDCouplingCMeshServant.hxx"
+#include "MEDCouplingIMeshServant.hxx"
 #include "MEDCouplingCurveLinearMeshServant.hxx"
 #include "DataArrayDoubleServant.hxx"
 #include "DataArrayIntServant.hxx"
@@ -129,6 +130,8 @@ namespace ParaMEDMEM
              return buildServantAndActivate<MEDCouplingExtrudedMeshServant>(dynamic_cast<const MEDCouplingExtrudedMesh *>(cppPointerOfMesh));
            if(dynamic_cast<const MEDCouplingCMesh *>(cppPointerOfMesh))
              return buildServantAndActivate<MEDCouplingCMeshServant>(dynamic_cast<const MEDCouplingCMesh *>(cppPointerOfMesh));
+           if(dynamic_cast<const MEDCouplingIMesh *>(cppPointerOfMesh))
+             return buildServantAndActivate<MEDCouplingIMeshServant>(dynamic_cast<const MEDCouplingIMesh *>(cppPointerOfMesh));
            if(dynamic_cast<const MEDCouplingCurveLinearMesh *>(cppPointerOfMesh))
              return buildServantAndActivate<MEDCouplingCurveLinearMeshServant>(dynamic_cast<const MEDCouplingCurveLinearMesh *>(cppPointerOfMesh));
            throw INTERP_KERNEL::Exception("MEDCouplingMeshServant::_this : unrecognized type (or not managed type) of Mesh in input !");
@@ -148,6 +151,8 @@ namespace ParaMEDMEM
              return buildServantAndActivate2<MEDCouplingExtrudedMeshServant>(dynamic_cast<const MEDCouplingExtrudedMesh *>(cppPointerOfMesh));
            if(dynamic_cast<const MEDCouplingCMesh *>(cppPointerOfMesh))
              return buildServantAndActivate2<MEDCouplingCMeshServant>(dynamic_cast<const MEDCouplingCMesh *>(cppPointerOfMesh));
+           if(dynamic_cast<const MEDCouplingIMesh *>(cppPointerOfMesh))
+             return buildServantAndActivate2<MEDCouplingIMeshServant>(dynamic_cast<const MEDCouplingIMesh *>(cppPointerOfMesh));
            if(dynamic_cast<const MEDCouplingCurveLinearMesh *>(cppPointerOfMesh))
              return buildServantAndActivate2<MEDCouplingCurveLinearMeshServant>(dynamic_cast<const MEDCouplingCurveLinearMesh *>(cppPointerOfMesh));
            throw INTERP_KERNEL::Exception("MEDCouplingMeshServant::_this2 : unrecognized type (or not managed type) of Mesh in input !");
@@ -236,6 +241,23 @@ namespace ParaMEDMEM
          static PyObject *_this2(const MEDCouplingCMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
          {
            return buildServantAndActivate2<MEDCouplingCMeshServant>(cppPointerOfMesh);
+         }
+       }
+  };
+  
+  class MEDCouplingIMeshServant
+  {
+  public:
+    %extend
+       {
+         static PyObject *_this(const MEDCouplingIMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
+         {
+           return buildServantAndActivate<MEDCouplingIMeshServant>(cppPointerOfMesh);
+         }
+         
+         static PyObject *_this2(const MEDCouplingIMesh *cppPointerOfMesh) throw(INTERP_KERNEL::Exception)
+         {
+           return buildServantAndActivate2<MEDCouplingIMeshServant>(cppPointerOfMesh);
          }
        }
   };

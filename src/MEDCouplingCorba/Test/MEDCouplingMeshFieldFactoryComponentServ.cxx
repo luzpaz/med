@@ -29,6 +29,7 @@
 #include "MEDCoupling1SGTUMeshServant.hxx"
 #include "MEDCoupling1DGTUMeshServant.hxx"
 #include "MEDCouplingCMeshServant.hxx"
+#include "MEDCouplingIMeshServant.hxx"
 #include "MEDCouplingUMeshServant.hxx"
 #include "DataArrayDoubleServant.hxx"
 #include "DataArrayIntServant.hxx"
@@ -41,6 +42,7 @@
 #include "MEDCoupling1GTUMesh.hxx"
 #include "MEDCouplingUMesh.hxx"
 #include "MEDCouplingCMesh.hxx"
+#include "MEDCouplingIMesh.hxx"
 
 namespace SALOME_TEST
 {
@@ -131,6 +133,15 @@ namespace SALOME_TEST
     ParaMEDMEM::MEDCouplingCMeshServant *m=new ParaMEDMEM::MEDCouplingCMeshServant(m1);
     m1->decrRef();
     SALOME_MED::MEDCouplingCMeshCorbaInterface_ptr ret=m->_this();
+    return ret;
+  }
+  
+  SALOME_MED::MEDCouplingIMeshCorbaInterface_ptr MEDCouplingMeshFieldFactoryComponent::getIMesh()
+  {
+    ParaMEDMEM::MEDCouplingIMesh *m1=MEDCouplingCorbaServBasicsTest::buildIMesh();
+    ParaMEDMEM::MEDCouplingIMeshServant *m=new ParaMEDMEM::MEDCouplingIMeshServant(m1);
+    m1->decrRef();
+    SALOME_MED::MEDCouplingIMeshCorbaInterface_ptr ret=m->_this();
     return ret;
   }
 

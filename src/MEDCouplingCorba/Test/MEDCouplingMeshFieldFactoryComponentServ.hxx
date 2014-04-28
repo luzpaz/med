@@ -49,6 +49,7 @@ namespace SALOME_TEST
     SALOME_MED::MEDCouplingUMeshCorbaInterface_ptr getM1DMesh();
     SALOME_MED::MEDCouplingExtrudedMeshCorbaInterface_ptr getExtrudedMesh();
     SALOME_MED::MEDCouplingCMeshCorbaInterface_ptr getCMesh();
+    SALOME_MED::MEDCouplingIMeshCorbaInterface_ptr getIMesh();
     SALOME_MED::MEDCouplingCurveLinearMeshCorbaInterface_ptr getCLMesh();
     SALOME_MED::MEDCoupling1SGTUMeshCorbaInterface_ptr get1SGTUMesh();
     SALOME_MED::MEDCoupling1DGTUMeshCorbaInterface_ptr get1DGTUMesh();

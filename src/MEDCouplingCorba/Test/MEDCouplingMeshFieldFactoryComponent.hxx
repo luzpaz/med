@@ -32,6 +32,7 @@ namespace ParaMEDMEM
   class MEDCoupling1DGTUMesh;
   class MEDCoupling1SGTUMesh;
   class MEDCouplingCMesh;
+  class MEDCouplingIMesh;
   class MEDCouplingCurveLinearMesh;
   class DataArrayDouble;
   class DataArrayInt;
@@ -52,6 +53,7 @@ namespace SALOME_TEST
     static ParaMEDMEM::MEDCouplingUMesh *buildM1DMesh();
     static ParaMEDMEM::MEDCouplingExtrudedMesh *buildExtrudedMesh(ParaMEDMEM::MEDCouplingUMesh *&m2D);
     static ParaMEDMEM::MEDCouplingCMesh *buildCMesh();
+    static ParaMEDMEM::MEDCouplingIMesh *buildIMesh();
     static ParaMEDMEM::MEDCouplingCurveLinearMesh *buildCLMesh();
     static ParaMEDMEM::MEDCoupling1SGTUMesh *build1SGTUMesh();
     static ParaMEDMEM::MEDCoupling1DGTUMesh *build1DGTUMesh();

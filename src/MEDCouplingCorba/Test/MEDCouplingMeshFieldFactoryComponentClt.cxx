@@ -29,6 +29,8 @@
 #include "MEDCouplingExtrudedMeshClient.hxx"
 #include "MEDCouplingCMesh.hxx"
 #include "MEDCouplingCMeshClient.hxx"
+#include "MEDCouplingIMesh.hxx"
+#include "MEDCouplingIMeshClient.hxx"
 #include "MEDCouplingCurveLinearMesh.hxx"
 #include "MEDCouplingCurveLinearMeshClient.hxx"
 #include "MEDCouplingFieldDouble.hxx"
@@ -203,6 +205,18 @@ void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetchingCMesh()
   meshPtr->UnRegister();
   CORBA::release(meshPtr);
   ParaMEDMEM::MEDCouplingCMesh *meshRef=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildCMesh();
+  CPPUNIT_ASSERT(meshFromDistant->isEqual(meshRef,1e-12));
+  meshRef->decrRef();
+  meshFromDistant->decrRef();
+}
+
+void SALOME_TEST::MEDCouplingCorbaServBasicsTestClt::checkCorbaFetchingIMesh()
+{
+  SALOME_MED::MEDCouplingIMeshCorbaInterface_ptr meshPtr=_objC->getIMesh();
+  ParaMEDMEM::MEDCouplingIMesh *meshFromDistant=ParaMEDMEM::MEDCouplingIMeshClient::New(meshPtr);
+  meshPtr->UnRegister();
+  CORBA::release(meshPtr);
+  ParaMEDMEM::MEDCouplingIMesh *meshRef=SALOME_TEST::MEDCouplingCorbaServBasicsTest::buildIMesh();
   CPPUNIT_ASSERT(meshFromDistant->isEqual(meshRef,1e-12));
   meshRef->decrRef();
   meshFromDistant->decrRef();

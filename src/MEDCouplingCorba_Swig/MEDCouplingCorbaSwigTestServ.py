@@ -72,6 +72,10 @@ class MEDCouplingMeshFieldFactoryComponentPy(MEDCouplingCorbaServantTest_idl._0_
         mesh=self._test.buildCMesh()
         return MEDCouplingCMeshServant._this(mesh)
 
+    def getIMesh(self):
+        mesh=self._test.buildIMesh()
+        return MEDCouplingIMeshServant._this(mesh)
+
     def getCLMesh(self):
         mesh=self._test.buildCLMesh()
         return MEDCouplingCurveLinearMeshServant._this(mesh)
