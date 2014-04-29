@@ -2,7 +2,7 @@
 #define _DlgImageToMed_HXX
 
 #include <QtGui>
-#include "ui_DlgImageToMed.hxx"
+#include "ui_DlgImageToMed.h"
 #include "GenericDialog.hxx"
 
 #include "MEDOPGUIdialogs.hxx"

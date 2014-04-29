@@ -2,7 +2,7 @@
 #define _DlgChangeUnderlyingMesh_HXX
 
 #include <QtGui>
-#include "ui_DlgChangeUnderlyingMesh.hxx"
+#include "ui_DlgChangeUnderlyingMesh.h"
 #include "GenericDialog.hxx"
 
 #include <SALOME_AppStudyEditor.hxx>

@@ -2,7 +2,7 @@
 #define DLGALIAS_H
 
 #include <QtGui>
-#include "ui_DlgAlias.hxx"
+#include "ui_DlgAlias.h"
 #include "MEDOPGUIdialogs.hxx"
 
 class MEDOPGUI_DIALOGS_EXPORT DlgAlias : public QDialog

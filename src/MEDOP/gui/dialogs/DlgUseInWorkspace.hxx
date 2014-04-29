@@ -2,7 +2,7 @@
 #define _DlgUseInWorkspace_HXX
 
 #include <QtGui>
-#include "ui_DlgUseInWorkspace.hxx"
+#include "ui_DlgUseInWorkspace.h"
 #include "GenericDialog.hxx"
 
 class DlgUseInWorkspace : public GenericDialog
