@@ -2057,3 +2057,79 @@ void MEDCouplingBasicsTest5::testSimplexize3()
   //
   m->decrRef();
 }
+
+/**
+ * Two square cells intersected by a vertical line crossing only one cell.
+ */
+void MEDCouplingBasicsTest5::testIntersect2DMeshWith1DLine1()
+{
+  MEDCouplingCMesh *m1c = MEDCouplingCMesh::New();
+  DataArrayDouble *coordX = DataArrayDouble::New();
+  const double arrX[3] = {-1., 1., 2};
+  coordX->alloc(3,1);
+  std::copy(arrX,arrX+3,coordX->getPointer());
+  m1c->setCoordsAt(0,coordX);
+  DataArrayDouble *coordY = DataArrayDouble::New();
+  const double arrY[4] = {0., 2.};
+  coordY->alloc(2,1);
+  std::copy(arrY,arrY+2,coordY->getPointer());
+  m1c->setCoordsAt(1,coordY);
+  MEDCouplingUMesh *m1 = m1c->buildUnstructured();
+
+  // A simple line:
+  MEDCouplingUMesh *m2 = MEDCouplingUMesh::New("bla", 1);
+  const int conn2A[7] = {INTERP_KERNEL::NORM_SEG2,0,1,INTERP_KERNEL::NORM_SEG3,1,2,3};
+  const int connI2A[3] = {0,3,7};
+  const double coo2A[8] = {0.,-1.0,  0.,1.,   0.,3.,  0.5,2.2};
+  DataArrayDouble *coord2 = DataArrayDouble::New();
+  DataArrayInt *conn2 = DataArrayInt::New();
+  DataArrayInt *connI2 = DataArrayInt::New();
+  coord2->alloc(4,2); conn2->alloc(7,1); connI2->alloc(3, 1);
+  std::copy(coo2A ,coo2A+8, coord2->getPointer());
+  std::copy(conn2A ,conn2A+7, conn2->getPointer());
+  std::copy(connI2A,connI2A+3, connI2->getPointer());
+  m2->setCoords(coord2);
+  m2->setConnectivity(conn2, connI2);
+
+  // End of construction of input meshes m1bis and m2 -> start of specific part of the test
+  DataArrayInt * map1 = 0, * map2 = 0, * mapI2 = 0;
+  MEDCouplingUMesh *m3 = MEDCouplingUMesh::Intersect2DMeshWith1DLine(m1, m2, 1e-10, map1, map2, mapI2);
+  bool areNodesMerged; int newNbNodes;
+  DataArrayInt * d_tmp = m3->mergeNodes(1.0e-8, areNodesMerged, newNbNodes);
+  d_tmp->decrRef();
+  CPPUNIT_ASSERT_EQUAL(3,m3->getNumberOfCells());
+  CPPUNIT_ASSERT_EQUAL(20,m3->getNumberOfNodes());
+  CPPUNIT_ASSERT_EQUAL(2,m3->getSpaceDimension());
+
+  const int exp1[3] = {0,0,1};
+  const int exp2[4] = {0,1,0,1};
+  const int expI2[4] = {0,2,4,4};
+  CPPUNIT_ASSERT_EQUAL(3, map1->getNumberOfTuples());
+  CPPUNIT_ASSERT_EQUAL(4, map2->getNumberOfTuples());
+  CPPUNIT_ASSERT_EQUAL(4, mapI2->getNumberOfTuples());
+  CPPUNIT_ASSERT(std::equal(exp1,exp1+3, map1->getConstPointer()));
+  CPPUNIT_ASSERT(std::equal(exp2,exp2+4, map2->getConstPointer()));
+  CPPUNIT_ASSERT(std::equal(expI2,expI2+4, mapI2->getConstPointer()));
+
+  const int expConn[27] = {32, 1, 10, 7, 11, 4, 12, 13, 14, 15, 16, 32, 10, 0, 3, 11, 7, 17, 18, 19, 14, 13, 5, 2, 1, 4, 5};
+  const int expConnI[4] = {0, 11, 22, 27};
+  CPPUNIT_ASSERT_EQUAL(27, m3->getNodalConnectivity()->getNumberOfTuples());
+  CPPUNIT_ASSERT_EQUAL(4, m3->getNodalConnectivityIndex()->getNumberOfTuples());
+  CPPUNIT_ASSERT(std::equal(expConn,expConn+27, m3->getNodalConnectivity()->getConstPointer()));
+  CPPUNIT_ASSERT(std::equal(expConnI,expConnI+4, m3->getNodalConnectivityIndex()->getConstPointer()));
+
+  map1->decrRef();
+  map2->decrRef();
+  mapI2->decrRef();
+  m3->decrRef();
+  //
+  m2->decrRef();
+  m1->decrRef();
+  coordX->decrRef();
+  coordY->decrRef();
+  m1c->decrRef();
+  coord2->decrRef();
+  conn2->decrRef();
+  connI2->decrRef();
+}
+

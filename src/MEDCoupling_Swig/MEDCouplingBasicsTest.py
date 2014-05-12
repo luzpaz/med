@@ -14724,9 +14724,99 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(m.getNodalConnectivityIndex().isEqual(DataArrayInt([0,5])))
         pass
 
+    def testIntersect2DMeshWith1DLine1(self):
+        """ Basic test for Intersect2DMeshWith1DLine: a vertical line intersecting a square. """
+        m1c = MEDCouplingCMesh()
+        coordX = DataArrayDouble([-1., 1., 2])
+        m1c.setCoordsAt(0,coordX)
+        coordY = DataArrayDouble([0., 2.])
+        m1c.setCoordsAt(1,coordY);
+        m1 = m1c.buildUnstructured()
+
+        # A simple line:
+        m2 = MEDCouplingUMesh("bla", 1)
+        coord2 = DataArrayDouble([0.,-1.0,  0.,1.,  0.,3.,  0.5,2.2], 4, 2)
+        conn2 = DataArrayInt([NORM_SEG2,0,1,NORM_SEG3,1,2,3])
+        connI2 = DataArrayInt([0,3,7])
+        m2.setCoords(coord2)
+        m2.setConnectivity(conn2, connI2)
+
+        # End of construction of input meshes m1bis and m2 -> start of specific part of the test
+        m3, map1, map2, mapI2 = MEDCouplingUMesh.Intersect2DMeshWith1DLine(m1, m2, 1e-10)
+        m3.mergeNodes(1.0e-8)
+                
+        self.assertEqual(3,m3.getNumberOfCells())
+        self.assertEqual(20,m3.getNumberOfNodes())
+        self.assertEqual(2,m3.getSpaceDimension())
+        # Mapping
+        exp1, exp2, expI2 = [0,0,1], [0,1,0,1], [0,2,4,4]
+        self.assertEqual(3, map1.getNumberOfTuples())
+        self.assertEqual(4, map2.getNumberOfTuples())
+        self.assertEqual(4, mapI2.getNumberOfTuples())
+        self.assertEqual(exp1, map1.getValues())
+        self.assertEqual(exp2, map2.getValues())
+        self.assertEqual(expI2, mapI2.getValues())
+        
+        expConn = [32, 1, 10, 7, 11, 4, 12, 13, 14, 15, 16, 32, 10, 0, 3, 11, 7, 17, 18, 19, 14, 13, 5, 2, 1, 4, 5] # 27tpl
+        expConnI = [0, 11, 22, 27]
+        self.assertEqual(27, m3.getNodalConnectivity().getNumberOfTuples())
+        self.assertEqual(4, m3.getNodalConnectivityIndex().getNumberOfTuples())
+        self.assertEqual(expConn, m3.getNodalConnectivity().getValues())
+        self.assertEqual(expConnI, m3.getNodalConnectivityIndex().getValues())
+      
+    def testSwig2Intersect2DMeshWith1DLine2(self):
+        """ Star pattern (a triangle intersecting another one upside down) """
+        coords1 = DataArrayDouble([-2.,1.,   2.,1.,  0.,-2.], 3,2)
+        coords2 = DataArrayDouble([0.,2.,   2.,-1.,  -2.,-1.,  0.,3.], 4,2)
+        m1 = MEDCouplingUMesh("triangle", 2)
+        m2 = MEDCouplingUMesh("tri_line", 1)
+        m1.setCoords(coords1)
+        m2.setCoords(coords2)
+        m1.setConnectivity(DataArrayInt([NORM_TRI3, 0,1,2]), DataArrayInt([0,4]))
+        m2.setConnectivity(DataArrayInt([NORM_SEG2,0,1,NORM_SEG2,1,2,NORM_SEG2,2,3]), DataArrayInt([0,3,6,9]))
+
+        # End of construction of input meshes m1bis and m2 -> start of specific part of the test
+        m3, map1, map2, mapI2 = MEDCouplingUMesh.Intersect2DMeshWith1DLine(m1, m2, 1e-10)
+        # Mapping
+        exp1, exp2, expI2 = [0,0,0,0], [2, 0,1,2, 0, 1], [0,1,4,5,6]
+        self.assertEqual(exp1, map1.getValues())
+        self.assertEqual(exp2, map2.getValues())
+        self.assertEqual(expI2, mapI2.getValues())
+        expConn = [5, 0, 8, 12, 5, 8, 7, 9, 10, 11, 12, 5, 7, 1, 9, 5, 10, 2, 11]
+        expConnI = [0, 4, 11, 15, 19]
+        self.assertEqual(expConn, m3.getNodalConnectivity().getValues())
+        self.assertEqual(expConnI, m3.getNodalConnectivityIndex().getValues())
+      
+    def testSwig2Intersect2DMeshWith1DLine3(self):
+        """ Line pieces ending (or fully located) in the middle of a cell """
+        m1c = MEDCouplingCMesh()
+        m1c.setCoordsAt(0,DataArrayDouble([-1., 1.]))
+        m1c.setCoordsAt(1,DataArrayDouble([-1., 1.]));
+        m1 = m1c.buildUnstructured()
+        coords2 = DataArrayDouble([0.,0.,  0.,1.5, -1.5,0.,  0.6,1.1,  1.1,0.6,  0.5,0.0,  0.0,-0.5], 7,2)
+        m2 = MEDCouplingUMesh("piecewise_line", 1)
+        m2.setCoords(coords2)
+        c = DataArrayInt([NORM_SEG2,0,1, NORM_SEG2,1,2,  NORM_SEG2,3,4, NORM_SEG2,5,6])
+        cI = DataArrayInt([0,3,6,9,12])
+        m2.setConnectivity(c, cI)
+        
+        # End of construction of input meshes m1bis and m2 -> start of specific part of the test
+        m3, map1, map2, mapI2 = MEDCouplingUMesh.Intersect2DMeshWith1DLine(m1, m2, 1e-10)
+        self.assertEqual(3,m3.getNumberOfCells())
+        # Mapping
+        exp1, exp2, expI2 = [0,0,0], [1,2, 1, 2], [0,2,3,4]
+        self.assertEqual(exp1, map1.getValues())
+        self.assertEqual(exp2, map2.getValues())
+        self.assertEqual(expI2, mapI2.getValues())
+        expConn = [5, 1, 0, 11, 13, 12, 14, 15, 5, 11, 2, 13, 5, 14, 3, 15]
+        expConnI = [0, 8, 12, 16]
+        self.assertEqual(expConn, m3.getNodalConnectivity().getValues())
+        self.assertEqual(expConnI, m3.getNodalConnectivityIndex().getValues())
+      
     def setUp(self):
         pass
     pass
 
 if __name__ == '__main__':
     unittest.main()
+

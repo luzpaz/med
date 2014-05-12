@@ -76,6 +76,7 @@ namespace ParaMEDMEM
     CPPUNIT_TEST( testDAIBuildSubstractionOptimized1 );
     CPPUNIT_TEST( testDAIIsStrictlyMonotonic1 );
     CPPUNIT_TEST( testSimplexize3 );
+    CPPUNIT_TEST( testIntersect2DMeshWith1DLine1 );
     CPPUNIT_TEST_SUITE_END();
   public:
     void testUMeshTessellate2D1();
@@ -118,6 +119,7 @@ namespace ParaMEDMEM
     void testDAIBuildSubstractionOptimized1();
     void testDAIIsStrictlyMonotonic1();
     void testSimplexize3();
+    void testIntersect2DMeshWith1DLine1();
   };
 }
 

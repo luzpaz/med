@@ -2392,6 +2392,18 @@ namespace ParaMEDMEM
         return ret;
       }
 
+      static PyObject *Intersect2DMeshWith1DLine(const MEDCouplingUMesh *m1, const MEDCouplingUMesh *m2, double eps) throw(INTERP_KERNEL::Exception)
+      {
+        DataArrayInt *cellNb1=0,*cellNb2=0, *cellNbI2=0;
+        MEDCouplingUMesh *mret=MEDCouplingUMesh::Intersect2DMeshWith1DLine(m1,m2,eps,cellNb1,cellNb2, cellNbI2);
+        PyObject *ret=PyTuple_New(4);
+        PyTuple_SetItem(ret,0,SWIG_NewPointerObj(SWIG_as_voidptr(mret),SWIGTYPE_p_ParaMEDMEM__MEDCouplingUMesh, SWIG_POINTER_OWN | 0 ));
+        PyTuple_SetItem(ret,1,SWIG_NewPointerObj(SWIG_as_voidptr(cellNb1),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+        PyTuple_SetItem(ret,2,SWIG_NewPointerObj(SWIG_as_voidptr(cellNb2),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+        PyTuple_SetItem(ret,3,SWIG_NewPointerObj(SWIG_as_voidptr(cellNbI2),SWIGTYPE_p_ParaMEDMEM__DataArrayInt, SWIG_POINTER_OWN | 0 ));
+        return ret;
+      }
+
       PyObject *buildSlice3D(PyObject *origin, PyObject *vec, double eps) const throw(INTERP_KERNEL::Exception)
       {
         int spaceDim=self->getSpaceDimension();

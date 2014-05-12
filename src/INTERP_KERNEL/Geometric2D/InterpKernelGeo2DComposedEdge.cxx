@@ -137,7 +137,7 @@ void ComposedEdge::initLocations() const
 }
 
 /**
- * Reset the status of all edges (OUT, IN, ON) because they were potentially assignated
+ * Reset the status of all edges (OUT, IN, ON) because they were potentially assigned
  * by the previous candidate processing.
  */
 void ComposedEdge::initLocationsWithOther(const ComposedEdge& other) const

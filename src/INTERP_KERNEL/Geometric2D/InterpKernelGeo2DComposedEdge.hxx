@@ -37,6 +37,11 @@ namespace INTERP_KERNEL
   class ElementaryEdge;
   class IteratorOnComposedEdge;
 
+  /**
+     * A set of quadratic or linear edges, described mainly by their connectivity
+     * The set is assumed to be connected, but not necessarily closed (i.e. not necessarily forming a closed polygon).
+     * Some methods however requires a closed form.
+  */
   class ComposedEdge
   {
     friend class IteratorOnComposedEdge;

@@ -240,6 +240,8 @@ namespace ParaMEDMEM
     MEDCOUPLING_EXPORT static void ComputeVecAndPtOfFace(double eps, const double *coords, const int *begin, const int *end, double *v, double *p);
     MEDCOUPLING_EXPORT static void TryToCorrectPolyhedronOrientation(int *begin, int *end, const double *coords);
     MEDCOUPLING_EXPORT static MEDCouplingUMesh *Intersect2DMeshes(const MEDCouplingUMesh *m1, const MEDCouplingUMesh *m2, double eps, DataArrayInt *&cellNb1, DataArrayInt *&cellNb2);
+    MEDCOUPLING_EXPORT static MEDCouplingUMesh *Intersect2DMeshWith1DLine(const MEDCouplingUMesh *m1, const MEDCouplingUMesh *m2,
+                                                          double eps, DataArrayInt *&cellNb1, DataArrayInt *&cellNb2, DataArrayInt *&cellNbI2);
     MEDCOUPLING_EXPORT static bool BuildConvexEnvelopOf2DCellJarvis(const double *coords, const int *nodalConnBg, const int *nodalConnEnd, DataArrayInt *nodalConnecOut);
     MEDCOUPLING_EXPORT static bool RemoveIdsFromIndexedArrays(const int *idsToRemoveBg, const int *idsToRemoveEnd, DataArrayInt *arr, DataArrayInt *arrIndx, int offsetForRemoval=0);
     MEDCOUPLING_EXPORT static void ExtractFromIndexedArrays(const int *idsOfSelectBg, const int *idsOfSelectEnd, const DataArrayInt *arrIn, const DataArrayInt *arrIndxIn,
@@ -311,11 +313,20 @@ namespace ParaMEDMEM
                                             MEDCouplingUMesh *& m1Desc, DataArrayInt *&desc1, DataArrayInt *&descIndx1, DataArrayInt *&revDesc1, DataArrayInt *&revDescIndx1,
                                             std::vector<double>& addCoo,
                                             MEDCouplingUMesh *& m2Desc, DataArrayInt *&desc2, DataArrayInt *&descIndx2, DataArrayInt *&revDesc2, DataArrayInt *&revDescIndx2);
+    static void IntersectDescending2DMeshWith1DMesh(const MEDCouplingUMesh *m1, const MEDCouplingUMesh *m2, double eps,
+                                                    std::vector< std::vector<int> >& intersectEdge1, std::vector< std::vector<int> >& colinear2, std::vector< std::vector<int> >& subDiv2,
+                                                    MEDCouplingUMesh *& m1Desc, DataArrayInt *&desc1, DataArrayInt *&descIndx1, DataArrayInt *&revDesc1, DataArrayInt *&revDescIndx1,
+                                                    std::vector<double>& addCoo);
     static void BuildIntersectEdges(const MEDCouplingUMesh *m1, const MEDCouplingUMesh *m2, const std::vector<double>& addCoo, const std::vector< std::vector<int> >& subDiv, std::vector< std::vector<int> >& intersectEdge);
     static void BuildIntersecting2DCellsFromEdges(double eps, const MEDCouplingUMesh *m1, const int *desc1, const int *descIndx1, const std::vector<std::vector<int> >& intesctEdges1, const std::vector< std::vector<int> >& colinear2,
                                                   const MEDCouplingUMesh *m2, const int *desc2, const int *descIndx2, const std::vector<std::vector<int> >& intesctEdges2,
                                                   const std::vector<double>& addCoords,
                                                   std::vector<double>& addCoordsQuadratic, std::vector<int>& cr, std::vector<int>& crI, std::vector<int>& cNb1, std::vector<int>& cNb2);
+    static void Build2DCellsFrom1DCut(double eps, const MEDCouplingUMesh *m1, const int *desc1, const int *descIndx1, const std::vector<std::vector<int> >& intesctEdges1, const std::vector< std::vector<int> >& colinear2,
+                                                      const MEDCouplingUMesh *m2, const std::vector<std::vector<int> >& intesctEdges2,
+                                                      const std::vector<double>& addCoords,
+                                                      std::vector<double>& addCoordsQuadratic, std::vector<int>& cr, std::vector<int>& crI,
+                                                      std::vector<int>& cNb1, std::vector<int>& cNb2, std::vector<int>& cNbI2);
     static void AssemblyForSplitFrom3DCurve(const std::vector<int>& cut3DCurve, std::vector<int>& nodesOnPlane, const int *nodal3DSurf, const int *nodalIndx3DSurf,
                                               const int *nodal3DCurve, const int *nodalIndx3DCurve,
                                               const int *desc, const int *descIndx, std::vector< std::pair<int,int> >& cut3DSurf);
