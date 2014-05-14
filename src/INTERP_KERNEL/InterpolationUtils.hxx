@@ -38,6 +38,10 @@
 
 namespace INTERP_KERNEL
 {
+  /**
+   * Utility class performing conversion from Fortran indexing to C indexing.
+   * ConnType is typically an integer type describing a connectivity.
+   */
   template<class ConnType, NumberingPolicy numPol>
   class OTT//OffsetToolTrait
   {
@@ -47,20 +51,44 @@ namespace INTERP_KERNEL
   class OTT<ConnType,ALL_C_MODE>
   {
   public:
-    static ConnType indFC(ConnType i) { return i; }
-    static ConnType ind2C(ConnType i) { return i; }
-    static ConnType conn2C(ConnType i) { return i; }
-    static ConnType coo2C(ConnType i) { return i; }
+    static inline ConnType indFC(ConnType i) { return i; }
+    static inline ConnType ind2C(ConnType i) { return i; }
+    static inline ConnType conn2C(ConnType i) { return i; }
+    static inline ConnType coo2C(ConnType i) { return i; }
   };
   
   template<class ConnType>
   class OTT<ConnType,ALL_FORTRAN_MODE>
   {
   public:
-    static ConnType indFC(ConnType i) { return i+1; }
-    static ConnType ind2C(ConnType i) { return i-1; }
-    static ConnType conn2C(ConnType i) { return i-1; }
-    static ConnType coo2C(ConnType i) { return i-1; }
+    static inline ConnType indFC(ConnType i) { return i+1; }
+    static inline ConnType ind2C(ConnType i) { return i-1; }
+    static inline ConnType conn2C(ConnType i) { return i-1; }
+    static inline ConnType coo2C(ConnType i) { return i-1; }
+  };
+
+  /**
+   * Very similar to OTT but also deals with orientation along the way.
+   */
+  template<class ConnType, NumberingPolicy numPol>
+  class OTT2
+  {
+  };
+
+  template<class ConnType>
+  class OTT2<ConnType,ALL_C_MODE>
+  {
+  public:
+    static inline ConnType ind2F(ConnType i, const bool orient) { return orient?(i+1):-(i+1); }
+    static inline ConnType ind2C(ConnType i, bool & orient)     { orient=true; return i;      }
+  };
+
+  template<class ConnType>
+  class OTT2<ConnType,ALL_FORTRAN_MODE>
+  {
+  public:
+    static inline ConnType ind2F(ConnType i, const bool orient) { return i;                       }
+    static inline ConnType ind2C(ConnType i, bool & orient)     { orient=(i>0); return abs(i)-1; }
   };
 
   /*_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ */
