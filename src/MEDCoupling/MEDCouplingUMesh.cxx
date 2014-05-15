@@ -8714,6 +8714,34 @@ MEDCouplingUMesh *MEDCouplingUMesh::Intersect2DMeshes(const MEDCouplingUMesh *m1
   return ret.retn();
 }
 
+/*!
+ * Partitions the first given 2D mesh using the second given 1D mesh as a tool, and
+ * returns a mesh made of polygons.
+ * Thus the final result contains all nodes from m1 plus new nodes. However it doesn't necessarily contains
+ * all nodes from m2.
+ * The meshes should be in 2D space. In
+ * addition, returns three arrays mapping cells of the resulting mesh to cells of the input
+ * meshes. The first array as the same format as in Intersect2DMeshes, the two others are specific since
+ * a resulting cell can be mapped to more than one cell (=a segment) in the tool mesh.
+ *  \param [in] m1 - the first input mesh which is to be partioned
+ *  \param [in] m2 - the second input mesh which is used as a partition tool.
+ *  \param [in] eps - precision used to detect coincident mesh entities.
+ *  \param [out] cellNb1 - a new instance of DataArrayInt holding for each result
+ *         cell the id of the cell of \a m1 it comes from. The caller is to delete
+ *         this array using decrRef() as it is no more needed.
+ *  \param [out] cellNb2
+ *  \param [out] cellNbI2 - for each 2D cell \a i in the result, gives the list of 1D cells from m2 where
+ *          \a i comes from. This is given in surjective format (to be used with \a cellNb2). Both DataArrayInt-s are to
+ *          be deleted by the caller.
+ *  \return MEDCouplingUMesh * - the result 2D mesh which is a new instance of
+ *         MEDCouplingUMesh. The caller is to delete this mesh using decrRef() as it
+ *         is no more needed.
+ *  \throw If the coordinates array is not set in any of the meshes.
+ *  \throw If the nodal connectivity of cells is not defined in any of the meshes.
+ *  \throw If any of the meshes is not in 2D space.
+ *  \throw If m1 is not a mesh of dimension 2, or m1 is not a mesh of dimension 1
+ *  \throw If m2 is not a (piecewise) line (i.e. if a point has more than 2 adjacent segments)
+ */
 MEDCouplingUMesh *MEDCouplingUMesh::Intersect2DMeshWith1DLine(const MEDCouplingUMesh *m1, const MEDCouplingUMesh *m2,
                                                               double eps, DataArrayInt *&cellNb1, DataArrayInt *&cellNb2, DataArrayInt *&cellNbI2)
 {
@@ -8850,8 +8878,8 @@ void MEDCouplingUMesh::BuildIntersecting2DCellsFromEdges(double eps, const MEDCo
       ii=0;
       for(std::vector<int>::const_iterator it2=candidates2.begin();it2!=candidates2.end();it2++,ii++)
         {
-          pol1.initLocationsWithOther(pol2s[ii]);
-          pol2s[ii].updateLocOfEdgeFromCrudeDataArray2(desc2+descIndx2[*it2],desc2+descIndx2[*it2+1],intesctEdges2,pol1,desc1+descIndx1[i],desc1+descIndx1[i+1],intesctEdges1,colinear2);
+          INTERP_KERNEL::ComposedEdge::InitLocationsWithOther(pol1,pol2s[ii]);
+          pol2s[ii].updateLocOfEdgesFromCrudeDataArray(desc2+descIndx2[*it2],desc2+descIndx2[*it2+1],intesctEdges2,pol1,desc1+descIndx1[i],desc1+descIndx1[i+1],intesctEdges1,colinear2);
           //MEDCouplingUMeshAssignOnLoc(pol1,pol2,desc1+descIndx1[i],desc1+descIndx1[i+1],intesctEdges1,desc2+descIndx2[*it2],desc2+descIndx2[*it2+1],intesctEdges2,colinear2);
           pol1.buildPartitionsAbs(pol2s[ii],edges1,edgesBoundary2,mapp,i,*it2,offset3,addCoordsQuadratic,cr,crI,cNb1,cNb2);
         }
@@ -8934,19 +8962,13 @@ void MEDCouplingUMesh::Build2DCellsFrom1DCut(double eps, const MEDCouplingUMesh 
           MEDCouplingUMeshBuildQPFromMesh4(coo1,offset1,coo2,offset2,addCoords,*it2,intesctEdges2,
                                            /* output */mapp,mappRev);
           // pol2 is the new QP in the final merged result.
-          pol2s[ii].buildFromCrudeDataArray3(mappRev,cm2.isQuadratic(),conn2+connI2[*it2]+1,coo2,*it2,intesctEdges2,
+          pol2s[ii].buildFromCrudeDataArrayOneSeg(mappRev,cm2.isQuadratic(),conn2+connI2[*it2]+1,coo2,*it2,intesctEdges2,
                pol1,desc1+descIndx1[i],desc1+descIndx1[i+1],intesctEdges1,colinear2, /* output */ edgesIn2ForShare);
         }
-      pol1.initLocationsWithSeveralOthers(pol2s);
+      INTERP_KERNEL::QuadraticPolygon::InitLocationsWithSeveralOthers(pol1, pol2s);
+      //Locate pol2s[ii] relative to pol1 (this is done the other way around in the 2D/2D intersection)
       for(it2 = candidates2.begin(), ii = 0; it2 != candidates2.end(); it2++, ii++)
-        {
-          pol2s[ii].updateLocOfEdgeFromCrudeDataArray(*it2 ,intesctEdges2,pol1, desc1+descIndx1[i],desc1+descIndx1[i+1],intesctEdges1,colinear2);
-          double xBaryBB, yBaryBB;
-          double fact=pol1.normalizeExt(&pol2s[ii], xBaryBB, yBaryBB);
-          //Locate pol2s[ii] relative to pol1 (this is done the other way around in the 2D/2D intersection)
-          pol1.performLocatingOperationSlow(pol2s[ii]);
-          pol1.unApplyGlobalSimilarityExt(pol2s[ii],xBaryBB,yBaryBB,fact);
-        }
+        pol2s[ii].fullyLocateWithRespectTo(pol1,*it2,intesctEdges2,desc1+descIndx1[i],desc1+descIndx1[i+1],intesctEdges1,colinear2);
       // At this point all edges in (all elements of) pol2s are fully localized.
       // Zip consecutive IN segments from the list of candidates, and discard the pieces which are ending nowhere (e.g. an IN polyline
       // with an end-point in the middle of the cell).
@@ -8954,29 +8976,21 @@ void MEDCouplingUMesh::Build2DCellsFrom1DCut(double eps, const MEDCouplingUMesh 
       std::list<INTERP_KERNEL::QuadraticPolygon *> zip_list = INTERP_KERNEL::QuadraticPolygon::ZipConsecutiveSegments2(candidates2, pol2s, mapZipTo2);
 
       // Now the core of the algo - main output is in cr, crI, cNb1, cNb2 and cNbI2.
-      INTERP_KERNEL::QuadraticPolygon::BuildPartitionFromZipList(pol1, zip_list, edges1, edgesBoundary2, mapp,
-                                                                 i, mapZipTo2,
+      INTERP_KERNEL::QuadraticPolygon::BuildPartitionFromZipList(pol1, zip_list, edges1, edgesBoundary2, mapp, i, mapZipTo2,
                                                                  offset3,addCoordsQuadratic,cr,crI, cNb1,cNb2, cNbI2);
       // Deals with remaining (non-consumed) edges from m1: these are the edges that were never touched
       // by m2 but that we still want to keep in the final result.
       if(!edges1.empty())
         {
-          size_t oldSz = cNb2.size();
           try
           {
-              INTERP_KERNEL::QuadraticPolygon::ComputeResidual(pol1,edges1,edgesBoundary2,mapp,offset3,i,addCoordsQuadratic,cr,crI,cNb1,cNb2);
+              INTERP_KERNEL::QuadraticPolygon::ComputeResidualLineIntersect(pol1,edges1,edgesBoundary2,mapp,offset3,i,addCoordsQuadratic,cr,crI,cNb1,cNb2,cNbI2);
           }
           catch(INTERP_KERNEL::Exception& e)
           {
               std::ostringstream oss; oss << "Error when computing residual of cell #" << i << " in source/m1 mesh ! Maybe the neighbours of this cell in mesh are not well connected !\n" << "The deep reason is the following : " << e.what();
               throw INTERP_KERNEL::Exception(oss.str().c_str());
           }
-          // ComputeResidual has pushed some -1 at the back of cNb2. Replace this with void entries in cNbI2:
-          // TODO: discuss the format with Anthony.
-          size_t newSz = cNb2.size();
-          cNb2.resize(oldSz);
-          int val = (oldSz == 0) ? 0 : cNbI2.back();
-          for(size_t sss=0; sss<newSz-oldSz; sss++, cNbI2.push_back(val));
         }
       // Memory clean-up
       for(std::map<int,INTERP_KERNEL::Node *>::const_iterator it=mappRev.begin();it!=mappRev.end();it++)
@@ -9321,9 +9335,9 @@ void MEDCouplingUMesh::IntersectDescending2DMeshes(const MEDCouplingUMesh *m1, c
 }
 
 void MEDCouplingUMesh::IntersectDescending2DMeshWith1DMesh(const MEDCouplingUMesh *m1, const MEDCouplingUMesh *m2, double eps,
-                                                   std::vector< std::vector<int> >& intersectEdge1, std::vector< std::vector<int> >& colinear2, std::vector< std::vector<int> >& subDiv2,
-                                                   MEDCouplingUMesh *& m1Desc, DataArrayInt *&desc1, DataArrayInt *&descIndx1, DataArrayInt *&revDesc1, DataArrayInt *&revDescIndx1,
-                                                   std::vector<double>& addCoo)
+                                                           std::vector< std::vector<int> >& intersectEdge1, std::vector< std::vector<int> >& colinear2, std::vector< std::vector<int> >& subDiv2,
+                                                           MEDCouplingUMesh *& m1Desc, DataArrayInt *&desc1, DataArrayInt *&descIndx1, DataArrayInt *&revDesc1, DataArrayInt *&revDescIndx1,
+                                                           std::vector<double>& addCoo)
 {
   static const int SPACEDIM=2;
   // Build desc connectivity of first mesh only

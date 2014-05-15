@@ -56,7 +56,7 @@ namespace INTERP_KERNEL
     INTERPKERNEL_EXPORT bool presenceOfOn() const;
     INTERPKERNEL_EXPORT bool presenceOfQuadraticEdge() const;
     INTERPKERNEL_EXPORT void initLocations() const;
-    INTERPKERNEL_EXPORT void initLocationsWithOther(const ComposedEdge& other) const;
+    INTERPKERNEL_EXPORT static void InitLocationsWithOther(const ComposedEdge& first, const ComposedEdge& other);
     INTERPKERNEL_EXPORT ComposedEdge *clone() const;
     INTERPKERNEL_EXPORT bool isNodeIn(Node *n) const;
     INTERPKERNEL_EXPORT double getArea() const;

@@ -14763,6 +14763,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertEqual(4, m3.getNodalConnectivityIndex().getNumberOfTuples())
         self.assertEqual(expConn, m3.getNodalConnectivity().getValues())
         self.assertEqual(expConnI, m3.getNodalConnectivityIndex().getValues())
+        pass
       
     def testSwig2Intersect2DMeshWith1DLine2(self):
         """ Star pattern (a triangle intersecting another one upside down) """
@@ -14786,6 +14787,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         expConnI = [0, 4, 11, 15, 19]
         self.assertEqual(expConn, m3.getNodalConnectivity().getValues())
         self.assertEqual(expConnI, m3.getNodalConnectivityIndex().getValues())
+        pass
       
     def testSwig2Intersect2DMeshWith1DLine3(self):
         """ Line pieces ending (or fully located) in the middle of a cell """
@@ -14812,6 +14814,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         expConnI = [0, 8, 12, 16]
         self.assertEqual(expConn, m3.getNodalConnectivity().getValues())
         self.assertEqual(expConnI, m3.getNodalConnectivityIndex().getValues())
+        pass
       
     def setUp(self):
         pass
