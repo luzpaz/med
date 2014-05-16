@@ -14630,7 +14630,7 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertTrue(mu.getNodalConnectivityIndex().isEqual(DataArrayInt([0,5,10,15,20,25,30])))
         coo0=DataArrayDouble([(0,0,0),(1,0,0),(2,0,0),(0,1,0),(1,1,0),(2,1,0),(0,2,0),(1,2,0),(2,2,0),(0,3,0),(1,3,0),(2,3,0)])
         self.assertTrue(mu.getCoords().isEqual(coo0,1e-12))
-        mu.writeVTK("tutu.vtu")
+        #mu.writeVTK("tutu.vtu")
         #
         m=MEDCouplingCMesh()
         arrX=DataArrayDouble(3) ; arrX.iota()
@@ -14814,6 +14814,42 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         expConnI = [0, 8, 12, 16]
         self.assertEqual(expConn, m3.getNodalConnectivity().getValues())
         self.assertEqual(expConnI, m3.getNodalConnectivityIndex().getValues())
+        pass
+      
+    def testOrderConsecutiveCells1D1(self):
+        # A line in several unconnected pieces:
+        m2 = MEDCouplingUMesh.New("bla", 1)
+        c = DataArrayInt([NORM_SEG2,0,1,NORM_SEG3,1,3,2, NORM_SEG2,3,4,
+                               NORM_SEG3,5,7,6, NORM_SEG3,7,9,8, NORM_SEG2,9,10,
+                               NORM_SEG2,11,12,NORM_SEG2,12,13,
+                               NORM_SEG2,14,15])
+        cI = DataArrayInt([0,3,7,10,14,18,21,24,27,30])
+        coords2 = DataArrayDouble([float(i) for i in range(32)], 16,2)
+        m2.setCoords(coords2);
+        m2.setConnectivity(c, cI);
+        m2.checkCoherency2(1.0e-8);
+      
+        # Shuffle a bit :-)
+        m2.renumberCells(DataArrayInt([0,3,6,8,1,4,7,5,2]), True);
+        res = m2.orderConsecutiveCells1D()
+        expRes = [0,3,6,8,1,4,2,7,5]
+        self.assertEqual(m2.getNumberOfCells(),res.getNumberOfTuples())
+        self.assertEqual(expRes, res.getValues())
+      
+        # A closed line (should also work)
+        m3 = MEDCouplingUMesh.New("bla3", 1)
+        conn3A = DataArrayInt([NORM_SEG2,0,1,NORM_SEG3,1,3,2, NORM_SEG2,3,0])
+        coord3 = coords2[0:5]
+        c.reAlloc(10)
+        cI.reAlloc(4)
+        
+        m3.setCoords(coord3)
+        m3.setConnectivity(conn3A, cI)
+        m3.checkCoherency2(1.0e-8)
+        res2 = m3.orderConsecutiveCells1D()
+        expRes2 = [0,1,2]
+        self.assertEqual(m3.getNumberOfCells(),res2.getNumberOfTuples())
+        self.assertEqual(expRes2, res2.getValues())
         pass
       
     def setUp(self):

@@ -2133,3 +2133,56 @@ void MEDCouplingBasicsTest5::testIntersect2DMeshWith1DLine1()
   connI2->decrRef();
 }
 
+void MEDCouplingBasicsTest5::testOrderConsecutiveCells1D1()
+{
+  // A line in several unconnected pieces:
+  MEDCouplingUMesh *m2 = MEDCouplingUMesh::New("bla", 1);
+  const int conn2A[30] = {INTERP_KERNEL::NORM_SEG2,0,1,INTERP_KERNEL::NORM_SEG3,1,3,2, INTERP_KERNEL::NORM_SEG2,3,4,
+                         INTERP_KERNEL::NORM_SEG3,5,7,6, INTERP_KERNEL::NORM_SEG3,7,9,8, INTERP_KERNEL::NORM_SEG2,9,10,
+                         INTERP_KERNEL::NORM_SEG2,11,12,INTERP_KERNEL::NORM_SEG2,12,13,
+                         INTERP_KERNEL::NORM_SEG2,14,15};
+  const int connI2A[10] = {0,3,7,10,14,18,21,24,27,30};
+  double coo2A[32] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,00,0,0,0,0,0,0,0,0,0,0,0};
+  for(int i=0; i < 16; i++, coo2A[2*i]=0.0, coo2A[2*i+1]=double(i));
+  DataArrayDouble *coord2 = DataArrayDouble::New();
+  DataArrayInt *conn2 = DataArrayInt::New();
+  DataArrayInt *connI2 = DataArrayInt::New();
+  coord2->alloc(16,2); conn2->alloc(30,1); connI2->alloc(10, 1);
+  std::copy(coo2A ,coo2A+32, coord2->getPointer());
+  std::copy(conn2A ,conn2A+30, conn2->getPointer());
+  std::copy(connI2A,connI2A+10, connI2->getPointer());
+  m2->setCoords(coord2);
+  m2->setConnectivity(conn2, connI2);
+  m2->checkCoherency2(1.0e-8);
+
+  // Shuffle a bit :-)
+  const int shuf[9] = {0,3,6,8,1,4,7,5,2};
+  m2->renumberCells(shuf, true);
+  DataArrayInt * res = m2->orderConsecutiveCells1D();
+  const int expRes[9] = {0,3,6,8,1,4,2,7,5};
+  CPPUNIT_ASSERT_EQUAL(m2->getNumberOfCells(),res->getNumberOfTuples());
+  CPPUNIT_ASSERT(std::equal(expRes, expRes+9,res->getConstPointer()));
+
+  // A closed line (should also work)
+  MEDCouplingUMesh *m3 = MEDCouplingUMesh::New("bla3", 1);
+  const int conn3A[10] = {INTERP_KERNEL::NORM_SEG2,0,1,INTERP_KERNEL::NORM_SEG3,1,3,2, INTERP_KERNEL::NORM_SEG2,3,0};
+  DataArrayDouble *coord3 = coord2->selectByTupleId2(0, 5,1);
+  conn2->reAlloc(10); connI2->reAlloc(4);
+  std::copy(conn3A ,conn3A+10, conn2->getPointer());
+  m3->setCoords(coord3);
+  m3->setConnectivity(conn2, connI2);
+  m3->checkCoherency2(1.0e-8);
+  DataArrayInt * res2 = m3->orderConsecutiveCells1D();
+  const int expRes2[3] = {0,1,2};
+  CPPUNIT_ASSERT_EQUAL(m3->getNumberOfCells(),res2->getNumberOfTuples());
+  CPPUNIT_ASSERT(std::equal(expRes2, expRes2+3,res2->getConstPointer()));
+
+  coord2->decrRef();
+  coord3->decrRef();
+  conn2->decrRef();
+  connI2->decrRef();
+  m2->decrRef();
+  m3->decrRef();
+  res->decrRef();
+  res2->decrRef();
+}

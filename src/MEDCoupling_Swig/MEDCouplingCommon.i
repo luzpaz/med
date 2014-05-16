@@ -273,6 +273,7 @@ using namespace INTERP_KERNEL;
 %newobject ParaMEDMEM::MEDCouplingUMesh::getBoundingBoxForBBTreeFast;
 %newobject ParaMEDMEM::MEDCouplingUMesh::getBoundingBoxForBBTree2DQuadratic;
 %newobject ParaMEDMEM::MEDCouplingUMesh::getBoundingBoxForBBTree1DQuadratic;
+%newobject ParaMEDMEM::MEDCouplingUMesh::orderConsecutiveCells1D;
 %newobject ParaMEDMEM::MEDCouplingUMeshCellByTypeEntry::__iter__;
 %newobject ParaMEDMEM::MEDCouplingUMeshCellEntry::__iter__;
 %newobject ParaMEDMEM::MEDCoupling1GTUMesh::New;
@@ -1548,6 +1549,7 @@ namespace ParaMEDMEM
     DataArrayDouble *getBoundingBoxForBBTreeFast() const throw(INTERP_KERNEL::Exception);
     DataArrayDouble *getBoundingBoxForBBTree2DQuadratic(double arcDetEps=1e-12) const throw(INTERP_KERNEL::Exception);
     DataArrayDouble *getBoundingBoxForBBTree1DQuadratic(double arcDetEps=1e-12) const throw(INTERP_KERNEL::Exception);
+    DataArrayInt *orderConsecutiveCells1D() const throw(INTERP_KERNEL::Exception);
     int split2DCells(const DataArrayInt *desc, const DataArrayInt *descI, const DataArrayInt *subNodesInSeg, const DataArrayInt *subNodesInSegI, const DataArrayInt *midOpt=0, const DataArrayInt *midOptI=0) throw(INTERP_KERNEL::Exception);
     static MEDCouplingUMesh *Build0DMeshFromCoords(DataArrayDouble *da) throw(INTERP_KERNEL::Exception);
     static MEDCouplingUMesh *MergeUMeshes(const MEDCouplingUMesh *mesh1, const MEDCouplingUMesh *mesh2) throw(INTERP_KERNEL::Exception);

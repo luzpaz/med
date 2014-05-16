@@ -882,7 +882,7 @@ template<class SonsGenerator>
 MEDCouplingUMesh *MEDCouplingUMesh::buildDescendingConnectivityGen(DataArrayInt *desc, DataArrayInt *descIndx, DataArrayInt *revDesc, DataArrayInt *revDescIndx, DimM1DescNbrer nbrer) const
 {
   if(!desc || !descIndx || !revDesc || !revDescIndx)
-    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::buildDescendingConnectivityGen : present of a null pointer in input !");
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::buildDescendingConnectivityGen: presence of a null pointer in input!");
   checkConnectivityFullyDefined();
   int nbOfCells=getNumberOfCells();
   int nbOfNodes=getNumberOfNodes();
@@ -8998,6 +8998,90 @@ void MEDCouplingUMesh::Build2DCellsFrom1DCut(double eps, const MEDCouplingUMesh 
       for (std::list<INTERP_KERNEL::QuadraticPolygon *>::const_iterator itt = zip_list.begin(); itt != zip_list.end(); itt++)
         delete(*itt);
     }
+}
+
+/**
+ * Provides a renumbering of the cells of this (which has to be a piecewise connected 1D line), so that
+ * the segments of the line are indexed in consecutive order (i.e. cells \a i and \a i+1 are neighbors).
+ * This doesn't modify the mesh.
+ * The caller is to deal with the resulting DataArrayInt.
+ *  \throw If the coordinate array is not set.
+ *  \throw If the nodal connectivity of the cells is not defined.
+ *  \throw If m1 is not a mesh of dimension 2, or m1 is not a mesh of dimension 1
+ *  \throw If m2 is not a (piecewise) line (i.e. if a point has more than 2 adjacent segments)
+ */
+DataArrayInt * MEDCouplingUMesh::orderConsecutiveCells1D() const
+{
+  checkFullyDefined();
+  if(getMeshDimension()!=1 || getSpaceDimension()!=2)
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::orderConsecutiveCells1D works on unstructured mesh with (meshdim, spacedim) = (1,2)!");
+
+  // Check that this is a line (and not a more complex 1D mesh) - each point is used at most by 2 segments:
+  DataArrayInt *_d = DataArrayInt::New(), *_dI = DataArrayInt::New();
+  DataArrayInt *_rD = DataArrayInt::New(), *_rDI = DataArrayInt::New();
+  MEDCouplingUMesh * m_points;
+  m_points = buildDescendingConnectivity(_d, _dI, _rD, _rDI);
+  const int *d=_d->getConstPointer(), *dI=_dI->getConstPointer();
+  const int *rD=_rD->getConstPointer(), *rDI=_rDI->getConstPointer();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> _dsi = _rDI->deltaShiftIndex();
+  const int * dsi=_dsi->getConstPointer();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> dsii = _dsi->getIdsNotInRange(0,3);
+  m_points->decrRef();
+  if (dsii->getNumberOfTuples())
+    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::orderConsecutiveCells1D only work with a mesh being a (piecewise) connected line!");
+
+  int nc = getNumberOfCells();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> result(DataArrayInt::New());
+  result->alloc(nc,1);
+
+  // set of edges not used so far
+  std::set<int> edgeSet;
+  for (int i=0; i<nc; edgeSet.insert(i), i++);
+
+  int startSeg=0;
+  int newIdx=0;
+  // while we have points with only one neighbor segments
+  do
+    {
+      std::list<int> linePiece;
+      // fills a list of consecutive segment linked to startSeg. This can go forward or backward.
+      for (int direction=0;direction<2;direction++) // direction=0 --> forward, direction=1 --> backward
+        {
+          // Fill the list forward (resp. backward) from the start segment:
+          int activeSeg = startSeg;
+          int prevPointId = -20;
+          int ptId;
+          while (!edgeSet.empty())
+            {
+              if (!(direction == 1 && prevPointId==-20)) // prevent adding twice startSeg
+                {
+                  if (direction==0)
+                    linePiece.push_back(activeSeg);
+                  else
+                    linePiece.push_front(activeSeg);
+                  edgeSet.erase(activeSeg);
+                }
+
+              int ptId1 = d[dI[activeSeg]], ptId2 = d[dI[activeSeg]+1];
+              ptId = direction ? (ptId1 == prevPointId ? ptId2 : ptId1) : (ptId2 == prevPointId ? ptId1 : ptId2);
+              if (dsi[ptId] == 1) // hitting the end of the line
+                  break;
+              prevPointId = ptId;
+              int seg1 = rD[rDI[ptId]], seg2 = rD[rDI[ptId]+1];
+              activeSeg = (seg1 == activeSeg) ? seg2 : seg1;
+            }
+        }
+      // Done, save final piece into DA:
+      std::copy(linePiece.begin(), linePiece.end(), result->getPointer()+newIdx);
+      newIdx += linePiece.size();
+
+      // identify next valid start segment (one which is not consumed)
+      if(!edgeSet.empty())
+        startSeg = *(edgeSet.begin());
+    }
+  while (!edgeSet.empty());
+  _d->decrRef(); _dI->decrRef(); _rD->decrRef(); _rDI->decrRef();
+  return result.retn();
 }
 
 
