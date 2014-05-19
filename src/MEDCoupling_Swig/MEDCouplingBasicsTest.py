@@ -14815,7 +14815,47 @@ class MEDCouplingBasicsTest(unittest.TestCase):
         self.assertEqual(expConn, m3.getNodalConnectivity().getValues())
         self.assertEqual(expConnI, m3.getNodalConnectivityIndex().getValues())
         pass
-      
+    
+    def testSwig2Intersect2DMeshWith1DLine4(self):
+        """ Intersection with a line whose connectivity is not consecutive """
+        m1c = MEDCouplingCMesh()
+        coordX = DataArrayDouble([-1., 1., 2])
+        m1c.setCoordsAt(0,coordX)
+        coordY = DataArrayDouble([0., 2.])
+        m1c.setCoordsAt(1,coordY);
+        m1 = m1c.buildUnstructured()
+
+        # A simple line:
+        m2 = MEDCouplingUMesh("bla", 1)
+        coord2 = DataArrayDouble([0.,1.5,  0.5,1.,  0.0,0.5,  0.0,3.0,  0.0,-1.0], 5, 2)
+        conn2 = DataArrayInt([NORM_SEG3,0,2,1,NORM_SEG2,3,0,NORM_SEG2,2,4])
+        connI2 = DataArrayInt([0,4,7,10])
+        m2.setCoords(coord2)
+        m2.setConnectivity(conn2, connI2)
+
+        # End of construction of input meshes m1bis and m2 -> start of specific part of the test
+        m3, map1, map2, mapI2 = MEDCouplingUMesh.Intersect2DMeshWith1DLine(m1, m2, 1e-10)
+        m3.mergeNodes(1.0e-8)
+                
+        self.assertEqual(3,m3.getNumberOfCells())
+        self.assertEqual(2,m3.getSpaceDimension())
+        # Mapping
+        exp1, exp2, expI2 = [0,0,1], [1, 0, 2, 1, 0, 2], [0, 3, 6, 6]
+        self.assertEqual(3, map1.getNumberOfTuples())
+        self.assertEqual(6, map2.getNumberOfTuples())
+        self.assertEqual(4, mapI2.getNumberOfTuples())
+        self.assertEqual(exp1, map1.getValues())
+        self.assertEqual(exp2, map2.getValues())
+        self.assertEqual(expI2, mapI2.getValues())
+        
+        expConn = [32, 1, 11, 8, 6, 12, 4, 13, 14, 7, 15, 16, 17, 32, 11, 0, 3, 12, 6, 8, 18, 19, 20, 15, 7, 14, 5, 2, 1, 4, 5] # 31tpl
+        expConnI = [0, 13, 26, 31]
+        self.assertEqual(31, m3.getNodalConnectivity().getNumberOfTuples())
+        self.assertEqual(4, m3.getNodalConnectivityIndex().getNumberOfTuples())
+        self.assertEqual(expConn, m3.getNodalConnectivity().getValues())
+        self.assertEqual(expConnI, m3.getNodalConnectivityIndex().getValues())
+        pass
+
     def testOrderConsecutiveCells1D1(self):
         # A line in several unconnected pieces:
         m2 = MEDCouplingUMesh.New("bla", 1)

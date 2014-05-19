@@ -8742,24 +8742,20 @@ MEDCouplingUMesh *MEDCouplingUMesh::Intersect2DMeshes(const MEDCouplingUMesh *m1
  *  \throw If m1 is not a mesh of dimension 2, or m1 is not a mesh of dimension 1
  *  \throw If m2 is not a (piecewise) line (i.e. if a point has more than 2 adjacent segments)
  */
-MEDCouplingUMesh *MEDCouplingUMesh::Intersect2DMeshWith1DLine(const MEDCouplingUMesh *m1, const MEDCouplingUMesh *m2,
+MEDCouplingUMesh *MEDCouplingUMesh::Intersect2DMeshWith1DLine(const MEDCouplingUMesh *m1, const MEDCouplingUMesh *mesh2,
                                                               double eps, DataArrayInt *&cellNb1, DataArrayInt *&cellNb2, DataArrayInt *&cellNbI2)
 {
   m1->checkFullyDefined();
-  m2->checkFullyDefined();
-  if(m1->getMeshDimension()!=2 || m1->getSpaceDimension()!=2 || m2->getMeshDimension()!=1 || m2->getSpaceDimension()!=2)
+  mesh2->checkFullyDefined();
+  if(m1->getMeshDimension()!=2 || m1->getSpaceDimension()!=2 || mesh2->getMeshDimension()!=1 || mesh2->getSpaceDimension()!=2)
     throw INTERP_KERNEL::Exception("MEDCouplingUMesh::Intersect2DMeshWith1DLine works on unstructured meshes m1 with (meshdim, spacedim) = (2,2) and m2 with (meshdim, spacedim) = (1,2)!");
 
-  // Check that m2 is a line (and not a more complex 1D mesh) - each point is used at most by 2 segments:
-  DataArrayInt * d = DataArrayInt::New(), * dI = DataArrayInt::New();
-  DataArrayInt *rD = DataArrayInt::New(), * rDI = DataArrayInt::New();
-  MEDCouplingUMesh * m_points;
-  m_points = m2->buildDescendingConnectivity(d, dI, rD, rDI);
-  DataArrayInt * dsi = rDI->deltaShiftIndex();
-  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> dsii = dsi->getIdsNotInRange(0,3);
-  m_points->decrRef(); d->decrRef(); dI->decrRef(); rD->decrRef(); rDI->decrRef(); dsi->decrRef();
-  if (dsii->getNumberOfTuples())
-    throw INTERP_KERNEL::Exception("MEDCouplingUMesh::Intersect2DMeshWith1DLine only work with mesh2 being a (piecewise) connected line!");
+  // Check that m2 is a line (and not a more complex 1D mesh) and get a consecutive segment numbering
+  // (this will help to identify consecutive segments when performing the intersection)
+  int nc2 = mesh2->getNumberOfCells();
+  MEDCouplingAutoRefCountObjectPtr<DataArrayInt> renumb = mesh2->orderConsecutiveCells1D();
+  MEDCouplingAutoRefCountObjectPtr<MEDCouplingUMesh> m2 = (MEDCouplingUMesh *)mesh2->deepCpyConnectivityOnly();
+  m2->renumberCells(renumb->getConstPointer(), false);
 
   // Step 1: compute all edge intersections (new nodes)
   std::vector< std::vector<int> > intersectEdge1, colinear2, subDiv2;
@@ -8804,6 +8800,9 @@ MEDCouplingUMesh *MEDCouplingUMesh::Intersect2DMeshWith1DLine(const MEDCouplingU
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> c1=DataArrayInt::New(); c1->alloc((int)cNb1.size(),1); std::copy(cNb1.begin(),cNb1.end(),c1->getPointer());
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> c2=DataArrayInt::New(); c2->alloc((int)cNb2.size(),1); std::copy(cNb2.begin(),cNb2.end(),c2->getPointer());
   MEDCouplingAutoRefCountObjectPtr<DataArrayInt> cI2=DataArrayInt::New(); cI2->alloc((int)cNbI2.size(),1); std::copy(cNbI2.begin(),cNbI2.end(),cI2->getPointer());
+
+  const int * ptr = renumb->getConstPointer();
+  c2->transformWithIndArr(ptr, ptr+nc2);
   ret->setConnectivity(conn,connI,true);
   ret->setCoords(coo);
   cellNb1=c1.retn(); cellNb2=c2.retn();cellNbI2=cI2.retn();
