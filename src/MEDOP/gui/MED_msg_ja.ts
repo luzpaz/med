@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS>
+<TS version="2.0" language="ja" sourcelanguage="en">
   <context>
     <name>DatasourceController</name>
     <message>
@@ -86,7 +86,7 @@
       <source>ALIAS</source>
       <translation>エイリアス</translation>
     </message>
-    <message>
+    <message utf8="true">
       <location filename="MEDOP/gui/dialogs/DlgAlias.ui" line="436"/>
       <source>MSG_OPERATION_DEFINES_VARIABLE</source>
       <translation>(この操作はテキスト コンソールに&lt;alias&gt;という名前の変数を定義します。型 '&lt;alias&gt;. help()"利用可能な機能または単に「doc」参照する)&lt;/alias&gt; &lt;/alias&gt;</translation>
@@ -99,12 +99,12 @@
       <source>FORM</source>
       <translation>フォーム</translation>
     </message>
-    <message>
+    <message utf8="true">
       <location filename="MEDOP/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="403"/>
       <source>MESH_GT</source>
       <translation>-&gt; メッシュします。</translation>
     </message>
-    <message>
+    <message utf8="true">
       <location filename="MEDOP/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="420"/>
       <source>MSG_EXPLORER</source>
       <translation>(エクスプ ローラー データ空間で参照される MED (メッシュとフィールド) のデータのビューを提供します)</translation>
@@ -116,6 +116,7 @@
     </message>
     <message>
       <location filename="MEDOP/gui/dialogs/DlgChangeUnderlyingMesh.cxx" line="36"/>
+      <location filename="MEDOP/gui/dialogs/DlgChangeUnderlyingMesh.ui" line="391"/>
       <source>SELECT_MESH</source>
       <translation>エクスプ ローラーでメッシュを選択し、メッシュをクリックする必要があります。</translation>
     </message>
@@ -165,7 +166,7 @@
       <source>PRESSURE</source>
       <translation>圧力:</translation>
     </message>
-    <message>
+    <message utf8="true">
       <location filename="MEDOP/gui/dialogs/DlgUseInWorkspace.ui" line="56"/>
       <source>TEMPERATURE</source>
       <translation>温度:</translation>
@@ -183,6 +184,7 @@
     <name>MEDOPModule</name>
     <message>
       <location filename="MEDOP/gui/MEDOPModule.cxx" line="68"/>
+      <location filename="MEDOP/gui/MEDOPModule.cxx" line="157"/>
       <source>IMPORT_FROM_FILE</source>
       <translation>ファイルからのインポートします。</translation>
     </message>
@@ -269,6 +271,10 @@
     <name>@default</name>
     <message>
       <location filename="MEDOP/gui/MEDOPModule.cxx" line="151"/>
+      <location filename="MEDOP/gui/DatasourceController.cxx" line="152"/>
+      <location filename="MEDOP/gui/dialogs/DlgImageToMed.cxx" line="75"/>
+      <location filename="MEDOP/gui/WorkspaceController.cxx" line="267"/>
+      <location filename="MEDOP/gui/WorkspaceController.cxx" line="420"/>
       <source>FILE_FILTER_MED</source>
       <translation>音楽配信マック ＆ ファイル (* .med)</translation>
     </message>
